@@ -1,0 +1,711 @@
+1
+00:00:00,600 --> 00:00:04,192
+Hi everyone, and welcome to Linear Algebra at WenQuest.
+
+2
+00:00:04,592 --> 00:00:08,029
+This is Chapter 14, Section 2, the spectral theorem.
+
+3
+00:00:09,549 --> 00:00:12,060
+Let's start with a problem from the shop floor.
+
+4
+00:00:12,460 --> 00:00:15,711
+A robot arm holds a grinding wheel, or a deburring tool.
+
+5
+00:00:15,731 --> 00:00:18,690
+The tool presses on the part, the part pushes back,
+
+6
+00:00:18,710 --> 00:00:21,144
+and the tip of the arm gives way a little.
+
+7
+00:00:21,544 --> 00:00:25,706
+That little bit can be a few tenths of a millimetre of error on the finished part.
+
+8
+00:00:26,106 --> 00:00:29,984
+So an engineer wants to know: in which direction is the tip softest,
+
+9
+00:00:30,004 --> 00:00:33,138
+in which is it stiffest, and how big is the difference?
+
+10
+00:00:33,538 --> 00:00:37,680
+And a more practical question: if you push in some arbitrary direction,
+
+11
+00:00:37,700 --> 00:00:39,498
+where does the tip actually go?
+
+12
+00:00:39,898 --> 00:00:44,147
+In the last section we proved that the tip stiffness matrix is symmetric,
+
+13
+00:00:44,167 --> 00:00:48,006
+and that the eigenvectors of a symmetric matrix are perpendicular.
+
+14
+00:00:48,406 --> 00:00:50,907
+If we can always find a full set of them,
+
+15
+00:00:50,927 --> 00:00:55,455
+the stiffness matrix is just a few independent springs along perpendicular
+
+16
+00:00:55,475 --> 00:00:56,132
+directions.
+
+17
+00:00:56,532 --> 00:01:00,070
+Today's result, the spectral theorem, guarantees exactly that.
+
+18
+00:01:01,590 --> 00:01:06,490
+The spectral theorem says: let A be a real symmetric matrix of size n by n.
+
+19
+00:01:06,890 --> 00:01:12,235
+Then there is an orthogonal matrix Q and a real diagonal matrix Lambda such
+
+20
+00:01:12,255 --> 00:01:15,597
+that A equals Q times Lambda times Q transpose.
+
+21
+00:01:15,997 --> 00:01:19,670
+Orthogonal means Q transpose times Q is the identity.
+
+22
+00:01:19,690 --> 00:01:22,666
+The columns are perpendicular unit vectors.
+
+23
+00:01:23,066 --> 00:01:27,205
+The columns of Q are an orthonormal set of eigenvectors of A,
+
+24
+00:01:27,225 --> 00:01:31,569
+and the diagonal entries of Lambda are the matching eigenvalues.
+
+25
+00:01:31,969 --> 00:01:33,639
+The converse is true too.
+
+26
+00:01:33,659 --> 00:01:38,301
+Any matrix of the form Q Lambda Q transpose equals its own transpose,
+
+27
+00:01:38,321 --> 00:01:39,585
+so it is symmetric.
+
+28
+00:01:39,985 --> 00:01:40,902
+In other words,
+
+29
+00:01:40,922 --> 00:01:45,710
+being real symmetric and being diagonalizable by an orthogonal matrix are the
+
+30
+00:01:45,730 --> 00:01:46,397
+same thing.
+
+31
+00:01:47,917 --> 00:01:51,544
+The proof is by induction. Let's look only at the key step.
+
+32
+00:01:51,944 --> 00:01:57,599
+The characteristic polynomial always has a root, so take an eigenvalue λ₁ of A.
+
+33
+00:01:57,619 --> 00:02:02,555
+We showed last time it must be real. Take a real unit eigenvector q₁,
+
+34
+00:02:02,575 --> 00:02:04,997
+extend it to an orthonormal basis,
+
+35
+00:02:05,017 --> 00:02:08,373
+and put the basis into an orthogonal matrix Q₁.
+
+36
+00:02:08,773 --> 00:02:12,164
+Now change coordinates with Q₁ and see what A becomes.
+
+37
+00:02:12,564 --> 00:02:16,926
+The lower-left block is UᵀAq₁, which is λ₁Uᵀq₁.
+
+38
+00:02:16,946 --> 00:02:22,892
+The columns of U are perpendicular to q₁, so this block is zero.
+
+39
+00:02:23,292 --> 00:02:24,580
+Here is the key point.
+
+40
+00:02:24,600 --> 00:02:28,325
+The upper-right block is the transpose of the lower-left block,
+
+41
+00:02:28,345 --> 00:02:29,633
+so it is zero as well.
+
+42
+00:02:30,033 --> 00:02:33,715
+For a general matrix this step clears only the first column.
+
+43
+00:02:33,735 --> 00:02:37,232
+For a symmetric matrix the first row is cleared for free.
+
+44
+00:02:37,632 --> 00:02:41,231
+What is left, B, is still symmetric and one size smaller.
+
+45
+00:02:41,251 --> 00:02:44,786
+Repeat the same step on B, peel off one layer at a time,
+
+46
+00:02:44,806 --> 00:02:47,008
+and you end with a diagonal matrix.
+
+47
+00:02:48,528 --> 00:02:51,024
+The theorem has some immediate consequences.
+
+48
+00:02:51,424 --> 00:02:54,894
+First, a symmetric matrix can always be diagonalized.
+
+49
+00:02:54,914 --> 00:02:59,765
+Every eigenvalue has as many independent eigenvectors as its multiplicity,
+
+50
+00:02:59,785 --> 00:03:04,176
+so unlike the shear matrix in the last chapter, we never run short.
+
+51
+00:03:04,576 --> 00:03:07,533
+Second, the diagonalizing matrix is orthogonal.
+
+52
+00:03:07,553 --> 00:03:11,649
+Its inverse is just its transpose, so there is nothing to invert.
+
+53
+00:03:12,049 --> 00:03:14,330
+You will often see this stated as:
+
+54
+00:03:14,350 --> 00:03:19,271
+every real symmetric matrix is orthogonally similar to a diagonal matrix.
+
+55
+00:03:19,671 --> 00:03:23,351
+In code, always use numpy's eigh for symmetric matrices.
+
+56
+00:03:23,371 --> 00:03:28,108
+It returns the eigenvalues in increasing order and an orthonormal set of
+
+57
+00:03:28,128 --> 00:03:28,966
+eigenvectors.
+
+58
+00:03:30,486 --> 00:03:35,537
+So what does A = QΛQᵀ mean geometrically? Let's watch.
+
+59
+00:03:35,937 --> 00:03:41,344
+Here A is the 2 × 2 symmetric matrix (2 1; 1 2). Its eigenvalues are 1 and 3,
+
+60
+00:03:41,364 --> 00:03:45,079
+and the green and red eigenvectors are perpendicular.
+
+61
+00:03:45,479 --> 00:03:47,501
+Step one. Qᵀ is a rotation.
+
+62
+00:03:47,521 --> 00:03:51,660
+It turns the two eigenvectors onto the coordinate axes.
+
+63
+00:03:51,680 --> 00:03:54,685
+Q can always be chosen to be a rotation.
+
+64
+00:03:55,085 --> 00:03:57,713
+Step two. Λ stretches along the axes,
+
+65
+00:03:57,733 --> 00:04:01,076
+by a factor of 1 horizontally and 3 vertically.
+
+66
+00:04:01,096 --> 00:04:03,581
+The two directions don't interfere.
+
+67
+00:04:03,981 --> 00:04:05,807
+Step three. Q rotates back.
+
+68
+00:04:05,827 --> 00:04:11,005
+The unit circle has become an ellipse whose axes lie along the eigenvectors.
+
+69
+00:04:11,405 --> 00:04:14,122
+Finally, transform the circle by A directly.
+
+70
+00:04:14,142 --> 00:04:18,040
+The white curve lands exactly on the result of the three steps.
+
+71
+00:04:18,440 --> 00:04:19,453
+In one sentence:
+
+72
+00:04:19,473 --> 00:04:24,617
+a symmetric matrix stretches space independently along perpendicular directions.
+
+73
+00:04:24,637 --> 00:04:29,523
+The circle becomes an ellipse whose semi-axes are the absolute values of the
+
+74
+00:04:29,543 --> 00:04:30,297
+eigenvalues.
+
+75
+00:04:31,817 --> 00:04:37,953
+Multiply out QΛQᵀ as columns times rows, and you get another way to write it.
+
+76
+00:04:38,353 --> 00:04:46,979
+A = λ₁q₁q₁ᵀ + λ₂q₂q₂ᵀ + … + λₙqₙqₙᵀ.
+
+77
+00:04:47,379 --> 00:04:51,024
+Each qᵢqᵢᵀ is the projection onto the i-th axis.
+
+78
+00:04:51,044 --> 00:04:54,154
+These projections add up to the identity,
+
+79
+00:04:54,174 --> 00:04:57,514
+and any two different ones multiply to zero.
+
+80
+00:04:57,914 --> 00:05:02,284
+So a symmetric matrix is a weighted sum of perpendicular projections,
+
+81
+00:05:02,304 --> 00:05:05,911
+and the weights are the eigenvalues. Applied to a vector,
+
+82
+00:05:05,931 --> 00:05:10,619
+it projects onto each axis, scales by the eigenvalue, and adds the pieces.
+
+83
+00:05:10,639 --> 00:05:12,846
+This is the spectral decomposition.
+
+84
+00:05:13,246 --> 00:05:17,016
+It makes functions of a matrix easy. To get f(A),
+
+85
+00:05:17,036 --> 00:05:20,032
+just replace each eigenvalue λ by f(λ).
+
+86
+00:05:20,432 --> 00:05:25,200
+For example, the compliant wrist has stiffness K equal to (4 1; 1 4),
+
+87
+00:05:25,220 --> 00:05:26,935
+with eigenvalues 3 and 5.
+
+88
+00:05:26,955 --> 00:05:31,099
+Replace them by √3 and √5 and you have the square root of K.
+
+89
+00:05:31,119 --> 00:05:36,095
+Square roots of symmetric positive definite matrices show up in weighted
+
+90
+00:05:36,115 --> 00:05:38,593
+least squares and in Kalman filters.
+
+91
+00:05:40,113 --> 00:05:47,222
+Back to the robot. A planar two-link arm has links of 0.4 and 0.3 metres,
+
+92
+00:05:47,242 --> 00:05:51,812
+and joint stiffnesses of 2000 and 1000 N·m/rad.
+
+93
+00:05:52,212 --> 00:05:58,114
+The tip compliance is C = JK_q⁻¹Jᵀ, and the tip stiffness is its inverse.
+
+94
+00:05:58,134 --> 00:06:03,225
+At the pose (0°, 90°), the program gives this stiffness matrix,
+
+95
+00:06:03,245 --> 00:06:04,848
+and it is symmetric.
+
+96
+00:06:05,248 --> 00:06:11,187
+Run eigh, and the principal stiffnesses come out as 5764 and 24097 N/m,
+
+97
+00:06:11,207 --> 00:06:16,559
+more than four times apart. The soft axis points at 147 degrees,
+
+98
+00:06:16,579 --> 00:06:21,260
+the stiff axis at 57 degrees, perpendicular as promised.
+
+99
+00:06:21,660 --> 00:06:23,941
+Now push straight down with 10 newtons.
+
+100
+00:06:23,961 --> 00:06:26,891
+The spectral decomposition does it in three steps.
+
+101
+00:06:27,291 --> 00:06:30,798
+Step one, split the force onto the two axes.
+
+102
+00:06:30,818 --> 00:06:36,089
+About 5.4 newtons land on the soft axis and 8.4 on the stiff axis.
+
+103
+00:06:36,489 --> 00:06:39,707
+Step two, divide each by its stiffness.
+
+104
+00:06:39,727 --> 00:06:45,436
+The soft axis moves about 0.94 millimetres, the stiff axis only 0.35.
+
+105
+00:06:45,836 --> 00:06:51,150
+Step three, add them back. The deflection is (0.6, −0.8) millimetres,
+
+106
+00:06:51,170 --> 00:06:54,243
+the same as solving the system directly.
+
+107
+00:06:54,643 --> 00:06:57,059
+Notice that the push is straight down,
+
+108
+00:06:57,079 --> 00:07:00,778
+yet the deflection is about 37 degrees away from the push,
+
+109
+00:07:00,798 --> 00:07:02,125
+toward the soft axis.
+
+110
+00:07:02,145 --> 00:07:06,421
+Push with 10 newtons in every direction and the tips trace out this
+
+111
+00:07:06,441 --> 00:07:07,640
+compliance ellipse.
+
+112
+00:07:09,160 --> 00:07:12,173
+All these numbers come from Program 14.2.1.
+
+113
+00:07:12,193 --> 00:07:15,701
+Every number in the book is computed by a program.
+
+114
+00:07:16,101 --> 00:07:19,248
+The heart of it is a few lines. Build the compliance,
+
+115
+00:07:19,268 --> 00:07:23,731
+invert it to get the stiffness, call eigh, project the force onto the axes,
+
+116
+00:07:23,751 --> 00:07:26,301
+divide by the stiffnesses, and rotate back.
+
+117
+00:07:26,701 --> 00:07:30,200
+Here is the output. You can run it on the platform yourself,
+
+118
+00:07:30,220 --> 00:07:32,488
+change the pose or the joint stiffness,
+
+119
+00:07:32,508 --> 00:07:35,011
+and watch the principal stiffnesses change.
+
+120
+00:07:36,531 --> 00:07:41,385
+Now let's open Lab 14.2, the stiffness ellipse at a robot's tip.
+
+121
+00:07:41,785 --> 00:07:44,826
+Here is a planar two-link arm with elastic joints.
+
+122
+00:07:44,846 --> 00:07:48,071
+The ellipse around the tip is the compliance ellipse.
+
+123
+00:07:48,091 --> 00:07:52,234
+Its long axis is the soft axis and its short axis is the stiff axis.
+
+124
+00:07:52,634 --> 00:07:55,812
+Drag the push direction φ. Except along the two axes,
+
+125
+00:07:55,832 --> 00:08:00,700
+the deflection always swerves toward the soft axis instead of following the push.
+
+126
+00:08:01,100 --> 00:08:04,334
+The readout on the right shows the angle between them.
+
+127
+00:08:04,354 --> 00:08:07,587
+It is zero only when the push lies exactly on an axis.
+
+128
+00:08:07,607 --> 00:08:11,926
+Your first task is to turn the push onto the softest direction yourself,
+
+129
+00:08:11,946 --> 00:08:16,023
+so that the deflection lines up with it and is as large as possible.
+
+130
+00:08:16,423 --> 00:08:20,611
+Now turn the first joint, and keep an eye on the two principal stiffnesses.
+
+131
+00:08:21,011 --> 00:08:25,614
+The axes turn with the arm, but the stiffness values do not change. Why not?
+
+132
+00:08:25,634 --> 00:08:28,533
+That is the question to think about in this lab.
+
+133
+00:08:28,933 --> 00:08:31,261
+Now change the angle of the second joint.
+
+134
+00:08:31,281 --> 00:08:33,838
+Make it smaller and the ellipse gets flatter.
+
+135
+00:08:34,238 --> 00:08:36,435
+Make it larger and it gets rounder. So,
+
+136
+00:08:36,455 --> 00:08:40,187
+can you make the tip equally stiff in every direction? Which pose,
+
+137
+00:08:40,207 --> 00:08:43,882
+which stiffness? Each of the four tasks is checked automatically,
+
+138
+00:08:43,902 --> 00:08:47,066
+and the lab guide and report template are ready for you.
+
+139
+00:08:48,586 --> 00:08:52,837
+What you learned today is used in the WenQuest digital factory as well.
+
+140
+00:08:53,237 --> 00:08:55,954
+This is the motion and dynamics module.
+
+141
+00:08:55,974 --> 00:09:00,517
+It uses MuJoCo to simulate a UR5e arm carrying a 3 kilogram load,
+
+142
+00:09:00,537 --> 00:09:02,763
+plots the torque at every joint,
+
+143
+00:09:02,783 --> 00:09:06,553
+and then picks the motors and gearboxes automatically.
+
+144
+00:09:06,953 --> 00:09:08,427
+A gearbox is not rigid.
+
+145
+00:09:08,447 --> 00:09:12,976
+Its torsional stiffness is the main source of the joint stiffness k in
+
+146
+00:09:12,996 --> 00:09:14,016
+today's formula.
+
+147
+00:09:14,416 --> 00:09:16,391
+Once the gearbox is chosen,
+
+148
+00:09:16,411 --> 00:09:20,381
+you can plug its stiffness into C = JK_q⁻¹Jᵀ yourself,
+
+149
+00:09:20,401 --> 00:09:24,371
+get the arm's stiffness ellipsoid in its working pose,
+
+150
+00:09:24,391 --> 00:09:27,475
+and see which way the tool will be pushed.
+
+151
+00:09:27,875 --> 00:09:33,697
+On the platform you can try today's method on the digital factory's UR5e simulation.
+
+152
+00:09:35,217 --> 00:09:37,701
+There are four exercises for this lecture.
+
+153
+00:09:38,101 --> 00:09:43,628
+The first is a computation. Write a 2 × 2 symmetric matrix as QΛQᵀ,
+
+154
+00:09:43,648 --> 00:09:46,278
+and as a spectral decomposition.
+
+155
+00:09:46,678 --> 00:09:51,133
+The second is a proof. If a symmetric matrix satisfies A² = A,
+
+156
+00:09:51,153 --> 00:09:53,731
+show it is an orthogonal projection.
+
+157
+00:09:54,131 --> 00:09:55,642
+The third is programming.
+
+158
+00:09:55,662 --> 00:10:00,784
+Compute a matrix exponential from the spectral decomposition and compare with scipy.
+
+159
+00:10:01,184 --> 00:10:02,993
+The fourth is about the robot.
+
+160
+00:10:03,013 --> 00:10:06,407
+Find the principal stiffnesses and axes at another pose,
+
+161
+00:10:06,427 --> 00:10:10,187
+and explain why turning the first joint leaves them unchanged.
+
+162
+00:10:10,587 --> 00:10:12,505
+Plus the report for Lab 14.2.
+
+163
+00:10:12,525 --> 00:10:17,450
+Submit your work on the platform and the AI gives you feedback right away,
+
+164
+00:10:17,470 --> 00:10:18,319
+step by step.
+
+165
+00:10:19,839 --> 00:10:21,926
+To sum up in three sentences.
+
+166
+00:10:21,946 --> 00:10:27,086
+A real symmetric matrix is exactly a matrix you can diagonalize with an
+
+167
+00:10:27,106 --> 00:10:28,394
+orthogonal matrix.
+
+168
+00:10:28,794 --> 00:10:32,790
+Geometrically, it rotates, stretches along perpendicular axes,
+
+169
+00:10:32,810 --> 00:10:33,891
+and rotates back.
+
+170
+00:10:34,291 --> 00:10:38,366
+The spectral decomposition writes it as a weighted sum of projections,
+
+171
+00:10:38,386 --> 00:10:42,518
+and the axes of a robot's stiffness ellipse are the eigenvectors of its
+
+172
+00:10:42,538 --> 00:10:43,513
+stiffness matrix.
+
+173
+00:10:43,913 --> 00:10:45,335
+The lab, the program,
+
+174
+00:10:45,355 --> 00:10:50,279
+the notes and the exercises are all on the WenQuest learning platform at
+
+175
+00:10:50,299 --> 00:10:52,133
+learn.wenquestrobotics.com.
+
+176
+00:10:52,153 --> 00:10:54,811
+Sign up for free and try them yourself.
+
+177
+00:10:55,211 --> 00:10:59,153
+Next time we extend the spectral theorem to complex matrices,
+
+178
+00:10:59,173 --> 00:11:04,220
+with Hermitian and unitary matrices and the Schur decomposition. See you then.
