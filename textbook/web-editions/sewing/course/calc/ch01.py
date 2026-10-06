@@ -29,3 +29,9 @@ print("pool years:", 1877 - 1856)
 print("Howe->Singer:", 1851 - 1846, "years; Thimonnier 1830 -> Gibbs 1857:", 1857 - 1830)
 # Thimonnier 200 st/min vs 5000 st/min: time per stitch
 print("time per stitch 200:", 60 / 200 * 1000, "ms; 5000:", 60 / 5000 * 1000, "ms")
+# numbers quoted by the slides and the lecture video (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    F = {n: m * a_bdc(n) for n in (200, 4000, 5000, 6000)}
+    out(F200=F[200], F4000=F[4000], F5000=F[5000], F6000=F[6000], a200=a_bdc(200), a5000=a_bdc(5000),
+        up56=(F[6000] / F[5000] - 1) * 100, ratio=F[5000] / F[200], hits6000=6000 / 60)
