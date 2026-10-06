@@ -41,3 +41,22 @@ def narrate(llm, a, ch):
     if not text or extra:
         return {"text": base, "by": "rules", "note": "模型输出里有输入中没有的数字（{}），已退回规则版".format("、".join(sorted(extra))[:60])}
     return {"text": text, "by": llm.name}
+
+
+def polish(llm, base, facts, instruction, limit=200):
+    """通用的“有模型就改写成人话”（第 17 轮 D 期 D5）：推荐理由、日报周报的文字。
+    数字逐个核对：输出里不能有输入（facts + base）里没有的数字，否则退回规则文字。"""
+    if llm is None or not llm.available() or not base:
+        return {"text": base, "by": "rules"}
+    src = json.dumps({"规则文字": base, "事实": facts}, ensure_ascii=False, default=str)
+    system = ("你是工厂厂情中枢的助手。{}（{} 字以内，中文）。只能用给出的事实和数字，不增加、不推测；"
+              "保留全部单号和金额。").format(instruction, limit)
+    try:
+        text, _ = llm.run(system, [{"role": "user", "content": src}], [], lambda n, x: None, max_turns=1)
+    except Exception as e:  # noqa: BLE001
+        return {"text": base, "by": "rules", "note": "模型调用失败（{}），用规则版".format(type(e).__name__)}
+    text = (text or "").strip()
+    extra = _numbers(text) - _numbers(src)
+    if not text or extra:
+        return {"text": base, "by": "rules", "note": "模型输出里有输入中没有的数字（{}），已退回规则版".format("、".join(sorted(extra))[:60])}
+    return {"text": text, "by": llm.name}

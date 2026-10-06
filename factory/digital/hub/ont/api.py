@@ -379,8 +379,13 @@ def mount_anomaly(app, H, user_of, who):
                         "error": st.get("error"), "ms": st.get("ms"), "nodata": st.get("nodata", False)})
         changes = [{"ts": x["ts"].isoformat(), "who": x["who"], "rule": x["rule"], "field": x["field"], "old": x["old"], "new": x["new"]}
                    for x in H.db.q("select * from rule_change order by id desc limit 50")]
+        try:
+            from hub.ont import retro as RT                 # 第 17 轮 D 期：复盘的校准提示
+            calib = RT.calibration(H.db, u["mode"])
+        except Exception:  # noqa: BLE001
+            calib = []
         return {"rules": out, "changes": changes, "can_edit": bool(u.get("teacher")) and u.get("role") == "manager",
-                "last_round": d.last_round.get(u["mode"])}
+                "last_round": d.last_round.get(u["mode"]), "calibration": calib}
 
     @app.post("/api/ont/rules/{rid}")
     def rule_set(rid: str, body: dict = Body(default={}), u=Depends(user_of)):

@@ -6,6 +6,11 @@
       <TaskBar v-if="ov.teach" :t="ov.teach" />
       <div v-if="ov.demo" class="demo small">含“实验 7”教学情景的演示数据（订单、库存等由情景生成，不在 ERPNext 里）。教师可在“经营与成本”页重置或清空。</div>
 
+      <!-- 厂情中枢提醒条（第 17 轮 D 期 D6）：严重异常和带处理预案的异常；教学模式的学生不显示（实验 7 要自己从看板里找） -->
+      <router-link v-for="b in banner" :key="b.id" :to="b.url" class="ont-banner" :class="b.severity">
+        <b>{{ b.severity === 'critical' ? '严重' : '注意' }}</b><span>{{ b.text }}</span><span class="go">去处理 →</span>
+      </router-link>
+
       <!-- AI 今日简报 -->
       <section class="card brief" aria-label="AI 今日简报">
         <div class="brief-main">
@@ -148,9 +153,9 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { post, roleName, session } from '../lib/api';
+import { get, post, roleName, session } from '../lib/api';
 import { bus } from '../lib/bus';
 import { useOverview } from '../lib/overview';
 import { ask as aiAsk } from '../lib/ai';
@@ -198,6 +203,14 @@ function srcText(ev) {
   const t = (e.topic || '').replace('wq/gearbox/', '');
   return t + (e.name ? ' · ' + e.name : e.item ? ' · ' + e.item : e.ts ? ' · ' + timeOf(e.ts) : '') + (ev.length > 1 ? `（等 ${ev.length} 条）` : '');
 }
+const banner = ref([]);
+async function loadBanner() {
+  if (teach.value && !session.user.teacher) { banner.value = []; return; }
+  try { banner.value = (await get('/ont/banner')).items; } catch { banner.value = []; }
+}
+let bannerTimer = null;
+onMounted(() => { loadBanner(); bannerTimer = setInterval(loadBanner, 30000); });
+onUnmounted(() => clearInterval(bannerTimer));
 function ask(t) { aiAsk(t); }
 function askAi() { const t = q.value; q.value = ''; aiAsk(t); }
 async function refreshBrief() { await post('/ai/briefing/refresh'); load(); }
@@ -216,6 +229,10 @@ function act(t) {
 .link { border: 0; background: none; color: var(--accent); cursor: pointer; padding: 0; }
 .brief-item { display: flex; gap: 12px; align-items: baseline; }
 .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; position: relative; top: -1px; }
+.ont-banner { display: flex; gap: 10px; align-items: center; padding: 10px 14px; border-radius: 10px; margin-bottom: 10px; text-decoration: none;
+  background: #FFF6E5; border: 1px solid #F2C46D; color: #6B4500; font-size: 13px; }
+.ont-banner.critical { background: #FDECEA; border-color: #E8A39B; color: #8A1F14; }
+.ont-banner .go { margin-left: auto; white-space: nowrap; font-weight: 500; }
 .brief-text { font-size: 14px; line-height: 1.55; }
 .brief-ask { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px; justify-content: flex-end; }
 .brief-ask input { height: 40px; border: 1px solid #C8CEC7; border-radius: 8px; padding: 0 12px; }

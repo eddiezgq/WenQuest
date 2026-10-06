@@ -401,7 +401,7 @@ class Overview:
         return {"characteristic": characteristic, "title": CHARTS.get(characteristic, characteristic),
                 "name": d0.get("name"), "lower": lo, "upper": hi, "center": center,
                 "points": [{"serial": m["data"]["part_serial"], "value": m["data"]["value_mm"],
-                            "result": m["data"]["result"], "ts": m["ts"], "id": m["id"]} for m in pts],
+                            "result": m["data"]["result"], "ts": m["ts"], "id": m["id"], "seq": m.get("_seq")} for m in pts],
                 "mean_last5": round(mean5, 4), "shift_um": round((mean5 - center) * 1000, 1),
                 "margin_um": round((hi - max(last5)) * 1000, 1),
                 "src": unit_topic("qc-01", "measurement")}

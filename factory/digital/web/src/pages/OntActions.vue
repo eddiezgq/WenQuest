@@ -25,6 +25,10 @@
       </div>
       <div v-if="a.result" class="small">{{ a.result.text || a.result.error }}</div>
       <div class="a-a">
+        <template v-if="a.status === 'draft' && a.mine">
+          <button class="btn sm primary" @click="act(a, 'submit')">提交（附试运行）</button>
+          <span class="small muted">草稿：提交以后才进入审批</span>
+        </template>
         <template v-if="a.status === 'submitted'">
           <button class="btn sm primary" :disabled="!a.can_approve" :title="a.why_not" @click="act(a, 'approve')">批准并执行</button>
           <input v-model="reason[a.id]" placeholder="驳回原因" aria-label="驳回原因">
@@ -42,16 +46,18 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { get, post } from '../lib/api';
 import { fmtTs } from '../lib/ont';
 
 const BOX = { todo: '待我批准', mine: '我发起的', all: '全部' };
-const box = ref('todo');
+const route = useRoute();
+const box = ref(BOX[route.query.box] ? route.query.box : 'todo');
 const list = ref([]);
 const err = ref('');
 const reason = reactive({});
 const open = reactive({});
-function tone(s) { return { done: 'good', failed: 'bad', rejected: 'bad', submitted: 'warn', executing: 'info' }[s] || 'mute'; }
+function tone(s) { return { done: 'good', failed: 'bad', rejected: 'bad', submitted: 'warn', executing: 'info', draft: 'info' }[s] || 'mute'; }
 function baseLate(a, name) {
   const s = (a.trial?.base?.sales_orders || []).find((x) => x.name === name);
   if (!s || s.late_days === null) return '—';

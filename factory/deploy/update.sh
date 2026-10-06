@@ -20,6 +20,13 @@ APP="${1:-}"; BRIDGE="${2:-}"; OPENPLC="${3:-}"
 [ -n "$(envval WQ_ERP_OAUTH_SECRET)" ] || envset WQ_ERP_OAUTH_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 企业版演示工厂（第 9 轮）的工作台密钥：启动前要有
 [ -n "$(envval WQ_DEMO_SECRET)" ] || envset WQ_DEMO_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)"
+# AI 代理的模型、厂情提醒的发信（第 17 轮 D 期）：工厂 .env 里没填的，沿用学习平台已有的配置（Claude / DeepSeek 密钥、SMTP）
+[ -n "$(envval WQ_CLAUDE_KEY)" ] || [ -z "$(learnval ANTHROPIC_API_KEY)" ] || envset WQ_CLAUDE_KEY "$(learnval ANTHROPIC_API_KEY)"
+[ -n "$(envval WQ_DEEPSEEK_KEY)" ] || [ -z "$(learnval DEEPSEEK_API_KEY)" ] || envset WQ_DEEPSEEK_KEY "$(learnval DEEPSEEK_API_KEY)"
+for k in HOST PORT SECURE USER PASSWORD; do
+    [ -n "$(envval "WQ_SMTP_$k")" ] || [ -z "$(learnval "SMTP_$k")" ] || envset "WQ_SMTP_$k" "$(learnval "SMTP_$k")"
+done
+[ -n "$(envval WQ_MAIL_FROM)" ] || [ -z "$(learnval MOODLE_NOREPLY_EMAIL)" ] || envset WQ_MAIL_FROM "$(learnval MOODLE_NOREPLY_EMAIL)"
 for id in $(class_ids); do                 # 班级工厂（第 10 轮）的工作台密钥
     k="WQ_C_$(printf '%s' "$id" | tr '[:lower:]' '[:upper:]')_SECRET"
     [ -n "$(envval "$k")" ] || envset "$k" "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)"

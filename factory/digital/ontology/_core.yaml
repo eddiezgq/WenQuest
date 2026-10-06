@@ -61,12 +61,58 @@ types:
   AiRun:
     label: AI 运行
     label_en: AI run
-    maturity: next
-    key: 运行编号
-    title: "{key}"
-    sources: [厂情中枢（17D 起）]
+    maturity: have
+    sensitivity: 1
+    key: 运行编号，如 AI-00031
+    title: "{key} {question}"
+    sources: [AI 代理运行记录（ai_run 表，第 17 轮 D 期）]
     props:
       question: {t: str, l: 问题}
+      kind: {t: str, l: 种类}
+      user: {t: str, l: 提问人}
+      engine: {t: str, l: 引擎}
+      tools: {t: json, l: 用到的工具}
+      verified: {t: bool, l: 数字核对通过}
+      feedback: {t: int, l: 反馈}
+      created: {t: time, l: 时间}
+    links:
+      looked_at: {to: "*", l: 查过, inv: AI 运行}
+      anomaly: {to: Anomaly, l: 分析, inv: AI 运行}
+      drafted: {to: ActionRun, l: 起草, inv: 起草它的 AI 运行}
+  Report:
+    label: 厂情报告
+    label_en: Ops report
+    maturity: have
+    key: 报告编号，如 RPT-00012
+    title: "{key} {title}"
+    sources: [厂情日报、经营周报（report 表，第 17 轮 D 期）]
+    props:
+      title: {t: str, l: 标题}
+      kind: {t: str, l: 种类}
+      period_start: {t: time, l: 起}
+      period_end: {t: time, l: 止}
+      engine: {t: str, l: 文字由}
+      created: {t: time, l: 生成时间}
+    links:
+      mentions: {to: "*", l: 提到, inv: 报告}
+  Retro:
+    label: 复盘
+    label_en: Retrospective
+    maturity: have
+    key: 复盘编号，如 RT-00004
+    title: "{key} {title}"
+    sources: [厂情中枢复盘（retro 表，第 17 轮 D 期）]
+    props:
+      title: {t: str, l: 标题}
+      predicted_cost: {t: num, l: 推演多花, u: "$"}
+      actual_cost: {t: num, l: 实际多花, u: "$"}
+      deviation_pct: {t: num, l: 完工偏差, u: "%"}
+      causes: {t: json, l: 偏差原因}
+      created: {t: time, l: 生成时间}
+    links:
+      anomaly: {to: Anomaly, l: 复盘, inv: 复盘}
+      scenario: {to: Scenario, l: 检验, inv: 被复盘}
+      action: {to: ActionRun, l: 针对, inv: 复盘}
   TaskSheet:
     label: 工程任务单
     label_en: Engineering task sheet

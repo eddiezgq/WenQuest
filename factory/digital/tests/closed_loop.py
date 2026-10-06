@@ -357,6 +357,30 @@ def main():
     hub("POST", "/api/ont/shifts", {"mode": "continuous"}, teacher)
     acts = hub("GET", "/api/ont/actions?box=all", token=teacher)["actions"]
     check(len(acts) >= 3, "动作收件箱里有 {} 个动作".format(len(acts)))
+
+    print("12. 厂情中枢：AI 代理、提醒、日报与复盘（第 17 轮 D 期）")
+    hub("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "inject_fault", "minutes": 600, "reason": "闭环测试：AI 代理"}, teacher)
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"]
+                            if x["rule"] == "P1" and (x["subject"] or {}).get("key") == "grd-01"), None), "磨床停机异常", 90, 2)
+    ans = hub("POST", "/api/ai/chat", {"messages": [{"role": "user", "content": "外圆磨床要是再停一天，哪张订单受影响？怎么办最划算？"}]}, teacher)
+    check("compare_options" in ans["tools"] and ans["refs"] and ans["check"]["ok"],
+          "AI 代理（{}）：调了 {}，{} 条引用，数字核对{}".format(ans["engine"], "、".join(ans["tools"]), len(ans["refs"]),
+                                                       "通过" if ans["check"]["ok"] else "没通过：{}".format(ans["check"]["unverified"][:2])))
+    if an:
+        ans = hub("POST", "/api/ont/anomalies/{}/analyze".format(an["id"]), {}, teacher)
+        check(ans["run_id"] and ans["refs"], "让 AI 分析 A-{:05d}：{}".format(an["id"], ans["answer"][:60].replace("\n", " ")))
+        run = hub("GET", "/api/ai/runs/{}".format(ans["run_id"]), token=teacher)
+        check(len(run["steps"]) >= 2, "运行记录：{} 步（{}）".format(len(run["steps"]), "、".join(s["tool"] for s in run["steps"])))
+        b = hub("GET", "/api/ont/banner", token=teacher)["items"]
+        check(any(x["id"] == an["id"] for x in b) or bool(b), "首页提醒条 {} 条".format(len(b)))
+        n = wait(lambda: next((x for x in hub("GET", "/api/notifications", token=teacher)["items"] if x["ref"] == "A-{:05d}".format(an["id"])), None),
+                 "铃铛通知", 60, 3)
+        check(n is not None, "铃铛里有这个异常的通知：{}".format((n or {}).get("title")))
+    rp = hub("POST", "/api/reports/generate", {"kind": "daily"}, teacher)
+    check(rp["data"]["anomalies"]["open"] >= 1 and "厂情日报" in rp["text"], "日报：{}".format(rp["text"].split("\n")[0][:80]))
+    st = hub("GET", "/api/lab15", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 15 页：5 个任务，自动评 60 分")
+    hub("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "reset"}, teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位

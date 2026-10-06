@@ -10,6 +10,7 @@
           <h1>{{ o.display }}</h1>
           <span v-if="o.display !== o.key" class="mono muted">{{ o.key }}</span>
           <span v-if="tone" class="pill" :class="tone">{{ stateText }}</span>
+          <button class="btn sm ghost askbtn" @click="ask(o.key + ' 现在怎么样？有什么影响？')">问 AI 这个对象</button>
         </div>
         <div class="small muted">
           {{ o.label_en }} · 首次出现 {{ fmtTs(o.first_ts) || '—' }} · 最近更新 {{ fmtTs(o.updated_at) }}
@@ -99,6 +100,7 @@ import { useRoute } from 'vue-router';
 import OntGraph from '../components/OntGraph.vue';
 import ChainGraph from '../components/ChainGraph.vue';
 import { get } from '../lib/api';
+import { ask } from '../lib/ai';
 import ObjLink from '../components/ObjLink.vue';
 import { ont, loadTypes, getObj, getTimeline, lineage, fmtVal, fmtTs, stateTone, toCsv, download, DOMAIN_COLOR } from '../lib/ont';
 
@@ -164,6 +166,7 @@ watch(() => route.fullPath, () => { if (route.path.startsWith('/ont/')) load(); 
 </script>
 
 <style scoped>
+.askbtn { margin-left: auto; }
 .head { border-top: 5px solid var(--c); }
 .crumb { color: var(--muted); margin-bottom: 4px; }
 .title { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }

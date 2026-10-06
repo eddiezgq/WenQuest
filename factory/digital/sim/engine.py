@@ -577,7 +577,7 @@ class Engine:
         m.down_since = t
         self.pub(unit_topic(m.unit, "event"), "machine.event", "sim/" + m.unit,
                  {"event": "fault" if kind == "fault" else "alarm", "code": "E-" + m.unit.upper(),
-                  "message": reason, "expected_duration_s": dur_s}, None)
+                  "message": reason, "expected_duration_s": dur_s, "factory_ts": self.factory_ts(t)}, None)
         self.at(m.down_until, "recover", unit=m.unit, until=m.down_until)
         self._status(m, force=True)
 
@@ -598,7 +598,7 @@ class Engine:
         m.state = "run" if m.active else "idle"
         self.pub(unit_topic(m.unit, "event"), "machine.event", "sim/" + m.unit,
                  {"event": "recover", "message": ("人工复位：" if manual else "") + m.down_reason,
-                  "downtime_s": round(lost, 1)}, None)
+                  "downtime_s": round(lost, 1), "factory_ts": self.factory_ts(t)}, None)
         self._try_start(m)
 
     # ------------------------------------------------------------ AGV

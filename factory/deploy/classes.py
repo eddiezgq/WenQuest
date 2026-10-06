@@ -56,6 +56,9 @@ def services(c, ci_ports=None):
         WQ_AI_PER_HOUR="${WQ_AI_PER_HOUR:-30}", WQ_HISTORY_DAYS="${WQ_HISTORY_DAYS:-30}", WQ_LIBRARY_DIR="/library",
         WQ_LIBRARY_ORIGINS="https://%s.factory.${SITE_DOMAIN}" % cid, WQ_PUBLIC_URL="https://%s.factory.${SITE_DOMAIN}" % cid,
         WQ_CLAUDE_KEY="${WQ_CLAUDE_KEY:-}", WQ_CLAUDE_MODEL="${WQ_CLAUDE_MODEL:-claude-sonnet-5}",
+        WQ_DEEPSEEK_KEY="${WQ_DEEPSEEK_KEY:-}", WQ_DEEPSEEK_MODEL="${WQ_DEEPSEEK_MODEL:-deepseek-chat}",
+        WQ_SMTP_HOST="${WQ_SMTP_HOST:-}", WQ_SMTP_PORT="${WQ_SMTP_PORT:-2525}", WQ_SMTP_SECURE="${WQ_SMTP_SECURE:-tls}",
+        WQ_SMTP_USER="${WQ_SMTP_USER:-}", WQ_SMTP_PASSWORD="${WQ_SMTP_PASSWORD:-}", WQ_MAIL_FROM="${WQ_MAIL_FROM:-}",
         WQ_FACTORY_NAME=c["name"], WQ_CLASS_TEACHERS=",".join(c["teachers"]),
         WQ_FACTORY_TASK_KEY="${WQ_FACTORY_TASK_KEY:-}"),          # 工程任务单钥匙（第 11 轮 2.7（5））：学习平台下达、读进度
         volumes=["./library:/library:ro"],

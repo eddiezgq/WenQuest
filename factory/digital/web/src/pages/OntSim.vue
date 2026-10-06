@@ -10,10 +10,11 @@
         <p class="small muted">快照：<template v-if="snap">#{{ snap.id }} · {{ fmtTs(snap.factory_now) }} · {{ snap.exact ? '精确' : '近似（从总线状态重建）' }}</template>
           <template v-else>未拍</template>
           <button class="linkbtn" :disabled="busy" @click="newSnap">拍新快照</button></p>
+        <p v-if="isPast" class="small pastn">复盘推演：这是过去的快照，可以试“如果当时那样做会怎样”，但不能变成动作。</p>
         <p class="small muted">车间：{{ shift.mode === 'shift' ? '按班次（' + shift.start + '–' + shift.end + '）' : '24 小时连续' }}</p>
         <ol class="changes">
           <li v-for="(c, i) in changes" :key="i">
-            <span class="pill info">{{ TYPES[c.type] }}</span> <span class="small">{{ describe(c) }}</span>
+            <span class="pill info">{{ TYPE_LABEL[c.type] }}</span> <span class="small">{{ describe(c) }}</span>
             <button class="linkbtn" @click="changes.splice(i, 1); run()">删除</button>
           </li>
         </ol>
@@ -68,7 +69,7 @@
           <input v-model="title" placeholder="场景名" aria-label="场景名">
           <button class="btn sm ghost" :disabled="!title || busy" @click="save">保存场景</button>
         </div>
-        <button v-if="canInitiate && changes.some((c) => c.type !== 'insert_order')" class="btn primary sm wide" :disabled="busy" @click="toActions">把这些改动提交为动作</button>
+        <button v-if="canInitiate && !isPast && changes.some((c) => !['insert_order', 'breakdown'].includes(c.type))" class="btn primary sm wide" :disabled="busy" @click="toActions">把这些改动提交为动作</button>
         <p v-if="msg" class="small ok">{{ msg }} <router-link to="/ont/actions">去动作收件箱</router-link></p>
       </section>
 
@@ -109,6 +110,7 @@ import { fmtTs } from '../lib/ont';
 import GanttChart from '../components/GanttChart.vue';
 
 const TYPES = { reassign: '改派', reorder: '调序', insert_order: '插单', overtime: '加班', expedite: '维修加急', urgent_purchase: '紧急采购', outsource: '外协', split_delivery: '分批交货' };
+const TYPE_LABEL = { ...TYPES, breakdown: '假设停机' };
 const route = useRoute();
 const err = ref('');
 const msg = ref('');
@@ -140,6 +142,8 @@ const downUnits = computed(() => Object.entries(snap.value?.state?.machines || {
 const sos = computed(() => base.value?.sales_orders || []);
 const orderRows = computed(() => sos.value.filter((s) => s.work_orders?.length));
 
+// 过去的快照（2 小时以前拍的）：只能复盘推演，不能提交为动作（服务端也会拒绝）
+const isPast = computed(() => !!snap.value?.ts && Date.now() - new Date(snap.value.ts).getTime() > 2 * 3600 * 1000);
 function describe(c) {
   if (c.type === 'reassign') return `${c.work_order} ${c.operation.split(' ')[0]}：${c.from_unit.toUpperCase()} → ${c.to_unit.toUpperCase()}`;
   if (c.type === 'reorder') return `${c.work_order} 在 ${c.unit.toUpperCase()} 上排到最前`;
@@ -149,6 +153,7 @@ function describe(c) {
   if (c.type === 'outsource') return `${c.work_order} ${c.operation.split(' ')[0]} ${c.qty} 件，${c.days} 天`;
   if (c.type === 'split_delivery') return `${c.sales_order} 先交 ${c.first_qty} 台（${c.first_date}）`;
   if (c.type === 'insert_order') return `${c.work_order} SH-301 × ${c.qty}，${c.at} 下达`;
+  if (c.type === 'breakdown') return `假设 ${c.unit.toUpperCase()} 再停 ${Math.round(c.minutes)} 分钟（只推演）`;
   return JSON.stringify(c);
 }
 function otText(r) { return r?.overtime_min ? `${r.overtime_min} 分钟 × ${r.overtime_units} 台` : '0'; }
@@ -184,7 +189,7 @@ async function newSnap() {
 async function loadSnap(id) {
   const list = await get('/ont/snapshots?hours=720');
   const one = list.snapshots.find((x) => x.id === id);
-  snap.value = { id, factory_now: one?.factory_now, exact: one?.exact, state: null };
+  snap.value = { id, factory_now: one?.factory_now, exact: one?.exact, ts: one?.ts, state: null };
   // 快照内容（派工、停机）从“不处理”的推演里带回：服务端在推演结果里不返回整个快照，这里单独取
   const st = await post('/ont/simulate', { snapshot_id: id, changes: [] });
   base.value = st;
@@ -231,7 +236,12 @@ onMounted(async () => {
     form.value.first_date = form.value.day;
     form.value.at = form.value.day;
     loadScenarios();
-    if (route.query.a) {
+    if (route.query.scenario) {
+      await open(Number(route.query.scenario));
+    } else if (route.query.snap && !route.query.a) {
+      await loadSnap(Number(route.query.snap));
+      await run();
+    } else if (route.query.a) {
       const o = await get(`/ont/anomalies/${route.query.a}/options` + (route.query.snap ? '?snapshot_id=' + route.query.snap : ''));
       const opt = o.options.find((x) => x.key === route.query.opt);
       if (opt) changes.value = [...opt.changes];
@@ -246,6 +256,7 @@ onMounted(async () => {
 
 <style scoped>
 .back { color: var(--muted); font-weight: 500; }
+.pastn { background: #FFF4CC; border-radius: 6px; padding: 6px 8px; color: #6B4500; }
 .layout { display: grid; grid-template-columns: 300px minmax(0, 1fr) 260px; gap: 14px; align-items: start; }
 .layout > * { min-width: 0; }
 .mid table { display: block; overflow-x: auto; }

@@ -114,6 +114,15 @@ def mount(app, H, user_of, who):
             r = PB.evaluate(a, st, ctx_for(u, st))
         except P.PlanError as e:
             raise HTTPException(400, str(e))
+        locked = H.compare_locked(u, aid) if hasattr(H, "compare_locked") else False
+        if locked:                          # 实验 15 比对模式：学生提交自己的分析前，不显示建议和推荐理由
+            r = dict(r, reason=None, recommended=None, options=[dict(o, recommended=False) for o in r["options"]], locked=True)
+        elif r.get("reason") and u["mode"] != "teach" and H.ai is not None and H.ai.llm.available():
+            from hub.ont import narrate as NR
+            facts = [{"方案": o["key"] + " " + o["label"], "订单": o["result"]["sales_orders"], "多花": o["result"]["cost_total"],
+                      "加班分钟": o["result"]["overtime_min"]} for o in r["options"]]
+            p = NR.polish(H.ai.llm, r["reason"], facts, "把推荐理由改写成给厂长看的两三句话：推荐哪个、为什么、代价是什么")
+            r = dict(r, reason=p["text"], reason_by=p["by"])
         return dict(r, snapshot_id=sid, exact=exact, factory_now=st["factory_now"], shift_mode=(st.get("calendar") or {}).get("mode"),
                     can_initiate=AC.can_initiate(u))
 
@@ -125,7 +134,7 @@ def mount(app, H, user_of, who):
         out = []
         for a in rows:
             ok, why = AC.can_approve(u, a) if a["status"] == "submitted" else (False, "")
-            r = dict(AC.row(a), can_approve=ok, why_not=why)
+            r = dict(AC.row(a), can_approve=ok, why_not=why, mine=a["initiator"] == u.get("name"))
             if box == "mine" and a["initiator"] != u.get("name"):
                 continue
             if box == "todo" and not ok:
@@ -141,7 +150,7 @@ def mount(app, H, user_of, who):
             raise HTTPException(404, "没有这个动作")
         a = AC.sync(H.db, a)
         ok, why = AC.can_approve(u, a) if a["status"] == "submitted" else (False, "")
-        return dict(AC.row(a), can_approve=ok, why_not=why, log=AC.notes(H.db, aid))
+        return dict(AC.row(a), can_approve=ok, why_not=why, mine=a["initiator"] == u.get("name"), log=AC.notes(H.db, aid))
 
     @app.post("/api/ont/actions")
     def action_create(body: dict = Body(...), u=Depends(user_of)):
@@ -152,11 +161,13 @@ def mount(app, H, user_of, who):
         ids = []
         try:
             sid, st, exact = snap_of(u, body.get("snapshot_id"))
-            tr = AC.trial(H.db, snaps(), u["mode"], changes, st)
+            if H.db.one("select 1 as x from sim_snapshot where id=%s and ts < now() - interval '2 hours'", (sid,)):
+                raise AC.ActionError("这是过去的快照，只能做复盘推演，不能变成动作；请用最新快照")
+            tr = dict(AC.trial(H.db, snaps(), u["mode"], changes, st), snapshot_id=sid)
             for c in changes:
                 t = c.get("type")
-                if t == "insert_order":
-                    continue                    # 插单在推演里用；真正下达工单走“订单与计划”
+                if t in ("insert_order", "breakdown"):
+                    continue                    # 插单、假设停机只在推演里用；真正下达工单走“订单与计划”
                 aid = AC.create(H.db, u["mode"], u, t, c, body.get("scenario_id"), body.get("anomaly_id"), tr)
                 if body.get("submit", True):
                     AC.submit(H.db, aid, u, tr)

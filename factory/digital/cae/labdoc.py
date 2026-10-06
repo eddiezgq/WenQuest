@@ -11,7 +11,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab11": os.path.join(HERE, "实验11_减速器热平衡与输出轴轻量化.md"),
           "lab12": os.path.join(HERE, "实验12_一根轴的数字化设计与两个典型案例.md"),
           "lab13": os.path.join(HERE, "实验13_减速器数字孪生与预测性维护.md"),
-          "lab14": os.path.join(HERE, "实验14_减速器风扇冷却的流体与传热分析.md")}
+          "lab14": os.path.join(HERE, "实验14_减速器风扇冷却的流体与传热分析.md"),
+          "lab15": os.path.join(HERE, "实验15_车间异常的追因推演与决策.md")}
 
 
 def _doc():
@@ -105,6 +106,8 @@ def report_template_docx(lab="lab8"):
         return lab13_template()
     if lab == "lab14":
         return lab14_template()
+    if lab == "lab15":
+        return lab15_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -165,8 +168,10 @@ def report_template_docx(lab="lab8"):
     table([["方案", "改动", "安全系数", "疲劳寿命 / h", "下料重量 / kg", "评价（成本、加工）"],
            ["原设计", "45 钢，Ø40", "", "", "", ""],
            ["方案 A", "换 40Cr", "", "", "", ""],
-           ["方案 B", "键槽轴段 Ø44", "", "", "", ""]])
-    hint("AI 解释哪里说得对、哪里需要补充？你推荐哪个方案，理由是什么？")
+           ["方案 B", "键槽轴段 Ø44", "", "", "", ""],
+           ["方案 C", "台阶圆角 1.0 mm（B 版做法）", "", "", "", ""]])
+    table([["尖角与圆角", "台阶根部最大应力 MPa", "最大应力位置", "中网格 → 细网格变化"], ["A 版（尖角）", "", "", ""], ["加 1.0 mm 圆角", "", "", ""]])
+    hint("AI 解释哪里说得对、哪里需要补充？你推荐哪个方案，理由是什么？尖角处的应力为什么随网格一直变大？")
 
     d.add_heading("六、结论", 1)
     d.add_paragraph("")
@@ -484,6 +489,54 @@ def lab14_template():
     table([["AGV 风口布置", "驱动器平均 h", "工控机平均 h", "元件最高温度 ℃"], ["1 前下进、后上出", "", "", ""],
            ["2 前上进、后上出", "", "", ""], ["3 前下进、后下出", "", "", ""]])
     d.add_heading("六、结论与讨论", 1)
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab15_template():
+    """实验 15 报告模板（第 17 轮 D 期 D9）"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 15　车间异常的追因、推演与决策　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、出了什么事（任务 1）", 1)
+    table([["项目", "记录"], ["异常编号与标题", ""], ["发现时间（工厂时间）", ""], ["你从哪几页、哪些数据发现的", ""]])
+    d.add_heading("二、我的因果链与中枢的因果链", 1)
+    table([["环节", "我手工追的", "中枢的因果链", "一致吗？不一致的原因"], ["起因（设备 / 物料 / 质量）", "", "", ""], ["受影响的工序 / 工单", "", "", ""],
+           ["受影响的订单、客户", "", "", ""], ["不处理时晚几天、多花多少", "", "", ""]])
+    hint("每一环写依据：哪一页、哪张单、哪条总线消息（#编号）。")
+    d.add_heading("三、推演的方案（任务 2）", 1)
+    table([["场景", "改动", "订单预计交付 / 晚几天", "多花的钱", "加班", "校验"], ["SC-", "不处理", "", "", "", ""], ["SC-", "", "", "", "", ""],
+           ["SC-", "", "", "", "", ""]])
+    d.add_heading("四、我的选择（任务 3）", 1)
+    table([["项目", "记录"], ["选的方案", ""], ["理由（交期、成本、风险）", ""], ["代价", ""]])
+    d.add_heading("五、和中枢的建议比较", 1)
+    table([["项目", "记录"], ["中枢建议的方案与理由", ""], ["和我的选择一样吗", ""], ["不一样时，谁更合理？为什么", ""],
+           ["AI 分析（“让 AI 分析”）说了什么、哪句话有依据、哪句没有", ""]])
+    d.add_heading("六、执行与复盘（任务 4、5）", 1)
+    table([["项目", "记录"], ["动作编号、批准人、执行结果", ""], ["推演的完工时刻 / 实际完工时刻", ""], ["偏差（小时、%）", ""],
+           ["复盘找到的原因", ""], ["“如果当时选别的”：哪个更好", ""]])
+    d.add_heading("七、结论与讨论", 1)
+    hint("推演靠得住吗？什么情况下推演会偏？人和 AI 在决策里各该做什么？")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)

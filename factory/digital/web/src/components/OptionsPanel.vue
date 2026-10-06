@@ -9,7 +9,8 @@
     <div v-if="err" class="small err">{{ err }}</div>
     <template v-if="data">
       <p v-if="!data.options.length" class="small muted">这类异常还没有推演预案。</p>
-      <p v-if="data.reason" class="reason small">{{ data.reason }}</p>
+      <p v-if="data.locked" class="small lockn">比对模式（实验 15）：先在实验页提交你自己的因果链和方案选择，提交后这里才显示“建议”和推荐理由。推演数字照常可看。</p>
+      <p v-if="data.reason" class="reason small">{{ data.reason }}<span v-if="data.reason_by && data.reason_by !== 'rules'" class="muted"> · AI 改写</span></p>
       <div v-for="o in data.options" :key="o.key" class="opt" :class="{ rec: o.recommended, bad: !o.result.ok }">
         <div class="o-h"><b>{{ o.key }}</b> {{ o.label }} <span v-if="o.recommended" class="pill good">建议</span>
           <span v-if="!o.result.ok" class="pill bad">校验不通过</span></div>
@@ -70,6 +71,7 @@ watch(() => props.anomalyId, () => { data.value = null; load(); }, { immediate: 
 .op-h .linkbtn { margin-left: auto; }
 .linkbtn { border: none; background: none; color: var(--accent); cursor: pointer; font-size: 12px; }
 .reason { background: var(--good-bg); border-radius: 6px; padding: 6px 8px; color: var(--good); }
+.lockn { background: #FFF4CC; border-radius: 6px; padding: 6px 8px; }
 .opt { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-top: 8px; }
 .opt.rec { border-color: var(--good); box-shadow: 0 0 0 1px var(--good) inset; }
 .opt.bad { opacity: .75; }

@@ -483,7 +483,13 @@ def mount(app, H):
                        "阻力和各面散热系数 h，与平板公式比；h 加辐射送进有限元温度场算油温，和查表 K_s 比；改风速、风向、散热筋；选做 CPU 散热片风道、AGV 电控箱通风口布置。",
             "mode": "teach", "products": ["WQR-105"], "tool_url": public_base(request) + "/cfd",
             "guide_url": public_base(request) + "/api/cae/lab14/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab14/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab14/report-template.docx"}, {
+            "id": "lab15", "name": {"zh": "实验 15：车间异常的追因、推演与决策", "en": "Lab 15: root cause, what-if simulation and decisions for shop-floor anomalies"},
+            "summary": "老师注入停机、缺料或质量漂移；学生先用看板、车间终端、订单页手工追因，写出因果链；在推演工作台用仿真车间的快进副本试 3 个以上方案，"
+                       "比较交期、成本和加班，选一个并说明理由；提交后再看厂情中枢的建议和 AI 分析（比对模式）；采纳、批准、执行，最后看推演与实际的自动复盘。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab15",
+            "guide_url": public_base(request) + "/api/cae/lab15/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab15/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

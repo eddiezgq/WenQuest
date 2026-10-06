@@ -317,7 +317,7 @@ class Detector:
                       a["id"]))
                 if up:
                     self.note(a["id"], "system", "escalate", "严重度升为“{}”：{}".format(LEVEL_LABEL[f.severity], f.title))
-                    alerts.append(self._alert(a["id"], f, rid))
+                    alerts.append(self._alert(a["id"], f, rid, "escalate"))
                 continue
             # 人工关闭后 24 小时内复现 → 重新打开
             prev = db.one("select * from anomaly where mode=%s and rule=%s and fkey=%s and status='closed' and closed_at > %s "
@@ -326,7 +326,7 @@ class Detector:
                 db.x("update anomaly set status='open', last_seen=%s, hits=hits+1, misses=0, reopened=reopened+1, title=%s, detail=%s, "
                      "severity=%s, closed_at=null where id=%s", (now, f.title, Jsonb(detail), f.severity, prev["id"]))
                 self.note(prev["id"], "system", "reopen", "关闭后 {} 小时内再次出现，重新打开".format(REOPEN_H))
-                alerts.append(self._alert(prev["id"], f, rid))
+                alerts.append(self._alert(prev["id"], f, rid, "reopen"))
                 continue
             st["fired"] += 1
             st["last_fired"] = now.isoformat()
@@ -349,12 +349,12 @@ class Detector:
                 db.x("update anomaly set misses=%s where id=%s", (m, a["id"]))
         return alerts
 
-    def _alert(self, aid, f, rid):
-        """给首页提醒和 AI 助手的 ai.alert 内容（格式沿用原 AI 提醒）"""
+    def _alert(self, aid, f, rid, change="open"):
+        """给首页提醒和 AI 助手的 ai.alert 内容（格式沿用原 AI 提醒）；change：open / escalate / reopen（第 17 轮 D 期通知用）"""
         r = self.catalog[rid]
         return {"level": f.severity, "title": f.title, "detail": f.detail, "evidence": f.evidence,
                 "action_hint": f.hint or r.get("hint") or "", "key": f.alert_key or "{}:{}".format(rid, f.fkey),
-                "anomaly_id": aid, "rule": rid, "domain": r["domain"]}
+                "anomaly_id": aid, "rule": rid, "domain": r["domain"], "change": change}
 
     # ---- 人的操作
     def note(self, aid, who, kind, text):

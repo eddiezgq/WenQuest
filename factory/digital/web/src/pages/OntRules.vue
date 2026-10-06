@@ -6,6 +6,10 @@
         · {{ data?.can_edit ? '厂长（教师）可以改阈值和开关，每次改动都有记录' : '阈值和开关由厂长（教师）调整' }}</span>
     </div>
     <div v-if="err" class="err">{{ err }}</div>
+    <section v-if="data?.calibration?.length" class="card calib">
+      <div class="card-head"><h2>校准提示（来自复盘）</h2><span class="small muted">只提示，不自动改；改标准工时请在工艺规程里改</span></div>
+      <ul class="small"><li v-for="(c, i) in data.calibration" :key="i">{{ c.text }}<span class="muted">（{{ c.retros.join('、') }}）</span></li></ul>
+    </section>
     <section v-for="g in groups" :key="g.domain" class="card">
       <div class="card-head"><h2>{{ g.label }}</h2></div>
       <table class="t">
@@ -95,6 +99,7 @@ onMounted(load);
 </script>
 
 <style scoped>
+.calib { border-left: 4px solid var(--warn); }
 .back { color: var(--muted); font-weight: 500; }
 tr.off { opacity: .55; }
 .sev { font-size: 11px; font-weight: 600; border-radius: 4px; padding: 1px 6px; color: #fff; }

@@ -130,6 +130,7 @@ def submit(db, aid, u, trial):
         raise ActionError("只有草稿或被驳回的动作可以提交")
     db.x("update action set status='submitted', trial=%s where id=%s", (Jsonb(trial), aid))
     log(db, aid, u.get("name"), "submit", "提交，试运行：{}".format(_trial_text(trial)))
+    _notify(db, a, "submitted")
 
 
 def reject(db, aid, u, text):
@@ -143,6 +144,7 @@ def reject(db, aid, u, text):
         raise ActionError("驳回要写原因")
     db.x("update action set status='rejected', approver=%s, decided_at=now() where id=%s", (u.get("name"), aid))
     log(db, aid, u.get("name"), "reject", text.strip())
+    _notify(db, a, "rejected", u.get("name"), text.strip())
 
 
 def approve(H, aid, u, who):
@@ -161,10 +163,22 @@ def approve(H, aid, u, who):
     except Exception as e:  # noqa: BLE001
         db.x("update action set status='failed', result=%s, executed_at=now() where id=%s", (Jsonb({"error": str(e)}), aid))
         log(db, aid, "system", "fail", "执行失败：{}".format(e))
+        _notify(db, a, "failed", u.get("name"), str(e))
         raise ActionError("执行失败：{}".format(e))
     db.x("update action set status=%s, result=%s, executed_at=now() where id=%s", (status, Jsonb(res), aid))
     log(db, aid, "system", "execute", res.get("text", "已执行"))
+    _notify(db, a, "done" if status == "done" else "approved", u.get("name"), res.get("text"))
     return get(db, aid)
+
+
+def _notify(db, a, event, who=None, text=None):
+    """动作状态变化 → 通知（第 17 轮 D 期）；通知出错不影响动作本身"""
+    try:
+        from hub.ont import notify as NT
+        NT.on_action(db, a["mode"], a, event, who, text)
+    except Exception:  # noqa: BLE001
+        import logging
+        logging.getLogger("actions").exception("动作通知失败")
 
 
 def execute(H, a, u, who):
@@ -217,6 +231,7 @@ def sync(db, a):
         res = dict(a["result"], erp=pr["result"])
         db.x("update action set status=%s, result=%s where id=%s and status='executing'", (st, Jsonb(res), a["id"]))
         log(db, a["id"], "system", st, "ERPNext：{}".format(pr["result"]))
+        _notify(db, a, st, "ERPNext")
         return get(db, a["id"])
     return a
 
@@ -245,12 +260,13 @@ def row(a):
 
 def trial(db, snaps, mode, changes, scenario_snapshot=None):
     """试运行：用最新快照推演“做”与“不做”"""
+    sid = None
     if scenario_snapshot is not None:
         snap = scenario_snapshot
     else:
-        _, snap, _ = snaps.take(mode)
+        sid, snap, _ = snaps.take(mode)
     ctx = P.context(db, mode, dt.datetime.fromisoformat(snap["factory_now"]))
     base = P.simulate(snap, [], ctx)
     r = P.simulate(snap, changes, ctx)
     keep = ("sales_orders", "cost_total", "costs", "overtime_min", "overtime_units", "checks", "ok")
-    return dict({k: r[k] for k in keep}, base={k: base[k] for k in ("sales_orders", "cost_total")}, at=snap["factory_now"])
+    return dict({k: r[k] for k in keep}, base={k: base[k] for k in ("sales_orders", "cost_total")}, at=snap["factory_now"], snapshot_id=sid)

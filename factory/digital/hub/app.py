@@ -82,6 +82,7 @@ class Hub:
         self.vplc = None
         self.ont = None
         self.plan_snaps = None
+        self.agent = None
         self.stop = threading.Event()
         self.last_brief = {}
         self._ncr_sent = set()
@@ -97,6 +98,8 @@ class Hub:
         self.db.init()
         self.bus = Bus("wq-hub-" + secrets.token_hex(3))
         self.ai = Assistant(self.db, self.publish)
+        from hub.ont.agent import Agent               # AI 代理（第 17 轮 D 期）：问答走代理，工具是本体、异常、推演、动作
+        self.agent = Agent(self, self.ai.llm, locked=self.compare_locked)
         self.hist = Historian(self.db, self.on_message)
         self.hist.load()
         self.mes = MES(self.db, self.publish)
@@ -140,6 +143,16 @@ class Hub:
         try:
             P.init(self.db)
             AC.init(self.db)
+            from hub.ont import agent as AG
+            from hub.ont import evals as EV
+            AG.init(self.db)
+            EV.init(self.db)
+            from hub.ont import notify as NT
+            from hub.ont import report as RP
+            from hub.ont import retro as RT
+            NT.init(self.db)
+            RP.init(self.db)
+            RT.init(self.db)
         except Exception:  # noqa: BLE001
             log.exception("推演表初始化失败")
             return
@@ -167,6 +180,14 @@ class Hub:
                     self.db.x("delete from sim_snapshot where ts < now() - interval '30 days'")
                 except Exception:  # noqa: BLE001
                     pass
+
+    def compare_locked(self, u, anomaly_id=None):
+        """实验 15 的比对模式：学生提交自己的分析之前看不到建议和推荐理由（第 17 轮 D 期 D9）"""
+        try:
+            from hub import lab15
+            return lab15.locked(self.db, u, anomaly_id)
+        except ImportError:
+            return False
 
     def on_message(self, tp, msg):
         t = msg["type"]
@@ -222,6 +243,17 @@ class Hub:
             for mode in self.active_modes():
                 try:
                     new = self.ai.evaluate(mode)
+                    try:                              # 主动提醒（第 17 轮 D 期）：新的 / 升级 / 重开的异常，没人确认的“严重”异常
+                        from hub.ont import notify as NT
+                        NT.on_alerts(self.db, mode, new)
+                        NT.escalate(self.db, mode)
+                        from hub.ont import report as RP       # 厂情日报 07:30、经营周报周一 08:00（生产模式）
+                        for kind in RP.due(self.db, mode):
+                            RP.generate(self.db, mode, kind, llm=self.ai.llm)
+                        from hub.ont import retro as RT        # 自动复盘：异常解决、动作执行完、受影响的工单做完
+                        RT.due(self.db, mode)
+                    except Exception:  # noqa: BLE001
+                        log.exception("通知 / 报告出错")
                     last = self.last_brief.get(mode, 0)
                     if new or time.time() - last > 600:
                         self.ai.briefing(mode)
@@ -465,7 +497,8 @@ def routing(item: str):
 def health():
     ok_db = bool(H.db.one("select 1 as x"))
     return {"ok": ok_db, "bus": bool(H.bus and H.bus._connected.is_set()),
-            "messages": H.db.one("select count(*) as n from bus_message")["n"]}
+            "messages": H.db.one("select count(*) as n from bus_message")["n"],
+            "ai": (H.ai.llm.name.split(":")[0] if H.ai else "rules")}       # 第 17 轮 D 期：AI 代理用的引擎种类（claude / deepseek / rules），不含密钥
 
 
 @app.get("/api/layout")
@@ -674,7 +707,9 @@ def ai_chat(body: dict = Body(...), u=Depends(user_of)):
     if not msgs:
         raise HTTPException(400, "请输入问题")
     ai_quota(u)
-    return H.ai.chat(msgs, u["mode"], u["role"], u["name"])
+    if H.agent is None:
+        return H.ai.chat(msgs, u["mode"], u["role"], u["name"])
+    return H.agent.ask(u, msgs[-12:])
 
 
 _catalog = lib_select.Catalog()
@@ -1507,6 +1542,42 @@ def teach_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
 
 
+# ---------------------------------------------------------------- 实验 15（第 17 轮 D 期 D9）
+@app.get("/api/lab15")
+def lab15_status(u=Depends(user_of)):
+    from hub import lab15
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = lab15.check(H.db, u["name"])
+    out["teacher"] = bool(u.get("teacher"))
+    out["inject_kinds"] = lab15.INJECT
+    if u.get("teacher"):
+        out["class"] = lab15.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab15/inject")
+def lab15_inject(body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab15
+    try:
+        return lab15.inject(H, u, body.get("kind"), body)
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except (ValueError, KeyError) as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/lab15/{tid}")
+def lab15_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab15
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab15.answer(H.db, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
+
+
 @app.post("/api/scenario/reset")
 def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     """重置教学情景：清空教学模式的历史，让仿真器重新载入实验 7 情景。只有“厂长”角色（教师）能做。"""
@@ -1567,6 +1638,8 @@ _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quo
 # ---------------------------------------------------------------- 厂情中枢：工厂本体（第 17 轮 A 期）
 from hub.ont import api as _ont  # noqa: E402
 _ont.mount(app, H, user_of)
+from hub.ont import agent_api as _agent_api  # noqa: E402
+_agent_api.mount(app, H, user_of, who, ai_quota)  # 第 17 轮 D 期：AI 代理（要在 mount_anomaly 之前）
 _ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则
 from hub.ont import plan_api as _plan  # noqa: E402
 _plan.mount(app, H, user_of, who)                 # 第 17 轮 C 期：班次、推演、动作、时间回看

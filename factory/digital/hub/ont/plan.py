@@ -49,6 +49,7 @@ create table if not exists scenario (
 CHANGE_TYPES = {
     "reassign": "改派", "reorder": "调序 / 插单", "insert_order": "插单", "overtime": "加班", "expedite": "维修加急",
     "urgent_purchase": "紧急采购", "outsource": "外协", "split_delivery": "分批交货",
+    "breakdown": "假设停机",            # 第 17 轮 D 期：只用于推演（AI 代理、复盘），不能变成动作
 }
 OT_RATE = 1.5                     # 加班费倍数
 EXPEDITE_COST = 300.0             # 维修加急默认费用（美元，可在改动里改）
@@ -269,6 +270,19 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
         typ = c.get("type")
         if typ not in CHANGE_TYPES:
             raise PlanError("不认识的改动：{}".format(typ))
+        if typ == "breakdown":
+            m = eng.machines.get(str(c.get("unit") or "").lower())
+            mins = float(c.get("minutes") or 0)
+            if m is None or not 0 < mins <= 14 * 24 * 60:
+                checks.append({"ok": False, "text": "假设停机：设备或时长不对"})
+                continue
+            if m.state in ("down", "fault") and m.down_until:
+                m.down_until = m.down_until + mins * 60
+                eng.at(m.down_until, "recover", unit=m.unit, until=m.down_until)
+            else:
+                eng._go_down(m, clock.now(), mins * 60, c.get("reason") or "假设停机", "down")
+            applied.append(c)
+            continue
         if typ == "overtime":
             if cal.mode != "shift":
                 checks.append({"ok": False, "text": "车间是 24 小时连续运转，加班没有意义（先在教师控制台切到按班次）"})
@@ -352,6 +366,30 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
         if _all_done(eng, watch):
             break
     return _result(eng, events, t0, start_dt, watch, ctx, applied, checks, costs, cal, changes)
+
+
+def hypothesis(snap, unit, minutes, reason="假设停机"):
+    """“假如某台设备（再）停 N 分钟”（第 17 轮 D 期，AI 代理和复盘用）：返回一张改过的快照。
+    设备正在停机就把恢复时刻往后推，否则从快照时刻起停机。只用于推演，不能变成动作。"""
+    if unit not in (snap.get("machines") or {}):
+        raise PlanError("没有这台设备：{}".format(unit))
+    minutes = float(minutes)
+    if not 0 < minutes <= 14 * 24 * 60:
+        raise PlanError("假设停机时长应在 0–14 天之间")
+    clock = _Clock(snap["t"])
+    eng = Engine.from_snapshot(copy.deepcopy(snap), lambda *a: None, clock)
+    m = eng.machines[unit]
+    t = clock.now()
+    if m.state in ("down", "fault") and m.down_until:
+        m.down_until = m.down_until + minutes * 60
+        eng.at(m.down_until, "recover", unit=unit, until=m.down_until)
+    else:
+        eng._go_down(m, t, minutes * 60, reason, "down")
+    st = eng.snapshot()
+    st["hypothesis"] = {"unit": unit, "minutes": minutes}
+    if snap.get("approx"):
+        st["approx"] = True
+    return st
 
 
 def _all_done(eng, watch):

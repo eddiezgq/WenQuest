@@ -109,6 +109,7 @@ def tables(B, db, mode):
                                                    "created": _ts(r["created_at"])}, ts=_ts(r["created_at"]), upd_ts=_now(), text="提议")
     anomalies(B, db, mode)
     plans(B, db, mode)
+    agent_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -169,6 +170,49 @@ def plans(B, db, mode):
             targets.append(("SalesOrder", p["sales_order"]))
         for t, k in targets:
             B.link(mode, "ActionRun", key, "about", k, to_type=t)
+
+
+def agent_objs(B, db, mode):
+    """AI 运行、厂情报告、复盘（第 17 轮 D 期）"""
+    ok = db.one("select to_regclass('ai_run') is not null as a, to_regclass('report') is not null as r, to_regclass('retro') is not null as t")
+    if (ok or {}).get("a"):
+        for r in db.q('select id, kind, question, "user", engine, steps, refs, "check", feedback, anomaly_id, created_at from ai_run '
+                      "where mode=%s and created_at > now() - interval '60 days'", (mode,)):
+            key = "AI-{:05d}".format(r["id"])
+            B.obj(mode, "AiRun", key, {"question": (r["question"] or "")[:200], "kind": r["kind"], "user": r["user"], "engine": r["engine"],
+                                       "tools": [x.get("tool") for x in r["steps"] or []], "verified": (r["check"] or {}).get("ok"),
+                                       "feedback": r["feedback"], "created": _ts(r["created_at"])},
+                  ts=_ts(r["created_at"]), upd_ts=_now(), text="提问：" + (r["question"] or "")[:60])
+            if r["anomaly_id"]:
+                B.link(mode, "AiRun", key, "anomaly", "A-{:05d}".format(r["anomaly_id"]))
+            for f in r["refs"] or []:
+                if f.get("kind") == "object" and f.get("type") in B.onto.types:
+                    B.link(mode, "AiRun", key, "looked_at", f["key"].split("|", 1)[1], to_type=f["type"])
+                elif f.get("kind") == "action":
+                    B.link(mode, "AiRun", key, "drafted", "ACT-{:05d}".format(int(f["key"])))
+    if (ok or {}).get("r"):
+        for r in db.q("select id, kind, title, period_start, period_end, engine, data, created_at from report where mode=%s "
+                      "and created_at > now() - interval '120 days'", (mode,)):
+            key = "RPT-{:05d}".format(r["id"])
+            B.obj(mode, "Report", key, {"title": r["title"], "kind": r["kind"], "period_start": _ts(r["period_start"]),
+                                        "period_end": _ts(r["period_end"]), "engine": r["engine"], "created": _ts(r["created_at"])},
+                  ts=_ts(r["created_at"]), upd_ts=_now(), text="生成：" + r["title"])
+            for aid in ((r["data"] or {}).get("anomaly_ids") or [])[:40]:
+                B.link(mode, "Report", key, "mentions", "A-{:05d}".format(aid), to_type="Anomaly")
+    if (ok or {}).get("t"):
+        for r in db.q("select * from retro where mode=%s and created_at > now() - interval '120 days'", (mode,)):
+            key = "RT-{:05d}".format(r["id"])
+            dv = r["deviation"] or {}
+            B.obj(mode, "Retro", key, {"title": r["title"], "predicted_cost": (r["predicted"] or {}).get("cost_total"),
+                                       "actual_cost": (r["actual"] or {}).get("cost_total"), "deviation_pct": dv.get("finish_pct"),
+                                       "causes": [c.get("text") for c in r["causes"] or []], "created": _ts(r["created_at"])},
+                  ts=_ts(r["created_at"]), upd_ts=_now(), text="复盘：" + r["title"])
+            if r["anomaly_id"]:
+                B.link(mode, "Retro", key, "anomaly", "A-{:05d}".format(r["anomaly_id"]))
+            if r["scenario_id"]:
+                B.link(mode, "Retro", key, "scenario", "SC-{:05d}".format(r["scenario_id"]))
+            if r["action_id"]:
+                B.link(mode, "Retro", key, "action", "ACT-{:05d}".format(r["action_id"]))
 
 
 def twin(B, db, mode):

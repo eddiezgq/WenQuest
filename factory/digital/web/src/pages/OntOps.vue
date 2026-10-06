@@ -10,6 +10,8 @@
         <router-link to="/ont/actions" class="tablink">动作收件箱</router-link>
         <router-link to="/ont/map" class="tablink">全貌地图与搜索</router-link>
         <router-link to="/ont/rules" class="tablink">规则目录</router-link>
+        <router-link to="/ont/reports" class="tablink">日报与周报</router-link>
+        <router-link to="/ont/ai" class="tablink">AI 运行记录</router-link>
       </span>
     </div>
     <div v-if="err" class="err">{{ err }}</div>
@@ -22,7 +24,8 @@
         <button class="btn sm ghost" @click="shift(-1)">往前 1 小时</button>
         <button class="btn sm ghost" @click="shift(-24)">往前 1 天</button>
         <button v-if="hist" class="btn sm primary" @click="backToNow">回到现在</button>
-        <span v-if="hist" class="small warnline">正在回看 {{ fmtTs(hist.at) }}（只能看，推演都从现在出发）</span>
+        <span v-if="hist" class="small warnline">正在回看 {{ fmtTs(hist.at) }}（只能看；要问“如果当时那样做会怎样”，点“从这里推演”做复盘推演）</span>
+        <router-link v-if="hist?.snapshot" class="btn sm" :to="{ path: '/ont/sim', query: { snap: hist.snapshot.id, retro: 1 } }">从这里推演</router-link>
       </div>
       <div v-if="!sit" class="empty">读取中…</div>
       <template v-else>
@@ -90,6 +93,7 @@
             <p class="small muted">
               <template v-if="narr">{{ narr.by === 'rules' ? '规则版' : 'AI 润色（' + narr.by + '）' }}<template v-if="narr.note"> · {{ narr.note }}</template> · </template>
               <button class="linkbtn" :disabled="narrBusy" @click="narrate">{{ narrBusy ? '润色中…' : '讲成人话（AI 润色）' }}</button>
+              · <button class="linkbtn" :disabled="ai.busy" @click="analyze(sel.id, sel.key)">让 AI 分析</button>
             </p>
           </div>
           <ChainGraph :chain="sel.chain" @edge="(e) => (basis = e)" @node="(n) => (node = n)" />
@@ -141,6 +145,7 @@
               <span v-else class="muted"> {{ e.name || e.item || e.id || e.ts || '' }}</span></li>
           </ul>
           <OptionsPanel v-if="isOpen" :anomaly-id="sel.id" @adopted="loadSel" />
+          <RetroPanel v-else :anomaly-id="sel.id" />
         </template>
       </section>
     </div>
@@ -164,6 +169,8 @@ import { DOMAIN_COLOR, fmtVal, fmtTs as ts, fmtTs, lineage } from '../lib/ont';
 import ChainGraph from '../components/ChainGraph.vue';
 import ObjLink from '../components/ObjLink.vue';
 import OptionsPanel from '../components/OptionsPanel.vue';
+import RetroPanel from '../components/RetroPanel.vue';
+import { ai, analyze } from '../lib/ai';
 
 const ROLES = { planner: '计划员', engineer: '工艺员', operator: '操作工', quality: '质检员', manager: '厂长', sales: '销售' };
 const roleName = (r) => ROLES[r] || r;
