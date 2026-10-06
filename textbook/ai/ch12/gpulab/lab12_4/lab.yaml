@@ -1,0 +1,40 @@
+标题: ["GPU 实验 12.4 用开源模型转写录音并算词错率", "GPU Lab 12.4 Transcribing with an open model and measuring WER"]
+目的: ["用开源语音识别模型的三档大小转写公开测试样例，比较词错率与实时率，再叠加车间噪声看识别怎样退化——理解模型大小、速度与噪声鲁棒性之间的权衡。",
+       "Transcribe public test clips with three sizes of an open speech model, compare word error rate and real-time factor, then add workshop noise to see how recognition degrades."]
+显卡: basic
+结果:
+  - {名: tiny_wer, 说明: ["词错率，tiny", "WER, tiny"], 单位: "%"}
+  - {名: base_wer, 说明: ["词错率，base", "WER, base"], 单位: "%"}
+  - {名: small_wer, 说明: ["词错率，small", "WER, small"], 单位: "%"}
+  - {名: small_speed, 说明: ["small 比实时快多少倍", "small, times faster than real time"], 单位: ""}
+  - {名: wer_snr10, 说明: ["词错率，信噪比 10 dB", "WER at 10 dB SNR"], 单位: "%"}
+  - {名: wer_snr0, 说明: ["词错率，信噪比 0 dB", "WER at 0 dB SNR"], 单位: "%"}
+文件: []
+实际问题:
+  标题: ["车间里的语音指令", "Voice commands on the shop floor"]
+  内容: ["工人戴着手套、手里拿着零件，用语音指挥 AGV 最省事。可车间噪声大，识别错一条指令可能让设备动错方向——所以既要知道模型有多准，也要知道噪声下它退化得有多快。",
+         "With gloves on and parts in hand, voice is the easiest way to command an AGV. But a workshop is noisy, and one misrecognized command can send a vehicle the wrong way — so you need both the accuracy and how fast it degrades."]
+原理:
+  - ["词错率 = 编辑距离 ÷ 参考词数；比较前要统一大小写与标点，否则数字不可比（12.4 节）。", "WER = edit distance ÷ reference length; normalize case and punctuation first or the numbers are not comparable (Section 12.4)."]
+  - ["实时率 = 处理时间 ÷ 音频时长；解码是逐词元生成的，受读权重的带宽限制（9.7 节、算例 12.4.2）。", "Real-time factor = processing time ÷ audio duration; decoding is token-by-token and bandwidth-bound (Section 9.7, Example 12.4.2)."]
+步骤:
+  - ["运行第 1 节，看数据与归一化规则（任务 1）。", "Run section 1 to see the data and the normalization rule (task 1)."]
+  - ["三档模型各跑一遍，填入表 1（任务 2）。", "Run all three sizes and fill Table 1 (task 2)."]
+  - ["按 10、5、0 dB 加噪声，填入表 2（任务 3）。", "Add noise at 10, 5 and 0 dB and fill Table 2 (task 3)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  三档模型", "Table 1  Three model sizes"]
+    表头: ["模型", "参数（百万）", "词错率（%）", "比实时快几倍"]
+    表头英文: ["Model", "Params (M)", "WER (%)", "× real time"]
+    行: [["tiny", "", "", ""], ["base", "", "", ""], ["small", "", "", ""]]
+  - 标题: ["表 2  噪声下的词错率（small）", "Table 2  WER under noise (small)"]
+    表头: ["信噪比（dB）", "词错率（%）", "相对安静时增加"]
+    表头英文: ["SNR (dB)", "WER (%)", "Increase vs clean"]
+    行: [["安静", "", "—"], ["10", "", ""], ["5", "", ""], ["0", "", ""]]
+注意:
+  - ["测试样例只有几条，几十秒音频：这里的词错率只能看量级与相对差别，不能当作模型的正式成绩。", "Only a few clips and under a minute of audio: these WERs show orders of magnitude and relative gaps, not official scores."]
+  - ["第一次运行要下载模型（small 约 1 GB）与数据集。", "The first run downloads the models (small is about 1 GB) and the dataset."]
+  - ["噪声是程序合成的 1/f 噪声，不是真实车间录音。", "The noise is synthesized 1/f noise, not a real workshop recording."]
+思考题:
+  - ["模型从 tiny 换到 small，词错率降了多少、速度慢了多少？这条产线该选哪一档？", "How much does WER drop and speed fall from tiny to small? Which size fits this line?"]
+  - ["噪声下词错率上升，是增强（12.6 节）划算还是换大模型划算？要知道什么数据才能回答？", "Under noise, is enhancement (Section 12.6) or a bigger model the better buy? What data would you need to answer?"]

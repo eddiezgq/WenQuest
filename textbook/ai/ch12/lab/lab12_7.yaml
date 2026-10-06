@@ -1,0 +1,28 @@
+# 实验 12.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_7.js。
+原理:
+  - ["小词表的指令识别：把一遍发音算成特征向量，与十条指令的模板比余弦相似度，取最像的那一条；得分低就拒识（12.7 节）。", "Small-vocabulary command recognition: a spoken instance becomes a feature vector, matched by cosine similarity against ten command templates; a low score means rejection (Section 12.7)."]
+  - ["代价敏感的阈值：总代价 = 误执行次数 × 误执行代价 + （拒识 + 确认）次数 × 拒识代价，取总代价最小的阈值（与 11.8 节同一套做法）。", "Cost-sensitive threshold: total cost = wrong executions × their cost + (rejections + confirmations) × the rejection cost; pick the threshold that minimizes it (the same method as Section 11.8)."]
+  - ["听错比听不清危险：把“停止”听成“前进”会撞人，把“前进”听成“没听清”只是要再说一遍。", "Mishearing is worse than not hearing: “forward” heard for “stop” can hit someone; “please repeat” only costs a repeat."]
+  - 式: "总代价 = 误执行 × C_wrong + （拒识 + 确认）× C_reject"
+步骤:
+  - ["“得分分布”场景：信噪比取 20、5、−10 dB，记下准确率与两堆得分的重叠情况（任务 1，填表 1）。", "Score scene: set the SNR to 20, 5 and −10 dB and record the accuracy and how much the two piles overlap (task 1, Table 1)."]
+  - ["“阈值与代价”场景：信噪比回到 5 dB，把阈值从 0.5 拉到 0.85，记下误执行与拒识（任务 2，填表 1）。", "Threshold scene: back to 5 dB, raise the threshold from 0.5 to 0.85 and record the wrong executions and rejections (task 2, Table 1)."]
+  - ["“代价之比”场景：代价取（1,1）、（100,1）、（200,1），记下代价最低的阈值（任务 3、4，填表 2）。", "Cost scene: try costs (1,1), (100,1) and (200,1) and record the minimum-cost threshold (tasks 3 and 4, Table 2)."]
+  - ["打开“危险指令要确认”，在同一组参数下再记一次误执行与总代价（任务 5）。", "Turn on confirmation of risky commands and record the wrong executions and total cost again at the same settings (task 5)."]
+数据表:
+  - 标题: ["表 1  信噪比、阈值与两种错误", "Table 1  SNR, threshold and the two errors"]
+    表头: ["信噪比（dB）", "阈值", "准确率（%）", "误执行（次）", "拒识（次）", "总代价"]
+    表头英文: ["SNR (dB)", "Threshold", "Accuracy (%)", "Wrong", "Rejected", "Total cost"]
+    行: [["20", "0.50", "", "", "", ""], ["5", "0.50", "", "", "", ""], ["5", "0.85", "", "", "", ""], ["−10", "0.50", "", "", "", ""]]
+  - 标题: ["表 2  代价之比与最优阈值", "Table 2  Cost ratio and the best threshold"]
+    表头: ["误执行代价", "拒识代价", "比值", "代价最低的阈值", "那里的拒识比例（%）"]
+    表头英文: ["Cost of wrong", "Cost of rejection", "Ratio", "Best threshold", "Rejected share (%)"]
+    行: [["1", "1", "1", "", ""], ["100", "1", "100", "", ""], ["200", "1", "200", "", ""]]
+注意:
+  - ["指令的“声音”是按公式合成并简化成低维特征的，准确率只说明“信噪比掉下来识别就掉下来”的趋势，不是真实系统的指标；上线前必须用现场录音重测，并按现场噪声重定阈值。", "The commands are synthesized and reduced to low-dimensional features: the accuracy only shows the trend that recognition degrades with the SNR. It is not a real system's figure — re-measure with on-site recordings and re-tune the threshold there."]
+  - ["阈值在这里是在同一批试验上选又在同一批上评的；真实工作中必须一半定阈值、另一半评估（算例 12.7.2 就是这样做的），否则报出来的数字偏乐观。", "Here the threshold is chosen and evaluated on the same trials; in real work use one half to choose and the other to evaluate (as in Worked example 12.7.2), or the numbers come out too optimistic."]
+  - ["确认回路不是万能的：它只挡住“会让车动起来”的那几条指令，而且每次确认都要花时间（算例 12.7.3 的延迟预算）。", "Confirmation is not a cure-all: it only guards the commands that make the vehicle move, and each confirmation costs time (the latency budget in Worked example 12.7.3)."]
+思考题:
+  - ["“停止”听错的方向是安全的（本该动却停下）。要不要给它一个比别的指令更低的阈值？这样做有什么风险？", "Mishearing “stop” fails safe — the vehicle halts when it should move. Should it get a lower threshold than the rest, and what does that risk?"]
+  - ["把每条指令说的遍数从 2 加到 12，准确率与最优阈值变不变？这说明阈值该用多少数据来定？", "Raise the repeats per command from 2 to 12: do the accuracy and the best threshold change? What does that say about how much data a threshold needs?"]
+  - ["如果误执行的代价无法估价（比如可能伤人），这套“算总代价”的做法还成立吗？工程上该怎么办？", "If a wrong execution cannot be priced — it might injure someone — does the total-cost method still apply? What should engineering do instead?"]

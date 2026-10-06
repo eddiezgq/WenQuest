@@ -1,0 +1,27 @@
+# 实验 12.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_1.js。
+原理:
+  - ["语音分帧后逐帧做傅里叶变换：帧长 N 决定频率分辨率 Δf = 采样率 / N，帧移决定帧率（12.1 节）。", "Speech is framed and transformed per frame: the frame length N sets the frequency resolution Δf = sr/N; the hop sets the frame rate (Section 12.1)."]
+  - ["梅尔刻度 mel(f) = 2595·lg(1 + f/700)：低频分得细、高频分得粗，与人耳一致。", "The mel scale mel(f) = 2595·log10(1 + f/700) is fine at low frequencies and coarse at high ones, like the ear."]
+  - ["元音由基频的谐波按共振峰加权而成：识别认的是包络（共振峰），不是基频。", "A vowel is the pitch harmonics shaped by formants: recognition reads the envelope, not the pitch."]
+  - 式: "Δf = 采样率 ÷ 每帧采样点数；每秒的数 = 帧率 × 每帧的维数"
+步骤:
+  - ["“波形与频谱”场景：切换四个元音，记下前两个共振峰的大致位置（任务 1）。", "Waveform scene: switch between the four vowels and note where the first two formants sit (task 1)."]
+  - ["改基频，看包络是否跟着动（任务 1 的后半）。", "Change the pitch and check whether the envelope moves with it (second half of task 1)."]
+  - ["“分帧”场景：帧长取 5、25、80 ms，填表 1（任务 2）。", "Framing scene: try 5, 25 and 80 ms and fill Table 1 (task 2)."]
+  - ["“梅尔频带”场景：滤波器个数取 80、40、16，填表 2（任务 3）。", "Mel scene: try 80, 40 and 16 filters and fill Table 2 (task 3)."]
+  - ["把信噪比降到 0 dB，比较三种表示里还剩多少结构（任务 4）。", "Drop the SNR to 0 dB and compare what survives in each representation (task 4)."]
+数据表:
+  - 标题: ["表 1  帧长与分辨率", "Table 1  Frame length and resolution"]
+    表头: ["帧长（ms）", "每帧采样点", "频率分辨率（Hz）", "能否分开相邻谐波"]
+    表头英文: ["Frame (ms)", "Samples", "Δf (Hz)", "Harmonics separable?"]
+    行: [["5", "", "", ""], ["25", "", "", ""], ["80", "", "", ""]]
+  - 标题: ["表 2  梅尔滤波器个数", "Table 2  Number of mel filters"]
+    表头: ["滤波器个数", "每秒的数", "比波形省几倍", "重建误差（%）"]
+    表头英文: ["Filters", "Numbers per second", "Saving vs waveform", "Reconstruction error (%)"]
+    行: [["80", "", "", ""], ["40", "", "", ""], ["16", "", "", ""]]
+注意:
+  - ["信号是按公式合成的，不是真人录音：共振峰的位置是查表来的典型值，真实语音因人而异。", "The signal is synthesized from formulas, not recorded: the formant values are typical ones, and real speech varies by speaker."]
+  - ["“重建误差”只是衡量归并丢了多少的一个粗指标，不等于识别率会掉多少。", "The reconstruction error is a crude measure of what pooling discards; it is not how much accuracy would drop."]
+思考题:
+  - ["男声与女声说同一个元音，频谱里什么变了、什么没变？这对识别意味着什么？", "For the same vowel from a man and a woman, what changes in the spectrum and what does not? What does that mean for recognition?"]
+  - ["为什么不直接把 201 个频点喂给模型，非要归并成 80 维？", "Why pool 201 bins into 80 bands instead of feeding the bins straight to the model?"]

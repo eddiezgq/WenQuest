@@ -291,3 +291,32 @@
 11,三维高斯泼溅,3D Gaussian splatting,
 11,多目标跟踪,multi-object tracking,
 11,推理引擎,inference engine,
+12,语音识别,automatic speech recognition (ASR),
+12,语音合成,text-to-speech (TTS),
+12,采样率,sampling rate,
+12,分帧,framing,
+12,短时傅里叶变换,short-time Fourier transform (STFT),
+12,梅尔刻度,mel scale,
+12,梅尔频谱,mel spectrogram,
+12,倒谱系数,mel-frequency cepstral coefficients (MFCC),
+12,隐马尔可夫模型,hidden Markov model (HMM),
+12,高斯混合模型,Gaussian mixture model (GMM),
+12,维特比解码,Viterbi decoding,
+12,连接时序分类,connectionist temporal classification (CTC),
+12,空白符,blank symbol,CTC 中"不输出"的符号
+12,词错率,word error rate (WER),英文按词计
+12,字错率,character error rate (CER),中文按字计；公式与词错率相同
+12,声码器,vocoder,
+12,说话人识别,speaker recognition,
+12,等错误率,equal error rate (EER),
+12,语音增强,speech enhancement,
+12,谱减法,spectral subtraction,
+12,拒识,rejection,置信度不够时不执行
+12,端点检测,voice activity detection (VAD),
+12,信噪比,signal-to-noise ratio (SNR),
+12,对数梅尔频谱,log-mel spectrogram,
+12,对齐,alignment,帧与标注之间的对应关系
+12,共振峰,formant,
+12,实时率,real-time factor (RTF),处理时间与音频时长之比
+12,弱监督,weak supervision,
+12,嵌入,embedding,把对象映射成的定长向量
