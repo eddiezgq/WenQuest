@@ -222,8 +222,31 @@ def register(app, m) -> None:
             todo = stale(book, man, st)
             st["progress"] = {"done": 0, "total": len(todo), "current": ""}
             save_state(book, st)
-            for _no, cmid, a in todo:
+            # The recorded cmids follow the manifest's activity order at publishing time; if the pack gained or lost
+            # activities since then, a position can point at a quiz or assignment. Check against the live course and,
+            # where needed, take the resource at the same place among the section's file activities.
+            mods: dict[int, str] = {}
+            by_sec: dict[int, list[int]] = {}
+            try:
+                for sec in await state.moodle.call(sess.moodle_token, "core_course_get_contents", None, courseid=st["courseid"]) or []:
+                    for mo in sec.get("modules") or []:
+                        mods[int(mo["id"])] = mo.get("modname", "")
+                        if mo.get("modname") == "resource":
+                            by_sec.setdefault(int(sec.get("section", -1)), []).append(int(mo["id"]))
+            except Exception:  # noqa: BLE001 - without the listing, trust the record
+                mods = {}
+            lessons = {str(x["no"]): x for x in man["lessons"]}
+            for no, cmid, a in todo:
                 st["progress"]["current"] = ml(a["name"])
+                if mods and mods.get(cmid) != "resource":
+                    les = lessons[no]
+                    res = [x for x in les["activities"] if x["type"] == "resource"]
+                    live = by_sec.get(int(les["section"]), [])
+                    k = next(i for i, x in enumerate(res) if x is a)
+                    if len(live) != len(res):
+                        raise EngineError("pack_mismatch", f"{ml(les['name'])}: {len(live)}/{len(res)}", 409)
+                    rec = st["lessons"][no]
+                    rec["cmids"][les["activities"].index(a)] = cmid = live[k]
                 draft = await upload_files(sess, base, [a["file"]])
                 await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="replacefile", cmid=cmid, draftitemid=draft)
                 await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="module", cmid=cmid, name=ml(a["name"])[:250])

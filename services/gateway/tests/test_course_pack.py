@@ -13,6 +13,7 @@ from tests.test_materials import fake_moodle, login
 
 CALLS: list[tuple[str, str]] = []
 FAIL = {"add": 0}
+CONTENTS: dict = {"v": None}
 
 
 def moodle(request: httpx.Request) -> httpx.Response:
@@ -36,6 +37,8 @@ def moodle(request: httpx.Request) -> httpx.Response:
     if fn == "local_wenquest_create_quiz":
         CALLS.append((fn, body))
         return httpx.Response(200, json={"cmid": 900 + len(CALLS), "quizid": 1, "questions": 1})
+    if fn == "core_course_get_contents" and CONTENTS["v"] is not None:
+        return httpx.Response(200, json=CONTENTS["v"])
     if fn == "local_wenquest_edit_course":
         CALLS.append((fn, body))
         return httpx.Response(200, json={"status": "ok"})
@@ -52,6 +55,7 @@ def client(tmp_path):
         st.textbook_dir, st.data_dir = str(tmp_path / "textbook"), str(tmp_path / "data")
         CALLS.clear()
         FAIL["add"] = 0
+        CONTENTS["v"] = None
         yield c
         for k, v in saved.items():
             setattr(st, k, v)
@@ -190,3 +194,27 @@ def test_refresh_replaces_changed_files_in_place(client, tmp_path):
     assert edits[0]["draftitemid"][0] != "0" and edits[0]["cmid"] == edits[1]["cmid"]
     assert "multilang" in edits[1]["name"][0]
     assert not any(f in ("local_wenquest_add_activities", "local_wenquest_create_quiz") for f, _ in CALLS)
+
+
+def test_refresh_finds_the_file_when_the_record_is_shifted(client, tmp_path):
+    """A pack that gained activities after publishing: the recorded position points at the assignment."""
+    pack(tmp_path)
+    h = login(client)
+    client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 1})
+    assert wait(client, h)["status"] == "done"
+    sp = tmp_path / "data" / "course-packs" / "sewing.json"
+    st = json.loads(sp.read_text())
+    cm = st["lessons"]["1"]["cmids"]
+    page, deck, assign, quiz, plan = cm
+    st["lessons"]["1"]["cmids"] = [page, assign, deck, quiz, plan]   # recorded out of step with the course
+    st["files"].pop(str(deck), None)
+    sp.write_text(json.dumps(st))
+    CONTENTS["v"] = [{"section": 2, "modules": [{"id": page, "modname": "page"}, {"id": deck, "modname": "resource"},
+                                                 {"id": assign, "modname": "assign"}, {"id": quiz, "modname": "quiz"},
+                                                 {"id": plan, "modname": "resource"}]}]
+    CALLS.clear()
+    client.post("/api/v1/admin/course-packs/sewing/refresh", headers=h)
+    p = wait(client, h)
+    assert p["status"] == "done", p
+    edits = [parse_qs(b) for f, b in CALLS if f == "local_wenquest_edit_course"]
+    assert {e["cmid"][0] for e in edits} == {str(deck)}
