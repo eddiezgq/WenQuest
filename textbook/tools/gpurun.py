@@ -25,6 +25,7 @@ import os
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -78,10 +79,15 @@ def values(book_root: Path, chapters: set[int], status: dict[int, str]) -> tuple
 # ---------------------------------------------------------------- running on Lambda
 
 def _api(method: str, path: str, body: dict | None = None) -> dict:
+    # Lambda 的接口在 Cloudflare 后面，Python 默认的 User-Agent 会被拒（403），所以显式带一个
     req = urllib.request.Request(LAMBDA + path, method=method, data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"Authorization": f"Bearer {os.environ['LAMBDA_KEY']}", "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read().decode()).get("data") or {}
+                                 headers={"Authorization": f"Bearer {os.environ['LAMBDA_KEY'].strip()}", "Content-Type": "application/json",
+                                          "Accept": "application/json", "User-Agent": "wenquest-gpu/1.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode() or "{}").get("data") or {}
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"Lambda {method} {path}: HTTP {e.code} {e.read().decode(errors='replace')[:500]}") from None
 
 
 def _opts() -> list[str]:
