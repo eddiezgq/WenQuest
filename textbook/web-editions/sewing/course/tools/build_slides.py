@@ -704,7 +704,7 @@ def build_deck(spec, lesson, slides_html, out: Path) -> Path:
     for c in clips.values():
         if c.get("selector") and "#stage" in c["selector"]:
             c["cover"] = True
-    heavy = [k for k, s in enumerate(spec["slides"]) if any(clips.get(x, {}).get("page", "").startswith("proto")
+    heavy = [k for k, s in enumerate(spec["slides"]) if any(clips.get(x, {}).get("page", "").startswith(("proto-lockstitch", "model-"))
                                                             for x in re.findall(r'data-live="([^"]+)"', slides_html[k]))]
     notes = [s.get("notes") or ["", ""] for s in spec["slides"]]
     titles = [(s.get("title") or s.get("kicker") or ["", ""])[0] for s in spec["slides"]]
