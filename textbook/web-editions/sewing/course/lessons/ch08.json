@@ -151,22 +151,56 @@
               "rows": 8},
    "questions": [["把旋梭推迟 2° 后，挑线相位窗口变了吗？为什么？", "After retarding the hook by 2°, does the take-up window change? Why?"],
                  ["为什么最佳平衡率不是 1？结合合力轨迹的形状说明。", "Why is the best balance ratio not 1? Explain with the shape of the force locus."],
-                 ["“恢复标准”的平衡率是 0.3，你找到的最好的 k 是多少？与教材的 0.45 相比如何？", "“Reset to standard” sets k = 0.3; what best k did you find, and how does it compare with the book’s 0.45?"]]}
+                 ["“恢复标准”的平衡率是 0.3，你找到的最好的 k 是多少？与教材的 0.45 相比如何？", "“Reset to standard” sets k = 0.3; what best k did you find, and how does it compare with the book’s 0.45?"]]},
+  {"id": "tune-lockstitch", "no": "8-2", "title": ["综合调机", "Machine diagnosis"],
+   "goal": [["根据试缝现象提出可能的原因，用测量分辨真正的原因。", "Propose possible causes from what a test seam shows, and tell the real cause apart by measuring."],
+           ["按调机顺序（先钩线、再挑线与张力、后送布和平衡）排除 1–3 个故障，不动本来没问题的地方。", "Clear one to three faults in setting-up order (hook first, then take-up and tension, then feed and balance) without disturbing anything that was right."],
+           ["把每个故障的现象、判断依据和调整量写成调机报告。", "Write a setting-up report giving, for each fault, the symptom, the evidence and the adjustment."]],
+   "theory": [["钩线：梭尖到达时机针回升约 2 mm，梭尖与机针间隙 0.04–0.1 mm，梭尖高出针眼上沿约 1 mm；超出范围会跳针、劈线或碰针（第 5 章）。", "Loop catch: needle rise about 2 mm when the point arrives, point-to-needle clearance 0.04–0.1 mm, point about 1 mm above the top of the eye; outside these, stitches skip, the thread splits or the needle is hit (Chapter 5)."],
+             ["挑线与张力：针眼入布后欠线不超过 1 mm，绕梭时余量不为负；面线、底线张力平衡时交织点在布层中间（第 4、7 章）。", "Take-up and tension: no more than 1 mm short after the eye enters the fabric and no negative margin round the bobbin; with balanced tensions the interlock lies mid-ply (Chapters 4 and 7)."],
+             ["送布：牙落下时针眼上沿不高于针板，牙高约 0.8 mm，压脚压力要防止打滑（第 6 章）。整机：最大惯性力不超过 550 N（第 8 章）。", "Feed: the top of the eye no higher than the plate when the dog drops, dog height about 0.8 mm, enough foot pressure to stop slipping (Chapter 6). Whole machine: peak inertia force no more than 550 N (Chapter 8)."],
+             ["页面上的量具读数带有量具本身的误差；调整只知道变化量，不知道绝对值。", "Gauge readings include the scatter of the gauge itself; an adjustment tells you the change, not the absolute value."]],
+   "steps": [["打开实验页，故障数选 1，记下故障机编号；点“试缝 30 针”，记录线迹统计和看到的现象。", "Open the lab, choose 1 fault and note the machine number; press “Sew 30 stitches” and record the counts and symptoms."],
+            ["根据现象列出两三个可能的原因，每个原因对应一项测量；先量最可能的一项，记录读数并和标准值比较。", "From the symptoms list two or three possible causes, each with one measurement; measure the most likely first, record the reading and compare it with standard."],
+            ["找到偏离标准的项后调整，每次调整后再量一次，确认回到标准范围，再试缝。", "When a setting is off standard, adjust it, measure again to confirm it is back in range, then sew again."],
+            ["30 针都合格、没有其他现象时，页面列出这台机器的故障；对照你的判断，记下用了几次试缝、测量和调整。", "When all 30 stitches are good and nothing else shows, the page lists the machine's faults; compare with your diagnosis and note the numbers of tests, measurements and adjustments."],
+            ["故障数选 2，再做一台；注意两个故障的现象可能互相掩盖，排除一个后要重新试缝。", "Choose 2 faults and do another machine; the symptoms of two faults can mask each other, so sew again after clearing each one."],
+            ["故障数选 3，用老师给的故障机编号（或自选），试缝不超过 8 次、不乱调地排除全部故障（任务 3）。", "Choose 3 faults with the machine number your teacher gives (or your own), and clear them all in at most 8 tests without disturbing anything else (Task 3)."],
+            ["把日志复制进报告，按故障整理成“现象—测量—判断—调整—复核”。", "Copy the log into your report and arrange it per fault as symptom – measurement – diagnosis – adjustment – re-check."]],
+   "record": {"caption": ["调机记录", "Setting-up log"], "headers": [["故障机编号与故障数", "Machine number and faults"], ["试缝看到的现象", "Symptoms in the test seam"], ["怀疑的原因", "Suspected cause"], ["测量项与读数", "Measurement and reading"], ["调整量", "Adjustment"], ["复核结果", "Re-check"]], "rows": 8},
+   "questions": [["“底线被拉到正面”可能是面线太紧，也可能是底线太松。你怎样用测量分辨这两种情况？", "“Bobbin thread on top” may mean the upper thread is too tight or the bobbin thread too loose. How do you tell them apart by measuring?"],
+                 ["跳针可能来自旋梭定时、针杆高度、梭尖间隙或挑线供线不够。为什么调机时一般先查钩线，再查挑线？", "Skipped stitches may come from hook timing, needle-bar height, hook clearance or too little thread from the take-up. Why does one usually check the hook before the take-up?"],
+                 ["为什么不能看到跳针就去拧旋梭？结合“乱调”的检查说明先量后调的道理。", "Why should you not turn the hook as soon as you see skipped stitches? Use the check for disturbed settings to explain why one measures before adjusting."]]},
+  {"id": "proto-lockstitch", "no": "M8-1", "title": ["平缝机虚拟样机：调机与故障部位", "Lockstitch virtual prototype: tuning and where faults happen"],
+   "goal": [["在虚拟样机上把单个参数调离标准，看试缝结果和出事的部位，把现象和机构对应起来。", "Move one setting off standard on the virtual prototype and see the test-seam result and where the fault happens, linking symptom to mechanism."],
+           ["用时序图和测量功能解释故障：旋梭定时、送布定时、平衡率变了以后，时序和惯性力怎样变。", "Use the timing chart and the measuring tool to explain faults: how timing and inertia change when the hook timing, feed timing or balance ratio changes."]],
+   "theory": [["刺布：上轴 → 针杆曲柄 → 针杆连杆 → 针杆（曲柄滑块）。挑线：上轴 → 挑线曲柄销 → 挑线连杆 → 挑线杆（四连杆）。", "Needle: main shaft → needle-bar crank → needle-bar link → needle bar (slider-crank). Take-up: main shaft → take-up crank pin → link → take-up lever (four-bar)."],
+             ["钩线：上轴 → 同步带 1:1 → 下轴 → 旋梭，旋梭转角 = 2φ；梭尖在机针回升约 2 mm（约 206°）时到达机针。送布：送布偏心轮 → 针距调节器 → 牙架（水平），抬牙偏心轮 → 牙架（上下）。", "Hook: main shaft → timing belt 1:1 → hook shaft → rotary hook, hook angle = 2φ; the point reaches the needle at about 2 mm of needle rise (about 206°). Feed: feed eccentric → stitch regulator → feed bar (horizontal); lift eccentric → feed bar (vertical)."],
+             ["样机的运动全部由问渠平缝机机构库算出，尺寸取第 3–8 章算例；外形为通用示意。透明盖板、开窗剖切与真机套件 A、A+ 相同，零件编号与拆装手册一致。", "All motion comes from the WenQuest lockstitch mechanism library with the dimensions of the Chapter 3–8 examples; the outer shape is generic. The clear covers and cut-away windows match real-machine kits A and A+, and the part numbers match the assembly manual."]],
+   "steps": [["打开虚拟样机，展开“调机与试缝”，先点“恢复标准”、再点“试缝 30 针”，确认线迹正常。", "Open the virtual prototype, open “Adjust and test-sew”, press “Restore standard” then “Sew 30 stitches”, and confirm the seam is good."],
+            ["把旋梭定时调到 −20°，试缝；记下出现的故障、样机上标红的部位和页面给出的原因，再点故障看它对应的实验。", "Set the hook timing to −20° and sew; note the faults, the part marked red and the cause given, then click the fault to see the lab it points to."],
+            ["恢复标准后依次把针杆高度、夹线器张力、送布定时、压脚压力调到出毛病，每次只动一个，记录同样的内容。", "Reset, then push needle-bar height, upper tension, feed timing and foot pressure into trouble one at a time, recording the same items each time."],
+            ["把送布定时调到 +20°，在时序图上看送布牙曲线和机针曲线怎样重叠；点“看成线”慢放，看布在针里时是否还在动。", "Set the feed timing to +20°, look at how the feed-dog and needle curves overlap on the timing chart, and use “Watch the stitch form” in slow motion to see whether the fabric moves while the needle is in it."],
+            ["把转速调到 6000 r/min，平衡率分别取 0、0.45、1，试缝看是否出现“振动大”，记录页面给出的最大惯性力。", "Set the speed to 6000 r/min and the balance ratio to 0, 0.45 and 1 in turn; sew and see whether “Strong vibration” appears, recording the peak inertia force given."]],
+   "record": {"caption": ["单参数调偏的结果", "Effect of moving one setting"], "headers": [["调了什么，调到多少", "What was moved, and to what"], ["试缝统计", "Test-seam counts"], ["故障名称", "Faults"], ["标红部位", "Part marked red"], ["对应实验", "Lab to look at"]], "rows": 8},
+   "questions": [["旋梭定时太早和太晚都会跳针，样机给出的原因有什么不同？", "Hook timing too early and too late both skip stitches; how do the causes given by the prototype differ?"],
+                 ["送布定时推迟后为什么会断针？在时序图上指出原因。", "Why does retarding the feed break needles? Point to the reason on the timing chart."],
+                 ["平衡率取 1 时最大惯性力为什么反而变大？", "Why does the peak inertia force grow again when the balance ratio is 1?"]]}
  ],
  "assignment": {
-  "title": ["全机时序与整机动力学分析", "Whole-machine timing and dynamics analysis"],
+  "title": ["综合调机报告", "Machine diagnosis report"],
   "tasks": [
-   ["（计算）算例中机针在布中（101.7°–258.3°）与送布牙露出针板（325.8°–114.2°）的区间重叠多少度？在 4000、5000、6000 r/min 下各是多长时间？为什么这段重叠是允许的？", "(Calculation) In the worked example, by how many degrees do the needle-in-fabric (101.7°–258.3°) and dog-above-plate (325.8°–114.2°) intervals overlap? How long is that at 4000, 5000 and 6000 r/min? Why is the overlap acceptable?"],
+   ["（实验）在虚拟实验 8-2 中用老师给的故障机编号、故障数 3 排除全部故障（试缝不超过 8 次、不乱调，完成任务 3）。按故障写出：试缝看到的现象、怀疑过的原因、测量项与读数、判断、调整量和复核结果；附页面最后的结果框和日志。", "(Lab) In Virtual lab 8-2, use the machine number your teacher gives with 3 faults and clear them all (at most 8 tests, nothing else disturbed: Task 3). For each fault give the symptoms in the test seam, the causes you suspected, the measurements and readings, your diagnosis, the adjustment and the re-check; attach the final result box and the log."],
+   ["（分析）你的故障机里，哪两个故障的现象最容易混淆？说明你是靠哪一项测量把它们分开的，如果先调错了会出现什么现象。", "(Analysis) Which two faults on your machine had the most easily confused symptoms? Explain which measurement told them apart and what would have happened had you adjusted the wrong one first."],
    ["（计算与分析）把旋梭定时推迟 4°（钩线约 210°），用第 3 章公式（r = 15.5 mm、连杆 55 mm）求钩线时的回升量，说明哪条判据先不满足；再结合图 8-3 解释本章开头那位师傅把旋梭推迟七八度后为什么开始断线。", "(Calculation and analysis) Retard the hook by 4° (catch at about 210°). Using the Chapter 3 formula (r = 15.5 mm, rod 55 mm), find the rise at catch and say which criterion fails first; then use Fig. 8-3 to explain why the mechanic in the opening started getting thread breaks after retarding the hook seven or eight degrees."],
-   ["（实验）在虚拟实验 8-1 中完成任务 3，并在 6000 r/min 下记录 k = 0、0.3、0.45、0.6、1 时的最大合力，画出“最大合力—k”曲线，与图 8-5 比较。", "(Lab) Complete Task 3 of Virtual lab 8-1, and at 6000 r/min record the maximum resultant for k = 0, 0.3, 0.45, 0.6 and 1; plot maximum resultant against k and compare with Fig. 8-5."],
    ["（论述）为什么平衡块不能把平缝机的振动力消除干净？从一阶与二阶惯性力、竖直与水平方向、挑线杆的复杂运动三方面说明，并提出两条从设计上进一步减小振动的措施。", "(Discussion) Why can a counterweight not remove a lockstitch machine’s shaking force completely? Explain in terms of first- and second-order forces, vertical and horizontal directions, and the take-up lever’s complex motion, and propose two design measures to reduce vibration further."]
   ],
-  "deliverable": ["一份 PDF：计算过程、实验截图与曲线、论述题答案，共 4 页以内。", "One PDF: calculations, lab screenshots and the curve, and the discussion answer; no more than 4 pages."],
+  "deliverable": ["一份 PDF：调机报告（含结果框截图与日志）、分析题和计算论述题答案，共 5 页以内。", "One PDF: the diagnosis report (with the result box and log), and the answers to the analysis, calculation and discussion tasks; no more than 5 pages."],
   "rubric": [
-   ["第 1、2 题计算正确，判据判断准确（35 分）", "Tasks 1 and 2 calculated correctly with correct criterion judgements (35 points)"],
-   ["实验数据完整，曲线规范，与图 8-5 的比较合理（30 分）", "Complete lab data, a proper curve and a sensible comparison with Fig. 8-5 (30 points)"],
-   ["论述题三个方面说清，两条措施具体可行（25 分）", "Discussion covers all three aspects with two concrete, feasible measures (25 points)"],
-   ["书写规范、单位正确（10 分）", "Clear presentation and correct units (10 points)"]
+   ["每个故障的现象、测量、判断、调整、复核写全，判断有测量依据（40 分）", "Each fault has symptom, measurement, diagnosis, adjustment and re-check, with the diagnosis backed by measurement (40 points)"],
+   ["完成任务 3：试缝次数和有没有乱调以页面结果为准（15 分）", "Task 3 completed: number of tests and disturbed settings as shown by the page (15 points)"],
+   ["分析题说清容易混淆的现象和分辨方法（15 分）", "The analysis explains the confusable symptoms and how they were told apart (15 points)"],
+   ["计算与论述正确、具体（30 分）", "Correct, specific calculation and discussion (30 points)"]
   ]
  },
  "quiz": [
@@ -267,6 +301,6 @@
    {"phase": ["虚拟实验 8-1", "Virtual lab 8-1"], "minutes": 45, "content": ["分组完成三个任务与记录表，扫描平衡率并验证平方律。", "Groups complete the three tasks and log, sweep the balance ratio and verify the square law."]},
    {"phase": ["总结与作业", "Summary and homework"], "minutes": 20, "content": ["回到提速问题给出完整解答，总结第二篇平缝机机构；布置作业。", "Answer the speed-up problem in full and sum up Part II on lockstitch mechanisms; set the assignment."]}
   ],
-  "homework": ["完成作业“全机时序与整机动力学分析”；预习第 9 章包缝机。", "Complete the assignment “Whole-machine timing and dynamics analysis”; preview Chapter 9 on the overlock machine."]
+  "homework": ["完成作业“综合调机报告”；预习第 9 章包缝机。", "Complete the assignment “Machine diagnosis report”; preview Chapter 9 on the overlock machine."]
  }
 }

@@ -1,7 +1,7 @@
-<p class="eyebrow">第一篇 · 绪论</p><h1><span class="chno">第 2 章</span>线迹的形成</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-lockstitch"><b>动画</b>301 锁式线迹形成</a><a class="chip" href="#lab-model-lockstitch"><b>三维模型</b>工业平缝机</a></div><p>一台缝纫机的全部机构，都是为了一件事：让针线与底线在布料中按时相遇、相互交织。本章先看线迹本身，再看它是怎样一针一针形成的，最后把它拆成四个必须精确配合的动作。后面各章分别讨论实现这四个动作的机构。</p>
+<p class="eyebrow">第一篇 · 绪论</p><h1><span class="chno">第 2 章</span>线迹的形成</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">本章互动资源</span><a class="chip" href="#lab-lockstitch"><b>动画</b>301 锁式线迹形成</a><a class="chip" href="#lab-proto-lockstitch"><b>三维模型</b>平缝机虚拟样机</a></div><p>一台缝纫机的全部机构，都是为了一件事：让针线与底线在布料中按时相遇、相互交织。本章先看线迹本身，再看它是怎样一针一针形成的，最后把它拆成四个必须精确配合的动作。后面各章分别讨论实现这四个动作的机构。</p>
 <h3 id="s2-1">2.1 先看整机：工业平缝机的结构</h3>
 <p>讨论线迹之前，先认识一台完整的机器。图 2-1 是最常见的单针工业平缝机。它的外壳是一个“凹”字形的铸件：右边是立柱，上面是水平的<strong>机臂</strong>，左端下垂的部分叫<strong>机头</strong>，下面是嵌在台板里的<strong>底板</strong>。操作工面对机器坐着，布料从面前向里送进，在机头下方的压脚和针板之间被缝合。</p>
-<figure class="fig"><a class="zoom" href="img/fig_whole.png"><img src="img/fig_whole.png" alt="图 2-1　工业平缝机整机外观" loading="lazy"></a><figcaption>图 2-1　工业平缝机整机外观（由模型 2-1 渲染，结构示意）</figcaption></figure><section class="lab" id="lab-model-lockstitch" data-src="labs/model-lockstitch.html"><div class="lab-head"><span class="lab-kind">三维模型</span><h4 id="x21282">模型 2-1　工业平缝机</h4></div><p>可旋转、透视、爆炸查看整机和四条传动链，点击零件看名称。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/model-lockstitch.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
+<figure class="fig"><a class="zoom" href="img/fig_whole.png"><img src="img/fig_whole.png" alt="图 2-1　工业平缝机整机外观" loading="lazy"></a><figcaption>图 2-1　工业平缝机整机外观（三维模型渲染，结构示意）</figcaption></figure><section class="lab" id="lab-proto-lockstitch" data-src="labs/proto-lockstitch.html"><div class="lab-head"><span class="lab-kind">三维模型</span><h4 id="x21282">模型 2-1　平缝机虚拟样机</h4></div><p>按真实形状建模的平缝机：外壳可切换外观、透明盖板、开窗剖切、全透视，可拆开、按机构突出、点零件看编号；慢放看线环被钩住、绕过梭壳、收紧，时序图与三维画面联动，点哪个零件量哪个；调机试缝，故障在样机上标出部位。</p><div class="lab-actions"><button type="button" class="run">在本页运行</button><a class="open" href="labs/proto-lockstitch.html" target="_blank" rel="noopener">新窗口打开 ↗</a></div><div class="lab-frame" hidden></div></section>
 <p>从外面能看到的零件分三类：</p>
 <p>第一类是带线的零件。面线从线架上引下来，先经过夹线器，夹线器用弹簧压住线，给面线加上张力；再穿过机头前面上下摆动的挑线杆，最后向下走到针眼。线就是按这个顺序一路被引导、被控制的。</p>
 <p>第二类是直接接触布料的零件：针杆和装在它下端的机针、压住布的压脚、托住布的针板，以及藏在针板下面、只有齿尖会周期性地冒出来的送布牙。布就是夹在压脚和送布牙之间被一针一针往前推的。</p>
@@ -17,7 +17,7 @@
 <p>第三，送布是两个运动合成的。送布牙的水平运动来自上轴的送布偏心轮，中间经过针距调节器，所以针距可以调、也可以倒缝；上下运动则来自下轴的抬牙偏心轮。两个运动叠加起来，送布牙的齿尖就画出一个近似椭圆的轨迹：在上面时向前推布，落到针板以下后再退回来。</p>
 <p>图 2-4 是整机装配爆炸图，部件大致按拆装方向展开：先卸面板和机壳上的附件，再抽出上轴组件、针杆和挑线组件；底板下面是下轴、旋梭和送布组件。读图时把每个组件对应到图 2-3 的哪一条链上。</p>
 <figure class="fig"><a class="zoom" href="img/fig_explode.png"><img src="img/fig_explode.png" alt="图 2-4　整机装配爆炸图" loading="lazy"></a><figcaption>图 2-4　整机装配爆炸图（结构示意）</figcaption></figure>
-<p>静态图只能看一个角度。<a href="#lab-model-lockstitch" class="labref">模型 2-1　工业平缝机三维结构</a> 可以拖动旋转，在外观、透视、爆炸三种显示之间切换，点击某条传动链单独高亮；点“播放”后整台机器按真实运动关系转起来，面线随挑线杆收放。建议先在模型里把四条链各看一遍，再往下读。</p>
+<p>静态图只能看一个角度。<a href="#lab-proto-lockstitch" class="labref">模型 2-1　平缝机虚拟样机</a> 可以拖动旋转，外壳在外观、透明盖板、开窗剖切、全透视之间切换，拖“拆开程度”把整机拆开；在“机构”里点一条传动链让它单独突出，点零件看它的编号和名称；点“播放”后整台机器按真实运动关系转起来，面线从线团经夹线器、挑线杆走到机针，随挑线杆收放。建议先在样机里把四条链各看一遍，再往下读。</p>
 <h3 id="s2-2">2.2 引子：为什么会“跳针”</h3>
 <p>缝纫车间里最常见的投诉之一是跳针：布面上本该连续的线迹缺了一针。机器照常运转，针照常上下，线却没有交织上。原因几乎总是同一个——旋梭的梭尖没有在正确的时刻、正确的位置钩住针线形成的线环。要理解跳针，就要先理解线环是怎样产生的、只存在多长时间。</p>
 <h3 id="s2-3">2.3 线迹的分类</h3>

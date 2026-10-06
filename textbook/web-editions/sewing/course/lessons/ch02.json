@@ -167,15 +167,15 @@
      "When reading it, map each assembly to one of the trains in the block diagram."
     ],
     [
-     "模型 2-1：外观、透视、爆炸三种显示；点击传动链单独高亮；播放后整机按真实运动关系转起来。",
-     "Model 2-1: exterior, X-ray and exploded displays; click a train to highlight it; press Play and the whole machine runs with its true motion relations."
+     "模型 2-1（平缝机虚拟样机）：外观、透明盖板、开窗剖切、全透视四种外壳，可拆开；点击传动链单独突出；播放后整机按真实运动关系转起来，可慢放看成线。",
+     "Model 2-1 (lockstitch virtual prototype): painted, clear-cover, cut-away and X-ray housings, and it comes apart; click a train to highlight it; press Play and the whole machine runs with its true motion, with slow motion to watch the stitch form."
     ]
    ],
    "formula": "",
    "figure": "fig_explode.png",
    "narration": [
-    "这张爆炸图把整机部件大致按拆装的方向展开：先卸面板和机壳上的附件，再抽出上轴组件、针杆和挑线组件；底板下面是下轴、旋梭和送布组件。读图的方法是把每个组件对应到刚才框图的某一条链上。静态图只能看一个角度，所以请大家打开模型 2-1：可以拖动旋转，在外观、透视、爆炸之间切换，点一条传动链让它单独高亮；点播放，整台机器按真实运动关系转起来，面线还会随挑线杆收放。建议四条链各看一遍，再往下学。",
-    "This exploded view spreads the parts out roughly in the direction you would take them apart: first the face plate and fittings, then the main-shaft assembly, needle bar and take-up; under the bed are the hook shaft, rotary hook and feed assembly. The way to read it is to map each assembly to one of the trains in the block diagram. A static picture shows only one angle, so please open Model 2-1: you can drag to rotate, switch between exterior, X-ray and exploded, and click a drive train to highlight it; press Play and the whole machine runs with its true motion, the needle thread even paying out and taking up with the lever. Look at each of the four trains before going on."
+    "这张爆炸图把整机部件大致按拆装的方向展开：先卸面板和机壳上的附件，再抽出上轴组件、针杆和挑线组件；底板下面是下轴、旋梭和送布组件。读图的方法是把每个组件对应到刚才框图的某一条链上。静态图只能看一个角度，所以请大家打开模型 2-1：可以拖动旋转，外壳在外观、透明盖板、开窗剖切、全透视之间切换，还能拆开，点一条传动链让它单独突出；点播放，整台机器按真实运动关系转起来，面线还会随挑线杆收放。建议四条链各看一遍，再往下学。",
+    "This exploded view spreads the parts out roughly in the direction you would take them apart: first the face plate and fittings, then the main-shaft assembly, needle bar and take-up; under the bed are the hook shaft, rotary hook and feed assembly. The way to read it is to map each assembly to one of the trains in the block diagram. A static picture shows only one angle, so please open Model 2-1: you can drag to rotate, switch the housing between painted, clear covers, cut-away and X-ray, take it apart, and click a drive train to highlight it; press Play and the whole machine runs with its true motion, the needle thread even paying out and taking up with the lever. Look at each of the four trains before going on."
    ]
   },
   {
@@ -638,64 +638,64 @@
    ]
   },
   {
-   "id": "model-lockstitch",
+   "id": "proto-lockstitch",
    "no": "M2-1",
    "title": [
-    "工业平缝机三维结构",
-    "3D structure of an industrial lockstitch machine"
+    "平缝机虚拟样机：结构与成线",
+    "Lockstitch virtual prototype: structure and stitch formation"
    ],
    "goal": [
     [
-     "在三维模型中找出机臂、立柱、机头、底板和上轴、下轴，以及四条传动链。",
-     "Find the arm, pillar, head and bed, the main and hook shafts, and the four drive trains in the 3D model."
+     "在虚拟样机中找出机臂、立柱、机头、底板和上轴、下轴，以及四条传动链，记下关键零件的编号。",
+     "Find the arm, pillar, head and bed, the main and hook shafts, and the four drive trains on the virtual prototype, and note the numbers of the key parts."
     ],
     [
-     "运转模型，验证旋梭转角始终是主轴转角的 2 倍，以及主轴转角与当前阶段的对应关系。",
-     "Run the model to confirm that the hook angle is always twice the shaft angle, and how shaft angle maps to the current phase."
+     "慢放看线环怎样被梭尖钩住、绕过梭壳、被挑线杆收紧，并把它和时序图上的时刻对应起来。",
+     "Watch in slow motion how the loop is caught by the hook point, carried round the bobbin case and pulled tight by the take-up lever, and match it to moments on the timing chart."
     ],
     [
-     "把爆炸视图中的组件对应到框图中的传动链。",
-     "Map the assemblies in the exploded view to the drive trains in the block diagram."
+     "验证旋梭转角始终是主轴转角的 2 倍；用测量功能读出机针一转里的速度和加速度最大值。",
+     "Confirm that the hook angle is always twice the shaft angle, and use the measuring tool to read the needle's peak velocity and acceleration over one turn."
     ]
    ],
    "theory": [
     [
-     "刺布：上轴 → 针杆曲柄 → 针杆连杆 → 针杆（曲柄滑块）。挑线：上轴 → 挑线曲柄销 → 挑线杆（四连杆）。",
-     "Needle: main shaft → needle-bar crank → needle-bar link → needle bar (slider-crank). Take-up: main shaft → take-up crank pin → take-up lever (four-bar)."
+     "刺布：上轴 → 针杆曲柄 → 针杆连杆 → 针杆（曲柄滑块）。挑线：上轴 → 挑线曲柄销 → 挑线连杆 → 挑线杆（四连杆）。",
+     "Needle: main shaft → needle-bar crank → needle-bar link → needle bar (slider-crank). Take-up: main shaft → take-up crank pin → link → take-up lever (four-bar)."
     ],
     [
-     "钩线：上轴 → 同步带 1:1 → 下轴 → 齿轮 1:2 → 旋梭，所以旋梭转角 = 2φ。",
-     "Hook: main shaft → timing belt 1:1 → hook shaft → gears 1:2 → rotary hook, so hook angle = 2φ."
+     "钩线：上轴 → 同步带 1:1 → 下轴 → 旋梭，旋梭转角 = 2φ；梭尖在机针回升约 2 mm（约 206°）时到达机针。送布：送布偏心轮 → 针距调节器 → 牙架（水平），抬牙偏心轮 → 牙架（上下）。",
+     "Hook: main shaft → timing belt 1:1 → hook shaft → rotary hook, hook angle = 2φ; the point reaches the needle at about 2 mm of needle rise (about 206°). Feed: feed eccentric → stitch regulator → feed bar (horizontal); lift eccentric → feed bar (vertical)."
     ],
     [
-     "送布：上轴送布偏心轮 → 针距调节器 → 送布摆轴（水平）；下轴抬牙偏心轮 → 抬牙摆轴（上下）。",
-     "Feed: feed eccentric on the main shaft → stitch regulator → feed rock shaft (horizontal); lift eccentric on the hook shaft → lift rock shaft (vertical)."
+     "样机的运动全部由问渠平缝机机构库算出，尺寸取第 3–8 章算例；外形为通用示意。透明盖板、开窗剖切与真机套件 A、A+ 相同，零件编号与拆装手册一致。",
+     "All motion comes from the WenQuest lockstitch mechanism library with the dimensions of the Chapter 3–8 examples; the outer shape is generic. The clear covers and cut-away windows match real-machine kits A and A+, and the part numbers match the assembly manual."
     ]
    ],
    "steps": [
     [
-     "打开模型 2-1，在“显示”中选“外观”，用视角按钮“斜视、正面、左侧、背面”各看一遍，拖动旋转、滚轮缩放，找出机臂、立柱、机头、底板、手轮、线架。",
-     "Open Model 2-1, choose “Exterior” under Display, look from each view button (Isometric, Front, Left, Back), drag to rotate and scroll to zoom, and find the arm, pillar, head, bed, handwheel and thread stand."
+     "打开虚拟样机，拖动旋转、滚轮缩放，在“外壳”里依次选外观、透明盖板、开窗剖切、全透视，找出机臂、立柱、机头、底板、手轮和线架。",
+     "Open the virtual prototype, drag to rotate and scroll to zoom, choose Painted, Clear covers, Cut-away windows and X-ray under “Housing” in turn, and find the arm, pillar, head, bed, handwheel and thread stand."
     ],
     [
-     "切换到“透视”，勾选“显示标注”，找到上轴、下轴和立柱里的同步带。",
-     "Switch to “X-ray”, tick “Show labels”, and find the main shaft, hook shaft and the timing belt in the pillar."
+     "勾选“显示编号”，再点上轴、针杆、挑线杆、旋梭、送布牙，把编号、名称和所属机构填入记录表。",
+     "Tick “Show numbers”, then click the main shaft, needle bar, take-up lever, rotary hook and feed dog, and enter number, name and mechanism in the record table."
     ],
     [
-     "在“四条传动链”中依次点击刺布、挑线、钩线、送布，让每条链单独高亮，按传动顺序写下经过的零件。",
-     "Under “Four drive trains”, click Needle, Take-up, Hook and Feed in turn to highlight each, and write down the parts in drive order."
+     "在“机构”里依次点刺布、挑线、钩线、送布，让每条链单独突出，按传动顺序写下经过的零件；拖动“拆开程度”看部件怎样展开。",
+     "Under “Mechanisms”, click Needle, Take-up, Hook and Feed in turn to highlight each, and write down the parts in drive order; drag “Explode” to see how the assemblies come apart."
     ],
     [
-     "点“播放”，速度选“很慢”，观察四条链同时运动；再暂停，拖动“主轴转角”滑块到 0°、90°、180°、206°、270°、340°，记下旋梭转角、针杆位移和当前阶段。",
-     "Press Play at Very slow and watch all four trains move together; then pause and drag the Main-shaft angle slider to 0°, 90°, 180°, 206°, 270° and 340°, recording hook angle, needle-bar displacement and current phase."
+     "点“看成线（放大钩线区）”，速度选“慢放 1/100”，看面线线环随机针回升长大、被梭尖钩住、绕过梭壳、被挑线杆收紧。",
+     "Press “Watch the stitch form”, set the speed to Slow 1/100, and watch the needle-thread loop grow as the needle rises, get caught by the hook point, pass round the bobbin case and be pulled tight by the lever."
     ],
     [
-     "切换到“爆炸”，拖动“拆开程度”滑块从 0 到 1，看部件怎样展开，点击零件查看名称。",
-     "Switch to “Exploded” and drag the Explode amount slider from 0 to 1 to see how the parts separate; click parts to see their names."
+     "暂停，依次点“跳到：针杆最高、针最低、钩线、脱环、牙落下”，读出主轴转角、针杆位移和旋梭转角，并在时序图上找到同一时刻；再在时序图上点任一处，看三维画面跟着转到那个转角。",
+     "Pause, press the jump buttons (needle top, needle bottom, loop catch, loop release, dog drops) in turn, read shaft angle, needle-bar displacement and hook angle, and find the same moment on the timing chart; then click anywhere on the chart and watch the 3D view turn to that angle."
     ],
     [
-     "取消“显示台板”，从“背面”视角看底板下的下轴、旋梭和送布组件。",
-     "Untick “Show table” and look from the Back view at the hook shaft, rotary hook and feed assembly under the bed."
+     "点“测量”，再点机针，读出它一转里速度和加速度的最大值；换成挑线杆、送布牙各量一次。",
+     "Press “Measure”, click the needle and read the peak velocity and acceleration over one turn; repeat for the take-up lever and feed dog."
     ]
    ],
    "record": {
@@ -704,6 +704,10 @@
      "Shaft angle and mechanism states"
     ],
     "headers": [
+     [
+      "时刻",
+      "Moment"
+     ],
      [
       "主轴转角 φ（°）",
       "Shaft angle φ (°)"
@@ -717,8 +721,8 @@
       "Needle-bar displacement x (mm)"
      ],
      [
-      "当前阶段",
-      "Current phase"
+      "线环在做什么",
+      "What the loop is doing"
      ],
      [
       "挑线杆、送布牙在做什么",
@@ -733,12 +737,12 @@
      "Why is the hook angle always twice the shaft angle? With 1:1, could the loop still pass around the bobbin case?"
     ],
     [
-     "送布牙的水平运动和上下运动分别来自哪根轴？为什么针距调节器只装在水平运动这一路上？",
-     "Which shaft gives the feed dog its horizontal motion and which its vertical motion? Why is the stitch regulator only in the horizontal path?"
+     "线环被钩住以后，挑线杆是在放线还是在收线？如果挑线杆放线不够，会出现什么现象？",
+     "After the loop is caught, is the take-up lever paying out or taking up? What happens if it pays out too little?"
     ],
     [
-     "模型中“机针下行”“刺布”“形成线环”“钩线”“绕梭”“收紧与送布”各从多少度开始？和时序图的三个关键时刻怎样对应？",
-     "At what angles do the model's phases (needle descends, piercing, loop forming, catching, round the bobbin, tightening and feeding) begin, and how do they match the three key moments of the timing diagram?"
+     "机针的最大加速度出现在哪个转角附近？为什么转速提高一倍，惯性力要变成四倍？",
+     "Near which shaft angle does the needle reach its peak acceleration? Why does doubling the speed make the inertia force four times larger?"
     ]
    ]
   }

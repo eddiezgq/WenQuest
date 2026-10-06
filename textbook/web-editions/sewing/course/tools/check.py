@@ -8,8 +8,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 COURSE = HERE.parent
 BOOK = COURSE.parent
-LABS = {1: ['stitch'], 2: ['lockstitch', 'model-lockstitch'], 3: ['slidercrank'], 4: ['takeup'], 5: ['hook'], 6: ['feed'],
-        7: ['tension'], 8: ['timing'], 9: ['model-overlock', 'difffeed', 'rssr'], 10: ['looper', 'coverstitch'], 11: ['zigzag'],
+LABS = {1: ['stitch'], 2: ['lockstitch', 'proto-lockstitch'], 3: ['slidercrank'], 4: ['takeup'], 5: ['hook'], 6: ['feed'],
+        7: ['tension'], 8: ['timing', 'tune-lockstitch', 'proto-lockstitch'], 9: ['model-overlock', 'difffeed', 'rssr'], 10: ['looper', 'coverstitch'], 11: ['zigzag'],
         12: ['hang', 'tend'], 13: ['solenoid', 'servo'], 14: ['trim'], 15: ['pattern', 'patprog', 'model-pattern'], 16: ['embroid'],
         17: ['knit', 'knitprog', 'fpga', 'model-flatknit'], 18: ['ebox'], 19: ['config'], 20: ['proto-ls'], 21: ['proto-fk'],
         22: ['testbench'], 23: ['tol'], 24: ['hookfit'], 25: ['cam'], 26: ['iot'], 27: ['factory'], 28: ['line21'], 29: ['line'],

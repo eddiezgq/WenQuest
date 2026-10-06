@@ -15,10 +15,10 @@
 },
 {
 "ch": 2,
-"href": "labs/model-lockstitch.html",
+"href": "labs/proto-lockstitch.html",
 "kind": "3D model",
-"title": "Industrial lockstitch machine",
-"desc": "Rotate, X-ray and explode the whole machine and its four drive trains; click a part to see its name."
+"title": "Lockstitch virtual prototype",
+"desc": "A lockstitch machine modelled in its true shapes: painted, clear-cover, cut-away and X-ray housings, take it apart, highlight a mechanism, click a part for its number; watch the stitch form in slow motion with a linked timing chart; measure displacement, velocity and acceleration of any moving part; tune and test-sew, with faults marked on the machine."
 },
 {
 "ch": 3,
@@ -61,6 +61,13 @@
 "kind": "Virtual lab",
 "title": "Whole-machine timing editor",
 "desc": "Move the hook timing, take-up phase and feed timing and check six cross-mechanism criteria live; adjust the speed and balance ratio to see the locus and maximum of the machine’s resultant inertia force."
+},
+{
+"ch": 8,
+"href": "labs/tune-lockstitch.html",
+"kind": "Virtual lab",
+"title": "Machine diagnosis",
+"desc": "A lockstitch machine with 1–3 random faults: sew a test seam and look at both sides and at how the machine behaves, measure with gauges, adjust, until all 30 stitches are good; tests, measurements and adjustments are counted, and settings disturbed for no reason are flagged."
 },
 {
 "ch": 9,

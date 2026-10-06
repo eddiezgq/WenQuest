@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>综合调机</title>
+<style>
+:root{--bg:#f3f5f6;--sheet:#ffffff;--ink:#17212b;--muted:#5d6b7a;--rule:#d9e0e6;--accent:#0f6e74;--ok:#1e8449;--bad:#c0392b;--warn:#b7791f;--upper:#2f6fd6;--bobbin:#e0662f;--cloth:#efe4cc;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;--f-mono:ui-monospace,"SFMono-Regular",Menlo,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e1317;--sheet:#151c22;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--upper:#6ea8ff;--bobbin:#ff8c55;--cloth:#4a4232}}
+:root[data-theme="dark"]{--bg:#0e1317;--sheet:#151c22;--ink:#e2e7ec;--muted:#9aa6b2;--rule:#2b3540;--accent:#4cc3c9;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--upper:#6ea8ff;--bobbin:#ff8c55;--cloth:#4a4232}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+header{padding:12px 18px 6px}
+header h1{margin:0;font-size:1.25rem}
+header .sub{color:var(--muted);font-size:.85rem}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:12px;padding:0 18px 18px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;padding:0 10px 14px}}
+.col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:10px 12px}
+.panel h3{margin:0 0 6px;font-size:.95rem}
+button{font:inherit;font-size:.85rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+select,input[type=number]{font:inherit;font-size:.85rem;border:1px solid var(--rule);background:var(--sheet);color:var(--ink);border-radius:6px;padding:3px 6px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+canvas{display:block;width:100%;height:230px;border-radius:8px;background:var(--bg)}
+.story{font-size:.9rem}
+.obs{list-style:none;margin:6px 0 0;padding:0}
+.obs li{border-left:4px solid var(--warn);padding:3px 8px;margin:4px 0;font-size:.88rem}
+.obs li.bad{border-color:var(--bad)} .obs li.ok{border-color:var(--ok)}
+.strip{display:flex;flex-wrap:wrap;gap:3px;margin:6px 0}
+.strip i{width:12px;height:12px;border-radius:2px;display:inline-block}
+.s-ok{background:var(--ok)}.s-skip{background:var(--bad)}.s-cut{background:#8e44ad}.s-hit{background:var(--warn)}.s-break{background:#111;outline:1px solid var(--bad)}
+.tools{display:grid;grid-template-columns:1fr;gap:4px}
+.tool{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.85rem;border-bottom:1px dashed var(--rule);padding:3px 0}
+.tool .r{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);min-width:7em;text-align:right}
+.adj{display:grid;grid-template-columns:1fr auto auto;gap:4px 6px;align-items:center;font-size:.85rem}
+.adj span.v{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.log{font-family:var(--f-mono);font-size:.78rem;max-height:220px;overflow:auto;white-space:pre-wrap;color:var(--muted)}
+.done{border:2px solid var(--ok);border-radius:10px;padding:8px 12px;background:color-mix(in srgb,var(--ok) 8%,transparent)}
+.task{font-size:.85rem;margin:4px 0}
+.task .st{font-family:var(--f-mono);font-size:.78rem;margin-right:6px}
+.st.ok{color:var(--ok)} .st.no{color:var(--muted)}
+.note{color:var(--muted);font-size:.8rem}
+.back{display:inline-block;margin:0 18px 18px;color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <h1 data-t="title">实验 8-2　综合调机：找出故障机的毛病</h1>
+  <div class="sub" data-t="sub">《缝纫机设计与制造》第 8 章 · 用试缝看现象、用量具量、再动手调；判据来自第 4–8 章的实验，机构库与虚拟样机相同</div>
+</header>
+<div class="wrap">
+  <div class="col">
+    <section class="panel">
+      <p class="story" data-t="story">车间送来一台平缝机，操作工只说“缝不好”。你是修机工：先试缝，看线迹正反面和机器的表现；再用量具量出可疑的地方；动手调整，再试缝，直到 30 针都合格、没有其他毛病。每次试缝、测量和调整都记在日志里，报告要写出每个故障的现象、判断依据和调整量。</p>
+      <div class="row"><label for="level" data-t="levelL">故障数</label><select id="level"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+        <button id="newM" data-t="newM">换一台故障机</button>
+        <label for="seed" data-t="seedL">故障机编号</label><input id="seed" type="number" min="1" max="999999" style="width:7em"><button id="loadM" data-t="loadM">载入</button></div>
+      <div class="note" data-t="seedNote">同一个编号和故障数，得到的是同一台故障机（老师可以给全班同一个编号）。</div>
+    </section>
+    <section class="panel">
+      <h3 data-t="hSew">试缝</h3>
+      <div class="row"><button class="primary" id="sew" data-t="sew">试缝 30 针</button><span class="note" id="sewSum"></span></div>
+      <div class="strip" id="strip"></div>
+      <canvas id="cv" aria-label="缝好的布：正面与反面"></canvas>
+      <ul class="obs" id="obs"></ul>
+    </section>
+    <section class="panel" id="result" hidden></section>
+    <section class="panel">
+      <h3 data-t="hTasks">任务（自动判定）</h3>
+      <div id="tasks"></div>
+    </section>
+  </div>
+  <div class="col">
+    <section class="panel">
+      <h3 data-t="hMeas">测量（量具）</h3>
+      <div class="tools" id="tools"></div>
+    </section>
+    <section class="panel">
+      <h3 data-t="hAdj">调整</h3>
+      <div class="adj" id="adj"></div>
+      <div class="note" data-t="adjNote">调整只知道拧了多少，不知道现在的绝对值；要知道现在是多少，先量。</div>
+    </section>
+    <section class="panel">
+      <h3 data-t="hLog">日志</h3>
+      <div class="row note" id="counts"></div>
+      <div class="log" id="log"></div>
+    </section>
+  </div>
+</div>
+<a href="../index.html" class="back" data-t="back">返回教材</a>
+<script src="../../lib/lockstitch-kit.js" data-inline></script>
+<script>
+(function(){
+const LANG=(document.documentElement.lang||'zh').slice(0,2)==='en'?'en':'zh';
+const EN={title:'Lab 8-2 Machine diagnosis: find what is wrong',sub:'Sewing Machine Design and Manufacturing, chapter 8 · observe by test-sewing, measure with gauges, then adjust; the criteria come from the labs of chapters 4–8, the mechanism library is the same as the virtual machine',
+  story:'A lockstitch machine comes in from the sewing floor; the operator only says "it doesn\'t sew right". You are the mechanic: sew a test seam and look at both sides and at how the machine behaves; measure what looks suspicious; adjust and sew again until all 30 stitches are good and nothing else is wrong. Every test, measurement and adjustment is logged; your report gives, for each fault, the symptom, the evidence and the adjustment.',
+  levelL:'Faults',newM:'Another faulty machine',seedL:'Machine no.',loadM:'Load',seedNote:'The same number and number of faults always give the same machine (a teacher can give the whole class one number).',
+  hSew:'Test sewing',sew:'Sew 30 stitches',hTasks:'Tasks (checked automatically)',hMeas:'Measure (gauges)',hAdj:'Adjust',adjNote:'An adjustment only tells you how far you turned it, not the absolute value; measure to know where it is now.',hLog:'Log',back:'Back to the book'};
+if(LANG==='en'){document.title='Machine diagnosis';document.querySelectorAll('[data-t]').forEach(e=>{if(EN[e.dataset.t])e.textContent=EN[e.dataset.t];});}
+const Z=LANG==='zh';const L=(zh,en)=>Z?zh:en;
+const $=id=>document.getElementById(id), K=WQLS, M=K.machine;
+// ---------------------------------------------------------------- what the operator sees (symptoms, never causes)
+const SYM={hit:['咔嗒响，针尖起毛刺，断针','Clicking noise, burred needle tip, broken needles','bad'],cut:['面线起毛、劈开，常断线','Upper thread frays and splits, breaks often','bad'],
+  skip:['跳针：线迹上有长针脚','Skipped stitches: long stitches in the seam','bad'],short:['面线常断，线迹忽紧忽松','Upper thread breaks often; stitches tight and loose by turns','bad'],
+  slack:['机针下行时面线松垮，偶尔绕在针上','Upper thread goes slack as the needle comes down and sometimes wraps the needle','warn'],
+  jam:['布面起皱，针孔周围纱线被挤开','Fabric puckers; yarns pushed apart round the holes','bad'],tbreak:['高速时断线','Thread breaks at high speed','bad'],
+  bobup:['正面看得到底线（一个个小点）','Bobbin thread shows on top (little dots)','warn'],float:['反面面线成圈（浮线）','Loops of upper thread underneath','warn'],
+  loose:['线迹松，用指甲能挑起','Loose stitches: a fingernail lifts them','warn'],pucker:['缝线拉皱了布','The seam is puckered','bad'],
+  dogmark:['布反面有牙痕','Feed-dog marks on the underside','warn'],footmark:['布正面有压痕','Presser-foot marks on top','warn'],
+  slip:['针距比刻度短，长短不匀','Stitches shorter than set and uneven','warn'],drag:['机针被带弯，针眼处偶尔断针，线迹歪','Needle bends; occasional needle breaks; crooked stitches','bad'],
+  back:['针距不匀','Uneven stitch length','warn'],ply:['上层布越缝越长','Upper ply creeps ahead','warn'],vib:['机器振动、噪声大','The machine shakes and is noisy','warn']};
+// ---------------------------------------------------------------- gauges: they read the machine's real state, with gauge scatter
+let mach=null, cfg=null, faults=[], nTest=0, nMeas=0, nAdj=0, solved=false, lastSew=null;
+let rs=1;const rnd=()=>{rs=(rs*1103515245+12345)%2147483648;return rs/2147483648;};
+const noise=sd=>{let u=0,v=0;while(!u)u=rnd();while(!v)v=rnd();return sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+const TOOLS=[
+  ['dz',L('针杆高度规：针杆高度（对标准）','Needle-bar height gauge (vs standard)'),()=>(cfg.dz+noise(0.02)).toFixed(2)+' mm'],
+  ['rise',L('定时规：钩线时机针回升量（标准 2.0）','Timing gauge: needle rise at loop catch (standard 2.0)'),()=>(K.hook.geom({psi:cfg.psi,dz:cfg.dz,g:cfg.g,d:cfg.d,fab:'woven'}).h+noise(0.05)).toFixed(2)+' mm'],
+  ['g',L('塞尺：梭尖与机针的间隙（标准 0.04–0.1）','Feeler gauge: hook point to needle (standard 0.04–0.1)'),()=>Math.max(0,K.hook.geom({psi:cfg.psi,dz:cfg.dz,g:cfg.g,d:cfg.d,fab:'woven'}).g+noise(0.01)).toFixed(2)+' mm'],
+  ['d',L('看机针型号','Read the needle size'),()=>'Nm '+Math.round(cfg.d*100)],
+  ['stroke',L('挑线簧行程（标准 10）','Check-spring stroke (standard 10)'),()=>(cfg.stroke+noise(0.3)).toFixed(1)+' mm'],
+  ['u',L('过线板刻线位置（标准 0）','Thread-guide mark (standard 0)'),()=>(cfg.u+noise(0.5)).toFixed(1)+' mm'],
+  ['Td',L('张力计：面线张力（标准约 100）','Tension meter: upper thread (standard about 100)'),()=>(cfg.Td+noise(5)).toFixed(0)+' cN'],
+  ['Tb',L('梭壳吊线法：底线张力（标准约 40）','Bobbin-case drop test (standard about 40)'),()=>(cfg.Tb+noise(2)).toFixed(0)+' cN'],
+  ['feed',L('送布定时：牙落下时针眼上沿高出针板（标准 0）','Feed timing: eye above plate when the dog drops (standard 0)'),()=>{const F=K.feed.model({fab:cfg.fab,mode:'drop',s:cfg.s,dT:cfg.dT,dP:cfg.dP,h:cfg.h,P:cfg.P});return (F.eyeAtDrop+noise(0.1)).toFixed(1)+' mm';}],
+  ['h',L('牙高规：牙高出针板（标准 0.8）','Dog-height gauge (standard 0.8)'),()=>(cfg.h+noise(0.02)).toFixed(2)+' mm'],
+  ['P',L('压脚压力计（标准 1.00）','Foot-pressure gauge (standard 1.00)'),()=>(cfg.P+noise(0.03)).toFixed(2)],
+  ['vib',L('测振仪：整机最大惯性力（≤ 550 N）','Vibration meter: peak inertia force (≤ 550 N)'),()=>{let m=0;for(const [x,y] of K.timing.forces({dt:0,dT:cfg.dT,n:cfg.n,k:cfg.k}))m=Math.max(m,Math.hypot(x,y));return (m*(1+noise(0.02))).toFixed(0)+' N';}]];
+const ADJ=[['psi',L('旋梭定时','Hook timing'),1,'°',L('推迟','later'),L('提前','earlier')],['dz',L('针杆高度','Needle-bar height'),0.05,'mm',L('升','up'),L('降','down')],
+  ['g',L('梭尖间隙','Hook clearance'),0.01,'mm','+','−'],['stroke',L('挑线簧行程','Check-spring stroke'),0.5,'mm','+','−'],['u',L('过线板','Thread guide'),1,'mm','+','−'],
+  ['Td',L('夹线器','Upper tension'),5,'cN',L('紧','tighter'),L('松','looser')],['Tb',L('底线（梭壳螺钉）','Bobbin tension'),2,'cN',L('紧','tighter'),L('松','looser')],
+  ['dT',L('送布定时','Feed timing'),1,'°',L('推迟','later'),L('提前','earlier')],['h',L('牙高','Dog height'),0.05,'mm','+','−'],['P',L('压脚压力','Foot pressure'),0.05,'','+','−'],
+  ['k',L('平衡块（平衡率）','Counterweight (balance ratio)'),0.05,'','+','−']];
+// ---------------------------------------------------------------- log
+const logLines=[];
+function log(s){logLines.push(s);$('log').textContent=logLines.join('\n');$('log').scrollTop=1e9;
+  $('counts').textContent=L(`试缝 ${nTest} 次 · 测量 ${nMeas} 次 · 调整 ${nAdj} 次`,`${nTest} tests · ${nMeas} measurements · ${nAdj} adjustments`);}
+// ---------------------------------------------------------------- machine
+function load(level,seed){const g=M.generate(level,seed);mach={level,seed,init:Object.assign({},g.cfg)};cfg=Object.assign({},g.cfg);faults=g.faults;
+  nTest=nMeas=nAdj=0;solved=false;lastSew=null;rs=seed*7+level;logLines.length=0;$('seed').value=seed;$('level').value=level;
+  $('result').hidden=true;$('strip').innerHTML='';$('sewSum').textContent='';$('obs').innerHTML='';draw(null);
+  log(L(`故障机 #${seed}（${level} 个故障）到了。`,`Faulty machine #${seed} (${level} fault${level>1?'s':''}) arrived.`));}
+$('tools').innerHTML=TOOLS.map(([k,l],i)=>`<div class="tool"><span>${l}</span><span class="r" id="r_${k}">—</span><button data-i="${i}">${L('量','measure')}</button></div>`).join('');
+$('tools').onclick=e=>{const b=e.target.closest('button');if(!b)return;const [k,l,fn]=TOOLS[+b.dataset.i];const v=fn().replace(/^-0(\.0+)?( |$)/,'0$1$2');nMeas++;$('r_'+k).textContent=v;log(`${L('量','measure')}  ${l}: ${v}`);};
+$('adj').innerHTML=ADJ.map(([k,l,st,u,up,dn],i)=>`<span>${l}</span><button data-i="${i}" data-s="-1">${dn} ${st}${u?' '+u:''}</button><button data-i="${i}" data-s="1">${up} ${st}${u?' '+u:''}</button>`).join('')
+  +`<span>${L('机针','Needle')}</span><button id="needle90" style="grid-column:span 2">${L('换成 Nm 90','Fit an Nm 90 needle')}</button>`;
+$('adj').onclick=e=>{const b=e.target.closest('button');if(!b)return;nAdj++;
+  if(b.id==='needle90'){cfg.d=0.9;log(L('调  换机针 → Nm 90','adjust  needle → Nm 90'));return;}
+  const [k,l,st,u,up,dn]=ADJ[+b.dataset.i],sgn=+b.dataset.s;cfg[k]=Math.round((cfg[k]+sgn*st)*1000)/1000;log(`${L('调','adjust')}  ${l} ${sgn>0?up:dn} ${st}${u?' '+u:''}`);};
+// ---------------------------------------------------------------- test sewing
+$('sew').onclick=()=>{nTest++;const t=M.trial(cfg,30,mach.seed*31+nTest);lastSew=t;
+  const c={};t.res.forEach(r=>c[r]=(c[r]||0)+1);
+  $('strip').innerHTML=t.res.map(r=>`<i class="s-${r}"></i>`).join('');
+  $('sewSum').textContent=L(`正常 ${c.ok||0}，跳针 ${c.skip||0}，劈线 ${c.cut||0}，碰针 ${c.hit||0}，断线 ${c.break||0}`,`ok ${c.ok||0}, skipped ${c.skip||0}, split ${c.cut||0}, needle hit ${c.hit||0}, broken ${c.break||0}`);
+  const seen=new Set(t.ev.faults.map(f=>f.key));if(c.skip)seen.add('skip');if(c.cut)seen.add('cut');if(c.hit)seen.add('hit');if(c.break)seen.add('short');
+  const obs=[...seen].map(k=>SYM[k]).filter(Boolean);
+  $('obs').innerHTML=obs.length?obs.map(o=>`<li class="${o[2]}">${Z?o[0]:o[1]}</li>`).join(''):`<li class="ok">${L('30 针都合格，机器运转平稳，布面平整。','All 30 stitches good, the machine runs smoothly, the fabric lies flat.')}</li>`;
+  log(`${L('试缝','test')}  ${$('sewSum').textContent}${obs.length?' · '+obs.map(o=>Z?o[0]:o[1]).join('；'):''}`);
+  draw(t);
+  if(!obs.length&&!solved)finish();checkTasks();};
+// ---------------------------------------------------------------- the sewn fabric, both sides (drawn from the verdicts)
+function draw(t){const cv=$('cv'),r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;const g=cv.getContext('2d');g.setTransform(d,0,0,d,0,0);
+  const W=r.width,H=r.height,css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();g.clearRect(0,0,W,H);g.font='12px '+css('--f-body');
+  const half=H/2-6;[[L('正面','Top'),8],[L('反面','Underside'),H/2+4]].forEach(([lab,y0],side)=>{
+    g.fillStyle=css('--cloth');g.fillRect(10,y0+14,W-20,half-18);g.fillStyle=css('--muted');g.fillText(lab,12,y0+10);
+    if(!t)return;const ev=t.ev,keys=new Set(ev.faults.map(f=>f.key));
+    const pk=keys.has('pucker')||keys.has('jam')||keys.has('ply'),ym=y0+14+(half-18)/2,act=ev.feed.act,step=(W-60)/30*(act/3);
+    let x=30;const pts=[];t.res.forEach((r,i)=>{pts.push([x,r]);x+=step*(1+(keys.has('back')||keys.has('drag')?((i*7)%5-2)*0.08:0));});
+    // puckers: waves across the seam
+    if(pk){g.strokeStyle=css('--muted');g.globalAlpha=.5;for(let k=0;k<pts.length;k+=2){g.beginPath();g.moveTo(pts[k][0],ym-14);g.quadraticCurveTo(pts[k][0]+step,ym,pts[k][0],ym+14);g.stroke();}g.globalAlpha=1;}
+    if(side===0&&keys.has('footmark')){g.fillStyle=css('--muted');g.globalAlpha=.25;g.fillRect(20,ym-9,W-40,18);g.globalAlpha=1;}
+    if(side===1&&keys.has('dogmark')){g.strokeStyle=css('--muted');for(let xx=20;xx<W-20;xx+=4){g.beginPath();g.moveTo(xx,ym-6);g.lineTo(xx+2,ym+6);g.stroke();}}
+    // stitches: caught ones interlock; a skipped one leaves a long stitch; a broken thread ends the seam
+    g.lineWidth=2.2;let prev=null;const col=side===0?css('--upper'):css('--bobbin');
+    for(let i=0;i<pts.length;i++){const [px,r]=pts[i];if(r==='break'){g.fillStyle=css('--bad');g.fillText('✂',px-4,ym-6);prev=null;continue;}
+      const caught=r==='ok';if(!caught&&r!=='skip'){g.fillStyle=r==='hit'?css('--warn'):'#8e44ad';g.beginPath();g.arc(px,ym,3,0,7);g.fill();}
+      if(caught||r==='skip'){if(prev!==null&&caught){g.strokeStyle=col;g.beginPath();g.moveTo(prev,ym);
+        if(keys.has('loose'))g.quadraticCurveTo((prev+px)/2,ym-6,px,ym);else g.lineTo(px,ym);g.stroke();}
+        if(caught)prev=px;}
+      if(caught&&side===0&&keys.has('bobup')){g.fillStyle=css('--bobbin');g.beginPath();g.arc(px,ym,2.2,0,7);g.fill();}
+      if(caught&&side===1&&keys.has('float')){g.strokeStyle=css('--upper');g.lineWidth=1.4;g.beginPath();g.arc(px,ym+5,5,0,7);g.stroke();g.lineWidth=2.2;}}
+    g.lineWidth=1;});
+  if(t&&t.ev.faults.some(f=>f.key==='vib')){g.fillStyle=css('--warn');g.fillText(L('〰 机器在抖','〰 the machine shakes'),W-120,14);}}
+// ---------------------------------------------------------------- done: what was wrong, and was anything else disturbed
+const PNAME={psi:L('旋梭定时','hook timing'),dz:L('针杆高度','needle-bar height'),g:L('梭尖间隙','hook clearance'),d:L('机针','needle'),u:L('过线板','thread guide'),stroke:L('挑线簧','check spring'),
+  Td:L('面线张力','upper tension'),Tb:L('底线张力','bobbin tension'),dT:L('送布定时','feed timing'),dP:'dP',h:L('牙高','dog height'),P:L('压脚压力','foot pressure'),s:'s',n:'n',k:L('平衡率','balance ratio')};
+function finish(){solved=true;const bad=[];
+  // 有故障的参数可以动；粗针故障既可以换回细针，也可以重调梭尖间隙，所以间隙也算
+  const allowed=new Set();faults.forEach(k=>{const f=M.FAULTS.find(x=>x.key===k);allowed.add(f.p);if(f.p==='d')allowed.add('g');});
+  for(const k in M.TOL){const moved=Math.abs(cfg[k]-M.STD[k])>M.TOL[k]+1e-9;if(moved&&!allowed.has(k))bad.push(PNAME[k]||k);}
+  const names=faults.map(k=>{const f=M.FAULTS.find(x=>x.key===k);return Z?f.zh:f.en;});
+  const box=$('result');box.hidden=false;box.className='panel done';
+  box.innerHTML=`<h3>${L('排除完毕','Fixed')}</h3><p>${L('这台机器的故障：','The faults of this machine: ')}<b>${names.join(L('；','; '))}</b></p>
+  <p>${L(`用了试缝 ${nTest} 次、测量 ${nMeas} 次、调整 ${nAdj} 次。`,`You used ${nTest} tests, ${nMeas} measurements and ${nAdj} adjustments.`)}${bad.length?L(`<br>注意：这些本来没有毛病的地方被调离了标准：${bad.join('、')}。`,`<br>Note: these settings had nothing wrong but were moved off standard: ${bad.join(', ')}.`):L('<br>没有乱调：没毛病的地方都还在标准范围内。','<br>Nothing else was disturbed.')}</p>
+  <p class="note">${L('把日志里的现象、测量和调整整理进实验报告，每个故障写清现象、判断依据和调整量。','Put the symptoms, measurements and adjustments from the log into your report: for each fault, the symptom, the evidence and the adjustment.')}</p>`;
+  log(L(`排除完毕。故障：${names.join('；')}${bad.length?'；乱调：'+bad.join('、'):''}`,`Fixed. Faults: ${names.join('; ')}${bad.length?'; disturbed: '+bad.join(', '):''}`));
+  history.push({level:mach.level,tests:nTest,clean:!bad.length});}
+// ---------------------------------------------------------------- tasks
+const history=[];const done=new Set();
+const TASKS=[{t:L('排除一台 1 个故障的机器。','Fix a machine with 1 fault.'),ok:()=>history.some(h=>h.level>=1)},
+  {t:L('排除一台 2 个故障的机器。','Fix a machine with 2 faults.'),ok:()=>history.some(h=>h.level>=2)},
+  {t:L('排除一台 3 个故障的机器，试缝不超过 8 次，并且没有乱调。','Fix a machine with 3 faults in at most 8 tests, disturbing nothing else.'),ok:()=>history.some(h=>h.level>=3&&h.tests<=8&&h.clean)}];
+function checkTasks(){TASKS.forEach((k,i)=>{if(k.ok())done.add(i);});
+  $('tasks').innerHTML=TASKS.map((k,i)=>`<div class="task"><span class="st ${done.has(i)?'ok':'no'}">${done.has(i)?L('✓ 完成','✓ done'):L('○ 未完成','○ to do')}</span>${k.t}</div>`).join('');}
+// ---------------------------------------------------------------- start
+$('newM').onclick=()=>load(+$('level').value,1+Math.floor(Math.random()*99999));
+$('loadM').onclick=()=>{const s=Math.max(1,Math.min(999999,Math.round(+$('seed').value||1)));load(+$('level').value,s);};
+$('level').onchange=()=>$('newM').click();
+const qs=new URLSearchParams(location.search);
+load(Math.max(1,Math.min(3,+qs.get('level')||1)),Math.max(1,+qs.get('seed')||1+Math.floor(Math.random()*99999)));
+checkTasks();new ResizeObserver(()=>draw(lastSew)).observe($('cv'));
+window.__api={cfg:()=>cfg,faults:()=>faults,load,sew:()=>$('sew').click(),solved:()=>solved,done,
+  fix:()=>{for(const k of faults){const f=M.FAULTS.find(x=>x.key===k);cfg[f.p]=M.STD[f.p];}}};
+})();
+</script>
+</body>
+</html>

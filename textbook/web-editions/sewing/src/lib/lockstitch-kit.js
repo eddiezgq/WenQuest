@@ -262,5 +262,99 @@ const loop=(()=>{
   return {W,supply};
 })();
 
-root.WQLS={DEG,needle,takeup,hook,feed,tension,timing,loop,version:'2026-10-05'};
+/* ---------- 整机：一套调机参数 → 各机构的判定（第 20 轮；虚拟样机的调机面板、实验 8-2 综合调机共用） ----------
+   每个机构仍用它自己那一章的模型（实验 4-1、5-1、6-1、7-1、8-1），这里只把同一套参数分给它们，再把判定汇总成
+   “故障 + 部位 + 原因 + 去哪个实验细看”。面料：lining 衬里、cotton 棉布、denim 牛仔（钩线模型按梭织物）。 */
+const machine=(()=>{
+  const STD={psi:0,dz:0,g:0.08,d:0.9,u:0,stroke:10,fab:'cotton',th:'t24',Td:100,Tb:40,dT:0,dP:0,h:0.8,P:1.0,s:3,n:5000,k:0.3,mode:'drop'};
+  const FT={lining:0.4,cotton:1.5,denim:4.0};
+  const L=(zh,en)=>({zh,en});
+  function evaluate(c0){
+    const c=Object.assign({},STD,c0||{}),out=[];
+    const add=(key,sev,part,lab,title,cause)=>out.push({key,sev,part,lab,title,cause});
+    // 钩线（第 5 章）与供线（第 4 章）
+    const g=hook.geom({psi:c.psi,dz:c.dz,g:c.g,d:c.d,fab:'woven'});
+    const sup=loop.supply({u:c.u,t:FT[c.fab],s:c.s,phc:g.fc});
+    const margin=g.wAt*sup.k-(g.g+hook.TB);
+    let res=g.res; if(res==='ok'&&margin<0)res='skip';
+    if(res==='hit')add('hit','bad','hook','5-1',L('梭尖碰针','Hook point hits the needle'),L(`梭尖与机针的间隙只有 ${g.g.toFixed(2)} mm：响声、针尖起毛刺、断针。换了粗针（Nm ${Math.round(c.d*100)}）没有重调间隙最常见。`,`Hook-to-needle clearance only ${g.g.toFixed(2)} mm: noise, burred needle, broken needle. Most often a thicker needle (Nm ${Math.round(c.d*100)}) without resetting the clearance.`));
+    else if(res==='cut')add('cut','bad','hook','5-1',L('梭尖划线（劈线、断线）','Hook point splits the thread'),L(`梭尖比针眼上沿只高 ${g.D.toFixed(2)} mm，从针眼附近划过：针杆太高，或钩线太晚。`,`The hook point passes only ${g.D.toFixed(2)} mm above the eye: needle bar too high, or catching too late.`));
+    else if(res==='skip'){
+      const why=sup.k<1&&g.margin>=0?L(`挑线杆供线不够：针眼入布后欠线 ${sup.neg.toFixed(1)} mm，线环张不开。`,`Take-up supply too short: ${sup.neg.toFixed(1)} mm short after the eye enters the fabric, so the loop cannot open.`)
+        :g.h<2?L(`钩线太早：梭尖到达时机针只回升了 ${g.h.toFixed(2)} mm，线环还没张开。`,`Hook too early: the needle has risen only ${g.h.toFixed(2)} mm when the point arrives; the loop is not open yet.`)
+        :g.h>2.5?L(`钩线太晚：机针已回升 ${g.h.toFixed(2)} mm，线环已在收缩。`,`Hook too late: the needle has risen ${g.h.toFixed(2)} mm; the loop is shrinking.`)
+        :g.g>0.1?L(`梭尖离机针太远（间隙 ${g.g.toFixed(2)} mm），从线环外面滑过。`,`Hook point too far from the needle (clearance ${g.g.toFixed(2)} mm); it slides past outside the loop.`)
+        :L(`梭尖高度不在线环里（梭尖高于针眼上沿 ${g.D.toFixed(2)} mm）：针杆高度不对。`,`The hook point is not at the height of the loop (${g.D.toFixed(2)} mm above the eye): needle-bar height is wrong.`);
+      add('skip','bad','hook',sup.k<1&&g.margin>=0?'4-1':'5-1',L('跳针','Skipped stitches'),why);}
+    if(sup.ok&&sup.margin<0)add('short','bad','tklever','4-1',L('绕梭时线不够（断线）','Thread too short round the bobbin case (breaks)'),L(`钩线到脱环之间，旋梭要的线比挑线杆放下的多 ${(-sup.margin).toFixed(1)} mm：旋梭硬拉面线，容易断线、线迹不匀。`,`Between catch and release the hook needs ${(-sup.margin).toFixed(1)} mm more thread than the take-up lever gives: it drags the upper thread, which breaks or tightens unevenly.`));
+    if(sup.ok&&sup.pre>c.stroke)add('slack','warn','tklever','4-1',L('针眼入布前面线松垮','Upper thread slack before the eye enters'),L(`挑线杆放下的线多出挑线簧行程 ${(sup.pre-c.stroke).toFixed(1)} mm，面线松垮，可能被机针刺穿或绕住。`,`The lever releases ${(sup.pre-c.stroke).toFixed(1)} mm more than the check spring can hold: the thread goes slack and may be pierced or tangled.`));
+    // 张力（第 7 章）
+    const E=tension.ev({fab:c.fab,th:c.th,Td:c.Td,Tb:c.Tb,s:c.s,n:c.n});
+    if(E.jam)add('jam','bad','tension','7-1',L('线太粗：结构性起皱','Thread too coarse: structural pucker'),L('这种布织得密，粗线和相应的粗针把纱线挤开、把布撑皱。换细一号的线和针。','This fabric is tightly woven; the coarse thread and needle push the yarns apart. Use a finer thread and needle.'));
+    if(E.brk)add('tbreak','bad','tension','7-1',L('张力太大：断线','Tension too high: thread breaks'),L(`收紧时峰值张力 ${E.peak.toFixed(0)} cN，超过线的名义强力的三分之一。`,`Peak tension ${E.peak.toFixed(0)} cN exceeds a third of the thread strength.`));
+    if(E.z>0.6)add('bobup','warn','tension','7-1',L('底线被拉到正面','Bobbin thread pulled to the top'),L('面线相对太紧或底线太松，交织点被拉向布面。','Upper thread relatively too tight (or bobbin too loose): the interlock is pulled to the top.'));
+    else if(E.z<0.4)add('float','warn','tension','7-1',L('面线被拉到反面（浮线）','Upper thread pulled to the back (loops underneath)'),L('底线相对太紧或面线太松，交织点被拉向布底。','Bobbin thread relatively too tight (or upper too loose): the interlock is pulled to the underside.'));
+    if(E.loose)add('loose','warn','tension','7-1',L('线迹太松','Loose stitches'),L(`较小的张力只有 ${Math.min(E.Tn,c.Tb).toFixed(0)} cN，收不紧线迹。`,`The lower of the two tensions is only ${Math.min(E.Tn,c.Tb).toFixed(0)} cN: the stitch is not pulled in.`));
+    if(E.pk)add('pucker','bad','tension','7-1',L('张力起皱','Tension pucker'),L(`两根线的张力都偏高，缝线被拉长 ${E.shrink.toFixed(2)}%，缝好后回缩把布拉皱。`,`Both tensions too high: the thread is stretched ${E.shrink.toFixed(2)}% and shrinks back, puckering the seam.`));
+    // 送布（第 6 章）
+    const F=feed.model({fab:c.fab,mode:c.mode,s:c.s,dT:c.dT,dP:c.dP,h:c.h,P:c.P});
+    if(F.marks.includes('dog'))add('dogmark','warn','dog','6-1',L('牙痕','Feed-dog marks'),L('牙太高，布上留下牙痕。','Teeth too high: marks on the fabric.'));
+    if(F.marks.includes('foot'))add('footmark','warn','presser','6-1',L('压痕','Presser-foot marks'),L('压脚压力太大，布上留下压痕。','Foot pressure too high: marks on the fabric.'));
+    if(F.eps<0.999)add('slip','warn','dog','6-1',L('打滑：针距变短','Slipping: stitches too short'),L(`压脚压力低于不打滑所需的 ${F.Pmin.toFixed(2)}，布只走了牙行程的 ${(F.eps*100).toFixed(0)}%。`,`Foot pressure below the ${F.Pmin.toFixed(2)} needed; the fabric moves only ${(F.eps*100).toFixed(0)}% of the dog stroke.`));
+    if(F.drag>0.05)add('drag','bad','dog','6-1',L('机针在布中时布还在动（断针）','Fabric moves while the needle is in it (needle breaks)'),L(`布在针里被推着走了 ${F.drag.toFixed(2)} mm：针被带弯，重则撞上旋梭而断针。送布太晚。`,`The fabric is pushed ${F.drag.toFixed(2)} mm with the needle in it: the needle bends and may hit the hook. Feed too late.`));
+    if(F.back>0.05)add('back','warn','dog','6-1',L('回拖','Back-drag'),L(`牙把布往回带了 ${F.back.toFixed(2)} mm，针距不匀。`,`The dog drags the fabric back ${F.back.toFixed(2)} mm; uneven stitches.`));
+    if(F.ply>3)add('ply','warn','presser','6-1',L('上层布越缝越长：缝皱','Upper ply creeps: seam pucker'),L(`缝 40 cm 上层多出 ${F.ply.toFixed(1)} mm，多出的上层布在线迹之间拱起。`,`Over 40 cm the upper ply ends ${F.ply.toFixed(1)} mm longer and bulges between the stitches.`));
+    // 整机惯性力（第 8 章）
+    let fmax=0;for(const [x,y] of timing.forces({dt:0,dT:c.dT,n:c.n,k:c.k}))fmax=Math.max(fmax,Math.hypot(x,y));
+    if(fmax>550)add('vib','warn','upper','8-1',L('振动大','Strong vibration'),L(`整机惯性力最大 ${fmax.toFixed(0)} N（${c.n} r/min，平衡率 ${c.k}）：平衡块与转速不配。`,`Peak inertia force ${fmax.toFixed(0)} N (${c.n} r/min, balance ratio ${c.k}): counterweight and speed do not match.`));
+    return {cfg:c,faults:out,ok:!out.some(f=>f.sev==='bad'),hook:g,catch:res,supply:sup,tension:E,feed:F,fmax};
+  }
+  // 试缝 N 针：钩线带随机波动（同实验 5-1 的做法），其余机构的判定对每一针相同
+  function trial(c0,n,seed){
+    const ev=evaluate(c0),c=ev.cfg,R=hook.lcg(seed==null?7:seed),res=[];
+    const g0=Object.assign({},ev.hook);
+    for(let i=0;i<(n||30);i++){let r=hook.stitch(g0,{fab:'woven',dz:c.dz},R.gauss);
+      if(r==='ok'&&ev.supply.k<1&&R.rnd()>ev.supply.k)r='skip';
+      if(r==='ok'&&(ev.faults.some(f=>f.key==='short'||f.key==='tbreak'))&&R.rnd()<0.25)r='break';
+      res.push(r);}
+    return {ev,res};
+  }
+  // 综合调机（实验 8-2）的故障库：每种故障把一个参数改到出毛病的范围里（范围按上面的判据选定，保证试缝看得出来）
+  const FAULTS=[
+    {key:'hookEarly',p:'psi',lo:-22,hi:-15,zh:'旋梭定时太早',en:'Hook timed too early'},
+    {key:'hookLate',p:'psi',lo:14,hi:20,zh:'旋梭定时太晚',en:'Hook timed too late'},
+    {key:'barHigh',p:'dz',lo:0.75,hi:1.0,zh:'针杆太高',en:'Needle bar too high'},
+    {key:'barLow',p:'dz',lo:-1.0,hi:-0.9,zh:'针杆太低',en:'Needle bar too low'},
+    {key:'thickNeedle',p:'d',set:1.1,zh:'换了粗针没重调梭尖间隙',en:'Thicker needle fitted without resetting the hook clearance'},
+    {key:'spring',p:'stroke',lo:5,hi:7,zh:'挑线簧行程太小',en:'Check-spring stroke too short'},
+    {key:'guide',p:'u',lo:-12,hi:-9,zh:'过线板位置不对（放线太少）',en:'Thread guide set wrong (too little thread)'},
+    {key:'upperTight',p:'Td',lo:220,hi:260,zh:'夹线器太紧',en:'Upper tension too tight'},
+    {key:'upperLoose',p:'Td',lo:40,hi:50,zh:'夹线器太松',en:'Upper tension too loose'},
+    {key:'bobbinLoose',p:'Tb',lo:14,hi:19,zh:'底线太松',en:'Bobbin tension too loose'},
+    {key:'feedLate',p:'dT',lo:15,hi:25,zh:'送布定时太晚',en:'Feed timed too late'},
+    {key:'dogLow',p:'h',lo:0.3,hi:0.5,zh:'送布牙太低',en:'Feed dog set too low'},
+    {key:'footLight',p:'P',lo:0.4,hi:0.5,zh:'压脚压力不足',en:'Presser-foot pressure too low'},
+    {key:'balance',p:'k',lo:0.9,hi:1.0,zh:'平衡块装错（平衡率太大）',en:'Wrong counterweight (balance ratio too high)'},
+    {key:'balanceLow',p:'k',lo:0,hi:0.05,zh:'平衡块装错（平衡率太小）',en:'Wrong counterweight (balance ratio too low)'}];
+  // 没收进故障库的：梭尖间隙偏大、送布定时偏早——在本模型里试缝看不出毛病（标准布料上钩线余量够大；牙提前落下不妨碍机针），出了题学生也无从诊断
+  // 出题：level 个故障，同一参数不出两次；种子可复现（老师指定种子即同一台故障机）
+  function generate(level,seed){
+    const R=hook.lcg(seed>>>0||1);
+    for(let attempt=0;attempt<50;attempt++){
+      const pick=[],used=new Set();let guard=0;
+      while(pick.length<level&&guard++<200){const f=FAULTS[Math.floor(R.rnd()*FAULTS.length)];if(used.has(f.p))continue;used.add(f.p);pick.push(f);}
+      const c=Object.assign({},STD);
+      for(const f of pick){c[f.p]=f.set!=null?f.set:Math.round((f.lo+R.rnd()*(f.hi-f.lo))*100)/100;}
+      // 两个故障可能互相抵消（如针杆低又钩线晚）：试缝看不出毛病的不出，换一组
+      const t=trial(c,30,seed);
+      if(t.ev.faults.length||t.res.some(r=>r!=='ok'))return {cfg:c,faults:pick.map(f=>f.key)};
+    }
+    return {cfg:Object.assign({},STD,{psi:-18}),faults:['hookEarly']};
+  }
+  // 标准值附近的容差：调好以后，没有故障的参数应在这个范围里，否则算“乱调”
+  const TOL={psi:3,dz:0.15,g:0.03,d:0,u:3,stroke:1.5,Td:20,Tb:8,dT:5,dP:5,h:0.1,P:0.2,s:0.3,n:0,k:0.1};
+  return {STD,FT,evaluate,trial,FAULTS,generate,TOL};
+})();
+
+root.WQLS={DEG,needle,takeup,hook,feed,tension,timing,loop,machine,version:'2026-10-05'};
 })(typeof window!=='undefined'?window:globalThis);
