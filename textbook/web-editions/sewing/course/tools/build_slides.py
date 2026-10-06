@@ -598,7 +598,7 @@ const frames=new Map();
 function mount(el){if(el.querySelector('iframe'))return;const id=el.dataset.live,c=D.clips[id]||{};
   const f=document.createElement('iframe');const vw=c.vw||1600,vh=c.vh||900;f.width=vw;f.height=vh;f.setAttribute('allow','fullscreen');
   f.srcdoc=dec(pages[c.page]);el.appendChild(f);frames.set(f,{el,c,vw,vh});
-  f.addEventListener('load',()=>{const ask=()=>{try{f.contentWindow.postMessage({wqlive:1,steps:c.steps||[],selector:c.selector||''},'*')}catch(e){}};
+  f.addEventListener('load',()=>{const ask=()=>{try{f.contentWindow.postMessage({wqlive:1,steps:c.steps||[],selector:c.selector||'',loop:c.loop||0},'*')}catch(e){}};
     ask();for(let t=400;t<=4000;t+=400)setTimeout(()=>{try{f.contentWindow.postMessage({wqlive:2,selector:c.selector||''},'*')}catch(e){}},t);
     new ResizeObserver(()=>{try{f.contentWindow.postMessage({wqlive:2,selector:c.selector||''},'*')}catch(e){}}).observe(el);});}
 addEventListener('message',m=>{const d=m.data;if(!d||!d.wqrect)return;
@@ -680,8 +680,10 @@ def mark_frags(html: str, layout: str) -> str:
 
 
 LIVE_AGENT = """<script>(function(){function rect(sel){if(!sel)return[0,0,0,0];var t=document.querySelector(sel);if(!t)return[0,0,0,0];var b=t.getBoundingClientRect();return[b.left,b.top,b.width,b.height];}
-addEventListener('message',function(m){var d=m.data;if(!d||!d.wqlive)return;if(d.wqlive===1){(d.steps||[]).forEach(function(st){setTimeout(function(){try{[].concat(st.press||[]).forEach(function(s){var b=document.querySelector(s);b&&b.click();});
+function run(steps){(steps||[]).forEach(function(st){setTimeout(function(){try{[].concat(st.press||[]).forEach(function(s){var b=document.querySelector(s);b&&b.click();});
 Object.keys(st.set||{}).forEach(function(k){var e=document.getElementById(k);if(!e)return;e.value=st.set[k];e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));});if(st.js)(0,eval)(st.js);}catch(e){console.warn(e);}},(st.at||0)*1000+300);});}
+var looping=0;addEventListener('message',function(m){var d=m.data;if(!d||!d.wqlive)return;if(d.wqlive===1){run(d.steps);
+if(d.loop&&!looping)looping=setInterval(function(){run(d.steps);},d.loop*1000);}
 parent.postMessage({wqrect:rect(d.selector)},'*');});})();</script>"""
 
 

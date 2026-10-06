@@ -53,4 +53,5 @@ clip 的字段：`page` 实验页名；`selector` 只显示页面里的这一块
 3. 内容取自课程包 `course/lessons/chNN.json`（slides、problem、robot、life、summary、labs、assignment）和教材 `src/zh/chNN.html`；不编造事实和数字；数字由程序算出。
 4. 新画的 SVG：深色底上用浅色线（#f3f6fa）、强调色 #f2b705 / #2ec4b6 / #ff7a45 / #4c8dff；字 ≥ 22 像素（viewBox 宽 900 时按 900 计），中文字体不用写（继承）。
 5. 实验段只说怎样操作、观察什么，不报任务答案。
-6. 自检：`--preview all` 之后逐页看截图：没有溢出（程序会打印 `! page N overflows`）、没有重叠、活页面显示的是想要的那一块。
+6. **所有动画完整、不断循环**：活页面里的动画放完一遍（包括“拉线头”这类会停下来的演示）要自动从头再来。会停的页面在 clip 里写 `loop: 秒`（每隔这么久重做一遍 steps），steps 里把模式按钮、播放按钮重新点上；循环周期要长于一遍完整演示。整页嵌入的实验页（`lab`）由学生操作，不自动循环。
+7. 自检：`--preview all` 之后逐页看截图：没有溢出（程序会打印 `! page N overflows`）、没有重叠、活页面显示的是想要的那一块。

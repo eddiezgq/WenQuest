@@ -23,16 +23,18 @@ clips:
     page: stitch
     selector: "#cv"
     dur: 16
+    loop: 18           # 缝 11 秒、拉散约 7 秒，然后马上从头再缝，一直循环
     steps:
-      - {at: 0, press: "[data-m=chain]", set: {spd: 0.6}}
-      - {at: 10, press: "#pull"}
+      - {at: 0, press: "[data-m=chain]", set: {spd: 0.6}, js: "var p=document.getElementById('play');if(p.getAttribute('aria-pressed')==='false')p.click()"}
+      - {at: 11, press: "#pull"}
   lock:          # 301：缝几针，拉线头不散
     page: stitch
     selector: "#cv"
     dur: 16
+    loop: 18
     steps:
-      - {at: 0, press: "[data-m=lock]", set: {spd: 0.6}}
-      - {at: 10, press: "#pull"}
+      - {at: 0, press: "[data-m=lock]", set: {spd: 0.6}, js: "var p=document.getElementById('play');if(p.getAttribute('aria-pressed')==='false')p.click()"}
+      - {at: 11, press: "#pull"}
 
 slides:
   - layout: cover
