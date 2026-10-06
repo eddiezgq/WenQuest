@@ -95,7 +95,7 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends fonts-noto-cjk fonts-dejavu ffmpeg libpango1.0-dev libcairo2-dev pkg-config \
             texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-science dvisvgm cm-super > /dev/null
-          pip install -q manim==0.21.0 sherpa-onnx pyyaml numpy scipy matplotlib sympy schemdraw==0.23 python-docx==1.2.0 markdown-it-py jsonschema Pillow
+          pip install -q manim==0.21.0 sherpa-onnx pyyaml numpy scipy matplotlib sympy schemdraw==0.23 python-docx==1.2.0 markdown-it-py jsonschema Pillow httpx fastapi pydantic
           pip install -q -r services/labcheck/requirements.txt
           python -m playwright install --with-deps --only-shell chromium > /dev/null
           (cd textbook/tools && npm ci --no-audit --no-fund > /dev/null)
