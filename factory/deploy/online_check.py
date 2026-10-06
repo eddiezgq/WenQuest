@@ -121,5 +121,13 @@ except Exception as e:  # noqa: BLE001
     say("有限元计算服务连不上：{}".format(e))
     ok = False
 
+# 5. AI 代理用的引擎（第 17 轮 D 期）：claude / deepseek / rules（没配模型）
+try:
+    with urllib.request.urlopen("https://{}.{}/api/health".format(FAC, domain), timeout=30) as r:
+        h = json.loads(r.read().decode())
+    say("AI 代理引擎：{}".format({"claude": "Claude", "deepseek": "DeepSeek", "rules": "规则版（没配模型）"}.get(h.get("ai"), h.get("ai") or "未知")))
+except Exception as e:  # noqa: BLE001
+    say("读不到枢纽健康状态：{}".format(e))
+
 msg = "%0A".join(x.replace("%", "%25") for x in lines)
 print("::{} title=线上{}检查（{}）::{}".format("notice" if ok else "warning", "演示工厂" if FAC == "demo" else ("班级工厂 " + FAC.split(".")[0] if "." in FAC else "车间"), "正常" if ok else "有问题", msg))
