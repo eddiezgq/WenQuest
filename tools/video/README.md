@@ -49,3 +49,15 @@ python3 tools/video/make.py docs/课程视频/线性代数/14-2 --only lab --out
 ```
 
 正式制作在 GitHub Actions：`Lecture videos 公开课视频`（`.github/workflows/video.yml`），结果在运行页面的 Artifacts 里。
+
+## 网页版教材（第 23 轮：《缝纫机设计与制造》）
+
+- 讲稿写 `book: sewing`、`section: "2"`（讲号 = 课程包一讲 = 教材一章），放 `docs/课程视频/缝纫机/NN/`。
+- `code: [ch02]` 运行课程包程序 `course/calc/ch02.py`（程序末尾在设了 `WQ_BOOK_OUT` 时用 `bookout.out` 交出视频要引用的数）。
+- 插图 `img: fig_xray` 取 `img/fig_xray.webp`（英文版优先 `img/en/`）。
+- `homework` 的 `items: [1, 2, 3, 4]` 是课程包作业第几题；`foot` 可自定一行说明。
+- `lab` 镜头直接打开 `src/<语言>/labs/<lab>.html`（动画、虚拟实验、三维样机都这样录）；`book: true` 改为录网页版教材本章页面（工具先构建一次）。
+  步骤按元素 id：`set: {delta: 10}`（滑块、下拉框、勾选框）、`sweep`、`press: "#play"`（可列表）、`js: "…"`、`click: [x, y]`、`drag`；同一步里的几个动作一起做。
+- 网页一律按 15 帧/秒录、合成时补成 30 帧；页面带 `__api.manual/step` 的三维页不用虚拟时钟，逐帧推进（软件渲染每帧约 1 秒）。
+  本地没有外网时设 `WQ_THREE=…/three.min.js`（r128）。
+

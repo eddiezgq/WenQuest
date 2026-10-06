@@ -105,6 +105,7 @@ jobs:
           for d in ${{ inputs.lectures }}; do python -c "import yaml,sys; y=yaml.safe_load(open(sys.argv[1]+'/讲稿.yaml')); print(y['book'], y['section'])" "$d"; done > "$RUNNER_TEMP/sections"
           cd textbook
           for b in $(cut -d' ' -f1 "$RUNNER_TEMP/sections" | sort -u); do
+            [ -d "web-editions/$b" ] && continue   # 网页版教材（第 23 轮，如 sewing）：视频工具直接用源文件，不用构建
             secs=$(awk -v b="$b" '$1==b{print $2}' "$RUNNER_TEMP/sections" | paste -sd, -)
             sh ../tools/video/logged.sh python tools/build.py "$b" --only "$secs"
           done

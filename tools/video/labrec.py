@@ -8,10 +8,21 @@
   {sweep: {phi: [270, 200]}, dur: 6}             在 dur 秒内从起点平滑调到终点（可同时调几个）
   {press: start}                                 按按钮（start / reset 或实验自定义的按钮）
   {demo: soft}                                   执行某个任务的演示（只在讲稿明确需要时用；默认不报答案）
+
+独立实验页（网页版教材，第 23 轮，standalone=True）：页面自己就是一个实验，没有 WQ 对象。
+  {set: {d: 0.9}}            按元素 id 设定：滑块发 input，下拉框发 change，勾选框改勾选
+  {sweep: {phi: [0, 360]}, dur: 6}
+  {press: "#play"}           点按钮（CSS 选择器；不带 # 时按 id；可以是列表，依次点）
+  {js: "__api.setCfg({psi: -20})"}   调页面自己的接口（虚拟样机、综合调机都有 __api）
+  {click: [640, 360]}        在画面坐标处点一下（三维页点零件）
+  {drag: [[x0, y0], [x1, y1]], dur: 3}   按住拖动（三维页转视角）
 """
 from __future__ import annotations
 
 import asyncio
+import base64
+import math
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -37,62 +48,137 @@ async def _set(page, lab, pid, v, focus=True):
         }""", [lab, pid, v, focus])
 
 
+async def _set_any(page, pid, v, focus=True):
+    await page.evaluate(
+        """([pid, v, focus]) => {
+          const e = document.getElementById(pid) || document.querySelector(pid);
+          if (!e) throw new Error('no control ' + pid);
+          if (e.type === 'checkbox') { e.checked = !!v; e.dispatchEvent(new Event('change', {bubbles: true})); }
+          else { e.value = v; e.dispatchEvent(new Event(e.tagName === 'SELECT' ? 'change' : 'input', {bubbles: true})); }
+          const box = e.parentElement;
+          document.querySelectorAll('.wq-vid-focus').forEach(x => { if (x !== box) x.classList.remove('wq-vid-focus'); });
+          if (focus && e.type === 'range') box.classList.add('wq-vid-focus'); else box.classList.remove('wq-vid-focus');
+        }""", [pid, v, focus])
+
+
 async def record(url: str, lab: str, steps: list[dict], step_times: list[float], total: float, out: Path,
-                 width=1280, height=720, scale=1.5) -> Path:
+                 width=1280, height=720, scale=1.5, standalone=False, viewport=None, manual=False, fps=FPS) -> Path:
+    """manual=True（第 23 轮）：页面有 __api.manual / __api.step（三维页）。不用虚拟时钟，每帧调 step(1/fps) 渲染一帧再截图：
+    软件渲染下虚拟时钟会让三维页每帧渲染好几遍、越来越慢。三维镜头用 fps=15，合成时补成 30 帧。"""
     from playwright.async_api import async_playwright
     frames = out.with_suffix("")
     if frames.exists():
         shutil.rmtree(frames)
     frames.mkdir(parents=True)
     async with async_playwright() as p:
-        b = await p.chromium.launch()
+        if viewport:
+            width, height = viewport
+            scale = 1920 / width
+        args = ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] if (manual and os.environ.get("WQ_GL_FLAGS", "1") == "1") else []   # 只有三维页需要 WebGL
+        b = await p.chromium.launch(args=args)
         ctx = await b.new_context(viewport={"width": width, "height": height}, device_scale_factor=scale)
         page = await ctx.new_page()
         errors = []
         page.on("pageerror", lambda e: errors.append(str(e)))
-        await page.clock.install()
-        await page.goto(url)
-        await page.add_style_tag(content=CSS)
-        await page.clock.run_for(2500)
-        # the lab's own reset first, so tasks and readouts start clean
-        await page.evaluate(f"WQ.reset('{lab}')")
-        await page.clock.run_for(200)
-        n = int(round(total * FPS))
+        three = os.environ.get("WQ_THREE")       # 本地没有外网时用本地的 three.min.js（与 CDN 同版本 r128）
+        if three:
+            await page.route("**/three.min.js", lambda r: r.fulfill(path=three, content_type="application/javascript"))
+        if manual:
+            await page.goto(url)
+            await page.add_style_tag(content=CSS)
+            for _ in range(240):
+                if await page.evaluate("!!(window.__api && window.__api.step)"):
+                    break
+                await asyncio.sleep(0.5)
+            else:
+                raise RuntimeError("三维页没有 __api.step：" + "; ".join(errors[:3]))
+            await page.evaluate("__api.manual(true)")
+            cdp = await ctx.new_cdp_session(page)
+
+            async def advance():
+                await page.evaluate(f"__api.step({1 / fps})")
+
+            async def capture(fr):
+                r = await cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 90,
+                                                               "clip": {**(await page.evaluate("({x: scrollX, y: scrollY})")),
+                                                                            "width": width, "height": height, "scale": scale}})
+                (frames / f"{fr:05d}.jpg").write_bytes(base64.b64decode(r["data"]))
+        else:
+            await page.clock.install()
+            await page.goto(url)
+            await page.add_style_tag(content=CSS)
+            await page.clock.run_for(2500)
+            if not standalone:               # the lab's own reset first, so tasks and readouts start clean
+                await page.evaluate(f"WQ.reset('{lab}')")
+                await page.clock.run_for(200)
+
+            async def advance():
+                await page.clock.run_for(int(1000 / fps))
+
+            if standalone:                   # 网页版教材的页面：CDP 直接截图，比 page.screenshot 快
+                cdp = await ctx.new_cdp_session(page)
+
+                async def capture(fr):
+                    r = await cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 90,
+                                                                   "clip": {**(await page.evaluate("({x: scrollX, y: scrollY})")),
+                                                                            "width": width, "height": height, "scale": scale}})
+                    (frames / f"{fr:05d}.jpg").write_bytes(base64.b64decode(r["data"]))
+            else:
+                async def capture(fr):
+                    await page.screenshot(path=str(frames / f"{fr:05d}.jpg"), type="jpeg", quality=90)
+        setter = (lambda pid, v, focus=True: _set_any(page, pid, v, focus)) if standalone else \
+                 (lambda pid, v, focus=True: _set(page, lab, pid, v, focus))
+        n = int(round(total * fps))
         plan = []                        # (frame_from, frame_to, step)
         for i, st in enumerate(steps):
             if i >= len(step_times):
                 break
-            f0 = int(step_times[i] * FPS)
-            f1 = f0 + int(float(st.get("dur", 0)) * FPS)
+            f0 = int(step_times[i] * fps)
+            f1 = f0 + int(float(st.get("dur", 0)) * fps)
             plan.append((f0, f1, st))
         done = set()
         for fr in range(n):
             for k, (f0, f1, st) in enumerate(plan):
                 if fr < f0:
                     continue
-                if "set" in st and k not in done:
+                once = k not in done         # 一步里的几个动作（set、js、press…）在这一帧一起做，只做一次
+                done.add(k)
+                if "set" in st and once:
                     for pid, v in st["set"].items():
-                        await _set(page, lab, pid, v, focus=False)
-                    done.add(k)
-                if "press" in st and k not in done:
+                        await setter(pid, v, focus=False)
+                if standalone and "press" in st and once:
+                    for sel in (st["press"] if isinstance(st["press"], list) else [st["press"]]):
+                        await page.click(sel if sel[:1] in "#.[" else "#" + sel)
+                if "js" in st and once:
+                    await page.evaluate(st["js"])
+                if "click" in st and once:
+                    await page.mouse.click(*st["click"])
+                if "drag" in st and fr <= f1:
+                    (x0, y0), (x1, y1) = st["drag"]
+                    u = 1.0 if f1 == f0 else min(1.0, (fr - f0) / (f1 - f0))
+                    if fr == f0:
+                        await page.mouse.move(x0, y0)
+                        await page.mouse.down()
+                    await page.mouse.move(x0 + (x1 - x0) * u, y0 + (y1 - y0) * u)
+                    if fr == f1 or f1 == f0:
+                        await page.mouse.up()
+                if not standalone and "press" in st and once:
                     await page.evaluate("""([lab, a]) => { const s = document.querySelector('#lab-' + lab) || document;
                         const b = s.querySelector('[data-action="' + a + '"]'); if (b) b.click(); }""", [lab, st["press"]])
-                    done.add(k)
-                if "demo" in st and k not in done:
+                if "demo" in st and once:
                     await page.evaluate(f"WQ.demo('{lab}', '{st['demo']}')")
-                    done.add(k)
                 if "sweep" in st and fr <= f1:
                     u = 1.0 if f1 == f0 else min(1.0, (fr - f0) / (f1 - f0))
-                    u = 0.5 - 0.5 * __import__("math").cos(__import__("math").pi * u)   # ease in and out
+                    u = 0.5 - 0.5 * math.cos(math.pi * u)   # ease in and out
                     for pid, (a, bnd) in st["sweep"].items():
-                        await _set(page, lab, pid, round(a + (bnd - a) * u, 3), focus=fr < f1)
-            await page.clock.run_for(int(1000 / FPS))
-            await page.screenshot(path=str(frames / f"{fr:05d}.jpg"), type="jpeg", quality=90)
+                        await setter(pid, round(a + (bnd - a) * u, 3), focus=fr < f1)
+            await advance()
+            await capture(fr)
         await b.close()
         if errors:
             raise RuntimeError("实验页出错：" + "; ".join(errors[:3]))
-    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", str(frames / "%05d.jpg"),
-                    "-vf", "scale=1920:1080:flags=lanczos,format=yuv420p", "-c:v", "libx264", "-crf", "18", "-preset", "medium",
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", str(fps), "-i", str(frames / "%05d.jpg"),
+                    "-vf", f"scale=1920:1080:flags=lanczos,fps={FPS},format=yuv420p", "-c:v", "libx264", "-crf", "18", "-preset", "medium",
                     str(out)], check=True)
     shutil.rmtree(frames)
     return out

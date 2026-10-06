@@ -33,7 +33,7 @@ ROOT = HERE.parents[1]
 FPS = 30
 HEAD, PAUSE, TAIL, LEAD = 0.6, 0.38, 0.9, 0.35       # 秒：镜头开头、句间、镜头结尾；画面比配音提前 LEAD 秒变化
 FONT_ZH = "Noto Sans CJK SC"
-COURSE = {"linalg": ["线性代数", "Linear Algebra"]}
+COURSE = {"linalg": ["线性代数", "Linear Algebra"], "sewing": ["缝纫机设计与制造", "Sewing Machine Design and Manufacturing"]}
 VOICE_NOTE = {"clone": ["配音：AI 合成（讲者本人声音）", "Voice: AI-generated from the lecturer's own voice"],
               "kokoro": ["配音：AI 合成", "Voice: AI-generated"],
               "estimate": ["无声排版样片", "Silent layout preview"]}
@@ -98,6 +98,17 @@ asyncio.run(m())
 
 
 def figure(lec, name, lang, work: Path) -> str:
+    if lec.web:                                   # 网页版教材（第 23 轮）：img/名字.webp，英文版优先 img/en/
+        stem = Path(name).stem
+        src = lec.web / "img" / "en" / f"{stem}.webp"
+        if lang != "en" or not src.exists():
+            src = lec.web / "img" / f"{stem}.webp"
+        if not src.exists():
+            raise S.ScriptError(f"找不到插图 {src}")
+        png = work / f"{stem}.{lang}.png"
+        if not png.exists():
+            sh("ffmpeg", "-y", "-loglevel", "error", "-i", src, png)
+        return str(png)
     base = S.TEXTBOOK / "build" / lec.book / "figs"
     svg = (base / "en" / f"{name}.svg") if lang == "en" and (base / "en" / f"{name}.svg").exists() else base / f"{name}.svg"
     if not svg.exists():
@@ -211,6 +222,12 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
             body = [re.sub(r"#.*[一-鿿].*$", "", l).rstrip() for l in body]
             body = [l for l in body if l.strip()]
         spec.update(source="\n".join(body), result=d.get("result", []))
+    elif shot.kind == "homework" and lec.web:
+        ex = S.assignment(lec, d["items"], lang)
+        rows = [[f"{i}", k, txt.replace("`", "")] for i, (k, txt) in ex.items()]
+        spec.update(items=rows, head=lec.t(["本讲作业", "Assignment"], lang),
+                    foot=lec.t(d.get("foot") or ["另：本讲实验的实验报告。在问渠学习平台提交。",
+                                                 "Plus the lab report for this lecture. Submit on WenQuest."], lang))
     elif shot.kind == "homework":
         ex = S.exercises(lec, d["items"])
         ex_en = S.exercises_en(lec, d["items"]) if lang == "en" else {}
@@ -233,7 +250,7 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
                     cta=lec.t(["问渠学习平台 · 免费注册", "learn.wenquestrobotics.com"], lang),
                     cta2=lec.t(["实验 · 程序 · 讲义 · 作业 · AI 反馈", "Labs · programs · notes · exercises · instant AI feedback"], lang),
                     cta_at=max(0.5, tl_lines[n]["start"] - LEAD) if len(tl_lines) > n else tl["total"] - 3)
-    key = h([spec, (HERE / "slides.py").read_text(encoding="utf-8"), quality])
+    key = h([spec, (HERE / "slides.py").read_text(encoding="utf-8"), quality] + ([d, (HERE / "labrec.py").read_text(encoding="utf-8")] if shot.kind in ("lab", "clip") else []))   # 实验镜头：步骤或录屏程序变了要重录
     out = work / "shots" / f"{shot.id}.{lang}.{key}.mp4"
     if out.exists():
         return out
@@ -253,6 +270,21 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
         raw = manim(tmp / "scene.py", "Lesson", {"WQ_ANIM_SYNC": str(js)}, tmp, quality)
     elif shot.kind == "lab":
         import labrec
+        if lec.web:                               # 网页版教材：实验、动画、三维页各是一个独立网页，直接打开源文件（库按相对路径加载）
+            page = lec.web / "src" / lang / "labs" / f"{d['lab']}.html"
+            if d.get("book"):                     # 录网页版教材本身（平台“教材”书架上的那本书）：先构建一次
+                webed = work / "webed"
+                if not (webed / "index.html").exists():
+                    sh(sys.executable, lec.web / "build.py", webed, cwd=lec.web, capture_output=True)
+                page = webed / ("en" if lang == "en" else "") / f"ch{lec.chapter_no:02d}.html"
+            if not page.exists():
+                raise S.ScriptError(f"找不到实验页 {page}")
+            raw = work / "shots" / f"lab_{shot.id}_{lang}.mp4"
+            manual = "manual:on=>" in page.read_text(encoding="utf-8")      # 三维页：逐帧手动推进；网页实验一律 15 帧/秒录，合成时补成 30 帧
+            labrec.run(page.resolve().as_uri() + (d.get("query") or ""), d["lab"], d.get("steps") or [], tl["steps"], tl["total"], raw,
+                       standalone=True, viewport=tuple(d.get("viewport") or (1280, 720)), manual=manual, fps=15)
+            fit_length(raw, tl["total"], out)
+            return out
         page = S.TEXTBOOK / "build" / lec.book / "lab" / f"ch{lec.chapter_no:02d}.html"
         if not page.exists():
             raise S.ScriptError(f"找不到实验页 {page}（先构建：python3 textbook/tools/build.py {lec.book} --labs）")
@@ -278,6 +310,8 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
 
 
 def lecture_no(lec, lang):
+    if lec.web:
+        return f"第 {lec.section} 讲" if lang == "zh" else f"Lecture {lec.section}"
     c, k = lec.section.split(".")
     return f"第 {c} 章 · 第 {k} 讲" if lang == "zh" else f"Chapter {c} · Lecture {k}"
 
@@ -411,7 +445,45 @@ def covers(lec, lang, work, out_dir, quality):
     sh("ffmpeg", "-y", "-loglevel", "error", "-i", png, "-vf", "scale=1146:645,pad=1146:717:0:36:color=0x0f1419", out_dir / "cover_bilibili.png")
 
 
+UPLOAD = {   # 网页版教材的标题、标签、合集（第 23 轮）
+    "sewing": {"zh": {"title": "缝纫机设计与制造 第 {n} 讲｜{t}", "tags": ["缝纫机", "机械设计", "机构", "服装机械", "智能制造", "机器人", "工科", "问渠"],
+                      "list": "缝纫机设计与制造（问渠公开课）", "next": "下一讲"},
+               "en": {"title": "Sewing Machine Design {n:02d} | {t}", "tags": ["sewing machine", "mechanism design", "mechanical engineering",
+                                                                               "garment machinery", "manufacturing", "robotics", "WenQuest"],
+                      "list": "Sewing Machine Design and Manufacturing (WenQuest)", "next": "Next"}}}
+
+
+def upload_text_web(lec, lang, chapters, total, voice_backend, out_dir):
+    u = UPLOAD[lec.book][lang]
+    title = lec.t(lec.data["title"], lang)
+    t = u["title"].format(n=int(lec.section), t=title)
+    course = lec.t(COURSE[lec.book], lang)
+    if lang == "zh":
+        desc = [f"问渠 WenQuest · {course} · 第 {lec.section} 讲",
+                "本讲的虚拟实验、三维样机、讲义、作业和整本网页版教材都在问渠学习平台，免费注册即可学习：https://learn.wenquestrobotics.com",
+                "", "章节："] + [f"{mmss(a)} {p}" for a, p in chapters] + [
+                "", lec.t(VOICE_NOTE[voice_backend], lang) + "。字幕与讲稿一致，数字均由配套程序计算。",
+                f"下一讲：{lec.t(lec.data.get('next', ''), lang)}"]
+        extra = ["分区：知识 → 校园学习", "投稿时勾选“作者声明：使用 AI 合成技术”（配音）", f"合集：{u['list']}"]
+    else:
+        desc = [f"WenQuest · {course} · Lecture {lec.section}",
+                "The virtual labs, 3D prototype, notes, assignment and the whole web textbook for this lecture are free on WenQuest: https://learn.wenquestrobotics.com",
+                "", "Chapters:"] + [f"{mmss(a)} {p}" for a, p in chapters] + [
+                "", lec.t(VOICE_NOTE[voice_backend], lang) + ". Every number shown is computed by the companion program.",
+                f"Next: {lec.t(lec.data.get('next', ''), lang)}"]
+        extra = ["Category: Education", "Altered or synthetic content: Yes (AI voice)", f"Playlist: {u['list']}"]
+    tags = u["tags"] + [x for x in (lec.data.get("tags") or {}).get(lang, [])]
+    md = [f"# {t}", "", "## " + ("标题" if lang == "zh" else "Title"), t, "", "## " + ("简介" if lang == "zh" else "Description"), *desc,
+          "", "## " + ("标签" if lang == "zh" else "Tags"), ", ".join(tags), "", "## " + ("设置" if lang == "zh" else "Settings"), *[f"- {x}" for x in extra],
+          "", f"<!-- length {mmss(total)} -->"]
+    (out_dir / "upload.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+    (out_dir / "upload.json").write_text(json.dumps({"title": t, "description": "\n".join(desc), "tags": tags, "lang": lang,
+                                                     "playlist": u["list"]}, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def upload_text(lec, lang, chapters, total, voice_backend, out_dir):
+    if lec.web:
+        return upload_text_web(lec, lang, chapters, total, voice_backend, out_dir)
     c, k = lec.section.split(".")
     course = lec.t(COURSE.get(lec.book, [lec.book, lec.book]), lang)
     title = lec.t(lec.data["title"], lang)

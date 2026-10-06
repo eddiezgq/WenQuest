@@ -21,6 +21,9 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 TEXTBOOK = ROOT / "textbook"
+# 网页版教材（第 23 轮）：一讲 = 课程包一讲（一章），section 写讲号（如 "2"）；程序在 course/calc/chNN.py，
+# 插图在 img/（英文 img/en/），实验与动画页在 src/<语言>/labs/，作业取课程包 assignment
+WEB = {"sewing": TEXTBOOK / "web-editions" / "sewing"}
 KINDS = {"title", "slide", "anim", "code", "lab", "clip", "homework", "outro"}
 LANGS = ("zh", "en")
 PH = re.compile(r"\{\{\s*([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*(?::([^}]*))?\}\}")
@@ -66,7 +69,13 @@ class Lecture:
         return str(pair)
 
     @property
+    def web(self) -> Path | None:
+        return WEB.get(self.book)
+
+    @property
     def code_dir(self) -> Path:
+        if self.book in WEB:
+            return WEB[self.book] / "course" / "calc"
         return TEXTBOOK / self.book / f"ch{self.chapter_no:02d}" / "code"
 
     @property
@@ -76,7 +85,7 @@ class Lecture:
 
 def run_programs(book: str, ch: int, names: list[str]) -> dict:
     """Run the textbook programs that the script quotes; {name: {key: value}} (same values the book prints)."""
-    code = TEXTBOOK / book / f"ch{ch:02d}" / "code"
+    code = WEB[book] / "course" / "calc" if book in WEB else TEXTBOOK / book / f"ch{ch:02d}" / "code"
     out = {}
     for n in names:
         with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as f:
@@ -171,6 +180,29 @@ def load(lecture_dir: str | Path) -> Lecture:
                     raise ScriptError(f"镜头 {sid}：占位符没有填上：{ln.shown[:40]}")
         shots.append(shot)
     return Lecture(dir=d, book=book, section=sec, chapter_no=ch, data=data, shots=shots, values=values)
+
+
+def lesson(lec: Lecture) -> dict:
+    """The course-pack lesson of a web-edition book (course/lessons/chNN.json)."""
+    return json.loads((lec.web / "course" / "lessons" / f"ch{lec.chapter_no:02d}.json").read_text(encoding="utf-8"))
+
+
+def assignment(lec: Lecture, ids: list, lang: str) -> dict:
+    """Web-edition books: homework items are 1-based task numbers of the lesson's assignment → {n: (kind, text)}."""
+    tasks = lesson(lec)["assignment"]["tasks"]
+    i = 0 if lang == "zh" else 1
+    out = {}
+    for n in ids:
+        if not 1 <= int(n) <= len(tasks):
+            raise ScriptError(f"作业里没有第 {n} 题")
+        txt = tasks[int(n) - 1][i]
+        m = re.match(r"^[（(]?([^）)。.：:]{1,16})[）)]?[。.：:]?\s*(.+)$", txt, re.S)
+        kind, body = (m.group(1), m.group(2)) if m and len(m.group(1)) <= 16 and txt[:1] in "（(" else ("", txt)
+        if not kind:
+            m2 = re.match(r"^([^。.]{1,28})[。.]\s*(.+)$", txt, re.S)
+            kind, body = (m2.group(1), m2.group(2)) if m2 else ("", txt)
+        out[str(n)] = (kind, body.strip())
+    return out
 
 
 def exercises(lec: Lecture, ids: list[str]) -> dict:

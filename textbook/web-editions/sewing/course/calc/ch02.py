@@ -52,3 +52,9 @@ print(f"window edges: rise {lo:.2f}-{hi:.2f} mm -> {ang(lo):.1f}-{ang(hi):.1f} d
 print(f"assignment: rise at 198 = {rise(198):.2f} mm, caught={caught(198-206)}; 8 deg = {8/360*60/4000*1000:.3f} ms at 4000, {8/360*60/6000*1000:.3f} ms at 6000")
 # exam: 12 deg at 4000
 print("exam: 12 deg at 4000 =", round(12/360*60/4000*1000, 3), "ms")
+# numbers quoted by the lecture video (第 23 轮): run with WQ_BOOK_OUT set, the video tool reads them
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out
+    out(rise206=rise(206), rise216=rise(216), rise198=rise(198), win_lo=ang(lo), win_hi=ang(hi), win=ang(hi) - ang(lo),
+        h_lo=lo, h_hi=hi, ms_stitch=60 / 5000 * 1000, deg_per_ms=360 / (60 / 5000 * 1000), ms10=10 / 360 * 60 / 5000 * 1000,
+        in_fab=f, out_fab=360 - f)
