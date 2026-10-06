@@ -56,7 +56,7 @@ slides:
       - "Here's a problem from the shop floor. A shirt factory replaced its old lockstitch machines, rated 4000 stitches a minute, with a new model rated 5000. The line leader wants to run at 6000; the maintenance technician is worried about the needle bar and its bushings. At 5000 the inertia force on the needle bar at bottom dead centre is about {{ch01.F5000:.0f}} newtons. What does it become at 6000? We'll answer that at the end."
 
   - layout: section
-    no: "01"
+    num: "01"
     title: ["机器为什么学不会手缝", "Why a machine can't sew like a hand"]
 
   - layout: split
@@ -101,7 +101,7 @@ slides:
       - "You can try all three on WenQuest. Switch between hand sewing, 101 and 301, step through a stitch, and pull the thread end on each. At home, look at a rice sack. Its mouth is usually closed with a 101 chainstitch, so one pull opens it. The weakness becomes a feature."
 
   - layout: section
-    no: "02"
+    num: "02"
     title: ["发明时代：五个关键想法", "The age of invention: five key ideas"]
 
   - layout: timeline
@@ -138,7 +138,7 @@ slides:
       - "These patents overlapped, so anyone building a machine risked infringing someone else's. The lawsuits were endless; people called it the sewing machine war. In 1856 Howe, Singer and two other makers put nine patents into one pool and licensed them together, until 1877, twenty-one years. Licence fees fell, and the sewing machine finally went into mass production, into homes and factories. A machine is usually a combination of several key mechanisms, so designers need to understand intellectual property."
 
   - layout: section
-    no: "03"
+    num: "03"
     title: ["工业缝纫机的五个阶段", "Five stages of the industrial sewing machine"]
 
   - layout: stages
@@ -190,7 +190,7 @@ slides:
       - "The same square law holds for robots. Run the same path in half the cycle time and every acceleration becomes four times larger, and so does the inertia torque the motors must supply. That's why the arms of high-speed picking robots are light carbon-fibre tubes, for the same reason a sewing machine's needle bar is a hollow steel tube. Force is mass times acceleration, so cut the mass first."
 
   - layout: section
-    no: "04"
+    num: "04"
     title: ["缝制设备怎样分类：先看线迹", "Classifying sewing equipment: start with the stitch"]
 
   - layout: tiles
@@ -218,12 +218,12 @@ slides:
       - "On the shop floor, pick up a garment and turn it over. Straight dashes on both faces: lockstitch. A chain of loops underneath: chainstitch, which must be tied off or back-stitched or it pulls apart. Thread wrapped round the edge: overedge. Two or three parallel lines on top and a net underneath: coverstitch."
 
   - layout: section
-    no: "05"
+    num: "05"
     title: ["服装产业链中的缝制设备", "Sewing equipment in the apparel chain"]
 
   - layout: chain
     title: ["缝制设备在“裁”与“缝”之间", "Sewing equipment sits at cutting and sewing"]
-    steps: [["纤维", "Fibre"], ["纺纱", "Spinning"], ["织造/针织", "Weaving/knitting"], ["染整", "Dyeing"], ["设计打版", "Design"], ["裁剪", "Cutting"], ["缝制", "Sewing"], ["整烫包装", "Finishing"], ["物流零售", "Retail"]]
+    steps: [["纤维", "Fibre"], ["纺纱", "Spinning"], ["织造", "Weaving"], ["染整", "Dyeing"], ["打版", "Patterns"], ["裁剪", "Cutting"], ["缝制", "Sewing"], ["整烫", "Finishing"], ["零售", "Retail"]]
     hot: [5, 6]
     foot: ["缝制是劳动力最集中的环节：一个挡车工看几十台织机，缝制仍是一人一机", "Sewing is the most labour-intensive step: one weaver tends dozens of looms; sewing is still one person, one machine"]
     notes:
