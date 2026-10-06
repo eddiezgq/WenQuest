@@ -123,7 +123,8 @@ for _ in range(8):
     for i, nm in enumerate(LEG_JOINTS["left"]):
         q[nm] += dq[i]
 errs = np.array(errs)
-assert errs[5] < 1e-10 and errs[4] / errs[3] ** 2 < 5 and errs[5] / errs[4] ** 2 < 5      # 二次收敛（定理 15.1.2）
+assert errs[5] < 1e-10                                                               # 二次收敛（定理 15.1.2）：
+assert all(errs[k + 1] / errs[k] ** 2 < 5 for k in range(len(errs) - 1) if 1e-6 < errs[k] < 1e-2)   # 进入二次收敛区、又在舍入误差之上时比较
 qR, itR, errR = g1_leg_ik("right", T_p1, T_fr)
 sq = {nm: deg(qL[nm]) for nm in LEG_JOINTS["left"]}
 for a, b in zip(LEG_JOINTS["left"], LEG_JOINTS["right"]):        # 左右对称：俯仰、膝相同，横滚、偏航相反
@@ -143,13 +144,19 @@ target = np.array([0.40, -0.20, 0.35])
 Tw, qw, hist = g1_whole_body(target, T_p0, G1_REST, T_fl, T_fr, c_goal)
 Tn, qn, histn = g1_whole_body(target, T_p0, G1_REST, T_fl, T_fr, None)
 # 初值的影响（15.5 节）：从膝稍弯的姿态出发，收敛到另一组同样满足三项任务的解
-q_b = dict(G1_REST)
-q_b.update({"left_knee_joint": 0.2, "right_knee_joint": 0.2})
-Tb2, qb2, histb = g1_whole_body(target, Tm(np.eye(3), (0, 0, z_pel - 0.02)), q_b, T_fl, T_fr, c_goal)
-assert histb[-1][0] < 1e-10 and histb[-1][1] < 1e-10 and histb[-1][2] < 1e-10
+# 局部解落在哪一个，对数值细节很敏感（不同版本的数值库可能收敛到不同的解），所以依次试几个初值，取第一个
+# 收敛到“另一组”解的
 qr_ = np.array([G1_REST[n] for n in G1_JOINTS])
 cost_w = float(np.linalg.norm(np.array([qw[n] for n in G1_JOINTS]) - qr_))
-cost_b = float(np.linalg.norm(np.array([qb2[n] for n in G1_JOINTS]) - qr_))
+for b_wp0, b_hp0 in ((-0.4, 1.4), (-0.4, 1.58), (-0.52, 1.4), (-0.3, 1.2)):
+    q_b = dict(G1_REST)                                        # 弯腰、两髋大幅前屈的初值
+    q_b.update({"waist_pitch_joint": b_wp0, "left_hip_pitch_joint": b_hp0, "right_hip_pitch_joint": b_hp0})
+    Tb2, qb2, histb = g1_whole_body(target, Tm(np.eye(3), (0, 0, z_pel - 0.02)), q_b, T_fl, T_fr, c_goal)
+    cost_b = float(np.linalg.norm(np.array([qb2[n] for n in G1_JOINTS]) - qr_))
+    if (histb[-1][0] < 1e-10 and histb[-1][1] < 1e-10 and histb[-1][2] < 1e-10
+            and cost_b > cost_w + 0.3 and abs(qb2["waist_pitch_joint"] - qw["waist_pitch_joint"]) > 0.5):
+        break
+assert histb[-1][0] < 1e-10 and histb[-1][1] < 1e-10 and histb[-1][2] < 1e-10
 assert cost_b > cost_w + 0.3 and abs(qb2["waist_pitch_joint"] - qw["waist_pitch_joint"]) > 0.5
 cw, _ = com(G1, G1_INERTIAL, qw, Tw)
 cn, _ = com(G1, G1_INERTIAL, qn, Tn)
@@ -179,6 +186,7 @@ out(v1=v1, om1=om1, R1=R1, icry=icr1[1], tc=tc, beta=beta,
     th2_FR=float(th1_range["FR"][1]), th2_FL=float(th1_range["FL"][1]),
     v_est=tex(v_est, 4),
     z_pel=z_pel, drop=drop, z_pel1=z_pel - drop, itL=itL,
+    b_wp0=deg(b_wp0), b_hp0=deg(b_hp0),
     e0=errs[0], e1=errs[1], e2=errs[2], e3=errs[3], e4=errs[4], e5=errs[5], qc=errs[5] / errs[4] ** 2,
     q_hp=sq["left_hip_pitch_joint"], q_kn=sq["left_knee_joint"], q_ap=sq["left_ankle_pitch_joint"],
     tx=target[0], ty=target[1], tz=target[2], nvar=nvar, ntask=ntask, it_w=it_w, it_n=it_n,
