@@ -29,3 +29,6 @@ F = np.array([0.0, -10.0])                 # 竖直向下 10 N
 f = V.T @ F; d = V @ (f / lam)
 out(F=vec(F, 0), fmain=vec(f, 3), d_mm=vec(1000 * d, 3), d_solve=vec(1000 * np.linalg.solve(Kx, F), 3),
     dang=float(np.degrees(np.arctan2(d[1], d[0]))))
+# 公开课视频（第 22 轮）讲解三步时用到的分量：沿软轴、硬轴分到的力（N）与位移（mm），位移偏离推力的角度
+out(fs=float(abs(f[0])), fh=float(abs(f[1])), ds_mm=float(1000 * abs(f[0]) / lam[0]), dh_mm=float(1000 * abs(f[1]) / lam[1]),
+    dev=float(np.degrees(np.arccos(d @ F / (np.linalg.norm(d) * np.linalg.norm(F))))))
