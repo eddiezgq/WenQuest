@@ -1,0 +1,400 @@
+2026-10-07 04:37:00,407 INFO yield speech len 13.16, rtf 0.519769858444353
+100%|██████████| 1/1 [00:06<00:00,  6.96s/it]100%|██████████| 1/1 [00:06<00:00,  6.96s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:01,353 INFO synthesis text Hi everyone, and welcome to Linear Algebra at WenQuest. This is Chapter fourteen, Section two, the spectral theorem.
+2026-10-07 04:37:07,682 INFO yield speech len 11.76, rtf 0.5381656544549125
+100%|██████████| 1/1 [00:07<00:00,  7.27s/it]100%|██████████| 1/1 [00:07<00:00,  7.27s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:08,034 INFO synthesis text A robot arm holds a grinding wheel. The tool presses on the part, the part pushes back, and the tip of the arm gives way a little.
+2026-10-07 04:37:14,639 INFO yield speech len 12.08, rtf 0.5467394329854195
+100%|██████████| 1/1 [00:06<00:00,  6.95s/it]100%|██████████| 1/1 [00:06<00:00,  6.95s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:15,160 INFO synthesis text Running eigh, the principal stiffnesses are five thousand, seven hundred and sixty-four and twenty-four thousand and ninety-seven newtons per metre, more than four times apart.
+2026-10-07 04:37:23,682 INFO yield speech len 15.84, rtf 0.5379561372477599
+100%|██████████| 1/1 [00:09<00:00,  9.04s/it]100%|██████████| 1/1 [00:09<00:00,  9.04s/it]
+cv3: 6 句完成
+2026-10-07 04:37:23,851 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/revision/main HTTP/1.1" 200 None
+Fetching 19 files:   0%|          | 0/19 [00:00<?, ?it/s]2026-10-07 04:37:23,853 DEBUG Attempting to acquire lock 137949258617024 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,854 DEBUG Attempting to acquire lock 137949258619376 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,854 DEBUG Attempting to acquire lock 137949258619040 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,854 DEBUG Attempting to acquire lock 137949258617504 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,854 DEBUG Lock 137949258617024 acquired on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,855 DEBUG Lock 137949258619376 not acquired on models/cv2/.cache/huggingface/.gitignore.lock, waiting 0.05 seconds ...
+2026-10-07 04:37:23,855 DEBUG Attempting to acquire lock 137949258621440 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,855 DEBUG Lock 137949258619040 not acquired on models/cv2/.cache/huggingface/.gitignore.lock, waiting 0.05 seconds ...
+2026-10-07 04:37:23,855 DEBUG Lock 137949258617504 not acquired on models/cv2/.cache/huggingface/.gitignore.lock, waiting 0.05 seconds ...
+2026-10-07 04:37:23,856 DEBUG Lock 137949258621440 not acquired on models/cv2/.cache/huggingface/.gitignore.lock, waiting 0.05 seconds ...
+2026-10-07 04:37:23,857 DEBUG Attempting to release lock 137949258617024 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,857 DEBUG Attempting to acquire lock 137949258624080 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:23,857 DEBUG Lock 137949258617024 released on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,858 DEBUG Attempting to acquire lock 137949258627728 on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:23,858 DEBUG Attempting to acquire lock 137949258625664 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:23,858 DEBUG Lock 137949258624080 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:23,858 DEBUG Attempting to acquire lock 137949258628976 on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:23,859 DEBUG Lock 137949258627728 acquired on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:23,859 DEBUG Lock 137949258625664 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:23,859 DEBUG Attempting to release lock 137949258624080 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:23,859 DEBUG Attempting to release lock 137949258627728 on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:23,859 DEBUG Lock 137949258628976 acquired on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:23,859 DEBUG Attempting to release lock 137949258625664 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:23,859 DEBUG Lock 137949258624080 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:23,859 DEBUG Lock 137949258627728 released on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:23,859 DEBUG Attempting to release lock 137949258628976 on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:23,859 DEBUG Lock 137949258625664 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:23,860 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,861 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,861 DEBUG Lock 137949258628976 released on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:23,862 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,863 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,906 DEBUG Attempting to acquire lock 137949258619376 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,907 DEBUG Lock 137949258619376 acquired on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,907 DEBUG Attempting to release lock 137949258619376 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,907 DEBUG Lock 137949258619376 released on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,907 DEBUG Attempting to acquire lock 137949258619040 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,907 DEBUG Attempting to acquire lock 137949258617504 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,908 DEBUG Attempting to acquire lock 137949254520064 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:23,908 DEBUG Attempting to acquire lock 137949258621440 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,908 DEBUG Lock 137949258619040 acquired on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,908 DEBUG Lock 137949254520064 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:23,908 DEBUG Lock 137949258617504 not acquired on models/cv2/.cache/huggingface/.gitignore.lock, waiting 0.05 seconds ...
+2026-10-07 04:37:23,908 DEBUG Lock 137949258621440 not acquired on models/cv2/.cache/huggingface/.gitignore.lock, waiting 0.05 seconds ...
+2026-10-07 04:37:23,908 DEBUG Attempting to release lock 137949254520064 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:23,909 DEBUG Attempting to release lock 137949258619040 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,909 DEBUG Lock 137949254520064 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:23,909 DEBUG Lock 137949258619040 released on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,910 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,910 DEBUG Attempting to acquire lock 137949254521936 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:23,910 DEBUG Lock 137949254521936 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:23,910 DEBUG Attempting to release lock 137949254521936 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:23,910 DEBUG Lock 137949254521936 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:23,911 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,959 DEBUG Attempting to acquire lock 137949258621440 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,959 DEBUG Lock 137949258621440 acquired on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,959 DEBUG Attempting to release lock 137949258621440 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,959 DEBUG Lock 137949258621440 released on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,959 DEBUG Attempting to acquire lock 137949254523616 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:23,960 DEBUG Lock 137949254523616 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:23,960 DEBUG Attempting to release lock 137949254523616 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:23,960 DEBUG Lock 137949254523616 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:23,961 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:23,962 DEBUG Attempting to acquire lock 137949258617504 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,962 DEBUG Lock 137949258617504 acquired on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,962 DEBUG Attempting to release lock 137949258617504 on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,962 DEBUG Lock 137949258617504 released on models/cv2/.cache/huggingface/.gitignore.lock
+2026-10-07 04:37:23,962 DEBUG Attempting to acquire lock 137949254532304 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:23,962 DEBUG Lock 137949254532304 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:23,963 DEBUG Attempting to release lock 137949254532304 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:23,963 DEBUG Lock 137949254532304 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:23,963 DEBUG Starting new HTTPS connection (1): huggingface.co:443
+2026-10-07 04:37:24,004 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/.gitattributes HTTP/1.1" 307 0
+2026-10-07 04:37:24,006 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN/tokenizer_config.json HTTP/1.1" 307 0
+2026-10-07 04:37:24,007 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN/vocab.json HTTP/1.1" 307 0
+2026-10-07 04:37:24,011 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/README.md HTTP/1.1" 307 0
+2026-10-07 04:37:24,012 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Ftokenizer_config.json HTTP/1.1" 200 0
+2026-10-07 04:37:24,012 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/.gitattributes HTTP/1.1" 200 0
+2026-10-07 04:37:24,013 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fvocab.json HTTP/1.1" 200 0
+2026-10-07 04:37:24,014 DEBUG Attempting to acquire lock 137949254526688 on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,014 DEBUG Attempting to acquire lock 137949254529520 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,015 DEBUG Attempting to acquire lock 137949258625280 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,015 DEBUG Lock 137949254526688 acquired on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,015 DEBUG Lock 137949254529520 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,015 DEBUG Lock 137949258625280 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,019 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/README.md HTTP/1.1" 200 0
+2026-10-07 04:37:24,020 DEBUG Attempting to acquire lock 137949258620624 on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,020 DEBUG Lock 137949258620624 acquired on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,021 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fvocab.json HTTP/1.1" 200 None
+2026-10-07 04:37:24,022 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/.gitattributes HTTP/1.1" 200 None
+2026-10-07 04:37:24,022 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Ftokenizer_config.json HTTP/1.1" 200 None
+2026-10-07 04:37:24,023 DEBUG Attempting to release lock 137949254526688 on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,023 DEBUG Lock 137949254526688 released on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,023 DEBUG Attempting to acquire lock 137949254519824 on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,024 DEBUG Attempting to release lock 137949254529520 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,024 DEBUG Lock 137949254519824 acquired on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,024 DEBUG Lock 137949254529520 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,024 DEBUG Attempting to release lock 137949254519824 on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,024 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/README.md HTTP/1.1" 200 None
+2026-10-07 04:37:24,025 DEBUG Lock 137949254519824 released on models/cv2/.cache/huggingface/download/.gitattributes.lock
+2026-10-07 04:37:24,025 DEBUG Attempting to acquire lock 137949254530288 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,025 DEBUG Lock 137949254530288 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,026 DEBUG Attempting to acquire lock 137949258624608 on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,026 DEBUG Attempting to release lock 137949254530288 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,026 DEBUG Lock 137949258624608 acquired on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,027 DEBUG Attempting to release lock 137949258624608 on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,027 DEBUG Lock 137949258624608 released on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,027 DEBUG Lock 137949254530288 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/tokenizer_config.json.lock
+2026-10-07 04:37:24,028 DEBUG Attempting to acquire lock 137949258625088 on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,028 DEBUG Attempting to release lock 137949258620624 on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,028 DEBUG Lock 137949258620624 released on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,028 DEBUG Lock 137949258625088 acquired on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,029 DEBUG Attempting to release lock 137949258625088 on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,029 DEBUG Lock 137949258625088 released on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,029 DEBUG Attempting to acquire lock 137949254530096 on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,030 DEBUG Lock 137949254530096 acquired on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,030 DEBUG Attempting to release lock 137949254530096 on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,030 DEBUG Lock 137949254530096 released on models/cv2/.cache/huggingface/download/README.md.lock
+2026-10-07 04:37:24,030 DEBUG Attempting to acquire lock 137949254530000 on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,031 DEBUG Lock 137949254530000 acquired on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,031 DEBUG Attempting to release lock 137949254530000 on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,031 DEBUG Lock 137949254530000 released on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,043 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/asset/dingding.png HTTP/1.1" 302 0
+2026-10-07 04:37:24,044 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/campplus.onnx HTTP/1.1" 302 0
+2026-10-07 04:37:24,045 DEBUG Attempting to acquire lock 137949258616352 on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,045 DEBUG Lock 137949258616352 acquired on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,045 DEBUG Attempting to acquire lock 137949258620432 on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,046 DEBUG Lock 137949258620432 acquired on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,047 DEBUG Attempting to release lock 137949258625280 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,047 DEBUG Lock 137949258625280 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,048 DEBUG Attempting to acquire lock 137949258627584 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,048 DEBUG Lock 137949258627584 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,048 DEBUG Attempting to release lock 137949258627584 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,048 DEBUG Lock 137949258627584 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/vocab.json.lock
+2026-10-07 04:37:24,048 DEBUG Attempting to acquire lock 137949254518096 on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,048 DEBUG Lock 137949254518096 acquired on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,048 DEBUG Attempting to release lock 137949254518096 on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,048 DEBUG Lock 137949254518096 released on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,050 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/config.json HTTP/1.1" 307 0
+2026-10-07 04:37:24,054 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN/merges.txt HTTP/1.1" 307 0
+2026-10-07 04:37:24,055 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/config.json HTTP/1.1" 200 0
+2026-10-07 04:37:24,056 DEBUG Attempting to acquire lock 137949258619280 on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,056 DEBUG Lock 137949258619280 acquired on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,058 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,059 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fmerges.txt HTTP/1.1" 200 0
+2026-10-07 04:37:24,060 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,060 DEBUG Attempting to acquire lock 137949254530336 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,061 DEBUG Lock 137949254530336 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,061 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/config.json HTTP/1.1" 200 2
+2026-10-07 04:37:24,063 DEBUG Attempting to release lock 137949258619280 on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,063 DEBUG Lock 137949258619280 released on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,063 DEBUG Attempting to acquire lock 137949254518048 on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,063 DEBUG Lock 137949254518048 acquired on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,063 DEBUG Attempting to release lock 137949254518048 on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,063 DEBUG Lock 137949254518048 released on models/cv2/.cache/huggingface/download/config.json.lock
+2026-10-07 04:37:24,063 DEBUG Attempting to acquire lock 137949254530240 on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,064 DEBUG Lock 137949254530240 acquired on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,064 DEBUG Attempting to release lock 137949254530240 on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,064 DEBUG Lock 137949254530240 released on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,065 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN/generation_config.json HTTP/1.1" 307 0
+2026-10-07 04:37:24,066 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fmerges.txt HTTP/1.1" 200 None
+2026-10-07 04:37:24,070 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fgeneration_config.json HTTP/1.1" 200 0
+2026-10-07 04:37:24,070 DEBUG Attempting to acquire lock 137949254523232 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,071 DEBUG Lock 137949254523232 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,078 DEBUG Attempting to release lock 137949254530336 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,078 DEBUG Lock 137949254530336 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,078 DEBUG Attempting to acquire lock 137949258628304 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,079 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN/model.safetensors HTTP/1.1" 302 0
+2026-10-07 04:37:24,079 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/cosyvoice2.yaml HTTP/1.1" 307 0
+2026-10-07 04:37:24,080 DEBUG Lock 137949258628304 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,080 DEBUG Attempting to acquire lock 137949254532832 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:24,080 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fgeneration_config.json HTTP/1.1" 200 242
+2026-10-07 04:37:24,081 DEBUG Attempting to release lock 137949258628304 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,082 DEBUG Lock 137949254532832 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:24,082 DEBUG Lock 137949258628304 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/merges.txt.lock
+2026-10-07 04:37:24,082 DEBUG Attempting to acquire lock 137949254518192 on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:24,083 DEBUG Attempting to release lock 137949254523232 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,083 DEBUG Lock 137949254518192 acquired on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:24,083 DEBUG Lock 137949254523232 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,084 DEBUG Attempting to release lock 137949254518192 on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:24,084 DEBUG Attempting to acquire lock 137949254521552 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,084 DEBUG Lock 137949254518192 released on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:24,084 DEBUG Lock 137949254521552 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,085 DEBUG Attempting to release lock 137949254521552 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,085 DEBUG Lock 137949254521552 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/generation_config.json.lock
+2026-10-07 04:37:24,085 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/cosyvoice2.yaml HTTP/1.1" 200 0
+2026-10-07 04:37:24,086 DEBUG Attempting to acquire lock 137949254523808 on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:24,086 DEBUG Attempting to acquire lock 137949254520304 on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,086 DEBUG Lock 137949254523808 acquired on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:24,086 DEBUG Attempting to release lock 137949254523808 on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:24,086 DEBUG Lock 137949254523808 released on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:24,087 DEBUG Lock 137949254520304 acquired on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,092 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/cosyvoice2.yaml HTTP/1.1" 200 None
+2026-10-07 04:37:24,092 DEBUG Attempting to release lock 137949254520304 on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,092 DEBUG Lock 137949254520304 released on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,093 DEBUG Attempting to acquire lock 137949254519920 on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,093 DEBUG Lock 137949254519920 acquired on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,093 DEBUG Attempting to release lock 137949254519920 on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+2026-10-07 04:37:24,093 DEBUG Lock 137949254519920 released on models/cv2/.cache/huggingface/download/cosyvoice2.yaml.lock
+Fetching 19 files:  42%|████▏     | 8/19 [00:00<00:00, 33.16it/s]2026-10-07 04:37:24,093 DEBUG Attempting to acquire lock 137949254520304 on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,093 DEBUG Lock 137949254520304 acquired on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,094 DEBUG Attempting to release lock 137949254520304 on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,094 DEBUG Lock 137949254520304 released on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,095 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,097 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/configuration.json HTTP/1.1" 307 0
+2026-10-07 04:37:24,100 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/flow.decoder.estimator.fp32.onnx HTTP/1.1" 302 0
+2026-10-07 04:37:24,100 DEBUG Attempting to acquire lock 137949254529856 on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:24,101 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/flow.pt HTTP/1.1" 302 0
+2026-10-07 04:37:24,101 DEBUG Lock 137949254529856 acquired on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:24,101 DEBUG Attempting to acquire lock 137949254518480 on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:24,102 DEBUG Lock 137949254518480 acquired on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:24,103 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/configuration.json HTTP/1.1" 200 0
+2026-10-07 04:37:24,103 DEBUG Attempting to acquire lock 137949258627584 on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,104 DEBUG Lock 137949258627584 acquired on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,110 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN/config.json HTTP/1.1" 307 0
+2026-10-07 04:37:24,111 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/configuration.json HTTP/1.1" 200 47
+2026-10-07 04:37:24,111 DEBUG Attempting to release lock 137949258627584 on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,111 DEBUG Lock 137949258627584 released on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,112 DEBUG Attempting to acquire lock 137949254518144 on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,112 DEBUG Lock 137949254518144 acquired on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,112 DEBUG Attempting to release lock 137949254518144 on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,112 DEBUG Lock 137949254518144 released on models/cv2/.cache/huggingface/download/configuration.json.lock
+2026-10-07 04:37:24,112 DEBUG Attempting to acquire lock 137949254525344 on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:24,112 DEBUG Lock 137949254525344 acquired on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:24,112 DEBUG Attempting to release lock 137949254525344 on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:24,112 DEBUG Lock 137949254525344 released on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:24,113 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,115 DEBUG https://huggingface.co:443 "HEAD /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fconfig.json HTTP/1.1" 200 0
+2026-10-07 04:37:24,115 DEBUG Attempting to acquire lock 137949254520400 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,115 DEBUG Lock 137949254520400 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,116 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,120 DEBUG https://huggingface.co:443 "GET /api/resolve-cache/models/FunAudioLLM/CosyVoice2-0.5B/eec1ae6c79877dbd9379285cf8789c9e0879293d/CosyVoice-BlankEN%2Fconfig.json HTTP/1.1" 200 659
+2026-10-07 04:37:24,120 DEBUG Attempting to release lock 137949254520400 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,120 DEBUG Lock 137949254520400 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,120 DEBUG Attempting to acquire lock 137949258618128 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,121 DEBUG Lock 137949258618128 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,121 DEBUG Attempting to release lock 137949258618128 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,121 DEBUG Lock 137949258618128 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/config.json.lock
+2026-10-07 04:37:24,121 DEBUG Attempting to acquire lock 137949258616784 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:24,121 DEBUG Lock 137949258616784 acquired on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:24,122 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/hift.pt HTTP/1.1" 302 0
+2026-10-07 04:37:24,122 DEBUG Attempting to release lock 137949258616784 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:24,122 DEBUG Lock 137949258616784 released on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:24,123 DEBUG Attempting to acquire lock 137949254518192 on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,123 DEBUG Lock 137949254518192 acquired on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,135 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,136 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/llm.pt HTTP/1.1" 302 0
+2026-10-07 04:37:24,137 DEBUG Attempting to acquire lock 137949254519584 on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:24,137 DEBUG Lock 137949254519584 acquired on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:24,139 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/speech_tokenizer_v2.batch.onnx HTTP/1.1" 302 0
+2026-10-07 04:37:24,139 DEBUG Attempting to acquire lock 137949258616784 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:24,139 DEBUG Lock 137949258616784 acquired on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:24,152 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,153 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,171 DEBUG Attempting to release lock 137949258616352 on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,171 DEBUG Lock 137949258616352 released on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,171 DEBUG Attempting to acquire lock 137949258621824 on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,171 DEBUG Lock 137949258621824 acquired on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,171 DEBUG Attempting to release lock 137949258621824 on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,171 DEBUG Lock 137949258621824 released on models/cv2/.cache/huggingface/download/asset/dingding.png.lock
+2026-10-07 04:37:24,171 DEBUG Attempting to acquire lock 137949258624608 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:24,172 DEBUG Lock 137949258624608 acquired on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:24,172 DEBUG Attempting to release lock 137949258624608 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:24,172 DEBUG Lock 137949258624608 released on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:24,188 DEBUG https://huggingface.co:443 "HEAD /FunAudioLLM/CosyVoice2-0.5B/resolve/eec1ae6c79877dbd9379285cf8789c9e0879293d/speech_tokenizer_v2.onnx HTTP/1.1" 302 0
+2026-10-07 04:37:24,189 DEBUG Attempting to acquire lock 137949258621824 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:24,189 DEBUG Lock 137949258621824 acquired on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:24,208 DEBUG https://huggingface.co:443 "GET /api/models/FunAudioLLM/CosyVoice2-0.5B/xet-read-token/eec1ae6c79877dbd9379285cf8789c9e0879293d HTTP/1.1" 200 490
+2026-10-07 04:37:24,501 DEBUG Attempting to release lock 137949254518192 on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,501 DEBUG Lock 137949254518192 released on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,502 DEBUG Attempting to acquire lock 137949254523568 on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,502 DEBUG Lock 137949254523568 acquired on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,502 DEBUG Attempting to release lock 137949254523568 on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,502 DEBUG Lock 137949254523568 released on models/cv2/.cache/huggingface/download/hift.pt.lock
+2026-10-07 04:37:24,512 DEBUG Attempting to release lock 137949258620432 on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,512 DEBUG Lock 137949258620432 released on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,512 DEBUG Attempting to acquire lock 137949258624176 on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,512 DEBUG Lock 137949258624176 acquired on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,513 DEBUG Attempting to release lock 137949258624176 on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:24,513 DEBUG Lock 137949258624176 released on models/cv2/.cache/huggingface/download/campplus.onnx.lock
+2026-10-07 04:37:25,325 DEBUG Attempting to release lock 137949254529856 on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:25,325 DEBUG Lock 137949254529856 released on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:25,325 DEBUG Attempting to acquire lock 137949258625712 on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:25,325 DEBUG Lock 137949258625712 acquired on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:25,325 DEBUG Attempting to release lock 137949258625712 on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:25,325 DEBUG Lock 137949258625712 released on models/cv2/.cache/huggingface/download/flow.decoder.estimator.fp32.onnx.lock
+2026-10-07 04:37:25,531 DEBUG Attempting to release lock 137949258616784 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:25,532 DEBUG Lock 137949258616784 released on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:25,532 DEBUG Attempting to acquire lock 137949258618128 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:25,532 DEBUG Lock 137949258618128 acquired on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:25,532 DEBUG Attempting to release lock 137949258618128 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:25,532 DEBUG Lock 137949258618128 released on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.batch.onnx.lock
+2026-10-07 04:37:25,721 DEBUG Attempting to release lock 137949254532832 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:25,721 DEBUG Lock 137949254532832 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:25,722 DEBUG Attempting to acquire lock 137949256970160 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:25,722 DEBUG Lock 137949256970160 acquired on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:25,722 DEBUG Attempting to release lock 137949256970160 on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+2026-10-07 04:37:25,722 DEBUG Lock 137949256970160 released on models/cv2/.cache/huggingface/download/CosyVoice-BlankEN/model.safetensors.lock
+Fetching 19 files:  84%|████████▍ | 16/19 [00:01<00:00,  8.55it/s]2026-10-07 04:37:26,479 DEBUG Attempting to release lock 137949258621824 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:26,479 DEBUG Lock 137949258621824 released on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:26,480 DEBUG Attempting to acquire lock 137949256958832 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:26,480 DEBUG Lock 137949256958832 acquired on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:26,480 DEBUG Attempting to release lock 137949256958832 on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:26,480 DEBUG Lock 137949256958832 released on models/cv2/.cache/huggingface/download/speech_tokenizer_v2.onnx.lock
+2026-10-07 04:37:26,709 DEBUG Attempting to release lock 137949254518480 on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:26,709 DEBUG Lock 137949254518480 released on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:26,709 DEBUG Attempting to acquire lock 137949256966800 on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:26,709 DEBUG Lock 137949256966800 acquired on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:26,710 DEBUG Attempting to release lock 137949256966800 on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:26,710 DEBUG Lock 137949256966800 released on models/cv2/.cache/huggingface/download/flow.pt.lock
+2026-10-07 04:37:27,745 DEBUG Attempting to release lock 137949254519584 on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:27,745 DEBUG Lock 137949254519584 released on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:27,745 DEBUG Attempting to acquire lock 137949256966848 on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:27,745 DEBUG Lock 137949256966848 acquired on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:27,745 DEBUG Attempting to release lock 137949256966848 on models/cv2/.cache/huggingface/download/llm.pt.lock
+2026-10-07 04:37:27,745 DEBUG Lock 137949256966848 released on models/cv2/.cache/huggingface/download/llm.pt.lock
+Fetching 19 files: 100%|██████████| 19/19 [00:03<00:00,  4.88it/s]
+--- cv2 README.md ---
+---
+license: apache-2.0
+language:
+- zh
+- en
+- fr
+- es
+- ja
+- ko
+- it
+- ru
+- de
+pipeline_tag: text-to-speech
+---
+
+![SVG Banners](https://svg-banners.vercel.app/api?type=origin&text1=CosyVoice🤠&text2=Text-to-Speech%20💖%20Large%20Language%20Model&width=800&height=210)
+
+## 👉🏻 CosyVoice 👈🏻
+
+**Fun-CosyVoice 3.0**: [Demos](https://funaudiollm.github.io/cosyvoice3/); [Paper](https://arxiv.org/abs/2505.17589); [Modelscope](https://www.modelscope.cn/models/FunAudioLLM/Fun-CosyVoice3-0.5B-2512); [Huggingface](https://huggingface.co/FunAudioLLM/Fun-CosyVoice3-0.5B-2512); [CV3-Eval](https://github.com/FunAudioLLM/CV3-Eval)
+
+**CosyVoice 2.0**: [Demos](https://funaudiollm.github.io/cosyvoice2/); [Paper](https://arxiv.org/abs/2412.10117); [Modelscope](https://www.modelscope.cn/models/iic/CosyVoice2-0.5B); [HuggingFace](https://huggingface.co/FunAudioLLM/CosyVoice2-0.5B)
+
+**CosyVoice 1.0**: [Demos](https://fun-audio-llm.github.io); [Paper](https://funaudiollm.github.io/pdf/CosyVoice_v1.pdf); [Modelscope](https://www.modelscope.cn/models/iic/CosyVoice-300M); [HuggingFace](https://huggingface.co/FunAudioLLM/CosyVoice-300M)
+
+## Highlight🔥
+
+**Fun-CosyVoice 3.0** is an advanced text-to-speech (TTS) system based on large language models (LLM), surpassing its predecessor (CosyVoice 2.0) in content consistency, speaker similarity, and prosody naturalness. It is designed for zero-shot multilingual speech synthesis in the wild.
+### Key Features
+- **Language Coverage**: Covers 9 common languages (Chines
+/home/ubuntu/cv/lib/python3.10/site-packages/diffusers/models/lora.py:393: FutureWarning: `LoRACompatibleLinear` is deprecated and will be removed in version 1.0.0. Use of `LoRACompatibleLinear` is deprecated. Please switch to PEFT backend by installing PEFT: `pip install peft`.
+  deprecate("LoRACompatibleLinear", "1.0.0", deprecation_message)
+2026-10-07 04:37:29,068 INFO input frame rate=25
+[0;93m2026-10-07 04:37:30.489564468 [W:onnxruntime:, transformer_memcpy.cc:74 ApplyImpl] 8 Memcpy nodes are added to the graph main_graph for CUDAExecutionProvider. It might have negative impact on performance (including unable to run CUDA graph). Set session_options.log_severity_level=1 to see the detail logs before this message.[m
+[0;93m2026-10-07 04:37:30.492445659 [W:onnxruntime:, session_state.cc:1166 VerifyEachNodeIsAssignedToAnEp] Some nodes were not assigned to the preferred execution providers which may or may not have an negative impact on performance. e.g. ORT explicitly assigns shape related ops to CPU to improve perf.[m
+[0;93m2026-10-07 04:37:30.492462962 [W:onnxruntime:, session_state.cc:1168 VerifyEachNodeIsAssignedToAnEp] Rerunning with verbose output on a non-minimal build will show node assignments.[m
+2026-10-07 04:37:30,633 DEBUG Starting new HTTPS connection (1): www.modelscope.cn:443
+2026-10-07 04:37:31,491 DEBUG https://www.modelscope.cn:443 "GET /api/v1/models/pengzhendong/wetext/revisions HTTP/1.1" 403 137
+2026-10-07 04:37:31,491 - modelscope - ERROR - Authentication token does not exist, 
+2026-10-07 04:37:31,491 INFO no frontend is avaliable
+Downloading Model to directory: /home/ubuntu/.cache/modelscope/hub/pengzhendong/wetext
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:35,319 INFO synthesis text 同学们好，欢迎来到问渠的线性代数课。这一讲是第十四章第二节，谱定理。
+2026-10-07 04:37:40,875 INFO yield speech len 10.48, rtf 0.5301625901506147
+100%|██████████| 1/1 [00:07<00:00,  7.24s/it]100%|██████████| 1/1 [00:07<00:00,  7.24s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:41,002 INFO synthesis text 机械臂握着砂轮磨削工件，工具压在工件上，工件也在反推工具，末端就会被顶开一点点。
+2026-10-07 04:37:46,621 INFO yield speech len 10.6, rtf 0.5300910292931323
+100%|██████████| 1/1 [00:05<00:00,  5.74s/it]100%|██████████| 1/1 [00:05<00:00,  5.74s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:46,806 INFO synthesis text 用eigh一算，两个主刚度是五千七百六十四和两万四千零九十七牛每米，相差四倍多。
+2026-10-07 04:37:52,547 INFO yield speech len 11.68, rtf 0.49146354606706805
+100%|██████████| 1/1 [00:05<00:00,  5.92s/it]100%|██████████| 1/1 [00:05<00:00,  5.92s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:53,077 INFO synthesis text Hi everyone, and welcome to Linear Algebra at WenQuest. This is Chapter fourteen, Section two, the spectral theorem.
+2026-10-07 04:37:58,642 INFO yield speech len 10.24, rtf 0.5434266524389386
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:37:58,791 INFO synthesis text A robot arm holds a grinding wheel. The tool presses on the part, the part pushes back, and the tip of the arm gives way a little.
+2026-10-07 04:38:03,400 INFO yield speech len 8.88, rtf 0.5189599486084672
+100%|██████████| 1/1 [00:04<00:00,  4.75s/it]100%|██████████| 1/1 [00:04<00:00,  4.75s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 04:38:03,546 INFO synthesis text Running eigh, the principal stiffnesses are five thousand, seven hundred and sixty-four and twenty-four thousand and ninety-seven newtons per metre, more than four times apart.
+2026-10-07 04:38:09,694 INFO yield speech len 11.52, rtf 0.5336847777167957
+100%|██████████| 1/1 [00:06<00:00,  6.29s/it]100%|██████████| 1/1 [00:06<00:00,  6.29s/it]
+cv2: 6 句完成
+2026-10-07 04:38:09,827 DEBUG Attempting to acquire lock 137948433816240 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 04:38:09,828 DEBUG Lock 137948433816240 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 04:38:09,828 DEBUG Attempting to release lock 137948433816240 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 04:38:09,828 DEBUG Lock 137948433816240 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 04:38:09,830 DEBUG Attempting to acquire lock 137948433816000 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 04:38:09,830 DEBUG Lock 137948433816000 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 04:38:09,830 DEBUG Attempting to release lock 137948433816000 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 04:38:09,830 DEBUG Lock 137948433816000 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 14 分钟
