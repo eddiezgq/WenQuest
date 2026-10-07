@@ -104,14 +104,14 @@ for src in sorted(glob.glob("sample_*.wav")):
         import difflib
         unit = (lambda t: list(t.replace(" ", ""))) if lang == "zh" else (lambda t: t.split())
         key = (lambda w: w) if lang == "zh" else (lambda w: w.strip(".,:;!?").lower())
-        a, braw = [key(w) for w in unit(text)], unit(ref)
-        b = [key(w) for w in braw]
+        ua, braw = [key(w) for w in unit(text)], unit(ref)
+        ub = [key(w) for w in braw]
         best_r, best_span = 0.0, None
-        n = len(a)
-        for st in range(0, max(1, len(b) - n // 2)):
+        n = len(ua)
+        for st in range(0, max(1, len(ub) - n // 2)):
             for ln in range(int(n * 0.85), int(n * 1.15) + 2):
-                cand = b[st:st + ln]
-                r = difflib.SequenceMatcher(None, a, cand).ratio()
+                cand = ub[st:st + ln]
+                r = difflib.SequenceMatcher(None, ua, cand).ratio()
                 if r > best_r:
                     best_r, best_span = r, braw[st:st + ln]
         if best_span and best_r > 0.6:
