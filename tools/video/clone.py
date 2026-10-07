@@ -245,7 +245,11 @@ def gpu_session(job: dict, work: Path, out: Path):
         for f in ["job.json", "remote.py", "setup.sh", *[p.name for p in work.glob("sample_*.wav")]]:
             G._scp(str(work / f), f"ubuntu@{ip}:wqv/{f}")
         # 长时间运行不能挂在一条 SSH 连接上（10-07 断线过一次）：后台运行，每分钟取一次新日志
-        G._ssh(ip, "cd wqv && nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' > run.log 2>&1 < /dev/null &")
+        # 注意：“cd wqv && nohup … &” 会把整串放进后台子壳，它占着 SSH 的输出，连接就一直不返回（10-07 白等了 141 分钟）。
+        # 所以 cd 之后用分号，只把 nohup 这一条放后台；再加 60 秒超时兜底。
+        subprocess.run(["ssh", *G._opts(), f"ubuntu@{ip}",
+                        "cd wqv; nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' "
+                        "> run.log 2>&1 < /dev/null & disown; exit 0"], check=True, timeout=60)
         seen, deadline = 0, time.time() + 200 * 60
         while True:
             time.sleep(60)
