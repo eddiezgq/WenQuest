@@ -1,0 +1,40 @@
+188 句，引擎 ['cv2']
+Warning: Permanently added 'x.x.x.x' (ED25519) to the list of known hosts.
+== 准备环境（NVIDIA A10）
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+dpkg-preconfigure: unable to re-open stdin: 
+== 安装 CosyVoice 依赖
+[2026-10-07 15:49:35,557] [INFO] [real_accelerator.py:203:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+df: /home/ubuntu/.triton/autotune: No such file or directory
+  0%|                                               | 0.00/461M [00:00<?, ?iB/s]  6%|██▍                                    | 28.4M/461M [00:00<00:01, 298MiB/s] 13%|█████▏                                 | 60.8M/461M [00:00<00:01, 312MiB/s] 20%|███████▉                               | 94.4M/461M [00:00<00:01, 330MiB/s] 27%|██████████▉                             | 126M/461M [00:00<00:01, 327MiB/s] 34%|█████████████▋                          | 157M/461M [00:00<00:00, 327MiB/s] 41%|████████████████▌                       | 191M/461M [00:00<00:00, 337MiB/s] 48%|███████████████████▍                    | 224M/461M [00:00<00:00, 334MiB/s] 56%|██████████████████████▏                 | 256M/461M [00:00<00:00, 330MiB/s] 62%|████████████████████████▉               | 288M/461M [00:00<00:00, 332MiB/s] 70%|███████████████████████████▊            | 321M/461M [00:01<00:00, 335MiB/s] 77%|██████████████████████████████▌         | 353M/461M [00:01<00:00, 334MiB/s] 83%|█████████████████████████████████▍      | 385M/461M [00:01<00:00, 335MiB/s] 90%|████████████████████████████████████▏   | 417M/461M [00:01<00:00, 334MiB/s] 97%|██████████████████████████████████████▉ | 450M/461M [00:01<00:00, 334MiB/s]100%|████████████████████████████████████████| 461M/461M [00:01<00:00, 331MiB/s]
+提示音文字按录音稿校正（相似度 0.82）：real and its agent vectors are perpendicular. So it can be written as Q number and Q transpose. → real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:
+Traceback (most recent call last):
+  File "/home/ubuntu/wqv/remote.py", line 58, in <module>
+    print(f"提示音 {lang}: {a:.1f}–{b:.1f} s，{text.strip()}", flush=True)
+TypeError: unsupported format string passed to list.__format__
+2026-10-07 15:49:45,558 DEBUG Attempting to acquire lock 128456289236208 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 15:49:45,558 DEBUG Lock 128456289236208 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 15:49:45,558 DEBUG Attempting to release lock 128456289236208 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 15:49:45,558 DEBUG Lock 128456289236208 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 15:49:45,560 DEBUG Attempting to acquire lock 128456289238800 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 15:49:45,560 DEBUG Lock 128456289238800 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 15:49:45,561 DEBUG Attempting to release lock 128456289238800 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 15:49:45,561 DEBUG Lock 128456289238800 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 8 分钟
+Traceback (most recent call last):
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 294, in <module>
+    main()
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 290, in main
+    gpu_session(job, work, out)
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 240, in gpu_session
+    G._ssh(ip, "cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py")
+  File "/home/runner/work/WenQuest/WenQuest/textbook/tools/gpurun.py", line 98, in _ssh
+    subprocess.run(["ssh", *_opts(), f"ubuntu@{ip}", command], check=True)
+  File "/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-i', '/tmp/tmphsyns9je/wq_voice_key', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=20', 'ubuntu@x.x.x.x', 'cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py']' returned non-zero exit status 1.
