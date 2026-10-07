@@ -67,7 +67,7 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
           "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
-            "Location": "location_name"}
+            "Location": "location_name", "User": "email"}
 
 
 def now_str():
@@ -110,7 +110,7 @@ class Mock:
             self.put("Quality Inspection Template", {"name": tname})
             for p in params:
                 self.put("Quality Inspection Parameter", {"name": p["parameter"], "parameter": p["parameter"]})
-        self.put("User", {"name": "Administrator"})
+        self.put("User", {"name": "Administrator", "email": "admin@example.com"})
         # 第 18 轮 E3：资产要用的科目、角色（真 ERPNext 的标准科目表里有）
         self.put("Account", {"name": "Plants and Machineries - " + ABBR, "account_type": "Fixed Asset", "is_group": 0, "company": COMPANY})
         for r in ("Maintenance Manager", "Maintenance User", "System Manager"):
@@ -473,6 +473,11 @@ def create(doctype: str, body: dict = Body(...)):
             it.setdefault("delivery_date", doc.get("delivery_date"))
     if doctype == "Job Card":
         raise Err(417, "ValidationError", "作业卡由工单提交时自动生成")
+    if doctype == "Asset Maintenance":          # 真 ERPNext：保养任务按“被指派用户的邮箱”找用户建待办
+        for t in doc.get("asset_maintenance_tasks") or []:
+            u = M.db.get("User", {}).get(t.get("assign_to") or "")
+            if t.get("assign_to") and (u is None or u.get("email") not in M.db.get("User", {})):
+                raise Err(417, "LinkValidationError", "Could not find Allocated To: {}".format((u or {}).get("email") or t.get("assign_to")))
     M.put(doctype, doc)
     doc = M.db[doctype][doc["name"]]
     if submit:

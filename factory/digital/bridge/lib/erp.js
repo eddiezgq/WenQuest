@@ -343,15 +343,31 @@ class ERP {
       await this.insert('Item', { item_code: item, item_name: '生产设备 Production machine', stock_uom: 'Nos', is_stock_item: 0,
         is_fixed_asset: 1, asset_category: cat, ...(grp ? { item_group: grp.name } : {}) });
     }
+    // 保养任务要指派给一个用户：ERPNext 按“用户的邮箱”找人建待办，Administrator 的邮箱不是用户名，所以建一个设备组的用户
+    const user = 'maint@wenquest.local';
+    const roles = await this.list('Role', [['name', 'in', ['Maintenance User', 'Maintenance Manager', 'System Manager']]], ['name']);
+    const role = roles.length ? roles[0].name : 'System Manager';
+    if (!(await this.list('User', [['name', '=', user]])).length) {
+      try {
+        await this.insert('User', { email: user, first_name: '设备组', last_name: 'Maintenance', send_welcome_email: 0, enabled: 1,
+          user_type: 'System User', roles: [{ role }] });
+      } catch (e) {
+        if (!(await this.list('User', [['name', '=', user]])).length) throw e;
+      }
+    }
     const team = '设备组 Maintenance team';
+    const members = [{ team_member: 'Administrator', maintenance_role: role }, { team_member: user, maintenance_role: role }];
     if (!(await this.list('Asset Maintenance Team', [['name', '=', team]])).length) {
-      const roles = await this.list('Role', [['name', 'in', ['Maintenance User', 'Maintenance Manager', 'System Manager']]], ['name']);
-      await this.insert('Asset Maintenance Team', { maintenance_team_name: team, company, maintenance_manager: 'Administrator',
-        maintenance_team_members: [{ team_member: 'Administrator', maintenance_role: roles.length ? roles[0].name : 'System Manager' }] });
+      await this.insert('Asset Maintenance Team', { maintenance_team_name: team, company, maintenance_manager: user, maintenance_team_members: members });
+    } else {
+      const t = await this.get('Asset Maintenance Team', team);
+      if (!(t.maintenance_team_members || []).some((m) => m.team_member === user)) {
+        await this.update('Asset Maintenance Team', team, { maintenance_team_members: [...(t.maintenance_team_members || []), members[1]] });
+      }
     }
     await this.ensureCustomField('Asset Maintenance Task', 'wq_interval_h', { label: '周期（运行小时）Interval (run hours)', fieldtype: 'Float',
       insert_after: 'periodicity' });
-    this.assetSetup = { company, loc, cat, item, team };
+    this.assetSetup = { company, loc, cat, item, team, user };
     return this.assetSetup;
   }
 
@@ -374,12 +390,12 @@ class ERP {
         }
         const mt = await this.insert('Asset Maintenance', { asset_name: asset.name, company: S.company, maintenance_team: S.team,
           asset_maintenance_tasks: [{ maintenance_task: a.task.slice(0, 140), maintenance_type: 'Preventive Maintenance', maintenance_status: 'Planned',
-            start_date: today, periodicity: 'Monthly', assign_to: 'Administrator', description: a.task, wq_interval_h: a.interval_h }] });
+            start_date: today, periodicity: 'Monthly', assign_to: S.user, description: a.task, wq_interval_h: a.interval_h }] });
         out.push(['Asset Maintenance', mt, 'created']);
       }
     } else if (action === 'maint_log') {
       const lg = await this.insert('Asset Maintenance Log', { asset_maintenance: pv.asset_maintenance, task: pv.task, task_name: pv.task_name,
-        periodicity: pv.periodicity || 'Monthly', due_date: pv.date, description: pv.description || pv.task_name, task_assignee_email: 'admin@example.com',
+        periodicity: pv.periodicity || 'Monthly', due_date: pv.date, description: pv.description || pv.task_name, task_assignee_email: S.user,
         maintenance_status: 'Completed', completion_date: pv.date, actions_performed: pv.actions || '', docstatus: 1 });
       out.push(['Asset Maintenance Log', lg, 'submitted']);
     } else if (action === 'asset_repair') {

@@ -405,7 +405,8 @@ def for_anomaly(c, a):
             return chain_down(c, sk)
         if rule in ("Q1", "Q2", "Q3", "Q4"):
             char = v.get("characteristic")
-            parts = v.get("parts") or ([v["part"]] if v.get("part") else v.get("bad") or [])
+            parts = v.get("parts") if isinstance(v.get("parts"), list) else None          # Q4 的 parts 是件数，不是序列号
+            parts = parts or ([v["part"]] if v.get("part") else v.get("bad") or [])
             if rule == "Q1" and not parts:
                 parts = [m["data"]["part_serial"] for m in c.db.messages(["quality.measurement"], mode=c.mode, order="desc", limit=200)
                          if m["data"].get("characteristic") == char][:5]
@@ -437,7 +438,7 @@ def for_anomaly(c, a):
             if g.summary:
                 extra = ""
                 if v.get("p_fail") is not None:
-                    extra = "；未来一周坏掉的概率 {:.0%}".format(v["p_fail"])
+                    extra = "；未来 80 运行小时坏掉的概率 {:.0%}".format(v["p_fail"])
                 if v.get("overdue_h"):
                     extra = "；保养逾期 {:.0f} 运行小时".format(v["overdue_h"]) + extra
                 g.summary[0] = "{} 现在{}{}；如果停下来，影响下面这些工单和订单".format(unit.upper(), state, extra)
