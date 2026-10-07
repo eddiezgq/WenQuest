@@ -1,0 +1,25 @@
+188 句，引擎 ['cv2']
+Warning: Permanently added 'x.x.x.x' (ED25519) to the list of known hosts.
+== 准备环境（NVIDIA A10）
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+dpkg-preconfigure: unable to re-open stdin: 
+== 安装 CosyVoice 依赖
+client_loop: send disconnect: Broken pipe
+GPU 机器已关机，用时 141 分钟
+Traceback (most recent call last):
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 294, in <module>
+    main()
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 290, in main
+    gpu_session(job, work, out)
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 240, in gpu_session
+    G._ssh(ip, "cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py")
+  File "/home/runner/work/WenQuest/WenQuest/textbook/tools/gpurun.py", line 98, in _ssh
+    subprocess.run(["ssh", *_opts(), f"ubuntu@{ip}", command], check=True)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-i', '/tmp/tmp_ae0js97/wq_voice_key', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=20', 'ubuntu@x.x.x.x', 'cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py']' returned non-zero exit status 255.
