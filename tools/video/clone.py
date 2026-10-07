@@ -45,8 +45,9 @@ export DEBIAN_FRONTEND=noninteractive
 echo "== 准备环境（$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null)）"
 # 新开机的 Lambda 机器常在跑自动更新，占着 apt 锁：最多等 10 分钟
 sudo systemctl stop unattended-upgrades 2>/dev/null || true
-sudo apt-get -o DPkg::Lock::Timeout=600 update -qq
-sudo apt-get -o DPkg::Lock::Timeout=600 install -y -qq sox libsox-dev ffmpeg > /dev/null
+export DEBIAN_FRONTEND=noninteractive
+sudo -E apt-get -o DPkg::Lock::Timeout=600 update -qq
+sudo -E apt-get -o DPkg::Lock::Timeout=600 install -y -qq sox libsox-dev ffmpeg > /dev/null
 if [ ! -d CosyVoice ]; then
   git init -q CosyVoice && cd CosyVoice && git remote add origin https://github.com/FunAudioLLM/CosyVoice.git
   git fetch -q --depth 1 origin {COSYVOICE_COMMIT} && git checkout -q FETCH_HEAD && git submodule update -q --init --recursive --depth 1
@@ -128,7 +129,9 @@ for engine in job["engines"]:
     mdir = snapshot_download(job["models"][engine], local_dir=f"models/{engine}")
     for f in glob.glob(mdir + "/README*") + glob.glob(mdir + "/LICENSE*"):
         print(f"--- {engine} {os.path.basename(f)} ---\n" + open(f, encoding="utf-8", errors="replace").read()[:1500], flush=True)
-    cv = AutoModel(model_dir=mdir, fp16=False)
+    cv = AutoModel(model_dir=mdir, fp16=True)       # A10 上半精度约快一倍，音质无明显差别
+    import time as _t
+    t_start, n_done, total = _t.time(), 0, len(job["items"])
     os.makedirs(f"out/{engine}", exist_ok=True)
     for item in job["items"]:
         lang, text = item["lang"], item["text"]
@@ -147,6 +150,10 @@ for engine in job["engines"]:
         parts = [o["tts_speech"].squeeze(0).cpu().numpy() for o in gen]
         a = np.concatenate(parts) if parts else np.zeros(1, np.float32)
         sf.write(out, a, cv.sample_rate, subtype="PCM_16")
+        n_done += 1
+        if n_done % 10 == 0 or n_done == total:
+            el = _t.time() - t_start
+            print(f"{engine}: {n_done}/{total} 句，用时 {el / 60:.1f} 分钟，预计还要 {el / n_done * (total - n_done) / 60:.1f} 分钟", flush=True)
     print(f"{engine}: {len(job['items'])} 句完成", flush=True)
     del cv; torch.cuda.empty_cache()
 '''
@@ -237,7 +244,31 @@ def gpu_session(job: dict, work: Path, out: Path):
         G._ssh(ip, "mkdir -p wqv")
         for f in ["job.json", "remote.py", "setup.sh", *[p.name for p in work.glob("sample_*.wav")]]:
             G._scp(str(work / f), f"ubuntu@{ip}:wqv/{f}")
-        G._ssh(ip, "cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py")
+        # 长时间运行不能挂在一条 SSH 连接上（10-07 断线过一次）：后台运行，每分钟取一次新日志
+        G._ssh(ip, "cd wqv && nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' > run.log 2>&1 < /dev/null &")
+        seen, deadline = 0, time.time() + 200 * 60
+        while True:
+            time.sleep(60)
+            r = subprocess.run(["ssh", *G._opts(), "-o", "ServerAliveInterval=30", f"ubuntu@{ip}",
+                                f"tail -n +{seen + 1} wqv/run.log; echo '@@DONE@@'; cat wqv/done 2>/dev/null"],
+                               capture_output=True, text=True)
+            if r.returncode != 0:
+                print("（取日志失败，稍后再试）", r.stderr.strip()[-200:], flush=True)
+                if time.time() > deadline:
+                    raise RuntimeError("GPU 上的合成超时")
+                continue
+            body, _, done = r.stdout.partition("@@DONE@@\n")
+            lines = body.splitlines()
+            seen += len(lines)
+            for ln in lines:
+                if not ln.startswith(("debconf", "dpkg-preconfigure")):
+                    print(ln, flush=True)
+            if done.strip():
+                if done.strip() != "0":
+                    raise RuntimeError(f"GPU 上的合成出错（退出码 {done.strip()}）")
+                break
+            if time.time() > deadline:
+                raise RuntimeError("GPU 上的合成超时（200 分钟）")
         G._scp(f"ubuntu@{ip}:wqv/out/.", str(out))
         G._ssh(ip, "rm -rf wqv/sample_* wqv/prompt_* wqv/out")
     finally:
