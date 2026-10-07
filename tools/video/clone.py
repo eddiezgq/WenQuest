@@ -55,6 +55,9 @@ fi
 python3 -m venv ~/cv && . ~/cv/bin/activate
 pip install -q --upgrade pip
 echo "== 安装 CosyVoice 依赖"
+# openai-whisper 20231117 的安装脚本要 pkg_resources（新版 setuptools 已删）：先装旧 setuptools，关掉隔离单独装它
+pip install -q "setuptools<70" wheel
+pip install -q --no-build-isolation openai-whisper==20231117
 pip install -q -r CosyVoice/requirements.txt
 pip install -q huggingface_hub
 """
