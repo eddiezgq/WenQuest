@@ -91,6 +91,8 @@ def slots(db, mode="teach"):
     s["si_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     a = db.one("select id from anomaly where mode=%s and rule='M2' and subject_key='grd-01' order by id desc limit 1", (mode,))
     s["pm_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    a = db.one("select id from anomaly where mode=%s and rule='H2' and status in ('open','ack','doing') order by id limit 1", (mode,))
+    s["gap_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     return s
 
 
@@ -219,6 +221,9 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     ehs_scene(H)
     from hub import maint as MT                 # 第 18 轮 E3：点检表（磨床保养逾期来自情景里的运行小时）
     MT.seed(db, "teach")
+    from hub import people as PE                 # 第 18 轮 E4：30 人、技能矩阵、固定岗位
+    PE.seed(db, "teach")
+    PE.leave_next_shift(H, "teach", "P01", "评测·情景")    # 王强下一个班请假：磨床那一班没人（H2）
     s.reconcile()
     ai.detector().run("teach", now)
     return H, eng

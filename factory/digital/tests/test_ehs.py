@@ -48,7 +48,8 @@ def test_seed_people_trainings_hazards(env):
     from hub import ehs as EH
     H, _ = env
     ps = EH.people(H.db, "teach")
-    assert len(ps) == 12 and {p["post"] for p in ps} == {"操作工", "维修工", "安全员", "班组长"}
+    assert len(ps) == 30 and {"操作工", "维修工", "安全员", "班组长"} <= {p["post"] for p in ps}       # 第 18 轮 E4：员工档案 30 人（E2 的 12 人工号不变）
+    assert [p["name"] for p in ps if p["id"] in ("P01", "P12")] == ["王强", "冯涛"]
     assert "confined" in next(p for p in ps if p["id"] == "P07")["expired"]                     # 故事二：孙磊的受限空间已过期
     assert len(H.db.q("select id from hazard where mode='teach'")) == 12
     assert EH.qualified(H.db, "teach", "P07", "confined")[0] is False

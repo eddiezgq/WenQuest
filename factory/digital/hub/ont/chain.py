@@ -443,6 +443,12 @@ def for_anomaly(c, a):
                     extra = "；保养逾期 {:.0f} 运行小时".format(v["overdue_h"]) + extra
                 g.summary[0] = "{} 现在{}{}；如果停下来，影响下面这些工单和订单".format(unit.upper(), state, extra)
             return g
+        if rule == "H2" and v.get("unit"):              # 第 18 轮 E4：缺人 → 设备 → 工单 → 订单
+            g = chain_down(c, v["unit"])
+            if g.summary:
+                g.summary[0] = "{} {} {} 没人能开（{}）；这一班它停着，影响下面这些工单和订单".format(
+                    str(v.get("day"))[5:], {"day": "早班", "night": "晚班"}.get(v.get("shift"), ""), v["unit"].upper(), v.get("why") or "")
+            return g
         if rule in ("E1", "E2", "E5") and (v.get("unit") or st == "Machine"):   # 第 18 轮 E2：隐患 / 违规 → 设备 → 工单 → 订单
             unit = v.get("unit") or sk
             g = chain_down(c, unit)

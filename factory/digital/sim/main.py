@@ -71,6 +71,9 @@ class Service:
             self.calendar = cal
             self.eng.set_calendar(cal)
             return True, "班次：{}".format("按班次" if cal.mode == "shift" else "24 小时连续")
+        if cmd == "set_staffing":               # 第 18 轮 E4：排班算出的人员等级（两种模式都接受：生产模式按工厂自己的排班）
+            self.eng.set_staffing(data)
+            return True, "人员等级 {} 条（{}）".format(len(data.get("levels") or {}), "开" if self.eng.staffing.enabled else "关")
         if self.mode != "teach":
             return False, "生产模式下不能控制仿真器"
         if cmd == "set_reliability":            # 第 18 轮 E3：老师调可靠性（0 关、1 正常、5 加速）

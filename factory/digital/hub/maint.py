@@ -299,7 +299,14 @@ def open_repair(H, mode, unit, source, title, parts=None, who="系统", failure_
         db.x("update maint_failure set repair_id=%s where id=%s", (rid, failure_id))
     if inspection_id:
         db.x("update maint_inspection set repair_id=%s, status='handled' where id=%s", (rid, inspection_id))
-    holder = next((p["id"] for p in EH.qualified_people(db, mode, "loto") if p["post"] == "维修工"), None)
+    techs = [p for p in EH.qualified_people(db, mode, "loto") if p["post"] == "维修工"]
+    try:                                                 # 第 18 轮 E4：优先这一班在岗的持证维修工
+        from hub import people as PE
+        on = PE.on_shift_ids(db, mode)
+        techs = [p for p in techs if p["id"] in on] + [p for p in techs if p["id"] not in on]
+    except Exception:  # noqa: BLE001
+        pass
+    holder = techs[0]["id"] if techs else None
     if holder:
         pr = EH.request_permit(db, mode, {"kind": "loto", "unit": unit, "holder_id": holder, "minutes": rp["mttr_min"] if rp else 120,
                                           "reason": "维修 MR-{:05d}：{}".format(rid, title)}, who)

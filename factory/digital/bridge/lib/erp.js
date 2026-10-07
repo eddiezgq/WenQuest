@@ -226,6 +226,12 @@ class ERP {
           out.push(this.doc(r[0], r[1], r[2], opt));
           created.push([r[0], r[1].name]);
         }
+      } else if (d.action === 'people_setup') {
+        // 第 18 轮 E4：部门、岗位、员工档案
+        for (const r of await this.peopleService(d.action, d.preview)) {
+          out.push(this.doc(r[0], r[1], r[2], opt));
+          created.push([r[0], r[1].name]);
+        }
       } else if (d.action.startsWith('crm_') || ['complaint_issue', 'service_orders', 'service_order_done', 'spare_ship'].includes(d.action)) {
         // 第 18 轮 E1：客户与服务（线索、商机、报价、合同、投诉、服务工单、备件出库）
         for (const r of await this.crmService(d.action, d.preview)) {
@@ -369,6 +375,33 @@ class ERP {
       insert_after: 'periodicity' });
     this.assetSetup = { company, loc, cat, item, team, user };
     return this.assetSetup;
+  }
+
+  // ------------------------------------------------------------ 第 18 轮 E4：人员与组织
+  async peopleService(action, pv) {
+    const company = await this.getCompany();
+    const out = [];
+    const deptName = {};
+    for (const dpt of pv.departments || []) {
+      const had = (await this.list('Department', [['department_name', '=', dpt.name], ['company', '=', company]], ['name']))[0];
+      const doc = had ? await this.get('Department', had.name) : await this.insert('Department', { department_name: dpt.name, company });
+      deptName[dpt.name] = doc.name;
+      out.push(['Department', doc, had ? 'updated' : 'created']);
+    }
+    for (const g of pv.designations || []) {
+      const had = (await this.list('Designation', [['name', '=', g.name]], ['name']))[0];
+      const doc = had ? await this.get('Designation', had.name) : await this.insert('Designation', { designation_name: g.name, description: g.en });
+      out.push(['Designation', doc, had ? 'updated' : 'created']);
+    }
+    for (const e of pv.employees || []) {
+      // 可以重发：工号（employee_number）已有的不再建
+      const had = (await this.list('Employee', [['employee_number', '=', e.id]], ['name']))[0];
+      const doc = had ? await this.get('Employee', had.name) : await this.insert('Employee', { naming_series: 'HR-EMP-', first_name: e.name,
+        employee_number: e.id, company, status: 'Active', gender: e.gender, date_of_birth: e.born, date_of_joining: e.hired,
+        ...(deptName[e.dept] ? { department: deptName[e.dept] } : {}), designation: e.post, cell_number: e.phone });
+      out.push(['Employee', doc, had ? 'updated' : 'created']);
+    }
+    return out;
   }
 
   async maintService(action, pv) {
@@ -667,7 +700,7 @@ class ERP {
   async poll() {
     const out = [];
     for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order', 'Lead', 'Opportunity', 'Quotation', 'Contract', 'Issue',
-      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log']) {
+      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log', 'Employee', 'Department', 'Designation']) {
       const since = this.lastModified[dt];
       const filters = since ? [['modified', '>', since]] : [];
       const rows = await this.list(dt, filters, ['name', 'modified'], { order_by: 'modified asc', limit: 200 });
@@ -743,6 +776,12 @@ function summarize(doctype, d) {
         'wq_response_h', 'wq_warranty_months', 'wq_amount', 'wq_quotation', 'wq_sales_order']);
     case 'Issue':
       return pick(['subject', 'status', 'customer', 'opening_date', 'resolution_date', 'wq_serial', 'wq_kind', 'wq_engineer', 'wq_day']);
+    case 'Employee':                    // 第 18 轮 E4（只带工作上的字段：不带生日、电话）
+      return pick(['employee_name', 'first_name', 'employee_number', 'department', 'designation', 'status', 'date_of_joining', 'company']);
+    case 'Department':
+      return pick(['department_name', 'company', 'parent_department', 'is_group']);
+    case 'Designation':
+      return pick(['designation_name']);
     case 'Asset':                       // 第 18 轮 E3
       return pick(['asset_name', 'status', 'location', 'net_purchase_amount', 'purchase_date', 'asset_category', 'docstatus']);
     case 'Asset Maintenance':

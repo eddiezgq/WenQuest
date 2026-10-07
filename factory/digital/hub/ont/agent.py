@@ -54,7 +54,7 @@ SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
-    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "object": "查一个对象", "overview": "全厂概况",
+    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "object": "查一个对象", "overview": "全厂概况",
 }
 
 
@@ -386,6 +386,12 @@ class Tools:
             elif a.get("rule") == "M5":
                 from hub import maint as MT
                 ev = MT.parts_options(self.db, self.mode, a)
+            elif a.get("rule") == "H2":                  # 第 18 轮 E4：排班缺口（车间推演）
+                from hub import people as PE
+                ev = PE.options(self.db, self.mode, a, st, self._ctx_plan(st))
+            elif a.get("rule") == "H1":
+                from hub import people as PE
+                ev = PE.training_options(self.db, self.mode, a)
             else:
                 ev = PB.evaluate(a, st, self._ctx_plan(st))
         except P.PlanError as e:
@@ -637,6 +643,40 @@ class Tools:
                   ({"item_code": k, "stock": MT.stock_of(self.db, self.mode, k), "min": v} for k, v in MT.SPARE_MIN.items())]
         return {"repairs": reps, "pms": pms, "spares": spares, "page": self.run.page("maint-repairs", "设备维护 · 维修与备件", "/maint?tab=repairs")}
 
+    # ---- ⑲ 员工与技能（第 18 轮 E4）
+    def people_skills(self, unit=None):
+        from hub import people as PE
+        m = PE.matrix(self.db, self.mode)
+        units = [u for u in m["units"] if not unit or u["unit"] == str(unit).lower()]
+        if unit and not units:
+            return {"error": "没有这台需要人的设备：{}".format(unit)}
+        rows = []
+        for u in units:
+            who = [{"id": r["id"], "name": r["name"], "level": PE.LEVELS.get(r["cells"][u["unit"]]["level"]), "shift": PE.SHIFT_NAME.get(r["shift"]),
+                    "ref": self.run.obj("Employee", r["id"], r["name"])}
+                   for r in m["rows"] if u["unit"] in r["cells"] and r["cells"][u["unit"]]["level"]]
+            rows.append(dict(u, people=who, ref=self.run.obj("Machine", u["unit"], u["name"])))
+        return {"skills": rows, "single_points": [x["unit"] for x in PE.single_points(self.db, self.mode)],
+                "employees": len(PE.employees(self.db, self.mode)), "page": self.run.page("people-skills", "人员 · 技能矩阵", "/people?tab=skills")}
+
+    # ---- ⑳ 排班与缺口
+    def roster_gaps(self, hours=24):
+        from hub import people as PE
+        b = PE.today_board(self.db, self.mode)
+        gaps = [dict(g, ref=self.run.obj("Machine", g["unit"], UNITS[g["unit"]][1])) for g in PE.gaps(self.db, self.mode, hours=float(hours or 24))]
+        return {"now": {"day": b["day"], "shift": b["shift_name"]}, "on_shift": [x for x in b["people"] if x["units"]],
+                "absent": [x for x in b["people"] if x["attendance"] not in ("在岗", "迟到")], "roster_gaps": gaps, "enabled": PE.enabled(self.db, self.mode),
+                "page": self.run.page("people-roster", "人员 · 排班", "/people?tab=roster")}
+
+    # ---- ㉑ 加班与负荷
+    def overtime_load(self):
+        from hub import people as PE
+        names = {p["id"]: p["name"] for p in PE.employees(self.db, self.mode)}
+        ot = PE.overtime_week(self.db, self.mode)
+        return {"overtime": [{"emp_id": k, "name": names.get(k, k), "hours": v, "over": v > PE.OT_WEEK_LIMIT_H} for k, v in sorted(ot.items(), key=lambda x: -x[1])],
+                "limit_h": PE.OT_WEEK_LIMIT_H, "absence": PE.absence_rate(self.db, self.mode), "kpis": PE.kpis(self.db, self.mode),
+                "page": self.run.page("people-overtime", "人员 · 出勤与加班", "/people?tab=attendance")}
+
     # ---- ⑨ 起草动作（只起草）
     def draft_action(self, changes, anomaly_id=None, scenario_id=None, snapshot_id=None):
         from hub.ont import actions as AC
@@ -732,6 +772,12 @@ def _summary(out):
         return "故障概率 {:.0%}".format(out["p_fail"])
     if "repairs" in out and "spares" in out:
         return "维修单 {} 张".format(len(out["repairs"]))
+    if "skills" in out and "single_points" in out:
+        return "设备 {} 台，单点依赖 {} 台".format(len(out["skills"]), len(out["single_points"]))
+    if "roster_gaps" in out:
+        return "排班缺口 {} 个".format(len(out["roster_gaps"]))
+    if "overtime" in out and "limit_h" in out:
+        return "加班 {} 人".format(len(out["overtime"]))
     if "hazards" in out:
         return "危险源 {} 条".format(len(out["hazards"]))
     if "person_days" in out:
@@ -744,7 +790,7 @@ def _summary(out):
 TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", "list_anomalies", "get_anomaly", "simulate",
               "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
               "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess",
-              "maint_overview", "failure_risk", "repairs_spares"]
+              "maint_overview", "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -788,6 +834,11 @@ TOOLS = [
     {"name": "failure_risk", "description": "某台设备的故障风险（威布尔失效率模型）：未来 hours 运行小时坏掉的概率、预期停机、预期损失，保养后的概率",
      "input_schema": dict(_S(unit={"type": "string"}, hours={"type": "number"}), required=["unit"])},
     {"name": "repairs_spares", "description": "开着的维修单、保养单和维修备件库存（对比最低库存）", "input_schema": _S()},
+    {"name": "people_skills", "description": "员工与技能：每台需要人的设备谁会开（学徒 / 熟练 / 可带徒、哪个班），熟练以上只有一个人的设备（单点依赖）。unit 可选",
+     "input_schema": _S(unit={"type": "string", "description": "设备编号，如 grd-01"})},
+    {"name": "roster_gaps", "description": "排班与缺口：这一班谁在岗、谁请假，未来 hours 小时内哪一班哪台设备没人能开",
+     "input_schema": _S(hours={"type": "number"})},
+    {"name": "overtime_load", "description": "加班与负荷：本周每人加班小时（对比上限）、近 7 天各班组缺勤率", "input_schema": _S()},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -976,6 +1027,9 @@ class Rules:
             return "draft"
         if re.search(r"(\d+)\s*台.*?(\d{1,2})\s*月\s*(\d{1,2})\s*日", q) and re.search(r"订单|安排|接单|生产|交货|WQR", q):
             return "order"
+        if re.search(r"排班|缺人|请假|出勤|缺勤|迟到|技能矩阵|单点依赖|一个人会|会开|顶班|带教|调班|在岗|人手|本周加班|加班超|技能培训|员工", q) \
+                and not re.search(r"工程师|上门|服务|WQR105-", q):          # 第 18 轮 E4：人员与排班（客户现场的服务排班归客户与服务）
+            return "people"
         if (re.search(r"MR-\d{5}|PM-\d{5}|IC-\d{5}", q) or re.search(r"保养|维修单|点检|备件|台账|失效|概率|MTBF|平均故障间隔|运行小时", q)) \
                 and not re.search(r"上门|派工|WQR105-", q):            # 客户现场的上门点检归客户与服务
             return "maint"
@@ -1028,6 +1082,8 @@ class Rules:
                   "（可能性 × 严重度），再到指挥台比较“立即停机 / 限时整改 / 停机 + 改派加班”三个方案的交期和花费。",
         "maint": "提示：打开“设备维护”页的台账：看每台设备自上次保养运行了多少小时、离保养周期还差多少；点开一台看失效率曲线。"
                  "自己用 F(t) = 1 − exp(−(t/η)^β) 算一算再运行两周坏掉的概率，乘上修理费和停机损失，再和保养的花费比。",
+        "people": "提示：打开“人员”页：技能矩阵里标红的列是只有一个人会开的设备；排班表里标红的格子是这一班没人能开。"
+                  "想一想：缺人的这一班，从哪里调人？调走的人原来的岗位怎么办？加班要花多少钱？",
         "service": "提示：在“客户与服务”页的排班表里看 6 位工程师的空闲。同区域每人每天 2 单、跨区域 1 单；想一想：先修哪台、谁去、几天能做完、要带几件备件？",
     }
 
@@ -1260,6 +1316,46 @@ class Rules:
         out.append("这是估算，没有真的排班；排班表 [{}]。".format(r["page"]))
         return "\n".join(out)
 
+    # ---- 人员与排班（第 18 轮 E4）
+    def a_people(self, q):
+        if self.student:
+            return self._hint("people")
+        unit = find_machine(q)
+        if re.search(r"怎么处理|怎么办|方案|该不该", q):
+            a = self.t.db.one("select id from anomaly where mode=%s and rule in ('H2','H1') and status in ('open','ack','doing') "
+                              "{} order by rule desc, id desc limit 1".format("and subject_key=%s" if unit else ""), (self.t.mode, unit) if unit else (self.t.mode,))
+            if a:
+                return self.a_handle("A-{:05d} 怎么处理".format(a["id"]))
+        if re.search(r"加班|缺勤|出勤率", q) and not re.search(r"排班|缺人|请假", q):
+            r = self.t.overtime_load()
+            out = ["加班与出勤 [{}]：本周加班上限 {:g} 小时/人。".format(r["page"], r["limit_h"])]
+            out += ["· {}：{:g} 小时{}".format(x["name"], x["hours"], "（超限）" if x["over"] else "") for x in r["overtime"][:8]] or ["本周还没有人加班。"]
+            out.append("近 7 天缺勤率：" + "；".join("{} {:.0%}（{}/{}）".format(t, x["rate"], x["missed"], x["scheduled"]) for t, x in sorted(r["absence"].items())) + "。")
+            return "\n".join(out)
+        if re.search(r"技能|会开|单点|一个人|带教|培训", q):
+            r = self.t.people_skills(unit)
+            if r.get("error"):
+                return r["error"]
+            out = ["技能矩阵 [{}]：{} 台设备只有一个人能独立操作（单点依赖：{}）。".format(r["page"], len(r["single_points"]),
+                                                                  "、".join(u.upper() for u in r["single_points"]) or "没有")]
+            for x in r["skills"][:6 if not unit else 1]:
+                out.append("· {} [{}]：{}".format(x["unit"].upper(), x["ref"], "、".join("{} [{}]（{}，{}）".format(p["name"], p["ref"], p["level"], p["shift"])
+                                                                                   for p in x["people"]) or "没人会开"))
+            return "\n".join(out)
+        r = self.t.roster_gaps()
+        out = ["{} {}，在岗 {} 人，请假或缺勤 {} 人 [{}]。".format(r["now"]["day"], r["now"]["shift"], len(r["on_shift"]), len(r["absent"]), r["page"])]
+        if not r["enabled"]:
+            out.append("（车间“要有人”现在没打开：缺人不会让设备停下。）")
+        if r["roster_gaps"]:
+            out.append("24 小时内的排班缺口：")
+            out += ["· {} {} {} [{}]：{}".format(g["day"][5:], g["shift_name"], g["unit"].upper(), g["ref"], g["why"]) for g in r["roster_gaps"][:8]]
+            a = self.t.db.one("select id from anomaly where mode=%s and rule='H2' and status in ('open','ack','doing') order by id desc limit 1", (self.t.mode,))
+            if a:
+                out.append("处理方案可以问：“A-{:05d} 怎么处理？”".format(a["id"]))
+        else:
+            out.append("24 小时内没有排班缺口。")
+        return "\n".join(out)
+
     # ---- 设备维护（第 18 轮 E3）
     def a_maint(self, q):
         if self.student:
@@ -1488,10 +1584,17 @@ class Rules:
         if not lst:
             return "现在没有开着的异常，全厂运行平稳。"
         out = ["现在开着 {} 个异常（按严重程度）：".format(len(lst))]
-        for a in lst[:15]:
+        per, shown, more = {}, 0, {}
+        for a in lst:                                  # 同一条规则最多列 2 个，其余合并成一句（例如多台设备单点依赖）
+            r = a.get("rule") or a["key"]
+            per[r] = per.get(r, 0) + 1
+            if per[r] > 2 or shown >= 15:
+                more[r] = more.get(r, 0) + 1
+                continue
+            shown += 1
             out.append("· {} {} [{}]：{}".format(a["severity"], a["key"], a["ref"], a["title"]))
-        if len(lst) > 15:
-            out.append("……还有 {} 个，见厂情中枢异常清单。".format(len(lst) - 15))
+        if more:
+            out.append("……还有 {} 个（{}），见厂情中枢异常清单。".format(sum(more.values()), "、".join("{} {} 个".format(k, n) for k, n in more.items())))
         out.append("问“A-xxxxx 怎么处理？”可以看推演出的方案。")
         return "\n".join(out)
 

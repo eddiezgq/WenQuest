@@ -64,8 +64,13 @@ TYPES = {
     "pm_order": {"label": "保养工单", "costly": True, "maint": True},
     "repair_order": {"label": "维修工单", "costly": True, "maint": True, "nosim": True},
     "interval_change": {"label": "调整保养周期", "costly": True, "maint": True, "nosim": True},
+    # 第 18 轮 E4：人员与组织（发起：班组长、计划员、厂长；调班班组长或厂长批，加班顶班、技能培训花钱要厂长批）
+    "shift_swap": {"label": "调班", "costly": False, "people": True},
+    "overtime_assign": {"label": "加班顶班", "costly": True, "people": True},
+    "skill_training": {"label": "技能培训", "costly": True, "people": True, "nosim": True},
 }
 MAINT_INITIATORS = ("maintenance", "manager")
+PEOPLE_INITIATORS = ("lead", "planner", "manager")
 SERVICE_INITIATORS = ("service", "manager", "sales")
 EHS_INITIATORS = ("safety", "manager")
 
@@ -126,6 +131,12 @@ def title_of(t, p):
         return "维修工单：{} {}".format((p.get("unit") or "").upper(), p.get("title") or "")
     if t == "interval_change":
         return "调整保养周期：{} → {:g} 运行小时".format((p.get("unit") or "").upper(), float(p.get("interval_h") or 0))
+    if t in ("shift_swap", "overtime_assign"):
+        sh = {"day": "早班", "night": "晚班"}.get(p.get("shift"), p.get("shift"))
+        return "{}：{} {} {} 由 {} {}".format("调班" if t == "shift_swap" else "加班顶班", str(p.get("day"))[5:], sh, (p.get("unit") or "").upper(),
+                                         p.get("emp_id"), "顶岗" if t == "shift_swap" else "加班 {:g} 小时".format(int(p.get("minutes") or 720) / 60))
+    if t == "skill_training":
+        return "技能培训：{} 学 {}，带教 {:g} 小时".format(p.get("emp_id"), (p.get("unit") or "").upper(), float(p.get("hours") or 40))
     return t
 
 
@@ -151,6 +162,8 @@ def can_initiate(u, t=None):
         return u.get("role") in EHS_INITIATORS
     if t and TYPES.get(t, {}).get("maint"):
         return u.get("role") in MAINT_INITIATORS
+    if t and TYPES.get(t, {}).get("people"):
+        return u.get("role") in PEOPLE_INITIATORS
     return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
@@ -165,7 +178,10 @@ def can_approve(u, a):
     ehs = TYPES[a["type"]].get("ehs")
     if not costly and ehs and u.get("role") not in ("manager", "safety"):
         return False, "要安全员或厂长批准"
-    if not costly and not service and not ehs and u.get("role") not in ("manager", "planner"):
+    people = TYPES[a["type"]].get("people")
+    if not costly and people and u.get("role") not in ("manager", "lead"):
+        return False, "要班组长或厂长批准"
+    if not costly and not service and not ehs and not people and u.get("role") not in ("manager", "planner"):
         return False, "要计划员或厂长批准"
     if a["initiator"] == u.get("name"):
         if a["mode"] == "prod":
@@ -179,7 +195,8 @@ def create(db, mode, u, type_, params, scenario_id=None, anomaly_id=None, trial=
     if type_ not in TYPES:
         raise ActionError("不认识的动作 " + str(type_))
     if not can_initiate(u, type_):
-        raise ActionError("服务类动作由售后或厂长发起" if TYPES[type_].get("service") else "动作由计划员或厂长发起")
+        raise ActionError("服务类动作由售后或厂长发起" if TYPES[type_].get("service") else
+                          ("人员类动作由班组长、计划员或厂长发起" if TYPES[type_].get("people") else "动作由计划员或厂长发起"))
     p = dict(params)
     p["type"] = type_
     r = db.one("insert into action (mode, type, title, params, scenario_id, anomaly_id, initiator, initiator_role, trial) "
@@ -311,6 +328,10 @@ def execute(H, a, u, who):
         fn = {"pm_order": MT.exec_pm, "repair_order": MT.exec_repair, "interval_change": MT.exec_interval}[t]
         res = fn(H, mode, dict(p, _action_id=a["id"]), u)
         return res, "executing" if res.get("proposal_id") else "done"
+    if t in ("shift_swap", "overtime_assign", "skill_training"):
+        from hub import people as PE
+        fn = {"shift_swap": PE.exec_swap, "overtime_assign": PE.exec_overtime, "skill_training": PE.exec_training}[t]
+        return fn(H, mode, dict(p, _action_id=a["id"]), u), "done"
     if t in ("lockout", "rectify_order", "unlock", "training_plan"):
         from hub import ehs as EH
         fn = {"lockout": EH.exec_lockout, "rectify_order": EH.exec_rectify, "unlock": EH.exec_unlock, "training_plan": EH.exec_training}[t]
@@ -364,6 +385,9 @@ def trial(db, snaps, mode, changes, scenario_snapshot=None):
     if changes and all(no_sim(c.get("type")) for c in changes):
         return plain_trial(changes)
     changes = [c for c in changes if not no_sim(c.get("type"))]
+    if any(TYPES.get(c.get("type"), {}).get("people") for c in changes):     # 第 18 轮 E4：调班、加班顶班 → 推演里的“排班”改动
+        from hub import people as PE
+        changes = [PE.sim_change(db, mode, c) if TYPES.get(c.get("type"), {}).get("people") else c for c in changes]
     sid = None
     if scenario_snapshot is not None:
         snap = scenario_snapshot

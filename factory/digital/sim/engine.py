@@ -27,6 +27,8 @@ from wqbus.topics import unit_topic
 
 from sim import errors as ERR
 from sim.calendar import Calendar
+from sim.staffing import APPRENTICE_RATE, Staffing
+from sim import staffing as STF
 
 # 工序 → 可用设备（第一个是默认设备）
 OP_UNITS = {
@@ -132,6 +134,7 @@ class Machine:
         self.tool_life = 1.0
         self.last_status = None
         self.locked = None        # 第 18 轮 E2：挂牌上锁的许可证号（挂着锁不能复位、不会自动恢复）
+        self.no_staff = False     # 第 18 轮 E4：这一班没人能开
         rp = REL.params(unit)      # 第 18 轮 E3：自上次保养以来的运行小时（情景开始时已经用了一阵）
         self.run_h = float(rp["init_h"]) if rp else 0.0
         self.fail_mode = None
@@ -172,6 +175,9 @@ class Engine:
         # 第 18 轮 E3：可靠性系数（0 关闭；1 正常；5 加速）。随机故障用单独的随机数，不影响原来的加工节拍和误差
         self.rel_factor = 0.0
         self.rel_rng = random.Random((seed or 0) * 7919 + 17)
+        # 第 18 轮 E4：车间要有人（关闭时和以前完全一样）
+        self.staffing = Staffing()
+        self._staff_wait = {}                    # 设备 → 已排好的换班复查时刻（仿真秒）
 
     # ------------------------------------------------------------ 基础
     def now(self):
@@ -210,6 +216,32 @@ class Engine:
                 self._shift_wait[m.unit] = ts
                 self.at(ts, "shift_open", unit=m.unit)
         return True
+
+    def set_staffing(self, d):
+        """平台下发排班算出的人员等级（第 18 轮 E4）；人多了的设备马上重新判断能不能开工"""
+        self.staffing.update(d.get("enabled"), d.get("levels"), d.get("days"), bool(d.get("replace")))
+        self._staff_wait.clear()
+        for m in self.machines.values():
+            self._try_start(m)
+            self._status(m)
+
+    def _staff_level(self, m, t):
+        """这一班这台设备的人员等级；没人时排好换班时复查，返回 0"""
+        if not self.staffing.enabled:
+            return 2
+        local = self.factory_dt(t).astimezone(self.calendar.tzi)
+        lv = self.staffing.level(m.unit, local)
+        if lv == 0:
+            ts = self.sim_t(STF.next_change(local).astimezone(dt.timezone.utc))
+            if self._staff_wait.get(m.unit) != ts:
+                self._staff_wait[m.unit] = ts
+                self.at(ts, "staff_check", unit=m.unit)
+        return lv
+
+    def _ev_staff_check(self, t, unit):
+        if self._staff_wait.get(unit) is not None and self._staff_wait[unit] <= t + 1e-6:
+            self._staff_wait.pop(unit, None)
+        self._try_start(self.machines[unit])
 
     def _ev_shift_open(self, t, unit):
         if self._shift_wait.get(unit) is not None and self._shift_wait[unit] <= t + 1e-6:
@@ -499,6 +531,10 @@ class Engine:
                 break
             if self._shift_closed(m, t):         # 下班了：正在做的件做完，不开新件
                 break
+            lv = self._staff_level(m, t)         # 第 18 轮 E4：这一班没人能开就停在“缺人”
+            m.no_staff = lv == 0
+            if lv == 0:
+                break
             if m.setup_job != job.key and not m.active:
                 # 新工序先调整（装夹、对刀、调程序）
                 m.setup_job = job.key
@@ -513,6 +549,8 @@ class Engine:
             wear = 1 - m.tool_life
             factor = self.rng.uniform(0.96, 1.10) + 0.08 * wear
             dur = std * factor
+            if lv == 1:                          # 只有学徒：按 60% 的速度
+                dur = dur / APPRENTICE_RATE
             tok = next(self.tokens)
             m.active[tok] = (p, job, t, t + dur)
             if job.first_start is None:
@@ -781,8 +819,11 @@ class Engine:
             "shift": self.calendar.mode,
             "off_shift": self.calendar.mode == "shift" and not self.calendar.is_open(m.unit, self.factory_dt(t)),
         }
+        if self.staffing.enabled:                # 第 18 轮 E4：这一班的人员等级（0 没人 / 1 学徒 / 2 熟练）
+            data["staff_level"] = self.staffing.level(m.unit, self.factory_dt(t).astimezone(self.calendar.tzi))
+            data["no_staff"] = bool(getattr(m, "no_staff", False)) and data["staff_level"] == 0
         key = (data["state"], data["work_order"], data["operation"], data["qty_done"], data["queue"],
-               data["job_started"], len(data["dispatched"]), data["off_shift"])
+               data["job_started"], len(data["dispatched"]), data["off_shift"], data.get("staff_level"), data.get("no_staff"))
         if not force and key == m.last_status:
             return
         m.last_status = key
@@ -830,6 +871,7 @@ class Engine:
                 "auto_start": self.auto_start, "status_every_s": self.status_every_s,
                 "rng": [rs[0], list(rs[1]), rs[2]], "err_rng": [es[0], list(es[1]), es[2]],
                 "err_active": self.errors.active, "tokens": tok, "rel_factor": self.rel_factor, "seq": sq, "calendar": self.calendar.to_dict(),
+                "staffing": self.staffing.to_dict(), "staff_wait": self._staff_wait,
                 "shift_wait": self._shift_wait, "wos": wos, "machines": machines, "agvs": agvs,
                 "transfers": [[p.wo.name, p.serial, f, to] for p, f, to in self.transfers],
                 "queue": [[qt, qs, k, pl] for qt, qs, k, pl in sorted(self.q)]}
@@ -844,6 +886,8 @@ class Engine:
         e.errors.active = {k: dict(v) for k, v in (s.get("err_active") or {}).items()}
         e.calendar = Calendar.from_dict(s.get("calendar"))
         e._shift_wait = {k: v for k, v in (s.get("shift_wait") or {}).items()}
+        e.staffing = Staffing.from_dict(s.get("staffing"))
+        e._staff_wait = {k: v for k, v in (s.get("staff_wait") or {}).items()}
         parts = {}
         for name, w in s["wos"].items():
             wo = WorkOrder.__new__(WorkOrder)

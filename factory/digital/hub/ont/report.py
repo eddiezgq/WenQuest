@@ -138,6 +138,16 @@ def build(db, mode, kind, start, end):
                          "overdue_units": mk["overdue_units"], "open_repairs": mk["open_repairs"], "mtbf": mk["mtbf"]}
     except Exception:  # noqa: BLE001
         data["maint"] = None
+    # ---- 人员（第 18 轮 E4）
+    try:
+        from hub import people as PE
+        pk = PE.kpis(db, mode)
+        na = db.one("select count(*) as n from attendance where mode=%s and status in ('leave','absent') and at >= %s and at < %s", (mode, start, end))["n"]
+        sp = PE.single_points(db, mode)
+        data["people"] = {"absences": na, "gaps": pk["gaps"], "single_points": [x["unit"] for x in sp], "overtime_h_week": pk["overtime_h_week"],
+                          "attendance_rate": pk["attendance_rate"], "trainings": pk["trainings"]}
+    except Exception:  # noqa: BLE001
+        data["people"] = None
     # ---- 今天（本周）要关注的 3 件
     focus = []
     for a in still:
@@ -221,6 +231,11 @@ def text_of(kind, data):
         lines.append("设备维护：故障 {} 次（停机 {:g} 分钟），完成保养 {} 次；保养逾期 {} 台{}，开着的维修单 {} 张。".format(
             mt["failures"], mt["failure_down_min"], mt["pms_done"], mt["overdue"],
             "（{}）".format("、".join(u.upper() for u in mt["overdue_units"])) if mt["overdue_units"] else "", mt["open_repairs"]))
+    pe = data.get("people")
+    if pe and (pe["absences"] or pe["gaps"] or pe["single_points"] or pe["overtime_h_week"]):
+        lines.append("人员：请假缺勤 {} 人次，24 小时内排班缺口 {} 个；{} 台设备只有一个人会开{}；本周加班 {:g} 小时{}。".format(
+            pe["absences"], pe["gaps"], len(pe["single_points"]), "（{}）".format("、".join(u.upper() for u in pe["single_points"])) if pe["single_points"] else "",
+            pe["overtime_h_week"], "，{} 人在带教".format(pe["trainings"]) if pe["trainings"] else ""))
     if data["risk_orders"]:
         lines.append("交付风险：" + "；".join("{} {}".format(o["name"], o["risk"]) for o in data["risk_orders"]) + "。")
     if data["retros"]:

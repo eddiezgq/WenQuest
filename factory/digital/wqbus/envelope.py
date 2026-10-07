@@ -48,7 +48,9 @@ DATA_SCHEMAS = {
                                 # 第 18 轮 E2：挂牌上锁、解锁
                                 "lockout", "unlock",
                                 # 第 18 轮 E3：保养完成、可靠性系数
-                                "pm_done", "set_reliability", "set_run_h"]},
+                                "pm_done", "set_reliability", "set_run_h",
+                                # 第 18 轮 E4：排班算出的人员等级
+                                "set_staffing"]},
         "qty": {"type": "integer", "minimum": 1}}),
     "machine.ack": _obj(["accepted"], {"accepted": {"type": "boolean"}}),
     # 第 17 轮 C 期：仿真车间的完整状态快照（推演用），主题 wq/gearbox/machining/sim/snapshot

@@ -510,7 +510,14 @@ def mount(app, H):
                        "运行一段时间后对比保养过与没保养的设备的故障记录，用故障记录估平均故障间隔。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab18",
             "guide_url": public_base(request) + "/api/cae/lab18/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab18/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab18/report-template.docx"}, {
+            "id": "lab19", "name": {"zh": "实验 19：排班与技能——缺人时的决策", "en": "Lab 19: staffing and skills — deciding when someone is missing"},
+            "summary": "车间设备要有人才能开：按排班和技能矩阵，没人停、学徒按 60% 速度。学生先在技能矩阵里找单点依赖；老师让一位关键操作工请假，"
+                       "学生手算瓶颈设备停一个班少做多少件，在指挥台比较“调人顶岗 / 学徒带教 / 加班顶班 / 不处理”（比对模式）；"
+                       "起草调班或加班动作，批准后车间按新排班开；最后设计技能培训计划，把单点依赖降到 0。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab19",
+            "guide_url": public_base(request) + "/api/cae/lab19/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab19/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

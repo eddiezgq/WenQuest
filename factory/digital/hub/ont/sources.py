@@ -113,6 +113,7 @@ def tables(B, db, mode):
     service_objs(B, db, mode)
     ehs_objs(B, db, mode)
     maint_objs(B, db, mode)
+    people_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -336,6 +337,47 @@ def maint_objs(B, db, mode):
     for code, lo in MT.SPARE_MIN.items():
         B.obj(mode, "SparePart", code, {"stock": MT.stock_of(db, mode, code), "min_stock": lo})
         B.link(mode, "SparePart", code, "item", code)
+
+
+def people_objs(B, db, mode):
+    """人员与组织（第 18 轮 E4）：部门、岗位、员工（补部门、班次）、技能资质、今明两天的排班、技能培训"""
+    if not db.one("select to_regclass('roster_post') is not null as ok")["ok"]:
+        return
+    from hub import people as PE
+    erp = {str(m["data"].get("employee_number") or ""): m["data"].get("name") for m in db.erp_docs("Employee", mode)}
+    for d, en in PE.DEPTS:
+        B.obj(mode, "Department", d, {"name": d})
+    for k in PE.POSTS:
+        B.obj(mode, "Position", k, {"name": k})
+    for p in db.q("select * from ehs_person where mode=%s", (mode,)):
+        B.obj(mode, "Employee", p["id"], {"name": p["name"], "status": "在岗" if p["active"] else "离岗", "post": p["post"], "team": p["team"],
+                                         "dept": p.get("dept"), "shift": PE.SHIFT_NAME.get(p.get("shift")), "erp_id": erp.get(p["id"])})
+        if p.get("dept"):
+            B.link(mode, "Employee", p["id"], "department", p["dept"])
+        B.link(mode, "Employee", p["id"], "position", p["post"])
+    for r in db.q("select * from skill where mode=%s", (mode,)):
+        k = "{}/{}".format(r["emp_id"], r["unit"])
+        B.obj(mode, "Qualification", k, {"employee": r["emp_id"], "name": "{} {}".format(r["unit"].upper(), PE.LEVELS.get(r["level"], r["level"])),
+                                          "level": r["level"], "valid_until": str(r["valid_until"]) if r["valid_until"] else None})
+        B.link(mode, "Qualification", k, "employee", r["emp_id"])
+        if r["unit"] in UNITS:
+            B.link(mode, "Qualification", k, "machine", r["unit"])
+    d0, _ = PE.now_shift()
+    for d in (d0, d0 + dt.timedelta(days=1)):
+        for sh in ("day", "night"):
+            for u, r in PE.roster_for(db, mode, d, sh).items():
+                if not r["emp_id"]:
+                    continue
+                k = "{}/{}/{}".format(d.isoformat(), PE.SHIFT_NAME[sh], r["emp_id"])
+                ab = PE.absences(db, mode, d, sh).get(r["emp_id"])
+                B.obj(mode, "Roster", k, {"shift": PE.SHIFT_NAME[sh], "attended": not (ab and ab["status"] in ("leave", "absent")),
+                                          "unit": u, "source": r["source"]})
+                B.link(mode, "Roster", k, "employee", r["emp_id"])
+                B.link(mode, "Roster", k, "machine", u)
+    for t in PE.trainings(db, mode):
+        B.obj(mode, "TrainingRecord", t["key"], {"date": t["started_at"][:10], "passed": t["status"] == "passed",
+                                                 "topic": "{} 带教 {:g} 小时".format(t["unit"].upper(), float(t["hours"]))})
+        B.link(mode, "TrainingRecord", t["key"], "employee", t["emp_id"])
 
 
 def twin(B, db, mode):

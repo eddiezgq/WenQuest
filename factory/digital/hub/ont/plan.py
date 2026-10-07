@@ -52,10 +52,12 @@ CHANGE_TYPES = {
     "breakdown": "假设停机",            # 第 17 轮 D 期：只用于推演（AI 代理、复盘），不能变成动作
     "lockout": "停机挂牌整改",          # 第 18 轮 E2：重大隐患（可延后：先临时防护，delay_minutes 后停）
     "pm_order": "保养（停机挂牌）",     # 第 18 轮 E3：和停机挂牌一样推演，费用按保养人工算
+    "staff": "排班（调人 / 学徒 / 加班顶班）",   # 第 18 轮 E4：改某天某班某台设备的人员等级（0 没人 / 1 学徒 / 2 熟练）
 }
 RECTIFY_RATE = 45.0               # 安全整改 / 保养人工（美元 / 小时）
 PM_MATERIAL = 80.0                # 一次保养的油、脂、滤芯（美元）
 OT_RATE = 1.5                     # 加班费倍数
+WAGE_RATE = 30.0                  # 操作工工时（美元 / 小时；加班按 1.5 倍）
 EXPEDITE_COST = 300.0             # 维修加急默认费用（美元，可在改动里改）
 URGENT_PCT = 0.15                 # 紧急采购加急费：货值的 15%
 OUTSOURCE_MARKUP = 1.3            # 外协单价：本厂工时成本 × 1.3 + 每批运费
@@ -270,6 +272,7 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
     releases = [dict(r) for r in ctx.get("releases") or []]
     # ---- 改动
     cal = Calendar.from_dict(eng.calendar.to_dict())
+    staff_changed = False
     for c in changes:
         typ = c.get("type")
         if typ not in CHANGE_TYPES:
@@ -310,6 +313,21 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
                 costs.append({"what": "临时防护、专人看守", "usd": float(c["temp_cost"])})
             checks.append({"ok": True, "text": "{} {}停机挂牌，{} {:.0f} 分钟".format(m.unit.upper(), "{:.0f} 分钟后".format(delay) if delay else "立即",
                                                                           "保养" if typ == "pm_order" else "整改", mins)})
+            continue
+        if typ == "staff":
+            lv = {str(k): int(v) for k, v in (c.get("levels") or {}).items() if int(v) in (0, 1, 2)}
+            if not lv:
+                checks.append({"ok": False, "text": "排班：没有要改的班"})
+                continue
+            eng.staffing.enabled = True
+            eng.staffing.levels.update(lv)
+            staff_changed = True
+            applied.append(c)
+            if c.get("overtime_min"):
+                costs.append({"what": "加班顶班 {}（{:.0f} 小时）".format(c.get("who") or "", float(c["overtime_min"]) / 60),
+                              "usd": round(float(c["overtime_min"]) / 60 * WAGE_RATE * OT_RATE, 2)})
+            if any(v == 1 for v in lv.values()):
+                checks.append({"ok": True, "text": "学徒开机：按 60% 速度，要班组长带着"})
             continue
         if typ == "overtime":
             if cal.mode != "shift":
@@ -373,6 +391,8 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
             applied.append(c)                    # 不影响生产，只影响订单的判定
     if cal.to_dict() != eng.calendar.to_dict():
         eng.set_calendar(cal)                     # 只有加班改了日历才重设（重设会让每台设备重新判断一次开工）
+    if staff_changed:
+        eng.set_staffing({})                      # 人员等级改了：每台设备重新判断能不能开工
     # 待下达的工单（等料、插单）：到时刻下达
     for r in releases:
         at = r.get("at")

@@ -52,8 +52,8 @@ log = logging.getLogger("hub")
 logging.basicConfig(level=os.environ.get("WQ_LOG", "INFO"), format="%(asctime)s hub %(levelname)s %(message)s")
 
 SECRET = (os.environ.get("WQ_SECRET") or secrets.token_hex(16)).encode()
-ROLES = ("planner", "engineer", "operator", "quality", "manager", "approver", "sales", "service", "safety", "maintenance")   # approver、sales：企业版（第 8 轮）
-STUDENT_ROLES = ("planner", "engineer", "operator", "quality", "service", "safety", "maintenance")     # safety 安全员：第 18 轮 E2（实验 17）     # service 售后：第 18 轮 E1（实验 16）
+ROLES = ("planner", "engineer", "operator", "quality", "manager", "approver", "sales", "service", "safety", "maintenance", "lead")   # approver、sales：企业版（第 8 轮）
+STUDENT_ROLES = ("planner", "engineer", "operator", "quality", "service", "safety", "maintenance", "lead")   # lead 班组长：第 18 轮 E4（实验 19）     # safety 安全员：第 18 轮 E2（实验 17）     # service 售后：第 18 轮 E1（实验 16）
 # 登录方式（第 3 轮 D2）：local = 填名字进入（自己电脑上用）；wenquest = 问渠账号（线上）
 AUTH = os.environ.get("WQ_AUTH", "local")
 SSO_URL = os.environ.get("WQ_SSO_URL", "")          # 学习平台核对登录的接口，如 https://learn.<域名>/api/v1/auth/sso
@@ -156,6 +156,8 @@ class Hub:
             EH.init(self.db)
             from hub import maint as MT
             MT.init(self.db)
+            from hub import people as PE
+            PE.init(self.db)
             NT.init(self.db)
             RP.init(self.db)
             RT.init(self.db)
@@ -190,8 +192,8 @@ class Hub:
     def compare_locked(self, u, anomaly_id=None):
         """实验 15 的比对模式：学生提交自己的分析之前看不到建议和推荐理由（第 17 轮 D 期 D9）"""
         try:
-            from hub import lab15, lab16, lab17, lab18        # 实验 16–18（第 18 轮 E1–E3）沿用同一个比对模式
-            return any(m.locked(self.db, u, anomaly_id) for m in (lab15, lab16, lab17, lab18))
+            from hub import lab15, lab16, lab17, lab18, lab19        # 实验 16–19（第 18 轮 E1–E4）沿用同一个比对模式
+            return any(m.locked(self.db, u, anomaly_id) for m in (lab15, lab16, lab17, lab18, lab19))
         except ImportError:
             return False
 
@@ -273,6 +275,12 @@ class Hub:
                             MT.scan_failures(self, mode)
                     except Exception:  # noqa: BLE001
                         log.exception("设备维护出错")
+                    try:                              # 人员与组织（第 18 轮 E4）：员工档案进 ERPNext、出勤模拟、人员等级下发车间
+                        from hub import people as PE
+                        PE.ensure_setup(self, mode)
+                        PE.tick(self, mode)
+                    except Exception:  # noqa: BLE001
+                        log.exception("人员出错")
                     last = self.last_brief.get(mode, 0)
                     if new or time.time() - last > 600:
                         self.ai.briefing(mode)
@@ -1702,6 +1710,41 @@ def lab18_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
 
 
+# ---------------------------------------------------------------- 实验 19（第 18 轮 E4-10）
+@app.get("/api/lab19")
+def lab19_status(u=Depends(user_of)):
+    from hub import lab19
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = lab19.check(H.db, u["name"])
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = lab19.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab19/inject")
+def lab19_inject(body: dict = Body(default={}), u=Depends(user_of)):
+    from hub import lab19
+    try:
+        return lab19.inject(H, u, body)
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except (ValueError, KeyError) as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/lab19/{tid}")
+def lab19_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab19
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab19.answer(H.db, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
+
+
 @app.post("/api/scenario/reset")
 def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     """重置教学情景：清空教学模式的历史，让仿真器重新载入实验 7 情景。只有“厂长”角色（教师）能做。"""
@@ -1728,6 +1771,8 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     _EH.reset(H.db, "teach")
     from hub import maint as _MT                          # 第 18 轮 E3：点检、故障、维修、保养单清空（车间重载情景时可靠性回到关闭）
     _MT.reset(H.db, "teach")
+    from hub import people as _PE                         # 第 18 轮 E4：出勤、调班、加班、培训清空，技能回到初始，“要有人”关闭
+    _PE.reset(H.db, "teach")
     if H.ont is not None:
         H.ont.reset_mode("teach")
     H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
@@ -1774,6 +1819,8 @@ from hub import ehs_api as _ehs_api  # noqa: E402
 _ehs_api.mount(app, H, user_of, who)              # 第 18 轮 E2：安全环保
 from hub import maint_api as _maint_api  # noqa: E402
 _maint_api.mount(app, H, user_of, who)            # 第 18 轮 E3：设备维护
+from hub import people_api as _people_api  # noqa: E402
+_people_api.mount(app, H, user_of, who)           # 第 18 轮 E4：人员与排班
 from hub.ont import agent_api as _agent_api  # noqa: E402
 _agent_api.mount(app, H, user_of, who, ai_quota)  # 第 17 轮 D 期：AI 代理（要在 mount_anomaly 之前）
 _ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则

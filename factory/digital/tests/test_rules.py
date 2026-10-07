@@ -474,3 +474,57 @@ def test_M7_mtbf_drop():
     f = run("M7", _mdb(fails={"recent": 6, "before": 2}))
     assert len(f) == 1 and f[0].values["mtbf"] == 80 and f[0].values["before"] == 240
     assert run("M7", _mdb(fails={"recent": 3, "before": 3})) == []
+
+
+# ---------------------------------------------------------------- 第 18 轮 E4：人员与组织
+def _pdb(skills=()):
+    tables = [("to_regclass", lambda a: [{"ok": True}]),
+              ("from ehs_person", lambda a: [{"id": "P01", "name": "王强"}, {"id": "P19", "name": "宋雨"}, {"id": "P03", "name": "张伟"}]),
+              ("from skill where", lambda a: list(skills))]
+    return FakeDB(tables=tables)
+
+
+def test_H1_single_point(monkeypatch):
+    from hub import people as PE
+    monkeypatch.setattr(PE, "single_points", lambda db, mode: [{"unit": "hob-01", "name": "滚齿机", "emp_id": "P02", "emp_name": "李娜"}])
+    f = run("H1", _pdb())
+    assert [x.fkey for x in f] == ["hob-01"] and "李娜" in f[0].title and ("Employee", "P02") in f[0].about
+
+
+def test_H2_roster_gap(monkeypatch):
+    from hub import people as PE
+    g = [{"day": "2026-10-21", "shift": "day", "shift_name": "早班", "unit": "grd-01", "emp_id": "P01", "emp_name": "王强", "why": "王强 请假"},
+         {"day": "2026-10-21", "shift": "night", "shift_name": "晚班", "unit": "vmc-01", "emp_id": None, "emp_name": None, "why": "岗位空着（人被调走）"}]
+    monkeypatch.setattr(PE, "gaps", lambda db, mode, now=None, hours=24: g)
+    monkeypatch.setattr(PE, "enabled", lambda db, mode: True)
+    f = {x.fkey: x for x in run("H2", _pdb())}
+    assert set(f) == {"2026-10-21/day/grd-01", "2026-10-21/night/vmc-01"}
+    assert f["2026-10-21/day/grd-01"].severity == "critical" and f["2026-10-21/night/vmc-01"].severity == "warn"
+    monkeypatch.setattr(PE, "enabled", lambda db, mode: False)
+    assert run("H2", _pdb()) == []                                    # “要有人”没打开：缺人不影响车间，不报
+
+
+def test_H3_skill_expiring():
+    from hub import kpi
+    d0 = NOW.astimezone(kpi.TZ).date()
+    sk = [{"emp_id": "P19", "unit": "ht-01", "level": 2, "valid_until": d0 + dt.timedelta(days=20)},
+          {"emp_id": "P01", "unit": "grd-01", "level": 3, "valid_until": d0 - dt.timedelta(days=3)},
+          {"emp_id": "P03", "unit": "grd-01", "level": 2, "valid_until": d0 + dt.timedelta(days=90)}]
+    f = {x.fkey: x for x in run("H3", _pdb(sk))}
+    assert set(f) == {"P19/ht-01", "P01/grd-01"} and f["P01/grd-01"].severity == "warn" and f["P19/ht-01"].severity == "info"
+
+
+def test_H4_overtime_over(monkeypatch):
+    from hub import people as PE
+    monkeypatch.setattr(PE, "overtime_week", lambda db, mode, day=None: {"P03": 24.0, "P01": 6.0})
+    f = run("H4", _pdb())
+    assert len(f) == 1 and f[0].subject == ("Employee", "P03") and f[0].values["hours"] == 24
+
+
+def test_H5_absence_high(monkeypatch):
+    from hub import people as PE
+    monkeypatch.setattr(PE, "absence_rate", lambda db, mode, days=7: {"机加一班": {"scheduled": 70, "missed": 9, "rate": 0.129},
+                                                                     "机加二班": {"scheduled": 56, "missed": 2, "rate": 0.036},
+                                                                     "热处理": {"scheduled": 6, "missed": 2, "rate": 0.333}})
+    f = run("H5", _pdb())
+    assert [x.fkey for x in f] == ["机加一班"]                        # 热处理排班人次太少，不报

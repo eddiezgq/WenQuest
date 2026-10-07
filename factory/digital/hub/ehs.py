@@ -550,6 +550,12 @@ def exec_lockout(H, mode, p, u):
     holder = p.get("holder_id")
     if not holder or not qualified(db, mode, holder, "loto")[0]:
         cands = [x for x in qualified_people(db, mode, "loto") if x["post"] == "维修工"] or qualified_people(db, mode, "loto")
+        try:                                             # 第 18 轮 E4：优先这一班在岗的
+            from hub import people as PE
+            on = PE.on_shift_ids(db, mode)
+            cands = [x for x in cands if x["id"] in on] + [x for x in cands if x["id"] not in on]
+        except Exception:  # noqa: BLE001
+            pass
         if not cands:
             raise ValueError("没有挂牌上锁资质在有效期内的人")
         holder = cands[0]["id"]

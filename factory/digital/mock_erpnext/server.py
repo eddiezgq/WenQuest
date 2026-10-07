@@ -59,15 +59,20 @@ REQUIRED = {
     "Asset Maintenance Log": ["maintenance_status", "due_date", "description", "task_name", "task_assignee_email"],
     "Asset Repair": ["failure_date", "asset"],
     "Location": ["location_name"],
+    # 第 18 轮 E4：员工、部门、岗位（ERPNext 自带，不需要人力资源模块）
+    "Employee": ["first_name", "company", "status", "gender", "date_of_birth", "date_of_joining"],
+    "Department": ["department_name", "company"],
+    "Designation": ["designation_name"],
 }
 SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d}", "Job Card": "PO-JOB{n:05d}",
           "Material Request": "MAT-MR-{y}-{n:05d}", "Quality Inspection": "MAT-QA-{y}-{n:05d}",
           "Stock Entry": "MAT-STE-{y}-{n:05d}", "Purchase Order": "PUR-ORD-{y}-{n:05d}",
           "Lead": "CRM-LEAD-{y}-{n:05d}", "Opportunity": "CRM-OPP-{y}-{n:05d}", "Quotation": "SAL-QTN-{y}-{n:05d}",
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
-          "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}"}
+          "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}",
+          "Employee": "HR-EMP-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
-            "Location": "location_name", "User": "email"}
+            "Location": "location_name", "User": "email", "Designation": "designation_name"}
 
 
 def now_str():
@@ -111,6 +116,9 @@ class Mock:
             for p in params:
                 self.put("Quality Inspection Parameter", {"name": p["parameter"], "parameter": p["parameter"]})
         self.put("User", {"name": "Administrator", "email": "admin@example.com"})
+        for g in ("Male", "Female"):                     # 第 18 轮 E4：真 ERPNext 安装时就有
+            self.put("Gender", {"name": g})
+        self.put("Department", {"name": "All Departments", "department_name": "All Departments", "is_group": 1})
         # 第 18 轮 E3：资产要用的科目、角色（真 ERPNext 的标准科目表里有）
         self.put("Account", {"name": "Plants and Machineries - " + ABBR, "account_type": "Fixed Asset", "is_group": 0, "company": COMPANY})
         for r in ("Maintenance Manager", "Maintenance User", "System Manager"):
@@ -163,6 +171,8 @@ class Mock:
             return doc["customer_name"]
         if dt_ == "Custom Field":
             return "{}-{}".format(doc.get("dt"), doc.get("fieldname"))
+        if dt_ == "Department" and doc.get("department_name"):    # 真 ERPNext：部门名 - 公司缩写
+            return "{} - {}".format(doc["department_name"], ABBR) if doc.get("company") else doc["department_name"]
         if dt_ in BY_FIELD and doc.get(BY_FIELD[dt_]):
             return doc[BY_FIELD[dt_]]
         return doc.get("name") or uuid.uuid4().hex[:10]

@@ -318,7 +318,7 @@ def main():
     check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 2, "全厂态势 15 块，2 块待接入")
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
-    check(len(live) == 39 and not [x["id"] for x in live if x["error"]], "规则 39 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+    check(len(live) == 44 and not [x["id"] for x in live if x["error"]], "规则 44 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
 
     print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
     r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
@@ -386,6 +386,7 @@ def main():
     customer_and_service(teacher)
     safety(teacher)
     maintenance(teacher)
+    people(teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -626,6 +627,73 @@ def maintenance(teacher):
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 18 页：5 个任务，自动评 60 分")
     k = hub("GET", "/api/maint/kpis", token=teacher)
     check("mtbf" in k and k["factor"] == 0, "设备维护态势：逾期 {} 台，未关维修单 {}".format(k["overdue"], k["open_repairs"]))
+
+
+def people(teacher):
+    """第 18 轮 E4：员工档案进 ERPNext；车间“要有人”（请假 → 这一班人员等级 0）；关键人请假 → 排班缺口 H2 → 四个方案 → 调班 → 有人了；
+    单点依赖 H1 → 技能培训 → 考核通过 → 单点依赖少一台"""
+    print("16. 人员与组织（第 18 轮 E4）")
+    lead = login("测试班组长", "lead")
+
+    def mach(u):
+        return next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == u)
+    es = wait(lambda: (lambda e: e if all(x["erp_id"] for x in e) else None)(hub("GET", "/api/people/employees", token=teacher)["employees"]),
+              "ERPNext 员工档案", 480, 4)
+    check(es is not None and len(es) == 30, "ERPNext 员工档案 30 人（{}）".format("、".join("{} {}".format(x["id"], x["erp_id"]) for x in (es or [])[:2])))
+    if es is None:
+        for p in hub("GET", "/api/proposals", token=teacher):
+            if p.get("action") == "people_setup":
+                print("    提议 {} {}：{}".format(p.get("proposal_id"), p.get("status"), json.dumps(p.get("result"), ensure_ascii=False)[:600]))
+    deps = [d for d in erp_docs("Department") if d.get("department_name") in ("机加一班", "设备组")]
+    check(len(deps) == 2, "ERPNext 部门：{}".format("、".join(d["name"] for d in deps)))
+    hub("POST", "/api/people/staffing", {"enabled": True}, teacher)
+    td = hub("GET", "/api/people/today", token=teacher)
+    op = next((p for p in td["people"] if "saw-01" in p["units"]), None)
+    check(op is not None, "这一班锯床是 {}".format((op or {}).get("name")))
+    if op:
+        m = wait(lambda: (lambda m: m if m.get("staff_level") == 2 else None)(mach("saw-01")), "车间收到排班", 60, 2)
+        check(m is not None, "车间“要有人”打开，锯床这一班人员等级 2")
+        hub("POST", "/api/people/attendance", {"emp_id": op["id"], "status": "leave", "day": td["day"], "shift": td["shift"]}, lead)
+        m = wait(lambda: (lambda m: m if m.get("staff_level") == 0 else None)(mach("saw-01")), "请假后锯床没人", 60, 2)
+        check(m is not None, "{} 请假：锯床这一班没人能开（人员等级 0）".format(op["name"]))
+        hub("POST", "/api/people/attendance/clear", {"emp_id": op["id"], "day": td["day"], "shift": td["shift"]}, lead)
+        m = wait(lambda: (lambda m: m if m.get("staff_level") == 2 else None)(mach("saw-01")), "恢复在岗", 60, 2)
+        check(m is not None, "恢复在岗：锯床人员等级回到 2")
+    r = hub("POST", "/api/lab19/inject", {"enable": True, "emp_id": "P01"}, teacher)
+    check("请假" in r.get("text", ""), "老师注入：{}".format(r.get("text")))
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "H2" and "GRD-01" in x["title"]), None),
+              "排班缺口异常 H2", 90, 3)
+    check(an is not None, "异常 H2：{}".format((an or {}).get("title")))
+    if an:
+        o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+        kinds = [x["kind"] for x in o["options"]]
+        check(o.get("people") and kinds[:2] == ["none", "swap"], "缺人四方案：{}；{}".format("、".join(x["label"] for x in o["options"]), o.get("reason")))
+        sw = next(x for x in o["options"] if x["kind"] == "swap")
+        a = hub("POST", "/api/ont/actions", {"changes": sw["changes"], "anomaly_id": an["id"], "snapshot_id": o["snapshot_id"]}, lead)
+        d = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+        check(d["status"] == "done", "调班：{}".format((d.get("result") or {}).get("text")))
+        ch = sw["changes"][0]
+        ro = hub("GET", "/api/people/roster?week=" + ch["day"], token=teacher)
+        cell = next(r for r in ro["rows"] if r["day"] == ch["day"] and r["shift"] == ch["shift"])["cells"]["grd-01"]
+        check(cell["level"] == 2 and cell["source"] == "swap", "排班里 {} {} 磨床由 {} 顶岗".format(ch["day"], ch["shift"], cell["name"]))
+    h1 = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "H1" and "HOB-01" in x["title"]), None),
+              "单点依赖异常 H1", 60, 3)
+    check(h1 is not None, "异常 H1：{}".format((h1 or {}).get("title")))
+    if h1:
+        o = hub("GET", "/api/ont/anomalies/{}/options".format(h1["id"]), token=teacher)
+        t = next(x for x in o["options"] if x["kind"] == "training")
+        a = hub("POST", "/api/ont/actions", {"changes": t["changes"], "anomaly_id": h1["id"]}, lead)
+        d = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+        check(d["status"] == "done", "技能培训：{}".format((d.get("result") or {}).get("text")))
+        tr = next(x for x in hub("GET", "/api/people/trainings", token=teacher)["trainings"] if x["status"] == "doing" and x["unit"] == "hob-01")
+        hub("POST", "/api/people/trainings/{}/pass".format(tr["id"]), {}, lead)
+        sk = hub("GET", "/api/people/skills", token=teacher)
+        check("hob-01" not in [x["unit"] for x in sk["single_points"]], "考核通过：滚齿机不再是单点依赖（还剩 {} 台）".format(len(sk["single_points"])))
+    st = hub("GET", "/api/lab19", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 19 页：5 个任务，自动评 60 分")
+    k = hub("GET", "/api/people/kpis", token=teacher)
+    check("attendance_rate" in k and k["enabled"], "人员态势：出勤率 {:.0%}，缺口 {}，单点依赖 {} 台".format(k["attendance_rate"], k["gaps"], k["single_points"]))
+    hub("POST", "/api/people/staffing", {"enabled": False}, teacher)
 
 
 if __name__ == "__main__":
