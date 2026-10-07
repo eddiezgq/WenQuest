@@ -154,6 +154,7 @@ function describe(c) {
   if (c.type === 'split_delivery') return `${c.sales_order} 先交 ${c.first_qty} 台（${c.first_date}）`;
   if (c.type === 'insert_order') return `${c.work_order} SH-301 × ${c.qty}，${c.at} 下达`;
   if (c.type === 'breakdown') return `假设 ${c.unit.toUpperCase()} 再停 ${Math.round(c.minutes)} 分钟（只推演）`;
+  if (c.type === 'lockout') return `${c.unit.toUpperCase()} ${c.delay_minutes ? c.delay_minutes + ' 分钟后' : '立即'}停机挂牌整改 ${Math.round(c.minutes)} 分钟`;
   return JSON.stringify(c);
 }
 function otText(r) { return r?.overtime_min ? `${r.overtime_min} 分钟 × ${r.overtime_units} 台` : '0'; }

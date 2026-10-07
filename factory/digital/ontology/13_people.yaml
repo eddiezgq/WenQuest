@@ -25,13 +25,16 @@ types:
   Employee:
     label: 员工
     label_en: Employee
-    maturity: capture
+    maturity: have
+    sources: [安全环保的虚拟员工（第 18 轮 E2；人员领域包上线后换成员工档案）]
     sensitivity: 2
     key: 工号
     title: "{key} {name}"
     props:
       name: {t: str, l: 姓名}
       status: {t: str, l: 在岗状态}
+      post: {t: str, l: 岗位}
+      team: {t: str, l: 班组}
     links:
       position: {to: Position, l: 岗位, inv: 员工}
   Qualification:

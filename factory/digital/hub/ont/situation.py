@@ -8,7 +8,6 @@ import datetime as dt
 from hub.ont import schema as S
 
 WAITING = {
-    "ehs": "待接入：隐患随手拍、作业许可、安全培训记录（安全环保领域包）",
     "people": "待接入：员工、技能资质、排班（人员领域包）",
     "energy": "待接入：电表计量点与抄读（能源领域包）",
 }
@@ -53,6 +52,11 @@ def metrics(db, mode, ov, now):
         pipe = crm.pipeline(db, mode)
     except Exception:  # noqa: BLE001
         sk, pipe = {}, {}
+    try:                                    # 第 18 轮 E2：安全环保
+        from hub import ehs as EH
+        ek = EH.kpis(db, mode)
+    except Exception:  # noqa: BLE001
+        ek = None
     M = {
         "strategy": [("oee", "全厂 OEE（今日）", ov["oee"]["value"], "pct"), ("output", "本周产量", (k.get("output") or {}).get("value"), "int")],
         "customer": [("satisfaction", "满意度（近 30 天，5 分制）", sk.get("satisfaction"), "num"),
@@ -78,6 +82,11 @@ def metrics(db, mode, ov, now):
                     ("first_fix", "一次修复率", sk.get("first_fix"), "pct"),
                     ("warranty_cost", "保修成本（近 30 天）", sk.get("warranty_cost"), "usd")],
         "maintenance": [("down_min", "今日停机（分钟）", round(down_min), "int")],
+        "ehs": [("open_issues", "开着的隐患（重大）", "{}（{}）".format(ek["open_issues"], ek["major_open"]), "text"),
+                ("on_time", "整改按期率（近 30 天）", ek["on_time"], "pct"),
+                ("locked", "挂牌上锁的设备", ek["locked"], "int"),
+                ("training_due", "培训 30 天内到期 / 已过期", ek["training_due"], "int"),
+                ("near_miss", "未遂（近 30 天）", ek["near_miss_30d"], "int")] if ek else [],
         "finance": [("cost_var", "本周成本偏差", ov["cost"]["value"], "pct_signed")],
     }
     return M

@@ -420,7 +420,7 @@ class Overview:
                         "item": d.get("item"), "part_serial": d.get("part_serial"),
                         "progress": d.get("progress", 0), "qty_done": d.get("qty_done", 0),
                         "qty": d.get("qty", 0), "queue": d.get("queue", 0),
-                        "tool_life_left": d.get("tool_life_left"), "reason": d.get("reason"),
+                        "tool_life_left": d.get("tool_life_left"), "reason": d.get("reason"), "locked": d.get("locked"),
                         "down_until_s": d.get("down_until_s"), "down_for_s": d.get("down_for_s"), "dispatched": d.get("dispatched", []),
                         "ts": m["ts"] if m else None})
         return out

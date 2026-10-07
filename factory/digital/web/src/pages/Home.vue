@@ -192,7 +192,7 @@ const toneColor = (t) => TONE[t] || 'var(--muted)';
 
 function jobText(m) {
   if (m.state === 'down' || m.state === 'fault') {
-    return `${m.reason || '停机'} · 已停 ${Math.round((m.down_for_s || 0) / 60)} 分钟 · 排队 ${m.queue || 0} 件`;
+    return `${m.locked ? '🔒 ' : ''}${m.reason || '停机'} · 已停 ${Math.round((m.down_for_s || 0) / 60)} 分钟 · 排队 ${m.queue || 0} 件`;
   }
   if (!m.work_order) return m.state === 'idle' ? '等待派工' : '';
   return `${m.item || ''} ${opShort(m.operation)} · 第 ${Math.min(m.qty_done + (m.state === 'run' ? 1 : 0), m.qty)} / ${m.qty} 件${m.job_started ? '' : ' · 待开工'}`;

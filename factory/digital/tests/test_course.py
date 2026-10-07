@@ -131,6 +131,8 @@ def test_designs_cases_layout(client):
     l16 = next(x for x in c if x["id"] == "lab16")                 # 第 18 轮 E1：实验 16
     assert l16["tool_url"].endswith("/lab16") and l16["guide_url"].endswith("/api/cae/lab16/guide.docx")
     assert l16["report_template_url"].endswith("/api/cae/lab16/report-template.docx") and l16["mode"] == "teach"
+    l17 = next(x for x in c if x["id"] == "lab17")                 # 第 18 轮 E2：实验 17
+    assert l17["tool_url"].endswith("/lab17") and l17["guide_url"].endswith("/api/cae/lab17/guide.docx")
     lay = client.get("/api/course/layout", headers=AUTH).json()
     assert lay["floor"] == {"w_m": 50, "d_m": 28}
     grd = next(u for u in lay["units"] if u["unit"] == "grd-01")

@@ -111,6 +111,7 @@ def tables(B, db, mode):
     plans(B, db, mode)
     agent_objs(B, db, mode)
     service_objs(B, db, mode)
+    ehs_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -261,6 +262,54 @@ def service_objs(B, db, mode):
             B.link(mode, "Warranty", s_, "unit", s_)
     except Exception:  # noqa: BLE001
         pass
+
+
+def ehs_objs(B, db, mode):
+    """安全环保（第 18 轮 E2）：危险源、隐患、作业许可、事故（3 级敏感）、员工与培训、化学品、废弃物"""
+    if not db.one("select to_regclass('safety_issue') is not null as ok")["ok"]:
+        return
+    from hub import ehs as EH
+    for h in db.q("select * from hazard where mode=%s", (mode,)):
+        rk = EH.risk(h["likelihood"], h["severity"])
+        B.obj(mode, "Hazard", h["id"], {"name": h["name"], "level": rk["level"], "area": h["area"], "score": rk["score"], "controls": h["controls"]})
+        if h["unit"] in UNITS:
+            B.link(mode, "Hazard", h["id"], "machine", h["unit"])
+    for r in db.q("select * from safety_issue where mode=%s and found_at > now() - interval '365 days'", (mode,)):
+        k = "SI-{:05d}".format(r["id"])
+        B.obj(mode, "SafetyIssue", k, {"subject": r["subject"], "level": EH.LEVEL[r["level"]], "status": EH.STATUS[r["status"]],
+                                        "due": str(r["due_day"]) if r["due_day"] else None, "owner": r["owner"], "found_by": r["found_by"]},
+              ts=_ts(r["found_at"]), upd_ts=_now(), text="随手拍：" + r["subject"])
+        if r["unit"] in UNITS:
+            B.link(mode, "SafetyIssue", k, "machine", r["unit"])
+        if r["hazard_id"]:
+            B.link(mode, "SafetyIssue", k, "hazard", r["hazard_id"])
+        if r["permit_id"]:
+            B.link(mode, "SafetyIssue", k, "lockout", "PTW-{:05d}".format(r["permit_id"]))
+    for p in db.q("select * from ehs_person where mode=%s", (mode,)):
+        B.obj(mode, "Employee", p["id"], {"name": p["name"], "status": "在岗" if p["active"] else "离岗", "post": p["post"], "team": p["team"]})
+    for t in EH.trainings(db, mode):
+        k = "{}:{}".format(t["person_id"], t["kind"])
+        B.obj(mode, "SafetyTraining", k, {"topic": t["label"], "date": t["done_day"], "valid_months": EH.TRAININGS.get(t["kind"], ("", 0))[1],
+                                          "valid_until": t["valid_until"]})
+        B.link(mode, "SafetyTraining", k, "employee", t["person_id"])
+    for r in db.q("select * from work_permit where mode=%s and created_at > now() - interval '180 days'", (mode,)):
+        k = "PTW-{:05d}".format(r["id"])
+        B.obj(mode, "WorkPermit", k, {"kind": EH.PERMITS[r["kind"]], "status": EH.PERMIT_STATUS[r["status"]], "valid_from": _ts(r["valid_from"]) if r["valid_from"] else None,
+                                      "valid_to": _ts(r["valid_to"]) if r["valid_to"] else None}, ts=_ts(r["created_at"]), upd_ts=_now(), text="作业许可")
+        if r["unit"] in UNITS:
+            B.link(mode, "WorkPermit", k, "machine", r["unit"])
+        if r["holder_id"]:
+            B.link(mode, "WorkPermit", k, "holder", r["holder_id"])
+    for r in db.q("select * from incident where mode=%s and day > now() - interval '365 days'", (mode,)):
+        k = "IN-{:05d}".format(r["id"])
+        B.obj(mode, "Incident", k, {"kind": EH.INCIDENT_KINDS.get(r["kind"]), "severity": r["severity"], "date": str(r["day"]), "root_cause": r["root_cause"]})
+        if r["unit"] in UNITS:
+            B.link(mode, "Incident", k, "machine", r["unit"])
+    for r in db.q("select * from chemical where mode=%s", (mode,)):
+        B.obj(mode, "Chemical", r["code"], {"name": r["name"], "stock_kg": float(r["stock_kg"]), "sds": r["sds"]})
+    for r in db.q("select * from waste where mode=%s and produced_day > now() - interval '365 days'", (mode,)):
+        B.obj(mode, "Waste", "W-{:05d}".format(r["id"]), {"kind": EH.WASTES.get(r["kind"], (r["kind"],))[0], "qty_kg": float(r["qty_kg"]),
+                                                          "disposed_by": r["disposed_by"]})
 
 
 def twin(B, db, mode):

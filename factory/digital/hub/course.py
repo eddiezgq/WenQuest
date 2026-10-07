@@ -496,7 +496,14 @@ def mount(app, H):
                        "选一个并说明理由（比对模式）；起草派工、备件出库和客户通知，批准、执行，最后看工程师上门和客户回访。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab16",
             "guide_url": public_base(request) + "/api/cae/lab16/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab16/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab16/report-template.docx"}, {
+            "id": "lab17", "name": {"zh": "实验 17：安全隐患的识别、评估与停机决策", "en": "Lab 17: hazard identification, risk assessment and lockout decisions"},
+            "summary": "老师注入重大隐患（磨床防护罩缺失等）。学生先做风险评估（危险源、可能性 × 严重度），再自己追“停这台设备影响哪些工单、订单”；"
+                       "在指挥台比较“立即停机挂牌 / 限时整改 / 停机 + 改派加班”的交期和花费，选一个并说明理由（比对模式）；"
+                       "起草停机挂牌整改，批准后车间里设备真的停下，维修工整改后验收解锁，最后看订单的实际影响。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab17",
+            "guide_url": public_base(request) + "/api/cae/lab17/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab17/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

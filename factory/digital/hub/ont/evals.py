@@ -81,6 +81,14 @@ def slots(db, mode="teach"):
     a = db.one("select id from anomaly where mode=%s and rule='C1' and detail->'values'->>'complaint'=%s order by id desc limit 1",
                (mode, s["complaint"]))
     s["complaint_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    # 第 18 轮 E2：重大隐患和它的异常
+    try:
+        si = db.one("select id from safety_issue where mode=%s and level='major' order by id limit 1", (mode,))
+    except Exception:  # noqa: BLE001
+        si = None
+    s["si_major"] = "SI-{:05d}".format(si["id"]) if si else "SI-?????"
+    a = db.one("select id from anomaly where mode=%s and rule='E1' and fkey=%s order by id desc limit 1", (mode, s["si_major"]))
+    s["si_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     return s
 
 
@@ -206,9 +214,19 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     ai = Assistant(db, lambda *a: None, llm)
     H = types.SimpleNamespace(db=db, ai=ai, plan_snaps=EngineSnaps(db, eng), mes=None)
     H.twin = field_scene(H, h)
+    ehs_scene(H)
     s.reconcile()
     ai.detector().run("teach", now)
     return H, eng
+
+
+def ehs_scene(H, mode="teach"):
+    """第 18 轮 E2：员工、培训、危险源；磨床一条重大隐患；孙磊（受限空间培训已过期）申请热处理炉受限空间作业"""
+    from hub import ehs as EH
+    EH.seed(H.db, mode)
+    if not H.db.one("select 1 as x from safety_issue where mode=%s limit 1", (mode,)):
+        EH.inject_major(H, mode, "grd-01", "guard", "评测·情景")
+        EH.request_permit(H.db, mode, {"kind": "confined", "unit": "ht-01", "holder_id": "P07", "reason": "炉膛检修"}, "评测·情景")
 
 
 def field_scene(H, hist, mode="teach"):

@@ -50,7 +50,9 @@ CHANGE_TYPES = {
     "reassign": "改派", "reorder": "调序 / 插单", "insert_order": "插单", "overtime": "加班", "expedite": "维修加急",
     "urgent_purchase": "紧急采购", "outsource": "外协", "split_delivery": "分批交货",
     "breakdown": "假设停机",            # 第 17 轮 D 期：只用于推演（AI 代理、复盘），不能变成动作
+    "lockout": "停机挂牌整改",          # 第 18 轮 E2：重大隐患（可延后：先临时防护，delay_minutes 后停）
 }
+RECTIFY_RATE = 45.0               # 安全整改人工（美元 / 小时）
 OT_RATE = 1.5                     # 加班费倍数
 EXPEDITE_COST = 300.0             # 维修加急默认费用（美元，可在改动里改）
 URGENT_PCT = 0.15                 # 紧急采购加急费：货值的 15%
@@ -282,6 +284,26 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
             else:
                 eng._go_down(m, clock.now(), mins * 60, c.get("reason") or "假设停机", "down")
             applied.append(c)
+            continue
+        if typ == "lockout":
+            m = eng.machines.get(str(c.get("unit") or "").lower())
+            mins = float(c.get("minutes") or 0)
+            delay = float(c.get("delay_minutes") or 0)
+            if m is None or not 0 < mins <= 14 * 24 * 60:
+                checks.append({"ok": False, "text": "停机挂牌：设备或时长不对"})
+                continue
+            permit = c.get("permit") or "推演"
+            if delay > 0:
+                eng.at(clock.now() + delay * 60, "lockout_due", unit=m.unit, permit=permit, minutes=mins, reason="挂牌上锁（推演）")
+            else:
+                eng._lock(m, clock.now(), permit, mins, "挂牌上锁（推演）")
+            # 推演里整改按时做完：到时自动解锁
+            eng.at(clock.now() + (delay + mins) * 60 + 1, "unlock_due", unit=m.unit)
+            applied.append(c)
+            costs.append({"what": "安全整改人工 {:.0f} 分钟".format(mins), "usd": round(mins / 60 * RECTIFY_RATE, 2)})
+            if delay > 0 and c.get("temp_cost"):
+                costs.append({"what": "临时防护、专人看守", "usd": float(c["temp_cost"])})
+            checks.append({"ok": True, "text": "{} {}停机挂牌，整改 {:.0f} 分钟".format(m.unit.upper(), "{:.0f} 分钟后".format(delay) if delay else "立即", mins)})
             continue
         if typ == "overtime":
             if cal.mode != "shift":

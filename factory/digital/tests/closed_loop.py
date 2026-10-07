@@ -315,10 +315,10 @@ def main():
         check(r["status"] == "closed", "异常可以关闭并留记录")
     hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "reset"}, teacher)
     sit = hub("GET", "/api/ont/situation", token=teacher)
-    check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 3, "全厂态势 15 块，3 块待接入")
+    check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 2, "全厂态势 15 块，2 块待接入")
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
-    check(len(live) == 26 and not [x["id"] for x in live if x["error"]], "规则 26 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+    check(len(live) == 33 and not [x["id"] for x in live if x["error"]], "规则 33 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
 
     print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
     r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
@@ -384,6 +384,7 @@ def main():
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 15 页：5 个任务，自动评 60 分")
     hub("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "reset"}, teacher)
     customer_and_service(teacher)
+    safety(teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -489,6 +490,61 @@ def customer_and_service(teacher):
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 16 页：5 个任务，自动评 60 分")
     k = hub("GET", "/api/service/kpis", token=teacher)
     check("open_complaints" in k and "funnel_amount" in k, "客户与服务态势：开着的投诉 {}，漏斗 ${}".format(k.get("open_complaints"), k.get("funnel_amount")))
+
+
+def safety(teacher):
+    """第 18 轮 E2：隐患随手拍 → 异常 E1 → 停机挂牌（车间里设备真的停下、不能复位）→ 整改、验收解锁；许可缺资质；整改工单进 ERPNext"""
+    print("14. 安全环保（第 18 轮 E2）")
+    saf = login("测试安全员", "safety")
+    unit = "key-01"
+
+    def mach():
+        return next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == unit)
+    r = hub("POST", "/api/ehs/issues", {"unit": unit, "kind": "guard", "level": "major", "subject": "闭环测试：键槽铣床防护罩缺失"}, saf)
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "E1" and r["key"] in x["title"]), None),
+              "重大隐患异常 E1", 90, 3)
+    check(an is not None, "随手拍 {} → 异常 E1：{}".format(r["key"], (an or {}).get("title")))
+    if not an:
+        return
+    o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+    kinds = [x["kind"] for x in o["options"]]
+    check(o.get("ehs") and kinds[:3] == ["none", "lockout", "temp"], "处理方案：{}；{}".format("、".join(x["label"] for x in o["options"]), o.get("reason")))
+    lock = next(x for x in o["options"] if x["kind"] == "lockout")
+    a = hub("POST", "/api/ont/actions", {"changes": lock["changes"], "anomaly_id": an["id"], "snapshot_id": o["snapshot_id"]}, saf)
+    d = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+    check(d["status"] == "done", "停机挂牌：{}".format((d.get("result") or {}).get("text")))
+    m = wait(lambda: (lambda m: m if m.get("locked") and m["state"] == "down" else None)(mach()), "车间里设备挂牌上锁", 60, 2)
+    check(m is not None, "车间里 {} 停下，挂牌上锁 {}".format(unit.upper(), (m or {}).get("locked")))
+    hub("POST", "/api/mes/cmd", {"unit": unit, "command": "reset"}, teacher)
+    time.sleep(4)
+    check(bool(mach().get("locked")), "挂着锁时“复位”被车间拒绝")
+    hub("POST", "/api/ehs/issues/{}/fix".format(r["id"]), {"note": "闭环测试：装回防护罩"}, teacher)
+    try:
+        hub("POST", "/api/ehs/issues/{}/verify".format(r["id"]), token=teacher)
+        check(False, "整改人不能验收自己的整改")
+    except RuntimeError as e:
+        check("403" in str(e), "整改人不能验收自己的整改")
+    v = hub("POST", "/api/ehs/issues/{}/verify".format(r["id"]), token=saf)
+    check(v.get("unlock", {}).get("status") == "closed", "安全员验收关闭、许可关闭")
+    m = wait(lambda: (lambda m: m if not m.get("locked") and m["state"] != "down" else None)(mach()), "设备解锁恢复", 60, 2)
+    check(m is not None, "{} 解锁恢复（{}）".format(unit.upper(), (m or {}).get("state")))
+    p = hub("POST", "/api/ehs/permits", {"kind": "confined", "unit": "ht-01", "holder_id": "P07", "reason": "闭环测试：炉膛检修"}, saf)
+    check(p["status"] == "blocked", "受限空间许可缺资质被拦下：{}".format(p.get("why")))
+    e3 = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "E3" and p["key"] in x["title"]), None),
+              "缺资质异常 E3", 90, 3)
+    check(e3 is not None, "异常 E3：{}".format((e3 or {}).get("title")))
+    a = hub("POST", "/api/ont/actions", {"changes": [{"type": "rectify_order", "unit": unit, "subject": "闭环测试：防护罩加固", "minutes": 60,
+                                                      "issue_id": r["id"]}]}, saf)
+    hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+    x = wait(lambda: (lambda q: q if q["status"] in ("done", "failed") else None)(hub("GET", "/api/ont/actions/{}".format(a["ids"][0]), token=teacher)),
+             "整改工单进 ERPNext", 120, 3)
+    check(x is not None and x["status"] == "done", "整改工单：{}".format(((x or {}).get("result") or {}).get("erp")))
+    iss = [i for i in erp_docs("Issue") if "安全整改" in (i.get("subject") or "")]
+    check(bool(iss), "ERPNext 里有安全整改工单 {}".format("、".join(i["name"] for i in iss[-2:])))
+    st = hub("GET", "/api/lab17", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 17 页：5 个任务，自动评 60 分")
+    k = hub("GET", "/api/ehs/kpis", token=teacher)
+    check(k["locked"] == 0 and "training_due" in k, "安全环保态势：开着的隐患 {}，挂锁 {} 台".format(k["open_issues"], k["locked"]))
 
 
 if __name__ == "__main__":

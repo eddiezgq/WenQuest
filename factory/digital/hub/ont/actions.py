@@ -55,8 +55,20 @@ TYPES = {
     "service_batch": {"label": "服务派工", "costly": True, "service": True},
     "spare_ship": {"label": "备件出库", "costly": True, "service": True},
     "customer_notice": {"label": "客户通知", "costly": False, "service": True},
+    # 第 18 轮 E2：安全环保（发起：安全员、厂长；停机挂牌、整改工单花钱要厂长批；解锁、培训安全员批，不能自批）
+    "lockout": {"label": "停机挂牌整改", "costly": True, "ehs": True},
+    "rectify_order": {"label": "整改工单", "costly": True, "ehs": True, "nosim": True},
+    "unlock": {"label": "验收解锁", "costly": False, "ehs": True, "nosim": True},
+    "training_plan": {"label": "安排培训", "costly": False, "ehs": True, "nosim": True},
 }
 SERVICE_INITIATORS = ("service", "manager", "sales")
+EHS_INITIATORS = ("safety", "manager")
+
+
+def no_sim(t):
+    """不进车间推演的动作（服务类、整改工单、解锁、培训）"""
+    x = TYPES.get(t, {})
+    return bool(x.get("service") or x.get("nosim"))
 STATUS = {"draft": "草稿", "submitted": "待批准", "approved": "已批准", "rejected": "已驳回", "executing": "执行中",
           "done": "已完成", "failed": "执行失败"}
 INITIATORS = ("planner", "manager")
@@ -93,6 +105,15 @@ def title_of(t, p):
         return "备件出库：" + "、".join("{} × {}".format(i["item_code"], i["qty"]) for i in p.get("items") or [])
     if t == "customer_notice":
         return "预防性服务通知：{} 个客户".format(len(p.get("customers") or []))
+    if t == "lockout":
+        return "停机挂牌整改：{} {}，整改约 {} 分钟".format((p.get("unit") or "").upper(),
+                                                "{} 分钟后停".format(p["delay_minutes"]) if p.get("delay_minutes") else "立即停", p.get("minutes"))
+    if t == "rectify_order":
+        return "整改工单：{} {}".format((p.get("unit") or "").upper(), p.get("subject") or "")
+    if t == "unlock":
+        return "验收解锁：{}".format((p.get("unit") or "").upper())
+    if t == "training_plan":
+        return "安排培训：{} {} 人".format(p.get("kind"), len(p.get("people") or []))
     return t
 
 
@@ -114,6 +135,8 @@ def can_initiate(u, t=None):
         return True
     if t and TYPES.get(t, {}).get("service"):
         return u.get("role") in SERVICE_INITIATORS
+    if t and TYPES.get(t, {}).get("ehs"):
+        return u.get("role") in EHS_INITIATORS
     return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
@@ -125,7 +148,10 @@ def can_approve(u, a):
         return False, "这是要花钱的动作，要厂长批准"
     if not costly and service and u.get("role") not in ("manager", "service", "sales"):
         return False, "要售后或厂长批准"
-    if not costly and not service and u.get("role") not in ("manager", "planner"):
+    ehs = TYPES[a["type"]].get("ehs")
+    if not costly and ehs and u.get("role") not in ("manager", "safety"):
+        return False, "要安全员或厂长批准"
+    if not costly and not service and not ehs and u.get("role") not in ("manager", "planner"):
         return False, "要计划员或厂长批准"
     if a["initiator"] == u.get("name"):
         if a["mode"] == "prod":
@@ -266,6 +292,11 @@ def execute(H, a, u, who):
         sent = sum(1 for x in rows if x["status"] == "sent")
         return {"text": "通知 {} 个客户：{}".format(len(rows), "已发邮件 {} 封".format(sent) if sent else
                                                 ("教学模式只记录、不发出" if mode == "teach" else "没有邮箱，已记录，请人工联系")), "notices": rows}, "done"
+    if t in ("lockout", "rectify_order", "unlock", "training_plan"):
+        from hub import ehs as EH
+        fn = {"lockout": EH.exec_lockout, "rectify_order": EH.exec_rectify, "unlock": EH.exec_unlock, "training_plan": EH.exec_training}[t]
+        res = fn(H, mode, p, u)
+        return res, "executing" if res.get("proposal_id") else "done"
     raise ActionError("没有执行器：" + t)
 
 
@@ -311,7 +342,9 @@ def trial(db, snaps, mode, changes, scenario_snapshot=None):
     svc = [c for c in changes if TYPES.get(c.get("type"), {}).get("service")]
     if svc and len(svc) == len(changes):
         return service_trial(db, mode, svc)
-    changes = [c for c in changes if not TYPES.get(c.get("type"), {}).get("service")]
+    if changes and all(no_sim(c.get("type")) for c in changes):
+        return plain_trial(changes)
+    changes = [c for c in changes if not no_sim(c.get("type"))]
     sid = None
     if scenario_snapshot is not None:
         snap = scenario_snapshot
@@ -343,3 +376,10 @@ def service_trial(db, mode, changes):
     return {"sales_orders": [], "cost_total": total, "costs": [x for x in costs if x["usd"]], "overtime_min": 0, "overtime_units": 0,
             "checks": checks, "ok": all(x["ok"] for x in checks), "base": {"sales_orders": [], "cost_total": 0},
             "at": SV.field_today(db, mode).isoformat(), "snapshot_id": None, "service": est}
+
+
+def plain_trial(changes):
+    """不进推演的动作（整改工单、解锁、培训）：只列出要做的事"""
+    return {"sales_orders": [], "cost_total": 0.0, "costs": [], "overtime_min": 0, "overtime_units": 0,
+            "checks": [{"ok": True, "text": title_of(c["type"], c)} for c in changes], "ok": True, "base": {"sales_orders": [], "cost_total": 0},
+            "at": dt.datetime.now(dt.timezone.utc).isoformat(), "snapshot_id": None}

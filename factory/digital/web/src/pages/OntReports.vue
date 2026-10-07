@@ -39,6 +39,9 @@
         <template v-if="d.service"><h3>客户与服务</h3>
           <p class="small">新投诉 {{ d.service.new_complaints }} 张、开着 {{ d.service.open_complaints }} 张 · 完成服务 {{ d.service.jobs_done }} 单、待上门 {{ d.service.open_jobs }} 单 ·
             满意度 {{ d.service.satisfaction ?? '—' }} · 平均响应 {{ d.service.response_h ?? '—' }} 小时 · 保修成本 ${{ Math.round(d.service.warranty_cost || 0).toLocaleString() }}</p></template>
+        <template v-if="d.ehs"><h3>安全环保</h3>
+          <p class="small">新隐患 {{ d.ehs.new_issues }} 条（重大 {{ d.ehs.new_major }}）· 整改关闭 {{ d.ehs.closed }} 条 · 还开着 {{ d.ehs.open_issues }} 条（重大 {{ d.ehs.major_open }}、逾期 {{ d.ehs.overdue }}）·
+            挂牌上锁 {{ d.ehs.locked }} 台 · 培训 30 天内到期 {{ d.ehs.training_due }} 项 · 近 30 天未遂 {{ d.ehs.near_miss_30d }} 起</p></template>
         <h3>动作</h3>
         <p class="small">共 {{ d.actions.total }} 个<template v-for="(n, s) in d.actions.by_status" :key="s"> · {{ ST[s] || s }} {{ n }}</template></p>
         <ul v-if="d.actions.executed.length" class="small"><li v-for="a in d.actions.executed" :key="a.key">{{ a.key }} {{ a.title }}（{{ ST[a.status] }}）</li></ul>

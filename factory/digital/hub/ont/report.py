@@ -117,6 +117,17 @@ def build(db, mode, kind, start, end):
                            "satisfaction": sk["satisfaction"], "response_h": sk["response_h"], "warranty_cost": sk["warranty_cost"]}
     except Exception:  # noqa: BLE001
         data["service"] = None
+    # ---- 安全环保（第 18 轮 E2）
+    try:
+        from hub import ehs as EH
+        ek = EH.kpis(db, mode)
+        ni = db.one("select count(*) as n, count(*) filter (where level='major') as m from safety_issue where mode=%s and found_at >= %s and found_at < %s",
+                    (mode, start, end))
+        cl = db.one("select count(*) as n from safety_issue where mode=%s and closed_at >= %s and closed_at < %s", (mode, start, end))["n"]
+        data["ehs"] = {"new_issues": ni["n"], "new_major": ni["m"], "closed": cl, "open_issues": ek["open_issues"], "major_open": ek["major_open"],
+                       "overdue": ek["overdue"], "locked": ek["locked"], "training_due": ek["training_due"], "near_miss_30d": ek["near_miss_30d"]}
+    except Exception:  # noqa: BLE001
+        data["ehs"] = None
     # ---- 今天（本周）要关注的 3 件
     focus = []
     for a in still:
@@ -191,6 +202,10 @@ def text_of(kind, data):
     if sv and (sv["new_complaints"] or sv["open_complaints"] or sv["jobs_done"] or sv["open_jobs"]):
         lines.append("客户与服务：新投诉 {} 张、开着 {} 张；完成服务 {} 单、待上门 {} 单；满意度 {}。".format(
             sv["new_complaints"], sv["open_complaints"], sv["jobs_done"], sv["open_jobs"], "{:g} 分".format(sv["satisfaction"]) if sv["satisfaction"] is not None else "—"))
+    eh = data.get("ehs")
+    if eh and (eh["new_issues"] or eh["open_issues"] or eh["locked"]):
+        lines.append("安全环保：新隐患 {} 条（重大 {}）、整改关闭 {} 条，还开着 {} 条（重大 {}、逾期 {}）；挂牌上锁 {} 台。".format(
+            eh["new_issues"], eh["new_major"], eh["closed"], eh["open_issues"], eh["major_open"], eh["overdue"], eh["locked"]))
     if data["risk_orders"]:
         lines.append("交付风险：" + "；".join("{} {}".format(o["name"], o["risk"]) for o in data["risk_orders"]) + "。")
     if data["retros"]:

@@ -13,7 +13,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab13": os.path.join(HERE, "实验13_减速器数字孪生与预测性维护.md"),
           "lab14": os.path.join(HERE, "实验14_减速器风扇冷却的流体与传热分析.md"),
           "lab15": os.path.join(HERE, "实验15_车间异常的追因推演与决策.md"),
-          "lab16": os.path.join(HERE, "实验16_客户投诉的追溯召回与服务决策.md")}
+          "lab16": os.path.join(HERE, "实验16_客户投诉的追溯召回与服务决策.md"),
+          "lab17": os.path.join(HERE, "实验17_安全隐患的识别评估与停机决策.md")}
 
 
 def _doc():
@@ -111,6 +112,8 @@ def report_template_docx(lab="lab8"):
         return lab15_template()
     if lab == "lab16":
         return lab16_template()
+    if lab == "lab17":
+        return lab17_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -588,6 +591,52 @@ def lab16_template():
            ["计划上门日 / 实际完成日", ""], ["回访分数与扣分原因", ""], ["保修内工厂实际承担的费用", ""]])
     d.add_heading("六、结论与讨论", 1)
     hint("召回范围怎么定？什么时候值得整批排查？保修费用算在哪里、怎样从源头减少？")
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab17_template():
+    """实验 17 报告模板（第 18 轮 E2-9）"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 17　安全隐患的识别、评估与停机决策　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、风险评估（任务 1）", 1)
+    table([["项目", "记录"], ["隐患编号、设备、描述", ""], ["对应的危险源（编号、名称）", ""], ["原来的可能性 × 严重度", ""],
+           ["防护缺失后的可能性 × 严重度、风险值、等级", ""], ["为什么改的是可能性而不是严重度", ""]])
+    d.add_heading("二、影响链：我追的与系统的（任务 2）", 1)
+    table([["环节", "我手工追的", "系统的因果链", "一致吗？不一致的原因"], ["设备 → 派工队列里的工序", "", "", ""], ["工序 → 工单", "", "", ""],
+           ["工单 → 订单、客户、交期", "", "", ""], ["整改需要多久（分钟）", "", "", ""]])
+    d.add_heading("三、处理方案（任务 3）", 1)
+    table([["方案", "什么时候停、停多久", "订单预计交付 / 晚几天", "多花的钱（整改、临时措施、加班）", "安全上的问题"], ["A 不处理（对照）", "", "", "", ""],
+           ["B 立即停机挂牌", "", "", "", ""], ["C 限时整改", "", "", "", ""], ["D 停机 + 改派 / 加班（如有）", "", "", "", ""]])
+    d.add_heading("四、我的选择与中枢的建议", 1)
+    table([["项目", "记录"], ["选的方案", ""], ["理由（安全、交期、成本）", ""], ["代价", ""], ["中枢建议的方案与理由", ""],
+           ["一样吗？不一样时谁更合理", ""], ["AI 助手怎么回答的，哪句有依据、哪句没有", ""]])
+    d.add_heading("五、挂牌上锁全过程（任务 4、5）", 1)
+    table([["步骤", "时间（工厂时间）", "谁", "记录"], ["起草、提交停机挂牌动作", "", "", "动作编号："], ["批准", "", "", ""],
+           ["车间停机（许可证号）", "", "", "PTW-"], ["整改完成", "", "", ""], ["验收关闭、解锁", "", "", ""], ["订单的实际影响", "", "", ""]])
+    d.add_heading("六、结论与讨论", 1)
+    hint("限时整改什么时候可以接受？安全为什么不和交期、成本放在同一个天平上？挂牌上锁为什么要“两个人”？")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)

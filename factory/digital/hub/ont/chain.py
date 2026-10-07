@@ -429,6 +429,19 @@ def for_anomaly(c, a):
             g = Chain(c, "none")
             g.summary.append("这张投诉没有设备序列号，追不到出厂数据；先联系客户确认设备铭牌")
             return g
+        if rule in ("E1", "E2", "E5") and (v.get("unit") or st == "Machine"):   # 第 18 轮 E2：隐患 / 违规 → 设备 → 工单 → 订单
+            unit = v.get("unit") or sk
+            g = chain_down(c, unit)
+            m = next((x for x in c.ov["machines"] if x["unit"] == unit), None) or {}
+            if v.get("issue_id"):
+                k = "SI-{:05d}".format(v["issue_id"])
+                g.edge(g.node("SafetyIssue", k, role="cause", values={"内容": v.get("subject"), "整改工时（分钟）": v.get("fix_minutes")}),
+                       g.node("Machine", unit), "隐患在", "链接 SafetyIssue.machine")
+            state = {"run": "在运转", "idle": "空闲", "setup": "在调整", "down": "停机", "fault": "故障"}.get(m.get("state"), m.get("state") or "—")
+            if g.summary:
+                g.summary[0] = "{} 现在{}{}；{}".format(unit.upper(), state, "（挂牌上锁 {}）".format(m["locked"]) if m.get("locked") else "",
+                                                      "要停机整改约 {} 分钟".format(v["fix_minutes"]) if v.get("fix_minutes") else "")
+            return g
         if rule == "S2":
             return chain_late(c, wo=sk)
         return chain_generic(c, st, sk) if st else Chain(c, "none")

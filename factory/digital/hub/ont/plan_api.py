@@ -11,6 +11,7 @@ from hub.ont import playbook as PB
 
 
 SERVICE_RULES = ("C1", "C3", "C4", "V1", "V2")
+EHS_RULES = ("E1", "E3")
 
 
 def mount(app, H, user_of, who):
@@ -116,6 +117,18 @@ def mount(app, H, user_of, who):
             from hub import service as SV
             r = SV.anomaly_options(H.db, u["mode"], a)
             sid, st, exact = None, {"factory_now": SV.field_today(H.db, u["mode"]).isoformat(), "calendar": {}}, True
+        elif a["rule"] in EHS_RULES:          # 第 18 轮 E2：重大隐患（车间推演）、作业许可缺资质（复训 / 换人）
+            from hub import ehs as EH
+            if a["rule"] == "E3":
+                sid, st, exact = None, {"factory_now": dt.datetime.now(dt.timezone.utc).isoformat(), "calendar": {}}, True
+                r = EH.permit_options(H.db, u["mode"], a)
+            else:
+                sid, st, exact = snap_of(u, snapshot_id or None)
+                try:
+                    r = EH.options(H.db, u["mode"], a, st, ctx_for(u, st))
+                except P.PlanError as e:
+                    raise HTTPException(400, str(e))
+            r["ehs"] = True
         else:
             sid, st, exact = snap_of(u, snapshot_id or None)
             try:
@@ -132,7 +145,7 @@ def mount(app, H, user_of, who):
             p = NR.polish(H.ai.llm, r["reason"], facts, "把推荐理由改写成给厂长看的两三句话：推荐哪个、为什么、代价是什么")
             r = dict(r, reason=p["text"], reason_by=p["by"])
         return dict(r, snapshot_id=sid, exact=exact, factory_now=st["factory_now"], shift_mode=(st.get("calendar") or {}).get("mode"),
-                    can_initiate=AC.can_initiate(u, "service_batch" if r.get("service") else "reassign"))
+                    can_initiate=AC.can_initiate(u, "service_batch" if r.get("service") else ("lockout" if r.get("ehs") else "reassign")))
 
     # ---------------------------------------------------------------- 动作
     @app.get("/api/ont/actions")
@@ -170,6 +183,8 @@ def mount(app, H, user_of, who):
         try:
             if all(AC.TYPES.get(c.get("type"), {}).get("service") for c in changes):
                 tr = AC.service_trial(H.db, u["mode"], changes)           # 服务类：按排班估算，不用车间快照
+            elif all(AC.no_sim(c.get("type")) for c in changes):
+                tr = AC.plain_trial(changes)                               # 整改工单、解锁、培训：不用推演
             else:
                 sid, st, exact = snap_of(u, body.get("snapshot_id"))
                 if H.db.one("select 1 as x from sim_snapshot where id=%s and ts < now() - interval '2 hours'", (sid,)):

@@ -54,7 +54,7 @@ SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
-    "quality": "质量趋势", "anomalies": "现在有哪些异常", "object": "查一个对象", "overview": "全厂概况",
+    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "object": "查一个对象", "overview": "全厂概况",
 }
 
 
@@ -371,7 +371,14 @@ class Tools:
         if a.get("rule") in SV_RULES:
             return self._service_options(a)
         try:
-            ev = PB.evaluate(a, st, self._ctx_plan(st))
+            if a.get("rule") == "E1":                  # 第 18 轮 E2：重大隐患 → 停机挂牌 / 限时整改 / 停机 + 改派加班（车间推演）
+                from hub import ehs as EH
+                ev = EH.options(self.db, self.mode, a, st, self._ctx_plan(st))
+            elif a.get("rule") == "E3":
+                from hub import ehs as EH
+                ev = EH.permit_options(self.db, self.mode, a)
+            else:
+                ev = PB.evaluate(a, st, self._ctx_plan(st))
         except P.PlanError as e:
             return {"error": str(e)}
         locked = self.locked(self.u, a.get("id"))
@@ -536,6 +543,56 @@ class Tools:
             j["ref"] = self.run.obj("FieldUnit", j["serial"])
         return est
 
+    # ---- ⑬ 安全概况（第 18 轮 E2）
+    def ehs_overview(self):
+        """开着的隐患（重大在前）、挂牌上锁的设备、作业中的许可、培训到期、危废超期"""
+        from hub import ehs as EH
+        k = EH.kpis(self.db, self.mode)
+        rows = self.db.q("select * from safety_issue where mode=%s and status<>'closed' order by (level='major') desc, id limit 15", (self.mode,))
+        issues = []
+        for r in rows:
+            x = EH.issue_row(r)
+            issues.append({k2: x[k2] for k2 in ("key", "unit", "level_label", "subject", "status_label", "due_day", "overdue", "fix_minutes")})
+            issues[-1]["ref"] = self.run.obj("SafetyIssue", x["key"])
+        names = {p["id"]: p["name"] for p in self.db.q("select id, name from ehs_person where mode=%s", (self.mode,))}
+        permits = [dict(EH.permit_row(self.db, r, names), ref=self.run.obj("WorkPermit", "PTW-{:05d}".format(r["id"])))
+                   for r in self.db.q("select * from work_permit where mode=%s and status in ('active','blocked','requested') order by id", (self.mode,))]
+        due = [dict(t, name=names.get(t["person_id"])) for t in EH.trainings(self.db, self.mode) if t["days_left"] <= 30]
+        out = {"kpis": k, "issues": issues, "permits": [{k2: p[k2] for k2 in ("key", "kind_label", "unit", "holder", "status_label", "block_reason", "ref")}
+                                                         for p in permits],
+               "trainings_due": [{k2: t[k2] for k2 in ("name", "label", "valid_until", "days_left")} for t in due]}
+        out["page"] = self.run.page("ehs", "安全环保", "/ehs")
+        return out
+
+    # ---- ⑭ 某台设备的安全状态
+    def machine_safety(self, unit):
+        from hub import ehs as EH
+        unit = (unit or "").lower()
+        if unit not in UNITS:
+            return {"error": "没有这台设备：{}".format(unit)}
+        EH.seed(self.db, self.mode)
+        hz = [dict(h, risk=EH.risk(h["likelihood"], h["severity"]), ref=self.run.obj("Hazard", h["id"]))
+              for h in self.db.q("select id, name, likelihood, severity, controls from hazard where mode=%s and unit=%s order by id", (self.mode, unit))]
+        iss = [dict({k2: EH.issue_row(r)[k2] for k2 in ("key", "level_label", "subject", "status_label", "due_day", "fix_minutes")},
+                    ref=self.run.obj("SafetyIssue", "SI-{:05d}".format(r["id"])))
+               for r in self.db.q("select * from safety_issue where mode=%s and unit=%s and status<>'closed' order by id", (self.mode, unit))]
+        locks = [{"key": "PTW-{:05d}".format(r["id"]), "ref": self.run.obj("WorkPermit", "PTW-{:05d}".format(r["id"]))}
+                 for r in EH.active_locks(self.db, self.mode) if r["unit"] == unit]
+        m = next((x for x in kpi.overview(self.db, None, self.mode)["machines"] if x["unit"] == unit), {})
+        return {"unit": unit, "name": UNITS[unit][1], "ref": self.run.obj("Machine", unit, UNITS[unit][1]), "state": m.get("state"),
+                "locked": m.get("locked"), "hazards": [{k2: h[k2] for k2 in ("id", "name", "risk", "controls", "ref")} for h in hz],
+                "open_issues": iss, "locks": locks}
+
+    # ---- ⑮ 风险评估
+    def risk_assess(self, likelihood, severity):
+        from hub import ehs as EH
+        try:
+            r = EH.risk(likelihood, severity)
+        except (TypeError, ValueError) as e:
+            return {"error": str(e)}
+        r["rule"] = "可能性 × 严重度（各 1–5 分）：≥ 15 重大，8–14 较大，其余一般"
+        return r
+
     # ---- ⑨ 起草动作（只起草）
     def draft_action(self, changes, anomaly_id=None, scenario_id=None, snapshot_id=None):
         from hub.ont import actions as AC
@@ -623,6 +680,10 @@ def _summary(out):
         return "同批次 {} 台".format(len(out["check_units"]))
     if "units" in out and "complaints" in out:
         return "客户 360：{} 台设备、{} 个投诉".format(len(out["units"]), len(out["complaints"]))
+    if "issues" in out and "kpis" in out:
+        return "隐患 {} 条".format(len(out["issues"]))
+    if "hazards" in out:
+        return "危险源 {} 条".format(len(out["hazards"]))
     if "person_days" in out:
         return "派工 {} 台，{} 天".format(out["units"], out["days"])
     if "sales_orders" in out:
@@ -632,7 +693,7 @@ def _summary(out):
 
 TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", "list_anomalies", "get_anomaly", "simulate",
               "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
-              "customer_360", "complaint_scope", "service_estimate"]
+              "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -665,6 +726,12 @@ TOOLS = [
      "kind：inspect 点检 / bearing 换轴承 / auto 按报警决定",
      "input_schema": dict(_S(serials={"type": "array", "items": {"type": "string"}}, kind={"type": "string", "enum": ["inspect", "bearing", "auto"]}),
                           required=["serials"])},
+    {"name": "ehs_overview", "description": "安全概况：开着的隐患（重大在前、整改期限）、挂牌上锁的设备、作业许可（含缺资质被拦下的）、30 天内到期的安全培训、危废超期",
+     "input_schema": _S()},
+    {"name": "machine_safety", "description": "某台设备的安全状态：危险源与风险值、开着的隐患、是否挂牌上锁",
+     "input_schema": dict(_S(unit={"type": "string", "description": "设备编号，如 grd-01"}), required=["unit"])},
+    {"name": "risk_assess", "description": "风险评估：可能性 × 严重度（各 1–5 分）→ 风险值和等级",
+     "input_schema": dict(_S(likelihood={"type": "integer"}, severity={"type": "integer"}), required=["likelihood", "severity"])},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -853,6 +920,8 @@ class Rules:
             return "draft"
         if re.search(r"(\d+)\s*台.*?(\d{1,2})\s*月\s*(\d{1,2})\s*日", q) and re.search(r"订单|安排|接单|生产|交货|WQR", q):
             return "order"
+        if re.search(r"SI-\d{5}|PTW-\d{5}", q) or re.search(r"安全(?!库存)|隐患|挂牌|上锁|作业许可|许可证|培训|危险源|事故|未遂|化学品|危废|废弃物|风险评估|可能性", q):
+            return "safety"
         if re.search(r"CP-\d{5}", q) or re.search(r"投诉|召回|排查范围|同一?批|这批|装在谁|还装在|追溯", q):
             return "complaint"
         if re.search(r"派工|工程师|上门|排班|点检|服务单|售后|保修", q):
@@ -896,6 +965,8 @@ class Rules:
                     "想一想：哪一项最需要先处理？",
         "complaint": "提示：从投诉的那台设备出发往回追——它装的是哪根输出轴？那根轴是哪张工单、哪片砂轮磨的？同一片砂轮还磨了哪些轴、装到了谁家？"
                      "先自己列出排查范围，再到指挥台里对照因果链。",
+        "safety": "提示：打开“安全环保”页：隐患一栏看重大隐患和整改期限，作业许可一栏看谁挂着锁、谁缺资质。处理重大隐患前先做风险评估"
+                  "（可能性 × 严重度），再到指挥台比较“立即停机 / 限时整改 / 停机 + 改派加班”三个方案的交期和花费。",
         "service": "提示：在“客户与服务”页的排班表里看 6 位工程师的空闲。同区域每人每天 2 单、跨区域 1 单；想一想：先修哪台、谁去、几天能做完、要带几件备件？",
     }
 
@@ -956,7 +1027,7 @@ class Rules:
                                                               " " + so_refs if so_refs else "的订单推演里没有"))
         else:
             open_a = self.t.db.one("select * from anomaly where mode=%s and subject_type='Machine' and subject_key=%s and status in ('open','ack','doing') "
-                                   "order by last_seen desc limit 1", (self.t.mode, unit))
+                                   "and rule in ('P1','M1','P5') order by last_seen desc limit 1", (self.t.mode, unit))
             out.append("{}（{}）[{}]：{}".format(UNITS[unit][1], unit.upper(), mref, "；".join(imp["summary"][:3]) or "没有排着的工单"))
             if wos:
                 out.append("排在它上面的工单：{}；连到订单：{}。".format(
@@ -984,7 +1055,8 @@ class Rules:
         if m:
             return int(m.group(1))
         lst = self.t.list_anomalies()["anomalies"]
-        with_plays = [a for a in lst if a["rule"] in _playbook_rules()]
+        order = list(_playbook_rules_ordered())
+        with_plays = sorted([a for a in lst if a["rule"] in order], key=lambda a: (order.index(a["rule"]), a["id"]))
         return (with_plays or lst or [{"id": None}])[0]["id"]
 
     def a_handle(self, q):
@@ -1125,6 +1197,54 @@ class Rules:
         if r["unplanned"]:
             out.append("还有 {} 台 21 天内排不进。".format(len(r["unplanned"])))
         out.append("这是估算，没有真的排班；排班表 [{}]。".format(r["page"]))
+        return "\n".join(out)
+
+    # ---- 安全环保（第 18 轮 E2）
+    def a_safety(self, q):
+        if self.student:
+            return self._hint("safety")
+        m = re.search(r"SI-(\d{5})", q)
+        if m and re.search(r"怎么|处理|方案|办", q):
+            a = self.t.db.one("select id from anomaly where mode=%s and rule in ('E1','E2') and fkey=%s order by id desc limit 1",
+                              (self.t.mode, "SI-" + m.group(1)))
+            if a:
+                return self.a_handle("A-{:05d} 怎么处理".format(a["id"]))
+        r2 = re.search(r"可能性\D{0,4}(\d)\D{1,8}严重度?\D{0,4}(\d)", q)
+        if r2:
+            r = self.t.risk_assess(int(r2.group(1)), int(r2.group(2)))
+            if r.get("error"):
+                return r["error"]
+            return "可能性 {} × 严重度 {} = 风险值 {}，属于“{}”风险。{}。".format(r["likelihood"], r["severity"], r["score"], r["level"], r["rule"])
+        unit = find_machine(q)
+        if unit:
+            r = self.t.machine_safety(unit)
+            if r.get("error"):
+                return r["error"]
+            out = ["{}（{}）[{}]：现在{}{}。".format(r["name"], unit.upper(), r["ref"], {"run": "在运转", "idle": "空闲", "down": "停机", "fault": "故障",
+                                                                                   "setup": "在调整"}.get(r["state"], r["state"] or "—"),
+                                                "，挂牌上锁（{}）".format(r["locked"]) if r["locked"] else "")]
+            if r["hazards"]:
+                out.append("危险源：" + "；".join("{} [{}] 风险值 {}（{}），控制措施：{}".format(h["name"], h["ref"], h["risk"]["score"], h["risk"]["level"],
+                                                                                    "、".join(h["controls"])) for h in r["hazards"]) + "。")
+            if r["open_issues"]:
+                out.append("开着的隐患：" + "；".join("{} [{}] {}（{}，{}，期限 {}）".format(i["key"], i["ref"], i["subject"], i["level_label"], i["status_label"],
+                                                                                 i["due_day"]) for i in r["open_issues"]) + "。")
+            else:
+                out.append("没有开着的隐患。")
+            return "\n".join(out)
+        r = self.t.ehs_overview()
+        k = r["kpis"]
+        out = ["安全概况 [{}]：开着的隐患 {} 条（重大 {} 条，逾期 {} 条），挂牌上锁的设备 {} 台，培训 30 天内到期 / 已过期 {} 项，危废超期 {} 批。".format(
+            r["page"], k["open_issues"], k["major_open"], k["overdue"], k["locked"], k["training_due"], k["waste_over"])]
+        for i in r["issues"][:6]:
+            out.append("· {} [{}] {}：{}（{}{}）".format(i["key"], i["ref"], i["level_label"], i["subject"], i["status_label"], "，已逾期" if i["overdue"] else ""))
+        for p in [p for p in r["permits"] if p["block_reason"]][:3]:
+            out.append("· 许可 {} [{}] 被拦下：{}".format(p["key"], p["ref"], p["block_reason"]))
+        for t in r["trainings_due"][:4]:
+            out.append("· {}的“{}”培训{}".format(t["name"], t["label"], "已过期" if t["days_left"] < 0 else " {} 到期".format(t["valid_until"])))
+        a = self.t.db.one("select id from anomaly where mode=%s and rule='E1' and status in ('open','ack','doing') order by id desc limit 1", (self.t.mode,))
+        if a:
+            out.append("重大隐患的处理方案可以问：“A-{:05d} 怎么处理？”".format(a["id"]))
         return "\n".join(out)
 
     def a_draft(self, q):
@@ -1301,6 +1421,11 @@ class Rules:
                 "某张订单为什么晚、某种物料够不够、某张工单成本为什么超。").format(
             ov["local_time"], pct(k["oee"]["value"]), k["wip"]["value"], k["output"]["value"], k["output"]["total"],
             pct(k["fpy"]["value"], 1), ov["ref"])
+
+
+def _playbook_rules_ordered():
+    from hub.ont import playbook as PB
+    return list(PB.catalog()[0])
 
 
 def _playbook_rules():

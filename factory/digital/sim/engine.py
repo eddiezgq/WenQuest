@@ -129,6 +129,7 @@ class Machine:
         self.down_kind = "down"
         self.tool_life = 1.0
         self.last_status = None
+        self.locked = None        # 第 18 轮 E2：挂牌上锁的许可证号（挂着锁不能复位、不会自动恢复）
 
 
 class AGV:
@@ -301,7 +302,27 @@ class Engine:
             job.started = False
             self._status(m)
             return True, "当前件做完后暂停"
+        if cmd == "lockout":                   # 第 18 轮 E2：挂牌上锁（生产、教学都接受）：停机，直到 unlock
+            permit = str(d.get("permit") or "LOTO")
+            minutes = max(1.0, float(d.get("minutes", 120)))
+            reason = "挂牌上锁 {}：{}".format(permit, d.get("reason") or "整改")
+            delay = float(d.get("delay_minutes") or 0)
+            if delay > 0:
+                self.at(self.now() + delay * 60, "lockout_due", unit=m.unit, permit=permit, minutes=minutes, reason=reason)
+                return True, "{:.0f} 分钟后挂牌上锁（{}）".format(delay, permit)
+            self._lock(m, self.now(), permit, minutes, reason)
+            return True, "已挂牌上锁（{}），预计整改 {:.0f} 分钟".format(permit, minutes)
+        if cmd == "unlock":
+            if not m.locked:
+                return False, "这台设备没有挂锁"
+            m.locked = None
+            if m.state in ("down", "fault"):
+                self._recover(m, self.now(), manual=True)
+            self._status(m, force=True)
+            return True, "已解锁，设备恢复"
         if cmd == "reset":
+            if m.locked:
+                return False, "挂牌上锁中（{}），要先在“安全环保”页验收、解锁".format(m.locked)
             if m.state not in ("down", "fault"):
                 return True, "设备正常，无需复位"
             self._recover(m, self.now(), manual=True)
@@ -584,7 +605,34 @@ class Engine:
     def _ev_recover(self, t, unit, until):
         m = self.machines[unit]
         if m.down_until == until:
+            if m.locked:                       # 挂着锁：整改超时，不自动恢复，每 30 分钟顺延
+                m.down_until = t + 1800
+                self.at(m.down_until, "recover", unit=unit, until=m.down_until)
+                self._status(m, force=True)
+                return
             self._recover(m, t)
+
+    def _lock(self, m, t, permit, minutes, reason):
+        if m.state in ("down", "fault") and m.down_until:
+            m.down_reason = reason
+            m.down_until = max(m.down_until, t + minutes * 60)
+            self.at(m.down_until, "recover", unit=m.unit, until=m.down_until)
+            m.locked = permit
+            self._status(m, force=True)
+            return
+        m.locked = permit
+        self._go_down(m, t, minutes * 60, reason, "down")
+
+    def _ev_lockout_due(self, t, unit, permit, minutes, reason):
+        self._lock(self.machines[unit], t, permit, minutes, reason)
+
+    def _ev_unlock_due(self, t, unit):
+        """推演用：整改按时做完，自动解锁"""
+        m = self.machines[unit]
+        if m.locked:
+            m.locked = None
+            if m.state in ("down", "fault"):
+                self._recover(m, t, manual=True)
 
     def _recover(self, m, t, manual=False):
         lost = t - getattr(m, "down_since", t)
@@ -678,6 +726,7 @@ class Engine:
             "feed_mm_min": feed if running else 0,
             "tool_life_left": round(m.tool_life, 3),
             "reason": m.down_reason if m.state in ("down", "fault") else None,
+            "locked": m.locked,
             "down_until_s": round(m.down_until - t) if m.down_until else None,
             "down_for_s": round(t - m.down_since) if m.state in ("down", "fault") else None,
             "dispatched": [{"work_order": j.wo.name, "operation": j.op, "started": j.started,
@@ -721,7 +770,7 @@ class Engine:
                            "active": [[tk, p.wo.name, p.serial, j.op_index, st, en] for tk, (p, j, st, en) in m.active.items()],
                            "state": m.state, "setup_until": m.setup_until, "setup_job": list(m.setup_job) if m.setup_job else None,
                            "down_until": m.down_until, "down_reason": m.down_reason, "down_kind": m.down_kind,
-                           "down_since": getattr(m, "down_since", None), "tool_life": m.tool_life,
+                           "down_since": getattr(m, "down_since", None), "tool_life": m.tool_life, "locked": m.locked,
                            "last_status": list(m.last_status) if m.last_status else None}
         agvs = {}
         for u, a in self.agvs.items():
@@ -780,6 +829,7 @@ class Engine:
             m.down_until, m.down_reason, m.down_kind, m.tool_life = x["down_until"], x["down_reason"], x["down_kind"], x["tool_life"]
             if x.get("down_since") is not None:
                 m.down_since = x["down_since"]
+            m.locked = x.get("locked")
             m.last_status = tuple(x["last_status"]) if x.get("last_status") else None
         for u, x in s["agvs"].items():
             a = e.agvs[u]

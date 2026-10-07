@@ -325,3 +325,88 @@ def test_R3_late_order_with_contract_penalty():
     assert set(f) == {"SO-1", "SO-2"}
     assert f["SO-1"].values["penalty"] == 600 and f["SO-1"].severity == "critical"      # 3 天 × $200 ≥ $500
     assert f["SO-2"].severity == "warn"
+
+
+# ---------------------------------------------------------------- 第 18 轮 E2：安全、健康与环境
+def _edb(issues=(), permits=(), people=(), trainings=(), chems=(), wastes=()):
+    tables = [("to_regclass", lambda a: [{"ok": True}]),
+              ("from safety_issue where", lambda a: list(issues)),
+              ("kind='loto'", lambda a: [p for p in permits if p["kind"] == "loto" and p["status"] == "active"]),
+              ("from work_permit where", lambda a: [p for p in permits if p["status"] in ("blocked", "requested")]),
+              ("from ehs_person where id=", lambda a: [p for p in people if p["id"] == a[0]]),
+              ("from ehs_person where mode", lambda a: list(people)),
+              ("from ehs_training", lambda a: list(trainings)),
+              ("from chemical where", lambda a: list(chems)),
+              ("from waste where", lambda a: list(wastes))]
+    db = FakeDB(tables=tables)
+    db._ehs_ready = True
+    return db
+
+
+def _si(i, level="general", due=None, status="open", unit="grd-01"):
+    return {"id": i, "level": level, "status": status, "unit": unit, "subject": "防护罩松动", "area": "外圆磨床", "found_by": "王强",
+            "due_day": due, "owner": None, "fix_minutes": 120, "kind": "guard"}
+
+
+def test_E1_major_issue_open():
+    db = _edb([_si(1, "major"), _si(2), _si(3, "major", unit=None)])
+    f = {x.fkey: x for x in run("E1", db)}
+    assert set(f) == {"SI-00001", "SI-00003"} and f["SI-00001"].severity == "critical"
+    assert f["SI-00001"].subject == ("Machine", "grd-01") and f["SI-00001"].values["fix_minutes"] == 120
+    assert f["SI-00003"].subject == ("SafetyIssue", "SI-00003")
+
+
+def test_E2_issue_overdue():
+    from hub import kpi
+    d0 = NOW.astimezone(kpi.TZ).date()
+    db = _edb([_si(1, due=d0 - dt.timedelta(days=2)), _si(2, due=d0), _si(3, due=d0 - dt.timedelta(days=5), status="fixed")])
+    f = run("E2", db)
+    assert [x.fkey for x in f] == ["SI-00001"] and f[0].values["days"] == 2
+
+
+def test_E3_permit_without_valid_training():
+    from hub import kpi
+    d0 = NOW.astimezone(kpi.TZ).date()
+    people = [{"id": "P07", "name": "孙磊"}, {"id": "P06", "name": "赵刚"}]
+    tr = [{"id": 1, "person_id": "P07", "kind": "confined", "done_day": d0 - dt.timedelta(days=400), "valid_months": 12},
+          {"id": 2, "person_id": "P06", "kind": "confined", "done_day": d0 - dt.timedelta(days=30), "valid_months": 12}]
+    permits = [{"id": 1, "kind": "confined", "unit": "ht-01", "holder_id": "P07", "status": "blocked", "requested_by": "安全员"},
+               {"id": 2, "kind": "confined", "unit": "ht-01", "holder_id": "P06", "status": "requested", "requested_by": "安全员"}]
+    f = run("E3", _edb(permits=permits, people=people, trainings=tr))
+    assert [x.fkey for x in f] == ["PTW-00001"] and "已过期" in f[0].values["why"] and f[0].severity == "critical"
+
+
+def test_E4_training_due_or_expired():
+    from hub import kpi
+    d0 = NOW.astimezone(kpi.TZ).date()
+    people = [{"id": "P01", "name": "王强"}, {"id": "P02", "name": "李娜"}, {"id": "P03", "name": "张伟"}]
+    tr = [{"id": 1, "person_id": "P01", "kind": "induction", "done_day": d0 - dt.timedelta(days=36 * 30 + 40), "valid_months": 36},
+          {"id": 2, "person_id": "P02", "kind": "hot", "done_day": d0 - dt.timedelta(days=350), "valid_months": 12},
+          {"id": 3, "person_id": "P03", "kind": "hot", "done_day": d0 - dt.timedelta(days=30), "valid_months": 12}]
+    f = {x.fkey: x for x in run("E4", _edb(people=people, trainings=tr))}
+    assert set(f) == {"P01:induction", "P02:hot"}
+    assert f["P01:induction"].severity == "warn" and f["P02:hot"].severity == "info"
+
+
+def test_E5_running_while_locked_out():
+    permits = [{"id": 1, "kind": "loto", "unit": "grd-01", "status": "active"}, {"id": 2, "kind": "loto", "unit": "key-01", "status": "active"}]
+    ov = {"machines": [mach("grd-01", "run"), mach("key-01", "down", locked="PTW-00002")]}
+    f = run("E5", _edb(permits=permits), ov=ov)
+    assert [x.fkey for x in f] == ["PTW-00001"] and f[0].subject == ("Machine", "grd-01")
+
+
+def test_E6_chemical_out_of_range():
+    chems = [{"code": "CL-01", "name": "乳化切削液", "stock_kg": 20, "min_kg": 50, "max_kg": 400, "sds": ""},
+             {"code": "QO-01", "name": "淬火油", "stock_kg": 600, "min_kg": 200, "max_kg": 1000, "sds": ""},
+             {"code": "LO-01", "name": "导轨润滑油", "stock_kg": 260, "min_kg": 40, "max_kg": 200, "sds": ""}]
+    f = {x.fkey: x for x in run("E6", _edb(chems=chems))}
+    assert set(f) == {"CL-01", "LO-01"} and "低于" in f["CL-01"].title and "超过" in f["LO-01"].title
+
+
+def test_E7_hazardous_waste_over_90_days():
+    from hub import kpi
+    d0 = NOW.astimezone(kpi.TZ).date()
+    ws = [{"id": 1, "kind": "coolant", "qty_kg": 120, "produced_day": d0 - dt.timedelta(days=95)},
+          {"id": 2, "kind": "rags", "qty_kg": 10, "produced_day": d0 - dt.timedelta(days=30)}]
+    f = run("E7", _edb(wastes=ws))
+    assert [x.fkey for x in f] == ["W-00001"] and f[0].values["age_days"] == 95
