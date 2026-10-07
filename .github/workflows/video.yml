@@ -25,8 +25,8 @@ on:
       engine:
         description: "克隆模型：cv3（Fun-CosyVoice3）或 cv2（CosyVoice2）"
         type: choice
-        options: [cv3, cv2]
-        default: cv3
+        options: [cv2, cv3]
+        default: cv2
       upload:
         description: "做完后上传：none（只出文件）或 youtube（英文版私密上传到 YouTube）"
         type: choice

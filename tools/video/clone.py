@@ -99,6 +99,25 @@ for src in sorted(glob.glob("sample_*.wav")):
     _, a, b, text = best
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", src, "-ss", f"{max(0, a - 0.1):.2f}", "-to", f"{b + 0.15:.2f}",
                     "-ar", "16000", "-ac", "1", f"prompt_{lang}.wav"], check=True)
+    ref = (job.get("reference") or {}).get(lang)
+    if ref:   # 识别结果常有错字（如 eigenvectors 听成 agent vectors）：换成录音稿里最相近的一段原文
+        import difflib
+        unit = (lambda t: list(t.replace(" ", ""))) if lang == "zh" else (lambda t: t.split())
+        key = (lambda w: w) if lang == "zh" else (lambda w: w.strip(".,:;!?").lower())
+        a, braw = [key(w) for w in unit(text)], unit(ref)
+        b = [key(w) for w in braw]
+        best_r, best_span = 0.0, None
+        n = len(a)
+        for st in range(0, max(1, len(b) - n // 2)):
+            for ln in range(int(n * 0.85), int(n * 1.15) + 2):
+                cand = b[st:st + ln]
+                r = difflib.SequenceMatcher(None, a, cand).ratio()
+                if r > best_r:
+                    best_r, best_span = r, braw[st:st + ln]
+        if best_span and best_r > 0.6:
+            fixed = ("".join(best_span) if lang == "zh" else " ".join(best_span))
+            print(f"提示音文字按录音稿校正（相似度 {best_r:.2f}）：{text.strip()} → {fixed}", flush=True)
+            text = fixed
     prompts[lang] = (f"prompt_{lang}.wav", text.strip())
     print(f"提示音 {lang}: {a:.1f}–{b:.1f} s，{text.strip()}", flush=True)
 del asr; torch.cuda.empty_cache()
@@ -131,6 +150,18 @@ for engine in job["engines"]:
     print(f"{engine}: {len(job['items'])} 句完成", flush=True)
     del cv; torch.cuda.empty_cache()
 '''
+
+
+def reference_texts() -> dict:
+    """录音稿原文（《实施细则 · 第 22 轮》附录 A），用来校正提示音的识别文字。"""
+    import re
+    for p in sorted((ROOT / "docs" / "实施细则").glob("第22轮_*.md")):
+        t = p.read_text(encoding="utf-8")
+        m = re.search(r"\*\*中文（[^）]*）\*\*(.*?)\*\*英文（[^）]*）\*\*(.*)$", t, re.S)
+        if m:
+            clean = lambda x: re.sub(r"\s+", " ", x).strip()
+            return {"zh": clean(m.group(1)).replace(" ", ""), "en": clean(m.group(2))}
+    return {}
 
 
 def decrypt_samples(dst: Path) -> list[str]:
@@ -227,7 +258,7 @@ def main():
     a2 = sub.add_parser("lectures")
     a2.add_argument("lectures", nargs="+")
     a2.add_argument("--out", required=True)
-    a2.add_argument("--engine", default="cv3", choices=sorted(MODELS))
+    a2.add_argument("--engine", default="cv2", choices=sorted(MODELS))   # 2026-10-07 Eddie 试听后选 CosyVoice2
     a3 = sub.add_parser("encrypt")
     a3.add_argument("file")
     a3.add_argument("--lang", required=True, choices=["zh", "en"])
@@ -242,7 +273,7 @@ def main():
         decrypt_samples(work)
         if a.cmd == "audition":
             items = [{"lang": lang, "key": f"{lang}_{i + 1}", "text": t} for lang, ts in AUDITION.items() for i, t in enumerate(ts)]
-            job = {"engines": ["cv3", "cv2"], "models": MODELS, "items": items}
+            job = {"engines": ["cv3", "cv2"], "models": MODELS, "items": items, "reference": reference_texts()}
         else:
             import script as S
             import voice as V
@@ -254,7 +285,7 @@ def main():
                         if j["key"] not in seen:
                             seen.add(j["key"])
                             items.append({"lang": lang, **j})
-            job = {"engines": [a.engine], "models": MODELS, "items": items}
+            job = {"engines": [a.engine], "models": MODELS, "items": items, "reference": reference_texts()}
         print(f"{len(job['items'])} 句，引擎 {job['engines']}", flush=True)
         gpu_session(job, work, out)
 
