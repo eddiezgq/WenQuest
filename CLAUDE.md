@@ -35,6 +35,8 @@
 | 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 自动部署 |
 | 本地完整环境（Moodle + 网关 + 网页端） | `tools/local/setup.sh`，说明见 `docs/帮助/本地测试环境.md` | 推送前用老师和学生账号实际走一遍 |
 
+教材构建：`python3 textbook/tools/build.py <书名> [--pdf --labs]`。`--only` 认的是**节号**（`--only 1.4,1.5`），写成 `--only 1` 匹配不到任何一节，会“0 错误”通过却什么都没检查——交付前一定跑不带 `--only` 的全书构建。
+
 线上：学习平台 https://learn.wenquestrobotics.com ，经典界面 classic. 子域名，官网主域名。
 
 ## 沟通
