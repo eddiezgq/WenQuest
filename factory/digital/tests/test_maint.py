@@ -422,3 +422,19 @@ def test_failure_repair_auto_verified_and_reset_turns_reliability_off(env):
     assert MT.scan_failures(H, "teach") == []
     db.x("delete from maint_sim where mode='teach'")
     assert MT.factor(db, "teach") == 1 and MT.factor(db, "prod") == 0                   # 教学模式默认会坏
+
+
+def test_ensure_setup_resends_when_bridge_missed_it(env):
+    """建台账的提议确认了 3 分钟还没执行（桥接没收到）就重发；资产都读回来以后不再发"""
+    from hub import maint as MT
+    H, _ = env
+    db = H.db
+    db.x("delete from maint_sim where mode='teach'")
+    p1 = MT.ensure_setup(H, "teach")
+    assert p1 and db.one("select status from ai_proposal where proposal_id=%s", (p1,))["status"] == "confirmed"
+    assert MT.ensure_setup(H, "teach") == p1
+    db.x("update maint_sim set state = jsonb_set(state, '{setup_at}', to_jsonb(extract(epoch from now()) - 200)) where mode='teach'")
+    p2 = MT.ensure_setup(H, "teach")
+    assert p2 and p2 != p1
+    pv = db.one("select preview from ai_proposal where proposal_id=%s", (p2,))["preview"]
+    assert len(pv["assets"]) == 13

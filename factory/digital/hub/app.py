@@ -262,6 +262,9 @@ class Hub:
                         SV.tick(self, mode)
                         from hub import ehs as EH              # 安全环保的教学模拟器（第 18 轮 E2）：一般隐患、未遂、化学品与废物
                         EH.tick(self, mode)
+                    except Exception:  # noqa: BLE001
+                        log.exception("通知 / 报告出错")
+                    try:                              # 设备维护单独一段：前面的模拟器出错不影响台账和故障单
                         from hub import maint as MT            # 设备维护（第 18 轮 E3）：台账进 ERPNext、故障 → 维修单、模拟器
                         MT.ensure_setup(self, mode)
                         if mode == "teach":
@@ -269,7 +272,7 @@ class Hub:
                         else:
                             MT.scan_failures(self, mode)
                     except Exception:  # noqa: BLE001
-                        log.exception("通知 / 报告出错")
+                        log.exception("设备维护出错")
                     last = self.last_brief.get(mode, 0)
                     if new or time.time() - last > 600:
                         self.ai.briefing(mode)

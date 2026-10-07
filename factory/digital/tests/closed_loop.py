@@ -558,8 +558,12 @@ def maintenance(teacher):
     def mach(u):
         return next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == u)
     rows = wait(lambda: (lambda a: a if all(x["asset"] for x in a) else None)(hub("GET", "/api/maint/assets", token=teacher)["assets"]),
-                "ERPNext 资产台账", 240, 4)
+                "ERPNext 资产台账", 480, 4)
     check(rows is not None and len(rows) == 13, "ERPNext 资产台账 13 台（{}）".format("、".join(x["asset"] for x in (rows or [])[:3])))
+    if rows is None:                                    # 诊断：建台账的提议走到哪一步了
+        for p in hub("GET", "/api/proposals", token=teacher):
+            if p.get("action") == "maint_setup":
+                print("    提议 {} {}：{}".format(p.get("proposal_id"), p.get("status"), json.dumps(p.get("result"), ensure_ascii=False)[:600]))
     mts = erp_docs("Asset Maintenance")
     check(len(mts) >= 13, "ERPNext 维护计划 {} 条".format(len(mts)))
     d = hub("GET", "/api/maint/assets/" + unit, token=teacher)

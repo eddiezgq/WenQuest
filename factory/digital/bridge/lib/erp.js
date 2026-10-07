@@ -361,10 +361,17 @@ class ERP {
     const out = [];
     if (action === 'maint_setup') {
       for (const a of pv.assets) {
-        const asset = await this.insert('Asset', { asset_name: a.asset_name, item_code: S.item, asset_category: S.cat, company: S.company,
-          location: S.loc, asset_type: 'Existing Asset', purchase_date: a.purchase_date, available_for_use_date: a.purchase_date,
-          net_purchase_amount: a.value, calculate_depreciation: 0, maintenance_required: 1, docstatus: 1 });
-        out.push(['Asset', asset, 'submitted']);
+        // 可以重发：已经建过的资产、维护计划不再建（上一次提议可能在 ERPNext 还没就绪时丢了、或执行到一半）
+        const had = (await this.list('Asset', [['asset_name', '=', a.asset_name], ['docstatus', '!=', 2]], ['name']))[0];
+        const asset = had ? await this.get('Asset', had.name) : await this.insert('Asset', { asset_name: a.asset_name, item_code: S.item,
+          asset_category: S.cat, company: S.company, location: S.loc, asset_type: 'Existing Asset', purchase_date: a.purchase_date,
+          available_for_use_date: a.purchase_date, net_purchase_amount: a.value, calculate_depreciation: 0, maintenance_required: 1, docstatus: 1 });
+        out.push(['Asset', asset, had ? 'updated' : 'submitted']);
+        const hadMt = (await this.list('Asset Maintenance', [['asset_name', '=', asset.name]], ['name']))[0];
+        if (hadMt) {
+          out.push(['Asset Maintenance', await this.get('Asset Maintenance', hadMt.name), 'updated']);
+          continue;
+        }
         const mt = await this.insert('Asset Maintenance', { asset_name: asset.name, company: S.company, maintenance_team: S.team,
           asset_maintenance_tasks: [{ maintenance_task: a.task.slice(0, 140), maintenance_type: 'Preventive Maintenance', maintenance_status: 'Planned',
             start_date: today, periodicity: 'Monthly', assign_to: 'Administrator', description: a.task, wq_interval_h: a.interval_h }] });

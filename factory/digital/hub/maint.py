@@ -656,19 +656,30 @@ def ensure_setup(H, mode, who="系统"):
     db = H.db
     if H.ai is None:
         return None
+    import time as _t
     st = _state(db, mode)
     pid = st.get("setup_pid")
+    have = {str(m["data"].get("asset_name") or "").split(" ")[0] for m in db.erp_docs("Asset", mode)}
+    have_mt = {m["data"].get("asset_name") for m in db.erp_docs("Asset Maintenance", mode)}
+    have_all = all(u.upper() in have for u in units()) and len(have_mt) >= len(units())
+    if have_all:
+        return pid
     if pid:
         p = db.one("select status from ai_proposal where proposal_id=%s", (pid,))
-        if p and p["status"] != "failed":
+        age = _t.time() - float(st.get("setup_at") or 0)
+        if p is None:
+            pass
+        elif p["status"] == "failed":
+            if age < 3600:                                              # 上次失败：一小时后再试，不刷屏
+                return None
+        elif age < 180:                                                 # 还在执行（13 台资产要提交，真 ERPNext 要一两分钟）
             return pid
-        import time as _t
-        if _t.time() - float(st.get("setup_at") or 0) < 3600:          # 上次失败：一小时后再试，不刷屏
-            return None
-    have = {str(m["data"].get("asset_name") or "").split(" ")[0] for m in db.erp_docs("Asset", mode)}
+        elif p["status"] == "executed" and age < 900:
+            return pid                                                  # 执行完了，等轮询读回
+        # 确认了 3 分钟还没执行（桥接没收到：ERPNext 还没就绪时发的），或执行完 15 分钟仍缺：重发缺的（桥接按名称跳过已建的）
     rows = []
     for u in units():
-        if u.upper() in have:
+        if u.upper() in have and len(have_mt) >= len(units()):
             continue
         rows.append({"unit": u, "asset_name": "{} {}".format(u.upper(), UNITS[u][1]), "value": ASSETS.get(u, 20000),
                      "purchase_date": "{}-03-01".format(BOUGHT.get(u, 2020)), "task": "{:g} 小时保养：{}".format(interval_of(db, mode, u), PM_TEXT.get(u, "例行保养")),
@@ -677,7 +688,6 @@ def ensure_setup(H, mode, who="系统"):
         return None
     pid = H.ai.propose("maint_setup", {"assets": rows}, mode, who, "设备台账与保养计划 {} 台".format(len(rows)), source="maint")
     H.ai.decide(pid, who, True)
-    import time as _t
     st = _state(db, mode)
     st["setup_pid"], st["setup_at"] = pid, _t.time()
     _save_state(db, mode, st)
