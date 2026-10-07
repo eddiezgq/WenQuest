@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:09<00:00,  9.26s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:21,758 INFO synthesis text Notice that these two directions are already perpendicular. We did nothing to make them so. That is the gift of symmetry.
+2026-10-07 22:57:26,575 INFO yield speech len 9.08, rtf 0.5304659253175038
+
+100%|██████████| 1/1 [00:04<00:00,  4.99s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:26,755 INFO synthesis text Step three, put the unit eigenvectors into the columns of Q, put the eigenvalues in the same order into Lambda, and A is written as Q Lambda Q transpose.
+2026-10-07 22:57:33,812 INFO yield speech len 13.4, rtf 0.5266174985401666
+
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:33,995 INFO synthesis text Finally, check. The dot product is zero, both lengths are one, and multiplying the three matrices back gives A. You are about to see this very matrix in the animation.
+2026-10-07 22:57:40,646 INFO yield speech len 13.04, rtf 0.5100396147534891
+
+100%|██████████| 1/1 [00:06<00:00,  6.83s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:40,828 INFO synthesis text So what does A equals Q Lambda Q transpose mean geometrically? Let's watch.
+2026-10-07 22:57:44,255 INFO yield speech len 6.24, rtf 0.5491880652232047
+
+100%|██████████| 1/1 [00:03<00:00,  3.60s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:44,430 INFO synthesis text Here A is the two by two symmetric matrix two, one, one, two. Its eigenvalues are one and three, and the green and red eigenvectors are perpendicular.
+2026-10-07 22:57:52,346 INFO yield speech len 15.2, rtf 0.5207947523970353
+
+100%|██████████| 1/1 [00:08<00:00,  8.10s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.10s/it]
+cv2: 130/188 句，用时 11.9 分钟，预计还要 5.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:52,532 INFO synthesis text Step one. Q transpose is a rotation. It turns the two eigenvectors onto the coordinate axes. Q can always be chosen to be a rotation.
+2026-10-07 22:57:59,659 INFO yield speech len 13.56, rtf 0.5256173005849563
+
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:57:59,847 INFO synthesis text Step two. Lambda stretches along the axes, by a factor of one horizontally and three vertically. The two directions don't interfere.
+2026-10-07 22:58:05,651 INFO yield speech len 11.2, rtf 0.5182702413627079
+
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:05,832 INFO synthesis text Step three. Q rotates back. The unit circle has become an ellipse whose axes lie along the eigenvectors.
+2026-10-07 22:58:10,981 INFO yield speech len 9.8, rtf 0.525426232084936
+
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:11,161 INFO synthesis text Finally, transform the circle by A directly. The white curve lands exactly on the result of the three steps.
+2026-10-07 22:58:16,540 INFO yield speech len 10.24, rtf 0.5253275157883763
+
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:16,808 INFO synthesis text In one sentence: a symmetric matrix stretches space independently along perpendicular directions. The circle becomes an ellipse whose semi-axes are the absolute values of the eigenvalues.
+2026-10-07 22:58:24,902 INFO yield speech len 15.52, rtf 0.5215691076111548
+
+100%|██████████| 1/1 [00:08<00:00,  8.36s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:25,094 INFO synthesis text Multiply out Q Lambda Q transpose as columns times rows, and you get another way to write it.
+2026-10-07 22:58:29,810 INFO yield speech len 8.84, rtf 0.5334915888255538
+
+100%|██████████| 1/1 [00:04<00:00,  4.89s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:29,987 INFO synthesis text A equals lambda one q one q one transpose, plus lambda two q two q two transpose, and so on up to the n-th term.
+2026-10-07 22:58:36,880 INFO yield speech len 13.08, rtf 0.5270315784197699
+
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:37,062 INFO synthesis text Each q i q i transpose is the projection onto the i-th axis. These projections add up to the identity, and any two different ones multiply to zero.
+2026-10-07 22:58:43,316 INFO yield speech len 11.96, rtf 0.5229277156268474
+
+100%|██████████| 1/1 [00:06<00:00,  6.43s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:43,496 INFO synthesis text So a symmetric matrix is a weighted sum of perpendicular projections, and the weights are the eigenvalues. Applied to a vector, it projects onto each axis, scales by the eigenvalue, and adds the pieces. This is the spectral decomposition.
+2026-10-07 22:58:52,581 INFO yield speech len 17.4, rtf 0.5221665590658956
+
+100%|██████████| 1/1 [00:09<00:00,  9.27s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:52,775 INFO synthesis text It makes functions of a matrix easy. To get f of A, just replace each eigenvalue lambda by f of lambda.
+2026-10-07 22:58:58,666 INFO yield speech len 11.16, rtf 0.5278636691390827
+
+100%|██████████| 1/1 [00:06<00:00,  6.07s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.07s/it]
+cv2: 140/188 句，用时 13.0 分钟，预计还要 4.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:58:58,847 INFO synthesis text For example, the compliant wrist has stiffness K equal to four, one, one, four, with eigenvalues three and five. Replace them by root three and root five and you have the square root of K. Square roots of symmetric positive definite matrices show up in weighted least squares and in Kalman filters.
+2026-10-07 22:59:11,124 INFO yield speech len 24.24, rtf 0.5064941868923678
+
+100%|██████████| 1/1 [00:12<00:00, 12.47s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:11,199 WARNING synthesis text Now a three by three example. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-07 22:59:11,327 INFO synthesis text Now a three by three example.
+2026-10-07 22:59:13,120 INFO yield speech len 2.76, rtf 0.6497928197833076
+
+100%|██████████| 1/1 [00:01<00:00,  1.96s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.96s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:13,295 INFO synthesis text This matrix S has two on the diagonal and minus one next to it. It shows up in spring chains, finite differences and spline interpolation, and its eigenvalues are two minus root two, two, and two plus root two.
+2026-10-07 22:59:22,734 INFO yield speech len 18.44, rtf 0.5118822456699131
+
+100%|██████████| 1/1 [00:09<00:00,  9.62s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:22,927 INFO synthesis text The unit eigenvector for the eigenvalue two is one, zero, minus one, over root two. Multiplying it by its own transpose gives the projection P two onto that axis.
+2026-10-07 22:59:29,526 INFO yield speech len 12.8, rtf 0.5155753158032894
+
+100%|██████████| 1/1 [00:06<00:00,  6.78s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:29,712 INFO synthesis text The program adds the three projections and gets the identity up to about ten to the minus sixteen. Weight them by the eigenvalues and you get S back. That is the spectral decomposition on a computer: the only error is rounding.
+2026-10-07 22:59:37,934 INFO yield speech len 15.64, rtf 0.5256663807822615
+
+100%|██████████| 1/1 [00:08<00:00,  8.40s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:38,122 INFO synthesis text Back to the robot. A planar two-link arm has links of zero.four and zero.three metres, and joint stiffnesses of two thousand and one thousand newton metres per radian.
+2026-10-07 22:59:46,024 INFO yield speech len 15.24, rtf 0.5184670132914866
+
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:46,206 INFO synthesis text The tip compliance is J times K q inverse times J transpose, and the tip stiffness is its inverse. At the pose (zero degrees, ninety degrees), the program gives this stiffness matrix, and it is symmetric.
+2026-10-07 22:59:55,128 INFO yield speech len 17.52, rtf 0.509252150853475
+
+100%|██████████| 1/1 [00:09<00:00,  9.10s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 22:59:55,316 INFO synthesis text Run eigh, and the principal stiffnesses come out as five thousand, seven hundred and sixty-four and twenty-four thousand and ninety-seven newtons per metre, more than four times apart. The soft axis points at one hundred and forty-seven degrees, the stiff axis at fifty-seven degrees, perpendicular as promised.
+2026-10-07 23:00:05,042 INFO yield speech len 18.76, rtf 0.5184140667986513
+
+100%|██████████| 1/1 [00:09<00:00,  9.91s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:05,236 INFO synthesis text Now push straight down with ten newtons. The spectral decomposition does it in three steps.
+2026-10-07 23:00:09,668 INFO yield speech len 8.28, rtf 0.5352274519233888
+
+100%|██████████| 1/1 [00:04<00:00,  4.60s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:09,844 INFO synthesis text Step one, split the force onto the two axes. About five.four newtons land on the soft axis and eight.four on the stiff axis.
+2026-10-07 23:00:17,176 INFO yield speech len 13.96, rtf 0.5252262241177709
+
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+cv2: 150/188 句，用时 14.4 分钟，预计还要 3.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:17,356 INFO synthesis text Step two, divide each by its stiffness. The soft axis moves about zero.ninety-four millimetres, the stiff axis only zero.thirty-five.
+2026-10-07 23:00:24,116 INFO yield speech len 12.96, rtf 0.5216612676043569
+
+100%|██████████| 1/1 [00:06<00:00,  6.93s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:24,295 INFO synthesis text Step three, add them back. The deflection is zero point six, minus zero point eight millimetres, the same as solving the system directly.
+2026-10-07 23:00:29,320 INFO yield speech len 9.6, rtf 0.523398295044899
+
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:29,500 INFO synthesis text Notice that the push is straight down, yet the deflection is about thirty-seven degrees away from the push, toward the soft axis. Push with ten newtons in every direction and the tips trace out this compliance ellipse.
+2026-10-07 23:00:37,716 INFO yield speech len 15.84, rtf 0.5186703771051735
+
+100%|██████████| 1/1 [00:08<00:00,  8.39s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:37,900 INFO synthesis text All these numbers come from Program fourteen.two.one. Every number in the book is computed by a program.
+2026-10-07 23:00:42,046 INFO yield speech len 7.92, rtf 0.5235500106907854
+
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:42,221 INFO synthesis text The heart of it is a few lines. Build the compliance, invert it to get the stiffness, call eigh, project the force onto the axes, divide by the stiffnesses, and rotate back.
+2026-10-07 23:00:49,433 INFO yield speech len 13.72, rtf 0.5256560210236307
+
+100%|██████████| 1/1 [00:07<00:00,  7.39s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:49,613 INFO synthesis text Here is the output. You can run it on the platform yourself, change the pose or the joint stiffness, and watch the principal stiffnesses change.
+2026-10-07 23:00:56,517 INFO yield speech len 13.28, rtf 0.5198239202958992
+
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:56,695 INFO synthesis text Three things to watch when you write the code.
+2026-10-07 23:00:58,616 INFO yield speech len 3.24, rtf 0.5930896158571596
+
+100%|██████████| 1/1 [00:02<00:00,  2.09s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:00:58,790 INFO synthesis text First, the signs of the eigenvectors from eigh are arbitrary. When you plot axes or compare poses, fix the signs first, or an axis will suddenly flip by a hundred and eighty degrees and look like a bug.
+2026-10-07 23:01:06,178 INFO yield speech len 14.24, rtf 0.5188099956244565
+
+100%|██████████| 1/1 [00:07<00:00,  7.57s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:06,369 INFO synthesis text Second, a matrix that should be symmetric is often off by about ten to the minus sixteen, for instance when two off-diagonal entries are summed in a different order. Average A with its transpose before you call eigh.
+2026-10-07 23:01:14,270 INFO yield speech len 15.6, rtf 0.5064659546583127
+
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:14,452 INFO synthesis text Third, computing a matrix function through the spectral decomposition works for symmetric matrices. For a general matrix, use scipy's sqrtm and expm instead.
+2026-10-07 23:01:23,596 INFO yield speech len 17.6, rtf 0.5195154249668121
+
+100%|██████████| 1/1 [00:09<00:00,  9.33s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.33s/it]
+cv2: 160/188 句，用时 15.5 分钟，预计还要 2.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:23,660 WARNING synthesis text The spectral theorem is all around you. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-07 23:01:23,786 INFO synthesis text The spectral theorem is all around you.
+2026-10-07 23:01:25,339 INFO yield speech len 2.32, rtf 0.669561583420326
+
+100%|██████████| 1/1 [00:01<00:00,  1.72s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.72s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:25,510 INFO synthesis text Take a square rubber sheet and draw a circle on it. Stretch it east–west to twice its length and north–south by half. The circle becomes an ellipse, and its long and short axes are exactly the directions you pulled.
+2026-10-07 23:01:34,684 INFO yield speech len 17.8, rtf 0.5154219772038835
+
+100%|██████████| 1/1 [00:09<00:00,  9.35s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:34,871 INFO synthesis text Look closely: every other line you drew turns a little.
+2026-10-07 23:01:37,233 INFO yield speech len 4.16, rtf 0.5677495438318986
+
+100%|██████████| 1/1 [00:02<00:00,  2.53s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:37,407 INFO synthesis text Any pure stretch with no rotation behaves this way. Its matrix is symmetric, the pulling directions are the eigenvectors, and the stretch factors are the eigenvalues.
+2026-10-07 23:01:43,563 INFO yield speech len 12.0, rtf 0.5129875143369039
+
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:43,746 INFO synthesis text Now let's open Lab fourteen.two, the stiffness ellipse at a robot's tip.
+2026-10-07 23:01:47,246 INFO yield speech len 6.44, rtf 0.5435307203612713
+
+100%|██████████| 1/1 [00:03<00:00,  3.67s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:47,420 INFO synthesis text Here is a planar two-link arm with elastic joints. The ellipse around the tip is the compliance ellipse. Its long axis is the soft axis and its short axis is the stiff axis.
+2026-10-07 23:01:55,262 INFO yield speech len 15.24, rtf 0.514546529514583
+
+100%|██████████| 1/1 [00:08<00:00,  8.02s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:01:55,455 INFO synthesis text Drag the push direction phi. Except along the two axes, the deflection always swerves toward the soft axis instead of following the push.
+2026-10-07 23:02:02,186 INFO yield speech len 13.2, rtf 0.509968309691458
+
+100%|██████████| 1/1 [00:06<00:00,  6.90s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:02,366 INFO synthesis text The readout on the right shows the angle between them. It is zero only when the push lies exactly on an axis. Your first task is to turn the push onto the softest direction yourself, so that the deflection lines up with it and is as large as possible.
+2026-10-07 23:02:11,616 INFO yield speech len 17.64, rtf 0.5243412761731483
+
+100%|██████████| 1/1 [00:09<00:00,  9.43s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:11,879 INFO synthesis text Now turn the first joint, and keep an eye on the two principal stiffnesses.
+2026-10-07 23:02:16,262 INFO yield speech len 8.16, rtf 0.5371865688585767
+
+100%|██████████| 1/1 [00:04<00:00,  4.63s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:16,441 INFO synthesis text The axes turn with the arm, but the stiffness values do not change. Why not? That is the question to think about in this lab.
+2026-10-07 23:02:21,640 INFO yield speech len 9.88, rtf 0.5261560924622694
+
+100%|██████████| 1/1 [00:05<00:00,  5.38s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.38s/it]
+cv2: 170/188 句，用时 16.4 分钟，预计还要 1.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:21,826 INFO synthesis text Now change the angle of the second joint. Make it smaller and the ellipse gets flatter.
+2026-10-07 23:02:25,829 INFO yield speech len 7.6, rtf 0.5266907654310528
+
+100%|██████████| 1/1 [00:04<00:00,  4.18s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:26,005 INFO synthesis text Make it larger and it gets rounder. So, can you make the tip equally stiff in every direction? Which pose, which stiffness? Each of the four tasks is checked automatically, and the lab guide and report template are ready for you.
+2026-10-07 23:02:34,497 INFO yield speech len 16.12, rtf 0.5267826410440298
+
+100%|██████████| 1/1 [00:08<00:00,  8.67s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:34,692 INFO synthesis text What you learned today is used in the WenQuest digital factory as well.
+2026-10-07 23:02:38,599 INFO yield speech len 6.92, rtf 0.5646350066785868
+
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:38,839 INFO synthesis text This is the motion and dynamics module. It uses MuJoCo to simulate a URfivee arm carrying a three kilogram load, plots the torque at every joint, and then picks the motors and gearboxes automatically.
+2026-10-07 23:02:47,044 INFO yield speech len 15.0, rtf 0.5469544887542724
+
+100%|██████████| 1/1 [00:08<00:00,  8.45s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:47,409 INFO synthesis text A gearbox is not rigid. Its torsional stiffness is the main source of the joint stiffness k in today's formula.
+2026-10-07 23:02:53,180 INFO yield speech len 10.36, rtf 0.5570714308028055
+
+100%|██████████| 1/1 [00:06<00:00,  6.13s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:02:53,366 INFO synthesis text Once the gearbox is chosen, you can plug its stiffness into J times K q inverse times J transpose yourself, get the arm's stiffness ellipsoid in its working pose, and see which way the tool will be pushed.
+2026-10-07 23:03:03,444 INFO yield speech len 19.08, rtf 0.528220548069952
+
+100%|██████████| 1/1 [00:10<00:00, 10.27s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:03,668 INFO synthesis text On the platform you can try today's method on the digital factory's URfivee simulation.
+2026-10-07 23:03:07,595 INFO yield speech len 7.44, rtf 0.527877192343435
+
+100%|██████████| 1/1 [00:04<00:00,  4.10s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:07,647 WARNING synthesis text There are four exercises for this lecture. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-07 23:03:07,772 INFO synthesis text There are four exercises for this lecture.
+2026-10-07 23:03:09,573 INFO yield speech len 2.88, rtf 0.6252122422059377
+
+100%|██████████| 1/1 [00:01<00:00,  1.97s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:09,745 INFO synthesis text The first is a computation. Write a two by two symmetric matrix as Q Lambda Q transpose, and as a spectral decomposition.
+2026-10-07 23:03:15,028 INFO yield speech len 10.48, rtf 0.5040821228318542
+
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:15,211 INFO synthesis text The second is a proof. If a symmetric matrix satisfies A squared equals A, show it is an orthogonal projection.
+2026-10-07 23:03:20,197 INFO yield speech len 9.48, rtf 0.5258932395323419
+
+100%|██████████| 1/1 [00:05<00:00,  5.16s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.16s/it]
+cv2: 180/188 句，用时 17.4 分钟，预计还要 0.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:20,373 INFO synthesis text The third is programming. Compute a matrix exponential from the spectral decomposition and compare with scipy.
+2026-10-07 23:03:25,472 INFO yield speech len 9.88, rtf 0.5160986170594991
+
+100%|██████████| 1/1 [00:05<00:00,  5.27s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:25,652 INFO synthesis text The fourth is about the robot. Find the principal stiffnesses and axes at another pose, and explain why turning the first joint leaves them unchanged.
+2026-10-07 23:03:31,926 INFO yield speech len 11.88, rtf 0.5281496730316367
+
+100%|██████████| 1/1 [00:06<00:00,  6.44s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:32,103 INFO synthesis text Plus the report for Lab fourteen.two. Submit your work on the platform and the AI gives you feedback right away, step by step.
+2026-10-07 23:03:37,008 INFO yield speech len 9.48, rtf 0.5174183644322906
+
+100%|██████████| 1/1 [00:05<00:00,  5.08s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:37,189 INFO synthesis text To sum up in three sentences. A real symmetric matrix is exactly a matrix you can diagonalize with an orthogonal matrix.
+2026-10-07 23:03:43,291 INFO yield speech len 12.08, rtf 0.5051131477419114
+
+100%|██████████| 1/1 [00:06<00:00,  6.28s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:43,473 INFO synthesis text Geometrically, it rotates, stretches along perpendicular axes, and rotates back.
+2026-10-07 23:03:47,960 INFO yield speech len 8.44, rtf 0.5316696743264583
+
+100%|██████████| 1/1 [00:04<00:00,  4.66s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:48,137 INFO synthesis text The spectral decomposition writes it as a weighted sum of projections, and the axes of a robot's stiffness ellipse are the eigenvectors of its stiffness matrix.
+2026-10-07 23:03:54,748 INFO yield speech len 12.68, rtf 0.5213318563034106
+
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:03:54,931 INFO synthesis text The lab, the program, the notes and the exercises are all on the WenQuest learning platform at learn dot wenquest robotics dot com. Sign up for free and try them yourself.
+2026-10-07 23:04:03,526 INFO yield speech len 16.36, rtf 0.5253454000850761
+
+100%|██████████| 1/1 [00:08<00:00,  8.77s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-07 23:04:03,711 INFO synthesis text Next time we extend the spectral theorem to complex matrices, with Hermitian and unitary matrices and the Schur decomposition. See you then.
+2026-10-07 23:04:10,674 INFO yield speech len 13.4, rtf 0.5196768312311884
+
+100%|██████████| 1/1 [00:07<00:00,  7.14s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.14s/it]
+cv2: 188/188 句，用时 18.2 分钟，预计还要 0.0 分钟
+cv2: 188 句完成
+2026-10-07 23:04:10,842 DEBUG Attempting to acquire lock 130684513471552 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 23:04:10,842 DEBUG Lock 130684513471552 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 23:04:10,842 DEBUG Attempting to release lock 130684513471552 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 23:04:10,842 DEBUG Lock 130684513471552 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-07 23:04:10,844 DEBUG Attempting to acquire lock 130684513471312 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 23:04:10,844 DEBUG Lock 130684513471312 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 23:04:10,844 DEBUG Attempting to release lock 130684513471312 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-07 23:04:10,844 DEBUG Lock 130684513471312 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 29 分钟
