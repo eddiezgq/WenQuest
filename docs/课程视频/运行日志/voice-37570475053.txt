@@ -1,0 +1,50 @@
+6 句，引擎 ['cv3', 'cv2']
+Warning: Permanently added 'x.x.x.x' (ED25519) to the list of known hosts.
+== 准备环境（NVIDIA A10）
+debconf: unable to initialize frontend: Dialog
+debconf: (Dialog frontend will not work on a dumb terminal, an emacs shell buffer, or without a controlling terminal.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (This frontend requires a controlling tty.)
+debconf: falling back to frontend: Teletype
+dpkg-preconfigure: unable to re-open stdin: 
+== 安装 CosyVoice 依赖
+  error: subprocess-exited-with-error
+  
+  × Getting requirements to build wheel did not run successfully.
+  │ exit code: 1
+  ╰─> [17 lines of output]
+      Traceback (most recent call last):
+        File "/home/ubuntu/cv/lib/python3.10/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 389, in <module>
+          main()
+        File "/home/ubuntu/cv/lib/python3.10/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 373, in main
+          json_out["return_val"] = hook(**hook_input["kwargs"])
+        File "/home/ubuntu/cv/lib/python3.10/site-packages/pip/_vendor/pyproject_hooks/_in_process/_in_process.py", line 143, in get_requires_for_build_wheel
+          return hook(config_settings)
+        File "/tmp/pip-build-env-sizi2ppr/overlay/lib/python3.10/site-packages/setuptools/build_meta.py", line 333, in get_requires_for_build_wheel
+          return self._get_build_requires(config_settings, requirements=[])
+        File "/tmp/pip-build-env-sizi2ppr/overlay/lib/python3.10/site-packages/setuptools/build_meta.py", line 301, in _get_build_requires
+          self.run_setup()
+        File "/tmp/pip-build-env-sizi2ppr/overlay/lib/python3.10/site-packages/setuptools/build_meta.py", line 520, in run_setup
+          super().run_setup(setup_script=setup_script)
+        File "/tmp/pip-build-env-sizi2ppr/overlay/lib/python3.10/site-packages/setuptools/build_meta.py", line 317, in run_setup
+          exec(code, locals())  # noqa: S102 # exec is intentional here
+        File "<string>", line 5, in <module>
+      ModuleNotFoundError: No module named 'pkg_resources'
+      [end of output]
+  
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+ERROR: Failed to build 'openai-whisper' when getting requirements to build wheel
+GPU 机器已关机，用时 6 分钟
+Traceback (most recent call last):
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 260, in <module>
+    main()
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 256, in main
+    gpu_session(job, work, out)
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 206, in gpu_session
+    G._ssh(ip, "cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py")
+  File "/home/runner/work/WenQuest/WenQuest/textbook/tools/gpurun.py", line 98, in _ssh
+    subprocess.run(["ssh", *_opts(), f"ubuntu@{ip}", command], check=True)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-i', '/tmp/tmpoqvfcfm7/wq_voice_key', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=20', 'ubuntu@x.x.x.x', 'cd wqv && bash setup.sh && . ~/cv/bin/activate && python remote.py']' returned non-zero exit status 1.
