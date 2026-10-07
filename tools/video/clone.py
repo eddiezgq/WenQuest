@@ -42,7 +42,11 @@ AUDITION = {
 
 SETUP = f"""set -e
 export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update -qq && sudo apt-get install -y -qq sox libsox-dev ffmpeg > /dev/null
+echo "== 准备环境（$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null)）"
+# 新开机的 Lambda 机器常在跑自动更新，占着 apt 锁：最多等 10 分钟
+sudo systemctl stop unattended-upgrades 2>/dev/null || true
+sudo apt-get -o DPkg::Lock::Timeout=600 update -qq
+sudo apt-get -o DPkg::Lock::Timeout=600 install -y -qq sox libsox-dev ffmpeg > /dev/null
 if [ ! -d CosyVoice ]; then
   git init -q CosyVoice && cd CosyVoice && git remote add origin https://github.com/FunAudioLLM/CosyVoice.git
   git fetch -q --depth 1 origin {COSYVOICE_COMMIT} && git checkout -q FETCH_HEAD && git submodule update -q --init --recursive --depth 1
@@ -50,6 +54,7 @@ if [ ! -d CosyVoice ]; then
 fi
 python3 -m venv ~/cv && . ~/cv/bin/activate
 pip install -q --upgrade pip
+echo "== 安装 CosyVoice 依赖"
 pip install -q -r CosyVoice/requirements.txt
 pip install -q huggingface_hub
 """

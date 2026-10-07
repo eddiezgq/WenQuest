@@ -69,11 +69,31 @@ jobs:
             install -m 600 /dev/null "$RUNNER_TEMP/gpu_key" && printf '%s\n' "$SSH_PRIVATE" > "$RUNNER_TEMP/gpu_key"
             export LAMBDA_SSH_KEY_FILE="$RUNNER_TEMP/gpu_key"
           fi
+          log="$RUNNER_TEMP/voice.log"
+          set +e
           if [ "${{ inputs.task }}" = audition ]; then
-            sh tools/video/logged.sh python tools/video/clone.py audition --out "$RUNNER_TEMP/clone"
+            python -u tools/video/clone.py audition --out "$RUNNER_TEMP/clone" > "$log" 2>&1
           else
-            sh tools/video/logged.sh python tools/video/clone.py lectures ${{ inputs.lectures }} --engine ${{ inputs.engine }} --out "$RUNNER_TEMP/clone"
+            python -u tools/video/clone.py lectures ${{ inputs.lectures }} --engine ${{ inputs.engine }} --out "$RUNNER_TEMP/clone" > "$log" 2>&1
           fi
+          code=$?
+          set -e
+          cat "$log"
+          # 运行日志（去掉 IP）放回仓库，便于在会话里查原因；试听结果加密后也放回，Claude 解密后发给 Eddie
+          mkdir -p docs/课程视频/运行日志
+          sed -E 's/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/x.x.x.x/g' "$log" | tail -n 400 > "docs/课程视频/运行日志/voice-${{ github.run_id }}.txt"
+          if [ "${{ inputs.task }}" = audition ] && [ "$code" = 0 ]; then
+            mkdir -p docs/课程视频/声音样本/试听
+            for f in $(find "$RUNNER_TEMP/clone" -name '*.wav'); do
+              rel=$(echo "${f#$RUNNER_TEMP/clone/}" | tr '/' '_')
+              ffmpeg -y -loglevel error -i "$f" -b:a 96k "$RUNNER_TEMP/${rel%.wav}.mp3"
+              openssl enc -aes-256-cbc -salt -pbkdf2 -iter 200000 -in "$RUNNER_TEMP/${rel%.wav}.mp3" -out "docs/课程视频/声音样本/试听/${rel%.wav}.mp3.enc" -pass env:VOICE_KEY
+            done
+            cp "$RUNNER_TEMP/clone/prompts.json" docs/课程视频/声音样本/试听/提示音文字.json 2>/dev/null || true
+          fi
+          git config user.name "WenQuest video"; git config user.email "noreply@wenquestrobotics.com"
+          git add docs/课程视频 && git commit -q -m "公开课视频：声音合成运行记录 ${{ github.run_id }}" && { git pull -q --rebase origin main && git push -q origin HEAD:main; } || true
+          exit $code
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.task == 'audition' && 'audition' || 'voice-clone' }}
