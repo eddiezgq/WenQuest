@@ -1,0 +1,16 @@
+188 句，引擎 ['cv2']
+Warning: Permanently added 'x.x.x.x' (ED25519) to the list of known hosts.
+client_loop: send disconnect: Broken pipe
+GPU 机器已关机，用时 141 分钟
+Traceback (most recent call last):
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 325, in <module>
+    main()
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 321, in main
+    gpu_session(job, work, out)
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 248, in gpu_session
+    G._ssh(ip, "cd wqv && nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' > run.log 2>&1 < /dev/null &")
+  File "/home/runner/work/WenQuest/WenQuest/textbook/tools/gpurun.py", line 98, in _ssh
+    subprocess.run(["ssh", *_opts(), f"ubuntu@{ip}", command], check=True)
+  File "/opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['ssh', '-i', '/tmp/tmpxa579xtm/wq_voice_key', '-o', 'StrictHostKeyChecking=accept-new', '-o', 'ConnectTimeout=20', 'ubuntu@x.x.x.x', "cd wqv && nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' > run.log 2>&1 < /dev/null &"]' returned non-zero exit status 255.
