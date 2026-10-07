@@ -362,7 +362,7 @@ def people_objs(B, db, mode):
         B.link(mode, "Qualification", k, "employee", r["emp_id"])
         if r["unit"] in UNITS:
             B.link(mode, "Qualification", k, "machine", r["unit"])
-    d0, _ = PE.now_shift()
+    d0, _ = PE.now_shift(None, db, mode)
     for d in (d0, d0 + dt.timedelta(days=1)):
         for sh in ("day", "night"):
             for u, r in PE.roster_for(db, mode, d, sh).items():

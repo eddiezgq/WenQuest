@@ -67,7 +67,7 @@ def mount(app, H, user_of, who):
         rows = PE.week(H.db, u["mode"], day)
         if not can(u, DETAIL):
             rows = [dict(r, cells={k: dict(c, attendance=None) for k, c in r["cells"].items()}) for r in rows]
-        d, sh = PE.now_shift()
+        d, sh = PE.now_shift(None, H.db, u["mode"])
         return {"rows": rows, "now": {"day": d.isoformat(), "shift": sh}, "enabled": PE.enabled(H.db, u["mode"]),
                 "gaps": PE.gaps(H.db, u["mode"]), "can_manage": can(u)}
 

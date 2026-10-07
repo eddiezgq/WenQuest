@@ -315,7 +315,7 @@ def main():
         check(r["status"] == "closed", "异常可以关闭并留记录")
     hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "reset"}, teacher)
     sit = hub("GET", "/api/ont/situation", token=teacher)
-    check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 2, "全厂态势 15 块，2 块待接入")
+    check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 1, "全厂态势 15 块，1 块待接入（能源）")
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
     check(len(live) == 44 and not [x["id"] for x in live if x["error"]], "规则 44 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
@@ -634,6 +634,7 @@ def people(teacher):
     单点依赖 H1 → 技能培训 → 考核通过 → 单点依赖少一台"""
     print("16. 人员与组织（第 18 轮 E4）")
     lead = login("测试班组长", "lead")
+    hub("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": 1}, teacher)     # 排班按班次：车间回到正常速度，免得一个班两分钟就过去
 
     def mach(u):
         return next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == u)

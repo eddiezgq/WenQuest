@@ -153,9 +153,24 @@ def tz():
     return kpi.TZ
 
 
-def now_shift(now=None):
-    """现在是哪天的哪个班"""
-    now = now or dt.datetime.now(dt.timezone.utc)
+def factory_now(db=None, mode=None):
+    """工厂时间：教学模式车间可能倍速运行，按最近一条车间事件里的工厂时间推算（和真实时间差多少）；生产模式就是现在"""
+    now = dt.datetime.now(dt.timezone.utc)
+    if db is None or mode != "teach":
+        return now
+    try:
+        r = db.one("select ts, payload->'data'->>'factory_ts' as f from bus_message where mode=%s and type='machine.event' "
+                   "and payload->'data' ? 'factory_ts' order by seq desc limit 1", (mode,))
+    except Exception:  # noqa: BLE001
+        return now
+    if not r or not r["f"] or (now - r["ts"]).total_seconds() > 3600:
+        return now
+    return now + (dt.datetime.fromisoformat(r["f"].replace("Z", "+00:00")) - r["ts"])
+
+
+def now_shift(now=None, db=None, mode=None):
+    """现在（工厂时间）是哪天的哪个班"""
+    now = now or factory_now(db, mode)
     return STF.shift_of(now.astimezone(tz()))
 
 
@@ -338,8 +353,8 @@ def levels(db, mode, days):
     return out
 
 
-def window_days(now=None):
-    d, _ = now_shift(now)
+def window_days(now=None, db=None, mode=None):
+    d, _ = now_shift(now, db, mode)
     return [d + dt.timedelta(days=i) for i in range(-1, 8)]
 
 
@@ -349,7 +364,7 @@ def push(H, mode, who="系统", now=None):
     if mes is None:
         return None
     on = enabled(H.db, mode)
-    lv = levels(H.db, mode, window_days(now)) if on else {}
+    lv = levels(H.db, mode, window_days(now, H.db, mode)) if on else {}
     mes.command("sim", "set_staffing", mode, who, enabled=on, levels=lv, replace=True)
     st = _state(H.db, mode)
     st["pushed_at"] = dt.datetime.now(dt.timezone.utc).timestamp()
@@ -388,7 +403,7 @@ def week(db, mode, day=None):
 
 def gaps(db, mode, now=None, hours=24):
     """未来 hours 小时内（含现在这一班）有岗位、但这一班没人能开的设备"""
-    now = now or dt.datetime.now(dt.timezone.utc)
+    now = now or factory_now(db, mode)
     local = now.astimezone(tz())
     sk = skills(db, mode)
     out = []
@@ -419,7 +434,7 @@ def gaps(db, mode, now=None, hours=24):
 def on_shift_ids(db, mode, now=None):
     """这一班在岗的人（按各人的班次，去掉请假、缺勤的）"""
     seed(db, mode)
-    d, sh = now_shift(now)
+    d, sh = now_shift(now, db, mode)
     ab = {k for k, v in absences(db, mode, d, sh).items() if v["status"] in ("leave", "absent")}
     return {p["id"] for p in db.q("select id from ehs_person where mode=%s and active and shift=%s", (mode, sh)) if p["id"] not in ab}
 
@@ -432,7 +447,7 @@ def record_attendance(H, mode, emp_id, status, day=None, shift=None, who="系统
     if p is None:
         raise KeyError(emp_id)
     if day is None or shift is None:
-        d, sh = now_shift()
+        d, sh = now_shift(None, db, mode)
         day, shift = day or d, shift or (p["shift"] or sh)
     db.x("insert into attendance (mode, day, shift, emp_id, status, minutes_late, by_name) values (%s,%s,%s,%s,%s,%s,%s) "
          "on conflict (mode, day, shift, emp_id) do update set status=excluded.status, minutes_late=excluded.minutes_late, by_name=excluded.by_name, at=now()",
@@ -448,6 +463,7 @@ def clear_attendance(H, mode, emp_id, day, shift, who="系统"):
 
 def today_board(db, mode, now=None):
     """今天这一班：谁在岗、谁请假，岗位缺口"""
+    now = now or factory_now(db, mode)
     d, sh = now_shift(now)
     ro = roster_for(db, mode, d, sh)
     ab = absences(db, mode, d, sh)
@@ -666,7 +682,7 @@ def options(db, mode, a, snap, ctx):
                       {"type": "overtime_assign", "day": day, "shift": sh, "unit": unit, "emp_id": x["emp_id"], "minutes": 12 * 60}))
     stub = dict(a, rule="P1", subject_type="Machine", subject_key=unit)
     names = PB.affected(stub, ctx)
-    base = [{"type": "staff", "levels": levels(db, mode, window_days())}] if enabled(db, mode) else []    # 先按现在的排班
+    base = [{"type": "staff", "levels": levels(db, mode, window_days(None, db, mode))}] if enabled(db, mode) else []    # 先按现在的排班
     out = []
     for i, (kind, label, sim, note, action) in enumerate(plans):
         r = P.simulate(snap, base + sim, ctx)
@@ -722,7 +738,7 @@ def tick(H, mode, now=None, rng=None):
     out = {"absent": [], "late": [], "passed": []}
     st = _state(db, mode)
     if mode == "teach":
-        d, sh = now_shift(now)
+        d, sh = now_shift(None, db, mode)                      # 工厂时间的这一班
         k = "{}|{}".format(d.isoformat(), sh)
         if st.get("att") != k:
             st["att"] = k
@@ -755,7 +771,7 @@ def leave_next_shift(H, mode, emp_id, who, now=None):
     p = person(db, mode, emp_id)
     if p is None:
         raise ValueError("没有这个人")
-    local = (now or dt.datetime.now(dt.timezone.utc)).astimezone(tz())
+    local = (now or factory_now(db, mode)).astimezone(tz())
     d, sh = STF.shift_of(local)
     for _ in range(4):
         units = [uu for uu, r in roster_for(db, mode, d, sh).items() if r["emp_id"] == emp_id]
@@ -769,6 +785,7 @@ def leave_next_shift(H, mode, emp_id, who, now=None):
 # ---------------------------------------------------------------- 态势
 def kpis(db, mode, now=None):
     seed(db, mode)
+    now = now or factory_now(db, mode)
     d, sh = now_shift(now)
     ro = roster_for(db, mode, d, sh)
     on = {r["emp_id"] for r in ro.values() if r["emp_id"]}

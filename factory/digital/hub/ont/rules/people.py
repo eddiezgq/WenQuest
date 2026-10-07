@@ -31,7 +31,8 @@ def roster_gap(c, p, r):
     if not _has(c, "roster_post") or not PE.enabled(c.db, c.mode):
         return []
     out = []
-    for g in PE.gaps(c.db, c.mode, c.now, hours=float(p.get("hours", 24))):
+    now = PE.factory_now(c.db, c.mode) if c.mode == "teach" else c.now          # 教学模式按工厂时间（车间可能倍速运行）
+    for g in PE.gaps(c.db, c.mode, now, hours=float(p.get("hours", 24))):
         k = "{}/{}/{}".format(g["day"], g["shift"], g["unit"])
         out.append(Finding(k, "{} {} {} 没人能开：{}".format(g["day"][5:], g["shift_name"], g["unit"].upper(), g["why"]),
                            "这一班这台设备会停在“缺人”" + ("；它是瓶颈，影响整条线" if g["unit"] in BOTTLENECK else ""),
