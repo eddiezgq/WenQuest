@@ -89,6 +89,8 @@ def slots(db, mode="teach"):
     s["si_major"] = "SI-{:05d}".format(si["id"]) if si else "SI-?????"
     a = db.one("select id from anomaly where mode=%s and rule='E1' and fkey=%s order by id desc limit 1", (mode, s["si_major"]))
     s["si_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    a = db.one("select id from anomaly where mode=%s and rule='M2' and subject_key='grd-01' order by id desc limit 1", (mode,))
+    s["pm_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     return s
 
 
@@ -215,6 +217,8 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     H = types.SimpleNamespace(db=db, ai=ai, plan_snaps=EngineSnaps(db, eng), mes=None)
     H.twin = field_scene(H, h)
     ehs_scene(H)
+    from hub import maint as MT                 # 第 18 轮 E3：点检表（磨床保养逾期来自情景里的运行小时）
+    MT.seed(db, "teach")
     s.reconcile()
     ai.detector().run("teach", now)
     return H, eng

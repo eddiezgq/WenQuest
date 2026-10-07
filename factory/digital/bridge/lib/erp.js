@@ -220,6 +220,12 @@ class ERP {
           resolution_details: `已完成：${pv.what}${pv.note ? '。' + pv.note : ''}（问渠数字工厂 · 数字孪生）` });
         out.push(this.doc('Issue', iss, 'updated', opt));
         created.push(['Issue', iss.name]);
+      } else if (['maint_setup', 'maint_log', 'asset_repair', 'asset_repair_done', 'maint_interval'].includes(d.action)) {
+        // 第 18 轮 E3：设备台账、保养计划、保养记录、维修单
+        for (const r of await this.maintService(d.action, d.preview)) {
+          out.push(this.doc(r[0], r[1], r[2], opt));
+          created.push([r[0], r[1].name]);
+        }
       } else if (d.action.startsWith('crm_') || ['complaint_issue', 'service_orders', 'service_order_done', 'spare_ship'].includes(d.action)) {
         // 第 18 轮 E1：客户与服务（线索、商机、报价、合同、投诉、服务工单、备件出库）
         for (const r of await this.crmService(d.action, d.preview)) {
@@ -315,6 +321,72 @@ class ERP {
       const se = await this.insert('Stock Entry', { stock_entry_type: 'Material Issue', purpose: 'Material Issue', company,
         remarks: pv.note || '', items: pv.items.map((i) => ({ item_code: i.item_code, qty: i.qty, s_warehouse: WH.purchased })), docstatus: 1 });
       out.push(['Stock Entry', se, 'submitted']);
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------ 第 18 轮 E3：设备维护与资产
+  async ensureAssetSetup() {
+    if (this.assetSetup) return this.assetSetup;
+    const company = await this.getCompany();
+    const loc = '问渠车间 Workshop';
+    if (!(await this.list('Location', [['name', '=', loc]])).length) await this.insert('Location', { location_name: loc });
+    const cat = '生产设备 Production machinery';
+    if (!(await this.list('Asset Category', [['name', '=', cat]])).length) {
+      const acc = await this.list('Account', [['account_type', '=', 'Fixed Asset'], ['is_group', '=', 0], ['company', '=', company]], ['name']);
+      if (!acc.length) throw new Error('ERPNext 里找不到“固定资产”类型的科目，建不了资产分类');
+      await this.insert('Asset Category', { asset_category_name: cat, accounts: [{ company_name: company, fixed_asset_account: acc[0].name }] });
+    }
+    const item = 'AST-MACHINE';
+    if (!(await this.list('Item', [['name', '=', item]])).length) {
+      const grp = (await this.list('Item Group', [['is_group', '=', 0]], ['name'], { limit: 1 }))[0];
+      await this.insert('Item', { item_code: item, item_name: '生产设备 Production machine', stock_uom: 'Nos', is_stock_item: 0,
+        is_fixed_asset: 1, asset_category: cat, ...(grp ? { item_group: grp.name } : {}) });
+    }
+    const team = '设备组 Maintenance team';
+    if (!(await this.list('Asset Maintenance Team', [['name', '=', team]])).length) {
+      const roles = await this.list('Role', [['name', 'in', ['Maintenance User', 'Maintenance Manager', 'System Manager']]], ['name']);
+      await this.insert('Asset Maintenance Team', { maintenance_team_name: team, company, maintenance_manager: 'Administrator',
+        maintenance_team_members: [{ team_member: 'Administrator', maintenance_role: roles.length ? roles[0].name : 'System Manager' }] });
+    }
+    await this.ensureCustomField('Asset Maintenance Task', 'wq_interval_h', { label: '周期（运行小时）Interval (run hours)', fieldtype: 'Float',
+      insert_after: 'periodicity' });
+    this.assetSetup = { company, loc, cat, item, team };
+    return this.assetSetup;
+  }
+
+  async maintService(action, pv) {
+    const S = await this.ensureAssetSetup();
+    const today = erpDate(new Date().toISOString());
+    const out = [];
+    if (action === 'maint_setup') {
+      for (const a of pv.assets) {
+        const asset = await this.insert('Asset', { asset_name: a.asset_name, item_code: S.item, asset_category: S.cat, company: S.company,
+          location: S.loc, asset_type: 'Existing Asset', purchase_date: a.purchase_date, available_for_use_date: a.purchase_date,
+          net_purchase_amount: a.value, calculate_depreciation: 0, maintenance_required: 1, docstatus: 1 });
+        out.push(['Asset', asset, 'submitted']);
+        const mt = await this.insert('Asset Maintenance', { asset_name: asset.name, company: S.company, maintenance_team: S.team,
+          asset_maintenance_tasks: [{ maintenance_task: a.task.slice(0, 140), maintenance_type: 'Preventive Maintenance', maintenance_status: 'Planned',
+            start_date: today, periodicity: 'Monthly', assign_to: 'Administrator', description: a.task, wq_interval_h: a.interval_h }] });
+        out.push(['Asset Maintenance', mt, 'created']);
+      }
+    } else if (action === 'maint_log') {
+      const lg = await this.insert('Asset Maintenance Log', { asset_maintenance: pv.asset_maintenance, task: pv.task, task_name: pv.task_name,
+        periodicity: pv.periodicity || 'Monthly', due_date: pv.date, description: pv.description || pv.task_name, task_assignee_email: 'admin@example.com',
+        maintenance_status: 'Completed', completion_date: pv.date, actions_performed: pv.actions || '', docstatus: 1 });
+      out.push(['Asset Maintenance Log', lg, 'submitted']);
+    } else if (action === 'asset_repair') {
+      const r = await this.insert('Asset Repair', { asset: pv.asset, company: S.company, failure_date: pv.failure_date, repair_status: 'Pending',
+        description: pv.description || '' });
+      out.push(['Asset Repair', r, 'created']);
+    } else if (action === 'asset_repair_done') {
+      const r = await this.update('Asset Repair', pv.repair, { repair_status: 'Completed', completion_date: pv.completion_date,
+        actions_performed: pv.actions || '' });
+      out.push(['Asset Repair', r, 'updated']);
+    } else if (action === 'maint_interval') {
+      const mt = await this.get('Asset Maintenance', pv.asset_maintenance);
+      const tasks = (mt.asset_maintenance_tasks || []).map((t, i) => (i === 0 ? { ...t, wq_interval_h: pv.interval_h } : t));
+      out.push(['Asset Maintenance', await this.update('Asset Maintenance', pv.asset_maintenance, { asset_maintenance_tasks: tasks }), 'updated']);
     }
     return out;
   }
@@ -571,7 +643,8 @@ class ERP {
   // ------------------------------------------------------------ 5. ERPNext → 总线（轮询）
   async poll() {
     const out = [];
-    for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order', 'Lead', 'Opportunity', 'Quotation', 'Contract', 'Issue']) {
+    for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order', 'Lead', 'Opportunity', 'Quotation', 'Contract', 'Issue',
+      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log']) {
       const since = this.lastModified[dt];
       const filters = since ? [['modified', '>', since]] : [];
       const rows = await this.list(dt, filters, ['name', 'modified'], { order_by: 'modified asc', limit: 200 });
@@ -647,6 +720,17 @@ function summarize(doctype, d) {
         'wq_response_h', 'wq_warranty_months', 'wq_amount', 'wq_quotation', 'wq_sales_order']);
     case 'Issue':
       return pick(['subject', 'status', 'customer', 'opening_date', 'resolution_date', 'wq_serial', 'wq_kind', 'wq_engineer', 'wq_day']);
+    case 'Asset':                       // 第 18 轮 E3
+      return pick(['asset_name', 'status', 'location', 'net_purchase_amount', 'purchase_date', 'asset_category', 'docstatus']);
+    case 'Asset Maintenance':
+      return { ...pick(['asset_name', 'maintenance_team']),
+        asset_maintenance_tasks: (d.asset_maintenance_tasks || []).map((t) => ({ name: t.name, maintenance_task: t.maintenance_task,
+          periodicity: t.periodicity, description: t.description, next_due_date: t.next_due_date, last_completion_date: t.last_completion_date,
+          wq_interval_h: t.wq_interval_h })) };
+    case 'Asset Repair':
+      return pick(['asset', 'repair_status', 'failure_date', 'completion_date', 'description', 'docstatus']);
+    case 'Asset Maintenance Log':
+      return pick(['asset_maintenance', 'task_name', 'maintenance_status', 'completion_date', 'docstatus']);
     default:
       return {};
   }

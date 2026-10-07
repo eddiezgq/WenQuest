@@ -60,7 +60,12 @@ TYPES = {
     "rectify_order": {"label": "整改工单", "costly": True, "ehs": True, "nosim": True},
     "unlock": {"label": "验收解锁", "costly": False, "ehs": True, "nosim": True},
     "training_plan": {"label": "安排培训", "costly": False, "ehs": True, "nosim": True},
+    # 第 18 轮 E3：设备维护（发起：维修工、厂长；要停机或改计划，都要厂长批）
+    "pm_order": {"label": "保养工单", "costly": True, "maint": True},
+    "repair_order": {"label": "维修工单", "costly": True, "maint": True, "nosim": True},
+    "interval_change": {"label": "调整保养周期", "costly": True, "maint": True, "nosim": True},
 }
+MAINT_INITIATORS = ("maintenance", "manager")
 SERVICE_INITIATORS = ("service", "manager", "sales")
 EHS_INITIATORS = ("safety", "manager")
 
@@ -114,6 +119,13 @@ def title_of(t, p):
         return "验收解锁：{}".format((p.get("unit") or "").upper())
     if t == "training_plan":
         return "安排培训：{} {} 人".format(p.get("kind"), len(p.get("people") or []))
+    if t == "pm_order":
+        return "保养工单：{} {}停 {} 分钟".format((p.get("unit") or "").upper(), "{} 分钟后".format(p["delay_minutes"]) if p.get("delay_minutes") else "立即",
+                                         p.get("minutes"))
+    if t == "repair_order":
+        return "维修工单：{} {}".format((p.get("unit") or "").upper(), p.get("title") or "")
+    if t == "interval_change":
+        return "调整保养周期：{} → {:g} 运行小时".format((p.get("unit") or "").upper(), float(p.get("interval_h") or 0))
     return t
 
 
@@ -137,6 +149,8 @@ def can_initiate(u, t=None):
         return u.get("role") in SERVICE_INITIATORS
     if t and TYPES.get(t, {}).get("ehs"):
         return u.get("role") in EHS_INITIATORS
+    if t and TYPES.get(t, {}).get("maint"):
+        return u.get("role") in MAINT_INITIATORS
     return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
@@ -292,6 +306,11 @@ def execute(H, a, u, who):
         sent = sum(1 for x in rows if x["status"] == "sent")
         return {"text": "通知 {} 个客户：{}".format(len(rows), "已发邮件 {} 封".format(sent) if sent else
                                                 ("教学模式只记录、不发出" if mode == "teach" else "没有邮箱，已记录，请人工联系")), "notices": rows}, "done"
+    if t in ("pm_order", "repair_order", "interval_change"):
+        from hub import maint as MT
+        fn = {"pm_order": MT.exec_pm, "repair_order": MT.exec_repair, "interval_change": MT.exec_interval}[t]
+        res = fn(H, mode, dict(p, _action_id=a["id"]), u)
+        return res, "executing" if res.get("proposal_id") else "done"
     if t in ("lockout", "rectify_order", "unlock", "training_plan"):
         from hub import ehs as EH
         fn = {"lockout": EH.exec_lockout, "rectify_order": EH.exec_rectify, "unlock": EH.exec_unlock, "training_plan": EH.exec_training}[t]

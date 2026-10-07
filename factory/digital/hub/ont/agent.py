@@ -54,7 +54,7 @@ SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
-    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "object": "查一个对象", "overview": "全厂概况",
+    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "object": "查一个对象", "overview": "全厂概况",
 }
 
 
@@ -377,6 +377,15 @@ class Tools:
             elif a.get("rule") == "E3":
                 from hub import ehs as EH
                 ev = EH.permit_options(self.db, self.mode, a)
+            elif a.get("rule") in ("M2", "M4"):          # 第 18 轮 E3：保养时机
+                from hub import maint as MT
+                ev = MT.options(self.db, self.mode, a, st, self._ctx_plan(st))
+            elif a.get("rule") == "M3":
+                from hub import maint as MT
+                ev = MT.inspection_options(self.db, self.mode, a)
+            elif a.get("rule") == "M5":
+                from hub import maint as MT
+                ev = MT.parts_options(self.db, self.mode, a)
             else:
                 ev = PB.evaluate(a, st, self._ctx_plan(st))
         except P.PlanError as e:
@@ -593,6 +602,41 @@ class Tools:
         r["rule"] = "可能性 × 严重度（各 1–5 分）：≥ 15 重大，8–14 较大，其余一般"
         return r
 
+    # ---- ⑯ 设备台账与保养状态（第 18 轮 E3）
+    def maint_overview(self):
+        from hub import maint as MT
+        rows = sorted(MT.assets(self.db, self.mode), key=lambda x: (-x["overdue_h"], x["due_in_h"]))
+        out = {"kpis": MT.kpis(self.db, self.mode), "horizon_h": MT.HORIZON_H,
+               "machines": [dict({k: x[k] for k in ("unit", "name", "asset", "run_h", "pm_h", "overdue_h", "due_in_h", "p_fail", "expected_loss_usd",
+                                                    "failures_30d", "state", "locked")}, ref=self.run.obj("Machine", x["unit"], x["name"])) for x in rows]}
+        out["page"] = self.run.page("maint", "设备维护 · 台账与保养", "/maint")
+        return out
+
+    # ---- ⑰ 故障风险与预期损失
+    def failure_risk(self, unit, hours=None):
+        from hub import maint as MT
+        unit = (unit or "").lower()
+        if not MT.REL.params(unit):
+            return {"error": "没有这台设备的保养计划：{}".format(unit)}
+        r = MT.risk(self.db, self.mode, unit, float(hours or MT.HORIZON_H))
+        r.pop("curve", None)
+        r["ref"] = self.run.obj("Machine", unit, UNITS[unit][1])
+        r["formula"] = "F(t) = 1 − exp(−(t/η)^β)；已运行 t 小时、再运行 H 小时内坏掉的概率 = 1 − exp(−[((t+H)/η)^β − (t/η)^β])"
+        return r
+
+    # ---- ⑱ 维修与备件
+    def repairs_spares(self):
+        from hub import maint as MT
+        MT.init(self.db)
+        reps = [dict({k: r[k] for k in ("unit", "title", "status")}, key="MR-{:05d}".format(r["id"]), status_label=MT.STATUS[r["status"]],
+                     parts=r["parts"], ref=self.run.obj("RepairOrder", "MR-{:05d}".format(r["id"])))
+                for r in self.db.q("select * from maint_repair where mode=%s and status<>'closed' order by id", (self.mode,))]
+        pms = [{"key": "PM-{:05d}".format(r["id"]), "unit": r["unit"], "status_label": MT.PM_STATUS[r["status"]]}
+               for r in self.db.q("select * from maint_pm where mode=%s and status<>'closed' order by id", (self.mode,))]
+        spares = [dict(x, ref=self.run.obj("SparePart", x["item_code"])) for x in
+                  ({"item_code": k, "stock": MT.stock_of(self.db, self.mode, k), "min": v} for k, v in MT.SPARE_MIN.items())]
+        return {"repairs": reps, "pms": pms, "spares": spares, "page": self.run.page("maint-repairs", "设备维护 · 维修与备件", "/maint?tab=repairs")}
+
     # ---- ⑨ 起草动作（只起草）
     def draft_action(self, changes, anomaly_id=None, scenario_id=None, snapshot_id=None):
         from hub.ont import actions as AC
@@ -682,6 +726,12 @@ def _summary(out):
         return "客户 360：{} 台设备、{} 个投诉".format(len(out["units"]), len(out["complaints"]))
     if "issues" in out and "kpis" in out:
         return "隐患 {} 条".format(len(out["issues"]))
+    if "machines" in out and "horizon_h" in out:
+        return "设备 {} 台".format(len(out["machines"]))
+    if "p_fail" in out:
+        return "故障概率 {:.0%}".format(out["p_fail"])
+    if "repairs" in out and "spares" in out:
+        return "维修单 {} 张".format(len(out["repairs"]))
     if "hazards" in out:
         return "危险源 {} 条".format(len(out["hazards"]))
     if "person_days" in out:
@@ -693,7 +743,8 @@ def _summary(out):
 
 TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", "list_anomalies", "get_anomaly", "simulate",
               "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
-              "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess"]
+              "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess",
+              "maint_overview", "failure_risk", "repairs_spares"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -732,6 +783,11 @@ TOOLS = [
      "input_schema": dict(_S(unit={"type": "string", "description": "设备编号，如 grd-01"}), required=["unit"])},
     {"name": "risk_assess", "description": "风险评估：可能性 × 严重度（各 1–5 分）→ 风险值和等级",
      "input_schema": dict(_S(likelihood={"type": "integer"}, severity={"type": "integer"}), required=["likelihood", "severity"])},
+    {"name": "maint_overview", "description": "设备台账与保养状态：每台设备自上次保养运行了多少小时、保养周期、是否逾期、未来两周坏掉的概率和预期损失、近 30 天故障次数",
+     "input_schema": _S()},
+    {"name": "failure_risk", "description": "某台设备的故障风险（威布尔失效率模型）：未来 hours 运行小时坏掉的概率、预期停机、预期损失，保养后的概率",
+     "input_schema": dict(_S(unit={"type": "string"}, hours={"type": "number"}), required=["unit"])},
+    {"name": "repairs_spares", "description": "开着的维修单、保养单和维修备件库存（对比最低库存）", "input_schema": _S()},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -920,6 +976,9 @@ class Rules:
             return "draft"
         if re.search(r"(\d+)\s*台.*?(\d{1,2})\s*月\s*(\d{1,2})\s*日", q) and re.search(r"订单|安排|接单|生产|交货|WQR", q):
             return "order"
+        if (re.search(r"MR-\d{5}|PM-\d{5}|IC-\d{5}", q) or re.search(r"保养|维修单|点检|备件|台账|失效|概率|MTBF|平均故障间隔|运行小时", q)) \
+                and not re.search(r"上门|派工|WQR105-", q):            # 客户现场的上门点检归客户与服务
+            return "maint"
         if re.search(r"SI-\d{5}|PTW-\d{5}", q) or re.search(r"安全(?!库存)|隐患|挂牌|上锁|作业许可|许可证|培训|危险源|事故|未遂|化学品|危废|废弃物|风险评估|可能性", q):
             return "safety"
         if re.search(r"CP-\d{5}", q) or re.search(r"投诉|召回|排查范围|同一?批|这批|装在谁|还装在|追溯", q):
@@ -967,6 +1026,8 @@ class Rules:
                      "先自己列出排查范围，再到指挥台里对照因果链。",
         "safety": "提示：打开“安全环保”页：隐患一栏看重大隐患和整改期限，作业许可一栏看谁挂着锁、谁缺资质。处理重大隐患前先做风险评估"
                   "（可能性 × 严重度），再到指挥台比较“立即停机 / 限时整改 / 停机 + 改派加班”三个方案的交期和花费。",
+        "maint": "提示：打开“设备维护”页的台账：看每台设备自上次保养运行了多少小时、离保养周期还差多少；点开一台看失效率曲线。"
+                 "自己用 F(t) = 1 − exp(−(t/η)^β) 算一算再运行两周坏掉的概率，乘上修理费和停机损失，再和保养的花费比。",
         "service": "提示：在“客户与服务”页的排班表里看 6 位工程师的空闲。同区域每人每天 2 单、跨区域 1 单；想一想：先修哪台、谁去、几天能做完、要带几件备件？",
     }
 
@@ -1197,6 +1258,46 @@ class Rules:
         if r["unplanned"]:
             out.append("还有 {} 台 21 天内排不进。".format(len(r["unplanned"])))
         out.append("这是估算，没有真的排班；排班表 [{}]。".format(r["page"]))
+        return "\n".join(out)
+
+    # ---- 设备维护（第 18 轮 E3）
+    def a_maint(self, q):
+        if self.student:
+            return self._hint("maint")
+        unit = find_machine(q)
+        if re.search(r"怎么|处理|方案|该不该", q) and (unit or re.search(r"保养", q)):
+            a = self.t.db.one("select id from anomaly where mode=%s and rule in ('M2','M4') and status in ('open','ack','doing') "
+                              "{} order by id desc limit 1".format("and subject_key=%s" if unit else ""), (self.t.mode, unit) if unit else (self.t.mode,))
+            if a:
+                return self.a_handle("A-{:05d} 怎么处理".format(a["id"]))
+        if unit and re.search(r"概率|风险|坏|失效", q):
+            r = self.t.failure_risk(unit)
+            if r.get("error"):
+                return r["error"]
+            return ("{}（{}）[{}]：自上次保养已运行 {:g} 小时（保养周期 {:g} 小时{}）。按失效率模型（β = {:g}，η = {:g} 小时），未来 {:g} 运行小时坏掉的概率 {:.1%}，"
+                    "预期停机 {:g} 分钟、预期损失 ${:,.0f}（修理 ${:,.0f} + 停机损失 ${:,.0f} 乘概率）；保养后同样时间里坏掉的概率 {:.1%}，一次保养约 ${:,.0f}。").format(
+                UNITS[unit][1], unit.upper(), r["ref"], r["run_h"], r["pm_h"], "，逾期 {:g} 小时".format(r["overdue_h"]) if r["overdue_h"] else "",
+                r["beta"], r["eta_h"], r["horizon_h"], r["p_fail"], r["expected_down_min"], r["expected_loss_usd"], r["repair_usd"], r["lost_usd"],
+                r["p_after_pm"], r["pm_usd"])
+        if re.search(r"维修单|备件|MR-|等件", q):
+            r = self.t.repairs_spares()
+            out = ["维修与备件 [{}]：开着的维修单 {} 张，保养单 {} 张。".format(r["page"], len(r["repairs"]), len(r["pms"]))]
+            for x in r["repairs"][:6]:
+                out.append("· {} [{}] {} {}（{}）".format(x["key"], x["ref"], x["unit"].upper(), x["title"], x["status_label"]))
+            out.append("备件：" + "；".join("{} [{}] 库存 {:g}（最低 {}）{}".format(x["item_code"], x["ref"], x["stock"], x["min"], "，不足" if x["stock"] < x["min"] else "")
+                                         for x in r["spares"]) + "。")
+            return "\n".join(out)
+        r = self.t.maint_overview()
+        k = r["kpis"]
+        out = ["设备维护 [{}]：保养逾期 {} 台，开着的维修单 {} 张，点检异常待处理 {} 条，近 7 天故障停机 {:g} 分钟。".format(
+            r["page"], k["overdue"], k["open_repairs"], k["open_inspections"], k["failure_down_7d"])]
+        for x in r["machines"][:6]:
+            out.append("· {} [{}] {}：已运行 {:g} / {:g} 小时{}，未来 {:g} 运行小时坏掉的概率 {:.1%}".format(
+                x["unit"].upper(), x["ref"], x["name"], x["run_h"], x["pm_h"], "，逾期 {:g} 小时".format(x["overdue_h"]) if x["overdue_h"] else "",
+                r["horizon_h"], x["p_fail"]))
+        a = self.t.db.one("select id from anomaly where mode=%s and rule in ('M2','M4') and status in ('open','ack','doing') order by id desc limit 1", (self.t.mode,))
+        if a:
+            out.append("保养时机的方案可以问：“A-{:05d} 怎么处理？”".format(a["id"]))
         return "\n".join(out)
 
     # ---- 安全环保（第 18 轮 E2）

@@ -318,7 +318,7 @@ def main():
     check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 2, "全厂态势 15 块，2 块待接入")
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
-    check(len(live) == 33 and not [x["id"] for x in live if x["error"]], "规则 33 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+    check(len(live) == 39 and not [x["id"] for x in live if x["error"]], "规则 39 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
 
     print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
     r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
@@ -385,6 +385,7 @@ def main():
     hub("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "reset"}, teacher)
     customer_and_service(teacher)
     safety(teacher)
+    maintenance(teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -545,6 +546,82 @@ def safety(teacher):
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 17 页：5 个任务，自动评 60 分")
     k = hub("GET", "/api/ehs/kpis", token=teacher)
     check(k["locked"] == 0 and "training_due" in k, "安全环保态势：开着的隐患 {}，挂锁 {} 台".format(k["open_issues"], k["locked"]))
+
+
+def maintenance(teacher):
+    """第 18 轮 E3：ERPNext 资产台账与维护计划；点检异常 → M3；保养逾期 → M2 → 保养工单（挂牌上锁）→ 做完 → 验收解锁 → 运行小时清零、
+    ERPNext 保养记录；维修单（挂牌上锁）→ ERPNext 资产维修 → 完成"""
+    print("15. 设备维护与资产（第 18 轮 E3）")
+    mnt = login("测试维修工", "maintenance")
+    unit, runit = "hob-01", "vmc-01"
+
+    def mach(u):
+        return next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == u)
+    rows = wait(lambda: (lambda a: a if all(x["asset"] for x in a) else None)(hub("GET", "/api/maint/assets", token=teacher)["assets"]),
+                "ERPNext 资产台账", 240, 4)
+    check(rows is not None and len(rows) == 13, "ERPNext 资产台账 13 台（{}）".format("、".join(x["asset"] for x in (rows or [])[:3])))
+    mts = erp_docs("Asset Maintenance")
+    check(len(mts) >= 13, "ERPNext 维护计划 {} 条".format(len(mts)))
+    d = hub("GET", "/api/maint/assets/" + unit, token=teacher)
+    check(d["maintenance"] is not None and d["risk"]["beta"] > 1, "台账详情：维护计划 {}，β={}".format((d["maintenance"] or {}).get("name"), d["risk"]["beta"]))
+    # 点检
+    items = hub("GET", "/api/maint/checklist/" + unit, token=mnt)["items"]
+    ic = hub("POST", "/api/maint/inspections", {"unit": unit, "results": [{"item": items[0], "ok": False, "note": "闭环测试"}]}, mnt)
+    m3 = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "M3" and unit.upper() in x["title"]), None), "点检异常 M3", 90, 3)
+    check(m3 is not None, "点检 {} 有异常 → 异常 M3：{}".format(ic["key"], (m3 or {}).get("title")))
+    hub("POST", "/api/maint/inspections/{}/watch".format(ic["id"]), {}, mnt)
+    # 保养逾期 → M2 → 保养工单
+    pm_h = d["risk"]["pm_h"]
+    hub("POST", "/api/lab18/inject", {"factor": 0, "unit": unit, "hours": pm_h + 200}, teacher)
+    m = wait(lambda: (lambda m: m if (m.get("run_h_pm") or 0) > pm_h else None)(mach(unit)), "车间运行小时拨到逾期", 60, 2)
+    check(m is not None, "车间里 {} 自上次保养运行 {} 小时（周期 {:g}）".format(unit.upper(), (m or {}).get("run_h_pm"), pm_h))
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "M2" and unit.upper() in x["title"]), None),
+              "保养逾期异常 M2", 90, 3)
+    check(an is not None, "异常 M2：{}".format((an or {}).get("title")))
+    if not an:
+        return
+    o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+    kinds = [x["kind"] for x in o["options"]]
+    check(o.get("maint") and kinds == ["none", "pm_now", "pm_later"], "保养时机三方案：{}；{}".format("、".join(x["label"] for x in o["options"]), o.get("reason")))
+    now = next(x for x in o["options"] if x["kind"] == "pm_now")
+    a = hub("POST", "/api/ont/actions", {"changes": now["changes"], "anomaly_id": an["id"], "snapshot_id": o["snapshot_id"]}, mnt)
+    dd = hub("POST", "/api/ont/actions/{}/approve".format(a["ids"][0]), {}, teacher)
+    check(dd["status"] == "done", "保养工单：{}".format((dd.get("result") or {}).get("text")))
+    m = wait(lambda: (lambda m: m if m.get("locked") and m["state"] == "down" else None)(mach(unit)), "保养挂牌上锁", 60, 2)
+    check(m is not None, "车间里 {} 停下保养，挂牌上锁 {}".format(unit.upper(), (m or {}).get("locked")))
+    pm = next((x for x in hub("GET", "/api/maint/repairs", token=teacher)["pms"] if x["unit"] == unit and x["status"] == "doing"), None)
+    check(pm is not None, "保养单 {}".format((pm or {}).get("key")))
+    if not pm:
+        return
+    hub("POST", "/api/maint/pms/{}/done".format(pm["id"]), {"note": "闭环测试：换油、清洁"}, teacher)
+    try:
+        hub("POST", "/api/maint/pms/{}/verify".format(pm["id"]), token=teacher)
+        check(False, "保养人不能验收自己的保养")
+    except RuntimeError as e:
+        check("403" in str(e), "保养人不能验收自己的保养")
+    hub("POST", "/api/maint/pms/{}/verify".format(pm["id"]), token=mnt)
+    m = wait(lambda: (lambda m: m if not m.get("locked") and m["state"] != "down" and (m.get("run_h_pm") or 0) < 5 else None)(mach(unit)),
+             "保养后解锁、运行小时清零", 60, 2)
+    check(m is not None, "{} 验收解锁，自上次保养回到 {} 小时".format(unit.upper(), (m or {}).get("run_h_pm")))
+    lg = wait(lambda: [x for x in erp_docs("Asset Maintenance Log") if x.get("maintenance_status") == "Completed"], "ERPNext 保养记录", 120, 3)
+    check(bool(lg), "ERPNext 保养记录 {}".format("、".join(x["name"] for x in (lg or [])[-2:])))
+    # 维修单
+    r = hub("POST", "/api/maint/repairs", {"unit": runit, "title": "闭环测试：主轴异响"}, mnt)
+    m = wait(lambda: (lambda m: m if m.get("locked") else None)(mach(runit)), "维修挂牌上锁", 60, 2)
+    check(m is not None, "维修单 {}：{} 挂牌上锁".format(r["key"], runit.upper()))
+    ar = wait(lambda: [x for x in erp_docs("Asset Repair") if r["key"] in (x.get("description") or "")], "ERPNext 资产维修单", 120, 3)
+    check(bool(ar), "ERPNext 资产维修 {}".format("、".join(x["name"] for x in (ar or []))))
+    hub("POST", "/api/maint/repairs/{}/done".format(r["id"]), {"note": "闭环测试：换轴承"}, mnt)
+    hub("POST", "/api/maint/repairs/{}/verify".format(r["id"]), token=teacher)                  # 维修工开单、修好，厂长验收
+    m = wait(lambda: (lambda m: m if not m.get("locked") else None)(mach(runit)), "维修后解锁", 60, 2)
+    check(m is not None, "{} 维修验收解锁".format(runit.upper()))
+    done = wait(lambda: [x for x in erp_docs("Asset Repair") if r["key"] in (x.get("description") or "") and x.get("repair_status") == "Completed"],
+                "ERPNext 资产维修完成", 120, 3)
+    check(bool(done), "ERPNext 资产维修改为完成")
+    st = hub("GET", "/api/lab18", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 18 页：5 个任务，自动评 60 分")
+    k = hub("GET", "/api/maint/kpis", token=teacher)
+    check("mtbf" in k and k["factor"] == 0, "设备维护态势：逾期 {} 台，未关维修单 {}".format(k["overdue"], k["open_repairs"]))
 
 
 if __name__ == "__main__":

@@ -503,7 +503,14 @@ def mount(app, H):
                        "起草停机挂牌整改，批准后车间里设备真的停下，维修工整改后验收解锁，最后看订单的实际影响。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab17",
             "guide_url": public_base(request) + "/api/cae/lab17/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab17/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab17/report-template.docx"}, {
+            "id": "lab18", "name": {"zh": "实验 18：设备维护策略——保养时机的决策", "en": "Lab 18: maintenance strategy and preventive-maintenance timing"},
+            "summary": "车间设备按威布尔失效率随机损坏，保养后复位。学生看设备台账和失效率曲线，手算保养逾期设备未来 80 运行小时坏掉的概率和预期损失；"
+                       "在指挥台比较“现在保养 / 下班后保养 / 不做”（比对模式）；起草保养工单，到时间挂牌上锁、维修工保养、验收解锁；"
+                       "运行一段时间后对比保养过与没保养的设备的故障记录，用故障记录估平均故障间隔。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab18",
+            "guide_url": public_base(request) + "/api/cae/lab18/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab18/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

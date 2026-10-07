@@ -57,6 +57,11 @@ def metrics(db, mode, ov, now):
         ek = EH.kpis(db, mode)
     except Exception:  # noqa: BLE001
         ek = None
+    try:                                    # 第 18 轮 E3：设备维护
+        from hub import maint as MT
+        mk = MT.kpis(db, mode)
+    except Exception:  # noqa: BLE001
+        mk = None
     M = {
         "strategy": [("oee", "全厂 OEE（今日）", ov["oee"]["value"], "pct"), ("output", "本周产量", (k.get("output") or {}).get("value"), "int")],
         "customer": [("satisfaction", "满意度（近 30 天，5 分制）", sk.get("satisfaction"), "num"),
@@ -81,7 +86,9 @@ def metrics(db, mode, ov, now):
                     ("response_h", "投诉平均响应（小时）", sk.get("response_h"), "num"),
                     ("first_fix", "一次修复率", sk.get("first_fix"), "pct"),
                     ("warranty_cost", "保修成本（近 30 天）", sk.get("warranty_cost"), "usd")],
-        "maintenance": [("down_min", "今日停机（分钟）", round(down_min), "int")],
+        "maintenance": [("down_min", "今日停机（分钟）", round(down_min), "int")] + ([
+            ("pm_overdue", "保养逾期的设备", mk["overdue"], "int"), ("open_repairs", "开着的维修单", mk["open_repairs"], "int"),
+            ("failure_down_7d", "近 7 天故障停机（分钟）", round(mk["failure_down_7d"]), "int"), ("mtbf", "平均故障间隔（小时）", mk["mtbf"], "num")] if mk else []),
         "ehs": [("open_issues", "开着的隐患（重大）", "{}（{}）".format(ek["open_issues"], ek["major_open"]), "text"),
                 ("on_time", "整改按期率（近 30 天）", ek["on_time"], "pct"),
                 ("locked", "挂牌上锁的设备", ek["locked"], "int"),

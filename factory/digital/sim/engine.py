@@ -17,6 +17,8 @@ import heapq
 import itertools
 import os
 import random
+
+from sim import reliability as REL
 import time
 from collections import deque
 
@@ -130,6 +132,9 @@ class Machine:
         self.tool_life = 1.0
         self.last_status = None
         self.locked = None        # 第 18 轮 E2：挂牌上锁的许可证号（挂着锁不能复位、不会自动恢复）
+        rp = REL.params(unit)      # 第 18 轮 E3：自上次保养以来的运行小时（情景开始时已经用了一阵）
+        self.run_h = float(rp["init_h"]) if rp else 0.0
+        self.fail_mode = None
 
 
 class AGV:
@@ -164,6 +169,9 @@ class Engine:
         self.calendar = Calendar(tz=os.environ.get("WQ_TZ", "America/New_York"))
         self._shift_wait = {}                    # 设备 → 已排好的开工时刻（仿真秒）
         self.outsourced_done = []                # 外协回厂即完工的件：(时刻, 工单, 序列号)
+        # 第 18 轮 E3：可靠性系数（0 关闭；1 正常；5 加速）。随机故障用单独的随机数，不影响原来的加工节拍和误差
+        self.rel_factor = 0.0
+        self.rel_rng = random.Random((seed or 0) * 7919 + 17)
 
     # ------------------------------------------------------------ 基础
     def now(self):
@@ -302,6 +310,20 @@ class Engine:
             job.started = False
             self._status(m)
             return True, "当前件做完后暂停"
+        if cmd == "pm_done":                   # 第 18 轮 E3：保养做完，运行小时清零
+            m.run_h = 0.0
+            m.fail_mode = None
+            self._status(m, force=True)
+            return True, "保养完成，运行小时清零"
+        if cmd == "set_run_h":                 # 教学：老师把运行小时往前拨（模拟保养逾期）
+            if self.mode != "teach":
+                return False, "生产模式不接受"
+            m.run_h = max(0.0, float(d.get("hours", 0)))
+            self._status(m, force=True)
+            return True, "运行小时设为 {:g}".format(m.run_h)
+        if cmd == "set_reliability":
+            self.set_reliability(d.get("factor", 1))
+            return True, "可靠性系数 {:g}".format(self.rel_factor)
         if cmd == "lockout":                   # 第 18 轮 E2：挂牌上锁（生产、教学都接受）：停机，直到 unlock
             permit = str(d.get("permit") or "LOTO")
             minutes = max(1.0, float(d.get("minutes", 120)))
@@ -569,7 +591,31 @@ class Engine:
             m.setup_until = t + dur
             m.state = "setup"
             self.at(m.setup_until, "setup_done", unit=unit)
+        self._age(m, t, ct / 3600.0 / max(1, m.capacity))
         self._try_start(m)
+
+    # ------------------------------------------------------------ 可靠性（第 18 轮 E3）
+    def set_reliability(self, factor):
+        self.rel_factor = max(0.0, min(10.0, float(factor)))
+
+    def _age(self, m, t, dt_h):
+        """运行小时累加；可靠性打开时按威布尔条件概率抽签，坏了就按故障模式停机（平均修复时间附近随机）"""
+        rp = REL.params(m.unit)
+        if not rp or dt_h <= 0:
+            return
+        t0 = m.run_h
+        m.run_h += dt_h
+        f = self.rel_factor
+        if f <= 0 or m.state in ("down", "fault"):
+            return
+        p = REL.cond_fail(t0 * f, dt_h * f, rp["beta"], rp["eta_h"])
+        if self.rel_rng.random() >= p:
+            return
+        code, name, part = self.rel_rng.choice(rp["modes"])
+        dur = rp["mttr_min"] * 60 * self.rel_rng.uniform(0.6, 1.6)
+        m.fail_mode = code
+        self._go_down(m, t, dur, "故障：" + name, "fault",
+                      extra={"failure": code, "failure_name": name, "part": part, "run_h_pm": round(m.run_h, 1)})
 
     def _torque_log(self, p, job, corr):
         """跑合试验台每做完一台，发一条输出轴转矩记录（第 11 轮疲劳寿命用）"""
@@ -591,14 +637,14 @@ class Engine:
         return result
 
     # ------------------------------------------------------------ 停机
-    def _go_down(self, m, t, dur_s, reason, kind="down"):
+    def _go_down(self, m, t, dur_s, reason, kind="down", extra=None):
         m.state = kind
         m.down_reason, m.down_kind = reason, kind
         m.down_until = t + dur_s
         m.down_since = t
         self.pub(unit_topic(m.unit, "event"), "machine.event", "sim/" + m.unit,
-                 {"event": "fault" if kind == "fault" else "alarm", "code": "E-" + m.unit.upper(),
-                  "message": reason, "expected_duration_s": dur_s, "factory_ts": self.factory_ts(t)}, None)
+                 dict({"event": "fault" if kind == "fault" else "alarm", "code": "E-" + m.unit.upper(),
+                       "message": reason, "expected_duration_s": dur_s, "factory_ts": self.factory_ts(t)}, **(extra or {})), None)
         self.at(m.down_until, "recover", unit=m.unit, until=m.down_until)
         self._status(m, force=True)
 
@@ -727,6 +773,7 @@ class Engine:
             "tool_life_left": round(m.tool_life, 3),
             "reason": m.down_reason if m.state in ("down", "fault") else None,
             "locked": m.locked,
+            "run_h_pm": round(m.run_h, 1),
             "down_until_s": round(m.down_until - t) if m.down_until else None,
             "down_for_s": round(t - m.down_since) if m.state in ("down", "fault") else None,
             "dispatched": [{"work_order": j.wo.name, "operation": j.op, "started": j.started,
@@ -770,7 +817,7 @@ class Engine:
                            "active": [[tk, p.wo.name, p.serial, j.op_index, st, en] for tk, (p, j, st, en) in m.active.items()],
                            "state": m.state, "setup_until": m.setup_until, "setup_job": list(m.setup_job) if m.setup_job else None,
                            "down_until": m.down_until, "down_reason": m.down_reason, "down_kind": m.down_kind,
-                           "down_since": getattr(m, "down_since", None), "tool_life": m.tool_life, "locked": m.locked,
+                           "down_since": getattr(m, "down_since", None), "tool_life": m.tool_life, "locked": m.locked, "run_h": m.run_h,
                            "last_status": list(m.last_status) if m.last_status else None}
         agvs = {}
         for u, a in self.agvs.items():
@@ -782,7 +829,7 @@ class Engine:
         return {"v": 1, "t": t, "epoch": self.epoch.isoformat(), "factory_now": self.factory_dt(t).isoformat(), "mode": self.mode,
                 "auto_start": self.auto_start, "status_every_s": self.status_every_s,
                 "rng": [rs[0], list(rs[1]), rs[2]], "err_rng": [es[0], list(es[1]), es[2]],
-                "err_active": self.errors.active, "tokens": tok, "seq": sq, "calendar": self.calendar.to_dict(),
+                "err_active": self.errors.active, "tokens": tok, "rel_factor": self.rel_factor, "seq": sq, "calendar": self.calendar.to_dict(),
                 "shift_wait": self._shift_wait, "wos": wos, "machines": machines, "agvs": agvs,
                 "transfers": [[p.wo.name, p.serial, f, to] for p, f, to in self.transfers],
                 "queue": [[qt, qs, k, pl] for qt, qs, k, pl in sorted(self.q)]}
@@ -830,6 +877,8 @@ class Engine:
             if x.get("down_since") is not None:
                 m.down_since = x["down_since"]
             m.locked = x.get("locked")
+            if x.get("run_h") is not None:
+                m.run_h = x["run_h"]
             m.last_status = tuple(x["last_status"]) if x.get("last_status") else None
         for u, x in s["agvs"].items():
             a = e.agvs[u]

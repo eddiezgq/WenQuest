@@ -51,8 +51,10 @@ CHANGE_TYPES = {
     "urgent_purchase": "紧急采购", "outsource": "外协", "split_delivery": "分批交货",
     "breakdown": "假设停机",            # 第 17 轮 D 期：只用于推演（AI 代理、复盘），不能变成动作
     "lockout": "停机挂牌整改",          # 第 18 轮 E2：重大隐患（可延后：先临时防护，delay_minutes 后停）
+    "pm_order": "保养（停机挂牌）",     # 第 18 轮 E3：和停机挂牌一样推演，费用按保养人工算
 }
-RECTIFY_RATE = 45.0               # 安全整改人工（美元 / 小时）
+RECTIFY_RATE = 45.0               # 安全整改 / 保养人工（美元 / 小时）
+PM_MATERIAL = 80.0                # 一次保养的油、脂、滤芯（美元）
 OT_RATE = 1.5                     # 加班费倍数
 EXPEDITE_COST = 300.0             # 维修加急默认费用（美元，可在改动里改）
 URGENT_PCT = 0.15                 # 紧急采购加急费：货值的 15%
@@ -285,7 +287,7 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
                 eng._go_down(m, clock.now(), mins * 60, c.get("reason") or "假设停机", "down")
             applied.append(c)
             continue
-        if typ == "lockout":
+        if typ in ("lockout", "pm_order"):
             m = eng.machines.get(str(c.get("unit") or "").lower())
             mins = float(c.get("minutes") or 0)
             delay = float(c.get("delay_minutes") or 0)
@@ -300,10 +302,14 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
             # 推演里整改按时做完：到时自动解锁
             eng.at(clock.now() + (delay + mins) * 60 + 1, "unlock_due", unit=m.unit)
             applied.append(c)
-            costs.append({"what": "安全整改人工 {:.0f} 分钟".format(mins), "usd": round(mins / 60 * RECTIFY_RATE, 2)})
+            if typ == "pm_order":
+                costs.append({"what": "保养人工 {:.0f} 分钟、油脂滤芯".format(mins), "usd": round(mins / 60 * RECTIFY_RATE + PM_MATERIAL, 2)})
+            else:
+                costs.append({"what": "安全整改人工 {:.0f} 分钟".format(mins), "usd": round(mins / 60 * RECTIFY_RATE, 2)})
             if delay > 0 and c.get("temp_cost"):
                 costs.append({"what": "临时防护、专人看守", "usd": float(c["temp_cost"])})
-            checks.append({"ok": True, "text": "{} {}停机挂牌，整改 {:.0f} 分钟".format(m.unit.upper(), "{:.0f} 分钟后".format(delay) if delay else "立即", mins)})
+            checks.append({"ok": True, "text": "{} {}停机挂牌，{} {:.0f} 分钟".format(m.unit.upper(), "{:.0f} 分钟后".format(delay) if delay else "立即",
+                                                                          "保养" if typ == "pm_order" else "整改", mins)})
             continue
         if typ == "overtime":
             if cal.mode != "shift":

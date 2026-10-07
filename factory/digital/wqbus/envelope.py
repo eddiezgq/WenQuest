@@ -46,7 +46,9 @@ DATA_SCHEMAS = {
                                 # 第 17 轮 C 期：班次日历、快照，以及动作执行器用的改派、调序、维修加急
                                 "set_calendar", "snapshot", "reassign", "reorder", "expedite_repair", "outsource",
                                 # 第 18 轮 E2：挂牌上锁、解锁
-                                "lockout", "unlock"]},
+                                "lockout", "unlock",
+                                # 第 18 轮 E3：保养完成、可靠性系数
+                                "pm_done", "set_reliability", "set_run_h"]},
         "qty": {"type": "integer", "minimum": 1}}),
     "machine.ack": _obj(["accepted"], {"accepted": {"type": "boolean"}}),
     # 第 17 轮 C 期：仿真车间的完整状态快照（推演用），主题 wq/gearbox/machining/sim/snapshot

@@ -429,6 +429,19 @@ def for_anomaly(c, a):
             g = Chain(c, "none")
             g.summary.append("这张投诉没有设备序列号，追不到出厂数据；先联系客户确认设备铭牌")
             return g
+        if rule in ("M2", "M3", "M4", "M5", "M6") and (v.get("unit") or st == "Machine"):    # 第 18 轮 E3：保养 / 点检 / 维修 → 设备 → 工单 → 订单
+            unit = v.get("unit") or sk
+            g = chain_down(c, unit)
+            m = next((x for x in c.ov["machines"] if x["unit"] == unit), None) or {}
+            state = {"run": "在运转", "idle": "空闲", "setup": "在调整", "down": "停机", "fault": "故障"}.get(m.get("state"), m.get("state") or "—")
+            if g.summary:
+                extra = ""
+                if v.get("p_fail") is not None:
+                    extra = "；未来一周坏掉的概率 {:.0%}".format(v["p_fail"])
+                if v.get("overdue_h"):
+                    extra = "；保养逾期 {:.0f} 运行小时".format(v["overdue_h"]) + extra
+                g.summary[0] = "{} 现在{}{}；如果停下来，影响下面这些工单和订单".format(unit.upper(), state, extra)
+            return g
         if rule in ("E1", "E2", "E5") and (v.get("unit") or st == "Machine"):   # 第 18 轮 E2：隐患 / 违规 → 设备 → 工单 → 订单
             unit = v.get("unit") or sk
             g = chain_down(c, unit)

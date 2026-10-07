@@ -7,6 +7,8 @@
 import datetime as dt
 import re
 
+from wqbus import UNITS
+
 
 def _date(v):
     return str(v)[:10] if v else None
@@ -154,6 +156,29 @@ def erp_doc(B, mode, seq, ts, msg, ctx):
         serial = d.get("wq_serial") or d.get("serial")
         if serial:
             B.link(mode, "ServiceOrder", name, "unit", serial, seq=seq, ts=ts)
+    elif dt_ == "Asset":                                  # 第 18 轮 E3：资产维护模块
+        B.obj(mode, "Asset", name, {"name": d.get("asset_name"), "purchase_date": _date(d.get("purchase_date")),
+                                    "value": d.get("net_purchase_amount")}, seq, ts, ev, txt)
+        unit = str(d.get("asset_name") or "").split(" ")[0].lower()
+        if unit in UNITS:
+            B.link(mode, "Asset", name, "machine", unit, seq=seq, ts=ts)
+    elif dt_ == "Asset Maintenance":
+        t = (d.get("asset_maintenance_tasks") or [{}])[0]
+        B.obj(mode, "MaintenancePlan", name, {"interval_h": t.get("wq_interval_h"), "next_due": _date(t.get("next_due_date")),
+                                              "task": t.get("maintenance_task")}, seq, ts, ev, txt)
+        unit = str(name).split(" ")[0].lower()
+        if unit in UNITS:
+            B.link(mode, "MaintenancePlan", name, "machine", unit, seq=seq, ts=ts)
+    elif dt_ == "Asset Maintenance Log":
+        mt = d.get("asset_maintenance") or ""
+        unit = str(mt).split(" ")[0].lower()
+        if unit in UNITS and d.get("maintenance_status") == "Completed":
+            B.event(mode, "Machine", unit, ts, "maint.pm", "保养完成：{}（ERPNext {}）".format(d.get("task_name") or "", name), seq)
+    elif dt_ == "Asset Repair":
+        B.obj(mode, "RepairOrder", name, {"status": d.get("repair_status"), "description": d.get("description")}, seq, ts, ev, txt)
+        a = next((x for x in [d.get("asset")] if x), None)
+        if a:
+            B.link(mode, "RepairOrder", name, "asset", a, seq=seq, ts=ts)
     elif dt_ == "Customer":
         B.obj(mode, "Customer", name, {"name": name}, seq, ts, ev, txt)
     elif dt_ == "Supplier":

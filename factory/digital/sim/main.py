@@ -47,9 +47,13 @@ class Service:
     def _publish(self, tp, type_, source, data, corr, ts=None):
         self.bus.publish(tp, type_, source, data, corr=corr, ts=ts)
 
-    def _new_engine(self, speed=None):
-        return Engine(lambda tp, ty, src, d, corr: self._publish(tp, ty, src, d, corr), Clock(speed or self.speed),
-                      mode=self.mode, auto_start=self.auto)
+    def _new_engine(self, speed=None, reliability=None):
+        eng = Engine(lambda tp, ty, src, d, corr: self._publish(tp, ty, src, d, corr), Clock(speed or self.speed),
+                     mode=self.mode, auto_start=self.auto)
+        # 第 18 轮 E3：教学模式默认“会坏”（可靠性 1，老师可调）；生产模式不模拟故障；载入情景时关闭
+        if self.mode == "teach":
+            eng.set_reliability(float(os.environ.get("WQ_SIM_RELIABILITY", "1")) if reliability is None else reliability)
+        return eng
 
     def sim_command(self, data, corr):
         cmd = data.get("command")
@@ -69,6 +73,9 @@ class Service:
             return True, "班次：{}".format("按班次" if cal.mode == "shift" else "24 小时连续")
         if self.mode != "teach":
             return False, "生产模式下不能控制仿真器"
+        if cmd == "set_reliability":            # 第 18 轮 E3：老师调可靠性（0 关、1 正常、5 加速）
+            self.eng.set_reliability(data.get("factor", 1))
+            return True, "可靠性系数 {:g}".format(self.eng.rel_factor)
         if cmd == "set_speed":
             sp = float(data.get("speed", 20))
             if not 0.1 <= sp <= 600:
@@ -78,7 +85,7 @@ class Service:
             return True, "倍速已改为 {:g}".format(sp)
         if cmd == "load_scenario":
             speed = float(data.get("speed", 1))
-            self.eng = self._new_engine(speed)
+            self.eng = self._new_engine(speed, reliability=0)
             t = scenario.load(self.eng, self._publish, tz=self.tz)
             self.eng.clock = Clock(speed)
             self.eng.clock.t0_sim = t

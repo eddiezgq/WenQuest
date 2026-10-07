@@ -39,6 +39,10 @@
         <template v-if="d.service"><h3>客户与服务</h3>
           <p class="small">新投诉 {{ d.service.new_complaints }} 张、开着 {{ d.service.open_complaints }} 张 · 完成服务 {{ d.service.jobs_done }} 单、待上门 {{ d.service.open_jobs }} 单 ·
             满意度 {{ d.service.satisfaction ?? '—' }} · 平均响应 {{ d.service.response_h ?? '—' }} 小时 · 保修成本 ${{ Math.round(d.service.warranty_cost || 0).toLocaleString() }}</p></template>
+        <template v-if="d.maint"><h3>设备维护</h3>
+          <p class="small">故障 {{ d.maint.failures }} 次（停机 {{ d.maint.failure_down_min }} 分钟）· 完成保养 {{ d.maint.pms_done }} 次 · 保养逾期 {{ d.maint.overdue }} 台
+            {{ d.maint.overdue_units?.length ? '（' + d.maint.overdue_units.map((u) => u.toUpperCase()).join('、') + '）' : '' }} · 开着的维修单 {{ d.maint.open_repairs }} 张 ·
+            平均故障间隔 {{ d.maint.mtbf ?? '—' }} 小时</p></template>
         <template v-if="d.ehs"><h3>安全环保</h3>
           <p class="small">新隐患 {{ d.ehs.new_issues }} 条（重大 {{ d.ehs.new_major }}）· 整改关闭 {{ d.ehs.closed }} 条 · 还开着 {{ d.ehs.open_issues }} 条（重大 {{ d.ehs.major_open }}、逾期 {{ d.ehs.overdue }}）·
             挂牌上锁 {{ d.ehs.locked }} 台 · 培训 30 天内到期 {{ d.ehs.training_due }} 项 · 近 30 天未遂 {{ d.ehs.near_miss_30d }} 起</p></template>

@@ -112,6 +112,7 @@ def tables(B, db, mode):
     agent_objs(B, db, mode)
     service_objs(B, db, mode)
     ehs_objs(B, db, mode)
+    maint_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -310,6 +311,31 @@ def ehs_objs(B, db, mode):
     for r in db.q("select * from waste where mode=%s and produced_day > now() - interval '365 days'", (mode,)):
         B.obj(mode, "Waste", "W-{:05d}".format(r["id"]), {"kind": EH.WASTES.get(r["kind"], (r["kind"],))[0], "qty_kg": float(r["qty_kg"]),
                                                           "disposed_by": r["disposed_by"]})
+
+
+def maint_objs(B, db, mode):
+    """设备维护（第 18 轮 E3）：点检、故障记录、平台维修单、备件、保养计划的运行小时"""
+    if not db.one("select to_regclass('maint_repair') is not null as ok")["ok"]:
+        return
+    from hub import maint as MT
+    for r in db.q("select * from maint_inspection where mode=%s and at > now() - interval '90 days'", (mode,)):
+        k = "IC-{:05d}".format(r["id"])
+        B.obj(mode, "Inspection", k, {"result": "异常：" + "、".join(x["item"] for x in r["abnormal"]) if r["abnormal"] else "正常",
+                                      "at": _ts(r["at"]), "by": r["by_name"]}, ts=_ts(r["at"]), upd_ts=_now(), text="点检")
+        B.link(mode, "Inspection", k, "machine", r["unit"])
+    for r in db.q("select * from maint_failure where mode=%s and at > now() - interval '365 days'", (mode,)):
+        k = "FL-{:05d}".format(r["id"])
+        B.obj(mode, "FailureRecord", k, {"mode": r["name"], "cause": r["code"], "down_min": float(r["down_min"] or 0),
+                                         "run_h": float(r["run_h"]) if r["run_h"] is not None else None}, ts=_ts(r["at"]), upd_ts=_now(), text="故障")
+        B.link(mode, "FailureRecord", k, "machine", r["unit"])
+    for r in db.q("select * from maint_repair where mode=%s and created_at > now() - interval '365 days'", (mode,)):
+        k = "MR-{:05d}".format(r["id"])
+        B.obj(mode, "RepairOrder", k, {"status": MT.STATUS.get(r["status"]), "description": r["title"],
+                                       "cost": sum((r["cost"] or {}).values()) if r["cost"] else None}, ts=_ts(r["created_at"]), upd_ts=_now(), text="维修单")
+        B.link(mode, "RepairOrder", k, "machine", r["unit"])
+    for code, lo in MT.SPARE_MIN.items():
+        B.obj(mode, "SparePart", code, {"stock": MT.stock_of(db, mode, code), "min_stock": lo})
+        B.link(mode, "SparePart", code, "item", code)
 
 
 def twin(B, db, mode):

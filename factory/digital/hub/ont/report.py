@@ -128,6 +128,16 @@ def build(db, mode, kind, start, end):
                        "overdue": ek["overdue"], "locked": ek["locked"], "training_due": ek["training_due"], "near_miss_30d": ek["near_miss_30d"]}
     except Exception:  # noqa: BLE001
         data["ehs"] = None
+    # ---- 设备维护（第 18 轮 E3）
+    try:
+        from hub import maint as MT
+        mk = MT.kpis(db, mode)
+        nf = db.one("select count(*) as n, coalesce(sum(down_min),0) as m from maint_failure where mode=%s and at >= %s and at < %s", (mode, start, end))
+        pm = db.one("select count(*) as n from maint_pm where mode=%s and fixed_at >= %s and fixed_at < %s", (mode, start, end))["n"]
+        data["maint"] = {"failures": nf["n"], "failure_down_min": float(nf["m"] or 0), "pms_done": pm, "overdue": mk["overdue"],
+                         "overdue_units": mk["overdue_units"], "open_repairs": mk["open_repairs"], "mtbf": mk["mtbf"]}
+    except Exception:  # noqa: BLE001
+        data["maint"] = None
     # ---- 今天（本周）要关注的 3 件
     focus = []
     for a in still:
@@ -206,6 +216,11 @@ def text_of(kind, data):
     if eh and (eh["new_issues"] or eh["open_issues"] or eh["locked"]):
         lines.append("安全环保：新隐患 {} 条（重大 {}）、整改关闭 {} 条，还开着 {} 条（重大 {}、逾期 {}）；挂牌上锁 {} 台。".format(
             eh["new_issues"], eh["new_major"], eh["closed"], eh["open_issues"], eh["major_open"], eh["overdue"], eh["locked"]))
+    mt = data.get("maint")
+    if mt and (mt["failures"] or mt["overdue"] or mt["open_repairs"] or mt["pms_done"]):
+        lines.append("设备维护：故障 {} 次（停机 {:g} 分钟），完成保养 {} 次；保养逾期 {} 台{}，开着的维修单 {} 张。".format(
+            mt["failures"], mt["failure_down_min"], mt["pms_done"], mt["overdue"],
+            "（{}）".format("、".join(u.upper() for u in mt["overdue_units"])) if mt["overdue_units"] else "", mt["open_repairs"]))
     if data["risk_orders"]:
         lines.append("交付风险：" + "；".join("{} {}".format(o["name"], o["risk"]) for o in data["risk_orders"]) + "。")
     if data["retros"]:

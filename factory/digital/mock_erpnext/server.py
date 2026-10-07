@@ -48,12 +48,26 @@ REQUIRED = {
     "Quotation Item": ["item_code", "qty"],
     "Contract": ["party_type", "party_name", "contract_terms"],
     "Issue": ["subject"],
+    # 第 18 轮 E3：资产维护模块（必填与真 ERPNext v16 一致）
+    "Asset": ["asset_name", "item_code", "company", "location", "purchase_date", "asset_category", "available_for_use_date", "net_purchase_amount"],
+    "Asset Category": ["asset_category_name", "accounts"],
+    "Asset Category Account": ["company_name", "fixed_asset_account"],
+    "Asset Maintenance": ["asset_name", "company", "maintenance_team", "asset_maintenance_tasks"],
+    "Asset Maintenance Task": ["maintenance_task", "maintenance_status", "start_date", "periodicity"],
+    "Asset Maintenance Team": ["maintenance_team_name", "company", "maintenance_team_members"],
+    "Maintenance Team Member": ["team_member", "maintenance_role"],
+    "Asset Maintenance Log": ["maintenance_status", "due_date", "description", "task_name", "task_assignee_email"],
+    "Asset Repair": ["failure_date", "asset"],
+    "Location": ["location_name"],
 }
 SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d}", "Job Card": "PO-JOB{n:05d}",
           "Material Request": "MAT-MR-{y}-{n:05d}", "Quality Inspection": "MAT-QA-{y}-{n:05d}",
           "Stock Entry": "MAT-STE-{y}-{n:05d}", "Purchase Order": "PUR-ORD-{y}-{n:05d}",
           "Lead": "CRM-LEAD-{y}-{n:05d}", "Opportunity": "CRM-OPP-{y}-{n:05d}", "Quotation": "SAL-QTN-{y}-{n:05d}",
-          "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}"}
+          "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
+          "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}"}
+BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
+            "Location": "location_name"}
 
 
 def now_str():
@@ -97,6 +111,11 @@ class Mock:
             for p in params:
                 self.put("Quality Inspection Parameter", {"name": p["parameter"], "parameter": p["parameter"]})
         self.put("User", {"name": "Administrator"})
+        # 第 18 轮 E3：资产要用的科目、角色（真 ERPNext 的标准科目表里有）
+        self.put("Account", {"name": "Plants and Machineries - " + ABBR, "account_type": "Fixed Asset", "is_group": 0, "company": COMPANY})
+        for r in ("Maintenance Manager", "Maintenance User", "System Manager"):
+            self.put("Role", {"name": r})
+        self.put("Item Group", {"name": "Products", "is_group": 0})
         self.put("UOM", {"name": "Nos"})
         for u in ("Kg", "Litre"):
             self.put("UOM", {"name": u})
@@ -144,6 +163,8 @@ class Mock:
             return doc["customer_name"]
         if dt_ == "Custom Field":
             return "{}-{}".format(doc.get("dt"), doc.get("fieldname"))
+        if dt_ in BY_FIELD and doc.get(BY_FIELD[dt_]):
+            return doc[BY_FIELD[dt_]]
         return doc.get("name") or uuid.uuid4().hex[:10]
 
     # ------------------------------------------------------------ 校验
@@ -440,6 +461,11 @@ def create(doctype: str, body: dict = Body(...)):
     doc = {k: v for k, v in body.items() if k != "doctype"}
     M.validate(doctype, doc, "新建 " + doctype)
     doc["name"] = M.name_for(doctype, doc)
+    for v in doc.values():                     # 子表的每一行有自己的 name（真 ERPNext 一样）
+        if isinstance(v, list):
+            for row in v:
+                if isinstance(row, dict):
+                    row.setdefault("name", uuid.uuid4().hex[:10])
     submit = int(doc.get("docstatus", 0)) == 1
     doc["docstatus"] = 0
     if doctype == "Sales Order":

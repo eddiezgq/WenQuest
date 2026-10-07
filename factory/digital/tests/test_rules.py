@@ -410,3 +410,67 @@ def test_E7_hazardous_waste_over_90_days():
           {"id": 2, "kind": "rags", "qty_kg": 10, "produced_day": d0 - dt.timedelta(days=30)}]
     f = run("E7", _edb(wastes=ws))
     assert [x.fkey for x in f] == ["W-00001"] and f[0].values["age_days"] == 95
+
+
+# ---------------------------------------------------------------- 第 18 轮 E3：设备维护与资产
+def _mdb(state=None, inspections=(), repairs=(), bins=None, fails=None):
+    fails = fails or {}
+
+    def nfail(a):
+        if len(a) == 1:
+            return [{"n": fails.get("recent", 0)}]
+        return [{"n": fails.get("before" if len(a) == 3 else "recent", 0)}]
+    tables = [("to_regclass", lambda a: [{"ok": True}]),
+              ("from maint_sim", lambda a: [{"state": state}] if state is not None else []),
+              ("from maint_inspection where", lambda a: list(inspections)),
+              ("from maint_repair where", lambda a: list(repairs)),
+              ("from maint_failure where", nfail)]
+    db = FakeDB(docs={"Bin": bins or []}, tables=tables)
+    db._maint_ready = True
+    return db
+
+
+def test_M2_pm_overdue():
+    ov = {"machines": [mach("grd-01", run_h_pm=650), mach("hob-01", run_h_pm=100), mach("saw-01")]}
+    f = run("M2", _mdb(), ov=ov)
+    assert [x.fkey for x in f] == ["grd-01"] and f[0].values["overdue_h"] == 150 and 0 < f[0].values["p_fail"] < 1
+    f = run("M2", _mdb({"interval": {"grd-01": 700}}), ov=ov)                     # 保养周期改长以后不算逾期
+    assert f == []
+
+
+def test_M3_inspection_abnormal():
+    ins = [{"id": 4, "unit": "grd-01", "by_name": "王强", "note": "", "abnormal": [{"item": "没有异响、异常振动", "ok": False}]}]
+    f = run("M3", _mdb(inspections=ins))
+    assert [x.fkey for x in f] == ["IC-00004"] and "异响" in f[0].title and f[0].subject == ("Machine", "grd-01")
+
+
+def test_M4_failure_risk():
+    ov = {"machines": [mach("grd-01", run_h_pm=700), mach("hob-01", run_h_pm=10), mach("ht-01", "down", run_h_pm=5000)]}
+    assert run("M4", _mdb(), ov=ov) == []                                       # 700 小时约 17%，没到 20%
+    ov["machines"][0]["run_h_pm"] = 1300
+    f = run("M4", _mdb(), ov=ov)
+    assert [x.fkey for x in f] == ["grd-01"] and f[0].severity == "critical"    # 停着的设备不报
+    ov["machines"][0]["run_h_pm"] = 850
+    assert run("M4", _mdb(), ov=ov)[0].severity == "warn"
+
+
+def test_M5_repair_parts_short():
+    reps = [{"id": 1, "unit": "grd-01", "title": "主轴轴承", "status": "waiting_parts", "parts": [{"item_code": "BRG-6207", "qty": 2}]},
+            {"id": 2, "unit": "hob-01", "title": "润滑", "status": "doing", "parts": [{"item_code": "BRG-6205", "qty": 1}]}]
+    bins = [{"name": "b1", "item_code": "BRG-6207", "actual_qty": 1}, {"name": "b2", "item_code": "BRG-6205", "actual_qty": 6}]
+    f = run("M5", _mdb(repairs=reps, bins=bins))
+    assert [x.fkey for x in f] == ["MR-00001"] and ("Item", "BRG-6207") in f[0].about
+
+
+def test_M6_repair_overdue():
+    reps = [{"id": 1, "unit": "grd-01", "title": "x", "status": "doing", "started_at": NOW - dt.timedelta(minutes=40), "created_at": NOW},
+            {"id": 2, "unit": "grd-01", "title": "y", "status": "doing", "started_at": NOW - dt.timedelta(minutes=20), "created_at": NOW}]
+    f = run("M6", _mdb(repairs=reps))                                            # 480 × 2 ÷ 30 = 32 分钟
+    assert [x.fkey for x in f] == ["MR-00001"]
+
+
+def test_M7_mtbf_drop():
+    assert run("M7", _mdb(fails={"recent": 2, "before": 1})) == []               # 不到 3 次不报
+    f = run("M7", _mdb(fails={"recent": 6, "before": 2}))
+    assert len(f) == 1 and f[0].values["mtbf"] == 80 and f[0].values["before"] == 240
+    assert run("M7", _mdb(fails={"recent": 3, "before": 3})) == []

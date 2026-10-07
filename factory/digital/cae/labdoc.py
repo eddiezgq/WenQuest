@@ -14,7 +14,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab14": os.path.join(HERE, "实验14_减速器风扇冷却的流体与传热分析.md"),
           "lab15": os.path.join(HERE, "实验15_车间异常的追因推演与决策.md"),
           "lab16": os.path.join(HERE, "实验16_客户投诉的追溯召回与服务决策.md"),
-          "lab17": os.path.join(HERE, "实验17_安全隐患的识别评估与停机决策.md")}
+          "lab17": os.path.join(HERE, "实验17_安全隐患的识别评估与停机决策.md"),
+          "lab18": os.path.join(HERE, "实验18_设备维护策略保养时机的决策.md")}
 
 
 def _doc():
@@ -114,6 +115,8 @@ def report_template_docx(lab="lab8"):
         return lab16_template()
     if lab == "lab17":
         return lab17_template()
+    if lab == "lab18":
+        return lab18_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -637,6 +640,54 @@ def lab17_template():
            ["车间停机（许可证号）", "", "", "PTW-"], ["整改完成", "", "", ""], ["验收关闭、解锁", "", "", ""], ["订单的实际影响", "", "", ""]])
     d.add_heading("六、结论与讨论", 1)
     hint("限时整改什么时候可以接受？安全为什么不和交期、成本放在同一个天平上？挂牌上锁为什么要“两个人”？")
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab18_template():
+    """实验 18 报告模板（第 18 轮 E3-9）"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 18　设备维护策略：保养时机的决策　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、手算故障概率（任务 1）", 1)
+    table([["项目", "记录"], ["设备、保养周期", ""], ["β、η、可靠性系数 k", ""], ["自上次保养运行 t（小时）", ""],
+           ["((t+80)k/η)^β − (tk/η)^β", ""], ["未来 80 运行小时坏掉的概率 P", ""], ["修理费 + 停机损失", ""], ["预期损失 = P × 损失", ""],
+           ["一次保养的花费", ""]])
+    hint("写出每一步的数，和平台算的比较。")
+    d.add_heading("二、三个方案（任务 2）", 1)
+    table([["方案", "什么时候停、停多久", "订单预计交付 / 晚几天", "确定的花费", "预期故障损失", "合计"], ["A 不做（对照）", "", "", "", "", ""],
+           ["B 现在保养", "", "", "", "", ""], ["C 下班后保养", "", "", "", "", ""]])
+    d.add_heading("三、我的选择与中枢的建议", 1)
+    table([["项目", "记录"], ["选的方案", ""], ["理由（概率、损失、花费、交期）", ""], ["中枢建议的方案与理由", ""], ["一样吗？不一样时谁更合理", ""],
+           ["AI 助手怎么回答的，哪句有依据、哪句没有", ""]])
+    d.add_heading("四、保养全过程（任务 3）", 1)
+    table([["步骤", "时间（工厂时间）", "谁", "记录"], ["起草、提交保养工单", "", "", "动作编号："], ["批准", "", "", ""], ["挂牌上锁停机", "", "", "PTW-"],
+           ["保养完成", "", "", "PM-"], ["验收解锁", "", "", ""], ["ERPNext 保养记录", "", "", ""]])
+    d.add_heading("五、对比与平均故障间隔（任务 4、5）", 1)
+    table([["项目", "记录"], ["我保养的设备，保养后故障次数", ""], ["逾期最多的另一台，同期故障次数", ""], ["近 30 天全厂故障次数", ""],
+           ["MTBF 估计（运行小时）", ""], ["这一次的结果和概率预测一致吗？为什么可能不一致", ""]])
+    d.add_heading("六、结论与讨论", 1)
+    hint("β = 1 时定期保养还有意义吗？只看预期损失什么时候不够？保养周期太短、太长各有什么代价？")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)
