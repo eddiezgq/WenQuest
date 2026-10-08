@@ -50,7 +50,9 @@ DATA_SCHEMAS = {
                                 # 第 18 轮 E3：保养完成、可靠性系数
                                 "pm_done", "set_reliability", "set_run_h",
                                 # 第 18 轮 E4：排班算出的人员等级
-                                "set_staffing"]},
+                                "set_staffing",
+                                # 第 18 轮 E6：能源计量的设定与教学问题
+                                "set_energy"]},
         "qty": {"type": "integer", "minimum": 1}}),
     "machine.ack": _obj(["accepted"], {"accepted": {"type": "boolean"}}),
     # 第 17 轮 C 期：仿真车间的完整状态快照（推演用），主题 wq/gearbox/machining/sim/snapshot
@@ -96,6 +98,11 @@ DATA_SCHEMAS = {
                                                  "cycle_s": NUM, "peak_kN": NUM, "progress": FRAC}),
     "plc.shift": _obj(["run_id", "phase"], {"run_id": STR, "phase": {"enum": ["started", "done", "failed", "cancelled", "compat"]},
                                              "summary": {"type": "object"}, "error": STR, "compat": {"type": "object"}}),
+    # 第 18 轮 E6：计量读数（每 15 分钟工厂时间一条，全部计量点），主题 wq/gearbox/machining/sim/energy
+    "energy.reading": _obj(["ts", "end", "seconds", "meters"], {
+        "ts": STR, "end": STR, "seconds": {"type": "number", "exclusiveMinimum": 0}, "bucket": {"enum": ["peak", "flat", "valley"]},
+        "meters": {"type": "object", "additionalProperties": _obj(["value"], {"value": {"type": "number", "minimum": 0}})},
+        "env": _obj([], {"mist": NUM, "noise": NUM})}),
     "logistics.status": _obj(["x_m", "y_m"], {"x_m": NUM, "y_m": NUM, "battery": FRAC}),
     "ai.alert": _obj(["level", "title"], {"level": {"enum": ["info", "warn", "critical"]},
                                           "evidence": EVIDENCE}),

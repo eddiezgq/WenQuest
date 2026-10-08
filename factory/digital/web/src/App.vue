@@ -19,6 +19,7 @@
         <router-link v-if="session.user?.mode === 'teach'" to="/lab18" class="nav">实验 18 · 任务</router-link>
         <router-link v-if="session.user?.mode === 'teach'" to="/lab19" class="nav">实验 19 · 任务</router-link>
         <router-link v-if="session.user?.mode === 'teach'" to="/lab20" class="nav">实验 20 · 任务</router-link>
+        <router-link v-if="session.user?.mode === 'teach'" to="/lab21" class="nav">实验 21 · 任务</router-link>
       </div>
       <div class="group">
         <span class="group-title">资源</span>
@@ -93,6 +94,7 @@ const nav = [
   { to: '/maint', label: '设备维护', role: 'maintenance' },         // 第 18 轮 E3
   { to: '/people', label: '人员', role: 'lead' },                   // 第 18 轮 E4
   { to: '/supply', label: '采购与来料', role: 'planner' },          // 第 18 轮 E5
+  { to: '/energy', label: '能源与环境', role: 'manager' },          // 第 18 轮 E6
 ];
 const navShown = computed(() => nav.filter((n) => !n.only || n.only(session.user)));
 const cfg = ref({});
@@ -113,7 +115,7 @@ const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
   '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/cfd': '流体分析', '/mbd': '运动与动力分析', '/cam': '数控编程', '/opt': '设计优化', '/twin': '数字孪生', '/plc': '虚拟 PLC', '/tasks': '我的任务',
-  '/quality/8d': '质量异常单（8D）', '/ont': '厂情中枢 · 指挥台', '/ont/map': '厂情中枢 · 全貌地图', '/ont/rules': '厂情中枢 · 规则目录', '/ont/sim': '厂情中枢 · 推演工作台', '/ont/actions': '厂情中枢 · 动作收件箱', '/ont/ai': '厂情中枢 · AI 运行记录', '/ont/notify': '通知设置', '/service': '客户与服务', '/lab15': '实验 15 · 车间异常的追因、推演与决策', '/lab16': '实验 16 · 客户投诉的追溯、召回与服务决策', '/lab17': '实验 17 · 安全隐患的识别、评估与停机决策', '/ehs': '安全环保', '/maint': '设备维护', '/lab18': '实验 18 · 设备维护策略：保养时机的决策', '/people': '人员', '/lab19': '实验 19 · 排班与技能：缺人时的决策', '/supply': '采购与来料', '/lab20': '实验 20 · 供应链：来料不合格与供应商选择', '/ont/reports': '厂情中枢 · 日报与周报',
+  '/quality/8d': '质量异常单（8D）', '/ont': '厂情中枢 · 指挥台', '/ont/map': '厂情中枢 · 全貌地图', '/ont/rules': '厂情中枢 · 规则目录', '/ont/sim': '厂情中枢 · 推演工作台', '/ont/actions': '厂情中枢 · 动作收件箱', '/ont/ai': '厂情中枢 · AI 运行记录', '/ont/notify': '通知设置', '/service': '客户与服务', '/lab15': '实验 15 · 车间异常的追因、推演与决策', '/lab16': '实验 16 · 客户投诉的追溯、召回与服务决策', '/lab17': '实验 17 · 安全隐患的识别、评估与停机决策', '/ehs': '安全环保', '/maint': '设备维护', '/lab18': '实验 18 · 设备维护策略：保养时机的决策', '/people': '人员', '/lab19': '实验 19 · 排班与技能：缺人时的决策', '/supply': '采购与来料', '/lab20': '实验 20 · 供应链：来料不合格与供应商选择', '/energy': '能源与环境', '/lab21': '实验 21 · 能源：空转、错峰与单件碳足迹', '/ont/reports': '厂情中枢 · 日报与周报',
 }[route.path] || (route.path.startsWith('/quality/8d/') ? '质量异常单（8D）' : route.path.startsWith('/ont/') ? '厂情中枢' : '') || (route.path.startsWith('/design/') ? '设计审阅' : route.path.startsWith('/tasks/review/') ? '任务单审阅'
   : route.path.startsWith('/tasks/') ? '工程任务单' : '')));
 const clock = ref('');

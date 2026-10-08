@@ -100,6 +100,8 @@ def slots(db, mode="teach"):
     s["bad_lot"] = x["lot"] if x else "L??????-????"
     a = db.one("select id from anomaly where mode=%s and rule='W3' and status in ('open','ack','doing') order by id limit 1", (mode,))
     s["lot_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    a = db.one("select id from anomaly where mode=%s and rule='N2' and status in ('open','ack','doing') order by id limit 1", (mode,))
+    s["idle_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     return s
 
 
@@ -232,6 +234,8 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     PE.seed(db, "teach")
     PE.leave_next_shift(H, "teach", "P01", "评测·情景")    # 王强下一个班请假：磨床那一班没人（H2）
     supply_scene(H)                              # 第 18 轮 E5：一批不合格的轴承（W3）
+    from hub import energy as EG                 # 第 18 轮 E6：过去 24 小时的计量读数（忘关、峰时开炉、磨床劣化、漏气）
+    EG.energy_scene(H, eng)
     s.reconcile()
     ai.detector().run("teach", now)
     return H, eng

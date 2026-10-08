@@ -580,3 +580,76 @@ def test_W7_suspect_batch_used():
     assert run("W7", _sdb([_lot(5, "suspect")], uses=0)) == []
     f = run("W7", _sdb([_lot(5, "suspect")], uses=12))
     assert [x.fkey for x in f] == ["L261020-0005"] and f[0].values["parts"] == 12 and f[0].severity == "critical"
+
+
+# ---------------------------------------------------------------- 第 18 轮 E6：能源与环境
+def _ndb():
+    return FakeDB(tables=[("to_regclass", lambda a: [{"ok": True}])])
+
+
+def _energy(monkeypatch, **fns):
+    from hub import energy as EN
+    end = NOW - dt.timedelta(minutes=15)
+    monkeypatch.setattr(EN, "latest_ts", lambda db, mode: end)
+    monkeypatch.setattr(EN, "now_of", lambda db, mode: NOW)
+    monkeypatch.setattr(EN, "params", lambda db, mode: {"price": {"peak": 0.15, "flat": 0.10, "valley": 0.05}, "contract_kw": 220.0, "co2_factor": 0.5703,
+                                                         "mist_limit": 5.0, "noise_limit": 85.0})
+    for k, v in fns.items():
+        monkeypatch.setattr(EN, k, v)
+
+
+def test_N1_unit_energy_jump(monkeypatch):
+    rows = [{"unit": "grd-01", "name": "外圆磨床", "item": "SH-301", "recent_parts": 3, "recent": 3.1, "base_parts": 12, "base": 2.4, "base_from": "history", "change": 0.29},
+            {"unit": "cnc-l01-a", "name": "数控车床 A", "item": "SH-301", "recent_parts": 3, "recent": 4.6, "base_parts": 12, "base": 4.5, "base_from": "history", "change": 0.02},
+            {"unit": "key-01", "name": "键槽铣床", "item": "SH-301", "recent_parts": 1, "recent": 2.0, "base_parts": 3, "base": 1.0, "base_from": "standard", "change": 1.0},
+            {"unit": "ht-01", "name": "热处理炉", "item": "SH-301", "recent_parts": 5, "recent": 40, "base_parts": 20, "base": 22, "base_from": "history", "change": 0.8}]
+    _energy(monkeypatch, unit_energy=lambda db, mode, end=None, recent_parts=3, recent_h=24: rows)
+    f = run("N1", _ndb())
+    assert [x.fkey for x in f] == ["grd-01/SH-301"] and f[0].subject == ("Machine", "grd-01")      # 件数太少、热处理炉不报
+
+
+def test_N1_stale_readings_not_reported(monkeypatch):
+    from hub import energy as EN
+    _energy(monkeypatch, unit_energy=lambda *a, **k: [{"unit": "grd-01", "item": "SH-301", "recent_parts": 3, "recent": 3, "base": 2, "base_from": "history",
+                                                       "change": 0.5}])
+    monkeypatch.setattr(EN, "latest_ts", lambda db, mode: NOW - dt.timedelta(hours=5))
+    assert run("N1", _ndb()) == []                                     # 读数停了（车间没在跑）不判
+
+
+def test_N2_idle_energy(monkeypatch):
+    idle = [{"unit": u, "name": u, "kwh": k, "idle_kwh": i, "idle_h": h, "idle_share": i / k}
+            for u, k, i, h in (("hmc-01", 72, 72, 12), ("vmc-01", 70, 30, 6), ("cnc-l01-a", 80, 20, 3.6), ("saw-01", 30, 25, 12), ("key-01", 20, 2, 1))]
+    _energy(monkeypatch, idle_by_unit=lambda db, mode, hours=12, end=None: idle)
+    f = run("N2", _ndb())
+    assert [x.fkey for x in f] == ["hmc-01", "vmc-01", "saw-01"] and f[0].severity == "info"      # 只报空转最多的 3 台；占比低的不报
+
+
+def test_N3_peak_share_high(monkeypatch):
+    _energy(monkeypatch, peak_share=lambda db, mode, hours=24, end=None: {"hours": 24, "kwh": 2400, "peak_kwh": 800, "share": 0.333, "ht_peak_kwh": 400})
+    f = run("N3", _ndb())
+    assert len(f) == 1 and "33%" in f[0].title
+    _energy(monkeypatch, peak_share=lambda db, mode, hours=24, end=None: {"hours": 24, "kwh": 2400, "peak_kwh": 600, "share": 0.25, "ht_peak_kwh": 100})
+    assert run("N3", _ndb()) == []
+
+
+def test_N4_air_base_high(monkeypatch):
+    _energy(monkeypatch, air_excess=lambda db, mode, hours=4, end=None: {"hours": 4, "actual_kw": 9, "expected_kw": 3, "excess_kw": 6})
+    assert [x.fkey for x in run("N4", _ndb())] == ["E-AIR"]
+    _energy(monkeypatch, air_excess=lambda db, mode, hours=4, end=None: {"hours": 4, "actual_kw": 4, "expected_kw": 3, "excess_kw": 1})
+    assert run("N4", _ndb()) == []
+
+
+def test_N5_demand_near(monkeypatch):
+    _energy(monkeypatch, demand=lambda db, mode, end=None: {"kw": 230, "at": "2026-10-20T13:00:00", "contract_kw": 220, "ratio": 1.045})
+    f = run("N5", _ndb())
+    assert len(f) == 1 and f[0].severity == "critical"
+    _energy(monkeypatch, demand=lambda db, mode, end=None: {"kw": 150, "at": "2026-10-20T13:00:00", "contract_kw": 220, "ratio": 0.68})
+    assert run("N5", _ndb()) == []
+
+
+def test_N6_env_over(monkeypatch):
+    env = {"mist": {"label": "机加区油雾", "unit": "mg/m³", "value": 6.2, "max": 7.0, "limit": 5.0, "over": True, "n": 4},
+           "noise": {"label": "车间噪声", "unit": "dB(A)", "value": 80.0, "max": 86.0, "limit": 85.0, "over": False, "n": 4}}
+    _energy(monkeypatch, env_now=lambda db, mode, hours=1, end=None: env)
+    f = run("N6", _ndb())
+    assert [x.fkey for x in f] == ["mist"] and f[0].values["limit"] == 5.0

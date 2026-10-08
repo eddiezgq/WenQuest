@@ -54,7 +54,7 @@ SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
-    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "supplier": "采购与来料", "object": "查一个对象", "overview": "全厂概况",
+    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "supplier": "采购与来料", "energy": "能源与环境", "object": "查一个对象", "overview": "全厂概况",
 }
 
 
@@ -392,6 +392,12 @@ class Tools:
             elif a.get("rule") in ("W4", "W6"):
                 from hub import supply as SP
                 ev = SP.alt_options(self.db, self.mode, a)
+            elif a.get("rule") in ("N2", "N3", "N5"):    # 第 18 轮 E6：空转（自动待机）、峰时 / 需量（错峰），车间推演算电费和交期
+                from hub import energy as EG
+                ev = EG.options(self.db, self.mode, a, st, self._ctx_plan(st))
+            elif a.get("rule") in ("N1", "N4", "N6"):
+                from hub import energy as EG
+                ev = EG.fix_options(self.db, self.mode, a)
             elif a.get("rule") == "H2":                  # 第 18 轮 E4：排班缺口（车间推演）
                 from hub import people as PE
                 ev = PE.options(self.db, self.mode, a, st, self._ctx_plan(st))
@@ -677,6 +683,50 @@ class Tools:
         return {"open_lots": [dict(x, ref=self.run.obj("Batch", x["lot"]) if x["lot"] else None) for x in rows], "kpis": SP.kpis(self.db, self.mode),
                 "page": self.run.page("supply-lots", "采购与来料 · 采购单与到货", "/supply?tab=lots")}
 
+    # ---- ㉕ 能耗总览（第 18 轮 E6）
+    def energy_overview(self, day=None):
+        from hub import energy as EG
+        d = None
+        if day:
+            try:
+                d = dt.date.fromisoformat(str(day)[:10])
+            except ValueError:
+                return {"error": "日期格式 YYYY-MM-DD"}
+        o = EG.overview(self.db, self.mode, d)
+        if not o["hours"]:
+            return {"error": "还没有计量读数（教学模式由仿真车间每 15 分钟发一个；生产模式要接电表）"}
+        o.pop("series", None)
+        o["units"] = [dict(u, ref=self.run.obj("Meter", "E-" + u["unit"].upper(), u["name"])) for u in o["units"]]
+        o["demand"] = EG.demand(self.db, self.mode)
+        o["env"] = EG.env_now(self.db, self.mode)
+        o["settings"] = EG.settings(self.db, self.mode)
+        o["page"] = self.run.page("energy-overview", "能源与环境 · 总览", "/energy?tab=overview")
+        return o
+
+    # ---- ㉖ 单耗与空转
+    def unit_energy(self, unit=None):
+        from hub import energy as EG
+        rows = EG.unit_energy(self.db, self.mode)
+        idle = EG.idle_by_unit(self.db, self.mode)
+        if unit:
+            u = str(unit).lower()
+            rows = [x for x in rows if x["unit"] == u]
+            idle = [x for x in idle if x["unit"] == u]
+        return {"unit_energy": [dict(x, ref=self.run.obj("Machine", x["unit"], x["name"])) for x in rows],
+                "idle": sorted(idle, key=lambda x: -x["idle_kwh"]), "air": EG.air_excess(self.db, self.mode), "peak": EG.peak_share(self.db, self.mode),
+                "page": self.run.page("energy-unit", "能源与环境 · 单耗", "/energy?tab=unit")}
+
+    # ---- ㉗ 碳核算
+    def carbon_account(self, month=None):
+        from hub import energy as EG
+        try:
+            c = EG.carbon(self.db, self.mode, month)
+        except ValueError:
+            return {"error": "月份格式 YYYY-MM"}
+        c["ref"] = self.run.obj("CarbonAccount", c["month"])
+        c["page"] = self.run.page("energy-carbon", "能源与环境 · 碳与环境", "/energy?tab=carbon")
+        return c
+
     # ---- ⑲ 员工与技能（第 18 轮 E4）
     def people_skills(self, unit=None):
         from hub import people as PE
@@ -808,6 +858,12 @@ def _summary(out):
         return "维修单 {} 张".format(len(out["repairs"]))
     if "suppliers" in out and "single_source" in out:
         return "供应商 {} 家".format(len(out["suppliers"]))
+    if "by_bucket" in out and "units" in out:
+        return "用电 {:,.0f} 度".format(out.get("kwh") or 0)
+    if "unit_energy" in out:
+        return "单耗 {} 项".format(len(out["unit_energy"]))
+    if "t_co2e" in out:
+        return "碳排放 {:g} t".format(out["t_co2e"])
     if "open_lots" in out:
         return "未完的批次 {} 个".format(len(out["open_lots"]))
     if "parts" in out and ("lot" in out or "serial" in out):
@@ -830,7 +886,8 @@ def _summary(out):
 TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", "list_anomalies", "get_anomaly", "simulate",
               "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
               "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess",
-              "maint_overview", "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load", "supplier_scorecard", "batch_trace", "purchasing_status"]
+              "maint_overview", "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load", "supplier_scorecard", "batch_trace", "purchasing_status",
+              "energy_overview", "unit_energy", "carbon_account"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -884,6 +941,12 @@ TOOLS = [
     {"name": "batch_trace", "description": "批次追溯：给批号查这批料用到了哪些零件、工单、现场设备；或给零件 / 设备序列号查用了哪些批次、哪家供应商",
      "input_schema": _S(lot={"type": "string"}, serial={"type": "string"})},
     {"name": "purchasing_status", "description": "采购在途与风险：已下单、在途、到货待检、不合格、可疑的批次，承诺到货日和晚了几天", "input_schema": _S()},
+    {"name": "energy_overview", "description": "能耗总览：某天（默认最近一天）的用电、峰平谷电量、电费、峰时占比、碳排放、每台设备的运行 / 空转 / 待机 / 关机电量；"
+     "本月需量对比合同需量；车间油雾、噪声；现在的自动待机、错峰设定", "input_schema": _S(day={"type": "string", "description": "YYYY-MM-DD"})},
+    {"name": "unit_energy", "description": "单耗与空转：每台设备每个物料最近几件的单件运行电量对比基线（单耗突增）；近 12 小时各设备空转电量；空压机比该用的多多少（漏气）；近 24 小时峰时占比",
+     "input_schema": _S(unit={"type": "string", "description": "设备编号，如 grd-01"})},
+    {"name": "carbon_account", "description": "碳核算（外购电力，范围 2）：某月电量 × 电网排放因子，每台设备的排放，每件产品的碳足迹；水、压缩空气用量",
+     "input_schema": _S(month={"type": "string", "description": "YYYY-MM"})},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -1072,6 +1135,9 @@ class Rules:
             return "draft"
         if re.search(r"(\d+)\s*台.*?(\d{1,2})\s*月\s*(\d{1,2})\s*日", q) and re.search(r"订单|安排|接单|生产|交货|WQR", q):
             return "order"
+        if re.search(r"电费|用电|电量|能耗|单耗|空转|待机|峰时|谷时|错峰|需量|碳排|碳足迹|碳核算|排放|漏气|压缩空气|空压机|油雾|噪声|度电|节能|N[1-6]\b", q) \
+                and not re.search(r"CP-\d{5}|投诉|危废|废弃物", q):          # 第 18 轮 E6：能源与环境
+            return "energy"
         if re.search(r"排班|缺人|请假|出勤|缺勤|迟到|技能矩阵|单点依赖|一个人会|会开|顶班|带教|调班|在岗|人手|本周加班|加班超|技能培训|员工", q) \
                 and not re.search(r"工程师|上门|服务|WQR105-", q):          # 第 18 轮 E4：人员与排班（客户现场的服务排班归客户与服务）
             return "people"
@@ -1132,6 +1198,9 @@ class Rules:
                  "自己用 F(t) = 1 − exp(−(t/η)^β) 算一算再运行两周坏掉的概率，乘上修理费和停机损失，再和保养的花费比。",
         "supplier": "提示：打开“采购与来料”页：供应商一栏看各家的准时率、合格率和价格，哪几类物料只有一家；到货与检验一栏看抽样数据，按模板的上下限自己判定。"
                     "想一想：便宜的供应商算上晚到和不合格，真的便宜吗？",
+        "energy": "提示：打开“能源与环境”页：总览里看每台设备的电量条——灰色的“空转”是开着没活；曲线上红色是峰时。"
+                  "想一想：空转的设备设“空闲 N 分钟自动待机”能省多少，再开要预热会不会耽误交期？热处理炉挪到峰时以外开，一天省多少电费？"
+                  "单件电量乘电网排放因子（页面上写着）就是这一件的碳排放（电力部分）。",
         "people": "提示：打开“人员”页：技能矩阵里标红的列是只有一个人会开的设备；排班表里标红的格子是这一班没人能开。"
                   "想一想：缺人的这一班，从哪里调人？调走的人原来的岗位怎么办？加班要花多少钱？",
         "service": "提示：在“客户与服务”页的排班表里看 6 位工程师的空闲。同区域每人每天 2 单、跨区域 1 单；想一想：先修哪台、谁去、几天能做完、要带几件备件？",
@@ -1409,6 +1478,60 @@ class Rules:
                 "{:.0%}".format(x["on_time"]) if x["on_time"] is not None else "—", x["hist_on_time"],
                 "{:.0%}".format(x["pass_rate"]) if x["pass_rate"] is not None else "—", x["hist_pass"], x["price_index"], x["lead_days"]))
         out.append("单一来源：" + ("、".join(s["cat_name"] for s in r["single_source"]) or "没有") + "。" + r["tco_formula"] + "。")
+        return "\n".join(out)
+
+    # ---- 能源与环境（第 18 轮 E6）
+    def a_energy(self, q):
+        if self.student:
+            return self._hint("energy")
+        unit = find_machine(q)
+        if re.search(r"怎么处理|怎么办|方案|该不该|怎么省", q):
+            a = self.t.db.one("select id from anomaly where mode=%s and rule like 'N%%' and status in ('open','ack','doing') {} "
+                              "order by case severity when 'critical' then 0 when 'warn' then 1 else 2 end, id desc limit 1".format(
+                                  "and subject_key=%s" if unit else ""), (self.t.mode, unit) if unit else (self.t.mode,))
+            if a:
+                return self.a_handle("A-{:05d} 怎么处理".format(a["id"]))
+        if re.search(r"碳|排放", q):
+            r = self.t.carbon_account()
+            if r.get("error"):
+                return r["error"]
+            out = ["{} 碳核算 [{}]（{}，排放因子 {:g} kg/度）：用电 {:,.0f} 度，排放 {:g} 吨 CO2e（{:g} 小时的数据）[{}]。".format(
+                r["month"], r["ref"], r["scope"], r["factor"], r["kwh"], r["t_co2e"], r["hours"], r["page"])]
+            top = sorted(r["units"], key=lambda x: -x["kwh"])[:3]
+            out.append("用电最多：" + "；".join("{} {:,.0f} 度".format(x["unit"].upper(), x["kwh"]) for x in top) + "。")
+            for p in r["products"]:
+                out.append("· {} 每件约 {:g} 度、{:g} kg CO2e（{} 道工序{}）".format(p["item"], p["kwh"], p["co2_kg"], p["ops"],
+                                                                         "；{} 这个月还没有做过的件，没算进去".format("、".join(u.upper() for u in p["missing"])) if p["missing"] else ""))
+            return "\n".join(out)
+        if unit or re.search(r"单耗|空转|待机|漏气|压缩空气|空压机|每件", q):
+            r = self.t.unit_energy(unit)
+            out = ["单耗与空转 [{}]：".format(r["page"])]
+            for x in r["unit_energy"]:
+                if x["recent"] is None:
+                    continue
+                out.append("· {} [{}] {}：最近 {} 件每件 {:.2f} 度，基线 {:.2f} 度（{}），{}".format(
+                    x["unit"].upper(), x["ref"], x["item"], x["recent_parts"], x["recent"], x["base"] or 0, "近 7 天" if x["base_from"] == "history" else "标准值",
+                    "高 {:.0%}".format(x["change"]) if (x["change"] or 0) > 0.05 else "正常"))
+            idle = [x for x in r["idle"] if x["idle_kwh"] > 0][:5]
+            if idle:
+                out.append("近 12 小时空转：" + "；".join("{} {:.1f} 度（{:.0%}）".format(x["unit"].upper(), x["idle_kwh"], x["idle_share"]) for x in idle) + "。")
+            a = r["air"]
+            if a["hours"]:
+                out.append("空压机近 {:g} 小时平均 {:.1f} kW，按开着的用气设备应 {:.1f} kW{}。".format(
+                    a["hours"], a["actual_kw"], a["expected_kw"], "，多出 {:.1f} kW，可能漏气".format(a["excess_kw"]) if a["excess_kw"] > 3 else ""))
+            return "\n".join(out)
+        r = self.t.energy_overview()
+        if r.get("error"):
+            return r["error"]
+        out = ["{} 用电 [{}]：{:,.0f} 度（峰 {:,.0f} / 平 {:,.0f} / 谷 {:,.0f}），电费 ${:,.2f}，峰时占 {:.0%}；碳排放 {:,.0f} kg；空转 {:,.0f} 度（{:.0%}）。".format(
+            r["day"], r["page"], r["kwh"], r["by_bucket"]["peak"], r["by_bucket"]["flat"], r["by_bucket"]["valley"], r["cost"], r["peak_share"],
+            r["co2_kg"], r["idle_kwh"], r["idle_share"])]
+        top = sorted(r["units"], key=lambda x: -x["kwh"])[:3]
+        out.append("用电最多：" + "；".join("{} [{}] {:,.0f} 度".format(x["unit"].upper(), x["ref"], x["kwh"]) for x in top) + "。")
+        d = r["demand"]
+        out.append("本月最大需量 {:.0f} kW，合同 {:.0f} kW（{:.0%}）。".format(d["kw"], d["contract_kw"], d["ratio"]))
+        out.append("车间环境：" + "；".join("{} {} {}（限值 {:g}）".format(v["label"], v["value"] if v["value"] is not None else "—", v["unit"], v["limit"])
+                                         for v in r["env"].values()) + "。")
         return "\n".join(out)
 
     # ---- 人员与排班（第 18 轮 E4）

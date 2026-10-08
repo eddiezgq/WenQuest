@@ -54,7 +54,10 @@ CHANGE_TYPES = {
     "pm_order": "保养（停机挂牌）",     # 第 18 轮 E3：和停机挂牌一样推演，费用按保养人工算
     "staff": "排班（调人 / 学徒 / 加班顶班）",   # 第 18 轮 E4：改某天某班某台设备的人员等级（0 没人 / 1 学徒 / 2 熟练）
     "material_arrival": "到料日",                # 第 18 轮 E5：来料不合格时按方案改到料日（费用另算）
+    "energy_setting": "节能设定（空闲自动待机）",  # 第 18 轮 E6：units、standby_min（0 = 取消）
+    "tou_rule": "错峰（峰时不开新炉）",           # 第 18 轮 E6：units（热处理炉）、on
 }
+ENERGY_WINDOW_H = 24              # 第 18 轮 E6：推演里电量、电费按快照起的 24 小时比较
 RECTIFY_RATE = 45.0               # 安全整改 / 保养人工（美元 / 小时）
 PM_MATERIAL = 80.0                # 一次保养的油、脂、滤芯（美元）
 OT_RATE = 1.5                     # 加班费倍数
@@ -274,6 +277,13 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
     # ---- 改动
     cal = Calendar.from_dict(eng.calendar.to_dict())
     staff_changed = False
+    ectx = ctx.get("energy")
+    if ectx or any(c.get("type") in ("energy_setting", "tou_rule") for c in changes):
+        if not eng.energy.enabled:                # 第 18 轮 E6：近似快照没有计量，推演里打开（不改车间节拍）
+            eng.set_energy({"enabled": True})
+        eng._emark_all(t0)                        # 从快照时刻起算
+        eng.energy.tot = {}
+        eng.at(t0 + ENERGY_WINDOW_H * 3600, "energy_capture")
     for c in changes:
         typ = c.get("type")
         if typ not in CHANGE_TYPES:
@@ -399,6 +409,21 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
             applied.append(c)
         elif typ == "split_delivery":
             applied.append(c)                    # 不影响生产，只影响订单的判定
+        elif typ == "energy_setting":
+            sb = dict(eng.energy.standby)
+            m = float(c.get("standby_min") or 0)
+            for u in c.get("units") or []:
+                if m:
+                    sb[u] = m
+                else:
+                    sb.pop(u, None)
+            eng.set_energy({"standby": sb})
+            applied.append(c)
+        elif typ == "tou_rule":
+            tou = set(eng.energy.tou)
+            tou = tou | set(c.get("units") or []) if c.get("on", True) else tou - set(c.get("units") or [])
+            eng.set_energy({"tou": sorted(tou)})
+            applied.append(c)
     if cal.to_dict() != eng.calendar.to_dict():
         eng.set_calendar(cal)                     # 只有加班改了日历才重设（重设会让每台设备重新判断一次开工）
     if staff_changed:
@@ -421,9 +446,15 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
         eng.run_due()
         if time.time() - wall > limit_s:
             raise PlanError("推演超过 {:.0f} 秒，方案太大".format(limit_s))
-        if _all_done(eng, watch):
-            break
-    return _result(eng, events, t0, start_dt, watch, ctx, applied, checks, costs, cal, changes)
+        if _all_done(eng, watch) and (not eng.energy.enabled or eng.energy_capture is not None):
+            break                                 # 第 18 轮 E6：算电量时至少推到 24 小时
+    r = _result(eng, events, t0, start_dt, watch, ctx, applied, checks, costs, cal, changes)
+    if eng.energy.enabled:
+        from sim import energy as EN
+        cap = eng.energy_capture if eng.energy_capture is not None else (eng._emark_all(), eng.energy.totals())[1]
+        e = ectx or {}
+        r["energy"] = dict(EN.summarize({}, cap, e.get("price"), e.get("factor", 0.5703)), hours=ENERGY_WINDOW_H)
+    return r
 
 
 def hypothesis(snap, unit, minutes, reason="假设停机"):

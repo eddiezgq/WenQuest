@@ -318,7 +318,7 @@ def main():
     check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 1, "全厂态势 15 块，1 块待接入（能源）")
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
-    check(len(live) == 49 and not [x["id"] for x in live if x["error"]], "规则 49 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+    check(len(live) == 55 and not [x["id"] for x in live if x["error"]], "规则 55 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
 
     print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
     r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
@@ -388,6 +388,7 @@ def main():
     maintenance(teacher)
     people(teacher)
     supply(teacher)
+    energy(teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -774,6 +775,44 @@ def supply(teacher):
     k = hub("GET", "/api/supply/kpis", token=teacher)
     check("pass_rate" in k, "供应链态势：在途 {}，合格率 {}".format(k["in_transit"], k["pass_rate"]))
     hub("POST", "/api/supply/sim", {"enabled": False}, teacher)
+
+
+def energy(teacher):
+    """第 18 轮 E6：仿真车间每 15 分钟（工厂时间）发计量读数 → 平台入库 → 老师注入忘关 + 峰时开炉 → 空转异常 N2 → 四个方案 →
+    计划员采纳自动待机、厂长批准 → 车间按新设定待机；态势、碳核算、实验 21 页"""
+    print("18. 能源与环境（第 18 轮 E6）")
+    pl = login("测试计划员", "planner")
+    ov = wait(lambda: (lambda o: o if o["hours"] > 0 else None)(hub("GET", "/api/energy/overview", token=teacher)), "计量读数入库", 180, 3)
+    check(ov is not None, "计量读数：{} 用电 {} 度，电费 ${}，{} 个计量点".format((ov or {}).get("day"), (ov or {}).get("kwh"), (ov or {}).get("cost"),
+                                                                    len(hub("GET", "/api/energy/meters", token=teacher)["meters"])))
+    if not ov:
+        return
+    r = hub("POST", "/api/lab21/inject", {"enable": True}, teacher)
+    check("HMC-01" in r.get("text", ""), "老师注入：{}".format(r.get("text")))
+    an = wait(lambda: next((a for a in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if a["rule"] == "N2"), None), "空转异常 N2", 240, 4)
+    check(an is not None, "异常 N2：{}".format((an or {}).get("title")))
+    if not an:
+        return
+    o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+    kinds = [y["kind"] for y in o["options"]]
+    check(o.get("energy") == "N2" and kinds == ["none", "standby10", "standby30", "all10"], "空转四方案：{}；{}".format("、".join(y["label"] for y in o["options"]), o.get("reason")))
+    sb = next(y for y in o["options"] if y["kind"] == "standby10")
+    unit = sb["changes"][0]["units"][0]
+    check((sb.get("saving") or {}).get("kwh", 0) > 0, "{}：{}".format(sb["label"], sb["note"]))
+    a = hub("POST", "/api/ont/actions", {"changes": sb["changes"], "anomaly_id": an["id"]}, pl)
+    for aid in a["ids"]:
+        d = hub("POST", "/api/ont/actions/{}/approve".format(aid), {}, teacher)
+        check(d["status"] == "done", "{}：{}".format(d["title"], (d.get("result") or {}).get("text")))
+    on = wait(lambda: next((m for m in hub("GET", "/api/history?type=energy.reading&limit=5", token=teacher)
+                            if unit in (m["data"].get("standby") or {})), None), "车间按新设定运行", 120, 3)
+    check(on is not None, "车间读数里 {} 已设自动待机".format(unit.upper()))
+    k = hub("GET", "/api/energy/kpis", token=teacher)
+    check(k.get("kwh", 0) > 0, "能源态势：用电 {} 度，峰时 {}，空转 {}".format(k.get("kwh"), k.get("peak_share"), k.get("idle_share")))
+    c = hub("GET", "/api/energy/carbon", token=teacher)
+    check(c["t_co2e"] > 0, "碳核算 {}：{} 吨 CO2e".format(c["month"], c["t_co2e"]))
+    st = hub("GET", "/api/lab21", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 21 页：5 个任务，自动评 60 分")
+    hub("POST", "/api/energy/sim", {"sim": False}, teacher)
 
 
 if __name__ == "__main__":

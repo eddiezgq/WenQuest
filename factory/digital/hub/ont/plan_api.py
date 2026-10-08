@@ -15,6 +15,7 @@ EHS_RULES = ("E1", "E3")
 MAINT_RULES = ("M2", "M3", "M4", "M5")
 PEOPLE_RULES = ("H1", "H2")
 SUPPLY_RULES = ("W3", "W4", "W6")
+ENERGY_RULES = ("N1", "N2", "N3", "N4", "N5", "N6")
 
 
 def mount(app, H, user_of, who):
@@ -147,6 +148,18 @@ def mount(app, H, user_of, who):
                 sid, st, exact = None, {"factory_now": dt.datetime.now(dt.timezone.utc).isoformat(), "calendar": {}}, True
                 r = SP.alt_options(H.db, u["mode"], a)
             r["supply"] = True
+        elif a["rule"] in ENERGY_RULES:       # 第 18 轮 E6：空转（自动待机）、峰时 / 需量（错峰）用车间推演；单耗突增、漏气、环境超限给整改
+            from hub import energy as EN
+            if a["rule"] in ("N2", "N3", "N5"):
+                sid, st, exact = snap_of(u, snapshot_id or None)
+                try:
+                    r = EN.options(H.db, u["mode"], a, st, ctx_for(u, st))
+                except P.PlanError as e:
+                    raise HTTPException(400, str(e))
+            else:
+                sid, st, exact = None, {"factory_now": dt.datetime.now(dt.timezone.utc).isoformat(), "calendar": {}}, True
+                r = EN.fix_options(H.db, u["mode"], a)
+            r["energy"] = a["rule"]
         elif a["rule"] in PEOPLE_RULES:       # 第 18 轮 E4：排班缺口（车间推演）、单点依赖（技能培训）
             from hub import people as PE
             if a["rule"] == "H1":
@@ -187,7 +200,8 @@ def mount(app, H, user_of, who):
             p = NR.polish(H.ai.llm, r["reason"], facts, "把推荐理由改写成给厂长看的两三句话：推荐哪个、为什么、代价是什么")
             r = dict(r, reason=p["text"], reason_by=p["by"])
         return dict(r, snapshot_id=sid, exact=exact, factory_now=st["factory_now"], shift_mode=(st.get("calendar") or {}).get("mode"),
-                    can_initiate=AC.can_initiate(u, "service_batch" if r.get("service") else ("lockout" if r.get("ehs") else ("pm_order" if r.get("maint") else
+                    can_initiate=AC.can_initiate(u, {"N1": "repair_order", "N4": "rectify_order", "N6": "rectify_order"}.get(r.get("energy"), "energy_setting")) if r.get("energy") else
+                    AC.can_initiate(u, "service_batch" if r.get("service") else ("lockout" if r.get("ehs") else ("pm_order" if r.get("maint") else
                                                                                                                        ("shift_swap" if r.get("people") else ("purchase_order" if r.get("supply") else "reassign"))))))
 
     # ---------------------------------------------------------------- 动作

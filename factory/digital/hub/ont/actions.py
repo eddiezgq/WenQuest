@@ -73,10 +73,14 @@ TYPES = {
     "supplier_return": {"label": "退货", "costly": False, "supply": True, "nosim": True},
     "concession": {"label": "让步接收", "costly": False, "supply": True, "nosim": True},
     "alt_supplier": {"label": "开发备选供应商", "costly": True, "supply": True, "nosim": True},
+    # 第 18 轮 E6：能源（发起：计划员、维修工、厂长；改变车间的运行方式，厂长批）
+    "energy_setting": {"label": "节能设定", "costly": False, "energy": True},
+    "tou_rule": {"label": "错峰规则", "costly": False, "energy": True},
 }
 MAINT_INITIATORS = ("maintenance", "manager")
 PEOPLE_INITIATORS = ("lead", "planner", "manager")
 SUPPLY_INITIATORS = ("planner", "quality", "manager")
+ENERGY_INITIATORS = ("planner", "maintenance", "manager")
 SERVICE_INITIATORS = ("service", "manager", "sales")
 EHS_INITIATORS = ("safety", "manager")
 
@@ -151,6 +155,13 @@ def title_of(t, p):
     if t == "alt_supplier":
         from hub import supply as SP
         return "开发备选供应商：{}".format(SP.CAT_NAME.get(p.get("cat"), p.get("cat")))
+    if t == "energy_setting":
+        us = p.get("units") or []
+        m = float(p.get("standby_min") or 0)
+        return "节能设定：{} {}".format("、".join(u.upper() for u in us[:3]) + (" 等 {} 台".format(len(us)) if len(us) > 3 else ""),
+                                     "空闲 {:g} 分钟自动待机".format(m) if m else "取消自动待机")
+    if t == "tou_rule":
+        return "错峰规则：{} {}".format("、".join(u.upper() for u in p.get("units") or ["ht-01"]), "峰时不开新炉" if p.get("on", True) else "取消错峰")
     if t == "skill_training":
         return "技能培训：{} 学 {}，带教 {:g} 小时".format(p.get("emp_id"), (p.get("unit") or "").upper(), float(p.get("hours") or 40))
     return t
@@ -182,6 +193,8 @@ def can_initiate(u, t=None):
         return u.get("role") in PEOPLE_INITIATORS
     if t and TYPES.get(t, {}).get("supply"):
         return u.get("role") in SUPPLY_INITIATORS
+    if t and TYPES.get(t, {}).get("energy"):
+        return u.get("role") in ENERGY_INITIATORS
     return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
@@ -200,7 +213,9 @@ def can_approve(u, a):
         return False, "让步接收要质量或厂长批准"
     if a["type"] == "supplier_return" and u.get("role") not in ("manager", "planner", "quality"):
         return False, "要计划员、质量或厂长批准"
-    supply = TYPES[a["type"]].get("supply")
+    if TYPES[a["type"]].get("energy") and u.get("role") != "manager":
+        return False, "节能设定、错峰规则改变车间的运行方式，要厂长批准"
+    supply = TYPES[a["type"]].get("supply") or TYPES[a["type"]].get("energy")
     people = TYPES[a["type"]].get("people")
     if not costly and people and u.get("role") not in ("manager", "lead"):
         return False, "要班组长或厂长批准"
@@ -220,7 +235,8 @@ def create(db, mode, u, type_, params, scenario_id=None, anomaly_id=None, trial=
     if not can_initiate(u, type_):
         raise ActionError("服务类动作由售后或厂长发起" if TYPES[type_].get("service") else
                           ("人员类动作由班组长、计划员或厂长发起" if TYPES[type_].get("people") else
-                           ("供应链动作由计划员、质量或厂长发起" if TYPES[type_].get("supply") else "动作由计划员或厂长发起")))
+                           ("供应链动作由计划员、质量或厂长发起" if TYPES[type_].get("supply") else
+                            ("能源动作由计划员、维修工或厂长发起" if TYPES[type_].get("energy") else "动作由计划员或厂长发起"))))
     p = dict(params)
     p["type"] = type_
     r = db.one("insert into action (mode, type, title, params, scenario_id, anomaly_id, initiator, initiator_role, trial) "
@@ -364,6 +380,9 @@ def execute(H, a, u, who):
         else:
             res = SP.activate_alt(H, mode, p["cat"], u.get("name"))
         return res, "executing" if res.get("proposal_id") else "done"
+    if t in ("energy_setting", "tou_rule"):
+        from hub import energy as EN
+        return (EN.exec_setting if t == "energy_setting" else EN.exec_tou)(H, mode, p, u), "done"
     if t in ("shift_swap", "overtime_assign", "skill_training"):
         from hub import people as PE
         fn = {"shift_swap": PE.exec_swap, "overtime_assign": PE.exec_overtime, "skill_training": PE.exec_training}[t]
@@ -433,7 +452,10 @@ def trial(db, snaps, mode, changes, scenario_snapshot=None):
     base = P.simulate(snap, [], ctx)
     r = P.simulate(snap, changes, ctx)
     keep = ("sales_orders", "cost_total", "costs", "overtime_min", "overtime_units", "checks", "ok")
-    return dict({k: r[k] for k in keep}, base={k: base[k] for k in ("sales_orders", "cost_total")}, at=snap["factory_now"], snapshot_id=sid)
+    out = dict({k: r[k] for k in keep}, base={k: base[k] for k in ("sales_orders", "cost_total")}, at=snap["factory_now"], snapshot_id=sid)
+    if r.get("energy"):                           # 第 18 轮 E6：节能设定、错峰的试运行带上电量
+        out["energy"] = r["energy"]
+    return out
 
 
 def service_trial(db, mode, changes):

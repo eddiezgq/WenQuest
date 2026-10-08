@@ -115,6 +115,7 @@ def tables(B, db, mode):
     maint_objs(B, db, mode)
     people_objs(B, db, mode)
     supply_objs(B, db, mode)
+    energy_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -363,6 +364,28 @@ def supply_objs(B, db, mode):
                                           "price_index": s_["price_index"], "role": "默认" if s_["role"] == "default" else "备选"})
         B.link(mode, "SupplierRating", k, "supplier", s_["supplier"])
         B.obj(mode, "Supplier", s_["supplier"], {"name": s_["supplier"], "lead_days": s_["lead_days"], "category": s_["cat_name"]})
+
+
+def energy_objs(B, db, mode):
+    """能源与环境（第 18 轮 E6）：计量点、近 7 天每天每个计量点的用量、本月碳核算"""
+    if not db.one("select to_regclass('energy_read') is not null as ok")["ok"]:
+        return
+    from hub import energy as EN
+    from hub import kpi
+    if not db.one("select 1 as x from energy_read where mode=%s limit 1", (mode,)):
+        return
+    for m in EN.meters(db, mode):
+        B.obj(mode, "Meter", m["code"], {"medium": m["medium"], "unit": m["unit"], "name": m["label"]})
+        if m["machine"]:
+            B.link(mode, "Meter", m["code"], "machine", m["machine"])
+    end = EN._end(db, mode)
+    for r in db.q("select meter, (ts at time zone %s)::date as d, sum(value) as v from energy_read where mode=%s and ts >= %s "
+                  "group by 1, 2", (str(kpi.TZ), mode, end - dt.timedelta(days=7))):
+        k = "{}/{}".format(r["meter"], r["d"])
+        B.obj(mode, "EnergyUse", k, {"value": round(float(r["v"]), 3)})
+        B.link(mode, "EnergyUse", k, "meter", r["meter"])
+    c = EN.carbon(db, mode)
+    B.obj(mode, "CarbonAccount", c["month"], {"t_co2e": c["t_co2e"]})
 
 
 def people_objs(B, db, mode):

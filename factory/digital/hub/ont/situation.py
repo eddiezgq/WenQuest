@@ -8,7 +8,7 @@ import datetime as dt
 from hub.ont import schema as S
 
 WAITING = {
-    "energy": "待接入：电表计量点与抄读（能源领域包）",
+    "energy": "还没有计量读数（教学模式由仿真车间每 15 分钟发一个；生产模式要接电表）",
 }
 
 
@@ -71,6 +71,11 @@ def metrics(db, mode, ov, now):
         pk = PE.kpis(db, mode, now)
     except Exception:  # noqa: BLE001
         pk = None
+    try:                                    # 第 18 轮 E6：能源与环境
+        from hub import energy as EG
+        nk = EG.kpis(db, mode)
+    except Exception:  # noqa: BLE001
+        nk = None
     M = {
         "strategy": [("oee", "全厂 OEE（今日）", ov["oee"]["value"], "pct"), ("output", "本周产量", (k.get("output") or {}).get("value"), "int")],
         "customer": [("satisfaction", "满意度（近 30 天，5 分制）", sk.get("satisfaction"), "num"),
@@ -108,6 +113,9 @@ def metrics(db, mode, ov, now):
         "people": [("attendance", "这一班出勤率", pk["attendance_rate"], "pct"), ("gaps", "24 小时内排班缺口", pk["gaps"], "int"),
                    ("single_points", "单点依赖的设备", pk["single_points"], "int"), ("overtime_h", "本周加班（小时）", pk["overtime_h_week"], "num")]
         if pk else [],
+        "energy": [("kwh", "今天用电（度）", nk["kwh"], "int"), ("cost", "今天电费", nk["cost"], "usd"), ("peak_share", "峰时用电占比", nk["peak_share"], "pct"),
+                   ("idle_share", "空转电量占比", nk["idle_share"], "pct"), ("co2_kg", "今天碳排放（kg）", nk["co2_kg"], "int"),
+                   ("demand_ratio", "需量 / 合同需量（本月）", nk["demand_ratio"], "pct")] if nk else [],
         "finance": [("cost_var", "本周成本偏差", ov["cost"]["value"], "pct_signed")],
     }
     return M

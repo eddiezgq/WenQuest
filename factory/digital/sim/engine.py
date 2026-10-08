@@ -15,6 +15,7 @@ cycle_time_s、duration_s 等业务时长用仿真秒（零件实际要加工多
 import datetime as dt
 import heapq
 import itertools
+import math
 import os
 import random
 
@@ -29,6 +30,8 @@ from sim import errors as ERR
 from sim.calendar import Calendar
 from sim.staffing import APPRENTICE_RATE, Staffing
 from sim import staffing as STF
+from sim import energy as EN
+from wqbus.topics import topic as _topic
 
 # 工序 → 可用设备（第一个是默认设备）
 OP_UNITS = {
@@ -139,6 +142,19 @@ class Machine:
         self.run_h = float(rp["init_h"]) if rp else 0.0
         self.fail_mode = None
 
+    # 第 18 轮 E6：状态一变，能源计量在变之前把这一段的电量记下（引擎接上钩子；没接时什么也不做）
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, v):
+        old = getattr(self, "_state", None)
+        self._state = v
+        hook = getattr(self, "_hook", None)
+        if hook is not None and old != v:
+            hook(self, old, v)
+
 
 class AGV:
     def __init__(self, unit, pos):
@@ -178,6 +194,12 @@ class Engine:
         # 第 18 轮 E4：车间要有人（关闭时和以前完全一样）
         self.staffing = Staffing()
         self._staff_wait = {}                    # 设备 → 已排好的换班复查时刻（仿真秒）
+        # 第 18 轮 E6：能源计量（关闭时和以前完全一样）
+        self.energy = EN.Energy()
+        self._e_pending, self._tou_wait = {}, {}
+        self.energy_capture = None               # 推演用：某时刻的累计电量
+        for m in self.machines.values():
+            m._hook = self._on_state
 
     # ------------------------------------------------------------ 基础
     def now(self):
@@ -201,6 +223,7 @@ class Engine:
         self._shift_wait.clear()
         for m in self.machines.values():
             self._try_start(m)
+        self._emark_all()
 
     def _shift_closed(self, m, t):
         """按班次且现在下班：排好下次开工的事件，返回 True"""
@@ -224,6 +247,243 @@ class Engine:
         for m in self.machines.values():
             self._try_start(m)
             self._status(m)
+        self._emark_all()
+
+    # ------------------------------------------------------------ 能源（第 18 轮 E6）
+    def set_energy(self, d):
+        """平台下发：enabled 开关、power 功率表、standby 自动待机、tou 错峰设备、inject / clear 教学问题"""
+        e = self.energy
+        t = self.now()
+        was = e.enabled
+        if was:
+            self._emark_all(t)                   # 按旧设定把这一段记完
+        if d.get("enabled") is not None:
+            e.enabled = bool(d["enabled"])
+        e.update(d)
+        for x in d.get("clear") or []:
+            self._eclear(x)
+        for x in d.get("inject") or []:
+            self._einject(x, t)
+        if not e.enabled:
+            e.cur, e.next_read = {}, None
+            return
+        if not was:
+            e.cur, e.acc = {}, {}
+            e.env.update({"t": None, "mist_i": 0.0, "noise_i": 0.0, "s": 0.0, "air_m3": 0.0, "water": 0.0})
+            e.iv_start, e.next_read = t, None
+            for m in self.machines.values():
+                if m.state == "idle":
+                    e.idle_since.setdefault(m.unit, t)
+            self._schedule_read(t)
+        self._emark_all(t)
+        for m in self.machines.values():
+            self._try_start(m)
+
+    def _einject(self, x, t):
+        f, k, u = self.energy.faults, x.get("kind"), x.get("unit")
+        if k == "forgot" and u in self.machines:
+            f.setdefault("forgot", {})[u] = t + float(x.get("hours", 12)) * 3600
+            self.at(f["forgot"][u], "energy_mark", unit=u)
+        elif k in ("leak", "mist"):
+            f[k] = {"until": t + float(x.get("hours", 24 * 30)) * 3600}
+        elif k == "degrade" and u in self.machines:
+            f.setdefault("degrade", {})[u] = {"pct": float(x.get("pct", 0.3)), "t0": t}
+        elif k == "ht_peak":
+            s, e = EN.peak_window(self.factory_dt(t).astimezone(self.calendar.tzi))
+            s, e = self.sim_t(s), self.sim_t(e)
+            f["ht_peak"] = [s, e]
+            for ts in (s, e, e + (e - s)):
+                self.at(ts, "energy_mark", unit="ht-01")
+        else:
+            return
+        if u in self.machines:
+            self._emark(self.machines[u], t)
+
+    def _eclear(self, x):
+        f = self.energy.faults
+        k, u = (x.get("kind"), x.get("unit")) if isinstance(x, dict) else (x, None)
+        if k in ("forgot", "degrade") and u:
+            (f.get(k) or {}).pop(u, None)
+        else:
+            f.pop(k, None)
+
+    def _ebucket(self, t):
+        return EN.bucket(self.factory_dt(t).astimezone(self.calendar.tzi))
+
+    def _attended(self, m, t):
+        """这一班有没有人管这台（按班次下班、排班里这一班没人 → 没人，下班的人顺手关机）"""
+        now = self.factory_dt(t)
+        if self.calendar.mode == "shift" and not self.calendar.is_open(m.unit, now):
+            return False
+        if self.staffing.enabled and self.staffing.level(m.unit, now.astimezone(self.calendar.tzi)) == 0:
+            return False
+        return True
+
+    def _ht_peak_on(self, t):
+        w = self.energy.faults.get("ht_peak")
+        if not w:
+            return False
+        s, e = w
+        if "ht-01" in self.energy.tou:          # 错峰：这一炉挪到峰时之后
+            s, e = e, e + (e - s)
+        return s <= t < e
+
+    def _epower(self, m, t):
+        """这台设备此刻的档位和功率 (档, kW)"""
+        e = self.energy
+        run, idle, stby = e.power.get(m.unit, (0.0, 0.0, 0.0))
+        st = m.state
+        if st == "run":
+            return "run", run * e.degrade(m.unit, t)
+        if st == "setup":
+            return "setup", idle
+        if st in ("down", "fault"):
+            return "down", stby
+        if m.unit in EN.NO_STANDBY:
+            return ("run", run) if m.unit == "ht-01" and self._ht_peak_on(t) else ("idle", idle)
+        if m.unit not in EN.AUTO and not self._attended(m, t) and not e.forgot(m.unit, t):
+            return "off", 0.0
+        n = e.standby.get(m.unit)
+        if n:
+            since = e.idle_since.get(m.unit, t)
+            if t - since >= n * 60 - 1e-6:
+                return "standby", stby
+            ts = since + n * 60
+            if self._e_pending.get(m.unit) != ts:
+                self._e_pending[m.unit] = ts
+                self.at(ts, "energy_mark", unit=m.unit)
+        return "idle", idle
+
+    def _on_state(self, m, old, new):
+        e = self.energy
+        if not e.enabled:
+            return
+        t = self.now()
+        if new == "idle":
+            e.idle_since[m.unit] = t
+        self._emark(m, t)
+
+    def _eshared_accrue(self, t):
+        e = self.energy
+        for k in ("air", "light"):
+            e.accrue(k, t, self._ebucket)
+        e.accrue_env(t)
+
+    def _eshared_update(self, t):
+        e = self.energy
+        running = [u for u, c in e.cur.items() if u in EN.POWER and c[1] == "run"]
+        on = [u for u, c in e.cur.items() if u in EN.POWER and c[1] != "off"]
+        anyone = any(self._attended(m, t) for m in self.machines.values() if m.unit not in EN.AUTO)
+        flow = EN.AIR_PER_USER * sum(1 for u in running if u in EN.AIR_USERS) + (EN.LEAK_M3 if e.leak(t) else 0.0)
+        e.cur["air"] = [t, "run", EN.AIR_UNLOAD_KW + EN.AIR_KW_PER_M3 * flow]
+        e.cur["light"] = [t, "run" if anyone else "idle", EN.LIGHT_BASE + (EN.LIGHT_SHIFT if anyone else 0.0)]
+        e.env.update({"mist": EN.mist_mg(running, e.mist_fault(t)), "noise": EN.noise_db(running, e.quiet), "air_flow": flow,
+                      "water_h": EN.WATER_PER_H if anyone else 0.0, "on": len(on)})
+        e.env["max_mist"] = max(e.env.get("max_mist", 0.0), e.env["mist"])
+        e.env["max_noise"] = max(e.env.get("max_noise", 0.0), e.env["noise"])
+
+    def _emark(self, m, t=None):
+        e = self.energy
+        if not e.enabled:
+            return
+        t = self.now() if t is None else t
+        self._eshared_accrue(t)
+        e.accrue(m.unit, t, self._ebucket)
+        ps, kw = self._epower(m, t)
+        c = e.cur.get(m.unit)
+        e.cur[m.unit] = [max(t, c[0]) if c else t, ps, kw]
+        self._eshared_update(t)
+
+    def _emark_all(self, t=None):
+        if not self.energy.enabled:
+            return
+        t = self.now() if t is None else t
+        for m in self.machines.values():
+            self._emark(m, t)
+
+    def _ev_energy_mark(self, t, unit=None):
+        if self._e_pending.get(unit) is not None and self._e_pending[unit] <= t + 1e-6:
+            self._e_pending.pop(unit, None)
+        if unit in self.machines:
+            self._emark(self.machines[unit])
+        else:
+            self._emark_all()
+
+    def _ev_demo_inject(self, t, inject):
+        self.set_energy({"inject": inject})
+
+    def _ev_energy_capture(self, t):
+        if self.energy.enabled:
+            self._emark_all(t)
+            self.energy_capture = self.energy.totals()
+
+    def _tou_closed(self, m, t):
+        """错峰：峰时不开新的（正在做的做完）；排好峰时结束再开"""
+        if m.unit not in self.energy.tou:
+            return False
+        local = self.factory_dt(t).astimezone(self.calendar.tzi)
+        if EN.bucket(local) != "peak":
+            return False
+        end = self.sim_t(EN.peak_window(local)[1])
+        if self._tou_wait.get(m.unit) != end:
+            self._tou_wait[m.unit] = end
+            self.at(end + 1, "tou_open", unit=m.unit)
+        return True
+
+    def _ev_tou_open(self, t, unit):
+        self._tou_wait.pop(unit, None)
+        self._try_start(self.machines[unit])
+
+    def _epart(self, m, item, ct, n_in):
+        e = self.energy
+        kw = e.power.get(m.unit, (0.0,))[0] * e.degrade(m.unit, self.now())
+        kwh = kw * ct / 3600.0 / max(1, n_in)
+        a = e._slot(m.unit)["parts"].setdefault(item, [0, 0.0])
+        a[0] += 1
+        a[1] += kwh
+        if m.unit == "asm-01":
+            e.env["water"] = e.env.get("water", 0.0) + EN.WATER_PER_PART
+
+    def _schedule_read(self, t):
+        ts = self.factory_dt(t).timestamp()
+        nxt = (int(ts // EN.READ_S) + 1) * EN.READ_S
+        self.energy.next_read = t + (nxt - ts)
+        self.at(self.energy.next_read, "energy_read")
+
+    def _ev_energy_read(self, t):
+        e = self.energy
+        if not e.enabled or e.next_read is None or t < e.next_read - 1e-6:
+            return
+        self._emark_all(t)
+        secs = max(1e-6, t - (e.iv_start if e.iv_start is not None else t))
+        meters, tot = {}, 0.0
+        for u in EN.POWER:
+            a = e.acc.get(u) or {"kwh": 0.0, "s": {}, "k": {}, "parts": {}}
+            tot += a["kwh"]
+            meters[EN.meter_of(u)] = {"value": round(a["kwh"], 4), "kw": round(a["kwh"] * 3600 / secs, 3),
+                                      "s": {k: round(v, 1) for k, v in a["s"].items()}, "k": {k: round(v, 4) for k, v in (a.get("k") or {}).items()},
+                                      "parts": {i: [n, round(k, 4)] for i, (n, k) in a["parts"].items()}}
+        air = (e.acc.get("air") or {}).get("kwh", 0.0)
+        light = (e.acc.get("light") or {}).get("kwh", 0.0)
+        tot += air + light
+        meters["E-AIR"] = {"value": round(air, 4), "kw": round(air * 3600 / secs, 3)}
+        meters["E-TOTAL"] = {"value": round(tot, 4), "kw": round(tot * 3600 / secs, 3)}
+        meters["F-AIR"] = {"value": round(e.env.get("air_m3", 0.0), 3)}
+        meters["W-MAIN"] = {"value": round(e.env.get("water", 0.0), 4)}
+        s_ = e.env.get("s") or 0.0
+        env = {"mist": round(e.env["mist_i"] / s_, 3) if s_ else round(e.env.get("mist", 0.0), 3),
+               "noise": round(10 * math.log10(e.env["noise_i"] / s_), 2) if s_ and e.env["noise_i"] > 0 else round(e.env.get("noise", 0.0), 2)}
+        f = e.faults
+        active = [k for k in ("leak", "mist") if (f.get(k) and t < f[k]["until"])] + \
+                 ["forgot:" + u for u, until in (f.get("forgot") or {}).items() if t < until] + ["degrade:" + u for u in (f.get("degrade") or {})] + \
+                 (["ht_peak"] if f.get("ht_peak") and t < f["ht_peak"][1] + (f["ht_peak"][1] - f["ht_peak"][0]) else [])
+        self.pub(_topic("machining", "sim", "energy"), "energy.reading", "sim",
+                 {"ts": self.factory_ts(t - secs), "end": self.factory_ts(t), "seconds": round(secs, 1), "bucket": self._ebucket(t - secs),
+                  "meters": meters, "env": env, "standby": e.standby, "tou": e.tou, "faults": active}, None)
+        e.acc = {}
+        e.env.update({"mist_i": 0.0, "noise_i": 0.0, "s": 0.0, "air_m3": 0.0, "water": 0.0})
+        e.iv_start = t
+        self._schedule_read(t)
 
     def _staff_level(self, m, t):
         """这一班这台设备的人员等级；没人时排好换班时复查，返回 0"""
@@ -345,6 +605,8 @@ class Engine:
         if cmd == "pm_done":                   # 第 18 轮 E3：保养做完，运行小时清零
             m.run_h = 0.0
             m.fail_mode = None
+            if (self.energy.faults.get("degrade") or {}).pop(m.unit, None) is not None:   # 第 18 轮 E6：保养修好劣化
+                self._emark(m)
             self._status(m, force=True)
             return True, "保养完成，运行小时清零"
         if cmd == "set_run_h":                 # 教学：老师把运行小时往前拨（模拟保养逾期）
@@ -535,6 +797,15 @@ class Engine:
             m.no_staff = lv == 0
             if lv == 0:
                 break
+            if self.energy.enabled and self._tou_closed(m, t):     # 第 18 轮 E6：错峰，峰时不开新炉
+                break
+            if self.energy.enabled and not m.active and self._epower(m, t)[0] == "standby":
+                # 第 18 轮 E6：自动待机后再开，先预热（按调整算，不改原来的调整记录）
+                m.setup_until = t + EN.WARM_MIN * 60
+                m.state = "setup"
+                self.at(m.setup_until, "setup_done", unit=m.unit)
+                self._status(m)
+                return
             if m.setup_job != job.key and not m.active:
                 # 新工序先调整（装夹、对刀、调程序）
                 m.setup_job = job.key
@@ -580,8 +851,11 @@ class Engine:
         m = self.machines[unit]
         if token not in m.active:
             return                          # 停机时被顺延，旧事件作废
+        n_in = len(m.active)
         p, job, start, end = m.active.pop(token)
         ct = end - start
+        if self.energy.enabled:                 # 第 18 轮 E6：这一件的运行电量（炉子按同炉件数分摊）
+            self._epart(m, job.wo.item, ct, n_in)
         job.done += 1
         job.time_s += ct
         m.tool_life = max(0.0, m.tool_life - WEAR_PER_PART.get(unit, 0))
@@ -823,6 +1097,9 @@ class Engine:
         if self.staffing.enabled:                # 第 18 轮 E4：这一班的人员等级（0 没人 / 1 学徒 / 2 熟练）
             data["staff_level"] = self.staffing.level(m.unit, self.factory_dt(t).astimezone(self.calendar.tzi))
             data["no_staff"] = bool(getattr(m, "no_staff", False)) and data["staff_level"] == 0
+        if self.energy.enabled and m.unit in self.energy.cur:     # 第 18 轮 E6：此刻功率
+            data["power_kw"] = round(self.energy.cur[m.unit][2], 2)
+            data["power_state"] = self.energy.cur[m.unit][1]
         key = (data["state"], data["work_order"], data["operation"], data["qty_done"], data["queue"],
                data["job_started"], len(data["dispatched"]), data["off_shift"], data.get("staff_level"), data.get("no_staff"))
         if not force and key == m.last_status:
@@ -872,7 +1149,7 @@ class Engine:
                 "auto_start": self.auto_start, "status_every_s": self.status_every_s,
                 "rng": [rs[0], list(rs[1]), rs[2]], "err_rng": [es[0], list(es[1]), es[2]],
                 "err_active": self.errors.active, "tokens": tok, "rel_factor": self.rel_factor, "seq": sq, "calendar": self.calendar.to_dict(),
-                "staffing": self.staffing.to_dict(), "staff_wait": self._staff_wait,
+                "staffing": self.staffing.to_dict(), "staff_wait": self._staff_wait, "energy": self.energy.to_dict(),
                 "shift_wait": self._shift_wait, "wos": wos, "machines": machines, "agvs": agvs,
                 "transfers": [[p.wo.name, p.serial, f, to] for p, f, to in self.transfers],
                 "queue": [[qt, qs, k, pl] for qt, qs, k, pl in sorted(self.q)]}
@@ -938,6 +1215,7 @@ class Engine:
         heapq.heapify(e.q)
         e.seq = itertools.count(s["seq"])
         e.tokens = itertools.count(s["tokens"])
+        e.energy = EN.Energy.from_dict(s.get("energy"))   # 最后恢复：恢复设备状态时钩子还不记电
         e._last_periodic = time.time()          # 定时状态按真实时间发，副本不必一开始就补发一遍
         return e
 

@@ -454,6 +454,14 @@ def for_anomaly(c, a):
                 g.summary[0] = "{} {} {} 没人能开（{}）；这一班它停着，影响下面这些工单和订单".format(
                     str(v.get("day"))[5:], {"day": "早班", "night": "晚班"}.get(v.get("shift"), ""), v["unit"].upper(), v.get("why") or "")
             return g
+        if rule == "N1" and v.get("unit"):              # 第 18 轮 E6：单耗突增 → 设备（劣化）→ 停机维修影响的工单 → 订单
+            g = chain_down(c, v["unit"])
+            k = "E-{}".format(v["unit"].upper())
+            g.edge(g.node("Meter", k, role="cause", values={"单件电量（度）": v.get("recent"), "基线": v.get("base")}),
+                   g.node("Machine", v["unit"]), "计量", "链接 Meter.machine")
+            if g.summary:
+                g.summary[0] = "{} 每件多用 {:.0%} 的电，多半在劣化；停机维修会影响下面这些工单和订单".format(v["unit"].upper(), float(v.get("change") or 0))
+            return g
         if rule in ("E1", "E2", "E5") and (v.get("unit") or st == "Machine"):   # 第 18 轮 E2：隐患 / 违规 → 设备 → 工单 → 订单
             unit = v.get("unit") or sk
             g = chain_down(c, unit)

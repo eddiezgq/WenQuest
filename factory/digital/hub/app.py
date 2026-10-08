@@ -160,6 +160,8 @@ class Hub:
             PE.init(self.db)
             from hub import supply as SP
             SP.init(self.db)
+            from hub import energy as EG
+            EG.init(self.db)
             NT.init(self.db)
             RP.init(self.db)
             RT.init(self.db)
@@ -194,8 +196,8 @@ class Hub:
     def compare_locked(self, u, anomaly_id=None):
         """实验 15 的比对模式：学生提交自己的分析之前看不到建议和推荐理由（第 17 轮 D 期 D9）"""
         try:
-            from hub import lab15, lab16, lab17, lab18, lab19, lab20        # 实验 16–20（第 18 轮 E1–E5）沿用同一个比对模式
-            return any(m.locked(self.db, u, anomaly_id) for m in (lab15, lab16, lab17, lab18, lab19, lab20))
+            from hub import lab15, lab16, lab17, lab18, lab19, lab20, lab21   # 实验 16–21（第 18 轮 E1–E6）沿用同一个比对模式
+            return any(m.locked(self.db, u, anomaly_id) for m in (lab15, lab16, lab17, lab18, lab19, lab20, lab21))
         except ImportError:
             return False
 
@@ -211,6 +213,12 @@ class Hub:
                 self.vplc.on_message(tp, msg)
             except Exception:  # noqa: BLE001
                 log.exception("虚拟 PLC 处理消息出错")
+        if t == "energy.reading":                 # 第 18 轮 E6：计量读数入库
+            try:
+                from hub import energy as EG
+                EG.ingest(self.db, msg["mode"], msg["data"])
+            except Exception:  # noqa: BLE001
+                log.exception("能源读数入库出错")
         if t == "sim.snapshot" and self.plan_snaps is not None:
             try:
                 self.plan_snaps.deliver(msg)
@@ -289,6 +297,11 @@ class Hub:
                         SP.tick(self, mode)
                     except Exception:  # noqa: BLE001
                         log.exception("供应链出错")
+                    try:                              # 能源与环境（第 18 轮 E6）：计量开关与节能设定下发车间、模拟器出问题、修好了清掉
+                        from hub import energy as EG
+                        EG.tick(self, mode)
+                    except Exception:  # noqa: BLE001
+                        log.exception("能源出错")
                     last = self.last_brief.get(mode, 0)
                     if new or time.time() - last > 600:
                         self.ai.briefing(mode)
@@ -1718,6 +1731,41 @@ def lab18_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
 
 
+# ---------------------------------------------------------------- 实验 21（第 18 轮 E6-10）
+@app.get("/api/lab21")
+def lab21_status(u=Depends(user_of)):
+    from hub import lab21
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = lab21.check(H.db, u["name"])
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = lab21.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab21/inject")
+def lab21_inject(body: dict = Body(default={}), u=Depends(user_of)):
+    from hub import lab21
+    try:
+        return lab21.inject(H, u, body)
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except (ValueError, KeyError) as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/lab21/{tid}")
+def lab21_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab21
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab21.answer(H.db, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
+
+
 # ---------------------------------------------------------------- 实验 20（第 18 轮 E5-8）
 @app.get("/api/lab20")
 def lab20_status(u=Depends(user_of)):
@@ -1818,6 +1866,8 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     _PE.reset(H.db, "teach")
     from hub import supply as _SP                         # 第 18 轮 E5：批次清空，备选供应商回到初始，供应商模拟器关闭
     _SP.reset(H.db, "teach")
+    from hub import energy as _EG                         # 第 18 轮 E6：读数清空，节能设定、错峰回到初始，模拟器关闭（计量照开）
+    _EG.reset(H.db, "teach")
     if H.ont is not None:
         H.ont.reset_mode("teach")
     H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
@@ -1868,6 +1918,8 @@ from hub import people_api as _people_api  # noqa: E402
 _people_api.mount(app, H, user_of, who)           # 第 18 轮 E4：人员与排班
 from hub import supply_api as _supply_api  # noqa: E402
 _supply_api.mount(app, H, user_of, who)           # 第 18 轮 E5：采购与来料
+from hub import energy_api as _energy_api  # noqa: E402
+_energy_api.mount(app, H, user_of, who)           # 第 18 轮 E6：能源与环境
 from hub.ont import agent_api as _agent_api  # noqa: E402
 _agent_api.mount(app, H, user_of, who, ai_quota)  # 第 17 轮 D 期：AI 代理（要在 mount_anomaly 之前）
 _ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则

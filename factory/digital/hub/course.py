@@ -524,7 +524,14 @@ def mount(app, H):
                        "最后算两家供应商的总拥有成本，写供应商建议。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab20",
             "guide_url": public_base(request) + "/api/cae/lab20/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab20/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab20/report-template.docx"}, {
+            "id": "lab21", "name": {"zh": "实验 21：能源——空转、错峰与单件碳足迹", "en": "Lab 21: energy — idling, peak shifting and the carbon footprint of a part"},
+            "summary": "车间 16 个计量点每 15 分钟一个读数：每台设备的运行、空转、待机电量，峰平谷电费，碳排放。学生先找空转最多的设备，"
+                       "按运行功率和工时算输出轴每件的电量和碳足迹；老师注入“卧加下班忘关、热处理峰时开炉”，学生在指挥台比较几种自动待机方案（比对模式）"
+                       "并执行；最后算错峰和待机一个月各省多少钱、少排多少碳，区分“省钱”和“省电”。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab21",
+            "guide_url": public_base(request) + "/api/cae/lab21/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab21/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

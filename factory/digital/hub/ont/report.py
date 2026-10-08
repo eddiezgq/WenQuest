@@ -149,6 +149,21 @@ def build(db, mode, kind, start, end):
                           "rejected_open": k5["rejected_open"]}
     except Exception:  # noqa: BLE001
         data["supply"] = None
+    # ---- 能源与环境（第 18 轮 E6）：最近一个完整的工厂日
+    try:
+        from hub import energy as EG
+        ek = EG.kpis(db, mode)
+        if ek:
+            ov = EG.overview(db, mode)
+            env = EG.env_now(db, mode, hours=24)
+            data["energy"] = {"day": ov["day"], "kwh": ov["kwh"], "cost": ov["cost"], "peak_share": ov["peak_share"], "idle_kwh": ov["idle_kwh"],
+                              "idle_share": ov["idle_share"], "co2_kg": ov["co2_kg"], "demand_ratio": ov["demand_ratio"],
+                              "top_idle": [x["unit"] for x in sorted(ov["units"], key=lambda x: -x["by_state"].get("idle", 0)) if x["unit"] != "ht-01"][:2],
+                              "env_over": [v["label"] for v in env.values() if v["max"] is not None and v["max"] > v["limit"]]}
+        else:
+            data["energy"] = None
+    except Exception:  # noqa: BLE001
+        data["energy"] = None
     # ---- 人员（第 18 轮 E4）
     try:
         from hub import people as PE
@@ -247,6 +262,12 @@ def text_of(kind, data):
         lines.append("采购与来料：到货 {} 批（不合格 {} 批），在途 {} 批，待处理的不合格 {} 批；近 30 天准时率 {}、来料合格率 {}。".format(
             sp["arrived"], sp["rejected"], sp["in_transit"], sp["rejected_open"], "{:.0%}".format(sp["on_time"]) if sp["on_time"] is not None else "—",
             "{:.0%}".format(sp["pass_rate"]) if sp["pass_rate"] is not None else "—"))
+    en = data.get("energy")
+    if en and en["kwh"]:
+        lines.append("能源与环境（{}）：用电 {:,.0f} 度、电费 ${:,.2f}，峰时占 {:.0%}，空转 {:,.0f} 度（{:.0%}{}），碳排放 {:,.0f} kg；需量到合同的 {:.0%}{}。".format(
+            en["day"][5:], en["kwh"], en["cost"], en["peak_share"], en["idle_kwh"], en["idle_share"],
+            "，最多的是 " + "、".join(u.upper() for u in en["top_idle"]) if en["top_idle"] else "", en["co2_kg"], en["demand_ratio"],
+            "；" + "、".join(en["env_over"]) + "曾超限" if en["env_over"] else ""))
     pe = data.get("people")
     if pe and (pe["absences"] or pe["gaps"] or pe["single_points"] or pe["overtime_h_week"]):
         lines.append("人员：请假缺勤 {} 人次，24 小时内排班缺口 {} 个；{} 台设备只有一个人会开{}；本周加班 {:g} 小时{}。".format(

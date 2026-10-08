@@ -29,7 +29,9 @@
             <span v-if="s.split" class="muted">；首批 {{ s.split.first_qty }} 台 {{ s.split.first_projected }}</span>
           </li>
         </ul>
-        <div class="small">多花 <b>${{ Math.round(o.result.cost_total).toLocaleString() }}</b><template v-if="o.result.overtime_min"> · 加班 {{ o.result.overtime_min }} 分钟 × {{ o.result.overtime_units }} 台</template></div>
+        <div v-if="o.result.energy" class="small muted">未来 24 小时：{{ Math.round(o.result.energy.kwh).toLocaleString() }} 度，其中空转 {{ Math.round(o.result.energy.idle).toLocaleString() }} 度；
+          电费 ${{ o.result.energy.cost.toFixed(2) }}，峰时占 {{ Math.round(o.result.energy.peak_share * 100) }}%；碳 {{ Math.round(o.result.energy.co2_kg) }} kg</div>
+        <div class="small">{{ o.result.cost_total < 0 ? '省' : '多花' }} <b>${{ Math.abs(o.result.cost_total) < 100 ? Math.abs(o.result.cost_total).toFixed(2) : Math.round(Math.abs(o.result.cost_total)).toLocaleString() }}</b><template v-if="o.result.overtime_min"> · 加班 {{ o.result.overtime_min }} 分钟 × {{ o.result.overtime_units }} 台</template></div>
         <div v-for="(c, i) in o.result.checks.filter((x) => !x.ok)" :key="i" class="small err">{{ c.text }}</div>
         <div v-if="o.kind !== 'none'" class="o-a">
           <button v-if="data.can_initiate" class="btn sm" :class="o.recommended ? 'primary' : ''" :disabled="!o.result.ok || adopting"
