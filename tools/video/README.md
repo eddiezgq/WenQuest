@@ -61,3 +61,22 @@ python3 tools/video/make.py docs/课程视频/线性代数/14-2 --only lab --out
 - 网页一律按 15 帧/秒录、合成时补成 30 帧；页面带 `__api.manual/step` 的三维页不用虚拟时钟，逐帧推进（软件渲染每帧约 1 秒）。
   本地没有外网时设 `WQ_THREE=…/three.min.js`（r128）。
 
+
+## 课件即画面（第 25 轮起的标准，2026-10-08）
+
+讲稿只写开场、课后部分和结尾，正片自动由网页互动课件生成：
+
+```yaml
+book: sewing
+section: "3"
+deck: ch03                 # course/slides/ch03.yaml：每页一个镜头，配音 = 该页 notes，按句子逐条出现要点
+skip: [6, 21, 23]          # 控制长度时跳过的页
+intro: {zh: [...], en: [...]}      # 封面上说的话
+after:                     # 课程讲完、小结之前：实验录屏（kind: lab，格式同上）或追加的课件页
+  - {id: homework, part: [作业, Assignment], slide: {layout: points, ...}, say: {zh: [...], en: [...]}}
+outro: {zh: [...], en: [...]}      # 小结页讲稿之后再说的话（注册引导、下一讲）
+```
+
+- 课件里的整页实验（`lab` 版式）和小结页不按原位置出现：实验放到课后部分用实验录屏，小结放在最后。
+- 中文版录双语课件，英文版录 `make_deck(..., lang="en")` 生成的英文版课件（只显示英文、嵌英文实验页）。
+- 三维片段（`proto-*`、`model-*`）先在三维页上逐帧录好，课件录屏时按帧换图（`__wqFrame`），其余动画按虚拟时钟实时运行。

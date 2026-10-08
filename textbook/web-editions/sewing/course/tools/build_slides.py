@@ -198,7 +198,7 @@ html,body{width:1920px;height:1080px;background:var(--bg0);overflow:hidden}
 .chain .arr{flex:none;color:#f2b705;font-size:44px;font-weight:700;opacity:.7}
 .chain .brace{position:absolute;top:640px;font-size:30px;color:var(--amber);text-align:center;font-weight:700}
 /* answer */
-.answer .rows{position:absolute;left:110px;top:330px;width:1100px}
+.answer .row .a .en{display:none}.answer .rows{position:absolute;left:110px;top:330px;width:1100px}
 .answer .row{display:flex;justify-content:space-between;align-items:baseline;padding:26px 10px;border-bottom:1px solid var(--line)}
 .answer .row .a{font-size:46px}
 .answer .row .b{font-family:var(--enf);font-size:64px;font-weight:800}
@@ -351,7 +351,7 @@ def foot(no, page, total):
 
 
 def head(title, tag=None):
-    t = f'<div class="tag">{e(tag[0])}<span class="t-en">{e(tag[1])}</span></div>' if tag else ""
+    t = f'<div class="tag"><i class="t-zh" style="font-style:normal">{e(tag[0])}</i><span class="t-en">{e(tag[1])}</span></div>' if tag else ""
     return f'<div class="head">{t}<div class="zh">{e(title[0])}</div><div class="en">{e(title[1])}</div><div class="seam"></div></div>'
 
 
@@ -387,7 +387,7 @@ def fig_uri(name: str) -> str:
 
 def L_cover(s, ctx):
     return (f'<div class="slide cover"><div class="bgv live" data-live="{s["video"]}"></div><div class="shade"></div>'
-            f'<div class="txt"><div class="kick">{e(s["kicker"][0])}<span>{e(s["kicker"][1])}</span></div><h1>{e(s["title"][0])}</h1>'
+            f'<div class="txt"><div class="kick"><i style="font-style:normal">{e(s["kicker"][0])}</i><span>{e(s["kicker"][1])}</span></div><h1>{e(s["title"][0])}</h1>'
             f'<div class="h1en">{e(s["title"][1])}</div><div class="sub">{e(s["sub"][0])}</div><div class="suben">{e(s["sub"][1])}</div></div>'
             f'<div class="brand"><b>问渠 WenQuest</b>{COURSE_NAME[0]} · {COURSE_NAME[1]}</div></div>')
 
@@ -509,7 +509,9 @@ def L_chain(s, ctx):
 
 
 def L_answer(s, ctx):
-    rows = "".join(f'<div class="row"><div class="a">{e(r[0])}</div><div class="b">{e(r[1])}</div></div>' for r in s["rows"])
+    def left(x):   # 左栏可写成 [中文, English]（英文版课件显示英文）
+        return f'<span class="zh">{e(x[0])}</span><span class="en">{e(x[1])}</span>' if isinstance(x, list) else e(x)
+    rows = "".join(f'<div class="row"><div class="a">{left(r[0])}</div><div class="b">{e(r[1])}</div></div>' for r in s["rows"])
     return (f'<div class="slide answer"><div class="grain"></div>{head(s["title"], s.get("tag"))}<div class="rows">{rows}</div>'
             + (f'<div class="side card"><div class="big">{e(s["side"]["big"])}</div><div class="zh">{e(s["side"]["text"][0])}</div>'
                f'<div class="en">{e(s["side"]["text"][1])}</div></div>' if s.get("side") else "") +
@@ -588,7 +590,7 @@ if(new URLSearchParams(location.search).has('presenter')){addEventListener('load
 const stage=document.getElementById('stage'),slides=[...stage.children];
 const pages={};document.querySelectorAll('script[data-page]').forEach(s=>pages[s.dataset.page]=s.textContent);
 const dec=b64=>new TextDecoder().decode(Uint8Array.from(atob(b64),c=>c.charCodeAt(0)));
-const qs=new URLSearchParams(location.search);if(qs.has('all'))document.body.classList.add('all');
+const qs=new URLSearchParams(location.search);if(qs.has('all'))document.body.classList.add('all');if(qs.has('video'))document.documentElement.classList.add('video');
 let cur=0,frag=0;
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(-50%,-50%) scale(${s})`;}
 addEventListener('resize',fit);fit();
@@ -687,6 +689,25 @@ if(d.loop&&!looping)looping=setInterval(function(){run(d.steps);},d.loop*1000);}
 parent.postMessage({wqrect:rect(d.selector)},'*');});})();</script>"""
 
 
+def en_only_css() -> str:
+    """英文版课件（第 25 轮，录英文视频用）：中文隐去，英文按原来中文的字号排（略小一点，英文更长）。"""
+    out = ["html.en-only .zh{display:none!important}", "html.en-only .en{color:var(--ink)}",
+           "html.en-only .cover h1,html.en-only .cover .sub,html.en-only .cover .kick>i{display:none}",
+           "html.en-only .cover .h1en{font-size:96px;line-height:1.08;font-weight:800;color:var(--ink);margin-top:26px}",
+           "html.en-only .cover .suben{font-size:38px;color:#dbe4ef;margin-top:54px}",
+           "html.en-only .answer .row .a .en{display:inline}",
+           "html.en-only .tag .t-zh{display:none}html.en-only .tag .t-en{margin-left:0;font-size:26px;color:#0b1220}"]
+    for sel, props in re.findall(r"([^{}]*?)\.zh\{([^}]*)\}", CSS + DECK_CSS):
+        sel = sel.strip().split("}")[-1].strip()
+        props = re.sub(r"font-size:(\d+)px", lambda m: f"font-size:{round(int(m.group(1)) * 0.9)}px", props)
+        out.append(f"html.en-only {sel} .en{{{props};font-family:var(--enf);margin-top:0}}".replace("  ", " "))
+    return "".join(out)
+
+
+EN_ONLY_JS = ("<script>document.querySelectorAll('svg text').forEach(t=>{if(/[\\u4e00-\\u9fff]/.test(t.textContent)&&!/[A-Za-z]{3}/.test(t.textContent))t.style.display='none'});</script>")
+VIDEO_CSS = "html.video #nav,html.video #bar{display:none!important}html.video *{cursor:none!important}"
+
+
 def page_b64(name: str, lang="zh") -> str:
     sys.path.insert(0, str(BOOK))
     from inline import inline
@@ -697,7 +718,25 @@ def page_b64(name: str, lang="zh") -> str:
     return base64.b64encode(src.encode("utf-8")).decode("ascii")
 
 
-def build_deck(spec, lesson, slides_html, out: Path) -> Path:
+STILL_JS = ("<script>window.__wqFrame=function(t){var ps=[];document.querySelectorAll('.slide.on img.still').forEach(function(im){"
+            "var i=Math.floor(t*15)%(+im.dataset.n),src=im.dataset.dir+'/'+String(i).padStart(5,'0')+'.jpg';"
+            "if(im.getAttribute('src')!==src){im.src=src;ps.push(im.decode().catch(function(){}));}});return Promise.all(ps);};</script>")
+
+
+def use_stills(slides_html: list[str], stills: dict) -> list[str]:
+    """录视频用（第 25 轮）：三维片段在无头浏览器里实时渲染太慢，换成预先逐帧录好的画面（录屏程序每帧调 __wqFrame(t) 换图）。"""
+    out = []
+    for h in slides_html:
+        for name, (d, n) in stills.items():
+            h = re.sub(r'class="([^"]*)" data-live="%s"([^>]*)>' % re.escape(name),
+                       lambda m: f'class="{re.sub(r"\blive\b", "", m.group(1)).strip()}" data-still="{name}"{m.group(2)}>'
+                                 f'<img class="still" data-dir="{d}" data-n="{n}" src="{d}/00000.jpg" '
+                                 'style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block">', h)
+        out.append(h)
+    return out
+
+
+def build_deck(spec, lesson, slides_html, out: Path, lang: str = "zh", stills: dict | None = None) -> Path:
     no = spec["lesson"]
     clips = dict(spec.get("clips") or {})
     for lab in (s for s in spec["slides"] if s["layout"] == "lab"):
@@ -708,22 +747,25 @@ def build_deck(spec, lesson, slides_html, out: Path) -> Path:
             c["cover"] = True
     heavy = [k for k, s in enumerate(spec["slides"]) if any(clips.get(x, {}).get("page", "").startswith(("proto-lockstitch", "model-"))
                                                             for x in re.findall(r'data-live="([^"]+)"', slides_html[k]))]
+    if stills:
+        slides_html = use_stills(slides_html, stills)
     notes = [s.get("notes") or ["", ""] for s in spec["slides"]]
     titles = [(s.get("title") or s.get("kicker") or ["", ""])[0] for s in spec["slides"]]
     data = {"id": f"sewing-{no}", "clips": clips, "heavy": heavy}
     pres = PRESENTER.replace("__DATA__", json.dumps({"id": data["id"], "notes": notes, "titles": titles}, ensure_ascii=False))
     data["presenter"] = pres
     pages = sorted({c["page"] for c in clips.values()})
-    scripts = "".join(f'<script type="text/plain" data-page="{p}">{page_b64(p)}</script>' for p in pages)
+    scripts = "".join(f'<script type="text/plain" data-page="{p}">{page_b64(p, lang)}</script>' for p in pages)
     body = "".join(slides_html)
     title = f"第 {no} 讲 {lesson['title'][0]} · 课件"
-    doc = (f'<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-           f'<title>{e(title)}</title><style>{CSS}{DECK_CSS}</style></head><body><div id="stage">{body}</div>'
+    en = lang == "en"
+    doc = (f'<!doctype html><html lang="{"en" if en else "zh-CN"}"{" class=\"en-only\"" if en else ""}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+           f'<title>{e(title)}</title><style>{CSS}{DECK_CSS}{VIDEO_CSS}{en_only_css() if en else ""}</style></head><body><div id="stage">{body}</div>'
            f'<div id="bar"></div><div id="nav"><button id="bp" title="上一步 ←">◀</button><span id="pg"></span><button id="bn" title="下一步 → / 空格">▶</button>'
            f'<button id="bs" title="讲者视图（S）">讲者</button><button id="bf" title="全屏（F）">全屏</button></div>'
            f'<div id="fl"><button>返回课件（Esc）</button><iframe></iframe></div>'
            f'<script type="application/json" id="deck-data">{json.dumps(data, ensure_ascii=False).replace("</", "<\\/")}</script>{scripts}'
-           f'<script>{DECK_JS}</script></body></html>')
+           f'<script>{DECK_JS}</script>{EN_ONLY_JS if en else ""}{STILL_JS if stills else ""}</body></html>')
     out.write_text(doc, encoding="utf-8")
     return out
 
@@ -754,9 +796,12 @@ async def preview(deck: Path, n: int, outdir: Path, only: set | None = None):
             print("! page errors:", errors[:3])
 
 
-def make_deck(lesson_id: str, out: Path) -> Path:
-    """Build the deck of one lesson into out/ and return its path (used by build_course.py too)."""
+def make_deck(lesson_id: str, out: Path, lang: str = "zh", extra: list | None = None, name: str | None = None,
+              stills: dict | None = None) -> Path:
+    """Build the deck of one lesson into out/ and return its path (used by build_course.py too).
+    第 25 轮（讲课视频）：lang="en" 出英文版（只显示英文、嵌英文实验页）；extra = 追加的页（视频课后部分：作业、测验等）。"""
     spec = yaml.safe_load((COURSE / "slides" / f"{lesson_id}.yaml").read_text(encoding="utf-8"))
+    spec["slides"] = spec["slides"] + list(extra or [])
     values = run_programs(spec.get("code") or [])
     spec = fill(spec, values)
     lesson = json.loads((COURSE / "lessons" / f"{lesson_id}.json").read_text(encoding="utf-8"))
@@ -769,7 +814,7 @@ def make_deck(lesson_id: str, out: Path) -> Path:
         ctx = {"foot": foot(spec["lesson"], k + 1, len(slides)), "v": values}
         pages.append(mark_frags(LAYOUTS[s["layout"]](s, ctx), s["layout"]))
     no = spec["lesson"]
-    return build_deck(spec, lesson, pages, out / f"第{no}讲-{lesson['title'][0]}-课件.html")
+    return build_deck(spec, lesson, pages, out / (name or f"第{no}讲-{lesson['title'][0]}-课件.html"), lang, stills)
 
 
 def main():
@@ -777,9 +822,10 @@ def main():
     ap.add_argument("lesson")
     ap.add_argument("--out", required=True)
     ap.add_argument("--preview", default="", help="页码（逗号分隔）或 all：出预览截图")
+    ap.add_argument("--lang", default="zh", help="en：英文版（只显示英文，录英文视频用）")
     a = ap.parse_args()
     out = Path(a.out)
-    deck = make_deck(a.lesson, out)
+    deck = make_deck(a.lesson, out, a.lang, name=(f"{a.lesson}.en.html" if a.lang == "en" else None))
     print("deck:", deck, f"{deck.stat().st_size / 1e6:.2f} MB")
     if a.preview:
         n = deck.read_text(encoding="utf-8").count('<div class="slide ')

@@ -187,6 +187,44 @@ Base.card = _v_card
 '''
 
 
+def deck_stills(lec, lang, work: Path) -> dict:
+    """课件里的三维片段（虚拟样机、三维模型）先在三维页上逐帧录好（三维页自己的逐帧推进），课件录屏时按帧换图。"""
+    import labrec
+    import yaml
+    spec = yaml.safe_load((lec.web / "course" / "slides" / f"{lec.data['deck']}.yaml").read_text(encoding="utf-8"))
+    out = {}
+    for name, c in (spec.get("clips") or {}).items():
+        if not c["page"].startswith(("proto-", "model-")):
+            continue
+        d = work / f"still_{lang}_{name}"
+        if not (d / "00000.jpg").exists():
+            page = lec.web / "src" / lang / "labs" / f"{c['page']}.html"
+            full = ("var s=document.createElement('style');s.textContent='" + (c.get("selector") or "#stage") +
+                    "{position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:100vh!important;"
+                    "z-index:99999!important;margin:0!important;border-radius:0!important}';document.head.appendChild(s);"
+                    "dispatchEvent(new Event('resize'))")
+            steps, times = [{"js": full}], [0.0]
+            for st in sorted(c.get("steps") or [], key=lambda x: x.get("at", 0)):
+                st = {k: v for k, v in st.items() if k != "at"}
+                if "press" in st:                 # 舞台盖住了按钮：用脚本点
+                    sels = st.pop("press")
+                    sels = sels if isinstance(sels, list) else [sels]
+                    click = ";".join(f"document.querySelector({json.dumps(x if x[:1] in '#.[' else '#' + x)}).click()" for x in sels)
+                    st["js"] = click + (";" + st["js"] if st.get("js") else "")
+                steps.append(st)
+                times.append(float(st.get("at", 0)) + 0.1)
+            loop = float(c.get("loop") or 12)
+            mp4 = work / "shots" / f"still_{name}_{lang}.mp4"
+            mp4.parent.mkdir(parents=True, exist_ok=True)
+            labrec.run(page.resolve().as_uri(), c["page"], steps, times, loop, mp4, standalone=True, viewport=(1280, 720),
+                       manual=True, fps=15)
+            d.mkdir(parents=True, exist_ok=True)
+            sh("ffmpeg", "-y", "-loglevel", "error", "-i", mp4, "-vf", "fps=15,scale=1600:-2", "-q:v", "3", "-start_number", "0",
+               d / "%05d.jpg")
+        out[name] = (d.resolve().as_uri(), len(list(d.glob("*.jpg"))))
+    return out
+
+
 def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: str) -> Path:
     spec = {"kind": shot.kind, "lang": lang, "total": tl["total"], "steps": tl["steps"],
             "part": lec.t(shot.data.get("part", ""), lang), "head": lec.t(shot.data.get("head", ""), lang)}
@@ -250,7 +288,7 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
                     cta=lec.t(["问渠学习平台 · 免费注册", "learn.wenquestrobotics.com"], lang),
                     cta2=lec.t(["实验 · 程序 · 讲义 · 作业 · AI 反馈", "Labs · programs · notes · exercises · instant AI feedback"], lang),
                     cta_at=max(0.5, tl_lines[n]["start"] - LEAD) if len(tl_lines) > n else tl["total"] - 3)
-    key = h([spec, (HERE / "slides.py").read_text(encoding="utf-8"), quality] + ([d, (HERE / "labrec.py").read_text(encoding="utf-8")] if shot.kind in ("lab", "clip") else []))   # 实验镜头：步骤或录屏程序变了要重录
+    key = h([spec, (HERE / "slides.py").read_text(encoding="utf-8"), quality] + ([d, (HERE / "labrec.py").read_text(encoding="utf-8")] if shot.kind in ("lab", "clip", "deck") else []))   # 实验镜头：步骤或录屏程序变了要重录
     out = work / "shots" / f"{shot.id}.{lang}.{key}.mp4"
     if out.exists():
         return out
@@ -268,6 +306,24 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
         js = tmp / "sync.json"
         js.write_text(json.dumps({"lang": lang, "marks": tl["steps"]}), encoding="utf-8")
         raw = manim(tmp / "scene.py", "Lesson", {"WQ_ANIM_SYNC": str(js)}, tmp, quality)
+    elif shot.kind == "deck":
+        # 第 25 轮：画面就是网页互动课件（中文版双语、英文版只显示英文），翻到这一页，每个 “>” 出现下一个要点，最后一个 “>” 出现全部
+        import labrec
+        deck = work / f"deck_{lang}" / "deck.html"
+        if not deck.exists():
+            sys.path.insert(0, str(lec.web / "course" / "tools"))
+            import build_slides
+            build_slides.make_deck(lec.data["deck"], deck.parent, lang, extra=lec.data.get("deck_extra"), name="deck.html",
+                                   stills=deck_stills(lec, lang, work))
+        nxt = "(()=>{const f=document.querySelector('.slide.on .frag:not(.on)');if(f)f.classList.add('on')})()"
+        rest = "document.querySelectorAll('.slide.on .frag').forEach(f=>f.classList.add('on'))"
+        k = len(tl["steps"])
+        steps = [{"js": nxt} for _ in range(max(0, k - 1))] + ([{"js": rest}] if k else [])
+        raw = work / "shots" / f"deck_{shot.id}_{lang}.mp4"
+        labrec.run(deck.resolve().as_uri() + f"?video=1#{d['slide']}", "deck", steps, tl["steps"], tl["total"], raw,
+                   standalone=True, viewport=(1920, 1080), fps=15)
+        fit_length(raw, tl["total"], out)
+        return out
     elif shot.kind == "lab":
         import labrec
         if lec.web:                               # 网页版教材：实验、动画、三维页各是一个独立网页，直接打开源文件（库按相对路径加载）

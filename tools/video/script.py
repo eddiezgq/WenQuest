@@ -24,7 +24,7 @@ TEXTBOOK = ROOT / "textbook"
 # 网页版教材（第 23 轮）：一讲 = 课程包一讲（一章），section 写讲号（如 "2"）；程序在 course/calc/chNN.py，
 # 插图在 img/（英文 img/en/），实验与动画页在 src/<语言>/labs/，作业取课程包 assignment
 WEB = {"sewing": TEXTBOOK / "web-editions" / "sewing"}
-KINDS = {"title", "slide", "anim", "code", "lab", "clip", "homework", "outro"}
+KINDS = {"title", "slide", "anim", "code", "lab", "clip", "homework", "outro", "deck"}
 LANGS = ("zh", "en")
 PH = re.compile(r"\{\{\s*([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*(?::([^}]*))?\}\}")
 DUAL = re.compile(r"\[([^\[\]|]+)\|([^\[\]]+)\]")
@@ -141,11 +141,13 @@ def load(lecture_dir: str | Path) -> Lecture:
     if not p.exists():
         raise ScriptError(f"没有 {p}")
     raw = yaml.safe_load(p.read_text(encoding="utf-8"))
-    for k in ("book", "section", "title", "shots"):
+    for k in ("book", "section", "title") + (() if raw.get("deck") else ("shots",)):
         if k not in raw:
             raise ScriptError(f"讲稿缺少 {k}")
     book, sec = raw["book"], str(raw["section"])
     ch = int(sec.split(".")[0])
+    if raw.get("deck"):
+        raw = from_deck(raw)
     values = run_programs(book, ch, raw.get("code") or [])
     data = fill_tree({k: v for k, v in raw.items() if k != "shots"}, values, "讲稿头部")
     shots, seen = [], set()
@@ -180,6 +182,79 @@ def load(lecture_dir: str | Path) -> Lecture:
                     raise ScriptError(f"镜头 {sid}：占位符没有填上：{ln.shown[:40]}")
         shots.append(shot)
     return Lecture(dir=d, book=book, section=sec, chapter_no=ch, data=data, shots=shots, values=values)
+
+
+ZH_END = re.compile(r"(?<=[。！？])")
+EN_END = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9“\"'(])")
+
+
+def sentences(text: str, lang: str) -> list[str]:
+    text = re.sub(r"\s+", " " if lang == "en" else "", str(text)).strip()
+    parts = ZH_END.split(text) if lang == "zh" else EN_END.split(text)
+    return [x.strip() for x in parts if x.strip()]
+
+
+def from_deck(raw: dict) -> dict:
+    """第 25 轮起的标准：视频画面就是这一讲的网页互动课件（course/slides/chNN.yaml），配音是每页讲稿。
+    讲稿.yaml 只写：deck、intro（封面上说的）、after（课程讲完、小结之前的镜头：虚拟实验、数字工厂录屏，
+    或追加的课件页 {slide: {...}}，如作业、测验）、outro（小结之后的结尾）。每页的句子依次让该页要点逐条出现。"""
+    deck_id = raw["deck"]
+    dy = WEB[raw["book"]] / "course" / "slides" / f"{deck_id}.yaml"
+    deck = yaml.safe_load(dy.read_text(encoding="utf-8"))
+    code = list(dict.fromkeys(list(raw.get("code") or []) + list(deck.get("code") or [])))
+    slides = deck["slides"]
+    extra = [a["slide"] for a in raw.get("after") or [] if "slide" in a]
+    tools = WEB[raw["book"]] / "course" / "tools" / "build_slides.py"
+    import hashlib
+    stamp = hashlib.sha1((dy.read_text(encoding="utf-8") + tools.read_text(encoding="utf-8")
+                          + json.dumps(extra, ensure_ascii=False)).encode()).hexdigest()[:12]
+
+    def say_of(notes, zh_extra=(), en_extra=()):
+        zh = sentences(notes[0], "zh") + list(zh_extra) if notes else list(zh_extra)
+        en = sentences(notes[1], "en") + list(en_extra) if notes else list(en_extra)
+        k = min(len(zh), len(en))
+        return {"zh": [(">" if i < k else "") + x for i, x in enumerate(zh)],
+                "en": [(">" if i < k else "") + x for i, x in enumerate(en)]}
+
+    shots, part, summary = [], ["", ""], None
+    for n, sl in enumerate(slides, 1):
+        lay = sl["layout"]
+        if lay == "section":
+            part = sl["title"]
+        if lay == "lab":
+            continue                     # 学生自己操作的整页实验：视频里放到课后部分，用实验录屏
+        if n in (raw.get("skip") or []):
+            continue                     # 控制长度：课程部分约 10 分钟，次要的页留给课件和教材
+        if lay == "summary":
+            summary = (n, sl)
+            continue
+        if lay == "cover":
+            say = {"zh": raw["intro"]["zh"], "en": raw["intro"]["en"]}
+        elif lay == "section":
+            say = {"zh": [sl["title"][0] + "。"], "en": [sl["title"][1] + "."]}
+        else:
+            say = say_of(sl.get("notes"))
+        if not say["zh"]:
+            continue
+        shots.append({"id": f"p{n:02d}", "kind": "deck", "slide": n, "stamp": stamp,
+                      "part": part if lay != "cover" else ["开场", "Opening"], "say": say})
+    k = len(slides)
+    for a in raw.get("after") or []:
+        if "slide" in a:
+            k += 1
+            sl = a["slide"]
+            shots.append({"id": a.get("id") or f"x{k:02d}", "kind": "deck", "slide": k, "stamp": stamp,
+                          "part": a.get("part") or sl.get("title") or ["", ""], "say": a.get("say") or say_of(sl.get("notes"))})
+        else:
+            shots.append(a)
+    if summary:
+        n, sl = summary
+        out = raw.get("outro") or {"zh": [], "en": []}
+        shots.append({"id": "summary", "kind": "deck", "slide": n, "stamp": stamp, "part": ["小结", "Summary"],
+                      "say": say_of(sl.get("notes"), out["zh"], out["en"])})
+    new = {k_: v for k_, v in raw.items() if k_ not in ("intro", "after", "outro", "skip")}
+    new.update(code=code, shots=shots, deck_extra=extra)
+    return new
 
 
 def lesson(lec: Lecture) -> dict:

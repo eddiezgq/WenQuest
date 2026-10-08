@@ -315,9 +315,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["6000 转超限：减重或限速", "6000 r/min is over the limit: lighten it or slow it"]
     rows:
-      - ["6000 r/min 时惯性力", "{{ch03.F6000:.0f}} N"]
-      - ["方案一：减重到", "≤ {{ch03.mmax:.0f}} g"]
-      - ["方案二：限速到", "≤ {{ch03.nmax:.0f}} r/min"]
+      - [["6000 r/min 时惯性力", "Inertia force at 6000 r/min"], "{{ch03.F6000:.0f}} N"]
+      - [["方案一：减重到", "Option 1: lighten to"], "≤ {{ch03.mmax:.0f}} g"]
+      - [["方案二：限速到", "Option 2: limit speed to"], "≤ {{ch03.nmax:.0f}} r/min"]
     side: {big: "×{{ch03.r56:.2f}}", text: ["{{ch03.F5000:.0f}} → {{ch03.F6000:.0f}} N", "Force at BDC, 5000 → 6000 r/min"]}
     foot: ["减重：空心针杆、小型针夹、镂空连杆，并复核平衡和润滑", "To lighten: hollow bar, small clamp, lightened link; then re-check balance and oiling"]
     notes:

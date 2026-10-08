@@ -62,7 +62,7 @@ async def _set_any(page, pid, v, focus=True):
 
 
 async def record(url: str, lab: str, steps: list[dict], step_times: list[float], total: float, out: Path,
-                 width=1280, height=720, scale=1.5, standalone=False, viewport=None, manual=False, fps=FPS) -> Path:
+                 width=1280, height=720, scale=1.5, standalone=False, viewport=None, manual=False, fps=FPS, gl=False) -> Path:
     """manual=True（第 23 轮）：页面有 __api.manual / __api.step（三维页）。不用虚拟时钟，每帧调 step(1/fps) 渲染一帧再截图：
     软件渲染下虚拟时钟会让三维页每帧渲染好几遍、越来越慢。三维镜头用 fps=15，合成时补成 30 帧。"""
     from playwright.async_api import async_playwright
@@ -74,7 +74,7 @@ async def record(url: str, lab: str, steps: list[dict], step_times: list[float],
         if viewport:
             width, height = viewport
             scale = 1920 / width
-        args = ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] if (manual and os.environ.get("WQ_GL_FLAGS", "1") == "1") else []   # 只有三维页需要 WebGL
+        args = ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] if ((manual or gl) and os.environ.get("WQ_GL_FLAGS", "1") == "1") else []   # 只有三维页需要 WebGL
         b = await p.chromium.launch(args=args)
         ctx = await b.new_context(viewport={"width": width, "height": height}, device_scale_factor=scale)
         page = await ctx.new_page()
@@ -173,6 +173,8 @@ async def record(url: str, lab: str, steps: list[dict], step_times: list[float],
                     for pid, (a, bnd) in st["sweep"].items():
                         await setter(pid, round(a + (bnd - a) * u, 3), focus=fr < f1)
             await advance()
+            if standalone and not manual:    # 课件里预录的三维画面：按虚拟时间换到这一帧（第 25 轮）
+                await page.evaluate(f"window.__wqFrame ? __wqFrame({fr / fps}) : 0")
             await capture(fr)
         await b.close()
         if errors:
