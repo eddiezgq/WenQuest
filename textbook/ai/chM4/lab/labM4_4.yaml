@@ -1,0 +1,26 @@
+# 实验 M4.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 labM4_4.js。
+原理:
+  - ["浮点数只有有限位有效数字：尾数决定有效数字的位数，指数决定能表示多大多小。相邻两个可表示数之间有间隔，数越大间隔越大，相对间隔不变（M4.4 节；各格式的参数见表 8.1.1）。", "A float has a fixed number of significant digits: the mantissa sets precision, the exponent sets range. Neighbouring representable numbers are a gap apart, and that gap grows with the magnitude (Section M4.4; format parameters in Table 8.1.1)."]
+  - ["由此“大数吃小数”：单精度下 1e8 + 1 还是 1e8，因为这个量级上的间隔已经大于 1。浮点加法因此不满足结合律，求和的次序会改变结果。", "Hence large values swallow small ones: in single precision 1e8 + 1 is still 1e8. Floating-point addition is therefore not associative and the order of summation changes the result."]
+  - ["求和误差的两个界：最坏情况正比于项数 n（误差一直同号地累积），随机误差正比于 √n（正负相抵）。写法决定落在哪一头——顺序求和接近最坏，成对求和按 √(log n) 涨，补偿（卡亨）求和几乎不涨。", "Two bounds for summation error: the worst case grows like n, random errors like sqrt(n). The way you write it decides which: sequential is near worst case, pairwise grows like sqrt(log n), compensated (Kahan) barely grows."]
+  - 式: "机器精度 ε：1 与比它大的下一个可表示数之差；求和的相对误差 最坏 ≈ n·ε，随机 ≈ √n·ε"
+步骤:
+  - ["“一个数被存成什么”场景：把要存的数调到 1e−1（0.1），记下 FP64 / FP32 / FP16 存成的值与相对误差，填表 1（任务 1）。", "Rounding scene: set the value to 0.1 and record what FP64, FP32 and FP16 store and the relative error; fill Table 1 (task 1)."]
+  - ["把再加上的小数固定为 1，要存的数从 1e6 逐级调到 1e8，找出单精度从哪个数量级起把这个 1 吃掉；与 2²⁴ = 16 777 216 对照（任务 2）。", "Keep the addend at 1 and raise the value from 1e6 to 1e8 to find where single precision swallows it; compare with 2^24 = 16,777,216 (task 2)."]
+  - ["切到“一百万个数怎么加”场景，单精度、项数 1e5：记下顺序 / 成对 / 补偿三种写法的相对误差与倍数（任务 3），填表 2。", "Switch to the summation scene with 1e5 terms in single precision and record the three errors and their ratios (task 3); fill Table 2."]
+  - ["把项数加到 1e5.5、1e6，看顺序求和的误差涨了几倍，与 n（最坏）和 √n（随机）两条参照线比较（任务 4）；再把精度切到双精度重做一遍。", "Raise the terms to 1e5.5 and 1e6, see how much the sequential error grows and compare with the n and sqrt(n) references (task 4); then repeat in double precision."]
+数据表:
+  - 标题: ["表 1  同一个数在三种精度里", "Table 1  One number in three precisions"]
+    表头: ["要存的数", "FP64 存成", "FP32 存成", "FP16 存成", "FP16 相对误差"]
+    表头英文: ["value", "stored FP64", "stored FP32", "stored FP16", "FP16 rel. error"]
+    行: [["0.1", "", "", "", ""], ["1e3", "", "", "", ""], ["1e6", "", "", "", ""], ["1e8", "", "", "", ""]]
+  - 标题: ["表 2  三种求和写法的相对误差", "Table 2  Relative error of three ways to sum"]
+    表头: ["项数", "精度", "顺序", "成对", "补偿", "顺序 / 成对"]
+    表头英文: ["terms", "precision", "sequential", "pairwise", "compensated", "seq / pair"]
+    行: [["1e4", "单", "", "", "", ""], ["1e5", "单", "", "", "", ""], ["1e6", "单", "", "", "", ""], ["1e6", "双", "", "", "", ""]]
+注意:
+  - ["实验里的“真值”用双精度算出，项数很大时它自己也有误差。真要做基准，得用更高精度（如补偿求和的双精度版）当参照。", "The lab's reference value is computed in double precision, which has its own error at large n; a real benchmark needs a higher-precision reference."]
+  - ["半精度在浏览器里是按 IEEE 754 binary16 手工舍入模拟的，与显卡上的 FP16 一致；但显卡的张量核心在乘加时用的是 FP32 累加器，所以实际训练的误差比本实验的“全程 FP16”小得多（第 3、8 章）。", "Half precision is emulated by hand-rounding to IEEE 754 binary16, matching GPU FP16; but tensor cores accumulate in FP32, so real training error is far smaller than an all-FP16 run (Chapters 3 and 8)."]
+思考题:
+  - ["为什么混合精度训练里，矩阵乘法可以用 FP16，而累加必须用 FP32？用表 2 的数据说明。", "Why can mixed-precision training multiply in FP16 but must accumulate in FP32? Answer with the numbers in Table 2."]
+  - ["同一份代码在两块显卡上跑出的损失值差了小数点后第六位，是 bug 吗？从“并行归约的次序”解释，并说明要逐位复现需要固定哪些东西。", "Two GPUs give losses differing in the sixth decimal — is that a bug? Explain via the order of parallel reduction and say what must be fixed to reproduce bit for bit."]

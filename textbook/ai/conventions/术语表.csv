@@ -397,3 +397,15 @@ M3,KL 散度,Kullback–Leibler divergence,也称相对熵
 M3,蒙特卡洛,Monte Carlo,
 M3,置信区间,confidence interval,
 M3,威尔逊区间,Wilson interval,比例的置信区间，小样本下比正态近似可靠
+M4,信息论,information theory,
+M4,信息量,self-information,也称自信息，−log p
+M4,互信息,mutual information,
+M4,困惑度,perplexity,交叉熵的指数，语言模型的标准指标
+M4,数值计算,numerical computation,
+M4,数值稳定性,numerical stability,同一公式的不同写法里经得起舍入的那一种
+M4,机器精度,machine epsilon,1 与比它大的下一个可表示数之差
+M4,灾难性相消,catastrophic cancellation,两个相近的数相减，有效数字被抵消
+M4,顺序求和,sequential summation,
+M4,成对求和,pairwise summation,分治地两两相加，NumPy 的默认做法
+M4,补偿求和,compensated summation,也称卡亨求和（Kahan summation）
+M4,梯度裁剪,gradient clipping,
