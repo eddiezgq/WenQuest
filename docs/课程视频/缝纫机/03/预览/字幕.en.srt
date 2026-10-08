@@ -1,763 +1,867 @@
 1
-00:00:00,600 --> 00:00:01,614
+00:00:00,600 --> 00:00:01,752
 Hi everyone,
 
 2
-00:00:01,634 --> 00:00:07,820
+00:00:01,772 --> 00:00:08,783
 and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
 
 3
-00:00:08,220 --> 00:00:14,382
+00:00:09,183 --> 00:00:13,883
 This is Lecture 3, the needle-bar mechanism, a slider-crank.
 
 4
-00:00:15,902 --> 00:00:20,520
-Let's start with a problem from the shop floor.
+00:00:15,403 --> 00:00:16,703
+Here's the problem.
 
 5
-00:00:20,920 --> 00:00:27,588
-A factory runs its lockstitch machines at five thousand revolutions a minute,
+00:00:17,103 --> 00:00:23,986
+A factory's lockstitch machines have a needle-bar crank radius of 15.5 millimetres,
 
 6
-00:00:27,608 --> 00:00:30,540
-and production wants six thousand.
+00:00:24,006 --> 00:00:28,893
+a 55-millimetre link and a reciprocating mass of 120 grams,
 
 7
-00:00:30,940 --> 00:00:35,014
-The maintenance team is worried about the needle bar.
+00:00:28,913 --> 00:00:30,723
+an illustrative value.
 
 8
-00:00:35,034 --> 00:00:40,421
-It slides up and down in its bushings more than eighty times a second.
+00:00:31,123 --> 00:00:40,113
+They run at 5000 r/min; production wants 6000.
 
 9
-00:00:40,821 --> 00:00:45,442
-From experience they have set a limit for the bushings.
+00:00:40,513 --> 00:00:45,991
+Maintenance has set a limit for the needle-bar bushings:
 
 10
-00:00:45,462 --> 00:00:52,361
-The reciprocating inertia force at bottom dead centre must stay under 800 newtons.
+00:00:46,011 --> 00:00:52,275
+no more than 800 newtons of inertia force at bottom dead centre,
 
 11
-00:00:52,761 --> 00:00:56,670
-At six thousand, will it go over? And if it does,
+00:00:52,295 --> 00:00:55,613
+a figure assumed for this problem.
 
 12
-00:00:56,690 --> 00:01:00,920
-should we lighten the needle bar, or limit the speed?
+00:00:56,013 --> 00:00:59,473
+What is the force at 6000?
 
 13
-00:01:01,320 --> 00:01:05,660
-By the end of this lecture you'll be able to work it out.
+00:00:59,873 --> 00:01:01,613
+Is it over?
 
 14
-00:01:07,180 --> 00:01:11,971
-The needle bar has a clear job. Carry the needle through the fabric,
+00:01:02,013 --> 00:01:04,473
+And if so, what can we do?
 
 15
-00:01:11,991 --> 00:01:17,349
-reach its lowest point at exactly the right moment, and do it at high speed.
+00:01:05,993 --> 00:01:08,104
+What it must do, and how it's built.
 
 16
-00:01:17,749 --> 00:01:21,238
-Here we're looking along the main shaft.
+00:01:09,624 --> 00:01:12,725
+The mechanism has to meet five requirements at once.
 
 17
-00:01:21,258 --> 00:01:26,150
-The needle-bar crank sits on the front end of the shaft,
+00:01:13,125 --> 00:01:17,240
+Enough stroke: room for the cloth at the top,
 
 18
-00:01:26,170 --> 00:01:30,449
-with a counterweight cast opposite the crank pin.
+00:01:17,260 --> 00:01:21,099
+the eye below the hook path at the bottom.
 
 19
-00:01:30,849 --> 00:01:36,995
-A link runs from the crank pin to a connecting stud clamped on the needle bar.
+00:01:21,499 --> 00:01:27,159
+Exact timing: bottom dead centre at 180 degrees.
 
 20
-00:01:37,015 --> 00:01:43,082
-A guide block on the stud runs in a slot, so the bar can only go up and down.
+00:01:27,559 --> 00:01:36,259
+High speed: at 5000 r/min the bar reverses more than eighty times a second.
 
 21
-00:01:43,102 --> 00:01:44,189
-It can't turn.
+00:01:36,659 --> 00:01:37,519
+Low vibration.
 
 22
-00:01:44,589 --> 00:01:50,353
-There are two adjustments. Loosen the stud screw to set the needle-bar height,
+00:01:37,919 --> 00:01:43,645
+And the bar must not turn, because the scarf has to face the hook,
 
 23
-00:01:50,373 --> 00:01:56,508
-and loosen the needle clamp to set how deep the needle sits and which way it faces.
+00:01:43,665 --> 00:01:46,779
+while its height must be adjustable.
 
 24
-00:01:56,908 --> 00:02:01,891
-Remember, these adjustments only move things. They don't change the motion.
+00:01:48,299 --> 00:01:54,179
+This is the head of the virtual prototype with a window cut in it and the
 
 25
-00:02:01,911 --> 00:02:04,826
-The motion is set by the crank and the link.
+00:01:54,199 --> 00:01:56,199
+needle train highlighted.
 
 26
-00:02:06,346 --> 00:02:09,806
-Now draw it as a kinematic diagram.
+00:01:56,599 --> 00:02:00,621
+On the front of the main shaft is the needle-bar crank,
 
 27
-00:02:10,206 --> 00:02:14,720
-The main shaft is the crank OA, the link is AB,
+00:02:00,641 --> 00:02:04,221
+with a counterweight cast opposite the crank pin.
 
 28
-00:02:14,740 --> 00:02:21,183
-and the needle bar is the slider B. That's an in-line slider-crank.
+00:02:04,621 --> 00:02:11,561
+The link runs from the crank pin to a connector clamped on the needle bar.
 
 29
-00:02:21,583 --> 00:02:25,557
-A car engine's piston is a slider-crank too,
+00:02:11,961 --> 00:02:16,147
+The bar slides in an upper and a lower bushing,
 
 30
-00:02:25,577 --> 00:02:31,095
-and you may have derived its formulas in a mechanisms course.
+00:02:16,167 --> 00:02:21,784
+and a guide block on the connector rides in a slot in the head,
 
 31
-00:02:31,495 --> 00:02:36,215
-But there's one difference. The piston sits above the crankshaft,
+00:02:21,804 --> 00:02:26,169
+so the bar can only move up and down, never turn.
 
 32
-00:02:36,235 --> 00:02:39,715
-while the needle bar hangs below the main shaft.
+00:02:27,689 --> 00:02:31,589
+Kinematics: an upside-down slider-crank.
 
 33
-00:02:40,115 --> 00:02:46,807
-At the top of its stroke the crank pin points up, away from the bar,
+00:02:33,109 --> 00:02:42,165
+Strip away the shapes and it's an in-line slider-crank: the shaft is crank OA,
 
 34
-00:02:46,827 --> 00:02:50,855
-so the distance from O to B is l minus r.
+00:02:42,185 --> 00:02:47,169
+the link is AB, the needle bar is slider B.
 
 35
-00:02:51,255 --> 00:02:56,056
-So top and bottom dead centre are swapped compared with an engine.
+00:02:47,569 --> 00:02:54,509
+In mechanics classes the slider-crank is usually an engine.
 
 36
-00:02:56,076 --> 00:03:01,534
-Copy the engine formulas straight over and you'll get the two accelerations
+00:02:54,909 --> 00:02:58,978
+Careful: the piston is above the crank,
 
 37
-00:03:01,554 --> 00:03:02,995
-the wrong way round.
+00:02:58,998 --> 00:03:05,373
+and at the top the crank pin points at it, so OB is r plus l.
 
 38
-00:03:03,395 --> 00:03:11,718
-One more quantity runs through this whole lecture, the link ratio λ, r over l.
+00:03:05,773 --> 00:03:09,467
+The needle bar hangs below the shaft,
 
 39
-00:03:11,738 --> 00:03:19,099
-In our example r is 15.5 millimetres and l is 55, so λ is about 0.28.
+00:03:09,487 --> 00:03:16,393
+and at the top the crank pin points away from it, so OB is l minus r.
 
 40
-00:03:20,619 --> 00:03:24,712
-Take top dead centre as zero, downward as positive,
+00:03:16,793 --> 00:03:18,431
+The dead centres are swapped.
 
 41
-00:03:24,732 --> 00:03:28,180
-eliminate the link angle from the triangle,
+00:03:18,831 --> 00:03:24,567
+Copy the engine formula and you get the top and bottom accelerations the
 
 42
-00:03:28,200 --> 00:03:31,406
-and you get the needle-bar displacement.
+00:03:24,587 --> 00:03:25,847
+wrong way round.
 
 43
-00:03:31,806 --> 00:03:34,672
-The first term comes from the crank,
+00:03:27,367 --> 00:03:30,427
+Now the displacement.
 
 44
-00:03:34,692 --> 00:03:38,841
-the second is the correction from the swinging link.
+00:03:30,827 --> 00:03:36,042
+Take top dead centre as zero, downward positive.
 
 45
-00:03:38,861 --> 00:03:44,934
-Notice the second term has a minus sign, the opposite of the engine formula,
+00:03:36,442 --> 00:03:43,982
+From the geometry, OB equals l cos beta minus r cos phi,
 
 46
-00:03:44,954 --> 00:03:48,541
-and that's because the bar hangs upside down.
+00:03:44,002 --> 00:03:48,302
+and r sin phi equals l sin beta.
 
 47
-00:03:48,941 --> 00:03:51,657
-With the shaft turning steadily,
+00:03:48,702 --> 00:03:56,258
+Eliminate beta and you get this exact formula, with lambda, r over l,
 
 48
-00:03:51,677 --> 00:03:55,846
-differentiate twice and you get the acceleration.
+00:03:56,278 --> 00:03:57,905
+the link ratio.
 
 49
-00:03:55,866 --> 00:04:00,975
-At the two dead centres it's beautifully simple. At the top,
+00:03:58,305 --> 00:04:04,451
+Compare it with the piston formula: the second term has the opposite sign,
 
 50
-00:04:00,995 --> 00:04:07,387
-r ω squared times one minus λ. At the bottom, r ω squared times one plus λ,
+00:04:04,471 --> 00:04:06,285
+because the bar hangs.
 
 51
-00:04:07,407 --> 00:04:10,721
-with a minus sign because it points up.
+00:04:06,685 --> 00:04:07,933
+Try a number:
 
 52
-00:04:11,121 --> 00:04:15,979
-So the needle bar accelerates harder at the bottom than at the top.
+00:04:07,953 --> 00:04:14,667
+at 90 degrees of shaft angle the bar has moved only 13.3 millimetres,
 
 53
-00:04:15,999 --> 00:04:22,021
-And the bottom is exactly when the needle is in the fabric and the loop is forming.
+00:04:14,687 --> 00:04:17,205
+less than half the stroke.
 
 54
-00:04:22,421 --> 00:04:27,738
-Multiply by the reciprocating mass and you get the inertia force.
+00:04:18,725 --> 00:04:27,697
+This is the mechanism view of Lab 3-1, with the shaft turning steadily.
 
 55
-00:04:27,758 --> 00:04:29,791
-And because ω is squared,
+00:04:28,097 --> 00:04:29,445
+Watch the needle bar.
 
 56
-00:04:29,811 --> 00:04:34,881
-twenty percent more speed means over forty percent more force.
+00:04:29,845 --> 00:04:33,492
+At the top it seems to pause for a moment;
 
 57
-00:04:36,401 --> 00:04:42,342
-Let's see it move. On the left is the mechanism, on the right the displacement,
+00:04:33,512 --> 00:04:36,985
+at the bottom it turns round in a flash.
 
 58
-00:04:42,362 --> 00:04:47,021
-velocity and acceleration curves, all from the exact formulas.
+00:04:37,385 --> 00:04:45,100
+At 90 degrees it has moved only 13.3 millimetres, under half the stroke,
 
 59
-00:04:47,421 --> 00:04:49,216
-Press Top dead centre.
+00:04:45,120 --> 00:04:50,365
+and its top speed comes at 104.7 degrees, not 90.
 
 60
-00:04:49,236 --> 00:04:54,413
-The crank pin points straight up and the bar is at its highest.
+00:04:50,765 --> 00:04:56,239
+The reason is the tilted link: the bigger lambda, the bigger the shift.
 
 61
-00:04:54,433 --> 00:04:58,951
-The acceleration here is modest, and the curve is flat.
+00:04:57,759 --> 00:05:01,213
+Differentiate twice for the acceleration.
 
 62
-00:04:59,351 --> 00:05:01,120
-Now Bottom dead centre.
+00:05:01,613 --> 00:05:04,513
+Two values are worth remembering.
 
 63
-00:05:01,140 --> 00:05:06,643
-The crank points straight down and the bar turns round to come back up.
+00:05:04,913 --> 00:05:10,413
+At the top it's r omega squared times one minus lambda;
 
 64
-00:05:06,663 --> 00:05:11,855
-The acceleration curve plunges to its deepest, sharpest point here,
+00:05:10,433 --> 00:05:16,736
+at the bottom it's minus r omega squared times one plus lambda,
 
 65
-00:05:11,875 --> 00:05:17,611
-negative because it points up. This is where the inertia force is largest.
+00:05:16,756 --> 00:05:21,653
+the larger of the two; their ratio is about 0.56.
 
 66
-00:05:18,011 --> 00:05:19,708
-Now Loop-catch moment.
+00:05:22,053 --> 00:05:26,764
+Expand the root and the acceleration is the sum of two terms:
 
 67
-00:05:19,728 --> 00:05:24,155
-The needle has risen 2 millimetres from its lowest point,
+00:05:26,784 --> 00:05:32,890
+a first-order term varying with omega and a second-order term with twice omega,
 
 68
-00:05:24,175 --> 00:05:28,759
-at a shaft angle of about 206 degrees. As we saw last time,
+00:05:32,910 --> 00:05:34,673
+proportional to lambda.
 
 69
-00:05:28,779 --> 00:05:32,271
-this is when the hook point catches the loop.
+00:05:35,073 --> 00:05:41,591
+Blue is first order, orange second, yellow the sum, sharpest at the bottom.
 
 70
-00:05:32,671 --> 00:05:38,007
-Now let it run. The bar lingers at the top and whips round at the bottom.
+00:05:43,111 --> 00:05:52,663
+The worked example. r is 15.5, l is 55, so lambda is 0.282.
 
 71
-00:05:39,527 --> 00:05:46,003
-Here are the three curves for our example. Look for three things.
+00:05:53,063 --> 00:06:04,683
+At 5000 r/min omega is about 523.6 radians per second.
 
 72
-00:05:46,403 --> 00:05:49,906
-First, the displacement isn't symmetric.
+00:06:05,083 --> 00:06:08,721
+The stroke is 31 millimetres,
 
 73
-00:05:49,926 --> 00:05:56,686
-At 90 degrees the bar has moved only 13.3 millimetres, under half the stroke.
+00:06:08,741 --> 00:06:15,658
+the peak speed 8.43 metres per second at 104.7 degrees,
 
 74
-00:05:57,086 --> 00:06:02,789
-Second, the peak velocity, 8.43 metres per second, comes at 104.7 degrees,
+00:06:15,678 --> 00:06:25,623
+and the acceleration at the bottom 5447 metres per second squared, about 555 g.
 
 75
-00:06:02,809 --> 00:06:08,202
-not at 90. Both effects come from the swinging link, and the bigger λ,
+00:06:26,023 --> 00:06:33,240
+Check it with the simple dead-centre formula:
 
 76
-00:06:08,222 --> 00:06:09,826
-the bigger the shift.
+00:06:33,260 --> 00:06:41,763
+0.0155 times 523.6 squared times 1.282 is about 5447.
 
 77
-00:06:10,226 --> 00:06:10,959
-Third,
+00:06:43,283 --> 00:06:48,681
+These are the three curves from Lab 3-1: displacement,
 
 78
-00:06:10,979 --> 00:06:20,493
-the acceleration is about 3052 at the top and 5447 metres per second squared
+00:06:48,701 --> 00:06:55,303
+velocity and acceleration, with the red line at the current angle.
 
 79
-00:06:20,513 --> 00:06:22,249
-at the bottom.
+00:06:55,703 --> 00:06:59,534
+Near the top the acceleration is flat,
 
 80
-00:06:22,269 --> 00:06:27,894
-That's 555 times the acceleration of gravity.
+00:06:59,554 --> 00:07:07,235
+almost unchanged for thirty degrees either side; near the bottom it's sharp.
 
 81
-00:06:28,294 --> 00:06:34,031
-A needle-bar assembly of a hundred-odd grams carries hundreds of times its
+00:07:07,635 --> 00:07:11,792
+So the biggest inertia force comes at the bottom,
 
 82
-00:06:34,051 --> 00:06:34,887
-own weight,
+00:07:11,812 --> 00:07:15,202
+exactly when the needle is in the cloth,
 
 83
-00:06:34,907 --> 00:06:37,454
-back and forth 83 times a second.
+00:07:15,222 --> 00:07:19,550
+the loop is forming and the hook is about to catch.
 
 84
-00:06:37,474 --> 00:06:41,188
-That's what makes this mechanism hard to design.
+00:07:19,950 --> 00:07:25,290
+Let the bushings wear and the play grow, and the catch becomes unreliable.
 
 85
-00:06:42,708 --> 00:06:45,008
-So how long should the link be?
+00:07:26,810 --> 00:07:29,790
+Link ratio and the moment of catching.
 
 86
-00:06:45,408 --> 00:06:50,864
-Keep the stroke fixed. The bigger λ, that is, the shorter the link,
+00:07:31,310 --> 00:07:40,050
+In Lecture 2 we said the hook catches when the needle has risen about 2 millimetres.
 
 87
-00:06:50,884 --> 00:06:55,195
-the faster the needle rises after bottom dead centre,
+00:07:40,450 --> 00:07:48,138
+Expand the displacement about bottom dead centre and the rise is roughly r over two,
 
 88
-00:06:55,215 --> 00:06:57,892
-and the earlier the hook catches.
+00:07:48,158 --> 00:07:52,084
+times one plus lambda, times delta squared.
 
 89
-00:06:58,292 --> 00:07:11,300
-With λ at 0.2, 0.28 and 0.4, the catch comes at 206.9, 206.1 and 204.9 degrees.
+00:07:52,484 --> 00:08:00,002
+For our example, 2 millimetres of rise comes at delta of about 26 degrees,
 
 90
-00:07:11,320 --> 00:07:15,752
-Only a degree or two apart.
+00:08:00,022 --> 00:08:03,567
+so the catch is near 206.1 degrees.
 
 91
-00:07:16,152 --> 00:07:23,426
-But as we found last lecture, the no-skip window is only about ten degrees,
+00:08:03,967 --> 00:08:08,421
+The formula also says that for the same stroke,
 
 92
-00:07:23,446 --> 00:07:26,052
-so a degree or two matters.
+00:08:08,441 --> 00:08:13,847
+a bigger lambda means a faster rise and an earlier catch.
 
 93
-00:07:26,452 --> 00:07:28,542
-Acceleration goes the same way.
+00:08:15,367 --> 00:08:23,227
+Now exactly, with r of 15.5 at 5000 r/min.
 
 94
-00:07:28,562 --> 00:07:32,284
-A shorter link means harder acceleration at the bottom.
+00:08:23,627 --> 00:08:33,677
+For lambda of 0.20, 0.282 and 0.40 the 2-millimetre rise comes at 206.9,
 
 95
-00:07:32,304 --> 00:07:34,190
-A longer link runs smoother,
+00:08:33,697 --> 00:08:37,034
+206.1 and 204.9 degrees,
 
 96
-00:07:34,210 --> 00:07:37,660
-but the head gets taller and the parts get heavier.
+00:08:37,054 --> 00:08:44,727
+while the bottom acceleration climbs from 5099 to 5949.
 
 97
-00:07:38,060 --> 00:07:43,619
-So the link ratio on an industrial machine is a compromise. And remember,
+00:08:45,127 --> 00:08:48,225
+The catch moves only a degree or two,
 
 98
-00:07:43,639 --> 00:07:46,905
-change the crank radius or the link length,
+00:08:48,245 --> 00:08:52,776
+but Lecture 2's window is only about ten degrees wide,
 
 99
-00:07:46,925 --> 00:07:52,255
-and you must re-set the hook mounting angle and the needle-bar height.
+00:08:52,796 --> 00:08:56,062
+so if you change the link or the crank,
 
 100
-00:07:53,775 --> 00:07:56,250
-Now back to our problem.
+00:08:56,082 --> 00:09:00,107
+re-set the hook angle and the needle-bar height.
 
 101
-00:07:56,650 --> 00:08:01,024
-With 120 grams reciprocating at five thousand,
+00:09:01,627 --> 00:09:07,309
+On screen the link length sweeps between 35 and 90 millimetres;
 
 102
-00:08:01,044 --> 00:08:08,473
-the force at bottom dead centre is about 654 newtons. That's inside the limit.
+00:09:07,329 --> 00:09:09,481
+watch the curves follow.
 
 103
-00:08:08,873 --> 00:08:13,951
-At six thousand the speed is 1.2 times higher,
+00:09:09,881 --> 00:09:12,446
+A small lambda, a long link,
 
 104
-00:08:13,971 --> 00:08:21,709
-so the force is 1.44 times higher, about 941 newtons. That's over 800.
+00:09:12,466 --> 00:09:18,726
+means less acceleration at the bottom and motion closer to harmonic.
 
 105
-00:08:22,109 --> 00:08:23,785
-To keep six thousand,
+00:09:19,126 --> 00:09:24,255
+The price is a taller head and longer, heavier parts,
 
 106
-00:08:23,805 --> 00:08:28,711
-the reciprocating mass has to come down to 102 grams or less,
+00:09:24,275 --> 00:09:29,306
+and more reciprocating mass pulls the force back up.
 
 107
-00:08:28,731 --> 00:08:30,569
-about 18 grams lighter.
+00:09:29,706 --> 00:09:37,652
+So industrial lockstitch machines mostly sit between 0.25 and 0.32,
 
 108
-00:08:30,969 --> 00:08:34,067
-Keep the parts as they are,
+00:09:37,672 --> 00:09:39,198
+a compromise.
 
 109
-00:08:34,087 --> 00:08:40,189
-and the top speed is about 5532 revolutions a minute.
+00:09:39,598 --> 00:09:41,965
+In design nothing comes free.
 
 110
-00:08:40,589 --> 00:08:47,044
-The usual engineering answer is to lighten the parts. A hollow needle bar,
+00:09:43,485 --> 00:09:46,495
+Inertia force and balancing.
 
 111
-00:08:47,064 --> 00:08:50,369
-a small needle clamp, a pocketed link.
+00:09:48,015 --> 00:09:54,942
+The needle bar, clamp and needle, plus the share of the link at the bar end,
 
 112
-00:08:50,389 --> 00:08:54,569
-Then re-check the balancing and the lubrication.
+00:09:54,962 --> 00:09:59,420
+make up the reciprocating mass m, here 120 grams.
 
 113
-00:08:56,089 --> 00:09:03,067
-But there's a counterweight on the crank. Why worry about inertia force at all?
+00:09:59,820 --> 00:10:03,360
+The inertia force is m times a.
 
 114
-00:09:03,467 --> 00:09:08,233
-Split the force in two. The first-order part varies at shaft speed,
+00:10:03,760 --> 00:10:11,685
+At 5000 r/min that's about 654 newtons at the bottom.
 
 115
-00:09:08,253 --> 00:09:12,804
-and the counterweight's centrifugal force can cancel some of it.
+00:10:12,085 --> 00:10:22,385
+It goes with speed squared: only 235 at 3000, but 941 at 6000.
 
 116
-00:09:12,824 --> 00:09:15,376
-But that force turns with the crank,
+00:10:22,785 --> 00:10:28,279
+A part of a hundred-odd grams carrying hundreds of times its own weight,
 
 117
-00:09:15,396 --> 00:09:20,019
-so cancelling the vertical part creates a new imbalance sideways.
+00:10:28,299 --> 00:10:31,878
+back and forth more than eighty times a second.
 
 118
-00:09:20,039 --> 00:09:22,233
-It can only balance part of it.
+00:10:33,398 --> 00:10:35,848
+The inertia force has two parts.
 
 119
-00:09:22,633 --> 00:09:28,375
-The second-order part varies at twice shaft speed and is proportional to λ.
+00:10:36,248 --> 00:10:39,148
+The first-order part has the shaft frequency.
 
 120
-00:09:28,395 --> 00:09:31,602
-The counterweight can do nothing about it.
+00:10:39,548 --> 00:10:45,896
+A counterweight on the crank makes a centrifugal force at the same frequency;
 
 121
-00:09:31,622 --> 00:09:37,133
-So the best way to cut vibration is still to cut the reciprocating mass.
+00:10:45,916 --> 00:10:50,197
+it fully balances the rotating parts, crank and pin,
 
 122
-00:09:37,533 --> 00:09:42,305
-Robots work the same way. Run the same path in half the time,
+00:10:50,217 --> 00:10:55,076
+and can cancel part of the first-order reciprocating force.
 
 123
-00:09:42,325 --> 00:09:47,490
-and joint accelerations and motor inertia torque go up four times.
+00:10:55,476 --> 00:10:56,496
+Why only part?
 
 124
-00:09:47,510 --> 00:09:53,460
-Shorten the cycle, and the first limit you hit is usually peak motor torque.
+00:10:56,896 --> 00:10:59,235
+Its force turns with the crank,
 
 125
-00:09:53,860 --> 00:09:55,501
-And in everyday life,
+00:10:59,255 --> 00:11:04,636
+so while it cancels the vertical force it creates a new horizontal one.
 
 126
-00:09:55,521 --> 00:10:01,829
-the hum you feel in a four-cylinder car at high revs is that second-order force.
+00:11:05,036 --> 00:11:08,667
+The second-order force runs at twice the frequency,
 
 127
-00:10:01,849 --> 00:10:07,920
-Some engines add a pair of balance shafts, turning at twice crankshaft speed,
+00:11:08,687 --> 00:11:11,816
+and a counterweight can do nothing about it.
 
 128
-00:10:07,940 --> 00:10:09,264
-just to fight it.
+00:11:12,216 --> 00:11:17,116
+So the best cure for vibration is still a smaller m.
 
 129
-00:10:10,784 --> 00:10:17,312
-Now Virtual lab 3-1. On the WenQuest platform you can do it yourself.
+00:11:18,636 --> 00:11:22,856
+The needle-bar position is a function of shaft angle;
 
 130
-00:10:17,332 --> 00:10:24,524
-The numbers in the results panel are blurred here. Reading them is your job.
+00:11:22,876 --> 00:11:26,856
+change the speed and the same curve is run faster,
 
 131
-00:10:24,924 --> 00:10:28,349
-Task one, change only the link length.
+00:11:26,876 --> 00:11:30,136
+with acceleration going as omega squared.
 
 132
-00:10:28,369 --> 00:10:35,784
-Drag it to 90 millimetres and record the stroke and the dead-centre accelerations.
+00:11:30,536 --> 00:11:34,679
+Robot trajectory planning is exactly the same.
 
 133
-00:10:36,184 --> 00:10:43,326
-Then try 35. The curves change shape, and the catching moment moves too.
+00:11:35,079 --> 00:11:40,512
+Run the same path in half the time and each joint's speed doubles,
 
 134
-00:10:43,346 --> 00:10:51,084
-Task two is to set the link to 40 millimetres and read the new catching angle.
+00:11:40,532 --> 00:11:46,625
+while its acceleration and the inertia torque the motor must supply become
 
 135
-00:10:51,484 --> 00:10:57,048
-Task three, take the speed from three thousand to six thousand,
+00:11:46,645 --> 00:11:48,277
+four times as large.
 
 136
-00:10:57,068 --> 00:11:02,188
-and see how many times bigger the peak inertia force gets.
+00:11:48,677 --> 00:11:54,579
+The needle bar's sharp turn at the bottom is like the robot's sharpest corner,
 
 137
-00:11:02,208 --> 00:11:04,581
-That checks the square law.
+00:11:54,599 --> 00:11:57,995
+and that's where planners limit acceleration.
 
 138
-00:11:04,981 --> 00:11:10,166
-Task four, at five thousand revolutions a minute,
+00:11:59,515 --> 00:12:03,295
+An everyday example: a car engine.
 
 139
-00:11:10,186 --> 00:11:18,557
-adjust the reciprocating mass until the peak force is no more than 400 newtons.
+00:12:03,695 --> 00:12:07,569
+Piston, rod and crankshaft are a slider-crank too,
 
 140
-00:11:18,957 --> 00:11:22,996
-Check every number against your own hand calculation.
+00:12:07,589 --> 00:12:10,451
+only the piston sits above the crank,
 
 141
-00:11:23,016 --> 00:11:28,357
-The grey dashed curves are the textbook example, there for comparison.
+00:12:10,471 --> 00:12:14,813
+so its dead centres are the reverse of the needle bar's.
 
 142
-00:11:28,377 --> 00:11:32,417
-I won't give the answers here. They're yours to find.
+00:12:15,213 --> 00:12:20,162
+In a four-cylinder engine at high revs the second-order force,
 
 143
-00:11:32,817 --> 00:11:36,962
-The lab comes with a guide and a report template.
+00:12:20,182 --> 00:12:23,447
+at twice crank speed, makes the body hum,
 
 144
-00:11:36,982 --> 00:11:42,997
-Download them on the platform and hand in your report when you're done.
+00:12:23,467 --> 00:12:27,535
+and the counterweights on the crank can't touch it.
 
 145
-00:11:44,517 --> 00:11:50,426
-Numbers worked out in design have to be watched with data in the factory.
+00:12:27,935 --> 00:12:33,035
+So some engines add a pair of balance shafts turning at twice crank speed.
 
 146
-00:11:50,826 --> 00:11:55,143
-This is the quality loop in the WenQuest digital factory.
+00:12:34,555 --> 00:12:35,855
+Back to the start.
 
 147
-00:11:55,163 --> 00:12:00,317
-The adjustment station measures the hook clearance on every machine,
+00:12:36,255 --> 00:12:44,615
+The bottom acceleration is r omega squared times one plus lambda,
 
 148
-00:12:00,337 --> 00:12:04,121
-the readings go over the bus into a control chart,
+00:12:44,635 --> 00:12:49,644
+giving about 654 newtons at 5000 r/min.
 
 149
-00:12:04,141 --> 00:12:08,990
-and when the data drifts the system raises an alarm and drafts a
+00:12:50,044 --> 00:13:02,097
+At 6000 it's 1.44 times as much, about 941, over the 800-newton limit.
 
 150
-00:12:09,010 --> 00:12:13,326
-nonconformance report for a quality inspector to confirm.
+00:13:02,497 --> 00:13:10,940
+Two ways out: keep 6000 and bring the mass under 102 grams,
 
 151
-00:12:13,726 --> 00:12:19,041
-You can pick the detection rules yourself, change the drift rate,
+00:13:10,960 --> 00:13:19,260
+or keep the parts and run no faster than about 5532 r/min.
 
 152
-00:12:19,061 --> 00:12:22,899
-and see how many hours earlier the alarm comes.
+00:13:19,660 --> 00:13:26,713
+In practice you lighten: a hollow bar, a small clamp, a lightened link,
 
 153
-00:12:23,299 --> 00:12:26,433
-The second page is the serial-number and batch trace.
+00:13:26,733 --> 00:13:30,000
+then re-check balance and oiling.
 
 154
-00:12:26,453 --> 00:12:28,753
-From the machine that raised the alarm,
+00:13:31,520 --> 00:13:37,299
+Now Virtual lab 3-1. On the WenQuest platform you can do it yourself.
 
 155
-00:12:28,773 --> 00:12:33,394
-back to the hook batch it was built with and the grinder that made that batch.
+00:13:37,319 --> 00:13:43,687
+The numbers in the results panel are blurred here. Reading them is your job.
 
 156
-00:12:33,414 --> 00:12:37,143
-Then the other way, to every machine built with the same batch,
+00:13:44,087 --> 00:13:48,285
+Task one, change only the link length.
 
 157
-00:12:37,163 --> 00:12:39,345
-and whether any have already shipped.
+00:13:48,305 --> 00:13:57,387
+Drag it to 90 millimetres and record the stroke and the dead-centre accelerations.
 
 158
-00:12:39,745 --> 00:12:40,830
-Today's rule,
+00:13:57,787 --> 00:14:03,662
+Then try 35. The curves change shape, and the catching moment moves too.
 
 159
-00:12:40,850 --> 00:12:46,439
-re-set the hook and the needle-bar height whenever r or l changes,
+00:14:03,682 --> 00:14:10,048
+Task two is to set the link to 40 millimetres and read the new catching angle.
 
 160
-00:12:46,459 --> 00:12:50,858
-is checked and traced like this, machine by machine.
+00:14:10,448 --> 00:14:15,604
+Task three, take the speed from three thousand to six thousand,
 
 161
-00:12:50,878 --> 00:12:54,428
-We'll walk through it fully in Lecture 27.
+00:14:15,624 --> 00:14:20,369
+and see how many times bigger the peak inertia force gets.
 
 162
-00:12:55,948 --> 00:12:58,128
-Your assignment has four questions.
+00:14:20,389 --> 00:14:22,588
+That checks the square law.
 
 163
-00:12:58,528 --> 00:13:04,067
-One, calculation. For a new r, l and speed, find the stroke,
+00:14:22,988 --> 00:14:27,047
+Task four, at five thousand revolutions a minute,
 
 164
-00:13:04,087 --> 00:13:08,977
-the dead-centre accelerations and the catching angle,
+00:14:27,067 --> 00:14:33,624
+adjust the reciprocating mass until the peak force is no more than 400 newtons.
 
 165
-00:13:08,997 --> 00:13:11,386
-and check them in the lab.
+00:14:34,024 --> 00:14:38,109
+Check every number against your own hand calculation.
 
 166
-00:13:11,786 --> 00:13:15,042
-Two, design. Today's shop-floor problem.
+00:14:38,129 --> 00:14:43,531
+The grey dashed curves are the textbook example, there for comparison.
 
 167
-00:13:15,062 --> 00:13:19,548
-Give the numbers for lightening and for limiting speed,
+00:14:43,551 --> 00:14:47,636
+I won't give the answers here. They're yours to find.
 
 168
-00:13:19,568 --> 00:13:22,006
-and say which you'd recommend.
+00:14:48,036 --> 00:14:52,238
+The lab comes with a guide and a report template.
 
 169
-00:13:22,406 --> 00:13:25,180
-Three, analysis. Shorten the link.
+00:14:52,258 --> 00:14:58,356
+Download them on the platform and hand in your report when you're done.
 
 170
-00:13:25,200 --> 00:13:30,277
-How do the catching moment and the bottom acceleration change,
+00:14:59,876 --> 00:15:06,296
+Numbers worked out in design have to be watched with data in the factory.
 
 171
-00:13:30,297 --> 00:13:33,236
-and how should the hook be adjusted?
+00:15:06,696 --> 00:15:10,940
+This is the quality loop in the WenQuest digital factory.
 
 172
-00:13:33,636 --> 00:13:35,151
-Four, short answer.
+00:15:10,960 --> 00:15:16,027
+The adjustment station measures the hook clearance on every machine,
 
 173
-00:13:35,171 --> 00:13:41,696
-Give two reasons why a counterweight can't fully balance the reciprocating force.
+00:15:16,047 --> 00:15:19,768
+the readings go over the bus into a control chart,
 
 174
-00:13:43,216 --> 00:13:49,417
-There's also a ten-question quiz. For example, at its highest point,
+00:15:19,788 --> 00:15:24,555
+and when the data drifts the system raises an alarm and drafts a
 
 175
-00:13:49,437 --> 00:13:52,436
-what is the distance from O to B?
+00:15:24,575 --> 00:15:28,820
+nonconformance report for a quality inspector to confirm.
 
 176
-00:13:52,836 --> 00:13:56,785
-Shorten the link, and does the catch come earlier or later?
+00:15:29,220 --> 00:15:34,884
+You can pick the detection rules yourself, change the drift rate,
 
 177
-00:13:57,185 --> 00:14:03,005
-You get three attempts, and the explanations appear as soon as you submit.
+00:15:34,904 --> 00:15:38,994
+and see how many hours earlier the alarm comes.
 
 178
-00:14:04,525 --> 00:14:06,745
-Three things to take away.
+00:15:39,394 --> 00:15:42,727
+The second page is the serial-number and batch trace.
 
 179
-00:14:07,145 --> 00:14:12,068
-One. The needle bar is an upside-down slider-crank,
+00:15:42,747 --> 00:15:45,194
+From the machine that raised the alarm,
 
 180
-00:14:12,088 --> 00:14:16,624
-with its dead centres swapped from an engine's.
+00:15:45,214 --> 00:15:50,128
+back to the hook batch it was built with and the grinder that made that batch.
 
 181
-00:14:17,024 --> 00:14:21,791
-Two. The acceleration is largest at bottom dead centre,
+00:15:50,148 --> 00:15:54,114
+Then the other way, to every machine built with the same batch,
 
 182
-00:14:21,811 --> 00:14:26,056
-and inertia force grows with the square of speed.
+00:15:54,134 --> 00:15:56,454
+and whether any have already shipped.
 
 183
-00:14:26,076 --> 00:14:31,103
-Twenty percent faster means over forty percent more force.
+00:15:56,854 --> 00:15:57,832
+Today's rule,
 
 184
-00:14:31,503 --> 00:14:37,268
-Three. The counterweight can't touch the second-order force.
+00:15:57,852 --> 00:16:02,899
+re-set the hook and the needle-bar height whenever r or l changes,
 
 185
-00:14:37,288 --> 00:14:41,317
-Cutting the reciprocating mass works best.
+00:16:02,919 --> 00:16:06,890
+is checked and traced like this, machine by machine.
 
 186
-00:14:41,717 --> 00:14:44,896
-The virtual labs, the 3D prototype,
+00:16:06,910 --> 00:16:10,114
+We'll walk through it fully in Lecture 27.
 
 187
-00:14:44,916 --> 00:14:51,293
-the assignment and the quiz are all on the WenQuest learning platform,
+00:16:11,634 --> 00:16:17,519
+Your assignment has four questions. One, calculation. For a new r, l and speed,
 
 188
-00:14:51,313 --> 00:14:57,417
-at learn.wenquestrobotics.com. Sign up for free and start learning.
+00:16:17,539 --> 00:16:22,751
+find the stroke, the dead-centre accelerations and the catching angle,
 
 189
-00:14:57,817 --> 00:15:00,280
-Next time it's the take-up mechanism,
+00:16:22,771 --> 00:16:24,694
+and check them in the lab.
 
 190
-00:15:00,300 --> 00:15:05,044
-and how it pays thread out and pulls it back at just the right moments.
+00:16:25,094 --> 00:16:28,310
+Two, design. Today's shop-floor problem.
 
 191
-00:15:05,064 --> 00:15:05,917
+00:16:28,330 --> 00:16:32,760
+Give the numbers for lightening and for limiting speed,
+
+192
+00:16:32,780 --> 00:16:35,187
+and say which you'd recommend.
+
+193
+00:16:35,587 --> 00:16:41,442
+Three, shorten the link: how do the catch and the bottom acceleration change,
+
+194
+00:16:41,462 --> 00:16:46,173
+and how should the hook be adjusted? And four, a short answer:
+
+195
+00:16:46,193 --> 00:16:51,057
+why can't a counterweight fully balance the reciprocating force?
+
+196
+00:16:51,457 --> 00:16:57,077
+Submit the assignment and the lab report on the WenQuest platform.
+
+197
+00:16:58,597 --> 00:17:04,933
+There's also a ten-question quiz. For example, at its highest point,
+
+198
+00:17:04,953 --> 00:17:08,017
+what is the distance from O to B?
+
+199
+00:17:08,417 --> 00:17:12,250
+Shorten the link, and does the catch come earlier or later?
+
+200
+00:17:12,650 --> 00:17:18,816
+You get three attempts, and the explanations appear as soon as you submit.
+
+201
+00:17:20,336 --> 00:17:22,076
+Three things to remember.
+
+202
+00:17:22,476 --> 00:17:28,199
+One: the needle-bar mechanism is an upside-down slider-crank,
+
+203
+00:17:28,219 --> 00:17:35,354
+with dead centres swapped relative to an engine, so don't copy the formulas.
+
+204
+00:17:35,754 --> 00:17:39,978
+Two: the largest acceleration is at the bottom,
+
+205
+00:17:39,998 --> 00:17:43,410
+r omega squared times one plus lambda;
+
+206
+00:17:43,430 --> 00:17:48,016
+for a given stroke a bigger lambda catches earlier,
+
+207
+00:17:48,036 --> 00:17:52,080
+so changing r or l means re-setting the hook.
+
+208
+00:17:52,480 --> 00:17:55,988
+Three: inertia force goes with speed squared,
+
+209
+00:17:56,008 --> 00:17:59,673
+the counterweight can't touch the second order,
+
+210
+00:17:59,693 --> 00:18:02,260
+and the surest cure is less mass.
+
+211
+00:18:02,660 --> 00:18:04,560
+Next: the take-up mechanism.
+
+212
+00:18:04,960 --> 00:18:08,008
+The virtual labs, the 3D prototype,
+
+213
+00:18:08,028 --> 00:18:14,144
+the assignment and the quiz are all on the WenQuest learning platform,
+
+214
+00:18:14,164 --> 00:18:20,016
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+215
+00:18:20,416 --> 00:18:23,332
+Next time it's the take-up mechanism,
+
+216
+00:18:23,352 --> 00:18:28,965
+and how it pays thread out and pulls it back at just the right moments.
+
+217
+00:18:28,985 --> 00:18:29,996
 See you then.
