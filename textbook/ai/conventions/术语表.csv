@@ -334,3 +334,28 @@
 13,规模定律,scaling law,损失随规模与数据按幂律下降
 13,拒答,abstention,不确定时回答“没有规定”
 13,推理模型,reasoning model,用强化学习把长思维链训进模型
+M1,向量,vector,
+M1,矩阵,matrix,
+M1,数据矩阵,data matrix,一行一个样本，一列一项特征
+M1,列空间,column space,各列的所有线性组合
+M1,范数,norm,
+M1,弗罗贝尼乌斯范数,Frobenius norm,矩阵所有元素的平方和开根号
+M1,标准化,standardization,按列减均值、除标准差；也称 z 变换
+M1,余弦相似度,cosine similarity,
+M1,正交,orthogonal,内积为零
+M1,最小二乘,least squares,
+M1,投影矩阵,projection matrix,
+M1,特征值,eigenvalue,
+M1,特征向量,eigenvector,机器学习里“样本的特征向量”另指一组特征排成的向量，中文同名，按上下文区分
+M1,协方差矩阵,covariance matrix,
+M1,主成分,principal component,
+M1,主成分分析,principal component analysis (PCA),
+M1,幂迭代,power iteration,
+M1,奇异值,singular value,
+M1,奇异值分解,singular value decomposition (SVD),
+M1,秩,rank,非零奇异值的个数
+M1,低秩近似,low-rank approximation,
+M1,条件数,condition number,最大与最小奇异值之比
+M1,内积,inner product,
+M1,标准正交组,orthonormal set,
+M1,对称矩阵,symmetric matrix,

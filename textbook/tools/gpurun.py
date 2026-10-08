@@ -39,10 +39,21 @@ TYPES = {"basic": "gpu_1x_a10", "hopper": "gpu_1x_h100_sxm5", "profile": "gpu_1x
          "multi": "gpu_8x_a100"}          # multi：8 块 A100 SXM（NVSwitch），第 6 章多 GPU 与集合通信
 
 
-def runs(book_root: Path, chapters: set[int]) -> list[tuple[int, str, Path]]:
+def _chdir(no) -> str:
+    """章的目录名：普通章 ch07，数学篇 chM1（第 26 轮）。"""
+    s = str(no)
+    return f"ch{int(s):02d}" if s.isdigit() else f"ch{s}"
+
+
+def _chkey(no):
+    s = str(no)
+    return int(s) if s.isdigit() else int(s[1:]) - 1000
+
+
+def runs(book_root: Path, chapters: set[str]) -> list[tuple[str, str, Path]]:
     out = []
-    for ch in sorted(chapters):
-        base = book_root / f"ch{ch:02d}" / "code" / "runs"
+    for ch in sorted(chapters, key=_chkey):
+        base = book_root / _chdir(ch) / "code" / "runs"
         for d in sorted(base.glob("*/run.yaml")) if base.exists() else []:
             out.append((ch, d.parent.name, d.parent))
     return out
@@ -55,15 +66,16 @@ def fingerprint(folder: Path) -> str:
     return h.hexdigest()[:16]
 
 
-def values(book_root: Path, chapters: set[int], status: dict[int, str]) -> tuple[dict[str, dict], list[tuple[str, str, str]]]:
+def values(book_root: Path, chapters: set[str], status: dict[str, str]) -> tuple[dict[str, dict], list[tuple[str, str, str]]]:
     """({名: 数值或 {__pending__: True}}, [(级别, 位置, 说明)])。"""
+    status = {str(k): v for k, v in (status or {}).items()}     # 章号可能是数字也可能是 "M1"（第 26 轮）
     vals, probs = {}, []
     for ch, name, folder in runs(book_root, chapters):
         rec_p = folder.parent / f"{name}.json"
         where = f"第 {ch} 章 code/runs/{name}"
         if not rec_p.exists():
             vals[name] = {PENDING: True}
-            level = "warning" if status.get(ch, "draft") == "draft" else "error"
+            level = "warning" if status.get(str(ch), "draft") == "draft" else "error"
             probs.append((level, where, "还没有实测记录，正文显示“〔待实测〕”" + ("" if level == "warning" else "；这一章的状态不能超过“草稿”")))
             continue
         rec = json.loads(rec_p.read_text(encoding="utf-8"))

@@ -4,6 +4,7 @@ title: 人工智能
 title_en: Artificial Intelligence
 source: docs/教材/人工智能/00_提纲.md
 parts:
+- title: 数学篇 人工智能的数学基础
 - title: 上篇 第一部分 基础与原理
 - title: 上篇 第二部分 CUDA 编程
 - title: 上篇 第三部分 CUDA 上的人工智能系统
@@ -14,6 +15,80 @@ parts:
 - title: 下篇 第五部分 社会与服务
 - title: 下篇 第六部分 展望与治理
 chapters:
+- 'no': M1
+  title: 线性代数
+  level: 基础
+  part: 数学篇 人工智能的数学基础
+  sections:
+  - id: M1.1
+    title: 向量与矩阵：一批样本、一层网络长什么样
+  - id: M1.2
+    title: 矩阵乘法：为什么它是人工智能的核心运算
+  - id: M1.3
+    title: 范数与距离：度量误差、度量相似、度量梯度的大小
+  - id: M1.4
+    title: 正交、投影与最小二乘
+  - id: M1.5
+    title: 特征值与特征向量
+  - id: M1.6
+    title: 奇异值分解与低秩近似
+  - id: M1.7
+    title: 条件数：为什么有的矩阵算不准
+- 'no': M2
+  title: 微积分与最优化
+  level: 基础
+  part: 数学篇 人工智能的数学基础
+  sections:
+  - id: M2.1
+    title: 导数、偏导与梯度：梯度为什么指向最陡的方向
+  - id: M2.2
+    title: 链式法则与计算图
+  - id: M2.3
+    title: 泰勒展开与二阶信息：学习率为什么有上限
+  - id: M2.4
+    title: 凸与不凸：凸问题好在哪，深度学习为什么不凸也能训
+  - id: M2.5
+    title: 梯度下降及其变体的收敛
+  - id: M2.6
+    title: 约束优化与拉格朗日乘子
+  - id: M2.7
+    title: 矩阵微分速查
+- 'no': M3
+  title: 概率与统计
+  level: 基础
+  part: 数学篇 人工智能的数学基础
+  sections:
+  - id: M3.1
+    title: 概率、条件概率与贝叶斯公式
+  - id: M3.2
+    title: 随机变量、期望与方差；大数定律与中心极限定理
+  - id: M3.3
+    title: 常见分布与它们在模型里的位置
+  - id: M3.4
+    title: 最大似然估计：交叉熵损失是从哪来的
+  - id: M3.5
+    title: KL 散度与交叉熵
+  - id: M3.6
+    title: 采样与蒙特卡洛
+  - id: M3.7
+    title: 估计的不确定性：置信区间与为什么评测要报区间
+- 'no': M4
+  title: 信息论与数值计算
+  level: 基础
+  part: 数学篇 人工智能的数学基础
+  sections:
+  - id: M4.1
+    title: 信息量与熵
+  - id: M4.2
+    title: 交叉熵、困惑度与语言模型的指标
+  - id: M4.3
+    title: 互信息与特征选择的直觉
+  - id: M4.4
+    title: 浮点数、舍入与误差的累积
+  - id: M4.5
+    title: 数值稳定的写法：logsumexp、softmax 的平移与梯度裁剪
+  - id: M4.6
+    title: 条件数与病态问题：为什么归一化有用
 - 'no': 1
   title: 人工智能概论
   level: 基础

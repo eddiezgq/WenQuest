@@ -171,6 +171,18 @@ def anim_check(code: str) -> str:
         exec(compile(ast.Module(body=keep, type_ignores=[]), "animator-check", "exec"), ns)
         _ANIM_CHECK = ns["check"]
     return _ANIM_CHECK(code)
+def chdir(no) -> str:
+    """章的目录名：普通章 ch07，数学篇 chM1（第 26 轮）。"""
+    s = str(no)
+    return f"ch{int(s):02d}" if s.isdigit() else f"ch{s}"
+
+
+def chkey(no):
+    """排序键：数学篇（M1、M2…）排在第 1 章之前，其余按章号。"""
+    s = str(no)
+    return int(s) if s.isdigit() else int(s[1:]) - 1000
+
+
 KINDS = ("程序", "动画", "实验", "GPU实验", "图", "表", "任务")   # GPU实验: 云端 GPU 实验（人工智能第 14 轮附）          # 任务: engineering task sheets (第 11、13 轮)
 REF_KINDS = ("式", "定义", "定律", "定理", "引理", "推论", "准则", "算例", "程序", "图", "表", "动画", "实验", "任务", "习题")
 
@@ -190,7 +202,7 @@ class Problem:
 class Section:
     id: str
     title: str
-    chapter: int
+    chapter: str          # 章号标签："7" 或 "M1"
     path: Path
     source: str
     html: str = ""
@@ -243,11 +255,13 @@ FRONT = re.compile(r"\A---\n(.*?)\n---\n", re.S)
 
 def load_sections(book: dict, rep: Report, only: set | None = None) -> list[Section]:
     out = []
-    known = {s["id"]: (c["no"], s["title"]) for c in book["chapters"] for s in c["sections"]}
+    known = {s["id"]: (str(c["no"]), s["title"]) for c in book["chapters"] for s in c["sections"]}
     for c in book["chapters"]:      # 章首提要 NN-0.md (id "N.0") and 章末小结 NN-99.md (id "N.end")
-        known[f"{c['no']}.0"] = (c["no"], "本章提要")
-        known[f"{c['no']}.end"] = (c["no"], "本章小结")
-    for path in sorted(book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.md"), key=lambda p: [int(x) for x in re.findall(r"\d+", p.name)]):
+        known[f"{c['no']}.0"] = (str(c["no"]), "本章提要")
+        known[f"{c['no']}.end"] = (str(c["no"]), "本章小结")
+    files = sorted(book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.md"), key=lambda p: [int(x) for x in re.findall(r"\d+", p.name)])
+    files = sorted(book["root"].glob("chM[0-9]/M[0-9]-*.md"), key=lambda p: [int(x) for x in re.findall(r"\d+", p.name)]) + files
+    for path in files:
         if path.name.endswith(".en.md"):
             continue
         text = path.read_text(encoding="utf-8")
@@ -263,9 +277,9 @@ def load_sections(book: dict, rep: Report, only: set | None = None) -> list[Sect
         if sid not in known:
             rep.add("error", "结构", where, f"节号 {sid} 不在提纲里")
             continue
-        ch = int(sid.split(".")[0])
-        if path.parent.name != f"ch{ch:02d}":
-            rep.add("error", "结构", where, f"{sid} 应放在 ch{ch:02d}/")
+        ch = sid.split(".")[0]
+        if path.parent.name != chdir(ch):
+            rep.add("error", "结构", where, f"{sid} 应放在 {chdir(ch)}/")
         out.append(Section(sid, str(meta.get("title") or known[sid][1]), ch, path, text[m.end():]))
     return out
 
@@ -286,7 +300,7 @@ def load_sections_en(book: dict, zh: list[Section], rep: Report) -> list[Section
             rep.add("error", "结构", where, f"开头要有 --- id: \"{s.id}\" 和英文 title ---")
             continue
         out.append(Section(s.id, str(meta["title"]), s.chapter, path, text[m.end():], lang="en"))
-    for path in book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.en.md"):
+    for path in [*book["root"].glob("ch[0-9][0-9]/[0-9][0-9]-*.en.md"), *book["root"].glob("chM[0-9]/M[0-9]-*.en.md")]:
         zh_path = path.with_name(path.name[:-6] + ".md")
         if not zh_path.exists():
             rep.add("error", "结构", str(path.relative_to(book["root"].parent)), "没有对应的中文节（英文版只能翻译已有的中文）")
@@ -372,14 +386,14 @@ def check_other_books(book: dict, rep: Report) -> None:
 
 # ---------------------------------------------------------------- programs and placeholders
 
-def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") -> dict[str, dict]:
+def run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") -> dict[str, dict]:
     """Runs every program of these chapters; lang "en" runs them for the English edition (English figure labels and
     text values, figures in figs/en/)."""
     values: dict[str, dict] = {}
     cache = book["root"].parent / "build" / book["book"] / ("values" if lang == "zh" else "values-en")
     cache.mkdir(parents=True, exist_ok=True)
-    for ch in sorted(chapters):
-        code = book["root"] / f"ch{ch:02d}" / "code"
+    for ch in sorted(chapters, key=chkey):
+        code = book["root"] / chdir(ch) / "code"
         shared = b"".join(p.read_bytes() for p in sorted(code.glob("_*.py")))   # helper modules (not run themselves)
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "models").glob("*/*")))   # library models the programs read
         shared += b"".join(p.read_bytes() for p in sorted((book["root"] / "conventions").glob("*.py")))   # the book's constants (constants.py)
@@ -427,9 +441,9 @@ def run_programs(book: dict, chapters: set[int], rep: Report, lang: str = "zh") 
     return values
 
 
-def check_cuda(book: dict, chapters: set[int], rep: "Report") -> None:
+def check_cuda(book: dict, chapters: set[str], rep: "Report") -> None:
     """书中的 CUDA 程序（code/ 与 gpulab/ 下的 .cu）都要能编译（cucheck.py，clang 的 CUDA 前端）；结果按文件内容缓存。"""
-    files = [f for ch in sorted(chapters) for d in ("code", "gpulab") for f in sorted((book["root"] / f"ch{ch:02d}" / d).rglob("*.cu"))]
+    files = [f for ch in sorted(chapters, key=chkey) for d in ("code", "gpulab") for f in sorted((book["root"] / chdir(ch) / d).rglob("*.cu"))]
     if not files:
         return
     if not cucheck.available():
@@ -449,10 +463,10 @@ def check_cuda(book: dict, chapters: set[int], rep: "Report") -> None:
             hit.write_text("ok")
 
 
-def check_hip(book: dict, chapters: set[int], rep: "Report") -> None:
+def check_hip(book: dict, chapters: set[str], rep: "Report") -> None:
     """书中的 HIP 程序（code/hip 下的 .hip.cpp）要能在 AMD 开源的 HIP-CPU 上编译、运行并自己核对结果
     （hipcheck.py；速度与显存要在真正的 AMD 卡上测）。结果按文件内容缓存。"""
-    files = [f for ch in sorted(chapters) for f in sorted((book["root"] / f"ch{ch:02d}" / "code" / "hip").rglob("*.hip.cpp"))]
+    files = [f for ch in sorted(chapters, key=chkey) for f in sorted((book["root"] / chdir(ch) / "code" / "hip").rglob("*.hip.cpp"))]
     if not files:
         return
     if not hipcheck.available():
@@ -533,7 +547,7 @@ def fill(sec: Section, values: dict, rep: Report) -> str:
 DISPLAY = re.compile(r"\$\$(.+?)\$\$", re.S)
 INLINE = re.compile(r"(?<![\\$])\$(?!\$)([^$\n]+?)\$")
 FENCE = re.compile(r"^```.*?^```", re.S | re.M)
-DIRECTIVE = re.compile(r"^:::[ \t]*(" + "|".join(KINDS + tuple(english.KINDS)) + r")[ \t]+([\d.]+)[ \t]*\n(.*?)^:::[ \t]*$", re.S | re.M)
+DIRECTIVE = re.compile(r"^:::[ \t]*(" + "|".join(KINDS + tuple(english.KINDS)) + r")[ \t]+(M?[\d.]+)[ \t]*\n(.*?)^:::[ \t]*$", re.S | re.M)
 TAG = re.compile(r"\\tag\{([^}]+)\}")
 
 
@@ -829,16 +843,16 @@ def check_tags(sec: Section, rep: Report) -> None:
         nums = [int(n.rsplit(".", 1)[1]) for n in found]
         if nums and nums != list(range(1, len(nums) + 1)):
             rep.add("error", "编号", sec.id, f"{kind}编号应从 1 起连续：{nums}")
-    for n in re.findall(r"(?m)^(\d+\.\d+\.\d+)\s", sec.source):     # exercises "4.1.1 …" at line start
+    for n in re.findall(r"(?m)^(M?\d+\.\d+\.\d+)\s", sec.source):     # exercises "4.1.1 …" at line start
         sec.defines.add(f"习题 {n}")
-    heads = re.findall(r"(?m)^#{3,4}\s+(\d+\.\d+\.\d+)\s", sec.source)  # subsections "### 4.1.6 …"
+    heads = re.findall(r"(?m)^#{3,4}\s+(M?\d+\.\d+\.\d+)\s", sec.source)  # subsections "### 4.1.6 …"
     for n in heads:
         if not n.startswith(sec.id + "."):
             rep.add("error", "编号", sec.id, f"小节 {n} 不属于 {sec.id} 节")
         sec.defines.add(f"节 {n}")
 
 
-FIG_DIRECTIVE = re.compile(r"(?m)^:::[ \t]*(?:图|Figure)[ \t]+([\d.]+)[ \t]*$")
+FIG_DIRECTIVE = re.compile(r"(?m)^:::[ \t]*(?:图|Figure)[ \t]+(M?[\d.]+)[ \t]*$")
 STRICT_FIG_ORDER = {"robotics"}      # other books: a warning only, until their figures are renumbered
 
 
@@ -851,17 +865,19 @@ def check_figure_order(sec: Section, rep: Report, level: str = "error") -> None:
         rep.add(level, "编号", where, f"图编号应按出现顺序从 1 起连续：{'、'.join(found)}（应为 {'、'.join(want)}）")
 
 
-REF = re.compile(r"(" + "|".join(REF_KINDS) + r")\s*\(?(\d+\.\d+(?:\.\d+)?)\)?")
-EQ_LIST = re.compile(r"式\s*\((\d+\.\d+\.\d+)\)(?:\s*(?:和|与|、|至|到|–|-)\s*\((\d+\.\d+\.\d+)\))?")
-SEC_REF = re.compile(r"(?<![\d.])(\d+\.\d+)\s*节")
-SUB_REF = re.compile(r"(?<![\d.])(\d+\.\d+\.\d+)\s*节")
-CH_REF = re.compile(r"第\s*(\d+)\s*章")
+CH_NO = r"M?\d+"            # 章号：普通章 7，数学篇 M1（第 26 轮）
+REF = re.compile(r"(" + "|".join(REF_KINDS) + r")\s*\(?(" + CH_NO + r"\.\d+(?:\.\d+)?)\)?")
+EQ_LIST = re.compile(r"式\s*\((" + CH_NO + r"\.\d+\.\d+)\)(?:\s*(?:和|与|、|至|到|–|-)\s*\((" + CH_NO + r"\.\d+\.\d+)\))?")
+SEC_REF = re.compile(r"(?<![\d.])(" + CH_NO + r"\.\d+)\s*节")
+SUB_REF = re.compile(r"(?<![\d.])(" + CH_NO + r"\.\d+\.\d+)\s*节")
+CH_REF = re.compile(r"第\s*(" + CH_NO + r")\s*章")
 
 
 def check_refs(sections: list[Section], book: dict, rep: Report) -> None:
     defined = set().union(*(s.defines for s in sections)) if sections else set()
     written = {s.id for s in sections}
     known = {s["id"] for c in book["chapters"] for s in c["sections"]}
+    chaps = {str(c["no"]) for c in book["chapters"]}
     nchap = len(book["chapters"])
     for sec in sections:
         text = FENCE.sub("", sec.source)
@@ -895,7 +911,7 @@ def check_refs(sections: list[Section], book: dict, rep: Report) -> None:
             else:
                 rep.add("error", "引用", sec.id, f"{sid} 节不存在")
         for m in CH_REF.finditer(text):
-            if not 1 <= int(m.group(1)) <= nchap:
+            if m.group(1) not in chaps:
                 rep.add("error", "引用", sec.id, f"第 {m.group(1)} 章不存在（全书 {nchap} 章）")
 
 
@@ -1013,7 +1029,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     check_std_tables(book, rep)
     values = run_programs(book, {s.chapter for s in sections}, rep)
     # 书中数字的 GPU 实测记录（人工智能第 14 轮附 4.4 节）：code/runs/<名>/ 与 <名>.json
-    status = {int(k): (v or {}).get("status", "draft") for k, v in (prog_meta.get("chapters") or {}).items()}
+    status = {str(k): (v or {}).get("status", "draft") for k, v in (prog_meta.get("chapters") or {}).items()}
     check_cuda(book, {s.chapter for s in sections}, rep)
     check_hip(book, {s.chapter for s in sections}, rep)
     run_vals, run_probs = gpurun.values(book["root"], {s.chapter for s in sections}, status)
@@ -1068,8 +1084,8 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     out = out_dir or (book["root"].parent / "build" / book_name)
     web = out / "web"
     web.mkdir(parents=True, exist_ok=True)
-    titles = {c["no"]: c["title"] for c in book["chapters"]}
-    meta_ch = {int(k): v or {} for k, v in (prog_meta.get("chapters") or {}).items()}
+    titles = {str(c["no"]): c["title"] for c in book["chapters"]}
+    meta_ch = {str(k): v or {} for k, v in (prog_meta.get("chapters") or {}).items()}
     for no, v in meta_ch.items():
         if v.get("status") and v["status"] not in STATUS:
             rep.add("error", "结构", "progress.yaml", f"第 {no} 章的状态 {v['status']} 应为 {'、'.join(STATUS)} 之一")
@@ -1080,7 +1096,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     index = {"book": book_name, "title": book["title"], "title_en": book.get("title_en", ""), "parts": book["parts"],
              "parts_en": parts_en,
              "chapters": [{"no": c["no"], "title": c["title"], "level": c["level"], "part": c["part"],
-                           "title_en": meta_ch.get(c["no"], {}).get("title_en", ""), "status": meta_ch.get(c["no"], {}).get("status", ""),
+                           "title_en": meta_ch.get(str(c["no"]), {}).get("title_en", ""), "status": meta_ch.get(str(c["no"]), {}).get("status", ""),
                            "sections": _toc_sections(c, sections, sections_en)} for c in book["chapters"]],
              "errors": len(rep.errors)}
     # 互动资源 (第 9 轮 2.5): every chapter's animations and labs, in reading order, for the reader's lists
@@ -1102,14 +1118,14 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         (web / "en" / f"{sec.id}.html").write_text(f"<section class='wq-sec' id='sec-{sec.id}' lang='en'><h2>{head}</h2>{sec.html}</section>", encoding="utf-8")
         (web / "en" / f"{sec.id}.mp.html").write_text(f"<section class='wq-sec' lang='en'><h2>{head}</h2>{sec.html_mp}</section>", encoding="utf-8")
     (web / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=1), encoding="utf-8")
-    by_ch: dict[int, list[Section]] = {}
+    by_ch: dict[str, list[Section]] = {}
     for sec in sections:
         by_ch.setdefault(sec.chapter, []).append(sec)
-    index["pdf"] = sorted(by_ch) if pdf and not rep.errors else []
-    by_ch_en: dict[int, list[Section]] = {}
+    index["pdf"] = sorted(by_ch, key=chkey) if pdf and not rep.errors else []
+    by_ch_en: dict[str, list[Section]] = {}
     for sec in sections_en:
         by_ch_en.setdefault(sec.chapter, []).append(sec)
-    index["pdf_en"] = sorted(by_ch_en) if pdf and not rep.errors else []
+    index["pdf_en"] = sorted(by_ch_en, key=chkey) if pdf and not rep.errors else []
     anim_dir = out / "anim"
     anim_dir.mkdir(exist_ok=True)
     index["anims"] = {}
@@ -1123,13 +1139,13 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     lab_dir = out / "lab"
     lab_dir.mkdir(exist_ok=True)
     index["labs"] = {}
-    for ch, secs in sorted(by_ch.items()):
+    for ch, secs in sorted(by_ch.items(), key=lambda kv: chkey(kv[0])):
         items = [x for sec in secs for x in sec.labs]
         if not items:
             continue
         page_html = labkit().page(items, course=[book["title"], book.get("title_en", "")], chapter=[f"第{ch}章", f"Chapter {ch}"],
                                   key=f"wq-book-{book_name}", models=book_models(book))
-        (lab_dir / f"ch{ch:02d}.html").write_text(page_html, encoding="utf-8")
+        (lab_dir / f"{chdir(ch)}.html").write_text(page_html, encoding="utf-8")
         index["labs"][str(ch)] = [no for no, _ in items]
         for sec in secs:      # 实验指导书与报告模板 (第 7 轮第 4 步补充)
             for no, script, g in sec.labdocs:
@@ -1174,7 +1190,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 labdocs.report(gpulab.meta(g), g, out / "gpulab" / f"{stem}-report.docx", no, where)
     index["tasks"] = {}           # 工程任务单 (第 13 轮): task sheet, rubric and blank calculation sheet in Word
     task_dir = out / "task"
-    for ch, secs in sorted(by_ch.items()):
+    for ch, secs in sorted(by_ch.items(), key=lambda kv: chkey(kv[0])):
         for sec in secs:
             for no, path, t in sec.tasks:
                 where = ((f"《{book['title']}》第 {ch} 章", f"{book.get('title_en') or book['title']}, Chapter {ch}")
@@ -1196,28 +1212,28 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
     for ch, secs in by_ch.items():
         body = (f"<h1>第 {ch} 章　{html.escape(titles[ch])}</h1>"
                 + "".join(f"<section class='wq-sec'><h2>{html.escape(s.title) if s.id.endswith(('.0', '.end')) else s.id + '　' + html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
-        (out / f"ch{ch:02d}.html").write_text(page(f"第 {ch} 章 {titles[ch]}", body), encoding="utf-8")
+        (out / f"{chdir(ch)}.html").write_text(page(f"第 {ch} 章 {titles[ch]}", body), encoding="utf-8")
     for ch, secs in by_ch_en.items():
         t_en = meta_ch.get(ch, {}).get("title_en", "")
         body = (f"<h1>Chapter {ch}&nbsp; {html.escape(t_en)}</h1>"
                 + "".join(f"<section class='wq-sec' lang='en'><h2>{html.escape(s.title) if s.id.endswith(('.0', '.end')) else s.id + '&nbsp; ' + html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
-        (out / f"ch{ch:02d}.en.html").write_text(page(f"Chapter {ch} {t_en}", body, "en"), encoding="utf-8")
+        (out / f"{chdir(ch)}.en.html").write_text(page(f"Chapter {ch} {t_en}", body, "en"), encoding="utf-8")
     if pdf and not rep.errors:
-        make_pdfs(out, sorted(by_ch), rep)
-        make_pdfs(out, sorted(by_ch_en), rep, ".en")
+        make_pdfs(out, sorted(by_ch, key=chkey), rep)
+        make_pdfs(out, sorted(by_ch_en, key=chkey), rep, ".en")
     (out / "report.txt").write_text("\n".join(map(str, rep.problems)) or "全部检查通过", encoding="utf-8")
     return rep
 
 
-def make_pdfs(out: Path, chapters: list[int], rep: Report, suffix: str = "") -> None:
+def make_pdfs(out: Path, chapters: list[str], rep: Report, suffix: str = "") -> None:
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         exe = os.environ.get("WQ_CHROMIUM")
         b = p.chromium.launch(**({"executable_path": exe} if exe else {}))
         pg = b.new_page()
         for ch in chapters:
-            pg.goto((out / f"ch{ch:02d}{suffix}.html").as_uri())
-            pg.pdf(path=str(out / f"ch{ch:02d}{suffix}.pdf"), format="A4", print_background=True,
+            pg.goto((out / f"{chdir(ch)}{suffix}.html").as_uri())
+            pg.pdf(path=str(out / f"{chdir(ch)}{suffix}.pdf"), format="A4", print_background=True,
                    margin={"top": "22mm", "bottom": "22mm", "left": "20mm", "right": "20mm"},
                    display_header_footer=True, header_template="<span></span>",
                    footer_template="<div style='font-size:8px;width:100%;text-align:center;color:#666'>"

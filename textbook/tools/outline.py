@@ -28,8 +28,14 @@ def meta(book: str) -> tuple[Path, str, str]:
     return ROOT / m["outline"], m["title"], m["title_en"]
 
 PART = re.compile(r"^###\s+(.+?)\s*$")
-CHAPTER = re.compile(r"^\*\*第\s*(\d+)\s*章\s+(.+?)\*\*\s*(?:【([^】]+)】)?")
-SECTION = re.compile(r"^-\s+(\d+)\.(\d+)\s+(.+?)\s*$")
+CHAPTER = re.compile(r"^\*\*第\s*(M?\d+)\s*章\s+(.+?)\*\*\s*(?:【([^】]+)】)?")
+SECTION = re.compile(r"^-\s+(M?\d+)\.(\d+)\s+(.+?)\s*$")
+
+
+def chkey(no) -> int:
+    """排序键：数学篇（M1、M2…）排在第 1 章之前（《人工智能》第 26 轮）。"""
+    s = str(no)
+    return int(s) if s.isdigit() else int(s[1:]) - 1000
 
 
 def parse(text: str) -> dict:
@@ -46,14 +52,23 @@ def parse(text: str) -> dict:
             ch = None
             continue
         if m := CHAPTER.match(line):
-            ch = {"no": int(m.group(1)), "title": m.group(2).strip(), "level": m.group(3) or "", "part": part, "sections": []}
+            no = m.group(1)
+            ch = {"no": int(no) if no.isdigit() else no, "title": m.group(2).strip(),
+                  "level": m.group(3) or "", "part": part, "sections": []}
             chapters.append(ch)
             continue
-        if ch and (m := SECTION.match(line)) and int(m.group(1)) == ch["no"]:
+        if ch and (m := SECTION.match(line)) and m.group(1) == str(ch["no"]):
             ch["sections"].append({"id": f"{m.group(1)}.{m.group(2)}", "title": m.group(3)})
     nos = [c["no"] for c in chapters]
-    if nos != list(range(1, len(nos) + 1)):
-        raise ValueError(f"chapter numbers are not consecutive: {nos}")
+    want = sorted(nos, key=chkey)                       # 数学篇在前，正文各章按号
+    math_nos = [n for n in want if not str(n).isdigit()]
+    plain = [n for n in want if str(n).isdigit()]
+    if nos != want:
+        raise ValueError(f"chapters are out of order: {nos}")
+    if [chkey(n) for n in math_nos] != list(range(-999, -999 + len(math_nos))):
+        raise ValueError(f"数学篇的章号要从 M1 起连续：{math_nos}")
+    if plain != list(range(1, len(plain) + 1)):
+        raise ValueError(f"chapter numbers are not consecutive: {plain}")
     return {"parts": parts, "chapters": chapters}
 
 

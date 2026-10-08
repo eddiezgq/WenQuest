@@ -1,0 +1,25 @@
+# 实验 M1.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 labM1_6.js。
+原理:
+  - ["奇异值分解：任何矩阵都可以写成 A = UΣVᵀ，U 与 V 的列互相垂直，Σ 的对角元素 σ₁ ≥ σ₂ ≥ … ≥ 0 就是奇异值（定义 M1.6.1）。", "Any matrix factors as A = UΣVᵀ with orthonormal U and V, and the diagonal of Σ holds the singular values σ1 ≥ σ2 ≥ … ≥ 0 (Definition M1.6.1)."]
+  - ["几何上：矩阵把单位圆变成椭圆，椭圆的半轴长就是奇异值，半轴方向就是 U 的列（图 M1.6.1）。", "Geometrically a matrix turns the unit circle into an ellipse whose semi-axes are the singular values along the columns of U (Figure M1.6.1)."]
+  - ["低秩近似：只留前 k 个奇异值得到的矩阵，是所有秩 k 矩阵里离原矩阵最近的一个（定理 M1.6.1），误差等于剩下奇异值的平方和开根号。", "Keeping the first k singular values gives the closest rank-k matrix (Theorem M1.6.1); the error equals the root of the sum of the squares of the discarded values."]
+  - 式: "条件数 κ(A) = σ_max / σ_min；存储量 = k(m + n + 1) 个数"
+步骤:
+  - ["“圆变椭圆”场景：先把矩阵调成单位阵（任务 1），再把第二行调成第一行的一半（任务 2），各记下两个奇异值与条件数，填表 1。", "Circle-to-ellipse scene: set the matrix to the identity (task 1), then make the second row half the first (task 2); record both singular values and the condition number in Table 1."]
+  - ["“低秩近似”场景：噪声保持 1%，把 k 依次调到 1、2、3、6、10、20，填表 2（任务 3、5）。", "Low-rank scene: with 1% noise, set k to 1, 2, 3, 6, 10 and 20 and fill Table 2 (tasks 3 and 5)."]
+  - ["把噪声调成 0，重做 k = 1、2、3：相对误差在 k 等于几时降到零？这就是这张图的秩（任务 4）。", "Set the noise to 0 and repeat for k = 1, 2, 3: at which k does the error vanish? That is the rank of the image (task 4)."]
+数据表:
+  - 标题: ["表 1  两个矩阵的奇异值", "Table 1  Singular values of two matrices"]
+    表头: ["矩阵", "σ₁", "σ₂", "条件数", "椭圆是什么形状"]
+    表头英文: ["Matrix", "sigma1", "sigma2", "condition number", "shape"]
+    行: [["单位阵", "", "", "", ""], ["第二行是第一行的一半", "", "", "", ""], ["自己再试一个", "", "", "", ""]]
+  - 标题: ["表 2  保留几个奇异值", "Table 2  How many singular values to keep"]
+    表头: ["k", "相对误差（%）", "要存的数（%）", "比噪声水平高还是低"]
+    表头英文: ["k", "relative error (%)", "numbers kept (%)", "above or below the noise level"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["6", "", "", ""], ["10", "", "", ""], ["20", "", "", ""]]
+注意:
+  - ["实验里的奇异值是在浏览器里用幂迭代一个一个剥出来的，图也小（48×48），只为看清道理；真正算奇异值分解要用成熟的库（M1.6 节的工程师笔记）。", "The lab peels off singular triplets by power iteration on a small 48×48 image to make the idea visible; real work uses a proper library (see the engineer's notes in Section M1.6)."]
+  - ["噪声调到 0 时这张图是人为的理想情形：真实测量不可能没有噪声，所以现场选 k 要看误差什么时候贴上噪声水平。", "Zero noise is an idealisation; in practice choose k by where the error meets the noise level."]
+思考题:
+  - ["条件数为什么等于“最坏情况下误差被放大的倍数”？（提示：看椭圆最长与最短的半轴。）", "Why is the condition number the worst-case error amplification? (Hint: look at the longest and shortest semi-axes.)"]
+  - ["把同样的办法用在一层网络的权重矩阵上，省下的是存储还是运算？哪种情形两样都省？", "Applied to a layer's weight matrix, does this save storage or computation? When does it save both?"]
