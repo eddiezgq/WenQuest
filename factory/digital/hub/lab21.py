@@ -185,9 +185,8 @@ def inject(H, u, body):
     st = EN._state(H.db, "teach")
     for k in ("forgot:" + UNIT, "ht_peak"):
         if k in (st.get("faults") or {}):
-            st["faults"][k]["lab"] = True
-    st["lab21"] = {"unit": UNIT, "at": dt.datetime.now(dt.timezone.utc).isoformat()}
-    EN._save_state(H.db, "teach", st)
+            EN._patch_in(H.db, "teach", "faults", k, dict(st["faults"][k], lab=True))     # 实验的问题不让模拟器自动“修好”
+    EN._patch(H.db, "teach", {"lab21": {"unit": UNIT, "at": dt.datetime.now(dt.timezone.utc).isoformat()}})
     return {"text": "{}；{}。约 3 分钟（真实时间）后 {} 的空转满 1 小时，厂情中枢出异常".format(r1["text"], r2["text"], UNIT.upper())}
 
 

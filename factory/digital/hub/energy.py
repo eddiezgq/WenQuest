@@ -94,6 +94,24 @@ def _state(db, mode):
     return (r or {}).get("state") or {}
 
 
+def _patch(db, mode, d):
+    """只改给出的几个键（和别的线程同时改不同的键时不会互相覆盖）"""
+    init(db)
+    db.x("insert into energy_sim (mode, state) values (%s,%s) on conflict (mode) do update set state=energy_sim.state || excluded.state", (mode, Jsonb(d)))
+
+
+def _patch_in(db, mode, key, sub, val):
+    """改 state[key][sub]（val=None 删除）"""
+    init(db)
+    db.x("insert into energy_sim (mode, state) values (%s, '{}'::jsonb) on conflict (mode) do nothing", (mode,))
+    if val is None:
+        db.x("update energy_sim set state = state || jsonb_build_object(%s::text, coalesce(state->%s, '{}'::jsonb) - %s::text) where mode=%s",
+             (key, key, sub, mode))
+    else:
+        db.x("update energy_sim set state = state || jsonb_build_object(%s::text, coalesce(state->%s, '{}'::jsonb) || jsonb_build_object(%s::text, %s::jsonb)) "
+             "where mode=%s", (key, key, sub, Jsonb(val), mode))
+
+
 def _save_state(db, mode, st):
     db.x("insert into energy_sim (mode, state) values (%s,%s) on conflict (mode) do update set state=excluded.state", (mode, Jsonb(st)))
 
@@ -156,9 +174,7 @@ def sim_on(db, mode):
 
 
 def set_sim(db, mode, on):
-    st = _state(db, mode)
-    st["sim"] = bool(on)
-    _save_state(db, mode, st)
+    _patch(db, mode, {"sim": bool(on)})
     return {"sim": bool(on)}
 
 
@@ -181,9 +197,7 @@ def push(H, mode, who="系统", inject=None, clear=None):
         extra["clear"] = clear
     mes.command("sim", "set_energy", mode, who, enabled=on, standby=s["standby"] if on else {}, tou=s["tou"] if on else [],
                 quiet=s["quiet"], **extra)
-    st = _state(H.db, mode)
-    st["pushed_at"] = dt.datetime.now(dt.timezone.utc).timestamp()
-    _save_state(H.db, mode, st)
+    _patch(H.db, mode, {"pushed_at": dt.datetime.now(dt.timezone.utc).timestamp()})
     return {"enabled": on}
 
 
@@ -217,8 +231,7 @@ def ingest(db, mode, d):
     if d.get("faults") is not None:
         st = _state(db, mode)
         if st.get("live") != d["faults"]:
-            st["live"] = d["faults"]
-            _save_state(db, mode, st)
+            _patch(db, mode, {"live": d["faults"]})
 
 
 def now_of(db, mode):
@@ -561,9 +574,7 @@ def options(db, mode, a, snap, ctx):
     for o in out:
         o["recommended"] = o is best
     if a.get("id"):                              # 实验 21 评分用：中枢对这个异常推荐了哪个
-        st = _state(db, mode)
-        st.setdefault("recommended", {})[str(a["id"])] = best["kind"]
-        _save_state(db, mode, st)
+        _patch_in(db, mode, "recommended", str(a["id"]), best["kind"])
     sv = best.get("saving") or {}
     reason = ("建议 {} {}：未来 24 小时省 {:g} 度、${:,.2f}，{}".format(best["key"], best["label"], sv.get("kwh", 0), sv.get("usd", 0),
                                                               "；".join("{} {}".format(s["name"], "按时" if (s["late_days"] or 0) <= 0 else "晚 {} 天".format(s["late_days"]))
@@ -633,8 +644,7 @@ def exec_setting(H, mode, p, u):
             sb[x] = m
         else:
             sb.pop(x, None)
-    st["standby"] = sb
-    _save_state(db, mode, st)
+    _patch(db, mode, {"standby": sb})
     push(H, mode, u.get("name") or "系统")
     return {"text": "{}：{}".format("、".join(x.upper() for x in units), "空闲 {:g} 分钟自动待机".format(m) if m else "取消自动待机"), "standby": sb}
 
@@ -649,7 +659,7 @@ def exec_tou(H, mode, p, u):
     else:
         tou -= set(units)
     st["tou"] = sorted(tou)
-    _save_state(db, mode, st)
+    _patch(db, mode, {"tou": st["tou"]})
     push(H, mode, u.get("name") or "系统")
     return {"text": "{}：{}".format("、".join(x.upper() for x in units), "峰时（8–11、18–21 点）不开新炉" if p.get("on", True) else "取消错峰"), "tou": st["tou"]}
 
@@ -671,17 +681,14 @@ def inject(H, mode, kind, who="老师", unit=None, hours=None, pct=None):
         x["pct"] = float(pct)
     if kind == "forgot":
         x.setdefault("hours", 12)
-    st = _state(H.db, mode)
-    st.setdefault("faults", {})[kind + (":" + unit if unit else "")] = dict(x, at=dt.datetime.now(dt.timezone.utc).isoformat(), by=who)
-    _save_state(H.db, mode, st)
+    _patch_in(H.db, mode, "faults", kind + (":" + unit if unit else ""), dict(x, at=dt.datetime.now(dt.timezone.utc).isoformat(), by=who))
     push(H, mode, who, inject=[x])
     return {"text": "已注入：{}{}".format(FAULT_NAME[kind], "（{}）".format(unit.upper()) if unit else ""), "fault": x}
 
 
 def clear(H, mode, key, who="系统", why=""):
-    st = _state(H.db, mode)
-    f = (st.get("faults") or {}).pop(key, None)
-    _save_state(H.db, mode, st)
+    f = (_state(H.db, mode).get("faults") or {}).get(key)
+    _patch_in(H.db, mode, "faults", key, None)
     kind, _, unit = key.partition(":")
     push(H, mode, who, clear=[{"kind": kind, "unit": unit or None}])
     return f
@@ -722,8 +729,7 @@ def tick(H, mode, now=None, rng=None):
     for a in db.q("select params from action where mode=%s and type='rectify_order' and params->>'energy_fix'='noise' and status in ('executing','done')", (mode,)):
         q |= set(a["params"].get("units") or [])
     if q != set(st.get("quiet") or []):
-        st["quiet"] = sorted(q)
-        _save_state(db, mode, st)
+        _patch(db, mode, {"quiet": sorted(q)})
         push(H, mode)
     if mode != "teach":
         return out
@@ -742,13 +748,11 @@ def tick(H, mode, now=None, rng=None):
         return out
     last = float(st.get("auto_at") or 0)
     if not last:
-        st["auto_at"] = now.timestamp()
-        _save_state(db, mode, st)
+        _patch(db, mode, {"auto_at": now.timestamp()})
         return out
     if now.timestamp() - last < AUTO_EVERY_S:
         return out
-    st["auto_at"] = now.timestamp()
-    _save_state(db, mode, st)
+    _patch(db, mode, {"auto_at": now.timestamp()})
     kinds = {k.partition(":")[0] for k in st.get("faults") or {}}
     x = rng.random()
     if x < 0.45:
