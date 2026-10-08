@@ -636,6 +636,7 @@ def people(teacher):
     print("16. 人员与组织（第 18 轮 E4）")
     lead = login("测试班组长", "lead")
     hub("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": 1}, teacher)     # 排班按班次：车间回到正常速度，免得一个班两分钟就过去
+    time.sleep(5)                                                                                # 等车间发出带工厂时间的状态
 
     def mach(u):
         return next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == u)

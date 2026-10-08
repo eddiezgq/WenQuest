@@ -85,6 +85,7 @@ class Service:
                 return False, "倍速应在 0.1–600 之间"
             self.speed = sp
             self.eng.clock.set_speed(sp)
+            self.eng.publish_all_status()          # 第 18 轮 E4：状态里带工厂时间，平台据此重新对时
             return True, "倍速已改为 {:g}".format(sp)
         if cmd == "load_scenario":
             speed = float(data.get("speed", 1))

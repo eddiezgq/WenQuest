@@ -819,6 +819,7 @@ class Engine:
             "shift": self.calendar.mode,
             "off_shift": self.calendar.mode == "shift" and not self.calendar.is_open(m.unit, self.factory_dt(t)),
         }
+        data["factory_ts"] = self.factory_ts(t)   # 第 18 轮 E4：工厂时间（倍速运行时和真实时间不同；平台按它判断“现在是哪一班”）
         if self.staffing.enabled:                # 第 18 轮 E4：这一班的人员等级（0 没人 / 1 学徒 / 2 熟练）
             data["staff_level"] = self.staffing.level(m.unit, self.factory_dt(t).astimezone(self.calendar.tzi))
             data["no_staff"] = bool(getattr(m, "no_staff", False)) and data["staff_level"] == 0

@@ -159,8 +159,8 @@ def factory_now(db=None, mode=None):
     if db is None or mode != "teach":
         return now
     try:
-        r = db.one("select ts, payload->'data'->>'factory_ts' as f from bus_message where mode=%s and type='machine.event' "
-                   "and payload->'data' ? 'factory_ts' order by seq desc limit 1", (mode,))
+        r = db.one("select ts, payload->'data'->>'factory_ts' as f from bus_message where mode=%s and type in ('machine.status','machine.event') "
+                   "and payload->'data' ? 'factory_ts' order by seq desc limit 1", (mode,))         # 运转中的设备每 2 秒发一次状态
     except Exception:  # noqa: BLE001
         return now
     if not r or not r["f"] or (now - r["ts"]).total_seconds() > 3600:
