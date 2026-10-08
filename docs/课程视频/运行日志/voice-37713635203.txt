@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:14,033 INFO synthesis text A car engine's piston is a slider-crank too, and you may have derived its formulas in a mechanisms course.
+2026-10-08 01:54:19,193 INFO yield speech len 9.6, rtf 0.5375094960133235
+
+100%|██████████| 1/1 [00:05<00:00,  5.34s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:19,373 INFO synthesis text But there's one difference. The piston sits above the crankshaft, while the needle bar hangs below the main shaft.
+2026-10-08 01:54:23,648 INFO yield speech len 8.24, rtf 0.5187195192262964
+
+100%|██████████| 1/1 [00:04<00:00,  4.45s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:23,828 INFO synthesis text At the top of its stroke the crank pin points up, away from the bar, so the distance from O to B is l minus r.
+2026-10-08 01:54:29,528 INFO yield speech len 10.76, rtf 0.5297345964438853
+
+100%|██████████| 1/1 [00:05<00:00,  5.88s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:29,709 INFO synthesis text So top and bottom dead centre are swapped compared with an engine. Copy the engine formulas straight over and you'll get the two accelerations the wrong way round.
+2026-10-08 01:54:36,002 INFO yield speech len 11.76, rtf 0.5351445301860368
+
+100%|██████████| 1/1 [00:06<00:00,  6.47s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:36,184 INFO synthesis text One more quantity runs through this whole lecture, the link ratio lambda, r over l. In our example r is fifteen.five millimetres and l is fifty-five, so lambda is about zero.twenty-eight.
+2026-10-08 01:54:44,240 INFO yield speech len 15.76, rtf 0.5111727920280495
+
+100%|██████████| 1/1 [00:08<00:00,  8.24s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:44,426 INFO synthesis text Take top dead centre as zero, downward as positive, eliminate the link angle from the triangle, and you get the needle-bar displacement.
+2026-10-08 01:54:50,233 INFO yield speech len 10.88, rtf 0.533713904373786
+
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:50,498 INFO synthesis text The first term comes from the crank, the second is the correction from the swinging link. Notice the second term has a minus sign, the opposite of the engine formula, and that's because the bar hangs upside down.
+2026-10-08 01:54:59,297 INFO yield speech len 16.8, rtf 0.5237327303205217
+
+100%|██████████| 1/1 [00:09<00:00,  9.07s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.07s/it]
+cv2: 100/156 句，用时 9.1 分钟，预计还要 5.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:54:59,483 INFO synthesis text With the shaft turning steadily, differentiate twice and you get the acceleration. At the two dead centres it's beautifully simple. At the top, r omega squared times one minus lambda. At the bottom, r omega squared times one plus lambda, with a minus sign because it points up.
+2026-10-08 01:55:11,076 INFO yield speech len 21.8, rtf 0.5318021993024633
+
+100%|██████████| 1/1 [00:11<00:00, 11.78s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:11,282 INFO synthesis text So the needle bar accelerates harder at the bottom than at the top. And the bottom is exactly when the needle is in the fabric and the loop is forming.
+2026-10-08 01:55:17,277 INFO yield speech len 10.92, rtf 0.5490289939628853
+
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:17,467 INFO synthesis text Multiply by the reciprocating mass and you get the inertia force. And because omega is squared, twenty percent more speed means over forty percent more force.
+2026-10-08 01:55:24,204 INFO yield speech len 12.48, rtf 0.5398277861949725
+
+100%|██████████| 1/1 [00:06<00:00,  6.93s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:24,389 INFO synthesis text Let's see it move. On the left is the mechanism, on the right the displacement, velocity and acceleration curves, all from the exact formulas.
+2026-10-08 01:55:29,876 INFO yield speech len 10.64, rtf 0.5156945017047394
+
+100%|██████████| 1/1 [00:05<00:00,  5.67s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:30,069 INFO synthesis text Press Top dead centre. The crank pin points straight up and the bar is at its highest. The acceleration here is modest, and the curve is flat.
+2026-10-08 01:55:36,215 INFO yield speech len 11.6, rtf 0.5297813949913814
+
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:36,400 INFO synthesis text Now Bottom dead centre. The crank points straight down and the bar turns round to come back up. The acceleration curve plunges to its deepest, sharpest point here, negative because it points up. This is where the inertia force is largest.
+2026-10-08 01:55:46,002 INFO yield speech len 18.28, rtf 0.5252547806670942
+
+100%|██████████| 1/1 [00:09<00:00,  9.79s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:46,192 INFO synthesis text Now Loop-catch moment. The needle has risen two millimetres from its lowest point, at a shaft angle of about two hundred and six degrees. As we saw last time, this is when the hook point catches the loop.
+2026-10-08 01:55:53,793 INFO yield speech len 14.28, rtf 0.532267908422219
+
+100%|██████████| 1/1 [00:07<00:00,  7.78s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:53,974 INFO synthesis text Now let it run. The bar lingers at the top and whips round at the bottom.
+2026-10-08 01:55:56,946 INFO yield speech len 5.36, rtf 0.5544302178852594
+
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:55:57,124 INFO synthesis text Here are the three curves for our example. Look for three things.
+2026-10-08 01:56:00,735 INFO yield speech len 6.56, rtf 0.5504469682530659
+
+100%|██████████| 1/1 [00:03<00:00,  3.79s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:00,914 INFO synthesis text First, the displacement isn't symmetric. At ninety degrees the bar has moved only thirteen.three millimetres, under half the stroke.
+2026-10-08 01:56:06,446 INFO yield speech len 10.48, rtf 0.5278755917803931
+
+100%|██████████| 1/1 [00:05<00:00,  5.71s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.71s/it]
+cv2: 110/156 句，用时 10.2 分钟，预计还要 4.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:06,628 INFO synthesis text Second, the peak velocity, eight.forty-three metres per second, comes at one hundred and four.seven degrees, not at ninety. Both effects come from the swinging link, and the bigger lambda, the bigger the shift.
+2026-10-08 01:56:13,487 INFO yield speech len 12.76, rtf 0.5375458715851404
+
+100%|██████████| 1/1 [00:07<00:00,  7.04s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:13,669 INFO synthesis text Third, the acceleration is about three thousand and fifty-two at the top and five thousand, four hundred and forty-seven metres per second squared at the bottom. That's five hundred and fifty-five times the acceleration of gravity.
+2026-10-08 01:56:23,025 INFO yield speech len 17.72, rtf 0.5279895548895843
+
+100%|██████████| 1/1 [00:09<00:00,  9.54s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:23,215 INFO synthesis text A needle-bar assembly of a hundred-odd grams carries hundreds of times its own weight, back and forth eighty-three times a second. That's what makes this mechanism hard to design.
+2026-10-08 01:56:30,188 INFO yield speech len 12.92, rtf 0.539737902927694
+
+100%|██████████| 1/1 [00:07<00:00,  7.15s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:30,243 WARNING synthesis text So how long should the link be? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-08 01:56:30,376 INFO synthesis text So how long should the link be?
+2026-10-08 01:56:31,969 INFO yield speech len 2.32, rtf 0.6867911281256841
+
+100%|██████████| 1/1 [00:01<00:00,  1.77s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:32,146 INFO synthesis text Keep the stroke fixed. The bigger lambda, that is, the shorter the link, the faster the needle rises after bottom dead centre, and the earlier the hook catches.
+2026-10-08 01:56:38,676 INFO yield speech len 12.56, rtf 0.5198861193505062
+
+100%|██████████| 1/1 [00:06<00:00,  6.71s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:38,859 INFO synthesis text With lambda at zero.two, zero.twenty-eight and zero.four, the catch comes at two hundred and six.nine, two hundred and six.one and two hundred and four.nine degrees. Only a degree or two apart.
+2026-10-08 01:56:48,228 INFO yield speech len 17.48, rtf 0.5359902398264381
+
+100%|██████████| 1/1 [00:09<00:00,  9.55s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:48,413 INFO synthesis text But as we found last lecture, the no-skip window is only about ten degrees, so a degree or two matters.
+2026-10-08 01:56:53,698 INFO yield speech len 9.92, rtf 0.5327488866544539
+
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:56:53,877 INFO synthesis text Acceleration goes the same way. A shorter link means harder acceleration at the bottom. A longer link runs smoother, but the head gets taller and the parts get heavier.
+2026-10-08 01:56:59,817 INFO yield speech len 11.44, rtf 0.5192050567040077
+
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:00,000 INFO synthesis text So the link ratio on an industrial machine is a compromise. And remember, change the crank radius or the link length, and you must re-set the hook mounting angle and the needle-bar height.
+2026-10-08 01:57:07,461 INFO yield speech len 14.24, rtf 0.5239342203300991
+
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:07,516 WARNING synthesis text Now back to our problem. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-08 01:57:07,646 INFO synthesis text Now back to our problem.
+2026-10-08 01:57:09,374 INFO yield speech len 2.56, rtf 0.6749380379915237
+
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]
+cv2: 120/156 句，用时 11.3 分钟，预计还要 3.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:09,548 INFO synthesis text With one hundred and twenty grams reciprocating at five thousand, the force at bottom dead centre is about six hundred and fifty-four newtons. That's inside the limit.
+2026-10-08 01:57:15,715 INFO yield speech len 11.92, rtf 0.517381477675982
+
+100%|██████████| 1/1 [00:06<00:00,  6.34s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:15,894 INFO synthesis text At six thousand the speed is one.two times higher, so the force is one.forty-four times higher, about nine hundred and forty-one newtons. That's over eight hundred.
+2026-10-08 01:57:22,827 INFO yield speech len 12.92, rtf 0.5366280905602517
+
+100%|██████████| 1/1 [00:07<00:00,  7.12s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:23,015 INFO synthesis text To keep six thousand, the reciprocating mass has to come down to one hundred and two grams or less, about eighteen grams lighter.
+2026-10-08 01:57:27,519 INFO yield speech len 8.48, rtf 0.5311479545989126
+
+100%|██████████| 1/1 [00:04<00:00,  4.68s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:27,700 INFO synthesis text Keep the parts as they are, and the top speed is about five thousand, five hundred and thirty-two revolutions a minute.
+2026-10-08 01:57:32,645 INFO yield speech len 9.24, rtf 0.535191653610824
+
+100%|██████████| 1/1 [00:05<00:00,  5.12s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:32,824 INFO synthesis text The usual engineering answer is to lighten the parts. A hollow needle bar, a small needle clamp, a pocketed link. Then re-check the balancing and the lubrication.
+2026-10-08 01:57:40,170 INFO yield speech len 14.0, rtf 0.5247182505471366
+
+100%|██████████| 1/1 [00:07<00:00,  7.52s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:40,354 INFO synthesis text But there's a counterweight on the crank. Why worry about inertia force at all?
+2026-10-08 01:57:44,297 INFO yield speech len 7.16, rtf 0.5507189468298544
+
+100%|██████████| 1/1 [00:04<00:00,  4.12s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:44,475 INFO synthesis text Split the force in two. The first-order part varies at shaft speed, and the counterweight's centrifugal force can cancel some of it. But that force turns with the crank, so cancelling the vertical part creates a new imbalance sideways. It can only balance part of it.
+2026-10-08 01:57:53,995 INFO yield speech len 18.8, rtf 0.5063456296920776
+
+100%|██████████| 1/1 [00:09<00:00,  9.71s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:57:54,194 INFO synthesis text The second-order part varies at twice shaft speed and is proportional to lambda. The counterweight can do nothing about it. So the best way to cut vibration is still to cut the reciprocating mass.
+2026-10-08 01:58:01,797 INFO yield speech len 14.52, rtf 0.5236408598823653
+
+100%|██████████| 1/1 [00:07<00:00,  7.79s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:01,985 INFO synthesis text Robots work the same way. Run the same path in half the time, and joint accelerations and motor inertia torque go up four times. Shorten the cycle, and the first limit you hit is usually peak motor torque.
+2026-10-08 01:58:10,582 INFO yield speech len 15.96, rtf 0.538641393632817
+
+100%|██████████| 1/1 [00:08<00:00,  8.78s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:10,770 INFO synthesis text And in everyday life, the hum you feel in a four-cylinder car at high revs is that second-order force. Some engines add a pair of balance shafts, turning at twice crankshaft speed, just to fight it.
+2026-10-08 01:58:18,748 INFO yield speech len 15.44, rtf 0.5167395185312459
+
+100%|██████████| 1/1 [00:08<00:00,  8.16s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.16s/it]
+cv2: 130/156 句，用时 12.4 分钟，预计还要 2.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:18,941 INFO synthesis text Now Virtual lab three-one. On the WenQuest platform you can do it yourself. The numbers in the results panel are blurred here. Reading them is your job.
+2026-10-08 01:58:26,422 INFO yield speech len 13.76, rtf 0.5436622472696526
+
+100%|██████████| 1/1 [00:07<00:00,  7.67s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:26,622 INFO synthesis text Task one, change only the link length. Drag it to ninety millimetres and record the stroke and the dead-centre accelerations.
+2026-10-08 01:58:32,422 INFO yield speech len 10.88, rtf 0.5330144482500413
+
+100%|██████████| 1/1 [00:05<00:00,  5.99s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:32,615 INFO synthesis text Then try thirty-five. The curves change shape, and the catching moment moves too. Task two is to set the link to forty millimetres and read the new catching angle.
+2026-10-08 01:58:40,513 INFO yield speech len 14.92, rtf 0.5294004170568635
+
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:40,696 INFO synthesis text Task three, take the speed from three thousand to six thousand, and see how many times bigger the peak inertia force gets. That checks the square law.
+2026-10-08 01:58:47,545 INFO yield speech len 13.2, rtf 0.5188150839372115
+
+100%|██████████| 1/1 [00:07<00:00,  7.02s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:47,733 INFO synthesis text Task four, at five thousand revolutions a minute, adjust the reciprocating mass until the peak force is no more than four hundred newtons.
+2026-10-08 01:58:55,012 INFO yield speech len 13.64, rtf 0.5336505751455983
+
+100%|██████████| 1/1 [00:07<00:00,  7.46s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:58:55,200 INFO synthesis text Check every number against your own hand calculation. The grey dashed curves are the textbook example, there for comparison. I won't give the answers here. They're yours to find.
+2026-10-08 01:59:02,344 INFO yield speech len 13.48, rtf 0.5299944375318306
+
+100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:02,533 INFO synthesis text The lab comes with a guide and a report template. Download them on the platform and hand in your report when you're done.
+2026-10-08 01:59:08,072 INFO yield speech len 10.2, rtf 0.5430824850119796
+
+100%|██████████| 1/1 [00:05<00:00,  5.72s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.72s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:08,250 INFO synthesis text Numbers worked out in design have to be watched with data in the factory.
+2026-10-08 01:59:11,664 INFO yield speech len 5.96, rtf 0.572859800901989
+
+100%|██████████| 1/1 [00:03<00:00,  3.58s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:11,840 INFO synthesis text This is the quality loop in the WenQuest digital factory. The adjustment station measures the hook clearance on every machine, the readings go over the bus into a control chart, and when the data drifts the system raises an alarm and drafts a nonconformance report for a quality inspector to confirm.
+2026-10-08 01:59:23,746 INFO yield speech len 22.52, rtf 0.5287097042449626
+
+100%|██████████| 1/1 [00:12<00:00, 12.10s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:23,948 INFO synthesis text You can pick the detection rules yourself, change the drift rate, and see how many hours earlier the alarm comes.
+2026-10-08 01:59:28,805 INFO yield speech len 9.2, rtf 0.5278695925422338
+
+100%|██████████| 1/1 [00:05<00:00,  5.04s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.04s/it]
+cv2: 140/156 句，用时 13.6 分钟，预计还要 1.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:28,989 INFO synthesis text The second page is the serial-number and batch trace. From the machine that raised the alarm, back to the hook batch it was built with and the grinder that made that batch. Then the other way, to every machine built with the same batch, and whether any have already shipped.
+2026-10-08 01:59:37,583 INFO yield speech len 16.12, rtf 0.5331259951106372
+
+100%|██████████| 1/1 [00:08<00:00,  8.78s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:37,780 INFO synthesis text Today's rule, re-set the hook and the needle-bar height whenever r or l changes, is checked and traced like this, machine by machine. We'll walk through it fully in Lecture twenty-seven.
+2026-10-08 01:59:45,557 INFO yield speech len 14.8, rtf 0.5254535095111743
+
+100%|██████████| 1/1 [00:07<00:00,  7.96s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.96s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:45,617 WARNING synthesis text Your assignment has four questions. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-08 01:59:45,751 INFO synthesis text Your assignment has four questions.
+2026-10-08 01:59:47,304 INFO yield speech len 2.2, rtf 0.7058207555250687
+
+100%|██████████| 1/1 [00:01<00:00,  1.73s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:47,481 INFO synthesis text One, calculation. For a new r, l and speed, find the stroke, the dead-centre accelerations and the catching angle, and check them in the lab.
+2026-10-08 01:59:54,414 INFO yield speech len 12.92, rtf 0.5366345677213403
+
+100%|██████████| 1/1 [00:07<00:00,  7.12s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 01:59:54,603 INFO synthesis text Two, design. Today's shop-floor problem. Give the numbers for lightening and for limiting speed, and say which you'd recommend.
+2026-10-08 02:00:00,136 INFO yield speech len 10.24, rtf 0.5403385264798999
+
+100%|██████████| 1/1 [00:05<00:00,  5.71s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:00,326 INFO synthesis text Three, analysis. Shorten the link. How do the catching moment and the bottom acceleration change, and how should the hook be adjusted?
+2026-10-08 02:00:06,041 INFO yield speech len 10.96, rtf 0.5214419460644687
+
+100%|██████████| 1/1 [00:05<00:00,  5.90s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:06,224 INFO synthesis text Four, short answer. Give two reasons why a counterweight can't fully balance the reciprocating force.
+2026-10-08 02:00:10,524 INFO yield speech len 8.08, rtf 0.5322253645056545
+
+100%|██████████| 1/1 [00:04<00:00,  4.47s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:10,701 INFO synthesis text There's also a ten-question quiz. For example, at its highest point, what is the distance from O to B?
+2026-10-08 02:00:15,626 INFO yield speech len 9.24, rtf 0.5330085238337
+
+100%|██████████| 1/1 [00:05<00:00,  5.10s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:15,810 INFO synthesis text Shorten the link, and does the catch come earlier or later?
+2026-10-08 02:00:18,179 INFO yield speech len 4.0, rtf 0.592249870300293
+
+100%|██████████| 1/1 [00:02<00:00,  2.54s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:18,358 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-08 02:00:21,577 INFO yield speech len 5.84, rtf 0.5511725193833652
+
+100%|██████████| 1/1 [00:03<00:00,  3.39s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.39s/it]
+cv2: 150/156 句，用时 14.5 分钟，预计还要 0.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:21,622 WARNING synthesis text Three things to take away. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-08 02:00:21,750 INFO synthesis text Three things to take away.
+2026-10-08 02:00:23,263 INFO yield speech len 2.24, rtf 0.6753304174968174
+
+100%|██████████| 1/1 [00:01<00:00,  1.68s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:23,436 INFO synthesis text One. The needle bar is an upside-down slider-crank, with its dead centres swapped from an engine's.
+2026-10-08 02:00:28,370 INFO yield speech len 9.52, rtf 0.5182762356365429
+
+100%|██████████| 1/1 [00:05<00:00,  5.11s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:28,553 INFO synthesis text Two. The acceleration is largest at bottom dead centre, and inertia force grows with the square of speed. Twenty percent faster means over forty percent more force.
+2026-10-08 02:00:36,058 INFO yield speech len 14.24, rtf 0.5270001761029276
+
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:36,246 INFO synthesis text Three. The counterweight can't touch the second-order force. Cutting the reciprocating mass works best.
+2026-10-08 02:00:41,519 INFO yield speech len 9.92, rtf 0.5315941187643236
+
+100%|██████████| 1/1 [00:05<00:00,  5.45s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:41,704 INFO synthesis text The virtual labs, the threeD prototype, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-08 02:00:50,113 INFO yield speech len 15.72, rtf 0.5349113437662294
+
+100%|██████████| 1/1 [00:08<00:00,  8.59s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-08 02:00:50,296 INFO synthesis text Next time it's the take-up mechanism, and how it pays thread out and pulls it back at just the right moments. See you then.
+2026-10-08 02:00:54,606 INFO yield speech len 8.12, rtf 0.5307586909514931
+
+100%|██████████| 1/1 [00:04<00:00,  4.48s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.48s/it]
+cv2: 156/156 句，用时 15.0 分钟，预计还要 0.0 分钟
+cv2: 156 句完成
+2026-10-08 02:00:54,767 DEBUG Attempting to acquire lock 124912165289840 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-08 02:00:54,767 DEBUG Lock 124912165289840 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-08 02:00:54,768 DEBUG Attempting to release lock 124912165289840 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-08 02:00:54,768 DEBUG Lock 124912165289840 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-08 02:00:54,770 DEBUG Attempting to acquire lock 124912165284080 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-08 02:00:54,770 DEBUG Lock 124912165284080 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-08 02:00:54,770 DEBUG Attempting to release lock 124912165284080 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-08 02:00:54,770 DEBUG Lock 124912165284080 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 25 分钟
