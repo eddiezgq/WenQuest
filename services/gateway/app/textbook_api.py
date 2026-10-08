@@ -26,6 +26,18 @@ from .session import Session
 log = logging.getLogger("wenquest.textbook")
 
 BOOK = re.compile(r"^[a-z][a-z0-9_-]{0,40}$")
+CHNO = re.compile(r"^(?:\d{1,3}|M\d{1,2})$")      # 章号：普通章 7，数学篇 M1（《人工智能》第 26 轮）
+
+
+def chdir(no) -> str:
+    """章的文件名前缀：普通章 ch07，数学篇 chM1。与 textbook/tools/build.py 的同名函数一致。"""
+    t = str(no)
+    return f"ch{int(t):02d}" if t.isdigit() else f"ch{t}"
+
+
+def chlabel(no, en: bool = False) -> str:
+    """章号在标题里的写法：第 7 章 / 第 M1 章；英文 Chapter 7 / Chapter M1。"""
+    return f"Chapter {no}" if en else f"第 {no} 章"
 SECTION = re.compile(r"^\d{1,3}\.(\d{1,3}|end)$")
 PDF_TTL = 3600
 MEDIA_TTL = 86400
@@ -165,8 +177,8 @@ def register(app, m) -> None:
         idx = index(book)
         teacher = await m.can_create(sess.moodle_token)
         idx["teacher"] = teacher
-        idx["pdf"] = [c for c in idx.get("pdf", []) if (root() / book / f"ch{int(c):02d}.pdf").exists()] if teacher else []
-        idx["pdf_en"] = [c for c in idx.get("pdf_en", []) if (root() / book / f"ch{int(c):02d}.en.pdf").exists()] if teacher else []
+        idx["pdf"] = [c for c in idx.get("pdf", []) if (root() / book / f"{chdir(c)}.pdf").exists()] if teacher else []
+        idx["pdf_en"] = [c for c in idx.get("pdf_en", []) if (root() / book / f"{chdir(c)}.en.pdf").exists()] if teacher else []
         anims = idx.pop("anims", {}) or {}
         idx["anims_ready"] = sum((media_dir(m, book) / f"{n}-{h}.mp4").exists() for n, h in anims.items())
         idx["anims_total"] = len(anims)
@@ -195,7 +207,7 @@ def register(app, m) -> None:
 
         def lab(mt):
             ch, k, label = mt.group(1), mt.group(2), mt.group(3)
-            page = root() / book / "lab" / f"ch{int(ch):02d}.html"
+            page = root() / book / "lab" / f"{chdir(ch)}.html"
             if not page.exists():
                 return mt.group(0)
             label = re.sub(r"\s+", " ", re.sub(r"[【】\[\]]", " ", label)).strip()
@@ -203,7 +215,7 @@ def register(app, m) -> None:
                 note = (f"{label}: please open the virtual lab and download its guide and report template on the web" if en
                         else f"{label}：请在网页端打开虚拟实验，并下载实验指导书和报告模板")
                 return f"<p class='wq-note'>{note}</p>"
-            tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": int(ch)}).encode()).decode()
+            tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": str(ch)}).encode()).decode()
             url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}{'-en' if en else ''}"
             # 在本页运行（第 9 轮 2.5）: the lab page opens inside the text; a closed <details> does not load its frame
             run = "Run it here" if en else "在本页运行"
@@ -236,7 +248,7 @@ def register(app, m) -> None:
 
         def gpu(mt):              # 云端 GPU 实验（第 14 轮附）：本人专用、12 小时有效的控制页链接；指导书与报告模板
             ch, k, label = mt.group(1), mt.group(2), mt.group(3)
-            lab = f"{int(ch)}.{int(k)}"
+            lab = f"{ch}.{int(k)}"
             if mp:
                 note = f"{label}: please open the GPU lab on the web" if en else f"{label}：请在网页端打开 GPU 实验"
                 return f"<p class='wq-note'>{note}</p>"
@@ -265,7 +277,7 @@ def register(app, m) -> None:
             raise EngineError("link_expired", "link expired", 410)
         if not BOOK.match(d["b"]):
             raise EngineError("not_found", "no such lab", 404)
-        p = root() / d["b"] / "lab" / f"ch{int(d['c']):02d}.html"
+        p = root() / d["b"] / "lab" / f"{chdir(d['c'])}.html"
         if not p.exists():
             raise EngineError("not_found", "no such lab", 404)
         return HTMLResponse(p.read_text(encoding="utf-8"), headers={"Content-Security-Policy": labkit.CSP,
@@ -370,13 +382,15 @@ def register(app, m) -> None:
                 "prev": order[i - 1] if i > 0 else None, "next": order[i + 1] if i + 1 < len(order) else None}
 
     @app.get("/api/v1/textbooks/{book}/pdf/{chapter}")
-    async def pdf_link(book: str, chapter: int, sess: Annotated[Session, Depends(m.current)], lang: str = "zh"):
+    async def pdf_link(book: str, chapter: str, sess: Annotated[Session, Depends(m.current)], lang: str = "zh"):
         """A short-lived download link for a chapter's PDF (teachers only); lang=en for the English edition."""
         index(book)
+        if not CHNO.match(chapter):
+            raise EngineError("not_found", "no such chapter", 404)
         if not await m.can_create(sess.moodle_token):
             raise EngineError("forbidden", "the PDF is for teachers", 403)
         en = lang == "en"
-        if not (root() / book / f"ch{chapter:02d}{'.en' if en else ''}.pdf").exists():
+        if not (root() / book / f"{chdir(chapter)}{'.en' if en else ''}.pdf").exists():
             raise EngineError("not_found", "no PDF for this chapter", 404)
         tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": chapter, "u": sess.user_id, "t": time.time(),
                                                        **({"g": "en"} if en else {})}).encode()).decode()
@@ -390,12 +404,12 @@ def register(app, m) -> None:
             raise EngineError("link_expired", "link expired", 410)
         idx = index(d["b"])
         en = d.get("g") == "en"
-        p = root() / d["b"] / f"ch{int(d['c']):02d}{'.en' if en else ''}.pdf"
+        p = root() / d["b"] / f"{chdir(d['c'])}{'.en' if en else ''}.pdf"
         if not p.exists():
             raise EngineError("not_found", "no PDF for this chapter", 404)
-        ch = next((c for c in idx["chapters"] if c["no"] == int(d["c"])), {})
+        ch = next((c for c in idx["chapters"] if str(c["no"]) == str(d["c"])), {})
         if en:
-            name = f"{idx.get('title_en') or d['b']}-Chapter{int(d['c'])}-{ch.get('title_en', '')}.pdf".replace(":", " -")
+            name = f"{idx.get('title_en') or d['b']}-{chlabel(d['c'], True)}-{ch.get('title_en', '')}.pdf".replace(":", " -")
         else:
-            name = f"{idx.get('title', '')}-第{int(d['c'])}章-{ch.get('title', '')}.pdf"
+            name = f"{idx.get('title', '')}-{chlabel(d['c'])}-{ch.get('title', '')}.pdf"
         return FileResponse(p, media_type="application/pdf", filename=name)

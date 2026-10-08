@@ -153,15 +153,15 @@ export interface ReviewFlow {
   state: "" | "prereviewed" | "submitted" | "returned" | "approved"; prereview?: ReviewOpinion; note?: string;
   history: { ts: number; who: string; action: string; comment: string }[];
 }
-export interface TextbookSectionRef { id: string; title: string; written?: boolean; chapter?: number; kind?: "intro" | "summary";
+export interface TextbookSectionRef { id: string; title: string; written?: boolean; chapter?: number | string; kind?: "intro" | "summary";
   en?: boolean; title_en?: string }
-export interface TextbookChapter { no: number; title: string; level: string; part: string; sections: TextbookSectionRef[];
+export interface TextbookChapter { no: number | string; title: string; level: string; part: string; sections: TextbookSectionRef[];
   title_en?: string; status?: string }
 /** 互动资源（第 9 轮 2.5）: an animation or a virtual lab of a chapter, and the section it is in. */
 export interface TextbookResource { kind: "anim" | "lab"; num: string; title: string; title_en?: string; sec: string }
 export interface TextbookIndex { book: string; title: string; title_en?: string; parts: { title: string }[]; parts_en?: Record<string, string>;
   chapters: TextbookChapter[]; teacher: boolean; pdf: number[]; pdf_en?: number[]; resources?: Record<string, TextbookResource[]> }
-export interface TextbookSection { id: string; title: string; lang?: "zh" | "en"; chapter: { no: number; title: string; status?: string }; html: string;
+export interface TextbookSection { id: string; title: string; lang?: "zh" | "en"; chapter: { no: number | string; title: string; status?: string }; html: string;
   prev: TextbookSectionRef | null; next: TextbookSectionRef | null }
 export interface CommitteeItem { pid: string; lid: string; course: Text; chapter: Text; no: string; title: Text; teacher: string; state: string; submitted?: number; verdict: string }
 export interface StudioChapter { id: string; no: number; title: Text; summary: Text; lessons: StudioLesson[]; confirmed?: boolean; ready?: boolean }
@@ -493,7 +493,7 @@ export const api = {
   textbook: (book: string) => request<TextbookIndex>("GET", `/api/v1/textbooks/${book}`),
   textbookSection: (book: string, sid: string, mp = false, lang: "zh" | "en" = "zh") =>
     request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}?mp=${mp}&lang=${lang}`),
-  textbookPdf: (book: string, chapter: number, lang: "zh" | "en" = "zh") =>
+  textbookPdf: (book: string, chapter: number | string, lang: "zh" | "en" = "zh") =>
     request<{ url: string }>("GET", `/api/v1/textbooks/${book}/pdf/${chapter}?lang=${lang}`),
   studioConfirmChapter: (id: string, no: number) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/chapters/${no}/confirm`, {}),
   studioPace: (id: string, mode: "manual" | "daily", hour: number, tz: string) =>

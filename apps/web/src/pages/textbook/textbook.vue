@@ -116,7 +116,7 @@ const webTitle = ref("");
 const book = ref("");
 const idx = ref<TextbookIndex | null>(null);
 const cur = ref<TextbookSection | null>(null);
-const expanded = ref(new Set<number>());
+const expanded = ref(new Set<number | string>());
 const tocOpen = ref(false);
 const loaded = ref(false);
 const error = ref("");
@@ -139,7 +139,7 @@ const parts = computed(() => {
   return out;
 });
 const hasWritten = (c: TextbookChapter) => c.sections.some((s) => s.written);
-const chapterLabel = (n: number) => (en.value ? `Chapter ${n}` : `第 ${n} 章`);
+const chapterLabel = (n: number | string) => (en.value ? `Chapter ${n}` : `第 ${n} 章`);   // 数学篇的章号是 M1 这样的字符串（《人工智能》第 26 轮）
 const refTitle = (s: TextbookSectionRef) => (en.value && s.title_en ? s.title_en : s.title);
 const findRef = (sid: string) => idx.value?.chapters.flatMap((c) => c.sections).find((s) => s.id === sid);
 // 互动资源（第 9 轮 2.5）
@@ -165,7 +165,7 @@ async function go(r: TextbookResource) {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   // #endif
 }
-const pdfFor = (ch: number) => (en.value && idx.value?.pdf_en?.includes(ch)) || (!en.value && idx.value?.pdf.includes(ch));
+const pdfFor = (ch: number | string) => (en.value && idx.value?.pdf_en?.includes(ch)) || (!en.value && idx.value?.pdf.includes(ch));
 
 function setLang(l: "zh" | "en") {
   if (lang.value === l) return;
@@ -176,7 +176,7 @@ function setLang(l: "zh" | "en") {
 
 function fail(e: unknown) { error.value = errorText(e instanceof ApiError ? e.code : "unknown"); }
 
-function toggle(no: number) {
+function toggle(no: number | string) {
   const s = new Set(expanded.value);
   if (s.has(no)) s.delete(no); else s.add(no);
   expanded.value = s;
@@ -237,7 +237,7 @@ async function read(sid: string) {
   } catch (e) { fail(e); }
 }
 
-async function pdf(ch: number) {
+async function pdf(ch: number | string) {
   try {
     const r = await api.textbookPdf(book.value, ch, en.value && idx.value?.pdf_en?.includes(ch) ? "en" : "zh");
     // #ifdef H5
