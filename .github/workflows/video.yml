@@ -11,7 +11,7 @@ on:
       task:
         description: "audition（试听）或 render（成片）"
         type: choice
-        options: [render, audition, ytcheck]
+        options: [render, audition, ytcheck, release]
         default: render
       lectures:
         description: "讲稿目录，空格分隔（如 docs/课程视频/线性代数/14-2）"
@@ -32,6 +32,10 @@ on:
         type: choice
         options: [none, youtube]
         default: none
+      run:
+        description: "release：把以前某次运行（run id）的成片做成直接下载页"
+        required: false
+        default: ""
       lang:
         description: "语言"
         type: choice
@@ -193,6 +197,23 @@ jobs:
           name: videos
           path: ${{ runner.temp }}/videos
           retention-days: 14
+      - name: Direct download links (a GitHub release per run; artifacts are zips that browsers may block)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          files=()
+          for v in "$RUNNER_TEMP"/videos/*/*; do
+            [ -f "$v/lecture.mp4" ] || continue
+            lec=$(basename "$(dirname "$v")"); lang=$(basename "$v")
+            for f in lecture.mp4 lecture.srt cover_bilibili.png cover_youtube.png upload.md; do
+              [ -f "$v/$f" ] && cp "$v/$f" "$RUNNER_TEMP/lecture-$lec-$lang-$f" && files+=("$RUNNER_TEMP/lecture-$lec-$lang-$f")
+            done
+          done
+          [ ${#files[@]} -gt 0 ] || exit 0
+          gh release create "lecture-video-${{ github.run_id }}" "${files[@]}" --repo "${{ github.repository }}" \
+            --title "公开课视频 ${{ inputs.lectures }}" --notes "成片直接下载（中文 zh、英文 en）：mp4、字幕 srt、B 站与 YouTube 封面、上传资料。run ${{ github.run_id }}" \
+            --prerelease --latest=false --target "${{ github.sha }}"
+          echo "下载页：https://github.com/${{ github.repository }}/releases/tag/lecture-video-${{ github.run_id }}" >> "$GITHUB_STEP_SUMMARY"
 
   upload:
     needs: render
@@ -216,3 +237,24 @@ jobs:
         run: |
           pip install -q google-api-python-client google-auth
           for d in "$RUNNER_TEMP"/videos/*/en; do python tools/video/upload_youtube.py "$d" --privacy private; done
+
+  release:
+    if: inputs.task == 'release' && inputs.run != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: Direct download page for an earlier run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download "${{ inputs.run }}" --repo "${{ github.repository }}" -n videos -D videos
+          files=()
+          for v in videos/*/*; do
+            [ -f "$v/lecture.mp4" ] || continue
+            lec=$(basename "$(dirname "$v")"); lang=$(basename "$v")
+            for f in lecture.mp4 lecture.srt cover_bilibili.png cover_youtube.png upload.md; do
+              [ -f "$v/$f" ] && cp "$v/$f" "lecture-$lec-$lang-$f" && files+=("lecture-$lec-$lang-$f")
+            done
+          done
+          gh release create "lecture-video-${{ inputs.run }}" "${files[@]}" --repo "${{ github.repository }}" \
+            --title "公开课视频（run ${{ inputs.run }}）" --notes "成片直接下载（中文 zh、英文 en）：mp4、字幕、封面、上传资料。" \
+            --prerelease --latest=false
