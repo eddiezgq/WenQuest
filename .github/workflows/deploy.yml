@@ -85,7 +85,7 @@ jobs:
   textbook:
     needs: books
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150      # 《机器人学》全书检查已超过 60 分钟（10-07 起每次部署都卡在这里超时，什么都没上线）
     strategy:
       fail-fast: false
       matrix:
