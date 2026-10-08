@@ -1,0 +1,26 @@
+# 实验 M2.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 labM2_5.js。
+原理:
+  - ["二次损失上，梯度下降每一步的误差沿黑塞矩阵的第 j 个特征方向乘以 1 − ηλ_j（式 (M2.3.3)）。要全部收敛，必须 η < 2/λ_max（定理 M2.3.1）。", "On a quadratic loss the error along the j-th eigendirection of the Hessian is multiplied by 1 − eta*lambda_j each step (M2.3.3); convergence requires eta < 2/lambda_max (Theorem M2.3.1)."]
+  - ["最优学习率是 2/(λ_min + λ_max)，这时收敛因子是 (κ−1)/(κ+1)，误差降到 1/ε 约需 ½κ·ln(1/ε) 步（式 (M2.5.2)、(M2.5.3)）。", "The optimal rate is 2/(lambda_min + lambda_max), giving factor (kappa−1)/(kappa+1) and about ½·kappa·ln(1/eps) steps (M2.5.2, M2.5.3)."]
+  - ["带最优动量时收敛因子变成 (√κ−1)/(√κ+1)：步数由 κ 的量级降到 √κ 的量级（式 (M2.5.5)）。", "With optimal momentum the factor becomes (sqrt(kappa)−1)/(sqrt(kappa)+1): the step count drops from order kappa to order sqrt(kappa) (M2.5.5)."]
+  - 式: "本实验取 λ_min = 1、λ_max = κ，所以 2/λ_max = 2/κ，最优学习率是 2/(1+κ)"
+步骤:
+  - ["“碗里的轨迹”场景：条件数取 20，把学习率从 50% 加到 102%，记下轨迹的形状与是否收敛，填表 1（任务 1）。", "Trajectory scene: with kappa = 20, raise the learning rate from 50% to 102%, recording shape and convergence in Table 1 (task 1)."]
+  - ["条件数改成 100、学习率取 99%：观察之字出现在哪个方向（任务 2）。", "Set kappa = 100 and eta = 99%: note which direction the zig-zag happens along (task 2)."]
+  - ["切到“步数随学习率”场景：条件数依次取 20、200、1000，各记下最快的学习率与所需步数，填表 2（任务 3）。", "Switch to the sweep scene and record the fastest rate and its step count for kappa = 20, 200, 1000 in Table 2 (task 3)."]
+  - ["条件数保持 1000，把动量从 0 调到 0.9 以上，再记一次步数，与 √κ 的预测比较（任务 4）。", "Keep kappa = 1000, raise the momentum above 0.9, record the step count again and compare with the sqrt(kappa) prediction (task 4)."]
+数据表:
+  - 标题: ["表 1  学习率与收敛", "Table 1  Learning rate and convergence"]
+    表头: ["学习率（占 2/λmax 的 %）", "轨迹形状", "收敛？", "步数"]
+    表头英文: ["eta (% of 2/lambda_max)", "shape of the path", "converged?", "steps"]
+    行: [["50%", "", "", ""], ["95%", "", "", ""], ["99%", "", "", ""], ["102%", "", "", ""]]
+  - 标题: ["表 2  条件数、动量与步数", "Table 2  Condition number, momentum and steps"]
+    表头: ["条件数 κ", "最快的学习率", "步数（β = 0）", "步数（β ≈ 0.9）", "预测：½κ·ln1000 / √κ·ln1000"]
+    表头英文: ["kappa", "fastest eta", "steps (beta = 0)", "steps (beta ~ 0.9)", "predicted"]
+    行: [["20", "", "", "", ""], ["200", "", "", "", ""], ["1000", "", "", "", ""]]
+注意:
+  - ["实验里的损失是二次的、梯度是精确的、每步用全部数据。真实训练三条都不成立（随机梯度、曲率在变、分批），所以这些公式只给量级与趋势（M2.5.4 节）。", "The lab uses an exact quadratic loss and full-batch exact gradients; real training satisfies none of these, so the formulas give trends and orders of magnitude (Section M2.5.4)."]
+  - ["把动量调到接近 1 时步数会先降后升：动量太大也会振荡，与学习率太大是同一类问题。", "Pushing the momentum towards 1 first helps and then hurts: too much momentum oscillates, just as too large a learning rate does."]
+思考题:
+  - ["为什么把特征标准化能让训练快很多？它改变的是这张图里的哪个量？", "Why does standardising features speed up training so much — which quantity in this picture does it change?"]
+  - ["条件数只有 2 时，动量还值得加吗？从收敛因子算一算。", "With kappa = 2, is momentum still worth it? Compute both convergence factors."]

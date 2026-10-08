@@ -12,10 +12,10 @@ plt = style()
 C = COLORS
 X = parts()
 Z, _, _ = standardize(X)
-A = np.c_[np.ones(len(X)), X[:, 0], X[:, 1], X[:, 2]]
-Az = np.c_[np.ones(len(Z)), Z[:, 0], Z[:, 1], Z[:, 2]]
-s_raw = np.linalg.svd(A.T @ A, compute_uv=False)
-s_std = np.linalg.svd(Az.T @ Az, compute_uv=False)
+Xt = np.c_[np.ones(len(X)), X[:, 0], X[:, 1], X[:, 2]]
+Xz = np.c_[np.ones(len(Z)), Z[:, 0], Z[:, 1], Z[:, 2]]
+s_raw = np.linalg.svd(Xt.T @ Xt, compute_uv=False)
+s_std = np.linalg.svd(Xz.T @ Xz, compute_uv=False)
 
 fig, (a, b) = plt.subplots(1, 2, figsize=(11.0, 3.8))
 a.semilogy(range(1, 5), s_raw, "o-", color=C["x"], lw=1.6, ms=6, label=T("原始数据", "raw data"))

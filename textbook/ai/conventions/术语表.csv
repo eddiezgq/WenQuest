@@ -359,3 +359,19 @@ M1,条件数,condition number,最大与最小奇异值之比
 M1,内积,inner product,
 M1,标准正交组,orthonormal set,
 M1,对称矩阵,symmetric matrix,
+M2,导数,derivative,
+M2,偏导数,partial derivative,
+M2,链式法则,chain rule,
+M2,伴随,adjoint,计算图上某个量的 ∂ℒ/∂·
+M2,泰勒展开,Taylor expansion,
+M2,黑塞矩阵,Hessian matrix,二阶导数矩阵；不写“海森”
+M2,曲率,curvature,
+M2,牛顿法,Newton's method,
+M2,凸函数,convex function,
+M2,鞍点,saddle point,
+M2,收敛因子,convergence factor,误差每步缩小的倍数
+M2,约束优化,constrained optimization,
+M2,拉格朗日乘子,Lagrange multiplier,
+M2,分母布局,denominator layout,梯度与参数形状相同；本书用它
+M2,中心差分,central difference,误差 O(h²)
+M2,动量,momentum,
