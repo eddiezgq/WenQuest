@@ -113,8 +113,8 @@ def mount(app, H, user_of, who):
         return dict(r, created_at=r["created_at"].isoformat())
 
     # ---------------------------------------------------------------- 异常的候选方案（预案推演）
-    @app.get("/api/ont/anomalies/{aid}/options")
-    def options(aid: int, snapshot_id: int = 0, u=Depends(user_of)):
+    def compute_options(u, aid, snapshot_id=0):
+        """异常的候选方案与推荐（第 19 轮：抽成函数，实验 23 评“和中枢推荐比”也用它）→ (结果, 快照号, 快照, 是否精确)"""
         a = H.db.one("select * from anomaly where id=%s and mode=%s", (aid, u["mode"]))
         if a is None:
             raise HTTPException(404, "没有这个异常")
@@ -196,6 +196,13 @@ def mount(app, H, user_of, who):
                 r = PB.evaluate(a, st, ctx_for(u, st))
             except P.PlanError as e:
                 raise HTTPException(400, str(e))
+        return r, sid, st, exact
+
+    H.anomaly_options = compute_options
+
+    @app.get("/api/ont/anomalies/{aid}/options")
+    def options(aid: int, snapshot_id: int = 0, u=Depends(user_of)):
+        r, sid, st, exact = compute_options(u, aid, snapshot_id)
         locked = H.compare_locked(u, aid) if hasattr(H, "compare_locked") else False
         if locked:                          # 实验 15 比对模式：学生提交自己的分析前，不显示建议和推荐理由
             r = dict(r, reason=None, recommended=None, options=[dict(o, recommended=False) for o in r["options"]], locked=True)

@@ -944,7 +944,7 @@ TOOLS = [
     {"name": "simulate", "description": "推演：当前快照（可加“假设某设备再停 N 分钟”）+ 改动，快进算每张订单的预计完成、晚几天、多花的钱。不影响真车间",
      "input_schema": _S(changes=_CH, down_unit={"type": "string", "description": "假设停机的设备编号，如 grd-01"},
                         down_minutes={"type": "number"})},
-    {"name": "compare_options", "description": "按处理预案自动推演几个候选方案并排序推荐。给异常编号，或给“假设某设备再停 N 分钟”",
+    {"name": "compare_options", "description": "按处理方案自动推演几个候选方案并排序推荐。给异常编号，或给“假设某设备再停 N 分钟”",
      "input_schema": _S(anomaly_id={"type": "integer"}, down_unit={"type": "string"}, down_minutes={"type": "number"})},
     {"name": "draft_action", "description": "把方案起草成动作草稿（只起草，不提交、不执行；要人在动作收件箱提交、审批）。教学模式学生不可用",
      "input_schema": dict(_S(changes=_CH, anomaly_id={"type": "integer"}, scenario_id={"type": "integer"}), required=["changes"])},
@@ -1323,7 +1323,7 @@ class Rules:
             r = self.t.compare_options(anomaly_id=open_a["id"])
             if r.get("error"):
                 return "\n".join(out + ["推演没做成：{}".format(r["error"])])
-            out.append("对应的异常 {} [{}]。按预案推演了 {} 个方案：".format("A-{:05d}".format(open_a["id"]), r["anomaly_ref"], len(r["options"])))
+            out.append("对应的异常 {} [{}]。推演了 {} 个处理方案：".format("A-{:05d}".format(open_a["id"]), r["anomaly_ref"], len(r["options"])))
         out += self._options_text(r)
         if r.get("reason"):
             out.append(r["reason"])
@@ -1360,9 +1360,9 @@ class Rules:
         if r.get("error"):
             return "\n".join(out + ["推演没做成：{}".format(r["error"])])
         if not r["options"] or len(r["options"]) == 1:
-            out.append("这类异常还没有推演预案，按说明处理：{}".format(a.get("hint") or "见异常详情"))
+            out.append("这类异常还没有可推演的处理方案，按说明处理：{}".format(a.get("hint") or "见异常详情"))
             return "\n".join(out)
-        out.append("按预案推演了 {} 个方案：".format(len(r["options"])))
+        out.append("推演了 {} 个处理方案：".format(len(r["options"])))
         out += self._options_text(r)
         if r.get("reason"):
             out.append(r["reason"])

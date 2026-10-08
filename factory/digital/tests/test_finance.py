@@ -79,7 +79,7 @@ def test_standard_cost_and_margin_breakdown(env):
     m = ms[0]
     assert abs(sum(x["usd"] for x in m["lines"]) - m["cost"]) < 0.05 and abs(m["revenue"] - m["cost"] - m["margin"]) < 0.05
     assert m["revenue"] == m["qty"] * F.FG_SELLING_PRICE and 0.2 < m["margin_pct"] < 0.35
-    assert {x["key"] for x in m["lines"]} == {"material", "labor", "energy", "scrap", "actions", "warranty"}
+    assert {x["key"] for x in m["lines"]} == {"material", "labor", "energy", "scrap", "idle", "actions", "warranty"}
     assert "实测" in next(x for x in m["lines"] if x["key"] == "labor")["how"]
     assert FN.gross_margin(H.db, "teach") is not None
 

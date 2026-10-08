@@ -1,4 +1,4 @@
-<!-- 经营与财务（第 18 轮 E7）：经营目标（指标树）、订单毛利、应收应付与现金流、预算。手机宽度可用 -->
+<!-- 经营与财务（第 18 轮 E7）：经营目标（指标树）、订单毛利、应收应付与现金流、预算；生产与成本（第 19 轮并进来）。手机宽度可用 -->
 <template>
   <div class="page">
     <div class="page-title"><h1>经营与财务</h1>
@@ -107,6 +107,8 @@
     </template>
 
     <!-- ④ 预算 -->
+    <ProductionCost v-if="tab === 'production'" />
+
     <template v-if="tab === 'budget' && bd">
       <div class="card">
         <h3>{{ bd.month }} 预算（月度进度 {{ pct(bd.progress) }}）</h3>
@@ -128,8 +130,9 @@
 import { reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { get, post } from '../lib/api';
+import ProductionCost from '../components/ProductionCost.vue';
 
-const TABS = { objectives: '经营目标', margins: '订单毛利', arap: '应收应付', budget: '预算' };
+const TABS = { objectives: '经营目标', margins: '订单毛利', arap: '应收应付', budget: '预算', production: '生产与成本' };   // 生产与成本：原“经营与成本”页（第 19 轮 J-8）
 const TONE = { good: '达标', warn: '接近', bad: '偏离', mute: '没有数' };
 const DOMAINS = { sales: '订单与交付', finance: '财务', quality: '质量', production: '生产', energy: '能源', ehs: '安全环保' };
 const route = useRoute();

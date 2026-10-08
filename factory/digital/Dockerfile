@@ -44,6 +44,9 @@ COPY digital/cae/ digital/cae/
 COPY digital/std/ digital/std/
 # 实验指导书（实验 8 起，全部 Markdown，服务器上转成 Word）：用通配符，新实验不用再改这里
 COPY ["digital/实验*.md", "digital/"]
+# 帮助（第 19 轮：每页右上角“帮助”在网页里读）：总目录 + docs/帮助、docs/演示 的副本（help/sync.py 同步）
+COPY ["digital/帮助_数字工厂使用说明.md", "digital/"]
+COPY digital/help/ digital/help/
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist
 WORKDIR /app/digital

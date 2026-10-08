@@ -26,7 +26,7 @@
           </template>
           <button class="btn danger" @click="inject">注入</button><span class="small ok">{{ injMsg }}</span>
         </div>
-        <p class="small muted">建议：停机选 GRD-01、1200–2400 分钟，并在“经营与成本”切到“按班次”。注入后看指挥台右栏：“不处理”会晚、维修加急能按时，方案差别才明显；否则把停机加长再注入一次。</p>
+        <p class="small muted">建议：停机选 GRD-01、1200–2400 分钟，并在“情景导演”的教师控制台切到“按班次”。注入后看指挥台右栏：“不处理”会晚、维修加急能按时，方案差别才明显；否则把停机加长再注入一次。</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>学生</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ t.title }}</th><th class="num">合计</th></tr></thead>
           <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
             <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>

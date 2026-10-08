@@ -25,7 +25,7 @@ TASKS = [
 ]
 REPORT_POINTS = 40
 OPTIONS = [{"value": "dunning", "label": "发催款函"}, {"value": "hold", "label": "信用冻结"}, {"value": "none", "label": "不处理（对照）"}]
-COSTS = [{"value": "labor", "label": "工（折旧 + 人工）"}, {"value": "energy", "label": "电"}, {"value": "scrap", "label": "废品返工"},
+COSTS = [{"value": "labor", "label": "工（折旧 + 人工）"}, {"value": "energy", "label": "电"}, {"value": "idle", "label": "空转电（分摊）"}, {"value": "scrap", "label": "废品返工"},
          {"value": "actions", "label": "急单、加班、外协、加急"}, {"value": "warranty", "label": "保修"}]
 
 

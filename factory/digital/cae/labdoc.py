@@ -19,7 +19,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab19": os.path.join(HERE, "实验19_排班与技能缺人时的决策.md"),
           "lab20": os.path.join(HERE, "实验20_供应链来料不合格与供应商选择.md"),
           "lab21": os.path.join(HERE, "实验21_能源空转错峰与单件碳足迹.md"),
-          "lab22": os.path.join(HERE, "实验22_经营订单毛利应收与现金.md")}
+          "lab22": os.path.join(HERE, "实验22_经营订单毛利应收与现金.md"),
+          "lab23": os.path.join(HERE, "实验23_两周情景一张急单的全厂决策.md")}
 
 
 def _doc():
@@ -129,6 +130,8 @@ def report_template_docx(lab="lab8"):
         return lab21_template()
     if lab == "lab22":
         return lab22_template()
+    if lab == "lab23":
+        return lab23_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -882,6 +885,53 @@ def lab22_template():
     table([["项目", "数值"], ["应收余额", ""], ["近 30 天开票额", ""], ["DSO", ""], ["现金最紧的周与金额", ""], ["DSO 降到 30 天能多出的现金", ""]])
     d.add_heading("六、结论与讨论", 1)
     hint("毛利低的原因该找谁改；什么时候不催款、不冻结；为什么赚钱的工厂也会倒闭")
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab23_template():
+    """实验 23 报告模板（第 19 轮 J-7）：一组一份"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 23　两周情景：一张急单的全厂决策　课程设计报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "小组", ""], ["日期", "", "订单号", ""]], head=False)
+    d.add_heading("一、小组分工（任务 1）", 1)
+    table([["姓名 / 学号", "角色", "负责的幕"], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""], ["", "", ""]])
+    d.add_heading("二、八幕的决定（任务 2）", 1)
+    rows = [["幕", "发生什么", "厂情中枢报", "各方案多花 / 交期 / 风险", "我们选", "理由", "中枢推荐", "一样吗"]]
+    for n, t in ((1, "客户下急单"), (2, "缺料"), (3, "来料不合格"), (4, "缺人"), (5, "安全隐患"), (6, "保养逾期"), (7, "空转与峰时"), (8, "应收逾期")):
+        rows.append([str(n), t, "", "", "", "", "", ""])
+    table(rows)
+    d.add_heading("三、执行与单据（任务 3）", 1)
+    table([["幕", "动作编号", "发起人", "批准", "ERPNext 里的单据"], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]])
+    d.add_heading("四、复盘：这张订单赚了多少（任务 4）", 1)
+    table([["项目", "金额 $", "来自哪一幕"], ["收入", "", ""], ["料", "", ""], ["工（折旧 + 人工）", "", ""], ["电", "", ""], ["空转电（分摊）", "", ""],
+           ["废品返工", "", ""], ["急单、加班、外协、加急", "", ""], ["保修", "", ""], ["毛利 / 毛利率", "", ""], ["按标准的毛利率", "", ""]])
+    hint("把因果链截图贴在这里：从“应收逾期”或订单毛利一路追回到哪几个源头异常。")
+    d.add_heading("五、如果重来", 1)
+    hint("会改哪一幕的决定？估一估毛利、交期会怎么变。")
+    d.add_paragraph("")
+    d.add_heading("六、讨论", 1)
+    hint("哪个决定对毛利影响最大；交期、成本、安全冲突时怎么排先后；真实工厂里哪些钱追不到源头")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)

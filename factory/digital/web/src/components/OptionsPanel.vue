@@ -8,7 +8,7 @@
     <div v-if="busy && !data" class="small muted">正在用当前快照推演各方案…</div>
     <div v-if="err" class="small err">{{ err }}</div>
     <template v-if="data">
-      <p v-if="!data.options.length" class="small muted">这类异常还没有推演预案。</p>
+      <p v-if="!data.options.length" class="small muted">这类异常还没有处理方案。</p>
       <p v-if="data.locked" class="small lockn">比对模式（实验 15）：先在实验页提交你自己的因果链和方案选择，提交后这里才显示“建议”和推荐理由。推演数字照常可看。</p>
       <p v-if="data.reason" class="reason small">{{ data.reason }}<span v-if="data.reason_by && data.reason_by !== 'rules'" class="muted"> · AI 改写</span></p>
       <div v-for="o in data.options" :key="o.key" class="opt" :class="{ rec: o.recommended, bad: !o.result.ok }">

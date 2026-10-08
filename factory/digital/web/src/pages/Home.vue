@@ -4,7 +4,7 @@
     <div v-if="!ov && !error" class="muted">正在从历史库计算…</div>
     <template v-if="ov">
       <TaskBar v-if="ov.teach" :t="ov.teach" />
-      <div v-if="ov.demo" class="demo small">含“实验 7”教学情景的演示数据（订单、库存等由情景生成，不在 ERPNext 里）。教师可在“经营与成本”页重置或清空。</div>
+      <div v-if="ov.demo" class="demo small">含“实验 7”教学情景的演示数据（订单、库存等由情景生成，不在 ERPNext 里）。教师可在“情景导演”的教师控制台重置或清空。</div>
 
       <!-- 厂情中枢提醒条（第 17 轮 D 期 D6）：严重异常和带处理预案的异常；教学模式的学生不显示（实验 7 要自己从看板里找） -->
       <router-link v-for="b in banner" :key="b.id" :to="b.url" class="ont-banner" :class="b.severity">

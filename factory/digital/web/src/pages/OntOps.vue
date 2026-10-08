@@ -247,9 +247,9 @@ function ago(s) {
 const links = computed(() => {
   const a = sel.value;
   if (!a) return [];
-  const L = { production: [['/work/operator', '车间终端'], ['/work/manager', '经营与成本']], quality: [['/work/quality', '质量'], ['/quality/8d', '开 8D']],
+  const L = { production: [['/work/operator', '车间终端'], ['/finance?tab=production', '生产与成本']], quality: [['/work/quality', '质量'], ['/quality/8d', '开 8D']],
     sales: [['/work/planner', '订单与计划']], planning: [['/work/planner', '订单与计划']], supply: [['/work/planner', '订单与计划（请购）']],
-    service: [['/twin', '数字孪生']], maintenance: [['/work/manager', '经营与成本']], finance: [['/work/manager', '经营与成本']], product: [['/design', '设计发布与审批']] };
+    service: [['/twin', '数字孪生']], maintenance: [['/maint', '设备维护']], finance: [['/finance', '经营与财务']], product: [['/design', '设计发布与审批']] };
   const out = (L[a.domain] || []).map(([to, label]) => ({ to, label }));
   if (a.subject) out.unshift({ to: `/ont/${a.subject.type}/${encodeURIComponent(a.subject.key)}`, label: '对象页' });
   return out;

@@ -7,7 +7,7 @@ rules:
     role: [manager]
     params: {above_pct: 10}
     desc: 工单加工实际成本比标准高 above_pct% 以上
-    hint: 在“经营与成本”页看分解：调整、换刀工时还是废品
+    hint: 在“经营与财务 → 生产与成本”看分解：调整、换刀工时还是废品
   F2:
     name: 应收逾期
     fn: ar_overdue

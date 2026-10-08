@@ -6,26 +6,15 @@
         <span class="logo">渠</span>
         <span class="brand-text"><b>问渠数字工厂</b><small>WenQuest Digital Factory</small></span>
       </router-link>
-      <div class="group">
-        <span class="group-title">工作区</span>
-        <router-link v-for="n in navShown" :key="n.to" :to="n.to" class="nav" :class="{ mine: n.role === session.user?.role }">
-          {{ n.label }}<span v-if="n.role === session.user?.role" class="me">我的</span>
-        </router-link>
-        <a href="#" class="nav" @click.prevent="ai.open = true">AI 工厂助手</a>
-        <router-link v-if="session.user?.mode === 'teach'" to="/teach" class="nav">实验 7 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab15" class="nav">实验 15 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab16" class="nav">实验 16 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab17" class="nav">实验 17 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab18" class="nav">实验 18 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab19" class="nav">实验 19 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab20" class="nav">实验 20 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab21" class="nav">实验 21 · 任务</router-link>
-        <router-link v-if="session.user?.mode === 'teach'" to="/lab22" class="nav">实验 22 · 任务</router-link>
-      </div>
-      <div class="group">
-        <span class="group-title">资源</span>
-        <router-link to="/library" class="nav">零件与机器人库</router-link>
-        <router-link v-if="session.user?.teacher !== false" to="/members" class="nav">企业成员</router-link>
+      <!-- 第 19 轮 J-8：按工厂的价值链分组（总览 / 从订单到回款 / 保障 / 设计与工艺 / 教学 / 资源） -->
+      <div v-for="g in navGroups" :key="g.title" class="group">
+        <span class="group-title">{{ g.title }}</span>
+        <template v-for="n in g.items" :key="n.to || n.label">
+          <a v-if="n.ai" href="#" class="nav" @click.prevent="ai.open = true">{{ n.label }}</a>
+          <router-link v-else :to="n.to" class="nav" :class="{ mine: n.role === session.user?.role }">
+            {{ n.label }}<span v-if="n.role === session.user?.role" class="me">我的</span>
+          </router-link>
+        </template>
       </div>
       <div class="group">
         <span class="group-title">专业软件</span>
@@ -57,6 +46,7 @@
             <option v-for="r in rolesFor(session.user)" :key="r.key" :value="r.key">{{ r.name }}</option>
           </select>
         </label>
+        <router-link :to="'/help/' + helpName" class="helpbtn" title="这一页怎么用">帮助</router-link>
         <NotifyBell v-if="session.user" />
         <button class="avatar" :title="session.user?.name + '（点击退出）'" @click="doLogout">{{ (session.user?.name || '?').slice(0, 1) }}</button>
       </header>
@@ -77,28 +67,53 @@ import { ai } from './lib/ai';
 
 const route = useRoute();
 const router = useRouter();
-const nav = [
-  { to: '/', label: '首页 · 运营总览' },
-  { to: '/ont', label: '厂情中枢' },                // 第 17 轮 B 期：有了指挥台，对所有角色开放
-  { to: '/tasks', label: '我的任务' },
-  { to: '/work/planner', label: '订单与计划', role: 'planner' },
-  { to: '/work/engineer', label: '设计与工艺', role: 'engineer' },
-  { to: '/process', label: '工艺规程与 AI 评审', role: 'engineer' },
-  { to: '/work/operator', label: '车间执行', role: 'operator' },
-  { to: '/work/quality', label: '质量', role: 'quality' },
-  { to: '/work/manager', label: '经营与成本', role: 'manager' },
-  { to: '/3d', label: '3D 车间' },
-  { to: '/design', label: '设计发布与审批' },
-  { to: '/configurator', label: '参数配置器', role: 'sales' },
-  { to: '/service', label: '客户与服务', role: 'service' },          // 第 18 轮 E1
-  { to: '/ehs', label: '安全环保', role: 'safety' },                // 第 18 轮 E2
-  { to: '/maint', label: '设备维护', role: 'maintenance' },         // 第 18 轮 E3
-  { to: '/people', label: '人员', role: 'lead' },                   // 第 18 轮 E4
-  { to: '/supply', label: '采购与来料', role: 'planner' },          // 第 18 轮 E5
-  { to: '/energy', label: '能源与环境', role: 'manager' },          // 第 18 轮 E6
-  { to: '/finance', label: '经营与财务', role: 'manager' },         // 第 18 轮 E7
+const teachOnly = (u) => u?.mode === 'teach';
+const NAV = [
+  { title: '总览', items: [
+    { to: '/', label: '首页 · 运营总览' },
+    { to: '/ont', label: '厂情中枢' },                // 第 17 轮 B 期：有了指挥台，对所有角色开放
+    { to: '/tasks', label: '我的任务' },
+    { ai: true, label: 'AI 工厂助手' },
+  ] },
+  { title: '从订单到回款', items: [
+    { to: '/service', label: '客户与服务', role: 'service' },          // 第 18 轮 E1
+    { to: '/work/planner', label: '订单与计划', role: 'planner' },
+    { to: '/supply', label: '采购与来料', role: 'planner' },          // 第 18 轮 E5
+    { to: '/work/operator', label: '车间执行', role: 'operator' },
+    { to: '/work/quality', label: '质量', role: 'quality' },
+    { to: '/finance', label: '经营与财务', role: 'manager' },         // 第 18 轮 E7；第 19 轮并入原“经营与成本”
+  ] },
+  { title: '保障', items: [
+    { to: '/maint', label: '设备维护', role: 'maintenance' },         // 第 18 轮 E3
+    { to: '/people', label: '人员', role: 'lead' },                   // 第 18 轮 E4
+    { to: '/ehs', label: '安全环保', role: 'safety' },                // 第 18 轮 E2
+    { to: '/energy', label: '能源与环境', role: 'manager' },          // 第 18 轮 E6
+  ] },
+  { title: '设计与工艺', items: [
+    { to: '/work/engineer', label: '设计与工艺', role: 'engineer' },
+    { to: '/process', label: '工艺规程与 AI 评审' },
+    { to: '/design', label: '设计发布与审批' },
+    { to: '/configurator', label: '参数配置器', role: 'sales' },
+    { to: '/3d', label: '3D 车间' },
+  ] },
+  { title: '教学', only: teachOnly, items: [
+    { to: '/director', label: '情景导演', only: (u) => u?.teacher },   // 第 19 轮：两周情景（老师）
+    { to: '/labs', label: '实验与任务' },                              // 第 19 轮：实验 7、15–23 一个入口
+  ] },
+  { title: '资源', items: [
+    { to: '/library', label: '零件与机器人库' },
+    { to: '/members', label: '企业成员', only: (u) => u?.teacher !== false },
+    { to: '/help', label: '帮助' },
+  ] },
 ];
-const navShown = computed(() => nav.filter((n) => !n.only || n.only(session.user)));
+const navGroups = computed(() => NAV.filter((g) => !g.only || g.only(session.user))
+  .map((g) => ({ ...g, items: g.items.filter((n) => !n.only || n.only(session.user)) })).filter((g) => g.items.length));
+// 第 19 轮 J-10：右上角“帮助”打开这一页对应的帮助文件
+const HELP = [['/ont', '厂情中枢'], ['/service', '客户与服务'], ['/supply', '采购与来料'], ['/finance', '经营与财务'], ['/maint', '设备维护'],
+  ['/people', '人员与排班'], ['/ehs', '安全环保'], ['/energy', '能源与环境'], ['/cae', '仿真与分析'], ['/cfd', '流体分析'], ['/cam', '数控编程'],
+  ['/twin', '数字孪生'], ['/opt', '设计优化'], ['/plc', '虚拟PLC'], ['/library', '零件与机器人库'], ['/members', '数字工厂企业版使用说明'],
+  ['/director', '两周情景'], ['/lab23', '两周情景']];
+const helpName = computed(() => (HELP.find(([p]) => route.path === p || route.path.startsWith(p + '/')) || [null, '使用说明'])[1]);
 const cfg = ref({});
 const apps = computed(() => [
   { name: 'ERPNext', role: 'ERP / MRP', href: cfg.value.erpnext_url || '#', ext: true },
@@ -115,10 +130,11 @@ const apps = computed(() => [
 ].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
-  '/work/quality': '质量', '/work/manager': '经营与成本', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
+  '/work/quality': '质量', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
   '/design': '设计发布与审批', '/members': '企业成员', '/configurator': '参数配置器', '/cae': '仿真与分析', '/cfd': '流体分析', '/mbd': '运动与动力分析', '/cam': '数控编程', '/opt': '设计优化', '/twin': '数字孪生', '/plc': '虚拟 PLC', '/tasks': '我的任务',
   '/quality/8d': '质量异常单（8D）', '/ont': '厂情中枢 · 指挥台', '/ont/map': '厂情中枢 · 全貌地图', '/ont/rules': '厂情中枢 · 规则目录', '/ont/sim': '厂情中枢 · 推演工作台', '/ont/actions': '厂情中枢 · 动作收件箱', '/ont/ai': '厂情中枢 · AI 运行记录', '/ont/notify': '通知设置', '/service': '客户与服务', '/lab15': '实验 15 · 车间异常的追因、推演与决策', '/lab16': '实验 16 · 客户投诉的追溯、召回与服务决策', '/lab17': '实验 17 · 安全隐患的识别、评估与停机决策', '/ehs': '安全环保', '/maint': '设备维护', '/lab18': '实验 18 · 设备维护策略：保养时机的决策', '/people': '人员', '/lab19': '实验 19 · 排班与技能：缺人时的决策', '/supply': '采购与来料', '/lab20': '实验 20 · 供应链：来料不合格与供应商选择', '/energy': '能源与环境', '/lab21': '实验 21 · 能源：空转、错峰与单件碳足迹', '/finance': '经营与财务', '/lab22': '实验 22 · 经营：订单毛利、应收与现金', '/ont/reports': '厂情中枢 · 日报与周报',
-}[route.path] || (route.path.startsWith('/quality/8d/') ? '质量异常单（8D）' : route.path.startsWith('/ont/') ? '厂情中枢' : '') || (route.path.startsWith('/design/') ? '设计审阅' : route.path.startsWith('/tasks/review/') ? '任务单审阅'
+  '/director': '情景导演', '/labs': '实验与任务', '/lab23': '实验 23 · 两周情景：一张急单的全厂决策', '/help': '帮助',
+}[route.path] || (route.path.startsWith('/help/') ? '帮助' : '') || (route.path.startsWith('/quality/8d/') ? '质量异常单（8D）' : route.path.startsWith('/ont/') ? '厂情中枢' : '') || (route.path.startsWith('/design/') ? '设计审阅' : route.path.startsWith('/tasks/review/') ? '任务单审阅'
   : route.path.startsWith('/tasks/') ? '工程任务单' : '')));
 const clock = ref('');
 let timer;
@@ -187,6 +203,7 @@ onUnmounted(() => clearInterval(timer));
 .top { height: 64px; flex-shrink: 0; background: #fff; border-bottom: 1px solid var(--line); display: flex;
   align-items: center; padding: 0 28px; gap: 20px; position: sticky; top: 0; z-index: 10; }
 .title { display: flex; flex-direction: column; line-height: 1.3; }
+.helpbtn { height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; display: inline-flex; align-items: center; font-size: 13px; color: inherit; text-decoration: none; }
 .title b { font-size: 17px; font-weight: 600; }
 .title small { font-size: 12px; color: var(--muted); }
 .modes { margin-left: auto; display: flex; gap: 4px; background: var(--bg); border-radius: 8px; padding: 3px; }

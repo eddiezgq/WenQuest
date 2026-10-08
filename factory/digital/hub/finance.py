@@ -278,6 +278,8 @@ def ready_orders(db, mode, real_only=False):
         for w in ws:
             if w["data"]["name"] in shop and (w["data"].get("status") != "Completed" or _ts(w) < shop[w["data"]["name"]]):
                 w["ts"] = shop[w["data"]["name"]]
+        if name in sos and real_only and str(sos[name].get("source") or "").startswith("demo"):
+            continue                                  # 情景里的演示订单不在 ERPNext 里，不开票（第 19 轮：之前会开票失败）
         if name in sos:
             out.append((sos[name], max(_ts(w) for w in ws)))
         elif not real_only:
@@ -685,14 +687,24 @@ def margin(db, mode, so_name, store=True):
     bad = sum(x["bad"] for x in act)
     scrap = bad * (sh["material"] + sh["labor"] + sh["energy"])
     lines.append({"key": "scrap", "label": "废品返工", "usd": round(scrap, 2), "how": "不合格输出轴 {} 件 × 标准成本".format(bad)})
+    idle, idle_how = _idle(db, mode, wos)
+    lines.append({"key": "idle", "label": "空转电（分摊）", "usd": round(idle, 2), "how": idle_how})
     acts = 0.0
     used = []
-    for a in db.q("select id, type, title, trial, params from action where mode=%s and status in ('done','executing') and type = any(%s)", (mode, list(ACT_TYPES))):
+    from hub import story as ST            # 第 19 轮：情景主线订单——因情景各幕异常采纳的动作，费用全部记到主线订单上（不再分给别的订单）
+    story_of = ST.story_anomalies(db, mode)
+    since = _state(db, mode).get("since")   # 第 19 轮：只算这次情景（重置以后）的动作——情景里的演示订单每次重置都是同一个单号
+    for a in db.q("select id, type, title, trial, params, anomaly_id from action where mode=%s and status in ('done','executing') and type = any(%s) "
+                  "and (%s::timestamptz is null or created_at >= %s::timestamptz)", (mode, list(ACT_TYPES), since, since)):
         tr = a["trial"] or {}
         sos = [s["name"] for s in tr.get("sales_orders") or []]
-        hit = so_name in sos or any(str(v) in wos for v in (a["params"] or {}).values() if isinstance(v, str))
-        if hit:
+        owner = story_of.get(int(a["anomaly_id"])) if a["anomaly_id"] is not None else None
+        if owner:
+            hit, share = owner == so_name, float(tr.get("cost_total") or 0)
+        else:
+            hit = so_name in sos or any(str(v) in wos for v in (a["params"] or {}).values() if isinstance(v, str))
             share = float(tr.get("cost_total") or 0) / max(1, len(sos) or 1)
+        if hit:
             acts += share
             used.append({"id": a["id"], "title": a["title"], "usd": round(share, 2)})
     lines.append({"key": "actions", "label": "急单、加班、外协、加急", "usd": round(acts, 2), "how": "采纳并执行的动作费用，按受影响的订单分摊", "actions": used})
@@ -716,6 +728,57 @@ def margin(db, mode, so_name, store=True):
              "on conflict (mode, sales_order) do update set revenue=excluded.revenue, cost=excluded.cost, margin=excluded.margin, at=now()",
              (mode, so_name, d.get("customer"), item, qty, revenue, Jsonb(out), m))
     return out
+
+
+def _idle(db, mode, wos):
+    """空转电分摊（第 19 轮 J-4）：订单在做期间（工厂时间，第一件开工到最后一件做完），加工过它的设备的空转电量 × 电价，
+    按这台设备同期加工的件数分给这张订单（热处理炉保温不算空转）"""
+    if not wos:
+        return 0.0, "没有工单"
+    try:
+        from hub import energy as EN
+        rows = db.q("select topic, count(*) as n, min(payload->'data'->>'factory_ts') as a, max(payload->'data'->>'factory_ts') as b from bus_message "
+                    "where mode=%s and type='machine.event' and corr = any(%s) and payload->'data'->>'event'='cycle_end' group by topic", (mode, list(wos)))
+        if not rows:
+            return 0.0, "还没开工"
+        a, b = min(r["a"] for r in rows), max(r["b"] for r in rows)
+        price = EN.params(db, mode)["price"]
+        usd, kwh, units = 0.0, 0.0, []
+        for r in rows:
+            unit = r["topic"].split("/")[3]
+            if unit == "ht-01":
+                continue
+            tot = db.one("select count(*) as n from bus_message where mode=%s and type='machine.event' and topic=%s and payload->'data'->>'event'='cycle_end' "
+                         "and payload->'data'->>'factory_ts' between %s and %s", (mode, r["topic"], a, b))["n"] or r["n"]
+            share = min(1.0, float(r["n"]) / float(tot))
+            for e in db.q("select bucket, sum(coalesce((k->>'idle')::float, 0)) as v from energy_read where mode=%s and meter=%s and ts >= %s and ts < %s "
+                          "group by bucket", (mode, "E-" + unit.upper(), a, b)):
+                k = float(e["v"] or 0) * share
+                kwh += k
+                usd += k * float(price.get(e["bucket"] or "flat", price["flat"]))
+            units.append(unit)
+        return usd, "订单在做期间（工厂时间）{} 台设备的空转电 {:.1f} 度，按件数分摊".format(len(units), kwh)
+    except Exception:  # noqa: BLE001
+        log.exception("空转电分摊")
+        return 0.0, "没有计量数据"
+
+
+def make_overdue(H, mode, inv_id, days, who="老师"):
+    """第 19 轮 J-4：指定的这张发票逾期 days 天（账期日），不催就不付——情景第 8 幕用，逾期的就是主线订单自己的发票"""
+    if mode != "teach":
+        raise PermissionError("生产模式不模拟")
+    db = H.db
+    x = db.one("select * from invoice where id=%s and mode=%s", (inv_id, mode))
+    if x is None:
+        raise KeyError(inv_id)
+    if x["status"] in ("paid", "held", "failed"):
+        raise ValueError("这张发票现在{}，不能设为逾期".format(STATUS.get(x["status"])))
+    now = now_utc()
+    due = now - dt.timedelta(seconds=float(days) * day_s(mode))
+    db.x("update invoice set issued_at=%s, due_at=%s, pay_at=null, no_pay=true, note=coalesce(note,'') || %s where id=%s",
+         (due - dt.timedelta(seconds=TERMS_DAYS * day_s(mode)), due, "；{}：客户压着不付".format(who), inv_id))
+    return {"text": "{} 的发票（订单 {}，${:,.0f}）逾期 {:g} 天，不催就不付".format(x["party"].split(" ")[0], x["ref"], x["amount"], float(days)),
+            "invoice_id": inv_id}
 
 
 def margins(db, mode):

@@ -164,6 +164,10 @@ class Hub:
             EG.init(self.db)
             from hub import finance as FN
             FN.init(self.db)
+            from hub import story as ST
+            ST.init(self.db)
+            from hub import lab23 as L23
+            L23.init(self.db)
             NT.init(self.db)
             RP.init(self.db)
             RT.init(self.db)
@@ -198,8 +202,8 @@ class Hub:
     def compare_locked(self, u, anomaly_id=None):
         """实验 15 的比对模式：学生提交自己的分析之前看不到建议和推荐理由（第 17 轮 D 期 D9）"""
         try:
-            from hub import lab15, lab16, lab17, lab18, lab19, lab20, lab21, lab22   # 实验 16–22（第 18 轮 E1–E7）沿用同一个比对模式
-            return any(m.locked(self.db, u, anomaly_id) for m in (lab15, lab16, lab17, lab18, lab19, lab20, lab21, lab22))
+            from hub import lab15, lab16, lab17, lab18, lab19, lab20, lab21, lab22, lab23   # 实验 16–23 沿用同一个比对模式
+            return any(m.locked(self.db, u, anomaly_id) for m in (lab15, lab16, lab17, lab18, lab19, lab20, lab21, lab22, lab23))
         except ImportError:
             return False
 
@@ -309,6 +313,12 @@ class Hub:
                         FN.tick(self, mode)
                     except Exception:  # noqa: BLE001
                         log.exception("财务出错")
+                    try:                              # 第 19 轮：情景导演——推进等 ERPNext 的步骤、核对异常、自动演示
+                        if mode == "teach":
+                            from hub import story as ST
+                            ST.tick(self, mode)
+                    except Exception:  # noqa: BLE001
+                        log.exception("情景出错")
                     last = self.last_brief.get(mode, 0)
                     if new or time.time() - last > 600:
                         self.ai.briefing(mode)
@@ -1739,6 +1749,54 @@ def lab18_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
 
 
 # ---------------------------------------------------------------- 实验 22（第 18 轮 E7-10）
+# ---------------------------------------------------------------- 实验 23（第 19 轮 J-7）：两周情景，分组、分角色
+@app.get("/api/lab23")
+def lab23_status(u=Depends(user_of)):
+    from hub import lab23
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = lab23.check(H.db, u["name"])
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = lab23.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab23/register")
+def lab23_register(body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab23
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab23.register(H.db, u["name"], body.get("team"), body.get("role"))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/lab23/decide/{n}")
+def lab23_decide(n: int, body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab23
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab23.decide(H, u, n, body.get("option"), body.get("reason"))
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except (ValueError, KeyError) as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/lab23/{tid}")
+def lab23_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab23
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab23.answer(H, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
+
+
 @app.get("/api/lab22")
 def lab22_status(u=Depends(user_of)):
     from hub import lab22
@@ -1884,11 +1942,17 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     require_teacher(u)
     if u["role"] != "manager":
         raise HTTPException(403, "请用厂长（教师）角色重置")
+    reset_teach(who(u), float(body.get("speed", 1)), bool(body.get("scores")))
+    return {"reset": True}
+
+
+def reset_teach(by, speed=1.0, scores=False):
+    """清空教学模式的历史和各领域状态，让仿真器重新载入实验 7 情景（第 19 轮：情景导演“开始两周情景”也用它）"""
     H.db.x("delete from bus_message where mode='teach'")
     H.db.x("delete from machine_state_log where mode='teach'")
     H.db.x("delete from ncr where mode='teach' or mode is null")
     H.db.x("delete from ai_proposal where mode='teach'")
-    if body.get("scores"):
+    if scores:
         H.db.x("delete from task_result")
     H.hist._last_state = {k: v for k, v in H.hist._last_state.items() if k[1] != "teach"}
     H.hist._failed_parts.clear()
@@ -1914,8 +1978,7 @@ def teach_reset(body: dict = Body(default={}), u=Depends(user_of)):
     _FN.reset(H.db, "teach")
     if H.ont is not None:
         H.ont.reset_mode("teach")
-    H.mes.command("sim", "load_scenario", "teach", who(u), speed=float(body.get("speed", 1)))
-    return {"reset": True}
+    H.mes.command("sim", "load_scenario", "teach", by, speed=float(speed))
 
 
 # ---------------------------------------------------------------- 零件库文件（第 2 轮 L14）
@@ -1966,6 +2029,12 @@ from hub import energy_api as _energy_api  # noqa: E402
 _energy_api.mount(app, H, user_of, who)           # 第 18 轮 E6：能源与环境
 from hub import finance_api as _finance_api  # noqa: E402
 _finance_api.mount(app, H, user_of, who)          # 第 18 轮 E7：经营与财务
+from hub import story_api as _story_api  # noqa: E402
+_story_api.mount(app, H, user_of, who, reset_teach)   # 第 19 轮：情景导演（两周情景）
+from hub import help_api as _help_api  # noqa: E402
+_help_api.mount(app, user_of)                          # 第 19 轮：帮助在网页里读
+from hub import labs_api as _labs_api  # noqa: E402
+_labs_api.mount(app, H, user_of)                       # 第 19 轮：“实验与任务”一个入口
 from hub.ont import agent_api as _agent_api  # noqa: E402
 _agent_api.mount(app, H, user_of, who, ai_quota)  # 第 17 轮 D 期：AI 代理（要在 mount_anomaly 之前）
 _ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则

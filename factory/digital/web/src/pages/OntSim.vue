@@ -41,7 +41,7 @@
             <div class="field"><label>设备（空 = 全厂）</label><select v-model="form.unit"><option value="*">全厂</option>
               <option v-for="u in units" :key="u" :value="u">{{ u.toUpperCase() }}</option></select></div>
             <div class="field"><label>分钟（最多 240）</label><input v-model.number="form.minutes" type="number" min="30" max="240" step="30"></div>
-            <p v-if="shift.mode !== 'shift'" class="small err">车间是 24 小时连续运转，加班没有意义；老师可以在“经营与成本”的教师控制台切到按班次。</p>
+            <p v-if="shift.mode !== 'shift'" class="small err">车间是 24 小时连续运转，加班没有意义；老师可以在“情景导演”的教师控制台切到按班次。</p>
           </template>
           <template v-if="form.type === 'expedite'">
             <div class="field"><label>停机的设备</label><select v-model="form.unit"><option v-for="u in downUnits" :key="u" :value="u">{{ u.toUpperCase() }}</option></select></div>

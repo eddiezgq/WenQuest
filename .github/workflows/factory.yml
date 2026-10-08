@@ -11,6 +11,27 @@ on:
       - "services/gateway/app/production/labkit/plc.js"       # 虚拟 PLC 用的是这几份的副本（tests/test_vplc.py 核对一致）
       - "services/gateway/app/production/labkit/plants.js"
       - "services/gateway/app/production/labkit/shift.js"
+      # 帮助在网页里读（第 19 轮）：工厂镜像里是这些原件的副本（factory/digital/help/sync.py 同步，tests/test_help.py 核对一致）
+      - "docs/演示/**"
+      - "docs/帮助/两周情景.md"
+      - "docs/帮助/数字工厂术语表.md"
+      - "docs/帮助/厂情中枢.md"
+      - "docs/帮助/客户与服务.md"
+      - "docs/帮助/安全环保.md"
+      - "docs/帮助/设备维护.md"
+      - "docs/帮助/人员与排班.md"
+      - "docs/帮助/采购与来料.md"
+      - "docs/帮助/能源与环境.md"
+      - "docs/帮助/经营与财务.md"
+      - "docs/帮助/仿真与分析.md"
+      - "docs/帮助/流体分析.md"
+      - "docs/帮助/数控编程.md"
+      - "docs/帮助/数字孪生.md"
+      - "docs/帮助/设计优化.md"
+      - "docs/帮助/虚拟PLC.md"
+      - "docs/帮助/零件与机器人库.md"
+      - "docs/帮助/数字工厂企业版使用说明.md"
+      - "docs/帮助/数字工厂课程接口.md"
   workflow_dispatch:
 
 permissions:

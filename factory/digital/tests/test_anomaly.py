@@ -24,7 +24,7 @@ def legacy_findings(db, mode, now):
             mins = (m["down_until_s"] or 0) / 60
             found.append(("down:" + m["unit"], "critical" if m["state"] == "fault" else "warn",
                           "{} {}：{}".format(m["code"], "故障" if m["state"] == "fault" else "停机", m["reason"] or ""),
-                          "预计还要约 {:.0f} 分钟（仿真时间）；排队 {} 件{}".format(
+                          "预计还要约 {:.0f} 分钟（工厂时间）；排队 {} 件{}".format(
                               mins, m["queue"], "，是本周瓶颈" if m.get("bottleneck") else ""),
                           [{"topic": unit_topic(m["unit"], "status"), "ts": m["ts"]}],
                           "查看受影响的订单；必要时安排加班或转移工序"))

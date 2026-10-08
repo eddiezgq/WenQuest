@@ -26,6 +26,7 @@ P.add_argument("--erp-kind", choices=("mock", "real"), default="mock")
 P.add_argument("--erp-key", default="")
 P.add_argument("--erp-secret", default="")
 P.add_argument("--diag", default="", help="出错时把 ERPNext 错误日志写到这个文件（CI 用）")
+P.add_argument("--only", default="", help="只跑某一段（本地调试用）：story = 第 20 段全厂联调情景")
 A = P.parse_args()
 
 FAILS = []
@@ -123,6 +124,9 @@ def wait(fn, what, timeout=None, every=2):
 
 
 def main():
+    if A.only == "story":
+        story(login("测试教师", "manager"))
+        return finish(login("测试教师", "manager"))
     student = "测试学生" + time.strftime("%H%M%S")
     teacher = login("测试教师", "manager")
     print("1. 教师重置实验 7 情景")
@@ -332,7 +336,7 @@ def main():
         o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
         kinds = [x["kind"] for x in o["options"]]
         check(kinds[:1] == ["none"] and "overtime" in kinds and "expedite" in kinds and o["recommended"],
-              "预案推演 {} 个方案，用时 {:.1f} 秒，{}快照；{}".format(len(kinds), time.time() - t0, "精确" if o["exact"] else "近似", o["reason"]))
+              "处理方案推演 {} 个，用时 {:.1f} 秒，{}快照；{}".format(len(kinds), time.time() - t0, "精确" if o["exact"] else "近似", o["reason"]))
         exp = next(x for x in o["options"] if x["kind"] == "expedite")
         a = hub("POST", "/api/ont/actions", {"changes": exp["changes"], "anomaly_id": an["id"], "snapshot_id": o["snapshot_id"]}, teacher)
         before = next(m for m in hub("GET", "/api/overview", token=teacher)["machines"] if m["unit"] == "cnc-l01-b")["down_until_s"] or 0
@@ -391,6 +395,11 @@ def main():
     supply(teacher)
     energy(teacher)
     finance(teacher)
+    story(teacher)
+    finish(mgr)
+
+
+def finish(mgr):
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -878,6 +887,89 @@ def finance(teacher):
     st = hub("GET", "/api/lab22", token=teacher)
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 22 页：5 个任务，自动评 60 分")
     hub("POST", "/api/finance/sim", {"sim": False}, teacher)
+
+
+def story(teacher):
+    """第 19 轮：全厂体检——两周情景八幕在真 ERPNext 上跑一遍：每幕的异常出现；采纳方案、批准、执行；
+    订单做完开票、逾期、催款；复盘里这张订单的毛利包含各幕的钱，因果链从钱追回源头异常"""
+    print("20. 全厂联调：两周情景（第 19 轮）")
+    roles = {"W1": ("测试计划员", "planner"), "W3": ("测试计划员", "planner"), "H2": ("测试班组长", "lead"), "E1": ("测试安全员", "safety"),
+             "M2": ("测试维修工", "maintenance"), "N2": ("测试计划员", "planner"), "F2": ("测试销售", "sales")}
+    prefer = {"W1": ["urgent_purchase", "expedite"], "W3": ["alt"], "H2": ["overtime"], "E1": ["lockout"], "M2": ["pm_later", "pm_now"],
+              "N2": ["standby10"], "F2": ["dunning"]}
+
+    def st():
+        return hub("GET", "/api/story/state", token=teacher)
+
+    def beat(n):
+        return next(b for b in st()["beats"] if b["n"] == n)
+
+    r = hub("POST", "/api/story/start", {"speed": max(60, min(A.speed, 300))}, teacher)
+    check(r["run"] and len(r["beats"]) == 8, "开始两周情景：{} 幕，订单 {} × {}".format(len(r["beats"]), r["scenario"]["item"], r["scenario"]["qty"]))
+    ok = wait(lambda: (lambda x: x if x["run"]["status"] == "ready" else None)(st()), "车间载入实验 7 情景", 120, 3)
+    check(ok is not None, "情景载入，可以开演")
+    if not ok:
+        return
+    for n in range(1, 9):
+        if n == 8:
+            done = wait(lambda: (lambda x: x if x["next"]["ok"] else None)(st()), "车间做完这张订单", A.timeout, 5)
+            o = st()["order"]
+            check(done is not None, "订单 {} 做完（{} / {} 根）".format(st()["run"]["so"], o.get("parts"), o.get("qty")))
+            if not done:
+                return
+        res = wait(lambda: (lambda x: x if x["next"]["ok"] else None)(st()), "第 {} 幕可以演".format(n), 240, 3)
+        if res is None:
+            check(False, "第 {} 幕：{}".format(n, st()["next"]["why"]))
+            return
+        try:
+            hub("POST", "/api/story/next", {}, teacher)
+        except RuntimeError as e:
+            if "还没进 ERPNext" in str(e):
+                time.sleep(15)
+                hub("POST", "/api/story/next", {}, teacher)
+            else:
+                raise
+        b = wait(lambda: (lambda b: b if b["status"] == "ok" else None)(beat(n)), "第 {} 幕的异常".format(n), 240, 4)
+        bb = beat(n)
+        check(b is not None, "第 {} 幕“{}”：{}{}".format(n, bb["title"], (bb.get("note") or "")[:90],
+                                                     "；" + "、".join(x["title"][:30] for x in bb["seen"]) if bb.get("seen") else ""))
+        if not b:
+            return
+        for x in b["seen"]:
+            if not x.get("id") or x["rule"] not in roles:
+                continue
+            o = hub("GET", "/api/ont/anomalies/{}/options".format(x["id"]), token=teacher)
+            opts = [y for y in o["options"] if y.get("changes")]
+            pick = next((y for k in prefer.get(x["rule"], []) for y in opts if y["kind"] == k), None) or \
+                next((y for y in opts if y.get("recommended")), None) or (opts[0] if opts else None)
+            if pick is None:
+                check(False, "第 {} 幕 {} 没有可执行的方案（{}）".format(n, x["rule"], [y["kind"] for y in o["options"]]))
+                continue
+            who_ = login(*roles[x["rule"]])
+            a = hub("POST", "/api/ont/actions", {"changes": pick["changes"], "anomaly_id": x["id"], "snapshot_id": o.get("snapshot_id")}, who_)
+            for aid in a["ids"]:
+                d = hub("POST", "/api/ont/actions/{}/approve".format(aid), {}, teacher)
+                check(d["status"] in ("done", "executing"), "  {} → {}：{}".format(x["rule"], pick["label"], (d.get("result") or {}).get("text", d["status"])))
+    rv = hub("GET", "/api/story/review?report=1", token=teacher)
+    m = rv["margin"] or {}
+    lines = {x["key"]: x for x in m.get("lines", [])}
+    check(m and abs(sum(x["usd"] for x in m["lines"]) - m["cost"]) < 0.05, "复盘：{} 毛利率 {}（按标准 {}）".format(rv["sales_order"], m.get("margin_pct"), m.get("std_margin_pct")))
+    acts = (lines.get("actions") or {}).get("actions") or []
+    check(len(acts) >= 2 and lines["actions"]["usd"] > 0, "订单上记了 {} 笔动作费用 ${}（{}）".format(len(acts), (lines.get("actions") or {}).get("usd"),
+                                                                                "、".join(a["title"][:16] for a in acts[:4])))
+    check("idle" in lines, "空转电分摊：${}（{}）".format(lines.get("idle", {}).get("usd"), lines.get("idle", {}).get("how")))
+    check(rv["invoice"] and rv["invoice"]["doc"], "逾期的是这张订单自己的发票 {}（{}，催过 {} 次）".format((rv["invoice"] or {}).get("doc"),
+                                                                                    (rv["invoice"] or {}).get("status_name"), (rv["invoice"] or {}).get("dunned_n")))
+    an = [n for n in rv["chain"]["nodes"] if n["type"] == "Anomaly"]
+    check(len({n["domain"] for n in an}) >= 3, "复盘因果链：{} 个异常、{} 个领域；{}".format(len(an), len({n["domain"] for n in an}), "；".join(rv["chain"]["summary"])[:120]))
+    f2 = next((x for b in rv["beats"] if b["n"] == 8 for x in b["anomalies"] if x.get("id")), None)
+    if f2:
+        d = hub("GET", "/api/ont/anomalies/{}".format(f2["id"]), token=teacher)
+        srcs = [n for n in d["chain"]["nodes"] if n["type"] == "Anomaly" and n["key"] != "A-{:05d}".format(f2["id"])]
+        check(any(n["values"].get("规则") in ("W1", "W3") for n in srcs), "应收逾期的因果链从发票 → 订单 → 动作，追回到缺料 / 来料不合格（{}）".format(
+            "、".join(n["values"].get("规则") or "" for n in srcs)))
+    check(rv.get("report") and "周报" in (rv["report"]["text"] or "") or bool(rv.get("report")), "两周的周报已生成")
+    hub("POST", "/api/story/end", {}, teacher)
 
 
 if __name__ == "__main__":

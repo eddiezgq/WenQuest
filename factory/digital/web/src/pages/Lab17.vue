@@ -23,7 +23,7 @@
           <button class="btn" @click="inject('bypass')">模拟违规拆锁</button>
           <span class="small ok">{{ injMsg }}</span>
         </div>
-        <p class="small muted">建议 GRD-01 + 防护罩缺失；先在“经营与成本”切到“按班次”。“违规拆锁”只在这台设备挂着锁时有效：设备恢复运转而许可没关，规则 E5 会报警。</p>
+        <p class="small muted">建议 GRD-01 + 防护罩缺失；先在“情景导演”的教师控制台切到“按班次”。“违规拆锁”只在这台设备挂着锁时有效：设备恢复运转而许可没关，规则 E5 会报警。</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>学生</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ t.title }}</th><th class="num">合计</th></tr></thead>
           <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
             <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>

@@ -625,7 +625,7 @@ def fix_options(db, mode, a):
                 "result": dict(none, cost_total=cost, costs=[{"what": "整改人工", "usd": cost}]), "recommended": True},
                {"key": "B", "kind": "none", "label": "暂不处理", "note": "职业健康风险", "changes": [], "result": none, "recommended": False}]
         return {"options": out, "affected": [], "recommended": "A", "reason": "建议 A：环境指标超限要整改（安全环保的整改工单）"}
-    return {"options": [], "affected": [], "reason": "这类异常没有预案", "recommended": None}
+    return {"options": [], "affected": [], "reason": "这类异常没有处理方案", "recommended": None}
 
 
 # ---------------------------------------------------------------- 动作执行

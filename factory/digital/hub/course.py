@@ -538,7 +538,14 @@ def mount(app, H):
                        "（比对模式，看现金流预测）并执行；最后算应收周转天数，找现金最紧的一周，体会“赚钱”和“有钱”的区别。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab22",
             "guide_url": public_base(request) + "/api/cae/lab22/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab22/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab22/report-template.docx"}, {
+            "id": "lab23", "name": {"zh": "实验 23：两周情景——一张急单的全厂决策", "en": "Lab 23: two-week scenario — whole-plant decisions on one rush order"},
+            "summary": "两周课程设计，4–6 人一组、每人一个角色。老师在“情景导演”里一幕一幕地放：客户下急单 → 缺料 → 来料不合格 → 缺人 → "
+                       "赶工时的安全隐患 → 设备保养逾期 → 空转与峰时 → 交付后应收逾期。每一幕由该负责的角色代表小组看推演、选方案、写理由"
+                       "（比对模式）并发起动作；最后复盘：这张订单的毛利里能看到每一幕花的钱，从钱一路追回源头。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab23",
+            "guide_url": public_base(request) + "/api/cae/lab23/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab23/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

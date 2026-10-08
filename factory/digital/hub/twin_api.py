@@ -197,7 +197,7 @@ def mount(app, H, user_of, who, uid_of, is_teacher, ai_quota=None):
     @app.post("/api/twin/units/{serial}/fault")
     def twin_fault(serial: str, body: dict = Body(...), u=Depends(user_of)):
         if not is_teacher(u):
-            raise HTTPException(403, "只有老师能制造故障")
+            raise HTTPException(403, "只有老师能注入故障")
         if u["mode"] not in TW.FIELD_MODES:
             raise HTTPException(409, "这个模式下没有客户现场模拟器")
         try:

@@ -10,7 +10,8 @@
   field   现场设备报警 → 总成 → 输出轴 → 砂轮 → 同砂轮的轴 → 它们的现场设备 → 客户（排查范围）
   stock   缺料 → 物料 → 用到它的工单 → 销售订单 → 客户
   cost    成本差异 → 工序 → 调整、换刀、超时（差异分解）
-  late    订单延期风险 → 工单 → 未完工序 → 设备状态（为什么会晚）"""
+  late    订单延期风险 → 工单 → 未完工序 → 设备状态（为什么会晚）
+  money   （第 19 轮）应收逾期 / 毛利低 → 订单 → 记到订单上的动作费用 → 动作来自哪个异常（跨领域）"""
 import datetime as dt
 
 from hub.ont import schema as S
@@ -178,7 +179,7 @@ def chain_down(c, unit, vals=None, anchor=ANCHOR):
         for so, sn, v in g.work_order_to_customer(wn, wo):
             late.append((so, v))
     mins = round((m["down_until_s"] or 0) / 60) if m else 0
-    g.summary.append("{} {}（{}），预计还要约 {} 分钟（仿真时间）".format(unit.upper(), "故障" if m and m["state"] == "fault" else "停机",
+    g.summary.append("{} {}（{}），预计还要约 {} 分钟（工厂时间）".format(unit.upper(), "故障" if m and m["state"] == "fault" else "停机",
                                                               (m or {}).get("reason") or "原因未填", mins))
     if jobs:
         g.summary.append("排在它上面、还没做完的工序 {} 道，涉及工单 {}".format(len(jobs), "、".join(wos)))
@@ -388,6 +389,58 @@ def chain_generic(c, t, k, anchor=ANCHOR, label="涉及"):
     return g
 
 
+def chain_money(c, so, anchor=ANCHOR, invoice=None):
+    """第 19 轮 J-4：钱的链——（发票 →）订单毛利 ← 多花的各项 ← 采纳的动作 ← 动作来自哪个异常（哪个领域）。
+    “从毛利追回缺料”：订单上记的急单、加班、外协费用，每一笔都能追到当初的异常"""
+    from hub import finance as FN
+    g = Chain(c, "money")
+    son = g.node("SalesOrder", so, role="subject")
+    if invoice:
+        rn = g.node("Receivable", invoice.get("doc") or "INV-{:05d}".format(invoice["id"]), role="impact",
+                    values={"未付（$）": invoice.get("amount"), "逾期（天）": invoice.get("days")},
+                    display="发票 {}".format(invoice.get("doc") or invoice["id"]))
+        g.edge(anchor, rn, "逾期", "规则 F2")
+        g.edge(rn, son, "开票自", "经营与财务：发票的来源订单")
+    else:
+        g.edge(anchor, son, "毛利", "经营与财务：订单毛利")
+    try:
+        m = FN.margin(c.db, c.mode, so, store=False)
+    except KeyError:
+        m = None
+    if not m:
+        g.summary.append("订单 {} 还没做完，毛利还算不出来".format(so))
+        return g
+    if m.get("customer"):
+        g.edge(son, g.node("Customer", m["customer"]), "客户", "链接 SalesOrder.customer")
+    g.nodes[son]["values"].update({"毛利率": m["margin_pct"], "按标准": m["std_margin_pct"], "收入（$）": m["revenue"]})
+    lines = {x["key"]: x for x in m["lines"]}
+    acts = (lines.get("actions") or {}).get("actions") or []
+    if acts:
+        rows = {r["id"]: r for r in c.db.q("select id, type, title, anomaly_id from action where id = any(%s)", ([a["id"] for a in acts],))}
+        for a in acts:
+            an = g.node("Action", str(a["id"]), role="cause", values={"费用（$）": a["usd"]}, display=a["title"])
+            g.edge(an, son, "费用记到订单", "经营与财务：订单毛利“急单、加班、外协、加急”")
+            aid = (rows.get(a["id"]) or {}).get("anomaly_id")
+            if aid:
+                x = c.db.one("select id, rule, title, domain from anomaly where id=%s", (aid,))
+                if x:
+                    nid = "Anomaly|A-{:05d}".format(x["id"])
+                    g.nodes[nid] = {"id": nid, "type": "Anomaly", "key": "A-{:05d}".format(x["id"]), "display": x["title"], "label": "异常",
+                                    "domain": x["domain"], "role": "cause", "values": {"规则": x["rule"]}}
+                    g.edge(nid, an, "采纳", "动作的来源异常")
+    for k in ("idle", "scrap", "warranty"):
+        x = lines.get(k)
+        if x and x["usd"] > 0:
+            g.edge(g.node("CostLine", k, role="cause", values={"$": x["usd"]}, display=x["label"]), son, "多花", x["how"])
+    extra = [x for x in m["lines"] if x["key"] in ("actions", "idle", "scrap", "warranty") and x["usd"] > 0]
+    g.summary.append("{} 毛利率 {:.1%}（按标准 {:.1%}）".format(so, m["margin_pct"] or 0, m["std_margin_pct"] or 0)
+                     + ("；多花在：" + "、".join("{} ${:,.0f}".format(x["label"], x["usd"]) for x in extra) if extra else ""))
+    srcs = [n for n in g.nodes.values() if n["type"] == "Anomaly"]
+    if srcs:
+        g.summary.append("追到 {} 个源头异常：{}".format(len(srcs), "；".join(n["display"] for n in srcs[:4])))
+    return g
+
+
 def _has(c, table):
     return c.get("has:" + table, lambda: bool(c.db.one("select to_regclass(%s) is not null as ok", (table,))["ok"]))
 
@@ -426,6 +479,10 @@ def for_anomaly(c, a):
             return chain_stock(c, [x["item"] for x in v.get("lines") or []])
         if rule == "F1":
             return chain_cost(c, sk)
+        if rule == "F2" and v.get("sales_order"):        # 第 19 轮：应收逾期 → 发票 → 订单 → 订单上多花的钱 → 源头异常
+            return chain_money(c, v["sales_order"], invoice={"id": v.get("invoice_id"), "doc": v.get("doc"), "amount": v.get("amount"), "days": v.get("days")})
+        if rule == "F5" and v.get("sales_order"):        # 第 19 轮：订单毛利低 → 多花的钱 → 源头异常（从毛利追回缺料）
+            return chain_money(c, v["sales_order"])
         if rule in ("S1", "R3"):
             return chain_late(c, so=sk)
         if rule in ("C1", "C3", "C4"):                  # 第 18 轮 E1：投诉 → 现场设备 → 出厂数据 → 同批 → 排查范围

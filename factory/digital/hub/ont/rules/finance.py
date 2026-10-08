@@ -19,7 +19,7 @@ def cost_variance(c, p, r):
         why = "；".join("{} 差 {:.2f}".format(l.get("operation") or l.get("unit"), l.get("variance") or 0) for l in top)
         out.append(Finding(d["name"], "工单 {} 实际成本比标准高 {:.1f}%".format(d["name"], k["variance_pct"]),
                            "标准 ${:.2f}，实际 ${:.2f}；差异最大的工序：{}".format(k["std_cost"], k["actual_cost"], why),
-                           subject=("WorkOrder", d["name"]), hint="在“经营与成本”页看分解：调整、换刀工时还是废品",
+                           subject=("WorkOrder", d["name"]), hint="在“经营与财务 → 生产与成本”看分解：调整、换刀工时还是废品",
                            values={"std": k["std_cost"], "actual": k["actual_cost"], "variance_pct": k["variance_pct"]}))
     return out
 
@@ -45,7 +45,7 @@ def ar_overdue(c, p, r):
                                                          "；已催 {} 次".format(x["dunned_n"]) if x["dunned_n"] else ""),
                            severity="critical" if x["overdue_days"] > float(p.get("critical_days", 30)) else "warn",
                            subject=("Customer", x["party"]), about=[("Customer", x["party"])] + ([("Receivable", x["doc"])] if x["doc"] else []),
-                           hint=r.get("hint"), values={"invoice_id": x["id"], "doc": x["doc"], "customer": x["party"], "amount": x["outstanding"],
+                           hint=r.get("hint"), values={"invoice_id": x["id"], "doc": x["doc"], "customer": x["party"], "amount": x["outstanding"], "sales_order": None if x["opening"] else x["ref"],
                                                        "days": x["overdue_days"]}))
     return out
 
