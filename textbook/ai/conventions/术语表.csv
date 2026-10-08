@@ -375,3 +375,25 @@ M2,拉格朗日乘子,Lagrange multiplier,
 M2,分母布局,denominator layout,梯度与参数形状相同；本书用它
 M2,中心差分,central difference,误差 O(h²)
 M2,动量,momentum,
+M3,条件概率,conditional probability,
+M3,贝叶斯公式,Bayes' theorem,
+M3,先验,prior,
+M3,后验,posterior,
+M3,似然,likelihood,
+M3,几率,odds,p/(1−p)
+M3,随机变量,random variable,
+M3,期望,expectation,
+M3,方差,variance,
+M3,标准差,standard deviation,
+M3,二项分布,binomial distribution,
+M3,大数定律,law of large numbers,
+M3,中心极限定理,central limit theorem,
+M3,伯努利分布,Bernoulli distribution,
+M3,类别分布,categorical distribution,
+M3,高斯分布,Gaussian distribution,也称正态分布
+M3,泊松分布,Poisson distribution,
+M3,熵,entropy,
+M3,KL 散度,Kullback–Leibler divergence,也称相对熵
+M3,蒙特卡洛,Monte Carlo,
+M3,置信区间,confidence interval,
+M3,威尔逊区间,Wilson interval,比例的置信区间，小样本下比正态近似可靠

@@ -1,0 +1,25 @@
+# 实验 M3.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 labM3_7.js。
+原理:
+  - ["一次评测得到的准确率是个估计值，它的抽样误差按 1/√n 缩小（M3.2 节的大数定律与中心极限定理）。", "An accuracy measured once is an estimate whose sampling error shrinks as 1/sqrt(n) (Section M3.2)."]
+  - ["比例的 95% 置信区间用威尔逊区间算，比常见的正态近似在小样本与极端比例处可靠（M3.7 节）。", "The 95% interval for a proportion uses the Wilson form, which beats the normal approximation for small samples and extreme proportions (Section M3.7)."]
+  - ["两条区间重叠只说明“单看各自的区间分不出谁好”，不等于两者没有差别：直接看“两者之差”的分布更灵敏。", "Overlapping intervals mean the two numbers alone are inconclusive, not that the models are equal: look at the distribution of the difference instead."]
+  - 式: "威尔逊区间的中心 (p + z²/2n)/(1 + z²/n)，半宽 z·sqrt(p(1−p)/n + z²/4n²)/(1 + z²/n)，z = 1.96"
+步骤:
+  - ["“一个数字的区间”场景：题数 200、甲 76%、乙 79%，记下两条区间与是否重叠；再把题数调到 800、1500、3200，填表 1（任务 1、2）。", "Interval scene: with 200 questions, 76% vs 79%, record both intervals and whether they overlap; repeat at 800, 1500 and 3200 and fill Table 1 (tasks 1, 2)."]
+  - ["对每个题数，同时记下“换一批题乙仍然更高的比例”——它比“区间是否重叠”更早给出结论。", "At each size also record how often B still wins on fresh questions — it concludes sooner than the overlap test."]
+  - ["“挑最好的要付的代价”场景：题数固定 200，把配置数从 1 调到 50，填表 2（任务 3）；再把题数调到 2000 重做一遍（任务 4）。", "Picking scene: keep 200 questions and raise the configurations from 1 to 50 (task 3); then repeat with 2000 questions (task 4)."]
+数据表:
+  - 标题: ["表 1  题数与区间", "Table 1  Questions and intervals"]
+    表头: ["题数", "甲的区间", "乙的区间", "区间宽度", "重叠？", "乙仍更高的比例"]
+    表头英文: ["questions", "interval A", "interval B", "width", "overlap?", "B wins (%)"]
+    行: [["200", "", "", "", "", ""], ["800", "", "", "", "", ""], ["1500", "", "", "", "", ""], ["3200", "", "", "", "", ""]]
+  - 标题: ["表 2  挑选带来的乐观", "Table 2  Optimism from picking"]
+    表头: ["配置数", "题数 200 时高出", "题数 2000 时高出"]
+    表头英文: ["configurations", "optimism at n = 200", "optimism at n = 2000"]
+    行: [["1", "", ""], ["5", "", ""], ["20", "", ""], ["50", "", ""]]
+注意:
+  - ["实验假设每道题的对错互相独立、题目来自同一个分布。真实评测里题目有难有易、还可能与训练数据重叠，实际的不确定性只会更大（13.8 节）。", "The lab assumes independent questions from one distribution; real benchmarks have varying difficulty and possible contamination, so the real uncertainty is larger (Section 13.8)."]
+  - ["“挑最好的”这件事在调参、选 checkpoint、选提示词时天天发生。要诚实地报成绩，就得留一批从没用来挑过的数据。", "Picking the best happens whenever you tune, select a checkpoint or choose a prompt; an honest number needs data never used for picking."]
+思考题:
+  - ["为什么题数翻四倍，区间只窄一半？要把区间压到现在的十分之一，题数要加多少倍？", "Why does quadrupling the questions only halve the interval? How many more would you need to shrink it tenfold?"]
+  - ["如果两个模型错的是同几道难题（高度相关），比较它们时该用“各自的区间”还是“两者之差”？为什么？", "If the two models fail the same hard questions, should you compare separate intervals or the paired difference? Why?"]
