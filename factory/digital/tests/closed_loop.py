@@ -695,6 +695,7 @@ def people(teacher):
     k = hub("GET", "/api/people/kpis", token=teacher)
     check("attendance_rate" in k and k["enabled"], "人员态势：出勤率 {:.0%}，缺口 {}，单点依赖 {} 台".format(k["attendance_rate"], k["gaps"], k["single_points"]))
     hub("POST", "/api/people/staffing", {"enabled": False}, teacher)
+    hub("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": A.speed}, teacher)   # 后面的虚拟 PLC 演练按原来的倍速
 
 
 if __name__ == "__main__":
