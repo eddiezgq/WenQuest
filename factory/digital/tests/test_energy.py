@@ -181,7 +181,7 @@ def test_plan_energy_changes_and_capture():
     eng.at(0, "release", work_order="WO-T", item="SH-301", qty=6)
     _run(eng, clock, 1)
     snap = json.loads(json.dumps(eng.snapshot()))
-    ctx = {"energy": {"price": {"peak": 0.15, "flat": 0.1, "valley": 0.05}, "factor": 0.5703}}
+    ctx = {"energy": {"price": {"peak": 0.15, "flat": 0.1, "valley": 0.05}, "factor": 0.5306}}
     a = P.simulate(snap, [], ctx)
     b = P.simulate(snap, [{"type": "energy_setting", "units": ["vmc-01", "hmc-01", "cnc-l01-b"], "standby_min": 10}], ctx)
     assert a["energy"]["hours"] == 24 and b["energy"]["kwh"] < a["energy"]["kwh"] - 50
@@ -210,12 +210,12 @@ def test_meters_readings_overview_cost(env):
     assert o["hours"] >= 6 and o["kwh"] > 0
     assert abs(sum(o["by_bucket"].values()) - o["kwh"]) < 0.5
     want = sum(o["by_bucket"][b] * o["price"][b] for b in ("peak", "flat", "valley"))
-    assert o["cost"] == pytest.approx(want, abs=0.5) and o["co2_kg"] == pytest.approx(o["kwh"] * 0.5703, abs=0.5)
+    assert o["cost"] == pytest.approx(want, abs=0.5) and o["co2_kg"] == pytest.approx(o["kwh"] * 0.5306, abs=0.5)
     hm = next(u for u in o["units"] if u["unit"] == "hmc-01")
     assert hm["by_state"].get("idle", 0) > 0                              # 卧加下班忘关
     assert EN.demand(db, "teach")["kw"] > 0 and EN.kpis(db, "teach")["kwh"] == o["kwh"]
     c = EN.carbon(db, "teach")
-    assert c["t_co2e"] > 0 and c["factor"] == 0.5703 and any(p["item"] == "SH-301" for p in c["products"])
+    assert c["t_co2e"] > 0 and c["factor"] == 0.5306 and any(p["item"] == "SH-301" for p in c["products"])
     e = EN.env_now(db, "teach")
     assert set(e) == {"mist", "noise"} and e["noise"]["limit"] == 85.0
 
@@ -376,8 +376,8 @@ def test_lab21_flow(env):
     top = sorted(EN.idle_by_unit(db, "teach"), key=lambda x: -x["idle_kwh"])[0]["unit"]
     assert lab21.answer(db, U["name"], "l21_t1", {"unit": top})["score"] == 10
     kwh, co2 = lab21.expected_t2(db)
-    assert kwh == pytest.approx(10.892, abs=0.01) and co2 == pytest.approx(6.212, abs=0.01)
-    assert lab21.answer(db, U["name"], "l21_t2", {"kwh": 10.9, "co2_kg": 6.2})["score"] == 15
+    assert kwh == pytest.approx(10.892, abs=0.01) and co2 == pytest.approx(5.779, abs=0.01)
+    assert lab21.answer(db, U["name"], "l21_t2", {"kwh": 10.9, "co2_kg": 5.78})["score"] == 15
     a = lab21.target(db)
     assert a is not None
     best = (EN._state(db, "teach").get("recommended") or {}).get(str(a["id"])) or "standby10"
@@ -390,8 +390,8 @@ def test_lab21_flow(env):
     AC.approve(H, aid, TEA, TEA["name"])
     assert next(t for t in lab21.check(db, U["name"])["tasks"] if t["id"] == "l21_t4")["score"] == 15
     e = lab21.expected_t5(db)
-    assert e["tou_usd"] == pytest.approx(363.0) and e["standby_co2"] == pytest.approx(1088.1, abs=0.1)
-    assert lab21.answer(db, U["name"], "l21_t5", {"tou_usd": 363, "tou_co2": 0, "standby_co2": 1088})["score"] == 10
+    assert e["tou_usd"] == pytest.approx(363.0) and e["standby_co2"] == pytest.approx(1012.4, abs=0.1)
+    assert lab21.answer(db, U["name"], "l21_t5", {"tou_usd": 363, "tou_co2": 0, "standby_co2": 1012})["score"] == 10
     st = lab21.check(db, U["name"])
     assert st["score"] == 60 == st["of"] and st["report_points"] == 40
     assert any(c["user"] == U["name"] for c in lab21.class_view(db))
@@ -417,6 +417,6 @@ def test_lab21_documents_and_course():
     g = labdoc.guide_docx("lab21")
     t = labdoc.report_template_docx("lab21")
     text = "\n".join(p.text for p in docx.Document(io.BytesIO(g)).paragraphs)
-    assert "空转" in text and "0.5703" in text
+    assert "空转" in text and "0.5306" in text
     tt = docx.Document(io.BytesIO(t))
     assert "实验 21" in tt.paragraphs[0].text

@@ -70,7 +70,7 @@ ENV_POINTS = {"mist": ("机加区油雾", "mg/m³"), "noise": ("车间噪声", "
 PARAMS = {
     "price": {"peak": 0.15, "flat": 0.10, "valley": 0.05},     # 分时电价 $/kWh（E6-4）
     "contract_kw": 220.0,                                      # 合同需量（最大 15 分钟平均功率）
-    "co2_factor": 0.5703,                                      # 电网排放因子 kg CO2 / kWh（全国电网平均，可改）
+    "co2_factor": 0.5306,                                      # 全国电力平均二氧化碳排放因子 kg CO2 / kWh（生态环境部、国家统计局公布的 2023 年度值，可改）
     "mist_limit": 5.0,                                         # 油雾 mg/m³
     "noise_limit": 85.0,                                       # 噪声 dB(A)
 }

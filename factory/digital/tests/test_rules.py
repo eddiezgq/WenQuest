@@ -592,7 +592,7 @@ def _energy(monkeypatch, **fns):
     end = NOW - dt.timedelta(minutes=15)
     monkeypatch.setattr(EN, "latest_ts", lambda db, mode: end)
     monkeypatch.setattr(EN, "now_of", lambda db, mode: NOW)
-    monkeypatch.setattr(EN, "params", lambda db, mode: {"price": {"peak": 0.15, "flat": 0.10, "valley": 0.05}, "contract_kw": 220.0, "co2_factor": 0.5703,
+    monkeypatch.setattr(EN, "params", lambda db, mode: {"price": {"peak": 0.15, "flat": 0.10, "valley": 0.05}, "contract_kw": 220.0, "co2_factor": 0.5306,
                                                          "mist_limit": 5.0, "noise_limit": 85.0})
     for k, v in fns.items():
         monkeypatch.setattr(EN, k, v)

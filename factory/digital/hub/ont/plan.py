@@ -453,7 +453,7 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
         from sim import energy as EN
         cap = eng.energy_capture if eng.energy_capture is not None else (eng._emark_all(), eng.energy.totals())[1]
         e = ectx or {}
-        r["energy"] = dict(EN.summarize({}, cap, e.get("price"), e.get("factor", 0.5703)), hours=ENERGY_WINDOW_H)
+        r["energy"] = dict(EN.summarize({}, cap, e.get("price"), e.get("factor", 0.5306)), hours=ENERGY_WINDOW_H)
     return r
 
 

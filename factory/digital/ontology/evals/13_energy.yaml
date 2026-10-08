@@ -15,7 +15,7 @@ items:
   - id: Y04
     q: "这个月的碳排放是多少？每件输出轴多少？"
     tools: [carbon_account]
-    contains: ["CO2e", "SH-301", "0.5703"]
+    contains: ["CO2e", "SH-301", "0.5306"]
   - id: Y05
     q: "空压机是不是漏气了？"
     tools: [unit_energy]

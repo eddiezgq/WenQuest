@@ -194,7 +194,7 @@ class Energy:
         return {k: dict(v) for k, v in self.tot.items()}
 
 
-def summarize(tot0, tot1, price=None, factor=0.5703):
+def summarize(tot0, tot1, price=None, factor=0.5306):
     """两份累计之差 → 电量、分时电量、空转、电费、碳（推演和测试用）。price：{peak, flat, valley} $/kWh"""
     price = price or {"peak": 0.15, "flat": 0.10, "valley": 0.05}
     keys = set(tot0) | set(tot1)
