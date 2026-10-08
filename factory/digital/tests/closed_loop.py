@@ -942,8 +942,8 @@ def story(teacher):
             opts = [y for y in o["options"] if y.get("changes")]
             pick = next((y for k in prefer.get(x["rule"], []) for y in opts if y["kind"] == k), None) or \
                 next((y for y in opts if y.get("recommended")), None) or (opts[0] if opts else None)
-            if pick is None:
-                check(False, "第 {} 幕 {} 没有可执行的方案（{}）".format(n, x["rule"], [y["kind"] for y in o["options"]]))
+            if pick is None:                  # 例如缺料：第 2 幕已下的采购单在途、够用，推演只剩“不处理”——这也是一个结果，不算失败
+                check(bool(o["options"]), "第 {} 幕 {} 只有“{}”，不用采纳".format(n, x["rule"], "、".join(y["label"] for y in o["options"])))
                 continue
             who_ = login(*roles[x["rule"]])
             a = hub("POST", "/api/ont/actions", {"changes": pick["changes"], "anomaly_id": x["id"], "snapshot_id": o.get("snapshot_id")}, who_)

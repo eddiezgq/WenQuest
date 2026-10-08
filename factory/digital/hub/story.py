@@ -732,7 +732,8 @@ def money_chain(db, mode, so, m, per_beat):
                 nodes.append({"id": acn, "type": "Action", "key": str(a["id"]), "display": a["title"], "label": "动作", "role": "cause",
                               "values": {"费用（$）": a["cost"], "状态": a["status"]}})
                 edges.append({"from": an, "to": acn, "label": "采纳", "basis": {"how": "动作的来源异常", "seq": None, "text": None}})
-                edges.append({"from": acn, "to": son, "label": "费用记到订单", "basis": {"how": "经营与财务：订单毛利“急单、加班、外协、加急”", "seq": None, "text": None}})
+                edges.append({"from": acn, "to": son, "label": "费用记到订单" if a["cost"] else "处理",
+                              "basis": {"how": "经营与财务：订单毛利“急单、加班、外协、加急”" if a["cost"] else "这个动作不花钱", "seq": None, "text": None}})
             if not mine:
                 edges.append({"from": an, "to": son, "label": "影响", "basis": {"how": "情景第 {} 幕".format(b["n"]), "seq": None, "text": None}})
         if b.get("idle_usd"):

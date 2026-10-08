@@ -82,7 +82,7 @@
             <td class="num">{{ num(b.cost + (b.idle_usd || 0)) }}</td></tr></tbody></table>
         <p v-if="rv.invoice" class="small">这张订单的发票 {{ rv.invoice.doc || '（开票中）' }}：${{ num(rv.invoice.amount) }}，{{ rv.invoice.status_name }}{{ rv.invoice.dunned_n ? '，催过 ' + rv.invoice.dunned_n + ' 次' : '' }}。</p>
         <h3>跨领域因果链</h3>
-        <ChainGraph v-if="rv.chain.nodes.length > 1" :chain="rv.chain" />
+        <div v-if="rv.chain.nodes.length > 1" class="cgbox"><ChainGraph :chain="rv.chain" /></div>
         <details v-if="rv.report"><summary>两周的周报（{{ rv.report.at.slice(0, 16).replace('T', ' ') }}）</summary><pre class="rep">{{ rv.report.text }}</pre></details>
       </section>
 
@@ -172,6 +172,7 @@ onBeforeUnmount(() => clearInterval(timer));
 .link { color: var(--accent); }
 .tbl { width: 100%; }
 tr.top td { background: #FFF6E5; font-weight: 600; }
+.cgbox { height: 480px; }
 .rep { white-space: pre-wrap; font-size: 12px; background: var(--surface-2); padding: 8px; border-radius: 6px; }
 .ok { color: var(--good); }
 .warn-t { color: var(--warn); }
