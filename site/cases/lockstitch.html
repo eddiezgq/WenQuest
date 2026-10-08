@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="At 5,000 stitches a minute, how big a motor does the main shaft need? — WenQuest digital factory case.">
+<title>直驱平缝机 · 问渠典型应用</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Noto+Serif+SC:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: night hero with live 3D part → two-lane 12-step process strip → step detail → honest open items → courses & hands-on. Tokens follow site/index.html. */
+  :root {
+    --night: #0a1216; --night-2: #111d22; --night-line: #22323a; --night-ink: #e9eef0; --night-muted: #8fa1a8;
+    --paper: #f4f2ec; --surface: #fbfaf6; --ink: #121c21; --muted: #56656b; --line: #d6d2c6;
+    --accent: #f2b705; --accent-ink: #7a5a00; --blue: #5cb8d6;
+    --ok: #2e7d5b; --ok-bg: #e3f0e8; --hold: #a35e00; --hold-bg: #f8ead2;
+    --code-bg: #eceae2;
+    --serif: "Source Serif 4", "Noto Serif SC", Georgia, serif;
+    --serif-zh: "Noto Serif SC", "Source Serif 4", "Songti SC", serif;
+    --body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #0f181c; --surface: #152127; --ink: #e6ecee; --muted: #93a3a9; --line: #2a3a41; --accent-ink: #f2c94c; --ok: #6fcf9f; --ok-bg: #173327; --hold: #f2c94c; --hold-bg: #33290f; --code-bg: #0b1317; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #0f181c; --surface: #152127; --ink: #e6ecee; --muted: #93a3a9; --line: #2a3a41; --accent-ink: #f2c94c; --ok: #6fcf9f; --ok-bg: #173327; --hold: #f2c94c; --hold-bg: #33290f; --code-bg: #0b1317; color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.7 var(--body); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
+  .mono { font-family: var(--mono); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* top bar */
+  .top { background: var(--night); color: var(--night-ink); border-bottom: 1px solid var(--night-line); }
+  .top .wrap { display: flex; align-items: center; gap: 18px; height: 60px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+  .brand b { font: 900 20px/1 var(--serif-zh); letter-spacing: .04em; }
+  .brand small { font: 500 13px/1 var(--serif); color: var(--night-muted); }
+  .crumb { font-size: 14px; color: var(--night-muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .crumb a { text-decoration: none; }
+  .crumb a:hover { color: var(--night-ink); }
+  .sample { margin-left: auto; font: 500 12px/1 var(--mono); letter-spacing: .12em; color: var(--accent); border: 1px solid var(--night-line); border-radius: 999px; padding: 6px 10px; white-space: nowrap; }
+
+  /* hero */
+  .hero { background: var(--night); color: var(--night-ink); }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; padding-block: 56px 48px; align-items: center; }
+  .eyebrow { font: 500 13px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 18px; }
+  h1 { margin: 0; font: 900 clamp(30px, 4.2vw, 50px)/1.18 var(--serif-zh); letter-spacing: .01em; text-wrap: balance; }
+  .lede { margin: 22px 0 0; color: var(--night-muted); font-size: 17px; max-width: 34em; }
+  .lede b { color: var(--night-ink); font-weight: 500; }
+  .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 32px 0 0; border-top: 1px solid var(--night-line); }
+  .facts div { padding: 14px 14px 0 0; }
+  .facts dt { font: 500 12px/1.4 var(--body); color: var(--night-muted); }
+  .facts dd { margin: 4px 0 0; font: 600 26px/1.1 var(--serif); color: var(--night-ink); font-variant-numeric: tabular-nums; }
+  .facts dd small { font: 400 13px/1 var(--body); color: var(--night-muted); margin-left: 3px; }
+
+  .viewer { position: relative; background: radial-gradient(120% 90% at 50% 40%, #16262d 0%, var(--night) 70%); border: 1px solid var(--night-line); border-radius: 6px; aspect-ratio: 4 / 3.3; max-width: 100%; overflow: hidden; }
+  .viewer canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  .viewer canvas:active { cursor: grabbing; }
+  .viewer .tabs { position: absolute; left: 12px; top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .viewer .tabs button { font: 500 13px/1 var(--body); color: var(--night-muted); background: rgba(10,18,22,.75); border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 11px; cursor: pointer; }
+  .viewer .tabs button[aria-pressed="true"] { color: var(--night); background: var(--accent); border-color: var(--accent); }
+  .viewer .cap { position: absolute; left: 12px; right: 12px; bottom: 10px; font: 400 12.5px/1.5 var(--mono); color: var(--night-muted); }
+  .viewer .cap b { color: var(--night-ink); font-weight: 500; }
+
+  /* sections */
+  section { padding-block: 56px; }
+  h2 { margin: 0 0 6px; font: 700 clamp(24px, 3vw, 32px)/1.3 var(--serif-zh); text-wrap: balance; }
+  .sub { margin: 0 0 28px; color: var(--muted); max-width: 46em; }
+
+  /* process strip */
+  .lanes { display: grid; gap: 18px; }
+  .lane { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 14px; align-items: stretch; }
+  .lane-name { font: 700 15px/1.4 var(--serif-zh); padding-top: 12px; }
+  .lane-name small { display: block; font: 400 12px/1.4 var(--body); color: var(--muted); }
+  .steps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .step { text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; }
+  .step:hover { border-color: var(--muted); }
+  .step[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  .step .n { font: 500 12px/1 var(--mono); color: var(--muted); }
+  .step .t { font: 500 14.5px/1.35 var(--body); }
+  .pill { align-self: flex-start; font: 500 11.5px/1 var(--body); padding: 4px 7px; border-radius: 999px; }
+  .pill.ok { color: var(--ok); background: var(--ok-bg); }
+  .pill.hold { color: var(--hold); background: var(--hold-bg); }
+  .handoff { font: 400 13px/1.5 var(--body); color: var(--muted); padding-left: calc(7.5em + 14px); }
+  .handoff b { color: var(--ink); font-weight: 500; }
+
+  .detail { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 26px 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+  .detail h3 { margin: 0 0 4px; font: 700 21px/1.35 var(--serif-zh); }
+  .detail .who { font: 500 13px/1.4 var(--mono); color: var(--muted); margin: 0 0 14px; }
+  .detail p { margin: 0 0 12px; }
+  .detail ul { margin: 0 0 12px; padding-left: 1.2em; }
+  .detail li { margin-bottom: 4px; }
+  .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0 0 14px; font-size: 15px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .note { font-size: 14px; color: var(--hold); background: var(--hold-bg); border-radius: 4px; padding: 8px 12px; margin: 0 0 12px; }
+  .course { font-size: 14px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 4px; }
+  .course b { color: var(--ink); font-weight: 500; }
+  pre { margin: 0; background: var(--code-bg); border-radius: 4px; padding: 14px 16px; font: 400 13px/1.55 var(--mono); overflow-x: auto; max-height: 340px; }
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 500; color: var(--muted); font-size: 13px; }
+  td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+  .fig { margin: 0; }
+  .fig img { display: block; width: 100%; max-width: 420px; background: #fff; border-radius: 4px; border: 1px solid var(--line); }
+  .fig figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .bar { display: grid; gap: 8px; margin: 4px 0 14px; }
+  .bar div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) 4em; gap: 10px; align-items: center; font-size: 14px; }
+  .bar i { display: block; height: 12px; background: var(--accent); border-radius: 2px; }
+  .bar i.ghost { background: var(--line); }
+  .bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* open items */
+  .open { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+  .open div { border-top: 1px solid var(--line); padding: 14px 0 16px; }
+  .open h4 { margin: 0 0 4px; font: 500 16px/1.4 var(--body); }
+  .open p { margin: 0; color: var(--muted); font-size: 15px; }
+  .quote { margin: 28px 0 0; font: 500 19px/1.6 var(--serif-zh); max-width: 36em; }
+
+  /* courses & do it */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; }
+  .clist { list-style: none; margin: 0; padding: 0; }
+  .clist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .clist b { font-weight: 500; }
+  .clist small { display: block; color: var(--muted); font-size: 14px; }
+  .clist em { font-style: normal; font-size: 12.5px; color: var(--muted); align-self: start; padding-top: 3px; white-space: nowrap; }
+  .do { background: var(--night); color: var(--night-ink); border-radius: 6px; padding: 26px 26px 24px; }
+  .do h3 { margin: 0 0 12px; font: 700 20px/1.35 var(--serif-zh); }
+  .do ol { margin: 0 0 20px; padding-left: 1.3em; color: var(--night-muted); }
+  .do ol b { color: var(--night-ink); font-weight: 500; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { display: inline-block; text-decoration: none; font: 500 15px/1 var(--body); padding: 12px 16px; border-radius: 4px; }
+  .btn.pri { background: var(--accent); color: var(--night); }
+  .btn.sec { border: 1px solid var(--night-line); color: var(--night-ink); }
+  .mail { margin-top: 14px; font-size: 14px; color: var(--night-muted); }
+  .mail span { font-family: var(--mono); color: var(--night-ink); user-select: all; }
+  .files { margin-top: 20px; font-size: 14px; color: var(--muted); }
+  .files code { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+
+  footer { border-top: 1px solid var(--line); padding-block: 26px 40px; font-size: 13.5px; color: var(--muted); }
+  footer a { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .hero .wrap, .detail, .cols { grid-template-columns: minmax(0, 1fr); }
+    .lane { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .lane-name { padding-top: 0; }
+    .handoff { padding-left: 0; }
+    .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .open { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .detail { padding: 20px 18px; }
+    .brand small, .crumb { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* ---- added for the site version ---- */
+html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display: none !important; }
+html[lang="en"] h1, html[lang="en"] h2, html[lang="en"] .detail h3, html[lang="en"] .do h3, html[lang="en"] .lane-name, html[lang="en"] .quote { font-family: var(--serif); font-weight: 600; }
+.lang { margin-left: 12px; font: 500 13px/1 var(--body); color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.top .sample { margin-left: auto; }
+.top .sample + .sample { margin-left: auto; }
+.top .crumb { margin-right: auto; }
+.pill.na { color: var(--muted); background: var(--code-bg); }
+.unit { font-size: 13px; color: var(--muted); margin-top: -6px !important; }
+section.alt { background: var(--surface); border-block: 1px solid var(--line); }
+nav.cases { background: var(--night-2); border-bottom: 1px solid var(--night-line); }
+nav.cases { display: flex; flex-wrap: wrap; gap: 4px 24px; padding: 12px max(20px, calc((100% - 1140px) / 2)); }
+nav.cases a { color: var(--night-muted); text-decoration: none; font-size: 15px; padding: 4px 0; border-bottom: 2px solid transparent; }
+nav.cases a:hover { color: var(--night-ink); }
+nav.cases a[aria-current="page"] { color: var(--night-ink); border-bottom-color: var(--accent); }
+nav.cases .mono { font-size: 12px; color: var(--accent); margin-right: 4px; }
+.hero.short .wrap.one { display: block; padding-block: 56px 48px; }
+.hero.short h1 { max-width: 20em; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card { display: flex; flex-direction: column; gap: 10px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 22px 22px 20px; min-width: 0; }
+.card:hover { border-color: var(--accent); }
+.card .mono { font-size: 12px; color: var(--accent-ink); letter-spacing: .1em; }
+.card b { font: 700 22px/1.3 var(--serif-zh); }
+html[lang="en"] .card b { font-family: var(--serif); font-weight: 600; }
+.card .q { color: var(--muted); }
+.card .f { margin-top: auto; font-size: 13px; color: var(--ink); }
+@media (max-width: 900px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .top .sample { display: none; } }
+
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/" ><b>问渠</b><small>WenQuest Robotics</small></a>
+  <span class="crumb"><a href="index.html"><span data-zh>数字工厂 · 典型应用</span><span data-en>Digital factory · cases</span></a> › <span data-zh>直驱平缝机</span><span data-en>Direct-Drive Lockstitch</span></span>
+  
+  <button class="lang" id="langBtn" type="button">EN</button>
+</div></header>
+<div class="hero"><div class="wrap">
+  <div>
+    <p class="eyebrow"><span data-zh>典型应用 03 · 设计院 → 工厂 · 12 步</span><span data-en>Case 03 · design office → factory · 12 steps</span></p>
+    <h1><span data-zh>每分钟 5000 针，主轴电机该选多大？</span><span data-en>At 5,000 stitches a minute, how big a motor does the main shaft need?</span></h1>
+    <p class="lede"><span data-zh>以工业直驱平缝机为对象（JUKI DDL-9000C 一类）：电机直接装在主轴上。先算针杆机构在 5000 rpm 下的惯性力矩，分清“峰值”和“一转做功”，选出电机；再校核上轴的强度、疲劳和固有频率，用 OpenFOAM 算控制箱散热器，编好数控程序，<b>选出的 400 W 与实机一致</b>。</span><span data-en>Take an industrial direct-drive lockstitch machine (JUKI DDL-9000C class), with the motor right on the main shaft. Compute the needle-bar mechanism’s inertia torque at 5,000 rpm, separate “peak” from “work per revolution”, pick the motor, check the upper shaft for strength, fatigue and resonance, size the control-box heat sink with OpenFOAM and write the CNC programs. <b>The 400 W pick matches the real machine.</b></span></p>
+    <dl class="facts"><div><dt><span data-zh>惯性力矩峰值</span><span data-en>Peak inertia torque</span></dt><dd>2.82<small>N·m</small></dd></div><div><dt><span data-zh>选出电机功率</span><span data-en>Motor selected</span></dt><dd>400<small>W</small></dd></div><div><dt><span data-zh>上轴一阶 / 工作频率</span><span data-en>Shaft 1st mode / running</span></dt><dd>14×<small></small></dd></div><div><dt><span data-zh>散热器散热</span><span data-en>Heat sink rejects</span></dt><dd>23<small>W</small></dd></div></dl>
+  </div>
+  <div class="viewer">
+    <canvas id="cv" aria-label="三维模型，可拖动旋转 / 3D model, drag to rotate"></canvas>
+    <div class="tabs" role="group"><button type="button" data-part="LS-101" aria-pressed="true"><span data-zh>LS-101 上轴</span><span data-en>LS-101 upper shaft</span></button><button type="button" data-part="LS-HS" aria-pressed="false"><span data-zh>LS-HS 控制箱散热器</span><span data-en>LS-HS heat sink</span></button></div>
+    <div class="cap" id="cap"></div>
+  </div>
+</div></div>
+<nav class="cases" aria-label="典型应用"><a href="cobot-joint.html"><span class="mono">01</span> <span data-zh>协作机器人关节</span><span data-en>Collaborative Robot Joint</span></a><a href="scara.html"><span class="mono">02</span> <span data-zh>SCARA 机器人</span><span data-en>SCARA Robot</span></a><a href="lockstitch.html" aria-current="page"><span class="mono">03</span> <span data-zh>直驱平缝机</span><span data-en>Direct-Drive Lockstitch</span></a></nav>
+<section><div class="wrap">
+  <h2><span data-zh>12 步：从需求到车间完工</span><span data-en>12 steps: from requirement to finished parts</span></h2>
+  <p class="sub"><span data-zh>点任意一步，看这一步做了什么、得出什么数、产出了什么。绿色是通过，黄色是“待确认”：零件库缺数据，平台如实停下，没有估值。</span><span data-en>Click any step to see what was done, what numbers came out and what was produced. Green passed; amber is “to be confirmed”: the library lacked data, so the platform stopped instead of guessing.</span></p>
+  <div class="lanes">
+    <div class="lane"><div class="lane-name"><span data-zh>设计院</span><span data-en>Design office</span><small><span data-zh>FreeCAD AI 零件库</span><span data-en>FreeCAD AI parts library</span></small></div><div class="steps" id="lane0" role="tablist"></div></div>
+    <p class="handoff">↓ <span data-zh>发布为方案 </span><span data-en>Released as </span><b><span data-zh>LOCKSTITCH-DD 第 1 版，带自制件 LS-101、LS-HS；校验结论“通过”随方案发出</span><span data-en>LOCKSTITCH-DD rev 1, with made parts LS-101 and LS-HS; the selection verdict “pass” travels with it</span></b></p>
+    <div class="lane"><div class="lane-name"><span data-zh>数字工厂</span><span data-en>Digital factory</span><small>ERP · MES · <span data-zh>厂情中枢</span><span data-en>command center</span></small></div><div class="steps" id="lane1" role="tablist"></div></div>
+  </div>
+  <div class="detail" id="detail" role="tabpanel" aria-live="polite"></div>
+</div></section>
+<section class="alt"><div class="wrap">
+  <h2><span data-zh>还没定下来的地方</span><span data-en>What is still open</span></h2>
+  <p class="sub"><span data-zh>演练里卡住的地方都照实记下。每一条都是学生在课上可以接着做的题目。</span><span data-en>Everything that stalled in the run is recorded as it is. Each item is a problem students can pick up in class.</span></p>
+  <div class="open"><div><h4><span data-zh>缝制阻力</span><span data-en>Sewing resistance</span></h4><p><span data-zh>缝制阻力和摩擦零件库与样本都没有。400 W 是不含它们的下限，结论待确认。</span><span data-en>Neither the library nor the brochure gives sewing resistance or friction. The 400 W pick is a lower bound without them.</span></p></div><div><h4><span data-zh>刚性速度环要更大的驱动器</span><span data-en>A stiff speed loop needs a bigger drive</span></h4><p><span data-zh>SGM7J-08A 扭矩、转速都够，但库里最大的驱动器 SGD7S-2R8A 带不动，需要企业补更大驱动器的数据。</span><span data-en>SGM7J-08A has the torque and speed, but the largest drive in the library cannot run it; a larger drive’s data must be added.</span></p></div><div><h4><span data-zh>驱动器发热</span><span data-en>Drive heat</span></h4><p><span data-zh>散热器能散 23 W，但驱动器损耗零件库没有数据，够不够待确认。</span><span data-en>The heat sink rejects 23 W, but drive losses are not in the library, so adequacy is unconfirmed.</span></p></div><div><h4><span data-zh>演练用的假设</span><span data-en>Assumptions in this run</span></h4><p><span data-zh>针杆质量是示意值；起停加速时间 0.05 / 0.1 / 0.2 s 是设计假设；δ = 0.05 只为说明手轮大小，不是标准值；供电按三相 200 V。</span><span data-en>Needle-bar mass is illustrative; start-stop times of 0.05/0.1/0.2 s are design assumptions; δ = 0.05 only illustrates handwheel size and is not a standard; supply is 3-phase 200 V.</span></p></div></div>
+  <p class="quote"><span data-zh>数据不够就停下来，说清缺什么，不估一个数凑结论。真实的工程就是这样做的。</span><span data-en>When data run out, stop and say what is missing; never guess a number to reach a verdict. That is how real engineering works.</span></p>
+</div></section>
+<section><div class="wrap cols">
+  <div>
+    <h2><span data-zh>这个案例用到的课</span><span data-en>Courses behind this case</span></h2>
+    <p class="sub"><span data-zh>每一步背后都是一门课里的一章。</span><span data-en>Every step is a chapter in one of our courses.</span></p>
+    <ul class="clist"><li><span><b><span data-zh>缝纫机设计与制造</span><span data-en>Sewing Machine Design and Manufacturing</span></b><small><span data-zh>31 讲：机构、电控、样机与零件制造</span><span data-en>31 lessons: mechanisms, controls, prototypes and part making</span></small></span><em><span data-zh>已上线</span><span data-en>Online</span></em></li><li><span><b><span data-zh>机械设计</span><span data-en>Machine Design</span></b><small><span data-zh>第 33.11 节：平缝机上轴 LS-101</span><span data-en>§33.11: the lockstitch upper shaft LS-101</span></small></span><em><span data-zh>教材已上线</span><span data-en>Online</span></em></li><li><span><b><span data-zh>伺服驱动与运动控制</span><span data-en>Servo Drives and Motion Control</span></b><small><span data-zh>惯性力矩、盈亏功与电机选型</span><span data-en>Inertia torque, energy swing and motor sizing</span></small></span><em><span data-zh>特色选修 · 建设中</span><span data-en>Elective · planned</span></em></li><li><span><b><span data-zh>机械制造技术</span><span data-en>Manufacturing Technology</span></b><small><span data-zh>细长轴车削、散热器加工</span><span data-en>Slender-shaft turning, heat-sink machining</span></small></span><em><span data-zh>教材编写中</span><span data-en>In writing</span></em></li><li><span><b><span data-zh>ERP 原理与实践 · 制造执行系统 MES</span><span data-en>ERP and MES</span></b><small><span data-zh>物料与 BOM、MRP、工单与报工</span><span data-en>Items and BOMs, MRP, work orders</span></small></span><em><span data-zh>特色选修 · 建设中</span><span data-en>Elective · planned</span></em></li></ul>
+  </div>
+  <div>
+    <div class="do">
+      <h3><span data-zh>自己做一遍</span><span data-en>Do it yourself</span></h3>
+      <ol><li><b><span data-zh>实验 8</span><span data-en>Lab 8</span></b><span data-zh>：输出轴强度与疲劳校核</span><span data-en>: Output shaft strength and fatigue</span></li><li><b><span data-zh>实验 12</span><span data-en>Lab 12</span></b><span data-zh>：一根轴的数字化设计与两个典型案例</span><span data-en>: Digital design of a shaft</span></li><li><b><span data-zh>实验 14</span><span data-en>Lab 14</span></b><span data-zh>：风扇冷却的流体与传热分析</span><span data-en>: Fan cooling: flow and heat transfer</span></li><li><b><span data-zh>实验 7</span><span data-en>Lab 7</span></b><span data-zh>：数字工厂闭环（订单 → 车间 → 入库）</span><span data-en>: The factory loop: order → shop → stock</span></li></ol>
+      <div class="btns">
+        <a class="btn pri" href="https://learn.wenquestrobotics.com/" target="_blank" rel="noopener"><span data-zh>免费注册，开始学习</span><span data-en>Sign up free and start</span></a>
+        <a class="btn sec" href="index.html"><span data-zh>其他典型应用</span><span data-en>Other cases</span></a>
+      </div>
+      <p class="mail"><span data-zh>学校或企业预约演示工厂：</span><span data-en>Schools and companies, book a factory demo: </span><span>info@wenquestrobotics.com</span></p>
+    </div>
+    <p class="files"><span data-zh>本案例的成果文件：</span><span data-en>Files produced in this case: </span><a href="https://github.com/eddiezgq/freecad-ai-parts/tree/main/examples/apps/out/lockstitch" target="_blank" rel="noopener"><code>LS-101.step、LS-HS.step、O1001.nc、O1002.nc</code></a></p>
+  </div>
+</div></section>
+<footer><div class="wrap">
+  <span data-zh>依据：问渠《M13 典型应用全流程演练报告》（2026-10-07，M14 修订）；需求参数来自 </span><span data-en>Source: WenQuest “M13 end-to-end run of typical applications” (2026-10-07, revised in M14); requirements from </span><span data-zh><a href="https://www.sewingmachinesplus.com/media/products/juki/juki-9000c/brochure.pdf" target="_blank" rel="noopener">JUKI DDL-9000C 样本</a></span><span data-en><a href="https://www.sewingmachinesplus.com/media/products/juki/juki-9000c/brochure.pdf" target="_blank" rel="noopener">JUKI DDL-9000C brochure</a></span><span data-zh>；零件参数只用零件库里有出处的数据。</span><span data-en>; part data only from sourced entries in the parts library.</span>
+</div></footer>
+<script src="three.min.js"></script>
+<script>const CASE = {"steps":[{"n":1,"lane":0,"s":"ok","t":["动力学","Dynamics"],"who":["设计院 · 针杆曲柄滑块机构","Design · needle-bar slider-crank"],"body":["<p>针杆行程 35 mm（曲柄 17.5 mm、连杆 60 mm），主轴恒速 5000 rpm。往复质量的动能有增有减：惯性力矩峰值很大，一转做的功却约等于零。</p><dl class=\"kv\"><dt>惯性力矩峰值</dt><dd>2.82 N·m</dd><dt>均方根</dt><dd>1.60 N·m</dd><dt>一转平均</dt><dd>−0.060 N·m（约为零）</dd><dt>最大盈亏功</dt><dd>ΔE = 2.23 J；教材近似 2.07 J</dd></dl>","<p>Needle-bar stroke 35 mm (crank 17.5 mm, rod 60 mm), main shaft at a steady 5,000 rpm. The reciprocating mass gains and loses energy: the inertia torque peaks high, yet the work per revolution is about zero.</p><dl class=\"kv\"><dt>Peak inertia torque</dt><dd>2.82 N·m</dd><dt>RMS</dt><dd>1.60 N·m</dd><dt>Mean per revolution</dt><dd>−0.060 N·m (about zero)</dd><dt>Max energy swing</dt><dd>ΔE = 2.23 J; textbook estimate 2.07 J</dd></dl>"],"side":["<p class=\"note\">针杆质量按杆宽、杆厚取的示意值，不是实物数据。</p><p>旧版（M13）把惯性力矩当成连续扭矩，并把与 400 W 的差距归到“没加平衡块”。M14 改正：平衡块只平衡机座振动，恒速下不改变驱动扭矩。</p><p class=\"course\"><b>对应：</b>缝纫机课（机构各讲）；《机械设计》第 33.11 节</p>","<p class=\"note\">The needle-bar mass is an illustrative value from bar width and thickness, not measured data.</p><p>The first run (M13) treated inertia torque as continuous torque and blamed the gap to 400 W on a missing counterweight. M14 corrected it: the counterweight only balances frame vibration and does not change drive torque at steady speed.</p><p class=\"course\"><b>Course:</b> sewing-machine course (mechanism lessons); <i>Machine Design</i> §33.11</p>"]},{"n":2,"lane":0,"s":"ok","t":["选型","Selection"],"who":["设计院 · 上下限两种选法","Design · upper and lower bound"],"body":["<p>引擎逐对校验 28 组电机与驱动器，按两种假设各选一次：</p><div class=\"tbl\"><table><thead><tr><th>假设</th><th>结果</th></tr></thead><tbody><tr><td><b>下限</b>：惯量吸收波动，只付一转平均功</td><td>SGM7J-04A + SGD7S-2R8A，总体通过——<b>400 W，与 JUKI 实机一致</b></td></tr><tr><td><b>上限</b>：速度环很刚，电机吃下全部惯性力矩</td><td>SGM7J-08A 扭矩、转速够，但库里最大的驱动器 2.8 A 带不动（C9 失败）</td></tr></tbody></table></div>","<p>The engine checks 28 motor–drive pairs under two assumptions:</p><div class=\"tbl\"><table><thead><tr><th>Assumption</th><th>Result</th></tr></thead><tbody><tr><td><b>Lower bound</b>: inertia absorbs the swing; motor supplies only the mean work</td><td>SGM7J-04A + SGD7S-2R8A, overall pass — <b>400 W, same as the JUKI machine</b></td></tr><tr><td><b>Upper bound</b>: stiff speed loop; motor supplies all inertia torque</td><td>SGM7J-08A has the torque and speed, but the largest drive in the library (2.8 A) cannot run it (C9 fails)</td></tr></tbody></table></div>"],"side":["<p class=\"note\">缝制阻力和摩擦零件库与样本都没有，下限没算它们，结论待确认。</p><dl class=\"kv\"><dt>转速不均匀系数</dt><dd>δ = 0.083</dd><dt>降到 0.05（示例值）</dt><dd>再加约 6.5e-5 kg·m² 的手轮</dd><dt>0→5000 rpm 用 0.1 s</dt><dd>转子 0.25 + 机构 0.26 N·m</dd></dl><p class=\"course\"><b>对应：</b>特色选修“伺服驱动与运动控制”</p>","<p class=\"note\">Sewing resistance and friction are in neither the library nor the brochure; the lower bound leaves them out, so the verdict stays “to be confirmed”.</p><dl class=\"kv\"><dt>Speed fluctuation</dt><dd>δ = 0.083</dd><dt>To reach 0.05 (example)</dt><dd>Add about 6.5e-5 kg·m² handwheel</dd><dt>0→5,000 rpm in 0.1 s</dt><dd>Rotor 0.25 + mechanism 0.26 N·m</dd></dl><p class=\"course\"><b>Course:</b> elective “Servo Drives and Motion Control”</p>"]},{"n":3,"lane":0,"s":"ok","t":["上轴 · 强度与频率","Shaft · strength & modes"],"who":["设计院 · 有限元、疲劳、模态","Design · FEA, fatigue, modal"],"body":["<p>上轴 LS-101 两个轴承位径向支承、电机端固定，做模态、扭转有限元和疲劳。</p><dl class=\"kv\"><dt>一阶固有频率</dt><dd>1184.7 Hz，工作 83.3 Hz，比值 14.2，远离共振</dd><dt>最大 Von Mises</dt><dd>37.6 MPa，安全系数 9.4</dd><dt>手算</dt><dd>Ø10 段 τ = 16T/πd³ = 14.4 MPa（等效 24.9）</dd><dt>疲劳</dt><dd>5000 rpm 扭矩记录雨流计数：无限寿命</dd></dl>","<p>Upper shaft LS-101, radially supported at two bearing seats and fixed at the motor end: modes, torsion FEA and fatigue.</p><dl class=\"kv\"><dt>1st mode</dt><dd>1184.7 Hz vs 83.3 Hz running, ratio 14.2, far from resonance</dd><dt>Max von Mises</dt><dd>37.6 MPa, safety factor 9.4</dd><dt>Hand check</dt><dd>Ø10 section τ = 16T/πd³ = 14.4 MPa (equivalent 24.9)</dd><dt>Fatigue</dt><dd>Rainflow on the 5,000 rpm torque record: infinite life</dd></dl>"],"side":["<p class=\"note\">模态没算装在轴上的曲柄、带轮和转子的质量。</p><p class=\"course\"><b>对应：</b>《机械设计》第 33.11 节；数字工厂实验 8、12</p>","<p class=\"note\">The modal run leaves out crank, pulley and rotor mass mounted on the shaft.</p><p class=\"course\"><b>Course:</b> <i>Machine Design</i> §33.11; factory labs 8 and 12</p>"]},{"n":4,"lane":0,"s":"ok","t":["散热 CFD","Cooling CFD"],"who":["设计院 · OpenFOAM","Design · OpenFOAM"],"body":["<p>控制箱散热器：铝底板 120×80×6 mm、8 片 30 mm 直翅；风扇风速 2 m/s，空气 35 °C，散热器 60 °C。</p><dl class=\"kv\"><dt>散热量</dt><dd>23.2 W</dd><dt>平均散热系数</dt><dd>13.6 W/(m²·K)</dd></dl>","<p>Control-box heat sink: 120 × 80 × 6 mm aluminium base, eight 30 mm straight fins; fan air 2 m/s at 35 °C, sink at 60 °C.</p><dl class=\"kv\"><dt>Heat rejected</dt><dd>23.2 W</dd><dt>Mean film coefficient</dt><dd>13.6 W/(m²·K)</dd></dl>"],"side":["<p class=\"note\">驱动器损耗零件库没有数据，23 W 够不够待确认。</p><p class=\"course\"><b>对应：</b>数字工厂实验 14</p>","<p class=\"note\">Drive losses are not in the library, so whether 23 W is enough is to be confirmed.</p><p class=\"course\"><b>Course:</b> factory lab 14</p>"]},{"n":5,"lane":0,"s":"ok","t":["拓扑优化","Topology optimization"],"who":["设计院 · 拓扑优化","Design · topology optimization"],"body":["<p>电机支架：左边固定、右下角受力，保留 40% 材料，45 次迭代。</p><div class=\"bar\"><div><span>优化前柔度</span><i class=\"ghost\" style=\"width:100%\"></i><span>403</span></div><div><span>优化后柔度</span><i style=\"width:12.4%\"></i><span>50</span></div></div>","<p>Motor bracket: fixed on the left, loaded at the lower right, 40% material kept, 45 iterations.</p><div class=\"bar\"><div><span>Before</span><i class=\"ghost\" style=\"width:100%\"></i><span>403</span></div><div><span>After</span><i style=\"width:12.4%\"></i><span>50</span></div></div>"],"side":["<dl class=\"kv\"><dt>板面积</dt><dd>2,124 mm²</dd></dl>","<dl class=\"kv\"><dt>Plate area</dt><dd>2,124 mm²</dd></dl>"]},{"n":6,"lane":0,"s":"ok","t":["数控编程","CNC programming"],"who":["设计院 · CAM","Design · CAM"],"body":["<p>上轴用 Ø20 棒料，两次装夹车削，程序过了自动检查。</p><dl class=\"kv\"><dt>LS-101 车削</dt><dd>2 个程序，约 1.5 min</dd><dt>机床</dt><dd>示例数控车床（虚构）</dd></dl>","<p>The upper shaft is turned from Ø20 bar in two setups; the programs passed the automatic check.</p><dl class=\"kv\"><dt>LS-101 turning</dt><dd>2 programs, about 1.5 min</dd><dt>Machine</dt><dd>Example lathe (fictional)</dd></dl>"],"side":["<pre>%\nO1001 (LS-101 车削 右端[第一次装夹])\n(毛坯 Ø20×299)\n(机床 示例数控车床[虚构])\n(T01 外圆粗车刀)\n(T02 外圆精车刀)\nG21 G18 G40 G97 G99\nG00 X200.0 Z150.0\nT0101\nG50 S3000\nG96 S120 M03\n(车端面[余量 1])\nG00 X24.0 Z2.0 M08\nZ0.0\nG01 X-1.0 F0.3\nG00 Z2.0\nX24.0\n(分层粗车[每层 ap=2.5])\nX15.0\n…</pre>","<pre>%\nO1001 (LS-101 车削 右端[第一次装夹])\n(毛坯 Ø20×299)\n(机床 示例数控车床[虚构])\n(T01 外圆粗车刀)\n(T02 外圆精车刀)\nG21 G18 G40 G97 G99\nG00 X200.0 Z150.0\nT0101\nG50 S3000\nG96 S120 M03\n(车端面[余量 1])\nG00 X24.0 Z2.0 M08\nZ0.0\nG01 X-1.0 F0.3\nG00 Z2.0\nX24.0\n(分层粗车[每层 ap=2.5])\nX15.0\n…</pre>"]},{"n":7,"lane":1,"s":"ok","t":["转为 ERP 物料","Into ERP"],"who":["工厂 · 厂长确认 → ERPNext","Factory · plant manager approves → ERPNext"],"body":["<p>厂长确认后，桥接程序在 ERPNext 里建供应商、物料和带工序的 BOM。</p><dl class=\"kv\"><dt>供应商</dt><dd>2 家</dd><dt>物料</dt><dd>6 种</dd><dt>BOM</dt><dd>3 张（含工序）</dd></dl>","<p>After approval, the bridge creates suppliers, items and routed BOMs in ERPNext.</p><dl class=\"kv\"><dt>Suppliers</dt><dd>2</dd><dt>Items</dt><dd>6</dd><dt>BOMs</dt><dd>3 (with operations)</dd></dl>"],"side":["<p class=\"note\">两家供应商都没填采购提前期，交期待确认。</p><p class=\"course\"><b>对应：</b>特色选修“ERP 原理与实践”</p>","<p class=\"note\">Neither supplier has a lead time on file; lead time to be confirmed.</p><p class=\"course\"><b>Course:</b> elective “ERP Principles and Practice”</p>"]},{"n":8,"lane":1,"s":"ok","t":["工艺规程","Process plans"],"who":["工厂 · 工艺员 → AI 评审 → 技术负责人","Factory · process engineer → AI review → chief engineer"],"body":["<p>LS-101 6 道工序，粗基准为毛坯外圆；LS-HS 3 道工序，粗基准为毛坯底面。技术负责人批准为第 1 版。</p>","<p>LS-101 has 6 operations with the stock diameter as rough datum; LS-HS has 3 with the stock bottom face. The chief engineer approves rev 1.</p>"],"side":["<p class=\"note\">细长轴 L/d ≈ 30，实际要顶尖、跟刀架；仿真不计让刀。</p><p class=\"course\"><b>对应：</b>《机械制造技术》工艺规程设计；缝纫机课“零件制造”</p>","<p class=\"note\">A slender shaft (L/d ≈ 30) needs centers and a follow rest in practice; the simulation ignores deflection.</p><p class=\"course\"><b>Course:</b> <i>Manufacturing Technology</i>, process planning; sewing-machine course, part manufacturing</p>"]},{"n":9,"lane":1,"s":"ok","t":["接单与 MRP","Order & MRP"],"who":["工厂 · 计划员","Factory · planner"],"body":["<p>示例客户订 2 台，MRP 生成工单和请购单。</p><div class=\"tbl\"><table><thead><tr><th>工单</th><th class=\"r\">数量</th><th class=\"r\">工时</th></tr></thead><tbody><tr><td>LS-101 上轴</td><td class=\"r\">2</td><td class=\"r\">约 53 min</td></tr><tr><td>LS-HS 散热器</td><td class=\"r\">2</td><td class=\"r\">约 62 min</td></tr><tr><td>LOCKSTITCH-DD 总装</td><td class=\"r\">2</td><td class=\"r\">约 133 min</td></tr></tbody></table></div>","<p>A demo customer orders 2 units; MRP creates work orders and purchase requests.</p><div class=\"tbl\"><table><thead><tr><th>Work order</th><th class=\"r\">Qty</th><th class=\"r\">Time</th></tr></thead><tbody><tr><td>LS-101 upper shaft</td><td class=\"r\">2</td><td class=\"r\">≈ 53 min</td></tr><tr><td>LS-HS heat sink</td><td class=\"r\">2</td><td class=\"r\">≈ 62 min</td></tr><tr><td>LOCKSTITCH-DD assembly</td><td class=\"r\">2</td><td class=\"r\">≈ 133 min</td></tr></tbody></table></div>"],"side":["<dl class=\"kv\"><dt>请购</dt><dd>SGD7S-2R8A ×2、SGM7J-04A ×2、原材料 RM-6061-B125 ×10</dd></dl><p class=\"course\"><b>对应：</b>特色选修“生产计划与排程”</p>","<dl class=\"kv\"><dt>Requests</dt><dd>SGD7S-2R8A ×2, SGM7J-04A ×2, stock RM-6061-B125 ×10</dd></dl><p class=\"course\"><b>Course:</b> elective “Production Planning and Scheduling”</p>"]},{"n":10,"lane":1,"s":"ok","t":["采购到货","Receiving"],"who":["工厂 · 仓库","Factory · warehouse"],"body":["<p>3 种物料到货，ERPNext 生成收货单，入原材料库。</p>","<p>Three items arrive; ERPNext posts a purchase receipt into raw-material stock.</p>"],"side":["<p class=\"course\"><b>对应：</b>特色选修“仓储管理与智能仓库”</p>","<p class=\"course\"><b>Course:</b> elective “Warehousing”</p>"]},{"n":11,"lane":1,"s":"ok","t":["MES 车间执行","MES execution"],"who":["工厂 · 车间终端","Factory · shop-floor terminal"],"body":["<p>两张自制件工单派到 7 台设备完工，再下总装工单。</p><dl class=\"kv\"><dt>自制件</dt><dd>MFG-WO-2026-00007、00008，仿真 52 s 完工</dd><dt>总装</dt><dd>MFG-WO-2026-00009，84 s 完工</dd></dl>","<p>Two made-part work orders run on 7 machines, then the assembly order.</p><dl class=\"kv\"><dt>Made parts</dt><dd>MFG-WO-2026-00007, 00008, done in 52 s simulated</dd><dt>Assembly</dt><dd>MFG-WO-2026-00009, done in 84 s</dd></dl>"],"side":["<p class=\"course\"><b>对应：</b>特色选修“制造执行系统 MES”</p>","<p class=\"course\"><b>Course:</b> elective “Manufacturing Execution Systems”</p>"]},{"n":12,"lane":1,"s":"ok","t":["厂情中枢","Factory command center"],"who":["工厂 · 异常、追因、推演、动作","Factory · anomaly, root cause, what-if, action"],"body":["<p>演练中给一台数控车床注入“主轴过热”停机。4 s 后厂情中枢报出异常和因果链，推演两个方案并给出推荐。</p><dl class=\"kv\"><dt>方案 A</dt><dd>不处理，费用 0：在手订单都能按时交</dd><dt>方案 B</dt><dd>维修加急，费用 300：不改善交期</dd><dt>推荐</dt><dd>A；演练仍批准 B，验证动作能下到车间</dd></dl>","<p>During the run a CNC lathe was forced to stop (“spindle overheating”). Four seconds later the command center raised an anomaly with its causal chain, simulated two responses and recommended one.</p><dl class=\"kv\"><dt>Option A</dt><dd>Do nothing, cost 0: every open order still ships on time</dd><dt>Option B</dt><dd>Rush repair, cost 300: no gain in delivery</dd><dt>Recommended</dt><dd>A. The run still approved B to prove the action reaches the shop floor</dd></dl>"],"side":["<dl class=\"kv\"><dt>工厂复算</dt><dd>LS-101 有限元 34.3 MPa、安全系数 10.3（设计院 37.6 MPa；网格与固定面不同，量级一致）；粗车程序 2 个，检查通过</dd></dl><p class=\"course\"><b>对应：</b>“智能制造与数字孪生”；数字工厂实验 15</p>","<dl class=\"kv\"><dt>Factory re-check</dt><dd>LS-101 FEA 34.3 MPa, safety factor 10.3 (design 37.6 MPa; different mesh and fixed face, same order); 2 roughing programs pass</dd></dl><p class=\"course\"><b>Course:</b> “Smart Manufacturing and Digital Twins”; factory lab 15</p>"]}],"parts":[{"id":"LS-101","label":["LS-101 上轴","LS-101 upper shaft"],"cap":["<b>LS-101</b> 上轴 · Ø16 × 297 mm · 一阶 1185 Hz，是 5000 rpm 工作频率的 14 倍","<b>LS-101</b> upper shaft · Ø16 × 297 mm · 1st mode 1185 Hz, 14× the 5,000 rpm running speed"]},{"id":"LS-HS","label":["LS-HS 控制箱散热器","LS-HS heat sink"],"cap":["<b>LS-HS</b> 控制箱散热器 · 120×80 mm 底板、8 片直翅 · 2 m/s 风速散热 23.2 W","<b>LS-HS</b> control-box heat sink · 120 × 80 mm base, 8 straight fins · 23.2 W at 2 m/s air"]}],"mesh":{"LS-101":{"v":[6.0,-0.0,32.0,5.93,0.89,32.0,5.73,1.77,32.0,5.41,2.6,32.0,4.96,3.38,32.0,4.4,4.08,32.0,3.74,4.69,32.0,3.0,5.2,32.0,2.19,5.59,32.0,1.34,5.85,32.0,0.45,5.98,32.0,-0.45,5.98,32.0,-1.34,5.85,32.0,-2.19,5.59,32.0,-3.0,5.2,32.0,-3.74,4.69,32.0,-4.4,4.08,32.0,-4.96,3.38,32.0,-5.41,2.6,32.0,-5.73,1.77,32.0,-5.93,0.89,32.0,-6.0,-0.0,32.0,-5.93,-0.89,32.0,-5.73,-1.77,32.0,-5.41,-2.6,32.0,-4.96,-3.38,32.0,-4.4,-4.08,32.0,-3.74,-4.69,32.0,-3.0,-5.2,32.0,-2.19,-5.59,32.0,-1.34,-5.85,32.0,-0.45,-5.98,32.0,0.45,-5.98,32.0,1.34,-5.85,32.0,2.19,-5.59,32.0,3.0,-5.2,32.0,3.74,-4.69,32.0,4.4,-4.08,32.0,4.96,-3.38,32.0,5.41,-2.6,32.0,5.73,-1.77,32.0,5.93,-0.89,32.0,6.0,-0.0,32.0,6.0,-0.0,22.0,6.0,-0.0,22.0,5.93,0.89,22.0,5.73,1.77,22.0,5.41,2.6,22.0,4.96,3.38,22.0,4.4,4.08,22.0,3.74,4.69,22.0,3.0,5.2,22.0,2.19,5.59,22.0,1.34,5.85,22.0,0.45,5.98,22.0,-0.45,5.98,22.0,-1.34,5.85,22.0,-2.19,5.59,22.0,-3.0,5.2,22.0,-3.74,4.69,22.0,-4.4,4.08,22.0,-4.96,3.38,22.0,-5.41,2.6,22.0,-5.73,1.77,22.0,-5.93,0.89,22.0,-6.0,-0.0,22.0,-5.93,-0.89,22.0,-5.73,-1.77,22.0,-5.41,-2.6,22.0,-4.96,-3.38,22.0,-4.4,-4.08,22.0,-3.74,-4.69,22.0,-3.0,-5.2,22.0,-2.19,-5.59,22.0,-1.34,-5.85,22.0,-0.45,-5.98,22.0,0.45,-5.98,22.0,1.34,-5.85,22.0,2.19,-5.59,22.0,3.0,-5.2,22.0,3.74,-4.69,22.0,4.4,-4.08,22.0,4.96,-3.38,22.0,5.41,-2.6,22.0,5.73,-1.77,22.0,5.93,-0.89,22.0,8.0,-0.0,32.0,7.91,1.19,32.0,7.64,2.36,32.0,7.21,3.47,32.0,6.61,4.51,32.0,5.86,5.44,32.0,4.99,6.25,32.0,4.0,6.93,32.0,2.92,7.45,32.0,1.78,7.8,32.0,0.6,7.98,32.0,-0.6,7.98,32.0,-1.78,7.8,32.0,-2.92,7.45,32.0,-4.0,6.93,32.0,-4.99,6.25,32.0,-5.86,5.44,32.0,-6.61,4.51,32.0,-7.21,3.47,32.0,-7.64,2.36,32.0,-7.91,1.19,32.0,-8.0,-0.0,32.0,-7.91,-1.19,32.0,-7.64,-2.36,32.0,-7.21,-3.47,32.0,-6.61,-4.51,32.0,-5.86,-5.44,32.0,-4.99,-6.25,32.0,-4.0,-6.93,32.0,-2.92,-7.45,32.0,-1.78,-7.8,32.0,-0.6,-7.98,32.0,0.6,-7.98,32.0,1.78,-7.8,32.0,2.92,-7.45,32.0,4.0,-6.93,32.0,4.99,-6.25,32.0,5.86,-5.44,32.0,6.61,-4.51,32.0,7.21,-3.47,32.0,7.64,-2.36,32.0,7.91,-1.19,32.0,6.0,-0.0,32.0,5.93,0.89,32.0,5.73,1.77,32.0,5.41,2.6,32.0,4.96,3.38,32.0,4.4,4.08,32.0,3.74,4.69,32.0,3.0,5.2,32.0,2.19,5.59,32.0,1.34,5.85,32.0,0.45,5.98,32.0,-0.45,5.98,32.0,-1.34,5.85,32.0,-2.19,5.59,32.0,-3.0,5.2,32.0,-3.74,4.69,32.0,-4.4,4.08,32.0,-4.96,3.38,32.0,-5.41,2.6,32.0,-5.73,1.77,32.0,-5.93,0.89,32.0,-6.0,-0.0,32.0,-5.93,-0.89,32.0,-5.73,-1.77,32.0,-5.41,-2.6,32.0,-4.96,-3.38,32.0,-4.4,-4.08,32.0,-3.74,-4.69,32.0,-3.0,-5.2,32.0,-2.19,-5.59,32.0,-1.34,-5.85,32.0,-0.45,-5.98,32.0,0.45,-5.98,32.0,1.34,-5.85,32.0,2.19,-5.59,32.0,3.0,-5.2,32.0,3.74,-4.69,32.0,4.4,-4.08,32.0,4.96,-3.38,32.0,5.41,-2.6,32.0,5.73,-1.77,32.0,5.93,-0.89,32.0,6.0,-0.0,22.0,5.93,0.89,22.0,5.73,1.77,22.0,5.41,2.6,22.0,4.96,3.38,22.0,4.4,4.08,22.0,3.74,4.69,22.0,3.0,5.2,22.0,2.19,5.59,22.0,1.34,5.85,22.0,0.45,5.98,22.0,-0.45,5.98,22.0,-1.34,5.85,22.0,-2.19,5.59,22.0,-3.0,5.2,22.0,-3.74,4.69,22.0,-4.4,4.08,22.0,-4.96,3.38,22.0,-5.41,2.6,22.0,-5.73,1.77,22.0,-5.93,0.89,22.0,-6.0,-0.0,22.0,-5.93,-0.89,22.0,-5.73,-1.77,22.0,-5.41,-2.6,22.0,-4.96,-3.38,22.0,-4.4,-4.08,22.0,-3.74,-4.69,22.0,-3.0,-5.2,22.0,-2.19,-5.59,22.0,-1.34,-5.85,22.0,-0.45,-5.98,22.0,0.45,-5.98,22.0,1.34,-5.85,22.0,2.19,-5.59,22.0,3.0,-5.2,22.0,3.74,-4.69,22.0,4.4,-4.08,22.0,4.96,-3.38,22.0,5.41,-2.6,22.0,5.73,-1.77,22.0,5.93,-0.89,22.0,5.0,-0.0,22.0,4.94,0.75,22.0,4.78,1.47,22.0,4.5,2.17,22.0,4.13,2.82,22.0,3.67,3.4,22.0,3.12,3.91,22.0,2.5,4.33,22.0,1.83,4.65,22.0,1.11,4.87,22.0,0.37,4.99,22.0,-0.37,4.99,22.0,-1.11,4.87,22.0,-1.83,4.65,22.0,-2.5,4.33,22.0,-3.12,3.91,22.0,-3.67,3.4,22.0,-4.13,2.82,22.0,-4.5,2.17,22.0,-4.78,1.47,22.0,-4.94,0.75,22.0,-5.0,-0.0,22.0,-4.94,-0.75,22.0,-4.78,-1.47,22.0,-4.5,-2.17,22.0,-4.13,-2.82,22.0,-3.67,-3.4,22.0,-3.12,-3.91,22.0,-2.5,-4.33,22.0,-1.83,-4.65,22.0,-1.11,-4.87,22.0,-0.37,-4.99,22.0,0.37,-4.99,22.0,1.11,-4.87,22.0,1.83,-4.65,22.0,2.5,-4.33,22.0,3.12,-3.91,22.0,3.67,-3.4,22.0,4.13,-2.82,22.0,4.5,-2.17,22.0,4.78,-1.47,22.0,4.94,-0.75,22.0,8.0,-0.0,247.0,7.91,1.19,247.0,7.64,2.36,247.0,7.21,3.47,247.0,6.61,4.51,247.0,5.86,5.44,247.0,4.99,6.25,247.0,4.0,6.93,247.0,2.92,7.45,247.0,1.78,7.8,247.0,0.6,7.98,247.0,-0.6,7.98,247.0,-1.78,7.8,247.0,-2.92,7.45,247.0,-4.0,6.93,247.0,-4.99,6.25,247.0,-5.86,5.44,247.0,-6.61,4.51,247.0,-7.21,3.47,247.0,-7.64,2.36,247.0,-7.91,1.19,247.0,-8.0,-0.0,247.0,-7.91,-1.19,247.0,-7.64,-2.36,247.0,-7.21,-3.47,247.0,-6.61,-4.51,247.0,-5.86,-5.44,247.0,-4.99,-6.25,247.0,-4.0,-6.93,247.0,-2.92,-7.45,247.0,-1.78,-7.8,247.0,-0.6,-7.98,247.0,0.6,-7.98,247.0,1.78,-7.8,247.0,2.92,-7.45,247.0,4.0,-6.93,247.0,4.99,-6.25,247.0,5.86,-5.44,247.0,6.61,-4.51,247.0,7.21,-3.47,247.0,7.64,-2.36,247.0,7.91,-1.19,247.0,8.0,-0.0,247.0,8.0,-0.0,32.0,8.0,-0.0,32.0,7.91,1.19,32.0,7.64,2.36,32.0,7.21,3.47,32.0,6.61,4.51,32.0,5.86,5.44,32.0,4.99,6.25,32.0,4.0,6.93,32.0,2.92,7.45,32.0,1.78,7.8,32.0,0.6,7.98,32.0,-0.6,7.98,32.0,-1.78,7.8,32.0,-2.92,7.45,32.0,-4.0,6.93,32.0,-4.99,6.25,32.0,-5.86,5.44,32.0,-6.61,4.51,32.0,-7.21,3.47,32.0,-7.64,2.36,32.0,-7.91,1.19,32.0,-8.0,-0.0,32.0,-7.91,-1.19,32.0,-7.64,-2.36,32.0,-7.21,-3.47,32.0,-6.61,-4.51,32.0,-5.86,-5.44,32.0,-4.99,-6.25,32.0,-4.0,-6.93,32.0,-2.92,-7.45,32.0,-1.78,-7.8,32.0,-0.6,-7.98,32.0,0.6,-7.98,32.0,1.78,-7.8,32.0,2.92,-7.45,32.0,4.0,-6.93,32.0,4.99,-6.25,32.0,5.86,-5.44,32.0,6.61,-4.51,32.0,7.21,-3.47,32.0,7.64,-2.36,32.0,7.91,-1.19,32.0,5.0,-0.0,22.0,4.94,0.75,22.0,4.78,1.47,22.0,4.5,2.17,22.0,4.13,2.82,22.0,3.67,3.4,22.0,3.12,3.91,22.0,2.5,4.33,22.0,1.83,4.65,22.0,1.11,4.87,22.0,0.37,4.99,22.0,-0.37,4.99,22.0,-1.11,4.87,22.0,-1.83,4.65,22.0,-2.5,4.33,22.0,-3.12,3.91,22.0,-3.67,3.4,22.0,-4.13,2.82,22.0,-4.5,2.17,22.0,-4.78,1.47,22.0,-4.94,0.75,22.0,-5.0,-0.0,22.0,-4.94,-0.75,22.0,-4.78,-1.47,22.0,-4.5,-2.17,22.0,-4.13,-2.82,22.0,-3.67,-3.4,22.0,-3.12,-3.91,22.0,-2.5,-4.33,22.0,-1.83,-4.65,22.0,-1.11,-4.87,22.0,-0.37,-4.99,22.0,0.37,-4.99,22.0,1.11,-4.87,22.0,1.83,-4.65,22.0,2.5,-4.33,22.0,3.12,-3.91,22.0,3.67,-3.4,22.0,4.13,-2.82,22.0,4.5,-2.17,22.0,4.78,-1.47,22.0,4.94,-0.75,22.0,5.0,-0.0,22.0,5.0,-0.0,0.0,5.0,-0.0,0.0,4.94,0.75,0.0,4.78,1.47,0.0,4.5,2.17,0.0,4.13,2.82,0.0,3.67,3.4,0.0,3.12,3.91,0.0,2.5,4.33,0.0,1.83,4.65,0.0,1.11,4.87,0.0,0.37,4.99,0.0,-0.37,4.99,0.0,-1.11,4.87,0.0,-1.83,4.65,0.0,-2.5,4.33,0.0,-3.12,3.91,0.0,-3.67,3.4,0.0,-4.13,2.82,0.0,-4.5,2.17,0.0,-4.78,1.47,0.0,-4.94,0.75,0.0,-5.0,-0.0,0.0,-4.94,-0.75,0.0,-4.78,-1.47,0.0,-4.5,-2.17,0.0,-4.13,-2.82,0.0,-3.67,-3.4,0.0,-3.12,-3.91,0.0,-2.5,-4.33,0.0,-1.83,-4.65,0.0,-1.11,-4.87,0.0,-0.37,-4.99,0.0,0.37,-4.99,0.0,1.11,-4.87,0.0,1.83,-4.65,0.0,2.5,-4.33,0.0,3.12,-3.91,0.0,3.67,-3.4,0.0,4.13,-2.82,0.0,4.5,-2.17,0.0,4.78,-1.47,0.0,4.94,-0.75,0.0,8.0,-0.0,247.0,7.91,1.19,247.0,7.64,2.36,247.0,7.21,3.47,247.0,6.61,4.51,247.0,5.86,5.44,247.0,4.99,6.25,247.0,4.0,6.93,247.0,2.92,7.45,247.0,1.78,7.8,247.0,0.6,7.98,247.0,-0.6,7.98,247.0,-1.78,7.8,247.0,-2.92,7.45,247.0,-4.0,6.93,247.0,-4.99,6.25,247.0,-5.86,5.44,247.0,-6.61,4.51,247.0,-7.21,3.47,247.0,-7.64,2.36,247.0,-7.91,1.19,247.0,-8.0,-0.0,247.0,-7.91,-1.19,247.0,-7.64,-2.36,247.0,-7.21,-3.47,247.0,-6.61,-4.51,247.0,-5.86,-5.44,247.0,-4.99,-6.25,247.0,-4.0,-6.93,247.0,-2.92,-7.45,247.0,-1.78,-7.8,247.0,-0.6,-7.98,247.0,0.6,-7.98,247.0,1.78,-7.8,247.0,2.92,-7.45,247.0,4.0,-6.93,247.0,4.99,-6.25,247.0,5.86,-5.44,247.0,6.61,-4.51,247.0,7.21,-3.47,247.0,7.64,-2.36,247.0,7.91,-1.19,247.0,6.0,-0.0,247.0,5.93,0.89,247.0,5.73,1.77,247.0,5.41,2.6,247.0,4.96,3.38,247.0,4.4,4.08,247.0,3.74,4.69,247.0,3.0,5.2,247.0,2.19,5.59,247.0,1.34,5.85,247.0,0.45,5.98,247.0,-0.45,5.98,247.0,-1.34,5.85,247.0,-2.19,5.59,247.0,-3.0,5.2,247.0,-3.74,4.69,247.0,-4.4,4.08,247.0,-4.96,3.38,247.0,-5.41,2.6,247.0,-5.73,1.77,247.0,-5.93,0.89,247.0,-6.0,-0.0,247.0,-5.93,-0.89,247.0,-5.73,-1.77,247.0,-5.41,-2.6,247.0,-4.96,-3.38,247.0,-4.4,-4.08,247.0,-3.74,-4.69,247.0,-3.0,-5.2,247.0,-2.19,-5.59,247.0,-1.34,-5.85,247.0,-0.45,-5.98,247.0,0.45,-5.98,247.0,1.34,-5.85,247.0,2.19,-5.59,247.0,3.0,-5.2,247.0,3.74,-4.69,247.0,4.4,-4.08,247.0,4.96,-3.38,247.0,5.41,-2.6,247.0,5.73,-1.77,247.0,5.93,-0.89,247.0,5.0,-0.0,0.0,4.94,0.75,0.0,4.78,1.47,0.0,4.5,2.17,0.0,4.13,2.82,0.0,3.67,3.4,0.0,3.12,3.91,0.0,2.5,4.33,0.0,1.83,4.65,0.0,1.11,4.87,0.0,0.37,4.99,0.0,-0.37,4.99,0.0,-1.11,4.87,0.0,-1.83,4.65,0.0,-2.5,4.33,0.0,-3.12,3.91,0.0,-3.67,3.4,0.0,-4.13,2.82,0.0,-4.5,2.17,0.0,-4.78,1.47,0.0,-4.94,0.75,0.0,-5.0,-0.0,0.0,-4.94,-0.75,0.0,-4.78,-1.47,0.0,-4.5,-2.17,0.0,-4.13,-2.82,0.0,-3.67,-3.4,0.0,-3.12,-3.91,0.0,-2.5,-4.33,0.0,-1.83,-4.65,0.0,-1.11,-4.87,0.0,-0.37,-4.99,0.0,0.37,-4.99,0.0,1.11,-4.87,0.0,1.83,-4.65,0.0,2.5,-4.33,0.0,3.12,-3.91,0.0,3.67,-3.4,0.0,4.13,-2.82,0.0,4.5,-2.17,0.0,4.78,-1.47,0.0,4.94,-0.75,0.0,6.0,-0.0,257.0,5.93,0.89,257.0,5.73,1.77,257.0,5.41,2.6,257.0,4.96,3.38,257.0,4.4,4.08,257.0,3.74,4.69,257.0,3.0,5.2,257.0,2.19,5.59,257.0,1.34,5.85,257.0,0.45,5.98,257.0,-0.45,5.98,257.0,-1.34,5.85,257.0,-2.19,5.59,257.0,-3.0,5.2,257.0,-3.74,4.69,257.0,-4.4,4.08,257.0,-4.96,3.38,257.0,-5.41,2.6,257.0,-5.73,1.77,257.0,-5.93,0.89,257.0,-6.0,-0.0,257.0,-5.93,-0.89,257.0,-5.73,-1.77,257.0,-5.41,-2.6,257.0,-4.96,-3.38,257.0,-4.4,-4.08,257.0,-3.74,-4.69,257.0,-3.0,-5.2,257.0,-2.19,-5.59,257.0,-1.34,-5.85,257.0,-0.45,-5.98,257.0,0.45,-5.98,257.0,1.34,-5.85,257.0,2.19,-5.59,257.0,3.0,-5.2,257.0,3.74,-4.69,257.0,4.4,-4.08,257.0,4.96,-3.38,257.0,5.41,-2.6,257.0,5.73,-1.77,257.0,5.93,-0.89,257.0,6.0,-0.0,257.0,6.0,-0.0,247.0,6.0,-0.0,247.0,5.93,0.89,247.0,5.73,1.77,247.0,5.41,2.6,247.0,4.96,3.38,247.0,4.4,4.08,247.0,3.74,4.69,247.0,3.0,5.2,247.0,2.19,5.59,247.0,1.34,5.85,247.0,0.45,5.98,247.0,-0.45,5.98,247.0,-1.34,5.85,247.0,-2.19,5.59,247.0,-3.0,5.2,247.0,-3.74,4.69,247.0,-4.4,4.08,247.0,-4.96,3.38,247.0,-5.41,2.6,247.0,-5.73,1.77,247.0,-5.93,0.89,247.0,-6.0,-0.0,247.0,-5.93,-0.89,247.0,-5.73,-1.77,247.0,-5.41,-2.6,247.0,-4.96,-3.38,247.0,-4.4,-4.08,247.0,-3.74,-4.69,247.0,-3.0,-5.2,247.0,-2.19,-5.59,247.0,-1.34,-5.85,247.0,-0.45,-5.98,247.0,0.45,-5.98,247.0,1.34,-5.85,247.0,2.19,-5.59,247.0,3.0,-5.2,247.0,3.74,-4.69,247.0,4.4,-4.08,247.0,4.96,-3.38,247.0,5.41,-2.6,247.0,5.73,-1.77,247.0,5.93,-0.89,247.0,6.0,-0.0,257.0,5.93,0.89,257.0,5.73,1.77,257.0,5.41,2.6,257.0,4.96,3.38,257.0,4.4,4.08,257.0,3.74,4.69,257.0,3.0,5.2,257.0,2.19,5.59,257.0,1.34,5.85,257.0,0.45,5.98,257.0,-0.45,5.98,257.0,-1.34,5.85,257.0,-2.19,5.59,257.0,-3.0,5.2,257.0,-3.74,4.69,257.0,-4.4,4.08,257.0,-4.96,3.38,257.0,-5.41,2.6,257.0,-5.73,1.77,257.0,-5.93,0.89,257.0,-6.0,-0.0,257.0,-5.93,-0.89,257.0,-5.73,-1.77,257.0,-5.41,-2.6,257.0,-4.96,-3.38,257.0,-4.4,-4.08,257.0,-3.74,-4.69,257.0,-3.0,-5.2,257.0,-2.19,-5.59,257.0,-1.34,-5.85,257.0,-0.45,-5.98,257.0,0.45,-5.98,257.0,1.34,-5.85,257.0,2.19,-5.59,257.0,3.0,-5.2,257.0,3.74,-4.69,257.0,4.4,-4.08,257.0,4.96,-3.38,257.0,5.41,-2.6,257.0,5.73,-1.77,257.0,5.93,-0.89,257.0,5.0,-0.0,257.0,4.94,0.75,257.0,4.78,1.47,257.0,4.5,2.17,257.0,4.13,2.82,257.0,3.67,3.4,257.0,3.12,3.91,257.0,2.5,4.33,257.0,1.83,4.65,257.0,1.11,4.87,257.0,0.37,4.99,257.0,-0.37,4.99,257.0,-1.11,4.87,257.0,-1.83,4.65,257.0,-2.5,4.33,257.0,-3.12,3.91,257.0,-3.67,3.4,257.0,-4.13,2.82,257.0,-4.5,2.17,257.0,-4.78,1.47,257.0,-4.94,0.75,257.0,-5.0,-0.0,257.0,-4.94,-0.75,257.0,-4.78,-1.47,257.0,-4.5,-2.17,257.0,-4.13,-2.82,257.0,-3.67,-3.4,257.0,-3.12,-3.91,257.0,-2.5,-4.33,257.0,-1.83,-4.65,257.0,-1.11,-4.87,257.0,-0.37,-4.99,257.0,0.37,-4.99,257.0,1.11,-4.87,257.0,1.83,-4.65,257.0,2.5,-4.33,257.0,3.12,-3.91,257.0,3.67,-3.4,257.0,4.13,-2.82,257.0,4.5,-2.17,257.0,4.78,-1.47,257.0,4.94,-0.75,257.0,5.0,-0.0,297.0,4.94,0.75,297.0,4.78,1.47,297.0,4.5,2.17,297.0,4.13,2.82,297.0,3.67,3.4,297.0,3.12,3.91,297.0,2.5,4.33,297.0,1.83,4.65,297.0,1.11,4.87,297.0,0.37,4.99,297.0,-0.37,4.99,297.0,-1.11,4.87,297.0,-1.83,4.65,297.0,-2.5,4.33,297.0,-3.12,3.91,297.0,-3.67,3.4,297.0,-4.13,2.82,297.0,-4.5,2.17,297.0,-4.78,1.47,297.0,-4.94,0.75,297.0,-5.0,-0.0,297.0,-4.94,-0.75,297.0,-4.78,-1.47,297.0,-4.5,-2.17,297.0,-4.13,-2.82,297.0,-3.67,-3.4,297.0,-3.12,-3.91,297.0,-2.5,-4.33,297.0,-1.83,-4.65,297.0,-1.11,-4.87,297.0,-0.37,-4.99,297.0,0.37,-4.99,297.0,1.11,-4.87,297.0,1.83,-4.65,297.0,2.5,-4.33,297.0,3.12,-3.91,297.0,3.67,-3.4,297.0,4.13,-2.82,297.0,4.5,-2.17,297.0,4.78,-1.47,297.0,4.94,-0.75,297.0,5.0,-0.0,297.0,5.0,-0.0,257.0,5.0,-0.0,257.0,4.94,0.75,257.0,4.78,1.47,257.0,4.5,2.17,257.0,4.13,2.82,257.0,3.67,3.4,257.0,3.12,3.91,257.0,2.5,4.33,257.0,1.83,4.65,257.0,1.11,4.87,257.0,0.37,4.99,257.0,-0.37,4.99,257.0,-1.11,4.87,257.0,-1.83,4.65,257.0,-2.5,4.33,257.0,-3.12,3.91,257.0,-3.67,3.4,257.0,-4.13,2.82,257.0,-4.5,2.17,257.0,-4.78,1.47,257.0,-4.94,0.75,257.0,-5.0,-0.0,257.0,-4.94,-0.75,257.0,-4.78,-1.47,257.0,-4.5,-2.17,257.0,-4.13,-2.82,257.0,-3.67,-3.4,257.0,-3.12,-3.91,257.0,-2.5,-4.33,257.0,-1.83,-4.65,257.0,-1.11,-4.87,257.0,-0.37,-4.99,257.0,0.37,-4.99,257.0,1.11,-4.87,257.0,1.83,-4.65,257.0,2.5,-4.33,257.0,3.12,-3.91,257.0,3.67,-3.4,257.0,4.13,-2.82,257.0,4.5,-2.17,257.0,4.78,-1.47,257.0,4.94,-0.75,257.0,5.0,-0.0,297.0,4.94,0.75,297.0,4.78,1.47,297.0,4.5,2.17,297.0,4.13,2.82,297.0,3.67,3.4,297.0,3.12,3.91,297.0,2.5,4.33,297.0,1.83,4.65,297.0,1.11,4.87,297.0,0.37,4.99,297.0,-0.37,4.99,297.0,-1.11,4.87,297.0,-1.83,4.65,297.0,-2.5,4.33,297.0,-3.12,3.91,297.0,-3.67,3.4,297.0,-4.13,2.82,297.0,-4.5,2.17,297.0,-4.78,1.47,297.0,-4.94,0.75,297.0,-5.0,-0.0,297.0,-4.94,-0.75,297.0,-4.78,-1.47,297.0,-4.5,-2.17,297.0,-4.13,-2.82,297.0,-3.67,-3.4,297.0,-3.12,-3.91,297.0,-2.5,-4.33,297.0,-1.83,-4.65,297.0,-1.11,-4.87,297.0,-0.37,-4.99,297.0,0.37,-4.99,297.0,1.11,-4.87,297.0,1.83,-4.65,297.0,2.5,-4.33,297.0,3.12,-3.91,297.0,3.67,-3.4,297.0,4.13,-2.82,297.0,4.5,-2.17,297.0,4.78,-1.47,297.0,4.94,-0.75,297.0],"i":[1,0,43,1,43,45,2,45,46,2,46,47,2,1,45,3,2,47,4,3,47,4,47,48,4,48,49,5,4,49,6,5,49,6,49,50,7,6,50,7,50,51,7,51,52,8,7,52,9,8,52,9,52,53,10,9,53,10,53,54,11,10,54,11,54,55,12,11,55,12,55,56,13,12,56,13,56,57,14,13,57,14,57,58,15,14,58,15,58,59,16,15,59,16,59,60,16,60,61,17,16,61,18,61,62,18,17,61,19,62,63,19,63,64,19,18,62,20,19,64,21,64,65,21,20,64,22,65,66,22,21,65,23,66,67,23,67,68,23,22,66,24,23,68,25,68,69,25,24,68,26,69,70,26,25,69,27,70,71,27,71,72,27,26,70,28,27,72,29,28,72,29,72,73,29,73,74,30,29,74,31,30,74,31,74,75,32,31,75,32,75,76,33,32,76,33,76,77,33,77,78,34,33,78,35,34,78,35,78,79,36,35,79,36,79,80,37,36,80,37,80,81,38,37,81,38,81,82,39,38,82,39,82,83,40,39,83,40,83,84,40,84,85,41,40,85,42,41,85,42,85,44,155,113,112,155,114,113,155,112,154,153,111,110,153,112,111,153,154,112,156,114,155,152,153,110,157,114,156,157,115,114,157,116,115,151,152,110,151,110,109,158,116,157,150,151,109,150,109,108,159,116,158,159,117,116,149,150,108,149,108,107,160,117,159,160,118,117,148,107,106,148,149,107,161,119,118,161,120,119,161,118,160,147,106,105,147,148,106,162,120,161,121,120,162,146,105,104,146,147,105,163,121,162,103,146,104,145,146,103,164,122,121,164,121,163,144,103,102,144,145,103,165,122,164,123,122,165,101,144,102,101,143,144,166,123,165,124,123,166,167,124,166,100,142,143,100,143,101,125,124,167,99,141,142,99,142,100,126,167,168,126,168,169,126,125,167,98,139,140,98,140,141,98,141,99,127,126,169,127,169,128,97,139,98,86,127,128,96,139,97,96,138,139,87,128,129,87,86,128,95,138,96,95,136,137,95,137,138,88,87,129,88,129,130,88,130,131,94,136,95,89,88,131,93,135,136,93,136,94,90,89,131,90,131,132,92,135,93,92,134,135,91,132,133,91,133,134,91,90,132,91,134,92,239,197,196,239,196,238,237,196,195,237,238,196,240,197,239,240,198,197,236,195,194,236,237,195,241,198,240,241,199,198,235,236,194,235,194,193,242,199,241,242,200,199,242,201,200,234,235,193,234,193,192,243,201,242,233,192,191,233,234,192,244,202,201,244,201,243,232,191,190,232,233,191,189,232,190,245,202,244,245,203,202,231,232,189,246,204,203,246,203,245,230,189,188,230,231,189,247,205,204,247,204,246,187,230,188,229,230,187,248,206,205,248,205,247,228,187,186,228,229,187,207,206,248,207,248,249,185,227,228,185,228,186,208,207,249,208,249,250,184,226,227,184,227,185,209,250,251,209,208,250,183,225,226,183,226,184,224,225,183,210,251,252,210,209,251,182,224,183,211,252,253,211,210,252,181,223,224,181,224,182,170,211,253,170,253,212,180,223,181,180,222,223,171,170,212,171,212,213,179,222,180,179,221,222,172,171,213,172,213,214,172,214,215,178,221,179,178,219,220,178,220,221,173,172,215,177,219,178,177,218,219,174,173,215,174,215,216,176,218,177,175,174,216,175,216,217,175,217,218,175,218,176,255,254,297,255,297,299,256,299,300,256,255,299,257,300,301,257,256,300,258,257,301,258,301,302,258,302,303,259,258,303,260,259,303,260,303,304,261,260,304,261,304,305,262,261,305,262,305,306,263,262,306,263,306,307,264,263,307,264,307,308,264,308,309,265,264,309,266,265,309,266,309,310,266,310,311,267,266,311,268,267,311,268,311,312,268,312,313,269,268,313,270,269,313,270,313,314,270,314,315,271,270,315,272,315,316,272,271,315,273,316,317,273,317,318,273,272,316,274,273,318,275,318,319,275,274,318,276,319,320,276,275,319,277,320,321,277,321,322,277,276,320,278,277,322,279,322,323,279,278,322,280,323,324,280,279,323,281,324,325,281,280,324,282,325,326,282,281,325,283,282,326,283,326,327,284,283,327,284,327,328,285,284,328,285,328,329,286,285,329,286,329,330,287,286,330,287,330,331,288,287,331,288,331,332,289,288,332,289,332,333,290,289,333,290,333,334,291,290,334,291,334,335,292,291,335,292,335,336,293,292,336,293,336,337,294,293,337,294,337,338,295,294,338,295,338,339,296,295,339,296,339,298,341,340,383,341,383,385,342,385,386,342,386,387,342,341,385,343,342,387,344,343,387,344,387,388,345,344,388,345,388,389,346,345,389,346,389,390,347,346,390,347,390,391,348,347,391,348,391,392,348,392,393,349,348,393,350,349,393,350,393,394,351,350,394,351,394,395,351,395,396,352,351,396,352,396,397,353,352,397,354,353,397,354,397,398,355,354,398,355,398,399,356,355,399,356,399,400,356,400,401,357,356,401,358,401,402,358,357,401,359,402,403,359,358,402,360,403,404,360,359,403,361,404,405,361,360,404,362,405,406,362,361,405,363,406,407,363,362,406,364,407,408,364,363,407,365,408,409,365,364,408,366,409,410,366,365,409,367,410,411,367,366,410,368,411,412,368,367,411,369,368,412,369,412,413,370,369,413,370,413,414,371,370,414,371,414,415,372,371,415,372,415,416,373,372,416,373,416,417,373,417,418,374,373,418,375,374,418,375,418,419,376,375,419,376,419,420,377,376,420,377,420,421,378,377,421,378,421,422,378,422,423,379,378,423,380,379,423,380,423,424,381,380,424,381,424,425,382,381,425,382,425,384,495,452,453,495,453,454,495,494,452,493,450,451,493,451,452,493,452,494,496,495,454,492,450,493,497,496,454,497,454,455,497,455,456,491,450,492,491,449,450,498,497,456,490,449,491,490,448,449,499,498,456,499,456,457,489,448,490,489,447,448,500,499,457,500,457,458,488,446,447,488,447,489,501,458,459,501,459,460,501,500,458,487,445,446,487,446,488,502,501,460,461,502,460,486,444,445,486,445,487,503,502,461,443,444,486,485,443,486,504,461,462,504,503,461,484,442,443,484,443,485,505,504,462,463,505,462,441,442,484,441,484,483,506,505,463,464,506,463,507,506,464,440,483,482,440,441,483,465,507,464,439,482,481,439,440,482,466,508,507,466,509,508,466,507,465,438,480,479,438,481,480,438,439,481,467,509,466,467,468,509,437,438,479,426,468,467,436,437,479,436,479,478,427,469,468,427,468,426,435,436,478,435,477,476,435,478,477,428,469,427,428,470,469,428,471,470,434,435,476,429,471,428,433,476,475,433,434,476,430,471,429,430,472,471,432,433,475,432,475,474,431,473,472,431,474,473,431,472,430,431,432,474,540,539,538,532,534,533,541,536,535,541,537,536,541,538,537,541,540,538,544,542,541,544,543,542,528,530,529,528,531,530,546,545,544,546,541,535,546,544,541,549,548,547,550,547,546,550,549,547,521,523,522,510,551,550,510,550,546,511,510,546,511,532,531,511,535,534,511,534,532,511,531,528,511,546,535,512,511,528,518,520,519,518,521,520,518,524,523,518,525,524,518,526,525,518,523,521,513,512,528,513,527,526,513,528,527,515,514,513,515,517,516,515,513,526,515,518,517,515,526,518,553,552,595,553,595,597,554,597,598,554,598,599,554,553,597,555,554,599,556,555,599,556,599,600,556,600,601,557,556,601,558,557,601,558,601,602,559,558,602,559,602,603,559,603,604,560,559,604,561,560,604,561,604,605,562,561,605,562,605,606,563,562,606,563,606,607,564,563,607,564,607,608,565,564,608,565,608,609,566,565,609,566,609,610,567,566,610,567,610,611,568,567,611,568,611,612,568,612,613,569,568,613,570,613,614,570,569,613,571,614,615,571,615,616,571,570,614,572,571,616,573,616,617,573,572,616,574,617,618,574,573,617,575,618,619,575,619,620,575,574,618,576,575,620,577,620,621,577,576,620,578,621,622,578,577,621,579,622,623,579,623,624,579,578,622,580,579,624,581,580,624,581,624,625,581,625,626,582,581,626,583,582,626,583,626,627,584,583,627,584,627,628,585,584,628,585,628,629,585,629,630,586,585,630,587,586,630,587,630,631,588,587,631,588,631,632,589,588,632,589,632,633,590,589,633,590,633,634,591,590,634,591,634,635,592,591,635,592,635,636,592,636,637,593,592,637,594,593,637,594,637,596,707,664,665,707,706,664,705,663,664,705,664,706,708,707,665,708,665,666,704,662,663,704,663,705,709,708,666,709,666,667,703,662,704,703,661,662,710,709,667,710,667,668,710,668,669,702,661,703,702,660,661,711,710,669,701,659,660,701,660,702,712,669,670,712,711,669,700,658,659,700,659,701,657,658,700,713,712,670,713,670,671,699,657,700,714,671,672,714,713,671,698,656,657,698,657,699,715,672,673,715,714,672,655,656,698,697,655,698,716,673,674,716,715,673,696,654,655,696,655,697,675,716,674,675,717,716,653,696,695,653,654,696,676,717,675,676,718,717,652,695,694,652,653,695,677,719,718,677,718,676,651,694,693,651,652,694,692,651,693,678,720,719,678,719,677,650,651,692,679,721,720,679,720,678,649,692,691,649,650,692,638,721,679,638,680,721,648,649,691,648,691,690,639,680,638,639,681,680,647,648,690,647,690,689,640,681,639,640,682,681,640,683,682,646,647,689,646,688,687,646,689,688,641,683,640,645,646,687,645,687,686,642,683,641,642,684,683,644,645,686,643,684,642,643,685,684,643,686,685,643,644,686,723,722,765,723,765,767,723,767,768,724,768,769,724,723,768,725,724,769,726,725,769,726,769,770,726,770,771,727,726,771,728,727,771,728,771,772,729,728,772,729,772,773,729,773,774,730,729,774,731,730,774,731,774,775,732,731,775,732,775,776,733,732,776,733,776,777,734,733,777,734,777,778,735,734,778,735,778,779,736,735,779,736,779,780,737,736,780,737,780,781,738,737,781,738,781,782,738,782,783,739,738,783,740,783,784,740,739,783,741,784,785,741,785,786,741,740,784,742,741,786,743,786,787,743,742,786,744,787,788,744,743,787,745,788,789,745,789,790,745,744,788,746,745,790,747,790,791,747,746,790,748,791,792,748,747,791,749,792,793,749,793,794,749,748,792,750,749,794,751,750,794,751,794,795,751,795,796,752,751,796,753,752,796,753,796,797,754,753,797,754,797,798,755,754,798,755,798,799,755,799,800,756,755,800,757,756,800,757,800,801,758,757,801,758,801,802,759,758,802,759,802,803,760,759,803,760,803,804,761,760,804,761,804,805,762,761,805,762,805,806,762,806,807,763,762,807,764,763,807,764,807,766,838,836,837,830,831,832,839,833,834,839,834,835,839,835,836,839,836,838,842,839,840,842,840,841,826,827,828,826,828,829,844,842,843,844,833,839,844,839,842,847,845,846,848,844,845,848,845,847,819,820,821,808,848,849,808,844,848,809,844,808,809,829,830,809,832,833,809,830,832,809,826,829,809,833,844,810,826,809,816,817,818,816,818,819,816,821,822,816,822,823,816,823,824,816,819,821,811,826,810,811,824,825,811,825,826,813,811,812,813,814,815,813,824,811,813,815,816,813,816,824],"size":[16.0,16.0,297.0]},"LS-HS":{"v":[0.0,0.0,0.0,0.0,0.0,6.0,0.0,80.0,0.0,0.0,80.0,6.0,0.0,76.0,6.0,0.0,76.0,36.0,0.0,74.0,36.0,0.0,74.0,6.0,0.0,66.0,6.0,0.0,66.0,36.0,0.0,64.0,36.0,0.0,64.0,6.0,0.0,56.0,6.0,0.0,56.0,36.0,0.0,54.0,36.0,0.0,54.0,6.0,0.0,46.0,6.0,0.0,46.0,36.0,0.0,44.0,36.0,0.0,44.0,6.0,0.0,36.0,6.0,0.0,36.0,36.0,0.0,34.0,36.0,0.0,34.0,6.0,0.0,26.0,6.0,0.0,26.0,36.0,0.0,24.0,36.0,0.0,24.0,6.0,0.0,16.0,6.0,0.0,16.0,36.0,0.0,14.0,36.0,0.0,14.0,6.0,0.0,6.0,6.0,0.0,6.0,36.0,0.0,4.0,36.0,0.0,4.0,6.0,0.0,0.0,0.0,120.0,0.0,0.0,0.0,0.0,6.0,120.0,0.0,6.0,0.0,0.0,6.0,0.0,4.0,6.0,120.0,0.0,6.0,120.0,4.0,6.0,0.0,6.0,6.0,0.0,14.0,6.0,120.0,6.0,6.0,120.0,14.0,6.0,0.0,16.0,6.0,0.0,24.0,6.0,120.0,16.0,6.0,120.0,24.0,6.0,0.0,26.0,6.0,0.0,34.0,6.0,120.0,26.0,6.0,120.0,34.0,6.0,0.0,36.0,6.0,0.0,44.0,6.0,120.0,36.0,6.0,120.0,44.0,6.0,0.0,46.0,6.0,0.0,54.0,6.0,120.0,46.0,6.0,120.0,54.0,6.0,0.0,56.0,6.0,0.0,64.0,6.0,120.0,56.0,6.0,120.0,64.0,6.0,0.0,66.0,6.0,0.0,74.0,6.0,120.0,66.0,6.0,120.0,74.0,6.0,0.0,76.0,6.0,0.0,80.0,6.0,120.0,76.0,6.0,120.0,80.0,6.0,0.0,80.0,0.0,120.0,80.0,0.0,0.0,80.0,6.0,120.0,80.0,6.0,0.0,0.0,0.0,0.0,80.0,0.0,120.0,0.0,0.0,120.0,80.0,0.0,120.0,0.0,0.0,120.0,0.0,6.0,120.0,80.0,0.0,120.0,80.0,6.0,120.0,76.0,6.0,120.0,76.0,36.0,120.0,74.0,36.0,120.0,74.0,6.0,120.0,66.0,6.0,120.0,66.0,36.0,120.0,64.0,36.0,120.0,64.0,6.0,120.0,56.0,6.0,120.0,56.0,36.0,120.0,54.0,36.0,120.0,54.0,6.0,120.0,46.0,6.0,120.0,46.0,36.0,120.0,44.0,36.0,120.0,44.0,6.0,120.0,36.0,6.0,120.0,36.0,36.0,120.0,34.0,36.0,120.0,34.0,6.0,120.0,26.0,6.0,120.0,26.0,36.0,120.0,24.0,36.0,120.0,24.0,6.0,120.0,16.0,6.0,120.0,16.0,36.0,120.0,14.0,36.0,120.0,14.0,6.0,120.0,6.0,6.0,120.0,6.0,36.0,120.0,4.0,36.0,120.0,4.0,6.0,0.0,4.0,6.0,120.0,4.0,6.0,0.0,4.0,36.0,120.0,4.0,36.0,0.0,4.0,36.0,0.0,6.0,36.0,120.0,4.0,36.0,120.0,6.0,36.0,0.0,6.0,6.0,120.0,6.0,6.0,0.0,6.0,36.0,120.0,6.0,36.0,0.0,14.0,6.0,120.0,14.0,6.0,0.0,14.0,36.0,120.0,14.0,36.0,0.0,14.0,36.0,0.0,16.0,36.0,120.0,14.0,36.0,120.0,16.0,36.0,0.0,16.0,6.0,120.0,16.0,6.0,0.0,16.0,36.0,120.0,16.0,36.0,0.0,24.0,6.0,120.0,24.0,6.0,0.0,24.0,36.0,120.0,24.0,36.0,0.0,24.0,36.0,0.0,26.0,36.0,120.0,24.0,36.0,120.0,26.0,36.0,0.0,26.0,6.0,120.0,26.0,6.0,0.0,26.0,36.0,120.0,26.0,36.0,0.0,34.0,6.0,120.0,34.0,6.0,0.0,34.0,36.0,120.0,34.0,36.0,0.0,34.0,36.0,0.0,36.0,36.0,120.0,34.0,36.0,120.0,36.0,36.0,0.0,36.0,6.0,120.0,36.0,6.0,0.0,36.0,36.0,120.0,36.0,36.0,0.0,44.0,6.0,120.0,44.0,6.0,0.0,44.0,36.0,120.0,44.0,36.0,0.0,44.0,36.0,0.0,46.0,36.0,120.0,44.0,36.0,120.0,46.0,36.0,0.0,46.0,6.0,120.0,46.0,6.0,0.0,46.0,36.0,120.0,46.0,36.0,0.0,54.0,6.0,120.0,54.0,6.0,0.0,54.0,36.0,120.0,54.0,36.0,0.0,54.0,36.0,0.0,56.0,36.0,120.0,54.0,36.0,120.0,56.0,36.0,0.0,56.0,6.0,120.0,56.0,6.0,0.0,56.0,36.0,120.0,56.0,36.0,0.0,64.0,6.0,120.0,64.0,6.0,0.0,64.0,36.0,120.0,64.0,36.0,0.0,64.0,36.0,0.0,66.0,36.0,120.0,64.0,36.0,120.0,66.0,36.0,0.0,66.0,6.0,120.0,66.0,6.0,0.0,66.0,36.0,120.0,66.0,36.0,0.0,74.0,6.0,120.0,74.0,6.0,0.0,74.0,36.0,120.0,74.0,36.0,0.0,74.0,36.0,0.0,76.0,36.0,120.0,74.0,36.0,120.0,76.0,36.0,0.0,76.0,6.0,120.0,76.0,6.0,0.0,76.0,36.0,120.0,76.0,36.0],"i":[4,3,2,7,4,2,8,7,2,11,8,2,12,11,2,15,12,2,16,15,2,6,5,4,6,4,7,10,9,8,10,8,11,14,13,12,14,12,15,17,16,19,18,17,19,0,24,23,0,28,27,0,27,24,0,31,28,32,31,0,21,20,23,35,32,0,22,21,23,1,35,0,25,24,27,26,25,27,30,29,28,30,28,31,33,32,35,34,33,35,0,16,2,0,19,16,0,20,19,0,23,20,39,36,37,39,38,36,43,41,40,43,40,42,47,45,44,47,44,46,51,49,48,51,48,50,55,53,52,55,52,54,59,57,56,59,56,58,63,61,60,63,60,62,67,65,64,67,64,66,71,69,68,71,68,70,75,73,72,75,72,74,79,77,76,79,76,78,83,80,81,83,82,80,88,86,87,91,86,88,92,86,91,95,86,92,96,86,95,99,86,96,100,86,99,90,88,89,90,91,88,94,92,93,94,95,92,98,96,97,98,99,96,101,103,100,102,103,101,84,107,108,84,111,112,84,108,111,84,112,115,116,84,115,105,107,104,119,84,116,106,107,105,85,84,119,109,111,108,110,111,109,114,112,113,114,115,112,117,119,116,118,119,117,84,86,100,84,100,103,84,103,104,84,104,107,123,120,121,123,122,120,127,125,124,127,124,126,131,129,128,131,128,130,135,132,133,135,134,132,139,137,136,139,136,138,143,141,140,143,140,142,147,144,145,147,146,144,151,149,148,151,148,150,155,153,152,155,152,154,159,156,157,159,158,156,163,161,160,163,160,162,167,165,164,167,164,166,171,168,169,171,170,168,175,173,172,175,172,174,179,177,176,179,176,178,183,180,181,183,182,180,187,185,184,187,184,186,191,189,188,191,188,190,195,192,193,195,194,192,199,197,196,199,196,198,203,201,200,203,200,202,207,204,205,207,206,204,211,209,208,211,208,210,215,213,212,215,212,214],"size":[120.0,80.0,36.0]}}};</script>
+<script>
+// ---- language (shared with the home page: localStorage "wq-site-lang") ----
+const root = document.documentElement, langBtn = document.getElementById("langBtn");
+let lang;
+try { lang = localStorage.getItem("wq-site-lang"); } catch (e) {}
+lang = lang || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+const onLang = [];
+function setLang(l) {
+  lang = l; root.lang = l === "en" ? "en" : "zh-CN";
+  langBtn.textContent = l === "en" ? "中文" : "EN";
+  try { localStorage.setItem("wq-site-lang", l); } catch (e) {}
+  onLang.forEach(f => f());
+}
+langBtn.addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));
+setLang(lang);
+/*LANG-END*/
+const L = () => (lang === "en" ? 1 : 0);
+const STATUS = { ok: ["通过", "Passed"], hold: ["待确认", "To confirm"], na: ["不适用", "N/A"] };
+
+// ---- process strip ----
+let current = 1;
+function drawChips() {
+  [0, 1].forEach(lane => {
+    const box = document.getElementById("lane" + lane);
+    box.innerHTML = "";
+    CASE.steps.filter(s => s.lane === lane).forEach(st => {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "step"; b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", st.n === current ? "true" : "false");
+      b.innerHTML = `<span class="n">${String(st.n).padStart(2, "0")}</span><span class="t">${st.t[L()]}</span><span class="pill ${st.s}">${STATUS[st.s][L()]}</span>`;
+      b.addEventListener("click", () => { current = st.n; drawChips(); drawDetail(); });
+      box.appendChild(b);
+    });
+  });
+}
+function drawDetail() {
+  const st = CASE.steps.find(s => s.n === current);
+  document.getElementById("detail").innerHTML =
+    `<div><h3>${String(st.n).padStart(2, "0")} · ${st.t[L()]}</h3><p class="who">${st.who[L()]}</p>${st.body[L()]}</div><div>${st.side[L()]}</div>`;
+}
+drawChips(); drawDetail();
+onLang.push(drawChips, drawDetail);
+
+// ---- 3D viewer ----
+(function () {
+  const cv = document.getElementById("cv"), cap = document.getElementById("cap");
+  let partId = CASE.parts[0].id;
+  const setCap = () => { cap.innerHTML = CASE.parts.find(p => p.id === partId).cap[L()]; };
+  setCap(); onLang.push(setCap);
+  if (!window.THREE) { cap.textContent = lang === "en" ? "The 3D model did not load. Reload the page." : "三维模型加载失败，请刷新页面。"; return; }
+  const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  const scene = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(32, 1, 1, 8000);
+  scene.add(new THREE.HemisphereLight(0xdfe9ee, 0x1a252a, 0.85));
+  const key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(1, 1.4, 1.2); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xf2b705, 0.35); rim.position.set(-1.2, -0.4, -1); scene.add(rim);
+  const holder = new THREE.Group(); scene.add(holder);
+  const cache = {};
+  function build(id) {
+    const m = CASE.mesh[id];
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(m.v, 3));
+    g.setIndex(m.i); g.computeVertexNormals(); g.computeBoundingBox();
+    const c = new THREE.Vector3(); g.boundingBox.getCenter(c); g.translate(-c.x, -c.y, -c.z);
+    g.computeBoundingSphere();
+    const grp = new THREE.Group();
+    grp.add(new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0xbfc8cc, metalness: 0.55, roughness: 0.38, side: THREE.DoubleSide })));
+    grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 28), new THREE.LineBasicMaterial({ color: 0x0a1216, transparent: true, opacity: 0.55 })));
+    const s = m.size;  // put the longest dimension horizontal, the thinnest facing the viewer at an angle
+    if (s[2] >= s[0] && s[2] >= s[1]) grp.rotation.x = -Math.PI / 2;
+    if (s[2] >= s[0] && s[2] >= s[1] && s[2] > 2 * s[0]) { grp.rotation.set(0, Math.PI / 2, 0); }
+    if (s[2] < 0.3 * Math.min(s[0], s[1])) grp.rotation.x = -Math.PI / 2.6;
+    return { grp, r: g.boundingSphere.radius };
+  }
+  let obj = null;
+  function select(id) {
+    partId = id;
+    if (obj) holder.remove(obj);
+    cache[id] = cache[id] || build(id);
+    obj = cache[id].grp; holder.add(obj);
+    const r = cache[id].r;
+    cam.position.set(0, r * 0.9, r * 3.3); cam.lookAt(0, 0, 0);
+    setCap();
+  }
+  document.querySelectorAll(".viewer .tabs button").forEach(b => b.addEventListener("click", () => {
+    document.querySelectorAll(".viewer .tabs button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    select(b.dataset.part);
+  }));
+  select(partId);
+  let rx = 0.35, ry = 0.6, drag = null, idle = true;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  cv.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, rx, ry }; idle = false; cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener("pointermove", e => { if (!drag) return; ry = drag.ry + (e.clientX - drag.x) * 0.01; rx = Math.max(-1.3, Math.min(1.3, drag.rx + (e.clientY - drag.y) * 0.01)); });
+  cv.addEventListener("pointerup", () => { drag = null; });
+  function resize() { const w = cv.clientWidth, h = cv.clientHeight; if (!w || !h) return; renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+  window.addEventListener("resize", resize); resize();
+  (function tick() { if (idle && !reduce) ry += 0.004; holder.rotation.set(rx, ry, 0); renderer.render(scene, cam); requestAnimationFrame(tick); })();
+})();
+
+</script>
+</body>
+</html>
