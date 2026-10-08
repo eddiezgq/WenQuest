@@ -69,6 +69,26 @@ KINDS = {
 }
 
 
+_YT = re.compile(r"^https?://(?:www\.|m\.)?(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})")
+_BILI = re.compile(r"^https?://(?:www\.|m\.)?bilibili\.com/video/(BV[0-9A-Za-z]{10})")
+
+
+def video_link(url: str | None) -> dict | None:
+    """A B 站 or YouTube page link -> the provider's own embeddable player (第 25 轮：讲课视频). Anything else -> None."""
+    u = (url or "").strip()
+    m = _YT.match(u)
+    if m:
+        return {"provider": "youtube", "id": m.group(1), "page": f"https://www.youtube.com/watch?v={m.group(1)}",
+                "embed": f"https://www.youtube-nocookie.com/embed/{m.group(1)}?rel=0&autoplay=1"}
+    m = _BILI.match(u)
+    if m:
+        p = re.search(r"[?&]p=(\d+)", u)
+        page = f"&page={p.group(1)}" if p else ""
+        return {"provider": "bilibili", "id": m.group(1), "page": f"https://www.bilibili.com/video/{m.group(1)}",
+                "embed": f"https://player.bilibili.com/player.html?bvid={m.group(1)}{page}&high_quality=1&danmaku=0&autoplay=1"}
+    return None
+
+
 def file_kind(filename: str | None, mimetype: str | None = None) -> str:
     """What the frontend should do with a file: play it, show it, run it, or offer it for download."""
     ext = (filename or "").rsplit(".", 1)[-1].lower() if "." in (filename or "") else ""

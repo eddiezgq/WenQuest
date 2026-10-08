@@ -761,7 +761,28 @@ def lesson_entry(d: dict, out: Path, tmp: Path) -> dict:
     summary = [f"<p>{esc(p[0])} {esc(p[1])} · 建议 {d['hours']} 学时。{esc(CH[no][2])}。</p>",
                f"<p>{esc(p[2])} · {d['hours']} class hours. {esc(CH[no][3])}.</p>"]
     return {"no": no, "section": no + 1, "name": pair(f"第 {no} 讲 {title[0]}", f"Lesson {no}: {title[1]}"),
-            "summary": summary, "activities": acts}
+            "summary": summary, "activities": acts, "videos": lecture_videos(no, title)}
+
+
+def lecture_videos(no: int, title) -> list[dict]:
+    """讲课视频（第 25 轮）：公开课视频发布后，链接记在 docs/课程视频/缝纫机/NN/链接.yaml（bilibili: BV…；youtube: 视频 id 或网址）。
+    平台把它们做成本讲的“讲课视频”（网址活动），页里直接播放：中文界面放 B 站版，英文界面放 YouTube 版。"""
+    f = BOOK.parents[2] / "docs" / "课程视频" / "缝纫机" / f"{no:02d}" / "链接.yaml"
+    if not f.exists():
+        return []
+    import yaml
+    d = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+    out = []
+    bv, yt = str(d.get("bilibili") or "").strip(), str(d.get("youtube") or "").strip()
+    if bv:
+        url = bv if bv.startswith("http") else f"https://www.bilibili.com/video/{bv}"
+        out.append({"type": "url", "lang": "zh", "url": url, "visible": 1,
+                    "name": pair(f"讲课视频：第 {no} 讲 {title[0]}（中文）", f"Lecture video: Lesson {no} {title[1]} (Chinese)")})
+    if yt:
+        url = yt if yt.startswith("http") else f"https://www.youtube.com/watch?v={yt}"
+        out.append({"type": "url", "lang": "en", "url": url, "visible": 1,
+                    "name": pair(f"讲课视频：第 {no} 讲 {title[0]}（英文）", f"Lecture video: Lesson {no} {title[1]} (English)")})
+    return out
 
 
 def exam_entry(kind: str, lessons: dict[int, dict]) -> dict:

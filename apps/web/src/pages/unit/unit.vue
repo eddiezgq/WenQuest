@@ -13,6 +13,11 @@
       </view>
 
       <view class="blocks">
+        <!-- 讲课视频（第 25 轮）：最前面，B 站 / YouTube 在页里播放 -->
+        <view v-if="groups.stream.length" class="block">
+          <text class="bh">{{ t("unit.lectureVideo") }}</text>
+          <VideoEmbed :modules="groups.stream" @viewed="markViewed" />
+        </view>
         <!-- 网页互动课件（第 24 轮）：放在最前面，就在这里放映 -->
         <view v-if="groups.deck.length" class="block">
           <text class="bh">{{ t("unit.slides") }}</text>
@@ -118,6 +123,7 @@ import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import ModuleRow from "../../components/ModuleRow.vue";
 import LecturePlayer from "../../components/LecturePlayer.vue";
+import VideoEmbed from "../../components/VideoEmbed.vue";
 import { absolute, api, ApiError, type LectureMedia, type Module, type Section, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 import { type CourseData, loadCourse, moduleKind, studentPreview, units, visibleModules } from "../../store";
@@ -140,14 +146,15 @@ const prev = computed(() => (unitIndex.value > 0 ? unitList.value[unitIndex.valu
 const next = computed(() => (unitIndex.value >= 0 && unitIndex.value < unitList.value.length - 1 ? unitList.value[unitIndex.value + 1] : null));
 
 const groups = computed(() => {
-  const g: Record<string, Module[]> = { deck: [], video: [], reading: [], slides: [], lab: [], guides: [], assign: [], other: [], teacher: [] };
+  const g: Record<string, Module[]> = { stream: [], deck: [], video: [], reading: [], slides: [], lab: [], guides: [], assign: [], other: [], teacher: [] };
   if (!d.value || !section.value) return g;
   for (const m of visibleModules(d.value, section.value)) {
     if (m.hidden) { g.teacher.push(m); continue; }
     const k = moduleKind(m);
     // 课程包课程：讲义和练习的文字页由网页版教材这一章代替
     if (bookChapter.value && m.type === "page" && /^(讲义|练习)[：:]|^(Notes|Practice):/.test(m.name || "")) continue;
-    if (k === "deck") g.deck.push(m);
+    if (k === "stream") g.stream.push(m);
+    else if (k === "deck") g.deck.push(m);
     else if (k === "video") g.video.push(m);
     else if (k === "reading") g.reading.push(m);
     else if (k === "slides" || k === "pdf") g.slides.push(m);
@@ -187,6 +194,10 @@ function deckFull() {
   const el = (deckBox.value?.$el || deckBox.value) as HTMLElement | null;
   el?.requestFullscreen?.();
   // #endif
+}
+function markViewed(id: number) {
+  const m = section.value?.modules.find((x) => x.id === id);
+  if (m && m.has_completion) m.completed = true;
 }
 const trackable = computed(() => (d.value && section.value ? visibleModules(d.value, section.value).filter((m) => m.has_completion) : []));
 const doneCount = computed(() => trackable.value.filter((m) => m.completed).length);

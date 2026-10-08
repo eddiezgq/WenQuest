@@ -38,7 +38,10 @@ export interface Module {
   completed?: boolean;
   has_completion?: boolean;
   file?: ModuleFile;
+  /** 讲课视频（第 25 轮）：B 站 / YouTube 链接 → 可嵌入的播放器 */
+  video?: VideoLink;
 }
+export interface VideoLink { provider: "youtube" | "bilibili"; id: string; page: string; embed: string }
 export interface Section {
   id: number;
   number: number;
@@ -71,6 +74,7 @@ export interface Activity {
   html?: string;
   intro?: string;
   url?: string;
+  video?: VideoLink;
   due?: number | null;
   files?: { name: string; size: number; mimetype: string; kind: FileKind; url: string; lab_url?: string }[];
   kind?: FileKind | "lecture";

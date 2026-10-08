@@ -42,18 +42,18 @@ export function visibleModules(d: CourseData, s: Section): Module[] {
 export function moduleKind(m: Module): string {
   if (m.type === "resource") return m.file?.kind || "file";
   if (m.type === "page") return "reading";
-  if (m.type === "url") return "link";
+  if (m.type === "url") return m.video ? "stream" : "link";
   return m.type; // assign, quiz, forum, ...
 }
 
 export const KIND_ICON: Record<string, string> = {
-  reading: "文", deck: "◧", book: "文", video: "▶", slides: "◧", pdf: "▤", lab: "⚗", doc: "▤", sheet: "▦", image: "◩",
+  reading: "文", stream: "▶", deck: "◧", book: "文", video: "▶", slides: "◧", pdf: "▤", lab: "⚗", doc: "▤", sheet: "▦", image: "◩",
   audio: "♪", file: "▢", link: "↗", assign: "✎", quiz: "?", forum: "✉",
 };
 
 /** A chapter-like section: has lessons, videos, slides or labs (not the course-info section). */
 export function isUnit(d: CourseData, s: Section): boolean {
-  return visibleModules(d, s).some((m) => ["reading", "deck", "video", "slides", "lab", "assign"].includes(moduleKind(m)));
+  return visibleModules(d, s).some((m) => ["reading", "stream", "deck", "video", "slides", "lab", "assign"].includes(moduleKind(m)));
 }
 
 export function findModule(d: CourseData, cmid: number): { section: Section; module: Module; index: number } | null {
@@ -93,7 +93,8 @@ export function courseMenu(d: CourseData): { key: string }[] {
     announcements: true,
     syllabus: teacher || !!syllabusSection(d) || !!d.info.summary,
     modules: true,
-    slides: teacher || has("slides", "pdf"),
+    videos: has("stream"),
+    slides: teacher || has("slides", "pdf", "deck"),
     labs: teacher || has("lab"),
     assignments: teacher || has("assign"),
     tasks: teacher || mods.some((m) => moduleKind(m) === "assign" && /工程任务单|TS-\d+-\d+/.test(m.name || "")),
@@ -108,7 +109,7 @@ export function courseMenu(d: CourseData): { key: string }[] {
 }
 
 export const MENU_ORDER = [
-  "home", "announcements", "syllabus", "modules", "slides", "labs", "assignments", "tasks",
+  "home", "announcements", "syllabus", "modules", "videos", "slides", "labs", "assignments", "tasks",
   "quizzes", "discussions", "online", "grades", "people", "calendar",
 ];
 

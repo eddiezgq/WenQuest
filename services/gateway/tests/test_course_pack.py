@@ -218,3 +218,38 @@ def test_refresh_finds_the_file_when_the_record_is_shifted(client, tmp_path):
     assert p["status"] == "done", p
     edits = [parse_qs(b) for f, b in CALLS if f == "local_wenquest_edit_course"]
     assert {e["cmid"][0] for e in edits} == {str(deck)}
+
+
+def test_lecture_videos_are_published_and_added_by_refresh(client, tmp_path):
+    """第 25 轮：讲课视频 (B 站 / YouTube links) go into the lesson as url activities, also into lessons published before."""
+    pack(tmp_path)
+    base = tmp_path / "textbook" / "sewing" / "course"
+    man = json.loads((base / "manifest.json").read_text())
+    man["lessons"][0]["videos"] = [{"type": "url", "lang": "zh", "url": "https://www.bilibili.com/video/BV1xx411c7mD", "visible": 1,
+                                    "name": ["讲课视频（中文）", "Lecture video (Chinese)"]}]
+    (base / "manifest.json").write_text(json.dumps(man, ensure_ascii=False))
+    h = login(client)
+    client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 1})
+    p = wait(client, h)
+    assert p["status"] == "done" and p["stale"] == 0
+    adds = [parse_qs(b) for f, b in CALLS if f == "local_wenquest_add_activities"]
+    assert any(a.get("activities[0][url]") == ["https://www.bilibili.com/video/BV1xx411c7mD"] for a in adds)
+    # the English version is published later: the course pack shows one thing to update, and 更新 adds it
+    man["lessons"][0]["videos"].append({"type": "url", "lang": "en", "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "visible": 1,
+                                        "name": ["讲课视频（英文）", "Lecture video (English)"]})
+    (base / "manifest.json").write_text(json.dumps(man, ensure_ascii=False))
+    assert client.get("/api/v1/admin/course-packs", headers=h).json()["packs"][0]["stale"] == 1
+    CALLS.clear()
+    client.post("/api/v1/admin/course-packs/sewing/refresh", headers=h)
+    p = wait(client, h)
+    assert p["status"] == "done" and p["stale"] == 0
+    adds = [parse_qs(b) for f, b in CALLS if f == "local_wenquest_add_activities"]
+    assert [a.get("activities[0][url]") for a in adds] == [["https://www.youtube.com/watch?v=dQw4w9WgXcQ"]]
+
+
+def test_video_links_become_embeddable_players():
+    from app import content
+    assert content.video_link("https://youtu.be/dQw4w9WgXcQ")["embed"].startswith("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ")
+    assert content.video_link("https://www.bilibili.com/video/BV1xx411c7mD?p=2")["embed"].startswith(
+        "https://player.bilibili.com/player.html?bvid=BV1xx411c7mD&page=2")
+    assert content.video_link("https://example.com/video/BV1xx411c7mD") is None

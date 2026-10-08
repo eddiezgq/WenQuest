@@ -349,6 +349,10 @@ def register(app: FastAPI) -> None:
                     "completed": (m.get("completiondata") or {}).get("state") in (1, 2),
                     "has_completion": bool(m.get("completion")),
                 }
+                if m.get("modname") == "url":
+                    v = content.video_link(next((x.get("fileurl") for x in m.get("contents") or [] if x.get("fileurl")), ""))
+                    if v:
+                        item["video"] = v
                 if m.get("modname") == "resource":
                     f = next((x for x in m.get("contents") or [] if x.get("type") == "file"), None)
                     if f:
@@ -397,6 +401,13 @@ def register(app: FastAPI) -> None:
                 raise EngineError("not_found", "url", 404)
             base["url"] = u.get("externalurl")
             base["intro"] = content.clean(resolve(u.get("intro"), lg), state.settings.moodle_url, sign)
+            v = content.video_link(base["url"])
+            if v:
+                base["video"] = v
+                try:   # 讲课视频：打开播放即记“已看”
+                    await state.moodle.call(tok, "mod_url_view_url", None, urlid=inst)
+                except EngineError:
+                    pass
         elif kind == "assign":
             a = next((x for x in await state.moodle.assignments(tok, courseid, lg) if x["cmid"] == cmid), None)
             if not a:

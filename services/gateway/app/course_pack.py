@@ -93,7 +93,7 @@ def register(app, m) -> None:
             status = "failed"   # the gateway restarted mid-way: press again to continue
         return {"book": book, "title": man["course"]["fullname"][i], "version": man.get("version", ""),
                 "courseid": st["courseid"], "status": status, "error": st["error"], "progress": st["progress"],
-                "batches": batches, "updated": st.get("updated", 0), "stale": len(stale(book, man, st)), "skipped": st.get("skipped", 0)}
+                "batches": batches, "updated": st.get("updated", 0), "stale": len(stale(book, man, st)) + len(new_videos(man, st)), "skipped": st.get("skipped", 0)}
 
     async def call(sess: Session, fn: str, **kw: Any) -> dict:
         return await state.moodle.call(sess.moodle_token, fn, None, **kw)
@@ -116,6 +116,8 @@ def register(app, m) -> None:
                 out["draftitemid"] = await upload_files(sess, base, a["files"])
         elif t == "resource":
             out["draftitemid"] = await upload_files(sess, base, [a["file"]])
+        elif t == "url":
+            out["url"] = a["url"]
         elif t in ("assign", "forum"):
             out["intro"] = ml(a.get("intro"), True)
             if t == "assign":
@@ -215,6 +217,22 @@ def register(app, m) -> None:
                     out.append((str(les["no"]), int(cmid), a))
         return out
 
+    def new_videos(man: dict, st: dict) -> list[tuple[dict, dict]]:
+        """讲课视频（第 25 轮）: videos of published lessons that are not in the course yet."""
+        have = st.get("videos", {})
+        return [(les, v) for les in man["lessons"] if lesson_done(st, les)
+                for v in les.get("videos") or [] if v["url"] not in have.get(str(les["no"]), [])]
+
+    async def add_videos(sess: Session, book: str, st: dict, pairs: list[tuple[dict, dict]], live_urls: set[str]) -> None:
+        for les, v in pairs:
+            st["progress"]["current"] = ml(v["name"])
+            if v["url"] not in live_urls:
+                await call(sess, "local_wenquest_add_activities", courseid=st["courseid"], section=les["section"],
+                           sectionname="", sectionsummary="",
+                           activities=[{"type": "url", "name": ml(v["name"])[:250], "url": v["url"], "visible": int(v.get("visible", 1))}])
+            st.setdefault("videos", {}).setdefault(str(les["no"]), []).append(v["url"])
+            save_state(book, st)
+
     def norm(t: str) -> str:
         """A Moodle activity name as plain text: multilang spans keep the Chinese one, tags and spaces dropped."""
         m_ = re.search(r'<span[^>]*lang="zh[^"]*"[^>]*>(.*?)</span>', t or "", re.S)
@@ -253,9 +271,14 @@ def register(app, m) -> None:
             # that cannot be matched is left alone and counted instead of stopping the whole update.
             live: dict[int, list[tuple[int, str]]] = {}
             names: dict[int, str] = {}
+            live_urls: set[str] = set()
+            vids = new_videos(man, st)
+            st["progress"]["total"] += len(vids)
             try:
                 for sec in await state.moodle.call(sess.moodle_token, "core_course_get_contents", None, courseid=st["courseid"]) or []:
                     for mo in sec.get("modules") or []:
+                        if mo.get("modname") == "url":
+                            live_urls.update(x.get("fileurl", "") for x in mo.get("contents") or [])
                         if mo.get("modname") == "resource":
                             nm = norm(mo.get("name", ""))
                             live.setdefault(int(sec.get("section", -1)), []).append((int(mo["id"]), nm))
@@ -286,6 +309,8 @@ def register(app, m) -> None:
                     skipped += 1
                 save_state(book, st)
             st["skipped"] = skipped
+            await add_videos(sess, book, st, vids, live_urls)
+            st["progress"]["done"] += len(vids)
             st.update(status="done", error="")
             st["progress"]["current"] = ""
         except Exception as exc:  # noqa: BLE001 - the administrator sees the reason and presses again
@@ -309,6 +334,7 @@ def register(app, m) -> None:
             for les in lessons:
                 await publish_activities(sess, base, st, book, str(les["no"]), cid, les["section"], ml(les["name"]),
                                          ml(les["summary"], True), les["activities"])
+                await add_videos(sess, book, st, [(les, v) for les_, v in new_videos(man, st) if les_ is les], set())
                 st["progress"]["done"] += 1
                 save_state(book, st)
             for e in exams:

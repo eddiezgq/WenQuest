@@ -114,7 +114,7 @@
       </view>
 
       <!-- ================= Slides / Labs / Assignments: grouped by unit ================= -->
-      <view v-else-if="tab === 'slides' || tab === 'labs' || tab === 'assignments' || tab === 'quizzes'">
+      <view v-else-if="tab === 'videos' || tab === 'slides' || tab === 'labs' || tab === 'assignments' || tab === 'quizzes'">
         <view class="h1-row">
           <text class="h1">{{ t("menu." + tab) }}</text>
           <view v-if="isTeacher(d) && (tab === 'quizzes' || tab === 'assignments')" class="h1-acts">
@@ -302,7 +302,7 @@ function unitMeta(s: Section): string {
   return parts.join(" · ");
 }
 
-const KINDS: Record<string, string[]> = { slides: ["slides", "pdf"], labs: ["lab"], assignments: ["assign"], quizzes: ["quiz"] };
+const KINDS: Record<string, string[]> = { videos: ["stream"], slides: ["slides", "pdf", "deck"], labs: ["lab"], assignments: ["assign"], quizzes: ["quiz"] };
 const grouped = computed(() => {
   if (!d.value || !KINDS[tab.value]) return [];
   const want = KINDS[tab.value];

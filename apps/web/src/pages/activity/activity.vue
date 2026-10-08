@@ -17,6 +17,7 @@
       <view v-if="a.type === 'page'" class="paper"><MathContent :html="a.html || ''" /></view>
 
       <!-- External link -->
+      <VideoEmbed v-else-if="a.type === 'url' && a.video" :modules="[{ id: a.id, type: 'url', name: a.name, video: a.video }]" />
       <view v-else-if="a.type === 'url'" class="paper">
         <RichContent v-if="a.intro" :html="a.intro" />
         <view class="primary" @click="openLink(a.url || '')">{{ t("activity.openLink") }} ↗</view>
@@ -108,6 +109,7 @@ import MathContent from "../../components/MathContent.vue";
 import RichContent from "../../components/RichContent.vue";
 import SlidePresenter from "../../components/SlidePresenter.vue";
 import LecturePlayer from "../../components/LecturePlayer.vue";
+import VideoEmbed from "../../components/VideoEmbed.vue";
 import AssignmentView from "../../components/work/AssignmentView.vue";
 import QuizView from "../../components/work/QuizView.vue";
 // #ifdef H5
@@ -134,7 +136,7 @@ const kindKey = computed(() => {
   if (!a.value) return "file";
   if (a.value.type === "resource") return a.value.lecture ? "lecture" : fileKind.value;
   if (a.value.type === "page") return "reading";
-  if (a.value.type === "url") return "link";
+  if (a.value.type === "url") return a.value.video ? "stream" : "link";
   return ["assign", "quiz", "forum"].includes(a.value.type) ? a.value.type : "file";
 });
 const ctx = computed(() => (d.value ? findModule(d.value, id.value) : null));
