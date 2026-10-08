@@ -76,11 +76,17 @@ TYPES = {
     # 第 18 轮 E6：能源（发起：计划员、维修工、厂长；改变车间的运行方式，厂长批）
     "energy_setting": {"label": "节能设定", "costly": False, "energy": True},
     "tou_rule": {"label": "错峰规则", "costly": False, "energy": True},
+    # 第 18 轮 E7：经营与财务（发起：销售、计划员、厂长；催款销售或厂长批；信用冻结、调预算厂长批；付款花钱厂长批）
+    "dunning": {"label": "催款", "costly": False, "finance": True, "nosim": True},
+    "credit_hold": {"label": "信用冻结 / 放行", "costly": False, "finance": True, "nosim": True},
+    "payment": {"label": "付款", "costly": True, "finance": True, "nosim": True},
+    "budget_change": {"label": "调整预算", "costly": False, "finance": True, "nosim": True},
 }
 MAINT_INITIATORS = ("maintenance", "manager")
 PEOPLE_INITIATORS = ("lead", "planner", "manager")
 SUPPLY_INITIATORS = ("planner", "quality", "manager")
 ENERGY_INITIATORS = ("planner", "maintenance", "manager")
+FINANCE_INITIATORS = ("sales", "planner", "manager")
 SERVICE_INITIATORS = ("service", "manager", "sales")
 EHS_INITIATORS = ("safety", "manager")
 
@@ -160,6 +166,16 @@ def title_of(t, p):
         m = float(p.get("standby_min") or 0)
         return "节能设定：{} {}".format("、".join(u.upper() for u in us[:3]) + (" 等 {} 台".format(len(us)) if len(us) > 3 else ""),
                                      "空闲 {:g} 分钟自动待机".format(m) if m else "取消自动待机")
+    if t == "dunning":
+        return "催款：发票 #{}".format(p.get("invoice_id"))
+    if t == "credit_hold":
+        return "{}：{}{}".format("信用冻结" if p.get("hold") else "信用放行", str(p.get("customer") or "").split(" ")[0],
+                                "，额度 ${:,.0f}".format(float(p["limit"])) if p.get("limit") else "")
+    if t == "payment":
+        return "{}：发票 #{}".format("推迟 {:g} 天付款".format(float(p["delay_days"])) if p.get("delay_days") else "付款", p.get("invoice_id"))
+    if t == "budget_change":
+        from hub import finance as FN
+        return "调整预算：{} → ${:,.0f}".format(FN.CENTERS.get(p.get("center"), p.get("center")), float(p.get("amount") or 0))
     if t == "tou_rule":
         return "错峰规则：{} {}".format("、".join(u.upper() for u in p.get("units") or ["ht-01"]), "峰时不开新炉" if p.get("on", True) else "取消错峰")
     if t == "skill_training":
@@ -195,6 +211,8 @@ def can_initiate(u, t=None):
         return u.get("role") in SUPPLY_INITIATORS
     if t and TYPES.get(t, {}).get("energy"):
         return u.get("role") in ENERGY_INITIATORS
+    if t and TYPES.get(t, {}).get("finance"):
+        return u.get("role") in FINANCE_INITIATORS
     return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
@@ -213,9 +231,13 @@ def can_approve(u, a):
         return False, "让步接收要质量或厂长批准"
     if a["type"] == "supplier_return" and u.get("role") not in ("manager", "planner", "quality"):
         return False, "要计划员、质量或厂长批准"
+    if a["type"] == "dunning" and u.get("role") not in ("manager", "sales"):
+        return False, "催款要销售或厂长批准"
+    if a["type"] in ("credit_hold", "budget_change") and u.get("role") != "manager":
+        return False, "信用冻结、调整预算要厂长批准"
     if TYPES[a["type"]].get("energy") and u.get("role") != "manager":
         return False, "节能设定、错峰规则改变车间的运行方式，要厂长批准"
-    supply = TYPES[a["type"]].get("supply") or TYPES[a["type"]].get("energy")
+    supply = TYPES[a["type"]].get("supply") or TYPES[a["type"]].get("energy") or TYPES[a["type"]].get("finance")
     people = TYPES[a["type"]].get("people")
     if not costly and people and u.get("role") not in ("manager", "lead"):
         return False, "要班组长或厂长批准"
@@ -236,7 +258,8 @@ def create(db, mode, u, type_, params, scenario_id=None, anomaly_id=None, trial=
         raise ActionError("服务类动作由售后或厂长发起" if TYPES[type_].get("service") else
                           ("人员类动作由班组长、计划员或厂长发起" if TYPES[type_].get("people") else
                            ("供应链动作由计划员、质量或厂长发起" if TYPES[type_].get("supply") else
-                            ("能源动作由计划员、维修工或厂长发起" if TYPES[type_].get("energy") else "动作由计划员或厂长发起"))))
+                            ("能源动作由计划员、维修工或厂长发起" if TYPES[type_].get("energy") else
+                             ("财务动作由销售、计划员或厂长发起" if TYPES[type_].get("finance") else "动作由计划员或厂长发起")))))
     p = dict(params)
     p["type"] = type_
     r = db.one("insert into action (mode, type, title, params, scenario_id, anomaly_id, initiator, initiator_role, trial) "
@@ -379,6 +402,11 @@ def execute(H, a, u, who):
             res = SP.concession(H, mode, int(p["lot_id"]), u.get("name"), a["id"])
         else:
             res = SP.activate_alt(H, mode, p["cat"], u.get("name"))
+        return res, "executing" if res.get("proposal_id") else "done"
+    if t in ("dunning", "credit_hold", "payment", "budget_change"):
+        from hub import finance as FN
+        fn = {"dunning": FN.exec_dunning, "credit_hold": FN.exec_credit, "payment": FN.exec_payment, "budget_change": FN.exec_budget}[t]
+        res = fn(H, mode, p, u)
         return res, "executing" if res.get("proposal_id") else "done"
     if t in ("energy_setting", "tou_rule"):
         from hub import energy as EN

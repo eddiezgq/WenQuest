@@ -93,10 +93,11 @@ def test_catalog_loads_33_live_rules_and_waiting_ones():
     from hub.ont import anomaly as A
     c = A.load_catalog()
     live = [r for r in c.values() if not r["waiting"]]
-    assert len(live) == 55                                            # 第 18 轮 E1：C1–C5、R3；E2：E1–E7；E3：M2–M7；E4：H1–H5；E5：W3–W7；E6：N1–N6
+    assert len(live) == 61 == len(c)                                  # 第 18 轮 E1：C1–C5、R3；E2：E1–E7；E3：M2–M7；E4：H1–H5；E5：W3–W7；E6：N1–N6；E7：F2–F7
     assert {k for k, r in c.items() if not r["waiting"]} >= {"C1", "C2", "C3", "C4", "C5", "R3"}
     assert {k for k, r in c.items() if not r["waiting"]} >= {"E1", "E2", "E3", "E4", "E5", "E6", "E7"}
-    assert {r["domain"] for r in c.values() if r["waiting"]} == {"finance"}                    # 第 18 轮 E6：能源上线，只剩财务待数据
+    assert not [k for k, r in c.items() if r["waiting"]]                                       # 第 18 轮 E7：财务上线，没有“待数据”的规则了
+    assert {k for k, r in c.items() if not r["waiting"]} >= {"F1", "F2", "F3", "F4", "F5", "F6", "F7"}
     assert {k for k, r in c.items() if not r["waiting"]} >= {"N1", "N2", "N3", "N4", "N5", "N6"}
     assert {k for k, r in c.items() if not r["waiting"]} >= {"H1", "H2", "H3", "H4", "H5"}       # 第 18 轮 E4：人员领域上线
 
@@ -178,8 +179,9 @@ def test_rule_config_changes_are_audited(db):
     assert not D.rule("P5")["enabled"]
     ch = db.q("select field, old, new from rule_change where rule='P5' order by id")
     assert [(c["field"], c["old"], c["new"]) for c in ch] == [("params.above", 6, 3), ("enabled", True, False)]
+    D.catalog["F2"] = dict(D.catalog["F2"], waiting=True)                # 第 18 轮 E7 起规则库没有“待数据”的了：临时当它是待数据
     with pytest.raises(RuleError):
-        D.set_rule("F2", "王老师", enabled=True)                          # 待数据的规则不能启用（财务领域；能源 E6 已上线）
+        D.set_rule("F2", "王老师", enabled=True)                          # 待数据的规则不能启用
     D.set_rule("P5", "王老师", enabled=True, params={"above": 6})
 
 

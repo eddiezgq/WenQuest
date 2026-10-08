@@ -653,3 +653,73 @@ def test_N6_env_over(monkeypatch):
     _energy(monkeypatch, env_now=lambda db, mode, hours=1, end=None: env)
     f = run("N6", _ndb())
     assert [x.fkey for x in f] == ["mist"] and f[0].values["limit"] == 5.0
+
+
+# ---------------------------------------------------------------- 第 18 轮 E7：经营与财务
+def _fdb():
+    return FakeDB(tables=[("to_regclass", lambda a: [{"ok": True}])])
+
+
+def _inv(i, days, status="open", party="示例·峰顶搅拌机 Summit Mixer Works (Demo)", doc=None, dunned=0):
+    return {"id": i, "doc": doc, "party": party, "ref": "期初", "amount": 6600, "outstanding": 6600, "issued_at": NOW.isoformat(), "due_at": NOW.isoformat(),
+            "overdue_days": days, "status": status, "status_label": "", "opening": doc is None, "dunned_n": dunned, "dunned_at": None}
+
+
+def test_F2_ar_overdue(monkeypatch):
+    from hub import finance as FN
+    monkeypatch.setattr(FN, "ar", lambda db, mode, now=None: {"invoices": [_inv(1, 5), _inv(2, 0), _inv(3, 40, doc="ACC-SINV-2026-00003"), _inv(4, 10, "paid")]})
+    f = {x.fkey: x for x in run("F2", _fdb())}
+    assert set(f) == {"INV-00001", "ACC-SINV-2026-00003"} and f["ACC-SINV-2026-00003"].severity == "critical" and f["INV-00001"].severity == "warn"
+    assert f["INV-00001"].values["invoice_id"] == 1
+
+
+def test_F3_credit_over(monkeypatch):
+    from hub import finance as FN
+    rows = [{"customer": "A", "limit": 25000, "exposure": 33000, "balance": 13200, "open_orders": 19800, "hold": False},
+            {"customer": "B", "limit": 40000, "exposure": 9900, "balance": 9900, "open_orders": 0, "hold": False},
+            {"customer": "C", "limit": 10000, "exposure": 20000, "balance": 20000, "open_orders": 0, "hold": True}]
+    monkeypatch.setattr(FN, "credit", lambda db, mode, now=None: rows)
+    assert [x.fkey for x in run("F3", _fdb())] == ["A"]                   # 已经冻结的不再报
+
+
+def test_F4_cash_short(monkeypatch):
+    from hub import finance as FN
+    cf = {"cash": 5000, "weekly_expense": 8000, "weeks": [{"week": 1, "in": 0, "out": 8000, "balance": -3000}, {"week": 2, "in": 0, "out": 20000, "balance": -23000}],
+          "low": {"week": 2, "balance": -23000}}
+    monkeypatch.setattr(FN, "cashflow", lambda db, mode, weeks=8, now=None, assume=None: cf)
+    f = run("F4", _fdb())
+    assert len(f) == 1 and f[0].severity == "critical" and "第 2 周" in f[0].title
+    monkeypatch.setattr(FN, "cashflow", lambda db, mode, weeks=8, now=None, assume=None: dict(cf, low={"week": 1, "balance": 1000}))
+    assert run("F4", _fdb()) == []
+
+
+def test_F5_margin_low(monkeypatch):
+    from hub import finance as FN
+    lines = [{"key": "material", "label": "料", "usd": 5000}, {"key": "labor", "label": "工", "usd": 7000}, {"key": "actions", "label": "急单", "usd": 2000}]
+    monkeypatch.setattr(FN, "objectives", lambda db, mode: [{"metric": "gross_margin", "target": 0.25}])
+    monkeypatch.setattr(FN, "margins", lambda db, mode: [{"sales_order": "SO-1", "margin_pct": 0.12, "revenue": 16500, "cost": 14500, "lines": lines},
+                                                          {"sales_order": "SO-2", "margin_pct": 0.22, "revenue": 16500, "cost": 12900, "lines": lines}])
+    f = run("F5", _fdb())
+    assert [x.fkey for x in f] == ["SO-1"] and "工 $7,000" in f[0].detail          # 22% 在目标 − 5 个百分点以内，不报
+
+
+def test_F6_budget_over(monkeypatch):
+    from hub import finance as FN
+    bv = {"month": "2026-10", "progress": 0.5, "rows": [
+        {"center": "energy", "name": "能源", "budget": 4000, "actual": 2600, "should": 2000, "over": 600},
+        {"center": "labor", "name": "生产人工与折旧", "budget": 30000, "actual": 15500, "should": 15000, "over": 500},
+        {"center": "admin", "name": "管理费用", "budget": 8000, "actual": 9000, "should": 4000, "over": 5000}]}
+    monkeypatch.setattr(FN, "budget_view", lambda db, mode: bv)
+    assert [x.fkey for x in run("F6", _fdb())] == ["2026-10/energy"]       # 超 30% 报；超 3% 不报；管理费用不判
+    monkeypatch.setattr(FN, "budget_view", lambda db, mode: dict(bv, progress=0.02))
+    assert run("F6", _fdb()) == []                                      # 月初不判
+
+
+def test_F7_objective_off(monkeypatch):
+    from hub import finance as FN
+    obs = [{"code": "O1", "name": "准时交付", "tone": "bad", "red_days": 6, "value": 0.8, "target": 0.95, "direction": "ge", "unit": "pct", "history": [1] * 7, "domain": "sales"},
+           {"code": "O3", "name": "一次合格率", "tone": "bad", "red_days": 2, "value": 0.9, "target": 0.97, "direction": "ge", "unit": "pct", "history": [1] * 7, "domain": "quality"},
+           {"code": "O4", "name": "OEE", "tone": "good", "red_days": 0, "value": 0.8, "target": 0.75, "direction": "ge", "unit": "pct", "history": [1] * 7, "domain": "production"}]
+    monkeypatch.setattr(FN, "objectives", lambda db, mode: obs)
+    f = run("F7", _fdb())
+    assert [x.fkey for x in f] == ["O1"] and "80%" in f[0].title

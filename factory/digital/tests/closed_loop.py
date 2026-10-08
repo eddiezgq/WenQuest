@@ -319,7 +319,7 @@ def main():
     check(len(sit["cards"]) == 15 and set(wt) <= {"energy"}, "全厂态势 15 块，待接入：{}（第 18 轮 E6 起能源有计量读数后也接上）".format("、".join(wt) or "没有"))
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
-    check(len(live) == 55 and not [x["id"] for x in live if x["error"]], "规则 55 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+    check(len(live) == 61 and not [x["id"] for x in live if x["error"]], "规则 61 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
 
     print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
     r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
@@ -390,6 +390,7 @@ def main():
     people(teacher)
     supply(teacher)
     energy(teacher)
+    finance(teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -814,6 +815,61 @@ def energy(teacher):
     st = hub("GET", "/api/lab21", token=teacher)
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 21 页：5 个任务，自动评 60 分")
     hub("POST", "/api/energy/sim", {"sim": False}, teacher)
+
+
+def finance(teacher):
+    """第 18 轮 E7：订单做完 → ERPNext 销售发票；来料合格 → 采购发票；登记收款 → 收款单；付款动作 → 付款单；
+    注入逾期 → 应收逾期 F2 → 三个方案 → 销售催款、厂长批准；毛利、指标树、预算、实验 22 页"""
+    print("19. 经营与财务（第 18 轮 E7）")
+    sa = login("测试销售", "sales")
+
+    def inv(pred, what, timeout=240):
+        return wait(lambda: next((x for x in hub("GET", "/api/finance/ar", token=teacher)["invoices"] if pred(x)), None), what, timeout, 4)
+    si = inv(lambda x: x["doc"] and x["status"] in ("open", "paying"), "订单做完开票（ERPNext 销售发票）")
+    check(si is not None, "销售发票 {}：{} ${:,.0f}，订单 {}".format((si or {}).get("doc"), str((si or {}).get("party") or "").split(" ")[0],
+                                                             (si or {}).get("amount", 0), (si or {}).get("ref")))
+    if si:
+        sis = [d for d in erp_docs("Sales Invoice") if d["name"] == si["doc"]]
+        check(bool(sis) and sis[0].get("docstatus") == 1, "ERPNext 销售发票 {} 已提交，未付 ${}".format(si["doc"], sis[0].get("outstanding_amount") if sis else "—"))
+        r = hub("POST", "/api/finance/invoices/{}/receive".format(si["id"]), {}, sa)
+        check(r["status"] == "paying", "登记收款：{}".format(r.get("proposal_id")))
+        paid = wait(lambda: next((x for x in erp_docs("Sales Invoice") if x["name"] == si["doc"] and float(x.get("outstanding_amount") or 0) <= 0.005), None),
+                    "ERPNext 收款单冲销发票", 120, 3)
+        check(paid is not None, "ERPNext 收款后 {} 已付清（{}）".format(si["doc"], (paid or {}).get("status")))
+    ap = wait(lambda: next((x for x in hub("GET", "/api/finance/ap", token=teacher)["invoices"] if x["doc"]), None), "来料合格 → 采购发票", 240, 4)
+    check(ap is not None, "采购发票 {}：{} ${:,.0f}（收货单 {}）".format((ap or {}).get("doc"), str((ap or {}).get("party") or "").split(" ")[0],
+                                                                  (ap or {}).get("amount", 0), (ap or {}).get("ref")))
+    if ap:
+        a = hub("POST", "/api/ont/actions", {"changes": [{"type": "payment", "invoice_id": ap["id"]}]}, sa)
+        for aid in a["ids"]:
+            d = hub("POST", "/api/ont/actions/{}/approve".format(aid), {}, teacher)
+            check(d["status"] in ("done", "executing"), "{}：{}".format(d["title"], (d.get("result") or {}).get("text")))
+        pe = wait(lambda: next((x for x in erp_docs("Purchase Invoice") if x["name"] == ap["doc"] and float(x.get("outstanding_amount") or 0) <= 0.005), None),
+                  "ERPNext 付款单", 120, 3)
+        check(pe is not None, "ERPNext 付款后 {} 已付清".format(ap["doc"]))
+    r = hub("POST", "/api/lab22/inject", {"enable": True}, teacher)
+    check("海港" in r.get("text", ""), "老师注入：{}".format(r.get("text")))
+    an = wait(lambda: next((x for x in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if x["rule"] == "F2" and "海港" in x["title"]), None),
+              "应收逾期异常 F2", 90, 3)
+    check(an is not None, "异常 F2：{}".format((an or {}).get("title")))
+    if an:
+        o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+        kinds = [y["kind"] for y in o["options"]]
+        check(o.get("finance") == "F2" and kinds == ["none", "dunning", "hold"], "应收逾期三方案：{}；{}".format("、".join(y["label"] for y in o["options"]), o.get("reason")))
+        dn = next(y for y in o["options"] if y["kind"] == "dunning")
+        a = hub("POST", "/api/ont/actions", {"changes": dn["changes"], "anomaly_id": an["id"]}, sa)
+        for aid in a["ids"]:
+            d = hub("POST", "/api/ont/actions/{}/approve".format(aid), {}, teacher)
+            check(d["status"] == "done", "{}：{}".format(d["title"], (d.get("result") or {}).get("text")))
+    m = hub("GET", "/api/finance/margins", token=teacher)
+    check(bool(m["margins"]), "订单毛利：{} 张，毛利率 {}".format(len(m["margins"]), m["gross_margin"]))
+    ob = hub("GET", "/api/finance/objectives", token=teacher)
+    check(len(ob["objectives"]) == 7, "经营目标 7 个，达标 {} 个".format(sum(1 for x in ob["objectives"] if x["tone"] == "good")))
+    b = hub("GET", "/api/finance/budget", token=teacher)
+    check(len(b["rows"]) == 7, "{} 预算 7 个成本中心，已用 ${:,.0f} / ${:,.0f}".format(b["month"], b["total_actual"], b["total_budget"]))
+    st = hub("GET", "/api/lab22", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 22 页：5 个任务，自动评 60 分")
+    hub("POST", "/api/finance/sim", {"sim": False}, teacher)
 
 
 if __name__ == "__main__":

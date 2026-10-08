@@ -235,6 +235,12 @@ class ERP {
         }
         // 入库后库存马上更新（放在前面：最后一条要带“提议完成”的标记）
         if (d.action === 'incoming_receipt') out.splice(at, 0, ...await this.bins());
+      } else if (['sales_invoice', 'purchase_invoice', 'payment', 'dunning_note'].includes(d.action)) {
+        // 第 18 轮 E7：销售发票、采购发票、收付款、催款记录
+        for (const r of await this.financeService(d.action, d.preview)) {
+          out.push(this.doc(r[0], r[1], r[2], opt));
+          created.push([r[0], r[1].name]);
+        }
       } else if (d.action === 'people_setup') {
         // 第 18 轮 E4：部门、岗位、员工档案
         for (const r of await this.peopleService(d.action, d.preview)) {
@@ -442,6 +448,74 @@ class ERP {
         const done = await this.update('Purchase Receipt', pr.name, { items, docstatus: 1 });
         out.push(['Purchase Receipt', done, 'submitted']);
       }
+    }
+    return out;
+  }
+
+  // ------------------------------------------------------------ 第 18 轮 E7：经营与财务
+  async financeService(action, pv) {
+    const out = [];
+    const strip = (x) => {
+      const r = { ...x };
+      for (const k of ['name', '__islocal', '__unsaved', 'parent', 'parenttype', 'parentfield', 'idx', 'docstatus']) delete r[k];
+      return r;
+    };
+    const clean = (doc) => {
+      const d = strip(doc);
+      if (Array.isArray(d.items)) d.items = d.items.map(strip);
+      return d;
+    };
+    if (action === 'sales_invoice') {
+      // 按销售订单开票（可以重发：这张订单已有提交的发票就不再开）
+      const had = (await this.list('Sales Invoice', [['Sales Invoice Item', 'sales_order', '=', pv.sales_order], ['docstatus', '=', 1]], ['name']))[0];
+      if (had) return [['Sales Invoice', await this.get('Sales Invoice', had.name), 'updated']];
+      const made = clean(await this.method('erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice', { source_name: pv.sales_order }));
+      if (!(made.items || []).length) throw new Error(`销售订单 ${pv.sales_order} 已经全部开票`);
+      const today = erpDate(new Date().toISOString());
+      made.posting_date = today;
+      made.set_posting_time = 1;
+      made.due_date = pv.due_date && pv.due_date >= today ? pv.due_date : today;
+      made.payment_terms_template = null;
+      made.payment_schedule = [];
+      made.remarks = `问渠数字工厂：订单 ${pv.sales_order} 做完开票${pv.remarks ? '；' + pv.remarks : ''}`;
+      made.docstatus = 1;
+      out.push(['Sales Invoice', await this.insert('Sales Invoice', made), 'submitted']);
+    } else if (action === 'purchase_invoice') {
+      const had = (await this.list('Purchase Invoice', [['Purchase Invoice Item', 'purchase_receipt', '=', pv.purchase_receipt], ['docstatus', '=', 1]], ['name']))[0];
+      if (had) return [['Purchase Invoice', await this.get('Purchase Invoice', had.name), 'updated']];
+      const made = clean(await this.method('erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice', { source_name: pv.purchase_receipt }));
+      const today = erpDate(new Date().toISOString());
+      made.posting_date = today;
+      made.set_posting_time = 1;
+      made.due_date = pv.due_date && pv.due_date >= today ? pv.due_date : today;
+      made.bill_no = pv.bill_no || `WQ-${pv.purchase_receipt}`;
+      made.bill_date = today;
+      made.payment_terms_template = null;
+      made.payment_schedule = [];
+      made.remarks = `问渠数字工厂：收货单 ${pv.purchase_receipt}（批号 ${pv.lot || '—'}）的供应商发票`;
+      made.docstatus = 1;
+      out.push(['Purchase Invoice', await this.insert('Purchase Invoice', made), 'submitted']);
+    } else if (action === 'payment') {
+      // 按发票收款 / 付款（可以重发：发票已经付清就不再建）
+      const inv = await this.get(pv.doctype, pv.invoice);
+      if (Number(inv.outstanding_amount || 0) <= 0.005) return [[pv.doctype, inv, 'updated']];
+      const made = await this.method('erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry', { dt: pv.doctype, dn: pv.invoice });
+      const pe = { ...made };
+      for (const k of ['name', '__islocal', '__unsaved', 'docstatus']) delete pe[k];
+      pe.references = (pe.references || []).map(strip);
+      const today = erpDate(new Date().toISOString());
+      pe.posting_date = today;
+      pe.reference_no = pv.reference_no || `WQ-${pv.invoice}`;
+      pe.reference_date = today;
+      pe.remarks = pv.remarks || `问渠数字工厂：${pv.doctype === 'Sales Invoice' ? '收款' : '付款'} ${pv.invoice}`;
+      pe.docstatus = 1;
+      out.push(['Payment Entry', await this.insert('Payment Entry', pe), 'submitted']);
+      out.push([pv.doctype, await this.get(pv.doctype, pv.invoice), 'updated']);
+    } else if (action === 'dunning_note') {
+      const c = await this.insert('Comment', { comment_type: 'Comment', reference_doctype: 'Sales Invoice', reference_name: pv.invoice,
+        content: pv.content });
+      out.push(['Sales Invoice', await this.get('Sales Invoice', pv.invoice), 'updated']);
+      void c;
     }
     return out;
   }
@@ -769,7 +843,8 @@ class ERP {
   async poll() {
     const out = [];
     for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order', 'Lead', 'Opportunity', 'Quotation', 'Contract', 'Issue',
-      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log', 'Employee', 'Department', 'Designation', 'Purchase Receipt']) {
+      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log', 'Employee', 'Department', 'Designation', 'Purchase Receipt',
+      'Sales Invoice', 'Purchase Invoice', 'Payment Entry']) {
       const since = this.lastModified[dt];
       const filters = since ? [['modified', '>', since]] : [];
       const rows = await this.list(dt, filters, ['name', 'modified'], { order_by: 'modified asc', limit: 200 });
@@ -804,7 +879,7 @@ function summarize(doctype, d) {
   switch (doctype) {
     case 'Sales Order':
       return { ...pick(['customer', 'delivery_date', 'transaction_date', 'status', 'docstatus', 'per_delivered']),
-        items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, delivered_qty: i.delivered_qty || 0 })) };
+        items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, delivered_qty: i.delivered_qty || 0, rate: i.rate })), ...pick(['per_billed']) };
     case 'Work Order':
       return { ...pick(['production_item', 'qty', 'produced_qty', 'status', 'docstatus', 'bom_no',
         'expected_delivery_date']), planned_start_date: String(d.planned_start_date || '').slice(0, 10),
@@ -848,6 +923,15 @@ function summarize(doctype, d) {
     case 'Purchase Receipt':            // 第 18 轮 E5
       return { ...pick(['supplier', 'status', 'docstatus', 'posting_date', 'wq_lot']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, purchase_order: i.purchase_order, quality_inspection: i.quality_inspection })) };
+    case 'Sales Invoice':               // 第 18 轮 E7
+      return { ...pick(['customer', 'status', 'docstatus', 'posting_date', 'due_date', 'grand_total', 'outstanding_amount']),
+        sales_orders: [...new Set((d.items || []).map((i) => i.sales_order).filter(Boolean))] };
+    case 'Purchase Invoice':
+      return { ...pick(['supplier', 'status', 'docstatus', 'posting_date', 'due_date', 'grand_total', 'outstanding_amount', 'bill_no']),
+        purchase_receipts: [...new Set((d.items || []).map((i) => i.purchase_receipt).filter(Boolean))] };
+    case 'Payment Entry':
+      return { ...pick(['payment_type', 'party_type', 'party', 'paid_amount', 'posting_date', 'docstatus']),
+        references: (d.references || []).map((r) => ({ reference_doctype: r.reference_doctype, reference_name: r.reference_name, allocated_amount: r.allocated_amount })) };
     case 'Employee':                    // 第 18 轮 E4（只带工作上的字段：不带生日、电话）
       return pick(['employee_name', 'first_name', 'employee_number', 'department', 'designation', 'status', 'date_of_joining', 'company']);
     case 'Department':

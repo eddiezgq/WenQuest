@@ -531,7 +531,14 @@ def mount(app, H):
                        "并执行；最后算错峰和待机一个月各省多少钱、少排多少碳，区分“省钱”和“省电”。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab21",
             "guide_url": public_base(request) + "/api/cae/lab21/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab21/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab21/report-template.docx"}, {
+            "id": "lab22", "name": {"zh": "实验 22：经营——订单毛利、应收与现金", "en": "Lab 22: business — order margin, receivables and cash"},
+            "summary": "钱在工厂里走两条路：订单 → 开票 → 收款，采购 → 收货 → 发票 → 付款，都在 ERPNext 里。学生先在指挥台的指标树里找没达标的经营指标，"
+                       "按分解表算一张订单的毛利（料、工、电、废品、急单加班、保修）；老师注入一笔客户逾期不付的发票，学生比较“催款 / 信用冻结 / 不处理”"
+                       "（比对模式，看现金流预测）并执行；最后算应收周转天数，找现金最紧的一周，体会“赚钱”和“有钱”的区别。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab22",
+            "guide_url": public_base(request) + "/api/cae/lab22/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab22/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

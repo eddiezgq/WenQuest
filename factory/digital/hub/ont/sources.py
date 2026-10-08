@@ -116,6 +116,7 @@ def tables(B, db, mode):
     people_objs(B, db, mode)
     supply_objs(B, db, mode)
     energy_objs(B, db, mode)
+    finance_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -364,6 +365,31 @@ def supply_objs(B, db, mode):
                                           "price_index": s_["price_index"], "role": "默认" if s_["role"] == "default" else "备选"})
         B.link(mode, "SupplierRating", k, "supplier", s_["supplier"])
         B.obj(mode, "Supplier", s_["supplier"], {"name": s_["supplier"], "lead_days": s_["lead_days"], "category": s_["cat_name"]})
+
+
+def finance_objs(B, db, mode):
+    """经营与财务（第 18 轮 E7）：应收、应付（ERPNext 发票）、经营目标、本月预算"""
+    if not db.one("select to_regclass('invoice') is not null as ok")["ok"]:
+        return
+    from hub import finance as FN
+    for x in db.q("select * from invoice where mode=%s and doc is not null and issued_at > now() - interval '365 days'", (mode,)):
+        t = "Receivable" if x["kind"] == "ar" else "Payable"
+        props = {"amount": x["amount"], "due": x["due_at"].date().isoformat(), "status": FN.STATUS.get(x["status"]), "outstanding": x["outstanding"]}
+        if x["kind"] == "ar":
+            props["overdue_days"] = round(FN.overdue_days(mode, x), 1) if x["status"] == "open" else 0
+        B.obj(mode, t, x["doc"], props)
+        if x["kind"] == "ar":
+            if x["ref"] and x["ref"] != "期初":
+                B.link(mode, t, x["doc"], "sales_order", x["ref"])
+            B.link(mode, t, x["doc"], "customer", x["party"])
+        else:
+            B.link(mode, t, x["doc"], "supplier", x["party"])
+    for o in FN.objectives(db, mode):
+        B.obj(mode, "Objective", o["code"], {"name": o["name"], "period": "本年", "owner": o["owner"], "target": o["target"], "value": o["value"],
+                                              "status": {"good": "达标", "warn": "接近", "bad": "偏离", "mute": "没有数"}[o["tone"]]})
+    bv = FN.budget_view(db, mode)
+    for x in bv["rows"]:
+        B.obj(mode, "Budget", "{}/{}".format(bv["month"], x["center"]), {"name": x["name"], "amount": x["budget"], "actual": x["actual"]})
 
 
 def energy_objs(B, db, mode):

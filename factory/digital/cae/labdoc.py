@@ -18,7 +18,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab18": os.path.join(HERE, "实验18_设备维护策略保养时机的决策.md"),
           "lab19": os.path.join(HERE, "实验19_排班与技能缺人时的决策.md"),
           "lab20": os.path.join(HERE, "实验20_供应链来料不合格与供应商选择.md"),
-          "lab21": os.path.join(HERE, "实验21_能源空转错峰与单件碳足迹.md")}
+          "lab21": os.path.join(HERE, "实验21_能源空转错峰与单件碳足迹.md"),
+          "lab22": os.path.join(HERE, "实验22_经营订单毛利应收与现金.md")}
 
 
 def _doc():
@@ -126,6 +127,8 @@ def report_template_docx(lab="lab8"):
         return lab20_template()
     if lab == "lab21":
         return lab21_template()
+    if lab == "lab22":
+        return lab22_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -835,6 +838,50 @@ def lab21_template():
     hint("错峰和待机，哪个是“省钱”，哪个是“省电”？")
     d.add_heading("六、结论与讨论", 1)
     hint("自动待机设多长合适；错峰对碳排放有没有用；开工率低时每件分摊的电为什么多")
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab22_template():
+    """实验 22 报告模板（第 18 轮 E7-10）"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 22　经营：订单毛利、应收与现金　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、没达标的经营指标（任务 1）", 1)
+    table([["指标", "现在的值", "目标", "数从哪个领域来", "该去哪里找原因"], ["", "", "", "", ""], ["", "", "", "", ""], ["", "", "", "", ""]])
+    d.add_heading("二、订单毛利（任务 2）", 1)
+    table([["项目", "金额 $", "来源（实测 / 标准）"], ["收入", "", ""], ["料", "", ""], ["工（折旧 + 人工）", "", ""], ["电", "", ""], ["废品返工", "", ""],
+           ["急单、加班、外协、加急", "", ""], ["保修", "", ""], ["毛利 / 毛利率", "", ""], ["按标准的毛利率", "", ""]])
+    hint("和按标准比差在哪？报价、工艺、供应商各能改什么？")
+    d.add_heading("三、三个方案（任务 3）", 1)
+    table([["方案", "预计几天收到钱", "现金最低的周与金额", "对客户关系的影响"], ["A 不处理（对照）", "", "", ""], ["B 发催款函", "", "", ""], ["C 信用冻结", "", "", ""]])
+    table([["项目", "记录"], ["选的方案", ""], ["理由", ""], ["中枢建议的方案与理由", ""], ["一样吗？不一样时谁更合理", ""]])
+    d.add_heading("四、执行（任务 4）", 1)
+    table([["步骤", "时间", "谁", "记录"], ["起草、提交", "", "", "动作编号："], ["批准", "", "", ""], ["客户付款（收款单）", "", "", ""]])
+    d.add_heading("五、应收周转与现金（任务 5）", 1)
+    table([["项目", "数值"], ["应收余额", ""], ["近 30 天开票额", ""], ["DSO", ""], ["现金最紧的周与金额", ""], ["DSO 降到 30 天能多出的现金", ""]])
+    d.add_heading("六、结论与讨论", 1)
+    hint("毛利低的原因该找谁改；什么时候不催款、不冻结；为什么赚钱的工厂也会倒闭")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)

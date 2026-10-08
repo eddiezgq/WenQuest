@@ -54,7 +54,7 @@ SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
-    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "supplier": "采购与来料", "energy": "能源与环境", "object": "查一个对象", "overview": "全厂概况",
+    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "supplier": "采购与来料", "energy": "能源与环境", "finance": "经营与财务", "object": "查一个对象", "overview": "全厂概况",
 }
 
 
@@ -392,6 +392,9 @@ class Tools:
             elif a.get("rule") in ("W4", "W6"):
                 from hub import supply as SP
                 ev = SP.alt_options(self.db, self.mode, a)
+            elif a.get("rule") in ("F2", "F3", "F4", "F5", "F6", "F7"):     # 第 18 轮 E7：应收、信用、现金、预算（看现金流）
+                from hub import finance as FN
+                ev = FN.options(self.db, self.mode, a)
             elif a.get("rule") in ("N2", "N3", "N5"):    # 第 18 轮 E6：空转（自动待机）、峰时 / 需量（错峰），车间推演算电费和交期
                 from hub import energy as EG
                 ev = EG.options(self.db, self.mode, a, st, self._ctx_plan(st))
@@ -727,6 +730,33 @@ class Tools:
         c["page"] = self.run.page("energy-carbon", "能源与环境 · 碳与环境", "/energy?tab=carbon")
         return c
 
+    # ---- ㉘ 订单毛利分解（第 18 轮 E7）
+    def order_margin(self, sales_order=None):
+        from hub import finance as FN
+        if sales_order:
+            try:
+                m = FN.margin(self.db, self.mode, sales_order, store=False)
+            except KeyError:
+                return {"error": "没有这张订单：{}".format(sales_order)}
+            return dict(m, ref=self.run.obj("SalesOrder", sales_order), page=self.run.page("finance-margins", "经营与财务 · 订单毛利", "/finance?tab=margins"))
+        ms = FN.margins(self.db, self.mode)
+        tgt = next((o["target"] for o in FN.objectives(self.db, self.mode) if o["metric"] == "gross_margin"), 0.25)
+        return {"margins": [dict(m, ref=self.run.obj("SalesOrder", m["sales_order"])) for m in ms], "gross_margin": FN.gross_margin(self.db, self.mode),
+                "target": tgt, "page": self.run.page("finance-margins", "经营与财务 · 订单毛利", "/finance?tab=margins")}
+
+    # ---- ㉙ 应收应付与现金流
+    def ar_ap_cash(self):
+        from hub import finance as FN
+        a = FN.ar(self.db, self.mode)
+        return {"ar": a, "ap": FN.ap(self.db, self.mode), "credit": FN.credit(self.db, self.mode), "cashflow": FN.cashflow(self.db, self.mode),
+                "dso": FN.dso(self.db, self.mode), "page": self.run.page("finance-arap", "经营与财务 · 应收应付", "/finance?tab=arap")}
+
+    # ---- ㉚ 经营目标与预算
+    def objectives_budget(self):
+        from hub import finance as FN
+        return {"objectives": [dict(o, ref=self.run.obj("Objective", o["code"], o["name"])) for o in FN.objectives(self.db, self.mode)],
+                "budget": FN.budget_view(self.db, self.mode), "page": self.run.page("finance-objectives", "经营与财务 · 经营目标", "/finance?tab=objectives")}
+
     # ---- ⑲ 员工与技能（第 18 轮 E4）
     def people_skills(self, unit=None):
         from hub import people as PE
@@ -858,6 +888,14 @@ def _summary(out):
         return "维修单 {} 张".format(len(out["repairs"]))
     if "suppliers" in out and "single_source" in out:
         return "供应商 {} 家".format(len(out["suppliers"]))
+    if "lines" in out and "margin_pct" in out:
+        return "毛利率 {}".format("{:.1%}".format(out["margin_pct"]) if out["margin_pct"] is not None else "—")
+    if "margins" in out:
+        return "订单 {} 张".format(len(out["margins"]))
+    if "ar" in out and "cashflow" in out:
+        return "应收 ${:,.0f}".format(out["ar"]["total"])
+    if "objectives" in out and "budget" in out:
+        return "目标 {} 个".format(len(out["objectives"]))
     if "by_bucket" in out and "units" in out:
         return "用电 {:,.0f} 度".format(out.get("kwh") or 0)
     if "unit_energy" in out:
@@ -887,7 +925,7 @@ TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", 
               "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
               "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess",
               "maint_overview", "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load", "supplier_scorecard", "batch_trace", "purchasing_status",
-              "energy_overview", "unit_energy", "carbon_account"]
+              "energy_overview", "unit_energy", "carbon_account", "order_margin", "ar_ap_cash", "objectives_budget"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -947,6 +985,12 @@ TOOLS = [
      "input_schema": _S(unit={"type": "string", "description": "设备编号，如 grd-01"})},
     {"name": "carbon_account", "description": "碳核算（外购电力，范围 2）：某月电量 × 电网排放因子，每台设备的排放，每件产品的碳足迹；水、压缩空气用量",
      "input_schema": _S(month={"type": "string", "description": "YYYY-MM"})},
+    {"name": "order_margin", "description": "订单毛利：给订单号看收入、料、工、电、废品、急单加班外协、保修的分解和毛利率（每项说明来源）；不给就列出做完的订单的毛利和目标",
+     "input_schema": _S(sales_order={"type": "string", "description": "如 SAL-ORD-2026-00021"})},
+    {"name": "ar_ap_cash", "description": "应收应付与现金流：应收账龄（未到期 / 逾期分档）、每张未付发票、客户信用额度与余额、应付到期、未来 8 周现金流预测、应收周转天数",
+     "input_schema": _S()},
+    {"name": "objectives_budget", "description": "经营目标与预算：指标树（目标、现在的值、红黄绿、近 7 天红了几天），本月各成本中心预算、实际、按进度应花",
+     "input_schema": _S()},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -1135,6 +1179,9 @@ class Rules:
             return "draft"
         if re.search(r"(\d+)\s*台.*?(\d{1,2})\s*月\s*(\d{1,2})\s*日", q) and re.search(r"订单|安排|接单|生产|交货|WQR", q):
             return "order"
+        if re.search(r"毛利|应收|应付|欠款|欠钱|催款|回款|收款|账龄|现金流|现金|预算|超支|信用额度|信用冻结|经营目标|指标树|发票|DSO|周转天数", q) \
+                and not re.search(r"CP-\d{5}|投诉", q):                       # 第 18 轮 E7：经营与财务
+            return "finance"
         if re.search(r"电费|用电|电量|能耗|单耗|空转|待机|峰时|谷时|错峰|需量|碳排|碳足迹|碳核算|排放|漏气|压缩空气|空压机|油雾|噪声|度电|节能|N[1-6]\b", q) \
                 and not re.search(r"CP-\d{5}|投诉|危废|废弃物", q):          # 第 18 轮 E6：能源与环境
             return "energy"
@@ -1198,6 +1245,8 @@ class Rules:
                  "自己用 F(t) = 1 − exp(−(t/η)^β) 算一算再运行两周坏掉的概率，乘上修理费和停机损失，再和保养的花费比。",
         "supplier": "提示：打开“采购与来料”页：供应商一栏看各家的准时率、合格率和价格，哪几类物料只有一家；到货与检验一栏看抽样数据，按模板的上下限自己判定。"
                     "想一想：便宜的供应商算上晚到和不合格，真的便宜吗？",
+        "finance": "提示：打开“经营与财务”页：经营目标一栏看哪些指标是红的；订单毛利一栏点开一张订单，看料、工、电、废品各花了多少；"
+                   "应收应付一栏看账龄和现金流预测。想一想：逾期的客户是先催款还是先停发货？现金哪一周最紧？",
         "energy": "提示：打开“能源与环境”页：总览里看每台设备的电量条——灰色的“空转”是开着没活；曲线上红色是峰时。"
                   "想一想：空转的设备设“空闲 N 分钟自动待机”能省多少，再开要预热会不会耽误交期？热处理炉挪到峰时以外开，一天省多少电费？"
                   "单件电量乘电网排放因子（页面上写着）就是这一件的碳排放（电力部分）。",
@@ -1226,8 +1275,8 @@ class Rules:
                     "（还有 {} 台高风险设备没覆盖）".format(len(o["uncovered_high"])) if o["uncovered_high"] else "", o["ref"]))
             return lines
         for o in r["options"]:
-            sos = "；".join(self._so_line(s) for s in o["sales_orders"] if s["name"] in r["affected"]) or "没有受影响的订单"
-            lines.append("{} {}：{}，多花 ${:,.0f}{}{} [{}]".format(o["key"], o["label"], sos, o["cost_total"],
+            sos = "；".join(self._so_line(s) for s in o["sales_orders"] if s["name"] in r["affected"]) or o.get("note") or "没有受影响的订单"
+            lines.append("{} {}：{}，{} ${:,.0f}{}{} [{}]".format(o["key"], o["label"], sos, "省" if o["cost_total"] < 0 else "多花", abs(o["cost_total"]),
                                                               "，加班 {} 分钟".format(o["overtime_min"]) if o["overtime_min"] else "",
                                                               "（校验不通过：{}）".format("；".join(o["failed_checks"])) if not o["ok"] else "",
                                                               o["ref"]))
@@ -1478,6 +1527,59 @@ class Rules:
                 "{:.0%}".format(x["on_time"]) if x["on_time"] is not None else "—", x["hist_on_time"],
                 "{:.0%}".format(x["pass_rate"]) if x["pass_rate"] is not None else "—", x["hist_pass"], x["price_index"], x["lead_days"]))
         out.append("单一来源：" + ("、".join(s["cat_name"] for s in r["single_source"]) or "没有") + "。" + r["tco_formula"] + "。")
+        return "\n".join(out)
+
+    # ---- 经营与财务（第 18 轮 E7）
+    def a_finance(self, q):
+        if self.student:
+            return self._hint("finance")
+        if re.search(r"怎么处理|怎么办|方案|该不该", q):
+            a = self.t.db.one("select id from anomaly where mode=%s and rule in ('F2','F3','F4','F6') and status in ('open','ack','doing') "
+                              "order by case severity when 'critical' then 0 when 'warn' then 1 else 2 end, id desc limit 1", (self.t.mode,))
+            if a:
+                return self.a_handle("A-{:05d} 怎么处理".format(a["id"]))
+        so = re.search(r"SAL-ORD-\d{4}-\d{5}", q)
+        if so or re.search(r"毛利", q):
+            r = self.t.order_margin(so.group(0) if so else None)
+            if r.get("error"):
+                return r["error"]
+            if so:
+                out = ["订单 {} [{}]：{} × {:g}，收入 ${:,.0f}，成本 ${:,.0f}，毛利 ${:,.0f}（{}；按标准 {}）[{}]。".format(
+                    r["sales_order"], r["ref"], r["item"], r["qty"], r["revenue"], r["cost"], r["margin"],
+                    "{:.1%}".format(r["margin_pct"]) if r["margin_pct"] is not None else "—",
+                    "{:.1%}".format(r["std_margin_pct"]) if r["std_margin_pct"] is not None else "—", r["page"])]
+                out += ["· {} ${:,.0f}：{}".format(x["label"], x["usd"], x["how"]) for x in r["lines"]]
+                return "\n".join(out)
+            if not r["margins"]:
+                return "还没有做完的订单，算不了毛利 [{}]。".format(r["page"])
+            out = ["做完的订单毛利率 {}（目标 {:.0%}）[{}]：".format("{:.1%}".format(r["gross_margin"]) if r["gross_margin"] is not None else "—", r["target"], r["page"])]
+            out += ["· {} [{}] {}：毛利率 {}".format(m["sales_order"], m["ref"], str(m["customer"] or "").split(" ")[0],
+                                                "{:.1%}".format(m["margin_pct"]) if m["margin_pct"] is not None else "—") for m in r["margins"][:8]]
+            return "\n".join(out)
+        if re.search(r"目标|指标树|预算|超支", q):
+            r = self.t.objectives_budget()
+            out = ["经营目标 [{}]：".format(r["page"])]
+            for o in r["objectives"]:
+                v = o["value"]
+                fmt = (lambda x: "{:.0%}".format(x)) if o["unit"] == "pct" else (lambda x: "{:g}".format(round(float(x), 1)))
+                out.append("· {} [{}]：{}（目标 {}{}）{}".format(o["name"], o["ref"], fmt(v) if v is not None else "—", "≥" if o["direction"] == "ge" else "≤",
+                                                          fmt(o["target"]), {"good": "达标", "warn": "接近", "bad": "偏离", "mute": "没有数"}[o["tone"]]))
+            b = r["budget"]
+            out.append("{} 预算（月度进度 {:.0%}）：".format(b["month"], b["progress"]) + "；".join(
+                "{} ${:,.0f} / ${:,.0f}{}".format(x["name"], x["actual"], x["budget"], "（超）" if x["ratio"] and x["ratio"] > 1.1 else "") for x in b["rows"]) + "。")
+            return "\n".join(out)
+        r = self.t.ar_ap_cash()
+        a = r["ar"]
+        out = ["应收 ${:,.0f}（逾期 ${:,.0f}），应收周转 {} 天 [{}]。账龄：{}。".format(a["total"], a["overdue"], r["dso"] if r["dso"] is not None else "—", r["page"],
+                                                                     "；".join("{} ${:,.0f}".format(a["buckets"][k], v) for k, v in a["aging"].items()))]
+        for x in [x for x in a["invoices"] if x["overdue_days"] > 0][:5]:
+            out.append("· {} {} ${:,.0f} 逾期 {:.0f} 天{}".format(x["party"].split(" ")[0], x["doc"] or "期初", x["outstanding"], x["overdue_days"],
+                                                           "（已催 {} 次）".format(x["dunned_n"]) if x["dunned_n"] else ""))
+        cf = r["cashflow"]
+        out.append("应付 ${:,.0f}。现金 ${:,.0f}；未来 8 周最低在第 {} 周 ${:,.0f}。".format(r["ap"]["total"], cf["cash"], cf["low"]["week"], cf["low"]["balance"]))
+        over = [c for c in r["credit"] if c["used"] and c["used"] > 1]
+        if over:
+            out.append("信用超限：" + "；".join("{} ${:,.0f} / ${:,.0f}".format(c["customer"].split(" ")[0], c["exposure"], c["limit"]) for c in over) + "。")
         return "\n".join(out)
 
     # ---- 能源与环境（第 18 轮 E6）

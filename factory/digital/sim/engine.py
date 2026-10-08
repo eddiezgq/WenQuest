@@ -288,8 +288,11 @@ class Engine:
             f[k] = {"until": t + float(x.get("hours", 24 * 30)) * 3600}
         elif k == "degrade" and u in self.machines:
             f.setdefault("degrade", {})[u] = {"pct": float(x.get("pct", 0.3)), "t0": t}
-        elif k == "ht_peak":
-            s, e = EN.peak_window(self.factory_dt(t).astimezone(self.calendar.tzi))
+        elif k == "ht_peak":                     # 下一个完整的峰时段（正在峰时段里就取再下一个，整段 3 小时都在以后）
+            local = self.factory_dt(t).astimezone(self.calendar.tzi)
+            s, e = EN.peak_window(local)
+            if s is not None and s <= local:
+                s, e = EN.peak_window(e)
             s, e = self.sim_t(s), self.sim_t(e)
             f["ht_peak"] = [s, e]
             for ts in (s, e, e + (e - s)):

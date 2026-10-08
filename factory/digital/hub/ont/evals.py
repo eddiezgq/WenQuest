@@ -102,6 +102,13 @@ def slots(db, mode="teach"):
     s["lot_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     a = db.one("select id from anomaly where mode=%s and rule='N2' and status in ('open','ack','doing') order by id limit 1", (mode,))
     s["idle_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    a = db.one("select id from anomaly where mode=%s and rule='F2' and status in ('open','ack','doing') order by id limit 1", (mode,))
+    s["overdue_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    try:
+        x = db.one("select sales_order from order_margin where mode=%s order by sales_order limit 1", (mode,))
+    except Exception:  # noqa: BLE001
+        x = None
+    s["margin_so"] = x["sales_order"] if x else "SAL-ORD-2026-?????"
     return s
 
 
@@ -236,6 +243,8 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     supply_scene(H)                              # 第 18 轮 E5：一批不合格的轴承（W3）
     from hub import energy as EG                 # 第 18 轮 E6：过去 24 小时的计量读数（忘关、峰时开炉、磨床劣化、漏气）
     EG.energy_scene(H, eng)
+    from hub import finance as FN                # 第 18 轮 E7：目标、预算、信用、期初应收（峰顶搅拌机那笔逾期 5 天）
+    FN.seed(db, "teach", now)
     s.reconcile()
     ai.detector().run("teach", now)
     return H, eng

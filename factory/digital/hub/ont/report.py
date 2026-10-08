@@ -164,6 +164,20 @@ def build(db, mode, kind, start, end):
             data["energy"] = None
     except Exception:  # noqa: BLE001
         data["energy"] = None
+    # ---- 经营与财务（第 18 轮 E7）
+    try:
+        from hub import finance as FN
+        fk = FN.kpis(db, mode)
+        rec = db.one("select coalesce(sum(amount),0) as s, count(*) as n from invoice where mode=%s and kind='ar' and issued_at >= %s and issued_at < %s "
+                     "and status <> 'failed' and not opening", (mode, start, end))
+        got = db.one("select coalesce(sum(amount),0) as s from invoice where mode=%s and kind='ar' and status='paid' and paid_at >= %s and paid_at < %s",
+                     (mode, start, end))["s"]
+        off = [o["name"] for o in FN.objectives(db, mode) if o["tone"] == "bad"]
+        data["finance"] = {"revenue": float(rec["s"]), "invoices": rec["n"], "received": float(got), "gross_margin": fk["gross_margin"], "overdue": fk["ar_overdue"],
+                           "dso": fk["dso"], "budget_used": fk["budget_used"], "progress": fk["progress"], "over_centers": [FN.CENTERS[c] for c in fk["over_centers"]],
+                           "cash": fk["cash"], "objectives_off": off}
+    except Exception:  # noqa: BLE001
+        data["finance"] = None
     # ---- 人员（第 18 轮 E4）
     try:
         from hub import people as PE
@@ -262,6 +276,16 @@ def text_of(kind, data):
         lines.append("采购与来料：到货 {} 批（不合格 {} 批），在途 {} 批，待处理的不合格 {} 批；近 30 天准时率 {}、来料合格率 {}。".format(
             sp["arrived"], sp["rejected"], sp["in_transit"], sp["rejected_open"], "{:.0%}".format(sp["on_time"]) if sp["on_time"] is not None else "—",
             "{:.0%}".format(sp["pass_rate"]) if sp["pass_rate"] is not None else "—"))
+    fi = data.get("finance")
+    if fi:
+        if kind == "weekly":
+            lines.append("经营与财务：开票 {} 张 ${:,.0f}，收款 ${:,.0f}；毛利率 {}；逾期应收 ${:,.0f}，应收周转 {} 天；预算用了 {}（月度进度 {:.0%}）{}；{}。".format(
+                fi["invoices"], fi["revenue"], fi["received"], "{:.1%}".format(fi["gross_margin"]) if fi["gross_margin"] is not None else "—", fi["overdue"],
+                fi["dso"] if fi["dso"] is not None else "—", "{:.0%}".format(fi["budget_used"]) if fi["budget_used"] is not None else "—", fi["progress"],
+                "，超支：" + "、".join(fi["over_centers"]) if fi["over_centers"] else "",
+                "偏离目标的指标：" + "、".join(fi["objectives_off"]) if fi["objectives_off"] else "经营指标都在目标附近"))
+        elif fi["overdue"] or fi["revenue"]:
+            lines.append("现金与应收：现金 ${:,.0f}，逾期应收 ${:,.0f}{}。".format(fi["cash"], fi["overdue"], "；今天开票 ${:,.0f}".format(fi["revenue"]) if fi["revenue"] else ""))
     en = data.get("energy")
     if en and en["kwh"]:
         lines.append("能源与环境（{}）：用电 {:,.0f} 度、电费 ${:,.2f}，峰时占 {:.0%}，空转 {:,.0f} 度（{:.0%}{}），碳排放 {:,.0f} kg；需量到合同的 {:.0%}{}。".format(

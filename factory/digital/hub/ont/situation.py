@@ -71,13 +71,20 @@ def metrics(db, mode, ov, now):
         pk = PE.kpis(db, mode, now)
     except Exception:  # noqa: BLE001
         pk = None
+    try:                                    # 第 18 轮 E7：经营与财务
+        from hub import finance as FN
+        fk = FN.kpis(db, mode)
+        obj = FN.objectives(db, mode)
+    except Exception:  # noqa: BLE001
+        fk, obj = None, []
     try:                                    # 第 18 轮 E6：能源与环境
         from hub import energy as EG
         nk = EG.kpis(db, mode)
     except Exception:  # noqa: BLE001
         nk = None
     M = {
-        "strategy": [("oee", "全厂 OEE（今日）", ov["oee"]["value"], "pct"), ("output", "本周产量", (k.get("output") or {}).get("value"), "int")],
+        "strategy": [("oee", "全厂 OEE（今日）", ov["oee"]["value"], "pct"), ("output", "本周产量", (k.get("output") or {}).get("value"), "int")] + ([
+            ("objectives_met", "经营目标达标", "{} / {}".format(sum(1 for o in obj if o["tone"] == "good"), len(obj)), "text")] if obj else []),
         "customer": [("satisfaction", "满意度（近 30 天，5 分制）", sk.get("satisfaction"), "num"),
                      ("open_complaints", "开着的投诉", sk.get("open_complaints"), "int"),
                      ("funnel", "漏斗金额", pipe.get("funnel_amount"), "usd"),
@@ -109,14 +116,16 @@ def metrics(db, mode, ov, now):
                 ("on_time", "整改按期率（近 30 天）", ek["on_time"], "pct"),
                 ("locked", "挂牌上锁的设备", ek["locked"], "int"),
                 ("training_due", "培训 30 天内到期 / 已过期", ek["training_due"], "int"),
-                ("near_miss", "未遂（近 30 天）", ek["near_miss_30d"], "int")] if ek else [],
+                ("near_miss", "未遂（近 30 天）", ek["near_miss_30d"], "int"), ("major_open", "开着的重大隐患", ek["major_open"], "int")] if ek else [],
         "people": [("attendance", "这一班出勤率", pk["attendance_rate"], "pct"), ("gaps", "24 小时内排班缺口", pk["gaps"], "int"),
                    ("single_points", "单点依赖的设备", pk["single_points"], "int"), ("overtime_h", "本周加班（小时）", pk["overtime_h_week"], "num")]
         if pk else [],
         "energy": [("kwh", "今天用电（度）", nk["kwh"], "int"), ("cost", "今天电费", nk["cost"], "usd"), ("peak_share", "峰时用电占比", nk["peak_share"], "pct"),
                    ("idle_share", "空转电量占比", nk["idle_share"], "pct"), ("co2_kg", "今天碳排放（kg）", nk["co2_kg"], "int"),
                    ("demand_ratio", "需量 / 合同需量（本月）", nk["demand_ratio"], "pct")] if nk else [],
-        "finance": [("cost_var", "本周成本偏差", ov["cost"]["value"], "pct_signed")],
+        "finance": [("cost_var", "本周成本偏差", ov["cost"]["value"], "pct_signed")] + ([
+            ("gross_margin", "毛利率（做完的订单）", fk["gross_margin"], "pct"), ("ar_overdue", "逾期应收", fk["ar_overdue"], "usd"),
+            ("dso", "应收周转天数", fk["dso"], "num"), ("budget_used", "预算已用（本月）", fk["budget_used"], "pct"), ("cash", "现金", fk["cash"], "usd")] if fk else []),
     }
     return M
 

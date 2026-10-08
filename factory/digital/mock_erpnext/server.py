@@ -69,6 +69,13 @@ REQUIRED = {
     "Purchase Receipt": ["supplier", "company", "posting_date", "items"],
     "Purchase Receipt Item": ["item_code", "qty"],
     "Supplier": ["supplier_name"],
+    # 第 18 轮 E7：销售发票、采购发票、收付款（客户端给的；科目、币种等由按单生成的方法带出）
+    "Sales Invoice": ["customer", "company", "posting_date", "due_date", "items", "debit_to"],
+    "Sales Invoice Item": ["item_code", "qty", "rate", "income_account"],
+    "Purchase Invoice": ["supplier", "company", "posting_date", "due_date", "items", "credit_to"],
+    "Purchase Invoice Item": ["item_code", "qty", "rate"],
+    "Payment Entry": ["payment_type", "party_type", "party", "posting_date", "company", "paid_from", "paid_to", "paid_amount", "received_amount"],
+    "Payment Entry Reference": ["reference_doctype", "reference_name", "allocated_amount"],
 }
 SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d}", "Job Card": "PO-JOB{n:05d}",
           "Material Request": "MAT-MR-{y}-{n:05d}", "Quality Inspection": "MAT-QA-{y}-{n:05d}",
@@ -76,7 +83,8 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Lead": "CRM-LEAD-{y}-{n:05d}", "Opportunity": "CRM-OPP-{y}-{n:05d}", "Quotation": "SAL-QTN-{y}-{n:05d}",
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
           "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}",
-          "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}"}
+          "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}",
+          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
             "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name"}
 
@@ -316,6 +324,36 @@ class Mock:
                     po.update(per_received=round(100 * got / tot, 2) if tot else 100, modified=now_str(),
                               status="To Bill" if got >= tot else "To Receive and Bill")
             doc["status"] = "To Bill"
+        elif dt_ in ("Sales Invoice", "Purchase Invoice"):     # 第 18 轮 E7：发票提交后挂账；到期日不能早于过账日
+            if str(doc.get("due_date") or "") < str(doc.get("posting_date") or ""):
+                raise Err(417, "ValidationError", "Due Date cannot be before Posting Date")
+            tot = round(sum(float(i["qty"]) * float(i["rate"]) for i in doc["items"]), 2)
+            for i in doc["items"]:
+                i["amount"] = round(float(i["qty"]) * float(i["rate"]), 2)
+            doc.update(total=tot, net_total=tot, grand_total=tot, rounded_total=tot, outstanding_amount=tot, status="Unpaid")
+            if dt_ == "Sales Invoice":
+                for so_name in {i.get("sales_order") for i in doc["items"] if i.get("sales_order")}:
+                    so = self.db.get("Sales Order", {}).get(so_name)
+                    if so:
+                        billed = sum(float(i["amount"]) for si in self.db.get("Sales Invoice", {}).values() if si.get("docstatus") == 1
+                                     for i in si["items"] if i.get("sales_order") == so_name) + sum(i["amount"] for i in doc["items"] if i.get("sales_order") == so_name)
+                        tot_so = sum(float(r["qty"]) * float(r.get("rate") or 0) for r in so["items"]) or billed
+                        so.update(per_billed=round(min(100, 100 * billed / tot_so), 2) if tot_so else 100, modified=now_str())
+            else:
+                for pr_name in {i.get("purchase_receipt") for i in doc["items"] if i.get("purchase_receipt")}:
+                    pr = self.db.get("Purchase Receipt", {}).get(pr_name)
+                    if pr:
+                        pr.update(status="Completed", per_billed=100, modified=now_str())
+        elif dt_ == "Payment Entry":                   # 第 18 轮 E7：收付款冲减发票的未付金额
+            for r in doc.get("references") or []:
+                inv = self.db.get(r["reference_doctype"], {}).get(r["reference_name"])
+                if inv is None or inv.get("docstatus") != 1:
+                    raise Err(417, "ValidationError", "{} {} 不存在或没提交".format(r["reference_doctype"], r["reference_name"]))
+                if float(r["allocated_amount"]) > float(inv["outstanding_amount"]) + 0.01:
+                    raise Err(417, "ValidationError", "Allocated Amount cannot be greater than outstanding amount")
+                inv["outstanding_amount"] = round(float(inv["outstanding_amount"]) - float(r["allocated_amount"]), 2)
+                inv["status"] = "Paid" if inv["outstanding_amount"] <= 0.005 else "Partly Paid"
+                inv["modified"] = now_str()
         elif dt_ == "Quotation":                       # 真 ERPNext：报价提交后状态 Open，关联的商机改为 Quotation
             doc["status"] = "Open"
             opp = self.db.get("Opportunity", {}).get(doc.get("opportunity") or "")
@@ -436,11 +474,18 @@ def _filters(raw):
     f = json.loads(raw)
     if isinstance(f, dict):
         return [[k, "=", v] for k, v in f.items()]
-    return [x[-3:] if len(x) == 4 else x for x in f]
+    return [(x[0],) + tuple(x[1:]) if len(x) == 4 else tuple(x) for x in f]
 
 
 def _match(doc, flt):
-    for field, op, val in flt:
+    for x in flt:
+        if len(x) == 4:                  # [子表 DocType, 字段, 运算, 值]：任一子表行满足（第 18 轮 E7：按订单找发票）
+            child, field, op, val = x
+            rows = [r for v in doc.values() if isinstance(v, list) for r in v if isinstance(r, dict)]
+            if not any(_match(r, [(field, op, val)]) for r in rows) and not _match(doc, [(field, op, val)]):
+                return False
+            continue
+        field, op, val = x
         v = doc.get(field)
         if op == "=" and str(v) != str(val):
             return False
@@ -485,6 +530,66 @@ def mpr(body: dict = Body(...)):
              for r in po["items"] if float(r["qty"]) > float(r.get("received_qty", 0))]
     return {"message": {"doctype": "Purchase Receipt", "supplier": po["supplier"], "company": po["company"],
                         "posting_date": dt.date.today().isoformat(), "set_warehouse": po.get("set_warehouse"), "items": items, "__islocal": 1}}
+
+
+@app.post("/api/method/erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice")
+def msi(body: dict = Body(...)):
+    """第 18 轮 E7：按销售订单生成销售发票（未保存）：带出没开票的数量、单价、收入科目、应收科目"""
+    so = M.db.get("Sales Order", {}).get(body.get("source_name") or "")
+    if so is None or so.get("docstatus") != 1:
+        raise Err(417, "ValidationError", "销售订单 {} 不存在或没提交".format(body.get("source_name")))
+    billed = {}
+    for si in M.db.get("Sales Invoice", {}).values():
+        if si.get("docstatus") == 1:
+            for i in si["items"]:
+                if i.get("so_detail"):
+                    billed[i["so_detail"]] = billed.get(i["so_detail"], 0) + float(i["qty"])
+    items = [{"item_code": r["item_code"], "qty": float(r["qty"]) - billed.get(r["name"], 0), "rate": float(r.get("rate") or 0),
+              "uom": r.get("uom") or "Nos", "conversion_factor": 1, "sales_order": so["name"], "so_detail": r["name"],
+              "income_account": "Sales - " + ABBR, "cost_center": "Main - " + ABBR}
+             for r in so["items"] if float(r["qty"]) > billed.get(r["name"], 0)]
+    today = dt.date.today().isoformat()
+    return {"message": {"doctype": "Sales Invoice", "customer": so["customer"], "company": so["company"], "posting_date": today, "due_date": today,
+                        "currency": "USD", "conversion_rate": 1, "debit_to": "Debtors - " + ABBR, "items": items, "__islocal": 1}}
+
+
+@app.post("/api/method/erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice")
+def mpi(body: dict = Body(...)):
+    """第 18 轮 E7：按收货单生成采购发票（未保存）"""
+    pr = M.db.get("Purchase Receipt", {}).get(body.get("source_name") or "")
+    if pr is None or pr.get("docstatus") != 1:
+        raise Err(417, "ValidationError", "收货单 {} 不存在或没提交".format(body.get("source_name")))
+    items = [{"item_code": r["item_code"], "qty": float(r["qty"]), "rate": float(r.get("rate") or (M.db["Item"].get(r["item_code"]) or {}).get("valuation_rate") or 0),
+              "uom": r.get("uom") or "Nos", "conversion_factor": 1, "purchase_receipt": pr["name"], "pr_detail": r.get("name"),
+              "purchase_order": r.get("purchase_order"), "expense_account": "Stock Received But Not Billed - " + ABBR}
+             for r in pr["items"]]
+    today = dt.date.today().isoformat()
+    return {"message": {"doctype": "Purchase Invoice", "supplier": pr["supplier"], "company": pr["company"], "posting_date": today, "due_date": today,
+                        "currency": "USD", "conversion_rate": 1, "credit_to": "Creditors - " + ABBR, "items": items, "__islocal": 1}}
+
+
+@app.get("/api/method/erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry")
+@app.post("/api/method/erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry")
+async def gpe(request: Request):
+    """第 18 轮 E7：按发票生成收款 / 付款单（未保存），金额 = 未付金额"""
+    q = dict(request.query_params)
+    if request.method == "POST":
+        try:
+            q.update(await request.json())
+        except Exception:  # noqa: BLE001
+            pass
+    inv = M.db.get(q.get("dt") or "", {}).get(q.get("dn") or "")
+    if inv is None or inv.get("docstatus") != 1:
+        raise Err(417, "ValidationError", "{} {} 不存在或没提交".format(q.get("dt"), q.get("dn")))
+    sale = q["dt"] == "Sales Invoice"
+    amt = float(inv["outstanding_amount"])
+    return {"message": {"doctype": "Payment Entry", "payment_type": "Receive" if sale else "Pay", "company": inv["company"],
+                        "posting_date": dt.date.today().isoformat(), "party_type": "Customer" if sale else "Supplier",
+                        "party": inv["customer"] if sale else inv["supplier"],
+                        "paid_from": inv["debit_to"] if sale else "Cash - " + ABBR, "paid_to": "Cash - " + ABBR if sale else inv["credit_to"],
+                        "paid_amount": amt, "received_amount": amt, "source_exchange_rate": 1, "target_exchange_rate": 1,
+                        "references": [{"reference_doctype": q["dt"], "reference_name": q["dn"], "total_amount": float(inv["grand_total"]),
+                                        "outstanding_amount": amt, "allocated_amount": amt}], "__islocal": 1}}
 
 
 @app.post("/api/method/erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry")
