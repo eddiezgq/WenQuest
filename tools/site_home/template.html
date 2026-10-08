@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<title>WenQuest Robotics Academy · 问渠机器人学院</title>
+<meta name="description" content="WenQuest Robotics Academy · 问渠机器人学院 — courses, a learning platform, a digital factory and virtual robotics labs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Noto+Serif+SC:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --night: #0a1216; --night-2: #111d22; --night-line: #22323a; --night-ink: #e9eef0; --night-muted: #8fa1a8;
+    --paper: #f4f2ec; --surface: #fbfaf6; --ink: #121c21; --muted: #56656b; --line: #d6d2c6;
+    --accent: #f2b705; --accent-ink: #7a5a00; --blue: #5cb8d6;
+    --serif: "Source Serif 4", "Noto Serif SC", Georgia, serif;
+    --serif-zh: "Noto Serif SC", "Source Serif 4", "Songti SC", serif;
+    --body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #0f181c; --surface: #152127; --ink: #e6ecee; --muted: #93a3a9; --line: #2a3a41; --accent-ink: #f2c94c; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #0f181c; --surface: #152127; --ink: #e6ecee; --muted: #93a3a9; --line: #2a3a41; --accent-ink: #f2c94c; color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.7 var(--body); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display: none !important; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
+
+  /* ---------- header ---------- */
+  header.top { position: absolute; inset: 0 0 auto 0; z-index: 3; color: var(--night-ink); }
+  header.top .wrap { display: flex; align-items: center; gap: 28px; height: 72px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; margin-right: auto; }
+  .brand b { font: 600 18px/1 var(--serif); letter-spacing: .01em; }
+  .brand small { font: 500 13px/1 var(--serif); color: var(--night-muted); }
+  .lang { font: 500 14px/1 var(--body); color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+  @media (max-width: 520px) { header.top .wrap { gap: 12px; } .brand small { display: none; } .wq-auth { gap: 10px; } }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; min-height: min(100vh, 920px); background: var(--night); color: var(--night-ink); overflow: hidden; display: flex; align-items: flex-end; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .hero .wrap { position: relative; z-index: 2; width: 100%; padding-block: 140px 56px; pointer-events: none; }
+  .hero .wrap a, .hero .wrap button { pointer-events: auto; }
+  .eyebrow { font: 500 13px/1 var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--accent); margin: 0 0 22px; }
+  h1 { margin: 0; font-weight: 700; line-height: 1.08; }
+  h1 .zh { display: block; font: 900 clamp(40px, 7vw, 92px)/1.05 var(--serif-zh); letter-spacing: .02em; white-space: nowrap; }
+  h1 .en { display: block; font: 400 clamp(22px, 3vw, 36px)/1.25 var(--serif); font-style: italic; color: var(--night-muted); margin-top: 14px; max-width: 30ch; }
+  .motto { margin: 30px 0 0; font: 500 clamp(17px, 2vw, 21px)/1.6 var(--serif-zh); color: var(--night-ink); }
+  .motto i { display: block; font: italic 400 17px/1.6 var(--serif); color: var(--night-muted); }
+  .fig { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 44px; padding-top: 16px; border-top: 1px solid var(--night-line); font: 400 13px/1.5 var(--mono); color: var(--night-muted); }
+  .fig b { color: var(--night-ink); font-weight: 500; }
+  .fig .k { color: var(--accent); }
+  .fig .k2 { color: var(--blue); }
+  .fig button { font: inherit; color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 2px 12px; cursor: pointer; margin-left: auto; }
+  .fig button:hover { border-color: var(--accent); }
+
+  /* ---------- index ---------- */
+  .index { border-bottom: 1px solid var(--line); background: var(--paper); }
+  .index ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .index li a { display: block; padding: 22px 20px 22px 0; text-decoration: none; border-right: 1px solid var(--line); height: 100%; }
+  .index li:last-child a { border-right: 0; }
+  .index li:not(:first-child) a { padding-left: 20px; }
+  .index .no { font: 500 13px/1 var(--mono); color: var(--accent-ink); }
+  .index .t { display: block; font: 700 20px/1.3 var(--serif-zh); margin-top: 8px; }
+  html[lang="en"] .index .t { font-family: var(--serif); font-weight: 600; }
+  .index .s { display: block; font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .index li a:hover .t { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 5px; }
+  @media (max-width: 820px) {
+    .index ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .index li a { border-right: 0; border-bottom: 1px solid var(--line); padding-left: 0 !important; }
+    .index li:nth-child(odd) a { border-right: 1px solid var(--line); }
+    .index li:nth-child(even) a { padding-left: 16px !important; }
+  }
+
+  /* ---------- sections ---------- */
+  section.part { padding-block: 96px; border-bottom: 1px solid var(--line); }
+  .part .head { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 0 32px; margin-bottom: 40px; }
+  .part .roman { font: 400 56px/1 var(--serif); color: var(--accent-ink); }
+  .part h2 { margin: 0; font: 700 clamp(30px, 4vw, 44px)/1.2 var(--serif-zh); text-wrap: balance; }
+  html[lang="en"] .part h2 { font-family: var(--serif); font-weight: 600; }
+  .part .lead { margin: 14px 0 0; max-width: 62ch; color: var(--muted); font-size: 18px; }
+  .part .body { margin-left: 152px; }
+  @media (max-width: 820px) { .part .head { grid-template-columns: 1fr; } .part .roman { font-size: 40px; margin-bottom: 8px; } .part .body { margin-left: 0; } section.part { padding-block: 64px; } }
+
+  .links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+  .lib-note { margin: 12px 0 0; font-size: 14px; color: var(--muted, #5d6873); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; font: 500 15px/1 var(--body); text-decoration: none; padding: 12px 18px; border: 1px solid var(--ink); border-radius: 2px; color: var(--ink); background: transparent; }
+  .btn.solid { background: var(--ink); color: var(--paper); }
+  .btn:hover { border-color: var(--accent-ink); }
+  .btn.solid:hover { background: var(--accent); border-color: var(--accent); color: #121c21; }
+
+  /* courses table */
+  table.courses { width: 100%; border-collapse: collapse; font-size: 16px; }
+  table.courses th { text-align: left; font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); padding: 0 16px 12px 0; border-bottom: 1px solid var(--ink); }
+  table.courses td { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.courses td:first-child { font: 600 19px/1.35 var(--serif-zh); width: 26%; }
+  html[lang="en"] table.courses td:first-child { font-family: var(--serif); }
+  table.courses td.st { white-space: nowrap; font: 500 13px/1.4 var(--mono); color: var(--muted); }
+  table.courses td.st.now { color: var(--accent-ink); }
+  .tbl { overflow-x: auto; }
+  @media (max-width: 700px) { table.courses td:nth-child(3) { display: none; } table.courses th:nth-child(3) { display: none; } }
+
+  /* live figures */
+  figure.live { margin: 0; }
+  .frame { position: relative; border: 1px solid var(--ink); background: var(--night); aspect-ratio: 16 / 9; overflow: hidden; }
+  .frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--night); }
+  .frame.tall { aspect-ratio: 16 / 11; }
+  figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; margin-top: 10px; font: 400 13px/1.5 var(--mono); color: var(--muted); }
+  figcaption b { color: var(--ink); font-weight: 500; }
+  figcaption a { color: var(--accent-ink); }
+  @media (max-width: 700px) { .frame, .frame.tall { aspect-ratio: 3 / 4; } }
+
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin-top: 32px; border-top: 1px solid var(--line); }
+  .facts div { padding: 18px 20px 0 0; }
+  .facts div + div { padding-left: 20px; border-left: 1px solid var(--line); }
+  .facts b { display: block; font: 600 17px/1.4 var(--serif-zh); }
+  html[lang="en"] .facts b { font-family: var(--serif); }
+  .facts span { font-size: 15px; color: var(--muted); }
+  @media (max-width: 700px) { .facts { grid-template-columns: 1fr; } .facts div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); margin-top: 16px; } }
+
+  .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+  @media (max-width: 900px) { .two { grid-template-columns: 1fr; } }
+
+  /* ---------- footer ---------- */
+  footer { background: var(--night); color: var(--night-muted); padding-block: 64px 40px; font-size: 15px; }
+  footer .cols { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 40px; }
+  footer h3 { margin: 0 0 12px; font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  footer p { margin: 0 0 10px; }
+  footer b { color: var(--night-ink); font-weight: 500; }
+  footer .addr { font: 500 16px/1.4 var(--mono); color: var(--night-ink); }
+  footer .copy { background: none; border: 1px solid var(--night-line); color: var(--night-ink); font: inherit; font-size: 13px; padding: 4px 12px; border-radius: 999px; cursor: pointer; margin-left: 8px; }
+  footer .base { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--night-line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font: 400 13px/1.5 var(--mono); }
+  @media (max-width: 820px) { footer .cols { grid-template-columns: 1fr; gap: 28px; } }
+
+  /* ---------- 第 27 轮：下拉菜单 ---------- */
+  header.top .wrap { gap: 18px; }
+  .brand b.zh { font: 900 22px/1 var(--serif-zh); letter-spacing: .04em; }
+  nav.main { display: flex; gap: 2px; }
+  nav.main .dd { position: relative; }
+  nav.main .dd > a, nav.main .dd > button { white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; font: 400 15px/1 var(--body); color: var(--night-muted); text-decoration: none; background: none; border: 0; padding: 10px 9px; cursor: pointer; }
+  nav.main .dd > a:hover, nav.main .dd > button:hover, nav.main .dd.open > button { color: var(--night-ink); }
+  nav.main .dd > button::after { content: "▾"; font-size: 10px; opacity: .7; }
+  nav.main .menu { position: absolute; left: 0; top: 100%; min-width: 220px; background: var(--night-2); border: 1px solid var(--night-line); border-radius: 6px; padding: 8px; display: none; z-index: 10; box-shadow: 0 12px 30px rgba(0,0,0,.35); }
+  nav.main .dd.open .menu, nav.main .dd:hover .menu, nav.main .dd:focus-within .menu { display: block; }
+  nav.main .menu a { display: block; padding: 8px 10px; border-radius: 4px; text-decoration: none; color: var(--night-ink); font-size: 14.5px; line-height: 1.4; }
+  nav.main .menu a small { display: block; color: var(--night-muted); font-size: 12.5px; }
+  nav.main .menu a:hover { background: #1b2d35; }
+  nav.main .menu .sep { height: 1px; background: var(--night-line); margin: 6px 4px; }
+  .brand, .brand b, .brand small, .lang { white-space: nowrap; flex: none; }
+  html[lang="en"] nav.main .dd > a, html[lang="en"] nav.main .dd > button { font-size: 14px; padding: 10px 7px; }
+  header.top .wrap { max-width: 1340px; }
+  html[lang="en"] .brand small { display: none; }
+  @media (max-width: 1439px) { .brand small { display: none; } header.top .wrap { gap: 12px; } }
+  .burger { display: none; margin-left: auto; font: 500 14px/1 var(--body); color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+  @media (max-width: 1279px) {
+    .burger { display: inline-block; }
+    nav.main { display: none; position: absolute; left: 0; right: 0; top: 72px; flex-direction: column; background: var(--night-2); border-block: 1px solid var(--night-line); padding: 8px 20px 16px; max-height: calc(100vh - 80px); overflow-y: auto; }
+    header.top.menu-open nav.main { display: flex; }
+    nav.main .dd > a, nav.main .dd > button { width: 100%; justify-content: space-between; padding: 12px 0; font-size: 16px; color: var(--night-ink); border-bottom: 1px solid var(--night-line); }
+    nav.main .menu { position: static; display: none; box-shadow: none; border: 0; background: none; padding: 4px 0 8px 12px; }
+    nav.main .dd:hover .menu, nav.main .dd:focus-within .menu { display: none; }
+    nav.main .dd.open .menu { display: block; }
+  }
+
+  /* hero buttons */
+  .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; pointer-events: auto; }
+  .hero-cta a { pointer-events: auto; }
+  .btn.gold { background: var(--accent); border-color: var(--accent); color: #121c21; }
+  .btn.ghost { color: var(--night-ink); border-color: var(--night-line); }
+  .btn.ghost:hover { border-color: var(--accent); }
+
+  /* numbers strip */
+  .numbers { background: var(--surface); border-bottom: 1px solid var(--line); }
+  .numbers dl { margin: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .numbers div { padding: 22px 16px 20px 0; }
+  .numbers div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+  .numbers dd { margin: 0; font: 600 30px/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+  .numbers dt { font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+  .numbers .asof { font: 400 12px/1 var(--mono); color: var(--muted); padding: 0 0 14px; }
+  @media (max-width: 900px) { .numbers dl { grid-template-columns: repeat(3, minmax(0, 1fr)); } .numbers div:nth-child(4) { padding-left: 0; border-left: 0; } }
+  @media (max-width: 520px) { .numbers dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } .numbers div { padding-left: 0 !important; border-left: 0 !important; } }
+
+  /* majors */
+  .majors { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .major { display: flex; flex-direction: column; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 22px 20px 20px; min-width: 0; scroll-margin-top: 90px; }
+  .major .no { font: 500 12px/1 var(--mono); color: var(--accent-ink); letter-spacing: .12em; }
+  .major h3 { margin: 0; font: 700 22px/1.3 var(--serif-zh); }
+  html[lang="en"] .major h3 { font-family: var(--serif); font-weight: 600; }
+  .major p { margin: 0; color: var(--muted); font-size: 15px; }
+  .major ul { margin: 0; padding-left: 1.1em; font-size: 15px; }
+  .major .see { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+  .major .see a { color: var(--accent-ink); }
+  .major .soon { font: 400 12.5px/1.4 var(--mono); color: var(--muted); }
+  @media (max-width: 1000px) { .majors { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) { .majors { grid-template-columns: minmax(0, 1fr); } }
+
+  /* how a lesson works */
+  .chainx { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; counter-reset: s; }
+  .chainx li { counter-increment: s; border-top: 3px solid var(--ink); padding-top: 12px; }
+  .chainx li.hot { border-top-color: var(--accent); }
+  .chainx b { display: block; font: 600 18px/1.35 var(--serif-zh); }
+  html[lang="en"] .chainx b { font-family: var(--serif); }
+  .chainx b::before { content: counter(s) " "; font: 500 13px/1 var(--mono); color: var(--accent-ink); }
+  .chainx span { color: var(--muted); font-size: 15px; }
+  @media (max-width: 900px) { .chainx { grid-template-columns: minmax(0, 1fr); } }
+
+  /* industrial park */
+  .plants { width: 100%; border-collapse: collapse; font-size: 15.5px; margin-top: 8px; }
+  .plants td, .plants th { text-align: left; padding: 12px 14px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .plants th { font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--ink); }
+  .plants td:first-child { font: 600 17px/1.35 var(--serif-zh); white-space: nowrap; }
+  html[lang="en"] .plants td:first-child { font-family: var(--serif); }
+  .st-run { color: #3f9a6f; font: 500 13px/1.4 var(--mono); white-space: nowrap; }
+  .st-start { color: var(--accent-ink); font: 500 13px/1.4 var(--mono); white-space: nowrap; }
+  .st-plan { color: var(--muted); font: 500 13px/1.4 var(--mono); white-space: nowrap; }
+  .casecards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 28px; }
+  .casecards a { display: flex; flex-direction: column; gap: 6px; text-decoration: none; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 16px 16px 14px; min-width: 0; }
+  .casecards a:hover { border-color: var(--accent-ink); }
+  .casecards .mono { font: 500 12px/1 var(--mono); color: var(--accent-ink); }
+  .casecards b { font: 600 17px/1.35 var(--serif-zh); }
+  html[lang="en"] .casecards b { font-family: var(--serif); }
+  .casecards span.q { color: var(--muted); font-size: 14px; }
+  @media (max-width: 1000px) { .casecards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .casecards { grid-template-columns: minmax(0, 1fr); } }
+
+  /* course map */
+  .tiers { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+  .tiers button { font: 500 14.5px/1 var(--body); color: var(--ink); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+  .tiers button[aria-selected="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .tier { display: none; }
+  .tier.on { display: block; }
+  .legend-st { display: flex; flex-wrap: wrap; gap: 16px; font-size: 13px; color: var(--muted); margin-top: 14px; }
+  td.st.plan { color: var(--muted); }
+
+  /* join, enroll, about */
+  .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+  .three h3 { margin: 0 0 8px; font: 700 20px/1.35 var(--serif-zh); }
+  html[lang="en"] .three h3 { font-family: var(--serif); font-weight: 600; }
+  .three p { margin: 0 0 10px; color: var(--muted); }
+  .three p b { color: var(--ink); font-weight: 500; }
+  @media (max-width: 900px) { .three { grid-template-columns: minmax(0, 1fr); } }
+  .vm { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; }
+  .vm .k { font: 500 12px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--accent-ink); }
+  .vm p.big { margin: 10px 0 0; font: 600 clamp(22px, 2.6vw, 30px)/1.45 var(--serif-zh); text-wrap: balance; }
+  html[lang="en"] .vm p.big { font-family: var(--serif); }
+  @media (max-width: 800px) { .vm { grid-template-columns: minmax(0, 1fr); } }
+  .note-box { margin-top: 18px; font-size: 14.5px; color: var(--muted); border-left: 3px solid var(--accent); padding-left: 12px; max-width: 62ch; }
+  section.part.alt { background: var(--surface); }
+</style>
+</head>
+<body>
+
+<header class="top" id="topbar">
+  <div class="wrap">
+    <a class="brand" href="/" title="问渠 · 回首页 / Home"><b class="zh">问渠</b><small>WenQuest Robotics</small></a>
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="mainnav"><span data-zh>菜单</span><span data-en>Menu</span></button>
+    <nav class="main" id="mainnav" aria-label="Main">
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>关于我们</span><span data-en>About</span></button>
+        <div class="menu">
+          <a href="#about"><span data-zh>愿景与使命</span><span data-en>Vision &amp; mission</span></a>
+          <a href="#about-founder"><span data-zh>创办人</span><span data-en>Founder</span></a>
+          <a href="#contact"><span data-zh>联系我们</span><span data-en>Contact</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>专业</span><span data-en>Programs</span></button>
+        <div class="menu">
+          <a href="#m-robotics"><span data-zh>机器人工程</span><span data-en>Robotics Engineering</span></a>
+          <a href="#m-micro"><span data-zh>电子信息与微电子</span><span data-en>Electronics &amp; Microelectronics</span></a>
+          <a href="#m-mfg"><span data-zh>智能制造工程</span><span data-en>Smart Manufacturing</span></a>
+          <a href="#m-cs"><span data-zh>计算机科学与技术</span><span data-en>Computer Science</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>课程</span><span data-en>Courses</span></button>
+        <div class="menu">
+          <a href="#courses" data-tier="gen"><span data-zh>通识课</span><span data-en>General education</span></a>
+          <a href="#courses" data-tier="base"><span data-zh>基础课</span><span data-en>Foundations</span></a>
+          <a href="#courses" data-tier="major"><span data-zh>专业课</span><span data-en>Major courses</span></a>
+          <a href="#courses" data-tier="feat"><span data-zh>特色课程</span><span data-en>Signature courses</span></a>
+          <div class="sep"></div>
+          <a href="#how"><span data-zh>一节课怎么上</span><span data-en>How a lesson works</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>数字工厂</span><span data-en>Digital factory</span></button>
+        <div class="menu">
+          <a href="/cases/"><span data-zh>典型应用与案例</span><span data-en>Cases</span><small><span data-zh>协作机器人关节、SCARA、平缝机、数字主线</span><span data-en>Cobot joint, SCARA, lockstitch, digital thread</span></small></a>
+          <a href="#factory"><span data-zh>数字工业园</span><span data-en>Industrial park</span></a>
+          <a href="/factory"><span data-zh>工厂演示</span><span data-en>Factory demo</span></a>
+          <a href="https://factory.wenquestrobotics.com/"><span data-zh>进入数字工厂（登录）</span><span data-en>Enter the factory (sign-in)</span></a>
+          <a href="https://factory.wenquestrobotics.com/library"><span data-zh>零件与机器人库</span><span data-en>Parts &amp; robot library</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>虚拟实验室</span><span data-en>Virtual labs</span></button>
+        <div class="menu">
+          <a href="#labs"><span data-zh>实验室介绍</span><span data-en>About the labs</span></a>
+          <a href="/lab"><span data-zh>倒立摆与二连杆机械臂</span><span data-en>Cart-pole and two-link arm</span></a>
+          <a href="/lab/kinematics"><span data-zh>质点运动学实验台</span><span data-en>Kinematics lab bench</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>学习平台</span><span data-en>Platform</span></button>
+        <div class="menu">
+          <a href="#platform"><span data-zh>平台介绍</span><span data-en>About the platform</span></a>
+          <a href="https://learn.wenquestrobotics.com/"><span data-zh>登录 / 注册</span><span data-en>Sign in / sign up</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>教师与合作</span><span data-en>Teach &amp; partner</span></button>
+        <div class="menu">
+          <a href="#join"><span data-zh>来问渠开课</span><span data-en>Teach on WenQuest</span></a>
+          <a href="#join"><span data-zh>审阅教材</span><span data-en>Review a textbook</span></a>
+          <a href="#join"><span data-zh>学校与企业合作</span><span data-en>Schools &amp; companies</span></a>
+        </div></div>
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>招生与学费</span><span data-en>Admissions</span></button>
+        <div class="menu">
+          <a href="#enroll"><span data-zh>怎样报名</span><span data-en>How to enroll</span></a>
+          <a href="#enroll"><span data-zh>收费</span><span data-en>Fees</span></a>
+          <a href="/kits.html"><span data-zh>真机套件意向登记</span><span data-en>Hardware kit interest</span></a>
+        </div></div>
+      <div class="dd"><a href="#donate"><span data-zh>捐赠</span><span data-en>Give</span></a></div>
+    </nav>
+    <button class="lang" id="langBtn" type="button">EN</button>
+    <span data-wq-auth></span>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" aria-label="WenQuest Robotics Academy">
+    <canvas id="chaos" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow">WenQuest Robotics Academy · <span data-zh>问渠机器人学院</span><span data-en>est. 2026</span></p>
+      <h1><span class="zh">问渠机器人学院</span><span class="en">Model it. Simulate it. Build it.</span></h1>
+      <p class="motto"><span data-zh>四个专业，教材、动画、虚拟实验和一座会运转的数字工厂连成一体。中英双语，免费入门。</span><span data-en>Four programs, with textbooks, animations, virtual labs and a running digital factory built as one. Bilingual, free to start.</span><i>问渠那得清如许，为有源头活水来。 · Every answer has a source.</i></p>
+      <div class="hero-cta">
+        <a class="btn gold" href="https://learn.wenquestrobotics.com/"><span data-zh>免费开始学习</span><span data-en>Start learning free</span> →</a>
+        <a class="btn ghost" href="#join"><span data-zh>学校与老师合作</span><span data-en>Schools &amp; instructors</span></a>
+        <a class="btn ghost" href="/cases/"><span data-zh>看数字工厂案例</span><span data-en>See factory cases</span></a>
+      </div>
+      <div class="fig" aria-live="off">
+        <span><b><span data-zh>图 1</span><span data-en>Fig. 1</span></b> · <span data-zh>两个双摆，初始角只差</span><span data-en>Two double pendulums whose starting angles differ by</span> <b>0.001 rad</b></span>
+        <span>RK4 · dt = 1 ms · <span data-zh>浏览器实时计算</span><span data-en>computed live in your browser</span></span>
+        <span><span class="k">θ₂</span> / <span class="k2">θ₂′</span> <span data-zh>相差</span><span data-en>apart</span> <b id="gap">0.001</b> rad · t = <b id="tt">0.0</b> s</span>
+        <button id="again" type="button"><span data-zh>重新释放</span><span data-en>Release again</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="numbers" aria-label="WenQuest in numbers">
+    <div class="wrap">
+      <dl>
+        <div><dd>9</dd><dt><span data-zh>本自编教材</span><span data-en>textbooks of our own</span></dt></div>
+        <div><dd>__CH__</dd><dt><span data-zh>章已写成（规划 __PLAN__ 章）</span><span data-en>chapters written (of __PLAN__ planned)</span></dt></div>
+        <div><dd>__ANIM__</dd><dt><span data-zh>段 3Blue1Brown 风格动画</span><span data-en>3Blue1Brown-style animations</span></dt></div>
+        <div><dd>__LAB__</dd><dt><span data-zh>个浏览器虚拟实验，配指导书与报告模板</span><span data-en>browser labs, each with guide and report template</span></dt></div>
+        <div><dd>__FLAB__</dd><dt><span data-zh>个数字工厂实验</span><span data-en>digital-factory labs</span></dt></div>
+        <div><dd>31</dd><dt><span data-zh>讲缝纫机课已全部上线，免费</span><span data-en>sewing-machine lessons online, free</span></dt></div>
+      </dl>
+      <p class="asof"><span data-zh>截至 __ASOF__，由仓库自动统计</span><span data-en>As of __ASOF__, counted from our repository</span></p>
+    </div>
+  </section>
+
+  <!-- I. Programs -->
+  <section class="part" id="majors">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">I</div>
+        <div>
+          <h2><span data-zh>四个专业</span><span data-en>Four programs</span></h2>
+          <p class="lead"><span data-zh>课程分通识课、基础课、专业课、特色课程四层。每个专业都落到数字工厂里的真实产品上：设计它、算它、做出来。</span><span data-en>Courses come in four tiers: general education, foundations, major courses and signature courses. Every program lands on a real product in the digital factory: design it, compute it, make it.</span></p>
+        </div>
+      </div>
+      <div class="body" style="margin-left:0">
+        <div class="majors">
+          <article class="major" id="m-robotics">
+            <span class="no">01</span>
+            <h3><span data-zh>机器人工程</span><span data-en>Robotics Engineering</span></h3>
+            <p><span data-zh>从数学和力学出发，到运动学、动力学、控制，再到关节、整机和人形。</span><span data-en>From mathematics and mechanics to kinematics, dynamics and control, then to joints, whole robots and humanoids.</span></p>
+            <ul>
+              <li><span data-zh>《机器人学》（61 章，在写）</span><span data-en><i>Robotics</i> (61 chapters, in progress)</span></li>
+              <li><span data-zh>控制与运动学 · 机械设计 · PLC</span><span data-en>Control &amp; kinematics · machine design · PLC</span></li>
+              <li><span data-zh>特色：移动机器人、人形机器人与具身智能</span><span data-en>Signature: mobile robots, humanoids and embodied AI</span></li>
+            </ul>
+            <div class="see"><a href="/cases/cobot-joint.html"><span data-zh>案例：协作机器人关节，从力矩算到车间做出来 →</span><span data-en>Case: a cobot joint, from torque to finished parts →</span></a><a href="/lab"><span data-zh>实验：倒立摆与二连杆机械臂 →</span><span data-en>Lab: cart-pole and two-link arm →</span></a><span class="soon"><span data-zh>专业介绍页建设中</span><span data-en>Program page coming</span></span></div>
+          </article>
+          <article class="major" id="m-micro">
+            <span class="no">02</span>
+            <h3><span data-zh>电子信息与微电子</span><span data-en>Electronics &amp; Microelectronics</span></h3>
+            <p><span data-zh>从晶体管到芯片版图，全部用开源工具，在浏览器里做电路仿真和 Verilog 综合。</span><span data-en>From transistors to chip layout with open-source tools, simulating circuits and synthesizing Verilog right in the browser.</span></p>
+            <ul>
+              <li><span data-zh>《数字集成电路设计》（在写）</span><span data-en><i>Digital IC Design</i> (in progress)</span></li>
+              <li><span data-zh>电路、模电数电、信号与系统等 21 门课的方案</span><span data-en>A 21-course plan: circuits, analog, digital, signals…</span></li>
+              <li><span data-zh>特色：贯通项目 RTL → GDS，优秀作品可流片</span><span data-en>Signature: an RTL → GDS project; the best designs can be taped out</span></li>
+            </ul>
+            <div class="see"><span class="soon"><span data-zh>电路板厂、芯片厂在数字工厂里建设中；专业介绍页建设中</span><span data-en>PCB and chip plants under construction in the factory; program page coming</span></span></div>
+          </article>
+          <article class="major" id="m-mfg">
+            <span class="no">03</span>
+            <h3><span data-zh>智能制造工程</span><span data-en>Smart Manufacturing</span></h3>
+            <p><span data-zh>机械设计、制造工艺、PLC，再加 ERP、MES、仓储和数字孪生，在一座会运转的工厂里学。</span><span data-en>Machine design, manufacturing processes and PLCs, plus ERP, MES, warehousing and digital twins, learned inside a factory that runs.</span></p>
+            <ul>
+              <li><span data-zh>《机械设计》《机械制造技术》《PLC 原理及实践》</span><span data-en><i>Machine Design</i>, <i>Manufacturing Technology</i>, <i>PLC</i></span></li>
+              <li><span data-zh>缝纫机设计与制造（31 讲，已上线）</span><span data-en>Sewing machine design &amp; manufacturing (31 lessons, online)</span></li>
+              <li><span data-zh>特色：智能装备与绿色制造、工厂运营与工业软件</span><span data-en>Signature: smart equipment &amp; green manufacturing; factory operations &amp; industrial software</span></li>
+            </ul>
+            <div class="see"><a href="/cases/digital-thread.html"><span data-zh>案例：一台报警，追到车间那片砂轮 →</span><span data-en>Case: from one complaint to one grinding wheel →</span></a><a href="/cases/lockstitch.html"><span data-zh>案例：直驱平缝机选电机 →</span><span data-en>Case: sizing a direct-drive lockstitch motor →</span></a><span class="soon"><span data-zh>专业介绍页建设中</span><span data-en>Program page coming</span></span></div>
+          </article>
+          <article class="major" id="m-cs">
+            <span class="no">04</span>
+            <h3><span data-zh>计算机科学与技术</span><span data-en>Computer Science</span></h3>
+            <p><span data-zh>AI 原生的计算机专业：从大一的 AI 结对编程到大三的智能体开发，课程实验调用云端 GPU。</span><span data-en>An AI-native CS program: from pair-programming with AI in year one to building agents in year three, with cloud GPUs for labs.</span></p>
+            <ul>
+              <li><span data-zh>《人工智能》（AI 与 CUDA、典型应用，在写）</span><span data-en><i>Artificial Intelligence</i> (AI &amp; CUDA, applications; in progress)</span></li>
+              <li><span data-zh>数据结构、操作系统、计算机网络（建设中）</span><span data-en>Data structures, operating systems, networks (planned)</span></li>
+              <li><span data-zh>特色：GPU 云实验、机器人软件与 ROS 2、工业软件开发</span><span data-en>Signature: cloud GPU labs, robot software and ROS 2, industrial software</span></li>
+            </ul>
+            <div class="see"><span class="soon"><span data-zh>专业介绍页建设中</span><span data-en>Program page coming</span></span></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- II. How a lesson works -->
+  <section class="part alt" id="how">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">II</div>
+        <div>
+          <h2><span data-zh>一节课怎么上</span><span data-en>How a lesson works</span></h2>
+          <p class="lead"><span data-zh>理工科每一节课都走同一条线。实际问题以机器人为主，再配一个生活里的例子。</span><span data-en>Every science and engineering lesson follows the same line. The problem is usually a robot, paired with one everyday example.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <ol class="chainx">
+          <li><b><span data-zh>实际问题</span><span data-en>A real problem</span></b><span><span data-zh>比如：机械臂抓传送带上的零件，要提前多少出手？</span><span data-en>Say: how early must an arm reach for a part on a conveyor?</span></span></li>
+          <li><b><span data-zh>概念</span><span data-en>The concept</span></b><span><span data-zh>教材里讲清楚，每个数都由程序算出，不是手抄的。</span><span data-en>Explained in our textbook; every number is computed by code, not copied.</span></span></li>
+          <li><b><span data-zh>动画</span><span data-en>Animation</span></b><span><span data-zh>3Blue1Brown 风格，表现静态图表现不了的变化。</span><span data-en>3Blue1Brown style, showing change a still figure cannot.</span></span></li>
+          <li class="hot"><b><span data-zh>虚拟实验</span><span data-en>Virtual lab</span></b><span><span data-zh>浏览器里调参数、看结果，任务完成自动打勾。<a href="/lab/kinematics">试一个 →</a></span><span data-en>Tune and test in the browser; tasks tick themselves. <a href="/lab/kinematics">Try one →</a></span></span></li>
+          <li><b><span data-zh>建模求解</span><span data-en>Model and solve</span></b><span><span data-zh>写出模型、求解、检验，再说清模型在哪里失效。</span><span data-en>Build the model, solve, check, then say where it breaks.</span></span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- III. Courses -->
+  <section class="part" id="courses">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">III</div>
+        <div>
+          <h2><span data-zh>课程地图</span><span data-en>Course map</span></h2>
+          <p class="lead"><span data-zh>状态照实写：已上线的可以直接学，编写中的教材按章上线，规划中的还没有开始。</span><span data-en>Status as it really is: online courses are open now, textbooks in progress go live chapter by chapter, planned ones have not started.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <div class="tiers" role="tablist">
+          <button type="button" role="tab" data-t="gen" aria-selected="false"><span data-zh>通识课</span><span data-en>General education</span></button>
+          <button type="button" role="tab" data-t="base" aria-selected="true"><span data-zh>基础课</span><span data-en>Foundations</span></button>
+          <button type="button" role="tab" data-t="major" aria-selected="false"><span data-zh>专业课</span><span data-en>Major courses</span></button>
+          <button type="button" role="tab" data-t="feat" aria-selected="false"><span data-zh>特色课程</span><span data-en>Signature courses</span></button>
+        </div>
+__TIERS__
+        <div class="links">
+          <a class="btn solid" href="https://learn.wenquestrobotics.com/"><span data-zh>进入学习平台上课</span><span data-en>Go to class</span> →</a>
+          <a class="btn" href="/lab/kinematics"><span data-zh>试做大学物理第 1 章虚拟实验</span><span data-en>Try the Physics Ch. 1 labs</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- IV. Factory -->
+  <section class="part alt" id="factory">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">IV</div>
+        <div>
+          <h2><span data-zh>数字工厂：一座教学工业园</span><span data-en>The digital factory: a teaching industrial park</span></h2>
+          <p class="lead"><span data-zh>按真实企业数据运转：ERP、工艺、MRP、MES、质量、设备、能源和厂情中枢都在系统里。几座工厂互为上下游，学生在这里设计产品、排产、算成本、追问题。</span><span data-en>It runs on realistic company data: ERP, process plans, MRP, MES, quality, equipment, energy and a command center. The plants supply one another; students design products, schedule, cost and trace problems here.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <div class="casecards">
+          <a href="/cases/cobot-joint.html"><span class="mono"><span data-zh>典型应用 01</span><span data-en>Case 01</span></span><b><span data-zh>协作机器人关节</span><span data-en>Cobot joint</span></b><span class="q"><span data-zh>只用现成零件，能不能做出一台协作机器人的肩关节？</span><span data-en>Can a cobot shoulder be built from catalogue parts alone?</span></span></a>
+          <a href="/cases/scara.html"><span class="mono"><span data-zh>典型应用 02</span><span data-en>Case 02</span></span><b><span data-zh>SCARA 机器人</span><span data-en>SCARA robot</span></b><span class="q"><span data-zh>节拍定了 0.4 秒，零件库能不能供得上？</span><span data-en>A 0.4 s cycle: can the library supply it?</span></span></a>
+          <a href="/cases/lockstitch.html"><span class="mono"><span data-zh>典型应用 03</span><span data-en>Case 03</span></span><b><span data-zh>直驱平缝机</span><span data-en>Direct-drive lockstitch</span></b><span class="q"><span data-zh>每分钟 5000 针，主轴电机该选多大？</span><span data-en>5,000 stitches a minute: how big a motor?</span></span></a>
+          <a href="/cases/digital-thread.html"><span class="mono"><span data-zh>专题案例 04</span><span data-en>Topic case 04</span></span><b><span data-zh>一台报警，追到砂轮</span><span data-en>From complaint to wheel</span></b><span class="q"><span data-zh>客户一个电话，追到车间那片砂轮，再找出同样隐患的设备。</span><span data-en>One call, traced to one grinding wheel and forward to every unit at risk.</span></span></a>
+        </div>
+        <div class="tbl" style="margin-top:28px">
+          <table class="plants">
+            <thead><tr><th><span data-zh>工厂</span><span data-en>Plant</span></th><th><span data-zh>产品</span><span data-en>Products</span></th><th><span data-zh>主要课程</span><span data-en>Main courses</span></th><th><span data-zh>状态</span><span data-en>Status</span></th></tr></thead>
+            <tbody>
+              <tr><td><span data-zh>减速器厂</span><span data-en>Gearbox plant</span></td><td><span data-zh>二级圆柱齿轮减速器 WQR-105</span><span data-en>Two-stage gearbox WQR-105</span></td><td><span data-zh>机械设计、机械制造技术、ERP / MES、质量、数字孪生</span><span data-en>Machine design, manufacturing, ERP/MES, quality, digital twins</span></td><td class="st-run"><span data-zh>运行中</span><span data-en>Running</span></td></tr>
+              <tr><td><span data-zh>机器人厂</span><span data-en>Robot plant</span></td><td><span data-zh>协作机器人关节 COBOT-J2、SCARA-600 已进厂</span><span data-en>Cobot joint COBOT-J2 and SCARA-600 already in production</span></td><td><span data-zh>机器人学、控制与运动学、伺服驱动</span><span data-en>Robotics, control &amp; kinematics, servo drives</span></td><td class="st-start"><span data-zh>起步</span><span data-en>Starting</span></td></tr>
+              <tr><td><span data-zh>电路板厂</span><span data-en>PCB plant</span></td><td><span data-zh>伺服驱动板、控制板：设计 → 贴片 → 检测</span><span data-en>Servo and control boards: design → SMT → test</span></td><td><span data-zh>电路、模电数电、嵌入式</span><span data-en>Circuits, electronics, embedded systems</span></td><td class="st-plan"><span data-zh>建设中</span><span data-en>Planned</span></td></tr>
+              <tr><td><span data-zh>传感器厂</span><span data-en>Sensor plant</span></td><td><span data-zh>编码器、力矩传感器、IMU</span><span data-en>Encoders, torque sensors, IMUs</span></td><td><span data-zh>大学物理、传感器与检测、信号与系统</span><span data-en>Physics, sensing, signals &amp; systems</span></td><td class="st-plan"><span data-zh>建设中</span><span data-en>Planned</span></td></tr>
+              <tr><td><span data-zh>芯片厂</span><span data-en>Chip plant</span></td><td><span data-zh>晶圆制造与封装测试，接问渠自己的 RTL → GDS 设计</span><span data-en>Wafer fab and packaging, fed by our own RTL → GDS designs</span></td><td><span data-zh>微电子方向各课</span><span data-en>Microelectronics courses</span></td><td class="st-plan"><span data-zh>建设中</span><span data-en>Planned</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure class="live" style="margin-top:32px">
+          <div class="frame tall"><iframe src="/factory" title="Digital factory" loading="lazy"></iframe></div>
+          <figcaption><span><b><span data-zh>图 2</span><span data-en>Fig. 2</span></b> · <span data-zh>数字工厂演示画面（实际工厂需登录），基于开源 ERP（ERPNext）</span><span data-en>Digital factory demo (the live factory needs sign-in), built on open-source ERP (ERPNext)</span></span><a href="/factory"><span data-zh>全屏打开</span><span data-en>Open full screen</span> ↗</a></figcaption>
+        </figure>
+        <div class="links">
+          <a class="btn solid" href="/cases/"><span data-zh>全部案例</span><span data-en>All cases</span> →</a>
+          <a class="btn" href="https://factory.wenquestrobotics.com/"><span data-zh>进入数字工厂</span><span data-en>Enter the digital factory</span></a>
+          <a class="btn" href="https://factory.wenquestrobotics.com/library"><span data-zh>零件与机器人库</span><span data-en>Parts &amp; robot library</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- V. Labs -->
+  <section class="part" id="labs">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">V</div>
+        <div>
+          <h2><span data-zh>机器人虚拟实验室</span><span data-en>Virtual robotics labs</span></h2>
+          <p class="lead"><span data-zh>物理仿真直接在浏览器里运行，调参、失败、重来只要几秒。AI 助教读你的实验曲线，指出现象和原因，但不代你完成。</span><span data-en>Physics runs right in your browser, so tuning, failing and retrying take seconds. The AI tutor reads your traces and explains what happened, without doing the work for you.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <div class="two">
+          <figure class="live">
+            <div class="frame tall"><iframe src="/lab" title="Robotics lab" loading="lazy"></iframe></div>
+            <figcaption><span><b><span data-zh>图 3</span><span data-en>Fig. 3</span></b> · <span data-zh>倒立摆 PID 与二连杆机械臂</span><span data-en>Cart-pole PID and two-link arm</span></span><a href="/lab"><span data-zh>打开</span><span data-en>Open</span> ↗</a></figcaption>
+          </figure>
+          <figure class="live">
+            <div class="frame tall"><iframe src="/lab/kinematics" title="Kinematics lab bench" loading="lazy"></iframe></div>
+            <figcaption><span><b><span data-zh>图 4</span><span data-en>Fig. 4</span></b> · <span data-zh>质点运动学实验台（中 / EN）</span><span data-en>Kinematics lab bench (EN / 中)</span></span><a href="/lab/kinematics"><span data-zh>打开</span><span data-en>Open</span> ↗</a></figcaption>
+          </figure>
+        </div>
+        <p class="lead" style="margin-top:28px;font-size:16px"><span data-zh>倒立摆方程已与 MuJoCo 3.4 逐步对照。实体机器人实验室在筹建中：先在仿真里做对，以后再上真机。</span><span data-en>The cart-pole equations are checked step by step against MuJoCo 3.4. A physical robot lab is being planned: get it right in simulation first, then on real hardware.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VI. Platform -->
+  <section class="part alt" id="platform">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">VI</div>
+        <div>
+          <h2><span data-zh>学习平台 · 问渠</span><span data-en>Learning platform · WenQuest</span></h2>
+          <p class="lead"><span data-zh>老师交来一堆杂乱的资料，或只说一句要求，AI 就能整理出一门完整的课。每个回答都依据课程资料，并注明出处。</span><span data-en>Hand it a pile of messy files, or just one sentence, and the AI builds a complete course. Every answer is grounded in the course materials and cites its source.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <figure class="live">
+          <div class="frame"><iframe src="/demo" title="WenQuest demo" loading="lazy"></iframe></div>
+          <figcaption><span><b><span data-zh>图 5</span><span data-en>Fig. 5</span></b> · <span data-zh>问渠平台动态演示：一次提问怎样从学生走到大模型再回来</span><span data-en>Platform walkthrough: how a question travels from student to model and back</span></span><a href="/demo"><span data-zh>全屏打开</span><span data-en>Open full screen</span> ↗</a></figcaption>
+        </figure>
+        <div class="facts">
+          <div><b><span data-zh>AI 建课</span><span data-en>AI course building</span></b><span><span data-zh>对话中建课，资料再乱也由 AI 整理</span><span data-en>Build by conversation; the AI sorts the materials</span></span></div>
+          <div><b><span data-zh>网页互动课件</span><span data-en>Interactive web slides</span></b><span><span data-zh>动画、虚拟实验、三维模型嵌在课件里当场操作</span><span data-en>Animations, labs and 3D models run inside the slides</span></span></div>
+          <div><b><span data-zh>网页与微信小程序</span><span data-en>Web and WeChat</span></b><span><span data-zh>一套代码，腾讯会议与 Zoom 直播课</span><span data-en>One codebase; live classes on Tencent Meeting or Zoom</span></span></div>
+        </div>
+        <div class="links">
+          <a class="btn solid" href="https://learn.wenquestrobotics.com/"><span data-zh>登录学习平台</span><span data-en>Sign in</span> →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VII. Join / enroll -->
+  <section class="part" id="join">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">VII</div>
+        <div>
+          <h2><span data-zh>教师、学校与企业</span><span data-en>Instructors, schools and companies</span></h2>
+          <p class="lead"><span data-zh>课程向全世界的贡献者开放。来开课、来审稿、来合作，都请来信。</span><span data-en>Our courses are open to contributors worldwide. To teach, review or partner, write to us.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <div class="three">
+          <div><h3><span data-zh>来问渠开课</span><span data-en>Teach on WenQuest</span></h3><p><span data-zh>用问渠的教材、动画、实验和数字工厂开你的课。<b>入驻开课的老师分得课程收入的 40%。</b></span><span data-en>Teach with our textbooks, animations, labs and factory. <b>Instructors receive 40% of course revenue.</b></span></p></div>
+          <div><h3><span data-zh>审阅教材</span><span data-en>Review a textbook</span></h3><p><span data-zh>每本教材按章请专家审阅。审阅是义务支持，在教材和网站上署名致谢。</span><span data-en>Each textbook is reviewed chapter by chapter. Reviewing is volunteer work, acknowledged by name in the book and on this site.</span></p></div>
+          <div><h3><span data-zh>学校与企业</span><span data-en>Schools and companies</span></h3><p><span data-zh>学校可以共建示范课，企业可以预约演示工厂、用数字工厂做设计与仿真。</span><span data-en>Schools can co-build a pilot course; companies can book the demo factory or use it for design and simulation.</span></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="part alt" id="enroll">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">VIII</div>
+        <div>
+          <h2><span data-zh>招生与学费</span><span data-en>Admissions and fees</span></h2>
+          <p class="lead"><span data-zh>注册免费。学生自由选课：部分课程免费，其余按课程学分收费。</span><span data-en>Sign-up is free. Students choose their own courses: some are free, the rest are charged per credit.</span></p>
+        </div>
+      </div>
+      <div class="body">
+        <div class="three">
+          <div><h3><span data-zh>1 · 免费注册</span><span data-en>1 · Sign up free</span></h3><p><span data-zh>在学习平台注册账号，就能看公开内容、做部分虚拟实验。</span><span data-en>Create an account on the platform to read open content and try many labs.</span></p></div>
+          <div><h3><span data-zh>2 · 选课</span><span data-en>2 · Choose courses</span></h3><p><span data-zh>在课程目录里申请加入课程。缝纫机设计与制造等课程免费。</span><span data-en>Request to join courses from the catalogue. Sewing Machine Design &amp; Manufacturing and others are free.</span></p></div>
+          <div><h3><span data-zh>3 · 学分与证书</span><span data-en>3 · Credits and certificates</span></h3><p><span data-zh>按学分收费的价格和专业报名办法即将公布。问渠发结业证书，不是学位。</span><span data-en>Per-credit prices and program enrolment are coming soon. WenQuest issues certificates of completion, not degrees.</span></p></div>
+        </div>
+        <div class="links"><a class="btn solid" href="https://learn.wenquestrobotics.com/"><span data-zh>免费注册</span><span data-en>Sign up free</span> →</a><a class="btn" href="/kits.html"><span data-zh>真机套件意向登记</span><span data-en>Hardware kit interest</span></a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="part" id="about">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">IX</div>
+        <div><h2><span data-zh>关于我们</span><span data-en>About us</span></h2></div>
+      </div>
+      <div class="body">
+        <div class="vm">
+          <div><span class="k"><span data-zh>愿景</span><span data-en>Vision</span></span><p class="big"><span data-zh>让每个想学机器人的人，都能用上世界一流的教材、实验和工厂。</span><span data-en>Anyone who wants to learn robotics can use world-class textbooks, labs and factories.</span></p></div>
+          <div><span class="k"><span data-zh>使命</span><span data-en>Mission</span></span><p class="big"><span data-zh>用 AI 把好课程的成本降到最低：教材、动画、虚拟实验、数字工厂一体，中英双语，免费入门，学以致用。</span><span data-en>Use AI to bring the cost of a great course down to almost nothing: textbooks, animations, virtual labs and a digital factory in one, bilingual, free to start, built for real work.</span></p></div>
+        </div>
+        <div class="three" style="margin-top:44px">
+          <div id="about-founder"><h3><span data-zh>创办人</span><span data-en>Founder</span></h3><p><span data-zh><b>张国庆（Eddie Zhang）</b>，曾任大学教授、院长和校长。课程是他半生从教之后对社会的回馈，不作为生意经营。</span><span data-en><b>Guoqing (Eddie) Zhang</b>, a former university professor, dean and president. The courses are his way of giving back after a lifetime in education, not run as a business.</span></p></div>
+          <div id="donate"><h3><span data-zh>捐赠与支持</span><span data-en>Give and support</span></h3><p><span data-zh>你的捐赠用来写教材、做实验、补贴学生。在线捐赠通道正在准备，现在请来信联系。</span><span data-en>Gifts fund textbooks, labs and student support. Online giving is being set up; for now, please write to us.</span></p></div>
+          <div id="contact"><h3><span data-zh>联系我们</span><span data-en>Contact</span></h3><p><span data-zh>来信介绍你的背景和想做的事：学习、开课、审稿、合作或捐赠。</span><span data-en>Tell us who you are and what you have in mind: learning, teaching, reviewing, partnering or giving.</span></p><p><span class="addr" id="addr" style="font-family:var(--mono)">info@wenquestrobotics.com</span> <button class="btn" id="copy" type="button" style="padding:6px 12px"><span data-zh>复制</span><span data-en>Copy</span></button></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h3><span data-zh>问渠机器人学院</span><span data-en>WenQuest Robotics Academy</span></h3>
+        <p><span data-zh>四个专业，教材、动画、虚拟实验和数字工厂一体。中英双语。</span><span data-en>Four programs; textbooks, animations, virtual labs and a digital factory in one. Bilingual.</span></p>
+        <p><a href="/" style="color:var(--night-ink)"><span data-zh>回首页</span><span data-en>Home</span></a> · <a href="/cases/" style="color:var(--night-ink)"><span data-zh>数字工厂案例</span><span data-en>Factory cases</span></a> · <a href="https://learn.wenquestrobotics.com/" style="color:var(--night-ink)"><span data-zh>学习平台</span><span data-en>Platform</span></a></p>
+      </div>
+      <div>
+        <h3><span data-zh>AI 助教</span><span data-en>AI tutor</span></h3>
+        <p><span data-zh>只依据课程资料回答并注明出处；作业和实验只引导思路；评分建议由老师复核后才生效。</span><span data-en>Answers only from course materials, with sources; guides rather than solves; grading suggestions count only after an instructor reviews them.</span></p>
+      </div>
+      <div>
+        <h3><span data-zh>联系方式</span><span data-en>Contact</span></h3>
+        <p class="addr">info@wenquestrobotics.com</p>
+      </div>
+    </div>
+    <div class="base"><span>© 2026 WenQuest Robotics Academy · 问渠机器人学院</span><span><a href="/terms.html"><span data-zh>用户协议</span><span data-en>Terms</span></a> · <a href="/privacy.html"><span data-zh>隐私说明</span><span data-en>Privacy</span></a> · wenquestrobotics.com</span></div>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // ---- language ----
+  const root = document.documentElement, btn = document.getElementById("langBtn");
+  let stored = null;
+  try { stored = localStorage.getItem("wq-site-lang"); } catch (e) {}
+  let lang = stored || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+  const setLang = (l) => { lang = l; root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", l); } catch (e) {} };
+  setLang(lang);
+  btn.onclick = () => setLang(lang === "en" ? "zh" : "en");
+
+  // ---- copy email ----
+  const copy = document.getElementById("copy");
+  copy.onclick = async () => {
+    try { await navigator.clipboard.writeText(document.getElementById("addr").textContent); copy.textContent = "✓"; }
+    catch (e) { copy.textContent = "info@wenquestrobotics.com"; }
+  };
+
+
+  // ---- menus: click to open (touch), close on outside click; burger on narrow screens ----
+  const top = document.getElementById("topbar"), burger = document.getElementById("burger");
+  burger.onclick = () => { const o = top.classList.toggle("menu-open"); burger.setAttribute("aria-expanded", o ? "true" : "false"); };
+  document.querySelectorAll("nav.main .dd > button").forEach(b => b.addEventListener("click", e => {
+    const dd = b.parentElement, was = dd.classList.contains("open");
+    document.querySelectorAll("nav.main .dd.open").forEach(x => x.classList.remove("open"));
+    if (!was) dd.classList.add("open");
+    e.stopPropagation();
+  }));
+  document.addEventListener("click", e => { if (!e.target.closest("nav.main")) document.querySelectorAll("nav.main .dd.open").forEach(x => x.classList.remove("open")); });
+  document.querySelectorAll("nav.main .menu a").forEach(a => a.addEventListener("click", () => {
+    document.querySelectorAll("nav.main .dd.open").forEach(x => x.classList.remove("open"));
+    top.classList.remove("menu-open"); burger.setAttribute("aria-expanded", "false");
+    if (a.dataset.tier) showTier(a.dataset.tier);
+  }));
+
+  // ---- course map tiers ----
+  function showTier(t) {
+    document.querySelectorAll(".tiers button").forEach(b => b.setAttribute("aria-selected", b.dataset.t === t ? "true" : "false"));
+    document.querySelectorAll(".tier").forEach(d => d.classList.toggle("on", d.dataset.t === t));
+  }
+  document.querySelectorAll(".tiers button").forEach(b => b.addEventListener("click", () => showTier(b.dataset.t)));
+
+  // ---- two double pendulums (chaos) ----
+  const cv = document.getElementById("chaos"), ctx = cv.getContext("2d");
+  const g = 9.81, m1 = 1, m2 = 1, l1 = 1, l2 = 1, dt = 0.001;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function deriv(s) {
+    const [a1, a2, w1, w2] = s, d = a1 - a2, den = 2 * m1 + m2 - m2 * Math.cos(2 * d);
+    const b1 = (-g * (2 * m1 + m2) * Math.sin(a1) - m2 * g * Math.sin(a1 - 2 * a2) - 2 * Math.sin(d) * m2 * (w2 * w2 * l2 + w1 * w1 * l1 * Math.cos(d))) / (l1 * den);
+    const b2 = (2 * Math.sin(d) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.cos(a1) + w2 * w2 * l2 * m2 * Math.cos(d))) / (l2 * den);
+    return [w1, w2, b1, b2];
+  }
+  function rk4(s) {
+    const k1 = deriv(s), k2 = deriv(s.map((v, i) => v + dt / 2 * k1[i])), k3 = deriv(s.map((v, i) => v + dt / 2 * k2[i])), k4 = deriv(s.map((v, i) => v + dt * k3[i]));
+    return s.map((v, i) => v + dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+  }
+  let A, B, t, trailA, trailB, W = 0, H = 0, dpr = 1;
+  function release() {
+    const a1 = 2.0 + Math.random() * 0.6, a2 = 2.3 + Math.random() * 0.6;
+    A = [a1, a2, 0, 0]; B = [a1, a2 + 0.001, 0, 0]; t = 0; trailA = []; trailB = [];
+  }
+  function fit() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+  function geom() {
+    const wide = W > 820, scale = Math.min(H * 0.19, wide ? W * 0.12 : W * 0.2);
+    return { ox: wide ? W * 0.74 : W * 0.5, oy: wide ? H * 0.45 : H * 0.3, s: scale };
+  }
+  function tip(s, G) {
+    const x1 = G.ox + G.s * Math.sin(s[0]), y1 = G.oy + G.s * Math.cos(s[0]);
+    return [x1, y1, x1 + G.s * Math.sin(s[1]), y1 + G.s * Math.cos(s[1])];
+  }
+  const gapEl = document.getElementById("gap"), ttEl = document.getElementById("tt");
+  function draw() {
+    const G = geom();
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    ctx.strokeStyle = "rgba(143,161,168,0.08)"; ctx.lineWidth = 1;
+    for (let x = G.ox % 40; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = G.oy % 40; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    const trail = (tr, col) => {
+      for (let i = 1; i < tr.length; i++) {
+        ctx.strokeStyle = col; ctx.globalAlpha = (i / tr.length) * 0.9; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(tr[i - 1][0], tr[i - 1][1]); ctx.lineTo(tr[i][0], tr[i][1]); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+    trail(trailB, css("--blue")); trail(trailA, css("--accent"));
+    const arm = (s, col) => {
+      const [x1, y1, x2, y2] = tip(s, G);
+      ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(G.ox, G.oy); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x1, y1, 5, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(x2, y2, 6, 0, 7); ctx.fill();
+    };
+    arm(B, "rgba(92,184,214,0.85)"); arm(A, "rgba(242,183,5,0.95)");
+    ctx.fillStyle = "#e9eef0"; ctx.beginPath(); ctx.arc(G.ox, G.oy, 4, 0, 7); ctx.fill();
+    gapEl.textContent = Math.abs(A[1] - B[1]).toFixed(3);
+    ttEl.textContent = t.toFixed(1);
+  }
+  function stepTo(frames) {
+    const G = geom();
+    for (let f = 0; f < frames; f++) {
+      for (let k = 0; k < 16; k++) { A = rk4(A); B = rk4(B); t += dt; }
+      const a = tip(A, G), b = tip(B, G);
+      trailA.push([a[2], a[3]]); trailB.push([b[2], b[3]]);
+      if (trailA.length > 260) { trailA.shift(); trailB.shift(); }
+    }
+  }
+  fit(); release();
+  addEventListener("resize", () => { fit(); trailA = []; trailB = []; });
+  document.getElementById("again").onclick = release;
+  if (reduce) { stepTo(600); draw(); return; }
+  let visible = true;
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(cv);
+  (function loop() {
+    if (visible && !document.hidden) { stepTo(1); draw(); if (t > 40) release(); }
+    requestAnimationFrame(loop);
+  })();
+})();
+</script>
+<script src="/auth.js" defer></script>
+</body>
+</html>
