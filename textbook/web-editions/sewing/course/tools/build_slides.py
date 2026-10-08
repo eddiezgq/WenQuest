@@ -479,7 +479,7 @@ def L_formula(s, ctx):
         g.append(f'<text x="{x + 75}" y="{410 - hgt:.0f}" font-size="44" font-weight="800" fill="#f3f6fa" text-anchor="middle" class="en">{e(b["F"])} N</text>')
         g.append(f'<text x="{x + 75}" y="480" font-size="26" fill="#d3deea" text-anchor="middle">{e(b["label"][0])}</text>')
     return (f'<div class="slide formula"><div class="grain"></div>{head(s["title"])}<div class="eq">{s["formula_html"]}'
-            f'<span class="sub">针杆下止点惯性力<br><span style="font-family:var(--enf);font-size:22px">needle-bar inertia force at BDC</span></span></div>'
+            f'<span class="sub"><span class="zh">针杆下止点惯性力</span><span class="en" style="font-family:var(--enf);font-size:22px;display:block">needle-bar inertia force at BDC</span></span></div>'
             f'<div class="chart"><svg viewBox="0 0 950 520" width="950" height="520">{"".join(g)}</svg></div>'
             f'<div class="footnote"><div class="zh">{e(s["foot"][0])}</div><div class="en">{e(s["foot"][1])}</div></div>{ctx["foot"]}</div>')
 
@@ -700,12 +700,17 @@ def en_only_css() -> str:
     for sel, props in re.findall(r"([^{}]*?)\.zh\{([^}]*)\}", CSS + DECK_CSS):
         sel = sel.strip().split("}")[-1].strip()
         props = re.sub(r"font-size:(\d+)px", lambda m: f"font-size:{round(int(m.group(1)) * 0.9)}px", props)
-        out.append(f"html.en-only {sel} .en{{{props};font-family:var(--enf);margin-top:0}}".replace("  ", " "))
+        out.append(f"html.en-only {sel} .en{{{props};font-family:var(--enf);margin-top:0;color:var(--ink)}}".replace("  ", " "))
     return "".join(out)
 
 
-EN_ONLY_JS = ("<script>document.querySelectorAll('svg text').forEach(t=>{if(/[\\u4e00-\\u9fff]/.test(t.textContent)&&!/[A-Za-z]{3}/.test(t.textContent))t.style.display='none'});</script>")
-VIDEO_CSS = "html.video #nav,html.video #bar{display:none!important}html.video *{cursor:none!important}"
+EN_ONLY_JS = r"""<script>(function(){var C=/[　-〿一-鿿＀-￯]/;
+var w=document.createTreeWalker(document.getElementById('stage'),NodeFilter.SHOW_TEXT),n,list=[];while((n=w.nextNode()))list.push(n);
+list.forEach(function(t){var x=t.nodeValue;if(!C.test(x))return;
+ if(x.indexOf('·')>=0){var keep=x.split('·').filter(function(p){return !C.test(p)});t.nodeValue=keep.join(' · ').trim();return;}
+ if(/[A-Za-z]{2,}|[A-Za-z]\s*=/.test(x)){t.nodeValue=x.replace(/[　-〿一-鿿＀-￯]+/g,' ').replace(/^[\s:：,，]+|[\s:：,，]+$/g,'').replace(/\s{2,}/g,' ');return;}
+ t.nodeValue='';});})();</script>"""
+VIDEO_CSS = "html.video #nav,html.video #bar,html.video .foot{display:none!important}html.video *{cursor:none!important}"
 
 
 def page_b64(name: str, lang="zh") -> str:
