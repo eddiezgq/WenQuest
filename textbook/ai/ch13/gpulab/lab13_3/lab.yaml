@@ -1,0 +1,42 @@
+标题: ["GPU 实验 13.3 从零训练一个字符级小语言模型", "GPU Lab 13.3 Training a character-level language model from scratch"]
+目的: ["亲手训四档大小的字符级语言模型，看损失随规模怎样下降、在对数坐标上是不是一条直线，并用小模型外推大模型——把 13.4 节的规模定律在自己的机器上做一遍。",
+       "Train four sizes of a character-level language model, watch the loss fall with scale, check whether it is a straight line in log-log coordinates, and extrapolate from the small models to the large one — the scaling laws of Section 13.4, on your own GPU."]
+显卡: basic
+结果:
+  - {名: xs_loss, 说明: ["验证损失，最小一档", "validation loss, smallest"], 单位: ""}
+  - {名: l_loss, 说明: ["验证损失，最大一档", "validation loss, largest"], 单位: ""}
+  - {名: alpha, 说明: ["拟合出的幂律指数", "fitted power-law exponent"], 单位: ""}
+  - {名: extrap_err_pct, 说明: ["用最小两档外推到最大一档的误差", "extrapolation error from the two smallest"], 单位: "%"}
+  - {名: l_tflops, 说明: ["最大一档实际跑出的算力", "achieved compute, largest"], 单位: "TFLOP/s"}
+文件: []
+实际问题:
+  标题: ["该把钱花在模型上还是数据上", "Spend on the model or on the data"]
+  内容: ["要训一个自己的模型，预算只够一次：模型做多大、数据喂多少？规模定律就是回答这个问题的工具。但论文里的曲线是别人在别的设置上拟的，自己的任务上成不成立，只有自己训几档小模型才知道。",
+         "You can afford one training run: how big a model, how much data? Scaling laws answer exactly that — but the published curves were fitted on someone else's setup. The only way to know whether they hold for your task is to train a few small models yourself."]
+原理:
+  - ["同一套设置下，验证损失随参数量近似 L = (N_c/N)^α，在对数坐标上是一条直线（13.4 节）。", "Under one fixed setup the validation loss follows L = (N_c/N)^α, a straight line in log-log coordinates (Section 13.4)."]
+  - ["训练算力按 6ND 估：每个参数每个词元约 6 次浮点运算（9.2 节）。", "Training compute is about 6ND: roughly six floating-point operations per parameter per token (Section 9.2)."]
+  - ["规模定律数的是非嵌入参数——字符级模型的词表很小，这一点影响不大，词表大时差别明显。", "Scaling laws count non-embedding parameters; with a character vocabulary that hardly matters, with a large vocabulary it does."]
+步骤:
+  - ["运行第 1 节，准备语料与数据划分（任务 1）。", "Run section 1 to prepare the corpus and the split (task 1)."]
+  - ["运行第 2 节，四档模型各训一遍，填入表 1（任务 2）。", "Run section 2 to train all four sizes and fill Table 1 (task 2)."]
+  - ["运行第 3 节，拟合幂律并外推，填入表 2（任务 3）。", "Run section 3 to fit the power law and extrapolate; fill Table 2 (task 3)."]
+  - ["运行第 4 节，把同样的算力改成“小模型多喂数据”，比较损失（任务 4）。", "Run section 4 to spend the same compute on a smaller model with more data, and compare (task 4)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  四档模型", "Table 1  Four sizes"]
+    表头: ["档", "非嵌入参数（百万）", "验证损失", "困惑度", "用时（秒）", "实际算力（TFLOP/s）"]
+    表头英文: ["Size", "Non-emb params (M)", "Val loss", "Perplexity", "Seconds", "TFLOP/s"]
+    行: [["xs", "", "", "", "", ""], ["s", "", "", "", "", ""], ["m", "", "", "", "", ""], ["l", "", "", "", "", ""]]
+  - 标题: ["表 2  幂律与外推", "Table 2  The power law and extrapolation"]
+    表头: ["用哪些点拟合", "指数 α", "外推到最大一档的预测", "实测", "误差（%）"]
+    表头英文: ["Points used", "Exponent α", "Predicted largest", "Measured", "Error (%)"]
+    行: [["全部四档", "", "—", "", "—"], ["最小两档", "", "", "", ""]]
+注意:
+  - ["四档模型都很小（十万到几百万参数），拟出的指数不要与论文在大模型上的数字相比；这里要看的是“是不是一条直线”。", "All four models are tiny; do not compare the fitted exponent with published values for large models — what matters here is whether the points fall on a line."]
+  - ["每一档训练同样多的词元，所以算力随参数线性增长，不是“算力最优”的配置（13.4 节算例 13.4.3 讨论过）。", "Each size sees the same number of tokens, so compute grows linearly with parameters — this is not the compute-optimal split discussed in Section 13.4."]
+  - ["损失受随机种子影响，差 0.01 左右是正常的；比较时看趋势，不看小数点后两位。", "Loss varies with the seed by about 0.01; read the trend, not the second decimal."]
+思考题:
+  - ["你拟出的指数是多少？把最小两档的直线外推到最大一档，误差多大？这对“用小模型预测大模型”意味着什么？", "What exponent did you fit? How large is the error when extrapolating from the two smallest to the largest? What does that say about predicting large models from small ones?"]
+  - ["同样的算力，训一个大模型少喂数据，还是训一个小模型多喂数据？你的实验支持哪一种？", "With the same compute, a bigger model on less data or a smaller model on more? Which does your experiment support?"]
+  - ["字符级模型的词表只有几十个符号。换成词级或子词级词表，嵌入层会占多大比例？这会怎样影响“非嵌入参数”这个口径？", "A character vocabulary has a few dozen symbols. With word or subword tokens, how large would the embedding become, and how would that affect the non-embedding count?"]

@@ -1,0 +1,44 @@
+标题: ["GPU 实验 13.5 用 LoRA 微调一个开源小模型", "GPU Lab 13.5 Fine-tuning an open model with LoRA"]
+目的: ["在程序生成的质量手册问答对上，用全量微调与 LoRA 各训一遍同一个开源小模型，比较可训练参数、显存、每步时间与训练后的损失——看清“省了多少、差了多少”。",
+       "Fine-tune the same open model twice on generated quality-manual question–answer pairs — once fully, once with LoRA — and compare trainable parameters, memory, step time and the resulting loss."]
+显卡: basic
+结果:
+  - {名: lora_trainable_pct, 说明: ["LoRA 可训练参数占比", "LoRA trainable share"], 单位: "%"}
+  - {名: lora_peak_GB, 说明: ["LoRA 显存峰值", "LoRA peak memory"], 单位: "GB"}
+  - {名: full_peak_GB, 说明: ["全量微调显存峰值", "full fine-tune peak memory"], 单位: "GB"}
+  - {名: lora_loss_eval, 说明: ["LoRA 训练后的损失", "loss after LoRA"], 单位: ""}
+  - {名: full_loss_eval, 说明: ["全量微调后的损失", "loss after full fine-tuning"], 单位: ""}
+  - {名: param_ratio, 说明: ["全量 ÷ LoRA 的可训练参数之比", "trainable-parameter ratio"], 单位: "倍"}
+文件: []
+实际问题:
+  标题: ["让模型学会本厂的说法", "Teaching the model the plant's own wording"]
+  内容: ["通用模型不知道“让步接收单谁签”“301 轴的公差是多少”。手里只有几十条到几千条本厂的问答，租一天显卡，怎么微调最划算？全量微调要存一整套优化器状态，LoRA 只训两个小矩阵——差别有多大，自己测一次就知道。",
+         "A general model does not know who signs a concession form or the tolerance of part 301. With a few hundred in-house pairs and one day of GPU time, which fine-tuning is the better buy? Full tuning stores a whole optimizer state; LoRA trains two small matrices. Measure it once and you know."]
+原理:
+  - ["LoRA：冻住原权重 W，只训练两个低秩矩阵 A、B，前向时用 W + BA（13.5 节）。可训练参数少两三个数量级，优化器状态也随之变小。", "LoRA freezes W and trains two low-rank matrices A and B, using W + BA in the forward pass (Section 13.5). Trainable parameters drop by orders of magnitude, and with them the optimizer state."]
+  - ["显存账：参数 + 梯度 + 优化器状态 + 激活值（9.2 节）。全量微调的梯度与优化器状态与参数同量级，LoRA 只按低秩部分算。", "Memory: parameters + gradients + optimizer state + activations (Section 9.2). Full tuning's gradients and optimizer state scale with the parameters; LoRA's scale with the low-rank part only."]
+  - ["数据只有几十条时，全量微调很容易把模型“训歪”（灾难性遗忘）；LoRA 改动小，反而更稳。", "With only dozens of examples, full tuning easily damages the model (catastrophic forgetting); LoRA changes less and is often more stable."]
+步骤:
+  - ["运行第 1 节，生成问答数据、载入模型（任务 1）。", "Run section 1 to generate the data and load the model (task 1)."]
+  - ["运行第 2 节做 LoRA 微调，记下可训练参数、显存与时间（任务 2，填表 1）。", "Run section 2 for LoRA and record trainable parameters, memory and time (task 2, Table 1)."]
+  - ["运行第 3 节做全量微调，填同一张表（任务 3）。", "Run section 3 for full fine-tuning and fill the same table (task 3)."]
+  - ["运行第 4 节，问几个问题，对比微调前后的回答（任务 4，填表 2）。", "Run section 4, ask a few questions and compare answers before and after (task 4, Table 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  两种微调", "Table 1  Two kinds of fine-tuning"]
+    表头: ["做法", "可训练参数", "占总参数（%）", "显存峰值（GB）", "每步（ms）", "训练后损失"]
+    表头英文: ["Method", "Trainable", "Share (%)", "Peak memory (GB)", "ms/step", "Loss after"]
+    行: [["LoRA（r=8）", "", "", "", "", ""], ["全量微调", "", "", "", "", ""]]
+  - 标题: ["表 2  微调前后的回答", "Table 2  Answers before and after"]
+    表头: ["问题", "微调前", "LoRA 之后", "对不对"]
+    表头英文: ["Question", "Before", "After LoRA", "Correct?"]
+    行: [["SH-301 输出轴的同轴度公差？", "", "", ""], ["让步接收单谁签字？", "", "", ""], ["检验记录保存几年？", "", "", ""]]
+注意:
+  - ["这个任务只有十几条数据、几十步训练，损失只能看相对高低，不能当作模型能力的度量。", "The task has only a dozen or so examples and a few dozen steps: the loss is comparable across runs, not a measure of ability."]
+  - ["第一次运行要下载模型（约 1 GB）。", "The first run downloads the model (about 1 GB)."]
+  - ["显存峰值随批大小与序列长度变化；比较时两种做法必须用同样的批大小。", "Peak memory depends on batch size and sequence length; keep them identical across the two methods."]
+  - ["数据由程序生成，不是企业真实手册；真实项目里这一步最花时间的是**整理数据**，不是训练。", "The data is generated, not a real manual; in a real project the time goes into preparing data, not training."]
+思考题:
+  - ["LoRA 的可训练参数只占百分之几，显存却没有按同样的比例降下来。为什么？（想想显存里还有什么。）", "LoRA trains a few percent of the parameters but memory does not fall by the same factor. Why? Think about what else occupies memory."]
+  - ["把 r 从 8 改成 32，参数、显存与损失各怎样变？r 越大一定越好吗？", "Change r from 8 to 32: what happens to parameters, memory and loss? Is a larger r always better?"]
+  - ["几十条数据微调出来的模型，会不会把原来会的东西忘掉？怎样设计一个实验来检查？", "Can a model fine-tuned on dozens of examples forget what it knew? How would you design a check?"]

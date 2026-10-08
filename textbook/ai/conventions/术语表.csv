@@ -320,3 +320,17 @@
 12,实时率,real-time factor (RTF),处理时间与音频时长之比
 12,弱监督,weak supervision,
 12,嵌入,embedding,把对象映射成的定长向量
+13,独热编码,one-hot encoding,维数等于词表大小
+13,词向量,word embedding,也称词嵌入；静态表示
+13,预训练,pre-training,在无标注语料上先训练
+13,掩码语言模型,masked language model (MLM),BERT 一脉
+13,自回归语言模型,autoregressive language model,GPT 一脉
+13,对齐,alignment,让模型听指令、说人话、该拒就拒
+13,指令微调,instruction tuning,也称有监督微调（SFT）
+13,奖励模型,reward model (RM),由两两比较拟出的打分器
+13,直接偏好优化,direct preference optimization (DPO),把奖励与策略合成一个目标
+13,检索增强生成,retrieval-augmented generation (RAG),先检索再生成
+13,思维链,chain of thought (CoT),让模型写出中间推理步骤
+13,规模定律,scaling law,损失随规模与数据按幂律下降
+13,拒答,abstention,不确定时回答“没有规定”
+13,推理模型,reasoning model,用强化学习把长思维链训进模型

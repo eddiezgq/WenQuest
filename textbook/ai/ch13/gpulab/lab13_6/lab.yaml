@@ -1,0 +1,44 @@
+标题: ["GPU 实验 13.6 搭一个带出处的手册问答系统", "GPU Lab 13.6 Building a manual QA system with citations"]
+目的: ["把真正的句向量模型接进 13.6 节的检索流程，再让一个开源小模型按取回的片子作答并给出条文号，量出三件事：召回率、引用正确率、该拒的拒住了几个。",
+       "Plug a real embedding model into the retrieval pipeline of Section 13.6, have an open model answer from the retrieved chunks with clause numbers, and measure three things: recall, citation accuracy, and how many unanswerable questions were refused."]
+显卡: basic
+结果:
+  - {名: shop_bm25, 说明: ["口语问法的召回率，词频检索", "recall, BM25, shop wording"], 单位: "%"}
+  - {名: shop_emb, 说明: ["口语问法的召回率，句向量模型", "recall, embeddings, shop wording"], 单位: "%"}
+  - {名: shop_hybrid, 说明: ["口语问法的召回率，混合", "recall, hybrid, shop wording"], 单位: "%"}
+  - {名: fact_pct, 说明: ["关键事实答对率", "key facts correct"], 单位: "%"}
+  - {名: cite_pct, 说明: ["引用正确率", "citations correct"], 单位: "%"}
+  - {名: refuse_pct, 说明: ["手册里没有的问题被拒答的比例", "unanswerable questions refused"], 单位: "%"}
+文件: []
+实际问题:
+  标题: ["车间问手册", "Asking the manual"]
+  内容: ["几千页的质量手册，老师傅凭记忆、新人靠翻纸。要做的是：问一句话，答出来，并指到第几条第几页；手册里没有的，老老实实说没有规定。答错一次的代价远高于让人自己去翻，所以这个系统宁可拒答。",
+         "A manual of several thousand pages: the veterans remember it, the new hires leaf through it. The job: ask in one sentence, get an answer, and get pointed to the clause and page — and when the manual says nothing, say so. A wrong answer costs far more than a refusal, so this system should rather refuse."]
+原理:
+  - ["检索增强：切片建索引 → 取回最像的几片 → 连同问题交给模型（13.6 节）。", "Retrieval-augmented generation: chunk and index, retrieve the closest chunks, hand them to the model with the question (Section 13.6)."]
+  - ["句向量模型把句子映射成向量，同义的说法落在相近的方向上——这是书中那个哈希向量做不到的事。", "An embedding model maps sentences so that paraphrases land close together — exactly what the hashed vectors in the book cannot do."]
+  - ["引用是硬要求：答对了但指错条文，车间照样不敢用（13.9 节）。", "Citations are a hard requirement: a right answer pointing at the wrong clause is still unusable (Section 13.9)."]
+步骤:
+  - ["运行第 1 节，生成手册与问题、载入句向量模型（任务 1）。", "Run section 1 to generate the manual and questions and load the embedding model (task 1)."]
+  - ["运行第 2 节，三种检索 × 两种问法各记一次召回率（任务 2，填表 1）。", "Run section 2 and record recall for three methods and two wordings (task 2, Table 1)."]
+  - ["运行第 3 节，让模型带出处作答，记下三个比例（任务 3，填表 2）。", "Run section 3 to answer with citations and record the three percentages (task 3, Table 2)."]
+  - ["运行第 4 节，把提示里“没有就说没有规定”那句去掉，看拒答率怎样变（任务 4）。", "Run section 4 with the refusal instruction removed from the prompt and see how the refusal rate changes (task 4)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  检索方式与问法", "Table 1  Method and wording"]
+    表头: ["问法", "词频（BM25）", "句向量", "混合", "词频+同义词+零件号"]
+    表头英文: ["Wording", "BM25", "Embeddings", "Hybrid", "BM25+syn+part"]
+    行: [["手册原词", "", "", "", ""], ["工人口语", "", "", "", ""]]
+  - 标题: ["表 2  作答质量与代价", "Table 2  Answer quality and cost"]
+    表头: ["提示里是否要求拒答", "关键事实答对（%）", "引用正确（%）", "该拒的拒住（%）", "每问词元数", "每问耗时（ms）"]
+    表头英文: ["Refusal instruction", "Facts correct (%)", "Citations correct (%)", "Refused (%)", "Tokens/question", "ms/question"]
+    行: [["有", "", "", "", "", ""], ["没有", "", "", "", "", ""]]
+注意:
+  - ["手册由程序按模板生成，不放任何企业真实文件；问答对与标准答案的出处也由程序给出。", "The manual is generated from templates — no real company documents — and the gold clause numbers come from the generator."]
+  - ["生成用的是 0.5B 的小模型，答得不如大模型；这里要看的是流程与相对差别，不是绝对分数。", "Generation uses a 0.5B model and answers worse than a large one; read the pipeline and the relative differences, not the absolute scores."]
+  - ["第一次运行要下载两个模型（合计约 1.5 GB）。", "The first run downloads two models (about 1.5 GB in total)."]
+  - ["国内部署要用已备案的模型；本实验用的是公开权重的开源模型，在自己的机器上跑，数据不出厂。", "For deployment in China use a filed model; this lab uses open weights on your own machine, so the data never leaves the plant."]
+思考题:
+  - ["句向量在口语问法上比词频检索好多少？如果只好几个点，为“换模型”付的工程代价值不值？", "How much better are embeddings than BM25 on colloquial wording? If the gain is a few points, is the engineering cost of switching worth it?"]
+  - ["去掉“没有就说没有规定”那句之后，拒答率变成多少？这说明拒答这件事是谁负责的？", "With the refusal instruction removed, what happens to the refusal rate? Whose job is refusing, then?"]
+  - ["引用正确率比答对率低的那部分，错在哪里？是检索取错了，还是模型指错了？怎样分辨？", "Where do the cases with a right answer but a wrong citation go wrong — retrieval or the model? How would you tell?"]

@@ -1,0 +1,29 @@
+# 实验 13.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_6.js。
+原理:
+  - ["检索增强：先把手册切片建索引，问问题时取回最像的几片，连同问题一起交给模型（13.6 节）。", "Retrieval-augmented generation: chunk the manual, index it, retrieve the closest chunks for a question and hand them to the model with the question (Section 13.6)."]
+  - ["BM25 按词频与逆文档频率打分，长片打折；它要求问法与手册用词对得上。", "BM25 scores by term frequency and inverse document frequency with a length penalty; it needs the wording to match the manual."]
+  - ["本实验里的“向量检索”是哈希向量，没有语义——它不能把“晃动”认成“同轴度”。真正的句向量模型要显卡（GPU 实验 13.6）。", "The “vector retrieval” here is hashed and carries no semantics: it cannot connect a colloquial word to the manual's term. A real embedding model needs a GPU (GPU lab 13.6)."]
+  - ["代价按词元算：取回 k 片、每片 n 字，送进模型的词元约 k·n/1.5 加上提示。", "Cost is per token: k chunks of n characters cost about k·n/1.5 tokens plus the prompt."]
+  - 式: "召回率 = 取回的标准条文数 ÷ 标准条文数；词元 ≈ k × 切片长度 ÷ 1.5 + 提示"
+步骤:
+  - ["“切片与代价”场景：把切片长度从 100 调到 1000，记下召回率与词元数（任务 1、4，填表 1）。", "Chunking scene: sweep the chunk length from 100 to 1000 and record recall and tokens (tasks 1 and 4, Table 1)."]
+  - ["“三种检索”场景：两种问法 × 三种检索各记一次召回率（任务 2，填表 2）。", "Methods scene: record recall for both wordings and all three methods (task 2, Table 2)."]
+  - ["在口语问法下打开同义词表与零件号加权，记下救回多少（任务 3）。", "With shop-floor wording, turn on the synonym list and the part-number boost and record how much recall returns (task 3)."]
+  - ["“逐个问题看”场景：关掉零件号加权，翻一遍 10 个问题，记下有几个取回了别的零件的同类条文（任务 5）。", "Question-by-question scene: with the boost off, page through the ten questions and count how many returned the same clause for the wrong part (task 5)."]
+数据表:
+  - 标题: ["表 1  切片长度、召回率与代价", "Table 1  Chunk length, recall and cost"]
+    表头: ["切片长度（字）", "切片数", "召回率（%）", "每问词元数", "一千问的费用（美元）"]
+    表头英文: ["Chunk length", "Chunks", "Recall (%)", "Tokens per question", "Cost per 1000 ($)"]
+    行: [["100", "", "", "", ""], ["300", "", "", "", ""], ["1000", "", "", "", ""]]
+  - 标题: ["表 2  问法与检索方式", "Table 2  Wording and retrieval method"]
+    表头: ["问法", "词频", "哈希向量", "混合", "混合+同义词+零件号"]
+    表头英文: ["Wording", "BM25", "Hashed vectors", "Hybrid", "Hybrid+syn+part"]
+    行: [["手册原词", "", "", "", ""], ["工人口语", "", "", "", ""]]
+注意:
+  - ["手册是按模板生成的，规模只有几百条；真实手册有几千条，检索会更难，差别也更明显。", "The manual is generated and holds only a few hundred clauses; a real one has thousands, where retrieval is harder and the differences larger."]
+  - ["这里的召回率只看“标准条文有没有被取回”，不看模型答得对不对。答对还要看模型会不会用取回的内容（13.9 节）。", "Recall here only asks whether the gold clause came back, not whether the model answered correctly — that also depends on the model using what it got (Section 13.9)."]
+  - ["费用按一个假设的单价折算，只用来比较不同设置的相对高低。", "The cost uses an assumed price per token and is only meant for comparing settings."]
+思考题:
+  - ["如果把整本手册塞进上下文，召回率就是 100%，为什么还要检索？（算一算词元数。）", "Stuffing the whole manual in gives 100% recall — so why retrieve? Work out the token count."]
+  - ["取回条数从 5 加到 20，召回率几乎不动而代价涨了几倍。什么情况下加 k 才真的有用？", "Going from 5 to 20 chunks barely moves recall but multiplies the cost. When does a larger k actually help?"]
+  - ["同义词表要几十条就能起作用，它的维护成本在哪里？什么时候该换成训练出来的句向量模型？", "A few dozen synonyms already help — where does maintaining the list get expensive, and when should it give way to a trained embedding model?"]

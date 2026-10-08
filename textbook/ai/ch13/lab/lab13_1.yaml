@@ -1,0 +1,25 @@
+# 实验 13.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_1.js。
+原理:
+  - ["独热编码：一个词占一维，任何两个不同词的内积都是 0——这种表示里没有“像不像”（13.1 节）。", "One-hot: one dimension per word and every pair of distinct words has inner product 0 — such a representation has no notion of similarity (Section 13.1)."]
+  - ["skip-gram 加负采样：让“中心词·真实上下文词”的内积变大、“中心词·随机词”的内积变小，几十行代码就能训出有方向含义的向量。", "Skip-gram with negative sampling pushes up the inner product of a word with its true context and pushes down that with random words; a few dozen lines suffice to get directions that mean something."]
+  - ["类比之所以是加减法：如果“粗 → 精”在每一簇里都是同一个位移，把这个位移加到另一类零件上就落在它的“精”附近。", "Analogy is arithmetic because “rough → fine” is the same displacement in every cluster: add it elsewhere and you land on that cluster's “fine”."]
+  - 式: "P(真实上下文) = σ(中心词向量 · 上下文向量)；类比：v(精X) − v(粗X) + v(粗Y) ≈ v(精Y)"
+步骤:
+  - ["“共现”场景：看“精轴”这一行亮在哪些列上——哪几列来自零件、哪几列来自等级（任务 1 之前的观察）。", "Co-occurrence scene: see which columns light up for “fine shaft” — which come from the part and which from the grade."]
+  - ["“训练”场景：把维数降到 2，记下两个余弦与类比正确数（任务 1，填表 1）。", "Training scene: drop to 2 dimensions and record both cosines and the number of correct analogies (task 1, Table 1)."]
+  - ["把语料降到 200 句、轮数降到 1（任务 2），再把维数降到 4（任务 4），各记一行。", "Cut the corpus to 200 sentences with 1 epoch (task 2), then set the dimension to 4 (task 4); record a row for each."]
+  - ["把负样本降到 1、步长加到 0.1（任务 3），看“是否发散”这一项。", "Cut the negative samples to 1 and raise the learning rate to 0.1 (task 3); watch the “diverged” readout."]
+  - ["回到默认设置（任务 5），确认 20 对类比全对，记下此时的两个余弦。", "Return to the defaults (task 5), confirm all 20 analogies hold and record both cosines."]
+数据表:
+  - 标题: ["表 1  设置与类比", "Table 1  Settings and analogies"]
+    表头: ["维数", "轮数", "语料句数", "负样本", "类比正确（/20）", "同一零件余弦", "同一等级余弦"]
+    表头英文: ["Dim", "Epochs", "Sentences", "Negatives", "Analogies (/20)", "Same part cos", "Same grade cos"]
+    行: [["2", "10", "2000", "5", "", "", ""], ["24", "1", "200", "5", "", "", ""], ["4", "10", "2000", "5", "", "", ""], ["24", "10", "2000", "1", "", "", ""], ["24", "10", "2000", "5", "", "", ""]]
+注意:
+  - ["语料是按模板生成的，结构比真实语料干净得多：真实语料里一个词有多种意思、分布也不均匀，类比不会这么整齐。", "The corpus is generated from templates and is far cleaner than real text, where words are ambiguous and distributions skewed; real analogies are much less tidy."]
+  - ["这里只训了十几个词、几十万次更新。真实的词向量是在几十亿词上训的（13.1 节给出原始数字）。", "Only a handful of words and a few hundred thousand updates are trained here; real embeddings are trained on billions of words (Section 13.1 gives the published numbers)."]
+  - ["维数、轮数、语料三者缺一都学不出结构——但在这份干净的语料上，少量数据也能撑住类比，真实语料不会这么宽容。", "Dimension, epochs and corpus all matter; on this clean corpus a little data still suffices, which real text would not forgive."]
+思考题:
+  - ["如果语料里“精”只跟“轴”一起出现，类比还会成立吗？这对“用网络文本训出来的向量会学到什么偏见”意味着什么？", "If “fine” only ever co-occurred with “shaft”, would the analogy still work? What does that imply about biases learned from web text?"]
+  - ["为什么维数太小会把“零件”与“等级”挤在一起？从“几个方向够不够用”的角度解释。", "Why does too small a dimension conflate part and grade? Explain it in terms of how many directions the space has."]
+  - ["这个实验里的词向量能判断“同轴度”与“跳动”是近义词吗？为什么？（这正是 13.6 节检索要面对的问题。）", "Could these vectors tell that two synonyms mean the same thing? Why not — and how does that bear on retrieval in Section 13.6?"]
