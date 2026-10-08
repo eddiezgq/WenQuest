@@ -259,13 +259,25 @@ def so_doc(db, mode, name):
     return so
 
 
+def _shop_done(db, mode):
+    """车间里最后一道工序做完的工单 → 时刻（以车间为准：ERPNext 里有不合格件时工单可能一直是“进行中”）"""
+    return {r["corr"]: r["ts"] for r in db.q(
+        "select corr, max(ts) as ts from bus_message where mode=%s and type='machine.event' and payload->'data'->>'event'='op_complete' "
+        "and (payload->'data'->>'last_op')::boolean group by corr", (mode,)) if r["corr"]}
+
+
 def ready_orders(db, mode, real_only=False):
-    """工单全部完工的订单：[(订单, 完工时刻)]；real_only：只要 ERPNext 里有的订单（开票用）"""
+    """工单全部完工的订单：[(订单, 完工时刻)]；real_only：只要 ERPNext 里有的订单（开票用）。
+    完工 = ERPNext 里工单已完成，或者车间最后一道工序已经做完"""
     sos, wos = sales_orders(db, mode), wo_by_so(db, mode)
+    shop = _shop_done(db, mode)
     out = []
     for name, ws in wos.items():
-        if not ws or not all(w["data"].get("status") == "Completed" for w in ws):
+        if not ws or not all(w["data"].get("status") == "Completed" or w["data"]["name"] in shop for w in ws):
             continue
+        for w in ws:
+            if w["data"]["name"] in shop and (w["data"].get("status") != "Completed" or _ts(w) < shop[w["data"]["name"]]):
+                w["ts"] = shop[w["data"]["name"]]
         if name in sos:
             out.append((sos[name], max(_ts(w) for w in ws)))
         elif not real_only:

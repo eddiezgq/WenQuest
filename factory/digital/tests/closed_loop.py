@@ -828,6 +828,14 @@ def finance(teacher):
     si = inv(lambda x: x["doc"] and x["status"] in ("open", "paying"), "订单做完开票（ERPNext 销售发票）")
     check(si is not None, "销售发票 {}：{} ${:,.0f}，订单 {}".format((si or {}).get("doc"), str((si or {}).get("party") or "").split(" ")[0],
                                                              (si or {}).get("amount", 0), (si or {}).get("ref")))
+    if si is None:                       # 诊断：开票提议、订单的工单状态
+        for p in hub("GET", "/api/proposals", token=teacher):
+            if p.get("action") == "sales_invoice":
+                check(False, "诊断 开票提议 {} {}：{}".format(p.get("proposal_id"), p.get("status"), json.dumps(p.get("result"), ensure_ascii=False)[:400]))
+        rows = hub("GET", "/api/finance/ar", token=teacher)["invoices"]
+        check(False, "诊断 应收：{}".format([(x["id"], x["ref"], x["status"], x["doc"]) for x in rows]))
+        wos = [(w["name"], w.get("status"), w.get("sales_order") or w.get("wq_sales_order"), w.get("produced_qty"), w.get("qty")) for w in erp_docs("Work Order")][-6:]
+        check(False, "诊断 工单：{}".format(wos))
     if si:
         sis = [d for d in erp_docs("Sales Invoice") if d["name"] == si["doc"]]
         check(bool(sis) and sis[0].get("docstatus") == 1, "ERPNext 销售发票 {} 已提交，未付 ${}".format(si["doc"], sis[0].get("outstanding_amount") if sis else "—"))
