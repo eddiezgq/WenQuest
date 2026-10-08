@@ -18,6 +18,7 @@ ROOT = HERE.parents[1]
 OUT = ROOT / "site" / "cases"
 sys.path.insert(0, str(HERE))
 from cases import CASES, REPO  # noqa: E402
+from stories import STORIES  # noqa: E402
 
 CDN_THREE = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
 
@@ -60,6 +61,7 @@ def steps_json(case):
 
 STYLE = (HERE / "style.css").read_text(encoding="utf-8")
 SCRIPT = (HERE / "page.js").read_text(encoding="utf-8")
+STORY_JS = (HERE / "story.js").read_text(encoding="utf-8")
 
 
 def head(title_zh, title_en, three_src, preview):
@@ -86,7 +88,7 @@ def topbar(crumb, preview):
 
 def case_nav(active):
     items = []
-    for c in CASES:
+    for c in CASES + STORIES:
         cur = ' aria-current="page"' if c["slug"] == active else ""
         items.append(f'<a href="{c["slug"]}.html"{cur}><span class="mono">{c["no"]}</span> {bi(c["name"])}</a>')
     return '<nav class="cases" aria-label="典型应用">' + "".join(items) + "</nav>"
@@ -167,6 +169,77 @@ def page(case, preview):
 """
 
 
+def story_page(st):
+    facts = "".join(f'<div><dt>{bi(lbl)}</dt><dd>{v}<small>{bi(u) if u[0] or u[1] else ""}</small></dd></div>' for lbl, v, u in st["facts"])
+    rows = []
+    for o in st["options"]:
+        tag = f'<span class="tag">{bi(("中枢推荐", "Recommended"))}</span>' if o["rec"] else ""
+        miss_cls = ' class="miss-bad"' if o["miss"][0] != "0" else ""
+        rec_cls = ' class="rec"' if o["rec"] else ""
+        rows.append(f'<tr{rec_cls}><td><b>{o["key"]}</b> · {bi(o["label"])}{tag}</td><td class="r">{o["units"]}</td>'
+                    f'<td>{bi(o["eng"])}</td><td class="r">{o["days"]}</td><td class="r">{o["pd"]}</td><td class="r">{o["cost"]}</td><td class="r">{o["cust"]}</td><td{miss_cls}>{bi(o["miss"])}</td></tr>')
+    head_row = "".join(f"<th{c}>{bi(t)}</th>" for t, c in [
+        (("方案", "Option"), ""), (("上门台数", "Units visited"), ' class="r"'), (("工程师", "Engineers"), ""), (("天数", "Days"), ' class="r"'),
+        (("人天", "Person-days"), ' class="r"'), (("费用", "Cost"), ' class="r"'), (("通知客户", "Customers"), ' class="r"'), (("漏掉的高风险", "High-risk missed"), "")])
+    after = "".join(f"<li><b>{bi(h)}</b><span>{bi(t)}</span></li>" for h, t in st["after"])
+    opens = "".join(f"<div><h4>{bi(h)}</h4><p>{bi(t)}</p></div>" for h, t in st["open"])
+    courses = "".join(f"<li><span><b>{bi(n)}</b><small>{bi(d)}</small></span><em>{bi(s)}</em></li>" for n, d, s in st["courses"])
+    labs = "".join(f'<li><b>{bi((a, c))}</b>{bi(("：" + b, ": " + d))}</li>' for a, b, c, d in st["labs"])
+    crumb = f'<a href="index.html">{bi(("数字工厂 · 典型应用", "Digital factory · cases"))}</a> › {bi(st["name"])}'
+    data = {"chain": st["chain"]}
+    return f"""{head(st['name'][0], st['title'][1], "", False)}{topbar(crumb, False)}
+<div class="hero story"><div class="wrap">
+  <div>
+    <p class="eyebrow">{bi(("专题案例 " + st["no"] + " · 减速器厂 · 数字主线", "Topic case " + st["no"] + " · gearbox plant · digital thread"))}</p>
+    <h1>{bi(st["title"])}</h1>
+    <p class="lede">{bi(st["lede"])}</p>
+    <dl class="facts">{facts}</dl>
+    <div class="chain" id="chain" style="margin-top:36px"></div>
+    <div class="legend"><span><i style="background:#c2553f"></i>{bi(("投诉的设备", "Reported unit"))}</span><span><i style="background:var(--accent)"></i>{bi(("可能的源头", "Likely source"))}</span><span><i style="background:#d98c1f"></i>{bi(("高风险", "High risk"))}</span><span>{bi(("点任意一环看记录和依据", "Click a link for the record and its basis"))}</span></div>
+    <div class="nd" id="nodeDetail" aria-live="polite"></div>
+  </div>
+</div></div>
+{case_nav(st["slug"])}
+<section><div class="wrap">
+  <h2>{bi(("三个服务方案，按排班算好", "Three service options, priced against the schedule"))}</h2>
+  <p class="sub">{bi(st["options_note"])}</p>
+  <div class="tbl opts"><table><thead><tr>{head_row}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>
+  <h3 class="group-h">{bi(("选定之后", "After the choice"))}</h3>
+  <ol class="after">{after}</ol>
+  <p class="everyday">{bi(st["everyday"])}</p>
+</div></section>
+<section class="alt"><div class="wrap">
+  <h2>{bi(("留给课堂讨论的", "Open for class discussion"))}</h2>
+  <div class="open">{opens}</div>
+</div></section>
+<section><div class="wrap cols">
+  <div>
+    <h2>{bi(("这个案例用到的课", "Courses behind this case"))}</h2>
+    <ul class="clist">{courses}</ul>
+  </div>
+  <div>
+    <div class="do">
+      <h3>{bi(("自己做一遍", "Do it yourself"))}</h3>
+      <ol>{labs}</ol>
+      <div class="btns">
+        <a class="btn pri" href="https://learn.wenquestrobotics.com/" target="_blank" rel="noopener">{bi(("免费注册，开始学习", "Sign up free and start"))}</a>
+        <a class="btn sec" href="index.html">{bi(("其他案例", "Other cases"))}</a>
+      </div>
+      <p class="mail">{bi(("学校或企业预约演示工厂：", "Schools and companies, book a factory demo: "))}<span>info@wenquestrobotics.com</span></p>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">{bi(("依据：", "Source: "))}{bi(st["basis"])}</div></footer>
+<script>const STORY = {json.dumps(data, ensure_ascii=False, separators=(",", ":"))};</script>
+<script>
+{SCRIPT.split("/*LANG-END*/")[0]}
+{STORY_JS}
+</script>
+</body>
+</html>
+"""
+
+
 def index(preview):
     cards = []
     for c in CASES:
@@ -177,6 +250,14 @@ def index(preview):
   <span class="q">{bi(c["title"])}</span>
   <span class="f mono">{facts}</span>
 </a>""")
+    scards = []
+    for c in STORIES:
+        facts = " · ".join(f"{v}" for _, v, _u in c["facts"][2:3])
+        scards.append(f"""<a class="card" href="{c['slug']}.html">
+  <span class="mono">{bi(("专题案例 " + c["no"], "Topic case " + c["no"]))}</span>
+  <b>{bi(c["name"])}</b>
+  <span class="q">{bi(c["title"])}</span>
+</a>""")
     crumb = bi(("数字工厂 · 典型应用", "Digital factory · cases"))
     return f"""{head("典型应用", "Typical applications", "", preview)}{topbar(crumb, preview)}
 <div class="hero short"><div class="wrap one">
@@ -185,7 +266,9 @@ def index(preview):
   <p class="lede">{bi(("全部用零件库里有出处的零件。设计院做动力学、选型、强度、优化和数控编程，数字工厂接着走 ERP、工艺、MRP、采购、MES 和厂情中枢。从空库开始一次跑完约 10 分钟，34 步全部完成。", "Every part comes from a sourced entry in the parts library. The design office does dynamics, selection, strength, optimization and CNC; the digital factory takes over with ERP, process plans, MRP, purchasing, MES and the command center. From an empty database the whole run takes about 10 minutes, all 34 steps passing."))}</p>
 </div></div>
 <section><div class="wrap"><div class="cards">{''.join(cards)}</div>
-<p class="sub" style="margin-top:28px">{bi(("减速器厂的专题案例（数字主线追溯、隐患牵动交付、数字孪生等）随后上线。", "Topic cases from the gearbox plant (digital thread, safety and delivery, digital twins) follow."))}</p>
+<h2 class="group-h">{bi(("减速器厂专题案例", "Gearbox plant topic cases"))}</h2>
+<div class="cards">{''.join(scards)}</div>
+<p class="sub" style="margin-top:20px">{bi(("隐患牵动交付、数字孪生、一根轴的数字化一生等专题案例随后上线。", "More topic cases follow: safety and delivery, digital twins, the digital life of a shaft."))}</p>
 </div></section>
 <footer><div class="wrap">{bi(("依据：问渠《M13 典型应用全流程演练报告》（2026-10-07，M14 修订）。", "Source: WenQuest “M13 end-to-end run of typical applications” (2026-10-07, revised in M14)."))}</div></footer>
 <script>
@@ -205,6 +288,8 @@ def main():
     (OUT / "index.html").write_text(index(False), encoding="utf-8")
     for c in CASES:
         (OUT / f"{c['slug']}.html").write_text(page(c, False), encoding="utf-8")
+    for st in STORIES:
+        (OUT / f"{st['slug']}.html").write_text(story_page(st), encoding="utf-8")
         if preview_dir:
             (preview_dir / f"{c['slug']}.html").write_text(page(c, True), encoding="utf-8")
     if preview_dir:

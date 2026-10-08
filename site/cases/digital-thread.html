@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="One customer call, traced back to one grinding wheel, then forward to every machine that shares the risk — WenQuest digital factory case.">
+<title>一台报警，追到砂轮 · 问渠典型应用</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Noto+Serif+SC:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: night hero with live 3D part → two-lane 12-step process strip → step detail → honest open items → courses & hands-on. Tokens follow site/index.html. */
+  :root {
+    --night: #0a1216; --night-2: #111d22; --night-line: #22323a; --night-ink: #e9eef0; --night-muted: #8fa1a8;
+    --paper: #f4f2ec; --surface: #fbfaf6; --ink: #121c21; --muted: #56656b; --line: #d6d2c6;
+    --accent: #f2b705; --accent-ink: #7a5a00; --blue: #5cb8d6;
+    --ok: #2e7d5b; --ok-bg: #e3f0e8; --hold: #a35e00; --hold-bg: #f8ead2;
+    --code-bg: #eceae2;
+    --serif: "Source Serif 4", "Noto Serif SC", Georgia, serif;
+    --serif-zh: "Noto Serif SC", "Source Serif 4", "Songti SC", serif;
+    --body: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --paper: #0f181c; --surface: #152127; --ink: #e6ecee; --muted: #93a3a9; --line: #2a3a41; --accent-ink: #f2c94c; --ok: #6fcf9f; --ok-bg: #173327; --hold: #f2c94c; --hold-bg: #33290f; --code-bg: #0b1317; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --paper: #0f181c; --surface: #152127; --ink: #e6ecee; --muted: #93a3a9; --line: #2a3a41; --accent-ink: #f2c94c; --ok: #6fcf9f; --ok-bg: #173327; --hold: #f2c94c; --hold-bg: #33290f; --code-bg: #0b1317; color-scheme: dark; }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 16px/1.7 var(--body); -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
+  .mono { font-family: var(--mono); }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* top bar */
+  .top { background: var(--night); color: var(--night-ink); border-bottom: 1px solid var(--night-line); }
+  .top .wrap { display: flex; align-items: center; gap: 18px; height: 60px; }
+  .brand { display: flex; align-items: baseline; gap: 10px; text-decoration: none; }
+  .brand b { font: 900 20px/1 var(--serif-zh); letter-spacing: .04em; }
+  .brand small { font: 500 13px/1 var(--serif); color: var(--night-muted); }
+  .crumb { font-size: 14px; color: var(--night-muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .crumb a { text-decoration: none; }
+  .crumb a:hover { color: var(--night-ink); }
+  .sample { margin-left: auto; font: 500 12px/1 var(--mono); letter-spacing: .12em; color: var(--accent); border: 1px solid var(--night-line); border-radius: 999px; padding: 6px 10px; white-space: nowrap; }
+
+  /* hero */
+  .hero { background: var(--night); color: var(--night-ink); }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; padding-block: 56px 48px; align-items: center; }
+  .eyebrow { font: 500 13px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin: 0 0 18px; }
+  h1 { margin: 0; font: 900 clamp(30px, 4.2vw, 50px)/1.18 var(--serif-zh); letter-spacing: .01em; text-wrap: balance; }
+  .lede { margin: 22px 0 0; color: var(--night-muted); font-size: 17px; max-width: 34em; }
+  .lede b { color: var(--night-ink); font-weight: 500; }
+  .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin: 32px 0 0; border-top: 1px solid var(--night-line); }
+  .facts div { padding: 14px 14px 0 0; }
+  .facts dt { font: 500 12px/1.4 var(--body); color: var(--night-muted); }
+  .facts dd { margin: 4px 0 0; font: 600 26px/1.1 var(--serif); color: var(--night-ink); font-variant-numeric: tabular-nums; }
+  .facts dd small { font: 400 13px/1 var(--body); color: var(--night-muted); margin-left: 3px; }
+
+  .viewer { position: relative; background: radial-gradient(120% 90% at 50% 40%, #16262d 0%, var(--night) 70%); border: 1px solid var(--night-line); border-radius: 6px; aspect-ratio: 4 / 3.3; max-width: 100%; overflow: hidden; }
+  .viewer canvas { width: 100%; height: 100%; display: block; cursor: grab; touch-action: none; }
+  .viewer canvas:active { cursor: grabbing; }
+  .viewer .tabs { position: absolute; left: 12px; top: 12px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .viewer .tabs button { font: 500 13px/1 var(--body); color: var(--night-muted); background: rgba(10,18,22,.75); border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 11px; cursor: pointer; }
+  .viewer .tabs button[aria-pressed="true"] { color: var(--night); background: var(--accent); border-color: var(--accent); }
+  .viewer .cap { position: absolute; left: 12px; right: 12px; bottom: 10px; font: 400 12.5px/1.5 var(--mono); color: var(--night-muted); }
+  .viewer .cap b { color: var(--night-ink); font-weight: 500; }
+
+  /* sections */
+  section { padding-block: 56px; }
+  h2 { margin: 0 0 6px; font: 700 clamp(24px, 3vw, 32px)/1.3 var(--serif-zh); text-wrap: balance; }
+  .sub { margin: 0 0 28px; color: var(--muted); max-width: 46em; }
+
+  /* process strip */
+  .lanes { display: grid; gap: 18px; }
+  .lane { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 14px; align-items: stretch; }
+  .lane-name { font: 700 15px/1.4 var(--serif-zh); padding-top: 12px; }
+  .lane-name small { display: block; font: 400 12px/1.4 var(--body); color: var(--muted); }
+  .steps { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+  .step { text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; }
+  .step:hover { border-color: var(--muted); }
+  .step[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 -3px 0 var(--accent); }
+  .step .n { font: 500 12px/1 var(--mono); color: var(--muted); }
+  .step .t { font: 500 14.5px/1.35 var(--body); }
+  .pill { align-self: flex-start; font: 500 11.5px/1 var(--body); padding: 4px 7px; border-radius: 999px; }
+  .pill.ok { color: var(--ok); background: var(--ok-bg); }
+  .pill.hold { color: var(--hold); background: var(--hold-bg); }
+  .handoff { font: 400 13px/1.5 var(--body); color: var(--muted); padding-left: calc(7.5em + 14px); }
+  .handoff b { color: var(--ink); font-weight: 500; }
+
+  .detail { margin-top: 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 26px 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+  .detail h3 { margin: 0 0 4px; font: 700 21px/1.35 var(--serif-zh); }
+  .detail .who { font: 500 13px/1.4 var(--mono); color: var(--muted); margin: 0 0 14px; }
+  .detail p { margin: 0 0 12px; }
+  .detail ul { margin: 0 0 12px; padding-left: 1.2em; }
+  .detail li { margin-bottom: 4px; }
+  .kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0 0 14px; font-size: 15px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; font-variant-numeric: tabular-nums; }
+  .note { font-size: 14px; color: var(--hold); background: var(--hold-bg); border-radius: 4px; padding: 8px 12px; margin: 0 0 12px; }
+  .course { font-size: 14px; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 4px; }
+  .course b { color: var(--ink); font-weight: 500; }
+  pre { margin: 0; background: var(--code-bg); border-radius: 4px; padding: 14px 16px; font: 400 13px/1.55 var(--mono); overflow-x: auto; max-height: 340px; }
+  .tbl { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-weight: 500; color: var(--muted); font-size: 13px; }
+  td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
+  .fig { margin: 0; }
+  .fig img { display: block; width: 100%; max-width: 420px; background: #fff; border-radius: 4px; border: 1px solid var(--line); }
+  .fig figcaption { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .bar { display: grid; gap: 8px; margin: 4px 0 14px; }
+  .bar div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) 4em; gap: 10px; align-items: center; font-size: 14px; }
+  .bar i { display: block; height: 12px; background: var(--accent); border-radius: 2px; }
+  .bar i.ghost { background: var(--line); }
+  .bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* open items */
+  .open { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+  .open div { border-top: 1px solid var(--line); padding: 14px 0 16px; }
+  .open h4 { margin: 0 0 4px; font: 500 16px/1.4 var(--body); }
+  .open p { margin: 0; color: var(--muted); font-size: 15px; }
+  .quote { margin: 28px 0 0; font: 500 19px/1.6 var(--serif-zh); max-width: 36em; }
+
+  /* courses & do it */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 40px; }
+  .clist { list-style: none; margin: 0; padding: 0; }
+  .clist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .clist b { font-weight: 500; }
+  .clist small { display: block; color: var(--muted); font-size: 14px; }
+  .clist em { font-style: normal; font-size: 12.5px; color: var(--muted); align-self: start; padding-top: 3px; white-space: nowrap; }
+  .do { background: var(--night); color: var(--night-ink); border-radius: 6px; padding: 26px 26px 24px; }
+  .do h3 { margin: 0 0 12px; font: 700 20px/1.35 var(--serif-zh); }
+  .do ol { margin: 0 0 20px; padding-left: 1.3em; color: var(--night-muted); }
+  .do ol b { color: var(--night-ink); font-weight: 500; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { display: inline-block; text-decoration: none; font: 500 15px/1 var(--body); padding: 12px 16px; border-radius: 4px; }
+  .btn.pri { background: var(--accent); color: var(--night); }
+  .btn.sec { border: 1px solid var(--night-line); color: var(--night-ink); }
+  .mail { margin-top: 14px; font-size: 14px; color: var(--night-muted); }
+  .mail span { font-family: var(--mono); color: var(--night-ink); user-select: all; }
+  .files { margin-top: 20px; font-size: 14px; color: var(--muted); }
+  .files code { font-family: var(--mono); font-size: 13px; color: var(--ink); }
+
+  footer { border-top: 1px solid var(--line); padding-block: 26px 40px; font-size: 13.5px; color: var(--muted); }
+  footer a { color: var(--ink); }
+
+  @media (max-width: 900px) {
+    .hero .wrap, .detail, .cols { grid-template-columns: minmax(0, 1fr); }
+    .lane { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+    .lane-name { padding-top: 0; }
+    .handoff { padding-left: 0; }
+    .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .open { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .detail { padding: 20px 18px; }
+    .brand small, .crumb { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+
+/* ---- added for the site version ---- */
+html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display: none !important; }
+html[lang="en"] h1, html[lang="en"] h2, html[lang="en"] .detail h3, html[lang="en"] .do h3, html[lang="en"] .lane-name, html[lang="en"] .quote { font-family: var(--serif); font-weight: 600; }
+.lang { margin-left: 12px; font: 500 13px/1 var(--body); color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
+.top .sample { margin-left: auto; }
+.top .sample + .sample { margin-left: auto; }
+.top .crumb { margin-right: auto; }
+.pill.na { color: var(--muted); background: var(--code-bg); }
+.unit { font-size: 13px; color: var(--muted); margin-top: -6px !important; }
+section.alt { background: var(--surface); border-block: 1px solid var(--line); }
+nav.cases { background: var(--night-2); border-bottom: 1px solid var(--night-line); }
+nav.cases { display: flex; flex-wrap: wrap; gap: 4px 24px; padding: 12px max(20px, calc((100% - 1140px) / 2)); }
+nav.cases a { color: var(--night-muted); text-decoration: none; font-size: 15px; padding: 4px 0; border-bottom: 2px solid transparent; }
+nav.cases a:hover { color: var(--night-ink); }
+nav.cases a[aria-current="page"] { color: var(--night-ink); border-bottom-color: var(--accent); }
+nav.cases .mono { font-size: 12px; color: var(--accent); margin-right: 4px; }
+.hero.short .wrap.one { display: block; padding-block: 56px 48px; }
+.hero.short h1 { max-width: 20em; }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.card { display: flex; flex-direction: column; gap: 10px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 22px 22px 20px; min-width: 0; }
+.card:hover { border-color: var(--accent); }
+.card .mono { font-size: 12px; color: var(--accent-ink); letter-spacing: .1em; }
+.card b { font: 700 22px/1.3 var(--serif-zh); }
+html[lang="en"] .card b { font-family: var(--serif); font-weight: 600; }
+.card .q { color: var(--muted); }
+.card .f { margin-top: auto; font-size: 13px; color: var(--ink); }
+@media (max-width: 900px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 520px) { .top .sample { display: none; } }
+
+/* ---- story pages (gearbox plant topic cases) ---- */
+.chain { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; counter-reset: n; }
+.node { position: relative; text-align: left; font: inherit; color: var(--night-ink); background: var(--night-2); border: 1px solid var(--night-line); border-radius: 6px; padding: 12px 12px 14px; margin-right: 18px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.node:not(:last-child)::after { content: "→"; position: absolute; right: -16px; top: 50%; transform: translateY(-50%); color: var(--night-muted); font-size: 14px; }
+.node:last-child { margin-right: 0; }
+.node .k { font: 500 12px/1.3 var(--body); color: var(--night-muted); }
+.node .v { font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
+.node .s { font-size: 12.5px; color: var(--night-muted); }
+.node.alarm { border-color: #c2553f; }
+.node.cause { border-color: var(--accent); }
+.node.risk { border-color: #d98c1f; }
+.node[aria-pressed="true"] { background: #1b2d35; box-shadow: inset 0 -3px 0 var(--accent); }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 14px 0 0; font-size: 13px; color: var(--night-muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.nd { margin-top: 16px; background: var(--night-2); border: 1px solid var(--night-line); border-radius: 6px; padding: 16px 18px; color: var(--night-ink); max-width: 60em; }
+.nd p { margin: 0 0 8px; }
+.nd .how { font-size: 13px; color: var(--night-muted); margin: 0; }
+.nd .how code { font-family: var(--mono); font-size: 12.5px; color: var(--night-ink); }
+.hero.story .wrap { grid-template-columns: minmax(0, 1fr); }
+.opts tr.rec td { background: var(--ok-bg); }
+.opts td .tag { font: 500 11.5px/1 var(--body); color: var(--ok); border: 1px solid var(--ok); border-radius: 999px; padding: 3px 6px; margin-left: 6px; white-space: nowrap; }
+.opts td.miss-bad { color: var(--hold); }
+.after { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; counter-reset: a; }
+.after li { border-top: 2px solid var(--ink); padding-top: 10px; counter-increment: a; }
+.after b { display: block; font-weight: 500; margin-bottom: 4px; }
+.after b::before { content: counter(a) " · "; font-family: var(--mono); color: var(--muted); }
+.after span { color: var(--muted); font-size: 15px; }
+.everyday { margin: 26px 0 0; padding-left: 14px; border-left: 3px solid var(--accent); color: var(--muted); max-width: 46em; }
+.group-h { margin: 44px 0 14px; font: 700 18px/1.3 var(--serif-zh); }
+html[lang="en"] .group-h { font-family: var(--serif); font-weight: 600; }
+@media (max-width: 1000px) {
+  .chain { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 14px; }
+  .node:nth-child(3n):not(:last-child)::after { content: "↓"; right: auto; left: 50%; top: auto; bottom: -15px; transform: none; }
+  .node:nth-child(3n) { margin-right: 0; }
+  .after { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .chain { grid-template-columns: minmax(0, 1fr); }
+  .node { margin-right: 0; }
+  .node:not(:last-child)::after { content: "↓"; right: auto; left: 18px; top: auto; bottom: -15px; transform: none; }
+  .after { grid-template-columns: minmax(0, 1fr); }
+}
+
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <a class="brand" href="/" ><b>问渠</b><small>WenQuest Robotics</small></a>
+  <span class="crumb"><a href="index.html"><span data-zh>数字工厂 · 典型应用</span><span data-en>Digital factory · cases</span></a> › <span data-zh>一台报警，追到砂轮</span><span data-en>From one complaint to one grinding wheel</span></span>
+  
+  <button class="lang" id="langBtn" type="button">EN</button>
+</div></header>
+<div class="hero story"><div class="wrap">
+  <div>
+    <p class="eyebrow"><span data-zh>专题案例 04 · 减速器厂 · 数字主线</span><span data-en>Topic case 04 · gearbox plant · digital thread</span></p>
+    <h1><span data-zh>客户一个电话，追到车间里的那片砂轮，再找出还有谁家的设备有同样的隐患</span><span data-en>One customer call, traced back to one grinding wheel, then forward to every machine that shares the risk</span></h1>
+    <p class="lede"><span data-zh>北方矿业来电：2 号主运皮带上的减速器有异响、振动变大。厂情中枢沿着数据往回追：这台减速器装的哪根输出轴、在哪台磨床上用哪片砂轮磨的；再往前追：同一片砂轮还磨了哪些轴、装进了哪些客户的设备。然后<b>按数字孪生的健康度排出风险，给出三个服务方案，算好人、天数和费用</b>，人批准后派工。</span><span data-en>Northern Mining calls: the gearbox on belt line 2 is noisy and vibrating more. The command center walks the data back — which output shaft is in this gearbox, which grinder and which wheel ground it — then forward: what else that wheel ground, and whose machines those shafts went into. It <b>ranks the risk with the digital twins, prices three service options in engineers, days and dollars</b>, and dispatches once a person approves.</span></p>
+    <dl class="facts"><div><dt><span data-zh>追溯链</span><span data-en>Trace chain</span></dt><dd>6<small><span data-zh>环</span><span data-en>links</span></small></dd></div><div><dt><span data-zh>同批另外装在</span><span data-en>Same batch also in</span></dt><dd>2<small><span data-zh>台设备</span><span data-en>units</span></small></dd></div><div><dt><span data-zh>推荐方案费用</span><span data-en>Recommended option</span></dt><dd>$973<small></small></dd></div><div><dt><span data-zh>推荐方案漏掉高风险</span><span data-en>High-risk units missed</span></dt><dd>0<small><span data-zh>台</span><span data-en></span></small></dd></div></dl>
+    <div class="chain" id="chain" style="margin-top:36px"></div>
+    <div class="legend"><span><i style="background:#c2553f"></i><span data-zh>投诉的设备</span><span data-en>Reported unit</span></span><span><i style="background:var(--accent)"></i><span data-zh>可能的源头</span><span data-en>Likely source</span></span><span><i style="background:#d98c1f"></i><span data-zh>高风险</span><span data-en>High risk</span></span><span><span data-zh>点任意一环看记录和依据</span><span data-en>Click a link for the record and its basis</span></span></div>
+    <div class="nd" id="nodeDetail" aria-live="polite"></div>
+  </div>
+</div></div>
+<nav class="cases" aria-label="典型应用"><a href="cobot-joint.html"><span class="mono">01</span> <span data-zh>协作机器人关节</span><span data-en>Collaborative Robot Joint</span></a><a href="scara.html"><span class="mono">02</span> <span data-zh>SCARA 机器人</span><span data-en>SCARA Robot</span></a><a href="lockstitch.html"><span class="mono">03</span> <span data-zh>直驱平缝机</span><span data-en>Direct-Drive Lockstitch</span></a><a href="digital-thread.html" aria-current="page"><span class="mono">04</span> <span data-zh>一台报警，追到砂轮</span><span data-en>From one complaint to one grinding wheel</span></a></nav>
+<section><div class="wrap">
+  <h2><span data-zh>三个服务方案，按排班算好</span><span data-en>Three service options, priced against the schedule</span></h2>
+  <p class="sub"><span data-zh>三台都已过保修期，费用全部向客户收取；备件都是 2 套 6206-2RS 轴承（BRG-6206）。工程师按区域排班：北部赵岩、东部周海、南部林青，同区域每人每天最多 2 单。中枢推荐 B：比 C 少通知一家客户、少花 $480，又不漏掉高风险的那台。</span><span data-en>All three units are out of warranty, so customers are billed; each option uses 2 sets of 6206-2RS bearings (BRG-6206). Engineers are scheduled by region — Zhao Yan north, Zhou Hai east, Lin Qing south — at most 2 jobs per person per day. The command center recommends B: one fewer customer to notify and $480 less than C, without missing the high-risk unit.</span></p>
+  <div class="tbl opts"><table><thead><tr><th><span data-zh>方案</span><span data-en>Option</span></th><th class="r"><span data-zh>上门台数</span><span data-en>Units visited</span></th><th><span data-zh>工程师</span><span data-en>Engineers</span></th><th class="r"><span data-zh>天数</span><span data-en>Days</span></th><th class="r"><span data-zh>人天</span><span data-en>Person-days</span></th><th class="r"><span data-zh>费用</span><span data-en>Cost</span></th><th class="r"><span data-zh>通知客户</span><span data-en>Customers</span></th><th><span data-zh>漏掉的高风险</span><span data-en>High-risk missed</span></th></tr></thead><tbody><tr><td><b>A</b> · <span data-zh>只修出问题的</span><span data-en>Repair the reported unit only</span></td><td class="r">1</td><td><span data-zh>赵岩</span><span data-en>Zhao Yan</span></td><td class="r">2</td><td class="r">0.5</td><td class="r">$493</td><td class="r">1</td><td class="miss-bad"><span data-zh>1 台（WQR105-H2408-05）</span><span data-en>1 (WQR105-H2408-05)</span></td></tr><tr class="rec"><td><b>B</b> · <span data-zh>修 + 高风险上门点检</span><span data-en>Repair + inspect high-risk units</span><span class="tag"><span data-zh>中枢推荐</span><span data-en>Recommended</span></span></td><td class="r">2</td><td><span data-zh>赵岩、周海</span><span data-en>Zhao Yan, Zhou Hai</span></td><td class="r">2</td><td class="r">1.0</td><td class="r">$973</td><td class="r">2</td><td><span data-zh>0</span><span data-en>0</span></td></tr><tr><td><b>C</b> · <span data-zh>整批排查</span><span data-en>Inspect the whole batch</span></td><td class="r">3</td><td><span data-zh>赵岩、周海、林青</span><span data-en>Zhao Yan, Zhou Hai, Lin Qing</span></td><td class="r">2</td><td class="r">1.5</td><td class="r">$1,453</td><td class="r">3</td><td><span data-zh>0</span><span data-en>0</span></td></tr></tbody></table></div>
+  <h3 class="group-h"><span data-zh>选定之后</span><span data-en>After the choice</span></h3>
+  <ol class="after"><li><b><span data-zh>起草动作</span><span data-en>Draft actions</span></b><span><span data-zh>采纳 B，AI 起草三个动作：服务派工、备件出库、给东港码头的预防性服务通知。</span><span data-en>Adopting B, the AI drafts three actions: service dispatch, spare-parts issue and a preventive-service notice to East Port.</span></span></li><li><b><span data-zh>人来批准</span><span data-en>A person approves</span></b><span><span data-zh>派工和出库要花钱，只有厂长能批；客户通知由另一位售后或老师批，不能批自己发起的。</span><span data-en>Dispatch and parts cost money, so only the plant manager can approve; the notice needs another service person or the teacher — never its author.</span></span></li><li><b><span data-zh>落到 ERPNext</span><span data-en>Into ERPNext</span></b><span><span data-zh>批准后 ERPNext 里有服务单（写明工程师和上门日）和备件出库单；工程师日历多了单子。</span><span data-en>After approval ERPNext holds the service issues (engineer and visit date) and the stock entry; the engineers’ calendars fill in.</span></span></li><li><b><span data-zh>回访</span><span data-en>Follow-up</span></b><span><span data-zh>工程师按日子上门换轴承，孪生健康度回到绿；第二天客户回访打分，响应慢、拖期、修完又坏都会扣分。</span><span data-en>Engineers replace the bearings on schedule and the twin returns to green; the next day the customer scores the service, losing points for slow response, delay or a repeat failure.</span></span></li></ol>
+  <p class="everyday"><span data-zh>生活里的同一件事：汽车厂发现某批刹车片有问题，按车架号查出用了这批零件的车，给车主寄召回通知。</span><span data-en>The everyday version: a carmaker finds a bad batch of brake pads, looks up every VIN that got them, and mails recall notices.</span></p>
+</div></section>
+<section class="alt"><div class="wrap">
+  <h2><span data-zh>留给课堂讨论的</span><span data-en>Open for class discussion</span></h2>
+  <div class="open"><div><h4><span data-zh>只看同一片砂轮够吗</span><span data-en>Is one wheel the right batch?</span></h4><p><span data-zh>批次还可以按同一张工单、同一炉热处理、同一批轴承来划。范围划窄会漏，划宽会多花钱、多惊动客户。</span><span data-en>Batches can also be cut by work order, heat-treat lot or bearing lot. Too narrow misses units; too wide costs more and alarms more customers.</span></p></div><div><h4><span data-zh>这笔钱算谁的</span><span data-en>Whose budget pays?</span></h4><p><span data-zh>保修内由工厂出钱。该算售后、质量还是生产？怎样从源头少花这笔钱，比如把砂轮修整间隔从 30 件改为 20 件？</span><span data-en>In warranty the factory pays. Should it land on service, quality or production? How do you cut it at the source — say, dressing the wheel every 20 parts instead of 30?</span></p></div><div><h4><span data-zh>演练是教学情景</span><span data-en>This run is a teaching scenario</span></h4><p><span data-zh>客户、设备和砂轮批次都是教学工厂的情景数据，现场时钟 1 分钟 = 1 天。追溯和方案的算法与线上一致。</span><span data-en>Customers, units and wheel batches are scenario data in the teaching factory, with a field clock of 1 minute = 1 day. The tracing and option logic are the same code that runs live.</span></p></div></div>
+</div></section>
+<section><div class="wrap cols">
+  <div>
+    <h2><span data-zh>这个案例用到的课</span><span data-en>Courses behind this case</span></h2>
+    <ul class="clist"><li><span><b><span data-zh>质量管理与 SPC</span><span data-en>Quality Management and SPC</span></b><small><span data-zh>批次追溯、不合格品处理、CAPA</span><span data-en>Batch traceability, nonconformance, CAPA</span></small></span><em><span data-zh>特色选修 · 建设中</span><span data-en>Elective · planned</span></em></li><li><span><b><span data-zh>设备管理与预测性维护</span><span data-en>Equipment Management and Predictive Maintenance</span></b><small><span data-zh>数字孪生、轴承寿命、维护时机</span><span data-en>Digital twins, bearing life, maintenance timing</span></small></span><em><span data-zh>特色选修 · 建设中</span><span data-en>Elective · planned</span></em></li><li><span><b><span data-zh>智能制造与数字孪生</span><span data-en>Smart Manufacturing and Digital Twins</span></b><small><span data-zh>工厂本体、异常、追因、推演与动作</span><span data-en>Factory ontology, anomalies, root cause, what-if and actions</span></small></span><em><span data-zh>特色选修 · 建设中</span><span data-en>Elective · planned</span></em></li><li><span><b><span data-zh>工业数据与 AI 代理</span><span data-en>Industrial Data and AI Agents</span></b><small><span data-zh>AI 代理怎样调工具、引依据、只起草不擅自执行</span><span data-en>How the AI agent calls tools, cites evidence and only drafts</span></small></span><em><span data-zh>特色选修 · 建设中</span><span data-en>Elective · planned</span></em></li><li><span><b><span data-zh>机械制造技术</span><span data-en>Manufacturing Technology</span></b><small><span data-zh>磨削、砂轮修整与加工误差</span><span data-en>Grinding, wheel dressing and machining error</span></small></span><em><span data-zh>教材编写中</span><span data-en>In writing</span></em></li></ul>
+  </div>
+  <div>
+    <div class="do">
+      <h3><span data-zh>自己做一遍</span><span data-en>Do it yourself</span></h3>
+      <ol><li><b><span data-zh>实验 16</span><span data-en>Lab 16</span></b><span data-zh>：客户投诉的追溯、召回与服务决策</span><span data-en>: Complaint traceability, recall and service decisions</span></li><li><b><span data-zh>实验 15</span><span data-en>Lab 15</span></b><span data-zh>：车间异常的追因、推演与决策</span><span data-en>: Shop-floor anomalies: root cause, what-if, decision</span></li><li><b><span data-zh>实验 13</span><span data-en>Lab 13</span></b><span data-zh>：减速器数字孪生与预测性维护</span><span data-en>: Gearbox digital twin and predictive maintenance</span></li></ol>
+      <div class="btns">
+        <a class="btn pri" href="https://learn.wenquestrobotics.com/" target="_blank" rel="noopener"><span data-zh>免费注册，开始学习</span><span data-en>Sign up free and start</span></a>
+        <a class="btn sec" href="index.html"><span data-zh>其他案例</span><span data-en>Other cases</span></a>
+      </div>
+      <p class="mail"><span data-zh>学校或企业预约演示工厂：</span><span data-en>Schools and companies, book a factory demo: </span><span>info@wenquestrobotics.com</span></p>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap"><span data-zh>依据：</span><span data-en>Source: </span><span data-zh>问渠数字工厂教学模式演练（2026-10-08），引擎与实验 16 相同；记录见仓库 tools/site_cases/runs/。</span><span data-en>WenQuest digital factory, teaching-mode run (2026-10-08), same engine as Lab 16; record in tools/site_cases/runs/ in the repository.</span></div></footer>
+<script>const STORY = {"chain":[{"k":["投诉","Complaint"],"v":"WQR105-H2404-01","sub":["北方矿业 · 2 号主运皮带","Northern Mining · belt line 2"],"tone":"alarm","d":["客户来电：减速器异响，振动比以前大。投诉登记后，规则 C1 在下一个检测周期开出异常。数字孪生：健康度绿，但最先到期的中间轴轴承 B（6206-2RS）寿命已用 73.7%。","Phone complaint: noise and more vibration. Rule C1 opens an anomaly on the next detection cycle. Digital twin: health green, but the first-due bearing (intermediate shaft B, 6206-2RS) has used 73.7% of its life."],"how":"规则 C1（客户投诉）/ rule C1"},{"k":["输出轴","Output shaft"],"v":"SH301-H2404-01","sub":["出厂档案","Build record"],"tone":"","d":["从现场设备找到它的出厂总成，再找到装在里面的输出轴。依据是数字孪生的出厂数据。","From the field unit to its shipped assembly, then to the output shaft installed in it, using the twin’s build record."],"how":"PartSerial.became → PartSerial.installed_in"},{"k":["砂轮","Grinding wheel"],"v":"grd-01/S1","sub":["GRD-01 外圆磨床","GRD-01 cylindrical grinder"],"tone":"cause","d":["这根轴的磨外圆工序记下了用的是哪片砂轮：grd-01/S1，加工时砂轮剩余寿命 62%。轴承位尺寸由这一刀决定。","The grinding operation recorded which wheel it used: grd-01/S1, with 62% wheel life left at the time. This pass sets the bearing seat size."],"how":"PartSerial.processed（加工记录 / machining record）"},{"k":["同一片砂轮磨出","Same wheel also ground"],"v":"SH301-H2406-09 · SH301-H2408-05","sub":["另外 2 根输出轴","2 more output shafts"],"tone":"","d":["反过来查：同一片砂轮还磨了两根输出轴。如果问题出在砂轮（修整不及时、磨损），这两根轴的轴承位也可能偏。","Searching the other way: the same wheel ground two more shafts. If the wheel is the cause (late dressing, wear), their bearing seats may be off too."],"how":"PartSerial.processed（props.tool = grd-01/S1）"},{"k":["装在","Installed in"],"v":"WQR105-H2408-05","sub":["东港码头 · 散货输送线","East Port · bulk conveyor"],"tone":"risk","d":["健康度黄：换油已过期；最先到期的轴承寿命已用 51.4%。按规则（健康度红 / 黄，或轴承寿命用过 50%）判为<b>高风险</b>。","Health yellow: oil change overdue; first-due bearing at 51.4% of life. By the rule (health red or yellow, or a bearing past 50%) it is <b>high risk</b>."],"how":"PartSerial.installed_in → FieldUnit.customer"},{"k":["装在","Installed in"],"v":"WQR105-H2406-09","sub":["鲜丰食品 · 包装线","Fresh Foods · packaging line"],"tone":"","d":["健康度绿，没有报警，最先到期的轴承寿命只用了 3.5%。在排查范围里，但不是高风险。","Health green, no alarms, first-due bearing at only 3.5% of life. In the check scope, but not high risk."],"how":"PartSerial.installed_in → FieldUnit.customer"}]};</script>
+<script>
+// ---- language (shared with the home page: localStorage "wq-site-lang") ----
+const root = document.documentElement, langBtn = document.getElementById("langBtn");
+let lang;
+try { lang = localStorage.getItem("wq-site-lang"); } catch (e) {}
+lang = lang || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+const onLang = [];
+function setLang(l) {
+  lang = l; root.lang = l === "en" ? "en" : "zh-CN";
+  langBtn.textContent = l === "en" ? "中文" : "EN";
+  try { localStorage.setItem("wq-site-lang", l); } catch (e) {}
+  onLang.forEach(f => f());
+}
+langBtn.addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));
+setLang(lang);
+
+// ---- chain: click a link to see the record and how the link was made ----
+const LL = () => (lang === "en" ? 1 : 0);
+let cur = 0;
+function drawChain() {
+  const box = document.getElementById("chain");
+  box.innerHTML = "";
+  STORY.chain.forEach((n, i) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "node " + (n.tone || ""); b.setAttribute("aria-pressed", i === cur ? "true" : "false");
+    b.innerHTML = `<span class="k">${String(i + 1).padStart(2, "0")} · ${n.k[LL()]}</span><span class="v mono">${n.v}</span><span class="s">${n.sub[LL()]}</span>`;
+    b.addEventListener("click", () => { cur = i; drawChain(); });
+    box.appendChild(b);
+  });
+  const n = STORY.chain[cur];
+  document.getElementById("nodeDetail").innerHTML =
+    `<p>${n.d[LL()]}</p><p class="how"><span>${LL() ? "Link from" : "链接依据"}</span> <code>${n.how}</code></p>`;
+}
+drawChain();
+onLang.push(drawChain);
+
+</script>
+</body>
+</html>
