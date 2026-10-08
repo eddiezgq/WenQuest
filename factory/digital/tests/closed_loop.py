@@ -315,7 +315,8 @@ def main():
         check(r["status"] == "closed", "异常可以关闭并留记录")
     hub("POST", "/api/mes/cmd", {"unit": "cnc-l01-b", "command": "reset"}, teacher)
     sit = hub("GET", "/api/ont/situation", token=teacher)
-    check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 1, "全厂态势 15 块，1 块待接入（能源）")
+    wt = [x["domain"] for x in sit["cards"] if x["waiting"]]
+    check(len(sit["cards"]) == 15 and set(wt) <= {"energy"}, "全厂态势 15 块，待接入：{}（第 18 轮 E6 起能源有计量读数后也接上）".format("、".join(wt) or "没有"))
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
     check(len(live) == 55 and not [x["id"] for x in live if x["error"]], "规则 55 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
