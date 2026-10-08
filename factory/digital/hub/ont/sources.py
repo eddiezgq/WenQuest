@@ -114,6 +114,7 @@ def tables(B, db, mode):
     ehs_objs(B, db, mode)
     maint_objs(B, db, mode)
     people_objs(B, db, mode)
+    supply_objs(B, db, mode)
     try:
         for r in db.q("select id, unit, created_by, summary, alarms, status from plc_run where mode=%s", (mode,)):
             sm = r["summary"] or {}
@@ -337,6 +338,31 @@ def maint_objs(B, db, mode):
     for code, lo in MT.SPARE_MIN.items():
         B.obj(mode, "SparePart", code, {"stock": MT.stock_of(db, mode, code), "min_stock": lo})
         B.link(mode, "SparePart", code, "item", code)
+
+
+def supply_objs(B, db, mode):
+    """供应链（第 18 轮 E5）：批次、来料检验、供应商评价"""
+    if not db.one("select to_regclass('lot') is not null as ok")["ok"]:
+        return
+    from hub import supply as SP
+    for x in db.q("select * from lot where mode=%s and lot is not null and ordered_at > now() - interval '180 days'", (mode,)):
+        n = db.one("select count(distinct part_serial) as n from batch_use where mode=%s and lot=%s", (mode, x["lot"]))["n"]
+        B.obj(mode, "Batch", x["lot"], {"qty": float(x["qty"]), "qty_left": float(x["qty_left"] or 0), "status": SP.STATUS.get(x["status"]),
+                                        "po": x["po"], "parts": n}, ts=_ts(x["ordered_at"]), upd_ts=_now(), text="批次")
+        B.link(mode, "Batch", x["lot"], "item", x["item"])
+        B.link(mode, "Batch", x["lot"], "supplier", x["supplier"])
+        ins = x["inspection"] or {}
+        if ins:
+            k = "IQ-{}".format(x["lot"])
+            B.obj(mode, "IncomingInspection", k, {"result": "合格" if ins.get("status") == "Accepted" else "不合格"}, ts=_ts(x["ordered_at"]), upd_ts=_now(),
+                  text="来料检验")
+    for s_ in SP.scorecard(db, mode):
+        k = "{}-30d".format(s_["supplier"])
+        B.obj(mode, "SupplierRating", k, {"on_time": round(s_["on_time"] * 100, 1) if s_["on_time"] is not None else None,
+                                          "quality": round(s_["pass_rate"] * 100, 1) if s_["pass_rate"] is not None else None,
+                                          "price_index": s_["price_index"], "role": "默认" if s_["role"] == "default" else "备选"})
+        B.link(mode, "SupplierRating", k, "supplier", s_["supplier"])
+        B.obj(mode, "Supplier", s_["supplier"], {"name": s_["supplier"], "lead_days": s_["lead_days"], "category": s_["cat_name"]})
 
 
 def people_objs(B, db, mode):

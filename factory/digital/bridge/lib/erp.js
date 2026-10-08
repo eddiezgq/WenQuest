@@ -226,6 +226,15 @@ class ERP {
           out.push(this.doc(r[0], r[1], r[2], opt));
           created.push([r[0], r[1].name]);
         }
+      } else if (['supply_setup', 'purchase_order', 'incoming_receipt'].includes(d.action)) {
+        // 第 18 轮 E5：备选供应商、采购单、收货 + 来料检验
+        const at = out.length;
+        for (const r of await this.supplyService(d.action, d.preview)) {
+          out.push(this.doc(r[0], r[1], r[2], opt));
+          created.push([r[0], r[1].name]);
+        }
+        // 入库后库存马上更新（放在前面：最后一条要带“提议完成”的标记）
+        if (d.action === 'incoming_receipt') out.splice(at, 0, ...await this.bins());
       } else if (d.action === 'people_setup') {
         // 第 18 轮 E4：部门、岗位、员工档案
         for (const r of await this.peopleService(d.action, d.preview)) {
@@ -375,6 +384,66 @@ class ERP {
       insert_after: 'periodicity' });
     this.assetSetup = { company, loc, cat, item, team, user };
     return this.assetSetup;
+  }
+
+  // ------------------------------------------------------------ 第 18 轮 E5：供应链
+  async supplyService(action, pv) {
+    const company = await this.getCompany();
+    const out = [];
+    const wh = (code) => (code.startsWith('RM-') ? WH.raw : WH.purchased);
+    if (action === 'supply_setup') {
+      // 备选供应商（可以重发：按名称跳过已建的）
+      for (const sp of pv.suppliers || []) {
+        const had = (await this.list('Supplier', [['name', '=', sp.name]], ['name']))[0];
+        const doc = had ? await this.get('Supplier', had.name) : await this.insert('Supplier', { supplier_name: sp.name, supplier_type: 'Company',
+          ...(sp.group ? { supplier_group: sp.group } : {}) });
+        out.push(['Supplier', doc, had ? 'updated' : 'created']);
+      }
+    } else if (action === 'purchase_order') {
+      const date = erpDate(new Date().toISOString());
+      const po = await this.insert('Purchase Order', { supplier: pv.supplier, company, transaction_date: date, schedule_date: pv.schedule_date,
+        set_warehouse: wh(pv.items[0].item_code), docstatus: 1,
+        items: pv.items.map((i) => ({ item_code: i.item_code, qty: i.qty, rate: i.rate, schedule_date: pv.schedule_date, warehouse: wh(i.item_code),
+          ...(i.material_request ? { material_request: i.material_request, material_request_item: i.material_request_item } : {}) })) });
+      out.push(['Purchase Order', po, 'submitted']);
+    } else if (action === 'incoming_receipt') {
+      // 按采购单生成收货单（批号记在自定义字段）；要检验的物料先建来料检验单；合格（或让步接收）才提交收货单入库
+      await this.ensureCustomField('Purchase Receipt', 'wq_lot', { label: '批号 Lot', fieldtype: 'Data', insert_after: 'supplier' });
+      const made = await this.method('erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt', { source_name: pv.purchase_order });
+      const pr0 = { ...made };
+      delete pr0.name;
+      delete pr0.__islocal;
+      const row = (pr0.items || []).find((i) => i.item_code === pv.item_code);
+      if (!row) throw new Error(`采购单 ${pv.purchase_order} 里没有待收的 ${pv.item_code}`);
+      const qty = pv.accept ? pv.accept_qty : pv.qty;
+      const clean = { ...row };
+      for (const k of ['name', '__islocal', '__unsaved', 'parent', 'parenttype', 'parentfield', 'idx', 'docstatus']) delete clean[k];
+      pr0.items = [{ ...clean, qty, received_qty: qty, rejected_qty: 0 }];
+      pr0.posting_date = erpDate(new Date().toISOString());
+      pr0.wq_lot = pv.lot;
+      pr0.remarks = `批号 ${pv.lot}${pv.remarks ? '；' + pv.remarks : ''}`;
+      const pr = await this.insert('Purchase Receipt', pr0);
+      out.push(['Purchase Receipt', pr, 'created']);
+      let qi = null;
+      if (pv.inspect) {
+        qi = await this.insert('Quality Inspection', { report_date: pr0.posting_date, inspection_type: 'Incoming', reference_type: 'Purchase Receipt',
+          reference_name: pr.name, item_code: pv.item_code, sample_size: pv.sample_size || 1, inspected_by: 'Administrator', status: pv.status,
+          manual_inspection: 1, remarks: `批号 ${pv.lot}：${pv.remarks || ''}`.slice(0, 500),
+          ...(pv.template ? { quality_inspection_template: pv.template } : {}),
+          readings: (pv.readings || []).map((r) => (r.numeric ? { specification: r.specification, numeric: 1, manual_inspection: 1, min_value: r.min,
+            max_value: r.max, reading_1: String(r.value), status: r.ok ? 'Accepted' : 'Rejected' }
+            : { specification: r.specification, numeric: 0, manual_inspection: 1, value: r.value, reading_value: r.value, status: r.ok ? 'Accepted' : 'Rejected' })),
+          docstatus: 1 });
+        out.push(['Quality Inspection', qi, 'submitted']);
+      }
+      if (pv.accept) {
+        const cur = await this.get('Purchase Receipt', pr.name);
+        const items = (cur.items || []).map((i) => (i.item_code === pv.item_code && qi ? { ...i, quality_inspection: qi.name } : i));
+        const done = await this.update('Purchase Receipt', pr.name, { items, docstatus: 1 });
+        out.push(['Purchase Receipt', done, 'submitted']);
+      }
+    }
+    return out;
   }
 
   // ------------------------------------------------------------ 第 18 轮 E4：人员与组织
@@ -700,7 +769,7 @@ class ERP {
   async poll() {
     const out = [];
     for (const dt of ['Sales Order', 'Work Order', 'Material Request', 'Purchase Order', 'Lead', 'Opportunity', 'Quotation', 'Contract', 'Issue',
-      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log', 'Employee', 'Department', 'Designation']) {
+      'Asset', 'Asset Maintenance', 'Asset Repair', 'Asset Maintenance Log', 'Employee', 'Department', 'Designation', 'Purchase Receipt']) {
       const since = this.lastModified[dt];
       const filters = since ? [['modified', '>', since]] : [];
       const rows = await this.list(dt, filters, ['name', 'modified'], { order_by: 'modified asc', limit: 200 });
@@ -776,6 +845,9 @@ function summarize(doctype, d) {
         'wq_response_h', 'wq_warranty_months', 'wq_amount', 'wq_quotation', 'wq_sales_order']);
     case 'Issue':
       return pick(['subject', 'status', 'customer', 'opening_date', 'resolution_date', 'wq_serial', 'wq_kind', 'wq_engineer', 'wq_day']);
+    case 'Purchase Receipt':            // 第 18 轮 E5
+      return { ...pick(['supplier', 'status', 'docstatus', 'posting_date', 'wq_lot']),
+        items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, purchase_order: i.purchase_order, quality_inspection: i.quality_inspection })) };
     case 'Employee':                    // 第 18 轮 E4（只带工作上的字段：不带生日、电话）
       return pick(['employee_name', 'first_name', 'employee_number', 'department', 'designation', 'status', 'date_of_joining', 'company']);
     case 'Department':

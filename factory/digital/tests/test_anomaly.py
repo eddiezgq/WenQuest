@@ -93,7 +93,7 @@ def test_catalog_loads_33_live_rules_and_waiting_ones():
     from hub.ont import anomaly as A
     c = A.load_catalog()
     live = [r for r in c.values() if not r["waiting"]]
-    assert len(live) == 44                                            # 第 18 轮 E1：C1–C5、R3；E2：E1–E7；E3：M2–M7；E4：H1–H5
+    assert len(live) == 49                                            # 第 18 轮 E1：C1–C5、R3；E2：E1–E7；E3：M2–M7；E4：H1–H5；E5：W3–W7
     assert {k for k, r in c.items() if not r["waiting"]} >= {"C1", "C2", "C3", "C4", "C5", "R3"}
     assert {k for k, r in c.items() if not r["waiting"]} >= {"E1", "E2", "E3", "E4", "E5", "E6", "E7"}
     assert {r["domain"] for r in c.values() if r["waiting"]} >= {"energy"}

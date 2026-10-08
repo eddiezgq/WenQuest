@@ -68,9 +68,15 @@ TYPES = {
     "shift_swap": {"label": "调班", "costly": False, "people": True},
     "overtime_assign": {"label": "加班顶班", "costly": True, "people": True},
     "skill_training": {"label": "技能培训", "costly": True, "people": True, "nosim": True},
+    # 第 18 轮 E5：供应链（发起：计划员、质量、厂长；采购单、开发备选花钱厂长批；退货计划员批；让步接收质量批）
+    "purchase_order": {"label": "采购单", "costly": True, "supply": True, "nosim": True},
+    "supplier_return": {"label": "退货", "costly": False, "supply": True, "nosim": True},
+    "concession": {"label": "让步接收", "costly": False, "supply": True, "nosim": True},
+    "alt_supplier": {"label": "开发备选供应商", "costly": True, "supply": True, "nosim": True},
 }
 MAINT_INITIATORS = ("maintenance", "manager")
 PEOPLE_INITIATORS = ("lead", "planner", "manager")
+SUPPLY_INITIATORS = ("planner", "quality", "manager")
 SERVICE_INITIATORS = ("service", "manager", "sales")
 EHS_INITIATORS = ("safety", "manager")
 
@@ -135,6 +141,16 @@ def title_of(t, p):
         sh = {"day": "早班", "night": "晚班"}.get(p.get("shift"), p.get("shift"))
         return "{}：{} {} {} 由 {} {}".format("调班" if t == "shift_swap" else "加班顶班", str(p.get("day"))[5:], sh, (p.get("unit") or "").upper(),
                                          p.get("emp_id"), "顶岗" if t == "shift_swap" else "加班 {:g} 小时".format(int(p.get("minutes") or 720) / 60))
+    if t == "purchase_order":
+        return "采购单：{} {}{}".format(str(p.get("supplier") or "").split(" ")[0], "、".join("{} × {:g}".format(i["item_code"], float(i["qty"]))
+                                                                                 for i in p.get("items") or []), "（加急）" if p.get("rush") else "")
+    if t == "supplier_return":
+        return "退货：批次 #{}".format(p.get("lot_id"))
+    if t == "concession":
+        return "让步接收（全检挑用）：批次 #{}".format(p.get("lot_id"))
+    if t == "alt_supplier":
+        from hub import supply as SP
+        return "开发备选供应商：{}".format(SP.CAT_NAME.get(p.get("cat"), p.get("cat")))
     if t == "skill_training":
         return "技能培训：{} 学 {}，带教 {:g} 小时".format(p.get("emp_id"), (p.get("unit") or "").upper(), float(p.get("hours") or 40))
     return t
@@ -164,6 +180,8 @@ def can_initiate(u, t=None):
         return u.get("role") in MAINT_INITIATORS
     if t and TYPES.get(t, {}).get("people"):
         return u.get("role") in PEOPLE_INITIATORS
+    if t and TYPES.get(t, {}).get("supply"):
+        return u.get("role") in SUPPLY_INITIATORS
     return u.get("role") in INITIATORS or (t is None and u.get("role") in SERVICE_INITIATORS)
 
 
@@ -178,10 +196,15 @@ def can_approve(u, a):
     ehs = TYPES[a["type"]].get("ehs")
     if not costly and ehs and u.get("role") not in ("manager", "safety"):
         return False, "要安全员或厂长批准"
+    if a["type"] == "concession" and u.get("role") not in ("manager", "quality"):
+        return False, "让步接收要质量或厂长批准"
+    if a["type"] == "supplier_return" and u.get("role") not in ("manager", "planner", "quality"):
+        return False, "要计划员、质量或厂长批准"
+    supply = TYPES[a["type"]].get("supply")
     people = TYPES[a["type"]].get("people")
     if not costly and people and u.get("role") not in ("manager", "lead"):
         return False, "要班组长或厂长批准"
-    if not costly and not service and not ehs and not people and u.get("role") not in ("manager", "planner"):
+    if not costly and not service and not ehs and not people and not supply and u.get("role") not in ("manager", "planner"):
         return False, "要计划员或厂长批准"
     if a["initiator"] == u.get("name"):
         if a["mode"] == "prod":
@@ -196,7 +219,8 @@ def create(db, mode, u, type_, params, scenario_id=None, anomaly_id=None, trial=
         raise ActionError("不认识的动作 " + str(type_))
     if not can_initiate(u, type_):
         raise ActionError("服务类动作由售后或厂长发起" if TYPES[type_].get("service") else
-                          ("人员类动作由班组长、计划员或厂长发起" if TYPES[type_].get("people") else "动作由计划员或厂长发起"))
+                          ("人员类动作由班组长、计划员或厂长发起" if TYPES[type_].get("people") else
+                           ("供应链动作由计划员、质量或厂长发起" if TYPES[type_].get("supply") else "动作由计划员或厂长发起")))
     p = dict(params)
     p["type"] = type_
     r = db.one("insert into action (mode, type, title, params, scenario_id, anomaly_id, initiator, initiator_role, trial) "
@@ -327,6 +351,18 @@ def execute(H, a, u, who):
         from hub import maint as MT
         fn = {"pm_order": MT.exec_pm, "repair_order": MT.exec_repair, "interval_change": MT.exec_interval}[t]
         res = fn(H, mode, dict(p, _action_id=a["id"]), u)
+        return res, "executing" if res.get("proposal_id") else "done"
+    if t in ("purchase_order", "supplier_return", "concession", "alt_supplier"):
+        from hub import supply as SP
+        if t == "purchase_order":
+            r = SP.place_po(H, mode, p["supplier"], p.get("items") or [], u.get("name"), action_id=a["id"], rush=bool(p.get("rush")))
+            res = {"text": "采购单已交 ERPNext（提议 {}），承诺 {} 到货".format(r["proposal_id"], r["promised"]), "proposal_id": r["proposal_id"], "lots": r["lots"]}
+        elif t == "supplier_return":
+            res = SP.return_lot(H, mode, int(p["lot_id"]), u.get("name"), a["id"])
+        elif t == "concession":
+            res = SP.concession(H, mode, int(p["lot_id"]), u.get("name"), a["id"])
+        else:
+            res = SP.activate_alt(H, mode, p["cat"], u.get("name"))
         return res, "executing" if res.get("proposal_id") else "done"
     if t in ("shift_swap", "overtime_assign", "skill_training"):
         from hub import people as PE

@@ -138,6 +138,17 @@ def build(db, mode, kind, start, end):
                          "overdue_units": mk["overdue_units"], "open_repairs": mk["open_repairs"], "mtbf": mk["mtbf"]}
     except Exception:  # noqa: BLE001
         data["maint"] = None
+    # ---- 采购与来料（第 18 轮 E5）
+    try:
+        from hub import supply as SP
+        k5 = SP.kpis(db, mode)
+        arr = db.one("select count(*) as n from lot where mode=%s and arrived_at >= %s and arrived_at < %s", (mode, start, end))["n"]
+        rej = db.one("select count(*) as n from lot where mode=%s and inspection->>'status'='Rejected' and arrived_at >= %s and arrived_at < %s",
+                     (mode, start, end))["n"]
+        data["supply"] = {"arrived": arr, "rejected": rej, "in_transit": k5["in_transit"], "on_time": k5["on_time"], "pass_rate": k5["pass_rate"],
+                          "rejected_open": k5["rejected_open"]}
+    except Exception:  # noqa: BLE001
+        data["supply"] = None
     # ---- 人员（第 18 轮 E4）
     try:
         from hub import people as PE
@@ -231,6 +242,11 @@ def text_of(kind, data):
         lines.append("设备维护：故障 {} 次（停机 {:g} 分钟），完成保养 {} 次；保养逾期 {} 台{}，开着的维修单 {} 张。".format(
             mt["failures"], mt["failure_down_min"], mt["pms_done"], mt["overdue"],
             "（{}）".format("、".join(u.upper() for u in mt["overdue_units"])) if mt["overdue_units"] else "", mt["open_repairs"]))
+    sp = data.get("supply")
+    if sp and (sp["arrived"] or sp["rejected_open"] or sp["in_transit"]):
+        lines.append("采购与来料：到货 {} 批（不合格 {} 批），在途 {} 批，待处理的不合格 {} 批；近 30 天准时率 {}、来料合格率 {}。".format(
+            sp["arrived"], sp["rejected"], sp["in_transit"], sp["rejected_open"], "{:.0%}".format(sp["on_time"]) if sp["on_time"] is not None else "—",
+            "{:.0%}".format(sp["pass_rate"]) if sp["pass_rate"] is not None else "—"))
     pe = data.get("people")
     if pe and (pe["absences"] or pe["gaps"] or pe["single_points"] or pe["overtime_h_week"]):
         lines.append("人员：请假缺勤 {} 人次，24 小时内排班缺口 {} 个；{} 台设备只有一个人会开{}；本周加班 {:g} 小时{}。".format(

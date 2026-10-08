@@ -318,7 +318,7 @@ def main():
     check(len(sit["cards"]) == 15 and sum(1 for x in sit["cards"] if x["waiting"]) == 1, "全厂态势 15 块，1 块待接入（能源）")
     rl = hub("GET", "/api/ont/rules", token=teacher)["rules"]
     live = [x for x in rl if not x["waiting"]]
-    check(len(live) == 44 and not [x["id"] for x in live if x["error"]], "规则 44 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
+    check(len(live) == 49 and not [x["id"] for x in live if x["error"]], "规则 49 条在跑，没有出错（{}）".format([x["id"] for x in live if x["error"]]))
 
     print("11. 厂情中枢：推演与动作（第 17 轮 C 期）")
     r = hub("POST", "/api/ont/shifts", {"mode": "shift"}, teacher)
@@ -387,6 +387,7 @@ def main():
     safety(teacher)
     maintenance(teacher)
     people(teacher)
+    supply(teacher)
     print()
     if FAILS:
         # 桥接写 ERPNext 出错时会把原因作为 erp.doc（action=failed）发到总线：列出来，便于定位
@@ -696,6 +697,82 @@ def people(teacher):
     check("attendance_rate" in k and k["enabled"], "人员态势：出勤率 {:.0%}，缺口 {}，单点依赖 {} 台".format(k["attendance_rate"], k["gaps"], k["single_points"]))
     hub("POST", "/api/people/staffing", {"enabled": False}, teacher)
     hub("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": A.speed}, teacher)   # 后面的虚拟 PLC 演练按原来的倍速
+
+
+def supply(teacher):
+    """第 18 轮 E5：备选供应商进 ERPNext；采购单 → 在途 → 到货 → 来料检验不合格（ERPNext 检验单、收货单草稿）→ W3 → 四个方案 →
+    退货 + 备选急单（ERPNext 采购单）→ 到货 → 检验合格 → 收货单提交入库、库存增加"""
+    print("17. 供应链（第 18 轮 E5）")
+    qa = login("测试质量", "quality")
+    pl = login("测试计划员", "planner")
+
+    def lot(lid):
+        return next((x for x in hub("GET", "/api/supply/lots", token=teacher)["lots"] if x["id"] == lid), None)
+
+    def stock(item):
+        return sum(float(b.get("actual_qty") or 0) for b in erp_docs("Bin") if b.get("item_code") == item)
+    sp = hub("GET", "/api/supply/suppliers", token=teacher)
+    check(len(sp["suppliers"]) == 10 and {x["cat"] for x in sp["single_source"]} == {"castings", "forgings", "hardware", "lubricant"},
+          "供应商 10 家（4 家备选），单一来源：{}".format("、".join(x["cat_name"] for x in sp["single_source"])))
+    r = hub("POST", "/api/lab20/inject", {"enable": True}, teacher)
+    lid = r.get("lot_id")
+    check(bool(lid), "老师注入：{}".format(r.get("text")))
+    if not lid:
+        return
+    x = wait(lambda: (lambda x: x if x and x["status"] == "transit" else None)(lot(lid)), "采购单进 ERPNext、供应商发货", 240, 4)
+    check(x is not None and x["po"], "采购单 {}，在途，承诺 {} 到货".format((x or {}).get("po"), (x or {}).get("promised")))
+    if not x:
+        for p in hub("GET", "/api/proposals", token=teacher):
+            if p.get("action") in ("purchase_order", "supply_setup"):
+                print("    提议 {} {} {}：{}".format(p.get("action"), p.get("proposal_id"), p.get("status"), json.dumps(p.get("result"), ensure_ascii=False)[:500]))
+        return
+    pos = [p for p in erp_docs("Purchase Order") if p["name"] == x["po"]]
+    check(bool(pos), "ERPNext 采购单 {}（{}）".format(x["po"], pos[0].get("supplier") if pos else "—"))
+    hub("POST", "/api/supply/lots/{}/arrive".format(lid), {}, pl)
+    sm = hub("GET", "/api/supply/lots/{}/sample".format(lid), token=qa)
+    bad = [1 for row in sm["rows"] for p in sm["params"] if p["numeric"] and not (p["min"] <= row[p["specification"]] <= p["max"])]
+    check(len(bad) >= 2, "抽样 {} 件，{} 处超差".format(sm["sample_size"], len(bad)))
+    r = hub("POST", "/api/supply/lots/{}/inspect".format(lid), {"accept": False, "note": "闭环测试：内径偏差超差"}, qa)
+    check(r["status"] == "rejected", "质量判不合格")
+    pr = wait(lambda: (lambda p: p if p and p["status"] == "executed" else None)(hub("GET", "/api/proposals/{}".format(r["proposal_id"]), token=teacher)),
+              "ERPNext 来料检验单", 120, 3)
+    check(pr is not None, "ERPNext：{}".format(((pr or {}).get("result") or {}).get("created")))
+    an = wait(lambda: next((a for a in hub("GET", "/api/ont/anomalies", token=teacher)["anomalies"] if a["rule"] == "W3" and x["lot"] in a["title"]), None),
+              "来料不合格异常 W3", 90, 3)
+    check(an is not None, "异常 W3：{}".format((an or {}).get("title")))
+    if not an:
+        return
+    o = hub("GET", "/api/ont/anomalies/{}/options".format(an["id"]), token=teacher)
+    kinds = [y["kind"] for y in o["options"]]
+    check(o.get("supply") and kinds == ["none", "return", "alt", "concession"], "来料不合格四方案：{}；{}".format("、".join(y["label"] for y in o["options"]), o.get("reason")))
+    alt = next(y for y in o["options"] if y["kind"] == "alt")
+    a = hub("POST", "/api/ont/actions", {"changes": alt["changes"], "anomaly_id": an["id"]}, pl)
+    for aid in a["ids"]:
+        d = hub("POST", "/api/ont/actions/{}/approve".format(aid), {}, teacher)
+        check(d["status"] in ("done", "executing"), "{}：{}".format(d["title"], (d.get("result") or {}).get("text")))
+    check(lot(lid)["status"] == "returned", "这一批退货")
+    nl = wait(lambda: next((y for y in hub("GET", "/api/supply/lots", token=teacher)["lots"] if y["supplier"].startswith("示例·北方") and y["status"] == "transit"), None),
+              "备选急单进 ERPNext", 240, 4)
+    check(nl is not None, "备选供应商急单 {}：{} × {:g}".format((nl or {}).get("po"), (nl or {}).get("item"), (nl or {}).get("qty", 0)))
+    if not nl:
+        return
+    s0 = stock("BRG-6207")
+    hub("POST", "/api/supply/lots/{}/arrive".format(nl["id"]), {}, pl)
+    sm = hub("GET", "/api/supply/lots/{}/sample".format(nl["id"]), token=qa)
+    ok = all(p["min"] <= row[p["specification"]] <= p["max"] for row in sm["rows"] for p in sm["params"] if p["numeric"])
+    r = hub("POST", "/api/supply/lots/{}/inspect".format(nl["id"]), {"accept": ok}, qa)
+    check(r["status"] == ("accepted" if ok else "rejected"), "备选这一批检验：{}".format("合格" if ok else "不合格（随机）"))
+    if ok:
+        prs = wait(lambda: [p for p in erp_docs("Purchase Receipt") if p.get("docstatus") == 1 and (p.get("wq_lot") == nl["lot"] or nl["lot"] in str(p.get("remarks") or ""))],
+                   "ERPNext 收货单提交", 120, 3)
+        check(bool(prs), "ERPNext 收货单 {} 提交入库".format("、".join(p["name"] for p in (prs or []))))
+        s1 = wait(lambda: (lambda v: v if v >= s0 + float(nl["qty"]) - 0.01 else None)(stock("BRG-6207")), "库存增加", 90, 3)
+        check(s1 is not None, "BRG-6207 库存 {:g} → {:g}".format(s0, s1 or 0))
+    st = hub("GET", "/api/lab20", token=teacher)
+    check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 20 页：5 个任务，自动评 60 分")
+    k = hub("GET", "/api/supply/kpis", token=teacher)
+    check("pass_rate" in k, "供应链态势：在途 {}，合格率 {}".format(k["in_transit"], k["pass_rate"]))
+    hub("POST", "/api/supply/sim", {"enabled": False}, teacher)
 
 
 if __name__ == "__main__":

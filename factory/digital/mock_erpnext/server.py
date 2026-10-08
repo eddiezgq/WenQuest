@@ -63,6 +63,12 @@ REQUIRED = {
     "Employee": ["first_name", "company", "status", "gender", "date_of_birth", "date_of_joining"],
     "Department": ["department_name", "company"],
     "Designation": ["designation_name"],
+    # 第 18 轮 E5：采购单、收货、供应商
+    "Purchase Order": ["supplier", "company", "transaction_date", "schedule_date", "items"],
+    "Purchase Order Item": ["item_code", "qty", "schedule_date"],
+    "Purchase Receipt": ["supplier", "company", "posting_date", "items"],
+    "Purchase Receipt Item": ["item_code", "qty"],
+    "Supplier": ["supplier_name"],
 }
 SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d}", "Job Card": "PO-JOB{n:05d}",
           "Material Request": "MAT-MR-{y}-{n:05d}", "Quality Inspection": "MAT-QA-{y}-{n:05d}",
@@ -70,9 +76,9 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Lead": "CRM-LEAD-{y}-{n:05d}", "Opportunity": "CRM-OPP-{y}-{n:05d}", "Quotation": "SAL-QTN-{y}-{n:05d}",
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
           "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}",
-          "Employee": "HR-EMP-{n:05d}"}
+          "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
-            "Location": "location_name", "User": "email", "Designation": "designation_name"}
+            "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name"}
 
 
 def now_str():
@@ -105,7 +111,9 @@ class Mock:
             self.put("Supplier", {"name": s["name"], "supplier_name": s["name"]})
         for code, (name, kind, uom, rate, sup, qit, note) in F.ITEMS.items():
             self.put("Item", {"name": code, "item_code": code, "item_name": name, "stock_uom": uom,
-                              "quality_inspection_template": qit, "description": note})
+                              "quality_inspection_template": qit, "description": note, "valuation_rate": rate,
+                              # 与 seed.py 一样：原材料、外购件有进货检验模板的，收货前要检验
+                              "inspection_required_before_purchase": 1 if qit and kind in ("raw", "buy") else 0})
         for ws, (cap, costs) in F.WORKSTATIONS.items():
             self.put("Workstation", {"name": ws, "workstation_name": ws, "production_capacity": cap,
                                      "hour_rate": float(sum(costs))})
@@ -282,6 +290,32 @@ class Mock:
                 wo["produced_qty"] = float(wo.get("produced_qty", 0)) + float(doc["fg_completed_qty"])
                 wo["status"] = "Completed" if wo["produced_qty"] >= float(wo["qty"]) else "In Process"
                 wo["modified"] = now_str()
+        elif dt_ == "Purchase Order":                  # 第 18 轮 E5
+            doc.update(status="To Receive and Bill", per_received=0)
+            for it in doc.get("items", []):
+                it.setdefault("received_qty", 0)
+                it.setdefault("warehouse", doc.get("set_warehouse"))
+        elif dt_ == "Purchase Receipt":
+            # 真 ERPNext StockController.validate_inspection：要求收货前检验的物料，每行要挂检验单；检验单不合格就不许提交
+            for i, it in enumerate(doc["items"]):
+                item = self.db["Item"].get(it["item_code"]) or {}
+                qi = self.db.get("Quality Inspection", {}).get(it.get("quality_inspection") or "")
+                if item.get("inspection_required_before_purchase") and not qi:
+                    raise Err(417, "QualityInspectionRequiredError", "Row #{}: Quality Inspection is required for Item {}".format(i + 1, it["item_code"]))
+                if qi and (qi.get("status") == "Rejected" or qi.get("docstatus") != 1):
+                    raise Err(417, "QualityInspectionRejectedError", "Row #{}: Quality Inspection {} is rejected".format(i + 1, qi["name"]))
+            for it in doc["items"]:
+                self.bin_add(it["item_code"], it.get("warehouse") or doc.get("set_warehouse"), float(it["qty"]))
+                po = self.db.get("Purchase Order", {}).get(it.get("purchase_order") or "")
+                if po:
+                    row = next((r for r in po["items"] if r.get("name") == it.get("purchase_order_item")), None)
+                    if row:
+                        row["received_qty"] = float(row.get("received_qty", 0)) + float(it["qty"])
+                    tot = sum(float(r["qty"]) for r in po["items"])
+                    got = sum(min(float(r["qty"]), float(r.get("received_qty", 0))) for r in po["items"])
+                    po.update(per_received=round(100 * got / tot, 2) if tot else 100, modified=now_str(),
+                              status="To Bill" if got >= tot else "To Receive and Bill")
+            doc["status"] = "To Bill"
         elif dt_ == "Quotation":                       # 真 ERPNext：报价提交后状态 Open，关联的商机改为 Quotation
             doc["status"] = "Open"
             opp = self.db.get("Opportunity", {}).get(doc.get("opportunity") or "")
@@ -437,6 +471,20 @@ def run_doc_method(body: dict = Body(...)):
     if body.get("method") != "get_items_and_operations_from_bom" or doc.get("doctype") != "Work Order":
         raise Err(417, "ValidationError", "模拟 ERPNext 不支持 {}".format(body.get("method")))
     return {"docs": [M.bom_operations(doc)], "message": None}
+
+
+@app.post("/api/method/erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt")
+def mpr(body: dict = Body(...)):
+    """第 18 轮 E5：按采购单生成收货单（未保存），和真 ERPNext 一样只带没收齐的数量"""
+    po = M.db.get("Purchase Order", {}).get(body.get("source_name") or "")
+    if po is None or po.get("docstatus") != 1:
+        raise Err(417, "ValidationError", "采购单 {} 不存在或没提交".format(body.get("source_name")))
+    items = [{"item_code": r["item_code"], "qty": float(r["qty"]) - float(r.get("received_qty", 0)), "received_qty": float(r["qty"]) - float(r.get("received_qty", 0)),
+              "rate": r.get("rate"), "warehouse": r.get("warehouse") or po.get("set_warehouse"), "purchase_order": po["name"],
+              "purchase_order_item": r["name"], "uom": r.get("uom"), "stock_uom": r.get("stock_uom"), "conversion_factor": 1}
+             for r in po["items"] if float(r["qty"]) > float(r.get("received_qty", 0))]
+    return {"message": {"doctype": "Purchase Receipt", "supplier": po["supplier"], "company": po["company"],
+                        "posting_date": dt.date.today().isoformat(), "set_warehouse": po.get("set_warehouse"), "items": items, "__islocal": 1}}
 
 
 @app.post("/api/method/erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry")

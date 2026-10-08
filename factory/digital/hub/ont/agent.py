@@ -54,7 +54,7 @@ SV_RULES = ("C1", "C3", "C4", "V1", "V2")             # 这几类异常的方案
 INTENTS = {
     "draft": "起草动作", "machine": "设备停机的影响与对策", "handle": "某个异常怎么处理", "order": "新订单能不能接（算料）",
     "cost": "工单成本为什么超", "late": "订单为什么晚 / 交期", "bottleneck": "瓶颈在哪", "material": "物料够不够",
-    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "object": "查一个对象", "overview": "全厂概况",
+    "quality": "质量趋势", "anomalies": "现在有哪些异常", "safety": "安全环保", "maint": "设备维护", "people": "人员与排班", "supplier": "采购与来料", "object": "查一个对象", "overview": "全厂概况",
 }
 
 
@@ -386,6 +386,12 @@ class Tools:
             elif a.get("rule") == "M5":
                 from hub import maint as MT
                 ev = MT.parts_options(self.db, self.mode, a)
+            elif a.get("rule") == "W3":                  # 第 18 轮 E5：来料不合格（推演到料日）
+                from hub import supply as SP
+                ev = SP.options(self.db, self.mode, a, st, self._ctx_plan(st))
+            elif a.get("rule") in ("W4", "W6"):
+                from hub import supply as SP
+                ev = SP.alt_options(self.db, self.mode, a)
             elif a.get("rule") == "H2":                  # 第 18 轮 E4：排班缺口（车间推演）
                 from hub import people as PE
                 ev = PE.options(self.db, self.mode, a, st, self._ctx_plan(st))
@@ -643,6 +649,34 @@ class Tools:
                   ({"item_code": k, "stock": MT.stock_of(self.db, self.mode, k), "min": v} for k, v in MT.SPARE_MIN.items())]
         return {"repairs": reps, "pms": pms, "spares": spares, "page": self.run.page("maint-repairs", "设备维护 · 维修与备件", "/maint?tab=repairs")}
 
+    # ---- ㉒ 供应商评分卡（第 18 轮 E5）
+    def supplier_scorecard(self):
+        from hub import supply as SP
+        rows = [dict(x, ref=self.run.obj("Supplier", x["supplier"], x["supplier"].split(" ")[0])) for x in SP.scorecard(self.db, self.mode)]
+        return {"suppliers": rows, "single_source": SP.single_source(self.db, self.mode), "kpis": SP.kpis(self.db, self.mode),
+                "tco_formula": "每件总拥有成本 = 单价 × 价格指数 + (1 − 合格率) × ${:g} + (1 − 准时率) × ${:g}".format(SP.REJECT_COST, SP.LATE_COST),
+                "page": self.run.page("supply-suppliers", "采购与来料 · 供应商", "/supply?tab=suppliers")}
+
+    # ---- ㉓ 批次追溯
+    def batch_trace(self, lot=None, serial=None):
+        from hub import supply as SP
+        if not lot and not serial:
+            return {"error": "给批号（如 L261007-0012）或零件 / 设备序列号"}
+        r = SP.trace(self.db, self.mode, lot, serial)
+        if lot and not r.get("row"):
+            return {"error": "没有这个批次：{}".format(lot)}
+        r["page"] = self.run.page("supply-batches", "采购与来料 · 批次", "/supply?tab=batches")
+        if lot:
+            r["ref"] = self.run.obj("Batch", lot)
+        return r
+
+    # ---- ㉔ 采购在途与风险
+    def purchasing_status(self):
+        from hub import supply as SP
+        rows = SP.lots(self.db, self.mode, ("ordered", "transit", "arrived", "rejected", "suspect"), limit=60)
+        return {"open_lots": [dict(x, ref=self.run.obj("Batch", x["lot"]) if x["lot"] else None) for x in rows], "kpis": SP.kpis(self.db, self.mode),
+                "page": self.run.page("supply-lots", "采购与来料 · 采购单与到货", "/supply?tab=lots")}
+
     # ---- ⑲ 员工与技能（第 18 轮 E4）
     def people_skills(self, unit=None):
         from hub import people as PE
@@ -772,6 +806,12 @@ def _summary(out):
         return "故障概率 {:.0%}".format(out["p_fail"])
     if "repairs" in out and "spares" in out:
         return "维修单 {} 张".format(len(out["repairs"]))
+    if "suppliers" in out and "single_source" in out:
+        return "供应商 {} 家".format(len(out["suppliers"]))
+    if "open_lots" in out:
+        return "未完的批次 {} 个".format(len(out["open_lots"]))
+    if "parts" in out and ("lot" in out or "serial" in out):
+        return "批次追溯：{} 个零件".format(len(out["parts"]))
     if "skills" in out and "single_points" in out:
         return "设备 {} 台，单点依赖 {} 台".format(len(out["skills"]), len(out["single_points"]))
     if "roster_gaps" in out:
@@ -790,7 +830,7 @@ def _summary(out):
 TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", "list_anomalies", "get_anomaly", "simulate",
               "compare_options", "draft_action", "query_messages", "work_order_cost", "plan_order", "propose_order",
               "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess",
-              "maint_overview", "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load"]
+              "maint_overview", "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load", "supplier_scorecard", "batch_trace", "purchasing_status"]
 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
@@ -839,6 +879,11 @@ TOOLS = [
     {"name": "roster_gaps", "description": "排班与缺口：这一班谁在岗、谁请假，未来 hours 小时内哪一班哪台设备没人能开",
      "input_schema": _S(hours={"type": "number"})},
     {"name": "overtime_load", "description": "加班与负荷：本周每人加班小时（对比上限）、近 7 天各班组缺勤率", "input_schema": _S()},
+    {"name": "supplier_scorecard", "description": "供应商评分卡：每家的准时率、来料合格率（近 30 天）、过去一年的历史、价格指数、提前期、默认还是备选；单一来源的物料类别；总拥有成本公式",
+     "input_schema": _S()},
+    {"name": "batch_trace", "description": "批次追溯：给批号查这批料用到了哪些零件、工单、现场设备；或给零件 / 设备序列号查用了哪些批次、哪家供应商",
+     "input_schema": _S(lot={"type": "string"}, serial={"type": "string"})},
+    {"name": "purchasing_status", "description": "采购在途与风险：已下单、在途、到货待检、不合格、可疑的批次，承诺到货日和晚了几天", "input_schema": _S()},
     {"name": "query_messages", "description": "查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like，corr 为工单号或提议号",
      "input_schema": _S(types={"type": "array", "items": {"type": "string"}}, topic_like={"type": "string"}, corr={"type": "string"},
                         hours={"type": "number"}, limit={"type": "integer"})},
@@ -1030,6 +1075,9 @@ class Rules:
         if re.search(r"排班|缺人|请假|出勤|缺勤|迟到|技能矩阵|单点依赖|一个人会|会开|顶班|带教|调班|在岗|人手|本周加班|加班超|技能培训|员工", q) \
                 and not re.search(r"工程师|上门|服务|WQR105-", q):          # 第 18 轮 E4：人员与排班（客户现场的服务排班归客户与服务）
             return "people"
+        if (re.search(r"L\d{6}-\d{4}", q) or re.search(r"供应商|评分卡|准时率|来料|批次|批号|在途|单一来源|备选|总拥有成本|采购单", q)) \
+                and not re.search(r"CP-\d{5}|投诉|现场|客户", q):          # 第 18 轮 E5：采购与来料（客户投诉的追溯归客户与服务）
+            return "supplier"
         if (re.search(r"MR-\d{5}|PM-\d{5}|IC-\d{5}", q) or re.search(r"保养|维修单|点检|备件|台账|失效|概率|MTBF|平均故障间隔|运行小时", q)) \
                 and not re.search(r"上门|派工|WQR105-", q):            # 客户现场的上门点检归客户与服务
             return "maint"
@@ -1082,6 +1130,8 @@ class Rules:
                   "（可能性 × 严重度），再到指挥台比较“立即停机 / 限时整改 / 停机 + 改派加班”三个方案的交期和花费。",
         "maint": "提示：打开“设备维护”页的台账：看每台设备自上次保养运行了多少小时、离保养周期还差多少；点开一台看失效率曲线。"
                  "自己用 F(t) = 1 − exp(−(t/η)^β) 算一算再运行两周坏掉的概率，乘上修理费和停机损失，再和保养的花费比。",
+        "supplier": "提示：打开“采购与来料”页：供应商一栏看各家的准时率、合格率和价格，哪几类物料只有一家；到货与检验一栏看抽样数据，按模板的上下限自己判定。"
+                    "想一想：便宜的供应商算上晚到和不合格，真的便宜吗？",
         "people": "提示：打开“人员”页：技能矩阵里标红的列是只有一个人会开的设备；排班表里标红的格子是这一班没人能开。"
                   "想一想：缺人的这一班，从哪里调人？调走的人原来的岗位怎么办？加班要花多少钱？",
         "service": "提示：在“客户与服务”页的排班表里看 6 位工程师的空闲。同区域每人每天 2 单、跨区域 1 单；想一想：先修哪台、谁去、几天能做完、要带几件备件？",
@@ -1314,6 +1364,51 @@ class Rules:
         if r["unplanned"]:
             out.append("还有 {} 台 21 天内排不进。".format(len(r["unplanned"])))
         out.append("这是估算，没有真的排班；排班表 [{}]。".format(r["page"]))
+        return "\n".join(out)
+
+    # ---- 采购与来料（第 18 轮 E5）
+    def a_supplier(self, q):
+        if self.student:
+            return self._hint("supplier")
+        m = re.search(r"L\d{6}-\d{4}", q)
+        if re.search(r"怎么处理|怎么办|方案|该不该", q):
+            a = self.t.db.one("select id from anomaly where mode=%s and rule in ('W3','W4','W6') and status in ('open','ack','doing') "
+                              "order by case rule when 'W3' then 0 when 'W4' then 1 else 2 end, id desc limit 1", (self.t.mode,))
+            if a:
+                return self.a_handle("A-{:05d} 怎么处理".format(a["id"]))
+        if m or re.search(r"批次|批号|追溯", q):
+            lot = m.group(0) if m else None
+            if not lot:
+                x = self.t.db.one("select lot from lot where mode=%s and lot is not null and status in ('rejected','suspect') order by id desc limit 1", (self.t.mode,))
+                lot = x["lot"] if x else None
+            if not lot:
+                return "现在没有不合格或可疑的批次。可以给我一个批号（如 L261007-0012）来追溯。"
+            r = self.t.batch_trace(lot=lot)
+            if r.get("error"):
+                return r["error"]
+            x = r["row"]
+            out = ["批次 {} [{}]：{} × {:g}，{}，{}（{}）。".format(lot, r["ref"], x["item"], x["qty"], x["supplier"].split(" ")[0], x["status_label"], r["page"])]
+            out.append("用到了 {} 个零件、{} 张工单{}。".format(len(r["parts"]), len(r["work_orders"]),
+                                                       "，装进了现场设备 " + "、".join(u["serial"] for u in r["units"][:5]) if r["units"] else ""))
+            return "\n".join(out)
+        if re.search(r"在途|到货|采购单|晚", q) and not re.search(r"准时率|评分", q):
+            r = self.t.purchasing_status()
+            k = r["kpis"]
+            out = ["采购与来料 [{}]：在途 {} 批，到货待检 {} 批，不合格待处理 {} 批。".format(r["page"], k["in_transit"], k["waiting_inspection"], k["rejected_open"])]
+            for x in r["open_lots"][:8]:
+                out.append("· {} {} × {:g}（{}）：{}{}".format(x["lot"] or "#{}".format(x["id"]), x["item"], x["qty"], x["supplier"].split(" ")[0], x["status_label"],
+                                                          "，承诺 {}".format(x["promised"]) if x["promised"] else ""))
+            return "\n".join(out)
+        r = self.t.supplier_scorecard()
+        out = ["供应商评分卡 [{}]（近 30 天；括号里是过去一年）：".format(r["page"])]
+        for x in r["suppliers"]:
+            if not x["active"]:
+                continue
+            out.append("· {} [{}]（{}，{}）：准时率 {}（{:.0%}），合格率 {}（{:.0%}），价格指数 {:g}，提前期 {} 天".format(
+                x["supplier"].split(" ")[0], x["ref"], x["cat_name"], "默认" if x["role"] == "default" else "备选",
+                "{:.0%}".format(x["on_time"]) if x["on_time"] is not None else "—", x["hist_on_time"],
+                "{:.0%}".format(x["pass_rate"]) if x["pass_rate"] is not None else "—", x["hist_pass"], x["price_index"], x["lead_days"]))
+        out.append("单一来源：" + ("、".join(s["cat_name"] for s in r["single_source"]) or "没有") + "。" + r["tco_formula"] + "。")
         return "\n".join(out)
 
     # ---- 人员与排班（第 18 轮 E4）
@@ -1588,7 +1683,7 @@ class Rules:
         for a in lst:                                  # 同一条规则最多列 2 个，其余合并成一句（例如多台设备单点依赖）
             r = a.get("rule") or a["key"]
             per[r] = per.get(r, 0) + 1
-            if per[r] > 2 or shown >= 15:
+            if per[r] > 2 or shown >= 20:
                 more[r] = more.get(r, 0) + 1
                 continue
             shown += 1

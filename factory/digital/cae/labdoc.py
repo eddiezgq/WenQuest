@@ -16,7 +16,8 @@ GUIDES = {"lab8": GUIDE_MD, "lab9": os.path.join(HERE, "实验9_机械臂关节�
           "lab16": os.path.join(HERE, "实验16_客户投诉的追溯召回与服务决策.md"),
           "lab17": os.path.join(HERE, "实验17_安全隐患的识别评估与停机决策.md"),
           "lab18": os.path.join(HERE, "实验18_设备维护策略保养时机的决策.md"),
-          "lab19": os.path.join(HERE, "实验19_排班与技能缺人时的决策.md")}
+          "lab19": os.path.join(HERE, "实验19_排班与技能缺人时的决策.md"),
+          "lab20": os.path.join(HERE, "实验20_供应链来料不合格与供应商选择.md")}
 
 
 def _doc():
@@ -120,6 +121,8 @@ def report_template_docx(lab="lab8"):
         return lab18_template()
     if lab == "lab19":
         return lab19_template()
+    if lab == "lab20":
+        return lab20_template()
     from docx.shared import Pt
     d = _doc()
     d.add_heading("实验 8　输出轴强度与疲劳校核　实验报告", 0)
@@ -738,6 +741,51 @@ def lab19_template():
     hint("花费 = 带教小时 × 工时 $30 ×（1 + 师傅分出去的 25%）。")
     d.add_heading("六、结论与讨论", 1)
     hint("调人顶岗为什么不总是最好？加班顶班看不见的代价？健康的技能矩阵每台设备至少几个熟练的人？")
+    d.add_paragraph("")
+    buf = io.BytesIO()
+    d.save(buf)
+    return buf.getvalue()
+
+
+def lab20_template():
+    """实验 20 报告模板（第 18 轮 E5-8）"""
+    from docx.shared import Pt
+    d = _doc()
+    d.add_heading("实验 20　供应链：来料不合格与供应商选择　实验报告", 0)
+
+    def table(rows, head=True):
+        t = d.add_table(rows=len(rows), cols=len(rows[0]))
+        t.style = "Table Grid"
+        for r, row in enumerate(rows):
+            for c, v in enumerate(row):
+                t.cell(r, c).text = v
+                if head and r == 0:
+                    for run in t.cell(r, c).paragraphs[0].runs:
+                        run.bold = True
+        d.add_paragraph()
+
+    def hint(text):
+        p = d.add_paragraph(text)
+        p.runs[0].italic = True
+        p.runs[0].font.size = Pt(9)
+
+    table([["班级", "", "组号", ""], ["姓名 / 学号", "", "日期", ""]], head=False)
+    d.add_heading("一、单一来源（任务 1）", 1)
+    table([["物料类别", "唯一的供应商", "有没有可开发的备选", "风险"], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]])
+    d.add_heading("二、来料检验（任务 2）", 1)
+    table([["项目", "记录"], ["批号、物料、数量、供应商", ""], ["检验模板与上下限", ""], ["抽样件数", ""], ["超差的件和读数", ""], ["判定", ""],
+           ["ERPNext 检验单号、收货单号", ""]])
+    d.add_heading("三、四个方案（任务 3）", 1)
+    table([["方案", "到料日", "订单预计交付 / 晚几天", "花费", "质量风险"], ["A 不处理（对照）", "", "", "", ""], ["B 退货等补发", "", "", "", ""],
+           ["C 备选急单", "", "", "", ""], ["D 让步接收全检", "", "", "", ""]])
+    table([["项目", "记录"], ["选的方案", ""], ["理由", ""], ["中枢建议的方案与理由", ""], ["一样吗？不一样时谁更合理", ""]])
+    d.add_heading("四、执行（任务 4）", 1)
+    table([["步骤", "时间", "谁", "记录"], ["起草、提交", "", "", "动作编号："], ["批准", "", "", ""], ["ERPNext 单据", "", "", ""], ["这一批的状态", "", "", ""]])
+    d.add_heading("五、总拥有成本（任务 5）", 1)
+    table([["供应商", "单价 × 价格指数", "(1 − 合格率) × $4", "(1 − 准时率) × $3", "每件总拥有成本"], ["默认", "", "", "", ""], ["备选", "", "", "", ""]])
+    hint("以后默认向哪家下单？为什么还要保留另一家？")
+    d.add_heading("六、结论与讨论", 1)
+    hint("抽样的风险；让步接收什么时候可以接受；单一来源一定不好吗？")
     d.add_paragraph("")
     buf = io.BytesIO()
     d.save(buf)

@@ -93,6 +93,13 @@ def slots(db, mode="teach"):
     s["pm_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     a = db.one("select id from anomaly where mode=%s and rule='H2' and status in ('open','ack','doing') order by id limit 1", (mode,))
     s["gap_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
+    try:
+        x = db.one("select lot from lot where mode=%s and status='rejected' order by id limit 1", (mode,))
+    except Exception:  # noqa: BLE001
+        x = None
+    s["bad_lot"] = x["lot"] if x else "L??????-????"
+    a = db.one("select id from anomaly where mode=%s and rule='W3' and status in ('open','ack','doing') order by id limit 1", (mode,))
+    s["lot_anomaly"] = "A-{:05d}".format(a["id"]) if a else "A-?????"
     return s
 
 
@@ -224,9 +231,24 @@ def sandbox(dsn, name="wq_eval_sandbox", llm=None, now=None):
     from hub import people as PE                 # 第 18 轮 E4：30 人、技能矩阵、固定岗位
     PE.seed(db, "teach")
     PE.leave_next_shift(H, "teach", "P01", "评测·情景")    # 王强下一个班请假：磨床那一班没人（H2）
+    supply_scene(H)                              # 第 18 轮 E5：一批不合格的轴承（W3）
     s.reconcile()
     ai.detector().run("teach", now)
     return H, eng
+
+
+def supply_scene(H, mode="teach"):
+    """第 18 轮 E5：向五大湖轴承下一批 BRG-6207 × 40，到货抽检不合格（沙盘里没有桥接：采购单号直接填）"""
+    from factory import data as F
+    from hub import supply as SP
+    SP.seed(H.db, mode)
+    if H.db.one("select 1 as x from lot where mode=%s limit 1", (mode,)):
+        return
+    r = SP.place_po(H, mode, F.SUPPLIERS["bearings"]["name"], [{"item_code": "BRG-6207", "qty": 40}], "评测·情景")
+    lid = r["lots"][0]
+    H.db.x("update lot set po='PUR-ORD-EVAL-0001', lot=%s, status='transit', truth_bad=true, due_at=now() where id=%s", ("L261001-{:04d}".format(lid), lid))
+    SP.arrive(H.db, mode, lid, "评测·情景")
+    SP.inspect(H, mode, lid, False, "评测·情景")
 
 
 def ehs_scene(H, mode="teach"):

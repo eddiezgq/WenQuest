@@ -61,6 +61,11 @@ def metrics(db, mode, ov, now):
         mk = MT.kpis(db, mode)
     except Exception:  # noqa: BLE001
         mk = None
+    try:                                    # 第 18 轮 E5：供应链
+        from hub import supply as SP
+        sk2 = SP.kpis(db, mode)
+    except Exception:  # noqa: BLE001
+        sk2 = None
     try:                                    # 第 18 轮 E4：人员与组织
         from hub import people as PE
         pk = PE.kpis(db, mode, now)
@@ -76,7 +81,9 @@ def metrics(db, mode, ov, now):
                   ("risk_orders", "风险订单", sum(1 for o in ov["orders"] if o["tone"] in ("bad", "warn")), "int")],
         "product": [("pending_design", "待审批设计 / 工艺", pend, "int"),
                     ("analysis_7d", "近 7 天分析作业", _count(db, mode, "AnalysisJob", "and first_ts > %s", (now - dt.timedelta(days=7),)), "int")],
-        "supply": [("short_items", "缺料项", sum(1 for m in ov["materials"] if m["tone"] == "bad"), "int"), ("open_po", "在途采购单", len(pos), "int")],
+        "supply": [("short_items", "缺料项", sum(1 for m in ov["materials"] if m["tone"] == "bad"), "int"), ("open_po", "在途采购单", len(pos), "int")] + ([
+            ("on_time", "供应商准时率（近 30 天）", sk2["on_time"], "pct"), ("pass_rate", "来料合格率（近 30 天）", sk2["pass_rate"], "pct"),
+            ("single_source", "单一来源的物料类别", sk2["single_source"], "int")] if sk2 else []),
         "planning": [("open_wo", "未完工单", len(wos), "int"), ("wip", "在制品（件）", ov["wip"]["now"], "int")],
         "production": [("oee", "OEE（今日）", ov["oee"]["value"], "pct"),
                        ("down", "停机设备", ov["machine_counts"].get("down", 0) + ov["machine_counts"].get("fault", 0), "int")],

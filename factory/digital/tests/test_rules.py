@@ -528,3 +528,55 @@ def test_H5_absence_high(monkeypatch):
                                                                      "热处理": {"scheduled": 6, "missed": 2, "rate": 0.333}})
     f = run("H5", _pdb())
     assert [x.fkey for x in f] == ["机加一班"]                        # 热处理排班人次太少，不报
+
+
+# ---------------------------------------------------------------- 第 18 轮 E5：供应链
+def _sdb(lots=(), uses=0):
+    tables = [("to_regclass", lambda a: [{"ok": True}]),
+              ("from lot where mode=%s and status='rejected'", lambda a: [x for x in lots if x["status"] == "rejected"]),
+              ("from lot where mode=%s and status='suspect'", lambda a: [x for x in lots if x["status"] == "suspect"]),
+              ("from batch_use", lambda a: [{"n": uses}])]
+    return FakeDB(tables=tables)
+
+
+def _lot(i, status, item="BRG-6207"):
+    return {"id": i, "lot": "L261020-{:04d}".format(i), "status": status, "item": item, "qty": 40, "supplier": "示例·五大湖轴承 Great Lakes Bearing (Demo)",
+            "inspection": {"sample_size": 8, "bad": [{"n": 1}, {"n": 3}]}, "note": "事后发现内径偏差"}
+
+
+def test_W3_incoming_rejected():
+    f = run("W3", _sdb([_lot(1, "rejected"), _lot(2, "accepted"), _lot(3, "rejected", "RM-HT200-BASE")]))
+    k = {x.fkey: x for x in f}
+    assert set(k) == {"L261020-0001", "L261020-0003"} and k["L261020-0001"].severity == "critical" and k["L261020-0003"].severity == "warn"
+    assert k["L261020-0001"].values["lot_id"] == 1
+
+
+def _sc(**k):
+    return dict({"supplier": "示例·东岳铸造 Dongyue Castings (Demo)", "cat": "castings", "cat_name": "铸件", "role": "default", "active": True,
+                 "arrived": 4, "on_time": 0.25, "inspected": 4, "pass_rate": 1.0}, **k)
+
+
+def test_W4_supplier_late(monkeypatch):
+    from hub import supply as SP
+    monkeypatch.setattr(SP, "scorecard", lambda db, mode, days=30: [_sc(), _sc(supplier="B", arrived=2, on_time=0.0), _sc(supplier="C", on_time=0.9)])
+    f = run("W4", _sdb())
+    assert [x.fkey for x in f] == ["示例·东岳铸造 Dongyue Castings (Demo)"] and f[0].values["cat"] == "castings"
+
+
+def test_W5_supplier_quality(monkeypatch):
+    from hub import supply as SP
+    monkeypatch.setattr(SP, "scorecard", lambda db, mode, days=30: [_sc(pass_rate=0.75), _sc(supplier="B", pass_rate=0.98), _sc(supplier="C", inspected=1, pass_rate=0)])
+    assert [x.fkey for x in run("W5", _sdb())] == ["示例·东岳铸造 Dongyue Castings (Demo)"]
+
+
+def test_W6_single_source(monkeypatch):
+    from hub import supply as SP
+    monkeypatch.setattr(SP, "single_source", lambda db, mode: [{"cat": "hardware", "cat_name": "标准件与油封", "supplier": "P", "items": ["SEAL-20"], "has_alt": False}])
+    f = run("W6", _sdb())
+    assert [x.fkey for x in f] == ["hardware"] and "还没有备选" in f[0].detail
+
+
+def test_W7_suspect_batch_used():
+    assert run("W7", _sdb([_lot(5, "suspect")], uses=0)) == []
+    f = run("W7", _sdb([_lot(5, "suspect")], uses=12))
+    assert [x.fkey for x in f] == ["L261020-0005"] and f[0].values["parts"] == 12 and f[0].severity == "critical"

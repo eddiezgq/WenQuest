@@ -415,6 +415,11 @@ def for_anomaly(c, a):
             return chain_field(c, [sk])
         if rule == "V2":
             return chain_field(c, v.get("units") or [])
+        if rule in ("W3",) and v.get("item"):           # 第 18 轮 E5：来料不合格 → 等这种料的工单 → 订单
+            g = chain_stock(c, [v["item"]])
+            if g.summary:
+                g.summary[0] = "{} 批 {}（{}）来料不合格，这批进不了库；等这种料的工单和订单如下".format(v["item"], v.get("lot"), str(v.get("supplier") or "").split(" ")[0])
+            return g
         if rule in ("W1",):
             return chain_stock(c, [sk])
         if rule == "W2":

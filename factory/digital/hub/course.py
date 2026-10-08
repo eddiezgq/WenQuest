@@ -517,7 +517,14 @@ def mount(app, H):
                        "起草调班或加班动作，批准后车间按新排班开；最后设计技能培训计划，把单点依赖降到 0。",
             "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab19",
             "guide_url": public_base(request) + "/api/cae/lab19/guide.docx",
-            "report_template_url": public_base(request) + "/api/cae/lab19/report-template.docx"}])
+            "report_template_url": public_base(request) + "/api/cae/lab19/report-template.docx"}, {
+            "id": "lab20", "name": {"zh": "实验 20：供应链——来料不合格与供应商选择", "en": "Lab 20: supply chain — rejected incoming material and supplier selection"},
+            "summary": "料从下单到用掉都在平台和 ERPNext 里：采购单、到货、来料检验、批次、用到哪些零件。学生先看供应商评分卡、找出单一来源；"
+                       "老师注入一批不合格的轴承，学生按检验模板看抽样数据判定；在指挥台比较“退货等补发 / 备选急单 / 让步接收 / 不处理”（比对模式）并执行；"
+                       "最后算两家供应商的总拥有成本，写供应商建议。",
+            "mode": "teach", "products": ["WQR-105", "SH-301"], "tool_url": public_base(request) + "/lab20",
+            "guide_url": public_base(request) + "/api/cae/lab20/guide.docx",
+            "report_template_url": public_base(request) + "/api/cae/lab20/report-template.docx"}])
 
     @app.get("/api/course/layout", dependencies=[K])
     def course_layout():

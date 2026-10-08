@@ -53,6 +53,7 @@ CHANGE_TYPES = {
     "lockout": "停机挂牌整改",          # 第 18 轮 E2：重大隐患（可延后：先临时防护，delay_minutes 后停）
     "pm_order": "保养（停机挂牌）",     # 第 18 轮 E3：和停机挂牌一样推演，费用按保养人工算
     "staff": "排班（调人 / 学徒 / 加班顶班）",   # 第 18 轮 E4：改某天某班某台设备的人员等级（0 没人 / 1 学徒 / 2 熟练）
+    "material_arrival": "到料日",                # 第 18 轮 E5：来料不合格时按方案改到料日（费用另算）
 }
 RECTIFY_RATE = 45.0               # 安全整改 / 保养人工（美元 / 小时）
 PM_MATERIAL = 80.0                # 一次保养的油、脂、滤芯（美元）
@@ -387,6 +388,15 @@ def _simulate(snap, changes, ctx, horizon_days, limit_s):
             applied.append(c)
             price = (F.ITEMS.get(c["item"]) or [None, None, None, 0])[3] or 0
             costs.append({"what": "紧急采购 {} × {}".format(c["item"], c["qty"]), "usd": round(float(price) * float(c["qty"]) * URGENT_PCT, 2)})
+        elif typ == "material_arrival":
+            hit = [r for r in releases if c["item"] in (r.get("short") or [r.get("material")])]
+            for r in hit:
+                arr = dict(r.get("arrivals") or {r.get("material"): r.get("at")})
+                arr[c["item"]] = c["arrive"]
+                r["arrivals"] = arr
+                r["at"] = max(arr.values())
+            checks.append({"ok": True, "text": "{} {} 到料{}".format(c["item"], c["arrive"], "" if hit else "（现在没有在等这种料的工单）")})
+            applied.append(c)
         elif typ == "split_delivery":
             applied.append(c)                    # 不影响生产，只影响订单的判定
     if cal.to_dict() != eng.calendar.to_dict():
