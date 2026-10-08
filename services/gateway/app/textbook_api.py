@@ -35,16 +35,16 @@ def chdir(no) -> str:
     return f"ch{int(t):02d}" if t.isdigit() else f"ch{t}"
 
 
-def chlabel(no, en: bool = False) -> str:
-    """章号在标题里的写法：第 7 章 / 第 M1 章；英文 Chapter 7 / Chapter M1。"""
-    return f"Chapter {no}" if en else f"第 {no} 章"
-SECTION = re.compile(r"^\d{1,3}\.(\d{1,3}|end)$")
+def chname(no, en: bool = False) -> str:
+    """章号在下载文件名里的写法（与改动前一致，不加空格）：Chapter4 / 第4章、ChapterM1 / 第M1章。"""
+    return f"Chapter{no}" if en else f"第{no}章"
+SECTION = re.compile(r"^(?:\d{1,3}|M\d{1,2})\.(\d{1,3}|end)$")      # 数学篇的节号是 M1.1（第 26 轮）
 PDF_TTL = 3600
 MEDIA_TTL = 86400
-LABBOX = re.compile(r"<div class='wq-media-box wq-labbox' data-lab='(\d+)-(\d+)'>(.*?)</div>", re.S)
+LABBOX = re.compile(r"<div class='wq-media-box wq-labbox' data-lab='(M?\d+)-(\d+)'>(.*?)</div>", re.S)
 BOX = re.compile(r"<div class='wq-media-box' data-anim='(\w+)' data-hash='(\w+)'>(.*?)</div>", re.S)
-GPUBOX = re.compile(r"<div class='wq-media-box wq-gpubox' data-gpulab='(\d+)-(\d+)'>(.*?)</div>", re.S)   # 云端 GPU 实验
-TASKBOX = re.compile(r"(<div class='wq-taskbox' data-task='(\d+)-(\d+)'>)")      # 工程任务单 (第 13 轮)
+GPUBOX = re.compile(r"<div class='wq-media-box wq-gpubox' data-gpulab='(M?\d+)-(\d+)'>(.*?)</div>", re.S)   # 云端 GPU 实验
+TASKBOX = re.compile(r"(<div class='wq-taskbox' data-task='(M?\d+)-(\d+)'>)")      # 工程任务单 (第 13 轮)
 TASKDOCS = ("task", "rubric", "calc")
 # 网页版教材（第 15 轮）：整本网页书放在 <dir>/<book>/webed/（book.json + 页面、实验、插图），登录后经有时效的链接阅读
 WEB_TTL = 12 * 3600
@@ -409,7 +409,7 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no PDF for this chapter", 404)
         ch = next((c for c in idx["chapters"] if str(c["no"]) == str(d["c"])), {})
         if en:
-            name = f"{idx.get('title_en') or d['b']}-{chlabel(d['c'], True)}-{ch.get('title_en', '')}.pdf".replace(":", " -")
+            name = f"{idx.get('title_en') or d['b']}-{chname(d['c'], True)}-{ch.get('title_en', '')}.pdf".replace(":", " -")
         else:
-            name = f"{idx.get('title', '')}-{chlabel(d['c'])}-{ch.get('title', '')}.pdf"
+            name = f"{idx.get('title', '')}-{chname(d['c'])}-{ch.get('title', '')}.pdf"
         return FileResponse(p, media_type="application/pdf", filename=name)

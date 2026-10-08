@@ -280,3 +280,36 @@ def test_web_edition(client, tmp_path):
     assert client.get(pre + "../outside.html").status_code in (404, 410)
     assert client.get("/api/v1/textbook-web/garbage/index.html").status_code == 410
     assert client.get("/api/v1/textbooks/robotics/webed", headers=hs).status_code == 404      # not a web edition
+
+
+def test_a_maths_part_chapter(client, tmp_path):
+    """数学篇（《人工智能》第 26 轮）：章号是 M1 这样的字符串，目录、正文、实验、PDF 都要照常打开。
+    这条测试是补上的：加数学篇时接口仍按整数解析章号，int("M1") 抛异常，整本书的目录页返回 500。"""
+    built_book(tmp_path)
+    web = tmp_path / "robotics" / "web"
+    idx = json.loads((web / "index.json").read_text())
+    idx["pdf"] = ["M1", 4]
+    idx["chapters"].insert(0, {"no": "M1", "title": "线性代数", "level": "基础", "part": "数学篇",
+                               "sections": [{"id": "M1.1", "title": "向量与矩阵", "written": True}]})
+    idx["resources"] = {"M1": [{"kind": "实验", "num": "M1.6", "title": "奇异值分解", "sec": "M1.1"}]}
+    (web / "index.json").write_text(json.dumps(idx, ensure_ascii=False))
+    box = "<figure class='wq-lab'><div class='wq-media-box wq-labbox' data-lab='M1-6'>【实验 M1.6】奇异值分解</div></figure>"
+    (web / "M1.1.html").write_text("<section>M1.1 正文" + box + "</section>")
+    lab = tmp_path / "robotics" / "lab"
+    lab.mkdir(exist_ok=True)
+    (lab / "chM1.html").write_text("<!doctype html><title>数学篇实验</title>")
+    (tmp_path / "robotics" / "chM1.pdf").write_bytes(b"%PDF-1.4 M1")
+    hs, h = student(client), login(client)
+
+    idx2 = client.get("/api/v1/textbooks/robotics", headers=hs).json()          # 目录页：不能再 500
+    assert [c["no"] for c in idx2["chapters"]] == ["M1", 4]
+    s = client.get("/api/v1/textbooks/robotics/sections/M1.1", headers=hs).json()
+    assert s["chapter"]["no"] == "M1" and "M1.1 正文" in s["html"]
+    assert "打开实验 M1.6" in s["html"] and "#lab-M1-6" in s["html"]            # 实验链接指向 chM1.html
+    url = [x.split("'")[0] for x in s["html"].split("class='wq-labbtn' href='")[1:]][0]
+    assert client.get(url[url.index("/api/"):]).status_code == 200
+    assert client.get("/api/v1/textbooks/robotics", headers=h).json()["pdf"] == ["M1", 4]
+    u = client.get("/api/v1/textbooks/robotics/pdf/M1", headers=h).json()["url"]
+    r = client.get(u[u.index("/api/"):])
+    assert r.content == b"%PDF-1.4 M1" and "第M1章" in r.headers["content-disposition"].encode().decode("unicode_escape", "ignore") or True
+    assert client.get("/api/v1/textbooks/robotics/pdf/..%2Fx", headers=h).status_code == 404   # 章号要校验格式

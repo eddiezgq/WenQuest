@@ -35,6 +35,8 @@
 | 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 自动部署 |
 | 本地完整环境（Moodle + 网关 + 网页端） | `tools/local/setup.sh`，说明见 `docs/帮助/本地测试环境.md` | 推送前用老师和学生账号实际走一遍 |
 
+改了平台要读的数据格式（例如教材 `web/index.json` 的字段或类型），必须连 `services/gateway` 的测试一起跑，并且用真实构建产物把页面打开一遍再推——只跑 `textbook/tools` 的测试不够：2026-10-08 加数学篇的 M 章号时就是这样把《人工智能》整本的目录页跑成了 500。
+
 教材构建：`python3 textbook/tools/build.py <书名> [--pdf --labs]`。`--only` 认的是**节号**（`--only 1.4,1.5`），写成 `--only 1` 匹配不到任何一节，会“0 错误”通过却什么都没检查——交付前一定跑不带 `--only` 的全书构建。
 
 线上：学习平台 https://learn.wenquestrobotics.com ，经典界面 classic. 子域名，官网主域名。

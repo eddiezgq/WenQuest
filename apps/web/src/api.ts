@@ -160,7 +160,7 @@ export interface TextbookChapter { no: number | string; title: string; level: st
 /** 互动资源（第 9 轮 2.5）: an animation or a virtual lab of a chapter, and the section it is in. */
 export interface TextbookResource { kind: "anim" | "lab"; num: string; title: string; title_en?: string; sec: string }
 export interface TextbookIndex { book: string; title: string; title_en?: string; parts: { title: string }[]; parts_en?: Record<string, string>;
-  chapters: TextbookChapter[]; teacher: boolean; pdf: number[]; pdf_en?: number[]; resources?: Record<string, TextbookResource[]> }
+  chapters: TextbookChapter[]; teacher: boolean; pdf: (number | string)[]; pdf_en?: (number | string)[]; resources?: Record<string, TextbookResource[]> }
 export interface TextbookSection { id: string; title: string; lang?: "zh" | "en"; chapter: { no: number | string; title: string; status?: string }; html: string;
   prev: TextbookSectionRef | null; next: TextbookSectionRef | null }
 export interface CommitteeItem { pid: string; lid: string; course: Text; chapter: Text; no: string; title: Text; teacher: string; state: string; submitted?: number; verdict: string }
