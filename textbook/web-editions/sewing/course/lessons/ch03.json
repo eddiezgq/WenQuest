@@ -41,8 +41,8 @@
    "What is the inertia force at bottom dead centre at 6000 r/min, and does it exceed the limit? Keeping 6000 r/min, to what mass must the reciprocating parts be reduced? Keeping the parts, what is the highest allowable speed?"
   ],
   "answer": [
-   "下止点加速度 a = rω²(1 + λ)，λ = 0.282。5000 r/min 时约 5447 m/s²，惯性力约 654 N；6000 r/min 时惯性力增大到 1.44 倍，约 942 N，超过 800 N。保持 6000 r/min，往复质量须减到约 102 g 以下（800 / 7844 m/s²）；保持 120 g，转速最高约 5530 r/min（5000 × √(800/654)）。工程上常见的做法是空心针杆、小型针夹、镂空连杆来减重，并复核平衡和润滑。",
-   "At bottom dead centre a = rω²(1 + λ), with λ = 0.282. At 5000 r/min this is about 5447 m/s² and the force about 654 N; at 6000 r/min the force grows 1.44 times to about 942 N, over the 800 N limit. Keeping 6000 r/min, the reciprocating mass must come down to about 102 g or less (800 / 7844 m/s²); keeping 120 g, the top speed is about 5530 r/min (5000 × √(800/654)). The usual engineering answer is to lighten the parts with a hollow needle bar, a small needle clamp and a pocketed link, and then re-check balancing and lubrication."
+   "下止点加速度 a = rω²(1 + λ)，λ = 0.282。5000 r/min 时约 5447 m/s²，惯性力约 654 N；6000 r/min 时惯性力增大到 1.44 倍，约 941 N，超过 800 N。保持 6000 r/min，往复质量须减到约 102 g 以下（800 / 7844 m/s²）；保持 120 g，转速最高约 5530 r/min（5000 × √(800/654)）。工程上常见的做法是空心针杆、小型针夹、镂空连杆来减重，并复核平衡和润滑。",
+   "At bottom dead centre a = rω²(1 + λ), with λ = 0.282. At 5000 r/min this is about 5447 m/s² and the force about 654 N; at 6000 r/min the force grows 1.44 times to about 941 N, over the 800 N limit. Keeping 6000 r/min, the reciprocating mass must come down to about 102 g or less (800 / 7844 m/s²); keeping 120 g, the top speed is about 5530 r/min (5000 × √(800/654)). The usual engineering answer is to lighten the parts with a hollow needle bar, a small needle clamp and a pocketed link, and then re-check balancing and lubrication."
   ]
  },
  "robot": {
@@ -369,8 +369,8 @@
      "Example m = 120 g (illustrative, to be weighed on real parts): about 654 N at bottom dead centre and about 366 N at top."
     ],
     [
-     "惯性力与转速平方成正比：5000 → 6000 r/min，增大到 1.44 倍，约 942 N。",
-     "Inertia force scales with speed squared: from 5000 to 6000 r/min it grows 1.44 times, to about 942 N."
+     "惯性力与转速平方成正比：5000 → 6000 r/min，增大到 1.44 倍，约 941 N。",
+     "Inertia force scales with speed squared: from 5000 to 6000 r/min it grows 1.44 times, to about 941 N."
     ],
     [
      "一百多克的部件，承受几百倍于自重的力，每秒来回八十多次。",
@@ -380,8 +380,8 @@
    "formula": "F = -m\\,a \\approx -m r\\omega^{2}\\cos\\varphi + m r\\omega^{2}\\lambda\\cos2\\varphi",
    "figure": "",
    "narration": [
-    "针杆、针夹、机针，再加上连杆折算到针杆一端的那部分，合起来叫往复质量 m。惯性力就是负的 m 乘 a。算例取 m 等于 120 克，这是示意值，真机要称零件。下止点惯性力约 0.12 乘 5447，约 654 牛；上止点约 366 牛。惯性力和转速平方成正比，从每分钟 5000 转提到 6000 转，变成 1.44 倍，约 942 牛。这就是本讲车间问题的答案：超过了假定的 800 牛限值。一百多克的零件，要扛几百倍于自重的力，每秒来回八十多次，这就是高速机的设计难点。",
-    "The needle bar, needle clamp and needle, plus the part of the link mass referred to the needle-bar end, make up the reciprocating mass m. The inertia force is minus m times a. The example takes m as 120 grams, an illustrative value; on a real machine you weigh the parts. At bottom dead centre the force is about 0.12 times 5447, about 654 newtons; at the top about 366. Inertia force scales with speed squared, so going from 5000 to 6000 r/min multiplies it by 1.44, to about 942 newtons. That answers our shop-floor problem: it exceeds the assumed 800-newton limit. A part of a hundred-odd grams carrying hundreds of times its own weight, reversing more than eighty times a second: that is what makes high-speed machines hard."
+    "针杆、针夹、机针，再加上连杆折算到针杆一端的那部分，合起来叫往复质量 m。惯性力就是负的 m 乘 a。算例取 m 等于 120 克，这是示意值，真机要称零件。下止点惯性力约 0.12 乘 5447，约 654 牛；上止点约 366 牛。惯性力和转速平方成正比，从每分钟 5000 转提到 6000 转，变成 1.44 倍，约 941 牛。这就是本讲车间问题的答案：超过了假定的 800 牛限值。一百多克的零件，要扛几百倍于自重的力，每秒来回八十多次，这就是高速机的设计难点。",
+    "The needle bar, needle clamp and needle, plus the part of the link mass referred to the needle-bar end, make up the reciprocating mass m. The inertia force is minus m times a. The example takes m as 120 grams, an illustrative value; on a real machine you weigh the parts. At bottom dead centre the force is about 0.12 times 5447, about 654 newtons; at the top about 366. Inertia force scales with speed squared, so going from 5000 to 6000 r/min multiplies it by 1.44, to about 941 newtons. That answers our shop-floor problem: it exceeds the assumed 800-newton limit. A part of a hundred-odd grams carrying hundreds of times its own weight, reversing more than eighty times a second: that is what makes high-speed machines hard."
    ]
   },
   {
@@ -810,12 +810,12 @@
     "算例针杆（m = 120 g）在 5000 r/min 时下止点惯性力约 654 N。转速提高到 6000 r/min 时约为多少牛？",
     "The example needle bar (m = 120 g) has about 654 N at bottom dead centre at 5000 r/min. What is it at 6000 r/min?"
    ],
-   "answer": 942,
+   "answer": 941,
    "tolerance": 4,
    "unit": "N",
    "feedback": [
-    "惯性力与转速平方成正比：654 × (6000/5000)² = 654 × 1.44 ≈ 942 N。",
-    "Inertia force scales with speed squared: 654 × (6000/5000)² = 654 × 1.44 ≈ 942 N."
+    "惯性力与转速平方成正比：654 N × (6000/5000)²，精确计算约 941 N。",
+    "Inertia force scales with speed squared: 654 N × (6000/5000)², about 941 N when computed exactly."
    ]
   },
   {

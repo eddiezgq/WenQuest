@@ -41,8 +41,8 @@
    "What is the inertia force of the needle bar at bottom dead centre at 4000, 5000 and 6000 stitches per minute? By what percentage does it rise from 5000 to 6000? Compared with Thimonnier's machine at 200 stitches per minute, how many times larger is the force at 5000?"
   ],
   "answer": [
-   "惯性力与转速的平方成正比。4000 针时约 654 × (4000/5000)² ≈ 419 N；5000 针时 654 N；6000 针时约 654 × 1.2² ≈ 942 N，增大 44%。每分钟 200 针时加速度只有约 8.7 m/s²，惯性力约 1 N，比每分钟 5000 针时小 (5000/200)² = 625 倍。所以提速不是“拧一下旋钮”的事：每分钟 6000 针时针杆每秒要承受 100 次、每次近千牛的冲击，平衡、材料和润滑都要重新核算（第 3、8 章）。",
-   "Inertia force is proportional to the square of speed. At 4000 it is about 654 × (4000/5000)² ≈ 419 N; at 5000 it is 654 N; at 6000 it is about 654 × 1.2² ≈ 942 N, an increase of 44%. At 200 stitches per minute the acceleration is only about 8.7 m/s² and the force about 1 N, (5000/200)² = 625 times smaller than at 5000. So raising the speed is not just a matter of turning a knob: at 6000 stitches per minute the needle bar takes a load of nearly a kilonewton 100 times a second, and balancing, materials and lubrication all have to be re-checked (Chapters 3 and 8)."
+   "惯性力与转速的平方成正比。4000 针时约 654 × (4000/5000)² ≈ 419 N；5000 针时 654 N；6000 针时约 654 N × 1.2²，精确计算约 941 N，增大 44%。每分钟 200 针时加速度只有约 8.7 m/s²，惯性力约 1 N，比每分钟 5000 针时小 (5000/200)² = 625 倍。所以提速不是“拧一下旋钮”的事：每分钟 6000 针时针杆每秒要承受 100 次、每次近千牛的冲击，平衡、材料和润滑都要重新核算（第 3、8 章）。",
+   "Inertia force is proportional to the square of speed. At 4000 it is about 654 × (4000/5000)² ≈ 419 N; at 5000 it is 654 N; at 6000 it is about 654 N × 1.2², about 941 N when computed exactly, an increase of 44%. At 200 stitches per minute the acceleration is only about 8.7 m/s² and the force about 1 N, (5000/200)² = 625 times smaller than at 5000. So raising the speed is not just a matter of turning a knob: at 6000 stitches per minute the needle bar takes a load of nearly a kilonewton 100 times a second, and balancing, materials and lubrication all have to be re-checked (Chapters 3 and 8)."
   ]
  },
  "robot": {
@@ -467,8 +467,8 @@
    "The five stages of the industrial sewing machine — mechanisation, high speed, electronic control, automation and intelligence — are layered, not replaced."
   ],
   [
-   "惯性力与转速平方成正比：算例针杆 5000 r/min 时约 654 N，6000 r/min 时约 942 N（+44%）；这使平衡、材料、润滑成为高速化的核心。",
-   "Inertia force is proportional to speed squared: about 654 N at 5000 r/min for the example needle bar, about 942 N at 6000 r/min (+44%); this makes balancing, materials and lubrication central to high speed."
+   "惯性力与转速平方成正比：算例针杆 5000 r/min 时约 654 N，6000 r/min 时约 941 N（+44%）；这使平衡、材料、润滑成为高速化的核心。",
+   "Inertia force is proportional to speed squared: about 654 N at 5000 r/min for the example needle bar, about 941 N at 6000 r/min (+44%); this makes balancing, materials and lubrication central to high speed."
   ],
   [
    "分类先看线迹：ISO 4915 六类（100—600）；缝制设备服务于产业链中劳动力最集中的“裁”与“缝”，价值要在产量、质量、成本上体现。",
