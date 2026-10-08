@@ -1,0 +1,355 @@
+# 《缝纫机设计与制造》公开课 第 3 讲：刺布机构（按《线性代数》14.2 标准样片的结构与审读流程）
+# 格式见 tools/video/README.md。say 里每行一句配音、一条字幕；行首 “>” = 说这句之前画面进入下一步。
+# 中英两种语言 “>” 的个数必须相同。“[字幕|读法]”：字幕显示前者、配音读后者。
+# {{ch03.键:格式}} 由课程包程序 textbook/web-editions/sewing/course/calc/ch03.py 的输出填入，不手写数字。
+# 时长（Eddie 2026-10-07）：约 15 分钟——课程约 10 分钟（open … balance），虚拟实验、数字工厂互动、作业、测验、结尾约 5 分钟。
+# 内容取自课程包第 3 讲（course/lessons/ch03.json）与教材第 3 章。
+book: sewing
+section: "3"
+code: [ch03]
+title: ["刺布机构：针杆的曲柄滑块", "The Needle-Bar Mechanism: a Slider-Crank"]
+chapter: ["第二篇 机构 · 第 3 章", "Part II Mechanisms · Chapter 3"]
+next: ["第 4 讲 挑线机构", "Lecture 4 The take-up mechanism"]
+cover_formula: '|a_{\mathrm{BDC}}|=r\omega^{2}(1+\lambda)'
+tags:
+  zh: [刺布机构, 针杆, 曲柄滑块, 惯性力, 平衡块, 平缝机]
+  en: [needle bar, slider-crank, inertia force, counterweight, sewing machine design]
+
+shots:
+  - id: open
+    kind: title
+    say:
+      zh:
+        - 同学们好，欢迎来到问渠。
+        - 这是《缝纫机设计与制造》第三讲，刺布机构：针杆的曲柄滑块。
+      en:
+        - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+        - This is Lecture 3, the needle-bar mechanism, a slider-crank.
+
+  - id: problem
+    kind: lab
+    lab: proto-lockstitch
+    part: ["车间问题", "The problem"]
+    steps:
+      - press: ["#shell [data-k=xray]", "#chains [data-k=needle]"]
+    say:
+      zh:
+        - 先看车间里的一个问题。
+        - 一家工厂的平缝机，平时每分钟五千转，生产部要求提到每分钟六千转。
+        - ">设备科担心的是针杆：针杆在轴套里上下滑动，每秒来回八十多次。"
+        - 他们按经验给针杆轴套定了一个限值：下止点的往复惯性力不能超过 {{ch03.Flim:.0f}} 牛。
+        - 提速到六千转，会不会超限？如果超了，是该给针杆减重，还是该限制转速？
+        - 这一讲学完，你就能算出答案。
+      en:
+        - Let's start with a problem from the shop floor.
+        - A factory runs its lockstitch machines at five thousand revolutions a minute, and production wants six thousand.
+        - ">The maintenance team is worried about the needle bar. It slides up and down in its bushings more than eighty times a second."
+        - From experience they have set a limit for the bushings. The reciprocating inertia force at bottom dead centre must stay under {{ch03.Flim:.0f}} newtons.
+        - At six thousand, will it go over? And if it does, should we lighten the needle bar, or limit the speed?
+        - By the end of this lecture you'll be able to work it out.
+
+  - id: structure
+    kind: slide
+    part: ["刺布机构", "The mechanism"]
+    head: ["上轴转一圈，针杆上下一次", "One shaft turn, one up-and-down of the needle bar"]
+    items:
+      - img: fig_needlebar_mech
+      - text: ["曲柄在上轴前端，对面铸有平衡块", "The crank sits on the end of the main shaft, with a counterweight opposite"]
+      - text: ["连杆把曲柄销和针杆连起来；导滑块让针杆只上下、不转动", "A link joins crank pin and needle bar; a guide block stops the bar turning"]
+      - text: ["两处调整：针杆高度、机针深度与朝向", "Two adjustments: needle-bar height, needle depth and direction"]
+    say:
+      zh:
+        - ">刺布机构的任务很明确：带着机针穿过布料，在准确的时刻到达最低点，还要能跑高速。"
+        - ">这是顺着上轴看过去的结构图。上轴前端装着针杆曲柄，曲柄销的对面铸有一块平衡块。"
+        - ">连杆一端套在曲柄销上，另一端铰接在夹于针杆上的连接轴上。连接轴另一端有个导滑块嵌在导槽里，保证针杆只上下动、不转动。"
+        - ">这里有两处调整：松开连接轴螺钉，可以调针杆高度；松开针夹螺钉，可以调机针插入的深度和朝向。"
+        - 记住，这两处调整只改变位置，不改变运动规律。运动规律由曲柄和连杆决定。
+      en:
+        - ">The needle bar has a clear job. Carry the needle through the fabric, reach its lowest point at exactly the right moment, and do it at high speed."
+        - ">Here we're looking along the main shaft. The needle-bar crank sits on the front end of the shaft, with a counterweight cast opposite the crank pin."
+        - ">A link runs from the crank pin to a connecting stud clamped on the needle bar. A guide block on the stud runs in a slot, so the bar can only go up and down. It can't turn."
+        - ">There are two adjustments. Loosen the stud screw to set the needle-bar height, and loosen the needle clamp to set how deep the needle sits and which way it faces."
+        - Remember, these adjustments only move things. They don't change the motion. The motion is set by the crank and the link.
+
+  - id: diagram
+    kind: slide
+    part: ["倒挂的曲柄滑块", "An upside-down slider-crank"]
+    head: ["和发动机一样，但倒过来挂", "Like an engine, but hanging upside down"]
+    items:
+      - img: w_f239087a
+      - text: ["曲柄 OA、连杆 AB、滑块 B：对心曲柄滑块", "Crank OA, link AB, slider B: an in-line slider-crank"]
+      - text: ["针杆在上轴下方：上止点 OB = l − r", "The bar hangs below the shaft: OB = l − r at top dead centre"]
+      - text: ["连杆比 λ = r / l，算例 λ = {{ch03.lam:.3f}}", "Link ratio λ = r / l; in our example λ = {{ch03.lam:.3f}}"]
+    say:
+      zh:
+        - ">把结构画成运动简图。"
+        - ">上轴是曲柄 OA，连杆是 AB，针杆就是滑块 B。这是一个对心曲柄滑块机构。"
+        - 汽车发动机的活塞也是曲柄滑块，你可能在机械原理课上推过它的公式。
+        - 但要注意一个区别：活塞在曲轴上方，针杆却倒挂在上轴下方。
+        - ">针杆在最高点时，曲柄销朝上、背离针杆，O 到 B 的距离是 l 减 r。"
+        - 所以上、下止点和发动机正好对调。直接套发动机的公式，会把上下止点的加速度弄反。
+        - ">还有一个贯穿这一讲的量：连杆比 [λ|兰姆达]，等于 r 除以 l。我们的算例 r 是 {{ch03.r:.1f}} 毫米，l 是 {{ch03.l:.0f}} 毫米，[λ|兰姆达] 约 {{ch03.lam:.2f}}。"
+      en:
+        - ">Now draw it as a kinematic diagram."
+        - ">The main shaft is the crank OA, the link is AB, and the needle bar is the slider B. That's an in-line slider-crank."
+        - A car engine's piston is a slider-crank too, and you may have derived its formulas in a mechanisms course.
+        - But there's one difference. The piston sits above the crankshaft, while the needle bar hangs below the main shaft.
+        - ">At the top of its stroke the crank pin points up, away from the bar, so the distance from O to B is l minus r."
+        - So top and bottom dead centre are swapped compared with an engine. Copy the engine formulas straight over and you'll get the two accelerations the wrong way round.
+        - ">One more quantity runs through this whole lecture, the link ratio [λ|lambda], r over l. In our example r is {{ch03.r:.1f}} millimetres and l is {{ch03.l:.0f}}, so [λ|lambda] is about {{ch03.lam:.2f}}."
+
+  - id: formula
+    kind: slide
+    part: ["位移与加速度", "Displacement and acceleration"]
+    head: ["一个位移公式，两个止点", "One displacement formula, two dead centres"]
+    items:
+      - tex: 'x(\varphi)=r(1-\cos\varphi)-l\left(1-\sqrt{1-\lambda^{2}\sin^{2}\varphi}\right)'
+      - tex: 'a_{\mathrm{TDC}}=r\omega^{2}(1-\lambda),\qquad a_{\mathrm{BDC}}=-r\omega^{2}(1+\lambda)'
+      - text: ["下止点加速度更大，两者之比 (1 − λ) : (1 + λ)", "Bottom dead centre is harder: the ratio is (1 − λ) : (1 + λ)"]
+      - text: ["惯性力 F = m·a，与转速平方成正比", "Inertia force F = m·a grows with speed squared"]
+    say:
+      zh:
+        - ">以上止点为零点、向下为正，由三角形的几何关系消去连杆的摆角，就得到针杆的位移公式。"
+        - 第一项是曲柄带来的，第二项是连杆摆动带来的修正。注意第二项是减号，和发动机活塞的公式符号相反，原因就是针杆倒挂。
+        - ">主轴匀速转动，对时间求两次导数，就得到加速度。在两个止点，结果特别简单：上止点是 r [ω|欧米伽] 平方乘一减 [λ|兰姆达]；下止点大小是 r [ω|欧米伽] 平方乘一加 [λ|兰姆达]，负号表示方向朝上。"
+        - ">所以针杆在下止点的加速度比上止点大。这正是机针扎在布里、线环正在形成的时刻。"
+        - ">乘上往复质量，就是惯性力。[ω|欧米伽] 是平方关系，转速提高两成，惯性力就要增加四成多。"
+      en:
+        - ">Take top dead centre as zero, downward as positive, eliminate the link angle from the triangle, and you get the needle-bar displacement."
+        - The first term comes from the crank, the second is the correction from the swinging link. Notice the second term has a minus sign, the opposite of the engine formula, and that's because the bar hangs upside down.
+        - ">With the shaft turning steadily, differentiate twice and you get the acceleration. At the two dead centres it's beautifully simple. At the top, r [ω|omega] squared times one minus [λ|lambda]. At the bottom, r [ω|omega] squared times one plus [λ|lambda], with a minus sign because it points up."
+        - ">So the needle bar accelerates harder at the bottom than at the top. And the bottom is exactly when the needle is in the fabric and the loop is forming."
+        - ">Multiply by the reciprocating mass and you get the inertia force. And because [ω|omega] is squared, twenty percent more speed means over forty percent more force."
+
+  - id: anim
+    kind: lab
+    lab: slidercrank
+    part: ["看它动起来", "See it move"]
+    steps:
+      - press: "[data-go='0']"
+      - press: "[data-go='180']"
+      - press: "[data-go='hook']"
+      - press: "#play"
+    say:
+      zh:
+        - 来看这个机构动起来的样子。左边是机构，右边是位移、速度、加速度三条曲线，都按精确公式计算。
+        - ">点“上止点”。曲柄销在正上方，针杆在最高处，这里的加速度不大，曲线很平缓。"
+        - ">再点“下止点”。曲柄转到正下方，针杆转身向上，加速度曲线在这里冲到最深、最尖的低谷，负号表示方向朝上。这就是最大惯性力的位置。"
+        - ">再点“钩线时刻”：机针从最低点回升 2 毫米，主轴转到约 {{ch03.rise2:.0f}} 度。上一讲说过，梭尖就在这一刻钩住线环。"
+        - ">让它连续转起来。你会发现，针杆在上面停留得久，在下面转身得快。"
+      en:
+        - Let's see it move. On the left is the mechanism, on the right the displacement, velocity and acceleration curves, all from the exact formulas.
+        - ">Press Top dead centre. The crank pin points straight up and the bar is at its highest. The acceleration here is modest, and the curve is flat."
+        - ">Now Bottom dead centre. The crank points straight down and the bar turns round to come back up. The acceleration curve plunges to its deepest, sharpest point here, negative because it points up. This is where the inertia force is largest."
+        - ">Now Loop-catch moment. The needle has risen 2 millimetres from its lowest point, at a shaft angle of about {{ch03.rise2:.0f}} degrees. As we saw last time, this is when the hook point catches the loop."
+        - ">Now let it run. The bar lingers at the top and whips round at the bottom."
+
+  - id: curves
+    kind: slide
+    part: ["读曲线", "Reading the curves"]
+    head: ["算例：r = {{ch03.r:.1f}} mm，l = {{ch03.l:.0f}} mm，{{ch03.n:.0f}} r/min", "Example: r = {{ch03.r:.1f}} mm, l = {{ch03.l:.0f}} mm, {{ch03.n:.0f}} r/min"]
+    items:
+      - img: w_f0f8ad0a
+      - text: ["90° 时只走了 {{ch03.x90:.1f}} mm，不到行程 {{ch03.stroke:.0f}} mm 的一半", "At 90° the bar has moved only {{ch03.x90:.1f}} mm, under half the {{ch03.stroke:.0f}} mm stroke"]
+      - text: ["最大速度 {{ch03.vmax:.2f}} m/s，在 {{ch03.fvmax:.1f}}°", "Peak velocity {{ch03.vmax:.2f}} m/s, at {{ch03.fvmax:.1f}}°"]
+      - text: ["上止点 {{ch03.aT:.0f}} m/s²，下止点 {{ch03.aB:.0f}} m/s²（约 {{ch03.gB:.0f}} g）", "{{ch03.aT:.0f}} m/s² at the top, {{ch03.aB:.0f}} m/s² at the bottom (about {{ch03.gB:.0f}} g)"]
+    say:
+      zh:
+        - ">这是算例的三条曲线，读它抓住三点。"
+        - ">第一，位移曲线不对称。主轴转到 90 度，针杆只走了 {{ch03.x90:.1f}} 毫米，不到行程的一半。"
+        - ">第二，最大速度 {{ch03.vmax:.2f}} 米每秒，出现在 {{ch03.fvmax:.1f}} 度，而不是 90 度。这两点都是连杆摆动造成的，[λ|兰姆达] 越大，偏得越多。"
+        - ">第三，上止点加速度约 {{ch03.aT:.0f}}，下止点约 {{ch03.aB:.0f}} 米每二次方秒，相当于重力加速度的 {{ch03.gB:.0f}} 倍。"
+        - 一百多克的针杆组件，要承受几百倍于自重的力，每秒来回 {{ch03.hz:.0f}} 次，这就是刺布机构设计的难处。
+      en:
+        - ">Here are the three curves for our example. Look for three things."
+        - ">First, the displacement isn't symmetric. At 90 degrees the bar has moved only {{ch03.x90:.1f}} millimetres, under half the stroke."
+        - ">Second, the peak velocity, {{ch03.vmax:.2f}} metres per second, comes at {{ch03.fvmax:.1f}} degrees, not at 90. Both effects come from the swinging link, and the bigger [λ|lambda], the bigger the shift."
+        - ">Third, the acceleration is about {{ch03.aT:.0f}} at the top and {{ch03.aB:.0f}} metres per second squared at the bottom. That's {{ch03.gB:.0f}} times the acceleration of gravity."
+        - A needle-bar assembly of a hundred-odd grams carries hundreds of times its own weight, back and forth {{ch03.hz:.0f}} times a second. That's what makes this mechanism hard to design.
+
+  - id: lambda
+    kind: slide
+    part: ["连杆比的折中", "The link-ratio compromise"]
+    head: ["λ 改变加速度，也改变钩线时刻", "λ changes the acceleration and the catching moment"]
+    items:
+      - img: w_55ae5477
+      - text: ["λ = 0.20 / {{ch03.lam:.3f}} / 0.40：钩线 {{ch03.c20:.1f}}° / {{ch03.rise2:.1f}}° / {{ch03.c40:.1f}}°", "λ = 0.20 / {{ch03.lam:.3f}} / 0.40: catch at {{ch03.c20:.1f}}° / {{ch03.rise2:.1f}}° / {{ch03.c40:.1f}}°"]
+      - text: ["下止点加速度 {{ch03.a20:.0f}} / {{ch03.aB:.0f}} / {{ch03.a40:.0f}} m/s²", "Bottom acceleration {{ch03.a20:.0f}} / {{ch03.aB:.0f}} / {{ch03.a40:.0f}} m/s²"]
+      - text: ["改了 r 或 l，要重校旋梭安装角和针杆高度", "Change r or l, and re-set the hook angle and needle-bar height"]
+    say:
+      zh:
+        - 那连杆该取多长？
+        - ">保持行程不变，[λ|兰姆达] 越大，也就是连杆越短，针在下止点后回升得越快，钩线时刻就越早。"
+        - ">[λ|兰姆达] 取 0.2、{{ch03.lam:.2f}}、0.4，钩线时刻分别是 {{ch03.c20:.1f}}、{{ch03.rise2:.1f}}、{{ch03.c40:.1f}} 度，只差一两度。"
+        - 可上一讲算过，不跳针的窗口只有十度左右，一两度也不能忽略。
+        - ">加速度也一样：连杆越短，下止点加速度越大。连杆长一些，运动更平稳，可机头就得加高，零件也更重。"
+        - ">所以工业平缝机的 [λ|兰姆达] 是一个折中。还要记住：一旦改了曲柄半径或连杆长度，旋梭的安装角和针杆高度都要重新校正。"
+      en:
+        - So how long should the link be?
+        - ">Keep the stroke fixed. The bigger [λ|lambda], that is, the shorter the link, the faster the needle rises after bottom dead centre, and the earlier the hook catches."
+        - ">With [λ|lambda] at 0.2, {{ch03.lam:.2f}} and 0.4, the catch comes at {{ch03.c20:.1f}}, {{ch03.rise2:.1f}} and {{ch03.c40:.1f}} degrees. Only a degree or two apart."
+        - But as we found last lecture, the no-skip window is only about ten degrees, so a degree or two matters.
+        - ">Acceleration goes the same way. A shorter link means harder acceleration at the bottom. A longer link runs smoother, but the head gets taller and the parts get heavier."
+        - ">So the link ratio on an industrial machine is a compromise. And remember, change the crank radius or the link length, and you must re-set the hook mounting angle and the needle-bar height."
+
+  - id: example
+    kind: slide
+    part: ["回到车间问题", "Back to the problem"]
+    head: ["六千转，针杆受得了吗？", "Can the needle bar take six thousand?"]
+    items:
+      - tex: 'F_{5000}=m\,r\omega^{2}(1+\lambda)\approx {{ch03.F5000:.0f}}\ \mathrm{N}'
+      - tex: 'F_{6000}=F_{5000}\times\left(\tfrac{6000}{5000}\right)^{2}\approx {{ch03.F6000:.0f}}\ \mathrm{N}>{{ch03.Flim:.0f}}\ \mathrm{N}'
+      - text: ["保持 6000 r/min：往复质量减到 {{ch03.mmax:.0f}} g 以下", "Keep 6000 r/min: cut the mass to {{ch03.mmax:.0f}} g or less"]
+      - text: ["保持 {{ch03.mass:.0f}} g：转速最高约 {{ch03.nmax:.0f}} r/min", "Keep {{ch03.mass:.0f}} g: top speed about {{ch03.nmax:.0f}} r/min"]
+    say:
+      zh:
+        - 现在回到开头的问题。
+        - ">往复质量 {{ch03.mass:.0f}} 克，每分钟五千转时，下止点惯性力约 {{ch03.F5000:.0f}} 牛，没有超限。"
+        - ">提到六千转，转速是原来的 1.2 倍，惯性力是 {{ch03.r56:.2f}} 倍，约 {{ch03.F6000:.0f}} 牛，超过了 {{ch03.Flim:.0f}} 牛。"
+        - ">如果坚持六千转，往复质量要减到 {{ch03.mmax:.0f}} 克以下，要减掉约 {{ch03.dm:.0f}} 克。"
+        - ">如果零件不改，转速最高只能到每分钟约 {{ch03.nmax:.0f}} 转。"
+        - 工程上常见的答案是减重：空心的针杆、小巧的针夹、镂空的连杆，减完以后再复核平衡和润滑。
+      en:
+        - Now back to our problem.
+        - ">With {{ch03.mass:.0f}} grams reciprocating at five thousand, the force at bottom dead centre is about {{ch03.F5000:.0f}} newtons. That's inside the limit."
+        - ">At six thousand the speed is 1.2 times higher, so the force is {{ch03.r56:.2f}} times higher, about {{ch03.F6000:.0f}} newtons. That's over {{ch03.Flim:.0f}}."
+        - ">To keep six thousand, the reciprocating mass has to come down to {{ch03.mmax:.0f}} grams or less, about {{ch03.dm:.0f}} grams lighter."
+        - ">Keep the parts as they are, and the top speed is about {{ch03.nmax:.0f}} revolutions a minute."
+        - The usual engineering answer is to lighten the parts. A hollow needle bar, a small needle clamp, a pocketed link. Then re-check the balancing and the lubrication.
+
+  - id: balance
+    kind: slide
+    part: ["平衡块、机器人与发动机", "Counterweights, robots and engines"]
+    head: ["平衡块为什么不能全抵消", "Why the counterweight can't cancel it all"]
+    items:
+      - text: ["一阶力 m r ω² cos φ：平衡块可抵消一部分", "First order, m r ω² cos φ: the counterweight cancels part of it"]
+      - text: ["二阶力 m r ω² λ cos 2φ：两倍频率，平衡块无能为力", "Second order, m r ω² λ cos 2φ: twice the frequency, the counterweight can't touch it"]
+      - text: ["机器人：同一路径时间减半，加速度和惯性力矩变 4 倍", "Robots: run a path in half the time, and acceleration and inertia torque go up four times"]
+      - text: ["生活：发动机用两倍转速的平衡轴对付二阶力", "Everyday: engines use balance shafts at twice crank speed"]
+    say:
+      zh:
+        - 曲柄上不是有平衡块吗？为什么还怕惯性力？
+        - ">惯性力可以拆成两部分。一阶部分频率等于主轴转速，平衡块的离心力能抵消它的一部分。但平衡块的力随曲柄一起转，抵消了竖直方向，又在水平方向产生新的不平衡，所以只能平衡一部分。"
+        - ">二阶部分以两倍转速变化，大小正比于 [λ|兰姆达]，平衡块对它完全无能为力。所以降振最有效的办法，还是减小往复质量。"
+        - ">机器人也是同样的道理：同一条路径，运动时间缩短一半，关节加速度和电机要出的惯性力矩都变成四倍。提节拍时，最先碰到的往往就是电机峰值力矩。"
+        - ">生活里，四缸汽车发动机高速时车身嗡嗡发振，就是二阶惯性力。有些发动机专门加一对以两倍曲轴转速旋转的平衡轴来对付它。"
+      en:
+        - But there's a counterweight on the crank. Why worry about inertia force at all?
+        - ">Split the force in two. The first-order part varies at shaft speed, and the counterweight's centrifugal force can cancel some of it. But that force turns with the crank, so cancelling the vertical part creates a new imbalance sideways. It can only balance part of it."
+        - ">The second-order part varies at twice shaft speed and is proportional to [λ|lambda]. The counterweight can do nothing about it. So the best way to cut vibration is still to cut the reciprocating mass."
+        - ">Robots work the same way. Run the same path in half the time, and joint accelerations and motor inertia torque go up four times. Shorten the cycle, and the first limit you hit is usually peak motor torque."
+        - ">And in everyday life, the hum you feel in a four-cylinder car at high revs is that second-order force. Some engines add a pair of balance shafts, turning at twice crankshaft speed, just to fight it."
+
+  - id: lab31
+    kind: lab
+    lab: slidercrank
+    part: ["虚拟实验", "Virtual lab"]
+    steps:
+      - js: "document.querySelectorAll('[id^=k-]').forEach(e => e.style.filter = 'blur(7px)')"
+        sweep: {l: [55, 90]}
+        dur: 4
+      - sweep: {l: [90, 35]}
+        dur: 5
+      - sweep: {l: [35, 55], n: [5000, 3000]}
+        dur: 4
+      - sweep: {n: [3000, 5000], m: [120, 80]}
+        dur: 5
+      - set: {m: 120}
+    say:
+      zh:
+        - 下面是本讲的虚拟实验 3-1，在问渠学习平台上可以亲手做。结果区的数字这里先遮住，留给你自己读。
+        - ">任务一：只改连杆长度。拉到 90 毫米，记下行程和上下止点加速度。"
+        - ">再拉到 35 毫米。曲线的形状变了，钩线时刻也跟着动。任务二就是把连杆改到 40 毫米，读出新的钩线转角。"
+        - ">任务三：转速从三千改到六千，看最大惯性力变成几倍，验证平方关系。"
+        - ">任务四：在每分钟五千转下调往复质量，找出让最大惯性力不超过 400 牛的那个质量。"
+        - ">每个数都和你的手算结果对一对。灰色虚线是教材算例，可以随时对照。答案这里不说，留给你自己找。"
+        - 实验配有指导书和报告模板，在平台上下载，做完把报告交上来。
+      en:
+        - Now Virtual lab 3-1. On the WenQuest platform you can do it yourself. The numbers in the results panel are blurred here. Reading them is your job.
+        - ">Task one, change only the link length. Drag it to 90 millimetres and record the stroke and the dead-centre accelerations."
+        - ">Then try 35. The curves change shape, and the catching moment moves too. Task two is to set the link to 40 millimetres and read the new catching angle."
+        - ">Task three, take the speed from three thousand to six thousand, and see how many times bigger the peak inertia force gets. That checks the square law."
+        - ">Task four, at five thousand revolutions a minute, adjust the reciprocating mass until the peak force is no more than 400 newtons."
+        - ">Check every number against your own hand calculation. The grey dashed curves are the textbook example, there for comparison. I won't give the answers here. They're yours to find."
+        - The lab comes with a guide and a report template. Download them on the platform and hand in your report when you're done.
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    steps:
+      - js: "document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; })"
+        press: "#play"
+      - press: "#tabB"
+        js: "setTimeout(() => document.querySelectorAll('svg text').forEach(t => { if (!/已装整机|Built #/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }), 800)"
+    say:
+      zh:
+        - 设计算出来的参数，到了工厂要靠数据盯住。
+        - ">这是问渠数字工厂的质量闭环。总装调试工位逐台测量梭尖间隙，测量值经过总线进入控制图；数据一漂移，系统就报警，起草不合格品报告，交给质检员确认。"
+        - 你可以自己选判异规则、改漂移速度，看报警能提前几个小时。
+        - ">切到第二页，是序列号和批次的追溯图：从报警的那台整机，查到它装的旋梭批次、加工这批旋梭的磨床；再反过来查，同批旋梭还装在哪些整机上、有没有已经发货。"
+        - 今天说的“改了 r 或 l 要重校旋梭和针杆高度”，在工厂里就是这样逐台检查、逐台追溯的。第二十七讲会完整地走一遍。
+      en:
+        - Numbers worked out in design have to be watched with data in the factory.
+        - ">This is the quality loop in the WenQuest digital factory. The adjustment station measures the hook clearance on every machine, the readings go over the bus into a control chart, and when the data drifts the system raises an alarm and drafts a nonconformance report for a quality inspector to confirm."
+        - You can pick the detection rules yourself, change the drift rate, and see how many hours earlier the alarm comes.
+        - ">The second page is the serial-number and batch trace. From the machine that raised the alarm, back to the hook batch it was built with and the grinder that made that batch. Then the other way, to every machine built with the same batch, and whether any have already shipped."
+        - Today's rule, re-set the hook and the needle-bar height whenever r or l changes, is checked and traced like this, machine by machine. We'll walk through it fully in Lecture 27.
+
+  - id: homework
+    kind: homework
+    items: [1, 2, 3, 4]
+    foot: ["另：虚拟实验 3-1 的实验报告。在问渠学习平台提交。", "Plus the report for Virtual lab 3-1. Submit it on WenQuest."]
+    say:
+      zh:
+        - 作业一共四道题。
+        - ">第一题，计算：换一组 r、l 和转速，求行程、上下止点加速度和钩线转角，并用实验核对。"
+        - ">第二题，设计：就是今天的车间问题，给出减重和限速两个方案的数字，说明你推荐哪一个。"
+        - ">第三题，分析：连杆缩短以后，钩线时刻和下止点加速度怎么变，旋梭该怎么调。"
+        - ">第四题，简答：平衡块为什么不能完全平衡往复惯性力，说出两条理由。"
+      en:
+        - Your assignment has four questions.
+        - ">One, calculation. For a new r, l and speed, find the stroke, the dead-centre accelerations and the catching angle, and check them in the lab."
+        - ">Two, design. Today's shop-floor problem. Give the numbers for lightening and for limiting speed, and say which you'd recommend."
+        - ">Three, analysis. Shorten the link. How do the catching moment and the bottom acceleration change, and how should the hook be adjusted?"
+        - ">Four, short answer. Give two reasons why a counterweight can't fully balance the reciprocating force."
+
+  - id: quiz
+    kind: slide
+    part: ["测验", "Quiz"]
+    head: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+    items:
+      - text: ["针杆在最高点时，O 到 B 的距离等于多少？", "At its highest point, what is the distance from O to B?"]
+      - text: ["保持 r 不变把连杆缩短，钩线时刻会怎样变？", "Keep r, shorten the link: how does the catching moment move?"]
+      - text: ["三次作答机会，提交后立刻看到解析", "Three attempts, with explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：针杆在最高点时，O 到 B 的距离是多少？"
+        - ">连杆缩短以后，钩线时刻是提前还是推后？"
+        - ">每道题有三次机会，提交后马上能看到解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, at its highest point, what is the distance from O to B?"
+        - ">Shorten the link, and does the catch come earlier or later?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+  - id: outro
+    kind: outro
+    points:
+      - ["针杆是倒挂的曲柄滑块：上下止点和发动机对调", "The needle bar is an upside-down slider-crank: dead centres swapped from an engine"]
+      - ["下止点加速度 rω²(1 + λ) 最大，惯性力与转速平方成正比", "Bottom acceleration rω²(1 + λ) is the largest; inertia force grows with speed squared"]
+      - ["二阶力平衡块抵消不了，减轻往复质量最有效", "The counterweight can't cancel the second-order force; cutting mass works best"]
+    say:
+      zh:
+        - 这一讲的要点有三条。
+        - ">第一，针杆是倒挂的曲柄滑块，上下止点和发动机正好对调。"
+        - ">第二，下止点加速度最大，惯性力和转速的平方成正比，提速两成，力就大四成多。"
+        - ">第三，平衡块对二阶惯性力无能为力，减轻往复质量最有效。"
+        - 虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+        - 下一讲，我们看挑线机构，看它怎样在对的时刻放线和收线。我们下一讲见。
+      en:
+        - Three things to take away.
+        - ">One. The needle bar is an upside-down slider-crank, with its dead centres swapped from an engine's."
+        - ">Two. The acceleration is largest at bottom dead centre, and inertia force grows with the square of speed. Twenty percent faster means over forty percent more force."
+        - ">Three. The counterweight can't touch the second-order force. Cutting the reciprocating mass works best."
+        - The virtual labs, the 3D prototype, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+        - Next time it's the take-up mechanism, and how it pays thread out and pulls it back at just the right moments. See you then.

@@ -103,4 +103,5 @@ if __import__("os").environ.get("WQ_BOOK_OUT"):
         F3000=F[3000], F4000=F[4000], F5000=F[5000], F6000=F[6000], FT=m0 * aT, r56=F[6000] / F[5000],
         F1=m0 * r0 / 1000 * (2 * math.pi * 5000 / 60) ** 2, F2=m0 * r0 / 1000 * (2 * math.pi * 5000 / 60) ** 2 * lam,
         mmax=800 / abs(acc(180, r0, l0, 6000)) * 1000, nmax=1000 * math.sqrt(800 / (m0 * ab1)), Flim=800,
-        hz=5000 / 60, mass=m0 * 1000, gmass=aB / 9.81)
+        hz=5000 / 60, mass=m0 * 1000, gmass=aB / 9.81,
+        r=r0, l=l0, n=5000, dm=m0 * 1000 - 800 / abs(acc(180, r0, l0, 6000)) * 1000)   # 视频第 3 讲引用
