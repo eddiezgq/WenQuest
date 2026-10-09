@@ -1,0 +1,967 @@
+1
+00:00:00,600 --> 00:00:06,460
+Hi everyone, and welcome to the Digital Factory Practicum at WenQuest.
+
+2
+00:00:06,860 --> 00:00:11,282
+This is Lecture 10, business. Margin, receivables and cash.
+
+3
+00:00:11,302 --> 00:00:14,670
+Making money is not the same as having money.
+
+4
+00:00:16,190 --> 00:00:18,290
+Here's what happened.
+
+5
+00:00:18,690 --> 00:00:26,329
+The 20 joint reducers the robot plant added have all been delivered and
+
+6
+00:00:26,349 --> 00:00:31,075
+invoiced for 33,000 dollars on 30-day terms.
+
+7
+00:00:31,475 --> 00:00:35,855
+It's now 15 days past due and the money hasn't come.
+
+8
+00:00:36,255 --> 00:00:42,721
+There's 60,000 in the bank and 8,000 a week of fixed costs: wages,
+
+9
+00:00:42,741 --> 00:00:44,195
+rent and so on.
+
+10
+00:00:44,595 --> 00:00:50,918
+Sales says the robot plant is a big customer and chasing will hurt the relationship;
+
+11
+00:00:50,938 --> 00:00:56,052
+accounts says if we don't collect, in two months we can't pay wages.
+
+12
+00:00:56,452 --> 00:00:56,922
+Who's right?
+
+13
+00:00:58,442 --> 00:01:00,942
+How much did the order make.
+
+14
+00:01:02,462 --> 00:01:04,628
+Cost comes in three blocks.
+
+15
+00:01:05,028 --> 00:01:15,050
+Material: each part's BOM quantity times its price, 538.74 a unit.
+
+16
+00:01:15,450 --> 00:01:21,098
+Labour: each operation's time times the workstation rate,
+
+17
+00:01:21,118 --> 00:01:27,262
+which holds depreciation and wages; the grinder, for instance,
+
+18
+00:01:27,282 --> 00:01:32,630
+is 20 dollars of depreciation and 26 of wages an hour.
+
+19
+00:01:33,030 --> 00:01:39,330
+All operations together give 571.80 a unit.
+
+20
+00:01:39,730 --> 00:01:46,950
+The digital factory books depreciation with wages as labour, a conversion cost;
+
+21
+00:01:46,970 --> 00:01:51,991
+accountants put depreciation in manufacturing overhead.
+
+22
+00:01:52,390 --> 00:01:59,970
+Energy, the energy part of the rates, is 73.87.
+
+23
+00:02:00,370 --> 00:02:10,630
+Standard cost 1,184.41; sold at 1,650, a standard margin of 28.2 percent.
+
+24
+00:02:11,030 --> 00:02:18,074
+And margin isn't profit: it still has to pay overheads, selling costs,
+
+25
+00:02:18,094 --> 00:02:19,789
+interest and tax.
+
+26
+00:02:21,310 --> 00:02:25,770
+What you actually spend is often more than standard.
+
+27
+00:02:26,170 --> 00:02:32,593
+The digital factory splits an order's money into seven lines: material, labour,
+
+28
+00:02:32,613 --> 00:02:38,302
+energy, scrap and rework, idle power, rush and overtime, and warranty,
+
+29
+00:02:38,322 --> 00:02:40,667
+each traceable to its source.
+
+30
+00:02:41,067 --> 00:02:51,428
+This order's 33,000 of revenue, cut block by block, leaves a margin of 8,413,
+
+31
+00:02:51,448 --> 00:02:53,585
+or 25.5 percent.
+
+32
+00:02:53,985 --> 00:03:01,758
+The dashed line is the margin at standard cost, 28.2 percent: 2.7 points lost,
+
+33
+00:03:01,778 --> 00:03:05,055
+just above the 25 percent target.
+
+34
+00:03:06,575 --> 00:03:11,567
+The unplanned money totals 899 dollars.
+
+35
+00:03:11,967 --> 00:03:18,193
+The largest is overtime: the skilled grinder operator was away,
+
+36
+00:03:18,213 --> 00:03:22,853
+12 hours of cover at 30 dollars times 1.5, 540.
+
+37
+00:03:23,253 --> 00:03:33,622
+Re-zeroing and a new wheel after the grinder stopped: 184; two scrapped shafts:
+
+38
+00:03:33,642 --> 00:03:42,300
+106; bearings 20 percent dearer from the alternative supplier: 64.
+
+39
+00:03:42,700 --> 00:03:51,752
+On screen overtime goes from 12 to 24 and 48 hours and the margin bar shrinks;
+
+40
+00:03:51,772 --> 00:03:56,754
+then a 5 percent price cut takes even more.
+
+41
+00:03:57,154 --> 00:04:05,610
+The band saw idling for 24 hours cost only 4.80: judge money by the numbers,
+
+42
+00:04:05,630 --> 00:04:07,729
+not by impressions.
+
+43
+00:04:09,249 --> 00:04:16,917
+The big blocks are labour, 35.2 percent of revenue, and material, 32.7;
+
+44
+00:04:16,937 --> 00:04:22,114
+apart from material, labour is the largest line.
+
+45
+00:04:22,514 --> 00:04:26,094
+To earn more, look at hours and rates first.
+
+46
+00:04:26,494 --> 00:04:32,756
+If a margin falls more than 5 points below target, below 20 percent,
+
+47
+00:04:32,776 --> 00:04:36,914
+the hub flags it and lists the biggest lines.
+
+48
+00:04:37,314 --> 00:04:38,014
+Who fixes it?
+
+49
+00:04:38,414 --> 00:04:43,140
+A low price goes to sales, dear material to purchasing,
+
+50
+00:04:43,160 --> 00:04:47,887
+excess hours to process engineering and the shop floor.
+
+51
+00:04:48,287 --> 00:04:49,462
+By the way,
+
+52
+00:04:49,482 --> 00:04:56,634
+the 215-dollar after-shift service from Lecture 6 is booked to the
+
+53
+00:04:56,654 --> 00:04:58,698
+maintenance budget,
+
+54
+00:04:58,718 --> 00:05:00,546
+not to the order.
+
+55
+00:05:02,066 --> 00:05:04,406
+When does the money come back.
+
+56
+00:05:05,926 --> 00:05:09,578
+Delivered, invoiced, not paid: that's a receivable,
+
+57
+00:05:09,598 --> 00:05:13,106
+the plant's money still in the customer's pocket.
+
+58
+00:05:13,506 --> 00:05:17,486
+First the ageing, sorted by days overdue.
+
+59
+00:05:17,886 --> 00:05:23,861
+Receivables are 62,700, 63 percent overdue.
+
+60
+00:05:24,261 --> 00:05:32,050
+On screen the robot plant's invoice goes from 0 to 15, 35 and 70 days overdue,
+
+61
+00:05:32,070 --> 00:05:38,457
+dropping band by band; the older it gets, the harder to collect.
+
+62
+00:05:38,857 --> 00:05:44,413
+Then credit: it owes 33,000, already over its 30,000 limit,
+
+63
+00:05:44,433 --> 00:05:50,462
+and counting its next batch, in production and not yet invoiced,
+
+64
+00:05:50,482 --> 00:05:57,077
+exposure is already 165 percent, so the hub raises a second exception:
+
+65
+00:05:57,097 --> 00:05:58,779
+over credit limit.
+
+66
+00:06:00,299 --> 00:06:04,439
+Whether receivables are high depends on sales.
+
+67
+00:06:04,839 --> 00:06:07,455
+DSO, days sales outstanding,
+
+68
+00:06:07,475 --> 00:06:12,539
+says how many days of sales the receivables represent.
+
+69
+00:06:12,939 --> 00:06:22,950
+Only two invoices went out in the last 30 days, GreenValley and Harbor Crane,
+
+70
+00:06:22,970 --> 00:06:25,686
+23,100, or 770 a day.
+
+71
+00:06:26,086 --> 00:06:35,866
+DSO is 62,700 over 770: 81.4 days, against a target of 45.
+
+72
+00:06:36,266 --> 00:06:41,886
+Once the robot plant pays, it falls to 38.6.
+
+73
+00:06:42,286 --> 00:06:50,706
+DSO converts to money: every day off brings 770 dollars back to the bank.
+
+74
+00:06:52,226 --> 00:06:54,997
+Margin answers whether we make money;
+
+75
+00:06:55,017 --> 00:06:58,166
+cash answers whether we can pay the bills.
+
+76
+00:06:58,566 --> 00:07:04,146
+Wages, rent and suppliers are paid in cash, not in receivables.
+
+77
+00:07:04,546 --> 00:07:08,888
+The digital factory forecasts 8 weeks ahead:
+
+78
+00:07:08,908 --> 00:07:14,935
+this week's cash is last week's plus cash in, minus cash out,
+
+79
+00:07:14,955 --> 00:07:16,719
+minus fixed costs.
+
+80
+00:07:17,119 --> 00:07:22,571
+Receipts come on the due date plus the customer's usual delay:
+
+81
+00:07:22,591 --> 00:07:28,219
+Summit in week 1, GreenValley in week 4, Harbor Crane in week 5.
+
+82
+00:07:28,619 --> 00:07:34,374
+Three material bills go out in weeks 3, 5 and 7.
+
+83
+00:07:34,774 --> 00:07:41,234
+Cash must stay above zero every week, ideally with a week of costs to spare.
+
+84
+00:07:42,754 --> 00:07:44,671
+First, doing nothing.
+
+85
+00:07:45,071 --> 00:07:49,411
+The robot plant won't pay unless chased,
+
+86
+00:07:49,431 --> 00:07:53,771
+so its 33,000 doesn't arrive in 8 weeks.
+
+87
+00:07:54,171 --> 00:08:00,276
+On screen the cash is drawn week by week: cash in as green bars,
+
+88
+00:08:00,296 --> 00:08:01,807
+cash out as red.
+
+89
+00:08:02,207 --> 00:08:09,567
+In week 7 only 1,376 is left, below the safety line;
+
+90
+00:08:09,587 --> 00:08:16,947
+in week 8 it's minus 6,624: the wages can't be paid.
+
+91
+00:08:18,467 --> 00:08:29,923
+The order clearly made 8,413, yet week 8 shows minus 6,624.
+
+92
+00:08:30,323 --> 00:08:34,700
+That's how a profitable factory goes bankrupt:
+
+93
+00:08:34,720 --> 00:08:38,523
+materials and wages were paid out first,
+
+94
+00:08:38,543 --> 00:08:43,398
+while 33,000 of sales money sits with the customer.
+
+95
+00:08:43,798 --> 00:08:48,374
+The longer the money is on the road, the more cash you advance;
+
+96
+00:08:48,394 --> 00:08:52,898
+the more orders and the faster you grow, the more you advance.
+
+97
+00:08:53,298 --> 00:08:58,758
+Many plants don't die of losses; they die when the cash runs out.
+
+98
+00:09:00,278 --> 00:09:02,898
+This is Virtual lab 10-2.
+
+99
+00:09:03,298 --> 00:09:07,598
+The robot plant's payment day slides from day 3 onward.
+
+100
+00:09:07,998 --> 00:09:09,812
+Paid on day 3,
+
+101
+00:09:09,832 --> 00:09:18,850
+the whole curve lifts and the lowest cash in 8 weeks is still 26,376.
+
+102
+00:09:19,250 --> 00:09:20,687
+Paid on day 50,
+
+103
+00:09:20,707 --> 00:09:26,904
+the first 7 weeks match doing nothing and week 7 has only 1,376,
+
+104
+00:09:26,924 --> 00:09:32,344
+below the safety line; any later and it goes below zero.
+
+105
+00:09:32,744 --> 00:09:36,524
+The red dashed line is the do-nothing control.
+
+106
+00:09:36,924 --> 00:09:42,482
+Each week the customer is late, part of the curve sinks.
+
+107
+00:09:44,002 --> 00:09:46,902
+The hub offers three options.
+
+108
+00:09:47,302 --> 00:09:52,362
+A, do nothing: cash goes negative in week 8.
+
+109
+00:09:52,762 --> 00:09:59,037
+B, a dunning letter: customers usually pay within 3 days,
+
+110
+00:09:59,057 --> 00:10:07,209
+the lowest cash in 8 weeks is 26,376, and the relationship stays friendly.
+
+111
+00:10:07,609 --> 00:10:12,204
+C, a credit freeze: dun and stop new shipments,
+
+112
+00:10:12,224 --> 00:10:17,800
+so the next 16,500 batch is neither shipped nor invoiced.
+
+113
+00:10:18,200 --> 00:10:21,935
+For the overdue invoice, C is the same as B;
+
+114
+00:10:21,954 --> 00:10:26,543
+C also delays the next batch's invoice and collection,
+
+115
+00:10:26,563 --> 00:10:32,260
+which the 8-week forecast leaves out because it isn't invoiced yet.
+
+116
+00:10:32,660 --> 00:10:40,303
+C adds damage control, at the price of the relationship.
+
+117
+00:10:40,703 --> 00:10:42,638
+The hub has two rules:
+
+118
+00:10:42,658 --> 00:10:48,325
+the overdue rule looks only at days and recommends B at 15 days;
+
+119
+00:10:48,345 --> 00:10:54,723
+the credit-limit rule looks at exposure and recommends C at 165 percent.
+
+120
+00:10:55,123 --> 00:10:58,070
+When they clash, a person weighs them:
+
+121
+00:10:58,090 --> 00:11:04,239
+we dun first and freeze if it's still unpaid before the next batch is invoiced.
+
+122
+00:11:05,759 --> 00:11:07,823
+Doing nothing isn't free;
+
+123
+00:11:07,843 --> 00:11:12,657
+its price isn't in the margin table but in the cash table:
+
+124
+00:11:12,677 --> 00:11:18,325
+borrow and pay interest, or delay suppliers and hurt your scorecard.
+
+125
+00:11:18,725 --> 00:11:21,843
+Still, sometimes it's better not to chase:
+
+126
+00:11:21,863 --> 00:11:26,700
+a reliable customer with plenty of orders in a short rough patch,
+
+127
+00:11:26,720 --> 00:11:30,585
+or a small sum where chasing could lose a big order.
+
+128
+00:11:30,985 --> 00:11:34,308
+Then phone, find out what's going on,
+
+129
+00:11:34,328 --> 00:11:38,645
+agree a payment date and put it in the forecast.
+
+130
+00:11:39,045 --> 00:11:41,465
+Weigh money and the relationship together.
+
+131
+00:11:42,985 --> 00:11:45,684
+In the digital factory.
+
+132
+00:11:47,204 --> 00:11:54,686
+After class, do Lab 22 on the digital factory's Business and finance page.
+
+133
+00:11:55,086 --> 00:11:59,231
+First find the missed objectives in the objective tree;
+
+134
+00:11:59,251 --> 00:12:04,909
+then open the order your instructor names and calculate its margin from the
+
+135
+00:12:04,929 --> 00:12:05,666
+breakdown.
+
+136
+00:12:06,066 --> 00:12:11,956
+The instructor injects a 13,200-dollar Harbor Crane invoice,
+
+137
+00:12:11,976 --> 00:12:15,995
+15 days overdue and unpaid unless chased.
+
+138
+00:12:16,395 --> 00:12:17,626
+Compare dunning,
+
+139
+00:12:17,646 --> 00:12:22,789
+a freeze and doing nothing in the command centre and give reasons;
+
+140
+00:12:22,809 --> 00:12:26,465
+the hub's advice stays hidden until you submit.
+
+141
+00:12:26,865 --> 00:12:30,621
+Then raise the dunning, the instructor approves,
+
+142
+00:12:30,641 --> 00:12:33,925
+and a few minutes later the customer pays.
+
+143
+00:12:34,325 --> 00:12:38,539
+Finally compute DSO and find the tightest week.
+
+144
+00:12:38,939 --> 00:12:43,809
+In teaching mode a payment day lasts two minutes,
+
+145
+00:12:43,829 --> 00:12:50,097
+so you see invoices fall overdue and get paid within one class.
+
+146
+00:12:51,617 --> 00:12:55,467
+Why does the robot plant pay late too?
+
+147
+00:12:55,867 --> 00:13:03,786
+It sells collaborative robots to integrators, who build cells for end users,
+
+148
+00:13:03,806 --> 00:13:06,607
+usually paid by milestones.
+
+149
+00:13:07,007 --> 00:13:14,076
+Take a 120,000-dollar cell, an illustrative figure: 30 percent on signing,
+
+150
+00:13:14,096 --> 00:13:21,165
+60 percent after site acceptance, and a 10 percent retention a year later.
+
+151
+00:13:21,565 --> 00:13:27,280
+If acceptance slips two months, 72,000 arrives two months late;
+
+152
+00:13:27,300 --> 00:13:34,107
+the integrator pays the robot plant late, and the robot plant pays us late.
+
+153
+00:13:34,507 --> 00:13:39,616
+So the robot plant's credit limit should reflect how its own customers pay.
+
+154
+00:13:40,016 --> 00:13:47,312
+We can also negotiate a down payment, or deliver and invoice in batches.
+
+155
+00:13:48,832 --> 00:13:53,977
+An everyday example: a shop that lets regulars buy on credit.
+
+156
+00:13:54,377 --> 00:14:02,372
+It sells 3,000 a month at a 30 percent margin with 600 of rent and wages:
+
+157
+00:14:02,392 --> 00:14:04,677
+300 a month on paper.
+
+158
+00:14:05,077 --> 00:14:12,392
+But half goes on credit, repaid two months later, while stock is paid in cash,
+
+159
+00:14:12,412 --> 00:14:15,777
+and the shop opened with only 1,000.
+
+160
+00:14:16,177 --> 00:14:23,186
+Cash is negative in month 1 and 1,400 short in month 2:
+
+161
+00:14:23,206 --> 00:14:26,637
+borrow or run out of stock.
+
+162
+00:14:27,037 --> 00:14:29,643
+The same problem as today's plant.
+
+163
+00:14:31,163 --> 00:14:32,362
+Back to the start.
+
+164
+00:14:32,762 --> 00:14:37,952
+The order made 8,413, 25.5 percent, just on target;
+
+165
+00:14:37,972 --> 00:14:43,060
+it fell short of standard mainly through overtime,
+
+166
+00:14:43,080 --> 00:14:46,022
+grinder re-setting and scrap.
+
+167
+00:14:46,422 --> 00:14:51,482
+DSO is 81.4 days, far above target.
+
+168
+00:14:51,882 --> 00:14:58,182
+Doing nothing, cash reaches minus 6,624 in week 8.
+
+169
+00:14:58,582 --> 00:15:07,025
+Send the dunning letter now: the money returns in about 3 days,
+
+170
+00:15:07,045 --> 00:15:15,086
+the lowest cash in 8 weeks is 26,376, and DSO falls to 38.6.
+
+171
+00:15:15,486 --> 00:15:20,768
+Only 15 days overdue, so the overdue rule says dun;
+
+172
+00:15:20,788 --> 00:15:26,798
+at 165 percent exposure the credit-limit rule says freeze.
+
+173
+00:15:27,198 --> 00:15:33,679
+Weighing them, dun first; if it's still unpaid when the next batch is invoiced,
+
+174
+00:15:33,699 --> 00:15:37,712
+or past 30 days, ask the plant manager to freeze.
+
+175
+00:15:38,112 --> 00:15:43,406
+Next time, negotiate a down payment or batch invoicing,
+
+176
+00:15:43,426 --> 00:15:48,721
+and price overtime and dearer suppliers into the quote.
+
+177
+00:15:50,241 --> 00:15:57,087
+Now Virtual lab 10-1. On the WenQuest platform you can do it yourself.
+
+178
+00:15:57,107 --> 00:16:04,541
+The numbers in the results panel are blurred here; reading them is your job.
+
+179
+00:16:04,941 --> 00:16:11,744
+First press robot plant order and read the margin and its percentage.
+
+180
+00:16:11,764 --> 00:16:15,995
+Check them line by line against Table 10-2.
+
+181
+00:16:16,395 --> 00:16:21,735
+Then press standard cost and see how many points the unplanned money took off.
+
+182
+00:16:22,135 --> 00:16:25,390
+Back on the robot plant order,
+
+183
+00:16:25,410 --> 00:16:32,485
+drag overtime from 0 to 48 hours and watch the margin bar shrink.
+
+184
+00:16:32,885 --> 00:16:40,362
+Then drag the band saw's idling from 0 to 72 hours: the margin hardly moves.
+
+185
+00:16:40,382 --> 00:16:43,025
+Judge money by the numbers.
+
+186
+00:16:43,425 --> 00:16:49,431
+Finally press Play and watch the revenue being cut block by block,
+
+187
+00:16:49,451 --> 00:16:51,165
+leaving the margin.
+
+188
+00:16:52,685 --> 00:16:56,591
+Virtual lab 10-2: cash over the next 8 weeks.
+
+189
+00:16:56,611 --> 00:17:00,256
+Press do nothing and find the lowest week,
+
+190
+00:17:00,276 --> 00:17:05,665
+and the weeks cash falls below the safety line and below zero.
+
+191
+00:17:06,065 --> 00:17:09,992
+Then press dun: the whole curve lifts.
+
+192
+00:17:10,392 --> 00:17:14,711
+Press freeze credit: cash is the same as dunning.
+
+193
+00:17:14,731 --> 00:17:18,252
+Read the note below to see what differs.
+
+194
+00:17:18,652 --> 00:17:25,556
+Drag the payment day from day 3 all the way to day 60 and watch the curve
+
+195
+00:17:25,576 --> 00:17:27,832
+sink section by section.
+
+196
+00:17:28,232 --> 00:17:34,155
+Drag the days overdue past 30 and watch the ageing band and the hub's
+
+197
+00:17:34,175 --> 00:17:36,049
+recommendation change.
+
+198
+00:17:36,449 --> 00:17:40,229
+Finally press Play to draw the cash week by week.
+
+199
+00:17:40,249 --> 00:17:44,339
+I won't give the answers here; they're yours to find.
+
+200
+00:17:44,359 --> 00:17:49,457
+Both labs come with a guide and a report template on the platform.
+
+201
+00:17:50,977 --> 00:17:55,371
+After class you'll do Lab 22 in the WenQuest digital factory.
+
+202
+00:17:55,391 --> 00:17:59,352
+First find the missed objectives in the objective tree,
+
+203
+00:17:59,372 --> 00:18:04,779
+then open the order your instructor names and calculate its margin from the
+
+204
+00:18:04,799 --> 00:18:05,503
+breakdown.
+
+205
+00:18:05,903 --> 00:18:11,817
+The instructor injects an unpaid overdue invoice. Compare dunning,
+
+206
+00:18:11,837 --> 00:18:16,851
+a credit freeze and doing nothing in the command centre,
+
+207
+00:18:16,871 --> 00:18:20,987
+choose one and give reasons. Until you submit,
+
+208
+00:18:21,007 --> 00:18:25,123
+the factory hub's recommendation stays hidden.
+
+209
+00:18:25,523 --> 00:18:30,024
+Then raise the dunning, the instructor approves it,
+
+210
+00:18:30,044 --> 00:18:36,141
+and a few minutes later the customer pays and the invoice turns paid.
+
+211
+00:18:36,161 --> 00:18:40,307
+Finally compute DSO and find the tightest week.
+
+212
+00:18:41,827 --> 00:18:45,673
+The assignment has three tasks. One, calculation:
+
+213
+00:18:45,693 --> 00:18:49,539
+if the robot plant demands a 5 percent price cut,
+
+214
+00:18:49,559 --> 00:18:55,219
+does the margin still meet target? If overtime goes from 12 to 24 hours,
+
+215
+00:18:55,239 --> 00:19:00,663
+what's the margin, and what's the lowest price that holds 25 percent?
+
+216
+00:19:01,063 --> 00:19:03,381
+Two, cash: compute a DSO;
+
+217
+00:19:03,401 --> 00:19:09,179
+then suppose the robot plant pays unchased but only on day 50,
+
+218
+00:19:09,199 --> 00:19:14,043
+forecast 8 weeks of cash and find the tightest week.
+
+219
+00:19:14,443 --> 00:19:20,502
+Three, the Lab 22 report, focusing on how you compared the options,
+
+220
+00:19:20,522 --> 00:19:25,583
+and answering: why can a profitable factory go bankrupt?
+
+221
+00:19:27,103 --> 00:19:31,831
+There's also a ten-question quiz. For example:
+
+222
+00:19:31,851 --> 00:19:39,881
+receivables of 45,000 and 27,000 invoiced in the last 30 days. What's the DSO?
+
+223
+00:19:40,281 --> 00:19:47,024
+If an order's margin meets the target, can the plant still run out of cash?
+
+224
+00:19:47,424 --> 00:19:50,067
+You can take the quiz three times,
+
+225
+00:19:50,087 --> 00:19:53,984
+and the explanations appear as soon as you submit.
+
+226
+00:19:55,504 --> 00:19:57,644
+Three things to remember.
+
+227
+00:19:58,044 --> 00:20:03,654
+One: break down the margin, revenue minus material, labour,
+
+228
+00:20:03,674 --> 00:20:11,002
+energy and unplanned costs, to see where the money went; price goes to sales,
+
+229
+00:20:11,022 --> 00:20:16,060
+material to purchasing, hours to process engineering.
+
+230
+00:20:16,460 --> 00:20:23,067
+Two: read receivables by ageing and DSO, forecast cash week by week,
+
+231
+00:20:23,087 --> 00:20:25,600
+and watch the lowest week.
+
+232
+00:20:26,000 --> 00:20:32,904
+Three: an overdue invoice is judged by days, dunning first within 30;
+
+233
+00:20:32,924 --> 00:20:36,617
+an over-limit customer gets a freeze,
+
+234
+00:20:36,637 --> 00:20:41,334
+and when the two disagree a person weighs them;
+
+235
+00:20:41,354 --> 00:20:44,645
+making money is not having money.
+
+236
+00:20:45,045 --> 00:20:51,185
+After class: Assignment 10, Quiz 10 and the Lab 22 report.
+
+237
+00:20:51,585 --> 00:20:55,351
+The virtual labs, the digital-factory lab,
+
+238
+00:20:55,371 --> 00:21:01,661
+the assignment and the quiz are all on the WenQuest learning platform,
+
+239
+00:21:01,681 --> 00:21:07,700
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+240
+00:21:08,100 --> 00:21:11,531
+Next time it's AI agents and decisions,
+
+241
+00:21:11,551 --> 00:21:18,609
+and whether to trust an AI that explains why an order earned less than standard.
+
+242
+00:21:18,629 --> 00:21:19,760
+See you then.

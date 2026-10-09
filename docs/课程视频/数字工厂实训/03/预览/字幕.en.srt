@@ -1,0 +1,971 @@
+1
+00:00:00,600 --> 00:00:06,460
+Hi everyone, and welcome to the Digital Factory Practicum at WenQuest.
+
+2
+00:00:06,860 --> 00:00:13,560
+This is Lecture 3, the factory hub. The grinder stopped;
+
+3
+00:00:13,580 --> 00:00:16,560
+what is the cheapest fix?
+
+4
+00:00:18,080 --> 00:00:20,180
+Here's what happened.
+
+5
+00:00:20,580 --> 00:00:26,775
+The robot plant's 20 extra joint reducers are due on Thursday.
+
+6
+00:00:27,175 --> 00:00:35,383
+At ten on Monday the bottleneck grinder GRD-01 has a spindle fault and must
+
+7
+00:00:35,403 --> 00:00:37,029
+wait for parts,
+
+8
+00:00:37,049 --> 00:00:38,674
+about 24 hours.
+
+9
+00:00:39,074 --> 00:00:44,464
+Three orders are queued: Summit's 8 units due Wednesday,
+
+10
+00:00:44,484 --> 00:00:50,454
+the robot plant's 20 due Thursday, Harbor's 12 due much later.
+
+11
+00:00:50,854 --> 00:00:56,093
+The supervisor says 24 hours is three shifts: three days late,
+
+12
+00:00:56,113 --> 00:00:59,994
+600 dollars in penalties, expedite the repair.
+
+13
+00:01:00,394 --> 00:01:01,774
+Is he right?
+
+14
+00:01:03,294 --> 00:01:05,126
+Spot it, trace it.
+
+15
+00:01:06,646 --> 00:01:09,346
+How does the hub know?
+
+16
+00:01:09,746 --> 00:01:10,326
+Through rules.
+
+17
+00:01:10,726 --> 00:01:17,593
+A rule is a judgement written as a program: if the data meet a condition,
+
+18
+00:01:17,613 --> 00:01:19,386
+raise an exception.
+
+19
+00:01:19,786 --> 00:01:27,835
+This stop fires P1, machine down; P5, more than 6 parts queued at a bottleneck;
+
+20
+00:01:27,855 --> 00:01:34,168
+S1, an order may be late; and R3, a delay will cost a penalty.
+
+21
+00:01:34,568 --> 00:01:39,216
+The rules check the plant every 20 seconds: they never forget,
+
+22
+00:01:39,236 --> 00:01:41,776
+never tire and judge consistently.
+
+23
+00:01:42,176 --> 00:01:47,565
+But they only say that something is wrong, not why or what to do,
+
+24
+00:01:47,585 --> 00:01:51,476
+and these four exceptions are really one event.
+
+25
+00:01:51,876 --> 00:01:57,205
+Thresholds need judgement too: too loose and alerts flood in,
+
+26
+00:01:57,225 --> 00:02:00,976
+too tight and real trouble goes unreported.
+
+27
+00:02:02,496 --> 00:02:07,892
+Everything in a plant is connected: operations queue on machines,
+
+28
+00:02:07,912 --> 00:02:13,642
+belong to work orders, which serve orders, which belong to customers.
+
+29
+00:02:14,042 --> 00:02:18,302
+The hub stores these links as a network and walks it two ways.
+
+30
+00:02:18,702 --> 00:02:22,322
+Up to the cause: why is the order late?
+
+31
+00:02:22,722 --> 00:02:25,942
+Its operation is queued on the grinder.
+
+32
+00:02:26,342 --> 00:02:27,922
+Why is the grinder idle?
+
+33
+00:02:28,322 --> 00:02:31,367
+A spindle fault, waiting for parts.
+
+34
+00:02:31,767 --> 00:02:37,249
+Down to the impact: three groups of work orders are pushed back,
+
+35
+00:02:37,269 --> 00:02:41,892
+three orders finish later, and someone pays a penalty.
+
+36
+00:02:42,292 --> 00:02:49,192
+Every link needs evidence: a message, a document, a rule.
+
+37
+00:02:49,592 --> 00:02:51,606
+A link without evidence is a guess.
+
+38
+00:02:53,126 --> 00:03:00,986
+This is Animation 3-1, with the downtime moving between 4 and 40 hours.
+
+39
+00:03:01,386 --> 00:03:06,610
+Watch the colours: all three groups of work orders are pushed back,
+
+40
+00:03:06,630 --> 00:03:10,914
+yet at 24 hours only the robot plant's order turns red.
+
+41
+00:03:11,314 --> 00:03:18,475
+Summit is first in the queue, ground right after the repair, done at Tue 15:12,
+
+42
+00:03:18,495 --> 00:03:23,292
+and still ships Wednesday; Harbor's date is far away.
+
+43
+00:03:23,692 --> 00:03:29,371
+From 26 hours Summit's slack runs out and it turns red too.
+
+44
+00:03:29,771 --> 00:03:35,865
+The impact can't be guessed; it has to be worked out order by order.
+
+45
+00:03:37,385 --> 00:03:38,645
+Work out the impact.
+
+46
+00:03:40,165 --> 00:03:44,625
+The supervisor divided 24 by 9, about 2.7 days.
+
+47
+00:03:45,025 --> 00:03:45,747
+What's wrong?
+
+48
+00:03:46,147 --> 00:03:51,487
+The repair runs overnight, but the shop doesn't work at night anyway.
+
+49
+00:03:51,887 --> 00:03:58,163
+What's really lost is only the overlap of the stop and the shifts,
+
+50
+00:03:58,183 --> 00:04:05,508
+the two yellow blocks: 7 hours on Monday, 10 to 5, and 2 on Tuesday, 8 to 10,
+
+51
+00:04:05,528 --> 00:04:07,702
+9 hours in all, not 24.
+
+52
+00:04:08,102 --> 00:04:16,403
+A 20-hour stop starting at 3 on Friday afternoon loses only Friday's 2 hours;
+
+53
+00:04:16,423 --> 00:04:19,104
+the weekend isn't worked.
+
+54
+00:04:20,624 --> 00:04:24,804
+Lose 9 hours, and the order is 9 hours late?
+
+55
+00:04:25,204 --> 00:04:27,479
+It depends on the slack.
+
+56
+00:04:27,879 --> 00:04:33,104
+Without the stop the grinder does Summit's 5.2 hours,
+
+57
+00:04:33,124 --> 00:04:38,646
+then the robot plant's 13, finishing at 10:12 Wednesday.
+
+58
+00:04:39,046 --> 00:04:41,606
+The robot order ships Thursday,
+
+59
+00:04:41,626 --> 00:04:45,852
+so its shafts must be done by the end of Wednesday;
+
+60
+00:04:45,872 --> 00:04:48,183
+the regular shift ends at 5,
+
+61
+00:04:48,203 --> 00:04:52,429
+and finishing that evening on overtime also counts.
+
+62
+00:04:52,829 --> 00:04:57,436
+In regular hours that's 6.8 hours of slack.
+
+63
+00:04:57,456 --> 00:05:01,525
+9 minus 6.8 leaves it 2.2 hours short:
+
+64
+00:05:01,545 --> 00:05:09,812
+the shafts slip to Thursday morning and the order ships Friday, one day late,
+
+65
+00:05:09,832 --> 00:05:12,072
+a 200-dollar penalty.
+
+66
+00:05:12,472 --> 00:05:18,252
+The supervisor's three days and 600 dollars are three times the real figure.
+
+67
+00:05:19,771 --> 00:05:27,071
+On screen, first the original order, then the robot order moved to the front.
+
+68
+00:05:27,471 --> 00:05:34,422
+It's ground by 2 pm Wednesday, on time; but Summit is pushed back,
+
+69
+00:05:34,442 --> 00:05:42,554
+done only at Thu 10:12, 2 days late, 400 dollars, more than the original 200.
+
+70
+00:05:42,954 --> 00:05:47,837
+Reordering didn't remove the loss; it moved it to another customer.
+
+71
+00:05:48,237 --> 00:05:52,320
+You only see that if the chain works out every order together.
+
+72
+00:05:53,840 --> 00:05:56,140
+Three remedies, simulated.
+
+73
+00:05:57,660 --> 00:06:01,721
+To make up 2.2 hours there are three remedies,
+
+74
+00:06:01,741 --> 00:06:05,714
+priced from the digital factory's parameters.
+
+75
+00:06:06,114 --> 00:06:15,917
+Overtime: the grinder costs 52 dollars an hour, overtime 1.5 times that, 78,
+
+76
+00:06:15,937 --> 00:06:22,766
+at most 4 hours a day; 2.2 hours cost 171.60 dollars.
+
+77
+00:06:23,166 --> 00:06:28,651
+Expediting: 300 more and the remaining downtime is halved,
+
+78
+00:06:28,671 --> 00:06:33,586
+yet it's still a day late; the next slide shows why.
+
+79
+00:06:33,986 --> 00:06:45,657
+Outsourcing: one unit's three shafts cost 43.94, plus 50 freight per batch;
+
+80
+00:06:45,677 --> 00:06:50,646
+we need 4 units, 225.76 dollars.
+
+81
+00:06:52,166 --> 00:06:54,346
+The supervisor wanted to expedite.
+
+82
+00:06:54,746 --> 00:06:58,832
+The remaining 24 hours are halved to 12,
+
+83
+00:06:58,852 --> 00:07:03,554
+and the grinder is back at 10 on Monday night.
+
+84
+00:07:03,954 --> 00:07:11,020
+But of the 12 hours saved, 10 are at night, when the shop doesn't work anyway;
+
+85
+00:07:11,040 --> 00:07:16,107
+the only extra production is 2 hours on Tuesday morning.
+
+86
+00:07:16,507 --> 00:07:22,701
+L drops from 9 to 7, still 12 minutes short. 300 dollars spent,
+
+87
+00:07:22,721 --> 00:07:27,927
+the robot order still a day late, 500 dollars in all.
+
+88
+00:07:28,327 --> 00:07:31,752
+A faster repair doesn't mean an on-time delivery.
+
+89
+00:07:33,272 --> 00:07:38,024
+Which is cheaper depends on the gap.
+
+90
+00:07:38,424 --> 00:07:46,163
+An hour of outsourced grinding costs 67.60 dollars, less than 78 of overtime,
+
+91
+00:07:46,183 --> 00:07:49,589
+but each batch adds 50 of freight.
+
+92
+00:07:49,989 --> 00:08:00,929
+They cost the same when 78 h equals 67.6 h plus 50, at about 4.8 hours.
+
+93
+00:08:01,329 --> 00:08:06,069
+A smaller gap favours overtime, a bigger one outsourcing.
+
+94
+00:08:06,469 --> 00:08:18,845
+Today it's only 2.2 hours, so overtime at 171.60 beats outsourcing at 225.76.
+
+95
+00:08:20,365 --> 00:08:25,539
+The hand calculation quietly assumes there's enough overtime,
+
+96
+00:08:25,559 --> 00:08:32,265
+that outsourced parts return on time and that the orders ahead aren't affected.
+
+97
+00:08:32,665 --> 00:08:38,959
+So the hub also simulates: it snapshots the plant, makes a fast-forward copy,
+
+98
+00:08:38,979 --> 00:08:44,863
+applies one option and runs minute by minute on the real shift calendar,
+
+99
+00:08:44,883 --> 00:08:47,405
+without touching the real shop.
+
+100
+00:08:47,805 --> 00:08:51,564
+This is the Gantt chart of Virtual lab 3-2,
+
+101
+00:08:51,584 --> 00:08:57,012
+with the play-head sweeping through the week: red is the stop,
+
+102
+00:08:57,032 --> 00:08:59,385
+yellow frames are overtime.
+
+103
+00:08:59,785 --> 00:09:05,867
+With overtime the robot order is done at Wed 17:12, on time;
+
+104
+00:09:05,887 --> 00:09:13,190
+outsourcing is on time too; expediting and doing nothing are a day late.
+
+105
+00:09:13,590 --> 00:09:18,010
+Delivery first, then money: overtime ranks first.
+
+106
+00:09:19,530 --> 00:09:27,043
+On screen the downtime moves from 8 to 48 hours and the four options' costs
+
+107
+00:09:27,063 --> 00:09:28,550
+change with it.
+
+108
+00:09:28,950 --> 00:09:35,976
+From 7 to 22 hours the repair ends at night and L stays at 7 hours;
+
+109
+00:09:35,996 --> 00:09:41,865
+doing nothing costs 200 dollars all the way to 25 hours.
+
+110
+00:09:42,265 --> 00:09:50,655
+From 26 hours Summit's slack of 10.8 regular hours runs out and it is late too.
+
+111
+00:09:51,055 --> 00:09:57,861
+At 30 hours the hand calculation says the robot order is 8.2 hours short,
+
+112
+00:09:57,881 --> 00:10:01,415
+so 639.60 dollars of overtime will do;
+
+113
+00:10:01,435 --> 00:10:07,119
+the simulation says the grinder is back only at 4 pm Tuesday,
+
+114
+00:10:07,139 --> 00:10:12,075
+and even 4 hours a day leaves both orders a day late.
+
+115
+00:10:12,475 --> 00:10:16,628
+The hub's ranking then recommends doing nothing,
+
+116
+00:10:16,648 --> 00:10:21,671
+400 dollars with two late orders; expediting, 500 dollars,
+
+117
+00:10:21,691 --> 00:10:27,496
+saves Summit and leaves only the robot order late, yet ranks lower,
+
+118
+00:10:27,516 --> 00:10:33,495
+because the rule looks at the latest order, not at how many are late.
+
+119
+00:10:33,895 --> 00:10:38,434
+From 31 hours expediting ranks first.
+
+120
+00:10:38,834 --> 00:10:43,508
+Which order to save is for people to decide;
+
+121
+00:10:43,528 --> 00:10:48,736
+Lab 15's discussion question 2 asks exactly this.
+
+122
+00:10:50,256 --> 00:10:51,996
+Decide and act.
+
+123
+00:10:53,516 --> 00:10:55,288
+Don't compare on money alone.
+
+124
+00:10:55,688 --> 00:11:03,813
+Doing nothing costs only 200 dollars, less than outsourcing; why not choose it?
+
+125
+00:11:04,213 --> 00:11:07,336
+Because delivery comes before money:
+
+126
+00:11:07,356 --> 00:11:11,963
+a day late may stop the robot plant's line for a day,
+
+127
+00:11:11,983 --> 00:11:16,677
+and the penalty is only what a contract can spell out.
+
+128
+00:11:17,077 --> 00:11:22,344
+Lay out the risks too: overtime needs a skilled grinder operator,
+
+129
+00:11:22,364 --> 00:11:26,167
+and the grinder is already overdue for service,
+
+130
+00:11:26,187 --> 00:11:31,128
+so as we saw in Lecture 6 extra hours raise the failure risk;
+
+131
+00:11:31,148 --> 00:11:34,219
+outsourced parts need full inspection,
+
+132
+00:11:34,239 --> 00:11:38,855
+and if the other shop is a day late it's all for nothing.
+
+133
+00:11:39,255 --> 00:11:42,853
+Option C, expediting, isn't shown:
+
+134
+00:11:42,873 --> 00:11:49,555
+at 500 dollars it is still a day late and wins on no dimension.
+
+135
+00:11:49,955 --> 00:11:55,695
+On all three dimensions: overtime first, outsourcing as the fallback.
+
+136
+00:11:57,215 --> 00:12:00,815
+Finally, do it yourself in the digital factory.
+
+137
+00:12:01,215 --> 00:12:05,675
+Lab 15 uses comparison mode.
+
+138
+00:12:06,075 --> 00:12:09,299
+The instructor injects a breakdown,
+
+139
+00:12:09,319 --> 00:12:14,860
+and without opening the hub you trace it from the home page,
+
+140
+00:12:14,880 --> 00:12:19,865
+shop terminals and order pages: which machine stopped,
+
+141
+00:12:19,885 --> 00:12:27,095
+which work orders are queued, which orders they belong to, how many days late.
+
+142
+00:12:27,495 --> 00:12:31,755
+The platform scores you against the system's chain.
+
+143
+00:12:32,155 --> 00:12:38,470
+Then try at least three options in the what-if workbench and save them;
+
+144
+00:12:38,490 --> 00:12:43,110
+choose one, give reasons on delivery, cost and risk,
+
+145
+00:12:43,130 --> 00:12:46,233
+and only then see the hub's advice.
+
+146
+00:12:46,633 --> 00:12:52,919
+The option becomes an action that runs after the instructor approves it;
+
+147
+00:12:52,939 --> 00:12:59,751
+when the work orders are done the platform reviews prediction against reality.
+
+148
+00:13:00,151 --> 00:13:04,636
+Note that the lab tracks only the output shaft,
+
+149
+00:13:04,656 --> 00:13:10,771
+so its numbers are smaller than today's; the method is the same.
+
+150
+00:13:12,291 --> 00:13:15,191
+A causal chain doesn't stop at the factory gate.
+
+151
+00:13:15,591 --> 00:13:23,683
+Each of the robot plant's collaborative robots uses WQR-105 units in the two
+
+152
+00:13:23,703 --> 00:13:25,391
+big base joints,
+
+153
+00:13:25,411 --> 00:13:31,902
+so 20 reducers make 10 robots; these are illustrative values.
+
+154
+00:13:32,302 --> 00:13:38,340
+If we're a day late, its line builds 10 fewer, and its customers wait too.
+
+155
+00:13:38,740 --> 00:13:41,328
+Robots do the same thing inside:
+
+156
+00:13:41,348 --> 00:13:47,603
+when a controller reports overcurrent on joint 3, it traces up for the cause,
+
+157
+00:13:47,623 --> 00:13:53,144
+an overload, a worn reducer or a collision, and down for the impact:
+
+158
+00:13:53,164 --> 00:13:58,686
+this robot stops, the line's cycle time drops, today's output falls.
+
+159
+00:13:59,086 --> 00:14:02,157
+That's robot fault diagnosis.
+
+160
+00:14:03,677 --> 00:14:06,097
+Daily life works the same way.
+
+161
+00:14:06,497 --> 00:14:12,987
+A takeaway: the restaurant accepts it in 2 minutes, cooks for 12,
+
+162
+00:14:13,007 --> 00:14:19,797
+a rider is found in 5, the ride takes 11; the promise is 30 minutes.
+
+163
+00:14:20,197 --> 00:14:27,259
+At the lunch peak the kitchen takes 25 minutes, and the food arrives after 43.
+
+164
+00:14:27,659 --> 00:14:32,239
+The rider arrives early and just waits for the food.
+
+165
+00:14:32,639 --> 00:14:39,050
+The chain has no slack, so the kitchen's extra 13 minutes all become lateness.
+
+166
+00:14:39,450 --> 00:14:44,348
+Calling the rider won't help: the kitchen is where it's stuck,
+
+167
+00:14:44,368 --> 00:14:46,965
+and the rider is only downstream.
+
+168
+00:14:47,365 --> 00:14:50,355
+When the app updates its arrival time,
+
+169
+00:14:50,375 --> 00:14:55,345
+it's running a causal chain and a simulation in the background.
+
+170
+00:14:56,865 --> 00:14:58,064
+Back to the start.
+
+171
+00:14:58,464 --> 00:15:04,886
+The grinder is down 24 hours, but only 9 production hours are really lost.
+
+172
+00:15:05,286 --> 00:15:10,494
+The robot order had 6.8 hours of slack and is 2.2 hours short:
+
+173
+00:15:10,514 --> 00:15:15,554
+doing nothing makes it a day late with a 200-dollar penalty,
+
+174
+00:15:15,574 --> 00:15:18,674
+while Summit and Harbor stay on time.
+
+175
+00:15:19,074 --> 00:15:25,549
+The supervisor's three days and 600 dollars are three times the real figure,
+
+176
+00:15:25,569 --> 00:15:30,934
+and the expediting he wanted costs 300 without saving the date.
+
+177
+00:15:31,334 --> 00:15:34,633
+Recommendation: after the repair,
+
+178
+00:15:34,653 --> 00:15:41,071
+2 hours of overtime on Tuesday and 12 minutes more on Wednesday,
+
+179
+00:15:41,091 --> 00:15:46,705
+171.60 dollars, and the order ships on time on Thursday.
+
+180
+00:15:47,105 --> 00:15:50,650
+The fallback is outsourcing 4 units.
+
+181
+00:15:51,050 --> 00:15:56,275
+Overtime needs the plant manager's approval before the shift calendar changes.
+
+182
+00:15:57,795 --> 00:16:05,104
+Here's Animation 3-1, which you can try yourself on the WenQuest platform.
+
+183
+00:16:05,124 --> 00:16:12,135
+The numbers in the results panel are blurred; reading them is your job.
+
+184
+00:16:12,535 --> 00:16:19,686
+First press Chapter, 24 hours, then drag the downtime from zero to 48 hours.
+
+185
+00:16:19,706 --> 00:16:22,328
+Which order turns red first,
+
+186
+00:16:22,348 --> 00:16:27,801
+and why does almost nothing change between 7 and 22 hours?
+
+187
+00:16:28,201 --> 00:16:34,779
+Next press Friday 3 pm, 20 hours. With the same 20-hour stop,
+
+188
+00:16:34,799 --> 00:16:41,701
+how does the production time lost compare with a stop on Monday?
+
+189
+00:16:42,101 --> 00:16:49,539
+Then move the robot order to the front. Which order turns red now?
+
+190
+00:16:49,559 --> 00:16:53,041
+Do the penalties go up or down?
+
+191
+00:16:53,441 --> 00:16:59,163
+Finally press Replay and watch the chain light up from machine to customer.
+
+192
+00:16:59,183 --> 00:17:02,301
+Ask where each layer's numbers come from.
+
+193
+00:17:03,821 --> 00:17:10,709
+Virtual lab 3-2: overtime, expediting or outsourcing? Press Chapter, 24 hours,
+
+194
+00:17:10,729 --> 00:17:16,643
+and check the four options' costs and deliveries against Table 3-3.
+
+195
+00:17:17,043 --> 00:17:23,354
+Drag the downtime from 2 to 48 hours and see where the recommendation changes.
+
+196
+00:17:23,754 --> 00:17:28,859
+Press 30 hours. Work out the overtime cost by hand,
+
+197
+00:17:28,879 --> 00:17:37,100
+then raise the daily overtime cap to 240 minutes and see what the simulation says.
+
+198
+00:17:37,500 --> 00:17:42,114
+Then press Expedite 6 hours late: does it do any worse?
+
+199
+00:17:42,134 --> 00:17:48,939
+Finally play the Gantt chart and watch the grinder's week under the four options.
+
+200
+00:17:48,959 --> 00:17:52,984
+I won't give the answers; they're yours to find.
+
+201
+00:17:53,384 --> 00:17:58,244
+Both labs come with a guide and a report template on the platform.
+
+202
+00:17:59,764 --> 00:18:04,354
+After class you'll do Lab 15 in the WenQuest digital factory.
+
+203
+00:18:04,374 --> 00:18:07,000
+The instructor injects a breakdown,
+
+204
+00:18:07,020 --> 00:18:12,517
+and without opening the hub you trace it yourself: which machine stopped,
+
+205
+00:18:12,537 --> 00:18:18,412
+which work orders are queued, which orders they belong to, how many days late.
+
+206
+00:18:18,812 --> 00:18:23,684
+Then try at least three options in the what-if workbench,
+
+207
+00:18:23,704 --> 00:18:29,778
+choose one and explain it on delivery, cost and risk. Until you submit,
+
+208
+00:18:29,798 --> 00:18:32,352
+the hub's advice stays hidden.
+
+209
+00:18:32,752 --> 00:18:38,991
+Your option becomes an action that runs only after the instructor approves it;
+
+210
+00:18:39,011 --> 00:18:41,398
+when the work orders are done,
+
+211
+00:18:41,418 --> 00:18:46,292
+the platform reviews how far the simulation was from reality.
+
+212
+00:18:47,812 --> 00:18:51,678
+The assignment has three tasks. One, calculation:
+
+213
+00:18:51,698 --> 00:18:57,228
+how much production time does a 20-hour stop on Friday afternoon lose;
+
+214
+00:18:57,248 --> 00:19:02,938
+for a 30-hour stop on Monday, work out overtime and outsourcing by hand,
+
+215
+00:19:02,958 --> 00:19:06,427
+then simulate it and explain the difference.
+
+216
+00:19:06,827 --> 00:19:12,444
+Two, analysis: move the robot order to the front; how late is each order,
+
+217
+00:19:12,464 --> 00:19:18,468
+what are the penalties, and what do you recommend on money, delivery and risk?
+
+218
+00:19:18,868 --> 00:19:21,264
+Three, the Lab 15 report,
+
+219
+00:19:21,284 --> 00:19:28,416
+focusing on your causal chain against the system's and your choice against
+
+220
+00:19:28,436 --> 00:19:30,058
+the hub's advice.
+
+221
+00:19:31,578 --> 00:19:35,767
+There's also a ten-question quiz. For example:
+
+222
+00:19:35,787 --> 00:19:39,518
+a 24-hour stop from 10 on Monday morning,
+
+223
+00:19:39,538 --> 00:19:43,360
+how many production hours are really lost?
+
+224
+00:19:43,760 --> 00:19:48,051
+If expediting halves the remaining downtime,
+
+225
+00:19:48,071 --> 00:19:53,340
+do you always gain half of it back as production time?
+
+226
+00:19:53,740 --> 00:19:59,461
+You get three attempts, and the explanations appear as soon as you submit.
+
+227
+00:20:00,981 --> 00:20:03,121
+Three things to remember.
+
+228
+00:20:03,521 --> 00:20:07,072
+One: rules find exceptions in the data,
+
+229
+00:20:07,092 --> 00:20:13,023
+and a causal chain traces up to the cause and down to the impact,
+
+230
+00:20:13,043 --> 00:20:15,679
+with evidence for every link.
+
+231
+00:20:16,079 --> 00:20:19,005
+Two: impact must be calculated;
+
+232
+00:20:19,025 --> 00:20:25,659
+the production time really lost is the overlap of downtime and shifts,
+
+233
+00:20:25,679 --> 00:20:32,979
+an order is late only beyond its slack, and affected is not the same as late.
+
+234
+00:20:33,379 --> 00:20:40,057
+Three: simulate the options; fast-forward overtime, expediting and outsourcing,
+
+235
+00:20:40,077 --> 00:20:45,399
+rank by delivery first and money second, and lay out the risks.
+
+236
+00:20:45,799 --> 00:20:50,219
+Estimates from experience are often wrong.
+
+237
+00:20:50,619 --> 00:20:57,178
+After class: Assignment 3, Quiz 3 and the Lab 15 report.
+
+238
+00:20:57,578 --> 00:21:02,270
+The animation, the virtual lab, the digital-factory lab,
+
+239
+00:21:02,290 --> 00:21:08,160
+the assignment and the quiz are all on the WenQuest learning platform,
+
+240
+00:21:08,180 --> 00:21:13,798
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+241
+00:21:14,198 --> 00:21:17,388
+Next time it's customers and service,
+
+242
+00:21:17,408 --> 00:21:23,810
+and how far to trace and recall when a robot customer hears a noisy joint.
+
+243
+00:21:23,830 --> 00:21:24,938
+See you then.

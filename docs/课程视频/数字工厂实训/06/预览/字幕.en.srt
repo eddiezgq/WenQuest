@@ -1,0 +1,911 @@
+1
+00:00:00,600 --> 00:00:06,460
+Hi everyone, and welcome to the Digital Factory Practicum at WenQuest.
+
+2
+00:00:06,860 --> 00:00:14,806
+This is Lecture 6, maintenance and reliability. Should we stop for service?
+
+3
+00:00:16,326 --> 00:00:18,426
+Here's what happened.
+
+4
+00:00:18,826 --> 00:00:26,243
+Every gear shaft for the robot plant's extra order of joint reducers goes
+
+5
+00:00:26,263 --> 00:00:28,586
+through grinder GRD-01,
+
+6
+00:00:28,606 --> 00:00:30,929
+the plant's bottleneck.
+
+7
+00:00:31,329 --> 00:00:37,362
+On Monday morning the factory hub flagged it as overdue:
+
+8
+00:00:37,382 --> 00:00:42,226
+the interval is 500 hours and it has run 620.
+
+9
+00:00:42,626 --> 00:00:45,659
+A failure stops it for 8 hours,
+
+10
+00:00:45,679 --> 00:00:52,651
+costs 1,200 dollars to repair and loses 200 dollars of margin per hour;
+
+11
+00:00:52,671 --> 00:00:59,446
+a service stops it for 3 hours and costs 215 in labour and materials.
+
+12
+00:00:59,846 --> 00:01:03,672
+The supervisor says the rush order comes first;
+
+13
+00:01:03,692 --> 00:01:07,026
+the maintenance planner says stop it now.
+
+14
+00:01:07,426 --> 00:01:07,896
+Who's right?
+
+15
+00:01:09,416 --> 00:01:11,313
+Why machines fail.
+
+16
+00:01:12,833 --> 00:01:19,774
+First, the failure rate: given that a machine has run t hours without failing,
+
+17
+00:01:19,794 --> 00:01:23,254
+the chance per hour that it fails next.
+
+18
+00:01:23,654 --> 00:01:27,350
+Statistics show three phases, like a bathtub.
+
+19
+00:01:27,750 --> 00:01:31,993
+New machines suffer infant mortality and the rate falls;
+
+20
+00:01:32,013 --> 00:01:37,702
+the cure is run-in and acceptance, and frequent dismantling makes it worse.
+
+21
+00:01:38,102 --> 00:01:45,746
+In the middle the rate is roughly constant and failures come from outside;
+
+22
+00:01:45,766 --> 00:01:47,922
+service doesn't help.
+
+23
+00:01:48,322 --> 00:01:55,029
+Then comes wear-out: bearings, guides and seals wear and the rate rises.
+
+24
+00:01:55,429 --> 00:01:59,009
+That's the phase preventive maintenance fights.
+
+25
+00:02:00,529 --> 00:02:07,239
+To describe these phases engineers mostly use the Weibull distribution.
+
+26
+00:02:07,639 --> 00:02:10,597
+F of t is the chance of failing before t;
+
+27
+00:02:10,617 --> 00:02:15,899
+differentiate and divide by the reliability and you get the failure rate.
+
+28
+00:02:16,299 --> 00:02:22,332
+On screen beta goes from 0.7 up to 4; watch the red failure rate:
+
+29
+00:02:22,352 --> 00:02:27,639
+below one it falls, at one it's flat, above one it rises.
+
+30
+00:02:28,039 --> 00:02:33,553
+Mechanical wear is usually between two and four.
+
+31
+00:02:33,953 --> 00:02:39,770
+Eta is the characteristic life: whatever beta is,
+
+32
+00:02:39,790 --> 00:02:45,368
+the failure probability at eta is 63.2 percent.
+
+33
+00:02:46,888 --> 00:02:51,351
+The grinder has beta three and eta 900 hours,
+
+34
+00:02:51,371 --> 00:02:56,332
+the parameters the digital factory uses to age it.
+
+35
+00:02:56,732 --> 00:03:05,403
+At the 500-hour interval the failure probability is 15.8 percent; now,
+
+36
+00:03:05,423 --> 00:03:08,383
+at 620 hours, it's 27.9;
+
+37
+00:03:08,403 --> 00:03:17,323
+and the failure rate has more than quadrupled between 300 and 620 hours.
+
+38
+00:03:17,723 --> 00:03:25,223
+Mean life is 804 hours, and by 800 hours the probability is past half.
+
+39
+00:03:26,743 --> 00:03:29,157
+Probability, then money.
+
+40
+00:03:30,677 --> 00:03:37,097
+A decision doesn't need F of 620; we know it hasn't failed.
+
+41
+00:03:37,497 --> 00:03:44,757
+We need the chance that a machine which has run t hours fails within H more.
+
+42
+00:03:45,157 --> 00:03:53,377
+That's a conditional probability: one minus R of t plus H over R of t.
+
+43
+00:03:53,777 --> 00:04:05,827
+For the grinder: 700 over 900 cubed minus 620 over 900 cubed is 0.1436,
+
+44
+00:04:05,847 --> 00:04:09,397
+so P is 13.4 percent.
+
+45
+00:04:09,797 --> 00:04:13,690
+Service it now and the clock goes back to zero:
+
+46
+00:04:13,710 --> 00:04:16,605
+0.07 percent for the next 80 hours,
+
+47
+00:04:16,625 --> 00:04:21,601
+about one hundred and ninetieth of the risk without service.
+
+48
+00:04:23,121 --> 00:04:25,621
+This is Virtual lab 6-1.
+
+49
+00:04:26,021 --> 00:04:33,496
+The orange band is the next 80 hours, and t slides from 100 hours onward.
+
+50
+00:04:33,896 --> 00:04:37,281
+The band keeps its width,
+
+51
+00:04:37,301 --> 00:04:45,453
+but the curve gets steeper and the probability inside grows:
+
+52
+00:04:45,473 --> 00:04:52,400
+3.8 percent at 300 hours, 13.4 at 620, 20.7 at 800.
+
+53
+00:04:52,800 --> 00:04:57,414
+That's what beta above one means: the longer you wait,
+
+54
+00:04:57,434 --> 00:04:59,902
+the riskier the next stretch.
+
+55
+00:05:01,422 --> 00:05:03,402
+One special case to remember.
+
+56
+00:05:03,802 --> 00:05:11,086
+When beta is one, t cancels in the exponent and P depends only on H.
+
+57
+00:05:11,486 --> 00:05:19,663
+A machine that has run 620 hours and one just serviced have exactly the same
+
+58
+00:05:19,683 --> 00:05:23,869
+chance of failing in the next 80 hours:
+
+59
+00:05:23,889 --> 00:05:27,429
+9.5 percent each with eta of 800.
+
+60
+00:05:27,828 --> 00:05:30,506
+That's memorylessness.
+
+61
+00:05:30,906 --> 00:05:37,519
+Random failures can't be fought with scheduled service; you need protection,
+
+62
+00:05:37,539 --> 00:05:40,486
+condition monitoring or a standby.
+
+63
+00:05:42,006 --> 00:05:44,226
+Now turn probability into money.
+
+64
+00:05:44,626 --> 00:05:48,018
+One failure of the grinder:
+
+65
+00:05:48,038 --> 00:05:56,739
+a 1,200 repair plus 8 hours stopped at 200 an hour on the bottleneck,
+
+66
+00:05:56,759 --> 00:05:59,393
+2,800 dollars in all.
+
+67
+00:05:59,793 --> 00:06:11,164
+The expected loss without service is 13.4 percent of 2,800, about 375 dollars.
+
+68
+00:06:11,564 --> 00:06:16,875
+Mind you, that's an expectation, not money you'll certainly spend:
+
+69
+00:06:16,895 --> 00:06:22,287
+most of the time nothing happens, sometimes you lose 2,800 at once.
+
+70
+00:06:22,687 --> 00:06:27,130
+If one failure would make you miss a key customer's delivery,
+
+71
+00:06:27,150 --> 00:06:28,667
+add that penalty too.
+
+72
+00:06:30,187 --> 00:06:33,667
+The factory hub offers three options.
+
+73
+00:06:34,067 --> 00:06:37,636
+A, do nothing: 375 dollars expected,
+
+74
+00:06:37,656 --> 00:06:44,017
+and a failure stops it for 8 hours and may delay the rush order.
+
+75
+00:06:44,417 --> 00:06:46,648
+B, service now:
+
+76
+00:06:46,668 --> 00:06:58,354
+215 plus 600 of margin lost while the bottleneck stops for 3 hours, about 817.
+
+77
+00:06:58,754 --> 00:07:02,040
+C, service after the shift:
+
+78
+00:07:02,060 --> 00:07:09,879
+it runs 4 more hours with only a 0.63 percent chance of failing,
+
+79
+00:07:09,899 --> 00:07:11,961
+about 235 in all.
+
+80
+00:07:12,361 --> 00:07:19,621
+C is cheapest: risk nearly zero, and no production time lost on the bottleneck.
+
+81
+00:07:20,021 --> 00:07:24,041
+The supervisor and the planner were each half right.
+
+82
+00:07:25,561 --> 00:07:28,622
+Choosing the interval.
+
+83
+00:07:30,142 --> 00:07:33,122
+One step further: what should the rule be?
+
+84
+00:07:33,522 --> 00:07:38,739
+A common policy is age-based maintenance: service at T hours,
+
+85
+00:07:38,759 --> 00:07:43,460
+and if it fails first, repair it and restart the clock.
+
+86
+00:07:43,860 --> 00:07:51,134
+In a cycle, with probability R of T it reaches T and you pay for a service;
+
+87
+00:07:51,154 --> 00:07:56,872
+with probability F of T it fails and you pay for a failure.
+
+88
+00:07:57,272 --> 00:07:59,132
+That's the numerator.
+
+89
+00:07:59,532 --> 00:08:07,977
+The mean cycle length, the integral of R from zero to T, is the denominator.
+
+90
+00:08:08,377 --> 00:08:14,037
+Divide and you get the long-run cost per operating hour.
+
+91
+00:08:14,437 --> 00:08:19,882
+As T goes to infinity it's run to failure:
+
+92
+00:08:19,902 --> 00:08:24,697
+3.48 dollars an hour for the grinder.
+
+93
+00:08:26,217 --> 00:08:31,157
+This is Virtual lab 6-2 with T sweeping back and forth.
+
+94
+00:08:31,557 --> 00:08:37,006
+First, servicing after the shift at 215 a time:
+
+95
+00:08:37,026 --> 00:08:42,708
+the optimum is 312 hours at 1.04 dollars an hour,
+
+96
+00:08:42,728 --> 00:08:50,970
+seventy percent below run to failure; the current 500 hours costs 1.30,
+
+97
+00:08:50,990 --> 00:08:52,017
+too long.
+
+98
+00:08:52,417 --> 00:08:58,041
+Now switch to stopping production, 600 more of lost margin each time:
+
+99
+00:08:58,061 --> 00:09:02,703
+service is dearer and the optimum moves out to 535 hours,
+
+100
+00:09:02,723 --> 00:09:05,157
+so 500 is practically optimal.
+
+101
+00:09:05,557 --> 00:09:08,605
+The cheaper the service, the more often;
+
+102
+00:09:08,625 --> 00:09:14,511
+and moving it out of production time saves far more than tuning the interval.
+
+103
+00:09:16,031 --> 00:09:23,874
+On screen two identical machines run 20,000 hours on the same random lifetimes:
+
+104
+00:09:23,894 --> 00:09:29,049
+blue is serviced every T hours, red runs to failure.
+
+105
+00:09:29,449 --> 00:09:35,929
+At first the lines are close, and red may even be lower when it's lucky;
+
+106
+00:09:35,949 --> 00:09:39,631
+the longer they run, the clearer the gap,
+
+107
+00:09:39,651 --> 00:09:45,138
+and their slopes approach C of T and the run-to-failure 3.48.
+
+108
+00:09:45,538 --> 00:09:53,358
+Judge a policy by its long-run average, not by one or two lucky runs.
+
+109
+00:09:54,878 --> 00:09:56,596
+Checking and doing.
+
+110
+00:09:58,116 --> 00:10:00,576
+Where do beta and eta come from?
+
+111
+00:10:00,976 --> 00:10:02,117
+From failure records.
+
+112
+00:10:02,517 --> 00:10:06,378
+The simplest measure is MTBF:
+
+113
+00:10:06,398 --> 00:10:13,337
+30 days at 16 hours with 3 failures gives 160 hours.
+
+114
+00:10:13,737 --> 00:10:18,791
+It's only an average and can't show whether the rate is rising;
+
+115
+00:10:18,811 --> 00:10:20,241
+with more records,
+
+116
+00:10:20,261 --> 00:10:26,282
+fit a Weibull to the hours since last service at each failure and recompute
+
+117
+00:10:26,302 --> 00:10:27,329
+the interval.
+
+118
+00:10:27,729 --> 00:10:35,358
+And keep probability apart from one outcome: with a 13 percent risk,
+
+119
+00:10:35,378 --> 00:10:40,645
+one or two of ten students' grinders will fail.
+
+120
+00:10:41,045 --> 00:10:46,545
+Not failing doesn't prove skipping the service was right.
+
+121
+00:10:48,065 --> 00:10:51,665
+Finally, do it yourself in the digital factory.
+
+122
+00:10:52,065 --> 00:10:58,481
+Each of its 13 machines has its own Weibull parameters, the model we've used,
+
+123
+00:10:58,501 --> 00:11:02,326
+and they really fail with those probabilities.
+
+124
+00:11:02,726 --> 00:11:06,735
+In Lab 18 you read the asset register,
+
+125
+00:11:06,755 --> 00:11:14,368
+calculate the probability and expected loss, and the platform checks it.
+
+126
+00:11:14,768 --> 00:11:19,060
+In the command centre you compare the three options,
+
+127
+00:11:19,080 --> 00:11:21,963
+choose one and submit your reasons;
+
+128
+00:11:21,983 --> 00:11:26,193
+the hub's recommendation stays hidden until you do.
+
+129
+00:11:26,593 --> 00:11:32,063
+Then you raise the service order, the instructor approves it,
+
+130
+00:11:32,083 --> 00:11:36,653
+and you go through lockout, service and acceptance,
+
+131
+00:11:36,673 --> 00:11:39,893
+leaving a service record in ERPNext.
+
+132
+00:11:40,293 --> 00:11:43,236
+Finally the shop keeps running:
+
+133
+00:11:43,256 --> 00:11:49,833
+count failures on serviced and unserviced machines and estimate MTBF.
+
+134
+00:11:51,353 --> 00:11:59,304
+Every joint of a collaborative robot has a precision reducer whose grease
+
+135
+00:11:59,324 --> 00:12:03,563
+ages and whose bearings and teeth wear:
+
+136
+00:12:03,583 --> 00:12:06,293
+a classic beta above one.
+
+137
+00:12:06,693 --> 00:12:14,058
+Take beta 2.5 and eta 20,000 hours, illustrative values.
+
+138
+00:12:14,458 --> 00:12:23,733
+A joint that has run 14,000 hours has a 15.0 percent chance of failing in the
+
+139
+00:12:23,753 --> 00:12:25,061
+next 2,000;
+
+140
+00:12:25,081 --> 00:12:28,924
+a freshly greased one, only 0.3.
+
+141
+00:12:29,324 --> 00:12:34,984
+That's why makers specify regreasing by hours.
+
+142
+00:12:35,384 --> 00:12:40,530
+Better still, the controller can read each joint motor's current;
+
+143
+00:12:40,550 --> 00:12:44,504
+friction creeping up means the reducer is wearing,
+
+144
+00:12:44,524 --> 00:12:47,524
+and servicing on condition is cheaper.
+
+145
+00:12:47,924 --> 00:12:56,243
+The WQR-105 reducers our plant makes go into exactly these joints.
+
+146
+00:12:57,763 --> 00:13:02,540
+An everyday example: changing a car's oil.
+
+147
+00:13:02,940 --> 00:13:10,479
+The manual says every 5,000 kilometres; stretching it to 8,000 is usually fine,
+
+148
+00:13:10,499 --> 00:13:16,412
+but one engine failure costs as much as dozens of oil changes.
+
+149
+00:13:16,812 --> 00:13:22,802
+When to change it is probability times loss against a small, certain cost:
+
+150
+00:13:22,822 --> 00:13:25,725
+the same problem as today's grinder.
+
+151
+00:13:27,245 --> 00:13:28,444
+Back to the start.
+
+152
+00:13:28,844 --> 00:13:35,482
+The grinder has a 13.4 percent chance of failing in the next 80 hours,
+
+153
+00:13:35,502 --> 00:13:40,047
+an expected loss of 375 dollars without service.
+
+154
+00:13:40,447 --> 00:13:46,759
+Of the three options, servicing after the shift is cheapest,
+
+155
+00:13:46,779 --> 00:13:48,764
+about 235 expected:
+
+156
+00:13:48,784 --> 00:13:56,363
+the rush order is untouched and the risk over the next 80 hours drops to
+
+157
+00:13:56,383 --> 00:13:58,263
+about 0.7 percent.
+
+158
+00:13:58,663 --> 00:14:03,090
+And if services are always done after the shift,
+
+159
+00:14:03,110 --> 00:14:09,483
+the optimal interval is about 312 hours; the current 500 is too long.
+
+160
+00:14:09,883 --> 00:14:13,726
+Changing it needs the plant manager's approval:
+
+161
+00:14:13,746 --> 00:14:20,383
+submit it under the asset's details and the ERPNext maintenance schedule follows.
+
+162
+00:14:21,903 --> 00:14:27,765
+Now Virtual lab 6-1. On the WenQuest platform you can do it yourself.
+
+163
+00:14:27,785 --> 00:14:34,243
+The numbers in the results panel are blurred here; reading them is your job.
+
+164
+00:14:34,643 --> 00:14:42,240
+First choose GRD-01 and read the chance of failing in the next 80 hours after 620,
+
+165
+00:14:42,260 --> 00:14:49,114
+and the expected loss. Check them against the hand calculation from class.
+
+166
+00:14:49,514 --> 00:14:57,147
+Then drag the hours run from zero to twelve hundred and watch the probability
+
+167
+00:14:57,167 --> 00:14:59,036
+in the orange band.
+
+168
+00:14:59,056 --> 00:15:04,999
+Press Service now: how far does it drop, and by what factor?
+
+169
+00:15:05,399 --> 00:15:09,978
+Next press the beta-equals-one check and drag again.
+
+170
+00:15:09,998 --> 00:15:16,433
+Does the probability still change? Why is scheduled service useless then?
+
+171
+00:15:16,833 --> 00:15:21,477
+Finally press Play and watch the saw-tooth of the clock:
+
+172
+00:15:21,497 --> 00:15:26,558
+service at the interval resets it, and now and then it fails.
+
+173
+00:15:26,578 --> 00:15:32,139
+Try intervals of 300 and 800 hours and count services and failures.
+
+174
+00:15:33,659 --> 00:15:37,831
+Virtual lab 6-2: choosing the service interval.
+
+175
+00:15:37,851 --> 00:15:44,163
+The curve is the long-run cost per operating hour of age-based service;
+
+176
+00:15:44,183 --> 00:15:47,552
+the red dashed line is run to failure.
+
+177
+00:15:47,952 --> 00:15:50,080
+Press service after shift,
+
+178
+00:15:50,100 --> 00:15:56,028
+drag the interval to the lowest point and read the optimum and its cost.
+
+179
+00:15:56,048 --> 00:16:01,812
+Then press stop during production and see which way the minimum moves.
+
+180
+00:16:02,212 --> 00:16:06,160
+Finally play the race between two identical machines,
+
+181
+00:16:06,180 --> 00:16:09,903
+one serviced every T hours and one run to failure,
+
+182
+00:16:09,923 --> 00:16:15,219
+on the same random lifetimes for 20,000 hours, and compare their costs.
+
+183
+00:16:15,239 --> 00:16:19,187
+I won't give the answers here; they're yours to find.
+
+184
+00:16:19,587 --> 00:16:24,447
+Both labs come with a guide and a report template on the platform.
+
+185
+00:16:25,967 --> 00:16:31,922
+After class you'll do Lab 18 in the WenQuest digital factory.
+
+186
+00:16:31,942 --> 00:16:39,072
+All 13 machines on the floor age by today's Weibull model and really fail
+
+187
+00:16:39,092 --> 00:16:41,521
+with these probabilities.
+
+188
+00:16:41,921 --> 00:16:47,137
+First calculate the overdue machine's probability and expected loss,
+
+189
+00:16:47,157 --> 00:16:49,216
+and the platform checks it.
+
+190
+00:16:49,236 --> 00:16:53,297
+Then compare the three options in the command centre,
+
+191
+00:16:53,317 --> 00:16:56,839
+choose one and give reasons. Until you submit,
+
+192
+00:16:56,859 --> 00:17:00,381
+the factory hub's recommendation stays hidden.
+
+193
+00:17:00,781 --> 00:17:05,574
+Then raise the service order, the instructor approves it,
+
+194
+00:17:05,594 --> 00:17:09,881
+and you go through lockout, service and acceptance.
+
+195
+00:17:09,901 --> 00:17:12,752
+Finally let the shop keep running,
+
+196
+00:17:12,772 --> 00:17:19,001
+count failures on serviced and unserviced machines, and estimate the MTBF.
+
+197
+00:17:20,521 --> 00:17:24,257
+The assignment has three tasks. One, calculation:
+
+198
+00:17:24,277 --> 00:17:27,246
+if the grinder is left until 800 hours,
+
+199
+00:17:27,266 --> 00:17:31,922
+what are the probability and expected loss? Then a CNC lathe:
+
+200
+00:17:31,942 --> 00:17:37,901
+does servicing it now pay, and why is the answer different from the grinder's?
+
+201
+00:17:38,301 --> 00:17:39,455
+Two, design:
+
+202
+00:17:39,475 --> 00:17:46,400
+use C of T to find the lathe's optimal interval and compare it with the
+
+203
+00:17:46,420 --> 00:17:48,161
+current 600 hours.
+
+204
+00:17:48,561 --> 00:17:50,890
+Three, the Lab 18 report,
+
+205
+00:17:50,910 --> 00:17:57,845
+focusing on how you compared the options and how your choice compares with
+
+206
+00:17:57,865 --> 00:17:59,443
+the hub's advice.
+
+207
+00:18:00,963 --> 00:18:04,466
+There's also a ten-question quiz. For example,
+
+208
+00:18:04,486 --> 00:18:10,211
+for a machine with beta below one, should you shorten the service interval?
+
+209
+00:18:10,611 --> 00:18:14,874
+A grinder 300 hours after its last service:
+
+210
+00:18:14,894 --> 00:18:19,855
+what's its chance of failing in the next 80 hours?
+
+211
+00:18:20,255 --> 00:18:22,898
+You can take the quiz three times,
+
+212
+00:18:22,918 --> 00:18:26,815
+and the explanations appear as soon as you submit.
+
+213
+00:18:28,335 --> 00:18:30,475
+Three things to remember.
+
+214
+00:18:30,875 --> 00:18:34,035
+One: service only helps against wear;
+
+215
+00:18:34,055 --> 00:18:38,417
+scheduled service pays only when beta is above one,
+
+216
+00:18:38,437 --> 00:18:42,800
+and with beta of one failure doesn't depend on age.
+
+217
+00:18:43,200 --> 00:18:46,747
+Two: decide with the conditional probability,
+
+218
+00:18:46,767 --> 00:18:52,138
+the chance that a machine which has run t hours fails in the next H,
+
+219
+00:18:52,158 --> 00:18:56,340
+times the loss per failure; that's the expected loss,
+
+220
+00:18:56,360 --> 00:19:00,224
+to be weighed with the service cost and delivery.
+
+221
+00:19:00,624 --> 00:19:06,962
+Three: set the interval with C of T; the cheaper the service, the more often,
+
+222
+00:19:06,982 --> 00:19:13,484
+and moving it out of production time often saves more than tuning the interval.
+
+223
+00:19:13,884 --> 00:19:21,781
+After class: Assignment 6, Quiz 6 and the Lab 18 report.
+
+224
+00:19:22,181 --> 00:19:25,947
+The virtual labs, the digital-factory lab,
+
+225
+00:19:25,967 --> 00:19:32,257
+the assignment and the quiz are all on the WenQuest learning platform,
+
+226
+00:19:32,277 --> 00:19:38,296
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+227
+00:19:38,696 --> 00:19:45,477
+Next time it's people and shifts, and what to do when a key technician is away.
+
+228
+00:19:45,497 --> 00:19:46,596
+See you then.
