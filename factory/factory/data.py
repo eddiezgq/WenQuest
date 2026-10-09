@@ -338,3 +338,25 @@ OPENING_STOCK = {
     "KEY-6x6x25": 10, "KEY-8x7x36": 10, "KEY-10x8x28": 20, "KEY-12x8x45": 10,
     "PLUG-M16": 10, "VENT-M16": 10, "GAUGE-M12": 10, "OIL-CKC220": 25, "SEALANT": 0.5,
 }
+
+
+# ---------------------------------------------------------------- 工厂清单（第 30 轮；freecad-ai-parts ADR-0064）
+# WQ_PLANT_FILE 指定了企业的清单时，工作站、工序、班次、客户与供应商取自清单；没指定时就是上面的演示工厂
+try:
+    from factory import plant as _plant
+    _P = _plant.active()
+except ImportError:                    # 按文件路径单独载入本文件时（课程的 calc 程序）：没有 factory 包
+    if __import__("os").environ.get("WQ_PLANT_FILE"):   # 指定了清单却找不到 factory 包：不能悄悄用演示工厂
+        raise
+    _P = None
+
+DEMO_CUSTOMERS = list(CUSTOMERS)        # 演示工厂的客户：教学情景（sim/scenario.py、实验 15–23、E1–E7 的演示数据）始终用它们
+if _P:
+    WORKSTATIONS = _P["WORKSTATIONS"]
+    OPERATIONS = _P["OPERATIONS"]
+    INSPECTION_OPS = _P["INSPECTION_OPS"]
+    SHIFT = _P["SHIFT"]
+    if _P["SUPPLIERS"]:
+        SUPPLIERS = {k: {"name": v["name"], "lead": v.get("lead")} for k, v in _P["SUPPLIERS"].items()}
+    if _P["CUSTOMERS"]:
+        CUSTOMERS = list(_P["CUSTOMERS"])

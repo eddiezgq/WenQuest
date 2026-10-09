@@ -19,6 +19,7 @@ x-app-env: &app-env
   WQ_MQTT_PORT: "1883"
   WQ_MODE: teach
   WQ_TZ: ${WQ_TZ:-America/New_York}
+  WQ_PLANT_FILE: ${WQ_PLANT_FILE:-}       # 工厂清单（第 30 轮）；空 = 演示工厂（问渠减速器厂），如 /app/plants/example-sewing.yaml
 
 x-demo-env: &demo-env
   WQ_DB: postgresql://wq:${WQ_DB_PASSWORD:?}@db:5432/wq_demo
@@ -26,6 +27,7 @@ x-demo-env: &demo-env
   WQ_MQTT_PORT: "1883"
   WQ_MODE: prod
   WQ_TZ: ${WQ_TZ:-America/New_York}
+  WQ_PLANT_FILE: ${WQ_DEMO_PLANT_FILE:-}  # 演示企业单独一份清单（第 30 轮）；空 = 演示工厂
 
 x-erpnext: &erpnext
   image: frappe/erpnext:v16.34.1
@@ -97,6 +99,8 @@ services:
       WQ_CLAUDE_MODEL: ${WQ_CLAUDE_MODEL:-claude-sonnet-5}
       WQ_DEEPSEEK_KEY: ${WQ_DEEPSEEK_KEY:-}             # 国内部署用已备案的 DeepSeek（第 17 轮 D 期）
       WQ_DEEPSEEK_MODEL: ${WQ_DEEPSEEK_MODEL:-deepseek-chat}
+      WQ_AI_PROVIDER: ${WQ_AI_PROVIDER:-auto}           # 第 30 轮 H-6：auto 时国内（cn）只用 DeepSeek、其他 Claude 优先
+      WQ_AI_REGION: ${WQ_AI_REGION:-}                   # cn / intl；空 = 按 WQ_TZ 推断
       WQ_SMTP_HOST: ${WQ_SMTP_HOST:-}                   # 厂情提醒的邮件（第 17 轮 D 期）；空 = 只发站内和群机器人
       WQ_SMTP_PORT: ${WQ_SMTP_PORT:-2525}
       WQ_SMTP_SECURE: ${WQ_SMTP_SECURE:-tls}
@@ -213,6 +217,8 @@ services:
       WQ_CLAUDE_MODEL: ${WQ_CLAUDE_MODEL:-claude-sonnet-5}
       WQ_DEEPSEEK_KEY: ${WQ_DEEPSEEK_KEY:-}             # 国内部署用已备案的 DeepSeek（第 17 轮 D 期）
       WQ_DEEPSEEK_MODEL: ${WQ_DEEPSEEK_MODEL:-deepseek-chat}
+      WQ_AI_PROVIDER: ${WQ_AI_PROVIDER:-auto}           # 第 30 轮 H-6：auto 时国内（cn）只用 DeepSeek、其他 Claude 优先
+      WQ_AI_REGION: ${WQ_AI_REGION:-}                   # cn / intl；空 = 按 WQ_TZ 推断
       WQ_SMTP_HOST: ${WQ_SMTP_HOST:-}                   # 厂情提醒的邮件（第 17 轮 D 期）；空 = 只发站内和群机器人
       WQ_SMTP_PORT: ${WQ_SMTP_PORT:-2525}
       WQ_SMTP_SECURE: ${WQ_SMTP_SECURE:-tls}

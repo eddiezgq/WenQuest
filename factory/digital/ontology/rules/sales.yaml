@@ -11,6 +11,7 @@ rules:
   R3:
     name: 延期会触发合同违约金
     fn: order_penalty
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn            # 违约金达到 critical_usd 为 critical
     role: [planner, manager]
     params: {critical_usd: 500}

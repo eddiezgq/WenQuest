@@ -29,6 +29,7 @@ RUN pip install -r digital/requirements.txt "requests>=2.31"
 COPY factory/ factory/
 # 服务器首次安装时用它把减速器厂数据导入 ERPNext（第 3 轮 D6）
 COPY seed.py seed.py
+COPY plants/ plants/
 COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 # 虚拟 PLC（第 18 轮第 8 步）：班次在仿真车间里算、回放；PLC 引擎是学习平台实验台的同一份 JS（Debian 自带的 nodejs 运行）

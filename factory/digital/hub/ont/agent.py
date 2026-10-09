@@ -848,7 +848,10 @@ class Tools:
         fn = getattr(self, name, None) if name in TOOL_NAMES else None
         t = time.time()
         try:
-            out = fn(**(args or {})) if fn else {"error": "未知工具 " + str(name)}
+            if name in DEMO_ONLY_TOOLS and not _demo_plant():
+                out = {"error": DEMO_ONLY_NOTE}
+            else:
+                out = fn(**(args or {})) if fn else {"error": "未知工具 " + str(name)}
         except TypeError as e:
             out = {"error": "参数不对：{}".format(e)}
         except Exception as e:  # noqa: BLE001
@@ -930,6 +933,21 @@ TOOL_NAMES = ["search_objects", "get_object", "neighbors", "impact", "metrics", 
 _S = lambda **p: {"type": "object", "properties": p}                                    # noqa: E731
 _CH = {"type": "array", "items": {"type": "object"}, "description": "改动清单（与推演工作台相同）：reassign / reorder / overtime / expedite / "
        "urgent_purchase / outsource / split_delivery，参数照 compare_options 返回的 changes"}
+# 第 30 轮 H-2：E1–E7 领域的工具（第 18 轮加的）只在演示工厂；企业工厂（工厂清单 demo_data: false）里不给模型、规则版调用也只回“没有”
+DEMO_ONLY_TOOLS = frozenset((
+    "customer_360", "complaint_scope", "service_estimate", "ehs_overview", "machine_safety", "risk_assess", "maint_overview",
+    "failure_risk", "repairs_spares", "people_skills", "roster_gaps", "overtime_load", "supplier_scorecard", "batch_trace",
+    "purchasing_status", "energy_overview", "unit_energy", "carbon_account", "order_margin", "ar_ap_cash", "objectives_budget"))
+
+DEMO_ONLY_INTENTS = frozenset(("finance", "energy", "people", "supplier", "maint", "safety", "complaint", "service", "customer"))
+DEMO_ONLY_NOTE = "本厂没有这个领域的数据（客户与服务、安全环保、设备维护、人员、供应链、能源、经营与财务只在演示工厂）"
+
+
+def _demo_plant():
+    from factory import plant
+    return plant.is_demo()
+
+
 TOOLS = [
     {"name": "search_objects", "description": "在工厂本体里按编号、名称、别名搜索对象（设备、工单、订单、物料、零件、客户……）",
      "input_schema": dict(_S(q={"type": "string"}, type={"type": "string", "description": "可选：限定类型，如 Machine、SalesOrder"}), required=["q"])},
@@ -1015,7 +1033,7 @@ class Agent:
         return u["mode"] == "teach" and not u.get("teacher")
 
     def tools_for(self, u):
-        drop = set()
+        drop = set() if _demo_plant() else set(DEMO_ONLY_TOOLS)     # 第 30 轮 H-2：企业工厂不给 E1–E7 的工具
         if u["mode"] == "teach":
             drop.add("propose_order")
         if self.student(u):
@@ -1056,13 +1074,16 @@ class Agent:
 
     def _system(self, u):
         from hub.ai import ROLE_NAMES
-        base = ("你是“问渠减速器厂”的 AI 工厂代理，是全厂员工的同事。你通过工厂本体（设备、工单、订单、物料、零件、客户等对象和它们的关系）、"
+        from factory import plant
+        facts = ("工厂：唯一成品 WQR-105 二级圆柱齿轮减速器；本轮闭环零件是输出轴 SH-301（下料 → 粗车 → 调质 → 精车 → 铣键槽 → 磨外圆 → 检验）。"
+                 if plant.is_demo() else plant.brief())
+        base = ("你是“" + plant.display_name() + "”的 AI 工厂代理，是全厂员工的同事。你通过工厂本体（设备、工单、订单、物料、零件、客户等对象和它们的关系）、"
                 "异常与因果链、推演（快进副本）和历史库看到全厂。回答用中文，简洁，先给结论再给依据。\n"
                 "规矩：① 数据只来自工具结果，不编造；② 每个结论后面用 [n] 标出依据，n 是工具结果里对象、消息、异常、推演的 ref 编号；"
                 "③ 回答里的数字必须是工具结果里出现过的（可以四舍五入、换算成百分比或小时），不确定就再查；"
                 "④ 处理方案先用 compare_options 或 simulate 推演再说，不凭感觉；⑤ 写操作只能起草（draft_action 动作草稿、propose_order 提议），"
                 "起草前先问对方要不要，人提交、审批后才执行。\n"
-                "工厂：唯一成品 WQR-105 二级圆柱齿轮减速器；本轮闭环零件是输出轴 SH-301（下料 → 粗车 → 调质 → 精车 → 铣键槽 → 磨外圆 → 检验）。"
+                + facts.replace("{", "{{").replace("}", "}}") +
                 "设备编号：{}。今天是 {}。").format("、".join("{} {}".format(k, UNITS[k][1]) for k in MACHINES),
                                                dt.datetime.now(kpi.TZ).strftime("%Y-%m-%d %A"))
         if self.student(u):
@@ -1167,6 +1188,8 @@ class Rules:
 
     def answer(self, q, messages=None):
         intent = self.intent(q)
+        if intent in DEMO_ONLY_INTENTS and not _demo_plant():       # 第 30 轮 H-2：企业工厂没有 E1–E7 的数据
+            return DEMO_ONLY_NOTE, intent
         fn = getattr(self, "a_" + intent)
         try:
             return fn(q), intent

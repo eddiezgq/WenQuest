@@ -3,7 +3,8 @@
 
 运行：uvicorn hub.app:app --port 8100
 环境变量：WQ_DB、WQ_MQTT_HOST/PORT/USER/PASSWORD、WQ_MQTT_WS（浏览器连总线的地址）、WQ_ERPNEXT_URL、
-WQ_NODERED_URL、WQ_TZ、WQ_SECRET、WQ_CLAUDE_KEY / WQ_DEEPSEEK_KEY（可选）；
+WQ_NODERED_URL、WQ_TZ、WQ_SECRET、WQ_CLAUDE_KEY / WQ_DEEPSEEK_KEY（可选）、WQ_AI_PROVIDER / WQ_AI_REGION（第 30 轮，见 hub/llm.py）、
+WQ_PLANT_FILE（工厂清单，第 30 轮；不设 = 演示工厂）；
 线上另有 WQ_AUTH=wenquest、WQ_SSO_URL、WQ_LOGIN_URL、WQ_AI_PER_HOUR、WQ_HISTORY_DAYS（见第 3 轮细则）。
 """
 import base64
@@ -31,6 +32,7 @@ from wqbus import layout as L  # noqa: E402
 from wqbus.client import Bus  # noqa: E402
 from wqbus.topics import topic, unit_topic  # noqa: E402
 from factory import data as F  # noqa: E402
+from factory import plant as PLANT  # noqa: E402
 from hub import kpi, mrp  # noqa: E402
 from hub import select as lib_select  # noqa: E402
 from hub import design as design_web  # noqa: E402
@@ -67,6 +69,15 @@ FACTORY_NAME = os.environ.get("WQ_FACTORY_NAME", "")                       # 班
 CLASS_TEACHERS = {x for x in os.environ.get("WQ_CLASS_TEACHERS", "").split(",") if x}
 CLASS_IDS = set(os.environ.get("WQ_CLASS_IDS", "").split())                # 公共工厂：有哪些班级工厂（给 Caddy 按需发证书）
 WEB_DIST = os.environ.get("WQ_WEB_DIST", os.path.join(os.path.dirname(HERE), "web", "dist"))
+# 工厂清单（第 30 轮 H-2；freecad-ai-parts ADR-0064）：E1–E7 领域、实验 15–23、情景导演、教学模拟器只在演示工厂开。
+# 企业工厂（WQ_PLANT_FILE 指定、demo_data: false）里这些接口一律 404，网页按 /api/config 的 plant.hidden 不显示入口
+DEMO_PLANT = PLANT.is_demo()
+TEACH_ONLY_API = tuple("/api/lab{}".format(n) for n in range(15, 24)) + (
+    "/api/labs", "/api/story", "/api/scenario", "/api/teach/batch-complaint",
+    "/api/complaints", "/api/crm", "/api/followups", "/api/ont/customer360", "/api/service",     # E1 客户与服务
+    "/api/ehs", "/api/maint", "/api/people", "/api/supply", "/api/energy", "/api/finance")      # E2–E7
+TEACH_ONLY_NAV = ("/service", "/supply", "/finance", "/maint", "/people", "/ehs", "/energy", "/director", "/labs", "/teach",
+                  "/plc") + tuple("/lab{}".format(n) for n in range(15, 24))
 PUBLISH_ALLOW = ("wq/gearbox/design/",)       # HTTP → 总线网关只放行这些主题（FreeCAD 宏用）
 
 
@@ -98,6 +109,7 @@ class Hub:
         self.db.init()
         self.bus = Bus("wq-hub-" + secrets.token_hex(3))
         self.ai = Assistant(self.db, self.publish)
+        ai_setting_load(self.db, self.ai.llm)          # 第 30 轮 H-6：管理员选的模型（Claude / DeepSeek / 自动）
         from hub.ont.agent import Agent               # AI 代理（第 17 轮 D 期）：问答走代理，工具是本体、异常、推演、动作
         self.agent = Agent(self, self.ai.llm, locked=self.compare_locked)
         self.hist = Historian(self.db, self.on_message)
@@ -245,8 +257,8 @@ class Hub:
 
     def _first_run(self):
         """第一次启动（教学模式、历史库还是空的）：让仿真器载入实验 7 情景，首页一打开就有内容。"""
-        if DEFAULT_MODE != "teach" or os.environ.get("WQ_AUTO_SCENARIO", "1") != "1":
-            return
+        if DEFAULT_MODE != "teach" or os.environ.get("WQ_AUTO_SCENARIO", "1") != "1" or not DEMO_PLANT:
+            return                              # 实验 7 情景是演示工厂的；企业工厂不载入
         for _ in range(6):
             if self.db.one("select 1 as x from bus_message where mode='teach' and type='erp.doc' limit 1"):
                 return
@@ -276,49 +288,51 @@ class Hub:
                             RP.generate(self.db, mode, kind, llm=self.ai.llm)
                         from hub.ont import retro as RT        # 自动复盘：异常解决、动作执行完、受影响的工单做完
                         RT.due(self.db, mode)
-                        from hub import service as SV          # 客户与服务的教学模拟器（第 18 轮 E1）：投诉、上门、回访、线索
-                        SV.tick(self, mode)
-                        from hub import ehs as EH              # 安全环保的教学模拟器（第 18 轮 E2）：一般隐患、未遂、化学品与废物
-                        EH.tick(self, mode)
+                        if DEMO_PLANT:                         # E1–E7 只在演示工厂（第 30 轮 H-2）
+                            from hub import service as SV          # 客户与服务的教学模拟器（第 18 轮 E1）：投诉、上门、回访、线索
+                            SV.tick(self, mode)
+                            from hub import ehs as EH              # 安全环保的教学模拟器（第 18 轮 E2）：一般隐患、未遂、化学品与废物
+                            EH.tick(self, mode)
                     except Exception:  # noqa: BLE001
                         log.exception("通知 / 报告出错")
-                    try:                              # 设备维护单独一段：前面的模拟器出错不影响台账和故障单
-                        from hub import maint as MT            # 设备维护（第 18 轮 E3）：台账进 ERPNext、故障 → 维修单、模拟器
-                        MT.ensure_setup(self, mode)
-                        if mode == "teach":
-                            MT.tick(self, mode)
-                        else:
-                            MT.scan_failures(self, mode)
-                    except Exception:  # noqa: BLE001
-                        log.exception("设备维护出错")
-                    try:                              # 人员与组织（第 18 轮 E4）：员工档案进 ERPNext、出勤模拟、人员等级下发车间
-                        from hub import people as PE
-                        PE.ensure_setup(self, mode)
-                        PE.tick(self, mode)
-                    except Exception:  # noqa: BLE001
-                        log.exception("人员出错")
-                    try:                              # 供应链（第 18 轮 E5）：备选供应商进 ERPNext、发货到货、批次用料、模拟器
-                        from hub import supply as SP
-                        SP.ensure_setup(self, mode)
-                        SP.tick(self, mode)
-                    except Exception:  # noqa: BLE001
-                        log.exception("供应链出错")
-                    try:                              # 能源与环境（第 18 轮 E6）：计量开关与节能设定下发车间、模拟器出问题、修好了清掉
-                        from hub import energy as EG
-                        EG.tick(self, mode)
-                    except Exception:  # noqa: BLE001
-                        log.exception("能源出错")
-                    try:                              # 经营与财务（第 18 轮 E7）：订单做完开票、收货开采购发票、客户付款模拟器
-                        from hub import finance as FN
-                        FN.tick(self, mode)
-                    except Exception:  # noqa: BLE001
-                        log.exception("财务出错")
-                    try:                              # 第 19 轮：情景导演——推进等 ERPNext 的步骤、核对异常、自动演示
-                        if mode == "teach":
-                            from hub import story as ST
-                            ST.tick(self, mode)
-                    except Exception:  # noqa: BLE001
-                        log.exception("情景出错")
+                    if DEMO_PLANT:                    # E1–E7 与情景导演只在演示工厂（第 30 轮 H-2）
+                        try:                              # 设备维护单独一段：前面的模拟器出错不影响台账和故障单
+                            from hub import maint as MT            # 设备维护（第 18 轮 E3）：台账进 ERPNext、故障 → 维修单、模拟器
+                            MT.ensure_setup(self, mode)
+                            if mode == "teach":
+                                MT.tick(self, mode)
+                            else:
+                                MT.scan_failures(self, mode)
+                        except Exception:  # noqa: BLE001
+                            log.exception("设备维护出错")
+                        try:                              # 人员与组织（第 18 轮 E4）：员工档案进 ERPNext、出勤模拟、人员等级下发车间
+                            from hub import people as PE
+                            PE.ensure_setup(self, mode)
+                            PE.tick(self, mode)
+                        except Exception:  # noqa: BLE001
+                            log.exception("人员出错")
+                        try:                              # 供应链（第 18 轮 E5）：备选供应商进 ERPNext、发货到货、批次用料、模拟器
+                            from hub import supply as SP
+                            SP.ensure_setup(self, mode)
+                            SP.tick(self, mode)
+                        except Exception:  # noqa: BLE001
+                            log.exception("供应链出错")
+                        try:                              # 能源与环境（第 18 轮 E6）：计量开关与节能设定下发车间、模拟器出问题、修好了清掉
+                            from hub import energy as EG
+                            EG.tick(self, mode)
+                        except Exception:  # noqa: BLE001
+                            log.exception("能源出错")
+                        try:                              # 经营与财务（第 18 轮 E7）：订单做完开票、收货开采购发票、客户付款模拟器
+                            from hub import finance as FN
+                            FN.tick(self, mode)
+                        except Exception:  # noqa: BLE001
+                            log.exception("财务出错")
+                        try:                              # 第 19 轮：情景导演——推进等 ERPNext 的步骤、核对异常、自动演示
+                            if mode == "teach":
+                                from hub import story as ST
+                                ST.tick(self, mode)
+                        except Exception:  # noqa: BLE001
+                            log.exception("情景出错")
                     last = self.last_brief.get(mode, 0)
                     if new or time.time() - last > 600:
                         self.ai.briefing(mode)
@@ -349,6 +363,18 @@ class Hub:
 
 H = Hub()
 app = FastAPI(title="问渠数字工厂枢纽 WenQuest Digital Factory Hub", version="1.0.0")
+
+
+def teach_only(path):
+    """只属于演示工厂的接口（E1–E7、实验 15–23、情景）"""
+    return any(path == p or path.startswith(p + "/") for p in TEACH_ONLY_API)
+
+
+@app.middleware("http")
+async def _demo_plant_only(request: Request, call_next):
+    if not DEMO_PLANT and teach_only(request.url.path):
+        return JSONResponse({"detail": "这项功能只属于演示工厂（问渠减速器厂），本厂没有"}, 404)
+    return await call_next(request)
 
 
 @app.on_event("startup")
@@ -542,7 +568,57 @@ def config():
         "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "factory_name": FACTORY_NAME, "ai_engine": H.ai.llm.name if H.ai else "rules",
         "tz": str(kpi.TZ), "customers": F.CUSTOMERS, "fg": [{"item_code": "WQR-105", "name": F.ITEMS["WQR-105"][0],
                                                                "price": F.FG_SELLING_PRICE}],
+        "plant": _plant_cfg(),
     }
+
+
+def _plant_cfg():
+    """页面上随工厂变的：厂名、是否演示工厂、班次；hidden 是企业工厂里不显示的页面入口（第 30 轮 H-2）"""
+    from sim import calendar as cal
+    c = PLANT.company()
+    return {"name": PLANT.display_name(), "company": c["name"], "currency": c["currency"], "demo": DEMO_PLANT,
+            "shift": "{}–{}".format(cal.DEF_START, cal.DEF_END), "hidden": [] if DEMO_PLANT else list(TEACH_ONLY_NAV)}
+
+
+# ---------------------------------------------------------------- AI 模型选择（第 30 轮 H-6；freecad-ai-parts ADR-0063）
+AI_SETTING_SQL = "create table if not exists app_setting (key text primary key, value jsonb, updated_by text, ts timestamptz default now())"
+
+
+def ai_setting_load(db, llm):
+    try:
+        db.x(AI_SETTING_SQL)
+        r = db.one("select value from app_setting where key='ai_provider'")
+        llm.override = r["value"] if r and r["value"] in ("claude", "deepseek", "auto") else None
+    except Exception as e:  # noqa: BLE001 —— 设置读不到时按环境变量
+        log.warning("读不到 AI 模型设置：%s", e)
+
+
+def _can_admin_ai(u):
+    if u.get("teacher") or u["role"] == "manager":
+        return
+    raise HTTPException(403, "AI 模型设置要用厂长或管理员账号")
+
+
+@app.get("/api/admin/ai")
+def ai_status(u=Depends(user_of)):
+    _can_admin_ai(u)
+    return H.ai.llm.status()
+
+
+@app.post("/api/admin/ai")
+def ai_set(body: dict = Body(...), u=Depends(user_of)):
+    """选模型：claude / deepseek / auto（按地区：国内 DeepSeek、其他 Claude）。存库，重启后照样生效。
+    部署在国内（WQ_AI_REGION=cn）时只用 DeepSeek，选 claude 也不会调用 Claude（合规：国内只用已备案模型）。"""
+    _can_admin_ai(u)
+    v = body.get("provider")
+    if v not in ("claude", "deepseek", "auto"):
+        raise HTTPException(400, "provider 只能是 claude、deepseek 或 auto")
+    from psycopg.types.json import Jsonb
+    H.db.x(AI_SETTING_SQL)
+    H.db.x("insert into app_setting (key, value, updated_by) values ('ai_provider', %s, %s) on conflict (key) do update "
+           "set value=excluded.value, updated_by=excluded.updated_by, ts=now()", (Jsonb(v), who(u)))
+    H.ai.llm.override = v
+    return H.ai.llm.status()
 
 
 @app.get("/api/routing/{item}")
@@ -569,7 +645,8 @@ def health():
 @app.get("/api/layout")
 def get_layout():
     return {"floor": L.FLOOR, "units": {u: {"x": v[0], "y": v[1], "w": v[2], "d": v[3],
-                                           "name": wqbus.UNITS[u][1], "en": wqbus.UNITS[u][2]}
+                                           "name": wqbus.UNITS[u][1], "en": wqbus.UNITS[u][2],
+                                           **({"h": L.HEIGHT[u]} if L.HEIGHT and u in L.HEIGHT else {})}
                                        for u, v in L.LAYOUT.items()},
             "agv_home": L.AGV_HOME, "aisles": L.AISLES, "cross_x": L.CROSS_X}
 
@@ -823,6 +900,8 @@ def mes_cmd(body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(403, "不允许的指令 {}".format(cmd))
     if cmd in ("inject_fault", "set_speed", "load_scenario"):
         require_teacher(u)                 # 教师控制台（D3）
+    if cmd == "load_scenario" and not DEMO_PLANT:
+        raise HTTPException(400, "实验 7 情景只属于演示工厂，本厂没有")
     extra = {k: v for k, v in body.items() if k in ("minutes", "reason", "kind", "speed")}
     try:
         H.mes.command(unit, cmd, u["mode"], who(u), body.get("work_order"), body.get("operation"), **extra)

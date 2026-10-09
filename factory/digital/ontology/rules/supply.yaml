@@ -17,6 +17,7 @@ rules:
   W3:
     name: 来料检验不合格未处理
     fn: incoming_rejected
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [planner, quality]
     desc: 一批来料检验判不合格，还没退货或让步接收（轴承为严重）（第 18 轮 E5）
@@ -24,6 +25,7 @@ rules:
   W4:
     name: 供应商准时率低
     fn: supplier_late
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [planner, manager]
     params: {days: 30, on_time: 0.8, min_lots: 3}
@@ -32,6 +34,7 @@ rules:
   W5:
     name: 供应商来料合格率低
     fn: supplier_quality
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [quality, manager]
     params: {days: 30, pass_rate: 0.95, min_lots: 3}
@@ -40,6 +43,7 @@ rules:
   W6:
     name: 单一来源
     fn: single_source
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: info
     role: [planner, manager]
     desc: 一类物料只有一家在用的供应商
@@ -47,6 +51,7 @@ rules:
   W7:
     name: 可疑批次已用到零件上
     fn: suspect_batch_used
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: critical
     role: [quality, manager]
     desc: 判为可疑的批次已经用到了零件上（批次追溯）

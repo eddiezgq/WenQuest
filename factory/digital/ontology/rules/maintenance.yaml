@@ -11,6 +11,7 @@ rules:
   M2:
     name: 预防性维护逾期
     fn: pm_overdue
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     desc: 自上次保养以来的运行小时超过保养周期（ERPNext 维护计划；运行小时来自车间，第 18 轮 E3）
@@ -18,6 +19,7 @@ rules:
   M3:
     name: 点检异常未处理
     fn: inspection_abnormal
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     desc: 扫码点检有不合格项，还没开维修单或决定观察
@@ -25,6 +27,7 @@ rules:
   M4:
     name: 故障风险高
     fn: failure_risk
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     params: {threshold: 0.2}
@@ -33,6 +36,7 @@ rules:
   M5:
     name: 维修等备件
     fn: repair_parts_short
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: critical
     role: [manager]
     desc: 开着的维修单要用的备件库存不够
@@ -40,6 +44,7 @@ rules:
   M6:
     name: 维修超时
     fn: repair_overdue
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     params: {times: 2, teach_scale: 30}
@@ -48,6 +53,7 @@ rules:
   M7:
     name: 平均故障间隔下降
     fn: mtbf_drop
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     params: {drop: 0.3, min_failures: 3}

@@ -23,10 +23,26 @@ AGV_HOME = {"agv-01": (7, 9), "agv-02": (7, 18.5)}
 AISLES = (9.0, 18.5)    # 两条横向主通道；左侧 x=7 有一条纵向通道把它们连起来
 CROSS_X = 7.0
 
+try:                                   # 工厂清单（第 30 轮；freecad-ai-parts ADR-0064）
+    from factory import plant as _plant
+    _P = _plant.active()
+except ImportError:                    # 单独用总线库时（没有 factory 包）
+    if __import__("os").environ.get("WQ_PLANT_FILE"):   # 指定了清单却找不到 factory 包：不能悄悄用演示工厂
+        raise
+    _P = None
+if _P:
+    LAYOUT, FLOOR, AGV_HOME, AISLES, CROSS_X = _P["LAYOUT"], _P["FLOOR"], _P["AGV_HOME"], _P["AISLES"], _P["CROSS_X"]
+HEIGHT = _P["HEIGHT"] if _P else None   # 3D 车间的设备高度（米）；演示工厂用网页里的
+
 
 def dock(unit):
     """设备的上下料点：设备靠通道一侧。"""
     x, y, _, d = LAYOUT[unit]
+    if _P:                              # 清单里写了就用；没写朝最近的主通道那一侧
+        if unit in _P["DOCK"]:
+            return _P["DOCK"][unit]
+        a = min(AISLES, key=lambda v: abs(v - y))
+        return (x, y + d / 2 + 1.0) if a > y else (x, y - d / 2 - 1.0)
     return (x, y + d / 2 + 1.0) if y < AISLES[0] or AISLES[0] < y < AISLES[1] and y < 13.5 else (x, y - d / 2 - 1.0)
 
 

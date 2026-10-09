@@ -13,12 +13,13 @@ import math
 from collections import defaultdict
 
 from factory import data as F
+from factory import plant as _plant
 from sim.engine import OP_UNITS, SETUP_MIN, TOOL_CHANGE_MIN, expected_minutes, routing_for
 from hub.kpi import TZ, add_working_days, explode, rate_per_hour, Overview
 
 RELEASED_THIS_ROUND = {"SH-301"}
 LOT = {"raw_kg": 50, "default": 10}
-COMPANY = "问渠减速器厂 WenQuest Gearbox (Demo)"
+COMPANY = _plant.company()["name"]       # 工厂清单的公司（第 30 轮）；演示工厂仍是“问渠减速器厂 WenQuest Gearbox (Demo)”
 
 
 def lot_size(code):
@@ -107,7 +108,10 @@ def plan_order(db, customer, item, qty, delivery_date, mode="teach", now=None):
                         "routing": [op for op, _ in routing_for(code)]})
         else:
             deferred.append({"item_code": code, "qty": q, "name": F.ITEMS[code][0]})
-    mat, ops = std_unit_cost("SH-301")
+    std = None
+    if _plant.is_demo():                # 演示工厂的输出轴标准成本；企业工厂没有这道工艺
+        mat, ops = std_unit_cost("SH-301")
+        std = {"material": mat, "operations": ops, "total": round(mat + ops, 2)}
     preview = {
         "sales_order": {"customer": customer, "company": COMPANY, "item_code": item, "qty": qty,
                         "rate": F.FG_SELLING_PRICE if item == "WQR-105" else None,
@@ -118,7 +122,7 @@ def plan_order(db, customer, item, qty, delivery_date, mode="teach", now=None):
         "material_requests": mrs,
         "deferred": deferred,
         "warnings": warnings,
-        "std_cost_sh301": {"material": mat, "operations": ops, "total": round(mat + ops, 2)},
+        "std_cost_sh301": std,
         "basis": "库存取自 office/erp/bin 最新快照；在途取自采购单与请购单；占用取自在手订单与未开工工单",
     }
     return preview

@@ -3,6 +3,7 @@ rules:
   N1:
     name: 单耗突增
     fn: unit_energy_jump
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager, engineer]
     params: {pct: 0.25, parts: 3, recent_h: 24, min_parts: 2}
@@ -11,6 +12,7 @@ rules:
   N2:
     name: 空转能耗高
     fn: idle_energy
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: info
     role: [manager, planner]
     params: {hours: 12, share: 0.3, min_h: 1, min_kwh: 10, top: 3}
@@ -19,6 +21,7 @@ rules:
   N3:
     name: 峰时用电占比高
     fn: peak_share_high
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager, planner]
     params: {share: 0.3, min_h: 20}
@@ -27,6 +30,7 @@ rules:
   N4:
     name: 压缩空气基荷高（可能漏气）
     fn: air_base_high
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager, engineer]
     params: {hours: 4, min_h: 2, kw: 3}
@@ -35,6 +39,7 @@ rules:
   N5:
     name: 需量接近合同需量
     fn: demand_near
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     params: {ratio: 0.9}
@@ -43,6 +48,7 @@ rules:
   N6:
     name: 车间环境指标超限
     fn: env_over
+    demo_only: true      # 第 30 轮 H-2：E1–E7 的规则，只在演示工厂跑（企业工厂按“待数据”）
     severity: warn
     role: [manager]
     params: {hours: 1}

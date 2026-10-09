@@ -95,6 +95,8 @@ def load_catalog(path=RULE_DIR):
     from hub.ont import rules as R
     onto = S.get()
     doms = {d["domain"] for d in onto.domains}
+    from factory import plant
+    demo = plant.is_demo()
     out = {}
     for f in sorted(glob.glob(os.path.join(path, "*.yaml"))):
         name = os.path.basename(f)
@@ -116,7 +118,8 @@ def load_catalog(path=RULE_DIR):
             roles = r["role"] if isinstance(r["role"], list) else [r["role"]]
             if any(x not in ROLES for x in roles):
                 raise RuleError("{}：role 只能是 {}".format(where, "、".join(ROLES)))
-            waiting = r.get("status") == "waiting"
+            # 第 30 轮 H-2：E1–E7 的规则（demo_only）只在演示工厂跑；企业工厂没有这些领域的数据，按“待数据”处理
+            waiting = r.get("status") == "waiting" or bool(r.get("demo_only")) and not demo
             fn = r.get("fn")
             if not waiting and fn not in R.REG:
                 raise RuleError("{}：检测函数 {} 不存在（hub/ont/rules/）".format(where, fn))

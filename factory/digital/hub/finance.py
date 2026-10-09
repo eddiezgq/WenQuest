@@ -95,8 +95,8 @@ create table if not exists finance_sim (
 
 TERMS_DAYS = 30                  # 客户付款条件、供应商付款条件（天）
 DAY_S_TEACH = 120                # 教学模式：账期的 1 天 = 真实 2 分钟
-LATE = {F.CUSTOMERS[0]: (0, 3), F.CUSTOMERS[1]: (3, 12), F.CUSTOMERS[2]: (10, 30)}      # 客户付款习惯：晚付天数范围（教学模拟器）
-CREDIT = {F.CUSTOMERS[0]: 40000.0, F.CUSTOMERS[1]: 30000.0, F.CUSTOMERS[2]: 25000.0}
+LATE = {F.DEMO_CUSTOMERS[0]: (0, 3), F.DEMO_CUSTOMERS[1]: (3, 12), F.DEMO_CUSTOMERS[2]: (10, 30)}      # 客户付款习惯：晚付天数范围（教学模拟器）
+CREDIT = {F.DEMO_CUSTOMERS[0]: 40000.0, F.DEMO_CUSTOMERS[1]: 30000.0, F.DEMO_CUSTOMERS[2]: 25000.0}
 DEFAULT_CREDIT = 30000.0
 DUN_PAY_DAYS = 3                 # 催款后几天内付
 OBJECTIVES = [
@@ -185,7 +185,7 @@ def seed(db, mode, now=None):
         for c, a in BUDGET.items():
             db.x("insert into budget (mode, month, center, amount, set_by) values (%s,%s,%s,%s,'系统') on conflict do nothing", (mode, m, c, a))
     if not db.one("select 1 as x from credit where mode=%s limit 1", (mode,)):
-        for c in F.CUSTOMERS:
+        for c in F.DEMO_CUSTOMERS:
             db.x("insert into credit (mode, customer, limit_amt) values (%s,%s,%s) on conflict do nothing", (mode, c, CREDIT.get(c, DEFAULT_CREDIT)))
     st = _state(db, mode)
     if "since" not in st:
@@ -200,7 +200,7 @@ def opening(db, mode, now=None):
     now = now or now_utc()
     if db.one("select 1 as x from invoice where mode=%s and opening limit 1", (mode,)):
         return
-    for c, qty, age in ((F.CUSTOMERS[0], 6, 10), (F.CUSTOMERS[1], 4, TERMS_DAYS + 5), (F.CUSTOMERS[2], 8, 20)):
+    for c, qty, age in ((F.DEMO_CUSTOMERS[0], 6, 10), (F.DEMO_CUSTOMERS[1], 4, TERMS_DAYS + 5), (F.DEMO_CUSTOMERS[2], 8, 20)):
         issued = now - dt.timedelta(seconds=age * day_s(mode))
         amt = qty * F.FG_SELLING_PRICE
         db.x("insert into invoice (mode, kind, party, ref, amount, outstanding, issued_at, due_at, status, opening, note) "
@@ -1057,7 +1057,7 @@ def inject(H, mode, customer=None, who="老师", days=15, qty=8):
         raise PermissionError("生产模式不模拟")
     db = H.db
     seed(db, mode)
-    customer = customer or F.CUSTOMERS[2]
+    customer = customer or F.DEMO_CUSTOMERS[2]
     now = now_utc()
     issued = now - dt.timedelta(seconds=(TERMS_DAYS + float(days)) * day_s(mode))
     amt = int(qty) * F.FG_SELLING_PRICE

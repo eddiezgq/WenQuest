@@ -33,8 +33,8 @@
     <main class="main">
       <header class="top">
         <div class="title">
-          <b>问渠减速器厂{{ cfg.factory_name ? "（" + cfg.factory_name + "）" : "" }} · {{ pageName }}</b>
-          <small>{{ clock }} · 第 1 班（08:00–17:00）· 数据实时刷新</small>
+          <b>{{ plantName }}{{ cfg.factory_name ? "（" + cfg.factory_name + "）" : "" }} · {{ pageName }}</b>
+          <small>{{ clock }} · 第 1 班（{{ cfg.plant?.shift || '08:00–17:00' }}）· 数据实时刷新</small>
         </div>
         <div class="modes" role="group" aria-label="模式">
           <button type="button" :class="{ on: session.user?.mode === 'teach' }" @click="setMode('teach')">教学模式</button>
@@ -68,6 +68,7 @@ import { ai } from './lib/ai';
 const route = useRoute();
 const router = useRouter();
 const teachOnly = (u) => u?.mode === 'teach';
+const cfg = ref({});
 const NAV = [
   { title: '总览', items: [
     { to: '/', label: '首页 · 运营总览' },
@@ -106,15 +107,19 @@ const NAV = [
     { to: '/help', label: '帮助' },
   ] },
 ];
+// 第 30 轮 H-2：工厂清单。企业工厂（不是演示工厂）里，E1–E7、实验与任务、情景导演、虚拟 PLC 不显示——
+// 哪些入口不显示由枢纽在 /api/config 的 plant.hidden 里给出；演示工厂为空，导航与以前完全一样
+const hidden = computed(() => new Set(cfg.value.plant?.hidden || []));
+const shown = (to) => !to || !hidden.value.has(to.split('?')[0]);
+const plantName = computed(() => cfg.value.plant?.name || '问渠减速器厂');
 const navGroups = computed(() => NAV.filter((g) => !g.only || g.only(session.user))
-  .map((g) => ({ ...g, items: g.items.filter((n) => !n.only || n.only(session.user)) })).filter((g) => g.items.length));
+  .map((g) => ({ ...g, items: g.items.filter((n) => (!n.only || n.only(session.user)) && shown(n.to)) })).filter((g) => g.items.length));
 // 第 19 轮 J-10：右上角“帮助”打开这一页对应的帮助文件
 const HELP = [['/ont', '厂情中枢'], ['/service', '客户与服务'], ['/supply', '采购与来料'], ['/finance', '经营与财务'], ['/maint', '设备维护'],
   ['/people', '人员与排班'], ['/ehs', '安全环保'], ['/energy', '能源与环境'], ['/cae', '仿真与分析'], ['/cfd', '流体分析'], ['/cam', '数控编程'],
   ['/twin', '数字孪生'], ['/opt', '设计优化'], ['/plc', '虚拟PLC'], ['/library', '零件与机器人库'], ['/members', '数字工厂企业版使用说明'],
   ['/director', '两周情景'], ['/lab23', '两周情景']];
 const helpName = computed(() => (HELP.find(([p]) => route.path === p || route.path.startsWith(p + '/')) || [null, '使用说明'])[1]);
-const cfg = ref({});
 const apps = computed(() => [
   { name: 'ERPNext', role: 'ERP / MRP', href: cfg.value.erpnext_url || '#', ext: true },
   { name: '设计台', role: 'CAD', href: '/work/engineer', route: '/work/engineer' },
@@ -127,7 +132,7 @@ const apps = computed(() => [
   { name: '虚拟 PLC', role: 'PLC', href: '/plc', route: '/plc' },
   { name: '车间终端', role: 'MES', href: '/work/operator', route: '/work/operator' },
   { name: 'Node-RED', role: '数据流', href: cfg.value.nodered_url || '#', ext: true },
-].filter((a) => a.name !== 'Node-RED' || cfg.value.nodered_url));   // 线上 Node-RED 不对外（第 3 轮 D8）
+].filter((a) => (a.name !== 'Node-RED' || cfg.value.nodered_url) && shown(a.route)));   // 线上 Node-RED 不对外（第 3 轮 D8）
 const pageName = computed(() => ({
   '/': '运营总览', '/work/planner': '订单与计划', '/work/engineer': '设计与工艺', '/work/operator': '车间终端',
   '/work/quality': '质量', '/3d': '3D 车间', '/teach': '实验 7', '/bus': '统一数据总线', '/library': '零件与机器人库',
@@ -166,6 +171,7 @@ watch(() => session.token, (t) => { if (t) start(); });
 async function start() {
   try {
     cfg.value = await loadConfig();
+    if (cfg.value.plant?.demo === false) document.title = plantName.value + ' · 问渠数字工厂';   // 演示工厂标题不变
     connectBus(cfg.value.mqtt_ws.replace('localhost', location.hostname), session.user.mode);
   } catch (e) { /* 首页会显示错误 */ }
 }

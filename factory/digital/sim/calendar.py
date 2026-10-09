@@ -10,6 +10,17 @@ from zoneinfo import ZoneInfo
 
 MAX_OT_MIN = 240
 
+try:                                   # 工厂清单（第 30 轮；freecad-ai-parts ADR-0064）：上下班时间、工作日、加班上限
+    from factory import plant as _plant
+    _P = _plant.active()
+except ImportError:
+    if __import__("os").environ.get("WQ_PLANT_FILE"):   # 指定了清单却找不到 factory 包：不能悄悄用演示工厂
+        raise
+    _P = None
+DEF_START, DEF_END, DEF_DAYS = ("08:00", "17:00", (0, 1, 2, 3, 4)) if not _P else (_P["CAL_START"], _P["CAL_END"], _P["WORKDAYS"])
+if _P:
+    MAX_OT_MIN = _P["MAX_OT_MIN"]
+
 
 def _hm(s):
     h, m = s.split(":")
@@ -17,8 +28,9 @@ def _hm(s):
 
 
 class Calendar:
-    def __init__(self, mode="continuous", tz="America/New_York", start="08:00", end="17:00", workdays=(0, 1, 2, 3, 4),
-                 overtime=None):
+    def __init__(self, mode="continuous", tz="America/New_York", start=None, end=None, workdays=None, overtime=None):
+        start, end = start or DEF_START, end or DEF_END
+        workdays = DEF_DAYS if workdays is None else workdays
         if mode not in ("continuous", "shift"):
             raise ValueError("班次模式只能是 continuous 或 shift")
         self.mode = mode

@@ -95,6 +95,9 @@ class Service:
             self.eng.publish_all_status()          # 第 18 轮 E4：状态里带工厂时间，平台据此重新对时
             return True, "倍速已改为 {:g}".format(sp)
         if cmd == "load_scenario":
+            from factory import plant
+            if not plant.is_demo():
+                return False, "实验 7 情景只属于演示工厂，本厂没有"
             speed = float(data.get("speed", 1))
             self.eng = self._new_engine(speed, reliability=0)
             t = scenario.load(self.eng, self._publish, tz=self.tz)

@@ -18,6 +18,9 @@ x-app: &app
     WQ_MQTT_PORT: "1883"
     WQ_MODE: ${WQ_MODE:-teach}
     WQ_TZ: ${WQ_TZ:-America/New_York}
+    WQ_PLANT_FILE: ${WQ_PLANT_FILE:-}       # 工厂清单（第 30 轮）；空 = 演示工厂
+    WQ_AI_PROVIDER: ${WQ_AI_PROVIDER:-auto}
+    WQ_AI_REGION: ${WQ_AI_REGION:-}
 
 services:
   bus:
