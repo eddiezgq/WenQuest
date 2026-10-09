@@ -1,0 +1,911 @@
+1
+00:00:00,600 --> 00:00:01,761
+Hi everyone,
+
+2
+00:00:01,781 --> 00:00:08,850
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,250 --> 00:00:13,502
+This is Lecture 4, the thread take-up.
+
+4
+00:00:13,902 --> 00:00:18,735
+The arm swinging up and down at the front of the head is the take-up lever.
+
+5
+00:00:18,755 --> 00:00:22,164
+By shaft angle it lends thread out and takes it back,
+
+6
+00:00:22,184 --> 00:00:26,241
+and if it gets that slightly wrong, the thread breaks or loops.
+
+7
+00:00:27,761 --> 00:00:28,461
+Here's the problem.
+
+8
+00:00:28,861 --> 00:00:34,129
+A lockstitch machine with this lecture's take-up dimensions,
+
+9
+00:00:34,149 --> 00:00:36,244
+catching at 206 degrees,
+
+10
+00:00:36,264 --> 00:00:41,708
+a 10-millimetre check-spring stroke and a 3-millimetre stitch.
+
+11
+00:00:42,108 --> 00:00:47,248
+On 1.5-millimetre shirting everything is fine.
+
+12
+00:00:47,648 --> 00:00:55,068
+On 3-millimetre denim the thread keeps breaking and the stitches go tight and loose.
+
+13
+00:00:55,468 --> 00:00:58,135
+The line leader also asks:
+
+14
+00:00:58,155 --> 00:01:03,717
+how much needle thread does a 50-centimetre seam need?
+
+15
+00:01:04,117 --> 00:01:06,119
+We'll answer both at the end.
+
+16
+00:01:07,639 --> 00:01:11,299
+How much thread does one stitch need?.
+
+17
+00:01:12,819 --> 00:01:14,094
+First the totals.
+
+18
+00:01:14,494 --> 00:01:22,074
+Only about 4.5 millimetres of needle thread actually stays in the cloth each stitch.
+
+19
+00:01:22,474 --> 00:01:26,168
+Yet as the loop goes round the bobbin case,
+
+20
+00:01:26,188 --> 00:01:29,968
+the needle side needs nearly 80 millimetres.
+
+21
+00:01:30,368 --> 00:01:36,015
+All that has to be lent out first and taken back afterwards.
+
+22
+00:01:36,415 --> 00:01:43,676
+The lever can give at most 82 millimetres per stitch, just enough.
+
+23
+00:01:44,076 --> 00:01:49,793
+That's the take-up's job: lending and taking back thread by shaft angle.
+
+24
+00:01:51,313 --> 00:01:54,373
+Let's follow the needle thread.
+
+25
+00:01:54,773 --> 00:01:57,657
+From the cone it goes through the tension,
+
+26
+00:01:57,677 --> 00:02:02,012
+two discs pressed by a spring that give the thread its tension;
+
+27
+00:02:02,032 --> 00:02:07,128
+round the check spring; through a guide into the eye of the take-up lever;
+
+28
+00:02:07,148 --> 00:02:12,313
+then down through more guides and the needle-bar guide into the needle eye.
+
+29
+00:02:12,713 --> 00:02:14,333
+The key is the middle stretch.
+
+30
+00:02:14,733 --> 00:02:19,383
+As the lever eye moves, the total length of the two spans changes.
+
+31
+00:02:19,783 --> 00:02:24,892
+Longer, and thread is drawn up; shorter, and it's let down.
+
+32
+00:02:26,412 --> 00:02:32,536
+This is the panel view of Lab 4-1: the four-bar take-up carrying the eye.
+
+33
+00:02:32,936 --> 00:02:37,076
+Each stitch, the lever does three jobs.
+
+34
+00:02:37,476 --> 00:02:43,237
+Give: as the needle goes in and the hook draws the loop bigger,
+
+35
+00:02:43,257 --> 00:02:46,816
+the lever comes down paying out thread.
+
+36
+00:02:47,216 --> 00:02:51,434
+Give too little and the hook has to drag it, tension jumps,
+
+37
+00:02:51,454 --> 00:02:53,230
+and the thread may break.
+
+38
+00:02:53,630 --> 00:02:58,418
+Take up: after the loop slips off, it rises fast,
+
+39
+00:02:58,438 --> 00:03:02,050
+pulling the interlace into the cloth.
+
+40
+00:03:02,450 --> 00:03:04,462
+Draw: a little further up,
+
+41
+00:03:04,482 --> 00:03:09,073
+drawing the next stitch's thread through the tension discs.
+
+42
+00:03:10,593 --> 00:03:12,520
+Giving is the hardest job,
+
+43
+00:03:12,540 --> 00:03:18,810
+because the needle and hook decide how much is needed and the lever can only follow;
+
+44
+00:03:18,830 --> 00:03:22,554
+so the supply curve has to cover the demand curve.
+
+45
+00:03:22,954 --> 00:03:27,530
+Sometimes the lever gives faster than the needle uses,
+
+46
+00:03:27,550 --> 00:03:33,148
+and loose thread hanging at the head can be pierced by the needle.
+
+47
+00:03:33,547 --> 00:03:35,947
+The check spring is the buffer:
+
+48
+00:03:35,967 --> 00:03:41,801
+it takes up slack when the thread is loose and is pulled onto its stop when
+
+49
+00:03:41,821 --> 00:03:42,659
+it's tight.
+
+50
+00:03:43,059 --> 00:03:48,048
+One service manual gives about 7 millimetres of stroke,
+
+51
+00:03:48,068 --> 00:03:51,599
+finished as the point enters the cloth.
+
+52
+00:03:53,119 --> 00:03:54,499
+The four-bar take-up.
+
+53
+00:03:56,019 --> 00:04:02,479
+Look along the main shaft from the head end, with the shaft centre as origin.
+
+54
+00:04:02,879 --> 00:04:06,659
+The crank pin P comes straight from the shaft angle.
+
+55
+00:04:07,059 --> 00:04:12,227
+The rocker joint M is a from P and b from the fixed pivot Q,
+
+56
+00:04:12,247 --> 00:04:16,637
+so it's where two circles meet; if they don't meet,
+
+57
+00:04:16,657 --> 00:04:19,836
+the linkage can't be assembled there.
+
+58
+00:04:20,236 --> 00:04:27,216
+Turn PM by alpha and extend to length c, and that's the eye E.
+
+59
+00:04:27,616 --> 00:04:33,695
+The transmission angle mu is best near 90 degrees;
+
+60
+00:04:33,715 --> 00:04:42,844
+in our example it stays between 41 and 115 over a turn, above the usual 40.
+
+61
+00:04:44,364 --> 00:04:49,631
+What matters to the thread isn't how high the eye is but the total length L
+
+62
+00:04:49,651 --> 00:04:50,829
+of the two spans,
+
+63
+00:04:50,849 --> 00:04:52,944
+guide to eye and eye to guide.
+
+64
+00:04:53,344 --> 00:05:00,665
+In our example L is longest at 55 degrees, 210.2 millimetres,
+
+65
+00:05:00,685 --> 00:05:09,089
+the tightest moment, and shortest at 293, 128.6; the difference, 81.6,
+
+66
+00:05:09,109 --> 00:05:14,144
+is the most thread it can give per stitch.
+
+67
+00:05:14,544 --> 00:05:19,444
+Supply S is L-max minus the current L.
+
+68
+00:05:19,844 --> 00:05:28,624
+Giving takes 240 degrees and taking up only 120: slow out, fast back.
+
+69
+00:05:30,143 --> 00:05:32,683
+Thread demand and surplus.
+
+70
+00:05:34,203 --> 00:05:38,320
+Now the demand on the needle and hook side, D,
+
+71
+00:05:38,340 --> 00:05:41,558
+treating the thread as inextensible.
+
+72
+00:05:41,958 --> 00:05:43,218
+Before the catch,
+
+73
+00:05:43,238 --> 00:05:49,016
+once the eye is through the cloth there are two strands below, down and back,
+
+74
+00:05:49,036 --> 00:05:51,426
+each as long as the eye is deep.
+
+75
+00:05:51,826 --> 00:05:55,983
+So D is twice x minus e-nought, or zero.
+
+76
+00:05:56,003 --> 00:06:03,188
+e-nought is how high the eye sits above the cloth at top dead centre,
+
+77
+00:06:03,208 --> 00:06:06,530
+18.5 millimetres in our example.
+
+78
+00:06:06,930 --> 00:06:17,589
+The eye goes in at about 109 degrees, and at the bottom D is 25 millimetres.
+
+79
+00:06:19,109 --> 00:06:25,924
+After the catch the thread below becomes a loop dragged by the hook point,
+
+80
+00:06:25,944 --> 00:06:27,772
+a complicated shape.
+
+81
+00:06:28,172 --> 00:06:30,032
+We use a simplified model.
+
+82
+00:06:30,432 --> 00:06:36,204
+Looking along the hook shaft, the loop is stretched between the cloth hole,
+
+83
+00:06:36,224 --> 00:06:41,146
+the hook point and the part of the case rim the point has swept,
+
+84
+00:06:41,166 --> 00:06:46,321
+and the demand is the perimeter of the convex hull of those points.
+
+85
+00:06:46,721 --> 00:06:53,042
+The two strands before the catch are just the hull of two points,
+
+86
+00:06:53,062 --> 00:06:54,701
+so it's one idea.
+
+87
+00:06:55,101 --> 00:06:59,174
+At the catch it's 21 millimetres;
+
+88
+00:06:59,194 --> 00:07:04,881
+with the point at the bottom it peaks at 79.6.
+
+89
+00:07:06,401 --> 00:07:09,218
+Once the loop is off the case,
+
+90
+00:07:09,238 --> 00:07:16,028
+the demand falls to what the stitch actually keeps: q is about s plus t.
+
+91
+00:07:16,428 --> 00:07:20,357
+The interlace is in the middle of the cloth,
+
+92
+00:07:20,377 --> 00:07:27,268
+so each stitch the thread runs one stitch length along the face and goes down
+
+93
+00:07:27,288 --> 00:07:29,602
+and up half the thickness,
+
+94
+00:07:29,622 --> 00:07:31,128
+which adds one t.
+
+95
+00:07:31,528 --> 00:07:36,581
+Here q is about 4.5 millimetres.
+
+96
+00:07:36,981 --> 00:07:44,753
+Handy on the shop floor: a 50-centimetre seam is about 167 stitches,
+
+97
+00:07:44,773 --> 00:07:52,774
+about 75 centimetres of needle thread, about 86 with 15 percent waste.
+
+98
+00:07:54,294 --> 00:07:59,905
+Put supply and demand on one chart; the difference is the surplus.
+
+99
+00:08:00,305 --> 00:08:04,556
+Positive means extra thread, taken up by the check spring;
+
+100
+00:08:04,576 --> 00:08:08,605
+negative means too little, and the hook has to drag it.
+
+101
+00:08:09,005 --> 00:08:14,944
+In our example the surplus at the catch is about 24 millimetres,
+
+102
+00:08:14,964 --> 00:08:19,879
+the extra a four-bar gives: it is smooth and durable,
+
+103
+00:08:19,899 --> 00:08:23,882
+and the price is usually some extra thread.
+
+104
+00:08:24,282 --> 00:08:30,202
+With the hook point at the bottom it's smallest, only 1.9 millimetres,
+
+105
+00:08:30,222 --> 00:08:33,511
+the tightest moment of the whole cycle.
+
+106
+00:08:33,911 --> 00:08:39,971
+The vertical line follows the shaft; watch it sweep past that point.
+
+107
+00:08:41,491 --> 00:08:44,397
+Take the three criteria in time order.
+
+108
+00:08:44,797 --> 00:08:50,197
+First, before the eye enters the cloth, the needle uses no thread,
+
+109
+00:08:50,217 --> 00:08:54,549
+so everything given must be held by the check spring:
+
+110
+00:08:54,569 --> 00:08:57,751
+the surplus must not exceed its stroke;
+
+111
+00:08:57,771 --> 00:09:01,200
+our maximum is 9.2 against a stroke of 10.
+
+112
+00:09:01,600 --> 00:09:07,580
+Second, from eye-in to the catch, it may be short by no more than a millimetre.
+
+113
+00:09:07,980 --> 00:09:10,679
+Third, and most important,
+
+114
+00:09:10,699 --> 00:09:19,465
+from catch to cast-off the surplus must stay positive with 1 to 2 millimetres spare;
+
+115
+00:09:19,485 --> 00:09:20,720
+ours is 1.9.
+
+116
+00:09:21,120 --> 00:09:27,877
+After cast-off, take it up fast and draw the next stitch's thread.
+
+117
+00:09:29,397 --> 00:09:31,064
+Adjustment and trade-offs.
+
+118
+00:09:32,584 --> 00:09:37,652
+On screen the cloth has gone from 1.5 to 3 millimetres,
+
+119
+00:09:37,672 --> 00:09:39,964
+everything else the same.
+
+120
+00:09:40,364 --> 00:09:46,101
+Thicker cloth makes the two strands under the needle longer and puts the
+
+121
+00:09:46,121 --> 00:09:48,739
+cloth hole further from the case,
+
+122
+00:09:48,759 --> 00:09:51,297
+so the whole demand curve rises.
+
+123
+00:09:51,697 --> 00:09:57,429
+The minimum margin goes from plus 1.9 to -0.9 millimetres,
+
+124
+00:09:57,449 --> 00:10:01,395
+and after the eye enters it's 1.9 short.
+
+125
+00:10:01,795 --> 00:10:08,308
+The loop runs out of thread, the hook drags it out of the tension discs,
+
+126
+00:10:08,328 --> 00:10:11,575
+tension leaps, and the thread snaps.
+
+127
+00:10:11,975 --> 00:10:13,558
+That's why denim breaks it.
+
+128
+00:10:15,078 --> 00:10:20,120
+The fix is to move the thread guide in the give-more direction;
+
+129
+00:10:20,140 --> 00:10:24,378
+the manual says left for thick cloth, right for thin.
+
+130
+00:10:24,778 --> 00:10:31,796
+On the right, 3-millimetre cloth with the guide moved 12 millimetres.
+
+131
+00:10:32,196 --> 00:10:39,137
+The minimum margin is back to 1.4; the shortfall is down to 0.6, under one;
+
+132
+00:10:39,157 --> 00:10:43,313
+and before the eye enters the surplus is 8.5,
+
+133
+00:10:43,333 --> 00:10:47,490
+still inside the 10-millimetre spring stroke.
+
+134
+00:10:47,890 --> 00:10:49,950
+All three criteria are met.
+
+135
+00:10:51,470 --> 00:10:54,187
+Hook timing changes the demand curve too.
+
+136
+00:10:54,587 --> 00:10:57,792
+With the point early, at 198 degrees,
+
+137
+00:10:57,812 --> 00:11:05,114
+the extra thread round the case drops to 18 millimetres and the margin is still 1.7.
+
+138
+00:11:05,514 --> 00:11:16,254
+Late, at 214, the margin is down to 0.7 while the extra rises to 31.
+
+139
+00:11:16,654 --> 00:11:22,895
+So after re-timing the hook or fitting a new one, as we will in Lecture 5,
+
+140
+00:11:22,915 --> 00:11:27,549
+test-sew thin and thick cloth and re-check the take-up.
+
+141
+00:11:29,069 --> 00:11:34,246
+The heart of take-up design is a supply curve that covers the demand,
+
+142
+00:11:34,266 --> 00:11:37,409
+with the check spring taking up the extra.
+
+143
+00:11:37,809 --> 00:11:42,669
+A welding robot's cable dress faces the same problem.
+
+144
+00:11:43,069 --> 00:11:47,689
+As the wrist turns the cable needs more length, then less;
+
+145
+00:11:47,709 --> 00:11:52,969
+too little and it's torn, too much and it sags and snags the work.
+
+146
+00:11:53,369 --> 00:11:58,484
+So a spring retractor near axes three and four takes up the slack,
+
+147
+00:11:58,504 --> 00:12:00,429
+just like a check spring.
+
+148
+00:12:00,829 --> 00:12:05,864
+Electronic cams on servo motors too: the steeper the curve you follow,
+
+149
+00:12:05,884 --> 00:12:09,474
+the higher the acceleration and peak motor torque.
+
+150
+00:12:10,994 --> 00:12:14,560
+An everyday example: flying a kite.
+
+151
+00:12:14,960 --> 00:12:19,838
+When it climbs you must let line out in time;
+
+152
+00:12:19,858 --> 00:12:25,171
+give too little and the line goes taut and snaps.
+
+153
+00:12:25,571 --> 00:12:30,631
+When the wind drops and it falls, you must reel in fast,
+
+154
+00:12:30,651 --> 00:12:33,988
+or the slack line drapes into a tree.
+
+155
+00:12:34,388 --> 00:12:39,864
+The reel in your hand is the take-up lever: when to give, how much,
+
+156
+00:12:39,884 --> 00:12:45,688
+when to take back, all decided by what the kite needs at the other end.
+
+157
+00:12:47,208 --> 00:12:49,123
+Back to the start.
+
+158
+00:12:49,523 --> 00:12:55,348
+Going from 1.5 to 3-millimetre cloth lifts the demand curve;
+
+159
+00:12:55,368 --> 00:13:03,531
+the minimum margin becomes -0.9 millimetres and after the eye enters it's 1.9 short,
+
+160
+00:13:03,551 --> 00:13:09,279
+so the hook drags thread out of the tension, tension leaps,
+
+161
+00:13:09,299 --> 00:13:11,423
+and the thread breaks.
+
+162
+00:13:11,823 --> 00:13:19,223
+Move the guide about 12 millimetres toward giving more and the margin is back
+
+163
+00:13:19,243 --> 00:13:19,898
+to 1.4,
+
+164
+00:13:19,918 --> 00:13:22,596
+with all three criteria met.
+
+165
+00:13:22,996 --> 00:13:32,825
+Thread: about 167 stitches at 4.5 millimetres, about 75 centimetres,
+
+166
+00:13:32,845 --> 00:13:36,446
+86 with 15 percent waste.
+
+167
+00:13:37,966 --> 00:13:42,754
+Now Virtual lab 4-1. On the WenQuest platform you can do it yourself.
+
+168
+00:13:42,774 --> 00:13:45,889
+The indicators on the right are blurred here.
+
+169
+00:13:45,909 --> 00:13:48,746
+Read them yourself when you work the lab.
+
+170
+00:13:49,146 --> 00:13:51,813
+Task one. Pause, drag the shaft angle,
+
+171
+00:13:51,833 --> 00:13:55,419
+and find where the lever pulls the thread tightest,
+
+172
+00:13:55,439 --> 00:14:00,792
+the moment the supply is zero. Then compare it with the eye's highest point.
+
+173
+00:14:01,192 --> 00:14:07,058
+Task two. Set the cloth to 3 millimetres. Watch the whole demand curve rise,
+
+174
+00:14:07,078 --> 00:14:12,092
+and when you do the lab, write down the indicators at this point.
+
+175
+00:14:12,492 --> 00:14:17,410
+Then move only the thread guide, leaving the spring stroke,
+
+176
+00:14:17,430 --> 00:14:21,260
+the link dimensions and the hook timing alone,
+
+177
+00:14:21,280 --> 00:14:27,872
+until all three criteria are met. Record the guide position and the indicators.
+
+178
+00:14:28,272 --> 00:14:32,317
+Task three. Put the cloth and the guide back,
+
+179
+00:14:32,337 --> 00:14:36,472
+then bring the catch earlier than 198 degrees,
+
+180
+00:14:36,492 --> 00:14:41,350
+and watch how the extra thread round the case changes.
+
+181
+00:14:41,750 --> 00:14:46,790
+Then make it later than 214, and watch the minimum margin.
+
+182
+00:14:46,810 --> 00:14:52,810
+Record both sets and check them against the example from the lecture.
+
+183
+00:14:53,210 --> 00:14:57,763
+Two more tasks: draw your own supply curve with the cam type,
+
+184
+00:14:57,783 --> 00:15:03,237
+and change the rocker length to see how the eye path and the transmission
+
+185
+00:15:03,257 --> 00:15:04,212
+angle change.
+
+186
+00:15:04,232 --> 00:15:08,636
+Download the guide and the report template on the platform,
+
+187
+00:15:08,656 --> 00:15:11,710
+and hand in your report when you're done.
+
+188
+00:15:13,230 --> 00:15:19,090
+Everything in this lecture is on the WenQuest learning platform.
+
+189
+00:15:19,490 --> 00:15:25,243
+You can open today's interactive slides and Virtual lab 4-1 yourself,
+
+190
+00:15:25,263 --> 00:15:28,590
+page through them, and drag the sliders.
+
+191
+00:15:28,990 --> 00:15:32,934
+You submit the assignment and the lab report on the platform,
+
+192
+00:15:32,954 --> 00:15:35,014
+and get marks and comments back.
+
+193
+00:15:35,414 --> 00:15:39,266
+Questions go to the course discussion forum,
+
+194
+00:15:39,286 --> 00:15:44,987
+and the grades page shows your mark on every assignment and quiz.
+
+195
+00:15:46,507 --> 00:15:50,717
+Your assignment has four questions. One, calculation.
+
+196
+00:15:50,737 --> 00:15:55,426
+With the dimensions in Table 4-1, work out by hand where P,
+
+197
+00:15:55,446 --> 00:16:01,092
+M and E are at a shaft angle of 90 degrees, and the transmission angle,
+
+198
+00:16:01,112 --> 00:16:03,247
+then check them in the lab.
+
+199
+00:16:03,647 --> 00:16:05,557
+Two, adjustment. In the lab,
+
+200
+00:16:05,577 --> 00:16:10,382
+set the cloth to 3 millimetres and move only the guide until all three
+
+201
+00:16:10,402 --> 00:16:11,554
+criteria are met,
+
+202
+00:16:11,574 --> 00:16:13,898
+with screenshots before and after.
+
+203
+00:16:13,918 --> 00:16:17,827
+Then decide whether 2.5-millimetre cloth needs adjusting.
+
+204
+00:16:18,227 --> 00:16:18,712
+Three,
+
+205
+00:16:18,732 --> 00:16:25,021
+estimate the needle thread for one shirt and how many shirts a cone covers.
+
+206
+00:16:25,041 --> 00:16:29,648
+And four, discussion: a cam can make supply hug demand,
+
+207
+00:16:29,668 --> 00:16:33,602
+so why do fast machines still use the four-bar?
+
+208
+00:16:34,002 --> 00:16:40,585
+Submit the assignment and the lab report on the WenQuest platform.
+
+209
+00:16:42,105 --> 00:16:45,901
+There's also a ten-question quiz. For example,
+
+210
+00:16:45,921 --> 00:16:52,205
+is the lever's tightest moment always when its eye is geometrically highest?
+
+211
+00:16:52,605 --> 00:16:58,590
+Change from 1.5 to 3-millimetre cloth and the take-up runs short.
+
+212
+00:16:58,610 --> 00:17:03,025
+Which way does the manual say to move the guide?
+
+213
+00:17:03,425 --> 00:17:09,507
+You get three attempts, and the explanations appear as soon as you submit.
+
+214
+00:17:11,027 --> 00:17:12,607
+Three things to remember.
+
+215
+00:17:13,007 --> 00:17:18,608
+One: the take-up lends and takes back thread by shaft angle, giving,
+
+216
+00:17:18,628 --> 00:17:22,990
+taking up and drawing each stitch; giving is hardest,
+
+217
+00:17:23,010 --> 00:17:25,387
+and supply must cover demand.
+
+218
+00:17:25,787 --> 00:17:31,094
+Two: industrial machines use the four-bar, smooth and durable,
+
+219
+00:17:31,114 --> 00:17:35,647
+at the cost of extra thread held by the check spring.
+
+220
+00:17:36,047 --> 00:17:42,752
+Three: the three criteria, before eye-in, after eye-in, and catch to cast-off;
+
+221
+00:17:42,772 --> 00:17:48,787
+move the guide for thick cloth, and re-check after re-timing the hook.
+
+222
+00:17:49,187 --> 00:17:51,407
+Next: the hook mechanism.
+
+223
+00:17:51,807 --> 00:17:56,131
+The slides, the virtual lab, the 3D prototype,
+
+224
+00:17:56,151 --> 00:18:02,740
+the assignment and the quiz are all on the WenQuest learning platform,
+
+225
+00:18:02,760 --> 00:18:09,067
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+226
+00:18:09,467 --> 00:18:12,232
+Next time, the hook mechanism,
+
+227
+00:18:12,252 --> 00:18:18,360
+and how the rotary hook catches the loop at just the right moment.
+
+228
+00:18:18,380 --> 00:18:19,567
+See you then.
