@@ -122,6 +122,8 @@ def test_leak_degrade_and_ht_peak_with_tou():
     for name, setting, inj in (("base", {}, []), ("leak", {}, [{"kind": "leak"}]), ("degrade", {}, [{"kind": "degrade", "unit": "grd-01", "pct": 0.4}]),
                                ("peak", {}, [{"kind": "ht_peak"}]), ("peak_tou", {"tou": ["ht-01"]}, [{"kind": "ht_peak"}])):
         eng, clock, out = make_engine(auto=True)
+        # 固定从周一 10:00 开始（工厂时间原来取真实时间：在不同时刻跑，错峰前后的电量对比会落在不同的电价时段，测试时过时不过）
+        eng.epoch = dt.datetime(2026, 10, 5, 10, 0, tzinfo=eng.calendar.tzi).astimezone(dt.timezone.utc)
         eng.set_energy(dict({"enabled": True}, **setting))
         eng.set_energy({"inject": inj})
         eng.at(0, "release", work_order="WO-T", item="SH-301", qty=8)
