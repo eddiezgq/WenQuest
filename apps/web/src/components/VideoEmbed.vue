@@ -48,7 +48,7 @@ watch(() => list.value.map((m) => m.id).join(",") + locale.value, () => { cur.va
 
 const provider = (m: Module) => (m.video?.provider === "youtube" ? "YouTube" : t("video.bilibili"));
 function label(m: Module) {
-  return m.video?.provider === "youtube" ? t("video.enVersion") : t("video.zhVersion");
+  return m.video?.provider === "youtube" ? "YouTube" : t("video.bilibili");   // 两个平台的版本不一定分中英文
 }
 function pick(i: number) {
   cur.value = i;
