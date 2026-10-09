@@ -24,7 +24,7 @@ _spec.loader.exec_module(F)
 
 
 def _consts(path, names, ns=None):
-    """只读模块里的常数（不导入：这些模块要连数据库）；值里可以引用 F（如 F.CUSTOMERS[0]）"""
+    """只读模块里的常数（不导入：这些模块要连数据库）；值里可以引用 F（如 F.DEMO_CUSTOMERS[0]）"""
     out = {}
     for node in ast.parse(path.read_text(encoding="utf-8")).body:
         if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name) and node.targets[0].id in names:
@@ -38,7 +38,7 @@ SP = _consts(DIG / "hub" / "supply.py", {"ALT"})
 SE = _consts(DIG / "sim" / "energy.py", {"POWER"})
 EN = _consts(DIG / "hub" / "energy.py", {"PARAMS"}, {"EN": None})
 OBJ = {o[0]: o for o in FN["OBJECTIVES"]}
-GREEN, SUMMIT, HARBOR = F.CUSTOMERS
+GREEN, SUMMIT, HARBOR = F.DEMO_CUSTOMERS          # 演示工厂的三家客户（第 30 轮：finance.py 按 DEMO_CUSTOMERS 取）
 
 
 # ---------------------------------------------------------------- 标准成本（照抄 finance._std）
@@ -122,7 +122,7 @@ top_key = max([x for x in lines if x[0] != "material"], key=lambda x: x[1])[0]
 
 # ---------------------------------------------------------------- 应收、账龄、DSO（finance.ar / dso）
 T30 = FN["TERMS_DAYS"]
-late_mid = {c: sum(FN["LATE"][c]) / 2 for c in F.CUSTOMERS}
+late_mid = {c: sum(FN["LATE"][c]) / 2 for c in F.DEMO_CUSTOMERS}
 ROBOT = "机器人厂"
 od_robot = 15.0                                 # 实验 22 注入、两周情景第 8 幕：逾期 15 天，不催就不付
 # 期初应收照抄 finance.opening()：(客户, 台数, 开票几天前)；再加机器人厂这张
