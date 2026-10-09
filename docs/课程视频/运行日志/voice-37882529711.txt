@@ -1,0 +1,400 @@
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:16,350 WARNING synthesis text The hub offers three options. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-09 05:12:16,477 INFO synthesis text The hub offers three options.
+2026-10-09 05:12:18,235 INFO yield speech len 2.92, rtf 0.6022921163741857
+
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:18,410 INFO synthesis text A, do nothing: cash goes negative in week eight.
+2026-10-09 05:12:21,290 INFO yield speech len 5.08, rtf 0.5669352107160673
+
+100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:21,465 INFO synthesis text B, a dunning letter: customers usually pay within three days, the lowest cash in eight weeks is twenty-six,three hundred and seventy-six, and the relationship stays friendly.
+2026-10-09 05:12:28,872 INFO yield speech len 14.48, rtf 0.5115392458373011
+
+100%|██████████| 1/1 [00:07<00:00,  7.58s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.58s/it]
+cv2: 660/720 句，用时 52.7 分钟，预计还要 4.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:29,055 INFO synthesis text C, a credit freeze: dun and stop new shipments, so the next sixteen,five hundred batch is neither shipped nor invoiced.
+2026-10-09 05:12:34,383 INFO yield speech len 10.24, rtf 0.5202676635235548
+
+100%|██████████| 1/1 [00:05<00:00,  5.50s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:34,560 INFO synthesis text For the overdue invoice, C is the same as B; C also delays the next batch's invoice and collection, which the eight-week forecast leaves out because it isn't invoiced yet.
+2026-10-09 05:12:41,799 INFO yield speech len 14.08, rtf 0.5141273479570042
+
+100%|██████████| 1/1 [00:07<00:00,  7.42s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:41,984 INFO synthesis text C adds damage control, at the price of the relationship.
+2026-10-09 05:12:46,053 INFO yield speech len 7.68, rtf 0.5297376774251461
+
+100%|██████████| 1/1 [00:04<00:00,  4.24s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:46,233 INFO synthesis text The hub has two rules: the overdue rule looks only at days and recommends B at fifteen days; the credit-limit rule looks at exposure and recommends C at one hundred and sixty-five percent.
+2026-10-09 05:12:53,550 INFO yield speech len 14.04, rtf 0.5211397793218282
+
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:53,739 INFO synthesis text When they clash, a person weighs them: we dun first and freeze if it's still unpaid before the next batch is invoiced.
+2026-10-09 05:12:58,611 INFO yield speech len 9.16, rtf 0.5319161446333972
+
+100%|██████████| 1/1 [00:05<00:00,  5.05s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:12:58,790 INFO synthesis text Doing nothing isn't free; its price isn't in the margin table but in the cash table: borrow and pay interest, or delay suppliers and hurt your scorecard.
+2026-10-09 05:13:05,278 INFO yield speech len 12.64, rtf 0.5132962631273873
+
+100%|██████████| 1/1 [00:06<00:00,  6.67s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:05,464 INFO synthesis text Still, sometimes it's better not to chase: a reliable customer with plenty of orders in a short rough patch, or a small sum where chasing could lose a big order.
+2026-10-09 05:13:11,525 INFO yield speech len 11.88, rtf 0.5102325970877701
+
+100%|██████████| 1/1 [00:06<00:00,  6.24s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:11,713 INFO synthesis text Then phone, find out what's going on, agree a payment date and put it in the forecast.
+2026-10-09 05:13:15,719 INFO yield speech len 7.68, rtf 0.5215871458252271
+
+100%|██████████| 1/1 [00:04<00:00,  4.18s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:15,773 WARNING synthesis text Weigh money and the relationship together. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-09 05:13:15,900 INFO synthesis text Weigh money and the relationship together.
+2026-10-09 05:13:17,414 INFO yield speech len 2.44, rtf 0.6206757709628246
+
+100%|██████████| 1/1 [00:01<00:00,  1.68s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:17,461 WARNING synthesis text In the digital factory. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-09 05:13:17,588 INFO synthesis text In the digital factory.
+2026-10-09 05:13:19,370 INFO yield speech len 2.8, rtf 0.6364153112683978
+
+100%|██████████| 1/1 [00:01<00:00,  1.95s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.95s/it]
+cv2: 670/720 句，用时 53.6 分钟，预计还要 4.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:19,543 INFO synthesis text After class, do Lab twenty-two on the digital factory's Business and finance page.
+2026-10-09 05:13:23,544 INFO yield speech len 7.52, rtf 0.5319830902079319
+
+100%|██████████| 1/1 [00:04<00:00,  4.17s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:23,723 INFO synthesis text First find the missed objectives in the objective tree; then open the order your instructor names and calculate its margin from the breakdown.
+2026-10-09 05:13:29,372 INFO yield speech len 10.6, rtf 0.5329035812953733
+
+100%|██████████| 1/1 [00:05<00:00,  5.82s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:29,560 INFO synthesis text The instructor injects a thirteen,two hundred-dollar Harbor Crane invoice, fifteen days overdue and unpaid unless chased.
+2026-10-09 05:13:34,764 INFO yield speech len 9.96, rtf 0.5225367814182756
+
+100%|██████████| 1/1 [00:05<00:00,  5.38s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:34,946 INFO synthesis text Compare dunning, a freeze and doing nothing in the command centre and give reasons; the hub's advice stays hidden until you submit.
+2026-10-09 05:13:40,090 INFO yield speech len 10.16, rtf 0.5062427342407346
+
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:40,382 INFO synthesis text Then raise the dunning, the instructor approves, and a few minutes later the customer pays.
+2026-10-09 05:13:44,202 INFO yield speech len 7.08, rtf 0.5395699355561855
+
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:44,378 INFO synthesis text Finally compute DSO and find the tightest week.
+2026-10-09 05:13:46,743 INFO yield speech len 4.24, rtf 0.5576608315953668
+
+100%|██████████| 1/1 [00:02<00:00,  2.54s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:46,920 INFO synthesis text In teaching mode a payment day lasts two minutes, so you see invoices fall overdue and get paid within one class.
+2026-10-09 05:13:52,675 INFO yield speech len 11.28, rtf 0.5102597441233642
+
+100%|██████████| 1/1 [00:05<00:00,  5.93s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:52,731 WARNING synthesis text Why does the robot plant pay late too? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-09 05:13:52,858 INFO synthesis text Why does the robot plant pay late too?
+2026-10-09 05:13:55,061 INFO yield speech len 3.92, rtf 0.5620604875136395
+
+100%|██████████| 1/1 [00:02<00:00,  2.38s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:13:55,245 INFO synthesis text It sells collaborative robots to integrators, who build cells for end users, usually paid by milestones.
+2026-10-09 05:14:00,738 INFO yield speech len 10.76, rtf 0.5105213161737946
+
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:00,922 INFO synthesis text Take a one hundred and twenty,zero-dollar cell, an illustrative figure: thirty percent on signing, sixty percent after site acceptance, and a ten percent retention a year later.
+2026-10-09 05:14:08,294 INFO yield speech len 14.2, rtf 0.5191561034027959
+
+100%|██████████| 1/1 [00:07<00:00,  7.55s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.55s/it]
+cv2: 680/720 句，用时 54.4 分钟，预计还要 3.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:08,539 INFO synthesis text If acceptance slips two months, seventy-two,zero arrives two months late; the integrator pays the robot plant late, and the robot plant pays us late.
+2026-10-09 05:14:15,124 INFO yield speech len 12.6, rtf 0.5226716162666442
+
+100%|██████████| 1/1 [00:06<00:00,  6.82s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:15,308 INFO synthesis text So the robot plant's credit limit should reflect how its own customers pay.
+2026-10-09 05:14:18,188 INFO yield speech len 5.2, rtf 0.5538575924359835
+
+100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:18,360 INFO synthesis text We can also negotiate a down payment, or deliver and invoice in batches.
+2026-10-09 05:14:22,379 INFO yield speech len 7.36, rtf 0.5460833077845366
+
+100%|██████████| 1/1 [00:04<00:00,  4.19s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:22,556 INFO synthesis text An everyday example: a shop that lets regulars buy on credit.
+2026-10-09 05:14:25,299 INFO yield speech len 5.2, rtf 0.5273968898333036
+
+100%|██████████| 1/1 [00:02<00:00,  2.91s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:25,475 INFO synthesis text It sells three,zero a month at a thirty percent margin with six hundred of rent and wages: three hundred a month on paper.
+2026-10-09 05:14:30,727 INFO yield speech len 10.32, rtf 0.508872483127801
+
+100%|██████████| 1/1 [00:05<00:00,  5.43s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:30,912 INFO synthesis text But half goes on credit, repaid two months later, while stock is paid in cash, and the shop opened with only one,zero.
+2026-10-09 05:14:36,538 INFO yield speech len 10.72, rtf 0.524804329694207
+
+100%|██████████| 1/1 [00:05<00:00,  5.80s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:36,715 INFO synthesis text Cash is negative in month one and one,four hundred short in month two: borrow or run out of stock.
+2026-10-09 05:14:42,018 INFO yield speech len 10.48, rtf 0.5060356309395709
+
+100%|██████████| 1/1 [00:05<00:00,  5.47s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:42,071 WARNING synthesis text The same problem as today's plant. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-09 05:14:42,198 INFO synthesis text The same problem as today's plant.
+2026-10-09 05:14:43,805 INFO yield speech len 2.64, rtf 0.6088030157667218
+
+100%|██████████| 1/1 [00:01<00:00,  1.77s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:43,978 INFO synthesis text The order made eight,four hundred and thirteen, twenty-five.five percent, just on target; it fell short of standard mainly through overtime, grinder re-setting and scrap.
+2026-10-09 05:14:50,882 INFO yield speech len 13.28, rtf 0.5198530763028616
+
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:51,066 INFO synthesis text DSO is eighty-one.four days, far above target.
+2026-10-09 05:14:53,844 INFO yield speech len 5.08, rtf 0.5467801112828292
+
+100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+cv2: 690/720 句，用时 55.1 分钟，预计还要 2.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:54,023 INFO synthesis text Doing nothing, cash reaches minus six,six hundred and twenty-four in week eight.
+2026-10-09 05:14:57,293 INFO yield speech len 6.32, rtf 0.5172786456120165
+
+100%|██████████| 1/1 [00:03<00:00,  3.44s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:14:57,471 INFO synthesis text Send the dunning letter now: the money returns in about three days, the lowest cash in eight weeks is twenty-six,three hundred and seventy-six, and DSO falls to thirty-eight.six.
+2026-10-09 05:15:06,137 INFO yield speech len 16.6, rtf 0.5220645307058311
+
+100%|██████████| 1/1 [00:08<00:00,  8.85s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:06,326 INFO synthesis text Only fifteen days overdue, so the overdue rule says dun; at one hundred and sixty-five percent exposure the credit-limit rule says freeze.
+2026-10-09 05:15:12,239 INFO yield speech len 11.36, rtf 0.520575676165836
+
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:12,418 INFO synthesis text Weighing them, dun first; if it's still unpaid when the next batch is invoiced, or past thirty days, ask the plant manager to freeze.
+2026-10-09 05:15:17,755 INFO yield speech len 10.64, rtf 0.5016209711705831
+
+100%|██████████| 1/1 [00:05<00:00,  5.51s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.51s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:17,937 INFO synthesis text Next time, negotiate a down payment or batch invoicing, and price overtime and dearer suppliers into the quote.
+2026-10-09 05:15:23,300 INFO yield speech len 10.64, rtf 0.5040078234851808
+
+100%|██████████| 1/1 [00:05<00:00,  5.54s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:23,481 INFO synthesis text Now Virtual lab ten-one. On the WenQuest platform you can do it yourself. The numbers in the results panel are blurred here; reading them is your job.
+2026-10-09 05:15:30,708 INFO yield speech len 14.32, rtf 0.5046663837059916
+
+100%|██████████| 1/1 [00:07<00:00,  7.41s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:30,899 INFO synthesis text First press robot plant order and read the margin and its percentage. Check them line by line against Table ten-two.
+2026-10-09 05:15:36,819 INFO yield speech len 11.16, rtf 0.5304194693069731
+
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:36,997 INFO synthesis text Then press standard cost and see how many points the unplanned money took off.
+2026-10-09 05:15:39,835 INFO yield speech len 5.36, rtf 0.5294851402738201
+
+100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:40,013 INFO synthesis text Back on the robot plant order, drag overtime from zero to forty-eight hours and watch the margin bar shrink.
+2026-10-09 05:15:45,439 INFO yield speech len 10.4, rtf 0.5217848603542035
+
+100%|██████████| 1/1 [00:05<00:00,  5.60s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:45,620 INFO synthesis text Then drag the band saw's idling from zero to seventy-two hours: the margin hardly moves. Judge money by the numbers.
+2026-10-09 05:15:50,763 INFO yield speech len 10.16, rtf 0.5062842932273084
+
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+cv2: 700/720 句，用时 56.1 分钟，预计还要 1.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:50,951 INFO synthesis text Finally press Play and watch the revenue being cut block by block, leaving the margin.
+2026-10-09 05:15:55,055 INFO yield speech len 7.76, rtf 0.5288352364117337
+
+100%|██████████| 1/1 [00:04<00:00,  4.28s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:15:55,242 INFO synthesis text Virtual lab ten-two: cash over the next eight weeks. Press do nothing and find the lowest week, and the weeks cash falls below the safety line and below zero.
+2026-10-09 05:16:02,110 INFO yield speech len 13.0, rtf 0.5283232285426214
+
+100%|██████████| 1/1 [00:07<00:00,  7.05s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:02,162 WARNING synthesis text Then press dun: the whole curve lifts. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-09 05:16:02,291 INFO synthesis text Then press dun: the whole curve lifts.
+2026-10-09 05:16:04,667 INFO yield speech len 4.04, rtf 0.5880875752703978
+
+100%|██████████| 1/1 [00:02<00:00,  2.55s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:04,842 INFO synthesis text Press freeze credit: cash is the same as dunning. Read the note below to see what differs.
+2026-10-09 05:16:08,951 INFO yield speech len 7.88, rtf 0.5215141978965798
+
+100%|██████████| 1/1 [00:04<00:00,  4.29s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:09,134 INFO synthesis text Drag the payment day from day three all the way to day sixty and watch the curve sink section by section.
+2026-10-09 05:16:13,914 INFO yield speech len 9.2, rtf 0.5196166815965072
+
+100%|██████████| 1/1 [00:04<00:00,  4.95s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:14,095 INFO synthesis text Drag the days overdue past thirty and watch the ageing band and the hub's recommendation change.
+2026-10-09 05:16:18,322 INFO yield speech len 7.88, rtf 0.5363860408666775
+
+100%|██████████| 1/1 [00:04<00:00,  4.40s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:18,505 INFO synthesis text Finally press Play to draw the cash week by week. I won't give the answers here; they're yours to find. Both labs come with a guide and a report template on the platform.
+2026-10-09 05:16:25,409 INFO yield speech len 13.08, rtf 0.5278509326666503
+
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:25,597 INFO synthesis text After class you'll do Lab twenty-two in the WenQuest digital factory. First find the missed objectives in the objective tree, then open the order your instructor names and calculate its margin from the breakdown.
+2026-10-09 05:16:33,250 INFO yield speech len 14.6, rtf 0.5241881331352338
+
+100%|██████████| 1/1 [00:07<00:00,  7.83s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:33,434 INFO synthesis text The instructor injects an unpaid overdue invoice. Compare dunning, a credit freeze and doing nothing in the command centre, choose one and give reasons. Until you submit, the factory hub's recommendation stays hidden.
+2026-10-09 05:16:43,521 INFO yield speech len 19.24, rtf 0.5242953181514621
+
+100%|██████████| 1/1 [00:10<00:00, 10.27s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:43,759 INFO synthesis text Then raise the dunning, the instructor approves it, and a few minutes later the customer pays and the invoice turns paid. Finally compute DSO and find the tightest week.
+2026-10-09 05:16:51,558 INFO yield speech len 14.84, rtf 0.5255653209120759
+
+100%|██████████| 1/1 [00:08<00:00,  8.02s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.02s/it]
+cv2: 710/720 句，用时 57.1 分钟，预计还要 0.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:16:51,744 INFO synthesis text The assignment has three tasks. One, calculation: if the robot plant demands a five percent price cut, does the margin still meet target? If overtime goes from twelve to twenty-four hours, what's the margin, and what's the lowest price that holds twenty-five percent?
+2026-10-09 05:17:01,598 INFO yield speech len 18.88, rtf 0.5219562200166412
+
+100%|██████████| 1/1 [00:10<00:00, 10.04s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:01,790 INFO synthesis text Two, cash: compute a DSO; then suppose the robot plant pays unchased but only on day fifty, forecast eight weeks of cash and find the tightest week.
+2026-10-09 05:17:08,465 INFO yield speech len 13.0, rtf 0.5134221223684458
+
+100%|██████████| 1/1 [00:06<00:00,  6.85s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:08,655 INFO synthesis text Three, the Lab twenty-two report, focusing on how you compared the options, and answering: why can a profitable factory go bankrupt?
+2026-10-09 05:17:14,506 INFO yield speech len 11.16, rtf 0.5242891850010041
+
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:14,692 INFO synthesis text There's also a ten-question quiz. For example: receivables of forty-five,zero and twenty-seven,zero invoiced in the last thirty days. What's the DSO?
+2026-10-09 05:17:21,510 INFO yield speech len 12.84, rtf 0.5310019600057156
+
+100%|██████████| 1/1 [00:06<00:00,  6.99s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:21,690 INFO synthesis text If an order's margin meets the target, can the plant still run out of cash?
+2026-10-09 05:17:25,256 INFO yield speech len 6.8, rtf 0.5243939511916217
+
+100%|██████████| 1/1 [00:03<00:00,  3.73s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:25,430 INFO synthesis text One: break down the margin, revenue minus material, labour, energy and unplanned costs, to see where the money went; price goes to sales, material to purchasing, hours to process engineering.
+2026-10-09 05:17:34,690 INFO yield speech len 18.04, rtf 0.5133241745426491
+
+100%|██████████| 1/1 [00:09<00:00,  9.44s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:34,879 INFO synthesis text Two: read receivables by ageing and DSO, forecast cash week by week, and watch the lowest week.
+2026-10-09 05:17:39,709 INFO yield speech len 9.16, rtf 0.5272413185069654
+
+100%|██████████| 1/1 [00:05<00:00,  5.01s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:39,895 INFO synthesis text Three: an overdue invoice is judged by days, dunning first within thirty; an over-limit customer gets a freeze, and when the two disagree a person weighs them; making money is not having money.
+2026-10-09 05:17:49,629 INFO yield speech len 18.68, rtf 0.5210900970393636
+
+100%|██████████| 1/1 [00:09<00:00,  9.92s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:49,825 INFO synthesis text After class: Assignment ten, Quiz ten and the Lab twenty-two report.
+2026-10-09 05:17:53,189 INFO yield speech len 6.16, rtf 0.5461104891516946
+
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-09 05:17:53,364 INFO synthesis text Next time it's AI agents and decisions, and whether to trust an AI that explains why an order earned less than standard. See you then.
+2026-10-09 05:17:59,560 INFO yield speech len 11.68, rtf 0.5304632325694986
+
+100%|██████████| 1/1 [00:06<00:00,  6.37s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.37s/it]
+cv2: 720/720 句，用时 58.2 分钟，预计还要 0.0 分钟
+cv2: 720 句完成
+2026-10-09 05:17:59,721 DEBUG Attempting to acquire lock 131046846663744 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-09 05:17:59,721 DEBUG Lock 131046846663744 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-09 05:17:59,721 DEBUG Attempting to release lock 131046846663744 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-09 05:17:59,721 DEBUG Lock 131046846663744 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-09 05:17:59,723 DEBUG Attempting to acquire lock 131046846663504 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-09 05:17:59,723 DEBUG Lock 131046846663504 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-09 05:17:59,723 DEBUG Attempting to release lock 131046846663504 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-09 05:17:59,723 DEBUG Lock 131046846663504 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 69 分钟
