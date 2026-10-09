@@ -2,7 +2,7 @@
 
 > 第 30 轮 H-4。做法照那边（freecad-ai-parts，ADR-0065）：`tools/help_videos.py` 用浏览器自动化在演示厂（本地版、教学模式）里操作并录制，
 > 字幕叠在画面上，**不配音**。每段 30–90 秒，1280×720。
-> **本文件用完请移出 `help/teach/`**（理由见 `_anchors.md` 开头）。
+> 本文件原在 `web/src/help/teach/`，第 30 轮第 4 步已挪到这里（理由见 `_anchors.md` 开头）。`teach-publish` 已从 videos.json 删掉。
 
 ## 一、清单（videos.json 教学版部分）
 

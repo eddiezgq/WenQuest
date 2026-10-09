@@ -3,12 +3,12 @@
   <div class="page">
     <div class="page-title"><h1>情景导演</h1>
       <span class="muted">{{ st?.scenario?.name || '两周情景' }} · 一张急单串起七个领域</span>
-      <span class="r small"><router-link to="/help/两周情景">怎么用</router-link> · <router-link to="/help/学校版演示脚本">学校版演示脚本</router-link> · <router-link to="/help/企业版演示脚本">企业版演示脚本</router-link> · <router-link to="/help/演示前检查表">检查表</router-link></span></div>
+      <span class="r small"><router-link to="/help/teach/director">怎么用</router-link> · <router-link to="/help/docs/学校版演示脚本">学校版演示脚本</router-link> · <router-link to="/help/docs/企业版演示脚本">企业版演示脚本</router-link> · <router-link to="/help/docs/演示前检查表">检查表</router-link></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="!isTeacher" class="card empty">情景导演只给老师（教学模式）。学生在“实验与任务 → 实验 23”里跟着情景做决定。</div>
 
     <template v-if="isTeacher && st">
-      <section class="card dbar">
+      <section class="card dbar" data-help="dir-bar">
         <div class="ctl">
           <label class="small">倍速 <select v-model.number="speed" aria-label="车间倍速"><option v-for="x in [10, 20, 30, 60, 120]" :key="x" :value="x">{{ x }}×</option></select></label>
           <label class="small" title="停机挂牌整改、保养到了预计时长还没人收尾，由“情景里的人”整改验收、保养完工，设备解锁。课堂上要学生自己收尾就关掉"><input v-model="wrapup" type="checkbox"> 自动收尾</label>
@@ -35,7 +35,7 @@
         <p v-if="run?.wrap_log?.length" class="small muted">自动收尾：{{ run.wrap_log.join('；') }}</p>
       </section>
 
-      <ol class="timeline">
+      <ol class="timeline" data-help="dir-timeline">
         <li v-for="b in st.beats" :key="b.n" class="card beat" :class="[b.status, { cur: run && b.n === run.beat_no }]">
           <div class="bh">
             <span class="no">第 {{ b.n }} 幕</span><span class="day small muted">第 {{ b.day }} 天</span>
@@ -86,7 +86,7 @@
         <details v-if="rv.report"><summary>两周的周报（{{ rv.report.at.slice(0, 16).replace('T', ' ') }}）</summary><pre class="rep">{{ rv.report.text }}</pre></details>
       </section>
 
-      <TeacherConsole />
+      <TeacherConsole data-help="dir-console" />
     </template>
   </div>
 </template>

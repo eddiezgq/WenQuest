@@ -1,0 +1,474 @@
+{
+  "planner-order": {
+    "title": "接一张订单并算料",
+    "path": "/work/planner",
+    "steps": [
+      {
+        "help": "planner-neworder",
+        "text": "订单从这里开始：计划员在“新建订单”里填客户、产品、数量和交期。"
+      },
+      {
+        "help": "planner-customer",
+        "text": "选客户。客户来自 ERPNext（企业工厂是工厂清单里登记的客户）。"
+      },
+      {
+        "help": "planner-qty",
+        "text": "填数量和交期。交期决定了工单最晚什么时候要开工。"
+      },
+      {
+        "help": "planner-calc",
+        "text": "点“算料”：系统按 BOM 展开，扣掉库存、在途和其他订单的占用，算出要请购什么、要下哪些工单。这一步不写任何东西。"
+      },
+      {
+        "help": "planner-proposals",
+        "text": "看清楚后提交，会在这里生成一条“提议”。提议要人确认，确认后才写进 ERPNext：AI 和系统都只起草，不替你做决定。"
+      }
+    ]
+  },
+  "open-3d": {
+    "title": "看 3D 车间",
+    "path": "/3d",
+    "steps": [
+      {
+        "help": "3d-scene",
+        "text": "这是车间的实时三维画面：设备位置、尺寸都来自工厂清单，顶上的灯是设备状态，物流小车按总线消息移动。拖动旋转、滚轮缩放。"
+      },
+      {
+        "help": "3d-legend",
+        "text": "灯的颜色：绿色运行、灰色空闲、黄色换型、红色停机。点一台设备，右边会显示它正在做的工单和刀具寿命。"
+      }
+    ]
+  },
+  "home-tour": {
+    "title": "看懂首页",
+    "path": "/",
+    "steps": [
+      {
+        "help": "home-brief",
+        "text": "AI 今日简报：现在最该关注的三四件事，每条下面写着数据来源。教学模式下只提示方向。"
+      },
+      {
+        "help": "home-kpis",
+        "text": "关键指标：准时交付率、在制品、设备综合效率（OEE）、一次合格率等；彩色小字说明离目标多远。"
+      },
+      {
+        "help": "home-shop",
+        "text": "车间实况：每台设备此刻的状态，绿色运行、灰色空闲、黄色调整、红色停机；“瓶颈”是本周负荷最满的设备。"
+      },
+      {
+        "help": "home-orders",
+        "text": "订单与交期：在手订单按交期排，标签是系统预测的延期风险。"
+      },
+      {
+        "help": "home-quality",
+        "text": "质量：关键尺寸的控制图，红虚线是公差上下限，点越靠近红线越要注意。"
+      }
+    ]
+  },
+  "planner-release": {
+    "title": "把工单下达车间",
+    "path": "/work/planner",
+    "steps": [
+      {
+        "help": "planner-proposals",
+        "text": "先确认订单提议：确认后 ERPNext 里才有销售订单和工单。"
+      },
+      {
+        "help": "planner-wos",
+        "text": "工单表里点“下达车间”：工单按工艺路线逐道派给设备，操作工在车间终端就能看到要做的工序。"
+      }
+    ]
+  },
+  "operator-start": {
+    "title": "在车间终端开工",
+    "path": "/work/operator",
+    "steps": [
+      {
+        "help": "op-units",
+        "text": "先选你的工位。圆点颜色是设备此刻的状态。"
+      },
+      {
+        "help": "op-now",
+        "text": "这里是设备正在做的：工单、工序、零件序列号、完成件数、主轴转速、待加工件数。"
+      },
+      {
+        "help": "op-jobs",
+        "text": "派到本工位的工序在这里。点“开工”设备才开始加工；没有派工就没有“开工”按钮，要先由计划员下达工单。设备停机时上面会出现红框，处理完点“复位”。"
+      }
+    ]
+  },
+  "quality-chart": {
+    "title": "看控制图、开质量异常单",
+    "path": "/work/quality",
+    "steps": [
+      {
+        "help": "q-chart",
+        "text": "控制图：每个点是一件零件的测量值。连续上升、靠近公差线，都是要处理的信号。"
+      },
+      {
+        "help": "q-8d",
+        "text": "发现异常就为这个特性开一张质量异常单（8D），按 D1–D8 填写，D5 选纠正措施。"
+      }
+    ]
+  },
+  "process-plan": {
+    "title": "提交工艺规程给 AI 评审",
+    "path": "/process",
+    "steps": [
+      {
+        "help": "pp-reference",
+        "text": "先看参照工艺规程：格式、工序、切削用量都在里面，照着改。"
+      },
+      {
+        "help": "pp-upload",
+        "text": "改好上传。AI 先做预检（定位误差、夹紧力、工时等），再由技术负责人批注、批准。"
+      }
+    ]
+  },
+  "ont-anomaly": {
+    "title": "在厂情中枢追一个异常",
+    "path": "/ont",
+    "query": {
+      "view": "anomalies"
+    },
+    "steps": [
+      {
+        "help": "ont-tabs",
+        "text": "厂情中枢有全厂态势、异常处理、推演工作台、动作收件箱、日报与周报。现在在“异常处理”。"
+      },
+      {
+        "help": "ont-list",
+        "text": "左边是开着的异常，按领域筛选。选一个。"
+      },
+      {
+        "help": "ont-chain",
+        "text": "中间是它的因果链：往前是原因，往后是影响。点一条连线看依据（哪条消息、哪个数）。"
+      },
+      {
+        "help": "ont-actions",
+        "text": "右边处理：确认、开始处理，或者先去推演工作台比较几种处理办法，再起草动作。"
+      }
+    ]
+  },
+  "teacher-console": {
+    "title": "教师控制台",
+    "path": "/director",
+    "steps": [
+      {
+        "help": "dir-console",
+        "text": "教师控制台在情景导演页最下面：仿真倍速、注入一次故障、车间班次、重置实验 7 情景。勾“同时清空学生得分”才清分。"
+      }
+    ]
+  },
+  "ai-model": {
+    "title": "选 AI 模型",
+    "path": "/ont/ai",
+    "steps": [
+      {
+        "help": "ai-model",
+        "text": "“自动”时国内部署用 DeepSeek、其他地方用 Claude；也可以固定用一家。没配密钥的那家会标出来。国内部署只用 DeepSeek，出错也不换 Claude；国外部署一家出错自动换另一家。这里显示上次实际用的是哪家。只有厂长或老师能改。"
+      }
+    ]
+  },
+  "engineer-design": {
+    "title": "在线设计并发布新版本",
+    "path": "/work/engineer",
+    "steps": [
+      {
+        "help": "eng-design",
+        "text": "在线设计：改输出轴的轴段直径与长度、倒角、圆角、键槽，右边三维模型马上跟着变，下面是校核结果。"
+      },
+      {
+        "help": "eng-publish",
+        "text": "填改动说明，点“发布新版本”。校核没通过时按钮是灰的，看红字。生产模式这里是“提交审批”。"
+      },
+      {
+        "help": "eng-versions",
+        "text": "发布后这里多一个版本：STEP、零件图、键槽 G 代码，ERPNext 里的设计版本加一。"
+      },
+      {
+        "help": "eng-cad",
+        "text": "想用真 CAD：下载“我的 CAD 宏包”，在 FreeCAD 1.1 或 SolidWorks 里执行发布宏，效果相同。"
+      }
+    ]
+  },
+  "ont-situation": {
+    "title": "看全厂态势",
+    "path": "/ont",
+    "steps": [
+      {
+        "help": "ont-tabs",
+        "text": "厂情中枢的各个地方：全厂态势、异常处理、推演工作台、动作收件箱、全貌地图、规则目录、日报周报、AI 运行记录。"
+      },
+      {
+        "help": "ont-timebar",
+        "text": "时间栏：可以回看过去 7 天的任一时刻；回看时点“从这里推演”，试“如果当时那样做”。"
+      },
+      {
+        "help": "ont-cards",
+        "text": "每个领域一块卡片：关键指标、近 7 天小折线、开着的异常数（红严重、黄警告、蓝提示）。点卡片只看这个领域的异常。"
+      }
+    ]
+  },
+  "ont-options": {
+    "title": "比较处理方案",
+    "path": "/ont",
+    "query": {
+      "view": "anomalies"
+    },
+    "steps": [
+      {
+        "help": "ont-list",
+        "text": "先在左边选一个异常。"
+      },
+      {
+        "help": "ont-chain",
+        "text": "中间是因果链：原因在上，影响在下。点一条边看依据。"
+      },
+      {
+        "help": "ont-options",
+        "text": "推演与建议：每个方案的预计交期、多花的钱。第一个标“建议”。比对模式下，提交自己的选择之前不显示建议。看好了点“采纳，生成动作”。"
+      }
+    ]
+  },
+  "ont-inbox": {
+    "title": "动作收件箱",
+    "path": "/ont/actions",
+    "steps": [
+      {
+        "help": "act-boxes",
+        "text": "待我批准、我发起的、全部。"
+      },
+      {
+        "help": "act-rules",
+        "text": "谁能批：花钱的动作要厂长批；不能批自己发起的。"
+      },
+      {
+        "help": "act-list",
+        "text": "每个动作有试运行结果（和“不处理”对比）。“批准并执行”以后，执行器发给车间、改班次表或在 ERPNext 建单据；情况变了先“用最新快照重新试运行”。"
+      }
+    ]
+  },
+  "service-tour": {
+    "title": "登记一条投诉",
+    "path": "/service",
+    "query": {
+      "tab": "complaints"
+    },
+    "steps": [
+      {
+        "help": "svc-kpis",
+        "text": "上方五个数：满意度、开着的投诉、待上门的服务、保修成本、漏斗金额。"
+      },
+      {
+        "help": "svc-tabs",
+        "text": "五个标签：销售漏斗、投诉、服务与排班、回访与满意度、客户 360。"
+      },
+      {
+        "help": "svc-complaint",
+        "text": "填设备序列号（会带出客户）、现象、严重度，点“登记”，同时在 ERPNext 开投诉单。20 秒内厂情中枢开异常。要用“售后”角色。"
+      }
+    ]
+  },
+  "supply-inspect": {
+    "title": "检验一批来料",
+    "path": "/supply",
+    "query": {
+      "tab": "inspect"
+    },
+    "steps": [
+      {
+        "help": "sup-kpis",
+        "text": "上方：在途、到货待检、不合格待处理、准时率 / 合格率、供应商模拟器。"
+      },
+      {
+        "help": "sup-tabs",
+        "text": "四个标签：采购单与在途、到货与检验、批次、供应商。"
+      },
+      {
+        "help": "sup-inspect",
+        "text": "到货待检的批次点“检验”，看抽样数据，逐件对照上下限，判合格或不合格。任何一件、任何一项超差，整批不合格。"
+      }
+    ]
+  },
+  "finance-tour": {
+    "title": "看经营与财务",
+    "path": "/finance",
+    "steps": [
+      {
+        "help": "fin-kpis",
+        "text": "上方五个数：毛利率、应收与逾期、应收周转天数、现金、本月预算已用。"
+      },
+      {
+        "help": "fin-tabs",
+        "text": "经营目标、订单毛利、应收应付、预算、生产与成本。"
+      },
+      {
+        "help": "fin-objectives",
+        "text": "经营目标的指标树：每个目标挂一个指标，数取自各领域的态势卡。绿达标、黄差一点、红偏离。"
+      }
+    ]
+  },
+  "finance-production": {
+    "title": "看生产与成本",
+    "path": "/finance",
+    "query": {
+      "tab": "production"
+    },
+    "steps": [
+      {
+        "help": "fin-tabs",
+        "text": "生产与成本原来是一个独立页面，现在是“经营与财务”的一个标签。"
+      },
+      {
+        "help": "fin-production",
+        "text": "各设备今日 OEE、本月交付、工单成本分解：差异来自调整、换刀、超时。"
+      }
+    ]
+  },
+  "maint-tour": {
+    "title": "看设备台账",
+    "path": "/maint",
+    "steps": [
+      {
+        "help": "maint-kpis",
+        "text": "上方：保养逾期的设备、开着的维修单、近 7 天故障停机、平均故障间隔、点检异常待处理。"
+      },
+      {
+        "help": "maint-tabs",
+        "text": "四个标签：设备台账、保养、点检、维修与备件。"
+      },
+      {
+        "help": "maint-assets",
+        "text": "每台设备：自上次保养运行了多少小时、保养周期、未来一段运行时间内坏的概率、预期损失。点“详情”看失效率曲线。"
+      }
+    ]
+  },
+  "maint-pm": {
+    "title": "保养单与验收解锁",
+    "path": "/maint",
+    "query": {
+      "tab": "pm"
+    },
+    "steps": [
+      {
+        "help": "maint-tabs",
+        "text": "保养在厂情中枢里排：保养逾期、故障风险高的异常，采纳“现在保养”或“下班后保养”，厂长批准后生成保养单。"
+      },
+      {
+        "help": "maint-pm",
+        "text": "到时间设备挂牌上锁停下。维修工做完点“保养完成”，另一个人点“验收解锁”，设备恢复。"
+      }
+    ]
+  },
+  "people-tour": {
+    "title": "看排班",
+    "path": "/people",
+    "steps": [
+      {
+        "help": "people-kpis",
+        "text": "上方：这一班出勤率、排班缺口、单点依赖的设备、本周加班、车间“要有人”开没开。"
+      },
+      {
+        "help": "people-tabs",
+        "text": "组织与员工、技能矩阵、排班、出勤与加班。"
+      },
+      {
+        "help": "people-roster",
+        "text": "每一格是这一班谁开这台设备。红：没人能开；黄：学徒带着开。点格子可以换人，生成调班动作。"
+      }
+    ]
+  },
+  "ehs-tour": {
+    "title": "报一条隐患",
+    "path": "/ehs",
+    "steps": [
+      {
+        "help": "ehs-kpis",
+        "text": "上方：开着的隐患（重大、逾期）、整改按期率、挂牌上锁的设备、培训到期、未遂。"
+      },
+      {
+        "help": "ehs-tabs",
+        "text": "隐患、作业许可、事故与未遂、培训与资质、化学品与废弃物。"
+      },
+      {
+        "help": "ehs-report",
+        "text": "随手拍：选设备、种类、等级，写一句话，拍照，提交。谁都能报。重大隐患在厂情中枢报“重大隐患未关闭”。"
+      }
+    ]
+  },
+  "energy-tour": {
+    "title": "找空转最多的设备",
+    "path": "/energy",
+    "steps": [
+      {
+        "help": "energy-kpis",
+        "text": "上方：用电、电费、峰时占比、空转电量、碳排放、需量。"
+      },
+      {
+        "help": "energy-curve",
+        "text": "车间总表：每 15 分钟的平均功率，红峰、黄平、蓝谷；虚线是合同需量。"
+      },
+      {
+        "help": "energy-units",
+        "text": "每台设备的电量条，灰色是空转。灰色多的设备，可以考虑自动待机。"
+      }
+    ]
+  },
+  "labs-tour": {
+    "title": "打开实验与任务",
+    "path": "/labs",
+    "steps": [
+      {
+        "help": "labs-grid",
+        "text": "实验 7、15–23 每个一张卡片：领域、学时、任务数、自动评的得分和报告分、做到第几个任务。点卡片进实验页，“指导书”直接下载。"
+      }
+    ]
+  },
+  "lab-page": {
+    "title": "看一个实验页",
+    "path": "/lab15",
+    "steps": [
+      {
+        "help": "lab-links",
+        "text": "先下载指导书和报告模板。"
+      },
+      {
+        "help": "lab-sum",
+        "text": "你的得分；黄色标签表示还在比对模式：提交选择之前，指挥台和 AI 不显示建议。"
+      },
+      {
+        "help": "lab-task",
+        "text": "任务一个一个做：读说明和提示，填表提交，马上给分和反馈。"
+      }
+    ]
+  },
+  "director-tour": {
+    "title": "情景导演",
+    "path": "/director",
+    "steps": [
+      {
+        "help": "dir-bar",
+        "text": "选倍速、要不要自动收尾，点“开始两周情景”；之后点“下一幕”。还有快进到订单做完、自动演示、复盘。"
+      },
+      {
+        "help": "dir-timeline",
+        "text": "八幕的时间线：每一幕的旁白、讲解要点、去看的页面、谁处理；厂情中枢报出异常后打勾。"
+      },
+      {
+        "help": "dir-console",
+        "text": "页面最下面是教师控制台：倍速、注入故障、车间班次、重置实验 7 情景。"
+      }
+    ]
+  },
+  "cost-tour": {
+    "title": "看生产成本",
+    "path": "/cost",
+    "steps": [
+      {
+        "help": "cost-production",
+        "text": "各设备今日的设备综合效率（OEE）、本月交付、工单成本分解：差异来自调整、换刀、超时；成本按工厂清单里各工作站的每小时费率算。"
+      }
+    ]
+  }
+}

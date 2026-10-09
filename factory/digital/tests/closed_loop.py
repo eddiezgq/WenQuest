@@ -27,6 +27,8 @@ P.add_argument("--erp-key", default="")
 P.add_argument("--erp-secret", default="")
 P.add_argument("--diag", default="", help="出错时把 ERPNext 错误日志写到这个文件（CI 用）")
 P.add_argument("--only", default="", help="只跑某一段（本地调试用）：story = 第 20 段全厂联调情景")
+P.add_argument("--upto", type=int, default=0, help="只跑前几段（本地版 CI 跑 1–3 段：--upto 3）")
+P.add_argument("--teacher-password", default="", help="本地版（WQ_EDITION=local）当老师要的密码：factory/digital/.env 的 WQ_TEACHER_PASSWORD")
 A = P.parse_args()
 
 FAILS = []
@@ -102,7 +104,10 @@ def check(cond, what):
 
 
 def login(name, role):
-    return hub("POST", "/api/login", {"name": name, "role": role, "mode": "teach"})["token"]
+    body = {"name": name, "role": role, "mode": "teach"}
+    if A.teacher_password:            # 本地版：带老师密码，和服务器演练一样人人是老师（第 30 轮 H-5）
+        body["teacher_password"] = A.teacher_password
+    return hub("POST", "/api/login", body)["token"]
 
 
 def wait(fn, what, timeout=None, every=2):
@@ -165,6 +170,8 @@ def main():
     st = hub("GET", "/api/teach", token=planner)
     check(st["tasks"][1]["score"] == 20, "任务 2 满分（{}）".format(st["tasks"][1]["score"]))
 
+    if A.upto and A.upto < 4:
+        return finish(mgr)
     print("4. 任务 3：工艺员发布新版设计（模拟 FreeCAD 宏）")
     sys.path[:0] = [__file__.rsplit("/tests/", 1)[0] + "/freecad"]
     import wq_publish  # noqa: E402

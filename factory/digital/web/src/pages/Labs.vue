@@ -3,10 +3,10 @@
   <div class="page">
     <div class="page-title"><h1>实验与任务</h1>
       <span class="muted">每个实验平台自动评一部分分数，报告由老师在课程里批改</span>
-      <span class="r small"><router-link to="/help/使用说明">帮助</router-link><template v-if="d?.teacher"> · <router-link to="/director">情景导演</router-link></template></span></div>
+      <span class="r small"><router-link to="/help/teach/labs">帮助</router-link><template v-if="d?.teacher"> · <router-link to="/director">情景导演</router-link></template></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <p v-if="d && d.mode !== 'teach'" class="card empty">实验只在教学模式出现。右上角切到“教学模式”。</p>
-    <div v-if="d && d.mode === 'teach'" class="grid">
+    <div v-if="d && d.mode === 'teach'" class="grid" data-help="labs-grid">
       <router-link v-for="l in d.labs" :key="l.no" :to="l.path" class="card lab" :class="{ done: l.done === l.tasks, started: l.started }">
         <div class="lh"><b class="no">实验 {{ l.no }}</b><span class="dom small">{{ l.domain }}</span></div>
         <h2>{{ l.title }}</h2>

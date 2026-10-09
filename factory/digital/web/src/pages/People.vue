@@ -3,11 +3,11 @@
   <div class="page">
     <div class="page-title"><h1>人员</h1>
       <span class="muted">部门岗位 → 员工 → 谁能开哪台设备 → 排班 → 出勤；缺人的那一班设备开不了</span>
-      <span class="tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
+      <span class="tabs" data-help="people-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="msg" class="ok small">{{ msg }}</div>
 
-    <section v-if="kp" class="kpis">
+    <section v-if="kp" class="kpis" data-help="people-kpis">
       <div class="card k"><span class="small muted">这一班出勤率</span><b>{{ Math.round(kp.attendance_rate * 100) }}%</b>
         <span class="small muted">{{ kp.day }} {{ kp.shift === 'day' ? '早班' : '晚班' }}，在岗 {{ kp.on_shift - kp.absent }} / {{ kp.on_shift }}</span></div>
       <div class="card k"><span class="small muted">24 小时内排班缺口</span><b :class="{ bad: kp.gaps }">{{ kp.gaps }}</b></div>
@@ -52,7 +52,7 @@
 
     <!-- ③ 排班 -->
     <template v-if="tab === 'roster' && ro">
-      <div class="card">
+      <div class="card" data-help="people-roster">
         <div class="row small"><button class="btn sm" @click="shiftWeek(-7)">上一周</button><button class="btn sm" @click="shiftWeek(7)">下一周</button>
           <span class="muted">现在：{{ ro.now.day }} {{ ro.now.shift === 'day' ? '早班' : '晚班' }}</span>
           <span v-if="!ro.enabled" class="pill warn">车间“要有人”没打开：缺人不会让设备停下</span></div>

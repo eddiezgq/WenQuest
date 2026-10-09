@@ -3,10 +3,10 @@
   <div class="page">
     <div class="page-title"><h1>实验 18 · 设备维护策略：保养时机的决策</h1>
       <span class="muted">平台自动评 {{ s?.of || 60 }} 分（按平台里的事实），报告 {{ s?.report_points || 40 }} 分由老师在课程里批改</span>
-      <span class="r small"><a href="/api/cae/lab18/guide.docx">指导书</a> · <a href="/api/cae/lab18/report-template.docx">报告模板</a></span></div>
+      <span class="r small" data-help="lab-links"><a href="/api/cae/lab18/guide.docx">指导书</a> · <a href="/api/cae/lab18/report-template.docx">报告模板</a></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
-      <div class="card sum">
+      <div class="card sum" data-help="lab-sum">
         <b class="big">{{ s.score }} / {{ s.of }}</b>
         <span v-if="!s.teacher" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? '比对模式：提交任务 2 之前，指挥台和 AI 不显示建议' : '已提交选择：可以看中枢的建议，和你的对比' }}</span>
         <router-link v-if="s.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.anomaly_id } }">打开这台设备的异常</router-link>
@@ -29,7 +29,7 @@
             <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
       </section>
 
-      <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" :class="{ done: t.done }">
+      <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
         <div class="card-head"><h2>任务 {{ i + 1 }}　{{ t.title }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
         <p>{{ t.desc }}</p>
         <p class="small muted">提示：{{ t.hint }}</p>

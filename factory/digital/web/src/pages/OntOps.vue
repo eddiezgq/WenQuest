@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-title"><h1>厂情中枢 · 指挥台</h1>
       <span class="muted">全厂态势、异常、原因和影响 · 规则每 20 秒检查一次全厂</span>
-      <span class="tabs" role="tablist">
+      <span class="tabs" data-help="ont-tabs" role="tablist">
         <button type="button" role="tab" :class="{ on: view === 'situation' }" @click="go({ view: 'situation' })">全厂态势</button>
         <button type="button" role="tab" :class="{ on: view === 'anomalies' }" @click="go({ view: 'anomalies' })">异常处理
           <span v-if="openCount" class="cnt">{{ openCount }}</span></button>
@@ -18,7 +18,7 @@
 
     <!-- 第一屏：全厂态势 -->
     <template v-if="view === 'situation'">
-      <div class="timebar card">
+      <div class="timebar card" data-help="ont-timebar">
         <span class="small"><b>时间</b></span>
         <input v-model="atLocal" type="datetime-local" :max="maxLocal" :min="minLocal" aria-label="回看时刻" @change="loadHist">
         <button class="btn sm ghost" @click="shift(-1)">往前 1 小时</button>
@@ -29,7 +29,7 @@
       </div>
       <div v-if="!sit" class="empty">读取中…</div>
       <template v-else>
-        <div v-for="row in rows" :key="row.key" class="maprow">
+        <div v-for="row in rows" :key="row.key" class="maprow" data-help="ont-cards">
           <div class="rowlabel">{{ row.label }}</div>
           <div class="cards" :class="row.key">
             <button v-for="c in row.cards" :key="c.domain" type="button" class="sc" :style="{ '--c': DOMAIN_COLOR[c.domain] }"
@@ -67,7 +67,7 @@
 
     <!-- 第二屏：异常处理（三栏） -->
     <div v-else class="three">
-      <section class="card list">
+      <section class="card list" data-help="ont-list">
         <div class="filters">
           <select v-model="f.status" aria-label="状态" @change="loadList"><option value="open">开着的</option><option value="closed">已结束</option><option value="all">全部</option></select>
           <select v-model="f.domain" aria-label="领域" @change="loadList"><option value="">全部领域</option>
@@ -96,7 +96,7 @@
               · <button class="linkbtn" :disabled="ai.busy" @click="analyze(sel.id, sel.key)">让 AI 分析</button>
             </p>
           </div>
-          <ChainGraph :chain="sel.chain" @edge="(e) => (basis = e)" @node="(n) => (node = n)" />
+          <ChainGraph data-help="ont-chain" :chain="sel.chain" @edge="(e) => (basis = e)" @node="(n) => (node = n)" />
           <div v-if="basis" class="basis small">
             <b>依据</b>：{{ basis.label }} —— {{ basis.basis.how }}
             <template v-if="basis.basis.text">；{{ basis.basis.text }}</template>
@@ -112,7 +112,7 @@
         <div v-else class="empty">左边选一个异常，这里显示它的原因和影响。</div>
       </section>
 
-      <section class="card right">
+      <section class="card right" data-help="ont-actions">
         <template v-if="sel">
           <h2>处理</h2>
           <p class="small"><b>{{ sel.rule_info.id }} {{ sel.rule_info.name }}</b>：<span class="muted">{{ sel.rule_info.desc }}</span></p>
@@ -144,7 +144,7 @@
               <button v-if="e.seq" class="linkbtn" @click="showSource(e.seq)">#{{ e.seq }}</button>
               <span v-else class="muted"> {{ e.name || e.item || e.id || e.ts || '' }}</span></li>
           </ul>
-          <OptionsPanel v-if="isOpen" :anomaly-id="sel.id" @adopted="loadSel" />
+          <OptionsPanel v-if="isOpen" data-help="ont-options" :anomaly-id="sel.id" @adopted="loadSel" />
           <RetroPanel v-else :anomaly-id="sel.id" />
         </template>
       </section>

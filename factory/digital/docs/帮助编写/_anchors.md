@@ -2,9 +2,9 @@
 
 > 第 30 轮 H-3。教学版各章的 `goto` 块用到下面这些引导（tour）。每一步高亮一个带 `data-help="名字"` 的元素。
 > 合并时：① 把下表的 `data-help` 加到对应 .vue 文件；② 把第三节的引导并进 `web/src/help/tours.json`；
-> ③ **本文件和 `_videos.md` 用完请移出 `help/teach/`**（例如放到 `docs/实施细则/附件/`）：`help/index.js` 用
-> `import.meta.glob('./*/*.md')` 把这个目录里所有 .md 都当章节，`tests/test_help.py` 也要求文件名是 `NN-名字.md`，
-> 留在这里会多出两“章”并让测试失败。
+> ③ 本文件和 `_videos.md` 原在 `web/src/help/teach/`，第 30 轮第 4 步已挪到这里（`factory/digital/docs/帮助编写/`）：
+> `help/index.js` 把 `help/<版本>/` 里所有 .md 都当章节，`tests/test_help.py` 也要求章节文件名是 `NN-名字.md`。
+> 第 4 步已照本文件加好标记、并好引导（`nav-help` 由 `App.vue` 的导航数据 `help: 'nav-help'` 渲染）。
 
 ## 一、注意
 

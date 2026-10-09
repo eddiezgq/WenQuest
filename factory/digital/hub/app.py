@@ -4,7 +4,7 @@
 运行：uvicorn hub.app:app --port 8100
 环境变量：WQ_DB、WQ_MQTT_HOST/PORT/USER/PASSWORD、WQ_MQTT_WS（浏览器连总线的地址）、WQ_ERPNEXT_URL、
 WQ_NODERED_URL、WQ_TZ、WQ_SECRET、WQ_CLAUDE_KEY / WQ_DEEPSEEK_KEY（可选）、WQ_AI_PROVIDER / WQ_AI_REGION（第 30 轮，见 hub/llm.py）、
-WQ_PLANT_FILE（工厂清单，第 30 轮；不设 = 演示工厂）；
+WQ_PLANT_FILE（工厂清单，第 30 轮；不设 = 演示工厂）；WQ_EDITION=local、WQ_TEACHER_PASSWORD（学校本地版，第 30 轮 H-5）；
 线上另有 WQ_AUTH=wenquest、WQ_SSO_URL、WQ_LOGIN_URL、WQ_AI_PER_HOUR、WQ_HISTORY_DAYS（见第 3 轮细则）。
 """
 import base64
@@ -58,6 +58,12 @@ ROLES = ("planner", "engineer", "operator", "quality", "manager", "approver", "s
 STUDENT_ROLES = ("planner", "engineer", "operator", "quality", "service", "safety", "maintenance", "lead")   # lead 班组长：第 18 轮 E4（实验 19）     # safety 安全员：第 18 轮 E2（实验 17）     # service 售后：第 18 轮 E1（实验 16）
 # 登录方式（第 3 轮 D2）：local = 填名字进入（自己电脑上用）；wenquest = 问渠账号（线上）
 AUTH = os.environ.get("WQ_AUTH", "local")
+# 版本（第 30 轮 H-5）：local = 学校机房的本地版（factory/local/start.sh 设）；server = 线上服务器或开发机
+EDITION = os.environ.get("WQ_EDITION", "server")
+# 本地版填名字登录时：学生只能选学生岗位；当老师（厂长、生产模式、教师控制台）要输老师密码（.env 的 WQ_TEACHER_PASSWORD）。
+# 不是本地版时照旧：填名字的人都按老师（开发机、CI 演练）
+LOCAL_ROLES = AUTH == "local" and EDITION == "local"
+TEACHER_PASSWORD = os.environ.get("WQ_TEACHER_PASSWORD", "")
 SSO_URL = os.environ.get("WQ_SSO_URL", "")          # 学习平台核对登录的接口，如 https://learn.<域名>/api/v1/auth/sso
 LOGIN_URL = os.environ.get("WQ_LOGIN_URL", "")      # 学习平台登录页，如 https://learn.<域名>/pages/login/login
 SSO_COOKIE = "wq_sso"                               # 全站登录凭证（学习平台设置，整个域名共用）
@@ -403,7 +409,7 @@ def user_of(x_wq_token: str = Header(default="")):
         if hmac.compare_digest(sig, hmac.new(SECRET, raw.encode(), hashlib.sha256).hexdigest()[:32]):
             u = json.loads(base64.urlsafe_b64decode(raw.encode()))
             if u.get("exp", float("inf")) > time.time():
-                u.setdefault("teacher", True)      # 本地版的旧凭证：人人可用全部角色
+                u.setdefault("teacher", not LOCAL_ROLES)      # 填名字登录的旧凭证：人人可用全部角色（学校本地版除外）
                 return u
     except Exception:  # noqa: BLE001
         pass
@@ -421,6 +427,8 @@ def check_allowed(teacher, role, mode, member=None):
         return
     if mode == "prod" and member and role in member:
         return
+    if LOCAL_ROLES:
+        raise HTTPException(403, "学生只能选学生岗位、用教学模式；老师请勾“我是老师”并输老师密码")
     raise HTTPException(403, "这个角色或生产模式没有授权给你（请老师或企业管理员在“企业成员”里授权）")
 
 
@@ -477,11 +485,33 @@ def _display_name(w):
 @app.get("/api/login/info")
 def login_info(request: Request):
     """登录页用：登录方式、学习平台登录页地址，以及（线上）此人是否已在学习平台登录。"""
-    out = {"auth": AUTH, "login_url": LOGIN_URL, "student_roles": STUDENT_ROLES}
+    out = {"auth": AUTH, "login_url": LOGIN_URL, "student_roles": STUDENT_ROLES,
+           "edition": EDITION, "teacher_password": LOCAL_ROLES}      # 本地版：当老师要输老师密码（第 30 轮 H-5）
     if AUTH == "wenquest":
         w = wenquest_user(request.cookies.get(SSO_COOKIE, ""))
         out["account"] = {"fullname": w["fullname"], "teacher": w["teacher"]} if w else None
     return out
+
+
+_pw_fails = {}
+
+
+def _local_teacher(request, pw):
+    """本地版的老师密码：不填 = 学生；填错报错（同一台电脑 10 分钟内错 5 次就先锁 10 分钟）。"""
+    if not pw:
+        return False
+    ip, now = (request.client.host if request.client else "?"), time.time()
+    with _ai_lock:
+        fails = [t for t in _pw_fails.get(ip, []) if now - t < 600]
+        _pw_fails[ip] = fails
+        if len(fails) >= 5:
+            raise HTTPException(429, "老师密码错得太多，请 10 分钟后再试")
+    if TEACHER_PASSWORD and hmac.compare_digest(pw.encode(), TEACHER_PASSWORD.encode()):
+        return True
+    with _ai_lock:
+        _pw_fails.setdefault(ip, []).append(now)
+    raise HTTPException(403, "老师密码不对（在启动工厂那台电脑的 factory/digital/.env 里，WQ_TEACHER_PASSWORD）"
+                        if TEACHER_PASSWORD else "这台工厂没有设老师密码（factory/digital/.env 的 WQ_TEACHER_PASSWORD）")
 
 
 @app.post("/api/login")
@@ -506,11 +536,16 @@ def login(request: Request, body: dict = Body(...)):
         _seen(w["id"], _display_name(w), teacher)
     else:
         name = str(body.get("name", "")).strip()[:40]
-        role = body.get("role", "manager")
         if not name:
             raise HTTPException(400, "请填写姓名")
-        check_allowed(True, role, mode)
-        u = {"name": name, "role": role, "mode": mode, "teacher": True}
+        teacher = True
+        if LOCAL_ROLES:                       # 学校本地版（第 30 轮 H-5）：输对老师密码才是老师，否则是学生
+            teacher = _local_teacher(request, str(body.get("teacher_password") or ""))
+            if not teacher:
+                mode = "teach"
+        role = body.get("role") or ("manager" if teacher else "planner")
+        check_allowed(teacher, role, mode)
+        u = {"name": name, "role": role, "mode": mode, "teacher": teacher}
     if u["mode"] == "teach":
         H.teach.start(u["name"])
     return {"token": _sign(u), "user": u}
@@ -558,18 +593,27 @@ def caddy_ask(domain: str = ""):
 
 
 @app.get("/api/config")
-def config():
+def config(request: Request):
+    lan = _lan_host(request)
     return {
-        "mqtt_ws": os.environ.get("WQ_MQTT_WS", "ws://localhost:9001"),
+        "mqtt_ws": lan(os.environ.get("WQ_MQTT_WS", "ws://localhost:9001")),
         "erpnext_url": ((os.environ.get("WQ_PUBLIC_URL", "").rstrip("/") + "/api/erp/sso") if AUTH == "wenquest" and erp_sso.enabled()
-                        else os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090")),   # 线上：经单点登录入口（第 7 轮）
-        "nodered_url": os.environ.get("WQ_NODERED_URL", "http://localhost:1880"),   # 线上设为空：不对外（D8）
-        "auth": AUTH, "login_url": LOGIN_URL,
+                        else lan(os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090"))),   # 线上：经单点登录入口（第 7 轮）
+        "nodered_url": lan(os.environ.get("WQ_NODERED_URL", "http://localhost:1880")),   # 线上设为空：不对外（D8）
+        "auth": AUTH, "login_url": LOGIN_URL, "edition": EDITION,
         "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "factory_name": FACTORY_NAME, "ai_engine": H.ai.llm.name if H.ai else "rules",
         "tz": str(kpi.TZ), "customers": F.CUSTOMERS, "fg": [{"item_code": "WQR-105", "name": F.ITEMS["WQR-105"][0],
                                                                "price": F.FG_SELLING_PRICE}],
         "plant": _plant_cfg(),
     }
+
+
+def _lan_host(request):
+    """本地版（第 30 轮 H-5）：机房里学生用 http://老师电脑IP:8100 打开，总线、ERPNext 的地址里的 localhost 换成同一个 IP。"""
+    host = request.url.hostname or "localhost"
+    if EDITION != "local" or host in ("localhost", "127.0.0.1"):
+        return lambda url: url
+    return lambda url: url.replace("//localhost:", "//" + host + ":").replace("//127.0.0.1:", "//" + host + ":")
 
 
 def _plant_cfg():
@@ -2111,7 +2155,7 @@ _finance_api.mount(app, H, user_of, who)          # 第 18 轮 E7：经营与财
 from hub import story_api as _story_api  # noqa: E402
 _story_api.mount(app, H, user_of, who, reset_teach)   # 第 19 轮：情景导演（两周情景）
 from hub import help_api as _help_api  # noqa: E402
-_help_api.mount(app, user_of)                          # 第 19 轮：帮助在网页里读
+_help_api.mount(app, user_of)                          # 第 19 轮：帮助在网页里读；第 30 轮：/api/help/docs、帮助视频 /api/help/media、/help-media/
 from hub import labs_api as _labs_api  # noqa: E402
 _labs_api.mount(app, H, user_of)                       # 第 19 轮：“实验与任务”一个入口
 from hub.ont import agent_api as _agent_api  # noqa: E402

@@ -3,11 +3,11 @@
   <div class="page">
     <div class="page-title"><h1>采购与来料</h1>
       <span class="muted">请购 → 采购单 → 发货 → 到货 → 来料检验 → 批次入库 → 用到哪些零件 → 供应商评分</span>
-      <span class="tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
+      <span class="tabs" data-help="sup-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="msg" class="ok small">{{ msg }}</div>
 
-    <section v-if="kp" class="kpis">
+    <section v-if="kp" class="kpis" data-help="sup-kpis">
       <div class="card k"><span class="small muted">在途</span><b>{{ kp.in_transit }}</b><span class="small muted">批</span></div>
       <div class="card k"><span class="small muted">到货待检</span><b :class="{ warn: kp.waiting_inspection }">{{ kp.waiting_inspection }}</b></div>
       <div class="card k"><span class="small muted">不合格待处理</span><b :class="{ bad: kp.rejected_open }">{{ kp.rejected_open }}</b></div>
@@ -39,7 +39,7 @@
 
     <!-- ② 到货与来料检验 -->
     <template v-if="tab === 'inspect' && lt">
-      <div class="card">
+      <div class="card" data-help="sup-inspect">
         <table class="tbl small"><thead><tr><th>批号</th><th>物料</th><th class="num">数量</th><th>供应商</th><th>到货</th><th>状态</th><th></th></tr></thead>
           <tbody><tr v-for="x in lt.lots.filter((y) => ['arrived', 'rejected', 'accepted'].includes(y.status)).slice(0, 40)" :key="x.id" :class="{ sel: sm && sm.id === x.id }">
             <td>{{ x.lot }}</td><td>{{ x.item }}</td><td class="num">{{ x.qty }}</td><td>{{ x.supplier.split(' ')[0] }}</td><td>{{ (x.arrived_at || '').slice(5, 16).replace('T', ' ') }}</td>

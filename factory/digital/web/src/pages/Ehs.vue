@@ -3,11 +3,11 @@
   <div class="page">
     <div class="page-title"><h1>安全环保</h1>
       <span class="muted">隐患随手拍 → 整改 → 验收；作业许可核对资质；挂牌上锁时车间里这台设备真的停下</span>
-      <span class="tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}
+      <span class="tabs" data-help="ehs-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}
         <span v-if="k === 'issues' && kp?.major_open" class="cnt">{{ kp.major_open }}</span></button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
 
-    <section v-if="kp" class="kpis">
+    <section v-if="kp" class="kpis" data-help="ehs-kpis">
       <div class="card k"><span class="small muted">开着的隐患</span><b>{{ kp.open_issues }}</b><span class="small" :class="{ bad: kp.major_open }">重大 {{ kp.major_open }} · 逾期 {{ kp.overdue }}</span></div>
       <div class="card k"><span class="small muted">整改按期率（近 30 天）</span><b>{{ kp.on_time == null ? '—' : Math.round(kp.on_time * 100) + '%' }}</b></div>
       <div class="card k"><span class="small muted">挂牌上锁的设备</span><b>{{ kp.locked }}</b></div>
@@ -17,7 +17,7 @@
 
     <!-- ① 隐患 -->
     <template v-if="tab === 'issues' && is">
-      <div class="card">
+      <div class="card" data-help="ehs-report">
         <h3>随手拍</h3>
         <div class="grid3">
           <label>设备 / 位置<select v-model="ni.unit"><option value="">（区域，不是某台设备）</option>

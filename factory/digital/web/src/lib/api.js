@@ -34,8 +34,9 @@ export const get = (p) => api('GET', p);
 export const post = (p, b) => api('POST', p, b ?? {});
 
 // 本地版填名字；线上版（问渠账号）不传名字，枢纽凭全站登录凭证认人
-export async function login(name, role, mode) {
-  const r = await post('/login', name ? { name, role, mode } : { role, mode });
+// extra：本地版的老师密码 { teacher_password }（第 30 轮 H-5）
+export async function login(name, role, mode, extra) {
+  const r = await post('/login', { ...(name ? { name } : {}), role, mode, ...(extra || {}) });
   session.token = r.token;
   session.user = r.user;
   save();

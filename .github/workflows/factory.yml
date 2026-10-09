@@ -268,6 +268,120 @@ jobs:
           fi
           true
 
+  local:
+    # 第 30 轮 H-5：学校机房的本地版（factory/local/start.sh）能一条命令起整座工厂；学生、老师的登录分开；闭环演练 1–3 段通过。
+    # 不挡部署（deploy 只等 build、rehearsal）
+    name: 本地版能起来
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: 启动本地版（教学模式、演示工厂、模拟 ERPNext）
+        run: factory/local/start.sh 2>&1 | tee "$RUNNER_TEMP/start.log"
+      - name: 枢纽健康、总线已连、仿真车间在发数据
+        run: |
+          for i in $(seq 1 60); do
+            h=$(curl -fsS http://localhost:8100/api/health || true)
+            echo "$h"
+            python3 -c 'import json, sys; h = json.loads(sys.argv[1] or "{}"); sys.exit(0 if h.get("ok") and h.get("bus") and h.get("messages", 0) > 0 else 1)' "$h" && exit 0
+            sleep 5
+          done
+          exit 1
+      - name: 网页、“本地版”标识、学生与老师分开登录
+        run: |
+          curl -fsS http://localhost:8100/ | grep -q '<div id="app"'
+          pw=$(sed -n 's/^WQ_TEACHER_PASSWORD=//p' factory/digital/.env)
+          test -n "$pw"
+          grep -q "老师密码：$pw" "$RUNNER_TEMP/start.log"          # 第一次启动把老师密码显示出来
+          python3 - "$pw" <<'PY'
+          import json, sys, urllib.error, urllib.request
+          H = "http://localhost:8100/api"
+          def post(path, body):
+              req = urllib.request.Request(H + path, data=json.dumps(body).encode(), headers={"content-type": "application/json"})
+              try:
+                  return 200, json.loads(urllib.request.urlopen(req, timeout=30).read())
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read().decode()
+          cfg = json.load(urllib.request.urlopen(H + "/config", timeout=30))
+          assert cfg["edition"] == "local" and cfg["plant"]["demo"], cfg.get("edition")
+          info = json.load(urllib.request.urlopen(H + "/login/info", timeout=30))
+          assert info["teacher_password"] is True, info
+          code, r = post("/login", {"name": "CI 学生", "role": "planner", "mode": "prod"})
+          assert code == 200 and r["user"]["teacher"] is False and r["user"]["mode"] == "teach", (code, r)
+          code, r = post("/login", {"name": "CI 学生", "role": "manager", "mode": "teach"})
+          assert code == 403, (code, r)
+          code, r = post("/login", {"name": "CI 老师", "role": "manager", "mode": "prod", "teacher_password": "wrong"})
+          assert code == 403, (code, r)
+          code, r = post("/login", {"name": "CI 老师", "role": "manager", "mode": "prod", "teacher_password": sys.argv[1]})
+          assert code == 200 and r["user"]["teacher"] is True and r["user"]["mode"] == "prod", (code, r)
+          print("登录：学生只有学生岗位、教学模式；老师要密码")
+          PY
+      - name: 闭环演练 1–3 段（重置情景 → 读看板 → 接单算料写进模拟 ERPNext）
+        working-directory: factory/digital
+        run: |
+          python3 tests/closed_loop.py --hub http://localhost:8100 --erp http://localhost:8091 --upto 3 --timeout 300 \
+            --teacher-password "$(sed -n 's/^WQ_TEACHER_PASSWORD=//p' .env)" 2>&1 | tee "$RUNNER_TEMP/closed_loop.log"
+      - name: 失败时的日志
+        if: failure()
+        run: |
+          cd factory/digital
+          { docker compose --profile mock ps -a; docker compose --profile mock logs --no-color --tail 80 hub sim bridge mock-erpnext; } > "$RUNNER_TEMP/local_diag.log" 2>&1 || true
+          [ ! -s "$RUNNER_TEMP/closed_loop.log" ] || { grep -E "✗|失败|Traceback|Error" "$RUNNER_TEMP/closed_loop.log" | tail -n 30 > "$RUNNER_TEMP/local_fail.log"; python3 ../deploy/ci_annotate.py 本地版闭环失败项 "$RUNNER_TEMP/local_fail.log" 30; }
+          python3 ../deploy/ci_annotate.py 本地版诊断 "$RUNNER_TEMP/local_diag.log" 150
+      - name: 停止
+        if: always()
+        run: factory/local/stop.sh --reset
+
+  help-videos:
+    # 第 30 轮 H-4：在本地版（教学模式、演示工厂）里按剧本操作、录下帮助视频（tools/help_videos.py，字幕叠画面、不配音）；
+    # 推送到 main 时发布到 Release help-videos，镜像构建时取最新的一份（factory/digital/Dockerfile）。不挡部署
+    name: 录帮助视频
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: write          # 发布到 Release
+    steps:
+      - uses: actions/checkout@v4
+      - name: 启动本地版
+        run: factory/local/start.sh
+      - name: 等仿真车间有数据
+        run: |
+          for i in $(seq 1 60); do
+            h=$(curl -fsS http://localhost:8100/api/health || true)
+            python3 -c 'import json, sys; h = json.loads(sys.argv[1] or "{}"); sys.exit(0 if h.get("bus") and h.get("messages", 0) > 0 else 1)' "$h" && exit 0
+            sleep 5
+          done
+          exit 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 录教学版帮助视频
+        run: |
+          pip install -q playwright==1.55.0 && python -m playwright install --with-deps chromium >/dev/null
+          python factory/digital/tools/help_videos.py --hub http://localhost:8100 --edition teach --out help-media \
+            --teacher-password "$(sed -n 's/^WQ_TEACHER_PASSWORD=//p' factory/digital/.env)" 2>&1 | tee "$RUNNER_TEMP/videos.log"
+          tar czf help-videos-teach.tar.gz -C help-media . && ls -la help-media
+      - uses: actions/upload-artifact@v4
+        with:
+          name: help-videos-teach
+          path: help-videos-teach.tar.gz
+      - name: 推送到 main 时发布帮助视频
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view help-videos >/dev/null 2>&1 || gh release create help-videos --title "帮助的操作视频" \
+            --notes "CI 在本地版上自动录制（第 30 轮 H-4），数字工厂镜像构建时取用。" --prerelease
+          gh release upload help-videos help-videos-teach.tar.gz --clobber
+      - name: 视频没录成时的输出（写成注释）
+        if: failure()
+        run: '[ ! -f "$RUNNER_TEMP/videos.log" ] || python3 factory/deploy/ci_annotate.py 录视频 "$RUNNER_TEMP/videos.log" 60'
+      - name: 停止
+        if: always()
+        run: factory/local/stop.sh --reset
+
   build:
     name: 构建镜像
     needs: test
@@ -296,6 +410,7 @@ jobs:
           file: factory/digital/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.app }}
+          build-args: HELP_VIDEOS_STAMP=${{ github.sha }}      # 帮助视频那一步不走缓存，取 Release 里最新的一份（第 30 轮 H-4）
           cache-from: type=gha,scope=factory-app
           cache-to: type=gha,mode=max,scope=factory-app
       - uses: docker/build-push-action@v6

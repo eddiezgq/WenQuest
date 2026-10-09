@@ -3,10 +3,10 @@
   <div class="page">
     <div class="page-title"><h1>设备维护</h1>
       <span class="muted">台账 → 保养 → 点检 → 故障 → 维修 → 备件；保养、维修都挂牌上锁，做完由另一个人验收解锁</span>
-      <span class="tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
+      <span class="tabs" data-help="maint-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
 
-    <section v-if="kp" class="kpis">
+    <section v-if="kp" class="kpis" data-help="maint-kpis">
       <div class="card k"><span class="small muted">保养逾期的设备</span><b :class="{ bad: kp.overdue }">{{ kp.overdue }}</b>
         <span class="small muted">{{ kp.overdue_units.map((u) => u.toUpperCase()).join('、') || '—' }}</span></div>
       <div class="card k"><span class="small muted">开着的维修单</span><b>{{ kp.open_repairs }}</b></div>
@@ -17,12 +17,12 @@
 
     <!-- ① 台账 -->
     <template v-if="tab === 'assets' && as">
-      <div v-if="session.user?.teacher && session.user?.mode === 'teach'" class="card row small">
+      <div v-if="session.user?.teacher && session.user?.mode === 'teach'" class="card row small" data-help="maint-reliability">
         <b>老师：车间可靠性</b>
         <button v-for="f in [0, 1, 5]" :key="f" class="btn sm" :class="{ primary: kp?.factor === f }" @click="setFactor(f)">{{ { 0: '关（不会坏）', 1: '正常', 5: '加速 ×5' }[f] }}</button>
         <span class="muted">情景重载后回到“关”。加速时老化快 5 倍，课堂上看得见。</span>
       </div>
-      <div class="card">
+      <div class="card" data-help="maint-assets">
         <table class="tbl small"><thead><tr><th>设备</th><th>资产号</th><th class="num">原值</th><th class="num">自上次保养</th><th class="num">周期</th><th>保养</th>
           <th class="num">未来 {{ as.horizon_h }} 运行小时坏的概率</th><th class="num">预期损失</th><th class="num">近 30 天故障</th><th></th></tr></thead>
           <tbody><tr v-for="a in as.assets" :key="a.unit" :class="{ sel: sel === a.unit }">
@@ -70,7 +70,7 @@
     <!-- ② 保养 -->
     <template v-if="tab === 'pm' && rp">
       <p class="small muted">保养在厂情中枢里排：保养逾期（M2）、故障风险高（M4）的异常右栏有“现在保养 / 下班后保养 / 不做”三个方案，采纳后生成保养工单，到时间自动挂牌上锁。</p>
-      <table class="tbl small card"><thead><tr><th>保养单</th><th>设备</th><th>状态</th><th class="num">时长</th><th class="num">保养时运行小时</th><th>做的人 / 验收</th><th></th></tr></thead>
+      <table class="tbl small card" data-help="maint-pm"><thead><tr><th>保养单</th><th>设备</th><th>状态</th><th class="num">时长</th><th class="num">保养时运行小时</th><th>做的人 / 验收</th><th></th></tr></thead>
         <tbody><tr v-for="p in rp.pms" :key="p.id"><td class="mono">{{ p.key }}</td><td>{{ p.unit.toUpperCase() }}</td>
           <td><span class="pill" :class="{ closed: 'good', fixed: 'info', doing: 'warn' }[p.status] || 'mute'">{{ p.status_label }}</span></td>
           <td class="num">{{ p.minutes }} 分钟{{ p.delay_minutes ? '（' + p.delay_minutes + ' 分钟后）' : '' }}</td><td class="num">{{ p.run_h ?? '—' }}</td>

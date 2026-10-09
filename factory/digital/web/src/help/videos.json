@@ -1,0 +1,46 @@
+{
+  "teach-login": {
+    "edition": "teach",
+    "title": "登录、选角色、两种模式"
+  },
+  "teach-order": {
+    "edition": "teach",
+    "title": "接单与 MRP"
+  },
+  "teach-dispatch": {
+    "edition": "teach",
+    "title": "派工与报工"
+  },
+  "teach-3d": {
+    "edition": "teach",
+    "title": "3D 车间"
+  },
+  "teach-anomaly": {
+    "edition": "teach",
+    "title": "异常追因与推演"
+  },
+  "teach-8d": {
+    "edition": "teach",
+    "title": "质量异常单（8D）"
+  },
+  "teach-ai": {
+    "edition": "teach",
+    "title": "AI 工厂助手"
+  },
+  "teach-labs": {
+    "edition": "teach",
+    "title": "实验与任务"
+  },
+  "teach-director": {
+    "edition": "teach",
+    "title": "情景导演"
+  },
+  "teach-maint": {
+    "edition": "teach",
+    "title": "设备维护：保养工单、挂牌上锁"
+  },
+  "ent-ai": {
+    "edition": "enterprise",
+    "title": "AI 设置与运行记录"
+  }
+}

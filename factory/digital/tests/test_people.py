@@ -270,6 +270,9 @@ def test_agent_people_tools_and_intent(env):
     assert t.people_skills("grd-01")["skills"][0]["skilled"] == 2 and t.people_skills("qc-01").get("error")
     g = t.roster_gaps()
     assert "roster_gaps" in g and g["enabled"]
+    # 本周确有一笔加班（前面的测试记在“今天 + 3 天”，周四以后会落到下周，所以这里自己记一笔今天的）
+    from hub import people as PE
+    H.db.x("insert into overtime_log (mode, day, emp_id, minutes, action_id) values (%s,%s,%s,%s,%s)", ("teach", PE.today(), "P02", 60, None))
     o = t.overtime_load()
     assert o["limit_h"] == 12 and any(x["emp_id"] == "P02" for x in o["overtime"])
     r = Rules(None, False)

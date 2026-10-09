@@ -65,6 +65,18 @@ services:
       WQ_OPENPLC_CHECK_URL: http://openplc:8300
     depends_on: [bus]
 
+  # 计算服务（第 11 轮起：有限元、动力学、数控、流体、优化）：工作台“仿真与分析”等页由它算；本地版一起启动（第 30 轮 H-5）
+  cae:
+    <<: *app
+    command: ["uvicorn", "cae.service:app", "--host", "0.0.0.0", "--port", "8200"]
+    environment:
+      WQ_CAE_DATA: /data
+      WQ_CAE_TIME_LIMIT_S: ${WQ_CAE_TIME_LIMIT_S:-300}
+      WQ_CAE_MAX_ELEMENTS: ${WQ_CAE_MAX_ELEMENTS:-200000}
+      WQ_CAE_THREADS: "2"
+      TZ: ${WQ_TZ:-America/New_York}
+    volumes: [cae-data:/data]
+
   # OpenPLC 运行时（第 18 轮第 8 步）：虚拟 PLC 的程序在这里再编译、运行一次，检查是不是标准 IEC 61131-3
   openplc:
     build:
@@ -99,3 +111,4 @@ services:
 volumes:
   bus-data:
   db-data:
+  cae-data:

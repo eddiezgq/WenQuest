@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="msg" class="ok small">{{ msg }}</div>
 
-    <section v-if="ov" class="kpis">
+    <section v-if="ov" class="kpis" data-help="energy-kpis">
       <div class="card k"><span class="small muted">用电（{{ ov.day.slice(5) }}）</span><b>{{ num(ov.kwh) }}</b><span class="small muted">度 · {{ ov.hours }} 小时的数据</span></div>
       <div class="card k"><span class="small muted">电费</span><b>${{ money(ov.cost) }}</b><span class="small muted">峰 {{ num(ov.by_bucket.peak) }} / 平 {{ num(ov.by_bucket.flat) }} / 谷 {{ num(ov.by_bucket.valley) }} 度</span></div>
       <div class="card k"><span class="small muted">峰时占比</span><b :class="{ warn: ov.peak_share > 0.3 }">{{ pct(ov.peak_share) }}</b><span class="small muted">目标 30% 以下</span></div>
@@ -19,7 +19,7 @@
 
     <!-- ① 总览 -->
     <template v-if="tab === 'overview' && ov">
-      <div class="card">
+      <div class="card" data-help="energy-curve">
         <div class="ch"><h3>车间总表（{{ ov.day }}，15 分钟平均功率 kW）</h3>
           <span class="small"><i class="sw peak"></i>峰 ${{ ov.price.peak }} <i class="sw flat"></i>平 ${{ ov.price.flat }} <i class="sw valley"></i>谷 ${{ ov.price.valley }} /度</span>
           <span class="row small"><button class="linkbtn" @click="shift(-1)">前一天</button><button class="linkbtn" @click="shift(1)">后一天</button></span></div>
@@ -29,7 +29,7 @@
         </svg>
         <p class="small muted">虚线：合同需量 {{ ov.contract_kw }} kW。横轴 0–24 点。</p>
       </div>
-      <div class="card">
+      <div class="card" data-help="energy-units">
         <h3>每台设备的电量（度）</h3>
         <div v-for="u in ov.units" :key="u.unit" class="bar-row">
           <span class="bn">{{ u.unit.toUpperCase() }} <span class="muted">{{ u.name }}</span></span>

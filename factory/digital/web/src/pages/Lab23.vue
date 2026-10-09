@@ -3,10 +3,10 @@
   <div class="page">
     <div class="page-title"><h1>实验 23 · 两周情景：一张急单的全厂决策</h1>
       <span class="muted">两周课程设计，4–6 人一组；平台自动评 {{ s?.of || 60 }} 分，报告 {{ s?.report_points || 40 }} 分由老师在课程里批改</span>
-      <span class="r small"><a href="/api/cae/lab23/guide.docx">指导书</a> · <a href="/api/cae/lab23/report-template.docx">报告模板</a> · <router-link to="/help/两周情景">帮助</router-link></span></div>
+      <span class="r small" data-help="lab-links"><a href="/api/cae/lab23/guide.docx">指导书</a> · <a href="/api/cae/lab23/report-template.docx">报告模板</a> · <router-link to="/help/teach/director">帮助</router-link></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
-      <div class="card sum">
+      <div class="card sum" data-help="lab-sum">
         <b class="big">{{ s.score }} / {{ s.of }}</b>
         <span v-if="s.team" class="small">小组 <b>{{ s.team }}</b>：{{ s.members.map((m) => m.user + '（' + m.roles.join('、') + '）').join('；') }}</span>
         <span v-if="!s.teacher && s.team" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? '比对模式：本组还有幕没交决定，这些异常在指挥台上不显示建议' : '各幕都交了决定：指挥台显示中枢的建议' }}</span>
@@ -22,7 +22,7 @@
             <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
       </section>
 
-      <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" :class="{ done: t.done }">
+      <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
         <div class="card-head"><h2>任务 {{ i + 1 }}　{{ t.title }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
         <p>{{ t.desc }}</p>
         <p class="small muted">提示：{{ t.hint }}</p>

@@ -3,11 +3,11 @@
   <div class="page">
     <div class="page-title"><h1>经营与财务</h1>
       <span class="muted">订单 → 开票 → 收款 · 采购 → 收货 → 发票 → 付款 · 每张订单的毛利 · 经营目标与预算</span>
-      <span class="tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
+      <span class="tabs" data-help="fin-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}</button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="msg" class="ok small">{{ msg }}</div>
 
-    <section v-if="kp" class="kpis">
+    <section v-if="kp" class="kpis" data-help="fin-kpis">
       <div class="card k"><span class="small muted">毛利率（做完的订单）</span><b :class="tone(kp.gross_margin, 0.25)">{{ pct1(kp.gross_margin) }}</b><span class="small muted">目标 25%</span></div>
       <div class="card k"><span class="small muted">应收 / 逾期</span><b>${{ num(kp.ar_total) }}</b><span class="small" :class="{ bad: kp.ar_overdue > 0 }">逾期 ${{ num(kp.ar_overdue) }}</span></div>
       <div class="card k"><span class="small muted">应收周转天数</span><b :class="{ warn: kp.dso > 45 }">{{ kp.dso ?? '—' }}</b><span class="small muted">账期日</span></div>
@@ -17,7 +17,7 @@
 
     <!-- ① 经营目标 -->
     <template v-if="tab === 'objectives' && ob">
-      <div class="card">
+      <div class="card" data-help="fin-objectives">
         <h3>指标树（目标 → 指标 → 领域）</h3>
         <div class="tree">
           <div class="root">本年经营目标 <span class="small muted">达标 {{ ob.objectives.filter((o) => o.tone === 'good').length }} / {{ ob.objectives.length }}</span></div>
@@ -107,7 +107,7 @@
     </template>
 
     <!-- ④ 预算 -->
-    <ProductionCost v-if="tab === 'production'" />
+    <ProductionCost v-if="tab === 'production'" data-help="fin-production" />
 
     <template v-if="tab === 'budget' && bd">
       <div class="card">

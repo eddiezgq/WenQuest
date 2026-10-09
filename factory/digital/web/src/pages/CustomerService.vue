@@ -3,11 +3,11 @@
   <div class="page">
     <div class="page-title"><h1>客户与服务</h1>
       <span class="muted">线索 → 商机 → 报价 → 合同 → 订单；投诉 → 追溯 → 派工 → 回访。线索、商机、报价、合同、服务工单都在 ERPNext 里有对应单据</span>
-      <span class="tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}
+      <span class="tabs" data-help="svc-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}
         <span v-if="k === 'complaints' && kp?.open_complaints" class="cnt">{{ kp.open_complaints }}</span></button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
 
-    <section v-if="kp" class="kpis">
+    <section v-if="kp" class="kpis" data-help="svc-kpis">
       <div class="card k"><span class="small muted">满意度（近 30 天）</span><b>{{ kp.satisfaction ?? '—' }}<small v-if="kp.satisfaction"> / 5</small></b><span class="small muted">{{ kp.surveys }} 次回访</span></div>
       <div class="card k"><span class="small muted">开着的投诉</span><b>{{ kp.open_complaints }}</b><span class="small muted">平均响应 {{ kp.response_h ?? '—' }} 小时</span></div>
       <div class="card k"><span class="small muted">待上门的服务</span><b>{{ kp.open_jobs }}</b><span class="small muted">一次修复率 {{ kp.first_fix == null ? '—' : Math.round(kp.first_fix * 100) + '%' }}</span></div>
@@ -94,7 +94,7 @@
 
     <!-- ② 投诉 -->
     <template v-if="tab === 'complaints' && cp">
-      <div v-if="cp.can_edit" class="card">
+      <div v-if="cp.can_edit" class="card" data-help="svc-complaint">
         <h3>登记投诉</h3>
         <div class="grid3">
           <label>设备序列号（铭牌）<input v-model="nc.serial" list="serials" placeholder="例如 WQR105-H2504-06"></label>

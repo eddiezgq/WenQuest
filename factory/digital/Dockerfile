@@ -50,6 +50,17 @@ COPY ["digital/帮助_数字工厂使用说明.md", "digital/"]
 COPY digital/help/ digital/help/
 COPY digital/mock_erpnext/ digital/mock_erpnext/
 COPY --from=web /web/dist digital/web/dist
+# 帮助的操作视频（第 30 轮 H-4）：CI 在本地版上录好，发布在本仓库 Release help-videos，这里取最新的一份；
+# 企业版的几段（AI 设置等）由 freecad-ai-parts 录，取它的 Release。取不到就不带（没有外网也照常构建，帮助照常可用，只是没有视频）。
+# HELP_VIDEOS_STAMP 每次构建不同（工作流传提交号），让这一步不走缓存
+ARG HELP_VIDEOS_STAMP=none
+ENV WQ_HELP_MEDIA=/app/digital/help-media
+RUN mkdir -p "$WQ_HELP_MEDIA" && for src in eddiezgq/WenQuest:teach eddiezgq/freecad-ai-parts:enterprise; do \
+      repo="${src%%:*}"; ed="${src##*:}"; \
+      python -c "import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], '/tmp/hv.tgz')" \
+        "https://github.com/$repo/releases/download/help-videos/help-videos-$ed.tar.gz" 2>/dev/null \
+      && tar xzf /tmp/hv.tgz -C "$WQ_HELP_MEDIA" && echo "帮助视频（$ed）已带上 $HELP_VIDEOS_STAMP" \
+      || echo "没有取到 $ed 版帮助视频（不影响使用）"; rm -f /tmp/hv.tgz; done
 WORKDIR /app/digital
 EXPOSE 8100
 CMD ["uvicorn", "hub.app:app", "--host", "0.0.0.0", "--port", "8100"]

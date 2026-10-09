@@ -49,8 +49,9 @@ const routes = [
   { path: '/lab23', component: () => import('./pages/Lab23.vue') },
   { path: '/labs', component: () => import('./pages/Labs.vue') },              // 第 19 轮：实验与任务（一个入口）
   { path: '/director', component: () => import('./pages/Director.vue') },      // 第 19 轮：情景导演
-  { path: '/help', component: () => import('./pages/Help.vue') },              // 第 19 轮：帮助在网页里读
-  { path: '/help/:name', component: () => import('./pages/Help.vue') },
+  // 帮助（第 30 轮 H-3，搬自 freecad-ai-parts ADR-0065）：教学版、企业版、资料；登录前也能看，登录后在工作台框架里
+  { path: '/help/:ed?/:ch?', component: () => import('./pages/Help.vue'), meta: { public: true, shell: true } },
+  { path: '/cost', component: () => import('./pages/Cost.vue') },              // 第 30 轮：企业工厂的“生产成本”
   { path: '/service', component: () => import('./pages/CustomerService.vue') },
   { path: '/ont', component: () => import('./pages/OntOps.vue') },
   { path: '/ont/map', component: () => import('./pages/OntHub.vue') },
