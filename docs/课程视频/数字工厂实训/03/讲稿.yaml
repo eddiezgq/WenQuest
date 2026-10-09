@@ -1,0 +1,157 @@
+# 《数字工厂实训》公开课 第 3 讲：厂情中枢：异常、追因与推演（第 29 轮样板讲）
+# 画面是这一讲的网页互动课件（textbook/web-editions/dfactory/course/slides/ch03.yaml），配音是课件每页的讲稿（notes）。
+# 这里只写开场、课后部分和结尾。课后部分：动画 3-1、虚拟实验 3-2 录屏、数字工厂实验页、作业页、测验页。
+# 数字一律由 course/calc/ch03.py 算出（{{ch03.键:格式}}），模型和参数取自数字工厂 factory/data.py、hub/ont/plan.py、playbooks.yaml、sim/calendar.py。
+book: dfactory
+section: "3"
+deck: ch03
+skip: []                   # 不跳页：生活例子（外卖）是本讲唯一的生活例子
+code: [ch03]
+title: ["厂情中枢：磨床停了，怎么办最划算", "The Factory Hub: The Grinder Stopped. What Is the Cheapest Fix?"]
+chapter: ["第二篇 方法 · 第 3 章", "Part II The Method · Chapter 3"]
+next: ["第 4 讲 客户与服务：追溯与召回", "Lecture 4 Customers and service: traceability and recall"]
+cover_formula: 'L=\left|[t_s,\,t_s+D)\cap\text{shifts}\right|'
+tags:
+  zh: [厂情中枢, 异常, 因果链, 推演, 加班, 外协, 数字工厂]
+  en: [factory hub, exceptions, root cause, what-if simulation, overtime, outsourcing, digital factory]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《数字工厂实训》第三讲，厂情中枢：磨床停了，怎么办最划算。
+  en:
+    - Hi everyone, and welcome to the Digital Factory Practicum at WenQuest.
+    - This is Lecture 3, the factory hub. The grinder stopped; what is the cheapest fix?
+
+after:
+  - id: lab31
+    kind: lab
+    lab: causal
+    part: ["动画", "Animation"]
+    steps:
+      - js: "__lab.play(false); document.querySelectorAll('[id^=k]').forEach(e => { if (e.tagName === 'B') e.style.filter = 'blur(7px)'; })"
+        press: "[data-p=book]"
+        dur: 2
+      - sweep: {D: [0, 48]}
+        dur: 7
+      - press: "[data-p=fri]"
+        dur: 3
+      - press: "[data-p=rush]"
+        dur: 3
+      - press: "#again"
+        dur: 9
+    say:
+      zh:
+        - 下面是动画 3-1，在问渠学习平台上可以亲手做。结果区的数字这里先遮住，留给你自己读。
+        - ">先点“本章：停 24 小时”，再把停机时长从零拖到 48 小时。看哪张订单先变红，为什么 7 到 22 小时之间几乎不变。"
+        - ">再点“周五 15 点停 20 小时”。同样停 20 小时，真正丢掉的生产时间和周一停比，差多少？"
+        - ">然后把机器人订单插到最前。哪张订单变红了？违约金是多了还是少了？"
+        - ">最后点“从头亮起”，看因果链从设备到客户一层层亮起来，每一层的数字从哪里来。"
+      en:
+        - Here's Animation 3-1, which you can try yourself on the WenQuest platform. The numbers in the results panel are blurred; reading them is your job.
+        - ">First press Chapter, 24 hours, then drag the downtime from zero to 48 hours. Which order turns red first, and why does almost nothing change between 7 and 22 hours?"
+        - ">Next press Friday 3 pm, 20 hours. With the same 20-hour stop, how does the production time lost compare with a stop on Monday?"
+        - ">Then move the robot order to the front. Which order turns red now? Do the penalties go up or down?"
+        - ">Finally press Replay and watch the chain light up from machine to customer. Ask where each layer's numbers come from."
+
+  - id: lab32
+    kind: lab
+    lab: whatif
+    part: ["虚拟实验", "Virtual lab"]
+    steps:
+      - js: "__lab.play(false); document.querySelectorAll('[id^=k]').forEach(e => { if (e.tagName === 'B') e.style.filter = 'blur(7px)'; })"
+        press: "[data-p=book]"
+        dur: 3
+      - sweep: {D: [2, 48]}
+        dur: 6
+      - press: "[data-p=d30]"
+        dur: 2
+      - set: {ot: 240}
+        dur: 3
+      - press: "[data-p=dec]"
+        dur: 2
+      - press: "#play"
+        dur: 9
+    say:
+      zh:
+        - ">虚拟实验 3-2：加班、加急还是外协。先点“本章：停 24 小时”，四个方案的花费和交期跟教材表 3-3 对一对。"
+        - ">把停机时长从 2 小时拖到 48 小时，看推荐方案在哪里换了。"
+        - ">点“停 30 小时”，先自己手算加班费，再把每天最多加班拉到 240 分钟，看推演怎么说。"
+        - ">再点“晚 6 小时才加急”，加急的效果变了吗？最后播放甘特图，看磨床在四个方案下的一周。答案这里不说，留给你自己找。"
+        - 两个实验都配有指导书和报告模板，在平台上下载。
+      en:
+        - ">Virtual lab 3-2: overtime, expediting or outsourcing? Press Chapter, 24 hours, and check the four options' costs and deliveries against Table 3-3."
+        - ">Drag the downtime from 2 to 48 hours and see where the recommendation changes."
+        - ">Press 30 hours. Work out the overtime cost by hand, then raise the daily overtime cap to 240 minutes and see what the simulation says."
+        - ">Then press Expedite 6 hours late: does it do any worse? Finally play the Gantt chart and watch the grinder's week under the four options. I won't give the answers; they're yours to find."
+        - Both labs come with a guide and a report template on the platform.
+
+  - id: factory
+    part: ["数字工厂", "Digital factory"]
+    slide:
+      layout: points
+      tag: ["课后", "After class"]
+      title: ["数字工厂实验 15：车间异常的追因推演与决策", "Digital-factory Lab 15: root cause, what-if and decision"]
+      points:
+        - ["老师注入停机，先自己追因：哪台、哪些工单、哪些订单、晚几天", "The instructor injects a stop; trace it yourself first"]
+        - ["推演至少 3 个方案，选一个写理由；提交后才看到中枢的建议", "Simulate at least 3 options, choose and justify; see the hub's advice after submitting"]
+        - ["老师批准后执行，工单做完看复盘", "Execute after approval; read the review when the work orders finish"]
+      foot: ["实验里只跟踪输出轴 SH-301，数字比课上小，方法一样", "The lab tracks only output shaft SH-301, so its numbers are smaller; the method is the same"]
+    say:
+      zh:
+        - ">课后要在问渠数字工厂里做实验 15。老师注入一次停机，你先不看厂情中枢，自己追因：哪台设备停了，排着哪些工单，属于哪些订单，会晚几天。"
+        - ">然后在推演工作台至少试三个方案，选一个，把交期、成本、风险写清楚。提交之前，看不到中枢的建议。"
+        - ">方案变成动作，老师批准后才执行；工单做完，平台自动复盘，告诉你推演和实际差多少。"
+      en:
+        - ">After class you'll do Lab 15 in the WenQuest digital factory. The instructor injects a breakdown, and without opening the hub you trace it yourself: which machine stopped, which work orders are queued, which orders they belong to, how many days late."
+        - ">Then try at least three options in the what-if workbench, choose one and explain it on delivery, cost and risk. Until you submit, the hub's advice stays hidden."
+        - ">Your option becomes an action that runs only after the instructor approves it; when the work orders are done, the platform reviews how far the simulation was from reality."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      tag: ["课后", "After class"]
+      title: ["作业 3：停机的影响面与处理方案", "Assignment 3: the impact of a breakdown and how to handle it"]
+      points:
+        - ["计算：周五停 20 h；周一停 30 h 的加班费、外协费", "Compute: a 20 h Friday stop; overtime and outsourcing for a 30 h stop"]
+        - ["分析：机器人订单插到最前，钱、交期、风险", "Analyse: robot order first, on money, delivery and risk"]
+        - ["实验 15 报告：你的因果链与系统的比较", "Lab 15 report: your causal chain against the system's"]
+      foot: ["作业和报告都在问渠学习平台提交", "Submit both on WenQuest"]
+    say:
+      zh:
+        - ">作业一共三题。第一题计算：周五下午停 20 小时丢多少生产时间；周一停 30 小时，手算加班费和外协费，再用虚拟实验推演，说说为什么不一致。"
+        - ">第二题分析：把机器人订单插到最前，各订单晚几天、罚多少，从钱、交期、风险三方面写建议。"
+        - ">第三题是实验 15 的报告，重点写你画的因果链和系统的比较，以及你的选择和中枢建议的对照。"
+      en:
+        - ">The assignment has three tasks. One, calculation: how much production time does a 20-hour stop on Friday afternoon lose; for a 30-hour stop on Monday, work out overtime and outsourcing by hand, then simulate it and explain the difference."
+        - ">Two, analysis: move the robot order to the front; how late is each order, what are the penalties, and what do you recommend on money, delivery and risk?"
+        - ">Three, the Lab 15 report, focusing on your causal chain against the system's and your choice against the hub's advice."
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      tag: ["课后", "After class"]
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["周一 10:00 停 24 h，真正丢掉几个生产小时？", "A 24 h stop from 10:00 Monday: how many production hours are lost?"]
+        - ["维修加急一定能多出一半生产时间吗？", "Does expediting always gain half the downtime back?"]
+        - ["三次作答机会，提交后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：周一上午 10 点停 24 小时，真正丢掉几个生产小时？"
+        - ">维修加急把剩余停机减半，就一定能多出一半的生产时间吗？"
+        - ">每道题有三次机会，提交后马上能看到解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: a 24-hour stop from 10 on Monday morning, how many production hours are really lost?"
+        - ">If expediting halves the remaining downtime, do you always gain half of it back as production time?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 动画、虚拟实验、数字工厂实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们看客户与服务：机器人客户投诉关节异响，追到哪片砂轮、要召回几台。我们下一讲见。
+  en:
+    - The animation, the virtual lab, the digital-factory lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's customers and service, and how far to trace and recall when a robot customer hears a noisy joint. See you then.

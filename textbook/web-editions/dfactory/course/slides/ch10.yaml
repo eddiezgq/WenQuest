@@ -1,0 +1,302 @@
+# 第 10 讲 经营：毛利、应收与现金 · 网页互动课件（第 29 轮样板讲）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 textbook/tools/webcourse/wc_slides.py 的 L_*。
+# {{ch10.键:格式}} 由 course/calc/ch10.py 算出（口径和常数取自数字工厂 hub/finance.py、factory/data.py），不手写数字。
+lesson: 10
+code: [ch10]
+
+clips:
+  hero:          # 封面：订单毛利瀑布一块块搭起来，循环（铺满背景）
+    page: waterfall
+    selector: "#plotPanel"
+    cover: true
+  extras:        # 计划外的钱：加班 0 → 12 → 24 → 48 h，再降价 5%，毛利柱跟着变矮（一直循环）
+    page: waterfall
+    selector: "#plotPanel"
+    loop: 16
+    steps:
+      - {at: 0, js: "__lab.play(false)", press: ["[data-p=std]"]}
+      - {at: 2, press: ["[data-p=robot]"]}
+      - {at: 5, set: {ot: 24}}
+      - {at: 7.5, set: {ot: 48}}
+      - {at: 10, set: {ot: 12}}
+      - {at: 12, press: ["[data-p=cut]"]}
+  age:           # 应收账龄：机器人厂这笔逾期 0 → 15 → 35 → 70 天，一档一档往下掉（一直循环）
+    page: cashflow
+    selector: "#agePanel"
+    loop: 12
+    steps:
+      - {at: 0, js: "__lab.play(false)", press: ["[data-p=none]"]}
+      - {at: 0.2, set: {od: 0}}
+      - {at: 2.5, set: {od: 15}}
+      - {at: 5.5, set: {od: 35}}
+      - {at: 8.5, set: {od: 70}}
+  cash:          # 不处理：8 周现金一周一周画出来，第 8 周跌破零（一直循环）
+    page: cashflow
+    selector: "#plotPanel"
+  payday:        # 付款日从第 3 天拖到第 60 天：曲线一段段往下沉（一直循环）
+    page: cashflow
+    selector: "#plotPanel"
+    loop: 16
+    steps:
+      - {at: 0, js: "__lab.play(false)", press: ["[data-p=dun]"]}
+      - {at: 2, set: {pay: 17}}
+      - {at: 4, set: {pay: 31}}
+      - {at: 6, set: {pay: 45}}
+      - {at: 8, set: {pay: 50}}
+      - {at: 10.5, press: ["[data-p=none]"]}
+      - {at: 13.5, press: ["[data-p=dun]"]}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 10 讲 · 经营", "Lecture 10 · Business"]
+    title: ["毛利、应收与现金", "Margin, Receivables and Cash"]
+    sub: ["赚钱和有钱是两回事", "Making money is not having money"]
+    notes:
+      - "这一讲讲钱。工厂为机器人厂这批急单停过机、加过班、换过供应商，货终于交了，发票也开了。我们问两个问题：这单到底赚了多少？钱什么时候回到账上？背景上是这张订单的毛利瀑布：收入被各项成本一块块切掉，剩下的才是毛利。"
+      - "This lecture is about money. For the robot plant's rush order the plant stopped machines, paid overtime and switched suppliers; now the goods are delivered and invoiced. Two questions: how much did the order actually make, and when does the money get back to the bank? Behind me is the order's margin waterfall: revenue cut block by block by costs, and what's left is the gross margin."
+
+  - layout: question
+    tag: ["厂里出的事", "What happened in the plant"]
+    title: ["交了货、开了票，机器人厂迟迟不付款", "Delivered and invoiced, but the robot plant won't pay"]
+    facts:
+      - ["20 台 × $1,650 = ${{ch10.rev:,.0f}}，逾期 {{ch10.od:.0f}} 天", "20 × $1,650 = ${{ch10.rev:,.0f}}, {{ch10.od:.0f}} days overdue"]
+      - ["账上现金 ${{ch10.cash0:,.0f}}，每周开支 ${{ch10.wk:,.0f}}", "Cash ${{ch10.cash0:,.0f}}, fixed costs ${{ch10.wk:,.0f}} a week"]
+      - ["销售怕伤和气，会计怕发不出工资", "Sales fears the relationship; accounts fears payroll"]
+    notes:
+      - "先看厂里出的事。机器人厂追加的 20 台关节减速器已经全部交货，开了 {{ch10.rev:,.0f}} 美元的发票，付款条件 30 天。现在过了到期日 {{ch10.od:.0f}} 天，钱还没到。账上现金 {{ch10.cash0:,.0f}}，每周工资房租这些固定开支 {{ch10.wk:,.0f}}。销售说机器人厂是大客户，催急了伤和气；会计说再不收回来，两个月后就发不出工资了。听谁的？"
+      - "Here's what happened. The 20 joint reducers the robot plant added have all been delivered and invoiced for {{ch10.rev:,.0f}} dollars on 30-day terms. It's now {{ch10.od:.0f}} days past due and the money hasn't come. There's {{ch10.cash0:,.0f}} in the bank and {{ch10.wk:,.0f}} a week of fixed costs: wages, rent and so on. Sales says the robot plant is a big customer and chasing will hurt the relationship; accounts says if we don't collect, in two months we can't pay wages. Who's right?"
+
+  - layout: section
+    num: "01"
+    title: ["这单赚了多少", "How much did the order make"]
+
+  - layout: bignum
+    title: ["料、工、费：每台的标准成本", "Material, labour, overheads: standard cost per unit"]
+    nums:
+      - {n: "${{ch10.u_mat:,.2f}}", n_en: "material", label: ["料：BOM 用量 × 单价", "BOM quantities × prices"]}
+      - {n: "${{ch10.u_lab:,.2f}}", n_en: "labour", label: ["工：工时 × 折旧和人工费率", "hours × depreciation and wage rates"]}
+      - {n: "${{ch10.u_en:,.2f}}", n_en: "energy", label: ["电：工位费率的能耗项", "energy part of the rates"]}
+    foot: ["标准成本 ${{ch10.u_cost:,.2f}}，卖 $1,650：标准毛利率 {{ch10.std_pct:.1f}}%（目标 ≥ 25%）", "Standard cost ${{ch10.u_cost:,.2f}}, sold at $1,650: standard margin {{ch10.std_pct:.1f}}% (target ≥ 25%)"]
+    notes:
+      - "成本分三块。料，是 BOM 上每个零件的用量乘单价，每台 {{ch10.u_mat:,.2f}}。工，是每道工序的工时乘工位费率，费率里有设备折旧和人工，比如外圆磨床每小时折旧 20、人工 26，全部工序加起来每台 {{ch10.u_lab:,.2f}}。数字工厂把折旧和人工合在一起记作工，也就是加工费；会计上折旧属于制造费用。电是费率里的能耗一项，每台 {{ch10.u_en:,.2f}}。合起来标准成本 {{ch10.u_cost:,.2f}}，卖 1650，标准毛利率 {{ch10.std_pct:.1f}}%。注意，毛利不是利润，它还要付管理、销售、利息和税。"
+      - "Cost comes in three blocks. Material: each part's BOM quantity times its price, {{ch10.u_mat:,.2f}} a unit. Labour: each operation's time times the workstation rate, which holds depreciation and wages; the grinder, for instance, is 20 dollars of depreciation and 26 of wages an hour. All operations together give {{ch10.u_lab:,.2f}} a unit. The digital factory books depreciation with wages as labour, a conversion cost; accountants put depreciation in manufacturing overhead. Energy, the energy part of the rates, is {{ch10.u_en:,.2f}}. Standard cost {{ch10.u_cost:,.2f}}; sold at 1,650, a standard margin of {{ch10.std_pct:.1f}} percent. And margin isn't profit: it still has to pay overheads, selling costs, interest and tax."
+
+  - layout: split
+    title: ["一张订单的毛利分解", "Breaking down an order's margin"]
+    points:
+      - ["收入 − 料 − 工 − 电 − 废品 − 空转 − 加班外协 − 保修", "Revenue − material − labour − energy − scrap − idle − overtime − warranty"]
+      - ["毛利 ${{ch10.margin:,.0f}}，毛利率 {{ch10.m_pct:.1f}}%", "Margin ${{ch10.margin:,.0f}}, {{ch10.m_pct:.1f}}%"]
+      - ["比标准少 {{ch10.gap:.1f}} 个百分点", "{{ch10.gap:.1f}} points below standard"]
+    visual: {fig: fig10_waterfall}
+    notes:
+      - "实际花的常常比标准多。数字工厂把一张订单花的钱分成七项：料、工、电、废品返工、空转电、急单加班外协、保修，每一项都能点开看来源。这张单收入 {{ch10.rev:,.0f}}，一块块切下去，剩下毛利 {{ch10.margin:,.0f}}，毛利率 {{ch10.m_pct:.1f}}%。虚线是按标准成本的毛利，{{ch10.std_pct:.1f}}%，少了 {{ch10.gap:.1f}} 个百分点，刚好压在 25% 的目标线上面。"
+      - "What you actually spend is often more than standard. The digital factory splits an order's money into seven lines: material, labour, energy, scrap and rework, idle power, rush and overtime, and warranty, each traceable to its source. This order's {{ch10.rev:,.0f}} of revenue, cut block by block, leaves a margin of {{ch10.margin:,.0f}}, or {{ch10.m_pct:.1f}} percent. The dashed line is the margin at standard cost, {{ch10.std_pct:.1f}} percent: {{ch10.gap:.1f}} points lost, just above the 25 percent target."
+
+  - layout: split
+    title: ["计划外的钱：前面几讲都记在账上", "Unplanned money: the earlier lectures land in the accounts"]
+    points:
+      - ["加班 {{ch10.ot_h:.0f}} h × $30 × 1.5 = ${{ch10.x_ot:,.0f}}", "Overtime {{ch10.ot_h:.0f}} h × $30 × 1.5 = ${{ch10.x_ot:,.0f}}"]
+      - ["磨床重新调整 ${{ch10.x_lab:,.0f}}，废品 ${{ch10.x_scrap:,.0f}}，换供应商 ${{ch10.x_alt:,.0f}}", "Re-setting ${{ch10.x_lab:,.0f}}, scrap ${{ch10.x_scrap:,.0f}}, dearer supplier ${{ch10.x_alt:,.0f}}"]
+      - ["带锯床空转 24 h：只有 ${{ch10.x_idle:,.2f}}", "Band saw idling 24 h: just ${{ch10.x_idle:,.2f}}"]
+    visual: {video: extras}
+    notes:
+      - "计划外的钱一共 {{ch10.extra:,.0f}} 美元。最多的是加班：磨床熟练工请假，加班顶班 12 小时，每小时 30 乘 1.5 倍，{{ch10.x_ot:,.0f}}。磨床停机后重新对刀换砂轮 {{ch10.x_lab:,.0f}}，两根废轴 {{ch10.x_scrap:,.0f}}，轴承换供应商贵两成 {{ch10.x_alt:,.0f}}。画面上加班从 12 拖到 24、48 小时，毛利柱一点点变矮；再降价 5%，掉得更多。带锯床空转 24 小时只花 {{ch10.x_idle:,.2f}}：看钱要看数，不能凭印象。"
+      - "The unplanned money totals {{ch10.extra:,.0f}} dollars. The largest is overtime: the skilled grinder operator was away, 12 hours of cover at 30 dollars times 1.5, {{ch10.x_ot:,.0f}}. Re-zeroing and a new wheel after the grinder stopped: {{ch10.x_lab:,.0f}}; two scrapped shafts: {{ch10.x_scrap:,.0f}}; bearings 20 percent dearer from the alternative supplier: {{ch10.x_alt:,.0f}}. On screen overtime goes from 12 to 24 and 48 hours and the margin bar shrinks; then a 5 percent price cut takes even more. The band saw idling for 24 hours cost only {{ch10.x_idle:,.2f}}: judge money by the numbers, not by impressions."
+
+  - layout: points
+    title: ["毛利低了，找谁改", "A low margin: who fixes it"]
+    points:
+      - ["大头是工 {{ch10.lab_share:.1f}}% 和料 {{ch10.mat_share:.1f}}%", "The big blocks: labour {{ch10.lab_share:.1f}}%, material {{ch10.mat_share:.1f}}%"]
+      - ["报价找销售，料找采购，工时找工艺和车间", "Price → sales, material → purchasing, hours → process engineering"]
+      - ["低于 {{ch10.f5:.0f}}%：中枢报“订单毛利低于目标”", "Below {{ch10.f5:.0f}}%: the hub flags “margin below target”"]
+    foot: ["第 6 讲下班后保养的 $215 记在维修预算里，不分到订单上", "Lecture 6's $215 after-shift service goes to the maintenance budget, not the order"]
+    notes:
+      - "大头是工和料：工占收入 {{ch10.lab_share:.1f}}%，料占 {{ch10.mat_share:.1f}}%，料以外最多的一项是工。想多赚钱，先看工时和费率。毛利率比目标低 5 个百分点以上，也就是低于 {{ch10.f5:.0f}}%，厂情中枢会报订单毛利低于目标，把花得最多的几项列出来。低了找谁？报价低找销售，料贵找采购，工时超找工艺和车间。顺便说一句，第 6 讲那次下班后保养的 215 美元记在维修保养预算里，不分到订单上。"
+      - "The big blocks are labour, {{ch10.lab_share:.1f}} percent of revenue, and material, {{ch10.mat_share:.1f}}; apart from material, labour is the largest line. To earn more, look at hours and rates first. If a margin falls more than 5 points below target, below {{ch10.f5:.0f}} percent, the hub flags it and lists the biggest lines. Who fixes it? A low price goes to sales, dear material to purchasing, excess hours to process engineering and the shop floor. By the way, the 215-dollar after-shift service from Lecture 6 is booked to the maintenance budget, not to the order."
+
+  - layout: lab
+    title: ["虚拟实验 10-1：订单毛利瀑布", "Lab 10-1: order margin waterfall"]
+    shot: {page: waterfall}
+    tasks:
+      - ["点“机器人厂订单”，逐行核对表 10-2", "Press “robot plant order”; check Table 10-2 line by line"]
+      - ["降价 5%：掉几个百分点，为什么少于 5？", "5% price cut: how many points, and why fewer than 5?"]
+      - ["加班 12→24 h（+$540）vs 工时少 0.5 h（−${{ch10.hr05:,.0f}}）", "Overtime 12→24 h (+$540) vs 0.5 h less per unit (−${{ch10.hr05:,.0f}})"]
+    notes:
+      - "现在大家自己做虚拟实验 10-1。先点机器人厂订单，读出毛利和毛利率，跟表 10-2 逐行对一对。再点按标准成本、降价 5%，各记一次毛利率，看降价 5% 掉了几个百分点：只掉了 {{ch10.cut_pts:.1f}} 个，为什么比 5 个少？可毛利额少了整整 {{ch10.cut_usd:,.0f}}，占原毛利的两成。然后把加班从 12 小时加到 24 小时，多花 540；再回到 12 小时，把每台工时减少半小时，省约 {{ch10.hr05:,.0f}}，台数越多省得越多，比一比哪个对毛利影响大。最后点播放，看瀑布一块块搭起来。"
+      - "Now try Virtual lab 10-1 yourselves. Press robot plant order, read the margin and its percentage, and check them line by line against Table 10-2. Then press standard cost and the 5 percent cut and record the margins: how many points does the cut take off? Only {{ch10.cut_pts:.1f}}: why fewer than five? Yet the margin itself loses a full {{ch10.cut_usd:,.0f}} dollars, a fifth of it. Then raise overtime from 12 to 24 hours, 540 dollars more; back at 12, cut the hours per unit by half an hour, about {{ch10.hr05:,.0f}} saved, and more with more units. Which matters more? Finally press Play and watch the waterfall build."
+
+  - layout: section
+    num: "02"
+    title: ["钱什么时候回来", "When does the money come back"]
+
+  - layout: split
+    title: ["应收账款与账龄", "Receivables and ageing"]
+    points:
+      - ["应收 ${{ch10.ar_total:,.0f}}，逾期 ${{ch10.overdue_amt:,.0f}}（{{ch10.overdue_share:.0f}}%）", "Receivables ${{ch10.ar_total:,.0f}}, overdue ${{ch10.overdue_amt:,.0f}} ({{ch10.overdue_share:.0f}}%)"]
+      - ["逾期越久越难收；60 天以上常要提坏账", "The older, the harder; over 60 days often needs a provision"]
+      - ["算上下一批，机器人厂信用占用已是 {{ch10.used:.0f}}%", "Counting its next batch, credit used is already {{ch10.used:.0f}}%"]
+    visual: {video: age}
+    notes:
+      - "货交了、票开了、钱没到，就是应收账款：钱是工厂的，却还在客户口袋里。先看账龄：按逾期多少天分档。现在应收 {{ch10.ar_total:,.0f}}，逾期的占 {{ch10.overdue_share:.0f}}%。画面上机器人厂这笔逾期从 0 天走到 15、35、70 天，一档一档往下掉；逾期越久越难收回。再看信用：它欠 {{ch10.robot_amt:,.0f}}，已经超过 3 万的额度；算上在做、还没开票的下一批，现在占用已是 {{ch10.used:.0f}}%，中枢另报一条客户信用超限。"
+      - "Delivered, invoiced, not paid: that's a receivable, the plant's money still in the customer's pocket. First the ageing, sorted by days overdue. Receivables are {{ch10.ar_total:,.0f}}, {{ch10.overdue_share:.0f}} percent overdue. On screen the robot plant's invoice goes from 0 to 15, 35 and 70 days overdue, dropping band by band; the older it gets, the harder to collect. Then credit: it owes {{ch10.robot_amt:,.0f}}, already over its 30,000 limit, and counting its next batch, in production and not yet invoiced, exposure is already {{ch10.used:.0f}} percent, so the hub raises a second exception: over credit limit."
+
+  - layout: bignum
+    title: ["应收周转天数 DSO", "Days sales outstanding"]
+    nums:
+      - {n: "${{ch10.per_day:,.0f}}", n_en: "per day", label: ["近 30 天日均开票", "average daily invoicing, last 30 days"]}
+      - {n: "{{ch10.dso:.1f}}", n_en: "DSO now", label: ["现在：应收 ÷ 日均开票（天）", "now: receivables ÷ daily invoicing (days)"]}
+      - {n: "{{ch10.dso_after:.1f}}", n_en: "after payment", label: ["机器人厂付清以后（天）", "after the robot plant pays (days)"]}
+    foot: ["目标 ≤ {{ch10.dso_target}} 天；DSO 每少 1 天，${{ch10.per_day:,.0f}} 回到账上", "Target ≤ {{ch10.dso_target}} days; each day off brings ${{ch10.per_day:,.0f}} back"]
+    notes:
+      - "应收多不多，要和卖得多不多比。DSO，应收周转天数，就是现在的应收相当于多少天的销售额。近 30 天开的票只有绿谷和海港两张，{{ch10.sales30:,.0f}}，每天 {{ch10.per_day:,.0f}}。DSO 等于 {{ch10.ar_total:,.0f}} 除以 {{ch10.per_day:,.0f}}，{{ch10.dso:.1f}} 天，目标 45 天，多了快一倍。机器人厂一付清，降到 {{ch10.dso_after:.1f}} 天。DSO 也能换成钱：每少一天，就有 {{ch10.per_day:,.0f}} 美元回到账上。"
+      - "Whether receivables are high depends on sales. DSO, days sales outstanding, says how many days of sales the receivables represent. Only two invoices went out in the last 30 days, GreenValley and Harbor Crane, {{ch10.sales30:,.0f}}, or {{ch10.per_day:,.0f}} a day. DSO is {{ch10.ar_total:,.0f}} over {{ch10.per_day:,.0f}}: {{ch10.dso:.1f}} days, against a target of 45. Once the robot plant pays, it falls to {{ch10.dso_after:.1f}}. DSO converts to money: every day off brings {{ch10.per_day:,.0f}} dollars back to the bank."
+
+  - layout: split
+    title: ["现金流预测：一周一周算", "Cash forecast: week by week"]
+    points:
+      - ["收款：到期日 + 客户平时晚几天", "Cash in: due date + the customer's usual delay"]
+      - ["付款：供应商发票到期日 + 固定开支", "Cash out: supplier due dates + fixed costs"]
+      - ["每周都要大于零，最好留一周开支", "Above zero every week, ideally a week to spare"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><text x="450" y="120" font-size="46" fill="#f3f6fa" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">Cₖ = Cₖ₋₁ + in − out − fixed</text><path d="M100 190 L800 190" stroke="#22324d" stroke-width="2"/><text x="120" y="270" font-size="32" fill="#5ee0d2">峰顶第 1 周、绿谷第 4 周、海港第 5 周</text><text x="120" y="305" font-size="22" fill="#8fa3ba" class="en">Summit week 1, GreenValley week 4, Harbor Crane week 5</text><text x="120" y="385" font-size="32" fill="#ff7a45">三批料钱：第 3、5、7 周</text><text x="120" y="420" font-size="22" fill="#8fa3ba" class="en">three material bills: weeks 3, 5, 7</text><text x="120" y="500" font-size="32" fill="#f2b705">每周固定开支 ${{ch10.wk:,.0f}}</text><text x="120" y="535" font-size="22" fill="#8fa3ba" class="en">fixed costs ${{ch10.wk:,.0f}} a week</text></svg>
+    notes:
+      - "毛利回答赚不赚钱，现金回答有没有钱付账。工资、房租、货款都要用现金付，不能用应收付。数字工厂做未来 8 周的现金预测：这周现金等于上周现金，加收款，减付款，再减固定开支。收款按到期日加这个客户平时晚几天：峰顶第 1 周到，绿谷第 4 周，海港第 5 周。三批料钱在第 3、5、7 周付。每周都要大于零，最好还留一周开支的余量。"
+      - "Margin answers whether we make money; cash answers whether we can pay the bills. Wages, rent and suppliers are paid in cash, not in receivables. The digital factory forecasts 8 weeks ahead: this week's cash is last week's plus cash in, minus cash out, minus fixed costs. Receipts come on the due date plus the customer's usual delay: Summit in week 1, GreenValley in week 4, Harbor Crane in week 5. Three material bills go out in weeks 3, 5 and 7. Cash must stay above zero every week, ideally with a week of costs to spare."
+
+  - layout: split
+    title: ["不处理：第 {{ch10.none_neg}} 周付不出工资", "Do nothing: no payroll in week {{ch10.none_neg}}"]
+    points:
+      - ["机器人厂不催就不付：8 周收不到", "The robot plant won't pay unless chased"]
+      - ["第 {{ch10.none_below}} 周只剩 ${{ch10.none_b7:,.0f}}", "Week {{ch10.none_below}}: only ${{ch10.none_b7:,.0f}} left"]
+      - ["第 {{ch10.none_neg}} 周 −${{ch10.none_low_abs:,.0f}}", "Week {{ch10.none_neg}}: −${{ch10.none_low_abs:,.0f}}"]
+    visual: {video: cash}
+    notes:
+      - "先看不处理。机器人厂不催就不付，8 周内这 {{ch10.robot_amt:,.0f}} 收不到。画面上现金一周一周画出来：收款是绿柱，付款是红柱。第 {{ch10.none_below}} 周只剩 {{ch10.none_b7:,.0f}}，跌破了安全线；第 {{ch10.none_neg}} 周变成负 {{ch10.none_low_abs:,.0f}}，付不出工资了。"
+      - "First, doing nothing. The robot plant won't pay unless chased, so its {{ch10.robot_amt:,.0f}} doesn't arrive in 8 weeks. On screen the cash is drawn week by week: cash in as green bars, cash out as red. In week {{ch10.none_below}} only {{ch10.none_b7:,.0f}} is left, below the safety line; in week {{ch10.none_neg}} it's minus {{ch10.none_low_abs:,.0f}}: the wages can't be paid."
+
+  - layout: bignum
+    title: ["赚钱的工厂也会倒闭", "A profitable factory can still go bankrupt"]
+    nums:
+      - {n: "+${{ch10.margin:,.0f}}", n_en: "margin", label: ["这单赚的毛利", "what the order made"]}
+      - {n: "−${{ch10.none_low_abs:,.0f}}", n_en: "week {{ch10.none_neg}}", label: ["不处理时的现金", "cash if nothing is done"]}
+      - {n: "${{ch10.robot_amt:,.0f}}", n_en: "receivable", label: ["压在客户手里的钱", "money stuck with the customer"]}
+    foot: ["料钱、工资先付出去，货款过了账期才回来；订单越多、长得越快，要垫的现金越多", "Materials and wages are paid first, sales money returns after the terms; the more orders and faster growth, the more cash to advance"]
+    notes:
+      - "这单明明赚了 {{ch10.margin:,.0f}}，第 {{ch10.none_neg}} 周却是负 {{ch10.none_low_abs:,.0f}}。这就是赚钱的工厂也会倒闭：料钱、工资先付出去了，{{ch10.robot_amt:,.0f}} 的货款还压在客户手里。钱在路上的时间越长，要垫的现金越多；订单越多、长得越快，垫得越多。很多工厂不是亏死的，是现金断了。"
+      - "The order clearly made {{ch10.margin:,.0f}}, yet week {{ch10.none_neg}} shows minus {{ch10.none_low_abs:,.0f}}. That's how a profitable factory goes bankrupt: materials and wages were paid out first, while {{ch10.robot_amt:,.0f}} of sales money sits with the customer. The longer the money is on the road, the more cash you advance; the more orders and the faster you grow, the more you advance. Many plants don't die of losses; they die when the cash runs out."
+
+  - layout: split
+    title: ["客户晚付一周，曲线就沉一段", "Each week of delay sinks the curve"]
+    points:
+      - ["催款：约 {{ch10.dun}} 天收到，最低 ${{ch10.dun_low:,.0f}}", "Dun: paid in about {{ch10.dun}} days, lowest ${{ch10.dun_low:,.0f}}"]
+      - ["拖到第 {{ch10.late_day:.0f}} 天：第 {{ch10.late_low_wk}} 周只剩 ${{ch10.late_low:,.0f}}", "Paid on day {{ch10.late_day:.0f}}: only ${{ch10.late_low:,.0f}} in week {{ch10.late_low_wk}}"]
+      - ["不付：第 {{ch10.none_neg}} 周见底", "Never paid: out of cash in week {{ch10.none_neg}}"]
+    visual: {video: payday}
+    notes:
+      - "这是虚拟实验 10-2。机器人厂的付款日从第 3 天一路往后拖：第 3 天收到，整条曲线抬高，8 周内最低还有 {{ch10.dun_low:,.0f}}；拖到第 {{ch10.late_day:.0f}} 天，前 7 周和不处理一样，第 {{ch10.late_low_wk}} 周只剩 {{ch10.late_low:,.0f}}，低于安全线；再往后，就跌破零。红色虚线是不处理的对照。客户晚付一周，曲线就有一段要往下沉。"
+      - "This is Virtual lab 10-2. The robot plant's payment day slides from day 3 onward. Paid on day 3, the whole curve lifts and the lowest cash in 8 weeks is still {{ch10.dun_low:,.0f}}. Paid on day {{ch10.late_day:.0f}}, the first 7 weeks match doing nothing and week {{ch10.late_low_wk}} has only {{ch10.late_low:,.0f}}, below the safety line; any later and it goes below zero. The red dashed line is the do-nothing control. Each week the customer is late, part of the curve sinks."
+
+  - layout: tiles
+    title: ["厂情中枢的三个方案", "The hub's three options"]
+    tiles:
+      - {k: "A", name: ["不处理（对照）", "Do nothing"], use: ["第 {{ch10.none_neg}} 周现金 −${{ch10.none_low_abs:,.0f}}", "Week {{ch10.none_neg}}: −${{ch10.none_low_abs:,.0f}}"]}
+      - {k: "B", hot: true, name: ["发催款函", "Dunning letter"], use: ["约 {{ch10.dun}} 天收到；最低 ${{ch10.dun_low:,.0f}}；不伤和气", "Paid in about {{ch10.dun}} days; lowest ${{ch10.dun_low:,.0f}}; friendly"]}
+      - {k: "C", name: ["信用冻结", "Credit freeze"], use: ["这一笔同 B；还推迟下一批 ${{ch10.next_amt:,.0f}} 的开票回款，伤关系", "Same as B for this invoice; delays the next ${{ch10.next_amt:,.0f}} invoice; hurts the relationship"]}
+    notes:
+      - "厂情中枢给三个方案。A 不处理，第 {{ch10.none_neg}} 周现金为负。B 发催款函，客户通常 {{ch10.dun}} 天内付，8 周内最低还有 {{ch10.dun_low:,.0f}}，不伤和气。C 信用冻结，催款同时停发他的新货，下一批 {{ch10.next_amt:,.0f}} 先不发货不开票。对逾期这一笔，C 和 B 一样；C 还推迟下一批的开票和回款，8 周预测里没计入，因为它还没开票。C 多的是止损，代价是关系。中枢有两条规则：应收逾期只看天数，{{ch10.od:.0f}} 天建议 B；信用超限看占用，{{ch10.used:.0f}}% 建议 C。两条打架，要人来权衡：我们选先催款，下一批开票前还没付再冻结。"
+      - "The hub offers three options. A, do nothing: cash goes negative in week {{ch10.none_neg}}. B, a dunning letter: customers usually pay within {{ch10.dun}} days, the lowest cash in 8 weeks is {{ch10.dun_low:,.0f}}, and the relationship stays friendly. C, a credit freeze: dun and stop new shipments, so the next {{ch10.next_amt:,.0f}} batch is neither shipped nor invoiced. For the overdue invoice, C is the same as B; C also delays the next batch's invoice and collection, which the 8-week forecast leaves out because it isn't invoiced yet. C adds damage control, at the price of the relationship. The hub has two rules: the overdue rule looks only at days and recommends B at {{ch10.od:.0f}} days; the credit-limit rule looks at exposure and recommends C at {{ch10.used:.0f}} percent. When they clash, a person weighs them: we dun first and freeze if it's still unpaid before the next batch is invoiced."
+
+  - layout: points
+    title: ["什么时候宁可不催", "When it is better not to chase"]
+    points:
+      - ["一向守信、订单多，只是一时困难", "A reliable customer with many orders, briefly in trouble"]
+      - ["钱很小，催了反而丢大单", "A small sum where chasing could lose a big order"]
+      - ["先打电话约付款日，再放进现金预测", "Phone first, agree a date, put it in the forecast"]
+    foot: ["“不处理”不等于没成本：代价在现金表里——借钱付利息，或拖欠供应商", "Doing nothing isn't free: its price is in the cash table, borrowing or delaying suppliers"]
+    notes:
+      - "不处理不等于没有成本，它的代价不在毛利表里，在现金表里：要么借钱付利息，要么拖欠供应商、影响评分卡。但有时候宁可不催：客户一向守信、订单又多，只是一时困难；或者钱很小，催了反而丢大单。这时先打电话问问情况，约个付款日，把它放进现金预测。决定要同时看钱和关系。"
+      - "Doing nothing isn't free; its price isn't in the margin table but in the cash table: borrow and pay interest, or delay suppliers and hurt your scorecard. Still, sometimes it's better not to chase: a reliable customer with plenty of orders in a short rough patch, or a small sum where chasing could lose a big order. Then phone, find out what's going on, agree a payment date and put it in the forecast. Weigh money and the relationship together."
+
+  - layout: lab
+    title: ["虚拟实验 10-2：未来 8 周的现金", "Lab 10-2: cash over the next 8 weeks"]
+    shot: {page: cashflow}
+    tasks:
+      - ["点“不处理”，核对表 10-4", "Press “do nothing”; check Table 10-4"]
+      - ["催款与冻结：现金一样，差在哪", "Dun vs freeze: same cash, what differs?"]
+      - ["付款日 3 → 60 天；逾期拖过 30 天", "Payment day 3 → 60; overdue past 30 days"]
+    notes:
+      - "做虚拟实验 10-2。先点不处理，读出最低的一周和金额，哪周跌破安全线、哪周跌破零，跟表 10-4 核对。再点催款和信用冻结，现金曲线一样，看下面的说明差在哪里。然后把付款日从第 3 天拖到第 60 天，每隔十天记一次最低现金，画一条关系线。最后把已逾期拖过 30 天，看账龄换档，中枢的建议变成什么。"
+      - "Now Virtual lab 10-2. Press do nothing and read the lowest week and amount and the weeks cash falls below the safety line and below zero; check them against Table 10-4. Then press dun and freeze credit: the cash curves match, so read the note below to see what differs. Then drag the payment day from 3 to 60, recording the lowest cash every ten days, and sketch the relationship. Finally drag the days overdue past 30 and watch the ageing band and the hub's recommendation change."
+
+  - layout: section
+    num: "03"
+    title: ["在数字工厂里做", "In the digital factory"]
+
+  - layout: chain
+    title: ["在数字工厂里做：实验 22", "In the digital factory: Lab 22"]
+    steps:
+      - ["指标树", "Objectives"]
+      - ["订单毛利", "Margin"]
+      - ["老师注入", "Injection"]
+      - ["比较方案", "Compare"]
+      - ["提交选择", "Submit"]
+      - ["催款审批", "Dun, approve"]
+      - ["客户付款", "Paid"]
+      - ["DSO 与现金", "DSO, cash"]
+    hot: [3, 4]
+    mark: ["比对模式", "comparison mode"]
+    foot: ["教学模式 1 个账期日 = 2 分钟；海港起重 $13,200 逾期 15 天、不催不付；成绩 = 平台 60 分 + 报告 40 分", "In teaching mode a payment day is 2 minutes; Harbor Crane's $13,200, 15 days overdue, unpaid unless chased; mark = 60 platform + 40 report"]
+    notes:
+      - "课后到数字工厂“经营与财务”页亲手做实验 22。先在经营目标的指标树里找没达标的指标；再打开老师指定的订单，按分解表手算毛利率。老师注入海港起重一笔 13200 美元的发票逾期 15 天、不催不付；你在指挥台比较催款、冻结、不处理，选一个写理由，提交之前看不到中枢的推荐。然后发起催款，老师批准，几分钟后客户付款。最后算 DSO，找出现金最紧的一周。教学模式下一个账期日只有 2 分钟，一节课就能看到逾期和付款。"
+      - "After class, do Lab 22 on the digital factory's Business and finance page. First find the missed objectives in the objective tree; then open the order your instructor names and calculate its margin from the breakdown. The instructor injects a 13,200-dollar Harbor Crane invoice, 15 days overdue and unpaid unless chased. Compare dunning, a freeze and doing nothing in the command centre and give reasons; the hub's advice stays hidden until you submit. Then raise the dunning, the instructor approves, and a few minutes later the customer pays. Finally compute DSO and find the tightest week. In teaching mode a payment day lasts two minutes, so you see invoices fall overdue and get paid within one class."
+
+  - layout: split
+    title: ["机器人联系：里程碑付款", "Robot link: milestone payments"]
+    points:
+      - ["签约 {{ch10.rb_pre_pct:.0f}}%、验收 {{ch10.rb_acc_pct:.0f}}%、质保金 {{ch10.rb_ret_pct:.0f}}%", "{{ch10.rb_pre_pct:.0f}}% on signing, {{ch10.rb_acc_pct:.0f}}% on acceptance, {{ch10.rb_ret_pct:.0f}}% retention"]
+      - ["验收拖两个月，${{ch10.rb_acc:,.0f}} 晚两个月", "Acceptance two months late: ${{ch10.rb_acc:,.0f}} two months late"]
+      - ["谈预付款、分批开票，让钱早回来", "Negotiate a down payment, invoice in batches"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><text x="60" y="70" font-size="30" fill="#d3deea">一个机器人工作站（示意）</text><text x="60" y="102" font-size="22" fill="#8fa3ba" class="en">one robot cell (illustrative): ${{ch10.rb_total:,.0f}}</text><rect x="60" y="130" width="234" height="80" rx="10" fill="#2ec4b6"/><rect x="300" y="130" width="468" height="80" rx="10" fill="#f2b705"/><rect x="774" y="130" width="76" height="80" rx="10" fill="#a78bfa"/><text x="177" y="182" font-size="34" font-weight="800" fill="#08101d" text-anchor="middle">{{ch10.rb_pre_pct:.0f}}%</text><text x="534" y="182" font-size="34" font-weight="800" fill="#08101d" text-anchor="middle">{{ch10.rb_acc_pct:.0f}}%</text><text x="812" y="180" font-size="24" font-weight="800" fill="#08101d" text-anchor="middle">{{ch10.rb_ret_pct:.0f}}%</text><text x="177" y="245" font-size="24" fill="#d3deea" text-anchor="middle">签约</text><text x="534" y="245" font-size="24" fill="#d3deea" text-anchor="middle">现场验收</text><text x="812" y="245" font-size="24" fill="#d3deea" text-anchor="middle">一年后</text><text x="177" y="273" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">signing</text><text x="534" y="273" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">site acceptance</text><text x="812" y="273" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">1 yr later</text><g font-size="28" fill="#f3f6fa" text-anchor="middle"><rect x="40" y="345" width="170" height="100" rx="14" fill="#22324d"/><text x="125" y="392">终端工厂</text><rect x="260" y="345" width="170" height="100" rx="14" fill="#22324d"/><text x="345" y="392">集成商</text><rect x="480" y="345" width="170" height="100" rx="14" fill="#22324d"/><text x="565" y="392">机器人厂</text><rect x="700" y="345" width="170" height="100" rx="14" fill="#4b5f7d" stroke="#f2b705" stroke-width="4"/><text x="785" y="392">减速器厂</text></g><g font-size="20" fill="#8fa3ba" text-anchor="middle" class="en"><text x="125" y="426">end user</text><text x="345" y="426">integrator</text><text x="565" y="426">robot plant</text><text x="785" y="426">our plant</text></g><g stroke="#ff7a45" stroke-width="5" fill="none"><path d="M212 395 L252 395"/><path d="M432 395 L472 395"/><path d="M652 395 L692 395"/></g><g fill="#ff7a45"><path d="M256 395 L240 385 L240 405 Z"/><path d="M476 395 L460 385 L460 405 Z"/><path d="M696 395 L680 385 L680 405 Z"/></g><text x="450" y="540" font-size="30" fill="#ff7a45" text-anchor="middle">晚付一节一节往上游传</text><text x="450" y="575" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">late payment travels up the chain link by link</text></svg>
+    notes:
+      - "机器人厂为什么也拖款？它把协作机器人卖给系统集成商，集成商做成工作站卖给终端工厂，常按里程碑付款。设一个工作站 {{ch10.rb_total:,.0f}} 美元，这是示意值：签约付 {{ch10.rb_pre_pct:.0f}}%，现场验收后付 {{ch10.rb_acc_pct:.0f}}%，质保金 {{ch10.rb_ret_pct:.0f}}% 一年后才付。终端工厂验收拖两个月，{{ch10.rb_acc:,.0f}} 就晚两个月；集成商拖机器人厂，机器人厂拖我们。所以给机器人厂定信用额度，要看它下游怎么回款。我们也可以谈预付款，或者分批交货分批开票。"
+      - "Why does the robot plant pay late too? It sells collaborative robots to integrators, who build cells for end users, usually paid by milestones. Take a {{ch10.rb_total:,.0f}}-dollar cell, an illustrative figure: {{ch10.rb_pre_pct:.0f}} percent on signing, {{ch10.rb_acc_pct:.0f}} percent after site acceptance, and a {{ch10.rb_ret_pct:.0f}} percent retention a year later. If acceptance slips two months, {{ch10.rb_acc:,.0f}} arrives two months late; the integrator pays the robot plant late, and the robot plant pays us late. So the robot plant's credit limit should reflect how its own customers pay. We can also negotiate a down payment, or deliver and invoice in batches."
+
+  - layout: points
+    title: ["生活例子：开小店卖货给熟客赊账", "Everyday example: a shop selling on credit"]
+    points:
+      - ["每月卖 ${{ch10.shop_s:,.0f}}，账面赚 ${{ch10.shop_profit:,.0f}}", "Sells ${{ch10.shop_s:,.0f}} a month, makes ${{ch10.shop_profit:,.0f}} on paper"]
+      - ["一半赊账、两个月后才还，进货要现付", "Half on credit, repaid two months later; stock paid in cash"]
+      - ["第 {{ch10.shop_low_m}} 个月缺 ${{ch10.shop_low_abs:,.0f}}", "Month {{ch10.shop_low_m}}: ${{ch10.shop_low_abs:,.0f}} short"]
+    foot: ["账上赚钱，手里没钱：赚钱和有钱是两回事", "Profitable on paper, broke in the till: making money is not having money"]
+    notes:
+      - "生活里的例子：开小店卖货给熟客赊账。每月卖 {{ch10.shop_s:,.0f}}，毛利率 {{ch10.shop_m:.0f}}%，房租工资 {{ch10.shop_fix:,.0f}}，账面每月赚 {{ch10.shop_profit:,.0f}}。可一半赊给熟客，两个月后才还，进货却要现付，开张时手里只有 {{ch10.shop_c0:,.0f}}。第 1 个月现金就是负的，第 {{ch10.shop_low_m}} 个月缺 {{ch10.shop_low_abs:,.0f}}，要借钱或者断货。跟今天的工厂是同一道题。"
+      - "An everyday example: a shop that lets regulars buy on credit. It sells {{ch10.shop_s:,.0f}} a month at a {{ch10.shop_m:.0f}} percent margin with {{ch10.shop_fix:,.0f}} of rent and wages: {{ch10.shop_profit:,.0f}} a month on paper. But half goes on credit, repaid two months later, while stock is paid in cash, and the shop opened with only {{ch10.shop_c0:,.0f}}. Cash is negative in month 1 and {{ch10.shop_low_abs:,.0f}} short in month {{ch10.shop_low_m}}: borrow or run out of stock. The same problem as today's plant."
+
+  - layout: answer
+    tag: ["回到厂里的事", "Back to the problem"]
+    title: ["这单赚了钱；现在发催款函", "The order made money; send the dunning letter now"]
+    rows:
+      - [["毛利（毛利率）", "Margin (percent)"], "${{ch10.margin:,.0f}} ({{ch10.m_pct:.1f}}%)"]
+      - [["应收周转天数 DSO", "Days sales outstanding"], "{{ch10.dso:.1f}} d"]
+      - [["不处理：第 {{ch10.none_neg}} 周现金", "Do nothing: cash in week {{ch10.none_neg}}"], "−${{ch10.none_low_abs:,.0f}}"]
+      - [["催款：8 周内最低现金", "Dunning: lowest cash in 8 weeks"], "${{ch10.dun_low:,.0f}}"]
+    side: {big: "{{ch10.dso_after:.1f}}", text: ["收回以后 DSO（天）", "DSO once paid (days)"]}
+    foot: ["应收逾期建议催款，信用超限建议冻结：先催款，下一批开票前没付再冻结", "Overdue rule: dun; credit-limit rule: freeze. Dun first, freeze if unpaid before the next invoice"]
+    notes:
+      - "回到开头。这单赚了 {{ch10.margin:,.0f}}，毛利率 {{ch10.m_pct:.1f}}%，刚守住目标；比标准少的主要是加班、磨床重新调整和废品。DSO {{ch10.dso:.1f}} 天，远超目标。不处理，第 {{ch10.none_neg}} 周现金变成负 {{ch10.none_low_abs:,.0f}}。建议现在发催款函：约 {{ch10.dun}} 天收回，8 周内最低还有 {{ch10.dun_low:,.0f}}，DSO 降到 {{ch10.dso_after:.1f}} 天。逾期才 {{ch10.od:.0f}} 天，应收逾期建议催款；占用 {{ch10.used:.0f}}%，信用超限建议冻结。两者权衡，先催款；如果下一批开票前还没付，或逾期超过 30 天，再请厂长冻结。下次接单谈预付款或分批开票，把加班和换供应商的钱算进报价。"
+      - "Back to the start. The order made {{ch10.margin:,.0f}}, {{ch10.m_pct:.1f}} percent, just on target; it fell short of standard mainly through overtime, grinder re-setting and scrap. DSO is {{ch10.dso:.1f}} days, far above target. Doing nothing, cash reaches minus {{ch10.none_low_abs:,.0f}} in week {{ch10.none_neg}}. Send the dunning letter now: the money returns in about {{ch10.dun}} days, the lowest cash in 8 weeks is {{ch10.dun_low:,.0f}}, and DSO falls to {{ch10.dso_after:.1f}}. Only {{ch10.od:.0f}} days overdue, so the overdue rule says dun; at {{ch10.used:.0f}} percent exposure the credit-limit rule says freeze. Weighing them, dun first; if it's still unpaid when the next batch is invoiced, or past 30 days, ask the plant manager to freeze. Next time, negotiate a down payment or batch invoicing, and price overtime and dearer suppliers into the quote."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["毛利分解：钱花在哪、找谁改", "Margin breakdown: where the money went, who fixes it"]
+      - ["DSO 与 8 周现金：最低的一周最要紧", "DSO and 8-week cash: the lowest week matters most"]
+      - ["逾期 30 天内先催款，超限再权衡；赚钱 ≠ 有钱", "Dun within 30 days, weigh the limit; profit ≠ cash"]
+    after: ["作业 10 · 测验 10 · 数字工厂实验 22 报告 —— 在问渠学习平台完成", "Assignment 10 · Quiz 10 · Lab 22 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，毛利分解：收入减去料、工、电和计划外的花费，看清钱花在哪里，报价找销售，料找采购，工时找工艺和车间。第二，应收看账龄和 DSO，现金一周一周预测，最低的一周最要紧。第三，应收逾期按天数，30 天以内先催款；信用超限建议冻结，两条不一致时由人权衡；赚钱和有钱是两回事。下课后做作业 10、测验 10，完成数字工厂实验 22 的报告。"
+      - "Three things to remember. One: break down the margin, revenue minus material, labour, energy and unplanned costs, to see where the money went; price goes to sales, material to purchasing, hours to process engineering. Two: read receivables by ageing and DSO, forecast cash week by week, and watch the lowest week. Three: an overdue invoice is judged by days, dunning first within 30; an over-limit customer gets a freeze, and when the two disagree a person weighs them; making money is not having money. After class: Assignment 10, Quiz 10 and the Lab 22 report."

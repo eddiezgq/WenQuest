@@ -5,7 +5,9 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TITLES = {"weibull": "Weibull reliability: how long will the machine last?", "pmopt": "Choosing the service interval"}
+TITLES = {"weibull": "Weibull reliability: how long will the machine last?", "pmopt": "Choosing the service interval",
+          "waterfall": "Order margin waterfall: where does the money go?", "cashflow": "Cash over the next 8 weeks: when will the customer pay?",
+          "causal": "The causal chain of one breakdown", "whatif": "Overtime, expediting or outsourcing?"}
 for p in sorted((ROOT / "src" / "zh" / "labs").glob("*.html")):
     s = p.read_text(encoding="utf-8")
     s = s.replace('<html lang="zh-CN">', '<html lang="en">', 1)

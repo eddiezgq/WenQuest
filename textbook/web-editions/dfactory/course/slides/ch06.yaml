@@ -43,7 +43,7 @@ clips:
     steps:
       - {at: 0, js: "__lab.play(false)", press: ["[data-p=after]"]}
       - {at: 0.2, set: {T: 150}}
-      - {at: 2, set: {T: 312}}
+      - {at: 2, set: {T: 310}}
       - {at: 4, set: {T: 500}}
       - {at: 6, set: {T: 1000}}
       - {at: 9, press: ["[data-p=during]"]}
@@ -127,8 +127,8 @@ slides:
       svg: |-
         <svg viewBox="0 0 900 640" width="100%" height="640"><text x="450" y="120" font-size="44" fill="#f3f6fa" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">P(t, H) = 1 − R(t+H) / R(t)</text><text x="450" y="210" font-size="34" fill="#f2b705" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">= 1 − exp{−[((t+H)/η)^β − (t/η)^β]}</text><path d="M100 270 L800 270" stroke="#22324d" stroke-width="2"/><text x="120" y="340" font-size="32" fill="#f3f6fa">GRD-01：t = 620 h，H = 80 h</text><text x="120" y="375" font-size="22" fill="#8fa3ba" class="en">GRD-01: t = 620 h, H = 80 h</text><text x="120" y="440" font-size="30" fill="#d3deea" font-family="'DejaVu Serif',serif">(700/900)³ − (620/900)³ = 0.1436</text><text x="120" y="530" font-size="64" font-weight="800" fill="#5ee0d2" font-family="'DejaVu Sans',sans-serif">P = {{ch06.p:.1f}}%</text><text x="470" y="530" font-size="30" fill="#8fa3ba">保养后 {{ch06.p_after:.2f}}%</text><text x="470" y="565" font-size="22" fill="#8fa3ba" class="en">after service {{ch06.p_after:.2f}}%</text></svg>
     notes:
-      - "做决定要的不是 F(620)，到现在没坏已经知道了。要的是：已经跑了 t 小时没坏，再跑 H 小时内坏掉的概率，这是条件概率，1 减 R(t+H) 比 R(t)。代入磨床：700 比 900 的立方减 620 比 900 的立方，等于 0.1436，P 等于 {{ch06.p:.1f}}%。如果现在保养，时钟拨回零，未来 80 小时只有 {{ch06.p_after:.2f}}%，小了约 {{ch06.ratio:.0f}} 倍。"
-      - "A decision doesn't need F of 620; we know it hasn't failed. We need the chance that a machine which has run t hours fails within H more. That's a conditional probability: one minus R of t plus H over R of t. For the grinder: 700 over 900 cubed minus 620 over 900 cubed is 0.1436, so P is {{ch06.p:.1f}} percent. Service it now and the clock goes back to zero: {{ch06.p_after:.2f}} percent for the next 80 hours, about {{ch06.ratio:.0f}} times smaller."
+      - "做决定要的不是 F(620)，到现在没坏已经知道了。要的是：已经跑了 t 小时没坏，再跑 H 小时内坏掉的概率，这是条件概率，1 减 R(t+H) 比 R(t)。代入磨床：700 比 900 的立方减 620 比 900 的立方，等于 0.1436，P 等于 {{ch06.p:.1f}}%。如果现在保养，时钟拨回零，未来 80 小时只有 {{ch06.p_after:.2f}}%，约为不保养时的 190 分之一。"
+      - "A decision doesn't need F of 620; we know it hasn't failed. We need the chance that a machine which has run t hours fails within H more. That's a conditional probability: one minus R of t plus H over R of t. For the grinder: 700 over 900 cubed minus 620 over 900 cubed is 0.1436, so P is {{ch06.p:.1f}} percent. Service it now and the clock goes back to zero: {{ch06.p_after:.2f}} percent for the next 80 hours, about one hundred and ninetieth of the risk without service."
 
   - layout: split
     title: ["窗口往后挪，概率越来越大", "Slide the window later and the risk grows"]
@@ -149,8 +149,8 @@ slides:
       - ["偶然失效靠防护、监测、备机", "Random failures need protection, monitoring, standby"]
     foot: ["无记忆性：芯片几乎不磨损，没人定期更换手机芯片", "Memorylessness: chips hardly wear, and nobody replaces a phone's chip on schedule"]
     notes:
-      - "有个特例要记住。β 等于 1 时，指数里的 t 消掉了，P 只和 H 有关。用了 620 小时的设备和刚保养完的，未来 80 小时坏掉的概率一模一样，取 η 等于 804 都是 {{ch06.p_exp_0:.1f}}%。这叫无记忆性。所以偶然失效不能靠定期保养，要靠防护、状态监测或者备机。"
-      - "One special case to remember. When beta is one, t cancels in the exponent and P depends only on H. A machine that has run 620 hours and one just serviced have exactly the same chance of failing in the next 80 hours: {{ch06.p_exp_0:.1f}} percent each with eta of 804. That's memorylessness. Random failures can't be fought with scheduled service; you need protection, condition monitoring or a standby."
+      - "有个特例要记住。β 等于 1 时，指数里的 t 消掉了，P 只和 H 有关。用了 620 小时的设备和刚保养完的，未来 80 小时坏掉的概率一模一样，取 η 等于 800 都是 {{ch06.p_exp_0:.1f}}%。这叫无记忆性。所以偶然失效不能靠定期保养，要靠防护、状态监测或者备机。"
+      - "One special case to remember. When beta is one, t cancels in the exponent and P depends only on H. A machine that has run 620 hours and one just serviced have exactly the same chance of failing in the next 80 hours: {{ch06.p_exp_0:.1f}} percent each with eta of 800. That's memorylessness. Random failures can't be fought with scheduled service; you need protection, condition monitoring or a standby."
 
   - layout: bignum
     title: ["预期损失 = 概率 × 一次的损失", "Expected loss = probability × loss per failure"]
@@ -299,11 +299,11 @@ slides:
       - [["不保养的预期损失", "Expected loss without service"], "${{ch06.EL:.0f}}"]
       - [["下班后保养（预期合计）", "Service after the shift (expected total)"], "${{ch06.opt_later:.0f}}"]
       - [["下班后保养的最优周期", "Optimal interval, after-shift service"], "{{ch06.T_opt}} h"]
-    side: {big: "÷{{ch06.ratio:.0f}}", text: ["保养后风险降到 {{ch06.p_after:.2f}}%", "Risk after service: {{ch06.p_after:.2f}}%"]}
+    side: {big: "÷{{ch06.ratio10:.0f}}", text: ["保养后风险降到 {{ch06.p_after:.2f}}%", "Risk after service: {{ch06.p_after:.2f}}%"]}
     foot: ["改周期要厂长批准：台账“详情”底部提交，ERPNext 维护计划跟着改", "Changing the interval needs the plant manager: submit it under the asset's Details; the ERPNext schedule follows"]
     notes:
-      - "回到开头。磨床未来 80 小时坏掉的概率 {{ch06.p:.1f}}%，不保养的预期损失 {{ch06.EL:.0f}} 美元。三个方案里下班后保养最划算，预期合计约 {{ch06.opt_later:.0f}}，急单不受影响，风险降到 {{ch06.p_after:.2f}}%。另外，保养如果都放在下班后做，最优周期约 {{ch06.T_opt}} 小时，现行 500 小时偏长。改周期要厂长批准，在台账详情底部提交，ERPNext 的维护计划跟着改。"
-      - "Back to the start. The grinder has a {{ch06.p:.1f}} percent chance of failing in the next 80 hours, an expected loss of {{ch06.EL:.0f}} dollars without service. Of the three options, servicing after the shift is cheapest, about {{ch06.opt_later:.0f}} expected: the rush order is untouched and the risk drops to {{ch06.p_after:.2f}} percent. And if services are always done after the shift, the optimal interval is about {{ch06.T_opt}} hours; the current 500 is too long. Changing it needs the plant manager's approval: submit it under the asset's details and the ERPNext maintenance schedule follows."
+      - "回到开头。磨床未来 80 小时坏掉的概率 {{ch06.p:.1f}}%，不保养的预期损失 {{ch06.EL:.0f}} 美元。三个方案里下班后保养最划算，预期合计约 {{ch06.opt_later:.0f}}，急单不受影响，未来 80 小时的风险降到约 {{ch06.p_C:.1f}}%。另外，保养如果都放在下班后做，最优周期约 {{ch06.T_opt}} 小时，现行 500 小时偏长。改周期要厂长批准，在台账详情底部提交，ERPNext 的维护计划跟着改。"
+      - "Back to the start. The grinder has a {{ch06.p:.1f}} percent chance of failing in the next 80 hours, an expected loss of {{ch06.EL:.0f}} dollars without service. Of the three options, servicing after the shift is cheapest, about {{ch06.opt_later:.0f}} expected: the rush order is untouched and the risk over the next 80 hours drops to about {{ch06.p_C:.1f}} percent. And if services are always done after the shift, the optimal interval is about {{ch06.T_opt}} hours; the current 500 is too long. Changing it needs the plant manager's approval: submit it under the asset's details and the ERPNext maintenance schedule follows."
 
   - layout: summary
     title: ["本讲小结", "Summary"]

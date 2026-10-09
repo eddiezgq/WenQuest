@@ -41,8 +41,8 @@
    "Without service, what are the probability of failing in the next 80 operating hours and the expected loss? Which is cheapest: don't stop, stop now, or stop after the shift? Is the 500 h interval right?"
   ],
   "answer": [
-   "P = 1 − exp{−[(700/900)³ − (620/900)³]} = 13.4%，预期损失 0.134 × $2,800 = $375。三个方案的预期合计：不做 $375，现在保养 $817（含停瓶颈 3 小时少挣 $600），下班后保养 $235。建议下班后保养，风险降到 0.07%。若保养都放在下班后，最优周期约 312 h（每运行小时 $1.04，现行 500 h 为 $1.30）；若在生产时间里停机保养，最优约 535 h，500 h 已接近最优。",
-   "P = 1 − exp{−[(700/900)³ − (620/900)³]} = 13.4%, expected loss 0.134 × $2,800 = $375. Expected totals: do nothing $375, service now $817 (including $600 of margin lost while the bottleneck stops for 3 hours), service after the shift $235. Service after the shift; the risk drops to 0.07%. If services are always done after the shift, the optimal interval is about 312 h ($1.04 per operating hour, against $1.30 at 500 h); if they stop production, the optimum is about 535 h and 500 h is already close."
+   "P = 1 − exp{−[(700/900)³ − (620/900)³]} = 13.4%，预期损失 0.134 × $2,800 = $375。三个方案的预期合计：不做 $375，现在保养 $817（含停瓶颈 3 小时少挣 $600），下班后保养 $235。建议下班后保养，未来 80 小时的风险降到约 0.7%（先跑 4 小时，再保养）。若保养都放在下班后，最优周期约 312 h（每运行小时 $1.04，现行 500 h 为 $1.30）；若在生产时间里停机保养，最优约 535 h，500 h 已接近最优。",
+   "P = 1 − exp{−[(700/900)³ − (620/900)³]} = 13.4%, expected loss 0.134 × $2,800 = $375. Expected totals: do nothing $375, service now $817 (including $600 of margin lost while the bottleneck stops for 3 hours), service after the shift $235. Service after the shift; the risk over the next 80 hours drops to about 0.7% (4 more hours, then the service). If services are always done after the shift, the optimal interval is about 312 h ($1.04 per operating hour, against $1.30 at 500 h); if they stop production, the optimum is about 535 h and 500 h is already close."
   ]
  },
  "robot": {
@@ -51,8 +51,8 @@
    "Robot link: regreasing joint reducers and condition monitoring"
   ],
   "text": [
-   "协作机器人每个关节里都有一台精密减速器，润滑脂老化、轴承和齿面磨损，是典型的 β > 1。设润滑相关失效 β = 2.5、η = 20,000 h（示意值）：已经运行 14,000 h 的关节，再跑 2,000 h 坏掉的概率 15.0%，刚换过脂的只有 0.3%，所以厂家按运行小时规定换脂周期。机器人控制器还能读到关节电机电流，摩擦力矩慢慢变大就是减速器在磨损，据此安排保养叫状态监测，比按龄保养更省。我们的工厂造的 WQR-105 正是装进这些关节的减速器。",
-   "Each joint of a collaborative robot contains a precision reducer whose grease ages and whose bearings and teeth wear: a typical β > 1. With β = 2.5 and η = 20,000 h for lubrication failures (illustrative values), a joint that has run 14,000 h has a 15.0% chance of failing in the next 2,000 h, against 0.3% right after regreasing, which is why manufacturers specify regreasing by operating hours. The controller can also read each joint motor's current: a slowly rising friction torque means the reducer is wearing, and scheduling service from it is condition monitoring, cheaper than age-based service. The WQR-105 reducers our plant makes go into exactly these joints."
+   "协作机器人每个关节里都有一台精密减速器，润滑脂老化、轴承和齿面磨损，是典型的 β > 1。设润滑相关失效 β = 2.5、η = 20,000 h（示意值）：已经运行 14,000 h 的关节，再跑 2,000 h 坏掉的概率 15.0%，刚换过脂的只有 0.3%，所以厂家按运行小时规定换脂周期。机器人控制器还能读到关节电机电流，摩擦力矩慢慢变大就是减速器在磨损，据此安排保养就是按状态保养（预测性维护），往往比按龄保养更省。我们的工厂造的 WQR-105 正是装进这些关节的减速器。",
+   "Each joint of a collaborative robot contains a precision reducer whose grease ages and whose bearings and teeth wear: a typical β > 1. With β = 2.5 and η = 20,000 h for lubrication failures (illustrative values), a joint that has run 14,000 h has a 15.0% chance of failing in the next 2,000 h, against 0.3% right after regreasing, which is why manufacturers specify regreasing by operating hours. The controller can also read each joint motor's current: a slowly rising friction torque means the reducer is wearing, and scheduling service from it is condition-based (predictive) maintenance, often cheaper than age-based service. The WQR-105 reducers our plant makes go into exactly these joints."
   ]
  },
  "life": {
@@ -159,8 +159,8 @@
      "Failure rate: 0.37 at 300 h, 1.58 at 620 h (per 1000 h)"
     ],
     [
-     "翻了四倍多：β = 3 的磨损",
-     "More than four times: wear-out with β = 3"
+     "是原来的 4.3 倍：β = 3 的磨损",
+     "4.3 times as much: wear-out with β = 3"
     ]
    ],
    "formula": "",
@@ -185,15 +185,15 @@
      "t = 620, H = 80: P = 13.4%"
     ],
     [
-     "现在保养：P(0, 80) = 0.07%，小 191 倍",
-     "Serviced now: P(0, 80) = 0.07%, 191 times smaller"
+     "现在保养：P(0, 80) = 0.07%，约为 1/190",
+     "Serviced now: P(0, 80) = 0.07%, about 1/190"
     ]
    ],
    "formula": "P(t,H)=1-\\frac{R(t+H)}{R(t)}=1-\\exp\\left\\{-\\left[\\left(\\frac{t+H}{\\eta}\\right)^{\\beta}-\\left(\\frac{t}{\\eta}\\right)^{\\beta}\\right]\\right\\}",
    "figure": "",
    "narration": [
-    "做决定要的不是 F(620)，到现在没坏我们已经知道了。要的是：已经跑了 t 小时没坏，再跑 H 小时内坏掉的概率。用条件概率，就是 1 减 R(t+H) 比 R(t)。代进去，700 比 900 的立方减 620 比 900 的立方，等于 0.1436，P 等于 13.4%。如果现在保养，时钟拨回零，未来 80 小时只有 0.07%，小了 191 倍。",
-    "A decision doesn't need F of 620; we already know it hasn't failed. We need the chance that a machine which has run t hours without failing fails within the next H. That's a conditional probability: one minus R of t plus H over R of t. Put in the numbers: 700 over 900 cubed minus 620 over 900 cubed is 0.1436, so P is 13.4 percent. Service it now and the clock goes back to zero: 0.07 percent for the next 80 hours, 191 times smaller."
+    "做决定要的不是 F(620)，到现在没坏我们已经知道了。要的是：已经跑了 t 小时没坏，再跑 H 小时内坏掉的概率。用条件概率，就是 1 减 R(t+H) 比 R(t)。代进去，700 比 900 的立方减 620 比 900 的立方，等于 0.1436，P 等于 13.4%。如果现在保养，时钟拨回零，未来 80 小时只有 0.07%，约为不保养时的 190 分之一。",
+    "A decision doesn't need F of 620; we already know it hasn't failed. We need the chance that a machine which has run t hours without failing fails within the next H. That's a conditional probability: one minus R of t plus H over R of t. Put in the numbers: 700 over 900 cubed minus 620 over 900 cubed is 0.1436, so P is 13.4 percent. Service it now and the clock goes back to zero: 0.07 percent for the next 80 hours, about one hundred and ninetieth of the risk without service."
    ]
   },
   {
@@ -218,8 +218,8 @@
    "formula": "",
    "figure": "",
    "narration": [
-    "有个特例值得记住。β 等于 1 时，指数里的 t 消掉了，P 只和 H 有关。用了 620 小时的设备和刚保养完的设备，未来 80 小时坏掉的概率一模一样，取 η 等于 804 小时都是 9.5%。这叫无记忆性。所以偶然失效不能靠定期保养，要靠防护、状态监测或者备机。",
-    "One special case is worth remembering. When beta is one, t cancels in the exponent and P depends only on H. A machine that has run 620 hours and one just serviced have exactly the same chance of failing in the next 80 hours: 9.5 percent each with eta of 804. That's called memorylessness. So random failures can't be fought with scheduled service; you need protection, condition monitoring or a standby machine."
+    "有个特例值得记住。β 等于 1 时，指数里的 t 消掉了，P 只和 H 有关。用了 620 小时的设备和刚保养完的设备，未来 80 小时坏掉的概率一模一样，取 η 等于 800 小时都是 9.5%。这叫无记忆性。所以偶然失效不能靠定期保养，要靠防护、状态监测或者备机。",
+    "One special case is worth remembering. When beta is one, t cancels in the exponent and P depends only on H. A machine that has run 620 hours and one just serviced have exactly the same chance of failing in the next 80 hours: 9.5 percent each with eta of 800. That's called memorylessness. So random failures can't be fought with scheduled service; you need protection, condition monitoring or a standby machine."
    ]
   },
   {
@@ -558,8 +558,8 @@
      "For β ≤ 1, C(T) only falls and there is no optimum."
     ],
     [
-     "模拟：每台设备的寿命按威布尔分布抽样，两台用同一串随机数，只有策略不同。",
-     "Simulation: lifetimes are drawn from the Weibull distribution; both machines use the same random numbers and differ only in policy."
+     "模拟：每台设备的寿命按威布尔分布抽样，两台各用一个种子相同的随机数流，零件寿命一模一样，只有策略不同（共同随机数）。",
+     "Simulation: lifetimes are drawn from the Weibull distribution; each machine has its own random stream with the same seed, so their part lifetimes are identical and only the policy differs (common random numbers)."
     ]
    ],
    "steps": [
@@ -661,8 +661,8 @@
   ],
   "tasks": [
    [
-    "计算题（教材习题 2、3）。(1) GRD-01 拖到 800 h 才处理，求未来 80 运行小时坏掉的概率和预期损失。(2) 数控车床 CNC-L01-A：β = 2.5，η = 1,400 h，已运行 700 h；坏一次停 240 分钟、修理 $700，停机每小时少挣 $60；保养停 120 分钟，人工 $45/h，材料 $80。求未来 80 h 坏掉的概率、预期损失和保养花费，判断现在保养是否划算，说明与 GRD-01 结论不同的原因。",
-    "Calculation (textbook exercises 2 and 3). (1) If GRD-01 is left until 800 h, find the probability of failing in the next 80 operating hours and the expected loss. (2) CNC lathe CNC-L01-A: β = 2.5, η = 1,400 h, run 700 h; a failure stops it for 240 minutes and costs $700, and an hour stopped loses $60; a service takes 120 minutes at $45/h plus $80 of materials. Find the probability of failing in the next 80 h, the expected loss and the service cost; decide whether servicing now pays and explain why the answer differs from GRD-01's."
+    "计算题（教材习题 2、3）。(1) GRD-01 拖到 800 h 才处理，求未来 80 运行小时坏掉的概率和预期损失。(2) 数控车床 CNC-L01-A：β = 2.5，η = 1,400 h，已运行 700 h；坏一次停 240 分钟、修理 $700，停机每小时少挣 $60；保养停 120 分钟，人工 $45/h，材料 $80。求未来 80 h 坏掉的概率、预期损失和保养花费。预期损失比保养费小，能不能据此不保养？用教材 6.6 节“推迟不等于省掉”的判别 h(t)(C_f − C_p) 与 C(T*) 比较，给出结论。",
+    "Calculation (textbook exercises 2 and 3). (1) If GRD-01 is left until 800 h, find the probability of failing in the next 80 operating hours and the expected loss. (2) CNC lathe CNC-L01-A: β = 2.5, η = 1,400 h, run 700 h; a failure stops it for 240 minutes and costs $700, and an hour stopped loses $60; a service takes 120 minutes at $45/h plus $80 of materials. Find the probability of failing in the next 80 h, the expected loss and the service cost. The expected loss is below the service cost: does that justify not servicing? Decide with the “postponing is not saving” test of Section 6.6, comparing h(t)(C_f − C_p) with C(T*)."
    ],
    [
     "设计题（教材习题 4）。对 CNC-L01-A 用 C(T) 求按龄保养的最优周期（C_p = $170，C_f = $940），与现行 600 h 比较；用虚拟实验 6-2 核对并附截图。",
@@ -858,8 +858,8 @@
    "tolerance": 5,
    "unit": "$",
    "feedback": [
-    "预期损失 = 3.75% × 2,800 ≈ $105，比一次保养的 $215 少，这时还不必提前保养。",
-    "Expected loss = 3.75% × 2,800 ≈ $105, less than a $215 service, so no early service is needed yet."
+    "预期损失 = 3.75% × 2,800 ≈ $105。它比一次保养费小，但这不等于可以不保养：300 h 已接近最优周期 312 h，应尽快安排下班后保养（教材 6.6 节“推迟不等于省掉”）。",
+    "Expected loss = 3.75% × 2,800 ≈ $105. It is less than a $215 service, but that does not mean skipping it: 300 h is close to the optimal 312 h, so schedule an after-shift service soon (Section 6.6, postponing is not saving)."
    ]
   },
   {

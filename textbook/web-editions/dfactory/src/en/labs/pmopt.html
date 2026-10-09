@@ -99,7 +99,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     sub: ['保养太勤白花钱，太懒常停机：拖动周期 T，找长期平均花费最低的点；播放看两台同样的设备一台按周期保养、一台坏了再修', 'Service too often and you waste money; too rarely and you keep breaking down. Drag T to find the lowest long-run cost; press Play to race two identical machines, one serviced every T hours, one repaired only when it fails'],
     plotTitle: ['每运行小时的长期平均花费 C(T)', 'Long-run average cost per operating hour C(T)'],
     lgC: ['按龄保养 C(T)', 'age-based service C(T)'], lgRun: ['不保养、坏了再修 C_f ÷ MTTF', 'run to failure C_f ÷ MTTF'], lgT: ['你选的周期 T', 'your interval T'],
-    simTitle: ['两台同样的设备跑同一段时间（同一串随机数）：累计花费', 'Two identical machines over the same hours (same random numbers): cumulative cost'],
+    simTitle: ['两台同样的设备跑同一段时间（零件寿命是同一串随机数）：累计花费', 'Two identical machines over the same hours (the same random part lifetimes): cumulative cost'],
     play: ['▶ 播放', '▶ Play'], pause: ['❚❚ 暂停', '❚❚ Pause'], again: ['换一串随机数', 'New random numbers'],
     params: ['参数', 'Parameters'], presets: ['GRD-01：', 'GRD-01:'], pAfter: ['下班后保养', 'service after shift'], pDuring: ['生产时间停机保养', 'stop during production'], pExp: ['β = 1 对照', 'β = 1 check'],
     lCp: ['一次保养 C_p（$）', 'Service cost C_p ($)'], lCf: ['一次故障 C_f（$）', 'Failure cost C_f ($)'], lT: ['保养周期 T（h）', 'Interval T (h)'],
@@ -110,13 +110,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     tasks: [['点“下班后保养”，读出 T*、C(T*) 和现行 500 h 时的花费，与教材 6.6 节核对。', 'Press “service after shift”; read T*, C(T*) and the cost at the current 500 h; check against Section 6.6.'],
             ['点“生产时间停机保养”（每次保养再加少挣的 $600），T* 移到哪里？为什么保养越贵、周期越长？', 'Press “stop during production” (each service also loses $600 of margin). Where does T* move? Why does a dearer service mean a longer interval?'],
             ['点“β = 1 对照”：曲线还有最低点吗？结论是什么？', 'Press “β = 1 check”: does the curve still have a minimum? What do you conclude?'],
-            ['把 T 放在 T* 附近，播放到 20000 h，比较两台设备的累计花费和平均每小时花费，与 C(T) 曲线核对。', 'Set T near T*, play to 20 000 h and compare the two machines’ cumulative and hourly costs with the C(T) curve.']],
+            ['把 T 放在 T* 附近，播放到 20000 h，比较两台设备的累计花费和平均每小时花费，与 C(T) 曲线核对。', 'Set T near T*, play to 20,000 h and compare the two machines’ cumulative and hourly costs with the C(T) curve.']],
     vMin: ['曲线在 T* 处最低：再勤，保养费占大头；再懒，故障损失占大头', 'The curve bottoms out at T*: shorter and service costs dominate; longer and failures dominate'],
     vNone: ['β ≤ 1：C(T) 一路下降，没有最低点——定期保养不划算，坏了再修（或改做状态监测）', 'β ≤ 1: C(T) keeps falling with no minimum; scheduled service does not pay, so repair on failure (or monitor condition)'],
     vCheap: ['C_p 接近 C_f：保养省不下多少，最优周期很长', 'C_p is close to C_f: servicing saves little, so the optimal interval is long'],
     xT: ['保养周期 T（运行小时）', 'service interval T (operating hours)'], yC: ['$ / 运行小时', '$ per operating hour'],
     sA: ['按周期 T 保养', 'service every T'], sB: ['坏了再修', 'run to failure'],
-    simNote: ['已运行 {t} h · 左：保养 {p} 次、故障 {f} 次 · 右：故障 {g} 次', 'run {t} h · A: {p} services, {f} failures · B: {g} failures'],
+    simNote: ['已运行 {t} h · 蓝线（按周期保养）：保养 {p} 次、故障 {f} 次 · 红线（坏了再修）：故障 {g} 次', 'run {t} h · blue (serviced every T): {p} services, {f} failures · red (run to failure): {g} failures'],
     ph: ['每小时 ${v}', '${v}/h']
   };
   function T_(k) { var v = TX[k]; return v ? v[zh ? 0 : 1] : k; }
@@ -137,7 +137,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     var n = 400, s = 0; for (var i = 0; i < n; i++) s += R(T * (i + 0.5) / n, p.b, p.e);
     s *= T / n; var r = R(T, p.b, p.e); return (p.cp * r + p.cf * (1 - r)) / s;
   }
-  function best(p) { var o = [Infinity, 0]; for (var T = 20; T <= 3000; T += 2) { var c = C(T, p); if (c < o[0]) o = [c, T]; } return o; }
+  function best(p) { var o = [Infinity, 0]; for (var T = 20; T <= 3000; T += 1) { var c = C(T, p); if (c < o[0]) o = [c, T]; } return o; }
 
   var X0 = 60, X1 = 720, Y0 = 290, Y1 = 18, TMAX = 1600;
   function draw() {
@@ -168,9 +168,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
   // ---------------- race: same random lifetimes for both machines
   var SPAN = 20000, sim;
-  function newSim(seed) { sim = { seed: seed || 11, h: 0, a: { age: 0, life: 0, cost: 0, p: 0, f: 0, pts: [[0, 0]] }, b: { age: 0, life: 0, cost: 0, f: 0, pts: [[0, 0]] } }; sim.a.life = draw1(); sim.b.life = draw1(); }
-  function rnd() { sim.seed = (sim.seed * 16807) % 2147483647; return (sim.seed - 1) / 2147483646; }
-  function draw1() { var p = v(); return p.e * Math.pow(-Math.log(1 - rnd()), 1 / p.b); }   // 威布尔寿命抽样
+  // 共同随机数：两台设备各有一个随机数流，种子相同，所以第 k 次装上的“零件”寿命完全一样，只有策略不同
+  function newSim(seed) { seed = seed || 11; sim = { seed: seed, h: 0, a: { s: seed, age: 0, life: 0, cost: 0, p: 0, f: 0, pts: [[0, 0]] }, b: { s: seed, age: 0, life: 0, cost: 0, f: 0, pts: [[0, 0]] } }; sim.a.life = draw1(sim.a); sim.b.life = draw1(sim.b); }
+  function rnd(m) { m.s = (m.s * 16807) % 2147483647; return (m.s - 1) / 2147483646; }
+  function draw1(m) { var p = v(); return p.e * Math.pow(-Math.log(1 - rnd(m)), 1 / p.b); }   // 威布尔寿命抽样（逆变换）
   newSim();
   function step(dh) {
     var p = v();
@@ -178,9 +179,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
       sim.h++;
       var A = sim.a, B = sim.b;
       A.age++; B.age++;
-      if (A.age >= A.life) { A.cost += p.cf; A.f++; A.age = 0; A.life = draw1(); }
-      else if (A.age >= p.T) { A.cost += p.cp; A.p++; A.age = 0; A.life = draw1(); }
-      if (B.age >= B.life) { B.cost += p.cf; B.f++; B.age = 0; B.life = draw1(); }
+      if (A.age >= A.life) { A.cost += p.cf; A.f++; A.age = 0; A.life = draw1(A); }
+      else if (A.age >= p.T) { A.cost += p.cp; A.p++; A.age = 0; A.life = draw1(A); }
+      if (B.age >= B.life) { B.cost += p.cf; B.f++; B.age = 0; B.life = draw1(B); }
       if (sim.h % 100 === 0) { A.pts.push([sim.h, A.cost]); B.pts.push([sim.h, B.cost]); }
     }
   }

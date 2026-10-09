@@ -88,8 +88,13 @@ out = {
     "delay": delay, "p_delay": p_delay * 100, "opt_none": opt_none, "opt_now": opt_now, "opt_later": opt_later,
     "mttf": mttf, "r_run": r_run, "r_opt": r_opt, "T_opt": T_opt, "r_opt2": r_opt2, "T_opt2": T_opt2, "r_500": r_500, "r_500b": r_500b,
     "save_opt": (1 - r_opt / r_run) * 100,
-    # β = 1（失效率不变）：保养不改变下一段时间坏掉的概率
-    "p_exp_0": P(0, H, 1.0, mttf) * 100, "p_exp_620": P(t0, H, 1.0, mttf) * 100,
+    # β = 1（失效率不变）：保养不改变下一段时间坏掉的概率；η 取 800 h（与 GRD-01 的平均寿命相近，实验 6-1 的“β = 1 对照”预置）
+    "eta_exp": 800, "p_exp_0": P(0, H, 1.0, 800) * 100, "p_exp_620": P(t0, H, 1.0, 800) * 100,
+    # 方案 C 未来 80 h 的总风险：先跑 4 h，保养后再跑 76 h
+    "p_C": (1 - (1 - p_delay) * (1 - P(0, H - delay))) * 100,
+    "ratio10": round(p / p_after, -1),
+    # 推迟不等于省掉（6.6 节）：此刻的边际判别 h(t)·(C_f − C_p) 与 C(T*) 比
+    "marg620": hz(t0) * (Cf - Cp),
     # MTBF 估计：近 30 天、每天 16 运行小时、3 次故障
     "mtbf": 30 * 16 / 3,
 }
@@ -106,7 +111,10 @@ out.update({
     "cnc_EL700": P(700, 80, cnc[0], cnc[1]) * (M["REPAIR_USD"]["cnc-l01-a"] + cnc[2] / 60 * 60),
     "cnc_Cp": 120 / 60 * M["LABOR_RATE"] + M["PM_MATERIAL"],
 })
-out["cnc_T"] = best(out["cnc_Cp"], out["cnc_Cf"], cnc[0], cnc[1])[1]
+_cr, out["cnc_T"] = best(out["cnc_Cp"], out["cnc_Cf"], cnc[0], cnc[1])
+out["cnc_Copt"] = _cr
+out["cnc_save80"] = 80 * _cr                                               # 推迟 80 h 省下的保养摊销
+out["cnc_marg"] = hz(700, cnc[0], cnc[1]) * (out["cnc_Cf"] - out["cnc_Cp"])  # 700 h 时的边际判别（$/h）
 out.update({
     "q_F400": F(400) * 100,                                       # GRD-01 运行 400 h 内坏掉的概率
     "q_p300": P(300, 80) * 100,                                   # 刚保养完 300 h，再跑 80 h

@@ -5,7 +5,7 @@
 book: dfactory
 section: "6"
 deck: ch06
-skip: [23]                 # 生活例子页（换机油）在小结前已由第 10 页“芯片不磨损”带过，控制课程部分约 10 分钟
+skip: []                   # 不跳页：生活例子（换机油）要留在视频里（课程标准）
 code: [ch06]
 title: ["设备维护与可靠性：该不该停下来保养", "Maintenance and Reliability: Should We Stop for Service?"]
 chapter: ["第三篇 七个领域 · 第 6 章", "Part III Seven Domains · Chapter 6"]
@@ -29,7 +29,7 @@ after:
     lab: weibull
     part: ["虚拟实验", "Virtual lab"]
     steps:
-      - js: "document.querySelectorAll('[id^=k]').forEach(e => { if (e.tagName === 'B') e.style.filter = 'blur(7px)'; })"
+      - js: "document.querySelectorAll('[id^=k], #plot text, #sim text').forEach(e => { if (e.tagName !== 'DIV') e.style.filter = 'blur(7px)'; })"
         press: "[data-p=grd]"
         dur: 2
       - sweep: {t: [0, 1200]}
@@ -40,7 +40,7 @@ after:
         dur: 1
       - sweep: {t: [0, 1200]}
         dur: 5
-      - press: "#play"
+      - press: ["[data-p=grd]", "#play"]
         dur: 8
     say:
       zh:
@@ -61,7 +61,7 @@ after:
     lab: pmopt
     part: ["虚拟实验", "Virtual lab"]
     steps:
-      - js: "document.querySelectorAll('[id^=k]').forEach(e => { if (e.tagName === 'B') e.style.filter = 'blur(7px)'; })"
+      - js: "document.querySelectorAll('[id^=k], #plot text, #sim text').forEach(e => { if (e.tagName !== 'DIV') e.style.filter = 'blur(7px)'; })"
         press: "[data-p=after]"
         dur: 2
       - sweep: {T: [100, 1200]}
@@ -70,6 +70,10 @@ after:
         dur: 1
       - sweep: {T: [100, 1200]}
         dur: 5
+      - press: "[data-p=after]"
+        dur: 1
+      - set: {T: 310}
+        dur: 1
       - press: "#play"
         dur: 8
     say:
@@ -135,16 +139,16 @@ after:
       points:
         - ["β < 1 的设备，该不该缩短保养周期？", "β < 1: should you shorten the service interval?"]
         - ["运行 300 h 的磨床，未来 80 h 坏掉的概率多大？", "A grinder at 300 h: chance of failing in the next 80 h?"]
-        - ["三次作答机会，提交后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+        - ["可做三次，提交后立刻看到解析", "Three attempts, explanations as soon as you submit"]
     say:
       zh:
         - ">学完还有一份十道题的测验，比如：β 小于 1 的设备，该不该缩短保养周期？"
         - ">刚保养完运行了 300 小时的磨床，未来 80 小时坏掉的概率多大？"
-        - ">每道题有三次机会，提交后马上能看到解析。"
+        - ">测验可以做三次，提交后马上能看到解析。"
       en:
         - ">There's also a ten-question quiz. For example, for a machine with beta below one, should you shorten the service interval?"
         - ">A grinder 300 hours after its last service: what's its chance of failing in the next 80 hours?"
-        - ">You get three attempts, and the explanations appear as soon as you submit."
+        - ">You can take the quiz three times, and the explanations appear as soon as you submit."
 
 outro:
   zh:

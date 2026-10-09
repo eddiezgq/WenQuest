@@ -101,9 +101,9 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     plotTitle: ['累计故障概率 F(t) 与失效率 h(t)', 'Failure probability F(t) and failure rate h(t)'],
     lgF: ['F(t)（左轴，%）', 'F(t) (left axis, %)'], lgH: ['h(t)（右轴，次/千小时）', 'h(t) (right axis, per 1000 h)'],
     lgWin: ['未来 H 小时', 'next H hours'], lgPm: ['保养周期', 'service interval'],
-    simTitle: ['一台设备的运行时钟：到周期就保养，时钟拨回零；坏了就停机修理', "One machine's clock: service at the interval resets it to zero; a failure stops it for repair"],
+    simTitle: ['一台设备的运行时钟：到周期就保养，时钟拨回零；坏了修好，时钟也归零', "One machine's clock: a service at the interval resets it to zero, and so does a repair after a failure"],
     play: ['▶ 播放', '▶ Play'], pause: ['❚❚ 暂停', '❚❚ Pause'], pmNow: ['现在保养（t → 0）', 'Service now (t → 0)'],
-    params: ['参数', 'Parameters'], presets: ['设备：', 'Machine:'], pExp: ['β = 1 对照', 'β = 1 check'],
+    params: ['参数', 'Parameters'], presets: ['设备：', 'Machine:'], pExp: ['β = 1 对照（η = 800）', 'β = 1 check (η = 800)'],
     lT: ['已运行 t（h）', 'Run so far t (h)'], lH: ['未来 H（h）', 'Next H (h)'], lPm: ['保养周期（h）', 'Interval (h)'], lCf: ['一次故障损失（$）', 'Loss per failure ($)'],
     results: ['结果', 'Results'],
     kF: ['F(t)：运行到 t 已经坏过的概率', 'F(t): chance it would have failed by t'], kh: ['h(t)：此刻的失效率（次/千小时）', 'h(t): failure rate now (per 1000 h)'],
@@ -125,7 +125,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   document.getElementById('tasks').innerHTML = TX.tasks.map(function (x) { return '<li>' + x[zh ? 0 : 1] + '</li>'; }).join('');
 
   var $ = function (id) { return document.getElementById(id); };
-  var P = { grd: [3, 900, 620, 500, 2800], cnc: [2.5, 1400, 380, 600, 940], ht: [2, 2400, 640, 1000, 1640], exp: [1, 900, 620, 500, 2800] };
+  var P = { grd: [3, 900, 620, 500, 2800], cnc: [2.5, 1400, 380, 600, 940], ht: [2, 2400, 640, 1000, 1160], exp: [1, 800, 620, 500, 2800] };
   function gamma(z) { // Lanczos
     var g = 7, c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
     if (z < 0.5) return Math.PI / (Math.sin(Math.PI * z) * gamma(1 - z));
@@ -229,7 +229,7 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
   $('play').onclick = function () { setPlay(!playing); };
   $('pmBtn').onclick = function () { $('t').value = 0; if (playing) { sim.pms++; sim.ev.push([sim.run, 'p', sim.age]); sim.trace.push([sim.run, 0]); sim.age = 0; } draw(); drawSim(); };
   document.querySelectorAll('[data-p]').forEach(function (b) {
-    b.onclick = function () { var q = P[b.dataset.p]; ['beta', 'eta', 't', 'pm', 'cf'].forEach(function (k, i) { $(k).value = q[i]; }); resetSim(); draw(); drawSim(); };
+    b.onclick = function () { var q = P[b.dataset.p]; ['beta', 'eta', 't', 'pm', 'cf'].forEach(function (k, i) { $(k).value = q[i]; }); $('H').value = 80; resetSim(); draw(); drawSim(); };
   });
   ['beta', 'eta', 't', 'H', 'pm', 'cf'].forEach(function (k) { $(k).addEventListener('input', function () { if (k !== 't' && k !== 'H') resetSim(); draw(); drawSim(); }); });
   draw(); drawSim();

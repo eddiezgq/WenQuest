@@ -1,5 +1,19 @@
 [
 {
+"ch": 3,
+"href": "labs/causal.html",
+"kind": "Animation",
+"title": "The causal chain of one breakdown",
+"desc": "When the grinder stops, the chain lights up from machine to customer and each order's delay and penalty are worked out; drag the downtime and start time, or put the robot order first, and watch the impact change"
+},
+{
+"ch": 3,
+"href": "labs/whatif.html",
+"kind": "Virtual lab",
+"title": "Overtime, expediting or outsourcing?",
+"desc": "Simulate four options: drag downtime, overtime, expediting fee, outsourcing price and return time, compare extra cost and delivery, and see the cheapest option that keeps the date; a Gantt chart loops through the grinder's week"
+},
+{
 "ch": 6,
 "href": "labs/weibull.html",
 "kind": "Virtual lab",
@@ -11,6 +25,20 @@
 "href": "labs/pmopt.html",
 "kind": "Virtual lab",
 "title": "Choosing the service interval",
-"desc": "The long-run cost curve of age-based maintenance: drag the interval to find its minimum, then race two identical machines (one serviced every T hours, one run to failure) over 20 000 hours with the same random numbers."
+"desc": "The long-run cost curve of age-based maintenance: drag the interval to find its minimum, then race two identical machines (one serviced every T hours, one run to failure) over 20,000 hours with the same random numbers."
+},
+{
+"ch": 10,
+"href": "labs/waterfall.html",
+"kind": "Virtual lab",
+"title": "Order margin waterfall: where does the money go?",
+"desc": "An order's revenue is cut block by block by material, labour, energy, scrap, idle power, overtime and a dearer supplier, leaving the gross margin. Drag the price, quantity, material cost, hours and unplanned costs and compare the margin with the target; the animation builds the waterfall block by block and loops."
+},
+{
+"ch": 10,
+"href": "labs/cashflow.html",
+"kind": "Virtual lab",
+"title": "Cash over the next 8 weeks: when will the customer pay?",
+"desc": "Cash over the next 8 weeks is drawn week by week and rises and falls with the customer's payment day. Press do nothing, dun or freeze credit to see the lowest week and whether cash falls below zero or the safety line; below are the receivables ageing, DSO and credit exposure."
 }
 ]

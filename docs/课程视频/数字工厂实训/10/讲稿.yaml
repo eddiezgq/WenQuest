@@ -1,0 +1,162 @@
+# 《数字工厂实训》公开课 第 10 讲：经营：毛利、应收与现金（第 29 轮样板讲）
+# 画面是这一讲的网页互动课件（textbook/web-editions/dfactory/course/slides/ch10.yaml），配音是课件每页的讲稿（notes）。
+# 这里只写开场、课后部分和结尾。课后部分：虚拟实验 10-1、10-2 录屏、数字工厂实验页、作业页、测验页。
+# 数字一律由 course/calc/ch10.py 算出（{{ch10.键:格式}}），口径和常数取自数字工厂 hub/finance.py、factory/data.py。
+book: dfactory
+section: "10"
+deck: ch10
+code: [ch10]
+title: ["经营：毛利、应收与现金：赚钱和有钱是两回事", "Business: Margin, Receivables and Cash. Making Money Is Not Having Money"]
+chapter: ["第三篇 七个领域 · 第 10 章", "Part III Seven Domains · Chapter 10"]
+next: ["第 11 讲 AI 代理与决策", "Lecture 11 AI agents and decisions"]
+cover_formula: '\text{DSO}=\frac{\text{AR}}{\text{30-day sales}/30}'
+tags:
+  zh: [经营, 毛利, 应收账款, 应收周转天数, 现金流, 数字工厂]
+  en: [gross margin, accounts receivable, DSO, cash flow, digital factory]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《数字工厂实训》第十讲，经营：毛利、应收与现金。赚钱和有钱，是两回事。
+  en:
+    - Hi everyone, and welcome to the Digital Factory Practicum at WenQuest.
+    - This is Lecture 10, business. Margin, receivables and cash. Making money is not the same as having money.
+
+after:
+  - id: lab101
+    kind: lab
+    lab: waterfall
+    part: ["虚拟实验", "Virtual lab"]
+    steps:
+      - js: "document.querySelectorAll('[id^=k]').forEach(e => { if (e.tagName === 'B') e.style.filter = 'blur(7px)'; })"
+        press: "[data-p=robot]"
+        dur: 2
+      - press: "[data-p=std]"
+        dur: 2
+      - press: "[data-p=robot]"
+        dur: 1
+      - sweep: {ot: [0, 48]}
+        dur: 5
+      - sweep: {idle: [0, 72]}
+        dur: 4
+      - press: "#play"
+        dur: 8
+    say:
+      zh:
+        - 下面是虚拟实验 10-1，在问渠学习平台上可以亲手做。结果区的数字这里先遮住，留给你自己读。
+        - ">先点“机器人厂订单”，读出毛利和毛利率，跟教材表 10-2 一行一行对一对。"
+        - ">再点“按标准成本”，看计划外的钱一共让毛利率少了几个百分点。"
+        - ">回到机器人厂订单，把加班从 0 拖到 48 小时，看毛利柱怎么变矮。"
+        - ">再把带锯床空转从 0 拖到 72 小时，毛利几乎不动：看钱要看数。"
+        - ">最后点播放，看收入被一块块切掉，剩下毛利。"
+      en:
+        - Now Virtual lab 10-1. On the WenQuest platform you can do it yourself. The numbers in the results panel are blurred here; reading them is your job.
+        - ">First press robot plant order and read the margin and its percentage. Check them line by line against Table 10-2."
+        - ">Then press standard cost and see how many points the unplanned money took off."
+        - ">Back on the robot plant order, drag overtime from 0 to 48 hours and watch the margin bar shrink."
+        - ">Then drag the band saw's idling from 0 to 72 hours: the margin hardly moves. Judge money by the numbers."
+        - ">Finally press Play and watch the revenue being cut block by block, leaving the margin."
+
+  - id: lab102
+    kind: lab
+    lab: cashflow
+    part: ["虚拟实验", "Virtual lab"]
+    steps:
+      - js: "document.querySelectorAll('[id^=k]').forEach(e => { if (e.tagName === 'B') e.style.filter = 'blur(7px)'; })"
+        press: "[data-p=none]"
+        dur: 2
+      - press: "[data-p=dun]"
+        dur: 2
+      - press: "[data-p=hold]"
+        dur: 2
+      - sweep: {pay: [3, 60]}
+        dur: 6
+      - sweep: {od: [0, 70]}
+        dur: 4
+      - press: "#play"
+        dur: 8
+    say:
+      zh:
+        - ">虚拟实验 10-2：未来 8 周的现金。先点“不处理”，找出现金最低的一周，哪周跌破安全线、哪周跌破零。"
+        - ">再点“催款”，整条曲线抬了起来。"
+        - ">点“信用冻结”：现金和催款一样，读一读下面的说明，差在哪里。"
+        - ">把付款日从第 3 天一路拖到第 60 天，看曲线一段一段往下沉。"
+        - ">把已逾期的天数拖过 30 天，看账龄换档，中枢的建议变成什么。"
+        - ">最后点播放，现金一周一周画出来。答案这里不说，留给你自己找。两个实验都配有指导书和报告模板，在平台上下载。"
+      en:
+        - ">Virtual lab 10-2: cash over the next 8 weeks. Press do nothing and find the lowest week, and the weeks cash falls below the safety line and below zero."
+        - ">Then press dun: the whole curve lifts."
+        - ">Press freeze credit: cash is the same as dunning. Read the note below to see what differs."
+        - ">Drag the payment day from day 3 all the way to day 60 and watch the curve sink section by section."
+        - ">Drag the days overdue past 30 and watch the ageing band and the hub's recommendation change."
+        - ">Finally press Play to draw the cash week by week. I won't give the answers here; they're yours to find. Both labs come with a guide and a report template on the platform."
+
+  - id: factory
+    part: ["数字工厂", "Digital factory"]
+    slide:
+      layout: points
+      tag: ["课后", "After class"]
+      title: ["数字工厂实验 22：订单毛利、应收与现金", "Digital-factory Lab 22: order margin, receivables and cash"]
+      points:
+        - ["找没达标的经营指标；按分解表手算一张订单的毛利率", "Find the missed objectives; calculate an order's margin from the breakdown"]
+        - ["比较催款、冻结、不处理，提交后才看到中枢的建议", "Compare dunning, freeze, nothing; see the hub's advice only after you submit"]
+        - ["发起催款、看客户付款；算 DSO，找现金最紧的一周", "Dun, watch the customer pay; compute DSO, find the tightest week"]
+      foot: ["订单做完自动开票、客户按习惯付款，都进 ERPNext；教学模式 1 个账期日 = 2 分钟", "Finished orders are invoiced and customers pay by habit, all in ERPNext; in teaching mode a payment day is 2 minutes"]
+    say:
+      zh:
+        - ">课后要在问渠数字工厂里做实验 22。先在经营目标的指标树里找没达标的指标，再打开老师指定的订单，按分解表手算毛利率。"
+        - ">老师注入一笔逾期不付的发票，你在指挥台比较催款、信用冻结、不处理三个方案，选一个写理由。提交之前，看不到厂情中枢的推荐。"
+        - ">然后发起催款，老师批准，几分钟后客户付款，发票变成已付。最后算 DSO，找出现金最紧的一周。"
+      en:
+        - ">After class you'll do Lab 22 in the WenQuest digital factory. First find the missed objectives in the objective tree, then open the order your instructor names and calculate its margin from the breakdown."
+        - ">The instructor injects an unpaid overdue invoice. Compare dunning, a credit freeze and doing nothing in the command centre, choose one and give reasons. Until you submit, the factory hub's recommendation stays hidden."
+        - ">Then raise the dunning, the instructor approves it, and a few minutes later the customer pays and the invoice turns paid. Finally compute DSO and find the tightest week."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      tag: ["课后", "After class"]
+      title: ["作业 10：订单毛利与现金", "Assignment 10: order margin and cash"]
+      points:
+        - ["计算：降价 5%、加班翻倍，毛利率各多少", "Compute: margins after a 5% price cut and double overtime"]
+        - ["现金：算 DSO；客户第 {{ch10.late_day:.0f}} 天才付，现金哪周最紧", "Cash: DSO; payment only on day {{ch10.late_day:.0f}}, which week is tightest"]
+        - ["实验 22 报告：方案比较，为什么赚钱的工厂也会倒闭", "Lab 22 report: the options, why profitable plants fail"]
+      foot: ["作业和报告都在问渠学习平台提交", "Submit both on WenQuest"]
+    say:
+      zh:
+        - ">作业一共三题。第一题计算：机器人厂要求降价 5%，毛利率还达不达标；加班从 12 小时变成 24 小时，毛利率多少，守住 25% 的最低单价是多少。"
+        - ">第二题现金：先算一个 DSO；再假设机器人厂不催也会付，但拖到第 {{ch10.late_day:.0f}} 天，做 8 周现金预测，找出最紧的一周。"
+        - ">第三题是实验 22 的报告，重点写方案比较，并回答：为什么赚钱的工厂也会倒闭。"
+      en:
+        - ">The assignment has three tasks. One, calculation: if the robot plant demands a 5 percent price cut, does the margin still meet target? If overtime goes from 12 to 24 hours, what's the margin, and what's the lowest price that holds 25 percent?"
+        - ">Two, cash: compute a DSO; then suppose the robot plant pays unchased but only on day {{ch10.late_day:.0f}}, forecast 8 weeks of cash and find the tightest week."
+        - ">Three, the Lab 22 report, focusing on how you compared the options, and answering: why can a profitable factory go bankrupt?"
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      tag: ["课后", "After class"]
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["应收 $45,000，近 30 天开票 $27,000，DSO 多少天？", "Receivables $45,000, 30-day invoicing $27,000: what DSO?"]
+        - ["毛利率达标，就一定不缺钱吗？", "On-target margin: can cash still run out?"]
+        - ["测验可以做三次，提交后立刻看到解析", "Three attempts at the quiz, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：应收四万五，近 30 天开票两万七，DSO 是多少天？"
+        - ">一张订单毛利率达到了目标，工厂就一定不会缺钱吗？"
+        - ">测验可以做三次，提交后马上能看到解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: receivables of 45,000 and 27,000 invoiced in the last 30 days. What's the DSO?"
+        - ">If an order's margin meets the target, can the plant still run out of cash?"
+        - ">You can take the quiz three times, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 虚拟实验、数字工厂实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们看 AI 代理与决策：让 AI 回答“这单为什么比标准少赚了”，它说的对不对。我们下一讲见。
+  en:
+    - The virtual labs, the digital-factory lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's AI agents and decisions, and whether to trust an AI that explains why an order earned less than standard. See you then.

@@ -1,0 +1,1208 @@
+{
+ "no": 3,
+ "title": [
+  "厂情中枢：异常、追因与推演",
+  "The Factory Hub: Exceptions, Root Causes and What-ifs"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说明规则怎样从数据里发现异常，举出停机、积压、延期、违约金四类规则，并说出规则的局限。",
+   "Explain how rules find exceptions in data, give the four rules fired by a breakdown (down, backlog, late order, penalty), and state what rules cannot do."
+  ],
+  [
+   "能沿因果链往上找原因、往下算影响：设备 → 工序 → 工单 → 订单 → 客户，并说出每条连线的依据。",
+   "Trace a causal chain up to the cause and down to the impact (machine → operation → work order → order → customer) and give the evidence for each link."
+  ],
+  [
+   "能算出停机真正丢掉的生产时间和各订单的余量，判断哪张订单会晚、晚几天、罚多少。",
+   "Compute the production time a stop really loses and each order's slack, and decide which orders are late, by how many days and at what penalty."
+  ],
+  [
+   "能算出加班、维修加急、外协三种方案的花费和交期，用推演检验手算，按钱、交期、风险三个维度选出方案。",
+   "Price overtime, expediting and outsourcing and their effect on delivery, check hand calculations with a simulation, and choose on money, delivery and risk."
+  ],
+  [
+   "能在数字工厂里完成实验 15：先自己追因和推演，再和中枢的建议比对，执行并复盘。",
+   "Complete Lab 15 in the digital factory: trace and simulate yourself first, compare with the hub's advice, execute and review."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "磨床停了 24 小时，机器人订单会晚吗？怎么补最划算？",
+   "The grinder is down for 24 hours: will the robot order be late, and what is the cheapest fix?"
+  ],
+  "text": [
+   "机器人厂追加的 20 台关节减速器周四交货（客户、台数、交期是本讲设定，示意值）。周一 10:00，瓶颈外圆磨床 GRD-01 主轴故障、等备件，要停 24 小时。排给磨床的活按顺序是：峰顶 8 台（周三交，违约金 $200/工作日）、机器人厂 20 台（周四交，违约金 $200/工作日，示意值）、海港 12 台（12 个工作日后交）。每台减速器三根轴共磨 39 分钟；车间 08:00–17:00 单班；轴磨完后 1 个工作日交货。车间主任说：停 24 小时等于三个班，要晚三天，赶紧维修加急。",
+   "The robot plant's extra order of 20 joint reducers is due on Thursday (customer, quantity and due date are this lecture's illustrative setting). At 10:00 Monday the bottleneck grinder GRD-01 has a spindle fault and waits for parts: 24 hours down. The grinder's queue, in order: Summit 8 units (due Wednesday, penalty $200 per working day), the robot plant 20 units (due Thursday, penalty $200 per working day, illustrative) and Harbor 12 units (due in 12 working days). Each reducer's three shafts take 39 minutes of grinding; the shop works 08:00–17:00; orders ship one working day after the last shaft. The supervisor says 24 hours is three shifts, three days late: expedite the repair."
+  ],
+  "question": [
+   "这次停机真正丢掉多少生产时间？哪张订单会晚、晚几天、罚多少？加班、维修加急、外协，哪个最划算又保交期？车间主任估得对吗？",
+   "How much production time does the stop really lose? Which order is late, by how much, at what penalty? Which of overtime, expediting and outsourcing keeps the date most cheaply? Was the supervisor right?"
+  ],
+  "answer": [
+   "停机周一 10:00 到周二 10:00，和班次重叠的只有 9 小时（周一 7 + 周二 2）。机器人订单不停机时周三 10:12 磨完，最晚周三下班前磨完（正班到 17:00，加班当晚做完也算），按正班算余量 6.8 小时，还差 2.2 小时：不处理晚 1 天，违约金 $200；峰顶、海港按时。车间主任估的晚 3 天、$600 是实际的 3 倍（$600 对 $200）。四个方案：不处理 $200.00（晚 1 天）；恢复后加班 2.2 小时 $171.60（按时）；维修加急 $300，只多出 2 个生产小时，仍晚 1 天，合计 $500.00；外协 4 台的轴 $225.76（按时）。建议加班，备选外协。",
+   "The stop runs from 10:00 Monday to 10:00 Tuesday, but only 9 hours overlap the shifts (7 on Monday + 2 on Tuesday). Without the stop the robot order would be ground by 10:12 Wednesday, with the end of Wednesday as the latest finish (regular shift to 17:00; finishing that evening on overtime also counts), a slack of 6.8 regular hours, so it is 2.2 hours short: doing nothing makes it 1 day late with a $200 penalty; Summit and Harbor stay on time. The supervisor's 3 days and $600 are 3 times the real figure ($600 against $200). Options: do nothing $200.00 (1 day late); overtime after the repair, 2.2 h, $171.60 (on time); expediting costs $300 but gains only 2 production hours and is still 1 day late, $500.00 in all; outsourcing the shafts of 4 units $225.76 (on time). Recommend overtime, with outsourcing as the fallback."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人联系：因果链顺着供应链走，也在机器人的控制器里",
+   "Robot link: causal chains run down the supply chain and inside the robot controller"
+  ],
+  "text": [
+   "机器人厂每台协作机器人底座两个大关节用 WQR-105，20 台减速器就是 10 台机器人（示意值）。我们晚交一天，它的装配线就少装 10 台，它的客户也跟着晚收货：因果链不在厂门口停下。机器人身上也有同样的追因：控制器报“关节 3 过流”，往上找原因（负载超了、减速器磨损、碰撞），往下算影响（这台机器人停了，生产线节拍掉多少、今天少做多少件），这正是机器人故障诊断做的事。",
+   "Each collaborative robot from the robot plant uses WQR-105 units in the two large joints of its base, so 20 reducers make 10 robots (illustrative values). If we ship a day late, its line builds 10 fewer robots and its customers wait too: a causal chain does not stop at the factory gate. Robots trace causes the same way: when a controller reports “joint 3 overcurrent”, it looks up for the cause (overload, a worn reducer, a collision) and down for the impact (this robot stops, the line's cycle time drops, today's output falls). That is what robot fault diagnosis does."
+  ]
+ },
+ "life": {
+  "title": [
+   "生活例子：外卖晚到，卡在哪一环",
+   "Everyday example: the takeaway is late. Where is it stuck?"
+  ],
+  "text": [
+   "一单外卖：接单 2 分钟、出餐 12 分钟、等骑手 5 分钟、配送 11 分钟，承诺 30 分钟。午高峰出餐用了 25 分钟，外卖 43 分钟才到。骑手早到了也只能等餐。这条链没有余量，厨房多用的 13 分钟全部变成晚到；催骑手没用：卡住的是厨房，骑手只是被牵连的下游。",
+   "A takeaway: accepting 2 minutes, cooking 12, waiting for a rider 5, the ride 11, promised in 30. At the lunch peak cooking takes 25 minutes and the food arrives after 43. The rider arrives early and just waits for the food. The chain has no slack, so the kitchen's extra 13 minutes all become lateness; chasing the rider does not help: the kitchen is where it is stuck, and the rider is only downstream."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "实际问题：磨床停了，哪张订单会晚？",
+    "The problem: the grinder stopped. Which order will be late?"
+   ],
+   "points": [
+    [
+     "周一 10:00 GRD-01 主轴故障，停 24 小时",
+     "10:00 Monday: GRD-01 spindle fault, 24 h down"
+    ],
+    [
+     "排着峰顶 8 台、机器人厂 20 台（周四交）、海港 12 台",
+     "Queued: Summit 8, robot plant 20 (due Thu), Harbor 12"
+    ],
+    [
+     "车间主任：三个班，晚三天，赶紧加急",
+     "Supervisor: three shifts, three days late, expedite!"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "先看厂里出的事。机器人厂追加的 20 台关节减速器周四交货，周一上午 10 点，瓶颈外圆磨床 GRD-01 主轴故障，要等备件，估计停 24 小时。磨床前面排着三张订单：峰顶 8 台周三交，机器人厂 20 台周四交，海港 12 台还早。车间主任说，停 24 小时就是三个班，机器人订单要晚三天，赶紧让维修加急。他说得对吗？这一讲我们把它算清楚。",
+    "Here's what happened. The robot plant's 20 extra joint reducers are due on Thursday. At ten on Monday morning the bottleneck grinder GRD-01 has a spindle fault and must wait for parts, about 24 hours. Three orders are queued: Summit's 8 units due Wednesday, the robot plant's 20 due Thursday, and Harbor's 12, due much later. The supervisor says 24 hours is three shifts, so the robot order will be three days late: expedite the repair. Is he right? Today we work it out."
+   ]
+  },
+  {
+   "title": [
+    "规则：从数据里发现异常",
+    "Rules: finding exceptions in data"
+   ],
+   "points": [
+    [
+     "P1 停机、P5 积压、S1 要延期、R3 有违约金",
+     "P1 down, P5 backlog, S1 late order, R3 penalty"
+    ],
+    [
+     "每 20 秒检查一遍：不会忘、不会累",
+     "Checked every 20 seconds: never forgets, never tires"
+    ],
+    [
+     "局限：只说出事了，不说为什么、怎么办",
+     "Limit: says that something is wrong, not why or what to do"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "中枢怎么知道出事？靠规则。规则就是写成程序的判断：数据满足某个条件，就报一条异常。这次停机，P1 报设备停机，P5 报瓶颈前排队超过 6 件，S1 报订单可能延期，R3 报延期要罚违约金。规则每 20 秒查一遍全厂，不会忘、不会累、标准一致。可它只说出事了，不说为什么、怎么办。四条异常其实是一件事，要把它们连起来。",
+    "How does the hub know? Through rules. A rule is a judgement written as a program: if the data meet a condition, raise an exception. This breakdown fires P1, machine down; P5, more than 6 parts queued at a bottleneck; S1, an order may be late; and R3, a delay will trigger a penalty. Rules check the plant every 20 seconds; they never forget or tire and judge consistently. But they only say that something is wrong, not why or what to do. These four exceptions are one event, and we need to connect them."
+   ]
+  },
+  {
+   "title": [
+    "因果链：往上找原因，往下算影响",
+    "Causal chain: up to the cause, down to the impact"
+   ],
+   "points": [
+    [
+     "往上：订单 ← 工单 ← 工序 ← 磨床 ← 主轴故障",
+     "Up: order ← work order ← operation ← grinder ← spindle fault"
+    ],
+    [
+     "往下：设备 → 工序 → 工单 → 订单 → 客户",
+     "Down: machine → operation → work order → order → customer"
+    ],
+    [
+     "每条连线都要有依据：消息、单据、规则",
+     "Every link needs evidence: a message, a document, a rule"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig03_chain.png",
+   "narration": [
+    "工厂里的东西是连着的：设备上排着工序，工序属于工单，工单为订单做，订单属于客户。中枢把这些连接存成一张网。出了异常，就沿网走两个方向：往上找原因，订单为什么晚，因为工序排在磨床上，磨床为什么停，主轴故障；往下算影响，三组工单推迟，三张订单完工推迟，哪个客户要罚。看图上的颜色：三组工单都被推迟了，只有机器人厂的订单变红。被牵连不等于会晚。",
+    "Everything in a plant is connected: operations queue on machines, operations belong to work orders, work orders serve orders, orders belong to customers. The hub stores these links as a network and walks it two ways. Up to the cause: why is the order late? Its operation is queued on the grinder. Why is the grinder idle? A spindle fault. Down to the impact: three groups of work orders are pushed back, three orders finish later, and someone pays a penalty. Look at the colours: all three groups are delayed, but only the robot plant's order turns red. Affected is not the same as late."
+   ]
+  },
+  {
+   "title": [
+    "停机时长不等于少干的时间",
+    "Downtime is not lost production time"
+   ],
+   "points": [
+    [
+     "夜里修，可夜里本来不开工",
+     "Repairs go on at night, but the shop doesn't work at night"
+    ],
+    [
+     "周一 7 h + 周二 2 h：L = 9 h，不是 24 h",
+     "7 h Monday + 2 h Tuesday: L = 9 h, not 24 h"
+    ],
+    [
+     "周五 15:00 停 20 h，只丢 2 h",
+     "Stop at 15:00 Friday for 20 h: only 2 h lost"
+    ]
+   ],
+   "formula": "L=\\bigl|\\,[t_s,\\;t_s+D)\\cap\\text{shifts}\\,\\bigr|",
+   "figure": "",
+   "narration": [
+    "车间主任的算法是 24 除以 9，约 2.7 天。错在哪？修理夜里也在进行，可车间夜里本来就不开工。真正丢掉的，只是停机和班次重叠的那一段：周一 10 点到 17 点 7 小时，周二 8 点到 10 点 2 小时，一共 9 小时，不是 24。同样停 20 小时，如果是周五下午 3 点开始停，只丢周五的 2 小时，周末本来不干活。",
+    "The supervisor divided 24 by 9, about 2.7 days. What's wrong? The repair goes on overnight, but the shop doesn't work at night anyway. What's really lost is the overlap of the stop and the shifts: 7 hours on Monday, 10 to 5, and 2 on Tuesday, 8 to 10, 9 hours in all, not 24. A 20-hour stop starting at 3 on Friday afternoon loses only Friday's 2 hours; the weekend isn't worked anyway."
+   ]
+  },
+  {
+   "title": [
+    "余量：差多少才会晚",
+    "Slack: how far behind before it's late"
+   ],
+   "points": [
+    [
+     "不停机：机器人订单周三 10:12 磨完",
+     "Without the stop: robot order ground by 10:12 Wednesday"
+    ],
+    [
+     "最晚周三下班（正班 17:00）：余量 S = 6.8 个正班小时",
+     "Latest: end of Wednesday (shift ends 17:00): slack S = 6.8 regular hours"
+    ],
+    [
+     "差 2.2 h → 晚 1 天，罚 $200（不是 3 天、$600）",
+     "Short 2.2 h → 1 day late, $200 (not 3 days, $600)"
+    ]
+   ],
+   "formula": "\\text{shortfall}=\\max(0,\\;L-S)",
+   "figure": "",
+   "narration": [
+    "丢了 9 小时，订单就晚 9 小时吗？还要看余量。不停机的话，磨床先磨峰顶 5.2 小时，再磨机器人厂 13 小时，周三上午 10 点 12 分磨完。机器人厂周四交货，轴最晚周三下班前磨完就行，正班到 17 点，加班当晚做完也算；按正班算，余量 6.8 小时。9 减 6.8，还差 2.2 小时，轴拖到周四上午，周五交货，晚 1 天，罚 200 美元。车间主任估的三天、600 美元，是实际的 3 倍。",
+    "Lose 9 hours, and the order is 9 hours late? It depends on the slack. Without the stop the grinder does Summit's 5.2 hours, then the robot plant's 13, finishing at 10:12 Wednesday. The robot order ships Thursday, so its shafts must be done by the end of Wednesday; the regular shift ends at 5, and finishing that evening on overtime also counts. In regular hours that's 6.8 hours of slack. 9 minus 6.8 leaves it 2.2 hours short; the shafts slip to Thursday morning, the order ships Friday, one day late, a 200-dollar penalty. The supervisor's three days and 600 dollars are three times the real figure."
+   ]
+  },
+  {
+   "title": [
+    "三个办法，各花多少钱",
+    "Three remedies and their prices"
+   ],
+   "points": [
+    [
+     "加班：$52/h × 1.5 = $78/h，每天最多 4 h",
+     "Overtime: $52/h × 1.5 = $78/h, up to 4 h a day"
+    ],
+    [
+     "维修加急：$300，剩余停机减半",
+     "Expedite: $300, remaining downtime halved"
+    ],
+    [
+     "外协：每台 $43.94 + 每批运费 $50，24 h 回厂",
+     "Outsource: $43.94 a unit + $50 freight, back in 24 h"
+    ]
+   ],
+   "formula": "C_{ot}=h\\times 52\\times 1.5,\\qquad C_{out}=n\\times\\tfrac{39}{60}\\times 52\\times 1.3+50",
+   "figure": "",
+   "narration": [
+    "差 2.2 小时，有三种补法，价钱都能从数字工厂的参数算出来。加班：磨床费率折旧 20、人工 26、能耗 6，一共 52 美元一小时，加班乘 1.5，78 美元一小时，每天最多 4 小时。维修加急：多花 300 美元，剩余停机时间减半。外协：外面厂的单价是本厂工时成本乘 1.3，一台减速器三根轴 43.94 美元，每批运费 50，24 小时回厂。",
+    "To make up 2.2 hours there are three remedies, all priced from the digital factory's parameters. Overtime: the grinder's rate is 20 depreciation, 26 labour and 6 energy, 52 dollars an hour; overtime is 1.5 times that, 78 an hour, at most 4 hours a day. Expediting: 300 dollars more and the remaining downtime is halved. Outsourcing: the other shop charges our hourly cost times 1.3, so one unit's three shafts cost 43.94, plus 50 freight per batch, back in 24 hours."
+   ]
+  },
+  {
+   "title": [
+    "手算：加班最便宜，加急白花钱",
+    "By hand: overtime is cheapest, expediting is wasted"
+   ],
+   "points": [
+    [
+     "加班 2.2 h = $171.60",
+     "Overtime 2.2 h = $171.60"
+    ],
+    [
+     "外协 4 台 = $225.76",
+     "Outsource 4 units = $225.76"
+    ],
+    [
+     "加急：省 12 h 停机，只多 2 h 生产，仍差 12 分钟",
+     "Expedite: 12 h less downtime, only 2 h more production, still 12 min short"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "先手算。加班 2.2 小时乘 78，171.60 美元。外协每台省 0.65 小时，要 4 台，225.76 美元。维修加急呢？剩余 24 小时减半成 12 小时，周一晚上 10 点修好。省下的 12 小时停机，有 10 小时在夜里，真正多出来的只有周二上午 2 小时。还差 12 分钟，花了 300 美元，照样晚 1 天。车间主任以为修得快就能保交期，可快出来的时间大多用不上。",
+    "First by hand. 2.2 hours of overtime at 78 is 171.60 dollars. Each outsourced unit saves 0.65 hours, so we need 4 units, 225.76 dollars. And expediting? The remaining 24 hours become 12, and the grinder is back at 10 on Monday night. Of the 12 hours saved, 10 are at night; the only extra production is 2 hours on Tuesday morning. It's still 12 minutes short: 300 dollars spent, and still a day late. The supervisor assumed a faster repair would save the date, but most of the time it gains is useless."
+   ]
+  },
+  {
+   "title": [
+    "加班还是外协：看差多少",
+    "Overtime or outsourcing: it depends on the gap"
+   ],
+   "points": [
+    [
+     "外协每小时的活 $67.60，比加班 $78 便宜",
+     "Outsourced grinding $67.60/h, cheaper than $78 overtime"
+    ],
+    [
+     "但每批多 $50 运费",
+     "But each batch adds $50 freight"
+    ],
+    [
+     "分界点 4.8 h：差得少加班，差得多外协",
+     "Break-even 4.8 h: small gaps overtime, large gaps outsourcing"
+    ]
+   ],
+   "formula": "78\\,h=67.6\\,h+50\\;\\Rightarrow\\;h=4.8",
+   "figure": "",
+   "narration": [
+    "加班和外协哪个便宜，看差多少。外协每磨一小时的活是 67.60 美元，比加班的 78 便宜，可每批多 50 美元运费。两边一样贵的时候，78 乘 h 等于 67.6 乘 h 加 50，h 约 4.8 小时。差得比这少，加班便宜；差得比这多，外协便宜。这次差 2.2 小时，加班便宜。",
+    "Which is cheaper, overtime or outsourcing, depends on the gap. An hour of outsourced grinding costs 67.60 dollars, less than 78 of overtime, but each batch adds 50 dollars of freight. They cost the same when 78 h equals 67.6 h plus 50, at about 4.8 hours. A smaller gap favours overtime, a bigger one outsourcing. Today the gap is 2.2 hours, so overtime wins."
+   ]
+  },
+  {
+   "title": [
+    "推演：把每个方案快进一遍",
+    "Simulation: fast-forward each option"
+   ],
+   "points": [
+    [
+     "快照 → 快进副本 → 换上方案 → 按班次日历往前跑",
+     "Snapshot → fast-forward copy → apply option → run on the shift calendar"
+    ],
+    [
+     "B 加班：周三 17:12 磨完，按时，$171.60",
+     "B overtime: done 17:12 Wed, on time, $171.60"
+    ],
+    [
+     "中枢的排序：先交期，再钱，再加班",
+     "The hub ranks: delivery, then money, then overtime"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig03_gantt.png",
+   "narration": [
+    "手算悄悄做了假设：加班时间够用、外协件按时回来、前面的订单不受影响。中枢不只手算，还要推演：给工厂拍一张快照，复制一个快进副本，换上一个方案，按真实的班次日历一分钟一分钟往前跑。图上是磨床在四个方案下的排程。加班：周三 17 点 12 分磨完，按时，171.60 美元；外协 4 台也按时，225.76；加急和不处理都晚 1 天。中枢先看交期，再比钱，加班排第一。",
+    "The hand calculation quietly assumes that there's enough overtime, that outsourced parts come back on time and that the orders ahead aren't affected. So the hub also simulates: it snapshots the plant, makes a fast-forward copy, applies one option and runs minute by minute on the real shift calendar. Here is the grinder's schedule under four options. Overtime: done at 17:12 Wednesday, on time, 171.60 dollars. Outsourcing 4 units is on time too, 225.76. Expediting and doing nothing are both a day late. Delivery first, then money: overtime ranks first."
+   ]
+  },
+  {
+   "title": [
+    "凭经验估代价常常错",
+    "Estimates from experience are often wrong"
+   ],
+   "points": [
+    [
+     "停 7–22 h：修好在夜里，结果几乎不变",
+     "7–22 h down: repaired overnight, hardly any difference"
+    ],
+    [
+     "停 26 h 起峰顶也晚；30 h：每天加 4 h，两单仍各晚 1 天",
+     "From 26 h Summit is late too; at 30 h, 4 h overtime a day still leaves both late"
+    ],
+    [
+     "排序有盲区：两单都晚的“不处理”（$400）排在只晚一单的加急（$500）前",
+     "The ranking has a blind spot: doing nothing ($400, two late) beats expediting ($500, one late)"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig03_cost.png",
+   "narration": [
+    "看停机时长从 2 小时拖到 48 小时，各方案多花的钱。停 7 到 22 小时，修好的时刻落在夜里，L 一直是 7 小时；不处理的 200 美元一直持续到 25 小时。从 26 小时起，峰顶的余量 10.8 个正班小时也用完了，峰顶也晚。停 30 小时，手算说机器人差 8.2 小时，加班 639.60 美元就行；推演却说，周二 16 点才修好，每天加满 4 小时，峰顶和机器人厂仍各晚 1 天。这时中枢的排序推荐不处理，400 美元，两单各晚 1 天；维修加急 500 美元只让机器人厂晚、保住了峰顶，却排在后面，因为规则只看最晚的那张。从 31 小时起加急才排第一。哪张先救，要人拿主意。",
+    "Here is how each option's cost changes as the downtime grows from 2 to 48 hours. From 7 to 22 hours the repair ends at night and L stays at 7 hours; doing nothing costs 200 dollars all the way to 25 hours. From 26 hours Summit's slack of 10.8 regular hours is used up and Summit is late too. At 30 hours the hand calculation says the robot order is 8.2 hours short, so 639.60 dollars of overtime will do; the simulation says the grinder is back only at 4 pm Tuesday, and even 4 hours of overtime a day leaves both orders a day late. The hub's ranking then recommends doing nothing, 400 dollars with both orders late; expediting, 500 dollars, saves Summit and leaves only the robot order late, yet ranks lower because the rule looks only at the latest order. From 31 hours expediting ranks first. Which order to save is for people to decide."
+   ]
+  },
+  {
+   "title": [
+    "方案的三个维度：钱、交期、风险",
+    "Three dimensions: money, delivery, risk"
+   ],
+   "points": [
+    [
+     "不处理只罚 $200，可机器人厂的线可能停",
+     "Doing nothing costs $200, but the robot line may stop"
+    ],
+    [
+     "加班要有人；磨床保养已逾期（第 6 讲）",
+     "Overtime needs an operator; the grinder is overdue for service (Lecture 6)"
+    ],
+    [
+     "插单：机器人按时，峰顶晚 2 天罚 $400",
+     "Reordering: robot on time, Summit 2 days late, $400"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "比方案不能只看钱。不处理只罚 200 美元，比外协还便宜，为什么不选？因为交期排在钱前面：机器人厂晚一天，它的装配线可能停一天，罚金只是合同里写得出来的那部分。风险也要摆出来：加班要有会开磨床的人；磨床保养已经逾期，多跑几小时故障风险更高；外协件要全检，外面的厂晚一天就前功尽弃。还有一种办法，把机器人订单插到最前：它按时了，可峰顶晚 2 天，罚 400。插单没消灭损失，只是换个人承担。",
+    "Don't compare on money alone. Doing nothing costs only 200 dollars, less than outsourcing; why not choose it? Because delivery comes before money: a day late may stop the robot plant's line for a day, and the penalty is only what a contract can spell out. Risks must be laid out too: overtime needs a skilled operator; the grinder is overdue for service, so extra hours raise the failure risk; outsourced parts need full inspection, and if the other shop is a day late it's all for nothing. One more remedy: move the robot order to the front. It's on time, but Summit is 2 days late and pays 400. Reordering doesn't remove the loss; it moves it to someone else."
+   ]
+  },
+  {
+   "title": [
+    "在数字工厂里做：实验 15",
+    "In the digital factory: Lab 15"
+   ],
+   "points": [
+    [
+     "任务 1：老师注入停机，先自己追因",
+     "Task 1: the instructor injects a stop; trace it yourself first"
+    ],
+    [
+     "任务 2–3：推演 ≥ 3 个方案，选一个写理由（比对模式）",
+     "Tasks 2–3: simulate ≥ 3 options, choose and justify (comparison mode)"
+    ],
+    [
+     "任务 4–5：老师批准后执行，看复盘",
+     "Tasks 4–5: execute after approval, read the review"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "最后到数字工厂里亲手做一次。实验 15 用比对模式：老师注入一次停机，你先不看厂情中枢，用首页、车间终端和订单页自己追因：哪台停了、排着哪些工单、属于哪些订单、会晚几天，平台按系统的因果链评分。然后在推演工作台至少试三个方案，存成场景；选一个，写清交期、成本、风险，提交以后才能看到中枢的建议。方案变成动作，老师批准后执行；工单做完，平台自动复盘，比推演和实际差多少。",
+    "Finally, do it yourself in the digital factory. Lab 15 uses comparison mode. The instructor injects a breakdown, and without opening the hub you trace it from the home page, shop terminals and order pages: which machine stopped, which work orders are queued, which orders they belong to, how many days late. The platform scores you against the system's chain. Then try at least three options in the what-if workbench and save them as scenarios; choose one, give reasons on delivery, cost and risk, and only then see the hub's advice. The option becomes an action that runs after the instructor approves it, and when the work orders are done the platform reviews prediction against reality."
+   ]
+  },
+  {
+   "title": [
+    "机器人联系与生活例子",
+    "Robot link and an everyday example"
+   ],
+   "points": [
+    [
+     "20 台减速器 = 10 台机器人：晚一天，机器人厂的线少装 10 台",
+     "20 reducers = 10 robots: a day late, 10 fewer robots built"
+    ],
+    [
+     "控制器报“关节过流”：往上找原因，往下算影响",
+     "A controller's 'joint overcurrent': trace up and down"
+    ],
+    [
+     "外卖晚 13 分钟：卡在厨房，不在骑手",
+     "Takeaway 13 min late: stuck in the kitchen, not with the rider"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "因果链不在厂门口停下。机器人厂每台协作机器人底座两个大关节用 WQR-105，20 台减速器就是 10 台机器人，这是示意值，我们晚一天，它的线就少装 10 台。机器人自己也追因：控制器报关节过流，往上找原因，是负载超了、减速器磨损还是撞到了东西，往下算影响，这条线少做多少件。生活里也一样：外卖承诺 30 分钟，午高峰出餐多用了 13 分钟，催骑手没用，卡住的是厨房。",
+    "A causal chain doesn't stop at the factory gate. Each of the robot plant's collaborative robots uses WQR-105 units in the two big base joints, an illustrative value, so 20 reducers make 10 robots; if we're a day late, its line builds 10 fewer. Robots trace causes too: a controller reporting joint overcurrent looks up for the cause, an overload, a worn reducer or a collision, and down for the impact, how much output the line loses. Daily life is the same: a takeaway promised in 30 minutes, the kitchen takes 13 minutes longer at lunch, and chasing the rider doesn't help; the kitchen is where it's stuck."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "规则把“数据满足某个条件”变成异常，不会忘、不会累；但只说出事了，不说为什么、怎么办。阈值要拿捏。",
+   "A rule turns a condition in the data into an exception and never forgets or tires, but it only says that something is wrong, not why or what to do. Thresholds need judgement."
+  ],
+  [
+   "因果链往上找原因、往下算影响：设备 → 工序 → 工单 → 订单 → 客户；每条连线都要有依据。",
+   "A causal chain traces up to the cause and down to the impact, machine → operation → work order → order → customer; every link needs evidence."
+  ],
+  [
+   "真正丢掉的生产时间 L 是停机和班次的重叠；订单晚不晚看 L − 余量 S。被牵连不等于会晚。",
+   "The production time really lost, L, is the overlap of downtime and shifts; an order is late only if L exceeds its slack S. Affected is not the same as late."
+  ],
+  [
+   "加班费 = 小时 × 费率 × 1.5；外协费 = 台数 × 单价 + 运费；加急的效果看省下的停机落在白天还是夜里。差得少加班便宜，差得多外协便宜。",
+   "Overtime = hours × rate × 1.5; outsourcing = units × price + freight; expediting helps only if the saved downtime falls in working hours. Small gaps favour overtime, large ones outsourcing."
+  ],
+  [
+   "推演把班次、上限、排队顺序都算进去，凭经验估代价常常错；方案按钱、交期、风险比，先交期、再钱、再加班。",
+   "Simulation includes shifts, caps and queue order, and estimates from experience are often wrong; compare options on money, delivery and risk, ranking delivery first, then money, then overtime."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "causal",
+   "no": "3-1",
+   "title": [
+    "一次停机的因果链",
+    "The causal chain of one breakdown"
+   ],
+   "goal": [
+    [
+     "看清一次停机怎样沿因果链从设备传到工序、工单、订单和客户。",
+     "See how one breakdown spreads along the causal chain from machine to operation, work orders, orders and customers."
+    ],
+    [
+     "会算真正丢掉的生产时间 L，理解它和停机时长、停机时刻的关系。",
+     "Compute the production time really lost, L, and see how it depends on the length and timing of the stop."
+    ],
+    [
+     "理解影响面要一张张订单算：被牵连不等于会晚，插单会把麻烦挪给别人。",
+     "Understand that impact is worked out order by order: affected is not late, and reordering moves the trouble to someone else."
+    ]
+   ],
+   "theory": [
+    [
+     "L = |[t_s, t_s + D) ∩ 班次|：停机和班次（周一到周五 08:00–17:00）重叠的小时。",
+     "L = |[t_s, t_s + D) ∩ shifts|: the hours where the stop overlaps the shifts (Mon–Fri 08:00–17:00)."
+    ],
+    [
+     "磨床按排队顺序加工；每台减速器三根轴共磨 39 分钟；轴磨完 1 个工作日后交货。",
+     "The grinder works through its queue in order; each reducer's three shafts take 39 minutes; orders ship one working day after the last shaft."
+    ],
+    [
+     "订单晚几天 = 交货日比交期晚几个工作日；违约金 = 晚的天数 × 合同的每日违约金。",
+     "Days late = working days between the due date and the delivery date; penalty = days late × the contract's daily penalty."
+    ],
+    [
+     "动画每层亮起的数字由同一个推演程序算出，与教材第 3 章一致。",
+     "The numbers shown as each layer lights up come from the same simulation as Chapter 3."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，点“本章：停 24 h”，看因果链一层层亮完。",
+     "Open the lab, press “Chapter: 24 h” and watch the chain light up layer by layer."
+    ],
+    [
+     "读出 L、被推迟的工单数、机器人订单和峰顶订单的交期、违约金合计，记入表格，与教材 3.3、3.4 节核对。",
+     "Read L, the number of work orders pushed back, the delivery of the robot and Summit orders and the total penalty; record them and check against Sections 3.3 and 3.4."
+    ],
+    [
+     "把停机时长从 0 拖到 60 h，每 4 h 记一次 L 和机器人订单晚几天；找出 L 不变的区间，说明原因。",
+     "Drag the downtime from 0 to 60 h, recording L and the robot order's delay every 4 h; find where L stays flat and explain why."
+    ],
+    [
+     "点“实验 15：停 20 h”和“停 40 h”，比较哪些订单变红。",
+     "Press “Lab 15: 20 h” and “40 h down” and compare which orders turn red."
+    ],
+    [
+     "点“周五 15:00 停 20 h”，记下 L，与周一停 20 h 比较。",
+     "Press “Fri 15:00, 20 h”, record L and compare with a 20-hour stop on Monday."
+    ],
+    [
+     "点“机器人插到最前”，记下各订单的交期和违约金，与按原顺序比较。",
+     "Press “Robot order first”, record each order's delivery and penalty and compare with the original order."
+    ],
+    [
+     "看下方磨床一周的排程条，指出停机块和三张订单的位置，解释余量在哪里被用掉。",
+     "Look at the grinder's weekly strip below, find the stop and the three orders, and explain where the slack goes."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 1　停机时长、时刻与影响面",
+     "Table 1  Downtime, timing and impact"
+    ],
+    "headers": [
+     [
+      "停机时刻",
+      "Start"
+     ],
+     [
+      "时长（h）",
+      "Length (h)"
+     ],
+     [
+      "排队顺序",
+      "Queue order"
+     ],
+     [
+      "L（h）",
+      "L (h)"
+     ],
+     [
+      "机器人订单",
+      "Robot order"
+     ],
+     [
+      "峰顶订单",
+      "Summit order"
+     ],
+     [
+      "违约金（$）",
+      "Penalties ($)"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "停机时长从 7 h 拖到 22 h，为什么机器人订单的结果几乎不变？",
+     "Why does the robot order's result barely change as the downtime grows from 7 to 22 h?"
+    ],
+    [
+     "三组工单都被推迟，为什么只有一张订单晚交？“影响面”应该怎样定义？",
+     "All three groups of work orders are delayed; why is only one order late? How should the impact be defined?"
+    ],
+    [
+     "把机器人订单插到最前，总违约金变多还是变少？这说明插单的代价是什么？",
+     "Moving the robot order first: do total penalties rise or fall? What does that say about the cost of reordering?"
+    ]
+   ]
+  },
+  {
+   "id": "whatif",
+   "no": "3-2",
+   "title": [
+    "加班、加急还是外协",
+    "Overtime, expediting or outsourcing?"
+   ],
+   "goal": [
+    [
+     "会算加班、维修加急、外协三种方案的花费和对交期的影响。",
+     "Price overtime, expediting and outsourcing and their effect on delivery."
+    ],
+    [
+     "用推演检验手算，找出手算漏掉的约束（加班上限、外协回厂时间、排队顺序）。",
+     "Check hand calculations by simulation and find the constraints they miss (overtime cap, outsourcing lead time, queue order)."
+    ],
+    [
+     "按“先交期、再钱、再加班”选出方案，并说清风险。",
+     "Choose an option by delivery first, then money, then overtime, and state its risks."
+    ]
+   ],
+   "theory": [
+    [
+     "加班费 = 加班小时 × 设备费率 × 1.5（GRD-01 费率 $52/h，加班 $78/h），每天最多 4 小时；机器人订单磨完就不再加班。",
+     "Overtime cost = hours × machine rate × 1.5 (GRD-01: $52/h, overtime $78/h), at most 4 h a day; overtime stops once the robot order is done."
+    ],
+    [
+     "维修加急：多花加急费（默认 $300），从决定时刻起剩余停机减半。",
+     "Expediting: an extra fee (default $300) halves the downtime remaining from the moment of decision."
+    ],
+    [
+     "外协：每台三根轴 39/60 × $52 × 1.3 = $43.94，每批运费 $50，24 小时后回厂。",
+     "Outsourcing: one unit's three shafts cost 39/60 × $52 × 1.3 = $43.94, plus $50 freight per batch, back after 24 hours."
+    ],
+    [
+     "每个方案的合计 = 方案本身的花费 + 违约金；排序先看最晚的订单晚几天，再看合计，再看加班。",
+     "Each option's total = the remedy's cost + penalties; rank by the worst delay, then the total, then overtime."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，点“本章：停 24 h”，读出四个方案的磨完时刻、交期、花费和合计，与教材表 3-3 核对。",
+     "Open the lab and press “Chapter: 24 h”; read each option's finish time, delivery, cost and total and check against Table 3-3."
+    ],
+    [
+     "读出 L、还差多少、保交期最少要加班和最少要外协，与教材 3.4、3.5 节手算核对。",
+     "Read L, the shortfall, the least overtime and fewest outsourced units that keep the date; check against the hand calculations in Sections 3.4 and 3.5."
+    ],
+    [
+     "把停机时长从 2 h 拖到 48 h，每 4 h 记一次推荐方案和它的合计，与教材图 3-3 对照。",
+     "Drag the downtime from 2 to 48 h, recording the recommended option and its total every 4 h; compare with Figure 3-3."
+    ],
+    [
+     "点“停 30 h”，先手算加班费，再看推演结果；把每天最多加班拉到 240 分钟，记下交期。",
+     "Press “30 h down”, work out the overtime cost by hand, then read the simulation; raise the daily cap to 240 minutes and record the delivery."
+    ],
+    [
+     "把外协回厂时间改成 48 h，再把外协价改成 $30，各记一次结果。",
+     "Set the outsourcing return time to 48 h, then the price to $30, and record the results."
+    ],
+    [
+     "点“晚 6 h 才加急”，比较加急方案和立即加急的差别，解释原因。",
+     "Press “Expedite 6 h late”, compare with expediting at once and explain."
+    ],
+    [
+     "点“播放”，看甘特图里四个方案的一周，指出加班块、停机块和外协回厂的时刻。",
+     "Press Play, watch the four options' week in the Gantt chart and point out the overtime blocks, the stop and the outsourcing return."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 2　四个方案的推演结果",
+     "Table 2  Simulation results of the four options"
+    ],
+    "headers": [
+     [
+      "停机（h）",
+      "Downtime (h)"
+     ],
+     [
+      "方案",
+      "Option"
+     ],
+     [
+      "机器人订单磨完",
+      "Robot order done"
+     ],
+     [
+      "交期",
+      "Delivery"
+     ],
+     [
+      "方案花费（$）",
+      "Remedy ($)"
+     ],
+     [
+      "违约金（$）",
+      "Penalties ($)"
+     ],
+     [
+      "合计（$）",
+      "Total ($)"
+     ]
+    ],
+    "rows": 12
+   },
+   "questions": [
+    [
+     "停 24 h 时维修加急为什么白花钱？什么样的停机，加急才最有用？",
+     "Why is expediting wasted at 24 h down? For what kind of stop is it most useful?"
+    ],
+    [
+     "停 30 h 时手算和推演为什么不一致？手算还可能漏掉哪些约束？",
+     "Why do hand calculation and simulation disagree at 30 h? What other constraints might a hand calculation miss?"
+    ],
+    [
+     "“不处理”只罚 $200，比外协便宜，中枢为什么不推荐它？你同意“先交期、再钱”吗？",
+     "Doing nothing costs only $200, less than outsourcing; why does the hub not recommend it? Do you agree with delivery first, then money?"
+    ]
+   ]
+  }
+ ],
+ "factory_labs": [
+  {
+   "id": "lab15",
+   "title": [
+    "实验 15 车间异常的追因推演与决策",
+    "Lab 15 Root cause, what-if simulation and decisions for shop-floor anomalies"
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 3：停机的影响面与处理方案",
+   "Assignment 3: the impact of a breakdown and how to handle it"
+  ],
+  "tasks": [
+   [
+    "计算题（教材习题 1、3）。(1) GRD-01 周五 15:00 停机 20 小时，求真正丢掉的生产时间。(2) 本章情景改为周一 10:00 起停 30 小时：求丢掉的生产时间、机器人订单还差几小时，以及手算的加班费和外协费（加班 $78/h；外协每台 $43.94、每批运费 $50）。用虚拟实验 3-2 推演（每天最多加班 240 分钟），说明手算和推演为什么不一致，峰顶会怎样，中枢推荐哪个方案，哪个方案能保住峰顶。",
+    "Calculation (textbook exercises 1 and 3). (1) GRD-01 stops at 15:00 Friday for 20 hours: find the production time really lost. (2) In this chapter's scenario let the stop last 30 hours from 10:00 Monday: find the production time lost, the robot order's shortfall, and by hand the overtime and outsourcing costs (overtime $78/h; outsourcing $43.94 a unit plus $50 freight a batch). Simulate it in Virtual lab 3-2 (overtime cap 240 minutes a day) and explain why hand calculation and simulation disagree, what happens to Summit, which option the hub recommends, and which option saves Summit."
+   ],
+   [
+    "分析题（教材习题 6）。把机器人订单插到磨床队列最前：各订单晚几天、违约金多少？和加班方案比，从钱、交期、风险三方面写一段建议（200 字以内）。",
+    "Analysis (textbook exercise 6). Move the robot order to the front of the grinder's queue: how late is each order and what are the penalties? Compare with the overtime option and write a recommendation covering money, delivery and risk (at most 150 words)."
+   ],
+   [
+    "实验报告：完成数字工厂实验 15，按报告模板写你画的因果链与系统因果链的比较、至少 3 个方案的推演表、你的选择与中枢建议的比较、执行和复盘，并回答讨论题。",
+    "Lab report: complete digital-factory Lab 15 and write up, using the template, your causal chain against the system's, a table of at least three simulated options, your choice against the hub's recommendation, the execution and the review, and the discussion questions."
+   ]
+  ],
+  "deliverable": [
+   "一份 PDF：计算题和分析题的完整过程（含虚拟实验截图），加实验 15 报告（用数字工厂提供的报告模板，6–10 页）。",
+   "One PDF: full working for the calculation and analysis tasks (with lab screenshots) plus the Lab 15 report (using the digital factory's template, 6–10 pages)."
+  ],
+  "rubric": [
+   [
+    "计算题：丢掉的生产时间、差额、加班费和外协费正确，能指出加班上限的影响，30 分",
+    "Calculation: correct lost time, shortfall, overtime and outsourcing costs, and the effect of the overtime cap, 30 points"
+   ],
+   [
+    "分析题：插单后的交期与违约金正确，建议同时说到钱、交期、风险，20 分",
+    "Analysis: correct deliveries and penalties after reordering, with a recommendation covering money, delivery and risk, 20 points"
+   ],
+   [
+    "实验报告：因果链有依据，方案推演完整，选择理由清楚，复盘有分析，40 分",
+    "Lab report: an evidenced causal chain, complete simulations, clear reasons and an analysed review, 40 points"
+   ],
+   [
+    "讨论：说清推演什么时候会偏、为什么要先交期再看钱，10 分",
+    "Discussion: when simulations go wrong and why delivery comes before money, 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "厂情中枢的规则能直接回答下面哪个问题？",
+    "Which question can the hub's rules answer directly?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "现在有没有设备停机、订单是否预计晚交",
+      "Is any machine down, and is any order forecast late?"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "停机的根本原因是什么",
+      "What is the root cause of the stop?"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "加班和外协哪个更划算",
+      "Is overtime or outsourcing cheaper?"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "这次停机该由谁负责",
+      "Who is to blame for the stop?"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "规则只判断数据是否满足条件、报出异常；为什么要靠因果链，怎么办要靠推演。",
+    "Rules only check conditions and raise exceptions; the cause needs the causal chain and the remedy needs simulation."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "因果链“往下算影响”的正确顺序是：",
+    "The correct order when tracing a causal chain down to the impact is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "设备 → 工序 → 工单 → 订单 → 客户",
+      "machine → operation → work order → order → customer"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "客户 → 订单 → 工单 → 工序 → 设备",
+      "customer → order → work order → operation → machine"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "设备 → 订单 → 工序 → 客户 → 工单",
+      "machine → order → operation → customer → work order"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "工单 → 设备 → 客户 → 工序 → 订单",
+      "work order → machine → customer → operation → order"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "设备上排着工序，工序属于工单，工单为订单做，订单属于客户。反过来走就是“往上找原因”。",
+    "Operations queue on machines, belong to work orders, which serve orders, which belong to customers. Walking the other way traces up to the cause."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "班次为周一到周五 08:00–17:00。磨床周一 10:00 停机，停 24 小时。真正丢掉的生产时间是多少小时？",
+    "Shifts are Mon–Fri 08:00–17:00. The grinder stops at 10:00 Monday for 24 hours. How many production hours are really lost?"
+   ],
+   "answer": 9.0,
+   "tolerance": 0.1,
+   "unit": "h",
+   "feedback": [
+    "周一 10:00–17:00 共 7 小时，周二 08:00–10:00 共 2 小时，合计 9 小时；夜里本来不开工。",
+    "7 hours on Monday (10:00–17:00) and 2 on Tuesday (08:00–10:00), 9 in all; the night isn't worked anyway."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "班次同上。磨床周五 15:00 停机，停 20 小时。真正丢掉的生产时间是多少小时？",
+    "Same shifts. The grinder stops at 15:00 Friday for 20 hours. How many production hours are really lost?"
+   ],
+   "answer": 2.0,
+   "tolerance": 0.1,
+   "unit": "h",
+   "feedback": [
+    "只丢周五 15:00–17:00 的 2 小时，修好时还是周六上午，周末不开工。",
+    "Only Friday's 2 hours (15:00–17:00) are lost; it is fixed on Saturday morning and the weekend isn't worked."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "GRD-01 的费率是 $52/小时，加班费按 1.5 倍。加班 3 小时要多少美元？",
+    "GRD-01's rate is $52 per hour and overtime is paid at 1.5 times. What do 3 hours of overtime cost in dollars?"
+   ],
+   "answer": 234.0,
+   "tolerance": 0.5,
+   "unit": "$",
+   "feedback": [
+    "加班费 = 3 × 52 × 1.5 = $234。",
+    "3 × 52 × 1.5 = $234."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "外协每台减速器的三根轴 $43.94，每批运费 $50。一批外协 6 台要多少美元？",
+    "Outsourcing one unit's three shafts costs $43.94, plus $50 freight per batch. What does one batch of 6 units cost in dollars?"
+   ],
+   "answer": 313.64,
+   "tolerance": 0.5,
+   "unit": "$",
+   "feedback": [
+    "外协费 = 6 × 43.94 + 运费 50 = $313.64。",
+    "6 × 43.94 + 50 = $313.64."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "本章情景里，维修加急把剩余停机从 24 小时减到 12 小时，所以机器人订单能多出 12 个生产小时、按时交货。",
+    "In this chapter's scenario, expediting cuts the remaining downtime from 24 to 12 hours, so the robot order gains 12 production hours and ships on time."
+   ],
+   "correct": false,
+   "feedback": [
+    "省下的 12 小时停机有 10 小时在夜里，只多出 2 个生产小时，还差 12 分钟，照样晚 1 天。",
+    "Of the 12 hours saved, 10 fall at night: only 2 production hours are gained, it is still 12 minutes short and ships a day late."
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "下面哪些说法是对的？",
+    "Which statements are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "被因果链牵连的订单不一定会晚交",
+      "An order on the causal chain is not necessarily late"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "差的生产时间少时，加班往往比外协便宜（外协每批有运费）",
+      "For small shortfalls overtime is often cheaper than outsourcing (each batch has freight)"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "把急单插到最前，总违约金一定变少",
+      "Moving a rush order to the front always lowers total penalties"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "手算和推演一致时，推演就不需要做",
+      "If hand calculation and simulation agree, there is no need to simulate"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "中枢排方案时先看交期，再比多花的钱",
+      "The hub ranks options by delivery first, then by extra cost"
+     ],
+     "correct": true
+    }
+   ],
+   "feedback": [
+    "影响面要一张张订单算；分界点约 4.8 小时；本章插单反而让违约金从 $200 变成 $400；不推演就不知道手算对不对。",
+    "Impact is worked out order by order; the break-even is about 4.8 hours; in this chapter reordering raises penalties from $200 to $400; without simulating you cannot know whether the hand calculation holds."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "本章情景：不处理只罚 $200，加班要 $171.60，外协要 $225.76。如果加班费涨到比 $200 还贵，中枢会推荐什么？",
+    "In this chapter's scenario doing nothing costs $200, overtime $171.60, outsourcing $225.76. If overtime cost more than $200, what would the hub recommend?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "仍推荐能保住交期的方案里最便宜的那个",
+      "Still the cheapest option that keeps the delivery date"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "不处理，因为它最便宜",
+      "Do nothing, because it is cheapest"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "维修加急，因为它处理了根本原因",
+      "Expediting, because it fixes the root cause"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "随机推荐一个",
+      "Any of them at random"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "中枢先看交期、再比钱。晚交的代价不只是罚金，机器人厂的线可能停；只有所有方案都晚时，才在晚的方案里比钱。",
+    "The hub ranks delivery before money. Lateness costs more than the penalty: the robot plant's line may stop. Only when every option is late does it compare money among them."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "实验 15 的“比对模式”是指：",
+    "In Lab 15, “comparison mode” means:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "提交自己的选择之前，看不到中枢的建议和推荐理由",
+      "The hub's recommendation and reasons stay hidden until you submit your own choice"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "同时比较两台磨床",
+      "Two grinders are compared at once"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "把推演和实际的偏差比一比",
+      "Simulation and reality are compared"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "和同学的答案比较",
+      "Your answer is compared with classmates'"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "先自己追因、推演、做决定，再看中枢和 AI 的建议，判断谁更合理。复盘才是推演和实际的比较。",
+    "You trace, simulate and decide first, then see the hub's and the AI's advice and judge which is better. Comparing simulation with reality is the review."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "本章情景：不停机时机器人订单周三 10:12 磨完，最晚周三下班（正班 17:00）；停机丢掉 9 个生产小时。机器人订单还差几小时？",
+    "In this chapter's scenario the robot order would be ground by 10:12 Wednesday without the stop, latest the end of Wednesday's regular shift at 17:00; the stop loses 9 production hours. How many hours short is the robot order?"
+   ],
+   "answer": 2.2,
+   "tolerance": 0.1,
+   "unit": "h",
+   "feedback": [
+    "余量 = 17:00 − 10:12 = 6.8 小时；差 9 − 6.8 = 2.2 小时。",
+    "Slack = 17:00 − 10:12 = 6.8 hours; shortfall = 9 − 6.8 = 2.2 hours."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "磨床周一 10:00 停机 30 小时。班次周一到周五 08:00–17:00。真正丢掉的生产时间是多少小时？",
+    "The grinder stops at 10:00 Monday for 30 hours. Shifts are Mon–Fri 08:00–17:00. How many production hours are really lost?"
+   ],
+   "answer": 15.0,
+   "tolerance": 0.1,
+   "unit": "h",
+   "feedback": [
+    "停到周二 16:00：周一 7 小时 + 周二 8 小时 = 15 小时。",
+    "Down until 16:00 Tuesday: 7 hours Monday + 8 hours Tuesday = 15 hours."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "加班每小时 $78；外协每磨 1 小时的活 $67.60，每批另加运费 $50。差多少小时时两者一样贵？",
+    "Overtime costs $78 an hour; outsourcing costs $67.60 per hour of grinding plus $50 freight per batch. At what shortfall in hours do they cost the same?"
+   ],
+   "answer": 4.81,
+   "tolerance": 0.1,
+   "unit": "h",
+   "feedback": [
+    "78h = 67.6h + 50，h = 50 ÷ 10.4 ≈ 4.8 小时。",
+    "78h = 67.6h + 50, so h = 50 ÷ 10.4 ≈ 4.8 hours."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "推演用的是工厂快照的“快进副本”，试方案不会影响真车间和真数据。",
+    "A simulation runs on a fast-forward copy of a plant snapshot, so trying options does not affect the real shop or its data."
+   ],
+   "correct": true,
+   "feedback": [
+    "推演只在副本里跑；方案要变成动作、经厂长批准后才真的执行。",
+    "Simulations run only in the copy; an option takes effect only after it becomes an action and the plant manager approves it."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "停机 30 小时时，手算说加班 8.2 小时就能保住交期，推演却说每天加到 4 小时也晚。最可能的原因是：",
+    "At 30 hours down the hand calculation says 8.2 hours of overtime keeps the date, but the simulation says even 4 hours a day is late. The most likely reason is:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "手算没考虑每天最多加班 4 小时，修好当天（周二）只剩 1 小时正班加 4 小时加班",
+      "The hand calculation ignored the 4-hour daily cap: on the repair day (Tuesday) only 1 regular hour plus 4 hours of overtime remain"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "推演程序算错了",
+      "The simulation is wrong"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "加班费率不同",
+      "The overtime rates differ"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "外协件没回来",
+      "The outsourced parts did not return"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "周二 16:00 才修好，周二、周三两晚最多加 8 小时，比 8.2 小时少一点；手算还忘了峰顶排在前面。推演结果：峰顶和机器人厂各晚 1 天，中枢推荐不处理（$400），只有维修加急（$500）保住峰顶。",
+    "The grinder is back only at 16:00 Tuesday, so two evenings allow at most 8 hours, just under 8.2, and the hand calculation forgot that Summit is ahead in the queue. Simulated: Summit and the robot plant are each 1 day late, the hub recommends doing nothing ($400), and only expediting ($500) saves Summit."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "规则与异常；因果链的两个方向；真正丢掉的生产时间与余量；加班、加急、外协的成本与交期；推演与三个维度。",
+   "Rules and exceptions; the two directions of a causal chain; production time really lost and slack; cost and delivery of overtime, expediting and outsourcing; simulation and the three dimensions."
+  ],
+  "difficult": [
+   "为什么停机时长不等于丢掉的生产时间；被牵连不等于会晚；加急为什么可能白花钱；手算的哪些假设会被推演打破。",
+   "Why downtime is not lost production; why affected is not late; why expediting can be wasted; which hand-calculation assumptions simulation breaks."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：磨床停了",
+     "Opening: the grinder stops"
+    ],
+    "minutes": 5,
+    "content": [
+     "展示指挥台上的停机异常和车间主任的估计，提出本讲的问题。",
+     "Show the breakdown in the command centre and the supervisor's estimate; pose the questions."
+    ]
+   },
+   {
+    "phase": [
+     "概念：规则与因果链",
+     "Concepts: rules and causal chains"
+    ],
+    "minutes": 12,
+    "content": [
+     "四条规则；因果链往上、往下；用动画 3-1 现场演示链条亮起和插单。",
+     "The four rules; tracing up and down; demonstrate the chain and reordering live in Animation 3-1."
+    ]
+   },
+   {
+    "phase": [
+     "建模：丢掉的生产时间、余量与三个办法",
+     "Modelling: lost time, slack and three remedies"
+    ],
+    "minutes": 15,
+    "content": [
+     "手算 L、余量、差额；加班、加急、外协的花费；分界点。",
+     "Calculate L, slack and shortfall by hand; price the three remedies; the break-even point."
+    ]
+   },
+   {
+    "phase": [
+     "推演与三个维度",
+     "Simulation and three dimensions"
+    ],
+    "minutes": 13,
+    "content": [
+     "用虚拟实验 3-2 演示四个方案和停 30 小时的反例；钱、交期、风险。",
+     "Demonstrate the four options and the 30-hour counterexample in Virtual lab 3-2; money, delivery and risk."
+    ]
+   },
+   {
+    "phase": [
+     "数字工厂实验 15：任务 1–2",
+     "Digital-factory Lab 15: tasks 1–2"
+    ],
+    "minutes": 60,
+    "content": [
+     "老师注入停机；学生先自己追因、提交；再在推演工作台试至少 3 个方案。",
+     "The instructor injects a stop; students trace it and submit, then try at least three options in the what-if workbench."
+    ]
+   },
+   {
+    "phase": [
+     "数字工厂实验 15：任务 3–4",
+     "Digital-factory Lab 15: tasks 3–4"
+    ],
+    "minutes": 40,
+    "content": [
+     "选方案写理由（比对模式），对照中枢建议；采纳为动作，老师批准，看执行结果。",
+     "Choose and justify (comparison mode), compare with the hub; adopt as an action, the instructor approves, observe the execution."
+    ]
+   },
+   {
+    "phase": [
+     "数字工厂实验 15：任务 5",
+     "Digital-factory Lab 15: task 5"
+    ],
+    "minutes": 25,
+    "content": [
+     "调快倍速让工单做完，读复盘，判断推演和实际的偏差区间；完成虚拟实验记录表。",
+     "Speed up the shop until the work orders finish, read the review and judge the deviation; complete the virtual-lab records."
+    ]
+   },
+   {
+    "phase": [
+     "比对与小结",
+     "Comparison and summary"
+    ],
+    "minutes": 10,
+    "content": [
+     "各组的选择和中枢建议对照，讨论“先交期、再钱”；布置作业。",
+     "Compare groups' choices with the hub's advice and discuss delivery-first ranking; set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "作业 3（计算题、分析题和实验 15 报告），下周上课前提交；测验 3 可做 3 次。",
+   "Assignment 3 (calculation, analysis and the Lab 15 report), due before next class; Quiz 3 allows 3 attempts."
+  ]
+ }
+}

@@ -1,0 +1,1178 @@
+{
+ "no": 10,
+ "title": [
+  "经营：毛利、应收与现金",
+  "Business: Margin, Receivables and Cash"
+ ],
+ "hours": 4,
+ "goals": [
+  [
+   "能说清收入、料、工、费和标准成本，算出一种产品的标准毛利率。",
+   "Explain revenue, material, labour, overheads and standard cost, and compute a product's standard margin."
+  ],
+  [
+   "能按数字工厂的七项分解表算一张订单的毛利和毛利率，找出比标准多花在哪里、该找谁改。",
+   "Compute an order's gross margin from the digital factory's seven-line breakdown, find where it exceeds standard and who should fix it."
+  ],
+  [
+   "能读应收账龄和信用占用，算应收周转天数 DSO。",
+   "Read receivables ageing and credit exposure, and compute days sales outstanding (DSO)."
+  ],
+  [
+   "能做未来 8 周的现金流预测，找出最紧的一周，说明为什么赚钱的工厂也会倒闭。",
+   "Forecast cash for the next 8 weeks, find the tightest week, and explain why a profitable factory can still go bankrupt."
+  ],
+  [
+   "能在数字工厂里比较催款、信用冻结、不处理三个方案，执行催款并看到客户付款。",
+   "Compare dunning, a credit freeze and doing nothing in the digital factory, execute the dunning and see the customer pay."
+  ]
+ ],
+ "problem": {
+  "title": [
+   "交了货、开了票，机器人厂迟迟不付款",
+   "Delivered and invoiced, but the robot plant won't pay"
+  ],
+  "text": [
+   "机器人厂追加的 20 台 WQR-105 关节减速器已经交货，开了 $33,000 的发票，付款条件 30 天，现在逾期 15 天，不催就不付。这张单前面停过机、加过班、换过轴承供应商。别的应收还有三笔共 $29,700。账上现金 $60,000，每周固定开支 $8,000，后面三批料的供应商发票各 $10,774.80，第 14、28、42 天到期。销售怕催急了伤和气，会计怕再不收回来，两个月后就发不出工资。",
+   "The 20 WQR-105 joint reducers the robot plant added have been delivered and invoiced for $33,000 on 30-day terms; the invoice is now 15 days overdue and won't be paid unless chased. Along the way the order suffered a machine stop, overtime and a switch of bearing supplier. Three other receivables total $29,700. There is $60,000 in the bank, fixed costs are $8,000 a week, and three supplier invoices for materials of $10,774.80 each fall due on days 14, 28 and 42. Sales fears chasing will damage the relationship; accounts fears that without it the wages can't be paid in two months."
+  ],
+  "question": [
+   "这单的毛利和毛利率是多少，比标准少在哪里？DSO 是多少？催款、信用冻结、不处理，未来 8 周现金哪周最紧，会不会见底？",
+   "What are the order's margin and margin percentage, and where does it fall short of standard? What is the DSO? With dunning, a credit freeze or doing nothing, which of the next 8 weeks is tightest, and does cash run out?"
+  ],
+  "answer": [
+   "收入 $33,000，成本 $24,586.77，毛利 $8,413.23，毛利率 25.5%，比标准 28.2% 少 2.7 个百分点，主要是加班 $540、磨床重新调整 $184、废品 $106；刚守住 25% 的目标。应收 $62,700，DSO = $62,700 ÷ $770/天 = 81.4 天。不处理：第 7 周跌破安全线，第 8 周现金 −$6,624。建议发催款函：约 3 天收回，8 周内最低仍有 $26,376（第 8 周），DSO 降到 38.6 天。“应收逾期”只看逾期天数，15 天建议催款；算上在做的下一批，信用占用已到 165%，“信用超限”建议冻结。两者权衡：先催款，下一批开票前还没付再冻结。",
+   "Revenue $33,000, cost $24,586.77, margin $8,413.23 or 25.5%, 2.7 points below the standard 28.2%, mainly overtime $540, grinder re-setting $184 and scrap $106; it just holds the 25% target. Receivables are $62,700: DSO = $62,700 ÷ $770 a day = 81.4 days. Doing nothing, cash falls below the safety line in week 7 and to −$6,624 in week 8. Send a dunning letter: paid in about 3 days, the lowest cash in 8 weeks is still $26,376 (week 8), and DSO falls to 38.6 days. The overdue rule looks only at days overdue and recommends dunning at 15 days; counting the next batch in production, credit exposure is already 165%, so the credit-limit rule recommends a freeze. Weighing the two: dun first, and freeze if it is still unpaid before the next batch is invoiced."
+  ]
+ },
+ "robot": {
+  "title": [
+   "机器人联系：里程碑付款，现金在链上传",
+   "Robot link: milestone payments pass cash shortages up the chain"
+  ],
+  "text": [
+   "机器人厂把协作机器人卖给系统集成商，集成商做成工作站卖给终端工厂，常按里程碑付款。设一个工作站 $120,000（示意）：签约付 30%（$36,000），验收后付 60%（$72,000），质保金 10%（$12,000）一年后付。终端工厂验收拖两个月，$72,000 就晚两个月；集成商拖机器人厂，机器人厂拖我们。所以给机器人厂定信用额度要看它下游的回款；我们也可以谈预付款、分批交货分批开票，让钱早点回来。",
+   "The robot plant sells collaborative robots to integrators, who build cells for end users, usually paid by milestones. Take a $120,000 cell (illustrative): 30% on signing ($36,000), 60% after acceptance ($72,000) and a 10% retention ($12,000) a year later. If acceptance slips two months, $72,000 arrives two months late; the integrator pays the robot plant late, and the robot plant pays us late. So the robot plant's credit limit should reflect how its own customers pay, and we can negotiate a down payment or batch delivery and invoicing to get money back sooner."
+  ]
+ },
+ "life": {
+  "title": [
+   "生活例子：开小店卖货给熟客赊账",
+   "Everyday example: a shop that sells to regulars on credit"
+  ],
+  "text": [
+   "小店每月卖 $3,000，毛利率 30%，房租工资每月 $600，账面每月赚 $300。可一半赊给熟客、两个月后才还，进货却要现付，开张时只有 $1,000：第 1 个月现金就是负的，第 2 个月缺 $1,400。赚钱和有钱是两回事。",
+   "A shop sells $3,000 a month at a 30% margin with $600 of rent and wages, making $300 a month on paper. But half goes on credit to regulars who pay two months later, while stock is paid in cash and the shop opened with $1,000: cash is negative in month 1 and $1,400 short in month 2. Making money is not having money."
+  ]
+ },
+ "slides": [
+  {
+   "title": [
+    "实际问题：交了货、开了票，客户不付钱",
+    "The problem: delivered and invoiced, not paid"
+   ],
+   "points": [
+    [
+     "20 台 × $1,650 = $33,000，逾期 15 天",
+     "20 × $1,650 = $33,000, 15 days overdue"
+    ],
+    [
+     "现金 $60,000，每周开支 $8,000",
+     "Cash $60,000, fixed costs $8,000 a week"
+    ],
+    [
+     "这单赚了多少？钱什么时候回来？",
+     "How much did it make? When does the money come back?"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "机器人厂追加的 20 台关节减速器已经交货，开了 $33,000 的发票，付款条件 30 天。现在逾期 15 天了，钱还没到。销售说大客户不好催，会计说再不收回来，两个月后就发不出工资。这一讲回答两个问题：这单到底赚了多少，钱什么时候回到账上。第一个看毛利，第二个看应收和现金。",
+    "The 20 joint reducers the robot plant added have been delivered and invoiced for $33,000 on 30-day terms. It's now 15 days overdue and the money hasn't come. Sales says you can't chase a big customer; accounts says that without it we won't make payroll in two months. Two questions today: how much did this order make, and when does the money come back? The first is about margin; the second about receivables and cash."
+   ]
+  },
+  {
+   "title": [
+    "料、工、费与标准成本",
+    "Material, labour, overheads and standard cost"
+   ],
+   "points": [
+    [
+     "每台：料 $538.74，工 $571.80，电 $73.87",
+     "Per unit: material $538.74, labour $571.80, energy $73.87"
+    ],
+    [
+     "标准成本 $1,184.41，标准毛利率 28.2%",
+     "Standard cost $1,184.41, standard margin 28.2%"
+    ],
+    [
+     "毛利不是利润：还要付管理、销售、利息和税",
+     "Margin is not profit: overheads, selling, interest and tax still to pay"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "成本分三块：料，是 BOM 用量乘单价，每台 $538.74；工，是工时乘工位费率，费率里有折旧和人工，磨床每小时折旧 20、人工 26，全部工序加起来每台 $571.80；数字工厂把折旧和人工合记作工，会计上折旧算制造费用；电每台 $73.87。合起来标准成本 $1,184.41，卖 1650，标准毛利率 28.2%。注意毛利不是利润，它还要付管理、销售、利息和税。",
+    "Cost comes in three blocks. Material: BOM quantities times prices, $538.74 a unit. Labour: hours times workstation rates, which hold depreciation and wages; the grinder is 20 dollars of depreciation and 26 of wages an hour; all operations together give $571.80 a unit. The digital factory books depreciation with wages as labour; accountants would put depreciation in overhead. Energy is $73.87. Standard cost $1,184.41; sold at 1,650, that's a standard margin of 28.2 percent. Margin isn't profit: it still has to pay overheads, selling costs, interest and tax."
+   ]
+  },
+  {
+   "title": [
+    "一张订单的毛利分解",
+    "Breaking down an order's margin"
+   ],
+   "points": [
+    [
+     "收入 $33,000 − 成本 $24,586.77 = $8,413.23",
+     "Revenue $33,000 − cost $24,586.77 = $8,413.23"
+    ],
+    [
+     "毛利率 25.5%，比标准少 2.7 个百分点",
+     "Margin 25.5%, 2.7 points below standard"
+    ],
+    [
+     "计划外 $898.54：加班 $540 最多",
+     "Unplanned $898.54: overtime $540 the largest"
+    ]
+   ],
+   "formula": "\\text{margin}=\\text{revenue}-\\text{material}-\\text{labour}-\\text{energy}-\\text{scrap}-\\text{idle}-\\text{rush}-\\text{warranty}",
+   "figure": "fig10_waterfall.png",
+   "narration": [
+    "数字工厂把一张订单花的钱分成七项：料、工、电、废品返工、空转电、急单加班外协、保修。这张单的收入 $33,000，被一块块切掉，剩下毛利 $8,413.23，毛利率 25.5%。比标准少了 2.7 个百分点，计划外一共 $898.54：加班 $540，磨床重新调整 $184，废品 $106，换供应商 $64，空转电只有 $4.80。",
+    "The digital factory splits an order's spending into seven lines: material, labour, energy, scrap, idle power, rush and overtime, and warranty. This order's $33,000 of revenue is cut block by block, leaving a margin of $8,413.23, or 25.5 percent: 2.7 points below standard. The unplanned costs total $898.54: overtime $540, grinder re-setting $184, scrap $106, the dearer supplier $64, and idle power just $4.80."
+   ]
+  },
+  {
+   "title": [
+    "看钱要看数：谁来改",
+    "Judge by numbers: who fixes what"
+   ],
+   "points": [
+    [
+     "工占收入 35.2%、料 32.7%：大头",
+     "Labour 35.2%, material 32.7% of revenue: the big blocks"
+    ],
+    [
+     "报价找销售，料找采购，工时找工艺和车间",
+     "Price → sales, material → purchasing, hours → process engineering"
+    ],
+    [
+     "低于目标 5 个百分点（20%）中枢报警",
+     "The hub flags orders more than 5 points below target (20%)"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "大头是工和料，工占收入 35.2%，料 32.7%。料以外花得最多的一项是工。有的事很吓人花钱却很少：带锯床空转 24 小时只有 $4.80；第 6 讲下班后保养的 215 记在维修预算里，不分到订单上。毛利率比目标低 5 个百分点以上，中枢报订单毛利低于目标。低了找谁？报价低找销售，料贵找采购，工时超找工艺和车间。",
+    "The big blocks are labour, 35.2 percent of revenue, and material, 32.7. Apart from material, labour is the largest line. Some alarming events cost little: 24 idle hours on the band saw cost $4.80, and Lecture 6's 215-dollar after-shift service goes to the maintenance budget, not the order. If a margin is more than 5 points below target, the hub flags it. Who fixes it? A low price goes to sales, dear material to purchasing, excess hours to process engineering and the shop floor."
+   ]
+  },
+  {
+   "title": [
+    "应收账款与账龄",
+    "Receivables and ageing"
+   ],
+   "points": [
+    [
+     "应收 $62,700：未到期 $23,100，逾期 $39,600",
+     "Receivables $62,700: not due $23,100, overdue $39,600"
+    ],
+    [
+     "逾期占 63%；超过 60 天常要提坏账",
+     "63% overdue; over 60 days often needs a bad-debt provision"
+    ],
+    [
+     "机器人厂信用占用 165%（额度 $30,000）",
+     "Robot plant credit used 165% (limit $30,000)"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig10_aging.png",
+   "narration": [
+    "货交了、票开了、钱没到，这就是应收账款。先看账龄：现在应收 $62,700，未到期 $23,100，逾期 $39,600，占 63%。逾期越久越难收。再看信用：机器人厂欠 $33,000，已经超过 $30,000 的额度，下一批 10 台一开票，占用就到 165%。",
+    "Delivered, invoiced, not paid: that's a receivable. First the ageing: $62,700 outstanding, $23,100 not yet due and $39,600 overdue, 63 percent. The older it is, the harder to collect. Then credit: the robot plant owes $33,000, above its $30,000 limit, and once its next 10 units are invoiced, its exposure reaches 165 percent."
+   ]
+  },
+  {
+   "title": [
+    "应收周转天数 DSO",
+    "Days sales outstanding"
+   ],
+   "points": [
+    [
+     "近 30 天开票 $23,100，日均 $770",
+     "Invoiced in 30 days $23,100, $770 a day"
+    ],
+    [
+     "DSO = $62,700 ÷ $770 = 81.4 天（目标 ≤ 45）",
+     "DSO = $62,700 ÷ $770 = 81.4 days (target ≤ 45)"
+    ],
+    [
+     "机器人厂付清后 38.6 天",
+     "After the robot plant pays: 38.6 days"
+    ]
+   ],
+   "formula": "\\text{DSO}=\\frac{\\text{receivables}}{\\text{invoiced in 30 days}/30}",
+   "figure": "",
+   "narration": [
+    "应收多不多，要和卖得多不多比。DSO 就是现在的应收相当于多少天的销售额。近 30 天开的票只有 $23,100，每天 $770，DSO 等于 81.4 天，目标是 45。机器人厂一付清，降到 38.6 天。DSO 也能换成钱：每少一天，就有 $770 回到账上。",
+    "Whether receivables are high depends on sales. DSO is how many days of sales the receivables represent. Only $23,100 was invoiced in the last 30 days, $770 a day, so DSO is 81.4 days against a target of 45. Once the robot plant pays, it falls to 38.6. DSO converts into money: every day off brings $770 back into the bank."
+   ]
+  },
+  {
+   "title": [
+    "现金流预测：每周一算",
+    "Cash forecast: week by week"
+   ],
+   "points": [
+    [
+     "收款按到期日 + 客户平时晚几天",
+     "Cash in on due date + the customer's usual delay"
+    ],
+    [
+     "付款按供应商发票到期日，再减固定开支",
+     "Cash out on supplier due dates, plus fixed costs"
+    ],
+    [
+     "安全线：一周开支 $8,000",
+     "Safety line: one week of costs, $8,000"
+    ]
+   ],
+   "formula": "C_k=C_{k-1}+\\text{in}_k-\\text{out}_k-\\text{fixed}",
+   "figure": "",
+   "narration": [
+    "毛利回答赚不赚钱，现金回答有没有钱付账。工资、房租、货款都要用现金付。数字工厂做未来 8 周的现金预测：这周现金等于上周现金，加收款，减付款，再减固定开支。收款按到期日加这个客户平时晚几天，已经逾期的算第 1 周。每周都要大于零，最好留一周开支 $8,000 的余量。",
+    "Margin answers whether we make money; cash answers whether we can pay the bills. Wages, rent and suppliers are paid in cash. The digital factory forecasts 8 weeks: this week's cash is last week's plus cash in, minus cash out, minus fixed costs. Receivables arrive on the due date plus the customer's usual delay; anything overdue counts in week 1. Cash must stay above zero, ideally with a week of costs, $8,000, to spare."
+   ]
+  },
+  {
+   "title": [
+    "不处理：赚了钱，却付不出工资",
+    "Do nothing: profitable, yet no payroll"
+   ],
+   "points": [
+    [
+     "第 7 周只剩 $1,376，跌破安全线",
+     "Week 7: only $1,376, below the safety line"
+    ],
+    [
+     "第 8 周 −$6,624",
+     "Week 8: −$6,624"
+    ],
+    [
+     "赚钱的工厂也会倒闭：钱压在客户手里",
+     "A profitable plant can go under: the money is with the customer"
+    ]
+   ],
+   "formula": "",
+   "figure": "fig10_cash.png",
+   "narration": [
+    "不处理，机器人厂不催就不付，8 周内这 $33,000 收不到。峰顶的钱第 1 周到，绿谷第 4 周，海港第 5 周，三批料钱在第 3、5、7 周付出去。第 7 周只剩 $1,376，第 8 周变成 −$6,624。可这单明明赚了 $8,413。料钱、工资先付了，货款压在客户手里：很多工厂不是亏死的，是现金断了。",
+    "Do nothing, and the robot plant won't pay: its $33,000 doesn't arrive within 8 weeks. Summit pays in week 1, GreenValley in week 4, Harbor Crane in week 5, and three material bills go out in weeks 3, 5 and 7. In week 7 only $1,376 is left; in week 8 it's −$6,624. Yet the order made $8,413. Materials and wages were paid first while the money sits with the customer. Many plants don't die of losses; they die when the cash runs out."
+   ]
+  },
+  {
+   "title": [
+    "三个方案：催款、冻结、不处理",
+    "Three options: dun, freeze, do nothing"
+   ],
+   "points": [
+    [
+     "催款：约 3 天收到，最低 $26,376",
+     "Dun: paid in about 3 days, lowest $26,376"
+    ],
+    [
+     "冻结：这一笔现金一样，还推迟下一批开票、伤关系",
+     "Freeze: same for this invoice, but delays the next batch's invoice and hurts the relationship"
+    ],
+    [
+     "逾期看天数：30 天内催款；信用超限建议冻结，由人权衡",
+     "Overdue: dun within 30 days; over the credit limit: freeze; a person weighs both"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "厂情中枢给三个方案。不处理，第 8 周现金为负。发催款函，客户通常 3 天内付，8 周内最低还有 $26,376。信用冻结，催款同时停发他的新货，对逾期这一笔，现金和催款一样；它还会推迟下一批的开票和回款，8 周预测里没计入。多的是止损，代价是关系。中枢有两条规则：应收逾期只看天数，15 天建议催款；信用超限看占用，165% 建议冻结。两条打架，我们选先催款，下一批开票前还没付再冻结。",
+    "The hub offers three options. Do nothing, and cash goes negative in week 8. Send a dunning letter: customers usually pay within 3 days, and the lowest cash in 8 weeks is still $26,376. Freeze credit: dun and stop shipping new goods. For the overdue invoice, cash is the same as dunning; it also delays the next batch's invoice and collection, which the 8-week forecast leaves out. What it adds is damage control, at the price of the relationship. The hub has two rules: the overdue rule looks only at days and recommends dunning at 15 days; the credit-limit rule looks at exposure and recommends a freeze at 165 percent. When they clash, we choose to dun first and freeze if it's still unpaid before the next batch is invoiced."
+   ]
+  },
+  {
+   "title": [
+    "什么时候宁可不催",
+    "When it is better not to chase"
+   ],
+   "points": [
+    [
+     "一向守信、订单多，只是一时困难",
+     "A reliable customer with many orders, briefly in trouble"
+    ],
+    [
+     "钱很小，催了反而丢大单",
+     "A small sum where chasing could lose a big order"
+    ],
+    [
+     "先打电话约付款日，再放进现金预测",
+     "Phone first, agree a date, put it in the forecast"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "不处理不等于没有成本，它的代价在现金表里：要么借钱付利息，要么拖供应商、影响评分卡。但有时候宁可不催：客户一向守信、订单又多，只是一时困难；或者钱很小，催了反而丢大单。这时可以先打电话问情况，约个付款日，放进现金预测里。决定要同时看钱和关系。",
+    "Doing nothing isn't free; its price sits in the cash table: borrow and pay interest, or delay suppliers and hurt your scorecard. But sometimes it's better not to chase: a reliable customer with plenty of orders in a short rough patch, or a small sum where chasing could lose a big order. Then phone, ask what's happening, agree a payment date and put it into the forecast. Weigh money and the relationship together."
+   ]
+  },
+  {
+   "title": [
+    "在数字工厂里做：实验 22",
+    "In the digital factory: Lab 22"
+   ],
+   "points": [
+    [
+     "任务 1–2：找没达标的指标；手算订单毛利率",
+     "Tasks 1–2: find missed objectives; hand-calculate an order margin"
+    ],
+    [
+     "任务 3：比较催款、冻结、不处理（比对模式）",
+     "Task 3: compare dunning, freeze, nothing (comparison mode)"
+    ],
+    [
+     "任务 4–5：执行催款、客户付款；算 DSO、找最紧的一周",
+     "Tasks 4–5: dun, see payment; compute DSO, find the tightest week"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "课后到数字工厂“经营与财务”页亲手做实验 22。先在指标树里找没达标的指标；再打开老师指定的订单，按分解表手算毛利率；老师注入海港起重一笔 13200 美元的发票逾期 15 天，你在指挥台比较三个方案，提交前看不到中枢的推荐；然后发起催款，老师批准，几分钟后客户付款；最后算 DSO，找出现金最紧的一周。",
+    "After class, do Lab 22 on the digital factory's Business and finance page. Find the missed objectives in the tree; open the order your instructor names and calculate its margin from the breakdown. The instructor injects a 13,200-dollar Harbor Crane invoice 15 days overdue; compare the three options in the command centre, without seeing the hub's advice until you submit. Then raise the dunning, get it approved and watch the customer pay a few minutes later. Finally compute DSO and find the tightest week."
+   ]
+  },
+  {
+   "title": [
+    "回到实际问题",
+    "Back to the problem"
+   ],
+   "points": [
+    [
+     "毛利 $8,413.23，毛利率 25.5%，刚守住目标",
+     "Margin $8,413.23, 25.5%, just on target"
+    ],
+    [
+     "DSO 81.4 天；不处理第 8 周现金 −$6,624",
+     "DSO 81.4 days; doing nothing, −$6,624 in week 8"
+    ],
+    [
+     "发催款函：最低 $26,376，DSO 降到 38.6 天",
+     "Dun: lowest $26,376, DSO down to 38.6 days"
+    ]
+   ],
+   "formula": "",
+   "figure": "",
+   "narration": [
+    "回到开头。这单赚了 $8,413.23，毛利率 25.5%，刚守住目标；比标准少的主要是加班和磨床重新调整。应收 DSO 81.4 天，远超目标。不处理，第 8 周现金变成 −$6,624。建议发催款函：约 3 天收回，8 周内最低还有 $26,376。逾期才 15 天，先催款；下一批开票前还没付，再冻结。下次接单谈预付款或分批开票，并把加班的钱算进报价。",
+    "Back to the start. The order made $8,413.23, 25.5 percent, just on target; the shortfall against standard is mainly overtime and grinder re-setting. DSO is 81.4 days, far above target. Doing nothing, cash reaches −$6,624 in week 8. Send a dunning letter: paid in about 3 days, with at least $26,376 in the next 8 weeks. Only 15 days overdue, so dun first and freeze if it's still unpaid before the next batch is invoiced; next time, negotiate a down payment or batch invoicing and price the overtime into the quote."
+   ]
+  }
+ ],
+ "summary": [
+  [
+   "毛利 = 收入 − 料 − 工 − 电 − 废品返工 − 空转电 − 急单加班外协加急 − 保修；WQR-105 的标准毛利率 28.2%。",
+   "Margin = revenue − material − labour − energy − scrap − idle power − rush, overtime and outsourcing − warranty; a WQR-105's standard margin is 28.2%."
+  ],
+  [
+   "毛利分解告诉你钱花在哪里、该找谁改：报价找销售，料找采购，工时找工艺和车间；看钱要看数，不凭印象。",
+   "The breakdown shows where the money went and who fixes it: price to sales, material to purchasing, hours to process engineering; judge by numbers, not impressions."
+  ],
+  [
+   "应收看账龄和信用占用；DSO = 应收余额 ÷ 近 30 天日均开票额。",
+   "Read receivables by ageing and credit exposure; DSO = receivables ÷ average daily invoicing over the last 30 days."
+  ],
+  [
+   "现金流预测：每周现金 = 上周现金 + 收款 − 付款 − 固定开支；最低的一周最要紧；赚钱的工厂也会因为现金断了而倒闭。",
+   "Cash forecast: cash this week = last week + cash in − cash out − fixed costs; the lowest week matters most; a profitable plant can fail when cash runs out."
+  ],
+  [
+   "应收逾期看逾期天数：30 天以内先催款，超过 30 天冻结；信用超限建议冻结；两条建议不同时，由人同时看钱和客户关系来权衡。",
+   "Overdue receivable: by days overdue, dun within 30 days and freeze beyond; over the credit limit, freeze; when the two disagree, a person weighs money and the relationship."
+  ]
+ ],
+ "labs": [
+  {
+   "id": "waterfall",
+   "no": "10-1",
+   "title": [
+    "订单毛利瀑布：钱都去哪儿了",
+    "Order margin waterfall: where does the money go?"
+   ],
+   "goal": [
+    [
+     "看清一张订单的收入怎样被料、工、电和计划外花费一块块切掉，剩下毛利。",
+     "See how an order's revenue is cut block by block by material, labour, energy and unplanned costs, leaving the margin."
+    ],
+    [
+     "比较标准毛利率和实际毛利率，找出差在哪一项。",
+     "Compare standard and actual margin and find which line makes the difference."
+    ],
+    [
+     "分析单价、工时、加班等因素对毛利率的影响大小。",
+     "Analyse how much price, hours, overtime and other factors move the margin."
+    ]
+   ],
+   "theory": [
+    [
+     "毛利 = 收入 − 料 − 工 − 电 − 废品返工 − 空转电 − 急单加班外协加急 − 保修；毛利率 = 毛利 ÷ 收入。",
+     "Margin = revenue − material − labour − energy − scrap − idle power − rush and overtime − warranty; margin % = margin ÷ revenue."
+    ],
+    [
+     "标准成本：每台料 $538.74、工 $571.80（13.34 小时 × 平均费率 $42.86/h）、电 $73.87。",
+     "Standard cost per unit: material $538.74, labour $571.80 (13.34 h × average rate $42.86/h), energy $73.87."
+    ],
+    [
+     "计划外：磨床调整 × $46/h，废品 × $52.87，空转 × 2.0 kW × $0.10，加班 × $30 × 1.5，轴承加价 = 每台 2 个 × $8 × 加价比例。",
+     "Unplanned: re-setting × $46/h, scrap × $52.87, idling × 2.0 kW × $0.10, overtime × $30 × 1.5, bearing premium = 2 per unit × $8 × premium."
+    ],
+    [
+     "目标毛利率 25%；低于 20% 时厂情中枢报“订单毛利低于目标”。",
+     "Target margin 25%; below 20% the hub raises “order margin below target”."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，点“机器人厂订单”预置，读出毛利和毛利率，逐行与教材表 10-2 核对。",
+     "Open the lab and press the “robot plant order” preset; read the margin and margin % and check each line against Table 10-2."
+    ],
+    [
+     "点“按标准成本”，记下标准毛利率；算计划外花费让毛利率少了几个百分点。",
+     "Press “standard cost” and record the standard margin; work out how many points the unplanned costs take off."
+    ],
+    [
+     "点“降价 5%”，记下毛利率，判断是否达标、中枢是否报警。",
+     "Press “5% price cut”, record the margin and decide whether it meets the target and whether the hub flags it."
+    ],
+    [
+     "回到机器人厂订单，把加班从 12 h 加到 24 h（多 $540），记下毛利率。",
+     "Back on the robot plant order, raise overtime from 12 h to 24 h ($540 more) and record the margin."
+    ],
+    [
+     "加班回到 12 h，把每台工时减少 0.5 h（20 台省约 $429，台数越多省得越多），记下毛利率，与上一步比较。",
+     "With overtime back at 12 h, cut the hours per unit by 0.5 h (about $429 saved on 20 units, more with more units), record the margin and compare with the previous step."
+    ],
+    [
+     "把带锯床空转从 0 拖到 72 h，记下毛利变化。",
+     "Drag the band saw idling from 0 to 72 h and record the change in margin."
+    ],
+    [
+     "点“播放”，看瀑布一块块搭起来，截图放进报告。",
+     "Press Play, watch the waterfall build block by block, and screenshot it for the report."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 1　不同情况下的订单毛利",
+     "Table 1  Order margin in different cases"
+    ],
+    "headers": [
+     [
+      "情况",
+      "Case"
+     ],
+     [
+      "单价（$）",
+      "Price ($)"
+     ],
+     [
+      "工时（h/台）",
+      "Hours per unit"
+     ],
+     [
+      "加班（h）",
+      "Overtime (h)"
+     ],
+     [
+      "成本合计（$）",
+      "Total cost ($)"
+     ],
+     [
+      "毛利（$）",
+      "Margin ($)"
+     ],
+     [
+      "毛利率（%）",
+      "Margin (%)"
+     ]
+    ],
+    "rows": 7
+   },
+   "questions": [
+    [
+     "每台工时少 0.5 h（省约 $429）和加班从 12 h 加到 24 h（多 $540），哪个对毛利率影响大？台数变多时呢？这说明改进该先抓什么？",
+     "Which moves the margin more: 0.5 h less per unit (about $429 saved) or overtime from 12 h to 24 h ($540 more)? And with more units? What should improvement target first?"
+    ],
+    [
+     "带锯床空转对毛利几乎没有影响，那还要不要管？从能耗和碳的角度说说。",
+     "Idling barely touches the margin. Should it still be managed? Discuss in terms of energy and carbon."
+    ],
+    [
+     "降价 5% 时毛利率掉了几个百分点？为什么比 5 个百分点少？毛利额却少了整整 $1,650，占原毛利的 20%，说明什么？",
+     "How many points does a 5% price cut take off the margin? Why fewer than 5? Yet the margin itself loses a full $1,650, 20% of the original: what does that tell you?"
+    ]
+   ]
+  },
+  {
+   "id": "cashflow",
+   "no": "10-2",
+   "title": [
+    "未来 8 周的现金：客户哪天付",
+    "Cash over the next 8 weeks: when will the customer pay?"
+   ],
+   "goal": [
+    [
+     "做未来 8 周的现金流预测，找出现金最紧的一周。",
+     "Forecast cash for the next 8 weeks and find the tightest week."
+    ],
+    [
+     "比较催款、信用冻结、不处理对现金和客户关系的影响。",
+     "Compare the effect of dunning, a credit freeze and doing nothing on cash and on the relationship."
+    ],
+    [
+     "读应收账龄、DSO 和信用占用，理解它们和现金的关系。",
+     "Read ageing, DSO and credit exposure and relate them to cash."
+    ]
+   ],
+   "theory": [
+    [
+     "第 k 周现金 = 上周现金 + 收款 − 付款 − 固定开支；收款按到期日 + 客户平时晚几天，逾期的算第 1 周。",
+     "Cash in week k = last week + cash in − cash out − fixed costs; receivables arrive on the due date + usual delay, overdue ones in week 1."
+    ],
+    [
+     "DSO = 应收余额 ÷ 近 30 天日均开票额。",
+     "DSO = receivables ÷ average daily invoicing over the last 30 days."
+    ],
+    [
+     "催款后客户通常 3 天内付；信用冻结同时停发新货，要厂长放行。",
+     "After dunning customers usually pay within 3 days; a freeze also stops new shipments until the plant manager releases them."
+    ],
+    [
+     "中枢的规则：“应收逾期”只看逾期天数，30 天以内建议催款，超过 30 天建议冻结；“信用超限”（占用含在做、未开票的订单）建议冻结。",
+     "The hub's rules: “receivable overdue” looks only at days overdue, recommending dunning within 30 days and a freeze beyond; “over credit limit” (exposure includes open, uninvoiced orders) recommends a freeze."
+    ]
+   ],
+   "steps": [
+    [
+     "打开实验页，点“不处理”，读出最低的一周和金额、跌破安全线和零的周，与教材表 10-4 核对。",
+     "Open the lab and press “do nothing”; read the lowest week and amount and the weeks cash falls below the safety line and zero; check against Table 10-4."
+    ],
+    [
+     "点“催款”，记下几天收到、最低的一周和金额。",
+     "Press “dun” and record the days until payment and the lowest week and amount."
+    ],
+    [
+     "点“信用冻结”，比较现金曲线和读数下面的说明，记下两者的差别。",
+     "Press “freeze credit”, compare the cash curve and the note under the results, and record the difference."
+    ],
+    [
+     "拖动付款日到第 10、20、30、40、50、60 天，每次记下最低的一周和金额。",
+     "Drag the payment day to days 10, 20, 30, 40, 50 and 60, recording the lowest week and amount each time."
+    ],
+    [
+     "读出 DSO 和收回以后的 DSO；把发票金额改为 $10,000 再读一次。",
+     "Read the DSO and the DSO once paid; set the invoice to $10,000 and read them again."
+    ],
+    [
+     "把“已逾期”拖过 30 天，看账龄换档、中枢建议变化。",
+     "Drag the days overdue past 30 and watch the ageing band and the hub's recommendation change."
+    ],
+    [
+     "把每周固定开支调到 $10,000，再看三个方案哪个会跌破零。",
+     "Raise fixed costs to $10,000 a week and see which options now fall below zero."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "表 2　付款日与现金最低点",
+     "Table 2  Payment day and lowest cash"
+    ],
+    "headers": [
+     [
+      "方案或付款日",
+      "Option or payment day"
+     ],
+     [
+      "几天收到",
+      "Days to payment"
+     ],
+     [
+      "最低的一周",
+      "Lowest week"
+     ],
+     [
+      "最低现金（$）",
+      "Lowest cash ($)"
+     ],
+     [
+      "跌破安全线的周",
+      "Week below safety line"
+     ],
+     [
+      "跌破零的周",
+      "Week below zero"
+     ]
+    ],
+    "rows": 8
+   },
+   "questions": [
+    [
+     "对逾期这一笔，催款和冻结的现金一样；冻结还会推迟下一批的开票和回款，为什么 8 周预测里没有计入？为什么“应收逾期”只在逾期超过 30 天时建议冻结，而“信用超限”现在就建议冻结？",
+     "For the overdue invoice, dunning and a freeze give the same cash; a freeze also delays the next batch's invoice and collection. Why is that not in the 8-week forecast? Why does the overdue rule recommend a freeze only after 30 days, while the credit-limit rule recommends one now?"
+    ],
+    [
+     "付款日推后一周，最低现金一定变少吗？用你的记录说明。",
+     "Does delaying payment by a week always lower the minimum cash? Use your records."
+    ],
+    [
+     "DSO 降到目标以内，现金就一定够吗？举一个反例。",
+     "If DSO is back within target, is cash necessarily enough? Give a counter-example."
+    ]
+   ]
+  }
+ ],
+ "factory_labs": [
+  {
+   "id": "lab22",
+   "title": [
+    "实验 22 经营：订单毛利、应收与现金",
+    "Lab 22 Business: order margin, receivables and cash"
+   ]
+  }
+ ],
+ "assignment": {
+  "title": [
+   "作业 10：订单毛利与现金",
+   "Assignment 10: order margin and cash"
+  ],
+  "tasks": [
+   [
+    "计算题（教材习题 2、3）。(1) 机器人厂要求降价 5%（单价 $1,567.50），其他花费按表 10-2 不变，求毛利率，判断是否达到 25% 目标、中枢是否报警。(2) 加班从 12 小时变成 24 小时（$30/h × 1.5），求毛利率，以及守住 25% 的最低单价。",
+    "Calculation (exercises 2 and 3). (1) The robot plant asks for a 5% cut (price $1,567.50) with the other costs of Table 10-2 unchanged: find the margin and decide whether it meets 25% and whether the hub flags it. (2) Overtime goes from 12 to 24 hours ($30/h × 1.5): find the margin and the lowest price that holds 25%."
+   ],
+   [
+    "现金题（教材习题 4、5）。(1) 应收 $45,000、近 30 天开票 $27,000，求 DSO。(2) 机器人厂不催也会付，但拖到第 50 天：按表 10-4 的数做 8 周现金预测，找最低的一周和金额，判断是否跌破 $8,000 安全线；用虚拟实验 10-2 核对并附截图。",
+    "Cash (exercises 4 and 5). (1) Receivables $45,000, invoiced in the last 30 days $27,000: find DSO. (2) The robot plant pays unchased but only on day 50: forecast 8 weeks from Table 10-4, find the lowest week and amount and whether it falls below the $8,000 safety line; check with Virtual lab 10-2 and attach a screenshot."
+   ],
+   [
+    "实验报告：完成数字工厂实验 22，按报告模板写没达标的指标与原因、订单毛利分解与改进、方案比较与选择、执行过程、DSO 与现金，并回答讨论题“为什么赚钱的工厂也会倒闭”。",
+    "Lab report: complete digital-factory Lab 22 and write up, using the template, the missed objectives and their causes, the margin breakdown and improvements, the options and your choice, the execution, DSO and cash, and the discussion question “why can a profitable factory go bankrupt?”."
+   ]
+  ],
+  "deliverable": [
+   "一份 PDF：计算题和现金题的完整过程（含截图），加实验 22 报告（用数字工厂提供的报告模板，6–10 页）。",
+   "One PDF: full working for the calculation and cash tasks (with screenshots) plus the Lab 22 report (using the digital factory's template, 6–10 pages)."
+  ],
+  "rubric": [
+   [
+    "计算题：毛利率、最低单价正确，判断有理有据，25 分",
+    "Calculation: correct margins and minimum price, with a reasoned judgement, 25 points"
+   ],
+   [
+    "现金题：DSO 和 8 周现金预测正确，找对最低的一周，25 分",
+    "Cash: correct DSO and 8-week forecast, the right lowest week, 25 points"
+   ],
+   [
+    "实验报告：数据完整，方案比较同时说到钱和客户关系，40 分",
+    "Lab report: complete data; the comparison covers both money and the relationship, 40 points"
+   ],
+   [
+    "讨论：说清毛利和现金的区别，10 分",
+    "Discussion: clearly separates margin and cash, 10 points"
+   ]
+  ]
+ },
+ "quiz": [
+  {
+   "type": "single",
+   "text": [
+    "按数字工厂的口径，WQR-105 每台标准成本里，下面哪一项属于“工”？",
+    "Under the digital factory's convention, which of these belongs to labour in a WQR-105's standard cost?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "磨床每小时的设备折旧 $20",
+      "The grinder's depreciation of $20 an hour"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "轴承 BRG-6207 的单价",
+      "The price of a BRG-6207 bearing"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "磨床每小时的能耗 $6",
+      "The grinder's energy of $6 an hour"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "润滑油的单价",
+      "The price of gear oil"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "数字工厂的工位费率分折旧、人工、能耗三项：折旧和人工记“工”（加工费），能耗记“电”，零件和油记“料”。会计上折旧属于制造费用，这里按数字工厂的口径。",
+    "Workstation rates have depreciation, wages and energy: the digital factory books depreciation and wages as labour (a conversion cost), energy as energy, parts and oil as material. In accounting, depreciation is manufacturing overhead; this follows the digital factory's convention."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一台减速器卖 $1,650，标准成本 $1,200。标准毛利率是百分之几？",
+    "A reducer sells for $1,650 and its standard cost is $1,200. What is the standard margin in percent?"
+   ],
+   "answer": 27.3,
+   "tolerance": 0.3,
+   "unit": "%",
+   "feedback": [
+    "毛利率 = (1650 − 1200) ÷ 1650 = 27.3%。",
+    "Margin = (1650 − 1200) ÷ 1650 = 27.3%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "一张订单收入 $33,000，各项成本合计 $24,586.77。毛利率是百分之几？",
+    "An order's revenue is $33,000 and its total cost $24,586.77. What is the margin in percent?"
+   ],
+   "answer": 25.5,
+   "tolerance": 0.3,
+   "unit": "%",
+   "feedback": [
+    "毛利率 = (33,000 − 24,586.77) ÷ 33,000 = 25.5%。",
+    "(33,000 − 24,586.77) ÷ 33,000 = 25.5%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "应收余额 $45,000，近 30 天开票 $27,000。DSO 是多少天？",
+    "Receivables are $45,000 and the last 30 days' invoicing is $27,000. What is the DSO in days?"
+   ],
+   "answer": 50.0,
+   "tolerance": 1,
+   "unit": "d",
+   "feedback": [
+    "日均开票 27000 ÷ 30 = 900，DSO = 45000 ÷ 900 = 50 天。",
+    "Daily invoicing 27,000 ÷ 30 = 900; DSO = 45,000 ÷ 900 = 50 days."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "日均开票 $900，DSO 从 60 天降到 40 天，现金多出多少美元？",
+    "With $900 invoiced a day, DSO falls from 60 to 40 days. How many dollars of cash are freed?"
+   ],
+   "answer": 18000.0,
+   "tolerance": 100,
+   "unit": "$",
+   "feedback": [
+    "少压 20 天的销售额：20 × 900 = $18,000。",
+    "20 fewer days of sales: 20 × 900 = $18,000."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "现金流预测里，一笔已经逾期、客户平时会晚几天付的应收，数字工厂把它算在哪一周收到？",
+    "In the cash forecast, when does the digital factory expect an overdue receivable from a customer who usually pays late?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "到期日加客户平时晚几天；已经过了的算第 1 周",
+      "Due date plus the usual delay; if already past, week 1"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "按到期日，已经过了就不算",
+      "On the due date; if past, not at all"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "一律算第 8 周",
+      "Always in week 8"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "开票日当周",
+      "The week it was invoiced"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "finance.cashflow：预计收款 = 到期日 + 这个客户平时晚几天（中值），早于今天的落在第 1 周；不催就不付的不算。",
+    "finance.cashflow: expected receipt = due date + the customer's usual delay; anything before today falls in week 1; invoices that won't be paid unless chased are left out."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "一张订单毛利率 25.5%，达到了目标，所以工厂这段时间不会缺钱。",
+    "An order's margin is 25.5%, on target, so the plant cannot run short of cash in this period."
+   ],
+   "correct": false,
+   "feedback": [
+    "毛利是“赚不赚钱”，现金是“有没有钱”。本章不处理时第 8 周现金为 −$6,624：赚钱的工厂也会因为现金断了而倒闭。",
+    "Margin is about making money; cash is about having it. Here, doing nothing leaves −$6,624 in week 8: a profitable plant can fail when cash runs out."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "机器人厂的发票逾期 15 天。对这条“应收逾期”异常，厂情中枢会推荐哪个方案？",
+    "The robot plant's invoice is 15 days overdue. For this “receivable overdue” exception, which option will the hub recommend?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "发催款函",
+      "Send a dunning letter"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "信用冻结",
+      "Freeze credit"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "不处理",
+      "Do nothing"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "临时提额",
+      "Raise the limit temporarily"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "“应收逾期”只看逾期天数：30 天以内建议催款，超过 30 天才建议冻结；不处理是对照。（“信用超限”是另一条异常，会建议冻结。）",
+    "The overdue rule looks only at days: within 30 days it recommends dunning, a freeze only after 30; doing nothing is the control. (“Over credit limit” is a separate exception that recommends a freeze.)"
+   ]
+  },
+  {
+   "type": "multiple",
+   "text": [
+    "关于信用冻结，下列说法正确的是：",
+    "Which statements about a credit freeze are correct?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "这个客户在做的订单做完先不发货、不开票，要厂长放行",
+      "The customer's orders in production are not shipped or invoiced until the plant manager releases them"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "对逾期这一笔的收款时间，效果和催款差不多",
+      "For the overdue invoice, the payment timing is about the same as dunning"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "会影响客户关系，可能让客户的生产线等料",
+      "It can damage the relationship and leave the customer's line waiting"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "冻结后客户的应收会立刻清零",
+      "The customer's receivable is cleared at once"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "冻结以后毛利率会提高",
+      "The margin rises after a freeze"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "冻结 = 催款 + 停发新货：对逾期这一笔，收款时间和催款相同；它还会推迟下一批的开票和回款（放行后账期重新算），8 周预测里没有计入，因为它还没开票。代价是关系；它不改变已经做完订单的毛利。",
+    "Freeze = dunning + stopping new shipments: for the overdue invoice the timing is the same as dunning; it also delays the next batch's invoice and collection (terms restart on release), which the 8-week forecast leaves out because it is not invoiced yet. Its price is the relationship; it does not change a finished order's margin."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "机器人厂订单的毛利分解里，“料”以外花得最多的一项是：",
+    "In the robot plant order's breakdown, which is the largest line apart from material?"
+   ],
+   "answers": [
+    {
+     "text": [
+      "工（折旧 + 人工）$11,619.97",
+      "Labour (depreciation + wages) $11,619.97"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "急单、加班、外协 $604.00",
+      "Rush, overtime, outsourcing $604.00"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "电 $1,477.47",
+      "Energy $1,477.47"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "空转电 $4.80",
+      "Idle power $4.80"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "工 $11,619.97，占收入 35.2%，比料还多；想多赚钱先看工时和费率。",
+    "Labour is $11,619.97, 35.2% of revenue, more than material; to earn more, look at hours and rates first."
+   ]
+  }
+ ],
+ "exam": [
+  {
+   "type": "numerical",
+   "text": [
+    "本章机器人厂订单的毛利表不变，单价从 $1,650 降到 $1,567.50（20 台）。毛利率是百分之几？",
+    "With the robot plant order's costs unchanged, the price falls from $1,650 to $1,567.50 (20 units). What is the margin in percent?"
+   ],
+   "answer": 21.6,
+   "tolerance": 0.3,
+   "unit": "%",
+   "feedback": [
+    "收入 $31,350，成本 $24,586.77，毛利率 21.6%。",
+    "Revenue $31,350, cost $24,586.77, margin 21.6%."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "本章情景里，峰顶搅拌那笔 $6,600 付了以后，应收 $56,100，近 30 天日均开票仍是 $770。DSO 是多少天？",
+    "In this chapter's scenario, after Summit pays its $6,600, receivables are $56,100 and daily invoicing is still $770. What is the DSO in days?"
+   ],
+   "answer": 72.9,
+   "tolerance": 0.5,
+   "unit": "d",
+   "feedback": [
+    "56,100 ÷ 770 = 72.9 天。",
+    "56,100 ÷ 770 = 72.9 days."
+   ]
+  },
+  {
+   "type": "numerical",
+   "text": [
+    "按表 10-4，机器人厂第 50 天才付 $33,000。8 周里现金最低是多少美元？",
+    "Using Table 10-4, the robot plant pays its $33,000 only on day 50. What is the lowest cash in the 8 weeks, in dollars?"
+   ],
+   "answer": 1376,
+   "tolerance": 50,
+   "unit": "$",
+   "feedback": [
+    "第 50 天落在第 8 周，前 7 周和不处理一样，第 7 周最低 $1,376，低于安全线。",
+    "Day 50 falls in week 8, so weeks 1–7 match doing nothing: lowest $1,376 in week 7, below the safety line."
+   ]
+  },
+  {
+   "type": "single",
+   "text": [
+    "工厂订单越多、增长越快，越容易缺现金，主要原因是：",
+    "The more orders a plant wins and the faster it grows, the more likely it is to run short of cash. Mainly because:"
+   ],
+   "answers": [
+    {
+     "text": [
+      "料钱和工资先付出去，货款要过账期才收回，要垫的现金越来越多",
+      "Materials and wages are paid first and sales money comes back only after the terms, so more cash must be advanced"
+     ],
+     "correct": true
+    },
+    {
+     "text": [
+      "订单多了毛利率一定下降",
+      "More orders always lower the margin"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "订单多了 DSO 一定上升",
+      "More orders always raise DSO"
+     ],
+     "correct": false
+    },
+    {
+     "text": [
+      "订单多了固定开支一定翻倍",
+      "More orders always double fixed costs"
+     ],
+     "correct": false
+    }
+   ],
+   "feedback": [
+    "从付料钱到收货款，钱在路上；订单越多，路上的钱越多，要垫的现金越多。",
+    "From paying for materials to collecting from customers the money is on the road; more orders put more money on the road."
+   ]
+  },
+  {
+   "type": "truefalse",
+   "text": [
+    "DSO 已经降到 45 天的目标以内，未来 8 周现金就一定不会跌破零。",
+    "Once DSO is within the 45-day target, cash cannot fall below zero in the next 8 weeks."
+   ],
+   "correct": false,
+   "feedback": [
+    "DSO 只看应收和销售的比例；现金还取决于现在的现金、供应商付款日和固定开支。大笔应付集中到期时，DSO 达标也可能见底。",
+    "DSO only compares receivables with sales; cash also depends on cash now, supplier due dates and fixed costs. Bunched payables can drain cash even with DSO on target."
+   ]
+  }
+ ],
+ "plan": {
+  "key": [
+   "毛利分解与毛利率；应收账龄与 DSO；8 周现金流预测；催款、冻结、不处理的比较。",
+   "Margin breakdown and margin %; ageing and DSO; the 8-week cash forecast; comparing dunning, freeze and doing nothing."
+  ],
+  "difficult": [
+   "毛利和现金的区别（赚钱的工厂为什么会倒闭）；现金预测里收款落在哪一周；冻结和催款对逾期这一笔现金一样、为什么还要区分；两条规则的建议不同时怎么权衡。",
+   "Margin versus cash (why profitable plants fail); which week a receipt falls in; why freeze and dunning differ when cash for the overdue invoice is the same; how to weigh two conflicting rules."
+  ],
+  "process": [
+   {
+    "phase": [
+     "导入：客户不付款",
+     "Opening: the customer won't pay"
+    ],
+    "minutes": 5,
+    "content": [
+     "展示厂情中枢的“应收逾期”异常和两种意见，提出本讲的问题。",
+     "Show the hub's “receivable overdue” exception and the two opinions; pose the questions."
+    ]
+   },
+   {
+    "phase": [
+     "概念：料工费与毛利分解",
+     "Concepts: cost blocks and margin breakdown"
+    ],
+    "minutes": 13,
+    "content": [
+     "标准成本；七项分解表；用虚拟实验 10-1 现场拖参数。",
+     "Standard cost; the seven-line breakdown; drag parameters live in Virtual lab 10-1."
+    ]
+   },
+   {
+    "phase": [
+     "概念：应收、账龄与 DSO",
+     "Concepts: receivables, ageing and DSO"
+    ],
+    "minutes": 10,
+    "content": [
+     "账龄分档、信用占用；DSO 的算法和换算成钱。",
+     "Ageing bands and credit exposure; computing DSO and converting it into cash."
+    ]
+   },
+   {
+    "phase": [
+     "建模：8 周现金与三个方案",
+     "Modelling: 8-week cash and three options"
+    ],
+    "minutes": 17,
+    "content": [
+     "手算表 10-4；虚拟实验 10-2 演示付款日和三个方案；讨论赚钱和有钱。",
+     "Work Table 10-4 by hand; demonstrate payment day and the three options in Virtual lab 10-2; discuss profit versus cash."
+    ]
+   },
+   {
+    "phase": [
+     "数字工厂实验 22：任务 1–2",
+     "Digital-factory Lab 22: tasks 1–2"
+    ],
+    "minutes": 45,
+    "content": [
+     "学生在指标树里找没达标的指标；打开指定订单手算毛利率并提交。老师巡视。",
+     "Students find missed objectives in the tree; open the named order, calculate its margin and submit. The instructor circulates."
+    ]
+   },
+   {
+    "phase": [
+     "数字工厂实验 22：任务 3–4",
+     "Digital-factory Lab 22: tasks 3–4"
+    ],
+    "minutes": 45,
+    "content": [
+     "老师注入发票逾期；学生比较三个方案、提交理由（比对模式）；发起催款、老师批准、看客户付款。",
+     "The instructor injects the overdue invoice; students compare options and submit (comparison mode); raise dunning, approval, watch the payment."
+    ]
+   },
+   {
+    "phase": [
+     "数字工厂实验 22：任务 5 与虚拟实验记录",
+     "Digital-factory Lab 22: task 5 and virtual-lab records"
+    ],
+    "minutes": 35,
+    "content": [
+     "算 DSO、找最紧的一周；完成虚拟实验 10-1、10-2 的记录表。",
+     "Compute DSO and find the tightest week; complete the record tables of Virtual labs 10-1 and 10-2."
+    ]
+   },
+   {
+    "phase": [
+     "比对与小结",
+     "Comparison and summary"
+    ],
+    "minutes": 10,
+    "content": [
+     "对照中枢建议讨论各组的选择，强调毛利和现金的区别；布置作业。",
+     "Discuss each group's choice against the hub's advice, stressing margin versus cash; set the assignment."
+    ]
+   }
+  ],
+  "homework": [
+   "作业 10（计算题、现金题和实验 22 报告），下周上课前提交；测验 10 可做 3 次。",
+   "Assignment 10 (calculation, cash and the Lab 22 report), due before next class; Quiz 10 allows 3 attempts."
+  ]
+ }
+}
