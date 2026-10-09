@@ -509,6 +509,20 @@ UPLOAD = {   # 网页版教材的标题、标签、合集（第 23 轮）
                       "list": "Sewing Machine Design and Manufacturing (WenQuest)", "next": "Next"}}}
 
 
+def _web_courses():
+    """第 29 轮：其他网页版教材的课名和上传文字写在各书 course/course.yaml（name、upload）"""
+    import yaml
+    for p in sorted((ROOT / "textbook" / "web-editions").glob("*/course/course.yaml")):
+        cfg = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+        book = cfg.get("book") or p.parents[1].name
+        if cfg.get("name"):
+            COURSE.setdefault(book, cfg["name"])
+        if cfg.get("upload"):
+            UPLOAD.setdefault(book, cfg["upload"])
+
+
+_web_courses()
+
 def upload_text_web(lec, lang, chapters, total, voice_backend, out_dir):
     u = UPLOAD[lec.book][lang]
     title = lec.t(lec.data["title"], lang)

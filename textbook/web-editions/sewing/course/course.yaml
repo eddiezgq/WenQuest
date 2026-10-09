@@ -1,0 +1,175 @@
+# 课程包与网页课件的按书配置（第 29 轮）：公用工具 textbook/tools/webcourse/ 读它。
+# 改课名、讲数、分批、考试、视频目录、课程说明都在这里，不改工具。
+book: sewing
+name:
+- 缝纫机设计与制造
+- Sewing Machine Design and Manufacturing
+shortname: SMDM
+deck_id: sewing
+lessons:
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 8
+- 9
+- 10
+- 11
+- 12
+- 13
+- 14
+- 15
+- 16
+- 17
+- 18
+- 19
+- 20
+- 21
+- 22
+- 23
+- 24
+- 25
+- 26
+- 27
+- 28
+- 29
+- 30
+- 31
+batches:
+- 'no': 1
+  lessons:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+  - 8
+  exams: []
+- 'no': 2
+  lessons:
+  - 9
+  - 10
+  - 11
+  - 12
+  - 13
+  - 14
+  - 15
+  - 16
+  - 17
+  - 18
+  - 19
+  - 20
+  - 21
+  - 22
+  exams:
+  - midterm
+- 'no': 3
+  lessons:
+  - 23
+  - 24
+  - 25
+  - 26
+  - 27
+  - 28
+  - 29
+  - 30
+  - 31
+  exams:
+  - final
+midterm_units: 4
+exam_section: 33
+exams:
+- midterm
+- final
+video_dir: 缝纫机
+summary:
+- <p>从一针线迹到整座数字工厂：缝纫机的机构、电控、原型机搭建与自动化测试、零件制造和服装生产线。8 个单元 31 讲，每讲有讲义、中英课件、动画与虚拟实验、实验指导书、作业和测验。</p>
+- '<p>From a single stitch to the digital factory: mechanisms, electrical control, building and testing control prototypes, manufacturing the parts, and garment lines. 8 units, 31 lessons, each with notes, bilingual slides, animations and virtual labs, lab guides, an assignment and a quiz.</p>'
+blurb: 从一针线迹到数字工厂：缝纫机的机构、电控、原型机与自动化测试、零件制造与智能工厂。31 讲，中英双语，配虚拟实验。
+info:
+- <p>《缝纫机设计与制造》是问渠机器人学院“智能制造装备”方向的课程，以同名教材（问渠学习平台“教材”栏目，网页版）为蓝本，从一针线迹讲起：平缝、包缝、特种机的机构，电气控制，电控原型机的搭建、自动化测试与迭代，主要零件的制造工艺，直到数字工厂与服装生产线。</p><p>全课 8 个单元、31 讲，建议共 {hours} 学时。每讲按“车间实际问题 → 概念 → 动画与虚拟实验 → 建模求解”展开，并配一个机器人联系和一个生活例子。</p><h4>每讲包含</h4><ul><li>讲义（教材本章 + 本讲导入、解答与小结）</li><li>动画、虚拟实验或三维模型（中文版、英文版）</li><li>网页互动课件（像 PPT 一样翻页，动画和实验嵌在页里可操作，中英对照，讲者窗口里有讲稿）</li><li>练习（教材习题）</li><li>实验指导书与实验报告模板（Word）</li><li>作业 1 份、测验 1 份（自动评分）</li></ul><h4>单元与各讲</h4><table><tr><th>单元</th><th>各讲</th></tr>{units}</table><h4>考核（建议）</h4><ul><li>每讲作业（含实验报告）30%</li><li>每讲测验 20%</li><li>期中考试（第 1–4 单元）20%</li><li>期末考试（全课）30%</li></ul><h4>学习建议</h4><p>先读讲义里的车间问题，带着问题读正文；每讲至少动手做一个虚拟实验，把数据填进报告模板；测验可以做 3 次，错题看解析后再做。讲解视频随后陆续补进各讲。</p>
+- '<p><em>Sewing Machine Design and Manufacturing</em> is a course of WenQuest Robotics Academy (intelligent manufacturing equipment). It follows the textbook of the same name (web edition, under Textbooks on WenQuest) from a single stitch to the whole factory: the mechanisms of lockstitch, overlock and special machines, electrical control, building, testing and iterating control prototypes, the manufacture of the key parts, and the digital factory and garment lines.</p><p>8 units, 31 lessons, about {hours} class hours. Every lesson runs shop-floor problem → concepts → animations and virtual labs → modelling and solving, with a robot link and an everyday example.</p><h4>Every lesson has</h4><ul><li>Notes (the textbook chapter plus the lesson''s opening, solution and summary)</li><li>Animations, virtual labs or 3D models (Chinese and English)</li><li>Interactive web slides (page by page like PPT, with live animations and labs, bilingual, script in the presenter view)</li><li>Practice (the textbook exercises)</li><li>Lab guides and report templates (Word)</li><li>One assignment and one quiz (marked automatically)</li></ul><h4>Units and lessons</h4><table><tr><th>Unit</th><th>Lessons</th></tr>{units}</table><h4>Assessment (suggested)</h4><ul><li>Assignments with lab reports 30%</li><li>Lesson quizzes 20%</li><li>Midterm (units 1–4) 20%</li><li>Final (whole course) 30%</li></ul><h4>How to study</h4><p>Read the shop-floor problem first and keep it in mind while you read; run at least one virtual lab per lesson and fill in the report template; each quiz allows 3 attempts. Lecture videos will be added to the lessons later.</p>'
+labs:
+  1:
+  - stitch
+  2:
+  - lockstitch
+  - proto-lockstitch
+  3:
+  - slidercrank
+  4:
+  - takeup
+  5:
+  - hook
+  6:
+  - feed
+  7:
+  - tension
+  8:
+  - timing
+  - tune-lockstitch
+  - proto-lockstitch
+  9:
+  - model-overlock
+  - difffeed
+  - rssr
+  10:
+  - looper
+  - coverstitch
+  11:
+  - zigzag
+  12:
+  - hang
+  - tend
+  13:
+  - solenoid
+  - servo
+  14:
+  - trim
+  15:
+  - pattern
+  - patprog
+  - model-pattern
+  16:
+  - embroid
+  17:
+  - knit
+  - knitprog
+  - fpga
+  - model-flatknit
+  18:
+  - ebox
+  19:
+  - config
+  20:
+  - proto-ls
+  21:
+  - proto-fk
+  22:
+  - testbench
+  23:
+  - tol
+  24:
+  - hookfit
+  25:
+  - cam
+  26:
+  - iot
+  27:
+  - factory
+  28:
+  - line21
+  29:
+  - line
+  30:
+  - soft
+  31:
+  - aiqc
+heavy_pages:
+- proto-lockstitch
+- model-

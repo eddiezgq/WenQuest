@@ -23,7 +23,7 @@ ROOT = Path(__file__).resolve().parents[2]
 TEXTBOOK = ROOT / "textbook"
 # 网页版教材（第 23 轮）：一讲 = 课程包一讲（一章），section 写讲号（如 "2"）；程序在 course/calc/chNN.py，
 # 插图在 img/（英文 img/en/），实验与动画页在 src/<语言>/labs/，作业取课程包 assignment
-WEB = {"sewing": TEXTBOOK / "web-editions" / "sewing"}
+WEB = {p.name: p for p in sorted((TEXTBOOK / "web-editions").iterdir()) if (p / "course").is_dir()}   # 第 29 轮起：有课程包的网页版教材都可以
 KINDS = {"title", "slide", "anim", "code", "lab", "clip", "homework", "outro", "deck"}
 LANGS = ("zh", "en")
 PH = re.compile(r"\{\{\s*([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*(?::([^}]*))?\}\}")
@@ -204,7 +204,7 @@ def from_deck(raw: dict) -> dict:
     code = list(dict.fromkeys(list(raw.get("code") or []) + list(deck.get("code") or [])))
     slides = deck["slides"]
     extra = [a["slide"] for a in raw.get("after") or [] if "slide" in a]
-    tools = WEB[raw["book"]] / "course" / "tools" / "build_slides.py"
+    tools = TEXTBOOK / "tools" / "webcourse" / "wc_slides.py"       # 公用课件引擎（第 29 轮）
     import hashlib
     stamp = hashlib.sha1((dy.read_text(encoding="utf-8") + tools.read_text(encoding="utf-8")
                           + json.dumps(extra, ensure_ascii=False)).encode()).hexdigest()[:12]
