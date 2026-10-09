@@ -1,0 +1,138 @@
+# 《缝纫机设计与制造》公开课 第 4 讲：挑线机构
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch04.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 4-1 录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch04.py 算出（{{ch04.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "4"
+deck: ch04
+skip: [8, 23, 24]          # 四种形式、连杆式与凸轮式、模型边界：控制课程部分约 10 分钟（课件与教材里都有）
+code: [ch04]
+title: ["挑线机构：按主轴转角借线、还线", "The Thread Take-up: Lending and Taking Back Thread"]
+chapter: ["第二篇 机构 · 第 4 章", "Part II Mechanisms · Chapter 4"]
+next: ["第 5 讲 钩线机构：旋梭", "Lecture 5 The hook mechanism: the rotary hook"]
+cover_formula: 'q \approx s + t'
+tags:
+  zh: [挑线机构, 挑线杆, 四连杆, 供线量, 耗线量, 平缝机]
+  en: [thread take-up, take-up lever, four-bar linkage, thread supply, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第四讲，挑线机构。
+    - 画面上机头前面那根上下摆动的杆子，就是挑线杆。它按主轴转角把线借出去、再收回来，差一点就断线或者浮线。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 4, the thread take-up.
+    - The arm swinging up and down at the front of the head is the take-up lever. By shaft angle it lends thread out and takes it back, and if it gets that slightly wrong, the thread breaks or loops.
+
+after:
+  - id: lab41
+    kind: lab
+    lab: takeup
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "['meter','state','tasks'].forEach(i => document.getElementById(i).style.filter = 'blur(7px)')"
+      - js: "document.getElementById('play').click()"
+        sweep: {ang: [0, 300]}
+        dur: 6
+      - js: "window.scrollTo(0, 400)"
+        sweep: {p_t: [1.5, 3]}
+        dur: 4
+      - js: "document.getElementById('play').click(); document.getElementById('cv').style.filter = 'blur(9px)'; window.scrollTo(0, 0)"
+        sweep: {p_u: [0, 16]}
+        dur: 6
+      - sweep: {p_u: [16, 0], p_t: [3, 1.5], p_phc: [206, 196]}
+        dur: 5
+      - sweep: {p_phc: [196, 218]}
+        dur: 5
+      - set: {p_phc: 206}
+    say:
+      zh:
+        - ">下面是本讲的虚拟实验 4-1，在问渠学习平台上可以亲手做。右边的指标这里先遮住，留给你自己读。"
+        - ">任务一：点暂停，拖动主轴转角，找到收线最紧、供线量为零的那一刻，和线孔最高点比一比。"
+        - ">任务二：把布厚改到 3 毫米。看耗线曲线怎样整体抬高，这时的各项指标，你做实验时记下来。"
+        - ">然后只调过线板位置，挑线簧行程、连杆尺寸和钩线时刻都不动，直到三条判据全部满足，把过线板位置和各项指标记下来。"
+        - ">任务三：布厚和过线板恢复原样，把钩线时刻提前到 198 度以前，看绕梭时多放的线怎么变。"
+        - ">再推迟到 214 度以后，看最小余量怎么变。两组数都记下来，和刚才课上的算例对一对。"
+        - ">还有两个任务：用凸轮式自己画供线曲线，再改摇杆长度，看线孔轨迹和传动角怎么变。指导书和报告模板在平台上下载，做完把报告交上来。"
+      en:
+        - ">Now Virtual lab 4-1. On the WenQuest platform you can do it yourself. The indicators on the right are blurred here. Read them yourself when you work the lab."
+        - ">Task one. Pause, drag the shaft angle, and find where the lever pulls the thread tightest, the moment the supply is zero. Then compare it with the eye's highest point."
+        - ">Task two. Set the cloth to 3 millimetres. Watch the whole demand curve rise, and when you do the lab, write down the indicators at this point."
+        - ">Then move only the thread guide, leaving the spring stroke, the link dimensions and the hook timing alone, until all three criteria are met. Record the guide position and the indicators."
+        - ">Task three. Put the cloth and the guide back, then bring the catch earlier than 198 degrees, and watch how the extra thread round the case changes."
+        - ">Then make it later than 214, and watch the minimum margin. Record both sets and check them against the example from the lecture."
+        - ">Two more tasks: draw your own supply curve with the cam type, and change the rocker length to see how the eye path and the transmission angle change. Download the guide and the report template on the platform, and hand in your report when you're done."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 4-1，可以自己动手", "Interactive slides and Lab 4-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和虚拟实验 4-1 都可以自己打开，一页页翻，亲手拖滑块。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and Virtual lab 4-1 yourself, page through them, and drag the sliders."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 4：挑线机构的计算与调整", "Assignment 4: take-up calculation and adjustment"]
+      points:
+        - ["计算：φ = 90° 时 P、M、E 的位置和传动角", "Compute: P, M, E and the transmission angle at φ = 90°"]
+        - ["调整：3 mm 布只调过线板，满足三条判据", "Adjust: 3 mm cloth, guide only, meet all three criteria"]
+        - ["估算一件衬衫的面线；讨论连杆式与凸轮式", "Estimate a shirt's thread; discuss four-bar versus cam"]
+      foot: ["另交虚拟实验 4-1 的实验报告。作业和报告都在问渠学习平台提交。", "Plus the report for Virtual lab 4-1. Submit both on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题是计算：用教材表 4-1 的尺寸，手算主轴转到 90 度时 P、M、E 三点的位置和传动角，再和实验核对。"
+        - ">第二题是调整：在虚拟实验里把布厚改成 3 毫米，只调过线板让三条判据都满足，附上调整前后的截图；再判断 2.5 毫米的布要不要调。"
+        - ">第三题估算一件衬衫要多少米面线、一个线团够缝多少件；第四题讨论：凸轮式能让供线紧贴耗线，高速机为什么还用连杆式。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One, calculation. With the dimensions in Table 4-1, work out by hand where P, M and E are at a shaft angle of 90 degrees, and the transmission angle, then check them in the lab."
+        - ">Two, adjustment. In the lab, set the cloth to 3 millimetres and move only the guide until all three criteria are met, with screenshots before and after. Then decide whether 2.5-millimetre cloth needs adjusting."
+        - ">Three, estimate the needle thread for one shirt and how many shirts a cone covers. And four, discussion: a cam can make supply hug demand, so why do fast machines still use the four-bar?"
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["收线最紧，一定是线孔最高的时刻吗？", "Is the tightest moment always when the eye is highest?"]
+        - ["布从 1.5 mm 换成 3 mm，过线板往哪边移？", "From 1.5 to 3 mm cloth: which way does the guide move?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：挑线杆收线最紧的时刻，一定就是线孔几何上最高的时刻吗？"
+        - ">布料从 1.5 毫米换成 3 毫米，挑线不够用，按说明书过线板该往哪边移？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, is the lever's tightest moment always when its eye is geometrically highest?"
+        - ">Change from 1.5 to 3-millimetre cloth and the take-up runs short. Which way does the manual say to move the guide?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们看钩线机构，看旋梭怎样在对的时刻钩住线环。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the 3D prototype, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, the hook mechanism, and how the rotary hook catches the loop at just the right moment. See you then.

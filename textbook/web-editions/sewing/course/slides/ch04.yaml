@@ -191,8 +191,8 @@ slides:
     h: 560
     caption: ["Δ > 0 多放，挑线簧收住；Δ < 0 放少，旋梭硬拉。最紧在梭尖最下面：余量 {{ch04.margin:.1f}} mm", "Tightest at the bottom: {{ch04.margin:.1f}} mm"]
     notes:
-      - "把供线量和耗线量画在一张图上，两者之差叫余线。余线为正，放多了，要靠挑线簧收住；为负，放少了，旋梭只能硬拉。算例钩线时余线约 {{ch04.waste:.0f}} 毫米，这是连杆式多放的线；梭尖转到最下面时余线最小，只有 {{ch04.margin:.1f}} 毫米，是整个循环里线最紧的时刻。竖线随主轴走，大家看它扫过这一点。"
-      - "Put supply and demand on one chart; the difference is the surplus. Positive means extra thread, taken up by the check spring; negative means too little, and the hook has to drag it. In our example the surplus at the catch is about {{ch04.waste:.0f}} millimetres, the extra a four-bar gives. With the hook point at the bottom it's smallest, only {{ch04.margin:.1f}} millimetres, the tightest moment of the whole cycle. The vertical line follows the shaft; watch it sweep past that point."
+      - "把供线量和耗线量画在一张图上，两者之差叫余线。余线为正，放多了，要靠挑线簧收住；为负，放少了，旋梭只能硬拉。算例钩线时余线约 {{ch04.waste:.0f}} 毫米，这是连杆式多放的线，连杆式平稳耐用，代价就是往往多放线；梭尖转到最下面时余线最小，只有 {{ch04.margin:.1f}} 毫米，是整个循环里线最紧的时刻。竖线随主轴走，大家看它扫过这一点。"
+      - "Put supply and demand on one chart; the difference is the surplus. Positive means extra thread, taken up by the check spring; negative means too little, and the hook has to drag it. In our example the surplus at the catch is about {{ch04.waste:.0f}} millimetres, the extra a four-bar gives: it is smooth and durable, and the price is usually some extra thread. With the hook point at the bottom it's smallest, only {{ch04.margin:.1f}} millimetres, the tightest moment of the whole cycle. The vertical line follows the shaft; watch it sweep past that point."
 
   - layout: points
     title: ["三条判据", "Three criteria"]
