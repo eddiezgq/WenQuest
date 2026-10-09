@@ -373,7 +373,7 @@ def media(src: dict, ctx, h=640, white=False) -> str:
     if "html" in src:
         return f'<div style="height:{h}px">{CUSTOM[src["html"]]()}</div>'
     if "fig" in src:            # 教材插图 img/<名>.webp（英文版 img/en/），内联进课件
-        return f'<div class="media white" style="height:{h}px"><img src="{fig_uri(src["fig"])}"></div>'
+        return f'<div class="media white" style="height:{h}px"><img src="{fig_uri(src["fig"], ctx.get("lang", "zh"))}"></div>'
     if "svg" in src:            # 为幻灯片新画的图（SVG 原文写在 yaml 里）
         return f'<div class="svgbox" style="height:{h}px">{src["svg"]}</div>'
     if "img" in src:
@@ -381,9 +381,11 @@ def media(src: dict, ctx, h=640, white=False) -> str:
     return ""
 
 
-def fig_uri(name: str) -> str:
+def fig_uri(name: str, lang: str = "zh") -> str:
     stem = Path(name).stem
     f = BOOK / "img" / f"{stem}.webp"
+    if lang == "en" and (BOOK / "img" / "en" / f"{stem}.webp").exists():     # 英文版课件用英文插图（第 29 轮）
+        f = BOOK / "img" / "en" / f"{stem}.webp"
     if not f.exists():
         raise SystemExit(f"no figure img/{stem}.webp")
     return "data:image/webp;base64," + base64.b64encode(f.read_bytes()).decode("ascii")
@@ -824,7 +826,7 @@ def make_deck(lesson_id: str, out: Path, lang: str = "zh", extra: list | None = 
     for k, s in enumerate(slides):
         if s["layout"] == "formula":
             s["formula_html"] = formula_html(s["formula"])
-        ctx = {"foot": foot(spec["lesson"], k + 1, len(slides)), "v": values}
+        ctx = {"foot": foot(spec["lesson"], k + 1, len(slides)), "v": values, "lang": lang}
         pages.append(mark_frags(LAYOUTS[s["layout"]](s, ctx), s["layout"]))
     no = spec["lesson"]
     return build_deck(spec, lesson, pages, out / (name or f"第{no}讲-{lesson['title'][0]}-课件.html"), lang, stills)

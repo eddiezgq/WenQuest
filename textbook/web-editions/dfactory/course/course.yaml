@@ -1,0 +1,42 @@
+# 《数字工厂实训》课程包与网页课件的配置（第 29 轮）：公用工具 textbook/tools/webcourse/ 读它。
+# 大纲：docs/课程体系/数字工厂实训/大纲.md。样板讲 3、6、10 先做完整，其余各讲先放大纲、标“建设中”（K-9）。
+book: dfactory
+name:
+- 数字工厂实训
+- Digital Factory Practicum
+shortname: DFP
+deck_id: dfactory
+lessons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+placeholders: true
+batches:
+- {'no': 1, lessons: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], exams: []}
+exams: []                 # 不设期末笔试（大纲第六节）
+exam_section: 14
+planned_hours: {1: 4, 2: 4, 4: 4, 5: 4, 7: 4, 8: 4, 9: 4, 11: 4, 12: 4}
+video_dir: 数字工厂实训
+factory_url: https://factory.wenquestrobotics.com
+planned:
+  1: {lab: ["实验 7（上）：读懂看板", "Lab 7 (part 1): reading the dashboards"]}
+  2: {lab: ["实验 7（下）：接单、算料、下达、开工、成本", "Lab 7 (part 2): order, materials, release, run, cost"]}
+  4: {lab: ["实验 16：客户投诉的追溯召回与服务决策", "Lab 16: tracing, recall and service decisions"]}
+  5: {lab: ["实验 17：安全隐患的识别评估与停机决策", "Lab 17: hazards, risk assessment and stop decisions"]}
+  7: {lab: ["实验 19：排班与技能缺人时的决策", "Lab 19: shifts, skills and staff shortages"]}
+  8: {lab: ["实验 20：供应链来料不合格与供应商选择", "Lab 20: nonconforming supplies and supplier choice"]}
+  9: {lab: ["实验 21：能源空转、错峰与单件碳足迹", "Lab 21: idling, peak shifting and carbon per unit"]}
+  11: {lab: ["厂情中枢的 AI 助手与评测题", "The hub's AI assistant and its test questions"]}
+  12: {lab: ["两周情景第 1–2 幕（课堂演示）", "Two-week scenario, acts 1–2 (classroom demo)"]}
+summary:
+- <p>在一座真在跑的数字工厂里学做决定：发现异常、追到原因、算出几种方案的代价（钱、交期、风险），发起动作、审批执行，再用数据复盘。12 讲，每讲 4 学时（1 学时概念与建模，3 学时数字工厂实验），另有两周课程设计。</p>
+- <p>Learn to make decisions in a digital factory that really runs: spot the exception, trace the cause, price the options (money, delivery, risk), act through approval, and review with data. 12 lectures of 4 hours (one hour of concepts and modelling, three hours of digital-factory labs), plus a two-week course project.</p>
+blurb: 智能工厂运营与决策：在问渠数字工厂里发现异常、追因、推演、决策、复盘。12 讲，中英双语，配数字工厂实验。
+info:
+- <p>《数字工厂实训》（副标题：智能工厂运营与决策）是问渠机器人学院面向机器人工程、智能制造工程专业三年级的特色实践课。全课在问渠数字工厂里进行：一座生产 WQR-105 减速器的工厂，订单、物料、设备、人员、质量、安全、能源和钱都连在一起。开学时机器人厂追加一批关节减速器，之后每一讲的事都围着这批货发生。</p><p>12 讲，建议共 {hours} 学时（每讲 4 学时：1 学时讲概念和建模，3 学时在数字工厂里做实验），另加两周课程设计（实验 23）。每讲按“工厂里的实际问题 → 概念 → 动画与虚拟实验 → 建模求解 → 在数字工厂里做决定”展开，配一个机器人联系和一个生活例子。</p><h4>每讲包含</h4><ul><li>讲义（教材本章 + 本讲导入、解答与小结）</li><li>动画与虚拟实验（可拖动参数）</li><li>网页互动课件（中英对照，讲者窗口里有讲稿）</li><li>数字工厂实验：实验页、指导书、报告模板</li><li>作业 1 份、测验 1 份（自动评分）</li><li>讲课视频（中、英）</li></ul><h4>单元与各讲</h4><table><tr><th>单元</th><th>各讲</th></tr>{units}</table><h4>考核</h4><ul><li>平时作业 20%</li><li>测验 10%（每讲一份，可做 3 次）</li><li>实验 40%（数字工厂自动评 60 分 + 实验报告 40 分）</li><li>课程设计 30%（实验 23）</li></ul><p>不设期末笔试。学校没有外网时，可以在机房或内网运行数字工厂本地版。</p><h4>现在的进度</h4><p>第 3、6、10 讲（厂情中枢、设备维护与可靠性、经营）已经完整；其余各讲先放大纲，陆续补齐。</p>
+- '<p><em>Digital Factory Practicum</em> (subtitle: Operating a Smart Factory: Decisions with Data) is a hands-on course of WenQuest Robotics Academy for third-year students of robotics engineering and intelligent manufacturing. It runs inside the WenQuest digital factory: a plant making WQR-105 gearboxes, where orders, materials, machines, people, quality, safety, energy and money are all connected. At the start of term the robot plant places an extra order for joint reducers, and every lecture after that revolves around this order.</p><p>12 lectures, about {hours} class hours (4 per lecture: one hour of concepts and modelling, three hours of lab work in the digital factory), plus a two-week course project (Lab 23). Each lecture runs a real problem in the plant → concepts → animations and virtual labs → modelling and solving → making the decision in the digital factory, with a robot link and an everyday example.</p><h4>Every lecture has</h4><ul><li>Notes (the textbook chapter plus the opening, solution and summary)</li><li>Animations and virtual labs with draggable parameters</li><li>Interactive web slides (bilingual, script in the presenter view)</li><li>A digital-factory lab: lab page, guide and report template</li><li>One assignment and one quiz (marked automatically)</li><li>Lecture videos (Chinese and English)</li></ul><h4>Units and lectures</h4><table><tr><th>Unit</th><th>Lectures</th></tr>{units}</table><h4>Assessment</h4><ul><li>Assignments 20%</li><li>Quizzes 10% (one per lecture, 3 attempts)</li><li>Labs 40% (60 points marked by the digital factory + 40 for the report)</li><li>Course project 30% (Lab 23)</li></ul><p>There is no written final exam. Schools without internet access can run the local edition of the digital factory in a computer lab or on their intranet.</p><h4>Progress</h4><p>Lectures 3, 6 and 10 (the factory hub, maintenance and reliability, business) are complete; the others show their outline for now and will be filled in.</p>'
+labs:
+  3: []
+  6: [weibull, pmopt]
+  10: []
+heavy_pages: []
+upload:                   # 讲课视频上传文字（tools/video/make.py 读）
+  zh: {title: "数字工厂实训 第 {n} 讲｜{t}", tags: [数字工厂, 智能制造, 工业软件, 设备维护, 决策, 机器人, 工科, 问渠], list: "数字工厂实训（问渠公开课）", next: "下一讲"}
+  en: {title: "Digital Factory Practicum, Lecture {n} | {t}", tags: [digital factory, smart manufacturing, industrial software, maintenance, decision making, robotics, engineering, WenQuest], list: "Digital Factory Practicum (WenQuest open course)", next: "Next"}

@@ -1,0 +1,125 @@
+<script>(function () {
+  var root = document.documentElement;
+  try { var t = localStorage.getItem('sm-theme'); if (t) root.setAttribute('data-theme', t); } catch (e) {}
+  var tb = document.querySelector('.theme');
+  if (tb) tb.addEventListener('click', function () {
+    var dark = root.getAttribute('data-theme') ? root.getAttribute('data-theme') === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('sm-theme', next); } catch (e) {}
+    if (window.__drawSeam) window.__drawSeam();
+  });
+
+  // 公式
+  function renderMath() {
+    if (!window.katex) return;
+    document.querySelectorAll('.math').forEach(function (el) {
+      var tex = el.textContent.replace(/^\\\[|\\\]$/g, '');
+      try { katex.render(tex, el, { displayMode: true, throwOnError: false }); } catch (e) {}
+    });
+  }
+  if (document.readyState === 'complete') renderMath(); else window.addEventListener('load', renderMath);
+
+  // 互动资源：页内运行
+  document.querySelectorAll('.lab').forEach(function (card) {
+    var btn = card.querySelector('.run'), box = card.querySelector('.lab-frame');
+    btn.addEventListener('click', function () {
+      if (box.hidden) {
+        if (!box.firstChild) {
+          var f = document.createElement('iframe');
+          f.src = card.dataset.src; f.title = card.querySelector('h4').textContent; f.loading = 'lazy';
+          f.setAttribute('allow', 'fullscreen');
+          box.appendChild(f);
+        }
+        box.hidden = false; card.classList.add('running'); btn.textContent = '收起';
+      } else { box.hidden = true; card.classList.remove('running'); btn.textContent = '在本页运行'; }
+    });
+  });
+  // 正文里指向资源的链接：滚到卡片并展开
+  document.querySelectorAll('a.labref').forEach(function (a) {
+    a.addEventListener('click', function (ev) {
+      var card = document.querySelector(a.getAttribute('href'));
+      if (!card) return;
+      ev.preventDefault();
+      card.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      var box = card.querySelector('.lab-frame');
+      if (box && box.hidden) card.querySelector('.run').click();
+    });
+  });
+
+  // 看大图
+  var lb = document.querySelector('.lightbox');
+  if (lb) {
+    document.querySelectorAll('a.zoom').forEach(function (a) {
+      a.addEventListener('click', function (ev) { ev.preventDefault(); lb.querySelector('img').src = a.getAttribute('href'); lb.hidden = false; });
+    });
+    lb.addEventListener('click', function () { lb.hidden = true; });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') lb.hidden = true; });
+  }
+
+  // 本章目录高亮
+  var links = Array.prototype.slice.call(document.querySelectorAll('.side a'));
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (e.isIntersecting) { links.forEach(function (a) { a.classList.remove('on'); }); var a = map[e.target.id]; if (a) a.classList.add('on'); }
+      });
+    }, { rootMargin: '-80px 0px -70% 0px' });
+    Object.keys(map).forEach(function (id) { var h = document.getElementById(id); if (h) io.observe(h); });
+  }
+
+  // 封面：八个领域的数据汇到厂情中枢，某处异常时沿因果链追过去
+  var cv = document.getElementById('factoryCanvas');
+  if (cv) {
+    var g = cv.getContext('2d'), W = 560, H = 360, cx = W / 2, cy = H / 2 + 4, R = 138, t0 = performance.now();
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function css(n) { return getComputedStyle(root).getPropertyValue(n).trim(); }
+    var names = ['订单', '物料', '设备', '人员', '质量', '安全', '能源', '现金'];
+    // 每 4 秒一个异常：从设备 → 订单 → 现金，或物料 → 订单，或能源 → 现金……
+    var chains = [[2, 0, 7], [1, 0], [4, 0, 7], [3, 2, 0], [6, 7], [5, 2, 0]];
+    function pos(k) { var a = -Math.PI / 2 + k * Math.PI / 4; return [cx + R * Math.cos(a) * 1.35, cy + R * Math.sin(a)]; }
+    function draw(now) {
+      var t = reduce ? 2.2 : (now - t0) / 1000, cyc = Math.floor(t / 4), ph = (t % 4) / 4;
+      var ink = css('--ink'), nd = css('--needle'), bb = css('--bobbin'), rule = css('--rule'), soft = css('--soft'), muted = css('--muted'), sheet = css('--sheet');
+      var ch = chains[cyc % chains.length];
+      g.clearRect(0, 0, W, H);
+      g.font = '13px ' + css('--f-body'); g.textAlign = 'center'; g.textBaseline = 'middle';
+      // 连线与数据脉冲（各领域 → 中枢）
+      for (var k = 0; k < 8; k++) {
+        var p = pos(k);
+        g.strokeStyle = rule; g.lineWidth = 1.5; g.beginPath(); g.moveTo(p[0], p[1]); g.lineTo(cx, cy); g.stroke();
+        var u = ((t * 0.45 + k * 0.137) % 1);
+        g.fillStyle = nd; g.globalAlpha = 0.85;
+        g.beginPath(); g.arc(p[0] + (cx - p[0]) * u, p[1] + (cy - p[1]) * u, 3, 0, 2 * Math.PI); g.fill(); g.globalAlpha = 1;
+      }
+      // 因果链：依次点亮
+      var lit = Math.min(ch.length, Math.floor(ph * (ch.length + 1.2)));
+      g.strokeStyle = bb; g.lineWidth = 3; g.setLineDash([7, 5]);
+      for (var i = 1; i < lit; i++) {
+        var a = pos(ch[i - 1]), b = pos(ch[i]);
+        g.beginPath(); g.moveTo(a[0], a[1]); g.quadraticCurveTo(cx + (a[0] + b[0] - 2 * cx) * 0.15, cy + (a[1] + b[1] - 2 * cy) * 0.15, b[0], b[1]); g.stroke();
+      }
+      g.setLineDash([]);
+      // 节点
+      for (k = 0; k < 8; k++) {
+        p = pos(k);
+        var on = ch.indexOf(k) >= 0 && ch.indexOf(k) < lit, first = k === ch[0] && lit > 0;
+        g.fillStyle = on ? bb : sheet; g.strokeStyle = on ? bb : rule; g.lineWidth = 2;
+        g.beginPath(); g.roundRect ? g.roundRect(p[0] - 34, p[1] - 15, 68, 30, 15) : g.rect(p[0] - 34, p[1] - 15, 68, 30); g.fill(); g.stroke();
+        if (first && !reduce) { g.strokeStyle = bb; g.globalAlpha = 1 - ph; g.lineWidth = 2; g.beginPath(); g.arc(p[0], p[1], 24 + 40 * ph, 0, 2 * Math.PI); g.stroke(); g.globalAlpha = 1; }
+        g.fillStyle = on ? '#fff' : ink; g.fillText(names[k], p[0], p[1] + 1);
+      }
+      // 中枢
+      g.fillStyle = nd; g.beginPath(); g.arc(cx, cy, 40, 0, 2 * Math.PI); g.fill();
+      g.fillStyle = '#fff'; g.font = '600 13px ' + css('--f-body'); g.fillText('厂情中枢', cx, cy + 1);
+      g.fillStyle = muted; g.font = '12px ' + css('--f-mono'); g.textAlign = 'left';
+      g.fillText('异常：' + names[ch[0]], 12, 18);
+      if (!reduce) requestAnimationFrame(draw);
+    }
+    window.__drawSeam = function () { if (reduce) draw(performance.now()); };
+    requestAnimationFrame(draw);
+  }
+})();
+</script>

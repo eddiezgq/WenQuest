@@ -1,0 +1,128 @@
+<p class="eyebrow">Part III · Seven Domains</p><h1><span class="chno">Chapter 6</span>Maintenance and Reliability</h1><div class="seam" aria-hidden="true"></div><div class="chips"><span class="chips-label">Interactive resources</span><a class="chip" href="#lab-weibull"><b>Virtual lab</b>Weibull reliability: how long will the machine last?</a><a class="chip" href="#lab-pmopt"><b>Virtual lab</b>Choosing the service interval</a><a class="chip" href="#s6-8"><b>Digital factory</b>Lab 18 Timing preventive maintenance</a></div>
+<p>Machines break down; everybody knows that. When they will break down, nobody knows. Yet a plant makes decisions about breakdowns every day. The grinder is overdue for service: do we stop it today or finish the rush order first? Should the service interval be 500 hours or 300? This chapter turns “nobody knows” into something you can calculate: <strong>the probability of failing in the next stretch of time</strong> and <strong>the expected loss</strong>, which you then weigh against the certain cost of a service. The model is the very one the WenQuest digital factory uses to age its machines, so what you calculate by hand, what the platform calculates and what actually happens on the shop floor are the same thing.</p>
+
+<h3 id="s6-1">6.1 The problem: the grinder is overdue. Stop it or not?</h3>
+<p>At the start of term the robot plant ordered an extra batch of joint reducers on a tight deadline. Every gear shaft in that batch has to pass the cylindrical grinder GRD-01, the bottleneck of the plant. On Monday morning the factory hub flags an exception, “service overdue”:</p>
+<div class="tbl"><table><caption>Table 6-1  Asset data for grinder GRD-01 (teaching scenario of the digital factory)</caption>
+<thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>
+<tr><td>Service interval</td><td>500 operating hours</td></tr>
+<tr><td>Run since the last service</td><td>620 hours (120 hours overdue)</td></tr>
+<tr><td>Reliability model</td><td>Weibull, β = 3, η = 900 hours</td></tr>
+<tr><td>One failure</td><td>480 minutes of downtime on average; $1,200 repair; $200 of margin lost per hour stopped (bottleneck)</td></tr>
+<tr><td>One service</td><td>180 minutes stopped; labour $45/hour × 3 hours + oil, grease and filters $80 = $215</td></tr>
+<tr><td>“The next two weeks”</td><td>about 80 operating hours on one shift</td></tr>
+</tbody></table></div>
+<p>The production supervisor says “the rush order comes first, the service can wait”; the maintenance planner says “it’s already overdue, stop it now”. Both have a point and neither has a number. This chapter answers: <strong>without service, how likely is a failure in the next 80 hours? What is the expected loss? Is it cheaper to stop now, after the shift, or not at all? And is the interval itself right?</strong></p>
+
+<h3 id="s6-2">6.2 Why machines fail: the bathtub curve</h3>
+<p>The tendency of a machine to fail per unit time is its <strong>failure rate</strong> h(t): given that it has run t hours without failing, the probability per hour that it fails next. Statistics over many machines show that the failure rate goes through roughly three phases (Figure 6-1), shaped like a bathtub:</p>
+<ul>
+<li><strong>Infant mortality</strong>: new or freshly overhauled machines reveal assembly mistakes and material defects early, and the failure rate falls with time. The cure is run-in, burn-in and acceptance testing, not maintenance: the more often you take a machine apart, the more chances to build in a new problem.</li>
+<li><strong>Random failures</strong>: in the middle the rate is roughly constant and failures come from outside, such as shocks, operator errors or power glitches. Maintenance does not help here.</li>
+<li><strong>Wear-out</strong>: bearings, guides, seals and grinding spindles wear, and the failure rate rises. <strong>Preventive maintenance targets exactly this phase</strong>: new oil, new filters and reset clearances put the machine back where its failure rate is low.</li>
+</ul>
+<figure class="fig chart"><a class="zoom" href="img/fig06_bathtub.png"><img src="img/fig06_bathtub.png" alt="Figure 6-1  The bathtub curve" loading="lazy"></a><figcaption>Figure 6-1  The bathtub curve: three phases of the failure rate over operating time (illustrative)</figcaption></figure>
+<p>So whether maintenance helps depends on which phase the machine is in. We need a model that can describe all three.</p>
+
+<h3 id="s6-3">6.3 The Weibull distribution</h3>
+<p>The most widely used life model in engineering is the <strong>Weibull distribution</strong>. Let t be the operating hours since the last service (or repair). The probability that the machine fails before t (the cumulative failure probability) is</p>
+<div class="math">\[F(t)=1-\exp\!\left[-\left(\frac{t}{\eta}\right)^{\beta}\right],\qquad R(t)=1-F(t)=\exp\!\left[-\left(\frac{t}{\eta}\right)^{\beta}\right]\]</div>
+<p>R(t) is the <strong>reliability</strong>, the probability of surviving t hours. Differentiating F and dividing by R gives the failure rate</p>
+<div class="math">\[h(t)=\frac{F'(t)}{R(t)}=\frac{\beta}{\eta}\left(\frac{t}{\eta}\right)^{\beta-1}\]</div>
+<p>Each parameter has a clear meaning:</p>
+<ul>
+<li>The <strong>shape parameter β</strong> sets how the failure rate changes over time: for β &lt; 1 h(t) falls (infant mortality), for β = 1 it stays constant (random failures; this is the exponential distribution), for β &gt; 1 it rises (wear-out). Mechanical wear typically has β between 2 and 4.</li>
+<li>The <strong>scale parameter η</strong> (characteristic life) sets the time scale: whatever β is, at t = η, F = 1 − e⁻¹ = 63.2%.</li>
+</ul>
+<p>The mean life (mean time to failure) is MTTF = η·Γ(1 + 1/β), where Γ is the gamma function. For GRD-01, β = 3 and η = 900 h, so MTTF = 900 × Γ(4/3) = 804 hours.</p>
+<figure class="fig chart"><a class="zoom" href="img/fig06_weibull.png"><img src="img/fig06_weibull.png" alt="Figure 6-2  Failure probability and failure rate of GRD-01" loading="lazy"></a><figcaption>Figure 6-2  Cumulative failure probability and failure rate of grinder GRD-01 (β = 3, η = 900 h, teaching-scenario parameters of the digital factory)</figcaption></figure>
+<p>Read a few values off Figure 6-2: at the 500 h service interval F = 15.8%; now, at 620 h, F = 27.9%; by 800 h it is past half (50.5%). The failure rate climbs from 0.37 per thousand hours at 300 h to 1.58 at 620 h, more than four times as much. That is what β = 3 means: the longer it runs, the likelier it is to fail.</p>
+<p>To drag β and η and watch the curves change, use <a href="#lab-weibull" class="labref">Virtual lab 6-1  Weibull reliability: how long will the machine last?</a></p><section class="lab" id="lab-weibull" data-src="labs/weibull.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x6lab1">Virtual lab 6-1  Weibull reliability: how long will the machine last?</h4></div><p>Drag β, η, the hours run and the look-ahead window to see the failure probability, the failure rate and the chance of failing in the next H hours; play to watch one machine serviced on schedule and failing now and then.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/weibull.html" target="_blank" rel="noopener">Open in a new window ↗</a></div><div class="lab-frame" hidden></div></section>
+
+<h3 id="s6-4">6.4 The probability of failing in the next stretch of time</h3>
+<p>A decision does not need F(620): we already know the machine has not failed so far. It needs <strong>the probability that a machine which has run t hours without failing will fail within the next H hours</strong>. That is a conditional probability:</p>
+<div class="math">\[P(t,H)=\frac{F(t+H)-F(t)}{R(t)}=1-\frac{R(t+H)}{R(t)}=1-\exp\!\left\{-\left[\left(\frac{t+H}{\eta}\right)^{\beta}-\left(\frac{t}{\eta}\right)^{\beta}\right]\right\}\]</div>
+<p>For GRD-01 with t = 620 h and H = 80 h:</p>
+<div class="math">\[\left(\tfrac{700}{900}\right)^{3}-\left(\tfrac{620}{900}\right)^{3}=0.4705-0.3269=0.1436,\qquad P=1-e^{-0.1436}=13.4\%\]</div>
+<p>If the machine is serviced now, its clock goes back to zero and the probability of failing in the next 80 h is P(0, 80) = 1 − exp[−(80/900)³] = 0.07%, about 190 times smaller.</p>
+<p>The <strong>expected loss</strong> is the probability of failure times the loss per failure. One failure of GRD-01 costs a $1,200 repair plus 8 hours stopped at $200 an hour, $1,600, so C<sub>f</sub> = $2,800 in all. The expected loss without service = 13.4% × $2,800 = <strong>$375</strong>.</p>
+<div class="callout"><p><strong>What if β = 1?</strong> In the exponent, t cancels out: P(t, H) = 1 − e<sup>−H/η</sup>, independent of t. A machine that has run 620 hours and one just serviced have the same chance of failing in the next 80 hours (9.5% each for η = 804 h). This is the “memoryless” property. For random failures, scheduled service is useless; you need protection, monitoring or a standby machine.</p></div>
+<p>In the digital factory the instructor can set the reliability factor k to “accelerated ×5” so that machines age visibly within one class. Then multiply both t and H by k before calculating: with k = 5, a machine that has run 100 h and will run another 20 h has P(500, 100) = 11.7%.</p>
+
+<h3 id="s6-5">6.5 Three options: don’t stop, stop now, stop after the shift</h3>
+<p>For “service overdue” the factory hub offers three options, each priced in money, delivery and risk:</p>
+<div class="tbl"><table><caption>Table 6-2  Three options for GRD-01 (next 80 operating hours)</caption>
+<thead><tr><th>Option</th><th>Certain cost</th><th>Failure risk</th><th>Total (expected)</th><th>Delivery</th></tr></thead><tbody>
+<tr><td>A Do nothing (baseline)</td><td>$0</td><td>13.4% × $2,800 = $375</td><td>$375</td><td>a failure stops it for 8 hours; the rush order may be late</td></tr>
+<tr><td>B Service now</td><td>$215 + 3 hours’ lost margin $600 = $815</td><td>0.07% × $2,800 = $2</td><td>$817</td><td>the bottleneck stops for 3 hours; the rush order is squeezed</td></tr>
+<tr><td>C Service after the shift</td><td>$215</td><td>4 more hours first: 0.63% × $2,800 = $18; after service $2</td><td><strong>$235</strong></td><td>no production time lost</td></tr>
+</tbody></table></div>
+<p>The answer is clear: <strong>service after the shift</strong>. It keeps the benefit of the service (risk down from 13.4% to almost nothing) without taking production time from the bottleneck. The supervisor and the planner were each half right: don’t stop the bottleneck during production, and don’t put the service off any longer.</p>
+<p>Three remarks:</p>
+<ul>
+<li><strong>The $375 for “do nothing” is an expectation, not money you will spend.</strong> Most of the time nothing happens (86.6%); now and then you lose $2,800. If one failure would make you miss a key customer’s delivery at a cost far above $2,800, put the penalty into C<sub>f</sub>, or treat “not late” as a hard constraint. The hub ranks options by delivery first and cost second.</li>
+<li><strong>The cost of downtime depends on whether the machine is the bottleneck.</strong> An hour lost on GRD-01 costs $200 of margin. A short stop on a non-bottleneck machine is absorbed by buffers and costs little (the digital factory uses $60 an hour).</li>
+<li><strong>The hub’s simulation counts downtime in delivery dates.</strong> It puts the service order into the shop-floor simulation and checks whether the rush order is late; the hand calculation in this chapter converts downtime into money. The two look from different angles and should agree; when they don’t, find out why.</li>
+</ul>
+
+<h3 id="s6-6">6.6 Choosing the service interval</h3>
+<p>Section 6.5 answered “what do we do this time”. The next question is “what should the rule be”: how long should the interval T be? Too short and service costs dominate; too long and failures dominate. In between lies an optimum.</p>
+<p>A common policy is <strong>age-based maintenance</strong>: service the machine when it has run T hours; if it fails before T, repair it and restart the clock. In one cycle, with probability R(T) it reaches T and costs C<sub>p</sub> for the service; with probability F(T) it fails on the way and costs C<sub>f</sub>. The average length of a cycle is ∫<sub>0</sub><sup>T</sup> R(t) dt. In the long run the average cost per operating hour is</p>
+<div class="math">\[C(T)=\frac{C_p\,R(T)+C_f\,F(T)}{\displaystyle\int_0^{T}R(t)\,dt}\]</div>
+<p>As T → ∞, C(T) → C<sub>f</sub>/MTTF, which is “no service, repair on failure”. For GRD-01: C<sub>f</sub>/MTTF = 2800/804 = $3.48 an hour.</p>
+<figure class="fig chart"><a class="zoom" href="img/fig06_cost.png"><img src="img/fig06_cost.png" alt="Figure 6-3  Average cost of age-based maintenance" loading="lazy"></a><figcaption>Figure 6-3  Average cost per operating hour of age-based maintenance for GRD-01: the optimal interval for two service costs (numerical calculation)</figcaption></figure>
+<p>Figure 6-3 has two curves:</p>
+<ul>
+<li><strong>Service after the shift</strong>, C<sub>p</sub> = $215: the optimum is T* = 312 h at $1.04 an hour, 70% cheaper than running to failure. The current 500 h costs $1.30/h; it is too long.</li>
+<li><strong>Stop during production</strong>, C<sub>p</sub> = $215 + $600 = $815: service is dearer, so the optimum moves out to T* = 535 h at $2.34 an hour. The current 500 h costs $2.35/h, practically optimal.</li>
+</ul>
+<p>Two lessons. First, <strong>the optimal interval depends on how expensive a service is</strong>: the smaller C<sub>p</sub> is compared with C<sub>f</sub>, the more often you should service. Second, <strong>changing how you work is worth more than tuning a parameter</strong>: moving the service out of production time cuts C<sub>p</sub> from $815 to $215 and the optimal cost from $2.34/h to $1.04/h, and then the interval should shrink to about 300 h. The curve is flat near its minimum, so a few dozen hours either way costs little; in practice a round number (300 h, say) is fine.</p>
+<p>If β ≤ 1, C(T) keeps falling and has no minimum: age-based maintenance does not pay. This is the memoryless property of Section 6.4 again.</p>
+<p>Use <a href="#lab-pmopt" class="labref">Virtual lab 6-2  Choosing the service interval</a> to drag T to the minimum, then play the “race” between two machines and watch the long-run average cost settle on C(T).</p><section class="lab" id="lab-pmopt" data-src="labs/pmopt.html"><div class="lab-head"><span class="lab-kind">Virtual lab</span><h4 id="x6lab2">Virtual lab 6-2  Choosing the service interval</h4></div><p>The long-run cost curve of age-based maintenance: drag the interval to find its minimum, then race two identical machines (one serviced every T hours, one run to failure) over 20 000 hours with the same random numbers.</p><div class="lab-actions"><button type="button" class="run">Run on this page</button><a class="open" href="labs/pmopt.html" target="_blank" rel="noopener">Open in a new window ↗</a></div><div class="lab-frame" hidden></div></section>
+
+<h3 id="s6-7">6.7 Checking with failure records: MTBF</h3>
+<p>Where do β and η come from? From failure records. The simplest measure is the <strong>mean time between failures</strong> (MTBF):</p>
+<div class="math">\[\text{MTBF}\approx\frac{\text{operating hours in the period}}{\text{number of failures}}\]</div>
+<p>For example, 30 days at 16 operating hours a day with 3 failures gives MTBF ≈ 30 × 16 ÷ 3 = 160 hours. MTBF is only an average; it cannot tell whether the failure rate is rising or falling. Once there are enough records, fit a Weibull distribution to the “hours since last service” at each failure to estimate β and η, then recompute the interval as in Section 6.6. If a machine keeps failing before its service is due, the interval is too long or η was overestimated.</p>
+<p>Keep <strong>probability</strong> and <strong>this particular outcome</strong> apart. With a 13.4% risk, one or two of ten students’ grinders will fail and the rest will not. Not failing does not prove that skipping the service was right, and failing does not prove that servicing was right. A policy is judged on the average over many runs, which is what the two-machine race in Lab 6-2 shows.</p>
+
+<h3 id="s6-8">6.8 Doing it in the digital factory: Lab 18</h3>
+<p>On the shop floor of the WenQuest digital factory, each of the 13 machines has its own Weibull parameters, the same model as in this chapter, and the machines really do fail with these probabilities (in teaching mode, when the instructor turns reliability on). Lab 18, “Maintenance strategy: timing preventive maintenance”, walks through the chapter:</p>
+<ol>
+<li><strong>Hand calculation</strong> (task 1): in “Maintenance → Asset register” find the machine marked “overdue” in red, read t, β, η, the repair cost and the downtime loss, calculate the probability of failing in the next 80 hours and the expected loss; the platform checks your answer.</li>
+<li><strong>Decision</strong> (task 2): in the command centre open the “service overdue” or “high failure risk” exception. The right-hand panel shows three options (do nothing, service now, service after the shift) with their cost, risk and order delivery. Choose one and give your reasons. Until you submit, the command centre hides the hub’s recommendation (comparison mode); afterwards you compare.</li>
+<li><strong>Execution</strong> (task 3): adopt the option to generate a service work order, which the instructor approves; the machine is locked and tagged out, the technician services it, you accept and unlock it, its “since last service” goes back to zero and ERPNext records the service.</li>
+<li><strong>Comparison and estimation</strong> (tasks 4 and 5): the shop keeps running; count how often the serviced and the unserviced machines fail, and estimate MTBF from the failure records.</li>
+</ol>
+<p>The lab page, guide and report template are under “Digital-factory lab” in this lecture. The lab mark is 60 points from the platform plus 40 for the report.</p>
+
+<h3 id="s6-9">6.9 Robot link and everyday example</h3>
+<p><strong>Robots: regreasing joint reducers.</strong> Each joint of a collaborative robot contains a precision reducer. Its grease ages and its bearings and tooth flanks wear: a typical β &gt; 1. Take β = 2.5 and η = 20,000 h for lubrication-related failures (illustrative values). By 10,000 h the cumulative failure probability is 16.2%; a joint that has already run 14,000 h has a 15.0% chance of failing in the next 2,000 h, against 0.3% for a freshly regreased one. That is why manufacturers specify regreasing by operating hours. Going further, the robot controller can read each joint motor’s current; a slowly growing friction torque in that current means the reducer is wearing. This is condition monitoring, which upgrades age-based maintenance to condition-based maintenance; Chapter 11 shows how AI helps read such data. The WQR-105 reducers our plant makes are exactly the ones that go into these joints.</p>
+<p><strong>Everyday example: servicing a car.</strong> The manual says “change the oil every 5,000 km”. Stretching it to 8,000 km is usually fine, but one engine failure costs as much as dozens of oil changes. Deciding when to change the oil is weighing “probability × loss” against “a small, certain cost”. And a counter-example: the chips in electronics hardly wear (β ≈ 1), and nobody “replaces their phone’s processor on schedule”.</p>
+
+<h3 id="s6-10">6.10 Back to the problem</h3>
+<p>GRD-01 has run 620 h. Its probability of failing in the next 80 operating hours is 13.4% and the expected loss is $375. The expected totals of the three options: do nothing $375, service now $817, service after the shift $235. <strong>Recommendation: service it after today’s shift.</strong> The rush order is not affected and the risk drops to 0.07%. The interval itself also deserves a second look: if services are always done after the shift, the optimum is about 312 h (current 500 h), cutting the long-run cost from $1.30 to $1.04 per operating hour; if services stop production, 500 h is already close to optimal. The change needs the plant manager’s approval: submit the new interval at the bottom of the asset’s “Details” page and the ERPNext maintenance schedule follows.</p>
+
+<h3 id="s6-11">Summary</h3>
+<ul>
+<li>The failure rate h(t) is the tendency to fail next, given survival so far. The bathtub curve has three phases, infant mortality, random failures and wear-out, and preventive maintenance only helps in the wear-out phase.</li>
+<li>Weibull: F(t) = 1 − exp[−(t/η)<sup>β</sup>]. β sets the shape (&lt;1 falling, =1 constant, &gt;1 rising failure rate); η is the time at which F = 63.2%; MTTF = ηΓ(1 + 1/β).</li>
+<li>Decisions use the conditional probability P(t, H) = 1 − exp{−[((t+H)/η)<sup>β</sup> − (t/η)<sup>β</sup>]}; expected loss = P × C<sub>f</sub>, compared with the certain cost of service and with delivery.</li>
+<li>The long-run cost C(T) of age-based maintenance has an optimal interval T*; the cheaper the service, the shorter the interval; moving services out of production time often saves more than tuning the interval.</li>
+<li>MTBF and Weibull fits check the policy against failure records; keep probability and a single outcome apart.</li>
+</ul>
+
+<h3 id="x6ex">Chapter 6 Exercises</h3>
+<ol>
+<li>Starting from the definition of R(t), derive the conditional failure probability P(t, H), and show that it does not depend on t when β = 1.</li>
+<li>If GRD-01 is left until 800 h, what are the probability of failing in the next 80 operating hours and the expected loss? (Answer: 20.7%, $581)</li>
+<li>CNC lathe CNC-L01-A: β = 2.5, η = 1,400 h, service interval 600 h, run 700 h so far. A failure stops it for 240 minutes and costs $700 to repair; it is not the bottleneck, so an hour stopped loses $60 of margin. A service takes 120 minutes at $45/h labour plus $80 of materials. Find the probability of failing in the next 80 h, the expected loss and the cost of a service; decide whether servicing now pays, and explain why the answer differs from GRD-01’s. (Answer: 5.3%, $50, $170)</li>
+<li>Use C(T) to find the optimal age-based interval for CNC-L01-A (service after the shift, C<sub>p</sub> = $170, C<sub>f</sub> = $940) and compare it with the current 600 h. Check with Virtual lab 6-2. (Answer: about 656 h)</li>
+<li>A machine ran 16 hours a day for the last 30 days and failed 4 times. Estimate its MTBF. Why can’t MTBF tell you whether scheduled service is worthwhile?</li>
+<li>The platform compares options by expected loss. Give an example where this is not enough and say how the comparison should be improved.</li>
+</ol>
+
+<h3 id="x6res">Resources</h3>
+<p><a href="#lab-weibull" class="labref">Virtual lab 6-1  Weibull reliability: how long will the machine last?</a>  Presets for GRD-01, CNC-L01-A, HT-01 and a β = 1 check; the readings check the hand calculation of Section 6.4 directly. Play to see the saw-tooth of the running clock: a service resets it, a failure interrupts it.</p>
+<p><a href="#lab-pmopt" class="labref">Virtual lab 6-2  Choosing the service interval</a>  Presets for “service after shift”, “stop during production” and a β = 1 check, matching Figure 6-3; two machines race with the same random numbers.</p>
+<p>Digital-factory Lab 18, “Maintenance strategy: timing preventive maintenance”: open the lab and download the guide and report template from this lecture’s course page.</p>

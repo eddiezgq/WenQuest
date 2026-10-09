@@ -1,0 +1,16 @@
+[
+{
+"ch": 6,
+"href": "labs/weibull.html",
+"kind": "Virtual lab",
+"title": "Weibull reliability: how long will the machine last?",
+"desc": "Drag β, η, the hours run and the look-ahead window to see the failure probability, the failure rate and the chance of failing in the next H hours; play to watch one machine serviced on schedule and failing now and then."
+},
+{
+"ch": 6,
+"href": "labs/pmopt.html",
+"kind": "Virtual lab",
+"title": "Choosing the service interval",
+"desc": "The long-run cost curve of age-based maintenance: drag the interval to find its minimum, then race two identical machines (one serviced every T hours, one run to failure) over 20 000 hours with the same random numbers."
+}
+]

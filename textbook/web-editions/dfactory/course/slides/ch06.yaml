@@ -1,0 +1,317 @@
+# 第 6 讲 设备维护与可靠性 · 网页互动课件（第 29 轮样板讲）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 textbook/tools/webcourse/wc_slides.py 的 L_*。
+# {{ch06.键:格式}} 由 course/calc/ch06.py 算出（模型和参数取自数字工厂 sim/reliability.py、hub/maint.py），不手写数字。
+lesson: 6
+code: [ch06]
+
+clips:
+  hero:          # 封面：GRD-01 的累计故障概率与运行时钟一直跑（铺满背景）
+    page: weibull
+    selector: "#plotPanel"
+    cover: true
+  curves:        # β 从 0.7 扫到 4：失效率从下降、不变到上升（一直循环）
+    page: weibull
+    selector: "#plotPanel"
+    loop: 15
+    steps:
+      - {at: 0, js: "__lab.play(false)", press: ["[data-p=grd]"]}
+      - {at: 0.2, set: {beta: 0.7}}
+      - {at: 3, set: {beta: 1}}
+      - {at: 6, set: {beta: 2}}
+      - {at: 9, set: {beta: 3}}
+      - {at: 12, set: {beta: 4}}
+  window:        # GRD-01：t 从 100 走到 1000，“未来 80 h”的窗口跟着走，概率越来越大（一直循环）
+    page: weibull
+    selector: "#plotPanel"
+    loop: 16
+    steps:
+      - {at: 0, js: "__lab.play(false)", press: ["[data-p=grd]"]}
+      - {at: 0.2, set: {t: 100}}
+      - {at: 2, set: {t: 300}}
+      - {at: 4, set: {t: 500}}
+      - {at: 6, set: {t: 620}}
+      - {at: 9, set: {t: 800}}
+      - {at: 11, set: {t: 1000}}
+      - {at: 13, set: {t: 0}}
+  clock:         # 运行时钟：保养周期 500 h 跑一阵
+    page: weibull
+    selector: "#machine"
+  cost:          # C(T)：T 从 150 扫到 1000，下班后保养 / 生产时间停机保养交替（一直循环）
+    page: pmopt
+    selector: "#plotPanel"
+    loop: 20
+    steps:
+      - {at: 0, js: "__lab.play(false)", press: ["[data-p=after]"]}
+      - {at: 0.2, set: {T: 150}}
+      - {at: 2, set: {T: 312}}
+      - {at: 4, set: {T: 500}}
+      - {at: 6, set: {T: 1000}}
+      - {at: 9, press: ["[data-p=during]"]}
+      - {at: 9.2, set: {T: 150}}
+      - {at: 11, set: {T: 535}}
+      - {at: 14, set: {T: 1000}}
+      - {at: 17, set: {T: 500}}
+  race:          # 两台设备比赛：按周期保养 vs 坏了再修（一直循环）
+    page: pmopt
+    selector: "#race"
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 6 讲", "Lecture 6"]
+    title: ["设备维护与可靠性", "Maintenance and Reliability"]
+    sub: ["该不该停下来保养，算出来", "Whether to stop for service: work it out"]
+    notes:
+      - "这一讲讲设备维护。设备会坏，什么时候坏谁也说不准，可工厂天天要做跟坏有关的决定：今天停不停下来保养，保养周期定多长。我们用一个概率模型，把说不准变成能算的东西：未来一段时间坏掉的概率，预期损失多少钱，再跟保养的确定花费比一比。背景上这台设备一直在跑，到周期就保养，时钟拨回零，偶尔坏一次。"
+      - "This lecture is about maintenance. Machines break down, and nobody knows exactly when, yet a plant makes decisions about breakdowns every day: do we stop for service today, and how long should the interval be? We'll use a probability model to turn 'nobody knows' into numbers: the chance of failing in the next stretch of time, the expected loss in money, and then a comparison with the certain cost of a service. In the background a machine keeps running; at each interval it's serviced and its clock resets, and now and then it fails."
+
+  - layout: question
+    tag: ["厂里出的事", "What happened in the plant"]
+    title: ["磨床保养逾期 120 小时，急单在赶，停不停？", "The grinder is 120 hours overdue and a rush order is on: stop it?"]
+    facts:
+      - ["GRD-01 是瓶颈：周期 500 h，已运行 620 h", "GRD-01 is the bottleneck: interval 500 h, run 620 h"]
+      - ["坏一次停 8 h、修理 $1,200、每小时少挣 $200", "A failure: 8 h down, $1,200 repair, $200 lost per hour"]
+      - ["保养一次停 3 h、人工材料 $215", "A service: 3 h down, $215 labour and materials"]
+    notes:
+      - "先看厂里出的事。机器人厂追加的关节减速器，齿轮轴都要过外圆磨床 GRD-01，它是全厂的瓶颈。周一早上厂情中枢报了一条保养逾期：周期 500 小时，已经跑了 620 小时。坏一次要停 8 个小时，修理 1200 美元，停机每小时少挣 200 美元毛利；保养一次停 3 小时，人工加材料 215 美元。车间主任说急单要紧，保养往后放；设备员说已经逾期，必须马上停。谁对？"
+      - "Here's what happened. Every gear shaft for the robot plant's extra order of joint reducers goes through grinder GRD-01, the plant's bottleneck. On Monday morning the factory hub flagged it as overdue: the interval is 500 hours and it has run 620. A failure stops it for 8 hours, costs 1,200 dollars to repair and loses 200 dollars of margin per hour; a service stops it for 3 hours and costs 215 in labour and materials. The supervisor says the rush order comes first; the maintenance planner says stop it now. Who's right?"
+
+  - layout: section
+    num: "01"
+    title: ["设备为什么会坏", "Why machines fail"]
+
+  - layout: split
+    title: ["浴盆曲线：失效率的三个阶段", "The bathtub curve: three phases"]
+    points:
+      - ["早期失效：失效率下降，靠磨合和验收", "Infant mortality: falling rate; run-in and acceptance"]
+      - ["偶然失效：失效率不变，保养帮不上", "Random failures: constant rate; service doesn't help"]
+      - ["磨损失效：失效率上升，保养对付这一段", "Wear-out: rising rate; this is what service fights"]
+    visual: {fig: fig06_bathtub}
+    notes:
+      - "先说失效率：设备已经用了 t 小时还没坏，接下来每小时坏掉的概率。大量统计表明它分三段，像个浴盆。新设备早期失效多，失效率往下走，对付它靠磨合和验收，拆得越勤越容易出问题。中间一段失效率大致不变，坏不坏看外因，保养帮不上。最后是磨损期，轴承、导轨、密封越用越磨，失效率往上走。预防性保养对付的正是这一段。"
+      - "First, the failure rate: given that a machine has run t hours without failing, the chance per hour that it fails next. Statistics show three phases, like a bathtub. New machines suffer infant mortality and the rate falls; the cure is run-in and acceptance, and frequent dismantling makes it worse. In the middle the rate is roughly constant and failures come from outside; service doesn't help. Then comes wear-out: bearings, guides and seals wear and the rate rises. That's the phase preventive maintenance fights."
+
+  - layout: split
+    title: ["威布尔分布：β 管形状，η 管尺度", "Weibull: β sets the shape, η the scale"]
+    points:
+      - ["F(t) = 1 − exp[−(t/η)^β]", "F(t) = 1 − exp[−(t/η)^β]"]
+      - ["β < 1 下降，= 1 不变，> 1 上升", "β < 1 falling, = 1 constant, > 1 rising"]
+      - ["t = η 时 F = 63.2%；MTTF = ηΓ(1+1/β)", "F = 63.2% at t = η; MTTF = ηΓ(1+1/β)"]
+    visual: {video: curves}
+    notes:
+      - "描述这三段，工程上最常用的是威布尔分布。F(t) 是运行到 t 之前坏掉的概率，对它求导再除以可靠度就是失效率。画面上 β 从 0.7 一路调到 4，看红色的失效率：β 小于 1 往下走，等于 1 是平的，大于 1 往上走。机械磨损一般 β 在 2 到 4。η 叫特征寿命，不管 β 多少，到 η 时累计故障概率都是 63.2%。"
+      - "To describe these phases engineers mostly use the Weibull distribution. F of t is the chance of failing before t; differentiate and divide by the reliability and you get the failure rate. On screen beta goes from 0.7 up to 4; watch the red failure rate: below one it falls, at one it's flat, above one it rises. Mechanical wear is usually between two and four. Eta is the characteristic life: whatever beta is, the failure probability at eta is 63.2 percent."
+
+  - layout: bignum
+    title: ["GRD-01：β = 3，η = 900 h，越用越容易坏", "GRD-01: β = 3, η = 900 h, likelier to fail with age"]
+    nums:
+      - {n: "{{ch06.F500:.1f}}%", n_en: "F(500)", label: ["到保养周期已坏过的概率", "Failure probability at the interval"]}
+      - {n: "{{ch06.F620:.1f}}%", n_en: "F(620)", label: ["现在", "Now"]}
+      - {n: "×{{ch06.h_ratio:.1f}}", n_en: "h(620) / h(300)", label: ["失效率：300 h → 620 h", "Failure rate: 300 h → 620 h"]}
+    foot: ["MTTF = 900 × Γ(4/3) = {{ch06.mttf:.0f}} h；F(800) = {{ch06.F800:.1f}}%，已经过半", "MTTF = 900 × Γ(4/3) = {{ch06.mttf:.0f}} h; F(800) = {{ch06.F800:.1f}}%, past half"]
+    notes:
+      - "磨床 β 等于 3、η 等于 900 小时，这是数字工厂里它老化用的参数。到保养周期 500 小时，累计故障概率 {{ch06.F500:.1f}}%；现在 620 小时，{{ch06.F620:.1f}}%；失效率从 300 小时到 620 小时涨了四倍多。平均寿命 {{ch06.mttf:.0f}} 小时，800 小时累计故障概率就过半了。"
+      - "The grinder has beta three and eta 900 hours, the parameters the digital factory uses to age it. At the 500-hour interval the failure probability is {{ch06.F500:.1f}} percent; now, at 620 hours, it's {{ch06.F620:.1f}}; and the failure rate has more than quadrupled between 300 and 620 hours. Mean life is {{ch06.mttf:.0f}} hours, and by 800 hours the probability is past half."
+
+  - layout: section
+    num: "02"
+    title: ["算概率，算钱", "Probability, then money"]
+
+  - layout: split
+    title: ["要的是条件概率", "What we need is a conditional probability"]
+    points:
+      - ["到现在没坏是已知的", "We already know it hasn't failed"]
+      - ["要的是：再跑 H 小时内坏掉的概率", "We need: the chance of failing within H more hours"]
+      - ["保养把时钟拨回零", "A service puts the clock back to zero"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><text x="450" y="120" font-size="44" fill="#f3f6fa" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">P(t, H) = 1 − R(t+H) / R(t)</text><text x="450" y="210" font-size="34" fill="#f2b705" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">= 1 − exp{−[((t+H)/η)^β − (t/η)^β]}</text><path d="M100 270 L800 270" stroke="#22324d" stroke-width="2"/><text x="120" y="340" font-size="32" fill="#f3f6fa">GRD-01：t = 620 h，H = 80 h</text><text x="120" y="375" font-size="22" fill="#8fa3ba" class="en">GRD-01: t = 620 h, H = 80 h</text><text x="120" y="440" font-size="30" fill="#d3deea" font-family="'DejaVu Serif',serif">(700/900)³ − (620/900)³ = 0.1436</text><text x="120" y="530" font-size="64" font-weight="800" fill="#5ee0d2" font-family="'DejaVu Sans',sans-serif">P = {{ch06.p:.1f}}%</text><text x="470" y="530" font-size="30" fill="#8fa3ba">保养后 {{ch06.p_after:.2f}}%</text><text x="470" y="565" font-size="22" fill="#8fa3ba" class="en">after service {{ch06.p_after:.2f}}%</text></svg>
+    notes:
+      - "做决定要的不是 F(620)，到现在没坏已经知道了。要的是：已经跑了 t 小时没坏，再跑 H 小时内坏掉的概率，这是条件概率，1 减 R(t+H) 比 R(t)。代入磨床：700 比 900 的立方减 620 比 900 的立方，等于 0.1436，P 等于 {{ch06.p:.1f}}%。如果现在保养，时钟拨回零，未来 80 小时只有 {{ch06.p_after:.2f}}%，小了约 {{ch06.ratio:.0f}} 倍。"
+      - "A decision doesn't need F of 620; we know it hasn't failed. We need the chance that a machine which has run t hours fails within H more. That's a conditional probability: one minus R of t plus H over R of t. For the grinder: 700 over 900 cubed minus 620 over 900 cubed is 0.1436, so P is {{ch06.p:.1f}} percent. Service it now and the clock goes back to zero: {{ch06.p_after:.2f}} percent for the next 80 hours, about {{ch06.ratio:.0f}} times smaller."
+
+  - layout: split
+    title: ["窗口往后挪，概率越来越大", "Slide the window later and the risk grows"]
+    points:
+      - ["t = 300 h：{{ch06.q_p300:.1f}}%", "t = 300 h: {{ch06.q_p300:.1f}}%"]
+      - ["t = 620 h：{{ch06.p:.1f}}%", "t = 620 h: {{ch06.p:.1f}}%"]
+      - ["t = 800 h：{{ch06.ex_p800:.1f}}%", "t = 800 h: {{ch06.ex_p800:.1f}}%"]
+    visual: {video: window}
+    notes:
+      - "画面上是虚拟实验 6-1，橙色窗口是未来 80 小时，t 从 100 小时一路往后挪。窗口宽度没变，曲线却越来越陡，窗口里的概率越来越大：300 小时时 {{ch06.q_p300:.1f}}%，620 小时 {{ch06.p:.1f}}%，800 小时 {{ch06.ex_p800:.1f}}%。这就是 β 大于 1 的意思：拖得越久，下一段越危险。"
+      - "This is Virtual lab 6-1. The orange band is the next 80 hours, and t slides from 100 hours onward. The band keeps its width, but the curve gets steeper and the probability inside grows: {{ch06.q_p300:.1f}} percent at 300 hours, {{ch06.p:.1f}} at 620, {{ch06.ex_p800:.1f}} at 800. That's what beta above one means: the longer you wait, the riskier the next stretch."
+
+  - layout: points
+    title: ["β = 1：保养没有用", "β = 1: service is useless"]
+    points:
+      - ["t 消掉了：P = 1 − e^(−H/η)", "t cancels out: P = 1 − e^(−H/η)"]
+      - ["用了 620 h 和刚保养完：都是 {{ch06.p_exp_0:.1f}}%", "Run 620 h or just serviced: both {{ch06.p_exp_0:.1f}}%"]
+      - ["偶然失效靠防护、监测、备机", "Random failures need protection, monitoring, standby"]
+    foot: ["无记忆性：芯片几乎不磨损，没人定期更换手机芯片", "Memorylessness: chips hardly wear, and nobody replaces a phone's chip on schedule"]
+    notes:
+      - "有个特例要记住。β 等于 1 时，指数里的 t 消掉了，P 只和 H 有关。用了 620 小时的设备和刚保养完的，未来 80 小时坏掉的概率一模一样，取 η 等于 804 都是 {{ch06.p_exp_0:.1f}}%。这叫无记忆性。所以偶然失效不能靠定期保养，要靠防护、状态监测或者备机。"
+      - "One special case to remember. When beta is one, t cancels in the exponent and P depends only on H. A machine that has run 620 hours and one just serviced have exactly the same chance of failing in the next 80 hours: {{ch06.p_exp_0:.1f}} percent each with eta of 804. That's memorylessness. Random failures can't be fought with scheduled service; you need protection, condition monitoring or a standby."
+
+  - layout: bignum
+    title: ["预期损失 = 概率 × 一次的损失", "Expected loss = probability × loss per failure"]
+    nums:
+      - {n: "${{ch06.Cf:,.0f}}", n_en: "C_f", label: ["一次故障：修理 $1,200 + 停 8 h × $200", "One failure: $1,200 + 8 h × $200"]}
+      - {n: "{{ch06.p:.1f}}%", n_en: "P(620, 80)", label: ["未来 80 h 坏掉的概率", "Chance of failing in 80 h"]}
+      - {n: "${{ch06.EL:.0f}}", n_en: "P × C_f", label: ["不保养的预期损失", "Expected loss without service"]}
+    foot: ["期望值不是会花的钱：{{ch06.p_ok:.1f}}% 的时候什么也不发生，少数时候一下赔 $2,800", "An expectation, not money spent: {{ch06.p_ok:.1f}}% of the time nothing happens; sometimes you lose $2,800 at once"]
+    notes:
+      - "把概率变成钱。磨床坏一次，修理 1200，停 8 小时，它是瓶颈，每小时少挣 200，合计 2800 美元。不保养的预期损失就是 {{ch06.p:.1f}}% 乘 2800，约 {{ch06.EL:.0f}} 美元。注意这是期望值，不是一定会花的钱：大多数时候什么也不发生，少数时候一下赔 2800。一次故障如果会让关键客户违约，就要把违约损失也算进去。"
+      - "Now turn probability into money. One failure of the grinder: a 1,200 repair plus 8 hours stopped at 200 an hour on the bottleneck, 2,800 dollars in all. The expected loss without service is {{ch06.p:.1f}} percent of 2,800, about {{ch06.EL:.0f}} dollars. Mind you, that's an expectation, not money you'll certainly spend: most of the time nothing happens, sometimes you lose 2,800 at once. If one failure would make you miss a key customer's delivery, add that penalty too."
+
+  - layout: tiles
+    title: ["厂情中枢的三个方案", "The hub's three options"]
+    tiles:
+      - {k: "A", name: ["不做（对照）", "Do nothing"], use: ["预期 ${{ch06.opt_none:.0f}}；坏了停 8 h，急单可能晚交", "${{ch06.opt_none:.0f}} expected; a failure stops it 8 h and may delay the rush order"]}
+      - {k: "B", name: ["现在保养", "Service now"], use: ["$215 + 瓶颈停 3 h 少挣 $600 ≈ ${{ch06.opt_now:.0f}}", "$215 + $600 lost on the bottleneck ≈ ${{ch06.opt_now:.0f}}"]}
+      - {k: "C", hot: true, name: ["下班后保养", "After the shift"], use: ["$215 + 先跑 4 h 的风险 ≈ ${{ch06.opt_later:.0f}}，最划算", "$215 + 4 h of risk ≈ ${{ch06.opt_later:.0f}}, cheapest"]}
+    notes:
+      - "厂情中枢给三个方案。A 不做，预期 {{ch06.opt_none:.0f}} 美元，一旦坏了停 8 小时，急单可能晚交。B 现在保养，215 再加瓶颈停 3 小时少挣 600，约 {{ch06.opt_now:.0f}}。C 下班后保养，先再跑 4 小时，这段时间坏掉的概率只有 {{ch06.p_delay:.2f}}%，合计约 {{ch06.opt_later:.0f}}。C 最划算：风险几乎降到零，又不占瓶颈的生产时间。车间主任和设备员各对了一半。"
+      - "The factory hub offers three options. A, do nothing: {{ch06.opt_none:.0f}} dollars expected, and a failure stops it for 8 hours and may delay the rush order. B, service now: 215 plus 600 of margin lost while the bottleneck stops for 3 hours, about {{ch06.opt_now:.0f}}. C, service after the shift: it runs 4 more hours with only a {{ch06.p_delay:.2f}} percent chance of failing, about {{ch06.opt_later:.0f}} in all. C is cheapest: risk nearly zero, and no production time lost on the bottleneck. The supervisor and the planner were each half right."
+
+  - layout: lab
+    title: ["虚拟实验 6-1：威布尔可靠性", "Lab 6-1: Weibull reliability"]
+    shot: {page: weibull}
+    tasks:
+      - ["选 GRD-01，核对 P 和预期损失", "Choose GRD-01; check P and the expected loss"]
+      - ["拖 t、点“现在保养”，P 降多少倍", "Drag t, press 'Service now': by how much does P drop?"]
+      - ["β = 1 对照；周期 300 / 800 h 各播一次", "β = 1 check; play with 300 h and 800 h intervals"]
+    notes:
+      - "现在大家自己做虚拟实验 6-1。先点 GRD-01，读出 t 等于 620、H 等于 80 时的概率和预期损失，跟刚才的手算核对。再把 t 从 0 拖到 1600，看概率怎么变；点现在保养，概率降到多少，算算降了多少倍。然后点 β 等于 1 对照，再拖 t，概率还变不变？最后播放，数一数保养了几次、坏了几次，把周期改成 300、800 小时再各播一次，比较。"
+      - "Now try Virtual lab 6-1 yourselves. Press GRD-01 and read the probability and expected loss at t of 620 and H of 80; check them against our hand calculation. Then drag t from 0 to 1600 and watch the probability; press Service now and work out how many times smaller it gets. Then press the beta-equals-one check and drag t again: does the probability still change? Finally press Play, count services and failures, and repeat with intervals of 300 and 800 hours."
+
+  - layout: section
+    num: "03"
+    title: ["保养周期怎样定", "Choosing the interval"]
+
+  - layout: split
+    title: ["按龄保养：长期每小时花多少", "Age-based maintenance: long-run cost per hour"]
+    points:
+      - ["到 T 小时保养；之前坏了就修好重新计时", "Service at T; if it fails first, repair and restart"]
+      - ["分子：一个周期的期望花费", "Numerator: expected cost of a cycle"]
+      - ["分母：一个周期的平均长度", "Denominator: mean length of a cycle"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><text x="450" y="150" font-size="38" fill="#f3f6fa" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">C(T) = [Cₚ·R(T) + C_f·F(T)] / ∫₀ᵀ R dt</text><path d="M100 230 L800 230" stroke="#22324d" stroke-width="2"/><text x="120" y="310" font-size="32" fill="#f2b705">太短：保养费占大头</text><text x="120" y="345" font-size="22" fill="#8fa3ba" class="en">too short: service costs dominate</text><text x="120" y="420" font-size="32" fill="#ff7a45">太长：故障损失占大头</text><text x="120" y="455" font-size="22" fill="#8fa3ba" class="en">too long: failures dominate</text><text x="120" y="540" font-size="32" fill="#5ee0d2">T → ∞：坏了再修 C_f / MTTF = ${{ch06.r_run:.2f}}/h</text><text x="120" y="575" font-size="22" fill="#8fa3ba" class="en">T → ∞: run to failure, C_f / MTTF = ${{ch06.r_run:.2f}}/h</text></svg>
+    notes:
+      - "再往前一步：规矩怎么定，周期取多少？常用的策略叫按龄保养：跑到 T 小时就保养，之前坏了就修好重新计时。一个周期里，以概率 R(T) 撑到 T、花保养费，以概率 F(T) 中途坏掉、花故障损失，这是分子；周期的平均长度是 R 从 0 到 T 的积分，这是分母。两者一除，就是长期每运行小时的平均花费。T 趋于无穷就是坏了再修，磨床每小时 {{ch06.r_run:.2f}} 美元。"
+      - "One step further: what should the rule be? A common policy is age-based maintenance: service at T hours, and if it fails first, repair it and restart the clock. In a cycle, with probability R of T it reaches T and you pay for a service; with probability F of T it fails and you pay for a failure. That's the numerator. The mean cycle length, the integral of R from zero to T, is the denominator. Divide and you get the long-run cost per operating hour. As T goes to infinity it's run to failure: {{ch06.r_run:.2f}} dollars an hour for the grinder."
+
+  - layout: split
+    title: ["最优周期取决于保养有多贵", "The optimum depends on how dear a service is"]
+    points:
+      - ["下班后保养：T* = {{ch06.T_opt}} h，${{ch06.r_opt:.2f}}/h", "After the shift: T* = {{ch06.T_opt}} h, ${{ch06.r_opt:.2f}}/h"]
+      - ["生产时间停机：T* = {{ch06.T_opt2}} h，${{ch06.r_opt2:.2f}}/h", "Stopping production: T* = {{ch06.T_opt2}} h, ${{ch06.r_opt2:.2f}}/h"]
+      - ["改做法比调参数更值钱", "Changing how you work beats tuning a number"]
+    visual: {video: cost}
+    notes:
+      - "这是虚拟实验 6-2，T 在来回扫。先看下班后保养，每次只花 215，最优周期 {{ch06.T_opt}} 小时，每小时 {{ch06.r_opt:.2f}} 美元，比坏了再修省七成；现行 500 小时是 {{ch06.r_500:.2f}}，偏长。再切到生产时间里停机保养，每次再加少挣的 600，保养变贵，最优周期后移到 {{ch06.T_opt2}} 小时，现行 500 小时几乎就是最优。保养越便宜越该勤；把保养挪到下班后，比调周期省得多。"
+      - "This is Virtual lab 6-2 with T sweeping back and forth. First, servicing after the shift at 215 a time: the optimum is {{ch06.T_opt}} hours at {{ch06.r_opt:.2f}} dollars an hour, seventy percent below run to failure; the current 500 hours costs {{ch06.r_500:.2f}}, too long. Now switch to stopping production, 600 more of lost margin each time: service is dearer and the optimum moves out to {{ch06.T_opt2}} hours, so 500 is practically optimal. The cheaper the service, the more often; and moving it out of production time saves far more than tuning the interval."
+
+  - layout: split
+    title: ["两台同样的设备比一比", "Race two identical machines"]
+    points:
+      - ["同一串随机寿命，只有策略不同", "Same random lifetimes, different policies"]
+      - ["按周期保养：坏得少，长期更省", "Serviced every T: fewer failures, cheaper overall"]
+      - ["跑得越久，平均越接近 C(T)", "The longer the run, the closer to C(T)"]
+    visual: {video: race}
+    notes:
+      - "画面上两台同样的设备用同一串随机寿命跑两万小时：蓝线按周期保养，红线坏了再修。刚开始两条线差不多，有时红线还更低，因为运气好没坏；跑得越久，差距越清楚，两条线的斜率分别接近 C(T) 和坏了再修的 {{ch06.r_run:.2f}}。判断策略要看长期平均，不能看一两次的运气。"
+      - "On screen two identical machines run 20,000 hours on the same random lifetimes: blue is serviced every T hours, red runs to failure. At first the lines are close, and red may even be lower when it's lucky; the longer they run, the clearer the gap, and their slopes approach C of T and the run-to-failure {{ch06.r_run:.2f}}. Judge a policy by its long-run average, not by one or two lucky runs."
+
+  - layout: lab
+    title: ["虚拟实验 6-2：保养周期怎样定", "Lab 6-2: choosing the service interval"]
+    shot: {page: pmopt}
+    tasks:
+      - ["读 T*、C(T*)、C(500)，与教材核对", "Read T*, C(T*), C(500); check against the book"]
+      - ["改 C_p：T* 怎样跟着移", "Change C_p: how does T* move?"]
+      - ["β = 1 对照；播放比赛到 20000 h", "β = 1 check; play the race to 20,000 h"]
+    notes:
+      - "做虚拟实验 6-2。先点下班后保养，读出最优周期、最优花费和现行 500 小时的花费，跟教材核对。再把保养费改成 100、400、1500，看最优周期怎么移，画一条趋势线。点 β 等于 1 对照，看曲线还有没有最低点。最后把 T 放在最优点附近，播放比赛到两万小时，两台设备的平均每小时花费跟曲线对一对。"
+      - "Now Virtual lab 6-2. Press service after shift and read the optimal interval, its cost and the cost at the current 500 hours; check them against the book. Then set the service cost to 100, 400 and 1,500 and see how the optimum moves; sketch the trend. Press the beta-equals-one check: is there still a minimum? Finally set T near the optimum, play the race to 20,000 hours and compare both machines' hourly costs with the curve."
+
+  - layout: section
+    num: "04"
+    title: ["检验与执行", "Checking and doing"]
+
+  - layout: points
+    title: ["用故障记录检验：MTBF", "Checking with failure records: MTBF"]
+    points:
+      - ["MTBF ≈ 运行小时 ÷ 故障次数：30 × 16 ÷ 3 = {{ch06.mtbf:.0f}} h", "MTBF ≈ hours ÷ failures: 30 × 16 ÷ 3 = {{ch06.mtbf:.0f}} h"]
+      - ["记录多了拟合 β、η，再重算周期", "With more records, fit β and η and recompute"]
+      - ["分清概率和这一次的结果", "Keep probability and a single outcome apart"]
+    foot: ["13% 的风险：十台磨床里一两台会坏；没坏不证明不保养是对的", "A 13% risk: one or two grinders in ten will fail; not failing doesn't prove skipping was right"]
+    notes:
+      - "β 和 η 从哪里来？从故障记录来。最简单的是平均故障间隔 MTBF：近 30 天、每天 16 运行小时、坏了 3 次，就是 {{ch06.mtbf:.0f}} 小时。它只是平均数，看不出失效率升还是降；记录多了，用每次故障时自上次保养以来的小时数拟合威布尔分布，再回头重算周期。还要分清概率和这一次的结果：13% 的风险，十个同学的磨床里一两台会坏。没坏不证明不保养是对的。"
+      - "Where do beta and eta come from? From failure records. The simplest measure is MTBF: 30 days at 16 hours with 3 failures gives {{ch06.mtbf:.0f}} hours. It's only an average and can't show whether the rate is rising; with more records, fit a Weibull to the hours since last service at each failure and recompute the interval. And keep probability apart from one outcome: with a 13 percent risk, one or two of ten students' grinders will fail. Not failing doesn't prove skipping the service was right."
+
+  - layout: chain
+    title: ["在数字工厂里做：实验 18", "In the digital factory: Lab 18"]
+    steps:
+      - ["读台账", "Read the asset"]
+      - ["手算 P", "Calculate P"]
+      - ["比较方案", "Compare options"]
+      - ["提交选择", "Submit choice"]
+      - ["保养工单", "Service order"]
+      - ["挂牌上锁", "Lockout"]
+      - ["验收解锁", "Accept, unlock"]
+      - ["对比与 MTBF", "Compare, MTBF"]
+    hot: [2, 3]
+    mark: ["比对模式", "comparison mode"]
+    foot: ["比对模式：提交前看不到中枢的推荐。13 台设备都按本讲的模型老化；成绩 = 平台 60 分 + 报告 40 分", "Comparison mode hides the hub's advice until you submit. All 13 machines age by this model; mark = 60 platform + 40 report"]
+    notes:
+      - "最后到数字工厂里亲手做一次。车间里 13 台设备每台都有自己的威布尔参数，就是我们用的这个模型，设备真会按这个概率坏。实验 18：读台账，手算概率和预期损失，平台核对；在指挥台比较三个方案、选一个写理由提交，提交之前看不到中枢的推荐；然后发起保养工单、老师批准，挂牌上锁、保养、验收解锁，ERPNext 里多一条保养记录；最后车间继续跑，对比保养过和没保养的设备各坏了几次，估 MTBF。"
+      - "Finally, do it yourself in the digital factory. Each of its 13 machines has its own Weibull parameters, the model we've used, and they really fail with those probabilities. In Lab 18 you read the asset register, calculate the probability and expected loss, and the platform checks it. In the command centre you compare the three options, choose one and submit your reasons; the hub's recommendation stays hidden until you do. Then you raise the service order, the instructor approves it, and you go through lockout, service and acceptance, leaving a service record in ERPNext. Finally the shop keeps running: count failures on serviced and unserviced machines and estimate MTBF."
+
+  - layout: split
+    title: ["机器人联系：关节减速器的换脂", "Robot link: regreasing joint reducers"]
+    points:
+      - ["润滑老化、齿面磨损：β > 1", "Ageing grease, wearing teeth: β > 1"]
+      - ["已运行 14000 h 再跑 2000 h：{{ch06.rob_p:.1f}}%；刚换脂 {{ch06.rob_p0:.1f}}%", "After 14,000 h, next 2,000 h: {{ch06.rob_p:.1f}}%; freshly greased {{ch06.rob_p0:.1f}}%"]
+      - ["读电机电流看摩擦：按状态保养", "Read motor current for friction: condition-based service"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><g transform="translate(120 90)"><rect x="0" y="380" width="200" height="40" rx="10" fill="#22324d"/><rect x="70" y="250" width="60" height="140" rx="12" fill="#4b5f7d"/><circle cx="100" cy="240" r="46" fill="#111d31" stroke="#f2b705" stroke-width="8"/><path d="M100 240 L330 110" stroke="#4b5f7d" stroke-width="40" stroke-linecap="round"/><circle cx="330" cy="110" r="40" fill="#111d31" stroke="#f2b705" stroke-width="8"/><path d="M330 110 L520 210" stroke="#4b5f7d" stroke-width="30" stroke-linecap="round"/><circle cx="520" cy="210" r="22" fill="#2ec4b6"/><text x="100" y="250" font-size="22" fill="#f2b705" text-anchor="middle" font-weight="700">WQR</text><text x="330" y="120" font-size="22" fill="#f2b705" text-anchor="middle" font-weight="700">WQR</text></g><path d="M120 560 C300 555 420 548 520 530 S700 470 800 400" stroke="#ff7a45" stroke-width="5" fill="none"/><text x="120" y="600" font-size="26" fill="#d3deea">关节电流里的摩擦力矩慢慢变大 = 减速器在磨损</text><text x="120" y="630" font-size="20" fill="#8fa3ba" class="en">friction torque creeping up in the joint current = the reducer is wearing</text></svg>
+    notes:
+      - "协作机器人每个关节里都有一台精密减速器，润滑脂会老化，轴承和齿面会磨损，是典型的 β 大于 1。设 β 等于 2.5、η 等于两万小时，这是示意值：已经跑了一万四千小时的关节，再跑两千小时坏掉的概率 {{ch06.rob_p:.1f}}%，刚换过脂的只有 {{ch06.rob_p0:.1f}}%，所以厂家按运行小时规定换脂。再进一步，控制器能读关节电机电流，摩擦力矩慢慢变大就是减速器在磨损，按状态保养更省。我们厂造的 WQR-105 正是装在这些关节里的减速器。"
+      - "Every joint of a collaborative robot has a precision reducer whose grease ages and whose bearings and teeth wear: a classic beta above one. Take beta 2.5 and eta 20,000 hours, illustrative values. A joint that has run 14,000 hours has a {{ch06.rob_p:.1f}} percent chance of failing in the next 2,000; a freshly greased one, only {{ch06.rob_p0:.1f}}. That's why makers specify regreasing by hours. Better still, the controller can read each joint motor's current; friction creeping up means the reducer is wearing, and servicing on condition is cheaper. The WQR-105 reducers our plant makes go into exactly these joints."
+
+  - layout: points
+    title: ["生活例子：多久换一次机油", "Everyday example: how often to change the oil"]
+    points:
+      - ["说明书：每 5000 公里换一次", "The manual: every 5,000 km"]
+      - ["拖到 8000 公里多半没事", "Stretching to 8,000 km is usually fine"]
+      - ["发动机坏一次，够换几十次油", "One engine failure costs dozens of oil changes"]
+    foot: ["比的就是“概率 × 损失”和“确定的小花费”", "It's probability × loss against a small, certain cost"]
+    notes:
+      - "生活里的例子：汽车换机油。说明书写每 5000 公里换一次，拖到 8000 公里多半也没事，可发动机坏一次的钱够换几十次油。什么时候换油，比的就是概率乘损失和确定的小花费，跟今天的磨床是同一道题。"
+      - "An everyday example: changing a car's oil. The manual says every 5,000 kilometres; stretching it to 8,000 is usually fine, but one engine failure costs as much as dozens of oil changes. When to change it is probability times loss against a small, certain cost: the same problem as today's grinder."
+
+  - layout: answer
+    tag: ["回到厂里的事", "Back to the problem"]
+    title: ["今天下班后保养；周期值得重定", "Service it after today's shift; revisit the interval"]
+    rows:
+      - [["未来 80 h 坏掉的概率", "Chance of failing in the next 80 h"], "{{ch06.p:.1f}}%"]
+      - [["不保养的预期损失", "Expected loss without service"], "${{ch06.EL:.0f}}"]
+      - [["下班后保养（预期合计）", "Service after the shift (expected total)"], "${{ch06.opt_later:.0f}}"]
+      - [["下班后保养的最优周期", "Optimal interval, after-shift service"], "{{ch06.T_opt}} h"]
+    side: {big: "÷{{ch06.ratio:.0f}}", text: ["保养后风险降到 {{ch06.p_after:.2f}}%", "Risk after service: {{ch06.p_after:.2f}}%"]}
+    foot: ["改周期要厂长批准：台账“详情”底部提交，ERPNext 维护计划跟着改", "Changing the interval needs the plant manager: submit it under the asset's Details; the ERPNext schedule follows"]
+    notes:
+      - "回到开头。磨床未来 80 小时坏掉的概率 {{ch06.p:.1f}}%，不保养的预期损失 {{ch06.EL:.0f}} 美元。三个方案里下班后保养最划算，预期合计约 {{ch06.opt_later:.0f}}，急单不受影响，风险降到 {{ch06.p_after:.2f}}%。另外，保养如果都放在下班后做，最优周期约 {{ch06.T_opt}} 小时，现行 500 小时偏长。改周期要厂长批准，在台账详情底部提交，ERPNext 的维护计划跟着改。"
+      - "Back to the start. The grinder has a {{ch06.p:.1f}} percent chance of failing in the next 80 hours, an expected loss of {{ch06.EL:.0f}} dollars without service. Of the three options, servicing after the shift is cheapest, about {{ch06.opt_later:.0f}} expected: the rush order is untouched and the risk drops to {{ch06.p_after:.2f}} percent. And if services are always done after the shift, the optimal interval is about {{ch06.T_opt}} hours; the current 500 is too long. Changing it needs the plant manager's approval: submit it under the asset's details and the ERPNext maintenance schedule follows."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["保养只对磨损段（β > 1）有用；β = 1 无记忆", "Service helps only in wear-out (β > 1); β = 1 is memoryless"]
+      - ["决策用条件概率 P(t, H)，预期损失 = P × C_f", "Decide with P(t, H); expected loss = P × C_f"]
+      - ["C(T) 求最优周期；把保养挪出生产时间更省", "C(T) gives the interval; moving service out of production saves more"]
+    after: ["作业 6 · 测验 6 · 数字工厂实验 18 报告 —— 在问渠学习平台完成", "Assignment 6 · Quiz 6 · Lab 18 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，保养只对磨损有用，β 大于 1 才值得定期保养；β 等于 1 时坏不坏和用了多久无关。第二，做决定用条件概率：已经跑了 t 小时，再跑 H 小时坏掉的概率，乘一次故障的损失，就是预期损失，再跟保养花费和交期一起比。第三，周期用 C(T) 来定，保养越便宜越该勤，把保养挪出生产时间往往比调周期更省。下课后做作业 6、测验 6，完成数字工厂实验 18 的报告。"
+      - "Three things to remember. One: service only helps against wear; scheduled service pays only when beta is above one, and with beta of one failure doesn't depend on age. Two: decide with the conditional probability, the chance that a machine which has run t hours fails in the next H, times the loss per failure; that's the expected loss, to be weighed with the service cost and delivery. Three: set the interval with C of T; the cheaper the service, the more often, and moving it out of production time often saves more than tuning the interval. After class: Assignment 6, Quiz 6 and the Lab 18 report."
