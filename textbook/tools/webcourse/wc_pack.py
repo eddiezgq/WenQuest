@@ -813,11 +813,11 @@ def lecture_videos(no: int, title) -> list[dict]:
     if bv:
         url = bv if bv.startswith("http") else f"https://www.bilibili.com/video/{bv}"
         out.append({"type": "url", "lang": "zh", "url": url, "visible": 1,
-                    "name": pair(f"讲课视频：第 {no} 讲 {title[0]}（中文）", f"Lecture video: Lesson {no} {title[1]} (Chinese)")})
+                    "name": pair(f"讲课视频：第 {no} 讲 {title[0]}（B 站）", f"Lecture video: Lesson {no} {title[1]} (Bilibili)")})
     if yt:
         url = yt if yt.startswith("http") else f"https://www.youtube.com/watch?v={yt}"
         out.append({"type": "url", "lang": "en", "url": url, "visible": 1,
-                    "name": pair(f"讲课视频：第 {no} 讲 {title[0]}（英文）", f"Lecture video: Lesson {no} {title[1]} (English)")})
+                    "name": pair(f"讲课视频：第 {no} 讲 {title[0]}（YouTube）", f"Lecture video: Lesson {no} {title[1]} (YouTube)")})
     return out
 
 
