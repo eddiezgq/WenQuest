@@ -159,7 +159,7 @@
    ],
    "points": [
     [
-     "胜家（1851 年）：直针上下运动，悬臂结构，布平放在台面上被压住、连续送进，可缝长缝和曲线。",
+     "辛格（1851 年）：直针上下运动，悬臂结构，布平放在台面上被压住、连续送进，可缝长缝和曲线。",
      "Singer (1851): a straight needle moving up and down in an overhanging arm; the cloth lies flat, held down and fed continuously, so long seams and curves are possible."
     ],
     [
@@ -178,7 +178,7 @@
    "formula": "",
    "figure": "fig_1_timeline.png",
    "narration": [
-    "第三个想法来自胜家：针改成上下运动的直针，装在伸到台面上方的悬臂里，布平放在台面上，被压板压住、连续向前送。布不再受板长限制，可以缝长缝，也可以边缝边转布缝曲线。今天的平缝机外形还是这个格局。第四个想法是威尔逊的：用连续旋转的钩子代替往复梭子，没有加速、减速、换向的冲击，这就是高速旋梭的原理；他还发明了升、进、降、退四动作送布。第五个想法是吉布斯的旋转钩单线链式，后来发展成链缝、包缝和绷缝。",
+    "第三个想法来自辛格：针改成上下运动的直针，装在伸到台面上方的悬臂里，布平放在台面上，被压板压住、连续向前送。布不再受板长限制，可以缝长缝，也可以边缝边转布缝曲线。今天的平缝机外形还是这个格局。第四个想法是威尔逊的：用连续旋转的钩子代替往复梭子，没有加速、减速、换向的冲击，这就是高速旋梭的原理；他还发明了升、进、降、退四动作送布。第五个想法是吉布斯的旋转钩单线链式，后来发展成链缝、包缝和绷缝。",
     "The third idea is Singer's: a straight needle moving up and down, carried in an arm reaching over the table, with the cloth lying flat, held down and fed forward continuously. The cloth is no longer limited by a plate, so long seams and curves are possible, and today's lockstitch machine still has this layout. The fourth idea is Wilson's: a continuously rotating hook instead of a reciprocating shuttle, with no speeding up, slowing down and reversing, which is the principle of the high-speed rotary hook; he also invented the four-motion feed. The fifth is Gibbs's rotary-hook chainstitch, which grew into chainstitch, overlock and coverstitch machines."
    ]
   },
@@ -193,7 +193,7 @@
      "The patents overlapped, anyone building a machine risked infringement, and lawsuits followed: the “sewing-machine war”."
     ],
     [
-     "1856 年，豪、胜家和两家制造商把九项专利合成“专利池”统一许可，一直运作到 1877 年。",
+     "1856 年，豪、辛格和两家制造商把九项专利合成“专利池”统一许可，一直运作到 1877 年。",
      "In 1856 Howe, Singer and two manufacturers pooled nine patents and licensed them together; the pool ran until 1877."
     ],
     [
@@ -208,7 +208,7 @@
    "formula": "",
    "figure": "",
    "narration": [
-    "这五个想法出自不同的人，专利互相交叉。你要造一台好用的缝纫机，针、钩、送布可能分别踩到三个人的专利，于是官司打个不停，史称缝纫机战争。1856 年，豪、胜家和两家制造商把九项专利放进一个专利池统一对外许可，每台机器的许可费一下子降了下来，缝纫机这才大量生产、进入家庭和工厂。这个专利池一直运作到 1877 年最后一项专利到期，前后二十一年。对工程师来说，这段历史提醒我们：机器是机构的组合，知识产权也是设计的一部分。",
+    "这五个想法出自不同的人，专利互相交叉。你要造一台好用的缝纫机，针、钩、送布可能分别踩到三个人的专利，于是官司打个不停，史称缝纫机战争。1856 年，豪、辛格和两家制造商把九项专利放进一个专利池统一对外许可，每台机器的许可费一下子降了下来，缝纫机这才大量生产、进入家庭和工厂。这个专利池一直运作到 1877 年最后一项专利到期，前后二十一年。对工程师来说，这段历史提醒我们：机器是机构的组合，知识产权也是设计的一部分。",
     "These five ideas came from different people and their patents overlapped. To build a usable machine, your needle, hook and feed might infringe three different people's patents, so the lawsuits never stopped: the sewing-machine war. In 1856 Howe, Singer and two manufacturers put nine patents into a pool and licensed them together. The fee per machine dropped sharply, and only then did sewing machines go into mass production and into homes and factories. The pool lasted until the last patent expired in 1877, twenty-one years in all. For engineers the lesson is that a machine is a combination of mechanisms, and intellectual property is part of design."
    ]
   },
@@ -613,7 +613,7 @@
     "Observation. Examine a T-shirt and a pair of jeans, find where class 300, 400, 500 and 600 stitches are used, photograph and label them, and explain why each place uses that class."
    ],
    [
-    "分析题。四动作送布中，送布牙为什么必须先降到针板以下再退回原位？如果不降就退，会发生什么？豪的机器为什么只能缝直线，胜家做了哪几处改变？",
+    "分析题。四动作送布中，送布牙为什么必须先降到针板以下再退回原位？如果不降就退，会发生什么？豪的机器为什么只能缝直线，辛格做了哪几处改变？",
     "Analysis. In the four-motion feed, why must the feed dog drop below the throat plate before it returns? What happens if it returns without dropping? Why could Howe's machine sew only straight seams, and what did Singer change?"
    ],
    [
@@ -735,14 +735,14 @@
     }
    ],
    "feedback": [
-    "豪已经得到了锁式线迹，问题出在送布：布挂在一块板上，行程受板长限制。胜家改成布平放、连续送进，才能缝长缝和曲线。",
+    "豪已经得到了锁式线迹，问题出在送布：布挂在一块板上，行程受板长限制。辛格改成布平放、连续送进，才能缝长缝和曲线。",
     "Howe already had the lockstitch; the problem was feeding: the cloth hung on a plate whose travel was limited. Singer laid the cloth flat and fed it continuously, allowing long seams and curves."
    ]
   },
   {
    "type": "multiple",
    "text": [
-    "胜家 1851 年的机器做了哪些改变？（选出所有正确项）",
+    "辛格 1851 年的机器做了哪些改变？（选出所有正确项）",
     "Which changes did Singer's 1851 machine make? (Select all that apply)"
    ],
    "answers": [
@@ -776,7 +776,7 @@
     }
    ],
    "feedback": [
-    "直针、悬臂、平放与连续送布是胜家的改变；旋转钩和四动作送布是威尔逊的专利。",
+    "直针、悬臂、平放与连续送布是辛格的改变；旋转钩和四动作送布是威尔逊的专利。",
     "The straight needle, overhanging arm and flat continuous feed were Singer's; the rotary hook and four-motion feed were Wilson's patents."
    ]
   },

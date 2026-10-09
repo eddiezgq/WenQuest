@@ -1,0 +1,130 @@
+# 《缝纫机设计与制造》公开课 第 1 讲：缝制设备与服装产业
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch01.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：动画 1-1 录屏、平台学习方式页（第 23 轮 3.4：本讲不硬凑数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch01.py 算出（{{ch01.键:格式}}）。
+book: sewing
+section: "1"
+deck: ch01
+skip: []
+code: [ch01]
+title: ["缝制设备与服装产业", "Sewing Equipment and the Apparel Industry"]
+chapter: ["第一篇 绪论 · 第 1 章", "Part I Introduction · Chapter 1"]
+next: ["第 2 讲 线迹的形成", "Lecture 2 How a stitch is formed"]
+cover_formula: 'F = m\,a \;\propto\; n^{2}'
+tags:
+  zh: [缝纫机, 缝制设备, 锁式线迹, 链式线迹, 服装产业, 惯性力]
+  en: [sewing machine, lockstitch, chainstitch, apparel industry, inertia force, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第一讲，缝制设备与服装产业。
+    - 这门课从一针线迹讲起，一直讲到一座数字化的服装工厂。
+    - 今天先看缝纫机是怎么来的、怎样一步步变成今天的样子，以及它在服装产业里处在什么位置。
+  en:
+    - Hi everyone, and welcome to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 1, sewing equipment and the apparel industry.
+    - The course starts from a single stitch and ends in a digital garment factory.
+    - Today we look at where the sewing machine came from, how it became what it is today, and where it sits in the apparel industry.
+
+after:
+  - id: lab11
+    kind: lab
+    lab: stitch
+    part: ["动画实验", "Animation lab"]
+    steps:
+      - js: "['m-th','msg'].forEach(i => document.getElementById(i).style.filter = 'blur(7px)'); document.querySelector('table').style.filter = 'blur(7px)'"
+        set: {spd: 0.8}
+      - js: "document.querySelector('[data-m=chain]').click()"
+      - js: "document.getElementById('pull').click()"
+      - js: "document.querySelector('[data-m=lock]').click()"
+      - js: "document.getElementById('pull').click()"
+    say:
+      zh:
+        - ">下面是本讲的动画 1-1，手缝与机缝，在问渠学习平台上可以亲手操作。右边的读数和比较表这里先遮住，留给你自己读、自己填。"
+        - 先看手缝：针眼在尾部，整根针连同线穿过两层布。点暂停、再单步，对照“现在发生什么”，记下手缝一针的每个动作。
+        - ">切到单线链式 101，单步走完一针：刺布、钩住线环、送布，再穿过上一个线环。读出已缝针数和每针穿过布层的线长，和手缝比一比。"
+        - ">缝几针以后点“拉线头”，看看会发生什么，把提示信息记进记录表。"
+        - ">再切到双线锁式 301，单步看刺布、钩线、绕梭、收紧和送布。"
+        - ">同样拉一拉线头，看它散不散，想一想为什么。"
+        - 记录表和三道思考题都在指导书里，做完把报告交到平台上。
+      en:
+        - ">Now Animation 1-1, hand sewing and machine sewing. You can work it yourself on the WenQuest platform. The readouts and the comparison table on the right are blurred here. Read them yourself when you work the lab."
+        - First, hand sewing. The eye is at the tail, so the whole needle and thread pass through both layers. Pause, then step, and use the panel on the right to note every action in one hand stitch.
+        - ">Switch to single-thread chainstitch 101 and step through one stitch: pierce, catch the loop, feed, and pass through the last loop. Read the stitch count and the thread length through the fabric per stitch, and compare with hand sewing."
+        - ">After a few stitches, press Pull thread end. Watch what happens, and write the message into your record table."
+        - ">Now switch to two-thread lockstitch 301, and step through piercing, catching, going round the bobbin, tightening and feeding."
+        - ">Pull the thread end here too. Does it come apart? Think about why."
+        - The record table and three questions are in the lab guide. Hand in your report on the platform when you're done.
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这门课", "Taking this course on WenQuest"]
+      points:
+        - ["每讲有互动课件、动画和实验，很多讲有三维样机", "Interactive slides, animations and labs; many with a 3D prototype"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样，可以自己动手。", "The slides, animations and labs are the same as in this video, and you can work them yourself."]
+    say:
+      zh:
+        - 这门课一共三十一讲，都在问渠学习平台上。
+        - ">每一讲有一套互动课件，像今天这样一页一页翻，里面的动画和虚拟实验都可以自己动手操作，很多讲还有可以转着看的三维样机。"
+        - ">每讲的作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，自己的每项作业、测验得分在成绩页一目了然。"
+      en:
+        - The course has thirty-one lectures, all on the WenQuest learning platform.
+        - ">Each lecture has a set of interactive slides that you page through just like today, and you can work the animations and virtual labs inside them yourself. Many lectures also have a 3D prototype you can turn around."
+        - ">You submit each assignment and lab report on the platform, and you get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 1：从一针到一个产业", "Assignment 1: from one stitch to an industry"]
+      points:
+        - ["计算：三种转速下的惯性力和增幅", "Compute: the inertia force at three speeds, and the rise"]
+        - ["观察：T 恤和牛仔裤上的 300—600 类线迹", "Observe: class 300–600 stitches on a T-shirt and jeans"]
+        - ["分析送布牙先降后退；测算出口占比和单价", "Analyse the feed-dog drop; estimate export share and unit value"]
+      foot: ["另交动画 1-1 的实验报告。作业和报告都在问渠学习平台提交。", "Plus the report for Animation 1-1. Submit both on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题是计算：每分钟 3000、4500、6000 针时惯性力各是多少，从 5000 提到 6000 增大百分之几，再说明为什么和转速的平方成正比。"
+        - ">第二题是观察：翻看一件 T 恤和一条牛仔裤，找出 300 到 600 类线迹各在哪里，拍照标注，说明为什么那里用那一类。"
+        - ">第三题分析四动作送布，送布牙为什么必须先降下去再退回来；第四题做一个产业测算，算出口占产量的比例和每台平均出口额。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One, calculation. Find the inertia force at 3000, 4500 and 6000 stitches a minute, the percentage rise from 5000 to 6000, and explain why it goes with speed squared."
+        - ">Two, observation. Look at a T-shirt and a pair of jeans, find where the class 300 to 600 stitches are, photograph and label them, and say why each place uses that class."
+        - ">Three, four-motion feed: why must the feed dog drop before it goes back? And four, an industry estimate: the export share of output and the average export value per machine."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["手缝难以机械化，根本原因是什么？", "Why is hand sewing so hard to mechanise?"]
+        - ["T 恤下摆正面两道线、反面网状：哪类线迹？", "A T-shirt hem, two lines on top, a net below: which class?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：手缝难以直接机械化，最根本的原因是什么？"
+        - ">一件 T 恤的下摆，正面两道平行直线、反面一片网状线，这是哪一类线迹，用什么机器缝？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, what is the fundamental reason hand sewing is hard to mechanise directly?"
+        - ">A T-shirt hem has two parallel lines on top and a net of thread underneath. Which class of stitch is it, and what machine sews it?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、动画、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们看一针线迹到底是怎样形成的，机针、旋梭、挑线杆怎样配合。我们下一讲见。
+  en:
+    - The slides, animations, virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, how a single stitch is actually formed, and how the needle, the hook and the take-up lever work together. See you then.

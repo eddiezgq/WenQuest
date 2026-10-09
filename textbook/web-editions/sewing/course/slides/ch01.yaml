@@ -110,13 +110,13 @@ slides:
     title: ["二十七年，五个关键想法", "Twenty-seven years, five key ideas"]
     events:
       - {year: 1830, who: ["蒂莫尼耶", "Thimonnier"], what: ["钩针链式线迹", "Hooked-needle chainstitch"]}
-      - {year: 1846, who: ["豪", "Howe"], what: ["针尖开眼 + 第二根线", "Eye at the point + second thread"]}
-      - {year: 1851, who: ["胜家", "Singer"], what: ["直针、悬臂、布平放连续送", "Straight needle, arm, flat continuous feed"]}
-      - {year: 1852, who: ["威尔逊", "Wilson"], what: ["旋转钩；1854 年四动作送布", "Rotary hook; four-motion feed in 1854"]}
+      - {year: 1846, who: ["豪", "Howe"], what: ["针尖开眼 + 第二根线", "Eye at point + 2nd thread"]}
+      - {year: 1851, who: ["辛格", "Singer"], what: ["直针、悬臂、布平放连续送", "Straight needle, arm, flat continuous feed"]}
+      - {year: 1851, who: ["威尔逊", "Wilson"], what: ["旋转钩、四动作送布", "Rotary hook; 4-motion feed"]}
       - {year: 1857, who: ["吉布斯", "Gibbs"], what: ["旋转钩做单线链式", "Rotary-hook chainstitch"]}
     notes:
-      - "从 1830 年到 1857 年，二十七年里出现了五个关键想法。蒂莫尼耶用带钩的针做出单线链式线迹；豪把针眼开在针尖，再加第二根线，得到锁式线迹；胜家用直针上下运动、悬臂结构，布平放在台面上连续送进；威尔逊用连续旋转的钩子代替来回运动的梭子，又发明了四动作送布；吉布斯用旋转钩做单线链式线迹。每一个想法，都解决了前一代机器的一个具体问题。"
-      - "Between 1830 and 1857, twenty-seven years, came five key ideas. Thimonnier made a single-thread chainstitch with a hooked needle. Howe put the eye at the point and added a second thread, which gave the lockstitch. Singer used a straight needle moving up and down, an overhanging arm, and cloth lying flat and fed continuously. Wilson replaced the shuttle that went back and forth with a hook that kept rotating, and then invented four-motion feed. Gibbs used a rotary hook for a single-thread chainstitch. Each idea solved a specific problem of the machine before it."
+      - "从 1830 年到 1857 年，二十七年里出现了五个关键想法。蒂莫尼耶用带钩的针做出单线链式线迹。豪在 1846 年取得专利，针眼开在针尖，再加第二根线，得到锁式线迹。辛格用直针上下运动、悬臂结构，布平放在台面上连续送进。威尔逊用连续旋转的钩子代替来回运动的梭子，又发明了四动作送布。吉布斯用旋转钩做单线链式线迹。每一个想法，都解决了前一代机器的一个具体问题。"
+      - "Between 1830 and 1857, twenty-seven years, came five key ideas. Thimonnier made a single-thread chainstitch with a hooked needle. Howe patented a needle with the eye at the point and a second thread, which gave the lockstitch. Isaac Singer used a straight needle moving up and down, an overhanging arm, and cloth lying flat and fed continuously. Wilson replaced the shuttle that went back and forth with a hook that kept rotating, and then invented four-motion feed. Gibbs used a rotary hook for a single-thread chainstitch. Each idea solved a specific problem of the machine before it."
 
   - layout: split
     title: ["旋转代替往复，四动作送布", "Rotation instead of reciprocation; four-motion feed"]
@@ -132,12 +132,12 @@ slides:
   - layout: bignum
     title: ["缝纫机战争与专利池", "The sewing machine war and the patent pool"]
     nums:
-      - {n: "1856", label: ["豪、胜家等把九项专利合成专利池", "Howe, Singer and others pooled nine patents"]}
+      - {n: "1856", label: ["豪、辛格等把九项专利合成专利池", "Howe, Singer and others pooled nine patents"]}
       - {n: "21 年", n_en: "21 yrs", label: ["统一许可，一直运作到 1877 年", "One licence, until 1877"]}
     foot: ["专利交叉、官司不断 → 合并许可 → 缝纫机大量生产，走进家庭和工厂", "Crossing patents and lawsuits → one pooled licence → mass production, into homes and factories"]
     notes:
-      - "这些专利互相交叉，谁造机器都可能侵权，官司不断，史称缝纫机战争。1856 年，豪、胜家和另外两家制造商把九项专利合成一个专利池，统一对外许可，一直运作到 1877 年，前后 21 年。许可费大幅降低，缝纫机这才开始大量生产，走进家庭和工厂。一台机器往往是若干关键机构的组合，做设计的人要懂知识产权。"
-      - "These patents overlapped, so anyone building a machine risked infringing someone else's. The lawsuits were endless; people called it the sewing machine war. In 1856 Howe, Singer and two other makers put nine patents into one pool and licensed them together, until 1877, twenty-one years. Licence fees fell, and the sewing machine finally went into mass production, into homes and factories. A machine is usually a combination of several key mechanisms, so designers need to understand intellectual property."
+      - "这些专利互相交叉，谁造机器都可能侵权，官司不断，史称缝纫机战争。1856 年，豪、辛格和另外两家制造商把九项专利合成一个专利池，统一对外许可，一直运作到 1877 年，前后 21 年。官司平息，造机器的人交一份统一的许可费就能放心生产，缝纫机这才开始大量生产，走进家庭和工厂。一台机器往往是若干关键机构的组合，做设计的人要懂知识产权。"
+      - "These patents overlapped, so anyone building a machine risked infringing someone else's. The lawsuits were endless; people called it the sewing machine war. In 1856 Howe, Singer and two other makers put nine patents into one pool and licensed them together, until 1877, twenty-one years. The lawsuits died down, makers could build machines safely by paying one licence fee, and the sewing machine finally went into mass production, into homes and factories. A machine is usually a combination of several key mechanisms, so designers need to understand intellectual property."
 
   - layout: section
     num: "03"
@@ -166,7 +166,7 @@ slides:
       - {n: 6000, F: "{{ch01.F6000:.0f}}", label: ["6000 针/分", "6000/min"]}
     foot: ["针杆：m = 120 g，r = 15.5 mm，l = 55 mm（第 3 讲算例）", "Needle bar: m = 120 g, r = 15.5 mm, l = 55 mm (Lecture 3 example)"]
     notes:
-      - "高速化遇到的核心问题是惯性力。针杆的加速度和转速的平方成正比，惯性力等于质量乘加速度，所以惯性力也和转速的平方成正比。蒂莫尼耶的机器每分钟 200 针，针杆惯性力大约只有 {{ch01.F200:.0f}} 牛；每分钟 5000 针时是 {{ch01.F5000:.0f}} 牛，大了 {{ch01.ratio:.0f}} 倍。这就是为什么平衡、材料、润滑会成为高速缝纫机设计的核心。"
+      - "高速化遇到的核心问题是惯性力。针杆的加速度和转速的平方成正比，惯性力等于质量乘加速度，所以惯性力也和转速的平方成正比。蒂莫尼耶的机器每分钟 200 针，针杆惯性力大约只有 {{ch01.F200:.0f}} 牛；每分钟 5000 针时是 {{ch01.F5000:.0f}} 牛，是它的 {{ch01.ratio:.0f}} 倍。这就是为什么平衡、材料、润滑会成为高速缝纫机设计的核心。"
       - "The central problem of high speed is inertia. The needle bar's acceleration goes with the square of speed, and force is mass times acceleration, so the inertia force goes with speed squared too. Thimonnier's machine at 200 stitches a minute put only about {{ch01.F200:.0f}} newton on the needle bar. At 5000 it is {{ch01.F5000:.0f}} newtons, {{ch01.ratio:.0f}} times as much. That's why balancing, materials and lubrication became the core of high-speed design."
 
   - layout: split
@@ -200,13 +200,13 @@ slides:
     tiles:
       - {k: "100", name: ["单线链式", "Single-thread chain"], use: ["米袋封口、假缝", "Sack closing, basting"]}
       - {k: "200", name: ["手缝", "Hand stitch"], use: ["仿手工装饰线", "Hand-look topstitch"]}
-      - {k: "300", name: ["锁式", "Lockstitch"], use: ["衬衫、西服、牛仔布接缝", "Shirts, suits, denim seams"], hot: true}
+      - {k: "300", name: ["锁式", "Lockstitch"], use: ["衬衫、西服、牛仔裤明线", "Shirts, suits, jeans topstitching"], hot: true}
       - {k: "400", name: ["多线链式", "Multi-thread chain"], use: ["牛仔裤后裆、腰头", "Jeans back rise, waistband"]}
       - {k: "500", name: ["包缝", "Overedge"], use: ["针织物合缝、锁边", "Knit seams, edge finishing"]}
       - {k: "600", name: ["覆盖（绷缝）", "Covering"], use: ["T 恤下摆、袖口", "T-shirt hems, cuffs"]}
     notes:
-      - "缝制设备怎样分类？先看线迹。国际标准 ISO 4915 把线迹分为六类，用百位数编号：100 单线链式、200 手缝、300 锁式、400 多线链式、500 包缝、600 覆盖。线迹决定成缝机构，同一类线迹的机器结构大同小异。用量最大的是 300 类锁式线迹，衬衫、西服、牛仔布的大部分接缝都是它。"
-      - "How do we classify sewing equipment? Start with the stitch. ISO 4915 sorts stitches into six classes numbered by hundreds: 100 single-thread chainstitch, 200 hand stitch, 300 lockstitch, 400 multi-thread chainstitch, 500 overedge and 600 covering stitch. The stitch decides the stitch-forming mechanism, so machines for the same class are much alike. The most used is class 300, lockstitch: most seams in shirts, suits and denim."
+      - "缝制设备怎样分类？先看线迹。国际标准 ISO 4915 把线迹分为六类，用百位数编号：100 单线链式、200 手缝、300 锁式、400 多线链式、500 包缝、600 覆盖。线迹决定成缝机构，同一类线迹的机器结构大同小异。用量最大的是 300 类锁式线迹，衬衫、西服的大部分接缝，还有牛仔裤上的明线，都是它。"
+      - "How do we classify sewing equipment? Start with the stitch. ISO 4915 sorts stitches into six classes numbered by hundreds: 100 single-thread chainstitch, 200 hand stitch, 300 lockstitch, 400 multi-thread chainstitch, 500 overedge and 600 covering stitch. The stitch decides the stitch-forming mechanism, so machines for the same class are much alike. The most used is class 300, lockstitch: most seams in shirts and suits, and the topstitching on jeans."
 
   - layout: tiles4
     title: ["现场怎样认线迹：翻过布看", "Telling stitches apart: turn the fabric over"]
@@ -216,7 +216,7 @@ slides:
       - {draw: overedge, name: ["包住布边 → 包缝", "Wrapping the edge → overedge"]}
       - {draw: cover, name: ["正面两三道、反面网状 → 绷缝", "2–3 lines on top, a net below → coverstitch"]}
     notes:
-      - "到车间拿起一件衣服，翻过来看就能认出线迹：两面都是一段段直线，是锁式；布底是一串线环，是链式，链式缝完要打结或回缝，否则一拉就散；线包住布边，是包缝；正面两三道平行线、反面是网状，是绷缝。"
+      - "到车间拿起一件衣服，翻过来看就能认出线迹：两面都是一段段直线，是锁式。布底是一串线环，是链式，链式缝完要打结或回缝，否则一拉就散。线包住布边，是包缝。正面两三道平行线、反面是网状，是绷缝。"
       - "On the shop floor, pick up a garment and turn it over. Straight dashes on both faces: lockstitch. A chain of loops underneath: chainstitch, which must be tied off or back-stitched or it pulls apart. Thread wrapped round the edge: overedge. Two or three parallel lines on top and a net underneath: coverstitch."
 
   - layout: section
@@ -224,13 +224,13 @@ slides:
     title: ["服装产业链中的缝制设备", "Sewing equipment in the apparel chain"]
 
   - layout: chain
-    title: ["缝制设备在“裁”与“缝”之间", "Sewing equipment sits at cutting and sewing"]
+    title: ["缝制设备在“裁”与“缝”之间", "Sewing equipment serves cutting and sewing"]
     steps: [["纤维", "Fibre"], ["纺纱", "Spinning"], ["织造", "Weaving"], ["染整", "Dyeing"], ["打版", "Patterns"], ["裁剪", "Cutting"], ["缝制", "Sewing"], ["整烫", "Finishing"], ["零售", "Retail"]]
     hot: [5, 6]
     foot: ["缝制是劳动力最集中的环节：一个挡车工看几十台织机，缝制仍是一人一机", "Sewing is the most labour-intensive step: one weaver tends dozens of looms; sewing is still one person, one machine"]
     notes:
       - "把视野放大到整个服装产业链：纤维、纺纱、织造或针织、染整、设计打版、裁剪、缝制、整烫包装、物流零售。缝制设备处在裁和缝这两个环节。缝制是整条链上劳动力最集中的环节：织布厂一个挡车工能看几十台织机，缝制却仍然是一人一机。这就是为什么自动化和智能化在缝制环节最有价值。"
-      - "Now zoom out to the whole apparel chain: fibre, spinning, weaving or knitting, dyeing and finishing, design and patterns, cutting, sewing, pressing and packing, logistics and retail. Sewing equipment sits at cutting and sewing. Sewing is the most labour-intensive link: in a weaving mill one operator tends dozens of looms, but sewing is still one person, one machine. That's why automation and intelligence are worth the most right here."
+      - "Now zoom out to the whole apparel chain: fibre, spinning, weaving or knitting, dyeing and finishing, design and patterns, cutting, sewing, pressing and packing, logistics and retail. Sewing equipment serves the cutting and sewing stages. Sewing is the most labour-intensive link: in a weaving mill one operator tends dozens of looms, but sewing is still one person, one machine. That's why automation and intelligence are worth the most right here."
 
   - layout: bignum
     title: ["几个数量级", "Orders of magnitude"]
@@ -240,12 +240,12 @@ slides:
       - {n: "469 万台", n_en: "4.69 million", label: ["其中出口（15.22 亿美元）", "Of which exported (USD 1.522 bn)"]}
     foot: ["用户劳动密集、利润薄：设备的价值最终体现在产量、质量和成本上", "Users are labour-intensive with thin margins: a machine is worth what it adds in output, quality and cost"]
     notes:
-      - "几个数量级：2019 年全球纺织服装就业大约 9100 万人；2024 年中国工业缝纫机产量约 685 万台，其中出口 469 万台、15.22 亿美元。缝纫机的用户是劳动密集、利润很薄的服装厂，对价格非常敏感，所以设备的价值最终要体现在产量、质量和成本上。"
+      - "先看几个数量级。2019 年全球纺织服装就业大约 9100 万人。2024 年中国工业缝纫机产量约 685 万台。其中出口 469 万台，出口额 15.22 亿美元。缝纫机的用户是劳动密集、利润很薄的服装厂，对价格非常敏感，所以设备的价值最终要体现在产量、质量和成本上。"
       - "Some orders of magnitude. In 2019 about 91 million people worked in textiles and apparel worldwide. In 2024 China made about 6.85 million industrial sewing machines and exported 4.69 million, worth 1.522 billion US dollars. The customers are labour-intensive garment factories with thin margins, very sensitive to price, so a machine is worth what it adds in output, quality and cost."
 
   - layout: answer
     tag: ["回到车间问题", "Back to the problem"]
-    title: ["开到 6000：每秒 100 次、每次近千牛", "At 6000: a hundred blows a second, each close to a kilonewton"]
+    title: ["开到 6000：每秒 {{ch01.hits6000:.0f}} 次、每次近千牛", "At 6000: {{ch01.hits6000:.0f}} blows a second, each close to a kilonewton"]
     rows:
       - ["4000 针/分", "{{ch01.F4000:.0f}} N"]
       - ["5000 针/分", "{{ch01.F5000:.0f}} N"]
@@ -253,8 +253,8 @@ slides:
     side: {big: "×{{ch01.r56:.2f}}", text: ["5000 → 6000 针/分：转速 ×1.2，惯性力 ×1.2²", "5000 → 6000: speed ×1.2, force ×1.2²"]}
     foot: ["提速不是拧一下旋钮：平衡、材料、润滑都要重新核算（第 3、8 讲）", "Speeding up is not turning a knob: balancing, materials and lubrication all need re-checking (Lectures 3 and 8)"]
     notes:
-      - "回到开头的问题。惯性力与转速的平方成正比：每分钟 4000 针时约 {{ch01.F4000:.0f}} 牛，5000 针时 {{ch01.F5000:.0f}} 牛，6000 针时约 {{ch01.F6000:.0f}} 牛，增大了 {{ch01.up56:.0f}}%。每分钟 6000 针，针杆每秒要承受 100 次、每次近千牛的冲击。所以提速不是拧一下旋钮的事，平衡、材料和润滑都要重新核算，我们在第 3 讲和第 8 讲详细算。"
-      - "Back to our problem. Inertia force goes with speed squared: about {{ch01.F4000:.0f}} newtons at 4000, {{ch01.F5000:.0f}} at 5000, and about {{ch01.F6000:.0f}} at 6000, {{ch01.up56:.0f}} percent more. At 6000 the needle bar takes a hundred blows a second, each close to a kilonewton. So speeding up isn't a matter of turning a knob. Balancing, materials and lubrication all have to be re-checked; we'll do the numbers in Lectures 3 and 8."
+      - "回到开头的问题。惯性力与转速的平方成正比：每分钟 4000 针时约 {{ch01.F4000:.0f}} 牛，5000 针时 {{ch01.F5000:.0f}} 牛，6000 针时约 {{ch01.F6000:.0f}} 牛，增大了 {{ch01.up56:.0f}}%。每分钟 6000 针，针杆每秒要承受 {{ch01.hits6000:.0f}} 次、每次近千牛的冲击。所以提速不是拧一下旋钮的事，平衡、材料和润滑都要重新核算，我们在第 3 讲和第 8 讲详细算。"
+      - "Back to our problem. Inertia force goes with speed squared: about {{ch01.F4000:.0f}} newtons at 4000, {{ch01.F5000:.0f}} at 5000, and about {{ch01.F6000:.0f}} at 6000, {{ch01.up56:.0f}} percent more. At 6000 the needle bar takes {{ch01.hits6000:.0f}} blows a second, each close to a kilonewton. So speeding up isn't a matter of turning a knob. Balancing, materials and lubrication all have to be re-checked; we'll do the numbers in Lectures 3 and 8."
 
   - layout: roadmap
     title: ["全书路线图", "The road through the course"]
@@ -268,8 +268,8 @@ slides:
       - ["一座工厂", "A factory"]
       - ["未来", "The future"]
     notes:
-      - "最后看全书的路线：从一针，到一台机器，到一类机器；再看机器怎样被控制，控制怎样做成样机并测出来；然后是机器怎样被制造，一座工厂怎样组织起来，最后是未来。每一讲都按同一个节奏：车间问题，结构、建模和算例，动画或虚拟实验，设计要点和现场要点。"
-      - "Finally, the road through the course. From a stitch, to a machine, to families of machines. Then how machines are controlled, and how control becomes a prototype you can test. Then how the machines are made, how a factory is organised, and the future. Every lecture has the same rhythm: a shop-floor problem, structure, modelling and a worked example, an animation or virtual lab, and design and shop-floor notes."
+      - "最后看全书的路线，从一针开始。到一台机器。再到一类机器。然后看机器怎样被控制。控制怎样做成样机，再测出来。接下来是机器怎样被制造。一座工厂怎样组织起来。最后是未来。每一讲都按同一个节奏：车间问题，结构、建模和算例，动画或虚拟实验，设计要点和现场要点。"
+      - "Finally, the road through the course, starting from a stitch. Then a machine. Then families of machines. Then how machines are controlled. How control becomes a prototype you can test. Then how the machines are made. How a factory is organised. And finally, the future. Every lecture has the same rhythm: a shop-floor problem, structure, modelling and a worked example, an animation or virtual lab, and design and shop-floor notes."
 
   - layout: summary
     title: ["本讲小结", "Summary"]
