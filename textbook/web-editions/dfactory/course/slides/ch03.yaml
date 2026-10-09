@@ -57,8 +57,8 @@ clips:
 slides:
   - layout: cover
     video: hero
-    kicker: ["第 3 讲", "Lecture 3"]
-    title: ["厂情中枢：异常、追因与推演", "The Factory Hub: Exceptions, Root Causes and What-ifs"]
+    kicker: ["第 3 讲 · 厂情中枢", "Lecture 3 · The Factory Hub"]
+    title: ["异常、追因与推演", "Exceptions, Root Causes and What-ifs"]
     sub: ["出了事，先算清楚再动手", "When something goes wrong, work it out before you act"]
     notes:
       - "这一讲讲厂情中枢。工厂里天天出事：设备停机、缺料、订单要晚。难的不是知道出事了，而是马上答出三个问题：为什么出事，会连累谁，怎么办最划算。背景上是一次停机的因果链：从磨床开始，一层层亮到工序、工单、订单和客户。这一讲我们把规则、因果链和推演这套方法从头走一遍。"

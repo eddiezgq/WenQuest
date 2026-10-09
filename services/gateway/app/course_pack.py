@@ -76,7 +76,23 @@ def register(app, m) -> None:
 
     def lesson_done(st: dict, les: dict) -> bool:
         x = st["lessons"].get(str(les["no"]))
+        if x and x.get("placeholder") and not les.get("placeholder"):
+            return False      # 发布时还是“建设中”的大纲，现在写好了：要换成完整的一讲（第 29 轮）
         return bool(x) and x.get("done", 0) >= len(les["activities"])
+
+    async def clear_placeholder(sess: Session, st: dict, book: str, les: dict) -> None:
+        """第 29 轮：一讲先以“建设中”大纲发布，写好以后再发布时，删掉大纲页，从头发布完整的一讲（节名、简介随之更新）。"""
+        key = str(les["no"])
+        rec = st["lessons"].get(key)
+        if not rec or not rec.get("placeholder") or les.get("placeholder"):
+            return
+        for cmid in rec.get("cmids") or []:
+            try:
+                await call(sess, "local_wenquest_edit_course", courseid=st["courseid"], action="deletemodule", cmid=int(cmid))
+            except EngineError:
+                pass   # already deleted by hand
+        st["lessons"][key] = {"done": 0, "cmids": []}
+        save_state(book, st)
 
     def view(book: str, man: dict, st: dict, lang: str) -> dict:
         i = 0 if lang == "zh" else 1
@@ -154,10 +170,12 @@ def register(app, m) -> None:
             "updated_by = excluded.updated_by", st["courseid"], c.get("blurb", ""), time.time(), sess.user_id)
 
     async def publish_activities(sess: Session, base: Path, st: dict, book: str, key: str, courseid: int, section: int,
-                                 sectionname: str, summary: str, acts: list[dict]) -> None:
+                                 sectionname: str, summary: str, acts: list[dict], placeholder: bool = False) -> None:
         """Publish acts[done:] into the section, saving progress after each step. Quizzes go through their own call;
         the other activities in runs, so their order in the section is the order in the manifest."""
         rec = st["lessons"].setdefault(key, {"done": 0, "cmids": []})
+        if placeholder:
+            rec["placeholder"] = True
         named = rec["done"] > 0
         i = rec["done"]
         while i < len(acts):
@@ -332,8 +350,9 @@ def register(app, m) -> None:
                 await create_course(sess, base, man, st, book)
             cid = st["courseid"]
             for les in lessons:
+                await clear_placeholder(sess, st, book, les)
                 await publish_activities(sess, base, st, book, str(les["no"]), cid, les["section"], ml(les["name"]),
-                                         ml(les["summary"], True), les["activities"])
+                                         ml(les["summary"], True), les["activities"], bool(les.get("placeholder")))
                 await add_videos(sess, book, st, [(les, v) for les_, v in new_videos(man, st) if les_ is les], set())
                 st["progress"]["done"] += 1
                 save_state(book, st)

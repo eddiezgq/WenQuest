@@ -27,7 +27,7 @@ planned:
   12: {lab: ["两周情景第 1–2 幕（课堂演示）", "Two-week scenario, acts 1–2 (classroom demo)"]}
 summary:
 - <p>在一座真在跑的数字工厂里学做决定：发现异常、追到原因、算出几种方案的代价（钱、交期、风险），发起动作、审批执行，再用数据复盘。12 讲，每讲 4 学时（1 学时概念与建模，3 学时数字工厂实验），另有两周课程设计。</p>
-- <p>Learn to make decisions in a digital factory that really runs: spot the exception, trace the cause, price the options (money, delivery, risk), act through approval, and review with data. 12 lectures of 4 hours (one hour of concepts and modelling, three hours of digital-factory labs), plus a two-week course project.</p>
+- '<p>Learn to make decisions in a digital factory that really runs: spot the exception, trace the cause, price the options (money, delivery, risk), act through approval, and review with data. 12 lectures of 4 hours (one hour of concepts and modelling, three hours of digital-factory labs), plus a two-week course project.</p>'
 blurb: 智能工厂运营与决策：在问渠数字工厂里发现异常、追因、推演、决策、复盘。12 讲，中英双语，配数字工厂实验。
 info:
 - <p>《数字工厂实训》（副标题：智能工厂运营与决策）是问渠机器人学院面向机器人工程、智能制造工程专业三年级的特色实践课。全课在问渠数字工厂里进行：一座生产 WQR-105 减速器的工厂，订单、物料、设备、人员、质量、安全、能源和钱都连在一起。开学时机器人厂追加一批关节减速器，之后每一讲的事都围着这批货发生。</p><p>12 讲，建议共 {hours} 学时（每讲 4 学时：1 学时讲概念和建模，3 学时在数字工厂里做实验），另加两周课程设计（实验 23）。每讲按“工厂里的实际问题 → 概念 → 动画与虚拟实验 → 建模求解 → 在数字工厂里做决定”展开，配一个机器人联系和一个生活例子。</p><h4>每讲包含</h4><ul><li>讲义（教材本章 + 本讲导入、解答与小结）</li><li>动画与虚拟实验（可拖动参数）</li><li>网页互动课件（中英对照，讲者窗口里有讲稿）</li><li>数字工厂实验：实验页、指导书、报告模板</li><li>作业 1 份、测验 1 份（自动评分）</li><li>讲课视频（中、英）</li></ul><h4>单元与各讲</h4><table><tr><th>单元</th><th>各讲</th></tr>{units}</table><h4>考核</h4><ul><li>平时作业 20%</li><li>测验 10%（每讲一份，可做 3 次）</li><li>实验 40%（数字工厂自动评 60 分 + 实验报告 40 分）</li><li>课程设计 30%（实验 23）</li></ul><p>不设期末笔试。学校没有外网时，可以在机房或内网运行数字工厂本地版。</p><h4>现在的进度</h4><p>第 3、6、10 讲（厂情中枢、设备维护与可靠性、经营）已经完整；其余各讲先放大纲，陆续补齐。</p>

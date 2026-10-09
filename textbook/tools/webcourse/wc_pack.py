@@ -778,7 +778,7 @@ def placeholder_entry(no: int) -> dict:
     en = (f"<p><strong>This lesson is being written.</strong> {esc(CH[no][3])}.</p>"
           + (f"<p>Digital-factory lab: {esc(pl['lab'][1])}</p>" if pl.get("lab") else ""))
     name = pair(f"第 {no} 讲 {CH[no][0]}（建设中）", f"Lesson {no}: {CH[no][1]} (coming soon)")
-    return {"no": no, "section": no + 1, "name": name,
+    return {"no": no, "section": no + 1, "name": name, "placeholder": True,   # 网关：写好以后再发布时，先删掉这一讲的大纲页
             "summary": [f"<p>{esc(p[0])} {esc(p[1])} · 建设中</p>", f"<p>{esc(p[2])} · coming soon</p>"],
             "activities": [{"type": "page", "name": pair(f"本讲大纲：第 {no} 讲 {CH[no][0]}", f"Outline: Lesson {no} {CH[no][1]}"),
                             "content": [zh, en], "files": [], "visible": 1}],

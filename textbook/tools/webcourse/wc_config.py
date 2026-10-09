@@ -23,4 +23,8 @@ def load(course: Path) -> dict:
     cfg.setdefault("heavy_pages", [])
     cfg.setdefault("placeholders", False)
     cfg["labs"] = {int(k): v for k, v in cfg["labs"].items()}
+    for k in ("name", "summary", "info"):     # [中文, English]：YAML 里没加引号、含“: ”的一句会被读成字典（第 29 轮）
+        v = cfg.get(k)
+        if not (isinstance(v, list) and len(v) == 2 and all(isinstance(x, str) for x in v)):
+            raise SystemExit(f"course.yaml: {k} 应是 [中文, English] 两句文字（含“: ”的句子要加引号）")
     return cfg

@@ -253,3 +253,43 @@ def test_video_links_become_embeddable_players():
     assert content.video_link("https://www.bilibili.com/video/BV1xx411c7mD?p=2")["embed"].startswith(
         "https://player.bilibili.com/player.html?bvid=BV1xx411c7mD&page=2")
     assert content.video_link("https://example.com/video/BV1xx411c7mD") is None
+
+
+def test_placeholder_lesson_is_replaced_when_written(client, tmp_path):
+    """第 29 轮：还没写的讲先以“建设中”大纲发布；写好以后再发布，删掉大纲页，换成完整的一讲。"""
+    pack(tmp_path)
+    mp = tmp_path / "textbook" / "sewing" / "course" / "manifest.json"
+    man = json.loads(mp.read_text(encoding="utf-8"))
+    full = man["lessons"][1]
+    man["lessons"][1] = {"no": 2, "section": 3, "name": ["第 2 讲（建设中）", "Lesson 2 (coming soon)"], "placeholder": True,
+                         "summary": ["<p>建设中</p>", "<p>coming soon</p>"],
+                         "activities": [{"type": "page", "name": ["本讲大纲", "Outline"], "content": ["<p>大纲</p>", "<p>Outline</p>"],
+                                         "files": [], "visible": 1}]}
+    mp.write_text(json.dumps(man, ensure_ascii=False), encoding="utf-8")
+    h = login(client)
+    client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 1})
+    p = wait(client, h)
+    assert p["status"] == "done" and p["batches"][0]["published"] == 2
+    placeholder_cmids = json.loads((tmp_path / "data" / "course-packs" / "sewing.json").read_text())["lessons"]["2"]["cmids"]
+    assert len(placeholder_cmids) == 1
+
+    # still a placeholder: pressing again publishes nothing
+    CALLS.clear()
+    client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 1})
+    wait(client, h)
+    assert CALLS == []
+
+    # lesson 2 is written: the batch shows it as not published, and publishing deletes the outline and adds the full lesson
+    man["lessons"][1] = full
+    mp.write_text(json.dumps(man, ensure_ascii=False), encoding="utf-8")
+    p = client.get("/api/v1/admin/course-packs", headers=h).json()["packs"][0]
+    assert p["batches"][0]["published"] == 1
+    client.post("/api/v1/admin/course-packs/sewing/publish", headers=h, json={"batch": 1})
+    p = wait(client, h)
+    assert p["status"] == "done" and p["batches"][0]["published"] == 2
+    deleted = [parse_qs(b) for f, b in CALLS if f == "local_wenquest_edit_course" and "deletemodule" in b]
+    assert [d["cmid"] for d in deleted] == [[str(placeholder_cmids[0])]]
+    first_add = parse_qs(next(b for f, b in CALLS if f == "local_wenquest_add_activities"))
+    assert first_add["section"] == ["3"] and "建设中" not in first_add["sectionname"][0]
+    rec = json.loads((tmp_path / "data" / "course-packs" / "sewing.json").read_text())["lessons"]["2"]
+    assert not rec.get("placeholder") and rec["done"] == len(full["activities"])
