@@ -32,7 +32,10 @@ def is_stop(text: str) -> bool:
     return t in ("停", "停停", "stop", "Stop", "STOP") or bool(STOP.search(text)) and len(text) <= 120
 DESIGN_FIELDS = {"subject": "学科与层次", "audience": "学生", "textbook": "教材", "platform": "贯穿全课的机器人",
                  "notation": "符号约定", "visual_style": "动画风格"}
-BACKGROUND = {"redesign", "remake_design_book", "revise_lesson", "write_lesson", "write_next", "proceed", "reread_textbook"}
+BACKGROUND = {"redesign", "remake_design_book", "revise_lesson", "write_lesson", "write_lessons", "write_next", "proceed",
+              "reread_textbook", "start_over", "study_textbook"}
+# round 31: fine-grained outline edits the course lead (or the teacher) can make at once
+OUTLINE_OPS = {"set_lesson", "add_lesson", "move_lesson", "remove_lesson", "move_chapter", "rename_chapter", "set_calendar_note"}
 
 
 def _id() -> str:
@@ -79,7 +82,15 @@ STEP_DOC = """Steps a proposal may contain (JSON objects with "type"):
 - write_lesson {lesson_id}: write this planned lesson now
 - write_next {}: write the next planned lesson of a confirmed chapter
 - proceed {}: materials stage only — the materials are settled, design the outline
-- set_pace {mode: manual|daily, hour}"""
+- set_pace {mode: manual|daily, hour}
+- set_lesson {lesson_id, title?: {zh, en}, goal?: {zh, en}, week?, sections?: [..]}: edit one lesson in place
+- add_lesson {chapter_no, title: {zh, en}, goal?: {zh, en}, week?, sections?, position? (1-based; default last)}
+- move_lesson {lesson_id, chapter_no, position? (1-based; default last)}
+- remove_lesson {lesson_id}: only a lesson not written yet (planned); written lessons need the teacher's confirmation
+- move_chapter {no, position}
+- rename_chapter {no, title: {zh, en}}
+- set_calendar_note {text}
+- write_lessons {lesson_ids: [..]}: write these planned lessons one after another (background work)"""
 
 LEAD = team.COMMON + (
     " Role: 课程负责人 (course lead) — the only one who talks to the teacher, and a senior colleague who knows the "
@@ -228,6 +239,26 @@ class LeadMixin:
             return proj["stage"] == "materials"
         if t == "set_pace":
             return s.get("mode") in ("manual", "daily")
+        if t in ("set_lesson", "move_lesson", "remove_lesson"):
+            les = lessons.get(str(s.get("lesson_id")))
+            if not les or les["status"] == "published":
+                return False
+            if t == "move_lesson":
+                return _int(s.get("chapter_no")) in nos
+            if t == "remove_lesson":
+                return les["status"] in ("planned", "failed")
+            return any(k in s for k in ("title", "goal", "week", "sections"))
+        if t == "add_lesson":
+            return _int(s.get("chapter_no")) in nos and bool(_disp(_pair(s.get("title"))))
+        if t == "move_chapter":
+            return _int(s.get("no")) in nos and _int(s.get("position")) >= 1
+        if t == "rename_chapter":
+            return _int(s.get("no")) in nos and bool(_disp(_pair(s.get("title"))))
+        if t == "set_calendar_note":
+            return bool(o)
+        if t == "write_lessons":
+            ids = [str(x) for x in s.get("lesson_ids") or []]
+            return proj["stage"] == "lessons" and bool(ids) and all(lessons.get(i) and lessons[i]["status"] in ("planned", "failed") for i in ids)
         if t == "start_over":
             return bool(o) or proj["stage"] in ("materials", "outline")
         if t == "study_textbook":
@@ -275,6 +306,33 @@ class LeadMixin:
             return "资料清单定下来，开始设计大纲"
         if t == "set_pace":
             return "改为每天自动写一课" if s["mode"] == "daily" else "改为手动：你说写才写"
+        if t == "set_lesson":
+            les = lessons[s["lesson_id"]]
+            parts = []
+            if "title" in s:
+                parts.append(f"改名为“{_disp(_pair(s['title']))}”")
+            if "goal" in s:
+                parts.append("改目标")
+            if "week" in s:
+                parts.append(f"排到第 {s['week']} 周")
+            if "sections" in s:
+                parts.append("改对应教材章节")
+            return f"《{_disp(les['title'])}》" + "、".join(parts)
+        if t == "add_lesson":
+            return f"第 {s['chapter_no']} 章加一课“{_disp(_pair(s['title']))}”"
+        if t == "move_lesson":
+            return f"《{_disp(lessons[s['lesson_id']]['title'])}》移到第 {s['chapter_no']} 章" + (f"第 {s['position']} 课" if s.get("position") else "")
+        if t == "remove_lesson":
+            return f"删除《{_disp(lessons[s['lesson_id']]['title'])}》"
+        if t == "move_chapter":
+            return f"第 {s['no']} 章挪到第 {s['position']} 位"
+        if t == "rename_chapter":
+            return f"第 {s['no']} 章改名为“{_disp(_pair(s['title']))}”"
+        if t == "set_calendar_note":
+            return "改教学日历说明"
+        if t == "write_lessons":
+            names = "、".join(f"《{_disp(lessons[i]['title'])}》" for i in s["lesson_ids"] if i in lessons)
+            return f"依次写 {len(s['lesson_ids'])} 课：{names}"
         if t == "start_over":
             return f"推倒重来：重读教材、重做课程设计书和整份大纲（已发布的课保留，待审的课改为待重写）：{str(s.get('note') or '')[:300]}"
         if t == "study_textbook":
@@ -386,10 +444,66 @@ class LeadMixin:
             book[s["field"]] = str(s["value"])[:800]
             book["by"] = "teacher"
             return ""
+        if t in OUTLINE_OPS:
+            return self.apply_outline_op(proj, s)
         if t == "set_pace":
             proj["pace"]["mode"] = s["mode"]
             if isinstance(s.get("hour"), int) and 0 <= s["hour"] <= 23:
                 proj["pace"]["hour"] = s["hour"]
+            return ""
+        raise EngineError("unknown_step", t)
+
+    def apply_outline_op(self, proj: dict, s: dict) -> str:
+        """Round 31: one fine-grained outline edit (published lessons never change)."""
+        from .studio import new_id
+        o = proj["outline"]
+        keys = [k for k in ("zh", "en") if o.get("languages") in (k, "both")] or ["zh"]
+        T = lambda v: {k: _pair(v)[k] for k in keys}  # noqa: E731
+        t = s["type"]
+        chap = lambda no: next(c for c in o["chapters"] if c["no"] == _int(no))  # noqa: E731
+        if t == "set_calendar_note":
+            o["calendar_note"] = str(s.get("text") or "")[:1000]
+            return ""
+        if t == "rename_chapter":
+            chap(s["no"])["title"] = T(s["title"])
+            return ""
+        if t == "move_chapter":
+            c = chap(s["no"])
+            o["chapters"].remove(c)
+            o["chapters"].insert(min(_int(s["position"]), len(o["chapters"]) + 1) - 1, c)
+            for i, x in enumerate(o["chapters"], 1):
+                x["no"] = i
+            return ""
+        if t == "add_lesson":
+            c = chap(s["chapter_no"])
+            les = {"id": new_id(), "status": "planned", "content": {}, "exercises": {}, "answers": {}, "review": None,
+                   "notes": "", "cmids": [], "error": "", "week": _int(s.get("week")), "sections": [str(x)[:40] for x in s.get("sections") or []][:12],
+                   "problem": {}, "title": T(s["title"]), "goal": T(s.get("goal") or "")}
+            pos = _int(s.get("position")) or len(c["lessons"]) + 1
+            c["lessons"].insert(min(pos, len(c["lessons"]) + 1) - 1, les)
+            c["confirmed"] = False
+            return les["id"]
+        c, les = self.find_lesson(proj, str(s["lesson_id"]))
+        if t == "set_lesson":
+            if "title" in s:
+                les["title"] = T(s["title"])
+            if "goal" in s:
+                les["goal"] = T(s["goal"])
+            if "week" in s:
+                les["week"] = _int(s["week"])
+            if "sections" in s:
+                les["sections"] = [str(x)[:40] for x in s.get("sections") or []][:12]
+            return ""
+        if t == "remove_lesson":
+            c["lessons"].remove(les)
+            return ""
+        if t == "move_lesson":
+            c["lessons"].remove(les)
+            dst = chap(s["chapter_no"])
+            pos = _int(s.get("position")) or len(dst["lessons"]) + 1
+            dst["lessons"].insert(min(pos, len(dst["lessons"]) + 1) - 1, les)
+            if dst is not c:
+                dst["confirmed"] = False
             return ""
         raise EngineError("unknown_step", t)
 
@@ -448,6 +562,19 @@ class LeadMixin:
                 self.say(proj, f"第 {chapter['no']} 章的课时安排还没确认，先不写。请先看一下大纲，点“本章确认”。", "lead")
                 return
             await self.write_lesson(proj, s["lesson_id"])
+        elif t == "write_lessons":
+            for lid in s["lesson_ids"]:
+                p = self.projects.load(proj["id"])
+                try:
+                    chapter, les = self.find_lesson(p, lid)
+                except Exception:  # noqa: BLE001 - removed meanwhile
+                    continue
+                if les["status"] not in ("planned", "failed"):
+                    continue
+                if not chapter_confirmed(chapter):
+                    chapter["confirmed"] = True      # the teacher asked for these lessons to be written
+                    self.projects.save(p)
+                await self.write_lesson(p, lid)
         elif t == "write_next":
             nxt = self.next_lesson(proj)
             if not nxt:

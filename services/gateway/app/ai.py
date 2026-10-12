@@ -163,7 +163,8 @@ class ModelGateway:
         return self.provider == "claude"
 
     async def agent(self, *, system: str, messages: list[dict], tools: list[dict], run_tool, model: str = "",
-                    thinking: int = 6000, max_tokens: int = 16000, max_rounds: int = 12, on_step=None) -> str:
+                    thinking: int = 6000, max_tokens: int = 16000, max_rounds: int = 12, on_step=None,
+                    on_text=None, cancelled=None) -> str:
         """Claude as itself: a multi-turn conversation with extended thinking and tools. `run_tool(name, input)`
         returns the tool's text result (awaitable). Returns the final reply text."""
         if self.provider != "claude":
@@ -172,11 +173,17 @@ class ModelGateway:
         headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
         text = ""
         for _ in range(max_rounds):
+            if cancelled and cancelled():
+                return (text + "\n\n" if text else "") + "（已按你的要求停下。）"
             use = model or self.claude_model
             body = {"model": use, "max_tokens": max_tokens, "system": system, "messages": msgs,
                     "tools": tools, **thinking_fields(use, thinking)}
             try:
-                data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
+                if on_text:
+                    data = await self._stream("https://api.anthropic.com/v1/messages", body, headers, on_text, text,
+                                               timeout=max(self.timeout, 600))
+                else:
+                    data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
             except AIError as e:
                 if model and model != self.claude_model and "not_found" in str(e):   # that model is not on this account
                     model = self.claude_model
@@ -244,6 +251,85 @@ class ModelGateway:
             return json.loads(data["choices"][0]["message"]["content"])
         except (KeyError, IndexError, ValueError) as exc:
             raise AIError("ai_bad_output", "model returned invalid JSON", 502) from exc
+
+    async def _stream(self, url: str, body: dict, headers: dict, on_text, before: str = "", timeout: float | None = None) -> dict:
+        """Streaming Messages call (round 31): text deltas go to `on_text` as they arrive; returns the same shape as a
+        plain call ({content, stop_reason}). A server that answers with plain JSON (tests) is accepted too."""
+        body = {**body, "stream": True}
+        blocks: list[dict] = []
+        partial: dict[int, str] = {}
+        stop = None
+        shown = (before + "\n\n") if before else ""
+        try:
+            async with self.http.stream("POST", url, json=body, headers=headers, timeout=timeout or self.timeout) as r:
+                if r.status_code >= 400:
+                    await r.aread()
+                    self._check(r)
+                if "text/event-stream" not in r.headers.get("content-type", ""):
+                    await r.aread()
+                    data = r.json()
+                    t = "\n".join(b.get("text", "") for b in data.get("content") or [] if b.get("type") == "text")
+                    if t:
+                        on_text(shown + t)
+                    return data
+                event = ""
+                async for line in r.aiter_lines():
+                    if line.startswith("event:"):
+                        event = line[6:].strip()
+                        continue
+                    if not line.startswith("data:"):
+                        continue
+                    try:
+                        d = json.loads(line[5:].strip())
+                    except ValueError:
+                        continue
+                    kind = d.get("type") or event
+                    if kind == "content_block_start":
+                        b = dict(d.get("content_block") or {})
+                        if b.get("type") == "tool_use":
+                            b["input"] = {}
+                        blocks.append(b)
+                    elif kind == "content_block_delta" and blocks:
+                        i = d.get("index", len(blocks) - 1)
+                        b = blocks[i] if i < len(blocks) else blocks[-1]
+                        dl = d.get("delta") or {}
+                        dt = dl.get("type")
+                        if dt == "text_delta":
+                            b["text"] = b.get("text", "") + dl.get("text", "")
+                            on_text(shown + "\n".join(x.get("text", "") for x in blocks if x.get("type") == "text"))
+                        elif dt == "thinking_delta":
+                            b["thinking"] = b.get("thinking", "") + dl.get("thinking", "")
+                        elif dt == "signature_delta":
+                            b["signature"] = dl.get("signature", "")
+                        elif dt == "input_json_delta":
+                            partial[i] = partial.get(i, "") + dl.get("partial_json", "")
+                    elif kind == "content_block_stop":
+                        i = d.get("index", len(blocks) - 1)
+                        if i in partial and i < len(blocks):
+                            try:
+                                blocks[i]["input"] = json.loads(partial[i] or "{}")
+                            except ValueError:
+                                blocks[i]["input"] = {}
+                    elif kind == "message_delta":
+                        stop = (d.get("delta") or {}).get("stop_reason") or stop
+                    elif kind == "error":
+                        raise AIError("ai_error", f"model stream error: {json.dumps(d)[:300]}", 502)
+        except httpx.TimeoutException as exc:
+            raise AIError("ai_timeout", "the model took too long", 504) from exc
+        except httpx.HTTPError as exc:
+            raise AIError("ai_unreachable", str(exc), 503) from exc
+        for b in blocks:   # text blocks carry citations etc. we do not need back
+            if b.get("type") == "text":
+                b.pop("citations", None)
+        return {"content": blocks, "stop_reason": stop}
+
+    def _check(self, r) -> None:
+        if r.status_code == 429:
+            raise AIError("ai_busy", "rate limited", 429)
+        if r.status_code in (401, 403):
+            raise AIError("ai_key_invalid", "the API key was rejected", 503)
+        if r.status_code >= 400:
+            raise AIError("ai_error", f"model API error {r.status_code}: {r.text[:300]}", 502)
 
     async def _post(self, url: str, body: dict, headers: dict, timeout: float | None = None) -> dict:
         try:

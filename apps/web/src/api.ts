@@ -127,7 +127,9 @@ export interface StudioFile {
   role: string; role_label: string; chapters: number[]; title: string; confidence: string; note: string; by: string;
 }
 export interface StudioQuestion { id: string; text: string; options: string[]; status: "open" | "answered" | "dropped"; answer: string }
-export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"; text: string; ts: number; kind: string; proposal?: string }
+export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"; text: string; ts: number; kind: string; proposal?: string;
+  /** kind "change" (round 31): what the course lead changed in the draft */
+  lines?: string[] }
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
@@ -191,6 +193,12 @@ export interface StudioProject {
   textbook_notes?: Record<string, { title: string; notes: string; seen_book: boolean }>;
   /** the course lead is answering the teacher's last message */
   lead_thinking?: boolean;
+  /** round 31: the AI course lead is answering; its reply so far; how much it does without asking; the undo list */
+  lead_agent?: boolean;
+  lead_draft?: string;
+  autonomy?: "ask" | "small" | "free";
+  history?: { id: string; at: number; label: string; by: "lead" | "teacher" }[];
+  last_change?: { at: number; lessons: string[]; label: string };
   /** 讲解视频 can be made (the voice service is set up); the course's voices */
   voices_on?: boolean;
   voices?: { zh: string; en: string };
@@ -468,6 +476,9 @@ export const api = {
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/proposals/${prop}/confirm${stopFirst ? "?stop_first=true" : ""}`, {}),
   studioCancelProposal: (id: string, prop: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/proposals/${prop}/cancel`, {}),
   studioLeadV2: (id: string, on: boolean) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/lead-v2`, { on }),
+  studioAutonomy: (id: string, level: "ask" | "small" | "free") =>
+    request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/autonomy`, { level }),
+  studioUndo: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/undo`),
   studioSubmitReview: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/submit`, {}),
   studioToCommittee: (id: string, lid: string, comment: string) =>
     request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/to-committee`, { comment }),

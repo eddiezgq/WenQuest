@@ -9,9 +9,11 @@
           <text>{{ t("studio.stage." + s) }}</text>
         </view>
         <view class="grow" />
-        <text v-if="p.lead_v2_available" class="chip2 leadv2" :class="{ on: p.lead_v2 }" @click="toggleLead">
-          {{ p.lead_v2 ? "✓ " : "" }}{{ t("lead.v2") }}
-        </text>
+        <view v-if="p.lead_agent" class="auto" :title="t('lead.autoHint')">
+          <text class="auto-l">{{ t("lead.autonomy") }}</text>
+          <text v-for="a in AUTONOMY" :key="a" class="chip2" :class="{ on: (p.autonomy || 'small') === a }" @click="setAutonomy(a)">{{ t("lead.auto." + a) }}</text>
+        </view>
+        <text v-if="(p.history || []).length" class="chip2 undo" :title="t('lead.undoWhat', { label: p.history![p.history!.length - 1].label })" @click="undo">↶ {{ t("lead.undo") }}</text>
         <view v-if="p.busy" class="working">
           <view class="dot" />
           <text>{{ p.busy.label }}</text>
@@ -33,6 +35,10 @@
             <view v-for="m in p.messages" :id="'m' + m.id" :key="m.id" class="msg" :class="[m.role, m.kind]">
               <text v-if="m.role === 'lead'" class="who">{{ t("studio.role.lead") }}</text>
               <text class="bubble">{{ m.text }}</text>
+              <!-- round 31: what the course lead changed in the draft (undo is at the top) -->
+              <view v-if="m.kind === 'change' && (m.lines || []).length" class="chg">
+                <text v-for="(ln, li) in m.lines" :key="li" class="chg-l">{{ ln }}</text>
+              </view>
               <!-- 提议: nothing happens until the teacher confirms -->
               <view v-if="m.kind === 'proposal' && propOf(m)" class="prop" :class="propOf(m)!.status">
                 <text class="prop-h">{{ t("lead.willDo") }}</text>
@@ -44,7 +50,14 @@
                 <text v-else class="prop-s">{{ t("lead.status." + propOf(m)!.status) }}</text>
               </view>
             </view>
-            <view v-if="p.lead_thinking" class="msg lead thinking"><text class="bubble">{{ p.lead_status ? p.lead_status + "…" : t("lead.thinking") }}</text></view>
+            <view v-if="p.lead_thinking" id="mthinking" class="msg lead thinking">
+              <text class="who">{{ t("studio.role.lead") }}</text>
+              <text v-if="p.lead_draft" class="bubble draft">{{ p.lead_draft }}</text>
+              <view class="think-row">
+                <text class="think-s">{{ p.lead_status ? p.lead_status + "…" : t("lead.thinking") }}</text>
+                <text class="think-stop" @click="stopLead">{{ t("lead.stopLead") }}</text>
+              </view>
+            </view>
             <!-- open questions, answered with one click -->
             <view v-for="q in openQuestions" :id="'q' + q.id" :key="q.id" class="qcard">
               <text class="q-text">{{ q.text }}</text>
@@ -279,7 +292,7 @@
                   <text class="o-act" @click="moveChapter(ci, 1)">↓</text>
                   <text class="o-act danger" @click="removeChapter(ci)">✕</text>
                 </view>
-                <view v-for="(l, li) in c.lessons" :key="l.id || li" class="o-les" :class="{ locked: l.status === 'published' }">
+                <view v-for="(l, li) in c.lessons" :key="l.id || li" class="o-les" :class="{ locked: l.status === 'published', changed: changedIds.has(l.id) }">
                   <input class="o-week" type="number" v-model.number="l.week" :disabled="l.status === 'published'" @input="dirty = true" />
                   <view class="grow">
                     <input class="o-in" v-model="l.title[lang]" :disabled="l.status === 'published'" @input="dirty = true" />
@@ -300,6 +313,13 @@
                 <text>{{ t("studio.unsaved") }}</text>
                 <text class="link" @click="resetOutline">{{ t("studio.discard") }}</text>
                 <view class="primary small" @click="saveOutline">{{ t("studio.save") }}</view>
+              </view>
+              <view v-if="(p.history || []).length" class="hist">
+                <text class="h3">{{ t("lead.changes") }}</text>
+                <text v-for="hh in (p.history || []).slice(-6).reverse()" :key="hh.id" class="hist-l">
+                  {{ hh.by === "lead" ? t("lead.byLead") : t("lead.byYou") }} · {{ hh.label }}
+                </text>
+                <text class="link" @click="undo">↶ {{ t("lead.undoWhat", { label: p.history![p.history!.length - 1].label }) }}</text>
               </view>
               <view class="calendar">
                 <text class="h3">{{ t("studio.calendar") }}</text>
@@ -748,9 +768,18 @@ function cancelProp(prop: string) {
   act(() => api.studioCancelProposal(id.value, prop));
 }
 const openNote = ref("");
-function toggleLead() {
-  act(() => api.studioLeadV2(id.value, !p.value?.lead_v2));
+const AUTONOMY = ["ask", "small", "free"] as const;
+function setAutonomy(a: "ask" | "small" | "free") {
+  act(() => api.studioAutonomy(id.value, a));
 }
+function undo() {
+  act(() => api.studioUndo(id.value));
+}
+function stopLead() {
+  act(() => api.studioSay(id.value, "停"));
+}
+// round 31: the lessons the last change touched are highlighted in the outline
+const changedIds = computed(() => new Set(p.value?.last_change?.lessons || []));
 function confirmChapter(no: number) {
   act(() => api.studioConfirmChapter(id.value, no));
 }
@@ -933,7 +962,18 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .notes-box { margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--wq-line); border-radius: 8px; background: #fbfcfd; display: flex; flex-direction: column; gap: 6px; }
 .note-h { font-size: 14px; font-weight: 600; cursor: pointer; }
 .note-t { white-space: pre-wrap; font-size: 13px; line-height: 1.6; color: var(--wq-text); padding: 4px 0 8px 14px; }
-.leadv2 { margin-right: 10px; }
+.auto { display: flex; align-items: center; gap: 6px; margin-right: 10px; flex-wrap: wrap; }
+.auto-l { font-size: 12px; color: var(--wq-muted); }
+.undo { margin-right: 10px; }
+.chg { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; padding: 8px 10px; border-left: 3px solid var(--wq-accent, #f2b705); background: #fffbea; border-radius: 4px; }
+.chg-l { font-size: 13px; color: var(--wq-ink); }
+.msg.thinking .bubble.draft { font-style: normal; color: var(--wq-ink); }
+.think-row { display: flex; gap: 12px; align-items: center; margin-top: 4px; }
+.think-s { font-size: 13px; color: var(--wq-muted); font-style: italic; }
+.think-stop { font-size: 13px; color: #b42318; cursor: pointer; text-decoration: underline; }
+.o-les.changed { background: #fffbea; box-shadow: inset 3px 0 0 var(--wq-accent, #f2b705); }
+.hist { margin: 16px 0; display: flex; flex-direction: column; gap: 4px; }
+.hist-l { font-size: 13px; color: var(--wq-muted); }
 .l-ch-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mtabs { display: none; }
 .cols { display: grid; grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr); gap: 16px; align-items: start; }

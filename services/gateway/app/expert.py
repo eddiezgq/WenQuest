@@ -18,31 +18,25 @@ import re
 from . import team
 from .ai import plain
 from .lead import BACKGROUND, STEP_DOC, _id, _int, _now, chapter_confirmed
+from .lead_agent import AGENT_LABEL, AGENT_TOOLS, principles
 
 log = logging.getLogger("wenquest.expert")
 
-EXPERT = (
-    "You are 课程负责人, the course lead of WenQuest's AI professor team: a senior professor of this course's subject "
-    "and an experienced curriculum designer, working with the teacher who owns the course. You have authority and use "
-    "it: read the textbook and materials before you advise (use the tools — never guess what a book says; if your "
-    "textbook notes do not cover what is asked, read the pages and save notes first), think the problem through, "
-    "then answer like a professor: what you found, your judgement, and a concrete plan (lessons, goals, textbook "
-    "sections and pages, the robot problem for each lesson). If the current course is built on a wrong basis (wrong "
-    "textbook, wrong level, a muddled chapter), say so and propose to redo it — even to start over. Disagree with the "
-    "teacher when you have reasons, say them, and offer the better option; the teacher decides.\n\n"
-    "Rules you must keep:\n"
-    "1. Nothing in the course changes until the teacher confirms: to change the course or start work, call the "
-    "`propose` tool with the exact steps; your reply then explains the proposal. Never claim something is done.\n"
-    "2. If you were told the teacher asked to stop, the work has already been stopped: say so in one sentence, then "
-    "discuss.\n"
-    "3. Published lessons are never changed.\n"
-    "4. Never invent page numbers, facts about a book or data; say when you have not seen the book itself.\n"
-    "Write to the teacher in their language (Chinese unless they write English), plainly, without flattery or filler. "
-    "Long answers are fine when the question needs them; use short paragraphs or a numbered plan.\n\n" + STEP_DOC + "\n"
+EXPERT_RULES = (
+    "\n\nHow to act (tools): look things up with the reading tools before you advise; change the draft with `edit_course`; "
+    "start the team's work with `start_work`; use `propose` only for a mixed plan the teacher should see as a whole. The "
+    "tools apply the autonomy level themselves and tell you whether a change was made or became a proposal; report exactly "
+    "that. Never claim something is done that a tool did not do.\n\n" + STEP_DOC + "\n"
     "- start_over {note}: re-read the textbook (new notes), redo the course design book and the whole outline following "
     "the note; published lessons stay, written-but-unpublished lessons go back to 'to be written'\n"
     "- study_textbook {}: (re)write the textbook notes for every chapter"
 )
+
+
+def expert_system() -> str:
+    """Round 31: the principles document (editable by Eddie) + how the tools work."""
+    return (principles() or "你是问渠 AI 教授团队的课程负责人。") + EXPERT_RULES
+
 
 TOOLS = [
     {"name": "list_materials", "description": "The teacher's uploaded files: id, name, role, chapters, pages.",
@@ -80,7 +74,7 @@ TOOLS = [
                       "required": ["summary", "steps"]}},
 ]
 
-TOOL_LABEL = {"list_materials": "正在看资料清单", "textbook_contents": "正在看教材目录", "read_pages": "正在查阅资料",
+TOOL_LABEL = {**AGENT_LABEL, "list_materials": "正在看资料清单", "textbook_contents": "正在看教材目录", "read_pages": "正在查阅资料",
               "search_materials": "正在资料里查找", "get_notes": "正在看教材研读笔记", "save_notes": "正在写教材研读笔记",
               "get_outline": "正在看大纲", "get_design_book": "正在看课程设计书", "get_lesson": "正在看已写的课",
               "propose": "正在整理方案"}
@@ -106,7 +100,8 @@ def strip_html(h: str) -> str:
 
 class ExpertMixin:
     def lead_v2_on(self, proj: dict) -> bool:
-        return bool(proj.get("lead_v2")) and getattr(self.ai, "agentic", False)
+        """Round 31: the AI course lead is the default wherever the model can act as an agent."""
+        return proj.get("lead_v2") is not False and getattr(self.ai, "agentic", False)
 
     @property
     def lead_model(self) -> str:
@@ -114,6 +109,16 @@ class ExpertMixin:
 
     def set_lead_status(self, pid: str, label: str) -> None:
         self.__dict__.setdefault("lead_status", {})[pid] = label
+
+    def set_lead_draft(self, pid: str, text: str) -> None:
+        """The reply as it is being written (round 31: shown while the lead is still answering)."""
+        self.__dict__.setdefault("lead_draft", {})[pid] = text
+
+    def lead_cancelled(self, pid: str) -> bool:
+        return bool(self.__dict__.setdefault("lead_cancel", {}).get(pid))
+
+    def cancel_lead(self, pid: str) -> None:
+        self.__dict__.setdefault("lead_cancel", {})[pid] = True
 
     # --- one turn ------------------------------------------------------------------------------------------------
     async def expert_reply(self, pid: str, text: str, stopped: str) -> None:
@@ -125,7 +130,7 @@ class ExpertMixin:
             nonlocal proj
             proj = self.projects.load(pid)
             out = await self.expert_tool(proj, name, inp, made)
-            if name in ("save_notes", "propose"):
+            if name in ("save_notes", "propose", "edit_course", "start_work", "undo"):
                 self.projects.save(proj)
             return out
 
@@ -137,8 +142,10 @@ class ExpertMixin:
 
         msgs = self.expert_messages(proj, text, stopped)
         try:
-            reply = await self.ai.agent(system=EXPERT + "\n\nProject at a glance:\n" + self.expert_glance(proj), messages=msgs,
-                                        tools=TOOLS, run_tool=run_tool, on_step=on_step, model=self.lead_model)
+            reply = await self.ai.agent(system=expert_system() + "\n\nProject at a glance:\n" + self.expert_glance(proj),
+                                        messages=msgs, tools=TOOLS + AGENT_TOOLS, run_tool=run_tool, on_step=on_step,
+                                        model=self.lead_model, on_text=lambda t: self.set_lead_draft(pid, t),
+                                        cancelled=lambda: self.lead_cancelled(pid))
         except Exception as e:  # noqa: BLE001 - say so instead of going quiet
             log.warning("expert lead failed: %s", e)
             proj = self.projects.load(pid)
@@ -148,6 +155,8 @@ class ExpertMixin:
             return
         finally:
             self.set_lead_status(pid, "")
+            self.set_lead_draft(pid, "")
+            self.__dict__.setdefault("lead_cancel", {}).pop(pid, None)
         proj = self.projects.load(pid)
         if stopped and "停" not in reply[:40]:
             reply = f"已经停下（{stopped}）。\n" + reply
@@ -163,7 +172,7 @@ class ExpertMixin:
     def expert_glance(self, proj: dict) -> str:
         m = proj["materials"]
         o = proj.get("outline") or {}
-        lines = [f"Stage: {proj['stage']}", f"Requirements: {json.dumps(proj['requirements'], ensure_ascii=False)[:1500]}",
+        lines = [self.agent_glance(proj), f"Stage: {proj['stage']}", f"Requirements: {json.dumps(proj['requirements'], ensure_ascii=False)[:1500]}",
                  f"Main textbook: file {m.get('textbook') or '(none)'}; title {m.get('book_title') or proj['requirements'].get('textbook') or '(unknown)'}",
                  f"Textbook notes written for chapters: {sorted((proj.get('textbook_notes') or {}).keys()) or 'none yet'}"]
         if o:
@@ -207,6 +216,9 @@ class ExpertMixin:
     # --- tools ---------------------------------------------------------------------------------------------------------
     async def expert_tool(self, proj: dict, name: str, inp: dict, made: list[str]) -> str:
         from .studio import pages_of
+        out = await self.agent_tool(proj, name, inp, made)
+        if out is not None:
+            return out
         items = {x.id: x for x in self.items(proj)}
         files = proj["materials"]["files"]
         if name == "list_materials":

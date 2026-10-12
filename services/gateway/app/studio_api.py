@@ -128,7 +128,9 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
                           "confidence": f.get("confidence", ""), "note": f.get("note", ""), "by": f.get("by", "")})
         files.sort(key=lambda f: f["path"])
         lessons = [les for c in (proj.get("outline") or {}).get("chapters", []) for les in c["lessons"]]
-        out = {k: v for k, v in proj.items() if k not in ("owner",)}
+        out = {k: v for k, v in proj.items() if k not in ("owner", "history")}
+        out["history"] = studio().history_view(proj)          # round 31: labels only, for the undo list
+        out["autonomy"] = studio().autonomy(proj)
         out["files"] = files
         out["roles"] = team.ROLES
         out["progress"] = {s: sum(1 for les in lessons if les["status"] == s)
@@ -139,6 +141,8 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         out["labs_on"] = bool(studio().labcheck_url)   # virtual labs can be made (the lab checker is set up)
         out["lead_status"] = studio().__dict__.get("lead_status", {}).get(proj["id"], "")
         out["lead_v2_available"] = bool(getattr(studio().ai, "agentic", False))
+        out["lead_agent"] = studio().lead_v2_on(proj)              # round 31: the AI course lead is answering
+        out["lead_draft"] = studio().__dict__.get("lead_draft", {}).get(proj["id"], "")
         out["voices_on"] = bool(studio().voice_url)    # lecture videos can be made (the voice service is set up)
         out["voices"] = studio().voices_of(proj)
         out["zip_url"] = sign_material(proj["id"], "*") if files else ""
@@ -313,6 +317,9 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         if proj["stage"] == "intake" and not studio().is_busy(pid):
             # Before the team starts, what the teacher writes is the course description.
             proj["requirements"]["notes"] = (proj["requirements"].get("notes", "") + "\n" + body.text).strip()[:4000]
+        from .lead import is_stop
+        if is_stop(body.text) and proj.get("lead_thinking"):
+            studio().cancel_lead(pid)            # round 31: "stop" also stops the course lead mid-answer
         studio().say(proj, body.text, "teacher")
         proj["lead_thinking"] = True
         studio().projects.save(proj)
@@ -350,6 +357,32 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
     async def cancel_proposal(pid: str, prop: str, sess: Annotated[Session, Depends(current)]):
         load(pid, sess)
         return view(studio().cancel_proposal(pid, prop))
+
+    class AutonomyIn(BaseModel):
+        level: str
+
+    @app.put("/api/v1/studio/projects/{pid}/autonomy")
+    async def set_autonomy(pid: str, body: AutonomyIn, sess: Annotated[Session, Depends(current)]):
+        """Round 31: how much the course lead does without asking (ask | small | free)."""
+        from .lead_agent import AUTONOMY, AUTONOMY_LABEL
+        await need_creator(sess)
+        proj = load(pid, sess)
+        if body.level not in AUTONOMY:
+            raise EngineError("bad_value", "level must be ask, small or free", 422)
+        proj["autonomy"] = body.level
+        studio().say(proj, f"自主程度改为“{AUTONOMY_LABEL[body.level]}”。", "system")
+        studio().projects.save(proj)
+        return view(proj)
+
+    @app.post("/api/v1/studio/projects/{pid}/undo")
+    async def undo(pid: str, sess: Annotated[Session, Depends(current)]):
+        """Round 31: undo the last change to the course draft (by the lead or the teacher)."""
+        await need_creator(sess)
+        proj = load(pid, sess)
+        label = studio().undo(proj)
+        studio().say(proj, f"已撤销：{label}", "system")
+        studio().projects.save(proj)
+        return view(proj)
 
     class LeadV2In(BaseModel):
         on: bool
@@ -433,6 +466,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         o = proj.get("outline")
         if not o:
             raise EngineError("wrong_stage", "no outline yet", 409)
+        studio().snapshot(proj, "你在右边改了大纲", "teacher")
         keys = lang_keys(o["languages"])
         T = lambda d: {k: str(d.get(k, "")).strip()[:300] for k in keys}  # noqa: E731
         old = {les["id"]: les for c in o["chapters"] for les in c["lessons"]}
@@ -563,6 +597,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         proj = load(pid, sess)
         if not proj.get("outline"):
             raise EngineError("wrong_stage", "no outline yet", 409)
+        studio().snapshot(proj, "你改了课程设计书", "teacher")
         book = normalize_design_book({**(proj.get("design_book") or {}), **body}, proj["outline"])
         book["by"] = "teacher"
         proj["design_book"] = book

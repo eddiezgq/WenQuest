@@ -35,6 +35,7 @@ from .moodle import EngineError
 from .lectures import LectureMixin
 from .lead import LeadMixin, chapter_confirmed
 from .expert import ExpertMixin
+from .lead_agent import LeadAgentMixin
 from .review import ReviewMixin
 
 log = logging.getLogger("wenquest.studio")
@@ -200,7 +201,7 @@ def summary(proj: dict, items: list[mt.Material] | None = None, with_outline: bo
 
 # --- the orchestrator ---------------------------------------------------------------------------
 
-class Studio(ReviewMixin, ExpertMixin, LeadMixin, LectureMixin):
+class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
     def __init__(self, projects: Projects, store: mt.Store, ai: ModelGateway, clean: Callable[[str], str]):
         self.projects = projects
         self.store = store
