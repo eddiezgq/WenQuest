@@ -177,3 +177,15 @@ def test_bilingual_html_uses_mlang_and_resolves():
     html = p["sections"][0]["activities"][0]["content"]
     assert resolve(html, "zh") == "<p>中</p>" and resolve(html, "en") == "<p>E</p>"
     assert p["fullname"].startswith('<span lang="zh_cn"')  # names keep span markup
+
+
+def test_model_rules_for_new_claude_models():
+    """Round 31 step 0: 5-generation models get adaptive thinking; 5.5+ get no forced tool_choice."""
+    from app.ai import model_rules, thinking_fields
+    assert model_rules("claude-sonnet-5") == {"adaptive": True, "forced_tool": True}
+    assert model_rules("claude-opus-5-5") == {"adaptive": True, "forced_tool": False}
+    assert model_rules("claude-sonnet-5-5") == {"adaptive": True, "forced_tool": False}
+    assert model_rules("claude-haiku-4-5-20251001") == {"adaptive": False, "forced_tool": True}
+    assert thinking_fields("claude-opus-5-5", 6000) == {"thinking": {"type": "adaptive"}, "output_config": {"effort": "high"}}
+    assert thinking_fields("claude-haiku-4-5", 6000) == {"thinking": {"type": "enabled", "budget_tokens": 6000}}
+    assert thinking_fields("claude-opus-5-5", 0) == {}

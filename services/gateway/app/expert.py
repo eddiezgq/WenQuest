@@ -16,6 +16,7 @@ import logging
 import re
 
 from . import team
+from .ai import plain
 from .lead import BACKGROUND, STEP_DOC, _id, _int, _now, chapter_confirmed
 
 log = logging.getLogger("wenquest.expert")
@@ -141,7 +142,7 @@ class ExpertMixin:
         except Exception as e:  # noqa: BLE001 - say so instead of going quiet
             log.warning("expert lead failed: %s", e)
             proj = self.projects.load(pid)
-            self.say(proj, ("已经停下了。" if stopped else "") + f"我这次没能处理你的话（{getattr(e, 'code', type(e).__name__)}），请再发一次。",
+            self.say(proj, ("已经停下了。" if stopped else "") + f"我这次没能处理你的话：{plain(getattr(e, 'code', ''))}。已记录，请稍后再发一次。",
                      "lead", "error")
             self.projects.save(proj)
             return

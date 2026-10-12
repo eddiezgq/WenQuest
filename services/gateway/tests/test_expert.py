@@ -67,7 +67,8 @@ def test_the_expert_reads_thinks_and_proposes(client):
     p, m = say(client, h, pid, "第一章的安排不对，你先看看教材再说", wait=15)
     assert m["kind"] == "proposal" and "教材第 1 章" in m["text"]
     body = SENT[0]
-    assert body["model"] == "claude-opus-5-5" and body["thinking"]["type"] == "enabled"
+    assert body["model"] == "claude-opus-5-5" and body["thinking"] == {"type": "adaptive"}   # 5-gen: adaptive only (round 31)
+    assert "budget_tokens" not in str(body) and body["output_config"]["effort"]
     assert {t["name"] for t in body["tools"]} >= {"read_pages", "save_notes", "propose", "get_outline"}
     assert "tool_choice" not in body                                           # it decides itself what to look at
     assert body["messages"][-1]["content"].endswith("你先看看教材再说")

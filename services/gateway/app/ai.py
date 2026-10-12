@@ -20,6 +20,23 @@ class AIError(EngineError):
     pass
 
 
+PLAIN = {
+    "ai_timeout": "模型这次想得太久，超时了",
+    "ai_busy": "模型这会儿太忙",
+    "ai_unreachable": "暂时连不上模型服务",
+    "ai_key_invalid": "模型的密钥不对，请管理员检查设置",
+    "ai_unavailable": "还没有配置模型",
+    "ai_bad_output": "模型这次的回答不完整",
+    "ai_error": "模型服务这次返回了错误",
+    "agent_unsupported": "当前的模型不支持这种工作方式",
+}
+
+
+def plain(code: str) -> str:
+    """A teacher-facing sentence for an error code (round 31: no raw codes on screen)."""
+    return PLAIN.get(code or "", "出了点问题")
+
+
 def unpack(v: Any) -> Any:
     """Models sometimes return a nested list or object as a JSON string ("[{...}]"). Parse those back."""
     if isinstance(v, str):
@@ -35,6 +52,34 @@ def unpack(v: Any) -> Any:
     if isinstance(v, list):
         return [unpack(x) for x in v]
     return v
+
+
+_NEW = re.compile(r"claude-(?:opus|sonnet|haiku|fable|mythos)-(\d+)(?:-(\d+))?")
+
+
+def model_rules(model: str) -> dict:
+    """What a Claude model accepts (round 31, step 0). Claude 5-generation models reject the manual thinking budget
+    (`thinking.type = enabled` + `budget_tokens`) and take adaptive thinking with `output_config.effort`; the 5.5 models
+    (and later) also reject a forced `tool_choice`. Older models keep the old request shape."""
+    m = _NEW.search(model or "")
+    if not m:
+        return {"adaptive": False, "forced_tool": True}
+    major, minor = int(m.group(1)), int(m.group(2) or 0)
+    # a long date suffix (e.g. -20251001) is not a minor version
+    if minor > 99:
+        minor = 0
+    adaptive = major >= 5
+    forced = not (major > 5 or (major == 5 and minor >= 5))
+    return {"adaptive": adaptive, "forced_tool": forced}
+
+
+def thinking_fields(model: str, budget: int, effort: str = "high") -> dict:
+    """The request fields that turn thinking on for this model."""
+    if not budget:
+        return {}
+    if model_rules(model)["adaptive"]:
+        return {"thinking": {"type": "adaptive"}, "output_config": {"effort": effort}}
+    return {"thinking": {"type": "enabled", "budget_tokens": budget}}
 
 
 class ModelGateway:
@@ -81,20 +126,35 @@ class ModelGateway:
             content = [{"type": "image", "source": {"type": "base64", "media_type": mime,
                                                     "data": base64.b64encode(data).decode()}} for mime, data in images]
             content.append({"type": "text", "text": prompt})
+        forced = model_rules(self.claude_model)["forced_tool"]
         body = {
             "model": self.claude_model,
             "max_tokens": max_tokens,
-            "system": system,
+            "system": system if forced else system + "\n\nAlways answer by calling the `output` tool exactly once.",
             "messages": [{"role": "user", "content": content}],
             "tools": [{"name": "output", "description": "Return the result.", "input_schema": schema}],
-            "tool_choice": {"type": "tool", "name": "output"},
+            "tool_choice": {"type": "tool", "name": "output"} if forced else {"type": "auto"},
         }
         headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01",
                    "content-type": "application/json"}
-        data = await self._post("https://api.anthropic.com/v1/messages", body, headers)
-        for block in data.get("content", []):
-            if block.get("type") == "tool_use":
-                return block.get("input") or {}
+        for attempt in range(2):
+            data = await self._post("https://api.anthropic.com/v1/messages", body, headers)
+            truncated = data.get("stop_reason") == "max_tokens"
+            for block in data.get("content", []):
+                if block.get("type") == "tool_use" and not truncated:
+                    return block.get("input") or {}
+            if truncated and attempt == 0 and body["max_tokens"] < 32000:   # a big job ran out of room: once more, larger
+                body["max_tokens"] = min(32000, body["max_tokens"] * 2)
+                continue
+            if not forced:   # the model may have answered in text
+                text = "\n".join(b.get("text", "") for b in data.get("content") or [] if b.get("type") == "text")
+                m = re.search(r"\{.*\}", text, re.S)
+                if m:
+                    try:
+                        return json.loads(m.group(0))
+                    except ValueError:
+                        pass
+            break
         raise AIError("ai_bad_output", "model returned no structured output", 502)
 
     # --- the expert lane (round 5–6): a stronger model that thinks first, and may use tools --------------------
@@ -112,10 +172,9 @@ class ModelGateway:
         headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
         text = ""
         for _ in range(max_rounds):
-            body = {"model": model or self.claude_model, "max_tokens": max_tokens, "system": system, "messages": msgs,
-                    "tools": tools}
-            if thinking:
-                body["thinking"] = {"type": "enabled", "budget_tokens": thinking}
+            use = model or self.claude_model
+            body = {"model": use, "max_tokens": max_tokens, "system": system, "messages": msgs,
+                    "tools": tools, **thinking_fields(use, thinking)}
             try:
                 data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
             except AIError as e:
@@ -147,7 +206,7 @@ class ModelGateway:
         if self.provider != "claude":
             return await self.json(system=system, prompt=prompt, schema=schema, max_tokens=min(max_tokens, 8000), fake=fake)
         body = {"model": model or self.claude_model, "max_tokens": max_tokens, "system": system,
-                "thinking": {"type": "enabled", "budget_tokens": thinking},
+                **thinking_fields(model or self.claude_model, thinking),
                 "messages": [{"role": "user", "content": prompt + "\n\nAfter thinking, reply with ONE JSON object matching this "
                                                                "JSON Schema and nothing else:\n" + json.dumps(schema, ensure_ascii=False)}]}
         headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01", "content-type": "application/json"}
@@ -157,6 +216,9 @@ class ModelGateway:
             if not (model and model != self.claude_model and "not_found" in str(e)):
                 raise
             body["model"] = self.claude_model
+            body.pop("thinking", None)
+            body.pop("output_config", None)
+            body.update(thinking_fields(self.claude_model, thinking))
             data = await self._post("https://api.anthropic.com/v1/messages", body, headers, timeout=max(self.timeout, 600))
         text = "\n".join(b.get("text", "") for b in data.get("content") or [] if b.get("type") == "text")
         m = re.search(r"\{.*\}", text, re.S)

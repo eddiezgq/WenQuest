@@ -30,7 +30,7 @@ from . import course_builder as cb
 from . import materials as mt
 from . import team
 from .production import spec as sp
-from .ai import ModelGateway
+from .ai import ModelGateway, plain
 from .moodle import EngineError
 from .lectures import LectureMixin
 from .lead import LeadMixin, chapter_confirmed
@@ -257,13 +257,13 @@ class Studio(ReviewMixin, ExpertMixin, LeadMixin, LectureMixin):
             except EngineError as exc:
                 p = self.projects.load(pid)
                 p["busy"] = None
-                self.say(p, f"这一步没有完成（{exc.code}）。可以稍后再试，或者告诉我换一种做法。", "system", "error")
+                self.say(p, f"这一步没有完成：{plain(exc.code)}。可以稍后再试，或者告诉我换一种做法。", "system", "error")
                 self.projects.save(p)
             except Exception:
                 log.exception("studio job failed for %s", pid)
                 p = self.projects.load(pid)
                 p["busy"] = None
-                self.say(p, "这一步出错了（server_error），已记录。可以再试一次。", "system", "error")
+                self.say(p, "这一步出错了，已记录。可以再试一次。", "system", "error")
                 self.projects.save(p)
 
         self.tasks[pid] = asyncio.create_task(job())
