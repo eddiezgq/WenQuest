@@ -58,11 +58,14 @@ WQ.lab({
   update(dt, api, s) {
     const m = mass6_3(api);
     const a = api.p.F / m;
+    const x0 = s.x;
     s.v += a * dt; s.x += s.v * dt;
     const noise = () => (Math.random() * 2 - 1) * 0.002;          // 计时误差 ±2 ms
-    if (s.t1 === null && s.x >= X1) s.t1 = api.t + noise();
+    // 越过光电门的时刻在这一步里插值求出：慢的电脑一帧可达 0.05 s，直接取帧末时刻会多出几个百分点的误差
+    const cross = (X) => api.t - dt + dt * (X - x0) / (s.x - x0);
+    if (s.t1 === null && s.x >= X1) s.t1 = cross(X1) + noise();
     if (s.t2 === null && s.x >= X2) {
-      s.t2 = api.t + noise();
+      s.t2 = cross(X2) + noise();
       s.aMeas = 2 * (X2 - X1) / (s.t2 * s.t2 - s.t1 * s.t1);      // 由 x = at²/2 在两道门处相减
       rec6_3.runs.push({ scene: api.scene, F: api.p.F, m: api.scene === "unknown" ? null : m, a: s.aMeas, load: api.p.load });
       if (rec6_3.runs.length > 12) rec6_3.runs.shift();
