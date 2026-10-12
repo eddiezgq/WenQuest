@@ -209,7 +209,9 @@ async def run(html: str, lab: str) -> dict:
                     tasks[tid] = False
                     continue
                 wait = await page.evaluate(f"() => WQ.demo('{lab}', {tid!r})")
-                deadline = time.monotonic() + min(30.0, float(wait or 5) / SPEED + 3.0)
+                # wall-clock limit as if the lab ran only at normal speed: on a slow machine (CI's software rendering)
+                # frames drop and SPEED steps per frame no longer means 4x; a task that ticks returns at once anyway
+                deadline = time.monotonic() + min(60.0, float(wait or 5) + 5.0)
                 ok = False
                 while time.monotonic() < deadline:
                     await page.wait_for_timeout(250)

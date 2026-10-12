@@ -52,7 +52,9 @@ jobs:
           pip install -q -r requirements.txt pytest httpx numpy trimesh
           python -m playwright install --with-deps --only-shell chromium
           sudo apt-get install -y -qq ffmpeg fonts-noto-cjk > /dev/null
-          python -m pytest -q
+          # 失败的测试写成注释（annotation），不下载日志也能看到是哪一条
+          set -o pipefail
+          python -m pytest -q -rf 2>&1 | tee "$RUNNER_TEMP/labcheck.txt" || { grep -E "^FAILED" "$RUNNER_TEMP/labcheck.txt" | sed 's/^/::error::/'; exit 1; }
       - name: Verilog synthesis service tests (inside its own image, with the Yosys that goes live)
         working-directory: services/micro-synth
         run: |
