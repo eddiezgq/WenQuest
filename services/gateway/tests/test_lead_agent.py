@@ -255,3 +255,17 @@ def test_long_structured_answers_are_streamed_and_get_more_room_when_cut_off():
     gw = ModelGateway("claude", httpx.AsyncClient(transport=httpx.MockTransport(handler)), anthropic_key="k")
     out = asyncio.run(gw._claude("s", "p", {"type": "object"}, 16000))
     assert out == {"a": [1, 2, 3]} and seen == [(True, 16000), (True, 32000)]
+
+
+def test_lesson_specs_in_other_shapes_are_understood():
+    """10-13: Sonnet 5 sent lesson specs the normaliser did not read (title left out; nested by language)."""
+    from app.production import spec as sp
+    d = {"problem": {"zh": {"title": "题", "text": "文", "given": ["a", "b"], "answer": "1"},
+                     "en": {"title": "P", "text": "txt", "given": ["A", "B"], "answer": "1"}},
+         "notes": {"zh": [{"heading": "一", "body": "<p>中</p>"}], "en": [{"heading": "One", "body": "<p>en</p>"}]},
+         "lab": {"title": ["l", "L"], "task_list": [{"zh": "任务1", "en": "t1"}, {"text": ["任务2", "t2"]}]}}
+    n = sp.normalize_lesson(d)
+    assert n["problem"]["text"] == ["文", "txt"] and n["problem"]["given"] == [["a", "A"], ["b", "B"]]
+    assert n["notes"] == [{"heading": ["一", "One"], "zh": "<p>中</p>", "en": "<p>en</p>"}]
+    assert n["lab"]["tasks"] == [["任务1", "t1"], ["任务2", "t2"]]
+    assert "problem" in sp.shape(d)

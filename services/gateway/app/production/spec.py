@@ -149,14 +149,55 @@ EXEMPLAR: dict[str, Any] = {
 def pair(v: Any) -> list[str]:
     """Anything -> [zh, en]. A single string is used for both."""
     if isinstance(v, (list, tuple)):
-        items = [str(x or "").strip() for x in v][:2]
+        items = [_flat(x) for x in v][:2]
         if len(items) == 1:
             items.append(items[0])
         return items if items else ["", ""]
     if isinstance(v, dict):
-        return [str(v.get("zh") or "").strip(), str(v.get("en") or "").strip()]
+        if "zh" in v or "en" in v or "cn" in v:
+            zh, en = _flat(v.get("zh") or v.get("cn")), _flat(v.get("en"))
+            return [zh or en, en or zh]
+        for k in ("text", "content", "title", "value", "body"):   # {"text": [zh, en]} and the like
+            if k in v:
+                return pair(v[k])
+        return ["", ""]
     s = str(v or "").strip()
     return [s, s]
+
+
+def _flat(x: Any) -> str:
+    if isinstance(x, (list, tuple)):
+        return "".join(_flat(i) for i in x)
+    if isinstance(x, dict):
+        return _flat(next(iter(x.values()), ""))
+    return str(x or "").strip()
+
+
+def _field_first(o: Any) -> Any:
+    """Models sometimes nest by language first ({"zh": {"title": .., "text": ..}, "en": {..}}): turn that into
+    {"title": [zh, en], "text": [zh, en]} (lists are zipped item by item)."""
+    if not (isinstance(o, dict) and set(o) <= {"zh", "en", "cn"} and any(isinstance(v, dict) for v in o.values())):
+        return o
+    zh, en = o.get("zh") or o.get("cn") or {}, o.get("en") or {}
+    zh, en = (zh if isinstance(zh, dict) else {}), (en if isinstance(en, dict) else {})
+    out = {}
+    for k in list(zh) + [k for k in en if k not in zh]:
+        a, b = zh.get(k), en.get(k)
+        if isinstance(a, list) or isinstance(b, list):
+            a, b = a if isinstance(a, list) else [], b if isinstance(b, list) else []
+            out[k] = [[a[i] if i < len(a) else "", b[i] if i < len(b) else ""] for i in range(max(len(a), len(b)))]
+        else:
+            out[k] = [a or b or "", b or a or ""]
+    return out
+
+
+def shape(d: Any, depth: int = 0) -> Any:
+    """A compact picture of a model answer's structure, for the log when it does not fit."""
+    if isinstance(d, dict):
+        return {k: shape(v, depth + 1) for k, v in list(d.items())[:14]} if depth < 2 else f"dict{sorted(d)[:6]}"
+    if isinstance(d, list):
+        return [f"list[{len(d)}]", shape(d[0], depth + 1)] if d else "list[0]"
+    return f"{type(d).__name__}:{str(d)[:40]!r}"
 
 
 def pairs(v: Any, limit: int = 12) -> list[list[str]]:
@@ -164,13 +205,39 @@ def pairs(v: Any, limit: int = 12) -> list[list[str]]:
 
 
 def normalize_lesson(d: Any) -> dict:
-    d = d if isinstance(d, dict) else {}
-    g = lambda k: d.get(k) if isinstance(d.get(k), dict) else {}  # noqa: E731
+    d = _field_first(d if isinstance(d, dict) else {})
+    if isinstance(d.get("lesson"), dict) and "problem" not in d:   # wrapped one level down
+        d = _field_first(d["lesson"])
+    g = lambda k: _field_first(d.get(k)) if isinstance(d.get(k), dict) else {}  # noqa: E731
     pr, co, ex, an, lab, mo, ev = g("problem"), g("concept"), g("example"), g("animation"), g("lab"), g("model"), g("everyday")
+    if not lab.get("tasks"):
+        lab = {**lab, "tasks": lab.get("task_list") or lab.get("steps") or []}
     notes = []
-    for n in d.get("notes") or []:
+    raw_notes = d.get("notes") or d.get("lecture_notes") or []
+    if isinstance(raw_notes, dict):          # {"sections": [...]} or {"zh": [sections], "en": [sections]}
+        if isinstance(raw_notes.get("sections"), list):
+            raw_notes = raw_notes["sections"]
+        else:
+            zl = raw_notes.get("zh") or raw_notes.get("cn") or []
+            el = raw_notes.get("en") or []
+            zl, el = (zl if isinstance(zl, list) else [zl]), (el if isinstance(el, list) else [el])
+            body = lambda x: _flat(x.get("body") or x.get("content") or x.get("text")) if isinstance(x, dict) else _flat(x)  # noqa: E731
+            head = lambda x: _flat(x.get("heading") or x.get("title")) if isinstance(x, dict) else ""  # noqa: E731
+            raw_notes = [{"heading": [head(zl[i]) if i < len(zl) else "", head(el[i]) if i < len(el) else ""],
+                          "zh": body(zl[i]) if i < len(zl) else "", "en": body(el[i]) if i < len(el) else ""}
+                         for i in range(max(len(zl), len(el)))]
+    for n in raw_notes if isinstance(raw_notes, list) else []:
         if isinstance(n, dict):
-            notes.append({"heading": pair(n.get("heading")), "zh": str(n.get("zh") or ""), "en": str(n.get("en") or "")})
+            body = n.get("body") or n.get("content") or n.get("text")
+            zh, en = n.get("zh"), n.get("en")
+            if (zh is None and en is None) and body is not None:
+                zh, en = pair(body)
+            elif isinstance(zh, (dict, list)) or isinstance(en, (dict, list)):
+                zh, en = _flat(zh), _flat(en)
+            notes.append({"heading": pair(n.get("heading") or n.get("title")), "zh": str(zh or ""), "en": str(en or "")})
+        elif isinstance(n, (list, str)):
+            z, e = pair(n)
+            notes.append({"heading": ["", ""], "zh": z, "en": e})
     return {
         "title": pair(d.get("title")), "goal": pair(d.get("goal")),
         "problem": {"title": pair(pr.get("title")), "text": pair(pr.get("text")), "given": pairs(pr.get("given"), 6), "answer": pair(pr.get("answer"))},

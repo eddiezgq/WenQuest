@@ -950,9 +950,14 @@ class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
             data = await self.ai.json(system=team.AUTHOR, prompt=team.lesson_prompt(ctx, src, notes, sp.STRUCTURE_GUIDE, previous),
                                       schema=sp.lesson_schema(), max_tokens=16000, fake=lambda: fake_spec(les, no))
             spec = sp.normalize_lesson(data)
+            if not spec["title"][0]:          # the title and goal are the outline's anyway
+                spec["title"] = sp.pair(les["title"])
+            if not spec["goal"][0] and les.get("goal"):
+                spec["goal"] = sp.pair(les["goal"])
             missing = sp.check_lesson(spec)
-            if not spec["title"][0] or len(missing) > 6:
-                log.warning("lesson spec for %s came back thin (keys %s; missing %s)", lid, sorted((data or {}).keys())[:20], missing)
+            if len(missing) > 6:
+                log.warning("lesson spec for %s came back thin (missing %s); shape: %s", lid, missing,
+                            json.dumps(sp.shape(data), ensure_ascii=False)[:3000])
                 if attempt == 0:   # once more, saying what was missing
                     notes = (teacher_note + "\n" if teacher_note else "") + "上一稿不完整，缺少：" + "；".join(missing or ["标题"]) + "。请写全每一部分。"
                     continue
