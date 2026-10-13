@@ -231,6 +231,16 @@ class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
         t = self.tasks.get(pid)
         return bool(t and not t.done())
 
+    def mark_failed(self, proj: dict, why: str) -> str:
+        """A job that broke off leaves no lesson half-way: one being written goes to 'failed' (can be written again)."""
+        names = []
+        for c in (proj.get("outline") or {}).get("chapters", []):
+            for les in c["lessons"]:
+                if les["status"] in ("writing", "reviewing"):
+                    les["status"], les["error"] = "failed", why[:500]
+                    names.append(disp(les["title"]))
+        return "》《".join(names)
+
     def run(self, proj: dict, label: str, coro_fn: Callable[[dict], Any]) -> None:
         """Run one piece of team work in the background; the project shows who is working on what."""
         pid = proj["id"]
@@ -256,14 +266,18 @@ class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
                 self.projects.save(p)
                 raise
             except EngineError as exc:
+                log.warning("studio job '%s' for %s stopped: %s %s", label, pid, exc.code, exc, exc_info=True)
                 p = self.projects.load(pid)
                 p["busy"] = None
-                self.say(p, f"这一步没有完成：{plain(exc.code)}。可以稍后再试，或者告诉我换一种做法。", "system", "error")
+                stuck = self.mark_failed(p, f"{exc.code}: {exc}")
+                self.say(p, f"这一步没有完成：{plain(exc.code)}。" + (f"《{stuck}》标为“没写成”，" if stuck else "")
+                         + "可以稍后再试，或者告诉我换一种做法。", "system", "error")
                 self.projects.save(p)
-            except Exception:
+            except Exception as exc:  # noqa: BLE001
                 log.exception("studio job failed for %s", pid)
                 p = self.projects.load(pid)
                 p["busy"] = None
+                self.mark_failed(p, f"{type(exc).__name__}: {exc}")
                 self.say(p, "这一步出错了，已记录。可以再试一次。", "system", "error")
                 self.projects.save(p)
 
@@ -278,12 +292,15 @@ class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
 
     def reconcile(self, proj: dict) -> dict:
         """After a restart, a project may still say 'busy' without anyone working on it."""
-        if proj.get("busy") and not self.is_busy(proj["id"]):
+        if self.is_busy(proj["id"]):
+            return proj
+        # nobody is working: no lesson can be half-written (also those left by a job that failed before round 31's fix)
+        stuck = [les for c in (proj.get("outline") or {}).get("chapters", []) for les in c["lessons"]
+                 if les["status"] in ("writing", "reviewing")]
+        if proj.get("busy") or stuck:
             proj["busy"] = None
-            for c in (proj.get("outline") or {}).get("chapters", []):
-                for les in c["lessons"]:
-                    if les["status"] in ("writing", "reviewing"):
-                        les["status"] = "planned" if not disp(les.get("content")) else "awaiting"
+            for les in stuck:
+                les["status"] = "planned" if not disp(les.get("content")) else "awaiting"
             self.projects.save(proj)
         return proj
 
@@ -935,6 +952,10 @@ class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
             spec = sp.normalize_lesson(data)
             missing = sp.check_lesson(spec)
             if not spec["title"][0] or len(missing) > 6:
+                log.warning("lesson spec for %s came back thin (keys %s; missing %s)", lid, sorted((data or {}).keys())[:20], missing)
+                if attempt == 0:   # once more, saying what was missing
+                    notes = (teacher_note + "\n" if teacher_note else "") + "上一稿不完整，缺少：" + "；".join(missing or ["标题"]) + "。请写全每一部分。"
+                    continue
                 raise EngineError("ai_bad_output", "the lesson spec is empty", 502)
             proj["busy"] = {"label": f"课程设计师正在写实验指导书和教案：{no}", "since": now()}
             self.projects.save(proj)

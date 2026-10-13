@@ -202,3 +202,56 @@ def test_write_steps_are_possible_in_the_outline_stage_and_settle_it(client):
     assert called == [("lessons", first["id"])]
     proj = st.projects.load(pid)
     assert proj["stage"] == "lessons" and proj["outline"]["chapters"][0]["confirmed"]
+
+
+def test_a_failed_writing_job_leaves_the_lesson_failed_not_stuck(client):
+    """A lesson whose writing broke off used to stay 'writing' forever, so it could never be written again."""
+    from app.moodle import EngineError
+    h = login(client)
+    pid, p = to_outline(client, h)
+    st = main._studio()
+    proj = st.projects.load(pid)
+    first = lessons(proj)[0]
+
+    async def broken(pr, lid, note=""):
+        _, les = st.find_lesson(pr, lid)
+        les["status"] = "writing"
+        st.projects.save(pr)
+        raise EngineError("ai_bad_output", "model returned no structured output (stop: max_tokens)", 502)
+    st.write_lesson = broken
+
+    async def go():
+        st.run(proj, "写", lambda pr: st.run_step(pr, {"type": "write_lesson", "lesson_id": first["id"]}))
+        await st.tasks[pid]
+    import asyncio
+    asyncio.run(go())
+    proj = st.projects.load(pid)
+    les = lessons(proj)[0]
+    assert les["status"] == "failed" and "max_tokens" in les["error"]
+    assert "没写成" in proj["messages"][-1]["text"]
+    assert st.step_ok(proj, {"type": "write_lessons", "lesson_ids": [les["id"]]})
+
+
+def test_long_structured_answers_are_streamed_and_get_more_room_when_cut_off():
+    import asyncio
+    seen = []
+
+    def sse(events):
+        return "".join(f"event: {e['type']}\ndata: {json.dumps(e)}\n\n" for e in events)
+
+    def handler(request):
+        body = json.loads(request.content)
+        seen.append((body.get("stream"), body["max_tokens"]))
+        if body["max_tokens"] < 32000:   # the first answer is cut off half-way through the tool input
+            ev = [{"type": "content_block_start", "index": 0, "content_block": {"type": "tool_use", "id": "t", "name": "output", "input": {}}},
+                  {"type": "content_block_delta", "index": 0, "delta": {"type": "input_json_delta", "partial_json": "{\"a\": [1, 2"}},
+                  {"type": "content_block_stop", "index": 0}, {"type": "message_delta", "delta": {"stop_reason": "max_tokens"}}]
+        else:
+            ev = [{"type": "content_block_start", "index": 0, "content_block": {"type": "tool_use", "id": "t", "name": "output", "input": {}}},
+                  {"type": "content_block_delta", "index": 0, "delta": {"type": "input_json_delta", "partial_json": "{\"a\": [1, 2, 3]}"}},
+                  {"type": "content_block_stop", "index": 0}, {"type": "message_delta", "delta": {"stop_reason": "tool_use"}}]
+        return httpx.Response(200, text=sse(ev), headers={"content-type": "text/event-stream"})
+
+    gw = ModelGateway("claude", httpx.AsyncClient(transport=httpx.MockTransport(handler)), anthropic_key="k")
+    out = asyncio.run(gw._claude("s", "p", {"type": "object"}, 16000))
+    assert out == {"a": [1, 2, 3]} and seen == [(True, 16000), (True, 32000)]

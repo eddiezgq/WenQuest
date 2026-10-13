@@ -8,12 +8,15 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import re
 from typing import Any
 
 import httpx
 
 from .moodle import EngineError
+
+log = logging.getLogger("wenquest.ai")
 
 
 class AIError(EngineError):
@@ -137,14 +140,25 @@ class ModelGateway:
         }
         headers = {"x-api-key": self.anthropic_key, "anthropic-version": "2023-06-01",
                    "content-type": "application/json"}
-        for attempt in range(2):
-            data = await self._post("https://api.anthropic.com/v1/messages", body, headers)
+        data: dict = {}
+        for attempt in range(3):
+            # a long answer is streamed: a plain request would hit the read timeout while the model is still writing
+            try:
+                if body["max_tokens"] > 8000:
+                    data = await self._stream("https://api.anthropic.com/v1/messages", body, headers, lambda _t: None,
+                                              timeout=max(self.timeout, 900))
+                else:
+                    data = await self._post("https://api.anthropic.com/v1/messages", body, headers)
+            except AIError as e:
+                if attempt and e.code == "ai_error" and "max_tokens" in str(e):   # more room than this model allows
+                    break
+                raise
             truncated = data.get("stop_reason") == "max_tokens"
             for block in data.get("content", []):
                 if block.get("type") == "tool_use" and not truncated:
                     return block.get("input") or {}
-            if truncated and attempt == 0 and body["max_tokens"] < 32000:   # a big job ran out of room: once more, larger
-                body["max_tokens"] = min(32000, body["max_tokens"] * 2)
+            if truncated and body["max_tokens"] < 64000:   # a big job ran out of room: again, with more room
+                body["max_tokens"] = min(64000, body["max_tokens"] * 2)
                 continue
             if not forced:   # the model may have answered in text
                 text = "\n".join(b.get("text", "") for b in data.get("content") or [] if b.get("type") == "text")
@@ -155,7 +169,9 @@ class ModelGateway:
                     except ValueError:
                         pass
             break
-        raise AIError("ai_bad_output", "model returned no structured output", 502)
+        log.warning("claude gave no structured output: model=%s stop=%s max_tokens=%s usage=%s blocks=%s", body["model"],
+                    data.get("stop_reason"), body["max_tokens"], data.get("usage"), [b.get("type") for b in data.get("content") or []])
+        raise AIError("ai_bad_output", f"model returned no structured output (stop: {data.get('stop_reason')})", 502)
 
     # --- the expert lane (round 5–6): a stronger model that thinks first, and may use tools --------------------
     @property
