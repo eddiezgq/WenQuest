@@ -131,11 +131,12 @@ def test_ok_starts_nothing_and_a_cancelled_proposal_changes_nothing(client):
     assert m["kind"] == "proposal" and not p["busy"]                            # proposed, not started
     p = client.post(f"/api/v1/studio/projects/{pid}/proposals/{m['proposal']}/cancel", headers=h).json()
     assert not p["busy"] and next(x for x in p["proposals"] if x["id"] == m["proposal"])["status"] == "cancelled"
-    # confirming a proposal that needs an unconfirmed chapter is refused with the reason
+    # confirming "write the next lesson" while its chapter is unconfirmed: the teacher asked to write, so the chapter is
+    # confirmed and the lesson written (round 31 step 4 — it used to stop and ask for 本章确认, going in circles)
     p, m = say(client, h, pid, "写下一课")
     p = client.post(f"/api/v1/studio/projects/{pid}/proposals/{m['proposal']}/confirm", headers=h).json()
     p = settle(client, h, pid)
-    assert "还没确认" in p["messages"][-1]["text"]
+    assert p["outline"]["chapters"][0]["confirmed"] and "做好了" in p["messages"][-1]["text"]
 
 
 def test_when_the_model_fails_the_lead_says_so(client, monkeypatch):

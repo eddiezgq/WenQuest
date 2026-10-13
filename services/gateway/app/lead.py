@@ -90,7 +90,10 @@ STEP_DOC = """Steps a proposal may contain (JSON objects with "type"):
 - move_chapter {no, position}
 - rename_chapter {no, title: {zh, en}}
 - set_calendar_note {text}
-- write_lessons {lesson_ids: [..]}: write these planned lessons one after another (background work)"""
+- write_lessons {lesson_ids: [..]}: write these planned lessons one after another (background work)
+- approve_outline {}: settle the outline and move on to writing lessons (outline stage only). Writing steps do this by
+  themselves when the outline is not settled yet, and confirm the chapter they write — the teacher asking to write is
+  the approval."""
 
 LEAD = team.COMMON + (
     " Role: 课程负责人 (course lead) — the only one who talks to the teacher, and a senior colleague who knows the "
@@ -234,7 +237,9 @@ class LeadMixin:
             les = lessons.get(str(s.get("lesson_id")))
             return bool(les) and les["status"] in ("planned", "failed")
         if t == "write_next":
-            return proj["stage"] == "lessons"
+            return self.can_write(proj)
+        if t == "approve_outline":
+            return proj["stage"] == "outline" and any(c["lessons"] for c in o.get("chapters") or [])
         if t == "proceed":
             return proj["stage"] == "materials"
         if t == "set_pace":
@@ -258,7 +263,7 @@ class LeadMixin:
             return bool(o)
         if t == "write_lessons":
             ids = [str(x) for x in s.get("lesson_ids") or []]
-            return proj["stage"] == "lessons" and bool(ids) and all(lessons.get(i) and lessons[i]["status"] in ("planned", "failed") for i in ids)
+            return self.can_write(proj) and bool(ids) and all(lessons.get(i) and lessons[i]["status"] in ("planned", "failed") for i in ids)
         if t == "start_over":
             return bool(o) or proj["stage"] in ("materials", "outline")
         if t == "study_textbook":
@@ -287,6 +292,8 @@ class LeadMixin:
             return f"删除第 {s['no']} 章（已发布的课时保留）"
         if t == "confirm_chapter":
             return f"确认第 {s['no']} 章的课时安排，可以开始写"
+        if t == "approve_outline":
+            return "大纲定稿，开始逐课写作（课程在第一次发布时在平台上建好）"
         if t == "redesign":
             which = "、".join(f"第 {n} 章" for n in s.get("chapters") or []) or "整份大纲"
             return f"课程设计师按你的要求重做{which}：{str(s.get('note') or '')[:200]}"
@@ -439,6 +446,9 @@ class LeadMixin:
             ch = next(c for c in o["chapters"] if c["no"] == _int(s["no"]))
             ch["confirmed"] = True
             return ""
+        if t == "approve_outline":
+            self.settle_outline(proj)
+            return ""
         if t == "set_design_book":
             book = proj.setdefault("design_book", {})
             book[s["field"]] = str(s["value"])[:800]
@@ -540,8 +550,22 @@ class LeadMixin:
             o["chapters"].append(chapter)
             o["chapters"].sort(key=lambda c: c["no"])
 
+    def can_write(self, proj: dict) -> bool:
+        """Lessons can be written once there is an outline with lessons; an unsettled outline is settled on the way."""
+        o = proj.get("outline") or {}
+        return proj["stage"] in ("outline", "lessons") and any(c["lessons"] for c in o.get("chapters") or [])
+
+    def settle_outline(self, proj: dict) -> None:
+        """大纲定稿 without the platform: the course itself is created at the first publish (which needs the teacher's session)."""
+        if proj["stage"] == "outline":
+            proj["stage"] = "lessons"
+            self.say(proj, "大纲定稿，开始逐课写作。每一课写好后要你审过、点“通过并发布”，学生才看得到；课程在第一次发布时在平台上建好。", "lead")
+
     async def run_step(self, proj: dict, s: dict) -> None:
         t = s["type"]
+        if t in ("write_lesson", "write_lessons", "write_next") and proj["stage"] == "outline":
+            self.settle_outline(proj)          # the teacher asked to write: that settles the outline
+            self.projects.save(proj)
         if t == "redesign":
             await self.redesign(proj, [n for n in (_int(x) for x in s.get("chapters") or []) if n], str(s.get("note") or ""))
         elif t == "remake_design_book":
@@ -559,8 +583,8 @@ class LeadMixin:
         elif t == "write_lesson":
             chapter, _ = self.find_lesson(proj, s["lesson_id"])
             if not chapter_confirmed(chapter):
-                self.say(proj, f"第 {chapter['no']} 章的课时安排还没确认，先不写。请先看一下大纲，点“本章确认”。", "lead")
-                return
+                chapter["confirmed"] = True          # the teacher asked for this lesson to be written
+                self.projects.save(proj)
             await self.write_lesson(proj, s["lesson_id"])
         elif t == "write_lessons":
             for lid in s["lesson_ids"]:
@@ -577,6 +601,13 @@ class LeadMixin:
                 await self.write_lesson(p, lid)
         elif t == "write_next":
             nxt = self.next_lesson(proj)
+            if not nxt:   # the next planned lesson sits in a chapter not confirmed yet: the teacher asked to write, so confirm it
+                ch = next((c for c in (proj.get("outline") or {}).get("chapters", [])
+                           if any(les["status"] in ("planned", "failed") for les in c["lessons"])), None)
+                if ch:
+                    ch["confirmed"] = True
+                    self.projects.save(proj)
+                    nxt = self.next_lesson(proj)
             if not nxt:
                 self.say(proj, self.nothing_to_write(proj), "lead")
                 return

@@ -31,7 +31,7 @@ AGENT_TOOLS = [
         "calendar note) and the course design book. `ops` are steps from the list in the system prompt (immediate ones: "
         "set_requirement, set_role, set_textbook, set_textbook_title, set_course_title, set_chapter, rename_chapter, "
         "move_chapter, remove_chapter, confirm_chapter, set_lesson, add_lesson, move_lesson, remove_lesson, "
-        "set_calendar_note, set_design_book, set_pace). Depending on the autonomy level they are applied at once (the "
+        "set_calendar_note, set_design_book, set_pace, approve_outline). Depending on the autonomy level they are applied at once (the "
         "teacher can undo) or become a proposal. Returns what happened."),
      "input_schema": {"type": "object", "properties": {"summary": {"type": "string"},
                                                        "ops": {"type": "array", "items": {"type": "object"}}},
@@ -43,12 +43,17 @@ AGENT_TOOLS = [
      "input_schema": {"type": "object", "properties": {"summary": {"type": "string"},
                                                        "steps": {"type": "array", "items": {"type": "object"}}},
                       "required": ["summary", "steps"]}},
+    {"name": "confirm_proposal", "description": (
+        "Carry out an open proposal (yours, waiting for the teacher) because the teacher has just agreed to it in the "
+        "chat (e.g. '好', '可以', '写吧', '就这样'). Only when the teacher's latest message agrees; never re-propose the "
+        "same thing instead. Immediate changes apply at once; background work starts and runs one step after another."),
+     "input_schema": {"type": "object", "properties": {"proposal_id": {"type": "string"}}, "required": ["proposal_id"]}},
     {"name": "undo", "description": "Undo the last change to the course draft (outline, design book, requirements).",
      "input_schema": {"type": "object", "properties": {}}},
     {"name": "history", "description": "The recent changes to the course draft, newest last.",
      "input_schema": {"type": "object", "properties": {}}},
 ]
-AGENT_LABEL = {"edit_course": "正在改课程草稿", "start_work": "正在安排工作", "undo": "正在撤销", "history": "正在看改动记录"}
+AGENT_LABEL = {"edit_course": "正在改课程草稿", "start_work": "正在安排工作", "confirm_proposal": "正在照你确认的做", "undo": "正在撤销", "history": "正在看改动记录"}
 
 
 def principles() -> str:
@@ -71,7 +76,7 @@ class LeadAgentMixin:
         hist = proj.setdefault("history", [])
         hist.append({"id": _id(), "at": _now(), "label": label[:300], "by": by,
                      "outline": copy.deepcopy(proj.get("outline")), "design_book": copy.deepcopy(proj.get("design_book")),
-                     "requirements": copy.deepcopy(proj.get("requirements") or {}),
+                     "requirements": copy.deepcopy(proj.get("requirements") or {}), "stage": proj.get("stage"),
                      "materials": {k: copy.deepcopy(proj["materials"].get(k)) for k in ("textbook", "book_title")}})
         del hist[:-30]
 
@@ -106,6 +111,10 @@ class LeadAgentMixin:
                 else:
                     dst["lessons"].append(les)
         proj["outline"] = o
+        # back to the outline stage only while nothing has been written (an approve_outline undone)
+        if snap.get("stage") == "outline" and proj.get("stage") == "lessons" and not any(
+                les["status"] != "planned" for c in (o or {}).get("chapters", []) for les in c["lessons"]):
+            proj["stage"] = "outline"
         proj["design_book"] = snap["design_book"]
         proj["requirements"] = snap["requirements"]
         for k, v in (snap.get("materials") or {}).items():
@@ -185,6 +194,42 @@ class LeadAgentMixin:
         self.run(proj, label, chain)
         return "started: " + label + note_bad
 
+    def agent_confirm(self, proj: dict, inp: dict) -> str:
+        """The teacher agreed in the chat: do what the open proposal says (same rules as the 确认 button)."""
+        p = next((x for x in proj.get("proposals") or [] if x["id"] == str(inp.get("proposal_id")) and x["status"] == "open"), None)
+        if not p:
+            opened = [x["id"] for x in proj.get("proposals") or [] if x["status"] == "open"]
+            return f"ERROR: no open proposal with that id (open: {opened or 'none'})"
+        work = [s for s in p["steps"] if s.get("type") in BACKGROUND and self.step_ok(proj, s)]
+        if work and self.is_busy(proj["id"]):
+            return f"NOT done: the team is busy ({(proj.get('busy') or {}).get('label', '')}). Tell the teacher; confirm again when it is done."
+        edits = [s for s in p["steps"] if s.get("type") not in BACKGROUND]
+        results = []
+        if edits:
+            self.snapshot(proj, p.get("summary") or "按确认的提议修改", "lead")
+        for s in edits:
+            if not self.step_ok(proj, s):
+                results.append(f"✗ {self.describe(proj, s) if s.get('type') else s}（现在做不了：条件变了）")
+                continue
+            try:
+                note = self.apply_step(proj, s)
+                results.append(f"✓ {self.describe(proj, s)}" + (f"（{note}）" if note else ""))
+            except EngineError as e:
+                results.append(f"✗ {self.describe(proj, s)}（{e}）")
+        results += [f"▶ {self.describe(proj, s)}" for s in work]
+        p["status"], p["result"], p["done"] = "done", results, _now()
+        proj["messages"].append({"id": _id(), "role": "lead", "kind": "change", "ts": _now(),
+                                 "text": "已按你的同意执行：" + (p.get("summary") or ""), "lines": results})
+        if work:
+            label = "；".join(self.describe(proj, s) for s in work)[:200]
+
+            async def chain(pr: dict, steps=work) -> None:
+                for st in steps:
+                    pr = self.projects.load(pr["id"])
+                    await self.run_step(pr, st)
+            self.run(proj, label, chain)
+        return "done:\n" + "\n".join(results)
+
     def make_proposal(self, proj: dict, summary: str, steps: list[dict], made: list[str]) -> str:
         prop = {"id": _id(), "summary": summary, "steps": steps[:16], "lines": [self.describe_step(proj, s) for s in steps[:16]],
                 "status": "open", "created": _now(), "result": []}
@@ -198,6 +243,8 @@ class LeadAgentMixin:
             return self.agent_edit(proj, inp, made)
         if name == "start_work":
             return self.agent_work(proj, inp, made)
+        if name == "confirm_proposal":
+            return self.agent_confirm(proj, inp)
         if name == "undo":
             try:
                 label = self.undo(proj)

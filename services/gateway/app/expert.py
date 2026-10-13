@@ -26,7 +26,10 @@ EXPERT_RULES = (
     "\n\nHow to act (tools): look things up with the reading tools before you advise; change the draft with `edit_course`; "
     "start the team's work with `start_work`; use `propose` only for a mixed plan the teacher should see as a whole. The "
     "tools apply the autonomy level themselves and tell you whether a change was made or became a proposal; report exactly "
-    "that. Never claim something is done that a tool did not do.\n\n" + STEP_DOC + "\n"
+    "that. Never claim something is done that a tool did not do. When the teacher asks you to write, call `start_work` "
+    "in that same turn (writing settles the outline and confirms the chapter by itself) instead of explaining what you "
+    "will do. When the teacher agrees to an open proposal in the chat, call `confirm_proposal` with its id — do not "
+    "propose it again.\n\n" + STEP_DOC + "\n"
     "- start_over {note}: re-read the textbook (new notes), redo the course design book and the whole outline following "
     "the note; published lessons stay, written-but-unpublished lessons go back to 'to be written'\n"
     "- study_textbook {}: (re)write the textbook notes for every chapter"
@@ -130,7 +133,7 @@ class ExpertMixin:
             nonlocal proj
             proj = self.projects.load(pid)
             out = await self.expert_tool(proj, name, inp, made)
-            if name in ("save_notes", "propose", "edit_course", "start_work", "undo"):
+            if name in ("save_notes", "propose", "edit_course", "start_work", "confirm_proposal", "undo"):
                 self.projects.save(proj)
             return out
 

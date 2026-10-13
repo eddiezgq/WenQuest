@@ -135,3 +135,70 @@ def test_streaming_reply_is_parsed():
     assert data["content"][0] == {"type": "thinking", "thinking": "", "signature": "sig"}
     assert data["content"][1]["text"] == "第 1 章改好了。" and seen[-1] == "第 1 章改好了。"
     assert data["content"][2]["input"] == {"a": 1}
+
+
+def test_writing_from_the_outline_stage_settles_it_and_agreement_in_chat_carries_out_the_proposal(client):
+    """Round 31, step 4 fix: the lead could not settle the outline, nor act on the teacher's 'yes' — it went in circles."""
+    h = login(client)
+    pid, p = to_outline(client, h)
+    assert p["stage"] == "outline"
+    ids = [x["id"] for x in lessons(p)[:2]]
+    # asking to write two lessons while the outline is not settled: a proposal (batch work), not "impossible"
+    as_claude([
+        use("start_work", {"summary": "写前两课", "steps": [{"type": "write_lessons", "lesson_ids": ids}]}, 1),
+        [{"type": "text", "text": "写两课是批量工作，提议在下面。"}],
+    ])
+    p, m = say(client, h, pid, "开始写吧", wait=15)
+    prop = next(x for x in p["proposals"] if x["status"] == "open")
+    assert prop["steps"][0]["type"] == "write_lessons"
+    # the teacher agrees in the chat: the lead carries the proposal out (no new proposal)
+    first = lessons(p)[0]
+    client.put(f"/api/v1/studio/projects/{pid}/autonomy", headers=h, json={"level": "ask"})
+    as_claude([
+        use("edit_course", {"summary": "改名", "ops": [{"type": "set_lesson", "lesson_id": first["id"], "title": {"zh": "新名字", "en": "New"}}]}, 1),
+        [{"type": "text", "text": "提议在下面。"}],
+    ])
+    p, m = say(client, h, pid, "第一课改个名", wait=15)
+    rename = next(x for x in p["proposals"] if x["status"] == "open" and x["steps"][0]["type"] == "set_lesson")
+    n_props = len(p["proposals"])
+    as_claude([
+        use("confirm_proposal", {"proposal_id": rename["id"]}, 1),
+        [{"type": "text", "text": "改好了。"}],
+    ])
+    p, m = say(client, h, pid, "好，就这样", wait=15)
+    assert len(p["proposals"]) == n_props
+    assert next(x for x in p["proposals"] if x["id"] == rename["id"])["status"] == "done"
+    assert lessons(p)[0]["title"]["zh"] == "新名字"
+    assert any(x.get("kind") == "change" and x["text"].startswith("已按你的同意执行") for x in p["messages"])
+
+
+def test_the_lead_can_settle_the_outline_and_undo_it(client):
+    h = login(client)
+    pid, p = to_outline(client, h)
+    as_claude([
+        use("edit_course", {"summary": "大纲定稿", "ops": [{"type": "approve_outline"}]}, 1),
+        [{"type": "text", "text": "大纲定稿了，可以开写。"}],
+    ])
+    p, m = say(client, h, pid, "大纲可以了", wait=15)
+    assert p["stage"] == "lessons" and not p["course"]["id"]      # the course is created at the first publish
+    p = client.post(f"/api/v1/studio/projects/{pid}/undo", headers=h).json()
+    assert p["stage"] == "outline"
+
+
+def test_write_steps_are_possible_in_the_outline_stage_and_settle_it(client):
+    import asyncio
+    h = login(client)
+    pid, p = to_outline(client, h)
+    st = main._studio()
+    proj = st.projects.load(pid)
+    first = lessons(proj)[0]
+    assert st.step_ok(proj, {"type": "write_next"}) and st.step_ok(proj, {"type": "write_lessons", "lesson_ids": [first["id"]]})
+    called = []
+
+    async def fake_write(pr, lid, note=""):
+        called.append((pr["stage"], lid))
+    st.write_lesson = fake_write
+    asyncio.run(st.run_step(proj, {"type": "write_next"}))
+    assert called == [("lessons", first["id"])]
+    proj = st.projects.load(pid)
+    assert proj["stage"] == "lessons" and proj["outline"]["chapters"][0]["confirmed"]
