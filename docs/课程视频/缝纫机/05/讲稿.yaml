@@ -1,0 +1,143 @@
+# 《缝纫机设计与制造》公开课 第 5 讲：钩线机构
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch05.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 5-1 录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch05.py 算出（{{ch05.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "5"
+deck: ch05
+skip: [5, 19, 22, 23]       # 三种钩线器、窗口有多宽、钩住以后、模型边界：控制课程部分约 10 分钟（课件与教材里都有）
+code: [ch05]
+title: ["钩线机构：旋梭在对的时刻钩住线环", "The Hook Mechanism: Catching the Loop at the Right Moment"]
+chapter: ["第二篇 机构 · 第 5 章", "Part II Mechanisms · Chapter 5"]
+next: ["第 6 讲 送布机构", "Lecture 6 The feed mechanism"]
+cover_formula: 'h \approx \tfrac{r}{2}(1+\lambda)\,\delta^2'
+tags:
+  zh: [钩线机构, 旋梭, 钩线时刻, 针杆高度, 梭尖间隙, 平缝机]
+  en: [rotary hook, loop catching, hook timing, needle bar height, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第五讲，钩线机构。
+    - 画面上底板下面那个一直朝一个方向高速旋转的零件，就是工业平缝机用的全回转旋梭。机针每扎一针，它的梭尖都要在一瞬间钩住面线的线环，早一点、晚一点、远一点、近一点，就会跳针、劈线，甚至撞针。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 5, the hook mechanism.
+    - The part spinning fast in one direction under the bed plate is the full rotary hook that industrial lockstitch machines use. On every stitch its point has a split second to catch the loop of needle thread. A little early or late, too far or too close, and you get a skipped stitch, a split thread or a needle strike.
+
+after:
+  - id: lab51
+    kind: lab
+    lab: hook
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "['meter','state','tasks','sewOut','stitches','phase'].forEach(i => document.getElementById(i).style.filter = 'blur(7px) grayscale(1)')"
+      - press: reset
+        js: "document.getElementById('sew').click()"
+        sweep: {ang: [190, 216]}
+        dur: 6
+      - press: [play, mess]
+      - sweep: {p_psi: [14, 0]}
+        dur: 4
+      - sweep: {p_dz: [0.4, 0], p_g: [0.26, 0.08]}
+        dur: 5
+      - set: {nm: "1.1"}
+        js: "['front','top'].forEach(i => document.getElementById(i).style.filter = 'blur(9px)'); document.getElementById('sew').click()"
+      - js: "window.scrollTo(0, 520)"
+        set: {nm: "0.9", fab: knit}
+      - set: {fab: woven}
+        js: "document.getElementById('map').style.filter = 'blur(16px) grayscale(1)'"
+        sweep: {p_psi: [0, 12]}
+        dur: 5
+    say:
+      zh:
+        - ">下面是本讲的虚拟实验 5-1，在问渠学习平台上可以亲手做。读数、试缝结果和任务判定这里先遮住，留给你自己读。"
+        - ">先点恢复手册标准，拖动主轴转角，看线环怎样在机针凹口一侧鼓出来、梭尖怎样从中间穿过。记下这时的读数，试缝 30 针。"
+        - ">任务一：点打乱，模拟一台没调好的机器。看哪些读数跑出了手册范围。"
+        - ">按课上讲的顺序调回来：先对钩线时刻，"
+        - ">再对针杆高度，最后调间隙，调好后试缝 30 针，全部正常才算完成。"
+        - ">任务二：把机针换成 Nm 110，先不动间隙试缝一次，看会发生什么，再把间隙调回手册范围。"
+        - ">任务三：面料改成针织，看下面的钩线窗口怎样变窄，把工作点放到深绿区的中间。"
+        - ">任务四：把旋梭安装角推迟到 10 度以上，只调针杆高度让试缝全部正常，这一题也是作业。指导书和报告模板在平台上下载，做完把报告交上来。"
+      en:
+        - ">Now Virtual lab 5-1. On the WenQuest platform you can do it yourself. The readings, the test-sewing result and the task checks are blurred here. Read them yourself when you work the lab."
+        - ">First restore the manual standard and drag the shaft angle. Watch the loop bulge out beside the needle's scarf and the hook point pass through it. Note the readings, and sew 30 test stitches."
+        - ">Task one. Press scramble, which imitates a badly adjusted machine, and see which readings fall outside the manual."
+        - ">Bring them back in the order from the lecture. Timing first,"
+        - ">then needle-bar height, and the clearance last. Then sew 30 test stitches. It's done when they're all good."
+        - ">Task two. Fit an Nm 110 needle, sew once without touching the clearance, and see what happens. Then bring the clearance back into the manual range."
+        - ">Task three. Switch to knit cloth, watch the catch window below get narrower, and put the working point in the middle of the dark green."
+        - ">Task four. Retard the hook 10 degrees or more, and adjust only the needle-bar height until every test stitch is good. That one is also in the assignment. Download the guide and the report template on the platform, and hand in your report when you're done."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件、三维样机和虚拟实验 5-1，可以自己动手", "Interactive slides, the 3D prototype and Lab 5-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件、三维样机和虚拟实验 5-1 都可以自己打开，放慢了看旋梭怎样钩线，亲手拖滑块。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides, the 3D prototype and Virtual lab 5-1 yourself, slow the hook down to watch it catch the loop, and drag the sliders."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 5：钩线调整计算与诊断", "Assignment 5: hook adjustment, calculation and diagnosis"]
+      points:
+        - ["计算：回升 1.6、2.0、2.5 mm 的钩线转角；Nm 70、Nm 110 的间隙", "Compute: catch angles for 1.6, 2.0, 2.5 mm rise; clearance with Nm 70 and Nm 110"]
+        - ["实验：安装角推迟 +10° 以上，只调针杆高度", "Lab: hook retarded past +10°, adjust bar height only"]
+        - ["论述：T 恤线跳针，从钩线窗口找三条措施", "Discuss: a T-shirt line skips; three fixes, mapped to the window"]
+      foot: ["另交虚拟实验 5-1 的实验报告。作业和报告都在问渠学习平台提交。", "Plus the report for Virtual lab 5-1. Submit both on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题是计算：用近似式求机针回升 1.6、2.0、2.5 毫米时的钩线转角，以及从 1.6 调到 2.5 毫米旋梭要转多少度。第二题，Nm 90 针时间隙调在 0.06 毫米，换成 Nm 70 和 Nm 110 各变成多少、出什么毛病、怎么重调。"
+        - ">第三题是实验：把旋梭安装角推迟到 10 度以上，只调针杆高度让试缝全部正常，用窗口的斜率说明为什么这样能补救。"
+        - ">第四题是论述：一条 T 恤线跳针严重，列出至少三条措施，说明每一条是加宽了窗口、把工作点移到了中间，还是减小了所需的距离。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One, calculation. With the approximate formula, find the shaft angle of catch for needle rises of 1.6, 2.0 and 2.5 millimetres, and how far the hook must turn on its shaft to go from 1.6 to 2.5. Two, the clearance was set at 0.06 millimetres with an Nm 90 needle. What does it become with Nm 70 and with Nm 110, what fault does each cause, and how do you reset it?"
+        - ">Three, the lab. Retard the hook angle past 10 degrees, adjust only the needle-bar height until every test stitch is good, and use the slope of the window to explain why that works."
+        - ">And four, discussion. A T-shirt line skips badly. List at least three fixes, and say whether each one widens the window, moves the working point to the middle, or reduces the distance needed."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["旋梭改成和主轴 1 比 1，会出什么问题？", "What goes wrong if the hook ran 1:1 with the shaft?"]
+        - ["钩线时刻推迟、针杆没动，最可能出什么毛病？", "Timing retarded, bar height untouched: what fault is likely?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：如果旋梭和主轴改成 1 比 1，线环还来得及脱出来吗？"
+        - ">钩线时刻推迟了，针杆高度没动，按钩线窗口模型，最可能出现什么问题？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, if the hook ran one to one with the shaft, would the loop cast off in time?"
+        - ">If the timing is retarded and the needle-bar height is left alone, what problem does the window model predict?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们看送布机构，看送布牙怎样在机针离开布料的时候把布往前送。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the 3D prototype, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, the feed mechanism, and how the feed dog moves the cloth forward while the needle is out of it. See you then.
