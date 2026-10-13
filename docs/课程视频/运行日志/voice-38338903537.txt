@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:01<00:00,  1.68s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:15:58,867 INFO synthesis text The Nm number divided by one hundred is roughly the needle diameter in millimetres.
+2026-10-13 03:16:02,648 INFO yield speech len 6.84, rtf 0.5527786692680672
+
+100%|██████████| 1/1 [00:03<00:00,  3.95s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.95s/it]
+cv2: 160/220 句，用时 12.1 分钟，预计还要 4.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:02,828 INFO synthesis text From Nm ninety to Nm one hundred and ten the diameter grows by zero.two millimetres, so the surface moves half that, zero.ten, toward the point: a clearance of zero.six becomes -zero.four, and the point hits the needle.
+2026-10-13 03:16:12,854 INFO yield speech len 19.24, rtf 0.521090979883428
+
+100%|██████████| 1/1 [00:10<00:00, 10.22s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:13,049 INFO synthesis text Go the other way, to Nm seventy, and it becomes zero.sixteen; the point misses the loop and stitches skip.
+2026-10-13 03:16:18,902 INFO yield speech len 11.4, rtf 0.5134568716350354
+
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:19,086 INFO synthesis text So after any needle change, reset the clearance.
+2026-10-13 03:16:21,227 INFO yield speech len 3.56, rtf 0.6014487716589081
+
+100%|██████████| 1/1 [00:02<00:00,  2.31s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:21,275 WARNING synthesis text Lab five-one shows it directly. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:16:21,401 INFO synthesis text Lab five-one shows it directly.
+2026-10-13 03:16:22,942 INFO yield speech len 2.48, rtf 0.6212567129442769
+
+100%|██████████| 1/1 [00:01<00:00,  1.71s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:23,122 INFO synthesis text On the right, an Nm ninety needle at the standard clearance: the point passes clear.
+2026-10-13 03:16:27,061 INFO yield speech len 7.44, rtf 0.5294241892394199
+
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:27,236 INFO synthesis text On the left, only the needle changed to Nm one hundred and ten, hook untouched: the needle surface has grown outward, the clearance is negative, and the point hits the needle.
+2026-10-13 03:16:35,489 INFO yield speech len 15.68, rtf 0.5263951207910266
+
+100%|██████████| 1/1 [00:08<00:00,  8.44s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:35,554 WARNING synthesis text That's the clatter on the shop floor. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:16:35,771 INFO synthesis text That's the clatter on the shop floor.
+2026-10-13 03:16:38,014 INFO yield speech len 3.36, rtf 0.6676221177691505
+
+100%|██████████| 1/1 [00:02<00:00,  2.50s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:38,191 INFO synthesis text When you hear it, stop at once and check the point and the needle; stone off any burr or replace the part.
+2026-10-13 03:16:42,482 INFO yield speech len 8.08, rtf 0.5311082495321141
+
+100%|██████████| 1/1 [00:04<00:00,  4.47s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:42,530 WARNING synthesis text The catch window. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:16:42,658 INFO synthesis text The catch window.
+2026-10-13 03:16:43,588 INFO yield speech len 0.88, rtf 1.0566651821136475
+
+100%|██████████| 1/1 [00:01<00:00,  1.10s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:43,630 WARNING synthesis text Why must the three be set together? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:16:43,757 INFO synthesis text Why must the three be set together?
+2026-10-13 03:16:45,302 INFO yield speech len 2.2, rtf 0.7023646614768287
+
+100%|██████████| 1/1 [00:01<00:00,  1.71s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.71s/it]
+cv2: 170/220 句，用时 12.8 分钟，预计还要 3.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:45,475 INFO synthesis text We need to know how big the loop is at the catch and where.
+2026-10-13 03:16:48,183 INFO yield speech len 4.64, rtf 0.5837193850813241
+
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:48,358 INFO synthesis text A real loop depends on thread stiffness, twist and how the cloth grips it, and is hard to compute, so the book uses a schematic model.
+2026-10-13 03:16:55,255 INFO yield speech len 13.2, rtf 0.5224298527746489
+
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:16:55,436 INFO synthesis text As the needle rises the loop bulges out by the scarf, growing to a maximum near two.two millimetres of rise, then closing again.
+2026-10-13 03:17:02,376 INFO yield speech len 12.68, rtf 0.5472932140157802
+
+100%|██████████| 1/1 [00:07<00:00,  7.11s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:02,557 INFO synthesis text The point catches it if the bulge exceeds the clearance plus the point's thickness.
+2026-10-13 03:17:06,701 INFO yield speech len 7.92, rtf 0.5232555998696221
+
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:06,882 INFO synthesis text Too near the eye splits the thread; zero clearance hits the needle.
+2026-10-13 03:17:09,809 INFO yield speech len 5.36, rtf 0.5460351260740365
+
+100%|██████████| 1/1 [00:03<00:00,  3.10s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:09,993 INFO synthesis text Check every point on the plane of hook angle against needle-bar height, and the points that catch form a region: the catch window, darker green meaning more margin.
+2026-10-13 03:17:17,281 INFO yield speech len 13.56, rtf 0.5374527786333653
+
+100%|██████████| 1/1 [00:07<00:00,  7.48s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:17,344 WARNING synthesis text Right, woven cloth; left, knit. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:17:17,475 INFO synthesis text Right, woven cloth; left, knit.
+2026-10-13 03:17:19,483 INFO yield speech len 3.32, rtf 0.6048975220645767
+
+100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:19,664 INFO synthesis text Knits stretch, the loop is small and unsteady, and the window is clearly narrower; that's why knits skip.
+2026-10-13 03:17:24,752 INFO yield speech len 9.16, rtf 0.5553809836441773
+
+100%|██████████| 1/1 [00:05<00:00,  5.26s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:24,952 INFO synthesis text On the shop floor: first fit a ball-point needle and check how it's fitted, then take the clearance to its lower limit; don't just keep moving the bar up and down.
+2026-10-13 03:17:31,998 INFO yield speech len 13.32, rtf 0.5290034117999377
+
+100%|██████████| 1/1 [00:07<00:00,  7.25s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:32,242 INFO synthesis text On screen the machine is scrambled, as if badly set up, and the working point jumps out of the window; then it's restored to the manual's standard and the point is back in the middle.
+2026-10-13 03:17:39,878 INFO yield speech len 14.24, rtf 0.5362393313579344
+
+100%|██████████| 1/1 [00:07<00:00,  7.87s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.87s/it]
+cv2: 180/220 句，用时 13.7 分钟，预计还要 3.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:40,101 INFO synthesis text Note the slant: catch later, and by the time the point arrives the eye has risen, so the point is relatively low; to compensate you lower the bar.
+2026-10-13 03:17:46,963 INFO yield speech len 12.36, rtf 0.555255594376993
+
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:47,143 INFO synthesis text That's why the manual says timing first, then height, then clearance, and why its standard point sits mid-window, with margin.
+2026-10-13 03:17:52,744 INFO yield speech len 10.76, rtf 0.5205011943902225
+
+100%|██████████| 1/1 [00:05<00:00,  5.78s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:52,799 WARNING synthesis text After the catch, and field notes. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:17:52,927 INFO synthesis text After the catch, and field notes.
+2026-10-13 03:17:54,681 INFO yield speech len 2.8, rtf 0.6264802387782507
+
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:17:54,853 INFO synthesis text Catching the loop and a robot picking moving parts off a conveyor are the same kind of problem: the tool must reach a moving target at the right time, the right height and the right clearance.
+2026-10-13 03:18:02,071 INFO yield speech len 13.6, rtf 0.5307363937882816
+
+100%|██████████| 1/1 [00:07<00:00,  7.39s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:02,254 INFO synthesis text The sewing machine locks its hook to the shaft phase mechanically; the robot uses the conveyor encoder as its shaft and corrects the pick point continuously, which is conveyor tracking.
+2026-10-13 03:18:08,436 INFO yield speech len 11.92, rtf 0.5186045929889551
+
+100%|██████████| 1/1 [00:06<00:00,  6.35s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:08,614 INFO synthesis text A thicker needle means resetting the clearance; a new gripper means recalibrating the tool centre point, or it crashes into the part.
+2026-10-13 03:18:15,298 INFO yield speech len 12.68, rtf 0.5271527481379945
+
+100%|██████████| 1/1 [00:06<00:00,  6.86s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:15,482 INFO synthesis text An everyday example: the baton change in a relay race, which has its own window.
+2026-10-13 03:18:18,801 INFO yield speech len 6.32, rtf 0.5250528643402872
+
+100%|██████████| 1/1 [00:03<00:00,  3.49s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:18,979 INFO synthesis text If the receiver starts too early, the runner can't catch up; too late and they collide; hold the hand at the wrong height and the baton drops.
+2026-10-13 03:18:25,126 INFO yield speech len 11.72, rtf 0.524501039713316
+
+100%|██████████| 1/1 [00:06<00:00,  6.32s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:25,365 INFO synthesis text Timing, height and distance have to work together, exactly like the hook: catch timing, needle-bar height and clearance, and none of them can be off.
+2026-10-13 03:18:31,335 INFO yield speech len 11.76, rtf 0.5076783043997628
+
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:31,387 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:18:31,515 INFO synthesis text Back to the start.
+2026-10-13 03:18:32,975 INFO yield speech len 2.0, rtf 0.7296290397644043
+
+100%|██████████| 1/1 [00:01<00:00,  1.63s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.63s/it]
+cv2: 190/220 句，用时 14.6 分钟，预计还要 2.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:33,145 INFO synthesis text The thicker needle's surface moves toward the point by half the diameter difference, zero.ten millimetres, so the clearance becomes -zero.four: the point hits the needle, hence the clatter and the broken needle.
+2026-10-13 03:18:42,035 INFO yield speech len 16.96, rtf 0.5241929079001805
+
+100%|██████████| 1/1 [00:09<00:00,  9.07s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:42,100 WARNING synthesis text Slide the hook out zero.ten millimetres. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:18:42,227 INFO synthesis text Slide the hook out zero.ten millimetres.
+2026-10-13 03:18:44,444 INFO yield speech len 3.92, rtf 0.565495600505751
+
+100%|██████████| 1/1 [00:02<00:00,  2.39s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:44,688 INFO synthesis text By the approximate formula two.zero millimetres of rise is at two hundred and five.seven degrees and two.five at two hundred and eight.seven, about three degrees of shaft; the hook turns twice as fast, so turn it about six degrees on its shaft.
+2026-10-13 03:18:54,078 INFO yield speech len 18.04, rtf 0.5205088074085717
+
+100%|██████████| 1/1 [00:09<00:00,  9.64s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:54,268 INFO synthesis text Then check the bar height, and set the clearance last.
+2026-10-13 03:18:56,495 INFO yield speech len 3.76, rtf 0.5923685875344784
+
+100%|██████████| 1/1 [00:02<00:00,  2.40s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:18:56,672 INFO synthesis text Now Virtual lab five-one. On the WenQuest platform you can do it yourself. The readings, the test-sewing result and the task checks are blurred here. Read them yourself when you work the lab.
+2026-10-13 03:19:04,392 INFO yield speech len 14.68, rtf 0.5258828645181266
+
+100%|██████████| 1/1 [00:07<00:00,  7.90s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:04,579 INFO synthesis text First restore the manual standard and drag the shaft angle. Watch the loop bulge out beside the needle's scarf and the hook point pass through it. Note the readings, and sew thirty test stitches.
+2026-10-13 03:19:11,850 INFO yield speech len 13.8, rtf 0.5268540416938671
+
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:12,033 INFO synthesis text Task one. Press scramble, which imitates a badly adjusted machine, and see which readings fall outside the manual.
+2026-10-13 03:19:16,868 INFO yield speech len 9.24, rtf 0.5233288069308062
+
+100%|██████████| 1/1 [00:05<00:00,  5.01s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:17,052 INFO synthesis text Bring them back in the order from the lecture. Timing first,.
+2026-10-13 03:19:19,832 INFO yield speech len 5.04, rtf 0.5516408454804194
+
+100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:20,008 INFO synthesis text then needle-bar height, and the clearance last. Then sew thirty test stitches. It's done when they're all good.
+2026-10-13 03:19:25,257 INFO yield speech len 9.92, rtf 0.5291172333302037
+
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:25,435 INFO synthesis text Task two. Fit an Nm one hundred and ten needle, sew once without touching the clearance, and see what happens. Then bring the clearance back into the manual range.
+2026-10-13 03:19:32,053 INFO yield speech len 12.68, rtf 0.5219304975274985
+
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.80s/it]
+cv2: 200/220 句，用时 15.6 分钟，预计还要 1.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:32,238 INFO synthesis text Task three. Switch to knit cloth, watch the catch window below get narrower, and put the working point in the middle of the dark green.
+2026-10-13 03:19:37,710 INFO yield speech len 10.4, rtf 0.5261309559528644
+
+100%|██████████| 1/1 [00:05<00:00,  5.65s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:37,892 INFO synthesis text Task four. Retard the hook ten degrees or more, and adjust only the needle-bar height until every test stitch is good. That one is also in the assignment. Download the guide and the report template on the platform, and hand in your report when you're done.
+2026-10-13 03:19:48,120 INFO yield speech len 19.64, rtf 0.5207718147036985
+
+100%|██████████| 1/1 [00:10<00:00, 10.41s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:48,368 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-13 03:19:51,668 INFO yield speech len 5.92, rtf 0.5574262222728213
+
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:51,843 INFO synthesis text You can open today's interactive slides, the threeD prototype and Virtual lab five-one yourself, slow the hook down to watch it catch the loop, and drag the sliders.
+2026-10-13 03:19:58,977 INFO yield speech len 13.64, rtf 0.5229732507834336
+
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:19:59,159 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-13 03:20:02,955 INFO yield speech len 7.0, rtf 0.5423908574240548
+
+100%|██████████| 1/1 [00:03<00:00,  3.97s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:03,133 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-13 03:20:09,369 INFO yield speech len 11.96, rtf 0.5214636541130551
+
+100%|██████████| 1/1 [00:06<00:00,  6.42s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.42s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-13 03:20:09,564 INFO synthesis text Your assignment has four questions. One, calculation. With the approximate formula, find the shaft angle of catch for needle rises of one.six, two.zero and two.five millimetres, and how far the hook must turn on its shaft to go from one.six to two.five. Two, the clearance was set at zero.six millimetres with an Nm ninety needle.
+2026-10-13 03:20:20,512 INFO yield speech len 21.12, rtf 0.5183741111646999
+
+ 50%|█████     | 1/2 [00:11<00:11, 11.14s/it]2026-10-13 03:20:20,703 INFO synthesis text  What does it become with Nm seventy and with Nm one hundred and ten, what fault does each cause, and how do you reset it?
+2026-10-13 03:20:26,447 INFO yield speech len 11.28, rtf 0.5092354530983784
+
+100%|██████████| 2/2 [00:17<00:00,  8.07s/it]
+100%|██████████| 2/2 [00:17<00:00,  8.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:26,629 INFO synthesis text Three, the lab. Retard the hook angle past ten degrees, adjust only the needle-bar height until every test stitch is good, and use the slope of the window to explain why that works.
+2026-10-13 03:20:33,764 INFO yield speech len 14.0, rtf 0.5096262523106166
+
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:33,950 INFO synthesis text And four, discussion. A T-shirt line skips badly. List at least three fixes, and say whether each one widens the window, moves the working point to the middle, or reduces the distance needed.
+2026-10-13 03:20:41,782 INFO yield speech len 14.92, rtf 0.5249407751630523
+
+100%|██████████| 1/1 [00:08<00:00,  8.02s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:41,970 INFO synthesis text Submit the assignment and the lab report on the WenQuest platform.
+2026-10-13 03:20:45,907 INFO yield speech len 7.36, rtf 0.534882040127464
+
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+cv2: 210/220 句，用时 16.8 分钟，预计还要 0.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:46,084 INFO synthesis text There's also a ten-question quiz. For example, if the hook ran one to one with the shaft, would the loop cast off in time?
+2026-10-13 03:20:50,917 INFO yield speech len 9.12, rtf 0.5299165844917297
+
+100%|██████████| 1/1 [00:05<00:00,  5.00s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:51,094 INFO synthesis text If the timing is retarded and the needle-bar height is left alone, what problem does the window model predict?
+2026-10-13 03:20:54,790 INFO yield speech len 6.96, rtf 0.5309914377914078
+
+100%|██████████| 1/1 [00:03<00:00,  3.87s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:54,969 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-13 03:20:58,041 INFO yield speech len 5.72, rtf 0.5370426428067935
+
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:58,092 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:20:58,220 INFO synthesis text Three things to remember.
+2026-10-13 03:20:59,524 INFO yield speech len 1.72, rtf 0.7583011028378509
+
+100%|██████████| 1/1 [00:01<00:00,  1.47s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:20:59,696 INFO synthesis text One: industrial machines use the full-rotary hook at two to one, spending an idle turn to buy time for tightening and feeding; the point moves at about fourteen metres a second.
+2026-10-13 03:21:07,276 INFO yield speech len 14.4, rtf 0.5263786845737033
+
+100%|██████████| 1/1 [00:07<00:00,  7.76s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.76s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:21:07,462 INFO synthesis text Two: you can adjust three things, timing, needle-bar height and clearance, and a new needle size always means a new clearance.
+2026-10-13 03:21:12,572 INFO yield speech len 9.84, rtf 0.5192492308655405
+
+100%|██████████| 1/1 [00:05<00:00,  5.29s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:21:12,758 INFO synthesis text Three: the catch window slants and is narrow, narrower still for knits, so set timing, then height, then clearance, with the working point mid-window.
+2026-10-13 03:21:19,419 INFO yield speech len 13.04, rtf 0.5108316069000338
+
+100%|██████████| 1/1 [00:06<00:00,  6.84s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:21:19,473 WARNING synthesis text Next: the feed mechanism. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-13 03:21:19,601 INFO synthesis text Next: the feed mechanism.
+2026-10-13 03:21:21,598 INFO yield speech len 3.28, rtf 0.6090171453429432
+
+100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:21:21,773 INFO synthesis text The slides, the virtual lab, the threeD prototype, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-13 03:21:30,078 INFO yield speech len 16.24, rtf 0.5114414568605095
+
+100%|██████████| 1/1 [00:08<00:00,  8.48s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-13 03:21:30,264 INFO synthesis text Next time, the feed mechanism, and how the feed dog moves the cloth forward while the needle is out of it. See you then.
+2026-10-13 03:21:35,652 INFO yield speech len 10.48, rtf 0.5140449254567386
+
+100%|██████████| 1/1 [00:05<00:00,  5.56s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.56s/it]
+cv2: 220/220 句，用时 17.7 分钟，预计还要 0.0 分钟
+cv2: 220 句完成
+2026-10-13 03:21:35,704 DEBUG Attempting to acquire lock 138508886691792 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-13 03:21:35,704 DEBUG Lock 138508886691792 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-13 03:21:35,704 DEBUG Attempting to release lock 138508886691792 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-13 03:21:35,705 DEBUG Lock 138508886691792 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-13 03:21:35,707 DEBUG Attempting to acquire lock 138508886698656 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-13 03:21:35,707 DEBUG Lock 138508886698656 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-13 03:21:35,707 DEBUG Attempting to release lock 138508886698656 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-13 03:21:35,707 DEBUG Lock 138508886698656 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+
+Downloading [en/itn/verbalizer.fst]:   0%|          | 0.00/731k [17:43<?, ?B/s]
+GPU 机器已关机，用时 30 分钟
