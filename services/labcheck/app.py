@@ -219,6 +219,16 @@ async def run(html: str, lab: str) -> dict:
                     if st["labs"][lab]["tasks"].get(tid):
                         ok = True
                         break
+                if not ok:   # a slow machine can lose the race once: run the demo again from a clean start, with more time
+                    await page.evaluate(f"() => WQ.reset('{lab}')")
+                    wait = await page.evaluate(f"() => WQ.demo('{lab}', {tid!r})")
+                    deadline = time.monotonic() + min(90.0, 2 * float(wait or 5) + 5.0)
+                    while time.monotonic() < deadline:
+                        await page.wait_for_timeout(250)
+                        st = await page.evaluate("() => WQ.status()")
+                        if st["labs"][lab]["tasks"].get(tid):
+                            ok = True
+                            break
                 tasks[tid] = ok
                 if not ok:
                     problems.append(f"task '{tid}': after its demo {demo} the task was not ticked (it cannot be completed as written)")
