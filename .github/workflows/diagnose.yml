@@ -1,0 +1,56 @@
+name: Diagnose 线上诊断
+
+# 手动运行：把服务器上网关最近的告警和错误日志读出来，写成 GitHub 注释（annotation）。
+# 用途：AI 建课等后台工作失败时，不登录服务器也能看到具体原因。只读，不改服务器上的任何东西。
+on:
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "看多久以内的日志（docker logs --since 的写法，例如 3h、30m）"
+        default: "3h"
+      pattern:
+        description: "只看包含这些词的行（grep -E 的写法）"
+        default: "WARNING|ERROR|Traceback|Error|wenquest\\.(ai|studio|expert|lead)"
+
+permissions:
+  contents: read
+
+jobs:
+  logs:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - name: Set up SSH
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+      - name: Read the gateway log
+        env:
+          SINCE: ${{ github.event.inputs.since }}
+          PATTERN: ${{ github.event.inputs.pattern }}
+        run: |
+          printf 'cd /opt/wenquest && . deploy/lib.sh && echo "model: $(envval CLAUDE_MODEL) lead: $(envval LEAD_MODEL)" && dc logs --no-color --since %q gateway 2>&1 | grep -E %q | grep -v -E "sk-ant|api[_-]?key|password|token=" | tail -n 150\n' "$SINCE" "$PATTERN" \
+            | ssh "deploy@$HOST" bash -s > log.txt || true
+          wc -l log.txt
+          # annotations: at most 10 per step, so pack the lines into 9 messages (newest last)
+          python3 - <<'EOF'
+          lines = open("log.txt", encoding="utf-8", errors="replace").read().splitlines()
+          chunks, cur = [], ""
+          for ln in lines:
+              ln = ln[:1500]
+              if len(cur) + len(ln) > 3800:
+                  chunks.append(cur); cur = ""
+              cur += ln + "\n"
+          if cur:
+              chunks.append(cur)
+          for c in chunks[-9:]:
+              print("::warning::" + c.replace("%", "%25").replace("\r", "").replace("\n", "%0A"))
+          EOF

@@ -13,6 +13,8 @@ on:
       - "tools/video/**"
       - "docs/课程视频/**"
       - ".github/workflows/video.yml"
+      # 线上诊断（只读日志）
+      - ".github/workflows/diagnose.yml"
   workflow_dispatch:
   # Weekly fresh build picks up Moodle security fixes from the stable branch.
   schedule:
