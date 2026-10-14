@@ -1,0 +1,907 @@
+1
+00:00:00,600 --> 00:00:01,703
+Hi everyone,
+
+2
+00:00:01,723 --> 00:00:08,444
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,844 --> 00:00:13,489
+This is Lecture 6, the feed mechanism.
+
+4
+00:00:13,889 --> 00:00:19,559
+On every stitch, the feed dog under the throat plate rises to bite the cloth,
+
+5
+00:00:19,579 --> 00:00:23,475
+pushes it forward a little, then drops and goes back.
+
+6
+00:00:23,495 --> 00:00:27,909
+Push too early or too late, or let the two plies move apart,
+
+7
+00:00:27,929 --> 00:00:33,376
+and you get uneven stitches, a growing upper ply, or even a broken needle.
+
+8
+00:00:34,896 --> 00:00:38,436
+Here's the problem.
+
+9
+00:00:38,836 --> 00:00:44,400
+A jeans factory is sewing waistbands: four plies of denim,
+
+10
+00:00:44,420 --> 00:00:49,599
+about 4 millimetres thick, with a 3 millimetre stitch.
+
+11
+00:00:49,999 --> 00:00:56,246
+The machine is set to the manual's standard feed timing and has always been
+
+12
+00:00:56,266 --> 00:00:58,670
+fine on 1.5 millimetre cloth.
+
+13
+00:00:59,070 --> 00:01:04,050
+But on the waistband the needle is dragged sideways and breaks from time to time.
+
+14
+00:01:04,450 --> 00:01:07,240
+When does the point enter such thick cloth?
+
+15
+00:01:07,640 --> 00:01:12,636
+How far is the cloth pushed after the needle is in?
+
+16
+00:01:13,036 --> 00:01:17,136
+How should the feed timing change, and by how much?
+
+17
+00:01:17,536 --> 00:01:19,836
+We'll work it out at the end.
+
+18
+00:01:21,356 --> 00:01:23,056
+What the feed has to do.
+
+19
+00:01:24,576 --> 00:01:34,316
+What the feed must do was patented by Wilson in 1854: the four-motion feed.
+
+20
+00:01:34,716 --> 00:01:40,157
+The dog rises to grip the cloth, advances carrying it forward,
+
+21
+00:01:40,177 --> 00:01:44,914
+drops below the throat plate and returns to its start.
+
+22
+00:01:45,314 --> 00:01:51,362
+Watch the side view from Lab 6-1; the green part is the feed dog.
+
+23
+00:01:51,762 --> 00:01:57,470
+Rise and drop decide when the cloth is gripped and released;
+
+24
+00:01:57,490 --> 00:02:00,715
+advance and return decide how far.
+
+25
+00:02:01,115 --> 00:02:06,317
+The key point: only the advance above the plate moves the cloth;
+
+26
+00:02:06,337 --> 00:02:09,499
+the return underneath doesn't touch it.
+
+27
+00:02:11,019 --> 00:02:15,510
+The first constraint: while the needle is in the cloth,
+
+28
+00:02:15,530 --> 00:02:17,479
+the cloth must not move.
+
+29
+00:02:17,879 --> 00:02:22,053
+This is the timing chart; across is the shaft angle,
+
+30
+00:02:22,073 --> 00:02:24,876
+the steep line is the needle point,
+
+31
+00:02:24,896 --> 00:02:29,150
+and the grey band is when the needle is in the cloth.
+
+32
+00:02:29,550 --> 00:02:33,381
+From Lecture 3's slider-crank formula,
+
+33
+00:02:33,401 --> 00:02:41,488
+with 1.5 millimetre cloth the point enters at 101.7 degrees and leaves at 258.3,
+
+34
+00:02:41,508 --> 00:02:46,251
+leaving about two hundred degrees for the feed.
+
+35
+00:02:46,651 --> 00:02:53,066
+Push the cloth with the needle in, and you get crooked, uneven stitches,
+
+36
+00:02:53,086 --> 00:02:56,551
+or the needle hits the hook and breaks.
+
+37
+00:02:58,071 --> 00:03:01,119
+Structurally there are two drive trains.
+
+38
+00:03:01,519 --> 00:03:03,497
+Green is the horizontal one:
+
+39
+00:03:03,517 --> 00:03:07,635
+the feed eccentric on the upper shaft drives the feed rod,
+
+40
+00:03:07,655 --> 00:03:12,630
+through the stitch regulator, a tilting guide, to the feed rock shaft,
+
+41
+00:03:12,650 --> 00:03:15,412
+which moves the dog bar back and forth.
+
+42
+00:03:15,812 --> 00:03:18,142
+Amber is the vertical one:
+
+43
+00:03:18,162 --> 00:03:24,018
+the lift eccentric on the lower shaft drives the lift rock shaft,
+
+44
+00:03:24,038 --> 00:03:27,271
+which raises and lowers the dog bar.
+
+45
+00:03:27,671 --> 00:03:30,869
+Add the two and you have the dog's motion.
+
+46
+00:03:31,269 --> 00:03:36,628
+The benefit: stitch length changes only the horizontal amplitude,
+
+47
+00:03:36,648 --> 00:03:39,359
+not when the dog rises and drops;
+
+48
+00:03:39,379 --> 00:03:44,490
+dog height changes only the vertical position, not the stitch.
+
+49
+00:03:46,010 --> 00:03:48,909
+The dog's path and the feed per stitch.
+
+50
+00:03:50,429 --> 00:03:51,452
+Now a model.
+
+51
+00:03:51,852 --> 00:03:56,592
+A link driven by an eccentric moves almost harmonically.
+
+52
+00:03:56,992 --> 00:04:04,173
+Horizontally, X is a cosine with amplitude half the stroke; vertically,
+
+53
+00:04:04,193 --> 00:04:08,738
+Y is a cosine too, shifted down by A minus h,
+
+54
+00:04:08,758 --> 00:04:14,012
+so at its highest the dog is just h above the plate.
+
+55
+00:04:14,412 --> 00:04:22,312
+Only while Y is above zero, with the dog showing above the plate, can it grip.
+
+56
+00:04:22,712 --> 00:04:30,199
+With a lift amplitude of 1.1 millimetres and a dog height of 0.8,
+
+57
+00:04:30,219 --> 00:04:38,169
+the half-width alpha is 74.2 degrees and the gripping interval 148.3:
+
+58
+00:04:38,189 --> 00:04:42,212
+up at 325.8 degrees, down at 114.2.
+
+59
+00:04:43,732 --> 00:04:48,942
+The cloth moves only while the dog is above the plate,
+
+60
+00:04:48,962 --> 00:04:56,398
+so the feed per stitch is the dog's horizontal position at the drop minus its
+
+61
+00:04:56,418 --> 00:04:58,432
+position at the rise.
+
+62
+00:04:58,832 --> 00:05:03,012
+With the foremost point at the drop,
+
+63
+00:05:03,032 --> 00:05:11,412
+s is S over two times one minus cos two alpha: here 0.926 of the stroke.
+
+64
+00:05:11,812 --> 00:05:17,592
+So a 3 millimetre stitch needs a dog stroke of 3.24.
+
+65
+00:05:17,992 --> 00:05:24,106
+The shortfall is the bit the dog travels forward below the plate before it emerges,
+
+66
+00:05:24,126 --> 00:05:25,732
+which carries nothing.
+
+67
+00:05:26,132 --> 00:05:30,784
+The stitch dial shows how far the cloth actually moves.
+
+68
+00:05:32,304 --> 00:05:36,799
+This is the path of the tooth tip, a tilted ellipse;
+
+69
+00:05:36,819 --> 00:05:42,964
+the thick part is where the dog is above the plate, carrying the cloth.
+
+70
+00:05:43,364 --> 00:05:45,784
+What if the phase is wrong?
+
+71
+00:05:46,184 --> 00:05:51,081
+On the left the horizontal motion alone is 30 degrees early:
+
+72
+00:05:51,101 --> 00:05:57,473
+the dog reaches its front point early but doesn't drop for another 30 degrees,
+
+73
+00:05:57,493 --> 00:06:00,178
+so above the plate it moves back,
+
+74
+00:06:00,198 --> 00:06:06,324
+dragging the cloth back 0.22 millimetres and leaving a stitch of only 2.17.
+
+75
+00:06:06,724 --> 00:06:08,184
+That's back-drag.
+
+76
+00:06:08,584 --> 00:06:14,287
+Delay it instead and the dog is still moving forward as it reaches the plate,
+
+77
+00:06:14,307 --> 00:06:17,335
+pushing the cloth after the needle is in.
+
+78
+00:06:17,735 --> 00:06:21,975
+Both are fixed by the eccentric's mounting angle.
+
+79
+00:06:23,495 --> 00:06:24,515
+Feed timing.
+
+80
+00:06:26,035 --> 00:06:30,455
+Put the needle and the dog on one angle axis.
+
+81
+00:06:30,855 --> 00:06:40,282
+Grey is the needle in the cloth, 101.7 to 258.3 degrees;
+
+82
+00:06:40,302 --> 00:06:50,235
+green is the dog gripping, from 325.8 across zero to 114.2.
+
+83
+00:06:50,635 --> 00:06:56,522
+They overlap only in the dozen or so degrees from 101.7 to 114.2,
+
+84
+00:06:56,542 --> 00:07:00,975
+and by then the dog is almost at its front point,
+
+85
+00:07:00,995 --> 00:07:07,973
+so the cloth moves only about 0.04 millimetres more, within the 0.05 allowed.
+
+86
+00:07:08,373 --> 00:07:12,993
+There's plenty of margin on the rising side; the tight side is the drop.
+
+87
+00:07:14,513 --> 00:07:17,853
+On the shop floor nobody measures angles.
+
+88
+00:07:18,253 --> 00:07:24,189
+The manual's standard feed timing says: as the feed dog drops below the plate,
+
+89
+00:07:24,209 --> 00:07:29,993
+its face and the top of the needle eye become flush with the plate together.
+
+90
+00:07:30,393 --> 00:07:35,932
+In our example both happen at 114.2 degrees.
+
+91
+00:07:36,332 --> 00:07:40,061
+Checking is easy: turn the handwheel, watch the plate,
+
+92
+00:07:40,081 --> 00:07:45,060
+and see whether the dog face and the eye top sink out of sight together.
+
+93
+00:07:45,460 --> 00:07:46,982
+In this chapter,
+
+94
+00:07:47,002 --> 00:07:54,211
+advancing or delaying the timing moves both the horizontal and lift motions
+
+95
+00:07:54,231 --> 00:07:55,078
+together.
+
+96
+00:07:56,598 --> 00:08:00,338
+Back to the thick cloth in our problem.
+
+97
+00:08:00,738 --> 00:08:05,141
+Thicker cloth means the point meets it sooner.
+
+98
+00:08:05,541 --> 00:08:12,322
+In the lab, switch to four plies of denim and the grey band widens,
+
+99
+00:08:12,342 --> 00:08:20,241
+starting earlier: the point enters at 92.7 degrees, 9 earlier than thin cloth.
+
+100
+00:08:20,641 --> 00:08:28,256
+But the feed timing hasn't changed, so the dog still drops at 114.2.
+
+101
+00:08:28,656 --> 00:08:32,212
+For those twenty-odd degrees the needle is already in,
+
+102
+00:08:32,232 --> 00:08:34,596
+and the cloth is still being pushed.
+
+103
+00:08:34,996 --> 00:08:36,856
+How far?
+
+104
+00:08:37,256 --> 00:08:38,948
+We'll calculate it at the end.
+
+105
+00:08:40,468 --> 00:08:43,880
+Stitch length, dog height and the foot.
+
+106
+00:08:45,400 --> 00:08:47,700
+How is the stitch length set?
+
+107
+00:08:48,100 --> 00:08:50,841
+The lower end of the feed rod, C,
+
+108
+00:08:50,861 --> 00:08:54,772
+is moved up and down about 2e by the eccentric,
+
+109
+00:08:54,792 --> 00:08:57,784
+but it can only slide along a guide.
+
+110
+00:08:58,184 --> 00:09:03,580
+Tilt the guide by theta and C also moves sideways 2e tan theta;
+
+111
+00:09:03,600 --> 00:09:09,340
+that's the dog's stroke, and times the feed efficiency, the stitch.
+
+112
+00:09:09,740 --> 00:09:16,490
+Theta zero, no feed; tip it the other way and you get reverse sewing,
+
+113
+00:09:16,510 --> 00:09:20,120
+which is what the reverse lever does.
+
+114
+00:09:20,520 --> 00:09:23,785
+With e of 3 millimetres and ratio 1,
+
+115
+00:09:23,805 --> 00:09:29,625
+a 3 millimetre stitch needs 28.4 degrees and 5 millimetres 42.0,
+
+116
+00:09:29,645 --> 00:09:33,914
+so the dial gets more crowded at long stitches.
+
+117
+00:09:35,434 --> 00:09:37,705
+Ply shift and feed systems.
+
+118
+00:09:39,225 --> 00:09:43,005
+The second big question: do both plies move together?
+
+119
+00:09:43,405 --> 00:09:48,612
+Drop feed has one dog underneath, pushing the lower ply directly;
+
+120
+00:09:48,632 --> 00:09:53,438
+the upper ply is carried only by friction between the plies,
+
+121
+00:09:53,458 --> 00:09:55,770
+while the foot holds it back.
+
+122
+00:09:56,170 --> 00:09:57,171
+In the lab,
+
+123
+00:09:57,191 --> 00:10:03,859
+switch to two plies of slippery lining and watch the marks on the cloth:
+
+124
+00:10:03,879 --> 00:10:09,710
+the upper marks fall further and further behind the lower ones.
+
+125
+00:10:10,110 --> 00:10:15,743
+Just one percent short per stitch is 4 millimetres over 40 centimetres.
+
+126
+00:10:16,143 --> 00:10:18,950
+Too little pressure and the cloth slips;
+
+127
+00:10:18,970 --> 00:10:21,707
+too much and the upper ply shifts more.
+
+128
+00:10:22,107 --> 00:10:24,327
+Drop feed is caught both ways.
+
+129
+00:10:25,847 --> 00:10:29,206
+There are several feed systems that deal with ply shift.
+
+130
+00:10:29,606 --> 00:10:35,240
+Differential feed uses two dogs to gather or stretch the same ply;
+
+131
+00:10:35,260 --> 00:10:41,065
+that's Lecture 9, and it doesn't help much with shift between plies.
+
+132
+00:10:41,465 --> 00:10:48,058
+Needle feed has the needle swing with the dog once it's in the cloth,
+
+133
+00:10:48,078 --> 00:10:50,645
+pinning the plies together.
+
+134
+00:10:51,045 --> 00:10:56,128
+Compound feed adds a pair of alternating presser feet, carrying top,
+
+135
+00:10:56,148 --> 00:11:00,405
+middle and bottom together; shift falls to about a tenth,
+
+136
+00:11:00,425 --> 00:11:03,857
+and it's used for leather, bags and car seats.
+
+137
+00:11:04,257 --> 00:11:08,702
+Top feed has its own dog, roller or belt above,
+
+138
+00:11:08,722 --> 00:11:13,357
+so the top and bottom feed can be set separately.
+
+139
+00:11:14,877 --> 00:11:20,497
+The dog's four motions are the gait of one leg of a walking robot.
+
+140
+00:11:20,897 --> 00:11:27,697
+In stance the foot is on the ground and pushes back, moving the body forward;
+
+141
+00:11:27,717 --> 00:11:32,037
+in swing it lifts and comes back through the air.
+
+142
+00:11:32,437 --> 00:11:37,162
+The foot path combines the hip's swing and the knee's lift,
+
+143
+00:11:37,182 --> 00:11:42,068
+just as the feed and lift eccentrics combine into an ellipse.
+
+144
+00:11:42,468 --> 00:11:46,968
+The body advances only by the foot's travel while on the ground.
+
+145
+00:11:47,368 --> 00:11:50,497
+Get the phase between the two joints wrong,
+
+146
+00:11:50,517 --> 00:11:56,136
+and the foot is already swinging forward again after touching down: it slips.
+
+147
+00:11:56,536 --> 00:11:57,996
+That's back-drag.
+
+148
+00:11:59,516 --> 00:12:01,889
+An everyday example: rowing.
+
+149
+00:12:02,289 --> 00:12:06,640
+The blade drives the boat only from the catch to the release;
+
+150
+00:12:06,660 --> 00:12:11,513
+after that it comes back through the air without touching the water.
+
+151
+00:12:11,913 --> 00:12:17,740
+Release too late and the blade drags back in the water and slows the boat.
+
+152
+00:12:18,140 --> 00:12:20,624
+That's exactly the feed dog,
+
+153
+00:12:20,644 --> 00:12:27,242
+pushing only while above the plate and back-dragging if it drops too late;
+
+154
+00:12:27,262 --> 00:12:30,640
+the water surface is the throat plate.
+
+155
+00:12:32,160 --> 00:12:33,542
+Back to the start.
+
+156
+00:12:33,942 --> 00:12:38,922
+With 4 millimetres of denim the point enters at 92.7 degrees,
+
+157
+00:12:38,942 --> 00:12:43,841
+9 earlier than thin cloth; the dog doesn't drop until 114.2,
+
+158
+00:12:43,861 --> 00:12:50,071
+and meanwhile the cloth is pushed about 0.11 millimetres with the needle in,
+
+159
+00:12:50,091 --> 00:12:54,498
+over the 0.05 allowed, so the needle bends and breaks.
+
+160
+00:12:54,898 --> 00:13:01,523
+Advance the feed timing, both motions together, by about 8 degrees:
+
+161
+00:13:01,543 --> 00:13:07,078
+the drop moves to 106.2 and the movement falls to 0.045.
+
+162
+00:13:07,478 --> 00:13:12,866
+Advance only the horizontal and 0.06 remains, with some back-drag.
+
+163
+00:13:13,266 --> 00:13:19,103
+A 3 millimetre stitch needs a dog stroke of 3.24.
+
+164
+00:13:20,623 --> 00:13:26,198
+Now Virtual lab 6-1. On the WenQuest platform you can do it yourself.
+
+165
+00:13:26,218 --> 00:13:31,226
+The readings, the status and the task checks are blurred here.
+
+166
+00:13:31,246 --> 00:13:34,551
+Read them yourself when you work the lab.
+
+167
+00:13:34,951 --> 00:13:39,839
+First press Pause and drag the shaft angle. Using the side view,
+
+168
+00:13:39,859 --> 00:13:44,977
+the path and the timing chart, find when the dog emerges and drops,
+
+169
+00:13:44,997 --> 00:13:47,891
+and when the needle enters and leaves.
+
+170
+00:13:48,291 --> 00:13:52,398
+Task one. Set the dog height to 1.0 millimetre,
+
+171
+00:13:52,418 --> 00:13:57,052
+read the emerge and drop angles off the timing chart,
+
+172
+00:13:57,072 --> 00:14:03,111
+enter them in the reading box and press Check. Then compare with 0.8.
+
+173
+00:14:03,511 --> 00:14:10,770
+Task two. Press Scramble timing, which imitates a badly adjusted machine.
+
+174
+00:14:11,170 --> 00:14:17,590
+First use the feed-timing slider to line up the drop with the moment the top
+
+175
+00:14:17,610 --> 00:14:20,047
+of the eye reaches the plate,
+
+176
+00:14:20,447 --> 00:14:25,616
+then remove back-drag with the phase difference.
+
+177
+00:14:25,636 --> 00:14:29,507
+It's done when every reading passes.
+
+178
+00:14:29,907 --> 00:14:30,754
+Task three.
+
+179
+00:14:30,774 --> 00:14:36,743
+Switch to four plies of denim and advance the feed timing until the movement
+
+180
+00:14:36,763 --> 00:14:40,447
+with the needle in and the back-drag both pass.
+
+181
+00:14:40,847 --> 00:14:43,837
+Task four. Two plies of slippery lining.
+
+182
+00:14:43,857 --> 00:14:49,329
+Raise the foot pressure step by step and watch slipping and shift change.
+
+183
+00:14:49,349 --> 00:14:53,015
+If drop feed can't do it, change the feed system.
+
+184
+00:14:53,035 --> 00:14:57,077
+The guide and the report template are on the platform.
+
+185
+00:14:58,597 --> 00:15:03,817
+Everything in this lecture is on the WenQuest learning platform.
+
+186
+00:15:04,217 --> 00:15:08,116
+You can open today's interactive slides,
+
+187
+00:15:08,136 --> 00:15:12,623
+the 3D prototype and Virtual lab 6-1 yourself,
+
+188
+00:15:12,643 --> 00:15:17,717
+and pause to see the dog grip and release the cloth.
+
+189
+00:15:18,117 --> 00:15:22,374
+You submit the assignment and the lab report on the platform,
+
+190
+00:15:22,394 --> 00:15:24,617
+and get marks and comments back.
+
+191
+00:15:25,017 --> 00:15:29,098
+Questions go to the course discussion forum,
+
+192
+00:15:29,118 --> 00:15:35,157
+and the grades page shows your mark on every assignment and quiz.
+
+193
+00:15:36,677 --> 00:15:41,120
+Your assignment has four questions. One, derivation and calculation.
+
+194
+00:15:41,140 --> 00:15:43,877
+Prove the formula for the feed per stitch,
+
+195
+00:15:43,897 --> 00:15:46,962
+find the gripping interval for two dog heights,
+
+196
+00:15:46,982 --> 00:15:50,375
+and the dog stroke needed for a 4 millimetre stitch.
+
+197
+00:15:50,775 --> 00:15:52,590
+Two, the stitch regulator.
+
+198
+00:15:52,610 --> 00:15:57,034
+Find the guide tilt for several stitch lengths and for reverse,
+
+199
+00:15:57,054 --> 00:16:00,632
+explain why the scale crowds towards long stitches,
+
+200
+00:16:00,652 --> 00:16:04,653
+and work out the dog's maximum velocity and acceleration.
+
+201
+00:16:05,053 --> 00:16:05,438
+Three,
+
+202
+00:16:05,458 --> 00:16:11,044
+use the Lecture 3 formula to find the needle-entry angle in 4 millimetres of denim,
+
+203
+00:16:11,064 --> 00:16:15,298
+explain what goes wrong with standard timing and how to fix it,
+
+204
+00:16:15,318 --> 00:16:19,688
+and complete Task three of the virtual lab. And four, discussion.
+
+205
+00:16:19,708 --> 00:16:24,686
+Two plies of silk lining, and the upper ply keeps growing. Compare needle,
+
+206
+00:16:24,706 --> 00:16:28,873
+compound and top feed, and give your equipment recommendation.
+
+207
+00:16:29,273 --> 00:16:36,053
+Submit the assignment and the lab report on the WenQuest platform.
+
+208
+00:16:37,573 --> 00:16:40,485
+There's also a ten-question quiz. For example,
+
+209
+00:16:40,505 --> 00:16:45,329
+when the dog returns below the plate, does it carry the cloth back a little,
+
+210
+00:16:45,349 --> 00:16:49,153
+and is that why the stitch is shorter than the dog's stroke?
+
+211
+00:16:49,553 --> 00:16:56,590
+Or, with the dog at 0.9 millimetres, how wide is the gripping interval?
+
+212
+00:16:56,990 --> 00:17:02,246
+You get three attempts, and the explanations appear as soon as you submit.
+
+213
+00:17:03,766 --> 00:17:05,346
+Three things to remember.
+
+214
+00:17:05,746 --> 00:17:11,883
+One: the dog's motion combines two harmonic motions into a tilted ellipse,
+
+215
+00:17:11,903 --> 00:17:16,126
+and only the part above the plate pushes the cloth.
+
+216
+00:17:16,526 --> 00:17:21,627
+Two: the cloth may move only after the needle is out;
+
+217
+00:17:21,647 --> 00:17:27,328
+standard timing has the dog face and eye top sink together,
+
+218
+00:17:27,348 --> 00:17:31,386
+and heavy cloth needs the timing advanced.
+
+219
+00:17:31,786 --> 00:17:38,446
+Three: drop feed is caught between slipping and ply shift, and needle,
+
+220
+00:17:38,466 --> 00:17:41,882
+compound and top feed each solve it.
+
+221
+00:17:42,282 --> 00:17:46,447
+Next: thread tension and stitch quality.
+
+222
+00:17:46,847 --> 00:17:50,799
+The slides, the virtual lab, the 3D prototype,
+
+223
+00:17:50,819 --> 00:17:56,842
+the assignment and the quiz are all on the WenQuest learning platform,
+
+224
+00:17:56,862 --> 00:18:02,627
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+225
+00:18:03,027 --> 00:18:06,979
+Next time, thread tension and stitch quality,
+
+226
+00:18:06,999 --> 00:18:13,687
+and how the needle and bobbin threads lock tight in the middle of the cloth.
+
+227
+00:18:13,707 --> 00:18:14,834
+See you then.
