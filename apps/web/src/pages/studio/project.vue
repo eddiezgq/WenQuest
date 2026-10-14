@@ -610,6 +610,8 @@ async function act(fn: () => Promise<StudioProject>) {
     take(await fn());
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";
+    // the alert sits at the top of the page; a button far down the page must not look as if nothing happened
+    uni.showToast({ title: errorText(error.value), icon: "none", duration: 4000 });
   }
 }
 
