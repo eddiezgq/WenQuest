@@ -107,4 +107,5 @@ if __import__("os").environ.get("WQ_BOOK_OUT"):
              drop48=j8[1], dragh8=jh[2], backh8=jh[3], h10rise=h1[0], h10drop=h1[1], h10s=h1[4], h10back=h1[3],
              th3=out["θ(3)"], th5=out["θ(5)"], v3=out["v,a @5000 3mm"][0], a3=out["v,a @5000 3mm"][1], ga3=out["v,a @5000 3mm"][1] / 9.81,
              nf_lo=out["针送布抓布区间"][0], nf_hi=out["针送布抓布区间"][1], pmin=Pmin, shift=out["衬里 错位@Pmin 40cm"],
-             nshift=out["针送布 错位(0.3)"], pct40=out["1% 40cm"])
+             nshift=out["针送布 错位(0.3)"], pct40=out["1% 40cm"],
+             phl=PHL0, cshift=0.08 * out["衬里 错位@Pmin 40cm"], fin4r=360 - cross(4.0))

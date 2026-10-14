@@ -1,0 +1,145 @@
+# 《缝纫机设计与制造》公开课 第 6 讲：送布机构
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch06.yaml，2026-10-14 新写），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 6-1 录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch06.py 算出（{{ch06.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "6"
+deck: ch06
+skip: [9, 15, 19, 20, 23, 26]   # 椭圆（下一页对比图里也有）、提前与推迟、牙高、压脚压力、下送布两难、模型边界：控制课程部分约 10 分钟（课件与教材里都有）
+code: [ch06]
+title: ["送布机构：布在什么时候动、动多少", "The Feed Mechanism: When and How Far the Cloth Moves"]
+chapter: ["第二篇 机构 · 第 6 章", "Part II Mechanisms · Chapter 6"]
+next: ["第 7 讲 线张力与线迹质量", "Lecture 7 Thread tension and stitch quality"]
+cover_formula: 's = \tfrac{S}{2}\,(1-\cos 2\alpha)'
+tags:
+  zh: [送布机构, 送布牙, 送布定时, 针距调节器, 针送布, 平缝机]
+  en: [feed dog, feed timing, stitch regulator, needle feed, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第六讲，送布机构。
+    - 机针每扎一针，针板下的送布牙就要升起来咬住布，往前推一小段，再落下去退回。推早了、推晚了，或者上下两层没一起走，就会针距不匀、上层变长，甚至断针。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 6, the feed mechanism.
+    - On every stitch, the feed dog under the throat plate rises to bite the cloth, pushes it forward a little, then drops and goes back. Push too early or too late, or let the two plies move apart, and you get uneven stitches, a growing upper ply, or even a broken needle.
+
+after:
+  - id: lab61
+    kind: lab
+    lab: feed
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "['meter','state','tasks','rdOut','modeNote','phase'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; })"
+      - press: play
+        sweep: {ang: [0, 360]}
+        dur: 8
+      - set: {p_h: "1.0"}
+        js: "window.scrollTo(0, 480)"
+      - press: [reset, mess]
+        js: "window.scrollTo(0, 0)"
+      - sweep: {p_dT: [20, 10]}
+        dur: 5
+      - sweep: {p_dP: [-25, -12]}
+        dur: 5
+      - press: reset
+        set: {fab: denim}
+        sweep: {p_dT: [0, -3]}
+        dur: 5
+      - set: {fab: lining}
+        press: play
+        sweep: {p_P: [0.6, 1.8]}
+        dur: 6
+    say:
+      zh:
+        - ">下面是本讲的虚拟实验 6-1，在问渠学习平台上可以亲手做。读数、状态和任务判定这里先遮住，留给你自己读。"
+        - ">先按暂停，拖动主轴转角，对照侧视动画、轨迹和时序图，找出牙升出、落下和机针入布、出布的时刻。"
+        - ">任务一：把牙高调到 1.0 毫米，从时序图读出牙升出和落下的角度，填进读图框按核对，再和 0.8 毫米比一比。"
+        - ">任务二：按打乱定时，模拟一台没调好的机器。"
+        - ">先用送布定时滑杆，把落牙时刻对到针眼上沿到达针板的时刻，"
+        - ">再用相位差消除回拖，各项读数都达标才算完成。"
+        - ">任务三：面料换成牛仔四层，把送布定时往前调，让布在针中的移动和回拖都达标。"
+        - ">任务四：衬里滑料两层，从小到大调压脚压力，看打滑和错位怎样变化，下送布做不到就换送布方式。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 6-1. On the WenQuest platform you can do it yourself. The readings, the status and the task checks are blurred here. Read them yourself when you work the lab."
+        - ">First press Pause and drag the shaft angle. Using the side view, the path and the timing chart, find when the dog emerges and drops, and when the needle enters and leaves."
+        - ">Task one. Set the dog height to 1.0 millimetre, read the emerge and drop angles off the timing chart, enter them in the reading box and press Check. Then compare with 0.8."
+        - ">Task two. Press Scramble timing, which imitates a badly adjusted machine."
+        - ">First use the feed-timing slider to line up the drop with the moment the top of the eye reaches the plate,"
+        - ">then remove back-drag with the phase difference. It's done when every reading passes."
+        - ">Task three. Switch to four plies of denim and advance the feed timing until the movement with the needle in and the back-drag both pass."
+        - ">Task four. Two plies of slippery lining. Raise the foot pressure step by step and watch slipping and shift change. If drop feed can't do it, change the feed system. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件、三维样机和虚拟实验 6-1，可以自己动手", "Interactive slides, the 3D prototype and Lab 6-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件、三维样机和虚拟实验 6-1 都可以自己打开，暂停下来看送布牙怎样抓布、放布。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides, the 3D prototype and Virtual lab 6-1 yourself, and pause to see the dog grip and release the cloth."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 6：送布机构计算与送布方式选择", "Assignment 6: feed calculations and choosing a feed system"]
+      points:
+        - ["推导 s = (S/2)(1 − cos 2α)；求抓布区间、4 mm 针距的行程", "Derive s = (S/2)(1 − cos 2α); gripping interval; stroke for 4 mm"]
+        - ["针距调节器：2–5 mm 与倒缝的倾角；牙的速度、加速度", "Regulator: tilt for 2–5 mm and reverse; dog speed and acceleration"]
+        - ["牛仔腰头入布角与调法（实验任务 3）；真丝衬里怎样选送布", "Denim entry angle and fix (lab task 3); a feed system for silk lining"]
+      foot: ["另交虚拟实验 6-1 的实验报告。作业和报告都在问渠学习平台提交。", "Plus the report for Virtual lab 6-1. Submit both on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题是推导和计算：证明每针送布量的公式，求两种牙高的抓布区间，以及 4 毫米针距要多大的牙行程。"
+        - ">第二题，针距调节器：求几种针距和倒缝时导杆的倾角，说明刻度为什么越往大越密，再算牙的最大速度和加速度。"
+        - ">第三题，用第 3 讲的公式求 4 毫米牛仔的入布角，说明标准定时下出什么问题、怎么调，并在虚拟实验里完成任务三。第四题是论述：两层真丝衬里上层越缝越长，比较针送布、综合送布、上送布，给出你的设备建议。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One, derivation and calculation. Prove the formula for the feed per stitch, find the gripping interval for two dog heights, and the dog stroke needed for a 4 millimetre stitch."
+        - ">Two, the stitch regulator. Find the guide tilt for several stitch lengths and for reverse, explain why the scale crowds towards long stitches, and work out the dog's maximum velocity and acceleration."
+        - ">Three, use the Lecture 3 formula to find the needle-entry angle in 4 millimetres of denim, explain what goes wrong with standard timing and how to fix it, and complete Task three of the virtual lab. And four, discussion. Two plies of silk lining, and the upper ply keeps growing. Compare needle, compound and top feed, and give your equipment recommendation."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["牙在针板下退回，会把布往回带吗？", "Does the dog carry the cloth back as it returns below the plate?"]
+        - ["牙高 0.9 mm，抓布区间是多少度？", "Dog height 0.9 mm: how wide is the gripping interval?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：送布牙在针板下面退回的时候，会不会把布往回带一段，所以针距才比牙的行程小？"
+        - ">再比如：牙高调到 0.9 毫米，抓布区间是多少度？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, when the dog returns below the plate, does it carry the cloth back a little, and is that why the stitch is shorter than the dog's stroke?"
+        - ">Or, with the dog at 0.9 millimetres, how wide is the gripping interval?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们看线张力与线迹质量，看面线和底线怎样在布的中间收紧成一个好线迹。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the 3D prototype, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, thread tension and stitch quality, and how the needle and bobbin threads lock tight in the middle of the cloth. See you then.

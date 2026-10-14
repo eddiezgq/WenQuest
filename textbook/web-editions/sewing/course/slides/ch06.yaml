@@ -1,0 +1,353 @@
+# 第 6 讲 送布机构 · 课件（第 24 轮新版式；2026-10-14 每日一讲时新写）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 textbook/tools/webcourse/wc_slides.py 的 LAYOUTS。
+# {{ch06.键:格式}} 由课程包程序 course/calc/ch06.py 算出，不手写数字。
+# notes：讲者备注（放映时只给老师看，录课时当讲稿用）。
+lesson: 6
+code: [ch06]
+
+clips:
+  hero:          # 封面：三维样机全透视，送布链突出，镜头对着针板下的送布牙
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: ["#shell [data-k=xray]", "#chains [data-k=feed]"]}
+      - {at: 2, js: "var t=document.getElementById('tableOn');t.checked=false;t.onchange();window.__api.cam(-0.6,0.28,800,[-60,40,0])"}
+  side:          # 实验 6-1：侧视动画（压脚、针板、送布牙、机针、两层布），一直转
+    page: feed
+    selector: "#side"
+    steps:
+      - {at: 0, js: "var M=document.querySelector('#side');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  lining:        # 衬里滑料两层、下送布：上下层记号越错越开
+    page: feed
+    selector: "#side"
+    steps:
+      - {at: 0, set: {fab: lining}, js: "var M=document.querySelector('#side');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  traj:          # 送布牙齿尖轨迹：倾斜的椭圆，粗线为抓布段
+    page: feed
+    selector: "#traj"
+    steps:
+      - {at: 0, js: "var M=document.querySelector('#traj');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  traj30:        # 水平单独提前 30°：落牙前已经往回走（回拖）
+    page: feed
+    selector: "#traj"
+    steps:
+      - {at: 0, set: {p_dP: "-30"}, js: "var M=document.querySelector('#traj');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  tim:           # 送布时序图：针尖、针眼、牙高、牙和布的水平位置
+    page: feed
+    selector: "#tim"
+    vh: 1250
+    steps:
+      - {at: 0, js: "var M=document.querySelector('#tim');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  denim:         # 牛仔四层：机针入布提前，标准定时下布在针中被推
+    page: feed
+    selector: "#tim"
+    vh: 1250
+    steps:
+      - {at: 0, set: {fab: denim}, js: "var M=document.querySelector('#tim');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+  h10:           # 牙高 1.0 mm：抓布区间变宽
+    page: feed
+    selector: "#tim"
+    vh: 1250
+    steps:
+      - {at: 0, set: {p_h: "1.0"}, js: "var M=document.querySelector('#tim');document.querySelectorAll('body *').forEach(function(e){if(!e.contains(M)&&!M.contains(e))e.style.visibility='hidden'})"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 6 讲", "Lecture 6"]
+    title: ["送布机构", "The Feed Mechanism"]
+    sub: ["布什么时候动、动多少，上下两层是否一起动", "When and how far the fabric moves, and whether both plies move together"]
+    notes:
+      - "这一讲讲第四条传动链：送布机构。画面上突出的是送布链，上轴的送布偏心轮管前后，下轴的抬牙偏心轮管上下，两路合起来让针板下的送布牙一针一针把布往前推。针距不匀、上层越缝越长、厚料断针，这三个车间毛病，修机师傅都会先查送布。"
+      - "Today the fourth drive train: the feed mechanism. On screen the feed train is highlighted: the feed eccentric on the upper shaft gives the back-and-forth motion, the lift eccentric on the lower shaft gives the up-and-down, and together they make the feed dog under the throat plate push the fabric forward stitch by stitch. Uneven stitches, a growing upper ply, broken needles on heavy work: for all three, a mechanic checks the feed first."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["牛仔裤腰头上断针", "Broken needles on jeans waistbands"]
+    facts:
+      - ["四层牛仔约 4 mm 厚，针距 3 mm", "Four plies of denim, about 4 mm; 3 mm stitch"]
+      - ["按说明书标准送布定时调好", "Set to the manual's standard feed timing"]
+      - ["薄料一直正常，缝腰头机针被带歪、断针", "Fine on thin cloth; on waistbands the needle bends and breaks"]
+    notes:
+      - "车间问题。某牛仔裤厂缝腰头，四层牛仔布约 4 毫米厚，针距 3 毫米。机器按使用说明书的标准送布定时调好，缝 1.5 毫米的薄料一直正常。可一缝腰头，机针就被布带歪，时有断针。针尖在什么时候扎进这么厚的布？布在机针入布以后还被推了多少？送布定时该怎么调、调多少？这一讲最后来算。"
+      - "Here's the problem. A jeans factory is sewing waistbands: four plies of denim, about 4 millimetres thick, with a 3 millimetre stitch. The machine is set to the manual's standard feed timing and has always been fine on 1.5 millimetre cloth. But on the waistband the needle is dragged sideways and breaks from time to time. When does the point enter such thick cloth? How far is the cloth pushed after the needle is in? How should the feed timing change, and by how much? We'll work it out at the end."
+
+  - layout: section
+    num: "01"
+    title: ["送布要做什么", "What the feed has to do"]
+
+  - layout: split
+    title: ["四动作：升、进、降、退", "Four motions: rise, advance, drop, return"]
+    points:
+      - ["升、降决定何时抓布、放布", "Rise and drop: when the fabric is gripped and released"]
+      - ["只有针板上方的“进”推动布", "Only the advance above the plate moves the fabric"]
+      - ["布夹在压脚、针板、送布牙之间", "The fabric is held by foot, plate and dog"]
+    visual: {video: side}
+    notes:
+      - "送布要做的事，威尔逊 1854 年就取得了专利，叫四动作送布：送布牙先升起顶住布，再往前带着布走，然后降到针板下面，最后退回原位。看实验 6-1 的侧视动画，绿色的就是送布牙。升和降决定什么时候抓布、放布，进和退决定推多远。关键一句：只有牙在针板上方的那段前进才推动布，在下面退回不碰布。"
+      - "What the feed must do was patented by Wilson in 1854: the four-motion feed. The dog rises to grip the cloth, advances carrying it forward, drops below the throat plate and returns to its start. Watch the side view from Lab 6-1; the green part is the feed dog. Rise and drop decide when the cloth is gripped and released; advance and return decide how far. The key point: only the advance above the plate moves the cloth; the return underneath doesn't touch it."
+
+  - layout: split
+    title: ["第一条约束：机针在布里，布不能动", "Rule one: no feeding while the needle is in"]
+    points:
+      - ["布厚 1.5 mm：{{ch06.fin:.1f}}° 入布，{{ch06.fout:.1f}}° 出布", "1.5 mm cloth: in at {{ch06.fin:.1f}}°, out at {{ch06.fout:.1f}}°"]
+      - ["剩下约两百度，是送布的全部时间", "The remaining two hundred degrees or so are all the feed gets"]
+      - ["针在布中被推：线迹歪，重则断针", "Pushed with the needle in: crooked stitches, or a broken needle"]
+    visual: {video: tim}
+    notes:
+      - "送布受的第一条约束：机针在布里的时候，布不能动。这是时序图，横轴是主轴转角，针尖曲线从上往下扎，灰色底纹是机针在布中的区间。用第 3 讲的曲柄滑块公式，1.5 毫米厚的布，针尖 {{ch06.fin:.1f}} 度入布、{{ch06.fout:.1f}} 度出布，剩下约两百度留给送布。机针在布中时布被推动，轻则线迹歪、针距不匀，重则机针撞上旋梭折断。"
+      - "The first constraint: while the needle is in the cloth, the cloth must not move. This is the timing chart; across is the shaft angle, the steep line is the needle point, and the grey band is when the needle is in the cloth. From Lecture 3's slider-crank formula, with 1.5 millimetre cloth the point enters at {{ch06.fin:.1f}} degrees and leaves at {{ch06.fout:.1f}}, leaving about two hundred degrees for the feed. Push the cloth with the needle in, and you get crooked, uneven stitches, or the needle hits the hook and breaks."
+
+  - layout: figure
+    title: ["结构：两条传动链合成一个运动", "Two drive trains make one motion"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 1700 600" width="100%" height="100%"><style>html.en-only .svgbox .en{font-size:26px!important;fill:#dbe4ef!important}</style><defs><marker id="g1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs><defs><marker id="g2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs><rect x="0" y="60" width="250" height="110" rx="18" fill="#101b2e" stroke="#2ec4b6" stroke-width="4"/><text x="125.0" y="110" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>上轴送布偏心轮</tspan></text><text x="125.0" y="144" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> feed eccentric</tspan></text><path d="M252 115 L296 115" stroke="#2ec4b6" stroke-width="5" marker-end="url(#g1)"/><rect x="300" y="60" width="250" height="110" rx="18" fill="#101b2e" stroke="#2ec4b6" stroke-width="4"/><text x="425.0" y="110" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>送布连杆</tspan></text><text x="425.0" y="144" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> feed rod</tspan></text><path d="M552 115 L596 115" stroke="#2ec4b6" stroke-width="5" marker-end="url(#g1)"/><rect x="600" y="60" width="250" height="110" rx="18" fill="#101b2e" stroke="#2ec4b6" stroke-width="4"/><text x="725.0" y="110" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>针距调节器</tspan></text><text x="725.0" y="144" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> stitch regulator</tspan></text><path d="M852 115 L896 115" stroke="#2ec4b6" stroke-width="5" marker-end="url(#g1)"/><rect x="900" y="60" width="250" height="110" rx="18" fill="#101b2e" stroke="#2ec4b6" stroke-width="4"/><text x="1025.0" y="110" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>送布摆轴</tspan></text><text x="1025.0" y="144" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> feed rock shaft</tspan></text><path d="M1152 115 L1290 115" stroke="#2ec4b6" stroke-width="5" marker-end="url(#g1)"/><rect x="0" y="300" width="250" height="110" rx="18" fill="#101b2e" stroke="#f2b705" stroke-width="4"/><text x="125.0" y="350" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>下轴抬牙偏心轮</tspan></text><text x="125.0" y="384" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> lift eccentric</tspan></text><path d="M252 355 L296 355" stroke="#f2b705" stroke-width="5" marker-end="url(#g2)"/><rect x="300" y="300" width="250" height="110" rx="18" fill="#101b2e" stroke="#f2b705" stroke-width="4"/><text x="425.0" y="350" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>抬牙摆轴</tspan></text><text x="425.0" y="384" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> lift rock shaft</tspan></text><path d="M552 355 L596 355" stroke="#f2b705" stroke-width="5" marker-end="url(#g2)"/><rect x="600" y="300" width="250" height="110" rx="18" fill="#101b2e" stroke="#f2b705" stroke-width="4"/><text x="725.0" y="350" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>叉臂</tspan></text><text x="725.0" y="384" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> fork arm</tspan></text><path d="M852 355 L896 355" stroke="#f2b705" stroke-width="5" marker-end="url(#g2)"/><rect x="900" y="300" width="250" height="110" rx="18" fill="#101b2e" stroke="#f2b705" stroke-width="4"/><text x="1025.0" y="350" font-size="32" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>牙架上下</tspan></text><text x="1025.0" y="384" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> dog bar up/down</tspan></text><path d="M1152 355 L1290 355" stroke="#f2b705" stroke-width="5" marker-end="url(#g2)"/><text x="0" y="40" font-size="26" fill="#5ee0d2" text-anchor="start" font-weight="700"><tspan>水平链：前后（针距）</tspan></text><text x="330" y="40" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> horizontal: back and forth (stitch length)</tspan></text><text x="0" y="280" font-size="26" fill="#f2b705" text-anchor="start" font-weight="700"><tspan>竖直链：上下（升落、牙高）</tspan></text><text x="350" y="280" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> vertical: up and down (rise, drop, height)</tspan></text><rect x="1300" y="60" width="390" height="350" rx="24" fill="rgba(46,196,182,.10)" stroke="#f3f6fa" stroke-width="4"/><text x="1495" y="200" font-size="44" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>送布牙</tspan></text><text x="1495" y="240" font-size="24" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> feed dog</tspan></text><text x="1495" y="310" font-size="34" fill="#f3f6fa" text-anchor="middle" font-family="'DejaVu Serif',serif" font-style="italic">X + Y</text><text x="1495" y="352" font-size="26" fill="#8fa3ba" text-anchor="middle"><tspan>两个运动叠加</tspan></text><text x="1495" y="380" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> two motions added</tspan></text><text x="0" y="470" font-size="30" fill="#5ee0d2" text-anchor="start"><tspan>针距只改水平幅度，不影响升落时刻</tspan></text><text x="600" y="470" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> stitch length changes the horizontal amplitude only, not when the dog rises and drops</tspan></text><text x="0" y="540" font-size="30" fill="#f2b705" text-anchor="start"><tspan>牙高只改竖直位置，不影响针距</tspan></text><text x="600" y="540" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> dog height changes the vertical position only, not the stitch length</tspan></text></svg>
+    h: 600
+    notes:
+      - "结构上是两条传动链。绿色是水平链：上轴的送布偏心轮带送布连杆，经过针距调节器，也就是导杆，到送布摆轴，让牙架前后动。琥珀色是竖直链：下轴的抬牙偏心轮带抬牙摆轴，托着牙架上下动。两个运动叠加就是送布牙的运动。好处是针距只改水平幅度，不影响升落时刻；牙高只改竖直位置，不影响针距。"
+      - "Structurally there are two drive trains. Green is the horizontal one: the feed eccentric on the upper shaft drives the feed rod, through the stitch regulator, a tilting guide, to the feed rock shaft, which moves the dog bar back and forth. Amber is the vertical one: the lift eccentric on the lower shaft drives the lift rock shaft, which raises and lowers the dog bar. Add the two and you have the dog's motion. The benefit: stitch length changes only the horizontal amplitude, not when the dog rises and drops; dog height changes only the vertical position, not the stitch."
+
+  - layout: section
+    num: "02"
+    title: ["牙的轨迹与送布量", "The dog's path and the feed per stitch"]
+
+  - layout: split
+    title: ["两个简谐运动；露出针板才抓布", "Two harmonic motions; it grips only above the plate"]
+    points:
+      - ["偏心轮带的连杆，输出接近简谐运动", "An eccentric-driven link gives nearly harmonic motion"]
+      - ["Y > 0 才抓布：α = arccos((A − h)/A)", "Grips only while Y > 0: α = arccos((A − h)/A)"]
+      - ["A = 1.1、h = 0.8 mm：2α = {{ch06.grip:.1f}}°", "A = 1.1, h = 0.8 mm: 2α = {{ch06.grip:.1f}}°"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html.en-only .svgbox .en{font-size:26px!important;fill:#dbe4ef!important}</style><text x="40" y="50" font-size="30" fill="#f3f6fa" font-family="'DejaVu Serif',serif" font-style="italic">X = (S/2) cos(φ − φF)</text><text x="40" y="100" font-size="30" fill="#f3f6fa" font-family="'DejaVu Serif',serif" font-style="italic">Y = (h − A) + A cos(φ − φL)</text><rect x="80" y="150" width="247" height="345" fill="rgba(46,196,182,.12)"/><rect x="786" y="150" width="74" height="345" fill="rgba(46,196,182,.12)"/><path d="M80 300 L860 300" stroke="#8fa3ba" stroke-width="3" stroke-dasharray="10 6"/><text x="420" y="290" font-size="24" fill="#8fa3ba" text-anchor="start"><tspan>针板面</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> plate, Y = 0</tspan></text><path d="M80 229 L93 220 L106 213 L119 206 L132 202 L145 198 L158 196 L171 196 L184 197 L197 200 L210 205 L223 210 L236 218 L249 226 L262 236 L275 247 L288 259 L301 272 L314 285 L327 300 L340 314 L353 329 L366 344 L379 359 L392 374 L405 388 L418 402 L431 415 L444 427 L457 438 L470 449 L483 458 L496 465 L509 472 L522 476 L535 480 L548 482 L561 482 L574 481 L587 478 L600 473 L613 468 L626 460 L639 452 L652 442 L665 431 L678 419 L691 406 L704 393 L717 378 L730 364 L743 349 L756 334 L769 319 L782 304 L795 290 L808 276 L821 263 L834 251 L847 240 L860 229" stroke="#ff7a45" stroke-width="5" fill="none"/><path d="M80 229 L92 221 L105 213 L117 207 L129 202 L142 199 L154 197 L167 196 L179 197 L191 199 L204 202 L216 207 L228 213 L241 221 L253 229 L266 239 L278 250 L290 261 L303 274 L315 287 L327 300" stroke="#2ec4b6" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M786 300 L795 290 L808 276 L821 263 L834 251 L847 240 L860 229" stroke="#2ec4b6" stroke-width="12" fill="none" stroke-linecap="round"/><text x="200" y="180" font-size="26" fill="#5ee0d2" text-anchor="middle" font-weight="700"><tspan>抓布</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> grip</tspan></text><path d="M327 300 L327 510 M786 300 L786 510" stroke="#4b5f7d" stroke-width="2" stroke-dasharray="6 5"/><text x="327" y="540" font-size="24" fill="#ffb38f" text-anchor="middle">{{ch06.drop:.1f}}° <tspan>落下</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> drop</tspan></text><text x="786" y="540" font-size="24" fill="#5ee0d2" text-anchor="middle">{{ch06.rise:.1f}}° <tspan>升出</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> rise</tspan></text><text x="450" y="522" font-size="26" fill="#ff7a45" text-anchor="start"><tspan>牙高</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> dog height Y</tspan></text><text x="80" y="595" font-size="24" fill="#8fa3ba">0°</text><text x="860" y="595" font-size="24" fill="#8fa3ba" text-anchor="end">360° <tspan>主轴转角</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> shaft angle</tspan></text><text x="450" y="632" font-size="28" fill="#5ee0d2" text-anchor="middle" font-weight="700"><tspan>抓布区间 </tspan>2α = {{ch06.grip:.1f}}°<tspan class="en" font-size="22" fill="#8fa3ba"> gripping interval, across 0°</tspan></text></svg>
+    notes:
+      - "建模。偏心轮带动的连杆，输出很接近简谐运动。水平方向 X 是一个余弦，幅值是行程的一半；竖直方向 Y 也是余弦，只是整体往下移了 A 减 h，牙最高时正好高出针板 h。只有 Y 大于零，牙露出针板，才抓得住布。算例抬牙幅值 1.1 毫米、牙高 0.8 毫米，半宽 α 是 {{ch06.alpha:.1f}} 度，抓布区间 {{ch06.grip:.1f}} 度，{{ch06.rise:.1f}} 度升出，{{ch06.drop:.1f}} 度落下。"
+      - "Now a model. A link driven by an eccentric moves almost harmonically. Horizontally, X is a cosine with amplitude half the stroke; vertically, Y is a cosine too, shifted down by A minus h, so at its highest the dog is just h above the plate. Only while Y is above zero, with the dog showing above the plate, can it grip. With a lift amplitude of 1.1 millimetres and a dog height of 0.8, the half-width alpha is {{ch06.alpha:.1f}} degrees and the gripping interval {{ch06.grip:.1f}}: up at {{ch06.rise:.1f}} degrees, down at {{ch06.drop:.1f}}."
+
+  - layout: split
+    title: ["轨迹是倾斜的椭圆", "The path is a tilted ellipse"]
+    points:
+      - ["两分量差 90° 椭圆是正的", "With the two motions 90° apart the ellipse is upright"]
+      - ["算例最高点比最前端早约 74°：右上斜", "Here the top comes about 74° before the front: it tilts"]
+      - ["粗线：牙在针板以上，带着布走", "Thick line: above the plate, carrying the cloth"]
+    visual: {video: traj}
+    notes:
+      - "把 X 和 Y 画在一张图上，就是送布牙齿尖的轨迹。如果两个分量相差正好 90 度，椭圆是正的；算例里牙的最高点比最前端早了约 74 度，椭圆就向右上倾斜。图里横线是针板面，粗线是牙在针板以上、带着布走的那一段，细线在针板下面退回。圆点就是此刻的齿尖，跟着主轴一圈一圈地转。"
+      - "Plot X against Y and you get the path of the tooth tip. If the two motions were exactly 90 degrees apart the ellipse would be upright; here the dog's highest point comes about 74 degrees before its foremost point, so the ellipse tilts up to the right. The horizontal line is the plate; the thick part is where the dog is above it, carrying the cloth; the thin part is the return underneath. The round dot is the tooth tip right now, going round with the shaft."
+
+  - layout: bignum
+    title: ["布走的距离小于牙的行程", "The cloth moves less than the dog's stroke"]
+    nums:
+      - {n: "{{ch06.eff:.3f}}", n_en: "s / S", label: ["送布效率：最前端与落牙同时", "Feed efficiency, front point at the drop"]}
+      - {n: "{{ch06.S3:.2f}} mm", n_en: "stroke for 3 mm", label: ["3 mm 针距要的牙行程", "Dog stroke for a 3 mm stitch"]}
+      - {n: "= 刻度", n_en: "dial = s", label: ["针距刻度标的是布走的距离", "The dial shows how far the cloth moves"]}
+    foot: ["s = X(落) − X(升) = (S/2)(1 − cos 2α)：牙在针板下已经往前走了一段，那段不带布", "s = X(drop) − X(rise) = (S/2)(1 − cos 2α): the dog moves forward a little below the plate, carrying nothing"]
+    notes:
+      - "布只在牙露出针板时跟着走，所以每针送布量是落牙时和升牙时牙的水平位置之差。最前端和落牙同时的时候，s 等于二分之 S 乘以一减余弦 2α，算例是行程的 {{ch06.eff:.3f}} 倍。所以要缝 3 毫米针距，牙的水平行程得有 {{ch06.S3:.2f}} 毫米。差的那一点，是牙升出针板以前已经在下面往前走了一段，那段不带布。针距刻度标的是布实际走的距离。"
+      - "The cloth moves only while the dog is above the plate, so the feed per stitch is the dog's horizontal position at the drop minus its position at the rise. With the foremost point at the drop, s is S over two times one minus cos two alpha: here {{ch06.eff:.3f}} of the stroke. So a 3 millimetre stitch needs a dog stroke of {{ch06.S3:.2f}}. The shortfall is the bit the dog travels forward below the plate before it emerges, which carries nothing. The stitch dial shows how far the cloth actually moves."
+
+  - layout: duo
+    title: ["相位差不对：回拖", "Wrong phase: back-drag"]
+    left: {video: traj30, label: ["水平单独提前 30°", "Horizontal 30° early"], note: ["落牙前已往回走：针距 {{ch06.s30:.2f}} mm", "Moving back before the drop: {{ch06.s30:.2f}} mm"]}
+    right: {video: traj, label: ["标准相位", "Standard phase"], note: ["最前端时落牙：针距 3.00 mm", "Drops at the front: 3.00 mm"]}
+    notes:
+      - "这是送布牙齿尖的轨迹，一个倾斜的椭圆，粗线是牙在针板以上、带着布走的那段。相位差设错了会怎样？左边把水平运动单独提前 30 度：牙早早到了最前端，可还要过 30 度才落下，这段时间它在针板上方往回走，把布拖回 {{ch06.back30:.2f}} 毫米，实际针距只剩 {{ch06.s30:.2f}} 毫米，这叫回拖。反过来单独推迟，牙落到针板面时还在往前走，布在机针入布以后还被推。两种毛病都靠偏心轮的安装角调好。"
+      - "This is the path of the tooth tip, a tilted ellipse; the thick part is where the dog is above the plate, carrying the cloth. What if the phase is wrong? On the left the horizontal motion alone is 30 degrees early: the dog reaches its front point early but doesn't drop for another 30 degrees, so above the plate it moves back, dragging the cloth back {{ch06.back30:.2f}} millimetres and leaving a stitch of only {{ch06.s30:.2f}}. That's back-drag. Delay it instead and the dog is still moving forward as it reaches the plate, pushing the cloth after the needle is in. Both are fixed by the eccentric's mounting angle."
+
+  - layout: section
+    num: "03"
+    title: ["送布定时", "Feed timing"]
+
+  - layout: split
+    title: ["把针和牙放在同一根转角轴上", "Needle and dog on one angle axis"]
+    points:
+      - ["针在布中 {{ch06.fin:.1f}}°–{{ch06.fout:.1f}}°", "Needle in the cloth {{ch06.fin:.1f}}–{{ch06.fout:.1f}}°"]
+      - ["牙抓布 {{ch06.rise:.1f}}°–{{ch06.drop:.1f}}°（跨过 0°）", "Dog grips {{ch06.rise:.1f}}–{{ch06.drop:.1f}}° (across 0°)"]
+      - ["只在 {{ch06.fin:.1f}}°–{{ch06.drop:.1f}}° 重叠：布只走 {{ch06.drag0:.2f}} mm", "Overlap {{ch06.fin:.1f}}–{{ch06.drop:.1f}}°: the cloth moves {{ch06.drag0:.2f}} mm"]
+    visual: {video: tim}
+    notes:
+      - "把机针和送布牙放在同一根转角轴上。灰底是机针在布中，{{ch06.fin:.1f}} 度到 {{ch06.fout:.1f}} 度；绿底是牙抓布，从 {{ch06.rise:.1f}} 度跨过零度到 {{ch06.drop:.1f}} 度。两者只在 {{ch06.fin:.1f}} 到 {{ch06.drop:.1f}} 度这十几度里重叠，而这时牙已经接近最前端，布只再走约 {{ch06.drag0:.2f}} 毫米，在 0.05 毫米的允许值以内。升牙一侧余量很大，紧张的是落牙一侧。"
+      - "Put the needle and the dog on one angle axis. Grey is the needle in the cloth, {{ch06.fin:.1f}} to {{ch06.fout:.1f}} degrees; green is the dog gripping, from {{ch06.rise:.1f}} across zero to {{ch06.drop:.1f}}. They overlap only in the dozen or so degrees from {{ch06.fin:.1f}} to {{ch06.drop:.1f}}, and by then the dog is almost at its front point, so the cloth moves only about {{ch06.drag0:.2f}} millimetres more, within the 0.05 allowed. There's plenty of margin on the rising side; the tight side is the drop."
+
+  - layout: points
+    title: ["说明书的标准定时：不用量角度", "The manual's standard timing: no protractor needed"]
+    points:
+      - ["牙落下时，牙面与针眼上沿同时与针板齐平", "As the dog drops, its face and the eye top reach the plate together"]
+      - ["算例两者都在 {{ch06.drop:.1f}}°", "In our example both happen at {{ch06.drop:.1f}}°"]
+      - ["检查：手转上轮，看两者是否同时没入针板", "To check: turn the handwheel and watch them sink together"]
+    foot: ["本章简化：定时提前或推迟时，水平和抬牙一起移动", "This chapter's simplification: timing moves the horizontal and lift motions together"]
+    notes:
+      - "现场不量角度。使用说明书的标准送布定时是这样规定的：送布牙落到针板以下的时候，牙面和针眼上沿同时与针板齐平。算例里这两件事都发生在 {{ch06.drop:.1f}} 度。检查方法很简单：手转上轮，盯着针板，看牙面和针眼上沿是不是一起没进去。本章把定时简化成水平和抬牙一起提前或推迟。"
+      - "On the shop floor nobody measures angles. The manual's standard feed timing says: as the feed dog drops below the plate, its face and the top of the needle eye become flush with the plate together. In our example both happen at {{ch06.drop:.1f}} degrees. Checking is easy: turn the handwheel, watch the plate, and see whether the dog face and the eye top sink out of sight together. In this chapter, advancing or delaying the timing moves both the horizontal and lift motions together."
+
+  - layout: bignum
+    title: ["提前与推迟：布在针中移动多少", "Early or late: how far the cloth moves with the needle in"]
+    nums:
+      - {n: "{{ch06.dm10:.3f}} mm", n_en: "10° early", label: ["提前 10°：几乎不动", "10° early: hardly moves"]}
+      - {n: "{{ch06.dp10:.2f}} mm", n_en: "10° late", label: ["推迟 10°：已超 0.05", "10° late: over 0.05"]}
+      - {n: "{{ch06.dp20:.2f}} mm", n_en: "20° late", label: ["推迟 20°：拖针", "20° late: needle drag"]}
+    foot: ["说明书：提前可防送布不匀，推迟可使线迹收紧——推迟要留意拖针", "Manual: earlier prevents uneven feeding, later tightens the stitch; mind needle drag when delaying"]
+    notes:
+      - "定时一动，布在针中的移动量变化很快。提前 10 度，落牙在 104 度左右，布在针中几乎不动，只有 {{ch06.dm10:.3f}} 毫米；推迟 10 度变成 {{ch06.dp10:.2f}} 毫米，已经超过允许值；推迟 20 度到了 {{ch06.dp20:.2f}} 毫米，机针明显被拖。说明书也说：提前可以防止送布不匀，推迟可以让线迹收紧，但推迟要留意拖针。"
+      - "Move the timing and the movement with the needle in changes fast. Ten degrees early, the drop is near 104 degrees and the cloth hardly moves with the needle in, just {{ch06.dm10:.3f}} millimetres. Ten degrees late it's {{ch06.dp10:.2f}}, already over the allowance; twenty degrees late, {{ch06.dp20:.2f}}, and the needle is clearly dragged. The manual says the same: earlier prevents uneven feeding, later tightens the stitch, but watch for needle drag when you delay it."
+
+  - layout: split
+    title: ["厚料：机针入布更早", "Heavy work: the needle enters earlier"]
+    points:
+      - ["4 mm 牛仔：针尖 {{ch06.fin4:.1f}}° 入布，早 {{ch06.early4:.0f}}°", "4 mm denim: the point enters at {{ch06.fin4:.1f}}°, {{ch06.early4:.0f}}° earlier"]
+      - ["牙仍到 {{ch06.drop:.1f}}° 才落下", "The dog still drops at {{ch06.drop:.1f}}°"]
+      - ["针在布中，布又被推一段", "So the cloth is pushed further with the needle in"]
+    visual: {video: denim}
+    notes:
+      - "回到车间问题的那块厚料。布厚了，针尖碰到布面就早了。实验里把面料换成牛仔四层，灰色区间变宽，入布一端提前了：针尖在 {{ch06.fin4:.1f}} 度就扎进布面，比薄料早 {{ch06.early4:.0f}} 度。可送布定时没动，牙还是到 {{ch06.drop:.1f}} 度才落下。这二十多度里机针已经在布里，布还在被往前推。推了多少？留到最后算。"
+      - "Back to the thick cloth in our problem. Thicker cloth means the point meets it sooner. In the lab, switch to four plies of denim and the grey band widens, starting earlier: the point enters at {{ch06.fin4:.1f}} degrees, {{ch06.early4:.0f}} earlier than thin cloth. But the feed timing hasn't changed, so the dog still drops at {{ch06.drop:.1f}}. For those twenty-odd degrees the needle is already in, and the cloth is still being pushed. How far? We'll calculate it at the end."
+
+  - layout: section
+    num: "04"
+    title: ["针距、牙高与压脚", "Stitch length, dog height and the foot"]
+
+  - layout: split
+    title: ["针距调节器：导杆倾角定针距", "Stitch regulator: the guide's tilt sets the stitch"]
+    points:
+      - ["行程 S = 2e·i·tanθ，针距 s = {{ch06.eff:.3f}} S", "Stroke S = 2e·i·tanθ, stitch s = {{ch06.eff:.3f}} S"]
+      - ["θ < 0 牙在针板上往后走：倒缝", "θ < 0: the dog moves back above the plate, reverse"]
+      - ["针距 3 mm 要 {{ch06.th3:.1f}}°，5 mm 要 {{ch06.th5:.1f}}°", "A 3 mm stitch needs {{ch06.th3:.1f}}°, 5 mm {{ch06.th5:.1f}}°"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html.en-only .svgbox .en{font-size:26px!important;fill:#dbe4ef!important}</style><defs><marker id="r1" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs><defs><marker id="r2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs><path d="M180 120 L180 560" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="10 8"/><path d="M180 540 L400 130" stroke="#c8d2de" stroke-width="22" stroke-linecap="round" opacity=".35"/><path d="M180 540 L400 130" stroke="#f3f6fa" stroke-width="5"/><circle cx="180" cy="540" r="14" fill="#08101d" stroke="#f3f6fa" stroke-width="4"/><text x="200" y="592" font-size="24" fill="#8fa3ba" text-anchor="start"><tspan>导杆支点</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> guide pivot</tspan></text><circle cx="340" cy="242" r="18" fill="#2ec4b6"/><circle cx="244" cy="421" r="18" fill="#2ec4b6" opacity=".55"/><text x="362" y="236" font-size="28" font-weight="700" fill="#5ee0d2">C</text><path d="M180 380 A 160 160 0 0 1 256 399" stroke="#f2b705" stroke-width="4" fill="none"/><text x="196" y="360" font-size="30" font-weight="800" fill="#f2b705">θ</text><path d="M470 242 L470 421" stroke="#f2b705" stroke-width="5" marker-start="url(#r1)" marker-end="url(#r1)"/><text x="490" y="320" font-size="30" font-weight="700" fill="#f2b705">2e</text><text x="490" y="356" font-size="24" fill="#8fa3ba" text-anchor="start"><tspan>偏心轮带 C 上下走</tspan></text><text x="490" y="384" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> eccentric: C up and down</tspan></text><path d="M244 480 L340 480" stroke="#2ec4b6" stroke-width="5" marker-start="url(#r2)" marker-end="url(#r2)"/><text x="360" y="490" font-size="28" font-weight="700" fill="#5ee0d2">2e·tanθ</text><text x="360" y="524" font-size="24" fill="#8fa3ba" text-anchor="start"><tspan>同时左右走 = 牙的行程</tspan></text><text x="360" y="552" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> and sideways: the dog's stroke</tspan></text><text x="560" y="100" font-size="30" fill="#f3f6fa" text-anchor="start" font-weight="700">θ = 0<tspan>：不送布</tspan><tspan class="en" font-size="24" fill="#8fa3ba"> no feed</tspan></text><text x="560" y="150" font-size="30" fill="#ffb38f" text-anchor="start" font-weight="700">θ &lt; 0<tspan>：倒缝</tspan><tspan class="en" font-size="24" fill="#8fa3ba"> reverse</tspan></text><text x="560" y="196" font-size="24" fill="#8fa3ba" text-anchor="start"><tspan>倒缝扳手把导杆推到另一侧</tspan></text><text x="560" y="224" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> the reverse lever tips it over</tspan></text></svg>
+    notes:
+      - "针距怎么调？送布连杆的下端 C 被偏心轮带着上下走约 2e，同时又只能沿导杆滑动。导杆倾斜 θ 角，C 就同时左右走 2e 乘正切 θ，这就是牙的行程，再乘送布效率就是针距。θ 等于零不送布；倒向另一侧就是倒缝，倒缝扳手做的就是这件事。算例偏心距 3 毫米、传动比 1，3 毫米针距要 {{ch06.th3:.1f}} 度，5 毫米要 {{ch06.th5:.1f}} 度，所以刻度越往大针距越密。"
+      - "How is the stitch length set? The lower end of the feed rod, C, is moved up and down about 2e by the eccentric, but it can only slide along a guide. Tilt the guide by theta and C also moves sideways 2e tan theta; that's the dog's stroke, and times the feed efficiency, the stitch. Theta zero, no feed; tip it the other way and you get reverse sewing, which is what the reverse lever does. With e of 3 millimetres and ratio 1, a 3 millimetre stitch needs {{ch06.th3:.1f}} degrees and 5 millimetres {{ch06.th5:.1f}}, so the dial gets more crowded at long stitches."
+
+  - layout: split
+    title: ["牙高改变抓布区间", "Dog height changes the gripping interval"]
+    points:
+      - ["0.8 → 1.0 mm：{{ch06.grip:.1f}}° → {{ch06.grip10:.1f}}°", "0.8 → 1.0 mm: {{ch06.grip:.1f}}° → {{ch06.grip10:.1f}}°"]
+      - ["升得早、落得晚：针距变 {{ch06.h10s:.2f}} mm", "Up earlier, down later: the stitch becomes {{ch06.h10s:.2f}} mm"]
+      - ["调牙高后，要复查定时和针距", "After changing height, recheck timing and stitch"]
+    visual: {video: h10}
+    notes:
+      - "牙高怎么选？说明书的标准是 0.75 到 0.85 毫米，薄料低一点，厚料可到 1.0 到 1.1 毫米。可牙高一变，抓布区间就跟着变。实验里把牙高调到 1.0 毫米，绿色区间两头都变宽，从 {{ch06.grip:.1f}} 度变成 {{ch06.grip10:.1f}} 度：牙升得更早、落得更晚。结果针距从 3 毫米变成 {{ch06.h10s:.2f}} 毫米，落牙推迟，布在针中的移动也增加。所以调完牙高，一定要复查定时和针距。"
+      - "How high should the dog be? The manual's standard is 0.75 to 0.85 millimetres, a little lower for fine cloth, up to 1.0 to 1.1 for heavy. But change the height and the gripping interval changes too. In the lab, set the dog to 1.0 millimetre: the green band widens at both ends, from {{ch06.grip:.1f}} to {{ch06.grip10:.1f}} degrees. The dog rises earlier and drops later, so the stitch grows from 3 to {{ch06.h10s:.2f}} millimetres, and with the later drop the cloth moves more with the needle in. So after changing the height, always recheck timing and stitch length."
+
+  - layout: points
+    title: ["压脚压力：太小打滑，太大错位", "Foot pressure: too low slips, too high shifts"]
+    points:
+      - ["太小：布跟不上牙，针距变短、忽长忽短", "Too low: the cloth lags the dog, stitches short and uneven"]
+      - ["太大：留压痕，上层被压脚拖住更多", "Too high: marks, and the foot holds back the upper ply more"]
+      - ["牙面以水平为标准；倾斜可防起皱或不匀", "The dog face is set level; tilting it fights puckering or uneven feed"]
+    notes:
+      - "布能不能跟着牙走，还要看压脚压力。压力太小，摩擦力不够，布跟不上牙，针距变短，而且忽长忽短，这叫打滑。压力太大，布面留压痕，而且上层布被压脚拖住得更多，这正是下一节的上层变长。说明书还以牙面水平为标准：前端抬高可以防起皱，前端降低可以防送布不匀，本章的模型不含倾斜。"
+      - "Whether the cloth follows the dog also depends on foot pressure. Too little, and there isn't enough friction: the cloth lags the dog and the stitches come out short and uneven. That's slipping. Too much, and it leaves marks, and the foot holds back the upper ply even more; that's the growing upper ply in the next section. The manual also takes a level dog face as standard: raise the front to prevent puckering, lower it to prevent uneven feeding. Our model leaves tilt out."
+
+  - layout: section
+    num: "05"
+    title: ["上下层错位与送布方式", "Ply shift and feed systems"]
+
+  - layout: split
+    title: ["上层布为什么越缝越长", "Why the upper ply grows"]
+    points:
+      - ["牙只推下层；上层靠摩擦带、被压脚拖", "The dog pushes the lower ply; the upper rides on friction, held by the foot"]
+      - ["每针少走 1%：缝 40 cm 差 {{ch06.pct40:.0f}} mm", "1% short per stitch: {{ch06.pct40:.0f}} mm over 40 cm"]
+      - ["示意模型：ρ = μf P/K", "Schematic model: ρ = μf P/K"]
+    visual: {video: lining}
+    notes:
+      - "第二个大问题：上下两层是否一起动。下送布只有一只牙在下面，直接推的是下层；上层只能靠两层之间的摩擦被带着走，同时还被压脚拖住。实验里换成衬里滑料两层，看布上的记号：上层记号越来越落在下层后面。一针只少走百分之一，缝 40 厘米就差 {{ch06.pct40:.0f}} 毫米。压力小了布打滑，压力大了上层错位更大，下送布两头为难。"
+      - "The second big question: do both plies move together? Drop feed has one dog underneath, pushing the lower ply directly; the upper ply is carried only by friction between the plies, while the foot holds it back. In the lab, switch to two plies of slippery lining and watch the marks on the cloth: the upper marks fall further and further behind the lower ones. Just one percent short per stitch is {{ch06.pct40:.0f}} millimetres over 40 centimetres. Too little pressure and the cloth slips; too much and the upper ply shifts more. Drop feed is caught both ways."
+
+  - layout: bignum
+    title: ["下送布的两难：衬里两层", "The drop-feed dilemma: two plies of lining"]
+    nums:
+      - {n: "{{ch06.pmin:.1f}}", n_en: "P_min", label: ["不打滑的最小压力（标准 = 1）", "Least pressure without slipping (standard = 1)"]}
+      - {n: "{{ch06.shift:.1f}} mm", n_en: "> 3 mm", label: ["此时缝 40 cm 已多出", "Upper ply excess over 40 cm"]}
+      - {n: "{{ch06.nshift:.2f}} mm", n_en: "needle feed", label: ["针送布约降到三成", "Needle feed: about 30%"]}
+    foot: ["P ≥ P_min = F₀/(μd − μf)；压力越大错位越大——下送布没有可用的压力区间（参数为示意值）", "P ≥ F₀/(μd − μf); more pressure, more shift: drop feed has no usable window (illustrative values)"]
+    notes:
+      - "这就是下送布的两难。压力小了打滑，不打滑的最小压力，衬里两层算出来是标准压力的 {{ch06.pmin:.1f}} 倍；可就在这个压力下，缝 40 厘米上层已经多出 {{ch06.shift:.1f}} 毫米，超过 3 毫米的允许值。压力再大，错位更大，还留压痕。下送布找不到一个能用的压力。换针送布，机针把两层钉在一起走，错位降到约三成，{{ch06.nshift:.2f}} 毫米。参数是示意值。"
+      - "That's the dilemma of drop feed. Too little pressure and it slips; for two plies of lining the least pressure without slipping works out at {{ch06.pmin:.1f}} of standard. But at that very pressure the upper ply is already {{ch06.shift:.1f}} millimetres long over 40 centimetres, more than the 3 allowed. More pressure, more shift, and marks too. There's no usable pressure with drop feed. Switch to needle feed, where the needle pins the two plies together, and the shift falls to about thirty percent, {{ch06.nshift:.2f}} millimetres. These are illustrative values."
+
+  - layout: tiles
+    title: ["几种送布方式", "Feed systems"]
+    tiles:
+      - {k: "a", name: ["下送布", "Drop feed"], use: ["只推下层，平缝机基本形式", "Pushes the lower ply; the basic form"]}
+      - {k: "b", name: ["差动送布", "Differential feed"], use: ["前后两牙，推挤或拉开（第 9 讲）", "Two dogs gather or stretch (Lecture 9)"]}
+      - {k: "c", name: ["针送布", "Needle feed"], use: ["机针随牙摆动，钉住两层", "The needle moves with the dog, pinning the plies"], hot: true}
+      - {k: "d", name: ["综合送布", "Compound feed"], use: ["牙 + 针 + 交替压脚：皮革、座椅", "Dog + needle + walking foot: leather, seats"], hot: true}
+      - {k: "e", name: ["上送布", "Top feed"], use: ["上方另设牙、滚轮或带，可分别设定", "A top dog, roller or belt, set separately"], hot: true}
+      - {k: "f", name: ["电子送布", "Electronic feed"], use: ["电机直接驱动，针距由程序给出（第 14 讲）", "Motor-driven, stitch set by program (Lecture 14)"]}
+    notes:
+      - "解决上下层错位，有几种送布方式。差动送布用前后两只牙推挤或拉开同一层布，第 9 讲讲，对层间错位帮助不大。针送布让机针扎进布后随牙一起摆，把两层钉在一起走。综合送布再加一对交替升降的内外压脚，上中下一起带走，错位降到约一成，皮革、箱包、汽车座椅都用它。上送布在上方另设牙、滚轮或送布带，上下送布量可以分别设定。"
+      - "There are several feed systems that deal with ply shift. Differential feed uses two dogs to gather or stretch the same ply; that's Lecture 9, and it doesn't help much with shift between plies. Needle feed has the needle swing with the dog once it's in the cloth, pinning the plies together. Compound feed adds a pair of alternating presser feet, carrying top, middle and bottom together; shift falls to about a tenth, and it's used for leather, bags and car seats. Top feed has its own dog, roller or belt above, so the top and bottom feed can be set separately."
+
+  - layout: lab
+    title: ["虚拟实验 6-1：送布牙轨迹与送布时序", "Lab 6-1: feed-dog trajectory and feed timing"]
+    shot: {page: feed, vh: 1000}
+    tasks:
+      - ["牙高 1.0 mm：读出升出、落下的角度", "Dog at 1.0 mm: read the emerge and drop angles"]
+      - ["打乱定时，用定时和相位差调回", "Scramble the timing; fix it with timing and phase"]
+      - ["牛仔四层、衬里两层：调到全部达标", "Four plies of denim, two of lining: make every reading pass"]
+    notes:
+      - "现在做虚拟实验 6-1。先按暂停，拖主轴转角，对照侧视动画、轨迹和时序图，找出牙升出、落下和机针入布、出布的时刻。任务一：牙高调到 1.0 毫米，从时序图读出升出和落下的角度。任务二：按打乱定时，先用定时滑杆对准落牙，再用相位差消除回拖。任务三、四：牛仔四层和衬里两层，调到各项读数都达标。"
+      - "Now Lab 6-1. Press Pause and drag the shaft angle; using the side view, the path and the timing chart, find when the dog emerges and drops and when the needle enters and leaves. Task one: set the dog to 1.0 millimetre and read the emerge and drop angles off the chart. Task two: press Scramble, line up the drop with the timing slider, then remove back-drag with the phase. Tasks three and four: four plies of denim and two of lining, adjusted until every reading passes."
+
+  - layout: points
+    title: ["模型的边界与现场要点", "Model limits and field notes"]
+    points:
+      - ["简谐近似：轨迹不是严格的椭圆", "Harmonic approximation: the path isn't a perfect ellipse"]
+      - ["错位、打滑模型是示意的，参数靠试缝定", "Shift and slip models are schematic; set them by test-sewing"]
+      - ["上层变长先减压力，不行就换送布方式", "Upper ply grows: ease the pressure, else change the feed"]
+    foot: ["换厚料：牙高、压力、定时一起考虑；不要靠操作工手拉补偿", "Heavy cloth: consider height, pressure and timing together; don't rely on the operator pulling the cloth"]
+    notes:
+      - "说说模型的边界。简谐近似忽略了高次谐波，真实轨迹不是严格的椭圆；正切公式只是原理，正倒缝针距实际略有差别。错位和打滑模型是示意的，参数只能靠试缝确定。现场要点：查定时就手转上轮看牙面和针眼上沿；换厚料时牙高、压力、定时一起考虑；上层变长先减压力，不行就换针送、综合送或上送，不要靠操作工用手拉布补偿。"
+      - "A word on the model's limits. The harmonic approximation ignores higher harmonics, so the real path isn't a perfect ellipse; the tangent formula is the principle, and real forward and reverse stitches differ slightly. The shift and slip models are schematic; their parameters come only from test sewing. In the field: check timing by turning the handwheel and watching the dog face and eye top; for heavy cloth, think about height, pressure and timing together; if the upper ply grows, ease the pressure first, then change to needle, compound or top feed. Don't rely on the operator pulling the cloth by hand."
+
+  - layout: split
+    title: ["机器人联系：步行机器人的足端轨迹", "Robot link: the foot path of a walking robot"]
+    points:
+      - ["着地时向后蹬 = 牙露出针板推布", "Stance, pushing back = the dog above the plate"]
+      - ["髋摆 + 膝抬，两路合成足端轨迹", "Hip swing plus knee lift make the foot path"]
+      - ["相位错了脚打滑 = 送布的回拖", "Wrong phase, the foot slips = back-drag"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html.en-only .svgbox .en{font-size:26px!important;fill:#dbe4ef!important}</style><rect x="250" y="30" width="400" height="96" rx="20" fill="#4b5f7d"/><text x="450" y="72" font-size="30" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>机身 → 前进</tspan></text><text x="450" y="106" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> body moves forward</tspan></text><circle cx="450" cy="150" r="22" fill="#f2b705"/><path d="M450 150 L520 300 L470 450" stroke="#c8d2de" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="520" cy="300" r="18" fill="#2ec4b6"/><text x="560" y="240" font-size="26" fill="#f2b705" text-anchor="start"><tspan>髋：前后摆</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> hip swings</tspan></text><text x="560" y="300" font-size="26" fill="#5ee0d2" text-anchor="start"><tspan>膝：抬落</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> knee lifts</tspan></text><path d="M80 470 L820 470" stroke="#8fa3ba" stroke-width="4"/><text x="830" y="505" font-size="22" fill="#8fa3ba" text-anchor="end"><tspan>地面</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> ground</tspan></text><ellipse cx="450" cy="440" rx="230" ry="60" fill="none" stroke="#ff7a45" stroke-width="4" stroke-dasharray="12 8" transform="rotate(-8 450 440)"/><path d="M620 470 L280 470" stroke="#2ec4b6" stroke-width="12" stroke-linecap="round"/><polygon points="270,470 300,455 300,485" fill="#2ec4b6"/><circle cx="470" cy="455" r="14" fill="#f3f6fa"/><text x="40" y="290" font-size="26" fill="#ffb38f" text-anchor="start"><tspan>摆动相：空中收回</tspan></text><text x="40" y="320" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> swing: back through the air</tspan></text><text x="40" y="352" font-size="26" fill="#ffb38f" text-anchor="start"><tspan>= 牙在针板下退回</tspan></text><text x="40" y="382" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> = the dog's return below the plate</tspan></text><text x="450" y="545" font-size="28" fill="#5ee0d2" text-anchor="middle" font-weight="700"><tspan>支撑相：着地向后蹬 = 抓布</tspan></text><text x="450" y="575" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> stance: on the ground, pushing back = gripping</tspan></text><text x="450" y="610" font-size="24" fill="#8fa3ba" text-anchor="middle"><tspan>每步前进 ≈ 着地那段的水平位移</tspan></text><text x="450" y="636" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> each step ≈ the foot's travel on the ground</tspan></text></svg>
+    notes:
+      - "送布牙的四动作，和步行机器人一条腿的步态是一回事。足端着地的支撑相向后蹬，推动机身前进；抬起的摆动相在空中收回。足端轨迹由髋关节的前后摆和膝关节的抬落两路合成，正像送布偏心轮和抬牙偏心轮合成一个椭圆。机身每步前进的只是着地那段的水平位移。两个关节相位设错，脚着地后已经开始往前收，就在地上打滑，这就是回拖。"
+      - "The dog's four motions are the gait of one leg of a walking robot. In stance the foot is on the ground and pushes back, moving the body forward; in swing it lifts and comes back through the air. The foot path combines the hip's swing and the knee's lift, just as the feed and lift eccentrics combine into an ellipse. The body advances only by the foot's travel while on the ground. Get the phase between the two joints wrong, and the foot is already swinging forward again after touching down: it slips. That's back-drag."
+
+  - layout: split
+    title: ["生活例子：划船的桨", "Everyday example: rowing"]
+    points:
+      - ["桨叶只在入水到出水之间推船", "The blade drives only from catch to release"]
+      - ["出水后在空中收回，不碰水", "It returns through the air, clear of the water"]
+      - ["出水太晚，桨叶往回带：船被拖慢", "Release too late, it drags back: the boat slows"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html.en-only .svgbox .en{font-size:26px!important;fill:#dbe4ef!important}</style><rect x="40" y="330" width="820" height="200" fill="#16314f"/><path d="M40 330 L860 330" stroke="#4c8dff" stroke-width="4"/><text x="850" y="560" font-size="24" fill="#8fa3ba" text-anchor="end"><tspan>水面 = 针板面</tspan></text><text x="850" y="590" font-size="22" fill="#f3f6fa" text-anchor="end"><tspan class="en" font-size="22" fill="#8fa3ba"> water surface = throat plate</tspan></text><path d="M180 120 Q 450 170 720 120 L700 100 L200 100 Z" fill="#4b5f7d"/><text x="450" y="80" font-size="26" fill="#f3f6fa" text-anchor="middle" font-weight="700"><tspan>船 → 前进</tspan></text><text x="560" y="80" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> the boat moves on</tspan></text><ellipse cx="450" cy="330" rx="260" ry="80" fill="none" stroke="#ff7a45" stroke-width="4" stroke-dasharray="12 8"/><path d="M190 330 A 260 80 0 0 0 710 330" stroke="#2ec4b6" stroke-width="12" fill="none"/><polygon points="200,330 226,318 222,346" fill="#2ec4b6"/><text x="450" y="460" font-size="28" fill="#5ee0d2" text-anchor="middle" font-weight="700"><tspan>水中：入水 → 出水，推船 = 抓布</tspan></text><text x="450" y="492" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> in the water, catch to release: drives = grips</tspan></text><text x="450" y="190" font-size="26" fill="#ffb38f" text-anchor="middle"><tspan>空中收回 = 牙在针板下退回</tspan></text><text x="450" y="220" font-size="22" fill="#f3f6fa" text-anchor="middle"><tspan class="en" font-size="22" fill="#8fa3ba"> back through the air = the return below the plate</tspan></text><text x="720" y="380" font-size="24" fill="#f2b705" text-anchor="start"><tspan>入水</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> catch</tspan></text><text x="70" y="380" font-size="24" fill="#f2b705" text-anchor="start"><tspan>出水</tspan><tspan class="en" font-size="22" fill="#8fa3ba"> release</tspan></text><text x="40" y="620" font-size="28" fill="#f3f6fa" text-anchor="start" font-weight="700"><tspan>出水太晚 = 回拖</tspan></text><text x="280" y="620" font-size="22" fill="#f3f6fa" text-anchor="start"><tspan class="en" font-size="22" fill="#8fa3ba"> release too late = back-drag</tspan></text></svg>
+    notes:
+      - "生活里的例子是划船。桨叶只在入水到出水这一段推船前进，出水以后在空中收回，不碰水。如果出水太晚，桨叶在水里往回带，船反而被拖慢。这和送布牙只在露出针板时推布、落牙太晚就回拖一模一样：水面就是针板面。"
+      - "An everyday example: rowing. The blade drives the boat only from the catch to the release; after that it comes back through the air without touching the water. Release too late and the blade drags back in the water and slows the boat. That's exactly the feed dog, pushing only while above the plate and back-dragging if it drops too late; the water surface is the throat plate."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the problem"]
+    title: ["断针：送布定时（水平和抬牙一起）提前约 8°", "Broken needles: advance the feed timing (both motions) by about 8°"]
+    rows:
+      - [["4 mm 牛仔：针尖入布", "Denim: needle in at"], "{{ch06.fin4:.1f}}°"]
+      - [["标准定时：布在针中被推", "Standard: moved, needle in"], "{{ch06.drag4:.2f}} mm"]
+      - [["一起提前 8°：针中移动", "Both 8° earlier: moved"], "{{ch06.drag48:.3f}} mm"]
+    side: {big: "{{ch06.S3:.2f}}", text: ["mm：3 mm 针距要的牙行程", "mm: dog stroke for a 3 mm stitch"]}
+    foot: ["只提前水平 8°：还剩 {{ch06.dragh8:.2f}} mm，并有少量回拖——两个运动要一起提前", "Advancing only the horizontal 8° leaves {{ch06.dragh8:.2f}} mm and some back-drag: move both together"]
+    notes:
+      - "回到开头。4 毫米牛仔，针尖在 {{ch06.fin4:.1f}} 度就入布，比薄料早 {{ch06.early4:.0f}} 度；牙到 {{ch06.drop:.1f}} 度才落下，这段时间布在针中被推了约 {{ch06.drag4:.2f}} 毫米，超出 0.05 的允许值，机针被带弯而断。把送布定时，水平和抬牙一起，提前约 8 度，落牙提前到 {{ch06.drop48:.1f}} 度，移动降到 {{ch06.drag48:.3f}} 毫米。只提前水平还剩 {{ch06.dragh8:.2f}} 毫米并有回拖。3 毫米针距要牙行程 {{ch06.S3:.2f}} 毫米。"
+      - "Back to the start. With 4 millimetres of denim the point enters at {{ch06.fin4:.1f}} degrees, {{ch06.early4:.0f}} earlier than thin cloth; the dog doesn't drop until {{ch06.drop:.1f}}, and meanwhile the cloth is pushed about {{ch06.drag4:.2f}} millimetres with the needle in, over the 0.05 allowed, so the needle bends and breaks. Advance the feed timing, both motions together, by about 8 degrees: the drop moves to {{ch06.drop48:.1f}} and the movement falls to {{ch06.drag48:.3f}}. Advance only the horizontal and {{ch06.dragh8:.2f}} remains, with some back-drag. A 3 millimetre stitch needs a dog stroke of {{ch06.S3:.2f}}."
+
+  - layout: summary
+    title: ["本讲小结", "Summary"]
+    points:
+      - ["两个简谐运动合成倾斜椭圆，露出针板才抓布", "Two harmonic motions, a tilted ellipse; it grips only above the plate"]
+      - ["机针出布后才送：厚料要把定时提前", "Feed only with the needle out: heavy cloth needs earlier timing"]
+      - ["下送布两难：针送、综合送、上送来解决", "Drop feed's dilemma: needle, compound or top feed"]
+    after: ["作业 6：送布机构计算与送布方式选择 · 测验 · 实验 6-1 报告 —— 在问渠学习平台完成", "Assignment 6 · quiz · Lab 6-1 report — on WenQuest"]
+    notes:
+      - "这一讲记住三件事。第一，送布牙的运动是水平、竖直两个简谐运动的合成，轨迹是倾斜的椭圆，只有露出针板那段才推布。第二，布只能在机针出布以后移动，标准定时是牙面和针眼上沿同时没入针板，厚料要把定时提前。第三，下送布有压力小打滑、压力大错位的两难，针送、综合送、上送各自解决。下一讲讲线张力与线迹质量。"
+      - "Three things to remember. One: the dog's motion combines two harmonic motions into a tilted ellipse, and only the part above the plate pushes the cloth. Two: the cloth may move only after the needle is out; standard timing has the dog face and eye top sink together, and heavy cloth needs the timing advanced. Three: drop feed is caught between slipping and ply shift, and needle, compound and top feed each solve it. Next: thread tension and stitch quality."
