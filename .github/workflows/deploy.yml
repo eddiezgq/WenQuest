@@ -82,12 +82,47 @@ jobs:
       list: ${{ steps.list.outputs.list }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - id: list
-        name: The books in textbook/
-        run: echo "list=$(ls textbook/*/book.yaml | xargs -n1 dirname | xargs -n1 basename | python3 -c 'import json,sys; print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')" >> "$GITHUB_OUTPUT"
+        name: The books to check — only those changed since the last successful deploy (第 32 轮附：省时间、省用量)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          all=$(ls textbook/*/book.yaml | xargs -n1 dirname | xargs -n1 basename | tr "\n" " ")
+          base=""
+          if [ "$EVENT" = "push" ]; then
+            base=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""' 2>/dev/null || true)
+            git cat-file -e "$base^{commit}" 2>/dev/null || base=""
+          fi
+          if [ -z "$base" ]; then
+            echo "Checking every book ($EVENT run, or no earlier successful deploy found)."
+            changed="ALL"
+          else
+            changed=$(git diff --name-only "$base" HEAD)
+            echo "Changed since $base:"; echo "$changed" | head -n 40
+          fi
+          CHANGED="$changed" python3 -c '
+          import json, os, sys
+          books = sys.argv[1].split()
+          changed = os.environ["CHANGED"]
+          shared = ("textbook/tools/", "services/labcheck/", "services/gateway/app/production/labkit/", "factory/")
+          if changed == "ALL":
+              pick = books
+          else:
+              files = [f for f in changed.splitlines() if f.strip()]
+              if any(f.startswith(shared) for f in files):
+                  pick = books
+              else:
+                  pick = [b for b in books if any(f.startswith(f"textbook/{b}/") for f in files)]
+          print("Books to check:", pick or "none", file=sys.stderr)
+          print("list=" + json.dumps(pick))
+          ' "$all" >> "$GITHUB_OUTPUT"
 
   textbook:
     needs: books
+    if: needs.books.outputs.list != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 150      # 《机器人学》全书检查已超过 60 分钟（10-07 起每次部署都卡在这里超时，什么都没上线）
     strategy:
@@ -304,6 +339,8 @@ jobs:
 
   deploy:
     needs: [build, textbook, webeditions]
+    # the textbook checks are skipped when no book changed: deploy anyway (the books on the server stay as they are)
+    if: always() && !cancelled() && needs.build.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -337,7 +374,7 @@ jobs:
             | ssh "deploy@$HOST" 'tar xzf - -C /opt/wenquest && chmod +x /opt/wenquest/deploy/*.sh'
 
       - name: Get the built textbooks
-        if: env.SKIP != '1'
+        if: env.SKIP != '1' && needs.textbook.result == 'success'
         uses: actions/download-artifact@v4
         with:
           pattern: textbook-*
@@ -345,7 +382,7 @@ jobs:
           path: textbook-build
 
       - name: Copy the textbooks (read by the gateway from /opt/wenquest/textbook)
-        if: env.SKIP != '1'
+        if: env.SKIP != '1' && needs.textbook.result == 'success'
         run: |
           books=$(ls textbook-build | tr "\n" " ")   # one line: the list goes into the remote command (several books since 第 10 轮)
           du -sh textbook-build/* || true
