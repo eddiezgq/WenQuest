@@ -23,7 +23,7 @@ AUTONOMY_LABEL = {"ask": "每步都问", "small": "小改直接做", "free": "�
 # edits that are always proposals, whatever the autonomy
 ALWAYS_ASK_EDIT = {"remove_chapter"}
 ALWAYS_ASK_WORK = {"start_over"}
-LIGHT_WORK = {"write_lesson", "revise_lesson", "write_next", "reread_textbook", "study_textbook", "remake_design_book"}
+LIGHT_WORK = {"rework_lesson", "write_lesson", "revise_lesson", "write_next", "reread_textbook", "study_textbook", "remake_design_book"}
 
 AGENT_TOOLS = [
     {"name": "edit_course", "description": (
@@ -43,6 +43,17 @@ AGENT_TOOLS = [
      "input_schema": {"type": "object", "properties": {"summary": {"type": "string"},
                                                        "steps": {"type": "array", "items": {"type": "object"}}},
                       "required": ["summary", "steps"]}},
+    {"name": "edit_lesson", "description": (
+        "Work on ONE written lesson (waiting for review) without rewriting all of it: change some parts and/or make some "
+        "deliverables again. Call get_lesson first to see its parts. `set`: your own new content for parts (same shape "
+        "as get_lesson shows: problem, notes, example, lab, model, …); `rewrite` + `note`: the lecturer rewrites those "
+        "parts following the note; `redo`: deliverables to make again (animation, lab, figures, exercises, guide_plan, "
+        "lecture). Slides and documents are laid out again; a changed animation/lab/figures part redoes it too. Runs as "
+        "background work (one lesson at a time); the teacher can undo it."),
+     "input_schema": {"type": "object", "properties": {
+         "lesson_id": {"type": "string"}, "summary": {"type": "string"}, "set": {"type": "object"},
+         "rewrite": {"type": "array", "items": {"type": "string"}}, "note": {"type": "string"},
+         "redo": {"type": "array", "items": {"type": "string"}}}, "required": ["lesson_id", "summary"]}},
     {"name": "confirm_proposal", "description": (
         "Carry out an open proposal (yours, waiting for the teacher) because the teacher has just agreed to it in the "
         "chat (e.g. '好', '可以', '写吧', '就这样'). Only when the teacher's latest message agrees; never re-propose the "
@@ -53,7 +64,7 @@ AGENT_TOOLS = [
     {"name": "history", "description": "The recent changes to the course draft, newest last.",
      "input_schema": {"type": "object", "properties": {}}},
 ]
-AGENT_LABEL = {"edit_course": "正在改课程草稿", "start_work": "正在安排工作", "confirm_proposal": "正在照你确认的做", "undo": "正在撤销", "history": "正在看改动记录"}
+AGENT_LABEL = {"edit_lesson": "正在安排改这一课", "edit_course": "正在改课程草稿", "start_work": "正在安排工作", "confirm_proposal": "正在照你确认的做", "undo": "正在撤销", "history": "正在看改动记录"}
 
 
 def principles() -> str:
@@ -116,6 +127,9 @@ class LeadAgentMixin:
                 les["status"] != "planned" for c in (o or {}).get("chapters", []) for les in c["lessons"]):
             proj["stage"] = "outline"
         proj["design_book"] = snap["design_book"]
+        b = snap.get("lesson_backup")
+        if b:   # a lesson worked on by rework_lesson: its folder and record come back as they were
+            self.lesson_restore(proj, b["lesson_id"], b["name"])
         proj["requirements"] = snap["requirements"]
         for k, v in (snap.get("materials") or {}).items():
             proj["materials"][k] = v
@@ -189,7 +203,7 @@ class LeadAgentMixin:
 
         async def chain(p: dict, steps=ok) -> None:
             for s in steps:
-                p = self.projects.load(p["id"])
+                self.refresh(p)
                 await self.run_step(p, s)
         self.run(proj, label, chain)
         return "started: " + label + note_bad
@@ -225,7 +239,7 @@ class LeadAgentMixin:
 
             async def chain(pr: dict, steps=work) -> None:
                 for st in steps:
-                    pr = self.projects.load(pr["id"])
+                    self.refresh(pr)
                     await self.run_step(pr, st)
             self.run(proj, label, chain)
         return "done:\n" + "\n".join(results)
@@ -243,6 +257,9 @@ class LeadAgentMixin:
             return self.agent_edit(proj, inp, made)
         if name == "start_work":
             return self.agent_work(proj, inp, made)
+        if name == "edit_lesson":
+            step = {"type": "rework_lesson", **{k: inp[k] for k in ("lesson_id", "summary", "set", "rewrite", "note", "redo") if k in inp}}
+            return self.agent_work(proj, {"summary": inp.get("summary") or "", "steps": [step]}, made)
         if name == "confirm_proposal":
             return self.agent_confirm(proj, inp)
         if name == "undo":

@@ -24,7 +24,8 @@ log = logging.getLogger("wenquest.expert")
 
 EXPERT_RULES = (
     "\n\nHow to act (tools): look things up with the reading tools before you advise; change the draft with `edit_course`; "
-    "start the team's work with `start_work`; use `propose` only for a mixed plan the teacher should see as a whole. The "
+    "start the team's work with `start_work`; change part of a written lesson or redo one of its deliverables with "
+    "`edit_lesson` (never rewrite a whole lesson for a local change); use `propose` only for a mixed plan the teacher should see as a whole. The "
     "tools apply the autonomy level themselves and tell you whether a change was made or became a proposal; report exactly "
     "that. Never claim something is done that a tool did not do. When the teacher asks you to write, call `start_work` "
     "in that same turn (writing settles the outline and confirms the chapter by itself) instead of explaining what you "
@@ -135,7 +136,7 @@ class ExpertMixin:
             nonlocal proj
             proj = self.projects.load(pid)
             out = await self.expert_tool(proj, name, inp, made)
-            if name in ("save_notes", "propose", "edit_course", "start_work", "confirm_proposal", "undo"):
+            if name in ("save_notes", "propose", "edit_course", "edit_lesson", "start_work", "confirm_proposal", "undo"):
                 self.projects.save(proj)
             return out
 
@@ -296,7 +297,7 @@ class ExpertMixin:
             body = strip_html((les.get("content") or {}).get("zh") or (les.get("content") or {}).get("en") or "")
             return (f"{les['title']} — {les['status']}\nReview: {json.dumps(les.get('review'), ensure_ascii=False)[:1500]}\n"
                     f"Checklist: {json.dumps([{k: c.get(k) for k in ('label', 'ok', 'note')} for c in les.get('checklist') or []], ensure_ascii=False)[:1500]}\n"
-                    f"Notes text:\n{' '.join(body.split())[:12000]}")
+                    f"Notes text:\n{' '.join(body.split())[:6000]}\n" + self.lesson_card(proj, les))
         if name == "propose":
             steps = [s for s in inp.get("steps") or [] if isinstance(s, dict)]
             ok = [s for s in steps if self.step_ok(proj, s) or s.get("type") in ("start_over", "study_textbook")]

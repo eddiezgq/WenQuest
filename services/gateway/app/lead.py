@@ -32,7 +32,7 @@ def is_stop(text: str) -> bool:
     return t in ("停", "停停", "stop", "Stop", "STOP") or bool(STOP.search(text)) and len(text) <= 120
 DESIGN_FIELDS = {"subject": "学科与层次", "audience": "学生", "textbook": "教材", "platform": "贯穿全课的机器人",
                  "notation": "符号约定", "visual_style": "动画风格"}
-BACKGROUND = {"redesign", "remake_design_book", "revise_lesson", "write_lesson", "write_lessons", "write_next", "proceed",
+BACKGROUND = {"rework_lesson", "redesign", "remake_design_book", "revise_lesson", "write_lesson", "write_lessons", "write_next", "proceed",
               "reread_textbook", "start_over", "study_textbook"}
 # round 31: fine-grained outline edits the course lead (or the teacher) can make at once
 OUTLINE_OPS = {"set_lesson", "add_lesson", "move_lesson", "remove_lesson", "move_chapter", "rename_chapter", "set_calendar_note"}
@@ -91,6 +91,12 @@ STEP_DOC = """Steps a proposal may contain (JSON objects with "type"):
 - rename_chapter {no, title: {zh, en}}
 - set_calendar_note {text}
 - write_lessons {lesson_ids: [..]}: write these planned lessons one after another (background work)
+- rework_lesson {lesson_id, summary, set?: {part: value}, rewrite?: [part], note?, redo?: [deliverable]}: work on ONE
+  written lesson (waiting for review) without rewriting all of it. parts: title, goal, problem, concept, notes, example,
+  animation, lab, model, everyday, summary, self_check, figures — `set` gives your own new content for a part (same
+  shape as get_lesson shows), `rewrite` has the lecturer rewrite those parts following `note`. deliverables: animation,
+  lab, figures, exercises, guide_plan, lecture — made again on their own. Slides, notes page, guide and plan are laid
+  out again every time; a changed animation/lab/figures part redoes that deliverable too. Undoable.
 - approve_outline {}: settle the outline and move on to writing lessons (outline stage only). Writing steps do this by
   themselves when the outline is not settled yet, and confirm the chapter they write — the teacher asking to write is
   the approval."""
@@ -261,6 +267,9 @@ class LeadMixin:
             return _int(s.get("no")) in nos and bool(_disp(_pair(s.get("title"))))
         if t == "set_calendar_note":
             return bool(o)
+        if t == "rework_lesson":
+            from .lesson_edit import rework_ok
+            return rework_ok(lessons.get(str(s.get("lesson_id"))), s)
         if t == "write_lessons":
             ids = [str(x) for x in s.get("lesson_ids") or []]
             return self.can_write(proj) and bool(ids) and all(lessons.get(i) and lessons[i]["status"] in ("planned", "failed") for i in ids)
@@ -294,6 +303,9 @@ class LeadMixin:
             return f"确认第 {s['no']} 章的课时安排，可以开始写"
         if t == "approve_outline":
             return "大纲定稿，开始逐课写作（课程在第一次发布时在平台上建好）"
+        if t == "rework_lesson":
+            from .lesson_edit import describe_rework
+            return describe_rework(lessons[str(s["lesson_id"])], s)
         if t == "redesign":
             which = "、".join(f"第 {n} 章" for n in s.get("chapters") or []) or "整份大纲"
             return f"课程设计师按你的要求重做{which}：{str(s.get('note') or '')[:200]}"
@@ -550,6 +562,15 @@ class LeadMixin:
             o["chapters"].append(chapter)
             o["chapters"].sort(key=lambda c: c["no"])
 
+    def refresh(self, proj: dict) -> None:
+        """Save this copy of the project, then bring it up to date from disk IN PLACE. A background job keeps one project
+        object from start to end (the job runner saves that object last); loading a second copy and working on it would
+        be overwritten by the runner's final save (10-13: a written lesson lost that way)."""
+        self.projects.save(proj)
+        fresh = self.projects.load(proj["id"])
+        proj.clear()
+        proj.update(fresh)
+
     def can_write(self, proj: dict) -> bool:
         """Lessons can be written once there is an outline with lessons; an unsettled outline is settled on the way."""
         o = proj.get("outline") or {}
@@ -563,6 +584,14 @@ class LeadMixin:
 
     async def run_step(self, proj: dict, s: dict) -> None:
         t = s["type"]
+        if t == "rework_lesson":
+            _, les = self.find_lesson(proj, str(s["lesson_id"]))
+            name = self.lesson_backup(proj, les)
+            self.snapshot(proj, self.describe(proj, s)[:300], "lead")
+            proj["history"][-1]["lesson_backup"] = {"lesson_id": les["id"], "name": name}
+            self.projects.save(proj)
+            await self.rework_lesson(proj, s)
+            return
         if t in ("write_lesson", "write_lessons", "write_next") and proj["stage"] == "outline":
             self.settle_outline(proj)          # the teacher asked to write: that settles the outline
             self.projects.save(proj)
@@ -588,17 +617,17 @@ class LeadMixin:
             await self.write_lesson(proj, s["lesson_id"])
         elif t == "write_lessons":
             for lid in s["lesson_ids"]:
-                p = self.projects.load(proj["id"])
+                self.refresh(proj)      # the teacher may have changed the outline meanwhile; same object, so nothing is lost
                 try:
-                    chapter, les = self.find_lesson(p, lid)
+                    chapter, les = self.find_lesson(proj, lid)
                 except Exception:  # noqa: BLE001 - removed meanwhile
                     continue
                 if les["status"] not in ("planned", "failed"):
                     continue
                 if not chapter_confirmed(chapter):
                     chapter["confirmed"] = True      # the teacher asked for these lessons to be written
-                    self.projects.save(p)
-                await self.write_lesson(p, lid)
+                    self.projects.save(proj)
+                await self.write_lesson(proj, lid)
         elif t == "write_next":
             nxt = self.next_lesson(proj)
             if not nxt:   # the next planned lesson sits in a chapter not confirmed yet: the teacher asked to write, so confirm it

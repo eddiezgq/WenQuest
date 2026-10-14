@@ -143,6 +143,8 @@ export interface StudioLesson {
   review_flow?: ReviewFlow;
   /** 每课一张清单: ok true = ticked, false = crossed, null = not checked; by "ai" | "auto+ai". */
   checklist?: { key: string; label: string; ok: boolean | null; by: string; note: string; image?: string; image_url?: string }[];
+  /** 改动记录 (round 32): what the course lead changed in this lesson since it was written, newest last. */
+  edits?: { at: number; what: string; by: string }[];
 }
 /** ready: the teacher confirmed this chapter's lessons (本章确认); only then are they written. */
 export interface ReviewOpinion {

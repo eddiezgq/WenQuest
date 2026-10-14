@@ -439,6 +439,10 @@
                           <image v-for="(s, si) in deckImgs" :key="si" :src="s" mode="widthFix" class="dv-img" />
                         </scroll-view>
                       </view>
+                      <view v-if="l.edits && l.edits.length" class="edits">
+                        <text class="h4">{{ t("lead.lessonEdits") }}</text>
+                        <text v-for="(e, i) in l.edits.slice(-5).reverse()" :key="i" class="muted-s edit-line">· {{ e.what }}</text>
+                      </view>
                       <view class="lesson-html"><MathContent :html="disp(l.content)" /></view>
                       <view v-if="disp(l.exercises)" class="sub">
                         <text class="h4">{{ t("studio.exercises") }}</text>
@@ -1166,4 +1170,6 @@ onUnload(() => { if (timer) clearTimeout(timer); });
 .fa.star { color: #b9c2bf; }
 .fa.star.on { color: var(--wq-accent); }
 .fa.del:hover { color: var(--wq-danger); }
+.edits { margin: 8px 0; padding: 8px 10px; background: #f6f8fb; border-radius: 6px; display: flex; flex-direction: column; gap: 2px; }
+.edit-line { display: block; }
 </style>
