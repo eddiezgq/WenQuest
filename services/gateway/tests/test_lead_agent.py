@@ -269,3 +269,15 @@ def test_lesson_specs_in_other_shapes_are_understood():
     assert n["notes"] == [{"heading": ["一", "One"], "zh": "<p>中</p>", "en": "<p>en</p>"}]
     assert n["lab"]["tasks"] == [["任务1", "t1"], ["任务2", "t2"]]
     assert "problem" in sp.shape(d)
+
+
+def test_parts_left_out_of_a_lesson_spec_are_written_separately():
+    from app.production import spec as sp
+    full = {"title": ["t", "T"], "problem": {"title": ["p", "P"], "text": ["文", "txt"], "given": [["a", "A"]], "answer": ["1", "1"]}}
+    s = sp.normalize_lesson(full)
+    gaps = sp.missing_parts(s)
+    assert "problem" not in gaps and {"notes", "lab", "model"} <= set(gaps)
+    schema = sp.parts_schema(gaps)
+    assert set(schema["properties"]) == set(gaps) and schema["required"] == gaps
+    merged = sp.merge_parts(full, {"notes": [{"heading": ["h", "H"], "zh": "中", "en": "en"}], "problem": {"text": ["x", "x"]}}, ["notes"])
+    assert merged["problem"] == full["problem"] and sp.normalize_lesson(merged)["notes"]

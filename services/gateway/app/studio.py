@@ -947,9 +947,25 @@ class Studio(ReviewMixin, LeadAgentMixin, ExpertMixin, LeadMixin, LectureMixin):
         self.projects.save(proj)
         notes, review, spec, gp = teacher_note, None, None, None
         for attempt in range(2):
-            data = await self.ai.json(system=team.AUTHOR, prompt=team.lesson_prompt(ctx, src, notes, sp.STRUCTURE_GUIDE, previous),
+            prompt = team.lesson_prompt(ctx, src, notes, sp.STRUCTURE_GUIDE, previous)
+            data = await self.ai.json(system=team.AUTHOR, prompt=prompt,
                                       schema=sp.lesson_schema(), max_tokens=16000, fake=lambda: fake_spec(les, no))
             spec = sp.normalize_lesson(data)
+            # a long spec sometimes comes back with whole parts left out: write just those parts, up to twice
+            for _ in range(2):
+                gaps = sp.missing_parts(spec)
+                if not gaps:
+                    break
+                log.info("lesson %s: writing the missing parts separately: %s", lid, gaps)
+                proj["busy"] = {"label": f"主讲教授在补写：{no}（{len(gaps)} 部分）", "since": now()}
+                self.projects.save(proj)
+                extra = await self.ai.json(
+                    system=team.AUTHOR, schema=sp.parts_schema(gaps), max_tokens=12000, fake=lambda: fake_spec(les, no),
+                    prompt=(prompt + "\n\nThe lesson spec written so far (keep to it — same robot problem, numbers and notation):\n"
+                            + json.dumps(sp.normalize_lesson(data), ensure_ascii=False)[:16000]
+                            + "\n\nWrite ONLY these parts of the spec, complete and in full: " + ", ".join(gaps)))
+                data = sp.merge_parts(data, extra, gaps)
+                spec = sp.normalize_lesson(data)
             if not spec["title"][0]:          # the title and goal are the outline's anyway
                 spec["title"] = sp.pair(les["title"])
             if not spec["goal"][0] and les.get("goal"):

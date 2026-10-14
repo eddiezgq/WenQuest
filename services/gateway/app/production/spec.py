@@ -260,6 +260,40 @@ def normalize_lesson(d: Any) -> dict:
     }
 
 
+# what makes each top-level part of a lesson spec count as written (for filling gaps part by part)
+PART_FILLED = {
+    "problem": lambda s: bool(s["problem"]["text"][0] and s["problem"]["given"]),
+    "concept": lambda s: bool(s["concept"]["points"]),
+    "notes": lambda s: bool(s["notes"]),
+    "example": lambda s: bool(s["example"]["steps"]),
+    "animation": lambda s: bool(s["animation"]["beats"]),
+    "lab": lambda s: len(s["lab"]["tasks"]) >= 2,
+    "model": lambda s: all(s["model"][k][0] for k in ("assume", "solve", "check", "improve")),
+    "everyday": lambda s: bool(s["everyday"]["text"][0]),
+    "summary": lambda s: bool(s["summary"]),
+    "self_check": lambda s: bool(s["self_check"]),
+}
+
+
+def missing_parts(spec: dict) -> list[str]:
+    return [k for k, ok in PART_FILLED.items() if not ok(spec)]
+
+
+def parts_schema(parts: list[str]) -> dict:
+    full = lesson_schema()
+    return _obj({k: full["properties"][k] for k in parts})
+
+
+def merge_parts(data: Any, extra: Any, parts: list[str]) -> dict:
+    """The answer so far plus the parts written separately (only those parts are taken from `extra`)."""
+    d = dict(data) if isinstance(data, dict) else {}
+    e = extra if isinstance(extra, dict) else {}
+    for k in parts:
+        if e.get(k):
+            d[k] = e[k]
+    return d
+
+
 def normalize_guide_plan(d: Any) -> dict:
     d = d if isinstance(d, dict) else {}
     gd = d.get("guide") if isinstance(d.get("guide"), dict) else {}
