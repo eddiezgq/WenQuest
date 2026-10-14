@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:07<00:00,  7.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:13,469 INFO synthesis text But the feed timing hasn't changed, so the dog still drops at one hundred and fourteen.two.
+2026-10-14 02:33:17,693 INFO yield speech len 7.68, rtf 0.5499559454619884
+
+100%|██████████| 1/1 [00:04<00:00,  4.40s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:17,871 INFO synthesis text For those twenty-odd degrees the needle is already in, and the cloth is still being pushed.
+2026-10-14 02:33:21,146 INFO yield speech len 5.96, rtf 0.5494702582391316
+
+100%|██████████| 1/1 [00:03<00:00,  3.45s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:21,196 WARNING synthesis text How far? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:33:21,377 INFO synthesis text How far?
+2026-10-14 02:33:22,673 INFO yield speech len 1.88, rtf 0.6890494772728454
+
+100%|██████████| 1/1 [00:01<00:00,  1.52s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:22,719 WARNING synthesis text We'll calculate it at the end. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:33:22,848 INFO synthesis text We'll calculate it at the end.
+2026-10-14 02:33:24,182 INFO yield speech len 1.76, rtf 0.7575385949828408
+
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:24,227 WARNING synthesis text Stitch length, dog height and the foot. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:33:24,353 INFO synthesis text Stitch length, dog height and the foot.
+2026-10-14 02:33:26,427 INFO yield speech len 3.44, rtf 0.6028252978657568
+
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:26,473 WARNING synthesis text How is the stitch length set? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:33:26,602 INFO synthesis text How is the stitch length set?
+2026-10-14 02:33:28,063 INFO yield speech len 2.32, rtf 0.6295146613285459
+
+100%|██████████| 1/1 [00:01<00:00,  1.63s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:28,239 INFO synthesis text The lower end of the feed rod, C, is moved up and down about twoe by the eccentric, but it can only slide along a guide.
+2026-10-14 02:33:33,427 INFO yield speech len 9.72, rtf 0.5337532900978998
+
+100%|██████████| 1/1 [00:05<00:00,  5.37s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:33,609 INFO synthesis text Tilt the guide by theta and C also moves sideways twoe tan theta; that's the dog's stroke, and times the feed efficiency, the stitch.
+2026-10-14 02:33:39,580 INFO yield speech len 11.2, rtf 0.5331605672836304
+
+100%|██████████| 1/1 [00:06<00:00,  6.15s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:39,766 INFO synthesis text Theta zero, no feed; tip it the other way and you get reverse sewing, which is what the reverse lever does.
+2026-10-14 02:33:45,299 INFO yield speech len 10.4, rtf 0.5320095098935641
+
+100%|██████████| 1/1 [00:05<00:00,  5.71s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.71s/it]
+cv2: 180/233 句，用时 13.8 分钟，预计还要 4.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:45,483 INFO synthesis text With e of three millimetres and ratio one, a three millimetre stitch needs twenty-eight.four degrees and five millimetres forty-two.zero, so the dial gets more crowded at long stitches.
+2026-10-14 02:33:52,755 INFO yield speech len 13.48, rtf 0.5394301711628627
+
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:52,808 WARNING synthesis text Ply shift and feed systems. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:33:52,936 INFO synthesis text Ply shift and feed systems.
+2026-10-14 02:33:54,547 INFO yield speech len 2.36, rtf 0.6825801679643534
+
+100%|██████████| 1/1 [00:01<00:00,  1.78s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:54,720 INFO synthesis text The second big question: do both plies move together?
+2026-10-14 02:33:57,026 INFO yield speech len 3.8, rtf 0.6068827603992664
+
+100%|██████████| 1/1 [00:02<00:00,  2.48s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:33:57,204 INFO synthesis text Drop feed has one dog underneath, pushing the lower ply directly; the upper ply is carried only by friction between the plies, while the foot holds it back.
+2026-10-14 02:34:03,757 INFO yield speech len 12.4, rtf 0.5284821218059909
+
+100%|██████████| 1/1 [00:06<00:00,  6.73s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:03,947 INFO synthesis text In the lab, switch to two plies of slippery lining and watch the marks on the cloth: the upper marks fall further and further behind the lower ones.
+2026-10-14 02:34:11,091 INFO yield speech len 13.56, rtf 0.5268668706438182
+
+100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:11,276 INFO synthesis text Just one percent short per stitch is four millimetres over forty centimetres.
+2026-10-14 02:34:14,500 INFO yield speech len 5.72, rtf 0.5636503646423767
+
+100%|██████████| 1/1 [00:03<00:00,  3.39s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:14,678 INFO synthesis text Too little pressure and the cloth slips; too much and the upper ply shifts more.
+2026-10-14 02:34:17,713 INFO yield speech len 5.68, rtf 0.5343757045101112
+
+100%|██████████| 1/1 [00:03<00:00,  3.21s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:17,764 WARNING synthesis text Drop feed is caught both ways. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:34:17,892 INFO synthesis text Drop feed is caught both ways.
+2026-10-14 02:34:19,390 INFO yield speech len 2.24, rtf 0.6686921630586896
+
+100%|██████████| 1/1 [00:01<00:00,  1.67s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:19,566 INFO synthesis text There are several feed systems that deal with ply shift.
+2026-10-14 02:34:21,607 INFO yield speech len 3.4, rtf 0.6002618284786448
+
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:21,782 INFO synthesis text Differential feed uses two dogs to gather or stretch the same ply; that's Lecture nine, and it doesn't help much with shift between plies.
+2026-10-14 02:34:27,929 INFO yield speech len 11.56, rtf 0.5316793918609619
+
+100%|██████████| 1/1 [00:06<00:00,  6.32s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.32s/it]
+cv2: 190/233 句，用时 14.5 分钟，预计还要 3.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:28,112 INFO synthesis text Needle feed has the needle swing with the dog once it's in the cloth, pinning the plies together.
+2026-10-14 02:34:33,003 INFO yield speech len 9.2, rtf 0.5316777851270593
+
+100%|██████████| 1/1 [00:05<00:00,  5.07s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:33,182 INFO synthesis text Compound feed adds a pair of alternating presser feet, carrying top, middle and bottom together; shift falls to about a tenth, and it's used for leather, bags and car seats.
+2026-10-14 02:34:40,038 INFO yield speech len 12.96, rtf 0.5290338102682137
+
+100%|██████████| 1/1 [00:07<00:00,  7.03s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:40,228 INFO synthesis text Top feed has its own dog, roller or belt above, so the top and bottom feed can be set separately.
+2026-10-14 02:34:45,127 INFO yield speech len 9.12, rtf 0.5371086168707463
+
+100%|██████████| 1/1 [00:05<00:00,  5.08s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:45,313 INFO synthesis text The dog's four motions are the gait of one leg of a walking robot.
+2026-10-14 02:34:48,518 INFO yield speech len 5.64, rtf 0.5682713173805399
+
+100%|██████████| 1/1 [00:03<00:00,  3.38s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:48,696 INFO synthesis text In stance the foot is on the ground and pushes back, moving the body forward; in swing it lifts and comes back through the air.
+2026-10-14 02:34:54,680 INFO yield speech len 11.16, rtf 0.5362622199519987
+
+100%|██████████| 1/1 [00:06<00:00,  6.17s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:34:54,871 INFO synthesis text The foot path combines the hip's swing and the knee's lift, just as the feed and lift eccentrics combine into an ellipse.
+2026-10-14 02:34:59,814 INFO yield speech len 9.68, rtf 0.5106737791014112
+
+100%|██████████| 1/1 [00:05<00:00,  5.12s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:00,010 INFO synthesis text The body advances only by the foot's travel while on the ground.
+2026-10-14 02:35:02,702 INFO yield speech len 4.52, rtf 0.5953963878935418
+
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:02,884 INFO synthesis text Get the phase between the two joints wrong, and the foot is already swinging forward again after touching down: it slips.
+2026-10-14 02:35:07,664 INFO yield speech len 8.8, rtf 0.5431636626070195
+
+100%|██████████| 1/1 [00:04<00:00,  4.96s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.96s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:07,717 WARNING synthesis text An everyday example: rowing. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:35:07,936 INFO synthesis text An everyday example: rowing.
+2026-10-14 02:35:09,577 INFO yield speech len 2.4, rtf 0.6839476029078166
+
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:09,751 INFO synthesis text The blade drives the boat only from the catch to the release; after that it comes back through the air without touching the water.
+2026-10-14 02:35:14,722 INFO yield speech len 9.32, rtf 0.5334165219073643
+
+100%|██████████| 1/1 [00:05<00:00,  5.15s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.15s/it]
+cv2: 200/233 句，用时 15.2 分钟，预计还要 2.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:14,904 INFO synthesis text Release too late and the blade drags back in the water and slows the boat.
+2026-10-14 02:35:18,261 INFO yield speech len 6.12, rtf 0.5485123668620789
+
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:18,437 INFO synthesis text That's exactly the feed dog, pushing only while above the plate and back-dragging if it drops too late; the water surface is the throat plate.
+2026-10-14 02:35:25,130 INFO yield speech len 12.52, rtf 0.5346483315903539
+
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:25,185 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:35:25,315 INFO synthesis text Back to the start.
+2026-10-14 02:35:26,615 INFO yield speech len 1.6, rtf 0.8127434551715851
+
+100%|██████████| 1/1 [00:01<00:00,  1.47s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:26,794 INFO synthesis text With four millimetres of denim the point enters at ninety-two.seven degrees, nine earlier than thin cloth; the dog doesn't drop until one hundred and fourteen.two, and meanwhile the cloth is pushed about zero.eleven millimetres with the needle in, over the zero.five allowed, so the needle bends and breaks.
+2026-10-14 02:35:37,693 INFO yield speech len 20.64, rtf 0.5280583288318427
+
+100%|██████████| 1/1 [00:11<00:00, 11.09s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:37,890 INFO synthesis text Advance the feed timing, both motions together, by about eight degrees: the drop moves to one hundred and six.two and the movement falls to zero.forty-five.
+2026-10-14 02:35:44,402 INFO yield speech len 12.2, rtf 0.5337314918392995
+
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:44,595 INFO synthesis text Advance only the horizontal and zero.six remains, with some back-drag.
+2026-10-14 02:35:47,717 INFO yield speech len 5.48, rtf 0.5698473349104832
+
+100%|██████████| 1/1 [00:03<00:00,  3.30s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:47,892 INFO synthesis text A three millimetre stitch needs a dog stroke of three.twenty-four.
+2026-10-14 02:35:51,138 INFO yield speech len 5.88, rtf 0.5520355539257024
+
+100%|██████████| 1/1 [00:03<00:00,  3.42s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:51,319 INFO synthesis text Now Virtual lab six-one. On the WenQuest platform you can do it yourself. The readings, the status and the task checks are blurred here. Read them yourself when you work the lab.
+2026-10-14 02:35:58,629 INFO yield speech len 13.96, rtf 0.5235979925937161
+
+100%|██████████| 1/1 [00:07<00:00,  7.49s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:35:58,813 INFO synthesis text First press Pause and drag the shaft angle. Using the side view, the path and the timing chart, find when the dog emerges and drops, and when the needle enters and leaves.
+2026-10-14 02:36:05,781 INFO yield speech len 13.0, rtf 0.5359982894017146
+
+100%|██████████| 1/1 [00:07<00:00,  7.15s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:06,028 INFO synthesis text Task one. Set the dog height to one.zero millimetre, read the emerge and drop angles off the timing chart, enter them in the reading box and press Check. Then compare with zero.eight.
+2026-10-14 02:36:13,925 INFO yield speech len 14.84, rtf 0.532110923062759
+
+100%|██████████| 1/1 [00:08<00:00,  8.14s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.14s/it]
+cv2: 210/233 句，用时 16.2 分钟，预计还要 1.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:14,117 INFO synthesis text Task two. Press Scramble timing, which imitates a badly adjusted machine.
+2026-10-14 02:36:17,956 INFO yield speech len 7.28, rtf 0.5272611484422788
+
+100%|██████████| 1/1 [00:04<00:00,  4.02s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:18,138 INFO synthesis text First use the feed-timing slider to line up the drop with the moment the top of the eye reaches the plate,.
+2026-10-14 02:36:22,953 INFO yield speech len 8.92, rtf 0.5397393297186881
+
+100%|██████████| 1/1 [00:04<00:00,  4.99s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:23,137 INFO synthesis text then remove back-drag with the phase difference. It's done when every reading passes.
+2026-10-14 02:36:27,929 INFO yield speech len 9.08, rtf 0.5277083571261771
+
+100%|██████████| 1/1 [00:04<00:00,  4.98s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:28,119 INFO synthesis text Task three. Switch to four plies of denim and advance the feed timing until the movement with the needle in and the back-drag both pass.
+2026-10-14 02:36:33,737 INFO yield speech len 10.56, rtf 0.5320573620723955
+
+100%|██████████| 1/1 [00:05<00:00,  5.80s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:33,921 INFO synthesis text Task four. Two plies of slippery lining. Raise the foot pressure step by step and watch slipping and shift change. If drop feed can't do it, change the feed system. The guide and the report template are on the platform.
+2026-10-14 02:36:42,490 INFO yield speech len 16.28, rtf 0.526323921850331
+
+100%|██████████| 1/1 [00:08<00:00,  8.75s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:42,678 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-14 02:36:45,656 INFO yield speech len 5.24, rtf 0.5683092670586273
+
+100%|██████████| 1/1 [00:03<00:00,  3.15s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:45,918 INFO synthesis text You can open today's interactive slides, the threeD prototype and Virtual lab six-one yourself, and pause to see the dog grip and release the cloth.
+2026-10-14 02:36:53,103 INFO yield speech len 13.52, rtf 0.5313934659111429
+
+100%|██████████| 1/1 [00:07<00:00,  7.46s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:53,304 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-14 02:36:56,927 INFO yield speech len 6.52, rtf 0.5557114361253984
+
+100%|██████████| 1/1 [00:03<00:00,  3.80s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:36:57,106 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-14 02:37:02,384 INFO yield speech len 10.16, rtf 0.5195291962210588
+
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:02,646 INFO synthesis text Your assignment has four questions. One, derivation and calculation. Prove the formula for the feed per stitch, find the gripping interval for two dog heights, and the dog stroke needed for a four millimetre stitch.
+2026-10-14 02:37:10,002 INFO yield speech len 13.72, rtf 0.5361396612995915
+
+100%|██████████| 1/1 [00:07<00:00,  7.61s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.61s/it]
+cv2: 220/233 句，用时 17.2 分钟，预计还要 1.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:10,190 INFO synthesis text Two, the stitch regulator. Find the guide tilt for several stitch lengths and for reverse, explain why the scale crowds towards long stitches, and work out the dog's maximum velocity and acceleration.
+2026-10-14 02:37:17,459 INFO yield speech len 13.96, rtf 0.5206625748500441
+
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:17,649 INFO synthesis text Three, use the Lecture three formula to find the needle-entry angle in four millimetres of denim, explain what goes wrong with standard timing and how to fix it, and complete Task three of the virtual lab. And four, discussion. Two plies of silk lining, and the upper ply keeps growing. Compare needle, compound and top feed, and give your equipment recommendation.
+2026-10-14 02:37:30,395 INFO yield speech len 23.84, rtf 0.5346145505873149
+
+100%|██████████| 1/1 [00:12<00:00, 12.94s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:30,605 INFO synthesis text Submit the assignment and the lab report on the WenQuest platform.
+2026-10-14 02:37:34,301 INFO yield speech len 6.8, rtf 0.5434829347273883
+
+100%|██████████| 1/1 [00:03<00:00,  3.88s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:34,478 INFO synthesis text There's also a ten-question quiz. For example, when the dog returns below the plate, does it carry the cloth back a little, and is that why the stitch is shorter than the dog's stroke?
+2026-10-14 02:37:40,503 INFO yield speech len 11.6, rtf 0.5194475733000656
+
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:40,692 INFO synthesis text Or, with the dog at zero.nine millimetres, how wide is the gripping interval?
+2026-10-14 02:37:44,601 INFO yield speech len 7.08, rtf 0.5520890661552127
+
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:44,778 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-14 02:37:47,856 INFO yield speech len 5.32, rtf 0.5786599521350143
+
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:47,904 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:37:48,035 INFO synthesis text Three things to remember.
+2026-10-14 02:37:49,262 INFO yield speech len 1.6, rtf 0.7668034732341766
+
+100%|██████████| 1/1 [00:01<00:00,  1.40s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:49,438 INFO synthesis text One: the dog's motion combines two harmonic motions into a tilted ellipse, and only the part above the plate pushes the cloth.
+2026-10-14 02:37:54,890 INFO yield speech len 10.4, rtf 0.5241948595413795
+
+100%|██████████| 1/1 [00:05<00:00,  5.63s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:37:55,075 INFO synthesis text Two: the cloth may move only after the needle is out; standard timing has the dog face and eye top sink together, and heavy cloth needs the timing advanced.
+2026-10-14 02:38:02,991 INFO yield speech len 14.88, rtf 0.5320255794832783
+
+100%|██████████| 1/1 [00:08<00:00,  8.10s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:38:03,186 INFO synthesis text Three: drop feed is caught between slipping and ply shift, and needle, compound and top feed each solve it.
+2026-10-14 02:38:08,607 INFO yield speech len 10.12, rtf 0.5356690864789156
+
+100%|██████████| 1/1 [00:05<00:00,  5.59s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.60s/it]
+cv2: 230/233 句，用时 18.1 分钟，预计还要 0.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:38:08,657 WARNING synthesis text Next: thread tension and stitch quality. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-14 02:38:08,794 INFO synthesis text Next: thread tension and stitch quality.
+2026-10-14 02:38:11,189 INFO yield speech len 4.2, rtf 0.5703721727643694
+
+100%|██████████| 1/1 [00:02<00:00,  2.58s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:38:11,371 INFO synthesis text The slides, the virtual lab, the threeD prototype, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-14 02:38:19,657 INFO yield speech len 15.8, rtf 0.524458387230016
+
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-14 02:38:19,846 INFO synthesis text Next time, thread tension and stitch quality, and how the needle and bobbin threads lock tight in the middle of the cloth. See you then.
+2026-10-14 02:38:26,171 INFO yield speech len 11.84, rtf 0.5341417886115409
+
+100%|██████████| 1/1 [00:06<00:00,  6.50s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.50s/it]
+cv2: 233/233 句，用时 18.4 分钟，预计还要 0.0 分钟
+cv2: 233 句完成
+2026-10-14 02:38:26,334 DEBUG Attempting to acquire lock 133082954665936 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-14 02:38:26,334 DEBUG Lock 133082954665936 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-14 02:38:26,334 DEBUG Attempting to release lock 133082954665936 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-14 02:38:26,334 DEBUG Lock 133082954665936 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-14 02:38:26,336 DEBUG Attempting to acquire lock 133082954678032 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-14 02:38:26,336 DEBUG Lock 133082954678032 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-14 02:38:26,336 DEBUG Attempting to release lock 133082954678032 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-14 02:38:26,336 DEBUG Lock 133082954678032 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 31 分钟
