@@ -141,8 +141,8 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
     assert next(c for c in les["checklist"] if c["key"] == "figures")["ok"] is True
     assert p["progress"]["awaiting"] == 1
     # the teacher can download each deliverable to check it
-    r = client.get(kinds["slides"]["url"])
-    assert r.status_code == 200 and r.content[:2] == b"PK"
+    r = client.get(kinds["slides"]["url"])     # the web interactive deck (round 32), opened in the browser, sandboxed
+    assert r.status_code == 200 and b'id="deck-data"' in r.content and "sandbox allow-scripts" in r.headers["content-security-policy"]
     assert client.get(kinds["plan"]["url"][:-4] + "abcd").status_code == 410
 
     # 5. the teacher approves: lesson, practice and a hidden answer key, plus the chapter's files

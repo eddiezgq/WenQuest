@@ -26,8 +26,8 @@ log = logging.getLogger("wenquest.lesson_edit")
 
 PARTS = ("title", "goal", "problem", "concept", "notes", "example", "animation", "lab", "model", "everyday", "summary",
          "self_check", "figures")
-REDO = ("animation", "lab", "figures", "exercises", "guide_plan", "lecture")
-REDO_LABEL = {"animation": "动画", "lab": "虚拟实验", "figures": "插图", "exercises": "练习与答案", "guide_plan": "实验指导书和教案",
+REDO = ("courseware", "animation", "lab", "figures", "exercises", "guide_plan", "lecture")
+REDO_LABEL = {"courseware": "网页课件", "animation": "动画", "lab": "虚拟实验", "figures": "插图", "exercises": "练习与答案", "guide_plan": "实验指导书和教案",
               "lecture": "讲解视频"}
 PART_LABEL = {"title": "课名", "goal": "目标", "problem": "机器人问题", "concept": "概念", "notes": "讲义", "example": "例题",
               "animation": "动画分镜", "lab": "虚拟实验设计", "model": "建模五步", "everyday": "生活中的例子", "summary": "小结",
@@ -184,6 +184,8 @@ class LessonEditMixin:
         else:
             js, shot = d / "lab.js", d / "lab.png"
             lab = {"code": js, "image": shot if shot.exists() else None} if js.exists() else None
+        if changed or set(redo) & {"courseware", "animation", "lab", "figures"} or not (d / "deck.json").exists():
+            await self.make_deck_design(proj, les, spec, no, video, lab, note if "courseware" in redo else "")
         proj["busy"] = {"label": f"正在重新排版课件：{no}", "since": time.time()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)

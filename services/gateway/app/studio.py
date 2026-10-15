@@ -1025,6 +1025,7 @@ class Studio(ReviewMixin, LessonEditMixin, LeadAgentMixin, ExpertMixin, LeadMixi
         spec.pop("factory_live", None)
         if fs:
             spec["factory_live"] = f"{self.factory.url}/embed/workshop?view=overview&mode=live"
+        await self.make_deck_design(proj, les, spec, no, video, lab)
         proj["busy"] = {"label": f"正在排版课件、指导书、报告模板和教案：{no}", "since": now()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
@@ -1584,6 +1585,21 @@ class Studio(ReviewMixin, LessonEditMixin, LeadAgentMixin, ExpertMixin, LeadMixi
         return labs.page(items, course=course, chapter=chap, lang=lang, key=f"wq-lab-{proj['id'][:8]}-{chapter['id'][:8]}",
                          models=models)
 
+    async def make_deck_design(self, proj: dict, les: dict, spec: dict, no: str, video, lab, note: str = "") -> None:
+        """课件设计师: lay the lesson out as a web interactive deck (deck.json; render() builds the page from it)."""
+        from .production import webdeck
+        d = self.lesson_dir(proj, les)
+        d.mkdir(parents=True, exist_ok=True)
+        proj["busy"] = {"label": f"课件设计师正在排网页互动课件：{no}", "since": now()}
+        self.projects.save(proj)
+        o = proj["outline"]
+        course = [o["title"].get("zh") or o["title"].get("en") or "", o["title"].get("en") or o["title"].get("zh") or ""]
+        assets = {"anim": bool(video), "lab": bool(lab),
+                  "figures": [{"name": Path(f["png"]).stem, "title": f["title"]} for f in spec.get("figures_made") or []
+                              if (d / f["png"]).exists()]}
+        slides = await webdeck.design(self.ai, spec, no, course, assets, note)
+        (d / "deck.json").write_text(json.dumps({"slides": slides}, ensure_ascii=False), encoding="utf-8")
+
     async def redo_lab(self, proj: dict, lid: str) -> None:
         await self.redo_media(proj, lid, "lab")
 
@@ -1612,6 +1628,7 @@ class Studio(ReviewMixin, LessonEditMixin, LeadAgentMixin, ExpertMixin, LeadMixi
         else:
             js, shot = d / "lab.js", d / "lab.png"
             lab = {"code": js, "image": shot if shot.exists() else None} if js.exists() else None
+        await self.make_deck_design(proj, les, spec, no, video, lab)
         proj["busy"] = {"label": f"正在重新排版课件：{no}", "since": now()}
         self.projects.save(proj)
         await asyncio.to_thread(self.render, proj, chapter, les, spec, gp, no, video, lab)
@@ -1641,8 +1658,8 @@ class Studio(ReviewMixin, LessonEditMixin, LeadAgentMixin, ExpertMixin, LeadMixi
         d = self.lesson_dir(proj, les)
         d.mkdir(parents=True, exist_ok=True)
         for old in d.iterdir():
-            if old.stem == "lab" or old.stem.startswith("fig-"):
-                continue  # lab.* belong to make_lab, fig-* to make_figures
+            if old.stem == "lab" or old.stem.startswith("fig-") or old.name == "deck.json":
+                continue  # lab.* belong to make_lab, fig-* to make_figures, deck.json to the courseware designer
             if old.suffix in (".pptx", ".docx", ".json", ".html") or (not video and old.suffix in (".mp4", ".png")):
                 old.unlink()
         # The lesson number is added by the layout; drop one the author may have put in the title.
@@ -1655,15 +1672,36 @@ class Studio(ReviewMixin, LessonEditMixin, LeadAgentMixin, ExpertMixin, LeadMixi
         lab_image = lab["image"] if lab and lab.get("image") else None
         deck.build(spec, d / f"{name} 课件.pptx", no=no, course=course, chapter=chap,
                    video=video["video"] if video else None, poster=video["poster"] if video else None, lab_image=lab_image)
+        les["deck_pptx"] = f"{name} 课件.pptx"     # only for making the lecture video; teachers and students get the web deck
+        lab_html = None
         if lab:
             from .production import labs
             lab_name = f"实验{no} 虚拟实验.html"
             from .production import scene3d as S3
             lab_models = S3.load_models(self.assets_dir(proj), les.get("lab_models") or []) if les.get("lab_models") else {}
-            (d / lab_name).write_text(labs.page([(no, (d / "lab.js").read_text(encoding="utf-8"))], course=course, chapter=chap,
-                                                lang="en" if o.get("languages") == "en" else "zh", models=lab_models), encoding="utf-8")
+            lab_html = labs.page([(no, (d / "lab.js").read_text(encoding="utf-8"))], course=course, chapter=chap,
+                                 lang="en" if o.get("languages") == "en" else "zh", models=lab_models)
+            (d / lab_name).write_text(lab_html, encoding="utf-8")
             files.append({"name": lab_name, "kind": "lab", "teacher_only": False})
-        files.append({"name": f"{name} 课件.pptx", "kind": "slides", "teacher_only": False})
+        # 网页互动课件 (the standard since 2026-10-06; round 32 附二): the same engine as 《缝纫机设计与制造》
+        from .production import webdeck
+        figs = [{"name": Path(f["png"]).stem, "png": d / f["png"], "title": f["title"]}
+                for f in spec.get("figures_made") or [] if (d / f["png"]).exists()]
+        assets = {"anim": bool(video), "lab": bool(lab_html), "figures": [{"name": f["name"], "title": f["title"]} for f in figs]}
+        try:
+            slides = json.loads((d / "deck.json").read_text(encoding="utf-8"))["slides"]
+            slides = [x for x in (webdeck.clean_slide(x, assets) for x in slides) if x] or webdeck.fallback(spec, no, assets)
+        except (OSError, ValueError, KeyError):
+            slides = webdeck.fallback(spec, no, assets)
+        deck_name = f"{name} 课件.html"
+        try:
+            webdeck.build(d / deck_name, slides, no=no, title=spec["title"], course=course, deck_id=f"{proj['id']}-{les['id']}",
+                          anim=video["video"] if video else None, lab_html=lab_html, figures=figs)
+            files.append({"name": deck_name, "kind": "slides", "teacher_only": False})
+            les["attention"] = [x for x in les.get("attention") or [] if x.get("kind") != "courseware"]
+        except Exception as e:  # noqa: BLE001 - the rest of the lesson still stands; the teacher sees what is missing
+            log.exception("web deck for %s failed", no)
+            les.setdefault("attention", []).append({"kind": "courseware", "text": f"网页课件没做成（{str(e)[:120]}），可以让课程负责人重做课件"})
         docs.guide(spec, gp, d / f"实验{no} 实验指导书.docx", no)
         files.append({"name": f"实验{no} 实验指导书.docx", "kind": "guide", "teacher_only": False})
         docs.report(spec, gp, d / f"实验{no} 实验报告模板.docx", no)

@@ -95,8 +95,9 @@ STEP_DOC = """Steps a proposal may contain (JSON objects with "type"):
   written lesson (waiting for review, or PUBLISHED — then it becomes a new version: students keep the published one
   until the teacher submits it and the committee approves) without rewriting all of it. parts: title, goal, problem, concept, notes, example,
   animation, lab, model, everyday, summary, self_check, figures — `set` gives your own new content for a part (same
-  shape as get_lesson shows), `rewrite` has the lecturer rewrite those parts following `note`. deliverables: animation,
-  lab, figures, exercises, guide_plan, lecture — made again on their own. Slides, notes page, guide and plan are laid
+  shape as get_lesson shows), `rewrite` has the lecturer rewrite those parts following `note`. deliverables: courseware (the
+  web interactive deck), animation, lab, figures, exercises, guide_plan, lecture — made again on their own; `note` then
+  says what to change (e.g. courseware: "more pages on the scheduler, a bignum page for the numbers"). Slides, notes page, guide and plan are laid
   out again every time; a changed animation/lab/figures part redoes that deliverable too. Undoable.
 - approve_outline {}: settle the outline and move on to writing lessons (outline stage only). Writing steps do this by
   themselves when the outline is not settled yet, and confirm the chapter they write — the teacher asking to write is

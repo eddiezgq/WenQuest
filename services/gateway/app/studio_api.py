@@ -1071,6 +1071,11 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             return Response(path.read_bytes(), media_type="text/html; charset=utf-8", headers={
                 "Cache-Control": "private, max-age=600", "X-Content-Type-Options": "nosniff",
                 "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-forms allow-modals; frame-ancestors 'self'"})
+        if f["kind"] == "slides" and d["n"].endswith(".html"):
+            # the web interactive deck (round 32): runs sandboxed like a lab, flips, plays its animation and lab inside
+            return Response(path.read_bytes(), media_type="text/html; charset=utf-8", headers={
+                "Cache-Control": "private, max-age=600", "X-Content-Type-Options": "nosniff",
+                "Content-Security-Policy": "sandbox allow-scripts allow-popups allow-forms allow-modals; frame-ancestors 'self'"})
         if f["kind"] == "lecture_part":
             return FileResponse(path, headers={"Cache-Control": "private, max-age=600"})
         return FileResponse(path, filename=d["n"], headers={"Cache-Control": "private, max-age=600"})

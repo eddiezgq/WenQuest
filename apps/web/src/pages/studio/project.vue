@@ -731,6 +731,10 @@ function download(link: string) {
 }
 
 async function previewDeck(lid: string) {
+  // 网页互动课件 (round 32): open the deck itself — it flips, plays and runs its lab in the browser
+  const les = p.value?.outline?.chapters.flatMap((c) => c.lessons).find((x) => x.id === lid);
+  const web = les?.files?.find((f) => f.kind === "slides" && f.name.endsWith(".html"));
+  if (web) { download(web.url); return; }
   deckFor.value = lid;
   deckImgs.value = [];
   for (let n = 0; n < 120 && deckFor.value === lid; n++) {

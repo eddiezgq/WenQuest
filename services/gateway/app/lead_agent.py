@@ -48,8 +48,8 @@ AGENT_TOOLS = [
         "before students see it) without rewriting all of it: change some parts and/or make some "
         "deliverables again. Call get_lesson first to see its parts. `set`: your own new content for parts (same shape "
         "as get_lesson shows: problem, notes, example, lab, model, …); `rewrite` + `note`: the lecturer rewrites those "
-        "parts following the note; `redo`: deliverables to make again (animation, lab, figures, exercises, guide_plan, "
-        "lecture). Slides and documents are laid out again; a changed animation/lab/figures part redoes it too. Runs as "
+        "parts following the note; `redo`: deliverables to make again (courseware = the web interactive deck, animation, lab, figures, "
+        "exercises, guide_plan, lecture), with `note` for what to change. Slides and documents are laid out again; a changed animation/lab/figures part redoes it too. Runs as "
         "background work (one lesson at a time); the teacher can undo it."),
      "input_schema": {"type": "object", "properties": {
          "lesson_id": {"type": "string"}, "summary": {"type": "string"}, "set": {"type": "object"},

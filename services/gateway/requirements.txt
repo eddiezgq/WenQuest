@@ -16,3 +16,4 @@ beautifulsoup4==4.13.5
 numpy==2.4.4
 trimesh==5.1.0
 matplotlib==3.10.9
+pyyaml==6.0.3

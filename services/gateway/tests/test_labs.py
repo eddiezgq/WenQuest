@@ -112,6 +112,8 @@ def test_lab_is_written_checked_fixed_and_published_once_per_chapter(client, mon
     d = studio.lesson_dir(studio.projects.load(pid), les)
     deck = Presentation(str(next(d.glob("*课件.pptx"))))
     assert any(s.shape_type == 13 for s in deck.slides[4].shapes)  # a picture on the lab slide
+    web = next(d.glob("*课件.html")).read_text(encoding="utf-8")   # the web deck runs the lab inside its lab page
+    assert 'data-live="lab:lab"' in web
 
     # publish: the chapter lab page goes in once
     publish(client, h, pid, les["id"])

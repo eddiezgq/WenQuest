@@ -129,7 +129,9 @@ class LectureMixin:
         self.clear_attention(les, "lecture")
         les.setdefault("checks", {}).pop("lecture", None)
         d = self.lesson_dir(proj, les)
-        deck = next((d / f["name"] for f in les.get("files") or [] if f["kind"] == "slides" and (d / f["name"]).exists()), None)
+        deck = d / les["deck_pptx"] if les.get("deck_pptx") and (d / les["deck_pptx"]).exists() else \
+            next((d / f["name"] for f in les.get("files") or [] if f["kind"] == "slides" and f["name"].endswith(".pptx")
+                  and (d / f["name"]).exists()), None)
         if not deck:
             return None
         out = self.lecture_dir(proj, les)
