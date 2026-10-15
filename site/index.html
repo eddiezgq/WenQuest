@@ -253,6 +253,33 @@
   @media (max-width: 800px) { .vm { grid-template-columns: minmax(0, 1fr); } }
   .note-box { margin-top: 18px; font-size: 14.5px; color: var(--muted); border-left: 3px solid var(--accent); padding-left: 12px; max-width: 62ch; }
   section.part.alt { background: var(--surface); }
+
+  /* solutions (round 33) */
+  .solgrid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; }
+  .solcards.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .solcards.six { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .solcards.six > .solcard { grid-column: span 2; }
+  .solcards.six > .solcard.half { grid-column: span 3; }
+  .solcards.six > .solcard.wide, .solcards.six > .solsub { grid-column: 1 / -1; }
+  .solcol h3 { margin: 0 0 4px; font: 600 22px/1.3 var(--serif-zh); }
+  html[lang="en"] .solcol h3 { font-family: var(--serif); }
+  .solcol .who { color: var(--muted); font-size: 15px; margin: 0 0 16px; }
+  .solcards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .solcard { display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 16px; min-width: 0; text-decoration: none; color: inherit; }
+  a.solcard:hover { border-color: var(--accent-ink); }
+  .solcard.wide { grid-column: 1 / -1; background: linear-gradient(135deg, var(--surface), rgba(15,110,116,.06)); }
+  .solcard .tag { font: 600 12px/1 var(--mono); color: var(--accent-ink); letter-spacing: .04em; }
+  .solcard b { font: 600 18px/1.35 var(--serif-zh); }
+  html[lang="en"] .solcard b { font-family: var(--serif); }
+  .solcard .what { font-size: 15px; }
+  .solcard ul { margin: 2px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .solcard .go { margin-top: auto; padding-top: 6px; font-size: 14px; color: var(--accent-ink); }
+  .solcard .flow { font: 13px/1.6 var(--mono); color: var(--muted); }
+  .solsub { grid-column: 1 / -1; margin: 10px 0 0; font: 600 14px/1.4 var(--mono); color: var(--muted); letter-spacing: .04em; }
+  @media (max-width: 1000px) { .solcards.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .solcards.six { grid-template-columns: repeat(2, minmax(0, 1fr)); } .solcards.six > .solcard, .solcards.six > .solcard.half { grid-column: span 1; } }
+  @media (max-width: 560px) { .solcards.four, .solcards.six { grid-template-columns: 1fr; } }
+  nav.main .menu .grp { padding: 8px 10px 2px; font: 600 11.5px/1.3 var(--mono); color: var(--night-muted); letter-spacing: .06em; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -262,6 +289,20 @@
     <a class="brand" href="/" title="问渠 · 回首页 / Home"><b class="zh">问渠</b><small>WenQuest Robotics</small></a>
     <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="mainnav"><span data-zh>菜单</span><span data-en>Menu</span></button>
     <nav class="main" id="mainnav" aria-label="Main">
+      <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>解决方案</span><span data-en>Solutions</span></button>
+        <div class="menu wide">
+          <div class="grp"><span data-zh>学校与培训机构</span><span data-en>Schools &amp; training providers</span></div>
+          <a href="#sol-school"><span data-zh>学习平台</span><span data-en>Learning platform</span></a>
+          <a href="#sol-school"><span data-zh>数字工厂（教学版）</span><span data-en>Digital factory for teaching</span></a>
+          <a href="#sol-school"><span data-zh>虚拟实验</span><span data-en>Virtual labs</span></a>
+          <a href="#sol-school"><span data-zh>教材</span><span data-en>Textbooks</span></a>
+          <div class="sep"></div>
+          <div class="grp"><span data-zh>企业</span><span data-en>Enterprises</span></div>
+          <a href="#sol-enterprise"><span data-zh>数字工厂集成平台</span><span data-en>Digital factory integration platform</span></a>
+          <a href="#sol-enterprise"><span data-zh>CAD · CAM · CAE</span><span data-en>CAD · CAM · CAE</span></a>
+          <a href="#sol-enterprise"><span data-zh>ERP · 厂情中枢</span><span data-en>ERP · Factory command center</span></a>
+          <a href="#sol-enterprise"><span data-zh>行业专用软件</span><span data-en>Industry software</span><small><span data-zh>凸轮设计与制造、缝纫机设计与制造</span><span data-en>Cam design &amp; manufacturing, sewing machine design &amp; manufacturing</span></small></a>
+        </div></div>
       <div class="dd"><button type="button" aria-haspopup="true"><span data-zh>关于我们</span><span data-en>About</span></button>
         <div class="menu">
           <a href="#about"><span data-zh>愿景与使命</span><span data-en>Vision &amp; mission</span></a>
@@ -353,15 +394,61 @@
         <div><dd>17</dd><dt><span data-zh>个数字工厂实验</span><span data-en>digital-factory labs</span></dt></div>
         <div><dd>31</dd><dt><span data-zh>讲缝纫机课已全部上线，免费</span><span data-en>sewing-machine lessons online, free</span></dt></div>
       </dl>
-      <p class="asof"><span data-zh>截至 2026-10-08，由仓库自动统计</span><span data-en>As of 2026-10-08, counted from our repository</span></p>
+      <p class="asof"><span data-zh>截至 2026-10-15，由仓库自动统计</span><span data-en>As of 2026-10-15, counted from our repository</span></p>
     </div>
   </section>
 
-  <!-- I. Programs -->
-  <section class="part" id="majors">
+  <!-- I. Solutions (round 33) -->
+  <section class="part" id="solutions">
     <div class="wrap">
       <div class="head">
         <div class="roman">I</div>
+        <div>
+          <h2><span data-zh>解决方案</span><span data-en>Solutions</span></h2>
+          <p class="lead"><span data-zh>同一套平台，两类用户：学校和培训机构用它开课、做实训；企业用它把设计、加工、经营和车间连起来。</span><span data-en>One platform, two kinds of users: schools and training providers teach and train on it; companies use it to connect design, machining, business and the shop floor.</span></p>
+        </div>
+      </div>
+      <div class="body" style="margin-left:0">
+        <div class="solgrid">
+          <div class="solcol" id="sol-school">
+            <h3><span data-zh>学校与培训机构</span><span data-en>Schools &amp; training providers</span></h3>
+            <p class="who"><span data-zh>高校、职业院校、企业培训中心</span><span data-en>Universities, vocational colleges, corporate training centers</span></p>
+            <div class="solcards four">
+<a class="solcard" href="#platform"><span class="tag"><span data-zh>平台</span><span data-en>Platform</span></span><b><span data-zh>学习平台</span><span data-en>Learning platform</span></b><span class="what"><span data-zh>老师交来一堆资料，或只说一句要求，AI 就建出一门完整的课。</span><span data-en>Hand over a pile of files, or one sentence of requirements, and the AI builds a complete course.</span></span><ul><li><span data-zh>课程负责人（AI）对话建课，随时改、可撤销</span><span data-en>Build and revise by conversation with an AI course lead; every change undoable</span></li><li><span data-zh>网页互动课件：动画、虚拟实验在页里运行</span><span data-en>Interactive web slides with animations and labs running inside</span></li><li><span data-zh>AI 预审 + 课程委员会审核后才发布；网页与微信小程序</span><span data-en>AI pre-review and committee approval before publishing; web and WeChat</span></li></ul><span class="go"><span data-zh>看学习平台</span><span data-en>See the platform</span> →</span></a>
+<a class="solcard" href="#factory"><span class="tag"><span data-zh>实训</span><span data-en>Practice</span></span><b><span data-zh>数字工厂（教学版）</span><span data-en>Digital factory for teaching</span></b><span class="what"><span data-zh>按真实企业数据运转的教学工业园，学生在里面扮演岗位。</span><span data-en>A teaching industrial park running on realistic company data, where students take real roles.</span></span><ul><li><span data-zh>设计、工艺、计划、采购、质检、设备等岗位实验</span><span data-en>Labs for design, process, planning, purchasing, quality and maintenance roles</span></li><li><span data-zh>每班一座自己的工厂，老师看得到每个人做了什么</span><span data-en>Each class gets its own factory; teachers see what everyone did</span></li><li><span data-zh>减速器厂运行中，机器人厂起步</span><span data-en>Gearbox plant running; robot plant starting</span></li></ul><span class="go"><span data-zh>看数字工业园</span><span data-en>See the industrial park</span> →</span></a>
+<a class="solcard" href="#labs"><span class="tag"><span data-zh>实验</span><span data-en>Labs</span></span><b><span data-zh>虚拟实验</span><span data-en>Virtual labs</span></b><span class="what"><span data-zh>物理仿真在浏览器里运行，调参、失败、重来只要几秒。</span><span data-en>Physics runs in the browser: tune, fail and retry in seconds.</span></span><ul><li><span data-zh>每个实验配指导书和报告模板，任务自动判定</span><span data-en>Every lab comes with a guide and report template; tasks are checked automatically</span></li><li><span data-zh>机器人、力学、电路、PLC、Verilog 芯片设计、GPU 编程</span><span data-en>Robotics, mechanics, circuits, PLC, Verilog chip design, GPU programming</span></li><li><span data-zh>AI 助教读实验曲线，讲原因不代做</span><span data-en>The AI tutor reads your traces and explains, without doing it for you</span></li></ul><span class="go"><span data-zh>看虚拟实验室</span><span data-en>See the labs</span> →</span></a>
+<a class="solcard" href="#courses"><span class="tag"><span data-zh>教材</span><span data-en>Textbooks</span></span><b><span data-zh>教材</span><span data-en>Textbooks</span></b><span class="what"><span data-zh>自编中英对照教材，每章配程序、动画和实验。</span><span data-en>Our own Chinese–English textbooks, every chapter with programs, animations and labs.</span></span><ul><li><span data-zh>机器人学、机械设计、制造技术、人工智能、PLC 等</span><span data-en>Robotics, machine design, manufacturing, AI, PLC and more</span></li><li><span data-zh>书里的数字由程序算出，构建时逐条核对</span><span data-en>Every number is computed by a program and checked at build time</span></li><li><span data-zh>网页版、PDF 和课程包（课件、作业、测验）</span><span data-en>Web edition, PDF and course packs (slides, assignments, quizzes)</span></li></ul><span class="go"><span data-zh>看课程地图</span><span data-en>See the course map</span> →</span></a>
+            </div>
+          </div>
+          <div class="solcol" id="sol-enterprise">
+            <h3><span data-zh>企业</span><span data-en>Enterprises</span></h3>
+            <p class="who"><span data-zh>中小制造企业：分模块选用，也可以整套集成</span><span data-en>Small and mid-sized manufacturers: pick modules, or integrate the whole set</span></p>
+            <div class="solcards six">
+<a class="solcard wide" href="/cases/digital-thread.html"><span class="tag"><span data-zh>集成平台</span><span data-en>Integration platform</span></span><b><span data-zh>数字工厂集成平台</span><span data-en>Digital factory integration platform</span></b><span class="what"><span data-zh>把设计、工艺、加工、经营和车间连成一条数字主线：改一次设计，下游自动跟着变，车间只拿到批准过的版本。</span><span data-en>One digital thread from design to process, machining, business and the shop floor: change a design once, everything downstream follows, and the shop only ever gets approved versions.</span></span><div class="flow"><span data-zh>CAD → 审批 → ERP（版本 / BOM）→ CAM 程序 → 车间 → 质量 → 厂情中枢</span><span data-en>CAD → approval → ERP (version / BOM) → CAM program → shop floor → quality → command center</span></div><ul><li><span data-zh>设计发布与审批：网页三维看图、差异着色、点处批注，批准才生效</span><span data-en>Design release and approval: web 3D viewing, change colouring, pinned comments; nothing takes effect until approved</span></li><li><span data-zh>批准后 ERP 物料版本、BOM、工单程序自动更新，全程留痕</span><span data-en>On approval the ERP item version, BOM and work-order programs update automatically, with a full audit trail</span></li><li><span data-zh>参数配置器：销售填参数，出三维、图纸、报价并草拟订单</span><span data-en>Configurator: sales enter parameters and get 3D, drawings, a quote and a draft order</span></li></ul><span class="go"><span data-zh>看数字主线案例</span><span data-en>See the digital-thread case</span> →</span></a>
+<a class="solcard" href="#contact"><span class="tag"><span data-zh>CAD</span><span data-en>CAD</span></span><b><span data-zh>设计接入</span><span data-en>Design (CAD)</span></b><span class="what"><span data-zh>接企业已有的 CAD，不让工程师换软件。</span><span data-en>Works with the CAD you already use.</span></span><ul><li><span data-zh>SolidWorks 宏、FreeCAD 工作台一键提交</span><span data-en>One-click submit from SolidWorks (macro) and FreeCAD (workbench)</span></li><li><span data-zh>任何 CAD 导出 STEP 即可发布</span><span data-en>Any CAD: export STEP and release</span></li><li><span data-zh>网页设计台：参数化零件在线建模</span><span data-en>Web design desk for parametric parts</span></li></ul><span class="go"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</span></a>
+<a class="solcard" href="#contact"><span class="tag"><span data-zh>CAM</span><span data-en>CAM</span></span><b><span data-zh>数控编程</span><span data-en>CNC programming (CAM)</span></b><span class="what"><span data-zh>在浏览器里排编程单，生成 G 代码并试切。</span><span data-en>Plan operations in the browser, generate G-code and dry-run it.</span></span><ul><li><span data-zh>FANUC 风格程序，仿真检查后挂到工艺规程</span><span data-en>FANUC-style programs, simulated before they join the routing</span></li><li><span data-zh>审批生效后随工单派到车间终端</span><span data-en>Released with the work order to the shop-floor terminal</span></li><li><span data-zh>机床参数按企业设备配置</span><span data-en>Machine parameters set to your equipment</span></li></ul><span class="go"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</span></a>
+<a class="solcard" href="#contact"><span class="tag"><span data-zh>CAE</span><span data-en>CAE</span></span><b><span data-zh>仿真与优化</span><span data-en>Simulation & optimization (CAE)</span></b><span class="what"><span data-zh>不用装软件，浏览器设置、服务器计算。</span><span data-en>No installation: set up in the browser, compute on the server.</span></span><ul><li><span data-zh>有限元强度、疲劳寿命、温度场与热应力</span><span data-en>FEA strength, fatigue life, temperature and thermal stress</span></li><li><span data-zh>流体分析（OpenFOAM）、多体动力学（MuJoCo）</span><span data-en>CFD (OpenFOAM) and multibody dynamics (MuJoCo)</span></li><li><span data-zh>设计优化与拓扑优化，结果送回设计</span><span data-en>Design and topology optimization, results back to design</span></li></ul><span class="go"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</span></a>
+<a class="solcard half" href="#contact"><span class="tag"><span data-zh>ERP</span><span data-en>ERP / MES</span></span><b><span data-zh>经营与生产</span><span data-en>Business & production (ERP / MES)</span></b><span class="what"><span data-zh>基于开源 ERPNext，接单、算料、排产、采购、财务一套数据。</span><span data-en>Built on open-source ERPNext: orders, MRP, scheduling, purchasing and finance on one set of data.</span></span><ul><li><span data-zh>物料、BOM、工艺规程、MRP、销售与采购</span><span data-en>Items, BOMs, routings, MRP, sales and purchasing</span></li><li><span data-zh>车间终端报工、质检、设备维护、人员排班</span><span data-en>Shop-floor reporting, quality, maintenance, staffing</span></li><li><span data-zh>能源与环境、安全环保</span><span data-en>Energy, environment, health and safety</span></li></ul><span class="go"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</span></a>
+<a class="solcard half" href="/cases/digital-thread.html"><span class="tag"><span data-zh>厂情中枢</span><span data-en>Command center</span></span><b><span data-zh>厂情中枢</span><span data-en>Factory command center</span></b><span class="what"><span data-zh>把全厂数据连成一张关系网，出了问题追得到根源。</span><span data-en>Links all plant data into one graph so problems can be traced to their root.</span></span><ul><li><span data-zh>工厂本体：订单、物料、设备、人员、质量等领域的关系</span><span data-en>Plant ontology linking orders, materials, equipment, people and quality</span></li><li><span data-zh>异常带因果链，处理记录可查；每日态势卡</span><span data-en>Anomalies with causal chains and handling records; daily status cards</span></li><li><span data-zh>数字孪生：卖出的每台产品在线监测、预测维护</span><span data-en>Digital twins: every unit sold monitored, with predictive maintenance</span></li></ul><span class="go"><span data-zh>看追溯案例</span><span data-en>See the trace case</span> →</span></a>
+              <div class="solsub"><span data-zh>行业专用软件</span><span data-en>Industry software</span></div>
+<a class="solcard half" href="#contact"><span class="tag"><span data-zh>专用软件</span><span data-en>Industry software</span></span><b><span data-zh>凸轮设计与制造</span><span data-en>Cam design & manufacturing</span></b><span class="what"><span data-zh>从运动要求到凸轮廓线，再到加工误差与补偿。</span><span data-en>From motion requirements to the cam profile, and on to machining error and compensation.</span></span><ul><li><span data-zh>挑线、送布等凸轮机构的运动与受力</span><span data-en>Motion and forces of take-up, feed and other cam mechanisms</span></li><li><span data-zh>廓线误差在高速下引起的加速度误差</span><span data-en>How micron-level profile errors become acceleration errors at speed</span></li><li><span data-zh>磨削补偿：算出能修掉哪些误差</span><span data-en>Grinding compensation: what can be corrected</span></li></ul><span class="go"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</span></a>
+<a class="solcard half" href="#contact"><span class="tag"><span data-zh>专用软件</span><span data-en>Industry software</span></span><b><span data-zh>缝纫机设计与制造</span><span data-en>Sewing machine design & manufacturing</span></b><span class="what"><span data-zh>平缝、包缝、绷缝、绣花等整机的机构、电控与制造。</span><span data-en>Mechanisms, controls and manufacturing of lockstitch, overlock, coverstitch and embroidery machines.</span></span><ul><li><span data-zh>机构仿真与三维整机结构</span><span data-en>Mechanism simulation and full 3D machine structures</span></li><li><span data-zh>伺服电控、线迹与张力调试</span><span data-en>Servo drives, stitch formation and tension tuning</span></li><li><span data-zh>零件库快速配套、尺寸链与共振校核</span><span data-en>Fast parts matching, dimension chains and resonance checks</span></li></ul><span class="go"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</span></a>
+            </div>
+          </div>
+        </div>
+        <div class="links">
+          <a class="btn solid" href="mailto:info@wenquestrobotics.com?subject=%E9%A2%84%E7%BA%A6%E6%BC%94%E7%A4%BA%20%2F%20Demo%20request"><span data-zh>预约演示</span><span data-en>Book a demo</span> →</a>
+          <a class="btn" href="#contact"><span data-zh>联系我们</span><span data-en>Contact us</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- II. Programs -->
+  <section class="part" id="majors">
+    <div class="wrap">
+      <div class="head">
+        <div class="roman">II</div>
         <div>
           <h2><span data-zh>四个专业</span><span data-en>Four programs</span></h2>
           <p class="lead"><span data-zh>课程分通识课、基础课、专业课、特色课程四层。每个专业都落到数字工厂里的真实产品上：设计它、算它、做出来。</span><span data-en>Courses come in four tiers: general education, foundations, major courses and signature courses. Every program lands on a real product in the digital factory: design it, compute it, make it.</span></p>
@@ -422,7 +509,7 @@
   <section class="part alt" id="how">
     <div class="wrap">
       <div class="head">
-        <div class="roman">II</div>
+        <div class="roman">III</div>
         <div>
           <h2><span data-zh>一节课怎么上</span><span data-en>How a lesson works</span></h2>
           <p class="lead"><span data-zh>理工科每一节课都走同一条线。实际问题以机器人为主，再配一个生活里的例子。</span><span data-en>Every science and engineering lesson follows the same line. The problem is usually a robot, paired with one everyday example.</span></p>
@@ -444,7 +531,7 @@
   <section class="part" id="courses">
     <div class="wrap">
       <div class="head">
-        <div class="roman">III</div>
+        <div class="roman">IV</div>
         <div>
           <h2><span data-zh>课程地图</span><span data-en>Course map</span></h2>
           <p class="lead"><span data-zh>状态照实写：已上线的可以直接学，编写中的教材按章上线，规划中的还没有开始。</span><span data-en>Status as it really is: online courses are open now, textbooks in progress go live chapter by chapter, planned ones have not started.</span></p>
@@ -473,7 +560,7 @@
   <section class="part alt" id="factory">
     <div class="wrap">
       <div class="head">
-        <div class="roman">IV</div>
+        <div class="roman">V</div>
         <div>
           <h2><span data-zh>数字工厂：一座教学工业园</span><span data-en>The digital factory: a teaching industrial park</span></h2>
           <p class="lead"><span data-zh>按真实企业数据运转：ERP、工艺、MRP、MES、质量、设备、能源和厂情中枢都在系统里。几座工厂互为上下游，学生在这里设计产品、排产、算成本、追问题。</span><span data-en>It runs on realistic company data: ERP, process plans, MRP, MES, quality, equipment, energy and a command center. The plants supply one another; students design products, schedule, cost and trace problems here.</span></p>
@@ -515,7 +602,7 @@
   <section class="part" id="labs">
     <div class="wrap">
       <div class="head">
-        <div class="roman">V</div>
+        <div class="roman">VI</div>
         <div>
           <h2><span data-zh>机器人虚拟实验室</span><span data-en>Virtual robotics labs</span></h2>
           <p class="lead"><span data-zh>物理仿真直接在浏览器里运行，调参、失败、重来只要几秒。AI 助教读你的实验曲线，指出现象和原因，但不代你完成。</span><span data-en>Physics runs right in your browser, so tuning, failing and retrying take seconds. The AI tutor reads your traces and explains what happened, without doing the work for you.</span></p>
@@ -541,7 +628,7 @@
   <section class="part alt" id="platform">
     <div class="wrap">
       <div class="head">
-        <div class="roman">VI</div>
+        <div class="roman">VII</div>
         <div>
           <h2><span data-zh>学习平台 · 问渠</span><span data-en>Learning platform · WenQuest</span></h2>
           <p class="lead"><span data-zh>老师交来一堆杂乱的资料，或只说一句要求，AI 就能整理出一门完整的课。每个回答都依据课程资料，并注明出处。</span><span data-en>Hand it a pile of messy files, or just one sentence, and the AI builds a complete course. Every answer is grounded in the course materials and cites its source.</span></p>
@@ -568,7 +655,7 @@
   <section class="part" id="join">
     <div class="wrap">
       <div class="head">
-        <div class="roman">VII</div>
+        <div class="roman">VIII</div>
         <div>
           <h2><span data-zh>教师、学校与企业</span><span data-en>Instructors, schools and companies</span></h2>
           <p class="lead"><span data-zh>课程向全世界的贡献者开放。来开课、来审稿、来合作，都请来信。</span><span data-en>Our courses are open to contributors worldwide. To teach, review or partner, write to us.</span></p>
@@ -587,7 +674,7 @@
   <section class="part alt" id="enroll">
     <div class="wrap">
       <div class="head">
-        <div class="roman">VIII</div>
+        <div class="roman">IX</div>
         <div>
           <h2><span data-zh>招生与学费</span><span data-en>Admissions and fees</span></h2>
           <p class="lead"><span data-zh>注册免费，自由选课。入门课免费，其余每学分 $39，一年最多付 $600。</span><span data-en>Free to sign up, free to choose. Starter courses are free; the rest are $39 per credit, capped at $600 a year.</span></p>
@@ -609,7 +696,7 @@
   <section class="part" id="about">
     <div class="wrap">
       <div class="head">
-        <div class="roman">IX</div>
+        <div class="roman">X</div>
         <div><h2><span data-zh>关于我们</span><span data-en>About us</span></h2></div>
       </div>
       <div class="body">
