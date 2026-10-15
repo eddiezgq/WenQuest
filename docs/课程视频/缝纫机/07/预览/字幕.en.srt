@@ -1,0 +1,1003 @@
+1
+00:00:00,600 --> 00:00:01,568
+Hi everyone,
+
+2
+00:00:01,588 --> 00:00:07,494
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:07,894 --> 00:00:13,034
+This is Lecture 7, thread tension and stitch quality.
+
+4
+00:00:13,434 --> 00:00:18,204
+The needle thread pulls from above, the bobbin thread from below,
+
+5
+00:00:18,224 --> 00:00:23,658
+and the point where they lock should sit right in the middle of the cloth.
+
+6
+00:00:23,678 --> 00:00:28,817
+Pull it off-centre and you get bobbin dots on top or loops underneath;
+
+7
+00:00:28,837 --> 00:00:32,428
+pull both too hard and the stitch looks balanced,
+
+8
+00:00:32,448 --> 00:00:35,597
+yet the seam puckers and the thread breaks.
+
+9
+00:00:37,117 --> 00:00:39,123
+Here's the problem.
+
+10
+00:00:39,523 --> 00:00:47,712
+A shirt factory is sewing plackets: two plies of cotton, 1 millimetre thick,
+
+11
+00:00:47,732 --> 00:00:51,708
+a 3 millimetre stitch, Tex 24 thread.
+
+12
+00:00:52,108 --> 00:00:58,544
+A new mechanic thinks the stitches aren't tight enough and sets the tension
+
+13
+00:00:58,564 --> 00:01:02,848
+assembly to 220 centinewtons and the bobbin to 90.
+
+14
+00:01:03,248 --> 00:01:06,489
+The stitch looks balanced on both faces,
+
+15
+00:01:06,509 --> 00:01:11,624
+but the finished placket puckers in fine ridges along the seam.
+
+16
+00:01:12,024 --> 00:01:14,364
+Is it really balanced?
+
+17
+00:01:14,764 --> 00:01:18,703
+How much shorter is a 40 centimetre placket?
+
+18
+00:01:19,103 --> 00:01:21,363
+How do we get it balanced and flat?
+
+19
+00:01:21,763 --> 00:01:23,183
+We'll work it out at the end.
+
+20
+00:01:24,703 --> 00:01:29,690
+Looking at a seam, a mechanic checks four things: bobbin dots showing on top,
+
+21
+00:01:29,710 --> 00:01:34,307
+loops of needle thread trailing underneath, whether the seam lies flat,
+
+22
+00:01:34,327 --> 00:01:36,843
+and whether the thread breaks or frays.
+
+23
+00:01:37,243 --> 00:01:44,868
+This is the stitch cross-section from Lab 7-1: blue is the needle thread,
+
+24
+00:01:44,888 --> 00:01:50,943
+orange the bobbin, and the white dots are where they lock.
+
+25
+00:01:51,343 --> 00:01:57,885
+As the tension assembly tightens and loosens, the lock point runs up and down.
+
+26
+00:01:58,285 --> 00:02:04,330
+The first two faults are a wrong ratio, the third usually both too tight,
+
+27
+00:02:04,350 --> 00:02:07,156
+the fourth a peak that's too high.
+
+28
+00:02:08,675 --> 00:02:10,052
+Where tension comes from.
+
+29
+00:02:11,572 --> 00:02:14,752
+First, where does tension come from?
+
+30
+00:02:15,152 --> 00:02:19,012
+This is the take-up animation from Lecture 4.
+
+31
+00:02:19,412 --> 00:02:25,066
+The needle thread leaves the tension assembly, passes the check spring,
+
+32
+00:02:25,086 --> 00:02:31,059
+wraps round several guides, the take-up lever eye and the needle-bar guide,
+
+33
+00:02:31,079 --> 00:02:34,256
+and finally goes through the needle eye.
+
+34
+00:02:34,656 --> 00:02:38,534
+The bobbin thread is much simpler: drawn off the bobbin,
+
+35
+00:02:38,554 --> 00:02:43,476
+it runs under a leaf spring on the case, and a screw sets the pressure.
+
+36
+00:02:43,876 --> 00:02:49,267
+Every part on the needle-thread path changes the tension:
+
+37
+00:02:49,287 --> 00:02:55,913
+the assembly adds a fixed amount, the guides multiply it, and the eye,
+
+38
+00:02:55,933 --> 00:03:01,894
+where the thread turns about 180 degrees, cuts a big piece off.
+
+39
+00:03:03,414 --> 00:03:10,191
+The tension assembly is a stud, two discs, a compression spring and a nut.
+
+40
+00:03:10,591 --> 00:03:18,152
+The needle thread runs between the discs; the spring presses them together,
+
+41
+00:03:18,172 --> 00:03:23,105
+and when the thread is pulled both its faces rub,
+
+42
+00:03:23,125 --> 00:03:27,452
+so the tension rises by 2 times mu times N.
+
+43
+00:03:27,852 --> 00:03:31,872
+That's a fixed amount added, whatever comes in.
+
+44
+00:03:32,272 --> 00:03:37,851
+Tighten the nut, N goes up, and the thread gets tighter.
+
+45
+00:03:38,251 --> 00:03:46,358
+A number: 10 centinewtons in, a 200 centinewton spring, mu of 0.2,
+
+46
+00:03:46,378 --> 00:03:48,452
+and 90 comes out.
+
+47
+00:03:48,852 --> 00:03:51,216
+When you lift the presser foot,
+
+48
+00:03:51,236 --> 00:03:55,370
+the discs are pushed at least half a millimetre apart,
+
+49
+00:03:55,390 --> 00:03:57,754
+so the thread pulls out freely.
+
+50
+00:03:59,274 --> 00:04:05,344
+When thread wraps round a cylindrical part such as a guide,
+
+51
+00:04:05,364 --> 00:04:10,918
+friction no longer adds a fixed amount but multiplies:
+
+52
+00:04:10,938 --> 00:04:14,737
+T2 equals T1 times e to the mu theta.
+
+53
+00:04:15,137 --> 00:04:17,952
+That's the capstan equation.
+
+54
+00:04:18,352 --> 00:04:24,303
+Mu 0.2 over 1 radian gives a factor of 1.22;
+
+55
+00:04:24,323 --> 00:04:29,052
+mu 0.35 over 180 degrees gives 3.0.
+
+56
+00:04:29,452 --> 00:04:31,327
+Read it the other way too:
+
+57
+00:04:31,347 --> 00:04:36,792
+thread always slides from its low-tension end towards its high-tension end.
+
+58
+00:04:37,192 --> 00:04:42,702
+When the stitch is tightened, the lock point is the upstream end,
+
+59
+00:04:42,722 --> 00:04:46,955
+so the take-up tension, after the turn at the eye,
+
+60
+00:04:46,975 --> 00:04:49,932
+arrives there cut to about a third.
+
+61
+00:04:51,452 --> 00:04:56,098
+Needle-thread tension isn't constant within a stitch.
+
+62
+00:04:56,498 --> 00:05:02,407
+A study put a tension sensor just after the tension assembly and found this pattern:
+
+63
+00:05:02,427 --> 00:05:06,713
+the highest peak comes at the moment the stitch is tightened,
+
+64
+00:05:06,733 --> 00:05:10,878
+and it's controlled directly by the assembly's pre-tension.
+
+65
+00:05:11,278 --> 00:05:16,733
+Then the take-up pays out and the check spring keeps a small tension;
+
+66
+00:05:16,753 --> 00:05:22,526
+after the catch the loop passes round the bobbin case and gives a second,
+
+67
+00:05:22,546 --> 00:05:23,558
+smaller peak.
+
+68
+00:05:23,958 --> 00:05:26,552
+Fabric thickness hardly matters,
+
+69
+00:05:26,572 --> 00:05:30,556
+and the bobbin only plays a part around cast-off.
+
+70
+00:05:30,956 --> 00:05:32,706
+The practical point:
+
+71
+00:05:32,726 --> 00:05:38,016
+turning the tension nut mainly changes that tightening peak.
+
+72
+00:05:39,536 --> 00:05:40,968
+Stitch balance.
+
+73
+00:05:42,488 --> 00:05:44,387
+As the stitch is tightened,
+
+74
+00:05:44,407 --> 00:05:48,865
+the take-up pulls the needle thread up while the bobbin thread,
+
+75
+00:05:48,885 --> 00:05:52,348
+drawn out of the case, pulls the lock point down.
+
+76
+00:05:52,748 --> 00:05:54,088
+It's a tug of war.
+
+77
+00:05:54,488 --> 00:05:55,806
+Watch the section:
+
+78
+00:05:55,826 --> 00:06:00,341
+tighten the assembly and the lock point is pulled to the top,
+
+79
+00:06:00,361 --> 00:06:03,315
+and orange bobbin dots show on the face;
+
+80
+00:06:03,335 --> 00:06:09,188
+loosen it and the point runs to the bottom and needle thread trails underneath.
+
+81
+00:06:09,588 --> 00:06:14,206
+Only when the two are roughly equal does it sit in the middle.
+
+82
+00:06:14,606 --> 00:06:17,329
+That's a balanced stitch.
+
+83
+00:06:17,729 --> 00:06:20,170
+They needn't be exactly equal,
+
+84
+00:06:20,190 --> 00:06:24,272
+because the threads turn at the edges of the hole,
+
+85
+00:06:24,292 --> 00:06:27,389
+and friction there works like a brake.
+
+86
+00:06:28,909 --> 00:06:32,754
+The book puts numbers on this with an illustrative model.
+
+87
+00:06:33,154 --> 00:06:39,572
+The lock-point position z runs from 0 at the bottom of the cloth to 1 at the top,
+
+88
+00:06:39,592 --> 00:06:45,614
+and r is the needle tension at the lock point divided by the bobbin tension.
+
+89
+00:06:46,014 --> 00:06:51,490
+At r equal to 1, z is 0.5, right in the middle;
+
+90
+00:06:51,510 --> 00:06:58,506
+at r equal to the balance band B, the point reaches the top.
+
+91
+00:06:58,906 --> 00:07:04,160
+Between 0.4 and 0.6 counts as balanced.
+
+92
+00:07:04,560 --> 00:07:11,941
+Look at the three curves: denim, with B of 3, is flat and easy to set; lining,
+
+93
+00:07:11,961 --> 00:07:18,772
+with B of 1.8, is steep, and a small error sends the point to a surface.
+
+94
+00:07:19,172 --> 00:07:23,432
+The straight-line relation is only a teaching simplification.
+
+95
+00:07:24,952 --> 00:07:30,176
+Everyone on the shop floor knows the assembly must be several times tighter
+
+96
+00:07:30,196 --> 00:07:32,834
+than the bobbin for a balanced stitch.
+
+97
+00:07:33,234 --> 00:07:33,501
+Why?
+
+98
+00:07:33,901 --> 00:07:37,925
+The model compares the needle tension at the lock point.
+
+99
+00:07:38,325 --> 00:07:41,176
+From the assembly to that point,
+
+100
+00:07:41,196 --> 00:07:46,199
+the thread is first multiplied by 1.22 round the guides,
+
+101
+00:07:46,219 --> 00:07:53,105
+then cut to a third at the eye; together, about 0.41 of the assembly setting.
+
+102
+00:07:53,505 --> 00:08:01,919
+So with a 40 centinewton bobbin, r equal to 1 needs the assembly at about 98,
+
+103
+00:08:01,939 --> 00:08:07,285
+and the cotton balance zone is roughly 84 to 115.
+
+104
+00:08:08,805 --> 00:08:14,986
+This is the tension plane from Lab 7-1: across is the assembly tension,
+
+105
+00:08:15,006 --> 00:08:17,169
+up is the bobbin tension.
+
+106
+00:08:17,569 --> 00:08:22,549
+Green is usable: balanced, firm, flat and unbroken.
+
+107
+00:08:22,949 --> 00:08:30,509
+Yellow is unbalanced, grey too loose, red puckered, and purple a breakage risk.
+
+108
+00:08:30,909 --> 00:08:33,794
+The white ring is the current setting,
+
+109
+00:08:33,814 --> 00:08:36,929
+100 on the assembly and 40 on the bobbin.
+
+110
+00:08:37,329 --> 00:08:43,075
+On the right, cotton has a fairly wide green band; on the left, thin,
+
+111
+00:08:43,095 --> 00:08:47,003
+slippery lining has a narrow band set low down,
+
+112
+00:08:47,023 --> 00:08:50,429
+and a little extra tension brings pucker.
+
+113
+00:08:51,949 --> 00:08:54,326
+Order of adjustment and diagnosis.
+
+114
+00:08:55,846 --> 00:09:02,479
+The rule is bobbin first, then the needle thread to match, because the bobbin,
+
+115
+00:09:02,499 --> 00:09:06,146
+set by its spring, is the stable reference.
+
+116
+00:09:06,546 --> 00:09:10,213
+Look at the section: this machine has a loose bobbin,
+
+117
+00:09:10,233 --> 00:09:15,082
+the lock point is pulled to the top, and bobbin dots show on the face.
+
+118
+00:09:15,102 --> 00:09:20,161
+r is too large, which could mean a tight needle thread or a loose bobbin.
+
+119
+00:09:20,561 --> 00:09:26,334
+If the assembly is at its usual setting and the machine suddenly does this,
+
+120
+00:09:26,354 --> 00:09:28,883
+the bobbin is the likely culprit,
+
+121
+00:09:28,903 --> 00:09:33,054
+such as a loose case spring or a loosely wound bobbin,
+
+122
+00:09:33,074 --> 00:09:36,221
+and loosening the assembly only hides it.
+
+123
+00:09:36,621 --> 00:09:40,098
+Loops underneath mean r is too small,
+
+124
+00:09:40,118 --> 00:09:47,281
+or the thread isn't seated between the discs, so thread it with the foot up.
+
+125
+00:09:48,801 --> 00:09:50,598
+Pucker and breakage.
+
+126
+00:09:52,118 --> 00:09:55,976
+Balance says the ratio is right, not the size.
+
+127
+00:09:56,376 --> 00:10:02,373
+A thread maker's guidance sorts seam pucker into four types.
+
+128
+00:10:02,773 --> 00:10:07,793
+Tension pucker: the thread is stretched as the stitch tightens,
+
+129
+00:10:07,813 --> 00:10:12,673
+springs back once sewn, and shortens the cloth so it buckles;
+
+130
+00:10:12,693 --> 00:10:16,753
+the cure is the lowest tension that still balances.
+
+131
+00:10:17,153 --> 00:10:23,875
+Structural pucker: in a tight weave, needle and thread push the yarns apart.
+
+132
+00:10:24,275 --> 00:10:28,565
+Dimensional instability: after washing and pressing,
+
+133
+00:10:28,585 --> 00:10:32,295
+thread and cloth shrink by different amounts.
+
+134
+00:10:32,695 --> 00:10:38,115
+Feed pucker is the ply shift of Lecture 6.
+
+135
+00:10:38,515 --> 00:10:42,115
+The first type is the one this lecture is about.
+
+136
+00:10:43,635 --> 00:10:46,672
+Tension pucker can be estimated.
+
+137
+00:10:47,072 --> 00:10:56,077
+The thread's stretch during tightening is about the tension over its stiffness EA,
+
+138
+00:10:56,097 --> 00:11:01,800
+and EA is roughly strength over elongation at break,
+
+139
+00:11:01,820 --> 00:11:05,652
+about 6700 centinewtons for Tex 24.
+
+140
+00:11:06,052 --> 00:11:15,512
+Thread used per unit of seam is about s plus t over s, here 1.33.
+
+141
+00:11:15,912 --> 00:11:21,479
+Multiply the two and you get the fractional shortening of the seam;
+
+142
+00:11:21,499 --> 00:11:25,732
+the cloth absorbs a little, and the rest is pucker.
+
+143
+00:11:26,132 --> 00:11:30,750
+Watch the section: both threads tightened in proportion,
+
+144
+00:11:30,770 --> 00:11:36,712
+the lock point stays in the middle, yet the cloth puckers more and more.
+
+145
+00:11:38,232 --> 00:11:40,584
+Now breakage.
+
+146
+00:11:40,984 --> 00:11:45,197
+The needle thread usually breaks at the tightening peak,
+
+147
+00:11:45,217 --> 00:11:49,882
+and what it can bear is far below its tensile-tester strength:
+
+148
+00:11:49,902 --> 00:11:52,452
+high-speed passes through the eye,
+
+149
+00:11:52,472 --> 00:11:56,684
+rubbing on the hook and needle heat all take their toll.
+
+150
+00:11:57,084 --> 00:12:04,304
+The illustrative rule: the peak should stay under a third of nominal strength.
+
+151
+00:12:04,704 --> 00:12:12,382
+Four plies of denim need 100 centinewtons in both threads at the lock point,
+
+152
+00:12:12,402 --> 00:12:19,270
+so the assembly is about 246, and at 5000 rpm the peak is about 345:
+
+153
+00:12:19,290 --> 00:12:24,740
+35 percent of Tex 24, too much, hence all that purple.
+
+154
+00:12:25,140 --> 00:12:28,520
+With Tex 40 it's 20 percent.
+
+155
+00:12:28,920 --> 00:12:33,420
+Heavy cloth needs heavy thread.
+
+156
+00:12:34,940 --> 00:12:39,218
+Robots use the capstan equation every day.
+
+157
+00:12:39,618 --> 00:12:44,230
+Many dexterous hands and soft arms are tendon-driven:
+
+158
+00:12:44,250 --> 00:12:50,610
+a motor in the palm or forearm pulls a cable that wraps round pulleys and
+
+159
+00:12:50,630 --> 00:12:54,718
+bends through the joints to pull the fingertip.
+
+160
+00:12:55,118 --> 00:13:01,280
+That's the same problem as the needle thread running from the assembly to the
+
+161
+00:13:01,300 --> 00:13:02,163
+lock point.
+
+162
+00:13:02,563 --> 00:13:07,166
+With a total wrap of 270 degrees and mu of 0.1,
+
+163
+00:13:07,186 --> 00:13:13,067
+the motor end pulls 1.6 times the fingertip; when releasing,
+
+164
+00:13:13,087 --> 00:13:16,903
+the ratio flips and you get hysteresis.
+
+165
+00:13:17,303 --> 00:13:21,520
+So a tension sensor near the joint closes the loop,
+
+166
+00:13:21,540 --> 00:13:26,172
+just like electronic thread tension on a sewing machine,
+
+167
+00:13:26,192 --> 00:13:29,911
+where a solenoid current sets the disc force.
+
+168
+00:13:31,431 --> 00:13:35,393
+An everyday example: a mooring bollard.
+
+169
+00:13:35,793 --> 00:13:40,839
+A sailor wraps the line two or three times round the bollard,
+
+170
+00:13:40,859 --> 00:13:43,413
+and one person can hold a ship:
+
+171
+00:13:43,433 --> 00:13:48,893
+every extra turn lets friction multiply the tension several times.
+
+172
+00:13:49,293 --> 00:13:52,109
+That's the capstan equation.
+
+173
+00:13:52,509 --> 00:13:58,871
+The needle thread turning about 180 degrees at the eye and losing two thirds
+
+174
+00:13:58,891 --> 00:14:03,070
+of its tension is the same law used the other way:
+
+175
+00:14:03,090 --> 00:14:09,117
+the ship's end is the take-up lever, the sailor's end is the lock point.
+
+176
+00:14:10,637 --> 00:14:11,777
+Back to the start.
+
+177
+00:14:12,177 --> 00:14:22,344
+With the assembly at 220, the needle tension at the lock point is about 89;
+
+178
+00:14:22,364 --> 00:14:30,357
+against the 90 centinewton bobbin, r is 0.99 and z is 0.50.
+
+179
+00:14:30,757 --> 00:14:32,417
+It really is balanced.
+
+180
+00:14:32,817 --> 00:14:40,599
+But the two threads average about 90, so the seam shortens 1.8 percent;
+
+181
+00:14:40,619 --> 00:14:47,961
+less the 0.6 percent the cotton absorbs, that's 1.2 percent pucker,
+
+182
+00:14:47,981 --> 00:14:51,917
+4.8 millimetres over 40 centimetres.
+
+183
+00:14:52,317 --> 00:14:53,337
+That's the ridge.
+
+184
+00:14:53,737 --> 00:15:01,654
+Loosen both in proportion, to 100 and 40: r is 1.02, still balanced,
+
+185
+00:15:01,674 --> 00:15:06,557
+pucker 0.21 percent, only 0.8 millimetres.
+
+186
+00:15:06,957 --> 00:15:07,878
+You can't see it.
+
+187
+00:15:09,398 --> 00:15:14,272
+Now Virtual lab 7-1. On the WenQuest platform you can do it yourself.
+
+188
+00:15:14,292 --> 00:15:18,670
+The readings, the status and the task checks are blurred here.
+
+189
+00:15:18,690 --> 00:15:21,578
+Read them yourself when you work the lab.
+
+190
+00:15:21,978 --> 00:15:27,940
+First drag only the assembly slider and watch the lock point move.
+
+191
+00:15:27,960 --> 00:15:32,382
+Note the two settings where it leaves 0.4 to 0.6,
+
+192
+00:15:32,402 --> 00:15:35,192
+and compare them with the book.
+
+193
+00:15:35,592 --> 00:15:38,816
+Task one. Press Scramble tension,
+
+194
+00:15:38,836 --> 00:15:43,732
+which imitates a machine someone has fiddled with.
+
+195
+00:15:44,132 --> 00:15:49,907
+First see which way the lock point has gone and whether the cloth puckers.
+
+196
+00:15:49,927 --> 00:15:54,763
+Decide whether one thread is relatively too tight or both are,
+
+197
+00:15:54,783 --> 00:15:56,408
+and only then adjust.
+
+198
+00:15:56,808 --> 00:16:02,254
+Task two. Press Machine with a loose bobbin, and bobbin dots show on top.
+
+199
+00:16:02,274 --> 00:16:07,346
+This time you may move only the bobbin slider, leaving the assembly,
+
+200
+00:16:07,366 --> 00:16:09,668
+the thread and the cloth alone.
+
+201
+00:16:10,068 --> 00:16:15,568
+Task three. Switch to four plies of denim at 5000 rpm or more.
+
+202
+00:16:15,588 --> 00:16:21,712
+First look for a usable region with Tex 24 and see how big the purple
+
+203
+00:16:21,732 --> 00:16:23,225
+breakage area is,
+
+204
+00:16:23,625 --> 00:16:31,337
+then change to heavier Tex 40 thread and get a stitch that is balanced,
+
+205
+00:16:31,357 --> 00:16:33,297
+firm and unbroken.
+
+206
+00:16:33,697 --> 00:16:36,155
+Task four. Two plies of lining.
+
+207
+00:16:36,175 --> 00:16:42,551
+Keep it balanced and lower both threads together until they're just firm enough,
+
+208
+00:16:42,571 --> 00:16:45,590
+with pucker no more than 0.15 percent.
+
+209
+00:16:45,610 --> 00:16:49,907
+The guide and the report template are on the platform.
+
+210
+00:16:51,427 --> 00:16:57,958
+Everything in this lecture is on the WenQuest learning platform.
+
+211
+00:16:58,358 --> 00:17:01,819
+You can open today's interactive slides,
+
+212
+00:17:01,839 --> 00:17:05,822
+the 3D prototype and Virtual lab 7-1 yourself,
+
+213
+00:17:05,842 --> 00:17:11,218
+and drag the tension sliders to see where the lock point goes.
+
+214
+00:17:11,618 --> 00:17:16,319
+You submit the assignment and the lab report on the platform,
+
+215
+00:17:16,339 --> 00:17:18,796
+and get marks and comments back.
+
+216
+00:17:19,196 --> 00:17:23,178
+Questions go to the course discussion forum,
+
+217
+00:17:23,198 --> 00:17:29,091
+and the grades page shows your mark on every assignment and quiz.
+
+218
+00:17:30,611 --> 00:17:33,643
+Your assignment has four questions. One,
+
+219
+00:17:33,663 --> 00:17:38,755
+the needle-thread tension after the assembly and three guides. Two,
+
+220
+00:17:38,775 --> 00:17:44,325
+the assembly range on cotton that keeps the lock point balanced and firm,
+
+221
+00:17:44,345 --> 00:17:47,911
+checked with a screenshot from the virtual lab.
+
+222
+00:17:48,311 --> 00:17:50,730
+Three, four plies of denim.
+
+223
+00:17:50,750 --> 00:17:55,788
+Find the least assembly setting and the tightening peak,
+
+224
+00:17:55,808 --> 00:17:59,763
+and decide whether Tex 24 or Tex 40 will do.
+
+225
+00:18:00,163 --> 00:18:04,349
+And four, diagnosis. A machine was fine yesterday,
+
+226
+00:18:04,369 --> 00:18:07,209
+but today bobbin dots show on top,
+
+227
+00:18:07,229 --> 00:18:11,919
+and loosening the assembly only brings loops underneath.
+
+228
+00:18:11,939 --> 00:18:16,125
+Explain the cause and write the correct procedure.
+
+229
+00:18:16,525 --> 00:18:22,082
+Submit the assignment and the lab report on the WenQuest platform.
+
+230
+00:18:23,602 --> 00:18:26,982
+There's also a ten-question quiz. For example,
+
+231
+00:18:27,002 --> 00:18:31,934
+the needle thread wraps a guide through 120 degrees with mu of 0.2.
+
+232
+00:18:31,954 --> 00:18:37,182
+By what factor is the tension multiplied? Watch the units of the angle.
+
+233
+00:18:37,582 --> 00:18:42,456
+Or, if the lock point sits in the middle of the cloth,
+
+234
+00:18:42,476 --> 00:18:46,082
+must the two tensions be the right size?
+
+235
+00:18:46,482 --> 00:18:51,702
+You get three attempts, and the explanations appear as soon as you submit.
+
+236
+00:18:53,222 --> 00:18:54,962
+Three things to remember.
+
+237
+00:18:55,362 --> 00:18:59,028
+One: the assembly adds a fixed amount,
+
+238
+00:18:59,048 --> 00:19:06,690
+the guides multiply by e to the mu theta, and the eye cuts it to about a third,
+
+239
+00:19:06,710 --> 00:19:13,382
+so the needle tension at the lock point is about 0.41 of the setting.
+
+240
+00:19:13,782 --> 00:19:19,264
+Two: the ratio of the two tensions decides where the threads lock;
+
+241
+00:19:19,284 --> 00:19:24,766
+set the bobbin first, then the needle thread, and when diagnosing,
+
+242
+00:19:24,786 --> 00:19:27,100
+find out which side changed.
+
+243
+00:19:27,500 --> 00:19:30,797
+Three: balance only means the ratio is right;
+
+244
+00:19:30,817 --> 00:19:35,440
+the size of the tension decides tightness, pucker and breakage.
+
+245
+00:19:35,840 --> 00:19:41,242
+Next time: motion coordination and machine dynamics.
+
+246
+00:19:41,642 --> 00:19:45,855
+The slides, the virtual lab, the 3D prototype,
+
+247
+00:19:45,875 --> 00:19:52,296
+the assignment and the quiz are all on the WenQuest learning platform,
+
+248
+00:19:52,316 --> 00:19:58,462
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+249
+00:19:58,862 --> 00:20:02,524
+Next time, we put the needle, take-up,
+
+250
+00:20:02,544 --> 00:20:09,985
+hook and feed mechanisms back on one main shaft, see how they're coordinated,
+
+251
+00:20:10,005 --> 00:20:14,539
+and why the whole machine shakes. See you then.
