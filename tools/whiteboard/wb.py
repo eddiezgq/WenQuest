@@ -19,10 +19,30 @@ HERE = Path(__file__).resolve().parent   # (the star import above brought core's
 HAND = HERE / "assets"   # Eddie's hand photo, kept out of the public repository
 
 
+REPO = HERE.parent.parent
+
+
+def local_media(src: str):
+    """Media frames for local samples: lab:<书>/<章.节> → the built textbook's lab page; video:<file> → the file inline."""
+    kind, _, ref = src.partition(":")
+    if kind == "lab":
+        book, _, no = ref.partition("/")
+        ch = no.split(".")[0]
+        p = REPO / "textbook" / "build" / book / "lab" / f"ch{int(ch):02d}.html"
+        if p.exists():
+            return {"kind": "page", "html": p.read_text(encoding="utf-8"), "hash": "lab-" + no.replace(".", "-"), "zoom": 1.0}
+    if kind == "video":
+        p = Path(ref)
+        if p.exists():
+            return {"kind": "video", "url": "data:video/mp4;base64," + base64.b64encode(p.read_bytes()).decode()}
+    print("media not found:", src)
+    return None
+
+
 def build(lesson_dir, mp4=False):
     d = Path(lesson_dir)
     L = json.loads((d / "lesson.json").read_text())
-    data, ex = compile_lesson(L)
+    data, ex = compile_lesson(L, local_media)
     (d / "data.json").write_text(json.dumps(data, ensure_ascii=False))
     (d / "board.excalidraw").write_text(json.dumps(excalidraw(L, ex), ensure_ascii=False))
     audio = d / L["audio"]

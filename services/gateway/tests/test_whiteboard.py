@@ -64,3 +64,30 @@ def test_proofread_keeps_times_and_count():
 
 def test_every_icon_has_help():
     assert set(wai.ICON_HELP) >= set(core.ICONS)
+
+
+def test_moves_and_media_follow_the_drawing():
+    lesson = {"title": "t", "audio": "", "segments": segs(3), "boards": [{"title": {"zh": "姿势"}, "elements": [
+        {"t": "line", "at": 0, "id": "arm", "pts": [[200, 700], [800, 700]]},
+        {"t": "arrow", "at": 0, "id": "load", "pts": [[800, 720], [800, 900]]},
+        {"t": "move", "at": 0, "kind": "rotate", "targets": ["arm"], "pivot": [200, 700], "to": -60},
+        {"t": "move", "at": 0, "kind": "shift", "targets": ["load"], "dx": -300, "dy": -520},
+        {"t": "media", "at": 2, "src": "lab:physics/2.5", "x": 300, "y": 300, "w": 960, "h": 540}]}]}
+    data, _ = core.compile_lesson(lesson, lambda src: {"kind": "page", "html": "<p>lab</p>"} if src.startswith("lab:") else None)
+    drawn = max(it["start"] + it["dur"] for it in data["items"] if it.get("eid") in ("arm", "load"))
+    rot, sh = data["moves"]
+    assert rot["start"] == sh["start"] >= drawn            # moves start together, after the things are drawn
+    assert all(it.get("eid") == "load" for it in data["items"] if it.get("eid") and it["shape"]["pts"][-1] == [800, 900])
+    frame = data["items"][-1]
+    assert data["media"][0]["start"] >= frame["start"] + frame["dur"]
+    assert "<\\/p>" in core.page(data, "t", render=True)   # embedded pages cannot end the script early
+
+
+def test_ai_keeps_only_listed_media_and_valid_moves():
+    els = [{"t": "media", "at": 0, "src": "lab:physics/2.5", "x": 0, "y": 0, "w": 900},
+           {"t": "media", "at": 0, "src": "https://example.com/x.mp4", "x": 0, "y": 0, "w": 900},
+           {"t": "move", "at": 0, "kind": "teleport", "targets": ["a"]},
+           {"t": "move", "at": 0, "kind": "spin", "targets": ["wheel"], "rpm": 999}]
+    out, _ = wai.fix_board(els, 2, frozenset({"lab:physics/2.5"}))
+    assert [e["t"] for e in out] == ["media", "move"] and out[1]["rpm"] == 120
+    assert out[0]["x"] >= wai.AREA[0] and abs(out[0]["h"] - 900 * 9 / 16) < 1

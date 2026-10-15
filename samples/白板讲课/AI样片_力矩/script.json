@@ -1,27 +1,108 @@
-{"title": {"zh": "机器人关节的力矩", "en": "Torque at a robot joint"},
+{
+ "title": {
+  "zh": "机器人关节的力矩",
+  "en": "Torque at a robot joint"
+ },
  "segments": [
-  {"zh": "一台机器人手臂，要把一个两公斤的零件水平举起来。", "en": "A robot arm has to hold a 2 kg part out horizontally."},
-  {"zh": "问题来了：肩关节的电机，至少要多大的劲？", "en": "How strong must the shoulder motor be?"},
-  {"zh": "先想一个生活里的例子：用扳手拧螺母。", "en": "First, an everyday example: turning a nut with a spanner."},
-  {"zh": "手握得越靠外，拧起来越省力。", "en": "The further out you hold it, the easier it turns."},
-  {"zh": "这说明，转动的效果不只看力有多大，还看力离转轴有多远。", "en": "Turning depends on the force and on how far it is from the axis."},
-  {"zh": "这个转动的效果，就叫力矩，英文是 torque。", "en": "This turning effect is called torque."},
-  {"zh": "力矩等于力乘以力臂：τ 等于 F 乘以 r。", "en": "Torque equals force times lever arm: tau = F times r."},
-  {"zh": "力臂，是转轴到力的作用线的垂直距离。", "en": "The lever arm is the perpendicular distance from the axis to the line of the force."},
-  {"zh": "力矩的单位是牛·米。", "en": "Torque is measured in newton-metres."},
-  {"zh": "现在回到机器人手臂，先把它画成一个简单的模型。", "en": "Back to the robot arm: first, a simple model."},
-  {"zh": "肩关节是转轴，手臂长零点五米，零件挂在末端。", "en": "The shoulder is the axis, the arm is 0.5 m long, the part hangs at the end."},
-  {"zh": "零件的重力，F 等于 m g，两公斤乘以九点八，约十九点六牛。", "en": "The part's weight: F = mg = 2 × 9.8 ≈ 19.6 N."},
-  {"zh": "手臂水平时，力臂就是整条手臂的长度，零点五米。", "en": "With the arm level, the lever arm is the whole arm, 0.5 m."},
-  {"zh": "所以零件产生的力矩，约是九点八牛·米。", "en": "So the part makes about 9.8 N·m of torque."},
-  {"zh": "手臂自己也有重量，一点二公斤，重心在中点。", "en": "The arm itself weighs 1.2 kg, centred at its middle."},
-  {"zh": "它的力矩是一点二乘九点八乘零点二五，约二点九牛·米。", "en": "Its torque: 1.2 × 9.8 × 0.25 ≈ 2.9 N·m."},
-  {"zh": "加起来，电机至少要提供约十二点七牛·米。", "en": "Together the motor must give at least about 12.7 N·m."},
-  {"zh": "实际选电机时还要留余量，常取一点五到两倍。", "en": "In practice we leave a margin of 1.5 to 2 times."},
-  {"zh": "所以我们选一台能输出二十五牛·米的关节电机。", "en": "So we choose a joint motor rated at 25 N·m."},
-  {"zh": "再想一下：手臂抬起六十度时，力臂变短了。", "en": "Now lift the arm to 60 degrees: the lever arm gets shorter."},
-  {"zh": "力臂变成 r 乘 cos60°，力矩只剩一半。", "en": "It becomes r cos 60°, so the torque halves."},
-  {"zh": "所以手臂水平伸直的时候，关节最吃力。", "en": "So the joint works hardest with the arm level."},
-  {"zh": "小结：力矩等于力乘以力臂。", "en": "Summary: torque equals force times lever arm."},
-  {"zh": "设计机器人关节，要按最吃力的姿势来算，再留出余量。", "en": "Size a robot joint for its hardest pose, then add a margin."}
- ]}
+  {
+   "zh": "一台机器人手臂，要把一个两公斤的零件水平举起来。",
+   "en": "A robot arm has to hold a 2 kg part out horizontally."
+  },
+  {
+   "zh": "问题来了：肩关节的电机，至少要多大的劲？",
+   "en": "How strong must the shoulder motor be?"
+  },
+  {
+   "zh": "先想一个生活里的例子：用扳手拧螺母。",
+   "en": "First, an everyday example: turning a nut with a spanner."
+  },
+  {
+   "zh": "手握得越靠外，拧起来越省力。",
+   "en": "The further out you hold it, the easier it turns."
+  },
+  {
+   "zh": "这说明，转动的效果不只看力有多大，还看力离转轴有多远。",
+   "en": "Turning depends on the force and on how far it is from the axis."
+  },
+  {
+   "zh": "这个转动的效果，就叫力矩，英文是 torque。",
+   "en": "This turning effect is called torque."
+  },
+  {
+   "zh": "力矩等于力乘以力臂：τ 等于 F 乘以 r。",
+   "en": "Torque equals force times lever arm: tau = F times r."
+  },
+  {
+   "zh": "力臂，是转轴到力的作用线的垂直距离。",
+   "en": "The lever arm is the perpendicular distance from the axis to the line of the force."
+  },
+  {
+   "zh": "力矩的单位是牛·米。",
+   "en": "Torque is measured in newton-metres."
+  },
+  {
+   "zh": "现在回到机器人手臂，先把它画成一个简单的模型。",
+   "en": "Back to the robot arm: first, a simple model."
+  },
+  {
+   "zh": "肩关节是转轴，手臂长零点五米，零件挂在末端。",
+   "en": "The shoulder is the axis, the arm is 0.5 m long, the part hangs at the end."
+  },
+  {
+   "zh": "零件的重力，F 等于 m g，两公斤乘以九点八，约十九点六牛。",
+   "en": "The part's weight: F = mg = 2 × 9.8 ≈ 19.6 N."
+  },
+  {
+   "zh": "手臂水平时，力臂就是整条手臂的长度，零点五米。",
+   "en": "With the arm level, the lever arm is the whole arm, 0.5 m."
+  },
+  {
+   "zh": "所以零件产生的力矩，约是九点八牛·米。",
+   "en": "So the part makes about 9.8 N·m of torque."
+  },
+  {
+   "zh": "手臂自己也有重量，一点二公斤，重心在中点。",
+   "en": "The arm itself weighs 1.2 kg, centred at its middle."
+  },
+  {
+   "zh": "它的力矩是一点二乘九点八乘零点二五，约二点九牛·米。",
+   "en": "Its torque: 1.2 × 9.8 × 0.25 ≈ 2.9 N·m."
+  },
+  {
+   "zh": "加起来，电机至少要提供约十二点七牛·米。",
+   "en": "Together the motor must give at least about 12.7 N·m."
+  },
+  {
+   "zh": "实际选电机时还要留余量，常取一点五到两倍。",
+   "en": "In practice we leave a margin of 1.5 to 2 times."
+  },
+  {
+   "zh": "所以我们选一台能输出二十五牛·米的关节电机。",
+   "en": "So we choose a joint motor rated at 25 N·m."
+  },
+  {
+   "zh": "再想一下：手臂抬起六十度时，力臂变短了。",
+   "en": "Now lift the arm to 60 degrees: the lever arm gets shorter."
+  },
+  {
+   "zh": "力臂变成 r 乘 cos60°，力矩只剩一半。",
+   "en": "It becomes r cos 60°, so the torque halves."
+  },
+  {
+   "zh": "所以手臂水平伸直的时候，关节最吃力。",
+   "en": "So the joint works hardest with the arm level."
+  },
+  {
+   "zh": "小结：力矩等于力乘以力臂。",
+   "en": "Summary: torque equals force times lever arm."
+  },
+  {
+   "zh": "设计机器人关节，要按最吃力的姿势来算，再留出余量。",
+   "en": "Size a robot joint for its hardest pose, then add a margin."
+  },
+  {
+   "zh": "最后，打开虚拟实验二点五，自己调一调肩关节的姿态，看看力矩怎么变。",
+   "en": "Finally, open virtual lab 2.5, change the shoulder pose yourself and watch the torque change."
+  }
+ ]
+}

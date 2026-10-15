@@ -78,6 +78,14 @@ BOARD_SYSTEM = """你是白板讲解的画板设计师。老师按讲稿一段�
 - icon：简笔画，name 只能从图标表里选；x, y 是中心；size 是边长（80～420）。表里没有的东西，用 box/text 写出来，或用 line/rect/ellipse 简单画。
   图标表里列了一些图标的“部位”（在 200×200 图标里的坐标）。要用箭头指向或圈出某个部位时，它在画板上的位置是
   (x + (部位x − 100) × size / 200, y + (部位y − 100) × size / 200)；箭头末端放在部位附近，程序会把它对准。
+- media：插入本课程已有的虚拟实验、动画或数字工厂视频（只能用“可插入的素材”清单里的 src）。x, y 是框的左上角，w, h 是框的大小
+  （约 16:9，宽 640～1200）。先画框，讲到这段时框里开始播放/打开实验；play 可写播放秒数。讲到动态过程、或“动手试试”时用。
+- move：让已经画好的东西动起来（画的东西活起来）。先给要动的元素写 id（任意短名，一组东西可以用同一个 id），
+  再写 {t: "move", at, kind, targets: [id…]}：
+  · rotate：绕 pivot [x, y] 转到 to 度（顺时针为正），如机械臂从水平抬到 60° 写 to: -60；dur 秒数（默认约 2 秒）；
+  · shift：平移 dx, dy；· spin：绕 pivot（不写则绕自身中心）持续转，rpm 每分钟转数，如车轮、齿轮、螺母；
+  · flow：线条上流动（电流、力的传递、光线、物料流），speed 快慢；· pulse：强调时闪一下。
+  讲到“转起来”“抬起来”“流过去”这类动作时就加 move，让画面活起来；一张画板 1～3 个动作即可。
 颜色 c：ink（黑，默认）、muted（灰，次要）、gold（金，重点）、red（红，问题/警示/力）、blue（蓝，概念/示意）、green（绿，结论/正确）。
 
 讲究：
@@ -90,7 +98,12 @@ BOARD_SYSTEM = """你是白板讲解的画板设计师。老师按讲稿一段�
 ELEMENT = {
     "type": "object",
     "properties": {
-        "t": {"type": "string", "enum": ["box", "text", "arrow", "line", "rect", "ellipse", "icon"]},
+        "t": {"type": "string", "enum": ["box", "text", "arrow", "line", "rect", "ellipse", "icon", "media", "move"]},
+        "id": {"type": "string"}, "src": {"type": "string"}, "play": {"type": "number"},
+        "kind": {"type": "string", "enum": ["rotate", "shift", "spin", "flow", "pulse"]},
+        "targets": {"type": "array", "items": {"type": "string"}}, "pivot": {"type": "array", "items": {"type": "number"}},
+        "to": {"type": "number"}, "dx": {"type": "number"}, "dy": {"type": "number"}, "rpm": {"type": "number"},
+        "speed": {"type": "number"}, "dur": {"type": "number"}, "delay": {"type": "number"},
         "at": {"type": "integer"},
         "x": {"type": "number"}, "y": {"type": "number"}, "w": {"type": "number"}, "h": {"type": "number"},
         "s": {"type": "number"}, "size": {"type": "number"},
@@ -132,6 +145,11 @@ def _fmt(t):
 
 
 # ---------------------------------------------------------------- layout check and repair
+def media_table(available: list[dict]) -> str:
+    """available: [{src, title, kind}] — the course's own labs, animations and factory videos."""
+    return "\n".join(f"- {m['src']}：{m.get('title', '')}（{m.get('kind', '')}）" for m in available) or "（这一课没有可插入的素材）"
+
+
 def text_width(text: str, s: float, font: str = "zh") -> float:
     w = 0.0
     for ch in text:
@@ -147,7 +165,7 @@ def bbox(e: dict):
         w = text_width(e["text"], e["s"], e.get("font", "zh"))
         x0 = e["x"] - (w / 2 if e.get("align") == "center" else w if e.get("align") == "right" else 0)
         return (x0, e["y"] - e["s"] * 0.88, x0 + w, e["y"] + e["s"] * 0.22)
-    if t in ("rect", "ellipse"):
+    if t in ("rect", "ellipse", "media"):
         return (e["x"], e["y"], e["x"] + e["w"], e["y"] + e["h"])
     if t == "icon":
         r = e["size"] / 2
@@ -170,13 +188,47 @@ def _num(v, d, lo, hi):
     return max(lo, min(hi, v))
 
 
-def clean_element(e: dict, nseg: int) -> dict | None:
+def clean_element(e: dict, nseg: int, allowed: frozenset = frozenset()) -> dict | None:
     """One element made safe: known type, numbers in range, texts short enough to fit; None if it cannot be used."""
     t = e.get("t")
     x0, y0, x1, y1 = AREA
     out = {"t": t, "at": int(_num(e.get("at"), 0, 0, max(0, nseg - 1)))}
     c = e.get("c") if e.get("c") in COLORS else "ink"
     out["c"] = c
+    if isinstance(e.get("id"), (str, int)) and str(e["id"]).strip():
+        out["id"] = str(e["id"]).strip()[:24]
+    if t == "move":
+        kind = e.get("kind") if e.get("kind") in ("rotate", "shift", "spin", "flow", "pulse") else None
+        targets = [str(x)[:24] for x in e.get("targets") or [] if str(x).strip()]
+        if not kind or not targets:
+            return None
+        out.update(kind=kind, targets=targets)
+        piv = e.get("pivot")
+        if isinstance(piv, (list, tuple)) and len(piv) >= 2:
+            out["pivot"] = [_num(piv[0], 960, -200, W + 200), _num(piv[1], 540, -200, H + 200)]
+        if kind == "rotate":
+            out["to"] = _num(e.get("to"), 30, -360, 360)
+        if kind == "shift":
+            out["dx"], out["dy"] = _num(e.get("dx"), 0, -1600, 1600), _num(e.get("dy"), 0, -900, 900)
+        if kind == "spin":
+            out["rpm"] = _num(e.get("rpm"), 20, 1, 120)
+        if kind == "flow":
+            out["speed"] = _num(e.get("speed"), 70, 10, 400)
+        if e.get("dur") is not None:
+            out["dur"] = _num(e.get("dur"), 2, 0.3, 12)
+        if e.get("delay") is not None:
+            out["delay"] = _num(e.get("delay"), 0, 0, 10)
+        return out
+    if t == "media":
+        src = str(e.get("src") or "").strip()
+        if src not in allowed:
+            return None
+        w = _num(e.get("w"), 960, 320, x1 - x0)
+        h = _num(e.get("h"), w * 9 / 16, 180, y1 - y0)
+        out.update(src=src, w=w, h=h, x=_num(e.get("x"), x0, x0, x1 - w), y=_num(e.get("y"), y0, y0, y1 - h))
+        if e.get("play") is not None:
+            out["play"] = _num(e.get("play"), 10, 1, 600)
+        return out
     if t == "icon" and e.get("name") not in ICONS:
         label = (e.get("zh") or e.get("text") or e.get("name") or "").strip()
         if not label or not re.search(r"[一-鿿]", label):
@@ -251,7 +303,7 @@ def snap_to_parts(els: list[dict], reach: float = 110) -> int:
                 if best and 0 < math.dist(best, p) <= reach:
                     e["pts"][k] = [round(best[0], 1), round(best[1], 1)]
                     n += 1
-        elif e["t"] == "ellipse" and max(e["w"], e["h"]) <= 140:
+        elif e["t"] == "ellipse" and max(e["w"], e["h"]) <= 140 and not e.get("id"):
             c = (e["x"] + e["w"] / 2, e["y"] + e["h"] / 2)
             best = min(parts, key=lambda q: math.dist(q, c), default=None)
             if best and 0 < math.dist(best, c) <= reach + 40:
@@ -260,10 +312,10 @@ def snap_to_parts(els: list[dict], reach: float = 110) -> int:
     return n
 
 
-def fix_board(elements: list[dict], nseg: int) -> tuple[list[dict], list[str]]:
+def fix_board(elements: list[dict], nseg: int, allowed: frozenset = frozenset()) -> tuple[list[dict], list[str]]:
     """Clean every element, then move solid things (boxes, words, icons, shapes) apart where they overlap."""
     notes = []
-    els = [c for c in (clean_element(e, nseg) for e in elements if isinstance(e, dict)) if c]
+    els = [c for c in (clean_element(e, nseg, allowed) for e in elements if isinstance(e, dict)) if c]
     for e in els:
         for key in ("text", "zh", "en"):
             if e.get(key):
@@ -274,7 +326,7 @@ def fix_board(elements: list[dict], nseg: int) -> tuple[list[dict], list[str]]:
     x0, y0, x1, y1 = AREA
     placed = []
     for e in els:
-        if e["t"] in ("arrow", "line") or (e["t"] in ("ellipse", "rect") and max(e["w"], e["h"]) <= 140):
+        if e["t"] in ("arrow", "line", "move") or (e["t"] in ("ellipse", "rect") and max(e["w"], e["h"]) <= 140):
             continue   # lines and small marks are meant to sit on other things
         for _ in range(12):
             b = bbox(e)
@@ -297,13 +349,13 @@ def fix_board(elements: list[dict], nseg: int) -> tuple[list[dict], list[str]]:
     return els, notes
 
 
-def fix_boards(boards: list[dict], nseg: int) -> tuple[list[dict], list[str]]:
+def fix_boards(boards: list[dict], nseg: int, allowed=()) -> tuple[list[dict], list[str]]:
     """Every board cleaned; boards follow the lecture (a later board never draws during an earlier segment)."""
     out, notes, floor = [], [], 0
     for i, b in enumerate(boards or []):
         if not isinstance(b, dict):
             continue
-        els, n = fix_board(b.get("elements") or [], nseg)
+        els, n = fix_board(b.get("elements") or [], nseg, frozenset(allowed))
         if not els:
             continue
         for e in els:
@@ -341,14 +393,15 @@ async def proofread(ai, segments: list[dict]) -> dict:
     return {"title": {"zh": str(t.get("zh") or "白板讲解")[:40], "en": str(t.get("en") or "")[:80]}, "segments": out}
 
 
-async def lay_out(ai, title: dict, segments: list[dict], note: str = "") -> tuple[list[dict], list[str]]:
-    """The AI lays the boards out; the program checks and repairs them."""
+async def lay_out(ai, title: dict, segments: list[dict], note: str = "", available: list[dict] | None = None) -> tuple[list[dict], list[str]]:
+    """The AI lays the boards out; the program checks and repairs them. available = the course's labs, animations, videos."""
     lines = "\n".join(f"{i}\t{_fmt(s.get('t0', 0))}–{_fmt(s.get('t1', 0))}\t{s['zh']}" for i, s in enumerate(segments))
     prompt = (f"课题：{title.get('zh')} / {title.get('en', '')}\n\n图标表（icon 的 name 只能用这些）：\n{icon_table()}\n\n"
+              f"可插入的素材（media 的 src 只能用这些）：\n{media_table(available or [])}\n\n"
               f"讲稿（编号、时间、话）：\n{lines[:50000]}" + (f"\n\n老师的意见：{note}" if note else ""))
     data = await ai.json(system=BOARD_SYSTEM, prompt=prompt, schema=BOARD_SCHEMA, max_tokens=32000,
                          fake=lambda: fake_boards(segments))
-    boards, notes = fix_boards(data.get("boards") or [], len(segments))
+    boards, notes = fix_boards(data.get("boards") or [], len(segments), [m["src"] for m in available or []])
     if not boards:
         boards, notes = fix_boards(fake_boards(segments)["boards"], len(segments))
         notes.append("the AI gave no usable board: a plain board of the key sentences was made")

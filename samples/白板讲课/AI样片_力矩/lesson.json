@@ -2,52 +2,52 @@
  "title": "机器人关节的力矩",
  "title_en": "Torque at a robot joint",
  "audio": "配音.wav",
- "duration": 114.39,
+ "duration": 121.57,
  "segments": [
   {
    "t0": 0.8,
-   "t1": 5.54,
+   "t1": 5.53,
    "zh": "一台机器人手臂，要把一个两公斤的零件水平举起来。",
    "en": "A robot arm has to hold a 2 kg part out horizontally."
   },
   {
-   "t0": 5.99,
-   "t1": 10.34,
+   "t0": 5.98,
+   "t1": 10.33,
    "zh": "问题来了：肩关节的电机，至少要多大的劲？",
    "en": "How strong must the shoulder motor be?"
   },
   {
-   "t0": 10.79,
-   "t1": 14.27,
+   "t0": 10.78,
+   "t1": 14.26,
    "zh": "先想一个生活里的例子：用扳手拧螺母。",
    "en": "First, an everyday example: turning a nut with a spanner."
   },
   {
-   "t0": 14.72,
-   "t1": 17.63,
+   "t0": 14.71,
+   "t1": 17.62,
    "zh": "手握得越靠外，拧起来越省力。",
    "en": "The further out you hold it, the easier it turns."
   },
   {
-   "t0": 18.08,
-   "t1": 23.72,
+   "t0": 18.07,
+   "t1": 23.71,
    "zh": "这说明，转动的效果不只看力有多大，还看力离转轴有多远。",
    "en": "Turning depends on the force and on how far it is from the axis."
   },
   {
-   "t0": 24.17,
-   "t1": 27.78,
+   "t0": 24.16,
+   "t1": 27.77,
    "zh": "这个转动的效果，就叫力矩，英文是 torque。",
    "en": "This turning effect is called torque."
   },
   {
-   "t0": 28.23,
-   "t1": 32.05,
+   "t0": 28.22,
+   "t1": 32.04,
    "zh": "力矩等于力乘以力臂：τ 等于 F 乘以 r。",
    "en": "Torque equals force times lever arm: tau = F times r."
   },
   {
-   "t0": 32.5,
+   "t0": 32.49,
    "t1": 36.08,
    "zh": "力臂，是转轴到力的作用线的垂直距离。",
    "en": "The lever arm is the perpendicular distance from the axis to the line of the force."
@@ -60,93 +60,99 @@
   },
   {
    "t0": 38.71,
-   "t1": 43.59,
+   "t1": 43.58,
    "zh": "现在回到机器人手臂，先把它画成一个简单的模型。",
    "en": "Back to the robot arm: first, a simple model."
   },
   {
    "t0": 44.03,
-   "t1": 49.09,
+   "t1": 49.08,
    "zh": "肩关节是转轴，手臂长零点五米，零件挂在末端。",
    "en": "The shoulder is the axis, the arm is 0.5 m long, the part hangs at the end."
   },
   {
-   "t0": 49.54,
-   "t1": 55.73,
+   "t0": 49.53,
+   "t1": 55.72,
    "zh": "零件的重力，F 等于 m g，两公斤乘以九点八，约十九点六牛。",
    "en": "The part's weight: F = mg = 2 × 9.8 ≈ 19.6 N."
   },
   {
-   "t0": 56.18,
-   "t1": 61.15,
+   "t0": 56.17,
+   "t1": 61.14,
    "zh": "手臂水平时，力臂就是整条手臂的长度，零点五米。",
    "en": "With the arm level, the lever arm is the whole arm, 0.5 m."
   },
   {
-   "t0": 61.6,
-   "t1": 65.25,
+   "t0": 61.59,
+   "t1": 65.24,
    "zh": "所以零件产生的力矩，约是九点八牛·米。",
    "en": "So the part makes about 9.8 N·m of torque."
   },
   {
-   "t0": 65.7,
+   "t0": 65.69,
    "t1": 70.24,
    "zh": "手臂自己也有重量，一点二公斤，重心在中点。",
    "en": "The arm itself weighs 1.2 kg, centred at its middle."
   },
   {
    "t0": 70.69,
-   "t1": 75.27,
+   "t1": 75.26,
    "zh": "它的力矩是一点二乘九点八乘零点二五，约二点九牛·米。",
    "en": "Its torque: 1.2 × 9.8 × 0.25 ≈ 2.9 N·m."
   },
   {
-   "t0": 75.72,
-   "t1": 80.08,
+   "t0": 75.71,
+   "t1": 80.07,
    "zh": "加起来，电机至少要提供约十二点七牛·米。",
    "en": "Together the motor must give at least about 12.7 N·m."
   },
   {
-   "t0": 80.53,
-   "t1": 84.9,
+   "t0": 80.52,
+   "t1": 84.88,
    "zh": "实际选电机时还要留余量，常取一点五到两倍。",
    "en": "In practice we leave a margin of 1.5 to 2 times."
   },
   {
-   "t0": 85.35,
-   "t1": 89.47,
+   "t0": 85.33,
+   "t1": 89.46,
    "zh": "所以我们选一台能输出二十五牛·米的关节电机。",
    "en": "So we choose a joint motor rated at 25 N·m."
   },
   {
-   "t0": 89.92,
-   "t1": 94.46,
+   "t0": 89.91,
+   "t1": 94.44,
    "zh": "再想一下：手臂抬起六十度时，力臂变短了。",
    "en": "Now lift the arm to 60 degrees: the lever arm gets shorter."
   },
   {
-   "t0": 94.91,
-   "t1": 99.43,
+   "t0": 94.89,
+   "t1": 99.4,
    "zh": "力臂变成 r 乘 cos60°，力矩只剩一半。",
    "en": "It becomes r cos 60°, so the torque halves."
   },
   {
-   "t0": 99.88,
-   "t1": 103.6,
+   "t0": 99.85,
+   "t1": 103.58,
    "zh": "所以手臂水平伸直的时候，关节最吃力。",
    "en": "So the joint works hardest with the arm level."
   },
   {
-   "t0": 104.05,
-   "t1": 106.64,
+   "t0": 104.03,
+   "t1": 106.61,
    "zh": "小结：力矩等于力乘以力臂。",
    "en": "Summary: torque equals force times lever arm."
   },
   {
-   "t0": 107.09,
-   "t1": 112.44,
+   "t0": 107.06,
+   "t1": 112.42,
    "zh": "设计机器人关节，要按最吃力的姿势来算，再留出余量。",
    "en": "Size a robot joint for its hardest pose, then add a margin."
+  },
+  {
+   "t0": 112.87,
+   "t1": 119.62,
+   "zh": "最后，打开虚拟实验二点五，自己调一调肩关节的姿态，看看力矩怎么变。",
+   "en": "Finally, open virtual lab 2.5, change the shoulder pose yourself and watch the torque change."
   }
  ],
  "boards": [
@@ -252,6 +258,7 @@
      "t": "ellipse",
      "at": 2,
      "c": "ink",
+     "id": "wrench",
      "x": 200.0,
      "y": 420.0,
      "w": 120.0,
@@ -261,6 +268,7 @@
      "t": "rect",
      "at": 2,
      "c": "ink",
+     "id": "wrench",
      "x": 300.0,
      "y": 455.0,
      "w": 760.0,
@@ -319,6 +327,22 @@
       ]
      ],
      "w": 3.2
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "c": "ink",
+     "kind": "rotate",
+     "targets": [
+      "wrench"
+     ],
+     "pivot": [
+      260.0,
+      480.0
+     ],
+     "to": 22.0,
+     "dur": 1.6,
+     "delay": 1.2
     },
     {
      "t": "text",
@@ -559,6 +583,7 @@
      "t": "arrow",
      "at": 11,
      "c": "red",
+     "id": "mg",
      "pts": [
       [
        965.0,
@@ -614,6 +639,16 @@
      "align": "left",
      "x": 1150.0,
      "y": 630.0
+    },
+    {
+     "t": "move",
+     "at": 11,
+     "c": "ink",
+     "kind": "flow",
+     "targets": [
+      "mg"
+     ],
+     "speed": 60.0
     }
    ]
   },
@@ -716,7 +751,7 @@
     {
      "t": "line",
      "at": 19,
-     "c": "blue",
+     "c": "muted",
      "pts": [
       [
        230.0,
@@ -727,50 +762,92 @@
        710.0
       ]
      ],
-     "w": 5.0
+     "w": 3.2
     },
     {
      "t": "line",
      "at": 19,
-     "c": "gold",
+     "c": "blue",
+     "id": "arm",
      "pts": [
       [
        230.0,
        710.0
       ],
       [
-       530.0,
-       190.0
+       830.0,
+       710.0
+      ]
+     ],
+     "w": 6.0
+    },
+    {
+     "t": "rect",
+     "at": 19,
+     "c": "blue",
+     "id": "arm",
+     "x": 800.0,
+     "y": 690.0,
+     "w": 60.0,
+     "h": 44.0,
+     "fill": "blue"
+    },
+    {
+     "t": "arrow",
+     "at": 19,
+     "c": "red",
+     "id": "load",
+     "pts": [
+      [
+       830.0,
+       740.0
+      ],
+      [
+       830.0,
+       900.0
       ]
      ],
      "w": 5.0
     },
     {
-     "t": "text",
+     "t": "move",
      "at": 19,
+     "c": "ink",
+     "kind": "rotate",
+     "targets": [
+      "arm"
+     ],
+     "pivot": [
+      230.0,
+      710.0
+     ],
+     "to": -60.0,
+     "dur": 2.6,
+     "delay": 1.0
+    },
+    {
+     "t": "move",
+     "at": 19,
+     "c": "ink",
+     "kind": "shift",
+     "targets": [
+      "load"
+     ],
+     "dx": -300.0,
+     "dy": -520.0,
+     "dur": 2.6,
+     "delay": 1.0
+    },
+    {
+     "t": "text",
+     "at": 20,
      "c": "ink",
      "text": "60°",
      "s": 40.0,
      "font": "en",
      "align": "left",
      "x": 330.0,
-     "y": 640.0
-    },
-    {
-     "t": "arrow",
-     "at": 20,
-     "c": "red",
-     "pts": [
-      [
-       530.0,
-       220.0
-      ],
-      [
-       530.0,
-       520.0
-      ]
-     ],
-     "w": 3.2
+     "y": 660.0
     },
     {
      "t": "line",
@@ -779,25 +856,25 @@
      "pts": [
       [
        230.0,
-       820.0
+       980.0
       ],
       [
        530.0,
-       820.0
+       980.0
       ]
      ],
-     "w": 3.2
+     "w": 4.0
     },
     {
      "t": "text",
      "at": 20,
      "c": "gold",
-     "text": "r·cos60° = r/2",
-     "s": 44.0,
-     "font": "en",
+     "text": "力臂 = r·cos60° = r/2",
+     "s": 40.0,
+     "font": "zh",
      "align": "center",
      "x": 380.0,
-     "y": 880.0
+     "y": 1035.0
     },
     {
      "t": "text",
@@ -871,6 +948,35 @@
      "align": "left",
      "x": 620.0,
      "y": 850.0
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "动手试试：虚拟实验 2.5",
+    "en": "Try it: virtual lab 2.5"
+   },
+   "elements": [
+    {
+     "t": "media",
+     "at": 24,
+     "c": "ink",
+     "src": "lab:physics/2.5",
+     "w": 1320.0,
+     "h": 742.0,
+     "x": 300.0,
+     "y": 230.0
+    },
+    {
+     "t": "text",
+     "at": 24,
+     "c": "muted",
+     "text": "选“UR5e 肩关节的负载力矩”，改变肩、肘的角度",
+     "s": 34.0,
+     "font": "zh",
+     "align": "center",
+     "x": 960.0,
+     "y": 1035.0
     }
    ]
   }

@@ -22,7 +22,7 @@ for s in script["segments"]:
     parts += [x, np.zeros(int(sr * 0.45), np.float32)]; t += len(x) / sr + 0.45
 parts.append(np.zeros(int(sr * 1.5), np.float32)); t += 1.5
 sf.write(here / "配音.wav", np.concatenate(parts), sr)
-boards, notes = wai.fix_boards(json.load(open(here / "boards.json"))["boards"], len(segs))
+boards, notes = wai.fix_boards(json.load(open(here / "boards.json"))["boards"], len(segs), ["lab:physics/2.5"])
 print("\n".join(notes) or "layout: no repairs needed")
 lesson = wai.to_lesson(script["title"], segs, boards, audio="配音.wav", duration=round(t, 2))
 json.dump(lesson, open(here / "lesson.json", "w"), ensure_ascii=False, indent=1)

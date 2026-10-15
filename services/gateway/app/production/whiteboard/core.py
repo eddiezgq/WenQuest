@@ -111,6 +111,9 @@ def expand(el):
         out.append({"t": "text", "x": x, "y": y + s * 0.12 + s * 0.85, "s": max(22, s * 0.62), "text": el["en"], "font": "en", "c": "muted", "align": "center", "at": el["at"]})
     else:
         out.append({"t": "text", "x": x, "y": y + s * 0.36, "s": s, "text": el["zh"], "font": "zh", "c": c, "align": "center", "at": el["at"]})
+    if el.get("id"):
+        for o in out:
+            o["id"] = el["id"]
     return out
 
 
@@ -120,9 +123,11 @@ def arrow_head(pts, size=22):
     return [[[x2 + size * math.cos(a + s), y2 + size * math.sin(a + s)], [x2, y2]] for s in (2.6, -2.6)]
 
 
-def compile_lesson(L):
+def compile_lesson(L, resolve_media=None):
+    """resolve_media(src) → {kind: video | page, url | html, hash}: where a media frame's lab, animation or video comes from."""
     segs = L["segments"]
     items, ex = [], []
+    moves, media = [], []
     boards = []
     for bi, b in enumerate(L["boards"]):
         ox, oy = bi * 2200, (bi % 2) * 260
@@ -136,7 +141,17 @@ def compile_lesson(L):
         for e in b["elements"]:
             els.extend(expand(e))
         for n, e in enumerate(els):
-            it = {"b": bi, "at": e["at"]}
+            if e["t"] == "move":      # 画的东西活起来：rotate / shift / spin / flow / pulse 编号为 targets 的元素
+                moves.append({"b": bi, "at": e["at"], "kind": e.get("kind", "rotate"), "targets": list(e.get("targets") or []),
+                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until") if k in e}})
+                continue
+            if e["t"] == "media":     # 虚拟实验、动画、数字工厂视频：先画框，框里再播放
+                src = (resolve_media or (lambda s_: None))(e.get("src", ""))
+                if src:
+                    media.append(dict(src, b=bi, x=e["x"], y=e["y"], w=e["w"], h=e["h"], item=len(items),
+                                      **{k: e[k] for k in ("from", "play", "zoom") if k in e}))
+                e = dict(e, t="rect", c=e.get("c", "muted"), sw=e.get("sw", 3.4))
+            it = {"b": bi, "at": e["at"], **({"eid": str(e["id"])} if e.get("id") else {})}
             c = color(e.get("c"))
             w = e.get("sw") or (e.get("w", 3.2) if e["t"] in ("arrow", "line", "path") else 3.2)
             t = e["t"]
@@ -157,7 +172,8 @@ def compile_lesson(L):
                     items.append(it)
                     h = arrow_head(pts, e.get("head", 22))
                     it = {"b": bi, "at": e["at"], "k": "rough", "shape": {"type": "line", "pts": [h[0][0], pts[-1], h[1][0]]},
-                          "opts": {"stroke": c, "strokeWidth": w, "seed": seed(bi, n, "h"), "roughness": 0.6}, "weight": 0.2}
+                          "opts": {"stroke": c, "strokeWidth": w, "seed": seed(bi, n, "h"), "roughness": 0.6}, "weight": 0.2,
+                          **({"eid": str(e["id"])} if e.get("id") else {})}
             elif t == "icon":
                 k = e.get("size", 200) / 200
                 x0, y0 = e["x"] - 100 * k, e["y"] - 100 * k
@@ -169,7 +185,39 @@ def compile_lesson(L):
                 raise SystemExit(f"unknown element type {t!r}")
             items.append(it)
             ex.append((bi, ox, oy, e))
-    return schedule(items, boards, L["segments"], L.get("duration", 0)), ex
+    data = schedule(items, boards, L["segments"], L.get("duration", 0))
+    add_moves_and_media(data, moves, media, segs)
+    return data, ex
+
+
+def add_moves_and_media(data, moves, media, segs):
+    """Times for the moves (from their segment) and the media frames (once the frame is drawn)."""
+    leave = {}
+    for k in data["cam"]:                    # when the camera leaves each board
+        for b, bd in enumerate(data["boards"]):
+            if [bd["ox"], bd["oy"]] == k["a"] and b not in leave:
+                leave[b] = k["t0"]
+    out = []
+    for m in moves:
+        s = segs[min(m["at"], len(segs) - 1)]
+        drawn = max([it["start"] + it["dur"] for it in data["items"] if it.get("eid") in m["targets"] and it["b"] == m["b"]] or [0])
+        start = max(s["t0"] + 0.25 + m.pop("delay", 0), drawn + 0.3)   # a thing moves only once it is drawn
+        dur = m.pop("dur", max(0.8, min(2.5, s["t1"] - s["t0"])))
+        until = m.pop("until", None)
+        end = segs[min(until, len(segs) - 1)]["t1"] if isinstance(until, int) else leave.get(m["b"], data["total"])
+        out.append(dict(m, start=round(start, 3), dur=round(dur, 3), end=round(end, 3)))
+    together = {}                            # moves of one segment that change a pose start together
+    for m in out:
+        if m["kind"] in ("rotate", "shift"):
+            together[(m["b"], m["at"])] = max(together.get((m["b"], m["at"]), 0), m["start"])
+    for m in out:
+        if m["kind"] in ("rotate", "shift"):
+            m["start"] = together[(m["b"], m["at"])]
+    data["moves"] = out
+    for md in media:
+        it = data["items"][md.pop("item")]
+        md["start"] = round(it["start"] + it["dur"] + 0.1, 3)
+    data["media"] = media
 
 
 
@@ -531,6 +579,8 @@ def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand
     rough_js = (HERE / "rough.js").read_text()
     player = (HERE / "player.js").read_text()
     ui = "" if render else (HERE / "ui.html").read_text()
+    # "</" inside the data (an embedded lab page has </script>) would end the script tag early
+    data_js = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     audio = "" if render or not audio_b64 else f'<audio id="aud" preload="auto" src="data:{audio_type};base64,{audio_b64}"></audio>'
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><style>
@@ -544,6 +594,6 @@ html,body{{margin:0;background:#fdfcf8;{'overflow:hidden' if render else ''}}}
 <g id="worldwrap"></g>{pen_svg(hand_dir)}</svg></div>
 {audio}{ui}
 <script>{rough_js}</script><script>{player}</script>
-<script>const DATA={json.dumps(data, ensure_ascii=False, separators=(',', ':'))};
+<script>const DATA={data_js};
 WB.init(document.getElementById('worldwrap'),DATA);if(window.UI)UI(DATA);</script>
 </body></html>"""
