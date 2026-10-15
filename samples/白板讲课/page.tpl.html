@@ -1,0 +1,50 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;background:#fff;overflow:hidden}
+svg{display:block}
+.s{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.t{stroke-width:1.2;stroke-linejoin:round}
+#pen{transition:none}
+</style></head><body>
+<svg id="cv" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs><filter id="paper"><feTurbulence baseFrequency="0.9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0.96  0 0 0 0 0.95  0 0 0 0 0.92  0 0 0 0.08 0"/></filter></defs>
+<rect width="1920" height="1080" fill="#fdfcf8"/><rect width="1920" height="1080" filter="url(#paper)"/>
+<g id="art">/*SVG*/</g>
+<g id="pen" transform="translate(-400,-400)">
+  <g transform="rotate(-38)">
+    <path d="M0,0 L-7,-20 L7,-20 Z" fill="#1d2329"/>
+    <rect x="-11" y="-46" width="22" height="26" rx="3" fill="#3a4550"/>
+    <rect x="-15" y="-250" width="30" height="206" rx="9" fill="#c98a00"/>
+    <rect x="-15" y="-250" width="9" height="206" rx="4" fill="#e3a91a"/>
+    <rect x="-16" y="-110" width="32" height="10" fill="#1d2329" opacity=".85"/>
+    <rect x="-13" y="-268" width="26" height="22" rx="7" fill="#1d2329"/>
+  </g>
+  <ellipse cx="8" cy="6" rx="30" ry="8" fill="#000" opacity=".06"/>
+</g>
+</svg>
+<script>
+const TL=/*TL*/, TOTAL=/*TOTAL*/;
+const els=TL.map(x=>{const e=document.getElementById(x.id);const L=e.getTotalLength();e.style.strokeDasharray=L+' '+L;e.style.strokeDashoffset=L;if(x.text)e.style.fillOpacity=0;return Object.assign(x,{e,L})});
+const pen=document.getElementById('pen');
+const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+function pt(x,p){const q=x.e.getPointAtLength(x.L*p);const m=x.e.getCTM();return {x:q.x,y:q.y}}
+window.seek=function(t){
+  let cur=null,prev=null,next=null;
+  for(const x of els){
+    const p=Math.min(1,Math.max(0,(t-x.start)/x.dur));
+    x.e.style.strokeDashoffset=x.L*(1-p);
+    if(x.text)x.e.style.fillOpacity=Math.min(1,Math.max(0,(t-x.start-x.dur*.6)/(x.dur*.6+.15)));
+    if(t>=x.start&&t<x.start+x.dur)cur=x;
+    if(x.start+x.dur<=t)prev=x; else if(!next&&x.start>t)next=next||x;
+  }
+  let pos;
+  if(cur){pos=pt(cur,(t-cur.start)/cur.dur)}
+  else if(prev&&next&&next.start-(prev.start+prev.dur)<1.6){const a=pt(prev,1),b=pt(next,0),g=next.start-(prev.start+prev.dur);const p=ease(Math.min(1,(t-prev.start-prev.dur)/g));pos={x:a.x+(b.x-a.x)*p,y:a.y+(b.y-a.y)*p}}
+  else if(prev&&!next){const a=pt(prev,1);const k=ease(Math.min(1,(t-prev.start-prev.dur)/1.2));pos={x:a.x+500*k,y:a.y+900*k}}
+  else if(prev){const a=pt(prev,1);const k=ease(Math.min(1,(t-prev.start-prev.dur)/0.8));const n=next?pt(next,0):null;
+     const g=next?next.start-t:9; const back=next&&g<0.8?ease(1-g/0.8):0;
+     const rest={x:a.x+260*k,y:a.y+380*k}; pos=n&&back?{x:rest.x+(n.x-rest.x)*back,y:rest.y+(n.y-rest.y)*back}:rest}
+  else {const n=pt(next,0);const k=ease(Math.min(1,Math.max(0,(t-(next.start-0.8))/0.8)));pos={x:n.x+300*(1-k),y:n.y+500*(1-k)}}
+  pen.setAttribute('transform',`translate(${pos.x},${pos.y})`);
+};
+seek(0);
+</script></body></html>
