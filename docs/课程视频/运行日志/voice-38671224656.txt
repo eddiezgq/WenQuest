@@ -1,0 +1,400 @@
+2026-10-15 02:53:36,698 INFO yield speech len 15.68, rtf 0.5137778514501999
+
+100%|██████████| 1/1 [00:08<00:00,  8.24s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:53:36,889 INFO synthesis text Loops underneath mean r is too small, or the thread isn't seated between the discs, so thread it with the foot up.
+2026-10-15 02:53:42,490 INFO yield speech len 10.68, rtf 0.52444568734044
+
+100%|██████████| 1/1 [00:05<00:00,  5.77s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:53:42,539 WARNING synthesis text Pucker and breakage. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:53:42,665 INFO synthesis text Pucker and breakage.
+2026-10-15 02:53:43,996 INFO yield speech len 1.88, rtf 0.7080211284312796
+
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:53:44,166 INFO synthesis text Balance says the ratio is right, not the size.
+2026-10-15 02:53:46,514 INFO yield speech len 4.0, rtf 0.5868585109710693
+
+100%|██████████| 1/1 [00:02<00:00,  2.52s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:53:46,685 INFO synthesis text A thread maker's guidance sorts seam pucker into four types.
+2026-10-15 02:53:49,901 INFO yield speech len 6.16, rtf 0.5220256068489768
+
+100%|██████████| 1/1 [00:03<00:00,  3.39s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.39s/it]
+cv2: 180/237 句，用时 13.9 分钟，预计还要 4.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:53:50,076 INFO synthesis text Tension pucker: the thread is stretched as the stitch tightens, springs back once sewn, and shortens the cloth so it buckles; the cure is the lowest tension that still balances.
+2026-10-15 02:53:57,129 INFO yield speech len 14.0, rtf 0.5037885052817208
+
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:53:57,433 INFO synthesis text Structural pucker: in a tight weave, needle and thread push the yarns apart.
+2026-10-15 02:54:00,984 INFO yield speech len 6.8, rtf 0.5221425084506764
+
+100%|██████████| 1/1 [00:03<00:00,  3.84s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:01,159 INFO synthesis text Dimensional instability: after washing and pressing, thread and cloth shrink by different amounts.
+2026-10-15 02:54:05,357 INFO yield speech len 8.04, rtf 0.5221300457247454
+
+100%|██████████| 1/1 [00:04<00:00,  4.37s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:05,409 WARNING synthesis text Feed pucker is the ply shift of Lecture six. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:54:05,534 INFO synthesis text Feed pucker is the ply shift of Lecture six.
+2026-10-15 02:54:08,454 INFO yield speech len 5.44, rtf 0.5367734852959127
+
+100%|██████████| 1/1 [00:03<00:00,  3.09s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:08,631 INFO synthesis text The first type is the one this lecture is about.
+2026-10-15 02:54:10,815 INFO yield speech len 3.64, rtf 0.6001244534502972
+
+100%|██████████| 1/1 [00:02<00:00,  2.35s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:10,862 WARNING synthesis text Tension pucker can be estimated. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:54:10,988 INFO synthesis text Tension pucker can be estimated.
+2026-10-15 02:54:12,912 INFO yield speech len 3.12, rtf 0.6165508276376969
+
+100%|██████████| 1/1 [00:02<00:00,  2.09s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:13,084 INFO synthesis text The thread's stretch during tightening is about the tension over its stiffness EA, and EA is roughly strength over elongation at break, about six thousand, seven hundred centinewtons for Tex twenty-four.
+2026-10-15 02:54:22,725 INFO yield speech len 18.6, rtf 0.5183156075016144
+
+100%|██████████| 1/1 [00:09<00:00,  9.83s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:22,917 INFO synthesis text Thread used per unit of seam is about s plus t over s, here one.thirty-three.
+2026-10-15 02:54:27,892 INFO yield speech len 9.48, rtf 0.5248113775052099
+
+100%|██████████| 1/1 [00:05<00:00,  5.14s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:28,067 INFO synthesis text Multiply the two and you get the fractional shortening of the seam; the cloth absorbs a little, and the rest is pucker.
+2026-10-15 02:54:33,105 INFO yield speech len 9.84, rtf 0.5120378684222213
+
+100%|██████████| 1/1 [00:05<00:00,  5.21s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:33,281 INFO synthesis text Watch the section: both threads tightened in proportion, the lock point stays in the middle, yet the cloth puckers more and more.
+2026-10-15 02:54:38,790 INFO yield speech len 10.6, rtf 0.5197664701713706
+
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+cv2: 190/237 句，用时 14.7 分钟，预计还要 3.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:38,839 WARNING synthesis text Now breakage. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:54:38,965 INFO synthesis text Now breakage.
+2026-10-15 02:54:40,536 INFO yield speech len 2.4, rtf 0.6549309690793356
+
+100%|██████████| 1/1 [00:01<00:00,  1.74s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:40,707 INFO synthesis text The needle thread usually breaks at the tightening peak, and what it can bear is far below its tensile-tester strength: high-speed passes through the eye, rubbing on the hook and needle heat all take their toll.
+2026-10-15 02:54:48,824 INFO yield speech len 15.72, rtf 0.5163267216912966
+
+100%|██████████| 1/1 [00:08<00:00,  8.29s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:49,008 INFO synthesis text The illustrative rule: the peak should stay under a third of nominal strength.
+2026-10-15 02:54:52,917 INFO yield speech len 7.24, rtf 0.5400251947055206
+
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:54:53,092 INFO synthesis text Four plies of denim need one hundred centinewtons in both threads at the lock point, so the assembly is about two hundred and forty-six, and at five thousand rpm the peak is about three hundred and forty-five: thirty-five percent of Tex twenty-four, too much, hence all that purple.
+2026-10-15 02:55:03,271 INFO yield speech len 20.08, rtf 0.5069140181598436
+
+100%|██████████| 1/1 [00:10<00:00, 10.36s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:03,338 WARNING synthesis text With Tex forty it's twenty percent. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:55:03,463 INFO synthesis text With Tex forty it's twenty percent.
+2026-10-15 02:55:05,532 INFO yield speech len 3.4, rtf 0.6085613194633933
+
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:05,579 WARNING synthesis text Heavy cloth needs heavy thread. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:55:05,704 INFO synthesis text Heavy cloth needs heavy thread.
+2026-10-15 02:55:08,289 INFO yield speech len 4.52, rtf 0.5719454415076602
+
+100%|██████████| 1/1 [00:02<00:00,  2.75s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:08,336 WARNING synthesis text Robots use the capstan equation every day. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:55:08,462 INFO synthesis text Robots use the capstan equation every day.
+2026-10-15 02:55:10,961 INFO yield speech len 4.36, rtf 0.5731023779702842
+
+100%|██████████| 1/1 [00:02<00:00,  2.67s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:11,135 INFO synthesis text Many dexterous hands and soft arms are tendon-driven: a motor in the palm or forearm pulls a cable that wraps round pulleys and bends through the joints to pull the fingertip.
+2026-10-15 02:55:18,819 INFO yield speech len 15.12, rtf 0.5082225673413151
+
+100%|██████████| 1/1 [00:07<00:00,  7.86s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:19,001 INFO synthesis text That's the same problem as the needle thread running from the assembly to the lock point.
+2026-10-15 02:55:22,727 INFO yield speech len 7.08, rtf 0.5262585346308132
+
+100%|██████████| 1/1 [00:03<00:00,  3.90s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:22,906 INFO synthesis text With a total wrap of two hundred and seventy degrees and mu of zero.one, the motor end pulls one.six times the fingertip; when releasing, the ratio flips and you get hysteresis.
+2026-10-15 02:55:30,398 INFO yield speech len 14.36, rtf 0.5217660270361515
+
+100%|██████████| 1/1 [00:07<00:00,  7.67s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.67s/it]
+cv2: 200/237 句，用时 15.6 分钟，预计还要 2.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:30,581 INFO synthesis text So a tension sensor near the joint closes the loop, just like electronic thread tension on a sewing machine, where a solenoid current sets the disc force.
+2026-10-15 02:55:37,107 INFO yield speech len 12.72, rtf 0.5130308041782499
+
+100%|██████████| 1/1 [00:06<00:00,  6.70s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:37,160 WARNING synthesis text An everyday example: a mooring bollard. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:55:37,288 INFO synthesis text An everyday example: a mooring bollard.
+2026-10-15 02:55:39,527 INFO yield speech len 4.0, rtf 0.5598204731941223
+
+100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:39,702 INFO synthesis text A sailor wraps the line two or three times round the bollard, and one person can hold a ship: every extra turn lets friction multiply the tension several times.
+2026-10-15 02:55:46,577 INFO yield speech len 13.12, rtf 0.5239909560215182
+
+100%|██████████| 1/1 [00:07<00:00,  7.06s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:46,766 INFO synthesis text The needle thread turning about one hundred and eighty degrees at the eye and losing two thirds of its tension is the same law used the other way: the ship's end is the take-up lever, the sailor's end is the lock point.
+2026-10-15 02:55:55,506 INFO yield speech len 16.64, rtf 0.5252463169969045
+
+100%|██████████| 1/1 [00:08<00:00,  8.92s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:55,566 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:55:55,691 INFO synthesis text Back to the start.
+2026-10-15 02:55:56,742 INFO yield speech len 1.16, rtf 0.9059242133436533
+
+100%|██████████| 1/1 [00:01<00:00,  1.22s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:55:56,915 INFO synthesis text With the assembly at two hundred and twenty, the needle tension at the lock point is about eighty-nine; against the ninety centinewton bobbin, r is zero.ninety-nine and z is zero.fifty.
+2026-10-15 02:56:06,431 INFO yield speech len 18.2, rtf 0.5228531753623878
+
+100%|██████████| 1/1 [00:09<00:00,  9.70s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:06,498 WARNING synthesis text It really is balanced. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:56:06,624 INFO synthesis text It really is balanced.
+2026-10-15 02:56:07,921 INFO yield speech len 1.68, rtf 0.771735395703997
+
+100%|██████████| 1/1 [00:01<00:00,  1.46s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:08,093 INFO synthesis text But the two threads average about ninety, so the seam shortens one.eight percent; less the zero.six percent the cotton absorbs, that's one.two percent pucker, four.eight millimetres over forty centimetres.
+2026-10-15 02:56:17,614 INFO yield speech len 19.12, rtf 0.4979771051446763
+
+100%|██████████| 1/1 [00:09<00:00,  9.71s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:17,681 WARNING synthesis text That's the ridge. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:56:17,807 INFO synthesis text That's the ridge.
+2026-10-15 02:56:18,810 INFO yield speech len 1.04, rtf 0.9648251992005568
+
+100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:18,981 INFO synthesis text Loosen both in proportion, to one hundred and forty: r is one.two, still balanced, pucker zero.twenty-one percent, only zero.eight millimetres.
+2026-10-15 02:56:25,821 INFO yield speech len 12.84, rtf 0.5327402988326884
+
+100%|██████████| 1/1 [00:07<00:00,  7.02s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.02s/it]
+cv2: 210/237 句，用时 16.5 分钟，预计还要 2.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:25,876 WARNING synthesis text You can't see it. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:56:26,001 INFO synthesis text You can't see it.
+2026-10-15 02:56:26,974 INFO yield speech len 0.96, rtf 1.0132953524589539
+
+100%|██████████| 1/1 [00:01<00:00,  1.14s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:27,142 INFO synthesis text Now Virtual lab seven-one. On the WenQuest platform you can do it yourself. The readings, the status and the task checks are blurred here. Read them yourself when you work the lab.
+2026-10-15 02:56:33,546 INFO yield speech len 12.2, rtf 0.5249490503404961
+
+100%|██████████| 1/1 [00:06<00:00,  6.58s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:33,731 INFO synthesis text First drag only the assembly slider and watch the lock point move. Note the two settings where it leaves zero.four to zero.six, and compare them with the book.
+2026-10-15 02:56:40,537 INFO yield speech len 13.24, rtf 0.5140985607020444
+
+100%|██████████| 1/1 [00:06<00:00,  6.98s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:40,722 INFO synthesis text Task one. Press Scramble tension, which imitates a machine someone has fiddled with.
+2026-10-15 02:56:45,028 INFO yield speech len 8.16, rtf 0.5276530396704581
+
+100%|██████████| 1/1 [00:04<00:00,  4.48s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:45,203 INFO synthesis text First see which way the lock point has gone and whether the cloth puckers. Decide whether one thread is relatively too tight or both are, and only then adjust.
+2026-10-15 02:56:51,706 INFO yield speech len 12.44, rtf 0.5227448472639372
+
+100%|██████████| 1/1 [00:06<00:00,  6.68s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:51,891 INFO synthesis text Task two. Press Machine with a loose bobbin, and bobbin dots show on top. This time you may move only the bobbin slider, leaving the assembly, the thread and the cloth alone.
+2026-10-15 02:56:58,416 INFO yield speech len 12.88, rtf 0.50656032858428
+
+100%|██████████| 1/1 [00:06<00:00,  6.70s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:56:58,600 INFO synthesis text Task three. Switch to four plies of denim at five thousand rpm or more. First look for a usable region with Tex twenty-four and see how big the purple breakage area is,.
+2026-10-15 02:57:05,300 INFO yield speech len 13.2, rtf 0.5075911138996934
+
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:05,481 INFO synthesis text then change to heavier Tex forty thread and get a stitch that is balanced, firm and unbroken.
+2026-10-15 02:57:10,625 INFO yield speech len 9.72, rtf 0.5293053854640128
+
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:10,804 INFO synthesis text Task four. Two plies of lining. Keep it balanced and lower both threads together until they're just firm enough, with pucker no more than zero.fifteen percent. The guide and the report template are on the platform.
+2026-10-15 02:57:19,335 INFO yield speech len 16.28, rtf 0.524037505250598
+
+100%|██████████| 1/1 [00:08<00:00,  8.71s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:19,521 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-15 02:57:23,083 INFO yield speech len 6.56, rtf 0.5429625147726478
+
+100%|██████████| 1/1 [00:03<00:00,  3.73s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.73s/it]
+cv2: 220/237 句，用时 17.5 分钟，预计还要 1.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:23,259 INFO synthesis text You can open today's interactive slides, the threeD prototype and Virtual lab seven-one yourself, and drag the tension sliders to see where the lock point goes.
+2026-10-15 02:57:30,108 INFO yield speech len 12.96, rtf 0.5285121592474572
+
+100%|██████████| 1/1 [00:07<00:00,  7.02s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:30,288 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-15 02:57:34,144 INFO yield speech len 7.2, rtf 0.5354947514004177
+
+100%|██████████| 1/1 [00:04<00:00,  4.03s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:34,323 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-15 02:57:39,509 INFO yield speech len 9.92, rtf 0.5227236257445428
+
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:39,687 INFO synthesis text Your assignment has four questions. One, the needle-thread tension after the assembly and three guides. Two, the assembly range on cotton that keeps the lock point balanced and firm, checked with a screenshot from the virtual lab.
+2026-10-15 02:57:48,765 INFO yield speech len 17.32, rtf 0.5241274971334268
+
+100%|██████████| 1/1 [00:09<00:00,  9.26s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:48,953 INFO synthesis text Three, four plies of denim. Find the least assembly setting and the tightening peak, and decide whether Tex twenty-four or Tex forty will do.
+2026-10-15 02:57:54,974 INFO yield speech len 11.48, rtf 0.5244672298431396
+
+100%|██████████| 1/1 [00:06<00:00,  6.19s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:57:55,152 INFO synthesis text And four, diagnosis. A machine was fine yesterday, but today bobbin dots show on top, and loosening the assembly only brings loops underneath. Explain the cause and write the correct procedure.
+2026-10-15 02:58:03,441 INFO yield speech len 16.08, rtf 0.515476313989554
+
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:03,629 INFO synthesis text Submit the assignment and the lab report on the WenQuest platform.
+2026-10-15 02:58:06,642 INFO yield speech len 5.6, rtf 0.5381518176623753
+
+100%|██████████| 1/1 [00:03<00:00,  3.18s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:06,818 INFO synthesis text There's also a ten-question quiz. For example, the needle thread wraps a guide through one hundred and twenty degrees with mu of zero.two. By what factor is the tension multiplied? Watch the units of the angle.
+2026-10-15 02:58:13,872 INFO yield speech len 13.6, rtf 0.5186321454889634
+
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:14,054 INFO synthesis text Or, if the lock point sits in the middle of the cloth, must the two tensions be the right size?
+2026-10-15 02:58:18,551 INFO yield speech len 8.52, rtf 0.5278097072117766
+
+100%|██████████| 1/1 [00:04<00:00,  4.67s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:18,728 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-15 02:58:21,648 INFO yield speech len 5.24, rtf 0.5573856011601804
+
+100%|██████████| 1/1 [00:03<00:00,  3.09s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.09s/it]
+cv2: 230/237 句，用时 18.4 分钟，预计还要 0.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:21,695 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-15 02:58:21,820 INFO synthesis text Three things to remember.
+2026-10-15 02:58:23,148 INFO yield speech len 1.76, rtf 0.7543601773001931
+
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:23,320 INFO synthesis text One: the assembly adds a fixed amount, the guides multiply by e to the mu theta, and the eye cuts it to about a third, so the needle tension at the lock point is about zero.forty-one of the setting.
+2026-10-15 02:58:32,683 INFO yield speech len 18.04, rtf 0.519004338596454
+
+100%|██████████| 1/1 [00:09<00:00,  9.55s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:32,874 INFO synthesis text Two: the ratio of the two tensions decides where the threads lock; set the bobbin first, then the needle thread, and when diagnosing, find out which side changed.
+2026-10-15 02:58:39,649 INFO yield speech len 13.36, rtf 0.5070730776130082
+
+100%|██████████| 1/1 [00:06<00:00,  6.95s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:39,829 INFO synthesis text Three: balance only means the ratio is right; the size of the tension decides tightness, pucker and breakage.
+2026-10-15 02:58:44,088 INFO yield speech len 7.96, rtf 0.53497070643171
+
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:44,264 INFO synthesis text Next time: motion coordination and machine dynamics.
+2026-10-15 02:58:47,336 INFO yield speech len 5.56, rtf 0.5524599723678699
+
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:47,508 INFO synthesis text The slides, the virtual lab, the threeD prototype, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-15 02:58:56,323 INFO yield speech len 16.84, rtf 0.52343826395882
+
+100%|██████████| 1/1 [00:08<00:00,  9.00s/it]
+100%|██████████| 1/1 [00:08<00:00,  9.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-15 02:58:56,512 INFO synthesis text Next time, we put the needle, take-up, hook and feed mechanisms back on one main shaft, see how they're coordinated, and why the whole machine shakes. See you then.
+2026-10-15 02:59:04,687 INFO yield speech len 15.72, rtf 0.5200639784184424
+
+100%|██████████| 1/1 [00:08<00:00,  8.35s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.35s/it]
+cv2: 237/237 句，用时 19.1 分钟，预计还要 0.0 分钟
+cv2: 237 句完成
+2026-10-15 02:59:04,858 DEBUG Attempting to acquire lock 135824385052624 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-15 02:59:04,858 DEBUG Lock 135824385052624 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-15 02:59:04,858 DEBUG Attempting to release lock 135824385052624 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-15 02:59:04,858 DEBUG Lock 135824385052624 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-15 02:59:04,860 DEBUG Attempting to acquire lock 135824385064720 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-15 02:59:04,861 DEBUG Lock 135824385064720 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-15 02:59:04,861 DEBUG Attempting to release lock 135824385064720 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-15 02:59:04,861 DEBUG Lock 135824385064720 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 30 分钟
