@@ -383,7 +383,7 @@ jobs:
         run: bash tools/vendor/deploy.sh "deploy@$HOST"
 
       - name: Get the built textbooks
-        if: env.SKIP != '1' && needs.textbook.result == 'success'
+        if: env.SKIP != '1'  # 网页版教材每次都有；教材没改时只有网页版（第 34 轮修正）
         uses: actions/download-artifact@v4
         with:
           pattern: textbook-*
@@ -391,7 +391,7 @@ jobs:
           path: textbook-build
 
       - name: Copy the textbooks (read by the gateway from /opt/wenquest/textbook)
-        if: env.SKIP != '1' && needs.textbook.result == 'success'
+        if: env.SKIP != '1'  # 网页版教材每次都有；教材没改时只有网页版（第 34 轮修正）
         run: |
           books=$(ls textbook-build | tr "\n" " ")   # one line: the list goes into the remote command (several books since 第 10 轮)
           du -sh textbook-build/* || true
@@ -437,6 +437,13 @@ jobs:
             python3 factory/deploy/ci_annotate.py "Server update" /tmp/update.log 180
             exit "$st"
           fi
+
+      - name: Pages get their fonts and libraries from this server (第 34 轮)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for u in "$D/vendor/VERSION" "$D/vendor/fonts/noto-sans-sc.css" "learn.$D/vendor/three/r128/three.min.js" "learn.$D/vendor/katex/0.16.9/katex.min.js" "$D/"; do h=${u%%/*}; c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$h:443:127.0.0.1" "https://$u"); echo "$c https://$u"; done' | tee /tmp/vendor.log
+          if grep -qv '^200 ' /tmp/vendor.log; then echo "::warning title=Fonts and libraries::$(grep -v '^200 ' /tmp/vendor.log | tr '\n' ' ')"; fi
 
       - name: Disk space on the server (round 19)
         if: env.SKIP != '1'
@@ -529,14 +536,14 @@ jobs:
         if: env.SKIP != '1'
         run: bash tools/vendor/deploy.sh "deploy@$HOST"
       - name: Get the built textbooks
-        if: env.SKIP != '1' && needs.textbook.result == 'success'
+        if: env.SKIP != '1'  # 网页版教材每次都有；教材没改时只有网页版（第 34 轮修正）
         uses: actions/download-artifact@v4
         with:
           pattern: textbook-*
           merge-multiple: true
           path: textbook-build
       - name: Copy the textbooks
-        if: env.SKIP != '1' && needs.textbook.result == 'success'
+        if: env.SKIP != '1'  # 网页版教材每次都有；教材没改时只有网页版（第 34 轮修正）
         run: |
           books=$(ls textbook-build | tr "\n" " ")
           tar czf - -C textbook-build . | ssh "deploy@$HOST" "set -e; mkdir -p /opt/wenquest/textbook; cd /opt/wenquest/textbook; for b in $books; do rm -rf \"\$b\"; done; tar xzf -"
@@ -559,6 +566,13 @@ jobs:
             python3 factory/deploy/ci_annotate.py "China server update" /tmp/update.log 180
             exit "$st"
           fi
+      - name: Pages get their fonts and libraries from this server (第 34 轮)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for u in "$D/vendor/VERSION" "$D/vendor/fonts/noto-sans-sc.css" "learn.$D/vendor/three/r128/three.min.js" "learn.$D/vendor/katex/0.16.9/katex.min.js" "$D/"; do h=${u%%/*}; c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$h:443:127.0.0.1" "https://$u"); echo "$c https://$u"; done' | tee /tmp/vendor.log
+          if grep -qv '^200 ' /tmp/vendor.log; then echo "::warning title=Fonts and libraries::$(grep -v '^200 ' /tmp/vendor.log | tr '\n' ' ')"; fi
+
       - name: Textbook animations
         if: env.SKIP != '1'
         continue-on-error: true
