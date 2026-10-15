@@ -221,6 +221,8 @@ def deck_stills(lec, lang, work: Path) -> dict:
             d.mkdir(parents=True, exist_ok=True)
             sh("ffmpeg", "-y", "-loglevel", "error", "-i", mp4, "-vf", "fps=15,scale=1600:-2", "-q:v", "3", "-start_number", "0",
                d / "%05d.jpg")
+            if (d / "00001.jpg").exists():   # 第一帧录在三维舞台铺开之前（黑屏），循环时每 12 秒闪一下：用第二帧代替
+                shutil.copyfile(d / "00001.jpg", d / "00000.jpg")
         out[name] = (d.resolve().as_uri(), len(list(d.glob("*.jpg"))))
     return out
 

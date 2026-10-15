@@ -68,3 +68,18 @@ for k, v in out.items():
 # 题目中按“0.41 倍”给出时的答案（容差覆盖 0.4067 的精确值）
 print("Q r=1 Tb30 Td (0.41):", 30 / 0.41)
 print("Q 衬里 Tb30 Td 上限 (0.41):", 1.8 ** 0.2 * 30 / 0.41)
+
+# numbers quoted by the slides (第 24 轮): only when WQ_BOOK_OUT is set
+if __import__("os").environ.get("WQ_BOOK_OUT"):
+    from bookout import out as book_out
+    p1, p2 = out["起皱 100/40"], out["起皱 220/90"]
+    lo, hi = out["棉布 Td 范围(Tb40)"]
+    book_out(KN=KN, GUIDE=GUIDE, EYEK=EYEK, ex_out=out["习题1 出夹线器"], cap180=out["μ0.35 180°"], cap120=out["Q 单过线件 120° μ0.2"],
+             td1=out["r=1 Tb40 所需 Td"], tdlo=lo, tdhi=hi, rlo=2.2 ** -0.2, rhi=2.2 ** 0.2,
+             tn220=out["问题 220/90 交织点面线张力"], r220=out["r 220/90"], z220=out["问题 z 220/90"],
+             tn100=KN * 100, r100=KN * 100 / 40, z100=out["问题 z 100/40"],
+             mean220=p2["mean"], sh220=p2["shrink_pct"], pk220=p2["pucker_pct"], mm220=p2["pucker_mm"],
+             mean100=p1["mean"], sh100=p1["shrink_pct"], pk100=p1["pucker_pct"], mm100=p1["pucker_mm"],
+             EA24=1000 / 0.15, EA24r=round(1000 / 0.15, -2), lam=(3 + 1.0) / 3,
+             den_td=out["牛仔 Td"], den_pk=out["牛仔 峰值"], den24=100 * out["峰值/Tex24"], den40=100 * out["峰值/Tex40"],
+             pk100n=peak(100, 5000), robot=out["机器人 腱绳放大"])

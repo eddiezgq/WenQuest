@@ -1,0 +1,140 @@
+# 《缝纫机设计与制造》公开课 第 7 讲：线张力与线迹质量
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch07.yaml，2026-10-15 新写），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 7-1 录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch07.py 算出（{{ch07.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "7"
+deck: ch07
+skip: [8, 16, 22, 24]   # 底线与挑线簧、调张力顺序、缺陷速查、模型边界：控制课程部分约 10 分钟（课件与教材里都有；调张力顺序在第 17 页讲稿开头带到）
+code: [ch07]
+title: ["线张力与线迹质量：两根线怎样收紧在布的中间", "Thread Tension and Stitch Quality: Locking Two Threads in the Middle of the Cloth"]
+chapter: ["第二篇 平缝机机构 · 第 7 章", "Part II Lockstitch Mechanisms · Chapter 7"]
+next: ["第 8 讲 运动协调与整机动力学", "Lecture 8 Motion coordination and machine dynamics"]
+cover_formula: 'T_2 = T_1\,e^{\mu\theta}'
+tags:
+  zh: [线张力, 夹线器, 线迹平衡, 缝皱, 绞盘公式, 缝纫机设计]
+  en: [thread tension, tension assembly, stitch balance, seam pucker, capstan equation, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第七讲，线张力与线迹质量。
+    - 面线和底线一上一下拉着，交织点要停在布的中间。拉偏了会冒底线、浮线；两根都太紧，看着平衡，布却会起皱、断线。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 7, thread tension and stitch quality.
+    - The needle thread pulls from above, the bobbin thread from below, and the point where they lock should sit right in the middle of the cloth. Pull it off-centre and you get bobbin dots on top or loops underneath; pull both too hard and the stitch looks balanced, yet the seam puckers and the thread breaks.
+
+after:
+  - id: lab71
+    kind: lab
+    lab: tension
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "['meter','state','tasks','secNote'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; })"
+      - sweep: {p_Td: [60, 160]}
+        dur: 8
+      - press: mess
+      - sweep: {p_Td: [230, 190]}
+        dur: 5
+      - press: lowb
+        sweep: {p_Tb: [15, 24]}
+        dur: 5
+      - set: {fab: denim}
+        js: "window.scrollTo(0, 470)"
+      - set: {th: t40}
+        js: "document.getElementById('map').style.filter = 'blur(7px) grayscale(1)'"
+      - set: {fab: lining, th: t24}
+        js: "document.getElementById('map').style.filter = ''; window.scrollTo(0, 0)"
+    say:
+      zh:
+        - ">下面是本讲的虚拟实验 7-1，在问渠学习平台上可以亲手做。读数、状态和任务判定这里先遮住，留给你自己读。"
+        - ">先只拖夹线器滑杆，看交织点怎样上下走，记下它离开 0.4 到 0.6 的两个值，和教材比一比。"
+        - ">任务一：按打乱张力，模拟一台被人乱调过的机器。"
+        - ">先看交织点偏向哪面、布皱不皱，判断哪根线相对太紧，还是两根都太紧，再动手调。"
+        - ">任务二：按底线太松的机器，正面冒出底线。这一次只许动底线滑杆，夹线器、线和面料都不动。"
+        - ">任务三：面料换成牛仔布四层，转速 5000 以上。先用 Tex 24 找可用区，看看紫色的断线风险有多大，"
+        - ">再换 Tex 40 的粗线，调到平衡、不松、不断。"
+        - ">任务四：衬里两层，保持平衡，把两根线一起降到刚好不松，起皱不超过 0.15%。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 7-1. On the WenQuest platform you can do it yourself. The readings, the status and the task checks are blurred here. Read them yourself when you work the lab."
+        - ">First drag only the assembly slider and watch the lock point move. Note the two settings where it leaves 0.4 to 0.6, and compare them with the book."
+        - ">Task one. Press Scramble tension, which imitates a machine someone has fiddled with."
+        - ">First see which way the lock point has gone and whether the cloth puckers. Decide whether one thread is relatively too tight or both are, and only then adjust."
+        - ">Task two. Press Machine with a loose bobbin, and bobbin dots show on top. This time you may move only the bobbin slider, leaving the assembly, the thread and the cloth alone."
+        - ">Task three. Switch to four plies of denim at 5000 rpm or more. First look for a usable region with Tex 24 and see how big the purple breakage area is,"
+        - ">then change to heavier Tex 40 thread and get a stitch that is balanced, firm and unbroken."
+        - ">Task four. Two plies of lining. Keep it balanced and lower both threads together until they're just firm enough, with pucker no more than 0.15 percent. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件、三维样机和虚拟实验 7-1，可以自己动手", "Interactive slides, the 3D prototype and Lab 7-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件、三维样机和虚拟实验 7-1 都可以自己打开，拖一拖张力滑杆，看交织点怎样跑。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides, the 3D prototype and Virtual lab 7-1 yourself, and drag the tension sliders to see where the lock point goes."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 7：线张力计算与线迹诊断", "Assignment 7: tension calculations and stitch diagnosis"]
+      points:
+        - ["夹线器与过线件：张力一路怎样变；平衡区的夹线器范围", "Assembly and guides along the path; the assembly range for balance"]
+        - ["牛仔四层：夹线器最小值、收紧峰，Tex 24 与 Tex 40 选哪种", "Denim: least setting, tightening peak; Tex 24 or Tex 40"]
+        - ["诊断：昨天正常、今天冒底线，越拧越松反而浮线", "Diagnosis: bobbin dots today, loops after loosening"]
+      foot: ["交一份 PDF（3–4 页），另交虚拟实验 7-1 的实验报告，都在问渠学习平台提交。", "One PDF of 3–4 pages, plus the Lab 7-1 report, both submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，算面线经过夹线器和三个过线件后的张力。第二题，求棉布上让交织点落在平衡区、又不太松的夹线器范围，并在虚拟实验里截图验证。"
+        - ">第三题，牛仔布四层，求夹线器最小设定和收紧峰，判断 Tex 24 和 Tex 40 哪种能用。"
+        - ">第四题是诊断：机器昨天正常，今天冒底线，夹线器越拧越松，反面又浮线。分析原因，写出正确的处理步骤。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One, the needle-thread tension after the assembly and three guides. Two, the assembly range on cotton that keeps the lock point balanced and firm, checked with a screenshot from the virtual lab."
+        - ">Three, four plies of denim. Find the least assembly setting and the tightening peak, and decide whether Tex 24 or Tex 40 will do."
+        - ">And four, diagnosis. A machine was fine yesterday, but today bobbin dots show on top, and loosening the assembly only brings loops underneath. Explain the cause and write the correct procedure."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["面线绕过 120°、μ = 0.2 的过线件，放大多少倍？", "Round a 120° guide at μ = 0.2: by what factor?"]
+        - ["交织点在布中间，张力大小就一定合适吗？", "Lock point in the middle: is the tension then right?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：面线绕过一个包角 120 度、摩擦系数 0.2 的过线件，张力放大多少倍？注意角度的单位。"
+        - ">再比如：只要交织点在布的中间，两根线的张力大小就一定合适吗？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, the needle thread wraps a guide through 120 degrees with mu of 0.2. By what factor is the tension multiplied? Watch the units of the angle."
+        - ">Or, if the lock point sits in the middle of the cloth, must the two tensions be the right size?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲，我们把刺布、挑线、钩线、送布四套机构放回一根主轴上，看它们怎样协调，以及整台机器为什么会抖。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the 3D prototype, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, we put the needle, take-up, hook and feed mechanisms back on one main shaft, see how they're coordinated, and why the whole machine shakes. See you then.
