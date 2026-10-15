@@ -27,6 +27,10 @@ class Settings(BaseSettings):
     # the WeChat mini program needs it set).
     public_url: str = ""
 
+    # Where this server runs (round 34): us (default) or cn. In China only registered models may be called, so with
+    # cn the gateway never uses Claude, even if an Anthropic key was left in .env.
+    region: str = "us"
+
     # --- AI models (see app/ai.py) ---
     # auto = Claude if a key is set, else DeepSeek; or claude / deepseek / fake (tests and demos)
     ai_provider: str = "auto"
@@ -102,3 +106,11 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def model_choice(s: "Settings") -> tuple[str, str]:
+    """The AI provider and Anthropic key to use: in China (region cn) Claude is never used."""
+    if s.region.strip().lower() != "cn":
+        return s.ai_provider, s.anthropic_api_key
+    return ("deepseek" if s.ai_provider == "claude" else s.ai_provider), ""
+

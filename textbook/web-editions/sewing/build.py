@@ -62,7 +62,9 @@ def script(lang, index=False):
         s = s.replace("'收起'", "'Collapse'").replace("'在本页运行'", "'Run on this page'")
         s = s.replace("'针距'", "'stitch length'").replace("'布面'", "'fabric top'").replace("'布底'", "'fabric bottom'")
         s = s.replace("'第 ' + (cyc + 1) + ' 针'", "'stitch ' + (cyc + 1)")
-    return '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>' + s
+    # 第 34 轮：KaTeX 由自己的服务器提供（/vendor/）；书页存到本机打开时再试原来的 CDN
+    return ('<script src="/vendor/katex/0.16.9/katex.min.js"></script><script>window.katex||document.write('
+            "'<scr'+'ipt src=\"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js\"></scr'+'ipt>')</script>" + s)
 
 def eyebrow(lang, n):
     p = part_of(n)

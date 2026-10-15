@@ -71,8 +71,8 @@ def head(title_zh, title_en, three_src, preview):
         '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
         '<link rel="icon" href="../favicon.svg" type="image/svg+xml">\n'
         f'<meta name="description" content="{html.escape(title_en)} — WenQuest digital factory case.">\n')
-    fonts = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
-             '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Noto+Serif+SC:wght@500;700;900&family=IBM+Plex+Sans:wght@400;500&family=Noto+Sans+SC:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">\n')
+    fonts = ('\n\n'
+             '<link rel="stylesheet" href="/vendor/fonts/source-serif-4.css"><link rel="stylesheet" href="/vendor/fonts/noto-serif-sc.css"><link rel="stylesheet" href="/vendor/fonts/ibm-plex-sans.css"><link rel="stylesheet" href="/vendor/fonts/noto-sans-sc.css"><link rel="stylesheet" href="/vendor/fonts/ibm-plex-mono.css">\n')
     return f"{shell}<title>{t}</title>\n{fonts}<style>\n{STYLE}\n</style>\n" + ("" if preview else "</head>\n<body>\n")
 
 

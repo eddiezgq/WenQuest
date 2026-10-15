@@ -12,7 +12,7 @@ TPL = r'''<!doctype html>
 </head>
 <body>
 <title>%%title%%</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/noto-sans-sc.css"><link rel="stylesheet" href="/vendor/fonts/noto-serif-sc.css"><link rel="stylesheet" href="/vendor/fonts/jetbrains-mono.css">
 <style>
 /* Layout: left = bed animation, error strip, needle zoom; right = checks, parameters, tasks. Stacks on narrow screens. */
 :root{

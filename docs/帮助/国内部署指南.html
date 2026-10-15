@@ -159,10 +159,10 @@ footer{max-width:960px;margin:40px auto 0;padding:0 32px;color:var(--muted);font
   <p class="lead">问渠目前跑在美国的服务器上，<b>国内还没有实际部署过</b>。本指南按现有部署程序（<code>deploy/</code> 目录）和国内要求整理。</p>
   <div class="grid3">
     <div class="card"><span class="tag ok">可直接用</span><p>部署脚本、服务器初始化、配置文件、备份恢复、回退、状态检查；DeepSeek 接入；本地语音合成（不出服务器）；数字工厂的 DeepSeek 助手。</p></div>
-    <div class="card"><span class="tag todo">要先改程序</span><p>镜像推到国内仓库（现在推到海外的 ghcr.io）；官网字体改为本地；异地备份支持阿里云 OSS；国内部署包去掉 Claude 插件。见第 13 节。</p></div>
+    <div class="card"><span class="tag ok">第 34 轮已改好</span><p>国内开关 <code>WQ_REGION=cn</code>（只用 DeepSeek、停用 Claude）；自动部署同时把镜像同步到国内仓库、部署到国内服务器；字体和三维库由自己的服务器提供；备份支持阿里云 OSS；基础镜像可换国内地址。<b>美国服务器的行为不变。</b></p></div>
     <div class="card"><span class="tag no">国内暂不可用</span><p>AI 课程负责人（第 31 轮的对话改课，目前要 Claude）退回到原来的固定流程；看图类自动检查要换国内多模态模型；Stripe 收费。</p></div>
   </div>
-  <div class="note warn"><b>标 ⚠ 的步骤</b>需要先改程序或先在国内服务器上实测一次。合规部分是常见做法的整理，<b>具体以属地主管部门和云服务商的要求为准</b>，正式办理前先咨询。</div>
+  <div class="note warn">部署程序第 34 轮已按国内要求改好，但<b>还没在国内服务器上实际跑过</b>，第一次部署请预留时间，按第 12 节排查。合规部分是常见做法的整理，<b>具体以属地主管部门和云服务商的要求为准</b>，正式办理前先咨询。</div>
 </section>
 
 <section id="s1" class="fade">
@@ -173,11 +173,12 @@ footer{max-width:960px;margin:40px auto 0;padding:0 32px;color:var(--muted);font
     <tr><td>服务器</td><td>DigitalOcean</td><td>阿里云 / 腾讯云 / 华为云 国内地域的云服务器</td></tr>
     <tr><td>域名开通 80/443</td><td>解析即可</td><td><b>先 ICP 备案</b>，未备案的域名在国内服务器上无法访问</td></tr>
     <tr><td>大模型</td><td>Claude</td><td><b>只用已备案模型</b>：DeepSeek（已接入）、通义千问等</td></tr>
-    <tr><td>镜像仓库</td><td>ghcr.io（GitHub）</td><td>国内访问不稳定 → 阿里云容器镜像服务 ACR 等 ⚠</td></tr>
+    <tr><td>镜像仓库</td><td>ghcr.io（GitHub）</td><td>国内访问不稳定 → 自动同步到阿里云容器镜像服务 ACR（第 8 节）</td></tr>
     <tr><td>Docker Hub 基础镜像</td><td>直接拉</td><td>国内基本拉不动 → 用云厂商镜像加速或预先转存</td></tr>
     <tr><td>证书</td><td>Caddy 自动申请</td><td>同样自动（Let's Encrypt）；备案通过后才能完成验证</td></tr>
     <tr><td>发信</td><td>Postmark 等，2525 端口</td><td>阿里云邮件推送、腾讯企业邮等国内服务</td></tr>
-    <tr><td>异地备份</td><td>DigitalOcean Spaces</td><td>阿里云 OSS / 腾讯云 COS（S3 兼容）⚠</td></tr>
+    <tr><td>异地备份</td><td>DigitalOcean Spaces</td><td>阿里云 OSS / 腾讯云 COS（<code>BACKUP_S3_PROVIDER</code>）</td></tr>
+    <tr><td>部署地区开关</td><td>不写（= us）</td><td><code>WQ_REGION=cn</code>：只用已备案模型，Claude 钥匙即使填了也不用</td></tr>
     <tr><td>GPU 实验</td><td>Lambda</td><td>AutoDL（已接入，<code>WQ_GPU_PROVIDER=autodl</code>）</td></tr>
     <tr><td>默认语言、时区</td><td>按站点</td><td><code>zh_cn</code>、<code>Asia/Shanghai</code></td></tr>
   </table></div>
@@ -234,7 +235,7 @@ footer{max-width:960px;margin:40px auto 0;padding:0 32px;color:var(--muted);font
     <div class="card"><h3 style="margin-top:0">技术资源</h3><div class="chklist" data-g="b">
       <label class="chk"><input type="checkbox"><span>国内云服务器（Ubuntu 24.04，见第 5 节选配置）</span></label>
       <label class="chk"><input type="checkbox"><span>DeepSeek API Key（platform.deepseek.com）</span></label>
-      <label class="chk"><input type="checkbox"><span>容器镜像仓库：阿里云 ACR 个人版或企业版 ⚠</span></label>
+      <label class="chk"><input type="checkbox"><span>容器镜像仓库：阿里云 ACR 个人版或企业版（建好命名空间）</span></label>
       <label class="chk"><input type="checkbox"><span>发信服务：阿里云邮件推送 / 腾讯企业邮等</span></label>
       <label class="chk"><input type="checkbox"><span>对象存储（异地备份）：阿里云 OSS / 腾讯云 COS</span></label>
       <label class="chk"><input type="checkbox"><span>（可选）AutoDL 账号，开 GPU 实验</span></label>
@@ -258,7 +259,7 @@ footer{max-width:960px;margin:40px auto 0;padding:0 32px;color:var(--muted);font
   <details open><summary>ICP 备案（必须，最先办）</summary><div>
     <p>在国内服务器上用域名对外提供网站，必须先做 ICP 备案。在购买服务器的云服务商控制台里办理（阿里云、腾讯云都有“备案”入口）：填主体信息和网站信息 → 人脸核验 → 云服务商初审 → 通信管理局审核。</p>
     <p>问渠用到的网址都在一个主域名下（官网、<code>learn.</code>、<code>classic.</code>，装数字工厂还有 <code>factory.</code>、<code>erp.</code> 等），<b>备案主域名一次即可</b>。网站名称、内容描述按“在线教育 / 教学平台”如实填写。</p>
-    <p>备案通过后，<b>官网和学习平台页面底部要显示备案号并链接到工信部备案系统</b>（beian.miit.gov.cn）。<span class="tag todo">⚠ 待改</span> 现在页面底部没有备案号的位置，上线前要加。</p>
+    <p>备案通过后，<b>官网和学习平台页面底部要显示备案号并链接到工信部备案系统</b>（beian.miit.gov.cn）。<span class="tag todo">备案后加</span> 拿到备案号后加到页面底部。</p>
   </div></details>
   <details><summary>公安联网备案</summary><div>
     <p>网站开通后 30 日内，到“全国互联网安全管理服务平台”办理，通过后页面底部同样要显示公安备案号。</p>
@@ -348,7 +349,7 @@ systemctl restart docker</pre></div></div>
 tar czf wq-deploy.tgz docker-compose.yml docker-compose.prod.yml .env.example deploy site
 scp wq-deploy.tgz deploy@&lt;服务器IP&gt;:/opt/wenquest/
 ssh deploy@&lt;服务器IP&gt; 'cd /opt/wenquest &amp;&amp; tar xzf wq-deploy.tgz &amp;&amp; chmod +x deploy/*.sh'</pre></div></div>
-  <div class="note warn"><b>⚠ Caddyfile 末尾</b>有一段 <code>qms.wenquestrobotics.com</code>（美国服务器上另一个演示项目），国内部署时删掉这一段，并删掉 <code>docker-compose.prod.yml</code> 里的 <code>qms-edge</code> 网络，或先 <code>docker network create qms-edge</code>。</div>
+  <div class="note">第 4 步可以不做：设置好第 8 节的自动部署后，GitHub 每次部署都会把这些文件、教材、字体复制过去。美国服务器专用的站点段已移到 <code>deploy/caddy-extra/us/</code>，<code>WQ_REGION=cn</code> 时不会加载，不用手工删。</div>
 </section>
 
 <section id="s8" class="fade">
@@ -363,16 +364,24 @@ ssh deploy@&lt;服务器IP&gt; 'cd /opt/wenquest &amp;&amp; tar xzf wq-deploy.tg
     <div class="seg" data-i="4"><b>上线</b>deploy/update.sh</div>
   </div>
   <div id="flowNote" class="out"></div>
-  <h3>路线 A（推荐，⚠ 需要改自动部署）：推到阿里云 ACR</h3>
+  <h3>路线 A（推荐）：GitHub 自动同步到阿里云 ACR，并自动部署到国内服务器</h3>
+  <p>部署工作流里有两个国内专用的步骤：<b>同步到国内仓库</b>（每次构建后把 7 个平台镜像和 postgres、redis、caddy、rclone 4 个基础镜像复制到 ACR）和<b>部署到国内服务器</b>。没有设置下面这些变量时它们自动跳过，美国的部署照常。</p>
   <ol>
-    <li>阿里云开通“容器镜像服务”，建命名空间（如 <code>wenquest</code>）和 7 个仓库：<code>engine</code>、<code>gateway</code>、<code>web</code>、<code>animator</code>、<code>labcheck</code>、<code>micro-synth</code>、<code>voice</code>。</li>
-    <li>GitHub 仓库加两个加密变量：<code>ACR_USERNAME</code>、<code>ACR_PASSWORD</code>；部署工作流在推 ghcr.io 之外再推一份到 ACR（<span class="tag todo">待做</span>：工作流还没有这一步，要另开一轮改）。</li>
-    <li>服务器上登录一次 ACR，之后 <code>update.sh</code> 用 ACR 的地址拉镜像：</li>
+    <li>阿里云开通“容器镜像服务”，建一个命名空间（如 <code>wenquest</code>），设置“访问凭证”的固定密码。仓库不用一个个建：命名空间里打开“自动创建仓库”，设为<b>私有</b>。</li>
+    <li>GitHub 仓库 → Settings → Secrets and variables → Actions：
+      <ul>
+        <li><b>Variables</b> 加 <code>CN_REGISTRY</code> = <code>registry.cn-hangzhou.aliyuncs.com/wenquest</code>（地域、命名空间按你的填）；</li>
+        <li><b>Secrets</b> 加 <code>CN_REGISTRY_USER</code>（阿里云账号全名）、<code>CN_REGISTRY_PASSWORD</code>（访问凭证密码）；</li>
+        <li>要自动部署到国内服务器，再加 <b>Secrets</b> <code>CN_DEPLOY_HOST</code>（服务器公网 IP）、<code>CN_DEPLOY_SSH_KEY</code>（第 7 节第 3 步公钥对应的私钥），可选 <code>CN_DEPLOY_KNOWN_HOSTS</code>。</li>
+      </ul></li>
+    <li>服务器上先运行一次 <code>deploy/init-env.sh</code>，第一个问题回答 <code>cn</code>（第 9 节）。</li>
+    <li>在 GitHub 的 Actions 页面手动运行一次 “Build and deploy”，或推送一次。之后每次推送，美国和国内服务器各自更新。</li>
   </ol>
+  <p>只想手工部署时（不设 <code>CN_DEPLOY_HOST</code>），镜像仍会同步到 ACR，在服务器上：</p>
 <pre>docker login --username=&lt;阿里云账号&gt; registry.cn-hangzhou.aliyuncs.com
 cd /opt/wenquest
 deploy/update.sh registry.cn-hangzhou.aliyuncs.com/wenquest/engine:&lt;版本号&gt;
-<span class="c"># update.sh 会按 engine 的地址推出其余 6 个（把 /engine: 换成 /gateway: 等），写进 .env 后拉取、启动</span></pre>
+<span class="c"># 版本号 = GitHub 部署记录里的 12 位提交号；update.sh 会按 engine 的地址推出其余 6 个，写进 .env 后拉取、启动</span></pre>
   <h3>路线 B（临时）：在能访问外网的机器上转存</h3>
 <pre><span class="c"># 在海外或能访问 ghcr.io 的电脑上（TAG 是 GitHub 部署记录里的 12 位版本号）</span>
 TAG=abc123def456; R=ghcr.io/eddiezgq/wenquest
@@ -407,8 +416,8 @@ cd /opt/wenquest &amp;&amp; deploy/update.sh $R/engine:$TAG</pre>
     <button class="btn" type="button" id="e_go">生成 .env</button><button class="btn ghost" type="button" id="e_new">重新生成密码</button>
 <pre id="e_out"></pre>
   </div>
-  <div class="step"><div class="k">✓</div><div>在服务器上：<code>cd /opt/wenquest &amp;&amp; nano .env</code>，粘贴进去保存，然后 <code>chmod 600 .env</code>。管理员密码和数据库密码另存一份到密码管理器。<br>也可以运行 <code>deploy/init-env.sh</code> 一问一答生成，再把语言、时区、模型几项改成上面的国内值。</div></div>
-  <div class="note warn">⚠ 异地备份：<code>deploy/backup.sh</code> 里 rclone 的服务商写的是 DigitalOcean。阿里云 OSS 兼容 S3，但是否能直接用要实测；不行就把那一行改成 <code>Alibaba</code>（待改）。</div>
+  <div class="step"><div class="k">✓</div><div>在服务器上：<code>cd /opt/wenquest &amp;&amp; nano .env</code>，粘贴进去保存，然后 <code>chmod 600 .env</code>。管理员密码和数据库密码另存一份到密码管理器。<br><b>更省事：</b>运行 <code>deploy/init-env.sh</code>，第一个问题回答 <code>cn</code>，它会自动填好中文、北京时间、<code>WQ_REGION=cn</code>、DeepSeek 钥匙、国内基础镜像地址、<code>BACKUP_S3_PROVIDER=Alibaba</code>，密码自动生成。</div></div>
+  <div class="note">异地备份到腾讯云 COS 时把 <code>BACKUP_S3_PROVIDER</code> 改成 <code>TencentCOS</code>。第一次设置后手动跑一次 <code>deploy/backup.sh</code>，看最后一行是否显示上传成功。</div>
 </section>
 
 <section id="s10" class="fade">
@@ -418,10 +427,10 @@ cd /opt/wenquest &amp;&amp; deploy/update.sh $R/engine:$TAG</pre>
 <pre>cd /opt/wenquest
 deploy/update.sh registry.cn-hangzhou.aliyuncs.com/wenquest/engine:&lt;版本号&gt;</pre>脚本会：先备份（已运行时）→ 写入 7 个镜像地址 → 拉取 → 启动 → 重载 Caddy → 等学习平台变“健康”（最多 15 分钟）。</div></div>
   <div class="step"><div class="k">2</div><div><b>看状态</b>
-<pre>deploy/status.sh</pre>三个网址都应返回 <code>200</code>（或 303 跳转）。打开 <code>https://learn.&lt;域名&gt;/api/health</code>，应看到 <code>"ai": "deepseek"</code>——说明网关用的是 DeepSeek。</div></div>
+<pre>deploy/status.sh</pre>三个网址都应返回 <code>200</code>（或 303 跳转）。打开 <code>https://learn.&lt;域名&gt;/api/health</code>，应看到 <code>"ai": "deepseek"</code> 和 <code>"region": "cn"</code>——说明网关只用 DeepSeek。</div></div>
   <div class="step"><div class="k">3</div><div><b>第一次登录</b>：<code>https://learn.&lt;域名&gt;</code> 用 <code>admin</code> 和 .env 里的管理员密码登录 → 管理 → 设立课程委员会（试点期可以自己当主任，打开“允许本人批准自己的课”）→ 审核老师注册。</div></div>
   <div class="step"><div class="k">4</div><div><b>（可选）数字工厂</b>：工厂是独立的一组容器（<code>/opt/wenquest/factory</code>），由“Digital factory 数字工厂部署”工作流安装；需要至少 3 GB 空闲内存。国内同样要解决 ERPNext（<code>frappe/erpnext</code>）等镜像的拉取问题。工厂的 AI 助手自动使用学习平台的 DeepSeek 钥匙。</div></div>
-  <div class="step"><div class="k">5</div><div><b>页面底部加备案号</b> ⚠：官网 <code>site/index.html</code>（由 <code>tools/site_home/</code> 生成）和学习平台登录页加 ICP 备案号、公安备案号，链接到备案系统。</div></div>
+  <div class="step"><div class="k">5</div><div><b>页面底部加备案号</b>（Eddie 自己加）：官网 <code>site/index.html</code>（由 <code>tools/site_home/</code> 生成）和学习平台登录页加 ICP 备案号、公安备案号，链接到备案系统。</div></div>
 </section>
 
 <section id="s11" class="fade">
@@ -450,12 +459,11 @@ docker image prune -a         <span class="c"># 删掉不用的旧镜像</span><
   <h2><span class="n">12</span>常见问题</h2>
   <details><summary>浏览器打不开网站，提示“网站暂时无法访问”或被拦截</summary><div>多半是<b>备案还没通过</b>或域名不在备案名下。云服务商会拦截未备案域名的 80/443。先在控制台确认备案状态，并确认解析的子域名都在备案的主域名下。</div></details>
   <details><summary>证书申请失败，Caddy 日志里一直在重试</summary><div>Caddy 用 Let's Encrypt，需要域名已解析到这台服务器、80/443 能从外网访问。检查：解析记录（第 6 节）、安全组放行 80/443、备案已通过。查看：<code>docker compose ... logs --tail 50 caddy</code>。</div></details>
-  <details><summary>docker pull 卡住或报 timeout</summary><div>Docker Hub 和 ghcr.io 在国内不稳定。用第 7 节的加速地址；仍不行用第 8 节路线 B 转存；长期用路线 A（ACR）。</div></details>
+  <details><summary>docker pull 卡住或报 timeout</summary><div>Docker Hub 和 ghcr.io 在国内不稳定。用第 8 节路线 A：平台镜像和基础镜像都从 ACR 拉（<code>.env</code> 里 <code>DB_IMAGE</code> 等 4 项指向 ACR）；临时可用路线 B 转存。</div></details>
   <details><summary>AI 功能都不工作，/api/health 里 "ai" 是 "none"</summary><div><code>.env</code> 里 <code>DEEPSEEK_API_KEY</code> 没填或填错，改好后 <code>deploy/update.sh</code>（不带参数）重启。确认 <code>ANTHROPIC_API_KEY</code> 留空——填了会优先用 Claude，国内调不通。</div></details>
   <details><summary>AI 建课对话里改大纲、改课时不像美国版那样灵活</summary><div>第 31 轮起的“AI 课程负责人”目前要 Claude 才能当代理（自己查资料、直接改草稿、撤销）。国内只有 DeepSeek 时，自动退回原来的流程：课程负责人给出提议，老师确认后执行。接入国内模型的代理能力在计划中。</div></details>
   <details><summary>收不到找回密码、通知邮件</summary><div>国内云服务器通常封 25 端口。用邮件服务商给的 SSL 端口（如 465），<code>SMTP_SECURE=ssl</code>；发件地址必须是服务商验证过的域名；在服务商控制台看投递记录。</div></details>
-  <details><summary>官网打开慢，字体闪一下</summary><div>官网用了 Google Fonts，国内访问不了，浏览器会等一会儿再用系统字体。<span class="tag todo">待改</span>：把字体文件放到服务器上或改用系统字体。</div></details>
-  <details><summary>三维模型、部分实验页面加载慢</summary><div>部分页面从 cdnjs 取 three.js，国内有时慢。<span class="tag todo">待改</span>：改为从自己的服务器提供。</div></details>
+  <details><summary>页面字体、三维模型从哪里来</summary><div>第 34 轮起，官网、网页版教材、实验页用的字体和 three.js、KaTeX 都由自己的服务器在 <code>/vendor/</code> 提供（部署时自动生成、复制），不再从 Google 和 cdnjs 取。Verilog 实验在国内（<code>WQ_REGION=cn</code>）自动改用服务器综合，仿真器也从 <code>/vendor/</code> 取。看到字体不对，先确认服务器上有 <code>/opt/wenquest/site/vendor/VERSION</code>。</div></details>
   <details><summary>Moodle 15 分钟还没“健康”，update.sh 报错退出</summary><div>首次安装大数据库或服务器内存不够。看 <code>logs --tail 200 moodle</code>；内存不足时升级配置（第 5 节）。更新后出错可 <code>deploy/rollback.sh</code>。</div></details>
 </section>
 
@@ -464,11 +472,12 @@ docker image prune -a         <span class="c"># 删掉不用的旧镜像</span><
   <p class="lead">这些改完，国内部署就能做到和美国一样“推送即上线”。建议作为一轮工作排期。</p>
   <div class="tbl"><table>
     <tr><th>#</th><th>要改的</th><th>为什么</th><th>状态</th></tr>
-    <tr><td>1</td><td>部署工作流同时推镜像到阿里云 ACR，并能部署到国内服务器</td><td>ghcr.io 国内拉不稳</td><td><span class="tag todo">待做</span></td></tr>
-    <tr><td>2</td><td>官网、学习平台页面底部显示 ICP / 公安备案号（按站点配置）</td><td>备案要求</td><td><span class="tag todo">待做</span></td></tr>
-    <tr><td>3</td><td>官网字体、three.js 等外部资源改为本地提供</td><td>Google Fonts 国内不可用、cdnjs 慢</td><td><span class="tag todo">待做</span></td></tr>
-    <tr><td>4</td><td>异地备份支持阿里云 OSS / 腾讯云 COS（rclone 服务商可配）</td><td>数据境内存储</td><td><span class="tag todo">待做</span></td></tr>
-    <tr><td>5</td><td>国内部署包不带 Claude 插件；Caddyfile 去掉美国专用段</td><td>合规、干净</td><td><span class="tag todo">待做</span></td></tr>
+    <tr><td>1</td><td>部署工作流同时推镜像到阿里云 ACR，并能部署到国内服务器</td><td>ghcr.io 国内拉不稳</td><td><span class="tag ok">已完成（第 34 轮）</span></td></tr>
+    <tr><td>2</td><td>官网、学习平台页面底部显示 ICP / 公安备案号</td><td>备案要求</td><td><span class="tag todo">备案后 Eddie 加</span></td></tr>
+    <tr><td>3</td><td>官网字体、three.js 等外部资源改为本地提供</td><td>Google Fonts 国内不可用、cdnjs 慢</td><td><span class="tag ok">已完成（第 34 轮）</span></td></tr>
+    <tr><td>4</td><td>异地备份支持阿里云 OSS / 腾讯云 COS（rclone 服务商可配）</td><td>数据境内存储</td><td><span class="tag ok">已完成（第 34 轮）</span></td></tr>
+    <tr><td>5</td><td>国内不用 Claude（网关忽略钥匙、Moodle 停用 Claude 插件）；美国专用站点段按地区加载</td><td>合规、干净</td><td><span class="tag ok">已完成（第 34 轮）</span></td></tr>
+    <tr><td>5b</td><td>数字工厂镜像（ERPNext、MariaDB 等）同步到国内仓库</td><td>工厂单独部署，Docker Hub 国内拉不动</td><td><span class="tag todo">待做</span></td></tr>
     <tr><td>6</td><td>AI 课程负责人接入国内模型（DeepSeek 的工具调用）</td><td>国内也要“对话改课”</td><td><span class="tag todo">计划中</span></td></tr>
     <tr><td>7</td><td>看图类检查（插图切题）换国内多模态模型</td><td>只有文字模型时这项会受限</td><td><span class="tag todo">计划中</span></td></tr>
     <tr><td>8</td><td>收费改微信支付 / 支付宝</td><td>Stripe 国内不可用</td><td><span class="tag todo">计划中</span></td></tr>
@@ -499,13 +508,16 @@ docker image prune -a         <span class="c"># 删掉不用的旧镜像</span><
   <div class="card"><h3 style="margin-top:0">国内版 .env 关键项</h3><table>
     <tr><td><code>MOODLE_LANG=zh_cn</code> · <code>WQ_DEFAULT_LANG=zh</code></td><td>默认中文</td></tr>
     <tr><td><code>MOODLE_TIMEZONE=Asia/Shanghai</code></td><td>北京时间</td></tr>
+    <tr><td><code>WQ_REGION=cn</code></td><td>国内开关：只用已备案模型，不加载美国专用站点段</td></tr>
     <tr><td><code>DEEPSEEK_API_KEY=…</code> · <code>ANTHROPIC_API_KEY=</code>（空）</td><td>只用已备案模型</td></tr>
+    <tr><td><code>DB_IMAGE</code> · <code>REDIS_IMAGE</code> · <code>CADDY_IMAGE</code> · <code>RCLONE_IMAGE</code></td><td>基础镜像改从国内仓库拉</td></tr>
+    <tr><td><code>BACKUP_S3_PROVIDER=Alibaba</code></td><td>异地备份到阿里云 OSS</td></tr>
     <tr><td><code>WQ_LIBRARY_URL=https://factory.&lt;你的域名&gt;</code></td><td>零件库用自己的工厂（默认指向美国）</td></tr>
     <tr><td><code>WQ_GPU_PROVIDER=autodl</code></td><td>开 GPU 实验时</td></tr>
   </table></div>
 </section>
 
-<footer>问渠 WenQuest · 国内部署指南 · 2026-10-15 版 · 源文件：仓库 <code>docs/帮助/国内部署指南.html</code>（单文件，可离线打开）。合规内容为常见做法整理，以主管部门最新要求为准。</footer>
+<footer>问渠 WenQuest · 国内部署指南 · 2026-10-15 版（第 34 轮程序） · 源文件：仓库 <code>docs/帮助/国内部署指南.html</code>（单文件，可离线打开）。合规内容为常见做法整理，以主管部门最新要求为准。</footer>
 </main>
 
 <script>
@@ -597,18 +609,19 @@ docker image prune -a         <span class="c"># 删掉不用的旧镜像</span><
   function pass(n){var a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',r='',b=new Uint32Array(n);(window.crypto||window.msCrypto).getRandomValues(b);for(var i=0;i<n;i++)r+=a[b[i]%a.length];return r}
   var P={};function newp(){P={admin:pass(20),db:pass(24),sec:pass(48)}}newp();
   function env(){var v=function(id){return (document.getElementById(id).value||'').trim()};var d=v('e_dom')||'example.cn',reg=v('e_reg').replace(/\/$/,'');
-    var t=['# 问渠 · 国内部署 .env（由《国内部署指南》生成；只放在服务器上，chmod 600）',
+    var t=['# 问渠 · 国内部署 .env（由《国内部署指南》生成；只放在服务器上，chmod 600）','WQ_REGION=cn',
     'MOODLE_WWWROOT=https://classic.'+d,'HTTP_PORT=8080','MOODLE_SSLPROXY=true','MOODLE_SITE_NAME='+(v('e_name')||'问渠 WenQuest'),'MOODLE_SITE_SHORTNAME=wenquest',
     'MOODLE_LANG=zh_cn','MOODLE_TIMEZONE=Asia/Shanghai','','SITE_DOMAIN='+d,'ACME_EMAIL='+v('e_mail'),
     'ENGINE_IMAGE='+(reg?reg+'/engine:<版本号>':''),'GATEWAY_IMAGE=','WEB_IMAGE=','ANIMATOR_IMAGE=','LABCHECK_IMAGE=','MICROSYNTH_IMAGE=','VOICE_IMAGE=',
-    '# 上面 7 个镜像由 deploy/update.sh <engine 镜像地址> 自动写入','',
+    '# 上面 7 个镜像由 deploy/update.sh <engine 镜像地址> 自动写入',
+    'DB_IMAGE='+(reg?reg+'/postgres:16-alpine':''),'REDIS_IMAGE='+(reg?reg+'/redis:7-alpine':''),'CADDY_IMAGE='+(reg?reg+'/caddy:2':''),'RCLONE_IMAGE='+(reg?reg+'/rclone:1':''),'',
     'APP_URL=https://learn.'+d,'APP_PORT=8088','WQ_SECRET_KEY='+P.sec,'WQ_DEFAULT_LANG=zh','WQ_PUBLIC_URL=https://learn.'+d,'',
     'MOODLE_ADMIN_USER=admin','MOODLE_ADMIN_PASSWORD='+P.admin,'MOODLE_ADMIN_EMAIL='+v('e_mail'),'',
     'DB_NAME=moodle','DB_USER=moodle','DB_PASSWORD='+P.db,'',
     '# 国内只用已备案模型：Claude 一律留空','ANTHROPIC_API_KEY=','CLAUDE_MODEL=claude-sonnet-5','DEEPSEEK_API_KEY='+v('e_ds'),'',
     'SMTP_HOST='+v('e_smtp'),'SMTP_PORT='+(v('e_port')||'465'),'SMTP_SECURE='+((v('e_port')||'465')==='465'?'ssl':'tls'),'SMTP_USER='+v('e_su'),'SMTP_PASSWORD=<发信密码>',
     'MOODLE_NOREPLY_EMAIL='+(v('e_su')||'noreply@'+d),'WQ_ADMIN_EMAIL='+v('e_mail'),'',
-    'BACKUP_KEEP_COUNT=10','BACKUP_KEEP_DAILY=7','BACKUP_MIN_FREE_PCT=15','BACKUP_S3_ENDPOINT='+v('e_s3'),'BACKUP_S3_BUCKET='+v('e_bk'),
+    'BACKUP_KEEP_COUNT=10','BACKUP_KEEP_DAILY=7','BACKUP_MIN_FREE_PCT=15','BACKUP_S3_PROVIDER=Alibaba','BACKUP_S3_ENDPOINT='+v('e_s3'),'BACKUP_S3_BUCKET='+v('e_bk'),
     'BACKUP_S3_ACCESS_KEY=<AccessKey ID>','BACKUP_S3_SECRET_KEY=<AccessKey Secret>','BACKUP_S3_KEEP_DAYS=30','',
     'WQ_LIBRARY_URL=https://factory.'+d,'# 开 GPU 实验时：','WQ_GPU_PROVIDER=','WQ_GPU_AUTODL_TOKEN=','WQ_GPU_AUTODL_SPECS='];
     var pre=document.getElementById('e_out');var btn=pre.querySelector('button.cp');pre.textContent=t.join('\n');if(btn)pre.appendChild(btn)}

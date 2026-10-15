@@ -276,4 +276,5 @@ def test_chinese_file_names_are_served(client):
 def test_health_reports_ai_provider_without_secrets(client):
     r = client.get("/api/health").json()
     assert r["ok"] is True and r["ai"] in ("claude", "deepseek", "fake", "none")
+    assert r["region"] == "us"   # 第 34 轮：不写 WQ_REGION = 美国，行为不变
     assert "key" not in str(r).lower()

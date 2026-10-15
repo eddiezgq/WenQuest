@@ -64,7 +64,9 @@ def script(lang, index=False):
                      ("'质量'", "'Quality'"), ("'安全'", "'Safety'"), ("'能源'", "'Energy'"), ("'现金'", "'Cash'"),
                      ("'厂情中枢'", "'Factory hub'"), ("'异常：'", "'Exception: '")):
             s = s.replace(a, b)
-    return '<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>' + s
+    # 第 34 轮：KaTeX 由自己的服务器提供（/vendor/）；书页存到本机打开时再试原来的 CDN
+    return ('<script src="/vendor/katex/0.16.9/katex.min.js"></script><script>window.katex||document.write('
+            "'<scr'+'ipt src=\"https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js\"></scr'+'ipt>')</script>" + s)
 
 def eyebrow(lang, n):
     p = part_of(n)

@@ -42,7 +42,7 @@ from . import textbook_api
 from . import tasks_api
 from .ai import ModelGateway
 from .mailer import Mailer
-from .config import Settings, get_settings
+from .config import Settings, get_settings, model_choice
 from .moodle import EngineError, MoodleClient
 from .multilang import plain, resolve
 from .session import Session, SessionCodec
@@ -73,7 +73,8 @@ async def lifespan(app: FastAPI):
     state.http = httpx.AsyncClient(timeout=s.http_timeout, follow_redirects=False)
     state.moodle = MoodleClient(s.moodle_url, s.moodle_service, state.http, s.moodle_connect_url)
     state.codec = SessionCodec(s.secret_key, s.session_days)
-    state.ai = ModelGateway(s.ai_provider, state.http, anthropic_key=s.anthropic_api_key,
+    provider, anthropic_key = model_choice(s)
+    state.ai = ModelGateway(provider, state.http, anthropic_key=anthropic_key,
                             claude_model=s.claude_model, deepseek_key=s.deepseek_api_key,
                             deepseek_model=s.deepseek_model, timeout=s.ai_timeout,
                             fake_delay=s.ai_fake_delay)
@@ -257,7 +258,7 @@ def register(app: FastAPI) -> None:
                 voice = r.json() if r.status_code == 200 else "down"
             except (httpx.HTTPError, ValueError):
                 voice = "down"
-        return {"ok": True, "version": VERSION, "ai": state.ai.provider, "slides": state.slides.available,
+        return {"ok": True, "version": VERSION, "ai": state.ai.provider, "region": state.settings.region, "slides": state.slides.available,
                 "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck, "voice": voice}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)

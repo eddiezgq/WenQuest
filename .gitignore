@@ -9,3 +9,6 @@ textbook/build/
 textbook/tools/node_modules/
 MUJOCO_LOG.TXT
 factory/plants/_local/
+tools/vendor/node_modules/
+# 字体与外部库由部署流程生成（第 34 轮，tools/vendor/build.py）
+site/vendor/

@@ -16,6 +16,15 @@
 	}
 }
 
+# Fonts and libraries in site/vendor/ (round 34): same files for the website and learn.; readable from
+# sandboxed lab pages (their origin is opaque), cached for a month (file names carry the version).
+(vendor_files) {
+	header Access-Control-Allow-Origin "*"
+	header Cache-Control "public, max-age=2592000"
+	root * /srv/site
+	file_server
+}
+
 # Academy website (static files in site/).
 {$SITE_DOMAIN} {
 	import security_headers
@@ -23,6 +32,10 @@
 	# Sign-in state for the website header (who is signed in, sign out): same gateway as the platform.
 	handle /api/v1/auth/* {
 		reverse_proxy web:80
+	}
+	# 字体与外部库（第 34 轮，tools/vendor 生成）：不再从 Google、cdnjs 取
+	handle /vendor/* {
+		import vendor_files
 	}
 	# Public forms of the website (第 20 轮: interest registration for the sewing-machine kits).
 	handle /api/v1/public/* {
@@ -46,7 +59,13 @@ learn.{$SITE_DOMAIN} {
 	request_body {
 		max_size 200MB
 	}
-	reverse_proxy web:80
+	# 网页版教材、实验页用的字体与外部库，和官网同一份（第 34 轮）
+	handle /vendor/* {
+		import vendor_files
+	}
+	handle {
+		reverse_proxy web:80
+	}
 }
 
 # Classic view (Moodle): course authoring for teachers and activities the new app does not cover yet.
@@ -156,11 +175,5 @@ demo-erp.{$SITE_DOMAIN} {
 	}
 }
 
-# QMS demo (a separate project on the same server, reached over the external qms-edge network).
-qms.wenquestrobotics.com {
-	encode gzip
-	request_body {
-		max_size 100MB
-	}
-	reverse_proxy qms-demo-edge:80
-}
+# 按部署地区引入的其他站点（第 34 轮）：WQ_REGION 不写 = us（美国服务器上另外的项目，如 QMS 演示）；cn = 没有。
+import caddy-extra/{$WQ_REGION:us}/*.caddy

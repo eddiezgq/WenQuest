@@ -27,6 +27,8 @@ dc pull --quiet moodle gateway web animator labcheck voice micro-synth
 # The web server also serves the digital factory (factory./erp.), reached over this network; create it
 # if the factory has not been installed yet, so the web server can start either way.
 docker network inspect factory-edge >/dev/null 2>&1 || docker network create factory-edge >/dev/null 2>&1 || true
+# The QMS demo network exists on the US server; elsewhere (a new or China server) an empty one lets the web server start.
+docker network inspect qms-edge >/dev/null 2>&1 || docker network create qms-edge >/dev/null 2>&1 || true
 
 # Digital factory course API (factory round 4, C2): copy its read-only key so the gateway can call
 # https://factory.<domain>/api/course/*. The factory generates the key on its own deploys.

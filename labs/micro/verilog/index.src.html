@@ -108,7 +108,8 @@ const SYNTH_URL = (() => {
 const FORCE = new URLSearchParams(location.search).get('mode');
 const PHONE = (navigator.userAgentData && navigator.userAgentData.mobile) || (matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 820);
 const LOCAL_LIMIT_MS = 15000;
-state.mode = FORCE === 'browser' || FORCE === 'server' ? FORCE : (SYNTH_URL && PHONE ? 'server' : 'browser');
+// 国内部署（第 34 轮）：网关送出 window.WQ_SYNTH_PREFER = 'server'，电脑也走服务器综合（公共 CDN 上 15.5 MB 的 Yosys 在国内下载太慢）
+state.mode = FORCE === 'browser' || FORCE === 'server' ? FORCE : (SYNTH_URL && (PHONE || window.WQ_SYNTH_PREFER === 'server') ? 'server' : 'browser');
 if (state.mode === 'server' && !SYNTH_URL) state.mode = 'browser';
 window.VERILOG_MODE = state.mode;   // 自动测试读取
 document.querySelectorAll('[data-ex]').forEach((b) => (b.onclick = () => {

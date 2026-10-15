@@ -4,7 +4,7 @@
 # stops publishing the app and Moodle ports directly; everything goes through Caddy on 80/443.
 services:
   caddy:
-    image: caddy:2
+    image: ${CADDY_IMAGE:-caddy:2}
     restart: unless-stopped
     depends_on:
       - moodle
@@ -16,6 +16,8 @@ services:
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN in .env}
       ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+      # 按地区引入 deploy/caddy-extra/<us|cn>/ 里的站点（第 34 轮）
+      WQ_REGION: ${WQ_REGION:-us}
     volumes:
       # The folder, not the single file: a deploy replaces deploy/Caddyfile with a new file, and a
       # single-file mount would keep showing Caddy the old one (so "caddy reload" changed nothing).

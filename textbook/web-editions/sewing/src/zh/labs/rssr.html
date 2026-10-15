@@ -6,7 +6,7 @@
 </head>
 <body>
 <title>空间四杆机构实验</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=Noto+Serif+SC:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/noto-sans-sc.css"><link rel="stylesheet" href="/vendor/fonts/noto-serif-sc.css"><link rel="stylesheet" href="/vendor/fonts/jetbrains-mono.css">
 <style>
 /* Layout: guide + tasks rail | parameters, 3D view, four curves, step-by-step calculation */
 :root{
@@ -110,7 +110,7 @@ canvas.chart{display:block;width:100%;height:auto;border-radius:6px;background:v
   </div>
 </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/vendor/three/r128/three.min.js"></script><script>window.THREE||document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></scr'+'ipt>')</script>
 <script>
 (()=>{
 const D2R=Math.PI/180, OMEGA=2*Math.PI*7000/60;

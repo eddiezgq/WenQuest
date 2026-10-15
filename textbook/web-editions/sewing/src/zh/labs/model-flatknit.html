@@ -6,7 +6,7 @@
 </head>
 <body>
 <title>电脑横机三维结构</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="/vendor/fonts/noto-sans-sc.css"><link rel="stylesheet" href="/vendor/fonts/jetbrains-mono.css">
 <style>
 /* Layout: full-bleed 3D stage on the left with label overlay; a control rail on the right; stacks on phones */
 :root{
@@ -92,7 +92,7 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
   </div>
 </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/vendor/three/r128/three.min.js"></script><script>window.THREE||document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></scr'+'ipt>')</script>
 <script>
 (()=>{
 const T=THREE, D2R=Math.PI/180;

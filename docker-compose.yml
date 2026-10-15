@@ -1,7 +1,8 @@
 # WenQuest: one-command deployment.  Usage:  cp .env.example .env  (edit it)  &&  docker compose up -d --build
 services:
   db:
-    image: postgres:16-alpine
+    # 基础镜像可换成国内仓库里的同一版本（第 34 轮）；不写 = Docker Hub 上的官方镜像
+    image: ${DB_IMAGE:-postgres:16-alpine}
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-moodle}
@@ -15,7 +16,7 @@ services:
       retries: 20
 
   redis:
-    image: redis:7-alpine
+    image: ${REDIS_IMAGE:-redis:7-alpine}
     restart: unless-stopped
 
   moodle:
@@ -52,6 +53,8 @@ services:
       WQ_PUBLIC_URL: ${WQ_PUBLIC_URL:-}
       # AI course builder and (later) the AI tutor use the same keys as Moodle's AI features.
       WQ_ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      # 部署地区（第 34 轮）：cn = 国内，只用已备案模型（DeepSeek），Claude 钥匙即使填了也不用
+      WQ_REGION: ${WQ_REGION:-us}
       WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
       # The course lead (专家版) and the AI pre-review use the strongest model.
       WQ_LEAD_MODEL: ${LEAD_MODEL:-claude-opus-5-5}

@@ -96,7 +96,11 @@ def register(app, m) -> None:
         if not PAGE.exists():
             raise EngineError("unavailable", "the Verilog lab page is not installed on this site", 503)
         conf = (f"<script>window.WQ_SYNTH_URL = {json.dumps('/api/v1/micro-synth/' + signed)};"
-                f"window.WQ_SYNTH_ON = {json.dumps(bool(state.settings.microsynth_url))};</script>")
+                f"window.WQ_SYNTH_ON = {json.dumps(bool(state.settings.microsynth_url))};"
+                # 国内部署（第 34 轮）：仿真器从自己的服务器取，综合走服务器（公共 CDN 在国内太慢）
+                + ("window.WQ_ENGINE_BASE = '/vendor/npm/';window.WQ_SYNTH_PREFER = 'server';"
+                   if state.settings.region.strip().lower() == "cn" else "")
+                + "</script>")
         page = PAGE.read_text(encoding="utf-8").replace("<head>", "<head>" + conf, 1)
         return HTMLResponse(page, headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"})
 

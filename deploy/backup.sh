@@ -117,12 +117,12 @@ offsite() {
     docker run --rm \
         -v "$WQ_DIR/backups:/backups:ro" \
         -e RCLONE_CONFIG_OFFSITE_TYPE=s3 \
-        -e RCLONE_CONFIG_OFFSITE_PROVIDER=DigitalOcean \
+        -e RCLONE_CONFIG_OFFSITE_PROVIDER="$(envval BACKUP_S3_PROVIDER | grep . || echo DigitalOcean)" \
         -e RCLONE_CONFIG_OFFSITE_ENDPOINT="$ENDPOINT" \
         -e RCLONE_CONFIG_OFFSITE_ACCESS_KEY_ID="$(envval BACKUP_S3_ACCESS_KEY)" \
         -e RCLONE_CONFIG_OFFSITE_SECRET_ACCESS_KEY="$(envval BACKUP_S3_SECRET_KEY)" \
         -e RCLONE_CONFIG_OFFSITE_ACL=private \
-        rclone/rclone:1 "$@"
+        "$(envval RCLONE_IMAGE | grep . || echo rclone/rclone:1)" "$@"
 }
 if [ "$MODE" != daily ]; then
     log "Pre-deploy backups stay on this server; only daily backups go off-site."

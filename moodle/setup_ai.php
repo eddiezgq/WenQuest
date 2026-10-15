@@ -16,6 +16,8 @@
  *   CLAUDE_MODEL        default claude-sonnet-5
  *   CLAUDE_ENDPOINT     default https://api.anthropic.com/v1/messages
  *   DEEPSEEK_API_KEY    DeepSeek API key (optional, for deployments in mainland China)
+ *   WQ_REGION           us (default) or cn: in China only registered models are used, so Claude is never
+ *                       configured and an existing Claude provider is disabled (round 34)
  *   MOODLE_LANG         default zh_cn (used only if the language pack is installed)
  *   MOODLE_TIMEZONE     default Asia/Shanghai
  *
@@ -68,7 +70,16 @@ function wenquest_upsert_provider(\core_ai\manager $manager, string $classname, 
 }
 
 $configured = false;
-if ($key = getenv('ANTHROPIC_API_KEY')) {
+$china = strtolower(trim((string) getenv('WQ_REGION'))) === 'cn';
+if ($china) {
+    foreach ($manager->get_provider_instances(['provider' => 'aiprovider_claude\provider']) as $provider) {
+        if (method_exists($manager, 'disable_provider_instance')) {
+            $manager->disable_provider_instance($provider);
+        }
+        mtrace('WQ_REGION=cn: Claude provider disabled (only registered models in China).');
+    }
+}
+if (!$china && ($key = getenv('ANTHROPIC_API_KEY'))) {
     wenquest_upsert_provider($manager, 'aiprovider_claude\provider', 'Claude', $key, [
         'model' => getenv('CLAUDE_MODEL') ?: 'claude-sonnet-5',
         'endpoint' => getenv('CLAUDE_ENDPOINT') ?: 'https://api.anthropic.com/v1/messages',
