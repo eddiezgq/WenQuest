@@ -22,8 +22,8 @@
 
   function render(user) {
     var html = user
-      ? '<a class="wq-me" href="' + learn + '/pages/courses/courses"><span class="wq-av">' + esc((user.fullname || "?").trim().slice(0, 1)) +
-        "</span>" + esc(user.fullname) + "</a>" +
+      ? '<a class="wq-me" href="' + learn + '/pages/courses/courses" title="' + esc(user.fullname) + '"><span class="wq-av">' +
+        esc((user.fullname || "?").trim().slice(0, 1)) + '</span><span class="wq-name">' + esc(user.fullname) + "</span></a>" +
         '<a class="wq-up" href="' + learn + '/pages/courses/courses">' + T("进入学习平台", "Learning platform") + "</a>" +
         '<a href="#" data-wq-out>' + T("退出", "Sign out") + "</a>"
       : '<a href="' + learn + "/pages/login/login?back=" + here + '">' + T("登录", "Sign in") + "</a>" +

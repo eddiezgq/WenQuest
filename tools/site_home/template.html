@@ -154,6 +154,10 @@
   .brand, .brand b, .brand small, .lang { white-space: nowrap; flex: none; }
   html[lang="en"] nav.main .dd > a, html[lang="en"] nav.main .dd > button { font-size: 14px; padding: 10px 7px; }
   header.top .wrap { max-width: 1340px; }
+  /* 登录后顶栏只放头像（悬停显示姓名）、“进入学习平台”“退出”：顶栏一行放得下，不超出右边（2026-10-15） */
+  header.top .wq-auth .wq-name { display: none; }
+  header.top .wq-auth { gap: 10px; }
+  header.top:has(.wq-me) .brand small { display: none; }   /* 登录后再省出英文小字的位置，留足余量 */
   html[lang="en"] .brand small { display: none; }
   @media (max-width: 1439px) { .brand small { display: none; } header.top .wrap { gap: 12px; } }
   .burger { display: none; margin-left: auto; font: 500 14px/1 var(--body); color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 7px 12px; cursor: pointer; }
