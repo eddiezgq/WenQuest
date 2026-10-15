@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>问渠 · 国内部署指南</title>
+<style>
+:root{
+  --bg:#f6f4ef;--paper:#fffdf8;--ink:#1d2329;--muted:#5f6b76;--line:#e3ddd2;--soft:#f0ece4;
+  --accent:#0f6e74;--accent2:#c2410c;--gold:#b7791f;--ok:#1e8449;--bad:#b42318;--warn:#b7791f;
+  --side:#10181f;--side-ink:#d9e2e8;--side-muted:#8c9aa6;--side-hi:#f2b705;
+  --code:#0f1720;--code-ink:#e6edf3;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1216;--paper:#141b21;--ink:#e3e9ee;--muted:#9aa7b2;--line:#25313b;--soft:#1a232b;
+  --accent:#4cc3c9;--accent2:#f08c58;--gold:#e8b04b;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--code:#0a0f13}}
+:root[data-theme="dark"]{--bg:#0d1216;--paper:#141b21;--ink:#e3e9ee;--muted:#9aa7b2;--line:#25313b;--soft:#1a232b;
+  --accent:#4cc3c9;--accent2:#f08c58;--gold:#e8b04b;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--code:#0a0f13}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 var(--font)}
+a{color:var(--accent)}
+/* layout */
+aside{position:fixed;inset:0 auto 0 0;width:280px;background:var(--side);color:var(--side-ink);overflow:auto;padding:22px 0 40px;z-index:20}
+aside .brand{padding:0 22px 16px;border-bottom:1px solid #22303a;margin-bottom:10px}
+aside .brand b{display:block;font-size:20px;letter-spacing:.04em}
+aside .brand small{color:var(--side-muted);font-size:12.5px}
+aside .prog{margin:10px 22px 14px;font-size:12.5px;color:var(--side-muted)}
+aside .bar{height:6px;background:#22303a;border-radius:3px;overflow:hidden;margin-top:6px}
+aside .bar i{display:block;height:100%;width:0;background:var(--side-hi);transition:width .5s}
+aside nav a{display:flex;gap:10px;align-items:baseline;padding:6px 22px;color:var(--side-ink);text-decoration:none;font-size:14.5px;border-left:3px solid transparent}
+aside nav a .n{font:12px var(--mono);color:var(--side-muted);min-width:22px}
+aside nav a:hover{background:#18242d}
+aside nav a.on{border-left-color:var(--side-hi);background:#1b2a34;color:#fff}
+aside nav a.sub{padding-left:54px;font-size:13px;color:var(--side-muted)}
+aside nav a.sub.on{color:#fff}
+aside .tools{padding:16px 22px 0;display:flex;gap:8px;flex-wrap:wrap}
+aside .tools button{background:#1b2a34;color:var(--side-ink);border:1px solid #2c3d49;border-radius:6px;padding:5px 10px;font:13px var(--font);cursor:pointer}
+main{margin-left:280px;padding:0 0 120px}
+.hamb{display:none;position:fixed;top:10px;left:10px;z-index:30;background:var(--side);color:#fff;border:0;border-radius:8px;padding:8px 12px;font:14px var(--font)}
+@media (max-width:980px){aside{transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 40px rgba(0,0,0,.4)}aside.open{transform:none}main{margin-left:0}.hamb{display:block}}
+section{max-width:960px;margin:0 auto;padding:56px 32px 8px}
+@media (max-width:600px){section{padding:48px 16px 8px}}
+h1{font-size:40px;line-height:1.2;margin:0 0 10px}
+h2{font-size:28px;line-height:1.3;margin:0 0 6px;display:flex;gap:14px;align-items:baseline}
+h2 .n{font:600 15px var(--mono);color:var(--accent2)}
+h3{font-size:19px;margin:28px 0 8px}
+.lead{color:var(--muted);font-size:17px;margin:0 0 18px}
+p{margin:10px 0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:14px 0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.note{border-left:4px solid var(--accent);background:var(--soft);padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+.warn{border-left-color:var(--warn)}
+.danger{border-left-color:var(--bad)}
+.tag{display:inline-block;font:600 12px/1 var(--mono);padding:4px 7px;border-radius:4px;background:var(--soft);color:var(--muted);vertical-align:middle}
+.tag.ok{background:rgba(30,132,73,.12);color:var(--ok)}.tag.todo{background:rgba(183,121,31,.15);color:var(--warn)}.tag.no{background:rgba(180,35,24,.12);color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:15px;margin:10px 0}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:600}
+.tbl{overflow-x:auto}
+td code{word-break:break-all}
+.grid2>*,.grid3>*,.step>*{min-width:0}
+code{overflow-wrap:anywhere}
+.card{overflow-x:auto}
+main{overflow-x:hidden}
+code{font:14px var(--mono);background:var(--soft);padding:1px 5px;border-radius:4px}
+pre{position:relative;background:var(--code);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow:auto;font:13.5px/1.6 var(--mono);margin:12px 0}
+pre .c{color:#7d8b97}
+pre button.cp{position:absolute;top:8px;right:8px;background:#22303a;color:#d9e2e8;border:1px solid #33444f;border-radius:6px;padding:3px 9px;font:12px var(--font);cursor:pointer}
+pre button.cp.done{background:var(--ok);color:#fff}
+.step{display:grid;grid-template-columns:44px 1fr;gap:14px;margin:16px 0}
+.step .k{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;font:700 17px var(--mono)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+.chk input{margin-top:6px;width:18px;height:18px;accent-color:var(--accent)}
+.chk.done span{color:var(--muted);text-decoration:line-through}
+details{background:var(--paper);border:1px solid var(--line);border-radius:10px;margin:10px 0;padding:0 18px}
+details summary{cursor:pointer;padding:14px 0;font-weight:600;list-style:none}
+details summary::before{content:"▸";display:inline-block;width:18px;color:var(--accent);transition:transform .2s}
+details[open] summary::before{transform:rotate(90deg)}
+details>div{padding:0 0 14px}
+label.f{display:block;font-size:14px;color:var(--muted);margin:10px 0 4px}
+input.t,select.t{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:15px var(--font)}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:8px;padding:9px 16px;font:15px var(--font);cursor:pointer;margin:6px 6px 0 0}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.hero{background:linear-gradient(135deg,#10181f,#16313a);color:#eef3f6;border-radius:0 0 22px 22px;margin:0 0 10px;padding:56px 32px 46px;max-width:none}
+.hero .wrap{max-width:900px;margin:0 auto}
+.hero .kick{font:600 13px var(--mono);letter-spacing:.12em;color:#f2b705}
+.hero p{color:#b8c6d0}
+.hero .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}
+.hero .facts div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px}
+.hero .facts b{display:block;font-size:24px;color:#fff}
+.hero .facts span{font-size:13px;color:#a9b8c3}
+@media (max-width:760px){.hero .facts{grid-template-columns:1fr 1fr}}
+/* diagrams */
+svg text{font-family:var(--font)}
+.diagram{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;margin:14px 0}
+.node rect{fill:var(--soft);stroke:var(--line);stroke-width:1.5;transition:all .2s}
+.node{cursor:pointer}
+.node:hover rect,.node.on rect{stroke:var(--accent);stroke-width:2.5;fill:var(--paper)}
+.node text{fill:var(--ink);font-size:14px}
+.node text.s{fill:var(--muted);font-size:11.5px}
+.wire{stroke:var(--line);stroke-width:2;fill:none}
+.pkt{fill:var(--accent2)}
+#archInfo{min-height:72px}
+.flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.seg{flex:1 1 120px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;min-width:120px;transition:all .35s}
+.seg b{display:block}
+.seg.lit{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,110,116,.15)}
+.seg.blocked{border-color:var(--bad);box-shadow:0 0 0 3px rgba(180,35,24,.15)}
+.arrow{color:var(--muted)}
+.gantt{position:relative;margin:12px 0}
+.gantt .row{display:grid;grid-template-columns:200px 1fr;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.gantt .track{position:relative;height:26px;background:var(--soft);border-radius:6px}
+.gantt .b{position:absolute;top:0;height:100%;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;padding:3px 8px;white-space:nowrap;overflow:hidden;width:0;transition:width 1.1s ease}
+.gantt .b.alt{background:var(--gold)}.gantt .b.red{background:var(--accent2)}
+.gantt .axis{display:grid;grid-template-columns:200px 1fr;gap:10px;font:12px var(--mono);color:var(--muted)}
+.gantt .axis div:last-child{display:flex;justify-content:space-between}
+@media (max-width:640px){.gantt .row,.gantt .axis{grid-template-columns:110px 1fr}}
+.out{background:var(--soft);border-radius:10px;padding:14px 16px;margin-top:12px}
+.big{font:700 28px var(--mono);color:var(--accent)}
+.meter{height:10px;background:var(--soft);border-radius:5px;overflow:hidden;margin:6px 0}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));width:0;transition:width .5s}
+.fade{opacity:0;transform:translateY(14px);transition:opacity .6s,transform .6s}
+.fade.in{opacity:1;transform:none}
+footer{max-width:960px;margin:40px auto 0;padding:0 32px;color:var(--muted);font-size:13px}
+@media print{aside,.hamb,.btn,pre button.cp{display:none!important}main{margin:0}.fade{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<button class="hamb" id="hamb" type="button">☰ 目录</button>
+<aside id="side">
+  <div class="brand"><b>问渠 · 国内部署指南</b><small>学习平台 · 数字工厂 · 合规备案 · 运维</small></div>
+  <div class="prog">部署进度（第 3 节的清单）<span id="progTxt">0 / 0</span><div class="bar"><i id="progBar"></i></div></div>
+  <nav id="toc"></nav>
+  <div class="tools"><button type="button" id="themeBtn">深色 / 浅色</button><button type="button" onclick="window.print()">打印</button><button type="button" id="resetBtn">清空勾选</button></div>
+</aside>
+
+<main>
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="kick">WENQUEST · 部署到中国大陆</div>
+    <h1>问渠国内部署指南</h1>
+    <p>把问渠学习平台（以及可选的数字工厂）部署到国内云服务器上：从办手续、选服务器、拿镜像，到填配置、上线、日常运维。每一步都有可以照做的命令。本页是一个文件，断网也能打开；左边目录随时跳转，勾选的进度保存在你这台电脑的浏览器里。</p>
+    <div class="facts">
+      <div><b>1–3 周</b><span>ICP 备案（常见情况，最长的一环）</span></div>
+      <div><b>1 天</b><span>技术部署（镜像就绪后）</span></div>
+      <div><b>8 核 16 GB</b><span>完整版建议起步（含数字工厂）</span></div>
+      <div><b>DeepSeek</b><span>国内只用已备案模型</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="s0" class="fade">
+  <h2><span class="n">00</span>先说清楚：现在到哪一步了</h2>
+  <p class="lead">问渠目前跑在美国的服务器上，<b>国内还没有实际部署过</b>。本指南按现有部署程序（<code>deploy/</code> 目录）和国内要求整理。</p>
+  <div class="grid3">
+    <div class="card"><span class="tag ok">可直接用</span><p>部署脚本、服务器初始化、配置文件、备份恢复、回退、状态检查；DeepSeek 接入；本地语音合成（不出服务器）；数字工厂的 DeepSeek 助手。</p></div>
+    <div class="card"><span class="tag todo">要先改程序</span><p>镜像推到国内仓库（现在推到海外的 ghcr.io）；官网字体改为本地；异地备份支持阿里云 OSS；国内部署包去掉 Claude 插件。见第 13 节。</p></div>
+    <div class="card"><span class="tag no">国内暂不可用</span><p>AI 课程负责人（第 31 轮的对话改课，目前要 Claude）退回到原来的固定流程；看图类自动检查要换国内多模态模型；Stripe 收费。</p></div>
+  </div>
+  <div class="note warn"><b>标 ⚠ 的步骤</b>需要先改程序或先在国内服务器上实测一次。合规部分是常见做法的整理，<b>具体以属地主管部门和云服务商的要求为准</b>，正式办理前先咨询。</div>
+</section>
+
+<section id="s1" class="fade">
+  <h2><span class="n">01</span>国内和美国部署有什么不同</h2>
+  <p class="lead">技术上是同一套程序，差别主要在网络、模型和手续。</p>
+  <div class="tbl"><table>
+    <tr><th>方面</th><th>美国（现在）</th><th>国内</th></tr>
+    <tr><td>服务器</td><td>DigitalOcean</td><td>阿里云 / 腾讯云 / 华为云 国内地域的云服务器</td></tr>
+    <tr><td>域名开通 80/443</td><td>解析即可</td><td><b>先 ICP 备案</b>，未备案的域名在国内服务器上无法访问</td></tr>
+    <tr><td>大模型</td><td>Claude</td><td><b>只用已备案模型</b>：DeepSeek（已接入）、通义千问等</td></tr>
+    <tr><td>镜像仓库</td><td>ghcr.io（GitHub）</td><td>国内访问不稳定 → 阿里云容器镜像服务 ACR 等 ⚠</td></tr>
+    <tr><td>Docker Hub 基础镜像</td><td>直接拉</td><td>国内基本拉不动 → 用云厂商镜像加速或预先转存</td></tr>
+    <tr><td>证书</td><td>Caddy 自动申请</td><td>同样自动（Let's Encrypt）；备案通过后才能完成验证</td></tr>
+    <tr><td>发信</td><td>Postmark 等，2525 端口</td><td>阿里云邮件推送、腾讯企业邮等国内服务</td></tr>
+    <tr><td>异地备份</td><td>DigitalOcean Spaces</td><td>阿里云 OSS / 腾讯云 COS（S3 兼容）⚠</td></tr>
+    <tr><td>GPU 实验</td><td>Lambda</td><td>AutoDL（已接入，<code>WQ_GPU_PROVIDER=autodl</code>）</td></tr>
+    <tr><td>默认语言、时区</td><td>按站点</td><td><code>zh_cn</code>、<code>Asia/Shanghai</code></td></tr>
+  </table></div>
+</section>
+
+<section id="s2" class="fade">
+  <h2><span class="n">02</span>架构一图看懂</h2>
+  <p class="lead">点任何一个方块看它是什么、要多少资源。橙色的点是一次请求的流向。</p>
+  <div class="diagram">
+  <svg viewBox="0 0 900 470" width="100%" id="arch" role="img" aria-label="问渠部署架构">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9aa7b2"/></marker></defs>
+    <path id="w1" class="wire" d="M120 70 L300 70" marker-end="url(#ar)"/>
+    <path id="w2" class="wire" d="M420 70 L560 70 L560 150" marker-end="url(#ar)"/>
+    <path id="w3" class="wire" d="M360 95 L360 150" marker-end="url(#ar)"/>
+    <path id="w4" class="wire" d="M360 200 L360 255" marker-end="url(#ar)"/>
+    <path id="w5" class="wire" d="M420 280 L520 280" marker-end="url(#ar)"/>
+    <path id="w6" class="wire" d="M300 280 L200 280 L200 350" marker-end="url(#ar)"/>
+    <path id="w7" class="wire" d="M600 175 L760 175 L760 255" marker-end="url(#ar)"/>
+    <path id="w8" class="wire" d="M360 305 L360 350" marker-end="url(#ar)"/>
+    <path id="w9" class="wire" d="M420 70 L760 70 L760 150" marker-end="url(#ar)"/>
+    <g class="node" data-k="user"><rect x="10" y="45" width="110" height="50" rx="10"/><text x="65" y="68" text-anchor="middle">老师 · 学生</text><text class="s" x="65" y="85" text-anchor="middle">浏览器 / 小程序</text></g>
+    <g class="node" data-k="caddy"><rect x="300" y="45" width="120" height="50" rx="10"/><text x="360" y="68" text-anchor="middle">Caddy</text><text class="s" x="360" y="85" text-anchor="middle">80/443 · 自动证书</text></g>
+    <g class="node" data-k="site"><rect x="500" y="150" width="120" height="50" rx="10"/><text x="560" y="173" text-anchor="middle">官网</text><text class="s" x="560" y="190" text-anchor="middle">静态页面 site/</text></g>
+    <g class="node" data-k="web"><rect x="300" y="150" width="120" height="50" rx="10"/><text x="360" y="173" text-anchor="middle">网页端 web</text><text class="s" x="360" y="190" text-anchor="middle">learn. 子域名</text></g>
+    <g class="node" data-k="gateway"><rect x="300" y="255" width="120" height="50" rx="10"/><text x="360" y="278" text-anchor="middle">接口网关</text><text class="s" x="360" y="295" text-anchor="middle">gateway · AI 服务层</text></g>
+    <g class="node" data-k="model"><rect x="520" y="255" width="140" height="50" rx="10"/><text x="590" y="278" text-anchor="middle">DeepSeek</text><text class="s" x="590" y="295" text-anchor="middle">已备案模型（云端）</text></g>
+    <g class="node" data-k="moodle"><rect x="140" y="350" width="120" height="50" rx="10"/><text x="200" y="373" text-anchor="middle">Moodle</text><text class="s" x="200" y="390" text-anchor="middle">教学引擎 · classic.</text></g>
+    <g class="node" data-k="db"><rect x="140" y="415" width="120" height="44" rx="10"/><text x="200" y="442" text-anchor="middle">PostgreSQL · Redis</text></g>
+    <g class="node" data-k="workers"><rect x="290" y="350" width="150" height="50" rx="10"/><text x="365" y="373" text-anchor="middle">工作服务</text><text class="s" x="365" y="390" text-anchor="middle">动画 · 实验检查 · 语音 · 综合</text></g>
+    <g class="node" data-k="factory"><rect x="700" y="150" width="140" height="50" rx="10"/><text x="770" y="173" text-anchor="middle">数字工厂（可选）</text><text class="s" x="770" y="190" text-anchor="middle">factory. · erp.</text></g>
+    <g class="node" data-k="erp"><rect x="700" y="255" width="140" height="50" rx="10"/><text x="770" y="278" text-anchor="middle">ERPNext · 总线</text><text class="s" x="770" y="295" text-anchor="middle">MariaDB · MQTT · CAE</text></g>
+    <circle r="6" class="pkt"><animateMotion dur="1.4s" repeatCount="indefinite"><mpath href="#w1"/></animateMotion></circle>
+    <circle r="6" class="pkt"><animateMotion dur="1.4s" begin=".7s" repeatCount="indefinite"><mpath href="#w3"/></animateMotion></circle>
+    <circle r="6" class="pkt"><animateMotion dur="1.4s" begin="1.1s" repeatCount="indefinite"><mpath href="#w4"/></animateMotion></circle>
+    <circle r="6" class="pkt"><animateMotion dur="1.6s" begin="1.5s" repeatCount="indefinite"><mpath href="#w5"/></animateMotion></circle>
+    <circle r="6" class="pkt"><animateMotion dur="1.6s" begin="1.8s" repeatCount="indefinite"><mpath href="#w6"/></animateMotion></circle>
+    <circle r="5" class="pkt" style="fill:var(--gold)"><animateMotion dur="2.2s" begin=".3s" repeatCount="indefinite"><mpath href="#w9"/></animateMotion></circle>
+  </svg>
+  <div id="archInfo" class="out">点上面的方块。</div>
+  </div>
+</section>
+
+<section id="s3" class="fade">
+  <h2><span class="n">03</span>准备清单</h2>
+  <p class="lead">逐项勾选，进度显示在左上角。勾选只保存在你这台电脑的浏览器里。</p>
+  <div class="grid2">
+    <div class="card"><h3 style="margin-top:0">主体与手续</h3><div class="chklist" data-g="a">
+      <label class="chk"><input type="checkbox"><span>运营主体（公司或学校）的营业执照 / 事业单位法人证书</span></label>
+      <label class="chk"><input type="checkbox"><span>负责人身份证、手机号（备案要人脸核验）</span></label>
+      <label class="chk"><input type="checkbox"><span>域名已实名认证，且在同一主体名下</span></label>
+      <label class="chk"><input type="checkbox"><span>ICP 备案已通过，拿到备案号</span></label>
+      <label class="chk"><input type="checkbox"><span>隐私政策、用户协议（中文）已准备</span></label>
+    </div></div>
+    <div class="card"><h3 style="margin-top:0">技术资源</h3><div class="chklist" data-g="b">
+      <label class="chk"><input type="checkbox"><span>国内云服务器（Ubuntu 24.04，见第 5 节选配置）</span></label>
+      <label class="chk"><input type="checkbox"><span>DeepSeek API Key（platform.deepseek.com）</span></label>
+      <label class="chk"><input type="checkbox"><span>容器镜像仓库：阿里云 ACR 个人版或企业版 ⚠</span></label>
+      <label class="chk"><input type="checkbox"><span>发信服务：阿里云邮件推送 / 腾讯企业邮等</span></label>
+      <label class="chk"><input type="checkbox"><span>对象存储（异地备份）：阿里云 OSS / 腾讯云 COS</span></label>
+      <label class="chk"><input type="checkbox"><span>（可选）AutoDL 账号，开 GPU 实验</span></label>
+    </div></div>
+  </div>
+</section>
+
+<section id="s4" class="fade">
+  <h2><span class="n">04</span>合规与备案</h2>
+  <p class="lead">技术部署一天能完成，手续才是最长的一环。下图是常见的先后顺序和耗时，滚到这里时会动起来。</p>
+  <div class="gantt" id="gantt">
+    <div class="axis"><div></div><div><span>第 0 周</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span><span>12 周</span></div></div>
+    <div class="row"><div>域名实名 · 云服务器</div><div class="track"><div class="b" data-l="0" data-w="6">1–3 天</div></div></div>
+    <div class="row"><div>ICP 备案</div><div class="track"><div class="b red" data-l="3" data-w="22">1–3 周（管局审核）</div></div></div>
+    <div class="row"><div>技术部署与试运行</div><div class="track"><div class="b" data-l="24" data-w="6">1–3 天</div></div></div>
+    <div class="row"><div>公安联网备案</div><div class="track"><div class="b alt" data-l="28" data-w="18">上线后 30 日内</div></div></div>
+    <div class="row"><div>AI 服务属地登记</div><div class="track"><div class="b alt" data-l="24" data-w="24">按属地网信部门要求</div></div></div>
+    <div class="row"><div>小程序备案（如上小程序）</div><div class="track"><div class="b alt" data-l="10" data-w="16">1–2 周</div></div></div>
+    <div class="row"><div>等级保护测评</div><div class="track"><div class="b red" data-l="30" data-w="60">定级备案 + 测评，常需数月</div></div></div>
+  </div>
+  <details open><summary>ICP 备案（必须，最先办）</summary><div>
+    <p>在国内服务器上用域名对外提供网站，必须先做 ICP 备案。在购买服务器的云服务商控制台里办理（阿里云、腾讯云都有“备案”入口）：填主体信息和网站信息 → 人脸核验 → 云服务商初审 → 通信管理局审核。</p>
+    <p>问渠用到的网址都在一个主域名下（官网、<code>learn.</code>、<code>classic.</code>，装数字工厂还有 <code>factory.</code>、<code>erp.</code> 等），<b>备案主域名一次即可</b>。网站名称、内容描述按“在线教育 / 教学平台”如实填写。</p>
+    <p>备案通过后，<b>官网和学习平台页面底部要显示备案号并链接到工信部备案系统</b>（beian.miit.gov.cn）。<span class="tag todo">⚠ 待改</span> 现在页面底部没有备案号的位置，上线前要加。</p>
+  </div></details>
+  <details><summary>公安联网备案</summary><div>
+    <p>网站开通后 30 日内，到“全国互联网安全管理服务平台”办理，通过后页面底部同样要显示公安备案号。</p>
+  </div></details>
+  <details><summary>生成式 AI：只用已备案模型、属地登记、内容标识</summary><div>
+    <ul>
+      <li><b>只调用已备案的大模型</b>：问渠国内部署用 DeepSeek（<code>.env</code> 里只填 <code>DEEPSEEK_API_KEY</code>，<code>ANTHROPIC_API_KEY</code> 留空）。数字工厂的 AI 助手会自动沿用这把钥匙。</li>
+      <li><b>属地登记</b>：面向公众、调用已备案模型的应用，很多地方要求上线前到属地网信部门登记。各地做法不一，先电话咨询。</li>
+      <li><b>AI 生成内容标识</b>：AI 写的课程内容、回答要能让人看出是 AI 生成的。问渠的 AI 助教回答注明出处、AI 建课的课时要经老师审核和课程委员会批准才发布；对外上线前再核对一遍界面上的标识是否符合最新要求。</li>
+    </ul>
+  </div></details>
+  <details><summary>网络安全等级保护（等保）</summary><div>
+    <p>面向学校的教学平台，通常要定级（多为二级或三级）、到公安机关备案、请测评机构测评。学校客户常会要求测评报告。问渠在设计上按三级准备：不改 Moodle 核心、操作留痕、每日备份、只开 22/80/443 端口、SSH 只允许密钥登录（服务器初始化脚本已做）。</p>
+  </div></details>
+  <details><summary>个人信息保护与数据境内存储</summary><div>
+    <ul>
+      <li>学生、老师的数据只存在国内服务器和国内对象存储里；异地备份不要再传到境外。</li>
+      <li>注册页要有隐私政策和用户协议并取得同意；未成年人（中学合作）另有要求。</li>
+      <li>国内部署时，<b>不要</b>把服务器上的数据传回美国的问渠服务器做 AI 处理。</li>
+    </ul>
+  </div></details>
+</section>
+
+<section id="s5" class="fade">
+  <h2><span class="n">05</span>选服务器</h2>
+  <p class="lead">按你要开的功能和同时在线人数估算。数字是按各服务的内存上限和经验估的，正式上线前建议做一次压力测试。</p>
+  <div class="card">
+    <div class="grid2">
+      <div>
+        <label class="chk"><input type="checkbox" id="m_base" checked disabled><span>学习平台基础（Moodle、数据库、网关、网页、官网）</span></label>
+        <label class="chk"><input type="checkbox" id="m_anim" checked><span>动画渲染（AI 建课的 Manim 动画）</span></label>
+        <label class="chk"><input type="checkbox" id="m_lab" checked><span>实验检查（虚拟实验自动试运行）</span></label>
+        <label class="chk"><input type="checkbox" id="m_voice" checked><span>语音（讲解视频配音、字幕）</span></label>
+        <label class="chk"><input type="checkbox" id="m_micro"><span>微电子综合（Verilog）</span></label>
+        <label class="chk"><input type="checkbox" id="m_fac"><span>数字工厂（ERPNext、总线、仿真计算）</span></label>
+      </div>
+      <div>
+        <label class="f">班级工厂数量（装数字工厂时）</label><input class="t" type="number" id="m_cls" value="0" min="0" max="40">
+        <label class="f">同一时刻在线学习的人数</label><input class="t" type="range" id="m_users" min="50" max="3000" step="50" value="300"><div>约 <b id="m_usersTxt">300</b> 人</div>
+        <label class="f">同时看讲课视频的比例</label><input class="t" type="range" id="m_video" min="0" max="100" step="5" value="30"><div><b id="m_videoTxt">30</b>%</div>
+      </div>
+    </div>
+    <div class="out">
+      <div class="grid3">
+        <div>建议规格<div class="big" id="r_spec">—</div></div>
+        <div>系统盘 / 数据盘<div class="big" id="r_disk">—</div></div>
+        <div>公网带宽<div class="big" id="r_bw">—</div></div>
+      </div>
+      <div style="margin-top:8px">内存需求 <span id="r_mem"></span><div class="meter"><i id="r_meter"></i></div></div>
+      <p id="r_note" style="color:var(--muted);font-size:14px"></p>
+    </div>
+  </div>
+  <div class="note">选 <b>Ubuntu 24.04 64 位</b>（部署脚本按它写的）；地域选离用户近的（华东、华南、华北）；安全组只放行 <b>22、80、443（TCP）和 443（UDP）</b>。带宽：视频多就选“按流量计费”并设上限，或把讲课视频放到对象存储 + CDN（更省）。</div>
+</section>
+
+<section id="s6" class="fade">
+  <h2><span class="n">06</span>域名解析</h2>
+  <p class="lead">输入主域名和服务器公网 IP，生成要添加的解析记录。</p>
+  <div class="card">
+    <div class="grid2"><div><label class="f">主域名（不带 www）</label><input class="t" id="d_dom" placeholder="例如 wenqu-edu.cn" value="example.cn"></div>
+    <div><label class="f">服务器公网 IP</label><input class="t" id="d_ip" placeholder="例如 47.100.1.2" value="47.100.0.1"></div></div>
+    <label class="chk"><input type="checkbox" id="d_fac"><span>装数字工厂（加 factory、erp、demo、班级工厂的通配符）</span></label>
+    <div class="tbl"><table id="d_tbl"><thead><tr><th>主机记录</th><th>类型</th><th>记录值</th><th>用途</th></tr></thead><tbody></tbody></table></div>
+  </div>
+  <div class="note warn">备案通过前，国内服务器上的 80/443 会被云服务商拦截，证书也申请不下来。<b>先备案、再解析、再部署。</b></div>
+</section>
+
+<section id="s7" class="fade">
+  <h2><span class="n">07</span>初始化服务器</h2>
+  <p class="lead">以 root 登录新服务器，做一次。问渠的 <code>deploy/bootstrap.sh</code> 会装 Docker、建 deploy 用户、只允许密钥登录、开防火墙、建 2 GB 交换区和每天 03:30 的备份任务。国内要先换掉它里面的 Docker 安装方式。</p>
+  <div class="step"><div class="k">1</div><div><b>用国内镜像装 Docker</b>（bootstrap.sh 里检测到已装 Docker 就会跳过安装）
+<pre><span class="c"># 官方安装脚本支持 --mirror Aliyun，从阿里云的软件源下载</span>
+curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun
+systemctl enable --now docker</pre></div></div>
+  <div class="step"><div class="k">2</div><div><b>配置拉 Docker Hub 基础镜像的加速地址</b>（postgres、redis、caddy、rclone、ERPNext 等来自 Docker Hub）
+<pre><span class="c"># 加速地址在云服务商控制台查（阿里云：容器镜像服务 → 镜像工具 → 镜像加速器）。
+# 注意：各家加速器一般只对自家云服务器有效，且对 Docker Hub 的覆盖有限，拉不到时用第 8 节的“转存”办法。</span>
+mkdir -p /etc/docker
+cat > /etc/docker/daemon.json &lt;&lt;'EOF'
+{ "registry-mirrors": ["https://&lt;你的专属地址&gt;.mirror.aliyuncs.com"] }
+EOF
+systemctl restart docker</pre></div></div>
+  <div class="step"><div class="k">3</div><div><b>运行初始化脚本</b>（把仓库的 <code>deploy/bootstrap.sh</code> 传到服务器上；参数是自动部署用的公钥，手工部署时填你自己的公钥）
+<pre>bash bootstrap.sh "ssh-ed25519 AAAA...你的公钥 deploy"</pre></div></div>
+  <div class="step"><div class="k">4</div><div><b>把部署文件放到 /opt/wenquest</b>（以 deploy 用户）
+<pre><span class="c"># 在能访问 GitHub 的电脑上打包仓库里需要的文件，传到服务器</span>
+tar czf wq-deploy.tgz docker-compose.yml docker-compose.prod.yml .env.example deploy site
+scp wq-deploy.tgz deploy@&lt;服务器IP&gt;:/opt/wenquest/
+ssh deploy@&lt;服务器IP&gt; 'cd /opt/wenquest &amp;&amp; tar xzf wq-deploy.tgz &amp;&amp; chmod +x deploy/*.sh'</pre></div></div>
+  <div class="note warn"><b>⚠ Caddyfile 末尾</b>有一段 <code>qms.wenquestrobotics.com</code>（美国服务器上另一个演示项目），国内部署时删掉这一段，并删掉 <code>docker-compose.prod.yml</code> 里的 <code>qms-edge</code> 网络，或先 <code>docker network create qms-edge</code>。</div>
+</section>
+
+<section id="s8" class="fade">
+  <h2><span class="n">08</span>拿到镜像（国内最关键的一步）</h2>
+  <p class="lead">问渠的 7 个程序镜像由 GitHub 自动构建，现在推到海外的 ghcr.io。国内服务器直接拉往往很慢或失败。点下面的按钮看两种路线的区别。</p>
+  <div><button class="btn" id="r_gh" type="button">现在：ghcr.io</button><button class="btn ghost" id="r_acr" type="button">国内：阿里云 ACR</button></div>
+  <div class="flow" id="flow">
+    <div class="seg" data-i="0"><b>GitHub Actions</b>测试、构建 7 个镜像</div><span class="arrow">→</span>
+    <div class="seg" data-i="1"><b id="f_reg">ghcr.io</b><span id="f_regs">海外仓库</span></div><span class="arrow">→</span>
+    <div class="seg" data-i="2"><b>跨境网络</b><span id="f_net">不稳定</span></div><span class="arrow">→</span>
+    <div class="seg" data-i="3"><b>国内服务器</b>docker pull</div><span class="arrow">→</span>
+    <div class="seg" data-i="4"><b>上线</b>deploy/update.sh</div>
+  </div>
+  <div id="flowNote" class="out"></div>
+  <h3>路线 A（推荐，⚠ 需要改自动部署）：推到阿里云 ACR</h3>
+  <ol>
+    <li>阿里云开通“容器镜像服务”，建命名空间（如 <code>wenquest</code>）和 7 个仓库：<code>engine</code>、<code>gateway</code>、<code>web</code>、<code>animator</code>、<code>labcheck</code>、<code>micro-synth</code>、<code>voice</code>。</li>
+    <li>GitHub 仓库加两个加密变量：<code>ACR_USERNAME</code>、<code>ACR_PASSWORD</code>；部署工作流在推 ghcr.io 之外再推一份到 ACR（<span class="tag todo">待做</span>：工作流还没有这一步，要另开一轮改）。</li>
+    <li>服务器上登录一次 ACR，之后 <code>update.sh</code> 用 ACR 的地址拉镜像：</li>
+  </ol>
+<pre>docker login --username=&lt;阿里云账号&gt; registry.cn-hangzhou.aliyuncs.com
+cd /opt/wenquest
+deploy/update.sh registry.cn-hangzhou.aliyuncs.com/wenquest/engine:&lt;版本号&gt;
+<span class="c"># update.sh 会按 engine 的地址推出其余 6 个（把 /engine: 换成 /gateway: 等），写进 .env 后拉取、启动</span></pre>
+  <h3>路线 B（临时）：在能访问外网的机器上转存</h3>
+<pre><span class="c"># 在海外或能访问 ghcr.io 的电脑上（TAG 是 GitHub 部署记录里的 12 位版本号）</span>
+TAG=abc123def456; R=ghcr.io/eddiezgq/wenquest
+for n in engine gateway web animator labcheck micro-synth voice; do docker pull $R/$n:$TAG; done
+docker pull postgres:16-alpine; docker pull redis:7-alpine; docker pull caddy:2; docker pull rclone/rclone:1
+docker save $(for n in engine gateway web animator labcheck micro-synth voice; do echo $R/$n:$TAG; done) \
+  postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1 | gzip &gt; wq-images.tgz
+<span class="c"># 传到国内服务器后</span>
+gunzip -c wq-images.tgz | docker load
+cd /opt/wenquest &amp;&amp; deploy/update.sh $R/engine:$TAG</pre>
+  <div class="note">镜像合计十几 GB（动画、语音镜像较大），路线 B 每次更新都要整包传，只适合首次部署或应急。</div>
+  <h3>教材</h3>
+  <p>网页版教材由 GitHub 构建后复制到服务器的 <code>/opt/wenquest/textbook/</code>。国内部署时把构建好的教材打包传过去，解压到这个目录；然后运行 <code>deploy/textbook-media.sh</code> 生成教材动画。</p>
+</section>
+
+<section id="s9" class="fade">
+  <h2><span class="n">09</span>填写配置文件 .env</h2>
+  <p class="lead">在下面填好，生成国内版 <code>.env</code>。密码在你的浏览器里随机生成，不经过任何网络。</p>
+  <div class="card">
+    <div class="grid2">
+      <div><label class="f">主域名</label><input class="t" id="e_dom" value="example.cn"></div>
+      <div><label class="f">管理员邮箱</label><input class="t" id="e_mail" value="admin@example.cn"></div>
+      <div><label class="f">平台名称</label><input class="t" id="e_name" value="问渠 WenQuest"></div>
+      <div><label class="f">DeepSeek API Key</label><input class="t" id="e_ds" placeholder="sk-...（可以以后再填）"></div>
+      <div><label class="f">发信服务器（SMTP）</label><input class="t" id="e_smtp" placeholder="如 smtpdm.aliyun.com（以服务商为准）"></div>
+      <div><label class="f">SMTP 端口</label><input class="t" id="e_port" value="465"></div>
+      <div><label class="f">SMTP 用户名</label><input class="t" id="e_su" placeholder="noreply@你的域名"></div>
+      <div><label class="f">镜像地址前缀</label><input class="t" id="e_reg" value="registry.cn-hangzhou.aliyuncs.com/wenquest"></div>
+      <div><label class="f">对象存储 Endpoint（异地备份，可空）</label><input class="t" id="e_s3" placeholder="如 https://oss-cn-hangzhou.aliyuncs.com"></div>
+      <div><label class="f">存储桶名称</label><input class="t" id="e_bk" placeholder="如 wenquest-backup"></div>
+    </div>
+    <button class="btn" type="button" id="e_go">生成 .env</button><button class="btn ghost" type="button" id="e_new">重新生成密码</button>
+<pre id="e_out"></pre>
+  </div>
+  <div class="step"><div class="k">✓</div><div>在服务器上：<code>cd /opt/wenquest &amp;&amp; nano .env</code>，粘贴进去保存，然后 <code>chmod 600 .env</code>。管理员密码和数据库密码另存一份到密码管理器。<br>也可以运行 <code>deploy/init-env.sh</code> 一问一答生成，再把语言、时区、模型几项改成上面的国内值。</div></div>
+  <div class="note warn">⚠ 异地备份：<code>deploy/backup.sh</code> 里 rclone 的服务商写的是 DigitalOcean。阿里云 OSS 兼容 S3，但是否能直接用要实测；不行就把那一行改成 <code>Alibaba</code>（待改）。</div>
+</section>
+
+<section id="s10" class="fade">
+  <h2><span class="n">10</span>首次上线</h2>
+  <p class="lead">按顺序做。第一次启动 Moodle 要安装数据库，可能 10 分钟以上。</p>
+  <div class="step"><div class="k">1</div><div><b>启动</b>（镜像地址见第 8 节）
+<pre>cd /opt/wenquest
+deploy/update.sh registry.cn-hangzhou.aliyuncs.com/wenquest/engine:&lt;版本号&gt;</pre>脚本会：先备份（已运行时）→ 写入 7 个镜像地址 → 拉取 → 启动 → 重载 Caddy → 等学习平台变“健康”（最多 15 分钟）。</div></div>
+  <div class="step"><div class="k">2</div><div><b>看状态</b>
+<pre>deploy/status.sh</pre>三个网址都应返回 <code>200</code>（或 303 跳转）。打开 <code>https://learn.&lt;域名&gt;/api/health</code>，应看到 <code>"ai": "deepseek"</code>——说明网关用的是 DeepSeek。</div></div>
+  <div class="step"><div class="k">3</div><div><b>第一次登录</b>：<code>https://learn.&lt;域名&gt;</code> 用 <code>admin</code> 和 .env 里的管理员密码登录 → 管理 → 设立课程委员会（试点期可以自己当主任，打开“允许本人批准自己的课”）→ 审核老师注册。</div></div>
+  <div class="step"><div class="k">4</div><div><b>（可选）数字工厂</b>：工厂是独立的一组容器（<code>/opt/wenquest/factory</code>），由“Digital factory 数字工厂部署”工作流安装；需要至少 3 GB 空闲内存。国内同样要解决 ERPNext（<code>frappe/erpnext</code>）等镜像的拉取问题。工厂的 AI 助手自动使用学习平台的 DeepSeek 钥匙。</div></div>
+  <div class="step"><div class="k">5</div><div><b>页面底部加备案号</b> ⚠：官网 <code>site/index.html</code>（由 <code>tools/site_home/</code> 生成）和学习平台登录页加 ICP 备案号、公安备案号，链接到备案系统。</div></div>
+</section>
+
+<section id="s11" class="fade">
+  <h2><span class="n">11</span>日常运维</h2>
+  <div class="grid2">
+    <div class="card"><h3 style="margin-top:0">更新到新版本</h3>
+<pre>cd /opt/wenquest
+deploy/update.sh &lt;新的 engine 镜像地址&gt;</pre>更新前自动备份（一小时内已有备份则跳过）。</div>
+    <div class="card"><h3 style="margin-top:0">出问题，退回上一版</h3>
+<pre>deploy/rollback.sh</pre>如果上一次更新升级了 Moodle 数据库，还要用更新前的备份恢复（见下）。</div>
+    <div class="card"><h3 style="margin-top:0">备份</h3>
+<pre>deploy/backup.sh          <span class="c"># 手动备份一次</span>
+ls backups/               <span class="c"># 每天 03:30 自动备份，本机保留 7 份日备份、10 份部署前备份</span></pre>剩余空间低于 15% 时先删旧备份，仍不够就跳过并报警，不会把磁盘写满。</div>
+    <div class="card"><h3 style="margin-top:0">恢复</h3>
+<pre>deploy/restore.sh backups/&lt;日期&gt;-daily</pre>恢复数据库、Moodle 文件、网关数据和 AI 建课项目。</div>
+    <div class="card"><h3 style="margin-top:0">看日志</h3>
+<pre>docker compose -f docker-compose.yml -f docker-compose.prod.yml logs --tail 100 gateway
+<span class="c"># 把 gateway 换成 moodle、web、caddy、animator、voice 等</span></pre></div>
+    <div class="card"><h3 style="margin-top:0">磁盘满了</h3>
+<pre>deploy/status.sh              <span class="c"># 超过 85% 会报警并列出占用</span>
+docker image prune -a         <span class="c"># 删掉不用的旧镜像</span></pre></div>
+  </div>
+</section>
+
+<section id="s12" class="fade">
+  <h2><span class="n">12</span>常见问题</h2>
+  <details><summary>浏览器打不开网站，提示“网站暂时无法访问”或被拦截</summary><div>多半是<b>备案还没通过</b>或域名不在备案名下。云服务商会拦截未备案域名的 80/443。先在控制台确认备案状态，并确认解析的子域名都在备案的主域名下。</div></details>
+  <details><summary>证书申请失败，Caddy 日志里一直在重试</summary><div>Caddy 用 Let's Encrypt，需要域名已解析到这台服务器、80/443 能从外网访问。检查：解析记录（第 6 节）、安全组放行 80/443、备案已通过。查看：<code>docker compose ... logs --tail 50 caddy</code>。</div></details>
+  <details><summary>docker pull 卡住或报 timeout</summary><div>Docker Hub 和 ghcr.io 在国内不稳定。用第 7 节的加速地址；仍不行用第 8 节路线 B 转存；长期用路线 A（ACR）。</div></details>
+  <details><summary>AI 功能都不工作，/api/health 里 "ai" 是 "none"</summary><div><code>.env</code> 里 <code>DEEPSEEK_API_KEY</code> 没填或填错，改好后 <code>deploy/update.sh</code>（不带参数）重启。确认 <code>ANTHROPIC_API_KEY</code> 留空——填了会优先用 Claude，国内调不通。</div></details>
+  <details><summary>AI 建课对话里改大纲、改课时不像美国版那样灵活</summary><div>第 31 轮起的“AI 课程负责人”目前要 Claude 才能当代理（自己查资料、直接改草稿、撤销）。国内只有 DeepSeek 时，自动退回原来的流程：课程负责人给出提议，老师确认后执行。接入国内模型的代理能力在计划中。</div></details>
+  <details><summary>收不到找回密码、通知邮件</summary><div>国内云服务器通常封 25 端口。用邮件服务商给的 SSL 端口（如 465），<code>SMTP_SECURE=ssl</code>；发件地址必须是服务商验证过的域名；在服务商控制台看投递记录。</div></details>
+  <details><summary>官网打开慢，字体闪一下</summary><div>官网用了 Google Fonts，国内访问不了，浏览器会等一会儿再用系统字体。<span class="tag todo">待改</span>：把字体文件放到服务器上或改用系统字体。</div></details>
+  <details><summary>三维模型、部分实验页面加载慢</summary><div>部分页面从 cdnjs 取 three.js，国内有时慢。<span class="tag todo">待改</span>：改为从自己的服务器提供。</div></details>
+  <details><summary>Moodle 15 分钟还没“健康”，update.sh 报错退出</summary><div>首次安装大数据库或服务器内存不够。看 <code>logs --tail 200 moodle</code>；内存不足时升级配置（第 5 节）。更新后出错可 <code>deploy/rollback.sh</code>。</div></details>
+</section>
+
+<section id="s13" class="fade">
+  <h2><span class="n">13</span>上线前还要改的程序（待做清单）</h2>
+  <p class="lead">这些改完，国内部署就能做到和美国一样“推送即上线”。建议作为一轮工作排期。</p>
+  <div class="tbl"><table>
+    <tr><th>#</th><th>要改的</th><th>为什么</th><th>状态</th></tr>
+    <tr><td>1</td><td>部署工作流同时推镜像到阿里云 ACR，并能部署到国内服务器</td><td>ghcr.io 国内拉不稳</td><td><span class="tag todo">待做</span></td></tr>
+    <tr><td>2</td><td>官网、学习平台页面底部显示 ICP / 公安备案号（按站点配置）</td><td>备案要求</td><td><span class="tag todo">待做</span></td></tr>
+    <tr><td>3</td><td>官网字体、three.js 等外部资源改为本地提供</td><td>Google Fonts 国内不可用、cdnjs 慢</td><td><span class="tag todo">待做</span></td></tr>
+    <tr><td>4</td><td>异地备份支持阿里云 OSS / 腾讯云 COS（rclone 服务商可配）</td><td>数据境内存储</td><td><span class="tag todo">待做</span></td></tr>
+    <tr><td>5</td><td>国内部署包不带 Claude 插件；Caddyfile 去掉美国专用段</td><td>合规、干净</td><td><span class="tag todo">待做</span></td></tr>
+    <tr><td>6</td><td>AI 课程负责人接入国内模型（DeepSeek 的工具调用）</td><td>国内也要“对话改课”</td><td><span class="tag todo">计划中</span></td></tr>
+    <tr><td>7</td><td>看图类检查（插图切题）换国内多模态模型</td><td>只有文字模型时这项会受限</td><td><span class="tag todo">计划中</span></td></tr>
+    <tr><td>8</td><td>收费改微信支付 / 支付宝</td><td>Stripe 国内不可用</td><td><span class="tag todo">计划中</span></td></tr>
+    <tr><td>9</td><td>压力测试，给出不同规格能撑多少人</td><td>第 5 节的数字目前是估算</td><td><span class="tag todo">计划中</span></td></tr>
+  </table></div>
+</section>
+
+<section id="s14" class="fade">
+  <h2><span class="n">14</span>附录：速查</h2>
+  <div class="grid2">
+    <div class="card"><h3 style="margin-top:0">服务器上的文件</h3><table>
+      <tr><td><code>/opt/wenquest/.env</code></td><td>配置与密码（只在服务器上）</td></tr>
+      <tr><td><code>/opt/wenquest/deploy/</code></td><td>部署、备份、恢复、回退脚本；Caddyfile</td></tr>
+      <tr><td><code>/opt/wenquest/site/</code></td><td>官网静态页面</td></tr>
+      <tr><td><code>/opt/wenquest/textbook/</code></td><td>网页版教材</td></tr>
+      <tr><td><code>/opt/wenquest/backups/</code></td><td>本机备份</td></tr>
+      <tr><td><code>/opt/wenquest/factory/</code></td><td>数字工厂（可选）</td></tr>
+    </table></div>
+    <div class="card"><h3 style="margin-top:0">服务与端口</h3><table>
+      <tr><td>caddy</td><td>对外 80 / 443（唯一对外入口）</td></tr>
+      <tr><td>web、gateway</td><td>learn.&lt;域名&gt;</td></tr>
+      <tr><td>moodle</td><td>classic.&lt;域名&gt;</td></tr>
+      <tr><td>db、redis</td><td>只在内部网络</td></tr>
+      <tr><td>animator、labcheck、voice、micro-synth</td><td>只在内部网络，供网关调用</td></tr>
+      <tr><td>cron</td><td>Moodle 定时任务</td></tr>
+    </table></div>
+  </div>
+  <div class="card"><h3 style="margin-top:0">国内版 .env 关键项</h3><table>
+    <tr><td><code>MOODLE_LANG=zh_cn</code> · <code>WQ_DEFAULT_LANG=zh</code></td><td>默认中文</td></tr>
+    <tr><td><code>MOODLE_TIMEZONE=Asia/Shanghai</code></td><td>北京时间</td></tr>
+    <tr><td><code>DEEPSEEK_API_KEY=…</code> · <code>ANTHROPIC_API_KEY=</code>（空）</td><td>只用已备案模型</td></tr>
+    <tr><td><code>WQ_LIBRARY_URL=https://factory.&lt;你的域名&gt;</code></td><td>零件库用自己的工厂（默认指向美国）</td></tr>
+    <tr><td><code>WQ_GPU_PROVIDER=autodl</code></td><td>开 GPU 实验时</td></tr>
+  </table></div>
+</section>
+
+<footer>问渠 WenQuest · 国内部署指南 · 2026-10-15 版 · 源文件：仓库 <code>docs/帮助/国内部署指南.html</code>（单文件，可离线打开）。合规内容为常见做法整理，以主管部门最新要求为准。</footer>
+</main>
+
+<script>
+(function(){
+  var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+  // ---- table of contents + scrollspy
+  var toc=document.getElementById('toc'), secs=[].slice.call(document.querySelectorAll('main section[id^="s"]'));
+  secs.forEach(function(s){var h=s.querySelector('h2');if(!h)return;var a=document.createElement('a');a.href='#'+s.id;
+    a.innerHTML='<span class="n">'+(h.querySelector('.n')||{textContent:''}).textContent+'</span><span>'+h.textContent.replace(/^\s*\d+/,'').trim()+'</span>';
+    toc.appendChild(a);
+    [].slice.call(s.querySelectorAll('h3')).forEach(function(h3,i){if(!h3.id)h3.id=s.id+'-'+i;var b=document.createElement('a');b.href='#'+h3.id;b.className='sub';b.textContent=h3.textContent;b.dataset.parent=s.id;toc.appendChild(b);});
+  });
+  var links=[].slice.call(toc.querySelectorAll('a'));
+  function spy(){var y=window.scrollY+120,cur=secs[0]&&secs[0].id;secs.forEach(function(s){if(s.offsetTop<=y)cur=s.id});
+    links.forEach(function(a){var on=a.getAttribute('href')==='#'+cur;a.classList.toggle('on',on);if(a.classList.contains('sub'))a.style.display=a.dataset.parent===cur?'flex':'none'});}
+  window.addEventListener('scroll',spy,{passive:true});spy();
+  var side=document.getElementById('side');document.getElementById('hamb').onclick=function(){side.classList.toggle('open')};
+  toc.addEventListener('click',function(){if(innerWidth<980)side.classList.remove('open')});
+  // ---- theme
+  var th=store.get('wq-dep-theme');if(th)document.documentElement.dataset.theme=th;
+  document.getElementById('themeBtn').onclick=function(){var d=document.documentElement,dark=d.dataset.theme?d.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+    d.dataset.theme=dark?'light':'dark';store.set('wq-dep-theme',d.dataset.theme)};
+  // ---- fade-in and gantt
+  var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');
+    if(e.target.id==='s4')[].forEach.call(document.querySelectorAll('#gantt .b'),function(b,i){setTimeout(function(){b.style.left=(+b.dataset.l/84*100)+'%';b.style.width=(+b.dataset.w/84*100)+'%'},i*180)});}})},{threshold:.12}):null;
+  [].forEach.call(document.querySelectorAll('.fade'),function(el){io?io.observe(el):el.classList.add('in')});
+  [].forEach.call(document.querySelectorAll('#gantt .b'),function(b){b.style.left=(+b.dataset.l/84*100)+'%'});
+  if(!io)[].forEach.call(document.querySelectorAll('#gantt .b'),function(b){b.style.width=(+b.dataset.w/84*100)+'%'});
+  // ---- copy buttons
+  [].forEach.call(document.querySelectorAll('pre'),function(p){var b=document.createElement('button');b.className='cp';b.type='button';b.textContent='复制';
+    b.onclick=function(){var t=p.cloneNode(true);t.removeChild(t.querySelector('button.cp'));var txt=t.textContent;
+      function ok(){b.textContent='已复制';b.classList.add('done');setTimeout(function(){b.textContent='复制';b.classList.remove('done')},1500)}
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fallback)}else fallback();
+      function fallback(){var ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok()}catch(e){}document.body.removeChild(ta)}};
+    p.appendChild(b)});
+  // ---- checklists with progress
+  var boxes=[].slice.call(document.querySelectorAll('.chklist input'));
+  var saved={};try{saved=JSON.parse(store.get('wq-dep-chk')||'{}')}catch(e){}
+  function prog(){var n=boxes.filter(function(b){return b.checked}).length;document.getElementById('progTxt').textContent=n+' / '+boxes.length;
+    document.getElementById('progBar').style.width=(boxes.length?n/boxes.length*100:0)+'%';
+    boxes.forEach(function(b,i){b.closest('.chk').classList.toggle('done',b.checked);saved[i]=b.checked});store.set('wq-dep-chk',JSON.stringify(saved))}
+  boxes.forEach(function(b,i){b.checked=!!saved[i];b.onchange=prog});prog();
+  document.getElementById('resetBtn').onclick=function(){boxes.forEach(function(b){b.checked=false});prog()};
+  // ---- architecture info
+  var INFO={user:['老师 · 学生','用浏览器打开 learn.<域名>，或用微信小程序（小程序要单独备案、配置服务器域名）。'],
+    caddy:['Caddy（唯一对外入口）','监听 80/443，自动申请和续期 HTTPS 证书，把官网、learn.、classic.、factory. 等网址分到各个服务。配置在 deploy/Caddyfile。'],
+    site:['官网','静态页面（site/ 目录），由 Caddy 直接提供，不占计算资源。'],
+    web:['网页端 web','问渠学习平台的界面（uni-app 网页版），/api 请求转给网关。'],
+    gateway:['接口网关 gateway','AI 服务层：AI 建课、AI 助教、课程、教材、虚拟实验、收费等。所有模型调用都经它，国内只连 DeepSeek。数据在 gatewaydata 卷，每日备份。'],
+    model:['DeepSeek（已备案）','云端大模型，按调用量付费。.env 里只填 DEEPSEEK_API_KEY。网关、Moodle 的 AI 功能、数字工厂的 AI 助手都用它。'],
+    moodle:['Moodle 教学引擎','后台管理课程、题库、成绩、权限；classic.<域名> 是给老师的经典界面。第一次启动会安装数据库。'],
+    db:['PostgreSQL · Redis','数据库（dbdata 卷）和缓存，只在内部网络，不对外。每日备份 db.dump。'],
+    workers:['工作服务','animator：渲染 Manim 动画（2 核 3 GB）；labcheck：无头浏览器试运行虚拟实验（1 核 2 GB）；voice：本地语音合成与识别，不出服务器（1.5 核 2 GB）；micro-synth：Verilog 综合（1 核 1 GB）。'],
+    factory:['数字工厂（可选）','独立的一组容器（/opt/wenquest/factory），工作台在 factory.<域名>；班级工厂在 <编号>.factory.<域名>。'],
+    erp:['ERPNext · 总线 · 仿真','ERPNext + MariaDB 做经营数据；MQTT 统一数据总线；CAE 容器算有限元、流体、多体动力学（排队，一次一个，内存上限 2.5 GB）。']};
+  var info=document.getElementById('archInfo');
+  [].forEach.call(document.querySelectorAll('#arch .node'),function(n){n.onclick=function(){[].forEach.call(document.querySelectorAll('#arch .node'),function(x){x.classList.remove('on')});n.classList.add('on');var t=INFO[n.dataset.k];info.innerHTML='<b>'+t[0]+'</b><br>'+t[1].replace(/</g,'&lt;')}});
+  // ---- registry route animation
+  var segs=[].slice.call(document.querySelectorAll('#flow .seg')),timer=null;
+  function route(acr){clearInterval(timer);segs.forEach(function(s){s.classList.remove('lit','blocked')});
+    document.getElementById('f_reg').textContent=acr?'阿里云 ACR':'ghcr.io';document.getElementById('f_regs').textContent=acr?'国内仓库':'海外仓库';
+    document.getElementById('f_net').textContent=acr?'国内骨干网，快':'跨境，常超时';
+    document.getElementById('r_gh').className='btn'+(acr?' ghost':'');document.getElementById('r_acr').className='btn'+(acr?'':' ghost');
+    var i=0;timer=setInterval(function(){if(i<segs.length){if(!acr&&i===2){segs[i].classList.add('blocked');clearInterval(timer);
+      document.getElementById('flowNote').innerHTML='跨境拉取 7 个共十几 GB 的镜像，常常超时、中断，部署时间不可控。';return}
+      segs[i].classList.add('lit');i++}else{clearInterval(timer);document.getElementById('flowNote').innerHTML='镜像从国内仓库拉取，几分钟完成；GitHub 推一份到 ACR 即可，服务器始终只连国内地址。'}},550)}
+  document.getElementById('r_gh').onclick=function(){route(false)};document.getElementById('r_acr').onclick=function(){route(true)};route(false);
+  // ---- sizing calculator
+  var S=[[2,4],[4,8],[8,16],[8,32],[16,32],[16,64],[32,64],[32,128]];
+  function calc(){var c=2,m=4.5,why=['基础 2 核 4.5 GB'];
+    if(m_anim.checked){c+=2;m+=3}if(m_lab.checked){c+=1;m+=2}if(m_voice.checked){c+=1.5;m+=2}if(m_micro.checked){c+=1;m+=1}
+    var cls=Math.max(0,+m_cls.value||0);if(m_fac.checked){c+=2;m+=6+cls*1.5}
+    var u=+m_users.value;document.getElementById('m_usersTxt').textContent=u;var extra=Math.max(0,u-100)/100;c+=extra*0.75;m+=extra*0.8;
+    var vp=+m_video.value;document.getElementById('m_videoTxt').textContent=vp;
+    m*=1.25;c=Math.ceil(c);var pick=S.find(function(s){return s[0]>=c&&s[1]>=m})||S[S.length-1];
+    document.getElementById('r_spec').textContent=pick[0]+' 核 '+pick[1]+' GB';
+    var disk=100+(m_fac.checked?60+cls*10:0)+Math.round(u/10);document.getElementById('r_disk').textContent='≥ '+(Math.ceil(disk/50)*50)+' GB';
+    var bw=Math.ceil(u*vp/100*2);document.getElementById('r_bw').textContent=(bw<10?10:bw)+' Mbps';
+    document.getElementById('r_mem').textContent='约 '+m.toFixed(1)+' GB（含 25% 余量）';document.getElementById('r_meter').style.width=Math.min(100,m/pick[1]*100)+'%';
+    document.getElementById('r_note').textContent=(bw>200?'视频带宽很大：建议把讲课视频放到对象存储 + CDN，服务器只出页面。':'')+(u>1000?' 上千人同时在线，建议数据库单独一台、做压力测试后再定。':'')+' 估算值，以压力测试为准。';}
+  ['m_anim','m_lab','m_voice','m_micro','m_fac','m_cls','m_users','m_video'].forEach(function(id){var el=document.getElementById(id);el.oninput=calc;el.onchange=calc});calc();
+  // ---- DNS table
+  function dns(){var d=(document.getElementById('d_dom').value||'example.cn').trim(),ip=(document.getElementById('d_ip').value||'1.2.3.4').trim(),f=document.getElementById('d_fac').checked;
+    var rows=[['@','官网 '+d],['www','跳转到主域名'],['learn','问渠学习平台'],['classic','Moodle 经典界面']];
+    if(f)rows=rows.concat([['factory','数字工厂工作台'],['erp','数字工厂 ERPNext'],['demo','企业版演示工厂'],['demo-erp','演示工厂 ERPNext'],['*.factory','班级工厂'],['*.erp','班级工厂 ERPNext']]);
+    document.querySelector('#d_tbl tbody').innerHTML=rows.map(function(r){return '<tr><td><code>'+r[0]+'</code></td><td>A</td><td><code>'+ip.replace(/</g,'')+'</code></td><td>'+r[1].replace(/</g,'')+'</td></tr>'}).join('')}
+  ['d_dom','d_ip','d_fac'].forEach(function(id){var el=document.getElementById(id);el.oninput=dns;el.onchange=dns});dns();
+  // ---- .env generator
+  function pass(n){var a='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',r='',b=new Uint32Array(n);(window.crypto||window.msCrypto).getRandomValues(b);for(var i=0;i<n;i++)r+=a[b[i]%a.length];return r}
+  var P={};function newp(){P={admin:pass(20),db:pass(24),sec:pass(48)}}newp();
+  function env(){var v=function(id){return (document.getElementById(id).value||'').trim()};var d=v('e_dom')||'example.cn',reg=v('e_reg').replace(/\/$/,'');
+    var t=['# 问渠 · 国内部署 .env（由《国内部署指南》生成；只放在服务器上，chmod 600）',
+    'MOODLE_WWWROOT=https://classic.'+d,'HTTP_PORT=8080','MOODLE_SSLPROXY=true','MOODLE_SITE_NAME='+(v('e_name')||'问渠 WenQuest'),'MOODLE_SITE_SHORTNAME=wenquest',
+    'MOODLE_LANG=zh_cn','MOODLE_TIMEZONE=Asia/Shanghai','','SITE_DOMAIN='+d,'ACME_EMAIL='+v('e_mail'),
+    'ENGINE_IMAGE='+(reg?reg+'/engine:<版本号>':''),'GATEWAY_IMAGE=','WEB_IMAGE=','ANIMATOR_IMAGE=','LABCHECK_IMAGE=','MICROSYNTH_IMAGE=','VOICE_IMAGE=',
+    '# 上面 7 个镜像由 deploy/update.sh <engine 镜像地址> 自动写入','',
+    'APP_URL=https://learn.'+d,'APP_PORT=8088','WQ_SECRET_KEY='+P.sec,'WQ_DEFAULT_LANG=zh','WQ_PUBLIC_URL=https://learn.'+d,'',
+    'MOODLE_ADMIN_USER=admin','MOODLE_ADMIN_PASSWORD='+P.admin,'MOODLE_ADMIN_EMAIL='+v('e_mail'),'',
+    'DB_NAME=moodle','DB_USER=moodle','DB_PASSWORD='+P.db,'',
+    '# 国内只用已备案模型：Claude 一律留空','ANTHROPIC_API_KEY=','CLAUDE_MODEL=claude-sonnet-5','DEEPSEEK_API_KEY='+v('e_ds'),'',
+    'SMTP_HOST='+v('e_smtp'),'SMTP_PORT='+(v('e_port')||'465'),'SMTP_SECURE='+((v('e_port')||'465')==='465'?'ssl':'tls'),'SMTP_USER='+v('e_su'),'SMTP_PASSWORD=<发信密码>',
+    'MOODLE_NOREPLY_EMAIL='+(v('e_su')||'noreply@'+d),'WQ_ADMIN_EMAIL='+v('e_mail'),'',
+    'BACKUP_KEEP_COUNT=10','BACKUP_KEEP_DAILY=7','BACKUP_MIN_FREE_PCT=15','BACKUP_S3_ENDPOINT='+v('e_s3'),'BACKUP_S3_BUCKET='+v('e_bk'),
+    'BACKUP_S3_ACCESS_KEY=<AccessKey ID>','BACKUP_S3_SECRET_KEY=<AccessKey Secret>','BACKUP_S3_KEEP_DAYS=30','',
+    'WQ_LIBRARY_URL=https://factory.'+d,'# 开 GPU 实验时：','WQ_GPU_PROVIDER=','WQ_GPU_AUTODL_TOKEN=','WQ_GPU_AUTODL_SPECS='];
+    var pre=document.getElementById('e_out');var btn=pre.querySelector('button.cp');pre.textContent=t.join('\n');if(btn)pre.appendChild(btn)}
+  document.getElementById('e_go').onclick=env;document.getElementById('e_new').onclick=function(){newp();env()};env();
+})();
+</script>
+</body>
+</html>
