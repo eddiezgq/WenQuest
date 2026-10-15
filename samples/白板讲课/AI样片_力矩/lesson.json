@@ -1,0 +1,878 @@
+{
+ "title": "机器人关节的力矩",
+ "title_en": "Torque at a robot joint",
+ "audio": "配音.wav",
+ "duration": 114.39,
+ "segments": [
+  {
+   "t0": 0.8,
+   "t1": 5.54,
+   "zh": "一台机器人手臂，要把一个两公斤的零件水平举起来。",
+   "en": "A robot arm has to hold a 2 kg part out horizontally."
+  },
+  {
+   "t0": 5.99,
+   "t1": 10.34,
+   "zh": "问题来了：肩关节的电机，至少要多大的劲？",
+   "en": "How strong must the shoulder motor be?"
+  },
+  {
+   "t0": 10.79,
+   "t1": 14.27,
+   "zh": "先想一个生活里的例子：用扳手拧螺母。",
+   "en": "First, an everyday example: turning a nut with a spanner."
+  },
+  {
+   "t0": 14.72,
+   "t1": 17.63,
+   "zh": "手握得越靠外，拧起来越省力。",
+   "en": "The further out you hold it, the easier it turns."
+  },
+  {
+   "t0": 18.08,
+   "t1": 23.72,
+   "zh": "这说明，转动的效果不只看力有多大，还看力离转轴有多远。",
+   "en": "Turning depends on the force and on how far it is from the axis."
+  },
+  {
+   "t0": 24.17,
+   "t1": 27.78,
+   "zh": "这个转动的效果，就叫力矩，英文是 torque。",
+   "en": "This turning effect is called torque."
+  },
+  {
+   "t0": 28.23,
+   "t1": 32.05,
+   "zh": "力矩等于力乘以力臂：τ 等于 F 乘以 r。",
+   "en": "Torque equals force times lever arm: tau = F times r."
+  },
+  {
+   "t0": 32.5,
+   "t1": 36.08,
+   "zh": "力臂，是转轴到力的作用线的垂直距离。",
+   "en": "The lever arm is the perpendicular distance from the axis to the line of the force."
+  },
+  {
+   "t0": 36.53,
+   "t1": 38.26,
+   "zh": "力矩的单位是牛·米。",
+   "en": "Torque is measured in newton-metres."
+  },
+  {
+   "t0": 38.71,
+   "t1": 43.59,
+   "zh": "现在回到机器人手臂，先把它画成一个简单的模型。",
+   "en": "Back to the robot arm: first, a simple model."
+  },
+  {
+   "t0": 44.03,
+   "t1": 49.09,
+   "zh": "肩关节是转轴，手臂长零点五米，零件挂在末端。",
+   "en": "The shoulder is the axis, the arm is 0.5 m long, the part hangs at the end."
+  },
+  {
+   "t0": 49.54,
+   "t1": 55.73,
+   "zh": "零件的重力，F 等于 m g，两公斤乘以九点八，约十九点六牛。",
+   "en": "The part's weight: F = mg = 2 × 9.8 ≈ 19.6 N."
+  },
+  {
+   "t0": 56.18,
+   "t1": 61.15,
+   "zh": "手臂水平时，力臂就是整条手臂的长度，零点五米。",
+   "en": "With the arm level, the lever arm is the whole arm, 0.5 m."
+  },
+  {
+   "t0": 61.6,
+   "t1": 65.25,
+   "zh": "所以零件产生的力矩，约是九点八牛·米。",
+   "en": "So the part makes about 9.8 N·m of torque."
+  },
+  {
+   "t0": 65.7,
+   "t1": 70.24,
+   "zh": "手臂自己也有重量，一点二公斤，重心在中点。",
+   "en": "The arm itself weighs 1.2 kg, centred at its middle."
+  },
+  {
+   "t0": 70.69,
+   "t1": 75.27,
+   "zh": "它的力矩是一点二乘九点八乘零点二五，约二点九牛·米。",
+   "en": "Its torque: 1.2 × 9.8 × 0.25 ≈ 2.9 N·m."
+  },
+  {
+   "t0": 75.72,
+   "t1": 80.08,
+   "zh": "加起来，电机至少要提供约十二点七牛·米。",
+   "en": "Together the motor must give at least about 12.7 N·m."
+  },
+  {
+   "t0": 80.53,
+   "t1": 84.9,
+   "zh": "实际选电机时还要留余量，常取一点五到两倍。",
+   "en": "In practice we leave a margin of 1.5 to 2 times."
+  },
+  {
+   "t0": 85.35,
+   "t1": 89.47,
+   "zh": "所以我们选一台能输出二十五牛·米的关节电机。",
+   "en": "So we choose a joint motor rated at 25 N·m."
+  },
+  {
+   "t0": 89.92,
+   "t1": 94.46,
+   "zh": "再想一下：手臂抬起六十度时，力臂变短了。",
+   "en": "Now lift the arm to 60 degrees: the lever arm gets shorter."
+  },
+  {
+   "t0": 94.91,
+   "t1": 99.43,
+   "zh": "力臂变成 r 乘 cos60°，力矩只剩一半。",
+   "en": "It becomes r cos 60°, so the torque halves."
+  },
+  {
+   "t0": 99.88,
+   "t1": 103.6,
+   "zh": "所以手臂水平伸直的时候，关节最吃力。",
+   "en": "So the joint works hardest with the arm level."
+  },
+  {
+   "t0": 104.05,
+   "t1": 106.64,
+   "zh": "小结：力矩等于力乘以力臂。",
+   "en": "Summary: torque equals force times lever arm."
+  },
+  {
+   "t0": 107.09,
+   "t1": 112.44,
+   "zh": "设计机器人关节，要按最吃力的姿势来算，再留出余量。",
+   "en": "Size a robot joint for its hardest pose, then add a margin."
+  }
+ ],
+ "boards": [
+  {
+   "title": {
+    "zh": "实际问题：举起零件",
+    "en": "The problem: hold a part"
+   },
+   "elements": [
+    {
+     "t": "icon",
+     "at": 0,
+     "c": "ink",
+     "name": "robot_arm",
+     "size": 420.0,
+     "x": 520.0,
+     "y": 640.0
+    },
+    {
+     "t": "box",
+     "at": 0,
+     "c": "blue",
+     "x": 860.0,
+     "y": 380.0,
+     "w": 236.00000000000003,
+     "h": 96.0,
+     "zh": "零件 2 kg",
+     "s": 40,
+     "en": "part"
+    },
+    {
+     "t": "arrow",
+     "at": 0,
+     "c": "blue",
+     "pts": [
+      [
+       860.0,
+       432.0
+      ],
+      [
+       790.0,
+       470.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "ellipse",
+     "at": 1,
+     "c": "red",
+     "x": 433.0,
+     "y": 754.6,
+     "w": 90.0,
+     "h": 90.0
+    },
+    {
+     "t": "arrow",
+     "at": 1,
+     "c": "red",
+     "pts": [
+      [
+       1150.0,
+       700.0
+      ],
+      [
+       478.0,
+       799.6
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "c": "red",
+     "text": "肩关节电机",
+     "s": 52.0,
+     "font": "zh",
+     "align": "left",
+     "x": 1180.0,
+     "y": 640.0
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "c": "red",
+     "text": "至少要多大的劲？",
+     "s": 52.0,
+     "font": "zh",
+     "align": "left",
+     "x": 1180.0,
+     "y": 720.0
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "生活中的例子：扳手",
+    "en": "Everyday example: a spanner"
+   },
+   "elements": [
+    {
+     "t": "ellipse",
+     "at": 2,
+     "c": "ink",
+     "x": 200.0,
+     "y": 420.0,
+     "w": 120.0,
+     "h": 120.0
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "c": "ink",
+     "x": 300.0,
+     "y": 455.0,
+     "w": 760.0,
+     "h": 50.0
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "c": "muted",
+     "text": "螺母（转轴）",
+     "s": 32.0,
+     "font": "zh",
+     "align": "center",
+     "x": 260.0,
+     "y": 600.0
+    },
+    {
+     "t": "arrow",
+     "at": 3,
+     "c": "red",
+     "pts": [
+      [
+       420.0,
+       330.0
+      ],
+      [
+       420.0,
+       445.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "c": "red",
+     "text": "费力",
+     "s": 40.0,
+     "font": "zh",
+     "align": "center",
+     "x": 420.0,
+     "y": 310.0
+    },
+    {
+     "t": "arrow",
+     "at": 3,
+     "c": "green",
+     "pts": [
+      [
+       1000.0,
+       330.0
+      ],
+      [
+       1000.0,
+       445.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "c": "green",
+     "text": "省力",
+     "s": 40.0,
+     "font": "zh",
+     "align": "center",
+     "x": 1000.0,
+     "y": 310.0
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "c": "ink",
+     "text": "转动的效果 = 力有多大 + 离转轴多远",
+     "s": 46.0,
+     "font": "zh",
+     "align": "left",
+     "x": 120.0,
+     "y": 760.0
+    },
+    {
+     "t": "box",
+     "at": 5,
+     "c": "gold",
+     "x": 960.0,
+     "y": 900.0,
+     "w": 360.0,
+     "h": 110.0,
+     "zh": "力矩",
+     "s": 52.0,
+     "en": "Torque"
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "力矩的定义",
+    "en": "What torque is"
+   },
+   "elements": [
+    {
+     "t": "text",
+     "at": 6,
+     "c": "gold",
+     "text": "τ = F × r",
+     "s": 90,
+     "font": "en",
+     "align": "center",
+     "x": 960.0,
+     "y": 330.0
+    },
+    {
+     "t": "ellipse",
+     "at": 7,
+     "c": "ink",
+     "x": 300.0,
+     "y": 570.0,
+     "w": 60.0,
+     "h": 60.0
+    },
+    {
+     "t": "line",
+     "at": 7,
+     "c": "ink",
+     "pts": [
+      [
+       360.0,
+       600.0
+      ],
+      [
+       1100.0,
+       600.0
+      ]
+     ],
+     "w": 5.0
+    },
+    {
+     "t": "arrow",
+     "at": 7,
+     "c": "red",
+     "pts": [
+      [
+       1100.0,
+       600.0
+      ],
+      [
+       1100.0,
+       820.0
+      ]
+     ],
+     "w": 5.0
+    },
+    {
+     "t": "text",
+     "at": 7,
+     "c": "red",
+     "text": "F",
+     "s": 56.0,
+     "font": "en",
+     "align": "left",
+     "x": 1130.0,
+     "y": 780.0
+    },
+    {
+     "t": "line",
+     "at": 7,
+     "c": "blue",
+     "pts": [
+      [
+       330.0,
+       680.0
+      ],
+      [
+       1100.0,
+       680.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "text",
+     "at": 7,
+     "c": "blue",
+     "text": "力臂 r（转轴到力的作用线的垂直距离）",
+     "s": 32.0,
+     "font": "zh",
+     "align": "center",
+     "x": 715.0,
+     "y": 735.0
+    },
+    {
+     "t": "text",
+     "at": 8,
+     "c": "ink",
+     "text": "单位：N·m",
+     "s": 52.0,
+     "font": "zh",
+     "align": "left",
+     "x": 1400.0,
+     "y": 560.0
+    },
+    {
+     "t": "text",
+     "at": 8,
+     "c": "muted",
+     "text": "newton-metre",
+     "s": 40.0,
+     "font": "en",
+     "align": "left",
+     "x": 1400.0,
+     "y": 630.0
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "建模：机器人手臂",
+    "en": "Modelling the robot arm"
+   },
+   "elements": [
+    {
+     "t": "ellipse",
+     "at": 9,
+     "c": "blue",
+     "x": 150.0,
+     "y": 420.0,
+     "w": 70.0,
+     "h": 70.0
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "c": "blue",
+     "pts": [
+      [
+       220.0,
+       455.0
+      ],
+      [
+       960.0,
+       455.0
+      ]
+     ],
+     "w": 6.0
+    },
+    {
+     "t": "text",
+     "at": 10,
+     "c": "muted",
+     "text": "肩关节（转轴）",
+     "s": 30.0,
+     "font": "zh",
+     "align": "center",
+     "x": 185.0,
+     "y": 560.0
+    },
+    {
+     "t": "line",
+     "at": 10,
+     "c": "muted",
+     "pts": [
+      [
+       185.0,
+       380.0
+      ],
+      [
+       960.0,
+       380.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "text",
+     "at": 10,
+     "c": "ink",
+     "text": "0.5 m",
+     "s": 40.0,
+     "font": "en",
+     "align": "center",
+     "x": 570.0,
+     "y": 360.0
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "c": "blue",
+     "x": 930.0,
+     "y": 470.0,
+     "w": 70.0,
+     "h": 60.0,
+     "fill": "blue"
+    },
+    {
+     "t": "arrow",
+     "at": 11,
+     "c": "red",
+     "pts": [
+      [
+       965.0,
+       540.0
+      ],
+      [
+       965.0,
+       720.0
+      ]
+     ],
+     "w": 5.0
+    },
+    {
+     "t": "text",
+     "at": 11,
+     "c": "red",
+     "text": "mg",
+     "s": 48.0,
+     "font": "en",
+     "align": "left",
+     "x": 1000.0,
+     "y": 700.0
+    },
+    {
+     "t": "text",
+     "at": 11,
+     "c": "ink",
+     "text": "F = mg = 2 × 9.8 ≈ 19.6 N",
+     "s": 44.0,
+     "font": "en",
+     "align": "left",
+     "x": 1150.0,
+     "y": 420.0
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "c": "ink",
+     "text": "r = 0.5 m（手臂水平）",
+     "s": 40.0,
+     "font": "zh",
+     "align": "left",
+     "x": 1150.0,
+     "y": 520.0
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "c": "gold",
+     "text": "τ = 19.6 × 0.5 ≈ 9.8 N·m",
+     "s": 48.0,
+     "font": "en",
+     "align": "left",
+     "x": 1150.0,
+     "y": 630.0
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "加上手臂自重，选电机",
+    "en": "Add the arm's weight, choose the motor"
+   },
+   "elements": [
+    {
+     "t": "text",
+     "at": 14,
+     "c": "ink",
+     "text": "手臂：1.2 kg，重心在中点（r = 0.25 m）",
+     "s": 40.0,
+     "font": "zh",
+     "align": "left",
+     "x": 120.0,
+     "y": 320.0
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "c": "ink",
+     "text": "τ臂 = 1.2 × 9.8 × 0.25 ≈ 2.9 N·m",
+     "s": 46.0,
+     "font": "zh",
+     "align": "left",
+     "x": 120.0,
+     "y": 420.0
+    },
+    {
+     "t": "text",
+     "at": 16,
+     "c": "gold",
+     "text": "τ总 = 9.8 + 2.9 = 12.7 N·m",
+     "s": 52.0,
+     "font": "zh",
+     "align": "left",
+     "x": 120.0,
+     "y": 530.0
+    },
+    {
+     "t": "box",
+     "at": 17,
+     "c": "ink",
+     "x": 500.0,
+     "y": 720.0,
+     "w": 520.0,
+     "h": 110.0,
+     "zh": "留余量 × 1.5～2",
+     "s": 44.0,
+     "en": "safety margin"
+    },
+    {
+     "t": "arrow",
+     "at": 18,
+     "c": "green",
+     "pts": [
+      [
+       780.0,
+       720.0
+      ],
+      [
+       1060.0,
+       720.0
+      ]
+     ],
+     "w": 5.0
+    },
+    {
+     "t": "box",
+     "at": 18,
+     "c": "green",
+     "x": 1400.0,
+     "y": 720.0,
+     "w": 560.0,
+     "h": 120.0,
+     "zh": "选 25 N·m 电机",
+     "s": 48.0,
+     "en": "choose a 25 N·m motor"
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "姿势变了，力矩也变",
+    "en": "Pose changes the torque"
+   },
+   "elements": [
+    {
+     "t": "ellipse",
+     "at": 19,
+     "c": "ink",
+     "x": 200.0,
+     "y": 680.0,
+     "w": 60.0,
+     "h": 60.0
+    },
+    {
+     "t": "line",
+     "at": 19,
+     "c": "blue",
+     "pts": [
+      [
+       230.0,
+       710.0
+      ],
+      [
+       830.0,
+       710.0
+      ]
+     ],
+     "w": 5.0
+    },
+    {
+     "t": "line",
+     "at": 19,
+     "c": "gold",
+     "pts": [
+      [
+       230.0,
+       710.0
+      ],
+      [
+       530.0,
+       190.0
+      ]
+     ],
+     "w": 5.0
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "c": "ink",
+     "text": "60°",
+     "s": 40.0,
+     "font": "en",
+     "align": "left",
+     "x": 330.0,
+     "y": 640.0
+    },
+    {
+     "t": "arrow",
+     "at": 20,
+     "c": "red",
+     "pts": [
+      [
+       530.0,
+       220.0
+      ],
+      [
+       530.0,
+       520.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "c": "gold",
+     "pts": [
+      [
+       230.0,
+       820.0
+      ],
+      [
+       530.0,
+       820.0
+      ]
+     ],
+     "w": 3.2
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "c": "gold",
+     "text": "r·cos60° = r/2",
+     "s": 44.0,
+     "font": "en",
+     "align": "center",
+     "x": 380.0,
+     "y": 880.0
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "c": "ink",
+     "text": "力矩只剩一半",
+     "s": 50.0,
+     "font": "zh",
+     "align": "left",
+     "x": 1050.0,
+     "y": 500.0
+    },
+    {
+     "t": "text",
+     "at": 21,
+     "c": "red",
+     "text": "水平伸直时最吃力！",
+     "s": 56.0,
+     "font": "zh",
+     "align": "left",
+     "x": 1050.0,
+     "y": 640.0
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "小结",
+    "en": "Summary"
+   },
+   "elements": [
+    {
+     "t": "box",
+     "at": 22,
+     "c": "gold",
+     "x": 960.0,
+     "y": 420.0,
+     "w": 700.0,
+     "h": 130.0,
+     "zh": "力矩 = 力 × 力臂",
+     "s": 56,
+     "en": "τ = F × r"
+    },
+    {
+     "t": "icon",
+     "at": 23,
+     "c": "gold",
+     "name": "robot_arm",
+     "size": 260.0,
+     "x": 400.0,
+     "y": 780.0
+    },
+    {
+     "t": "text",
+     "at": 23,
+     "c": "ink",
+     "text": "按最吃力的姿势来算",
+     "s": 48.0,
+     "font": "zh",
+     "align": "left",
+     "x": 620.0,
+     "y": 760.0
+    },
+    {
+     "t": "text",
+     "at": 23,
+     "c": "green",
+     "text": "再留出余量",
+     "s": 48.0,
+     "font": "zh",
+     "align": "left",
+     "x": 620.0,
+     "y": 850.0
+    }
+   ]
+  }
+ ]
+}

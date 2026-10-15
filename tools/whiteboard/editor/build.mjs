@@ -9,7 +9,7 @@ await esbuild.build({
   loader: { ".woff2": "file", ".ttf": "file" }, jsx: "automatic", conditions: ["production"], logLevel: "warning",
 });
 cpSync("node_modules/@excalidraw/excalidraw/dist/prod/fonts", "dist/fonts", { recursive: true });
-copyFileSync("../player.js", "dist/player.js");
-copyFileSync("../../vendor/node_modules/roughjs/bundled/rough.js", "dist/rough.js");
+copyFileSync("../../../services/gateway/app/production/whiteboard/player.js", "dist/player.js");
+copyFileSync("../../../services/gateway/app/production/whiteboard/rough.js", "dist/rough.js");
 copyFileSync("src/index.html", "dist/index.html");
 console.log("built dist/");

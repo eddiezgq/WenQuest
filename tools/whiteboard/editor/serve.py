@@ -186,7 +186,7 @@ async def render(req: Request):
     data = wb.compile_scene(body["scene"], body["segments"], L.get("duration", 0))
     job = uuid.uuid4().hex[:8]
     JOBS[job] = {"state": "running", "progress": 0}
-    (LESSON / "_render.html").write_text(wb.page(data, L["title"], render=True))
+    (LESSON / "_render.html").write_text(wb.page(data, L["title"], render=True, hand_dir=wb.HAND))
 
     def run():
         try:

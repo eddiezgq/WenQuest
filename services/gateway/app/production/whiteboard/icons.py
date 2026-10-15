@@ -111,3 +111,22 @@ ICONS = {
     "earth_arc": ["M0,170 Q100,120 200,170"],
     "signal": ["M60,60 Q100,20 140,60", "M75,80 Q100,52 125,80", circle(100, 100, 6)],
 }
+
+
+# Named parts of some icons (200×200 coordinates): the board designer points arrows and marks at them; arrows that end
+# near a part are snapped onto it (whiteboard/ai.py).
+ANCHORS = {
+    "robot_arm": {"base": (80, 176), "shoulder": (80, 150), "elbow": (128, 62), "gripper": (186, 53)},
+    "car": {"rear_wheel": (49, 142), "front_wheel": (155, 142), "headlight": (190, 108), "engine": (168, 90),
+            "cabin": (110, 82), "rear": (12, 120)},
+    "block_force": {"block": (93, 111), "force_tip": (186, 110), "ground": (100, 140)},
+    "phone": {"screen": (100, 100)},
+    "satellite": {"body": (100, 100), "panel_left": (45, 100), "panel_right": (155, 100), "antenna": (100, 150)},
+    "chip": {"core": (100, 100)},
+    "engine": {"block": (100, 110)},
+    "magnet": {"north": (71, 40), "south": (129, 40)},
+    "prism": {"in": (8, 112), "out": (194, 114)},
+    "laser": {"output": (190, 100)},
+    "wheel": {"hub": (100, 100), "rim": (100, 22)},
+    "spring": {"top": (100, 15), "bottom": (100, 185)},
+}

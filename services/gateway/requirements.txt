@@ -17,3 +17,6 @@ numpy==2.4.4
 trimesh==5.1.0
 matplotlib==3.10.9
 pyyaml==6.0.3
+# 白板讲课（第 35 轮）：手写字转笔画（woff2 字体）
+fonttools==4.67.0
+brotli==1.2.0

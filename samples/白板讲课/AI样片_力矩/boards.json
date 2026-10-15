@@ -1,0 +1,71 @@
+{"boards": [
+ {"title": {"zh": "实际问题：举起零件", "en": "The problem: hold a part"}, "elements": [
+  {"t": "icon", "at": 0, "name": "robot_arm", "x": 520, "y": 640, "size": 420},
+  {"t": "box", "at": 0, "x": 860, "y": 380, "w": 220, "h": 96, "zh": "零件 2 kg", "en": "part", "c": "blue"},
+  {"t": "arrow", "at": 0, "pts": [[860, 432], [790, 470]], "c": "blue"},
+  {"t": "ellipse", "at": 1, "x": 395, "y": 745, "w": 90, "h": 90, "c": "red"},
+  {"t": "arrow", "at": 1, "pts": [[1150, 700], [500, 790]], "c": "red"},
+  {"t": "text", "at": 1, "x": 1180, "y": 640, "text": "肩关节电机", "s": 52, "c": "red"},
+  {"t": "text", "at": 1, "x": 1180, "y": 720, "text": "至少要多大的劲？", "s": 52, "c": "red"}
+ ]},
+ {"title": {"zh": "生活中的例子：扳手", "en": "Everyday example: a spanner"}, "elements": [
+  {"t": "ellipse", "at": 2, "x": 200, "y": 420, "w": 120, "h": 120},
+  {"t": "rect", "at": 2, "x": 300, "y": 455, "w": 760, "h": 50},
+  {"t": "text", "at": 2, "x": 260, "y": 600, "text": "螺母（转轴）", "s": 32, "align": "center", "c": "muted"},
+  {"t": "arrow", "at": 3, "pts": [[420, 330], [420, 445]], "c": "red"},
+  {"t": "text", "at": 3, "x": 420, "y": 310, "text": "费力", "s": 40, "align": "center", "c": "red"},
+  {"t": "arrow", "at": 3, "pts": [[1000, 330], [1000, 445]], "c": "green"},
+  {"t": "text", "at": 3, "x": 1000, "y": 310, "text": "省力", "s": 40, "align": "center", "c": "green"},
+  {"t": "text", "at": 4, "x": 120, "y": 760, "text": "转动的效果 = 力有多大 + 离转轴多远", "s": 46},
+  {"t": "box", "at": 5, "x": 960, "y": 900, "w": 360, "h": 110, "zh": "力矩", "en": "Torque", "c": "gold", "s": 52}
+ ]},
+ {"title": {"zh": "力矩的定义", "en": "What torque is"}, "elements": [
+  {"t": "text", "at": 6, "x": 960, "y": 330, "text": "τ = F × r", "s": 96, "font": "en", "align": "center", "c": "gold"},
+  {"t": "ellipse", "at": 7, "x": 300, "y": 570, "w": 60, "h": 60},
+  {"t": "line", "at": 7, "pts": [[360, 600], [1100, 600]], "w": 5},
+  {"t": "arrow", "at": 7, "pts": [[1100, 600], [1100, 820]], "c": "red", "w": 5},
+  {"t": "text", "at": 7, "x": 1130, "y": 780, "text": "F", "s": 56, "font": "en", "c": "red"},
+  {"t": "line", "at": 7, "pts": [[330, 680], [1100, 680]], "c": "blue"},
+  {"t": "text", "at": 7, "x": 715, "y": 735, "text": "力臂 r（转轴到力的作用线的垂直距离）", "s": 32, "align": "center", "c": "blue"},
+  {"t": "text", "at": 8, "x": 1400, "y": 560, "text": "单位：N·m", "s": 52},
+  {"t": "text", "at": 8, "x": 1400, "y": 630, "text": "newton-metre", "s": 40, "font": "en", "c": "muted"}
+ ]},
+ {"title": {"zh": "建模：机器人手臂", "en": "Modelling the robot arm"}, "elements": [
+  {"t": "ellipse", "at": 9, "x": 150, "y": 420, "w": 70, "h": 70, "c": "blue"},
+  {"t": "line", "at": 9, "pts": [[220, 455], [960, 455]], "c": "blue", "w": 6},
+  {"t": "text", "at": 10, "x": 185, "y": 560, "text": "肩关节（转轴）", "s": 30, "align": "center", "c": "muted"},
+  {"t": "line", "at": 10, "pts": [[185, 380], [960, 380]], "c": "muted"},
+  {"t": "text", "at": 10, "x": 570, "y": 360, "text": "0.5 m", "s": 40, "font": "en", "align": "center"},
+  {"t": "rect", "at": 10, "x": 930, "y": 470, "w": 70, "h": 60, "c": "blue", "fill": "blue"},
+  {"t": "arrow", "at": 11, "pts": [[965, 540], [965, 720]], "c": "red", "w": 5},
+  {"t": "text", "at": 11, "x": 1000, "y": 700, "text": "mg", "s": 48, "font": "en", "c": "red"},
+  {"t": "text", "at": 11, "x": 1150, "y": 420, "text": "F = mg = 2 × 9.8 ≈ 19.6 N", "s": 44, "font": "en"},
+  {"t": "text", "at": 12, "x": 1150, "y": 520, "text": "r = 0.5 m（手臂水平）", "s": 40},
+  {"t": "text", "at": 13, "x": 1150, "y": 630, "text": "τ = 19.6 × 0.5 ≈ 9.8 N·m", "s": 48, "font": "en", "c": "gold"}
+ ]},
+ {"title": {"zh": "加上手臂自重，选电机", "en": "Add the arm's weight, choose the motor"}, "elements": [
+  {"t": "text", "at": 14, "x": 120, "y": 320, "text": "手臂：1.2 kg，重心在中点（r = 0.25 m）", "s": 40},
+  {"t": "text", "at": 15, "x": 120, "y": 420, "text": "τ臂 = 1.2 × 9.8 × 0.25 ≈ 2.9 N·m", "s": 46},
+  {"t": "text", "at": 16, "x": 120, "y": 530, "text": "τ总 = 9.8 + 2.9 = 12.7 N·m", "s": 52, "c": "gold"},
+  {"t": "box", "at": 17, "x": 500, "y": 720, "w": 520, "h": 110, "zh": "留余量 × 1.5～2", "en": "safety margin", "s": 44},
+  {"t": "arrow", "at": 18, "pts": [[780, 720], [1060, 720]], "c": "green", "w": 5},
+  {"t": "box", "at": 18, "x": 1400, "y": 720, "w": 560, "h": 120, "zh": "选 25 N·m 电机", "en": "choose a 25 N·m motor", "c": "green", "s": 48}
+ ]},
+ {"title": {"zh": "姿势变了，力矩也变", "en": "Pose changes the torque"}, "elements": [
+  {"t": "ellipse", "at": 19, "x": 200, "y": 680, "w": 60, "h": 60},
+  {"t": "line", "at": 19, "pts": [[230, 710], [830, 710]], "c": "blue", "w": 5},
+  {"t": "line", "at": 19, "pts": [[230, 710], [530, 190]], "c": "gold", "w": 5},
+  {"t": "text", "at": 19, "x": 330, "y": 640, "text": "60°", "s": 40, "font": "en"},
+  {"t": "arrow", "at": 20, "pts": [[530, 220], [530, 520]], "c": "red"},
+  {"t": "line", "at": 20, "pts": [[230, 820], [530, 820]], "c": "gold"},
+  {"t": "text", "at": 20, "x": 380, "y": 880, "text": "r·cos60° = r/2", "s": 44, "font": "en", "align": "center", "c": "gold"},
+  {"t": "text", "at": 20, "x": 1050, "y": 500, "text": "力矩只剩一半", "s": 50},
+  {"t": "text", "at": 21, "x": 1050, "y": 640, "text": "水平伸直时最吃力！", "s": 56, "c": "red"}
+ ]},
+ {"title": {"zh": "小结", "en": "Summary"}, "elements": [
+  {"t": "box", "at": 22, "x": 960, "y": 420, "w": 700, "h": 130, "zh": "力矩 = 力 × 力臂", "en": "τ = F × r", "c": "gold", "s": 56},
+  {"t": "icon", "at": 23, "name": "robot_arm", "x": 400, "y": 780, "size": 260, "c": "gold"},
+  {"t": "text", "at": 23, "x": 620, "y": 760, "text": "按最吃力的姿势来算", "s": 48},
+  {"t": "text", "at": 23, "x": 620, "y": 850, "text": "再留出余量", "s": 48, "c": "green"}
+ ]}
+]}
