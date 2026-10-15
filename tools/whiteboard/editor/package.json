@@ -1,0 +1,16 @@
+{
+  "name": "wenquest-whiteboard-editor",
+  "private": true,
+  "description": "白板课编辑器（第 35 轮第 2 步）：Excalidraw + 讲稿分段。npm ci && npm run build → dist/",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "0.18.1",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
+}

@@ -148,7 +148,12 @@ def compile_lesson(L):
                 raise SystemExit(f"unknown element type {t!r}")
             items.append(it)
             ex.append((bi, ox, oy, e))
-    # ---- timing: each segment's items share the time from the segment start to the next segment
+    return schedule(items, boards, L["segments"], L.get("duration", 0)), ex
+
+
+
+def schedule(items, boards, segs, duration=0):
+    """Give every stroke a start and a length from the words it belongs to (item["at"] = segment index)."""
     cam, starts = [], {}
     order = sorted(range(len(items)), key=lambda i: (items[i]["at"], i))
     by_seg = {}
@@ -190,9 +195,9 @@ def compile_lesson(L):
         cursor = t
     for it in items:
         it.pop("weight", None)
-    total = round(max(segs[-1]["t1"] + 2.0, L.get("duration", 0)), 2)
+    total = round(max(segs[-1]["t1"] + 2.0, duration or 0), 2)
     return {"W": W, "H": H, "boards": boards, "items": items, "cam": cam, "total": total,
-            "captions": [{"t0": s["t0"], "t1": s["t1"], "zh": s["zh"]} for s in segs]}, ex
+            "captions": [{"t0": s["t0"], "t1": s["t1"], "zh": s["zh"]} for s in segs]}
 
 
 def scale_path(d, k, x0, y0):
@@ -243,8 +248,10 @@ def excalidraw(L, ex):
         t = e["t"]
         if t == "text":
             s = e.get("s", 40)
-            width = len(e["text"]) * s * (1 if e.get("font", "zh") == "zh" else 0.5)
-            x = e["x"] - (width / 2 if e.get("align") == "center" else 0)
+            width = sum(s * (1.0 if ord(ch) > 0x2e80 else 0.55) for ch in e["text"])   # close to Excalidraw's own fonts
+            align = e.get("align", "left")
+            x = e["x"] - (width / 2 if align == "center" else width if align == "right" else 0)
+            common["customData"] = {"wq_at": e["at"], "wq_ax": e["x"], "wq_x": x, "wq_font": e.get("font", "zh")}
             els.append(dict(common, type="text", x=ox + x, y=oy + e["y"] - s, width=width, height=s * 1.25, text=e["text"],
                             originalText=e["text"], fontSize=s, fontFamily=5, textAlign=e.get("align", "left"),
                             verticalAlign="top", containerId=None, lineHeight=1.25, autoResize=True))
@@ -280,6 +287,128 @@ def excalidraw(L, ex):
                                     groupIds=[gid]))
     return {"type": "excalidraw", "version": 2, "source": "https://learn.wenquestrobotics.com", "elements": els,
             "appState": {"viewBackgroundColor": "#fdfcf8", "gridSize": None}, "files": {}}
+
+
+# ---------------- from an Excalidraw scene (第 2 步：老师在编辑器里改过的画板) ----------------
+def freedraw_d(pts, x, y):
+    if not pts:
+        return ""
+    P = [(x + p[0], y + p[1]) for p in pts]
+    if len(P) < 3:
+        return "M" + " L".join(f"{a:.1f},{b:.1f}" for a, b in P)
+    d = [f"M{P[0][0]:.1f},{P[0][1]:.1f}"]
+    for i in range(1, len(P) - 1):
+        mx, my = (P[i][0] + P[i + 1][0]) / 2, (P[i][1] + P[i + 1][1]) / 2
+        d.append(f"Q{P[i][0]:.1f},{P[i][1]:.1f} {mx:.1f},{my:.1f}")
+    d.append(f"L{P[-1][0]:.1f},{P[-1][1]:.1f}")
+    return " ".join(d)
+
+
+def compile_scene(scene, segs, duration=0):
+    """Excalidraw scene (frames = boards, customData.wq_at = segment index) → player data."""
+    live = [e for e in scene["elements"] if not e.get("isDeleted")]
+    frames = [e for e in live if e["type"] == "frame"]
+    if not frames:
+        frames = [{"id": "_all", "x": 0, "y": 0, "width": W, "height": H}]
+    fidx = {f["id"]: i for i, f in enumerate(frames)}
+    boards = [{"ox": f["x"], "oy": f["y"]} for f in frames]
+
+    def board_of(e):
+        if e.get("frameId") in fidx:
+            return fidx[e["frameId"]]
+        cx, cy = e["x"] + e.get("width", 0) / 2, e["y"] + e.get("height", 0) / 2
+        return min(range(len(frames)), key=lambda i: (frames[i]["x"] + W / 2 - cx) ** 2 + (frames[i]["y"] + H / 2 - cy) ** 2)
+
+    items, at, last_group = [], 0, None
+    nseg = len(segs)
+    for e in live:
+        if e["type"] == "frame":
+            continue
+        cd = e.get("customData") or {}
+        if isinstance(cd.get("wq_at"), int):
+            at = max(0, min(nseg - 1, cd["wq_at"]))
+        bi = board_of(e)
+        ox, oy = boards[bi]["ox"], boards[bi]["oy"]
+        x, y = e["x"] - ox, e["y"] - oy
+        c = e.get("strokeColor") or INK
+        sw = max(1.6, (e.get("strokeWidth") or 2) * 1.6)
+        opts = {"stroke": c, "strokeWidth": sw, "seed": e.get("seed", 1) % 2147483647,
+                "roughness": max(0.4, min(2.2, (e.get("roughness", 1) or 0.5) * 1.1))}
+        bg = e.get("backgroundColor")
+        if bg and bg != "transparent":
+            opts.update(fill=bg, fillStyle=e.get("fillStyle") or "hachure", hachureGap=9, fillWeight=1.6)
+        t = e["type"]
+        it = {"b": bi, "at": at, "eid": e["id"]}
+        if t in ("rectangle", "ellipse"):
+            it.update(k="rough", shape={"type": "rect" if t == "rectangle" else "ellipse", "x": x, "y": y, "w": e["width"], "h": e["height"]},
+                      opts=opts, weight=0.75 if "fill" not in opts else 1.3)
+        elif t == "diamond":
+            w_, h_ = e["width"], e["height"]
+            it.update(k="rough", shape={"type": "line", "pts": [[x + w_ / 2, y], [x + w_, y + h_ / 2], [x + w_ / 2, y + h_], [x, y + h_ / 2], [x + w_ / 2, y]]},
+                      opts=opts, weight=0.8)
+        elif t in ("arrow", "line"):
+            pts = [[x + p[0], y + p[1]] for p in e.get("points") or []]
+            if len(pts) < 2:
+                continue
+            it.update(k="rough", shape={"type": "line", "pts": pts}, opts=dict(opts, roughness=min(opts["roughness"], 0.9)), weight=0.45)
+            items.append(it)
+            for end, tip, prev in (("endArrowhead", pts[-1], pts[-2]), ("startArrowhead", pts[0], pts[1])):
+                if e.get(end):
+                    h = arrow_head([prev, tip], 10 + sw * 3)
+                    items.append({"b": bi, "at": at, "k": "rough", "shape": {"type": "line", "pts": [h[0][0], tip, h[1][0]]},
+                                  "opts": dict(opts, roughness=0.6, seed=opts["seed"] + 1), "weight": 0.2})
+            continue
+        elif t == "text":
+            s_ = e.get("fontSize", 36)
+            lh = s_ * (e.get("lineHeight") or 1.25)
+            align = e.get("textAlign", "left")
+            if isinstance(cd.get("wq_ax"), (int, float)) and isinstance(cd.get("wq_x"), (int, float)):
+                ax = cd["wq_ax"] + (x - cd["wq_x"])     # our anchor, moved as far as the teacher moved the text
+            else:
+                ax = x + (e["width"] / 2 if align == "center" else e["width"] if align == "right" else 0)
+            if cd.get("wq_font") in ("zh", "en"):
+                f = ZH if cd["wq_font"] == "zh" else EN
+            else:
+                f = ZH if any(ord(ch) > 0x2e80 for ch in e.get("text", "")) else EN
+            paths = []
+            for li, line in enumerate((e.get("text") or "").split("\n")):
+                gl, _ = f.glyphs(line, ax, y + li * lh + s_ * 0.92, s_, align)
+                paths += [{"d": d, "c": c, "w": 1.3, "f": 1} for d in gl]
+            if not paths:
+                continue
+            it.update(k="path", paths=paths, weight=max(0.35, 0.16 * len(paths)))
+        elif t == "freedraw":
+            d = freedraw_d(e.get("points") or [], x, y)
+            if not d:
+                continue
+            g = (e.get("groupIds") or [None])[0]
+            path = {"d": d, "c": c, "w": max(2.2, (e.get("strokeWidth") or 2) * 1.7)}
+            if g and last_group == g and items and items[-1].get("group") == g and items[-1]["b"] == bi:
+                items[-1]["paths"].append(path)
+                items[-1]["weight"] += 0.22
+                continue
+            it.update(k="path", paths=[path], weight=0.57, group=g)
+        else:
+            continue   # images and embeds: later
+        last_group = (e.get("groupIds") or [None])[0] if t == "freedraw" else None
+        items.append(it)
+    for it in items:
+        it.pop("group", None)
+    return schedule(items, boards, segs, duration)
+
+
+def build_scene(lesson_dir, mp4=False):
+    """lesson.json (segments, audio) + board.excalidraw (edited) → web page / MP4."""
+    d = Path(lesson_dir)
+    L = json.loads((d / "lesson.json").read_text())
+    scene = json.loads((d / "board.excalidraw").read_text())
+    data = compile_scene(scene, L["segments"], L.get("duration", 0))
+    (d / "data.json").write_text(json.dumps(data, ensure_ascii=False))
+    (d / "_render.html").write_text(page(data, L["title"], render=True))
+    print(f"scene: {len(data['boards'])} boards, {len(data['items'])} strokes, {data['total']} s")
+    if mp4:
+        render_mp4(d, data, d / L["audio"])
+    return data
 
 
 # ---------------- page ----------------
@@ -329,7 +458,7 @@ def build(lesson_dir, mp4=False):
         render_mp4(d, data, audio)
 
 
-def render_mp4(d, data, audio, fps=30, start=0.0, end=None):
+def render_mp4(d, data, audio, fps=30, start=0.0, end=None, progress=None):
     from playwright.sync_api import sync_playwright
     end = end or data["total"]
     out = d / "白板课.mp4"
@@ -346,6 +475,8 @@ def render_mp4(d, data, audio, fps=30, start=0.0, end=None):
             ff.stdin.write(p.screenshot(type="jpeg", quality=90))
             if i % 900 == 0:
                 print(f"  frame {i}/{n}", flush=True)
+            if progress and i % 30 == 0:
+                progress(round(100 * i / n))
         b.close()
     ff.stdin.close()
     ff.wait()
@@ -353,4 +484,7 @@ def render_mp4(d, data, audio, fps=30, start=0.0, end=None):
 
 
 if __name__ == "__main__":
-    build(sys.argv[1], "--mp4" in sys.argv)
+    if "--scene" in sys.argv:
+        build_scene(sys.argv[1], "--mp4" in sys.argv)
+    else:
+        build(sys.argv[1], "--mp4" in sys.argv)
