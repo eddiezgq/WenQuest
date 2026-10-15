@@ -37,6 +37,8 @@ LIBS = {
     "npm/digitaljs@0.14.2/dist/main.js": "digitaljs/dist/main.js",
     "npm/digitaljs@0.14.2/dist/285.main.js": "digitaljs/dist/285.main.js",
     "npm/digitaljs@0.14.2/dist/821.main.js": "digitaljs/dist/821.main.js",
+    # 白板讲课（第 35 轮）的手绘线条
+    "roughjs/4.6.6/rough.js": "roughjs/bundled/rough.js",
 }
 
 

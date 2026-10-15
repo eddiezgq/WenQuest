@@ -1,0 +1,39 @@
+<style>
+#cap{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);max-width:86%;background:rgba(20,26,31,.72);color:#fff;
+  font:500 clamp(14px,2.1vw,24px)/1.45 "PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;padding:.3em .8em;border-radius:6px;display:none;text-align:center}
+#stage.cc #cap.on{display:block}
+#bar{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;box-sizing:border-box;gap:12px;align-items:center;padding:10px 12px;font:14px/1 "PingFang SC","Microsoft YaHei",sans-serif;color:#1d2329}
+#bar button{border:1px solid #d9d3c7;background:#fff;border-radius:999px;padding:7px 14px;font:inherit;cursor:pointer;white-space:nowrap}
+#bar button.on{background:#1d2329;color:#fff;border-color:#1d2329}
+#seek{flex:1;accent-color:#c98a00;min-width:80px}
+#time{font-variant-numeric:tabular-nums;color:#5f6b76;white-space:nowrap}
+#big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer}
+#big span{width:96px;height:96px;border-radius:50%;background:rgba(29,35,41,.78);color:#fff;font-size:40px;display:flex;align-items:center;justify-content:center;padding-left:8px;box-sizing:border-box}
+@media (max-width:640px){#seek{order:9;flex-basis:100%}#bar button{padding:6px 11px}}
+#stage:fullscreen{max-width:none;background:#fdfcf8}
+</style>
+<div id="bar"><button id="pp" type="button">▶ 播放</button><input id="seek" type="range" min="0" max="1000" value="0" step="1">
+<span id="time">0:00 / 0:00</span><button id="ccb" type="button" class="on">字幕</button><button id="fs" type="button">全屏</button></div>
+<script>
+window.UI=function(D){
+  const a=document.getElementById('aud'),st=document.getElementById('stage'),pp=document.getElementById('pp'),sk=document.getElementById('seek'),tm=document.getElementById('time');
+  const cap=document.createElement('div');cap.id='cap';st.appendChild(cap);st.classList.add('cc');
+  const big=document.createElement('div');big.id='big';big.innerHTML='<span>▶</span>';st.appendChild(big);
+  const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+  let dragging=false;
+  function draw(){const t=a.currentTime;WB.seek(t);
+    if(!dragging)sk.value=Math.round(t/D.total*1000);tm.textContent=fmt(t)+' / '+fmt(D.total);
+    const c=D.captions.find(c=>t>=c.t0&&t<=c.t1+0.4);cap.textContent=c?c.zh:'';cap.classList.toggle('on',!!c);}
+  function loop(){draw();if(!a.paused)requestAnimationFrame(loop);}
+  function play(){a.play();pp.textContent='❚❚ 暂停';big.style.display='none';requestAnimationFrame(loop);}
+  function pause(){a.pause();pp.textContent='▶ 播放';}
+  pp.onclick=()=>a.paused?play():pause();big.onclick=play;st.addEventListener('click',e=>{if(e.target.closest('#big'))return;a.paused?play():pause();});
+  a.onended=()=>{pp.textContent='↻ 重播';};
+  sk.oninput=()=>{dragging=true;a.currentTime=sk.value/1000*D.total;draw();};sk.onchange=()=>{dragging=false;};
+  document.getElementById('ccb').onclick=e=>{st.classList.toggle('cc');e.target.classList.toggle('on');};
+  document.getElementById('fs').onclick=()=>{document.fullscreenElement?document.exitFullscreen():st.requestFullscreen&&st.requestFullscreen();};
+  document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();a.paused?play():pause();}
+    if(e.code==='ArrowRight'){a.currentTime=Math.min(D.total,a.currentTime+5);draw();}if(e.code==='ArrowLeft'){a.currentTime=Math.max(0,a.currentTime-5);draw();}});
+  draw();
+};
+</script>
