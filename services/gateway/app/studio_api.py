@@ -968,7 +968,9 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         await publish_lesson(proj, chapter, les, sess)
         f["state"], f["approved"] = "approved", time.time()
         studio().log_flow(les, who(sess, proj) + ("（本人审核）" if own else ""), "approve", comment)
-        studio().say(proj, f"课程委员会批准了《{disp(les['title'])}》{'（本人审核）' if own else ''}，已发布，学生现在能看到了。"
+        new_version = bool(les.pop("republish", None))
+        studio().say(proj, f"课程委员会批准了《{disp(les['title'])}》{'（本人审核）' if own else ''}，"
+                     + ("新版本已替换上线，学生现在看到的是新版本。" if new_version else "已发布，学生现在能看到了。")
                      + (f"\n主任意见：{comment}" if comment else ""), "system")
         studio().projects.save(proj)
         return proj
@@ -1285,12 +1287,23 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             fids = [fid for fid, f in proj["materials"]["files"].items()
                     if f["role"] in team.ATTACH_ROLES and chapter["no"] in (f.get("chapters") or [])]
             acts += await upload_files(proj, fids, sess)
+        old = [c for c in les.get("cmids") or [] if c != (course.get("labs") or {}).get(chapter["id"])]
         res = await m.state.moodle.call(sess.moodle_token, "local_wenquest_add_activities", None,
                                         courseid=course["id"], section=number, sectionname=ml(chapter["title"], lg),
                                         activities=acts)
         if chapter["id"] not in course["attached"]:
             course["attached"].append(chapter["id"])
         les["cmids"] = res.get("cmids", [])
+        # a new version of a published lesson (round 32, D5): the new activities are in; now take the old ones out
+        for cmid in old:
+            if cmid in les["cmids"]:
+                continue
+            try:
+                await m.state.moodle.call(sess.moodle_token, "local_wenquest_edit_course", None, courseid=course["id"],
+                                          action="deletemodule", cmid=int(cmid))
+            except EngineError as exc:
+                if exc.code not in ("not_found", "invalid_input"):
+                    raise
         if lab_index >= 0 and lab_index < len(les["cmids"]):
             course.setdefault("labs", {})[chapter["id"]] = les["cmids"][lab_index]
         les["status"] = "published"

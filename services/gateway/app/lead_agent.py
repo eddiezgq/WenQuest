@@ -44,7 +44,8 @@ AGENT_TOOLS = [
                                                        "steps": {"type": "array", "items": {"type": "object"}}},
                       "required": ["summary", "steps"]}},
     {"name": "edit_lesson", "description": (
-        "Work on ONE written lesson (waiting for review) without rewriting all of it: change some parts and/or make some "
+        "Work on ONE written lesson (waiting for review, or published — that makes a new version the committee approves "
+        "before students see it) without rewriting all of it: change some parts and/or make some "
         "deliverables again. Call get_lesson first to see its parts. `set`: your own new content for parts (same shape "
         "as get_lesson shows: problem, notes, example, lab, model, …); `rewrite` + `note`: the lecturer rewrites those "
         "parts following the note; `redo`: deliverables to make again (animation, lab, figures, exercises, guide_plan, "

@@ -145,6 +145,8 @@ export interface StudioLesson {
   checklist?: { key: string; label: string; ok: boolean | null; by: string; note: string; image?: string; image_url?: string }[];
   /** 改动记录 (round 32): what the course lead changed in this lesson since it was written, newest last. */
   edits?: { at: number; what: string; by: string }[];
+  /** 新版本 (round 32, D5): a published lesson being changed; students see the published one until the committee approves. */
+  republish?: { since: number; published?: number };
 }
 /** ready: the teacher confirmed this chapter's lessons (本章确认); only then are they written. */
 export interface ReviewOpinion {

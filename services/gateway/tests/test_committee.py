@@ -83,3 +83,55 @@ def test_own_lesson_needs_another_member_unless_self_review(client):
 def test_only_administrators_set_the_committee(client):
     h = login(client)
     assert client.put("/api/v1/admin/committee", headers=h, json={"members": ["t"], "chair": "t"}).status_code == 403
+
+
+def test_a_published_lesson_gets_a_new_version_that_replaces_the_old_one_when_approved(client):
+    """Round 32 (D5): the course lead changes a published lesson; students keep the published one until the chair
+    approves the new version, which then takes the old activities' place in the course."""
+    import asyncio
+    h = login(client)
+    pid, p = _write_first_lesson(client, h)
+    les = p["outline"]["chapters"][0]["lessons"][0]
+    base = f"/api/v1/studio/projects/{pid}/lessons/{les['id']}"
+    st = main._studio()
+    st.committee.save({"members": [{"id": 5, "name": "T", "email": ""}], "chair": 5, "self_review": True})
+    calls, nxt = [], iter([[201, 202, 203], [301, 302, 303]])
+    real = main.state.moodle.call
+
+    async def spy(token, fn, *a, **kw):
+        if fn == "local_wenquest_add_activities":
+            await real(token, fn, *a, **kw)
+            return {"courseid": 7, "sectionid": 30, "cmids": next(nxt)}
+        if fn == "local_wenquest_edit_course" and kw.get("action") == "deletemodule":
+            calls.append(kw["cmid"])
+            return {}
+        return await real(token, fn, *a, **kw)
+    main.state.moodle.call = spy
+
+    def through_committee():
+        client.post(f"{base}/submit", headers=h)
+        settle(client, h, pid)
+        client.post(f"{base}/to-committee", headers=h, json={"comment": ""})
+        return client.post(f"{base}/approve", headers=h).json()
+    p = through_committee()
+    first = p["outline"]["chapters"][0]["lessons"][0]
+    assert first["status"] == "published" and first["cmids"] == [201, 202, 203] and calls == []
+    # the course lead changes the published lesson: a new version, the course is not touched
+    step = {"type": "rework_lesson", "lesson_id": les["id"], "summary": "改小结", "set": {"summary": [["新小结", "New summary"]]}}
+    proj = st.projects.load(pid)
+    assert st.step_ok(proj, step)
+
+    async def go():
+        st.run(proj, "改", lambda pr: st.run_step(pr, step))
+        await st.tasks[pid]
+    asyncio.run(go())
+    p = client.get(f"/api/v1/studio/projects/{pid}", headers=h).json()
+    les2 = p["outline"]["chapters"][0]["lessons"][0]
+    assert les2["status"] == "awaiting" and les2["republish"] and les2["cmids"] == [201, 202, 203] and calls == []
+    assert "旧版" in p["messages"][-1]["text"]
+    # approved: new activities in, the old ones out
+    p = through_committee()
+    les3 = p["outline"]["chapters"][0]["lessons"][0]
+    assert les3["status"] == "published" and les3["cmids"] == [301, 302, 303] and not les3.get("republish")
+    assert sorted(calls) == [201, 202, 203]
+    assert "新版本已替换上线" in " ".join(m["text"] for m in p["messages"][-3:])

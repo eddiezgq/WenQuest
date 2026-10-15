@@ -92,7 +92,8 @@ STEP_DOC = """Steps a proposal may contain (JSON objects with "type"):
 - set_calendar_note {text}
 - write_lessons {lesson_ids: [..]}: write these planned lessons one after another (background work)
 - rework_lesson {lesson_id, summary, set?: {part: value}, rewrite?: [part], note?, redo?: [deliverable]}: work on ONE
-  written lesson (waiting for review) without rewriting all of it. parts: title, goal, problem, concept, notes, example,
+  written lesson (waiting for review, or PUBLISHED — then it becomes a new version: students keep the published one
+  until the teacher submits it and the committee approves) without rewriting all of it. parts: title, goal, problem, concept, notes, example,
   animation, lab, model, everyday, summary, self_check, figures — `set` gives your own new content for a part (same
   shape as get_lesson shows), `rewrite` has the lecturer rewrite those parts following `note`. deliverables: animation,
   lab, figures, exercises, guide_plan, lecture — made again on their own. Slides, notes page, guide and plan are laid
@@ -448,7 +449,7 @@ class LeadMixin:
         if t == "remove_chapter":
             no = _int(s["no"])
             ch = next(c for c in o["chapters"] if c["no"] == no)
-            if any(les["status"] == "published" for les in ch["lessons"]):
+            if any(les["status"] == "published" or les.get("republish") for les in ch["lessons"]):
                 raise EngineError("published", "这一章有已发布的课时，不能删")
             o["chapters"] = [c for c in o["chapters"] if c["no"] != no]
             for i, c in enumerate(o["chapters"], 1):

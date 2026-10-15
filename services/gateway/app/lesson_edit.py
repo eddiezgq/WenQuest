@@ -38,7 +38,7 @@ KEEP_BACKUPS = 3
 
 
 def rework_ok(les: dict | None, s: dict) -> bool:
-    if not les or les["status"] not in ("awaiting", "failed"):
+    if not les or les["status"] not in ("awaiting", "failed", "published"):   # published: a new version (round 32, D5)
         return False
     st = s.get("set") if isinstance(s.get("set"), dict) else {}
     rw = [p for p in s.get("rewrite") or [] if p in PARTS]
@@ -190,11 +190,19 @@ class LessonEditMixin:
         if "lecture" in redo or changed:
             await self.make_lecture(proj, chapter, les, spec, no)
         les["checklist"] = self.checklist(proj, les, video, lab)
-        les["status"] = "awaiting" if prev_status in ("awaiting", "failed") else prev_status
+        les["status"] = "awaiting"
+        if prev_status == "published":
+            # a new version: students keep the published one until the committee approves this one (round 32, D5)
+            les["republish"] = {"since": time.time(), "published": les.get("published")}
+            flow = les.get("review_flow") or {}
+            if flow.get("state") == "approved":
+                flow["state"] = ""
         les["error"] = ""
         les.setdefault("edits", []).append({"at": time.time(), "what": describe_rework(les, s)[:300], "by": "lead"})
         del les["edits"][:-20]
-        self.say(proj, f"改好了：{describe_rework(les, s)}。请在右边“课时进度”里看。", "lead", "lesson")
+        self.say(proj, f"改好了：{describe_rework(les, s)}。请在右边“课时进度”里看。"
+                 + ("这是已发布的课的新版本：学生现在看到的仍是旧版，提交审核、委员会批准后才替换上线。" if les.get("republish") else ""),
+                 "lead", "lesson")
 
     def lesson_card(self, proj: dict, les: dict) -> str:
         """The written lesson as the lead sees it to edit it: every part of its spec, its deliverables and review."""

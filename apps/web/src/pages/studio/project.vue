@@ -379,6 +379,7 @@
                     <text v-if="l.attention?.length && l.status === 'awaiting' && !l.review_flow?.state" class="st needs">{{ t("studio.needsYou") }}</text>
                     <text v-if="l.status === 'awaiting' && l.review_flow?.state" class="st" :class="l.review_flow.state === 'returned' ? 'needs' : 'awaiting'">{{ l.review_flow.state === "submitted" ? t("rev.waiting") : t("rev.state." + l.review_flow.state) }}</text>
                     <text v-else class="st" :class="l.status">{{ t("studio.status." + l.status) }}</text>
+                    <text v-if="l.republish" class="st needs">{{ t("lead.newVersion") }}</text>
                   </view>
                   <view v-if="openLesson === l.id" class="l-body">
                     <template v-if="l.status === 'awaiting' || l.status === 'published'">
