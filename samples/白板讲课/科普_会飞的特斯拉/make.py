@@ -256,7 +256,7 @@ els += [{"t": "move", "at": 34, "kind": "shift", "targets": ["air2"], "dx": 0, "
 B.append(els)
 # 35-38 · 虚拟实验录屏
 els = [txt(960, 150, 52, "虚拟实验：冷气推进能飞多久？", 35, c="blue"),
-       {"t": "media", "at": 35, "src": "video:" + str(here / "_lab.mp4"), "x": 210, "y": 210, "w": 1500, "h": 703, "play": 20},
+       {"t": "media", "at": 35, "src": "video:" + str(here / "_lab.webm"), "x": 210, "y": 210, "w": 1500, "h": 703, "play": 20},
        txt(960, 1000, 34, "网页版里可以自己调", 35, c="muted")]
 B.append(els)
 # 39 · 结论：很贵的跳

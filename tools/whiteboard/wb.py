@@ -34,7 +34,9 @@ def local_media(src: str):
     if kind == "video":
         p = Path(ref)
         if p.exists():
-            return {"kind": "video", "url": "data:video/mp4;base64," + base64.b64encode(p.read_bytes()).decode()}
+            # the recorder's Chromium cannot decode H.264: use WebM (VP9) clips for frames that must show in the MP4
+            mime = "video/webm" if p.suffix == ".webm" else "video/mp4"
+            return {"kind": "video", "url": f"data:{mime};base64," + base64.b64encode(p.read_bytes()).decode()}
     print("media not found:", src)
     return None
 
@@ -98,6 +100,7 @@ def render_mp4(d, data, audio, fps=30, start=0.0, end=None, progress=None):
         n = int((end - start) * fps)
         for i in range(n):
             p.evaluate(f"WB.seek({start + i / fps})")
+            p.evaluate("WB.settle()")      # videos in frames show the asked moment
             try:
                 ff.stdin.write(p.screenshot(type="jpeg", quality=90))
             except BrokenPipeError:   # -shortest: ffmpeg is done once the narration ends
