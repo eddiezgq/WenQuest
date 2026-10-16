@@ -1,0 +1,4088 @@
+{
+ "title": "Why can't your phone charge in nine minutes?",
+ "title_en": "Why can't your phone charge in nine minutes?",
+ "audio": "配音.wav",
+ "duration": 167.39,
+ "segments": [
+  {
+   "t0": 0.4,
+   "t1": 6.93,
+   "zh": "This week, a humanoid robot learned a trick your phone would kill for: nine minutes of charging, ninety minutes of work."
+  },
+  {
+   "t0": 7.43,
+   "t1": 12.47,
+   "zh": "My phone, meanwhile, is at three percent. It's watching this video with me. Nervously."
+  },
+  {
+   "t0": 13.07,
+   "t1": 20.48,
+   "zh": "The robot is Digit 5, from Agility Robotics. Its new batteries come from Nyobolt, a battery company in Cambridge, England."
+  },
+  {
+   "t0": 20.73,
+   "t1": 28.33,
+   "zh": "So here's the question: if a robot can charge in nine minutes, why can't everything? And why do people say fast charging hurts batteries?"
+  },
+  {
+   "t0": 28.83,
+   "t1": 35.17,
+   "zh": "First, the math. The old Digit worked two minutes for every minute it charged. That's about sixteen hours of work a day."
+  },
+  {
+   "t0": 35.42,
+   "t1": 43.44,
+   "zh": "Digit 5 claims ten to one. Run that around the clock and you get almost twenty-two hours. The companies say more than twenty. Close enough."
+  },
+  {
+   "t0": 43.84,
+   "t1": 51.24,
+   "zh": "Now, what is charging, really? Inside the battery, lithium ions travel from one side to the other, and have to find a place to park."
+  },
+  {
+   "t0": 51.49,
+   "t1": 57.7,
+   "zh": "On the other side, the parking garage is usually graphite: stacked sheets of carbon, like the floors of a garage."
+  },
+  {
+   "t0": 57.95,
+   "t1": 63.16,
+   "zh": "Charge slowly, and the ions drive in, find a floor, and slide into a spot. Lovely."
+  },
+  {
+   "t0": 63.56,
+   "t1": 68.03,
+   "zh": "Charge fast, and it's a stadium letting out. Everyone hits the entrance at once."
+  },
+  {
+   "t0": 68.28,
+   "t1": 75.87,
+   "zh": "The ones that can't get in? They park on the sidewalk. They turn into plain lithium metal, stuck on the surface. That's called lithium plating."
+  },
+  {
+   "t0": 76.12,
+   "t1": 80.44,
+   "zh": "Those ions are gone for good. Your battery just got a little smaller. Forever."
+  },
+  {
+   "t0": 81.04,
+   "t1": 87.56,
+   "zh": "Worse, the sidewalk parking can grow into tiny spikes. If one pokes all the way through to the other side: short circuit."
+  },
+  {
+   "t0": 88.06,
+   "t1": 93.94,
+   "zh": "Reason two: heat. The heat from a current grows with the current squared. Twice the current, four times the heat."
+  },
+  {
+   "t0": 94.19,
+   "t1": 98.88,
+   "zh": "So a nine-minute charge isn't just a bigger hose. It's a hose that wants to boil."
+  },
+  {
+   "t0": 99.38,
+   "t1": 105.53,
+   "zh": "Here's the twist: your phone already fast charges. Ever notice it races to about half, then slows to a crawl?"
+  },
+  {
+   "t0": 105.78,
+   "t1": 112.74,
+   "zh": "That's on purpose. An empty garage fills fast. A nearly full one has to slow down, or cars end up on the sidewalk."
+  },
+  {
+   "t0": 112.99,
+   "t1": 117.91,
+   "zh": "So how does Nyobolt do it? The company only says: proprietary anode materials."
+  },
+  {
+   "t0": 118.16,
+   "t1": 125.08,
+   "zh": "My guess, and it's only a guess: a garage with wider ramps and bigger doors, so the ions can rush in without piling up."
+  },
+  {
+   "t0": 125.58,
+   "t1": 131.39,
+   "zh": "Twist number two: there's a price. Every battery trades between how much it holds and how fast it fills."
+  },
+  {
+   "t0": 131.64,
+   "t1": 138.95,
+   "zh": "Digit 5 runs only ninety minutes per charge. Agility didn't build a marathon runner. They built a sprinter who naps a lot."
+  },
+  {
+   "t0": 139.35,
+   "t1": 146.29,
+   "zh": "For a warehouse robot, that's perfect. It works, steps onto its charger for nine minutes, and goes back to lifting boxes."
+  },
+  {
+   "t0": 146.54,
+   "t1": 150.65,
+   "zh": "Your phone would rather last all day. So it gets the big, slow garage."
+  },
+  {
+   "t0": 151.05,
+   "t1": 160.04,
+   "zh": "Friendly fine print: these numbers are the companies' claims. Early customers get the robot in 2027, and nobody outside has tested it yet."
+  },
+  {
+   "t0": 160.54,
+   "t1": 165.94,
+   "zh": "As for my phone: one percent. If you need me, I'll be in the charging dock. Nine minutes, tops."
+  }
+ ],
+ "boards": [
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 0,
+     "id": "bot_b",
+     "x": 389.0,
+     "y": 434.0,
+     "w": 182.0,
+     "h": 117.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 0,
+     "id": "bot_b",
+     "x": 402.0,
+     "y": 557.5,
+     "w": 156.0,
+     "h": 195.0,
+     "c": "ink",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "bot_b",
+     "x": 421.5,
+     "y": 462.6,
+     "w": 33.800000000000004,
+     "h": 39.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "bot_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M402.0,590.0 L350.0,681.0 L363.0,759.0"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "bot_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M441.0,752.5 L415.0,856.5 L454.0,954.0 L408.5,980"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "bot_b",
+     "x": 504.70000000000005,
+     "y": 462.6,
+     "w": 33.800000000000004,
+     "h": 39.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "bot_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M558.0,590.0 L610.0,681.0 L597.0,759.0"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "bot_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M519.0,752.5 L545.0,856.5 L506.0,954.0 L551.5,980"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "bot_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M451.4,512.0 Q480,532.8 508.6,512.0"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "bob",
+     "targets": [
+      "bot*"
+     ],
+     "amp": 10.4,
+     "hz": 1.0
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 480,
+     "y": 190,
+     "s": 64,
+     "text": "charge 9 min",
+     "c": "green",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 480,
+     "y": 290,
+     "s": 64,
+     "text": "work 90 min",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 1,
+     "name": "phone",
+     "x": 1400,
+     "y": 560,
+     "size": 640,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 1,
+     "id": "b1_b",
+     "x": 1373.0,
+     "y": 432.2,
+     "w": 54.0,
+     "h": 19.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 1,
+     "id": "b1_b",
+     "x": 1332.5,
+     "y": 452.0,
+     "w": 135.0,
+     "h": 216.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 1,
+     "id": "b1_b",
+     "x": 1339.7,
+     "y": 652.736,
+     "w": 120.6,
+     "h": 8.064,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 1,
+     "id": "b1_b",
+     "x": 1364.9,
+     "y": 515.0,
+     "w": 16.2,
+     "h": 21.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 1,
+     "id": "b1_b",
+     "x": 1418.9,
+     "y": 515.0,
+     "w": 16.2,
+     "h": 21.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "id": "b1_b",
+     "c": "ink",
+     "w": 3.2,
+     "d": "M1380.2,574.4 Q1400,556.4 1419.8,574.4"
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "id": "b1_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M1480.1,461.0 Q1498.1,497.0 1480.1,506.0 Q1462.1,497.0 1480.1,461.0"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "bob",
+     "targets": [
+      "b1*"
+     ],
+     "amp": 7.2,
+     "hz": 1.1
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 1400,
+     "y": 900,
+     "s": 60,
+     "text": "3%",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 1400,
+     "y": 980,
+     "s": 36,
+     "text": "(nervous)",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 2,
+     "id": "bot2_b",
+     "x": 246.0,
+     "y": 396.0,
+     "w": 168.0,
+     "h": 108.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "id": "bot2_b",
+     "x": 258.0,
+     "y": 510.0,
+     "w": 144.0,
+     "h": 180.0,
+     "c": "ink",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "id": "bot2_b",
+     "x": 276.0,
+     "y": 422.40000000000003,
+     "w": 31.2,
+     "h": 36.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "id": "bot2_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M258.0,540.0 L210.0,624.0 L222.0,696.0"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "id": "bot2_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M294.0,690.0 L270.0,786.0 L306.0,876.0 L264.0,900"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "id": "bot2_b",
+     "x": 352.79999999999995,
+     "y": 422.40000000000003,
+     "w": 31.2,
+     "h": 36.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "id": "bot2_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M402.0,540.0 L450.0,624.0 L438.0,696.0"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "id": "bot2_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M366.0,690.0 L390.0,786.0 L354.0,876.0 L396.0,900"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "id": "bot2_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M303.6,468.0 Q330,487.2 356.4,468.0"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "bob",
+     "targets": [
+      "bot2*"
+     ],
+     "amp": 9.6,
+     "hz": 1.0
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 960,
+     "y": 200,
+     "s": 80,
+     "text": "Digit 5",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 960,
+     "y": 280,
+     "s": 40,
+     "text": "Agility Robotics",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 960,
+     "y": 340,
+     "s": 40,
+     "text": "batteries: Nyobolt (Cambridge, England)",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 3,
+     "id": "q3",
+     "name": "question",
+     "x": 1060,
+     "y": 590,
+     "size": 240,
+     "c": "red"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "pulse",
+     "targets": [
+      "q3"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "x": 1160,
+     "y": 820,
+     "s": 52,
+     "text": "Why can't everything charge in 9 min?",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "x": 1160,
+     "y": 900,
+     "s": 44,
+     "text": "Does fast charging hurt?",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 3,
+     "id": "b3_b",
+     "x": 1576.0,
+     "y": 466.4,
+     "w": 48.0,
+     "h": 17.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 3,
+     "id": "b3_b",
+     "x": 1540.0,
+     "y": 484.0,
+     "w": 120.0,
+     "h": 192.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 3,
+     "id": "b3_b",
+     "x": 1546.4,
+     "y": 580.0,
+     "w": 107.2,
+     "h": 89.6,
+     "c": "green",
+     "fill": "green"
+    },
+    {
+     "t": "ellipse",
+     "at": 3,
+     "id": "b3_b",
+     "x": 1568.8,
+     "y": 540.0,
+     "w": 14.4,
+     "h": 19.200000000000003,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 3,
+     "id": "b3_b",
+     "x": 1616.8,
+     "y": 540.0,
+     "w": 14.4,
+     "h": 19.200000000000003,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 3,
+     "id": "b3_b",
+     "c": "ink",
+     "w": 3.2,
+     "d": "M1582.4,580 Q1600,597.6 1617.6,580"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "bob",
+     "targets": [
+      "b3*"
+     ],
+     "amp": 6.4,
+     "hz": 1.1
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 4,
+     "x": 960,
+     "y": 170,
+     "s": 64,
+     "text": "a 24-hour day",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 220,
+     "y": 450,
+     "s": 44,
+     "text": "old",
+     "c": "ink",
+     "align": "right",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 300.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 410.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 465.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 575.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 630.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 740.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 795.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 905.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 960.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1070.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1125.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1235.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1290.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1400.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1455.0,
+     "y": 400,
+     "w": 110.0,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 1565.0,
+     "y": 400,
+     "w": 55.0,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 1700,
+     "y": 450,
+     "s": 52,
+     "text": "16 h",
+     "c": "blue",
+     "align": "left",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 500,
+     "y": 550,
+     "s": 36,
+     "text": "blue = work, gold = charging",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 220,
+     "y": 750,
+     "s": 44,
+     "text": "new",
+     "c": "ink",
+     "align": "right",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 300.0,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 382.5,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 390.75,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 473.25,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 481.5,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 564.0,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 572.25,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 654.75,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 663.0,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 745.5,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 753.75,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 836.25,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 844.5,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 927.0,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 935.25,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1017.75,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1026.0,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1108.5,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1116.75,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1199.25,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1207.5,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1290.0,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1298.25,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1380.75,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1389.0,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1471.5,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1479.75,
+     "y": 700,
+     "w": 82.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1562.25,
+     "y": 700,
+     "w": 8.25,
+     "h": 70,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1570.5,
+     "y": 700,
+     "w": 49.5,
+     "h": 70,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 1700,
+     "y": 750,
+     "s": 52,
+     "text": "≈ 22 h",
+     "c": "green",
+     "align": "left",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 960,
+     "y": 900,
+     "s": 40,
+     "text": "(they say \"more than 20\". Close enough.)",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 6,
+     "x": 260,
+     "y": 300,
+     "w": 1400,
+     "h": 480,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 6,
+     "x": 280,
+     "y": 320,
+     "w": 260,
+     "h": 440,
+     "c": "red"
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 410,
+     "y": 840,
+     "s": 40,
+     "text": "cathode",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       320
+      ],
+      [
+       900.0,
+       340
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       360
+      ],
+      [
+       900.0,
+       380
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       400
+      ],
+      [
+       900.0,
+       420
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       440
+      ],
+      [
+       900.0,
+       460
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       480
+      ],
+      [
+       900.0,
+       500
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       520
+      ],
+      [
+       900.0,
+       540
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       560
+      ],
+      [
+       900.0,
+       580
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       600
+      ],
+      [
+       900.0,
+       620
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       640
+      ],
+      [
+       900.0,
+       660
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       680
+      ],
+      [
+       900.0,
+       700
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       900.0,
+       720
+      ],
+      [
+       900.0,
+       740
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       350
+      ],
+      [
+       1630,
+       350
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       410
+      ],
+      [
+       1630,
+       410
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       470
+      ],
+      [
+       1630,
+       470
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       530
+      ],
+      [
+       1630,
+       530
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       590
+      ],
+      [
+       1630,
+       590
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       650
+      ],
+      [
+       1630,
+       650
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 6,
+     "pts": [
+      [
+       1140,
+       710
+      ],
+      [
+       1630,
+       710
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 1380,
+     "y": 840,
+     "s": 40,
+     "text": "anode: graphite",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "x": 404,
+     "y": 404,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion6"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "x": 474,
+     "y": 484,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion6"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "x": 404,
+     "y": 564,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion6"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "x": 474,
+     "y": 644,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion6"
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "shift",
+     "targets": [
+      "ion6"
+     ],
+     "dx": 1000,
+     "dy": -30,
+     "dur": 3,
+     "delay": 2
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 960,
+     "y": 220,
+     "s": 44,
+     "text": "lithium ions: find a place to park",
+     "c": "gold",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 7,
+     "x": 1400,
+     "y": 270,
+     "s": 40,
+     "text": "= floors of a parking garage",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "x": 1234,
+     "y": 394,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "x": 1324,
+     "y": 514,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "x": 1414,
+     "y": 634,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "x": 1504,
+     "y": 394,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "text",
+     "at": 8,
+     "x": 960,
+     "y": 960,
+     "s": 52,
+     "text": "charge slowly: ions slide in. Lovely.",
+     "c": "green",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 9,
+     "x": 260,
+     "y": 300,
+     "w": 1400,
+     "h": 480,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 9,
+     "x": 280,
+     "y": 320,
+     "w": 260,
+     "h": 440,
+     "c": "red"
+    },
+    {
+     "t": "text",
+     "at": 9,
+     "x": 410,
+     "y": 840,
+     "s": 40,
+     "text": "cathode",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       320
+      ],
+      [
+       900.0,
+       340
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       360
+      ],
+      [
+       900.0,
+       380
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       400
+      ],
+      [
+       900.0,
+       420
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       440
+      ],
+      [
+       900.0,
+       460
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       480
+      ],
+      [
+       900.0,
+       500
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       520
+      ],
+      [
+       900.0,
+       540
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       560
+      ],
+      [
+       900.0,
+       580
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       600
+      ],
+      [
+       900.0,
+       620
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       640
+      ],
+      [
+       900.0,
+       660
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       680
+      ],
+      [
+       900.0,
+       700
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       900.0,
+       720
+      ],
+      [
+       900.0,
+       740
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       350
+      ],
+      [
+       1630,
+       350
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       410
+      ],
+      [
+       1630,
+       410
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       470
+      ],
+      [
+       1630,
+       470
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       530
+      ],
+      [
+       1630,
+       530
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       590
+      ],
+      [
+       1630,
+       590
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       650
+      ],
+      [
+       1630,
+       650
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 9,
+     "pts": [
+      [
+       1140,
+       710
+      ],
+      [
+       1630,
+       710
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "text",
+     "at": 9,
+     "x": 1380,
+     "y": 840,
+     "s": 40,
+     "text": "anode: graphite",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1044,
+     "y": 344,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1080,
+     "y": 378,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1116,
+     "y": 412,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1044,
+     "y": 446,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1080,
+     "y": 480,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1116,
+     "y": 514,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1044,
+     "y": 548,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1080,
+     "y": 582,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1116,
+     "y": 616,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1044,
+     "y": 650,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1080,
+     "y": 684,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "ellipse",
+     "at": 9,
+     "x": 1116,
+     "y": 718,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion9"
+    },
+    {
+     "t": "move",
+     "at": 9,
+     "kind": "pulse",
+     "targets": [
+      "ion9"
+     ],
+     "dur": 2
+    },
+    {
+     "t": "text",
+     "at": 9,
+     "x": 960,
+     "y": 220,
+     "s": 44,
+     "text": "charge fast: everyone hits the entrance at once",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "x": 1120,
+     "y": 330,
+     "w": 30,
+     "h": 50,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "x": 1120,
+     "y": 400,
+     "w": 30,
+     "h": 50,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "x": 1120,
+     "y": 470,
+     "w": 30,
+     "h": 50,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "x": 1120,
+     "y": 540,
+     "w": 30,
+     "h": 50,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "x": 1120,
+     "y": 610,
+     "w": 30,
+     "h": 50,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 10,
+     "x": 1120,
+     "y": 680,
+     "w": 30,
+     "h": 50,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "text",
+     "at": 10,
+     "x": 1260,
+     "y": 950,
+     "s": 48,
+     "text": "lithium plating",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 10,
+     "x": 1260,
+     "y": 1010,
+     "s": 32,
+     "text": "(parked on the sidewalk)",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 11,
+     "id": "b11_b",
+     "x": 168.0,
+     "y": 883.2,
+     "w": 24.0,
+     "h": 8.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 11,
+     "id": "b11_b",
+     "x": 150.0,
+     "y": 892.0,
+     "w": 60.0,
+     "h": 96.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 11,
+     "id": "b11_b",
+     "x": 153.2,
+     "y": 935.52,
+     "w": 53.6,
+     "h": 49.28,
+     "c": "green",
+     "fill": "green"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "id": "b11_b",
+     "x": 164.4,
+     "y": 920.0,
+     "w": 7.2,
+     "h": 9.600000000000001,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "id": "b11_b",
+     "x": 188.4,
+     "y": 920.0,
+     "w": 7.2,
+     "h": 9.600000000000001,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "b11_b",
+     "c": "ink",
+     "w": 3.2,
+     "d": "M171.2,946.4 Q180,938.4 188.8,946.4"
+    },
+    {
+     "t": "text",
+     "at": 11,
+     "x": 480,
+     "y": 1000,
+     "s": 40,
+     "text": "smaller. forever.",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 12,
+     "x": 260,
+     "y": 300,
+     "w": 1400,
+     "h": 480,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 12,
+     "x": 280,
+     "y": 320,
+     "w": 260,
+     "h": 440,
+     "c": "red"
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "x": 410,
+     "y": 840,
+     "s": 40,
+     "text": "cathode",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       320
+      ],
+      [
+       900.0,
+       340
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       360
+      ],
+      [
+       900.0,
+       380
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       400
+      ],
+      [
+       900.0,
+       420
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       440
+      ],
+      [
+       900.0,
+       460
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       480
+      ],
+      [
+       900.0,
+       500
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       520
+      ],
+      [
+       900.0,
+       540
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       560
+      ],
+      [
+       900.0,
+       580
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       600
+      ],
+      [
+       900.0,
+       620
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       640
+      ],
+      [
+       900.0,
+       660
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       680
+      ],
+      [
+       900.0,
+       700
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       900.0,
+       720
+      ],
+      [
+       900.0,
+       740
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       350
+      ],
+      [
+       1630,
+       350
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       410
+      ],
+      [
+       1630,
+       410
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       470
+      ],
+      [
+       1630,
+       470
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       530
+      ],
+      [
+       1630,
+       530
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       590
+      ],
+      [
+       1630,
+       590
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       650
+      ],
+      [
+       1630,
+       650
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 12,
+     "pts": [
+      [
+       1140,
+       710
+      ],
+      [
+       1630,
+       710
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "x": 1380,
+     "y": 840,
+     "s": 40,
+     "text": "anode: graphite",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "path",
+     "at": 12,
+     "c": "muted",
+     "w": 4,
+     "d": "M1140,560 L1080,540 L1040,575 L980,550 L940,585 L880,560 L840,590"
+    },
+    {
+     "t": "path",
+     "at": 12,
+     "c": "muted",
+     "w": 3,
+     "d": "M1080,540 L1060,500 M980,550 L960,610 M880,560 L860,520"
+    },
+    {
+     "t": "path",
+     "at": 12,
+     "id": "spark",
+     "c": "red",
+     "w": 6,
+     "d": "M820,520 L780,600 L830,600 L790,680"
+    },
+    {
+     "t": "move",
+     "at": 12,
+     "kind": "pulse",
+     "targets": [
+      "spark"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "x": 960,
+     "y": 220,
+     "s": 44,
+     "text": "tiny spikes grow across...",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "x": 960,
+     "y": 960,
+     "s": 64,
+     "text": "short circuit!",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 13,
+     "x": 960,
+     "y": 200,
+     "s": 64,
+     "text": "heat grows with current²",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "x": 480,
+     "y": 400,
+     "s": 48,
+     "text": "1× current",
+     "c": "ink",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 13,
+     "name": "flame",
+     "x": 480,
+     "y": 560,
+     "size": 150,
+     "c": "gold"
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "x": 1300,
+     "y": 400,
+     "s": 48,
+     "text": "2× current",
+     "c": "ink",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 13,
+     "id": "fl13",
+     "name": "flame",
+     "x": 1060,
+     "y": 560,
+     "size": 150,
+     "c": "red"
+    },
+    {
+     "t": "icon",
+     "at": 13,
+     "id": "fl13",
+     "name": "flame",
+     "x": 1220,
+     "y": 560,
+     "size": 150,
+     "c": "red"
+    },
+    {
+     "t": "icon",
+     "at": 13,
+     "id": "fl13",
+     "name": "flame",
+     "x": 1380,
+     "y": 560,
+     "size": 150,
+     "c": "red"
+    },
+    {
+     "t": "icon",
+     "at": 13,
+     "id": "fl13",
+     "name": "flame",
+     "x": 1540,
+     "y": 560,
+     "size": 150,
+     "c": "red"
+    },
+    {
+     "t": "move",
+     "at": 13,
+     "kind": "pulse",
+     "targets": [
+      "fl13"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "x": 1300,
+     "y": 700,
+     "s": 44,
+     "text": "= 4× heat",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 14,
+     "id": "th14",
+     "name": "thermometer",
+     "x": 420,
+     "y": 860,
+     "size": 200,
+     "c": "red"
+    },
+    {
+     "t": "move",
+     "at": 14,
+     "kind": "pulse",
+     "targets": [
+      "th14"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 14,
+     "x": 1060,
+     "y": 880,
+     "s": 52,
+     "text": "not a bigger hose: a hose that wants to boil",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "arrow",
+     "at": 15,
+     "pts": [
+      [
+       300,
+       820
+      ],
+      [
+       300,
+       260
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "arrow",
+     "at": 15,
+     "pts": [
+      [
+       300,
+       820
+      ],
+      [
+       1100,
+       820
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "x": 250,
+     "y": 300,
+     "s": 36,
+     "text": "100%",
+     "c": "muted",
+     "align": "right",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "x": 1100,
+     "y": 880,
+     "s": 36,
+     "text": "time",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "path",
+     "at": 15,
+     "c": "green",
+     "w": 5,
+     "d": "M300,820 L520,540 Q620,440 760,380 Q920,320 1080,300"
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "x": 560,
+     "y": 500,
+     "s": 40,
+     "text": "races to ~half",
+     "c": "green",
+     "align": "right",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "x": 900,
+     "y": 270,
+     "s": 40,
+     "text": "then crawls",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 16,
+     "id": "b16_b",
+     "x": 1517.0,
+     "y": 403.8,
+     "w": 66.0,
+     "h": 24.200000000000003,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 16,
+     "id": "b16_b",
+     "x": 1467.5,
+     "y": 428.0,
+     "w": 165.0,
+     "h": 264.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 16,
+     "id": "b16_b",
+     "x": 1476.3,
+     "y": 456.51200000000006,
+     "w": 147.4,
+     "h": 226.68800000000002,
+     "c": "green",
+     "fill": "green"
+    },
+    {
+     "t": "ellipse",
+     "at": 16,
+     "id": "b16_b",
+     "x": 1507.1,
+     "y": 505.0,
+     "w": 19.8,
+     "h": 26.400000000000002,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 16,
+     "id": "b16_b",
+     "x": 1573.1,
+     "y": 505.0,
+     "w": 19.8,
+     "h": 26.400000000000002,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 16,
+     "id": "b16_b",
+     "c": "ink",
+     "w": 3.2,
+     "d": "M1525.8,560 Q1550,584.2 1574.2,560"
+    },
+    {
+     "t": "move",
+     "at": 16,
+     "kind": "bob",
+     "targets": [
+      "b16*"
+     ],
+     "amp": 8.8,
+     "hz": 1.1
+    },
+    {
+     "t": "text",
+     "at": 16,
+     "x": 1550,
+     "y": 860,
+     "s": 40,
+     "text": "nearly full: slow down,",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 16,
+     "x": 1550,
+     "y": 920,
+     "s": 40,
+     "text": "or ions hit the sidewalk",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 17,
+     "x": 960,
+     "y": 200,
+     "s": 56,
+     "text": "\"proprietary anode materials\"",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "path",
+     "at": 18,
+     "c": "ink",
+     "w": 3.4,
+     "d": "M300,560 L300,400 L800,400 L800,780 L300,780 L300,620"
+    },
+    {
+     "t": "text",
+     "at": 18,
+     "x": 550,
+     "y": 860,
+     "s": 40,
+     "text": "graphite: narrow door",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 244,
+     "y": 504,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 204,
+     "y": 544,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 244,
+     "y": 584,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 204,
+     "y": 624,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 244,
+     "y": 664,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "path",
+     "at": 18,
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1120,450 L1120,400 L1620,400 L1620,780 L1120,780 L1120,730"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 1044,
+     "y": 454,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion18"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 1044,
+     "y": 514,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion18"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 1044,
+     "y": 574,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion18"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 1044,
+     "y": 634,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion18"
+    },
+    {
+     "t": "ellipse",
+     "at": 18,
+     "x": 1044,
+     "y": 694,
+     "w": 32,
+     "h": 32,
+     "c": "gold",
+     "fill": "gold",
+     "id": "ion18"
+    },
+    {
+     "t": "move",
+     "at": 18,
+     "kind": "shift",
+     "targets": [
+      "ion18"
+     ],
+     "dx": 300,
+     "dy": 0,
+     "dur": 2,
+     "delay": 3
+    },
+    {
+     "t": "text",
+     "at": 18,
+     "x": 1370,
+     "y": 860,
+     "s": 40,
+     "text": "wider ramps, bigger doors?",
+     "c": "green",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 18,
+     "x": 1370,
+     "y": 930,
+     "s": 34,
+     "text": "(my guess)",
+     "c": "gold",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 19,
+     "c": "ink",
+     "w": 4,
+     "d": "M520,700 L460,800 L580,800 Z"
+    },
+    {
+     "t": "line",
+     "at": 19,
+     "id": "plank",
+     "pts": [
+      [
+       220,
+       700
+      ],
+      [
+       820,
+       700
+      ]
+     ],
+     "c": "ink",
+     "w": 6
+    },
+    {
+     "t": "move",
+     "at": 19,
+     "kind": "wiggle",
+     "targets": [
+      "plank"
+     ],
+     "pivot": [
+      520,
+      700
+     ],
+     "amp": 8,
+     "hz": 0.6
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "x": 260,
+     "y": 640,
+     "s": 36,
+     "text": "holds a lot",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "x": 780,
+     "y": 640,
+     "s": 36,
+     "text": "fills fast",
+     "c": "green",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "x": 520,
+     "y": 900,
+     "s": 40,
+     "text": "pick one (mostly)",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "ellipse",
+     "at": 20,
+     "x": 1124.0,
+     "y": 568.0,
+     "w": 52.0,
+     "h": 52.0,
+     "c": "ink"
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1150,
+       620.0
+      ],
+      [
+       1150,
+       740.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1150,
+       740.0
+      ],
+      [
+       1110.0,
+       820
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1150,
+       740.0
+      ],
+      [
+       1190.0,
+       820
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1090.0,
+       580.0
+      ],
+      [
+       1150,
+       650.0
+      ],
+      [
+       1210.0,
+       580.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "x": 1150,
+     "y": 900,
+     "s": 36,
+     "text": "marathon runner",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1060,
+       560
+      ],
+      [
+       1240,
+       760
+      ]
+     ],
+     "c": "red",
+     "w": 5
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1240,
+       560
+      ],
+      [
+       1060,
+       760
+      ]
+     ],
+     "c": "red",
+     "w": 5
+    },
+    {
+     "t": "rect",
+     "at": 20,
+     "id": "bot20_b",
+     "x": 1544.0,
+     "y": 484.0,
+     "w": 112.0,
+     "h": 72.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 20,
+     "id": "bot20_b",
+     "x": 1552.0,
+     "y": 560.0,
+     "w": 96.0,
+     "h": 120.0,
+     "c": "ink",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 20,
+     "id": "bot20_b",
+     "x": 1564.0,
+     "y": 501.59999999999997,
+     "w": 20.8,
+     "h": 24.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 20,
+     "id": "bot20_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1552.0,580.0 L1520.0,636.0 L1528.0,684.0"
+    },
+    {
+     "t": "path",
+     "at": 20,
+     "id": "bot20_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1576.0,680.0 L1560.0,744.0 L1584.0,804.0 L1556.0,820"
+    },
+    {
+     "t": "ellipse",
+     "at": 20,
+     "id": "bot20_b",
+     "x": 1615.1999999999998,
+     "y": 501.59999999999997,
+     "w": 20.8,
+     "h": 24.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 20,
+     "id": "bot20_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1648.0,580.0 L1680.0,636.0 L1672.0,684.0"
+    },
+    {
+     "t": "path",
+     "at": 20,
+     "id": "bot20_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1624.0,680.0 L1640.0,744.0 L1616.0,804.0 L1644.0,820"
+    },
+    {
+     "t": "path",
+     "at": 20,
+     "id": "bot20_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1582.4,532.0 Q1600,544.8 1617.6,532.0"
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "x": 1720,
+     "y": 470,
+     "s": 48,
+     "text": "z z z",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "x": 1600,
+     "y": 900,
+     "s": 36,
+     "text": "sprinter who naps a lot",
+     "c": "green",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 21,
+     "id": "bot21_b",
+     "x": 310.0,
+     "y": 380.0,
+     "w": 140.0,
+     "h": 90.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 21,
+     "id": "bot21_b",
+     "x": 320.0,
+     "y": 475.0,
+     "w": 120.0,
+     "h": 150.0,
+     "c": "ink",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 21,
+     "id": "bot21_b",
+     "x": 335.0,
+     "y": 402.0,
+     "w": 26.0,
+     "h": 30.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 21,
+     "id": "bot21_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M320.0,500.0 L280.0,570.0 L290.0,630.0"
+    },
+    {
+     "t": "path",
+     "at": 21,
+     "id": "bot21_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M350.0,625.0 L330.0,705.0 L360.0,780.0 L325.0,800"
+    },
+    {
+     "t": "ellipse",
+     "at": 21,
+     "id": "bot21_b",
+     "x": 399.0,
+     "y": 402.0,
+     "w": 26.0,
+     "h": 30.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 21,
+     "id": "bot21_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M440.0,500.0 L480.0,570.0 L470.0,630.0"
+    },
+    {
+     "t": "path",
+     "at": 21,
+     "id": "bot21_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M410.0,625.0 L430.0,705.0 L400.0,780.0 L435.0,800"
+    },
+    {
+     "t": "path",
+     "at": 21,
+     "id": "bot21_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M358.0,440.0 Q380,456.0 402.0,440.0"
+    },
+    {
+     "t": "move",
+     "at": 21,
+     "kind": "bob",
+     "targets": [
+      "bot21*"
+     ],
+     "amp": 8.0,
+     "hz": 1.0
+    },
+    {
+     "t": "rect",
+     "at": 21,
+     "x": 620,
+     "y": 640,
+     "w": 120,
+     "h": 100,
+     "c": "gold"
+    },
+    {
+     "t": "rect",
+     "at": 21,
+     "x": 660,
+     "y": 540,
+     "w": 120,
+     "h": 100,
+     "c": "gold"
+    },
+    {
+     "t": "text",
+     "at": 21,
+     "x": 700,
+     "y": 820,
+     "s": 36,
+     "text": "boxes",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 21,
+     "id": "bat21",
+     "name": "battery",
+     "x": 400,
+     "y": 200,
+     "size": 160,
+     "c": "green"
+    },
+    {
+     "t": "text",
+     "at": 21,
+     "x": 500,
+     "y": 215,
+     "s": 36,
+     "text": "9 min",
+     "c": "green",
+     "align": "left",
+     "font": "en"
+    },
+    {
+     "t": "arrow",
+     "at": 21,
+     "pts": [
+      [
+       520,
+       260
+      ],
+      [
+       700,
+       500
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "arrow",
+     "at": 21,
+     "pts": [
+      [
+       250,
+       560
+      ],
+      [
+       320,
+       270
+      ]
+     ],
+     "c": "muted",
+     "w": 3
+    },
+    {
+     "t": "move",
+     "at": 21,
+     "kind": "pulse",
+     "targets": [
+      "bat21"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 21,
+     "x": 500,
+     "y": 980,
+     "s": 40,
+     "text": "work · charge · repeat",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "icon",
+     "at": 22,
+     "name": "phone",
+     "x": 1450,
+     "y": 540,
+     "size": 560,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 22,
+     "id": "b22_b",
+     "x": 1426.0,
+     "y": 426.4,
+     "w": 48.0,
+     "h": 17.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 22,
+     "id": "b22_b",
+     "x": 1390.0,
+     "y": 444.0,
+     "w": 120.0,
+     "h": 192.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 22,
+     "id": "b22_b",
+     "x": 1396.4,
+     "y": 477.28000000000003,
+     "w": 107.2,
+     "h": 152.32,
+     "c": "green",
+     "fill": "green"
+    },
+    {
+     "t": "ellipse",
+     "at": 22,
+     "id": "b22_b",
+     "x": 1418.8,
+     "y": 500.0,
+     "w": 14.4,
+     "h": 19.200000000000003,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 22,
+     "id": "b22_b",
+     "x": 1466.8,
+     "y": 500.0,
+     "w": 14.4,
+     "h": 19.200000000000003,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 22,
+     "id": "b22_b",
+     "c": "ink",
+     "w": 3.2,
+     "d": "M1432.4,540 Q1450,557.6 1467.6,540"
+    },
+    {
+     "t": "move",
+     "at": 22,
+     "kind": "bob",
+     "targets": [
+      "b22*"
+     ],
+     "amp": 6.4,
+     "hz": 1.1
+    },
+    {
+     "t": "text",
+     "at": 22,
+     "x": 1450,
+     "y": 900,
+     "s": 40,
+     "text": "lasts all day:",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 22,
+     "x": 1450,
+     "y": 960,
+     "s": 40,
+     "text": "big, slow garage",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 23,
+     "x": 960,
+     "y": 220,
+     "s": 64,
+     "text": "friendly fine print",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 23,
+     "x": 960,
+     "y": 400,
+     "s": 48,
+     "text": "company claims, not independent tests",
+     "c": "ink",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 23,
+     "x": 960,
+     "y": 500,
+     "s": 48,
+     "text": "early customers: 2027",
+     "c": "ink",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 23,
+     "x": 960,
+     "y": 600,
+     "s": 48,
+     "text": "real-world wear: unknown (for now)",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 23,
+     "id": "bot23_b",
+     "x": 904.0,
+     "y": 684.0,
+     "w": 112.0,
+     "h": 72.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 23,
+     "id": "bot23_b",
+     "x": 912.0,
+     "y": 760.0,
+     "w": 96.0,
+     "h": 120.0,
+     "c": "ink",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 23,
+     "id": "bot23_b",
+     "x": 924.0,
+     "y": 701.5999999999999,
+     "w": 20.8,
+     "h": 24.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "bot23_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M912.0,780.0 L880.0,836.0 L888.0,884.0"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "bot23_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M936.0,880.0 L920.0,944.0 L944.0,1004.0 L916.0,1020"
+    },
+    {
+     "t": "ellipse",
+     "at": 23,
+     "id": "bot23_b",
+     "x": 975.2,
+     "y": 701.5999999999999,
+     "w": 20.8,
+     "h": 24.0,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "bot23_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M1008.0,780.0 L1040.0,836.0 L1032.0,884.0"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "bot23_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M984.0,880.0 L1000.0,944.0 L976.0,1004.0 L1004.0,1020"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "bot23_b",
+     "c": "ink",
+     "w": 3.4,
+     "d": "M942.4,732.0 Q960,744.8 977.6,732.0"
+    },
+    {
+     "t": "move",
+     "at": 23,
+     "kind": "bob",
+     "targets": [
+      "bot23*"
+     ],
+     "amp": 6.4,
+     "hz": 1.0
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "icon",
+     "at": 24,
+     "name": "phone",
+     "x": 520,
+     "y": 520,
+     "size": 600,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 24,
+     "id": "b24_b",
+     "x": 494.5,
+     "y": 399.3,
+     "w": 51.0,
+     "h": 18.7,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 24,
+     "id": "b24_b",
+     "x": 456.25,
+     "y": 418.0,
+     "w": 127.5,
+     "h": 204.0,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 24,
+     "id": "b24_b",
+     "x": 463.05,
+     "y": 610.1,
+     "w": 113.9,
+     "h": 5.1,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 24,
+     "id": "b24_b",
+     "x": 486.85,
+     "y": 477.5,
+     "w": 15.299999999999999,
+     "h": 20.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 24,
+     "id": "b24_b",
+     "x": 537.85,
+     "y": 477.5,
+     "w": 15.299999999999999,
+     "h": 20.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 24,
+     "id": "b24_b",
+     "c": "ink",
+     "w": 3.2,
+     "d": "M501.3,533.6 Q520,516.6 538.7,533.6"
+    },
+    {
+     "t": "path",
+     "at": 24,
+     "id": "b24_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M595.65,426.5 Q612.65,460.5 595.65,469.0 Q578.65,460.5 595.65,426.5"
+    },
+    {
+     "t": "move",
+     "at": 24,
+     "kind": "bob",
+     "targets": [
+      "b24*"
+     ],
+     "amp": 6.8,
+     "hz": 1.1
+    },
+    {
+     "t": "text",
+     "at": 24,
+     "x": 520,
+     "y": 860,
+     "s": 64,
+     "text": "1%",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "rect",
+     "at": 24,
+     "x": 1180,
+     "y": 880,
+     "w": 400,
+     "h": 40,
+     "c": "green",
+     "fill": "green"
+    },
+    {
+     "t": "text",
+     "at": 24,
+     "x": 1380,
+     "y": 980,
+     "s": 40,
+     "text": "charging dock",
+     "c": "green",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "ellipse",
+     "at": 24,
+     "x": 1348.8,
+     "y": 577.6,
+     "w": 62.4,
+     "h": 62.4,
+     "c": "ink",
+     "id": "me"
+    },
+    {
+     "t": "line",
+     "at": 24,
+     "pts": [
+      [
+       1380,
+       640.0
+      ],
+      [
+       1380,
+       784.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "me"
+    },
+    {
+     "t": "line",
+     "at": 24,
+     "pts": [
+      [
+       1380,
+       784.0
+      ],
+      [
+       1332.0,
+       880
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "me"
+    },
+    {
+     "t": "line",
+     "at": 24,
+     "pts": [
+      [
+       1380,
+       784.0
+      ],
+      [
+       1428.0,
+       880
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "me"
+    },
+    {
+     "t": "line",
+     "at": 24,
+     "pts": [
+      [
+       1314.0,
+       748.0
+      ],
+      [
+       1380,
+       676.0
+      ],
+      [
+       1446.0,
+       748.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "me"
+    },
+    {
+     "t": "move",
+     "at": 24,
+     "kind": "bob",
+     "targets": [
+      "me"
+     ],
+     "amp": 10,
+     "hz": 0.8
+    },
+    {
+     "t": "text",
+     "at": 24,
+     "x": 1380,
+     "y": 330,
+     "s": 64,
+     "text": "Nine minutes, tops.",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    }
+   ]
+  }
+ ],
+ "pace": 0.5,
+ "hand": false
+}

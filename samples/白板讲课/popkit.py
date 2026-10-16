@@ -108,3 +108,82 @@ def cute_fly(cx, cy, k, at, idp="fly", moves=True, mood="happy"):
               {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_wr"], "pivot": [cx + 40 * k, cy - 5 * k], "amp": -18, "hz": 5},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 14 * k, "hz": 1.2}]
     return E
+
+
+def cute_drone(cx, cy, k, at, idp="dr", mood="happy", moves=True):
+    """A cute racing drone seen from the front: one big camera eye, two spinning rotors, little skids.
+    Ids: <idp>_body, <idp>_eye, <idp>_bl0 / <idp>_bl1 (rotor blades); "<idp>*" moves the whole drone."""
+    def P(d, c="ink", w=3.2, part="_body"):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d}
+    x0, y0, w, h = cx - 95 * k, cy - 50 * k, 190 * k, 100 * k
+    E = [P(f"M{x0 + 30 * k},{y0} L{x0 + w - 30 * k},{y0} Q{x0 + w},{y0} {x0 + w},{y0 + 30 * k} L{x0 + w},{y0 + h - 30 * k} "
+           f"Q{x0 + w},{y0 + h} {x0 + w - 30 * k},{y0 + h} L{x0 + 30 * k},{y0 + h} Q{x0},{y0 + h} {x0},{y0 + h - 30 * k} "
+           f"L{x0},{y0 + 30 * k} Q{x0},{y0} {x0 + 30 * k},{y0} Z")]
+    rot = []
+    for i, side in enumerate((-1, 1)):
+        hx, hy = cx + side * 175 * k, cy - 70 * k
+        E.append(P(f"M{cx + side * 90 * k},{cy - 20 * k} L{hx},{hy}", w=4))
+        E.append({"t": "ellipse", "at": at, "id": idp + "_body", "x": hx - 60 * k, "y": hy - 60 * k, "w": 120 * k, "h": 120 * k, "c": "muted"})
+        E.append({"t": "line", "at": at, "id": f"{idp}_bl{i}", "pts": [[hx - 52 * k, hy], [hx + 52 * k, hy]], "c": "blue", "w": 5})
+        rot.append((f"{idp}_bl{i}", hx, hy))
+    # the one big camera eye
+    E.append({"t": "ellipse", "at": at, "id": idp + "_eye", "x": cx - 30 * k, "y": cy - 40 * k, "w": 60 * k, "h": 60 * k, "c": "ink"})
+    if mood == "o":
+        E.append(P(f"M{cx - 14 * k},{cy - 24 * k} L{cx + 14 * k},{cy + 4 * k} M{cx + 14 * k},{cy - 24 * k} L{cx - 14 * k},{cy + 4 * k}", w=3, part="_eye"))
+    else:
+        E.append({"t": "ellipse", "at": at, "id": idp + "_eye", "x": cx - 12 * k, "y": cy - 22 * k, "w": 24 * k, "h": 24 * k, "c": "ink", "fill": "ink"})
+    for side in (-1, 1):   # blush
+        E.append({"t": "ellipse", "at": at, "id": idp + "_body", "x": cx + side * 58 * k - 10 * k, "y": cy + 10 * k, "w": 20 * k, "h": 10 * k, "c": "red", "fill": "red"})
+    E.append(P(f"M{cx - 14 * k},{cy + 30 * k} Q{cx},{cy + 42 * k} {cx + 14 * k},{cy + 30 * k}" if mood == "happy" else
+               f"M{cx - 8 * k},{cy + 34 * k} a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0", w=3))
+    E.append(P(f"M{cx - 60 * k},{y0 + h} L{cx - 75 * k},{y0 + h + 30 * k} L{cx - 30 * k},{y0 + h + 30 * k} "
+               f"M{cx + 60 * k},{y0 + h} L{cx + 75 * k},{y0 + h + 30 * k} L{cx + 30 * k},{y0 + h + 30 * k}", w=3))
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "spin", "targets": [b], "pivot": [hx, hy], "rpm": 240} for b, hx, hy in rot]
+        E.append({"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 12 * k, "hz": 1.3})
+    return E
+
+
+def cute_battery(cx, cy, k, at, idp="bat", level=0.6, mood="happy", sweat=False, moves=True, label=None):
+    """A standing battery with a face; level 0–1 sets the charge (green, red when low). "<idp>*" moves it."""
+    def P(d, c="ink", w=3.2, part="_b"):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d}
+    w, h = 150 * k, 240 * k
+    x0, y0 = cx - w / 2, cy - h / 2
+    c = "green" if level > 0.3 else "red"
+    E = [{"t": "rect", "at": at, "id": idp + "_b", "x": x0 + 45 * k, "y": y0 - 22 * k, "w": 60 * k, "h": 22 * k, "c": "ink", "fill": "ink"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": x0, "y": y0, "w": w, "h": h, "c": "ink"}]
+    fh = max(6 * k, (h - 16 * k) * level)
+    E.append({"t": "rect", "at": at, "id": idp + "_b", "x": x0 + 8 * k, "y": y0 + h - 8 * k - fh, "w": w - 16 * k, "h": fh, "c": c, "fill": c})
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": cx + side * 30 * k - 9 * k, "y": cy - 50 * k, "w": 18 * k, "h": 24 * k, "c": "ink", "fill": "ink"})
+    mouth = {"happy": f"M{cx - 22 * k},{cy} Q{cx},{cy + 22 * k} {cx + 22 * k},{cy}",
+             "tired": f"M{cx - 22 * k},{cy + 16 * k} Q{cx},{cy - 4 * k} {cx + 22 * k},{cy + 16 * k}"}[mood]
+    E.append(P(mouth))
+    if sweat:
+        E.append(P(f"M{x0 + w + 14 * k},{y0 + 10 * k} Q{x0 + w + 34 * k},{y0 + 50 * k} {x0 + w + 14 * k},{y0 + 60 * k} "
+                   f"Q{x0 + w - 6 * k},{y0 + 50 * k} {x0 + w + 14 * k},{y0 + 10 * k}", c="blue", w=3))
+    if label:
+        E.append(txt(cx, y0 + h + 60 * k, 48 * k, label, at, c=c, font="en", id=idp + "_b"))
+    if moves:
+        E.append({"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 8 * k, "hz": 1.1})
+    return E
+
+
+def cute_bot(cx, cy, k, at, idp="bot", mood="happy", moves=True):
+    """A cute warehouse humanoid standing with feet at (cx, cy): box head with two eyes, torso, bird-like legs.
+    "<idp>*" moves the whole robot."""
+    def P(d, c="ink", w=3.4, part="_b"):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d}
+    E = [{"t": "rect", "at": at, "id": idp + "_b", "x": cx - 70 * k, "y": cy - 420 * k, "w": 140 * k, "h": 90 * k, "c": "ink"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": cx - 60 * k, "y": cy - 325 * k, "w": 120 * k, "h": 150 * k, "c": "ink", "fill": "gold"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": cx + side * 32 * k - 13 * k, "y": cy - 398 * k, "w": 26 * k, "h": 30 * k, "c": "blue", "fill": "blue"})
+        E.append(P(f"M{cx + side * 60 * k},{cy - 300 * k} L{cx + side * 100 * k},{cy - 230 * k} L{cx + side * 90 * k},{cy - 170 * k}"))
+        E.append(P(f"M{cx + side * 30 * k},{cy - 175 * k} L{cx + side * 50 * k},{cy - 95 * k} L{cx + side * 20 * k},{cy - 20 * k} "
+                   f"L{cx + side * 55 * k},{cy}"))
+    E.append(P(f"M{cx - 22 * k},{cy - 360 * k} Q{cx},{cy - 344 * k} {cx + 22 * k},{cy - 360 * k}" if mood == "happy" else
+               f"M{cx - 22 * k},{cy - 346 * k} Q{cx},{cy - 362 * k} {cx + 22 * k},{cy - 346 * k}"))
+    if moves:
+        E.append({"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 8 * k, "hz": 1.0})
+    return E
