@@ -100,7 +100,7 @@ ELEMENT = {
     "properties": {
         "t": {"type": "string", "enum": ["box", "text", "arrow", "line", "rect", "ellipse", "icon", "media", "move"]},
         "id": {"type": "string"}, "src": {"type": "string"}, "play": {"type": "number"},
-        "kind": {"type": "string", "enum": ["rotate", "shift", "spin", "flow", "pulse", "wiggle", "bob", "signal"]},
+        "kind": {"type": "string", "enum": ["rotate", "shift", "spin", "flow", "pulse", "wiggle", "bob", "signal", "pop", "grow"]},
         "targets": {"type": "array", "items": {"type": "string"}}, "pivot": {"type": "array", "items": {"type": "number"}},
         "to": {"type": "number"}, "dx": {"type": "number"}, "dy": {"type": "number"}, "rpm": {"type": "number"},
         "speed": {"type": "number"}, "dur": {"type": "number"}, "delay": {"type": "number"},
@@ -198,7 +198,7 @@ def clean_element(e: dict, nseg: int, allowed: frozenset = frozenset()) -> dict 
     if isinstance(e.get("id"), (str, int)) and str(e["id"]).strip():
         out["id"] = str(e["id"]).strip()[:24]
     if t == "move":
-        kind = e.get("kind") if e.get("kind") in ("rotate", "shift", "spin", "flow", "pulse", "wiggle", "bob", "signal") else None
+        kind = e.get("kind") if e.get("kind") in ("rotate", "shift", "spin", "flow", "pulse", "wiggle", "bob", "signal", "pop", "grow") else None
         targets = [str(x)[:24] for x in e.get("targets") or [] if str(x).strip()]
         if not kind or not targets:
             return None

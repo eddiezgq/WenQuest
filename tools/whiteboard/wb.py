@@ -5,6 +5,7 @@
     python3 tools/whiteboard/wb.py <课目录> --mp4      # 另出 白板课.mp4（1920×1080，30 帧/秒）
 """
 import base64
+import os
 import json
 import subprocess
 import sys
@@ -42,15 +43,23 @@ def local_media(src: str):
 
 
 def srt(d, segs):
-    """字幕.zh.srt / 字幕.en.srt (when the segments have English) for uploading with the video."""
+    """One subtitle file for uploading with the video (sites take only one): 字幕.srt, each cue
+    the narration line and, when the segments have English, the English line under it."""
     def ts(x):
         ms = int(round(x * 1000))
         return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
-    for lang in ("zh", "en"):
-        if not all(s.get(lang) for s in segs):
-            continue
-        (d / f"字幕.{lang}.srt").write_text("".join(f"{i}\n{ts(s['t0'])} --> {ts(s['t1'] + 0.35)}\n{s[lang]}\n\n"
-                                                    for i, s in enumerate(segs, 1)), encoding="utf-8")
+    for old in ("字幕.zh.srt", "字幕.en.srt"):
+        (d / old).unlink(missing_ok=True)
+    out = []
+    for i, s in enumerate(segs, 1):
+        end = s["t1"] + 0.35
+        if i < len(segs):
+            end = min(end, segs[i]["t0"])
+        lines = [s.get("text") or s.get("zh") or ""]
+        if s.get("en") and s.get("en") != lines[0]:
+            lines.append(s["en"])
+        out.append(f"{i}\n{ts(s['t0'])} --> {ts(end)}\n" + "\n".join(lines) + "\n\n")
+    (d / "字幕.srt").write_text("".join(out), encoding="utf-8")
 
 
 def build(lesson_dir, mp4=False):
@@ -92,7 +101,7 @@ def render_mp4(d, data, audio, fps=30, start=0.0, end=None, progress=None):
     out = d / "白板课.mp4"
     ff = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "image2pipe", "-framerate", str(fps), "-c:v", "mjpeg", "-i", "-",
                            "-ss", str(start), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                           "-crf", "21", "-preset", "medium", "-c:a", "aac", "-b:a", "128k", "-shortest", str(out)], stdin=subprocess.PIPE)
+                           "-crf", os.environ.get("WB_CRF", "21"), "-preset", "medium", "-c:a", "aac", "-b:a", "128k", "-shortest", str(out)], stdin=subprocess.PIPE)
     with sync_playwright() as pw:
         b = pw.chromium.launch()
         p = b.new_page(viewport={"width": W, "height": H})

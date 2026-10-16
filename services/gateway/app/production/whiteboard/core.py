@@ -144,7 +144,7 @@ def compile_lesson(L, resolve_media=None):
         for n, e in enumerate(els):
             if e["t"] == "move":      # 画的东西活起来：rotate / shift / spin / flow / pulse 编号为 targets 的元素
                 moves.append({"b": bi, "at": e["at"], "kind": e.get("kind", "rotate"), "targets": list(e.get("targets") or []),
-                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until", "amp", "hz") if k in e}})
+                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until", "amp", "hz", "axis", "from") if k in e}})
                 continue
             if e["t"] == "media":     # 虚拟实验、动画、数字工厂视频：先画框，框里再播放
                 src = (resolve_media or (lambda s_: None))(e.get("src", ""))
@@ -187,10 +187,16 @@ def compile_lesson(L, resolve_media=None):
             items.append(it)
             ex.append((bi, ox, oy, e))
     pace = float(L.get("pace") or 1)        # 科普短片: < 1 draws faster (quick sketch, then hold), like a sped-up drawing
-    if pace != 1:
-        for it in items:
-            it["weight"] *= pace
-    data = schedule(items, boards, L["segments"], L.get("duration", 0))
+    ink = float(L.get("ink") or 1)          # > 1: bolder lines (clearer on a phone)
+    for it in items:
+        it["weight"] *= pace
+        if ink != 1:
+            if it["k"] == "rough":
+                it["opts"]["strokeWidth"] = it["opts"].get("strokeWidth", 3.2) * ink
+            else:
+                for q in it["paths"]:
+                    q["w"] = q.get("w", 1.4) * (ink if not q.get("f") else 1 + (ink - 1) / 2)
+    data = schedule(items, boards, L["segments"], L.get("duration", 0), pan=float(L.get("pan") or 0.8))
     add_moves_and_media(data, moves, media, segs)
     return data, ex
 
@@ -213,6 +219,9 @@ def add_moves_and_media(data, moves, media, segs):
         drawn = max([it["start"] + it["dur"] for it in data["items"] if it["b"] == m["b"] and targeted(it.get("eid"), m["targets"])] or [0])
         delay = m.pop("delay", None)
         start = max(s["t0"] + 0.25 + (delay or 0), drawn + 0.3)   # a thing moves only once it is drawn
+        if m["kind"] == "pop" or (m["kind"] == "grow" and not m.get("from")):   # …except popping or growing in, while it is drawn
+            first = min([it["start"] for it in data["items"] if it["b"] == m["b"] and targeted(it.get("eid"), m["targets"])] or [s["t0"]])
+            start = max(first, s["t0"] + (delay or 0))
         dur = m.pop("dur", max(0.8, min(2.5, s["t1"] - s["t0"])))
         until = m.pop("until", None)
         end = segs[min(until, len(segs) - 1)]["t1"] if isinstance(until, int) else leave.get(m["b"], data["total"])
@@ -232,7 +241,7 @@ def add_moves_and_media(data, moves, media, segs):
 
 
 
-def schedule(items, boards, segs, duration=0):
+def schedule(items, boards, segs, duration=0, pan=0.8):
     """Give every stroke a start and a length from the words it belongs to (item["at"] = segment index)."""
     cam, starts = [], {}
     order = sorted(range(len(items)), key=lambda i: (items[i]["at"], i))
@@ -254,8 +263,8 @@ def schedule(items, boards, segs, duration=0):
         if b != last_board:
             pan0 = max(cursor + 0.2, t0 - 0.3)
             a, z = boards[last_board], boards[b]
-            cam.append({"t0": round(pan0, 3), "t1": round(pan0 + 0.8, 3), "a": [a["ox"], a["oy"]], "b": [z["ox"], z["oy"]]})
-            cursor = pan0 + 0.9
+            cam.append({"t0": round(pan0, 3), "t1": round(pan0 + pan, 3), "a": [a["ox"], a["oy"]], "b": [z["ox"], z["oy"]]})
+            cursor = pan0 + pan + 0.1
             last_board = b
         start = max(t0 + 0.05, cursor)
         nxt = segs_with[n_ + 1] if n_ + 1 < len(segs_with) else None
@@ -619,7 +628,7 @@ def lesson_scene(L, prefix=""):
             if e["t"] == "move":
                 moves.append({"frame": f"{prefix}frame{bi}", "at": e["at"], "kind": e.get("kind", "rotate"),
                               "targets": [str(x) for x in e.get("targets") or []],
-                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until", "amp", "hz") if k in e}})
+                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until", "amp", "hz", "axis", "from") if k in e}})
     return scene, moves
 
 
@@ -637,10 +646,10 @@ def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand
     src = audio_url or (f"data:{audio_type};base64,{audio_b64}" if audio_b64 else "")
     audio = "" if render or not src else f'<audio id="aud" preload="auto" src="{_html.escape(src)}"></audio>'
     # burned-in captions sit in a band under the board (the board shrinks to 85 %), so they never cover the drawing
-    burn = "" if not (render and subs) else ("""<style>#stage{width:85%!important;margin:0 auto!important}
+    burn = "" if not (render and subs) else ("""<style>#stage{width:83%!important;margin:0 auto!important}
 #rcap{position:fixed;left:50%;bottom:1.1%;transform:translateX(-50%);width:94%;color:#1d2329;text-align:center;display:none;
-font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}#rcap .z{display:block;font-size:1.85vw;font-weight:500;line-height:1.3}
-#rcap .e{display:block;font-size:1.3vw;line-height:1.28;color:#5f6b76;margin-top:.1em;font-family:"DejaVu Sans","Helvetica",sans-serif}</style>
+font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}#rcap .z{display:block;font-size:2.15vw;font-weight:600;line-height:1.28}
+#rcap .e{display:block;font-size:1.45vw;line-height:1.25;color:#5f6b76;margin-top:.1em;font-family:"DejaVu Sans","Helvetica",sans-serif}</style>
 <script>(function(){const st=document.body,c=document.createElement('div');c.id='rcap';
 c.innerHTML='<span class="z"></span><span class="e"></span>';st.appendChild(c);const z=c.firstChild,e=c.lastChild,s=WB.seek;
 WB.seek=function(t){s(t);const k=DATA.captions.find(x=>t>=x.t0&&t<=x.t1+0.35);c.style.display=k?'block':'none';

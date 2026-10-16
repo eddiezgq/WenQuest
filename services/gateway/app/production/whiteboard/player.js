@@ -163,6 +163,8 @@
       else if (m.kind === 'spin') s = `rotate(${(m.rpm || 30) * 6 * (Math.min(t, m.end || 1e9) - m.start)} ${m.c[0]} ${m.c[1]})`;
       else if (m.kind === 'wiggle' && t < (m.end || 1e9)) s = `rotate(${(m.amp || 14) * Math.sin(2 * Math.PI * (m.hz || 4) * (t - m.start))} ${m.c[0]} ${m.c[1]})`;
       else if (m.kind === 'bob' && t < (m.end || 1e9)) s = `translate(0,${-(m.amp || 12) * Math.abs(Math.sin(Math.PI * (m.hz || 1.5) * (t - m.start)))})`;
+      else if (m.kind === 'pop') { const k = p < 1 ? Math.max(0.001, 1 + 0.25 * Math.sin(Math.PI * p) - (1 - p) * (1 - p)) : 1; s = `translate(${m.c[0]},${m.c[1]}) scale(${k}) translate(${-m.c[0]},${-m.c[1]})`; }
+      else if (m.kind === 'grow') { const f0 = m.from == null ? 0 : m.from, f1 = m.to == null ? 1 : m.to, k = Math.max(0.001, f0 + (f1 - f0) * e); s = `translate(${m.c[0]},${m.c[1]}) scale(${m.axis === 'y' ? 1 : k},${m.axis === 'y' ? k : 1}) translate(${-m.c[0]},${-m.c[1]})`; }
       else if (m.kind === 'pulse') { const k = 1 + 0.14 * Math.sin(Math.PI * p); s = `translate(${m.c[0]},${m.c[1]}) scale(${k}) translate(${-m.c[0]},${-m.c[1]})`; }
       if (s) for (const g of m.gs) tf.set(g, s + ' ' + (tf.get(g) || ''));
       if (m.kind === 'signal') {
