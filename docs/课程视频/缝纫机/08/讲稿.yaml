@@ -1,0 +1,166 @@
+# 《缝纫机设计与制造》公开课 第 8 讲：运动协调与整机动力学
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch08.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 8-1、8-2 录屏、数字工厂录屏（第 23 轮 3.4：第 8 讲演示数字工厂，示例是调试工位逐台测量与整机档案）、作业页、测验页。
+# 数字一律由 course/calc/ch08.py 算出（{{ch08.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "8"
+deck: ch08
+skip: [11, 15, 19, 20, 21, 22, 24, 25]   # 读窗口、惯性力来源、第四节（振动噪声、润滑、转速上限）、第五节章节页与平方律数字页：控制课程部分约 10 分钟（课件与教材里都有；平方律在第 4 页和回答页都讲到，开头师傅断线的原因留作作业第三题）
+code: [ch08]
+title: ["运动协调与整机动力学：四套机构，一根主轴", "Motion Coordination and Machine Dynamics: Four Mechanisms, One Shaft"]
+chapter: ["第二篇 平缝机机构 · 第 8 章", "Part II Lockstitch Mechanisms · Chapter 8"]
+next: ["第 9 讲 包缝机", "Lecture 9 The overlock machine"]
+cover_formula: 'F \propto n^{2}'
+tags:
+  zh: [运动协调, 时序图, 相位窗口, 惯性力, 平衡块, 缝纫机设计]
+  en: [machine timing, timing diagram, phase window, inertia force, counterweight, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第八讲，运动协调与整机动力学。
+    - 前几讲我们一个机构一个机构地拆开看；这一讲把它们装回同一根主轴上：一针里谁先谁后，动了一个别的怎么办，转速高了整台机器为什么会抖。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 8, motion coordination and machine dynamics.
+    - So far we've taken the machine apart one mechanism at a time. Today we put them back on one main shaft. What happens in what order within a stitch, what happens to the others when you move one, and why the whole machine shakes at high speed.
+
+after:
+  - id: lab81
+    kind: lab
+    lab: timing
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { const s = document.createElement('style'); s.textContent = '#checks, #tasks, #wOut { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); window.__ov = () => { let d = document.getElementById('wqov'); if (!d) { d = document.createElement('div'); d.id = 'wqov'; document.body.appendChild(d); } const c = document.getElementById('pol').getBoundingClientRect(); d.style.cssText = 'position:absolute;z-index:9;pointer-events:none;backdrop-filter:blur(9px) grayscale(1);-webkit-backdrop-filter:blur(9px) grayscale(1);left:' + (c.left + scrollX) + 'px;top:' + (c.top + scrollY) + 'px;width:' + (c.width * 0.5) + 'px;height:' + (c.height * 0.1) + 'px'; }; window.__ov(); })()"
+      - sweep: {p_dh: [0, 9]}
+        dur: 6
+      - set: {p_dh: 0}
+        sweep: {p_dt: [0, -6]}
+        dur: 6
+      - press: "#mess"
+      - press: "#reset"
+        js: "document.getElementById('tim').closest('section').style.display = 'none'; window.__ov()"
+      - sweep: {p_k: [0, 1]}
+        dur: 8
+      - set: {p_n: 6200}
+        sweep: {p_k: [1, 0.15]}
+        dur: 8
+      - js: "document.getElementById('tim').closest('section').style.display = ''; window.__ov()"
+    say:
+      zh:
+        - ">下面是虚拟实验 8-1，全机时序编辑器，在问渠平台上可以亲手做。判据检查、任务判定和最大合力先遮住，留给你自己读。"
+        - ">先在标准设定下记下六条判据，再只拖旋梭定时，看哪一条先变红。"
+        - ">恢复标准，再只拖挑线相位，找出判据全部满足的最早和最晚相位，记下两头各是哪条判据变红，填进窗口框核对。"
+        - ">任务一：按“打乱三个相位”，先看哪几条变红、在哪条轨道上，再把旋梭、挑线、送布一个一个调回来。"
+        - ">接下来看整机惯性力。左边是合力矢量的轨迹，右边是竖直和水平两个分量。"
+        - ">在 5000 转下把平衡率从 0 拖到 1，每 0.15 记一次最大合力，看轨迹怎样由竖着拉长变成横着拉长。"
+        - ">任务三：把转速提到 6000 以上，自己选平衡率，让最大合力不超过 550 牛，同时六条判据都满足。"
+        - ">指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 8-1, the whole-machine timing editor. On the WenQuest platform you can do it yourself. The criterion checks, the task checks and the maximum resultant are blurred here. Read them when you do the lab yourself."
+        - ">First record the six criteria at standard. Then drag only the hook timing and see which one turns red first."
+        - ">Reset, and drag only the take-up phase. Find the earliest and latest phases where everything passes, note which criterion turns red at each end, and enter them in the window box to check."
+        - ">Task one. Press Scramble three phases. See which criteria turn red and on which tracks, then bring the hook, take-up and feed back one at a time."
+        - ">Next, the machine's inertia forces. On the left, the locus of the resultant force; on the right, its vertical and horizontal parts."
+        - ">At 5000 r/min, drag the balance ratio from 0 to 1, record the maximum resultant every 0.15, and watch the locus change from tall to wide."
+        - ">Task three. Go above 6000 r/min and choose a balance ratio yourself, so the maximum resultant is no more than 550 newtons with all six criteria met."
+        - ">The guide and the report template are on the platform."
+
+  - id: lab82
+    kind: lab
+    lab: tune-lockstitch
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - set: {level: "2", seed: 20816}
+        press: "#loadM"
+        js: "(() => { const s = document.createElement('style'); s.textContent = '#sewSum, #counts, #log, #result, #tasks, .tool .r { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); })()"
+      - press: "#sew"
+      - press: "#tools button[data-i=\"1\"]"
+      - press: "#tools button[data-i=\"2\"]"
+      - js: "window.scrollTo(0, 0)"
+    say:
+      zh:
+        - ">虚拟实验 8-2 是综合调机，把第 4 到第 8 讲合起来用。页面给你一台有毛病的平缝机，只给故障机编号，不告诉原因。试缝统计、测量读数和日志这里也遮住了，现象留给你看。"
+        - ">先试缝 30 针，看线迹正面、反面和机器的表现。"
+        - ">根据现象列出两三个可能的原因，每个原因对应一项测量，先量最可能的那一项。"
+        - ">读数和标准值比一比；找到偏离的那一项再调，一次只调一处，调完再量、再试缝。"
+        - ">直到 30 针都合格，而且没有把本来好的地方调乱。同一个现象往往有几种原因，要靠测量分辨，这和真机调机的步骤一样。"
+      en:
+        - ">Virtual lab 8-2 is machine diagnosis, and it brings Lectures 4 to 8 together. The page gives you a faulty lockstitch machine with a machine number, but not the cause. The stitch counts, the gauge readings and the log are blurred here too; the symptoms are yours to read."
+        - ">First sew 30 stitches, and look at the top, the underside, and how the machine behaves."
+        - ">From the symptoms, list two or three possible causes, each with one measurement, and measure the most likely first."
+        - ">Compare each reading with standard. Adjust only the setting that's off, one thing at a time, then measure and sew again."
+        - ">Keep going until all 30 stitches are good, without disturbing anything that was right. One symptom often has several causes, and only measuring tells them apart. That's how you set up a real machine, too."
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    steps:
+      - js: "document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); document.getElementById('checksA').style.filter = 'blur(7px) grayscale(1)'"
+        press: "#play"
+      - press: "#tabB"
+        js: "setTimeout(() => { document.querySelectorAll('svg text').forEach(t => { if (!/已装整机|Built #|仓库剩余|Left in stores|已发货|Shipped/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }); document.querySelectorAll('svg text').forEach(t => { if (/装用起点|first used at/.test(t.textContent)) t.style.filter = 'blur(6px)'; }); ['cv3', 'checksL', 'late', 'latev', 'affIn'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; }); const s = document.createElement('style'); s.textContent = '#arch tr:nth-child(4) td.m, #arch tr:nth-child(11) td.m { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); }, 800)"
+      - sweep: {sn: [60, 100]}
+        dur: 8
+    say:
+      zh:
+        - ">调机调出来的数，到了工厂要逐台记下来。这是问渠数字工厂：总装调试工位逐台测量梭尖间隙，读数经过总线进入控制图，数据一漂移，系统就报警。"
+        - ">切到追溯页。右边是整机档案：每台机器的旋梭批次、梭尖间隙、钩线定时、出厂测试，都是历史库里的一条记录。"
+        - ">拖动序列号，一台一台地看。前面讲的旋梭定时、梭尖间隙，在工厂里就是这样逐台调、逐台记、出了问题逐台追。数字工厂里的示例是缝纫机总装线；第二十七讲会完整地走一遍。"
+      en:
+        - ">The numbers you set when adjusting a machine have to be recorded, machine by machine, in the factory. This is the WenQuest digital factory. The adjustment station measures the hook clearance on every machine, the readings go over the bus into a control chart, and if the data drifts the system raises an alarm."
+        - ">Switch to the trace page. On the right is the machine record: each machine's hook batch, hook clearance, hook timing and final test, each one a record in the history database."
+        - ">Drag the serial number and look at them one by one. The hook timing and clearance from earlier lectures are set, logged and, if something goes wrong, traced like this, one machine at a time. We'll walk through the whole factory in Lecture 27."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 8：综合调机报告", "Assignment 8: machine diagnosis report"]
+      points:
+        - ["实验 8-2：故障数 3，试缝 ≤ 8 次、不乱调；逐个故障写报告", "Lab 8-2 with 3 faults, ≤ 8 tests, nothing disturbed; report each fault"]
+        - ["分析：哪两个故障最易混淆，靠哪项测量分开", "Analysis: which two faults look alike, and which measurement told them apart"]
+        - ["计算旋梭推迟 4° 的回升量；论述平衡块为何消不净振动", "Rise with the hook retarded 4°; why a counterweight can't remove all vibration"]
+      foot: ["交一份 PDF（5 页以内），在问渠学习平台提交。", "One PDF of up to 5 pages, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业是一份综合调机报告，一共四道题。第一题，在虚拟实验 8-2 里用老师给的编号、故障数选 3，试缝不超过 8 次、不乱调，排除全部故障，逐个写出现象、怀疑过的原因、测量读数、判断、调整量和复核结果。"
+        - ">第二题，你的故障机里哪两个故障的现象最容易混淆？是靠哪一项测量把它们分开的？"
+        - ">第三题，旋梭推迟 4 度，用第 3 讲的公式求钩线时的回升量，说明哪条判据先不满足，再解释开头那位师傅为什么开始断线。第四题，从一阶和二阶、竖直和水平、挑线杆三方面论述平衡块为什么消不净振动，再提两条设计上的改进。"
+        - 报告做成一份 PDF，在问渠学习平台上提交。
+      en:
+        - ">The assignment is a machine diagnosis report, with four questions. One, in Virtual lab 8-2, use the machine number your teacher gives you with 3 faults and clear them all, in no more than 8 test seams and without disturbing anything else. For each fault, write the symptom, the causes you suspected, the readings, your diagnosis, the adjustment and the re-check."
+        - ">Two, which two faults on your machine looked most alike, and which measurement told them apart?"
+        - ">Three, retard the hook by 4 degrees, use the Lecture 3 formula to find the rise at the catch, say which criterion fails first, and explain why the mechanic at the start began breaking thread. Four, explain why a counterweight can't remove the vibration completely, in terms of first and second order, vertical and horizontal, and the take-up lever, and suggest two design improvements."
+        - Make the report one PDF and submit it on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["12.5° 的重叠区，4000 r/min 时持续多少毫秒？", "How long is the 12.5° overlap at 4000 r/min, in ms?"]
+        - ["挑线杆 55° 收线最紧时，送布牙在做什么？", "When the take-up is tightest at 55°, what is the feed dog doing?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：机针在布中和送布牙抓布重叠 12.5 度，主轴每分钟 4000 转时，这段重叠持续多少毫秒？"
+        - ">再比如：挑线杆在 55 度收线最紧的时候，送布牙在做什么？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, needle-in-fabric and dog gripping overlap by 12.5 degrees. At 4000 r/min, how many milliseconds does that last?"
+        - ">Or, when the take-up is tightest at 55 degrees, what is the feed dog doing?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+    - 平缝机的四套机构到这里就讲完了。下一讲换一种机器：包缝机，看三根线、两个弯针怎样一边切边一边把布边包起来，还有两只送布牙的差动送布。我们下一讲见。
+  en:
+    - The slides, the virtual labs, the 3D prototype, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - That completes the lockstitch machine. Next time, a different machine, the overlock machine. We'll see how three threads and two loopers wrap the edge while a knife trims it, and how two feed dogs give differential feed. See you then.
