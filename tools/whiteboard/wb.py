@@ -84,13 +84,19 @@ def render_mp4(d, data, audio, fps=30, start=0.0, end=None, progress=None):
         n = int((end - start) * fps)
         for i in range(n):
             p.evaluate(f"WB.seek({start + i / fps})")
-            ff.stdin.write(p.screenshot(type="jpeg", quality=90))
+            try:
+                ff.stdin.write(p.screenshot(type="jpeg", quality=90))
+            except BrokenPipeError:   # -shortest: ffmpeg is done once the narration ends
+                break
             if i % 900 == 0:
                 print(f"  frame {i}/{n}", flush=True)
             if progress and i % 30 == 0:
                 progress(round(100 * i / n))
         b.close()
-    ff.stdin.close()
+    try:
+        ff.stdin.close()
+    except BrokenPipeError:
+        pass
     ff.wait()
     print("→", out)
 

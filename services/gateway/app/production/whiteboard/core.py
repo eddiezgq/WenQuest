@@ -186,6 +186,10 @@ def compile_lesson(L, resolve_media=None):
                 raise SystemExit(f"unknown element type {t!r}")
             items.append(it)
             ex.append((bi, ox, oy, e))
+    pace = float(L.get("pace") or 1)        # 科普短片: < 1 draws faster (quick sketch, then hold), like a sped-up drawing
+    if pace != 1:
+        for it in items:
+            it["weight"] *= pace
     data = schedule(items, boards, L["segments"], L.get("duration", 0))
     add_moves_and_media(data, moves, media, segs)
     return data, ex
