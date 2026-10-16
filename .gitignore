@@ -23,3 +23,6 @@ apps/web/wb-editor/dist/
 # Eddie 的手的照片（第 35 轮）：是否放进公开仓库待 Eddie 定
 tools/whiteboard/assets/hand.*
 samples/白板讲课/**/配音.*
+
+# 教材网页版的图一律发 webp；出图脚本顺手生成的 png 是中间文件
+textbook/web-editions/*/img/**/*.png
