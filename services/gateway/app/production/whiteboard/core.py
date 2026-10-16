@@ -214,11 +214,17 @@ def add_moves_and_media(data, moves, media, segs):
             if [bd["ox"], bd["oy"]] == k["a"] and b not in leave:
                 leave[b] = k["t0"]
     out = []
+    first_delay = {}                         # moves of one thing timed one after another keep their order when it is drawn late
+    for m in moves:
+        if m.get("delay") is not None:
+            k = (m["b"], m["at"], tuple(m["targets"]))
+            first_delay[k] = min(first_delay.get(k, 1e9), m["delay"])
     for m in moves:
         s = segs[min(m["at"], len(segs) - 1)]
         drawn = max([it["start"] + it["dur"] for it in data["items"] if it["b"] == m["b"] and targeted(it.get("eid"), m["targets"])] or [0])
         delay = m.pop("delay", None)
-        start = max(s["t0"] + 0.25 + (delay or 0), drawn + 0.3)   # a thing moves only once it is drawn
+        later = (delay - first_delay[(m["b"], m["at"], tuple(m["targets"]))]) if delay is not None else 0
+        start = max(s["t0"] + 0.25 + (delay or 0), drawn + 0.3 + later)   # a thing moves only once it is drawn
         if m["kind"] == "pop" or (m["kind"] == "grow" and not m.get("from")):   # …except popping or growing in, while it is drawn
             first = min([it["start"] for it in data["items"] if it["b"] == m["b"] and targeted(it.get("eid"), m["targets"])] or [s["t0"]])
             start = max(first, s["t0"] + (delay or 0))
@@ -226,7 +232,22 @@ def add_moves_and_media(data, moves, media, segs):
         until = m.pop("until", None)
         end = segs[min(until, len(segs) - 1)]["t1"] if isinstance(until, int) else leave.get(m["b"], data["total"])
         out.append(dict(m, start=round(start, 3), dur=round(dur, 3), end=round(end, 3), **({"_own": 1} if delay is not None else {})))
-    together = {}                            # moves of one segment that change a pose start together (unless timed with a delay)
+    chains = {}                              # timed one-off moves of one thing still finish before the camera leaves (fast speech)
+    for m in out:
+        if m.get("_own") and m["kind"] in ("rotate", "shift", "pop", "grow", "pulse"):
+            chains.setdefault((m["b"], m["at"], tuple(m["targets"])), []).append(m)
+    for ms in chains.values():
+        base, last, end = min(m["start"] for m in ms), max(m["start"] + m["dur"] for m in ms), ms[0]["end"] - 0.15
+        if last > end:
+            f = max(0.0, end - base) / (last - base)
+            s0 = base
+            if f < 0.3:                          # too little time left: squeeze to 30 % and start a bit earlier so it still ends on screen
+                f = 0.3
+                s0 = end - (last - base) * f
+            for m in ms:
+                m["start"] = round(s0 + (m["start"] - base) * f, 3)
+                m["dur"] = round(max(0.2, m["dur"] * f), 3)
+    together = {}                           # moves of one segment that change a pose start together (unless timed with a delay)
     for m in out:
         if m["kind"] in ("rotate", "shift") and not m.get("_own"):
             together[(m["b"], m["at"])] = max(together.get((m["b"], m["at"]), 0), m["start"])
