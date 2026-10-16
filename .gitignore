@@ -13,13 +13,13 @@ tools/vendor/node_modules/
 # 字体与外部库由部署流程生成（第 34 轮，tools/vendor/build.py）
 site/vendor/
 # 白板讲课：中间文件；含 Eddie 录音的成品（录音、网页版、MP4）不进公开仓库（第 35 轮）
-samples/白板讲课/*/_*
-samples/白板讲课/*/data.json
-samples/白板讲课/*/录音.*
-samples/白板讲课/*/白板课.html
-samples/白板讲课/*/白板课.mp4
+samples/白板讲课/**/_*
+samples/白板讲课/**/data.json
+samples/白板讲课/**/录音.*
+samples/白板讲课/**/白板课.html
+samples/白板讲课/**/白板课.mp4
 apps/web/wb-editor/node_modules/
 apps/web/wb-editor/dist/
 # Eddie 的手的照片（第 35 轮）：是否放进公开仓库待 Eddie 定
 tools/whiteboard/assets/hand.*
-samples/白板讲课/*/配音.*
+samples/白板讲课/**/配音.*
