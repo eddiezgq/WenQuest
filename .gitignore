@@ -26,3 +26,8 @@ samples/白板讲课/**/配音.*
 
 # 教材网页版的图一律发 webp；出图脚本顺手生成的 png 是中间文件
 textbook/web-editions/*/img/**/*.png
+
+# 三维仿真视频（第 36 轮）：中间帧和成片不进仓库
+video3d/**/_frames/
+video3d/**/*.mp4
+video3d/**/*.webm
