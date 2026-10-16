@@ -1,0 +1,2200 @@
+{
+ "title": "知识图样段：能飞多久",
+ "title_en": "Knowledge-map sample",
+ "audio": "配音.wav",
+ "duration": 47.54,
+ "segments": [
+  {
+   "t0": 0.3,
+   "t1": 7.59,
+   "zh": "黑科技三，重头戏：它到底能飞多久？官方只给了两个数：十个喷口，六百升压缩空气。",
+   "en": "Trick three, the main event: how long can it fly? Tesla gave two numbers: ten jets, 600 liters of compressed air."
+  },
+  {
+   "t0": 7.71,
+   "t1": 15.72,
+   "zh": "六百升，就是三个浴缸。压到三百个大气压，大约装两百公斤空气；压到七百，也就三百多公斤。",
+   "en": "600 liters is three bathtubs. At 300 atmospheres that's about 200 kg of air; at 700, just over 300."
+  },
+  {
+   "t0": 15.84,
+   "t1": 22.31,
+   "zh": "冷空气喷出去，每秒最多六七百米。推力八万牛，除一下：每秒要喷掉一百三十公斤。",
+   "en": "Cold air leaves at 600 to 700 meters per second at most. 80 kN divided by that: 130 kg every second."
+  },
+  {
+   "t0": 22.43,
+   "t1": 27.98,
+   "zh": "两百公斤，每秒一百三，一秒半见底。而且压力一掉，推力跟着掉。",
+   "en": "200 kg at 130 per second: empty in a second and a half. And as pressure drops, so does thrust."
+  },
+  {
+   "t0": 28.1,
+   "t1": 34.12,
+   "zh": "只悬停呢？两吨的车要两万牛，每秒三十多公斤：五到十秒，就得落地。",
+   "en": "Just hovering? Two tons needs 20 kN, over 30 kg a second: down again in five to ten seconds."
+  },
+  {
+   "t0": 34.24,
+   "t1": 41.0,
+   "zh": "还有隐藏减益：气体一膨胀就降温，罐子越喷越冷，压力掉得更快，喷口还会结霜。",
+   "en": "Hidden penalty: expanding gas cools, the tank gets colder, pressure falls faster, and nozzles frost."
+  },
+  {
+   "t0": 41.12,
+   "t1": 45.92,
+   "zh": "结论：这不是飞，是用两百公斤空气，换来的一次很贵的跳。",
+   "en": "Verdict: it doesn't fly. It trades 200 kg of air for one very expensive jump."
+  }
+ ],
+ "boards": [
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 0,
+     "x": 960,
+     "y": 190,
+     "s": 84,
+     "text": "到底能飞多久？",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "q0"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "pop",
+     "targets": [
+      "q0"
+     ],
+     "dur": 0.35,
+     "delay": 0.0
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M334.0,604.0 L406.0,604.0 L450.0,820.0 L290.0,820.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M714.0,604.0 L786.0,604.0 L830.0,820.0 L670.0,820.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M140.0,584.0 L140.0,500.0 L320.0,480.0 L480.0,384.0 L700.0,384.0 L860.0,472.0 L990.0,508.0 L1004.0,572.0 L960.0,588.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M500.0,404.0 L680.0,404.0 L796.0,468.0 L400.0,468.0 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "hk_b",
+     "x": 604.0,
+     "y": 416.0,
+     "w": 28.0,
+     "h": 32.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "hk_b",
+     "x": 672.0,
+     "y": 416.0,
+     "w": 28.0,
+     "h": 32.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M860.0,524.0 Q900.0,548.0 940.0,524.0"
+    },
+    {
+     "t": "rect",
+     "at": 0,
+     "id": "hk_b",
+     "x": 136.0,
+     "y": 456.0,
+     "w": 92.0,
+     "h": 24.0,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "hk_w0",
+     "x": 232.0,
+     "y": 516.0,
+     "w": 136.0,
+     "h": 136.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M256.0,584.0 L344.0,584.0 M300.0,540.0 L300.0,628.0"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "hk_w1",
+     "x": 752.0,
+     "y": 516.0,
+     "w": 136.0,
+     "h": 136.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "hk_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M776.0,584.0 L864.0,584.0 M820.0,540.0 L820.0,628.0"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "wiggle",
+     "targets": [
+      "hk_jet"
+     ],
+     "pivot": [
+      560,
+      640
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "bob",
+     "targets": [
+      "hk*"
+     ],
+     "amp": 12.0,
+     "hz": 1.6
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 1440,
+     "y": 430,
+     "s": 150,
+     "text": "10",
+     "c": "blue",
+     "align": "center",
+     "font": "en",
+     "id": "nm439z"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "pop",
+     "targets": [
+      "nm439z"
+     ],
+     "dur": 0.35,
+     "delay": 1.2
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 1440,
+     "y": 520,
+     "s": 52,
+     "text": "个喷口",
+     "c": "blue",
+     "align": "center",
+     "font": "zh",
+     "id": "lb440z"
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 1440,
+     "y": 569.4,
+     "s": 32,
+     "text": "jets",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb440z"
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 1440,
+     "y": 760,
+     "s": 150,
+     "text": "600 L",
+     "c": "gold",
+     "align": "center",
+     "font": "en",
+     "id": "nm441z"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "pop",
+     "targets": [
+      "nm441z"
+     ],
+     "dur": 0.35,
+     "delay": 2.6
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 1440,
+     "y": 850,
+     "s": 52,
+     "text": "压缩空气",
+     "c": "gold",
+     "align": "center",
+     "font": "zh",
+     "id": "lb442z"
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 1440,
+     "y": 899.4,
+     "s": 32,
+     "text": "compressed air",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb442z"
+    },
+    {
+     "t": "line",
+     "at": 0,
+     "id": "st496z",
+     "pts": [
+      [
+       470,
+       650
+      ],
+      [
+       450,
+       760
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "signal",
+     "targets": [
+      "st496z"
+     ],
+     "speed": 220
+    },
+    {
+     "t": "line",
+     "at": 0,
+     "id": "st497z",
+     "pts": [
+      [
+       650,
+       650
+      ],
+      [
+       670,
+       760
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "signal",
+     "targets": [
+      "st497z"
+     ],
+     "speed": 220
+    }
+   ]
+  },
+  {
+   "title": {
+    "zh": "能飞多久？",
+    "en": "How long can it fly?"
+   },
+   "elements": [
+    {
+     "t": "text",
+     "at": 1,
+     "x": 1500,
+     "y": 95,
+     "s": 44,
+     "text": "冷气推进",
+     "c": "gold",
+     "align": "center",
+     "font": "zh",
+     "id": "lb443z"
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 1500,
+     "y": 136.8,
+     "s": 27,
+     "text": "Cold-gas thrust",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb443z"
+    },
+    {
+     "t": "rect",
+     "at": 1,
+     "x": 205,
+     "y": 250,
+     "w": 110,
+     "h": 230,
+     "c": "ink",
+     "sw": 5
+    },
+    {
+     "t": "rect",
+     "at": 1,
+     "x": 221,
+     "y": 454.1,
+     "w": 78,
+     "h": 9.9,
+     "c": "gold",
+     "sw": 3,
+     "fill": "gold",
+     "id": "tk444z"
+    },
+    {
+     "t": "rect",
+     "at": 1,
+     "x": 213,
+     "y": 262,
+     "w": 94,
+     "h": 210,
+     "c": "gold",
+     "sw": 3,
+     "fill": "gold",
+     "id": "fill445z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "grow",
+     "targets": [
+      "fill445z"
+     ],
+     "axis": "y",
+     "pivot": [
+      260,
+      472
+     ],
+     "dur": 1.2,
+     "delay": 2.5
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "ink",
+     "w": 3,
+     "d": "M345,300 L435,300 Q431,338 415,338 L365,338 Q349,338 345,300 Z",
+     "id": "tub446z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "pop",
+     "targets": [
+      "tub446z"
+     ],
+     "dur": 0.35,
+     "delay": 0.6
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "ink",
+     "w": 3,
+     "d": "M345,360 L435,360 Q431,398 415,398 L365,398 Q349,398 345,360 Z",
+     "id": "tub447z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "pop",
+     "targets": [
+      "tub447z"
+     ],
+     "dur": 0.35,
+     "delay": 0.8999999999999999
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "ink",
+     "w": 3,
+     "d": "M345,420 L435,420 Q431,458 415,458 L365,458 Q349,458 345,420 Z",
+     "id": "tub448z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "pop",
+     "targets": [
+      "tub448z"
+     ],
+     "dur": 0.35,
+     "delay": 1.2
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 300,
+     "y": 545,
+     "s": 36,
+     "text": "气罐 600 L ≈ 3 个浴缸",
+     "c": "ink",
+     "align": "center",
+     "font": "zh",
+     "id": "lb449z"
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 300,
+     "y": 579.2,
+     "s": 22,
+     "text": "Tank: 600 L ≈ 3 bathtubs",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb449z"
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 300,
+     "y": 640,
+     "s": 40,
+     "text": "300 bar ≈ 200 kg",
+     "c": "gold",
+     "align": "center",
+     "font": "zh",
+     "id": "nm450z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "pop",
+     "targets": [
+      "nm450z"
+     ],
+     "dur": 0.35,
+     "delay": 2.6
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 300,
+     "y": 690,
+     "s": 32,
+     "text": "700 bar ≈ 300+ kg",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "nm451z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "pop",
+     "targets": [
+      "nm451z"
+     ],
+     "dur": 0.35,
+     "delay": 4.6
+    },
+    {
+     "t": "arrow",
+     "at": 2,
+     "id": "ln452z",
+     "pts": [
+      [
+       470,
+       370
+      ],
+      [
+       580,
+       370
+      ]
+     ],
+     "c": "muted",
+     "w": 4
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "signal",
+     "targets": [
+      "ln452z"
+     ],
+     "speed": 260
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "c": "ink",
+     "w": 5,
+     "d": "M640,300 L760,300 L800,440 L600,440 Z"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "c": "blue",
+     "w": 5,
+     "d": "M640,450 L620,560",
+     "id": "jet453z"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "flow",
+     "targets": [
+      "jet453z"
+     ],
+     "speed": 160
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "c": "blue",
+     "w": 5,
+     "d": "M700,450 L700,560",
+     "id": "jet454z"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "flow",
+     "targets": [
+      "jet454z"
+     ],
+     "speed": 160
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "c": "blue",
+     "w": 5,
+     "d": "M760,450 L780,560",
+     "id": "jet455z"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "flow",
+     "targets": [
+      "jet455z"
+     ],
+     "speed": 160
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 700,
+     "y": 620,
+     "s": 36,
+     "text": "喷速 600–700 m/s",
+     "c": "blue",
+     "align": "center",
+     "font": "zh",
+     "id": "lb456z"
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 700,
+     "y": 654.2,
+     "s": 22,
+     "text": "Jet speed",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb456z"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "pop",
+     "targets": [
+      "lb456z"
+     ],
+     "dur": 0.35,
+     "delay": 0.3
+    },
+    {
+     "t": "arrow",
+     "at": 2,
+     "id": "ln457z",
+     "pts": [
+      [
+       830,
+       370
+      ],
+      [
+       960,
+       370
+      ]
+     ],
+     "c": "muted",
+     "w": 4
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "signal",
+     "targets": [
+      "ln457z"
+     ],
+     "speed": 260
+    },
+    {
+     "t": "arrow",
+     "at": 2,
+     "id": "a458z",
+     "pts": [
+      [
+       1080,
+       470
+      ],
+      [
+       1080,
+       250
+      ]
+     ],
+     "c": "red",
+     "w": 12
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "grow",
+     "targets": [
+      "a458z"
+     ],
+     "axis": "y",
+     "pivot": [
+      1080,
+      470
+     ],
+     "dur": 0.6,
+     "delay": 1.4
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 1080,
+     "y": 545,
+     "s": 36,
+     "text": "推力 80 kN",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "lb459z"
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 1080,
+     "y": 579.2,
+     "s": 22,
+     "text": "Thrust (reported)",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb459z"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "pop",
+     "targets": [
+      "lb459z"
+     ],
+     "dur": 0.35,
+     "delay": 1.6
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "x": 900,
+     "y": 610,
+     "w": 360,
+     "h": 70,
+     "c": "ink",
+     "sw": 3
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 1080,
+     "y": 655,
+     "s": 30,
+     "text": "推力 = 每秒空气 × 喷速",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 1080,
+     "y": 735,
+     "s": 52,
+     "text": "→ 130 kg/s",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "nm460z"
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "pop",
+     "targets": [
+      "nm460z"
+     ],
+     "dur": 0.35,
+     "delay": 3.4
+    },
+    {
+     "t": "arrow",
+     "at": 3,
+     "id": "ln461z",
+     "pts": [
+      [
+       1210,
+       370
+      ],
+      [
+       1330,
+       370
+      ]
+     ],
+     "c": "muted",
+     "w": 4
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "signal",
+     "targets": [
+      "ln461z"
+     ],
+     "speed": 260
+    },
+    {
+     "t": "line",
+     "at": 3,
+     "pts": [
+      [
+       1360,
+       470
+      ],
+      [
+       1800,
+       470
+      ]
+     ],
+     "c": "ink",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 3,
+     "pts": [
+      [
+       1360,
+       470
+      ],
+      [
+       1360,
+       250
+      ]
+     ],
+     "c": "ink",
+     "w": 4
+    },
+    {
+     "t": "path",
+     "at": 3,
+     "c": "red",
+     "w": 6,
+     "d": "M1360,265 C1420,275 1460,420 1540,455 C1620,468 1720,469 1800,470",
+     "id": "cv462z"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "grow",
+     "targets": [
+      "cv462z"
+     ],
+     "axis": "x",
+     "pivot": [
+      1360,
+      360
+     ],
+     "dur": 1.4,
+     "delay": 0.6
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "x": 1580,
+     "y": 545,
+     "s": 36,
+     "text": "全力喷：1.5 秒见底",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "lb463z"
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "x": 1580,
+     "y": 579.2,
+     "s": 22,
+     "text": "Full blast: empty in 1.5 s",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb463z"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "pop",
+     "targets": [
+      "lb463z"
+     ],
+     "dur": 0.35,
+     "delay": 1.6
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "x": 1580,
+     "y": 650,
+     "s": 72,
+     "text": "1.5 s",
+     "c": "red",
+     "align": "center",
+     "font": "en",
+     "id": "nm464z"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "pop",
+     "targets": [
+      "nm464z"
+     ],
+     "dur": 0.35,
+     "delay": 2.0
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 120,
+     "y": 790,
+     "s": 40,
+     "text": "只悬停？",
+     "c": "blue",
+     "align": "left",
+     "font": "zh",
+     "id": "lb465z"
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 120,
+     "y": 828.0,
+     "s": 24,
+     "text": "Just hover?",
+     "c": "muted",
+     "align": "left",
+     "font": "en",
+     "id": "lb465z"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M469.6,855.6 L498.4,855.6 L516.0,942.0 L452.0,942.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M621.6,855.6 L650.4,855.6 L668.0,942.0 L604.0,942.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M392.0,847.6 L392.0,814.0 L464.0,806.0 L528.0,767.6 L616.0,767.6 L680.0,802.8 L732.0,817.2 L737.6,842.8 L720.0,849.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M536.0,775.6 L608.0,775.6 L654.4,801.2 L496.0,801.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 4,
+     "id": "hv_b",
+     "x": 577.6,
+     "y": 780.4,
+     "w": 11.200000000000001,
+     "h": 12.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 4,
+     "id": "hv_b",
+     "x": 604.8,
+     "y": 780.4,
+     "w": 11.200000000000001,
+     "h": 12.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M680.0,823.6 Q696.0,833.2 712.0,823.6"
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "id": "hv_b",
+     "x": 390.4,
+     "y": 796.4,
+     "w": 36.800000000000004,
+     "h": 9.600000000000001,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 4,
+     "id": "hv_w0",
+     "x": 428.79999999999995,
+     "y": 820.4,
+     "w": 54.400000000000006,
+     "h": 54.400000000000006,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M438.4,847.6 L473.6,847.6 M456.0,830.0 L456.0,865.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 4,
+     "id": "hv_w1",
+     "x": 636.8,
+     "y": 820.4,
+     "w": 54.400000000000006,
+     "h": 54.400000000000006,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 4,
+     "id": "hv_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M646.4,847.6 L681.6,847.6 M664.0,830.0 L664.0,865.2"
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "wiggle",
+     "targets": [
+      "hv_jet"
+     ],
+     "pivot": [
+      560,
+      870
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "bob",
+     "targets": [
+      "hv*"
+     ],
+     "amp": 4.800000000000001,
+     "hz": 1.6
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 560,
+     "y": 1015,
+     "s": 32,
+     "text": "托住 2 吨 = 20 kN · 每秒 30+ kg",
+     "c": "blue",
+     "align": "center",
+     "font": "zh",
+     "id": "lb466z"
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 560,
+     "y": 1045.4,
+     "s": 19,
+     "text": "Hold 2 t: 20 kN, 30+ kg/s",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb466z"
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "pop",
+     "targets": [
+      "lb466z"
+     ],
+     "dur": 0.35,
+     "delay": 0.8
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 230,
+     "y": 940,
+     "s": 64,
+     "text": "5–10 s",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "nm467z"
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "pop",
+     "targets": [
+      "nm467z"
+     ],
+     "dur": 0.35,
+     "delay": 3.0
+    },
+    {
+     "t": "arrow",
+     "at": 4,
+     "id": "ln468z",
+     "pts": [
+      [
+       760,
+       880
+      ],
+      [
+       840,
+       880
+      ]
+     ],
+     "c": "muted",
+     "w": 4
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "signal",
+     "targets": [
+      "ln468z"
+     ],
+     "speed": 260
+    },
+    {
+     "t": "icon",
+     "at": 5,
+     "name": "thermometer",
+     "x": 920,
+     "y": 850,
+     "size": 170,
+     "c": "red",
+     "w": 4,
+     "id": "thm"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "wiggle",
+     "targets": [
+      "thm"
+     ],
+     "pivot": [
+      920,
+      930
+     ],
+     "amp": 5,
+     "hz": 3
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 4,
+     "d": "M1018,780 L1062,780 M1040,758 L1040,802 M1025,765 L1055,795 M1025,795 L1055,765",
+     "id": "sn469z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn469z"
+     ],
+     "dur": 0.35,
+     "delay": 1.4
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn469z"
+     ],
+     "pivot": [
+      1040,
+      780
+     ],
+     "rpm": 30
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 4,
+     "d": "M1088,860 L1132,860 M1110,838 L1110,882 M1095,845 L1125,875 M1095,875 L1125,845",
+     "id": "sn470z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn470z"
+     ],
+     "dur": 0.35,
+     "delay": 1.7999999999999998
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn470z"
+     ],
+     "pivot": [
+      1110,
+      860
+     ],
+     "rpm": 30
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 4,
+     "d": "M1028,930 L1072,930 M1050,908 L1050,952 M1035,915 L1065,945 M1035,945 L1065,915",
+     "id": "sn471z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn471z"
+     ],
+     "dur": 0.35,
+     "delay": 2.2
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn471z"
+     ],
+     "pivot": [
+      1050,
+      930
+     ],
+     "rpm": 30
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 1000,
+     "y": 990,
+     "s": 32,
+     "text": "越喷越冷 · 喷口结霜",
+     "c": "blue",
+     "align": "center",
+     "font": "zh",
+     "id": "lb472z"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 1000,
+     "y": 1020.4,
+     "s": 19,
+     "text": "Expanding gas cools, nozzles frost",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb472z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "lb472z"
+     ],
+     "dur": 0.35,
+     "delay": 0.6
+    },
+    {
+     "t": "arrow",
+     "at": 5,
+     "id": "ln473z",
+     "pts": [
+      [
+       1170,
+       880
+      ],
+      [
+       1290,
+       880
+      ]
+     ],
+     "c": "muted",
+     "w": 4
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "signal",
+     "targets": [
+      "ln473z"
+     ],
+     "speed": 260
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "id": "st474z",
+     "x": 1320,
+     "y": 770,
+     "w": 460,
+     "h": 170,
+     "c": "red",
+     "sw": 7
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 1550,
+     "y": 850,
+     "s": 54,
+     "text": "很贵的一跳",
+     "c": "red",
+     "align": "center",
+     "font": "zh",
+     "id": "st474z"
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 1550,
+     "y": 905,
+     "s": 30,
+     "text": "An expensive jump",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "st474z"
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pop",
+     "targets": [
+      "st474z"
+     ],
+     "dur": 0.45,
+     "delay": 0.4
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pulse",
+     "targets": [
+      "st474z"
+     ],
+     "delay": 2.4,
+     "dur": 0.8
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 1550,
+     "y": 1000,
+     "s": 32,
+     "text": "200 kg 空气 → 1 次跳",
+     "c": "gold",
+     "align": "center",
+     "font": "zh",
+     "id": "lb475z"
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 1550,
+     "y": 1030.4,
+     "s": 19,
+     "text": "200 kg of air → one jump",
+     "c": "muted",
+     "align": "center",
+     "font": "en",
+     "id": "lb475z"
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pop",
+     "targets": [
+      "lb475z"
+     ],
+     "dur": 0.35,
+     "delay": 1.4
+    },
+    {
+     "t": "ellipse",
+     "at": 1,
+     "id": "gauge476z",
+     "x": 60,
+     "y": 250,
+     "w": 90,
+     "h": 90,
+     "c": "ink",
+     "sw": 4
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "pop",
+     "targets": [
+      "gauge476z"
+     ],
+     "dur": 0.35,
+     "delay": 0.2
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "red",
+     "w": 5,
+     "d": "M105,295 L75,295",
+     "id": "needle477z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "rotate",
+     "targets": [
+      "needle477z"
+     ],
+     "to": 120,
+     "pivot": [
+      105,
+      295
+     ],
+     "dur": 0.8,
+     "delay": 2.6
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "rotate",
+     "targets": [
+      "needle477z"
+     ],
+     "to": 40,
+     "pivot": [
+      105,
+      295
+     ],
+     "dur": 0.8,
+     "delay": 4.6
+    },
+    {
+     "t": "text",
+     "at": 1,
+     "x": 105,
+     "y": 375,
+     "s": 26,
+     "text": "bar",
+     "c": "muted",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "blue",
+     "w": 3,
+     "d": "M355,318 Q375,310 395,318 Q415,326 430,318",
+     "id": "wv478z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "wiggle",
+     "targets": [
+      "wv478z"
+     ],
+     "pivot": [
+      392,
+      318
+     ],
+     "amp": 4,
+     "hz": 2
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "blue",
+     "w": 3,
+     "d": "M355,378 Q375,370 395,378 Q415,386 430,378",
+     "id": "wv479z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "wiggle",
+     "targets": [
+      "wv479z"
+     ],
+     "pivot": [
+      392,
+      378
+     ],
+     "amp": 4,
+     "hz": 2
+    },
+    {
+     "t": "path",
+     "at": 1,
+     "c": "blue",
+     "w": 3,
+     "d": "M355,438 Q375,430 395,438 Q415,446 430,438",
+     "id": "wv480z"
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "wiggle",
+     "targets": [
+      "wv480z"
+     ],
+     "pivot": [
+      392,
+      438
+     ],
+     "amp": 4,
+     "hz": 2
+    },
+    {
+     "t": "line",
+     "at": 2,
+     "id": "st481z",
+     "pts": [
+      [
+       680,
+       450
+      ],
+      [
+       656.0,
+       560
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "signal",
+     "targets": [
+      "st481z"
+     ],
+     "speed": 200
+    },
+    {
+     "t": "line",
+     "at": 2,
+     "id": "st482z",
+     "pts": [
+      [
+       740,
+       450
+      ],
+      [
+       740.0,
+       560
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "signal",
+     "targets": [
+      "st482z"
+     ],
+     "speed": 200
+    },
+    {
+     "t": "line",
+     "at": 2,
+     "id": "st483z",
+     "pts": [
+      [
+       800,
+       450
+      ],
+      [
+       824.0,
+       560
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "signal",
+     "targets": [
+      "st483z"
+     ],
+     "speed": 200
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "pulse",
+     "targets": [
+      "nm460z"
+     ],
+     "delay": 4.0,
+     "dur": 0.6
+    },
+    {
+     "t": "line",
+     "at": 2,
+     "id": "st484z",
+     "pts": [
+      [
+       1230,
+       725
+      ],
+      [
+       1340,
+       725
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "signal",
+     "targets": [
+      "st484z"
+     ],
+     "speed": 180
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "grow",
+     "targets": [
+      "fill445z"
+     ],
+     "axis": "y",
+     "from": 1,
+     "to": 0.05,
+     "pivot": [
+      260,
+      472
+     ],
+     "dur": 1.5,
+     "delay": 0.6
+    },
+    {
+     "t": "path",
+     "at": 3,
+     "c": "red",
+     "w": 1,
+     "d": "M1360,265 C1420,275 1460,420 1540,455 C1620,468 1720,469 1800,470",
+     "id": "cvs485z"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "signal",
+     "targets": [
+      "cvs485z"
+     ],
+     "speed": 220
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "pulse",
+     "targets": [
+      "nm464z"
+     ],
+     "delay": 2.8,
+     "dur": 0.6
+    },
+    {
+     "t": "ellipse",
+     "at": 3,
+     "id": "clk486z",
+     "x": 1720,
+     "y": 610,
+     "w": 80,
+     "h": 80,
+     "c": "ink",
+     "sw": 4
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "pop",
+     "targets": [
+      "clk486z"
+     ],
+     "dur": 0.35,
+     "delay": 1.8
+    },
+    {
+     "t": "path",
+     "at": 3,
+     "c": "red",
+     "w": 4,
+     "d": "M1760,650 L1760,620",
+     "id": "hand487z"
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "spin",
+     "targets": [
+      "hand487z"
+     ],
+     "pivot": [
+      1760,
+      650
+     ],
+     "rpm": 120
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "shift",
+     "targets": [
+      "hv*"
+     ],
+     "dx": 0,
+     "dy": -50,
+     "dur": 0.6,
+     "delay": 0.4
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "shift",
+     "targets": [
+      "hv*"
+     ],
+     "dx": 0,
+     "dy": 50,
+     "dur": 0.6,
+     "delay": 4.6
+    },
+    {
+     "t": "line",
+     "at": 4,
+     "id": "st488z",
+     "pts": [
+      [
+       510,
+       880
+      ],
+      [
+       500,
+       960
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "signal",
+     "targets": [
+      "st488z"
+     ],
+     "speed": 150
+    },
+    {
+     "t": "line",
+     "at": 4,
+     "id": "st489z",
+     "pts": [
+      [
+       610,
+       880
+      ],
+      [
+       620,
+       960
+      ]
+     ],
+     "c": "muted",
+     "w": 1
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "signal",
+     "targets": [
+      "st489z"
+     ],
+     "speed": 150
+    },
+    {
+     "t": "rect",
+     "at": 4,
+     "x": 150,
+     "y": 990,
+     "w": 170,
+     "h": 18,
+     "c": "red",
+     "sw": 2,
+     "fill": "red",
+     "id": "bar490z"
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "grow",
+     "targets": [
+      "bar490z"
+     ],
+     "axis": "x",
+     "from": 1,
+     "to": 0,
+     "pivot": [
+      150,
+      999
+     ],
+     "dur": 2.4,
+     "delay": 3.2
+    },
+    {
+     "t": "move",
+     "at": 4,
+     "kind": "pulse",
+     "targets": [
+      "nm467z"
+     ],
+     "delay": 3.0,
+     "dur": 0.6
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 3,
+     "d": "M1166,790 L1194,790 M1180,776 L1180,804",
+     "id": "sn2491z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn2491z"
+     ],
+     "dur": 0.35,
+     "delay": 2.4
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn2491z"
+     ],
+     "pivot": [
+      1180,
+      790
+     ],
+     "rpm": 40
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 3,
+     "d": "M1236,960 L1264,960 M1250,946 L1250,974",
+     "id": "sn2492z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn2492z"
+     ],
+     "dur": 0.35,
+     "delay": 2.6999999999999997
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn2492z"
+     ],
+     "pivot": [
+      1250,
+      960
+     ],
+     "rpm": 40
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 3,
+     "d": "M1251,800 L1279,800 M1265,786 L1265,814",
+     "id": "sn2493z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn2493z"
+     ],
+     "dur": 0.35,
+     "delay": 3.0
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn2493z"
+     ],
+     "pivot": [
+      1265,
+      800
+     ],
+     "rpm": 40
+    },
+    {
+     "t": "path",
+     "at": 5,
+     "c": "blue",
+     "w": 3,
+     "d": "M1201,955 L1229,955 M1215,941 L1215,969",
+     "id": "sn2494z"
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pop",
+     "targets": [
+      "sn2494z"
+     ],
+     "dur": 0.35,
+     "delay": 3.3
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "spin",
+     "targets": [
+      "sn2494z"
+     ],
+     "pivot": [
+      1215,
+      955
+     ],
+     "rpm": 40
+    },
+    {
+     "t": "arrow",
+     "at": 5,
+     "id": "a495z",
+     "pts": [
+      [
+       860,
+       780
+      ],
+      [
+       860,
+       900
+      ]
+     ],
+     "c": "blue",
+     "w": 6
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "grow",
+     "targets": [
+      "a495z"
+     ],
+     "axis": "y",
+     "pivot": [
+      860,
+      780
+     ],
+     "dur": 0.5,
+     "delay": 1.0
+    },
+    {
+     "t": "move",
+     "at": 1,
+     "kind": "bob",
+     "targets": [
+      "tub446z",
+      "tub447z",
+      "tub448z"
+     ],
+     "amp": 5,
+     "hz": 1.2
+    },
+    {
+     "t": "move",
+     "at": 3,
+     "kind": "wiggle",
+     "targets": [
+      "gauge476z"
+     ],
+     "pivot": [
+      105,
+      295
+     ],
+     "amp": 4,
+     "hz": 5
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "wiggle",
+     "targets": [
+      "needle477z"
+     ],
+     "pivot": [
+      105,
+      295
+     ],
+     "amp": 3,
+     "hz": 4
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "pulse",
+     "targets": [
+      "lb456z"
+     ],
+     "delay": 0.9,
+     "dur": 0.6
+    },
+    {
+     "t": "move",
+     "at": 2,
+     "kind": "pulse",
+     "targets": [
+      "lb459z"
+     ],
+     "delay": 2.4,
+     "dur": 0.6
+    },
+    {
+     "t": "move",
+     "at": 5,
+     "kind": "pulse",
+     "targets": [
+      "lb472z"
+     ],
+     "delay": 3.2,
+     "dur": 0.6
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pulse",
+     "targets": [
+      "nm450z"
+     ],
+     "delay": 1.6,
+     "dur": 0.5
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pulse",
+     "targets": [
+      "nm460z"
+     ],
+     "delay": 2.1,
+     "dur": 0.5
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pulse",
+     "targets": [
+      "nm464z"
+     ],
+     "delay": 2.6,
+     "dur": 0.5
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "pulse",
+     "targets": [
+      "nm467z"
+     ],
+     "delay": 3.1,
+     "dur": 0.5
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "shift",
+     "targets": [
+      "hv*"
+     ],
+     "dx": 0,
+     "dy": -40,
+     "dur": 0.35,
+     "delay": 0.2
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "shift",
+     "targets": [
+      "hv*"
+     ],
+     "dx": 0,
+     "dy": 40,
+     "dur": 0.35,
+     "delay": 0.6
+    }
+   ]
+  }
+ ],
+ "pace": 0.2,
+ "hand": false,
+ "subs": true,
+ "ink": 1.5,
+ "pan": 0.45
+}
