@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>虚拟实验：冷气推进的车能飞多久？· 问渠</title>
+<style>
+:root{--ink:#1d2329;--muted:#5f6b76;--line:#e3ddd2;--gold:#c98a00;--blue:#1f6f9f;--red:#c2410c;--green:#2e7d4f;--paper:#fdfcf8}
+html,body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif}
+.wrap{display:grid;grid-template-columns:1fr 340px;gap:16px;max-width:1240px;margin:0 auto;padding:16px;box-sizing:border-box}
+h1{font-size:20px;margin:0 0 2px}.sub{color:var(--muted);font-size:13px;margin:0 0 10px}
+canvas{width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:12px;display:block}
+.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+label{display:block;margin:10px 0 2px;font-weight:600}label small{font-weight:400;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--gold)}.val{float:right;font-variant-numeric:tabular-nums;color:var(--blue)}
+.btns{display:flex;gap:8px;margin:14px 0}button{flex:1;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:999px;padding:8px;font:inherit;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:8px}.out div{background:#f4f1ea;border-radius:8px;padding:6px 8px}
+.out b{display:block;font-size:20px;font-variant-numeric:tabular-nums}.out span{font-size:12px;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);margin-top:10px}
+@media (max-width:820px){.wrap{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+ <div>
+  <h1>冷气推进的车，能飞多久？ <small style="color:var(--muted);font-weight:400">How long can a cold-gas car fly?</small></h1>
+  <p class="sub">600 升压缩空气，从车底往下喷。调压力、车重，点“悬停”或“全力跳”。</p>
+  <div style="position:relative"><canvas id="cv" width="1200" height="660"></canvas><div id="fast" style="display:none;position:absolute;right:14px;top:10px;background:#1d2329;color:#fff;border-radius:999px;padding:2px 10px;font-size:14px"></div></div>
+ </div>
+ <div class="panel">
+  <label>气罐压力 <small>bar（大气压）</small><span class="val" id="pv"></span></label><input id="p" type="range" min="100" max="700" step="10" value="300">
+  <label>车重 <small>kg，不含空气</small><span class="val" id="mv"></span></label><input id="m" type="range" min="1500" max="2500" step="50" value="2000">
+  <div class="btns"><button id="hover">悬停 3 米</button><button id="jump" class="ghost">全力跳</button></div>
+  <div class="out">
+   <div><b id="air">–</b><span>罐里空气 kg</span></div><div><b id="thr">–</b><span>推力 kN</span></div>
+   <div><b id="time">–</b><span>空中时间 s</span></div><div><b id="hmax">–</b><span>最高 m</span></div>
+  </div>
+  <p class="note">估算模型：气罐 600 升、常温；空气按实际气体粗略修正；喷气速度 600 米/秒；推力与罐压成正比，300 bar 全开时 80 千牛（据报道的后部推力）。
+  悬停时推力只够托住车；罐压低到推力托不住车，就开始下降。数字是量级估算，不是特斯拉的实测。</p>
+ </div>
+</div>
+<script>
+const V = 0.6, RT = 287 * 293, VE = 600, F300 = 80000, G = 9.81;
+const $ = (id) => document.getElementById(id);
+const cv = $('cv'), cx = cv.getContext('2d');
+const Z = (p) => 1 + 0.00065 * p;                       // rough real-gas factor (p in bar)
+const massAt = (p) => p * 1e5 * V / (RT * Z(p));         // kg of air in the tank
+const pOf = (m) => { let p = m * RT / V / 1e5; for (let i = 0; i < 4; i++) p = m * RT * Z(p) / V / 1e5; return p; };
+
+// one flight, sampled every 0.02 s: {t, y, air, F}
+function simulate(p0, M, mode) {
+  let m = massAt(p0), y = 0, v = 0, t = 0, up = false, landed = false;
+  const out = [];
+  for (let k = 0; k < 4000 && !landed; k++) {
+    const p = pOf(m), Fmax = m > 0.5 ? F300 * p / 300 : 0, W = (M + m) * G;
+    let F = 0;
+    if (mode === 'jump') F = Fmax;
+    else {                                              // hover at 3 m: climb, hold, then sink when the tank cannot hold it
+      const want = W + (3 - y) * 2.2 * (M + m) - v * 2.6 * (M + m);
+      F = Math.max(0, Math.min(Fmax, want));
+    }
+    const dm = Math.min(m, F / VE * 0.02);
+    m -= dm;
+    const a = F / (M + m) - G;
+    v += a * 0.02; y += v * 0.02; t += 0.02;
+    if (y > 0.02) up = true;
+    if (y <= 0) { y = 0; if (up && v < 0) landed = true; v = Math.max(0, v); }
+    out.push({ t, y, air: m, F });
+  }
+  return out;
+}
+
+let run = null, start = 0, shown = 0;
+function readouts(s, i) {
+  const k = s[Math.min(i, s.length - 1)];
+  $('air').textContent = k.air.toFixed(0); $('thr').textContent = (k.F / 1000).toFixed(0);
+  const air = s.filter((x) => x.y > 0.02), done = i >= s.length - 1;
+  $('time').textContent = air.length ? ((Math.min(i, s.length - 1) >= s.indexOf(air[0]) ? Math.min(k.t, air[air.length - 1].t) - air[0].t : 0)).toFixed(1) : '0.0';
+  $('hmax').textContent = Math.max(0, ...s.slice(0, i + 1).map((x) => x.y)).toFixed(1);
+  if (done) $('time').textContent = air.length ? (air[air.length - 1].t - air[0].t).toFixed(1) : '0.0';
+}
+
+function draw(s, i) {
+  const W = cv.width, H = cv.height, k = s ? s[Math.min(i, s.length - 1)] : { y: 0, F: 0, air: massAt(+$('p').value) };
+  cx.clearRect(0, 0, W, H);
+  // scene (left 720 px): ground, height marks, car
+  const top = s ? Math.max(5, ...s.map((x) => x.y)) : 5, scale = 440 / Math.max(6, top * 1.15), gy = 560;
+  cx.strokeStyle = '#e3ddd2'; cx.fillStyle = '#5f6b76'; cx.font = '18px sans-serif'; cx.lineWidth = 1;
+  for (let h = 0; h <= top * 1.15; h += top > 30 ? 10 : top > 12 ? 5 : 1) {
+    const yy = gy - h * scale; cx.beginPath(); cx.moveTo(60, yy); cx.lineTo(700, yy); cx.stroke(); cx.fillText(h + ' m', 8, yy + 6);
+  }
+  cx.strokeStyle = '#1d2329'; cx.lineWidth = 4; cx.beginPath(); cx.moveTo(40, gy); cx.lineTo(710, gy); cx.stroke();
+  const carY = gy - k.y * scale;
+  if (k.F > 0) {                                        // jets
+    const len = 30 + 120 * k.F / 187000;
+    cx.fillStyle = 'rgba(31,111,159,.35)';
+    for (const x of [300, 420]) { cx.beginPath(); cx.moveTo(x - 14, carY); cx.lineTo(x + 14, carY); cx.lineTo(x + 30, carY + len); cx.lineTo(x - 30, carY + len); cx.fill(); }
+  }
+  cx.fillStyle = '#fff'; cx.strokeStyle = '#1d2329'; cx.lineWidth = 4;
+  cx.beginPath(); cx.moveTo(230, carY - 18); cx.lineTo(300, carY - 62); cx.lineTo(430, carY - 66); cx.lineTo(500, carY - 30); cx.lineTo(500, carY - 14); cx.lineTo(230, carY - 14); cx.closePath(); cx.fill(); cx.stroke();
+  for (const x of [280, 450]) { cx.beginPath(); cx.arc(x, carY - 12, 20, 0, 7); cx.fillStyle = '#1d2329'; cx.fill(); }
+  cx.fillStyle = '#1d2329'; cx.beginPath(); cx.arc(395, carY - 46, 5, 0, 7); cx.arc(420, carY - 46, 5, 0, 7); cx.fill();
+  // chart (right): thrust and air over time
+  const X0 = 760, Y0 = 560, CW = 400, CH = 400;
+  cx.strokeStyle = '#1d2329'; cx.lineWidth = 2; cx.beginPath(); cx.moveTo(X0, Y0 - CH); cx.lineTo(X0, Y0); cx.lineTo(X0 + CW, Y0); cx.stroke();
+  cx.fillStyle = '#5f6b76'; cx.font = '18px sans-serif'; cx.fillText('时间 →', X0 + CW - 60, Y0 + 26);
+  cx.fillStyle = '#c2410c'; cx.fillText('推力', X0 + 8, Y0 - CH + 16); cx.fillStyle = '#c98a00'; cx.fillText('罐里空气', X0 + 70, Y0 - CH + 16);
+  if (s) {
+    const T = s[s.length - 1].t, n = Math.min(i, s.length - 1), m0 = s[0].air + 1;
+    for (const [key, col, mx] of [['F', '#c2410c', 190000], ['air', '#c98a00', 360]]) {
+      cx.strokeStyle = col; cx.lineWidth = 3; cx.beginPath();
+      for (let j = 0; j <= n; j += 2) { const x = X0 + s[j].t / T * CW, y = Y0 - s[j][key] / mx * CH; j ? cx.lineTo(x, y) : cx.moveTo(x, y); }
+      cx.stroke();
+    }
+    cx.fillStyle = '#1d2329'; cx.font = '22px sans-serif'; cx.fillText((s[n].t).toFixed(1) + ' s', X0 + CW - 70, Y0 - CH + 16);
+  }
+}
+
+function frameAt(s, sec) { return Math.min(s.length - 1, Math.floor(sec / 0.02)); }
+function sync() { $('pv').textContent = $('p').value; $('mv').textContent = $('m').value; if (!run) { draw(null, 0); $('air').textContent = massAt(+$('p').value).toFixed(0); } }
+function go(mode) { run = simulate(+$('p').value, +$('m').value, mode); start = performance.now(); }
+$('p').oninput = $('m').oninput = () => { run = null; sync(); };
+$('hover').onclick = () => go('hover'); $('jump').onclick = () => go('jump');
+function loop() {
+  if (!window.WQ_DEMO && run) { const i = frameAt(run, (performance.now() - start) / 1000); draw(run, i); readouts(run, i); }
+  requestAnimationFrame(loop);
+}
+sync(); loop();
+
+// scripted demo for recording the video: SEEK(t) shows the lab at time t of the demo (deterministic)
+const DEMO = window.DEMO_OVERRIDE || [{ at: 0.6, p: 300, m: 2000, mode: 'hover', len: 7.4 }, { at: 9.2, p: 700, m: 2000, mode: 'hover', len: 13.0 },
+              { at: 23.4, p: 700, m: 1500, mode: 'hover', len: 13.6 }];
+const sims = {};
+window.SEEK = function (t) {
+  window.WQ_DEMO = true;
+  let cur = null;
+  for (const d of DEMO) if (t >= d.at - 1.4) cur = d;
+  if (!cur) cur = DEMO[0];
+  const prev = DEMO[DEMO.indexOf(cur) - 1];
+  // sliders glide to the new values during the 1.4 s before the run
+  const g = Math.max(0, Math.min(1, (t - (cur.at - 1.4)) / 1.2)), from = prev || cur;
+  $('p').value = Math.round(from.p + (cur.p - from.p) * g); $('m').value = Math.round(from.m + (cur.m - from.m) * g);
+  $('pv').textContent = $('p').value; $('mv').textContent = $('m').value;
+  const key = cur.p + ':' + cur.m + ':' + cur.mode;
+  sims[key] = sims[key] || simulate(cur.p, cur.m, cur.mode);
+  $('hover').style.outline = t >= cur.at && t < cur.at + 0.4 ? '4px solid #c98a00' : '';
+  if (t < cur.at) { if (prev && t > prev.at) { const s0 = sims[prev.p + ':' + prev.m + ':' + prev.mode]; draw(s0, s0.length - 1); readouts(s0, s0.length - 1); } else { draw(null, 0); $('air').textContent = massAt(+$('p').value).toFixed(0); } return; }
+  const s = sims[key], i = frameAt(s, (t - cur.at) * (cur.speed || 1)); draw(s, i); readouts(s, i);
+  $('fast').style.display = (cur.speed || 1) > 1.05 ? 'block' : 'none'; $('fast').textContent = '快放 ×' + (cur.speed || 1).toFixed(1);
+};
+window.READY = true;
+</script>
+</body></html>

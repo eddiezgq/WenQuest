@@ -2,6 +2,7 @@
 #cap{position:absolute;left:50%;bottom:4%;transform:translateX(-50%);max-width:86%;background:rgba(20,26,31,.72);color:#fff;
   font:500 clamp(14px,2.1vw,24px)/1.45 "PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;padding:.3em .8em;border-radius:6px;display:none;text-align:center}
 #stage.cc #cap.on{display:block}
+#cap .z,#cap .e{display:block}#cap .e{font-size:.72em;opacity:.9;font-family:Helvetica,Arial,sans-serif}
 #bar{max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;box-sizing:border-box;gap:12px;align-items:center;padding:10px 12px;font:14px/1 "PingFang SC","Microsoft YaHei",sans-serif;color:#1d2329}
 #bar button{border:1px solid #d9d3c7;background:#fff;border-radius:999px;padding:7px 14px;font:inherit;cursor:pointer;white-space:nowrap}
 #bar button.on{background:#1d2329;color:#fff;border-color:#1d2329}
@@ -17,13 +18,13 @@
 <script>
 window.UI=function(D){
   const a=document.getElementById('aud'),st=document.getElementById('stage'),pp=document.getElementById('pp'),sk=document.getElementById('seek'),tm=document.getElementById('time');
-  const cap=document.createElement('div');cap.id='cap';st.appendChild(cap);st.classList.add('cc');
+  const cap=document.createElement('div');cap.id='cap';cap.innerHTML='<span class="z"></span><span class="e"></span>';const cz=cap.firstChild,ce=cap.lastChild;st.appendChild(cap);st.classList.add('cc');
   const big=document.createElement('div');big.id='big';big.innerHTML='<span>▶</span>';st.appendChild(big);
   const fmt=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
   let dragging=false;
   function draw(){const t=a.currentTime;WB.seek(t);
     if(!dragging)sk.value=Math.round(t/D.total*1000);tm.textContent=fmt(t)+' / '+fmt(D.total);
-    const c=D.captions.find(c=>t>=c.t0&&t<=c.t1+0.4);cap.textContent=c?c.zh:'';cap.classList.toggle('on',!!c);}
+    const c=D.captions.find(c=>t>=c.t0&&t<=c.t1+0.4);cz.textContent=c?c.zh:'';ce.textContent=c&&c.en?c.en:'';ce.style.display=c&&c.en?'block':'none';cap.classList.toggle('on',!!c);}
   function loop(){draw();if(!a.paused)requestAnimationFrame(loop);}
   function play(){a.play();pp.textContent='❚❚ 暂停';big.style.display='none';requestAnimationFrame(loop);}
   function pause(){a.pause();pp.textContent='▶ 播放';}

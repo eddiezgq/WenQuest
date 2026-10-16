@@ -187,3 +187,45 @@ def cute_bot(cx, cy, k, at, idp="bot", mood="happy", moves=True):
     if moves:
         E.append({"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 8 * k, "hz": 1.0})
     return E
+
+
+def car(cx, cy, k, at, idp="car", mood="happy", jets=None, moves=True):
+    """小 R: a cute low sports car seen from the side, facing right; (cx, cy) = the middle of the road under it.
+    Ids: <idp>_b (body), <idp>_w0 / <idp>_w1 (wheels; spin about wheel_hub), <idp>_jet (gas jets: jets = "down" | "back" | None).
+    "<idp>*" moves the whole car."""
+    def P(d, c="ink", w=3.6, part="_b", **kw):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d, **kw}
+    X = lambda v: cx + v * k   # noqa: E731
+    Y = lambda v: cy - v * k   # noqa: E731
+    E = []
+    if jets == "down":
+        for x in (-95, 95):
+            E.append(P(f"M{X(x - 18)},{Y(18)} L{X(x + 18)},{Y(18)} L{X(x + 40)},{Y(-90)} L{X(x - 40)},{Y(-90)} Z", c="blue", w=3, part="_jet"))
+    if jets == "back":
+        E.append(P(f"M{X(-205)},{Y(60)} L{X(-205)},{Y(30)} L{X(-330)},{Y(10)} L{X(-330)},{Y(80)} Z", c="blue", w=3, part="_jet"))
+    E.append(P(f"M{X(-210)},{Y(28)} L{X(-210)},{Y(70)} L{X(-120)},{Y(80)} L{X(-40)},{Y(128)} L{X(70)},{Y(128)} "
+               f"L{X(150)},{Y(84)} L{X(215)},{Y(66)} L{X(222)},{Y(34)} L{X(200)},{Y(26)} Z"))
+    E.append(P(f"M{X(-30)},{Y(118)} L{X(60)},{Y(118)} L{X(118)},{Y(86)} L{X(-80)},{Y(86)} Z", c="blue", w=3))   # windshield
+    E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(22), "y": Y(112), "w": 14 * k, "h": 16 * k, "c": "ink", "fill": "ink"})
+    E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(56), "y": Y(112), "w": 14 * k, "h": 16 * k, "c": "ink", "fill": "ink"})
+    mouth = {"happy": f"M{X(150)},{Y(58)} Q{X(170)},{Y(46)} {X(190)},{Y(58)}", "o": f"M{X(162)},{Y(58)} a8,8 0 1,0 {16 * k},0 a8,8 0 1,0 {-16 * k},0",
+             "worried": f"M{X(150)},{Y(48)} Q{X(170)},{Y(60)} {X(190)},{Y(48)}"}[mood]
+    E.append(P(mouth, w=3))
+    E.append({"t": "rect", "at": at, "id": idp + "_b", "x": X(-212), "y": Y(92), "w": 46 * k, "h": 12 * k, "c": "red", "fill": "red"})   # spoiler
+    for i, x in enumerate((-130, 130)):   # wheels: <idp>_w0, <idp>_w1 (spin each about its own hub: wheel_hub(cx, cy, k, i))
+        E.append({"t": "ellipse", "at": at, "id": f"{idp}_w{i}", "x": X(x - 34), "y": Y(62), "w": 68 * k, "h": 68 * k, "c": "ink"})
+        E.append(P(f"M{X(x - 22)},{Y(28)} L{X(x + 22)},{Y(28)} M{X(x)},{Y(50)} L{X(x)},{Y(6)}", c="ink", w=3, part=f"_w{i}"))
+    if moves:
+        if jets:
+            E.append({"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_jet"], "pivot": [cx, cy], "amp": 3, "hz": 8})
+        E.append({"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 6 * k, "hz": 1.6})
+    return E
+
+
+def wheel_hub(cx, cy, k, i):
+    return [cx + (-130 if i == 0 else 130) * k, cy - 28 * k]
+
+
+def car_drive(cx, cy, k, at, idp="car", rpm=90):
+    """Spinning wheels for a car drawn with car()."""
+    return [{"t": "move", "at": at, "kind": "spin", "targets": [f"{idp}_w{i}"], "pivot": wheel_hub(cx, cy, k, i), "rpm": rpm} for i in (0, 1)]

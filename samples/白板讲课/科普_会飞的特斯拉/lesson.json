@@ -1,0 +1,5903 @@
+{
+ "title": "会飞的特斯拉，到底能飞多久？",
+ "title_en": "Tesla's flying Roadster: how long can it really fly?",
+ "audio": "配音.wav",
+ "duration": 434.51,
+ "segments": [
+  {
+   "t0": 0.4,
+   "t1": 5.31,
+   "zh": "昨天，美国得州，一辆白色跑车开上了一条倒挂的轨道。",
+   "en": "Yesterday in Texas, a white sports car drove onto an upside-down track."
+  },
+  {
+   "t0": 5.61,
+   "t1": 9.33,
+   "zh": "它头朝下开过去，翻个身，稳稳落地。",
+   "en": "It drove across upside down, flipped over, and landed."
+  },
+  {
+   "t0": 9.63,
+   "t1": 13.43,
+   "zh": "然后，它从五辆车的头顶上，“飞”了过去。",
+   "en": "Then it \"flew\" over the roofs of five cars."
+  },
+  {
+   "t0": 14.03,
+   "t1": 17.84,
+   "zh": "马斯克说：这就是将来真正上路的那辆车。",
+   "en": "Musk said: this is the actual car that will be on the roads."
+  },
+  {
+   "t0": 18.14,
+   "t1": 22.41,
+   "zh": "网上吵翻了：这是真飞，还是跳得很有派头？",
+   "en": "The internet split: real flight, or a very stylish jump?"
+  },
+  {
+   "t0": 22.81,
+   "t1": 28.34,
+   "zh": "今天我们不站队，我们算账。八分钟，把这辆车拆开看看。",
+   "en": "Today we don't take sides. We do the math. Eight minutes to take this car apart."
+  },
+  {
+   "t0": 28.94,
+   "t1": 33.7,
+   "zh": "先认识一下今天的主角：小 R，一辆有点紧张的跑车。",
+   "en": "Meet today's star: R, a slightly nervous sports car."
+  },
+  {
+   "t0": 34.0,
+   "t1": 37.92,
+   "zh": "第一个黑科技：倒着开，为什么掉不下来？",
+   "en": "Trick one: driving upside down, why doesn't it fall?"
+  },
+  {
+   "t0": 38.22,
+   "t1": 43.29,
+   "zh": "答案在车底：几台大风扇，拼命把车底下的空气往外抽。",
+   "en": "The answer is underneath: fans pump the air out from under the car."
+  },
+  {
+   "t0": 43.59,
+   "t1": 51.65,
+   "zh": "车底的空气变稀了，车顶上的大气还在使劲压。一上一下差出来的这股力，就把车按在路面上。",
+   "en": "Thin air below, the whole atmosphere pressing above: the difference pins the car to the road."
+  },
+  {
+   "t0": 51.95,
+   "t1": 55.16,
+   "zh": "这招叫“风扇车”，一点也不新。",
+   "en": "It's called a fan car, and it isn't new."
+  },
+  {
+   "t0": 55.46,
+   "t1": 61.39,
+   "zh": "1978 年，F1 有一辆赛车屁股上装了个大风扇，只比了一场，就赢了。",
+   "en": "In 1978, an F1 car with a giant fan on its back raced once, and won."
+  },
+  {
+   "t0": 61.69,
+   "t1": 67.16,
+   "zh": "然后就被叫停了。对手说它像个吸尘器，还把石子往后喷。",
+   "en": "Then it was pulled. Rivals called it a vacuum cleaner that sprayed stones behind it."
+  },
+  {
+   "t0": 67.56,
+   "t1": 75.02,
+   "zh": "关键在这里：机翼要靠速度才有下压力，风扇不用。车停着不动，也能把自己吸住。",
+   "en": "Here's the key: wings need speed to make downforce, fans don't. Even standing still, the car sticks."
+  },
+  {
+   "t0": 75.32,
+   "t1": 79.57,
+   "zh": "所以，只要吸力比车重还大，天花板就成了地板。",
+   "en": "So once the suction beats the car's weight, the ceiling becomes the floor."
+  },
+  {
+   "t0": 79.87,
+   "t1": 85.67,
+   "zh": "特斯拉屏幕上显示的吸力，约四千七百公斤，可能是车重的两倍多。",
+   "en": "Tesla's screen showed about 4,700 kg of downforce, maybe more than twice the car's weight."
+  },
+  {
+   "t0": 85.97,
+   "t1": 95.03,
+   "zh": "连科技媒体都说，这个数字可能有点水分。另一辆风扇车，一吨来重，号称两吨吸力，已经够吓人了。",
+   "en": "Even tech press suspect it's inflated. Another fan car, about a ton, claims two tons, which is already wild."
+  },
+  {
+   "t0": 95.33,
+   "t1": 98.0,
+   "zh": "第一个黑科技，打分：真本事。",
+   "en": "Trick one gets a score: the real thing."
+  },
+  {
+   "t0": 98.7,
+   "t1": 102.46,
+   "zh": "第二个黑科技：零到一百公里，只要一秒。",
+   "en": "Trick two: zero to sixty in one second."
+  },
+  {
+   "t0": 102.76,
+   "t1": 110.74,
+   "zh": "算一下：一秒加到每小时九十六公里，等于每秒提速二十七米，差不多是两点七个重力加速度。",
+   "en": "Do the math: 96 km/h in one second is 27 meters per second, every second. About 2.7 g."
+  },
+  {
+   "t0": 111.04,
+   "t1": 117.24,
+   "zh": "问题是，车靠轮胎抓着地面往前推。抓得再紧，最多也就一个多 g。",
+   "en": "But a car pushes off the road through its tires, and even great tires top out at one-point-something g."
+  },
+  {
+   "t0": 117.54,
+   "t1": 118.84,
+   "zh": "怎么办？两招。",
+   "en": "So what now? Two tricks."
+  },
+  {
+   "t0": 119.24,
+   "t1": 124.05,
+   "zh": "第一招，还是风扇：车被按得越紧，轮胎抓得越牢。",
+   "en": "First, the fans again: the harder the car is pressed down, the better the tires grip."
+  },
+  {
+   "t0": 124.35,
+   "t1": 129.65,
+   "zh": "第二招更狠：干脆不靠地面。车屁股后面，向后喷气。",
+   "en": "Second, more brutal: don't rely on the road at all. Blow gas out the back."
+  },
+  {
+   "t0": 129.95,
+   "t1": 134.6,
+   "zh": "这就是火箭的原理：把东西往后扔，自己就往前走。",
+   "en": "That's how a rocket works: throw stuff backward, and you go forward."
+  },
+  {
+   "t0": 134.9,
+   "t1": 143.45,
+   "zh": "据报道，后面四个喷口加起来，约八万牛顿推力。一辆两吨的车，光靠喷气，就有四个 g。",
+   "en": "Reportedly, the four rear jets make about 80 kilonewtons. For a two-ton car, that alone is 4 g."
+  },
+  {
+   "t0": 143.75,
+   "t1": 148.14,
+   "zh": "不过，还没有独立测量，这个“一秒”，我们先打个问号。",
+   "en": "No independent measurement yet, so that 'one second' gets a question mark."
+  },
+  {
+   "t0": 148.74,
+   "t1": 153.11,
+   "zh": "第三个，也是今天的重头戏：它到底能飞多久？",
+   "en": "Trick three, the main event: how long can it actually fly?"
+  },
+  {
+   "t0": 153.41,
+   "t1": 160.67,
+   "zh": "它喷的不是火，是压缩空气。官方说，车上有六百升压缩空气，供十个喷口用。",
+   "en": "It doesn't burn anything. It blows compressed air: Tesla says 600 liters feed ten jets."
+  },
+  {
+   "t0": 160.97,
+   "t1": 164.57,
+   "zh": "六百升听起来很多？其实也就三个浴缸。",
+   "en": "600 liters sounds like a lot? It's about three bathtubs."
+  },
+  {
+   "t0": 164.97,
+   "t1": 173.47,
+   "zh": "压得越狠，装得越多。官方没说压力，我们按常见的高压气罐估一估：大约能装两三百公斤空气。",
+   "en": "Tesla didn't give the pressure. Assuming a typical high-pressure tank, that's roughly 200 to 300 kilograms of air."
+  },
+  {
+   "t0": 173.77,
+   "t1": 181.38,
+   "zh": "冷空气喷出去，最快也就每秒几百米。要顶出八万牛的推力，每秒得喷掉一百多公斤。",
+   "en": "Cold air jets out at a few hundred meters per second at most. For 80 kN, you burn over 100 kilos every second."
+  },
+  {
+   "t0": 181.68,
+   "t1": 188.49,
+   "zh": "两三百公斤，每秒一百多公斤。全力喷，一两秒，推力就掉得差不多了。",
+   "en": "Two or three hundred kilos, over a hundred per second: at full blast, the thrust is mostly gone in a second or two."
+  },
+  {
+   "t0": 188.99,
+   "t1": 197.47,
+   "zh": "那不全力，只是把车托在半空悬停呢？两吨的车，要两万牛推力，每秒吃掉三十多公斤空气。",
+   "en": "What about just hovering? Holding up two tons takes 20 kN, eating over 30 kilos of air a second."
+  },
+  {
+   "t0": 197.77,
+   "t1": 202.7,
+   "zh": "而且越喷，罐里压力越低，推力越小，最后托不住了。",
+   "en": "And as it empties, pressure and thrust drop, until it can't hold the car."
+  },
+  {
+   "t0": 203.0,
+   "t1": 205.17,
+   "zh": "还有一个看不见的敌人：冷。",
+   "en": "There's also an invisible enemy: cold."
+  },
+  {
+   "t0": 205.47,
+   "t1": 212.37,
+   "zh": "气体一膨胀就会变冷。你按住喷雾罐不放，罐子会越来越冰手，就是这个道理。",
+   "en": "Expanding gas gets cold. Hold down a spray can and it turns icy. Same thing."
+  },
+  {
+   "t0": 212.67,
+   "t1": 220.54,
+   "zh": "罐子一冷，压力掉得更快，喷口还可能结霜。所以真实的飞行时间，只会比我们算的更短。",
+   "en": "A colder tank loses pressure even faster, and nozzles can frost up. So real airtime would be even shorter than our estimate."
+  },
+  {
+   "t0": 220.84,
+   "t1": 224.7,
+   "zh": "不信？我们做了一个虚拟实验，你可以自己调。",
+   "en": "Don't believe us? We built a virtual lab. Try it yourself."
+  },
+  {
+   "t0": 225.7,
+   "t1": 229.42,
+   "zh": "三百个大气压，悬停三米：五秒左右。",
+   "en": "300 atmospheres, hover at three meters: about five seconds."
+  },
+  {
+   "t0": 231.82,
+   "t1": 234.75,
+   "zh": "压到七百个大气压：十秒左右。",
+   "en": "Squeeze it to 700: about ten seconds."
+  },
+  {
+   "t0": 237.15,
+   "t1": 240.65,
+   "zh": "再把车减掉五百公斤：也就十二秒多。",
+   "en": "Then cut 500 kilos off the car: just over twelve."
+  },
+  {
+   "t0": 243.85,
+   "t1": 247.33,
+   "zh": "所以结论是：它不是“飞”，是一次很贵的“跳”。",
+   "en": "So the verdict: it doesn't fly. It does a very expensive jump."
+  },
+  {
+   "t0": 248.13,
+   "t1": 253.58,
+   "zh": "不过，跳得有派头，也是真功夫。它在空中是怎么翻跟头的？",
+   "en": "Still, a stylish jump takes real skill. How does it flip in mid-air?"
+  },
+  {
+   "t0": 253.88,
+   "t1": 260.52,
+   "zh": "秘密是：喷口不对准重心。推力偏一点，就变成让车转动的力，叫力矩。",
+   "en": "The secret: the jets don't point through the center of mass. Off-center thrust turns the car. That's torque."
+  },
+  {
+   "t0": 260.82,
+   "t1": 267.91,
+   "zh": "前面喷、后面不喷，车头就抬起来；左边喷、右边不喷，车就打滚。",
+   "en": "Fire the front but not the back, and the nose lifts. Fire the left but not the right, and it rolls."
+  },
+  {
+   "t0": 268.21,
+   "t1": 274.89,
+   "zh": "十个喷口一起配合，就能在空中“开”车。火箭回收落地，用的也是这一套。",
+   "en": "Ten jets working together let it steer in the air. Rockets that land themselves use the same trick."
+  },
+  {
+   "t0": 275.19,
+   "t1": 282.51,
+   "zh": "再烧一点脑：同样托起两吨，直升机能在天上待一个小时，喷口为什么只能撑几秒？",
+   "en": "A brain-burner: a helicopter holds up two tons for an hour. Why do jets last only seconds?"
+  },
+  {
+   "t0": 282.81,
+   "t1": 289.84,
+   "zh": "关键是：推力，是“喷出去的空气乘速度”；花掉的力气，却是“空气乘速度的平方”。",
+   "en": "Key: thrust is air times speed, but the energy you spend is air times speed squared."
+  },
+  {
+   "t0": 290.14,
+   "t1": 297.8,
+   "zh": "少量空气喷得飞快，推力一样，力气却花得多得多；大量空气慢慢往下推，最省力。",
+   "en": "Blasting a little air very fast wastes energy. Gently pushing lots of air is efficient."
+  },
+  {
+   "t0": 298.1,
+   "t1": 308.14,
+   "zh": "直升机的大旋翼，就是在慢慢推一大片空气。算一下，托起同样两吨，小喷口要的功率，大约是十米旋翼的三十倍。",
+   "en": "A big rotor gently pushes a huge column of air. For the same two tons, small jets need about thirty times the power of a ten-meter rotor."
+  },
+  {
+   "t0": 308.44,
+   "t1": 313.99,
+   "zh": "所以你看，真正在做飞行汽车的公司，造出来的都长着螺旋桨。",
+   "en": "That's why the companies actually building flying cars all put propellers on them."
+  },
+  {
+   "t0": 314.29,
+   "t1": 319.9,
+   "zh": "第三个黑科技，打分：物理没错，但它是表演，不是交通工具。",
+   "en": "Trick three gets a score: right physics, but it's a stunt, not transportation."
+  },
+  {
+   "t0": 320.6,
+   "t1": 322.91,
+   "zh": "好，假设你就坐在里面。",
+   "en": "OK, suppose you're sitting in it."
+  },
+  {
+   "t0": 323.21,
+   "t1": 328.44,
+   "zh": "起步四个 g，相当于过山车最猛的那一下，还要再猛一点。",
+   "en": "Launching at 4 g is like the wildest moment on a roller coaster, and then some."
+  },
+  {
+   "t0": 328.74,
+   "t1": 336.83,
+   "zh": "翻跟头的时候头朝下，血往脑袋里冲。科技媒体都在问：要不要穿战斗机飞行员的抗荷服？",
+   "en": "Upside down, blood rushes to your head. Tech press ask: will you need a fighter pilot's g-suit?"
+  },
+  {
+   "t0": 337.13,
+   "t1": 342.35,
+   "zh": "再看车里：每一个空隙，都塞满了碳纤维缠绕的高压气罐。",
+   "en": "And inside: every spare gap is packed with carbon-fiber-wrapped high-pressure tanks."
+  },
+  {
+   "t0": 342.65,
+   "t1": 348.68,
+   "zh": "这种罐子又轻又结实，但 SpaceX 几次火箭出事，都和这类罐子有关。",
+   "en": "They're light and strong, but this type of tank has been linked to SpaceX rocket failures."
+  },
+  {
+   "t0": 348.98,
+   "t1": 356.22,
+   "zh": "还有一道算术题：把六百升充满，最理想也要二十多度电，够这辆车跑一百多公里。",
+   "en": "And a sum: filling those 600 liters takes, ideally, over 20 kWh, enough to drive this car over 100 km."
+  },
+  {
+   "t0": 356.52,
+   "t1": 362.76,
+   "zh": "还有路边的人：据报道，演示时喷气卷起的碎石沙子，能飞出几十米。",
+   "en": "And bystanders: reportedly, the blast threw gravel and sand tens of meters during the demo."
+  },
+  {
+   "t0": 363.06,
+   "t1": 366.57,
+   "zh": "所以这些动作，只能在封闭场地里做。",
+   "en": "So these stunts belong on a closed course."
+  },
+  {
+   "t0": 366.87,
+   "t1": 372.82,
+   "zh": "马斯克自己说：安全不是主要目标；他们会“争取不害死任何人”。",
+   "en": "Musk himself said safety is not the main goal, and they will 'aspire not to kill anyone'."
+  },
+  {
+   "t0": 373.12,
+   "t1": 375.96,
+   "zh": "这两句是原话，我们不加评论。",
+   "en": "Those are his words. No comment from us."
+  },
+  {
+   "t0": 376.56,
+   "t1": 378.91,
+   "zh": "那这辆车，到底是什么？",
+   "en": "So what is this car, really?"
+  },
+  {
+   "t0": 379.21,
+   "t1": 383.79,
+   "zh": "吸地：真本事，七十年代就有，现在做得更猛。",
+   "en": "The suction: real, around since the seventies, now turned up."
+  },
+  {
+   "t0": 384.09,
+   "t1": 387.83,
+   "zh": "一秒破百：物理上说得通，等独立测量。",
+   "en": "The one-second sprint: physically plausible, awaiting independent tests."
+  },
+  {
+   "t0": 388.13,
+   "t1": 392.56,
+   "zh": "飞：几秒钟的表演。很酷，但别指望它带你上班。",
+   "en": "The flying: a few seconds of show. Cool, but it won't fly you to work."
+  },
+  {
+   "t0": 393.06,
+   "t1": 401.62,
+   "zh": "时间表：说是 2028 年量产。这辆车 2017 年就发布过，之后推迟了一次又一次。",
+   "en": "Timeline: production in 2028. It was first unveiled in 2017 and delayed again and again."
+  },
+  {
+   "t0": 401.92,
+   "t1": 407.1,
+   "zh": "最后一个彩蛋：马斯克说，也许会开着它飞越蛇河峡谷。",
+   "en": "One last easter egg: Musk said it might jump the Snake River Canyon."
+  },
+  {
+   "t0": 407.4,
+   "t1": 414.89,
+   "zh": "1974 年，有个特技演员骑着火箭摩托试过。降落伞提前打开，他飘进了峡谷底。",
+   "en": "In 1974 a stuntman tried it on a rocket bike. His parachute opened early, and he drifted into the canyon."
+  },
+  {
+   "t0": 415.19,
+   "t1": 418.96,
+   "zh": "要是小 R 真飞过去了，我们再做一期。",
+   "en": "If R actually makes it, we'll make another episode."
+  },
+  {
+   "t0": 419.56,
+   "t1": 432.71,
+   "zh": "友情提示：吸力、一秒破百、六百升是特斯拉的说法；八万牛推力来自媒体报道；能装多少空气、能飞几秒、要多少电，是我们按常见数值做的估算。",
+   "en": "Note: the suction, the one-second sprint and 600 liters are Tesla's claims; 80 kN is from press reports; air mass, airtime and energy are our own estimates."
+  }
+ ],
+ "boards": [
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 0,
+     "c": "ink",
+     "w": 5,
+     "d": "M160,260 L1760,260"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "c": "muted",
+     "w": 3,
+     "d": "M160,236 L1760,236"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "r0_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M750.0,220.0 L750.0,178.0 L840.0,168.0 L920.0,120.0 L1030.0,120.0 L1110.0,164.0 L1175.0,182.0 L1182.0,214.0 L1160.0,222.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "r0_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M930.0,130.0 L1020.0,130.0 L1078.0,162.0 L880.0,162.0 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "r0_b",
+     "x": 982.0,
+     "y": 136.0,
+     "w": 14.0,
+     "h": 16.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "r0_b",
+     "x": 1016.0,
+     "y": 136.0,
+     "w": 14.0,
+     "h": 16.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "r0_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1122.0,190.0 a8,8 0 1,0 16.0,0 a8,8 0 1,0 -16.0,0"
+    },
+    {
+     "t": "rect",
+     "at": 0,
+     "id": "r0_b",
+     "x": 748.0,
+     "y": 156.0,
+     "w": 46.0,
+     "h": 12.0,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "r0_w0",
+     "x": 796.0,
+     "y": 186.0,
+     "w": 68.0,
+     "h": 68.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "r0_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M808.0,220.0 L852.0,220.0 M830.0,198.0 L830.0,242.0"
+    },
+    {
+     "t": "ellipse",
+     "at": 0,
+     "id": "r0_w1",
+     "x": 1056.0,
+     "y": 186.0,
+     "w": 68.0,
+     "h": 68.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 0,
+     "id": "r0_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1068.0,220.0 L1112.0,220.0 M1090.0,198.0 L1090.0,242.0"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "rotate",
+     "targets": [
+      "r0*"
+     ],
+     "pivot": [
+      960,
+      254
+     ],
+     "to": 180,
+     "dur": 0.01
+    },
+    {
+     "t": "text",
+     "at": 0,
+     "x": 960,
+     "y": 120,
+     "s": 44,
+     "text": "倒挂的轨道",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 0,
+     "kind": "shift",
+     "targets": [
+      "r0*"
+     ],
+     "dx": 500,
+     "dy": 0,
+     "dur": 3.0,
+     "delay": 0.8
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "x": 220,
+     "y": 880,
+     "w": 220,
+     "h": 70,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 240,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 380,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "x": 520,
+     "y": 880,
+     "w": 220,
+     "h": 70,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 540,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 680,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "x": 820,
+     "y": 880,
+     "w": 220,
+     "h": 70,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 840,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 980,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "x": 1120,
+     "y": 880,
+     "w": 220,
+     "h": 70,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 1140,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 1280,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "rect",
+     "at": 2,
+     "x": 1420,
+     "y": 880,
+     "w": 220,
+     "h": 70,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 1440,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 2,
+     "x": 1580,
+     "y": 935,
+     "w": 40,
+     "h": 40,
+     "c": "muted"
+    },
+    {
+     "t": "path",
+     "at": 2,
+     "c": "red",
+     "w": 4,
+     "d": "M160,860 Q960,380 1780,860"
+    },
+    {
+     "t": "text",
+     "at": 2,
+     "x": 960,
+     "y": 560,
+     "s": 56,
+     "text": "“飞”过五辆车",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 3,
+     "c": "ink",
+     "w": 3,
+     "d": "M250,220 L810,220 Q840,220 840,250 L840,330 Q840,360 810,360 L310,360 L260,410 L275,360 L250,360 Q220,360 220,330 L220,250 Q220,220 250,220"
+    },
+    {
+     "t": "text",
+     "at": 3,
+     "x": 530.0,
+     "y": 305.84,
+     "s": 44,
+     "text": "这就是将来真正上路的车。",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 3,
+     "x": 293.6,
+     "y": 407.2,
+     "w": 72.8,
+     "h": 72.8,
+     "c": "ink"
+    },
+    {
+     "t": "line",
+     "at": 3,
+     "pts": [
+      [
+       330,
+       480.0
+      ],
+      [
+       330,
+       648.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "line",
+     "at": 3,
+     "pts": [
+      [
+       330,
+       648.0
+      ],
+      [
+       274.0,
+       760
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "line",
+     "at": 3,
+     "pts": [
+      [
+       330,
+       648.0
+      ],
+      [
+       386.0,
+       760
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "line",
+     "at": 3,
+     "pts": [
+      [
+       253.0,
+       606.0
+      ],
+      [
+       330,
+       522.0
+      ],
+      [
+       407.0,
+       606.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 1360,
+     "y": 330,
+     "s": 60,
+     "text": "真飞？",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 4,
+     "x": 1360,
+     "y": 450,
+     "s": 60,
+     "text": "还是跳得很有派头？",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 1360,
+     "y": 660,
+     "s": 52,
+     "text": "不站队，算账。",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 5,
+     "x": 1150,
+     "y": 720,
+     "w": 420,
+     "h": 240,
+     "c": "ink"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 1360,
+     "y": 800,
+     "s": 40,
+     "text": "F = m a",
+     "c": "ink",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 5,
+     "x": 1360,
+     "y": 870,
+     "s": 40,
+     "text": "8 分钟",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 6,
+     "id": "r1_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M582.0,649.6 L582.0,574.0 L744.0,556.0 L888.0,469.6 L1086.0,469.6 L1230.0,548.8 L1347.0,581.2 L1359.6,638.8 L1320.0,653.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 6,
+     "id": "r1_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M906.0,487.6 L1068.0,487.6 L1172.4,545.2 L816.0,545.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "id": "r1_b",
+     "x": 999.6,
+     "y": 498.4,
+     "w": 25.2,
+     "h": 28.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "id": "r1_b",
+     "x": 1060.8,
+     "y": 498.4,
+     "w": 25.2,
+     "h": 28.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 6,
+     "id": "r1_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1230.0,613.6 Q1266.0,592.0 1302.0,613.6"
+    },
+    {
+     "t": "rect",
+     "at": 6,
+     "id": "r1_b",
+     "x": 578.4,
+     "y": 534.4,
+     "w": 82.8,
+     "h": 21.6,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "id": "r1_w0",
+     "x": 664.8,
+     "y": 588.4,
+     "w": 122.4,
+     "h": 122.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 6,
+     "id": "r1_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M686.4,649.6 L765.6,649.6 M726.0,610.0 L726.0,689.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 6,
+     "id": "r1_w1",
+     "x": 1132.8,
+     "y": 588.4,
+     "w": 122.4,
+     "h": 122.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 6,
+     "id": "r1_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1154.4,649.6 L1233.6,649.6 M1194.0,610.0 L1194.0,689.2"
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "bob",
+     "targets": [
+      "r1*"
+     ],
+     "amp": 10.8,
+     "hz": 1.6
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "spin",
+     "targets": [
+      "r1_w0"
+     ],
+     "pivot": [
+      726.0,
+      649.6
+     ],
+     "rpm": 90
+    },
+    {
+     "t": "move",
+     "at": 6,
+     "kind": "spin",
+     "targets": [
+      "r1_w1"
+     ],
+     "pivot": [
+      1194.0,
+      649.6
+     ],
+     "rpm": 90
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 960,
+     "y": 240,
+     "s": 72,
+     "text": "小 R",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 6,
+     "x": 960,
+     "y": 320,
+     "s": 40,
+     "text": "有点紧张的跑车",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 6,
+     "id": "sweat",
+     "c": "blue",
+     "w": 3,
+     "d": "M1330,420 Q1350,460 1330,470 Q1310,460 1330,420"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 7,
+     "x": 960,
+     "y": 170,
+     "s": 60,
+     "text": "黑科技一：倒着开，为什么掉不下来？",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "r2_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M364.0,595.2 L364.0,528.0 L508.0,512.0 L636.0,435.2 L812.0,435.2 L940.0,505.6 L1044.0,534.4 L1055.2,585.6 L1020.0,598.4 Z"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "r2_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M652.0,451.2 L796.0,451.2 L888.8,502.4 L572.0,502.4 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "id": "r2_b",
+     "x": 735.2,
+     "y": 460.79999999999995,
+     "w": 22.400000000000002,
+     "h": 25.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "id": "r2_b",
+     "x": 789.6,
+     "y": 460.79999999999995,
+     "w": 22.400000000000002,
+     "h": 25.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "r2_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M940.0,547.2 Q972.0,566.4 1004.0,547.2"
+    },
+    {
+     "t": "rect",
+     "at": 8,
+     "id": "r2_b",
+     "x": 360.79999999999995,
+     "y": 492.79999999999995,
+     "w": 73.60000000000001,
+     "h": 19.200000000000003,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "id": "r2_w0",
+     "x": 437.59999999999997,
+     "y": 540.8,
+     "w": 108.80000000000001,
+     "h": 108.80000000000001,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "r2_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M456.79999999999995,595.2 L527.2,595.2 M492.0,560.0 L492.0,630.4"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "id": "r2_w1",
+     "x": 853.6,
+     "y": 540.8,
+     "w": 108.80000000000001,
+     "h": 108.80000000000001,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "r2_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M872.8,595.2 L943.2,595.2 M908.0,560.0 L908.0,630.4"
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "x": 604,
+     "y": 650,
+     "w": 52,
+     "h": 52,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "f1",
+     "c": "blue",
+     "w": 4,
+     "d": "M630,676 Q643.0,652.6 630,652.6 M630,676 Q653.4,686.4 650.8,687.7 M630,676 Q606.6,689.0 609.2,686.4"
+    },
+    {
+     "t": "move",
+     "at": 8,
+     "kind": "spin",
+     "targets": [
+      "f1"
+     ],
+     "pivot": [
+      630,
+      676
+     ],
+     "rpm": 160
+    },
+    {
+     "t": "ellipse",
+     "at": 8,
+     "x": 744,
+     "y": 650,
+     "w": 52,
+     "h": 52,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 8,
+     "id": "f2",
+     "c": "blue",
+     "w": 4,
+     "d": "M770,676 Q783.0,652.6 770,652.6 M770,676 Q793.4,686.4 790.8,687.7 M770,676 Q746.6,689.0 749.2,686.4"
+    },
+    {
+     "t": "move",
+     "at": 8,
+     "kind": "spin",
+     "targets": [
+      "f2"
+     ],
+     "pivot": [
+      770,
+      676
+     ],
+     "rpm": 160
+    },
+    {
+     "t": "arrow",
+     "at": 8,
+     "pts": [
+      [
+       700,
+       700
+      ],
+      [
+       700,
+       840
+      ]
+     ],
+     "c": "blue",
+     "w": 4
+    },
+    {
+     "t": "text",
+     "at": 8,
+     "x": 700,
+     "y": 900,
+     "s": 36,
+     "text": "抽走车底的空气",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "arrow",
+     "at": 9,
+     "pts": [
+      [
+       380.0,
+       300
+      ],
+      [
+       380.0,
+       410
+      ]
+     ],
+     "c": "red",
+     "w": 3,
+     "id": "press"
+    },
+    {
+     "t": "arrow",
+     "at": 9,
+     "pts": [
+      [
+       508.0,
+       300
+      ],
+      [
+       508.0,
+       410
+      ]
+     ],
+     "c": "red",
+     "w": 3,
+     "id": "press"
+    },
+    {
+     "t": "arrow",
+     "at": 9,
+     "pts": [
+      [
+       636.0,
+       300
+      ],
+      [
+       636.0,
+       410
+      ]
+     ],
+     "c": "red",
+     "w": 3,
+     "id": "press"
+    },
+    {
+     "t": "arrow",
+     "at": 9,
+     "pts": [
+      [
+       764.0,
+       300
+      ],
+      [
+       764.0,
+       410
+      ]
+     ],
+     "c": "red",
+     "w": 3,
+     "id": "press"
+    },
+    {
+     "t": "arrow",
+     "at": 9,
+     "pts": [
+      [
+       892.0,
+       300
+      ],
+      [
+       892.0,
+       410
+      ]
+     ],
+     "c": "red",
+     "w": 3,
+     "id": "press"
+    },
+    {
+     "t": "arrow",
+     "at": 9,
+     "pts": [
+      [
+       1020.0,
+       300
+      ],
+      [
+       1020.0,
+       410
+      ]
+     ],
+     "c": "red",
+     "w": 3,
+     "id": "press"
+    },
+    {
+     "t": "text",
+     "at": 9,
+     "x": 1480,
+     "y": 380,
+     "s": 48,
+     "text": "上面：整个大气压着",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 9,
+     "x": 1480,
+     "y": 700,
+     "s": 48,
+     "text": "下面：空气变稀",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 9,
+     "x": 1480,
+     "y": 860,
+     "s": 52,
+     "text": "差出来的力 = 下压力",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 9,
+     "kind": "pulse",
+     "targets": [
+      "press"
+     ]
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 11,
+     "x": 560,
+     "y": 200,
+     "s": 56,
+     "text": "1978 · F1 风扇车",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "f78_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M287.0,603.6 L287.0,549.0 L404.0,536.0 L508.0,473.6 L651.0,473.6 L755.0,530.8 L839.5,554.2 L848.6,595.8 L820.0,606.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "f78_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M521.0,486.6 L638.0,486.6 L713.4,528.2 L456.0,528.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "id": "f78_b",
+     "x": 588.6,
+     "y": 494.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "id": "f78_b",
+     "x": 632.8,
+     "y": 494.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "f78_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M755.0,564.6 Q781.0,580.2 807.0,564.6"
+    },
+    {
+     "t": "rect",
+     "at": 11,
+     "id": "f78_b",
+     "x": 284.4,
+     "y": 520.4,
+     "w": 59.800000000000004,
+     "h": 15.600000000000001,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "id": "f78_w0",
+     "x": 346.79999999999995,
+     "y": 559.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "f78_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M362.4,603.6 L419.6,603.6 M391.0,575.0 L391.0,632.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "id": "f78_w1",
+     "x": 684.8,
+     "y": 559.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "f78_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M700.4,603.6 L757.6,603.6 M729.0,575.0 L729.0,632.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 11,
+     "x": 190,
+     "y": 480,
+     "w": 120,
+     "h": 120,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 11,
+     "id": "f3",
+     "c": "blue",
+     "w": 4,
+     "d": "M250,540 Q280.0,486.0 250,486.0 M250,540 Q304.0,564.0 298.0,567.0 M250,540 Q196.0,570.0 202.0,564.0"
+    },
+    {
+     "t": "move",
+     "at": 11,
+     "kind": "spin",
+     "targets": [
+      "f3"
+     ],
+     "pivot": [
+      250,
+      540
+     ],
+     "rpm": 160
+    },
+    {
+     "t": "text",
+     "at": 11,
+     "x": 560,
+     "y": 820,
+     "s": 40,
+     "text": "只比了一场——赢了",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "x": 1400,
+     "y": 300,
+     "s": 56,
+     "text": "然后被叫停",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 12,
+     "c": "red",
+     "w": 3,
+     "d": "M1170,420 L1630,420 Q1660,420 1660,450 L1660,520 Q1660,550 1630,550 L1230,550 L1180,600 L1195,550 L1170,550 Q1140,550 1140,520 L1140,450 Q1140,420 1170,420"
+    },
+    {
+     "t": "text",
+     "at": 12,
+     "x": 1400.0,
+     "y": 502.28,
+     "s": 48,
+     "text": "这是吸尘器！",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 12,
+     "id": "stones",
+     "x": 130,
+     "y": 600,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 12,
+     "id": "stones",
+     "x": 160,
+     "y": 630,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 12,
+     "id": "stones",
+     "x": 190,
+     "y": 660,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 12,
+     "id": "stones",
+     "x": 220,
+     "y": 600,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 12,
+     "id": "stones",
+     "x": 250,
+     "y": 630,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "move",
+     "at": 12,
+     "kind": "shift",
+     "targets": [
+      "stones"
+     ],
+     "dx": -90,
+     "dy": 20,
+     "dur": 0.8
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 13,
+     "x": 500,
+     "y": 220,
+     "s": 48,
+     "text": "机翼：要速度",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 13,
+     "c": "muted",
+     "w": 4,
+     "d": "M300,380 Q500,320 700,380 Q500,360 300,380 Z"
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "x": 500,
+     "y": 470,
+     "s": 40,
+     "text": "车停着 → 0",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "x": 1400,
+     "y": 220,
+     "s": 48,
+     "text": "风扇：停着也行",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 13,
+     "x": 1330,
+     "y": 310,
+     "w": 140,
+     "h": 140,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 13,
+     "id": "f4",
+     "c": "blue",
+     "w": 4,
+     "d": "M1400,380 Q1435.0,317.0 1400,317.0 M1400,380 Q1463.0,408.0 1456.0,411.5 M1400,380 Q1337.0,415.0 1344.0,408.0"
+    },
+    {
+     "t": "move",
+     "at": 13,
+     "kind": "spin",
+     "targets": [
+      "f4"
+     ],
+     "pivot": [
+      1400,
+      380
+     ],
+     "rpm": 160
+    },
+    {
+     "t": "text",
+     "at": 13,
+     "x": 1400,
+     "y": 520,
+     "s": 40,
+     "text": "车停着 → 照样吸",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 14,
+     "x": 960,
+     "y": 680,
+     "s": 60,
+     "text": "吸力 > 车重  →  天花板 = 地板",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "x": 560,
+     "y": 860,
+     "s": 56,
+     "text": "≈ 4700 kg ?",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 15,
+     "x": 560,
+     "y": 930,
+     "s": 32,
+     "text": "（特斯拉屏幕上的数字）",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 16,
+     "x": 1360,
+     "y": 860,
+     "s": 40,
+     "text": "另一辆风扇车：约 1 吨重，号称 2 吨吸力",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 16,
+     "x": 1360,
+     "y": 930,
+     "s": 34,
+     "text": "媒体：4700 可能有水分",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 17,
+     "id": "r3_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M645.0,598.0 L645.0,535.0 L780.0,520.0 L900.0,448.0 L1065.0,448.0 L1185.0,514.0 L1282.5,541.0 L1293.0,589.0 L1260.0,601.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 17,
+     "id": "r3_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M915.0,463.0 L1050.0,463.0 L1137.0,511.0 L840.0,511.0 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 17,
+     "id": "r3_b",
+     "x": 993.0,
+     "y": 472.0,
+     "w": 21.0,
+     "h": 24.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 17,
+     "id": "r3_b",
+     "x": 1044.0,
+     "y": 472.0,
+     "w": 21.0,
+     "h": 24.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 17,
+     "id": "r3_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1185.0,553.0 Q1215.0,571.0 1245.0,553.0"
+    },
+    {
+     "t": "rect",
+     "at": 17,
+     "id": "r3_b",
+     "x": 642.0,
+     "y": 502.0,
+     "w": 69.0,
+     "h": 18.0,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 17,
+     "id": "r3_w0",
+     "x": 714.0,
+     "y": 547.0,
+     "w": 102.0,
+     "h": 102.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 17,
+     "id": "r3_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M732.0,598.0 L798.0,598.0 M765.0,565.0 L765.0,631.0"
+    },
+    {
+     "t": "ellipse",
+     "at": 17,
+     "id": "r3_w1",
+     "x": 1104.0,
+     "y": 547.0,
+     "w": 102.0,
+     "h": 102.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 17,
+     "id": "r3_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1122.0,598.0 L1188.0,598.0 M1155.0,565.0 L1155.0,631.0"
+    },
+    {
+     "t": "move",
+     "at": 17,
+     "kind": "bob",
+     "targets": [
+      "r3*"
+     ],
+     "amp": 9.0,
+     "hz": 1.6
+    },
+    {
+     "t": "rect",
+     "at": 17,
+     "x": 730,
+     "y": 230,
+     "w": 460,
+     "h": 110,
+     "c": "green"
+    },
+    {
+     "t": "text",
+     "at": 17,
+     "x": 960,
+     "y": 306,
+     "s": 48,
+     "text": "黑科技一：真本事",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 18,
+     "x": 960,
+     "y": 190,
+     "s": 60,
+     "text": "黑科技二：1 秒破百",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "x": 560,
+     "y": 400,
+     "s": 52,
+     "text": "0 → 96 km/h，用时 1 秒",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "x": 560,
+     "y": 500,
+     "s": 52,
+     "text": "= 每秒提速 27 m/s",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 19,
+     "x": 560,
+     "y": 620,
+     "s": 80,
+     "text": "≈ 2.7 g",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 20,
+     "x": 1180,
+     "y": 340,
+     "w": 440,
+     "h": 220,
+     "c": "ink"
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1200,
+       560
+      ],
+      [
+       1220,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1240,
+       560
+      ],
+      [
+       1260,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1280,
+       560
+      ],
+      [
+       1300,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1320,
+       560
+      ],
+      [
+       1340,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1360,
+       560
+      ],
+      [
+       1380,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1400,
+       560
+      ],
+      [
+       1420,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1440,
+       560
+      ],
+      [
+       1460,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1480,
+       560
+      ],
+      [
+       1500,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1520,
+       560
+      ],
+      [
+       1540,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "line",
+     "at": 20,
+     "pts": [
+      [
+       1560,
+       560
+      ],
+      [
+       1580,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "x": 1400,
+     "y": 450,
+     "s": 40,
+     "text": "轮胎抓地",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 20,
+     "x": 1400,
+     "y": 640,
+     "s": 52,
+     "text": "最多 1 个多 g",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 21,
+     "x": 960,
+     "y": 880,
+     "s": 56,
+     "text": "怎么办？两招。",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 22,
+     "id": "r4_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M226.0,520.8 L226.0,462.0 L352.0,448.0 L464.0,380.8 L618.0,380.8 L730.0,442.4 L821.0,467.6 L830.8,512.4 L800.0,523.6 Z"
+    },
+    {
+     "t": "path",
+     "at": 22,
+     "id": "r4_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M478.0,394.8 L604.0,394.8 L685.2,439.6 L408.0,439.6 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 22,
+     "id": "r4_b",
+     "x": 550.8,
+     "y": 403.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 22,
+     "id": "r4_b",
+     "x": 598.4,
+     "y": 403.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 22,
+     "id": "r4_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M730.0,478.8 Q758.0,495.6 786.0,478.8"
+    },
+    {
+     "t": "rect",
+     "at": 22,
+     "id": "r4_b",
+     "x": 223.20000000000005,
+     "y": 431.20000000000005,
+     "w": 64.39999999999999,
+     "h": 16.799999999999997,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 22,
+     "id": "r4_w0",
+     "x": 290.4,
+     "y": 473.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 22,
+     "id": "r4_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M307.20000000000005,520.8 L368.8,520.8 M338.0,490.0 L338.0,551.6"
+    },
+    {
+     "t": "ellipse",
+     "at": 22,
+     "id": "r4_w1",
+     "x": 654.4,
+     "y": 473.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 22,
+     "id": "r4_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M671.2,520.8 L732.8,520.8 M702.0,490.0 L702.0,551.6"
+    },
+    {
+     "t": "arrow",
+     "at": 22,
+     "pts": [
+      [
+       330.0,
+       240
+      ],
+      [
+       330.0,
+       350
+      ]
+     ],
+     "c": "red",
+     "w": 3
+    },
+    {
+     "t": "arrow",
+     "at": 22,
+     "pts": [
+      [
+       456.6666666666667,
+       240
+      ],
+      [
+       456.6666666666667,
+       350
+      ]
+     ],
+     "c": "red",
+     "w": 3
+    },
+    {
+     "t": "arrow",
+     "at": 22,
+     "pts": [
+      [
+       583.3333333333334,
+       240
+      ],
+      [
+       583.3333333333334,
+       350
+      ]
+     ],
+     "c": "red",
+     "w": 3
+    },
+    {
+     "t": "arrow",
+     "at": 22,
+     "pts": [
+      [
+       710.0,
+       240
+      ],
+      [
+       710.0,
+       350
+      ]
+     ],
+     "c": "red",
+     "w": 3
+    },
+    {
+     "t": "text",
+     "at": 22,
+     "x": 520,
+     "y": 820,
+     "s": 40,
+     "text": "第一招：按得越紧，抓得越牢",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "r5_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M1113.0,476.0 L1113.0,518.0 L938.0,546.0 L938.0,448.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "r5_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M1106.0,520.8 L1106.0,462.0 L1232.0,448.0 L1344.0,380.8 L1498.0,380.8 L1610.0,442.4 L1701.0,467.6 L1710.8,512.4 L1680.0,523.6 Z"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "r5_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M1358.0,394.8 L1484.0,394.8 L1565.2,439.6 L1288.0,439.6 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 23,
+     "id": "r5_b",
+     "x": 1430.8,
+     "y": 403.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 23,
+     "id": "r5_b",
+     "x": 1478.4,
+     "y": 403.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "r5_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1610.0,478.8 Q1638.0,495.6 1666.0,478.8"
+    },
+    {
+     "t": "rect",
+     "at": 23,
+     "id": "r5_b",
+     "x": 1103.2,
+     "y": 431.20000000000005,
+     "w": 64.39999999999999,
+     "h": 16.799999999999997,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 23,
+     "id": "r5_w0",
+     "x": 1170.4,
+     "y": 473.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "r5_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M1187.2,520.8 L1248.8,520.8 M1218.0,490.0 L1218.0,551.6"
+    },
+    {
+     "t": "ellipse",
+     "at": 23,
+     "id": "r5_w1",
+     "x": 1534.4,
+     "y": 473.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 23,
+     "id": "r5_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1551.2,520.8 L1612.8,520.8 M1582.0,490.0 L1582.0,551.6"
+    },
+    {
+     "t": "move",
+     "at": 23,
+     "kind": "wiggle",
+     "targets": [
+      "r5_jet"
+     ],
+     "pivot": [
+      1400,
+      560
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 23,
+     "kind": "bob",
+     "targets": [
+      "r5*"
+     ],
+     "amp": 8.399999999999999,
+     "hz": 1.6
+    },
+    {
+     "t": "move",
+     "at": 23,
+     "kind": "spin",
+     "targets": [
+      "r5_w0"
+     ],
+     "pivot": [
+      1218.0,
+      520.8
+     ],
+     "rpm": 200
+    },
+    {
+     "t": "move",
+     "at": 23,
+     "kind": "spin",
+     "targets": [
+      "r5_w1"
+     ],
+     "pivot": [
+      1582.0,
+      520.8
+     ],
+     "rpm": 200
+    },
+    {
+     "t": "text",
+     "at": 23,
+     "x": 1400,
+     "y": 820,
+     "s": 40,
+     "text": "第二招：干脆向后喷气",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 24,
+     "x": 1400,
+     "y": 900,
+     "s": 36,
+     "text": "往后扔东西，自己往前走 = 火箭",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 25,
+     "x": 960,
+     "y": 180,
+     "s": 52,
+     "text": "约 80,000 N ÷ 2,000 kg ≈ 4 g",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "icon",
+     "at": 26,
+     "id": "q1",
+     "name": "question",
+     "x": 1780,
+     "y": 300,
+     "size": 180,
+     "c": "red"
+    },
+    {
+     "t": "text",
+     "at": 26,
+     "x": 1600,
+     "y": 300,
+     "s": 34,
+     "text": "还没有独立测量",
+     "c": "red",
+     "align": "right",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 26,
+     "kind": "pulse",
+     "targets": [
+      "q1"
+     ]
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 27,
+     "x": 960,
+     "y": 180,
+     "s": 64,
+     "text": "黑科技三：到底能飞多久？",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M413.1,596.6 L459.9,596.6 L488.5,737.0 L384.5,737.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M660.1,596.6 L706.9,596.6 L735.5,737.0 L631.5,737.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M287.0,583.6 L287.0,529.0 L404.0,516.0 L508.0,453.6 L651.0,453.6 L755.0,510.8 L839.5,534.2 L848.6,575.8 L820.0,586.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M521.0,466.6 L638.0,466.6 L713.4,508.2 L456.0,508.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 28,
+     "id": "r6_b",
+     "x": 588.6,
+     "y": 474.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 28,
+     "id": "r6_b",
+     "x": 632.8,
+     "y": 474.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M755.0,544.6 Q781.0,560.2 807.0,544.6"
+    },
+    {
+     "t": "rect",
+     "at": 28,
+     "id": "r6_b",
+     "x": 284.4,
+     "y": 500.4,
+     "w": 59.800000000000004,
+     "h": 15.600000000000001,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 28,
+     "id": "r6_w0",
+     "x": 346.79999999999995,
+     "y": 539.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M362.4,583.6 L419.6,583.6 M391.0,555.0 L391.0,612.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 28,
+     "id": "r6_w1",
+     "x": 684.8,
+     "y": 539.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 28,
+     "id": "r6_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M700.4,583.6 L757.6,583.6 M729.0,555.0 L729.0,612.2"
+    },
+    {
+     "t": "move",
+     "at": 28,
+     "kind": "wiggle",
+     "targets": [
+      "r6_jet"
+     ],
+     "pivot": [
+      560,
+      620
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 28,
+     "kind": "bob",
+     "targets": [
+      "r6*"
+     ],
+     "amp": 7.800000000000001,
+     "hz": 1.6
+    },
+    {
+     "t": "text",
+     "at": 28,
+     "x": 560,
+     "y": 820,
+     "s": 40,
+     "text": "喷的是压缩空气，不是火",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 28,
+     "x": 560,
+     "y": 890,
+     "s": 36,
+     "text": "10 个喷口 · 600 升",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 29,
+     "c": "ink",
+     "w": 4,
+     "d": "M1100,380 L1360,380 Q1350,500 1300,500 L1160,500 Q1110,500 1100,380 Z"
+    },
+    {
+     "t": "line",
+     "at": 29,
+     "pts": [
+      [
+       1120,
+       410
+      ],
+      [
+       1340,
+       410
+      ]
+     ],
+     "c": "blue",
+     "w": 3
+    },
+    {
+     "t": "path",
+     "at": 29,
+     "c": "ink",
+     "w": 4,
+     "d": "M1400,380 L1660,380 Q1650,500 1600,500 L1460,500 Q1410,500 1400,380 Z"
+    },
+    {
+     "t": "line",
+     "at": 29,
+     "pts": [
+      [
+       1420,
+       410
+      ],
+      [
+       1640,
+       410
+      ]
+     ],
+     "c": "blue",
+     "w": 3
+    },
+    {
+     "t": "path",
+     "at": 29,
+     "c": "ink",
+     "w": 4,
+     "d": "M1250,560 L1510,560 Q1500,680 1450,680 L1310,680 Q1260,680 1250,560 Z"
+    },
+    {
+     "t": "line",
+     "at": 29,
+     "pts": [
+      [
+       1270,
+       590
+      ],
+      [
+       1490,
+       590
+      ]
+     ],
+     "c": "blue",
+     "w": 3
+    },
+    {
+     "t": "text",
+     "at": 29,
+     "x": 1400,
+     "y": 780,
+     "s": 48,
+     "text": "600 升 ≈ 3 个浴缸",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "rect",
+     "at": 30,
+     "x": 260,
+     "y": 300,
+     "w": 200,
+     "h": 480,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 30,
+     "x": 268,
+     "y": 308.0,
+     "w": 184,
+     "h": 464.0,
+     "c": "gold",
+     "fill": "gold",
+     "id": "air1"
+    },
+    {
+     "t": "text",
+     "at": 30,
+     "x": 360,
+     "y": 860,
+     "s": 40,
+     "text": "约 200–300 kg 空气",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 30,
+     "x": 360,
+     "y": 920,
+     "s": 30,
+     "text": "（按常见高压罐估算）",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 31,
+     "x": 1200,
+     "y": 320,
+     "s": 48,
+     "text": "冷空气喷速：每秒几百米",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 31,
+     "x": 1200,
+     "y": 440,
+     "s": 52,
+     "text": "8 万牛 → 每秒喷掉 100+ kg",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 32,
+     "x": 1200,
+     "y": 640,
+     "s": 64,
+     "text": "全力：一两秒",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 32,
+     "kind": "shift",
+     "targets": [
+      "air1"
+     ],
+     "dx": 0,
+     "dy": 440,
+     "dur": 2.0
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M413.1,616.6 L459.9,616.6 L488.5,757.0 L384.5,757.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M660.1,616.6 L706.9,616.6 L735.5,757.0 L631.5,757.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M287.0,603.6 L287.0,549.0 L404.0,536.0 L508.0,473.6 L651.0,473.6 L755.0,530.8 L839.5,554.2 L848.6,595.8 L820.0,606.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M521.0,486.6 L638.0,486.6 L713.4,528.2 L456.0,528.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 33,
+     "id": "r7_b",
+     "x": 588.6,
+     "y": 494.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 33,
+     "id": "r7_b",
+     "x": 632.8,
+     "y": 494.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M755.0,564.6 Q781.0,580.2 807.0,564.6"
+    },
+    {
+     "t": "rect",
+     "at": 33,
+     "id": "r7_b",
+     "x": 284.4,
+     "y": 520.4,
+     "w": 59.800000000000004,
+     "h": 15.600000000000001,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 33,
+     "id": "r7_w0",
+     "x": 346.79999999999995,
+     "y": 559.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M362.4,603.6 L419.6,603.6 M391.0,575.0 L391.0,632.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 33,
+     "id": "r7_w1",
+     "x": 684.8,
+     "y": 559.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 33,
+     "id": "r7_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M700.4,603.6 L757.6,603.6 M729.0,575.0 L729.0,632.2"
+    },
+    {
+     "t": "move",
+     "at": 33,
+     "kind": "wiggle",
+     "targets": [
+      "r7_jet"
+     ],
+     "pivot": [
+      560,
+      640
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 33,
+     "kind": "bob",
+     "targets": [
+      "r7*"
+     ],
+     "amp": 7.800000000000001,
+     "hz": 1.6
+    },
+    {
+     "t": "move",
+     "at": 33,
+     "kind": "shift",
+     "targets": [
+      "r7*"
+     ],
+     "dx": 0,
+     "dy": -160,
+     "dur": 1.2
+    },
+    {
+     "t": "text",
+     "at": 33,
+     "x": 560,
+     "y": 900,
+     "s": 40,
+     "text": "悬停：托住 2 吨 = 2 万牛",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 33,
+     "x": 1360,
+     "y": 360,
+     "s": 48,
+     "text": "每秒吃掉 30+ kg 空气",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 34,
+     "x": 1240,
+     "y": 460,
+     "w": 160,
+     "h": 380,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 34,
+     "x": 1248,
+     "y": 504.4,
+     "w": 144,
+     "h": 327.6,
+     "c": "gold",
+     "fill": "gold",
+     "id": "air2"
+    },
+    {
+     "t": "move",
+     "at": 34,
+     "kind": "shift",
+     "targets": [
+      "air2"
+     ],
+     "dx": 0,
+     "dy": 300,
+     "dur": 3.0
+    },
+    {
+     "t": "text",
+     "at": 34,
+     "x": 1600,
+     "y": 600,
+     "s": 40,
+     "text": "压力↓ 推力↓",
+     "c": "red",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 34,
+     "kind": "shift",
+     "targets": [
+      "r7*"
+     ],
+     "dx": 0,
+     "dy": 160,
+     "dur": 1.6,
+     "delay": 2.6
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 35,
+     "x": 960,
+     "y": 200,
+     "s": 64,
+     "text": "看不见的敌人：冷",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 36,
+     "x": 380,
+     "y": 420,
+     "w": 160,
+     "h": 360,
+     "c": "ink"
+    },
+    {
+     "t": "rect",
+     "at": 36,
+     "x": 420,
+     "y": 370,
+     "w": 80,
+     "h": 50,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 36,
+     "id": "spray",
+     "c": "muted",
+     "w": 3,
+     "d": "M520,380 L700,330 M520,390 L700,390 M520,400 L700,450"
+    },
+    {
+     "t": "move",
+     "at": 36,
+     "kind": "pulse",
+     "targets": [
+      "spray"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 36,
+     "x": 460,
+     "y": 860,
+     "s": 40,
+     "text": "按住不放 → 冰手",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 37,
+     "id": "snow0",
+     "c": "blue",
+     "w": 3,
+     "d": "M1070,420 L1130,420 M1100,390 L1100,450 M1079,399 L1121,441 M1079,441 L1121,399"
+    },
+    {
+     "t": "move",
+     "at": 37,
+     "kind": "spin",
+     "targets": [
+      "snow0"
+     ],
+     "pivot": [
+      1100,
+      420
+     ],
+     "rpm": 12
+    },
+    {
+     "t": "path",
+     "at": 37,
+     "id": "snow1",
+     "c": "blue",
+     "w": 3,
+     "d": "M1270,360 L1330,360 M1300,330 L1300,390 M1279,339 L1321,381 M1279,381 L1321,339"
+    },
+    {
+     "t": "move",
+     "at": 37,
+     "kind": "spin",
+     "targets": [
+      "snow1"
+     ],
+     "pivot": [
+      1300,
+      360
+     ],
+     "rpm": 12
+    },
+    {
+     "t": "path",
+     "at": 37,
+     "id": "snow2",
+     "c": "blue",
+     "w": 3,
+     "d": "M1470,460 L1530,460 M1500,430 L1500,490 M1479,439 L1521,481 M1479,481 L1521,439"
+    },
+    {
+     "t": "move",
+     "at": 37,
+     "kind": "spin",
+     "targets": [
+      "snow2"
+     ],
+     "pivot": [
+      1500,
+      460
+     ],
+     "rpm": 12
+    },
+    {
+     "t": "path",
+     "at": 37,
+     "id": "snow3",
+     "c": "blue",
+     "w": 3,
+     "d": "M1190,560 L1250,560 M1220,530 L1220,590 M1199,539 L1241,581 M1199,581 L1241,539"
+    },
+    {
+     "t": "move",
+     "at": 37,
+     "kind": "spin",
+     "targets": [
+      "snow3"
+     ],
+     "pivot": [
+      1220,
+      560
+     ],
+     "rpm": 12
+    },
+    {
+     "t": "path",
+     "at": 37,
+     "id": "snow4",
+     "c": "blue",
+     "w": 3,
+     "d": "M1390,620 L1450,620 M1420,590 L1420,650 M1399,599 L1441,641 M1399,641 L1441,599"
+    },
+    {
+     "t": "move",
+     "at": 37,
+     "kind": "spin",
+     "targets": [
+      "snow4"
+     ],
+     "pivot": [
+      1420,
+      620
+     ],
+     "rpm": 12
+    },
+    {
+     "t": "text",
+     "at": 37,
+     "x": 1300,
+     "y": 780,
+     "s": 44,
+     "text": "压力掉得更快 · 喷口结霜",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 37,
+     "x": 1300,
+     "y": 860,
+     "s": 40,
+     "text": "真实的飞行时间：更短",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 38,
+     "x": 960,
+     "y": 150,
+     "s": 52,
+     "text": "虚拟实验：冷气推进能飞多久？",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "media",
+     "at": 38,
+     "src": "video:/home/claude/wenquest/samples/白板讲课/科普_会飞的特斯拉/_lab.mp4",
+     "x": 210,
+     "y": 210,
+     "w": 1500,
+     "h": 703,
+     "play": 20
+    },
+    {
+     "t": "text",
+     "at": 38,
+     "x": 960,
+     "y": 1000,
+     "s": 34,
+     "text": "网页版里可以自己调",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M779.2,611.2 L836.8,611.2 L872.0,784.0 L744.0,784.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M1083.2,611.2 L1140.8,611.2 L1176.0,784.0 L1048.0,784.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M624.0,595.2 L624.0,528.0 L768.0,512.0 L896.0,435.2 L1072.0,435.2 L1200.0,505.6 L1304.0,534.4 L1315.2,585.6 L1280.0,598.4 Z"
+    },
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M912.0,451.2 L1056.0,451.2 L1148.8,502.4 L832.0,502.4 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 42,
+     "id": "r8_b",
+     "x": 995.2,
+     "y": 460.79999999999995,
+     "w": 22.400000000000002,
+     "h": 25.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 42,
+     "id": "r8_b",
+     "x": 1049.6,
+     "y": 460.79999999999995,
+     "w": 22.400000000000002,
+     "h": 25.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1219.2,547.2 a8,8 0 1,0 25.6,0 a8,8 0 1,0 -25.6,0"
+    },
+    {
+     "t": "rect",
+     "at": 42,
+     "id": "r8_b",
+     "x": 620.8,
+     "y": 492.79999999999995,
+     "w": 73.60000000000001,
+     "h": 19.200000000000003,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 42,
+     "id": "r8_w0",
+     "x": 697.5999999999999,
+     "y": 540.8,
+     "w": 108.80000000000001,
+     "h": 108.80000000000001,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M716.8,595.2 L787.2,595.2 M752.0,560.0 L752.0,630.4"
+    },
+    {
+     "t": "ellipse",
+     "at": 42,
+     "id": "r8_w1",
+     "x": 1113.6,
+     "y": 540.8,
+     "w": 108.80000000000001,
+     "h": 108.80000000000001,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 42,
+     "id": "r8_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1132.8,595.2 L1203.2,595.2 M1168.0,560.0 L1168.0,630.4"
+    },
+    {
+     "t": "move",
+     "at": 42,
+     "kind": "wiggle",
+     "targets": [
+      "r8_jet"
+     ],
+     "pivot": [
+      960,
+      640
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 42,
+     "kind": "bob",
+     "targets": [
+      "r8*"
+     ],
+     "amp": 9.600000000000001,
+     "hz": 1.6
+    },
+    {
+     "t": "move",
+     "at": 42,
+     "kind": "shift",
+     "targets": [
+      "r8*"
+     ],
+     "dx": 0,
+     "dy": -120,
+     "dur": 0.5
+    },
+    {
+     "t": "move",
+     "at": 42,
+     "kind": "shift",
+     "targets": [
+      "r8*"
+     ],
+     "dx": 0,
+     "dy": 120,
+     "dur": 0.5,
+     "delay": 1.4
+    },
+    {
+     "t": "text",
+     "at": 42,
+     "x": 960,
+     "y": 260,
+     "s": 72,
+     "text": "不是“飞”，是很贵的“跳”",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 43,
+     "x": 960,
+     "y": 180,
+     "s": 56,
+     "text": "它在空中怎么翻跟头？",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 44,
+     "id": "rf_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M326.0,520.8 L326.0,462.0 L452.0,448.0 L564.0,380.8 L718.0,380.8 L830.0,442.4 L921.0,467.6 L930.8,512.4 L900.0,523.6 Z"
+    },
+    {
+     "t": "path",
+     "at": 44,
+     "id": "rf_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M578.0,394.8 L704.0,394.8 L785.2,439.6 L508.0,439.6 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 44,
+     "id": "rf_b",
+     "x": 650.8,
+     "y": 403.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 44,
+     "id": "rf_b",
+     "x": 698.4,
+     "y": 403.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 44,
+     "id": "rf_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M830.0,478.8 Q858.0,495.6 886.0,478.8"
+    },
+    {
+     "t": "rect",
+     "at": 44,
+     "id": "rf_b",
+     "x": 323.20000000000005,
+     "y": 431.20000000000005,
+     "w": 64.39999999999999,
+     "h": 16.799999999999997,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 44,
+     "id": "rf_w0",
+     "x": 390.4,
+     "y": 473.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 44,
+     "id": "rf_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M407.20000000000005,520.8 L468.8,520.8 M438.0,490.0 L438.0,551.6"
+    },
+    {
+     "t": "ellipse",
+     "at": 44,
+     "id": "rf_w1",
+     "x": 754.4,
+     "y": 473.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 44,
+     "id": "rf_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M771.2,520.8 L832.8,520.8 M802.0,490.0 L802.0,551.6"
+    },
+    {
+     "t": "ellipse",
+     "at": 44,
+     "x": 610,
+     "y": 470,
+     "w": 22,
+     "h": 22,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "text",
+     "at": 44,
+     "x": 650,
+     "y": 450,
+     "s": 32,
+     "text": "重心",
+     "c": "red",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "arrow",
+     "at": 44,
+     "pts": [
+      [
+       870,
+       720
+      ],
+      [
+       870,
+       560
+      ]
+     ],
+     "c": "blue",
+     "w": 6
+    },
+    {
+     "t": "text",
+     "at": 44,
+     "x": 900,
+     "y": 700,
+     "s": 34,
+     "text": "推力偏一点",
+     "c": "blue",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 44,
+     "c": "gold",
+     "w": 5,
+     "d": "M440,340 Q620,250 800,340"
+    },
+    {
+     "t": "arrow",
+     "at": 44,
+     "pts": [
+      [
+       780,
+       330
+      ],
+      [
+       810,
+       352
+      ]
+     ],
+     "c": "gold",
+     "w": 5
+    },
+    {
+     "t": "text",
+     "at": 44,
+     "x": 620,
+     "y": 250,
+     "s": 44,
+     "text": "= 力矩，车就转",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 45,
+     "kind": "rotate",
+     "targets": [
+      "rf*"
+     ],
+     "pivot": [
+      620,
+      480
+     ],
+     "to": -25,
+     "dur": 0.8
+    },
+    {
+     "t": "text",
+     "at": 45,
+     "x": 1460,
+     "y": 420,
+     "s": 40,
+     "text": "前喷后不喷：抬头",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 45,
+     "x": 1460,
+     "y": 500,
+     "s": 40,
+     "text": "左喷右不喷：打滚",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 46,
+     "c": "ink",
+     "w": 4,
+     "d": "M1440,860 L1440,620 L1470,580 L1500,620 L1500,860 Z M1430,860 L1400,900 M1510,860 L1540,900"
+    },
+    {
+     "t": "path",
+     "at": 46,
+     "id": "flame",
+     "c": "red",
+     "w": 3,
+     "d": "M1450,870 L1470,940 L1490,870"
+    },
+    {
+     "t": "move",
+     "at": 46,
+     "kind": "pulse",
+     "targets": [
+      "flame"
+     ]
+    },
+    {
+     "t": "text",
+     "at": 46,
+     "x": 1700,
+     "y": 760,
+     "s": 36,
+     "text": "火箭回收",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 46,
+     "x": 1700,
+     "y": 810,
+     "s": 36,
+     "text": "也是这一套",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "ellipse",
+     "at": 47,
+     "id": "heli",
+     "x": 370,
+     "y": 360,
+     "w": 220,
+     "h": 120,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "heli",
+     "c": "ink",
+     "w": 4,
+     "d": "M590,410 L780,390 L800,350"
+    },
+    {
+     "t": "line",
+     "at": 47,
+     "id": "heli",
+     "pts": [
+      [
+       480,
+       360
+      ],
+      [
+       480,
+       320
+      ]
+     ],
+     "c": "ink",
+     "w": 4
+    },
+    {
+     "t": "line",
+     "at": 47,
+     "id": "heli_rotor",
+     "pts": [
+      [
+       150,
+       316
+      ],
+      [
+       810,
+       316
+      ]
+     ],
+     "c": "blue",
+     "w": 5
+    },
+    {
+     "t": "move",
+     "at": 47,
+     "kind": "wiggle",
+     "targets": [
+      "heli_rotor"
+     ],
+     "pivot": [
+      480,
+      316
+     ],
+     "amp": 6,
+     "hz": 6
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "heli",
+     "c": "ink",
+     "w": 3,
+     "d": "M400,480 L390,510 L570,510 L560,480"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M1327.0,502.0 L1363.0,502.0 L1385.0,610.0 L1305.0,610.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M1517.0,502.0 L1553.0,502.0 L1575.0,610.0 L1495.0,610.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M1230.0,492.0 L1230.0,450.0 L1320.0,440.0 L1400.0,392.0 L1510.0,392.0 L1590.0,436.0 L1655.0,454.0 L1662.0,486.0 L1640.0,494.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M1410.0,402.0 L1500.0,402.0 L1558.0,434.0 L1360.0,434.0 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 47,
+     "id": "r9_b",
+     "x": 1462.0,
+     "y": 408.0,
+     "w": 14.0,
+     "h": 16.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 47,
+     "id": "r9_b",
+     "x": 1496.0,
+     "y": 408.0,
+     "w": 14.0,
+     "h": 16.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1590.0,462.0 Q1610.0,474.0 1630.0,462.0"
+    },
+    {
+     "t": "rect",
+     "at": 47,
+     "id": "r9_b",
+     "x": 1228.0,
+     "y": 428.0,
+     "w": 46.0,
+     "h": 12.0,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 47,
+     "id": "r9_w0",
+     "x": 1276.0,
+     "y": 458.0,
+     "w": 68.0,
+     "h": 68.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M1288.0,492.0 L1332.0,492.0 M1310.0,470.0 L1310.0,514.0"
+    },
+    {
+     "t": "ellipse",
+     "at": 47,
+     "id": "r9_w1",
+     "x": 1536.0,
+     "y": 458.0,
+     "w": 68.0,
+     "h": 68.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 47,
+     "id": "r9_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1548.0,492.0 L1592.0,492.0 M1570.0,470.0 L1570.0,514.0"
+    },
+    {
+     "t": "move",
+     "at": 47,
+     "kind": "wiggle",
+     "targets": [
+      "r9_jet"
+     ],
+     "pivot": [
+      1440,
+      520
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 47,
+     "kind": "bob",
+     "targets": [
+      "r9*"
+     ],
+     "amp": 6.0,
+     "hz": 1.6
+    },
+    {
+     "t": "text",
+     "at": 47,
+     "x": 480,
+     "y": 640,
+     "s": 40,
+     "text": "直升机：一小时",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 47,
+     "x": 1440,
+     "y": 640,
+     "s": 40,
+     "text": "喷口：几秒",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 48,
+     "x": 960,
+     "y": 780,
+     "s": 46,
+     "text": "推力 = 空气 × 速度",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 48,
+     "x": 960,
+     "y": 860,
+     "s": 46,
+     "text": "力气 = 空气 × 速度²",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 49,
+     "x": 960,
+     "y": 960,
+     "s": 38,
+     "text": "少量空气喷得快：费力 · 大量空气推得慢：省力",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 50,
+     "x": 560,
+     "y": 300,
+     "s": 52,
+     "text": "托起同样 2 吨",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 50,
+     "x": 300,
+     "y": 400,
+     "w": 120,
+     "h": 30,
+     "c": "green",
+     "fill": "green"
+    },
+    {
+     "t": "text",
+     "at": 50,
+     "x": 560,
+     "y": 425,
+     "s": 36,
+     "text": "10 米旋翼",
+     "c": "green",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 50,
+     "x": 300,
+     "y": 480,
+     "w": 1200,
+     "h": 30,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "text",
+     "at": 50,
+     "x": 300,
+     "y": 570,
+     "s": 36,
+     "text": "小喷口：约 30 倍功率",
+     "c": "red",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 51,
+     "x": 960,
+     "y": 760,
+     "s": 44,
+     "text": "真正的飞行汽车：都长着螺旋桨",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "line",
+     "at": 51,
+     "id": "pr0",
+     "pts": [
+      [
+       700,
+       860
+      ],
+      [
+       820,
+       860
+      ]
+     ],
+     "c": "blue",
+     "w": 5
+    },
+    {
+     "t": "move",
+     "at": 51,
+     "kind": "wiggle",
+     "targets": [
+      "pr0"
+     ],
+     "pivot": [
+      760,
+      860
+     ],
+     "amp": 10,
+     "hz": 6
+    },
+    {
+     "t": "line",
+     "at": 51,
+     "id": "pr1",
+     "pts": [
+      [
+       900,
+       860
+      ],
+      [
+       1020,
+       860
+      ]
+     ],
+     "c": "blue",
+     "w": 5
+    },
+    {
+     "t": "move",
+     "at": 51,
+     "kind": "wiggle",
+     "targets": [
+      "pr1"
+     ],
+     "pivot": [
+      960,
+      860
+     ],
+     "amp": 10,
+     "hz": 6
+    },
+    {
+     "t": "line",
+     "at": 51,
+     "id": "pr2",
+     "pts": [
+      [
+       1100,
+       860
+      ],
+      [
+       1220,
+       860
+      ]
+     ],
+     "c": "blue",
+     "w": 5
+    },
+    {
+     "t": "move",
+     "at": 51,
+     "kind": "wiggle",
+     "targets": [
+      "pr2"
+     ],
+     "pivot": [
+      1160,
+      860
+     ],
+     "amp": 10,
+     "hz": 6
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 52,
+     "id": "r10_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M645.0,638.0 L645.0,575.0 L780.0,560.0 L900.0,488.0 L1065.0,488.0 L1185.0,554.0 L1282.5,581.0 L1293.0,629.0 L1260.0,641.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 52,
+     "id": "r10_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M915.0,503.0 L1050.0,503.0 L1137.0,551.0 L840.0,551.0 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 52,
+     "id": "r10_b",
+     "x": 993.0,
+     "y": 512.0,
+     "w": 21.0,
+     "h": 24.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 52,
+     "id": "r10_b",
+     "x": 1044.0,
+     "y": 512.0,
+     "w": 21.0,
+     "h": 24.0,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 52,
+     "id": "r10_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1185.0,608.0 Q1215.0,590.0 1245.0,608.0"
+    },
+    {
+     "t": "rect",
+     "at": 52,
+     "id": "r10_b",
+     "x": 642.0,
+     "y": 542.0,
+     "w": 69.0,
+     "h": 18.0,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 52,
+     "id": "r10_w0",
+     "x": 714.0,
+     "y": 587.0,
+     "w": 102.0,
+     "h": 102.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 52,
+     "id": "r10_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M732.0,638.0 L798.0,638.0 M765.0,605.0 L765.0,671.0"
+    },
+    {
+     "t": "ellipse",
+     "at": 52,
+     "id": "r10_w1",
+     "x": 1104.0,
+     "y": 587.0,
+     "w": 102.0,
+     "h": 102.0,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 52,
+     "id": "r10_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1122.0,638.0 L1188.0,638.0 M1155.0,605.0 L1155.0,671.0"
+    },
+    {
+     "t": "move",
+     "at": 52,
+     "kind": "bob",
+     "targets": [
+      "r10*"
+     ],
+     "amp": 9.0,
+     "hz": 1.6
+    },
+    {
+     "t": "rect",
+     "at": 52,
+     "x": 730,
+     "y": 230,
+     "w": 460,
+     "h": 110,
+     "c": "gold"
+    },
+    {
+     "t": "text",
+     "at": 52,
+     "x": 960,
+     "y": 306,
+     "s": 48,
+     "text": "黑科技三：物理没错，是表演",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 53,
+     "id": "r11_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M266.0,580.8 L266.0,522.0 L392.0,508.0 L504.0,440.8 L658.0,440.8 L770.0,502.4 L861.0,527.6 L870.8,572.4 L840.0,583.6 Z"
+    },
+    {
+     "t": "path",
+     "at": 53,
+     "id": "r11_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M518.0,454.8 L644.0,454.8 L725.2,499.6 L448.0,499.6 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 53,
+     "id": "r11_b",
+     "x": 590.8,
+     "y": 463.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 53,
+     "id": "r11_b",
+     "x": 638.4,
+     "y": 463.20000000000005,
+     "w": 19.599999999999998,
+     "h": 22.4,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 53,
+     "id": "r11_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M786.8,538.8 a8,8 0 1,0 22.4,0 a8,8 0 1,0 -22.4,0"
+    },
+    {
+     "t": "rect",
+     "at": 53,
+     "id": "r11_b",
+     "x": 263.20000000000005,
+     "y": 491.20000000000005,
+     "w": 64.39999999999999,
+     "h": 16.799999999999997,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 53,
+     "id": "r11_w0",
+     "x": 330.4,
+     "y": 533.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 53,
+     "id": "r11_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M347.20000000000005,580.8 L408.8,580.8 M378.0,550.0 L378.0,611.6"
+    },
+    {
+     "t": "ellipse",
+     "at": 53,
+     "id": "r11_w1",
+     "x": 694.4,
+     "y": 533.2,
+     "w": 95.19999999999999,
+     "h": 95.19999999999999,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 53,
+     "id": "r11_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M711.2,580.8 L772.8,580.8 M742.0,550.0 L742.0,611.6"
+    },
+    {
+     "t": "ellipse",
+     "at": 53,
+     "x": 588.3,
+     "y": 406.6,
+     "w": 23.400000000000002,
+     "h": 23.400000000000002,
+     "c": "ink",
+     "id": "driver"
+    },
+    {
+     "t": "line",
+     "at": 53,
+     "pts": [
+      [
+       600,
+       430.0
+      ],
+      [
+       600,
+       484.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "driver"
+    },
+    {
+     "t": "line",
+     "at": 53,
+     "pts": [
+      [
+       600,
+       484.0
+      ],
+      [
+       582.0,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "driver"
+    },
+    {
+     "t": "line",
+     "at": 53,
+     "pts": [
+      [
+       600,
+       484.0
+      ],
+      [
+       618.0,
+       520
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "driver"
+    },
+    {
+     "t": "line",
+     "at": 53,
+     "pts": [
+      [
+       575.25,
+       470.5
+      ],
+      [
+       600,
+       443.5
+      ],
+      [
+       624.75,
+       470.5
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "driver"
+    },
+    {
+     "t": "text",
+     "at": 54,
+     "x": 1360,
+     "y": 300,
+     "s": 56,
+     "text": "起步：约 4 g",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 54,
+     "x": 1360,
+     "y": 380,
+     "s": 36,
+     "text": "比过山车最猛的一下还猛",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "move",
+     "at": 55,
+     "kind": "rotate",
+     "targets": [
+      "r11*",
+      "driver"
+     ],
+     "pivot": [
+      560,
+      520
+     ],
+     "to": 180,
+     "dur": 1.0
+    },
+    {
+     "t": "text",
+     "at": 55,
+     "x": 1360,
+     "y": 600,
+     "s": 48,
+     "text": "头朝下：血往头上冲",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 55,
+     "x": 1360,
+     "y": 690,
+     "s": 40,
+     "text": "要穿抗荷服吗？",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 56,
+     "id": "r12_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M224.0,595.2 L224.0,528.0 L368.0,512.0 L496.0,435.2 L672.0,435.2 L800.0,505.6 L904.0,534.4 L915.2,585.6 L880.0,598.4 Z"
+    },
+    {
+     "t": "path",
+     "at": 56,
+     "id": "r12_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M512.0,451.2 L656.0,451.2 L748.8,502.4 L432.0,502.4 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "id": "r12_b",
+     "x": 595.2,
+     "y": 460.79999999999995,
+     "w": 22.400000000000002,
+     "h": 25.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "id": "r12_b",
+     "x": 649.6,
+     "y": 460.79999999999995,
+     "w": 22.400000000000002,
+     "h": 25.6,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 56,
+     "id": "r12_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M800.0,547.2 Q832.0,566.4 864.0,547.2"
+    },
+    {
+     "t": "rect",
+     "at": 56,
+     "id": "r12_b",
+     "x": 220.79999999999995,
+     "y": 492.79999999999995,
+     "w": 73.60000000000001,
+     "h": 19.200000000000003,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "id": "r12_w0",
+     "x": 297.59999999999997,
+     "y": 540.8,
+     "w": 108.80000000000001,
+     "h": 108.80000000000001,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 56,
+     "id": "r12_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M316.79999999999995,595.2 L387.2,595.2 M352.0,560.0 L352.0,630.4"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "id": "r12_w1",
+     "x": 713.6,
+     "y": 540.8,
+     "w": 108.80000000000001,
+     "h": 108.80000000000001,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 56,
+     "id": "r12_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M732.8,595.2 L803.2,595.2 M768.0,560.0 L768.0,630.4"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "x": 300,
+     "y": 500,
+     "w": 80,
+     "h": 50,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "x": 390,
+     "y": 500,
+     "w": 80,
+     "h": 50,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "x": 480,
+     "y": 500,
+     "w": 80,
+     "h": 50,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "x": 570,
+     "y": 500,
+     "w": 80,
+     "h": 50,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "x": 660,
+     "y": 500,
+     "w": 80,
+     "h": 50,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "ellipse",
+     "at": 56,
+     "x": 750,
+     "y": 500,
+     "w": 80,
+     "h": 50,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "text",
+     "at": 56,
+     "x": 560,
+     "y": 860,
+     "s": 40,
+     "text": "每个空隙：碳纤维高压气罐",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 57,
+     "x": 1400,
+     "y": 300,
+     "s": 40,
+     "text": "又轻又结实……",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 57,
+     "x": 1400,
+     "y": 370,
+     "s": 40,
+     "text": "SpaceX 几次出事和它有关",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 58,
+     "x": 1400,
+     "y": 560,
+     "s": 44,
+     "text": "充满 600 升：",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 58,
+     "x": 1400,
+     "y": 650,
+     "s": 60,
+     "text": "20+ 度电",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 58,
+     "x": 1400,
+     "y": 730,
+     "s": 36,
+     "text": "≈ 这辆车跑 100+ km（理想估算）",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M413.1,616.6 L459.9,616.6 L488.5,757.0 L384.5,757.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_jet",
+     "c": "blue",
+     "w": 3,
+     "d": "M660.1,616.6 L706.9,616.6 L735.5,757.0 L631.5,757.0 Z"
+    },
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M287.0,603.6 L287.0,549.0 L404.0,536.0 L508.0,473.6 L651.0,473.6 L755.0,530.8 L839.5,554.2 L848.6,595.8 L820.0,606.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M521.0,486.6 L638.0,486.6 L713.4,528.2 L456.0,528.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "rd_b",
+     "x": 588.6,
+     "y": 494.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "rd_b",
+     "x": 632.8,
+     "y": 494.4,
+     "w": 18.2,
+     "h": 20.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M755.0,564.6 Q781.0,580.2 807.0,564.6"
+    },
+    {
+     "t": "rect",
+     "at": 59,
+     "id": "rd_b",
+     "x": 284.4,
+     "y": 520.4,
+     "w": 59.800000000000004,
+     "h": 15.600000000000001,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "rd_w0",
+     "x": 346.79999999999995,
+     "y": 559.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M362.4,603.6 L419.6,603.6 M391.0,575.0 L391.0,632.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "rd_w1",
+     "x": 684.8,
+     "y": 559.4,
+     "w": 88.4,
+     "h": 88.4,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 59,
+     "id": "rd_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M700.4,603.6 L757.6,603.6 M729.0,575.0 L729.0,632.2"
+    },
+    {
+     "t": "move",
+     "at": 59,
+     "kind": "wiggle",
+     "targets": [
+      "rd_jet"
+     ],
+     "pivot": [
+      560,
+      640
+     ],
+     "amp": 3,
+     "hz": 8
+    },
+    {
+     "t": "move",
+     "at": 59,
+     "kind": "bob",
+     "targets": [
+      "rd*"
+     ],
+     "amp": 7.800000000000001,
+     "hz": 1.6
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 860,
+     "y": 620,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 900,
+     "y": 645,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 940,
+     "y": 670,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 980,
+     "y": 620,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 1020,
+     "y": 645,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 1060,
+     "y": 670,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 1100,
+     "y": 620,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "id": "debris",
+     "x": 1140,
+     "y": 645,
+     "w": 14,
+     "h": 14,
+     "c": "muted",
+     "fill": "muted"
+    },
+    {
+     "t": "move",
+     "at": 59,
+     "kind": "shift",
+     "targets": [
+      "debris"
+     ],
+     "dx": 520,
+     "dy": -60,
+     "dur": 1.6
+    },
+    {
+     "t": "ellipse",
+     "at": 59,
+     "x": 1574.0,
+     "y": 508.0,
+     "w": 52.0,
+     "h": 52.0,
+     "c": "ink",
+     "id": "bystander"
+    },
+    {
+     "t": "line",
+     "at": 59,
+     "pts": [
+      [
+       1600,
+       560.0
+      ],
+      [
+       1600,
+       680.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "bystander"
+    },
+    {
+     "t": "line",
+     "at": 59,
+     "pts": [
+      [
+       1600,
+       680.0
+      ],
+      [
+       1560.0,
+       760
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "bystander"
+    },
+    {
+     "t": "line",
+     "at": 59,
+     "pts": [
+      [
+       1600,
+       680.0
+      ],
+      [
+       1640.0,
+       760
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "bystander"
+    },
+    {
+     "t": "line",
+     "at": 59,
+     "pts": [
+      [
+       1540.0,
+       520.0
+      ],
+      [
+       1600,
+       590.0
+      ],
+      [
+       1660.0,
+       520.0
+      ]
+     ],
+     "c": "ink",
+     "w": 3.4,
+     "id": "bystander"
+    },
+    {
+     "t": "text",
+     "at": 59,
+     "x": 1300,
+     "y": 300,
+     "s": 44,
+     "text": "碎石沙子：几十米",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "rect",
+     "at": 60,
+     "x": 220,
+     "y": 860,
+     "w": 1480,
+     "h": 90,
+     "c": "gold"
+    },
+    {
+     "t": "text",
+     "at": 60,
+     "x": 960,
+     "y": 920,
+     "s": 44,
+     "text": "只能在封闭场地里做",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 61,
+     "c": "ink",
+     "w": 3,
+     "d": "M290,300 L1630,300 Q1660,300 1660,330 L1660,430 Q1660,460 1630,460 L350,460 L300,510 L315,460 L290,460 Q260,460 260,430 L260,330 Q260,300 290,300"
+    },
+    {
+     "t": "text",
+     "at": 61,
+     "x": 960.0,
+     "y": 400.16,
+     "s": 56,
+     "text": "“安全不是主要目标。”",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 61,
+     "c": "ink",
+     "w": 3,
+     "d": "M290,560 L1630,560 Q1660,560 1660,590 L1660,690 Q1660,720 1630,720 L350,720 L300,770 L315,720 L290,720 Q260,720 260,690 L260,590 Q260,560 290,560"
+    },
+    {
+     "t": "text",
+     "at": 61,
+     "x": 960.0,
+     "y": 660.16,
+     "s": 56,
+     "text": "“争取不害死任何人。”",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 62,
+     "x": 960,
+     "y": 940,
+     "s": 40,
+     "text": "（原话，不加评论）",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 63,
+     "x": 960,
+     "y": 180,
+     "s": 60,
+     "text": "那这辆车，到底是什么？",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "icon",
+     "at": 64,
+     "name": "check",
+     "x": 360,
+     "y": 380,
+     "size": 120,
+     "c": "green"
+    },
+    {
+     "t": "text",
+     "at": 64,
+     "x": 460,
+     "y": 400,
+     "s": 44,
+     "text": "吸地：真本事（七十年代就有）",
+     "c": "ink",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "icon",
+     "at": 65,
+     "name": "question",
+     "x": 360,
+     "y": 560,
+     "size": 110,
+     "c": "gold"
+    },
+    {
+     "t": "text",
+     "at": 65,
+     "x": 460,
+     "y": 580,
+     "s": 44,
+     "text": "1 秒破百：说得通，等独立测量",
+     "c": "ink",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "line",
+     "at": 66,
+     "pts": [
+      [
+       310,
+       700
+      ],
+      [
+       410,
+       790
+      ]
+     ],
+     "c": "red",
+     "w": 6
+    },
+    {
+     "t": "line",
+     "at": 66,
+     "pts": [
+      [
+       410,
+       700
+      ],
+      [
+       310,
+       790
+      ]
+     ],
+     "c": "red",
+     "w": 6
+    },
+    {
+     "t": "text",
+     "at": 66,
+     "x": 460,
+     "y": 760,
+     "s": 44,
+     "text": "飞：几秒钟的表演",
+     "c": "ink",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 66,
+     "x": 460,
+     "y": 840,
+     "s": 34,
+     "text": "别指望它带你上班",
+     "c": "muted",
+     "align": "left",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "line",
+     "at": 67,
+     "pts": [
+      [
+       200,
+       560
+      ],
+      [
+       1720,
+       560
+      ]
+     ],
+     "c": "ink",
+     "w": 4
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 248,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 260,
+     "y": 520,
+     "s": 34,
+     "text": "2017",
+     "c": "ink",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 260,
+     "y": 630,
+     "s": 34,
+     "text": "发布",
+     "c": "ink",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 483,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 495,
+     "y": 520,
+     "s": 34,
+     "text": "2020",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 495,
+     "y": 630,
+     "s": 34,
+     "text": "推迟",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 718,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 730,
+     "y": 520,
+     "s": 34,
+     "text": "2021",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 730,
+     "y": 630,
+     "s": 34,
+     "text": "推迟",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 953,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 965,
+     "y": 520,
+     "s": 34,
+     "text": "2023",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 965,
+     "y": 630,
+     "s": 34,
+     "text": "推迟",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 1188,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 1200,
+     "y": 520,
+     "s": 34,
+     "text": "2024",
+     "c": "red",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 1200,
+     "y": 630,
+     "s": 34,
+     "text": "推迟",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 1423,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "blue",
+     "fill": "blue"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 1435,
+     "y": 520,
+     "s": 34,
+     "text": "2026",
+     "c": "blue",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 1435,
+     "y": 630,
+     "s": 34,
+     "text": "再发布",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "ellipse",
+     "at": 67,
+     "x": 1658,
+     "y": 548,
+     "w": 24,
+     "h": 24,
+     "c": "gold",
+     "fill": "gold"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 1670,
+     "y": 520,
+     "s": 34,
+     "text": "2028",
+     "c": "gold",
+     "align": "center",
+     "font": "en"
+    },
+    {
+     "t": "text",
+     "at": 67,
+     "x": 1670,
+     "y": 630,
+     "s": 34,
+     "text": "量产？",
+     "c": "gold",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "path",
+     "at": 68,
+     "c": "ink",
+     "w": 4,
+     "d": "M100,520 L620,520 L720,900 L1200,900 L1300,520 L1820,520"
+    },
+    {
+     "t": "text",
+     "at": 68,
+     "x": 960,
+     "y": 980,
+     "s": 36,
+     "text": "蛇河峡谷",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 68,
+     "x": 960,
+     "y": 200,
+     "s": 44,
+     "text": "马斯克：也许飞越蛇河峡谷",
+     "c": "blue",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 69,
+     "x": 400,
+     "y": 380,
+     "s": 40,
+     "text": "1974 · 火箭摩托",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 69,
+     "id": "chute",
+     "c": "red",
+     "w": 4,
+     "d": "M860,420 Q920,330 980,420 Z M870,420 L920,500 M970,420 L920,500"
+    },
+    {
+     "t": "move",
+     "at": 69,
+     "kind": "shift",
+     "targets": [
+      "chute"
+     ],
+     "dx": 0,
+     "dy": 360,
+     "dur": 3.0
+    },
+    {
+     "t": "text",
+     "at": 69,
+     "x": 1500,
+     "y": 380,
+     "s": 40,
+     "text": "降落伞提前打开……",
+     "c": "muted",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 70,
+     "id": "r13_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M1392.0,485.6 L1392.0,452.0 L1464.0,444.0 L1528.0,405.6 L1616.0,405.6 L1680.0,440.8 L1732.0,455.2 L1737.6,480.8 L1720.0,487.2 Z"
+    },
+    {
+     "t": "path",
+     "at": 70,
+     "id": "r13_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M1536.0,413.6 L1608.0,413.6 L1654.4,439.2 L1496.0,439.2 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 70,
+     "id": "r13_b",
+     "x": 1577.6,
+     "y": 418.4,
+     "w": 11.200000000000001,
+     "h": 12.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 70,
+     "id": "r13_b",
+     "x": 1604.8,
+     "y": 418.4,
+     "w": 11.200000000000001,
+     "h": 12.8,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 70,
+     "id": "r13_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1680.0,469.6 Q1696.0,460.0 1712.0,469.6"
+    },
+    {
+     "t": "rect",
+     "at": 70,
+     "id": "r13_b",
+     "x": 1390.4,
+     "y": 434.4,
+     "w": 36.800000000000004,
+     "h": 9.600000000000001,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 70,
+     "id": "r13_w0",
+     "x": 1428.8,
+     "y": 458.4,
+     "w": 54.400000000000006,
+     "h": 54.400000000000006,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 70,
+     "id": "r13_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M1438.4,485.6 L1473.6,485.6 M1456.0,468.0 L1456.0,503.2"
+    },
+    {
+     "t": "ellipse",
+     "at": 70,
+     "id": "r13_w1",
+     "x": 1636.8,
+     "y": 458.4,
+     "w": 54.400000000000006,
+     "h": 54.400000000000006,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 70,
+     "id": "r13_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1646.4,485.6 L1681.6,485.6 M1664.0,468.0 L1664.0,503.2"
+    },
+    {
+     "t": "move",
+     "at": 70,
+     "kind": "bob",
+     "targets": [
+      "r13*"
+     ],
+     "amp": 4.800000000000001,
+     "hz": 1.6
+    },
+    {
+     "t": "text",
+     "at": 70,
+     "x": 1560,
+     "y": 300,
+     "s": 40,
+     "text": "小 R：真飞过去，再做一期",
+     "c": "green",
+     "align": "center",
+     "font": "zh"
+    }
+   ]
+  },
+  {
+   "elements": [
+    {
+     "t": "text",
+     "at": 71,
+     "x": 960,
+     "y": 200,
+     "s": 56,
+     "text": "友情提示",
+     "c": "red",
+     "align": "center",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 71,
+     "x": 300,
+     "y": 360,
+     "s": 40,
+     "text": "特斯拉的说法：吸力、1 秒破百、600 升",
+     "c": "ink",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 71,
+     "x": 300,
+     "y": 460,
+     "s": 40,
+     "text": "媒体报道：后部推力约 8 万牛",
+     "c": "blue",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 71,
+     "x": 300,
+     "y": 560,
+     "s": 40,
+     "text": "我们的估算：空气多少、飞几秒、要多少电",
+     "c": "gold",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "text",
+     "at": 71,
+     "x": 300,
+     "y": 700,
+     "s": 34,
+     "text": "发布会视频请看特斯拉官方 · 虚拟实验见网页版",
+     "c": "muted",
+     "align": "left",
+     "font": "zh"
+    },
+    {
+     "t": "path",
+     "at": 71,
+     "id": "r14_b",
+     "c": "ink",
+     "w": 3.6,
+     "d": "M1353.0,880.4 L1353.0,851.0 L1416.0,844.0 L1472.0,810.4 L1549.0,810.4 L1605.0,841.2 L1650.5,853.8 L1655.4,876.2 L1640.0,881.8 Z"
+    },
+    {
+     "t": "path",
+     "at": 71,
+     "id": "r14_b",
+     "c": "blue",
+     "w": 3,
+     "d": "M1479.0,817.4 L1542.0,817.4 L1582.6,839.8 L1444.0,839.8 Z"
+    },
+    {
+     "t": "ellipse",
+     "at": 71,
+     "id": "r14_b",
+     "x": 1515.4,
+     "y": 821.6,
+     "w": 9.799999999999999,
+     "h": 11.2,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "ellipse",
+     "at": 71,
+     "id": "r14_b",
+     "x": 1539.2,
+     "y": 821.6,
+     "w": 9.799999999999999,
+     "h": 11.2,
+     "c": "ink",
+     "fill": "ink"
+    },
+    {
+     "t": "path",
+     "at": 71,
+     "id": "r14_b",
+     "c": "ink",
+     "w": 3,
+     "d": "M1605.0,859.4 Q1619.0,867.8 1633.0,859.4"
+    },
+    {
+     "t": "rect",
+     "at": 71,
+     "id": "r14_b",
+     "x": 1351.6,
+     "y": 835.6,
+     "w": 32.199999999999996,
+     "h": 8.399999999999999,
+     "c": "red",
+     "fill": "red"
+    },
+    {
+     "t": "ellipse",
+     "at": 71,
+     "id": "r14_w0",
+     "x": 1385.2,
+     "y": 856.6,
+     "w": 47.599999999999994,
+     "h": 47.599999999999994,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 71,
+     "id": "r14_w0",
+     "c": "ink",
+     "w": 3,
+     "d": "M1393.6,880.4 L1424.4,880.4 M1409.0,865.0 L1409.0,895.8"
+    },
+    {
+     "t": "ellipse",
+     "at": 71,
+     "id": "r14_w1",
+     "x": 1567.2,
+     "y": 856.6,
+     "w": 47.599999999999994,
+     "h": 47.599999999999994,
+     "c": "ink"
+    },
+    {
+     "t": "path",
+     "at": 71,
+     "id": "r14_w1",
+     "c": "ink",
+     "w": 3,
+     "d": "M1575.6,880.4 L1606.4,880.4 M1591.0,865.0 L1591.0,895.8"
+    },
+    {
+     "t": "move",
+     "at": 71,
+     "kind": "bob",
+     "targets": [
+      "r14*"
+     ],
+     "amp": 4.199999999999999,
+     "hz": 1.6
+    }
+   ]
+  }
+ ],
+ "pace": 0.55,
+ "hand": false,
+ "subs": true
+}

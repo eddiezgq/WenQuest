@@ -277,7 +277,7 @@ def schedule(items, boards, segs, duration=0):
         it.pop("weight", None)
     total = round(max(segs[-1]["t1"] + 2.0, duration or 0), 2)
     return {"W": W, "H": H, "boards": boards, "items": items, "cam": cam, "total": total,
-            "captions": [{"t0": s["t0"], "t1": s["t1"], "zh": s["zh"]} for s in segs]}
+            "captions": [{"t0": s["t0"], "t1": s["t1"], "zh": s["zh"], **({"en": s["en"]} if s.get("en") else {})} for s in segs]}
 
 
 def scale_path(d, k, x0, y0):
@@ -623,10 +623,12 @@ def lesson_scene(L, prefix=""):
     return scene, moves
 
 
-def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand_dir=None, audio_url=None, seek_from=None, pen=True):
+def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand_dir=None, audio_url=None, seek_from=None, pen=True,
+         subs=False):
     """The lesson as one web page. audio_url instead of audio_b64 links the narration; seek_from (render pages for the
     frame-by-frame recorder) adds window.SEEK(t) = draw the moment seek_from + t, and window.READY. pen=False: no hand
-    (the drawing appears by itself, as in a sped-up sketch video)."""
+    (the drawing appears by itself, as in a sped-up sketch video). subs=True burns the captions (Chinese, and English
+    under it when the lecture has it) into a render page."""
     rough_js = (HERE / "rough.js").read_text()
     player = (HERE / "player.js").read_text()
     ui = "" if render else (HERE / "ui.html").read_text()
@@ -634,6 +636,15 @@ def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand
     data_js = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     src = audio_url or (f"data:{audio_type};base64,{audio_b64}" if audio_b64 else "")
     audio = "" if render or not src else f'<audio id="aud" preload="auto" src="{_html.escape(src)}"></audio>'
+    # burned-in captions sit in a band under the board (the board shrinks to 85 %), so they never cover the drawing
+    burn = "" if not (render and subs) else ("""<style>#stage{width:85%!important;margin:0 auto!important}
+#rcap{position:fixed;left:50%;bottom:1.1%;transform:translateX(-50%);width:94%;color:#1d2329;text-align:center;display:none;
+font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif}#rcap .z{display:block;font-size:1.85vw;font-weight:500;line-height:1.3}
+#rcap .e{display:block;font-size:1.3vw;line-height:1.28;color:#5f6b76;margin-top:.1em;font-family:"DejaVu Sans","Helvetica",sans-serif}</style>
+<script>(function(){const st=document.body,c=document.createElement('div');c.id='rcap';
+c.innerHTML='<span class="z"></span><span class="e"></span>';st.appendChild(c);const z=c.firstChild,e=c.lastChild,s=WB.seek;
+WB.seek=function(t){s(t);const k=DATA.captions.find(x=>t>=x.t0&&t<=x.t1+0.35);c.style.display=k?'block':'none';
+if(k){z.textContent=k.zh;e.textContent=k.en||'';e.style.display=k.en?'block':'none';}};})();</script>""")
     seek = "" if seek_from is None else (f"<script>window.SEEK=async function(t){{WB.seek({float(seek_from)}+t);await WB.settle();}};"
                                          "window.READY=true;</script>")
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -649,5 +660,5 @@ html,body{{margin:0;background:#fdfcf8;{'overflow:hidden' if render else ''}}}
 {audio}{ui}
 <script>{rough_js}</script><script>{player}</script>
 <script>const DATA={data_js};
-WB.init(document.getElementById('worldwrap'),DATA);if(window.UI)UI(DATA);</script>{seek}
+WB.init(document.getElementById('worldwrap'),DATA);if(window.UI)UI(DATA);</script>{burn}{seek}
 </body></html>"""

@@ -39,6 +39,18 @@ def local_media(src: str):
     return None
 
 
+def srt(d, segs):
+    """字幕.zh.srt / 字幕.en.srt (when the segments have English) for uploading with the video."""
+    def ts(x):
+        ms = int(round(x * 1000))
+        return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+    for lang in ("zh", "en"):
+        if not all(s.get(lang) for s in segs):
+            continue
+        (d / f"字幕.{lang}.srt").write_text("".join(f"{i}\n{ts(s['t0'])} --> {ts(s['t1'] + 0.35)}\n{s[lang]}\n\n"
+                                                    for i, s in enumerate(segs, 1)), encoding="utf-8")
+
+
 def build(lesson_dir, mp4=False):
     d = Path(lesson_dir)
     L = json.loads((d / "lesson.json").read_text())
@@ -51,7 +63,8 @@ def build(lesson_dir, mp4=False):
     b64 = base64.b64encode(web_audio.read_bytes()).decode()
     pen = L.get("hand", True)          # lesson.json "hand": false → no hand
     (d / "白板课.html").write_text(page(data, L["title"], b64, "audio/mpeg", hand_dir=HAND, pen=pen))
-    (d / "_render.html").write_text(page(data, L["title"], render=True, hand_dir=HAND, pen=pen))
+    (d / "_render.html").write_text(page(data, L["title"], render=True, hand_dir=HAND, pen=pen, subs=bool(L.get("subs"))))
+    srt(d, L["segments"])
     print(f"{len(L['boards'])} boards, {len(data['items'])} strokes, {data['total']} s → {d / '白板课.html'}")
     if mp4:
         render_mp4(d, data, audio)
