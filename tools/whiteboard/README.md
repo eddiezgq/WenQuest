@@ -8,9 +8,13 @@
 
 画法：方框、椭圆、箭头用 rough.js（Excalidraw 同款手绘线，MIT）；中文字用霞鹜文楷、英文用 Caveat（都是 OFL 开源字体），转成笔画路径后“先描边再填色”；简笔画图标在 `icons.py`（本项目自己画的线稿）。`player.js` 只按时间决定画面，网页播放和逐帧出视频用同一份代码。
 
-依赖：`tools/vendor/node_modules`（`cd tools/vendor && npm ci --ignore-scripts`）、Python 包 fonttools、brotli、svgpathtools、playwright，ffmpeg。
+依赖：Python 包 fonttools、brotli、playwright，ffmpeg。
 
     python3 tools/whiteboard/wb.py <课目录> [--mp4]
     python3 tools/whiteboard/snap.py <课目录> [秒 …]     # 每张画板画完时的截图，检查排版
 
 样例：`samples/白板讲课/物理学导论/`（Eddie 原视频的录音）。
+
+## 平台上（第 35 轮第 3 步）
+
+核心代码在网关 `services/gateway/app/production/whiteboard/`（编译、AI 写稿排板、声音处理），老师的白板课由 `app/whiteboards.py`（存储、后台生成、出 MP4）和 `app/whiteboard_api.py`（接口）管理；编辑器源码在 `apps/web/wb-editor/`（网页端镜像打包到 `/wb-editor/`）。这里的 `wb.py` 只用于本机做样片。使用说明见 `docs/帮助/白板课使用说明.md`。

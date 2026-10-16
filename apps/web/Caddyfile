@@ -21,8 +21,10 @@
 		@assets path /assets/*
 		header @assets Cache-Control "public, max-age=31536000, immutable"
 		header /index.html Cache-Control "no-cache"
+		# 白板课编辑器 (round 35): its file names do not change between builds
+		header /wb-editor/* Cache-Control "no-cache"
 		# History-mode routes (e.g. /pages/course/course) fall back to the app shell.
-		try_files {path} /index.html
+		try_files {path} {path}index.html /index.html
 		file_server
 	}
 }

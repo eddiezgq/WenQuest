@@ -11,6 +11,7 @@ lesson.json：
 import base64
 import glob
 import hashlib
+import html as _html
 import json
 import math
 import os
@@ -391,24 +392,31 @@ def _arc(p0, rx, ry, rot, large, sweep, p1, n=48):
         da -= 2 * math.pi
     return [(cx + rx * math.cos(a0 + da * k / n) * cp - ry * math.sin(a0 + da * k / n) * sp,
              cy + rx * math.cos(a0 + da * k / n) * sp + ry * math.sin(a0 + da * k / n) * cp) for k in range(n + 1)]
-def excalidraw(L, ex):
+def excalidraw(L, ex, prefix=""):
+    """Expanded lesson elements (from compile_lesson) → an Excalidraw scene (frames = boards). Elements keep their
+    id as customData.wq_id (moves find them by it); a media frame keeps its source as customData.wq_media."""
     els = []
     base = {"angle": 0, "backgroundColor": "transparent", "fillStyle": "hachure", "strokeWidth": 2, "strokeStyle": "solid",
             "roughness": 1, "opacity": 100, "groupIds": [], "frameId": None, "roundness": None, "version": 1, "versionNonce": 1,
             "isDeleted": False, "boundElements": None, "updated": 1, "link": None, "locked": False}
     for bi, b in enumerate(L["boards"]):
-        els.append(dict(base, id=f"frame{bi}", type="frame", x=bi * 2200, y=(bi % 2) * 260, width=W, height=H, seed=seed("f", bi),
+        els.append(dict(base, id=f"{prefix}frame{bi}", type="frame", x=bi * 2200, y=(bi % 2) * 260, width=W, height=H, seed=seed("f", bi),
                         name=(b.get("title") or {}).get("zh", f"画板 {bi + 1}"), strokeColor="#bbb"))
     for n, (bi, ox, oy, e) in enumerate(ex):
-        common = dict(base, id=f"e{n}", seed=seed("e", n), frameId=f"frame{bi}", strokeColor=color(e.get("c")),
-                      customData={"wq_at": e["at"]})
+        cd = {"wq_at": e["at"]}
+        if e.get("id"):
+            cd["wq_id"] = str(e["id"])
+        if e.get("src"):
+            cd["wq_media"] = {k: e[k] for k in ("src", "label", "from", "play", "zoom") if k in e}
+        common = dict(base, id=f"{prefix}e{n}", seed=seed(prefix, "e", n), frameId=f"{prefix}frame{bi}", strokeColor=color(e.get("c")),
+                      customData=cd)
         t = e["t"]
         if t == "text":
             s = e.get("s", 40)
             width = sum(s * (1.0 if ord(ch) > 0x2e80 else 0.55) for ch in e["text"])   # close to Excalidraw's own fonts
             align = e.get("align", "left")
             x = e["x"] - (width / 2 if align == "center" else width if align == "right" else 0)
-            common["customData"] = {"wq_at": e["at"], "wq_ax": e["x"], "wq_x": x, "wq_font": e.get("font", "zh")}
+            common["customData"] = dict(cd, wq_ax=e["x"], wq_x=x, wq_font=e.get("font", "zh"))
             els.append(dict(common, type="text", x=ox + x, y=oy + e["y"] - s, width=width, height=s * 1.25, text=e["text"],
                             originalText=e["text"], fontSize=s, fontFamily=5, textAlign=e.get("align", "left"),
                             verticalAlign="top", containerId=None, lineHeight=1.25, autoResize=True))
@@ -428,13 +436,13 @@ def excalidraw(L, ex):
                 ds = [scale_path(d, k, e["x"] - 100 * k, e["y"] - 100 * k) for d in ICONS[e["name"]]]
             else:
                 ds = [e["d"]]
-            gid = f"g{n}"
+            gid = f"{prefix}g{n}"
             for m, d in enumerate(ds):
                 for pts in sample_path(d):
                     x0, y0 = pts[0]
                     rel = [[p[0] - x0, p[1] - y0] for p in pts]
                     xs, ys = [p[0] for p in rel], [p[1] for p in rel]
-                    els.append(dict(common, id=f"e{n}_{m}_{len(els)}", type="freedraw", x=ox + x0, y=oy + y0, width=max(xs) - min(xs),
+                    els.append(dict(common, id=f"{prefix}e{n}_{m}_{len(els)}", type="freedraw", x=ox + x0, y=oy + y0, width=max(xs) - min(xs),
                                     height=max(ys) - min(ys), points=rel, pressures=[], simulatePressure=True, lastCommittedPoint=None,
                                     groupIds=[gid]))
     return {"type": "excalidraw", "version": 2, "source": "https://learn.wenquestrobotics.com", "elements": els,
@@ -456,8 +464,10 @@ def freedraw_d(pts, x, y):
     return " ".join(d)
 
 
-def compile_scene(scene, segs, duration=0):
-    """Excalidraw scene (frames = boards, customData.wq_at = segment index) → player data."""
+def compile_scene(scene, segs, duration=0, moves=None, resolve_media=None):
+    """Excalidraw scene (frames = boards, customData.wq_at = segment index) → player data.
+    moves: [{frame (frame id), at, kind, targets (wq_id), …}]; a rectangle with customData.wq_media is a media frame,
+    resolve_media(src) says where its lab, animation or video comes from."""
     live = [e for e in scene["elements"] if not e.get("isDeleted")]
     frames = [e for e in live if e["type"] == "frame"]
     if not frames:
@@ -472,6 +482,7 @@ def compile_scene(scene, segs, duration=0):
         return min(range(len(frames)), key=lambda i: (frames[i]["x"] + W / 2 - cx) ** 2 + (frames[i]["y"] + H / 2 - cy) ** 2)
 
     items, at, last_group = [], 0, None
+    media = []
     nseg = len(segs)
     for e in live:
         if e["type"] == "frame":
@@ -490,7 +501,13 @@ def compile_scene(scene, segs, duration=0):
         if bg and bg != "transparent":
             opts.update(fill=bg, fillStyle=e.get("fillStyle") or "hachure", hachureGap=9, fillWeight=1.6)
         t = e["type"]
-        it = {"b": bi, "at": at, "eid": e["id"]}
+        it = {"b": bi, "at": at, "eid": str(cd.get("wq_id") or e["id"])}
+        if t == "rectangle" and isinstance(cd.get("wq_media"), dict):
+            wm = cd["wq_media"]
+            src = (resolve_media or (lambda s_: None))(str(wm.get("src", "")))
+            if src:
+                media.append(dict(src, b=bi, x=x, y=y, w=e["width"], h=e["height"], item=len(items),
+                                  **{k: wm[k] for k in ("from", "play", "zoom") if k in wm}))
         if t in ("rectangle", "ellipse"):
             it.update(k="rough", shape={"type": "rect" if t == "rectangle" else "ellipse", "x": x, "y": y, "w": e["width"], "h": e["height"]},
                       opts=opts, weight=0.75 if "fill" not in opts else 1.3)
@@ -508,7 +525,7 @@ def compile_scene(scene, segs, duration=0):
                 if e.get(end):
                     h = arrow_head([prev, tip], 10 + sw * 3)
                     items.append({"b": bi, "at": at, "k": "rough", "shape": {"type": "line", "pts": [h[0][0], tip, h[1][0]]},
-                                  "opts": dict(opts, roughness=0.6, seed=opts["seed"] + 1), "weight": 0.2})
+                                  "opts": dict(opts, roughness=0.6, seed=opts["seed"] + 1), "weight": 0.2, "eid": it["eid"]})
             continue
         elif t == "text":
             s_ = e.get("fontSize", 36)
@@ -546,7 +563,14 @@ def compile_scene(scene, segs, duration=0):
         items.append(it)
     for it in items:
         it.pop("group", None)
-    return schedule(items, boards, segs, duration)
+    data = schedule(items, boards, segs, duration)
+    mv = []
+    for m in moves or []:
+        if m.get("frame") in fidx:
+            mv.append({**{k: v for k, v in m.items() if k != "frame"}, "b": fidx[m["frame"]],
+                       "at": max(0, min(nseg - 1, int(m.get("at", 0))))})
+    add_moves_and_media(data, mv, media, segs)
+    return data
 
 
 
@@ -575,15 +599,34 @@ def pen_svg(hand_dir=None):
             f'x="{-m["tip_x"] * k:.1f}" y="{-m["tip_y"] * k:.1f}" width="{m["width"] * k:.1f}" height="{m["height"] * k:.1f}"/></g>')
 
 
-def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand_dir=None):
+def lesson_scene(L, prefix=""):
+    """An AI-made lesson (boards of elements) → (Excalidraw scene, moves): the form the platform keeps and edits."""
+    _, ex = compile_lesson(L)
+    scene = excalidraw(L, ex, prefix)
+    moves = []
+    for bi, b in enumerate(L["boards"]):
+        for e in b["elements"]:
+            if e["t"] == "move":
+                moves.append({"frame": f"{prefix}frame{bi}", "at": e["at"], "kind": e.get("kind", "rotate"),
+                              "targets": [str(x) for x in e.get("targets") or []],
+                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until") if k in e}})
+    return scene, moves
+
+
+def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand_dir=None, audio_url=None, seek_from=None):
+    """The lesson as one web page. audio_url instead of audio_b64 links the narration; seek_from (render pages for the
+    frame-by-frame recorder) adds window.SEEK(t) = draw the moment seek_from + t, and window.READY."""
     rough_js = (HERE / "rough.js").read_text()
     player = (HERE / "player.js").read_text()
     ui = "" if render else (HERE / "ui.html").read_text()
     # "</" inside the data (an embedded lab page has </script>) would end the script tag early
     data_js = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    audio = "" if render or not audio_b64 else f'<audio id="aud" preload="auto" src="data:{audio_type};base64,{audio_b64}"></audio>'
+    src = audio_url or (f"data:{audio_type};base64,{audio_b64}" if audio_b64 else "")
+    audio = "" if render or not src else f'<audio id="aud" preload="auto" src="{_html.escape(src)}"></audio>'
+    seek = "" if seek_from is None else (f"<script>window.SEEK=async function(t){{WB.seek({float(seek_from)}+t);await WB.settle();}};"
+                                         "window.READY=true;</script>")
     return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{title}</title><style>
+<title>{_html.escape(str(title))}</title><style>
 html,body{{margin:0;background:#fdfcf8;{'overflow:hidden' if render else ''}}}
 #stage{{position:relative;width:100%;max-width:{'1920px' if render else '1280px'};margin:0 auto;aspect-ratio:16/9;background:#fdfcf8;overflow:hidden}}
 #cv{{position:absolute;inset:0;width:100%;height:100%}}
@@ -595,5 +638,5 @@ html,body{{margin:0;background:#fdfcf8;{'overflow:hidden' if render else ''}}}
 {audio}{ui}
 <script>{rough_js}</script><script>{player}</script>
 <script>const DATA={data_js};
-WB.init(document.getElementById('worldwrap'),DATA);if(window.UI)UI(DATA);</script>
+WB.init(document.getElementById('worldwrap'),DATA);if(window.UI)UI(DATA);</script>{seek}
 </body></html>"""

@@ -65,8 +65,8 @@
       const parts = [].concat(...items.filter((it) => it.eid && m.targets.includes(it.eid) && it.b === m.b).map((it) => it.parts));
       return Object.assign({}, m, { gs, c: c || [0, 0], parts });
     });
-    initMedia();
     pen = document.getElementById('pen');
+    initMedia();
     seek(0);
   }
 
@@ -87,16 +87,27 @@
         el.src = m.url; el.muted = true; el.playsInline = true; el.preload = 'auto';
         el.style.cssText = 'width:100%;height:100%;object-fit:contain;background:#fff';
       } else {
+        // a lab page is opened only shortly before its frame is drawn (it runs all the time once open)
         el = document.createElement('iframe');
-        if (m.html) el.srcdoc = m.html; else el.src = m.url;
-        el.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+        el.setAttribute('sandbox', 'allow-scripts');
         el.style.cssText = 'border:0;width:' + m.w * (m.zoom || 1.6) + 'px;height:' + m.h * (m.zoom || 1.6) + 'px;transform:scale(' + 1 / (m.zoom || 1.6) + ');transform-origin:0 0';
-        if (m.hash) el.addEventListener('load', () => { try { el.contentWindow.location.hash = m.hash; } catch (e) { /* cross-origin */ } });
+        // which lab of the page: the WenQuest lab protocol (a message), so the frame needs no access to this page
+        if (m.hash) el.addEventListener('load', () => { try { el.contentWindow.postMessage({ type: 'wq-lab', lab: m.hash.replace(/^lab-/, '') }, '*'); } catch (e) { /* closed */ } });
       }
       box.appendChild(el);
       layer.appendChild(box);
       return Object.assign({}, m, { box, el });
     });
+    // the hand stays in front of the frames: it moves to a see-through drawing above them
+    if (pen && !document.getElementById('wbpen')) {
+      const top = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      top.id = 'wbpen';
+      top.setAttribute('viewBox', '0 0 ' + D.W + ' ' + D.H);
+      top.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      top.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:hidden';
+      stage.appendChild(top);
+      top.appendChild(pen);
+    }
   }
 
   function placeMedia(t, cam) {
@@ -108,6 +119,11 @@
       m.box.style.width = m.w + 'px'; m.box.style.height = m.h + 'px';
       m.box.style.transform = `translate(${x}px,${y}px) scale(${k})`;
       const on = t >= m.start;
+      if (m.kind !== 'video' && !m.opened && t >= m.start - 3) {
+        m.opened = true;
+        m.loaded = new Promise((ok) => { m.el.addEventListener('load', ok); setTimeout(ok, 8000); });
+        if (m.html) m.el.srcdoc = m.html; else m.el.src = m.url;
+      }
       m.box.style.opacity = on ? Math.min(1, (t - m.start) / 0.4) : 0;
       m.box.style.pointerEvents = on && m.kind !== 'video' ? 'auto' : 'none';
       if (m.kind === 'video' && m.el.readyState >= 1) {
@@ -121,12 +137,13 @@
 
   // frame-by-frame recording waits until every video shows the asked frame
   function settle() {
-    return Promise.all(media.filter((m) => m.kind === 'video').map((m) => new Promise((ok) => {
+    const pages = media.filter((m) => m.loaded).map((m) => m.loaded);
+    return Promise.all(pages.concat(media.filter((m) => m.kind === 'video').map((m) => new Promise((ok) => {
       if (!m.el.seeking && m.el.readyState >= 2) return ok();
       const done = () => { m.el.removeEventListener('seeked', done); m.el.removeEventListener('loadeddata', done); ok(); };
       m.el.addEventListener('seeked', done); m.el.addEventListener('loadeddata', done);
       setTimeout(ok, 3000);
-    })));
+    }))));
   }
 
   function applyMoves(t) {

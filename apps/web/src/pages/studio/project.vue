@@ -430,6 +430,10 @@
                         </template>
                         <LectureStudio v-if="p.voices_on || l.files.some((f) => f.kind === 'lecture')" :pid="p.id" :lesson="l" :busy="!!p.busy"
                                        @act="(fn: any) => act(fn)" />
+                        <!-- 白板讲解 (round 35): this lesson as a whiteboard lecture, made in the background -->
+                        <view class="ghost small" @click="whiteboard(l)">
+                          ✎ {{ l.whiteboard ? t("wb.lessonOpen") : t("wb.lessonBtn") }}
+                        </view>
                         <view v-if="p.labs_on" class="ghost small" :class="{ disabled: !!p.busy }" @click="redoLab(l.id)">
                           ⚗ {{ l.files.some((f) => f.kind === 'lab') ? t("studio.redoLab") : t("studio.makeLab") }}
                         </view>
@@ -519,7 +523,7 @@ import MathContent from "../../components/MathContent.vue";
 import LectureStudio from "../../components/studio/LectureStudio.vue";
 import ReviewOpinion from "../../components/studio/ReviewOpinion.vue";
 import {
-  absolute, api, ApiError, type DesignBook, type Voice, type LibraryItem, type StudioChapter, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
+  absolute, api, ApiError, type DesignBook, type Voice, type LibraryItem, type StudioChapter, type StudioLesson, type StudioFile, type StudioOutline, type StudioProject, type Text, token,
 } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
@@ -613,6 +617,22 @@ async function act(fn: () => Promise<StudioProject>) {
     error.value = e instanceof ApiError ? e.code : "unknown";
     // the alert sits at the top of the page; a button far down the page must not look as if nothing happened
     uni.showToast({ title: errorText(error.value), icon: "none", duration: 4000 });
+  }
+}
+
+async function whiteboard(l: StudioLesson) {
+  if (l.whiteboard) {
+    // #ifdef H5
+    window.location.href = `/wb-editor/?id=${l.whiteboard}`;
+    // #endif
+    return;
+  }
+  try {
+    const w = await api.studioWhiteboard(id.value, l.id);
+    l.whiteboard = w.id;
+    uni.showToast({ title: t("wb.lessonMaking"), icon: "none", duration: 4000 });
+  } catch (e) {
+    uni.showToast({ title: errorText(e instanceof ApiError ? e.code : "unknown"), icon: "none", duration: 4000 });
   }
 }
 

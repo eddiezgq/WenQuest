@@ -1,7 +1,7 @@
 {
   "name": "wenquest-whiteboard-editor",
   "private": true,
-  "description": "白板课编辑器（第 35 轮第 2 步）：Excalidraw + 讲稿分段。npm ci && npm run build → dist/",
+  "description": "白板课编辑器（第 35 轮）：Excalidraw + 讲稿分段。npm ci && npm run build → dist/；网页端镜像打包到 /wb-editor/",
   "scripts": {
     "build": "node build.mjs"
   },

@@ -24,6 +24,7 @@ from pydantic import BaseModel, Field
 from . import accounts
 from . import gpulab
 from . import micro
+from . import whiteboard_api
 from . import catalog_api
 from . import course_pack
 from . import kit_interest
@@ -130,6 +131,7 @@ def create_app() -> FastAPI:
     tasks_api.register(app, sys.modules[__name__])
     gpulab.register(app, sys.modules[__name__])
     micro.register(app, sys.modules[__name__])
+    whiteboard_api.register(app, sys.modules[__name__])
     return app
 
 

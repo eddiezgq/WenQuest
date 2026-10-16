@@ -133,6 +133,8 @@ export interface StudioMessage { id: string; role: "teacher" | "lead" | "system"
 export interface StudioLesson {
   id: string; title: Text; goal: Text; week: number; sections: string[]; status: LessonStatus;
   content: Text; exercises: Text; answers: Text; notes: string; error: string;
+  /** 白板讲解 (round 35): the whiteboard lecture made from this lesson */
+  whiteboard?: string;
   files?: {
     name: string; kind: "animation" | "lecture" | "lab" | "slides" | "guide" | "report" | "plan" | "figure"; teacher_only: boolean; url: string;
     seconds?: number; langs?: ("zh" | "en")[]; source?: "ai" | "teacher"; lecture?: LectureMedia;
@@ -209,6 +211,12 @@ export interface StudioProject {
   zip_url?: string;
   design_book?: DesignBook | null;
   assets?: CourseAsset[];
+}
+/** 白板课 (round 35): a whiteboard lecture of the teacher's */
+export interface WbSummary {
+  id: string; title: Text; source: "topic" | "recording" | "lesson"; state: "making" | "waiting" | "ready" | "failed";
+  job: { label: string; progress: number } | null; error: string; duration: number; segments: number; updated: number;
+  course: { pid: string; lid?: string; title?: string } | null; mp4: boolean;
 }
 export interface Voice { id: string; lang: "zh" | "en"; gender: string; zh: string; en: string; sample: string }
 /** The lines of a lecture video: AI narration per slide, or the recording's subtitles. */
@@ -442,6 +450,36 @@ export const api = {
   studioFilesDone: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/files/done`, {}),
   studioDeleteFile: (id: string, fid: string) => request<StudioProject>("DELETE", `/api/v1/studio/projects/${id}/files/${fid}`),
   studioRedoLab: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lab`, {}),
+  // --- 白板课 (round 35) ---
+  wbList: () => request<{ lessons: WbSummary[]; voice_on: boolean; mp4_on: boolean }>("GET", "/api/v1/whiteboards"),
+  wbCreate: (b: { source: "topic" | "recording"; topic?: string; note?: string; minutes?: number; voice?: string; course_pid?: string; book?: string }) =>
+    request<WbSummary & { play?: string }>("POST", "/api/v1/whiteboards", b),
+  wbGet: (id: string) => request<WbSummary & { play: string; video: string }>("GET", `/api/v1/whiteboards/${id}`),
+  wbDelete: (id: string) => request<{ ok: boolean }>("DELETE", `/api/v1/whiteboards/${id}`),
+  studioWhiteboard: (id: string, lid: string) => request<WbSummary>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/whiteboard`, {}),
+  // Browser-only: the recording for a new whiteboard lesson, in 32 MB pieces
+  async wbUploadRecording(id: string, file: File, progress: (done: number) => void): Promise<WbSummary> {
+    const piece = 32 * 1024 * 1024;
+    const total = Math.max(1, Math.ceil(file.size / piece));
+    const upload = Math.random().toString(36).slice(2, 12).replace(/[^a-z0-9]/g, "x").padEnd(10, "0");
+    let body: any = {};
+    for (let i = 0; i < total; i++) {
+      const q = `kind=recording&upload=${upload}&index=${i}&total=${total}&name=${encodeURIComponent(file.name)}`;
+      let res: Response;
+      try {
+        res = await fetch(`${BASE}/api/v1/whiteboards/${id}/upload?${q}`, {
+          method: "POST", body: file.slice(i * piece, (i + 1) * piece),
+          headers: { Authorization: `Bearer ${token.value}`, "Content-Type": "application/octet-stream" },
+        });
+      } catch {
+        throw new ApiError("network", 0);
+      }
+      body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(body.error || `http_${res.status}`, res.status);
+      progress((i + 1) / total);
+    }
+    return body as WbSummary;
+  },
   studioVoices: () => request<{ available: boolean; voices: Voice[]; default: { zh?: string; en?: string } }>("GET", "/api/v1/studio/voices"),
   studioSetVoices: (id: string, v: { zh?: string; en?: string }) => request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/voices`, v),
   studioLecture: (id: string, lid: string) => request<LectureRows>("GET", `/api/v1/studio/projects/${id}/lessons/${lid}/lecture`),

@@ -82,6 +82,15 @@
       }
     },
     {
+      "path": "pages/whiteboard/whiteboard",
+      "style": {
+        "navigationBarTitleText": "白板课",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/studio/project",
       "style": {
         "navigationBarTitleText": "AI 建课",

@@ -38,6 +38,10 @@
         <text class="gicon">✦</text>
         <text class="glabel">{{ t("create.button") }}</text>
       </view>
+      <view v-if="user && user.can_create_courses" class="gitem" :class="{ on: nav === 'whiteboard' }" @click="go('whiteboard')">
+        <text class="gicon">✎</text>
+        <text class="glabel">{{ t("wb.nav") }}</text>
+      </view>
       <view v-if="cm && cm.member" class="gitem" :class="{ on: nav === 'committee' }" @click="go('committee')">
         <text class="gicon">✓</text>
         <text class="glabel">{{ t("rev.nav") }}</text>
@@ -137,7 +141,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
-  if (["catalog", "admin", "apply", "committee", "textbook"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
+  if (["catalog", "admin", "apply", "committee", "textbook", "whiteboard"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
