@@ -51,8 +51,10 @@
       parts.forEach((p) => { p.a = acc; acc += p.L; p.z = acc; });
       return Object.assign({}, it, { parts, total: acc, ox: D.boards[it.b].ox, oy: D.boards[it.b].oy, g });
     });
+    // a target is an id, or "name*" = every id starting with name
+    const hit = (m, eid) => !!eid && m.targets.some((t) => (t.endsWith('*') ? eid.startsWith(t.slice(0, -1)) : eid === t));
     moves = (D.moves || []).map((m) => {
-      const gs = [].concat(...m.targets.map((id) => groups[m.b + ':' + id] || []));
+      const gs = [].concat(...Object.keys(groups).filter((k) => k.startsWith(m.b + ':') && hit(m, k.slice(String(m.b).length + 1))).map((k) => groups[k]));
       let c = m.pivot;
       if (!c && gs.length) {   // pulse and spin without a pivot: the centre of what moves
         const bb = gs.map((g) => g.getBBox()).filter((b) => b.width || b.height);
@@ -62,8 +64,12 @@
           c = [(x0 + x1) / 2, (y0 + y1) / 2];
         }
       }
-      const parts = [].concat(...items.filter((it) => it.eid && m.targets.includes(it.eid) && it.b === m.b).map((it) => it.parts));
-      return Object.assign({}, m, { gs, c: c || [0, 0], parts });
+      const parts = [].concat(...items.filter((it) => it.b === m.b && hit(m, it.eid)).map((it) => it.parts));
+      // signal: bright dots running along the wires, one after another (a message passed on)
+      const dots = m.kind === 'signal' ? [0, 1, 2].map(() => mk('circle', { r: 11, fill: '#f2b705', stroke: '#c2410c', 'stroke-width': 3,
+        visibility: 'hidden' }, D.boards[m.b].g)) : [];
+      const sparts = items.filter((it) => it.b === m.b && hit(m, it.eid)).map((it) => it.parts[0]).filter(Boolean);   // one stroke per wire
+      return Object.assign({}, m, { gs, c: c || [0, 0], parts, dots, sparts });
     });
     pen = document.getElementById('pen');
     initMedia();
@@ -155,8 +161,21 @@
       if (m.kind === 'rotate') s = `rotate(${(m.to || 0) * e} ${m.c[0]} ${m.c[1]})`;
       else if (m.kind === 'shift') s = `translate(${(m.dx || 0) * e},${(m.dy || 0) * e})`;
       else if (m.kind === 'spin') s = `rotate(${(m.rpm || 30) * 6 * (Math.min(t, m.end || 1e9) - m.start)} ${m.c[0]} ${m.c[1]})`;
+      else if (m.kind === 'wiggle' && t < (m.end || 1e9)) s = `rotate(${(m.amp || 14) * Math.sin(2 * Math.PI * (m.hz || 4) * (t - m.start))} ${m.c[0]} ${m.c[1]})`;
+      else if (m.kind === 'bob' && t < (m.end || 1e9)) s = `translate(0,${-(m.amp || 12) * Math.abs(Math.sin(Math.PI * (m.hz || 1.5) * (t - m.start)))})`;
       else if (m.kind === 'pulse') { const k = 1 + 0.14 * Math.sin(Math.PI * p); s = `translate(${m.c[0]},${m.c[1]}) scale(${k}) translate(${-m.c[0]},${-m.c[1]})`; }
       if (s) for (const g of m.gs) tf.set(g, s + ' ' + (tf.get(g) || ''));
+      if (m.kind === 'signal') {
+        const total = m.sparts.reduce((a, q) => a + q.L, 0), on = t < (m.end || 1e9) && total > 0;
+        m.dots.forEach((dot, i) => {
+          let d = ((t - m.start) * (m.speed || 420) - i * total / 3) % total;
+          if (!on || d < 0) { dot.setAttribute('visibility', 'hidden'); return; }
+          let q = m.sparts[0];
+          for (const r of m.sparts) { if (d <= r.L) { q = r; break; } d -= r.L; }
+          const pt = q.e.getPointAtLength(Math.min(q.L, d));
+          dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); dot.setAttribute('visibility', 'visible');
+        });
+      }
       if (m.kind === 'flow' && t < (m.end || 1e9)) {
         for (const q of m.parts) { q.e.style.strokeDasharray = '18 14'; q.e.style.strokeDashoffset = -(t - m.start) * (m.speed || 70); }
       }

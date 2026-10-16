@@ -100,7 +100,7 @@ ELEMENT = {
     "properties": {
         "t": {"type": "string", "enum": ["box", "text", "arrow", "line", "rect", "ellipse", "icon", "media", "move"]},
         "id": {"type": "string"}, "src": {"type": "string"}, "play": {"type": "number"},
-        "kind": {"type": "string", "enum": ["rotate", "shift", "spin", "flow", "pulse"]},
+        "kind": {"type": "string", "enum": ["rotate", "shift", "spin", "flow", "pulse", "wiggle", "bob", "signal"]},
         "targets": {"type": "array", "items": {"type": "string"}}, "pivot": {"type": "array", "items": {"type": "number"}},
         "to": {"type": "number"}, "dx": {"type": "number"}, "dy": {"type": "number"}, "rpm": {"type": "number"},
         "speed": {"type": "number"}, "dur": {"type": "number"}, "delay": {"type": "number"},
@@ -198,7 +198,7 @@ def clean_element(e: dict, nseg: int, allowed: frozenset = frozenset()) -> dict 
     if isinstance(e.get("id"), (str, int)) and str(e["id"]).strip():
         out["id"] = str(e["id"]).strip()[:24]
     if t == "move":
-        kind = e.get("kind") if e.get("kind") in ("rotate", "shift", "spin", "flow", "pulse") else None
+        kind = e.get("kind") if e.get("kind") in ("rotate", "shift", "spin", "flow", "pulse", "wiggle", "bob", "signal") else None
         targets = [str(x)[:24] for x in e.get("targets") or [] if str(x).strip()]
         if not kind or not targets:
             return None
@@ -212,6 +212,9 @@ def clean_element(e: dict, nseg: int, allowed: frozenset = frozenset()) -> dict 
             out["dx"], out["dy"] = _num(e.get("dx"), 0, -1600, 1600), _num(e.get("dy"), 0, -900, 900)
         if kind == "spin":
             out["rpm"] = _num(e.get("rpm"), 20, 1, 120)
+        if kind in ("wiggle", "bob"):
+            out["amp"] = _num(e.get("amp"), 14 if kind == "wiggle" else 12, 1, 60)
+            out["hz"] = _num(e.get("hz"), 4 if kind == "wiggle" else 1.5, 0.2, 12)
         if kind == "flow":
             out["speed"] = _num(e.get("speed"), 70, 10, 400)
         if e.get("dur") is not None:

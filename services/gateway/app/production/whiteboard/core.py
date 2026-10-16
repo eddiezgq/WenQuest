@@ -144,7 +144,7 @@ def compile_lesson(L, resolve_media=None):
         for n, e in enumerate(els):
             if e["t"] == "move":      # 画的东西活起来：rotate / shift / spin / flow / pulse 编号为 targets 的元素
                 moves.append({"b": bi, "at": e["at"], "kind": e.get("kind", "rotate"), "targets": list(e.get("targets") or []),
-                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until") if k in e}})
+                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until", "amp", "hz") if k in e}})
                 continue
             if e["t"] == "media":     # 虚拟实验、动画、数字工厂视频：先画框，框里再播放
                 src = (resolve_media or (lambda s_: None))(e.get("src", ""))
@@ -195,6 +195,11 @@ def compile_lesson(L, resolve_media=None):
     return data, ex
 
 
+def targeted(eid, targets):
+    """A move's target is an element id, or "name*" = every id that starts with name (the fly* = the fly and its wings)."""
+    return bool(eid) and any(eid.startswith(t[:-1]) if t.endswith("*") else eid == t for t in targets)
+
+
 def add_moves_and_media(data, moves, media, segs):
     """Times for the moves (from their segment) and the media frames (once the frame is drawn)."""
     leave = {}
@@ -205,7 +210,7 @@ def add_moves_and_media(data, moves, media, segs):
     out = []
     for m in moves:
         s = segs[min(m["at"], len(segs) - 1)]
-        drawn = max([it["start"] + it["dur"] for it in data["items"] if it.get("eid") in m["targets"] and it["b"] == m["b"]] or [0])
+        drawn = max([it["start"] + it["dur"] for it in data["items"] if it["b"] == m["b"] and targeted(it.get("eid"), m["targets"])] or [0])
         start = max(s["t0"] + 0.25 + m.pop("delay", 0), drawn + 0.3)   # a thing moves only once it is drawn
         dur = m.pop("dur", max(0.8, min(2.5, s["t1"] - s["t0"])))
         until = m.pop("until", None)
@@ -613,13 +618,14 @@ def lesson_scene(L, prefix=""):
             if e["t"] == "move":
                 moves.append({"frame": f"{prefix}frame{bi}", "at": e["at"], "kind": e.get("kind", "rotate"),
                               "targets": [str(x) for x in e.get("targets") or []],
-                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until") if k in e}})
+                              **{k: e[k] for k in ("pivot", "to", "dx", "dy", "rpm", "speed", "dur", "delay", "until", "amp", "hz") if k in e}})
     return scene, moves
 
 
-def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand_dir=None, audio_url=None, seek_from=None):
+def page(data, title, audio_b64=None, audio_type="audio/mp4", render=False, hand_dir=None, audio_url=None, seek_from=None, pen=True):
     """The lesson as one web page. audio_url instead of audio_b64 links the narration; seek_from (render pages for the
-    frame-by-frame recorder) adds window.SEEK(t) = draw the moment seek_from + t, and window.READY."""
+    frame-by-frame recorder) adds window.SEEK(t) = draw the moment seek_from + t, and window.READY. pen=False: no hand
+    (the drawing appears by itself, as in a sped-up sketch video)."""
     rough_js = (HERE / "rough.js").read_text()
     player = (HERE / "player.js").read_text()
     ui = "" if render else (HERE / "ui.html").read_text()
@@ -638,7 +644,7 @@ html,body{{margin:0;background:#fdfcf8;{'overflow:hidden' if render else ''}}}
 <div id="stage"><svg id="cv" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMid meet">
 <defs><filter id="paper"><feTurbulence baseFrequency="0.9" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0.96 0 0 0 0 0.95 0 0 0 0 0.92 0 0 0 0.07 0"/></filter></defs>
 <rect width="{W}" height="{H}" fill="#fdfcf8"/><rect width="{W}" height="{H}" filter="url(#paper)"/>
-<g id="worldwrap"></g>{pen_svg(hand_dir)}</svg></div>
+<g id="worldwrap"></g>{pen_svg(hand_dir) if pen else '<g id="pen"></g>'}</svg></div>
 {audio}{ui}
 <script>{rough_js}</script><script>{player}</script>
 <script>const DATA={data_js};

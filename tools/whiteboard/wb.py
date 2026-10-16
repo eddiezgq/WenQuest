@@ -49,8 +49,9 @@ def build(lesson_dir, mp4=False):
     web_audio = d / "_web.mp3"   # MP3: every browser plays it (open-source Chromium has no AAC)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(audio), "-vn", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "64k", str(web_audio)], check=True)
     b64 = base64.b64encode(web_audio.read_bytes()).decode()
-    (d / "白板课.html").write_text(page(data, L["title"], b64, "audio/mpeg", hand_dir=HAND))
-    (d / "_render.html").write_text(page(data, L["title"], render=True, hand_dir=HAND))
+    pen = L.get("hand", True)          # lesson.json "hand": false → no hand
+    (d / "白板课.html").write_text(page(data, L["title"], b64, "audio/mpeg", hand_dir=HAND, pen=pen))
+    (d / "_render.html").write_text(page(data, L["title"], render=True, hand_dir=HAND, pen=pen))
     print(f"{len(L['boards'])} boards, {len(data['items'])} strokes, {data['total']} s → {d / '白板课.html'}")
     if mp4:
         render_mp4(d, data, audio)
