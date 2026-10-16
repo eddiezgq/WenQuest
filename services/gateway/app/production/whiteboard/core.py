@@ -211,17 +211,18 @@ def add_moves_and_media(data, moves, media, segs):
     for m in moves:
         s = segs[min(m["at"], len(segs) - 1)]
         drawn = max([it["start"] + it["dur"] for it in data["items"] if it["b"] == m["b"] and targeted(it.get("eid"), m["targets"])] or [0])
-        start = max(s["t0"] + 0.25 + m.pop("delay", 0), drawn + 0.3)   # a thing moves only once it is drawn
+        delay = m.pop("delay", None)
+        start = max(s["t0"] + 0.25 + (delay or 0), drawn + 0.3)   # a thing moves only once it is drawn
         dur = m.pop("dur", max(0.8, min(2.5, s["t1"] - s["t0"])))
         until = m.pop("until", None)
         end = segs[min(until, len(segs) - 1)]["t1"] if isinstance(until, int) else leave.get(m["b"], data["total"])
-        out.append(dict(m, start=round(start, 3), dur=round(dur, 3), end=round(end, 3)))
-    together = {}                            # moves of one segment that change a pose start together
+        out.append(dict(m, start=round(start, 3), dur=round(dur, 3), end=round(end, 3), **({"_own": 1} if delay is not None else {})))
+    together = {}                            # moves of one segment that change a pose start together (unless timed with a delay)
     for m in out:
-        if m["kind"] in ("rotate", "shift"):
+        if m["kind"] in ("rotate", "shift") and not m.get("_own"):
             together[(m["b"], m["at"])] = max(together.get((m["b"], m["at"]), 0), m["start"])
     for m in out:
-        if m["kind"] in ("rotate", "shift"):
+        if m["kind"] in ("rotate", "shift") and not m.pop("_own", None):
             m["start"] = together[(m["b"], m["at"])]
     data["moves"] = out
     for md in media:
