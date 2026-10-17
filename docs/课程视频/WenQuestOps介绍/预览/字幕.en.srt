@@ -1,0 +1,399 @@
+1
+00:00:00,600 --> 00:00:02,697
+I'm Eddie Zhang.
+我是 Eddie Zhang。
+
+2
+00:00:04,297 --> 00:00:15,717
+In the next ten minutes, I'll show you how a company of ten to two hundred people can run orders, stock, purchasing and quality from one record.
+接下来十分钟，我给您看：一家十到两百人的公司，怎样用一份记录管好订单、库存、采购和质量。
+
+3
+00:00:16,117 --> 00:00:18,975
+AI drafts. People decide.
+AI 起草，人来决定。
+
+4
+00:00:19,375 --> 00:00:25,860
+Everything you'll see is a working replica, with a fictional company called Harbor Lane Supply.
+下面看到的都是可以操作的复制品，用的是一家虚构的公司：Harbor Lane Supply。
+
+5
+00:00:27,380 --> 00:00:33,640
+Let's start with a Tuesday. A customer asks about a late order.
+先说一个周二。客户问一张迟到的订单。
+
+6
+00:00:35,240 --> 00:00:50,007
+The facts exist. The order is in the ERP, the shortage is in a spreadsheet, the supplier's delay is in someone's inbox, and the failed inspection is on paper.
+事实都在：订单在 ERP 里，缺料在表格里，供应商延期在某个人的邮箱里，检验不合格记在纸上。
+
+7
+00:00:51,607 --> 00:00:55,695
+Nobody can see the chain. So you spend the morning on the phone.
+可没人看得见这条链。于是一上午都在打电话。
+
+8
+00:00:58,415 --> 00:01:04,107
+Every record lives in its own tool, owned by one person.
+每份记录都在各自的工具里，归一个人管。
+
+9
+00:01:05,707 --> 00:01:10,887
+We don't ask anyone to type things twice. We connect what you already have.
+我们不让任何人重复录入，只把您已有的连起来。
+
+10
+00:01:13,607 --> 00:01:18,815
+Two more pains. Audit week, when evidence is hunted down at the last minute.
+还有两件头疼事。一是审核周，证据临时到处找。
+
+11
+00:01:20,415 --> 00:01:26,886
+And the new AI tools. They are fast, but nobody can check where their answers came from.
+二是新的 AI 工具：快是快，可谁也查不了它的答案从哪来。
+
+12
+00:01:29,606 --> 00:01:38,662
+Here is the whole design. At the bottom, ERPNext, a mature open-source ERP, used as it is.
+整个设计就这样。最底下是 ERPNext，成熟的开源 ERP，原样使用。
+
+13
+00:01:40,262 --> 00:01:46,875
+On top, our operations hub, which reads it, connects it, and checks it.
+上面是我们的运营中枢：读它、连它、查它。
+
+14
+00:01:49,595 --> 00:01:54,335
+One rule runs through everything: AI drafts, people sign.
+有一条规则贯穿始终：AI 起草，人签字。
+
+15
+00:01:55,935 --> 00:02:02,449
+Ask the AI for a report, and it writes from your records, with citations.
+让 AI 写报告，它照您的记录写，并注明出处。
+
+16
+00:02:04,049 --> 00:02:07,659
+Ask it to sign, and it is refused. Every time.
+让它签字？拒绝。每一次都拒绝。
+
+17
+00:02:10,379 --> 00:02:22,630
+First, the base. An ERP is your single book of record: one list of items, customers and suppliers, and every transaction posted once.
+先说底座。ERP 是公司唯一的账本：一份物料、客户、供应商清单，每笔业务只记一次。
+
+18
+00:02:24,230 --> 00:02:27,290
+Ship one order, and watch what moves.
+发一张货，看看什么跟着动。
+
+19
+00:02:30,010 --> 00:02:42,030
+ERPNext already covers the whole company: accounting, stock, buying, selling, manufacturing, projects and more.
+ERPNext 已经覆盖整个公司：会计、库存、采购、销售、生产、项目等等。
+
+20
+00:02:43,630 --> 00:02:50,850
+Accounting stays in ERPNext, where your accountant expects it.
+会计留在 ERPNext 里，会计习惯的地方。
+
+21
+00:02:52,450 --> 00:03:02,590
+Quality is where we add the most: ERPNext has basic inspections, and we add the full quality system on top.
+质量是我们加得最多的：ERPNext 只有基本检验，我们在上面加了完整的质量体系。
+
+22
+00:03:05,310 --> 00:03:08,250
+Every document posts balanced entries.
+每张单据都记一笔平衡的账。
+
+23
+00:03:09,850 --> 00:03:18,230
+Receive the goods, pay the supplier, ship to the customer: stock and cost of goods move together.
+收货、付供应商、发货给客户：库存和销货成本一起动。
+
+24
+00:03:19,830 --> 00:03:28,490
+Invoice and get paid, and the books stay balanced. Your accountant and your warehouse finally read the same numbers.
+开票、收款，账始终平衡。会计和仓库终于看的是同一组数。
+
+25
+00:03:31,210 --> 00:03:33,230
+Stock is a ledger too.
+库存也是一本账。
+
+26
+00:03:34,830 --> 00:03:39,370
+Every receipt and every shipment has a quantity and a value.
+每次收货、每次发货，都有数量和金额。
+
+27
+00:03:40,970 --> 00:03:44,390
+And you can't ship what you don't have.
+没有的货，发不出去。
+
+28
+00:03:47,110 --> 00:04:00,330
+In practice, stock is kept by warehouse, with a quality hold kept apart from what you can sell. Batches and serial numbers are how a recall finds every customer.
+实际用起来，库存按仓库分开，质量冻结的货和能卖的货分开放。批号和序列号，是召回时找到每一位客户的依据。
+
+29
+00:04:01,930 --> 00:04:11,300
+When an item falls below its reorder level, one click drafts a purchase order. It waits for a person.
+物料低于补货点，点一下就起草采购单。它等人来确认。
+
+30
+00:04:14,020 --> 00:04:18,931
+The ERP records. Our hub connects, measures and explains.
+ERP 负责记录。我们的中枢负责连接、度量、解释。
+
+31
+00:04:20,531 --> 00:04:24,471
+Changes become one connected picture of the business,
+业务变动连成一张完整的图，
+
+32
+00:04:26,071 --> 00:04:32,451
+metrics come with published formulas, anomalies come with their causes,
+指标的公式公开，异常附带原因，
+
+33
+00:04:34,051 --> 00:04:38,850
+and the fixes come back as drafts that a person confirms.
+解决办法以草稿回来，由人确认。
+
+34
+00:04:41,570 --> 00:04:46,390
+Every number has a published formula you can check by hand.
+每个数都有公开的公式，可以自己手算核对。
+
+35
+00:04:47,990 --> 00:04:54,998
+Change which orders count, and on-time delivery changes with them.
+改一下计入哪些订单，准时交付率跟着变。
+
+36
+00:04:56,598 --> 00:05:04,098
+And when there is no data, it says unknown. Never zero, never a guess.
+没有数据时，它显示“未知”。不写零，也不猜。
+
+37
+00:05:06,818 --> 00:05:10,318
+This is the morning dashboard. Every tile is clickable.
+这是每天早上的看板。每一格都能点。
+
+38
+00:05:11,918 --> 00:05:20,340
+Late orders, stock-outs, inventory, suppliers, quality: each one opens to the records behind it.
+迟到订单、缺货、库存、供应商、质量，点开就是背后的记录。
+
+39
+00:05:23,060 --> 00:05:24,638
+Back to Tuesday.
+回到那个周二。
+
+40
+00:05:26,238 --> 00:05:29,018
+Click the late order and follow the chain:
+点开迟到的订单，顺着链往下看：
+
+41
+00:05:30,618 --> 00:05:38,387
+the item that's short, the purchase order that arrived late. What used to take a morning takes a minute.
+缺的物料、迟到的采购单。过去要一上午，现在一分钟。
+
+42
+00:05:41,107 --> 00:05:43,167
+The fix comes back as a draft:
+解决办法以草稿的形式回来：
+
+43
+00:05:44,767 --> 00:05:48,391
+a purchase order, or a note to the customer.
+一张采购单，或一封给客户的说明。
+
+44
+00:05:49,991 --> 00:05:56,411
+Nothing reaches ERPNext until a person clicks confirm.
+人不点“确认”，什么也进不了 ERPNext。
+
+45
+00:05:59,131 --> 00:06:02,242
+The assistant sits on every page.
+助手在每一页都在。
+
+46
+00:06:03,842 --> 00:06:12,542
+Ask which orders are late and why. It answers from your records, cites every one, and every run is logged.
+问它哪些订单迟了、为什么。它照您的记录回答，每条都注明出处，每次运行都留记录。
+
+47
+00:06:15,262 --> 00:06:27,685
+And for you, the owner: what you invoiced this week, who owes you, what's overdue and from whom, and what you owe next.
+给老板看的：这周开了多少票，谁欠您钱，谁逾期了，接下来要付多少。
+
+48
+00:06:29,285 --> 00:06:39,430
+It reads ERPNext's own invoices, so these numbers match your accountant's to the cent.
+它读的就是 ERPNext 里的发票，所以和会计的数一分不差。
+
+49
+00:06:40,950 --> 00:06:55,290
+Quality is where most small companies drown. Here, a standard like ISO 9001 or 13485 becomes checks that read your actual records every day.
+质量是多数小公司最吃力的地方。在这里，ISO 9001、13485 这样的标准变成每天读取实际记录的检查。
+
+50
+00:06:56,890 --> 00:07:04,433
+Green means today's records satisfy it. Red names the exact record that doesn't.
+绿色：今天的记录满足要求；红色：直接指出是哪一条不满足。
+
+51
+00:07:07,153 --> 00:07:10,333
+A nonconformance follows its workflow.
+不合格品按流程走。
+
+52
+00:07:11,933 --> 00:07:13,630
+Contain it, sign it.
+先隔离，签字。
+
+53
+00:07:15,230 --> 00:07:17,304
+Propose a disposition.
+提出处置意见。
+
+54
+00:07:18,904 --> 00:07:27,759
+Try to approve your own disposition: refused. Someone else must approve, and the history can only grow.
+想自己批自己的处置？拒绝。必须由另一个人批，记录只增不改。
+
+55
+00:07:30,479 --> 00:07:32,216
+At incoming inspection,
+来料检验时，
+
+56
+00:07:33,816 --> 00:07:43,038
+type a reading out of tolerance, and it turns red at once. The verdict comes from code, not from the AI.
+输入一个超差读数，立刻变红。判定由程序给出，不由 AI 决定。
+
+57
+00:07:45,758 --> 00:07:49,088
+Signed inspections feed the control charts.
+签过字的检验数据进入控制图。
+
+58
+00:07:50,688 --> 00:07:57,548
+When the process shifts, a point turns red before bad parts pile up,
+工序一偏，点就变红，赶在废品堆起来之前，
+
+59
+00:07:59,148 --> 00:08:04,447
+and one click opens a nonconformance report from the signal.
+点一下就从这个信号开出不合格报告。
+
+60
+00:08:07,167 --> 00:08:08,307
+For medical devices,
+医疗器械，
+
+61
+00:08:09,907 --> 00:08:19,087
+scan the label: the device identifier, lot and expiry are read and checked,
+扫一下标签：器械标识、批号、有效期读出来并校验，
+
+62
+00:08:20,687 --> 00:08:22,947
+then traced to every shipment.
+再追到每一次发货。
+
+63
+00:08:25,667 --> 00:08:30,687
+A supplier warns that a lot of boxes may be bad.
+供应商提醒：有一批纸箱可能有问题。
+
+64
+00:08:32,287 --> 00:08:38,359
+Trace it forward: the lots that used it, the deliveries, the customers.
+往下追：用了它的生产批、发出的货、收货的客户。
+
+65
+00:08:39,959 --> 00:08:45,339
+Start a mock recall from the same screen, and record who confirmed.
+在同一个画面发起模拟召回，记下谁确认的。
+
+66
+00:08:48,059 --> 00:08:57,081
+Measuring machines send their files straight in. Each reading lands on the right part and feature, and a person accepts it.
+测量设备的文件直接导入。每个读数落到对应的零件和项目上，由人接收。
+
+67
+00:08:59,801 --> 00:09:04,150
+Machines connect too, each with its own key.
+设备也能接进来，每台有自己的钥匙。
+
+68
+00:09:05,750 --> 00:09:09,650
+A reading from a machine lands in an inbox and waits.
+设备发来的读数先进收件箱，等着。
+
+69
+00:09:11,250 --> 00:09:19,710
+A person accepts it, and it joins the inspection, marked as coming from that machine. A machine never signs.
+人接收后，它才进入检验记录，并标明来自哪台设备。设备永远不签字。
+
+70
+00:09:22,430 --> 00:09:32,970
+And this is where it leads: a factory where the warehouse, the robots, vision inspection and every gauge feed one hub.
+这就是它通向的地方：仓库、机器人、视觉质检、每一件量具，都汇入同一个中枢。
+
+71
+00:09:35,690 --> 00:09:47,651
+At the inspection station, vision reads each part's code, measures it against the drawing, and quarantines the bad ones automatically.
+质检站上，视觉系统读每个零件的码，按图纸测量，不合格的自动隔离。
+
+72
+00:09:50,371 --> 00:10:04,060
+The measuring machine, a five-axis scanner, the roughness tester and every hand gauge report in by themselves. A gauge past its calibration date is refused.
+三坐标、五轴扫描仪、粗糙度仪和每一把手持量具，都自己报数。过了校准期的量具，读数不收。
+
+73
+00:10:06,780 --> 00:10:11,880
+The loop closes with a person approving at the key step.
+闭环里，关键一步由人确认。
+
+74
+00:10:13,480 --> 00:10:18,260
+That's a vision, and every step toward it runs on the same record.
+这是愿景；而通往它的每一步，都跑在同一份记录上。
+
+75
+00:10:19,780 --> 00:10:32,942
+It's yours to run. ERPNext is open source with no per-user licences, the platform runs on a server you control, and your data stays yours.
+平台归您自己运行：ERPNext 是开源的，不按人头收许可费；平台装在您掌控的服务器上，数据归您。
+
+76
+00:10:34,542 --> 00:10:39,814
+We teach your people, and we offer hosted connections when you need them.
+我们教会您的人，需要时提供托管接口服务。
+
+77
+00:10:42,534 --> 00:10:48,975
+Don't switch everything at once. Import your data, and put one module live,
+不用一次全换。先导入数据，上线一个模块，
+
+78
+00:10:50,575 --> 00:10:56,608
+usually incoming inspection or nonconformance. Then grow.
+通常是来料检验或不合格品。再一步步扩。
+
+79
+00:10:59,328 --> 00:11:02,992
+One record. AI drafts. People decide.
+一份记录，AI 起草，人来决定。
+
+80
+00:11:04,592 --> 00:11:12,971
+We're inviting a small number of pilot companies. If that Tuesday sounded familiar, let's talk.
+我们正在邀请少数试点企业。如果那个周二听着耳熟，我们聊聊。

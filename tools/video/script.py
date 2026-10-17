@@ -24,7 +24,7 @@ TEXTBOOK = ROOT / "textbook"
 # 网页版教材（第 23 轮）：一讲 = 课程包一讲（一章），section 写讲号（如 "2"）；程序在 course/calc/chNN.py，
 # 插图在 img/（英文 img/en/），实验与动画页在 src/<语言>/labs/，作业取课程包 assignment
 WEB = {p.name: p for p in sorted((TEXTBOOK / "web-editions").iterdir()) if (p / "course").is_dir()}   # 第 29 轮起：有课程包的网页版教材都可以
-KINDS = {"title", "slide", "anim", "code", "lab", "clip", "homework", "outro", "deck"}
+KINDS = {"title", "slide", "anim", "code", "lab", "clip", "homework", "outro", "deck", "page"}
 LANGS = ("zh", "en")
 PH = re.compile(r"\{\{\s*([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)\s*(?::([^}]*))?\}\}")
 DUAL = re.compile(r"\[([^\[\]|]+)\|([^\[\]]+)\]")
@@ -141,6 +141,8 @@ def load(lecture_dir: str | Path) -> Lecture:
     if not p.exists():
         raise ScriptError(f"没有 {p}")
     raw = yaml.safe_load(p.read_text(encoding="utf-8"))
+    if raw.get("standalone"):            # 第 38 轮：独立视频，画面是外部网页课件（deck_html），不属于哪本教材
+        return load_standalone(d, raw)
     for k in ("book", "section", "title") + (() if raw.get("deck") else ("shots",)):
         if k not in raw:
             raise ScriptError(f"讲稿缺少 {k}")
@@ -171,7 +173,8 @@ def load(lecture_dir: str | Path) -> Lecture:
         if nz != ne:
             raise ScriptError(f"镜头 {sid}：中文 {nz} 个“>”，英文 {ne} 个，应相同")
         need = {"slide": len(body.get("items") or []), "homework": len(body.get("items") or []),
-                "outro": len(body.get("points") or []), "lab": len(body.get("steps") or [])}.get(kind)
+                "outro": len(body.get("points") or []), "lab": len(body.get("steps") or []),
+                "page": len(body.get("steps") or [])}.get(kind)
         if need is not None and nz > need:
             raise ScriptError(f"镜头 {sid}：“>” 有 {nz} 个，多于可显示的 {need} 项")
         for lang in LANGS:
@@ -182,6 +185,44 @@ def load(lecture_dir: str | Path) -> Lecture:
                     raise ScriptError(f"镜头 {sid}：占位符没有填上：{ln.shown[:40]}")
         shots.append(shot)
     return Lecture(dir=d, book=book, section=sec, chapter_no=ch, data=data, shots=shots, values=values)
+
+
+def load_standalone(d: Path, raw: dict) -> Lecture:
+    """独立视频（第 38 轮）：讲稿.yaml 写 standalone: true、title、deck_html（相对讲稿目录的网页课件）、langs（配音语言）、
+    subs（en+zh = 英文配音，字幕英文在上、中文在下）、shots（kind: page，page 页号，steps 与 “>” 一一对应）。
+    双语字幕时 say.zh 只作字幕，与 say.en 逐句对应，“>” 位置相同。"""
+    for k in ("title", "deck_html", "shots"):
+        if k not in raw:
+            raise ScriptError(f"讲稿缺少 {k}")
+    deck = d / raw["deck_html"]
+    if not deck.exists():
+        raise ScriptError(f"找不到网页课件 {deck}")
+    data = {k: v for k, v in raw.items() if k != "shots"}
+    shots, seen = [], set()
+    for i, s in enumerate(raw["shots"]):
+        sid = s.get("id") or f"shot{i + 1}"
+        if sid in seen:
+            raise ScriptError(f"镜头 id 重复：{sid}")
+        seen.add(sid)
+        if s.get("kind") != "page":
+            raise ScriptError(f"镜头 {sid}：独立视频只有 kind: page")
+        say = s.get("say") or {}
+        lines = {}
+        for lang in LANGS:
+            if not say.get(lang):
+                raise ScriptError(f"镜头 {sid}：缺少 say.{lang}")
+            lines[lang] = [split_line(str(x)) for x in say[lang]]
+        if raw.get("subs") == "en+zh":
+            if len(lines["zh"]) != len(lines["en"]) or any(a.step != b.step for a, b in zip(lines["zh"], lines["en"])):
+                raise ScriptError(f"镜头 {sid}：双语字幕要求中英文逐句对应，“>” 位置相同")
+        shot = Shot(id=sid, kind="page", data={k: v for k, v in s.items() if k != "say"}, lines=lines)
+        n = shot.steps("en")
+        if n != shot.steps("zh"):
+            raise ScriptError(f"镜头 {sid}：中文 {shot.steps('zh')} 个“>”，英文 {n} 个，应相同")
+        if n != len(s.get("steps") or []):
+            raise ScriptError(f"镜头 {sid}：“>” 有 {n} 个，steps 有 {len(s.get('steps') or [])} 步，应相同")
+        shots.append(shot)
+    return Lecture(dir=d, book="", section="", chapter_no=0, data=data, shots=shots, values={})
 
 
 ZH_END = re.compile(r"(?<=[。！？])")

@@ -121,7 +121,19 @@ for src in sorted(glob.glob("sample_*.wav")):
             text = fixed
     prompts[lang] = (f"prompt_{lang}.wav", text.strip())
     print(f"提示音 {lang}: {a:.1f}–{b:.1f} s，{text.strip()}", flush=True)
-del asr; torch.cuda.empty_cache()
+if not job.get("check"):
+    del asr; torch.cuda.empty_cache()
+
+
+def heard(path, lang, text):
+    """第 38 轮：用 Whisper 听一遍合成的句子，和讲稿比，0–1（1 = 一字不差）。"""
+    import difflib, re as _re
+    r = asr.transcribe(path, language=lang, condition_on_previous_text=False)
+    norm = (lambda t: list(_re.sub(r"[^\w]", "", t))) if lang == "zh" else (lambda t: list(_re.sub(r"[^a-z0-9]", "", t.lower())))   # 按字母比：E R P Next 与 ERPNext 相同
+    return round(difflib.SequenceMatcher(None, norm(text), norm(r["text"])).ratio(), 3), r["text"].strip()
+
+
+report = []
 json.dump({k: v[1] for k, v in prompts.items()}, open("out/prompts.json", "w", encoding="utf-8"), ensure_ascii=False)
 
 # 2. 合成
@@ -147,14 +159,39 @@ for engine in job["engines"]:
             wav = next(iter(prompts.values()))[0]
             t = ("You are a helpful assistant.<|endofprompt|>" + text) if engine == "cv3" else ("<|en|>" + text)
             gen = cv.inference_cross_lingual(t, wav, stream=False)
-        parts = [o["tts_speech"].squeeze(0).cpu().numpy() for o in gen]
-        a = np.concatenate(parts) if parts else np.zeros(1, np.float32)
-        sf.write(out, a, cv.sample_rate, subtype="PCM_16")
+        def synth():
+            if lang in prompts:
+                return cv.inference_zero_shot(text, ptext, wav, stream=False)
+            return cv.inference_cross_lingual(t, wav, stream=False)
+        best = None
+        for attempt in range(int(job.get("tries", 1))):
+            if attempt:
+                gen = synth()             # 采样有随机性：听不清就重新合成，留最好的一遍
+            parts = [o["tts_speech"].squeeze(0).cpu().numpy() for o in gen]
+            a = np.concatenate(parts) if parts else np.zeros(1, np.float32)
+            if not job.get("check"):
+                best = (1.0, a, "")
+                break
+            sf.write("try.wav", a, cv.sample_rate, subtype="PCM_16")
+            score, got = heard("try.wav", lang, text)
+            if best is None or score > best[0]:
+                best = (score, a, got)
+            if score >= 0.93:
+                break
+        sf.write(out, best[1], cv.sample_rate, subtype="PCM_16")
+        if job.get("check"):
+            report.append({"key": item["key"], "lang": lang, "score": best[0], "tries": attempt + 1, "text": text, "heard": best[2]})
+            if best[0] < 0.85:
+                print(f"！听着不清（{best[0]}，试了 {attempt + 1} 次）：{text[:60]} → {best[2][:60]}", flush=True)
         n_done += 1
         if n_done % 10 == 0 or n_done == total:
             el = _t.time() - t_start
             print(f"{engine}: {n_done}/{total} 句，用时 {el / 60:.1f} 分钟，预计还要 {el / n_done * (total - n_done) / 60:.1f} 分钟", flush=True)
     print(f"{engine}: {len(job['items'])} 句完成", flush=True)
+    if report:
+        json.dump(report, open(f"out/{engine}/check.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        weak = [r for r in report if r["score"] < 0.85]
+        print(f"{engine}: 听写核对 {len(report)} 句，平均 {sum(r['score'] for r in report) / len(report):.3f}，不清 {len(weak)} 句", flush=True)
     del cv; torch.cuda.empty_cache()
 '''
 
@@ -315,12 +352,13 @@ def main():
             items, seen = [], set()
             for d in a.lectures:
                 lec = S.load(d)
-                for lang in ("zh", "en"):
+                for lang in lec.data.get("langs") or ("zh", "en"):      # 独立视频（第 38 轮）只配讲稿写明的语言
                     for j in V.clone_jobs(lec, lang, Path(td) / "cache"):
                         if j["key"] not in seen:
                             seen.add(j["key"])
                             items.append({"lang": lang, **j})
-            job = {"engines": [a.engine], "models": MODELS, "items": items, "reference": reference_texts()}
+            job = {"engines": [a.engine], "models": MODELS, "items": items, "reference": reference_texts(),
+                   "check": True, "tries": 3}      # 第 38 轮：每句合成后用 Whisper 听写核对，听不清最多重合成 3 次
         print(f"{len(job['items'])} 句，引擎 {job['engines']}", flush=True)
         gpu_session(job, work, out)
 
