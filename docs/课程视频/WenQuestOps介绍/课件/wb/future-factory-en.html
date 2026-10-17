@@ -305,6 +305,6 @@ a.addEventListener('timeupdate',()=>{if(a.currentTime>=until){pause();}});
 addEventListener('message',(e)=>{const m=e.data||{};
  if(m.wb==='show'){pause();until=m.t1||1e9;a.currentTime=m.t0||0;WB.seek(a.currentTime);if(m.autoplay)setTimeout(()=>{if(a.paused)pp.click();},250);}
  if(m.wb==='stop')pause();
- if(m.wb==='at'){until=1e9;if(!a.paused)a.pause();WB.seek(m.t);}});
+ if(m.wb==='at'){until=1e9;if(!a.paused)a.pause();for(const id of ['big','bar','cap']){const e=document.getElementById(id);if(e)e.style.display='none';}WB.seek(m.t);}});
 parent.postMessage({wb:'ready'},'*');
 })();</script></body></html>

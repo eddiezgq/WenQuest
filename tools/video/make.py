@@ -32,6 +32,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 FPS = 30
 HEAD, PAUSE, TAIL, LEAD = 0.6, 0.38, 0.9, 0.35       # 秒：镜头开头、句间、镜头结尾；画面比配音提前 LEAD 秒变化
+HOLD = 1.2                                            # 秒：page 镜头里每做一步后多停一会（第 38 轮）
 FONT_ZH = "Noto Sans CJK SC"
 COURSE = {"linalg": ["线性代数", "Linear Algebra"], "sewing": ["缝纫机设计与制造", "Sewing Machine Design and Manufacturing"]}
 VOICE_NOTE = {"clone": ["配音：AI 合成（讲者本人声音）", "Voice: AI-generated from the lecturer's own voice"],
@@ -64,7 +65,7 @@ def timeline(lec, lang, voice):
             if ln.step:
                 steps.append(max(0.2, t - LEAD))
             lines.append({"shown": ln.shown, "wav": str(wav), "start": t, "end": t + d})
-            t += d + PAUSE
+            t += d + PAUSE + (HOLD if s.kind == "page" and ln.step else 0)   # 网页课件：点了什么，留一点时间看结果
         total = t - PAUSE + TAIL
         if s.kind == "title":
             total = max(total, 5.0)
