@@ -25,7 +25,12 @@ S = [
  ("全部合格，亮绿灯放行；有一项超差，推杆把它推进隔离箱。", "All in tolerance: green light, pass. One out: a pusher sends it into the quarantine bin."),
  ("每个测量值都画进控制图。趋势一偏，还没出废品，就先报警。", "Every reading goes onto a control chart. When the trend drifts, it alarms before a single bad part."),
  ("AI 起草不合格报告，但怎么处置，要工程师点头才生效。", "AI drafts the nonconformance report, but the disposition takes effect only when an engineer approves."),
- # 画板 3：数据中枢闭环
+ # 画板 3：测量数据自动采集
+ ("质检站不只有相机。三坐标测量机；三维扫描仪装在五轴上：X、Y、Z 三个直线轴，加上扫描头摆动和转台旋转，联动扫完整个零件；还有粗糙度仪。测完的数据自动传回，不用抄。", "The inspection station is more than a camera. A coordinate measuring machine; a 3D scanner on five axes, X, Y and Z plus a tilting head and a rotary table, moving together to cover the whole part; and a roughness tester. Their results come back automatically. No copying by hand."),
+ ("游标卡尺、千分尺、专用量规，带无线发送：按一下，读数就进记录，对上是哪个零件、哪一项。", "Calipers, micrometers and custom gauges send wirelessly: one press, and the reading lands in the record, tied to the part and the feature."),
+ ("每个读数都记着用的是哪台量具。量具过了校准期，读数不收，提醒送检。", "Every reading records which gauge took it. If that gauge is past its calibration date, the reading is refused and the gauge is flagged for recalibration."),
+ ("所有读数汇成一张表，自动判合格，进控制图，再进数据中枢。", "All readings come together in one table, judged automatically, plotted on control charts, and sent on to the data hub."),
+ # 画板 4：数据中枢闭环
  ("最后看中枢：订单、库存、设备、质量，连成一张数据网。", "Finally, the hub: orders, inventory, machines and quality, in one connected web of data."),
  ("数字孪生把整座工厂实时画在屏幕上，哪里慢、哪里堵，一眼看到。", "A digital twin draws the whole plant live on screen: where it's slow, where it's jammed, at a glance."),
  ("发现问题，AI 给出建议：换刀、降速、补料。", "When something's off, AI suggests a fix: change the tool, slow down, restock."),
@@ -362,9 +367,184 @@ pp = stick(nx + 470, ny + 280, 0.65, a, idp=uid("eng"))
 E += pp + check(a, nx + 470, ny + 40, c="green", d=1.8)
 B.append(E)
 
-# ============================================================== 画板 3：数据中枢闭环
-iso = Iso(1000, 470, 62)
+# ============================================================== 画板 3：测量数据自动采集
 a = 11
+E = title(a, "质检站 · 测量数据自动采集", "Inspection station: every gauge, collected automatically")
+col = uid("col")      # the collector box every device feeds
+kx, ky = 1300, 200
+E += [R(a, kx, ky, 580, 600, c="ink", sw=5, idp=col)]
+E += T(a, kx + 22, ky + 48, 34, "读数自动汇总 Readings", c="ink", align="left")
+E.append(P(a, f"M{kx + 20},{ky + 112} L{kx + 560},{ky + 112}", c="muted", w=2))
+for x_, h_ in ((kx + 24, "设备 Device"), (kx + 230, "项目 Feature"), (kx + 400, "结果 Result")):
+    E += T(a, x_, ky + 96, 22, h_, c="muted", align="left")
+feeds = []
+
+
+def feed(at, x0, y0, d=0.0):
+    fi = uid("feed")
+    feeds.append(fi)
+    return [P(at, f"M{x0},{y0} C{(x0 + kx) / 2},{y0} {(x0 + kx) / 2},{ky + 300} {kx - 6},{ky + 300}", c="#e0882b", w=2.8, idp=fi),
+            flow(at, fi, 80), signal(at, fi, 300)]
+
+
+def row(at, k, dev, feat, res, c_, d):
+    y_ = ky + 160 + 66 * k
+    return (T(at, kx + 24, y_, 26, dev, c="ink", align="left", d=d) + T(at, kx + 230, y_, 26, feat, c="ink", align="left", d=d + 0.15)
+            + T(at, kx + 400, y_, 26, res, c=c_, align="left", d=d + 0.3))
+
+
+# coordinate measuring machine: granite table, bridge, ram with probe (the ram goes up and down)
+iso = Iso(330, 330, 58)
+gr, _ = box(a, iso, 0, 0, 0, 5.0, 3.4, 0.9, c="ink", w=5)
+E += gr
+pt, _ = box(a, iso, 1.8, 1.1, 0.9, 1.4, 1.2, 0.5, c="blue", w=4, shade=False)
+E += pt
+br = uid("bridge")
+E += [P(a, iso.d([(2.6, -0.2, 0.9), (2.6, -0.2, 3.6), (2.6, 3.6, 3.6), (2.6, 3.6, 0.9)], close=False), c="ink", w=6, idp=br),
+      P(a, iso.d([(3.1, -0.2, 0.9), (3.1, -0.2, 3.6), (3.1, 3.6, 3.6), (3.1, 3.6, 0.9)], close=False), c="ink", w=4, idp=br),
+      P(a, iso.d([(2.6, -0.2, 3.6), (3.1, -0.2, 3.6)], close=False) + " " + iso.d([(2.6, 3.6, 3.6), (3.1, 3.6, 3.6)], close=False), c="ink", w=4, idp=br)]
+ram = uid("ram")
+p0, p1 = iso(2.85, 1.7, 3.6), iso(2.85, 1.7, 1.75)
+E += [P(a, f"M{p0[0] - 7},{p0[1]} L{p1[0] - 7},{p1[1]} M{p0[0] + 7},{p0[1]} L{p1[0] + 7},{p1[1]}", c="ink", w=4, idp=ram),
+      O(a, p1[0], p1[1] + 12, 10, c="red", fill="red", idp=ram), {"t": "move", "at": a, "kind": "bob", "targets": [ram], "amp": 22, "hz": 0.7}]
+E += label(a, 300, 640, "三坐标测量机", "CMM", c="ink", s=34, d=0.3)
+E += feed(a, 480, 380)
+E += row(a, 0, "三坐标 CMM", "孔位", "合格 ✓", "green", 0.6)
+# 3D scanner on a five-axis gantry: X (bridge), Y (carriage), Z (ram), A (head tilt), C (rotary table); the laser fan sweeps the part
+iso = Iso(800, 390, 56)
+s_ = iso.s
+st, _ = box(a, iso, 0, 0, 0, 4.4, 3.4, 0.6, c="ink", w=4)
+E += st
+tt, _ = cyl(a, iso, 2.2, 1.7, 0.6, 1.15, 0.22, c="ink", w=4)
+E += tt
+rim = uid("rim")
+E += [P(a, ell(iso, 2.2, 1.7, 0.82, 1.15), c="gold", w=3, idp=rim), signal(a, rim, 120)]
+pt2, _ = box(a, iso, 1.6, 1.2, 0.82, 1.2, 1.0, 0.65, c="blue", w=4, shade=False)
+E += pt2
+frame = " ".join(iso.d([(x_, y_, 0.6), (x_, y_, 3.4)], close=False) for x_, y_ in ((0, 0), (4.4, 0), (4.4, 3.4), (0, 3.4)))
+E += [P(a, frame, c="ink", w=3.4), P(a, iso.d([(0, 0, 3.4), (4.4, 0, 3.4)], close=False) + " " + iso.d([(0, 3.4, 3.4), (4.4, 3.4, 3.4)], close=False), c="ink", w=5)]
+bx0 = 0.8   # the bridge starts near the back end, carriage near the left rail
+E += [P(a, iso.d([(bx0, -0.15, 3.4), (bx0, 3.55, 3.4)], close=False) + " " + iso.d([(bx0 + 0.4, -0.15, 3.4), (bx0 + 0.4, 3.55, 3.4)], close=False),
+        c="gold", w=5, idp="scx_b")]
+cy0 = 0.6
+car, _ = box(a, iso, bx0 - 0.05, cy0, 3.25, 0.5, 0.6, 0.35, c="ink", w=4, idp="scx_y_c", shade=False)
+E += car
+r0, r1 = iso(bx0 + 0.2, cy0 + 0.3, 3.25), iso(bx0 + 0.2, cy0 + 0.3, 2.1)
+E += [P(a, f"M{r0[0] - 5},{r0[1]} L{r1[0] - 5},{r1[1]} M{r0[0] + 5},{r0[1]} L{r1[0] + 5},{r1[1]}", c="ink", w=4, idp="scx_y_z")]
+hd, _ = box(a, iso, bx0 - 0.1, cy0 + 0.05, 1.75, 0.6, 0.5, 0.35, c="red", w=4, idp="scx_y_z_h", shade=False)
+E += hd
+h0 = iso(bx0 + 0.2, cy0 + 0.3, 1.75)
+E += [P(a, f"M{h0[0]},{h0[1]} L{h0[0] - 40},{h0[1] + 70} M{h0[0]},{h0[1]} L{h0[0] + 40},{h0[1] + 70}", c="red", w=2.6, idp="scx_y_z_h"),
+      wig(a, "scx_y_z_h", r1, 18, 0.35)]   # A axis: the head tilts (listed before the shifts so it turns about its own joint)
+c0 = iso(2.2, 1.7, 0.6)
+E += [P(a, f"M{c0[0] - 80},{c0[1] + 50} Q{c0[0]},{c0[1] + 95} {c0[0] + 80},{c0[1] + 50}", c="gold", w=4)]
+E += T(a, c0[0] + 95, c0[1] + 60, 28, "C", c="gold", align="left")
+E += [P(a, f"M{r1[0] - 70},{r1[1] - 10} Q{r1[0] - 90},{r1[1] + 40} {r1[0] - 60},{r1[1] + 80}", c="red", w=4)]
+E += T(a, r1[0] - 120, r1[1] + 40, 28, "A", c="red", align="left")
+# axis arrows
+ox_, oy_ = iso(4.4, 3.4, 0.6)
+E += [{"t": "arrow", "at": a, "pts": [[ox_ + 20, oy_ + 10], [ox_ + 20 + C30 * 60, oy_ + 10 + S30 * 60]], "c": "red", "w": 4, "head": 14},
+      {"t": "arrow", "at": a, "pts": [[ox_ - 10, oy_ + 20], [ox_ - 10 - C30 * 60, oy_ + 20 + S30 * 60]], "c": "green", "w": 4, "head": 14},
+      {"t": "arrow", "at": a, "pts": [[ox_ + 40, oy_ - 10], [ox_ + 40, oy_ - 80]], "c": "blue", "w": 4, "head": 14}]
+E += T(a, ox_ + 20 + C30 * 60 + 20, oy_ + 10 + S30 * 60 + 14, 28, "X", c="red", align="left")
+E += T(a, ox_ - 10 - C30 * 60 - 26, oy_ + 20 + S30 * 60 + 14, 28, "Y", c="green", align="left")
+E += T(a, ox_ + 54, oy_ - 70, 28, "Z", c="blue", align="left")
+# the sweep: X back and forth, Y stepping, Z dipping; a point cloud grows on the part
+dX, dY = 1.6, 1.4
+mx_, my_ = C30 * s_ * dX, S30 * s_ * dX
+nx_, ny_ = -C30 * s_ * dY, S30 * s_ * dY
+t = 1.0
+for k in range(6):
+    sgn = 1 if k % 2 == 0 else -1
+    E.append(sh(a, "scx*", sgn * mx_, sgn * my_, t, 1.4))
+    t += 1.5
+    if k in (0, 2):
+        E.append(sh(a, "scx_y*", nx_ * 0.5, ny_ * 0.5, t, 0.6))
+        t += 0.7
+    if k == 4:
+        E.append(sh(a, "scx_y*", -nx_, -ny_, t, 0.8))
+        t += 0.9
+E.append({"t": "move", "at": a, "kind": "bob", "targets": ["scx_y_z*"], "amp": 14, "hz": 0.5})
+for k in range(12):
+    q = uid("pc")
+    x_, y_ = iso(1.7 + 0.09 * k, 1.3 + 0.08 * ((k * 5) % 11), 1.47)
+    E += [O(a, x_, y_, 4, c="red", fill="red", idp=q), pop(a, q, 1.2 + 0.6 * k)]
+E += label(a, 760, 712, "三维扫描仪 · 五轴联动", "5-axis 3D scanner: X Y Z + A C", c="ink", s=34, d=0.5)
+E += feed(a, 1030, 450)
+E += row(a, 1, "扫描 Scan", "轮廓", "合格 ✓", "green", 0.9)
+# roughness tester: a drive unit with a stylus; the surface profile it traces
+rx, ry = 1040, 680
+E += [R(a, rx, ry, 150, 60, c="ink", sw=4), P(a, f"M{rx + 150},{ry + 45} L{rx + 205},{ry + 70}", c="red", w=4)]
+prof = uid("prof")
+E += [P(a, f"M{rx - 40},{ry + 120} " + " ".join(f"L{rx - 40 + 14 * k},{ry + 120 + (9 if k % 2 else -7) * (1 + (k % 3) * 0.5)}" for k in range(1, 20)),
+        c="blue", w=3, idp=prof), {"t": "move", "at": a, "kind": "grow", "targets": [prof], "axis": "x", "pivot": [rx - 40, ry + 120], "dur": 1.6, "delay": 1.0}]
+E += label(a, rx + 75, ry - 70, "粗糙度仪", "Roughness tester", c="ink", s=32, d=1.0)
+E += feed(a, rx + 210, ry + 30)
+E += row(a, 2, "粗糙度 Ra", "表面", "合格 ✓", "green", 1.4)
+# 12 hand gauges with wireless senders
+a = 12
+
+
+def wireless(at, x, y, d):
+    E_ = []
+    for n in range(3):
+        i_ = uid("wl")
+        r_ = 16 + 14 * n
+        E_ += [P(at, f"M{x - r_ * 0.7},{y - r_ * 0.7} Q{x},{y - r_ * 1.3} {x + r_ * 0.7},{y - r_ * 0.7}", c="blue", w=3.4, idp=i_), pop(at, i_, d + 0.15 * n)]
+    return E_
+
+
+# vernier / digital caliper
+cx_, cy_ = 120, 800
+cal = uid("cal")
+E += [R(a, cx_, cy_, 380, 26, c="ink", sw=4, idp=cal),
+      P(a, f"M{cx_},{cy_} L{cx_},{cy_ + 110} L{cx_ + 26},{cy_ + 110} L{cx_ + 40},{cy_ + 26}", c="ink", w=4, idp=cal)]
+jaw = uid("jaw")
+E += [P(a, f"M{cx_ + 150},{cy_ - 20} L{cx_ + 240},{cy_ - 20} L{cx_ + 240},{cy_ + 50} L{cx_ + 150},{cy_ + 50} Z "
+           f"M{cx_ + 150},{cy_ + 26} L{cx_ + 150},{cy_ + 110} L{cx_ + 128},{cy_ + 110} L{cx_ + 120},{cy_ + 26}", c="ink", w=4, idp=jaw),
+      R(a, cx_ + 160, cy_ - 12, 70, 30, c="blue", sw=3, idp=jaw), sh(a, jaw, -60, 0, 0.3, 1.0)]
+E += wireless(a, cx_ + 230, cy_ - 50, 1.2)
+E += T(a, cx_ + 190, cy_ + 160, 30, "游标卡尺 Caliper", c="ink", d=0.2)
+# micrometer: C frame, anvil, spindle, thimble that turns
+mx, my = 640, 840
+mic = uid("mic")
+E += [P(a, f"M{mx},{my - 60} L{mx},{my - 20} Q{mx},{my + 60} {mx + 90},{my + 60} Q{mx + 170},{my + 60} {mx + 170},{my - 10} L{mx + 170},{my - 30}", c="ink", w=6, idp=mic),
+      R(a, mx - 14, my - 80, 28, 22, c="ink", sw=4, idp=mic), R(a, mx + 160, my - 50, 120, 40, c="ink", sw=4, idp=mic)]
+thim = uid("thim")
+E += [R(a, mx + 280, my - 56, 90, 52, c="ink", sw=4, idp=thim),
+      P(a, " ".join(f"M{mx + 290 + 14 * k},{my - 56} L{mx + 290 + 14 * k},{my - 4}" for k in range(6)), c="ink", w=2.4, idp=thim),
+      {"t": "move", "at": a, "kind": "wiggle", "targets": [thim], "pivot": [mx + 325, my - 30], "amp": 4, "hz": 1.5, "delay": 0.5}]
+E += wireless(a, mx + 400, my - 60, 1.6)
+E += T(a, mx + 180, my + 120, 30, "千分尺 Micrometer", c="ink", d=0.5)
+# custom go / no-go plug gauge
+gx_, gy_ = 1080, 860
+plug = uid("plug")
+E += [R(a, gx_, gy_ - 20, 70, 40, c="green", sw=4, idp=plug), R(a, gx_ + 70, gy_ - 30, 120, 60, c="ink", sw=4, idp=plug),
+      R(a, gx_ + 190, gy_ - 16, 60, 32, c="red", sw=4, idp=plug)]
+E += T(a, gx_ + 35, gy_ + 70, 26, "通 GO", c="green", d=0.8) + T(a, gx_ + 220, gy_ + 70, 26, "止 NO GO", c="red", d=0.9)
+E += T(a, gx_ + 130, gy_ + 120, 30, "专用量规 Custom gauge", c="ink", d=0.8)
+E += feed(a, cx_ + 400, cy_ - 30) + feed(a, mx + 380, my - 70) + feed(a, gx_ + 250, gy_ - 40)
+E += row(a, 3, "千分尺 Mic.", "外径", "合格 ✓", "green", 1.2)
+E += row(a, 4, "量规 Gauge", "孔", "通过 ✓", "green", 1.6)
+# 13 the calibration check: one caliper is past its calibration date → reading refused
+a = 13
+tag = uid("tag")
+E += [R(a, cx_ + 260, cy_ + 50, 170, 80, c="red", sw=4, idp=tag), pop(a, tag, 0.3)]
+E += T(a, cx_ + 345, cy_ + 85, 24, "校准过期", c="red", d=0.4) + T(a, cx_ + 345, cy_ + 115, 20, "Cal. overdue", c="red", d=0.5)
+E += row(a, 5, "卡尺 Caliper", "长度", "拒收 ✗", "red", 0.8)
+E += T(a, kx + 24, ky + 160 + 66 * 5 + 44, 22, "量具过期，读数不收，提醒送检", c="red", align="left", d=1.4)
+# 14 everything judged and sent on to the hub
+a = 14
+up = uid("up")
+E += [{"t": "arrow", "at": a, "id": up, "pts": [[kx + 240, ky + 610], [kx + 240, ky + 700]], "c": "red", "w": 6}, pulse(a, up, 0.4)]
+E += T(a, kx + 240, ky + 750, 32, "→ 控制图 → 数据中枢", c="red", d=0.6)
+E += T(a, kx + 240, ky + 790, 24, "Control charts, then the hub", c="muted", d=0.8)
+E.append(signal(a, feeds, 340))
+B.append(E)
+
+# ============================================================== 画板 4：数据中枢闭环
+iso = Iso(1000, 470, 62)
+a = 15
 E = title(a, "数据中枢 · 闭环", "The data hub: a closed loop")
 layers = (("订单 Orders", "blue"), ("库存 Inventory", "green"), ("设备 Machines", "gold"), ("质量 Quality", "red"))
 for k, (n_, c_) in enumerate(layers):
@@ -386,7 +566,7 @@ for k, (ic, n_, x_, y_) in enumerate((("robot_arm", "机器人 Robots", 330, 290
     E.append(P(a, f"M{x_ + 70},{y_ + 10} L{hubL[0] - 10},{hubL[1]}", c="#e0882b", w=3, idp=si))
 E += [flow(a, spokes, 80), signal(a, spokes, 240)]
 # 12 digital twin screen (right): a tiny isometric plant with a red jam spot
-a = 12
+a = 16
 tx0, ty0 = 1420, 540
 E += [R(a, tx0, ty0, 440, 290, c="blue", sw=5)]
 E += T(a, tx0 + 20, ty0 + 44, 30, "数字孪生 Digital twin", c="blue", align="left")
@@ -403,13 +583,13 @@ E += T(a, tx0 + 330, ty0 + 270, 28, "这里堵了 Jam", c="red", d=0.8)
 twl = uid("twl")
 E += [P(a, f"M{tx0 - 6},{ty0 + 60} L{iso(1.6, -1.6, 0)[0] + 10},{iso(1.6, -1.6, 0)[1] + 10}", c="blue", w=3, idp=twl), flow(a, twl, 60)]
 # 13 AI suggests (card, lower left)
-a = 13
+a = 17
 E += [R(a, 160, 760, 440, 200, c="gold", sw=5)]
 E += T(a, 185, 812, 36, "AI 建议 Suggestions", c="gold", align="left")
 for k, s_ in enumerate(("换刀 Change tool", "降速 Slow down", "补料 Restock")):
     E += T(a, 200, 862 + 40 * k, 30, "· " + s_, c="ink", align="left", d=0.4 + 0.4 * k)
 # 14 the loop: sense → analyse → suggest → approve → act → back (a ring of arrows with running dots)
-a = 14
+a = 18
 ring_ids = []
 cx, cy, rx, ry = 1040, 860, 330, 110
 steps = (("感知", "ink"), ("分析", "ink"), ("建议", "gold"), ("人确认", "red"), ("执行", "ink"))
@@ -425,7 +605,7 @@ for k, (n_, c_) in enumerate(steps):
     E += T(a, x_, y_ + 13, 34, n_, c=c_, d=0.2 + 0.3 * k)
 E += [signal(a, ring_ids, 320)]
 # 15 closing line, inside the loop
-a = 15
+a = 19
 E += T(a, cx, cy + 6, 54, "全集成 · 全自动", c="red", d=0.2)
 E += T(a, cx, cy + 56, 34, "人专心做判断", c="muted", d=0.8)
 B.append(E)

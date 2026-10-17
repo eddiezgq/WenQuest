@@ -54,27 +54,47 @@ AI 起草不合格报告，但怎么处置，要工程师点头才生效。
 AI drafts the nonconformance report, but the disposition takes effect only when an engineer approves.
 
 12
-00:01:03,570 --> 00:01:08,130
+00:01:03,570 --> 00:01:19,040
+质检站不只有相机。三坐标测量机；三维扫描仪装在五轴上：X、Y、Z 三个直线轴，加上扫描头摆动和转台旋转，联动扫完整个零件；还有粗糙度仪。测完的数据自动传回，不用抄。
+The inspection station is more than a camera. A coordinate measuring machine; a 3D scanner on five axes, X, Y and Z plus a tilting head and a rotary table, moving together to cover the whole part; and a roughness tester. Their results come back automatically. No copying by hand.
+
+13
+00:01:19,040 --> 00:01:26,760
+游标卡尺、千分尺、专用量规，带无线发送：按一下，读数就进记录，对上是哪个零件、哪一项。
+Calipers, micrometers and custom gauges send wirelessly: one press, and the reading lands in the record, tied to the part and the feature.
+
+14
+00:01:26,760 --> 00:01:32,710
+每个读数都记着用的是哪台量具。量具过了校准期，读数不收，提醒送检。
+Every reading records which gauge took it. If that gauge is past its calibration date, the reading is refused and the gauge is flagged for recalibration.
+
+15
+00:01:32,710 --> 00:01:38,170
+所有读数汇成一张表，自动判合格，进控制图，再进数据中枢。
+All readings come together in one table, judged automatically, plotted on control charts, and sent on to the data hub.
+
+16
+00:01:38,170 --> 00:01:42,740
 最后看中枢：订单、库存、设备、质量，连成一张数据网。
 Finally, the hub: orders, inventory, machines and quality, in one connected web of data.
 
-13
-00:01:08,130 --> 00:01:13,240
+17
+00:01:42,740 --> 00:01:47,840
 数字孪生把整座工厂实时画在屏幕上，哪里慢、哪里堵，一眼看到。
 A digital twin draws the whole plant live on screen: where it's slow, where it's jammed, at a glance.
 
-14
-00:01:13,240 --> 00:01:16,600
+18
+00:01:47,840 --> 00:01:51,200
 发现问题，AI 给出建议：换刀、降速、补料。
 When something's off, AI suggests a fix: change the tool, slow down, restock.
 
-15
-00:01:16,600 --> 00:01:22,020
+19
+00:01:51,200 --> 00:01:56,620
 人在关键处确认，机器人执行，结果再回到中枢，形成闭环。
 A person approves at the key step, robots carry it out, and the results flow back to the hub. A closed loop.
 
-16
-00:01:22,020 --> 00:01:27,690
+20
+00:01:56,620 --> 00:02:02,300
 全集成，全自动。人从搬运和盯守里解放出来，专心做判断。
 Fully integrated, fully automated. People are freed from hauling and watching, to focus on judgment.
 
