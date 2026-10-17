@@ -242,14 +242,57 @@ class WebLab:
         self.objs["body_cut"].hide_render = True
         self.threads = {}
         self.read = {}
+        self.loop3d = bool(p.get("loop3d"))       # 旋梭钩线：用 hookloop.py 的三维线环代替实验里的平面线环
+        if self.loop3d:
+            import hookloop
+            self.hl = hookloop
+            bpy.ops.mesh.primitive_uv_sphere_add(radius=0.0011, location=(0, 0, 0))
+            self.beak = bpy.context.object
+            self.beak.data.materials.append(mat("motor"))
+            add_group(f"{mid}.threads_static", self.beak)
+            arc = [(-18.2, hookloop.YH + 16.5 * math.cos(math.radians(a)), 16.5 * math.sin(math.radians(a))) for a in range(15, 106, 6)]
+            a1 = math.radians(105)
+            tip = arc[-1]
+            head = [(-18.2, hookloop.YH + 14.8 * math.cos(a1 - 0.12), 14.8 * math.sin(a1 - 0.12)), tip,
+                    (-18.2, hookloop.YH + 18.2 * math.cos(a1 - 0.12), 18.2 * math.sin(a1 - 0.12))]
+            self.arrow = [self.curve("arrow_arc", arc, "motor", 0.0005), self.curve("arrow_head", head, "motor", 0.0005, order=2)]
 
     def set(self, d):
         for key, m in d["parts"].items():
             if key in self.objs and key not in ("body",):
                 self.objs[key].matrix_world = self.offset @ self.C @ Matrix([m[0:4], m[4:8], m[8:12], m[12:16]]).transposed()
-        for name, pts in d["tubes"].items():
+        tubes = dict(d["tubes"])
+        if self.loop3d:
+            up = tubes.get("upper") or []
+            top = (self.hl.XN, 0.4, 0.0)
+            lp = self.hl.loop(d["phi"], d["read"]["phc"], tuple(up[12]), top) if len(up) > 12 else None
+            a = (2 * (d["phi"] - d["read"]["phc"])) % 720
+            if lp:
+                tubes["upper"] = [list(q) for q in up[:12]] + [list(q) for q in lp]
+                tubes["bobbin"] = [list(q) for q in self.hl.bobbin_thread(top)]
+            on = a <= self.hl.CATCH_TO_OFF
+            r = math.radians(a)
+            self.beak.location = self.offset @ self.C @ Vector((self.hl.X_BEAK - 0.6, self.hl.YH + self.hl.R_BEAK * math.cos(r),
+                                                                 self.hl.R_BEAK * math.sin(r)))
+            self.beak.hide_render = not on
+        for name, pts in tubes.items():
             self.tube(name, pts)
-        self.read = dict(d["read"], phi=d["phi"])
+        self.read = dict(d["read"], phi=d["phi"], hookdeg=(2 * (d["phi"] - d["read"]["phc"])) % 360)
+
+    def curve(self, name, pts, color, r, order=3):
+        cu = bpy.data.curves.new(name, "CURVE")
+        cu.dimensions, cu.bevel_depth, cu.bevel_resolution = "3D", r, 2
+        sp = cu.splines.new("NURBS")
+        sp.points.add(len(pts) - 1)
+        for p_, q in zip(sp.points, pts):
+            w = self.offset @ self.C @ Vector(q)
+            p_.co = (w.x, w.y, w.z, 1)
+        sp.use_endpoint_u, sp.order_u = True, order
+        o = bpy.data.objects.new(f"{self.mid}.{name}", cu)
+        o.data.materials.append(mat(color))
+        sc.collection.objects.link(o)
+        add_group(f"{self.mid}.threads_static", o)
+        return o
 
     def tube(self, name, pts):
         o = self.threads.get(name)
