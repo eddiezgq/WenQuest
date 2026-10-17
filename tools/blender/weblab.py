@@ -9,7 +9,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 LABS = {"sewing/proto-lockstitch": (ROOT / "textbook/web-editions/sewing/src", "zh/labs/proto-lockstitch.html")}
-VENDOR = ROOT / "site/vendor"
+VENDOR = ROOT / "site/vendor"                                   # 本地有；仓库里不放（.gitignore），three 取下面这份
+THREE_R128 = ROOT / "tools/site_cases/assets/three.min.js"      # 与 site/vendor/three/r128/three.min.js 相同
 TYPES = {".js": "application/javascript", ".html": "text/html", ".css": "text/css", ".json": "application/json",
          ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml"}
 
@@ -46,6 +47,8 @@ class Lab:
             return route.abort()
         path = unquote(u.path).lstrip("/")
         f = (VENDOR / path[len("vendor/"):]) if path.startswith("vendor/") else (self.root / path)
+        if path == "vendor/three/r128/three.min.js" and not f.is_file():
+            f = THREE_R128
         if not f.is_file():
             return route.fulfill(status=404, body="")
         route.fulfill(path=str(f), content_type=TYPES.get(f.suffix, "application/octet-stream"))
