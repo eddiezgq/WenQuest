@@ -11,25 +11,25 @@ clips:
     selector: "#stage"
     dur: 10
     steps:
-      - {at: 0, press: "[data-m=xray]", js: "document.getElementById('stage').style.background='radial-gradient(120% 90% at 55% 35%,#2a3d5c 0%,#13213a 60%,#08101d 100%)';var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: "[data-m=xray]", js: "document.getElementById('stage').style.background='radial-gradient(120% 90% at 55% 35%,#2a3d5c 0%,#13213a 60%,#08101d 100%)';var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   whole:         # 整机：斜视、透视，主轴慢转，看所有机构挂在一根主轴上
     page: model-overlock
     selector: "#stage"
     dur: 10
     steps:
-      - {at: 0, press: ["[data-m=xray]", "[data-v=iso]"], set: {spd: 30}, js: "var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: ["[data-m=xray]", "[data-v=iso]"], set: {spd: 30}, js: "var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   close:         # 成缝区特写：针尖轨迹，很慢地转，三次交接一直循环
     page: model-overlock
     selector: "#stage"
     dur: 12
     steps:
-      - {at: 0, press: ["[data-m=xray]", "[data-v=close]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: ["[data-m=xray]", "[data-v=close]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   front:         # 正面：上弯针“先竖后横”、下弯针“向左快、向右慢”
     page: model-overlock
     selector: "#stage"
     dur: 12
     steps:
-      - {at: 0, press: ["[data-m=xray]", "[data-v=front]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: ["[data-m=xray]", "[data-v=front]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   rssr:          # 实验 9-2：下弯针 RSSR 三维动画（自动转动）
     page: rssr
     selector: "#cv"
@@ -397,8 +397,8 @@ slides:
           <g font-size="30" font-weight="800"><text x="190" y="80" fill="#f2b705" class="en">R</text><text x="80" y="290" fill="#5ee0d2" class="en">S</text><text x="300" y="520" fill="#5ee0d2" class="en">S</text></g>
         </svg>
     notes:
-      - "下弯针的 RSSR 只靠“连杆长度不变”一条约束，把主轴转角换成摆角。Delta 并联机器人每条支链也是转动副、球铰、球铰，控制器解的是同一类方程。正负两个解是两种装配方式，就像机械臂逆解里的肘上、肘下，程序必须选定一种并保持连续。分母 d 点乘 t 趋于零就是奇异位形，机器人设计同样要让工作区远离奇异。"
-      - "The lower-looper RSSR turns shaft angle into swing angle with one constraint: the link length is constant. Each leg of a Delta parallel robot is also revolute, spherical, spherical, and its controller solves the same kind of equation. The plus and minus solutions are two assembly modes, just like elbow-up and elbow-down in a robot arm's inverse kinematics; the program must pick one and stay on it. When d dot t goes to zero you're at a singularity, and robot designers likewise keep the working range well away from it."
+      - "下弯针的 RSSR 只靠“连杆长度不变”一条约束，把主轴转角换成摆角。Delta 并联机器人每条支链也是转动副、球铰、球铰，控制器解的是同一类方程。位置方程有正负两个解，对应两种装配方式，就像机械臂逆解里的肘上、肘下，程序必须选定一种并保持连续。分母 d 点乘 t 趋于零就是奇异位形，机器人设计同样要让工作区远离奇异。"
+      - "The lower-looper RSSR turns shaft angle into swing angle with one constraint: the link length is constant. Each leg of a Delta parallel robot is also revolute, spherical, spherical, and its controller solves the same kind of equation. The position equation has a plus and a minus solution, the two assembly modes, just like elbow-up and elbow-down in a robot arm's inverse kinematics; the program must pick one and stay on it. When d dot t goes to zero you're at a singularity, and robot designers likewise keep the working range well away from it."
 
   - layout: split
     title: ["生活中：手推布，就是差动送布", "Everyday: pushing the fabric is differential feed"]

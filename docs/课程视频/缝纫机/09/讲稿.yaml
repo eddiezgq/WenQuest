@@ -1,0 +1,154 @@
+# 《缝纫机设计与制造》公开课 第 9 讲：包缝机
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch09.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 9-1（差动送布）、9-2（空间四杆 RSSR）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch09.py 算出（{{ch09.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "9"
+deck: ch09
+skip: [13, 16, 17, 18, 19, 25]   # 摆角公式、第四节（上弯针、两根弯针的不对称、切边）、汗布罗纹算例：控制课程部分约 10 分钟（课件与教材里都有；上弯针在成缝区特写里看得到，算例的数字在回答页全部讲到，不对称留作作业第四题）
+code: [ch09]
+title: ["包缝机：切边、缝合、锁边，一道完成", "The Overlock Machine: Trim, Seam and Finish in One Pass"]
+chapter: ["第三篇 包缝、绷缝与链缝 · 第 9 章", "Part III Overlock, Coverstitch and Chainstitch · Chapter 9"]
+next: ["第 10 讲 绷缝机与链缝机", "Lecture 10 Coverstitch and chainstitch machines"]
+cover_formula: 'D^{*} = 1 + \varepsilon_0/\eta'
+tags:
+  zh: [包缝机, 三线包缝, 弯针, 空间四杆机构, 差动送布, 缝纫机设计]
+  en: [overlock machine, serger, three-thread overlock, looper, RSSR linkage, differential feed, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第九讲，包缝机。
+    - 把一件针织 T 恤翻过来看侧缝，布边上包着一排密密的线圈，这就是包缝机缝的。它没有旋梭，针是斜的，针板下面两根弯针一横一竖地摆，前后还有两只送布牙。今天一样一样看它们为什么这样设计。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 9, the overlock machine.
+    - Turn a knitted T-shirt inside out and look at the side seam. The edge is wrapped in a dense row of thread loops, sewn by an overlock machine. It has no rotary hook, its needle is slanted, two loopers swing under the plate, and there are two feed dogs. Today we'll see why each is designed the way it is.
+
+after:
+  - id: lab91
+    kind: lab
+    lab: difffeed
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.78'; const s = document.createElement('style'); s.textContent = '#k-deff, #k-eps, #k-amp, #verdict, #tasks, #cvCurve { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('cvEdge').closest('section'); p.style.position = 'relative'; const d = document.createElement('div'); d.style.cssText = 'position:absolute;z-index:9;pointer-events:none;left:0;right:0;top:34px;height:96px;backdrop-filter:blur(8px) grayscale(1);-webkit-backdrop-filter:blur(8px) grayscale(1)'; p.appendChild(d); })()"
+        set: {fab: 0, dr: 1.0}
+      - sweep: {dr: [1.0, 1.5]}
+        dur: 9
+      - set: {fab: 1, dr: 1.0}
+        sweep: {dr: [1.0, 1.6]}
+        dur: 7
+      - set: {fab: 3, dr: 1.0}
+        sweep: {dr: [1.0, 0.97]}
+        dur: 6
+      - set: {fab: 0}
+        sweep: {dr: [1.0, 0.7]}
+        dur: 6
+    say:
+      zh:
+        - ">下面是虚拟实验 9-1，差动送布，在问渠平台上可以亲手做。实际差动比、布边应变、波浪高度、判定和任务这里先遮住，留给你自己读。"
+        - ">先选汗布，把差动比从 1 慢慢往上调：橙色差动牙的行程变长，两牙之间布上的竖线变密，下面缝好的布边从波浪变平，再变成细褶。任务一就是找出布边应变落进绿色带的那个差动比。"
+        - ">任务二换成罗纹。罗纹被拉得更长，多走的距离传到布上的比例又更小，再找一次。"
+        - ">任务三换成雪纺，方向反过来：差动比为 1 时布边已经起皱，要往 1 以下调。"
+        - ">最后故意调过头：汗布调小做荷叶边；雪纺调大收碎褶，留给你自己试。每一步记下读数，和模型算的比一比。"
+      en:
+        - ">Now Virtual lab 9-1, differential feed. On the WenQuest platform you can do it yourself. The effective ratio, the edge strain, the wave height, the verdict and the tasks are blurred here. Read them when you do the lab yourself."
+        - ">Start with jersey and raise the ratio slowly from 1. The orange differential dog's stroke grows, the marks on the fabric between the dogs crowd together, and the sewn edge below goes from wavy to flat, then to fine gathers. Task one is to find the ratio that puts the edge strain in the green band."
+        - ">Task two, switch to rib. Rib stretches more, and less of the extra travel reaches the fabric. Find it again."
+        - ">Task three, chiffon, and it goes the other way. At a ratio of 1 the edge already puckers, so you go below 1."
+        - ">Finally, overdo it on purpose: turn jersey down for a lettuce edge. Turning chiffon up for gathers is yours to try. Record the readings at every step and compare them with the model."
+
+  - id: lab92
+    kind: lab
+    lab: rssr
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { const s = document.createElement('style'); s.textContent = '.kpi, #status, #tasks, #calc { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); })()"
+        press: "[data-p=LL]"
+      - sweep: {p-r: [4.36, 6.2]}
+        dur: 8
+      - set: {p-r: 4.36}
+        js: "window.scrollTo(0, 470)"
+    say:
+      zh:
+        - ">虚拟实验 9-2 是空间四杆机构，也在平台上。摆角、传动角这些统计，还有逐步计算的结果，这里同样遮住。"
+        - ">选下弯针预设。任务一：只改曲柄半径，让摆角到 30 度，再和粗估式比一比：摆角约等于 2r 除以 c，c 是摇杆长。看差多少、为什么。"
+        - ">往下是三维视图：灰色曲柄、橙色球头连杆、蓝色摇杆，两根转动轴线既不平行也不相交，可以拖着转一圈。后面几个任务是移动摇杆提高传动角，再逐步加大 r，找到装不上的临界半径。指导书和报告模板在平台上下载。"
+      en:
+        - ">Virtual lab 9-2 is the spatial four-bar, also on the platform. The swing, the transmission angle and the other statistics, and the step-by-step results, are blurred here too."
+        - ">Pick the lower-looper preset. Task one: change only the crank radius until the swing is 30 degrees, then compare it with the rough estimate: swing is about 2r over c, where c is the rocker length. How far off is it, and why?"
+        - ">Further down is the 3D view: grey crank, orange ball-joint link, blue rocker. The two axes neither meet nor are parallel; drag the view round to see it clearly. The later tasks move the rocker to raise the transmission angle, then increase r step by step until the mechanism can't be assembled. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件、三维包缝机和虚拟实验 9-1、9-2，可以自己动手", "Interactive slides, the 3D overlocker and Labs 9-1 and 9-2, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件、三维包缝机和两个虚拟实验都可以自己打开，转动主轴，一针一针看三次交接。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides, the 3D overlock machine and both virtual labs yourself, and turn the shaft to watch the three hand-overs stitch by stitch."
+        - ">You submit the assignment and the lab reports on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 9：成缝区与差动送布的校核", "Assignment 9: checking the stitch zone and differential feed"]
+      points:
+        - ["卫衣布两层 3 mm：入布、出布转角与送布余量", "Two plies of 3 mm fleece: entry, exit and feed margins"]
+        - ["摆角加到 30°：粗估与实验 9-2 精确值，查传动角", "Swing up to 30°: estimate vs Lab 9-2, check the transmission angle"]
+        - ["卫衣布差动比与滑块半径；下弯针为何向左快、向右慢", "Fleece ratio and slide radius; why the lower looper is fast left, slow right"]
+      foot: ["计算过程、实验 9-2 截图和 2–3 页报告，在问渠学习平台提交。", "Working, a Lab 9-2 screenshot and a 2–3 page report, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，改缝两层卫衣布，布厚 3 毫米，求针尖入布、出布的转角，再求送布牙两头的时间余量，和 1.5 毫米时比较，说明风险和对策。"
+        - ">第二题，把下弯针摆角加到 30 度，先用粗估式估算曲柄半径，再用虚拟实验 9-2 求精确值，解释差异，并检查最小传动角是否还不小于 40 度。"
+        - ">第三题，卫衣布求波浪高、平整差动比和差动牙滑块该调到的半径。第四题按教材 9.8 节，分析下弯针为什么设计成向左快、向右慢，好处和代价各是多少。"
+        - 计算过程、实验截图和报告，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One, the machine now sews two plies of fleece, 3 millimetres thick. Find the shaft angles where the needle enters and leaves the fabric and the feed margins at each end, compare them with 1.5 millimetres, and state the risk and a remedy."
+        - ">Two, increase the lower looper's swing to 30 degrees. Estimate the crank radius with the rough formula, find the exact value in Virtual lab 9-2, explain the difference, and check that the minimum transmission angle is still at least 40 degrees."
+        - ">Three, for fleece, find the wave height, the flat-edge ratio and the radius to set the differential slide block to. Four, using Section 9.8 of the book, explain why the lower looper moves fast to the left and slow to the right, with the benefit and the cost in numbers."
+        - Submit your working, the lab screenshot and the report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["汗布 ε₀ = 18%、η = 0.85，D = 1.30 时 ε 是多少？", "Jersey, ε₀ = 18%, η = 0.85: what is ε at D = 1.30?"]
+        - ["传动角 39° 对 49.5°，连杆力约是几倍？", "Transmission angle 39° vs 49.5°: how many times the link force?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：汗布 ε₀ 是 18%、η 是 0.85，把差动比调到 1.30，布边应变是多少？"
+        - ">再比如：上弯针最小传动角 39 度，下弯针 49.5 度，驱动同样的阻力矩，上弯针的连杆力大约是下弯针的几倍？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, jersey has epsilon-zero of 18 percent and eta of 0.85. Set the ratio to 1.30: what is the edge strain?"
+        - ">Or, the upper looper's minimum transmission angle is 39 degrees and the lower looper's is 49.5. For the same resisting torque, roughly how many times larger is the upper looper's link force?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、三维样机、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲绷缝机与链缝机：T 恤下摆那两三道平行的线迹是怎么缝出来的，一批下摆又要备几个线团。我们下一讲见。
+  en:
+    - The slides, the virtual labs, the 3D model, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, coverstitch and chainstitch machines. How are the two or three parallel rows on a T-shirt hem sewn, and how many cones does a batch of hems need? See you then.
