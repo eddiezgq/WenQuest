@@ -25,6 +25,7 @@ from . import accounts
 from . import gpulab
 from . import micro
 from . import whiteboard_api
+from . import video3d_api
 from . import catalog_api
 from . import course_pack
 from . import kit_interest
@@ -90,7 +91,9 @@ async def lifespan(app: FastAPI):
     sweep = asyncio.create_task(_accounts_loop())
     books = asyncio.create_task(textbook_api.media_loop(sys.modules[__name__]))
     gpus = asyncio.create_task(gpulab.reap_loop(sys.modules[__name__]))
+    v3d = asyncio.create_task(video3d_api.loop(sys.modules[__name__]))
     yield
+    v3d.cancel()
     pace.cancel()
     sweep.cancel()
     books.cancel()
@@ -132,6 +135,7 @@ def create_app() -> FastAPI:
     gpulab.register(app, sys.modules[__name__])
     micro.register(app, sys.modules[__name__])
     whiteboard_api.register(app, sys.modules[__name__])
+    video3d_api.register(app, sys.modules[__name__])
     return app
 
 

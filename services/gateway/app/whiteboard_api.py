@@ -80,7 +80,8 @@ def register(app, m) -> None:
         from .textbook_api import media_dir
         st = m._studio()
         return {"ai": m.state.ai, "voice_url": st.voice_url, "labcheck_url": st.labcheck_url, "studio": st,
-                "textbook_dir": m.state.settings.textbook_dir, "textbook_media": lambda book: media_dir(m, book)}
+                "textbook_dir": m.state.settings.textbook_dir, "textbook_media": lambda book: media_dir(m, book),
+                "video3d_list": getattr(m, "video3d_wb_list", None), "video3d_file": getattr(m, "video3d_wb_file", None)}
 
     def wbs() -> Whiteboards:
         root = getattr(m.state, "whiteboards_dir", None) or str(Path(m.state.settings.data_dir) / "whiteboards")

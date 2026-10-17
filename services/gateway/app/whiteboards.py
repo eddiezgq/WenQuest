@@ -439,6 +439,14 @@ class Whiteboards:
         d = self.dir(L["id"]) / "uploads"
         return [{"src": f"upload:{p.name}", "title": p.stem[:80], "kind": "上传的视频"} for p in sorted(d.glob("*")) if p.suffix in VIDEO_EXT]
 
+    def video3d(self, L: dict) -> list[dict]:
+        """老师自己出好的三维仿真视频（第 38 轮）。"""
+        fn = self.env().get("video3d_list")
+        try:
+            return fn(L.get("owner")) if fn else []
+        except Exception:  # noqa: BLE001
+            return []
+
     def book_title(self, book: str) -> str:
         titles = self._catalog.setdefault("titles", {})
         if book not in titles:
@@ -463,12 +471,13 @@ class Whiteboards:
         ranked = sorted(enumerate(books), key=lambda x: (-len(words & bigrams(x[1]["title"])), x[0]))
         course = self.course_name(L)
         return ([dict(m, **{"from": "我上传的"}) for m in self.uploads(L)]
+                + [dict(m, **{"from": "我的三维视频"}) for m in self.video3d(L)]
                 + [dict(m, **{"from": course or "AI 建课"}) for m in self.course_catalog(L)]
                 + [dict(m, **{"from": self.book_title(m["book"])}) for _, m in ranked])
 
     def catalog_for(self, L: dict, limit: int = 24) -> list[dict]:
         """What the AI may put on the boards: the lesson's course first, then the textbook items closest to the topic."""
-        own = self.uploads(L) + self.course_catalog(L)
+        own = self.uploads(L) + self.video3d(L) + self.course_catalog(L)
         c = L.get("course") or {}
         if c.get("lid"):          # a lesson of the AI course builder: its own lab and animation first
             own.sort(key=lambda m: m.get("lid") != c["lid"])
@@ -508,6 +517,10 @@ class Whiteboards:
             _, les = studio.find_lesson(proj, m["lid"])
             p = studio.lesson_dir(proj, les) / m["name"]
             return ("page" if src.endswith("/lab") else "video", p, "") if p.exists() else None
+        if kind == "video3d":
+            fn = env.get("video3d_file")
+            p = fn(L.get("owner"), ref) if fn else None
+            return ("video", p, "") if p else None
         if kind == "upload":
             p = self.dir(L["id"]) / "uploads" / Path(ref).name
             return ("video", p, "") if p.exists() and p.suffix in VIDEO_EXT else None

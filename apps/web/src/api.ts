@@ -297,7 +297,7 @@ export interface Brief {
 }
 
 export class ApiError extends Error {
-  constructor(public code: string, public status: number) {
+  constructor(public code: string, public status: number, public detail: string = "") {
     super(code);
   }
 }
@@ -313,6 +313,7 @@ function load<T>(key: string): T | null {
 
 export const token = ref<string>((() => { try { return uni.getStorageSync(TOKEN_KEY) || ""; } catch { return ""; } })());
 export const user = ref<User | null>(load<User>(USER_KEY));
+export const v3Allowed = ref<boolean | null>(null);   // 三维视频菜单：老师、管理员、开通的企业账号（第 38 轮）
 
 function saveSession(tok: string, u: User | null) {
   token.value = tok;
@@ -360,7 +361,7 @@ export function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", path: stri
           saveSession("", null);
           uni.reLaunch({ url: "/pages/login/login" });
         }
-        reject(new ApiError(code, res.statusCode));
+        reject(new ApiError(code, res.statusCode, (body && typeof body.detail === "string" && body.detail) || ""));
       },
       fail(err: any) {
         const msg = String((err && err.errMsg) || "");
@@ -378,6 +379,23 @@ export interface CoursePack {
   progress: { done: number; total: number; current: string }; updated: number; stale: number;
   batches: { no: number; name: string; lessons: number; published: number; exams: number; exams_published: number; done: boolean }[];
 }
+
+// --- 三维仿真视频 (round 38) ---
+export interface V3Access { allowed: boolean; admin: boolean; teacher: boolean; granted: boolean }
+export interface V3Sample { id: string; title: { zh: string; en: string }; duration: number }
+export interface V3RenderState { state: string; done?: number; total?: number }
+export interface V3Summary { id: string; title: { zh: string; en: string }; updated: number; busy: string; poster: string;
+  renders: Record<string, V3RenderState>; owner: number }
+export interface V3Render extends V3RenderState { stage?: string; error?: string; urls: Record<string, string>; stale: boolean; at?: number }
+export interface V3Video extends V3Summary {
+  prompt: string; chat: { who: "me" | "ai"; text: string; at: number }[]; ai_error: string; version: number; scene: string;
+  stills: { state?: string; urls?: string[]; error?: string; stale: boolean; times?: number[]; seconds?: number };
+  renders: Record<string, any>; render_on: boolean; stills_on: boolean;
+  timeline?: { duration: number; labels: { t: number[]; zh: string; en: string; bottom: boolean }[]; shots: number; style: string };
+}
+export interface V3AdminOverview { grants: { user_id: number; username: string; note: string; at: number }[];
+  runs: { id: string; video: string; user_id: number; quality: string; kind: string; state: string; seconds: number; cost: number;
+          queued_at: number; end_reason: string }[]; render_on: boolean; stills_on: boolean; cost: number; hours: number }
 
 export const api = {
   async login(username: string, password: string): Promise<User> {
@@ -450,6 +468,20 @@ export const api = {
   studioFilesDone: (id: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/files/done`, {}),
   studioDeleteFile: (id: string, fid: string) => request<StudioProject>("DELETE", `/api/v1/studio/projects/${id}/files/${fid}`),
   studioRedoLab: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lab`, {}),
+  // --- 三维仿真视频 (round 38) ---
+  v3Access: () => request<V3Access>("GET", "/api/v1/video3d/access"),
+  v3Index: () => request<{ samples: V3Sample[]; videos: V3Summary[]; render_on: boolean; stills_on: boolean; admin: boolean }>("GET", "/api/v1/video3d"),
+  v3Create: (b: { prompt?: string; sample?: string }) => request<V3Video>("POST", "/api/v1/video3d", b),
+  v3Get: (id: string) => request<V3Video>("GET", `/api/v1/video3d/${id}`),
+  v3Delete: (id: string) => request<{ ok: boolean }>("DELETE", `/api/v1/video3d/${id}`),
+  v3Say: (id: string, text: string) => request<V3Video>("POST", `/api/v1/video3d/${id}/say`, { text }),
+  v3Scene: (id: string, scene: string) => request<V3Video>("PUT", `/api/v1/video3d/${id}/scene`, { scene }),
+  v3Stills: (id: string) => request<V3Video>("POST", `/api/v1/video3d/${id}/stills`, {}),
+  v3Render: (id: string, quality: "draft" | "hd") => request<V3Video>("POST", `/api/v1/video3d/${id}/render`, { quality }),
+  v3Cancel: (id: string, quality: "draft" | "hd") => request<V3Video>("POST", `/api/v1/video3d/${id}/render/${quality}/cancel`, {}),
+  v3Admin: () => request<V3AdminOverview>("GET", "/api/v1/video3d/admin/overview"),
+  v3Grant: (username: string, note: string) => request<{ ok: boolean; username: string; fullname: string }>("POST", "/api/v1/video3d/admin/grants", { username, note }),
+  v3Revoke: (uid: number) => request<{ ok: boolean }>("DELETE", `/api/v1/video3d/admin/grants/${uid}`),
   // --- 白板课 (round 35) ---
   wbList: () => request<{ lessons: WbSummary[]; voice_on: boolean; mp4_on: boolean }>("GET", "/api/v1/whiteboards"),
   wbCreate: (b: { source: "topic" | "recording"; topic?: string; note?: string; minutes?: number; voice?: string; course_pid?: string; book?: string }) =>

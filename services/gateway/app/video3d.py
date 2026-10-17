@@ -37,7 +37,7 @@ COLORS = {"body", "joint", "accent", "part", "table", "belt", "frame", "floor", 
           "feed", "steel", "shell", "wood", "thread", "bobbin", "dark", "chrome"}
 MAX_SECONDS = 120
 MAX_SCENE = 40_000
-LIVE = ("queued", "starting", "rendering", "fetching")
+LIVE = ("queued", "starting", "rendering", "stopping")
 QUALITY = {"draft": "小样", "hd": "高清"}
 
 
@@ -465,7 +465,8 @@ class Store:
             create table if not exists grant_(user_id integer primary key, username text, note text, by integer, at integer);
             create table if not exists run(id text primary key, video text, user_id integer, quality text, provider text,
                 kind text, region text, pid text, state text, price_hour real, queued_at integer, launched_at integer,
-                ended_at integer, end_reason text, cost real, seconds integer, msg text);
+                ended_at integer, end_reason text, cost real, seconds integer, msg text, url text, token text, final text,
+                errors integer default 0);
             """)
 
     def _con(self) -> sqlite3.Connection:
@@ -596,3 +597,264 @@ camera:
 labels:
   - {t: [0, 12], zh: 六轴机械臂, en: Six-axis arm}
 """
+
+
+# ---------------------------------------------------------------- 服务
+
+OUT_NAMES = {"draft": {"video_小样.mp4": "draft.mp4"}, "hd": {"video.mp4": "hd.mp4", "video.webm": "hd.webm"}}
+
+
+class Service:
+    def __init__(self, root: Path, ai, blender: Blender, provider, *, max_machines: int = 2, max_hours: float = 3.0,
+                 wait_minutes: int = 60):
+        self.store = Store(root)
+        self.ai, self.blender, self.provider = ai, blender, provider
+        self.max_machines, self.max_hours, self.wait = max_machines, max_hours, wait_minutes
+        self.tick_lock = asyncio.Lock()
+        self.tasks: set[asyncio.Task] = set()
+
+    @property
+    def render_on(self) -> bool:
+        return self.provider is not None
+
+    def spawn(self, coro) -> None:
+        t = asyncio.create_task(coro)
+        self.tasks.add(t)
+        t.add_done_callback(self.tasks.discard)
+
+    # ---- 新建、AI 写和改
+    async def create(self, owner: int, owner_name: str, prompt: str, sample: str) -> dict:
+        vid = secrets.token_hex(6)
+        V = {"id": vid, "owner": owner, "owner_name": owner_name, "prompt": prompt, "created": now(), "version": 0,
+             "title": {"zh": "新视频", "en": "New video"}, "chat": [], "busy": "", "ai_error": "", "from_sample": sample,
+             "stills": {}, "renders": {}}
+        self.store.vdir(vid).mkdir(parents=True, exist_ok=True)
+        if sample:
+            smp = next((x for x in await self.blender.samples() if x["id"] == sample), None)
+            if not smp:
+                raise KeyError(sample)
+            self.store.set_scene(V, smp["scene"])
+            V["title"] = dict(smp.get("title") or V["title"])
+            V["chat"].append({"who": "ai", "text": f"已复制样片“{sample}”。可以直接出关键画面，或者告诉我要改什么。", "at": now()})
+        if prompt:
+            V["chat"].append({"who": "me", "text": prompt, "at": now()})
+            V["busy"] = "ai"
+        self.store.save(V)
+        if prompt:
+            self.spawn(self.write(vid, prompt))
+        return V
+
+    async def say(self, V: dict, text: str) -> dict:
+        V["chat"].append({"who": "me", "text": text, "at": now()})
+        V["busy"], V["ai_error"] = "ai", ""
+        self.store.save(V)
+        self.spawn(self.write(V["id"], text))
+        return V
+
+    async def write(self, vid: str, instruction: str) -> None:
+        try:
+            samples = await self.blender.samples()
+            fmt = await self.blender.format()
+            V = self.store.load(vid)
+            cur = self.store.scene(vid)
+            refs = [x for x in samples if x["id"] in ("旋梭钩线_整机", "机械臂抓取")][:2]
+            hist = "\n".join(f"{'用户' if c['who'] == 'me' else '你'}：{c['text']}" for c in V["chat"][-8:-1])
+            base = ("## 场景格式说明\n" + (fmt or "（见样板）") + "\n\n## 样板场景\n"
+                    + "\n\n".join(f"### {x['id']}\n{x['scene']}" for x in refs)
+                    + ("\n\n## 当前场景（在它上面改）\n" + cur if cur else "")
+                    + ("\n\n## 之前的对话\n" + hist if hist else "")
+                    + "\n\n## 这次的要求\n" + instruction)
+            prompt, last_errs = base, []
+            for _ in range(3):
+                res = await self.ai.json(system=SYSTEM, prompt=prompt, schema=scene_schema(), max_tokens=8000,
+                                         fake=lambda: fake_scene(samples, instruction) if not cur else {"scene": cur, "reply": "好的，已按你的意见改了。"})
+                text = re.sub(r"^```(?:yaml)?\s*|\s*```\s*$", "", str(res.get("scene") or "").strip())
+                spec, errs = check(text)
+                if not errs:
+                    V = self.store.load(vid)
+                    self.store.set_scene(V, text)
+                    t = spec.get("title") or {}
+                    V["title"] = {"zh": str(t.get("zh") or V["title"]["zh"])[:60], "en": str(t.get("en") or V["title"]["en"])[:120]}
+                    V["chat"].append({"who": "ai", "text": str(res.get("reply") or "写好了。")[:1000], "at": now()})
+                    V["busy"], V["ai_error"] = "", ""
+                    self.store.save(V)
+                    return
+                last_errs = errs
+                prompt = base + "\n\n## 上一稿没通过检查，请改正后重写完整场景\n" + "\n".join("- " + e for e in errs[:20]) + "\n\n上一稿：\n" + text[:MAX_SCENE]
+            V = self.store.load(vid)
+            V["busy"], V["ai_error"] = "", "AI 写的场景三次都没通过检查：" + "；".join(last_errs[:3])
+            V["chat"].append({"who": "ai", "text": "这次没写成，请换个说法再试，或者从样片开始改。", "at": now()})
+            self.store.save(V)
+        except Exception as e:  # noqa: BLE001
+            log.exception("video3d write %s", vid)
+            try:
+                V = self.store.load(vid)
+                V["busy"], V["ai_error"] = "", f"AI 出错：{type(e).__name__}"
+                self.store.save(V)
+            except KeyError:
+                pass
+
+    def set_scene(self, V: dict, text: str) -> list[str]:
+        spec, errs = check(text)
+        if errs:
+            return errs
+        self.store.set_scene(V, text)
+        t = spec.get("title") or {}
+        V["title"] = {"zh": str(t.get("zh") or "")[:60], "en": str(t.get("en") or "")[:120]}
+        self.store.save(V)
+        return []
+
+    # ---- 关键画面（blender 容器）
+    async def stills(self, vid: str) -> None:
+        V = self.store.load(vid)
+        text = self.store.scene(vid)
+        spec, errs = check(text)
+        times = still_times(spec or {})
+        V["stills"] = {"state": "running", "version": V.get("version"), "times": times, "n": 0, "error": "", "at": now()}
+        self.store.save(V)
+        try:
+            r = await self.blender.stills(normalized(text), times)
+            d = self.store.vdir(vid) / "stills"
+            shutil.rmtree(d, ignore_errors=True)
+            d.mkdir()
+            if r.get("ok"):
+                for i, b in enumerate(r["stills"]):
+                    (d / f"{i}.png").write_bytes(base64.b64decode(b))
+            V = self.store.load(vid)
+            V["stills"].update(state="done" if r.get("ok") else "failed", n=len(r.get("stills") or []),
+                               error=str(r.get("error") or "")[-1500:], seconds=r.get("seconds"))
+        except Exception as e:  # noqa: BLE001
+            log.exception("video3d stills %s", vid)
+            V = self.store.load(vid)
+            V["stills"].update(state="failed", error=f"关键画面服务出错：{type(e).__name__}")
+        self.store.save(V)
+
+    # ---- 小样、高清（租机）
+    def request_render(self, V: dict, quality: str, uid: int) -> str:
+        rid = secrets.token_hex(6)
+        text = normalized(self.store.scene(V["id"]))
+        (self.store.vdir(V["id"]) / f"run_{rid}.yaml").write_text(text, encoding="utf-8")
+        self.store.add_run(id=rid, video=V["id"], user_id=uid, quality=quality, provider=getattr(self.provider, "name", ""),
+                           state="queued", queued_at=now(), price_hour=0.0)
+        V.setdefault("renders", {})[quality] = {"state": "queued", "run": rid, "version": V.get("version"), "stage": "",
+                                                 "done": 0, "total": 0, "error": "", "at": now()}
+        self.store.save(V)
+        return rid
+
+    def cancel(self, V: dict, quality: str) -> None:
+        R = (V.get("renders") or {}).get(quality) or {}
+        run = self.store.run(R.get("run") or "")
+        if run and run["state"] in LIVE and run["state"] != "stopping":
+            self._end(run, "cancelled", "cancelled", "")
+
+    def _view(self, vid: str, quality: str, **kw) -> None:
+        try:
+            V = self.store.load(vid)
+        except KeyError:
+            return
+        R = (V.get("renders") or {}).get(quality)
+        if R is not None:
+            R.update(kw)
+            self.store.save(V)
+
+    def _end(self, run: dict, final: str, reason: str, msg: str) -> None:
+        """结束一次出片：先记下结果，机器关掉以后才算完（关机失败下一轮再关）。"""
+        t = now()
+        secs = (t - run["launched_at"]) if run.get("launched_at") else 0
+        self.store.update_run(run["id"], state="stopping" if run.get("pid") else final, final=final, end_reason=reason,
+                              msg=msg[:2000], ended_at=t, seconds=secs, cost=round(secs / 3600 * (run.get("price_hour") or 0), 4))
+        self._view(run["video"], run["quality"], state=final, error=msg[:1500] if final == "failed" else "", at=t)
+
+    async def tick(self) -> None:
+        if self.provider is None:
+            return
+        async with self.tick_lock:
+            for run in self.store.live_runs():
+                try:
+                    await self._advance(run)
+                except Exception as e:  # noqa: BLE001
+                    log.exception("video3d run %s", run["id"])
+                    n = int(run.get("errors") or 0) + 1
+                    self.store.update_run(run["id"], errors=n)
+                    if n >= 40 and run["state"] != "stopping":       # 连续约 10 分钟出错
+                        self._end(run, "failed", "error", f"{type(e).__name__}: {e}")
+
+    async def _advance(self, run: dict) -> None:
+        t, st = now(), run["state"]
+        if st == "stopping":
+            try:
+                await self.provider.stop(run["pid"])
+            except Exception as e:  # noqa: BLE001
+                if "not found" not in str(e).lower():
+                    raise
+            self.store.update_run(run["id"], state=run.get("final") or "done")
+            return
+        try:
+            self.store.load(run["video"])
+        except KeyError:
+            self._end(run, "cancelled", "deleted", "")
+            return
+        if run.get("launched_at") and t - run["launched_at"] > self.max_hours * 3600:
+            self._end(run, "failed", "time_limit", f"超过 {self.max_hours} 小时还没出完，已关机")
+            return
+        if st == "queued":
+            busy = sum(1 for r in self.store.live_runs() if r["state"] in ("starting", "rendering"))
+            if busy >= self.max_machines:
+                self._view(run["video"], run["quality"], stage="waiting_machine")
+                return
+            try:
+                m = await self.provider.launch(f"wq-video3d-{run['id']}")
+            except NoCapacity:
+                if t - run["queued_at"] > self.wait * 60:
+                    self._end(run, "failed", "no_machine", f"等了 {self.wait} 分钟还没有空闲机器，请稍后再出")
+                else:
+                    self._view(run["video"], run["quality"], stage="waiting_machine")
+                return
+            self.store.update_run(run["id"], state="starting", pid=m["pid"], kind=m["kind"], region=m["region"],
+                                  price_hour=m["price_hour"], launched_at=now(), errors=0)
+            self._view(run["video"], run["quality"], state="starting", stage="booting")
+            return
+        if st == "starting":
+            s = await self.provider.status(run["pid"])
+            if s["state"] in ("stopped", "failed"):
+                self._end(run, "failed", "machine_failed", "租的机器没有开起来，请重出")
+                return
+            if s["state"] != "running":
+                if t - run["launched_at"] > 20 * 60:
+                    self._end(run, "failed", "boot_timeout", "租的机器 20 分钟还没开好，已关机，请重出")
+                return
+            jup = self.provider.jupyter(s["url"], s["token"])
+            q = run["quality"]
+            await jup.put("wq3d/bundle.tgz", await self.blender.bundle())
+            await jup.put("wq3d/run.sh", (await self.blender.run_sh()).decode("utf-8"))
+            await jup.put("wq3d/job/scene.yaml", (self.store.vdir(run["video"]) / f"run_{run['id']}.yaml").read_text(encoding="utf-8"))
+            await jup.put("wq3d/job/job.json", json.dumps({"quality": q}))
+            await jup.run(START_CODE)
+            self.store.update_run(run["id"], state="rendering", url=s["url"], token=s["token"], errors=0)
+            self._view(run["video"], q, state="rendering", stage="setup")
+            return
+        if st == "rendering":
+            jup = self.provider.jupyter(run["url"], run["token"])
+            raw = await jup.read_text("wq3d/status.json")
+            self.store.update_run(run["id"], errors=0)
+            if not raw:
+                return
+            s = json.loads(raw)
+            if s.get("stage") == "error":
+                self._end(run, "failed", "render_error", "出片出错：" + str(s.get("msg") or "")[-1200:])
+                return
+            if s.get("stage") != "done":
+                self._view(run["video"], run["quality"], stage=s.get("stage", ""), done=s.get("done", 0), total=s.get("total", 0))
+                return
+            out = self.store.vdir(run["video"]) / "out"
+            out.mkdir(exist_ok=True)
+            got = []
+            for src, dst in OUT_NAMES[run["quality"]].items():
+                if src in (s.get("files") or []):
+                    await jup.download(f"wq3d/out/{src}", out / dst)
+                    got.append(dst)
+            if not got:
+                self._end(run, "failed", "no_file", "机器上没有找到出好的视频")
+                return
+            self._view(run["video"], run["quality"], files=got, done=s.get("total", 0), total=s.get("total", 0))
+            self._end(self.store.run(run["id"]) or run, "done", "done", "")

@@ -42,6 +42,10 @@
         <text class="gicon">✎</text>
         <text class="glabel">{{ t("wb.nav") }}</text>
       </view>
+      <view v-if="v3Allowed" class="gitem" :class="{ on: nav === 'video3d' }" @click="go('video3d')">
+        <text class="gicon">◈</text>
+        <text class="glabel">{{ t("v3.nav") }}</text>
+      </view>
       <view v-if="cm && cm.member" class="gitem" :class="{ on: nav === 'committee' }" @click="go('committee')">
         <text class="gicon">✓</text>
         <text class="glabel">{{ t("rev.nav") }}</text>
@@ -121,7 +125,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { admin, accountApi, loadAdmin } from "../accountApi";
-import { api, user } from "../api";
+import { api, user, v3Allowed } from "../api";
 import { t, toggleLocale } from "../i18n";
 import { type CourseData, courseMenu, studentPreview } from "../store";
 
@@ -141,7 +145,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
-  if (["catalog", "admin", "apply", "committee", "textbook", "whiteboard"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
+  if (["catalog", "admin", "apply", "committee", "textbook", "whiteboard", "video3d"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
@@ -164,6 +168,8 @@ async function logout() {
 }
 onMounted(() => {
   loadAdmin();
+  if (user.value?.can_create_courses) v3Allowed.value = true;
+  else if (user.value && v3Allowed.value === null) api.v3Access().then((r) => (v3Allowed.value = r.allowed)).catch(() => {});
   if (user.value?.can_create_courses || user.value) api.committeeMe().then((r) => (cm.value = r)).catch(() => {});
 });
 </script>
