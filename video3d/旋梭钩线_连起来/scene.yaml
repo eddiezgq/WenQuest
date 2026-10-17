@@ -1,0 +1,48 @@
+# 旋梭钩线：钩线机构和线结连起来看（第 37 轮；Eddie 14:35：“我要你把它和勾线机构一起看，单独有什么意义，谁看不懂”）。
+# 同一画面里：下面是旋梭钩住线环、带它绕过梭壳；上面是针板上的两层布（沿针孔剖开）。关键一下：底线是从梭壳里出来的，
+# 线环绕过梭壳，就必然把底线套在里面；线环被拉上去，就把底线扣进两层布中间——结就是这样来的。示意，线径、针距放大。
+name: 旋梭钩线_连起来
+title: {zh: 线结是怎样钩出来的, en: Where the knot comes from}
+duration: 24
+floor: false
+clip: 0.002
+models:
+  - id: m
+    use: "weblab:sewing/proto-lockstitch"
+    loop3d: true
+    handover: 300
+    colors: {frame: shell, plate: steel, needle: needle, hook: hook, nbar: needle, bcase: dark, bstop: dark}
+  - {id: s, use: "gen:seam", at: [-0.017, 0.0, 0.0], rot_z: -90, stitches: 3, pitch: 0.004, ply: 0.0012, thread: 0.0004, width: 0.010,
+     tighten: [16, 20], hide_last_before_tighten: true}
+motion:
+  - drive: weblab
+    model: m
+    angle: [[0, 196], [3, 206.07], [14, 341.07], [20, 386.07], [24, 386.07]]
+camera:
+  - {t: 0, look: [-0.012, 0.0, -0.012], az: -90, el: 4, dist: 0.11}
+  - {t: 3, look: [-0.011, 0.0, -0.014], az: -90, el: 3, dist: 0.11}
+  - {t: 7, look: [-0.010, 0.0, -0.016], az: -90, el: 3, dist: 0.11}
+  - {t: 11, look: [-0.009, 0.0, -0.015], az: -45, el: 22, dist: 0.12}
+  - {t: 14, look: [-0.010, 0.0, -0.012], az: -55, el: 18, dist: 0.12}
+  - {t: 17, look: [-0.014, 0.0, -0.004], az: -80, el: 8, dist: 0.08}
+  - {t: 20.5, look: [-0.016, 0.0, 0.0008], az: -85, el: 6, dist: 0.035}
+  - {t: 24, look: [-0.016, 0.0, 0.0008], az: -60, el: 18, dist: 0.03}
+effects:
+  - {kind: cutaway, t: [0, 24], hide: [m.body, m.face, m.top, m.rear, m.table, m.stand, m.spool, m.details, m.oil, m.belt, m.tension, m.guide,
+                                     m.feed, m.lower, m.upper, m.rod, m.takeup, m.presser, m.slide, m.bush]}
+  - {kind: xray, t: [-2, 26], top: [m.threads, m.threads_static, m.nbar, s.threads]}
+labels:
+  - {t: [0, 3], zh: 上面：针板上的两层布（剖开）；下面：旋梭和梭壳, en: "Above: two plies of cloth on the needle plate (cut open). Below: the rotary hook and bobbin case"}
+  - {t: [3, 20], phi: [206, 240], zh: 梭尖（红点）钩住面线（蓝）的线环, en: "The hook point (red) catches the loop of upper thread (blue)"}
+  - {t: [3, 20], phi: [240, 300], zh: 注意橙色底线：它是从梭壳里出来的, en: "Watch the orange bobbin thread: it comes out of the bobbin case"}
+  - {t: [3, 20], phi: [300, 356], zh: 线环绕过整个梭壳——底线就被套在线环里面了, en: "The loop goes round the whole bobbin case, so the bobbin thread ends up inside the loop"}
+  - {t: [3, 20.5], phi: [356, 360], zh: 线环被拉上去，把底线一起带进两层布中间, en: "The loop is pulled up and takes the bobbin thread into the middle of the cloth"}
+  - {t: [14, 20.5], phi: [0, 40], zh: 线环被拉上去，把底线一起带进两层布中间, en: "The loop is pulled up and takes the bobbin thread into the middle of the cloth"}
+  - {t: [20.5, 24], zh: 面线（蓝）和底线（橙）在布中间扣成结——下一针再来一遍, en: "Upper (blue) and bobbin (orange) threads lock inside the cloth, and the next stitch repeats it"}
+  - {t: [0, 24], where: bottom, zh: 示意：线径、针距放大；面线蓝、底线橙；红箭头是旋梭转向, en: "Schematic: thread and stitch length enlarged; upper blue, bobbin orange; red arrow = hook rotation"}
+panel:
+  kind: readouts
+  head: 读数  Readouts
+  items:
+    - {zh: 主轴转角, en: shaft, key: phi, fmt: "{:5.0f}", unit: "°"}
+    - {zh: 旋梭转过, en: hook turned, key: hookdeg, fmt: "{:5.0f}", unit: "°", scale: 360}

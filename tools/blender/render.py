@@ -242,7 +242,8 @@ class WebLab:
         self.objs["body_cut"].hide_render = True
         self.threads = {}
         self.read = {}
-        self.loop3d = bool(p.get("loop3d"))       # 旋梭钩线：用 hookloop.py 的三维线环代替实验里的平面线环
+        self.loop3d = bool(p.get("loop3d"))
+        self.handover = p.get("handover")         # 旋梭转到这个角度（度）以后，布上的线迹接着画收线       # 旋梭钩线：用 hookloop.py 的三维线环代替实验里的平面线环
         if self.loop3d:
             import hookloop
             self.hl = hookloop
@@ -267,9 +268,13 @@ class WebLab:
             top = (self.hl.XN, 0.4, 0.0)
             lp = self.hl.loop(d["phi"], d["read"]["phc"], tuple(up[12]), top) if len(up) > 12 else None
             a = (2 * (d["phi"] - d["read"]["phc"])) % 720
-            if lp:
+            if self.handover is not None and self.handover <= a <= 360:     # 线环快收完：交给布上的线迹（gen:seam）接着画
+                tubes["upper"] = [list(q) for q in up[:12]] + [list(top)]
+            elif lp:
                 tubes["upper"] = [list(q) for q in up[:12]] + [list(q) for q in lp]
-                tubes["bobbin"] = [list(q) for q in self.hl.bobbin_thread(top)]
+            tubes["bobbin"] = [list(q) for q in self.hl.bobbin_thread(top)]
+            if self.handover is not None:
+                tubes["seam"] = None
             on = a <= self.hl.CATCH_TO_OFF
             r = math.radians(a)
             self.beak.location = self.offset @ self.C @ Vector((self.hl.X_BEAK - 0.6, self.hl.YH + self.hl.R_BEAK * math.cos(r),
@@ -328,8 +333,15 @@ class Seam:
         self.ply = p.get("ply", 0.0016)
         self.r = p.get("thread", 0.00028)
         L = self.n * self.pitch + self.pitch
+        # 放到机器上：at = 最后一针（针孔）的位置，rot_z = 绕竖直轴转（度）；不写就是单独一块布
+        self.root = empty(f"{mid}.root", (0, 0, 0))
+        n_ = self.n * self.pitch
+        self.root.location = Vector(p.get("at", (0, 0, 0))) - (Matrix.Rotation(math.radians(p.get("rot_z", 0)), 3, "Z") @ Vector((n_, 0, 0))
+                                                               if p.get("at") else Vector((0, 0, 0)))
+        self.root.rotation_euler = (0, 0, math.radians(p.get("rot_z", 0)))
         for k, (z0, c) in enumerate(((0.0, "table"), (self.ply, "shell"))):
-            o = mesh("box", (L, 0.012, self.ply), (L / 2 - self.pitch / 2, 0.006, z0 + self.ply / 2), color=c)
+            o = mesh("box", (L, p.get("width", 0.012), self.ply), (L / 2 - self.pitch / 2, p.get("width", 0.012) / 2, z0 + self.ply / 2),
+                     color=c, parent=self.root)
             add_group(f"{mid}.fabric", o)
         self.objs = {}
 
@@ -374,6 +386,7 @@ class Seam:
         o = bpy.data.objects.new(f"{self.mid}.{key}", cu)
         o.data.materials.append(mat(color))
         sc.collection.objects.link(o)
+        o.parent = self.root
         self.objs[key] = o
 
     def update(self, t):
@@ -383,9 +396,14 @@ class Seam:
         R = self.r
         h = 0.0009                                       # 底线在结里横着走的半长
         up, lo = [], []
+        pending = t < a and self.p.get("hide_last_before_tighten")     # 最后一针还没开始收：线从布面直接进针孔往下去
         for k in range(self.n + 1):
             x = k * self.pitch
             last = k == self.n
+            if last and pending:
+                up += [(x - 0.0022, 0, top), (x - 0.0003, 0, top), (x, 0, top - 0.0006), (x, 0, -0.004)]
+                lo += [(x - 0.0022, 0, bot), (x - 0.0006, 0, bot - 0.0003), (x, 0, -0.004)]
+                break
             zk = mid if not last else mid * u + (-0.0055) * (1 - u)      # 结的高度（最后一针从布下被拉上来）
             loop = 1.0 if not last else 1.0 + 4.0 * (1 - u)              # 面线线环的大小
             # 底线：沿布底来 → 进针孔上到结 → 在结里横着走一小段 → 下去 → 沿布底走
