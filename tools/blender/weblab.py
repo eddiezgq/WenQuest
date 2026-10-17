@@ -25,9 +25,10 @@ class Lab:
         self._pw = sync_playwright().start()
         self._b = self._pw.chromium.launch(args=["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"])
         self.page = self._b.new_page(viewport={"width": 640, "height": 400})
+        self.page.route("http*://**", lambda r: r.abort())          # 不联网：字体、统计等外部资源一律不取，结果不受网络影响
         self.page.route("**/vendor/three/r128/three.min.js",
                         lambda r: r.fulfill(path=str(THREE), content_type="application/javascript"))
-        self.page.goto(self.page_path.as_uri())
+        self.page.goto(self.page_path.as_uri(), wait_until="domcontentloaded")
         self.page.wait_for_function("window.__api && window.__api.dump", timeout=60000)
         self.page.evaluate("__api.manual(true)")
         return self
