@@ -25,11 +25,17 @@ class Lab:
     def __enter__(self):
         from playwright.sync_api import sync_playwright
         self._pw = sync_playwright().start()
-        self._b = self._pw.chromium.launch(args=["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"])
+        self._b = self._pw.chromium.launch(args=["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
+                                                 "--enable-webgl", "--ignore-gpu-blocklist"])      # 没有显卡也能建 WebGL
         self.page = self._b.new_page(viewport={"width": 640, "height": 400})
+        self.errors = []
+        self.page.on("pageerror", lambda e: self.errors.append(str(e)))
         self.page.route("**/*", self._serve)        # 页面从仓库里直接取（/vendor/ 取 site/vendor），不联网，结果不受网络影响
         self.page.goto(f"http://wq.local/{self.rel}", wait_until="domcontentloaded", timeout=120000)
-        self.page.wait_for_function("window.__api && window.__api.dump", timeout=60000)
+        try:
+            self.page.wait_for_function("window.__api && window.__api.dump", timeout=60000)
+        except Exception:
+            raise SystemExit("虚拟实验页没有就绪：" + " | ".join(self.errors[:5]))
         self.page.evaluate("__api.manual(true)")
         return self
 
