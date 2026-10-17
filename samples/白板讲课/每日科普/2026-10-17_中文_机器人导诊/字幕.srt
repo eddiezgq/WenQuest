@@ -1,0 +1,275 @@
+1
+00:00:00,300 --> 00:00:05,880
+七百个问题。一台机器人，在医院导诊台，一天要回答七百个问题。
+Seven hundred questions. A robot at a hospital help desk answers 700 questions a day.
+
+2
+00:00:05,880 --> 00:00:08,780
+我猜，其中三百个是：厕所在哪？
+My guess: three hundred of them are 'where's the bathroom?'
+
+3
+00:00:08,780 --> 00:00:11,800
+据报道，这是一台半人高的人形机器人，
+Reportedly, it's a half-size humanoid robot,
+
+4
+00:00:11,800 --> 00:00:14,600
+最近站上了一家三甲医院的导诊台。
+now staffing the help desk of a top-tier hospital.
+
+5
+00:00:14,600 --> 00:00:18,760
+今天的主角：小导。它管指路、管流程、管医保。
+Today's star: Little Guide. Directions, procedures, insurance questions.
+
+6
+00:00:18,760 --> 00:00:21,760
+算一下：一天八小时，七百个问题，
+Do the math: 700 questions in an eight-hour day
+
+7
+00:00:21,760 --> 00:00:25,070
+大约每四十秒，就有一个人冲它开口。
+is one every forty seconds or so.
+
+8
+00:00:25,070 --> 00:00:29,680
+今天的烧脑问题：医院大厅那么吵，它怎么听清你说的话？
+Today's brain teaser: in a noisy hospital lobby, how does it hear you?
+
+9
+00:00:29,680 --> 00:00:34,710
+先看有多吵。大厅里叫号、脚步、聊天，估计有六七十分贝。
+First, how noisy? Number calls, footsteps, chatter: maybe 60 to 70 decibels.
+
+10
+00:00:34,710 --> 00:00:39,000
+而你对它说话，也就六十分贝左右。噪声，和你一样大。
+And you talking to it? About 60 decibels. The noise is as loud as you are.
+
+11
+00:00:39,000 --> 00:00:44,170
+分贝每加十，声音的能量就乘十。七十比六十，能量是十倍。
+Every 10 decibels means ten times the energy. 70 versus 60 is ten times as much.
+
+12
+00:00:44,170 --> 00:00:46,690
+人是怎么做到的？鸡尾酒会效应：
+How do people manage? The cocktail party effect:
+
+13
+00:00:46,690 --> 00:00:50,180
+一屋子人在说话，你还是能听清对面那一个。
+a room full of talk, and you still follow one voice.
+
+14
+00:00:50,180 --> 00:00:55,590
+秘诀之一：两只耳朵。声音从左边来，左耳先听到，右耳晚一点。
+Secret one: two ears. Sound from the left hits the left ear first, the right ear a bit later.
+
+15
+00:00:55,590 --> 00:00:59,390
+大脑靠这一点点时间差，就知道声音从哪儿来。
+From that tiny delay, your brain knows where the sound came from.
+
+16
+00:00:59,390 --> 00:01:03,970
+小导没有耳朵，它头上有一圈麦克风，叫麦克风阵列。
+Little Guide has no ears. It has a ring of microphones: a microphone array.
+
+17
+00:01:03,970 --> 00:01:05,760
+声速每秒三百四十米。
+Sound travels 340 meters per second.
+
+18
+00:01:05,760 --> 00:01:09,830
+两个麦克风隔五厘米，时间差最多零点一五毫秒。
+Mics 5 cm apart hear it at most 0.15 milliseconds apart.
+
+19
+00:01:09,830 --> 00:01:14,590
+这么小的差，电脑也量得出来。于是，它知道你站在哪个方向。
+Tiny, but a computer can measure it. So it knows which direction you're standing in.
+
+20
+00:01:14,590 --> 00:01:18,800
+反转一：知道方向，还不够。噪声照样往里灌。
+Twist one: knowing the direction isn't enough. The noise still pours in.
+
+21
+00:01:18,800 --> 00:01:22,780
+下一招叫波束成形。打个比方：一群人齐步走。
+The next trick is beamforming. Think of a crowd marching in step.
+
+22
+00:01:22,780 --> 00:01:27,050
+把每个麦克风的声音，按你的时间差对齐，再加起来。
+Line up every mic's sound by your time delay, then add them together.
+
+23
+00:01:27,050 --> 00:01:30,040
+你的声音，步子对齐了，越加越响。
+Your voice is in step, so it adds up and gets louder.
+
+24
+00:01:30,040 --> 00:01:34,650
+四面八方的噪声，步子对不齐，加起来有的抵消，涨得慢。
+Noise from everywhere else is out of step. Some cancels out, and it grows more slowly.
+
+25
+00:01:34,650 --> 00:01:39,450
+理想情况下，六个麦克风，你的声音比噪声，能提高六倍，
+Ideally, six mics boost your voice over the noise six times,
+
+26
+00:01:39,450 --> 00:01:41,600
+大约八分贝。这是估算。
+about 8 decibels. That's an estimate.
+
+27
+00:01:41,600 --> 00:01:46,710
+相当于，在嘈杂的大厅里，给你一个人开了一束看不见的手电筒。
+It's like an invisible flashlight, shining only on you in the noisy hall.
+
+28
+00:01:46,710 --> 00:01:49,330
+反转二：听清了，还得听懂。
+Twist two: hearing you isn't the same as understanding you.
+
+29
+00:01:49,330 --> 00:01:53,400
+第一步，把声音变成文字：“请问心内科在几楼？”
+Step one: turn sound into text. 'Which floor is cardiology?'
+
+30
+00:01:53,400 --> 00:01:56,480
+第二步，AI 理解你在问什么：找科室。
+Step two: the AI works out what you want: a department.
+
+31
+00:01:56,480 --> 00:01:59,150
+第三步最关键：它不凭记忆回答，
+Step three is the key: it doesn't answer from memory.
+
+32
+00:01:59,150 --> 00:02:01,240
+而是先去翻医院的资料。
+It looks it up first.
+
+33
+00:02:01,240 --> 00:02:05,940
+这就像开卷考试：书里写着心内科在三楼，它才说三楼。
+Like an open-book exam: the book says third floor, so it says third floor.
+
+34
+00:02:05,940 --> 00:02:07,150
+为什么要开卷？
+Why open-book?
+
+35
+00:02:07,150 --> 00:02:10,900
+因为大模型闭卷考试，偶尔会一本正经地瞎编。
+Because a big AI model, taking the test closed-book, sometimes makes things up with a straight face.
+
+36
+00:02:10,900 --> 00:02:15,000
+在医院里，编错一个楼层，病人就要多爬三层楼。
+In a hospital, one wrong floor means a patient climbs three extra flights.
+
+37
+00:02:15,000 --> 00:02:19,940
+反转三，最反直觉：好的导诊机器人，要知道什么不该答。
+Twist three, the counterintuitive one: a good guide robot knows what not to answer.
+
+38
+00:02:19,940 --> 00:02:24,570
+报道里，它管的是指路、流程、医保。看病，还是交给医生。
+In the reports, it handles directions, procedures, insurance. Diagnosis stays with the doctors.
+
+39
+00:02:24,570 --> 00:02:27,730
+那为什么要做成人形，而不是一块大屏幕？
+So why make it humanoid, instead of just a big screen?
+
+40
+00:02:27,730 --> 00:02:30,900
+我的推测：人更愿意跟像人的东西说话，
+My guess: people talk more easily to something human-shaped,
+
+41
+00:02:30,900 --> 00:02:33,850
+而且它能转身，能抬手给你指方向。
+and it can turn and point the way.
+
+42
+00:02:33,850 --> 00:02:39,730
+半人高也有讲究：老人、坐轮椅的人、小朋友，都能平视它。这也是推测。
+Half height may matter too: seniors, wheelchair users, kids can look it in the eye. Also a guess.
+
+43
+00:02:39,730 --> 00:02:41,370
+再回到七百个问题。
+Back to the 700 questions.
+
+44
+00:02:41,370 --> 00:02:44,760
+人回答七百遍，嗓子哑了，脾气也没了。
+A person answering 700 times loses their voice, and their patience.
+
+45
+00:02:44,760 --> 00:02:48,050
+小导回答第七百遍，和第一遍一样耐心。
+Little Guide answers the 700th time as patiently as the first.
+
+46
+00:02:48,050 --> 00:02:51,070
+这可能才是它最大的本事：不累，不烦。
+That may be its real superpower: it never gets tired or grumpy.
+
+47
+00:02:51,070 --> 00:02:53,950
+算总账：听方向，靠时间差。
+Final tally: direction comes from the time delay.
+
+48
+00:02:53,950 --> 00:02:56,140
+听清楚，靠波束成形。
+Hearing clearly comes from beamforming.
+
+49
+00:02:56,140 --> 00:02:57,850
+答对，靠开卷考试。
+Getting it right comes from the open book.
+
+50
+00:02:57,850 --> 00:03:00,450
+不乱答，靠知道自己的边界。
+Not getting it wrong comes from knowing its limits.
+
+51
+00:03:00,450 --> 00:03:03,030
+友情提示：七百问是报道的数字，
+Friendly fine print: 700 is the reported number.
+
+52
+00:03:03,030 --> 00:03:05,380
+分贝和信噪比是我们的估算。
+The decibels and the gain are our estimates.
+
+53
+00:03:05,380 --> 00:03:10,300
+这台机器人内部用什么算法，没有公开。我们讲的是通用的原理。
+Its exact algorithms aren't public. We explained the general principles.
+
+54
+00:03:10,300 --> 00:03:14,750
+最后，小导想说：厕所在您左手边，直走二十米。
+Finally, Little Guide would like to say: the bathroom is on your left, twenty meters ahead.
+
+55
+00:03:14,750 --> 00:03:17,090
+这是今天的第七百零一遍。
+That's the seven hundred and first time today.
+

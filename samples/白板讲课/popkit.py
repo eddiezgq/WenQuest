@@ -229,3 +229,69 @@ def wheel_hub(cx, cy, k, i):
 def car_drive(cx, cy, k, at, idp="car", rpm=90):
     """Spinning wheels for a car drawn with car()."""
     return [{"t": "move", "at": at, "kind": "spin", "targets": [f"{idp}_w{i}"], "pivot": wheel_hub(cx, cy, k, i), "rpm": rpm} for i in (0, 1)]
+
+
+def cute_whale(cx, cy, k, at, idp="wh", mood="happy", moves=True, mouth_open=False):
+    """A cute sperm whale facing left: big box-shaped head, small lower jaw, round eye, smile, tail on the right, a spout.
+    (cx, cy) = middle of the body. Ids: <idp>_b (body), <idp>_jaw (lower jaw; rotate about jaw_hinge), <idp>_t (tail; wiggles),
+    <idp>_sp (spout). "<idp>*" moves the whole whale. mouth_open draws the jaw dropped."""
+    def P(d, c="ink", w=3.6, part="_b", **kw):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d, **kw}
+    X = lambda v: cx + v * k   # noqa: E731
+    Y = lambda v: cy + v * k   # noqa: E731
+    E = [P(f"M{X(-260)},{Y(-110)} Q{X(-270)},{Y(-150)} {X(-200)},{Y(-150)} L{X(40)},{Y(-140)} Q{X(170)},{Y(-120)} {X(250)},{Y(-30)} "
+           f"Q{X(290)},{Y(10)} {X(320)},{Y(0)} L{X(320)},{Y(20)} Q{X(220)},{Y(90)} {X(40)},{Y(80)} L{X(-150)},{Y(40)} "
+           f"Q{X(-262)},{Y(30)} {X(-262)},{Y(-40)} Z", c="ink", w=4, fill="blue"),
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-170), "y": Y(-60), "w": 30 * k, "h": 34 * k, "c": "ink", "fill": "ink"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-130), "y": Y(-10), "w": 34 * k, "h": 18 * k, "c": "red", "fill": "red"},
+         P({"happy": f"M{X(-240)},{Y(0)} Q{X(-210)},{Y(18)} {X(-180)},{Y(4)}", "o": f"M{X(-235)},{Y(6)} a10,10 0 1,0 {20 * k},0 a10,10 0 1,0 {-20 * k},0",
+            "worried": f"M{X(-240)},{Y(12)} Q{X(-210)},{Y(-4)} {X(-180)},{Y(12)}"}[mood], w=3)]
+    rot = 22 if mouth_open else 0
+    E.append(P(f"M{X(-240)},{Y(34)} L{X(-40)},{Y(64)} L{X(-40)},{Y(84)} L{X(-240)},{Y(52)} Z", c="ink", w=3.4, part="_jaw"))
+    for i in range(5):
+        E.append(P(f"M{X(-220 + 38 * i)},{Y(36 + 6 * i)} L{X(-212 + 38 * i)},{Y(22 + 6 * i)}", w=3, part="_jaw"))
+    E.append(P(f"M{X(310)},{Y(10)} Q{X(360)},{Y(-60)} {X(420)},{Y(-80)} Q{X(390)},{Y(-10)} {X(330)},{Y(12)} "
+               f"Q{X(390)},{Y(40)} {X(420)},{Y(100)} Q{X(350)},{Y(80)} {X(310)},{Y(18)} Z", c="ink", w=3.6, part="_t", fill="blue"))
+    E.append(P(f"M{X(-220)},{Y(-150)} Q{X(-240)},{Y(-220)} {X(-280)},{Y(-240)} M{X(-220)},{Y(-150)} Q{X(-215)},{Y(-230)} {X(-220)},{Y(-260)} "
+               f"M{X(-220)},{Y(-150)} Q{X(-195)},{Y(-220)} {X(-160)},{Y(-240)}", c="blue", w=3.4, part="_sp"))
+    if rot:
+        E.append({"t": "move", "at": at, "kind": "rotate", "targets": [idp + "_jaw"], "to": rot, "pivot": jaw_hinge(cx, cy, k), "dur": 0.3, "delay": 0})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_t"], "pivot": [X(320), Y(10)], "amp": 10, "hz": 1.4},
+              {"t": "move", "at": at, "kind": "pulse", "targets": [idp + "_sp"], "dur": 0.8},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 10 * k, "hz": 0.7}]
+    return E
+
+
+def jaw_hinge(cx, cy, k):
+    return [cx - 40 * k, cy + 74 * k]
+
+
+def cute_guide(cx, cy, k, at, idp="gd", mood="happy", moves=True, sweat=False):
+    """小导: a half-size reception robot (cute_bot proportions, feet at (cx, cy)) with a round screen belly, antenna with a
+    blinking light (<idp>_ant, spins/pulses) and a waving arm (<idp>_arm, wiggles). "<idp>*" moves the whole robot."""
+    def P(d, c="ink", w=3.4, part="_b", **kw):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d, **kw}
+    X = lambda v: cx + v * k   # noqa: E731
+    Y = lambda v: cy - v * k   # noqa: E731
+    E = [{"t": "rect", "at": at, "id": idp + "_b", "x": X(-80), "y": Y(400), "w": 160 * k, "h": 110 * k, "c": "ink"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": X(-62), "y": Y(280), "w": 124 * k, "h": 170 * k, "c": "ink", "fill": "gold"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": X(-40), "y": Y(250), "w": 80 * k, "h": 60 * k, "c": "ink"},
+         P(f"M{X(-28)},{Y(220)} L{X(-12)},{Y(220)} M{X(-28)},{Y(205)} L{X(20)},{Y(205)}", c="blue", w=3)]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 34 - 14), "y": Y(375), "w": 28 * k, "h": 32 * k, "c": "blue", "fill": "blue"})
+        E.append(P(f"M{X(side * 28)},{Y(110)} L{X(side * 36)},{Y(10)} L{X(side * 60)},{Y(0)}"))
+    E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-62), "y": Y(338), "w": 22 * k, "h": 12 * k, "c": "red", "fill": "red"})
+    E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(40), "y": Y(338), "w": 22 * k, "h": 12 * k, "c": "red", "fill": "red"})
+    E.append(P(f"M{X(-22)},{Y(330)} Q{X(0)},{Y(312)} {X(22)},{Y(330)}" if mood == "happy" else f"M{X(-22)},{Y(316)} Q{X(0)},{Y(332)} {X(22)},{Y(316)}"))
+    E.append(P(f"M{X(-62)},{Y(260)} L{X(-110)},{Y(190)} L{X(-100)},{Y(130)}"))
+    E.append(P(f"M{X(62)},{Y(260)} L{X(120)},{Y(320)} L{X(150)},{Y(380)}", part="_arm"))
+    E.append(P(f"M{X(0)},{Y(400)} L{X(0)},{Y(450)}", part="_ant"))
+    E.append({"t": "ellipse", "at": at, "id": idp + "_ant", "x": X(-14), "y": Y(478), "w": 28 * k, "h": 28 * k, "c": "red", "fill": "red"})
+    if sweat:
+        E.append(P(f"M{X(100)},{Y(420)} Q{X(120)},{Y(380)} {X(100)},{Y(370)} Q{X(80)},{Y(380)} {X(100)},{Y(420)}", c="blue", w=3))
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_arm"], "pivot": [X(62), Y(260)], "amp": 14, "hz": 2.2},
+              {"t": "move", "at": at, "kind": "pulse", "targets": [idp + "_ant"], "dur": 0.6},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 8 * k, "hz": 1.0}]
+    return E
