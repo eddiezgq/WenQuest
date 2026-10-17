@@ -20,12 +20,12 @@ shots:
     say:
       en:
         - ">I'm Eddie Zhang."
-        - "In the next ten minutes, I'll show you how a company of ten to two hundred people can run orders, stock, purchasing and quality from one record."
-        - "AI drafts. People decide."
+        - "In the next ten minutes, I'll show you how a small company can run orders, stock, purchasing and quality from one record."
+        - "[AI|A I] drafts. People decide."
         - "Everything you'll see is a working replica, with a fictional company called Harbor Lane Supply."
       zh:
         - ">我是 Eddie Zhang。"
-        - "接下来十分钟，我给您看：一家十到两百人的公司，怎样用一份记录管好订单、库存、采购和质量。"
+        - "接下来十分钟，我给您看：一家小公司，怎样用一份记录管好订单、库存、采购和质量。"
         - "AI 起草，人来决定。"
         - "下面看到的都是可以操作的复制品，用的是一家虚构的公司：Harbor Lane Supply。"
   - id: s02
@@ -36,11 +36,13 @@ shots:
     say:
       en:
         - ">Let's start with a Tuesday. A customer asks about a late order."
-        - ">The facts exist. The order is in the ERP, the shortage is in a spreadsheet, the supplier's delay is in someone's inbox, and the failed inspection is on paper."
+        - ">The facts all exist. The order is in the [ERP|E R P], and the shortage is in a spreadsheet."
+        - "The supplier's delay is in someone's inbox. The failed inspection is on paper."
         - ">Nobody can see the chain. So you spend the morning on the phone."
       zh:
         - ">先说一个周二。客户问一张迟到的订单。"
-        - ">事实都在：订单在 ERP 里，缺料在表格里，供应商延期在某个人的邮箱里，检验不合格记在纸上。"
+        - ">事实都在：订单在 ERP 里，缺料在表格里。"
+        - "供应商延期在某个人的邮箱里，检验不合格记在纸上。"
         - ">可没人看得见这条链。于是一上午都在打电话。"
   - id: s03
     kind: page
@@ -49,10 +51,10 @@ shots:
     steps: [{"show": 1}, {"click": "#joinBtn"}]
     say:
       en:
-        - ">Every record lives in its own tool, owned by one person."
+        - ">Today, every record lives in its own tool, owned by one person."
         - ">We don't ask anyone to type things twice. We connect what you already have."
       zh:
-        - ">每份记录都在各自的工具里，归一个人管。"
+        - ">现在，每份记录都在各自的工具里，归一个人管。"
         - ">我们不让任何人重复录入，只把您已有的连起来。"
   - id: s04
     kind: page
@@ -61,11 +63,11 @@ shots:
     steps: [{"show": 0.5}, {"show": 1}]
     say:
       en:
-        - ">Two more pains. Audit week, when evidence is hunted down at the last minute."
-        - ">And the new AI tools. They are fast, but nobody can check where their answers came from."
+        - ">Then there's audit week, when evidence is hunted down at the last minute."
+        - ">And there are the new [AI|A I] tools. They are fast, but nobody can check where the answers came from."
       zh:
-        - ">还有两件头疼事。一是审核周，证据临时到处找。"
-        - ">二是新的 AI 工具：快是快，可谁也查不了它的答案从哪来。"
+        - ">还有审核周：证据临时到处找。"
+        - ">还有新的 AI 工具：快是快，可谁也查不了答案从哪来。"
   - id: s05
     kind: page
     page: 7
@@ -73,11 +75,11 @@ shots:
     steps: [{"show": 0.5}, {"show": 1}]
     say:
       en:
-        - ">Here is the whole design. At the bottom, ERPNext, a mature open-source ERP, used as it is."
-        - ">On top, our operations hub, which reads it, connects it, and checks it."
+        - ">Here is the whole design. At the bottom is [ERPNext|E R P Next], a mature open-source [ERP|E R P], used as it is."
+        - ">On top sits our operations hub. It reads the records, connects them, and checks them."
       zh:
         - ">整个设计就这样。最底下是 ERPNext，成熟的开源 ERP，原样使用。"
-        - ">上面是我们的运营中枢：读它、连它、查它。"
+        - ">上面是我们的运营中枢：读取记录，把它们连起来，并检查它们。"
   - id: s06
     kind: page
     page: 8
@@ -85,13 +87,13 @@ shots:
     steps: [{"show": 1}, {"click": "#draftBtn"}, {"click": "#aiSign"}]
     say:
       en:
-        - ">One rule runs through everything: AI drafts, people sign."
-        - ">Ask the AI for a report, and it writes from your records, with citations."
-        - ">Ask it to sign, and it is refused. Every time."
+        - ">One rule runs through everything. [AI|A I] drafts, and people sign."
+        - ">Ask the [AI|A I] for a report. It writes from your records, with citations."
+        - ">Now ask it to sign. It is refused, every time."
       zh:
         - ">有一条规则贯穿始终：AI 起草，人签字。"
         - ">让 AI 写报告，它照您的记录写，并注明出处。"
-        - ">让它签字？拒绝。每一次都拒绝。"
+        - ">再让它签字：拒绝，每一次都拒绝。"
   - id: s07
     kind: page
     page: 11
@@ -99,10 +101,12 @@ shots:
     steps: [{"show": 1}, {"click": "#shipBtn"}]
     say:
       en:
-        - ">First, the base. An ERP is your single book of record: one list of items, customers and suppliers, and every transaction posted once."
+        - ">First, the base. An [ERP|E R P] is your single book of record."
+        - "There is one list of items, customers and suppliers, and every transaction is posted once."
         - ">Ship one order, and watch what moves."
       zh:
-        - ">先说底座。ERP 是公司唯一的账本：一份物料、客户、供应商清单，每笔业务只记一次。"
+        - ">先说底座。ERP 是公司唯一的账本。"
+        - "一份物料、客户、供应商清单，每笔业务只记一次。"
         - ">发一张货，看看什么跟着动。"
   - id: s08
     kind: page
@@ -111,13 +115,13 @@ shots:
     steps: [{"show": 1}, {"click": "button.mod", "text": "Accounting"}, {"click": "button.mod", "text": "Quality"}]
     say:
       en:
-        - ">ERPNext already covers the whole company: accounting, stock, buying, selling, manufacturing, projects and more."
-        - ">Accounting stays in ERPNext, where your accountant expects it."
-        - ">Quality is where we add the most: ERPNext has basic inspections, and we add the full quality system on top."
+        - ">[ERPNext|E R P Next] already covers the whole company: accounting, stock, buying, selling, manufacturing and more."
+        - ">Accounting stays in [ERPNext|E R P Next], where your accountant expects it."
+        - ">Quality is where we add the most. We build the full quality system on top."
       zh:
-        - ">ERPNext 已经覆盖整个公司：会计、库存、采购、销售、生产、项目等等。"
+        - ">ERPNext 已经覆盖整个公司：会计、库存、采购、销售、生产等等。"
         - ">会计留在 ERPNext 里，会计习惯的地方。"
-        - ">质量是我们加得最多的：ERPNext 只有基本检验，我们在上面加了完整的质量体系。"
+        - ">质量是我们加得最多的地方：我们在上面建了完整的质量体系。"
   - id: s09
     kind: page
     page: 16
@@ -126,145 +130,173 @@ shots:
     say:
       en:
         - ">Every document posts balanced entries."
-        - ">Receive the goods, pay the supplier, ship to the customer: stock and cost of goods move together."
-        - ">Invoice and get paid, and the books stay balanced. Your accountant and your warehouse finally read the same numbers."
+        - ">Receive the goods, pay the supplier, and ship to the customer. Stock and cost of goods move together."
+        - ">Invoice, get paid, and the books stay balanced."
+        - "Your accountant and your warehouse finally read the same numbers."
       zh:
         - ">每张单据都记一笔平衡的账。"
         - ">收货、付供应商、发货给客户：库存和销货成本一起动。"
-        - ">开票、收款，账始终平衡。会计和仓库终于看的是同一组数。"
+        - ">开票、收款，账始终平衡。"
+        - "会计和仓库终于看的是同一组数。"
   - id: s10
-    kind: page
-    page: 18
-    part: ["底座：ERPNext", "The base: ERPNext"]
-    steps: [{"show": 1}, {"js": "__C(18, '[data-sl=in]'); __C(18, '[data-sl=in2]')"}, {"click": "[data-sl=out]"}]
-    say:
-      en:
-        - ">Stock is a ledger too."
-        - ">Every receipt and every shipment has a quantity and a value."
-        - ">And you can't ship what you don't have."
-      zh:
-        - ">库存也是一本账。"
-        - ">每次收货、每次发货，都有数量和金额。"
-        - ">没有的货，发不出去。"
-  - id: s11
     kind: page
     page: 20
     part: ["底座：ERPNext", "The base: ERPNext"]
     steps: [{"show": 1}, {"click": "button.abtn", "text": "Draft a purchase order"}]
     say:
       en:
-        - ">In practice, stock is kept by warehouse, with a quality hold kept apart from what you can sell. Batches and serial numbers are how a recall finds every customer."
+        - ">Stock is kept by warehouse, and goods on quality hold are kept apart from what you can sell."
+        - "Batch and serial numbers are how a recall finds every customer."
         - ">When an item falls below its reorder level, one click drafts a purchase order. It waits for a person."
       zh:
-        - ">实际用起来，库存按仓库分开，质量冻结的货和能卖的货分开放。批号和序列号，是召回时找到每一位客户的依据。"
+        - ">库存按仓库分开，质量冻结的货和能卖的货分开放。"
+        - "批号和序列号，是召回时找到每一位客户的依据。"
         - ">物料低于补货点，点一下就起草采购单。它等人来确认。"
-  - id: s12
+  - id: s11
     kind: page
     page: 22
-    part: ["中枢", "The hub"]
-    steps: [{"show": 1}, {"click": "button.stage-n", "i": 2}, {"click": "button.stage-n", "i": 4}, {"click": "button.stage-n", "i": 5}]
+    part: ["中枢与看板", "The hub and the dashboard"]
+    steps: [{"show": 1}, {"click": "button.stage-n", "i": 1}, {"click": "button.stage-n", "i": 3}, {"click": "button.stage-n", "i": 4}]
     say:
       en:
-        - ">The ERP records. Our hub connects, measures and explains."
-        - ">Changes become one connected picture of the business,"
-        - ">metrics come with published formulas, anomalies come with their causes,"
-        - ">and the fixes come back as drafts that a person confirms."
+        - ">Now the heart of the product: the operations hub. It is built and running today, on top of [ERPNext|E R P Next]."
+        - ">Every few minutes it reads what changed in [ERPNext|E R P Next], and it never writes back on its own."
+        - ">It turns those changes into measures, with formulas anyone can check."
+        - ">And it finds what went wrong, together with the cause."
       zh:
-        - ">ERP 负责记录。我们的中枢负责连接、度量、解释。"
-        - ">业务变动连成一张完整的图，"
-        - ">指标的公式公开，异常附带原因，"
-        - ">解决办法以草稿回来，由人确认。"
+        - ">现在讲产品的核心：运营中枢。它已经做好、在运行，架在 ERPNext 之上。"
+        - ">它每隔几分钟读取 ERPNext 里变动的记录，自己从不写回。"
+        - ">它把这些变动算成指标，公式人人可查。"
+        - ">它还找出哪里出了问题，并给出原因。"
+  - id: s12
+    kind: page
+    page: 24
+    part: ["中枢与看板", "The hub and the dashboard"]
+    steps: [{"show": 1}, {"click": "#og .ogn[data-k=Item]"}, {"click": "#og .ogn[data-k=PurchaseOrder]"}]
+    say:
+      en:
+        - ">Inside, the hub keeps one connected picture of the business, across eight areas."
+        - ">Click an item, and you see its orders, its stock and its inspections."
+        - ">Click a purchase order, and you see the supplier and the receipt."
+      zh:
+        - ">中枢内部，把整个业务连成一张图，分八个领域。"
+        - ">点一个物料，就看到它的订单、库存和检验。"
+        - ">点一张采购单，就看到供应商和收货。"
   - id: s13
     kind: page
-    page: 25
-    part: ["中枢", "The hub"]
-    steps: [{"show": 1}, {"js": "__C(25, 'input[type=checkbox]', 0)"}, {"type": ["#dohS", 0, "0"]}]
+    page: 26
+    part: ["中枢与看板", "The hub and the dashboard"]
+    steps: [{"show": 1}]
     say:
       en:
-        - ">Every number has a published formula you can check by hand."
-        - ">Change which orders count, and on-time delivery changes with them."
-        - ">And when there is no data, it says unknown. Never zero, never a guess."
+        - ">This is the wall display, for the shop floor or the office screen."
+        - "The numbers move as the records change. On-time delivery, stock-outs, inspections, all live."
       zh:
-        - ">每个数都有公开的公式，可以自己手算核对。"
-        - ">改一下计入哪些订单，准时交付率跟着变。"
-        - ">没有数据时，它显示“未知”。不写零，也不猜。"
+        - ">这是车间或办公室大屏上的看板。"
+        - "数字随记录实时变化：准时交付、缺货、检验，全是实时的。"
   - id: s14
     kind: page
     page: 27
-    part: ["中枢", "The hub"]
+    part: ["中枢与看板", "The hub and the dashboard"]
     steps: [{"show": 1}, {"click": "button.kpi", "text": "Late orders"}]
     say:
       en:
-        - ">This is the morning dashboard. Every tile is clickable."
-        - ">Late orders, stock-outs, inventory, suppliers, quality: each one opens to the records behind it."
+        - ">And this is the morning dashboard, the first screen you open each day."
+        - "On-time delivery, late orders, stock-outs, inventory value and days on hand."
+        - "Supplier on-time rate, and open nonconformances."
+        - ">Every tile opens to the records behind it. Let's click late orders."
       zh:
-        - ">这是每天早上的看板。每一格都能点。"
-        - ">迟到订单、缺货、库存、供应商、质量，点开就是背后的记录。"
+        - ">这是每天早上第一眼看的看板。"
+        - "准时交付率、迟到订单、缺货、库存金额和库存天数。"
+        - "供应商准时率，还有未关闭的不合格品。"
+        - ">每一格都能点开背后的记录。我们点开迟到订单。"
   - id: s15
     kind: page
+    page: 25
+    part: ["中枢与看板", "The hub and the dashboard"]
+    steps: [{"show": 1}, {"js": "__C(25, 'input[type=checkbox]', 0)"}, {"type": ["#dohS", 0, "0"]}]
+    say:
+      en:
+        - ">Every number on that dashboard has a published formula you can check by hand."
+        - ">Change which orders count, and on-time delivery changes with them."
+        - ">When there is no data, it says unknown. Never zero, and never a guess."
+      zh:
+        - ">看板上每个数都有公开的公式，可以自己手算核对。"
+        - ">改一下计入哪些订单，准时交付率跟着变。"
+        - ">没有数据时，它显示“未知”。不写零，也不猜。"
+  - id: s16
+    kind: page
     page: 28
-    part: ["中枢", "The hub"]
+    part: ["中枢与看板", "The hub and the dashboard"]
     steps: [{"show": 1}, {"click": "tr.click", "text": "SO-1042"}, {"js": "__C(28, '#nx'); __C(28, '#nx')"}]
     say:
       en:
-        - ">Back to Tuesday."
-        - ">Click the late order and follow the chain:"
-        - ">the item that's short, the purchase order that arrived late. What used to take a morning takes a minute."
+        - ">Now, back to Tuesday."
+        - ">Click the late order, and the hub follows the chain for you."
+        - ">The item is short, because the purchase order arrived six days late."
+        - "What used to take a morning now takes a minute."
       zh:
-        - ">回到那个周二。"
-        - ">点开迟到的订单，顺着链往下看："
-        - ">缺的物料、迟到的采购单。过去要一上午，现在一分钟。"
-  - id: s16
+        - ">现在，回到那个周二。"
+        - ">点开迟到的订单，中枢替您顺着链往下找。"
+        - ">物料缺了，因为采购单晚到了六天。"
+        - "过去要一上午，现在一分钟。"
+  - id: s17
     kind: page
     page: 29
-    part: ["中枢", "The hub"]
+    part: ["中枢与看板", "The hub and the dashboard"]
     steps: [{"show": 1}, {"click": "tr.click", "i": 0}, {"click": "#cf"}]
     say:
       en:
-        - ">The fix comes back as a draft:"
-        - ">a purchase order, or a note to the customer."
-        - ">Nothing reaches ERPNext until a person clicks confirm."
+        - ">The fix comes back as a draft."
+        - ">It might be a purchase order, or a note to the customer."
+        - ">Nothing reaches [ERPNext|E R P Next] until a person clicks confirm."
       zh:
-        - ">解决办法以草稿的形式回来："
-        - ">一张采购单，或一封给客户的说明。"
+        - ">解决办法以草稿的形式回来。"
+        - ">可能是一张采购单，也可能是一封给客户的说明。"
         - ">人不点“确认”，什么也进不了 ERPNext。"
-  - id: s17
+  - id: s18
     kind: page
     page: 30
-    part: ["中枢", "The hub"]
+    part: ["中枢与看板", "The hub and the dashboard"]
     steps: [{"show": 1}, {"click": "button.abtn", "text": "Which orders are late"}]
     say:
       en:
         - ">The assistant sits on every page."
-        - ">Ask which orders are late and why. It answers from your records, cites every one, and every run is logged."
+        - ">Ask which orders are late, and why. It answers from your records and cites every one."
+        - "Every run is logged."
       zh:
         - ">助手在每一页都在。"
-        - ">问它哪些订单迟了、为什么。它照您的记录回答，每条都注明出处，每次运行都留记录。"
-  - id: s18
+        - ">问它哪些订单迟了、为什么。它照您的记录回答，每条都注明出处。"
+        - "每次运行都留记录。"
+  - id: s19
     kind: page
     page: 33
     part: ["运营", "Operations"]
     steps: [{"show": 1}]
     say:
       en:
-        - ">And for you, the owner: what you invoiced this week, who owes you, what's overdue and from whom, and what you owe next."
-        - "It reads ERPNext's own invoices, so these numbers match your accountant's to the cent."
+        - ">For you, the owner, there is the finance board."
+        - "What you invoiced this week, who owes you, what is overdue, and what you owe next."
+        - "It reads [ERPNext|E R P Next]'s own invoices, so it matches your accountant to the cent."
       zh:
-        - ">给老板看的：这周开了多少票，谁欠您钱，谁逾期了，接下来要付多少。"
-        - "它读的就是 ERPNext 里的发票，所以和会计的数一分不差。"
-  - id: s19
+        - ">给老板的，是财务看板。"
+        - "这周开了多少票，谁欠您钱，哪些逾期，接下来要付多少。"
+        - "它读的就是 ERPNext 里的发票，所以和会计一分不差。"
+  - id: s20
     kind: page
     page: 37
     part: ["质量", "Quality"]
     steps: [{"show": 1}, {"click": "button.kpi", "text": "Equipment calibrated"}]
     say:
       en:
-        - ">Quality is where most small companies drown. Here, a standard like ISO 9001 or 13485 becomes checks that read your actual records every day."
+        - ">Quality is where most small companies drown."
+        - "Here, a standard like [ISO 9001|I S O nine thousand and one] or [13485|one three four eight five] becomes checks that read your records every day."
         - ">Green means today's records satisfy it. Red names the exact record that doesn't."
       zh:
-        - ">质量是多数小公司最吃力的地方。在这里，ISO 9001、13485 这样的标准变成每天读取实际记录的检查。"
-        - ">绿色：今天的记录满足要求；红色：直接指出是哪一条不满足。"
-  - id: s20
+        - ">质量是多数小公司最吃力的地方。"
+        - "在这里，ISO 9001、13485 这样的标准，变成每天读取实际记录的检查。"
+        - ">绿色：今天的记录满足要求。红色：直接指出是哪一条不满足。"
+  - id: s21
     kind: page
     page: 38
     part: ["质量", "Quality"]
@@ -272,27 +304,31 @@ shots:
     say:
       en:
         - ">A nonconformance follows its workflow."
-        - ">Contain it, sign it."
-        - ">Propose a disposition."
-        - ">Try to approve your own disposition: refused. Someone else must approve, and the history can only grow."
+        - ">First, contain it and sign."
+        - ">Then propose a disposition."
+        - ">Now try to approve your own disposition. It is refused."
+        - "Someone else must approve, and the history can only grow."
       zh:
         - ">不合格品按流程走。"
         - ">先隔离，签字。"
-        - ">提出处置意见。"
-        - ">想自己批自己的处置？拒绝。必须由另一个人批，记录只增不改。"
-  - id: s21
+        - ">再提出处置意见。"
+        - ">想自己批自己的处置？拒绝。"
+        - "必须由另一个人批，记录只增不改。"
+  - id: s22
     kind: page
     page: 39
     part: ["质量", "Quality"]
     steps: [{"show": 1}, {"type": ["input.ain", 3, "3.3"]}]
     say:
       en:
-        - ">At incoming inspection,"
-        - ">type a reading out of tolerance, and it turns red at once. The verdict comes from code, not from the AI."
+        - ">This is an incoming inspection."
+        - ">Type a reading out of tolerance, and it turns red at once."
+        - "The verdict comes from code, not from the [AI|A I]."
       zh:
-        - ">来料检验时，"
-        - ">输入一个超差读数，立刻变红。判定由程序给出，不由 AI 决定。"
-  - id: s22
+        - ">这是一次来料检验。"
+        - ">输入一个超差读数，立刻变红。"
+        - "判定由程序给出，不由 AI 决定。"
+  - id: s23
     kind: page
     page: 40
     part: ["质量", "Quality"]
@@ -300,27 +336,27 @@ shots:
     say:
       en:
         - ">Signed inspections feed the control charts."
-        - ">When the process shifts, a point turns red before bad parts pile up,"
-        - ">and one click opens a nonconformance report from the signal."
+        - ">When the process shifts, a point turns red before bad parts pile up."
+        - ">One click opens a nonconformance report from that signal."
       zh:
         - ">签过字的检验数据进入控制图。"
-        - ">工序一偏，点就变红，赶在废品堆起来之前，"
-        - ">点一下就从这个信号开出不合格报告。"
-  - id: s23
+        - ">工序一偏，点就变红，赶在废品堆起来之前。"
+        - ">点一下，就从这个信号开出不合格报告。"
+  - id: s24
     kind: page
     page: 44
     part: ["受监管产品", "Regulated products"]
     steps: [{"show": 1}, {"click": "button.abtn", "text": "GS1 printed"}, {"click": "#tt"}]
     say:
       en:
-        - ">For medical devices,"
-        - ">scan the label: the device identifier, lot and expiry are read and checked,"
-        - ">then traced to every shipment."
+        - ">Now, medical devices."
+        - ">Scan the label. The device identifier, the lot and the expiry date are read and checked."
+        - ">Then the lot is traced to every shipment."
       zh:
-        - ">医疗器械，"
-        - ">扫一下标签：器械标识、批号、有效期读出来并校验，"
-        - ">再追到每一次发货。"
-  - id: s24
+        - ">再看医疗器械。"
+        - ">扫一下标签：器械标识、批号、有效期读出来并校验。"
+        - ">再把这一批追到每一次发货。"
+  - id: s25
     kind: page
     page: 43
     part: ["受监管产品", "Regulated products"]
@@ -328,22 +364,12 @@ shots:
     say:
       en:
         - ">A supplier warns that a lot of boxes may be bad."
-        - ">Trace it forward: the lots that used it, the deliveries, the customers."
-        - ">Start a mock recall from the same screen, and record who confirmed."
+        - ">Trace it forward, to the lots that used it, the deliveries, and the customers."
+        - ">Start a mock recall from the same screen, and record who confirmed it."
       zh:
         - ">供应商提醒：有一批纸箱可能有问题。"
         - ">往下追：用了它的生产批、发出的货、收货的客户。"
         - ">在同一个画面发起模拟召回，记下谁确认的。"
-  - id: s25
-    kind: page
-    page: 46
-    part: ["数字工厂", "Digital factory"]
-    steps: [{"show": 1}]
-    say:
-      en:
-        - ">Measuring machines send their files straight in. Each reading lands on the right part and feature, and a person accepts it."
-      zh:
-        - ">测量设备的文件直接导入。每个读数落到对应的零件和项目上，由人接收。"
   - id: s26
     kind: page
     page: 47
@@ -352,12 +378,12 @@ shots:
     say:
       en:
         - ">Machines connect too, each with its own key."
-        - ">A reading from a machine lands in an inbox and waits."
-        - ">A person accepts it, and it joins the inspection, marked as coming from that machine. A machine never signs."
+        - ">A reading from a machine lands in an inbox, and it waits."
+        - ">A person accepts it, and it joins the inspection. A machine never signs."
       zh:
         - ">设备也能接进来，每台有自己的钥匙。"
         - ">设备发来的读数先进收件箱，等着。"
-        - ">人接收后，它才进入检验记录，并标明来自哪台设备。设备永远不签字。"
+        - ">人接收后，它才进入检验记录。设备永远不签字。"
   - id: s27
     kind: page
     page: 51
@@ -365,9 +391,11 @@ shots:
     steps: [{"show": 1}]
     say:
       en:
-        - ">And this is where it leads: a factory where the warehouse, the robots, vision inspection and every gauge feed one hub."
+        - ">And this is where it leads."
+        - "A factory where the warehouse, the robots, vision inspection and every gauge feed one hub."
       zh:
-        - ">这就是它通向的地方：仓库、机器人、视觉质检、每一件量具，都汇入同一个中枢。"
+        - ">这就是它通向的地方。"
+        - "一座工厂：仓库、机器人、视觉质检、每一件量具，都汇入同一个中枢。"
   - id: s28
     kind: page
     page: 52
@@ -375,9 +403,11 @@ shots:
     steps: [{"show": 1}]
     say:
       en:
-        - ">At the inspection station, vision reads each part's code, measures it against the drawing, and quarantines the bad ones automatically."
+        - ">At the inspection station, vision reads each part's code and measures it against the drawing."
+        - "Bad parts are set aside automatically."
       zh:
-        - ">质检站上，视觉系统读每个零件的码，按图纸测量，不合格的自动隔离。"
+        - ">质检站上，视觉系统读每个零件的码，按图纸测量。"
+        - "不合格的自动隔离。"
   - id: s29
     kind: page
     page: 53
@@ -385,9 +415,11 @@ shots:
     steps: [{"show": 1}]
     say:
       en:
-        - ">The measuring machine, a five-axis scanner, the roughness tester and every hand gauge report in by themselves. A gauge past its calibration date is refused."
+        - ">The measuring machine, a five-axis scanner, the roughness tester and every hand gauge report in by themselves."
+        - "A gauge past its calibration date is refused."
       zh:
-        - ">三坐标、五轴扫描仪、粗糙度仪和每一把手持量具，都自己报数。过了校准期的量具，读数不收。"
+        - ">三坐标、五轴扫描仪、粗糙度仪和每一把手持量具，都自己报数。"
+        - "过了校准期的量具，读数不收。"
   - id: s30
     kind: page
     page: 54
@@ -396,10 +428,10 @@ shots:
     say:
       en:
         - ">The loop closes with a person approving at the key step."
-        - "That's a vision, and every step toward it runs on the same record."
+        - "That is the vision. And every step toward it runs on the same record."
       zh:
         - ">闭环里，关键一步由人确认。"
-        - "这是愿景；而通往它的每一步，都跑在同一份记录上。"
+        - "这是愿景。而通往它的每一步，都跑在同一份记录上。"
   - id: s31
     kind: page
     page: 10
@@ -407,10 +439,12 @@ shots:
     steps: [{"show": 0.5}, {"show": 1}]
     say:
       en:
-        - ">It's yours to run. ERPNext is open source with no per-user licences, the platform runs on a server you control, and your data stays yours."
+        - ">It's yours to run. [ERPNext|E R P Next] is open source, with no per-user licences."
+        - "The platform runs on a server you control, and your data stays yours."
         - ">We teach your people, and we offer hosted connections when you need them."
       zh:
-        - ">平台归您自己运行：ERPNext 是开源的，不按人头收许可费；平台装在您掌控的服务器上，数据归您。"
+        - ">平台归您自己运行。ERPNext 是开源的，不按人头收许可费。"
+        - "平台装在您掌控的服务器上，数据归您。"
         - ">我们教会您的人，需要时提供托管接口服务。"
   - id: s32
     kind: page
@@ -419,10 +453,10 @@ shots:
     steps: [{"show": 0.5}, {"show": 1}]
     say:
       en:
-        - ">Don't switch everything at once. Import your data, and put one module live,"
-        - ">usually incoming inspection or nonconformance. Then grow."
+        - ">Don't switch everything at once. Import your data, and put one module live."
+        - ">Usually that's incoming inspection or nonconformance. Then grow."
       zh:
-        - ">不用一次全换。先导入数据，上线一个模块，"
+        - ">不用一次全换。先导入数据，上线一个模块。"
         - ">通常是来料检验或不合格品。再一步步扩。"
   - id: s33
     kind: page
@@ -431,7 +465,7 @@ shots:
     steps: [{"show": 0.6}, {"show": 1}]
     say:
       en:
-        - ">One record. AI drafts. People decide."
+        - ">One record. [AI|A I] drafts. People decide."
         - ">We're inviting a small number of pilot companies. If that Tuesday sounded familiar, let's talk."
       zh:
         - ">一份记录，AI 起草，人来决定。"

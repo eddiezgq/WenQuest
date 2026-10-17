@@ -32,7 +32,8 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 FPS = 30
 HEAD, PAUSE, TAIL, LEAD = 0.6, 0.38, 0.9, 0.35       # 秒：镜头开头、句间、镜头结尾；画面比配音提前 LEAD 秒变化
-HOLD = 1.2                                            # 秒：page 镜头里每做一步后多停一会（第 38 轮）
+XFADE = 0.6                                           # 秒：独立视频镜头之间的转场（第 38 轮）
+HOLD = 0.9                                            # 秒：page 镜头里每做一步后多停一会（第 38 轮）
 FONT_ZH = "Noto Sans CJK SC"
 COURSE = {"linalg": ["线性代数", "Linear Algebra"], "sewing": ["缝纫机设计与制造", "Sewing Machine Design and Manufacturing"]}
 VOICE_NOTE = {"clone": ["配音：AI 合成（讲者本人声音）", "Voice: AI-generated from the lecturer's own voice"],
@@ -382,7 +383,7 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
 
 PAGE_INIT = r"""(() => {
   const st = document.createElement('style');
-  st.textContent = '#ctrl,#fpage,#clock,#scrim,#toc,#notes{display:none!important} .wq-vid-focus{outline:5px solid #f5c344!important;outline-offset:4px}';
+  st.textContent = '#ctrl,#fpage,#clock,#scrim,#toc,#notes{display:none!important} .pg.on{animation:none!important} .wq-vid-focus{outline:5px solid #f5c344!important;outline-offset:4px}';
   document.head.appendChild(st);
   window.__P = (n) => document.querySelectorAll('section.pg')[n - 1];
   window.__C = (n, sel, i, txt) => {           // click an element of page n (a gold ring shows what was clicked)
@@ -390,7 +391,8 @@ PAGE_INIT = r"""(() => {
     if (txt) els = els.filter((e) => e.textContent.includes(txt));
     const e = els[i || 0];
     if (!e) throw new Error('page ' + n + ': no ' + sel + ' ' + (txt || ''));
-    e.classList.add('wq-vid-focus'); setTimeout(() => e.classList.remove('wq-vid-focus'), 1200); e.click();
+    e.classList.add('wq-vid-focus'); setTimeout(() => e.classList.remove('wq-vid-focus'), 1200);
+    if (typeof e.click === 'function') e.click(); else e.dispatchEvent(new MouseEvent('click', {bubbles: true}));   // SVG shapes have no click()
   };
   window.__Y = (n, sel, i, v) => {             // type a value into an input of page n
     const e = __P(n).querySelectorAll(sel)[i];
@@ -478,7 +480,8 @@ def compose(lec, lang, tls, shot_files, out_dir: Path, work: Path, voice_backend
     out_dir.mkdir(parents=True, exist_ok=True)
     # absolute times
     dual = lang == "en" and lec.data.get("subs") == "en+zh"
-    t0, events, chapters, offsets = 0.0, [], [], []
+    xf = XFADE if lec.data.get("standalone") else 0.0      # 第 38 轮：独立视频镜头之间交叠 xf 秒做转场（落在镜头开头的静音里）
+    t0, events, chapters, offsets, cuts = 0.0, [], [], [], []
     for s, tl in zip(lec.shots, tls):
         offsets.append(t0)
         part = lec.t(s.data.get("part", ""), lang) if s.data.get("part") else ""
@@ -488,6 +491,8 @@ def compose(lec, lang, tls, shot_files, out_dir: Path, work: Path, voice_backend
             part = lec.t(["作业", "Homework"], lang)
         if s.kind == "outro":
             part = lec.t(["小结", "Summary"], lang)
+        if offsets[:-1]:
+            cuts.append("fadeblack" if part and chapters and chapters[-1][1] != part else "smoothleft")   # 换章：经暗场淡入；同章：平滑推移
         if part and (not chapters or chapters[-1][1] != part):
             chapters.append((t0, part))
         for k, ln in enumerate(tl["lines"]):
@@ -500,8 +505,8 @@ def compose(lec, lang, tls, shot_files, out_dir: Path, work: Path, voice_backend
             for txt, share in pieces(ln["shown"], lang, span):
                 events.append((x, x + span * share, txt, ""))
                 x += span * share
-        t0 += tl["total"]
-    total = t0
+        t0 += tl["total"] - xf
+    total = t0 + xf
     # audio
     rate = V.RATE
     track = np.zeros(int((total + 0.5) * rate), np.float32)
@@ -544,9 +549,22 @@ def compose(lec, lang, tls, shot_files, out_dir: Path, work: Path, voice_backend
     if dual:   # 画面缩到 85 % 放在上面，下面一条深蓝字幕带，字幕不挡课件
         vf = "scale=1632:918,pad=1920:1080:144:0:color=0x08142a," + vf.replace("y=h-th-30", "y=30")
     mp4 = out_dir / "lecture.mp4"
-    sh("ffmpeg", "-y", "-loglevel", "error", "-i", pic, "-i", aw, "-vf", vf,
-       "-af", "loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000", "-c:v", "libx264", "-crf", "20", "-preset", "medium",
-       "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", "-shortest", mp4)
+    if xf:     # 转场：各镜头按 offsets 交叠 xfade，再烧字幕、水印，一次编码
+        ins, chain, last = [], [], "0:v"
+        for p in shot_files:
+            ins += ["-i", p]
+        for k in range(1, len(shot_files)):
+            lab = f"x{k}"
+            chain.append(f"[{last}][{k}:v]xfade=transition={cuts[k - 1]}:duration={xf}:offset={offsets[k]:.3f}[{lab}]")
+            last = lab
+        fc = ";".join(chain + [f"[{last}]{vf}[vout]"]) if chain else f"[0:v]{vf}[vout]"
+        sh("ffmpeg", "-y", "-loglevel", "error", *ins, "-i", aw, "-filter_complex", fc, "-map", "[vout]", "-map", f"{len(shot_files)}:a",
+           "-af", "loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000", "-c:v", "libx264", "-crf", "20", "-preset", "medium",
+           "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", "-shortest", mp4)
+    else:
+        sh("ffmpeg", "-y", "-loglevel", "error", "-i", pic, "-i", aw, "-vf", vf,
+           "-af", "loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000", "-c:v", "libx264", "-crf", "20", "-preset", "medium",
+           "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", "-shortest", mp4)
     tl_out = {"total": total, "chapters": chapters, "shots": [{"id": s.id, "start": o, **tl} for s, o, tl in zip(lec.shots, offsets, tls)]}
     (out_dir / "timeline.json").write_text(json.dumps(tl_out, ensure_ascii=False, indent=1), encoding="utf-8")
     return mp4, chapters, total
