@@ -316,6 +316,94 @@ class WebLab:
         GROUPS[f"{self.mid}.threads"] = [x for x in self.threads.values() if x is not None]
 
 
+class Seam:
+    """gen:seam —— 锁式线迹的布料剖面（第 37 轮“旋梭钩线”第 4 步；Eddie 14:04“面线和底线锁紧应该展示不同颜色的线结”，14:06“锁迹线结应该很形象”）。
+    两层布沿针孔中心剖开；面线（蓝）走在布面上，底线（橙）走在布底下。每个针孔里：底线上到两层布中间横着走一小段，
+    面线从上面下来，从这段底线的下面兜过去再上去——两根线像两节链环一样扣在一起，结在两层布中间。
+    线画成两股捻在一起的样子，看得出是线。tighten: [起, 止] 秒：最后一针的面线线环从布下被拉上来，把底线拉进布中间。示意，尺寸放大。"""
+
+    def __init__(self, mid, p):
+        self.mid, self.p = mid, p
+        self.n, self.pitch = p.get("stitches", 5), p.get("pitch", 0.006)
+        self.ply = p.get("ply", 0.0016)
+        self.r = p.get("thread", 0.00028)
+        L = self.n * self.pitch + self.pitch
+        for k, (z0, c) in enumerate(((0.0, "table"), (self.ply, "shell"))):
+            o = mesh("box", (L, 0.012, self.ply), (L / 2 - self.pitch / 2, 0.006, z0 + self.ply / 2), color=c)
+            add_group(f"{mid}.fabric", o)
+        self.objs = {}
+
+    def strands(self, name, pts, color):
+        """沿中心线画两股相互缠绕的细线（像真线的捻度），再加一根细芯把缝隙填上。"""
+        for k in list(self.objs):
+            if k.startswith(name):
+                bpy.data.objects.remove(self.objs.pop(k), do_unlink=True)
+        P = [Vector(q) for q in pts]
+        dense = []                                        # 先把折线加密并平滑
+        for a, b in zip(P, P[1:]):
+            n = max(2, int((b - a).length / 0.00015))
+            dense += [a.lerp(b, i / n) for i in range(n)]
+        dense.append(P[-1])
+        for _ in range(6):
+            dense = [dense[0]] + [(dense[i - 1] + 2 * dense[i] + dense[i + 1]) / 4 for i in range(1, len(dense) - 1)] + [dense[-1]]
+        acc, up = 0.0, Vector((0, 0, 1))
+        sides = []
+        for i, c in enumerate(dense):
+            tng = (dense[min(i + 1, len(dense) - 1)] - dense[max(i - 1, 0)]).normalized()
+            nrm = tng.cross(up if abs(tng.dot(up)) < 0.9 else Vector((0, 1, 0))).normalized()
+            bin_ = tng.cross(nrm)
+            if i:
+                acc += (dense[i] - dense[i - 1]).length
+            sides.append((c, nrm, bin_, acc))
+        for j in range(2):
+            pts2 = []
+            for c, nrm, bin_, s_ in sides:
+                ang = s_ / 0.0011 * 2 * math.pi + j * math.pi        # 每 1.1 mm 捻一圈
+                pts2.append(c + (nrm * math.cos(ang) + bin_ * math.sin(ang)) * self.r * 0.55)
+            self._curve(f"{name}{j}", pts2, color, self.r * 0.55)
+        self._curve(f"{name}_core", dense, color, self.r * 0.45)
+        GROUPS[f"{self.mid}.threads"] = list(self.objs.values())
+
+    def _curve(self, key, pts, color, r):
+        cu = bpy.data.curves.new(key, "CURVE")
+        cu.dimensions, cu.bevel_depth, cu.bevel_resolution = "3D", r, 2
+        sp = cu.splines.new("POLY")
+        sp.points.add(len(pts) - 1)
+        for p_, q in zip(sp.points, pts):
+            p_.co = (q.x, q.y, q.z, 1)
+        o = bpy.data.objects.new(f"{self.mid}.{key}", cu)
+        o.data.materials.append(mat(color))
+        sc.collection.objects.link(o)
+        self.objs[key] = o
+
+    def update(self, t):
+        a, b = self.p.get("tighten", [0, 1])
+        u = smooth((t - a) / (b - a))                    # 0 = 线环还在布下，1 = 收紧
+        top, bot, mid = 2 * self.ply + self.r, -self.r, self.ply
+        R = self.r
+        h = 0.0009                                       # 底线在结里横着走的半长
+        up, lo = [], []
+        for k in range(self.n + 1):
+            x = k * self.pitch
+            last = k == self.n
+            zk = mid if not last else mid * u + (-0.0055) * (1 - u)      # 结的高度（最后一针从布下被拉上来）
+            loop = 1.0 if not last else 1.0 + 4.0 * (1 - u)              # 面线线环的大小
+            # 底线：沿布底来 → 进针孔上到结 → 在结里横着走一小段 → 下去 → 沿布底走
+            lo += [(x - 0.0022, 0, bot), (x - h - 0.0003, 0, zk - 0.0006), (x - h, 0, zk), (x + h, 0, zk),
+                   (x + h + 0.0003, 0, zk - 0.0006), (x + 0.0022, 0, bot)]
+            # 面线：沿布面来 → 从结的前面（y < 0）下去 → 从底线下面兜过去 → 从后面（y > 0）上来 → 沿布面走
+            ly = 2.2 * R * loop
+            up += [(x - 0.0022, 0, top), (x - 0.0003, -ly * 0.6, top - 0.0003), (x, -ly, zk + 2.5 * R),
+                   (x, -ly, zk), (x, -ly * 0.6, zk - 2.2 * R * loop), (x, 0, zk - 2.6 * R * loop),
+                   (x, ly * 0.6, zk - 2.2 * R * loop), (x, ly, zk), (x, ly, zk + 2.5 * R), (x + 0.0003, ly * 0.6, top - 0.0003),
+                   (x + 0.0022, 0, top)]
+            if not last:
+                up += [(x + self.pitch * f, 0, top) for f in (0.5,)]
+                lo += [(x + self.pitch * f, 0, bot) for f in (0.5,)]
+        self.strands("upper", up, "thread")
+        self.strands("bobbin", lo, "bobbin")
+
+
 class Item:
     """一个会被搬运的小物件：在 start 处出现 → 被机械臂夹住随夹爪走 → 放上传送带随皮带走。"""
 
@@ -345,6 +433,8 @@ for m in SPEC["models"]:
         OBJ[mid] = Arm6(mid, m.get("params", {}))
     elif use == "gen:conveyor":
         OBJ[mid] = Conveyor(mid, m)
+    elif use == "gen:seam":
+        OBJ[mid] = Seam(mid, m)
     elif use.startswith("weblab:"):
         OBJ[mid] = WebLab(mid, use[7:], m)
     elif use == "item":
@@ -572,7 +662,7 @@ def pose_at(t):
         if isinstance(o, Arm6) and mid in PATHS:
             p, g = PATHS[mid](t)
             o.set(p, g)
-        if isinstance(o, Conveyor):
+        if isinstance(o, (Conveyor, Seam)):
             o.update(t)
     bpy.context.view_layer.update()
     for mid, o in OBJ.items():

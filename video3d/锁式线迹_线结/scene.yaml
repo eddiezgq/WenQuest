@@ -1,0 +1,21 @@
+# 旋梭钩线讲解 · 第 4 步“面线和底线扣成结”小样（第 37 轮；Eddie 14:04：“面线和底线锁紧应该展示不同颜色的线结”）。
+# 两层布沿针孔剖开；面线蓝、底线橙；最后一针的线环从布下被拉上来，把底线拉进两层布中间扣住。示意，尺寸放大。
+name: 锁式线迹_线结
+title: {zh: 面线和底线在布中间扣成结, en: The two threads lock inside the fabric}
+duration: 14
+floor: false
+clip: 0.001
+models:
+  - {id: s, use: "gen:seam", stitches: 4, pitch: 0.006, ply: 0.0016, thread: 0.0003, tighten: [3, 9]}
+camera:
+  - {t: 0, look: [0.016, 0.0, -0.002], az: 0, el: 6, dist: 0.065}
+  - {t: 3, look: [0.020, 0.0, -0.001], az: 0, el: 4, dist: 0.050}
+  - {t: 9, look: [0.018, 0.0, 0.0016], az: -10, el: 6, dist: 0.022}
+  - {t: 14, look: [0.018, 0.0, 0.0016], az: -40, el: 20, dist: 0.016}
+effects:
+  - {kind: xray, t: [-2, 16], top: [s.threads]}
+labels:
+  - {t: [0, 3], zh: 剖开两层布：面线（蓝）在上，底线（橙）在下, en: "Cut through the two plies: upper thread (blue) on top, bobbin thread (orange) below"}
+  - {t: [3, 9], zh: 挑线杆收线：线环从布下被拉上来，把底线一起拉进布里, en: "The take-up pulls the loop up from below, dragging the bobbin thread into the cloth"}
+  - {t: [9, 14], zh: 面线绕住底线，结扣在两层布中间——这就是锁式线迹, en: "The upper thread wraps the bobbin thread and the knot sits between the plies: a lockstitch"}
+  - {t: [0, 14], where: bottom, zh: 示意：线径、针距放大；面线蓝、底线橙, en: "Schematic: thread and stitch length enlarged; upper blue, bobbin orange"}
