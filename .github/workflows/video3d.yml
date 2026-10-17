@@ -54,10 +54,15 @@ jobs:
           python -m playwright install --with-deps chromium > /dev/null   # 场景用到网页虚拟实验时，运动从实验页里取
       - name: 渲染第 ${{ matrix.k }} 份
         run: |
-          python3 tools/blender/render.py "${{ github.event.inputs.scene }}" ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --shard ${{ matrix.k }}/${{ github.event.inputs.shards }} 2>&1 | grep -v "^Fra:\|Saved:\|Time:" || true
-          cd "${{ github.event.inputs.scene }}"
-          ls _frames/f*.png | wc -l
-          test -n "$(ls _frames/f*.png 2>/dev/null)"
+          set +e
+          python3 tools/blender/render.py "${{ github.event.inputs.scene }}" ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --shard ${{ matrix.k }}/${{ github.event.inputs.shards }} > render.log 2>&1
+          rc=$?
+          grep -v "^Fra:\|Saved:\|Time:" render.log | tail -40
+          if [ $rc -ne 0 ]; then   # 出错原因写成注解，不用下载日志也能看到
+            grep -v "^Fra:\|Saved:\|Time:\|EGL" render.log | tail -12 | while IFS= read -r l; do echo "::error::$l"; done
+            exit $rc
+          fi
+          ls "${{ github.event.inputs.scene }}"/_frames/f*.png | wc -l
       - uses: actions/upload-artifact@v4
         with:
           name: frames-${{ matrix.k }}
