@@ -39,7 +39,7 @@ jobs:
   render:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 150            # 透视两遍渲染的高清片，单份可能超过 1 小时
     strategy:
       fail-fast: true
       matrix:

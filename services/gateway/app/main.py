@@ -264,8 +264,21 @@ def register(app: FastAPI) -> None:
                 voice = r.json() if r.status_code == 200 else "down"
             except (httpx.HTTPError, ValueError):
                 voice = "down"
+        blender: Any = False          # 三维仿真视频（第 38 轮）：关键画面容器；render = 有没有出片机器（Lambda 密钥）
+        if state.settings.video3d_blender_url:
+            try:
+                async with httpx.AsyncClient(timeout=2.0, trust_env=False) as c:
+                    r = await c.get(state.settings.video3d_blender_url.rstrip("/") + "/health")
+                blender = r.json() if r.status_code == 200 else "down"
+            except (httpx.HTTPError, ValueError):
+                blender = "down"
+        try:
+            v3render = video3d_api.service(sys.modules[__name__]).render_on
+        except Exception:  # noqa: BLE001
+            v3render = False
         return {"ok": True, "version": VERSION, "ai": state.ai.provider, "region": state.settings.region, "slides": state.slides.available,
-                "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck, "voice": voice}
+                "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck, "voice": voice,
+                "video3d": {"stills": blender, "render": v3render}}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn, response: Response):
