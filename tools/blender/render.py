@@ -1,6 +1,7 @@
 """三维仿真视频渲染器（第 37 轮第 2 步）：一段视频 = 一个场景文件 scene.yaml（只有数据，AI 写的也是它），本程序照着出片。
     python3 tools/blender/render.py <场景目录> [--draft] [--still 秒,秒] [--shard k/N] [--encode]
       --draft   960×540、15 帧/秒的小样          --still  只出这几秒的单帧（_frames/still_*.png）
+      --resume  接着画：_frames 里已有的帧跳过（本机渲染被打断时用）
       --shard   并行：只画第 k 份（GitHub 工作流 video3d.yml 用）     --encode  帧齐了以后只合成
 场景文件写什么，见 tools/blender/场景格式.md。模型只用已有的：程序生成的机构（gen:arm6、gen:conveyor）、简单形体（box、cyl）、
 已有虚拟实验里的整机模型（weblab:…，运动也取自实验本身）。运动都由程序算（逆运动学、实验的机构计算），不手调。"""
@@ -543,20 +544,27 @@ def camera(t):
 def effect(t):
     """透视程度 xu（0–1）、要叠在上面的组；剖开（换成开窗机壳、去掉外盖）。"""
     xu, top = 0.0, []
+    cuts = [e for e in SPEC.get("effects", []) if e["kind"] == "cutaway"]
+    for e in cuts:                        # 几段剖开可以叠用（整机去外盖，再近看时去掉更多）：先全部复原，再按当前时刻生效的几段设
+        for g in e.get("hide", []):
+            for o in GROUPS.get(g, []):
+                o.hide_render = False
+        for g in e.get("show", []):
+            for o in GROUPS.get(g, []):
+                o.hide_render = True
     for e in SPEC.get("effects", []):
         a, b = e["t"]
         if e["kind"] == "xray" and a - 1.5 < t < b + 1.5:
             u = smooth((t - a) / 1.5) - smooth((t - b) / 1.5)
             if u > xu:
                 xu, top = u, e["top"]
-        if e["kind"] == "cutaway":
-            on = a <= t < b
+        if e["kind"] == "cutaway" and a <= t < b:
             for g in e.get("hide", []):
                 for o in GROUPS.get(g, []):
-                    o.hide_render = on
+                    o.hide_render = True
             for g in e.get("show", []):
                 for o in GROUPS.get(g, []):
-                    o.hide_render = not on
+                    o.hide_render = False
     return xu, top
 
 
@@ -651,6 +659,8 @@ elif ENCODE:
 else:
     # 并行时隔帧分：第 k 份画第 k、k+N、k+2N…帧，透视这类慢镜头均摊到每一份，不会拖住某一份
     jobs = [(i, i / FPS) for i in (range(SHARD[0], NF, SHARD[1]) if SHARD else range(NF))]
+    if "--resume" in ARGV:                 # 接着上次没画完的画：已有的帧跳过
+        jobs = [(i, t) for i, t in jobs if not (DIR / "_frames" / f"f{i:05d}.png").exists()]
 
 
 
