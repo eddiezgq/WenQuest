@@ -92,7 +92,7 @@ jobs:
         run: |
           ls "${{ github.event.inputs.scene }}"/_frames/f*.png | wc -l
           python3 tools/blender/render.py "${{ github.event.inputs.scene }}" ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --encode 2>&1 | tail -3
-          ls -la "${{ github.event.inputs.scene }}"/*.mp4 "${{ github.event.inputs.scene }}"/*.webm
+          ls -la "${{ github.event.inputs.scene }}"/*.mp4                 # 小样只有 MP4；正式片另有 WebM
       - uses: actions/upload-artifact@v4
         with:
           name: video
