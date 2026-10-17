@@ -507,7 +507,7 @@ def subtimes(t):
     """运动模糊段（effects 里 kind: blur）：快门开着的这段时间里取 n 个时刻；其余只取 t。"""
     for e in SPEC.get("effects", []):
         if e["kind"] == "blur" and e["t"][0] <= t < e["t"][1]:
-            n, sh = e.get("n", 5), e.get("shutter", 0.5) / FPS
+            n, sh = (min(3, e.get("n", 5)) if DRAFT else e.get("n", 5)), e.get("shutter", 0.5) / FPS
             return [t + sh * (k / (n - 1) - 0.5) for k in range(n)]
     return [t]
 

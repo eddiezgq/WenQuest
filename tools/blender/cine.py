@@ -7,7 +7,10 @@ import bpy
 from mathutils import Vector
 from PIL import Image, ImageDraw, ImageFont
 
+import os
 FONT_B = "/usr/share/fonts/opentype/noto/NotoSansCJK-Black.ttc"
+if not os.path.exists(FONT_B):                  # 构建机上的字体包只有 Regular、Bold
+    FONT_B = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
 FONT_M = "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc"
 FONT_R = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 
@@ -33,6 +36,8 @@ def setup(sc, spec, mats, quick=False):
     sc.cycles.use_denoising = True
     sc.cycles.max_bounces, sc.cycles.glossy_bounces, sc.cycles.transparent_max_bounces = 6, 4, 4
     sc.cycles.use_adaptive_sampling = True
+    sc.render.use_persistent_data = True          # 逐帧只动零件位置：场景数据留在内存里，不必每帧重建
+    sc.cycles.denoising_prefilter = "FAST"
     sc.view_settings.view_transform = "AgX" if "AgX" in [i.identifier for i in sc.view_settings.bl_rna.properties["view_transform"].enum_items] else "Filmic"
     sc.view_settings.look = "None"
     sc.render.film_transparent = False

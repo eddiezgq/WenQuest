@@ -3,7 +3,8 @@
 # 模型和运动仍取自课程里的平缝机虚拟样机；数字：每分钟 5000 针、一针 12 ms、钩线约 206°、钩线窗口约 0.3 ms（教材第 5 章）。
 name: 缝纫机一针_震撼版
 style: cinematic
-samples: 48
+samples: 16
+fps: 24
 title: {zh: 平缝机一针, en: One lockstitch}
 duration: 24
 floor: false
@@ -32,8 +33,8 @@ camera:
   - {t: 21, look: [0.08, 0.0, 0.07], az: -32, el: 10, dist: 0.80, lens: 50, fstop: 5.6}
   - {t: 24, look: [0.08, 0.0, 0.07], az: -18, el: 12, dist: 0.74, lens: 50, fstop: 5.6}
 effects:
-  - {kind: blur, t: [0, 3], n: 6, shutter: 0.6}
-  - {kind: blur, t: [19, 24], n: 6, shutter: 0.6}
+  - {kind: blur, t: [0, 3], n: 4, shutter: 0.6}
+  - {kind: blur, t: [19, 24], n: 4, shutter: 0.6}
   - {kind: flash, t: [3, 3.35]}
   - {kind: flash, t: [20.95, 21.25]}
   - {kind: cutaway, t: [3, 21], hide: [m.body, m.face, m.top, m.rear, m.table, m.stand, m.spool, m.details, m.oil, m.belt, m.tension, m.guide]}
