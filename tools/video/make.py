@@ -383,7 +383,7 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
 
 PAGE_INIT = r"""(() => {
   const st = document.createElement('style');
-  st.textContent = '#ctrl,#fpage,#clock,#scrim,#toc,#notes{display:none!important} .pg.on{animation:none!important} .wq-vid-focus{outline:5px solid #f5c344!important;outline-offset:4px}';
+  st.textContent = '#ctrl,#fpage,#clock,#scrim,#toc,#notes{display:none!important} .pg.on,.stage-n{animation:none!important} .wq-vid-focus{outline:5px solid #f5c344!important;outline-offset:4px}';
   document.head.appendChild(st);
   window.__P = (n) => document.querySelectorAll('section.pg')[n - 1];
   window.__C = (n, sel, i, txt) => {           // click an element of page n (a gold ring shows what was clicked)

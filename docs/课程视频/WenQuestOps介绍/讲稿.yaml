@@ -303,13 +303,13 @@ shots:
     steps: [{"show": 1}, {"click": "#act"}, {"js": "__C(38, '#act')"}, {"js": "__C(38, '#act')"}]
     say:
       en:
-        - ">A nonconformance follows its workflow."
+        - ">Every nonconformance moves through fixed steps."
         - ">First, contain it and sign."
         - ">Then propose a disposition."
         - ">Now try to approve your own disposition. It is refused."
         - "Someone else must approve, and the history can only grow."
       zh:
-        - ">不合格品按流程走。"
+        - ">每一件不合格品都按固定的步骤走。"
         - ">先隔离，签字。"
         - ">再提出处置意见。"
         - ">想自己批自己的处置？拒绝。"
