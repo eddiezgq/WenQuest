@@ -221,6 +221,31 @@ table.st td { padding: 16px 18px; border-bottom: 2px solid var(--line); vertical
 .bigstamp { display: inline-block; border: 5px solid var(--pass); color: var(--pass); font-family: var(--display); font-weight: 700; font-size: 54px; letter-spacing: .06em; padding: 4px 26px; transform: rotate(-6deg); animation: stampIn .35s cubic-bezier(.2,1.6,.4,1) both; }
 .bigstamp.no { border-color: var(--fail); color: var(--fail); }
 .notes { display: none; }
+
+.aig { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.aig button { border: 2px solid var(--line); background: rgba(20,45,87,.75); color: var(--ink); border-radius: 12px; padding: 14px 16px; text-align: left; cursor: pointer; font-family: var(--display); font-size: 27px; font-weight: 600; display: grid; gap: 4px; }
+.aig button small { font-family: Inter, Arial, sans-serif; font-size: 17px; font-weight: 400; color: var(--soft); }
+.aig button.on { border-color: var(--gold); box-shadow: inset 6px 0 0 var(--gold); }
+.aiout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.aiout .card { padding: 22px 26px; } .aiout .card p { font-size: 25px; }
+.rulesonly { display: inline-flex; gap: 10px; align-items: center; font-size: 22px; color: var(--soft); margin-left: 16px; }
+table.vs { width: 100%; border-collapse: collapse; font-size: 25px; }
+table.vs th { font-family: var(--mono); font-size: 19px; font-weight: 400; color: var(--soft); text-align: left; padding: 8px 14px; border-bottom: 2px solid var(--line); }
+table.vs td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.vs td:first-child { color: var(--cyan); font-family: var(--mono); font-size: 20px; width: 190px; }
+table.vs td:nth-child(2) { color: var(--soft); }
+table.vs tr.hit td { background: rgba(245,195,68,.08); }
+table.vs td:nth-child(3) b { color: var(--gold); }
+.term { background: #050c1a; border: 2px solid var(--line); border-radius: 14px; padding: 22px 26px; font-family: var(--mono); font-size: 22px; line-height: 1.55; color: #cfe3ff; min-height: 420px; white-space: pre-wrap; }
+.term .ok { color: #4ade80; } .term .dim { color: #6b84a8; } .term .g { color: var(--gold); }
+.tline { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; align-items: end; height: 220px; margin-top: 10px; }
+.tline div { background: linear-gradient(180deg, var(--gold), #b07f12); border-radius: 8px 8px 0 0; position: relative; }
+.tline div span { position: absolute; top: -34px; left: 0; right: 0; text-align: center; font-family: var(--mono); font-size: 20px; color: var(--ink); }
+.tlab { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; font-family: var(--mono); font-size: 18px; color: var(--soft); text-align: center; margin-top: 6px; }
+.wfv { display: grid; gap: 10px; font-size: 22px; }
+.wfv .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.wfv .st { border: 2px solid var(--line); border-radius: 999px; padding: 4px 14px; } .wfv .st.new { border-color: var(--gold); color: var(--gold); }
+.rolecards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .modgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
 .mod { border: 2px solid var(--line); background: rgba(20,45,87,.75); color: var(--ink); border-radius: 12px; padding: 18px 22px; font-size: 32px; font-weight: 600; text-align: left; cursor: pointer; font-family: var(--display); }
 .mod.on { border-color: var(--gold); box-shadow: inset 6px 0 0 var(--gold); }
@@ -375,6 +400,17 @@ Now try "Let the AI sign". Refused, every time. Type any password and sign as a 
       <div class="card f"><span class="n">RULE 4</span><h3>Unknown is not pass</h3><p>A supplier with no inspected lots has no rate, not 0%.</p><button class="btn" type="button" id="unkBtn" style="justify-self:start">Show one</button><div id="unkOut"></div></div>
     </div>
     <aside class="notes">Four rules hold in every module. Code judges. People sign, and someone else approves. History only grows, enforced in the database itself. And unknown is not pass: click Show one. A supplier we never inspected gets unknown, not a perfect score.</aside>
+  </section>
+  <section class="pg" data-ch="2 · The idea" data-title="What the AI does">
+    <div class="head" style="margin-bottom:22px"><p class="kick f">Part 2 · AI native, click a job</p><h2 class="f">Eight jobs the AI does, and what it may never do</h2></div>
+    <div class="aig f" id="aig"></div>
+    <div class="aiout f" id="aiout"></div>
+    <aside class="notes">AI native means every module was designed asking first what the AI should do, with rules as the fallback. Eight jobs. It answers questions from your records and cites them. It writes a morning brief. It drafts purchase orders, nonconformance reports and customer notes. It sorts a shared drive and quotes what it read. It maps old spreadsheets to the right fields. It drafts procedures you are missing and leaves what it does not know for a person. It reads your own procedures and proposes how to fit the standard workflows to them, quoting the paragraph each change rests on. And it reports the gaps against a standard. In every case it proposes; code checks, and a person decides. Tick "rules only": a company that does not want its documents sent to an AI model still gets the rule-based version of most of these.</aside>
+  </section>
+  <section class="pg" data-ch="2 · The idea" data-title="How it is different">
+    <div class="head" style="margin-bottom:22px"><p class="kick f">Part 2 · Compared with the usual setup</p><h2 class="f">What changes compared with how most small companies run today</h2></div>
+    <table class="vs f" id="vs"><tr><th></th><th>The usual setup</th><th>WenQuest Ops</th></tr></table>
+    <aside class="notes">Compared with the usual setup in a small company: an accounting or ERP package, spreadsheets, a separate quality tool or a binder, and email in between. Click each row. One record instead of copies. AI that cites and cannot sign, instead of AI that guesses. Standards as checks that run every day, instead of a binder before the audit. An open base on your own server, with no per-user licences for the ERP. Installed by your IT person or IT provider in an afternoon. And changed by you, with a signature, instead of waiting for a vendor's release.</aside>
   </section>
   <section class="pg" data-ch="2 · The idea" data-title="Yours to run">
     <div class="head"><p class="kick f">Part 2 · Plainly</p><h2 class="f">You build and run it, with AI and our courses</h2></div>
@@ -668,6 +704,21 @@ We run these services; your system calls them; your records stay on your server.
     <div class="win f" data-app="docs" style="height:493px"></div>
     <aside class="notes">Upload your shared drive as it is. For each file the AI suggests the type, process, number and revision, and quotes the text it read. Click a file, check the quote, confirm. Then the file is under document control with versions, reviews and reading sign-off.</aside>
   </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Library check">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · After the import</p><h2 class="f">The whole library checked, and old logs turned into records</h2></div>
+    <div class="win f" data-app="library" style="height:493px"></div>
+    <aside class="notes">After the shared drive is in, the library is checked as a whole: the same number used for different documents, the same revision twice, identical copies in different folders, records with no procedure behind them, references to documents that are not there. Click a finding to fix it; the check runs again. Scans were read with OCR on your own server. A spreadsheet like the calibration log is not a document to control: its rows belong in the calibration module. The AI proposes which column is which field, code checks every column, and a person signs the import. Each imported row keeps the cell it came from.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Draft, review, approve">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · A procedure you never had</p><h2 class="f">AI drafts it. People fill, review and approve it.</h2></div>
+    <div class="win f" data-app="drafting" style="height:493px"></div>
+    <aside class="notes">The check found calibration records but no calibration procedure, and ISO 13485 clause 7.6 needs one. Ask the AI to draft it. It writes from what the standard requires, and anything it does not know about your company it marks "to fill" instead of guessing. Jordan fills the gaps and sends it for approval. Dana reviews: she can send it back with a reason, and it returns to draft; or approve it with her signature. Then it takes effect, as you'll see on the next page. The AI wrote the first draft; it never approves and never makes a document effective.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Document control">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Document control</p><h2 class="f">One version in effect. Signed changes. Everyone has read it.</h2></div>
+    <div class="win f" data-app="reading" style="height:493px"></div>
+    <aside class="notes">Document control, the way ISO 13485 auditors check it. Revision C of the receiving procedure is in effect; Jordan uploaded revision D as a draft. Try to edit revision C instead: refused, an effective document changes only by a new revision. Send D for approval. Try to approve it as Jordan: refused, the approver must be someone who did not upload, confirm or submit it. Switch to Dana and sign: D takes effect, its fingerprint is frozen, C becomes obsolete automatically, and the four people who must read it are asked to, with a due date. Sam confirms with his password; the others stay pending until they do. Each document type has a periodic review that someone else approves, and every step is in the history, which cannot be edited.</aside>
+  </section>
   <section class="pg" data-ch="7 · Regulated products" data-title="Production record">
     <div class="head" style="margin-bottom:24px"><p class="kick f">Part 7 · Device history, step by step</p><h2 class="f">Every step signed, every gauge checked</h2></div>
     <div class="win f" data-app="production" style="height:493px"></div>
@@ -698,7 +749,7 @@ We run these services; your system calls them; your records stay on your server.
     <div class="win f" data-app="inbox" style="height:493px"></div>
     <aside class="notes">Each machine has its own token. Click Send a reading: it lands in the inbox, waiting. Accept it as a person, and it is in the inspection, marked as coming from that machine. Revoke the token and send again: refused and logged. Going the other way, your MES reads events in order. A machine never signs.</aside>
   </section>
-  <section class="pg" data-ch="9 · Engineers, then starting" data-title="Under the hood">
+  <section class="pg" data-ch="9 · Deploy, change, start" data-title="Under the hood">
     <div class="head"><p class="kick f">Part 9 · For engineers</p><h2 class="f">What runs, where the rules live</h2></div>
     <table class="st">
       <tr class="f"><td>Base</td><td>ERPNext official image, unmodified, REST API only</td></tr>
@@ -710,7 +761,7 @@ We run these services; your system calls them; your records stay on your server.
     </table>
     <aside class="notes">For the engineers: ERPNext in its official image, a Python FastAPI hub with PostgreSQL, Docker Compose with automatic HTTPS. Two choices worth noting: the rules about signed records live in database triggers, and the modules that judge pass or fail are checked on every change so they never import AI or network code.</aside>
   </section>
-  <section class="pg" data-ch="9 · Engineers, then starting" data-title="The machine interface">
+  <section class="pg" data-ch="9 · Deploy, change, start" data-title="The machine interface">
     <div class="head"><p class="kick f">Part 9 · Integration</p><h2 class="f">Three calls an MES needs</h2></div>
     <div class="cols" style="grid-template-columns:1fr 1fr;gap:44px">
       <pre class="code f">POST /api/integration/v1/measurements
@@ -730,7 +781,38 @@ Authorization: Bearer wqo_…
     </div>
     <aside class="notes">The integration surface is deliberately small: two calls to send data, which wait for a person, and one to read events in commit order so a reader never misses one. Tokens are scoped, revocable, and stored only as a hash.</aside>
   </section>
-  <section class="pg" data-ch="9 · Engineers, then starting" data-title="Getting started">
+  <section class="pg" data-ch="9 · Deploy, change, start" data-title="Deploy in an afternoon">
+    <div class="head" style="margin-bottom:22px"><p class="kick f">Part 9 · Your IT person or IT provider runs one command</p><h2 class="f">Installed in an afternoon, on a server you control</h2></div>
+    <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:28px">
+      <div class="term f" id="term"></div>
+      <div class="cols" style="gap:16px;align-content:start">
+        <button class="btn solid f" id="instBtn" type="button">Run the installer</button>
+        <div class="card f"><span class="n">ONE FILE DESCRIBES THE COMPANY</span><p>Sites, warehouses, departments, roles, currency, time zone. Filled in a spreadsheet, checked line by line.</p></div>
+        <div class="card f"><span class="n">THEN</span><p>Sign in with Microsoft 365 or Google. Backup, restore, upgrade and a health check for monitoring. Our nightly test installs it on a clean machine.</p></div>
+      </div>
+    </div>
+    <aside class="notes">Deployment is one command, run by your IT person or your IT provider. One file describes the company: sites, warehouses, departments, roles, currency, time zone; you can fill it in a spreadsheet and it is checked line by line. The installer brings up ERPNext from its official image, PostgreSQL, the hub and the web app behind automatic HTTPS, and creates your company in ERPNext. The first run takes about fifteen to twenty-five minutes, and running it again is safe. Then people sign in with Microsoft 365 or Google accounts. Backup, restore, upgrade and a health check are built in, and every night our tests install the whole thing on a clean machine.</aside>
+  </section>
+  <section class="pg" data-ch="9 · Deploy, change, start" data-title="Change in days">
+    <div class="head" style="margin-bottom:22px"><p class="kick f">Part 9 · Fast iteration, both sides</p><h2 class="f">Changes in days, not release cycles</h2></div>
+    <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:30px">
+      <div class="card f"><span class="n">HOW WE BUILD IT</span><p style="font-size:24px">AI-assisted development, one change per reviewed pull request, every change tested.</p>
+        <div class="tline" id="tline"></div><div class="tlab"><span>Oct 12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span></span></div>
+        <p style="font-size:22px" id="tlNote">Pull requests merged since the first commit, running total (as of Oct 17).</p></div>
+      <div class="card f"><span class="n">HOW YOU CHANGE IT</span>
+        <div class="wfv" id="wfv"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" id="wfAi" type="button">AI: read our procedure</button><button class="btn" id="wfAcc" type="button">Accept the change</button><button class="btn solid" id="wfOn" type="button">Enable (someone else signs)</button></div>
+        <p style="font-size:22px" id="wfMsg"></p></div>
+    </div>
+    <aside class="notes">Fast iteration, on both sides. On ours: the product is built with AI-assisted development, one change per reviewed pull request, every change tested. From the first commit on October 12 to October 17, seventy-eight pull requests were merged. On yours: quality workflows are configuration, not code. Click "AI: read our procedure": it finds that your procedure says the customer is told about every nonconformance on their order, and proposes adding that step, quoting the paragraph. A person accepts it; someone else enables the new version with a signature. Records already open finish on the old version; new ones use the new one. The procedure document is regenerated from the new workflow.</aside>
+  </section>
+  <section class="pg" data-ch="9 · Deploy, change, start" data-title="How the service works">
+    <div class="head" style="margin-bottom:22px"><p class="kick f">Part 9 · Who does what</p><h2 class="f">Three roles at your company, and what we provide</h2></div>
+    <div class="rolecards f" id="roles"></div>
+    <div class="aiout f" id="svcOut"></div>
+    <aside class="notes">How the service works. Three roles at your company. The owner sets the goals and decides. An AI specialist, one of your own people, runs and adapts the platform; our courses train them. Your IT person or IT provider installs and maintains it; we give them a deployment course, documentation and support. What we provide: the platform, the courses, and hosted connections such as shipping labels and e-commerce orders, which are on our plan and clearly marked as planned. IT providers can join a partner program to deploy for their clients; its terms will be set with the first providers. And we start with a few pilot companies, working closely with each.</aside>
+  </section>
+  <section class="pg" data-ch="9 · Deploy, change, start" data-title="Getting started">
     <div class="head"><p class="kick f">Part 9 · A realistic path</p><h2 class="f">Start with one problem, then grow</h2></div>
     <div class="steps">
       <div class="f"><span class="w">STEP 1</span><b>Install and import</b><p>Your server; items, customers, suppliers and open orders from the old system.</p></div>
@@ -806,7 +888,7 @@ Authorization: Bearer wqo_…
     if (p.dataset.ch !== last) { const h = document.createElement('div'); h.className = 'ch'; h.textContent = p.dataset.ch; $('#tocList').appendChild(h); last = p.dataset.ch }
     const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<b>${i + 1}</b><span>${esc(p.dataset.title)}</span>`; b.onclick = () => { go(i); panel() }; $('#tocList').appendChild(b)
   })
-  const MIN = { 'Opening': 3, '1 · The problem': 4, '2 · The idea': 5, '3 · The base: ERPNext': 12, '4 · The hub': 10, '5 · Operations': 6, '6 · Quality that runs': 8, '7 · Regulated products': 4, '8 · Digital factory': 4, '9 · Engineers, then starting': 3, '10 · The future factory': 4 }
+  const MIN = { 'Opening': 3, '1 · The problem': 4, '2 · The idea': 7, '3 · The base: ERPNext': 12, '4 · The hub': 10, '5 · Operations': 6, '6 · Quality that runs': 8, '7 · Regulated products': 4, '8 · Digital factory': 4, '9 · Deploy, change, start': 7, '10 · The future factory': 4 }
   chapters.slice(1).forEach((c, k) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'f'; b.innerHTML = `<b>${k + 1}</b><span>${esc(c.name.replace(/^\d · /, ''))}</span><i>${MIN[c.name]} min</i>`; b.onclick = () => go(c.first); $('#agenda').appendChild(b) })
 
   // ---------- navigation with step-by-step reveal
@@ -854,6 +936,92 @@ Authorization: Bearer wqo_…
   addEventListener('touchstart', (e) => { tx = e.target.closest('.win, input, textarea') ? null : e.touches[0].clientX }, { passive: true })
   addEventListener('touchend', (e) => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) dx < 0 ? next() : prev() })
   let t0 = Date.now(); setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); $('#clock').textContent = `Elapsed ${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')} · page ${cur + 1} of ${pages.length}` }, 1000)
+
+
+  // ---------- why us: AI jobs, comparison, install, iteration, service
+  const AIJ = [['Answers', 'questions, with citations', 'Answers from your records through the hub; every answer cites the records; click to open them.', 'Never answers from outside your records; reads with your permissions; every run logged.'],
+    ['Morning brief', 'what needs you today', 'Each morning: late orders with causes, stock-outs, overdue inspections and reviews.', 'Only lists what the records show; unknown stays unknown.'],
+    ['Drafts', 'POs, NCRs, customer notes', 'Prepares a reorder, a nonconformance report or a delay note to a customer.', 'Nothing reaches ERPNext or a customer until a person confirms.'],
+    ['Sorts files', 'type, number, revision', 'Reads each file of a shared drive and proposes type, process, number and revision.', 'Must quote the text; code checks each quote is really in the file.'],
+    ['Maps old logs', 'columns to fields', 'Proposes which spreadsheet column fills which field of a module.', 'Never writes data: code checks the mapping, a person signs the import.'],
+    ['Drafts procedures', 'the ones you lack', 'Drafts a procedure a standard requires and you do not have.', 'Leaves "[to fill]" for what it does not know; never approves or makes it effective.'],
+    ['Fits the standard', 'to your own procedures', 'Reads your procedures and proposes changes to the standard workflows, each quoting its paragraph.', 'A person accepts each change; someone else enables the new version.'],
+    ['Finds the gaps', 'against ISO 9001 or 13485', 'Reports, control by control, whether evidence exists and where.', 'Checks are run by code on the records, not by the AI.']]
+  const RULES = { 0: 'Not offered without a model.', 1: 'Not offered without a model.', 2: 'Reorder rule still drafts purchase orders.', 3: 'Rules still propose type, number and revision from names and headings.', 4: 'Rules still propose the mapping from column names.', 5: 'Not offered; you write it yourself.', 6: 'Not offered; you change the workflow by hand.', 7: 'The checks still run; only the AI wording is missing.' }
+  let aiSel = 0, rulesOnly = false
+  function aiDraw() {
+    const g = $('#aig'); if (!g) return
+    g.innerHTML = AIJ.map(([t, sub], i) => `<button type="button" class="${i === aiSel ? 'on' : ''}" data-ai="${i}">${t}<small>${sub}</small></button>`).join('')
+    $$('#aig button').forEach((b) => b.onclick = () => { aiSel = +b.dataset.ai; aiDraw() })
+    const [t, , does, never] = AIJ[aiSel]
+    $('#aiout').innerHTML = `<div class="card"><span class="n">WHAT IT DOES · ${esc(t.toUpperCase())}</span><p>${esc(rulesOnly ? 'Rules only: ' + RULES[aiSel] : does)}</p></div>
+      <div class="card"><span class="n" style="color:var(--gold)">WHAT IT MAY NOT DO</span><p>${esc(never)}</p>
+      <label class="rulesonly"><input type="checkbox" id="rulesOnly" ${rulesOnly ? 'checked' : ''}> Rules only: no documents sent to an AI model</label></div>`
+    $('#rulesOnly').onchange = (e) => { rulesOnly = e.target.checked; aiDraw() }
+  }
+  aiDraw()
+
+  const VS = [['Records', 'ERP, spreadsheets, a quality tool and email, each with its own copy', '<b>One record:</b> ERPNext plus the hub; every screen reads the same data'],
+    ['AI', 'A chat tool that may guess, with no link to your records', '<b>Cites your records</b>, drafts for a person, can never sign'],
+    ['Quality', 'A binder or a separate system, checked before the audit', '<b>Checks that run every day</b> on the actual records, clause by clause'],
+    ['Unknowns', 'Missing data looks like a pass or a zero', '<b>Unknown is never pass</b>, shown as unknown'],
+    ['Cost model', 'Licences per user, data on the vendor’s servers', '<b>Open base on your server</b>, no per-user licences for the ERP'],
+    ['Deployment', 'A long project with consultants', '<b>One command</b> by your IT person or IT provider'],
+    ['Changes', 'Wait for the vendor’s next release', '<b>You change workflows</b>, with a signature, the same week']]
+  function vsDraw(hit = -1) {
+    const t = $('#vs'); if (!t) return
+    t.innerHTML = '<tr><th></th><th>The usual setup</th><th>WenQuest Ops</th></tr>' + VS.map(([a, b, c], i) => `<tr class="${i === hit ? 'hit' : ''}" data-vs="${i}" style="cursor:pointer"><td>${a}</td><td>${b}</td><td>${c}</td></tr>`).join('')
+    $$('#vs tr[data-vs]').forEach((r) => r.onclick = () => vsDraw(+r.dataset.vs))
+  }
+  vsDraw()
+
+  const INST = [['$ ./install.sh --company company.yaml --domain ops.yourco.com', ''], ['Checking company.yaml ... 3 sites, 4 warehouses, 6 roles', 'ok'], ['Starting ERPNext (official image), PostgreSQL, hub, web', 'ok'],
+    ['HTTPS certificate for ops.yourco.com', 'ok'], ['Creating the company in ERPNext: US, USD, standard chart of accounts', 'ok'], ['First sync from ERPNext', 'ok'], ['Backup schedule and health check', 'ok'],
+    ['Done. Open https://ops.yourco.com and sign in with Microsoft 365 or Google.', 'g']]
+  let instTimer = null
+  function instDraw(n) {
+    const t = $('#term'); if (!t) return
+    t.innerHTML = INST.slice(0, n).map(([l, k]) => k === 'ok' ? `<span class="dim">→</span> ${esc(l)}  <span class="ok">✓</span>` : k === 'g' ? `<span class="g">${esc(l)}</span>` : esc(l)).join('\n')
+      + (n === 0 ? '<span class="dim">First run: about 15–25 minutes. Running it again is safe.</span>' : '')
+  }
+  instDraw(0)
+  const ib = $('#instBtn'); if (ib) ib.onclick = () => { clearInterval(instTimer); let n = 1; instDraw(n); instTimer = setInterval(() => { n++; instDraw(n); if (n >= INST.length) clearInterval(instTimer) }, 700) }
+
+  const PR = [13, 13, 17, 16, 15, 4]   // pull requests merged per day (GitHub, UTC), Oct 12–17; first commit Oct 12
+  function tlDraw() {
+    const t = $('#tline'); if (!t) return
+    const tot = PR.reduce((a, b) => a + b, 0); let run = 0
+    t.innerHTML = PR.map((v) => { run += v; return `<div style="height:${Math.round(run / tot * 100)}%"><span>${run}</span></div>` }).join('') + '<div style="background:none"></div>'
+  }
+  tlDraw()
+  let wf = 0
+  function wfDraw(msg) {
+    const w = $('#wfv'); if (!w) return
+    const steps = ['Open', 'Contained', ...(wf >= 2 ? ['Customer notified'] : []), 'Disposition', 'CAPA', 'Closed']
+    w.innerHTML = `<div class="row"><span class="mono soft" style="font-size:18px">NCR workflow ${wf >= 3 ? 'v2 · enabled' : wf >= 2 ? 'v2 · draft' : 'v1 · in use'}</span></div>
+      <div class="row">${steps.map((x) => `<span class="st ${x === 'Customer notified' ? 'new' : ''}">${x}</span>`).join('<span class="soft">→</span>')}</div>
+      ${wf === 1 ? '<div style="font-size:21px;border-left:4px solid var(--gold);padding-left:12px">Proposed: add “Customer notified” after containment.<br><span class="soft">Quoting QP-08 §4.3: “The customer is informed of any nonconformance affecting their order.”</span></div>' : ''}`
+    $('#wfMsg').textContent = msg || ''
+  }
+  wfDraw()
+  const on1 = (id, f) => { const b = $('#' + id); if (b) b.onclick = f }
+  on1('wfAi', () => { wf = 1; wfDraw('Code found the quote in QP-08; the change passes the red lines.') })
+  on1('wfAcc', () => { if (wf < 1) return wfDraw('Ask the AI first.'); wf = 2; wfDraw('Accepted by Jordan into the draft version.') })
+  on1('wfOn', () => { if (wf < 2) return wfDraw('Nothing to enable yet.'); wf = 3; wfDraw('Enabled by Dana with her signature. Open NCRs finish on v1; new ones use v2. The procedure is regenerated.') })
+
+  const ROLES = [['Owner', 'Sets the goals, decides', ['Chooses the first problem to solve', 'Reads the dashboard and the finance board', 'Signs off what matters']],
+    ['AI specialist', 'One of your own people', ['Runs and adapts the platform with AI', 'Trained by our courses', 'Changes workflows, with a second signature']],
+    ['IT person or IT provider', 'Installs and maintains', ['One-command install, backup, upgrade', 'Deployment course and documentation from us', 'IT providers can join our partner program']]]
+  const WE = ['The platform, on your server', 'Courses: AI specialist, hands-on platform, deployment for IT', 'Hosted connections (planned): shipping labels, e-commerce orders, accounting, sales tax, EDI', 'Pilot companies: we work closely with the first few', 'Partner program for IT providers: terms set with the first providers']
+  let roleSel = 0
+  function roleDraw() {
+    const r = $('#roles'); if (!r) return
+    r.innerHTML = ROLES.map(([t, s2], i) => `<button type="button" class="mod rolebtn${i === roleSel ? ' on' : ''}" data-rl="${i}">${t}<div style="font-size:20px;font-weight:400;font-family:Inter,Arial,sans-serif;color:var(--soft)">${s2}</div></button>`).join('')
+    $$('#roles button').forEach((b) => b.onclick = (e) => { e.stopPropagation(); roleSel = +b.dataset.rl; roleDraw() })
+    $('#svcOut').innerHTML = `<div class="card"><span class="n">${esc(ROLES[roleSel][0].toUpperCase())}</span><ul class="ticks">${ROLES[roleSel][2].map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>
+      <div class="card"><span class="n" style="color:var(--gold)">WHAT WE PROVIDE</span><ul class="ticks">${WE.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></div>`
+  }
+  roleDraw()
 
   // for recording the talk as a video, page by page and point by point
   window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: (i) => frags(i).length, notes: (i) => ($('.notes', pages[i])?.textContent || '').trim(), state: () => ({ page: cur, frag }) }
@@ -1052,7 +1220,7 @@ Authorization: Bearer wqo_…
   // =====================================================================================
   // The replica of WenQuest Ops. Fictional demo company: Harbor Lane Supply.
   // =====================================================================================
-  const NAV = [['dashboard', 'Dashboard'], ['assistant', 'Assistant'], ['anomalies', 'Anomalies', 3], ['drafts', 'Drafts', 4], ['scan', 'Scan'], null, ['sales', 'Sales and delivery'], ['inventory', 'Inventory'], ['purchasing', 'Purchasing'], ['finance', 'Finance'], ['health', 'Quality system'], ['ncr', 'Nonconformances', 2], ['iqc', 'Incoming inspection'], ['spc', 'SPC'], ['inbox', 'From machines', 1], ['production', 'Production'], ['trace', 'Trace and recalls'], ['docs', 'Documents'], ['import', 'Import'], ['cmm', 'Measurement files']]
+  const NAV = [['dashboard', 'Dashboard'], ['assistant', 'Assistant'], ['anomalies', 'Anomalies', 3], ['drafts', 'Drafts', 4], ['scan', 'Scan'], null, ['sales', 'Sales and delivery'], ['inventory', 'Inventory'], ['purchasing', 'Purchasing'], ['finance', 'Finance'], ['health', 'Quality system'], ['ncr', 'Nonconformances', 2], ['iqc', 'Incoming inspection'], ['spc', 'SPC'], ['inbox', 'From machines', 1], ['production', 'Production'], ['trace', 'Trace and recalls'], ['docs', 'Documents'], ['library', 'Library check'], ['drafting', 'Draft with AI'], ['reading', 'Reading and review'], ['import', 'Import'], ['cmm', 'Measurement files']]
   function mountApp(el) {
     if (el.dataset.mounted) return; el.dataset.mounted = '1'
     if (el.dataset.app === 'wall') { el.innerHTML = '<div class="bar"><i></i><i></i><i></i><span class="url">ops.harborlane.example/wall</span><span class="live">LIVE</span></div><div style="min-height:0"></div>'; wall(el.lastChild); return }
@@ -1250,6 +1418,106 @@ Authorization: Bearer wqo_…
         ${ok[sel] ? '<span class="badge g" style="justify-self:start">Under document control</span>' : '<button class="abtn dark" id="cf" style="justify-self:start">Confirm</button>'}</div></div>`
       $$('tr.click', c.main).forEach((r) => r.onclick = () => draw(+r.dataset.i))
       const b = $('#cf', c.main); if (b) b.onclick = () => { ok[sel] = true; c.toast(D[sel][1].startsWith('Record') ? 'Confirmed. Rows can now be imported into the module through a column mapping.' : 'Confirmed. Now controlled: version, review date and reading sign-off.'); draw(Math.min(D.length - 1, ok.indexOf(false) >= 0 ? ok.indexOf(false) : sel)) }
+    }
+    draw()
+  }
+
+
+
+  VIEWS.library = (c) => {
+    // the library check after a shared-drive import (WenQuest Ops docs/checks.py), and a record ledger turned into module rows
+    const I = [['high', 'QP-07 is used for different documents', 'QP-07 Purchasing.docx and QP-07 Supplier evaluation.pdf carry the same number.', 'Suggest QP-11 for the second (your QP-NN pattern)'],
+      ['high', 'QP-05: the same revision more than once', 'Two different files both say revision C.', 'Open both, keep the right one'],
+      ['medium', 'Same file 3 times: WI-12 Box packing.pdf', 'Identical content in /Production, /Old and /Desktop copies.', 'Keep one, mark the others as not kept'],
+      ['medium', 'Calibration: records but no procedure', 'A calibration log exists, but no procedure says how calibration is done.', 'Draft one with AI'],
+      ['medium', 'QP-05 names documents that are not in the library', 'It refers to F-05-2 Inspection form.', 'Upload it, or correct the reference'],
+      ['info', '6 documents show no effective date', 'Mostly old work instructions.', 'Add the date when you confirm']]
+    const fixed = I.map(() => false)
+    let led = 0
+    function draw(msg) {
+      c.main.innerHTML = `<h5>Library check <span class="crumb">· 214 files from the shared drive · 9 scans read by OCR · 2 files with no text</span></h5>
+        <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:14px"><div class="panel" style="padding:6px"><table class="t"><tr><th>Found</th><th>What to do</th></tr>
+        ${I.map(([sev, t, d, f], i) => `<tr class="click" data-i="${i}" style="${fixed[i] ? 'opacity:.45' : ''}"><td><span class="badge ${sev === 'high' ? 'r' : sev === 'medium' ? 'a' : ''}">${sev}</span> <b>${t}</b><div style="color:#6b6b6b;font-size:12px">${d}</div></td><td style="font-size:13px">${fixed[i] ? '<span class="badge g">done</span>' : f}</td></tr>`).join('')}</table></div>
+        <div class="panel" style="display:grid;gap:8px;align-content:start"><b>Calibration log 2019-2025.xlsx</b><span style="color:#6b6b6b;font-size:13px">A record ledger, not a document to control: its rows belong in the calibration module.</span>
+          <table class="t"><tr><th>Column in the sheet</th><th>Field</th></tr>${[['Gauge ID', 'Gauge'], ['Cal date', 'Calibrated on'], ['Next due', 'Due date'], ['By', 'Done by'], ['Result', 'Result (pass / fail)']].map(([a, b]) => `<tr><td>${a}</td><td>${led ? b : '<span style="color:#aaa">…</span>'}</td></tr>`).join('')}</table>
+          ${led === 0 ? '<button class="abtn" id="lgMap">Propose the mapping (AI)</button>' : led === 1 ? '<div style="font-size:13px;color:#6b6b6b">AI proposed it; code checked every column. 412 rows ready, 3 with a date it cannot read (left for you).</div><button class="abtn dark" id="lgImp">Import 412 rows (sign)</button>' : '<span class="badge g" style="justify-self:start">412 calibration records imported · each row keeps its source cell</span>'}
+          ${msg ? `<div style="font-size:13px;background:#e3f4ea;color:#1f7a4d;padding:7px 9px;border-radius:8px">${msg}</div>` : ''}</div></div>`
+      $$('tr.click', c.main).forEach((r) => r.onclick = () => { fixed[+r.dataset.i] = true; draw('Fixed. The check runs again after every change.') })
+      const m = $('#lgMap', c.main); if (m) m.onclick = () => { led = 1; draw() }
+      const g = $('#lgImp', c.main); if (g) g.onclick = () => { led = 2; draw() }
+    }
+    draw()
+  }
+
+  VIEWS.drafting = (c) => {
+    // AI drafts a document a control point is missing (draft_ai.py); a person fills the gaps, a reviewer sends it back or approves
+    let st = 0, why = ''
+    const fill = (t) => `<mark style="background:#fff3c4;padding:0 3px">${t}</mark>`
+    function draw(msg, bad) {
+      const doc = `<div style="font-family:Georgia,serif;font-size:13.5px;line-height:1.5;background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:10px 12px">
+        <b>QP-12 Calibration of measuring equipment</b> <span style="color:#8a8a8a">rev A · draft · ISO 13485 7.6</span><br>
+        1. Purpose: keep every gauge used for acceptance within its calibration interval.<br>
+        2. Each gauge has an ID, a calibration interval and a due date in the calibration register.<br>
+        3. Calibration is done by ${st >= 2 ? 'Bay Calibration Lab' : fill('[to fill: who calibrates, in-house or which lab]')}.<br>
+        4. A gauge past its due date cannot be selected for a measurement; WenQuest Ops refuses it.<br>
+        5. Interval for torque wrenches: ${st >= 2 ? '12 months' : fill('[to fill: interval]')}.</div>`
+      const steps = ['AI draft', 'person fills the gaps', 'review', st === 3 ? 'sent back' : 'approved']
+      c.main.innerHTML = `<h5>Draft with AI <span class="crumb">· ISO 13485 7.6 control of monitoring and measuring equipment has no procedure</span></h5>
+        <div style="display:grid;grid-template-columns:1.35fr 1fr;gap:14px"><div style="display:grid;gap:8px;align-content:start">${st === 0 ? '<div class="panel" style="color:#6b6b6b">No procedure yet. The AI can draft one from what the standard requires. Anything it does not know about your company, it leaves for a person to fill.</div>' : doc}</div>
+        <div class="panel" style="display:grid;gap:8px;align-content:start">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;font-size:12px">${steps.map((x, i) => `<span style="padding:3px 9px;border-radius:999px;${i + 1 === st || (st === 4 && i === 3) || (st === 3 && i === 3) ? 'background:#171717;color:#fff' : i + 1 < st ? 'background:#e3f4ea;color:#1f7a4d' : 'background:#f1f1f1;color:#8a8a8a'}">${x}</span>`).join('')}</div>
+          ${st === 0 ? '<button class="abtn dark" id="drAi">Draft it with AI</button>' : ''}
+          ${st === 1 ? '<div style="font-size:13px">Two gaps marked for a person. Nothing is guessed.</div><button class="abtn dark" id="drFill">Jordan: fill the gaps and send for approval</button>' : ''}
+          ${st === 2 ? '<div style="font-size:13px">Sent for approval by Jordan. Reviewer: Dana.</div><button class="abtn" id="drBack">Dana: send back with a reason</button><button class="abtn dark" id="drOk">Dana: approve (sign)</button>' : ''}
+          ${st === 3 ? `<div style="font-size:13px">Sent back by Dana: “${why}” Back to draft; Jordan edits and sends it again.</div><button class="abtn dark" id="drAgain">Jordan: fixed, send again</button>` : ''}
+          ${st === 4 ? '<span class="badge g" style="justify-self:start">Approved by Dana · effective · readers assigned</span><div style="font-size:13px;color:#6b6b6b">The AI wrote the first draft. People filled it, reviewed it, and signed it. The AI never makes a document effective.</div>' : ''}
+          ${msg ? `<div style="font-size:13px;padding:7px 9px;border-radius:8px;${bad ? 'background:#fdecec;color:#b42318' : 'background:#e3f4ea;color:#1f7a4d'}">${msg}</div>` : ''}</div></div>`
+      const on = (id, f) => { const b = $('#' + id, c.main); if (b) b.onclick = f }
+      on('drAi', () => { st = 1; draw('Draft ready as rev A. Marked: AI draft.') })
+      on('drFill', () => { st = 2; draw() })
+      on('drBack', () => { why = 'Add how a gauge found out of tolerance is handled (impact on parts already measured).'; st = 3; draw() })
+      on('drAgain', () => { st = 2; draw('Sent again with section 6 added.') })
+      on('drOk', () => { st = 4; draw() })
+    }
+    draw()
+  }
+
+  VIEWS.reading = (c) => {
+    // document control (WenQuest Ops: draft → sent for approval → approved by someone not involved → effective; old revision obsolete; readers confirm)
+    const st = { d: 'draft', c: 'effective', fp: '', read: { Jordan: 'pending', Sam: 'pending', Priya: 'pending', Lee: 'pending' }, msg: '', bad: false,
+      log: [['Mar 4, 2025', 'Dana', 'Rev C approved, effective · fingerprint 9c41e07a2b3d'], ['Oct 16', 'Jordan', 'Rev D uploaded as a draft (sampling table updated)']] }
+    const add = (who, what) => st.log.unshift(['Oct 17', who, what])
+    const chip = (rev, s) => `<span class="badge ${s === 'effective' ? 'g' : s === 'obsolete' ? '' : 'a'}" style="font-size:13px">Rev ${rev} · ${s}</span>`
+    function draw() {
+      const steps = ['draft', 'in review', 'effective']
+      const k = steps.indexOf(st.d)
+      c.main.innerHTML = `<h5>QP-05 Receiving inspection <span class="crumb">· procedure · incoming inspection · document control</span></h5>
+        <div style="display:flex;gap:8px;margin:-4px 0 10px">${chip('B', 'obsolete')}${chip('C', st.c)}${chip('D', st.d)}</div>
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px">
+        <div class="panel" style="display:grid;gap:9px;align-content:start">
+          <div style="display:flex;gap:6px;align-items:center;font-size:13px">${steps.map((x, i) => `<span style="padding:4px 10px;border-radius:999px;${i === k ? 'background:#171717;color:#fff' : i < k ? 'background:#e3f4ea;color:#1f7a4d' : 'background:#f1f1f1;color:#8a8a8a'}">${x}</span>`).join('<span style="color:#bbb">→</span>')}</div>
+          ${st.d === 'draft' ? `<div style="display:flex;gap:8px;align-items:center"><b>Rev D</b> <span style="color:#6b6b6b;font-size:13px">uploaded by Jordan</span>
+              <button class="abtn dark" id="dcSend">Send for approval</button><button class="abtn" id="dcEdit">Edit Rev C instead</button></div>` : ''}
+          ${st.d === 'in review' ? `<div><b>Rev D</b> is waiting for approval.</div><div style="display:flex;gap:8px;align-items:center">Signed in as
+              <select class="ain" id="dcWho"><option>Jordan</option><option>Dana</option></select><button class="abtn dark" id="dcAppr">Approve (sign)</button></div>` : ''}
+          ${st.d === 'effective' ? `<div style="font-size:14px"><b>Rev D effective Oct 17.</b> Fingerprint <code>${st.fp}</code> frozen. Rev C made obsolete: replaced by revision D.</div>
+            <table class="t"><tr><th>Must read Rev D</th><th>Due</th><th>Status</th></tr>${Object.entries(st.read).map(([n, v]) => `<tr><td>${n}</td><td>Nov 16</td><td><span class="badge ${v === 'pending' ? 'a' : 'g'}">${v}</span></td></tr>`).join('')}</table>
+            <div style="display:flex;gap:8px;align-items:center">${st.read.Sam === 'pending' ? '<button class="abtn dark" id="dcRead">Sam: I have read and understood it (sign)</button>' : ''}<span style="color:#6b6b6b;font-size:13px">Next periodic review: Oct 17, 2028 · someone else approves it</span></div>` : ''}
+          ${st.msg ? `<div style="padding:8px 10px;border-radius:8px;font-size:14px;${st.bad ? 'background:#fdecec;color:#b42318' : 'background:#e3f4ea;color:#1f7a4d'}">${st.msg}</div>` : ''}
+        </div>
+        <div class="panel" style="display:grid;gap:6px;align-content:start"><b>History</b>
+          ${st.log.map(([d, w, t]) => `<div style="font-size:13px"><span style="color:#8a8a8a">${d}</span> · <b>${w}</b> · ${t}</div>`).join('')}
+          <div style="color:#8a8a8a;font-size:12px">Signed entries cannot be edited or deleted. Old files are never replaced.</div></div></div>`
+      const on = (id, f) => { const b = $('#' + id, c.main); if (b) b.onclick = f }
+      on('dcEdit', () => { st.msg = 'Refused: an effective document changes only by a new revision. Rev D is that revision.'; st.bad = true; draw() })
+      on('dcSend', () => { st.d = 'in review'; st.msg = 'Sent for approval.'; st.bad = false; add('Jordan', 'Rev D sent for approval'); draw() })
+      on('dcAppr', () => {
+        const who = $('#dcWho', c.main).value
+        if (who === 'Jordan') { st.msg = 'Refused: approval must come from someone who did not upload, confirm or submit it. Switch to Dana.'; st.bad = true; add('Jordan', 'approval refused (uploaded and submitted it)'); return draw() }
+        st.d = 'effective'; st.c = 'obsolete'; st.fp = '5be8d1904f6a'; st.msg = ''; st.bad = false
+        add('Dana', 'Rev D approved, effective · fingerprint 5be8d1904f6a'); add('WenQuest Ops', 'Rev C obsolete: replaced by revision D'); add('WenQuest Ops', '4 people asked to read Rev D, due Nov 16'); draw()
+      })
+      on('dcRead', () => { st.read.Sam = 'acknowledged'; add('Sam', 'read and understood Rev D (signed)'); st.msg = 'Sam confirmed with his password. Jordan, Priya and Lee are still pending; overdue readers show on the reading list.'; st.bad = false; draw() })
     }
     draw()
   }
