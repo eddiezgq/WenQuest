@@ -1,4 +1,5 @@
 # 样片 A：六轴机械臂抓取与放置（第 36 轮样片，第 37 轮改成场景文件；渲染：python3 tools/blender/render.py video3d/机械臂抓取）
+slug: arm-pick-place
 name: 机械臂抓取
 title: {zh: 六轴机械臂：抓取与放置, en: "6-axis robot arm: pick and place"}
 duration: 43

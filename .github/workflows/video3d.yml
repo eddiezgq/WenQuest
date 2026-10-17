@@ -12,6 +12,10 @@ on:
         description: "小样（960×540、15 帧/秒）"
         type: boolean
         default: false
+      release:
+        description: "同时出网页版（720p MP4 + 封面）并挂到发布页 video3d-samples（官网案例页用）"
+        type: boolean
+        default: false
       shards:
         description: "并行份数（1–20）"
         required: true
@@ -72,6 +76,8 @@ jobs:
   encode:
     needs: render
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -100,3 +106,18 @@ jobs:
             ${{ github.event.inputs.scene }}/*.mp4
             ${{ github.event.inputs.scene }}/*.webm
           retention-days: 14
+      - name: 网页版挂到发布页
+        if: ${{ github.event.inputs.release == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SCENE: ${{ github.event.inputs.scene }}
+        run: |
+          slug=$(python3 -c "import yaml,sys;print(yaml.safe_load(open(sys.argv[1]+'/scene.yaml')).get('slug',''))" "$SCENE")
+          [ -n "$slug" ] || { echo "::error::场景文件里要写 slug（英文文件名）才能挂到发布页"; exit 1; }
+          src=$(ls "$SCENE"/*.mp4 | grep -v _小样 | head -1)
+          ffmpeg -y -loglevel error -i "$src" -vf scale=1280:-2 -c:v libx264 -preset slow -crf 25 -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart "$slug.mp4"
+          ffmpeg -y -loglevel error -ss 1 -i "$src" -frames:v 1 -vf scale=1280:-2 -q:v 3 "$slug.jpg"
+          gh release view video3d-samples -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create video3d-samples -R "$GITHUB_REPOSITORY" --title "三维仿真视频样片（官网用）" --notes "video3d.yml 勾选“同时出网页版”时自动更新。"
+          gh release upload video3d-samples "$slug.mp4" "$slug.jpg" -R "$GITHUB_REPOSITORY" --clobber
+          ls -la "$slug".*
