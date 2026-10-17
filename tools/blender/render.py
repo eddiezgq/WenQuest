@@ -35,11 +35,14 @@ FONT_R = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 def encode():
     name = DIR / (NAME + ("_小样" if DRAFT else ""))
     pat = str(DIR / "_frames" / "f%05d.png")
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(FPS), "-i", pat, "-c:v", "libx264", "-pix_fmt", "yuv420p",
-                    "-crf", "18", str(name) + ".mp4"], check=True)
+    au = DIR / "audio.m4a"                       # 配音和音效（tools/blender/audio.py 生成，进仓库）
+    ain = ["-i", str(au)] if au.exists() else []
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(FPS), "-i", pat, *ain, "-c:v", "libx264", "-pix_fmt", "yuv420p",
+                    "-crf", "18", *(["-c:a", "aac", "-b:a", "160k", "-shortest"] if ain else []), str(name) + ".mp4"], check=True)
     if not DRAFT:
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(FPS), "-i", pat, "-c:v", "libvpx-vp9", "-b:v", "0",
-                        "-crf", "30", "-row-mt", "1", "-cpu-used", "4", str(name) + ".webm"], check=True)
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(FPS), "-i", pat, *ain, "-c:v", "libvpx-vp9", "-b:v", "0",
+                        "-crf", "30", "-row-mt", "1", "-cpu-used", "4", *(["-c:a", "libopus", "-b:a", "128k", "-shortest"] if ain else []),
+                        str(name) + ".webm"], check=True)
     print("→", name)
 
 
@@ -256,7 +259,7 @@ class WebLab:
         if not pts:
             return
         cu = bpy.data.curves.new(name, "CURVE")
-        cu.dimensions, cu.bevel_depth, cu.bevel_resolution = "3D", 0.00045, 2
+        cu.dimensions, cu.bevel_depth, cu.bevel_resolution = "3D", 0.0006 if SPEC.get("style") == "cinematic" else 0.00045, 2
         sp = cu.splines.new("NURBS")
         sp.points.add(len(pts) - 1)
         for p_, q in zip(sp.points, pts):
@@ -352,6 +355,7 @@ def shaft_angle(mid, t):
 
 
 # ------------------------------------------------------------------ 画面风格、镜头
+STYLE = SPEC.get("style", "engineering")       # engineering：工程图（快）；cinematic：写实电影（Cycles，见 cine.py）
 sc.render.engine = "BLENDER_WORKBENCH"
 shd = sc.display.shading
 shd.light, shd.color_type, shd.studio_light = "STUDIO", "MATERIAL", SPEC.get("light", "paint.sl")
@@ -367,6 +371,10 @@ cam = bpy.data.objects.new("cam", bpy.data.cameras.new("cam"))
 sc.collection.objects.link(cam)
 sc.camera = cam
 cam.data.clip_start = SPEC.get("clip", 0.01)
+if STYLE == "cinematic":
+    import cine
+    mat("thread"), mat("bobbin")
+    cine.setup(sc, SPEC, MATS, quick=DRAFT)
 
 
 def camera(t):
@@ -377,6 +385,8 @@ def camera(t):
     pos = look + dist * Vector((math.cos(el) * math.sin(az), -math.cos(el) * math.cos(az), math.sin(el)))
     cam.location = pos
     cam.rotation_euler = (look - pos).to_track_quat("-Z", "Y").to_euler()
+    if STYLE == "cinematic":
+        cine.dof(cam, look, keyed(keys, t, "fstop") if any("fstop" in k for k in keys) else 4.0)
 
 
 def effect(t):
@@ -491,18 +501,29 @@ else:
     # 并行时隔帧分：第 k 份画第 k、k+N、k+2N…帧，透视这类慢镜头均摊到每一份，不会拖住某一份
     jobs = [(i, i / FPS) for i in (range(SHARD[0], NF, SHARD[1]) if SHARD else range(NF))]
 
+
+
+def subtimes(t):
+    """运动模糊段（effects 里 kind: blur）：快门开着的这段时间里取 n 个时刻；其余只取 t。"""
+    for e in SPEC.get("effects", []):
+        if e["kind"] == "blur" and e["t"][0] <= t < e["t"][1]:
+            n, sh = e.get("n", 5), e.get("shutter", 0.5) / FPS
+            return [t + sh * (k / (n - 1) - 0.5) for k in range(n)]
+    return [t]
+
+
 # 虚拟实验：先把这一份要用的转角一次取齐（还有一圈 0–359° 的读数，画曲线用）
 DUMPS = {}
 for mid in WEBLAB_A:
     lab = OBJ[mid]
-    angles = sorted({round(shaft_angle(mid, t), 3) for _, t in jobs})
+    angles = sorted({round(shaft_angle(mid, ts), 3) for _, t in jobs for ts in subtimes(t) + [t]})
     for a, d in zip(angles, lab.lab.dumps(angles)):
         DUMPS[(mid, a)] = d
     pan = SPEC.get("panel") or {}
     if pan.get("plot") and jobs:
         CURVES[pan["plot"]["key"]] = [x["read"][pan["plot"]["key"]] for x in lab.lab.dumps(list(range(360)))]
 
-for n, t in jobs:
+def pose_at(t):
     read = {}
     for mid, o in OBJ.items():
         if isinstance(o, Arm6) and mid in PATHS:
@@ -518,16 +539,41 @@ for n, t in jobs:
             o.set(DUMPS[(mid, round(shaft_angle(mid, t), 3))])
             read = o.read
     xu, top = effect(t)
-    shd.show_xray, shd.xray_alpha = xu > 0.05, 1 - 0.7 * xu
+    if STYLE != "cinematic":
+        shd.show_xray, shd.xray_alpha = xu > 0.05, 1 - 0.7 * xu
     for g in HIDDEN:
         for o in GROUPS.get(g, []):
             o.hide_render = True
     camera(t)
-    f = out / (f"still_{t:05.1f}.png" if n is None else f"f{n:05d}.png")
-    sc.render.filepath = str(f)
+    return read, xu, top
+
+
+def snap(path):
+    sc.render.filepath = str(path)
     bpy.ops.render.render(write_still=True)
-    img = Image.open(f).convert("RGBA")
-    if xu > 0.05:                                     # 第二层：只画要“透出来”的组（透明底），按透视程度叠上去
+    return Image.open(path).convert("RGBA")
+
+
+for n, t in jobs:
+    f = out / (f"still_{t:05.1f}.png" if n is None else f"f{n:05d}.png")
+    subs = subtimes(t)
+    if len(subs) > 1:                                 # 运动模糊：快门时间里拍几张取平均（实验的机构只给得出某一瞬间的位姿）
+        full = sc.cycles.samples if STYLE == "cinematic" else 0
+        if full:
+            sc.cycles.samples = max(4, full // len(subs))
+        acc = None
+        for k, ts in enumerate(subs):
+            pose_at(ts)
+            im = snap(out / f"_sub_{SHARD[0] if SHARD else 0}.png")
+            acc = im if acc is None else Image.blend(acc, im, 1.0 / (k + 1))
+        if full:
+            sc.cycles.samples = full
+        read, xu, top = pose_at(t)
+        img = acc
+    else:
+        read, xu, top = pose_at(t)
+        img = snap(f)
+    if xu > 0.05 and STYLE != "cinematic":            # 第二层：只画要“透出来”的组（透明底），按透视程度叠上去
         keep = {id(o) for g in top for o in GROUPS.get(g, [])}
         saved = {o.name: o.hide_render for o in sc.objects}
         for o in sc.objects:
@@ -543,8 +589,8 @@ for n, t in jobs:
         for o in sc.objects:
             o.hide_render = saved[o.name]
         sc.render.film_transparent = False
-    hud(img.convert("RGB"), t, read).save(f)
-    if n is not None and n % 50 == 0:
+    (cine.hud(img, t, SPEC, W, H) if STYLE == "cinematic" else hud(img.convert("RGB"), t, read)).save(f)
+    if n is not None and n % 25 == 0:
         print(f"{n}/{NF}", flush=True)
 
 for o in OBJ.values():

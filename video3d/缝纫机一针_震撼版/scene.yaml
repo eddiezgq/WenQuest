@@ -1,0 +1,52 @@
+# 样片 B 震撼版（Eddie 2026-10-17 10:50：“感觉一点都不震撼，没吸引力”；10:51：“试试看”）。
+# 写实电影风格：真实转速的残影 → 冻结 → 子弹时间钻到针板下 → 梭尖钩线大特写（0.27 ms 的窗口，第 5 章算例）→ 提速 → 整机亮相。
+# 模型和运动仍取自课程里的平缝机虚拟样机；数字：每分钟 5000 针、一针 12 ms、钩线约 206°、钩线窗口约 0.3 ms（教材第 5 章）。
+name: 缝纫机一针_震撼版
+style: cinematic
+samples: 48
+title: {zh: 平缝机一针, en: One lockstitch}
+duration: 24
+floor: false
+clip: 0.002
+stage: {center: [0.08, 0.0, 0.07], size: 0.55}
+models:
+  - id: m
+    use: "weblab:sewing/proto-lockstitch"
+    colors: {frame: shell, table: wood, stand: steel, spool: thread, plate: steel, slide: steel, bush: gear, presser: chrome, belt: belt,
+             tension: steel, guide: steel, needle: needle, takeup: takeup, hook: hook, feed: feed, upper: steel, rod: steel,
+             lower: steel, details: steel, oil: accent}
+motion:
+  - drive: weblab
+    model: m
+    # 0–3 s 高速（每秒 20 转，画面里只剩残影）→ 3 s 冻结在 150° → 9–17 s 慢放 150°→270°（206° 钩线）→ 17–21 s 提速 → 21–24 s 高速
+    angle: [[0, -21450], [3, 150], [9, 150], [17, 270], [18, 330], [19, 560], [20, 1300], [21, 3200], [24, 24800]]
+camera:
+  - {t: 0, look: [0.0, 0.0, 0.08], az: -38, el: 12, dist: 0.60, lens: 50, fstop: 5.6}
+  - {t: 3, look: [-0.017, 0.0, 0.03], az: -30, el: 10, dist: 0.30, lens: 50, fstop: 4}
+  - {t: 3.6, look: [-0.017, 0.0, 0.01], az: -30, el: 8, dist: 0.20, lens: 50, fstop: 2.8}
+  - {t: 6.5, look: [-0.017, 0.0, 0.0], az: 60, el: 4, dist: 0.16, lens: 50, fstop: 2.8}
+  - {t: 9, look: [-0.017, -0.003, -0.010], az: -115, el: 6, dist: 0.12, lens: 50, fstop: 4}
+  - {t: 13, look: [-0.017, -0.003, -0.016], az: -95, el: 2, dist: 0.08, lens: 50, fstop: 4}
+  - {t: 17, look: [-0.017, -0.003, -0.016], az: -75, el: 3, dist: 0.085, lens: 50, fstop: 4}
+  - {t: 20.6, look: [0.02, 0.0, 0.06], az: -30, el: 10, dist: 0.45, lens: 50, fstop: 4}
+  - {t: 21, look: [0.08, 0.0, 0.07], az: -32, el: 10, dist: 0.80, lens: 50, fstop: 5.6}
+  - {t: 24, look: [0.08, 0.0, 0.07], az: -18, el: 12, dist: 0.74, lens: 50, fstop: 5.6}
+effects:
+  - {kind: blur, t: [0, 3], n: 6, shutter: 0.6}
+  - {kind: blur, t: [19, 24], n: 6, shutter: 0.6}
+  - {kind: flash, t: [3, 3.35]}
+  - {kind: flash, t: [20.95, 21.25]}
+  - {kind: cutaway, t: [3, 21], hide: [m.body, m.face, m.top, m.rear, m.table, m.stand, m.spool, m.details, m.oil, m.belt, m.tension, m.guide]}
+voice:
+  - {t: 0.3, dur: 2.7, zh: 每分钟五千针，你看清了吗？, en: "5,000 stitches a minute. Did you catch that?"}
+  - {t: 3.6, dur: 2.6, zh: 放慢两千倍。, en: "Let's slow it down 2,000 times."}
+  - {t: 9.2, dur: 3.6, zh: 针刚一回升，梭尖就钩住了线环。, en: "As the needle starts to rise, the hook point grabs the loop."}
+  - {t: 13.4, dur: 3.4, zh: 留给它的时间，只有零点三毫秒。, en: "It has just 0.3 milliseconds to do it."}
+  - {t: 17.4, dur: 3.3, zh: 一圈一针，一秒八十多针。, en: "One turn, one stitch: over 80 stitches a second."}
+  - {t: 21.4, dur: 2.5, zh: 问渠，三维仿真。, en: "WenQuest 3D simulation."}
+pops:
+  - {t: [11.6, 16.8], text: "206°", sub: 钩线 · loop pickup, x: 0.80, y: 0.58, size: 130}
+  - {t: [13.6, 16.8], text: "0.3 ms", sub: 时间窗口 · timing window, x: 0.20, y: 0.58, size: 120, color: [120, 200, 255]}
+  - {t: [17.6, 20.8], text: "5000 / min", sub: 每分钟针数 · stitches per minute, x: 0.5, y: 0.28, size: 120}
+titles:
+  - {t: [21.4, 24], zh: 问渠 · 三维仿真, en: WenQuest 3D Simulation, y: 0.16, size: 84}
