@@ -8,8 +8,10 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-LABS = {"sewing/proto-lockstitch": ROOT / "textbook/web-editions/sewing/src/zh/labs/proto-lockstitch.html"}
-THREE = ROOT / "site/vendor/three/r128/three.min.js"
+LABS = {"sewing/proto-lockstitch": (ROOT / "textbook/web-editions/sewing/src", "zh/labs/proto-lockstitch.html")}
+VENDOR = ROOT / "site/vendor"
+TYPES = {".js": "application/javascript", ".html": "text/html", ".css": "text/css", ".json": "application/json",
+         ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml"}
 
 
 class Lab:
@@ -18,20 +20,29 @@ class Lab:
     def __init__(self, name):
         if name not in LABS:
             raise SystemExit(f"没有这个虚拟实验：{name}（已接入：{', '.join(LABS)}）")
-        self.page_path = LABS[name]
+        self.root, self.rel = LABS[name]
 
     def __enter__(self):
         from playwright.sync_api import sync_playwright
         self._pw = sync_playwright().start()
         self._b = self._pw.chromium.launch(args=["--use-gl=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"])
         self.page = self._b.new_page(viewport={"width": 640, "height": 400})
-        self.page.route("http*://**", lambda r: r.abort())          # 不联网：字体、统计等外部资源一律不取，结果不受网络影响
-        self.page.route("**/vendor/three/r128/three.min.js",
-                        lambda r: r.fulfill(path=str(THREE), content_type="application/javascript"))
-        self.page.goto(self.page_path.as_uri(), wait_until="domcontentloaded")
+        self.page.route("**/*", self._serve)        # 页面从仓库里直接取（/vendor/ 取 site/vendor），不联网，结果不受网络影响
+        self.page.goto(f"http://wq.local/{self.rel}", wait_until="domcontentloaded", timeout=120000)
         self.page.wait_for_function("window.__api && window.__api.dump", timeout=60000)
         self.page.evaluate("__api.manual(true)")
         return self
+
+    def _serve(self, route):
+        from urllib.parse import unquote, urlparse
+        u = urlparse(route.request.url)
+        if u.hostname != "wq.local":
+            return route.abort()
+        path = unquote(u.path).lstrip("/")
+        f = (VENDOR / path[len("vendor/"):]) if path.startswith("vendor/") else (self.root / path)
+        if not f.is_file():
+            return route.fulfill(status=404, body="")
+        route.fulfill(path=str(f), content_type=TYPES.get(f.suffix, "application/octet-stream"))
 
     def __exit__(self, *a):
         self._b.close()
