@@ -134,6 +134,14 @@ def heard(path, lang, text):
 
 
 report = []
+import inspect as _inspect
+
+
+def tempo(a, sr, f):
+    """模型不收 speed 参数时：ffmpeg atempo 变速不变调。"""
+    sf.write("tempo_in.wav", a, sr, subtype="PCM_16")
+    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", "tempo_in.wav", "-filter:a", f"atempo={f}", "tempo_out.wav"], check=True)
+    return sf.read("tempo_out.wav", dtype="float32")[0]
 json.dump({k: v[1] for k, v in prompts.items()}, open("out/prompts.json", "w", encoding="utf-8"), ensure_ascii=False)
 
 # 2. 合成
@@ -142,11 +150,14 @@ for engine in job["engines"]:
     for f in glob.glob(mdir + "/README*") + glob.glob(mdir + "/LICENSE*"):
         print(f"--- {engine} {os.path.basename(f)} ---\n" + open(f, encoding="utf-8", errors="replace").read()[:1500], flush=True)
     cv = AutoModel(model_dir=mdir, fp16=True)       # A10 上半精度约快一倍，音质无明显差别
+    SPEED_OK = "speed" in _inspect.signature(cv.inference_zero_shot).parameters   # 模型不收 speed 时改用 ffmpeg 变速
+    print(f"{engine}: 语速参数 {'由模型处理' if SPEED_OK else '用 ffmpeg 变速'}", flush=True)
     import time as _t
     t_start, n_done, total = _t.time(), 0, len(job["items"])
     os.makedirs(f"out/{engine}", exist_ok=True)
     for item in job["items"]:
         lang, text = item["lang"], item["text"]
+        spd = {"speed": item["speed"]} if item.get("speed") and SPEED_OK else {}   # 第 38 轮：讲稿定的语速
         out = f"out/{engine}/{lang}/{item['key']}.wav"
         os.makedirs(os.path.dirname(out), exist_ok=True)
         if os.path.exists(out):
@@ -154,21 +165,23 @@ for engine in job["engines"]:
         if lang in prompts:
             wav, ptext = prompts[lang]
             ptext = ("You are a helpful assistant.<|endofprompt|>" + ptext) if engine == "cv3" else ptext
-            gen = cv.inference_zero_shot(text, ptext, wav, stream=False)
+            gen = cv.inference_zero_shot(text, ptext, wav, stream=False, **spd)
         else:   # 只有一种语言的样音：跨语种
             wav = next(iter(prompts.values()))[0]
             t = ("You are a helpful assistant.<|endofprompt|>" + text) if engine == "cv3" else ("<|en|>" + text)
-            gen = cv.inference_cross_lingual(t, wav, stream=False)
+            gen = cv.inference_cross_lingual(t, wav, stream=False, **spd)
         def synth():
             if lang in prompts:
-                return cv.inference_zero_shot(text, ptext, wav, stream=False)
-            return cv.inference_cross_lingual(t, wav, stream=False)
+                return cv.inference_zero_shot(text, ptext, wav, stream=False, **spd)
+            return cv.inference_cross_lingual(t, wav, stream=False, **spd)
         best = None
         for attempt in range(int(job.get("tries", 1))):
             if attempt:
                 gen = synth()             # 采样有随机性：听不清就重新合成，留最好的一遍
             parts = [o["tts_speech"].squeeze(0).cpu().numpy() for o in gen]
             a = np.concatenate(parts) if parts else np.zeros(1, np.float32)
+            if item.get("speed") and not spd:
+                a = tempo(a, cv.sample_rate, item["speed"])
             if not job.get("check"):
                 best = (1.0, a, "")
                 break

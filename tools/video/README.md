@@ -93,6 +93,7 @@ subs: en+zh                 # 英文配音，字幕英文在上、中文在下�
 title: [中文名, English title]
 deck_html: 课件/index.html  # 相对讲稿目录
 contact: someone@example.com   # 写进上传资料（可不写）
+pace: {speed: 1.3, head: 0.45, pause: 0.12, tail: 0.45, hold: 0.25, xfade: 0.4}   # 可选：语速倍数，镜头头尾、句间、每步后停顿与转场（秒）
 shots:
   - id: s01
     kind: page

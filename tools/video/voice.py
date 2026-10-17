@@ -169,8 +169,9 @@ class Voice:
 
 def clone_jobs(lec, lang: str, cache: Path) -> list[dict]:
     """The sentences clone.py has to speak: [{key, text}] (keys match Voice('clone').key)."""
-    v = Voice("clone", lang, cache)
-    return [{"key": v.key(v.spoken(ln.spoken)), "text": v.spoken(ln.spoken)}
+    speed = float((lec.data.get("pace") or {}).get("speed", 1.0))      # 第 38 轮：语速（克隆声音在 GPU 上按此语速合成）
+    v = Voice("clone", lang, cache, speed=speed)
+    return [{"key": v.key(v.spoken(ln.spoken)), "text": v.spoken(ln.spoken), **({"speed": speed} if speed != 1.0 else {})}
             for s in lec.shots for ln in s.lines[lang]]
 
 

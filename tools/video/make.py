@@ -59,15 +59,17 @@ def h(obj) -> str:
 def timeline(lec, lang, voice):
     """Per shot: lines with wav + start/end (seconds within the shot), step times, total length."""
     out = []
+    pc = lec.data.get("pace") or {}          # 第 38 轮：独立视频可自定节奏（head、pause、tail、hold 秒）
+    head, pause, tail, hold = (float(pc.get(k, d)) for k, d in (("head", HEAD), ("pause", PAUSE), ("tail", TAIL), ("hold", HOLD)))
     for s in lec.shots:
-        t, lines, steps = HEAD, [], []
+        t, lines, steps = head, [], []
         for ln in s.lines[lang]:
             wav, d = voice.say(voice.spoken(ln.spoken))
             if ln.step:
                 steps.append(max(0.2, t - LEAD))
             lines.append({"shown": ln.shown, "wav": str(wav), "start": t, "end": t + d})
-            t += d + PAUSE + (HOLD if s.kind == "page" and ln.step else 0)   # 网页课件：点了什么，留一点时间看结果
-        total = t - PAUSE + TAIL
+            t += d + pause + (hold if s.kind == "page" and ln.step else 0)   # 网页课件：点了什么，留一点时间看结果
+        total = t - pause + tail
         if s.kind == "title":
             total = max(total, 5.0)
         if s.kind == "lab":
@@ -480,7 +482,7 @@ def compose(lec, lang, tls, shot_files, out_dir: Path, work: Path, voice_backend
     out_dir.mkdir(parents=True, exist_ok=True)
     # absolute times
     dual = lang == "en" and lec.data.get("subs") == "en+zh"
-    xf = XFADE if lec.data.get("standalone") else 0.0      # 第 38 轮：独立视频镜头之间交叠 xf 秒做转场（落在镜头开头的静音里）
+    xf = float((lec.data.get("pace") or {}).get("xfade", XFADE)) if lec.data.get("standalone") else 0.0      # 第 38 轮：独立视频镜头之间交叠 xf 秒做转场（落在镜头开头的静音里）
     t0, events, chapters, offsets, cuts = 0.0, [], [], [], []
     for s, tl in zip(lec.shots, tls):
         offsets.append(t0)
@@ -714,7 +716,7 @@ def main():
     langs = ["zh", "en"] if a.lang == "both" else [a.lang]
     langs = [x for x in langs if x in (lec.data.get("langs") or langs)]     # 独立视频只做讲稿写明的语言（第 38 轮）
     for lang in langs:
-        voice = V.Voice(a.voice, lang, work / "voice")
+        voice = V.Voice(a.voice, lang, work / "voice", speed=float((lec.data.get("pace") or {}).get("speed", 1.0)))
         tls = timeline(lec, lang, voice)
         files = []
         for s, tl in zip(lec.shots, tls):
