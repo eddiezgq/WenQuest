@@ -1,0 +1,80 @@
+1
+00:00:00,300 --> 00:00:05,130
+这是一座未来工厂。订单一进来，整座工厂就自己动起来。
+This is a factory of the future. An order comes in, and the whole plant starts moving on its own.
+
+2
+00:00:05,130 --> 00:00:11,120
+原料从立体仓库出库，每一箱都扫条码、扫二维码，无人车一路送到产线。
+Materials leave the automated warehouse, every tote scanned by barcode and QR code, and driverless carts carry them to the line.
+
+3
+00:00:11,120 --> 00:00:14,870
+机械臂接手：上料、拧紧、装配，一台接一台。
+Robot arms take over: loading, fastening, assembling, one after another.
+
+4
+00:00:14,870 --> 00:00:20,530
+每一件产品都要经过机器视觉质检站：拍照、测量、判定，一眨眼完成。
+Every product passes a machine-vision station: image, measure, decide, in the blink of an eye.
+
+5
+00:00:20,530 --> 00:00:30,570
+不合格的，自动推出产线；合格的，自动生成 FDA 要求的 UDI 标签：二维码加人能读的文字，贴上、扫码复核、发货。
+Rejects are pushed off the line; good parts get an automatically generated FDA UDI label, a 2D code plus human-readable text, then a verifying scan, and they ship.
+
+6
+00:00:30,570 --> 00:00:34,160
+所有设备的数据，都实时汇到同一个数据中枢。
+Data from every machine flows, live, into one data hub.
+
+7
+00:00:34,160 --> 00:00:39,390
+放大看质检站。相机在上，环形灯打光，零件从下面流过。
+Zoom in on the inspection station. Camera above, ring light on, parts flowing underneath.
+
+8
+00:00:39,390 --> 00:00:47,860
+系统先读零件上的二维码，知道它是哪一批；再把图像变成尺寸：孔径、孔距、划痕，一项项和图纸公差比。
+It first reads the 2D code on the part to know its lot, then turns the image into dimensions: hole size, spacing, scratches, each checked against the drawing.
+
+9
+00:00:47,860 --> 00:00:53,150
+全部合格，亮绿灯放行；有一项超差，推杆把它推进隔离箱。
+All in tolerance: green light, pass. One out: a pusher sends it into the quarantine bin.
+
+10
+00:00:53,150 --> 00:00:58,560
+每个测量值都画进控制图。趋势一偏，还没出废品，就先报警。
+Every reading goes onto a control chart. When the trend drifts, it alarms before a single bad part.
+
+11
+00:00:58,560 --> 00:01:03,570
+AI 起草不合格报告，但怎么处置，要工程师点头才生效。
+AI drafts the nonconformance report, but the disposition takes effect only when an engineer approves.
+
+12
+00:01:03,570 --> 00:01:08,130
+最后看中枢：订单、库存、设备、质量，连成一张数据网。
+Finally, the hub: orders, inventory, machines and quality, in one connected web of data.
+
+13
+00:01:08,130 --> 00:01:13,240
+数字孪生把整座工厂实时画在屏幕上，哪里慢、哪里堵，一眼看到。
+A digital twin draws the whole plant live on screen: where it's slow, where it's jammed, at a glance.
+
+14
+00:01:13,240 --> 00:01:16,600
+发现问题，AI 给出建议：换刀、降速、补料。
+When something's off, AI suggests a fix: change the tool, slow down, restock.
+
+15
+00:01:16,600 --> 00:01:22,020
+人在关键处确认，机器人执行，结果再回到中枢，形成闭环。
+A person approves at the key step, robots carry it out, and the results flow back to the hub. A closed loop.
+
+16
+00:01:22,020 --> 00:01:27,690
+全集成，全自动。人从搬运和盯守里解放出来，专心做判断。
+Fully integrated, fully automated. People are freed from hauling and watching, to focus on judgment.
+
