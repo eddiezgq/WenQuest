@@ -488,8 +488,8 @@ if STILLS:
 elif ENCODE:
     jobs = []
 else:
-    lo, hi = (SHARD[0] * NF // SHARD[1], (SHARD[0] + 1) * NF // SHARD[1]) if SHARD else (0, NF)
-    jobs = [(i, i / FPS) for i in range(lo, hi)]
+    # 并行时隔帧分：第 k 份画第 k、k+N、k+2N…帧，透视这类慢镜头均摊到每一份，不会拖住某一份
+    jobs = [(i, i / FPS) for i in (range(SHARD[0], NF, SHARD[1]) if SHARD else range(NF))]
 
 # 虚拟实验：先把这一份要用的转角一次取齐（还有一圈 0–359° 的读数，画曲线用）
 DUMPS = {}
