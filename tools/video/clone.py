@@ -315,7 +315,7 @@ def main():
             items, seen = [], set()
             for d in a.lectures:
                 lec = S.load(d)
-                for lang in ("zh", "en"):
+                for lang in lec.data.get("langs") or ("zh", "en"):      # 独立视频（第 38 轮）只配讲稿写明的语言
                     for j in V.clone_jobs(lec, lang, Path(td) / "cache"):
                         if j["key"] not in seen:
                             seen.add(j["key"])

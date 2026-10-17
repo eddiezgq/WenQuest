@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WenQuest Ops</title></head><body>
+<title>Running a Small Factory on Connected Records</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a 1920×1080 stage scaled to the window, one page at a time; a live replica of the software sits inside the pages. */
+:root {
+  color-scheme: dark;
+  --stage: #0b1a33;      /* deep blue stage */
+  --stage-2: #10254a;
+  --panel: #142d57;
+  --line: #24467a;
+  --ink: #eaf1fb;
+  --soft: #a9bddb;
+  --gold: #f5c344;       /* emphasis (stitch line) */
+  --cyan: #4fd1e0;       /* secondary */
+  --pass: #52d18a; --fail: #ff7a6b; --unk: #e9c46a;
+  /* the software's own light look (Frappe UI) inside the replica window */
+  --app-bg: #ffffff; --app-side: #f8f8f8; --app-line: #ededed; --app-ink: #171717; --app-soft: #6b6b6b; --app-mute: #9a9a9a;
+  --app-blue: #0289f7; --app-green: #278f5e; --app-red: #cc2929; --app-amber: #d97706; --app-chip: #f3f3f3;
+  --display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --body: "Inter", "Segoe UI", Arial, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+}
+html, body { height: 100%; }
+body { background: #071225; color: var(--ink); font-family: var(--body); overflow: hidden; margin: 0; }
+* { box-sizing: border-box; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+
+#view { position: fixed; inset: 0; overflow: hidden; }
+#stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: center center; background: radial-gradient(120% 90% at 85% 0%, var(--stage-2), var(--stage) 60%); overflow: hidden; border-radius: 6px; box-shadow: 0 30px 80px rgba(0,0,0,.5); }
+#stage::before { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(79,209,224,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(79,209,224,.06) 1px, transparent 1px); background-size: 64px 64px; pointer-events: none; }
+
+/* pages */
+.pg { position: absolute; inset: 0; padding: 120px 110px 110px; display: none; }
+.pg.on { display: block; animation: pageIn .6s cubic-bezier(.2,.7,.2,1) both; }
+.pg.back { animation-name: pageBack; }
+@keyframes pageIn { from { opacity: 0; transform: translateX(60px) rotateY(-8deg); } to { opacity: 1; transform: none; } }
+@keyframes pageBack { from { opacity: 0; transform: translateX(-60px) rotateY(8deg); } to { opacity: 1; transform: none; } }
+.f { opacity: 0; transform: translateY(26px); transition: opacity .5s, transform .5s cubic-bezier(.2,.7,.2,1); }
+.f.in { opacity: 1; transform: none; }
+.all .f { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .pg.on { animation: none; } .f { transition: none; } * { animation-duration: .01s !important; } }
+
+.kick { font-family: var(--mono); font-size: 26px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+h1, h2, h3 { margin: 0; font-family: var(--display); font-weight: 700; line-height: 1.02; text-wrap: balance; }
+h1 { font-size: 132px; }
+h2 { font-size: 76px; }
+h3 { font-size: 44px; font-weight: 600; }
+p { margin: 0; }
+.lead { font-size: 36px; color: var(--soft); line-height: 1.4; max-width: 1300px; }
+.txt { font-size: 32px; line-height: 1.4; }
+.soft { color: var(--soft); }
+.mono { font-family: var(--mono); }
+.stitch { height: 0; border-top: 4px dashed var(--gold); width: 520px; animation: stitch 1.4s linear infinite; }
+@keyframes stitch { to { border-top-color: var(--gold); background-position: 40px 0; } }
+.wbwrap { display: grid; gap: 10px; justify-items: center; }
+.wbf { width: 1200px; height: 732px; border: 0; border-radius: 14px; background: #fdfcf8; box-shadow: 0 18px 50px rgba(0,0,0,.35); }
+.wbcap { font-size: 22px; margin: 0; }
+.head { display: grid; gap: 14px; margin-bottom: 40px; }
+.cols { display: grid; gap: 36px; }
+.c2 { grid-template-columns: 1fr 1fr; } .c3 { grid-template-columns: repeat(3, 1fr); } .c4 { grid-template-columns: repeat(4, 1fr); }
+.card { background: rgba(20,45,87,.75); border: 2px solid var(--line); border-radius: 14px; padding: 34px 36px; display: grid; gap: 14px; align-content: start; }
+.card .n { font-family: var(--mono); font-size: 24px; color: var(--cyan); letter-spacing: .1em; }
+.card p { font-size: 30px; color: var(--soft); line-height: 1.4; }
+.big { font-family: var(--display); font-size: 120px; font-weight: 700; color: var(--gold); line-height: 1; }
+.btn { border: 2px solid var(--cyan); background: transparent; color: var(--cyan); border-radius: 10px; padding: 12px 26px; font-size: 26px; font-weight: 600; cursor: pointer; }
+.btn:hover { background: rgba(79,209,224,.12); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.solid { background: var(--cyan); color: #06223a; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.chip { display: inline-flex; align-items: center; gap: 8px; font-size: 24px; font-weight: 600; border: 2px solid currentColor; border-radius: 99px; padding: 4px 18px; }
+.chip.pass { color: var(--pass); } .chip.fail { color: var(--fail); } .chip.unk { color: var(--unk); } .chip.wait { color: var(--gold); }
+.fict { position: absolute; right: 110px; bottom: 64px; font-family: var(--mono); font-size: 22px; color: var(--soft); opacity: .8; }
+
+/* chapter rail and controls */
+#rail { position: absolute; left: 110px; right: 110px; top: 40px; display: flex; gap: 10px; z-index: 5; }
+#rail button { flex: 1; border: 0; background: none; cursor: pointer; text-align: left; padding: 0; display: grid; gap: 8px; color: var(--soft); }
+#rail i { display: block; height: 5px; border-radius: 3px; background: var(--line); }
+#rail span { font-family: var(--mono); font-size: 18px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#rail button.done i { background: rgba(245,195,68,.5); } #rail button.cur i { background: var(--gold); } #rail button.cur span { color: var(--gold); }
+#foot { position: absolute; left: 110px; right: 110px; bottom: 34px; display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 20px; color: var(--soft); z-index: 5; }
+#ctrl { position: fixed; right: max(14px, env(safe-area-inset-right, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); display: flex; gap: 8px; z-index: 30; }
+#ctrl button { width: 46px; height: 46px; border-radius: 10px; border: 1px solid #2a4b80; background: rgba(11,26,51,.92); color: var(--ink); font-size: 20px; cursor: pointer; }
+#ctrl button:hover { border-color: var(--cyan); }
+#toc { position: fixed; left: 0; top: 0; bottom: 0; width: min(440px, 92vw); background: #0a1a36; border-right: 1px solid #23457a; z-index: 40; overflow-y: auto; padding: 24px 18px; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-top: max(24px, env(safe-area-inset-top, 0px)); transform: translateX(-102%); transition: transform .35s cubic-bezier(.2,.7,.2,1); }
+#toc.open { transform: none; box-shadow: 20px 0 60px rgba(0,0,0,.5); }
+#toc h4 { margin: 0 0 10px; font-family: var(--display); font-size: 30px; }
+#toc .ch { font-family: var(--mono); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); margin: 16px 8px 4px; }
+#toc button { display: flex; gap: 12px; width: 100%; text-align: left; background: none; border: 0; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 16px; color: var(--soft); }
+#toc button:hover, #toc button[aria-current="true"] { background: rgba(79,209,224,.12); color: var(--ink); }
+#toc b { font-family: var(--mono); font-weight: 400; font-size: 13px; min-width: 24px; padding-top: 2px; }
+#notes { position: fixed; right: 0; top: 0; bottom: 0; width: min(520px, 94vw); background: #0a1a36; border-left: 1px solid #23457a; z-index: 40; padding: 24px; padding-right: max(24px, env(safe-area-inset-right, 0px)); padding-top: max(24px, env(safe-area-inset-top, 0px)); overflow-y: auto; transform: translateX(102%); transition: transform .35s; }
+#notes.open { transform: none; box-shadow: -20px 0 60px rgba(0,0,0,.5); }
+#notes h4 { margin: 0 0 6px; font-family: var(--display); font-size: 28px; }
+#notesTxt { font-size: 18px; line-height: 1.65; white-space: pre-line; color: var(--ink); }
+#clock { font-family: var(--mono); font-size: 14px; color: var(--soft); margin-bottom: 12px; }
+#scrim { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 35; display: none; }
+#scrim.on { display: block; }
+
+/* the replica of the software */
+.win { position: relative; border-radius: 14px; overflow: hidden; background: var(--app-bg); color: var(--app-ink); box-shadow: 0 30px 70px rgba(0,0,0,.45), 0 0 0 2px rgba(79,209,224,.25); font-family: var(--body); font-size: 15px; line-height: 1.45; display: grid; grid-template-rows: 40px 1fr; }
+.win .bar { background: #e9eaec; display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+.win .bar i { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; } .win .bar i:nth-child(2) { background: #febc2e; } .win .bar i:nth-child(3) { background: #28c840; }
+.win .url { margin-left: 14px; background: #fff; border-radius: 6px; padding: 3px 12px; font-size: 13px; color: #555; flex: 1; max-width: 560px; }
+.win .live { margin-left: auto; font-size: 12px; color: #278f5e; font-weight: 600; display: flex; gap: 6px; align-items: center; }
+.win .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #28c840; animation: pulse 1.6s infinite; }
+@keyframes pulse { 50% { opacity: .3; } }
+.app { display: grid; grid-template-columns: 210px 1fr; min-height: 0; height: 100%; overflow: hidden; }
+.side { background: var(--app-side); border-right: 1px solid var(--app-line); padding: 12px 8px; display: grid; align-content: start; gap: 1px; overflow-y: auto; min-height: 0; }
+.side .co { display: flex; gap: 8px; align-items: center; padding: 4px 8px 12px; }
+.side .co b { width: 28px; height: 28px; border-radius: 7px; background: #171717; color: #fff; display: grid; place-items: center; font-size: 13px; }
+.side .co span { font-weight: 600; font-size: 13px; line-height: 1.2; } .side .co small { display: block; color: var(--app-mute); font-weight: 400; font-size: 11px; }
+.side .lab { font-size: 11px; color: var(--app-mute); padding: 10px 10px 4px; }
+.side button { border: 0; background: none; text-align: left; padding: 6px 10px; border-radius: 7px; font-size: 13.5px; color: #383838; cursor: pointer; display: flex; justify-content: space-between; }
+.side button:hover { background: #ececec; }
+.side button.on { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.1); color: #171717; font-weight: 600; }
+.side button em { font-style: normal; background: var(--app-red); color: #fff; border-radius: 99px; font-size: 11px; padding: 0 7px; }
+.main { padding: 18px 24px; overflow: auto; min-width: 0; position: relative; }
+.main h5 { margin: 0 0 12px; font-size: 20px; font-weight: 600; display: flex; gap: 10px; align-items: center; }
+.crumb { color: var(--app-mute); font-weight: 400; }
+.panel { border: 1px solid var(--app-line); border-radius: 10px; padding: 14px 16px; background: #fff; }
+.grid-k { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.kpi { border: 1px solid var(--app-line); border-radius: 10px; padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; background: #fff; transition: box-shadow .2s, transform .2s; }
+.kpi:hover { box-shadow: 0 4px 14px rgba(0,0,0,.08); transform: translateY(-1px); }
+.kpi small { color: var(--app-soft); font-size: 12px; } .kpi b { font-size: 26px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+.kpi .d { font-size: 12px; } .up { color: var(--app-green); } .dn { color: var(--app-red); }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 9px; border-radius: 99px; background: var(--app-chip); color: #444; }
+.badge.g { background: #e4f5ec; color: var(--app-green); } .badge.r { background: #fdeaea; color: var(--app-red); } .badge.a { background: #fef3e2; color: #b45309; } .badge.b { background: #e6f2fe; color: #0466c8; }
+table.t { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+table.t th { text-align: left; font-weight: 500; color: var(--app-soft); font-size: 12px; padding: 7px 8px; border-bottom: 1px solid var(--app-line); }
+table.t td { padding: 7px 8px; border-bottom: 1px solid #f3f3f3; }
+table.t tr.click { cursor: pointer; } table.t tr.click:hover td { background: #f7f9fc; }
+.abtn { border: 1px solid #d4d4d4; background: #fff; border-radius: 8px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; }
+.abtn:hover { background: #f5f5f5; }
+.abtn.dark { background: #171717; color: #fff; border-color: #171717; }
+.abtn.red { color: var(--app-red); }
+.abtn:disabled { opacity: .45; cursor: not-allowed; }
+.ain { border: 1px solid #d4d4d4; border-radius: 8px; padding: 6px 10px; font-size: 13.5px; background: #f7f7f7; min-width: 0; }
+.cellok { background: #e9f7ef; } .cellbad { background: #fdecec; }
+.toast { position: absolute; right: 20px; bottom: 18px; background: #171717; color: #fff; border-radius: 10px; padding: 10px 14px; font-size: 13px; animation: toast 3.4s both; pointer-events: none; max-width: 70%; }
+@keyframes fin { from { opacity: 0; transform: translateY(8px); } }
+@keyframes toast { 0% { opacity: 0; transform: translateY(10px); } 10%, 85% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+.stamp { display: inline-block; border: 3px solid var(--app-green); color: var(--app-green); font-weight: 800; letter-spacing: .06em; padding: 2px 12px; transform: rotate(-5deg); animation: stampIn .35s cubic-bezier(.2,1.6,.4,1) both; }
+.stamp.no { border-color: var(--app-red); color: var(--app-red); }
+@keyframes stampIn { from { transform: rotate(-5deg) scale(2.2); opacity: 0; } }
+.flow { display: flex; gap: 0; align-items: center; margin: 4px 0 14px; }
+.flow span { font-size: 12.5px; padding: 5px 12px; background: var(--app-chip); color: #666; position: relative; }
+.flow span.done { background: #e4f5ec; color: var(--app-green); } .flow span.now { background: #171717; color: #fff; }
+.chat { display: grid; gap: 10px; }
+.q { justify-self: end; background: #f1f1f1; border-radius: 12px; padding: 8px 12px; max-width: 80%; }
+.a { max-width: 92%; } .a a { color: var(--app-blue); cursor: pointer; text-decoration: underline; }
+.cite { display: inline-block; font-size: 11.5px; background: #e6f2fe; color: #0466c8; border-radius: 6px; padding: 0 6px; margin: 0 2px; cursor: pointer; }
+.typing::after { content: "▍"; animation: pulse 1s infinite; color: var(--app-blue); }
+
+/* wall display (the product's dark wall mode) */
+.wall { background: #050d1d; color: #e6eefb; display: grid; grid-template-rows: auto 1fr auto; gap: 18px; padding: 22px 26px; height: 100%; font-family: var(--body); }
+.wall .top { display: flex; justify-content: space-between; align-items: center; }
+.wall .top b { font-family: var(--display); font-size: 34px; letter-spacing: .02em; } .wall .top span { font-family: var(--mono); color: #7f98bd; font-size: 15px; }
+.wk { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.wt { background: #0b1a33; border: 1px solid #1d3762; border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; position: relative; overflow: hidden; }
+.wt small { color: #7f98bd; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+.wt b { font-family: var(--display); font-size: 64px; line-height: 1; font-variant-numeric: tabular-nums; }
+.wt svg { width: 100%; height: 46px; }
+.wt.alert { border-color: #ff7a6b; box-shadow: inset 0 0 0 1px #ff7a6b; } .wt.alert b { color: #ff7a6b; }
+.wchain { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.wchain div { background: #0b1a33; border: 1px solid #1d3762; border-radius: 12px; padding: 14px; display: grid; gap: 6px; position: relative; }
+.wchain div::after { content: ""; position: absolute; right: -15px; top: 50%; width: 15px; height: 2px; background: repeating-linear-gradient(90deg, var(--gold) 0 6px, transparent 6px 10px); background-size: 20px 2px; animation: dash 0.8s linear infinite; }
+.wchain div:last-child::after { display: none; }
+@keyframes dash { to { background-position: 20px 0; } }
+.wchain small { color: #7f98bd; text-transform: uppercase; font-size: 13px; letter-spacing: .05em; } .wchain b { font-size: 30px; font-family: var(--display); }
+.ticker { display: flex; gap: 40px; white-space: nowrap; overflow: hidden; font-family: var(--mono); font-size: 15px; color: #a9bddb; border-top: 1px solid #1d3762; padding-top: 12px; }
+.ticker div { animation: tick 38s linear infinite; display: flex; gap: 40px; } .ticker em { color: var(--gold); font-style: normal; }
+@keyframes tick { to { transform: translateX(-50%); } }
+
+/* stage components */
+.layers { display: grid; gap: 14px; width: 1180px; }
+.layer { border: 2px solid var(--ink); border-radius: 12px; padding: 20px 28px; display: flex; justify-content: space-between; align-items: center; background: rgba(20,45,87,.75); cursor: pointer; text-align: left; color: var(--ink); }
+.layer b { font-family: var(--display); font-size: 46px; } .layer span { font-family: var(--mono); color: var(--soft); font-size: 22px; }
+.layer.base { border-style: dashed; } .layer.top { border-color: var(--gold); }
+.layer.open { border-color: var(--cyan); }
+.ldesc { font-size: 28px; color: var(--soft); line-height: 1.45; min-height: 170px; }
+.web { position: relative; height: 640px; border: 2px dashed var(--line); border-radius: 16px; }
+.web svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.web line { stroke: var(--gold); stroke-width: 3; stroke-dasharray: 8 8; animation: dash2 1s linear infinite; opacity: 0; transition: opacity .6s .6s; }
+@keyframes dash2 { to { stroke-dashoffset: -16; } }
+.web.joined line { opacity: 1; }
+.node { position: absolute; transform: translate(-50%, -50%); padding: 16px 24px; border-radius: 10px; background: var(--panel); border: 2px solid var(--soft); font-size: 30px; font-weight: 600; white-space: nowrap; transition: left 1s cubic-bezier(.2,.7,.2,1), top 1s cubic-bezier(.2,.7,.2,1), border-color .5s; }
+.node small { display: block; font-family: var(--mono); font-size: 20px; font-weight: 400; color: var(--soft); }
+.node.hub { border-color: var(--gold); opacity: 0; transition: opacity .6s .5s; } .web.joined .hub { opacity: 1; }
+.web:not(.joined) .node:not(.hub) { animation: float 4s ease-in-out infinite alternate; }
+.web .node:nth-child(odd) { animation-delay: -2s; }
+@keyframes float { to { transform: translate(-50%, calc(-50% - 10px)); } }
+.scrawl { position: absolute; font-family: var(--mono); font-size: 24px; color: var(--fail); transition: opacity .4s; } .web.joined .scrawl { opacity: 0; }
+.ev { display: grid; grid-template-columns: 180px 1fr; gap: 26px; font-size: 38px; align-items: baseline; }
+.ev .tm { font-family: var(--mono); color: var(--gold); font-size: 32px; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.steps > div { border-top: 6px solid var(--gold); padding-top: 22px; display: grid; gap: 12px; align-content: start; }
+.steps .w { font-family: var(--mono); font-size: 24px; color: var(--cyan); }
+.steps b { font-family: var(--display); font-size: 46px; } .steps p { font-size: 28px; color: var(--soft); }
+pre.code { margin: 0; background: #071530; border: 2px solid var(--line); border-left: 6px solid var(--cyan); border-radius: 10px; padding: 26px 30px; font-family: var(--mono); font-size: 25px; line-height: 1.55; color: #d7e6fb; white-space: pre; overflow: hidden; }
+table.st { border-collapse: collapse; width: 100%; font-size: 30px; }
+table.st td { padding: 16px 18px; border-bottom: 2px solid var(--line); vertical-align: top; } table.st td:first-child { font-family: var(--mono); color: var(--cyan); width: 340px; font-size: 26px; }
+.roles button { border: 2px solid var(--line); background: rgba(20,45,87,.75); border-radius: 14px; padding: 30px; text-align: left; cursor: pointer; display: grid; gap: 10px; color: var(--ink); }
+.roles button[aria-pressed="true"] { border-color: var(--gold); box-shadow: inset 0 -6px 0 var(--gold); }
+.roles b { font-family: var(--display); font-size: 52px; } .roles span { font-size: 28px; color: var(--soft); }
+.agenda { display: grid; gap: 14px; }
+.agenda button { display: grid; grid-template-columns: 90px 1fr 140px; align-items: baseline; gap: 20px; background: rgba(20,45,87,.6); border: 2px solid var(--line); border-radius: 12px; padding: 16px 26px; cursor: pointer; color: var(--ink); text-align: left; }
+.agenda button:hover { border-color: var(--gold); }
+.agenda b { font-family: var(--mono); font-size: 30px; color: var(--gold); } .agenda span { font-size: 34px; font-weight: 600; } .agenda i { font-style: normal; font-family: var(--mono); font-size: 24px; color: var(--soft); text-align: right; }
+.sign { display: grid; gap: 16px; }
+.sign label { display: grid; gap: 6px; font-size: 24px; color: var(--soft); }
+.sign input, .sign select { background: #071530; border: 2px solid var(--line); border-radius: 10px; padding: 12px 16px; font-size: 26px; color: var(--ink); }
+.ncrtext { font-family: var(--mono); font-size: 23px; line-height: 1.6; white-space: pre-wrap; min-height: 300px; color: #d7e6fb; }
+.ncrtext.typing::after { content: "▍"; color: var(--gold); animation: pulse 1s infinite; }
+.bigstamp { display: inline-block; border: 5px solid var(--pass); color: var(--pass); font-family: var(--display); font-weight: 700; font-size: 54px; letter-spacing: .06em; padding: 4px 26px; transform: rotate(-6deg); animation: stampIn .35s cubic-bezier(.2,1.6,.4,1) both; }
+.bigstamp.no { border-color: var(--fail); color: var(--fail); }
+.notes { display: none; }
+.modgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.mod { border: 2px solid var(--line); background: rgba(20,45,87,.75); color: var(--ink); border-radius: 12px; padding: 18px 22px; font-size: 32px; font-weight: 600; text-align: left; cursor: pointer; font-family: var(--display); }
+.mod.on { border-color: var(--gold); box-shadow: inset 6px 0 0 var(--gold); }
+.docflow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; }
+.doc { position: relative; border: 2px solid var(--line); background: rgba(20,45,87,.75); color: var(--ink); border-radius: 12px; padding: 20px 18px; font-size: 30px; font-weight: 600; cursor: pointer; text-align: left; font-family: var(--display); display: grid; gap: 4px; }
+.doc small { font-family: var(--mono); font-size: 20px; color: var(--cyan); font-weight: 400; }
+.doc::after { content: ""; position: absolute; right: -19px; top: 50%; width: 20px; height: 3px; background: repeating-linear-gradient(90deg, var(--gold) 0 6px, transparent 6px 10px); background-size: 20px 3px; animation: dash .8s linear infinite; }
+.doc:last-child::after { display: none; }
+.doc.on { border-color: var(--gold); background: rgba(245,195,68,.12); } .doc.past { border-color: rgba(245,195,68,.45); }
+table.gl { width: 100%; border-collapse: collapse; font-size: 26px; margin-top: 10px; font-variant-numeric: tabular-nums; }
+table.gl th { text-align: left; font-family: var(--mono); font-size: 18px; color: var(--soft); font-weight: 400; padding: 6px 8px; border-bottom: 2px solid var(--line); }
+table.gl td { padding: 8px; border-bottom: 1px solid var(--line); } table.gl td + td { text-align: right; font-family: var(--mono); font-size: 24px; }
+#otd table.gl { font-size: 22px; margin-top: 4px; } #otd table.gl td { padding: 3px 8px; } #otd table.gl th + th { text-align: right; } #otd + .big, #otd ~ .big { font-size: 80px; }
+table.gl tr.tot td { font-weight: 700; border-top: 2px solid var(--soft); color: var(--gold); }
+.taccts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.tacct { border: 2px solid var(--line); border-radius: 12px; padding: 14px 18px; background: rgba(20,45,87,.75); display: grid; gap: 4px; transition: border-color .4s, box-shadow .4s; }
+.tacct small { font-family: var(--mono); font-size: 16px; color: var(--cyan); text-transform: uppercase; letter-spacing: .08em; }
+.tacct b { font-size: 24px; line-height: 1.2; } .tacct span { font-family: var(--mono); font-size: 30px; color: var(--ink); }
+.tacct.hit { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(245,195,68,.25); animation: fin .4s both; }
+.stmt { min-height: 300px; } .stmt p { font-size: 28px; }
+ul.ticks { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 12px; font-size: 28px; }
+ul.ticks li { padding-left: 34px; position: relative; } ul.ticks li::before { content: ""; position: absolute; left: 0; top: 14px; width: 18px; height: 3px; background: var(--gold); }
+table.sl { width: 100%; border-collapse: collapse; font-size: 26px; font-variant-numeric: tabular-nums; }
+table.sl th { text-align: left; font-family: var(--mono); font-size: 18px; color: var(--soft); font-weight: 400; padding: 8px; border-bottom: 2px solid var(--line); }
+table.sl td { padding: 10px 8px; border-bottom: 1px solid var(--line); } td.pos { color: var(--pass); } td.neg { color: var(--fail); }
+.val { display: grid; gap: 16px; } .val label, label.calc { display: grid; grid-template-columns: 1fr 200px; align-items: center; gap: 14px; font-size: 26px; color: var(--soft); }
+.val input, label.calc input { background: #071530; border: 2px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 28px; color: var(--ink); font-family: var(--mono); width: 100%; }
+label.calc { margin-top: 14px; grid-template-columns: 1fr 260px; }
+.pipe { display: grid; grid-template-columns: repeat(6, 1fr); gap: 22px; }
+.stage-n { position: relative; border: 2px solid var(--line); background: rgba(20,45,87,.75); color: var(--ink); border-radius: 14px; padding: 26px 18px; text-align: left; cursor: pointer; display: grid; gap: 8px; animation: fin .6s both; }
+.stage-n b { font-family: var(--display); font-size: 40px; } .stage-n small { font-family: var(--mono); font-size: 19px; color: var(--cyan); }
+.stage-n::after { content: ""; position: absolute; right: -23px; top: 50%; width: 24px; height: 3px; background: repeating-linear-gradient(90deg, var(--gold) 0 6px, transparent 6px 10px); background-size: 20px 3px; animation: dash .8s linear infinite; }
+.stage-n:last-child::after { display: none; } .stage-n.on { border-color: var(--gold); background: rgba(245,195,68,.12); }
+.synclog { font-family: var(--mono); font-size: 22px; line-height: 1.5; display: grid; gap: 10px; min-height: 360px; }
+.synclog span { color: var(--soft); } .synclog em { font-style: normal; color: var(--gold); display: inline-block; min-width: 76px; }
+
+.win.f { zoom: 1.4; }   /* the replica is laid out at its real size and enlarged so its text reads on a projector */
+.pg:has(.win) .head h2 { font-size: 60px; }
+.pg:has(.win) .head { gap: 8px; }
+</style>
+
+<div id="view"><div id="stage">
+  <nav id="rail" aria-label="Chapters"></nav>
+
+  <!-- ================= OPENING ================= -->
+  <section class="pg" data-ch="Opening" data-title="Cover">
+    <div style="position:absolute;right:-60px;top:150px;width:1080px;height:640px;opacity:.95;transform:perspective(1600px) rotateY(-18deg) rotateX(4deg);transform-origin:right center" class="win" data-app="wall" aria-hidden="true"></div>
+    <div style="position:relative;display:grid;gap:30px;max-width:900px;margin-top:70px">
+      <p class="kick f">A talk for owners, managers and engineers</p>
+      <h1 class="f" style="font-size:118px">Running a small factory on connected records</h1>
+      <div class="stitch f"></div>
+      <p class="lead f" style="font-size:32px">One open base for orders, stock, purchasing, quality and the shop floor. AI drafts the paperwork. People decide.</p>
+      <p class="f mono soft" style="font-size:22px">WenQuest Ops · Guoqing (Eddie) Zhang · demo data: a fictional company</p>
+    </div>
+    <aside class="notes">Good morning, and thank you for coming.
+Today is about one practical question: how a company of 10 to 200 people keeps orders, stock, purchasing, quality and machines in one connected record, without an IT department.
+What you see behind me is the software itself, on its wall display. Everything in this talk is the real interface, and you can click it. The company is fictional: Harbor Lane Supply.</aside>
+  </section>
+  <section class="pg" data-ch="Opening" data-title="Who is in the room">
+    <div class="head"><p class="kick f">Before we start</p><h2 class="f">Pick your seat. Each gets a different answer.</h2></div>
+    <div class="cols c3 roles f" role="group" aria-label="Your role">
+      <button type="button" aria-pressed="true" data-role="0"><b>Owner</b><span>Will it save money, and can we run it ourselves?</span></button>
+      <button type="button" aria-pressed="false" data-role="1"><b>Manager</b><span>Will people use it, and will audits get easier?</span></button>
+      <button type="button" aria-pressed="false" data-role="2"><b>Engineer</b><span>Is it sound and open, and can it talk to our machines?</span></button>
+    </div>
+    <p class="lead f" id="roleAns" style="margin-top:40px;color:var(--ink)"></p>
+    <aside class="notes">Quick show of hands: owners? Managers in operations or quality? Engineers and IT?
+Each of you will leave with one answer. Owners: what it costs to run and what it replaces. Managers: how daily work and audits change. Engineers: how it is built and how machines connect.</aside>
+  </section>
+  <section class="pg" data-ch="Opening" data-title="The hour">
+    <div class="head"><p class="kick f">The hour</p><h2 class="f">Seven parts. Click one to jump.</h2></div>
+    <div class="agenda" id="agenda"></div>
+    <aside class="notes">Here is the plan: the problem, the idea, then four parts of the product that you will see working, then a part for engineers and how to start. Questions are welcome at any time.</aside>
+  </section>
+  <section class="pg" data-ch="1 · The problem" data-title="A Tuesday at Harbor Lane">
+    <div class="head"><p class="kick f">Part 1 · Where time goes</p><h2 class="f">Four people. One day. One late order.</h2></div>
+    <div style="display:grid;gap:26px">
+      <div class="ev f"><span class="tm">9:10</span><span>A customer asks why order SO-1042 is late. Sales checks the ERP.</span></div>
+      <div class="ev f"><span class="tm">9:40</span><span>The warehouse checks a spreadsheet: bolts are short. Nobody knows why.</span></div>
+      <div class="ev f"><span class="tm">10:30</span><span>Purchasing finds the supplier shipped six days late.</span></div>
+      <div class="ev f"><span class="tm">14:00</span><span>Quality finds a hold tag on that supplier’s lot, in a binder.</span></div>
+      <div class="ev f"><span class="tm">16:45</span><span style="color:var(--gold)">The answer goes out. Every fact was already written down.</span></div>
+    </div>
+    <p class="fict">Illustrative story, fictional company</p>
+    <aside class="notes">Let me start with a day many of you will recognize.
+A customer asks about a late order. The facts exist: the order is in the ERP, the shortage in a spreadsheet, the late shipment in an email, the quality hold in a binder.
+Every fact was recorded. None of them were connected. So four people spend a day walking between records.</aside>
+  </section>
+  <section class="pg" data-ch="1 · The problem" data-title="Scattered records">
+    <div class="head"><p class="kick f">Part 1 · The same facts, two ways</p><h2 class="f">The facts exist. They are not connected.</h2></div>
+    <div class="web f" id="web">
+      <svg aria-hidden="true" id="webLines"></svg>
+      <div class="node hub" data-a="50,50" data-b="50,50">Operations hub<small>one record</small></div>
+      <div class="node" data-a="12,16" data-b="50,12">Sales orders<small>ERP</small></div>
+      <div class="node" data-a="84,22" data-b="84,28">Stock levels<small>spreadsheet</small></div>
+      <div class="node" data-a="30,80" data-b="84,72">Inspections<small>paper binder</small></div>
+      <div class="node" data-a="70,84" data-b="50,88">Supplier delays<small>someone’s inbox</small></div>
+      <div class="node" data-a="14,52" data-b="16,72">Calibration<small>sticker on the tool</small></div>
+      <div class="node" data-a="60,46" data-b="16,28">Corrective actions<small>Word files</small></div>
+      <span class="scrawl" style="left:36%;top:22%">“who has the latest?”</span>
+      <span class="scrawl" style="left:58%;top:64%">“it’s in my inbox”</span>
+    </div>
+    <div class="row f" style="margin-top:22px"><button class="btn solid" id="joinBtn" type="button">Connect them</button><span class="txt soft">Nothing is typed twice: the hub reads the ERP and keeps the quality records.</span></div>
+    <aside class="notes">Here are the records as they live today, each in its own tool, each owned by one person. Click Connect.
+The hub doesn't ask anyone to type things twice. It reads orders, stock and purchasing from the ERP and keeps the quality records itself, all linked.
+Once linked, the Tuesday question becomes one click.</aside>
+  </section>
+  <section class="pg" data-ch="1 · The problem" data-title="Audit week and the AI hire">
+    <div class="head"><p class="kick f">Part 1 · Two more pains</p><h2 class="f">Audit week, and “we hired someone for AI”</h2></div>
+    <div class="cols c2">
+      <div class="card f"><span class="n">AUDIT WEEK</span><h3>Evidence hunted by hand</h3><p>Procedures say one thing, the shop does another. Records can be edited after the fact, so signatures prove little.</p></div>
+      <div class="card f"><span class="n">THE AI HIRE</span><h3>AI can only guess</h3><p>Pointed at scattered records, AI guesses and nobody can check it. It needs your own connected records, with citations, and a person in charge.</p></div>
+    </div>
+    <aside class="notes">Two more pains. Audit week: evidence is hunted down the week before, and many records can be silently edited, so a signature means little.
+And the new one: owners are told to use AI. Pointed at scattered records it can only guess. It becomes useful when it works from your own connected records, cites them, and leaves decisions to people.</aside>
+  </section>
+  <section class="pg" data-ch="2 · The idea" data-title="How it is built">
+    <div class="head"><p class="kick f">Part 2 · The idea</p><h2 class="f">One open base, one record, modules on top</h2></div>
+    <div class="cols" style="grid-template-columns:1180px 1fr;gap:50px">
+      <div class="layers" id="layers">
+        <button type="button" class="layer top f" data-d="Every write to the ERP and every quality decision is confirmed or signed by a named person with their own password."><b>People</b><span>confirm · sign</span></button>
+        <button type="button" class="layer f" data-d="Answers from your records with citations; drafts purchase orders, reports and customer notes. Without an AI key, built-in rules answer common questions."><b>AI assistant</b><span>answers · drafts</span></button>
+        <button type="button" class="layer f" data-d="Quality, ISO 9001 and ISO 13485 packs, incoming inspection, calibration, production records, recalls, UDI labels, measurements, machines. Turn on what you need."><b>Modules</b><span>quality · regulated · factory</span></button>
+        <button type="button" class="layer f" data-d="Reads ERPNext continuously and links orders, items, receipts, suppliers and inspections into one graph; computes the metrics and traces causes."><b>Operations hub</b><span>one connected record</span></button>
+        <button type="button" class="layer base f" data-d="ERPNext: open-source orders, inventory, purchasing and accounting. The official image, used as is through its API; we never change its code."><b>ERPNext base</b><span>open source · unmodified</span></button>
+      </div>
+      <p class="ldesc f" id="ldesc">Click a layer to see what it does.</p>
+    </div>
+    <aside class="notes">This is the whole architecture. Read it from the bottom.
+The base is ERPNext, a mature open-source ERP, used as is through its API. Above it, the operations hub links everything into one graph. Modules on top. The AI assistant on the hub. And people at the top, who confirm and sign.</aside>
+  </section>
+  <section class="pg" data-ch="2 · The idea" data-title="AI drafts, people sign">
+    <div class="head"><p class="kick f">Part 2 · The working rule</p><h2 class="f">AI drafts. A person signs. Try it.</h2></div>
+    <div class="cols c2">
+      <div class="card f"><div class="row" style="justify-content:space-between"><h3>Draft nonconformance report</h3><span class="chip wait">AI draft</span></div>
+        <div class="ncrtext" id="ncrText"></div><div><button class="btn" id="draftBtn" type="button">Ask AI to draft it</button></div></div>
+      <div class="card sign f"><h3>Signature</h3>
+        <label for="signWho">Signer<select id="signWho"><option>Jordan, quality manager</option><option>Sam, operations manager</option></select></label>
+        <label for="signPw">Password (any text works in this demo)<input id="signPw" type="password" autocomplete="off"></label>
+        <div class="row"><button class="btn solid" id="signBtn" type="button" disabled>Sign as a person</button><button class="btn gold" id="aiSign" type="button" disabled>Let the AI sign</button></div>
+        <div id="signOut" style="min-height:120px"></div></div>
+    </div>
+    <aside class="notes">Here's the rule in action. Ask the AI to draft the report: it writes from the inspection record and cites it.
+Now try "Let the AI sign". Refused, every time. Type any password and sign as a person: the record locks with your name, the meaning and the time. From then on it can only be voided with a reason, never edited.</aside>
+  </section>
+  <section class="pg" data-ch="2 · The idea" data-title="Four rules">
+    <div class="head"><p class="kick f">Part 2 · In every module</p><h2 class="f">Four rules the software enforces</h2></div>
+    <div class="cols c4">
+      <div class="card f"><span class="n">RULE 1</span><h3>Code judges</h3><p>Pass, fail, sample size and acceptance are plain code. Never AI.</p></div>
+      <div class="card f"><span class="n">RULE 2</span><h3>People sign</h3><p>Your own password. Someone other than the author approves.</p></div>
+      <div class="card f"><span class="n">RULE 3</span><h3>History only grows</h3><p>The database refuses to edit or delete a signed record.</p></div>
+      <div class="card f"><span class="n">RULE 4</span><h3>Unknown is not pass</h3><p>A supplier with no inspected lots has no rate, not 0%.</p><button class="btn" type="button" id="unkBtn" style="justify-self:start">Show one</button><div id="unkOut"></div></div>
+    </div>
+    <aside class="notes">Four rules hold in every module. Code judges. People sign, and someone else approves. History only grows, enforced in the database itself. And unknown is not pass: click Show one. A supplier we never inspected gets unknown, not a perfect score.</aside>
+  </section>
+  <section class="pg" data-ch="2 · The idea" data-title="Yours to run">
+    <div class="head"><p class="kick f">Part 2 · Plainly</p><h2 class="f">You build and run it, with AI and our courses</h2></div>
+    <div class="cols c3">
+      <div class="card f"><span class="n">THE PLATFORM</span><h3>Your server</h3><p>One install script. Your data stays with you.</p></div>
+      <div class="card f"><span class="n">THE COURSES</span><h3>Your people</h3><p>Step-by-step courses teach your staff to set it up and adapt it.</p></div>
+      <div class="card f"><span class="n">HOSTED</span><h3>Outside connections</h3><p>Shipping labels, e-commerce orders, EDI, as hosted services.</p></div>
+    </div>
+    <p class="txt soft f" style="margin-top:36px">Pricing per company: [to be confirmed].</p>
+    <aside class="notes">How this works commercially. You run the platform on a server you control. We teach your people with courses, and we offer hosted connection services. You are not renting your own records back from a vendor.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="What an ERP is">
+    <div class="head"><p class="kick f">Part 3 · The base</p><h2 class="f">An ERP is the company’s single book of record</h2></div>
+    <div class="cols" style="grid-template-columns:1fr 1fr;gap:50px">
+      <div style="display:grid;gap:22px;align-content:start">
+        <div class="card f"><span class="n">ONE LIST OF EVERYTHING</span><p>One item list, one customer list, one supplier list, one chart of accounts.</p></div>
+        <div class="card f"><span class="n">EVERY TRANSACTION POSTS ONCE</span><p>Ship an order and the stock and the books move together, from the same document.</p></div>
+        <div class="card f"><span class="n">EVERYONE READS THE SAME NUMBERS</span><p>Sales, the warehouse and accounting stop keeping their own copies.</p></div>
+      </div>
+      <div class="card f" style="gap:18px"><h3>Ship one order. Watch what moves.</h3>
+        <button class="btn solid" id="shipBtn" type="button" style="justify-self:start">Submit delivery note DN-0331</button>
+        <div id="shipOut" style="display:grid;gap:12px;font-size:26px"></div></div>
+    </div>
+    <aside class="notes">Part 3 is the base everything runs on: the ERP.
+An ERP is the company's single book of record. One list of items, customers and suppliers, one chart of accounts. Every transaction is posted once, and everything that depends on it moves together.
+Click the button. One delivery note takes 400 bolts out of stock, records their cost in the books, and updates what the customer still waits for. Nobody retypes it into another system.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Why ERPNext">
+    <div class="head"><p class="kick f">Part 3 · The base</p><h2 class="f">Why we build on ERPNext</h2></div>
+    <div class="cols c2">
+      <div class="card f"><span class="n">OPEN SOURCE</span><h3>Free to run yourself</h3><p>GPLv3 licensed, built on the Frappe framework. No per-user licence when you host it yourself.</p></div>
+      <div class="card f"><span class="n">COMPLETE</span><h3>The whole back office</h3><p>Accounting, stock, buying, selling, manufacturing, projects, CRM, assets and more, in one system.</p></div>
+      <div class="card f"><span class="n">OPEN TO OTHER SOFTWARE</span><h3>Every document has an API</h3><p>Role permissions, a change history on documents, and a REST interface for every document type.</p></div>
+      <div class="card f"><span class="n">USED AS IT IS</span><h3>We never change its code</h3><p>The official image, talked to through its API. Its upgrades stay its upgrades.</p></div>
+    </div>
+    <aside class="notes">Why ERPNext. It is open source under GPLv3, built on the Frappe framework, and free to run on your own server without per-user licences.
+It covers the whole back office in one system. Every document type has a REST interface, which is how WenQuest Ops talks to it.
+And we use it exactly as it is: the official image, never a modified copy. So when ERPNext improves, you get the improvements, and your data is in a standard system that does not depend on us.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="The modules">
+    <div class="head"><p class="kick f">Part 3 · Click a module</p><h2 class="f">What ERPNext covers, and what we add</h2></div>
+    <div class="cols" style="grid-template-columns:1.25fr 1fr;gap:40px">
+      <div class="modgrid f" id="modgrid"></div>
+      <div class="card f" id="modOut" style="min-height:520px"></div>
+    </div>
+    <aside class="notes">Here are ERPNext's main modules. Click one.
+Each one shows what it does in ERPNext, and what WenQuest Ops reads from it or adds on top. For example Stock: ERPNext keeps the stock ledger; we read it to compute stock-outs and days on hand. Quality: ERPNext has basic quality inspections; we add the full quality system.
+HR and payroll is a separate Frappe app; we do not touch it.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Order to cash">
+    <div class="head"><p class="kick f">Part 3 · Selling</p><h2 class="f">Order to cash: five documents, each with its effect</h2></div>
+    <div class="docflow f" id="o2c"></div>
+    <div class="cols c2 f" style="margin-top:28px"><div class="card" id="o2cWhat"></div><div class="card" id="o2cGl"></div></div>
+    <aside class="notes">Order to cash. Five documents. Click each one.
+A quotation and a sales order change neither stock nor the books; the order records what the customer is owed.
+The delivery note takes the goods out of stock and, with perpetual inventory, posts their cost: debit cost of goods sold, credit stock in hand.
+The sales invoice creates the receivable: debit debtors, credit sales. The payment entry clears it against the bank.
+These are the same documents WenQuest Ops reads to compute on-time delivery and receivables.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Procure to pay">
+    <div class="head"><p class="kick f">Part 3 · Buying</p><h2 class="f">Procure to pay: from a request to a paid supplier</h2></div>
+    <div class="docflow f" id="p2p"></div>
+    <div class="cols c2 f" style="margin-top:28px"><div class="card" id="p2pWhat"></div><div class="card" id="p2pGl"></div></div>
+    <aside class="notes">Procure to pay is the mirror image. A material request, then a purchase order with a promised date.
+The purchase receipt brings the goods into stock: debit stock in hand, credit stock received but not billed, a holding account until the supplier's invoice arrives.
+The purchase invoice moves that to accounts payable, and the payment entry clears it.
+The receipt is also where our incoming inspection starts, and where we measure whether the supplier was on time.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Double entry, live">
+    <div class="head"><p class="kick f">Part 3 · Accounting · post the transactions in order</p><h2 class="f">Every document posts balanced entries</h2></div>
+    <div class="cols" style="grid-template-columns:420px 1fr;gap:36px">
+      <div style="display:grid;gap:12px;align-content:start" class="f" id="postBtns"></div>
+      <div class="f" style="display:grid;gap:18px">
+        <div class="taccts" id="taccts"></div>
+        <div class="row" id="tbal" style="font-size:28px"></div>
+      </div>
+    </div>
+    <aside class="notes">Accounting, live. Post the six transactions in order: receive the bolts, the supplier's invoice, pay the supplier, ship to the customer, invoice the customer, and the customer pays.
+Watch the accounts. Every posting has equal debits and credits, so the trial balance at the bottom always balances. Stock in hand goes up on receipt and down on delivery. The holding account for goods received but not billed clears when the invoice arrives.
+At the end the bank shows the margin on this one sale. Next page: the statements built from these same entries.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Statements and month-end">
+    <div class="head"><p class="kick f">Part 3 · Accounting · from the entries you just posted</p><h2 class="f">Profit and loss, balance sheet, month-end</h2></div>
+    <div class="cols c3">
+      <div class="card f"><span class="n">PROFIT AND LOSS</span><div id="pl" class="stmt"></div></div>
+      <div class="card f"><span class="n">BALANCE SHEET</span><div id="bs" class="stmt"></div></div>
+      <div class="card f"><span class="n">MONTH-END IN ERPNEXT</span><ul class="ticks"><li>Bank reconciliation against statements</li><li>Receivable and payable ageing</li><li>Period closing voucher</li><li>Cost centres and budgets</li><li>Multi-currency and taxes</li></ul></div>
+    </div>
+    <p class="txt soft f" style="margin-top:26px">Post on the previous page and these update. If nothing is posted yet, they show what is known: nothing.</p>
+    <aside class="notes">These statements are computed from the entries you posted on the previous page. Profit and loss: sales less cost of goods sold. The balance sheet: bank, receivables, stock, payables.
+Month-end in ERPNext is bank reconciliation, ageing reports, and a period closing voucher, with cost centres, budgets, multiple currencies and taxes when you need them.
+WenQuest Ops reads invoices to put receivables, overdue amounts and payables on the finance board, which you will see in part 5.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="The stock ledger">
+    <div class="head"><p class="kick f">Part 3 · Inventory</p><h2 class="f">Stock is a ledger: every movement, quantity and value</h2></div>
+    <div class="cols" style="grid-template-columns:1fr 380px;gap:36px">
+      <div class="card f" style="padding:24px"><table class="sl" id="sl"></table></div>
+      <div style="display:grid;gap:14px;align-content:start" class="f">
+        <button class="btn" type="button" data-sl="in">Receive 100 @ $0.40</button>
+        <button class="btn" type="button" data-sl="in2">Receive 100 @ $0.60</button>
+        <button class="btn gold" type="button" data-sl="out">Ship 120</button>
+        <button class="btn" type="button" data-sl="reset">Start over</button>
+        <div class="row" style="font-size:24px;gap:10px"><span class="soft">Valuation:</span><button class="btn solid" type="button" data-m="fifo">FIFO</button><button class="btn" type="button" data-m="ma">Moving average</button></div>
+      </div>
+    </div>
+    <aside class="notes">In ERPNext, stock is a ledger. Each receipt and each delivery is a line with a quantity, a rate and the running value, item by item and warehouse by warehouse.
+Receive 100 bolts at 40 cents, then 100 at 60 cents, then ship 120. Switch between FIFO and moving average: the quantity is the same, but the cost of the 120 shipped, and the value left on the shelf, differ.
+WenQuest Ops sums this ledger to get stock on hand and inventory value. It never estimates them.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Valuation compared">
+    <div class="head"><p class="kick f">Part 3 · Inventory · change the numbers</p><h2 class="f">FIFO or moving average: the same shipment, two costs</h2></div>
+    <div class="cols" style="grid-template-columns:520px 1fr;gap:40px">
+      <div class="card f val">
+        <label>First receipt qty <input id="vq1" type="number" value="100" min="0"></label>
+        <label>First receipt rate $ <input id="vr1" type="number" value="0.40" step="0.01" min="0"></label>
+        <label>Second receipt qty <input id="vq2" type="number" value="100" min="0"></label>
+        <label>Second receipt rate $ <input id="vr2" type="number" value="0.60" step="0.01" min="0"></label>
+        <label>Shipped qty <input id="vs" type="number" value="120" min="0"></label>
+      </div>
+      <div class="cols c2 f" id="valOut" style="align-content:start"></div>
+    </div>
+    <aside class="notes">Change the numbers. FIFO costs the shipment at the oldest receipts first. Moving average costs it at the average of everything on hand.
+When prices rise, FIFO shows lower cost of goods and higher stock value; moving average smooths it. The method is set per item or company in ERPNext and your accountant decides it; WenQuest Ops simply reads the values ERPNext computed.
+If you try to ship more than you have, it says so instead of inventing a cost.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Batches, serials, reorder">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 3 · Inventory in practice</p><h2 class="f">Batches, serial numbers and reorder levels</h2></div>
+    <div class="win f" data-app="inventory" style="height:493px"></div>
+    <aside class="notes">Inventory in practice, in the WenQuest Ops replica. Stock by warehouse, with the quality hold warehouse kept apart from what you can sell.
+Items can be tracked by batch or serial number in ERPNext; that is how a recall finds every customer. Each item can have a reorder level. Click "Draft a purchase order" on a short item: it becomes a draft, and nothing is sent to ERPNext until a person confirms it.</aside>
+  </section>
+  <section class="pg" data-ch="3 · The base: ERPNext" data-title="Manufacturing and more">
+    <div class="head"><p class="kick f">Part 3 · Beyond the back office</p><h2 class="f">Manufacturing, projects, assets, CRM</h2></div>
+    <div class="cols c4">
+      <div class="card f"><span class="n">MANUFACTURING</span><h3>BOM and work orders</h3><p>Bills of materials, work orders, job cards; raw materials consumed, finished goods received.</p></div>
+      <div class="card f"><span class="n">PROJECTS</span><h3>Jobs and timesheets</h3><p>Tasks, timesheets and project costing for make-to-order work.</p></div>
+      <div class="card f"><span class="n">ASSETS</span><h3>Machines and tools</h3><p>Asset register, depreciation and maintenance schedules.</p></div>
+      <div class="card f"><span class="n">CRM</span><h3>Leads to customers</h3><p>Leads, opportunities and quotations before the first order.</p></div>
+    </div>
+    <p class="txt soft f" style="margin-top:30px">WenQuest Ops links its signed production records to the ERPNext work order of the same lot.</p>
+    <aside class="notes">Beyond the back office, ERPNext has manufacturing with bills of materials and work orders, projects with timesheets, an asset register with depreciation, and a CRM for leads and quotations.
+WenQuest Ops does not replace these. Its production record, the signed step-by-step record a regulated product needs, refers to the ERPNext work order of the same lot.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="What the hub adds">
+    <div class="head"><p class="kick f">Part 4 · The operations hub · click a stage</p><h2 class="f">The ERP records. The hub connects, measures and explains.</h2></div>
+    <div class="pipe f" id="pipe"></div>
+    <div class="card f" id="pipeOut" style="margin-top:30px;min-height:190px"></div>
+    <aside class="notes">Part 4: the operations hub, the heart of WenQuest Ops. The ERP records transactions. The hub turns them into understanding.
+Click each stage. It reads every change from ERPNext as an event. It builds one graph of objects and links. It computes metrics with published formulas. It finds anomalies and traces their causes. And when something should be done, it prepares a draft that a person confirms before anything is written back.
+The quality, production and machine modules keep their records in the hub too, so they join the same graph.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="Sync, read-only">
+    <div class="head"><p class="kick f">Part 4 · The hub · try it</p><h2 class="f">It reads what changed, keeps every change, and never writes on its own</h2></div>
+    <div class="cols" style="grid-template-columns:1fr 1fr;gap:40px">
+      <div style="display:grid;gap:18px;align-content:start">
+        <div class="card f"><span class="n">EVERY FIVE MINUTES</span><p>Only documents changed since the last run; it resumes after any interruption.</p></div>
+        <div class="card f"><span class="n">EVERY CHANGE KEPT</span><p>Each change is an event. The whole graph can be rebuilt from the events, with the same result.</p></div>
+        <div class="card f"><span class="n">READ-ONLY</span><p>Writes to ERPNext only through drafts a person has confirmed.</p></div>
+      </div>
+      <div class="card f" style="gap:16px"><h3>Change a promised date in ERPNext</h3>
+        <button class="btn solid" id="syncBtn" type="button" style="justify-self:start">Move PO-0312 from Oct 20 to Oct 27</button>
+        <div id="syncOut" class="synclog"></div></div>
+    </div>
+    <aside class="notes">How the hub stays current. Every five minutes it asks ERPNext only for documents changed since the last time, and it picks up where it stopped after any interruption.
+Each change is kept as an event, so the whole graph can be rebuilt from scratch with the same result.
+Try it: a buyer moves a purchase order's promised date. The change arrives as an event, the order's object updates, and two sales orders that depend on it are now at risk. The hub found that by following links, not by anyone looking.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="The object graph">
+    <div class="head"><p class="kick f">Part 4 · The hub · click an object</p><h2 class="f">One graph of the business, eight domains</h2></div>
+    <div class="cols" style="grid-template-columns:1.35fr 1fr;gap:36px">
+      <div class="card f" style="padding:10px"><svg id="og" viewBox="0 0 980 620" style="width:100%;height:auto" role="img" aria-label="Object graph"></svg></div>
+      <div class="card f" id="ogOut"></div>
+    </div>
+    <aside class="notes">This is the hub's model of the business: eight domains, customers, sales and delivery, items, supply, warehouse, quality, people and finance.
+Click an object type. Its links light up: a sales order belongs to a customer, orders items, is fulfilled by delivery notes and billed by invoices. A purchase receipt receives a purchase order and is inspected by incoming inspection.
+Because everything is linked this way, a question about one object can be followed to every object that explains it.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="Metrics with published formulas">
+    <div class="head"><p class="kick f">Part 4 · The hub · toggle the orders</p><h2 class="f">Every number has a formula you can check by hand</h2></div>
+    <div class="cols c2">
+      <div class="card f"><span class="n">ON-TIME DELIVERY</span><p>Orders fully shipped in the period whose last delivery date is on or before the promised date.</p><div id="otd"></div></div>
+      <div class="card f"><span class="n">DAYS ON HAND</span><p>Inventory value ÷ (cost of goods shipped in the last 90 days ÷ 90).</p>
+        <label class="calc">Inventory value $ <input id="dohV" type="number" value="412600"></label>
+        <label class="calc">Shipped at cost, last 90 days $ <input id="dohS" type="number" value="977000"></label>
+        <p class="big" id="dohOut" style="font-size:84px"></p></div>
+    </div>
+    <aside class="notes">Every number on the dashboard has a published formula you can check by hand.
+On-time delivery: of the orders fully shipped in the period, how many shipped on or before the promised date. Toggle an order and watch the rate change. Untoggle them all and it says unknown, not zero.
+Days on hand: inventory value divided by the average daily cost of goods shipped over 90 days. Set the shipments to zero and it is unknown, not infinite. When a company defines a number differently, we change the rule, never the data.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="The wall display">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 4 · The shop floor screen</p><h2 class="f">The whole company, live, on one wall</h2></div>
+    <div class="win f" data-app="wall" style="height:493px"></div>
+    <aside class="notes">This is the wall display from the product, for the shop floor or the office TV. The numbers move as the records change: on-time delivery, stock-outs, open nonconformances, supplier on-time rate. The flow at the center follows the business chain from sales to stock to purchasing to receiving to quality. The ticker shows what just happened.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="The dashboard">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 4 · Click anything</p><h2 class="f">The morning dashboard, from the same records</h2></div>
+    <div class="win f" data-app="dashboard" style="height:493px"></div>
+    <aside class="notes">This is the morning dashboard. Every tile is clickable: click "Late orders" and you get the list, click one and you get its cause. The left menu works too; try Anomalies or Quality. Every number matches the ERP, because it comes from the same records.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="Trace a late order">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 4 · The Tuesday question</p><h2 class="f">Why is SO-1042 late? Click to follow the thread.</h2></div>
+    <div class="win f" data-app="anomalies" style="height:493px"></div>
+    <aside class="notes">Back to Tuesday. The anomalies page lists every late order with its cause chain. Click SO-1042 and follow it: the order, the item short, the purchase order that arrived late, the supplier and its record. Nobody searched; the links were made when the records were created.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="Drafts back to ERPNext">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 4 · The only way back</p><h2 class="f">Drafts: prepared by AI or rules, confirmed by a person</h2></div>
+    <div class="win f" data-app="drafts" style="height:493px"></div>
+    <aside class="notes">This is the only path back into ERPNext: drafts. The assistant or a rule prepares a purchase order, a quality inspection result or a customer note. A person opens it, checks it, and confirms. Only then is it created in ERPNext, as a draft document there too, so the accounting team still submits it.
+Confirm one. Discard another with a reason. Every draft, confirmed or not, stays in the log.</aside>
+  </section>
+  <section class="pg" data-ch="4 · The hub" data-title="The assistant">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 4 · Ask in plain English</p><h2 class="f">An assistant that cites your records</h2></div>
+    <div class="win f" data-app="assistant" style="height:493px"></div>
+    <aside class="notes">The assistant sits on every page. Click a suggested question. It answers from your records and every answer cites them; click a citation to open the record. When it suggests an action, it creates a draft for a person to confirm. It reads with your permissions, and every run is logged.</aside>
+  </section>
+  <section class="pg" data-ch="5 · Operations" data-title="Sales and delivery">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 5 · Operations · selling</p><h2 class="f">Sales and delivery, week by week</h2></div>
+    <div class="win f" data-app="sales" style="height:493px"></div>
+    <aside class="notes">Part 5, operations, board by board. Sales and delivery: orders by week, the top customers, and the orders that are late or at risk. Click a late order to see why, through the same trace you saw in part 4.
+At-risk means due within seven days with a shortage; the hub flags it before it becomes late.</aside>
+  </section>
+  <section class="pg" data-ch="5 · Operations" data-title="Purchasing and receiving">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 5 · Operations · buying</p><h2 class="f">Purchase orders, deliveries due and the receiving queue</h2></div>
+    <div class="win f" data-app="purchasing" style="height:493px"></div>
+    <aside class="notes">Purchasing and receiving: open purchase orders, what is due this week, what is overdue, money in transit, and each supplier's on-time rate counted line by line against the promised date.
+The receiving queue shows lots waiting for incoming inspection. A supplier with no receipts yet shows unknown, never a perfect score.</aside>
+  </section>
+  <section class="pg" data-ch="5 · Operations" data-title="Finance board">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 5 · Operations · money · toggle visitor mode</p><h2 class="f">Invoicing, receivables, payables</h2></div>
+    <div class="win f" data-app="finance" style="height:493px"></div>
+    <aside class="notes">The finance board, for the owner. Invoiced by week, receivables with their ageing, what is overdue and from whom, and payables due.
+It reads ERPNext's sales and purchase invoices; it never posts anything. Only people with the finance permission see it.
+Toggle visitor mode: amounts and names disappear and only ratios and trends remain, so the wall display can stay on when guests walk through.</aside>
+  </section>
+  <section class="pg" data-ch="5 · Operations" data-title="Warehousing and distribution">
+    <div class="head"><p class="kick f">Part 5 · Operations · <span class="chip wait" style="font-size:22px">Planned</span></p><h2 class="f">Warehousing and distribution module</h2></div>
+    <div class="cols c4">
+      <div class="card f"><span class="n">RECEIVE</span><h3>To a bin</h3><p>Receiving with scanning, quality hold, put-away to a location.</p></div>
+      <div class="card f"><span class="n">PICK</span><h3>Pick lists</h3><p>Pick by order or by batch, scanned to avoid wrong items.</p></div>
+      <div class="card f"><span class="n">SHIP</span><h3>Pack and label</h3><p>Packing, carrier labels and tracking through a hosted service.</p></div>
+      <div class="card f"><span class="n">COUNT</span><h3>Cycle counts</h3><p>Counts by location with differences posted after approval.</p></div>
+    </div>
+    <p class="txt soft f" style="margin-top:30px">On our plan for phase 2; shown here as planned, not as working software.</p>
+    <aside class="notes">This one is planned, not built yet. The warehousing and distribution module: receiving to a bin with scanning, pick lists, packing with carrier labels from a hosted service, and cycle counts.
+It is on our phase 2 plan. I show it so you know where we are going; everything before this page is working software.</aside>
+  </section>
+  <section class="pg" data-ch="5 · Operations" data-title="Hosted connections">
+    <div class="head"><p class="kick f">Part 5 · Operations · <span class="chip wait" style="font-size:22px">Planned</span></p><h2 class="f">Hosted connections to the outside world</h2></div>
+    <div class="cols c3">
+      <div class="card f"><span class="n">SHIPPING</span><h3>Carrier labels</h3><p>Rates, labels and tracking numbers on the delivery.</p></div>
+      <div class="card f"><span class="n">E-COMMERCE</span><h3>Online orders</h3><p>Web shop orders arrive as sales orders to confirm.</p></div>
+      <div class="card f"><span class="n">ACCOUNTING</span><h3>QuickBooks bridge</h3><p>For companies keeping QuickBooks during the move.</p></div>
+      <div class="card f"><span class="n">TAX</span><h3>US sales tax</h3><p>Rates by address on quotations and invoices.</p></div>
+      <div class="card f"><span class="n">EDI</span><h3>Large customers</h3><p>Orders, ship notices and invoices by EDI.</p></div>
+      <div class="card f"><span class="n">HOW</span><h3>Paid services we run</h3><p>Called by your system; your records stay on your server.</p></div>
+    </div>
+    <aside class="notes">Also planned: hosted connections, which are the paid services in our model. Shipping labels, e-commerce orders, a QuickBooks bridge for companies moving gradually, US sales tax, and EDI for large customers.
+We run these services; your system calls them; your records stay on your server.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Standards as running processes">
+    <div class="head"><p class="kick f">Part 6 · ISO 9001 and ISO 13485</p><h2 class="f">A standard becomes processes, controls and checks</h2></div>
+    <div class="cols c3">
+      <div class="card f"><span class="n">PROCESS</span><h3>Steps and records</h3><p>Who does what, required fields, who signs, who approves.</p></div>
+      <div class="card f"><span class="n">CONTROL</span><h3>Tied to a clause</h3><p>Each control point names the clause it answers.</p></div>
+      <div class="card f"><span class="n">CHECK</span><h3>Read from records</h3><p>Every control is checked against the actual records, every day.</p></div>
+    </div>
+    <aside class="notes">Part 6, the largest. A standard like ISO 9001 or 13485 becomes processes, controls tied to clauses, and checks that read the actual records every day. The procedure document is generated from the configured workflow, so the two never drift apart.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Quality system health">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Click a red or amber control</p><h2 class="f">The quality system, checked by its own records</h2></div>
+    <div class="win f" data-app="health" style="height:493px"></div>
+    <aside class="notes">This is the health view. Green: the records satisfy the control today. Red: a specific record does not; click it and it names the torque wrench past its due date. Amber: unknown, not enough records to say; the internal audit for the period is not recorded yet, so it is not counted as passed. You see red the day it turns red, not in audit week.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Nonconformance to CAPA">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Walk a report through its steps</p><h2 class="f">Nonconformance and CAPA, with separation of duties</h2></div>
+    <div class="win f" data-app="ncr" style="height:493px"></div>
+    <aside class="notes">Walk this nonconformance report through its workflow. Contain it, then propose a disposition. Try to approve the disposition as the same person: refused, someone else must approve. Switch the user to Dana and approve. Then the corrective action, and closure only after effectiveness is checked. Every step is a signature in the history.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Incoming inspection">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Type readings, then sign</p><h2 class="f">Incoming inspection, judged by code</h2></div>
+    <div class="win f" data-app="iqc" style="height:493px"></div>
+    <aside class="notes">An inspection in progress: eight samples, board thickness with limits 3.5 to 4.5 millimetres, and a pass-fail check. Type a reading like 3.3 and watch the cell turn red. Then sign: code counts the failing units against acceptance number zero and judges the lot. A different person releases or rejects it.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="SPC">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Move the process</p><h2 class="f">Control charts from your signed inspections</h2></div>
+    <div class="win f" data-app="spc" style="height:493px"></div>
+    <aside class="notes">A control chart of board thickness from signed inspections. Drag the process shift: after lot 12 the points move, and a point outside the limits turns red. Open a report from the signal in one click. Untick the spec limits: capability becomes unknown, never a made-up number.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Documents, sorted by AI">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Your old folders</p><h2 class="f">Upload the shared drive. AI sorts it. You confirm.</h2></div>
+    <div class="win f" data-app="docs" style="height:493px"></div>
+    <aside class="notes">Upload your shared drive as it is. For each file the AI suggests the type, process, number and revision, and quotes the text it read. Click a file, check the quote, confirm. Then the file is under document control with versions, reviews and reading sign-off.</aside>
+  </section>
+  <section class="pg" data-ch="7 · Regulated products" data-title="Production record">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 7 · Device history, step by step</p><h2 class="f">Every step signed, every gauge checked</h2></div>
+    <div class="win f" data-app="production" style="height:493px"></div>
+    <aside class="notes">A production record for a regulated product. Record each step in order. Pick the overdue torque wrench for the measurement: refused, it is out of calibration. Pick the caliper and record it; the reading is judged against the template's limits. When all steps are done, a person who did not build the lot releases it.</aside>
+  </section>
+  <section class="pg" data-ch="7 · Regulated products" data-title="Trace and recall">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 7 · A supplier warns you</p><h2 class="f">From a supplier lot to every customer, in seconds</h2></div>
+    <div class="win f" data-app="trace" style="height:493px"></div>
+    <aside class="notes">A supplier says a lot of boxes may be bad. Trace forward: the incoming lot, the production lots that used it, the deliveries that carried them, and the customers. Start a mock recall from the same screen and record who confirmed.</aside>
+  </section>
+  <section class="pg" data-ch="7 · Regulated products" data-title="Scan a UDI label">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 7 · Unique device identification</p><h2 class="f">Scan a label: the record opens</h2></div>
+    <div class="win f" data-app="scan" style="height:493px"></div>
+    <aside class="notes">Medical devices carry a unique device identifier from an issuing agency, GS1 or HIBCC. Click the sample codes: the printed form, the raw DataMatrix string with its separator, a GS1 web address, a HIBC code. Each is read and its check digit verified; then the item, the lot and its trace open. Change one digit and the check fails.</aside>
+  </section>
+  <section class="pg" data-ch="8 · Digital factory" data-title="Leave the old system">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 8 · Moving in</p><h2 class="f">Import from QuickBooks, NetSuite, SAP or Excel</h2></div>
+    <div class="win f" data-app="import" style="height:493px"></div>
+    <aside class="notes">Moving in. Click Match columns: the usual export names are recognised. The preview shows every row: ready, already in ERPNext and skipped, or waiting for something imported first. Sign to import. Open orders arrive as drafts for someone to check, and importing the same file again changes nothing.</aside>
+  </section>
+  <section class="pg" data-ch="8 · Digital factory" data-title="Measurement files">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 8 · CMMs and 3D scanners</p><h2 class="f">A measuring machine’s file, previewed, then signed</h2></div>
+    <div class="win f" data-app="cmm" style="height:493px"></div>
+    <aside class="notes">A coordinate measuring machine exported a CSV. Edit it on the left: features match the plan's characteristics by name, parts go to the samples in order, and anything not in the plan is listed as left out. A value outside the plan's limits is flagged. Nothing is written until the inspector signs, and the original file is kept.</aside>
+  </section>
+  <section class="pg" data-ch="8 · Digital factory" data-title="Machines and an MES">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 8 · A machine sends, a person accepts</p><h2 class="f">Your MES talks to the quality record</h2></div>
+    <div class="win f" data-app="inbox" style="height:493px"></div>
+    <aside class="notes">Each machine has its own token. Click Send a reading: it lands in the inbox, waiting. Accept it as a person, and it is in the inspection, marked as coming from that machine. Revoke the token and send again: refused and logged. Going the other way, your MES reads events in order. A machine never signs.</aside>
+  </section>
+  <section class="pg" data-ch="9 · Engineers, then starting" data-title="Under the hood">
+    <div class="head"><p class="kick f">Part 9 · For engineers</p><h2 class="f">What runs, where the rules live</h2></div>
+    <table class="st">
+      <tr class="f"><td>Base</td><td>ERPNext official image, unmodified, REST API only</td></tr>
+      <tr class="f"><td>Hub</td><td>Python (FastAPI) and PostgreSQL; incremental sync with resume</td></tr>
+      <tr class="f"><td>Install</td><td>Docker Compose, automatic HTTPS, one script; backup, restore, upgrade</td></tr>
+      <tr class="f"><td>Sign-in</td><td>Own accounts, Microsoft 365 or Google Workspace</td></tr>
+      <tr class="f"><td>Rules</td><td>Database triggers refuse edits to signed records and logs</td></tr>
+      <tr class="f"><td>Judging code</td><td>Checked on every change: no AI or network imports</td></tr>
+    </table>
+    <aside class="notes">For the engineers: ERPNext in its official image, a Python FastAPI hub with PostgreSQL, Docker Compose with automatic HTTPS. Two choices worth noting: the rules about signed records live in database triggers, and the modules that judge pass or fail are checked on every change so they never import AI or network code.</aside>
+  </section>
+  <section class="pg" data-ch="9 · Engineers, then starting" data-title="The machine interface">
+    <div class="head"><p class="kick f">Part 9 · Integration</p><h2 class="f">Three calls an MES needs</h2></div>
+    <div class="cols" style="grid-template-columns:1fr 1fr;gap:44px">
+      <pre class="code f">POST /api/integration/v1/measurements
+Authorization: Bearer wqo_…
+{"inspection": "IQC-00005",
+ "readings": [{"sample": 1,
+   "characteristic": "Board thickness",
+   "value": 4.02}],
+ "equipment": "CAL-01"}
+
+→ 202 {"status": "pending"}</pre>
+      <div style="display:grid;gap:22px;align-content:start">
+        <div class="card f"><span class="n">SEND</span><p>Measurements and production step results land in the inbox for a person.</p></div>
+        <div class="card f"><span class="n">READ</span><p>Events in commit order: lots released or rejected, reports opened.</p></div>
+        <div class="card f"><span class="n">TOKENS</span><p>Scoped, revocable, stored as a hash; every call logged.</p></div>
+      </div>
+    </div>
+    <aside class="notes">The integration surface is deliberately small: two calls to send data, which wait for a person, and one to read events in commit order so a reader never misses one. Tokens are scoped, revocable, and stored only as a hash.</aside>
+  </section>
+  <section class="pg" data-ch="9 · Engineers, then starting" data-title="Getting started">
+    <div class="head"><p class="kick f">Part 9 · A realistic path</p><h2 class="f">Start with one problem, then grow</h2></div>
+    <div class="steps">
+      <div class="f"><span class="w">STEP 1</span><b>Install and import</b><p>Your server; items, customers, suppliers and open orders from the old system.</p></div>
+      <div class="f"><span class="w">STEP 2</span><b>One module live</b><p>Usually incoming inspection or nonconformance; load old logs.</p></div>
+      <div class="f"><span class="w">STEP 3</span><b>Run the standard</b><p>Turn on the ISO pack and clear the red tiles.</p></div>
+      <div class="f"><span class="w">STEP 4</span><b>Connect the floor</b><p>Measurements, machines, labels and scanning.</p></div>
+    </div>
+    <aside class="notes">How to start: don't switch everything at once. Install and import. Put one module live, usually incoming inspection or nonconformance. Turn on the ISO pack and clear the red tiles. Then connect the floor.</aside>
+  </section>
+  <section class="pg" data-ch="10 · The future factory" data-title="The future factory, at a glance">
+    <div class="head" style="margin-bottom:18px"><p class="kick f">Part 10 · A vision · 1 of 4 · <span class="chip wait" style="font-size:22px">Vision</span></p><h2 class="f" style="font-size:52px">The future factory, at a glance</h2></div>
+    <div class="wbwrap"><iframe class="wbf" data-t0="0.0" data-t1="35.1" title="The future factory, at a glance (whiteboard animation)" loading="lazy"></iframe></div>
+    <aside class="notes">This is a factory of the future. An order comes in, and the whole plant starts moving on its own. Materials leave the automated warehouse, every tote scanned by barcode and QR code, and driverless carts carry them to the line. Robot arms take over: loading, fastening, assembling, one after another. Every product passes a machine-vision station: image, measure, decide, in the blink of an eye. Rejects are pushed off the line; good parts get an automatically generated FDA UDI label, a 2D code plus human-readable text, then a verifying scan, and they ship. Data from every machine flows, live, into one data hub.</aside>
+  </section>
+  <section class="pg" data-ch="10 · The future factory" data-title="Machine vision: automatic inspection">
+    <div class="head" style="margin-bottom:18px"><p class="kick f">Part 10 · A vision · 2 of 4 · <span class="chip wait" style="font-size:22px">Vision</span></p><h2 class="f" style="font-size:52px">Machine vision: automatic inspection</h2></div>
+    <div class="wbwrap"><iframe class="wbf" data-t0="35.1" data-t1="64.33" title="Machine vision: automatic inspection (whiteboard animation)" loading="lazy"></iframe></div>
+    <aside class="notes">Zoom in on the inspection station. Camera above, ring light on, parts flowing underneath. It first reads the 2D code on the part to know its lot, then turns the image into dimensions: hole size, spacing, scratches, each checked against the drawing. All in tolerance: green light, pass. One out: a pusher sends it into the quarantine bin. Every reading goes onto a control chart. When the trend drifts, it alarms before a single bad part. AI drafts the nonconformance report, but the disposition takes effect only when an engineer approves.</aside>
+  </section>
+  <section class="pg" data-ch="10 · The future factory" data-title="Every gauge, collected automatically">
+    <div class="head" style="margin-bottom:18px"><p class="kick f">Part 10 · A vision · 3 of 4 · <span class="chip wait" style="font-size:22px">Vision</span></p><h2 class="f" style="font-size:52px">Every gauge, collected automatically</h2></div>
+    <div class="wbwrap"><iframe class="wbf" data-t0="64.33" data-t1="102.22" title="Every gauge, collected automatically (whiteboard animation)" loading="lazy"></iframe></div>
+    <aside class="notes">The inspection station is more than a camera. A coordinate measuring machine; a 3D scanner on five axes, X, Y and Z plus a tilting head and a rotary table, moving together to cover the whole part; and a roughness tester. Their results come back automatically. No copying by hand. Calipers, micrometers and custom gauges send wirelessly: one press, and the reading lands in the record, tied to the part and the feature. Every reading records which gauge took it. If that gauge is past its calibration date, the reading is refused and the gauge is flagged for recalibration. All readings come together in one table, judged automatically, plotted on control charts, and sent on to the data hub.</aside>
+  </section>
+  <section class="pg" data-ch="10 · The future factory" data-title="The data hub: a closed loop">
+    <div class="head" style="margin-bottom:18px"><p class="kick f">Part 10 · A vision · 4 of 4 · <span class="chip wait" style="font-size:22px">Vision</span></p><h2 class="f" style="font-size:52px">The data hub: a closed loop</h2></div>
+    <div class="wbwrap"><iframe class="wbf" data-t0="102.22" data-t1="129.25" title="The data hub: a closed loop (whiteboard animation)" loading="lazy"></iframe></div>
+    <aside class="notes">Finally, the hub: orders, inventory, machines and quality, in one connected web of data. A digital twin draws the whole plant live on screen: where it&#x27;s slow, where it&#x27;s jammed, at a glance. When something&#x27;s off, AI suggests a fix: change the tool, slow down, restock. A person approves at the key step, robots carry it out, and the results flow back to the hub. A closed loop. Fully integrated, fully automated. People are freed from hauling and watching, to focus on judgment.</aside>
+  </section>
+  <section class="pg" data-ch="10 · The future factory" data-title="Questions">
+    <div style="display:grid;gap:34px;margin-top:150px;max-width:1300px">
+      <p class="kick f">Thank you</p>
+      <h1 class="f">One record. AI drafts. People decide.</h1>
+      <div class="stitch f"></div>
+      <p class="lead f">We are inviting a small number of pilot companies. Questions?</p>
+      <p class="f mono soft" style="font-size:24px">Contact: eddiezgq@gmail.com</p>
+    </div>
+    <aside class="notes">One connected record, AI that drafts, people who decide. We are inviting a small number of pilot companies; if that Tuesday sounded familiar, let's talk. Questions?</aside>
+  </section>
+
+  <div id="foot"><span id="ftitle"></span><span id="fpage"></span></div>
+</div></div>
+
+<div id="ctrl">
+  <button id="tocBtn" type="button" aria-label="Outline (M)" title="Outline (M)">☰</button>
+  <button id="prevBtn" type="button" aria-label="Previous (←)" title="Previous (←)">◀</button>
+  <button id="nextBtn" type="button" aria-label="Next (→ or space)" title="Next (→ or space)">▶</button>
+  <button id="notesBtn" type="button" aria-label="Speaker notes (S)" title="Speaker notes (S)">✎</button>
+  <button id="fsBtn" type="button" aria-label="Full screen (F)" title="Full screen (F)">⤢</button>
+</div>
+<div id="scrim"></div>
+<nav id="toc" aria-label="Outline"><h4>Outline</h4><div id="tocList"></div></nav>
+<aside id="notes" aria-label="Speaker notes"><h4 id="notesTitle">Notes</h4><div id="clock"></div><div id="notesTxt"></div></aside>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)]
+  const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const pages = $$('.pg'), stage = $('#stage')
+  let cur = 0, frag = 0
+  const all = new URLSearchParams(location.search).has('all')
+  if (all) document.body.classList.add('all')
+
+  // ---------- scale the 1920×1080 stage to the window
+  function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); stage.style.transform = `translate(-50%, -50%) scale(${s})` }
+  addEventListener('resize', fit); fit()
+
+  // ---------- chapters, outline, agenda
+  const chapters = []; pages.forEach((p, i) => { const c = p.dataset.ch; if (!chapters.length || chapters.at(-1).name !== c) chapters.push({ name: c, first: i }) })
+  chapters.forEach((c) => { const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<i></i><span>${esc(c.name)}</span>`; b.onclick = () => go(c.first); $('#rail').appendChild(b) })
+  let last = ''
+  pages.forEach((p, i) => {
+    if (p.dataset.ch !== last) { const h = document.createElement('div'); h.className = 'ch'; h.textContent = p.dataset.ch; $('#tocList').appendChild(h); last = p.dataset.ch }
+    const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<b>${i + 1}</b><span>${esc(p.dataset.title)}</span>`; b.onclick = () => { go(i); panel() }; $('#tocList').appendChild(b)
+  })
+  const MIN = { 'Opening': 3, '1 · The problem': 4, '2 · The idea': 5, '3 · The base: ERPNext': 12, '4 · The hub': 10, '5 · Operations': 6, '6 · Quality that runs': 8, '7 · Regulated products': 4, '8 · Digital factory': 4, '9 · Engineers, then starting': 3, '10 · The future factory': 4 }
+  chapters.slice(1).forEach((c, k) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'f'; b.innerHTML = `<b>${k + 1}</b><span>${esc(c.name.replace(/^\d · /, ''))}</span><i>${MIN[c.name]} min</i>`; b.onclick = () => go(c.first); $('#agenda').appendChild(b) })
+
+  // ---------- navigation with step-by-step reveal
+  const frags = (i) => $$('.f', pages[i])
+  function render(dir) {
+    pages.forEach((p, i) => { p.classList.toggle('on', i === cur); p.classList.toggle('back', i === cur && dir < 0) })
+    frags(cur).forEach((f, k) => f.classList.toggle('in', all || k < frag))
+    const ci = chapters.findIndex((c, k) => cur >= c.first && (k === chapters.length - 1 || cur < chapters[k + 1].first))
+    $$('#rail button').forEach((b, k) => { b.classList.toggle('cur', k === ci); b.classList.toggle('done', k < ci) })
+    $('#ftitle').textContent = `${pages[cur].dataset.ch} · ${pages[cur].dataset.title}`
+    $('#fpage').textContent = `${cur + 1} / ${pages.length}`
+    $$('#tocList button').forEach((b, k) => b.setAttribute('aria-current', String(k === cur)))
+    $('#notesTitle').textContent = `${cur + 1}. ${pages[cur].dataset.title}`
+    $('#notesTxt').textContent = ($('.notes', pages[cur])?.textContent || '').trim()
+    $$('[data-app]', pages[cur]).forEach(mountApp)
+    $$('iframe.wbf').forEach((f) => { if (!pages[cur].contains(f) && f.dataset.on) f.contentWindow?.postMessage({ wb: 'stop' }, '*') })
+    $$('iframe.wbf', pages[cur]).forEach((f) => {
+      const show = () => f.contentWindow?.postMessage({ wb: 'show', t0: +f.dataset.t0, t1: +f.dataset.t1, autoplay: !!window.__wbAutoplay }, '*')
+      if (!f.dataset.on) { f.dataset.on = '1'; f.addEventListener('load', show); f.src = 'wb/future-factory-en.html' } else show()
+    })
+    try { history.replaceState(null, '', `#p${cur + 1}`) } catch { /* the frame may refuse */ }
+  }
+  function go(i, step = 'all') {
+    i = Math.max(0, Math.min(pages.length - 1, i)); const dir = i < cur ? -1 : 1; cur = i
+    frag = step === 'all' ? frags(i).length : step; render(dir)
+  }
+  function next() { if (frag < frags(cur).length) { frag++; frags(cur)[frag - 1].classList.add('in') } else if (cur < pages.length - 1) { cur++; frag = Math.min(1, frags(cur).length); render(1) } }
+  function prev() { if (cur > 0) go(cur - 1) }
+  $('#nextBtn').onclick = next; $('#prevBtn').onclick = prev
+  const scrim = $('#scrim')
+  function panel(which) { $('#toc').classList.toggle('open', which === 'toc'); $('#notes').classList.toggle('open', which === 'notes'); scrim.classList.toggle('on', !!which) }
+  $('#tocBtn').onclick = () => panel($('#toc').classList.contains('open') ? null : 'toc')
+  $('#notesBtn').onclick = () => panel($('#notes').classList.contains('open') ? null : 'notes')
+  scrim.onclick = () => panel(null)
+  $('#fsBtn').onclick = () => { try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}) } catch { /* not here */ } }
+  addEventListener('keydown', (e) => {
+    if (e.target.closest('input, textarea, select')) return
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); next() }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev() }
+    else if (e.key === 'Home') go(0); else if (e.key === 'End') go(pages.length - 1)
+    else if (/^[mM]$/.test(e.key)) $('#tocBtn').click(); else if (/^[sSnN]$/.test(e.key)) $('#notesBtn').click()
+    else if (/^[fF]$/.test(e.key)) $('#fsBtn').click(); else if (e.key === 'Escape') panel(null)
+  })
+  let tx = null
+  addEventListener('touchstart', (e) => { tx = e.target.closest('.win, input, textarea') ? null : e.touches[0].clientX }, { passive: true })
+  addEventListener('touchend', (e) => { if (tx === null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 60) dx < 0 ? next() : prev() })
+  let t0 = Date.now(); setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); $('#clock').textContent = `Elapsed ${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')} · page ${cur + 1} of ${pages.length}` }, 1000)
+
+  // for recording the talk as a video, page by page and point by point
+  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: (i) => frags(i).length, notes: (i) => ($('.notes', pages[i])?.textContent || '').trim(), state: () => ({ page: cur, frag }) }
+
+  // ---------- stage widgets
+  const ROLE = ['You will see one record you run yourself, what it replaces, and how to start small. Watch parts 2, 3 and 7.',
+    'You will see a morning list with causes, workflows people follow, and a quality system that checks itself. Watch parts 3, 4 and 5.',
+    'You will see the architecture, where the rules are enforced, how files and machines connect, and the API. Watch parts 2, 6 and 7.']
+  $$('.roles button').forEach((b) => b.onclick = () => { $$('.roles button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); $('#roleAns').textContent = ROLE[b.dataset.role] })
+  $('#roleAns').textContent = ROLE[0]
+
+  const web = $('#web')
+  function place(s) {
+    $$('.node', web).forEach((n) => { const [x, y] = n.dataset[s].split(','); n.style.left = x + '%'; n.style.top = y + '%' })
+    $('#webLines').innerHTML = s === 'b' ? $$('.node:not(.hub)', web).map((n) => { const [x, y] = n.dataset.b.split(','); return `<line x1="50%" y1="50%" x2="${x}%" y2="${y}%"/>` }).join('') : ''
+  }
+  place('a')
+  $('#joinBtn').onclick = () => { const on = !web.classList.contains('joined'); web.classList.toggle('joined', on); place(on ? 'b' : 'a'); $('#joinBtn').textContent = on ? 'Scatter them again' : 'Connect them' }
+
+  $$('#layers .layer').forEach((l) => l.onclick = () => { $$('#layers .layer').forEach((x) => x.classList.toggle('open', x === l)); $('#ldesc').textContent = l.dataset.d })
+
+  const NCR = 'NCR (draft) from inspection IQC-00002\nItem: BOX-12 corrugated box, lot CP-0412\nSupplier: Coastal Packaging\nFound: board thickness 3.30 mm, sample 2\n       plan limits 3.50–4.50 mm (caliper CAL-01)\nLot: rejected by code (1 failing unit, Ac 0)\nProposed: return to supplier\nSource: [Inspection IQC-00002]'
+  let typing
+  $('#draftBtn').onclick = () => { clearInterval(typing); const o = $('#ncrText'); o.textContent = ''; o.classList.add('typing'); $('#signOut').innerHTML = ''; let k = 0
+    typing = setInterval(() => { o.textContent = NCR.slice(0, k += 3); if (k >= NCR.length) { clearInterval(typing); o.classList.remove('typing'); $('#signBtn').disabled = false; $('#aiSign').disabled = false } }, 16) }
+  $('#aiSign').onclick = () => { $('#signOut').innerHTML = '<span class="bigstamp no">REFUSED</span><p class="txt soft" style="margin-top:12px;font-size:24px">A machine never signs. A signature needs a named person and their own password.</p>' }
+  $('#signBtn').onclick = () => { if (!$('#signPw').value) { $('#signOut').innerHTML = '<p class="txt soft" style="font-size:24px">Type a password first: signing is re-entering your own password.</p>'; return }
+    $('#signOut').innerHTML = `<span class="bigstamp">SIGNED</span><p class="txt soft" style="margin-top:12px;font-size:24px">${esc($('#signWho').value.split(',')[0])} · “Report opened” · ${new Date().toLocaleTimeString()}. Locked: void with a reason, never edit.</p>`
+    $('#signPw').value = ''; $('#signBtn').disabled = true; $('#aiSign').disabled = true }
+  $('#unkBtn').onclick = () => { $('#unkOut').innerHTML = '<p style="font-size:26px;color:var(--ink)">Coastal Packaging<br>Lots inspected: 0<br>Rejection rate: <span class="chip unk">unknown</span></p>' }
+
+
+  // =====================================================================================
+  // Part 3 (ERPNext) and part 4 (the hub): stage widgets. Fictional numbers.
+  // =====================================================================================
+  const money = (v) => (v < 0 ? '−' : '') + '$' + Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+  // one delivery note, everything it moves
+  $('#shipBtn').onclick = () => {
+    const o = $('#shipOut'); o.innerHTML = ''
+    ;[['Stock ledger', 'HX-BOLT-M8 · Main warehouse · −400 pcs at $0.50 = −$200.00'], ['General ledger', 'Dr Cost of goods sold $200.00 · Cr Stock in hand $200.00'],
+      ['Sales order SO-1039', 'Delivered 400 of 400 · ready to invoice'], ['Customer Bayline Electrical', 'Nothing left to deliver on SO-1039']]
+      .forEach(([a, b], k) => setTimeout(() => o.insertAdjacentHTML('beforeend', `<div style="animation:fin .5s both;border-left:5px solid var(--gold);padding:6px 16px"><b>${a}</b><br><span class="soft">${b}</span></div>`), k * 450))
+  }
+
+  // modules map
+  const MODS = [
+    ['Accounting', 'Chart of accounts, journals, invoices, payments, bank reconciliation, budgets, cost centres, taxes, multi-currency, statements.', 'Reads sales and purchase invoices for the finance board: invoiced, receivables and ageing, payables.'],
+    ['Stock', 'Items, warehouses, the stock ledger, valuation (FIFO or moving average), batches, serial numbers, reorder levels, stock reconciliation.', 'Reads the stock ledger for on-hand, value, stock-outs and days on hand; traces batches to customers.'],
+    ['Buying', 'Suppliers, material requests, purchase orders with promised dates, receipts, purchase invoices.', 'Measures supplier on-time line by line; starts incoming inspection from the receipt.'],
+    ['Selling', 'Customers, quotations, sales orders, delivery notes, sales invoices, price lists.', 'Measures on-time delivery, finds late and at-risk orders and traces why.'],
+    ['Manufacturing', 'Bills of materials, work orders, job cards, material consumption and finished goods.', 'Signed production records refer to the work order of the same lot.'],
+    ['Quality', 'Quality inspections and simple procedures.', 'Adds the full quality system: ISO 9001 and 13485 packs, NCR, CAPA, sampling, calibration, documents, audits.'],
+    ['Projects', 'Projects, tasks, timesheets, project costing.', 'Not used by WenQuest Ops today.'],
+    ['CRM', 'Leads, opportunities, quotations.', 'Not used today; customers come in through selling.'],
+    ['Assets', 'Asset register, depreciation, maintenance.', 'Measuring equipment is kept in the quality module with its calibrations.'],
+    ['HR and payroll', 'A separate Frappe app (HRMS): employees, leave, payroll.', 'Not touched. People and roles come from the company file.']]
+  MODS.forEach(([n], i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'mod'; b.textContent = n; b.onclick = () => showMod(i); $('#modgrid').appendChild(b) })
+  function showMod(i) { $$('#modgrid .mod').forEach((b, k) => b.classList.toggle('on', k === i)); const [n, a, w] = MODS[i]; $('#modOut').innerHTML = `<span class="n">ERPNEXT · ${esc(n.toUpperCase())}</span><h3>${esc(n)}</h3><p>${esc(a)}</p><span class="n" style="margin-top:14px;color:var(--gold)">WENQUEST OPS</span><p style="color:var(--ink)">${esc(w)}</p>` }
+  showMod(1)
+
+  // document flows with their effects
+  const FLOWS = {
+    o2c: [['Quotation', 'Prices offered to the customer. Nothing moves yet.', 'No stock or ledger entries.', []],
+      ['Sales order', '400 × HX-BOLT-M8 at $0.90, promised Oct 9. The demand is recorded.', 'No ledger entries; the order is what the customer is owed.', []],
+      ['Delivery note', 'Goods leave the warehouse: −400 pcs in the stock ledger at their valuation, $0.50.', 'Perpetual inventory posts the cost.', [['Cost of goods sold', 200, 0], ['Stock in hand', 0, 200]]],
+      ['Sales invoice', 'The customer is billed $360.00.', 'A receivable is created.', [['Debtors (A/R)', 360, 0], ['Sales', 0, 360]]],
+      ['Payment entry', 'The customer pays into the bank.', 'The receivable is cleared.', [['Bank', 360, 0], ['Debtors (A/R)', 0, 360]]]],
+    p2p: [['Material request', 'The warehouse asks for 400 bolts.', 'No stock or ledger entries.', []],
+      ['Purchase order', '400 × HX-BOLT-M8 at $0.50 from Gulf Fasteners, promised Oct 9.', 'No ledger entries; the promised date is what supplier on-time is measured against.', []],
+      ['Purchase receipt', 'Goods arrive: +400 pcs. Incoming inspection starts here.', 'Stock goes up; a holding account waits for the invoice.', [['Stock in hand', 200, 0], ['Stock received but not billed', 0, 200]]],
+      ['Purchase invoice', 'The supplier bills $200.00.', 'The holding account clears into payables.', [['Stock received but not billed', 200, 0], ['Creditors (A/P)', 0, 200]]],
+      ['Payment entry', 'The supplier is paid.', 'The payable is cleared.', [['Creditors (A/P)', 200, 0], ['Bank', 0, 200]]]]
+  }
+  Object.entries(FLOWS).forEach(([id, steps]) => {
+    const host = $('#' + id)
+    steps.forEach(([n], i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'doc'; b.innerHTML = `<small>${i + 1}</small>${esc(n)}`; b.onclick = () => pick(i); host.appendChild(b) })
+    function pick(i) {
+      $$('.doc', host).forEach((b, k) => { b.classList.toggle('on', k === i); b.classList.toggle('past', k < i) })
+      const [n, what, gl, lines] = steps[i]
+      $('#' + id + 'What').innerHTML = `<span class="n">WHAT IT DOES</span><h3>${esc(n)}</h3><p>${esc(what)}</p>`
+      $('#' + id + 'Gl').innerHTML = `<span class="n">GENERAL LEDGER</span><p>${esc(gl)}</p>${lines.length ? `<table class="gl"><tr><th>Account</th><th>Debit</th><th>Credit</th></tr>${lines.map(([a, d, c]) => `<tr><td>${esc(a)}</td><td>${d ? money(d) : ''}</td><td>${c ? money(c) : ''}</td></tr>`).join('')}</table>` : ''}`
+    }
+    pick(2)
+  })
+
+  // double entry, live (shared with the statements page)
+  const ACCTS = [['Bank', 'asset', 1000], ['Debtors (A/R)', 'asset', 0], ['Stock in hand', 'asset', 0], ['Stock received but not billed', 'liab', 0], ['Creditors (A/P)', 'liab', 0], ['Equity', 'equity', 1000], ['Sales', 'income', 0], ['Cost of goods sold', 'expense', 0]]
+  const POSTS = [['Receive 400 bolts', 'Purchase receipt', [['Stock in hand', 200], ['Stock received but not billed', -200]]],
+    ['Supplier invoice $200', 'Purchase invoice', [['Stock received but not billed', 200], ['Creditors (A/P)', -200]]],
+    ['Pay the supplier', 'Payment entry', [['Creditors (A/P)', 200], ['Bank', -200]]],
+    ['Ship 400 to Bayline', 'Delivery note', [['Cost of goods sold', 200], ['Stock in hand', -200]]],
+    ['Invoice Bayline $360', 'Sales invoice', [['Debtors (A/R)', 360], ['Sales', -360]]],
+    ['Bayline pays', 'Payment entry', [['Bank', 360], ['Debtors (A/R)', -360]]]]
+  const L = { done: 0, bal: {} }      // balances as debit-positive numbers
+  const resetL = () => { L.done = 0; ACCTS.forEach(([a, t, o]) => { L.bal[a] = ['asset', 'expense'].includes(t) ? o : -o }) }
+  resetL()
+  function drawT(flash = []) {
+    $('#taccts').innerHTML = ACCTS.map(([a, t]) => { const v = L.bal[a]; const shown = ['asset', 'expense'].includes(t) ? v : -v
+      return `<div class="tacct${flash.includes(a) ? ' hit' : ''}"><small>${t === 'liab' ? 'liability' : t}</small><b>${esc(a)}</b><span>${money(shown)}</span></div>` }).join('')
+    const dr = Object.values(L.bal).filter((v) => v > 0).reduce((x, y) => x + y, 0), cr = -Object.values(L.bal).filter((v) => v < 0).reduce((x, y) => x + y, 0)
+    $('#tbal').innerHTML = `<span class="soft">Trial balance:</span> debits ${money(dr)} · credits ${money(cr)} <span class="chip ${Math.abs(dr - cr) < 1e-6 ? 'pass' : 'fail'}">${Math.abs(dr - cr) < 1e-6 ? 'balanced' : 'not balanced'}</span>`
+    $('#postBtns').innerHTML = POSTS.map(([n, d], i) => `<button class="btn${i === L.done ? ' solid' : ''}" type="button" data-p="${i}" ${i !== L.done ? 'disabled' : ''} style="text-align:left">${i + 1}. ${esc(n)}<br><small style="font-weight:400;font-size:18px">${esc(d)}</small></button>`).join('') + '<button class="btn" type="button" id="postReset">Start over</button>'
+    $$('[data-p]').forEach((b) => b.onclick = () => { const [, , lines] = POSTS[+b.dataset.p]; lines.forEach(([a, v]) => { L.bal[a] += v }); L.done++; drawT(lines.map((x) => x[0])); drawStmts() })
+    $('#postReset').onclick = () => { resetL(); drawT(); drawStmts() }
+  }
+  function drawStmts() {
+    const g = (a) => L.bal[a], sales = -g('Sales'), cogs = g('Cost of goods sold')
+    $('#pl').innerHTML = L.done === 0 ? '<p>Nothing posted yet.</p>' : `<table class="gl"><tr><td>Sales</td><td>${money(sales)}</td></tr><tr><td>Cost of goods sold</td><td>${money(-cogs)}</td></tr><tr class="tot"><td>Gross profit</td><td>${money(sales - cogs)}</td></tr></table>`
+    const assets = g('Bank') + g('Debtors (A/R)') + g('Stock in hand'), liab = -(g('Stock received but not billed') + g('Creditors (A/P)')), eq = -g('Equity') + (sales - cogs)
+    $('#bs').innerHTML = `<table class="gl"><tr><td>Bank</td><td>${money(g('Bank'))}</td></tr><tr><td>Receivables</td><td>${money(g('Debtors (A/R)'))}</td></tr><tr><td>Stock</td><td>${money(g('Stock in hand'))}</td></tr><tr class="tot"><td>Assets</td><td>${money(assets)}</td></tr><tr><td>Liabilities</td><td>${money(liab)}</td></tr><tr><td>Equity + profit</td><td>${money(eq)}</td></tr><tr class="tot"><td>Liabilities + equity</td><td>${money(liab + eq)}</td></tr></table>`
+  }
+  drawT(); drawStmts()
+
+  // stock ledger with valuation
+  const SL = { rows: [], method: 'fifo' }
+  const MOVES = { in: [100, 0.40], in2: [100, 0.60], out: [-120, null] }
+  function drawSL() {
+    let layers = [], qty = 0, val = 0
+    const rows = SL.rows.map(([k, q, r], i) => {
+      if (q > 0) { layers.push([q, r]); qty += q; val += q * r; return [i, k, q, r, qty, val, ''] }
+      const need = -q; if (need > qty) return [i, k, q, null, qty, val, 'not enough stock: refused']
+      let cost = 0
+      if (SL.method === 'fifo') { let left = need; while (left > 0) { const [lq, lr] = layers[0]; const take = Math.min(lq, left); cost += take * lr; left -= take; if (take === lq) layers.shift(); else layers[0] = [lq - take, lr] } }
+      else { const avg = val / qty; cost = need * avg; layers = [[qty - need, avg]] }
+      qty -= need; val -= cost; return [i, k, q, cost / need, qty, val, '']
+    })
+    $('#sl').innerHTML = `<tr><th>#</th><th>Voucher</th><th>Qty</th><th>Rate</th><th>Balance qty</th><th>Balance value</th></tr>` + (rows.length ? rows.map(([i, k, q, r, bq, bv, note]) => `<tr style="animation:fin .4s both"><td>${i + 1}</td><td>${k === 'out' ? 'Delivery note' : 'Purchase receipt'}</td><td class="${q < 0 ? 'neg' : 'pos'}">${q > 0 ? '+' : ''}${q}</td><td>${r == null ? '—' : '$' + r.toFixed(4)}</td><td>${bq}</td><td>${note ? `<span class="chip fail" style="font-size:20px">${note}</span>` : money(bv)}</td></tr>`).join('') : '<tr><td colspan="6" class="soft">No movements yet. Receive some bolts.</td></tr>')
+    $$('[data-m]').forEach((b) => b.classList.toggle('solid', b.dataset.m === SL.method))
+  }
+  $$('[data-sl]').forEach((b) => b.onclick = () => { const k = b.dataset.sl; if (k === 'reset') SL.rows = []; else SL.rows.push([k, MOVES[k][0], MOVES[k][1]]); drawSL() })
+  $$('[data-m]').forEach((b) => b.onclick = () => { SL.method = b.dataset.m; drawSL() })
+  drawSL()
+
+  // valuation compared
+  function drawVal() {
+    const q1 = +$('#vq1').value || 0, r1 = +$('#vr1').value || 0, q2 = +$('#vq2').value || 0, r2 = +$('#vr2').value || 0, s = +$('#vs').value || 0
+    const out = $('#valOut')
+    if (s > q1 + q2) { out.innerHTML = `<div class="card" style="grid-column:1/-1"><span class="chip fail">refused</span><p style="margin-top:10px">Shipping ${s} with ${q1 + q2} on hand is not possible; no cost is invented.</p></div>`; return }
+    const fifo = Math.min(s, q1) * r1 + Math.max(0, s - q1) * r2, avg = q1 + q2 ? (q1 * r1 + q2 * r2) / (q1 + q2) : 0, ma = s * avg, total = q1 * r1 + q2 * r2
+    out.innerHTML = [['FIFO', fifo], ['Moving average', ma]].map(([n, c]) => `<div class="card"><span class="n">${n.toUpperCase()}</span><p>Cost of the ${s} shipped</p><p class="big" style="font-size:80px">${money(c)}</p><p>Left on the shelf: <b style="color:var(--ink)">${money(total - c)}</b></p></div>`).join('')
+  }
+  ;['vq1', 'vr1', 'vq2', 'vr2', 'vs'].forEach((id) => $('#' + id).oninput = drawVal); drawVal()
+
+  // the hub pipeline
+  const PIPE = [['ERPNext', 'documents', 'Orders, receipts, deliveries, invoices and the stock ledger, as your people enter them in ERPNext.'],
+    ['Events', 'every change', 'Each changed document arrives as an event, numbered and kept. Nothing is lost if a sync is interrupted.'],
+    ['Object graph', 'one record', 'Events become objects and links across eight domains, plus the quality, production and machine records the hub keeps itself.'],
+    ['Metrics', 'published formulas', 'On-time delivery, stock-outs, inventory value, days on hand, supplier on-time, open nonconformances, receivables. Unknown when data is missing.'],
+    ['Anomalies', 'with causes', 'Rules find late and at-risk orders, stock-outs, late purchase orders, slow suppliers, failed inspections, and trace each one through the links.'],
+    ['Drafts', 'a person confirms', 'Purchase orders, inspection results and notes prepared by AI or rules. Written to ERPNext only after a person confirms.']]
+  PIPE.forEach(([a, b], i) => { const d = document.createElement('button'); d.type = 'button'; d.className = 'stage-n'; d.style.animationDelay = (i * 0.25) + 's'; d.innerHTML = `<b>${a}</b><small>${b}</small>`; d.onclick = () => pipe(i); $('#pipe').appendChild(d) })
+  function pipe(i) { $$('#pipe .stage-n').forEach((d, k) => d.classList.toggle('on', k === i)); $('#pipeOut').innerHTML = `<span class="n">STAGE ${i + 1} · ${PIPE[i][0].toUpperCase()}</span><p style="font-size:32px;color:var(--ink)">${PIPE[i][2]}</p>` }
+  pipe(2)
+
+  // sync demo
+  $('#syncBtn').onclick = () => {
+    const o = $('#syncOut'); o.innerHTML = ''; $('#syncBtn').disabled = true
+    ;[['10:05:00', 'sync', 'Asked ERPNext for documents changed since 10:00:00'], ['10:05:01', 'event', '#48211 Purchase Order PO-0312 modified · schedule_date Oct 20 → Oct 27'], ['10:05:01', 'graph', 'PO-0312 updated; linked to HX-WASHER-8 and Gulf Fasteners'],
+      ['10:05:02', 'rule', 'SO-1055 now at risk: due Oct 24, HX-WASHER-8 short until Oct 27'], ['10:05:02', 'rule', 'SO-1058 now at risk: due Oct 25'], ['10:05:02', 'metric', 'Gulf Fasteners: 1 more line due late']]
+      .forEach(([t, k, x], i) => setTimeout(() => { o.insertAdjacentHTML('beforeend', `<div style="animation:fin .4s both"><span>${t}</span> <em>${k}</em> ${esc(x)}</div>`); if (i === 5) $('#syncBtn').disabled = false }, i * 500))
+  }
+
+  // object graph
+  const ON = { Customer: [130, 90, 'Customers'], SalesOrder: [360, 90, 'Sales & delivery'], DeliveryNote: [600, 90, 'Sales & delivery'], SalesInvoice: [840, 90, 'Finance'], Item: [360, 300, 'Products & items'], StockLedger: [130, 300, 'Warehouse'],
+    Warehouse: [130, 510, 'Warehouse'], PurchaseOrder: [600, 300, 'Supply'], Supplier: [840, 300, 'Supply'], PurchaseReceipt: [600, 510, 'Supply'], Inspection: [360, 510, 'Quality'], NCR: [840, 510, 'Quality'] }
+  const OE = [['SalesOrder', 'Customer', 'for'], ['SalesOrder', 'Item', 'orders'], ['DeliveryNote', 'SalesOrder', 'fulfils'], ['SalesInvoice', 'SalesOrder', 'bills'], ['SalesInvoice', 'Customer', 'owed by'], ['StockLedger', 'Item', 'moves'], ['StockLedger', 'Warehouse', 'in'],
+    ['PurchaseOrder', 'Item', 'orders'], ['PurchaseOrder', 'Supplier', 'from'], ['PurchaseReceipt', 'PurchaseOrder', 'receives'], ['Inspection', 'PurchaseReceipt', 'inspects'], ['NCR', 'Inspection', 'raised by'], ['NCR', 'Supplier', 'about'], ['DeliveryNote', 'Item', 'ships']]
+  const NM2 = { Customer: 'Customer', SalesOrder: 'Sales order', DeliveryNote: 'Delivery note', SalesInvoice: 'Sales invoice', Item: 'Item', StockLedger: 'Stock ledger entry', Warehouse: 'Warehouse', PurchaseOrder: 'Purchase order', Supplier: 'Supplier', PurchaseReceipt: 'Purchase receipt', Inspection: 'Incoming inspection', NCR: 'Nonconformance' }
+  function og(sel) {
+    let s = '', lab = ''
+    OE.forEach(([a, b, l]) => { const on = sel && (a === sel || b === sel); const [x1, y1] = ON[a], [x2, y2] = ON[b]
+      s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${on ? '#f5c344' : '#2c5491'}" stroke-width="${on ? 4 : 2}"${on ? ' stroke-dasharray="10 6"><animate attributeName="stroke-dashoffset" from="32" to="0" dur="0.8s" repeatCount="indefinite"/></line>' : '/>'}`
+      if (on) { const hz = y1 === y2, lx = (x1 + x2) / 2 + (hz ? 0 : 14), ly = hz ? y1 - 46 : (y1 + y2) / 2 + 6; lab += `<text x="${lx}" y="${ly}" fill="#f5c344" font-size="20" text-anchor="${hz ? 'middle' : 'start'}" font-family="IBM Plex Mono, monospace" paint-order="stroke" stroke="#0f2448" stroke-width="6">${l}</text>` } })
+    Object.entries(ON).forEach(([k, [x, y]]) => { const on = k === sel, near = sel && OE.some(([a, b]) => (a === sel && b === k) || (b === sel && a === k))
+      s += `<g class="ogn" data-k="${k}" style="cursor:pointer"><rect x="${x - 105}" y="${y - 34}" width="210" height="68" rx="12" fill="${on ? '#f5c344' : near ? '#1d3f73' : '#142d57'}" stroke="${on || near ? '#f5c344' : '#3a64a3'}" stroke-width="2"/><text x="${x}" y="${y + 8}" text-anchor="middle" font-size="22" font-weight="600" fill="${on ? '#0b1a33' : '#eaf1fb'}" font-family="Inter, Arial, sans-serif">${NM2[k]}</text></g>` })
+    $('#og').innerHTML = s + lab
+    $$('#og .ogn').forEach((g) => g.onclick = () => og(g.dataset.k))
+    if (sel) { const links = OE.filter(([a, b]) => a === sel || b === sel).map(([a, b, l]) => a === sel ? `${l} → ${NM2[b]}` : `${NM2[a]} ${l} it`)
+      $('#ogOut').innerHTML = `<span class="n">${ON[sel][2].toUpperCase()}</span><h3>${NM2[sel]}</h3><ul class="ticks">${links.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` }
+  }
+  og('SalesOrder')
+
+  // metrics by hand
+  const ORD = [['SO-1031', 'Oct 2', 'Oct 1', 1], ['SO-1033', 'Oct 3', 'Oct 3', 1], ['SO-1036', 'Oct 6', 'Oct 8', 1], ['SO-1037', 'Oct 7', 'Oct 7', 1], ['SO-1039', 'Oct 8', 'Oct 8', 1]]
+  function otd() {
+    const on = ORD.filter((o) => o[3]), good = on.filter(([, due, sh]) => +sh.split(' ')[1] <= +due.split(' ')[1]).length
+    $('#otd').innerHTML = `<table class="gl"><tr><th></th><th>Order</th><th>Promised</th><th>Last delivery</th></tr>${ORD.map(([n, d, s, k], i) => `<tr><td><input type="checkbox" data-o="${i}" ${k ? 'checked' : ''} aria-label="Count ${n}"></td><td>${n}</td><td>${d}</td><td style="color:${+s.split(' ')[1] <= +d.split(' ')[1] ? 'var(--pass)' : 'var(--fail)'}">${s}</td></tr>`).join('')}</table>
+      <p class="big" style="font-size:64px;margin-top:10px">${on.length ? Math.round(good / on.length * 1000) / 10 + '%' : 'unknown'}</p><p>${on.length ? `${good} of ${on.length} on time` : 'No shipped orders counted: unknown, not 0%.'}</p>`
+    $$('[data-o]').forEach((c) => c.onchange = () => { ORD[+c.dataset.o][3] = c.checked ? 1 : 0; otd() })
+  }
+  otd()
+  const doh = () => { const v = +$('#dohV').value, s = +$('#dohS').value; $('#dohOut').textContent = s > 0 ? (v / (s / 90)).toFixed(1) + ' days' : 'unknown' }
+  ;['dohV', 'dohS'].forEach((id) => $('#' + id).oninput = doh); doh()
+
+  // =====================================================================================
+  // The replica of WenQuest Ops. Fictional demo company: Harbor Lane Supply.
+  // =====================================================================================
+  const NAV = [['dashboard', 'Dashboard'], ['assistant', 'Assistant'], ['anomalies', 'Anomalies', 3], ['drafts', 'Drafts', 4], ['scan', 'Scan'], null, ['sales', 'Sales and delivery'], ['inventory', 'Inventory'], ['purchasing', 'Purchasing'], ['finance', 'Finance'], ['health', 'Quality system'], ['ncr', 'Nonconformances', 2], ['iqc', 'Incoming inspection'], ['spc', 'SPC'], ['inbox', 'From machines', 1], ['production', 'Production'], ['trace', 'Trace and recalls'], ['docs', 'Documents'], ['import', 'Import'], ['cmm', 'Measurement files']]
+  function mountApp(el) {
+    if (el.dataset.mounted) return; el.dataset.mounted = '1'
+    if (el.dataset.app === 'wall') { el.innerHTML = '<div class="bar"><i></i><i></i><i></i><span class="url">ops.harborlane.example/wall</span><span class="live">LIVE</span></div><div style="min-height:0"></div>'; wall(el.lastChild); return }
+    el.innerHTML = `<div class="bar"><i></i><i></i><i></i><span class="url"></span><span class="live">Harbor Lane Supply (Demo)</span></div>
+      <div class="app"><div class="side"><div class="co"><b>H</b><span>Harbor Lane Supply<small>Fictional demo</small></span></div></div><div class="main"></div></div>`
+    const side = $('.side', el), main = $('.main', el), url = $('.url', el)
+    NAV.forEach((n) => { if (!n) { const l = document.createElement('div'); l.className = 'lab'; l.textContent = 'Records'; side.appendChild(l); return }
+      const b = document.createElement('button'); b.type = 'button'; b.dataset.v = n[0]; b.innerHTML = `<span>${n[1]}</span>${n[2] ? `<em>${n[2]}</em>` : ''}`; b.onclick = () => show(n[0]); side.appendChild(b) })
+    const ctx = { main, show, toast: (t) => { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; main.appendChild(d); setTimeout(() => d.remove(), 3500) } }
+    function show(v, arg) { $$('.side button', el).forEach((b) => b.classList.toggle('on', b.dataset.v === v)); url.textContent = `ops.harborlane.example/${v === 'dashboard' ? '' : v}`; main.scrollTop = 0; (VIEWS[v] || VIEWS.dashboard)(ctx, arg) }
+    show(el.dataset.app)
+  }
+
+  // ---------- data
+  const spark = (pts, w = 120, h = 34, color = '#0289f7') => { const mx = Math.max(...pts), mn = Math.min(...pts); const p = pts.map((v, i) => `${(i / (pts.length - 1)) * w},${h - 3 - ((v - mn) / (mx - mn || 1)) * (h - 6)}`).join(' ')
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true"><polyline points="${p}" fill="none" stroke="${color}" stroke-width="2"/><circle cx="${w}" cy="${p.split(' ').at(-1).split(',')[1]}" r="3" fill="${color}"/></svg>` }
+  const KPI = [['On-time delivery', 91.4, '%', [88, 90, 87, 92, 93, 90, 91.4], '+1.2 pts', 1, 'late'], ['Late orders', 3, '', [6, 5, 7, 4, 5, 4, 3], '−1 vs last week', 1, 'late'], ['Stock-outs', 2, '', [1, 3, 2, 4, 3, 2, 2], 'HX-BOLT-M8, CBL-12-50', 0, 'stock'],
+    ['Inventory value', 412.6, 'k$', [398, 401, 405, 410, 409, 414, 412.6], '38 days on hand', 1, 'stock'], ['Supplier on time', 86, '%', [91, 90, 88, 86, 87, 85, 86], 'Gulf Fasteners 60%', 0, 'sup'], ['Open NCRs', 4, '', [2, 3, 3, 5, 4, 4, 4], '1 overdue', 0, 'ncr']]
+  const LATE = [['SO-1042', 'Bayline Electrical', 'Oct 9', 'HX-BOLT-M8 short by 400'], ['SO-1047', 'Coastal Retail', 'Oct 11', 'CBL-12-50 short by 120'], ['SO-1051', 'Gulf Hardware', 'Oct 12', 'Waiting for QA release of DHR-00002']]
+
+  // ---------- wall (dark wall mode)
+  function wall(host) {
+    host.innerHTML = `<div class="wall"><div class="top"><b>HARBOR LANE SUPPLY · OPERATIONS</b><span id="wclock"></span></div><div style="display:grid;gap:18px;align-content:start">
+      <div class="wk">${[['On-time delivery', '91.4%', [88, 90, 87, 92, 93, 90, 91.4], 0], ['Late orders', '3', [6, 5, 7, 4, 5, 4, 3], 1], ['Supplier on time', '86%', [91, 90, 88, 86, 87, 85, 86], 0], ['Open NCRs', '4', [2, 3, 3, 5, 4, 4, 4], 1]]
+        .map(([l, v, s, a]) => `<div class="wt${a ? ' alert' : ''}"><small>${l}</small><b data-v="${v}">${v}</b>${spark(s, 220, 46, a ? '#ff7a6b' : '#4fd1e0').replace('width="220" height="46"', '')}</div>`).join('')}</div>
+      <div class="wchain">${[['Sales', '38 open orders'], ['Stock', '2 stock-outs'], ['Purchasing', '11 open POs'], ['Receiving', '4 lots to inspect'], ['Quality', '1 lot rejected']].map(([a, b]) => `<div><small>${a}</small><b>${b}</b></div>`).join('')}</div>
+      <div class="wk" style="grid-template-columns:2fr 1fr"><div class="wt"><small>Shipments this week vs plan</small><svg viewBox="0 0 600 120" style="height:120px">${[62, 70, 58, 81, 77, 90, 84].map((v, i) => `<rect x="${20 + i * 82}" y="${115 - v}" width="50" height="${v}" rx="4" fill="#4fd1e0" opacity="${i === 6 ? 1 : .55}"><animate attributeName="height" from="0" to="${v}" dur="1.2s" begin="${i * 0.1}s" fill="freeze"/><animate attributeName="y" from="115" to="${115 - v}" dur="1.2s" begin="${i * 0.1}s" fill="freeze"/></rect><rect x="${20 + i * 82}" y="${115 - 75}" width="50" height="2" fill="#f5c344"/>`).join('')}</svg></div>
+        <div class="wt"><small>Quality system</small><b>12 / 14</b><span style="color:#a9bddb;font-size:15px">controls met · 1 red · 1 unknown</span></div></div></div>
+      <div class="ticker"><div>${Array(2).fill(['<em>09:42</em> PR-0077 received from Gulf Fasteners, 6 days late', '<em>09:55</em> IQC-00002 BOX-12 rejected by code', '<em>10:03</em> NCR-00007 opened by Jordan', '<em>10:20</em> SO-1039 shipped to Bayline Electrical', '<em>10:31</em> DHR-00001 released by Dana', '<em>10:44</em> CAL-01 used, due Jan 2027'].join(' · ')).map((t) => `<span>${t}</span>`).join('')}</div></div></div>`
+    const tick = () => { const c = $('#wclock', host); if (!c) return; c.textContent = new Date().toLocaleTimeString() + ' · auto-refresh'; }
+    tick(); setInterval(tick, 1000)
+    setInterval(() => { const b = $$('.wt b', host)[0]; if (!b) return; const v = (91.2 + Math.random() * .5).toFixed(1); b.textContent = v + '%' }, 2600)
+  }
+
+  // ---------- views
+  const VIEWS = {}
+  VIEWS.dashboard = (c) => {
+    c.main.innerHTML = `<h5>Dashboard <span class="crumb">· Harbor Lane Supply · this week</span></h5>
+      <div class="grid-k">${KPI.map(([l, v, u, s, d, good, to]) => `<button type="button" class="kpi" data-to="${to}" style="text-align:left"><small>${l}</small><b data-n="${v}" data-u="${u}">0</b>${spark(s)}<span class="d ${good ? 'up' : 'dn'}">${d}</span></button>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;margin-top:12px">
+        <div class="panel"><b>Business chain</b><div style="display:flex;gap:8px;margin-top:10px">${[['Sales', '38 open', ''], ['Stock', '2 short', 'r'], ['Purchasing', '1 late PO', 'a'], ['Receiving', '4 to inspect', 'b'], ['Quality', '1 rejected', 'r']].map(([a, b, k]) => `<div style="flex:1;border:1px solid #ededed;border-radius:8px;padding:8px"><div style="color:#6b6b6b;font-size:12px">${a}</div><span class="badge ${k}">${b}</span></div>`).join('<span style="align-self:center;color:#bbb">→</span>')}</div>
+          <div style="margin-top:12px"><b>Needs attention today</b><table class="t" style="margin-top:6px"><tr><th>What</th><th>Why</th><th></th></tr>
+          ${[['SO-1042 late', 'HX-BOLT-M8 short; PO-0310 arrived 6 days late', 'anomalies'], ['TW-02 torque wrench', 'Past its calibration due date', 'health'], ['NCR-00007', 'Disposition waiting for approval', 'ncr'], ['2 readings from a machine', 'Waiting in From machines', 'inbox']].map(([a, b, v]) => `<tr class="click" data-go="${v}"><td><b>${a}</b></td><td>${b}</td><td style="color:#0289f7">Open →</td></tr>`).join('')}</table></div></div>
+        <div class="panel"><b>On-time delivery, 12 weeks</b><svg viewBox="0 0 360 170" style="width:100%;height:170px;margin-top:8px">${(() => { const d = [84, 86, 85, 88, 87, 89, 90, 88, 92, 93, 90, 91.4]; const x = (i) => 20 + i * 30, y = (v) => 160 - (v - 80) * 11; return `<line x1="20" x2="350" y1="${y(90)}" y2="${y(90)}" stroke="#d97706" stroke-dasharray="4 4"/><text x="350" y="${y(90) - 4}" font-size="10" text-anchor="end" fill="#d97706">target 90%</text><polyline points="${d.map((v, i) => `${x(i)},${y(v)}`).join(' ')}" fill="none" stroke="#0289f7" stroke-width="2.5"/>${d.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="${v < 90 ? '#cc2929' : '#0289f7'}"><title>Week ${i + 1}: ${v}%</title></circle>`).join('')}` })()}</svg>
+          <b>Top suppliers on time</b><table class="t"><tr><td>Bay Calibration Lab</td><td><span class="badge g">100%</span></td></tr><tr><td>Coastal Packaging</td><td><span class="badge g">94%</span></td></tr><tr><td>Gulf Fasteners</td><td><span class="badge r">60%</span></td></tr><tr><td>Northside Plastics</td><td><span class="badge">unknown · no receipts</span></td></tr></table></div></div>`
+    $$('.kpi b', c.main).forEach((b) => { const n = Number(b.dataset.n), u = b.dataset.u, dec = n % 1 ? 1 : 0; let k = 0; const t = setInterval(() => { k++; const v = (n * Math.min(1, k / 30)).toFixed(dec); b.textContent = (u === 'k$' ? '$' + v + 'k' : v + u); if (k >= 30) clearInterval(t) }, 25) })
+    $$('.kpi', c.main).forEach((b) => b.onclick = () => c.show(b.dataset.to === 'late' ? 'anomalies' : b.dataset.to === 'ncr' ? 'ncr' : b.dataset.to === 'sup' ? 'health' : 'anomalies'))
+    $$('[data-go]', c.main).forEach((r) => r.onclick = () => c.show(r.dataset.go))
+  }
+
+  VIEWS.anomalies = (c, pick = 0) => {
+    const chains = [
+      [['Sales order SO-1042', 'Promised Oct 9 to Bayline Electrical; not shipped', 'r'], ['Item HX-BOLT-M8', '400 short in Main warehouse; needed by 2 orders', 'r'], ['Purchase order PO-0310', 'Received Oct 15 on PR-0077: 6 days after the promised date', 'a'], ['Supplier Gulf Fasteners', '2 of its last 5 receipts late; 1 lot rejected at incoming inspection', 'r']],
+      [['Sales order SO-1047', 'Promised Oct 11 to Coastal Retail', 'r'], ['Item CBL-12-50', '120 short; reorder point passed Oct 2', 'a'], ['No purchase order', 'Nothing ordered since the stock fell below the reorder point', 'r']],
+      [['Sales order SO-1051', 'Promised Oct 12 to Gulf Hardware', 'r'], ['Production lot DHR-00002', 'Steps done; waiting for QA release', 'a']]]
+    c.main.innerHTML = `<h5>Anomalies <span class="crumb">· late orders and their causes</span></h5><div style="display:grid;grid-template-columns:360px 1fr;gap:14px">
+      <div class="panel" style="padding:6px"><table class="t"><tr><th>Order</th><th>Customer</th><th>Due</th></tr>${LATE.map(([a, b, d], i) => `<tr class="click" data-i="${i}" style="${i === pick ? 'background:#f2f7fd' : ''}"><td><b>${a}</b></td><td>${b}</td><td><span class="badge r">${d}</span></td></tr>`).join('')}</table></div>
+      <div class="panel"><b>Why ${LATE[pick][0]} is late</b><span class="crumb"> · traced through the linked records</span><div id="ch" style="margin-top:14px;display:grid;gap:0"></div>
+      <div style="margin-top:14px;display:flex;gap:8px"><button class="abtn" id="nx">Next link</button><button class="abtn dark" id="dr">Draft a delay note to the customer</button></div></div></div>`
+    $$('tr.click', c.main).forEach((r) => r.onclick = () => VIEWS.anomalies(c, Number(r.dataset.i)))
+    const ch = chains[pick]; let n = 0
+    const step = () => { if (n >= ch.length) return; const [a, b, k] = ch[n++]; const d = document.createElement('div'); d.style.cssText = 'display:grid;grid-template-columns:28px 1fr;gap:10px;animation:fin .5s both'
+      d.innerHTML = `<div style="display:grid;justify-items:center"><span style="width:14px;height:14px;border-radius:50%;background:${k === 'r' ? '#cc2929' : '#d97706'};margin-top:4px"></span>${n < ch.length ? '<span style="width:2px;flex:1;min-height:34px;background:#e5e5e5"></span>' : ''}</div><div style="padding-bottom:12px"><b>${a}</b><div style="color:#6b6b6b">${b}</div></div>`
+      $('#ch', c.main).appendChild(d); $('#nx', c.main).disabled = n >= ch.length }
+    step(); $('#nx', c.main).onclick = step
+    $('#dr', c.main).onclick = () => { c.toast('Draft saved to Drafts: “Delay note for ' + LATE[pick][0] + '”. A person confirms before it is sent.') }
+  }
+
+  VIEWS.assistant = (c) => {
+    c.main.innerHTML = `<h5>Assistant <span class="crumb">· answers cite your records; actions become drafts</span></h5>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:14px;height:calc(100% - 40px)"><div class="panel" style="display:grid;grid-template-rows:1fr auto;gap:10px;min-height:0"><div class="chat" id="chat" style="overflow:auto;align-content:start"></div>
+      <div style="display:flex;gap:8px"><input class="ain" id="qin" style="flex:1" placeholder="Ask about orders, stock, suppliers or quality"><button class="abtn dark" id="qgo">Ask</button></div></div>
+      <div class="panel"><b>Try</b><div style="display:grid;gap:8px;margin-top:10px">${['Which orders are late, and why?', 'What needs my attention today?', 'How is Gulf Fasteners doing?', 'Draft a reorder for HX-BOLT-M8'].map((q) => `<button class="abtn" data-q="${q}" style="text-align:left">${q}</button>`).join('')}</div><p style="color:#6b6b6b;font-size:12.5px;margin-top:14px">Reads with your role. Every run is logged.</p></div></div>`
+    const A = {
+      'Which orders are late, and why?': [['3 orders are late. ', ''], ['SO-1042', 'anomalies'], [' waits for HX-BOLT-M8, short by 400 after ', ''], ['PO-0310', 'anomalies'], [' arrived 6 days late from Gulf Fasteners. SO-1047 waits for CBL-12-50, with no purchase order open. SO-1051 waits for QA release of ', ''], ['DHR-00002', 'production'], ['.', '']],
+      'What needs my attention today?': [['Four things: SO-1042 is late (', ''], ['trace', 'anomalies'], ['); the torque wrench TW-02 is past its calibration date (', ''], ['quality system', 'health'], ['); ', ''], ['NCR-00007', 'ncr'], [' waits for a disposition approval; and two machine readings wait in ', ''], ['From machines', 'inbox'], ['.', '']],
+      'How is Gulf Fasteners doing?': [['On time 3 of the last 5 receipts (60%). One lot rejected at ', ''], ['IQC-00002', 'iqc'], ['; on the approved list on condition. Northside Plastics has no receipts yet, so its rate is unknown, not 100%.', '']],
+      'Draft a reorder for HX-BOLT-M8': [['Drafted purchase order: 1,000 × HX-BOLT-M8 from Coastal Fasteners (on time 94%). It is in ', ''], ['Drafts', 'dashboard'], [' for someone to confirm; nothing is sent to ERPNext until then.', '']] }
+    const chat = $('#chat', c.main)
+    function ask(q) {
+      chat.insertAdjacentHTML('beforeend', `<div class="q">${esc(q)}</div>`)
+      const a = document.createElement('div'); a.className = 'a typing'; chat.appendChild(a)
+      const parts = A[q] || [['I can answer from your records about orders, stock, suppliers and quality. Try one of the questions on the right.', '']]
+      let i = 0, ch = 0, node = null
+      const t = setInterval(() => { if (i >= parts.length) { clearInterval(t); a.classList.remove('typing'); return }
+        const [txt, link] = parts[i]
+        if (link) { const s = document.createElement('span'); s.className = 'cite'; s.textContent = txt; s.onclick = () => c.show(link); a.appendChild(s); i++; node = null; return }
+        if (!node) { node = document.createTextNode(''); a.appendChild(node) }
+        ch += 4; node.textContent = txt.slice(0, ch); if (ch >= txt.length) { i++; ch = 0; node = null }
+        chat.scrollTop = 1e6 }, 22)
+    }
+    $$('[data-q]', c.main).forEach((b) => b.onclick = () => ask(b.dataset.q))
+    $('#qgo', c.main).onclick = () => { const v = $('#qin', c.main).value.trim(); if (v) { ask(v); $('#qin', c.main).value = '' } }
+    ask('Which orders are late, and why?')
+  }
+
+  VIEWS.health = (c) => {
+    const CP = [['ok', 'Documents current', '4.2.4', 'QP-05 and QP-11 in effect; periodic reviews on time.'], ['ok', 'Records kept', '4.2.5', 'Signed records locked; history append-only.'], ['ok', 'Management review', '5.6', 'MR-2026 held and signed; 2 actions open, not overdue.'],
+      ['ok', 'Training current', '6.2', 'Operators trained on the current KIT-M8 template.'], ['ok', 'Risk managed', '7.1', 'Risk file for HX-BOLT-M8 approved; a second still in draft.'], ['ok', 'Design changes', '7.3.9', 'CHG-0001 closed, approved by someone other than the author.'],
+      ['ok', 'Suppliers approved', '7.4.1', '3 approved, 1 on condition; no receipt from an unapproved supplier.'], ['ok', 'Production recorded', '7.5.1', 'DHR-00001 complete; DHR-00002 in production.'], ['ok', 'Lots traceable', '7.5.9', 'Every finished lot links to released material lots.'],
+      ['bad', 'Equipment calibrated', '7.6', 'TW-02 torque wrench is 47 days past its calibration due date. It cannot be used until recalibrated; 3 inspections it measured are listed for review.'], ['ok', 'Complaints handled', '8.2.2', '3 complaints: 1 closed, 1 under investigation, 1 new within its target.'],
+      ['unk', 'Internal audits', '8.2.4', 'No internal audit recorded for this period: unknown, not passed.'], ['ok', 'Nonconforming product', '8.3', 'Rejected lot CP-0412 has its report and disposition.'], ['ok', 'Corrective action', '8.5.2', 'CAPA-0001 effectiveness verified before closing.']]
+    c.main.innerHTML = `<h5>Quality system <span class="crumb">· ISO 13485 · checked against the records today</span></h5>
+      <div style="display:flex;gap:10px;margin-bottom:12px"><span class="badge g">12 met</span><span class="badge r">1 not met</span><span class="badge a">1 unknown</span><button class="abtn" style="margin-left:auto" id="aud">Internal audit checklist</button></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${CP.map(([s, n, cl], i) => `<button type="button" class="kpi" data-i="${i}" style="text-align:left;border-left:5px solid ${s === 'ok' ? '#278f5e' : s === 'bad' ? '#cc2929' : '#d97706'}"><small>ISO 13485 ${cl}</small><b style="font-size:15px">${n}</b><span class="d" style="color:${s === 'ok' ? '#278f5e' : s === 'bad' ? '#cc2929' : '#b45309'}">${s === 'ok' ? 'met' : s === 'bad' ? 'not met' : 'unknown'}</span></button>`).join('')}</div>
+      <div class="panel" id="hw" style="margin-top:12px;min-height:84px;color:#6b6b6b">Click a control to see what the check found.</div>`
+    $$('[data-i]', c.main).forEach((b) => b.onclick = () => { const [s, n, cl, w] = CP[b.dataset.i]; $('#hw', c.main).innerHTML = `<b style="color:#171717">${n} · clause ${cl}</b> <span class="badge ${s === 'ok' ? 'g' : s === 'bad' ? 'r' : 'a'}">${s === 'ok' ? 'met' : s === 'bad' ? 'not met' : 'unknown'}</span><p style="margin-top:6px;color:#383838">${w}</p>${s === 'bad' ? '<button class="abtn" style="margin-top:8px" id="gg">Open TW-02</button>' : ''}`; const g = $('#gg', c.main); if (g) g.onclick = () => c.show('production') })
+    $('#aud', c.main).onclick = () => c.toast('Audit checklist generated from the same checks: 14 questions, each linked to its evidence.')
+  }
+
+  VIEWS.ncr = (c) => {
+    const S = { step: 1, user: 'Jordan', log: [['Jordan', 'Report opened (from IQC-00002)']] }
+    const STEPS = ['Open', 'Contained', 'Disposition proposed', 'Disposition approved', 'CAPA verified', 'Closed']
+    function draw(msg) {
+      c.main.innerHTML = `<h5>NCR-00007 <span class="crumb">· BOX-12 board thickness below limit · lot CP-0412</span></h5>
+        <div class="flow">${STEPS.map((s, i) => `<span class="${i < S.step ? 'done' : i === S.step ? 'now' : ''}">${s}</span>`).join('')}</div>
+        <div style="display:grid;grid-template-columns:1fr 330px;gap:14px"><div class="panel" style="display:grid;gap:10px">
+          <table class="t"><tr><td style="color:#6b6b6b;width:150px">Item</td><td>BOX-12 corrugated box</td></tr><tr><td style="color:#6b6b6b">Supplier</td><td>Coastal Packaging</td></tr><tr><td style="color:#6b6b6b">Found</td><td>3.30 mm on sample 2 (limits 3.50–4.50), caliper CAL-01</td></tr><tr><td style="color:#6b6b6b">Disposition</td><td>${S.step >= 3 ? 'Return to supplier (200 pcs)' : '—'}</td></tr></table>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${S.step < STEPS.length - 1 ? `<button class="abtn dark" id="act">${['', 'Record containment', 'Propose disposition', 'Approve disposition', 'Verify CAPA effectiveness', 'Close the report'][S.step]} (sign)</button>` : '<span class="stamp">CLOSED · LOCKED</span>'}
+            <label style="margin-left:auto;font-size:13px;color:#6b6b6b">Signed in as <select class="ain" id="who"><option${S.user === 'Jordan' ? ' selected' : ''}>Jordan</option><option${S.user === 'Dana' ? ' selected' : ''}>Dana</option></select></label></div>
+          ${msg ? `<div style="font-size:13.5px;padding:8px 10px;border-radius:8px;background:${msg[0] === '!' ? '#fdecec' : '#e9f7ef'};color:${msg[0] === '!' ? '#a11' : '#1d6b47'}">${esc(msg.replace(/^!/, ''))}</div>` : ''}</div>
+          <div class="panel"><b>History</b><div style="display:grid;gap:6px;margin-top:8px;font-size:13px">${S.log.map(([u, t]) => `<div><b>${u}</b> · ${t}</div>`).join('')}</div><p style="color:#9a9a9a;font-size:12px;margin-top:10px">Signed entries cannot be edited or deleted.</p></div></div>`
+      $('#who', c.main).onchange = (e) => { S.user = e.target.value; draw() }
+      const a = $('#act', c.main); if (a) a.onclick = () => {
+        if (S.step === 3 && S.user === 'Jordan') return draw('!Refused: the disposition was proposed by Jordan; someone else must approve it. Switch to Dana.')
+        const names = ['', 'Containment recorded: 200 pcs on hold', 'Disposition proposed: return to supplier', 'Disposition approved', 'CAPA-0003 effectiveness verified: 3 lots in limits', 'Report closed']
+        S.log.push([S.user, names[S.step]]); S.step++; draw(S.step === STEPS.length - 1 ? 'Closed. The report is now read-only.' : 'Signed by ' + S.user + '.') }
+    }
+    draw()
+  }
+
+  VIEWS.iqc = (c) => {
+    const n = 8, vals = ['4.02', '3.97', '4.05', '', '', '', '', ''], att = Array(n).fill('pass')
+    c.main.innerHTML = `<h5>IQC-00005 <span class="crumb">· BOX-12 · lot CP-DEMO-7 · 200 pcs · normal inspection n 8, Ac 0, Re 1</span></h5>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:14px"><div class="panel" style="padding:8px"><table class="t"><tr><th>Sample</th><th>Board thickness <span style="color:#9a9a9a">≥ 3.50, ≤ 4.50 mm · CAL-01</span></th><th>Print legible</th></tr>
+      ${vals.map((v, i) => `<tr><td>${i + 1}</td><td><input class="ain" data-i="${i}" value="${v}" inputmode="decimal" style="width:110px" aria-label="Sample ${i + 1} thickness"></td><td><select class="ain" data-a="${i}" aria-label="Sample ${i + 1} print"><option>pass</option><option>fail</option></select></td></tr>`).join('')}</table></div>
+      <div class="panel" style="display:grid;gap:10px;align-content:start"><b>Sign and judge</b><p style="color:#6b6b6b;font-size:13px">Type a reading like 3.3 to see a failing cell. Samples 1–3 came from a measurement file.</p>
+      <button class="abtn" id="fill">Fill the rest with good readings</button><input class="ain" type="password" placeholder="Your password" id="pw"><button class="abtn dark" id="sg">Sign (judge the lot)</button><div id="res"></div></div></div>`
+    const mark = () => $$('[data-i]', c.main).forEach((x) => { const v = parseFloat(x.value); x.parentElement.className = x.value.trim() === '' ? '' : (v >= 3.5 && v <= 4.5 ? 'cellok' : 'cellbad') })
+    $$('[data-i]', c.main).forEach((x) => x.oninput = mark); mark()
+    $('#fill', c.main).onclick = () => { $$('[data-i]', c.main).forEach((x, i) => { if (!x.value) x.value = (3.95 + ((i * 7) % 9) / 100).toFixed(2) }); mark() }
+    $('#sg', c.main).onclick = () => {
+      const ins = $$('[data-i]', c.main), empty = ins.filter((x) => !x.value.trim()).length
+      if (empty) return void ($('#res', c.main).innerHTML = `<span style="color:#cc2929;font-size:13px">${empty} readings missing: an inspection is signed when every sample is measured.</span>`)
+      if (!$('#pw', c.main).value) return void ($('#res', c.main).innerHTML = '<span style="color:#cc2929;font-size:13px">Type your password to sign.</span>')
+      const bad = ins.filter((x) => { const v = parseFloat(x.value); return !(v >= 3.5 && v <= 4.5) }).length + $$('[data-a]', c.main).filter((s) => s.value === 'fail').length
+      $('#res', c.main).innerHTML = `<div>${bad <= 0 ? '<span class="stamp">ACCEPT</span>' : '<span class="stamp no">REJECT</span>'}</div><p style="font-size:13px;margin-top:8px">${bad} failing unit(s) against Ac 0 / Re 1, counted by code. ${bad ? 'A nonconformance report is opened.' : 'Dana releases it; the result goes to ERPNext as a draft.'}</p>`
+      ins.forEach((x) => x.disabled = true)
+    }
+  }
+
+  VIEWS.spc = (c) => {
+    c.main.innerHTML = `<h5>SPC <span class="crumb">· BOX-12 · board thickness · X-bar and R, n = 5, 20 lots</span></h5>
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:14px"><div class="panel"><svg id="sv" viewBox="0 0 640 330" style="width:100%"></svg></div>
+      <div class="panel" style="display:grid;gap:12px;align-content:start;font-size:13px"><label>Process shift after lot 12 <b id="shv"></b><input type="range" id="sh" min="-0.15" max="0.15" step="0.01" value="0.08" style="width:100%"></label>
+      <label>Spread within a lot σ <b id="sdv"></b><input type="range" id="sd" min="0.01" max="0.12" step="0.005" value="0.04" style="width:100%"></label>
+      <label><input type="checkbox" id="spec" checked> Spec limits 3.80–4.20 mm</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">${['Cp', 'Cpk', 'Signals'].map((k) => `<div class="kpi" style="cursor:default"><small>${k}</small><b id="${k}" style="font-size:20px">–</b></div>`).join('')}</div>
+      <div id="sn" style="color:#383838"></div><button class="abtn dark" id="sncr">Open a nonconformance report</button></div></div>`
+    let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646 }
+    const g = () => { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v) }
+    const base = Array.from({ length: 20 }, () => Array.from({ length: 5 }, g))
+    function draw() {
+      const sh = +$('#sh', c.main).value, sd = +$('#sd', c.main).value, spec = $('#spec', c.main).checked
+      $('#shv', c.main).textContent = (sh >= 0 ? '+' : '') + sh.toFixed(2); $('#sdv', c.main).textContent = sd.toFixed(3)
+      const G = base.map((r, k) => r.map((z) => 4 + z * sd + (k >= 12 ? sh : 0))), xb = G.map((r) => r.reduce((a, b) => a + b) / 5), R = G.map((r) => Math.max(...r) - Math.min(...r))
+      const cx = xb.slice(0, 12).reduce((a, b) => a + b) / 12, rb = R.slice(0, 12).reduce((a, b) => a + b) / 12, ucl = cx + .577 * rb, lcl = cx - .577 * rb, sig = rb / 2.326
+      const lo = Math.min(lcl, ...xb, spec ? 3.8 : 9) - .02, hi = Math.max(ucl, ...xb, spec ? 4.2 : 0) + .02, y = (v) => 300 - (v - lo) / (hi - lo) * 280, x = (k) => 60 + k * 29
+      let s = ''; const hl = (v, col, d, l) => { s += `<line x1="55" x2="625" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-dasharray="${d}" stroke-width="1.5"/><text x="50" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="#6b6b6b">${l}</text>` }
+      hl(cx, '#9a9a9a', '', cx.toFixed(3)); hl(ucl, '#0289f7', '6 4', 'UCL'); hl(lcl, '#0289f7', '6 4', 'LCL'); if (spec) { hl(4.2, '#d97706', '2 4', 'USL'); hl(3.8, '#d97706', '2 4', 'LSL') }
+      s += `<polyline points="${xb.map((v, k) => `${x(k)},${y(v)}`).join(' ')}" fill="none" stroke="#171717" stroke-width="2"/>`
+      let n = 0; xb.forEach((v, k) => { const o = v > ucl || v < lcl; if (o) n++; s += `<circle cx="${x(k)}" cy="${y(v)}" r="5" fill="${o ? '#cc2929' : '#fff'}" stroke="${o ? '#cc2929' : '#171717'}" stroke-width="2"><title>Lot ${k + 1}: ${v.toFixed(3)}</title></circle>` })
+      $('#sv', c.main).innerHTML = s; $('#Signals', c.main).textContent = n
+      if (!spec) { $('#Cp', c.main).textContent = $('#Cpk', c.main).textContent = 'unknown'; $('#sn', c.main).textContent = 'No spec limits: capability is unknown, never assumed.' }
+      else { const all = G.slice(12).flat(), mu = all.reduce((a, b) => a + b) / all.length; $('#Cp', c.main).textContent = (0.4 / (6 * sig)).toFixed(2); $('#Cpk', c.main).textContent = (Math.min(4.2 - mu, mu - 3.8) / (3 * sig)).toFixed(2); $('#sn', c.main).textContent = n ? `${n} lot(s) outside the control limits.` : 'In control.' }
+      $('#sncr', c.main).disabled = !n
+    }
+    ;['sh', 'sd', 'spec'].forEach((id) => $('#' + id, c.main).oninput = draw); draw()
+    $('#sncr', c.main).onclick = () => c.toast('NCR-00008 opened with the chart’s signals: lots outside the control limits after lot 12.')
+  }
+
+  VIEWS.docs = (c) => {
+    const D = [['QP-05 Receiving inspection.docx', 'Procedure', 'Incoming inspection', 'QP-05', 'C', '“5.2 Each lot is sampled per the company sampling table…” (page 2)'],
+      ['Calibration log 2019-2025.xlsx', 'Record (ledger)', 'Calibration', '—', '—', '“Gauge ID | Due date | Done by…” (sheet 1, row 1)'],
+      ['WI-12 Box packing.pdf', 'Work instruction', 'Production', 'WI-12', 'B', '“Place 50 bolts by weight; close with label…” (page 1)'],
+      ['ISO 9001 certificate Coastal.pdf', 'Certificate (external)', 'Purchasing', '—', '—', '“…is certified to ISO 9001:2015, valid until…” (page 1)'],
+      ['NCR log 2023.xlsx', 'Record (ledger)', 'Nonconformance', '—', '—', '“NCR # | Date | Part | Problem…” (sheet 1, row 1)']]
+    const ok = D.map(() => false)
+    function draw(sel = 0) {
+      c.main.innerHTML = `<h5>Documents <span class="crumb">· 5 files uploaded from the shared drive · AI suggestions to confirm</span></h5>
+        <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:14px"><div class="panel" style="padding:6px"><table class="t"><tr><th>File</th><th>AI says</th><th>Status</th></tr>
+        ${D.map((d, i) => `<tr class="click" data-i="${i}" style="${i === sel ? 'background:#f2f7fd' : ''}"><td><b>${d[0]}</b></td><td>${d[1]} · ${d[2]}</td><td>${ok[i] ? '<span class="badge g">confirmed</span>' : '<span class="badge a">to confirm</span>'}</td></tr>`).join('')}</table></div>
+        <div class="panel" style="display:grid;gap:8px;align-content:start"><b>${D[sel][0]}</b><table class="t"><tr><td style="color:#6b6b6b">Type</td><td>${D[sel][1]}</td></tr><tr><td style="color:#6b6b6b">Process</td><td>${D[sel][2]}</td></tr><tr><td style="color:#6b6b6b">Number</td><td>${D[sel][3]}</td></tr><tr><td style="color:#6b6b6b">Revision</td><td>${D[sel][4]}</td></tr></table>
+        <div style="background:#f7f7f7;border-left:3px solid #0289f7;padding:8px 10px;font-size:13px">Quoted: ${D[sel][5]}</div>
+        ${ok[sel] ? '<span class="badge g" style="justify-self:start">Under document control</span>' : '<button class="abtn dark" id="cf" style="justify-self:start">Confirm</button>'}</div></div>`
+      $$('tr.click', c.main).forEach((r) => r.onclick = () => draw(+r.dataset.i))
+      const b = $('#cf', c.main); if (b) b.onclick = () => { ok[sel] = true; c.toast(D[sel][1].startsWith('Record') ? 'Confirmed. Rows can now be imported into the module through a column mapping.' : 'Confirmed. Now controlled: version, review date and reading sign-off.'); draw(Math.min(D.length - 1, ok.indexOf(false) >= 0 ? ok.indexOf(false) : sel)) }
+    }
+    draw()
+  }
+
+  VIEWS.production = (c) => {
+    const ST = [['Count 50 bolts', 'check'], ['Box weight 0.90–1.10 kg', 'measure'], ['Torque on lid 2.0–3.0 N·m', 'measure2'], ['Label serial', 'record']]
+    const done = []
+    function draw(msg) {
+      const k = done.length
+      c.main.innerHTML = `<h5>DHR-00002 <span class="crumb">· KIT-M8 boxed bolt kit · lot KIT-2610-02 · in production</span></h5>
+        <div class="panel" style="padding:6px"><table class="t"><tr><th>#</th><th>Step</th><th>Result</th><th>Equipment</th><th>By</th></tr>
+        ${ST.map(([n, t], i) => `<tr style="${i === k ? 'background:#f2f7fd' : ''}"><td>${i + 1}</td><td><b>${n}</b></td><td>${done[i] ? `<span class="badge ${done[i][0] === 'pass' ? 'g' : 'r'}">${done[i][1]}</span>` : i === k ? (t === 'check' ? '<select class="ain" id="v"><option>pass</option><option>fail</option></select>' : t === 'record' ? '<input class="ain" id="v" value="L-004513">' : `<input class="ain" id="v" value="${t === 'measure' ? '1.02' : '2.6'}" style="width:90px">`) : '—'}</td>
+          <td>${done[i] ? (done[i][2] || '—') : i === k && t.startsWith('measure') ? '<select class="ain" id="g"><option value="">Choose…</option><option>CAL-01 caliper</option><option>TW-02 torque wrench</option><option>SC-03 scale</option></select>' : '—'}</td><td>${done[i] ? 'Sam' : ''}</td></tr>`).join('')}</table></div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:12px">${k < ST.length ? `<button class="abtn dark" id="rec">Record step ${k + 1} (sign as Sam)</button>` : '<button class="abtn dark" id="rel">Submit for release</button>'}
+        <span style="font-size:13px;color:#6b6b6b">Sam is trained on KIT-M8 rev 2 ✓</span></div>
+        ${msg ? `<div style="margin-top:10px;font-size:13.5px;padding:8px 10px;border-radius:8px;background:${msg[0] === '!' ? '#fdecec' : '#e9f7ef'};color:${msg[0] === '!' ? '#a11' : '#1d6b47'}">${esc(msg.replace(/^!/, ''))}</div>` : ''}`
+      const r = $('#rec', c.main); if (r) r.onclick = () => {
+        const t = ST[k][1], v = $('#v', c.main).value, g = $('#g', c.main)?.value
+        if (t.startsWith('measure')) {
+          if (!g) return draw('!Name the equipment used: this step requires it.')
+          if (g.startsWith('TW-02')) return draw('!TW-02 is past its calibration due date: it cannot be used. Measure with equipment in calibration.')
+          const x = parseFloat(v), [lo, hi] = t === 'measure' ? [0.9, 1.1] : [2.0, 3.0], pass = x >= lo && x <= hi
+          done.push([pass ? 'pass' : 'fail', `${v} ${t === 'measure' ? 'kg' : 'N·m'} · ${pass ? 'pass' : 'fail'}`, g.split(' ')[0]]); return draw(pass ? 'Judged by code: within the template’s limits.' : '!Judged by code: outside the limits. A nonconformance report can be opened from this step.')
+        }
+        done.push([t === 'check' && v === 'fail' ? 'fail' : 'pass', v]); draw('Recorded and signed.')
+      }
+      const rl = $('#rel', c.main); if (rl) rl.onclick = () => draw('Submitted. Dana, who did not build the lot, reviews and releases it; then its UDI label can be printed.')
+    }
+    draw()
+  }
+
+  VIEWS.trace = (c) => {
+    c.main.innerHTML = `<h5>Trace <span class="crumb">· forward from an incoming lot</span></h5>
+      <div style="display:flex;gap:8px;margin-bottom:12px"><input class="ain" value="IQC-00001 · BOX-12 lot CP-0405 · Coastal Packaging" style="flex:1" readonly><button class="abtn dark" id="tr">Trace forward</button><button class="abtn" id="mr" disabled>Start a mock recall</button></div>
+      <div class="panel"><svg id="tg" viewBox="0 0 900 380" style="width:100%"></svg></div>`
+    const N = [[90, 190, 'Incoming lot', 'CP-0405 · 200 pcs'], [330, 110, 'DHR-00001', 'KIT-2610-01 · 20'], [330, 270, 'DHR-00003', 'KIT-2609-04 · 30'], [580, 60, 'DN-0311', 'Bayline Electrical'], [580, 170, 'DN-0318', 'Gulf Hardware'], [580, 290, 'DN-0322', 'Coastal Retail'], [810, 190, '3 customers', '50 kits shipped']]
+    const E = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 5], [3, 6], [4, 6], [5, 6]]
+    $('#tr', c.main).onclick = () => {
+      let s = ''; E.forEach(([a, b], i) => { s += `<line x1="${N[a][0] + 70}" y1="${N[a][1]}" x2="${N[b][0] - 70}" y2="${N[b][1]}" stroke="#0289f7" stroke-width="2" opacity="0"><animate attributeName="opacity" to="1" begin="${0.3 + i * 0.18}s" dur=".3s" fill="freeze"/></line>` })
+      N.forEach(([x, y, a, b], i) => { s += `<g opacity="0"><animate attributeName="opacity" to="1" begin="${i * 0.2}s" dur=".3s" fill="freeze"/><rect x="${x - 70}" y="${y - 30}" width="140" height="60" rx="8" fill="${i === 6 ? '#171717' : '#fff'}" stroke="#d4d4d4"/><text x="${x}" y="${y - 6}" font-size="13" font-weight="600" text-anchor="middle" fill="${i === 6 ? '#fff' : '#171717'}">${a}</text><text x="${x}" y="${y + 13}" font-size="11.5" text-anchor="middle" fill="${i === 6 ? '#ddd' : '#6b6b6b'}">${b}</text></g>` })
+      $('#tg', c.main).innerHTML = s; $('#mr', c.main).disabled = false
+    }
+    $('#mr', c.main).onclick = () => c.toast('Mock recall RC-0002 started: 3 customers listed; confirmations recorded with who and when.')
+    $('#tr', c.main).click()
+  }
+
+  const GS = '\x1d', AIS = { '01': 14, '10': null, '11': 6, '17': 6, '21': null }, NM = { '01': 'Device identifier (GTIN)', '10': 'Lot', '11': 'Production date', '17': 'Expiry date', '21': 'Serial' }
+  const gchk = (d) => { let s = 0; [...d].reverse().forEach((ch, i) => { s += +ch * (i % 2 ? 1 : 3) }); return (10 - s % 10) % 10 }
+  const ymd = (v) => { const m = +v.slice(2, 4), d = +v.slice(4); if (m < 1 || m > 12) throw Error(v + ' is not a real date'); return (d ? new Date(Date.UTC(2000 + +v.slice(0, 2), m - 1, d)) : new Date(Date.UTC(2000 + +v.slice(0, 2), m, 0))).toISOString().slice(0, 10) }
+  const HS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%', hchk = (d) => HS[[...d].reduce((a, ch) => a + HS.indexOf(ch), 0) % 43]
+  function readCode(raw) {
+    const s = raw.trim().replace(/␝|<GS>/g, GS).replace(/^\][A-Za-z][0-9A-Za-z]/, '')
+    let el
+    if (/^https?:\/\//i.test(s)) { const [path, q = ''] = s.split('://')[1].split('?'), sg = path.split('/').slice(1); const st = sg.findIndex((x, k) => x === '01' && /^\d{8,14}$/.test(sg[k + 1] || '')); if (st < 0) throw Error('not a GS1 web address'); el = []; for (let k = st; k < sg.length - 1; k += 2) if (sg[k] in AIS) el.push([sg[k], decodeURIComponent(sg[k + 1])]); q.split('&').forEach((p) => { const [a, v] = p.split('='); if (a in AIS && v) el.push([a, v]) }); return ['GS1 web address', el] }
+    if (s.startsWith('(')) return ['GS1 printed form', [...s.matchAll(/\((\d{2,4})\)([^(]*)/g)].map((m) => [m[1], m[2]])]
+    if (s.startsWith('+')) { const b = s.slice(0, -1); if (hchk(b) !== s.slice(-1)) throw Error('the HIBC check character is wrong: it should be ' + hchk(b)); const [p, sec = ''] = b.slice(1).split('/'); const m = p.match(/^([A-Z][A-Z0-9]{3})([A-Z0-9]{1,18})(\d)$/); if (!m) throw Error('not LIC, product number and unit'); const f = [['Labeler code', m[1]], ['Product number', m[2]], ['Unit', m[3]]]; if (sec.startsWith('$$3')) f.push(['Expiry date', ymd(sec.slice(3, 9))], ['Lot', sec.slice(9)]); return ['HIBC', null, f] }
+    if (/^\d{2}/.test(s)) { el = []; let i = 0; while (i < s.length) { if (s[i] === GS) { i++; continue } const ai = Object.keys(AIS).find((a) => s.startsWith(a, i)); if (!ai) throw Error('unknown application identifier at ' + s.slice(i, i + 4)); i += 2; let e = AIS[ai] ? i + AIS[ai] : s.indexOf(GS, i); if (e < 0) e = s.length; el.push([ai, s.slice(i, e)]); i = e } return ['GS1 DataMatrix (raw)', el] }
+    throw Error('not a GS1 or HIBC code')
+  }
+  VIEWS.scan = (c) => {
+    const P = [['GS1 printed', '(01)09521234567899(11)261016(17)290131(10)KIT-2610-01'], ['DataMatrix (raw)', ']d20109521234567899112610161729013110KIT-2610-01␝21SN7'], ['GS1 web address', 'https://id.gs1.org/01/09521234567899/10/KIT-2610-01?17=290131'], ['HIBC', '+A123WIDGET10/$$3290131L1'], ['Wrong check digit', '(01)09521234567898(10)KIT-2610-01']]
+    c.main.innerHTML = `<h5>Scan <span class="crumb">· a scanner types here, or use a phone camera</span></h5>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">${P.map(([l, v]) => `<button class="abtn" data-c="${esc(v)}">${l}</button>`).join('')}</div>
+      <form id="sf" style="display:flex;gap:8px"><input class="ain" id="si" style="flex:1;font-family:var(--mono);font-size:15px" placeholder="Scan or type the code" aria-label="Code"><button class="abtn dark">Read</button></form>
+      <div style="height:3px;background:#eee;margin:10px 0;position:relative;overflow:hidden;border-radius:2px"><div id="bm" style="position:absolute;inset:0;width:30%;background:#cc2929;opacity:0"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="panel" id="so" style="min-height:220px;color:#6b6b6b">The code’s fields appear here.</div><div class="panel" id="sr" style="color:#6b6b6b">Records it matches appear here.</div></div>
+      <p style="color:#9a9a9a;font-size:12px;margin-top:8px">Examples use GS1 prefix 952, reserved for examples. The software checks identifiers; it never invents one.</p>`
+    const read = (v) => { const bm = $('#bm', c.main); bm.animate([{ left: '-30%', opacity: 1 }, { left: '100%', opacity: 1 }], { duration: 500 })
+      try { const [form, el, f0] = readCode(v); const f = f0 || el.map(([a, x]) => { if (a === '01') { const g = x.padStart(14, '0'); if (gchk(g.slice(0, -1)) !== +g.slice(-1)) throw Error(`the check digit of ${x} is wrong: it should be ${gchk(g.slice(0, -1))}`); return [NM[a], g] } return [NM[a], a === '11' || a === '17' ? ymd(x) : x] })
+        $('#so', c.main).innerHTML = `<span class="badge g">read</span> <span class="badge">${form}</span><table class="t" style="margin-top:8px">${f.map(([k, x]) => `<tr><td style="color:#6b6b6b">${k}</td><td style="font-family:var(--mono)">${esc(x)}</td></tr>`).join('')}</table>`
+        $('#sr', c.main).innerHTML = form === 'HIBC' ? '<b style="color:#171717">No item has this identifier here.</b><p>The code was read; WIDGET1 is not one of Harbor Lane’s items.</p>' : `<table class="t"><tr><td>Item</td><td><b>HX-BOLT-M8</b></td></tr><tr><td>Production lot</td><td><b>DHR-00001</b> <span class="badge g">released</span></td></tr><tr><td>Materials</td><td>BOX-12 lot CP-0405</td></tr></table><button class="abtn" style="margin-top:8px" id="tt">Trace it</button>`
+        const t = $('#tt', c.main); if (t) t.onclick = () => c.show('trace')
+      } catch (e) { $('#so', c.main).innerHTML = `<span class="badge r">not read</span><p style="margin-top:8px;color:#383838">${esc(e.message)}</p>`; $('#sr', c.main).textContent = 'Nothing is looked up for a code that cannot be read.' } }
+    $$('[data-c]', c.main).forEach((b) => b.onclick = () => { $('#si', c.main).value = b.dataset.c; read(b.dataset.c) })
+    $('#sf', c.main).onsubmit = (e) => { e.preventDefault(); read($('#si', c.main).value) }
+    $('#si', c.main).value = P[0][1]; read(P[0][1])
+  }
+
+  VIEWS.import = (c) => {
+    c.main.innerHTML = `<h5>Import <span class="crumb">· products.csv · QuickBooks export · into ERPNext items</span></h5>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="panel"><b>Columns</b><div id="mp" style="display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;align-items:center;margin-top:10px">
+      ${[['Product/Service Name', 'item_code'], ['Sales Description', 'description'], ['Type = Inventory', 'is_stock_item = yes'], ['Sales Price / Rate', 'standard_rate']].map(([a, b]) => `<span class="badge" style="font-family:var(--mono);padding:6px 10px">${a}</span><span class="ar" style="height:2px;background:#0289f7;transform:scaleX(0);transform-origin:left;transition:transform .5s"></span><span class="badge b to" style="font-family:var(--mono);padding:6px 10px;opacity:0;transition:opacity .5s">${b}</span>`).join('')}</div>
+      <button class="abtn dark" id="mt" style="margin-top:12px">Match columns</button></div><div class="panel" id="pv" style="color:#6b6b6b">The preview appears after matching. Nothing is written until someone signs.</div></div>`
+    $('#mt', c.main).onclick = () => { $$('.ar', c.main).forEach((a, i) => setTimeout(() => a.style.transform = 'scaleX(1)', i * 150)); $$('.to', c.main).forEach((a, i) => setTimeout(() => a.style.opacity = 1, 200 + i * 150))
+      setTimeout(() => { $('#pv', c.main).innerHTML = `<b style="color:#171717">Preview</b><table class="t" style="margin-top:6px"><tr><th>Row</th><th>Item</th><th>What happens</th></tr><tr><td>2</td><td>TEST-1</td><td><span class="badge g">ready</span></td></tr><tr><td>3</td><td>HX-BOLT-M8</td><td><span class="badge">already in ERPNext: skipped</span></td></tr><tr><td>4</td><td>BOX-24</td><td><span class="badge g">ready</span></td></tr></table><button class="abtn dark" id="is" style="margin-top:10px">Import 2 rows (sign)</button>`
+        $('#is', c.main).onclick = () => { $('#is', c.main).outerHTML = '<span class="stamp">IMPORTED</span><p style="font-size:13px;margin-top:6px;color:#383838">2 items created in ERPNext. Importing the same file again changes nothing.</p>' } }, 900) }
+  }
+
+  VIEWS.cmm = (c) => {
+    c.main.innerHTML = `<h5>Measurement file <span class="crumb">· into IQC-00005 · plan: Board thickness 3.50–4.50 mm</span></h5>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div class="panel"><b>cmm-export.csv</b><textarea id="cv" spellcheck="false" style="width:100%;height:230px;margin-top:8px;font-family:var(--mono);font-size:13.5px;border:1px solid #ddd;border-radius:8px;padding:8px">Part,Feature,Axis,Nominal,Measured,+Tol,-Tol
+1,Board thickness,,4.0,4.02,0.5,-0.5
+2,Board thickness,,4.0,3.97,0.5,-0.5
+3,Board thickness,,4.0,4.61,0.5,-0.5
+1,Flap width,,60,60.1,0.5,-0.5</textarea><p style="font-size:12.5px;color:#9a9a9a">Edit the file: the preview follows.</p></div><div class="panel" id="cp"></div></div>`
+    const run = () => { const rows = $('#cv', c.main).value.split(/\n/).filter((l) => l.trim()).map((l) => l.split(',')), h = rows[0].map((x) => x.trim().toLowerCase())
+      const fi = h.indexOf('feature'), vi = h.indexOf('measured'), pi = h.indexOf('part'); if (fi < 0 || vi < 0) return void ($('#cp', c.main).innerHTML = '<span class="badge r">not read</span><p>Needs a Feature and a Measured column.</p>')
+      const parts = [], rd = [], left = new Set(); rows.slice(1).forEach((r) => { const f = (r[fi] || '').trim(), p = (r[pi] || '1').trim(); if (!f) return; if (!parts.includes(p)) parts.push(p); if (f.toLowerCase() !== 'board thickness') { left.add(f); return } const v = parseFloat(r[vi]); rd.push([parts.indexOf(p) + 1, v]) })
+      $('#cp', c.main).innerHTML = `<b>Preview</b> <span class="crumb">· ${parts.length} part(s) → samples 1–${parts.length}</span><table class="t" style="margin-top:6px"><tr><th>Sample</th><th>Board thickness</th><th>Plan limits</th></tr>${rd.map(([s, v]) => `<tr><td>${s}</td><td style="font-family:var(--mono)">${isNaN(v) ? 'not a number' : v.toFixed(3)}</td><td>${!isNaN(v) && v >= 3.5 && v <= 4.5 ? '<span class="badge g">within</span>' : '<span class="badge r">outside</span>'}</td></tr>`).join('')}</table>
+        ${[...left].map((f) => `<p style="font-size:13px;color:#6b6b6b;margin-top:6px">${esc(f)}: not in the plan, left out</p>`).join('')}<div style="display:flex;gap:8px;margin-top:10px"><select class="ain"><option>CAL-01 caliper</option></select><button class="abtn dark" id="ci">Import ${rd.length} readings (sign)</button></div>`
+      $('#ci', c.main).onclick = () => c.toast(`${rd.length} readings imported into IQC-00005; the file is kept with the inspection.`) }
+    $('#cv', c.main).oninput = run; run()
+  }
+
+  VIEWS.inbox = (c) => {
+    c.main.innerHTML = `<h5>From machines <span class="crumb">· what machines sent, waiting for a person</span></h5>
+      <div style="display:grid;grid-template-columns:260px 1fr 260px;gap:14px"><div class="panel" style="display:grid;gap:8px;align-content:start"><b>Receiving gauge station</b><span style="font-size:12px;color:#6b6b6b;font-family:var(--mono)">token wqo_7Kd… · may send measurements</span>
+        <button class="abtn dark" id="snd">Send a reading</button><button class="abtn red" id="rvk">Revoke its token</button><div id="wire" style="display:grid;gap:6px"></div></div>
+      <div class="panel" style="display:grid;gap:8px;align-content:start"><b>Waiting</b><div id="ib" style="display:grid;gap:8px"></div></div>
+      <div class="panel" style="display:grid;gap:6px;align-content:start;font-size:12.5px"><b style="font-size:14px">IQC-00005 readings</b><div id="ir" style="display:grid;gap:4px;color:#383838"></div><b style="font-size:14px;margin-top:8px">Call log</b><div id="cl" style="display:grid;gap:3px;font-family:var(--mono);color:#6b6b6b"></div></div></div>`
+    let rev = false, n = 0; const vals = [4.01, 3.96, 4.04, 3.99]
+    const log = (t) => $('#cl', c.main).insertAdjacentHTML('afterbegin', `<div>${new Date().toLocaleTimeString()} ${t}</div>`)
+    const send = () => { const v = vals[n % 4], s = 5 + (n % 4); const p = document.createElement('div'); p.className = 'badge b'; p.style.animation = 'toast 1.6s both'; p.textContent = `sample ${s} · ${v} mm →`; $('#wire', c.main).prepend(p); setTimeout(() => p.remove(), 1600)
+      if (rev) return log('POST → 401 revoked'); n++; log('POST → 202 pending')
+      const it = document.createElement('div'); it.style.cssText = 'border:1px solid #ededed;border-radius:8px;padding:8px;display:grid;gap:6px;animation:stampIn .3s both'
+      it.innerHTML = `<div style="display:flex;justify-content:space-between"><b>Sample ${s} · Board thickness ${v} mm</b><span class="badge a">pending</span></div><div style="display:flex;gap:6px"><button class="abtn dark">Accept (sign as Jordan)</button><button class="abtn">Reject</button></div>`
+      const [ac, rj] = $$('button', it); ac.onclick = () => { $('.badge', it).className = 'badge g'; $('.badge', it).textContent = 'accepted by Jordan'; ac.remove(); rj.remove(); $('#ir', c.main).insertAdjacentHTML('afterbegin', `<div>Sample ${s}: ${v} mm · from gauge station · accepted by Jordan</div>`) }
+      rj.onclick = () => { $('.badge', it).className = 'badge r'; $('.badge', it).textContent = 'rejected: wrong fixture'; ac.remove(); rj.remove() }
+      $('#ib', c.main).prepend(it) }
+    $('#snd', c.main).onclick = send
+    $('#rvk', c.main).onclick = () => { rev = !rev; $('#rvk', c.main).textContent = rev ? 'Make a new token' : 'Revoke its token'; log(rev ? 'token revoked by Dana' : 'new token made by Dana') }
+    send()
+  }
+
+
+  // ---------- operations views (fictional data)
+  const bars = (vals, labels, color = '#0289f7', target) => { const mx = Math.max(...vals, target || 0) * 1.15, w = 480, h = 150
+    return `<svg viewBox="0 0 ${w} ${h + 22}" style="width:100%;height:auto">${target ? `<line x1="0" x2="${w}" y1="${h - target / mx * h}" y2="${h - target / mx * h}" stroke="#d97706" stroke-dasharray="4 4"/>` : ''}${vals.map((v, i) => { const bw = w / vals.length, x = i * bw + bw * 0.18, bh = v / mx * h
+      return `<rect x="${x}" y="${h - bh}" width="${bw * 0.64}" height="${bh}" rx="3" fill="${color}" opacity="${i === vals.length - 1 ? 1 : 0.55}"><title>${labels[i]}: ${v.toLocaleString()}</title><animate attributeName="height" from="0" to="${bh}" dur=".8s" fill="freeze"/><animate attributeName="y" from="${h}" to="${h - bh}" dur=".8s" fill="freeze"/></rect><text x="${x + bw * 0.32}" y="${h + 16}" font-size="10" text-anchor="middle" fill="#9a9a9a">${labels[i]}</text>` }).join('')}</svg>` }
+  const WEEKS = ['W33', 'W34', 'W35', 'W36', 'W37', 'W38', 'W39', 'W40']
+
+  VIEWS.inventory = (c) => {
+    const ROWS = [['HX-BOLT-M8', 'Hex bolt M8 × 30', 'batch', 1180, 0, 1580, 2000, 0.50], ['CBL-12-50', 'Cable 12 AWG, 50 ft', '—', 30, 0, 150, 120, 18.20], ['BOX-12', 'Corrugated box 12 in', 'batch', 610, 200, 300, 400, 0.85],
+      ['OUTLET-DUP', 'Duplex outlet', 'serial', 240, 0, 160, 150, 2.40], ['HX-WASHER-8', 'Washer M8', 'batch', 5200, 0, 2600, 3000, 0.04]]
+    const drafted = new Set()
+    function draw() {
+      c.main.innerHTML = `<h5>Inventory <span class="crumb">· from the ERPNext stock ledger · Main and QC hold warehouses</span></h5>
+        <div class="grid-k" style="grid-template-columns:repeat(4,1fr)">${[['Inventory value', '$412.6k'], ['Days on hand', '38.0'], ['Stock-outs', '2'], ['On quality hold', '200 pcs']].map(([a, b]) => `<div class="kpi" style="cursor:default"><small>${a}</small><b>${b}</b></div>`).join('')}</div>
+        <div class="panel" style="margin-top:12px;padding:6px"><table class="t"><tr><th>Item</th><th>Tracked by</th><th>Main</th><th>QC hold</th><th>Open demand</th><th>Reorder level</th><th>Position</th><th></th></tr>
+        ${ROWS.map(([code, name, tr, main, hold, dem, ro, rate], i) => { const short = dem - main
+          return `<tr><td><b>${code}</b><div style="color:#9a9a9a;font-size:12px">${name}</div></td><td>${tr}</td><td>${main.toLocaleString()}</td><td>${hold ? `<span class="badge a">${hold}</span>` : '0'}</td><td>${dem.toLocaleString()}</td><td>${ro.toLocaleString()}</td>
+            <td>${short > 0 ? `<span class="badge r">short ${short.toLocaleString()}</span>` : main < ro ? '<span class="badge a">below reorder</span>' : '<span class="badge g">ok</span>'}</td>
+            <td>${short > 0 || main < ro ? (drafted.has(i) ? '<span class="badge b">draft PO waiting</span>' : `<button class="abtn" data-r="${i}">Draft a purchase order</button>`) : ''}</td></tr>` }).join('')}</table></div>
+        <p style="color:#9a9a9a;font-size:12px;margin-top:6px">Stock on quality hold is not counted as available until the lot is released.</p>`
+      $$('[data-r]', c.main).forEach((b) => b.onclick = () => { drafted.add(+b.dataset.r); c.toast(`Draft purchase order for ${ROWS[+b.dataset.r][0]} saved to Drafts. A person confirms before it reaches ERPNext.`); draw() })
+    }
+    draw()
+  }
+
+  VIEWS.drafts = (c) => {
+    const D = [['Purchase order', 'HX-BOLT-M8 × 1,000 from Coastal Fasteners', 'Assistant', 'pending'], ['Quality inspection', 'IQC-00001 result: accepted, for PR-0074', 'Incoming inspection', 'pending'],
+      ['Customer note', 'Delay note to Bayline Electrical for SO-1042', 'Assistant', 'pending'], ['Purchase order', 'CBL-12-50 × 200 from Northside Supply', 'Reorder rule', 'pending']]
+    function draw(sel = 0, msg) {
+      const [k, what, by, st] = D[sel]
+      c.main.innerHTML = `<h5>Drafts <span class="crumb">· nothing reaches ERPNext until a person confirms</span></h5>
+        <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px"><div class="panel" style="padding:6px"><table class="t"><tr><th>Kind</th><th>What</th><th>Prepared by</th><th>Status</th></tr>
+        ${D.map(([a, b, p, s], i) => `<tr class="click" data-i="${i}" style="${i === sel ? 'background:#f2f7fd' : ''}"><td>${a}</td><td><b>${b}</b></td><td>${p}</td><td><span class="badge ${s === 'pending' ? 'a' : s === 'confirmed' ? 'g' : ''}">${s}</span></td></tr>`).join('')}</table></div>
+        <div class="panel" style="display:grid;gap:10px;align-content:start"><b>${k}</b><div>${what}</div><div style="color:#6b6b6b;font-size:13px">Prepared by ${by}. ${k === 'Purchase order' ? 'Supplier on time 94%; price from the last order.' : ''}</div>
+        ${st === 'pending' ? `<div style="display:flex;gap:8px"><button class="abtn dark" id="cf">Confirm and create in ERPNext</button><button class="abtn" id="ds">Discard</button></div><input class="ain" id="why" placeholder="Reason, if you discard it">` : `<span class="badge ${st === 'confirmed' ? 'g' : ''}" style="justify-self:start">${st}</span>`}
+        ${msg ? `<div style="font-size:13px;padding:8px 10px;border-radius:8px;background:${msg[0] === '!' ? '#fdecec' : '#e9f7ef'};color:${msg[0] === '!' ? '#a11' : '#1d6b47'}">${esc(msg.replace(/^!/, ''))}</div>` : ''}</div></div>`
+      $$('tr.click', c.main).forEach((r) => r.onclick = () => draw(+r.dataset.i))
+      const cf = $('#cf', c.main); if (cf) cf.onclick = () => { D[sel][3] = 'confirmed'; draw(sel, `Created in ERPNext as a draft ${k.toLowerCase()} (${k === 'Purchase order' ? 'PO-0319' : k === 'Quality inspection' ? 'QI-0088' : 'sent after review'}). Logged with your name.`) }
+      const ds = $('#ds', c.main); if (ds) ds.onclick = () => { const w = $('#why', c.main).value.trim(); if (!w) return draw(sel, '!Say why it is discarded; the reason is kept.'); D[sel][3] = 'discarded'; draw(sel, 'Discarded: ' + w) }
+    }
+    draw()
+  }
+
+  VIEWS.sales = (c) => {
+    c.main.innerHTML = `<h5>Sales and delivery <span class="crumb">· submitted sales orders and delivery notes</span></h5>
+      <div class="grid-k" style="grid-template-columns:repeat(4,1fr)">${[['Orders this week', '$48.2k · 14'], ['On-time delivery', '91.4%'], ['Late', '3'], ['At risk (≤ 7 days, short)', '2']].map(([a, b]) => `<div class="kpi" style="cursor:default"><small>${a}</small><b>${b}</b></div>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:12px;margin-top:12px"><div class="panel"><b>Order value by week ($k)</b>${bars([31.5, 38.0, 35.2, 41.9, 39.4, 44.1, 46.0, 48.2], WEEKS)}</div>
+      <div class="panel"><b>Top customers, 8 weeks</b><table class="t">${[['Bayline Electrical', '$92.4k'], ['Gulf Hardware', '$71.0k'], ['Coastal Retail', '$54.8k'], ['Harbor Builders', '$33.1k']].map(([a, b]) => `<tr><td>${a}</td><td style="text-align:right">${b}</td></tr>`).join('')}</table>
+        <b style="display:block;margin-top:10px">Late or at risk</b><table class="t">${[['SO-1042', 'late', 'r'], ['SO-1047', 'late', 'r'], ['SO-1051', 'late', 'r'], ['SO-1055', 'at risk', 'a'], ['SO-1058', 'at risk', 'a']].map(([a, b, k]) => `<tr class="click" data-go="anomalies"><td><b>${a}</b></td><td><span class="badge ${k}">${b}</span></td><td style="color:#0289f7">Why →</td></tr>`).join('')}</table></div></div>`
+    $$('[data-go]', c.main).forEach((r) => r.onclick = () => c.show('anomalies'))
+  }
+
+  VIEWS.purchasing = (c) => {
+    c.main.innerHTML = `<h5>Purchasing and receiving <span class="crumb">· purchase orders, receipts, incoming inspection</span></h5>
+      <div class="grid-k" style="grid-template-columns:repeat(4,1fr)">${[['Open purchase orders', '11'], ['In transit', '$23.7k'], ['Overdue lines', '2'], ['Lots to inspect', '4']].map(([a, b]) => `<div class="kpi" style="cursor:default"><small>${a}</small><b>${b}</b></div>`).join('')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><div class="panel"><b>Supplier on time, line by line (90 days)</b><table class="t"><tr><th>Supplier</th><th>Lines</th><th>On time</th></tr>
+        ${[['Coastal Packaging', '17', '94%', 'g'], ['Bay Calibration Lab', '3', '100%', 'g'], ['Coastal Fasteners', '12', '92%', 'g'], ['Gulf Fasteners', '5', '60%', 'r'], ['Northside Supply', '0', 'unknown', '']].map(([a, b, p, k]) => `<tr><td>${a}</td><td>${b}</td><td><span class="badge ${k}">${p}</span></td></tr>`).join('')}</table></div>
+      <div class="panel"><b>Due this week</b><table class="t"><tr><th>PO</th><th>Supplier</th><th>Promised</th></tr>${[['PO-0310', 'Gulf Fasteners', 'Oct 9 · received Oct 15', 'r'], ['PO-0312', 'Gulf Fasteners', 'Oct 27', 'a'], ['PO-0315', 'Coastal Packaging', 'Oct 18', 'g'], ['PO-0316', 'Coastal Fasteners', 'Oct 19', 'g']].map(([a, b, d, k]) => `<tr><td><b>${a}</b></td><td>${b}</td><td><span class="badge ${k}">${d}</span></td></tr>`).join('')}</table>
+        <button class="abtn" style="margin-top:10px" id="go">Open the receiving queue</button></div></div>`
+    $('#go', c.main).onclick = () => c.show('iqc')
+  }
+
+  VIEWS.finance = (c) => {
+    let visitor = false
+    function draw() {
+      const m = (s) => visitor ? '••••' : s, n = (s) => visitor ? 'Customer' : s
+      c.main.innerHTML = `<h5>Finance <span class="crumb">· from ERPNext sales and purchase invoices · read-only</span><label style="margin-left:auto;font-size:13px;font-weight:500"><input type="checkbox" id="vis" ${visitor ? 'checked' : ''}> Visitor mode</label></h5>
+        <div class="grid-k" style="grid-template-columns:repeat(4,1fr)">${[['Invoiced this week', m('$46.9k')], ['Receivables', m('$128.4k')], ['Overdue receivables', visitor ? '14%' : '$18.0k · 14%'], ['Payables due in 14 days', m('$37.2k')]].map(([a, b]) => `<div class="kpi" style="cursor:default"><small>${a}</small><b>${b}</b></div>`).join('')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><div class="panel"><b>Invoiced by week ${visitor ? '(trend only)' : '($k)'}</b>${bars([30.2, 36.8, 33.9, 40.1, 41.7, 42.0, 44.8, 46.9], WEEKS, '#278f5e')}</div>
+        <div class="panel"><b>Receivables by age</b>${(() => { const A = [['Not due', 110.4], ['1–30 days', 11.1], ['31–60', 4.2], ['61–90', 1.9], ['90+', 0.8]], t = A.reduce((x, y) => x + y[1], 0)
+          return `<div style="display:flex;height:26px;border-radius:6px;overflow:hidden;margin:10px 0">${A.map(([a, v], i) => `<div title="${a}" style="width:${v / t * 100}%;background:${['#278f5e', '#7cc4a0', '#d97706', '#e0703a', '#cc2929'][i]}"></div>`).join('')}</div><table class="t">${A.map(([a, v]) => `<tr><td>${a}</td><td style="text-align:right">${visitor ? (v / t * 100).toFixed(0) + '%' : '$' + v.toFixed(1) + 'k'}</td></tr>`).join('')}</table>` })()}
+          <b style="display:block;margin-top:8px">Most overdue</b><table class="t">${[['Harbor Builders', '$9.8k', '41 days'], ['Coastal Retail', '$5.1k', '35 days']].map(([a, b, d]) => `<tr><td>${n(a)}</td><td>${m(b)}</td><td><span class="badge r">${d}</span></td></tr>`).join('')}</table></div></div>`
+      $('#vis', c.main).onchange = (e) => { visitor = e.target.checked; draw() }
+    }
+    draw()
+  }
+
+  // ---------- start
+  addEventListener('hashchange', () => { const h = location.hash.match(/^#p(\d+)$/); if (h && +h[1] - 1 !== cur) go(+h[1] - 1) })
+  const m = location.hash.match(/^#p(\d+)$/)
+  go(m ? +m[1] - 1 : 0, m ? 'all' : 1)
+})()
+</script>
+
+</body></html>
