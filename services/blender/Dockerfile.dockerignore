@@ -1,0 +1,13 @@
+# 构建上下文是仓库根目录：只放行渲染要用的文件
+*
+!services/blender/requirements.txt
+!services/blender/app.py
+!services/blender/run.sh
+!tools/blender/*.py
+!tools/blender/*.md
+!tools/blender/requirements.txt
+!tools/site_cases/assets/three.min.js
+!textbook/web-editions/sewing/src/zh/labs/proto-lockstitch.html
+!textbook/web-editions/sewing/src/lib/lockstitch-kit.js
+!textbook/web-editions/sewing/src/lib/proto-lockstitch-mesh.js
+!video3d/*/scene.yaml

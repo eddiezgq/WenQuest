@@ -81,6 +81,14 @@ class Settings(BaseSettings):
     gpu_lambda_prices: str = "gpu_1x_a10=1.29,gpu_1x_h100_sxm5=3.99"
     gpu_idle_minutes: int = 30
     gpu_max_hours: float = 3.0
+    # 三维仿真视频（第 38 轮）：关键画面在 blender 容器出；小样、高清租 Lambda 机器出，出完关机。
+    video3d_blender_url: str = ""                 # e.g. http://blender:8000
+    video3d_provider: str = "auto"                # auto（有 Lambda 密钥就用 Lambda）| lambda | mock | off
+    video3d_lambda_key: str = ""                  # 空 = 用 gpu_lambda_key
+    video3d_lambda_types: str = "gpu_1x_a10,gpu_1x_a6000,gpu_1x_a100_sxm4,gpu_1x_a100,gpu_1x_h100_pcie"   # 按顺序挑有空的
+    video3d_max_machines: int = 2                 # 同时最多开几台
+    video3d_max_hours: float = 3.0                # 一台机器最长开多久
+    video3d_wait_minutes: int = 60                # 没有空机器时最多等多久
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
     # --- accounts: sign-up, email codes, teacher approval (app/accounts.py) ---

@@ -67,6 +67,10 @@ services:
       WQ_MICROSYNTH_URL: http://micro-synth:8000
       # Lecture videos: speech synthesis and recognition by the voice service (below).
       WQ_VOICE_URL: http://voice:8000
+      # 三维仿真视频（第 38 轮）：关键画面在 blender 容器出；小样、高清租 Lambda 机器出（密钥 WQ_VIDEO3D_LAMBDA_KEY，空则用 WQ_GPU_LAMBDA_KEY）。
+      WQ_VIDEO3D_BLENDER_URL: http://blender:8000
+      WQ_VIDEO3D_LAMBDA_KEY: ${VIDEO3D_LAMBDA_KEY:-}
+      WQ_VIDEO3D_PROVIDER: ${VIDEO3D_PROVIDER:-auto}
       # 问渠零件与机器人库, published by the digital factory (docs/方案/数字工厂资源接口约定.md). Empty = built-in sample.
       WQ_LIBRARY_URL: ${WQ_LIBRARY_URL:-https://factory.wenquestrobotics.com}
       # Sign-up, teacher approval and course notices by email (see docs/帮助/注册登录与审核.md).
@@ -153,6 +157,26 @@ services:
     read_only: true
     tmpfs:
       - /tmp:size=128m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+    networks:
+      - render
+
+  # 三维仿真视频的关键画面（Blender，第 38 轮）。和动画渲染一样：没有密钥、不能上网，2 个 CPU、3 GB。
+  blender:
+    build:
+      context: .
+      dockerfile: services/blender/Dockerfile
+    image: ${BLENDER_IMAGE:-wenquest/blender:0.1}
+    restart: unless-stopped
+    cpus: 2
+    mem_limit: 3g
+    pids_limit: 512
+    read_only: true
+    shm_size: 512m
+    tmpfs:
+      - /tmp:size=1500m
     security_opt:
       - no-new-privileges:true
     cap_drop: [ALL]
