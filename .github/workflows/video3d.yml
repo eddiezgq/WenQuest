@@ -1,0 +1,97 @@
+# 三维仿真视频并行出片（第 37 轮第 1 步）：手动触发；把一段视频的帧切成 N 份，在 GitHub 免费构建机上同时渲染，最后合成 MP4 / WebM。
+# 成片作为本次运行的附件（artifact）保存 14 天；需要长期保存的再挂到课程或发布页。
+name: 3D video
+on:
+  workflow_dispatch:
+    inputs:
+      scene:
+        description: "场景目录（如 video3d/机械臂抓取）"
+        required: true
+        default: video3d/机械臂抓取
+      draft:
+        description: "小样（960×540、15 帧/秒）"
+        type: boolean
+        default: false
+      shards:
+        description: "并行份数（1–20）"
+        required: true
+        default: "20"
+permissions:
+  contents: read
+concurrency:
+  group: video3d-${{ github.event.inputs.scene }}
+  cancel-in-progress: true
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.m.outputs.list }}
+    steps:
+      - id: m
+        run: |
+          n=${{ github.event.inputs.shards }}
+          [ "$n" -ge 1 ] && [ "$n" -le 20 ] || { echo "份数要在 1–20"; exit 1; }
+          echo "list=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
+  render:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: true
+      matrix:
+        k: ${{ fromJson(needs.plan.outputs.list) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"          # bpy 4.2 只有 Python 3.11 的版本
+          cache: pip
+          cache-dependency-path: tools/blender/requirements.txt
+      - name: Blender（bpy）、字体
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk libegl1 libxkbcommon0 libsm6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libgl1 > /dev/null
+          pip install -q -r tools/blender/requirements.txt
+      - name: 渲染第 ${{ matrix.k }} 份
+        run: |
+          cd "${{ github.event.inputs.scene }}"
+          python3 scene.py ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --shard ${{ matrix.k }}/${{ github.event.inputs.shards }} 2>&1 | grep -v "^Fra:\|Saved:\|Time:" || true
+          ls _frames/f*.png | wc -l
+          test -n "$(ls _frames/f*.png 2>/dev/null)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frames-${{ matrix.k }}
+          path: ${{ github.event.inputs.scene }}/_frames/f*.png
+          retention-days: 1
+          compression-level: 0
+  encode:
+    needs: render
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: tools/blender/requirements.txt
+      - name: 合成
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-noto-cjk libegl1 libxkbcommon0 libsm6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libgl1 > /dev/null
+          pip install -q -r tools/blender/requirements.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: frames-*
+          merge-multiple: true
+          path: ${{ github.event.inputs.scene }}/_frames
+      - name: 合成视频
+        run: |
+          cd "${{ github.event.inputs.scene }}"
+          ls _frames/f*.png | wc -l
+          python3 scene.py ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --encode 2>&1 | tail -3
+          ls -la *.mp4 *.webm 2>/dev/null
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video
+          path: |
+            ${{ github.event.inputs.scene }}/*.mp4
+            ${{ github.event.inputs.scene }}/*.webm
+          retention-days: 14

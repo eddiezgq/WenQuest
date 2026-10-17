@@ -2,6 +2,8 @@
 运动全部自己算：夹爪走的路线（直线 + 平滑加减速）→ 逆运动学算出 6 个关节角 → 写进 Blender；零件夹住时跟着夹爪走，放上传送带后随皮带走。
 Blender（bpy 模块）只负责画：工程图风格（Workbench），中英标注和关节角面板用 PIL 叠在每一帧上，最后 ffmpeg 合成。
     python3 scene.py [--draft] [--still 秒,秒,...]       # --draft：960×540、15 帧/秒；--still：只出这几秒的单帧
+    python3 scene.py [--draft] --shard k/N               # 并行：只画第 k 份（共 N 份）的帧（GitHub 工作流 video3d.yml 用）
+    python3 scene.py [--draft] --encode                  # 帧都齐了以后只合成视频
 输出：本目录 机械臂抓取.mp4 / 机械臂抓取.webm（中间帧在 _frames/，不进仓库）。"""
 import math
 import subprocess
@@ -296,8 +298,18 @@ def hud(img, t, q, grip, k, zh, en, xray):
 # ------------------------------------------------------------------ 出片
 out = HERE / "_frames"
 out.mkdir(exist_ok=True)
-times = STILLS if STILLS else [i / FPS for i in range(int(TOTAL * FPS))]
-for n, t in enumerate(times):
+SHARD = [int(x) for x in sys.argv[sys.argv.index("--shard") + 1].split("/")] if "--shard" in sys.argv else None
+ENCODE = "--encode" in sys.argv
+NF = int(TOTAL * FPS)
+if STILLS:
+    jobs = list(enumerate(STILLS))
+elif ENCODE:
+    jobs = []
+else:
+    lo, hi = (SHARD[0] * NF // SHARD[1], (SHARD[0] + 1) * NF // SHARD[1]) if SHARD else (0, NF)
+    jobs = [(i, i / FPS) for i in range(lo, hi)]
+times = [t for _, t in jobs]
+for n, t in jobs:
     q, grip, k, zh, en, xray = pose(t)
     f = out / (f"still_{t:05.1f}.png" if STILLS else f"f{n:05d}.png")
     sc.render.filepath = str(f)
@@ -310,9 +322,10 @@ for n, t in enumerate(times):
         for o in MOTORS:
             o.hide_render = False
         sc.display.shading.show_xray, sc.render.film_transparent = False, True
-        sc.render.filepath = str(out / "_motors.png")
+        tmp = out / f"_motors_{SHARD[0] if SHARD else 0}.png"
+        sc.render.filepath = str(tmp)
         bpy.ops.render.render(write_still=True)
-        top = Image.open(out / "_motors.png").convert("RGBA")
+        top = Image.open(tmp).convert("RGBA")
         top.putalpha(top.getchannel("A").point(lambda v: int(v * min(1.0, XU))))
         img = Image.alpha_composite(img, top)
         for o in others:
@@ -320,8 +333,8 @@ for n, t in enumerate(times):
         sc.render.film_transparent = False
     hud(img.convert("RGB"), t, q, grip, k, zh, en, xray).save(f)
     if n % 50 == 0:
-        print(f"{n}/{len(times)}", flush=True)
-if not STILLS:
+        print(f"{n}/{NF}", flush=True)
+if not STILLS and not SHARD:
     name = HERE / ("机械臂抓取_小样" if DRAFT else "机械臂抓取")
     pat = str(out / "f%05d.png")
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-framerate", str(FPS), "-i", pat, "-c:v", "libx264", "-pix_fmt", "yuv420p",
