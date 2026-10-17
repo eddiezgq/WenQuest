@@ -51,10 +51,11 @@ jobs:
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk libegl1 libxkbcommon0 libsm6 libxi6 libxxf86vm1 libxfixes3 libxrender1 libgl1 > /dev/null
           pip install -q -r tools/blender/requirements.txt
+          python -m playwright install --with-deps chromium > /dev/null   # 场景用到网页虚拟实验时，运动从实验页里取
       - name: 渲染第 ${{ matrix.k }} 份
         run: |
+          python3 tools/blender/render.py "${{ github.event.inputs.scene }}" ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --shard ${{ matrix.k }}/${{ github.event.inputs.shards }} 2>&1 | grep -v "^Fra:\|Saved:\|Time:" || true
           cd "${{ github.event.inputs.scene }}"
-          python3 scene.py ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --shard ${{ matrix.k }}/${{ github.event.inputs.shards }} 2>&1 | grep -v "^Fra:\|Saved:\|Time:" || true
           ls _frames/f*.png | wc -l
           test -n "$(ls _frames/f*.png 2>/dev/null)"
       - uses: actions/upload-artifact@v4
@@ -84,10 +85,9 @@ jobs:
           path: ${{ github.event.inputs.scene }}/_frames
       - name: 合成视频
         run: |
-          cd "${{ github.event.inputs.scene }}"
-          ls _frames/f*.png | wc -l
-          python3 scene.py ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --encode 2>&1 | tail -3
-          ls -la *.mp4 *.webm 2>/dev/null
+          ls "${{ github.event.inputs.scene }}"/_frames/f*.png | wc -l
+          python3 tools/blender/render.py "${{ github.event.inputs.scene }}" ${{ github.event.inputs.draft == 'true' && '--draft' || '' }} --encode 2>&1 | tail -3
+          ls -la "${{ github.event.inputs.scene }}"/*.mp4 "${{ github.event.inputs.scene }}"/*.webm
       - uses: actions/upload-artifact@v4
         with:
           name: video

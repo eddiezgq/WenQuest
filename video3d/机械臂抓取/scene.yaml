@@ -1,0 +1,64 @@
+# 样片 A：六轴机械臂抓取与放置（第 36 轮样片，第 37 轮改成场景文件；渲染：python3 tools/blender/render.py video3d/机械臂抓取）
+name: 机械臂抓取
+title: {zh: 六轴机械臂：抓取与放置, en: "6-axis robot arm: pick and place"}
+duration: 43
+models:
+  - {id: arm, use: "gen:arm6", params: {d1: 0.45, l2: 0.55, l3: 0.50, tool: 0.19}}
+  - {id: table, use: box, size: [0.36, 0.36, 0.25], at: [0.62, -0.40, 0.125], color: table}
+  - {id: belt, use: "gen:conveyor", at: [0.65, 0.55], length: 1.9, width: 0.30, height: 0.35, speed: 0.12}
+  - {id: part1, use: item, start: [0.62, -0.40, 0.29], appear: 0, pick: 10.1, drop: 17.5, arm: arm, belt: belt}
+  - {id: part2, use: item, start: [0.62, -0.40, 0.29], appear: 18, pick: 34.05, drop: 37.85, arm: arm, belt: belt}
+points:
+  home: [0.55, 0.0, 0.75]
+  pick: [0.62, -0.40, 0.29]
+  pick_up: [0.62, -0.40, 0.51]
+  place: [0.45, 0.55, 0.39]
+  place_up: [0.45, 0.55, 0.61]
+  place2: [0.20, 0.55, 0.39]
+  place2_up: [0.20, 0.55, 0.61]
+motion:
+  - drive: pick_place
+    model: arm
+    steps:
+      - {t: [0, 5], at: home}
+      - {t: [5, 8], from: home, to: pick_up}
+      - {t: [8, 9.6], from: pick_up, to: pick}
+      - {t: [9.6, 10.6], at: pick, do: grip}
+      - {t: [10.6, 12], from: pick, to: pick_up, holding: true}
+      - {t: [12, 15.5], from: pick_up, to: place_up, holding: true}
+      - {t: [15.5, 17], from: place_up, to: place, holding: true}
+      - {t: [17, 18], at: place, do: release}
+      - {t: [18, 21], from: place, to: home}
+      - {t: [21, 31], at: home}
+      - {t: [31, 33], from: home, to: pick_up}
+      - {t: [33, 33.8], from: pick_up, to: pick}
+      - {t: [33.8, 34.3], at: pick, do: grip}
+      - {t: [34.3, 35], from: pick, to: pick_up, holding: true}
+      - {t: [35, 36.8], from: pick_up, to: place2_up, holding: true}
+      - {t: [36.8, 37.6], from: place2_up, to: place2, holding: true}
+      - {t: [37.6, 38.1], at: place2, do: release}
+      - {t: [38.1, 40], from: place2, to: home}
+      - {t: [40, 43], at: home}
+camera:
+  - {t: 0, look: [0.45, 0.05, 0.45], az: -60, el: 27.3, dist: 3.26}
+  - {t: 5, look: [0.45, 0.05, 0.45], az: 10, el: 30, dist: 3.0}
+  - {t: 21, look: [0.45, 0.05, 0.45], az: 10, el: 30, dist: 3.0}
+  - {t: 23, look: [0.25, 0.0, 0.6], az: 0, el: 33, dist: 2.39}
+  - {t: 29, look: [0.25, 0.0, 0.6], az: -30, el: 33, dist: 2.39}
+  - {t: 31, look: [0.45, 0.05, 0.45], az: -40, el: 30, dist: 3.0}
+  - {t: 34, look: [0.45, 0.05, 0.45], az: 10, el: 30, dist: 3.0}
+effects:
+  - {kind: xray, t: [21, 31], top: [arm.motors]}
+labels:
+  - {t: [5, 8], zh: ① 移到零件上方, en: ① Move above the part}
+  - {t: [8, 9.6], zh: ② 下降, en: ② Descend}
+  - {t: [9.6, 10.6], zh: ③ 夹紧, en: ③ Grip}
+  - {t: [10.6, 12], zh: ④ 提起, en: ④ Lift}
+  - {t: [12, 15.5], zh: ⑤ 移到传送带, en: ⑤ Carry to the conveyor}
+  - {t: [15.5, 17], zh: ⑥ 放下, en: ⑥ Lower}
+  - {t: [17, 18], zh: ⑦ 松开, en: ⑦ Release}
+  - {t: [18, 21], zh: ⑧ 回原位, en: ⑧ Return home}
+  - {t: [21, 31], zh: 透视：每个关节一台伺服电机 + 减速器, en: "X-ray: a servo motor and a reducer in every joint"}
+  - {t: [31, 38.1], zh: 再来一次，快 2 倍, en: "Again, twice as fast"}
+  - {t: [38.1, 43], zh: 逆运动学：给出夹爪位置 → 算出 6 个关节角, en: "Inverse kinematics: gripper pose in, six joint angles out"}
+panel: {kind: joints, arm: arm}

@@ -1,2 +1,4 @@
 bpy==4.2.0
 pillow
+pyyaml
+playwright

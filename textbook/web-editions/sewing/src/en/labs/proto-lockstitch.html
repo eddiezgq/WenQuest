@@ -230,8 +230,8 @@ cloth.position.set(MT.XN+20,0.75,-20);cloth.receiveShadow=true;root.add(cloth);
 // ---------------------------------------------------------------- threads: upper thread from the spool to the needle, the loop round the hook, the seam
 const THREAD_MAT=new THREE.MeshStandardMaterial({color:0x3f86f0,roughness:0.55,metalness:0,emissive:0x0b2a5a});
 const BOBBIN_MAT=new THREE.MeshStandardMaterial({color:0xe0662f,roughness:0.55,metalness:0,emissive:0x3a1206});
-const tubes={};
-function tube(name,pts,mat,r){if(tubes[name]){root.remove(tubes[name]);tubes[name].geometry.dispose();tubes[name]=null;}
+const tubes={},tubePts={};
+function tube(name,pts,mat,r){tubePts[name]=pts&&pts.length>1?pts.map(q=>[q[0],q[1],q[2]]):null;if(tubes[name]){root.remove(tubes[name]);tubes[name].geometry.dispose();tubes[name]=null;}
   if(!pts||pts.length<2)return;const v=pts.map(q=>new THREE.Vector3(q[0],q[1],q[2]));
   const c=new THREE.CatmullRomCurve3(v,false,'centripetal',0.15);tubes[name]=new THREE.Mesh(new THREE.TubeGeometry(c,Math.max(40,pts.length*14),r||0.45,6,false),mat);root.add(tubes[name]);}
 const XL=MT.XN+0.8;                         // the plane in which the loop is drawn (just in front of the bobbin-case face)
@@ -456,7 +456,13 @@ function tick(dt,t){
 requestAnimationFrame(frame);
 window.__api={pose,setShell:k=>{shell=k;applyShell();},setChain:k=>{chain=k;applyChain();},setExplode:v=>{ex=v;applyExplode();},
   setPhi,setCfg:o=>{Object.assign(cfg,o);changed();},cfg:()=>cfg,ev:()=>EV,sew:()=>$('sew').click(),zoom:()=>$('zoomBtn').click(),meas:k=>{measKey=k;$('meas').hidden=false;},cam:(y,p,d,t)=>{yaw=y;pitch=p;dist=d;if(t)target.set(...t);$('spin').checked=false;},tags:v=>{$('tagsOn').checked=v;},
-  manual:on=>{manual=!!on;},step:dt=>{vt+=dt*1000;tick(dt,vt);}};
+  manual:on=>{manual=!!on;},step:dt=>{vt+=dt*1000;tick(dt,vt);},
+  // 出三维视频用（第 37 轮）：主轴累计转角 a（度）时每个零件的世界矩阵（mm，y 向上）、线的路径点、读数；Blender 照此摆放
+  dump:a=>{A=a;phi=((A%360)+360)%360;const P=pose(phi);threads(A,P.x);root.updateMatrixWorld(true);
+    const parts={};for(const m of meshes)parts[m.userData.key]=Array.from(m.matrixWorld.elements);
+    const L=K.takeup.linkPose(phi,LK0);
+    return {phi,parts,tubes:tubePts,read:{needle:MT.TIP_TDC-P.x,hook:P.hook,tk:L?L.E[1]:null,dogX:-EV.feed.X(phi),dogY:EV.feed.Y(phi),phc:PHC}};},
+  mesh:()=>M};
 })();
 </script>
 </body>
