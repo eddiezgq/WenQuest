@@ -45,6 +45,57 @@ def outline(circles, seg=48):
     return _hull(pts)
 
 
+def hull_path(circles):
+    """若干圆的凸包边界，逆时针：[("arc", (cx, cz), r, a0, a1)（度，a1 > a0）, ("line", (x0, z0), (x1, z1)), …]。
+    先用细采样找出凸包上圆的先后次序，再按外公切线精确求切点，所以轮廓是真正的圆弧加直线（数控可直接用）。"""
+    cs = [tuple(map(float, c)) for c in circles]
+    if len(cs) == 1:
+        (x, z, r), = cs
+        return [("arc", (x, z), r, 0.0, 360.0)]
+    pts, owner = [], {}
+    for k, (x, z, r) in enumerate(cs):
+        for i in range(720):
+            a = 2 * math.pi * i / 720
+            q = (round(x + r * math.cos(a), 6), round(z + r * math.sin(a), 6))
+            pts.append(q)
+            owner.setdefault(q, k)
+    hull = _hull(pts)
+    seq = []
+    for q in hull:
+        k = owner.get(q)
+        if k is not None and (not seq or seq[-1] != k):
+            seq.append(k)
+    while len(seq) > 1 and seq[0] == seq[-1]:
+        seq.pop()
+    if len(seq) == 1:
+        x, z, r = cs[seq[0]]
+        return [("arc", (x, z), r, 0.0, 360.0)]
+    tang = []                                   # 每段 i→j 的外公切线切点
+    for a, b in zip(seq, seq[1:] + seq[:1]):
+        (x1, z1, r1), (x2, z2, r2) = cs[a], cs[b]
+        dx, dz = x2 - x1, z2 - z1
+        L = math.hypot(dx, dz)
+        ux, uz = dx / L, dz / L
+        rx, rz = uz, -ux                        # 逆时针走时，外侧在右手边
+        sb = max(-1.0, min(1.0, (r1 - r2) / L))
+        cb = math.sqrt(1 - sb * sb)
+        nx, nz = cb * rx + sb * ux, cb * rz + sb * uz
+        tang.append(((x1 + r1 * nx, z1 + r1 * nz), (x2 + r2 * nx, z2 + r2 * nz)))
+    out = []
+    for i, k in enumerate(seq):
+        x, z, r = cs[k]
+        arrive = tang[i - 1][1]
+        leave = tang[i][0]
+        a0 = math.degrees(math.atan2(arrive[1] - z, arrive[0] - x))
+        a1 = math.degrees(math.atan2(leave[1] - z, leave[0] - x))
+        while a1 <= a0 + 1e-9:
+            a1 += 360
+        if a1 - a0 > 1e-6 and abs(a1 - a0 - 360) > 1e-6:
+            out.append(("arc", (x, z), r, a0, a1))
+        out.append(("line", leave, tang[i][1]))
+    return out
+
+
 def parts3d(params=None, phi=0.0):
     """主轴转角 phi 时的零件清单"""
     p = clean(params)
@@ -143,8 +194,21 @@ def _bd_solid(bd, d):
     if d["type"] == "box":
         return bd.Solid.make_box(*d["size"], bd.Plane(origin=tuple(d["base"])))
     if d["type"] == "plate":
-        pts = outline(d["circles"])
-        face = bd.Face(bd.Wire.make_polygon([(x, d["y0"], z) for x, z in pts], close=True))
+        edges = []
+        y = d["y0"]
+        for seg in hull_path(d["circles"]):
+            if seg[0] == "line":
+                (x0, z0), (x1, z1) = seg[1], seg[2]
+                if math.hypot(x1 - x0, z1 - z0) > 1e-6:
+                    edges.append(bd.Edge.make_line((x0, y, z0), (x1, y, z1)))
+            else:
+                (cx, cz), r, a0, a1 = seg[1], seg[2], seg[3], seg[4]
+                P = lambda a: (cx + r * math.cos(math.radians(a)), y, cz + r * math.sin(math.radians(a)))  # noqa: E731
+                if a1 - a0 >= 359.999:
+                    edges.append(bd.Edge.make_circle(r, bd.Plane(origin=(cx, y, cz), z_dir=(0, -1, 0))))
+                else:
+                    edges.append(bd.Edge.make_three_point_arc(P(a0), P((a0 + a1) / 2), P(a1)))
+        face = bd.Face(bd.Wire(edges))
         sol = bd.Solid.extrude(face, bd.Vector(0, d["t"], 0))
         for hx, hz, hr in d["holes"]:
             hole = bd.Solid.make_cylinder(hr, d["t"] + 2, bd.Plane(origin=(hx, d["y0"] - 1, hz), z_dir=(0, 1, 0)))
@@ -166,9 +230,20 @@ def freecad_shapes(model):
         elif d["type"] == "box":
             sh = Part.makeBox(*d["size"], V(*d["base"]))
         else:
-            pts = outline(d["circles"])
-            poly = Part.makePolygon([V(x, d["y0"], z) for x, z in pts] + [V(pts[0][0], d["y0"], pts[0][1])])
-            sh = Part.Face(poly).extrude(V(0, d["t"], 0))
+            edges = []
+            for seg in hull_path(d["circles"]):
+                if seg[0] == "line":
+                    (x0, z0), (x1, z1) = seg[1], seg[2]
+                    if math.hypot(x1 - x0, z1 - z0) > 1e-6:
+                        edges.append(Part.LineSegment(V(x0, d["y0"], z0), V(x1, d["y0"], z1)).toShape())
+                else:
+                    (cx, cz), r, a0, a1 = seg[1], seg[2], seg[3], seg[4]
+                    if a1 - a0 >= 359.999:
+                        edges.append(Part.makeCircle(r, V(cx, d["y0"], cz), V(0, -1, 0)))
+                    else:
+                        P = lambda a: V(cx + r * math.cos(math.radians(a)), d["y0"], cz + r * math.sin(math.radians(a)))  # noqa: E731
+                        edges.append(Part.Arc(P(a0), P((a0 + a1) / 2), P(a1)).toShape())
+            sh = Part.Face(Part.Wire(Part.__sortEdges__(edges))).extrude(V(0, d["t"], 0))
             for hx, hz, hr in d["holes"]:
                 sh = sh.cut(Part.makeCylinder(hr, d["t"] + 2, V(hx, d["y0"] - 1, hz), V(0, 1, 0)))
         res.append((d["name"], d["zh"], sh, tuple(d["color"])))
@@ -186,7 +261,7 @@ def freecad_macro(params=None, phi=0.0):
         "import FreeCAD as App",
         "import Part",
         "DEG = math.pi / 180",
-        inspect.getsource(_hull), inspect.getsource(outline),
+        inspect.getsource(_hull), inspect.getsource(outline), inspect.getsource(hull_path),
         "MODEL = " + json.dumps(model, ensure_ascii=False),
         inspect.getsource(freecad_shapes).replace("    import FreeCAD as App\n    import Part\n", ""),
         "doc = App.newDocument('WenQuestLockstitch')",
@@ -226,12 +301,18 @@ def to_dxf(params=None):
         minz = min(z for _, z in pts)
         sx, sz = x0 - minx, -minz
         lay = d["name"]
-        for i in range(len(pts)):
-            (ax, az), (bx, bz) = pts[i], pts[(i + 1) % len(pts)]
-            ents += ["0", "LINE", "8", lay, "10", f"{ax + sx:.4f}", "20", f"{az + sz:.4f}", "11", f"{bx + sx:.4f}", "21", f"{bz + sz:.4f}"]
+        for seg in hull_path(d["circles"]):
+            if seg[0] == "line":
+                (ax, az), (bx, bz) = seg[1], seg[2]
+                ents += ["0", "LINE", "8", lay, "10", f"{ax + sx:.4f}", "20", f"{az + sz:.4f}", "11", f"{bx + sx:.4f}", "21", f"{bz + sz:.4f}"]
+            elif seg[4] - seg[3] >= 359.999:
+                ents += ["0", "CIRCLE", "8", lay, "10", f"{seg[1][0] + sx:.4f}", "20", f"{seg[1][1] + sz:.4f}", "40", f"{seg[2]:.4f}"]
+            else:
+                ents += ["0", "ARC", "8", lay, "10", f"{seg[1][0] + sx:.4f}", "20", f"{seg[1][1] + sz:.4f}", "40", f"{seg[2]:.4f}",
+                         "50", f"{seg[3] % 360:.4f}", "51", f"{seg[4] % 360:.4f}"]
         for hx, hz, hr in d["holes"]:
             ents += ["0", "CIRCLE", "8", lay, "10", f"{hx + sx:.4f}", "20", f"{hz + sz:.4f}", "40", f"{hr:.4f}"]
         ents += ["0", "TEXT", "8", lay, "10", f"{x0:.2f}", "20", f"{-8:.2f}", "40", "3", "1", f"{d['name']} t={d['t']:g}"]
-        x0 += (maxx - minx) + 15
+        x0 += max(maxx - minx, 2.1 * len(d["name"]) + 10) + 15
     body = ["0", "SECTION", "2", "HEADER", "9", "$INSUNITS", "70", "4", "0", "ENDSEC", "0", "SECTION", "2", "ENTITIES"] + ents + ["0", "ENDSEC", "0", "EOF"]
     return ("\n".join(body) + "\n").encode("ascii")

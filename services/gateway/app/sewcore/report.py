@@ -182,7 +182,7 @@ def calc_report(params=None, lang="zh", project="", company=""):
         d.add_paragraph(_t(f"{len(R['checks'])} 项校核：不合格 {len(bad)} 项，需注意 {len(warn)} 项。",
                            f"{len(R['checks'])} checks: {len(bad)} fail, {len(warn)} need attention.", lang))
         for c in bad + warn:
-            d.add_paragraph(f"{c['name'][lang]}：{c['value']}（{_t('判据', 'criterion', lang)} {c['limit']}）{c['advice'][lang]}", style="List Bullet")
+            d.add_paragraph(f"{c['name'][lang]}：{c['value'][lang]}（{_t('判据', 'criterion', lang)} {c['limit'][lang]}）{c['advice'][lang]}", style="List Bullet")
     if "trial" in R:
         cn = R["trial"]["counts"]
         d.add_paragraph(_t(f"虚拟试缝 30 针：成缝 {cn['ok']}，跳针 {cn['skip']}，碰针 {cn['hit']}，划线 {cn['cut']}，断线 {cn['break']}。",
@@ -221,7 +221,7 @@ def calc_report(params=None, lang="zh", project="", company=""):
     d.add_heading(_t("四、校核", "4 Checks", lang), 1)
     t = _table(d, [_t("讲次", "Lecture", lang), _t("校核项", "Check", lang), _t("数值", "Value", lang), _t("判据", "Criterion", lang),
                    _t("结论", "Result", lang)],
-               [[c["lecture"], c["name"][lang], c["value"], c["limit"], STATE[c["state"]][1 if lang == "en" else 0]] for c in R["checks"]])
+               [[c["lecture"], c["name"][lang], c["value"][lang], c["limit"][lang], STATE[c["state"]][1 if lang == "en" else 0]] for c in R["checks"]])
     for i, c in enumerate(R["checks"]):
         cell = t.rows[i + 1].cells[4]
         for run in cell.paragraphs[0].runs:
@@ -307,7 +307,7 @@ def params_xlsx(params=None, lang="zh", project=""):
     ws3 = wb.create_sheet(_t("校核", "Checks", lang))
     ws3.append([_t("讲次", "Lecture", lang), _t("校核项", "Check", lang), _t("数值", "Value", lang), _t("判据", "Criterion", lang), _t("结论", "Result", lang)])
     for c in R["checks"]:
-        ws3.append([c["lecture"], c["name"][lang], c["value"], c["limit"], STATE[c["state"]][1 if lang == "en" else 0]])
+        ws3.append([c["lecture"], c["name"][lang], c["value"][lang], c["limit"][lang], STATE[c["state"]][1 if lang == "en" else 0]])
         ws3.cell(ws3.max_row, 5).font = Font(bold=True, color=STATE[c["state"]][2])
     ws4 = wb.create_sheet(_t("运动曲线", "Curves", lang))
     C = R["curves"]

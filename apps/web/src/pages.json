@@ -82,6 +82,13 @@
       }
     },
     {
+      "path": "pages/sewing/sewing",
+      "style": {
+        "navigationBarTitleText": "缝纫机设计",
+        "h5": { "titleNView": false }
+      }
+    },
+    {
       "path": "pages/video3d/video3d",
       "style": {
         "navigationBarTitleText": "三维视频",

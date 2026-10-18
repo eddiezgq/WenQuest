@@ -46,6 +46,10 @@
         <text class="gicon">◈</text>
         <text class="glabel">{{ t("v3.nav") }}</text>
       </view>
+      <view v-if="sewOn" class="gitem" :class="{ on: nav === 'sewing' }" @click="go('sewing')">
+        <text class="gicon">⚙</text>
+        <text class="glabel">{{ t("sew.nav") }}</text>
+      </view>
       <view v-if="cm && cm.member" class="gitem" :class="{ on: nav === 'committee' }" @click="go('committee')">
         <text class="gicon">✓</text>
         <text class="glabel">{{ t("rev.nav") }}</text>
@@ -125,7 +129,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { admin, accountApi, loadAdmin } from "../accountApi";
-import { api, user, v3Allowed } from "../api";
+import { api, request, user, v3Allowed } from "../api";
 import { t, toggleLocale } from "../i18n";
 import { type CourseData, courseMenu, studentPreview } from "../store";
 
@@ -138,6 +142,7 @@ const props = defineProps<{
 }>();
 
 const accountOpen = ref(false);
+const sewOn = ref(props.nav === "sewing");
 const cm = ref<{ member: boolean; waiting?: number } | null>(null);
 const initial = computed(() => (user.value?.fullname || "?").trim().slice(0, 1).toUpperCase());
 const menu = computed(() => (props.course ? courseMenu(props.course) : []));
@@ -145,7 +150,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
-  if (["catalog", "admin", "apply", "committee", "textbook", "whiteboard", "video3d"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
+  if (["catalog", "admin", "apply", "committee", "textbook", "whiteboard", "video3d", "sewing"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
@@ -170,6 +175,8 @@ onMounted(() => {
   loadAdmin();
   if (user.value?.can_create_courses) v3Allowed.value = true;
   else if (user.value && v3Allowed.value === null) api.v3Access().then((r) => (v3Allowed.value = r.allowed)).catch(() => {});
+  // 缝纫机设计软件（第 39 轮）：已开通企业账号的人在左栏看到入口
+  if (user.value && !sewOn.value) request<{ licensed: boolean }>("GET", "/api/v1/sewing/me").then((r) => (sewOn.value = r.licensed)).catch(() => {});
   if (user.value?.can_create_courses || user.value) api.committeeMe().then((r) => (cm.value = r)).catch(() => {});
 });
 </script>

@@ -58,7 +58,7 @@ def show_checks(obj=None):
     t = QtW.QTableWidget(len(R.get("checks", [])), 5)
     t.setHorizontalHeaderLabels(["结论", "校核项", "数值", "判据", "建议"])
     for i, c in enumerate(R.get("checks", [])):
-        cells = [WORD[c["state"]], "第{}讲 {}".format(c["lecture"], c["name"]["zh"]), c["value"], c["limit"], c["advice"]["zh"]]
+        cells = [WORD[c["state"]], "第{}讲 {}".format(c["lecture"], c["name"]["zh"]), c["value"]["zh"], c["limit"]["zh"], c["advice"]["zh"]]
         for j, v in enumerate(cells):
             it = QtW.QTableWidgetItem(str(v))
             if j == 0:
@@ -160,7 +160,7 @@ class Cmd:
         self.text, self.tip, self.fn, self.needs = text, tip, fn, needs
 
     def GetResources(self):
-        return {"MenuText": self.text, "ToolTip": self.tip, "Pixmap": ICON}
+        return {"MenuText": self.text, "ToolTip": self.tip}      # 不给图标：工具栏直接显示中文按钮名，一看就懂
 
     def Activated(self):
         try:

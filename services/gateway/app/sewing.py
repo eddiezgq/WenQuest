@@ -126,6 +126,7 @@ def register(app, m) -> None:
         limit(req)
         r = sewcore.analyze(body.params)
         r["proto"] = sewcore.proto_cfg(r["params"])
+        r["card"] = sewcore.adjust_card(r["params"])
         return r
 
     @app.get("/api/v1/sewing/proto")

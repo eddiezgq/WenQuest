@@ -193,8 +193,12 @@ def analyze(params=None, trial=True):
     # ---- 校核：每条 {key, 组, 名称, 数值, 判据, 结论 ok/warn/bad, 讲次, 建议} ----
     checks = []
 
+    def bi(x):
+        return dict(zh=x[0], en=x[1]) if isinstance(x, tuple) else dict(zh=x, en=x)
+
     def chk(key, grp, zh, en, value, limit, state, lec, adv_zh="", adv_en=""):
-        checks.append(dict(key=key, group=grp, name=dict(zh=zh, en=en), value=value, limit=limit, state=state, lecture=lec,
+        """value / limit：纯数字写一个字符串；带文字的写 (中文, English)"""
+        checks.append(dict(key=key, group=grp, name=dict(zh=zh, en=en), value=bi(value), limit=bi(limit), state=state, lecture=lec,
                            advice=dict(zh=adv_zh, en=adv_en)))
 
     chk("needle_force", "needle", "针杆下止点惯性力", "Needle-bar inertia force at BDC", f"{F_bdc:.0f} N", f"≤ {p['F_lim']:.0f} N",
@@ -205,26 +209,28 @@ def analyze(params=None, trial=True):
         "ok" if 0.2 <= lam <= 0.4 else "warn", 3,
         "λ 太大二阶惯性力大、针杆侧向力大；太小机头高度增加。" if not 0.2 <= lam <= 0.4 else "",
         "Too large: strong second-order force and side load; too small: a taller head." if not 0.2 <= lam <= 0.4 else "")
-    chk("catch_rise", "hook", "钩线时机针回升量", "Needle rise when the hook catches", f"{G['h']:.2f} mm（{G['fc']:.1f}°）", "1.6–2.5 mm",
+    chk("catch_rise", "hook", "钩线时机针回升量", "Needle rise when the hook catches", (f"{G['h']:.2f} mm（{G['fc']:.1f}°）", f"{G['h']:.2f} mm ({G['fc']:.1f}°)"), "1.6–2.5 mm",
         "ok" if 1.6 <= G["h"] <= 2.5 else "bad", 5,
         "调旋梭定时：回升量太小钩线太早、太大线环已收缩，都会跳针。" if not 1.6 <= G["h"] <= 2.5 else "",
         "Adjust the hook timing: too little rise catches too early, too much catches a shrinking loop; both skip." if not 1.6 <= G["h"] <= 2.5 else "")
     res_txt = {"ok": ("钩住线环", "loop caught"), "skip": ("跳针", "skip"), "hit": ("梭尖碰针", "hook hits needle"), "cut": ("梭尖划线", "hook splits thread")}
     chk("hook", "hook", "钩线（线环余量、间隙、梭尖高度）", "Loop catch (margin, clearance, point height)",
-        f"{res_txt[G['res']][0]}；间隙 {G['g']:.2f} mm，梭尖高于针眼 {G['D']:.2f} mm", "钩住且不碰针、不划线",
+        (f"{res_txt[G['res']][0]}；间隙 {G['g']:.2f} mm，梭尖高于针眼 {G['D']:.2f} mm",
+         f"{res_txt[G['res']][1]}; clearance {G['g']:.2f} mm, point {G['D']:.2f} mm above the eye"),
+        ("钩住且不碰针、不划线", "caught, no hit, no split"),
         "ok" if G["res"] == "ok" else "bad", 5,
         {"hit": "换粗针后要把旋梭沿轴向移出，恢复间隙。", "cut": "降低针杆或提前钩线。", "skip": "按调机卡重新定旋梭定时、针杆高度、梭尖间隙。"}.get(G["res"], ""),
         {"hit": "After fitting a thicker needle, move the hook axially to restore the clearance.", "cut": "Lower the needle bar or catch earlier.",
          "skip": "Reset hook timing, needle-bar height and clearance as on the adjustment card."}.get(G["res"], ""))
     if TK["ok"]:
-        chk("takeup_margin", "takeup", "绕梭时挑线余量（最小）", "Take-up margin round the bobbin (min)", f"{TK['margin']:.1f} mm（{TK['at']}°）", "≥ 1 mm",
+        chk("takeup_margin", "takeup", "绕梭时挑线余量（最小）", "Take-up margin round the bobbin (min)", (f"{TK['margin']:.1f} mm（{TK['at']}°）", f"{TK['margin']:.1f} mm ({TK['at']}°)"), "≥ 1 mm",
             "ok" if TK["margin"] >= 1 else "bad", 4,
             "加大挑线曲柄半径或线眼到 P 的距离，或把过线板往放线多的方向调。" if TK["margin"] < 1 else "",
             "Increase the take-up crank radius or the P–eye length, or move the thread guide to give more thread." if TK["margin"] < 1 else "")
         chk("takeup_neg", "takeup", "针眼入布后欠线", "Thread shortfall after the eye enters", f"{TK['neg']:.1f} mm", "≤ 1 mm",
             "ok" if TK["neg"] <= 1 else "bad", 4, "欠线超过线的弹性伸长，线环张不开。" if TK["neg"] > 1 else "",
             "More shortfall than the thread can stretch: the loop cannot open." if TK["neg"] > 1 else "")
-        chk("takeup_pre", "takeup", "针眼入布前多放的线", "Thread released before the eye enters", f"{TK['pre']:.1f} mm", f"≤ 挑线簧行程 {p['stroke']:.1f} mm",
+        chk("takeup_pre", "takeup", "针眼入布前多放的线", "Thread released before the eye enters", f"{TK['pre']:.1f} mm", (f"≤ 挑线簧行程 {p['stroke']:.1f} mm", f"≤ check-spring stroke {p['stroke']:.1f} mm"),
             "ok" if TK["pre"] <= p["stroke"] else "warn", 4, "多出的线挑线簧收不住，面线松垮。" if TK["pre"] > p["stroke"] else "",
             "The check spring cannot take up the extra thread; the upper thread goes slack." if TK["pre"] > p["stroke"] else "")
         mu0, mu1 = TK["mu"]
@@ -232,19 +238,19 @@ def analyze(params=None, trial=True):
             "ok" if mu0 >= 40 and mu1 <= 140 else "warn", 4, "传动角太小，摇杆受力大、磨损快。" if not (mu0 >= 40 and mu1 <= 140) else "",
             "A small transmission angle loads and wears the rocker." if not (mu0 >= 40 and mu1 <= 140) else "")
     else:
-        chk("takeup_ok", "takeup", "挑线四杆能否整周转动", "Take-up linkage turns a full revolution", "不能（装不上）", "能整周转动", "bad", 4,
+        chk("takeup_ok", "takeup", "挑线四杆能否整周转动", "Take-up linkage turns a full revolution", ("不能（装不上）", "no (cannot be assembled)"), ("能整周转动", "full revolution"), "bad", 4,
             "四杆尺寸不满足整周转动，改挑线杆或摇杆长度。", "The four-bar cannot turn a full revolution; change the lever or rocker length.")
     chk("feed_drag", "feed", "机针在布中时送布量", "Feed while the needle is in the fabric", f"{F['drag']:.2f} mm", "≤ 0.05 mm",
         "ok" if F["drag"] <= 0.05 else "bad", 6, "送布太晚：提前送布定时。" if F["drag"] > 0.05 else "",
         "Feed too late: advance the feed timing." if F["drag"] > 0.05 else "")
-    chk("feed_slip", "feed", "实际针距 / 设定针距", "Actual / set stitch length", f"{F['eps'] * 100:.0f}%（不打滑需压力 ≥ {F['Pmin']:.2f}）", "100%",
+    chk("feed_slip", "feed", "实际针距 / 设定针距", "Actual / set stitch length", (f"{F['eps'] * 100:.0f}%（不打滑需压力 ≥ {F['Pmin']:.2f}）", f"{F['eps'] * 100:.0f}% (no slip needs pressure ≥ {F['Pmin']:.2f})"), "100%",
         "ok" if F["eps"] >= 0.999 else "warn", 6, "加大压脚压力或牙高。" if F["eps"] < 0.999 else "",
         "Raise the presser-foot pressure or the dog height." if F["eps"] < 0.999 else "")
     chk("feed_back", "feed", "回拖", "Back-drag", f"{F['back']:.2f} mm", "≤ 0.05 mm", "ok" if F["back"] <= 0.05 else "warn", 6,
         "水平与抬牙相位不配，调水平送布相位。" if F["back"] > 0.05 else "", "Horizontal and lift phases mismatch: adjust the horizontal phase." if F["back"] > 0.05 else "")
     chk("feed_ply", "feed", "上下层错位（缝 40 cm）", "Ply shift over 40 cm", f"{F['ply']:.1f} mm", "≤ 3 mm", "ok" if F["ply"] <= 3 else "warn", 6,
         "滑料用针送布或综合送布。" if F["ply"] > 3 else "", "Use needle feed or compound feed for slippery fabric." if F["ply"] > 3 else "")
-    chk("feed_marks", "feed", "牙痕与压痕", "Dog and foot marks", "有" if F["marks"] else "无", "无", "warn" if F["marks"] else "ok", 6,
+    chk("feed_marks", "feed", "牙痕与压痕", "Dog and foot marks", ("有", "yes") if F["marks"] else ("无", "none"), ("无", "none"), "warn" if F["marks"] else "ok", 6,
         "降低牙高或压脚压力。" if F["marks"] else "", "Lower the dog or the foot pressure." if F["marks"] else "")
     chk("tension_bal", "tension", "交织点位置（0.5 = 布中间）", "Interlock position (0.5 = mid-fabric)", f"{E['z']:.2f}", "0.40–0.60",
         "ok" if E["bal"] else "warn", 7, "面线、底线张力比例不对。" if not E["bal"] else "", "Upper/bobbin tension ratio is wrong." if not E["bal"] else "")
@@ -252,16 +258,16 @@ def analyze(params=None, trial=True):
         "峰值张力太大会断线：降夹线器张力或换粗一号线。" if E["brk"] else "", "Peak tension too high: lower the disc tension or use a heavier thread." if E["brk"] else "")
     chk("tension_pucker", "tension", "张力起皱", "Tension pucker", f"{E['pucker']:.2f}%", f"≤ {E['f']['plim']}%", "ok" if not E["pk"] else "bad", 7,
         "两根线张力都偏高，按比例一起降。" if E["pk"] else "", "Both tensions are high; lower them together." if E["pk"] else "")
-    chk("tension_loose", "tension", "线迹收紧", "Stitch tightness", f"较小张力 {min(E['Tn'], p['Tb']):.0f} cN", f"≥ {E['f']['Tmin']} cN",
+    chk("tension_loose", "tension", "线迹收紧", "Stitch tightness", (f"较小张力 {min(E['Tn'], p['Tb']):.0f} cN", f"lower tension {min(E['Tn'], p['Tb']):.0f} cN"), f"≥ {E['f']['Tmin']} cN",
         "ok" if not E["loose"] else "warn", 7, "", "")
-    chk("tension_jam", "tension", "线与面料匹配", "Thread suits the fabric", THREAD[p["th"]]["name"], "不粗于面料允许", "ok" if not E["jam"] else "bad", 7,
+    chk("tension_jam", "tension", "线与面料匹配", "Thread suits the fabric", THREAD[p["th"]]["name"], ("不粗于面料允许", "not coarser than the fabric allows"), "ok" if not E["jam"] else "bad", 7,
         "换细一号的线和针。" if E["jam"] else "", "Use a finer thread and needle." if E["jam"] else "")
     chk("frame_force", "frame", "整机惯性力（最大合力）", "Machine inertia force (peak)", f"{fmax:.0f} N", "≤ 550 N", "ok" if fmax <= 550 else "warn", 8,
         "调平衡率，或降低最高转速。" if fmax > 550 else "", "Adjust the balance ratio or lower the top speed." if fmax > 550 else "")
-    chk("frame_res", "frame", "二阶激振频率 / 机壳固有频率", "2nd-order excitation / frame natural frequency", f"{r2:.3f}（共振转速 {n_res:.0f} r/min）", "≤ 0.90",
+    chk("frame_res", "frame", "二阶激振频率 / 机壳固有频率", "2nd-order excitation / frame natural frequency", (f"{r2:.3f}（共振转速 {n_res:.0f} r/min）", f"{r2:.3f} (resonance at {n_res:.0f} r/min)"), "≤ 0.90",
         "ok" if r2 <= 0.9 else "bad", 23, "离共振太近：机壳加筋提高固有频率，或降低最高转速。" if r2 > 0.9 else "",
         "Too close to resonance: stiffen the frame to raise its natural frequency, or lower the top speed." if r2 > 0.9 else "")
-    chk("chain", "manuf", "梭尖间隙合格率（装配调整后）", "Hook-clearance yield (after adjustment)", f"{CH['y_adj'] * 100:.2f}%（互换装配 {CH['y_int'] * 100:.1f}%）", "≥ 99%",
+    chk("chain", "manuf", "梭尖间隙合格率（装配调整后）", "Hook-clearance yield (after adjustment)", (f"{CH['y_adj'] * 100:.2f}%（互换装配 {CH['y_int'] * 100:.1f}%）", f"{CH['y_adj'] * 100:.2f}% (interchangeable: {CH['y_int'] * 100:.1f}%)"), "≥ 99%",
         "ok" if CH["y_adj"] >= 0.99 else "bad", 23, "", "")
 
     # ---- 曲线：每 2° 一个点 ----
