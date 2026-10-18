@@ -30,9 +30,10 @@ clips:
     dur: 12
     steps:
       - {at: 0, press: ["[data-m=xray]", "[data-v=front]"], set: {spd: 30}, js: "var c=document.getElementById('paths');if(!c.checked)c.click();var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
-  rssr:          # 实验 9-2：下弯针 RSSR 三维动画（自动转动）
+  rssr:          # 实验 9-2：下弯针 RSSR 三维动画（自动转动）。英文页文字长、三维视图更靠下，窗口要高一些，否则下半截是黑的
     page: rssr
     selector: "#cv"
+    vh: 1400
     dur: 10
     steps:
       - {at: 0, press: "[data-p=LL]", js: "var p=document.getElementById('play');if(p.getAttribute('aria-pressed')==='false')p.click()"}

@@ -1,0 +1,27 @@
+# 实验 22.4 的指导书与报告模板。目的、场景、参数、任务取自 lab22_4.js。
+原理:
+  - 式: ["直线：p(ℓ) = p_B + ℓ û，ṗ = û ℓ̇，p̈ = û ℓ̈；每个控制周期求逆解，取与上一周期最近的一组", "Line: p(ℓ) = p_B + ℓ û, ṗ = û ℓ̇, p̈ = û ℓ̈; solve the IK every cycle and take the solution nearest the previous one"]
+  - 式: ["关节速度与加速度：θ̇ = J_s⁻¹ V_s，θ̈ = J_s⁻¹(V̇_s − J̇_s θ̇)", "Joint velocity and acceleration: θ̇ = J_s⁻¹ V_s, θ̈ = J_s⁻¹(V̇_s − J̇_s θ̇)"]
+  - 式: ["沿路径允许的速度：ℓ̇ ≤ min_i v_i,max / |θ_i′(ℓ)|", "Admissible path speed: ℓ̇ ≤ min_i v_i,max / |θ_i′(ℓ)|"]
+  - 式: ["过三点的圆：c = p₁ + (‖b‖²(n × a) + ‖a‖²(b × n))/(2‖n‖²)，a = p₂ − p₁，b = p₃ − p₁，n = a × b", "Circle through three points: c = p₁ + (‖b‖²(n × a) + ‖a‖²(b × n))/(2‖n‖²), a = p₂ − p₁, b = p₃ − p₁, n = a × b"]
+步骤:
+  - ["场景“送入卡盘”：选做法 0，按“开始”，记录 TCP 偏离直线的最大距离和各关节的最大速度（任务 1），填入表 1。", "Scene “Into the chuck”: choose method 0, press Start, and record the largest deviation and the largest joint speeds (task 1) in Table 1."]
+  - ["选做法 1，重复（任务 2）。比较两种做法的关节最大速度。", "Choose method 1 and repeat (task 2). Compare the largest joint speeds of the two methods."]
+  - ["场景“经过手腕奇异”：0.1 m/s 匀速走完全程（任务 3），记录关节 4、6 的最大转速；再选自动减速（任务 4），记录用时，填入表 2。", "Scene “Past the wrist singularity”: go the whole way at a constant 0.1 m/s (task 3) and record the peak speeds of joints 4 and 6; then choose automatic slowing (task 4) and record the time in Table 2."]
+  - ["把直线速度改为 0.05 m/s 和 0.2 m/s，重复上一步，填入表 2。", "Change the line speed to 0.05 m/s and 0.2 m/s and repeat, filling in Table 2."]
+  - ["生活场景“蛋糕裱花”：移动中间点，使圆弧半径在 8～10 cm 之间，按“开始”走完一次（任务 5）。", "Everyday scene “Piping a cake”: move the middle point until the arc radius is 8 to 10 cm and pipe it once (task 5)."]
+数据表:
+  - 标题: ["表 1  送入卡盘的两种做法", "Table 1  Two ways into the chuck"]
+    表头: ["做法", "最大偏离 / mm", "关节最大速度 / (°/s)", "最快的关节"]
+    表头英文: ["Method", "Largest deviation / mm", "Largest joint speed / (°/s)", "Fastest joint"]
+    行: [["关节空间五次多项式", "", "", ""], ["笛卡尔直线", "", "", ""]]
+    行英文: [["Joint-space quintic", "", "", ""], ["Cartesian line", "", "", ""]]
+  - 标题: ["表 2  经过手腕奇异附近", "Table 2  Near the wrist singularity"]
+    表头: ["直线速度 / (m/s)", "匀速：关节 4 最大转速 / (°/s)", "匀速：关节 6 最大转速 / (°/s)", "自动减速：用时 / s"]
+    表头英文: ["Line speed / (m/s)", "Constant: joint 4 peak / (°/s)", "Constant: joint 6 peak / (°/s)", "Slowed: time / s"]
+    行: [["0.05", "", "", ""], ["0.1", "", "", ""], ["0.2", "", "", ""]]
+注意:
+  - ["工位的尺寸、送料的速度和加速度都是示意值；UR5e 的关节速度上限 180°/s 取自厂商资料。", "The cell dimensions and the pushing speed and acceleration are illustrative; the UR5e joint speed limit of 180°/s is from the manufacturer's data."]
+  - ["“自动减速”只按速度上限减速，没有限制加速度；同时限制加速度的做法见 22.6 节。", "“Slow down” limits only the speed, not the acceleration; limiting both is the subject of Section 22.6."]
+思考题:
+  - ["自动减速时，用时随直线速度的设定值怎样变化？为什么设定值加大到一定程度后，用时几乎不再减少？", "With automatic slowing, how does the time change with the set line speed? Why does it hardly decrease beyond a certain setting?"]

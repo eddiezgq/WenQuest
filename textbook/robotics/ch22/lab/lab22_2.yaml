@@ -1,0 +1,27 @@
+# 实验 22.2 的指导书与报告模板。目的、场景、参数、任务取自 lab22_2.js。
+原理:
+  - 式: ["梯形：t_a = v/a，T = L/v + v/a（L ≥ v²/a）；三角形：T = 2√(L/a)", "Trapezoid: t_a = v/a, T = L/v + v/a (L ≥ v²/a); triangle: T = 2√(L/a)"]
+  - 式: ["S 形 = 同一 v′、a 的梯形曲线用宽 t_j 的盒形窗滑动平均：T_S = L/v′ + v′/a + a/j，j = a/t_j", "S-curve = the trapezoid with the same v′, a averaged over a box of width t_j: T_S = L/v′ + v′/a + a/j, j = a/t_j"]
+  - 式: ["弹性模态 φ'' + 2ζωφ' + ω²φ = −θ̈；无阻尼时 A_S = A |sin(π f_n t_j)/(π f_n t_j)|", "Flexible mode φ'' + 2ζωφ' + ω²φ = −θ̈; without damping A_S = A |sin(π f_n t_j)/(π f_n t_j)|"]
+  - 式: ["振幅衰减到 A₀ 的等待时间 ln(A/A₀)/(ζω)", "Waiting time for the amplitude to decay to A₀: ln(A/A₀)/(ζω)"]
+步骤:
+  - ["场景“关节 1 带弹性末端”：梯形曲线、默认限值，按“开始”，记录运动时间、残余振幅和等待时间（任务 1），填入表 1。", "Scene “Joint 1 with a flexible tip”: trapezoid with the default limits; press Start and record the motion time, residual amplitude and waiting time (task 1) in Table 1."]
+  - ["减小转角，直到测量区显示“三角形”（任务 2）；记下此时的转角，与 v²/a 比较。", "Reduce the rotation until the readout shows “triangle” (task 2); note the rotation and compare it with v²/a."]
+  - ["改为 S 形曲线，t_j 从 0.02 s 逐步加大到 0.3 s，记录残余振幅，填入表 2；找出振幅最小的 t_j（任务 3）。", "Switch to the S-curve and raise t_j from 0.02 s to 0.3 s, recording the residual amplitude in Table 2; find the t_j with the smallest amplitude (task 3)."]
+  - ["生活场景“电梯”：选 S 形曲线，调 t_j 使加加速度不超过 1.5 m/s³，在 16 s 以内到达，运行一次（任务 4）。", "Everyday scene “Lift”: choose the S-curve and set t_j so that the jerk is at most 1.5 m/s³ and the lift arrives within 16 s; run it once (task 4)."]
+数据表:
+  - 标题: ["表 1  两种曲线的比较（转角 103.4°）", "Table 1  The two profiles compared (rotation 103.4°)"]
+    表头: ["曲线", "t_j / s", "运动时间 / s", "残余振幅 / mm", "等待时间 / s", "起动到可以送料 / s"]
+    表头英文: ["Profile", "t_j / s", "Motion time / s", "Residual amplitude / mm", "Waiting time / s", "Start to ready / s"]
+    行: [["梯形", "—", "", "", "", ""], ["S 形", "0.1", "", "", "", ""], ["S 形", "0.125", "", "", "", ""]]
+    行英文: [["Trapezoid", "—", "", "", "", ""], ["S-curve", "0.1", "", "", "", ""], ["S-curve", "0.125", "", "", "", ""]]
+  - 标题: ["表 2  残余振幅随 t_j 的变化", "Table 2  Residual amplitude against t_j"]
+    表头: ["t_j / s", "0.05", "0.1", "0.125", "0.15", "0.2", "0.25", "0.3"]
+    表头英文: ["t_j / s", "0.05", "0.1", "0.125", "0.15", "0.2", "0.25", "0.3"]
+    行: [["残余振幅 / mm", "", "", "", "", "", "", ""]]
+    行英文: [["Residual amplitude / mm", "", "", "", "", "", "", ""]]
+注意:
+  - ["固有频率 8 Hz、阻尼比 0.02、加速度上限 6 rad/s² 都是示意值；UR5e 的速度上限 180°/s 取自厂商资料。", "The 8 Hz natural frequency, damping ratio 0.02 and acceleration limit of 6 rad/s² are illustrative; the UR5e velocity limit of 180°/s is from the manufacturer's data."]
+  - ["画面中末端的振动放大了 150 倍；手臂按实际时间的一半速度播放，电梯快放 3 倍。", "The tip vibration is drawn 150 times larger; the arm plays at half speed and the lift three times faster."]
+思考题:
+  - ["若末端的固有频率随负载在 6～10 Hz 之间变化，t_j 应当怎样选？", "If the natural frequency varies between 6 and 10 Hz with the load, how should t_j be chosen?"]

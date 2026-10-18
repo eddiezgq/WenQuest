@@ -1,0 +1,400 @@
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:00,361 INFO synthesis text On the right is the threeD animation from Virtual Lab nine-two.
+2026-10-18 05:19:04,025 INFO yield speech len 6.76, rtf 0.542082201094317
+
+100%|██████████| 1/1 [00:03<00:00,  3.83s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:04,072 WARNING synthesis text How do we get the speed? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-18 05:19:04,199 INFO synthesis text How do we get the speed?
+2026-10-18 05:19:06,191 INFO yield speech len 3.52, rtf 0.5660254169594158
+
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:06,365 INFO synthesis text The two ends of a rigid link have equal velocity components along the link.
+2026-10-18 05:19:10,090 INFO yield speech len 6.88, rtf 0.541433899901634
+
+100%|██████████| 1/1 [00:03<00:00,  3.89s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:10,263 INFO synthesis text That gives theta-dot as d dot A-dot over d dot t.
+2026-10-18 05:19:13,901 INFO yield speech len 6.88, rtf 0.5287644821544026
+
+100%|██████████| 1/1 [00:03<00:00,  3.81s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.81s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:14,133 INFO synthesis text When the denominator goes to zero, it's a dead point and speed and load blow up; the transmission angle measures how far we are from it.
+2026-10-18 05:19:19,102 INFO yield speech len 9.84, rtf 0.5050033815507966
+
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:19,285 INFO synthesis text At seven thousand r/min the rocker peaks at about one hundred and eighty-two radians per second, the looper tip at about six.nine metres per second, and the minimum transmission angle is forty-nine.five degrees, above the usual forty-degree limit.
+2026-10-18 05:19:31,024 INFO yield speech len 22.84, rtf 0.5139715930417623
+
+100%|██████████| 1/1 [00:11<00:00, 11.93s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:31,220 INFO synthesis text Beyond a crank radius of about ten.six millimetres, the mechanism can no longer be assembled.
+2026-10-18 05:19:35,301 INFO yield speech len 7.92, rtf 0.5152487092547946
+
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:35,354 WARNING synthesis text Differential feed: keeping the edge flat. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-18 05:19:35,554 INFO synthesis text Differential feed: keeping the edge flat.
+2026-10-18 05:19:37,807 INFO yield speech len 3.92, rtf 0.5745289885267919
+
+100%|██████████| 1/1 [00:02<00:00,  2.50s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:37,981 INFO synthesis text An overlocker has one feed dog behind the needle and one in front.
+2026-10-18 05:19:41,015 INFO yield speech len 5.84, rtf 0.5194279429030745
+
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:41,190 INFO synthesis text The main dog behind the needle feeds one stitch length s each stitch; the differential dog in front feeds s_d.
+2026-10-18 05:19:46,344 INFO yield speech len 10.0, rtf 0.5153696298599243
+
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+cv2: 160/213 句，用时 12.9 分钟，预计还要 4.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:46,393 WARNING synthesis text Their ratio is the differential ratio D. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-18 05:19:46,519 INFO synthesis text Their ratio is the differential ratio D.
+2026-10-18 05:19:49,125 INFO yield speech len 4.72, rtf 0.5521056005510233
+
+100%|██████████| 1/1 [00:02<00:00,  2.77s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:49,298 INFO synthesis text With D greater than one, the front dog feeds more and crowds the fabric between the dogs, cancelling the stretch of a knit.
+2026-10-18 05:19:54,674 INFO yield speech len 10.48, rtf 0.5130204308123989
+
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:54,852 INFO synthesis text With D less than one it feeds less and gently pulls a slippery woven apart.
+2026-10-18 05:19:58,788 INFO yield speech len 7.36, rtf 0.5348427140194436
+
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:19:58,966 INFO synthesis text Here D sweeps between zero.eight and one.six; watch how the two strokes change.
+2026-10-18 05:20:03,067 INFO yield speech len 7.72, rtf 0.5311509179327772
+
+100%|██████████| 1/1 [00:04<00:00,  4.27s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:03,244 INFO synthesis text When knit fabric is sewn, the presser foot drags the top ply back and the main dog pulls forward, so the edge is stretched, and the stitches fix it in that stretched state.
+2026-10-18 05:20:10,661 INFO yield speech len 14.08, rtf 0.5267947573553432
+
+100%|██████████| 1/1 [00:07<00:00,  7.59s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:10,845 INFO synthesis text Let go and the fabric shrinks back, but the thread doesn't, so the extra length bulges into waves, the so-called lettuce or ruffled edge.
+2026-10-18 05:20:17,318 INFO yield speech len 12.36, rtf 0.5236696078167764
+
+100%|██████████| 1/1 [00:06<00:00,  6.65s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:17,501 INFO synthesis text A simple model: at D equal to one the edge stretches by epsilon-zero, and only a fraction eta of the extra dog travel reaches the fabric.
+2026-10-18 05:20:23,985 INFO yield speech len 12.64, rtf 0.5129428038114233
+
+100%|██████████| 1/1 [00:06<00:00,  6.66s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:24,168 INFO synthesis text Setting the edge strain to zero gives the flat-edge ratio D-star equals one plus epsilon-zero over eta.
+2026-10-18 05:20:30,164 INFO yield speech len 11.76, rtf 0.5098090082609734
+
+100%|██████████| 1/1 [00:06<00:00,  6.17s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:30,346 INFO synthesis text Treat the wave as a sine, and its height is about lambda root epsilon over pi.
+2026-10-18 05:20:34,620 INFO yield speech len 8.0, rtf 0.5341788828372955
+
+100%|██████████| 1/1 [00:04<00:00,  4.45s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:34,797 INFO synthesis text This is the jersey edge as sewn in Virtual Lab nine-one.
+2026-10-18 05:20:37,770 INFO yield speech len 5.28, rtf 0.5630019036206332
+
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+cv2: 170/213 句，用时 13.8 分钟，预计还要 3.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:37,945 INFO synthesis text On the left, ratio one.zero: the edge is wavy.
+2026-10-18 05:20:40,478 INFO yield speech len 4.72, rtf 0.5367441197573128
+
+100%|██████████| 1/1 [00:02<00:00,  2.71s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:40,658 INFO synthesis text On the right, set to one.two: the waves have basically gone.
+2026-10-18 05:20:44,011 INFO yield speech len 6.36, rtf 0.5271852391320954
+
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:44,190 INFO synthesis text The differential lever on the outside of the machine moves a slider in the slotted arm of the differential dog; slide it outwards and the ratio goes up.
+2026-10-18 05:20:50,204 INFO yield speech len 11.56, rtf 0.5202606268820053
+
+100%|██████████| 1/1 [00:06<00:00,  6.19s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:50,382 INFO synthesis text A typical high-speed overlocker adjusts from one to zero.seven up to one to two.
+2026-10-18 05:20:54,499 INFO yield speech len 7.72, rtf 0.5332156475343852
+
+100%|██████████| 1/1 [00:04<00:00,  4.29s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:20:54,684 INFO synthesis text The lower-looper RSSR turns shaft angle into swing angle with one constraint: the link length is constant.
+2026-10-18 05:21:00,063 INFO yield speech len 10.28, rtf 0.5232745107509746
+
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:00,239 INFO synthesis text Each leg of a Delta parallel robot is also revolute, spherical, spherical, and its controller solves the same kind of equation.
+2026-10-18 05:21:05,981 INFO yield speech len 11.0, rtf 0.5219667608087714
+
+100%|██████████| 1/1 [00:05<00:00,  5.92s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:06,164 INFO synthesis text The position equation has a plus and a minus solution, the two assembly modes, just like elbow-up and elbow-down in a robot arm's inverse kinematics; the program must pick one and stay on it.
+2026-10-18 05:21:13,292 INFO yield speech len 13.76, rtf 0.5179852247238159
+
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:13,477 INFO synthesis text When d dot t goes to zero you're at a singularity, and robot designers likewise keep the working range well away from it.
+2026-10-18 05:21:18,664 INFO yield speech len 10.32, rtf 0.5026142033495644
+
+100%|██████████| 1/1 [00:05<00:00,  5.37s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:18,721 WARNING synthesis text Differential feed shows up at home too. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-18 05:21:18,847 INFO synthesis text Differential feed shows up at home too.
+2026-10-18 05:21:20,847 INFO yield speech len 3.28, rtf 0.6098230437534612
+
+100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:21,020 INFO synthesis text Hem a knit T-shirt on a home machine and the edge often comes out wavy.
+2026-10-18 05:21:24,945 INFO yield speech len 7.6, rtf 0.5163828009053281
+
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.10s/it]
+cv2: 180/213 句，用时 14.5 分钟，预计还要 2.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:25,121 INFO synthesis text Experienced sewers gently push the fabric towards the needle with their fingers in front of the presser foot as they sew.
+2026-10-18 05:21:30,786 INFO yield speech len 11.12, rtf 0.509424475457171
+
+100%|██████████| 1/1 [00:05<00:00,  5.84s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:30,968 INFO synthesis text The fingers are the differential feed dog: feeding in a little extra fabric cancels the stretch caused by the drag of the presser foot.
+2026-10-18 05:21:36,580 INFO yield speech len 10.96, rtf 0.5120667880468994
+
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:36,633 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-18 05:21:36,760 INFO synthesis text Back to the start.
+2026-10-18 05:21:38,163 INFO yield speech len 1.92, rtf 0.7310815155506134
+
+100%|██████████| 1/1 [00:01<00:00,  1.57s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:38,335 INFO synthesis text Jersey side seams at a ratio of one.zero have eighteen percent edge strain, giving waves about four.one millimetres high, visible at a glance.
+2026-10-18 05:21:44,364 INFO yield speech len 12.08, rtf 0.4990945588673977
+
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:44,544 INFO synthesis text The flat-edge ratio is one plus epsilon-zero over eta: about one.twenty-one for jersey and one.thirty-eight for rib; rib at one by mistake would wave about four.five millimetres.
+2026-10-18 05:21:52,677 INFO yield speech len 15.64, rtf 0.5199963479395717
+
+100%|██████████| 1/1 [00:08<00:00,  8.31s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:52,864 INFO synthesis text Both are within the machine's one to zero.seven up to one to two range.
+2026-10-18 05:21:56,374 INFO yield speech len 6.56, rtf 0.5349965357198948
+
+100%|██████████| 1/1 [00:03<00:00,  3.68s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:21:56,553 INFO synthesis text Remember epsilon-zero and eta are illustrative; in practice you measure them by test sewing.
+2026-10-18 05:22:00,094 INFO yield speech len 6.64, rtf 0.5332401358937643
+
+100%|██████████| 1/1 [00:03<00:00,  3.71s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:00,269 INFO synthesis text Now Virtual lab nine-one, differential feed. On the WenQuest platform you can do it yourself. The effective ratio, the edge strain, the wave height, the verdict and the tasks are blurred here. Read them when you do the lab yourself.
+2026-10-18 05:22:09,615 INFO yield speech len 18.12, rtf 0.5158073854762197
+
+100%|██████████| 1/1 [00:09<00:00,  9.53s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:09,807 INFO synthesis text Start with jersey and raise the ratio slowly from one. The orange differential dog's stroke grows, the marks on the fabric between the dogs crowd together, and the sewn edge below goes from wavy to flat, then to fine gathers. Task one is to find the ratio that puts the edge strain in the green band.
+2026-10-18 05:22:21,823 INFO yield speech len 23.36, rtf 0.514392422078407
+
+100%|██████████| 1/1 [00:12<00:00, 12.21s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:22,024 INFO synthesis text Task two, switch to rib. Rib stretches more, and less of the extra travel reaches the fabric. Find it again.
+2026-10-18 05:22:27,192 INFO yield speech len 10.32, rtf 0.5006833825000496
+
+100%|██████████| 1/1 [00:05<00:00,  5.34s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.34s/it]
+cv2: 190/213 句，用时 15.6 分钟，预计还要 1.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:27,374 INFO synthesis text Task three, chiffon, and it goes the other way. At a ratio of one the edge already puckers, so you go below one.
+2026-10-18 05:22:32,810 INFO yield speech len 10.4, rtf 0.522602704855112
+
+100%|██████████| 1/1 [00:05<00:00,  5.61s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.61s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:32,993 INFO synthesis text Finally, overdo it on purpose: turn jersey down for a lettuce edge. Turning chiffon up for gathers is yours to try. Record the readings at every step and compare them with the model.
+2026-10-18 05:22:39,878 INFO yield speech len 13.0, rtf 0.5296139350304236
+
+100%|██████████| 1/1 [00:07<00:00,  7.06s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:40,058 INFO synthesis text Virtual lab nine-two is the spatial four-bar, also on the platform. The swing, the transmission angle and the other statistics, and the step-by-step results, are blurred here too.
+2026-10-18 05:22:46,977 INFO yield speech len 13.28, rtf 0.5209707711116377
+
+100%|██████████| 1/1 [00:07<00:00,  7.10s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:47,169 INFO synthesis text Pick the lower-looper preset. Task one: change only the crank radius until the swing is thirty degrees, then compare it with the rough estimate: swing is about twor over c, where c is the rocker length. How far off is it, and why?
+2026-10-18 05:22:57,389 INFO yield speech len 19.56, rtf 0.5225043842885149
+
+100%|██████████| 1/1 [00:10<00:00, 10.41s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:22:57,581 INFO synthesis text Further down is the threeD view: grey crank, orange ball-joint link, blue rocker. The two axes neither meet nor are parallel; drag the view round to see it clearly. The later tasks move the rocker to raise the transmission angle, then increase r step by step until the mechanism can't be assembled. The guide and the report template are on the platform.
+2026-10-18 05:23:09,701 INFO yield speech len 23.64, rtf 0.5126624341341848
+
+100%|██████████| 1/1 [00:12<00:00, 12.31s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:09,905 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-18 05:23:12,572 INFO yield speech len 4.92, rtf 0.541993709114509
+
+100%|██████████| 1/1 [00:02<00:00,  2.84s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:12,745 INFO synthesis text You can open today's interactive slides, the threeD overlock machine and both virtual labs yourself, and turn the shaft to watch the three hand-overs stitch by stitch.
+2026-10-18 05:23:20,055 INFO yield speech len 14.04, rtf 0.5206220849626765
+
+100%|██████████| 1/1 [00:07<00:00,  7.48s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:20,235 INFO synthesis text You submit the assignment and the lab reports on the platform, and get marks and comments back.
+2026-10-18 05:23:24,549 INFO yield speech len 7.96, rtf 0.5419092262210559
+
+100%|██████████| 1/1 [00:04<00:00,  4.48s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:24,726 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-18 05:23:29,044 INFO yield speech len 8.56, rtf 0.504397761041873
+
+100%|██████████| 1/1 [00:04<00:00,  4.49s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:29,230 INFO synthesis text Your assignment has four questions. One, the machine now sews two plies of fleece, three millimetres thick. Find the shaft angles where the needle enters and leaves the fabric and the feed margins at each end, compare them with one.five millimetres, and state the risk and a remedy.
+2026-10-18 05:23:39,820 INFO yield speech len 20.48, rtf 0.5171017139218748
+
+100%|██████████| 1/1 [00:10<00:00, 10.78s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.78s/it]
+cv2: 200/213 句，用时 16.8 分钟，预计还要 1.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:40,017 INFO synthesis text Two, increase the lower looper's swing to thirty degrees. Estimate the crank radius with the rough formula, find the exact value in Virtual lab nine-two, explain the difference, and check that the minimum transmission angle is still at least forty degrees.
+2026-10-18 05:23:48,475 INFO yield speech len 16.88, rtf 0.5010426750680282
+
+100%|██████████| 1/1 [00:08<00:00,  8.64s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:48,663 INFO synthesis text Three, for fleece, find the wave height, the flat-edge ratio and the radius to set the differential slide block to. Four, using Section nine.eight of the book, explain why the lower looper moves fast to the left and slow to the right, with the benefit and the cost in numbers.
+2026-10-18 05:23:59,580 INFO yield speech len 21.0, rtf 0.5198380947113037
+
+100%|██████████| 1/1 [00:11<00:00, 11.10s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:23:59,774 INFO synthesis text Submit your working, the lab screenshot and the report on the WenQuest platform.
+2026-10-18 05:24:02,941 INFO yield speech len 5.72, rtf 0.5537241072087855
+
+100%|██████████| 1/1 [00:03<00:00,  3.34s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:03,116 INFO synthesis text There's also a ten-question quiz. For example, jersey has epsilon-zero of eighteen percent and eta of zero.eighty-five. Set the ratio to one.thirty: what is the edge strain?
+2026-10-18 05:24:10,934 INFO yield speech len 15.2, rtf 0.5143581409203379
+
+100%|██████████| 1/1 [00:07<00:00,  7.99s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:11,118 INFO synthesis text Or, the upper looper's minimum transmission angle is thirty-nine degrees and the lower looper's is forty-nine.five. For the same resisting torque, roughly how many times larger is the upper looper's link force?
+2026-10-18 05:24:18,646 INFO yield speech len 14.44, rtf 0.5213481072243561
+
+100%|██████████| 1/1 [00:07<00:00,  7.70s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:18,827 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-18 05:24:21,989 INFO yield speech len 5.8, rtf 0.5450848053241598
+
+100%|██████████| 1/1 [00:03<00:00,  3.33s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:22,037 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-18 05:24:22,163 INFO synthesis text Three things to remember.
+2026-10-18 05:24:23,551 INFO yield speech len 2.12, rtf 0.6548162901176596
+
+100%|██████████| 1/1 [00:01<00:00,  1.56s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:23,725 INFO synthesis text One: in stitch five hundred and four each of three threads has its own job, with no tight knot, so it stretches; each stitch needs three loop entries, at the right moment and with tiny clearance.
+2026-10-18 05:24:32,585 INFO yield speech len 16.92, rtf 0.5236307498129265
+
+100%|██████████| 1/1 [00:09<00:00,  9.04s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:32,773 INFO synthesis text Two: the lower looper is driven by a spatial RSSR four-bar, analysed entirely from the constant link length, which gives the swing, angular speed and transmission angle.
+2026-10-18 05:24:41,341 INFO yield speech len 16.36, rtf 0.5237688207976101
+
+100%|██████████| 1/1 [00:08<00:00,  8.75s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:41,528 INFO synthesis text Three: differential feed, with flat-edge ratio one plus epsilon-zero over eta and wave height about lambda root epsilon over pi.
+2026-10-18 05:24:49,408 INFO yield speech len 15.44, rtf 0.5103404040163663
+
+100%|██████████| 1/1 [00:08<00:00,  8.06s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.06s/it]
+cv2: 210/213 句，用时 17.9 分钟，预计还要 0.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:49,600 INFO synthesis text The assignment, the quiz and both labs are on WenQuest.
+2026-10-18 05:24:52,457 INFO yield speech len 5.0, rtf 0.5714739799499512
+
+100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:24:52,629 INFO synthesis text The slides, the virtual labs, the threeD model, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-18 05:25:00,181 INFO yield speech len 14.4, rtf 0.5244822469022539
+
+100%|██████████| 1/1 [00:07<00:00,  7.73s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-18 05:25:00,370 INFO synthesis text Next time, coverstitch and chainstitch machines. How are the two or three parallel rows on a T-shirt hem sewn, and how many cones does a batch of hems need? See you then.
+2026-10-18 05:25:07,697 INFO yield speech len 14.48, rtf 0.5059984507481696
+
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+cv2: 213/213 句，用时 18.3 分钟，预计还要 0.0 分钟
+cv2: 213 句完成
+2026-10-18 05:25:07,862 DEBUG Attempting to acquire lock 129906721099728 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-18 05:25:07,862 DEBUG Lock 129906721099728 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-18 05:25:07,862 DEBUG Attempting to release lock 129906721099728 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-18 05:25:07,862 DEBUG Lock 129906721099728 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-18 05:25:07,865 DEBUG Attempting to acquire lock 129906721106592 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-18 05:25:07,865 DEBUG Lock 129906721106592 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-18 05:25:07,865 DEBUG Attempting to release lock 129906721106592 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-18 05:25:07,865 DEBUG Lock 129906721106592 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 28 分钟

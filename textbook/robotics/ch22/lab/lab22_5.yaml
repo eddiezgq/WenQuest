@@ -1,0 +1,20 @@
+# 实验 22.5 的指导书与报告模板。目的、场景、参数、任务取自 lab22_5.js。
+原理:
+  - 式: ["解耦插值：参考点 p_d(s) = (1 − s) p_dA + s p_dB，姿态 R(s) = R_A e^{[r]s}，r = log(R_Aᵀ R_B)，原点 p(s) = p_d(s) − R(s) d", "Decoupled: reference point p_d(s) = (1 − s) p_dA + s p_dB, orientation R(s) = R_A e^{[r]s}, r = log(R_Aᵀ R_B), origin p(s) = p_d(s) − R(s) d"]
+  - 式: ["旋量插值：T(s) = T_A e^{[V]s}，[V] = log(T_A⁻¹ T_B)；物体运动旋量沿途不变", "Screw: T(s) = T_A e^{[V]s}, [V] = log(T_A⁻¹ T_B); the body twist is constant along the way"]
+  - 式: ["换基座坐标系：两种插值都不变；换工具坐标系：旋量插值的刚体运动不变，解耦插值改变", "Changing the base frame changes neither; changing the tool frame leaves the screw motion unchanged but changes the decoupled one"]
+步骤:
+  - ["场景“从料架上方到卡盘前”：依次选 0、1、2，各按“开始”运行一次（任务 1～3），把读数填入表 1。", "Scene “From above the rack to the chuck”: choose 0, 1 and 2 in turn and press Start each time (tasks 1–3); fill in Table 1."]
+  - ["观察三种插值中法兰盘中心的路径，指出哪一种让法兰盘中心走直线。", "Watch the flange-centre path under each interpolation and say which one keeps the flange centre on a straight line."]
+  - ["生活场景“拧瓶盖”：先选旋量插值运行（任务 4），再选解耦插值运行（任务 5），记录瓶盖中心离轴线的最大距离。", "Everyday scene “Screwing a cap”: run the screw interpolation (task 4), then the decoupled one (task 5), and record the largest distance of the cap centre from the axis."]
+数据表:
+  - 标题: ["表 1  三种位姿插值的比较", "Table 1  The three pose interpolations compared"]
+    表头: ["插值", "TCP 中点偏离 / mm", "TCP 路程 / m", "法兰盘中心路程 / m", "关节转角之和 / (°)"]
+    表头英文: ["Interpolation", "TCP off-line at middle / mm", "TCP distance / m", "Flange-centre distance / m", "Sum of joint rotations / (°)"]
+    行: [["解耦（TCP）", "", "", "", ""], ["解耦（法兰盘中心）", "", "", "", ""], ["旋量", "", "", "", ""]]
+    行英文: [["Decoupled (TCP)", "", "", "", ""], ["Decoupled (flange centre)", "", "", "", ""], ["Screw", "", "", "", ""]]
+注意:
+  - ["工位的尺寸是示意值；时间规律取五次多项式，只用于观看，不是最快的。", "The cell dimensions are illustrative; the timing is a quintic, for viewing only, not the fastest."]
+  - ["瓶子与瓶盖放大 4 倍画出；上升量 1.5 mm 很小，主要看瓶盖中心的路径。", "The bottle and cap are drawn four times larger; the 1.5 mm rise is small, so watch mainly the path of the cap centre."]
+思考题:
+  - ["机器人的直线运动指令以 TCP 为参考点。若 TCP 标定错了 2 cm，“直线”运动时真正的工具尖走的是什么路径？", "Linear move commands use the TCP as the reference point. If the TCP is calibrated 2 cm wrong, what path does the real tool tip follow in a “linear” move?"]
