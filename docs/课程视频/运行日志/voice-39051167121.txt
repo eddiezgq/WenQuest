@@ -1,0 +1,400 @@
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:12,921 INFO synthesis text Accounting stays in ERPNext, where your accountant expects it.
+2026-10-17 17:02:16,796 INFO yield speech len 7.24, rtf 0.5351079103037797
+
+100%|██████████| 1/1 [00:04<00:00,  4.04s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.04s/it]
+cv2: 20/80 句，用时 1.3 分钟，预计还要 3.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:16,969 INFO synthesis text Quality is where we add the most: ERPNext has basic inspections, and we add the full quality system on top.
+2026-10-17 17:02:22,146 INFO yield speech len 10.16, rtf 0.5095060181430006
+
+100%|██████████| 1/1 [00:05<00:00,  5.35s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:22,196 WARNING synthesis text Every document posts balanced entries. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:02:22,321 INFO synthesis text Every document posts balanced entries.
+2026-10-17 17:02:24,175 INFO yield speech len 2.96, rtf 0.6263641086784569
+
+100%|██████████| 1/1 [00:02<00:00,  2.02s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:24,347 INFO synthesis text Receive the goods, pay the supplier, ship to the customer: stock and cost of goods move together.
+2026-10-17 17:02:28,746 INFO yield speech len 8.4, rtf 0.5237116983958653
+
+100%|██████████| 1/1 [00:04<00:00,  4.57s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:28,923 INFO synthesis text Invoice and get paid, and the books stay balanced. Your accountant and your warehouse finally read the same numbers.
+2026-10-17 17:02:33,505 INFO yield speech len 8.68, rtf 0.5278686499266031
+
+100%|██████████| 1/1 [00:04<00:00,  4.75s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:33,553 WARNING synthesis text Stock is a ledger too. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:02:33,679 INFO synthesis text Stock is a ledger too.
+2026-10-17 17:02:35,119 INFO yield speech len 2.04, rtf 0.7058868221208161
+
+100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:35,288 INFO synthesis text Every receipt and every shipment has a quantity and a value.
+2026-10-17 17:02:37,840 INFO yield speech len 4.56, rtf 0.5595697122707702
+
+100%|██████████| 1/1 [00:02<00:00,  2.72s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.72s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:37,885 WARNING synthesis text And you can't ship what you don't have. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:02:38,010 INFO synthesis text And you can't ship what you don't have.
+2026-10-17 17:02:40,060 INFO yield speech len 3.44, rtf 0.595837207727654
+
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:40,233 INFO synthesis text In practice, stock is kept by warehouse, with a quality hold kept apart from what you can sell. Batches and serial numbers are how a recall finds every customer.
+2026-10-17 17:02:47,173 INFO yield speech len 13.24, rtf 0.5241688644777972
+
+100%|██████████| 1/1 [00:07<00:00,  7.11s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:47,351 INFO synthesis text When an item falls below its reorder level, one click drafts a purchase order. It waits for a person.
+2026-10-17 17:02:52,302 INFO yield speech len 9.4, rtf 0.5266474916579875
+
+100%|██████████| 1/1 [00:05<00:00,  5.12s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:52,476 INFO synthesis text The ERP records. Our hub connects, measures and explains.
+2026-10-17 17:02:55,266 INFO yield speech len 5.04, rtf 0.5537169320242745
+
+100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+cv2: 30/80 句，用时 1.9 分钟，预计还要 3.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:55,439 INFO synthesis text Changes become one connected picture of the business,.
+2026-10-17 17:02:57,752 INFO yield speech len 3.96, rtf 0.5842505681394327
+
+100%|██████████| 1/1 [00:02<00:00,  2.48s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:02:57,928 INFO synthesis text metrics come with published formulas, anomalies come with their causes,.
+2026-10-17 17:03:01,450 INFO yield speech len 6.4, rtf 0.550428181886673
+
+100%|██████████| 1/1 [00:03<00:00,  3.69s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:01,623 INFO synthesis text and the fixes come back as drafts that a person confirms.
+2026-10-17 17:03:04,372 INFO yield speech len 4.92, rtf 0.5587666015314862
+
+100%|██████████| 1/1 [00:02<00:00,  2.92s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:04,543 INFO synthesis text Every number has a published formula you can check by hand.
+2026-10-17 17:03:07,256 INFO yield speech len 4.84, rtf 0.560594343942059
+
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:07,426 INFO synthesis text Change which orders count, and on-time delivery changes with them.
+2026-10-17 17:03:11,254 INFO yield speech len 7.04, rtf 0.5436170507561077
+
+100%|██████████| 1/1 [00:03<00:00,  4.00s/it]
+100%|██████████| 1/1 [00:03<00:00,  4.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:11,427 INFO synthesis text And when there is no data, it says unknown. Never zero, never a guess.
+2026-10-17 17:03:15,401 INFO yield speech len 7.52, rtf 0.5283791334071058
+
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:15,574 INFO synthesis text This is the morning dashboard. Every tile is clickable.
+2026-10-17 17:03:17,655 INFO yield speech len 3.52, rtf 0.5913270468061621
+
+100%|██████████| 1/1 [00:02<00:00,  2.25s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:17,827 INFO synthesis text Late orders, stock-outs, inventory, suppliers, quality: each one opens to the records behind it.
+2026-10-17 17:03:22,227 INFO yield speech len 8.56, rtf 0.5139701277296119
+
+100%|██████████| 1/1 [00:04<00:00,  4.57s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:22,276 WARNING synthesis text Back to Tuesday. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:03:22,402 INFO synthesis text Back to Tuesday.
+2026-10-17 17:03:23,670 INFO yield speech len 1.6, rtf 0.7923267781734467
+
+100%|██████████| 1/1 [00:01<00:00,  1.43s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:23,715 WARNING synthesis text Click the late order and follow the chain: too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:03:23,840 INFO synthesis text Click the late order and follow the chain:
+2026-10-17 17:03:25,600 INFO yield speech len 2.8, rtf 0.6283929518290929
+
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+cv2: 40/80 句，用时 2.5 分钟，预计还要 2.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:25,771 INFO synthesis text the item that's short, the purchase order that arrived late. What used to take a morning takes a minute.
+2026-10-17 17:03:29,945 INFO yield speech len 7.8, rtf 0.5351975025274814
+
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:29,996 WARNING synthesis text The fix comes back as a draft: too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:03:30,121 INFO synthesis text The fix comes back as a draft:
+2026-10-17 17:03:31,590 INFO yield speech len 2.08, rtf 0.7059642901787391
+
+100%|██████████| 1/1 [00:01<00:00,  1.64s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:31,635 WARNING synthesis text a purchase order, or a note to the customer. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:03:31,791 INFO synthesis text a purchase order, or a note to the customer.
+2026-10-17 17:03:33,958 INFO yield speech len 3.68, rtf 0.5890340260837389
+
+100%|██████████| 1/1 [00:02<00:00,  2.37s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:34,130 INFO synthesis text Nothing reaches ERPNext until a person clicks confirm.
+2026-10-17 17:03:37,687 INFO yield speech len 6.44, rtf 0.5523239233478996
+
+100%|██████████| 1/1 [00:03<00:00,  3.73s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:37,735 WARNING synthesis text The assistant sits on every page. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:03:37,860 INFO synthesis text The assistant sits on every page.
+2026-10-17 17:03:39,796 INFO yield speech len 3.16, rtf 0.6126495101783849
+
+100%|██████████| 1/1 [00:02<00:00,  2.10s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:39,997 INFO synthesis text Ask which orders are late and why. It answers from your records, cites every one, and every run is logged.
+2026-10-17 17:03:44,457 INFO yield speech len 8.72, rtf 0.5115276629771661
+
+100%|██████████| 1/1 [00:04<00:00,  4.66s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:44,631 INFO synthesis text And for you, the owner: what you invoiced this week, who owes you, what's overdue and from whom, and what you owe next.
+2026-10-17 17:03:51,144 INFO yield speech len 12.48, rtf 0.5218735872170864
+
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:51,327 INFO synthesis text It reads ERPNext's own invoices, so these numbers match your accountant's to the cent.
+2026-10-17 17:03:56,627 INFO yield speech len 10.2, rtf 0.5196492578469071
+
+100%|██████████| 1/1 [00:05<00:00,  5.47s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:03:56,803 INFO synthesis text Quality is where most small companies drown. Here, a standard like ISO nine thousand and one or thirteen thousand, four hundred and eighty-five becomes checks that read your actual records every day.
+2026-10-17 17:04:04,322 INFO yield speech len 14.36, rtf 0.5235540501586574
+
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:04,504 INFO synthesis text Green means today's records satisfy it. Red names the exact record that doesn't.
+2026-10-17 17:04:08,532 INFO yield speech len 7.6, rtf 0.5299310935171028
+
+100%|██████████| 1/1 [00:04<00:00,  4.20s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.20s/it]
+cv2: 50/80 句，用时 3.2 分钟，预计还要 1.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:08,581 WARNING synthesis text A nonconformance follows its workflow. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:08,707 INFO synthesis text A nonconformance follows its workflow.
+2026-10-17 17:04:10,674 INFO yield speech len 3.2, rtf 0.614745169878006
+
+100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:10,720 WARNING synthesis text Contain it, sign it. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:10,846 INFO synthesis text Contain it, sign it.
+2026-10-17 17:04:12,191 INFO yield speech len 1.84, rtf 0.7312220075856084
+
+100%|██████████| 1/1 [00:01<00:00,  1.51s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.51s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:12,236 WARNING synthesis text Propose a disposition. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:12,361 INFO synthesis text Propose a disposition.
+2026-10-17 17:04:13,838 INFO yield speech len 2.12, rtf 0.6965390916140574
+
+100%|██████████| 1/1 [00:01<00:00,  1.64s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:14,151 INFO synthesis text Try to approve your own disposition: refused. Someone else must approve, and the history can only grow.
+2026-10-17 17:04:18,903 INFO yield speech len 8.96, rtf 0.5304192059806414
+
+100%|██████████| 1/1 [00:05<00:00,  5.07s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:18,953 WARNING synthesis text At incoming inspection,. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:19,079 INFO synthesis text At incoming inspection,.
+2026-10-17 17:04:20,413 INFO yield speech len 1.76, rtf 0.7582580501383002
+
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:20,585 INFO synthesis text type a reading out of tolerance, and it turns red at once. The verdict comes from code, not from the AI.
+2026-10-17 17:04:25,523 INFO yield speech len 9.32, rtf 0.5298327222914143
+
+100%|██████████| 1/1 [00:05<00:00,  5.11s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:25,571 WARNING synthesis text Signed inspections feed the control charts. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:25,697 INFO synthesis text Signed inspections feed the control charts.
+2026-10-17 17:04:27,663 INFO yield speech len 3.44, rtf 0.5715323742045912
+
+100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:27,836 INFO synthesis text When the process shifts, a point turns red before bad parts pile up,.
+2026-10-17 17:04:31,537 INFO yield speech len 6.88, rtf 0.5379680977311245
+
+100%|██████████| 1/1 [00:03<00:00,  3.87s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:31,709 INFO synthesis text and one click opens a nonconformance report from the signal.
+2026-10-17 17:04:34,684 INFO yield speech len 5.32, rtf 0.5591383105830142
+
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:34,731 WARNING synthesis text For medical devices,. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:34,862 INFO synthesis text For medical devices,.
+2026-10-17 17:04:35,904 INFO yield speech len 1.16, rtf 0.8983975854413263
+
+100%|██████████| 1/1 [00:01<00:00,  1.21s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.21s/it]
+cv2: 60/80 句，用时 3.6 分钟，预计还要 1.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:36,075 INFO synthesis text scan the label: the device identifier, lot and expiry are read and checked,.
+2026-10-17 17:04:40,792 INFO yield speech len 9.2, rtf 0.5127405861149664
+
+100%|██████████| 1/1 [00:04<00:00,  4.89s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:40,842 WARNING synthesis text then traced to every shipment. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:40,968 INFO synthesis text then traced to every shipment.
+2026-10-17 17:04:42,510 INFO yield speech len 2.28, rtf 0.6763762549350136
+
+100%|██████████| 1/1 [00:01<00:00,  1.71s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:42,681 INFO synthesis text A supplier warns that a lot of boxes may be bad.
+2026-10-17 17:04:45,339 INFO yield speech len 5.04, rtf 0.527339842584398
+
+100%|██████████| 1/1 [00:02<00:00,  2.83s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:45,514 INFO synthesis text Trace it forward: the lots that used it, the deliveries, the customers.
+2026-10-17 17:04:48,838 INFO yield speech len 6.12, rtf 0.5431637654896655
+
+100%|██████████| 1/1 [00:03<00:00,  3.49s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:49,010 INFO synthesis text Start a mock recall from the same screen, and record who confirmed.
+2026-10-17 17:04:52,038 INFO yield speech len 5.4, rtf 0.5607574515872531
+
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:52,353 INFO synthesis text Measuring machines send their files straight in. Each reading lands on the right part and feature, and a person accepts it.
+2026-10-17 17:04:57,209 INFO yield speech len 9.08, rtf 0.5348497550392991
+
+100%|██████████| 1/1 [00:05<00:00,  5.17s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:04:57,261 WARNING synthesis text Machines connect too, each with its own key. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:04:57,389 INFO synthesis text Machines connect too, each with its own key.
+2026-10-17 17:04:59,851 INFO yield speech len 4.4, rtf 0.5595475977117365
+
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:00,024 INFO synthesis text A reading from a machine lands in an inbox and waits.
+2026-10-17 17:05:02,345 INFO yield speech len 4.0, rtf 0.5801454782485962
+
+100%|██████████| 1/1 [00:02<00:00,  2.49s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:02,518 INFO synthesis text A person accepts it, and it joins the inspection, marked as coming from that machine. A machine never signs.
+2026-10-17 17:05:06,997 INFO yield speech len 8.48, rtf 0.5281992959526349
+
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:07,174 INFO synthesis text And this is where it leads: a factory where the warehouse, the robots, vision inspection and every gauge feed one hub.
+2026-10-17 17:05:12,702 INFO yield speech len 10.56, rtf 0.5234012775348894
+
+100%|██████████| 1/1 [00:05<00:00,  5.70s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.70s/it]
+cv2: 70/80 句，用时 4.2 分钟，预计还要 0.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:12,881 INFO synthesis text At the inspection station, vision reads each part's code, measures it against the drawing, and quarantines the bad ones automatically.
+2026-10-17 17:05:19,106 INFO yield speech len 12.0, rtf 0.5187355875968933
+
+100%|██████████| 1/1 [00:06<00:00,  6.40s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:19,285 INFO synthesis text The measuring machine, a five-axis scanner, the roughness tester and every hand gauge report in by themselves. A gauge past its calibration date is refused.
+2026-10-17 17:05:26,363 INFO yield speech len 13.84, rtf 0.5114182399187474
+
+100%|██████████| 1/1 [00:07<00:00,  7.25s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:26,544 INFO synthesis text The loop closes with a person approving at the key step.
+2026-10-17 17:05:29,402 INFO yield speech len 5.12, rtf 0.5582583136856556
+
+100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:29,577 INFO synthesis text That's a vision, and every step toward it runs on the same record.
+2026-10-17 17:05:32,288 INFO yield speech len 4.8, rtf 0.5648315946261089
+
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:32,460 INFO synthesis text It's yours to run. ERPNext is open source with no per-user licences, the platform runs on a server you control, and your data stays yours.
+2026-10-17 17:05:39,137 INFO yield speech len 13.2, rtf 0.5058651801311609
+
+100%|██████████| 1/1 [00:06<00:00,  6.85s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:39,317 INFO synthesis text We teach your people, and we offer hosted connections when you need them.
+2026-10-17 17:05:42,209 INFO yield speech len 5.4, rtf 0.5354744858211941
+
+100%|██████████| 1/1 [00:03<00:00,  3.07s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:42,387 INFO synthesis text Don't switch everything at once. Import your data, and put one module live,.
+2026-10-17 17:05:45,836 INFO yield speech len 6.52, rtf 0.5288648459077613
+
+100%|██████████| 1/1 [00:03<00:00,  3.62s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:46,012 INFO synthesis text usually incoming inspection or nonconformance. Then grow.
+2026-10-17 17:05:49,353 INFO yield speech len 6.08, rtf 0.5496160372307426
+
+100%|██████████| 1/1 [00:03<00:00,  3.51s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.51s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:49,399 WARNING synthesis text One record. AI drafts. People decide. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-17 17:05:49,526 INFO synthesis text One record. AI drafts. People decide.
+2026-10-17 17:05:51,765 INFO yield speech len 3.8, rtf 0.5892360837836015
+
+100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-17 17:05:51,940 INFO synthesis text We're inviting a small number of pilot companies. If that Tuesday sounded familiar, let's talk.
+2026-10-17 17:05:56,415 INFO yield speech len 8.44, rtf 0.5302783719736254
+
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+cv2: 80/80 句，用时 5.0 分钟，预计还要 0.0 分钟
+cv2: 80 句完成
+2026-10-17 17:05:56,578 DEBUG Attempting to acquire lock 139917138661328 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-17 17:05:56,578 DEBUG Lock 139917138661328 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-17 17:05:56,578 DEBUG Attempting to release lock 139917138661328 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-17 17:05:56,578 DEBUG Lock 139917138661328 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-17 17:05:56,580 DEBUG Attempting to acquire lock 139917138673424 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-17 17:05:56,580 DEBUG Lock 139917138673424 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-17 17:05:56,580 DEBUG Attempting to release lock 139917138673424 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-17 17:05:56,580 DEBUG Lock 139917138673424 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 16 分钟

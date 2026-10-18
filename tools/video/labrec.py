@@ -62,7 +62,8 @@ async def _set_any(page, pid, v, focus=True):
 
 
 async def record(url: str, lab: str, steps: list[dict], step_times: list[float], total: float, out: Path,
-                 width=1280, height=720, scale=1.5, standalone=False, viewport=None, manual=False, fps=FPS, gl=False) -> Path:
+                 width=1280, height=720, scale=1.5, standalone=False, viewport=None, manual=False, fps=FPS, gl=False,
+                 init_js: str | None = None) -> Path:
     """manual=True（第 23 轮）：页面有 __api.manual / __api.step（三维页）。不用虚拟时钟，每帧调 step(1/fps) 渲染一帧再截图：
     软件渲染下虚拟时钟会让三维页每帧渲染好几遍、越来越慢。三维镜头用 fps=15，合成时补成 30 帧。"""
     from playwright.async_api import async_playwright
@@ -108,6 +109,9 @@ async def record(url: str, lab: str, steps: list[dict], step_times: list[float],
             await page.goto(url)
             await page.add_style_tag(content=CSS)
             await page.clock.run_for(2500)
+            if init_js:                      # 第 38 轮：网页课件翻到这一页、隐藏翻页按钮、装好点击和要点出现的小函数
+                await page.evaluate(init_js)
+                await page.clock.run_for(2500)
             if not standalone:               # the lab's own reset first, so tasks and readouts start clean
                 await page.evaluate(f"WQ.reset('{lab}')")
                 await page.clock.run_for(200)
