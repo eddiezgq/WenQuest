@@ -12,6 +12,11 @@ RUN apt-get update \
  && rm -rf /var/lib/apt/lists/*
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+# 缝纫机设计软件（第 39 轮）出 STEP 用 build123d（OpenCASCADE）；装不上时网页版仍可用，只是不出 STEP（改给 FreeCAD 宏）
+RUN apt-get update && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 libxrender1 libx11-6 libxext6 \
+ && rm -rf /var/lib/apt/lists/* \
+ && (sed -e "s/\[[^]]*\]//" -e "/^-/d" requirements.txt > /tmp/pins.txt && pip install --no-cache-dir -c /tmp/pins.txt build123d==0.13.0 && python -c "import build123d" \
+     || (echo "build123d unavailable: STEP export disabled" && pip uninstall -y build123d || true))
 COPY app ./app
 RUN useradd -r -u 10001 -m wq && mkdir -p /data && chown wq /data
 USER wq
