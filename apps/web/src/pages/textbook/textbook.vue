@@ -86,7 +86,7 @@
             </view>
           </view>
           <text v-if="error" class="wq-error">{{ error }}<text v-if="lastSid" class="retry" @click="read(lastSid)"> {{ t("book.retry") }}</text></text>
-          <text v-if="reading" class="wq-empty">{{ t("common.loading") }}</text>
+          <text v-if="reading" class="loading-bar">{{ t("common.loading") }}</text>
           <text v-if="!cur && loaded && !error && !reading" class="wq-empty">{{ t("book.nothing") }}</text>
           <BookContent v-if="cur" :html="cur.html" />
           <view v-if="cur" class="pager">
@@ -232,6 +232,10 @@ async function read(sid: string) {
   view.value = "read";
   reading.value = true;
   lastSid.value = sid;
+  tocOpen.value = false;                 // 手机上：点了马上收起目录、回到页顶，看得到“正在加载”（原来要等整节下载完才有变化，像没反应）
+  // #ifdef H5
+  window.scrollTo({ top: 0 });
+  // #endif
   try {
     const want = en.value && findRef(sid)?.en ? "en" : "zh";
     cur.value = await api.textbookSection(book.value, sid, mp, want);
@@ -295,6 +299,7 @@ onLoad(async (q: any) => {
 .langs-t { font-size: 12px; color: var(--wq-muted); margin-right: 2px; }
 .lg { font-size: 12px; border: 1px solid var(--wq-line); border-radius: 12px; padding: 2px 10px; cursor: pointer; }
 .lg.on { background: var(--wq-ink, #1d2327); color: #fff; border-color: transparent; }
+.loading-bar { display: block; background: #fff6dd; color: #7a5a00; border-radius: 8px; padding: 10px 12px; margin: 6px 0 10px; font-size: 14px; }
 .retry { color: var(--wq-link); cursor: pointer; margin-left: 6px; }
 .no-en { display: block; font-size: 13px; color: #8a5a00; background: #fff8e6; border-radius: 6px; padding: 6px 10px; margin: 6px 0; }
 .toc-secs { padding-left: 10px; }
