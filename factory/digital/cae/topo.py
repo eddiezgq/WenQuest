@@ -56,8 +56,6 @@ def _bc(preset, nelx, nely):
 
 
 def run(preset="mbb", nelx=None, nely=None, volfrac=0.5, penal=3.0, rmin=1.5, max_iter=200, tol=0.01, frames=24):
-    from scipy.sparse import coo_matrix
-    from scipy.sparse.linalg import spsolve
     if preset not in PRESETS:
         raise ValueError("不认识的算例 {}".format(preset))
     nelx = int(nelx or PRESETS[preset]["nelx"])
@@ -66,6 +64,15 @@ def run(preset="mbb", nelx=None, nely=None, volfrac=0.5, penal=3.0, rmin=1.5, ma
         raise ValueError("网格 {}×{} 不合适：单元数在 32–{} 之间".format(nelx, nely, MAX_ELEMENTS))
     if not 0.1 <= volfrac <= 0.9:
         raise ValueError("材料用量（体积比）要在 0.1–0.9 之间")
+    fixed, F = _bc(preset, nelx, nely)
+    r = _solve(nelx, nely, fixed, F, volfrac, penal, rmin, max_iter, tol, frames)
+    return dict(r, preset=preset, label=PRESETS[preset]["label"])
+
+
+def _solve(nelx, nely, fixed, F, volfrac, penal, rmin, max_iter=200, tol=0.01, frames=24, solid=None, void=None):
+    """SIMP 主循环。solid / void：单元布尔数组（按 el = ely + elx·nely 编号），始终有材料 / 始终没材料；体积比只按其余单元算"""
+    from scipy.sparse import coo_matrix
+    from scipy.sparse.linalg import spsolve
     Emin, E0 = 1e-9, 1.0
     KE = _ke()
     nel = nelx * nely
@@ -93,9 +100,14 @@ def run(preset="mbb", nelx=None, nely=None, volfrac=0.5, penal=3.0, rmin=1.5, ma
                     sh.append(max(0.0, rmin - math.hypot(i1 - i2, j1 - j2)))
     Hf = coo_matrix((sh, (ih, jh)), shape=(nel, nel)).tocsc()
     Hs = np.asarray(Hf.sum(1)).ravel()
-    fixed, F = _bc(preset, nelx, nely)
     free = np.setdiff1d(np.arange(ndof), fixed)
+    solid = np.zeros(nel, bool) if solid is None else np.asarray(solid, bool)
+    void = np.zeros(nel, bool) if void is None else (np.asarray(void, bool) & ~solid)
+    act = ~(solid | void)
+    if not act.any():
+        raise ValueError("没有可以优化的区域")
     x = np.full(nel, volfrac)
+    x[solid], x[void] = 1.0, 0.0
     hist, snaps = [], []
     change, it = 1.0, 0
     U = np.zeros(ndof)
@@ -116,20 +128,131 @@ def run(preset="mbb", nelx=None, nely=None, volfrac=0.5, penal=3.0, rmin=1.5, ma
         while (l2 - l1) / (l1 + l2) > 1e-3:
             lm = (l1 + l2) / 2
             xn = np.clip(x * np.sqrt(np.maximum(-dc, 0) / lm), np.maximum(0, x - move), np.minimum(1, x + move))
-            if xn.mean() > volfrac:
+            xn[solid], xn[void] = 1.0, 0.0
+            if xn[act].mean() > volfrac:
                 l1 = lm
             else:
                 l2 = lm
         change = float(np.abs(xn - x).max())
         x = xn
-        hist.append([it, round(c, 4), round(float(x.mean()), 4), round(change, 4)])
+        hist.append([it, round(c, 4), round(float(x[act].mean()), 4), round(change, 4)])
         snaps.append(x.copy())
     pick = sorted(set(np.linspace(0, len(snaps) - 1, min(frames, len(snaps))).round().astype(int)))
-    grey = float(((x > 0.1) & (x < 0.9)).mean())
-    return {"preset": preset, "label": PRESETS[preset]["label"], "nelx": nelx, "nely": nely, "volfrac": volfrac, "penal": penal,
+    grey = float(((x[act] > 0.1) & (x[act] < 0.9)).mean())
+    return {"nelx": nelx, "nely": nely, "volfrac": volfrac, "penal": penal,
             "rmin": rmin, "iterations": it, "converged": change <= tol, "compliance": hist[-1][1], "history": hist, "grey": round(grey, 4),
             "density": x.reshape(nelx, nely).T.round(4).tolist(),          # [行（向下）][列（向右）]
             "frames": [{"it": int(k + 1), "density": (snaps[k].reshape(nelx, nely).T * 255).round().astype(np.uint8).tolist()} for k in pick]}
+
+
+# ---------- 两孔平板（学习平台第 41 轮：设计软件的曲柄、连杆、摆杆减重） ----------
+MAX_PLATE_ELEMENTS = 6000
+MIN_CUT_R = 1.6                     # 减重孔最窄处的一半：最小立铣刀 Ø3 的半径再留 0.1 mm
+
+
+def plate_spec(p):
+    """检查并整理平板说明（单位 mm，y 向上，零件自己的平面坐标）：
+    domain 设计区域（多边形，现在的零件外形）；solid 保留的实心圆 [x, y, r]（孔周围的毂、平衡块）；holes 孔 [x, y, r]；
+    support 支承孔（[x, y, r]，孔里的节点全固定，相当于销轴）；load {at: [x, y, r], f: [fx, fy]}（N，均分到孔里的节点）；cell_mm 单元边长"""
+    from shapely.geometry import Polygon
+    dom = Polygon([tuple(map(float, q)) for q in p["domain"]])
+    if not dom.is_valid or dom.area <= 0:
+        raise ValueError("设计区域不是有效的多边形")
+    c = float(p.get("cell_mm") or 0) or max(0.3, math.sqrt(dom.area / 4000))
+    x0, y0, x1, y1 = dom.bounds
+    nelx, nely = int(math.ceil((x1 - x0) / c)) + 2, int(math.ceil((y1 - y0) / c)) + 2
+    if nelx * nely > MAX_PLATE_ELEMENTS:
+        c *= math.sqrt(nelx * nely / MAX_PLATE_ELEMENTS) * 1.02
+        nelx, nely = int(math.ceil((x1 - x0) / c)) + 2, int(math.ceil((y1 - y0) / c)) + 2
+    circ = lambda q: [float(q[0]), float(q[1]), float(q[2])]  # noqa: E731
+    out = {"domain": [list(map(float, q)) for q in dom.exterior.coords[:-1]], "cell_mm": round(c, 4), "origin": [x0 - c, y0 - c],
+           "nelx": nelx, "nely": nely, "solid": [circ(q) for q in p.get("solid") or []], "holes": [circ(q) for q in p.get("holes") or []],
+           "support": circ(p["support"]), "load": {"at": circ(p["load"]["at"]), "f": [float(p["load"]["f"][0]), float(p["load"]["f"][1])]},
+           "thickness_mm": float(p.get("thickness_mm") or 6)}
+    if not (out["load"]["f"][0] or out["load"]["f"][1]):
+        raise ValueError("载荷是零")
+    return out
+
+
+def _plate_grid(ps):
+    c, (x0, y0), nelx, nely = ps["cell_mm"], ps["origin"], ps["nelx"], ps["nely"]
+    ex = x0 + (np.arange(nelx) + 0.5) * c                     # 单元中心
+    ey = y0 + (nely - np.arange(nely) - 0.5) * c
+    EX, EY = np.meshgrid(ex, ey, indexing="ij")               # [elx, ely] → el = ely + elx·nely 与 ravel() 一致
+    nx_ = x0 + np.arange(nelx + 1) * c
+    ny_ = y0 + (nely - np.arange(nely + 1)) * c
+    NX, NY = np.meshgrid(nx_, ny_, indexing="ij")             # 节点 i·(nely+1) + j
+    return EX.ravel(), EY.ravel(), NX.ravel(), NY.ravel()
+
+
+def run_plate(spec, volfrac=0.5, penal=3.0, rmin=1.5, max_iter=200, tol=0.01, frames=24):
+    from shapely import vectorized
+    from shapely.geometry import Polygon
+    ps = plate_spec(spec)
+    if not 0.1 <= volfrac <= 0.9:
+        raise ValueError("材料用量（体积比）要在 0.1–0.9 之间")
+    nelx, nely, c = ps["nelx"], ps["nely"], ps["cell_mm"]
+    EX, EY, NX, NY = _plate_grid(ps)
+    inside = vectorized.contains(Polygon(ps["domain"]).buffer(c * 0.3), EX, EY)
+    solid = np.zeros(EX.size, bool)
+    for x, y, r in ps["solid"] + ps["holes"] + [ps["support"], ps["load"]["at"]]:
+        solid |= np.hypot(EX - x, EY - y) <= r + 0.5 * c        # 毂、孔（当作销轴）一直实心
+    void = ~inside & ~solid
+    ndof = 2 * (nelx + 1) * (nely + 1)
+    sx, sy, sr = ps["support"]
+    fix_n = np.nonzero(np.hypot(NX - sx, NY - sy) <= sr + 1e-9)[0]
+    lx, ly, lr = ps["load"]["at"]
+    ld_n = np.nonzero(np.hypot(NX - lx, NY - ly) <= lr + 1e-9)[0]
+    if len(fix_n) < 2 or len(ld_n) < 1:
+        raise ValueError("单元太粗，孔里落不下节点（单元边长 {:.2f} mm）".format(c))
+    fixed = np.sort(np.concatenate([2 * fix_n, 2 * fix_n + 1]))
+    F = np.zeros(ndof)
+    F[2 * ld_n] = ps["load"]["f"][0] / len(ld_n)
+    F[2 * ld_n + 1] = ps["load"]["f"][1] / len(ld_n)
+    r = _solve(nelx, nely, fixed, F, volfrac, penal, rmin, max_iter, tol, frames, solid=solid, void=void)
+    keep = (np.asarray(r["density"]).T.ravel() >= 0.5) & inside
+    r.update(preset="plate", label="两孔平板减重", plate=ps,
+             mass_ratio=round(float(keep.sum() / max(1, (inside | solid).sum())), 4))
+    return r
+
+
+def plate_polygon(ps, density, holes=True):
+    """平板结果 → 零件轮廓（mm，零件平面坐标）：密度 ≥ 0.5 的单元 ∪ 保留的实心圆，裁到设计区域里，再挖掉孔（holes=False 时不挖）"""
+    from shapely.geometry import Point, Polygon
+    from shapely.ops import unary_union
+    c = ps["cell_mm"]
+    g = to_polygon(density, c)
+    from shapely import affinity
+    g = affinity.translate(g, ps["origin"][0], ps["origin"][1])
+    keep = [Point(x, y).buffer(r, 64) for x, y, r in ps["solid"]]
+    dom = Polygon(ps["domain"])
+    # 圆顺网格台阶：先闭（补小缺口）再开（去小毛刺），各一格多，然后按半格简化——轮廓点少，图纸和数控刀路都干净
+    g = g.buffer(c * 1.2).buffer(-c * 2.4).buffer(c * 1.2)
+    g = unary_union([g] + keep).intersection(dom.buffer(1e-6))
+    parts = sorted(getattr(g, "geoms", [g]), key=lambda q: -q.area)
+    g = parts[0]                                               # 只要和孔连着的那一大块
+    # 减重孔太窄、最小立铣刀（Ø3）放不进的填回去：做不出来的孔没有用，填回去只是多一点质量
+    keep_in = [h for h in g.interiors if Polygon(h).buffer(-MIN_CUT_R).area > 0]
+    g = Polygon(g.exterior, keep_in)
+    if holes:
+        for x, y, r in ps["holes"]:
+            g = g.difference(Point(x, y).buffer(r, 64))
+    return g.simplify(c * 0.5)
+
+
+def plate_step(ps, density):
+    """STEP 里的孔是真正的圆柱面（有限元按圆柱面找支承孔、受力孔，数控按圆柱面认钻孔）；板厚沿 z 从 −t 到 0（上表面在 Z0，
+    数控的工件零点）；返回 (STEP, 带孔的轮廓)"""
+    import build123d as bd
+    from cae.thermal_parts import tempfile_step
+    g0 = plate_polygon(ps, density, holes=False)
+    t = ps["thickness_mm"]
+    face = bd.Face(bd.Wire.make_polygon([bd.Vector(x, y, 0) for x, y in list(g0.exterior.coords)[:-1]], close=True),
+                   [bd.Wire.make_polygon([bd.Vector(x, y, 0) for x, y in list(h.coords)[:-1]], close=True) for h in g0.interiors])
+    shape = bd.Pos(0, 0, -t) * bd.extrude(face, t)
+    for x, y, r in ps["holes"]:
+        shape = shape - bd.Pos(x, y, -t / 2) * bd.Cylinder(r, t * 2)
+    return tempfile_step(shape), plate_polygon(ps, density)
 
 
 def layout(preset, density, length_mm):

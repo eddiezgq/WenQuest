@@ -5,7 +5,8 @@
 - 只认服务器对服务器的钥匙 WQ_FACTORY_CAE_KEY（Authorization: Bearer），不对外开放；
 - 任务按软件登记在单独的工厂编号下（app=sewing → wq_sewing_saas，默认；app=cam → wq_cam_saas），
   提交人记成“单位::用户”，单位之间互相看不到；
-- 每个单位每天的任务数有上限（有限元 / 模态 / 动力学 WQ_DESIGN_SW_DAILY，默认 20；要用有限元的优化 WQ_DESIGN_SW_OPT_DAILY，默认 5）；
+- 每个单位每天的任务数有上限（有限元 / 模态 / 动力学 / 拓扑优化 WQ_DESIGN_SW_DAILY，默认 20；数控编程 WQ_DESIGN_SW_CAM_DAILY，默认 100；
+  要用有限元的优化 WQ_DESIGN_SW_OPT_DAILY，默认 5）；
 - 只提交计算、读结果，不改零件库，不改生产数据（《数字工厂资源接口约定》第七节）。
 """
 import hmac
@@ -45,7 +46,15 @@ def require_key(authorization: str = Header(default="")):
 def daily_limit(kind):
     if kind == "opt":
         return int(os.environ.get("WQ_DESIGN_SW_OPT_DAILY", "5"))
+    if kind == "cam":                      # 数控编程几秒、不排队，单独计数
+        return int(os.environ.get("WQ_DESIGN_SW_CAM_DAILY", "100"))
     return int(os.environ.get("WQ_DESIGN_SW_DAILY", "20"))
+
+
+def _used(js, kind):
+    """今天（滚动 24 小时）用了几个：数控编程单独算，其余（有限元、模态、动力学、拓扑优化）合在一起算"""
+    today = time.time() - 86400
+    return sum(1 for j in js if (j.get("created") or 0) > today and ((j.get("kind") == "cam") == (kind == "cam")))
 
 
 def _org(org):
@@ -106,8 +115,7 @@ def mount(app):
         kind = body.get("kind") or "fea"
         if kind not in KINDS:
             raise HTTPException(400, "不认识的计算类型")
-        today = time.time() - 86400
-        used = sum(1 for j in _jobs(org, factory=factory) if (j.get("created") or 0) > today)
+        used = _used(_jobs(org, factory=factory), kind)
         if used >= daily_limit(kind):
             raise HTTPException(429, "本单位今天的计算次数已用完（每天 {} 个），明天再来或联系问渠调整".format(daily_limit(kind)))
         owner = "{}::{}".format(org, str(body.get("user") or "")[:40])
@@ -117,12 +125,74 @@ def mount(app):
             return cae_api.call("POST", "/jobs", json=dict(common, step_sha=body.get("step_sha"), setup=body.get("setup") or {})).json()
         return cae_api.call("POST", "/mbd/jobs", json=dict(common, model=body.get("model") or {}, setup=body.get("setup") or {})).json()
 
+    # ---------- 拓扑优化（两孔平板）、数控编程（学习平台第 41 轮第二批） ----------
+    def _quota(org, factory, kind="fea"):
+        if _used(_jobs(org, factory=factory), kind) >= daily_limit(kind):
+            raise HTTPException(429, "本单位今天的{}次数已用完（每天 {} 个），明天再来或联系问渠调整".format(
+                "数控编程" if kind == "cam" else "计算", daily_limit(kind)))
+
+    def _common(body, factory):
+        return {"owner": "{}::{}".format(_org(body.get("org")), str(body.get("user") or "")[:40]), "owner_name": str(body.get("user_name") or "")[:60],
+                "factory": factory, "title": str(body.get("title") or "")[:80]}
+
+    @app.post("/api/design-sw/topo", dependencies=dep)
+    def ds_topo(body: dict = Body(...)):
+        """body：org、user、title、spec（preset = plate，plate = 平板说明，volfrac）"""
+        org = _org(body.get("org"))
+        factory = factory_of(body.get("app"))
+        _quota(org, factory)
+        spec = dict(body.get("spec") or {}, preset="plate")
+        return cae_api.call("POST", "/topo/jobs", json=dict(_common(body, factory), spec=spec)).json()
+
+    @app.get("/api/design-sw/topo/{jid}/result", dependencies=dep)
+    def ds_topo_result(jid: str, org: str):
+        j = _mine(jid, org)
+        return cae_api.call("GET", "/topo/jobs/{}/result".format(j["id"])).json()
+
+    @app.post("/api/design-sw/topo/{jid}/to-step", dependencies=dep)
+    def ds_topo_step(jid: str, org: str):
+        j = _mine(jid, org)
+        return cae_api.call("POST", "/topo/jobs/{}/to-step".format(j["id"])).json()
+
+    @app.get("/api/design-sw/geometry/{sha}/step", dependencies=dep)
+    def ds_step(sha: str):
+        r = cae_api.call("GET", "/geometry/{}/step".format(sha.replace("/", "")))
+        return Response(r.content, media_type="application/step")
+
+    @app.post("/api/design-sw/cam", dependencies=dep)
+    def ds_cam(body: dict = Body(...)):
+        """平板零件的铣削程序：body：org、user、title、sha（已登记的 STEP）、name、material、stock_margin。
+        识别外轮廓、型腔、孔 → 编程单（立式加工中心）→ 生成程序并试切检查（同步，几秒）"""
+        from cae import cam_job as J
+        org = _org(body.get("org"))
+        factory = factory_of(body.get("app"))
+        _quota(org, factory, "cam")
+        r = cae_api.call("POST", "/cam/recognize", json={"sha": body.get("sha")}).json()
+        if r["mill"].get("error"):
+            raise HTTPException(422, "认不出铣削特征：" + r["mill"]["error"])
+        try:
+            spec = J.plan_mill(r["mill"], "VMC-01", str(body.get("material") or "45"), float(body.get("stock_margin", 2.0)),
+                               str(body.get("name") or "零件")[:40])
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+        j = cae_api.call("POST", "/cam/jobs", json=dict(_common(body, factory), spec=spec)).json()
+        j["features"] = {k: r["mill"].get(k) for k in ("top", "bottom", "bbox")}
+        j["features"].update(pockets=len(r["mill"].get("pockets") or []), holes=len(r["mill"].get("holes") or []),
+                             narrow=r["mill"].get("narrow_openings") or 0)
+        return j
+
+    @app.get("/api/design-sw/cam/{jid}/{k}.nc", dependencies=dep)
+    def ds_cam_nc(jid: str, k: int, org: str):
+        j = _mine(jid, org)
+        r = cae_api.call("GET", "/cam/jobs/{}/{}.nc".format(j["id"], int(k)))
+        return Response(r.content, media_type="text/plain; charset=utf-8")
+
     @app.get("/api/design-sw/jobs", dependencies=dep)
     def ds_jobs(org: str, app: str = ""):
         org = _org(org)
         js = _jobs(org, factory=factory_of(app))
-        today = time.time() - 86400
-        return {"jobs": js, "used_today": sum(1 for j in js if (j.get("created") or 0) > today), "daily_limit": daily_limit("fea")}
+        return {"jobs": js, "used_today": _used(js, "fea"), "daily_limit": daily_limit("fea"),
+                "cam_used_today": _used(js, "cam"), "cam_daily_limit": daily_limit("cam")}
 
     @app.get("/api/design-sw/jobs/{jid}", dependencies=dep)
     def ds_job(jid: str, org: str):

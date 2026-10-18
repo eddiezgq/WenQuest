@@ -55,6 +55,42 @@ class FakeFactory:
             return httpx.Response(200, json={"motors": [dict(name="伺服 0.55 kW", power_w=550, rated_nm=1.0, peak_nm=3.0, max_rpm=6000, inertia_kgm2=1e-4),
                                                         dict(name="伺服 1.5 kW", power_w=1500, rated_nm=6.0, peak_nm=18.0, max_rpm=6000, inertia_kgm2=4e-4)],
                                              "source": "测试"})
+        if path == "/topo" and req.method == "POST":
+            b = json.loads(req.content)
+            self.posted.append(b)
+            self.n += 1
+            jid = f"j{self.n}"
+            self.jobs[jid] = dict(id=jid, org=b["org"], kind="topo", status="queued", position=1, body=b)
+            return httpx.Response(200, json={"id": jid, "status": "queued"})
+        if path.startswith("/topo/"):
+            jid, tail = path.split("/")[2], path.split("/")[3]
+            j = self.jobs.get(jid)
+            if not j or j["org"] != q.get("org"):
+                return httpx.Response(404, json={"detail": "没有这个任务"})
+            pl = j["body"]["spec"]["plate"]
+            if tail == "result":
+                return httpx.Response(200, json={"preset": "plate", "iterations": 40, "converged": True, "density": [[1.0]], "plate": {"cell_mm": 0.5, "origin": [0, 0]}})
+            t = pl["thickness_mm"]
+            faces = [dict(id=i, kind="cylinder", axis=[0, 0, 1], axis_origin=[h[0], h[1], -t / 2], radius_mm=h[2]) for i, h in enumerate(pl["holes"])]
+            return httpx.Response(200, json={"geometry": {"sha": "topo-sha", "faces": faces}, "outline": [p_[:2] for p_ in pl["domain"]],
+                                             "inner": [[[h[0] + h[2], h[1]], [h[0], h[1] + h[2]], [h[0] - h[2], h[1]]] for h in pl["holes"]] + [[[0, 1], [1, 1], [1, 2]]],
+                                             "area_mm2": 300.0, "thickness_mm": t})
+        if path.startswith("/geometry/") and path.endswith("/step"):
+            return httpx.Response(200, content=b"ISO-10303-21;")
+        if path == "/cam" and req.method == "POST":
+            b = json.loads(req.content)
+            self.posted.append(b)
+            self.n += 1
+            jid = f"j{self.n}"
+            self.jobs[jid] = dict(id=jid, org=b["org"], kind="cam", status="done", body=b)
+            return httpx.Response(200, json={"id": jid, "status": "done", "features": {"pockets": 1, "holes": 2, "narrow": 0},
+                                             "programs": [{"time": {"total_s": 61.5}, "tools": {"1": {"kind": "endmill", "d": 10.0}, "2": {"kind": "drill", "d": 7.0}},
+                                                           "checks": [], "path": [[0, 0, 0, 5, 1, 0, 1], [1, 10, 0, -3, 2, 1, 1], [1, 10, 10, -3, 3, 2, 1]]}]})
+        if path.startswith("/cam/") and path.endswith(".nc"):
+            j = self.jobs.get(path.split("/")[2])
+            if not j or j["org"] != q.get("org"):
+                return httpx.Response(404, json={"detail": "没有这个任务"})
+            return httpx.Response(200, text="%\nO5001\nG00 X0 Y0\nM30\n%")
         parts = path.strip("/").split("/")
         if parts[0] == "jobs":
             j = self.jobs.get(parts[1])
@@ -208,3 +244,44 @@ def test_cae_setup_formulas():
 def sewcore_clean(machine, p):
     from app import sewcore
     return sewcore.get(machine).clean(p)
+
+
+def test_topo_verify_cam(cae):
+    """第 41 轮第二批：两孔平板减重 → 有限元复核（同一受力、孔按圆柱面找到）→ 铣削程序；DXF、STEP、G 代码下载"""
+    c, h, fk = cae
+    o = c.get("/api/v1/sewing/cae/options?machine=overlock", headers=h).json()
+    assert o["kinds"]["topo"] and o["kinds"]["cam"] and "LL_Rocker" in [p["key"] for p in o["cam_parts"]]
+    assert c.get("/api/v1/sewing/cae/options?machine=cover", headers=h).json()["cam_parts"] == []
+    assert c.post("/api/v1/sewing/cae/topo", json={"machine": "lockstitch", "part": "ConnectingRod", "volfrac": 0.95}, headers=h).status_code == 422
+    r = c.post("/api/v1/sewing/cae/topo", json={"machine": "overlock", "part": "LL_Rocker", "volfrac": 0.5}, headers=h).json()
+    pl = fk.posted[-1]["spec"]["plate"]
+    assert pl["support"] == pl["holes"][0] and pl["load"]["at"] == pl["holes"][1] and len(pl["solid"]) >= 2
+    case = CS.fea_case("overlock", {}, "LL_Rocker")
+    tc = CS.topo_case("overlock", {}, "LL_Rocker")
+    assert math.hypot(*tc["case"]["vector_n"]) == pytest.approx(abs(case["ref_load"]), abs=0.01)   # 复核用完整的力
+    assert pl["load"]["f"] == tc["case"]["vector_n"][:2] and abs(tc["case"]["vector_n"][2]) > 1     # 优化只用板面内的分量
+    xs = [q[0] for q in pl["domain"]]
+    assert abs((min(xs) + max(xs)) / 2) < 1e-6                                                    # 外形中心在原点（数控工件零点）
+    j = done(c, h, fk, r["id"])
+    assert j["result"]["mass_ratio"] == pytest.approx(300.0 / CS.topo_case("overlock", {}, "LL_Rocker")["area0"], rel=1e-3)
+    assert c.get(f"/api/v1/sewing/cae/jobs/{r['id']}/image.png", headers=h).content[:4] == b"\x89PNG"
+    dxf = c.get(f"/api/v1/sewing/cae/jobs/{r['id']}/part.dxf", headers=h).text
+    assert dxf.count("CIRCLE") == 2 and "LINE" in dxf                                              # 安装孔画整圆，减重孔、外形画线
+    assert c.get(f"/api/v1/sewing/cae/jobs/{r['id']}/part.step", headers=h).content.startswith(b"ISO-10303-21")
+    assert c.get(f"/api/v1/sewing/cae/jobs/{r['id']}/report.docx", headers=h).status_code == 404
+    v = c.post(f"/api/v1/sewing/cae/topo/{r['id']}/verify", headers=h).json()
+    b = fk.posted[-1]
+    assert b["step_sha"] == "topo-sha" and b["setup"]["loads"][0]["faces"] == [0] and b["setup"]["loads"][1]["faces"] == [1]
+    assert b["setup"]["loads"][1]["vector_n"] == tc["case"]["vector_n"]
+    j = done(c, h, fk, v["id"])
+    assert {x["key"] for x in j["result"]["checks"]} == {"sf", "life"}
+    # 数控：零件直接出程序、减重后的零件出程序
+    m = c.post("/api/v1/sewing/cae/cam", json={"machine": "overlock", "part": "LL_Rocker"}, headers=h).json()
+    assert fk.posted[-1]["material"] == "45" and m["status"] == "done"
+    j = c.get(f"/api/v1/sewing/cae/jobs/{m['id']}", headers=h).json()
+    assert j["result"]["checks"][0]["state"] == "ok" and j["result"]["time_s"] == 61.5 and len(j["result"]["path"]) == 3
+    assert "M30" in c.get(f"/api/v1/sewing/cae/jobs/{m['id']}/program.nc", headers=h).text
+    m2 = c.post("/api/v1/sewing/cae/cam", json={"machine": "overlock", "topo": r["id"]}, headers=h).json()
+    assert fk.posted[-1]["sha"] == "topo-sha" and m2["status"] == "done"
+    assert c.post("/api/v1/sewing/cae/cam", json={"machine": "overlock", "part": "Nope"}, headers=h).status_code == 404
+    assert c.post("/api/v1/sewing/cae/cam", json={"machine": "cover", "part": "LL_Rocker"}, headers=h).status_code == 404

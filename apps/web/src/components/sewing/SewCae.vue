@@ -78,14 +78,38 @@
         </view>
       </view>
 
+      <!-- 减重与加工（第 41 轮第二批）：拓扑优化、数控编程 -->
+      <view v-if="opt && (opt.kinds.topo || opt.kinds.cam)" class="box">
+        <text class="bt">{{ t("sew.cae.make") }}</text>
+        <template v-if="opt.kinds.topo">
+          <text class="st">{{ t("sew.cae.topo") }}</text>
+          <text class="hint">{{ t("sew.cae.topoNote") }}</text>
+          <view class="row">
+            <text v-for="p in opt.parts" :key="p.key" class="opt" :class="{ on: tpart === p.key }" @click="tpart = p.key">{{ L(p) }}</text>
+          </view>
+          <view class="row"><text class="muted small">{{ t("sew.cae.keep") }}</text>
+            <text v-for="v in [0.4, 0.5, 0.6]" :key="v" class="opt" :class="{ on: vf === v }" @click="vf = v">{{ Math.round(v * 100) }}%</text></view>
+          <view class="btn" :class="{ disabled: !canRun }" @click="submitTopo">{{ t("sew.cae.run") }}</view>
+        </template>
+        <template v-if="opt.kinds.cam">
+          <text class="st">{{ t("sew.cae.cam") }}</text>
+          <text class="hint">{{ t("sew.cae.camNote") }}</text>
+          <view class="row">
+            <text v-for="p in opt.cam_parts" :key="p.key" class="opt" :class="{ on: cpart === p.key }" @click="cpart = p.key">{{ L(p) }}</text>
+          </view>
+          <view class="btn" :class="{ disabled: !canRun }" @click="submitCam('')">{{ busy === "cam" ? t("sew.making") : t("sew.cae.runCam") }}</view>
+        </template>
+      </view>
+
       <!-- 任务与结果 -->
       <view class="box">
         <view class="bh"><text class="bt">{{ t("sew.cae.jobs") }}</text><text class="link" @click="loadJobs">{{ t("sew.cae.refresh") }}</text></view>
         <text v-if="!jobs.length" class="hint">{{ t("sew.cae.noJobs") }}</text>
-        <view v-for="j in jobs" :key="j.jid" class="job" :class="{ on: sel && sel.id === j.jid }" @click="openJob(j.jid)">
+        <view v-for="j in (allJobs ? jobs : jobs.slice(0, 10))" :key="j.jid" class="job" :class="{ on: sel && sel.id === j.jid }" @click="openJob(j.jid)">
           <text class="jt">{{ j.title }}</text>
           <text class="js" :class="j.status">{{ statusText(j) }}</text>
         </view>
+        <text v-if="jobs.length > 10" class="link" @click="allJobs = !allJobs">{{ allJobs ? t("sew.cae.fewer") : t("sew.cae.all", { n: jobs.length }) }}</text>
         <view v-if="sel" class="res">
           <text class="ct">{{ sel.title }}</text>
           <text v-if="sel.status !== 'done'" class="hint">{{ statusText(sel) }}<text v-if="sel.error"> · {{ sel.error }}</text></text>
@@ -114,11 +138,30 @@
               <text class="para">{{ t("sew.cae.mbdSum", { a: n3(sel.result.torque_peak_mbd), b: n3(sel.result.torque_peak_formula) }) }}</text>
               <svg class="svg" viewBox="0 0 300 120" v-html="spark(sel.result.series, 'N·m')" />
             </view>
+            <view v-if="sel.kind === 'topo'" class="res">
+              <text class="para">{{ t("sew.cae.topoSum", { r: pct(sel.result.mass_ratio), a0: n1(sel.result.area0), a: n1(sel.result.area), it: sel.result.iterations }) }}</text>
+              <view class="row">
+                <view class="btn sm" :class="{ disabled: !canRun }" @click="verifyTopo">{{ t("sew.cae.verify") }}</view>
+                <view class="btn ghost sm" :class="{ disabled: !canRun }" @click="submitCam(sel.id)">{{ t("sew.cae.runCam") }}</view>
+                <view class="btn ghost sm" @click="getFile(`/api/v1/sewing/cae/jobs/${sel.id}/part.dxf`, 'part.dxf')">DXF ↓</view>
+                <view class="btn ghost sm" @click="getFile(`/api/v1/sewing/cae/jobs/${sel.id}/part.step`, 'part.step')">STEP ↓</view>
+              </view>
+              <text class="hint">{{ t("sew.cae.topoAfter") }}</text>
+            </view>
+            <view v-if="sel.kind === 'cam'" class="res">
+              <text class="para">{{ t("sew.cae.camSum", { s: Math.round(sel.result.time_s), n: sel.result.tools.length }) }}</text>
+              <text class="para muted">{{ sel.result.tools.map((x: any) => (x.kind === "drill" ? t("sew.cae.drill") : t("sew.cae.endmill")) + " Ø" + x.d).join("，") }}</text>
+              <text v-for="(x, i) in sel.result.issues" :key="i" class="para badc">{{ x }}</text>
+              <text v-if="sel.result.features && sel.result.features.narrow" class="para badc">{{ t("sew.cae.narrow", { n: sel.result.features.narrow }) }}</text>
+              <svg class="svg path" viewBox="0 0 300 200" v-html="pathSvg(sel.result.path)" />
+              <text class="hint">{{ t("sew.cae.pathNote") }}</text>
+              <view class="row"><view class="btn ghost" @click="getFile(`/api/v1/sewing/cae/jobs/${sel.id}/program.nc`, 'program.nc')">{{ t("sew.cae.nc") }}</view></view>
+            </view>
             <!-- #ifdef H5 -->
             <image v-if="img" class="img" :src="img" mode="widthFix" />
             <!-- #endif -->
             <view class="row">
-              <view class="btn ghost" @click="getReport">{{ busy === "report" ? t("sew.making") : t("sew.cae.report") }}</view>
+              <view v-if="sel.kind !== 'topo' && sel.kind !== 'cam'" class="btn ghost" @click="getReport">{{ busy === "report" ? t("sew.making") : t("sew.cae.report") }}</view>
               <text class="hint">{{ t("sew.cae.inCalc") }}</text>
             </view>
           </template>
@@ -137,11 +180,16 @@ import { errorText, locale, t } from "../../i18n";
 const props = defineProps<{ machine: string; params: Record<string, number | string>; licensed: boolean; active: boolean; labels?: Record<string, string> }>();
 const emit = defineEmits<{ (e: "apply", p: Record<string, number | string>): void }>();
 
-interface Opt { connected: boolean; parts: { key: string; zh: string; en: string }[]; goals: { key: string; zh: string; en: string }[];
+interface Opt { connected: boolean; parts: { key: string; zh: string; en: string }[]; cam_parts: { key: string; zh: string; en: string }[];
+  goals: { key: string; zh: string; en: string }[];
   quota: { used: number; limit: number } | null; kinds: Record<string, boolean> }
 const FRAME_MATS = ["HT200", "QT500-7", "Q235", "6061-T6"];
 const opt = ref<Opt | null>(null);
 const part = ref("");
+const tpart = ref("");
+const cpart = ref("");
+const vf = ref(0.5);
+const allJobs = ref(false);
 const goal = ref("");
 const optRes = ref<any>(null);
 const motor = ref<any>(null);
@@ -164,7 +212,8 @@ async function load() {
   msg.value = "";
   try {
     opt.value = await request<Opt>("GET", `/api/v1/sewing/cae/options?machine=${props.machine}`);
-    part.value = opt.value.parts[0]?.key || "";
+    part.value = tpart.value = opt.value.parts[0]?.key || "";
+    cpart.value = opt.value.cam_parts?.[0]?.key || "";
   } catch (e) { fail(e); }
   goal.value = "";
   optRes.value = motor.value = sel.value = null;
@@ -184,6 +233,41 @@ async function submit(kind: "fea" | "mbd") {
     await loadJobs();
     await openJob(r.id);
     refreshQuota();
+  } catch (e) { fail(e); }
+  busy.value = "";
+}
+async function submitTopo() {
+  if (!canRun.value) return;
+  busy.value = "topo";
+  msg.value = "";
+  try {
+    const r = await request<{ id: string }>("POST", "/api/v1/sewing/cae/topo", { machine: props.machine, params: { ...props.params }, part: tpart.value, volfrac: vf.value }, 120000);
+    await loadJobs();
+    await openJob(r.id);
+    refreshQuota();
+  } catch (e) { fail(e); }
+  busy.value = "";
+}
+async function verifyTopo() {
+  if (!canRun.value || !sel.value) return;
+  busy.value = "verify";
+  try {
+    const r = await request<{ id: string }>("POST", `/api/v1/sewing/cae/topo/${sel.value.id}/verify`, {}, 120000);
+    await loadJobs();
+    await openJob(r.id);
+    refreshQuota();
+  } catch (e) { fail(e); }
+  busy.value = "";
+}
+// 数控编程：零件直接出程序；topo 不空时用这个拓扑优化任务减重后的零件
+async function submitCam(topo: string) {
+  if (!canRun.value) return;
+  busy.value = "cam";
+  msg.value = "";
+  try {
+    const r = await request<{ id: string }>("POST", "/api/v1/sewing/cae/cam", { machine: props.machine, params: { ...props.params }, part: cpart.value, topo }, 180000);
+    await loadJobs();
+    await openJob(r.id);
   } catch (e) { fail(e); }
   busy.value = "";
 }
@@ -253,7 +337,7 @@ async function openJob(id: string, quiet = false) {
     const j = await request<any>("GET", `/api/v1/sewing/cae/jobs/${id}`, undefined, 180000);
     const changed = !sel.value || sel.value.id !== id || (sel.value.status !== "done" && j.status === "done");
     sel.value = j;
-    if (changed) { img.value = ""; if (j.status === "done" && (j.kind === "fea" || j.kind === "frame")) loadImage(id); }
+    if (changed) { img.value = ""; if (j.status === "done" && ["fea", "frame", "topo"].includes(j.kind)) loadImage(id); }
     if (j.status === "done" && quiet) loadJobs();
     if (j.status !== "done" && j.status !== "failed") poll();
   } catch (e) { if (!quiet) fail(e); }
@@ -278,21 +362,24 @@ async function loadImage(id: string) {
 async function getReport() {
   if (!sel.value || busy.value) return;
   busy.value = "report";
+  await getFile(`/api/v1/sewing/cae/jobs/${sel.value.id}/report.docx`, "CAE.docx");
+  busy.value = "";
+}
+async function getFile(path: string, fallback: string) {
   // #ifdef H5
   try {
-    const res = await authed(`/api/v1/sewing/cae/jobs/${sel.value.id}/report.docx`);
+    const res = await authed(path);
     const m = /filename\*=UTF-8''([^;]+)/.exec(res.headers.get("content-disposition") || "");
     const url = URL.createObjectURL(await res.blob());
     const a = document.createElement("a");
     a.href = url;
-    a.download = m ? decodeURIComponent(m[1]) : "CAE.docx";
+    a.download = m ? decodeURIComponent(m[1]) : fallback;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5000);
   } catch (e) { fail(e); }
   // #endif
-  busy.value = "";
 }
 function statusText(j: any) {
   if (j.status === "queued") return j.position ? t("sew.cae.queued", { n: j.position }) : t("sew.cae.st.queued");
@@ -306,6 +393,23 @@ function fmtParams(p: Record<string, number | string>) {
 const NOTES = ["fmax", "mu_min", "margin", "pre", "neg", "gamma_min", "swing", "arc", "eps_pct", "window"];
 function noteText(n: Record<string, unknown>) {
   return Object.entries(n || {}).map(([k, v]) => `${NOTES.includes(k) ? t("sew.cae.note." + k) : k} ${Array.isArray(v) ? v.join("…") : v}`).join("，");
+}
+const pct = (v: number | null | undefined) => (v == null ? "—" : `${Math.round(v * 100)}%`);
+// 刀路俯视图：快移灰色虚线，切削蓝色；行 [0 快移 / 1 切削, x, y, z]
+function pathSvg(rows: number[][]) {
+  if (!rows || rows.length < 2) return "";
+  const xs = rows.map((r) => r[1]), ys = rows.map((r) => r[2]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const k = Math.min(284 / (x1 - x0 || 1), 184 / (y1 - y0 || 1));
+  const X = (v: number) => 8 + (v - x0) * k + (284 - (x1 - x0) * k) / 2, Y = (v: number) => 192 - (v - y0) * k - (184 - (y1 - y0) * k) / 2;
+  let s = `<rect x="0" y="0" width="300" height="200" fill="#fff" stroke="#e1e6ea"/>`;
+  for (let i = 1; i < rows.length; i++) {
+    const a = rows[i - 1], b = rows[i];
+    if (Math.abs(a[1] - b[1]) + Math.abs(a[2] - b[2]) < 1e-6) continue;
+    s += b[0] ? `<line x1="${X(a[1]).toFixed(1)}" y1="${Y(a[2]).toFixed(1)}" x2="${X(b[1]).toFixed(1)}" y2="${Y(b[2]).toFixed(1)}" stroke="#2d6fb3" stroke-width="1"/>`
+      : `<line x1="${X(a[1]).toFixed(1)}" y1="${Y(a[2]).toFixed(1)}" x2="${X(b[1]).toFixed(1)}" y2="${Y(b[2]).toFixed(1)}" stroke="#9aa7b2" stroke-width="0.6" stroke-dasharray="3 2"/>`;
+  }
+  return s;
 }
 function spark(ys: number[], unit: string) {
   if (!ys || !ys.length) return "";
@@ -379,5 +483,8 @@ onBeforeUnmount(() => clearTimeout(timer));
 .tr.th { background: #eaf2fa; font-weight: 600; }
 .td { flex: 1; padding: 5px 8px; min-width: 0; }
 .okc { color: #2e7d4f; font-weight: 700; }
+.st { display: block; font-weight: 600; color: var(--wq-ink); margin-top: 10px; }
+.small { font-size: 12px; }
+.svg.path { max-width: 480px; }
 .badc { color: var(--wq-danger); }
 </style>

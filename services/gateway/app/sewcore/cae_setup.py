@@ -295,3 +295,103 @@ def life_years(summary):
         return float("inf")
     h = summary.get("life_hours")
     return None if h is None else h / HOURS_PER_YEAR
+
+
+# ---------- 拓扑优化（两孔平板）、数控编程（第 41 轮第二批） ----------
+FLAT_FRAME = {"o": [0.0, 0.0, 0.0], "u": [1.0, 0.0, 0.0], "v": [0.0, 1.0, 0.0], "n": [0.0, 0.0, 1.0]}
+
+
+def _center(d):
+    """零件外形（几个圆的凸包）的外接矩形中心，平面坐标"""
+    pts = cad.outline(d["circles"], seg=32)
+    return ((min(x for x, _ in pts) + max(x for x, _ in pts)) / 2, (min(y for _, y in pts) + max(y for _, y in pts)) / 2)
+
+
+def flat(d):
+    """零件放平：平面坐标 (a, b) → (x − 中心, y − 中心)，厚度沿 z 从 −t 到 0——上表面在 Z0、外形中心在 X0 Y0（数控的工件零点；
+    上表面不在 Z0 时试切报“快移撞到工件”，零件离原点远时报“超程”）。拓扑优化的结果也在这个坐标里"""
+    cx, cy = _center(d)
+    q = dict(d, frame=dict(FLAT_FRAME, o=[-cx, -cy, -float(d["t"])]))
+    q.pop("y0", None)
+    return q
+
+
+def _local(fr, v):
+    _, u, w, _ = fr
+    return [sum(v[i] * u[i] for i in range(3)), sum(v[i] * w[i] for i in range(3))]
+
+
+def topo_case(machine, params, part, volfrac=0.5):
+    """同 fea_case 的零件和受力，换成平板坐标：设计区域 = 现在的外形（几个圆的凸包），圆（毂、平衡块）保留实心，
+    第一个孔支承、第二个孔受力（与 fea_case 的支承孔、受力孔同一对）。拓扑优化是平面的，只用力在板面内的分量；
+    有限元复核用完整的力（包缝机球头连杆的力有垂直于板面的分量）"""
+    case = fea_case(machine, params, part)
+    if not case:
+        return None
+    d = case["descriptor"]
+    fr = cad._frame(d)
+    cx, cy = _center(d)
+    sh = lambda c: [float(c[0]) - cx, float(c[1]) - cy] + [float(v) for v in c[2:]]  # noqa: E731
+    holes = [sh(h) for h in d["holes"]]
+    f2 = _local(fr, case["vector_n"])
+    dom = [sh(q) for q in cad.outline(d["circles"], seg=64)]
+    area0 = _area(dom) - sum(math.pi * r * r for _, _, r in holes)
+    plate = {"domain": dom, "solid": [sh(c) for c in d["circles"]], "holes": holes,
+             "support": holes[0], "load": {"at": holes[1], "f": [round(f2[0], 3), round(f2[1], 3)]}, "thickness_mm": float(d["t"])}
+    t = float(d["t"])
+    fn = sum(case["vector_n"][i] * fr[3][i] for i in range(3))          # 垂直于板面的分量：平面拓扑优化管不到，有限元复核要算上
+    fl = dict(case, descriptor=flat(d), vector_n=[round(f2[0], 3), round(f2[1], 3), round(fn, 3)],
+              support=dict(center=[holes[0][0], holes[0][1], -t / 2], axis=[0.0, 0.0, 1.0], r=holes[0][2]),
+              load=dict(center=[holes[1][0], holes[1][1], -t / 2], axis=[0.0, 0.0, 1.0], r=holes[1][2]))
+    return {"spec": {"plate": plate, "volfrac": float(volfrac)}, "case": fl, "area0": area0}
+
+
+def _area(pts):
+    return abs(sum(pts[i][0] * pts[i - 1][1] - pts[i - 1][0] * pts[i][1] for i in range(len(pts)))) / 2
+
+
+CAM_EN = {"NeedleCrank": "Needle crank", "ConnectingRod": "Needle-bar link", "TakeupCrank": "Take-up crank", "TakeupLever": "Take-up lever",
+          "TakeupRocker": "Take-up rocker", "LiftEccentric": "Lift eccentric", "FeedEccentric": "Feed eccentric",
+          "OL_NeedleCrank": "Needle crank", "OL_NeedleRod": "Needle link", "LL_Eccentric": "Lower-looper eccentric", "LL_Rocker": "Lower-looper rocker",
+          "LL_Looper": "Lower looper", "UL_Eccentric": "Upper-looper eccentric", "UL_Rocker": "Upper-looper rocker",
+          "FeedArmMain": "Main feed arm", "FeedArmDiff": "Differential feed arm"}
+
+
+def cam_parts(machine):
+    """可以出铣削程序的平板零件（本软件三维模型里的平板件；旋梭不是板件，不算；绷缝机没有三维零件）"""
+    if machine not in ("lockstitch", "overlock"):
+        return []
+    model = cad.parts3d({}, 0.0, machine)
+    return [dict(key=d["name"], zh=d["zh"], en=CAM_EN.get(d["name"], d["name"])) for d in model["parts"]
+            if d["type"] == "plate" and d["name"] in CAM_EN]
+
+
+def cam_desc(machine, params, part):
+    if machine not in ("lockstitch", "overlock") or part not in CAM_EN:
+        return None
+    model = cad.parts3d(get(machine).clean(params), 0.0, machine)
+    d = next((x for x in model["parts"] if x["type"] == "plate" and x["name"] == part), None)
+    return flat(d) if d else None
+
+
+def outline_dxf(outer, inner, holes, name, t):
+    """拓扑优化后的零件轮廓 → DXF（R12，mm）：外轮廓、减重孔用多段线，安装孔用整圆"""
+    ents = []
+
+    def poly(pts):
+        for (ax, ay), (bx, by) in zip(pts, pts[1:] + pts[:1]):
+            ents.extend(["0", "LINE", "8", name, "10", f"{ax:.4f}", "20", f"{ay:.4f}", "11", f"{bx:.4f}", "21", f"{by:.4f}"])
+    poly(outer)
+    hc = [(x, y, r) for x, y, r in holes]
+    for ring in inner:
+        cx = sum(p[0] for p in ring) / len(ring)
+        cy = sum(p[1] for p in ring) / len(ring)
+        if any(math.hypot(cx - x, cy - y) < 0.3 * r for x, y, r in hc):
+            continue                                            # 安装孔：下面画整圆
+        poly(ring)
+    for x, y, r in hc:
+        ents.extend(["0", "CIRCLE", "8", name, "10", f"{x:.4f}", "20", f"{y:.4f}", "40", f"{r:.4f}"])
+    ents.extend(["0", "TEXT", "8", name, "10", f"{min(p[0] for p in outer):.2f}", "20", f"{min(p[1] for p in outer) - 8:.2f}", "40", "3",
+                 "1", f"{name} t={t:g}"])
+    body = ["0", "SECTION", "2", "HEADER", "9", "$INSUNITS", "70", "4", "0", "ENDSEC", "0", "SECTION", "2", "ENTITIES"] + ents + ["0", "ENDSEC", "0", "EOF"]
+    return ("\n".join(body) + "\n").encode("utf-8")

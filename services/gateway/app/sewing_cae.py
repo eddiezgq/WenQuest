@@ -45,6 +45,8 @@ class DesignIn(BaseModel):
     part: str = Field(default="", max_length=40)
     goal: str = Field(default="", max_length=20)
     project: str = Field(default="", max_length=80)
+    volfrac: float = Field(default=0.5, ge=0.3, le=0.8)
+    topo: str = Field(default="", max_length=40)        # 数控编程：用这个拓扑优化任务减重后的零件
 
 
 def phash(machine: str, p: dict) -> str:
@@ -101,6 +103,45 @@ def contour_png(raw: bytes, title: str) -> bytes:
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(0, vmax))
     fig.colorbar(sm, ax=ax, shrink=0.7, label="von Mises MPa")
     ax.set_title(title, fontsize=11)
+    b = io.BytesIO()
+    fig.savefig(b, format="png", dpi=110, bbox_inches="tight")
+    plt.close(fig)
+    return b.getvalue()
+
+
+def topo_png(res: dict, ctx: dict, title: str) -> bytes:
+    """减重结果：原外形（虚线）、减重后的零件（实心）、孔、受力方向"""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Circle, Polygon
+    from .sewcore.report import _mpl_cjk
+    plt.rcParams["font.family"] = [_mpl_cjk(), "DejaVu Sans"]
+    fig, ax = plt.subplots(figsize=(6.4, 5.0))
+    dom = ctx["domain"]
+    ax.add_patch(Polygon(dom, closed=True, fill=False, ls="--", lw=1.0, ec="#8a9aa8"))
+    ax.add_patch(Polygon(res["outline"], closed=True, fc="#2d6fb3", ec="#1d4e75", lw=1.0))
+    for ring in res["inner"]:
+        ax.add_patch(Polygon(ring, closed=True, fc="white", ec="#1d4e75", lw=0.8))
+    for x, y, r in ctx["holes"]:
+        ax.add_patch(Circle((x, y), r, fc="white", ec="#1d4e75", lw=0.8))
+    sx, sy = ctx["support"]["center"][:2]
+    lx, ly = ctx["load"]["center"][:2]
+    fx, fy = ctx["vector_n"][:2]
+    L = max(abs(fx), abs(fy)) or 1
+    xs = [p[0] for p in dom]
+    ys = [p[1] for p in dom]
+    span = max(max(xs) - min(xs), max(ys) - min(ys))
+    ax.annotate("", xy=(lx + fx / L * span * 0.25, ly + fy / L * span * 0.25), xytext=(lx, ly),
+                arrowprops=dict(arrowstyle="-|>", color="#c0392b", lw=2))
+    ax.plot([sx], [sy], marker="^", ms=12, color="#2e9e6a")
+    ratio = res.get("mass_ratio")
+    ax.set_title(f"{title}\n质量 {ratio:.0%}（虚线为原外形；绿 = 支承孔，红箭头 = 受力）" if ratio else title, fontsize=10)
+    m = span * 0.32
+    ax.set_xlim(min(xs) - m, max(xs) + m)
+    ax.set_ylim(min(ys) - m, max(ys) + m)
+    ax.set_aspect("equal")
+    ax.set_xlabel("mm")
     b = io.BytesIO()
     fig.savefig(b, format="png", dpi=110, bbox_inches="tight")
     plt.close(fig)
@@ -167,9 +208,9 @@ def register(app, m) -> None:
                 q = {"used": j["used_today"], "limit": j["daily_limit"]}
             except EngineError:
                 q = None
-        return {"connected": connected(), "parts": CS.parts(machine), "goals": OPT.goals(machine), "quota": q,
+        return {"connected": connected(), "parts": CS.parts(machine), "cam_parts": CS.cam_parts(machine), "goals": OPT.goals(machine), "quota": q,
                 "kinds": {"fea": bool(CS.parts(machine)), "frame": True, "mbd": machine in ("lockstitch", "overlock"),
-                          "motor": machine in ("lockstitch", "overlock")}}
+                          "motor": machine in ("lockstitch", "overlock"), "topo": bool(CS.parts(machine)), "cam": bool(CS.cam_parts(machine))}}
 
     # ---------- 强度 + 疲劳 ----------
     @app.post("/api/v1/sewing/cae/fea")
@@ -252,6 +293,121 @@ def register(app, m) -> None:
         sel["source"] = "通用典型值 / typical catalogue values"      # 工厂表里的来源写了品牌名，平台内容不点名
         return sel
 
+    # ---------- 拓扑优化（两孔平板减重，第 41 轮第二批） ----------
+    @app.post("/api/v1/sewing/cae/topo")
+    async def topo(body: DesignIn, sess: Annotated[Session, Depends(m.current)]):
+        lic = await m.sewing_need_license(sess)
+        M = sewcore.get(body.machine)
+        p = M.clean(body.params)
+        tc = CS.topo_case(body.machine, p, body.part, body.volfrac)
+        if not tc:
+            raise EngineError("not_found", "this part cannot be optimised for this machine", 404)
+        name = next((x["zh"] for x in CS.parts(body.machine) if x["key"] == body.part), body.part)
+        title = f"{M.NAME[0]} · {name} · 减重（留 {body.volfrac:.0%}）"
+        spec = dict(tc["spec"], material_id=p.get("mat", "45-QT"))
+        j = await factory("POST", "/topo", json=dict(org=lic["org"], user=str(sess.user_id), user_name=lic.get("name") or "", title=title, spec=spec))
+        c = tc["case"]
+        ctx = {k: c[k] for k in ("phi", "vector_n", "ref_load", "series", "block_seconds", "n", "analytic", "support", "load")}
+        ctx.update(material=p.get("mat", "45-QT"), area0=tc["area0"], t=float(c["descriptor"]["t"]), holes=tc["spec"]["plate"]["holes"],
+                   domain=tc["spec"]["plate"]["domain"], part_zh=name, volfrac=body.volfrac)
+        save(j["id"], lic, sess, body.machine, "topo", body.part, title, p, ctx)
+        return {"id": j["id"], "status": j["status"]}
+
+    @app.post("/api/v1/sewing/cae/topo/{jid}/verify")
+    async def topo_verify(jid: str, sess: Annotated[Session, Depends(m.current)]):
+        """减重后的零件送有限元复核（同一组受力、同一材料，强度与疲劳判据不变）"""
+        lic = await m.sewing_need_license(sess)
+        d = row(jid, lic["org"])
+        if d["kind"] != "topo" or not d["result"]:
+            raise EngineError("not_found", "the optimisation has not finished", 404)
+        ctx = d["ctx"]
+        geo = d["result"]["geometry"]
+        try:
+            setup = CS.fea_setup(dict(support=ctx["support"], load=ctx["load"], vector_n=ctx["vector_n"], descriptor={"t": ctx["t"]}),
+                                 geo["faces"], ctx["material"])
+        except ValueError as e:
+            raise EngineError("factory_error", str(e), 400) from e
+        title = d["title"].replace("减重", "减重后复核")
+        j = await factory("POST", "/jobs", json=submit_body(lic, sess, "fea", title, d["part"], step_sha=geo["sha"], setup=setup))
+        fctx = {k: ctx[k] for k in ("phi", "vector_n", "ref_load", "series", "block_seconds", "n", "analytic")}
+        fctx.update(material=ctx["material"], from_topo=jid)
+        save(j["id"], lic, sess, d["machine"], "fea", d["part"], title, d["params"], fctx)
+        return {"id": j["id"], "status": j["status"]}
+
+    # ---------- 数控编程（平板零件铣削，第 41 轮第二批） ----------
+    @app.post("/api/v1/sewing/cae/cam")
+    async def cam(body: DesignIn, sess: Annotated[Session, Depends(m.current)]):
+        lic = await m.sewing_need_license(sess)
+        M = sewcore.get(body.machine)
+        p = M.clean(body.params)
+        if body.topo:
+            t = row(body.topo, lic["org"])
+            if t["kind"] != "topo" or not t["result"]:
+                raise EngineError("not_found", "the optimisation has not finished", 404)
+            sha, part, name = t["result"]["geometry"]["sha"], t["part"], t["ctx"].get("part_zh", t["part"]) + "（减重后）"
+            p = t["params"]
+        else:
+            dsc = CS.cam_desc(body.machine, p, body.part)
+            if not dsc:
+                raise EngineError("not_found", "no flat part with this name", 404)
+            step = await asyncio.to_thread(CS.part_step, dsc)
+            if not step:
+                raise EngineError("unavailable", "3D part generation is not installed on this server", 503)
+            sha = (await factory("POST", "/geometry", content=step))["sha"]
+            part, name = body.part, dsc["zh"]
+        mat = str(p.get("mat", "45-QT"))
+        title = f"{M.NAME[0]} · {name} · 铣削程序"
+        j = await factory("POST", "/cam", json=dict(org=lic["org"], user=str(sess.user_id), user_name=lic.get("name") or "", title=title,
+                                                    sha=sha, name=name[:40], material=("7075" if mat.startswith("7075") else "6061" if mat.startswith("6061") else "45")))
+        res = cam_result(j)
+        save(j["id"], lic, sess, body.machine, "cam", part, title, p, {"sha": sha, "topo": body.topo or None})
+        with db() as c:
+            c.execute("update cae_jobs set result=? where jid=?", (json.dumps(res), j["id"]))
+        return {"id": j["id"], "status": "done" if j.get("status") == "done" else j.get("status")}
+
+    def cam_result(j: dict) -> dict:
+        progs = j.get("programs") or []
+        bad = [c for pg in progs for c in pg.get("checks") or [] if c.get("level") in ("error", "bad")]
+        warn = [c for pg in progs for c in pg.get("checks") or [] if c.get("level") in ("warn", "warning")]
+        total = sum((pg.get("time") or {}).get("total_s", 0) for pg in progs)
+        path = []
+        for pg in progs[:1]:
+            rows = pg.get("path") or []
+            step = max(1, len(rows) // 1500)
+            path = [[r[0], round(r[1], 2), round(r[2], 2), round(r[3], 2)] for r in rows[::step]]
+        txt = lambda c: str(c.get("text") or c.get("msg") or c.get("message") or c.get("kind") or "")  # noqa: E731
+        res = {"status": j.get("status"), "error": j.get("error"), "programs": len(progs), "time_s": round(total, 1),
+               "tools": [dict(n=k, **v) for pg in progs for k, v in (pg.get("tools") or {}).items()],
+               "features": j.get("features"), "path": path, "issues": [txt(c) for c in bad + warn][:10]}
+        res["checks"] = [dict(key="cam_sim", zh="试切检查（撞刀、过切、超程、转速、功率）", en="Trial-cut checks (collision, gouge, overtravel, speed, power)",
+                              value=f"{len(bad)} / {len(warn)}", limit="0 错误 / errors", state="bad" if bad or j.get("status") != "done" else ("warn" if warn else "ok"))]
+        return res
+
+    @app.get("/api/v1/sewing/cae/jobs/{jid}/program.nc")
+    async def program(jid: str, sess: Annotated[Session, Depends(m.current)]):
+        lic = await m.sewing_need_license(sess)
+        d = row(jid, lic["org"])
+        if d["kind"] != "cam":
+            raise EngineError("not_found", "no program for this analysis", 404)
+        r = await factory("GET", f"/cam/{jid}/0.nc", params={"org": lic["org"]}, raw=True)
+        from urllib.parse import quote
+        return Response(r.content, media_type="text/plain; charset=utf-8",
+                        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(d['title'] + '.nc')}"})
+
+    @app.get("/api/v1/sewing/cae/jobs/{jid}/part.{ext}")
+    async def topo_part(jid: str, ext: str, sess: Annotated[Session, Depends(m.current)]):
+        lic = await m.sewing_need_license(sess)
+        d = row(jid, lic["org"])
+        if d["kind"] != "topo" or not d["result"] or ext not in ("dxf", "step"):
+            raise EngineError("not_found", "no optimised part", 404)
+        from urllib.parse import quote
+        name = quote(d["title"] + "." + ext)
+        if ext == "dxf":
+            data = CS.outline_dxf(d["result"]["outline"], d["result"]["inner"], d["ctx"]["holes"], d["part"], d["ctx"]["t"])
+            return Response(data, media_type="application/dxf", headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
+        r = await factory("GET", f"/geometry/{d['result']['geometry']['sha']}/step", raw=True)
+        return Response(r.content, media_type="application/step", headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
+
     # ---------- 结果 ----------
     async def finish(d: dict, j: dict) -> dict | None:
         """任务算完后补算（疲劳、模态、对照）并给出判定；结果缓存"""
@@ -279,6 +435,16 @@ def register(app, m) -> None:
                      value="∞" if res["infinite"] else ("—" if life is None else ("> 1000 年 / years" if life > 1000 else f"{life:.1f} 年 / years")),
                      limit=f"≥ {LIFE_MIN_Y:g} 年 / years",
                      state="ok" if res["infinite"] or (life is not None and life >= LIFE_MIN_Y) else "bad")]
+        elif d["kind"] == "topo":
+            r = await factory("GET", f"/topo/{d['jid']}/result", params={"org": d["org"]})
+            st2 = await factory("POST", f"/topo/{d['jid']}/to-step", params={"org": d["org"]})
+            a0 = ctx.get("area0") or 0
+            ratio = st2["area_mm2"] / a0 if a0 else None
+            res = {"iterations": r.get("iterations"), "converged": r.get("converged"), "mass_ratio": ratio, "area0": a0, "area": st2["area_mm2"],
+                   "outline": st2["outline"], "inner": st2["inner"], "geometry": {"sha": st2["geometry"]["sha"], "faces": st2["geometry"]["faces"]},
+                   "density": r.get("density"), "cell_mm": (r.get("plate") or {}).get("cell_mm"), "origin": (r.get("plate") or {}).get("origin")}
+            res["checks"] = [dict(key="topo_mass", zh="减重后质量 / 原质量", en="Mass after / before",
+                                  value=f"{ratio:.0%}" if ratio else "—", limit="送有限元复核 / verify with FEA", state="ok" if ratio else "warn")]
         elif d["kind"] == "frame":
             mo = await factory("POST", f"/jobs/{d['jid']}/modal", params={"org": d["org"]})
             fr = [x["hz"] for x in mo.get("freqs") or []]
@@ -343,6 +509,9 @@ def register(app, m) -> None:
     async def image(jid: str, sess: Annotated[Session, Depends(m.current)]):
         lic = await m.sewing_need_license(sess)
         d = row(jid, lic["org"])
+        if d["kind"] == "topo" and d["result"]:
+            png = await asyncio.to_thread(topo_png, d["result"], d["ctx"], d["title"])
+            return Response(png, media_type="image/png", headers={"Cache-Control": "private, max-age=3600"})
         if d["kind"] not in ("fea", "frame"):
             raise EngineError("not_found", "no contour for this analysis", 404)
         r = await factory("GET", f"/jobs/{jid}/surface.bin", params={"org": lic["org"]}, raw=True)
@@ -353,6 +522,8 @@ def register(app, m) -> None:
     async def report(jid: str, sess: Annotated[Session, Depends(m.current)]):
         lic = await m.sewing_need_license(sess)
         d = row(jid, lic["org"])
+        if d["kind"] in ("topo", "cam"):
+            raise EngineError("not_found", "no report for this analysis", 404)
         imgs = []
         if d["kind"] in ("fea", "frame"):
             r = await factory("GET", f"/jobs/{jid}/surface.bin", params={"org": lic["org"]}, raw=True)

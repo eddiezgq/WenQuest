@@ -125,3 +125,40 @@ def test_table_coupling():
         assert abs(f(q) - (q / 2 + 0.1 * math.sin(2 * q))) < 1e-5
     with pytest.raises(ValueError):
         MC.coupling_fn("table", {"deg": [0, 10], "value": [0, 1]})
+
+
+def _rod_plate():
+    from shapely.geometry import Point
+    from shapely.ops import unary_union
+    d = unary_union([Point(0, 0).buffer(9, 32), Point(0, -55).buffer(8, 32)]).convex_hull
+    return {"domain": [list(q) for q in d.exterior.coords[:-1]], "solid": [[0, 0, 6.5], [0, -55, 5.5]], "holes": [[0, 0, 3.5], [0, -55, 3]],
+            "support": [0, 0, 3.5], "load": {"at": [0, -55, 3], "f": [400, -650]}, "thickness_mm": 6}
+
+
+def test_topo_plate_step_and_cam(ds):
+    """第 41 轮第二批：两孔平板拓扑优化 → 减重零件 STEP 与轮廓 → 铣削程序；单位隔离、每日上限照样"""
+    c = ds
+    assert c.post("/api/design-sw/topo", headers=H, json={"org": "甲厂", "spec": {"plate": {"domain": [[0, 0], [1, 0]]}}}).status_code == 400
+    j = c.post("/api/design-sw/topo", headers=H, json={"org": "甲厂", "user": "7", "title": "连杆减重", "spec": {"plate": _rod_plate(), "volfrac": 0.5}}).json()
+    assert j["factory"] == "wq_sewing_saas" and j["kind"] == "topo"
+    j = wait(c, j["id"], "甲厂")
+    assert j["status"] == "done", j.get("error")
+    assert c.get(f"/api/design-sw/topo/{j['id']}/result", params={"org": "乙厂"}, headers=H).status_code == 404
+    r = c.get(f"/api/design-sw/topo/{j['id']}/result", params={"org": "甲厂"}, headers=H).json()
+    assert r["preset"] == "plate" and r["converged"] and 0.3 < r["mass_ratio"] < 0.9
+    s = c.post(f"/api/design-sw/topo/{j['id']}/to-step", params={"org": "甲厂"}, headers=H).json()
+    assert len(s["inner"]) >= 2 and s["area_mm2"] > 100                                   # 两个孔还在
+    cyl = [f for f in s["geometry"]["faces"] if f["kind"] == "cylinder"]
+    assert any(abs(f["radius_mm"] - 3.5) < 0.05 for f in cyl) and any(abs(f["radius_mm"] - 3.0) < 0.05 for f in cyl)
+    assert c.get(f"/api/design-sw/geometry/{s['geometry']['sha']}/step", headers=H).content.startswith(b"ISO-10303-21")
+    m = c.post("/api/design-sw/cam", headers=H, json={"org": "甲厂", "user": "7", "sha": s["geometry"]["sha"], "name": "针杆连杆", "material": "45"}).json()
+    assert m["status"] == "done", m.get("error")
+    assert m["programs"] and m["features"]["holes"] >= 2 and m["features"]["narrow"] == 0
+    nc = c.get(f"/api/design-sw/cam/{m['id']}/0.nc", params={"org": "甲厂"}, headers=H).text
+    assert "G0" in nc and ("M30" in nc or "M02" in nc)
+    assert c.get(f"/api/design-sw/cam/{m['id']}/0.nc", params={"org": "乙厂"}, headers=H).status_code == 404
+    # 每日上限（测试里设为 2）：拓扑优化算一个，数控编程单独计数（不占这 2 个）
+    lst = c.get("/api/design-sw/jobs", params={"org": "甲厂"}, headers=H).json()
+    assert lst["used_today"] == 1 and lst["cam_used_today"] == 1 and lst["cam_daily_limit"] == 100
+    assert c.post("/api/design-sw/topo", headers=H, json={"org": "甲厂", "spec": {"plate": _rod_plate()}}).status_code == 200
+    assert c.post("/api/design-sw/topo", headers=H, json={"org": "甲厂", "spec": {"plate": _rod_plate()}}).status_code == 429
