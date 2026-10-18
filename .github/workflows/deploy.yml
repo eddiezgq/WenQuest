@@ -419,11 +419,12 @@ jobs:
           G_AUTODL_SPECS: ${{ secrets.WQ_GPU_AUTODL_SPECS }}
           G_LAMBDA_KEY: ${{ secrets.WQ_GPU_LAMBDA_KEY }}
           G_LAMBDA_SSH_KEY: ${{ secrets.WQ_GPU_LAMBDA_SSH_KEY }}
+          V3_LAMBDA_KEY: ${{ secrets.LAMBDA_KEY }}     # 三维仿真视频出片（第 38 轮）：用配音合成、GPU 实测那把 Lambda 密钥
         run: |
           # only plain tokens are passed on (letters, digits and - _ . : = , /); nothing is printed
           cmd=""
           for pair in "WQ_GPU_PROVIDER=$G_PROVIDER" "WQ_GPU_AUTODL_TOKEN=$G_AUTODL_TOKEN" "WQ_GPU_AUTODL_SPECS=$G_AUTODL_SPECS" \
-                      "WQ_GPU_LAMBDA_KEY=$G_LAMBDA_KEY" "WQ_GPU_LAMBDA_SSH_KEY=$G_LAMBDA_SSH_KEY"; do
+                      "WQ_GPU_LAMBDA_KEY=$G_LAMBDA_KEY" "WQ_GPU_LAMBDA_SSH_KEY=$G_LAMBDA_SSH_KEY" "VIDEO3D_LAMBDA_KEY=$V3_LAMBDA_KEY"; do
             k="${pair%%=*}"; v="${pair#*=}"
             [ -n "$v" ] || continue
             if ! printf '%s' "$v" | grep -Eq '^[A-Za-z0-9._:=,/-]+$'; then echo "::error::$k 含有不允许的字符"; exit 1; fi
