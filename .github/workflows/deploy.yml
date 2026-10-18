@@ -163,7 +163,7 @@ jobs:
           npm ci --no-audit --no-fund
           pip install -q -r ../../services/labcheck/requirements.txt trimesh
           python -m playwright install --with-deps --only-shell chromium > /dev/null
-          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0 sympy
+          pip install -q python-docx==1.2.0 markdown-it-py pyyaml numpy scipy matplotlib schemdraw==0.23 jsonschema pytest httpx fastapi pydantic gmsh==4.15.2 pylife==2.3.1 paho-mqtt==2.1.0 trimesh==5.1.0 sympy mujoco==3.14.0
           if [ "${{ matrix.book }}" = mfgtech ]; then   # 三维图、三维动画、工程图：数字工厂的三维模型（build123d，第 13 轮 8.3）
             pip install -q build123d==0.13.0 Pillow
           fi

@@ -25,6 +25,22 @@ MAX_CODE = 60_000
 CSP = ("default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; "
        "font-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'")
 
+# Physics labs (第 41 轮, view: "physics") run MuJoCo's WebAssembly build, which the kit loads from this server's
+# /vendor/ (same origin as the lab page; https://wq.local is where the build's trial run serves it). Lab code itself
+# still may not load anything (FORBIDDEN below).
+# MuJoCo's JavaScript bindings (Emscripten embind) build their call wrappers with new Function, so these pages also
+# allow 'unsafe-eval'. Only the book's own labs (written and reviewed in the repository) use this view; AI-written labs
+# are still checked statically (no eval, no import, no network) and do not get physics pages yet.
+PHYSICS_CSP = CSP.replace("script-src 'unsafe-inline'", "script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' 'self' https://wq.local") \
+                 .replace("connect-src 'none'", "connect-src 'self' https://wq.local")
+PHYSICS_VIEW = re.compile(r"""view\s*:\s*["']physics["']""")
+
+
+def csp_for(page_html: str) -> str:
+    """The Content-Security-Policy a built lab page needs (the page's own <meta> says the same)."""
+    return PHYSICS_CSP if 'data-physics="1"' in page_html[:2000] else CSP
+
+
 FORBIDDEN = [
     (r"\bfetch\s*\(", "network access (fetch)"), (r"XMLHttpRequest", "network access (XMLHttpRequest)"),
     (r"WebSocket|EventSource|RTCPeerConnection", "network access"), (r"sendBeacon", "network access (sendBeacon)"),
@@ -89,7 +105,7 @@ def models_used(code: str, models: dict) -> list[str]:
 
 
 def page(labs: list[tuple[str, str]], *, course: list[str], chapter: list[str], lang: str = "zh",
-         key: str = "wq-lab", models: dict | None = None) -> str:
+         key: str = "wq-lab", models: dict | None = None, mjcf: dict | None = None) -> str:
     """One lab page with the labs [(lesson number '2.1', code), ...] in order. `models` ({id: {entry, glb, motion}}):
     the course's library copies; the ones the labs name are embedded with the 3D engine (3D labs, view: '3d')."""
     css = (KIT / "kit.css").read_text(encoding="utf-8")
@@ -97,10 +113,16 @@ def page(labs: list[tuple[str, str]], *, course: list[str], chapter: list[str], 
     used = sorted({m for _, code in labs for m in models_used(code, models or {})})
     plants = any(PLC_VIEW.search(code or "") and "WQPLANTS" in (code or "") for _, code in labs)   # PLC labs on 3D machines
     three = ""
-    if used or plants:
+    physics = any(PHYSICS_VIEW.search(code or "") for _, code in labs)
+    if used or plants or physics:
         engine = THREE_ENGINE.read_text(encoding="utf-8").replace("</script", "<\\/script")
         data = json.dumps({k: models[k] for k in used}).replace("</", "<\\/")
         three = f"<script>\n{engine}\n</script>\n<script>window.WQ_MODELS = {data};</script>\n"
+    robots = {k: v for k, v in (mjcf or {}).items()
+              if any(re.search(r"""mjcf\(\s*["']""" + re.escape(k) + r"""["']""", code or "") for _, code in labs)}
+    if robots:   # 第 41 轮：物理仿真实验用到的书中机器人模型（MJCF 文本）
+        data = json.dumps(robots, ensure_ascii=False).replace("</", "<\\/")
+        three += f"<script>window.WQ_MJCF = {data};</script>\n"
     if any(CIRCUIT_VIEW.search(code or "") for _, code in labs):
         if not CIRCUITJS.exists():
             raise FileNotFoundError(f"circuit labs need {CIRCUITJS} (build it with tools/circuitjs/build.sh)")
@@ -119,11 +141,11 @@ def page(labs: list[tuple[str, str]], *, course: list[str], chapter: list[str], 
         lab_id = no.replace(".", "-")
         scripts.append(f"<script>\nWQ.begin({_js_string(lab_id)});\ntry {{\n{code}\n}} catch (e) {{ WQ.fail({_js_string(lab_id)}, e); }}\n</script>")
     return f"""<!doctype html>
-<html lang="{'en' if lang == 'en' else 'zh-CN'}" data-lang="{'en' if lang == 'en' else 'zh'}" data-key="{esc(key)}" data-title="{esc(json.dumps(title, ensure_ascii=False))}">
+<html lang="{'en' if lang == 'en' else 'zh-CN'}" data-lang="{'en' if lang == 'en' else 'zh'}" data-key="{esc(key)}"{' data-physics="1"' if physics else ''} data-title="{esc(json.dumps(title, ensure_ascii=False))}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="{CSP}">
+<meta http-equiv="Content-Security-Policy" content="{PHYSICS_CSP if physics else CSP}">
 <title>{esc(title[0])}</title>
 <style>
 {css}

@@ -37,6 +37,9 @@ LIBS = {
     "npm/digitaljs@0.14.2/dist/main.js": "digitaljs/dist/main.js",
     "npm/digitaljs@0.14.2/dist/285.main.js": "digitaljs/dist/285.main.js",
     "npm/digitaljs@0.14.2/dist/821.main.js": "digitaljs/dist/821.main.js",
+    # 浏览器 MuJoCo（第 41 轮）：官方单线程版，与教材构建用的 Python 版 mujoco==3.14.0 同一版本
+    "npm/@mujoco/mujoco@3.14.0/mujoco.js": "@mujoco/mujoco/mujoco.js",
+    "npm/@mujoco/mujoco@3.14.0/mujoco.wasm": "@mujoco/mujoco/mujoco.wasm",
     # 白板讲课（第 35 轮）的手绘线条
     "roughjs/4.6.6/rough.js": "roughjs/bundled/rough.js",
 }

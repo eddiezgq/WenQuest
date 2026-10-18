@@ -734,7 +734,9 @@ function reset(L) {
   if (!L.ready) return;   // a 3D lab resets once its models are loaded
   L.api.running = false; L.api.t = 0;
   L.state = {};
+  if (L.physics) safe(L, () => physReset(L));
   safe(L, () => L.def.reset && L.def.reset(L.api, L.state));
+  if (L.physics && L.sim) safe(L, () => { L.sim.mj.mj_forward(L.sim.m, L.sim.d); physSync(L); });
   readouts(L);
 }
 function start(L) {
@@ -820,9 +822,10 @@ function build(id, def) {
   $("labs").appendChild(sec);
 
   const plc3d = def.view === "plc" && def.plant && typeof def.plant.build3d === "function";   // PLC lab on a 3D machine (WQPLANTS)
-  const is3d = def.view === "3d" || plc3d;
+  const physics = def.view === "physics";   // 第 41 轮：MuJoCo 物理仿真（浏览器版，官方 @mujoco/mujoco）
+  const is3d = def.view === "3d" || plc3d || physics;
   const ctx = is3d ? null : canvas.getContext("2d");
-  const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, ready: !is3d && !circuit, circuit,
+  const L = { id, def, broken: false, state: {}, sceneDef: def.scenes[0], is3d, physics, ready: !is3d && !circuit, circuit,
     dom: { tab, tabDone: tab.querySelector(".done"), sec, canvas, chips, params, read, tasks, err, problem } };
   const api = {
     ctx, canvas, w: 0, h: 0, p: {}, scene: def.scenes[0].id, t: 0, running: false,
@@ -839,7 +842,8 @@ function build(id, def) {
     calc: CALC, graph: (o) => graph(ctx, o), qm: QM, gpu: GPU,
   };
   L.api = api;
-  if (is3d && !plc3d) setup3d(L);
+  if (physics) setupPhysics(L, stageBox, bar);
+  else if (is3d && !plc3d) setup3d(L);
   if (circuit) setupCircuit(L);
   if (def.view === "plc") {
     if (!window.WQPLCUI) throw new Error("this page has no PLC engine (view: 'plc')");
@@ -959,6 +963,164 @@ function setup3d(L) {
   }).catch((e) => fail(L.id, e));
 }
 
+
+// ---------- physics labs (第 41 轮): MuJoCo in the browser — the official build, same version as the book's Python ----------
+// def.view = "physics"; def.physics = { xml(api) → MJCF text (rebuilt when it changes, e.g. a slider changes a mass),
+//   rate: real-time factor (default 1; api.rate overrides), maxSteps: per frame (default 4000), camera: [az, el, fill] }.
+// The kit draws every geom (box, sphere, capsule, cylinder, ellipsoid, plane) from the simulation and steps it while running.
+// api.sim = { mj, m, d } (MuJoCo module, model, data); api.id(kind, name); api.qpos(i) / api.qvel(i); api.energy();
+// def.chart(api, state, ctx, w, h): an optional strip of curves under the stage (api.plot works on it via api.cplot).
+const MJ_VERSION = "3.14.0";
+const MJ = { mod: null, loading: null };
+function mujocoUrl() {
+  if (window.WQ_MUJOCO_URL) return window.WQ_MUJOCO_URL;
+  const base = /^https?:$/.test(location.protocol) ? location.origin : "https://wq.local";   // wq.local: the build's trial run serves it
+  return `${base}/vendor/npm/@mujoco/mujoco@${MJ_VERSION}/mujoco.js`;
+}
+function loadMujoco() {
+  if (!MJ.loading) MJ.loading = import(mujocoUrl()).then((m) => m.default()).then((mod) => (MJ.mod = mod));
+  return MJ.loading;
+}
+const OBJ = { body: 1, joint: 3, geom: 5, site: 6, actuator: 19, sensor: 21 };
+function setupPhysics(L, stageBox, bar) {
+  const api = L.api, def = L.def;
+  if (!window.WQ3D) { fail(L.id, new Error("this page has no 3D engine (physics labs need it)")); return; }
+  const E = window.WQ3D;
+  const st = E.stage(L.dom.canvas, { width: 800, height: 500, theme: "light" });
+  L.st = st;
+  api.three = E.THREE; api.st = st; api.keep = {};
+  api.trace = (color) => E.trace(st, color);
+  api.rate = (def.physics && def.physics.rate) || 1;
+  L.world = new E.THREE.Group(); L.world.rotation.x = -Math.PI / 2;   // MuJoCo z up → three.js y up
+  st.scene.add(L.world);
+  api.id = (kind, name) => (L.sim ? L.sim.mj.mj_name2id(L.sim.m, OBJ[kind] ?? kind, name) : -1);
+  api.qpos = (i) => (L.sim ? L.sim.d.qpos[i] : NaN);
+  api.qvel = (i) => (L.sim ? L.sim.d.qvel[i] : NaN);
+  api.energy = () => (L.sim ? [L.sim.d.energy[0], L.sim.d.energy[1]] : [NaN, NaN]);
+  // the book's robots (textbook/<book>/models/mjcf, from Menagerie without meshes): api.mjcf("ur5e", {option, world, tool, actuator})
+  api.mjcf = (name, parts = {}) => {
+    const t = (window.WQ_MJCF || {})[name];
+    if (!t) throw new Error(`robot model ${name} is not in this page`);
+    return t.replace("<!--OPTION-->", parts.option || "").replace("<!--WORLD-->", parts.world || "")
+      .replace("<!--TOOL-->", parts.tool || "").replace("<!--ACTUATOR-->", parts.actuator || "");
+  };
+  api.m = {};
+  api.view = (az = 35, el = 22, fill = 0.8) => {
+    const b = new E.THREE.Box3().setFromObject(L.world);
+    Object.values(api.m).forEach((h) => b.union(h.box()));
+    if (!b.isEmpty()) E.frame(st, b, az, el, fill);
+    if (L.orbit) { L.orbit.target.copy(b.getCenter(new E.THREE.Vector3())); L.orbit.update(); }
+  };
+  if (def.chart) {
+    const c = el("canvas", "chart"); c.setAttribute("aria-hidden", "true");
+    stageBox.insertBefore(c, bar);
+    L.chart = { canvas: c, ctx: c.getContext("2d"), w: 0, h: 0 };
+    api.cplot = (...a) => plot(L.chart.ctx, ...a);
+  }
+  const note = el("div", "loading"); biText(note, ["正在加载物理引擎 MuJoCo（约 3 MB，只在第一次）…", "Loading the MuJoCo physics engine (about 3 MB, first time only)…"]);
+  stageBox.insertBefore(note, bar);
+  const models = window.WQ_MODELS || {};
+  Promise.all([loadMujoco(), ...(def.models || []).map(async (mid) => {   // library glTF: the look of the robots (node name = MJCF body name)
+    const mm = models[mid];
+    if (!mm) throw new Error(`model ${mid} is not in this page`);
+    api.m[mid] = await E.loadModel(st, mm.glb, mm.entry, {});
+  })]).then(() => {
+    note.remove();
+    try { L.orbit = new E.OrbitControls(st.camera, L.dom.canvas); L.orbit.enableDamping = true; } catch (e) { /* optional */ }
+    L.ready = true;
+    reset(L);
+    const cam = (def.physics && def.physics.camera) || [35, 22, 0.8];
+    api.view(...cam);
+    safe(L, () => def.setup3d && def.setup3d(api, api.keep));
+  }).catch((e) => { note.remove(); fail(L.id, new Error("MuJoCo did not load: " + (e && e.message || e))); });
+}
+function physReset(L) {
+  const mj = MJ.mod, api = L.api;
+  const xml = String(L.def.physics.xml(api) || "");
+  if (!L.sim || L.sim.xml !== xml) {
+    if (L.sim) { try { L.sim.d.delete(); L.sim.m.delete(); } catch (e) { /* already freed */ } }
+    const m = mj.MjModel.from_xml_string(xml), d = new mj.MjData(m);
+    L.sim = { mj, m, d, xml };
+    api.sim = L.sim;
+    physMeshes(L);
+  } else {
+    mj.mj_resetData(L.sim.m, L.sim.d);
+  }
+  L.simT = 0;
+}
+function physMeshes(L) {
+  const THREE = L.api.three, m = L.sim.m, mj = L.sim.mj;
+  while (L.world.children.length) L.world.remove(L.world.children[0]);
+  L.geoms = [];
+  // bodies drawn by a library glTF (same body names): their simple collision shapes are hidden unless physics.collision
+  L.skins = [];
+  const drawn = new Set();
+  Object.values(L.api.m || {}).forEach((h) => {
+    for (let b = 1; b < m.nbody; b++) {
+      const n = h.nodes[mj.mj_id2name(m, 1, b)];
+      if (n) { L.skins.push([b, n]); drawn.add(b); n.matrixAutoUpdate = false; }
+    }
+    h.holder.position.set(0, 0, 0); h.holder.rotation.set(0, 0, 0);
+  });
+  const showColl = L.def.physics && L.def.physics.collision;
+  for (let i = 0; i < m.ngeom; i++) {
+    const t = m.geom_type[i], s = [m.geom_size[3 * i], m.geom_size[3 * i + 1], m.geom_size[3 * i + 2]];
+    const c = [m.geom_rgba[4 * i], m.geom_rgba[4 * i + 1], m.geom_rgba[4 * i + 2], m.geom_rgba[4 * i + 3]];
+    let g = null;
+    if (t === 0) { g = null; }                                                      // plane: the stage already has a floor
+    else if (t === 2) g = new THREE.SphereGeometry(s[0], 32, 16);
+    else if (t === 3) g = new THREE.CapsuleGeometry(s[0], 2 * s[1], 8, 24).rotateX(Math.PI / 2);   // MuJoCo capsules lie along local z
+    else if (t === 4) g = new THREE.SphereGeometry(1, 32, 16).scale(s[0], s[1], s[2]);
+    else if (t === 5) g = new THREE.CylinderGeometry(s[0], s[0], 2 * s[1], 32).rotateX(Math.PI / 2);
+    else if (t === 6) g = new THREE.BoxGeometry(2 * s[0], 2 * s[1], 2 * s[2]);
+    if (!g || c[3] === 0 || (drawn.has(m.geom_bodyid[i]) && !showColl)) { L.geoms.push(null); continue; }
+    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(c[0], c[1], c[2]), transparent: c[3] < 1, opacity: c[3], metalness: 0.15, roughness: 0.6 });
+    const mesh = new THREE.Mesh(g, mat); mesh.castShadow = true; mesh.matrixAutoUpdate = false;
+    L.world.add(mesh); L.geoms.push(mesh);
+  }
+}
+function physSync(L) {
+  if (!L.sim) return;
+  const d = L.sim.d, THREE = L.api.three;
+  const P = d.geom_xpos, R = d.geom_xmat;
+  L.geoms.forEach((mesh, i) => {
+    if (!mesh) return;
+    const r = (k) => R[9 * i + k];
+    mesh.matrix.set(r(0), r(1), r(2), P[3 * i], r(3), r(4), r(5), P[3 * i + 1], r(6), r(7), r(8), P[3 * i + 2], 0, 0, 0, 1);
+  });
+  L.world.updateMatrixWorld(true);
+  if (L.skins && L.skins.length) {           // glTF link nodes follow the simulated bodies (world pose → local matrix under the parent)
+    const xp = d.xpos, xm = d.xmat, W = L.world.matrixWorld, M = new THREE.Matrix4(), inv = new THREE.Matrix4();
+    L.skins.forEach(([b, n]) => {
+      const r = (k) => xm[9 * b + k];
+      M.set(r(0), r(1), r(2), xp[3 * b], r(3), r(4), r(5), xp[3 * b + 1], r(6), r(7), r(8), xp[3 * b + 2], 0, 0, 0, 1);
+      M.premultiply(W);
+      n.parent.updateMatrixWorld(false);
+      inv.copy(n.parent.matrixWorld).invert();
+      n.matrix.copy(inv).multiply(M);
+      n.matrixWorld.copy(M);
+      n.children.forEach((c) => c.updateMatrixWorld(true));
+    });
+  }
+}
+function physStep(L, dt) {
+  if (!L.sim) return;
+  const { mj, m, d } = L.sim;
+  L.simT += dt * (L.api.rate || 1);
+  const cap = (L.def.physics && L.def.physics.maxSteps) || 4000;
+  let k = 0;
+  while (d.time < L.simT && k < cap) { mj.mj_step(m, d); k++; }
+  if (k >= cap) L.simT = d.time;          // the machine is slower than real time: let simulated time lag instead of piling up
+}
+function physChart(L) {
+  const c = L.chart, r = c.canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.width * 4 / 16));
+  if (w !== c.w || h !== c.h) { c.w = w; c.h = h; c.canvas.width = w * dpr; c.canvas.height = h * dpr; c.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  c.ctx.clearRect(0, 0, w, h);
+  L.def.chart(L.api, L.state, c.ctx, w, h);
+}
+
 function show(id) {
   if (!LABS[id]) return;
   active = id;
@@ -979,7 +1141,8 @@ function check(def) {   // clear messages for the lab author (the checker report
     `param ${p.id}: needs id, name [zh, en], min < max, value`));
   need(Array.isArray(def.tasks) && def.tasks.length >= 2 && def.tasks.length <= 6, "tasks: 2-6 tasks");
   def.tasks.forEach((t) => need(t.id && Array.isArray(t.text), "every task needs id and text [zh, en]"));
-  need(typeof def.draw === "function" || (def.view === "plc" && def.plant && def.plant.build3d), "draw(api, state) is required");
+  need(typeof def.draw === "function" || (def.view === "plc" && def.plant && def.plant.build3d) || def.view === "physics", "draw(api, state) is required");
+  if (def.view === "physics") need(def.physics && typeof def.physics.xml === "function", "physics.xml(api) must return the MJCF model");
 }
 
 window.WQ = {
@@ -996,7 +1159,7 @@ window.WQ = {
     const labs = {};
     ORDER.forEach((id) => {
       const L = LABS[id];
-      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.def.view === "plc" ? "plc" : L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
+      labs[id] = { broken: L.broken, ready: !!L.ready, view: L.def.view === "plc" ? "plc" : L.physics ? "physics" : L.is3d ? "3d" : L.circuit ? "circuit" : "2d", scenes: L.def.scenes.map((s) => s.id), params: L.def.params.map((p) => p.id),
         tasks: Object.fromEntries(L.def.tasks.map((t) => [t.id, !!t.ok])), demos: Object.fromEntries(L.def.tasks.map((t) => [t.id, t.demo || null])) };
     });
     return { errors: errors.slice(), active, labs };
@@ -1038,11 +1201,13 @@ function begin() {
       const n = Math.max(1, Math.min(20, Math.round(WQ.speed)));
       for (let i = 0; i < n && L.api.running; i++) {
         L.api.t += dt;
+        if (L.physics) safe(L, () => physStep(L, dt));
         safe(L, () => L.def.update && L.def.update(dt, L.api, L.state));
       }
       if (L.api.running || !L.drawn || L.api.w !== L.lastW) { readouts(L); }
       if (L.is3d) {
-        safe(L, () => { L.def.draw(L.api, L.state); if (L.orbit) L.orbit.update(); L.st.render(); });
+        safe(L, () => { if (L.physics) physSync(L); if (L.def.draw) L.def.draw(L.api, L.state); if (L.orbit) L.orbit.update(); L.st.render(); });
+        if (L.chart) safe(L, () => physChart(L));
       } else {
         safe(L, () => { L.api.ctx.clearRect(0, 0, L.api.w, L.api.h); L.def.draw(L.api, L.state); });
       }

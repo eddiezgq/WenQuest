@@ -280,7 +280,8 @@ def register(app, m) -> None:
         p = root() / d["b"] / "lab" / f"{chdir(d['c'])}.html"
         if not p.exists():
             raise EngineError("not_found", "no such lab", 404)
-        return HTMLResponse(p.read_text(encoding="utf-8"), headers={"Content-Security-Policy": labkit.CSP,
+        page = p.read_text(encoding="utf-8")
+        return HTMLResponse(page, headers={"Content-Security-Policy": labkit.csp_for(page),
                                                                      "Cache-Control": "private, max-age=3600"})
 
     @app.get("/api/v1/textbook-web/{signed}/{path:path}")

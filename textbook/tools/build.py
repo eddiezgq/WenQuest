@@ -73,6 +73,12 @@ def labkit():
 _MODELS: dict = {}
 
 
+def book_mjcf(book: dict) -> dict:
+    """第 41 轮：物理仿真实验用的机器人模型（textbook/<book>/models/mjcf/*.xml，mjcf_web.py 由 Menagerie 生成）。"""
+    d = book["root"] / "models" / "mjcf"
+    return {p.stem: p.read_text(encoding="utf-8") for p in sorted(d.glob("*.xml"))} if d.is_dir() else {}
+
+
 def book_models(book: dict) -> dict:
     """The library models copied into the book (textbook/<book>/models/<id>/entry.json + default.glb), in the form the
     lab kit embeds for 3D labs: {id: {entry (normalised like the platform does), glb (base64), motion}}."""
@@ -1144,7 +1150,7 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         if not items:
             continue
         page_html = labkit().page(items, course=[book["title"], book.get("title_en", "")], chapter=[f"第{ch}章", f"Chapter {ch}"],
-                                  key=f"wq-book-{book_name}", models=book_models(book))
+                                  key=f"wq-book-{book_name}", models=book_models(book), mjcf=book_mjcf(book))
         (lab_dir / f"{chdir(ch)}.html").write_text(page_html, encoding="utf-8")
         index["labs"][str(ch)] = [no for no, _ in items]
         for sec in secs:      # 实验指导书与报告模板 (第 7 轮第 4 步补充)

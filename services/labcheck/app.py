@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import asyncio
 import base64
+import os
 import time
+from pathlib import Path
 
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
@@ -19,6 +21,21 @@ from playwright.async_api import async_playwright
 
 app = FastAPI(title="WenQuest lab checker")
 LOCK = asyncio.Lock()
+# Physics labs (第 41 轮) load MuJoCo's WebAssembly build from https://wq.local/vendor/…; the checker serves it from disk.
+MUJOCO = "/vendor/npm/@mujoco/mujoco@3.14.0/"
+_HERE = Path(__file__).resolve()
+MUJOCO_DIRS = [Path(p) for p in (os.environ.get("WQ_MUJOCO_DIR", ""),) if p] + [
+    _HERE.parents[2] / "site/vendor/npm/@mujoco/mujoco@3.14.0", _HERE.parents[2] / "textbook/tools/node_modules/@mujoco/mujoco",
+    _HERE.parents[2] / "tools/vendor/node_modules/@mujoco/mujoco", Path("/srv/mujoco")] if len(_HERE.parents) > 2 else [Path("/srv/mujoco")]
+
+
+def mujoco_file(url: str) -> Path | None:
+    if not url.startswith("https://wq.local" + MUJOCO):
+        return None
+    name = url.split(MUJOCO, 1)[1].split("?")[0]
+    if name not in ("mujoco.js", "mujoco.wasm"):
+        return None
+    return next((d / name for d in MUJOCO_DIRS if (d / name).is_file()), None)
 SPEED = 4          # physics steps per frame while checking (labs run 4x faster)
 LIMIT = 100.0      # seconds for one whole check
 RENDER_LIMIT = 900.0   # seconds for one 3D animation
@@ -158,8 +175,12 @@ async def run(html: str, lab: str) -> dict:
             page = await ctx.new_page()
 
             async def block(route):
+                f = mujoco_file(route.request.url)
                 if route.request.url.startswith("data:") or route.request.url == "about:blank":
                     await route.continue_()
+                elif f is not None:
+                    await route.fulfill(path=str(f), headers={"Access-Control-Allow-Origin": "*"},
+                                        content_type="application/wasm" if f.suffix == ".wasm" else "text/javascript")
                 else:
                     errors.append(f"the lab tried to load {route.request.url[:120]} (not allowed)")
                     await route.abort()
@@ -177,7 +198,7 @@ async def run(html: str, lab: str) -> dict:
                 try:
                     await page.wait_for_function(f"() => {{ const s = WQ.status().labs[{lab!r}]; return s.ready || s.broken; }}", timeout=30000)
                 except Exception:
-                    problems.append("the 3D lab's models did not load within 30 s")
+                    problems.append("the 3D lab's models (or a physics lab's MuJoCo engine) did not load within 30 s")
                     return result(problems, errors, tasks, shot)
                 info = (await page.evaluate("() => WQ.status()"))["labs"][lab]
             if info["broken"]:
