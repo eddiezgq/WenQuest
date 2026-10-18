@@ -1,0 +1,34 @@
+# 实验 23.4 的指导书与报告模板。目的、场景、参数、任务取自 lab23_4.js。
+原理:
+  - ["没有外力矩时，自由刚体的转动由欧拉方程描述（主轴坐标系）。动能和角动量的大小守恒，只有绕主轴的转动可以保持不变（永久转动）。", "Without external torque a free rigid body obeys Euler's equations (principal axes). Kinetic energy and the magnitude of the angular momentum are conserved, and only rotations about principal axes stay unchanged (permanent rotations)."]
+  - 式: "I₁ω̇₁ = (I₂ − I₃)ω₂ω₃,   I₂ω̇₂ = (I₃ − I₁)ω₃ω₁,   I₃ω̇₃ = (I₁ − I₂)ω₁ω₂"
+  - 式: "2K = I₁ω₁² + I₂ω₂² + I₃ω₃²,   |L|² = I₁²ω₁² + I₂²ω₂² + I₃²ω₃²"
+  - 式: ["长方体 a×b×c：I₁ = m(b² + c²)/12，I₂ = m(a² + c²)/12，I₃ = m(a² + b²)/12", "Box a×b×c: I₁ = m(b² + c²)/12, I₂ = m(a² + c²)/12, I₃ = m(a² + b²)/12"]
+  - ["网球拍定理（I₁ < I₂ < I₃）：绕最小、最大惯量轴的转动稳定，绕中间轴的转动不稳定。在中间轴附近，扰动开始时按 e^{λt} 增长：", "Tennis-racket theorem (I₁ < I₂ < I₃): spin about the least and greatest axes is stable, about the middle axis unstable. Near the middle axis a perturbation first grows like e^{λt}:"]
+  - 式: "λ = ω₀ √((I₃ − I₂)(I₂ − I₁)/(I₁I₃))"
+  - ["扰动缩小 10 倍，翻转大约推迟 ln 10/λ；所以翻转总会来，只是早晚不同。", "A ten times smaller perturbation delays the flip by about ln 10/λ, so the flip always comes, sooner or later."]
+步骤:
+  - ["场景“空间站工具箱”，中间边 b = 24 cm、ω₀ = 8 rad/s、ε = 1%。由测量区读出三个主惯量，与式 (23.1.11) 的计算比较，填入表 1。", "Scene “Tool case in orbit”, b = 24 cm, ω₀ = 8 rad/s, ε = 1%. Read the three principal moments and compare them with Eq. (23.1.11) in Table 1."]
+  - ["转轴选 1（中间轴），按“开始”。观察画面中角动量 L（不动）和角速度 ω（乱动）的方向，读出第一次翻转的时刻和翻转次数（任务 1），填入表 2。", "Choose axis 1 (middle) and press Start. Watch L (fixed) and ω (wandering) on the stage; record the time of the first flip and the number of flips (task 1) in Table 2."]
+  - ["转轴分别选 2 和 0，各转 10 s 以上（任务 2、3），记录主轴方向角速度的最小值。", "Choose axes 2 and 0 and spin for at least 10 s each (tasks 2, 3); record the smallest angular velocity about the chosen axis."]
+  - ["转轴选 1，把 ε 依次改为 2%、0.5%、0.1%，记录第一次翻转的时刻（任务 4），检验“ε 缩小 10 倍，推迟约 ln 10/λ”。", "Axis 1 again with ε = 2%, 0.5% and 0.1%; record the first flip (task 4) and check that a ten times smaller ε delays it by about ln 10/λ."]
+  - ["任一设置转满 10 s，读出动能与 |L|² 的漂移（任务 5）。", "Run any setting for 10 s and read the drift of energy and |L|² (task 5)."]
+  - ["改变中间边 b（12～38 cm），看 λ 怎样变化、翻转来得早还是晚。", "Change the middle edge b (12 to 38 cm) and see how λ and the flip time change."]
+  - ["生活场景“抛起的手机”：分别绕三根轴转，看哪一种屏幕翻面（任务 6）。", "Everyday scene “A tossed phone”: spin about each axis and see which turns the screen over (task 6)."]
+数据表:
+  - 标题: ["表 1  工具箱的主惯量", "Table 1  Principal moments of the tool case"]
+    表头: ["中间边 b / cm", "I₁ / (kg·m²)", "I₂ / (kg·m²)", "I₃ / (kg·m²)", "式 (23.1.11) 的 I₂", "λ（ω₀ = 8 rad/s）/ (rad/s)"]
+    表头英文: ["Middle edge b / cm", "I₁ / (kg·m²)", "I₂ / (kg·m²)", "I₃ / (kg·m²)", "I₂ by Eq. (23.1.11)", "λ (ω₀ = 8 rad/s) / (rad/s)"]
+    行: [["24", "", "", "", "", ""], ["16", "", "", "", "", ""], ["32", "", "", "", "", ""]]
+  - 标题: ["表 2  绕三根轴转动", "Table 2  Spinning about the three axes"]
+    表头: ["转轴", "ε / %", "第一次翻转 / s", "10 s 内翻转次数", "主轴方向角速度的最小值 / (rad/s)", "稳定吗"]
+    表头英文: ["Axis", "ε / %", "First flip / s", "Flips in 10 s", "Smallest ω about the axis / (rad/s)", "Stable?"]
+    行: [["1（中间）", "1", "", "", "", ""], ["1（中间）", "2", "", "", "", ""], ["1（中间）", "0.5", "", "", "", ""], ["1（中间）", "0.1", "", "", "", ""], ["2（最大）", "1", "", "", "", ""], ["0（最小）", "1", "", "", "", ""]]
+    行英文: [["1 (middle)", "1", "", "", "", ""], ["1 (middle)", "2", "", "", "", ""], ["1 (middle)", "0.5", "", "", "", ""], ["1 (middle)", "0.1", "", "", "", ""], ["2 (greatest)", "1", "", "", "", ""], ["0 (least)", "1", "", "", "", ""]]
+注意:
+  - ["工具箱和手机的尺寸、质量都是示意值；看作均匀长方体。", "The sizes and masses of the case and the phone are illustrative; both are treated as uniform boxes."]
+  - ["浏览器里的 MuJoCo 与书中程序用同一版本（3.14.0），步长 1 ms、RK4。书中算例 23.4.2 的数字由同一个模型算出：第一次翻转 1.60 s，此后每 2.71 s 一次。", "The MuJoCo in the browser is the same version as the book's programs (3.14.0), RK4 with a 1 ms step; Example 23.4.2 uses the same model: first flip at 1.60 s, then every 2.71 s."]
+  - ["手机较慢时，画面里的时间会比真实时间走得慢，结果不变。", "On a slow device simulated time runs slower than real time; the results are the same."]
+思考题:
+  - ["中间边 b 接近最长边（38 cm）时，翻转来得早还是晚？用 λ 的公式说明。b = 40 cm 时会怎样？", "When b approaches the longest edge (38 cm), does the flip come sooner or later? Explain with λ. What happens at b = 40 cm?"]
+  - ["真实的物体有能量耗散（例如装着液体）。由 |L| 守恒、动能减小，说明最后它会绕哪根轴转（“探险者 1 号”）。", "Real bodies dissipate energy (e.g. with liquid inside). With |L| fixed and energy decreasing, about which axis does the body end up spinning (Explorer 1)?"]

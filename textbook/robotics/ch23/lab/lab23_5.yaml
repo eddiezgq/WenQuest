@@ -1,0 +1,33 @@
+# 实验 23.5 的指导书与报告模板。目的、场景、参数、任务取自 lab23_5.js。
+原理:
+  - ["模型文件（MJCF）给出每个连杆的质量、质心位置和主惯量（在惯量坐标系中）。在某一姿态下，MuJoCo 算出各连杆质心在基座坐标系中的位置 c_i 和惯量主轴的方向 R_i。", "The model file (MJCF) gives each link's mass, centre of mass and principal moments. In a given pose MuJoCo provides each link's centre of mass c_i in the base frame and the orientation R_i of its principal axes."]
+  - 式: ["整臂：m = Σ m_i，c = Σ m_i c_i / m（式 (23.1.3)）", "Whole arm: m = Σ m_i, c = Σ m_i c_i / m (Eq. 23.1.3)"]
+  - 式: ["绕关节 1 轴（竖直的 z 轴）：I_zz = Σ [(R_i diag(I_i) R_iᵀ)_zz + m_i (x_i² + y_i²)]（式 (23.5.2)）", "About joint 1 (the vertical z axis): I_zz = Σ [(R_i diag(I_i) R_iᵀ)_zz + m_i (x_i² + y_i²)] (Eq. 23.5.2)"]
+  - ["这个量也等于关节空间质量矩阵的第一个对角元素减去电机转子的等效惯量。", "It also equals the first diagonal element of the joint-space mass matrix minus the motor's reflected rotor inertia."]
+  - ["关节 1 不出力时，手臂绕竖直轴的角动量守恒；收臂前后其他关节都静止，所以：", "With no torque at joint 1 the arm's angular momentum about the vertical is conserved; with the other joints at rest before and after folding:"]
+  - 式: "θ̇₁(end) = θ̇₁(start) · I_zz(start) / I_zz(end)"
+步骤:
+  - ["场景“摆姿态、读惯量”：θ₂ = θ₃ = 0、无负载，读出质量、质心、I_zz 和 MuJoCo 的 M₁₁ − 转子惯量（任务 1），填入表 1。", "Scene “Pose and inertia”: θ₂ = θ₃ = 0, no payload; record mass, centre of mass, I_zz and MuJoCo's M₁₁ − rotor inertia (task 1) in Table 1."]
+  - ["改变 θ₂、θ₃，找一个 I_zz 小于 1 kg·m² 的姿态（任务 2）；再记录表 1 中其余姿态。", "Change θ₂, θ₃ to find a pose with I_zz below 1 kg·m² (task 2); record the other poses of Table 1."]
+  - ["零位，负载依次为 1、2、3.8、5 kg，记录 I_zz 和质心（任务 3），填入表 2。", "At the zero position set the payload to 1, 2, 3.8 and 5 kg and record I_zz and the centre of mass (task 3) in Table 2."]
+  - ["场景“关节 1 自由转动时收臂”：按“开始”，记录收臂前后的 θ̇₁ 和 I_zz（任务 4），填入表 3。", "Scene “Folding with joint 1 free”: press Start and record θ̇₁ and I_zz before and after (task 4) in Table 3."]
+  - ["生活场景“转椅上收臂”：按“开始”，记录转速和 I_zz（任务 5），填入表 3。", "Everyday scene “Arms in on a swivel chair”: press Start and record the speed and I_zz (task 5) in Table 3."]
+数据表:
+  - 标题: ["表 1  姿态与绕关节 1 轴的转动惯量（无负载）", "Table 1  Pose and inertia about joint 1 (no payload)"]
+    表头: ["θ₂ / (°)", "θ₃ / (°)", "质心 (x, y, z) / m", "质心到轴的距离 / m", "I_zz / (kg·m²)", "M₁₁ − 转子惯量 / (kg·m²)"]
+    表头英文: ["θ₂ / (°)", "θ₃ / (°)", "CoM (x, y, z) / m", "CoM distance from the axis / m", "I_zz / (kg·m²)", "M₁₁ − rotor inertia / (kg·m²)"]
+    行: [["0", "0", "", "", "", ""], ["0", "90", "", "", "", ""], ["0", "150", "", "", "", ""], ["-45", "0", "", "", "", ""], ["-90", "0", "", "", "", ""]]
+  - 标题: ["表 2  负载的影响（零位）", "Table 2  Effect of the payload (zero position)"]
+    表头: ["负载 / kg", "总质量 / kg", "质心 x / m", "I_zz / (kg·m²)", "比无负载增加"]
+    表头英文: ["Payload / kg", "Total mass / kg", "CoM x / m", "I_zz / (kg·m²)", "Increase over no payload"]
+    行: [["0", "", "", "", ""], ["1", "", "", "", ""], ["2", "", "", "", ""], ["3.8", "", "", "", ""], ["5", "", "", "", ""]]
+  - 标题: ["表 3  角动量守恒", "Table 3  Conservation of angular momentum"]
+    表头: ["场景", "开始的转速 / (rad/s)", "结束的转速 / (rad/s)", "开始的 I_zz / (kg·m²)", "结束的 I_zz / (kg·m²)", "两个比值"]
+    表头英文: ["Scene", "Initial speed / (rad/s)", "Final speed / (rad/s)", "Initial I_zz / (kg·m²)", "Final I_zz / (kg·m²)", "The two ratios"]
+    行: [["UR5e 收臂", "", "", "", "", ""], ["转椅", "", "", "", "", ""]]
+    行英文: [["UR5e folding", "", "", "", "", ""], ["Swivel chair", "", "", "", "", ""]]
+注意:
+  - ["UR5e 的质量、惯量来自 MuJoCo Menagerie（与零件库同一版本）：惯量是按均匀圆柱估算的值（算例 23.1.3），连杆质量沿用上一代 UR5 的数值（23.5.2 节），与真实的 UR5e 有出入；负载与转椅上的人是示意值。", "The UR5e's masses and inertias come from MuJoCo Menagerie (the same version as the parts library): the inertias are uniform-cylinder estimates (Example 23.1.3) and the link masses are those of the earlier UR5 (Section 23.5.2), so they differ from a real UR5e; the payload and the person on the chair are illustrative."]
+  - ["关节 1 自由转动的场景中，关节 1 的电机转子惯量设为零、转角限位取消；真实机器人断电时刹车会锁住关节，不要这样试。", "In the free-joint-1 scene the rotor inertia of joint 1 is set to zero and its limits removed; on a real robot the brake locks the joint when power is off, so do not try this."]
+思考题:
+  - ["表 2 中负载只占总质量的一小部分，为什么 I_zz 增加得那么多？用平行轴定理说明。", "In Table 2 the payload is a small part of the total mass, so why does I_zz grow so much? Explain with the parallel-axis theorem."]
