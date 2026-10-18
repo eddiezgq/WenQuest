@@ -62,11 +62,18 @@ GROUPS = [
         ("fn", "机壳一阶固有频率", "Frame first natural frequency", "Hz", 190, 120, 320, 1),
         ("zeta", "机壳阻尼比", "Frame damping ratio", "", 0.03, 0.01, 0.15, 0.005),
     ]),
+    ("drive", "主轴电机（CAE 选型用）", "Spindle motor (for CAE sizing)", [
+        ("T_sew", "缝纫阻力矩（估计）", "Sewing resistance torque (estimate)", "N·m", 0.2, 0.0, 2.0, 0.05),
+        ("mat", "关键零件材料", "Material of key parts", "", "45-QT", None, None, None),
+    ]),
 ]
 CHOICES = {
     "fab": [("lining", "衬里滑料", "Lining"), ("cotton", "棉布", "Cotton"), ("denim", "牛仔布", "Denim")],
     "th": [("t18", "Tex 18（细）", "Tex 18 (fine)"), ("t24", "Tex 24", "Tex 24"), ("t40", "Tex 40（粗）", "Tex 40 (coarse)")],
     "mode": [("drop", "下送布", "Drop feed"), ("needle", "针送布", "Needle feed"), ("compound", "综合送布", "Compound feed")],
+    "mat": [("45-QT", "45 钢（调质）", "Steel 45, Q&T"), ("40Cr-QT", "40Cr（调质）", "40Cr steel, Q&T"),
+            ("QT500-7", "QT500-7 球墨铸铁", "Ductile iron QT500-7"), ("7075-T6", "7075-T6 铝合金", "Aluminium 7075-T6"),
+            ("6061-T6", "6061-T6 铝合金", "Aluminium 6061-T6")],
 }
 PARAMS = {p[0]: p for g in GROUPS for p in g[3]}
 DEFAULTS = {k: p[4] for k, p in PARAMS.items()}

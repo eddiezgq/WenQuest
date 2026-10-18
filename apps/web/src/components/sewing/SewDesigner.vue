@@ -1,5 +1,5 @@
 <template>
-  <!-- 缝纫机设计与制造软件（第 39 轮平缝机，第 40 轮加包缝机、绷缝机）。机型在上，参数在左，三维样机 / 校核 / 时序 / 零件与制造 / 导出在右。来宾可试算，开通后可保存与导出。 -->
+  <!-- 缝纫机设计与制造软件（第 39 轮平缝机，第 40 轮加包缝机、绷缝机，第 41 轮接入问渠 CAE）。机型在上，参数在左，三维样机 / 校核 / 时序 / 零件与制造 / CAE 分析 / 导出在右。来宾可试算，开通后可保存与导出。 -->
   <view class="sew">
     <view class="head">
       <text class="h1">{{ t("sew.title") }}</text>
@@ -139,6 +139,11 @@
             <view><text class="pt">{{ lang === "en" ? s.en : s.zh }}</text><text class="para">{{ lang === "en" ? s.do_en : s.do_zh }}</text></view></view>
         </view>
 
+        <!-- CAE 分析（第 41 轮） -->
+        <view v-show="tab === 'cae'" class="pane">
+          <SewCae :machine="machine" :params="params" :licensed="me.licensed" :active="tab === 'cae'" :labels="plabels" @apply="applyParams" />
+        </view>
+
         <!-- 导出 -->
         <view v-show="tab === 'export'" class="pane">
           <view v-if="!me.licensed" class="note">{{ t("sew.expLocked") }} <text class="link" @click="contact">{{ t("sew.contact") }} →</text></view>
@@ -183,6 +188,7 @@ import { computed, reactive, ref, watch } from "vue";
 import { ApiError, BASE, request, token } from "../../api";
 import { siteUrl } from "../../accountApi";
 import { errorText, locale, t } from "../../i18n";
+import SewCae from "./SewCae.vue";
 
 interface Choice { key: string; zh: string; en: string }
 interface Param { key: string; zh: string; en: string; unit: string; default: number | string; min: number; max: number; step: number; choices: Choice[] }
@@ -198,7 +204,7 @@ const kinds = ref<string[]>(["report", "card", "params", "step", "macro", "dxf",
 const machines = ref<Choice[]>([]);
 const machine = ref("lockstitch");
 const COLORS = ["#2d6fb3", "#7d5ba6", "#c0392b", "#2e9e6a", "#e8913a"];
-const tabs = ["proto", "checks", "timing", "parts", "export"];
+const tabs = ["proto", "checks", "timing", "parts", "cae", "export"];
 
 const schema = ref<Group[]>([]);
 const params = reactive<Record<string, number | string>>({});
@@ -227,6 +233,7 @@ const bads = computed(() => (R.value ? R.value.checks.filter((c: Check) => c.sta
 const warns = computed(() => (R.value ? R.value.checks.filter((c: Check) => c.state === "warn").length : 0));
 const mname = (k?: string) => { const m = machines.value.find((x) => x.key === (k || "lockstitch")); return m ? L(m) : ""; };
 const projectNames = computed(() => projects.value.map((p) => `${p.name}（${mname(p.machine)}）`));
+const plabels = computed(() => { const o: Record<string, string> = {}; for (const grp of schema.value) for (const x of grp.params) o[x.key] = L(x); return o; });
 const pIndex = computed(() => Math.max(0, projects.value.findIndex((p) => p.id === current.value?.id)));
 const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper" };
 const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${PAGES[machine.value] || PAGES.lockstitch}`);
@@ -260,6 +267,18 @@ function typed(p: Param, raw: string) {
   const v = Number(raw);
   if (!isFinite(v)) return;
   setv(p.key, Math.min(p.max, Math.max(p.min, v)));
+}
+// CAE 分析 / 设计优化的“采用”：回填参数（夹在参数范围里）再算
+function applyParams(p: Record<string, number | string>) {
+  const lim: Record<string, Param> = {};
+  for (const grp of schema.value) for (const x of grp.params) lim[x.key] = x;
+  for (const [k, v] of Object.entries(p)) {
+    const d = lim[k];
+    if (!d) continue;
+    params[k] = typeof v === "number" && !d.choices.length ? Math.min(d.max, Math.max(d.min, v)) : v;
+  }
+  msg.value = t("sew.cae.applied", { p: Object.entries(p).map(([k, v]) => `${plabels.value[k] || k} = ${v}`).join("，") });
+  compute();
 }
 function reset() {
   Object.assign(params, defaults);
@@ -297,6 +316,7 @@ async function switchMachine(m: string, keepProject = false) {
   if (m === machine.value && R.value) return;
   machine.value = m;
   R.value = null;
+  msg.value = "";
   if (!keepProject) { current.value = null; pname.value = ""; }
   await loadSchema();
   compute();

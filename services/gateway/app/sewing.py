@@ -119,6 +119,10 @@ def register(app, m) -> None:
             return {"user_id": sess.user_id, "org": "问渠", "name": "", "note": "admin"}
         raise EngineError("not_licensed", "this feature is for activated enterprise accounts", 403)
 
+    # 第 41 轮：CAE 接口（sewing_cae.py）共用开通检查和数据库
+    m.sewing_need_license = need_license
+    m.sewing_db = db
+
     # ---------- 来宾也能用 ----------
     @app.get("/api/v1/sewing/schema")
     async def schema(machine: str = "lockstitch"):
@@ -227,7 +231,8 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no 3D parts for this machine yet", 404)
         from .sewcore import cad, report
         if kind == "report":
-            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE)
+            cae = m.sewing_cae_results(lic["org"], M.MACHINE, p) if hasattr(m, "sewing_cae_results") else []
+            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE, cae=cae)
         elif kind == "card":
             data = report.card_docx(p, lang, body.project, machine=M.MACHINE)
         elif kind == "params":

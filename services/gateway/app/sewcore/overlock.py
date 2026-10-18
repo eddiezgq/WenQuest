@@ -29,12 +29,14 @@ GROUPS = [
         ("r", "曲柄半径", "Crank radius", "mm", 12.25, 8, 16, 0.05),
         ("l", "连杆长", "Connecting-rod length", "mm", 42.0, 30, 60, 0.5),
         ("tip0", "针尖最高时高出针板", "Needle tip above plate at TDC", "mm", 9.5, 6, 14, 0.1),
+        ("mr", "针杆组件质量（强度、动力学用）", "Needle-bar assembly mass (for CAE)", "kg", 0.08, 0.03, 0.2, 0.005),
     ]),
     ("lower", "下弯针（空间四杆 RSSR）", "Lower looper (spatial RSSR)", [
         ("ll_r", "偏心半径", "Eccentric radius", "mm", 4.3619, 2, 11, 0.01),
         ("ll_b", "球头连杆长", "Ball-link length", "mm", 22.4789, 16, 32, 0.01),
         ("ll_c", "摆杆长", "Rocker length", "mm", 22.0, 16, 30, 0.1),
         ("ll_R", "弯针尖到摆轴", "Looper point to rocker axis", "mm", 38.0, 30, 46, 0.5),
+        ("ll_J", "下弯针组件对摆轴的转动惯量（估计）", "Lower looper assembly inertia about its axis (estimate)", "g·cm²", 200, 20, 2000, 10),
     ]),
     ("upper", "上弯针（空间四杆 RSSR）", "Upper looper (spatial RSSR)", [
         ("ul_r", "偏心半径", "Eccentric radius", "mm", 7.3801, 3, 12, 0.01),
@@ -53,8 +55,15 @@ GROUPS = [
         ("kn_ov", "上下刀重叠量", "Knife overlap", "mm", 0.8, 0, 2, 0.05),
         ("w", "线迹宽（切边线到针）", "Stitch width (cut line to needle)", "mm", 4.0, 2, 7, 0.5),
     ]),
+    ("drive", "主轴电机（CAE 选型用）", "Spindle motor (for CAE sizing)", [
+        ("T_sew", "缝纫阻力矩（估计）", "Sewing resistance torque (estimate)", "N·m", 0.15, 0.0, 2.0, 0.05),
+        ("mat", "关键零件材料", "Material of key parts", "", "45-QT", None, None, None),
+    ]),
 ]
+from .design import CHOICES as _LC
+
 CHOICES = {
+    "mat": _LC["mat"],
     "stitch": [("504", "504 三线包缝", "504 three-thread"), ("514", "514 四线包缝", "514 four-thread")],
     "fab": [("jersey", "汗布（单面针织）", "Single jersey"), ("rib", "罗纹", "Rib knit"), ("fleece", "卫衣布（毛圈）", "Fleece"),
             ("chiffon", "雪纺（薄梭织）", "Chiffon (light woven)"), ("twill", "斜纹布（中厚梭织）", "Twill (medium woven)")],

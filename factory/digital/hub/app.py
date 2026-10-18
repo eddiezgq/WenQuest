@@ -2175,6 +2175,11 @@ from hub import tasks as _tasks  # noqa: E402
 _tasks.mount(app, H, user_of, who, _uid, _emit_as)
 
 
+# ---------------------------------------------------------------- 设计软件接口（学习平台第 41 轮：缝纫机设计软件提交 CAE 计算）
+from hub import design_sw_api as _design_sw  # noqa: E402
+_design_sw.mount(app)
+
+
 # ---------------------------------------------------------------- 网页
 if os.path.isdir(WEB_DIST):
     app.mount("/assets", StaticFiles(directory=os.path.join(WEB_DIST, "assets")), name="assets")

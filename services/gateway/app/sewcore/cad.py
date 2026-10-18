@@ -147,7 +147,7 @@ def _parts_lockstitch(params=None, phi=0.0):
     # 刺布机构
     cw = max(6.0, 4 + 60 * (0.06 + p["k"] * p["mr"]))          # 平衡块半径随平衡块质量示意
     plate("NeedleCrank", "针杆曲柄", [(0, 0, 11), (pin[0], pin[1], 7), (-math.sin(a) * cw * 0.9, -math.cos(a) * cw * 0.9, cw)], 4, 8,
-          holes=[(0, 0, 7)], color=(0.80, 0.55, 0.20))
+          holes=[(0, 0, 7), (pin[0], pin[1], 3.5)], color=(0.80, 0.55, 0.20))
     plate("ConnectingRod", "针杆连杆", [(pin[0], pin[1], 6.5), (0, zj, 5.5)], 12, 6, holes=[(pin[0], pin[1], 3.5), (0, zj, 3)],
           color=(0.85, 0.70, 0.30))
     cyl("CrankPin", "曲柄销", 3.5, 16, (pin[0], 4, pin[1]), (0, 1, 0), color=(0.5, 0.5, 0.5))
@@ -381,7 +381,8 @@ def _parts_overlock(params=None, phi=0.0):
     pin = (Cy + r * (math.cos(a) * en[1] + math.sin(a) * w[1]), Cz + r * (math.cos(a) * en[2] + math.sin(a) * w[2]))
     s = r * math.cos(a) - math.sqrt(l * l - (r * math.sin(a)) ** 2)
     jn = (Cy + s * en[1], Cz + s * en[2])
-    plate("OL_NeedleCrank", "引针曲柄", [(Cy, Cz, 10), (pin[0], pin[1], 6)], yz(-38), 6, holes=[(Cy, Cz, 6)], color=(0.80, 0.55, 0.20))
+    plate("OL_NeedleCrank", "引针曲柄", [(Cy, Cz, 10), (pin[0], pin[1], 6)], yz(-38), 6, holes=[(Cy, Cz, 6), (pin[0], pin[1], 3)],
+          color=(0.80, 0.55, 0.20))
     plate("OL_NeedleRod", "引针连杆", [(pin[0], pin[1], 5.5), (jn[0], jn[1], 4.5)], yz(-32), 5, holes=[(pin[0], pin[1], 3), (jn[0], jn[1], 2.5)],
           color=(0.85, 0.70, 0.30))
     cyl("OL_NeedleBar", "针杆", 3.5, 70, (-29.5, jn[0], jn[1]), (0, -en[1], -en[2]), color=(0.70, 0.72, 0.75))
@@ -398,7 +399,8 @@ def _parts_overlock(params=None, phi=0.0):
         sphere(f"{tag}_BallB", f"{zh}连杆球头（摆杆端）", B, 3.2)
         rod(f"{tag}_Link", f"{zh}球头连杆", A, B, 2.2, col)
         fr = dict(o=[Q[i] - 2 * e[i] for i in range(3)], u=list(v0), v=list(v1), n=list(e))
-        plate(f"{tag}_Rocker", f"{zh}摆杆", [(0, 0, 6), (cc * math.cos(th), cc * math.sin(th), 4)], fr, 4, holes=[(0, 0, 3)], color=col)
+        plate(f"{tag}_Rocker", f"{zh}摆杆", [(0, 0, 6), (cc * math.cos(th), cc * math.sin(th), 4)], fr, 4,
+              holes=[(0, 0, 3), (cc * math.cos(th), cc * math.sin(th), 1.5)], color=col)
         cyl(f"{tag}_Shaft", f"{zh}摆轴", 3, 55 if tag == "LL" else 35, [Q[i] - 8 * e[i] for i in range(3)], e)
         if tag == "LL":
             top = [Q[i] + 44 * e[i] for i in range(3)]

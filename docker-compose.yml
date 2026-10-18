@@ -88,6 +88,7 @@ services:
       WQ_FACTORY_URL: ${WQ_FACTORY_URL:-}
       WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}
       WQ_FACTORY_TASK_KEY: ${WQ_FACTORY_TASK_KEY:-}      # 工程任务单（第 11 轮 2.7（5））
+      WQ_FACTORY_CAE_KEY: ${WQ_FACTORY_CAE_KEY:-}        # 缝纫机设计软件提交 CAE 计算（第 41 轮）
       WQ_FACTORY_CLASSES: ${WQ_FACTORY_CLASSES:-}
       WQ_TEXTBOOK_DIR: /textbook
       # 云端 GPU 实验（《人工智能》第 14 轮附）：平台与密钥只在服务器的 .env 里（docs/帮助/GPU平台接入说明.md）

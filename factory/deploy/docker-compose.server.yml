@@ -93,6 +93,7 @@ services:
       WQ_LIBRARY_ORIGINS: https://learn.${SITE_DOMAIN},https://factory.${SITE_DOMAIN}
       WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}      # 课程接口只读钥匙（第 4 轮 C2）
       WQ_FACTORY_TASK_KEY: ${WQ_FACTORY_TASK_KEY:-}      # 工程任务单钥匙（第 11 轮 2.7（5））
+      WQ_FACTORY_CAE_KEY: ${WQ_FACTORY_CAE_KEY:-}        # 设计软件 CAE 钥匙（学习平台第 41 轮）
       WQ_TWIN_DEVICE_KEY: ${WQ_TWIN_DEVICE_KEY:-}        # 数字孪生真设备接入钥匙（第 15 轮）
       WQ_PUBLIC_URL: https://factory.${SITE_DOMAIN}
       WQ_CLAUDE_KEY: ${WQ_CLAUDE_KEY:-}
