@@ -36,6 +36,7 @@ class Program:
     segments: list[Segment] = field(default_factory=list)
     table: tuple[np.ndarray, np.ndarray] | None = None  # (θ rad, s) for a program given by points
     unit: str = "mm"  # mm (translating) or rad (oscillating)
+    advance: float = 0.0  # net advance per cycle (indexing: the output does not come back; mm or rad)
 
     # ------------------------------------------------------------ construction
 
@@ -47,6 +48,10 @@ class Program:
         unit = d.get("unit", "mm")
         if unit not in ("mm", "rad"):
             raise ProgramError("the unit of a program is mm (translating follower) or rad (oscillating follower)")
+        adv = d.get("advance_deg") if unit == "rad" else None
+        advance = radians(float(adv)) if adv not in (None, "") else float(d.get("advance") or 0.0)
+        if not isfinite(advance):
+            raise ProgramError("numbers must be finite")
         if d.get("table"):
             t = d["table"]
             th = np.radians(np.asarray(t.get("deg", []), dtype=float))
@@ -57,7 +62,7 @@ class Program:
                 raise ProgramError("a table needs at least 8 points, an angle and a displacement for each")
             if np.any(np.diff(th) <= 0) or th[0] < 0 or th[-1] >= 2 * pi:
                 raise ProgramError("table angles rise strictly within 0° ≤ θ < 360°")
-            return cls(table=(th, s), unit=unit)
+            return cls(table=(th, s), unit=unit, advance=advance)
         segs = []
         for k, x in enumerate(d.get("segments") or [], 1):
             kind = x.get("kind")
@@ -78,7 +83,7 @@ class Program:
                 if law not in LAWS:
                     raise ProgramError(f"segment {k}: unknown motion law {law}")
             segs.append(Segment(kind, beta, h if kind != "dwell" else 0.0, law))
-        p = cls(segments=segs, unit=unit)
+        p = cls(segments=segs, unit=unit, advance=advance)
         p.validate()
         return p
 
@@ -93,9 +98,14 @@ class Program:
         level = 0.0
         for k, s in enumerate(self.segments, 1):
             level += s.h if s.kind == "rise" else -s.h if s.kind == "return" else 0
-            if level < -1e-9:
+            if level < -1e-9 and self.advance == 0:
                 raise ProgramError(f"segment {k}: the follower would go below its lowest position")
-        if abs(level) > 1e-9:
+        if abs(level - self.advance) > 1e-9 and self.advance != 0:
+            raise ProgramError(
+                "the net movement over a cycle differs from the index advance by "
+                f"{level - self.advance:.6g} {self.unit}"
+            )
+        if abs(level) > 1e-9 and self.advance == 0:
             raise ProgramError(
                 "the follower does not come back to where it started: rises and returns differ by "
                 f"{level:.6g} {self.unit}"
@@ -131,11 +141,14 @@ class Program:
         from scipy.interpolate import CubicSpline  # noqa: PLC0415
 
         t, s = self.table
+        k = self.advance / (2 * pi)  # an indexing table: spline the part that repeats, add the steady advance back
         tt = np.concatenate([t, [t[0] + 2 * pi]])
-        ss = np.concatenate([s, [s[0]]])
+        ss = np.concatenate([s - k * t, [s[0] - k * t[0]]])
         cs = CubicSpline(tt, ss, bc_type="periodic")
         x = np.where(th < t[0], th + 2 * pi, th)
-        return cs(x), cs(x, 1), cs(x, 2), cs(x, 3)
+        base = cs(x) + k * x
+        base = np.where(th < t[0], base - self.advance, base)
+        return base, cs(x, 1) + k, cs(x, 2), cs(x, 3)
 
     def lift(self) -> float:
         s, *_ = self.eval(np.linspace(0, 2 * pi, 3601))
@@ -151,6 +164,7 @@ class Program:
             return []
         out, start = [], 0.0
         n = len(self.segments)
+        # (an indexing program joins its last segment to the first one of the next cycle in the same way)
         lift = max(self.lift(), 1e-12)
         for k in range(n):
             a, b = self.segments[k], self.segments[(k + 1) % n]
