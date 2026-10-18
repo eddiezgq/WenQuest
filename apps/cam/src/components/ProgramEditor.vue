@@ -4,7 +4,8 @@ import { computed, ref, watch } from 'vue'
 import { project, laws } from '../store'
 import { t, lang } from '../i18n'
 
-const prog = computed(() => project.program)
+const props = defineProps({ program: { type: Object, default: null }, indexing: Boolean })
+const prog = computed(() => props.program || project.program)
 const rad = computed(() => prog.value.unit === 'rad')
 const liftKey = computed(() => (rad.value ? 'h_deg' : 'h'))
 const total = computed(() => (prog.value.segments || []).reduce((a, s) => a + (Number(s.deg) || 0), 0))
@@ -22,19 +23,19 @@ watch(useTable, (on) => {
     tableText.value = tableToText() || '0, 0\n45, 2\n90, 8\n135, 14\n180, 16\n225, 14\n270, 8\n315, 2'
     applyTable()
   } else {
-    delete project.program.table
-    if (!project.program.segments?.length) project.program.segments = [{ kind: 'rise', deg: 180, [liftKey.value]: 10, law: 'cycloidal' }, { kind: 'return', deg: 180, [liftKey.value]: 10, law: 'cycloidal' }]
+    delete prog.value.table
+    if (!prog.value.segments?.length) prog.value.segments = [{ kind: 'rise', deg: 180, [liftKey.value]: 10, law: 'cycloidal' }, { kind: 'return', deg: 180, [liftKey.value]: 10, law: 'cycloidal' }]
   }
 })
 function applyTable() {
   const pts = tableText.value.split(/\n/).map((l) => l.split(/[,\s\t]+/).filter(Boolean).map(Number)).filter((p) => p.length >= 2 && p.every(Number.isFinite))
-  project.program.table = { deg: pts.map((p) => p[0]), [rad.value ? 's_deg' : 's']: pts.map((p) => p[1]) }
+  prog.value.table = { deg: pts.map((p) => p[0]), [rad.value ? 's_deg' : 's']: pts.map((p) => p[1]) }
 }
 
-function add() { project.program.segments.push({ kind: 'dwell', deg: 30 }) }
-function remove(i) { project.program.segments.splice(i, 1) }
+function add() { prog.value.segments.push({ kind: 'dwell', deg: 30 }) }
+function remove(i) { prog.value.segments.splice(i, 1) }
 function move(i, d) {
-  const a = project.program.segments, j = i + d
+  const a = prog.value.segments, j = i + d
   if (j < 0 || j >= a.length) return
   ;[a[i], a[j]] = [a[j], a[i]]
 }
@@ -64,6 +65,7 @@ const lawName = (l) => (lang.value === 'zh' ? l.zh : l.en)
       </table>
       <div class="foot"><button type="button" class="ghost" @click="add">+ {{ t('addSeg') }}</button>
         <span :class="['tot', Math.abs(total - 360) > 1e-6 && 'bad']">{{ t('total') }} {{ +total.toFixed(4) }}° / 360°</span></div>
+      <label v-if="indexing" class="adv">{{ t('advance') }} <input v-model.number="prog.advance_deg" type="number" step="any" class="num"> °</label>
     </template>
     <template v-else>
       <p class="hint">{{ t('tableHint') }}</p>
@@ -85,6 +87,8 @@ const lawName = (l) => (lang.value === 'zh' ? l.zh : l.en)
 .tot { font: 500 13px/1 var(--mono); color: var(--ok); }
 .tot.bad { color: var(--bad); }
 .check { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-bottom: 10px; color: var(--muted); }
+.adv { display: flex; gap: 6px; align-items: center; font-size: 13px; margin-top: 8px; }
+.adv .num { width: 80px; }
 .hint { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; }
 textarea { width: 100%; }
 </style>

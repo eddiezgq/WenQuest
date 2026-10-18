@@ -34,9 +34,10 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .brand { display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: inherit; white-space: nowrap; }
 .brand b { font: 900 18px/1 var(--serif-zh); letter-spacing: .04em; }
 .brand small { font-size: 12px; color: var(--night-muted); }
-.title { background: transparent; border: 1px solid transparent; color: var(--night-ink); font-size: 14px; width: min(34ch, 30vw); }
+.title { background: transparent; border: 1px solid transparent; text-overflow: ellipsis; color: var(--night-ink); font-size: 14px; width: min(34ch, 30vw); flex: 0 1 auto; min-width: 8ch; }
 .title:hover, .title:focus { border-color: var(--night-line); }
-.tools { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.tools { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.tools button, .modes button { white-space: nowrap; }
 .tools select.dark { max-width: 220px; }
 
 .work { display: grid; grid-template-columns: 340px minmax(0, 1fr) 320px; grid-template-rows: minmax(420px, 58vh) auto; gap: 12px; padding: 12px; }
@@ -71,6 +72,8 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .embed .stage { grid-column: 1; grid-row: 1; }
 .embed .side { grid-column: 2; grid-row: 1; }
 
+@media (max-width: 1520px) { .brand small { display: none; } .tools select.dark { max-width: 150px; } }
+@media (max-width: 1360px) { .top { flex-wrap: wrap; height: auto; padding: 8px 16px; row-gap: 6px; } .title { order: 3; flex: 1 1 100%; width: auto; } }
 @media (max-width: 1100px) {
   .work { grid-template-columns: 320px minmax(0, 1fr); }
   .side { grid-column: 2; }
@@ -86,7 +89,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   .top { height: auto; flex-wrap: wrap; padding: 8px 12px; }
   .title { order: 3; width: 100%; }
   .modes { order: 4; width: 100%; } .modes button { flex: 1; }
-  .tools { flex-wrap: wrap; margin-left: 0; }
+  .tools { flex-wrap: wrap; margin-left: 0; flex-shrink: 1; }
   .work, .embed .work { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; padding: 8px; }
   .edit, .stage, .side, .curves, .embed .curves, .embed .stage, .embed .side, .meas .stage { grid-column: 1; grid-row: auto; }
   .stage { min-height: 360px; }
