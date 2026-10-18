@@ -1,0 +1,30 @@
+# 实验 22.6 的指导书与报告模板。目的、场景、参数、任务取自 lab22_6.js。
+原理:
+  - 式: ["沿路径 θ(σ) 运动：θ̇ = θ′σ̇，θ̈ = θ′σ̈ + θ″σ̇²；令 x = σ̇²、u = σ̈，则 dx/dσ = 2u", "Along a path θ(σ): θ̇ = θ′σ̇, θ̈ = θ′σ̈ + θ″σ̇²; with x = σ̇², u = σ̈ we have dx/dσ = 2u"]
+  - 式: ["限值对 (x, u) 是线性的：θᵢ′² x ≤ vᵢ²，−aᵢ ≤ θᵢ′u + θᵢ″x ≤ aᵢ", "The limits are linear in (x, u): θᵢ′² x ≤ vᵢ², −aᵢ ≤ θᵢ′u + θᵢ″x ≤ aᵢ"]
+  - 式: ["两遍算法：从终点往回求每点刹得住的最大 x（可控集），再从起点往前每步取最大的 u；每段用时 Δt = 2Δσ/(√x_k + √x_{k+1})", "Two passes: backwards from the end, the largest x that can still stop (controllable set); forwards from the start, the largest u at each step; each step takes Δt = 2Δσ/(√x_k + √x_{k+1})"]
+  - 式: ["平稳：σ(t) 用宽 t_j 的盒形窗滑动平均，t_j = 1/f_n 时消除频率 f_n 的残余振动；限值乘 η 留出滤波后的余量", "Smoothness: average σ(t) over a box window of width t_j; t_j = 1/f_n removes residual vibration at f_n; scale the limits by η to leave room after filtering"]
+步骤:
+  - ["场景“上下料的节拍”：选做法 0，按“开始”运行（任务 1），把读数填入表 1。", "Scene “Loading cycle”: choose method 0 and press Start (task 1); fill in Table 1."]
+  - ["选做法 1，再选做法 2（η = 1），各运行一次（任务 2），填入表 1。注意转移时间和等待时间各自的变化。", "Choose method 1, then method 2 (η = 1), and run each once (task 2); fill in Table 1. Note how the transfer time and the waiting time change."]
+  - ["选做法 3，先取 t_j = 0.125 s、η = 1，看速度、加速度是否超限；再逐步减小 η，直到不超限，且残余振幅不超过 0.05 mm、半个循环不超过 3.8 s（任务 3）。", "Choose method 3 with t_j = 0.125 s and η = 1 and check whether any limit is exceeded; then lower η step by step until nothing is exceeded, the residual amplitude is at most 0.05 mm and the half cycle at most 3.8 s (task 3)."]
+  - ["保持 η 不变，把 t_j 改为 0.0625 s、0.25 s 和 0.1 s，记录残余振幅（表 2）。", "Keep η and change t_j to 0.0625 s, 0.25 s and 0.1 s; record the residual amplitude (Table 2)."]
+  - ["生活场景“弯道上开车”：侧向加速度上限取 3 m/s²，先选全程匀速运行，再选时间最优运行（任务 4），比较两者的用时。", "Everyday scene “Driving through bends”: set the lateral limit to 3 m/s², run the constant speed first, then the time-optimal profile (task 4), and compare the times."]
+数据表:
+  - 标题: ["表 1  四种做法的节拍", "Table 1  Cycle times of the four methods"]
+    表头: ["做法", "转移 / s", "速度、加速度最大占比 / %", "残余振幅 / mm", "等待 / s", "半个循环 / s"]
+    表头英文: ["Method", "Transfer / s", "Largest speed / acceleration share / %", "Residual amplitude / mm", "Wait / s", "Half cycle / s"]
+    行: [["0 每点停下", "", "", "", "", ""], ["1 样条缩放", "", "", "", "", ""], ["2 时间最优", "", "", "", "", ""], ["3 时间最优 + 滤波", "", "", "", "", ""]]
+    行英文: [["0 stop at each point", "", "", "", "", ""], ["1 scaled spline", "", "", "", "", ""], ["2 time-optimal", "", "", "", "", ""], ["3 time-optimal + filter", "", "", "", "", ""]]
+  - 标题: ["表 2  滤波窗宽与残余振幅（做法 3）", "Table 2  Filter width and residual amplitude (method 3)"]
+    表头: ["t_j / s", "η", "转移 / s", "残余振幅 / mm"]
+    表头英文: ["t_j / s", "η", "Transfer / s", "Residual amplitude / mm"]
+    行: [["0.0625", "", "", ""], ["0.1", "", "", ""], ["0.125", "", "", ""], ["0.25", "", "", ""]]
+    行英文: [["0.0625", "", "", ""], ["0.1", "", "", ""], ["0.125", "", "", ""], ["0.25", "", "", ""]]
+注意:
+  - ["工位尺寸、关节加速度限值、振动模态（8 Hz、阻尼比 0.02）、夹紧和松开的时间都是示意值。", "The cell dimensions, joint acceleration limits, vibration mode (8 Hz, damping ratio 0.02) and the grip and release times are illustrative."]
+  - ["界面用 1000 段的网格求时间最优，约束只在网格点上施加，网格点之间加速度可能略超限值（约 2%）；程序 22.6.1 用 4000 段，数值略有不同。", "The lab solves on a 1000-step grid; the constraints hold at the grid points, and between them the acceleration may slightly exceed its limit (about 2%). Program 22.6.1 uses 4000 steps, so its numbers differ slightly."]
+  - ["画面中关节 1 叠加了放大 30 倍的扭转角；播放放慢 2 倍。道路场景加快 4 倍播放，车放大 4 倍画出。", "Joint 1 is drawn with its torsion magnified 30 times; playback is 2× slower. The road scene plays 4× faster and the car is drawn 4 times larger."]
+思考题:
+  - ["时间最优的转移比每点停下快得多，为什么半个循环只快了一点？滤波让转移变慢了，为什么节拍却最短？", "The time-optimal transfer is much faster than stopping at each point; why is its half cycle only a little shorter? Filtering slows the transfer down; why is its cycle the shortest?"]
+  - ["若夹着更重的零件，振动频率降到 6 Hz，t_j 应怎样改？节拍会怎样变化？", "With a heavier part the vibration drops to 6 Hz. How should t_j change, and what happens to the cycle time?"]

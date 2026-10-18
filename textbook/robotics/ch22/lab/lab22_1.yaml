@@ -1,0 +1,22 @@
+# 实验 22.1 的指导书与报告模板。目的、场景、参数、任务取自 lab22_1.js。
+原理:
+  - 式: ["同步的点到点运动：θ(t) = θ_A + s(t) Δθ，θ̇ = Δθ ṡ，θ̈ = Δθ s̈，θ⃛ = Δθ s⃛；τ = t/T", "Synchronised point-to-point motion: θ(t) = θ_A + s(t) Δθ, θ̇ = Δθ ṡ, θ̈ = Δθ s̈, θ⃛ = Δθ s⃛; τ = t/T"]
+  - 式: ["三次：s = 3τ² − 2τ³，max ṡ = 1.5/T，max |s̈| = 6/T²，两端加速度跳变", "Cubic: s = 3τ² − 2τ³, max ṡ = 1.5/T, max |s̈| = 6/T², the acceleration jumps at both ends"]
+  - 式: ["五次：s = 10τ³ − 15τ⁴ + 6τ⁵，max ṡ = 15/(8T)，max |s̈| = 10/(√3 T²)，max |s⃛| = 60/T³", "Quintic: s = 10τ³ − 15τ⁴ + 6τ⁵, max ṡ = 15/(8T), max |s̈| = 10/(√3 T²), max |s⃛| = 60/T³"]
+  - 式: ["最短时间 T_min = max_i max(c_v|Δθ_i|/v_i, √(c_a|Δθ_i|/a_i), ∛(c_j|Δθ_i|/j_i))", "Shortest time T_min = max_i max(c_v|Δθ_i|/v_i, √(c_a|Δθ_i|/a_i), ∛(c_j|Δθ_i|/j_i))"]
+步骤:
+  - ["场景“UR5e 关节 1 点到点”：选直线插值（0），按“开始”，观察速度曲线两端的跳变和加速度的冲激（任务 1）。", "Scene “UR5e joint 1 point to point”: choose linear (0), press Start, and watch the velocity jumps and acceleration impulses at both ends (task 1)."]
+  - ["选三次多项式（1），从 2 s 开始逐步减小运动时间，直到某个峰值刚好达到限值，记下最短时间和起作用的限值，填入表 1（任务 2）。", "Choose the cubic (1) and reduce the time from 2 s until one peak just reaches its limit; record the shortest time and the binding limit in Table 1 (task 2)."]
+  - ["选五次多项式（2），重复上一步（任务 3）。再把转角改为 30°、170°，重复两种多项式，填入表 1。", "Choose the quintic (2) and repeat (task 3). Then set the rotation to 30° and 170° and repeat both polynomials, filling in Table 1."]
+  - ["生活场景“自动门”：找出 4 s 以内、不超限且加加速度有界的设置，按“开始”运行一次（任务 4）。", "Everyday scene “Automatic door”: find a setting within 4 s, within the limits and with bounded jerk, and press Start once (task 4)."]
+数据表:
+  - 标题: ["表 1  点到点运动的最短时间", "Table 1  Shortest point-to-point times"]
+    表头: ["转角 / (°)", "时间标度", "最短时间 / s", "速度峰值 / (°/s)", "加速度峰值 / (rad/s²)", "起作用的限值"]
+    表头英文: ["Rotation / (°)", "Time scaling", "Shortest time / s", "Peak velocity / (°/s)", "Peak acceleration / (rad/s²)", "Binding limit"]
+    行: [["103.4", "三次", "", "", "", ""], ["103.4", "五次", "", "", "", ""], ["30", "三次", "", "", "", ""], ["30", "五次", "", "", "", ""], ["170", "三次", "", "", "", ""], ["170", "五次", "", "", "", ""]]
+    行英文: [["103.4", "cubic", "", "", "", ""], ["103.4", "quintic", "", "", "", ""], ["30", "cubic", "", "", "", ""], ["30", "quintic", "", "", "", ""], ["170", "cubic", "", "", "", ""], ["170", "quintic", "", "", "", ""]]
+注意:
+  - ["加速度、加加速度的限值和自动门的限值都是示意值；UR5e 的速度上限 180°/s 取自厂商资料。", "The acceleration and jerk limits and the door limits are illustrative; the UR5e speed limit of 180°/s is from the manufacturer's data."]
+  - ["动画按实际时间的一半速度播放。", "The animation plays at half the real speed."]
+思考题:
+  - ["转角很小时，起作用的往往是加速度限值还是速度限值？用式 (22.1.11) 说明。", "For small rotations, is the binding limit usually the acceleration or the velocity? Explain with Eq. (22.1.11)."]

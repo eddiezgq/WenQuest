@@ -1,0 +1,26 @@
+# 实验 22.3 的指导书与报告模板。目的、场景、参数、任务取自 lab22_3.js。
+原理:
+  - 式: ["每段三次埃尔米特多项式：由两端的位置 q_k、q_{k+1} 和速度 v_k、v_{k+1} 确定（式 (22.1.4)）", "Each segment is a cubic Hermite polynomial fixed by the end positions q_k, q_{k+1} and velocities v_k, v_{k+1} (Eq. (22.1.4))"]
+  - 式: ["三次样条：v_{k−1}/h_{k−1} + 2(1/h_{k−1} + 1/h_k) v_k + v_{k+1}/h_k = 3(Δ_{k−1}/h_{k−1}² + Δ_k/h_k²)", "Cubic spline: v_{k−1}/h_{k−1} + 2(1/h_{k−1} + 1/h_k) v_k + v_{k+1}/h_k = 3(Δ_{k−1}/h_{k−1}² + Δ_k/h_k²)"]
+  - 式: ["抛物线过渡：过渡中加速度 (v_out − v_in)/t_b，经过路径点的时刻偏离 (v_out − v_in) t_b/8", "Parabolic blend: acceleration (v_out − v_in)/t_b, deviation (v_out − v_in) t_b/8 at the via-point time"]
+步骤:
+  - ["场景“UR5e 侧视”：选做法 0，按“开始”运行一次（任务 1），记下总时间，填入表 1。", "Scene “UR5e side view”: choose method 0 and press Start once (task 1); record the total time in Table 1."]
+  - ["选做法 1、2，从 2.5 s 逐步减小总时间，找出不超限的最短总时间，记录加速度的跳变，填入表 1（做法 2 为任务 2）。", "Choose methods 1 and 2, reduce the total time from 2.5 s to the shortest one within the limits, and record the acceleration jump in Table 1 (method 2 is task 2)."]
+  - ["选做法 3，调节总时间，使两个路径点处的偏离都不超过 3°，且总时间比做法 0 短（任务 3）；记录偏离随总时间的变化，填入表 2。", "Choose method 3 and adjust the total time so that both deviations are at most 3° and it is faster than method 0 (task 3); record how the deviation changes with the total time in Table 2."]
+  - ["生活场景“绘图仪写 S”：用样条找出比每点停下快两成以上、又不超限的总时间（任务 4）。", "Everyday scene “A plotter writes S”: with the spline, find a total time at least 20% faster than stopping at each point and within the limits (task 4)."]
+数据表:
+  - 标题: ["表 1  四种做法的比较（UR5e 侧视）", "Table 1  The four methods compared (UR5e side view)"]
+    表头: ["做法", "最短总时间 / s", "加速度峰值 / 限值", "路径点处加速度的跳变 / (rad/s²)", "偏离路径点 / (°)"]
+    表头英文: ["Method", "Shortest total time / s", "Peak acceleration / limit", "Acceleration jump at via points / (rad/s²)", "Deviation from via points / (°)"]
+    行: [["每点停下", "", "", "", "0"], ["经验速度", "", "", "", "0"], ["三次样条", "", "", "0", "0"], ["抛物线过渡", "", "", "", ""]]
+    行英文: [["Stop at each", "", "", "", "0"], ["Heuristic", "", "", "", "0"], ["Cubic spline", "", "", "0", "0"], ["Parabolic blends", "", "", "", ""]]
+  - 标题: ["表 2  抛物线过渡的偏离与总时间", "Table 2  Blend deviation against total time"]
+    表头: ["总时间 / s", "1.8", "2.0", "2.4", "3.0"]
+    表头英文: ["Total time / s", "1.8", "2.0", "2.4", "3.0"]
+    行: [["M 处的偏离 / (°)", "", "", "", ""]]
+    行英文: [["Deviation at M / (°)", "", "", "", ""]]
+注意:
+  - ["各段时长按“每点停下”时的比例分配；加速度、加加速度限值和绘图仪的限值都是示意值。", "The segment durations keep the proportions of “stop at each point”; the acceleration and jerk limits and the plotter limits are illustrative."]
+  - ["侧视图只显示关节 2、3，其余关节在循环中的运动没有画出。", "The side view shows joints 2 and 3 only; the other joints of the cycle are not drawn."]
+思考题:
+  - ["抛物线过渡的偏离与总时间的平方成反比，为什么？", "Why is the blend deviation inversely proportional to the square of the total time?"]
