@@ -1,0 +1,28 @@
+# 实验 23.3 的指导书与报告模板。目的、场景、参数、任务取自 lab23_3.js。
+原理:
+  - ["角动量定理：力矩等于角动量的变化率。转子绕自身对称轴以 ω 自转，角动量 L = I₃ω 沿转轴。", "Angular momentum theorem: the moment equals the rate of change of angular momentum. A rotor spinning at ω about its symmetry axis has L = I₃ω along the axis."]
+  - ["支架以 Ω 扳动转轴（Ω 垂直于转轴）时，L 随转轴一起转动，变化率为 Ω × L，所以支架必须对转子施加陀螺力矩：", "When the frame turns the axis at Ω (normal to it), L turns with the axis at the rate Ω × L, so the frame must apply the gyroscopic torque:"]
+  - 式: "M = Ω × L,   |M| = I₃ ω Ω"
+  - ["反过来，若力矩来自重力，轴就绕竖直线转动，称为进动。轴水平、支点到盘心距离为 l 时：", "Conversely, if the moment comes from gravity the axle turns about the vertical: precession. With a level axle and the disc centre at l from the pivot:"]
+  - 式: ["Ω = m𝔤l/(I₃ω),   I₃ = m r²/2（均匀圆盘）", "Ω = m𝔤l/(I₃ω),   I₃ = m r²/2 (uniform disc)"]
+  - ["自转越快，进动越慢；不自转时 L ≈ 0，重力矩直接让轴倒下。", "The faster the spin, the slower the precession; without spin L ≈ 0 and the gravity moment simply tips the axle over."]
+步骤:
+  - ["场景“手腕上的电主轴”：12000 r/min、Ω = 1 rad/s，按“开始”，读出陀螺力矩与预测（任务 1），填入表 1。", "Scene “Spindle on the wrist”: 12000 r/min, Ω = 1 rad/s; press Start and record the torque and the prediction (task 1) in Table 1."]
+  - ["分别改变转速（6000、15000 r/min）和 Ω（0.5、2 rad/s），验证 |M| 与 ω、Ω 都成正比，填入表 1。", "Change the speed (6000, 15000 r/min) and Ω (0.5, 2 rad/s) and check that |M| is proportional to both (Table 1)."]
+  - ["把砂轮改为反转，观察力矩分量的符号（任务 2）。", "Reverse the wheel and watch the sign of the torque component (task 2)."]
+  - ["场景“演示陀螺仪”：自转 60 rad/s，按“开始”，读出进动角速度（任务 3）；再改为 40、30、20 rad/s（任务 4），填入表 2。", "Scene “Demonstration gyroscope”: spin 60 rad/s, press Start and read the precession rate (task 3); then 40, 30 and 20 rad/s (task 4), Table 2."]
+  - ["把自转调为 0，看轴怎样倒下（任务 5）。", "Set the spin to 0 and watch the axle fall (task 5)."]
+数据表:
+  - 标题: ["表 1  电主轴的陀螺力矩", "Table 1  Gyroscopic torque of the spindle"]
+    表头: ["转速 / (r/min)", "Ω / (rad/s)", "L = I₃ω / (kg·m²/s)", "测得 |M| / (N·m)", "预测 I₃ωΩ / (N·m)"]
+    表头英文: ["Speed / (r/min)", "Ω / (rad/s)", "L = I₃ω / (kg·m²/s)", "Measured |M| / (N·m)", "Predicted I₃ωΩ / (N·m)"]
+    行: [["12000", "1", "", "", ""], ["6000", "1", "", "", ""], ["15000", "1", "", "", ""], ["12000", "0.5", "", "", ""], ["12000", "2", "", "", ""]]
+  - 标题: ["表 2  陀螺仪的进动", "Table 2  Precession of the gyroscope"]
+    表头: ["自转 ω / (rad/s)", "预测 Ω / (rad/s)", "测得 Ω / (rad/s)", "Ω·ω / (rad²/s²)"]
+    表头英文: ["Spin ω / (rad/s)", "Predicted Ω / (rad/s)", "Measured Ω / (rad/s)", "Ω·ω / (rad²/s²)"]
+    行: [["60", "", "", ""], ["40", "", "", ""], ["30", "", "", ""], ["20", "", "", ""]]
+注意:
+  - ["电主轴和陀螺仪的尺寸、质量、转速都是示意值。", "The sizes, masses and speeds of the spindle and the gyroscope are illustrative."]
+  - ["陀螺仪以恰好的进动角速度开始运动，所以几乎没有章动；用手放开时会有点头的章动，转得越快越小。", "The gyroscope starts with exactly the steady precession rate, so there is almost no nutation; released by hand it nods a little, less the faster it spins."]
+思考题:
+  - ["表 2 中 Ω·ω 为什么近似不变？自转很慢（例如 10 rad/s）时，式 (23.3.18) 还准确吗？", "Why is Ω·ω nearly constant in Table 2? Is Eq. (23.3.18) still accurate for a slow spin, say 10 rad/s?"]

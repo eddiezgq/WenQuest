@@ -146,7 +146,7 @@ LIM = "#9aa4ab"            # 限值（虚线）
 COL3 = "#1f77b4"           # 三次
 COL5 = "#d9730d"           # 五次
 COLL = "#7a868d"           # 直线插值
-SHAFT_L, SHAFT_TOP = 0.24, 0.04      # 轴 SH-301 的长度（示意值）、夹持点到轴端的距离
+SHAFT_L, SHAFT_TOP = 0.182, 0.04     # SH-301 坯料长 182 mm（数字工厂工艺规程 factory/digital/std/SH-301_process.yaml）、夹持点到轴端的距离（示意值）
 
 
 def curves(ax, xlabel=None, ylabel=None):

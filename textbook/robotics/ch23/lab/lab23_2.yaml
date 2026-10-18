@@ -1,0 +1,33 @@
+# 实验 23.2 的指导书与报告模板。目的、场景、参数、任务取自 lab23_2.js。
+原理:
+  - ["绕水平轴自由摆动的刚体称为复摆。设它对轴的转动惯量为 J_o，质心到轴的距离为 d，运动方程为 J_o θ̈ = −m𝔤 d sin θ。", "A rigid body swinging freely about a horizontal axis is a physical pendulum. With J_o its moment of inertia about the axis and d the distance of the centre of mass, J_o θ̈ = −m𝔤 d sin θ."]
+  - ["平行轴定理：对轴的转动惯量等于对过质心的平行轴的转动惯量加上 m d²。", "Parallel-axis theorem: the moment about the axis equals that about the parallel axis through the centre of mass plus m d²."]
+  - 式: "J_o = I_C + m d² = m (k² + d²)"
+  - ["小幅摆动时周期为：", "For small swings the period is:"]
+  - 式: "T₀ = 2π √(J_o/(m𝔤d)) = 2π √((k² + d²)/(𝔤d))"
+  - ["d = k 时周期最短；d 与 k²/d 周期相同。振幅 θ₀ 较大时，精确周期为 T = T₀ · (2/π) K(sin²(θ₀/2))，K 是第一类完全椭圆积分。", "The period is shortest at d = k; d and k²/d give the same period. For a larger amplitude θ₀, T = T₀ · (2/π) K(sin²(θ₀/2)), with K the complete elliptic integral of the first kind."]
+  - 式: ["米尺（长 L）：k = L/√12；UR5e 小臂：取书中模型的 m、d、I_C", "Metre stick (length L): k = L/√12; UR5e forearm: m, d, I_C from the book's model"]
+步骤:
+  - ["场景“钉子上的米尺”：d = 50 cm、θ₀ = 5°，按“开始”，读出测得的周期和预测（任务 1），填入表 1。", "Scene “A metre stick on a nail”: d = 50 cm, θ₀ = 5°; press Start and record the measured and predicted periods (task 1) in Table 1."]
+  - ["把 d 依次设为 40、30、29、25、20、10、5 cm，重复，填入表 1；找出周期最短的悬挂点（任务 2）。", "Repeat for d = 40, 30, 29, 25, 20, 10 and 5 cm (Table 1) and find the pivot with the shortest period (task 2)."]
+  - ["d = 50 cm，把释放角改为 20°、40°、60°，比较测得的周期与小幅预测、精确公式，填入表 2。", "With d = 50 cm release from 20°, 40° and 60°; compare the measured period with the small-angle prediction and the exact formula (Table 2)."]
+  - ["场景“UR5e 小臂”：不挂负载，θ₀ = 5°，测周期（任务 3）；再挂 0.5、1、2 kg（任务 4），填入表 3。", "Scene “UR5e forearm”: no payload, θ₀ = 5°, measure the period (task 3); then 0.5, 1 and 2 kg (task 4), Table 3."]
+数据表:
+  - 标题: ["表 1  米尺的周期与悬挂点（θ₀ = 5°）", "Table 1  Period of the metre stick against the pivot (θ₀ = 5°)"]
+    表头: ["d / cm", "J_o / (kg·m²)", "预测 T₀ / s", "测得 T / s", "相对差别"]
+    表头英文: ["d / cm", "J_o / (kg·m²)", "Predicted T₀ / s", "Measured T / s", "Relative difference"]
+    行: [["50", "", "", "", ""], ["40", "", "", "", ""], ["30", "", "", "", ""], ["29", "", "", "", ""], ["25", "", "", "", ""], ["20", "", "", "", ""], ["10", "", "", "", ""], ["5", "", "", "", ""]]
+  - 标题: ["表 2  振幅的影响（d = 50 cm）", "Table 2  Effect of the amplitude (d = 50 cm)"]
+    表头: ["θ₀ / (°)", "小幅预测 T₀ / s", "精确公式 T / s", "测得 T / s"]
+    表头英文: ["θ₀ / (°)", "Small-angle T₀ / s", "Exact T / s", "Measured T / s"]
+    行: [["5", "", "", ""], ["20", "", "", ""], ["40", "", "", ""], ["60", "", "", ""]]
+  - 标题: ["表 3  UR5e 小臂（θ₀ = 5°）", "Table 3  UR5e forearm (θ₀ = 5°)"]
+    表头: ["负载 / kg", "m / kg", "d / m", "J_o / (kg·m²)", "预测 T₀ / s", "测得 T / s"]
+    表头英文: ["Payload / kg", "m / kg", "d / m", "J_o / (kg·m²)", "Predicted T₀ / s", "Measured T / s"]
+    行: [["0", "", "", "", "", ""], ["0.5", "", "", "", "", ""], ["1", "", "", "", "", ""], ["2", "", "", "", "", ""]]
+注意:
+  - ["米尺的质量 0.15 kg 是示意值；周期与质量无关。", "The stick's mass of 0.15 kg is illustrative; the period does not depend on it."]
+  - ["小臂的质量、质心、惯量取自书中的 UR5e 模型（MuJoCo Menagerie）；实验中不计电机转子的等效惯量（模型中的 armature），真实机器人刹车松开时摆得更慢。", "The forearm's mass, centre of mass and inertia come from the book's UR5e model (MuJoCo Menagerie); the motor's reflected rotor inertia (armature) is left out, so a real arm swings more slowly."]
+  - ["周期由角速度相邻几次变号的间隔求得，摆动两个周期以后才显示。", "The period is found from successive sign changes of the angular velocity and shows after two swings."]
+思考题:
+  - ["为什么复摆的周期与质量无关，却与质量的分布有关？", "Why does the period not depend on the mass but on how the mass is distributed?"]
