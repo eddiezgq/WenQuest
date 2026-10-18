@@ -345,7 +345,10 @@ def test_examples_run():
 
     res = {}
     for f in sorted(pathlib.Path(__file__).parent.parent.joinpath("examples").glob("*.json")):
-        res[f.stem] = analyse(json.loads(f.read_text(encoding="utf-8")))
+        d = json.loads(f.read_text(encoding="utf-8"))
+        if d.get("kind") == "system":
+            continue  # a cam system (tests/test_system.py)
+        res[f.stem] = analyse(d)
     assert set(res) == {"packaging-plate", "sewing-feed", "sewing-takeup-groove"}
     assert {c["id"]: c["status"] for c in res["sewing-feed"]["checks"]}["jump"] == "fail"
     assert all({c["id"]: c["status"] for c in r["checks"]}["stress"] == "unknown" for r in res.values())

@@ -1,0 +1,186 @@
+{
+ "kind": "system",
+ "title": {
+  "zh": "示例：加工中心凸轮式换刀机构（弧面分度凸轮 + 槽凸轮，参数为虚构）",
+  "en": "Example: machining-centre cam tool changer (globoidal + groove cam, fictional numbers)"
+ },
+ "camshaft": {
+  "rpm": 60,
+  "J": 0.02,
+  "friction": 2.0,
+  "start_deg": 15,
+  "stop_deg": 15
+ },
+ "drive": {
+  "ratio": 30,
+  "eta": 0.7,
+  "J_motor": 0.0004,
+  "rated_Nm": null,
+  "peak_Nm": null,
+  "max_rpm": null
+ },
+ "cams": [
+  {
+   "id": "index",
+   "name": {
+    "zh": "换刀臂转动（弧面分度凸轮）",
+    "en": "Arm rotation (globoidal cam)"
+   },
+   "type": "globoidal",
+   "program": {
+    "unit": "rad",
+    "advance_deg": 180,
+    "segments": [
+     {
+      "kind": "dwell",
+      "deg": 15
+     },
+     {
+      "kind": "rise",
+      "deg": 50,
+      "h_deg": 65,
+      "law": "mod_sine"
+     },
+     {
+      "kind": "dwell",
+      "deg": 65
+     },
+     {
+      "kind": "rise",
+      "deg": 110,
+      "h_deg": 180,
+      "law": "mod_sine"
+     },
+     {
+      "kind": "dwell",
+      "deg": 65
+     },
+     {
+      "kind": "return",
+      "deg": 40,
+      "h_deg": 65,
+      "law": "mod_sine"
+     },
+     {
+      "kind": "dwell",
+      "deg": 15
+     }
+    ]
+   },
+   "globoidal": {
+    "C": 170,
+    "n": 8,
+    "Rp": 40,
+    "rr": 9,
+    "b": 15,
+    "L": 80,
+    "clearance": 1,
+    "phase_deg": 22.5,
+    "hand": 1
+   },
+   "material": {
+    "E1": 206000,
+    "nu1": 0.3,
+    "E2": 206000,
+    "nu2": 0.3
+   },
+   "limits": {
+    "phi_rise_deg": 40,
+    "rib_min": 4
+   },
+   "output": {
+    "J": 0.46,
+    "load": 0,
+    "tip": 150
+   },
+   "elastic": {
+    "fn": 60,
+    "zeta": 0.03
+   }
+  },
+  {
+   "id": "plunge",
+   "name": {
+    "zh": "拔刀与插刀（槽凸轮 + 摆杆）",
+    "en": "Tool pull-out and insertion (groove cam + lever)"
+   },
+   "type": "disk",
+   "program": {
+    "unit": "rad",
+    "segments": [
+     {
+      "kind": "dwell",
+      "deg": 65
+     },
+     {
+      "kind": "rise",
+      "deg": 65,
+      "h_deg": 22,
+      "law": "mod_sine"
+     },
+     {
+      "kind": "dwell",
+      "deg": 110
+     },
+     {
+      "kind": "return",
+      "deg": 65,
+      "h_deg": 22,
+      "law": "mod_sine"
+     },
+     {
+      "kind": "dwell",
+      "deg": 55
+     }
+    ]
+   },
+   "mechanism": {
+    "follower": "oscillating",
+    "contact": "roller",
+    "rb": 110,
+    "rr": 14,
+    "a": 250,
+    "L": 180,
+    "sigma": 1,
+    "groove": true,
+    "width": 18
+   },
+   "material": {
+    "E1": 206000,
+    "nu1": 0.3,
+    "E2": 206000,
+    "nu2": 0.3
+   },
+   "limits": {
+    "phi_rise_deg": 45,
+    "phi_return_deg": 45
+   },
+   "output": {
+    "J": 2.7,
+    "load": -88.2,
+    "radius": 300,
+    "tip": 300
+   },
+   "elastic": {
+    "fn": 45,
+    "zeta": 0.03
+   }
+  }
+ ],
+ "interlocks": [
+  {
+   "moving": "index",
+   "still": "plunge",
+   "gap_deg": 0
+  },
+  {
+   "moving": "plunge",
+   "still": "index",
+   "gap_deg": 0
+  }
+ ],
+ "limits": {
+  "vib_um": null,
+  "cycle_s": null
+ }
+}
