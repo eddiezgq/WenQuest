@@ -52,7 +52,9 @@ jobs:
         run: python3 tools/vendor/check_external.py
       - name: Cam design kernel and API tests (问渠凸轮, 第 39 轮)
         working-directory: services/cam
-        run: pip install -q -r requirements-dev.txt && python -m pytest -q
+        run: |
+          pip install -q -r requirements-dev.txt
+          python -m pytest -q -rf 2>&1 | tee "$RUNNER_TEMP/cam.txt" || { grep -E "^(FAILED|ERROR)" "$RUNNER_TEMP/cam.txt" | sed 's/^/::error::/'; exit 1; }
       - name: Animator code check tests
         working-directory: services/animator
         run: pip install -q fastapi==0.141.1 pydantic==2.13.3 pytest && python -m pytest -q
