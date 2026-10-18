@@ -16,6 +16,9 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from camkit import analyse, min_base_radius
+from camkit import measure as ME
+from camkit import mfg as MF
+from camkit import step as ST
 from camkit.disk import GeometryError
 from camkit.laws import LAWS, coefficients
 from camkit.program import ProgramError
@@ -23,7 +26,7 @@ from camkit.program import ProgramError
 HERE = Path(__file__).parent
 EXAMPLES = HERE / "examples"
 WEB = Path(os.environ.get("CAM_WEB_DIR", HERE / "web"))
-MAX_BODY = 512 * 1024
+MAX_BODY = 4 * 1024 * 1024  # a measured point cloud can be a few MB
 
 ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^segment (\d+): a (\w+) has a lift more than 0$", r"第 \1 段：升程或回程的行程要大于 0"),
@@ -58,6 +61,29 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^the pitch curve has a point that does not move", "理论廓线退化：请检查参数"),
     (r"^unknown mechanism field: (.*)$", r"不认识的机构参数：\1"),
     (r"^numbers must be finite$", "数值必须是有限数"),
+    # manufacturing and measurement (step 3)
+    (r"^the process is grinding, milling or wire EDM$", "加工方式是磨削、铣削或慢走丝"),
+    (r"^the chord tolerance is between", "弦高公差在 0.00001 到 0.1 mm 之间"),
+    (r"^give the tool radius", "请填刀具半径（砂轮或铣刀）"),
+    (r"^the tool is wider than the groove", "刀具比槽宽：刀具半径不能大于滚子半径"),
+    (r"^give the milling depth", "请填铣削深度（或接触宽度）"),
+    (r"^the depth per pass is more than 0$", "每层切深要大于 0"),
+    (r"^the program has no cutting moves$", "程序里没有切削段"),
+    (r"^the cam outline has a point that does not move", "凸轮廓线有尖点，不能加工"),
+    (r"^the table step divides 360°$", "点表步距要能整除 360°"),
+    (r"^give the thickness", "请填厚度（接触宽度）才能出三维模型"),
+    (r"^give the blank radius and plate thickness", "槽凸轮出三维模型要填毛坯半径和盘厚"),
+    (r"^the plate must be thicker than the groove depth$", "盘厚要大于槽深"),
+    (r"^the blank radius must be larger", "毛坯半径要大于槽外侧壁"),
+    (r"^the measurement needs at least 36 rows", "测量数据至少要 36 行，每行两个数"),
+    (r"^cam angles in degrees, within one turn$", "转角用度，在一圈之内"),
+    (r"^the measurement must cover the whole turn$", "测量数据要覆盖整圈"),
+    (r"^the measurement is a lift table or profile points$", "测量数据是升程表或廓线 XY 点"),
+    (r"^the low orders end between", "低阶的上限要在 2 和最高阶数之间"),
+    (r"^profile points need a cam outline", "用 XY 点时，凸轮廓线要能被从中心出发的每条射线只穿过一次"),
+    (r"^choose orders between 1 and the highest order$", "补偿阶次要在 1 和最高阶数之间"),
+    (r"^give the actual wheel radius$", "请填修整后的实际砂轮半径"),
+    (r"^the tool centre path is not star-shaped", "刀心轨迹对凸轮中心不是星形，X–C 磨削走不了，请改用铣削或小砂轮"),
 ]
 
 
@@ -141,6 +167,174 @@ async def analyse_ep(request: Request):
 async def min_rb(request: Request):
     p = await project_of(request)
     return run(lambda: min_base_radius(p))
+
+
+# --------------------------------------------------------------------------------------- step 3: manufacturing
+
+
+def _mfg_of(p: dict) -> dict:
+    return dict(p.get("mfg") or {})
+
+
+def _thin(a, n):
+    a = np.asarray(a)
+    step = max(1, a.shape[-1] // n)
+    return a[..., ::step]
+
+
+def _scale(unit: str) -> float:
+    return 1e3 if unit == "mm" else 1e6  # µm or µrad for the error curves
+
+
+def manufacture_view(p: dict) -> dict:
+    out = MF.manufacture(p, _mfg_of(p))
+    return _mfg_json(out)
+
+
+def _mfg_json(out: dict) -> dict:
+    sim = out.get("sim")
+    paths = []
+    for ph in out["paths"]:
+        d = {"name": ph["name"], "points": ph["points"], "tool": _thin(ph["Q"], 1440).round(4).tolist()}
+        if "xc" in ph:
+            X, C = ph["xc"]
+            d["xc"] = [np.round(X, 5).tolist(), np.round(C, 5).tolist()]
+        paths.append(d)
+    res = {
+        "checks": out["checks"],
+        "program": out["program"],
+        "process": out["settings"]["process"],
+        "tool_r": out["settings"]["tool_r"],
+        "surfaces": [{"name": sf.name, "zh": sf.zh, "xy": _thin(sf.P, 1440).round(4).tolist()}
+                     for sf in out["surfaces"]],
+        "paths": paths,
+    }
+    if sim is not None:
+        res["sim"] = {
+            "deg": _thin(sim["deg"], 720).round(2).tolist(),
+            "flanks": [{"name": f["name"], "dev_um": (_thin(f["dev"], 720) * 1e3).round(4).tolist()}
+                       for f in sim["flanks"]],
+            "over": out["over"],
+            "under": out["under"],
+        }
+    return res
+
+
+def export_file(p: dict, kind: str) -> dict:
+    title = (p.get("title") or {}).get("en") or "cam"
+    base = re.sub(r"[^A-Za-z0-9_-]+", "_", title).strip("_")[:40] or "cam"
+    st = _mfg_of(p)
+    if kind == "nc":
+        out = MF.manufacture(p, st)
+        if not out["program"]:
+            raise ValueError(next((c["note"] for c in out["checks"] if c["status"] == "fail"), "no program"))
+        return {"name": f"{base}.nc", "mime": "text/plain", "text": out["program"]}
+    if kind == "dxf":
+        _, _, sfs, _ = MF.design(p)
+        return {"name": f"{base}.dxf", "mime": "application/dxf",
+                "text": MF.dxf(sfs, float(st.get("chord_tol") or MF.DEFAULTS["chord_tol"]))}
+    if kind == "csv":
+        text = MF.point_table(p, float(st.get("table_step") or 0.5))
+        return {"name": f"{base}-points.csv", "mime": "text/csv", "text": text}
+    if kind == "step":
+        m, _, sfs, _ = MF.design(p)
+        blank = st.get("blank") or {}
+        num = lambda v: None if v in (None, "") else float(v)  # noqa: E731
+        text, rep = ST.solid(base, sfs[0].P, m.width, sfs[1].P if m.groove else None, num(blank.get("radius")),
+                             num(blank.get("plate")))
+        return {"name": f"{base}.step", "mime": "application/step", "text": text, "report": rep}
+    raise HTTPException(404, {"en": "no such export", "zh": "没有这种导出"})
+
+
+def measure_view(p: dict) -> dict:
+    r = ME.measure(p, p.get("measure") or {})
+    return _meas_json(r)
+
+
+def _meas_json(r: dict) -> dict:
+    k = _scale(r["unit"])
+    h = r["harm"]
+    return {
+        "unit": r["unit"],
+        "err_unit": "µm" if r["unit"] == "mm" else "µrad",
+        "shift_deg": r["shift_deg"],
+        "offset": r["offset"] * k,
+        "deg": _thin(r["deg"], 720).round(2).tolist(),
+        "e": (_thin(r["e"], 720) * k).round(4).tolist(),
+        "acc": None if r["acc"] is None else _thin(r["acc"], 720).round(5).tolist(),
+        "acc_unit": "m/s²" if r["unit"] == "mm" else "rad/s²",
+        "harm": {"k": h["k"].tolist(), "A": (h["A"] * k).round(5).tolist(),
+                 "phase_deg": np.degrees(h["phase"]).round(2).tolist()},
+        "groups": {g: v * k for g, v in r["groups"].items()},
+        "low_hi": r["low_hi"],
+        "allow_k": None if r["allow_k"] is None else (np.asarray(r["allow_k"]) * k).round(5).tolist(),
+        "rpm": r["rpm"],
+        "checks": r["checks"],
+    }
+
+
+def compensate_view(p: dict) -> dict:
+    meas = p.get("measure") or {}
+    comp = meas.get("comp") or {}
+    lo, hi = int(comp.get("lo") or 1), int(comp.get("hi") or 6)
+    c = ME.compensate(p, meas, _mfg_of(p), lo, hi)
+    k = _scale(c["measure"]["unit"])
+    return {
+        "measure": _meas_json(c["measure"]),
+        "mfg": _mfg_json(c["mfg"]),
+        "remaining": (_thin(c["remaining"], 720) * k).round(4).tolist(),
+        "selected": (_thin(c["e_sel"], 720) * k).round(4).tolist(),
+        "after_A": (c["harm_after"]["A"] * k).round(5).tolist(),
+        "lo": lo,
+        "hi": hi,
+        "rms_before": float(np.sqrt(np.mean(c["measure"]["e"] ** 2)) * k),
+        "rms_after": float(np.sqrt(np.mean(c["remaining"] ** 2)) * k),
+    }
+
+
+def wheel_view(p: dict) -> dict:
+    st = _mfg_of(p)
+    r = ME.wheel_error(p, st, MF._num(st.get("r_actual")))
+    k = _scale("mm")
+    return {"deg": np.round(r["deg"], 2).tolist(), "dn_um": (r["dn"] * k).round(4).tolist(),
+            "lift": (r["lift"] * (_scale("rad") if r["mfg"]["mechanism"].follower == "oscillating" else k)).round(4)
+            .tolist(), "max_dn_um": r["max_dn"] * k}
+
+
+@app.post("/api/manufacture")
+async def manufacture_ep(request: Request):
+    p = await project_of(request)
+    return run(lambda: manufacture_view(p))
+
+
+@app.post("/api/export/{kind}")
+async def export_ep(kind: str, request: Request):
+    p = await project_of(request)
+    return run(lambda: export_file(p, kind))
+
+
+@app.post("/api/measure")
+async def measure_ep(request: Request):
+    p = await project_of(request)
+    return run(lambda: measure_view(p))
+
+
+@app.post("/api/compensate")
+async def compensate_ep(request: Request):
+    p = await project_of(request)
+    return run(lambda: compensate_view(p))
+
+
+@app.post("/api/wheel-error")
+async def wheel_ep(request: Request):
+    p = await project_of(request)
+    return run(lambda: wheel_view(p))
+
+
+@app.post("/api/synthetic")
+async def synthetic_ep(request: Request):
+    p = await project_of(request)
+    return run(lambda: {"text": ME.synthetic(p)})
 
 
 if WEB.is_dir():

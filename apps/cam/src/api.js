@@ -14,3 +14,13 @@ export async function api(path, body) {
   }
   return data
 }
+
+// Save text from the service as a file in the browser.
+export function saveText(name, text, mime = 'text/plain') {
+  const blob = new Blob([text], { type: mime + ';charset=utf-8' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = name
+  a.click()
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+}
