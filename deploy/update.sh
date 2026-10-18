@@ -22,7 +22,7 @@ fi
 
 log "Pulling images..."
 dc pull --quiet --ignore-buildable
-dc pull --quiet moodle gateway web animator labcheck voice micro-synth blender
+dc pull --quiet moodle gateway web animator labcheck voice micro-synth blender cam
 
 # The web server also serves the digital factory (factory./erp.), reached over this network; create it
 # if the factory has not been installed yet, so the web server can start either way.

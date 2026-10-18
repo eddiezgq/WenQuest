@@ -34,6 +34,7 @@ set_images() {
     envset MICROSYNTH_IMAGE "${1/\/engine:/\/micro-synth:}"
     envset VOICE_IMAGE "${1/\/engine:/\/voice:}"
     envset BLENDER_IMAGE "${1/\/engine:/\/blender:}"
+    envset CAM_IMAGE "${1/\/engine:/\/cam:}"
 }
 
 dc() {

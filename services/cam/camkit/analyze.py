@@ -73,8 +73,39 @@ def material(d: dict) -> Y.Material:
     return Y.Material(E1=_num(d.get("E1")), nu1=_num(d.get("nu1")), E2=_num(d.get("E2")), nu2=_num(d.get("nu2")))
 
 
+NOTE_ZH = {  # the notes of the checks, in Chinese (longest phrases first)
+    "give the speed and the follower mass": "请填转速和从动件质量（或转动惯量）",
+    "give the allowed pressure angle": "请填许用压力角",
+    "groove cam: form-closed": "槽凸轮：形封闭，不会跳离",
+    "outer flank undercut": "槽外侧根切",
+    "knife edge: not a line contact": "尖顶：不是线接触",
+    "contact width and materials": "接触宽度和材料",
+    "allowed contact stress": "许用接触应力",
+    "speed and mass": "转速和质量",
+    "give ": "请填",
+    ", ": "、",
+}
+
+
+def note_zh(note: str) -> str:
+    out = note
+    for en, zh in NOTE_ZH.items():
+        out = out.replace(en, zh)
+    return out
+
+
 def _check(cid, zh, en, value, limit, status, unit="", note=""):
-    return {"id": cid, "zh": zh, "en": en, "value": value, "limit": limit, "unit": unit, "status": status, "note": note}
+    return {
+        "id": cid,
+        "zh": zh,
+        "en": en,
+        "value": value,
+        "limit": limit,
+        "unit": unit,
+        "status": status,
+        "note": note,
+        "note_zh": note_zh(note),
+    }
 
 
 def _phase_mask(geo):
@@ -330,6 +361,7 @@ def analyse(project: dict, n: int = 3600, out_n: int = 361) -> dict:
         "v": pick(geo["s1"]),
         "a": pick(geo["s2"]),
         "phi_deg": pick(np.degrees(geo["phi_signed"])),
+        "j": pick(prog.eval(geo["theta"])[3]),
         "rho_profile": pick(geo["rho_profile"]),
     }
     if w is not None:
@@ -337,7 +369,22 @@ def analyse(project: dict, n: int = 3600, out_n: int = 361) -> dict:
         curves |= {"vel": pick(geo["s1"] * w * scale), "acc": pick(geo["s2"] * w**2 * scale)}
     if fz is not None:
         curves |= {"force": pick(fz["force"]), "torque_Nm": pick(fz["torque"] / 1000)}
-    shapes = {"profile": pick(geo["profile"]), "pitch": pick(geo["pitch"]), "outer": pick(geo["outer"])}
+    # outlines at 0.25° for drawing; the follower's position over the turn for the animation (fixed frame)
+    fine = np.arange(0, n, max(1, n // 1440))
+
+    def fine_pick(a):
+        return None if a is None else np.asarray(a)[..., fine].round(5).tolist()
+
+    shapes = {
+        "profile": fine_pick(geo["profile"]),
+        "pitch": fine_pick(geo["pitch"]),
+        "outer": fine_pick(geo["outer"]),
+        "follower": pick(geo["F"]),
+        "normal": pick(geo["normal"]),
+        "rb": m.rb,
+        "rp": m.rp,
+        "mechanism": {k: getattr(m, k) for k in MECH_KEYS},
+    }
     status = (
         FAIL if any(c["status"] == FAIL for c in cks) else UNKNOWN if any(c["status"] == UNKNOWN for c in cks) else PASS
     )
