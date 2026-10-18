@@ -132,7 +132,7 @@ p { margin: 0; }
 .kpi .d { font-size: 12px; } .up { color: var(--app-green); } .dn { color: var(--app-red); }
 .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 9px; border-radius: 99px; background: var(--app-chip); color: #444; }
 .badge.g { background: #e4f5ec; color: var(--app-green); } .badge.r { background: #fdeaea; color: var(--app-red); } .badge.a { background: #fef3e2; color: #b45309; } .badge.b { background: #e6f2fe; color: #0466c8; }
-table.t { width: 100%; border-collapse: collapse; font-size: 13.5px; font-variant-numeric: tabular-nums; }
+table.t { width: 100%; border-collapse: collapse; color: inherit; font-size: 13.5px; font-variant-numeric: tabular-nums; }
 table.t th { text-align: left; font-weight: 500; color: var(--app-soft); font-size: 12px; padding: 7px 8px; border-bottom: 1px solid var(--app-line); }
 table.t td { padding: 7px 8px; border-bottom: 1px solid #f3f3f3; }
 table.t tr.click { cursor: pointer; } table.t tr.click:hover td { background: #f7f9fc; }
@@ -699,6 +699,21 @@ We run these services; your system calls them; your records stay on your server.
     <div class="win f" data-app="spc" style="height:493px"></div>
     <aside class="notes">A control chart of board thickness from signed inspections. Drag the process shift: after lot 12 the points move, and a point outside the limits turns red. Open a report from the signal in one click. Untick the spec limits: capability becomes unknown, never a made-up number.</aside>
   </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Quality tools">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Where are most of our problems?</p><h2 class="f">Pareto charts from records you already sign</h2></div>
+    <div class="win f" data-app="tools" style="height:493px"></div>
+    <aside class="notes">The classic quality tools, computed by code from records you already keep: no second spreadsheet. A check sheet at the packing bench: count what you see with plus and minus, sign it with your password. The Pareto ranks the categories, largest first, with the running share; the first bars that reach 80% are where to start. Click a bar to list the signed tallies behind it. Switch to nonconformance reports by supplier: one report has no supplier recorded, and it stays as its own bar, never dropped. Histograms and scatter plots work the same way, from signed readings.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Cause analysis">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Why did it happen?</p><h2 class="f">Fishbone and 5 Why: AI suggests, you decide</h2></div>
+    <div class="win f" data-app="causes" style="height:493px"></div>
+    <aside class="notes">A fishbone on a nonconformance report about stripped bolts. Ask the AI for causes. It reads the report and the related records the system gathers: other reports on the item, inspections, complaints, gauges, recent changes. Every suggestion must cite one of them. One cited a gauge record it was never shown, so code dropped it. The others arrive dashed: accept or remove each one; you cannot conclude while any is undecided. Conclude with your signature, and the root cause is added to section D4 of the report's 8D. From then on the analysis is kept as it is. 5 Why works the same way, and each why is confirmed by a person before the next one is asked.</aside>
+  </section>
+  <section class="pg" data-ch="6 · Quality that runs" data-title="Process FMEA and flow">
+    <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · What could go wrong, step by step?</p><h2 class="f">Process FMEA on your own scales, tied to the process flow</h2></div>
+    <div class="win f" data-app="fmea" style="height:493px"></div>
+    <aside class="notes">A process FMEA. Severity, occurrence and detection are ranked on the company's own scales, written in its own words, and RPN is computed by code: change a rank and watch it. Your rule says when a row needs action; lower the threshold and more rows turn red, each asking for an action. The last row was drafted by the AI from your records: it gives no ranks, ever. Give them and confirm the row. Try to approve as Jordan: refused, he edited it. Dana approves with her signature, and the PFMEA is fixed with the rule and a fingerprint. On the right, the process flow chart: click a step and the PFMEA rows that analyse it light up; steps with none are marked.</aside>
+  </section>
   <section class="pg" data-ch="6 · Quality that runs" data-title="Documents, sorted by AI">
     <div class="head" style="margin-bottom:24px"><p class="kick f">Part 6 · Your old folders</p><h2 class="f">Upload the shared drive. AI sorts it. You confirm.</h2></div>
     <div class="win f" data-app="docs" style="height:493px"></div>
@@ -1220,7 +1235,7 @@ Authorization: Bearer wqo_…
   // =====================================================================================
   // The replica of WenQuest Ops. Fictional demo company: Harbor Lane Supply.
   // =====================================================================================
-  const NAV = [['dashboard', 'Dashboard'], ['assistant', 'Assistant'], ['anomalies', 'Anomalies', 3], ['drafts', 'Drafts', 4], ['scan', 'Scan'], null, ['sales', 'Sales and delivery'], ['inventory', 'Inventory'], ['purchasing', 'Purchasing'], ['finance', 'Finance'], ['health', 'Quality system'], ['ncr', 'Nonconformances', 2], ['iqc', 'Incoming inspection'], ['spc', 'SPC'], ['inbox', 'From machines', 1], ['production', 'Production'], ['trace', 'Trace and recalls'], ['docs', 'Documents'], ['library', 'Library check'], ['drafting', 'Draft with AI'], ['reading', 'Reading and review'], ['import', 'Import'], ['cmm', 'Measurement files']]
+  const NAV = [['dashboard', 'Dashboard'], ['assistant', 'Assistant'], ['anomalies', 'Anomalies', 3], ['drafts', 'Drafts', 4], ['scan', 'Scan'], null, ['sales', 'Sales and delivery'], ['inventory', 'Inventory'], ['purchasing', 'Purchasing'], ['finance', 'Finance'], ['health', 'Quality system'], ['ncr', 'Nonconformances', 2], ['iqc', 'Incoming inspection'], ['spc', 'SPC'], ['tools', 'Quality tools'], ['causes', 'Cause analysis'], ['fmea', 'Process FMEA'], ['inbox', 'From machines', 1], ['production', 'Production'], ['trace', 'Trace and recalls'], ['docs', 'Documents'], ['library', 'Library check'], ['drafting', 'Draft with AI'], ['reading', 'Reading and review'], ['import', 'Import'], ['cmm', 'Measurement files']]
   function mountApp(el) {
     if (el.dataset.mounted) return; el.dataset.mounted = '1'
     if (el.dataset.app === 'wall') { el.innerHTML = '<div class="bar"><i></i><i></i><i></i><span class="url">ops.harborlane.example/wall</span><span class="live">LIVE</span></div><div style="min-height:0"></div>'; wall(el.lastChild); return }
@@ -1400,6 +1415,106 @@ Authorization: Bearer wqo_…
     }
     ;['sh', 'sd', 'spec'].forEach((id) => $('#' + id, c.main).oninput = draw); draw()
     $('#sncr', c.main).onclick = () => c.toast('NCR-00008 opened with the chart’s signals: lots outside the control limits after lot 12.')
+  }
+
+  VIEWS.tools = (c) => {
+    // quality tools (WenQuest Ops ADR-0022, 22a): Pareto from signed records; check sheet tallies, signed; "not recorded" is its own bar
+    const CS = { 'Crushed box': 54, 'Wrong label': 21, 'Loose lid': 9, 'Missing bolts': 7, 'Torn bag': 3, 'Other': 2 }
+    const NCR = { 'Gulf Fasteners': 2, 'Coastal Packaging': 1, 'not recorded': 1 }
+    const st = { src: 'cs', tally: Object.fromEntries(Object.keys(CS).map((k) => [k, 0])), n: 10, sel: null }
+    function draw() {
+      const data = st.src === 'cs' ? CS : NCR, bars = Object.entries(data).filter(([, v]) => v).sort((a, b) => (a[0] === 'not recorded') - (b[0] === 'not recorded') || b[1] - a[1])
+      const tot = bars.reduce((a, [, v]) => a + v, 0), max = Math.max(...bars.map(([, v]) => v)), W = 520, H = 250, L = 34, w = (W - L - 40) / bars.length
+      let cum = 0, pts = [], s = `<line x1="${L}" x2="${W - 40}" y1="${20 + .2 * (H - 70)}" y2="${20 + .2 * (H - 70)}" stroke="#bbb" stroke-dasharray="4 4"/><text x="${W - 36}" y="${24 + .2 * (H - 70)}" font-size="11" fill="#6b6b6b">80%</text>`
+      bars.forEach(([k, v], i) => { cum += v; const x = L + i * w, h = v / max * (H - 70), nr = k === 'not recorded'
+        s += `<g class="click" data-k="${esc(k)}"><rect x="${x + w * .12}" y="${H - 50 - h}" width="${w * .76}" height="${h}" rx="3" fill="${nr ? '#a3a3a3' : '#0289f7'}" opacity="${st.sel === k ? 1 : .75}" ${st.sel === k ? 'stroke="#171717" stroke-width="2"' : ''}/><text x="${x + w / 2}" y="${H - 54 - h}" font-size="11" text-anchor="middle">${v}</text>
+          <text x="${x + w / 2}" y="${H - 34}" font-size="11" text-anchor="middle" fill="#525252">${esc(k.length > 13 ? k.slice(0, 12) + '…' : k)}</text></g>`
+        pts.push(`${x + w / 2},${20 + (1 - cum / tot) * (H - 70)}`) })
+      s += `<polyline points="${pts.join(' ')}" fill="none" stroke="#d97706" stroke-width="2"/>` + pts.map((p) => `<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" fill="#d97706"/>`).join('')
+      const few = (() => { let a = 0, n = 0; for (const [, v] of bars) { a += v; n++; if (a / tot >= .8) return n } return n })()
+      c.main.innerHTML = `<h5>Quality tools <span class="crumb">· Pareto · computed by code from signed records</span></h5>
+        <div style="display:grid;grid-template-columns:1fr 290px;gap:14px"><div class="panel"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;font-size:13px">Count
+          <select class="ain" id="qsrc"><option value="cs" ${st.src === 'cs' ? 'selected' : ''}>Check sheet: packing bench defects</option><option value="ncr" ${st.src === 'ncr' ? 'selected' : ''}>Nonconformance reports by supplier</option></select></div>
+          <svg viewBox="0 0 ${W} ${H}" style="width:100%">${s}</svg>
+          <p style="font-size:13px;color:#383838">${tot} counted. The first ${few} of ${bars.length} make up 80% or more: start there.${st.src === 'ncr' ? ' <b>1 of 4 reports has no supplier recorded</b>: shown as its own bar, never dropped.' : ''}</p>
+          ${st.sel ? `<div style="font-size:12.5px;color:#525252;border-top:1px solid #eee;padding-top:6px">${st.src === 'cs' ? `<b>${esc(st.sel)}</b> from ${st.n} signed tallies: CS-00001 … CS-${String(st.n).padStart(5, '0')}` : `<b>${esc(st.sel)}</b>: ${st.sel === 'Gulf Fasteners' ? 'NCR-00006, NCR-00007' : st.sel === 'not recorded' ? 'NCR-00004 (supplier left empty)' : 'NCR-00005'}`}</div>` : '<p style="font-size:12.5px;color:#8a8a8a">Click a bar to list the records behind it.</p>'}</div>
+        <div class="panel" style="display:grid;gap:7px;align-content:start;font-size:13px"><b>Record a tally at the bench</b>
+          ${Object.keys(CS).map((k) => `<div style="display:flex;align-items:center;gap:6px"><span style="flex:1">${k}</span><button class="abtn" data-m="${esc(k)}">−</button><b style="width:22px;text-align:center">${st.tally[k]}</b><button class="abtn" data-p="${esc(k)}">+</button></div>`).join('')}
+          <button class="abtn dark" id="qsign">Record and sign</button><span style="color:#6b6b6b;font-size:12px">Signed with your password; never changed afterwards.</span></div></div>`
+      $('#qsrc', c.main).onchange = (e) => { st.src = e.target.value; st.sel = null; draw() }
+      $$('[data-k]', c.main).forEach((g) => g.onclick = () => { st.sel = g.dataset.k; draw() })
+      $$('[data-p]', c.main).forEach((b) => b.onclick = () => { st.tally[b.dataset.p]++; draw() })
+      $$('[data-m]', c.main).forEach((b) => b.onclick = () => { st.tally[b.dataset.m] = Math.max(0, st.tally[b.dataset.m] - 1); draw() })
+      $('#qsign', c.main).disabled = !Object.values(st.tally).some((v) => v)
+      $('#qsign', c.main).onclick = () => { const n = Object.values(st.tally).reduce((a, b) => a + b, 0); for (const k in CS) CS[k] += st.tally[k], st.tally[k] = 0
+        st.n++; st.src = 'cs'; draw(); c.toast(`CS-${String(st.n).padStart(5, '0')} recorded and signed by Jordan: ${n} counted. The Pareto includes it.`) }
+    }
+    draw()
+  }
+
+  VIEWS.causes = (c) => {
+    // cause analysis (ADR-0022, 22b): the AI suggests causes citing records it was shown; a person decides each; the signed conclusion goes to 8D D4
+    const BONES = ['People', 'Machines', 'Materials', 'Methods', 'Environment', 'Measurement']
+    const st = { items: [['Materials', 'Lot rolled with thread over the limit', 'IQC-00002', 'ok'], ['Machines', 'Supplier dies not re-set after maintenance', 'CAPA-00003', 'ok']], asked: false, done: false, who: 'Jordan' }
+    function draw() {
+      const open = st.items.filter((x) => x[3] === 'ai').length, ok = st.items.filter((x) => x[3] === 'ok').length
+      const cell = (b) => `<div style="border-left:2px solid #d4d4d4;padding:2px 8px 4px;min-height:58px"><b style="font-size:13px">${b}</b>${st.items.map((x, i) => [x, i]).filter(([x]) => x[0] === b && x[3] !== 'gone').map(([x, i]) =>
+        `<div style="margin-top:5px;padding:5px 7px;border-radius:7px;font-size:12.5px;background:${x[3] === 'ai' ? '#fffaf0' : '#fff'};border:1px ${x[3] === 'ai' ? 'dashed #d97706' : 'solid #e5e5e5'}">${x[3] === 'ai' ? '<span class="badge a" style="font-size:10px;padding:0 5px">AI</span> ' : ''}${esc(x[1])} <span style="color:#0289f7">${x[2]}</span>
+          ${x[3] === 'ai' && !st.done ? `<div style="margin-top:4px;display:flex;gap:4px"><button class="abtn dark" data-a="${i}" style="padding:2px 8px">Accept</button><button class="abtn" data-r="${i}" style="padding:2px 8px">Remove</button></div>` : ''}</div>`).join('') || '<div style="color:#a3a3a3;font-size:12px;margin-top:4px">No cause yet</div>'}</div>`
+      c.main.innerHTML = `<h5>RCA-00004 · Fishbone <span class="crumb">· on NCR-00007 · M8 bolts strip at assembly</span></h5>
+        <div class="panel" style="display:grid;grid-template-columns:repeat(3,1fr) 150px;grid-template-rows:auto 14px auto;gap:4px 10px;align-items:stretch">
+          ${BONES.slice(0, 3).map((b, k) => cell(b).replace('<div style="', `<div style="grid-row:1;grid-column:${k + 1};`)).join('')}
+          <div style="grid-row:1/4;grid-column:4;align-self:center;border:2px solid #383838;border-radius:9px;padding:8px;font-size:13px"><small style="color:#6b6b6b">Problem</small><br><b>M8 bolts strip at the usual torque</b></div>
+          <div style="grid-row:2;grid-column:1/4;height:3px;background:#383838;align-self:center"></div>
+          ${BONES.slice(3).map((b, k) => cell(b).replace('<div style="', `<div style="grid-row:3;grid-column:${k + 1};`)).join('')}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;font-size:13px">
+          <div class="panel" style="display:grid;gap:6px;align-content:start"><b>Suggestions from the AI</b><span style="color:#6b6b6b">Reads NCR-00007 and 9 related records. Must cite them; anything else is dropped.</span>
+            <button class="abtn" id="cAsk" ${st.asked || st.done ? 'disabled' : ''}>✨ Suggest causes</button>
+            ${st.asked ? '<span style="color:#b45309">Dropped: “Thread gauge reads short” cites GAUGE-404, a record it was not shown.</span>' : ''}</div>
+          <div class="panel" style="display:grid;gap:6px;align-content:start"><b>Conclude</b>
+            ${st.done ? '<span class="badge g" style="justify-self:start">Signed by Jordan · written to 8D D4 of NCR-00007</span><span style="color:#6b6b6b">The analysis is now kept as it is; later findings are added as addenda.</span>'
+              : `<span style="color:${open || !ok ? '#b45309' : '#6b6b6b'}">${open ? `${open} suggestion(s) to accept or remove first` : 'Ready: the root cause is signed and added to the report.'}</span>
+              <input class="ain" id="cTxt" value="Supplier dies not re-set after maintenance; no first-article check"><button class="abtn dark" id="cEnd" ${open || !ok ? 'disabled' : ''}>Conclude and sign</button>`}</div></div>`
+      const a = $('#cAsk', c.main); if (a) a.onclick = () => { st.asked = true; st.items.push(['Methods', 'No first-article data asked after supplier maintenance', 'CAPA-00003', 'ai'], ['Materials', 'Same supplier lot reached a customer', 'CMP-00002', 'ai']); draw() }
+      $$('[data-a]', c.main).forEach((b) => b.onclick = () => { st.items[+b.dataset.a][3] = 'ok'; draw() })
+      $$('[data-r]', c.main).forEach((b) => b.onclick = () => { st.items[+b.dataset.r][3] = 'gone'; draw() })
+      const e = $('#cEnd', c.main); if (e) e.onclick = () => { st.done = true; draw(); c.toast('RCA-00004 concluded and signed. 8D D4 of NCR-00007 now ends with this root cause.') }
+    }
+    draw()
+  }
+
+  VIEWS.fmea = (c) => {
+    // process FMEA and flow (ADR-0022, 22c-22d): the company's own scales and rule; RPN = S × O × D by code; the AI drafts rows without ranks
+    const R = [['Incoming inspection', 'Lot with thread over the limit accepted', 'Bolts strip at the customer', 'Supplier dies not re-set', 8, 4, 5, 'First-article data after die maintenance', 1],
+      ['Kit 25 bolts', 'Bolts missing from a kit', 'Customer short of parts', 'Count by eye', 5, 3, 4, '', 1],
+      ['Pack', 'Box crushed', 'Parts damaged in transit', 'Light carton for heavy kits', 3, 5, 6, '', 1],
+      ['Receive lot', 'Wrong item in the carton', 'Kit built with wrong bolts', 'Label not checked against the order', null, null, null, '', 0]]
+    const FLOW = [['10', 'Receive lot', '➜', [3]], ['20', 'Incoming inspection', '□', [0]], ['30', 'Store', '▽', []], ['40', 'Kit 25 bolts', '○', [1]], ['50', 'Weigh the kit', '□', [1]], ['60', 'Pack', '○', [2]], ['70', 'Ship', '➜', []]]
+    const st = { t: 100, s: 9, who: 'Jordan', ok: false, hl: null, msg: '' }
+    function draw() {
+      const rank = (v, i, k) => `<select class="ain" data-i="${i}" data-k="${k}" style="padding:2px 4px;width:46px" ${st.ok ? 'disabled' : ''}><option value=""></option>${Array.from({ length: 10 }, (_, n) => `<option ${v === n + 1 ? 'selected' : ''}>${n + 1}</option>`).join('')}</select>`
+      const need = []; const rows = R.map((r, i) => { const rpn = r[4] && r[5] && r[6] ? r[4] * r[5] * r[6] : null, act = rpn != null && (rpn >= st.t || r[4] >= st.s)
+        if (!r[8]) need.push(`row ${i + 1}: drafted by the AI; give its ranks and confirm`); else if (rpn == null) need.push(`row ${i + 1}: the ranks`); else if (act && !r[7]) need.push(`row ${i + 1}: needs action under your rule`)
+        return `<tr style="${!r[8] ? 'background:#fffaf0' : ''}${st.hl != null && FLOW[st.hl][3].includes(i) ? ';outline:2px solid #0289f7' : ''}"><td>${i + 1}</td><td>${r[0]}</td><td><b>${esc(r[1])}</b>${!r[8] ? ' <span class="badge a" style="font-size:10px;padding:0 5px">AI</span>' : ''}</td><td>${esc(r[3])}</td>
+          <td>${rank(r[4], i, 4)}</td><td>${rank(r[5], i, 5)}</td><td>${rank(r[6], i, 6)}</td><td style="font-weight:700;color:${act ? '#cc2929' : '#171717'}">${rpn ?? '–'}${act ? '<br><small style="font-weight:500">action</small>' : ''}</td><td style="font-size:12px">${esc(r[7]) || (act ? '<span style="color:#cc2929">say what is recommended</span>' : '')}</td>
+          <td>${!r[8] && !st.ok ? `<button class="abtn" data-c="${i}" style="padding:2px 8px">Confirm</button>` : ''}</td></tr>` }).join('')
+      c.main.innerHTML = `<h5>PFMEA-00001 · Receiving and kitting M8 bolts <span class="crumb">· ${st.ok ? 'approved by Dana · fixed' : 'draft v2'}</span></h5>
+        <div style="display:grid;grid-template-columns:1fr 190px;gap:12px"><div class="panel" style="padding:8px;font-size:12.5px">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px;color:#525252">Your rule: action when RPN ≥ <input class="ain" id="ft" type="number" value="${st.t}" style="width:62px" ${st.ok ? 'disabled' : ''}> or S ≥ <input class="ain" id="fs" type="number" value="${st.s}" style="width:48px" ${st.ok ? 'disabled' : ''}><span style="margin-left:auto">RPN = S × O × D, computed</span></div>
+          <table class="t"><tr><th>#</th><th>Step</th><th>Failure mode</th><th>Cause</th><th>S</th><th>O</th><th>D</th><th>RPN</th><th>Action</th><th></th></tr>${rows}</table>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">${st.ok ? '<span class="badge g">Approved, signed by Dana · fingerprint kept · changed only by a new version</span>'
+            : `${need.length ? `<span style="color:#b45309">${need[0]}${need.length > 1 ? ` (+${need.length - 1})` : ''}</span>` : '<span style="color:#1f7a4d">Ready to approve</span>'}<span style="margin-left:auto">Signed in as</span><select class="ain" id="fw"><option ${st.who === 'Jordan' ? 'selected' : ''}>Jordan</option><option ${st.who === 'Dana' ? 'selected' : ''}>Dana</option></select><button class="abtn dark" id="fa" ${need.length ? 'disabled' : ''}>Approve (sign)</button>`}</div>
+          ${st.msg ? `<p style="color:#cc2929;margin-top:6px">${st.msg}</p>` : ''}</div>
+        <div class="panel" style="font-size:12.5px;display:grid;gap:2px;align-content:start"><b>Process flow PF-00001</b><span style="color:#6b6b6b;font-size:11.5px;margin-bottom:4px">Click a step: its PFMEA rows light up.</span>
+          ${FLOW.map(([n, name, sh, rows], k) => `<button class="abtn" data-f="${k}" style="text-align:left;padding:4px 8px;${st.hl === k ? 'border-color:#0289f7' : ''}"><span style="display:inline-block;width:16px">${sh}</span> ${n} ${name}${rows.length ? '' : ' <small style="color:#a3a3a3">no row</small>'}</button>${k < FLOW.length - 1 ? `<div style="text-align:center;color:#a3a3a3;line-height:1">${k === 3 ? '↓ <small style="color:#d97706">↺ rework from 50</small>' : '↓'}</div>` : ''}`).join('')}</div></div>`
+      $$('select[data-i]', c.main).forEach((s) => s.onchange = () => { R[+s.dataset.i][+s.dataset.k] = s.value ? +s.value : null; draw() })
+      $$('[data-c]', c.main).forEach((b) => b.onclick = () => { const r = R[+b.dataset.c]; if (!(r[4] && r[5] && r[6])) { c.toast('Give its ranks first: the AI never does.'); return } r[8] = 1; draw() })
+      $$('[data-f]', c.main).forEach((b) => b.onclick = () => { st.hl = st.hl === +b.dataset.f ? null : +b.dataset.f; draw() })
+      const t = $('#ft', c.main); if (t) { t.onchange = () => { st.t = +t.value || 1; draw() }; $('#fs', c.main).onchange = (e) => { st.s = +e.target.value || 10; draw() } }
+      const w = $('#fw', c.main); if (w) w.onchange = () => { st.who = w.value; st.msg = ''; draw() }
+      const a = $('#fa', c.main); if (a) a.onclick = () => { if (st.who === 'Jordan') { st.msg = 'Refused: Jordan edited this PFMEA. Someone who did not own or edit it approves.'; draw(); return } st.ok = true; st.msg = ''; draw(); c.toast('PFMEA-00001 v2 approved by Dana. RPNs and the rule are kept with a fingerprint; v1 is superseded.') }
+    }
+    draw()
   }
 
   VIEWS.docs = (c) => {
