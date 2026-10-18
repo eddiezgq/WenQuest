@@ -124,8 +124,10 @@ def test_gates(monkeypatch):
     r = client.post("/api/cae/arm", json={"project": p})
     assert r.status_code == 200, r.text
     geo, fea = calls
-    assert geo[2]["params"] == {"app": "cam", "org": "示例机床厂"} and geo[2]["content"].startswith(b"ISO-10303-21")
+    assert geo[1] == "/geometry" and geo[2]["content"].startswith(b"ISO-10303-21")
+    assert fea[:2] == ("POST", "/jobs")
     body = fea[2]["json"]
-    assert body["org"] == "示例机床厂" and body["user"] == "7" and body["app"] == "cam" and body["sha"] == "s1"
+    assert body["org"] == "示例机床厂" and body["user"] == "7" and body["app"] == "cam"
+    assert body["kind"] == "fea" and body["step_sha"] == "s1"
     assert client.get("/api/examples/atc-globoidal/cae").status_code == 200
     assert client.get("/api/examples/packaging-plate/cae").status_code == 404

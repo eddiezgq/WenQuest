@@ -135,9 +135,9 @@ def _who(me):
 def cae_mbd(request: Request, p: dict) -> dict:
     me = B.need_company(request)
     xml, setup, notes = CS.mbd_model(p)
-    model = B.hub("POST", "/mbd/model", params={"app": "cam", "org": me["org"], "name": "cam-system.xml"},
-                  content=xml.encode())
-    job = B.hub("POST", "/mbd", json=dict(_who(me), model=model["ref"], setup=setup, title=_title(p, "动力学")))
+    model = B.hub("POST", "/mbd/model", params={"name": "cam-system.xml"}, content=xml.encode())
+    job = B.hub("POST", "/jobs", json=dict(_who(me), kind="mbd", model=model["ref"], setup=setup,
+                                           title=_title(p, "动力学")))
     return {"job": job, "notes": notes}
 
 
@@ -145,11 +145,12 @@ def cae_arm(request: Request, p: dict) -> dict:
     me = B.need_company(request)
     arm, cae = p.get("arm") or {}, p.get("cae") or {}
     text, _ = AR.step(arm)
-    geo = B.hub("POST", "/geometry", params={"app": "cam", "org": me["org"]}, content=text.encode())
+    geo = B.hub("POST", "/geometry", content=text.encode())
     loads = CS.arm_loads(p, cae.get("arm_cam") or "index", float(cae.get("tool_mass") or 0), float(arm["R_tip"]))
     setup = CS.arm_fea_setup(geo["faces"], AR.sizes(arm), loads, float(cae.get("tool_mass") or 0),
                              cae.get("material_id") or "45-QT")
-    job = B.hub("POST", "/fea", json=dict(_who(me), sha=geo["sha"], setup=setup, title=_title(p, "换刀臂强度")))
+    job = B.hub("POST", "/jobs", json=dict(_who(me), kind="fea", step_sha=geo["sha"], setup=setup,
+                                           title=_title(p, "换刀臂强度")))
     return {"job": job, "loads": {k: loads[k] for k in ("Ft_max", "Fc_max", "F_max", "deg", "cycle_s")}}
 
 
@@ -167,13 +168,15 @@ def cae_followup(request: Request, jid: str, what: str, p: dict) -> dict:
     if what == "fatigue":
         arm, cae = p.get("arm") or {}, p.get("cae") or {}
         loads = CS.arm_loads(p, cae.get("arm_cam") or "index", float(cae.get("tool_mass") or 0), float(arm["R_tip"]))
-        return B.hub("POST", f"/jobs/{jid}/fatigue", params=org,
-                     json=CS.fatigue_body(loads, float(cae.get("changes_per_day") or 0)))
+        out = B.hub("POST", f"/jobs/{jid}/fatigue", params=org,
+                    json=CS.fatigue_body(loads, float(cae.get("changes_per_day") or 0)))
+        out.pop("damage_b64", None)  # only the summary is shown here
+        return out
     if what == "compare":
-        ser = B.hub("GET", f"/jobs/{jid}/joint-series", params=dict(org, joint="camshaft"))
+        ser = B.hub("GET", f"/mbd/jobs/{jid}/joint-series", params=dict(org, joint="camshaft"))
         cmp = CS.compare_torque(p, ser["values"], ser["duration_s"])
         try:
-            motors = B.hub("GET", f"/jobs/{jid}/motors", params=org)
+            motors = B.hub("GET", f"/mbd/jobs/{jid}/motors", params=org)
         except HTTPException:
             motors = None
         return {"compare": _thin_cmp(cmp), "motors": motors}

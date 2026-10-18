@@ -144,7 +144,7 @@ def _table(d, head, rows, widths=None):
 NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 
 
-def calc_report(params=None, lang="zh", project="", company="", machine="lockstitch"):
+def calc_report(params=None, lang="zh", project="", company="", machine="lockstitch", cae=None):
     from docx.shared import Cm, RGBColor
     M = get(machine)
     R = M.analyze(params)
@@ -226,6 +226,20 @@ def calc_report(params=None, lang="zh", project="", company="", machine="locksti
         _table(d, [_t("环", "Link", lang), _t("公差 ±mm", "Tolerance ±mm", lang), _t("装配调整吸收", "Absorbed by adjustment", lang),
                    _t("换针时变化", "Changes with needle", lang)],
                [[_t(c[0], c[1], lang), c[2], "✓" if c[3] else "", "✓" if c[4] else ""] for c in CHAIN])
+    if cae:
+        head("CAE 分析结果（问渠数字工厂）", "CAE results (WenQuest digital factory)")
+        d.add_paragraph(_t("以下是同一组设计参数在问渠数字工厂计算服务里算出的结果：有限元强度与疲劳（Gmsh + CalculiX + pyLife）、"
+                           "机壳模态、机构动力学（MuJoCo）。详细报告在设计页“CAE 分析”里下载。",
+                           "Results computed for this same set of design parameters by the WenQuest digital-factory computing service: "
+                           "FEA strength and fatigue (Gmsh + CalculiX + pyLife), frame modes, mechanism dynamics (MuJoCo). "
+                           "Full reports can be downloaded from the CAE tab of the design page.", lang))
+        rows = []
+        for x in cae:
+            for c in (x["result"] or {}).get("checks", []):
+                rows.append([x["title"], _t(c["zh"], c["en"], lang), c["value"], c["limit"], STATE[c["state"]][1 if lang == "en" else 0]])
+        if rows:
+            _table(d, [_t("分析", "Analysis", lang), _t("项目", "Item", lang), _t("数值", "Value", lang), _t("判据", "Criterion", lang),
+                       _t("结论", "Result", lang)], rows)
     head("装配调机顺序", "Assembly adjustment sequence")
     for i, s_ in enumerate(R["card"], 1):
         d.add_paragraph(f"{i}. {_t(s_['zh'], s_['en'], lang)}：{_t(s_['do_zh'], s_['do_en'], lang)}")

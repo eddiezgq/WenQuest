@@ -1,32 +1,33 @@
 # -*- coding: utf-8 -*-
-"""设计软件接口（第 39 轮第 4 步 / 第 41 轮共用）：学习平台上的行业专用软件（问渠凸轮、缝纫机设计）提交 CAE 计算。
+"""设计软件接口（学习平台第 41 轮，第 39 轮第 4 步共用）：问渠缝纫机设计软件（学习平台网关）和问渠凸轮（凸轮服务）
+把计算任务交给数字工厂的 cae 计算服务。
 
-只认服务器对服务器的钥匙 WQ_FACTORY_CAE_KEY（Authorization: Bearer），不对浏览器开放；只能提交计算、取结果，
-不改零件库、不改生产数据（《数字工厂资源接口约定》“设计软件提交计算任务”一节）。
-调用方在请求里写明软件（app：cam / sewing）、单位（org）和提交人（user、user_name）——身份由调用方（学习平台网关、
-凸轮服务）核对过企业开通后才转来。任务记在计算服务的工厂编号 wq_<app>_saas 下，owner 为“单位/提交人”。
-用量：每个单位每天有限元 / 模态 / 动力学任务上限 WQ_DESIGN_SW_DAILY（默认 20）。
-
-路径（都在 /api/design-sw/ 下）：
-  GET  materials                       材料库（带出处）
-  POST geometry?app=&org=              正文是 STEP → 面列表（id、类型、圆柱的轴线与半径、面积、中心）与 sha
-  POST fea                             {app, org, user, user_name, sha, setup, title} → 有限元任务
-  POST mbd/model?app=&org=&name=       正文是 MJCF（xml）→ 模型信息（关节、构件）
-  POST mbd                             {app, org, user, user_name, model, setup, title} → 动力学任务
-  GET  jobs/{jid}?org=                 任务状态和结果（只能看本单位的）
-  POST jobs/{jid}/modal?org=           固有频率（用这次强度计算的零件、材料和支承）
-  POST jobs/{jid}/fatigue?org=         疲劳寿命（正文同计算服务）
-  GET  jobs/{jid}/joint-series?org=&joint=   动力学：某个关节的位置、速度、驱动力随时间
-  GET  jobs/{jid}/motors?org=          动力学：电机选型（数字工厂电机库）
+- 只认服务器对服务器的钥匙 WQ_FACTORY_CAE_KEY（Authorization: Bearer），不对外开放；
+- 任务按软件登记在单独的工厂编号下（app=sewing → wq_sewing_saas，默认；app=cam → wq_cam_saas），
+  提交人记成“单位::用户”，单位之间互相看不到；
+- 每个单位每天的任务数有上限（有限元 / 模态 / 动力学 WQ_DESIGN_SW_DAILY，默认 20；要用有限元的优化 WQ_DESIGN_SW_OPT_DAILY，默认 5）；
+- 只提交计算、读结果，不改零件库，不改生产数据（《数字工厂资源接口约定》第七节）。
 """
-import datetime as dt
 import hmac
 import os
-import re
+import time
 
 from fastapi import Body, Depends, Header, HTTPException, Request
+from fastapi.responses import Response
 
-APPS = ("cam", "sewing")
+from hub import cae_api
+
+FACTORY = "wq_sewing_saas"
+APPS = {"sewing": "wq_sewing_saas", "cam": "wq_cam_saas"}
+KINDS = ("fea", "mbd")
+
+
+def factory_of(app):
+    if app in (None, ""):
+        return FACTORY
+    if app not in APPS:
+        raise HTTPException(400, "不认识的设计软件")
+    return APPS[app]
 
 
 def _key():
@@ -37,117 +38,135 @@ def require_key(authorization: str = Header(default="")):
     k = _key()
     got = authorization[7:].strip() if authorization.lower().startswith("bearer ") else ""
     if not k or not got or not hmac.compare_digest(got.encode(), k.encode()):
-        raise HTTPException(401, "需要数字工厂设计软件钥匙（Authorization: Bearer …）")
+        raise HTTPException(401, "需要设计软件钥匙（Authorization: Bearer …）")
     return True
 
 
-def factory_of(app):
-    if app not in APPS:
-        raise HTTPException(400, "不认识的设计软件")
-    return "wq_{}_saas".format(app)
+def daily_limit(kind):
+    if kind == "opt":
+        return int(os.environ.get("WQ_DESIGN_SW_OPT_DAILY", "5"))
+    return int(os.environ.get("WQ_DESIGN_SW_DAILY", "20"))
 
 
 def _org(org):
     org = (org or "").strip()
-    if not org or len(org) > 80 or "/" in org:
+    if not org or "::" in org or len(org) > 80:
         raise HTTPException(400, "单位名称不对")
     return org
 
 
-def daily_limit():
-    try:
-        return int(os.environ.get("WQ_DESIGN_SW_DAILY", "20"))
-    except ValueError:
-        return 20
+def _jobs(org, kind="", factory=FACTORY):
+    params = {"factory": factory, "limit": 500}
+    if kind:
+        params["kind"] = kind
+    js = cae_api.call("GET", "/jobs", params=params).json()["jobs"]
+    return [j for j in js if str(j.get("owner") or "").startswith(org + "::")]
 
 
-def mount(app, call):
-    """call(method, path, **kw)：转交计算服务（hub.cae_api.call；测试时换成假的）。"""
+def _mine(jid, org):
+    j = cae_api.call("GET", "/jobs/{}".format(jid.replace("/", ""))).json()
+    if j.get("factory") not in APPS.values() or not str(j.get("owner") or "").startswith(_org(org) + "::"):
+        raise HTTPException(404, "没有这个任务")
+    return j
 
-    def used_today(factory, org):
-        jobs = call("GET", "/jobs", params={"factory": factory, "limit": 500}).json().get("jobs", [])
-        today = dt.date.today()
-        n = 0
-        for j in jobs:
-            if not str(j.get("owner") or "").startswith(org + "/"):
-                continue
-            created = j.get("created")
-            if created and dt.date.fromtimestamp(float(created)) == today:
-                n += 1
-        return n
 
-    def check_quota(factory, org):
-        if used_today(factory, org) >= daily_limit():
-            raise HTTPException(429, "本单位今天的计算次数已用完（每天 {} 个），明天再算或联系问渠".format(daily_limit()))
+def mount(app):
+    dep = [Depends(require_key)]
 
-    def owned(jid, org):
-        jid = re.sub(r"[^0-9A-Za-z_-]", "", jid)
-        j = call("GET", "/jobs/{}".format(jid)).json()
-        if not str(j.get("factory") or "").endswith("_saas") or not str(j.get("owner") or "").startswith(_org(org) + "/"):
-            raise HTTPException(404, "没有这个任务")
-        return j
+    @app.get("/api/design-sw/health", dependencies=dep)
+    def ds_health():
+        return cae_api.call("GET", "/health").json()
 
-    @app.get("/api/design-sw/materials")
-    def ds_materials(_=Depends(require_key)):
-        return call("GET", "/materials").json()
+    @app.get("/api/design-sw/materials", dependencies=dep)
+    def ds_materials():
+        return cae_api.call("GET", "/materials").json()
 
-    @app.post("/api/design-sw/geometry")
-    async def ds_geometry(request: Request, app: str = "cam", org: str = "", _=Depends(require_key)):
-        factory_of(app)
-        _org(org)
+    @app.get("/api/design-sw/motors", dependencies=dep)
+    def ds_motors():
+        """主轴伺服选型用的电机表（与动力学的电机选型助手同一张）"""
+        from cae import motors as MT
+        return {"motors": [{"name": m[0], "power_w": m[1], "rated_nm": m[2], "peak_nm": m[3], "max_rpm": m[4], "inertia_kgm2": m[5]}
+                           for m in MT.MOTORS], "source": MT.SOURCE}
+
+    @app.post("/api/design-sw/geometry", dependencies=dep)
+    async def ds_geometry(request: Request):
         data = await request.body()
-        return call("POST", "/geometry", content=data).json()
+        return cae_api.call("POST", "/geometry", content=data).json()
 
-    @app.post("/api/design-sw/fea")
-    def ds_fea(body: dict = Body(...), _=Depends(require_key)):
-        factory = factory_of(body.get("app"))
-        org = _org(body.get("org"))
-        check_quota(factory, org)
-        payload = {"step_sha": body.get("sha"), "setup": body.get("setup") or {}, "title": body.get("title") or "",
-                   "factory": factory, "owner": "{}/{}".format(org, body.get("user") or ""),
-                   "owner_name": body.get("user_name") or ""}
-        return call("POST", "/jobs", json=payload).json()
-
-    @app.post("/api/design-sw/mbd/model")
-    async def ds_mbd_model(request: Request, app: str = "cam", org: str = "", name: str = "model.xml",
-                           _=Depends(require_key)):
-        factory_of(app)
-        _org(org)
+    @app.post("/api/design-sw/mbd/model", dependencies=dep)
+    async def ds_mbd_model(request: Request, name: str = "model.xml"):
+        """上传设计软件自己生成的 MJCF（问渠凸轮的整机模型），返回可直接放进任务 model 的引用"""
         data = await request.body()
-        return call("POST", "/mbd/models/upload", params={"name": name}, content=data).json()
+        return cae_api.call("POST", "/mbd/models/upload", params={"name": name[:60]}, content=data).json()
 
-    @app.post("/api/design-sw/mbd")
-    def ds_mbd(body: dict = Body(...), _=Depends(require_key)):
-        factory = factory_of(body.get("app"))
+    @app.post("/api/design-sw/jobs", dependencies=dep)
+    def ds_submit(body: dict = Body(...)):
         org = _org(body.get("org"))
-        check_quota(factory, org)
-        payload = {"model": body.get("model") or {}, "setup": body.get("setup") or {}, "title": body.get("title") or "",
-                   "factory": factory, "owner": "{}/{}".format(org, body.get("user") or ""),
-                   "owner_name": body.get("user_name") or ""}
-        return call("POST", "/mbd/jobs", json=payload).json()
+        factory = factory_of(body.get("app"))
+        kind = body.get("kind") or "fea"
+        if kind not in KINDS:
+            raise HTTPException(400, "不认识的计算类型")
+        today = time.time() - 86400
+        used = sum(1 for j in _jobs(org, factory=factory) if (j.get("created") or 0) > today)
+        if used >= daily_limit(kind):
+            raise HTTPException(429, "本单位今天的计算次数已用完（每天 {} 个），明天再来或联系问渠调整".format(daily_limit(kind)))
+        owner = "{}::{}".format(org, str(body.get("user") or "")[:40])
+        common = {"owner": owner, "owner_name": str(body.get("user_name") or "")[:60], "factory": factory,
+                  "title": str(body.get("title") or "")[:80], "item": str(body.get("item") or "")[:40] or None}
+        if kind == "fea":
+            return cae_api.call("POST", "/jobs", json=dict(common, step_sha=body.get("step_sha"), setup=body.get("setup") or {})).json()
+        return cae_api.call("POST", "/mbd/jobs", json=dict(common, model=body.get("model") or {}, setup=body.get("setup") or {})).json()
 
-    @app.get("/api/design-sw/jobs/{jid}")
-    def ds_job(jid: str, org: str = "", _=Depends(require_key)):
-        return owned(jid, org)
+    @app.get("/api/design-sw/jobs", dependencies=dep)
+    def ds_jobs(org: str, app: str = ""):
+        org = _org(org)
+        js = _jobs(org, factory=factory_of(app))
+        today = time.time() - 86400
+        return {"jobs": js, "used_today": sum(1 for j in js if (j.get("created") or 0) > today), "daily_limit": daily_limit("fea")}
 
-    @app.post("/api/design-sw/jobs/{jid}/modal")
-    def ds_modal(jid: str, org: str = "", _=Depends(require_key)):
-        j = owned(jid, org)
-        return call("POST", "/jobs/{}/modal".format(j["id"])).json()
+    @app.get("/api/design-sw/jobs/{jid}", dependencies=dep)
+    def ds_job(jid: str, org: str):
+        return _mine(jid, org)
 
-    @app.post("/api/design-sw/jobs/{jid}/fatigue")
-    def ds_fatigue(jid: str, org: str = "", body: dict = Body(...), _=Depends(require_key)):
-        j = owned(jid, org)
-        out = call("POST", "/jobs/{}/fatigue".format(j["id"]), json=body).json()
-        out.pop("damage_b64", None)              # 设计软件只要汇总
-        return out
+    @app.post("/api/design-sw/jobs/{jid}/fatigue", dependencies=dep)
+    def ds_fatigue(jid: str, org: str, body: dict = Body(...)):
+        j = _mine(jid, org)
+        return cae_api.call("POST", "/jobs/{}/fatigue".format(j["id"]), json=body).json()
 
-    @app.get("/api/design-sw/jobs/{jid}/joint-series")
-    def ds_joint_series(jid: str, org: str = "", joint: str = "", _=Depends(require_key)):
-        j = owned(jid, org)
-        return call("GET", "/mbd/jobs/{}/joint-series".format(j["id"]), params={"joint": joint}).json()
+    @app.post("/api/design-sw/jobs/{jid}/modal", dependencies=dep)
+    def ds_modal(jid: str, org: str):
+        j = _mine(jid, org)
+        return cae_api.call("POST", "/jobs/{}/modal".format(j["id"])).json()
 
-    @app.get("/api/design-sw/jobs/{jid}/motors")
-    def ds_motors(jid: str, org: str = "", safety: float = 1.2, _=Depends(require_key)):
-        j = owned(jid, org)
-        return call("GET", "/mbd/jobs/{}/motors".format(j["id"]), params={"safety": safety}).json()
+    @app.post("/api/design-sw/jobs/{jid}/report", dependencies=dep)
+    def ds_report(jid: str, org: str, body: dict = Body(default={})):
+        j = _mine(jid, org)
+        r = cae_api.call("POST", "/jobs/{}/report".format(j["id"]), json=body)
+        return Response(r.content, media_type=r.headers.get("content-type", "application/octet-stream"),
+                        headers={"Content-Disposition": r.headers.get("content-disposition", "attachment")})
+
+    @app.get("/api/design-sw/jobs/{jid}/surface.bin", dependencies=dep)
+    def ds_surface(jid: str, org: str):
+        j = _mine(jid, org)
+        return Response(cae_api.call("GET", "/jobs/{}/surface.bin".format(j["id"])).content, media_type="application/octet-stream")
+
+    @app.get("/api/design-sw/jobs/{jid}/series.bin", dependencies=dep)
+    def ds_series(jid: str, org: str):
+        """动力学的全部曲线（单精度，不取整；低速仿真后要按转速平方换算，取整会丢精度）"""
+        j = _mine(jid, org)
+        return Response(cae_api.call("GET", "/jobs/{}/series.bin".format(j["id"])).content, media_type="application/octet-stream")
+
+    @app.get("/api/design-sw/mbd/jobs/{jid}/joint-series", dependencies=dep)
+    def ds_joint_series(jid: str, org: str, joint: str):
+        j = _mine(jid, org)
+        return cae_api.call("GET", "/mbd/jobs/{}/joint-series".format(j["id"]), params={"joint": joint}).json()
+
+    @app.get("/api/design-sw/mbd/jobs/{jid}/member-series", dependencies=dep)
+    def ds_member_series(jid: str, org: str, member: str):
+        j = _mine(jid, org)
+        return cae_api.call("GET", "/mbd/jobs/{}/member-series".format(j["id"]), params={"member": member}).json()
+
+    @app.get("/api/design-sw/mbd/jobs/{jid}/motors", dependencies=dep)
+    def ds_mbd_motors(jid: str, org: str):
+        j = _mine(jid, org)
+        return cae_api.call("GET", "/mbd/jobs/{}/motors".format(j["id"])).json()

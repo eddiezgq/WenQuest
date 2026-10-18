@@ -30,6 +30,7 @@ from . import catalog_api
 from . import course_pack
 from . import kit_interest
 from . import sewing
+from . import sewing_cae
 from . import content
 from . import course_api
 from . import edit_api
@@ -133,6 +134,7 @@ def create_app() -> FastAPI:
     course_pack.register(app, sys.modules[__name__])
     kit_interest.register(app, sys.modules[__name__])
     sewing.register(app, sys.modules[__name__])
+    sewing_cae.register(app, sys.modules[__name__])
     tasks_api.register(app, sys.modules[__name__])
     gpulab.register(app, sys.modules[__name__])
     micro.register(app, sys.modules[__name__])
