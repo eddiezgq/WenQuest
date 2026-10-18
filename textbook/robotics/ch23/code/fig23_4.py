@@ -63,7 +63,7 @@ E2 = 1.0                                                             # 2K
 s = np.sqrt(E2 * I)                                                  # 能量椭球的半轴
 u, v = np.meshgrid(np.linspace(0, 2 * math.pi, 60), np.linspace(0, math.pi, 30))
 ax.plot_surface(s[0] * np.cos(u) * np.sin(v), s[1] * np.sin(u) * np.sin(v), s[2] * np.cos(v), color="#dbe9f6", alpha=0.25,
-                linewidth=0, shade=False)
+                linewidth=0, shade=False, rasterized=True)
 # 交线：|L|² = λ 2K，λ 在 (I₁, I₃) 内；在椭球上用 RK4 的轨道画（从 L 的初值出发积分一个周期，避免手解交线的分支）
 lams = list(np.linspace(I[0] * 1.02, I[1] * 0.985, 5)) + list(np.linspace(I[1] * 1.012, I[2] * 0.985, 5))
 for lam in lams:

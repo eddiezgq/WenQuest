@@ -59,6 +59,9 @@ _ANIM_CHECK = None
 _LABKIT = None
 
 
+FIG_MAX, FIG_WARN = 1_500_000, 600_000     # 一张图的 SVG 字节数上限与提醒线
+
+
 def labkit():
     """The platform's lab kit (services/gateway/app/production/labs.py): static check and the lab page."""
     global _LABKIT
@@ -609,7 +612,14 @@ def directive_html(sec: Section, kind: str, num: str, body: str, values: dict, r
             rep.add("error", "图", sec.id, f"{label}：没有找到示意图 {src or '（未写 src）'}（由 code/ 里的程序用 bookout.figure 生成）")
             return f"<figure class='wq-fig' id='{kind}-{num}'><div class='wq-media-box'>{box}</div></figure>"
         import base64
-        data = base64.b64encode(p.read_bytes()).decode()
+        raw = p.read_bytes()
+        # 手机上打开整节时，过大的矢量图（上万个点、密网格）要几十秒甚至打不开（2026-10-18 Eddie：“手机上很多章节内容都打不开”）
+        if len(raw) > FIG_MAX:
+            rep.add("error", "图", sec.id, f"{label}：图 {src}.svg 有 {len(raw) / 1e6:.1f} MB，手机打不开。把密集的点、面画成位图"
+                    f"（plot/scatter/plot_surface 加 rasterized=True，figure 前 fig.set_dpi(200)），整张图仍是矢量图")
+        elif len(raw) > FIG_WARN:
+            rep.add("warning", "图", sec.id, f"{label}：图 {src}.svg 有 {len(raw) / 1e6:.1f} MB，偏大；密集部分可以加 rasterized=True")
+        data = base64.b64encode(raw).decode()
         return (f"<figure class='wq-fig' id='{kind}-{num}'><img class='wq-figimg' alt='{label}' src='data:image/svg+xml;base64,{data}'/>"
                 f"<figcaption>{label}{gap}{cap}</figcaption>{('<p>' + html.escape(note) + '</p>') if note else ''}</figure>")
     if kind == "表":     # the table itself follows in Markdown; here only its numbered caption

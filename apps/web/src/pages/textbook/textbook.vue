@@ -85,8 +85,9 @@
               <text class="chip-k">{{ t("book.kind." + r.kind) }} {{ r.num }}</text> {{ resTitle(r) }}
             </view>
           </view>
-          <text v-if="error" class="wq-error">{{ error }}</text>
-          <text v-if="!cur && loaded && !error" class="wq-empty">{{ t("book.nothing") }}</text>
+          <text v-if="error" class="wq-error">{{ error }}<text v-if="lastSid" class="retry" @click="read(lastSid)"> {{ t("book.retry") }}</text></text>
+          <text v-if="reading" class="wq-empty">{{ t("common.loading") }}</text>
+          <text v-if="!cur && loaded && !error && !reading" class="wq-empty">{{ t("book.nothing") }}</text>
           <BookContent v-if="cur" :html="cur.html" />
           <view v-if="cur" class="pager">
             <view v-if="cur.prev" class="pg" @click="read(cur.prev.id)">‹ {{ cur.prev.kind ? "" : cur.prev.id }} {{ refTitle(cur.prev) }}</view>
@@ -101,12 +102,12 @@
 
 <script setup lang="ts">
 // 问渠教材阅读（第 7 轮）：目录按篇、章、节；正文是构建好的网页（公式已在服务器排好）；PDF 只给老师。
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import BookContent from "../../components/BookContent.vue";
 import { absolute, api, ApiError, token, type TextbookChapter, type TextbookIndex, type TextbookResource, type TextbookSection, type TextbookSectionRef } from "../../api";
-import { errorText, locale, t } from "../../i18n";
+import { errorText, locale, setLocale, t } from "../../i18n";
 
 const books = ref<{ book: string; title: string; title_en?: string; web?: boolean; labs?: number; chapters: number; sections?: number; written?: number }[]>([]);
 // 网页版教材（第 15 轮）
@@ -120,9 +121,10 @@ const expanded = ref(new Set<number | string>());
 const tocOpen = ref(false);
 const loaded = ref(false);
 const error = ref("");
-// 正文语言（第 8 轮）：读者自己选，记在本机；默认跟界面语言。没有英文版的节显示中文并说明。
-const LANG_KEY = "wq-book-lang";
-const lang = ref<"zh" | "en">((uni.getStorageSync(LANG_KEY) as "zh" | "en") || (locale.value === "en" ? "en" : "zh"));
+// 正文语言：跟平台界面语言走（2026-10-18 修：原来另记一个“教材语言”，手机系统是英文或点过一次 English 后，
+// 界面是中文、教材却一直是英文）。书里的 中文 / English 按钮同时切换界面语言。没有英文版的节显示中文并说明。
+try { uni.removeStorageSync("wq-book-lang"); } catch { /* old setting, no longer used */ }
+const lang = computed<"zh" | "en">(() => (locale.value === "en" ? "en" : "zh"));
 const en = computed(() => lang.value === "en");
 let mp = false;
 // #ifndef H5
@@ -168,11 +170,12 @@ async function go(r: TextbookResource) {
 const pdfFor = (ch: number | string) => (en.value && idx.value?.pdf_en?.includes(ch)) || (!en.value && idx.value?.pdf.includes(ch));
 
 function setLang(l: "zh" | "en") {
-  if (lang.value === l) return;
-  lang.value = l;
-  uni.setStorageSync(LANG_KEY, l);
-  if (cur.value) read(cur.value.id);
+  if (lang.value !== l) setLocale(l);
 }
+watch(lang, () => {                                   // 界面语言一变（书里的按钮或页面顶上的切换），正文跟着换
+  if (webBook.value && book.value) open(book.value);
+  else if (cur.value) read(cur.value.id);
+});
 
 function fail(e: unknown) { error.value = errorText(e instanceof ApiError ? e.code : "unknown"); }
 
@@ -222,9 +225,13 @@ function openNew() {
   // #endif
 }
 
+const reading = ref(false);
+const lastSid = ref("");
 async function read(sid: string) {
   error.value = "";
   view.value = "read";
+  reading.value = true;
+  lastSid.value = sid;
   try {
     const want = en.value && findRef(sid)?.en ? "en" : "zh";
     cur.value = await api.textbookSection(book.value, sid, mp, want);
@@ -235,6 +242,7 @@ async function read(sid: string) {
     window.scrollTo({ top: 0 });
     // #endif
   } catch (e) { fail(e); }
+  finally { reading.value = false; }
 }
 
 async function pdf(ch: number | string) {
@@ -287,6 +295,7 @@ onLoad(async (q: any) => {
 .langs-t { font-size: 12px; color: var(--wq-muted); margin-right: 2px; }
 .lg { font-size: 12px; border: 1px solid var(--wq-line); border-radius: 12px; padding: 2px 10px; cursor: pointer; }
 .lg.on { background: var(--wq-ink, #1d2327); color: #fff; border-color: transparent; }
+.retry { color: var(--wq-link); cursor: pointer; margin-left: 6px; }
 .no-en { display: block; font-size: 13px; color: #8a5a00; background: #fff8e6; border-radius: 6px; padding: 6px 10px; margin: 6px 0; }
 .toc-secs { padding-left: 10px; }
 .toc-sec { padding: 4px 6px; font-size: 13px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; gap: 6px; }

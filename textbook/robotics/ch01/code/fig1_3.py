@@ -89,7 +89,7 @@ pts = np.array([fk_point(ur, dict(zip(names, rng.uniform(-math.pi, math.pi, 6)))
 rh = np.hypot(pts[:, 0], pts[:, 1]) * np.sign(pts[:, 0] + 1e-12)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.6, 4.4))
-ax1.plot(px, py, ".", ms=0.6, color=C["z"], alpha=0.35)
+ax1.plot(px, py, ".", ms=0.6, color=C["z"], alpha=0.35, rasterized=True)   # 上万个点：画成位图（rasterized），整张图仍是矢量图，手机上才打得开（2026-10-18）
 th = np.linspace(0, 2 * np.pi, 300)
 ax1.plot((a1 + a2) * np.cos(th), (a1 + a2) * np.sin(th), "--", color=C["muted"], lw=0.8)
 ax1.plot([0, a1 * math.cos(0.5), a1 * math.cos(0.5) + a2 * math.cos(0.5 - 1.2)],
@@ -103,7 +103,7 @@ ax1.text(-0.62, -0.68, T("虚线：半径 a₁ + a₂ = 0.6 m；缺口来自关�
          color=C["muted"])
 ax1.set_xlim(-0.68, 0.68)
 ax1.set_ylim(-0.72, 0.66)
-ax2.plot(rh, pts[:, 2], ".", ms=0.8, color=C["accent"], alpha=0.35)
+ax2.plot(rh, pts[:, 2], ".", ms=0.8, color=C["accent"], alpha=0.35, rasterized=True)
 sh_z = fk_point(ur, {}, "upper_arm_link")[2]                  # 肩关节轴的高度
 ax2.plot(0.85 * np.cos(th), sh_z + 0.85 * np.sin(th), "--", color=C["muted"], lw=0.8)
 ax2.text(-1.02, -0.95, T("虚线：以肩部为中心、半径 0.85 m（厂家工作半径）",
@@ -121,5 +121,6 @@ for ax in (ax1, ax2):
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
 fig.tight_layout()
+fig.set_dpi(200)                    # 位图部分的分辨率
 figure(fig, "fig1_3_2")
 plt.close(fig)

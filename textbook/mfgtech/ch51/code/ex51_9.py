@@ -49,10 +49,11 @@ axs[0].set_xlabel(T("工序基准的位置变动 / µm", "position of the operat
 axs[0].legend(fontsize=8, frameon=False)
 axs[0].set_yticks([])
 xs, ys = zip(*pts)
-axs[1].plot(np.array(xs) * 1000, np.array(ys) * 1000, ".", ms=1, color=M.ACCENT, alpha=0.4)
+axs[1].plot(np.array(xs) * 1000, np.array(ys) * 1000, ".", ms=1, color=M.ACCENT, alpha=0.4, rasterized=True)   # 上万个点：画成位图（rasterized），整张图仍是矢量图，手机上才打得开（2026-10-18）
 axs[1].set_aspect("equal")
 axs[1].set_xlabel(T("孔心相对心轴中心 / µm", "bore centre relative to mandrel / µm"), fontsize=8.5)
 for ax in axs:
     for sp in ("top", "right"):
         ax.spines[sp].set_visible(False)
+fig.set_dpi(200)
 figure(fig, "fig51_9_1")

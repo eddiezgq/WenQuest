@@ -12,6 +12,7 @@ const store = {
 const KEY = document.documentElement.dataset.key || "wq-lab";
 let lang = store.get(KEY + "-lang") || document.documentElement.dataset.lang || "zh";
 if (/(^|[-#])en$/.test(location.hash)) lang = "en";
+else if (/(^|[-#])zh$/.test(location.hash)) lang = "zh";   // opened from the Chinese text: Chinese, whatever was chosen last time
 const T = (zh, en) => (lang === "en" ? (en || zh) : (zh || en));
 const P = (pair) => (Array.isArray(pair) ? T(pair[0], pair[1]) : String(pair == null ? "" : pair));
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();

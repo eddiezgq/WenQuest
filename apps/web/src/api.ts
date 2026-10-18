@@ -577,7 +577,7 @@ export const api = {
     request<{ url: string; title: string; title_en: string }>("GET", `/api/v1/textbooks/${book}/webed?lang=${lang}&page=${encodeURIComponent(page)}`),
   textbook: (book: string) => request<TextbookIndex>("GET", `/api/v1/textbooks/${book}`),
   textbookSection: (book: string, sid: string, mp = false, lang: "zh" | "en" = "zh") =>
-    request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}?mp=${mp}&lang=${lang}`),
+    request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}?mp=${mp}&lang=${lang}`, undefined, 180000),   // 手机网络慢：图多的节要多等一会儿
   textbookPdf: (book: string, chapter: number | string, lang: "zh" | "en" = "zh") =>
     request<{ url: string }>("GET", `/api/v1/textbooks/${book}/pdf/${chapter}?lang=${lang}`),
   studioConfirmChapter: (id: string, no: number) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/chapters/${no}/confirm`, {}),

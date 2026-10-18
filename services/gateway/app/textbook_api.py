@@ -216,7 +216,7 @@ def register(app, m) -> None:
                         else f"{label}：请在网页端打开虚拟实验，并下载实验指导书和报告模板")
                 return f"<p class='wq-note'>{note}</p>"
             tok = m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": str(ch)}).encode()).decode()
-            url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}{'-en' if en else ''}"
+            url = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-lab/{tok}#lab-{ch}-{k}{'-en' if en else '-zh'}"
             # 在本页运行（第 9 轮 2.5）: the lab page opens inside the text; a closed <details> does not load its frame
             run = "Run it here" if en else "在本页运行"
             out = (f"<details class='wq-labrun'><summary>▶ {run}</summary>"
