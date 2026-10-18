@@ -204,13 +204,19 @@ services:
     networks:
       - render
 
-  # 问渠凸轮（第 39 轮）：凸轮设计网页版与计算内核 camkit，网址 <主域名>/cam/。没有密钥、不调用外部服务。
+  # 问渠凸轮（第 39 轮）：凸轮设计网页版与计算内核 camkit，网址 <主域名>/cam/。自己只计算；第 4 步起，已开通企业的
+  # CAE 计算经数字工厂枢纽的设计软件接口提交（钥匙 WQ_FACTORY_CAE_KEY，从数字工厂的 .env 复制过来）。
   cam:
     build:
       context: .
       dockerfile: services/cam/Dockerfile
     image: ${CAM_IMAGE:-wenquest/cam:0.1}
     restart: unless-stopped
+    environment:
+      # 第 39 轮第 4 步：凸轮系统的 CAE 交给数字工厂（枢纽“设计软件接口”）；谁登录、哪个单位问网关
+      WQ_FACTORY_URL: ${WQ_FACTORY_URL:-}
+      WQ_FACTORY_CAE_KEY: ${WQ_FACTORY_CAE_KEY:-}
+      WQ_GATEWAY_URL: http://gateway:8000
     cpus: 1
     mem_limit: 768m
     pids_limit: 64

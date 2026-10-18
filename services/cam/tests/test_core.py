@@ -346,7 +346,7 @@ def test_examples_run():
     res = {}
     for f in sorted(pathlib.Path(__file__).parent.parent.joinpath("examples").glob("*.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
-        if d.get("kind") == "system":
+        if d.get("kind") == "system" or f.name.endswith(".cae.json"):
             continue  # a cam system (tests/test_system.py)
         res[f.stem] = analyse(d)
     assert set(res) == {"packaging-plate", "sewing-feed", "sewing-takeup-groove"}

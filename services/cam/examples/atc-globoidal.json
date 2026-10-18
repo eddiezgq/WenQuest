@@ -157,9 +157,10 @@
    },
    "output": {
     "J": 2.7,
-    "load": -88.2,
+    "load": -88.29,
     "radius": 300,
-    "tip": 300
+    "tip": 300,
+    "m": 30
    },
    "elastic": {
     "fn": 45,
@@ -182,5 +183,22 @@
  "limits": {
   "vib_um": null,
   "cycle_s": null
+ },
+ "arm": {
+  "R_tip": 150,
+  "R_hub": 48,
+  "bore": 20,
+  "w_root": 60,
+  "w_tip": 44,
+  "R_grip": 46,
+  "r_fork": 32,
+  "thickness": 28,
+  "fillet": 4
+ },
+ "cae": {
+  "arm_cam": "index",
+  "tool_mass": 8,
+  "material_id": "40Cr-QT",
+  "changes_per_day": 500
  }
 }

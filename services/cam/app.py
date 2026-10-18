@@ -147,6 +147,8 @@ def laws():
 def examples():
     out = []
     for f in sorted(EXAMPLES.glob("*.json")):
+        if f.name.endswith(".cae.json"):
+            continue  # an example's precomputed CAE results (round 39, step 4)
         d = json.loads(f.read_text(encoding="utf-8"))
         out.append({"id": f.stem, "title": d.get("title", {"zh": f.stem, "en": f.stem}), "kind": d.get("kind", "cam")})
     return out
@@ -338,6 +340,10 @@ async def synthetic_ep(request: Request):
     p = await project_of(request)
     return run(lambda: {"text": ME.synthetic(p)})
 
+
+import system_api  # noqa: E402  (cam systems, round 39 step 4)
+
+system_api.register(app, run, project_of)
 
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")

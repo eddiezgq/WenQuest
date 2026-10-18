@@ -2116,6 +2116,11 @@ _course.mount(app, H)
 # ---------------------------------------------------------------- 仿真与分析（第 11 轮）
 from hub import cae_api as _cae  # noqa: E402
 _cae.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+try:                                       # 设计软件提交 CAE（第 39 轮第 4 步 / 第 41 轮，只在问渠这边，见 SYNC.md）
+    from hub import design_sw_api as _dsw  # noqa: E402
+    _dsw.mount(app, _cae.call)
+except ImportError:
+    pass
 
 # ---------------------------------------------------------------- 数控编程（第 13 轮）
 from hub import cam_api as _cam  # noqa: E402

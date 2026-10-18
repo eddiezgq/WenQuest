@@ -159,7 +159,8 @@ def sdof(t: np.ndarray, acc: np.ndarray, wn: float, zeta: float, cycles: int = 1
     return ys[-n:]
 
 
-def analyse(system: dict) -> dict:
+def analyse(system: dict, quick: bool = False) -> dict:
+    """quick: skip the slow checks of each cam (undercut search, contact stress) — used by the optimiser."""
     cs = system.get("camshaft") or {}
     dr = system.get("drive") or {}
     lim = system.get("limits") or {}
@@ -185,7 +186,7 @@ def analyse(system: dict) -> dict:
         dJe += 2 * o["inertia"] * (s1 * k) * (s2 * k)
         load_t += o["load"] * s1 * k
         # the cam on its own: the same checks as a single cam, at the camshaft's run speed
-        sub = _cam_checks(c, prog, cs, o)
+        sub = _cam_checks(c, prog, cs, o, quick)
         # elastic dynamics: the motion of the output over time, the member on its drive
         acc = (s2 * thd**2 + s1 * thdd) * k
         el = c.get("elastic") or {}
@@ -295,12 +296,13 @@ def _dwell_vibration(prog, th, th_deg, y, o):
     return out
 
 
-def _cam_checks(c: dict, prog: Program, cs: dict, o: dict) -> dict:
+def _cam_checks(c: dict, prog: Program, cs: dict, o: dict, quick: bool = False) -> dict:
     """The cam's own checks at the run speed (pressure angle, undercut, contact stress …)."""
     rpm = _num(cs.get("rpm"))
     if c.get("type") == "globoidal":
-        r = G.analyse({"program": c.get("program"), "globoidal": c.get("globoidal"), "limits": c.get("limits")})
-        stress = _globoid_stress(c, prog, rpm, o)
+        r = G.analyse({"program": c.get("program"), "globoidal": c.get("globoidal"), "limits": c.get("limits")},
+                      undercut_check=not quick)
+        stress = None if quick else _globoid_stress(c, prog, rpm, o)
         if stress is not None:
             r["checks"].append(stress)
         return r
@@ -312,7 +314,7 @@ def _cam_checks(c: dict, prog: Program, cs: dict, o: dict) -> dict:
     else:
         sub["loads"]["mass"] = o["inertia"]
         sub["loads"]["load"] = o["load"]
-    return A.analyse(sub, n=1440, out_n=361)
+    return A.analyse(sub, n=720 if quick else 1440, out_n=361)
 
 
 def _globoid_stress(c, prog, rpm, o):

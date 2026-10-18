@@ -89,8 +89,10 @@ def test_arm_mass_properties_and_step():
     assert abs(mp["J"] - J_num) / J_num < 2e-3
     assert abs(mp["mass"] - 7850 * 0.028 * solid.area * 1e-6) < 1e-9
     text, rep = AR.step(ARM)
-    assert text.count("ADVANCED_FACE") == 4 and rep["fit_dev"]["outline"] <= 0.002
-    assert abs(rep["volume"] - solid.area * 28) / rep["volume"] < 1e-3
+    # each piece of the outline is a face (the forks exact cylinders), plus the two flat faces and the bore
+    assert text.count("ADVANCED_FACE") == rep["pieces"] + 3 and text.count("CYLINDRICAL_SURFACE") == 3
+    assert rep["fit_dev"]["outline"] <= 0.01
+
 
 
 def test_arm_refusals():

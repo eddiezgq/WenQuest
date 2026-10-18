@@ -107,6 +107,56 @@ def mass_properties(d: dict) -> dict:
     return {"mass": rho * t * area, "J": rho * t * J, "area_mm2": shape.area}
 
 
+def pieces(s: dict, ring: np.ndarray) -> list[dict]:
+    """The outline as exact fork arcs (so the finite-element set-up finds them as cylinders) and smooth pieces."""
+    on = np.zeros(ring.shape[1], dtype=bool)
+    centre = {}
+    for sgn in (1, -1):
+        d = np.hypot(ring[0] - sgn * s["R_tip"], ring[1])
+        m = np.abs(d - s["r_fork"]) < 0.01  # the polygon from shapely lies on the circle within its chord error
+        on |= m
+        centre[sgn] = m
+    n = ring.shape[1]
+    if not on.any():
+        raise ArmError("the fork is not on the outline")
+    # start the walk just after an arc ends, so that runs do not wrap around the end of the array
+    k0 = int(np.flatnonzero(on & ~np.roll(on, -1))[0]) + 1
+    R = np.roll(ring, -k0, axis=1)
+    onr = np.roll(on, -k0)
+    sg = np.where(np.roll(centre[1], -k0), 1, -1)
+    out, i = [], 0
+    while i < n:
+        j = i
+        while j + 1 < n and onr[j + 1] == onr[i]:
+            j += 1
+        end = R[:, (j + 1) % n]
+        if onr[i]:
+            cx = sg[i] * s["R_tip"]
+            a0 = math.atan2(R[1, i], R[0, i] - cx)
+            a1 = math.atan2(R[1, (i + 1) % n], R[0, (i + 1) % n] - cx)
+            ccw = math.sin(a1 - a0) > 0
+            out.append({"arc": (cx, 0.0, s["r_fork"]), "start": tuple(R[:, i]), "end": tuple(end), "ccw": ccw})
+        else:
+            out.append({"pts": np.concatenate([R[:, i: j + 1], end[:, None]], axis=1)})
+        i = j + 1
+    # put the arcs' ends exactly on their circles, and the neighbouring pieces' ends on the same points
+    m = len(out)
+    for k, pc in enumerate(out):
+        if "arc" not in pc:
+            continue
+        cx, cy, r = pc["arc"]
+        for key in ("start", "end"):
+            x, y = pc[key]
+            d = math.hypot(x - cx, y - cy)
+            pc[key] = (cx + r * (x - cx) / d, cy + r * (y - cy) / d)
+        prev, nxt = out[(k - 1) % m], out[(k + 1) % m]
+        if "pts" in prev:
+            prev["pts"][:, -1] = pc["start"]
+        if "pts" in nxt:
+            nxt["pts"][:, 0] = pc["end"]
+    return out
+
+
 def step(d: dict, name: str = "atc-arm") -> tuple[str, dict]:
     s, _, ring = outline(d)
-    return S.plate(name, ring, s["thickness"], (s["bore"],))
+    return S.plate_pieces(name, pieces(s, ring), s["thickness"], (s["bore"],), tol=0.01)

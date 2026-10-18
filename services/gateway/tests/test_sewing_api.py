@@ -60,6 +60,13 @@ def test_license_projects_exports(sc):
     assert client.get("/api/v1/admin/sewing/licenses", headers=admin).json()["licenses"][0]["org"] == "甲缝纫机厂"
     me = client.get("/api/v1/sewing/me", headers=user).json()
     assert me["licensed"] and me["org"] == "甲缝纫机厂"
+    # 第 39 轮第 4 步：官网上的问渠凸轮用同一份开通，带全站登录 cookie 或 Bearer 来问
+    tok = user["Authorization"].split(" ", 1)[1]
+    for kw in ({"headers": user}, {"cookies": {"wq_sso": tok}}):
+        im = client.get("/api/v1/industry/me", **kw).json()
+        assert im["login"] and im["licensed"] and im["org"] == "甲缝纫机厂" and im["user_id"] == uid
+    client.cookies.clear()
+    assert client.get("/api/v1/industry/me").json()["login"] is False
     # 项目：存、改、列、删；别的单位看不到
     p = client.post("/api/v1/sewing/projects", json={"name": "GC-01 高速平缝机", "params": {"n": 5500, "zz": 1}}, headers=user).json()
     assert p["params"]["n"] == 5500 and "zz" not in p["params"]

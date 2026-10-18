@@ -218,7 +218,7 @@ def thickness(g: Globoid) -> dict:
     return {"root": t(g.rho1), "pitch": t(g.Rp)}
 
 
-def analyse(project: dict, m: int = 720) -> dict:
+def analyse(project: dict, m: int = 720, undercut_check: bool = True) -> dict:
     """Checks and curves of a globoidal indexing cam."""
     prog = Program.from_dict(project.get("program") or {})
     if prog.unit != "rad":
@@ -250,13 +250,15 @@ def analyse(project: dict, m: int = 720) -> dict:
                       FAIL if tk["root"] <= 0 else (INFO if lim_t is None else (PASS if tk["root"] >= lim_t else FAIL)),
                       "mm", "" if tk["root"] > 0 else "neighbouring rollers overlap: fewer or thinner rollers"))
     # undercut: sample contact points on every flank and see whether a roller cuts them away later
-    sfs = surfaces(g, prog, m=180, k=5)
-    pts = np.concatenate([s["Q"][:, s["on"]] for s in sfs], axis=1)
-    hit = undercut(g, prog, pts, m=720)
-    frac = float(hit.mean()) if hit.size else 0.0
-    checks.append(_ck("undercut", "不根切、无干涉（接触点不被别的滚子切掉）", "No undercut or interference",
-                      round(100 * frac, 3), 0, PASS if frac == 0 else FAIL, "%",
-                      "" if frac == 0 else "part of the flank is cut away by a roller: check the motion law and sizes"))
+    if undercut_check:
+        sfs = surfaces(g, prog, m=180, k=5)
+        pts = np.concatenate([s["Q"][:, s["on"]] for s in sfs], axis=1)
+        hit = undercut(g, prog, pts, m=720)
+        frac = float(hit.mean()) if hit.size else 0.0
+        checks.append(_ck("undercut", "不根切、无干涉（接触点不被别的滚子切掉）", "No undercut or interference",
+                          round(100 * frac, 3), 0, PASS if frac == 0 else FAIL, "%",
+                          "" if frac == 0 else
+                          "part of the flank is cut away by a roller: check the motion law and sizes"))
     checks.append(_ck("core", "凸轮槽底到轴线的半径", "Groove bottom to cam axis", g.core, None, INFO, "mm"))
     status = FAIL if any(c["status"] == FAIL for c in checks) else (
         UNKNOWN if any(c["status"] == UNKNOWN for c in checks) else PASS)
