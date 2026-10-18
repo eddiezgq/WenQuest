@@ -1,0 +1,57 @@
+{
+ "title": {
+  "zh": "示例：平缝机挑线槽凸轮（参数为虚构）",
+  "en": "Example: lockstitch take-up groove cam (fictional numbers)"
+ },
+ "program": {
+  "unit": "rad",
+  "segments": [
+   {
+    "kind": "rise",
+    "deg": 110,
+    "h_deg": 24,
+    "law": "mod_sine"
+   },
+   {
+    "kind": "dwell",
+    "deg": 40
+   },
+   {
+    "kind": "return",
+    "deg": 150,
+    "h_deg": 24,
+    "law": "poly4567"
+   },
+   {
+    "kind": "dwell",
+    "deg": 60
+   }
+  ]
+ },
+ "mechanism": {
+  "follower": "oscillating",
+  "contact": "roller",
+  "rb": 22,
+  "rr": 4,
+  "a": 45,
+  "L": 38,
+  "sigma": 1,
+  "groove": true,
+  "width": 6
+ },
+ "loads": {
+  "rpm": 5000,
+  "inertia": 2e-05,
+  "load": 800
+ },
+ "material": {
+  "E1": 206000,
+  "nu1": 0.3,
+  "E2": 206000,
+  "nu2": 0.3
+ },
+ "limits": {
+  "phi_rise_deg": 45,
+  "phi_return_deg": 45
+ }
+}

@@ -1,0 +1,57 @@
+{
+ "title": {
+  "zh": "示例：包装机推料盘形凸轮（参数为虚构）",
+  "en": "Example: packaging pusher plate cam (fictional numbers)"
+ },
+ "program": {
+  "unit": "mm",
+  "segments": [
+   {
+    "kind": "rise",
+    "deg": 100,
+    "h": 40,
+    "law": "cycloidal"
+   },
+   {
+    "kind": "dwell",
+    "deg": 80
+   },
+   {
+    "kind": "return",
+    "deg": 120,
+    "h": 40,
+    "law": "poly345"
+   },
+   {
+    "kind": "dwell",
+    "deg": 60
+   }
+  ]
+ },
+ "mechanism": {
+  "follower": "translating",
+  "contact": "roller",
+  "rb": 60,
+  "rr": 15,
+  "e": 10,
+  "sigma": 1,
+  "width": 20
+ },
+ "loads": {
+  "rpm": 200,
+  "mass": 3.0,
+  "k": 8,
+  "preload": 15,
+  "load": 60
+ },
+ "material": {
+  "E1": 206000,
+  "nu1": 0.3,
+  "E2": 206000,
+  "nu2": 0.3
+ },
+ "limits": {
+  "phi_rise_deg": 30,
+  "phi_return_deg": 40
+ }
+}

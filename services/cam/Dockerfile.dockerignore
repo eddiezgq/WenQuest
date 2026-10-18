@@ -1,0 +1,12 @@
+# Only what the cam image needs (the build context is the repository root).
+*
+!apps/cam/package.json
+!apps/cam/package-lock.json
+!apps/cam/index.html
+!apps/cam/vite.config.js
+!apps/cam/src
+!services/cam/requirements.txt
+!services/cam/camkit
+!services/cam/examples
+!services/cam/app.py
+**/__pycache__

@@ -20,6 +20,7 @@ sys.path.insert(0, str(HERE))
 from cases import CASES, REPO  # noqa: E402
 from stories import STORIES  # noqa: E402
 import video3d_page  # noqa: E402
+import cam_page  # noqa: E402
 
 CDN_THREE = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
 
@@ -288,6 +289,7 @@ def main():
     shutil.copy(HERE / "assets" / "three.min.js", OUT / "three.min.js")
     (OUT / "index.html").write_text(index(False), encoding="utf-8")
     (OUT / "video3d.html").write_text(video3d_page.page(head, topbar, bi, SCRIPT), encoding="utf-8")   # 第 38 轮
+    (OUT / "cam.html").write_text(cam_page.page(head, topbar, bi, SCRIPT), encoding="utf-8")   # 第 39 轮
     for c in CASES:
         (OUT / f"{c['slug']}.html").write_text(page(c, False), encoding="utf-8")
     for st in STORIES:

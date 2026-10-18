@@ -9,12 +9,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SERVED = ["site", "tools/site_home", "tools/site_cases", "textbook/web-editions", "textbook/tools", "labs/micro",
-          "services/gateway/app", "apps/web/src"]
+          "services/gateway/app", "apps/web/src", "apps/cam"]
 SKIP = [
     "site/vendor/",                      # the local copies themselves
     "labs/micro/spice/",                 # SPICE calibration page, not offered on the platform
     "labs/micro/tools/",                 # browser tests: they block or stub these addresses
     "apps/web/src/static/h5/mathjax/",   # MathJax's built-in default addresses (speech add-on, only on request)
+    "apps/cam/dist/",                    # built from apps/cam/src (checked above)
     "/node_modules/", "/__pycache__/",
 ]
 EXT = (".html", ".js", ".mjs", ".css", ".py", ".vue", ".ts")

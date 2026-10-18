@@ -41,6 +41,11 @@
 	handle /api/v1/public/* {
 		reverse_proxy web:80
 	}
+	# 问渠凸轮（第 39 轮）：凸轮设计网页版，容器 cam 自己出页面和接口
+	redir /cam /cam/ 308
+	handle_path /cam/* {
+		reverse_proxy cam:8000
+	}
 	handle {
 		root * /srv/site
 		try_files {path} {path}/ {path}.html

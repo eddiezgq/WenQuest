@@ -50,6 +50,9 @@ jobs:
           docker run --rm -v "$PWD/deploy:/d:ro" -e SITE_DOMAIN=example.cn -e ACME_EMAIL=ci@example.cn -e WQ_REGION=cn caddy:2 caddy validate --config /d/Caddyfile --adapter caddyfile
       - name: Pages that go live load no Google Fonts or public CDN (第 34 轮：国内访问不了)
         run: python3 tools/vendor/check_external.py
+      - name: Cam design kernel and API tests (问渠凸轮, 第 39 轮)
+        working-directory: services/cam
+        run: pip install -q -r requirements-dev.txt && python -m pytest -q
       - name: Animator code check tests
         working-directory: services/animator
         run: pip install -q fastapi==0.141.1 pydantic==2.13.3 pytest && python -m pytest -q
@@ -259,6 +262,7 @@ jobs:
           echo "voice=ghcr.io/${repo}/voice:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "microsynth=ghcr.io/${repo}/micro-synth:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "blender=ghcr.io/${repo}/blender:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "cam=ghcr.io/${repo}/cam:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -335,6 +339,16 @@ jobs:
           tags: ${{ steps.meta.outputs.blender }}
           cache-from: type=gha,scope=blender
           cache-to: type=gha,mode=max,scope=blender
+
+      - name: Build and push cam design image (问渠凸轮, 第 39 轮)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: services/cam/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.cam }}
+          cache-from: type=gha,scope=cam
+          cache-to: type=gha,mode=max,scope=cam
 
       - name: Build and push Verilog synthesis image
         uses: docker/build-push-action@v6

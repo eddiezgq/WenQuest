@@ -1,0 +1,57 @@
+{
+ "title": {
+  "zh": "示例：送布抬牙凸轮（参数为虚构）",
+  "en": "Example: feed-lift cam (fictional numbers)"
+ },
+ "program": {
+  "unit": "mm",
+  "segments": [
+   {
+    "kind": "rise",
+    "deg": 150,
+    "h": 4,
+    "law": "mod_trapezoid"
+   },
+   {
+    "kind": "dwell",
+    "deg": 30
+   },
+   {
+    "kind": "return",
+    "deg": 150,
+    "h": 4,
+    "law": "mod_trapezoid"
+   },
+   {
+    "kind": "dwell",
+    "deg": 30
+   }
+  ]
+ },
+ "mechanism": {
+  "follower": "translating",
+  "contact": "roller",
+  "rb": 14,
+  "rr": 3,
+  "e": 0,
+  "sigma": 1,
+  "width": 5
+ },
+ "loads": {
+  "rpm": 5000,
+  "mass": 0.05,
+  "k": 3,
+  "preload": 6,
+  "load": 5
+ },
+ "material": {
+  "E1": 206000,
+  "nu1": 0.3,
+  "E2": 206000,
+  "nu2": 0.3
+ },
+ "limits": {
+  "phi_rise_deg": 30,
+  "phi_return_deg": 30
+ }
+}

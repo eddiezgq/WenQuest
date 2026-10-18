@@ -1,0 +1,24 @@
+name: Cam kernel tests
+
+# 第 39 轮：问渠凸轮计算内核的标准题。只在 services/cam 改动时运行。
+on:
+  push:
+    paths: ["services/cam/**", ".github/workflows/cam.yml"]
+  pull_request:
+    paths: ["services/cam/**", ".github/workflows/cam.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Standard problems
+        working-directory: services/cam
+        run: pip install -q -r requirements-dev.txt && python -m pytest -q
