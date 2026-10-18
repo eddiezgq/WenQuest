@@ -47,12 +47,12 @@ def show_checks(obj=None):
     dlg.setWindowTitle("校核结果 · " + obj.Label)
     dlg.resize(820, 640)
     lay = QtW.QVBoxLayout(dlg)
-    k = R.get("key", {})
-    tr = R.get("trial", {}).get("counts", {})
-    head = QtW.QLabel("<b>{}</b>　λ = {:.3f}　针杆惯性力 {:.0f} N　钩线角 {:.1f}°　整机惯性力 {:.0f} N　共振转速 {:.0f} r/min<br>"
-                      "虚拟试缝 30 针：成缝 {}，跳针 {}，碰针 {}，划线 {}，断线 {}".format(
-                          obj.Status, k.get("lam", 0), k.get("F_bdc", 0), k.get("fc", 0), k.get("fmax", 0), k.get("n_res", 0),
-                          tr.get("ok", 0), tr.get("skip", 0), tr.get("hit", 0), tr.get("cut", 0), tr.get("break", 0)))
+    tr = R.get("trial", {}).get("counts")
+    res = "　".join("{} {} {}".format(r["zh"], r["value"], r["unit"]) for r in R.get("results", [])[:6])
+    txt = "<b>{}</b>　{}".format(obj.Status, res)
+    if tr:
+        txt += "<br>虚拟试缝 30 针：成缝 {}，跳针 {}，碰针 {}，划线 {}，断线 {}".format(tr["ok"], tr["skip"], tr["hit"], tr["cut"], tr["break"])
+    head = QtW.QLabel(txt)
     head.setWordWrap(True)
     lay.addWidget(head)
     t = QtW.QTableWidget(len(R.get("checks", [])), 5)
@@ -70,6 +70,14 @@ def show_checks(obj=None):
     t.resizeColumnsToContents()
     t.horizontalHeader().setStretchLastSection(True)
     lay.addWidget(t)
+    for tb in R.get("tables", []):
+        cell = lambda c: c[0] if isinstance(c, (list, tuple)) else str(c)  # noqa: E731
+        html = "<b>{}</b><table cellpadding='4' border='1' cellspacing='0'><tr>{}</tr>{}</table>".format(
+            tb["zh"], "".join("<th>{}</th>".format(h[0]) for h in tb["head"]),
+            "".join("<tr>{}</tr>".format("".join("<td>{}</td>".format(cell(c)) for c in r)) for r in tb["rows"]))
+        lab = QtW.QLabel(html)
+        lab.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        lay.addWidget(lab)
     btn = QtW.QPushButton("关闭")
     btn.clicked.connect(dlg.accept)
     lay.addWidget(btn)
@@ -172,8 +180,8 @@ class Cmd:
         return App.ActiveDocument is not None or not self.needs
 
 
-def new_design():
-    obj = F.add_design()
+def new_design(machine="lockstitch"):
+    obj = F.add_design(machine=machine)
     Gui.Selection.clearSelection()
     Gui.Selection.addSelection(obj)
     try:
@@ -201,6 +209,9 @@ def _file(save, title, filt):
 
 def export_step():
     obj = design()
+    if obj and not obj.Parts:
+        QtW.QMessageBox.information(None, "问渠缝纫机", "这个机型第一期没有三维零件。")
+        return
     if obj:
         path = _file(True, "导出 STEP", "STEP (*.step *.stp)")
         if path:
@@ -252,6 +263,8 @@ def submit():
 
 def register():
     cmds = [("WQS_New", Cmd("新建平缝机设计", "按默认（教材算例）参数生成平缝机机构零件和校核", new_design)),
+            ("WQS_NewOverlock", Cmd("新建包缝机设计", "按教材第 9 讲算例机生成包缝机机构零件和校核", lambda: new_design("overlock"))),
+            ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机弯针定时校核与耗线量、线团计划（第一期没有三维零件）", lambda: new_design("cover"))),
             ("WQS_Recompute", Cmd("重新计算", "改了参数后重算零件与校核（Ctrl+R 也可以）", recompute)),
             ("WQS_Checks", Cmd("校核结果", "红绿灯列表：惯性力、钩线、挑线、送布、张力、共振、尺寸链", show_checks)),
             ("WQS_Timing", Cmd("时序图", "针杆、钩线窗口、送布、挑线的时序", show_timing)),

@@ -24,11 +24,11 @@ def _pname(k):
     return "P_" + k
 
 
-def add_design(doc=None, params=None, label="平缝机设计"):
+def add_design(doc=None, params=None, label=None, machine="lockstitch"):
     doc = doc or App.ActiveDocument or App.newDocument("WenQuestSewing")
     obj = doc.addObject("App::FeaturePython", "SewDesign")
-    SewDesign(obj, params)
-    obj.Label = label
+    SewDesign(obj, params, machine)
+    obj.Label = label or (sewcore.get(machine).NAME[0] + "设计")
     try:
         import FreeCADGui  # noqa: F401
         ViewProviderSewDesign(obj.ViewObject)
@@ -39,14 +39,18 @@ def add_design(doc=None, params=None, label="平缝机设计"):
 
 
 class SewDesign:
-    def __init__(self, obj, params=None):
-        p = sewcore.clean(params)
-        for g, gzh, gen, items in sewcore.GROUPS:
+    def __init__(self, obj, params=None, machine="lockstitch"):
+        M = sewcore.get(machine)
+        p = M.clean(params)
+        obj.addProperty("App::PropertyString", "Machine", "机型", "lockstitch 平缝机 / overlock 包缝机 / cover 绷缝机")
+        obj.Machine = M.MACHINE
+        obj.setEditorMode("Machine", 1)
+        for g, gzh, gen, items in M.GROUPS:
             for k, zh, en, unit, d, lo, hi, st in items:
                 tip = "{}（{}）{}".format(zh, en, " 单位 " + unit if unit else "")
-                if k in sewcore.CHOICES:
+                if k in M.CHOICES:
                     obj.addProperty("App::PropertyEnumeration", _pname(k), gzh, tip)
-                    setattr(obj, _pname(k), [c[0] for c in sewcore.CHOICES[k]])
+                    setattr(obj, _pname(k), [c[0] for c in M.CHOICES[k]])
                     setattr(obj, _pname(k), p[k])
                 else:
                     obj.addProperty(PROP, _pname(k), gzh, tip)
@@ -60,28 +64,34 @@ class SewDesign:
         obj.setEditorMode("Parts", 1)
         obj.Proxy = self
 
+    @staticmethod
+    def machine(obj):
+        return sewcore.get(getattr(obj, "Machine", "lockstitch") or "lockstitch")
+
     def params(self, obj):
+        M = self.machine(obj)
         p = {}
-        for k in sewcore.PARAMS:
+        for k in M.PARAMS:
             v = getattr(obj, _pname(k), None)
             if v is not None:
                 p[k] = v
-        return sewcore.clean(p)
+        return M.clean(p)
 
     def execute(self, obj):
         p = self.params(obj)
-        R = sewcore.analyze(p)
+        R = self.machine(obj).analyze(p)
         bad = [c for c in R["checks"] if c["state"] == "bad"]
         warn = [c for c in R["checks"] if c["state"] == "warn"]
         obj.Status = "全部合格" if not bad and not warn else "不合格 {} 项，注意 {} 项".format(len(bad), len(warn))
-        keep = {k: R[k] for k in ("params", "key", "checks", "timing", "trial", "chain", "ok", "version") if k in R}
-        keep["curves"] = R["curves"]
+        keep = {k: R[k] for k in ("machine", "params", "results", "checks", "timing", "trial", "chain", "tables", "ok", "version", "key") if k in R}
         obj.ResultJson = json.dumps(keep, ensure_ascii=False)
         self.update_parts(obj, p, float(obj.Phi.Value if hasattr(obj.Phi, "Value") else obj.Phi))
 
     def update_parts(self, obj, p, phi):
         doc = obj.Document
-        model = cad.parts3d(p, phi)
+        if self.machine(obj).MACHINE not in ("lockstitch", "overlock"):
+            return                      # 绷缝机第一期只有计算与校核，没有零件（第 40 轮 Q2）
+        model = cad.parts3d(p, phi, self.machine(obj).MACHINE)
         have = {getattr(o, "SewKey", ""): o for o in (obj.Parts or [])}
         out = []
         for name, zh, shape, color in cad.freecad_shapes(model):
@@ -146,17 +156,22 @@ def result(obj):
 
 def export_params(obj, path):
     p = obj.Proxy.params(obj)
+    M = SewDesign.machine(obj)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({"format": "wenquest-sewing", "machine": "lockstitch", "version": sewcore.VERSION, "project": obj.Label, "params": p},
+        json.dump({"format": "wenquest-sewing", "machine": M.MACHINE, "version": M.VERSION, "project": obj.Label, "params": p},
                   f, ensure_ascii=False, indent=1)
 
 
 def import_params(obj, path):
     with open(path, encoding="utf-8") as f:
         d = json.load(f)
-    p = sewcore.clean(d.get("params") or d)
+    M = SewDesign.machine(obj)
+    if d.get("machine", "lockstitch") != M.MACHINE:
+        raise ValueError("参数文件是{}的，这个设计是{}的。请先新建对应机型的设计再导入。".format(
+            sewcore.get(d.get("machine")).NAME[0], M.NAME[0]))
+    p = M.clean(d.get("params") or d)
     for k, v in p.items():
-        setattr(obj, _pname(k), v if k in sewcore.CHOICES else float(v))
+        setattr(obj, _pname(k), v if k in M.CHOICES else float(v))
     if d.get("project"):
         obj.Label = d["project"]
     obj.Document.recompute()

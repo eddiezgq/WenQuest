@@ -7,9 +7,13 @@
 """
 import math
 
+from .common import line_chart, result, xy_chart
 from .kit import FEED_A, FT, LK0, THREAD, FEED_FAB, Mech
 
+MACHINE = "lockstitch"
+NAME = ("平缝机", "Lockstitch")
 VERSION = "1.0"
+LECTURES = ("第 3–8 讲与第 23 讲", "lectures 3–8 and 23")
 
 # ---------- 参数表：网页表单、FreeCAD 面板、计算书都从这里生成 ----------
 # (key, 中文, English, 单位, 默认, 最小, 最大, 步长)
@@ -306,6 +310,38 @@ def analyze(params=None, trial=True):
         curves=curves, timing=timing, chain=CH,
         parts=parts(p, M, F),
     )
+    K = out["key"]
+    out["machine"] = MACHINE
+    out["results"] = [
+        result("连杆比 λ", "Rod ratio λ", f"{K['lam']:.3f}"), result("针杆行程", "Needle-bar stroke", f"{K['stroke']:.1f}", "mm"),
+        result("主轴角速度 ω", "Shaft speed ω", f"{K['omega']:.1f}", "rad/s"),
+        result("针杆最大速度（转角）", "Needle-bar peak velocity (angle)", f"{K['vmax']:.2f} ({K['vmax_at']:.1f}°)", "m/s"),
+        result("上止点 / 下止点加速度", "Acceleration at TDC / BDC", f"{K['a_tdc']:.0f} / {abs(K['a_bdc']):.0f}", "m/s²"),
+        result("针杆惯性力（下止点 / 上止点）", "Needle-bar inertia force (BDC / TDC)", f"{K['F_bdc']:.0f} / {K['F_tdc']:.0f}", "N"),
+        result("针尖入布 / 出布", "Needle point enters / leaves fabric", f"{K['pin']:.1f} / {K['pout']:.1f}", "°"),
+        result("机针回升 2 mm 的转角（标准钩线角）", "Angle at 2 mm rise (standard catch)", f"{K['phc0']:.2f}", "°"),
+        result("惯性力不超限的最高转速", "Top speed within the bushing limit", f"{K['n_max_F']:.0f}", "r/min"),
+        result("钩线角 / 回升量", "Catch angle / rise", f"{K['fc']:.1f} / {K['rise_fc']:.2f}", "° / mm"),
+        result("梭尖线速度", "Hook-point speed", f"{K['hook_speed']:.1f}", "m/s"),
+        result("挑线杆最大供线量", "Take-up maximum supply", "—" if K["takeup_Smax"] is None else f"{K['takeup_Smax']:.1f}", "mm"),
+        result("挑线最大线加速度", "Peak thread acceleration", "—" if not K["takeup_acc"] else f"{K['takeup_acc'] / 1000:.1f}", "km/s²"),
+        result("送布偏心行程 / 送布效率", "Feed stroke / efficiency", f"{K['feed_S']:.3f} / {K['feed_eff']:.3f}", "mm / —"),
+        result("整机惯性合力", "Resultant inertia force", f"{K['fmax']:.0f}", "N"),
+        result("机壳振动 / 噪声", "Frame vibration / noise", f"{K['vib']:.1f} / {K['noise']:.1f}", "mm/s / dB(A)"),
+        result("二阶共振转速", "2nd-order resonance speed", f"{K['n_res']:.0f}", "r/min"),
+    ]
+    C = curves
+    out["charts"] = [line_chart("needle", "针尖高出针板（mm）", "Needle tip above the plate (mm)", C["phi"], [("针尖", "tip", "#2d6fb3", C["needle_tip"])], zero=True),
+                     line_chart("needle_v", "针杆速度（m/s）", "Needle-bar velocity (m/s)", C["phi"], [("速度", "velocity", "#e8913a", C["needle_v"])], zero=True),
+                     line_chart("needle_a", "针杆加速度（m/s²）", "Needle-bar acceleration (m/s²)", C["phi"], [("加速度", "acceleration", "#c0392b", C["needle_a"])], zero=True)]
+    if C["takeup_S"]:
+        out["charts"].append(line_chart("takeup", "挑线：供线量 S（蓝）与耗线量 D（红）（mm）", "Take-up: supply S (blue) and demand D (red) (mm)", C["phi"],
+                                        [("供线量 S", "supply S", "#2d6fb3", C["takeup_S"]), ("耗线量 D", "demand D", "#c0392b", C["takeup_D"])]))
+    out["charts"].append(xy_chart("feed", "送布牙齿尖轨迹（mm）", "Feed-dog tooth path (mm)", C["feed_x"], C["feed_y"], ref_zh="针板", ref_en="plate"))
+    out["charts"].append(line_chart("force", "整机惯性合力（N），虚线为 550 N", "Resultant inertia force (N), dashed line 550 N", C["phi"],
+                                    [("合力", "resultant", "#7d5ba6", C["force"])], ref=550))
+    out["card"] = adjust_card(p)
+    out["view"] = dict(page="proto-lockstitch", sync="setCfg", cfg=_cfg(p))
     if T:
         out["trial"] = dict(res=T["res"], counts={k: T["res"].count(k) for k in ("ok", "skip", "hit", "cut", "break")},
                             faults=T["ev"]["faults"])

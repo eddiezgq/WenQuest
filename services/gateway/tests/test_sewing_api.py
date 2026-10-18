@@ -102,3 +102,33 @@ def test_bad_input_is_cleaned(client):  # noqa: F811
     r = client.post("/api/v1/sewing/analyze", json={"params": {"n": "abc", "fab": "silk", "r": 1e9, "l": None}}).json()
     assert r["params"]["n"] == 5000 and r["params"]["fab"] == "cotton" and r["params"]["r"] == 25 and r["params"]["l"] == 55
     json.dumps(r)
+
+
+def test_machines_overlock_and_cover(sc):
+    """第 40 轮：包缝机、绷缝机——参数表、计算、项目记机型、出件（绷缝机没有三维零件）"""
+    client = sc
+    s = client.get("/api/v1/sewing/schema?machine=overlock").json()
+    assert [m["key"] for m in s["machines"]] == ["lockstitch", "overlock", "cover"] and s["machine"] == "overlock"
+    assert "ll_r" in [p["key"] for g in s["groups"] for p in g["params"]] and "step" in s["kinds"]
+    s = client.get("/api/v1/sewing/schema?machine=cover").json()
+    assert "Lcm" in [p["key"] for g in s["groups"] for p in g["params"]] and "step" not in s["kinds"]
+    r = client.post("/api/v1/sewing/analyze", json={"machine": "overlock", "params": {}}).json()
+    assert r["machine"] == "overlock" and r["view"]["page"] == "model-overlock"
+    r = client.post("/api/v1/sewing/analyze", json={"machine": "cover", "params": {"stitch": "602"}}).json()
+    assert r["tables"][0]["rows"][-1][-1] == "10" and r["view"]["cfg"]["rr"] == 3.2
+    assert client.post("/api/v1/sewing/analyze", json={"machine": "nope", "params": {}}).status_code == 422
+    admin = login(client)
+    p = client.post("/api/v1/sewing/projects", json={"name": "OL-1", "machine": "overlock", "params": {"D": 1.3}}, headers=admin).json()
+    assert p["machine"] == "overlock" and p["params"]["D"] == 1.3 and "ll_r" in p["params"]
+    lst = client.get("/api/v1/sewing/projects", headers=admin).json()["projects"]
+    assert lst[0]["machine"] == "overlock"
+    for kind in ("report", "card", "params", "dxf", "macro"):
+        r = client.post(f"/api/v1/sewing/export/{kind}", json={"machine": "overlock", "params": {}, "project": "OL-1"}, headers=admin)
+        assert r.status_code == 200, kind
+    for kind in ("report", "card", "params"):
+        r = client.post(f"/api/v1/sewing/export/{kind}", json={"machine": "cover", "params": {}, "project": "CV-1"}, headers=admin)
+        assert r.status_code == 200, kind
+    assert client.post("/api/v1/sewing/export/step", json={"machine": "cover", "params": {}}, headers=admin).status_code == 404
+    j = client.post("/api/v1/sewing/export/json", json={"machine": "cover", "params": {}}, headers=admin).json()
+    assert j["machine"] == "cover"
+    assert client.get("/api/v1/sewing/proto?page=../../etc").status_code == 404

@@ -1,5 +1,5 @@
 <template>
-  <!-- 缝纫机设计与制造软件（第 39 轮）：平缝机。参数在左，三维样机 / 校核 / 时序 / 零件与制造 / 导出在右。来宾可试算，开通后可保存与导出。 -->
+  <!-- 缝纫机设计与制造软件（第 39 轮平缝机，第 40 轮加包缝机、绷缝机）。机型在上，参数在左，三维样机 / 校核 / 时序 / 零件与制造 / 导出在右。来宾可试算，开通后可保存与导出。 -->
   <view class="sew">
     <view class="head">
       <text class="h1">{{ t("sew.title") }}</text>
@@ -12,6 +12,11 @@
           <text class="link" @click="contact">{{ t("sew.contact") }} →</text>
         </template>
       </view>
+    </view>
+
+    <!-- 机型 -->
+    <view class="mbar">
+      <text v-for="m in machines" :key="m.key" class="mopt" :class="{ on: machine === m.key }" @click="switchMachine(m.key)">{{ L(m) }}</text>
     </view>
 
     <!-- 项目条（已开通） -->
@@ -70,20 +75,21 @@
         <!-- 三维样机 -->
         <view v-show="tab === 'proto'" class="pane">
           <!-- #ifdef H5 -->
-          <view class="frame">
-            <iframe v-if="protoOk" ref="frame" class="proto" :src="protoSrc" title="3D" @load="syncProto" />
+          <view class="frame" :class="{ flat: R && R.view.page === 'looper' }">
+            <iframe v-if="protoOk" :key="protoSrc" ref="frame" class="proto" :src="protoSrc" title="3D" @load="syncProto" />
             <view v-else class="empty">{{ t("sew.protoMissing") }}</view>
           </view>
           <!-- #endif -->
-          <text class="hint">{{ t("sew.protoNote") }}</text>
+          <text class="hint">{{ t("sew.protoNote." + machine) }}</text>
           <view v-if="R" class="kgrid">
-            <view v-for="k in keyRows" :key="k[0]" class="kc"><text class="kl">{{ t("sew.k." + k[0]) }}</text><text class="kv">{{ k[1] }}</text></view>
+            <view v-for="(k, i) in R.results" :key="i" class="kc"><text class="kl">{{ lang === "en" ? k.en : k.zh }}</text>
+              <text class="kv">{{ k.value }} <text class="muted small">{{ k.unit }}</text></text></view>
           </view>
         </view>
 
         <!-- 校核 -->
         <view v-if="R" v-show="tab === 'checks'" class="pane">
-          <view class="trial">
+          <view v-if="R.trial" class="trial">
             <text class="kl">{{ t("sew.trial") }}</text>
             <view class="dots"><text v-for="(s, i) in R.trial.res" :key="i" class="dot" :class="s" /></view>
             <text class="hint">{{ t("sew.trialSum", { ok: R.trial.counts.ok, skip: R.trial.counts.skip, hit: R.trial.counts.hit, cut: R.trial.counts.cut, brk: R.trial.counts.break }) }}</text>
@@ -107,11 +113,8 @@
           <svg class="svg" viewBox="0 0 640 170" v-html="timingSvg()" />
           <text class="hint">{{ t("sew.chart.angle") }}</text>
           <view class="charts">
-            <view class="chart"><text class="ct">{{ t("sew.chart.needle") }}</text><svg class="svg" viewBox="0 0 300 150" v-html="line([R.curves.needle_tip], ['#2d6fb3'], true)" /></view>
-            <view v-if="R.curves.takeup_S.length" class="chart"><text class="ct">{{ t("sew.chart.takeup") }}</text>
-              <svg class="svg" viewBox="0 0 300 150" v-html="line([R.curves.takeup_S, R.curves.takeup_D], ['#2d6fb3', '#c0392b'], false)" /></view>
-            <view class="chart"><text class="ct">{{ t("sew.chart.feed") }}</text><svg class="svg" viewBox="0 0 300 150" v-html="path(R.curves.feed_x, R.curves.feed_y)" /></view>
-            <view class="chart"><text class="ct">{{ t("sew.chart.force") }}</text><svg class="svg" viewBox="0 0 300 150" v-html="line([R.curves.force], ['#7d5ba6'], false, 550)" /></view>
+            <view v-for="c in R.charts" :key="c.key" class="chart"><text class="ct">{{ lang === "en" ? c.en : c.zh }}</text>
+              <svg class="svg" viewBox="0 0 300 150" v-html="c.kind === 'xy' ? path(c) : line(c)" /></view>
           </view>
         </view>
 
@@ -122,8 +125,15 @@
             <text class="pt">{{ lang === "en" ? pt.en : pt.zh }}</text>
             <view v-for="(d, i) in pt.dims" :key="i" class="dim"><text>{{ lang === "en" ? d[1] : d[0] }}</text><text class="dv">{{ d[2] }} {{ d[3] }}</text></view>
           </view>
-          <text class="ct">{{ t("sew.chain") }}</text>
-          <text class="para">{{ t("sew.chainText", { w: R.chain.worst.toFixed(3), yi: (R.chain.y_int * 100).toFixed(1), ya: (R.chain.y_adj * 100).toFixed(2), ys: (R.chain.y_swap * 100).toFixed(1) }) }}</text>
+          <view v-for="tb in R.tables || []" :key="tb.key">
+            <text class="ct">{{ lang === "en" ? tb.en : tb.zh }}</text>
+            <view class="tbl">
+              <view class="tr th"><text v-for="(h, i) in tb.head" :key="i" class="td">{{ lang === "en" ? h[1] : h[0] }}</text></view>
+              <view v-for="(r, j) in tb.rows" :key="j" class="tr"><text v-for="(c, i) in r" :key="i" class="td">{{ Array.isArray(c) ? (lang === "en" ? c[1] : c[0]) : c }}</text></view>
+            </view>
+          </view>
+          <text v-if="R.chain" class="ct">{{ t("sew.chain") }}</text>
+          <text v-if="R.chain" class="para">{{ t("sew.chainText", { w: R.chain.worst.toFixed(3), yi: (R.chain.y_int * 100).toFixed(1), ya: (R.chain.y_adj * 100).toFixed(2), ys: (R.chain.y_swap * 100).toFixed(1) }) }}</text>
           <text class="ct">{{ t("sew.card") }}</text>
           <view v-for="(s, i) in R.card" :key="i" class="step"><text class="sn">{{ i + 1 }}</text>
             <view><text class="pt">{{ lang === "en" ? s.en : s.zh }}</text><text class="para">{{ lang === "en" ? s.do_en : s.do_zh }}</text></view></view>
@@ -135,7 +145,7 @@
           <view class="lrow"><text class="muted">{{ t("sew.lang") }}</text>
             <text class="opt" :class="{ on: flang === 'zh' }" @click="flang = 'zh'">中文</text>
             <text class="opt" :class="{ on: flang === 'en' }" @click="flang = 'en'">English</text></view>
-          <view v-for="k in KINDS" :key="k" class="exp" :class="{ locked: !me.licensed }" @click="download(k)">
+          <view v-for="k in kinds" :key="k" class="exp" :class="{ locked: !me.licensed }" @click="download(k)">
             <text>{{ t("sew.exp." + k) }}</text><text class="muted">{{ making === k ? t("sew.making") : "↓" }}</text>
           </view>
           <view class="fc">
@@ -179,17 +189,21 @@ interface Param { key: string; zh: string; en: string; unit: string; default: nu
 interface Group { key: string; zh: string; en: string; params: Param[] }
 interface Check { key: string; group: string; name: { zh: string; en: string }; value: { zh: string; en: string }; limit: { zh: string; en: string }; state: "ok" | "warn" | "bad"; lecture: number;
   advice: { zh: string; en: string } }
-interface Project { id: number; name: string; note?: string; params?: Record<string, number | string>; updated?: number }
+interface Project { id: number; name: string; note?: string; machine?: string; params?: Record<string, number | string>; updated?: number }
+interface Chart { key: string; kind: "line" | "xy"; zh: string; en: string; x: number[]; series: { zh: string; en: string; color: string; y: number[] }[];
+  ref?: number | null; zero?: boolean; ref_zh?: string; ref_en?: string }
 
-const props = defineProps<{ startTab?: string }>();
-const KINDS = ["report", "card", "params", "step", "macro", "dxf", "json"];
+const props = defineProps<{ startTab?: string; startMachine?: string }>();
+const kinds = ref<string[]>(["report", "card", "params", "step", "macro", "dxf", "json"]);
+const machines = ref<Choice[]>([]);
+const machine = ref("lockstitch");
 const COLORS = ["#2d6fb3", "#7d5ba6", "#c0392b", "#2e9e6a", "#e8913a"];
 const tabs = ["proto", "checks", "timing", "parts", "export"];
 
 const schema = ref<Group[]>([]);
 const params = reactive<Record<string, number | string>>({});
 const defaults: Record<string, number | string> = {};
-const open = reactive<Record<string, boolean>>({ basic: true, needle: true });
+const open = reactive<Record<string, boolean>>({ basic: true, needle: true, looper: true });
 const R = ref<any>(null);
 const busy = ref(false);
 const tab = ref("proto");
@@ -211,21 +225,11 @@ const lang = computed(() => (locale.value === "en" ? "en" : "zh"));
 const L = (x: { zh: string; en: string }) => (lang.value === "en" ? x.en || x.zh : x.zh || x.en);
 const bads = computed(() => (R.value ? R.value.checks.filter((c: Check) => c.state === "bad").length : 0));
 const warns = computed(() => (R.value ? R.value.checks.filter((c: Check) => c.state === "warn").length : 0));
-const projectNames = computed(() => projects.value.map((p) => p.name));
+const mname = (k?: string) => { const m = machines.value.find((x) => x.key === (k || "lockstitch")); return m ? L(m) : ""; };
+const projectNames = computed(() => projects.value.map((p) => `${p.name}（${mname(p.machine)}）`));
 const pIndex = computed(() => Math.max(0, projects.value.findIndex((p) => p.id === current.value?.id)));
-const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}`);
-
-const f = (v: number, d = 0) => (v == null || isNaN(v) ? "—" : v.toFixed(d));
-const keyRows = computed(() => {
-  const k = R.value?.key;
-  if (!k) return [];
-  return [
-    ["lam", f(k.lam, 3)], ["stroke", `${f(k.stroke, 1)} mm`], ["vmax", `${f(k.vmax, 2)} m/s`], ["abdc", `${f(Math.abs(k.a_bdc))} m/s²`],
-    ["fbdc", `${f(k.F_bdc)} N`], ["nmax", `${f(k.n_max_F)} r/min`], ["fc", `${f(k.fc, 1)}° / ${f(k.rise_fc, 2)} mm`], ["hook", `${f(k.hook_speed, 1)} m/s`],
-    ["smax", k.takeup_Smax == null ? "—" : `${f(k.takeup_Smax, 1)} mm`], ["feeds", `${f(k.feed_S, 2)} mm`], ["fmax", `${f(k.fmax)} N`],
-    ["vib", `${f(k.vib, 1)} mm/s / ${f(k.noise, 1)} dB(A)`], ["nres", `${f(k.n_res)} r/min`],
-  ];
-});
+const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper" };
+const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${PAGES[machine.value] || PAGES.lockstitch}`);
 
 // ---------- 计算 ----------
 let timer: any = null;
@@ -238,7 +242,7 @@ async function compute() {
   const my = ++seq;
   busy.value = true;
   try {
-    const r = await request<any>("POST", "/api/v1/sewing/analyze", { params: { ...params } });
+    const r = await request<any>("POST", "/api/v1/sewing/analyze", { machine: machine.value, params: { ...params } });
     if (my !== seq) return;
     R.value = r;
     syncProto();
@@ -262,14 +266,40 @@ function reset() {
   compute();
 }
 
-// 三维样机：同源页面，直接调它的 __api.setCfg
+// 三维样机 / 动画：同源页面。平缝机调 __api.setCfg；绷缝机弯针动画改 __api.ST 再 changed()；包缝机三维结构模型不用同步
 function syncProto() {
   // #ifdef H5
   try {
     const w = frame.value?.contentWindow || (frame.value?.$el as HTMLIFrameElement | undefined)?.contentWindow;
-    if (w && w.__api && R.value) w.__api.setCfg(R.value.proto);
+    const v = R.value?.view;
+    if (!w || !w.__api || !v) return;
+    if (v.sync === "setCfg") w.__api.setCfg(v.cfg);
+    else if (v.sync === "ST") { Object.assign(w.__api.ST, v.cfg); w.__api.changed(); }
   } catch { /* the page is still loading */ }
   // #endif
+}
+
+// 换机型：参数表、默认值、导出种类都跟着换；当前项目清空
+async function loadSchema() {
+  const s = await request<{ groups: Group[]; machines: Choice[]; kinds: Record<string, string> }>("GET", `/api/v1/sewing/schema?machine=${machine.value}`);
+  schema.value = s.groups;
+  machines.value = s.machines;
+  kinds.value = Object.keys(s.kinds);
+  for (const k of Object.keys(defaults)) delete defaults[k];
+  for (const k of Object.keys(params)) delete params[k];
+  for (const grp of s.groups) for (const p of grp.params) defaults[p.key] = p.default;
+  Object.assign(params, defaults);
+  open[s.groups[0]?.key || "basic"] = true;
+  if (s.groups[1]) open[s.groups[1].key] = true;
+  if (machine.value === "cover" && s.groups[2]) open[s.groups[2].key] = true;     // 耗线计划是绷缝机的卖点，默认展开
+}
+async function switchMachine(m: string, keepProject = false) {
+  if (m === machine.value && R.value) return;
+  machine.value = m;
+  R.value = null;
+  if (!keepProject) { current.value = null; pname.value = ""; }
+  await loadSchema();
+  compute();
 }
 
 // ---------- 图 ----------
@@ -291,8 +321,9 @@ function timingSvg() {
   return s;
 }
 const esc = (x: string) => String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;");
-function line(series: number[][], colors: string[], zero: boolean, ref?: number) {
-  const phi: number[] = R.value.curves.phi;
+function line(c: Chart) {
+  const phi = c.x, zero = !!c.zero, ref = c.ref == null ? undefined : c.ref;
+  const series = c.series.map((x) => x.y), colors = c.series.map((x) => x.color);
   const all = series.flat().concat(ref != null ? [ref] : []).concat(zero ? [0] : []);
   let lo = Math.min(...all), hi = Math.max(...all);
   if (hi - lo < 1e-6) hi = lo + 1;
@@ -308,13 +339,14 @@ function line(series: number[][], colors: string[], zero: boolean, ref?: number)
   });
   return s;
 }
-function path(xs: number[], ys: number[]) {
+function path(c: Chart) {
+  const xs = c.x, ys = c.series[0].y;
   const xl = Math.min(...xs), xh = Math.max(...xs), yl = Math.min(...ys, 0), yh = Math.max(...ys, 0);
   const sc = Math.min(250 / (xh - xl || 1), 115 / (yh - yl || 1));
   const X = (v: number) => 150 + (v - (xl + xh) / 2) * sc, Y = (v: number) => 75 - (v - (yl + yh) / 2) * sc;
   let s = `<rect x="4" y="4" width="292" height="142" fill="#fff" stroke="#e1e6ea"/>`;
   s += `<line x1="8" x2="292" y1="${Y(0)}" y2="${Y(0)}" stroke="#8a9aa8" stroke-width="0.8"/>`;
-  s += `<text x="290" y="${Y(0) - 3}" font-size="9" text-anchor="end" fill="#6b7b88">${lang.value === "en" ? "plate" : "针板"}</text>`;
+  s += `<text x="290" y="${Y(0) - 3}" font-size="9" text-anchor="end" fill="#6b7b88">${esc(lang.value === "en" ? c.ref_en || "" : c.ref_zh || "")}</text>`;
   s += `<polygon fill="none" stroke="#2e9e6a" stroke-width="1.6" points="${xs.map((v, j) => `${X(v).toFixed(1)},${Y(ys[j]).toFixed(1)}`).join(" ")}"/>`;
   return s;
 }
@@ -332,6 +364,7 @@ async function pickProject(e: any) {
   const p = projects.value[Number(e.detail.value)];
   if (!p) return;
   const full = await request<Project>("GET", `/api/v1/sewing/projects/${p.id}`);
+  await switchMachine(full.machine || "lockstitch", true);
   current.value = full;
   pname.value = full.name;
   Object.assign(params, defaults, full.params || {});
@@ -346,7 +379,7 @@ async function save(asNew: boolean) {
   const name = pname.value.trim() || (current.value && !asNew ? current.value.name : "");
   if (!name) return (msg.value = t("sew.namePh"));
   try {
-    const body = { name, params: { ...params } };
+    const body = { name, machine: machine.value, params: { ...params } };
     const p = current.value && !asNew
       ? await request<Project>("PUT", `/api/v1/sewing/projects/${current.value.id}`, body)
       : await request<Project>("POST", "/api/v1/sewing/projects", body);
@@ -381,7 +414,7 @@ async function download(kind: string) {
     const res = await fetch(`${BASE}${isZip ? "/api/v1/sewing/freecad.zip" : `/api/v1/sewing/export/${kind}`}`, {
       method: isZip ? "GET" : "POST",
       headers: { Authorization: `Bearer ${token.value}`, "Content-Type": "application/json" },
-      body: isZip ? undefined : JSON.stringify({ params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value }),
+      body: isZip ? undefined : JSON.stringify({ machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value }),
     });
     if (!res.ok) {
       let code = `http_${res.status}`;
@@ -436,10 +469,8 @@ function contact() {
 }
 
 async function init() {
-  const s = await request<{ groups: Group[] }>("GET", "/api/v1/sewing/schema");
-  schema.value = s.groups;
-  for (const grp of s.groups) for (const p of grp.params) defaults[p.key] = p.default;
-  Object.assign(params, defaults);
+  if (props.startMachine && ["lockstitch", "overlock", "cover"].includes(props.startMachine)) machine.value = props.startMachine;
+  await loadSchema();
   compute();
   loadMe();
   // #ifdef H5
@@ -495,6 +526,16 @@ init();
 .tab { padding: 8px 14px; cursor: pointer; font-size: 14px; color: var(--wq-muted); border-bottom: 2px solid transparent; }
 .tab.on { color: var(--wq-ink); font-weight: 600; border-bottom-color: #1d4e75; }
 .pane { background: #fff; border: 1px solid var(--wq-line); border-top: 0; border-radius: 0 0 8px 8px; padding: 14px; }
+.mbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.mopt { padding: 8px 18px; border-radius: 8px; border: 1px solid var(--wq-line); background: #fff; cursor: pointer; font-weight: 600; font-size: 15px; }
+.mopt.on { background: #1d4e75; color: #fff; border-color: #1d4e75; }
+.tbl { border: 1px solid var(--wq-line); border-radius: 6px; overflow: hidden; font-size: 13px; }
+.tr { display: flex; border-top: 1px solid var(--wq-line); }
+.tr:first-child { border-top: 0; }
+.tr.th { background: #eaf2fa; font-weight: 600; }
+.td { flex: 1; padding: 6px 8px; min-width: 0; }
+.tr:last-child { font-weight: 600; }
+.frame.flat { aspect-ratio: 4 / 3; }
 .frame { position: relative; width: 100%; aspect-ratio: 16 / 10; background: #0b1220; border-radius: 6px; overflow: hidden; }
 .proto { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .empty { color: #c9d4d8; padding: 40px; text-align: center; }

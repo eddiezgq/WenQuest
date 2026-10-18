@@ -40,17 +40,24 @@ MIME = {"docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.
         "FCMacro": "text/x-python; charset=utf-8", "dxf": "image/vnd.dxf", "wqsew.json": "application/json"}
 
 
+MACHINE_RE = "^(lockstitch|overlock|cover)$"
+NO_CAD = {"cover"}                   # 绷缝机第一期没有三维零件（第 40 轮 Q2）
+
+
 class AnalyzeIn(BaseModel):
+    machine: str = Field(default="lockstitch", pattern=MACHINE_RE)
     params: dict[str, Any] = Field(default_factory=dict)
 
 
 class ProjectIn(BaseModel):
     name: str = Field(min_length=1, max_length=80)
     note: str = Field(default="", max_length=2000)
+    machine: str = Field(default="lockstitch", pattern=MACHINE_RE)
     params: dict[str, Any] = Field(default_factory=dict)
 
 
 class ExportIn(BaseModel):
+    machine: str = Field(default="lockstitch", pattern=MACHINE_RE)
     params: dict[str, Any] = Field(default_factory=dict)
     project: str = Field(default="", max_length=80)
     lang: str = "zh"
@@ -75,6 +82,8 @@ def register(app, m) -> None:
                      granted_by integer, ts integer)""")
         c.execute("""create table if not exists projects(id integer primary key, org text, owner integer, owner_name text, name text,
                      note text, params text, created integer, updated integer)""")
+        if "machine" not in [r[1] for r in c.execute("pragma table_info(projects)")]:      # 第 40 轮加机型
+            c.execute("alter table projects add column machine text default 'lockstitch'")
         return c
 
     def ip(req: Request) -> str:
@@ -112,27 +121,32 @@ def register(app, m) -> None:
 
     # ---------- 来宾也能用 ----------
     @app.get("/api/v1/sewing/schema")
-    async def schema():
-        return {"version": sewcore.VERSION,
+    async def schema(machine: str = "lockstitch"):
+        M = sewcore.get(machine)
+        return {"version": M.VERSION, "machine": M.MACHINE,
+                "machines": [{"key": k, "zh": sewcore.MACHINES[k].NAME[0], "en": sewcore.MACHINES[k].NAME[1]} for k in sewcore.ORDER],
                 "groups": [{"key": g, "zh": zh, "en": en,
                             "params": [{"key": k, "zh": pzh, "en": pen, "unit": u, "default": d, "min": lo, "max": hi, "step": st,
-                                        "choices": [{"key": c[0], "zh": c[1], "en": c[2]} for c in sewcore.CHOICES.get(k, [])]}
+                                        "choices": [{"key": c[0], "zh": c[1], "en": c[2]} for c in M.CHOICES.get(k, [])]}
                                        for k, pzh, pen, u, d, lo, hi, st in items]}
-                           for g, zh, en, items in sewcore.GROUPS],
-                "kinds": {k: v[1] for k, v in KINDS.items()}}
+                           for g, zh, en, items in M.GROUPS],
+                "kinds": {k: v[1] for k, v in KINDS.items() if not (M.MACHINE in NO_CAD and k in ("step", "macro", "dxf"))}}
 
     @app.post("/api/v1/sewing/analyze")
     async def analyze(body: AnalyzeIn, req: Request):
         limit(req)
-        r = sewcore.analyze(body.params)
-        r["proto"] = sewcore.proto_cfg(r["params"])
-        r["card"] = sewcore.adjust_card(r["params"])
+        r = sewcore.get(body.machine).analyze(body.params)
+        r["proto"] = r["view"]["cfg"]                 # 第 39 轮的字段名，网页旧版本还在用
         return r
 
+    PAGES = {"proto-lockstitch", "model-overlock", "looper"}
+
     @app.get("/api/v1/sewing/proto")
-    async def proto(lang: str = "zh"):
+    async def proto(lang: str = "zh", page: str = "proto-lockstitch"):
+        if page not in PAGES:
+            raise EngineError("not_found", "no such page", 404)
         base = Path(state.settings.textbook_dir) / "sewing" / "webed"
-        p = base / ("en/labs" if lang == "en" else "labs") / "proto-lockstitch.html"
+        p = base / ("en/labs" if lang == "en" else "labs") / f"{page}.html"
         if not p.exists():
             raise EngineError("not_found", "the 3D prototype is not installed on this server", 404)
         return HTMLResponse(p.read_text(encoding="utf-8"), headers={"Cache-Control": "public, max-age=600",
@@ -162,19 +176,19 @@ def register(app, m) -> None:
     async def projects(sess: Annotated[Session, Depends(m.current)]):
         lic = await need_license(sess)
         with db() as c:
-            rs = c.execute("select id,name,note,owner_name,created,updated from projects where org=? order by updated desc", (lic["org"],))
+            rs = c.execute("select id,name,note,owner_name,machine,created,updated from projects where org=? order by updated desc", (lic["org"],))
             return {"org": lic["org"], "projects": [dict(r) for r in rs]}
 
     @app.post("/api/v1/sewing/projects")
     async def create(body: ProjectIn, sess: Annotated[Session, Depends(m.current)]):
         lic = await need_license(sess)
         now = int(time.time())
-        p = sewcore.clean(body.params)
+        p = sewcore.get(body.machine).clean(body.params)
         with db() as c:
             if c.execute("select count(*) from projects where org=?", (lic["org"],)).fetchone()[0] >= 500:
                 raise EngineError("too_many", "at most 500 projects per company", 400)
-            cur = c.execute("insert into projects(org,owner,owner_name,name,note,params,created,updated) values(?,?,?,?,?,?,?,?)",
-                            (lic["org"], sess.user_id, lic.get("name") or "", body.name.strip(), body.note, json.dumps(p), now, now))
+            cur = c.execute("insert into projects(org,owner,owner_name,name,note,params,machine,created,updated) values(?,?,?,?,?,?,?,?,?)",
+                            (lic["org"], sess.user_id, lic.get("name") or "", body.name.strip(), body.note, json.dumps(p), body.machine, now, now))
             return row(c.execute("select * from projects where id=?", (cur.lastrowid,)).fetchone())
 
     @app.get("/api/v1/sewing/projects/{pid}")
@@ -188,8 +202,8 @@ def register(app, m) -> None:
         lic = await need_license(sess)
         with db() as c:
             own(c, pid, lic)
-            c.execute("update projects set name=?, note=?, params=?, updated=? where id=?",
-                      (body.name.strip(), body.note, json.dumps(sewcore.clean(body.params)), int(time.time()), pid))
+            c.execute("update projects set name=?, note=?, params=?, machine=?, updated=? where id=?",
+                      (body.name.strip(), body.note, json.dumps(sewcore.get(body.machine).clean(body.params)), body.machine, int(time.time()), pid))
             return row(c.execute("select * from projects where id=?", (pid,)).fetchone())
 
     @app.delete("/api/v1/sewing/projects/{pid}")
@@ -207,27 +221,30 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no such export", 404)
         lic = await need_license(sess)
         lang = "en" if body.lang.startswith("en") else "zh"
-        p = sewcore.clean(body.params)
+        M = sewcore.get(body.machine)
+        p = M.clean(body.params)
+        if M.MACHINE in NO_CAD and kind in ("step", "macro", "dxf"):
+            raise EngineError("not_found", "no 3D parts for this machine yet", 404)
         from .sewcore import cad, report
         if kind == "report":
-            data = report.calc_report(p, lang, body.project, lic["org"])
+            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE)
         elif kind == "card":
-            data = report.card_docx(p, lang, body.project)
+            data = report.card_docx(p, lang, body.project, machine=M.MACHINE)
         elif kind == "params":
-            data = report.params_xlsx(p, lang, body.project)
+            data = report.params_xlsx(p, lang, body.project, machine=M.MACHINE)
         elif kind == "step":
-            data = cad.to_step(p)
+            data = cad.to_step(p, machine=M.MACHINE)
             if data is None:
                 raise EngineError("unavailable", "STEP export is not installed on this server; use the FreeCAD macro", 503)
         elif kind == "macro":
-            data = cad.freecad_macro(p).encode("utf-8")
+            data = cad.freecad_macro(p, machine=M.MACHINE).encode("utf-8")
         elif kind == "dxf":
-            data = cad.to_dxf(p)
+            data = cad.to_dxf(p, machine=M.MACHINE)
         else:
-            data = json.dumps({"format": "wenquest-sewing", "machine": "lockstitch", "version": sewcore.VERSION,
+            data = json.dumps({"format": "wenquest-sewing", "machine": M.MACHINE, "version": M.VERSION,
                                "project": body.project, "params": p}, ensure_ascii=False, indent=1).encode("utf-8")
         label, ext = KINDS[kind]
-        stem = (body.project.strip() or "平缝机") if lang == "zh" else (body.project.strip() or "lockstitch")
+        stem = (body.project.strip() or M.NAME[0]) if lang == "zh" else (body.project.strip() or M.MACHINE)
         name = f"{stem}-{label if lang == 'zh' else kind}.{ext}"
         return Response(data, media_type=MIME[ext], headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(name)}",
                                                               "Cache-Control": "no-store"})
@@ -280,7 +297,7 @@ def workbench_zip() -> bytes:
         for f in sorted((core / "freecad").glob("*")):
             if f.is_file() and f.suffix in (".py", ".svg", ".txt") and f.name != "使用说明.txt":
                 z.write(f, root + f.name)
-        for f in ("__init__.py", "kit.py", "design.py", "cad.py"):
+        for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "machines.py", "cad.py"):
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")
     return b.getvalue()
