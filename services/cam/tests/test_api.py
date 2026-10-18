@@ -70,3 +70,12 @@ def test_manufacture_errors_in_chinese():
     p["mfg"] = {"process": "mill", "tool_r": 9}
     r = client.post("/api/manufacture", json={"project": p})
     assert r.status_code == 422 and "刀具比槽宽" in r.json()["detail"]["zh"]
+
+
+def test_image_copies_every_service_module():
+    """2026-10-18：镜像只拷了 app.py，新加的 system_api.py 没进镜像，线上 /cam/ 起不来（502）"""
+    from pathlib import Path
+    here = Path(__file__).resolve().parents[1]
+    docker = (here / "Dockerfile").read_text(encoding="utf-8")
+    mods = sorted(p.name for p in here.glob("*.py"))
+    assert "COPY services/cam/*.py ./" in docker or all(f"services/cam/{m}" in docker for m in mods), mods
