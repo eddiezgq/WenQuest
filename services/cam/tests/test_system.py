@@ -70,7 +70,7 @@ def test_torque_of_one_output():
     with pytest.raises(ValueError):
         S.analyse(s)  # an indexing program on an oscillating disk-cam follower is refused by the disk checks
     s["cams"][0]["type"] = "globoidal"
-    s["cams"][0]["globoidal"] = {"C": 200, "n": 8, "Rp": 50, "rr": 10, "b": 20, "L": 100, "phase_deg": 22.5}
+    s["cams"][0]["globoidal"] = {"C": 200, "n": 8, "Rp": 50, "rr": 10, "b": 20, "L": 70, "phase_deg": 22.5}
     r = S.analyse(s)
     u = np.linspace(0, 1, 200001)
     w = rpm * 2 * math.pi / 60

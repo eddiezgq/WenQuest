@@ -238,3 +238,24 @@ def _wrap(w: Writer, name: str, brep: str) -> str:
             "FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));", "ENDSEC;", "DATA;"]
     body = [f"#{i + 1}={r};" for i, r in enumerate(rows)]
     return "\n".join(head + body + ["ENDSEC;", "END-ISO-10303-21;"]) + "\n"
+
+
+def plate(name: str, outline: np.ndarray, thickness: float, bores: tuple[float, ...] = (),
+          tol: float = 0.002) -> tuple[str, dict]:
+    """A flat part: the closed counter-clockwise outline (2, N, dense) extruded by thickness, with round through
+    holes centred on the origin (radii in bores). Used for the tool-changer arm (round 39, step 4c)."""
+    if not thickness or thickness <= 0:
+        raise StepError("give the thickness of the part")
+    w = Writer()
+    k, c, dev = fit(outline, tol)
+    b, t = Loop(w, "bspline", 0.0, k, c), Loop(w, "bspline", thickness, k, c)
+    holes = [(Loop(w, "circle", 0.0, R=r), Loop(w, "circle", thickness, R=r)) for r in bores]
+    faces = [_plane_face(w, 0.0, False, [(b, False)] + [(hb, True) for hb, _ in holes]),
+             _plane_face(w, thickness, True, [(t, True)] + [(ht, False) for _, ht in holes]),
+             _side_face(w, b, t, True)]
+    faces += [_side_face(w, hb, ht, False) for hb, ht in holes]
+    shell = w.add(f"CLOSED_SHELL('',({','.join(faces)}))")
+    brep = w.add(f"MANIFOLD_SOLID_BREP('{_esc(name)}',{shell})")
+    area = _area(outline) - sum(math.pi * r * r for r in bores)
+    return _wrap(w, name, brep), {"fit_dev": {"outline": dev}, "ctrl": {"outline": c.shape[1]},
+                                  "volume": area * thickness}

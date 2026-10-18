@@ -22,7 +22,7 @@ ATC = {"unit": "rad", "advance_deg": 180, "segments": [
     {"kind": "rise", "deg": 60, "h_deg": 65, "law": "mod_sine"}, {"kind": "dwell", "deg": 50},
     {"kind": "rise", "deg": 120, "h_deg": 180, "law": "mod_sine"}, {"kind": "dwell", "deg": 50},
     {"kind": "return", "deg": 60, "h_deg": 65, "law": "mod_sine"}, {"kind": "dwell", "deg": 20}]}
-GEO = {"C": 150, "n": 8, "Rp": 40, "rr": 9, "b": 15, "L": 80, "phase_deg": 22.5}
+GEO = {"C": 170, "n": 8, "Rp": 40, "rr": 9, "b": 15, "L": 56, "phase_deg": 22.5}
 
 
 def test_indexing_program():
@@ -59,6 +59,8 @@ def test_envelope_normal_equals_roller_normal():
         n_num /= np.linalg.norm(n_num, axis=0)
         ok = on & np.roll(on, 1, axis=0) & np.roll(on, -1, axis=0)
         ok[:, [0, -1]] = False
+        if not ok.any():
+            continue
         cosang = np.abs((n_num * N).sum(0))[ok]
         worst = max(worst, float(np.max(1 - cosang)))
         count += int(ok.sum())
@@ -102,9 +104,8 @@ def test_dwell_flank_curvature():
     prog = {"unit": "rad", "advance_deg": 45, "segments": [
         {"kind": "dwell", "deg": 120}, {"kind": "rise", "deg": 120, "h_deg": 45, "law": "cycloidal"},
         {"kind": "dwell", "deg": 120}]}
-    geo = GEO | {"phase_deg": 0}
-    g, sfs = _flank(prog, geo, m=2880, k=21)
-    sf = next(s for s in sfs if s["roller"] == 1 and s["side"] == 1)  # roller at 45°, in the cam during the dwell
+    g, sfs = _flank(prog, GEO, m=2880, k=21)
+    sf = next(s for s in sfs if s["roller"] == 0 and s["side"] == 1)  # roller at 22.5°, in the cam during the dwell
     kap = G.flank_curvature(sf)
     j = 240  # 30° into the first dwell
     th = sf["theta"][j]
@@ -125,7 +126,7 @@ def test_undercut_found_only_when_too_fast():
     assert ck["engage"]["status"] == "pass" and ck["rib"]["value"] > 0
     fast = {"unit": "rad", "advance_deg": 180,
             "segments": [{"kind": "rise", "deg": 30, "h_deg": 180, "law": "mod_sine"}, {"kind": "dwell", "deg": 330}]}
-    bad = G.analyse({"program": fast, "globoidal": GEO | {"C": 90}})
+    bad = G.analyse({"program": fast, "globoidal": GEO | {"C": 90}})  # (pressure: no limit given → unknown)
     ck = {c["id"]: c for c in bad["checks"]}
     assert ck["undercut"]["status"] == "fail" and ck["pressure"]["status"] == "unknown"
 
@@ -135,5 +136,7 @@ def test_refusals():
         G.globoid(GEO | {"C": 40})  # rollers reach the cam axis
     with pytest.raises(G.GloboidError):
         G.globoid(GEO | {"n": 2})
+    with pytest.raises(G.GloboidError):
+        G.globoid(GEO | {"L": 70})  # longer than the arc of the rollers' inner ends
     with pytest.raises(G.GloboidError):
         G.analyse({"program": {"unit": "mm", "segments": [{"kind": "dwell", "deg": 360}]}, "globoidal": GEO})

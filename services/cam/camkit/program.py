@@ -137,6 +137,12 @@ class Program:
             start = end
         return s, s1, s2, s3
 
+    def position(self, theta) -> np.ndarray:
+        """s at cam angles θ continued past one turn: an indexing program keeps advancing (s(θ + 2π) = s(θ) +
+        advance), unlike eval, which repeats the first turn."""
+        th = np.asarray(theta, dtype=float)
+        return self.eval(th)[0] + self.advance * np.floor(th / (2 * pi))
+
     def _eval_table(self, th):
         from scipy.interpolate import CubicSpline  # noqa: PLC0415
 

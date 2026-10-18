@@ -71,6 +71,9 @@ class Globoid:
             raise GloboidError("the rollers start too close to the turret centre: make the pitch radius larger")
         if self.core <= 0:
             raise GloboidError("the rollers reach the cam axis: make the centre distance larger or the rollers shorter")
+        if self.L / 2 > 0.9 * self.rho1:
+            raise GloboidError("the cam is too long for the turret: half its length must stay inside the arc the "
+                               "rollers' inner ends describe (L/2 ≤ 0.9·(R_p − b/2))")
         if self.hand not in (1, -1):
             raise GloboidError("the hand is +1 or −1")
 
