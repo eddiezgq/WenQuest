@@ -121,7 +121,32 @@ def coupling_fn(name, p):
         return lambda q: ratchet_state(p, math.degrees(q))[0]
     if name == "ratchet_wheel":
         return lambda q: ratchet_state(p, math.degrees(q))[1]
+    if name == "table":
+        return table_fn(p)
     raise ValueError("不认识的耦合“{}”".format(name))
+
+
+def table_fn(p):
+    """表格耦合（第 39 轮第 4 步，问渠凸轮等设计软件送来的凸轮系统）：主动件转一圈内的从动件位置表
+    p = {"deg": [...], "value": [...], "advance": 每圈净前进量}，周期插值（三次样条），超过一圈按净前进量累加。"""
+    import numpy as np
+    from scipy.interpolate import CubicSpline
+    deg = np.asarray(p["deg"], float)
+    val = np.asarray(p["value"], float)
+    adv = float(p.get("advance") or 0.0)
+    if len(deg) < 8 or len(deg) != len(val) or np.any(np.diff(deg) <= 0) or deg[0] < 0 or deg[-1] >= 360:
+        raise ValueError("耦合表不对：至少 8 个点，转角在 0–360° 内逐个增大")
+    th = np.radians(deg)
+    k = adv / (2 * math.pi)
+    cs = CubicSpline(np.concatenate([th, [th[0] + 2 * math.pi]]), np.concatenate([val - k * th, [val[0] - k * th[0]]]),
+                     bc_type="periodic")
+
+    def f(q):
+        x = float(q) - th[0]
+        n = math.floor(x / (2 * math.pi))
+        r = x - n * 2 * math.pi + th[0]
+        return float(cs(r)) + k * r + adv * n
+    return f
 
 
 def couplings(mid, p):

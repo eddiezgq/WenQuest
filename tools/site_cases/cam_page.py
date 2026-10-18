@@ -20,7 +20,7 @@ EXTRA_CSS = """
   .camsteps .st { white-space: nowrap; font-size: 13px; }
   .camsteps .st.now { color: var(--ok, #2e7d5b); font-weight: 600; }
   .camsteps .st.next { color: var(--muted); }
-  .camex { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
+  .camex { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
   .camex a { display: block; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px; color: var(--ink); text-decoration: none; }
   .camex a:hover { border-color: var(--accent); }
   .camex b { display: block; font: 700 17px/1.4 var(--serif-zh); }
@@ -39,6 +39,9 @@ EXAMPLES = [
      ("5000 r/min 下弹簧压不住，从动件会跳离：看软件怎样把问题指出来。", "At 5000 r/min the spring cannot hold the follower: see how the check reports it.")),
     ("packaging-plate", ("包装机推料盘形凸轮", "Packaging machine pusher cam"),
      ("偏置直动滚子从动件，带载荷、弹簧和转速，校核全做。", "Offset translating roller follower with load, spring and speed; every check runs.")),
+    ("atc-globoidal", ("加工中心凸轮式换刀机构（凸轮系统）", "Machining-centre cam tool changer (a cam system)"),
+     ("一根轴上的弧面分度凸轮转换刀臂、槽凸轮拔刀插刀：时序与联锁、电机转矩、停歇振动、三维整机、四轴程序，换刀臂有限元与整机多体动力学。",
+      "On one camshaft a globoidal indexing cam turns the arm and a groove cam pulls and inserts the tools: timing and interlocks, motor torque, dwell vibration, the whole machine in 3D, a 4-axis program, arm FEA and multibody dynamics.")),
 ]
 
 STEPS = [
@@ -50,9 +53,17 @@ STEPS = [
      ("磨床 X–C 程序、铣削程序、DXF；程序仿真；STEP 模型；导入实测廓线，谐波分解、加速度误差、补偿磨削程序",
       "Grinder X–C and milling programs, DXF; program simulation; STEP models; measured profiles in, harmonic breakdown, acceleration error, compensated grinding programs"),
      "now"),
-    (("空间凸轮", "Spatial cams"),
-     ("圆柱凸轮、弧面分度凸轮：包络齿面、接触与干涉检查、三维模型、四轴程序",
-      "Cylindrical and globoidal indexing cams: enveloped flanks, contact and interference checks, 3D models, 4-axis programs"),
+    (("凸轮系统与弧面分度凸轮", "Cam systems and globoidal indexing cams"),
+     ("一根凸轮轴上几个凸轮：时序图、联锁、起停、电机转矩、停歇段残余振动、运动规律与最高转速搜索；弧面分度凸轮的包络齿面、压力角、根切、筋厚、接触应力，按加工方法生成的三维模型和四轴程序",
+      "Several cams on one camshaft: timing diagram, interlocks, start and stop, motor torque, residual vibration in the dwells, a search over motion laws and top speed; globoidal indexing cams with enveloped flanks, pressure angle, undercut, rib thickness, contact stress, a 3D model built the way it is machined, and a 4-axis program"),
+     "now"),
+    (("接入问渠 CAE", "Linked to WenQuest CAE"),
+     ("零件有限元强度、模态、疲劳和整机多体动力学（MuJoCo），在问渠数字工厂的计算服务上算，与本软件的解析结果对照；示例结果免登录可看",
+      "Part FEA, modes, fatigue and whole-machine multibody dynamics (MuJoCo), run on the WenQuest digital-factory compute service and compared with this software's own results; the example results are open without sign-in"),
+     "now"),
+    (("圆柱凸轮", "Cylindrical cams"),
+     ("圆柱槽凸轮的包络面、接触检查、三维模型和加工程序",
+      "Cylindrical groove cams: enveloped flanks, contact checks, 3D model and machining program"),
      "next"),
     (("FreeCAD 工作台与 AI 起草", "FreeCAD workbench and AI drafts"),
      ("同一个计算内核进 FreeCAD；一句话要求变成运动程序草稿，由代码检查后人确认",

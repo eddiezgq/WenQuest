@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-"""设计软件接口（学习平台第 41 轮）：问渠缝纫机设计软件（学习平台网关）把计算任务交给数字工厂的 cae 计算服务。
+"""设计软件接口（学习平台第 41 轮，第 39 轮第 4 步共用）：问渠缝纫机设计软件（学习平台网关）和问渠凸轮（凸轮服务）
+把计算任务交给数字工厂的 cae 计算服务。
 
-- 只认学习平台网关带的服务钥匙 WQ_FACTORY_CAE_KEY（Authorization: Bearer），不对外开放；
-- 任务一律登记在单独的工厂编号 wq_sewing_saas 下，提交人记成“单位::用户”，单位之间互相看不到；
+- 只认服务器对服务器的钥匙 WQ_FACTORY_CAE_KEY（Authorization: Bearer），不对外开放；
+- 任务按软件登记在单独的工厂编号下（app=sewing → wq_sewing_saas，默认；app=cam → wq_cam_saas），
+  提交人记成“单位::用户”，单位之间互相看不到；
 - 每个单位每天的任务数有上限（有限元 / 模态 / 动力学 WQ_DESIGN_SW_DAILY，默认 20；要用有限元的优化 WQ_DESIGN_SW_OPT_DAILY，默认 5）；
 - 只提交计算、读结果，不改零件库，不改生产数据（《数字工厂资源接口约定》第七节）。
 """
@@ -16,7 +18,16 @@ from fastapi.responses import Response
 from hub import cae_api
 
 FACTORY = "wq_sewing_saas"
+APPS = {"sewing": "wq_sewing_saas", "cam": "wq_cam_saas"}
 KINDS = ("fea", "mbd")
+
+
+def factory_of(app):
+    if app in (None, ""):
+        return FACTORY
+    if app not in APPS:
+        raise HTTPException(400, "不认识的设计软件")
+    return APPS[app]
 
 
 def _key():
@@ -44,8 +55,8 @@ def _org(org):
     return org
 
 
-def _jobs(org, kind=""):
-    params = {"factory": FACTORY, "limit": 500}
+def _jobs(org, kind="", factory=FACTORY):
+    params = {"factory": factory, "limit": 500}
     if kind:
         params["kind"] = kind
     js = cae_api.call("GET", "/jobs", params=params).json()["jobs"]
@@ -54,7 +65,7 @@ def _jobs(org, kind=""):
 
 def _mine(jid, org):
     j = cae_api.call("GET", "/jobs/{}".format(jid.replace("/", ""))).json()
-    if j.get("factory") != FACTORY or not str(j.get("owner") or "").startswith(_org(org) + "::"):
+    if j.get("factory") not in APPS.values() or not str(j.get("owner") or "").startswith(_org(org) + "::"):
         raise HTTPException(404, "没有这个任务")
     return j
 
@@ -82,27 +93,34 @@ def mount(app):
         data = await request.body()
         return cae_api.call("POST", "/geometry", content=data).json()
 
+    @app.post("/api/design-sw/mbd/model", dependencies=dep)
+    async def ds_mbd_model(request: Request, name: str = "model.xml"):
+        """上传设计软件自己生成的 MJCF（问渠凸轮的整机模型），返回可直接放进任务 model 的引用"""
+        data = await request.body()
+        return cae_api.call("POST", "/mbd/models/upload", params={"name": name[:60]}, content=data).json()
+
     @app.post("/api/design-sw/jobs", dependencies=dep)
     def ds_submit(body: dict = Body(...)):
         org = _org(body.get("org"))
+        factory = factory_of(body.get("app"))
         kind = body.get("kind") or "fea"
         if kind not in KINDS:
             raise HTTPException(400, "不认识的计算类型")
         today = time.time() - 86400
-        used = sum(1 for j in _jobs(org) if (j.get("created") or 0) > today)
+        used = sum(1 for j in _jobs(org, factory=factory) if (j.get("created") or 0) > today)
         if used >= daily_limit(kind):
             raise HTTPException(429, "本单位今天的计算次数已用完（每天 {} 个），明天再来或联系问渠调整".format(daily_limit(kind)))
         owner = "{}::{}".format(org, str(body.get("user") or "")[:40])
-        common = {"owner": owner, "owner_name": str(body.get("user_name") or "")[:60], "factory": FACTORY,
+        common = {"owner": owner, "owner_name": str(body.get("user_name") or "")[:60], "factory": factory,
                   "title": str(body.get("title") or "")[:80], "item": str(body.get("item") or "")[:40] or None}
         if kind == "fea":
             return cae_api.call("POST", "/jobs", json=dict(common, step_sha=body.get("step_sha"), setup=body.get("setup") or {})).json()
         return cae_api.call("POST", "/mbd/jobs", json=dict(common, model=body.get("model") or {}, setup=body.get("setup") or {})).json()
 
     @app.get("/api/design-sw/jobs", dependencies=dep)
-    def ds_jobs(org: str):
+    def ds_jobs(org: str, app: str = ""):
         org = _org(org)
-        js = _jobs(org)
+        js = _jobs(org, factory=factory_of(app))
         today = time.time() - 86400
         return {"jobs": js, "used_today": sum(1 for j in js if (j.get("created") or 0) > today), "daily_limit": daily_limit("fea")}
 

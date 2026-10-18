@@ -238,3 +238,151 @@ def _wrap(w: Writer, name: str, brep: str) -> str:
             "FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));", "ENDSEC;", "DATA;"]
     body = [f"#{i + 1}={r};" for i, r in enumerate(rows)]
     return "\n".join(head + body + ["ENDSEC;", "END-ISO-10303-21;"]) + "\n"
+
+
+def plate(name: str, outline: np.ndarray, thickness: float, bores: tuple[float, ...] = (),
+          tol: float = 0.002) -> tuple[str, dict]:
+    """A flat part: the closed counter-clockwise outline (2, N, dense) extruded by thickness, with round through
+    holes centred on the origin (radii in bores). Used for the tool-changer arm (round 39, step 4c)."""
+    if not thickness or thickness <= 0:
+        raise StepError("give the thickness of the part")
+    w = Writer()
+    k, c, dev = fit(outline, tol)
+    b, t = Loop(w, "bspline", 0.0, k, c), Loop(w, "bspline", thickness, k, c)
+    holes = [(Loop(w, "circle", 0.0, R=r), Loop(w, "circle", thickness, R=r)) for r in bores]
+    faces = [_plane_face(w, 0.0, False, [(b, False)] + [(hb, True) for hb, _ in holes]),
+             _plane_face(w, thickness, True, [(t, True)] + [(ht, False) for _, ht in holes]),
+             _side_face(w, b, t, True)]
+    faces += [_side_face(w, hb, ht, False) for hb, ht in holes]
+    shell = w.add(f"CLOSED_SHELL('',({','.join(faces)}))")
+    brep = w.add(f"MANIFOLD_SOLID_BREP('{_esc(name)}',{shell})")
+    area = _area(outline) - sum(math.pi * r * r for r in bores)
+    return _wrap(w, name, brep), {"fit_dev": {"outline": dev}, "ctrl": {"outline": c.shape[1]},
+                                  "volume": area * thickness}
+
+
+# ----------------------------------------------------------------------------------- outlines made of pieces
+# A flat part whose outline is a chain of exact circular arcs and B-spline pieces, so that the faces a finite-element
+# set-up needs (a fork, a bore) come out as true cylinders (round 39, step 4d).
+
+
+def fit_open(P: np.ndarray, tol: float = FIT_TOL):
+    """Clamped cubic B-spline through an open chain of points (2, N), refined until within tol of the polyline."""
+    N = P.shape[1]
+    m = min(N, 24)
+    while True:
+        idx = np.unique(np.linspace(0, N - 1, m).round().astype(int))
+        pts = P[:, idx]
+        k = 3 if len(idx) > 3 else len(idx) - 1
+        tck, u = splprep([pts[0], pts[1]], s=0, k=k)
+        um = 0.5 * (u[:-1] + u[1:])
+        q = np.array(splev(um, tck))
+        j = cKDTree(P.T).query(q.T)[1]
+        dev = float(np.max(_seg_dist_open(P, q, j))) if q.size else 0.0
+        if dev <= tol or m >= N:
+            t, c, kk = tck
+            n = len(t) - kk - 1
+            return np.asarray(t), np.array([c[0][:n], c[1][:n]]), kk, dev
+        m = min(N, m * 2)
+
+
+def _seg_dist_open(P, q, j):
+    N = P.shape[1]
+    best = np.full(q.shape[1], np.inf)
+    for o in (-1, 0):
+        a = P[:, np.clip(j + o, 0, N - 1)]
+        b = P[:, np.clip(j + o + 1, 0, N - 1)]
+        ab = b - a
+        L2 = np.sum(ab * ab, axis=0)
+        t = np.clip(np.sum((q - a) * ab, axis=0) / np.where(L2 > 0, L2, 1), 0, 1)
+        d = q - (a + ab * t)
+        best = np.minimum(best, np.hypot(d[0], d[1]))
+    return best
+
+
+def _knots_mult(t):
+    ks, ms = [], []
+    for v in t:
+        if ks and abs(v - ks[-1]) < 1e-14:
+            ms[-1] += 1
+        else:
+            ks.append(float(v))
+            ms.append(1)
+    return ks, ms
+
+
+def plate_pieces(name: str, pieces: list[dict], thickness: float, bores: tuple[float, ...] = (),
+                 tol: float = 0.002) -> tuple[str, dict]:
+    """pieces, in order around the outline (counter-clockwise, material on the left):
+         {"arc": (cx, cy, r), "start": (x, y), "end": (x, y), "ccw": bool}  — an exact circular arc
+         {"pts": (2, N) array}                                             — a smooth piece (B-spline)
+       each piece ends where the next begins. bores: round holes on the origin."""
+    if not thickness or thickness <= 0:
+        raise StepError("give the thickness of the part")
+    w = Writer()
+    zs = (0.0, thickness)
+    n = len(pieces)
+    starts = [tuple(pc["start"]) if "arc" in pc else (float(pc["pts"][0, 0]), float(pc["pts"][1, 0])) for pc in pieces]
+    vtx = {z: [w.add(f"VERTEX_POINT('',{w.pt(x, y, z)})") for x, y in starts] for z in zs}
+    edges = {z: [] for z in zs}
+    surfs, devs = [], []
+    for i, pc in enumerate(pieces):
+        a, b = i, (i + 1) % n
+        if "arc" in pc:
+            cx, cy, r = pc["arc"]
+            for z in zs:
+                place = w.add(f"AXIS2_PLACEMENT_3D('',{w.pt(cx, cy, z)},{w.dir(0, 0, 1)},{w.dir(1, 0, 0)})")
+                circ = w.add(f"CIRCLE('',{place},{_r(r)})")
+                sense = ".T." if pc["ccw"] else ".F."
+                edges[z].append(w.add(f"EDGE_CURVE('',{vtx[z][a]},{vtx[z][b]},{circ},{sense})"))
+            ax = w.add(f"AXIS2_PLACEMENT_3D('',{w.pt(cx, cy, 0)},{w.dir(0, 0, 1)},{w.dir(1, 0, 0)})")
+            surfs.append((w.add(f"CYLINDRICAL_SURFACE('',{ax},{_r(r)})"), bool(pc["ccw"])))
+        else:
+            P = np.asarray(pc["pts"], float)
+            t, c, k, dev = fit_open(P, tol)
+            devs.append(dev)
+            ks, ms = _knots_mult(t)
+            curves = {}
+            for z in zs:
+                cps = ",".join(w.pt(c[0, j], c[1, j], z) for j in range(c.shape[1]))
+                curves[z] = w.add(f"B_SPLINE_CURVE_WITH_KNOTS('',{k},({cps}),.UNSPECIFIED.,.F.,.F.,"
+                                  f"({','.join(str(x) for x in ms)}),({','.join(_r(x) for x in ks)}),.UNSPECIFIED.)")
+                edges[z].append(w.add(f"EDGE_CURVE('',{vtx[z][a]},{vtx[z][b]},{curves[z]},.T.)"))
+            vec = w.add(f"VECTOR('',{w.dir(0, 0, 1)},{_r(thickness)})")
+            surfs.append((w.add(f"SURFACE_OF_LINEAR_EXTRUSION('',{curves[0.0]},{vec})"), True))
+    seams = []
+    for i in range(n):
+        x, y = starts[i]
+        vec = w.add(f"VECTOR('',{w.dir(0, 0, 1)},{_r(thickness)})")
+        line = w.add(f"LINE('',{w.pt(x, y, 0)},{vec})")
+        seams.append(w.add(f"EDGE_CURVE('',{vtx[0.0][i]},{vtx[thickness][i]},{line},.T.)"))
+
+    def oe(e, fwd):
+        return w.add(f"ORIENTED_EDGE('',*,*,{e},{'.T.' if fwd else '.F.'})")
+
+    faces = []
+    for i, (surf, sense) in enumerate(surfs):
+        b = (i + 1) % n
+        el = w.add(f"EDGE_LOOP('',({oe(edges[0.0][i], True)},{oe(seams[b], True)},{oe(edges[thickness][i], False)},"
+                   f"{oe(seams[i], False)}))")
+        faces.append(w.add(f"ADVANCED_FACE('',({w.add(f'FACE_OUTER_BOUND({chr(39)}{chr(39)},{el},.T.)')}),{surf},"
+                           f"{'.T.' if sense else '.F.'})"))
+    holes = [(Loop(w, "circle", 0.0, R=r), Loop(w, "circle", thickness, R=r)) for r in bores]
+    for z, up in ((0.0, False), (thickness, True)):
+        order = [oe(e, up) for e in (edges[z] if up else edges[z][::-1])]
+        bounds = [w.add(f"FACE_OUTER_BOUND('',{w.add(f'EDGE_LOOP({chr(39)}{chr(39)},({chr(44).join(order)}))')},.T.)")]
+        for hb, ht in holes:
+            lp = ht if up else hb
+            bounds.append(w.add(f"FACE_BOUND('',{w.add(f'EDGE_LOOP({chr(39)}{chr(39)},({lp.oe(not up)}))')},.T.)"))
+        plane = w.add(f"PLANE('',{w.axis(z, 1.0 if up else -1.0)})")
+        faces.append(w.add(f"ADVANCED_FACE('',({','.join(bounds)}),{plane},.T.)"))
+    for hb, ht in holes:
+        p0 = w.pt(hb.start[0], hb.start[1], 0.0)
+        line = w.add(f"LINE('',{p0},{w.add(f'VECTOR({chr(39)}{chr(39)},{w.dir(0, 0, 1)},{_r(thickness)})')})")
+        seam = w.add(f"EDGE_CURVE('',{hb.vertex},{ht.vertex},{line},.T.)")
+        el = w.add(f"EDGE_LOOP('',({oe(seam, True)},{ht.oe(True)},{oe(seam, False)},{hb.oe(False)}))")
+        cyl = w.add(f"CYLINDRICAL_SURFACE('',{w.axis(0.0)},{_r(abs(hb.start[0]))})")
+        faces.append(w.add(f"ADVANCED_FACE('',({w.add(f'FACE_OUTER_BOUND({chr(39)}{chr(39)},{el},.T.)')}),{cyl},.F.)"))
+    shell = w.add(f"CLOSED_SHELL('',({','.join(faces)}))")
+    brep = w.add(f"MANIFOLD_SOLID_BREP('{_esc(name)}',{shell})")
+    return _wrap(w, name, brep), {"fit_dev": {"outline": max(devs) if devs else 0.0}, "pieces": n}

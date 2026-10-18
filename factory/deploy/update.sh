@@ -14,7 +14,7 @@ APP="${1:-}"; BRIDGE="${2:-}"; OPENPLC="${3:-}"
 [ -n "$(envval WQ_FACTORY_READ_KEY)" ] || envset WQ_FACTORY_READ_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 工程任务单钥匙（第 11 轮 2.7（5））：学习平台下达任务单、读进度和分数；公共工厂和班级工厂共用，学习平台部署时复制过去
 [ -n "$(envval WQ_FACTORY_TASK_KEY)" ] || envset WQ_FACTORY_TASK_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
-# 设计软件 CAE 钥匙（学习平台第 41 轮）：缝纫机设计软件经 /api/design-sw/* 提交计算任务；学习平台部署时复制过去
+# 设计软件钥匙（第 39 轮第 4 步 / 第 41 轮）：问渠凸轮、缝纫机设计软件提交 CAE 计算；学习平台部署时复制过去
 [ -n "$(envval WQ_FACTORY_CAE_KEY)" ] || envset WQ_FACTORY_CAE_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 数字孪生真设备接入钥匙（第 15 轮）：现场采集器 POST /api/twin/telemetry 时用
 [ -n "$(envval WQ_TWIN_DEVICE_KEY)" ] || envset WQ_TWIN_DEVICE_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"

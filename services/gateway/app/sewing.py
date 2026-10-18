@@ -164,6 +164,20 @@ def register(app, m) -> None:
         lic = license_of(sess.user_id)
         return {"login": True, "licensed": bool(lic) or admin, "admin": admin, "org": (lic or {}).get("org") or ("问渠" if admin else "")}
 
+    @app.get("/api/v1/industry/me")
+    async def industry_me(req: Request, sess: Annotated[Session | None, Depends(optional)]):
+        """问渠凸轮等不在本应用里的行业专用软件（第 39 轮第 4 步，挂在官网 /cam/）问：谁登录了（全站登录 cookie 或
+        Bearer），账号给哪个单位开通了。开通与缝纫机设计软件是同一份企业授权。"""
+        if not sess:
+            tok = req.cookies.get("wq_sso", "")
+            sess = state.codec.read(tok) if tok else None
+        if not sess:
+            return {"login": False, "licensed": False, "org": "", "user_id": None, "name": ""}
+        admin = await m.accounts_is_admin(sess)
+        lic = license_of(sess.user_id)
+        return {"login": True, "licensed": bool(lic) or admin, "org": (lic or {}).get("org") or ("问渠" if admin else ""),
+                "user_id": sess.user_id, "name": (lic or {}).get("name") or ""}
+
     # ---------- 机型项目（已开通） ----------
     def row(r) -> dict:
         d = dict(r)

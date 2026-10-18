@@ -83,6 +83,8 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^profile points need a cam outline", "用 XY 点时，凸轮廓线要能被从中心出发的每条射线只穿过一次"),
     (r"^choose orders between 1 and the highest order$", "补偿阶次要在 1 和最高阶数之间"),
     (r"^give the actual wheel radius$", "请填修整后的实际砂轮半径"),
+    (r"^a disk cam brings its follower back", "盘形凸轮每转一圈从动件都回到原位：净分度的运动程序要用弧面分度凸轮"),
+    (r"^the net movement over a cycle differs from the index advance by (.*)$", r"一个循环的净转角与分度角相差 \1"),
     (r"^the tool centre path is not star-shaped", "刀心轨迹对凸轮中心不是星形，X–C 磨削走不了，请改用铣削或小砂轮"),
 ]
 
@@ -145,8 +147,10 @@ def laws():
 def examples():
     out = []
     for f in sorted(EXAMPLES.glob("*.json")):
+        if f.name.endswith(".cae.json"):
+            continue  # an example's precomputed CAE results (round 39, step 4)
         d = json.loads(f.read_text(encoding="utf-8"))
-        out.append({"id": f.stem, "title": d.get("title", {"zh": f.stem, "en": f.stem})})
+        out.append({"id": f.stem, "title": d.get("title", {"zh": f.stem, "en": f.stem}), "kind": d.get("kind", "cam")})
     return out
 
 
@@ -336,6 +340,10 @@ async def synthetic_ep(request: Request):
     p = await project_of(request)
     return run(lambda: {"text": ME.synthetic(p)})
 
+
+import system_api  # noqa: E402  (cam systems, round 39 step 4)
+
+system_api.register(app, run, project_of)
 
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")

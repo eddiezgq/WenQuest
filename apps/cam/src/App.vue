@@ -12,6 +12,11 @@ import Checks from './components/Checks.vue'
 import Report from './components/Report.vue'
 import MfgWorkspace from './components/MfgWorkspace.vue'
 import MeasureWorkspace from './components/MeasureWorkspace.vue'
+import SystemWorkspace from './components/SystemWorkspace.vue'
+import System3D from './components/System3D.vue'
+import CaePanel from './components/CaePanel.vue'
+import SystemReport from './components/SystemReport.vue'
+import { kind, system, openSystem, sysMode, analyseSystemSoon, loadExampleCae, sysResult } from './sysstore'
 
 const tab = ref('program')
 const theta = ref(0)
@@ -34,11 +39,19 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
 
 async function openExample(id) {
   if (!id) return
-  try { replace(await api('/examples/' + id)); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null } catch (e) { error.value = e }
+  try {
+    const p = await api('/examples/' + id)
+    if (p.kind === 'system') { openSystem(p, id); return }
+    kind.value = 'cam'
+    replace(p); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
+  } catch (e) { error.value = e }
 }
-function fresh() { replace(blank()); mfgResult.value = null; measResult.value = null; compResult.value = null }
+function fresh() { kind.value = 'cam'; replace(blank()); mfgResult.value = null; measResult.value = null; compResult.value = null }
+const isSys = computed(() => kind.value === 'system' && system.cams)
+const modeList = computed(() => (isSys.value ? [['sys', 'modeSys'], ['sys3d', 'modeSys3d'], ['cae', 'modeCae']] : [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]))
+const curMode = computed({ get: () => (isSys.value ? sysMode.value : mode.value), set: (v) => { if (isSys.value) sysMode.value = v; else mode.value = v } })
 function saveFile() {
-  const blob = new Blob([JSON.stringify(project, null, 1)], { type: 'application/json' })
+  const blob = new Blob([JSON.stringify(isSys.value ? system : project, null, 1)], { type: 'application/json' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
   a.download = ((lang.value === 'zh' ? project.title.zh : project.title.en) || 'cam').replace(/[\\/:*?"<>|]+/g, '_') + '.wqcam.json'
@@ -48,12 +61,16 @@ function saveFile() {
 async function openFile(e) {
   const f = e.target.files?.[0]
   if (!f) return
-  try { replace(JSON.parse(await f.text())) } catch { error.value = { message: 'not a project file', zh: '不是问渠凸轮的项目文件' } }
+  try {
+    const p = JSON.parse(await f.text())
+    if (p.kind === 'system') openSystem(p, p.example_id || '')
+    else { kind.value = 'cam'; replace(p) }
+  } catch { error.value = { message: 'not a project file', zh: '不是问渠凸轮的项目文件' } }
   e.target.value = ''
 }
 const titleText = computed({
-  get: () => (lang.value === 'zh' ? project.title.zh : project.title.en),
-  set: (v) => { project.title = { ...project.title, [lang.value]: v } },
+  get: () => { const tt = isSys.value ? system.title || {} : project.title; return lang.value === 'zh' ? tt.zh : tt.en },
+  set: (v) => { if (isSys.value) system.title = { ...(system.title || {}), [lang.value]: v }; else project.title = { ...project.title, [lang.value]: v } },
 })
 
 onMounted(async () => {
@@ -62,18 +79,20 @@ onMounted(async () => {
   const ex = new URLSearchParams(location.search).get('example')
   if (ex) await openExample(ex)
   analyseSoon(0)
+  if (isSys.value) { analyseSystemSoon(0); loadExampleCae() }
   if (embed) playing.value = true
 })
 </script>
 
 <template>
-  <Report v-if="showReport" @close="showReport = false" />
+  <SystemReport v-if="showReport && isSys" @close="showReport = false" />
+  <Report v-else-if="showReport" @close="showReport = false" />
   <div v-else class="shell" :class="{ embed }">
     <header class="top">
       <a class="brand" :href="embed ? '/cam/' : '/cases/cam.html'" :target="embed ? '_blank' : null" rel="noopener"><b>{{ t('app') }}</b><small>{{ t('tagline') }}</small></a>
       <input v-if="!embed" v-model="titleText" class="title" :aria-label="t('title')">
       <nav v-if="!embed" class="modes" :aria-label="t('app')">
-        <button v-for="[k, l] in [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]" :key="k" type="button" :class="{ on: mode === k }" @click="mode = k">{{ t(l) }}</button>
+        <button v-for="[k, l] in modeList" :key="k" type="button" :class="{ on: curMode === k }" @click="curMode = k">{{ t(l) }}</button>
       </nav>
       <div class="tools">
         <select class="dark" :aria-label="t('examples')" @change="openExample($event.target.value); $event.target.value = ''">
@@ -85,13 +104,19 @@ onMounted(async () => {
           <button type="button" class="dark" @click="fileInput.click()">{{ t('open') }}</button>
           <input ref="fileInput" type="file" accept=".json,application/json" hidden @change="openFile">
           <button type="button" class="dark" @click="saveFile">{{ t('save') }}</button>
-          <button type="button" class="accent" :disabled="!result" @click="showReport = true">{{ t('report') }}</button>
+          <button type="button" class="accent" :disabled="isSys ? !sysResult : !result" @click="showReport = true">{{ t('report') }}</button>
         </template>
         <button type="button" class="dark lang" @click="setLang(lang === 'zh' ? 'en' : 'zh')">{{ lang === 'zh' ? 'EN' : '中' }}</button>
       </div>
     </header>
 
-    <MfgWorkspace v-if="mode === 'mfg' && !embed" />
+    <template v-if="isSys">
+      <System3D v-if="embed" />
+      <SystemWorkspace v-else-if="sysMode === 'sys'" />
+      <System3D v-else-if="sysMode === 'sys3d'" />
+      <CaePanel v-else />
+    </template>
+    <MfgWorkspace v-else-if="mode === 'mfg' && !embed" />
     <MeasureWorkspace v-else-if="mode === 'measure' && !embed" />
     <main v-else class="work">
       <aside class="edit">

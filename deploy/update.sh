@@ -46,7 +46,7 @@ if [ -r "$FACTORY_ENV" ]; then
         envset WQ_FACTORY_TASK_KEY "$tk"
         log "Digital factory task key updated."
     fi
-    # 缝纫机设计软件接 CAE（第 41 轮）：设计软件钥匙
+    # 设计软件钥匙（第 39 轮第 4 步 / 第 41 轮）：问渠凸轮、缝纫机设计软件提交 CAE 计算
     ck=$(grep -E '^WQ_FACTORY_CAE_KEY=' "$FACTORY_ENV" | tail -n 1 | cut -d= -f2- || true)
     if [ -n "$ck" ] && [ "$ck" != "$(envval WQ_FACTORY_CAE_KEY)" ]; then
         envset WQ_FACTORY_CAE_KEY "$ck"
