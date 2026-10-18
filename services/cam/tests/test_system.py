@@ -107,3 +107,22 @@ def test_atc_example():
     assert idx["vib"] and all(d["tip_um"] >= 0 for d in idx["vib"])
     pl = next(c for c in r["cams"] if c["id"] == "plunge")
     assert {c["id"]: c for c in pl["checks"]}["phi_rise"]["status"] == "pass"
+
+
+def test_design_search():
+    """With an allowed vibration, the search finds the highest speed for each law; just above it the limit fails,
+    at it the limit holds. Without any speed limit nothing is invented: the least-vibration feasible law is shown."""
+    from camkit import system_opt as O
+
+    s = atc()
+    r = O.optimise(s)
+    assert r["basis"] == "least vibration" and set(r["limits_missing"]) == {"vib", "peak", "speed"}
+    assert r["best"] is None or not r["best"]["fails"]
+    s["limits"]["vib_um"] = 60
+    r = O.optimise(s)
+    best = r["best"]
+    assert r["basis"] == "fastest" and best["rpm_max"]
+    lim = {"vib": 60, "peak": None, "speed": None}
+    law = O.with_law(s, best["law"])
+    assert O.ok_at(law, best["rpm_max"], lim)[0]
+    assert not O.ok_at(law, best["rpm_max"] * 1.03, lim)[0]
