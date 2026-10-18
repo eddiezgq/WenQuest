@@ -1,7 +1,7 @@
 <script setup>
 // 问渠凸轮 (round 39, step 2): edit on the left, the cam turning in the middle, checks on the right, curves below.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { project, result, error, busy, analyseSoon, loadLaws, replace, blank } from './store'
+import { project, result, error, busy, analyseSoon, loadLaws, replace, blank, mode, mfgResult, measResult, compResult } from './store'
 import { api } from './api'
 import { t, lang, setLang } from './i18n'
 import ProgramEditor from './components/ProgramEditor.vue'
@@ -10,6 +10,8 @@ import CamView from './components/CamView.vue'
 import Charts from './components/Charts.vue'
 import Checks from './components/Checks.vue'
 import Report from './components/Report.vue'
+import MfgWorkspace from './components/MfgWorkspace.vue'
+import MeasureWorkspace from './components/MeasureWorkspace.vue'
 
 const tab = ref('program')
 const theta = ref(0)
@@ -32,9 +34,9 @@ onBeforeUnmount(() => cancelAnimationFrame(raf))
 
 async function openExample(id) {
   if (!id) return
-  try { replace(await api('/examples/' + id)); theta.value = 0 } catch (e) { error.value = e }
+  try { replace(await api('/examples/' + id)); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null } catch (e) { error.value = e }
 }
-function fresh() { replace(blank()) }
+function fresh() { replace(blank()); mfgResult.value = null; measResult.value = null; compResult.value = null }
 function saveFile() {
   const blob = new Blob([JSON.stringify(project, null, 1)], { type: 'application/json' })
   const a = document.createElement('a')
@@ -70,6 +72,9 @@ onMounted(async () => {
     <header class="top">
       <a class="brand" :href="embed ? '/cam/' : '/cases/cam.html'" :target="embed ? '_blank' : null" rel="noopener"><b>{{ t('app') }}</b><small>{{ t('tagline') }}</small></a>
       <input v-if="!embed" v-model="titleText" class="title" :aria-label="t('title')">
+      <nav v-if="!embed" class="modes" :aria-label="t('app')">
+        <button v-for="[k, l] in [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]" :key="k" type="button" :class="{ on: mode === k }" @click="mode = k">{{ t(l) }}</button>
+      </nav>
       <div class="tools">
         <select class="dark" :aria-label="t('examples')" @change="openExample($event.target.value); $event.target.value = ''">
           <option value="">{{ t('examples') }}…</option>
@@ -86,7 +91,9 @@ onMounted(async () => {
       </div>
     </header>
 
-    <main class="work">
+    <MfgWorkspace v-if="mode === 'mfg' && !embed" />
+    <MeasureWorkspace v-else-if="mode === 'measure' && !embed" />
+    <main v-else class="work">
       <aside class="edit">
         <nav class="tabs">
           <button v-for="[k, l] in [['program', 'tabProgram'], ['mech', 'tabMech'], ['loads', 'tabLoads'], ['limits', 'tabLimits']]" :key="k" type="button" :class="{ on: tab === k }" @click="tab = k">{{ t(l) }}</button>

@@ -49,7 +49,7 @@ STEPS = [
     (("加工程序与误差补偿", "Machining programs and error compensation"),
      ("磨床 X–C 程序、铣削程序、DXF；程序仿真；STEP 模型；导入实测廓线，谐波分解、加速度误差、补偿磨削程序",
       "Grinder X–C and milling programs, DXF; program simulation; STEP models; measured profiles in, harmonic breakdown, acceleration error, compensated grinding programs"),
-     "next"),
+     "now"),
     (("空间凸轮", "Spatial cams"),
      ("圆柱凸轮、弧面分度凸轮：包络齿面、接触与干涉检查、三维模型、四轴程序",
       "Cylindrical and globoidal indexing cams: enveloped flanks, contact and interference checks, 3D models, 4-axis programs"),
