@@ -165,12 +165,9 @@ def test_story_flow(env):
     from hub import energy as EN
     fs = EN._state(db, "teach")["faults"]
     assert fs["forgot:saw-01"]["lab"] and fs["ht_peak"]["lab"]
-    from hub.ont import plan as PL
-    assert PL.calendar(db, "teach").mode == "shift"                       # 按班次：别的设备下班关了，只有忘关的那台整夜空转
     db.x("insert into anomaly (mode, rule, fkey, domain, subject_type, subject_key, severity, role, title, detail, first_seen, last_seen) "
          "values ('teach','N2','saw-01','energy','Machine','saw-01','info','planner','SAW-01 空转 12 小时','{}'::jsonb, now(), now())")
     assert _beat(ST.tick(H), 7)["seen"][0]["rule"] == "N2"
-    assert PL.calendar(db, "teach").mode == "continuous"                  # 空转看到了就换回原来的班次
 
     # 第 8 幕要等订单做完
     r = ST.run(db)

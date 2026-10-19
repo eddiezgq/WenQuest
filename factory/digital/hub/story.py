@@ -149,9 +149,6 @@ def start(H, who, code="two_weeks", speed=None, auto=False, reset=None, wrapup=T
     db = H.db
     init(db)
     sc = scenario(code)
-    old = run(db)
-    if old is not None:
-        _restore_calendar(db, old, getattr(H, "mes", None), who)
     db.x("update story_run set status='ended', ended_at=now() where mode=%s and status <> 'ended'", (MODE,))
     sp = float(speed or sc.get("speed") or 30)
     if reset is not None:
@@ -204,27 +201,10 @@ def fast_forward(H, on=True, speed=None):
     return state(db)
 
 
-def _restore_calendar(db, r, mes=None, who="情景导演"):
-    """第 7 幕把车间切到了按班次：情景结束时换回原来的班次日历"""
-    before = (r.get("state") or {}).get("calendar_before")
-    if not before:
-        return
-    from hub.ont import plan as PL
-    from sim.calendar import Calendar
-    PL.save_calendar(db, MODE, Calendar.from_dict(before), who)
-    _patch(db, r["id"], {"calendar_before": None})
-    if mes is not None:
-        try:
-            PL.push_calendar(mes, db, MODE, who)
-        except Exception:  # noqa: BLE001
-            log.exception("情景结束：班次日历没发出去")
-
-
 def end(db, who, mes=None):
     r = run(db)
     if r is None:
         raise ValueError("还没有开始情景")
-    _restore_calendar(db, r, mes, who)
     db.x("update story_run set status='ended', ended_at=now(), auto=false where id=%s", (r["id"],))
     _patch(db, r["id"], {"ended_by": who})
     return state(db)
@@ -418,22 +398,9 @@ def _step_overdue(H, r, sc, st, who):
 
 
 def _step_energy(H, r, sc, st, who):
-    """第 7 幕：带锯床下班忘关、热处理峰时开炉。
-    车间切到“按班次”（下班关机）：教学模式缺省 24 小时连续运转，所有没活的设备都整夜空转，空转规则只报最多的几台，
-    功率小的带锯床排不上，这一幕就等不到（2026-10-18 部署演练）；按班次时别的设备下班关了，只有忘关的那台整夜空转"""
     from hub import energy as EN
-    from hub.ont import plan as PL
     db = H.db
     unit = st.get("unit") or "grd-01"
-    cal = PL.calendar(db, MODE)
-    if cal.mode != "shift":
-        _patch(db, r["id"], {"calendar_before": cal.to_dict()})         # 情景结束（或重新开始）时换回来
-        d = dict(cal.to_dict(), mode="shift")
-        PL.save_calendar(db, MODE, type(cal).from_dict(d), who)
-        try:
-            PL.push_calendar(H.mes, db, MODE, who)
-        except Exception:  # noqa: BLE001
-            log.exception("情景第 7 幕：车间切按班次没发出去")
     EN.set_sim(db, MODE, True)
     out = [EN.inject(H, MODE, "forgot", who, unit=unit, hours=float(st.get("hours") or 24))["text"]]
     keys = ["forgot:" + unit]
@@ -550,9 +517,6 @@ def tick(H, mode=MODE):
         ok = len(seen) >= len(b.get("expect") or []) and not pend
         if seen != (row["seen"] or []) or ok != row["ok"]:
             db.x("update story_beat set seen=%s, ok=%s where run_id=%s and beat_no=%s", (Jsonb(seen), ok, r["id"], n))
-        if ok and any(st_.get("step") == "energy" for st_ in b.get("do") or []) and (r["state"] or {}).get("calendar_before"):
-            _restore_calendar(db, r, getattr(H, "mes", None))        # 空转已经看到了：换回原来的班次，免得后面等订单做完时车间只在白天干活
-            r = run(db, run_id=r["id"])
     r = run(db, run_id=r["id"])
     try:
         _wrapup(H, r)
