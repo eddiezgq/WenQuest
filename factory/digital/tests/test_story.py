@@ -145,6 +145,10 @@ def test_story_flow(env):
     st = ST.next_beat(H, "王老师")
     assert "GRD-01" in _beat(st, 4)["note"]
     _detect(H)
+    # 同一件事情景开始前就开着（前面的实验让同一个人同一班请过假）：first_seen 是以前的，只要情景里规则又看到了也算
+    db.x("update anomaly set first_seen = first_seen - interval '3 days', last_seen = last_seen - interval '3 days' where mode='teach' and rule='H2'")
+    assert not _beat(ST.tick(H), 4)["seen"]
+    _detect(H)
     assert _beat(ST.tick(H), 4)["seen"][0]["rule"] == "H2"
 
     # 第 5 幕：重大隐患 → E1

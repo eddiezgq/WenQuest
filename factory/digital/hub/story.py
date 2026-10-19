@@ -455,17 +455,21 @@ def _match(a, about, sc):
 
 
 def _seen(db, r, sc, b, row):
-    """这一幕预计的异常：情景开始以后出现过的（开着或已处理的都算）"""
+    """这一幕预计的异常：情景开始以后出现过的（开着或已处理的都算）。
+    同一件事（同一规则、同一键，例如“10-18 晚班 GRD-01 没人”）情景开始前就开着、或 24 小时内关过又被重新打开时，
+    first_seen 是以前的；只要情景开始后规则又看到了它（last_seen 在情景开始后）也算——不然这一幕会一直等不到
+    （2026-10-18 数字工厂部署演练：前面的“人员与排班”实验刚让同一个人同一班请过假，第 4 幕随钟点时过时不过）"""
     out = []
     since = r["started_at"]
     for e in b.get("expect") or []:
         if e.get("rule"):
-            cands = db.q("select id, rule, fkey, subject_key, title, detail, status, first_seen, severity from anomaly where mode=%s and rule=%s "
-                         "and first_seen >= %s order by id", (MODE, e["rule"], since))
+            cands = db.q("select id, rule, fkey, subject_key, title, detail, status, first_seen, last_seen, severity from anomaly "
+                         "where mode=%s and rule=%s and (first_seen >= %s or last_seen >= %s) order by id", (MODE, e["rule"], since, since))
             hit = next((a for a in cands if _match(a, e.get("about"), sc)), None)
             if hit:
+                t = hit["first_seen"] if hit["first_seen"] >= since else hit["last_seen"]
                 out.append({"id": hit["id"], "rule": hit["rule"], "title": hit["title"], "status": hit["status"], "severity": hit["severity"],
-                            "first_seen": hit["first_seen"].isoformat(), "after_s": round((hit["first_seen"] - row["executed_at"]).total_seconds())})
+                            "first_seen": t.isoformat(), "after_s": round((t - row["executed_at"]).total_seconds())})
         elif e.get("check") == "order_released":
             if r["so"] and (r["state"] or {}).get("wo"):
                 out.append({"check": "order_released", "title": "订单 {} 已写进 ERPNext，工单 {} 已下达车间".format(r["so"], r["state"]["wo"])})
