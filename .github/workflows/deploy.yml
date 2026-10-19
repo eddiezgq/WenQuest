@@ -473,6 +473,14 @@ jobs:
           ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for u in "$D/vendor/VERSION" "$D/vendor/fonts/noto-sans-sc.css" "learn.$D/vendor/three/r128/three.min.js" "learn.$D/vendor/katex/0.16.9/katex.min.js" "$D/"; do h=${u%%/*}; c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$h:443:127.0.0.1" "https://$u"); echo "$c https://$u"; done' | tee /tmp/vendor.log
           if grep -qv '^200 ' /tmp/vendor.log; then echo "::warning title=Fonts and libraries::$(grep -v '^200 ' /tmp/vendor.log | tr '\n' ' ')"; fi
 
+      - name: Cam design site answers (问渠凸轮 /cam/；不通时把容器状态和日志作为注释发出来)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for i in $(seq 1 12); do c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$D:443:127.0.0.1" "https://$D/cam/api/health"); [ "$c" = 200 ] && break; sleep 5; done; echo "cam $c"; if [ "$c" != 200 ]; then . deploy/lib.sh; dc ps -a cam; dc logs --tail 80 cam; fi' > /tmp/cam.log 2>&1 || true
+          cat /tmp/cam.log
+          if ! grep -q '^cam 200$' /tmp/cam.log; then python3 factory/deploy/ci_annotate.py "Cam site /cam/" /tmp/cam.log 120; exit 1; fi
+
       - name: Disk space on the server (round 19)
         if: env.SKIP != '1'
         continue-on-error: true
