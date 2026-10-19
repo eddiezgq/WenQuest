@@ -1,0 +1,887 @@
+1
+00:00:00,600 --> 00:00:01,731
+Hi everyone,
+
+2
+00:00:01,751 --> 00:00:08,639
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,039 --> 00:00:15,139
+This is Lecture 10, coverstitch and chainstitch machines.
+
+4
+00:00:15,539 --> 00:00:20,593
+Turn a T-shirt over and look at the hem. Two straight lines on the face,
+
+5
+00:00:20,613 --> 00:00:23,694
+and a net covering the raw edge on the back.
+
+6
+00:00:23,714 --> 00:00:28,486
+The back rise of a pair of jeans has two strong rows of chainstitch.
+
+7
+00:00:28,506 --> 00:00:33,138
+Neither uses a rotary hook or a bobbin. A looper forms the stitch,
+
+8
+00:00:33,158 --> 00:00:37,930
+and the thread comes straight off large cones. Today, two questions.
+
+9
+00:00:37,950 --> 00:00:40,961
+Which two moments make or break stitch 401,
+
+10
+00:00:40,981 --> 00:00:44,696
+and how many cones does a batch of T-shirt hems need?
+
+11
+00:00:46,216 --> 00:00:47,956
+The shop-floor problem.
+
+12
+00:00:48,356 --> 00:00:52,704
+A knitwear factory has an order for 1000 T-shirts:
+
+13
+00:00:52,724 --> 00:00:58,819
+about 100 centimetres of hem and 72 of cuffs, 172 centimetres a shirt,
+
+14
+00:00:58,839 --> 00:01:05,283
+sewn in 406 two-needle three-thread on a cylinder-bed coverstitch machine,
+
+15
+00:01:05,303 --> 00:01:11,747
+at 7 stitches per centimetre, fabric 0.5 millimetres, gauge 4 millimetres,
+
+16
+00:01:11,767 --> 00:01:15,329
+wastage 12 percent, 5000 metres per cone.
+
+17
+00:01:15,729 --> 00:01:20,519
+The store supervisor takes the published ratio of 18,
+
+18
+00:01:20,539 --> 00:01:25,602
+works out a total length and plans to divide it by 5000.
+
+19
+00:01:26,002 --> 00:01:30,606
+How much does each thread need, how many cones of each,
+
+20
+00:01:30,626 --> 00:01:33,381
+and what's wrong with his method?
+
+21
+00:01:34,901 --> 00:01:38,481
+The chainstitch family.
+
+22
+00:01:40,001 --> 00:01:45,222
+What chainstitch gains: thread comes from large cones, with no bobbin,
+
+23
+00:01:45,242 --> 00:01:49,115
+so long seams go in one pass; the loops can open up,
+
+24
+00:01:49,135 --> 00:01:52,634
+so the seam stretches a lot, which suits knits;
+
+25
+00:01:52,654 --> 00:01:57,501
+and a coverstitch seams and covers the raw edge in one operation.
+
+26
+00:01:57,901 --> 00:02:02,834
+What it loses: it uses much more thread, its end can unravel,
+
+27
+00:02:02,854 --> 00:02:06,001
+and it can't be locked by back-tacking.
+
+28
+00:02:06,401 --> 00:02:18,932
+On the right, Virtual Lab 10-2 cycles through 401, 406, 407, 602 and 605,
+
+29
+00:02:18,952 --> 00:02:21,339
+face and back.
+
+30
+00:02:21,739 --> 00:02:29,026
+406 and 407 have two or three needles sharing one looper;
+
+31
+00:02:29,046 --> 00:02:33,000
+602 and 605 add a cover thread.
+
+32
+00:02:34,520 --> 00:02:37,278
+How stitch 401 forms.
+
+33
+00:02:38,798 --> 00:02:43,460
+One 401 stitch has four moments.
+
+34
+00:02:43,860 --> 00:02:46,974
+One, the catch at about 214 degrees:
+
+35
+00:02:46,994 --> 00:02:53,415
+the needle has risen about 3.4 millimetres and the looper point enters the
+
+36
+00:02:53,435 --> 00:02:55,853
+loop from behind the needle.
+
+37
+00:02:56,253 --> 00:03:00,602
+Two, the needle leaves, the fabric feeds,
+
+38
+00:03:00,622 --> 00:03:08,593
+and the looper reaches its leftmost point at about 356, spreading the loop.
+
+39
+00:03:08,993 --> 00:03:13,743
+Three, at about 130 degrees the looper is on its way back,
+
+40
+00:03:13,763 --> 00:03:15,634
+in front of the needle,
+
+41
+00:03:15,654 --> 00:03:20,568
+and the next needle enters the triangle formed by the blade,
+
+42
+00:03:20,588 --> 00:03:23,693
+the looper thread and the needle loop.
+
+43
+00:03:24,093 --> 00:03:24,497
+Four,
+
+44
+00:03:24,517 --> 00:03:31,618
+at about 176 the looper is rightmost and the old loop casts off and is pulled tight.
+
+45
+00:03:32,018 --> 00:03:34,798
+Success depends on moments one and three.
+
+46
+00:03:36,318 --> 00:03:42,018
+This is the front-view animation from Virtual Lab 10-1.
+
+47
+00:03:42,418 --> 00:03:47,742
+The looper is drawn light when it's behind the needle and dark when it's in front.
+
+48
+00:03:48,142 --> 00:03:49,598
+Watch two moments.
+
+49
+00:03:49,998 --> 00:03:55,578
+At the catch, the point must be behind the needle, going right into the loop.
+
+50
+00:03:55,978 --> 00:03:59,418
+When the next needle comes down to looper height,
+
+51
+00:03:59,438 --> 00:04:04,361
+the point must already be in front of the needle, but not yet past it,
+
+52
+00:04:04,381 --> 00:04:07,469
+so the needle can enter the thread triangle.
+
+53
+00:04:07,869 --> 00:04:14,889
+One looper motion decides both, so change one and the other changes too.
+
+54
+00:04:16,409 --> 00:04:25,048
+Here's the point's path seen from above, with front–back magnified four times.
+
+55
+00:04:25,448 --> 00:04:30,575
+The left–right swing decides when the point reaches the needle;
+
+56
+00:04:30,595 --> 00:04:35,884
+the front–back needle-avoiding move decides which side it passes.
+
+57
+00:04:36,284 --> 00:04:40,695
+Both are roughly harmonic and about 90 degrees apart,
+
+58
+00:04:40,715 --> 00:04:46,715
+so together they trace a flat ellipse: behind the needle on the way out,
+
+59
+00:04:46,735 --> 00:04:48,805
+in front on the way back.
+
+60
+00:04:49,205 --> 00:04:54,534
+At 130 degrees, when the next needle reaches looper height,
+
+61
+00:04:54,554 --> 00:05:01,515
+the point is 1.4 millimetres left of the needle's centre and 0.41 in front of
+
+62
+00:05:01,535 --> 00:05:02,603
+its surface.
+
+63
+00:05:04,123 --> 00:05:08,079
+Write the conditions for a good stitch as five criteria.
+
+64
+00:05:08,479 --> 00:05:08,820
+One:
+
+65
+00:05:08,840 --> 00:05:15,942
+the needle rise at the catch must be in the range where the loop is big enough,
+
+66
+00:05:15,962 --> 00:05:19,819
+about 1.0 to 4.2 millimetres in this model.
+
+67
+00:05:20,219 --> 00:05:22,053
+Two: at the catch,
+
+68
+00:05:22,073 --> 00:05:29,984
+the point must be at least 0.2 millimetres above the eye and below the top of
+
+69
+00:05:30,004 --> 00:05:30,911
+the loop;
+
+70
+00:05:30,931 --> 00:05:32,559
+standard is 1.5.
+
+71
+00:05:32,959 --> 00:05:39,891
+Three: the clearance on the outward stroke is 0 to 0.1 millimetres;
+
+72
+00:05:39,911 --> 00:05:43,419
+negative means hitting the needle.
+
+73
+00:05:43,819 --> 00:05:48,610
+Four: when the needle reaches looper height,
+
+74
+00:05:48,630 --> 00:05:54,624
+the point is at least 0.3 to its left and 0.2 in front.
+
+75
+00:05:55,024 --> 00:06:00,924
+Five: no collision while the needle is below looper height.
+
+76
+00:06:02,444 --> 00:06:05,132
+Move only the looper timing,
+
+77
+00:06:05,152 --> 00:06:11,610
+and the usable range is about minus 3.5 to plus 4 degrees, under 8.
+
+78
+00:06:12,010 --> 00:06:13,870
+The two ends fail differently.
+
+79
+00:06:14,270 --> 00:06:20,578
+Advance it and the point comes back too early: criterion four fails first,
+
+80
+00:06:20,598 --> 00:06:25,453
+the needle misses the triangle and the chain falls apart.
+
+81
+00:06:25,853 --> 00:06:32,989
+Retard it and the loop has already shrunk: criterion one fails first,
+
+82
+00:06:33,009 --> 00:06:34,753
+a skipped stitch.
+
+83
+00:06:35,153 --> 00:06:44,124
+The looper can be raised about 1.7 millimetres but lowered no more than 0.8;
+
+84
+00:06:44,144 --> 00:06:53,115
+the retraction must be about 2.45 to 3.8; the avoidance at least about 0.86.
+
+85
+00:06:53,515 --> 00:06:57,733
+These numbers show how the settings constrain each other;
+
+86
+00:06:57,753 --> 00:07:00,037
+they're not an adjustment spec.
+
+87
+00:07:01,557 --> 00:07:06,381
+The coverstitch machine: needles, a looper, a spreader.
+
+88
+00:07:07,901 --> 00:07:15,545
+The coverstitch stitch zone has a row of needles, one looper and a spreader.
+
+89
+00:07:15,945 --> 00:07:23,356
+The gauge is 3.2 to 6.4 millimetres, the speed 6500 stitches a minute,
+
+90
+00:07:23,376 --> 00:07:27,285
+the needle-bar stroke 31 millimetres.
+
+91
+00:07:27,685 --> 00:07:33,903
+Below the fabric, the looper takes the right, middle and left needles in turn,
+
+92
+00:07:33,923 --> 00:07:38,142
+so the needles are set at slightly different heights.
+
+93
+00:07:38,542 --> 00:07:39,970
+Above the fabric,
+
+94
+00:07:39,990 --> 00:07:46,362
+the spreader is leftmost when the needle bar has come down 1.1 millimetres,
+
+95
+00:07:46,382 --> 00:07:52,584
+about 25 degrees, laying the cover thread across in front of the needles;
+
+96
+00:07:52,604 --> 00:07:57,698
+the needle points reach it at about 77 degrees and catch it.
+
+97
+00:07:58,098 --> 00:08:02,478
+Coverstitch machines have differential feed too.
+
+98
+00:08:03,998 --> 00:08:07,058
+Thread consumption: how much for a batch.
+
+99
+00:08:08,578 --> 00:08:12,433
+The geometric model counts thread by thread.
+
+100
+00:08:12,833 --> 00:08:19,911
+Each needle thread uses one stitch length, plus twice the fabric thickness,
+
+101
+00:08:19,931 --> 00:08:23,413
+plus about 1 millimetre for the loop.
+
+102
+00:08:23,813 --> 00:08:29,859
+The looper thread uses the number of needles times twice the stitch length
+
+103
+00:08:29,879 --> 00:08:31,335
+plus 1 millimetre,
+
+104
+00:08:31,355 --> 00:08:34,696
+plus a stitch length and twice the gauge.
+
+105
+00:08:35,096 --> 00:08:39,665
+Divide by the stitch length and you get the consumption ratio:
+
+106
+00:08:39,685 --> 00:08:42,996
+centimetres of thread per centimetre of seam.
+
+107
+00:08:43,396 --> 00:08:51,732
+At 7 stitches per centimetre, a stitch length of about 1.43 millimetres,
+
+108
+00:08:51,752 --> 00:09:00,320
+406 gives 2.4 for each needle thread and 12.0 for the looper, 16.8 in all,
+
+109
+00:09:00,340 --> 00:09:03,222
+against the published 18.
+
+110
+00:09:03,622 --> 00:09:08,158
+The denser the stitches, the more thread per centimetre.
+
+111
+00:09:09,678 --> 00:09:15,914
+The looper's swing and its avoiding move are both roughly harmonic and about
+
+112
+00:09:15,934 --> 00:09:17,313
+90 degrees apart,
+
+113
+00:09:17,333 --> 00:09:19,618
+so they make a flat ellipse.
+
+114
+00:09:20,018 --> 00:09:27,041
+Send a sine command to each axis of a SCARA robot or an X–Y table and you get
+
+115
+00:09:27,061 --> 00:09:29,236
+a circle or ellipse too:
+
+116
+00:09:29,256 --> 00:09:35,182
+the amplitudes set the shape, the phase difference the direction.
+
+117
+00:09:35,582 --> 00:09:40,578
+The 401 timing window is only about 7.5 degrees,
+
+118
+00:09:40,598 --> 00:09:46,012
+just 0.19 milliseconds at 6500 revolutions a minute,
+
+119
+00:09:46,032 --> 00:09:52,387
+so looper and needle bar must be synchronised by shaft angle.
+
+120
+00:09:52,787 --> 00:09:58,067
+A robot picking from a moving conveyor does the same:
+
+121
+00:09:58,087 --> 00:10:03,167
+it sets targets from the conveyor encoder position.
+
+122
+00:10:03,567 --> 00:10:05,507
+That's an electronic cam.
+
+123
+00:10:07,027 --> 00:10:08,965
+Chainstitch at home:
+
+124
+00:10:08,985 --> 00:10:15,327
+rice and flour sacks are often closed with a single-thread chain.
+
+125
+00:10:15,727 --> 00:10:18,383
+Find the right thread end, pull,
+
+126
+00:10:18,403 --> 00:10:23,067
+and the whole seam comes undone loop by loop like a zip.
+
+127
+00:10:23,467 --> 00:10:30,287
+That's the chainstitch's habit of unravelling from an unsecured end,
+
+128
+00:10:30,307 --> 00:10:33,607
+which here becomes a convenience.
+
+129
+00:10:34,007 --> 00:10:36,912
+On clothes it's a weakness,
+
+130
+00:10:36,932 --> 00:10:44,172
+so the end of a 401 seam on jeans has to be secured by other means.
+
+131
+00:10:45,692 --> 00:10:46,752
+Back to the start.
+
+132
+00:10:47,152 --> 00:11:00,446
+Each thread needs its ratio times 172 centimetres times 1000 pieces times 1.12.
+
+133
+00:11:00,846 --> 00:11:11,446
+By the model, each needle thread needs about 4623 metres, 1 cone each;
+
+134
+00:11:11,466 --> 00:11:18,425
+the looper thread about 23117 metres, 5 cones;
+
+135
+00:11:18,445 --> 00:11:24,190
+about 32364 metres and 7 cones in all.
+
+136
+00:11:24,590 --> 00:11:32,078
+The supervisor's total divided by 5000 also gives 7, but only by coincidence:
+
+137
+00:11:32,098 --> 00:11:36,954
+it says nothing about which thread needs how many.
+
+138
+00:11:37,354 --> 00:11:44,060
+The looper thread takes 71 percent, and a cone feeds only one thread,
+
+139
+00:11:44,080 --> 00:11:48,740
+so the looper thread must be stocked separately.
+
+140
+00:11:50,260 --> 00:11:55,353
+Now Virtual lab 10-1, the chainstitch looper and stitch 401.
+
+141
+00:11:55,373 --> 00:11:59,444
+On the WenQuest platform you can do it yourself.
+
+142
+00:11:59,464 --> 00:12:03,450
+The readings of the five criteria, the verdict,
+
+143
+00:12:03,470 --> 00:12:07,199
+the settings and the tasks are blurred here.
+
+144
+00:12:07,219 --> 00:12:10,523
+Read them when you do the lab yourself.
+
+145
+00:12:10,923 --> 00:12:15,512
+First pause and press Loop-catch moment. The needle has risen,
+
+146
+00:12:15,532 --> 00:12:21,014
+and in the front and top views you can see the looper point enter the loop
+
+147
+00:12:21,034 --> 00:12:22,723
+from behind the needle.
+
+148
+00:12:23,123 --> 00:12:27,657
+Now press Needle at looper height. As the next needle comes down,
+
+149
+00:12:27,677 --> 00:12:30,179
+the point is already in front of it,
+
+150
+00:12:30,199 --> 00:12:35,503
+and the needle has to go into the triangle of blade, looper thread and loop.
+
+151
+00:12:35,903 --> 00:12:40,933
+Task one: press Scramble. All five settings are thrown off.
+
+152
+00:12:40,953 --> 00:12:46,753
+See which criteria turn red, then bring back the timing, the height,
+
+153
+00:12:46,773 --> 00:12:53,515
+the avoidance, the clearance and the retraction one by one until all five pass.
+
+154
+00:12:53,915 --> 00:13:02,414
+Task two: reset, then move only the looper timing, half a degree at a time.
+
+155
+00:13:02,434 --> 00:13:05,027
+Try retarding it first,
+
+156
+00:13:05,427 --> 00:13:11,784
+then advancing it. Note which criterion turns red first at each end,
+
+157
+00:13:11,804 --> 00:13:18,067
+and check the window from the lecture for yourself in the task box.
+
+158
+00:13:19,587 --> 00:13:25,186
+Virtual lab 10-2, coverstitch and thread use, is on the platform too.
+
+159
+00:13:25,206 --> 00:13:29,665
+The readings on the consumption chart, the batch table,
+
+160
+00:13:29,685 --> 00:13:34,062
+the cone count and the tasks are blurred here as well.
+
+161
+00:13:34,462 --> 00:13:40,477
+Start by switching stitches. 401 has one needle thread and one looper thread.
+
+162
+00:13:40,497 --> 00:13:46,042
+The face looks like a lockstitch, and the back is a row of chain loops.
+
+163
+00:13:46,442 --> 00:13:52,062
+605 has three needles and one looper, plus a cover thread,
+
+164
+00:13:52,082 --> 00:13:57,507
+so both faces are covered. Go through all five stitches,
+
+165
+00:13:57,527 --> 00:14:04,022
+note each thread's ratio, and compare it with the published figure.
+
+166
+00:14:04,422 --> 00:14:09,835
+The task: go back to 406 and press the T-shirt hem-and-cuffs preset.
+
+167
+00:14:09,855 --> 00:14:14,629
+The quantity, the wastage and the cone length are filled in.
+
+168
+00:14:14,649 --> 00:14:19,583
+Read the batch length and the number of cones for each thread,
+
+169
+00:14:19,603 --> 00:14:22,779
+and enter them in the task box to check.
+
+170
+00:14:23,179 --> 00:14:29,025
+Finally, slide the density slowly from 7 stitches per centimetre down to 4.
+
+171
+00:14:29,045 --> 00:14:30,903
+The stitches spread out.
+
+172
+00:14:30,923 --> 00:14:36,535
+Think about why sparser stitches use less thread per centimetre of seam.
+
+173
+00:14:36,555 --> 00:14:40,759
+The guide and the report template are on the platform.
+
+174
+00:14:42,279 --> 00:14:48,312
+Everything in this lecture is on the WenQuest learning platform.
+
+175
+00:14:48,712 --> 00:14:55,435
+You can open today's interactive slides and both virtual labs yourself,
+
+176
+00:14:55,455 --> 00:15:02,844
+and drag the shaft angle to watch the looper catch the loop, moment by moment.
+
+177
+00:15:03,244 --> 00:15:08,177
+You submit the assignment and the lab reports on the platform,
+
+178
+00:15:08,197 --> 00:15:10,733
+and get marks and comments back.
+
+179
+00:15:11,133 --> 00:15:15,069
+Questions go to the course discussion forum,
+
+180
+00:15:15,089 --> 00:15:20,913
+and the grades page shows your mark on every assignment and quiz.
+
+181
+00:15:22,433 --> 00:15:26,351
+Your assignment has four questions. One: 2000 sports tops,
+
+182
+00:15:26,371 --> 00:15:31,239
+an 80-centimetre neckline each, sewn in 605 with a 5.6-millimetre gauge,
+
+183
+00:15:31,259 --> 00:15:35,380
+10 percent wastage and 5000-metre cones. Using today's model,
+
+184
+00:15:35,400 --> 00:15:39,386
+find each thread's ratio, batch length and number of cones,
+
+185
+00:15:39,406 --> 00:15:42,577
+and say which thread is most likely to run out.
+
+186
+00:15:42,977 --> 00:15:43,231
+Two:
+
+187
+00:15:43,251 --> 00:15:48,232
+the manual puts the spreader at its leftmost when the needle bar has come
+
+188
+00:15:48,252 --> 00:15:51,110
+down 1.1 millimetres from top dead centre.
+
+189
+00:15:51,130 --> 00:15:55,564
+Use the Chapter 3 formula to check that this is about 25 degrees,
+
+190
+00:15:55,584 --> 00:15:58,304
+then find the angle for 2.0 millimetres.
+
+191
+00:15:58,324 --> 00:16:01,182
+What happens if the spreader arrives late?
+
+192
+00:16:01,582 --> 00:16:04,380
+Three: in Virtual lab 10-1,
+
+193
+00:16:04,400 --> 00:16:10,120
+retard and then advance the looper timing by 5 degrees,
+
+194
+00:16:10,140 --> 00:16:16,173
+and give the first criterion to fail, the fault you'd see,
+
+195
+00:16:16,193 --> 00:16:24,105
+and the order of adjustment. Four, for discussion: on the same knit garment,
+
+196
+00:16:24,125 --> 00:16:32,037
+why are hems usually 406, joining seams 605 or 607, and side seams overlock?
+
+197
+00:16:32,437 --> 00:16:34,545
+Submit your working,
+
+198
+00:16:34,565 --> 00:16:41,143
+the lab screenshots and the analysis on the WenQuest platform.
+
+199
+00:16:42,663 --> 00:16:46,371
+There's also a ten-question quiz. For example,
+
+200
+00:16:46,391 --> 00:16:50,341
+at standard settings the catch is at 214 degrees,
+
+201
+00:16:50,361 --> 00:16:55,527
+with a rise of 3.36 millimetres. Retard the looper by 5 degrees:
+
+202
+00:16:55,547 --> 00:17:01,443
+roughly how far has the needle risen at the catch, and is that a problem?
+
+203
+00:17:01,843 --> 00:17:09,129
+Or, add a cover thread to 406 to get 602, with everything else the same.
+
+204
+00:17:09,149 --> 00:17:15,623
+By what percentage does the thread per centimetre of seam go up?
+
+205
+00:17:16,023 --> 00:17:21,517
+You get three attempts, and the explanations appear as soon as you submit.
+
+206
+00:17:23,037 --> 00:17:25,497
+Three things to remember.
+
+207
+00:17:25,897 --> 00:17:29,827
+One: a 401 stitch hinges on two moments: at the catch,
+
+208
+00:17:29,847 --> 00:17:35,606
+the point enters the loop from behind the needle; when the next needle arrives,
+
+209
+00:17:35,626 --> 00:17:39,776
+the point is in front and the needle enters the triangle.
+
+210
+00:17:40,176 --> 00:17:45,689
+Two: the looper's swing and avoidance make a flat ellipse,
+
+211
+00:17:45,709 --> 00:17:51,796
+and the timing window is only about minus 3.5 to plus 4 degrees.
+
+212
+00:17:52,196 --> 00:17:59,507
+Three: count consumption thread by thread and stock cones the same way,
+
+213
+00:17:59,527 --> 00:18:02,089
+with extra looper thread.
+
+214
+00:18:02,489 --> 00:18:06,989
+The assignment, quiz and both labs are on WenQuest.
+
+215
+00:18:07,389 --> 00:18:10,660
+The slides, the virtual labs,
+
+216
+00:18:10,680 --> 00:18:18,605
+the assignment and the quiz are all on the WenQuest learning platform,
+
+217
+00:18:18,625 --> 00:18:26,209
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+218
+00:18:26,609 --> 00:18:32,684
+Next time, the mechanisms of typical special machines. Zigzag machines,
+
+219
+00:18:32,704 --> 00:18:33,800
+buttonholers,
+
+220
+00:18:33,820 --> 00:18:40,239
+button sewers and bartackers are each a sewing head plus a planar motion of
+
+221
+00:18:40,259 --> 00:18:42,385
+the needle or the fabric.
+
+222
+00:18:42,405 --> 00:18:43,501
+See you then.
