@@ -1,0 +1,157 @@
+# 《缝纫机设计与制造》公开课 第 10 讲：绷缝机与链缝机
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch10.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 10-1（链缝弯针与 401 线迹）、10-2（绷缝线迹与耗线量）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch10.py 算出（{{ch10.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "10"
+deck: ch10
+skip: [4, 12, 17, 19, 21, 22]   # 六宫格线迹家族、说明书 A = B、资料耗线比、五种线迹柱状图、第五节章节页、整批用量：控制课程部分约 10 分钟（课件与教材里都有；线迹家族在第 5 页动画里轮流出现，整批用量的算法与数字在回答页全部讲到）
+code: [ch10]
+title: ["绷缝机与链缝机：弯针代替旋梭，线团代替梭芯", "Coverstitch and Chainstitch Machines: A Looper for a Hook, a Cone for a Bobbin"]
+chapter: ["第三篇 包缝、绷缝与链缝 · 第 10 章", "Part III Overlock, Coverstitch and Chainstitch · Chapter 10"]
+next: ["第 11 讲 典型特种机的机构", "Lecture 11 Mechanisms of typical special machines"]
+cover_formula: 'L = c \cdot \ell \cdot N \cdot (1 + w)'
+tags:
+  zh: [绷缝机, 链缝机, 401 线迹, 弯针定时, 耗线量, 缝纫机设计]
+  en: [coverstitch machine, chainstitch, stitch 401, looper timing, thread consumption, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十讲，绷缝机与链缝机。
+    - 翻过一件 T 恤看下摆，正面两道直线，反面一张网盖住毛边；牛仔裤后裆是两道结实的链式线迹。它们都不用旋梭和梭芯，靠弯针成缝，线从大线团直接供给。今天看两件事：401 线迹靠哪两个时刻缝成，一批 T 恤下摆要备几个线团。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 10, coverstitch and chainstitch machines.
+    - Turn a T-shirt over and look at the hem. Two straight lines on the face, and a net covering the raw edge on the back. The back rise of a pair of jeans has two strong rows of chainstitch. Neither uses a rotary hook or a bobbin. A looper forms the stitch, and the thread comes straight off large cones. Today, two questions. Which two moments make or break stitch 401, and how many cones does a batch of T-shirt hems need?
+
+after:
+  - id: lab101
+    kind: lab
+    lab: looper
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; const s = document.createElement('style'); s.textContent = '#checks, #verdict, #tasks, #msg, #w1, #w2, #emin, #dphiv, #dzv, #ev, #gapv, #rrv { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; })()"
+        press: "#reset"
+      - press: "[data-go=fc]"
+      - press: "[data-go=fd]"
+      - press: ["#play", "#mess"]
+      - press: "#reset"
+        sweep: {dphi: [0, 2]}
+        dur: 6
+      - sweep: {dphi: [2, -1.5]}
+        dur: 6
+    say:
+      zh:
+        - ">下面是虚拟实验 10-1，链缝弯针与 401 线迹，在问渠平台上可以亲手做。右边五条判据的读数、结论、调整量和任务这里先遮住，留给你自己读。"
+        - ">先暂停，按“钩线时刻”：针已经回升，在正视图和俯视图上确认，弯针刀尖是从针后钻进线环的。"
+        - ">再按“针到弯针高度”：下一针降下来时，刀尖已经绕到针前，针要刺进刀身、弯针线和线环围成的三角。"
+        - ">任务一，按“打乱”：五个量同时被改乱，看哪几条判据变红，再按判据逐一调回弯针定时、高度、避针量、间隙和回退量，直到五条全部满足。"
+        - ">任务二，恢复标准后只动弯针定时，每次半度，先往推迟方向试，"
+        - ">再往提前方向试，记下每一端第一条变红的判据，亲手验证前面讲的窗口，填进任务框核对。"
+      en:
+        - ">Now Virtual lab 10-1, the chainstitch looper and stitch 401. On the WenQuest platform you can do it yourself. The readings of the five criteria, the verdict, the settings and the tasks are blurred here. Read them when you do the lab yourself."
+        - ">First pause and press Loop-catch moment. The needle has risen, and in the front and top views you can see the looper point enter the loop from behind the needle."
+        - ">Now press Needle at looper height. As the next needle comes down, the point is already in front of it, and the needle has to go into the triangle of blade, looper thread and loop."
+        - ">Task one: press Scramble. All five settings are thrown off. See which criteria turn red, then bring back the timing, the height, the avoidance, the clearance and the retraction one by one until all five pass."
+        - ">Task two: reset, then move only the looper timing, half a degree at a time. Try retarding it first,"
+        - ">then advancing it. Note which criterion turns red first at each end, and check the window from the lecture for yourself in the task box."
+
+  - id: lab102
+    kind: lab
+    lab: coverstitch
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; const s = document.createElement('style'); s.textContent = '#tbl, #cones, #bars, #spcv { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; })()"
+      - press: "[data-t='401']"
+      - press: "[data-t='605']"
+      - press: ["[data-t='406']", "#pT"]
+      - sweep: {spc: [7, 4]}
+        dur: 7
+    say:
+      zh:
+        - ">虚拟实验 10-2 是绷缝线迹与耗线量，也在平台上。耗线柱状图的读数、整批用量表、线团数和任务同样遮住。"
+        - ">先切换线迹。401 是一根针线、一根弯针线：正面像平缝，反面是一串链环。"
+        - ">605 是三根针、一根弯针，再加一根装饰线，正反两面都盖住。五种线迹逐一切换，记下每根线的耗线比，和资料值比一比。"
+        - ">任务：换回 406，按“T 恤下摆加袖口”预设，件数、损耗和线团长度都填好了，读出每根线的整批米数和线团数，填进任务框核对。"
+        - ">最后把针密从每厘米 7 针慢慢滑到 4 针，看线迹变稀，想想为什么针越稀，每厘米缝用的线越少。指导书和报告模板在平台上下载。"
+      en:
+        - ">Virtual lab 10-2, coverstitch and thread use, is on the platform too. The readings on the consumption chart, the batch table, the cone count and the tasks are blurred here as well."
+        - ">Start by switching stitches. 401 has one needle thread and one looper thread. The face looks like a lockstitch, and the back is a row of chain loops."
+        - ">605 has three needles and one looper, plus a cover thread, so both faces are covered. Go through all five stitches, note each thread's ratio, and compare it with the published figure."
+        - ">The task: go back to 406 and press the T-shirt hem-and-cuffs preset. The quantity, the wastage and the cone length are filled in. Read the batch length and the number of cones for each thread, and enter them in the task box to check."
+        - ">Finally, slide the density slowly from 7 stitches per centimetre down to 4. The stitches spread out. Think about why sparser stitches use less thread per centimetre of seam. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 10-1、10-2，可以自己动手", "Interactive slides and Labs 10-1 and 10-2, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和两个虚拟实验都可以自己打开，拖动主轴转角，一个时刻一个时刻地看弯针怎样钩线。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and both virtual labs yourself, and drag the shaft angle to watch the looper catch the loop, moment by moment."
+        - ">You submit the assignment and the lab reports on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 10：链缝弯针定时与绷缝备线", "Assignment 10: looper timing and thread planning"]
+      points:
+        - ["2000 件运动衫领口用 605：每根线的用量和线团数", "605 on 2000 necklines: length and cones for each thread"]
+        - ["撑线器：针杆下降 1.1 mm 与 2.0 mm 对应的主轴转角", "Spreader: shaft angles for 1.1 mm and 2.0 mm of descent"]
+        - ["弯针定时 ±5°：先坏的判据与调整顺序；下摆、拼缝、侧缝各用什么线迹", "Timing ±5°: first failure and adjustment order; which stitch for hems, joins, side seams"]
+      foot: ["计算过程、实验 10-1 判据截图两张和 2 页以内的分析，在问渠学习平台提交。", "Working, two Lab 10-1 screenshots and up to 2 pages of analysis, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，2000 件运动衫，领口每件 80 厘米，用 605，针距宽度 5.6 毫米，损耗 10%，线团每个 5000 米，按本讲的模型求每根线的耗线比、整批用量和线团数，并说明哪根线最容易断供。"
+        - ">第二题，手册规定针杆从上止点下降 1.1 毫米时撑线器在最左，用第 3 章的公式验算它约是 {{ch10.spread:.0f}} 度，再求下降 2.0 毫米时的转角。撑线器晚到会怎样？"
+        - ">第三题，在虚拟实验 10-1 里把弯针定时推迟、提前各 5 度，说明先坏的判据、故障现象和调整顺序。第四题讨论：同样缝针织衫，为什么下摆多用 406，拼缝多用 605 或 607，侧缝多用包缝。"
+        - 计算过程、实验截图和分析，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: 2000 sports tops, an 80-centimetre neckline each, sewn in 605 with a 5.6-millimetre gauge, 10 percent wastage and 5000-metre cones. Using today's model, find each thread's ratio, batch length and number of cones, and say which thread is most likely to run out."
+        - ">Two: the manual puts the spreader at its leftmost when the needle bar has come down 1.1 millimetres from top dead centre. Use the Chapter 3 formula to check that this is about {{ch10.spread:.0f}} degrees, then find the angle for 2.0 millimetres. What happens if the spreader arrives late?"
+        - ">Three: in Virtual lab 10-1, retard and then advance the looper timing by 5 degrees, and give the first criterion to fail, the fault you'd see, and the order of adjustment. Four, for discussion: on the same knit garment, why are hems usually 406, joining seams 605 or 607, and side seams overlock?"
+        - Submit your working, the lab screenshots and the analysis on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["标准 {{ch10.catch:.0f}}° 钩线、回升 {{ch10.rise:.2f}} mm；推迟 5°，回升约多少？", "Catch at {{ch10.catch:.0f}}°, rise {{ch10.rise:.2f}} mm; retard 5°: what is the rise?"]
+        - ["406 改成 602，每厘米缝用线增加百分之几？", "406 to 602: by what percentage does thread per cm rise?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：标准时 {{ch10.catch:.0f}} 度钩线，针回升 {{ch10.rise:.2f}} 毫米；把弯针定时推迟 5 度，钩线时针回升大约多少？会不会出问题？"
+        - ">再比如：406 加一根装饰线变成 602，其余不变，每缝 1 厘米用线增加百分之几？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, at standard settings the catch is at {{ch10.catch:.0f}} degrees, with a rise of {{ch10.rise:.2f}} millimetres. Retard the looper by 5 degrees: roughly how far has the needle risen at the catch, and is that a problem?"
+        - ">Or, add a cover thread to 406 to get 602, with everything else the same. By what percentage does the thread per centimetre of seam go up?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲典型特种机的机构：之字缝机、锁眼机、钉扣机、套结机，都是一个缝纫头，加上针或布在平面里的运动。我们下一讲见。
+  en:
+    - The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time, the mechanisms of typical special machines. Zigzag machines, buttonholers, button sewers and bartackers are each a sewing head plus a planar motion of the needle or the fabric. See you then.
