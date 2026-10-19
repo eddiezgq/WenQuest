@@ -362,9 +362,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["线团按每根线算：针线各 {{ch10.k_n:.0f}} 个，弯针线 {{ch10.k_l:.0f}} 个", "Count cones per thread: {{ch10.k_n:.0f}} per needle thread, {{ch10.k_l:.0f}} for the looper"]
     rows:
-      - ["针线（每根）", "{{ch10.b_n:.0f}} m · {{ch10.k_n:.0f}} 个"]
-      - ["弯针线", "{{ch10.b_l:.0f}} m · {{ch10.k_l:.0f}} 个"]
-      - ["合计", "{{ch10.b_tot:.0f}} m · {{ch10.k_tot:.0f}} 个"]
+      - [["针线（每根）", "Needle thread (each)"], ["{{ch10.b_n:.0f}} m · {{ch10.k_n:.0f}} 个", "{{ch10.b_n:.0f}} m · {{ch10.k_n:.0f}} cone"]]
+      - [["弯针线", "Looper thread"], ["{{ch10.b_l:.0f}} m · {{ch10.k_l:.0f}} 个", "{{ch10.b_l:.0f}} m · {{ch10.k_l:.0f}} cones"]]
+      - [["合计", "Total"], ["{{ch10.b_tot:.0f}} m · {{ch10.k_tot:.0f}} 个", "{{ch10.b_tot:.0f}} m · {{ch10.k_tot:.0f}} cones"]]
     side: {big: "{{ch10.l_share:.0f}}%", text: ["弯针线占七成：总长除以 5000 不知道哪根线要几个", "The looper takes about 70%: a total ÷ 5000 can't tell which thread needs what"]}
     foot: ["主管算出 7 个是碰巧；弯针线必须单独多备", "The supervisor's 7 is a coincidence; the looper thread must be stocked separately"]
     notes:
