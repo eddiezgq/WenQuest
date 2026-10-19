@@ -8,5 +8,5 @@
 !services/cam/requirements.txt
 !services/cam/camkit
 !services/cam/examples
-!services/cam/app.py
+!services/cam/*.py
 **/__pycache__

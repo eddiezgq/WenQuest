@@ -79,3 +79,6 @@ def test_image_copies_every_service_module():
     docker = (here / "Dockerfile").read_text(encoding="utf-8")
     mods = sorted(p.name for p in here.glob("*.py"))
     assert "COPY services/cam/*.py ./" in docker or all(f"services/cam/{m}" in docker for m in mods), mods
+    # 构建上下文的白名单（Dockerfile.dockerignore）也要放行：只改 Dockerfile 时线上仍然缺 system_api.py
+    ignore = (here / "Dockerfile.dockerignore").read_text(encoding="utf-8").splitlines()
+    assert "!services/cam/*.py" in ignore or all(f"!services/cam/{m}" in ignore for m in mods), mods
