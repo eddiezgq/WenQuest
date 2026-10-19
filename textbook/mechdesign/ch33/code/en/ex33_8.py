@@ -80,7 +80,7 @@ big = cyc[np.argsort(-cyc[:, 0])][:3]
 plt = style()
 fig, ax = plt.subplots(figsize=(8.0, 3.4))
 m = outer
-ax.scatter(zz[m], vm[m], s=2, color=D.MOMENT, alpha=0.35, lw=0, label=T("有限元：表面节点", "FEA: surface nodes"))
+ax.scatter(zz[m], vm[m], s=2, color=D.MOMENT, alpha=0.35, lw=0, rasterized=True, label=T("有限元：表面节点", "FEA: surface nodes"))
 ax.plot(zs, vn, color=D.INK, lw=1.4, label=T("梁理论名义应力", "beam theory, nominal"))
 for k, z0 in (("II", 90.0), ("III", 115.0), ("IV", 172.0)):
     v = hot[k if k != "IV" else "IV_fillet"]
@@ -92,6 +92,7 @@ ax.legend(fontsize=8.5, frameon=False, loc="upper left", markerscale=4)
 for s in ("top", "right"):
     ax.spines[s].set_visible(False)
 fig.tight_layout()
+fig.set_dpi(200)
 figure(fig, "fig33_8_1")
 
 fig, axs = plt.subplots(1, 2, figsize=(8.6, 3.0), gridspec_kw={"width_ratios": [2.2, 1]})
