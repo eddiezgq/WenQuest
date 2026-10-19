@@ -358,24 +358,26 @@ def _step_arrive_reject(H, r, sc, st, who):
 
 
 def _step_leave(H, r, sc, st, who):
-    """第 4 幕：这台设备下个班的人请假（打开“要有人”）"""
+    """第 4 幕：这台设备下个班的人请假（打开“要有人”）。
+    从下一个班开始找（不用现在这一班）：情景里车间倍速运行，现在这一班可能真实时间几秒后就结束，
+    厂情中枢每 20 秒才检测一次，缺口还没被看到就过去了，这一幕就等不到（2026-10-18 部署演练夜里跑时卡在这里）"""
     from hub import people as PE
+    from sim import staffing as STF
     db = H.db
     unit = st.get("unit") or "grd-01"
     PE.set_enabled(H, MODE, True, who)
     d, sh = PE.now_shift(db=db, mode=MODE)
     emp = None
     for _ in range(3):
+        d, sh = STF.shift_of(STF.next_change(STF.shift_start(d, sh, PE.tz())))
         ro = PE.roster_for(db, MODE, d, sh)
         emp = (ro.get(unit) or {}).get("emp_id")
         if emp:
             break
-        from sim import staffing as STF
-        d, sh = STF.shift_of(STF.next_change(STF.shift_start(d, sh, PE.tz())))
     if not emp:
         raise ValueError("{} 最近没有排班".format(unit.upper()))
     p = PE.person(db, MODE, emp)
-    d, sh, units = PE.leave_next_shift(H, MODE, emp, who)
+    d, sh, units = PE.leave_next_shift(H, MODE, emp, who, now=STF.shift_start(d, sh, PE.tz()) + dt.timedelta(minutes=1))
     return {"emp_id": emp, "text": "{} {} {} 请假（{} 这一班没人）".format(p["name"], d.isoformat(), PE.SHIFT_NAME[sh], "、".join(u.upper() for u in units))}
 
 
