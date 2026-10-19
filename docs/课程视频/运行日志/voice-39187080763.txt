@@ -1,0 +1,400 @@
+
+100%|██████████| 1/1 [00:03<00:00,  3.48s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:17,576 INFO synthesis text Move only the looper timing, and the usable range is about minus three.five to plus four degrees, under eight.
+2026-10-19 02:12:22,280 INFO yield speech len 9.2, rtf 0.5113147393516873
+
+100%|██████████| 1/1 [00:04<00:00,  4.88s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:22,335 WARNING synthesis text The two ends fail differently. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-19 02:12:22,462 INFO synthesis text The two ends fail differently.
+2026-10-19 02:12:23,820 INFO yield speech len 1.88, rtf 0.7219588502924493
+
+100%|██████████| 1/1 [00:01<00:00,  1.53s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:23,990 INFO synthesis text Advance it and the point comes back too early: criterion four fails first, the needle misses the triangle and the chain falls apart.
+2026-10-19 02:12:29,992 INFO yield speech len 11.24, rtf 0.534017421172607
+
+100%|██████████| 1/1 [00:06<00:00,  6.17s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:30,167 INFO synthesis text Retard it and the loop has already shrunk: criterion one fails first, a skipped stitch.
+2026-10-19 02:12:34,925 INFO yield speech len 8.92, rtf 0.5334419252626564
+
+100%|██████████| 1/1 [00:04<00:00,  4.93s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.93s/it]
+cv2: 130/188 句，用时 11.6 分钟，预计还要 5.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:35,106 INFO synthesis text The looper can be raised about one.seven millimetres but lowered no more than zero.eight; the retraction must be about two.forty-five to three.eight; the avoidance at least about zero.eighty-six.
+2026-10-19 02:12:44,425 INFO yield speech len 18.04, rtf 0.5165699580291951
+
+100%|██████████| 1/1 [00:09<00:00,  9.50s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:44,613 INFO synthesis text These numbers show how the settings constrain each other; they're not an adjustment spec.
+2026-10-19 02:12:48,195 INFO yield speech len 6.6, rtf 0.5426733060316606
+
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:48,369 INFO synthesis text The coverstitch machine: needles, a looper, a spreader.
+2026-10-19 02:12:51,170 INFO yield speech len 4.92, rtf 0.5693137161130828
+
+100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:51,347 INFO synthesis text The coverstitch stitch zone has a row of needles, one looper and a spreader.
+2026-10-19 02:12:55,603 INFO yield speech len 7.68, rtf 0.55408775806427
+
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:12:55,781 INFO synthesis text The gauge is three.two to six.four millimetres, the speed six thousand, five hundred stitches a minute, the needle-bar stroke thirty-one millimetres.
+2026-10-19 02:13:01,809 INFO yield speech len 11.36, rtf 0.5306346735484164
+
+100%|██████████| 1/1 [00:06<00:00,  6.21s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:01,991 INFO synthesis text Below the fabric, the looper takes the right, middle and left needles in turn, so the needles are set at slightly different heights.
+2026-10-19 02:13:07,503 INFO yield speech len 10.48, rtf 0.5259555487232354
+
+100%|██████████| 1/1 [00:05<00:00,  5.69s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:07,684 INFO synthesis text Above the fabric, the spreader is leftmost when the needle bar has come down one.one millimetres, about twenty-five degrees, laying the cover thread across in front of the needles; the needle points reach it at about seventy-seven degrees and catch it.
+2026-10-19 02:13:17,750 INFO yield speech len 19.2, rtf 0.5242562666535378
+
+100%|██████████| 1/1 [00:10<00:00, 10.25s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:17,943 INFO synthesis text Coverstitch machines have differential feed too.
+2026-10-19 02:13:20,559 INFO yield speech len 4.44, rtf 0.5893023701401444
+
+100%|██████████| 1/1 [00:02<00:00,  2.79s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:20,606 WARNING synthesis text Thread consumption: how much for a batch. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-19 02:13:20,734 INFO synthesis text Thread consumption: how much for a batch.
+2026-10-19 02:13:22,676 INFO yield speech len 3.08, rtf 0.6304757935660226
+
+100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:22,723 WARNING synthesis text The geometric model counts thread by thread. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-19 02:13:22,851 INFO synthesis text The geometric model counts thread by thread.
+2026-10-19 02:13:25,152 INFO yield speech len 3.88, rtf 0.5929978237938636
+
+100%|██████████| 1/1 [00:02<00:00,  2.47s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.47s/it]
+cv2: 140/188 句，用时 12.4 分钟，预计还要 4.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:25,326 INFO synthesis text Each needle thread uses one stitch length, plus twice the fabric thickness, plus about one millimetre for the loop.
+2026-10-19 02:13:30,944 INFO yield speech len 10.6, rtf 0.5300417486226784
+
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:31,121 INFO synthesis text The looper thread uses the number of needles times twice the stitch length plus one millimetre, plus a stitch length and twice the gauge.
+2026-10-19 02:13:36,873 INFO yield speech len 10.92, rtf 0.526778994899093
+
+100%|██████████| 1/1 [00:05<00:00,  5.93s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:37,058 INFO synthesis text Divide by the stitch length and you get the consumption ratio: centimetres of thread per centimetre of seam.
+2026-10-19 02:13:41,215 INFO yield speech len 7.92, rtf 0.5248574897496388
+
+100%|██████████| 1/1 [00:04<00:00,  4.33s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:41,394 INFO synthesis text At seven stitches per centimetre, a stitch length of about one.forty-three millimetres, four hundred and six gives two.four for each needle thread and twelve.zero for the looper, sixteen.eight in all, against the published eighteen.
+2026-10-19 02:13:51,906 INFO yield speech len 19.88, rtf 0.5287664636999548
+
+100%|██████████| 1/1 [00:10<00:00, 10.70s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:52,102 INFO synthesis text The denser the stitches, the more thread per centimetre.
+2026-10-19 02:13:54,734 INFO yield speech len 4.6, rtf 0.5722661122031835
+
+100%|██████████| 1/1 [00:02<00:00,  2.80s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:13:54,908 INFO synthesis text The looper's swing and its avoiding move are both roughly harmonic and about ninety degrees apart, so they make a flat ellipse.
+2026-10-19 02:14:00,194 INFO yield speech len 9.96, rtf 0.5308018391390881
+
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:00,371 INFO synthesis text Send a sine command to each axis of a SCARA robot or an X–Y table and you get a circle or ellipse too: the amplitudes set the shape, the phase difference the direction.
+2026-10-19 02:14:08,361 INFO yield speech len 15.2, rtf 0.5256328770988866
+
+100%|██████████| 1/1 [00:08<00:00,  8.17s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:08,552 INFO synthesis text The four hundred and one timing window is only about seven.five degrees, just zero.nineteen milliseconds at six thousand, five hundred revolutions a minute, so looper and needle bar must be synchronised by shaft angle.
+2026-10-19 02:14:17,231 INFO yield speech len 16.88, rtf 0.5141352872712918
+
+100%|██████████| 1/1 [00:08<00:00,  8.86s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:17,418 INFO synthesis text A robot picking from a moving conveyor does the same: it sets targets from the conveyor encoder position.
+2026-10-19 02:14:23,062 INFO yield speech len 10.4, rtf 0.5427311016963078
+
+100%|██████████| 1/1 [00:05<00:00,  5.82s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:23,113 WARNING synthesis text That's an electronic cam. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-19 02:14:23,240 INFO synthesis text That's an electronic cam.
+2026-10-19 02:14:24,557 INFO yield speech len 1.96, rtf 0.672273976462228
+
+100%|██████████| 1/1 [00:01<00:00,  1.49s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.49s/it]
+cv2: 150/188 句，用时 13.4 分钟，预计还要 3.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:24,732 INFO synthesis text Chainstitch at home: rice and flour sacks are often closed with a single-thread chain.
+2026-10-19 02:14:29,210 INFO yield speech len 8.32, rtf 0.5382300856021734
+
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:29,390 INFO synthesis text Find the right thread end, pull, and the whole seam comes undone loop by loop like a zip.
+2026-10-19 02:14:33,478 INFO yield speech len 7.36, rtf 0.5554275992123977
+
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:33,661 INFO synthesis text That's the chainstitch's habit of unravelling from an unsecured end, which here becomes a convenience.
+2026-10-19 02:14:38,904 INFO yield speech len 10.16, rtf 0.5160517814591175
+
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:39,082 INFO synthesis text On clothes it's a weakness, so the end of a four hundred and one seam on jeans has to be secured by other means.
+2026-10-19 02:14:44,658 INFO yield speech len 10.2, rtf 0.5466639528087541
+
+100%|██████████| 1/1 [00:05<00:00,  5.75s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:44,709 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-19 02:14:44,837 INFO synthesis text Back to the start.
+2026-10-19 02:14:45,879 INFO yield speech len 1.08, rtf 0.9649923554173222
+
+100%|██████████| 1/1 [00:01<00:00,  1.21s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:46,052 INFO synthesis text Each thread needs its ratio times one hundred and seventy-two centimetres times one thousand pieces times one.twelve.
+2026-10-19 02:14:53,096 INFO yield speech len 13.32, rtf 0.5287847182414195
+
+100%|██████████| 1/1 [00:07<00:00,  7.22s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:14:53,282 INFO synthesis text By the model, each needle thread needs about four thousand, six hundred and twenty-three metres, one cone each; the looper thread about twenty-three thousand, one hundred and seventeen metres, five cones; about thirty-two thousand, three hundred and sixty-four metres and seven cones in all.
+2026-10-19 02:15:05,624 INFO yield speech len 23.4, rtf 0.5273985455178807
+
+100%|██████████| 1/1 [00:12<00:00, 12.53s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:05,828 INFO synthesis text The supervisor's total divided by five thousand also gives seven, but only by coincidence: it says nothing about which thread needs how many.
+2026-10-19 02:15:12,546 INFO yield speech len 12.44, rtf 0.5400251537273935
+
+100%|██████████| 1/1 [00:06<00:00,  6.90s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:12,727 INFO synthesis text The looper thread takes seventy-one percent, and a cone feeds only one thread, so the looper thread must be stocked separately.
+2026-10-19 02:15:18,611 INFO yield speech len 11.44, rtf 0.5143266457777758
+
+100%|██████████| 1/1 [00:06<00:00,  6.06s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:18,796 INFO synthesis text Now Virtual lab ten-one, the chainstitch looper and stitch four hundred and one. On the WenQuest platform you can do it yourself. The readings of the five criteria, the verdict, the settings and the tasks are blurred here. Read them when you do the lab yourself.
+2026-10-19 02:15:29,349 INFO yield speech len 20.32, rtf 0.5193284646732601
+
+100%|██████████| 1/1 [00:10<00:00, 10.74s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.74s/it]
+cv2: 160/188 句，用时 14.5 分钟，预计还要 2.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:29,543 INFO synthesis text First pause and press Loop-catch moment. The needle has risen, and in the front and top views you can see the looper point enter the loop from behind the needle.
+2026-10-19 02:15:35,760 INFO yield speech len 11.96, rtf 0.51986549211585
+
+100%|██████████| 1/1 [00:06<00:00,  6.39s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:35,941 INFO synthesis text Now press Needle at looper height. As the next needle comes down, the point is already in front of it, and the needle has to go into the triangle of blade, looper thread and loop.
+2026-10-19 02:15:42,425 INFO yield speech len 12.4, rtf 0.5229628278363135
+
+100%|██████████| 1/1 [00:06<00:00,  6.66s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:42,614 INFO synthesis text Task one: press Scramble. All five settings are thrown off. See which criteria turn red, then bring back the timing, the height, the avoidance, the clearance and the retraction one by one until all five pass.
+2026-10-19 02:15:52,060 INFO yield speech len 17.72, rtf 0.5330661349587194
+
+100%|██████████| 1/1 [00:09<00:00,  9.64s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:52,250 INFO synthesis text Task two: reset, then move only the looper timing, half a degree at a time. Try retarding it first,.
+2026-10-19 02:15:58,273 INFO yield speech len 11.16, rtf 0.5397186270751406
+
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:15:58,452 INFO synthesis text then advancing it. Note which criterion turns red first at each end, and check the window from the lecture for yourself in the task box.
+2026-10-19 02:16:05,418 INFO yield speech len 12.76, rtf 0.5459065160781239
+
+100%|██████████| 1/1 [00:07<00:00,  7.14s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:05,601 INFO synthesis text Virtual lab ten-two, coverstitch and thread use, is on the platform too. The readings on the consumption chart, the batch table, the cone count and the tasks are blurred here as well.
+2026-10-19 02:16:13,211 INFO yield speech len 14.56, rtf 0.5226654829559745
+
+100%|██████████| 1/1 [00:07<00:00,  7.79s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:13,393 INFO synthesis text Start by switching stitches. four hundred and one has one needle thread and one looper thread. The face looks like a lockstitch, and the back is a row of chain loops.
+2026-10-19 02:16:19,554 INFO yield speech len 11.72, rtf 0.5256819033378627
+
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:19,759 INFO synthesis text six hundred and five has three needles and one looper, plus a cover thread, so both faces are covered. Go through all five stitches, note each thread's ratio, and compare it with the published figure.
+2026-10-19 02:16:29,182 INFO yield speech len 17.6, rtf 0.5353843488476493
+
+100%|██████████| 1/1 [00:09<00:00,  9.63s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:29,375 INFO synthesis text The task: go back to four hundred and six and press the T-shirt hem-and-cuffs preset. The quantity, the wastage and the cone length are filled in. Read the batch length and the number of cones for each thread, and enter them in the task box to check.
+2026-10-19 02:16:38,935 INFO yield speech len 18.4, rtf 0.5195674170618473
+
+100%|██████████| 1/1 [00:09<00:00,  9.74s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:39,126 INFO synthesis text Finally, slide the density slowly from seven stitches per centimetre down to four. The stitches spread out. Think about why sparser stitches use less thread per centimetre of seam. The guide and the report template are on the platform.
+2026-10-19 02:16:48,237 INFO yield speech len 17.6, rtf 0.5176673152230002
+
+100%|██████████| 1/1 [00:09<00:00,  9.30s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.30s/it]
+cv2: 170/188 句，用时 15.8 分钟，预计还要 1.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:48,430 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-19 02:16:51,823 INFO yield speech len 6.08, rtf 0.5580222528231771
+
+100%|██████████| 1/1 [00:03<00:00,  3.56s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:51,997 INFO synthesis text You can open today's interactive slides and both virtual labs yourself, and drag the shaft angle to watch the looper catch the loop, moment by moment.
+2026-10-19 02:16:59,456 INFO yield speech len 14.16, rtf 0.5268157370346415
+
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:16:59,645 INFO synthesis text You submit the assignment and the lab reports on the platform, and get marks and comments back.
+2026-10-19 02:17:03,611 INFO yield speech len 7.52, rtf 0.5274539932291559
+
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:17:03,792 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-19 02:17:08,983 INFO yield speech len 9.8, rtf 0.5296736834000567
+
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:17:09,161 INFO synthesis text Your assignment has four questions. One: two thousand sports tops, an eighty-centimetre neckline each, sewn in six hundred and five with a five.six-millimetre gauge, ten percent wastage and five thousand-metre cones. Using today's model, find each thread's ratio, batch length and number of cones, and say which thread is most likely to run out.
+2026-10-19 02:17:19,774 INFO yield speech len 20.28, rtf 0.5233204576390734
+
+100%|██████████| 1/1 [00:10<00:00, 10.80s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:17:19,969 INFO synthesis text Two: the manual puts the spreader at its leftmost when the needle bar has come down one.one millimetres from top dead centre. Use the Chapter three formula to check that this is about twenty-five degrees, then find the angle for two.zero millimetres. What happens if the spreader arrives late?
+2026-10-19 02:17:29,470 INFO yield speech len 18.4, rtf 0.5163892714873605
+
+100%|██████████| 1/1 [00:09<00:00,  9.69s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:17:29,666 INFO synthesis text Three: in Virtual lab ten-one, retard and then advance the looper timing by five degrees, and give the first criterion to fail, the fault you'd see, and the order of adjustment. Four, for discussion: on the same knit garment, why are hems usually four hundred and six, joining seams six hundred and five or six hundred and seven, and side seams overlock?
+2026-10-19 02:17:46,473 INFO yield speech len 30.72, rtf 0.5471218532572191
+
+100%|██████████| 1/1 [00:17<00:00, 17.01s/it]
+100%|██████████| 1/1 [00:17<00:00, 17.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:17:46,683 INFO synthesis text Submit your working, the lab screenshots and the analysis on the WenQuest platform.
+2026-10-19 02:17:51,535 INFO yield speech len 8.8, rtf 0.5513646385886452
+
+100%|██████████| 1/1 [00:05<00:00,  5.02s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:17:51,713 INFO synthesis text There's also a ten-question quiz. For example, at standard settings the catch is at two hundred and fourteen degrees, with a rise of three.thirty-six millimetres. Retard the looper by five degrees: roughly how far has the needle risen at the catch, and is that a problem?
+2026-10-19 02:18:01,281 INFO yield speech len 18.8, rtf 0.5089350456887103
+
+100%|██████████| 1/1 [00:09<00:00,  9.75s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:01,473 INFO synthesis text Or, add a cover thread to four hundred and six to get six hundred and two, with everything else the same. By what percentage does the thread per centimetre of seam go up?
+2026-10-19 02:18:08,868 INFO yield speech len 13.8, rtf 0.5358743840369625
+
+100%|██████████| 1/1 [00:07<00:00,  7.57s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.57s/it]
+cv2: 180/188 句，用时 17.1 分钟，预计还要 0.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:09,054 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-19 02:18:12,065 INFO yield speech len 5.52, rtf 0.5454011153483737
+
+100%|██████████| 1/1 [00:03<00:00,  3.18s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:12,110 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-19 02:18:12,237 INFO synthesis text Three things to remember.
+2026-10-19 02:18:13,991 INFO yield speech len 2.48, rtf 0.7073913851091939
+
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:14,164 INFO synthesis text One: a four hundred and one stitch hinges on two moments: at the catch, the point enters the loop from behind the needle; when the next needle arrives, the point is in front and the needle enters the triangle.
+2026-10-19 02:18:21,626 INFO yield speech len 13.92, rtf 0.5360983911601976
+
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:21,809 INFO synthesis text Two: the looper's swing and avoidance make a flat ellipse, and the timing window is only about minus three.five to plus four degrees.
+2026-10-19 02:18:27,993 INFO yield speech len 11.64, rtf 0.5312539662692145
+
+100%|██████████| 1/1 [00:06<00:00,  6.36s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:28,193 INFO synthesis text Three: count consumption thread by thread and stock cones the same way, with extra looper thread.
+2026-10-19 02:18:33,363 INFO yield speech len 9.92, rtf 0.5212370186082779
+
+100%|██████████| 1/1 [00:05<00:00,  5.37s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:33,548 INFO synthesis text The assignment, quiz and both labs are on WenQuest.
+2026-10-19 02:18:36,198 INFO yield speech len 4.52, rtf 0.5863893348558815
+
+100%|██████████| 1/1 [00:02<00:00,  2.82s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:36,374 INFO synthesis text The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-19 02:18:46,464 INFO yield speech len 18.84, rtf 0.535552339695568
+
+100%|██████████| 1/1 [00:10<00:00, 10.28s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-19 02:18:46,660 INFO synthesis text Next time, the mechanisms of typical special machines. Zigzag machines, buttonholers, button sewers and bartackers are each a sewing head plus a planar motion of the needle or the fabric. See you then.
+2026-10-19 02:18:55,665 INFO yield speech len 16.92, rtf 0.5322399009767717
+
+100%|██████████| 1/1 [00:09<00:00,  9.19s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.19s/it]
+cv2: 188/188 句，用时 17.9 分钟，预计还要 0.0 分钟
+cv2: 188 句完成
+2026-10-19 02:18:55,726 DEBUG Attempting to acquire lock 130827935371216 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-19 02:18:55,727 DEBUG Lock 130827935371216 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-19 02:18:55,727 DEBUG Attempting to release lock 130827935371216 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-19 02:18:55,727 DEBUG Lock 130827935371216 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-19 02:18:55,729 DEBUG Attempting to acquire lock 130827935378080 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-19 02:18:55,729 DEBUG Lock 130827935378080 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-19 02:18:55,729 DEBUG Attempting to release lock 130827935378080 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-19 02:18:55,729 DEBUG Lock 130827935378080 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+
+Downloading [zh/itn/prefix.fst]:   0%|          | 0.00/1.83M [17:57<?, ?B/s]
+GPU 机器已关机，用时 29 分钟
