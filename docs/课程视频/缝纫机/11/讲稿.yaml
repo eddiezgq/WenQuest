@@ -1,0 +1,134 @@
+# 《缝纫机设计与制造》公开课 第 11 讲：典型特种机的机构
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch11.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 11-1（之字缝：摆针定时与钩线）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch11.py 算出（{{ch11.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "11"
+deck: ch11
+skip: [4, 14, 19, 21]   # 六种机器一览、两端高度与间隙的调法、机械凸轮到电子凸轮、第五节章节页：控制课程部分约 10 分钟（课件与教材里都有；六种机器在开场里说到，“针在布外才能移动”的约束在第 18、20、24 页都讲到）
+code: [ch11]
+title: ["典型特种机的机构：一个缝纫头，加一套平面运动", "Mechanisms of Typical Special Machines: a Sewing Head plus a Planar Motion"]
+chapter: ["第三篇 包缝、绷缝与链缝 · 第 11 章", "Part III Overlock, Coverstitch and Chainstitch · Chapter 11"]
+next: ["第 12 讲", "Lecture 12"]
+cover_formula: 'a_{\max} = C\,\frac{w\,\omega^2}{\beta^2}'
+tags:
+  zh: [之字缝机, 锁眼机, 钉扣机, 套结机, 电脑刺绣机, 运动规律, 缝纫机设计]
+  en: [zigzag sewing machine, buttonholer, button sewer, bartacker, embroidery machine, motion law, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十一讲，典型特种机的机构。
+    - 衬衫上的扣眼、钉好的纽扣、裤袢两端的套结、内衣上的松紧带之字线，都出自特种机。它们看起来五花八门，结构却一样：一个缝纫头，加上针或布在平面里的运动。今天以之字缝机为主线，看横摆放在哪段转角、用什么运动规律、摆宽受什么限制。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 11, the mechanisms of typical special machines.
+    - The buttonholes on a shirt, the buttons sewn on it, the bartacks at the ends of a belt loop, the zigzag that holds the elastic in underwear. All of them come from special machines. They look very different, but they share one structure. A sewing head, plus a motion of the needle or the fabric in a plane. Today we follow the zigzag machine. Where in the turn of the shaft does the swing belong, which motion law should it follow, and what limits the bight?
+
+after:
+  - id: lab111
+    kind: lab
+    lab: zigzag
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checks, #wv, #fsv, #fev, #rlv, #msg { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; })()"
+        press: "#reset"
+      - set: {fs: 250, fe: 110}
+      - press: ["#reset", "#mess"]
+        js: "window.scrollTo(0, 0)"
+      - press: "#reset"
+        js: "(() => { window.scrollTo(0, 0); const s = document.getElementById('law'); s.selectedIndex = 1; s.dispatchEvent(new Event('change', {bubbles: true})); })()"
+      - sweep: {fe: [85, 60]}
+        dur: 6
+      - press: "#reset"
+        js: "window.scrollTo(0, 0)"
+        sweep: {w: [8, 11.5]}
+        dur: 8
+    say:
+      zh:
+        - ">下面是虚拟实验 11-1，之字缝的摆针定时与钩线，在问渠平台上可以亲手做。判据读数、调整量和任务这里先遮住，留给你自己读。"
+        - ">先把摆动开始改到 250 度、结束改到 110 度：左边针尖路径上出现红色段，横摆伸进了针在布里的时段。"
+        - ">任务一，按“打乱”：区间、规律、旋梭定时都被改乱。先调摆动开始和结束，让横摆离开红色区段，再调旋梭定时，直到四条判据全部满足。"
+        - ">恢复标准，把运动规律换成摆线。在平台上把修正梯形、摆线、简谐都试一遍，记下横向惯性力，除以 0.15 千克就是峰值加速度，和前面的算例对照。"
+        - ">任务二，用摆线，把区间一点点收窄，找出惯性力不超过 250 牛、横摆又全在布外的最窄区间，自己读数，填进报告。"
+        - ">最后恢复标准，慢慢加大摆宽，看右边的线迹图里没钩住的叉是怎样出现的。这里只看现象；任务三要先把旋梭定时调到窗口上边，再找最大摆宽，填进任务框核对。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 11-1, zigzag swing timing and loop catching. On the WenQuest platform you can do it yourself. The readings of the four criteria, the values of the settings and the tasks are blurred here, so you can read them yourself on the platform."
+        - ">First set the swing start to 250 degrees and the end to 110. A red segment appears on the needle path on the left: the swing has run into the time the needle is in the fabric."
+        - ">Task one: press Scramble. The interval, the law and the hook timing are all thrown off. Adjust the swing start and end first, until the swing leaves the red segment, then the hook timing, until all four criteria pass."
+        - ">Reset, and switch the motion law to cycloidal. On the platform, try modified trapezoid, cycloidal and harmonic in turn. Note the sideways inertia force, divide by 0.15 kilograms to get the peak acceleration, and compare with the worked example."
+        - ">Task two: with the cycloidal law, narrow the interval step by step. Find the narrowest interval that keeps the force at or under 250 newtons and the swing entirely out of the fabric. Read it yourself and put it in your report."
+        - ">Finally, reset and slowly widen the bight. Watch how crosses for missed catches appear in the stitch view on the right. This only shows the effect. For task three, first set the hook timing to the top of the window, then find the maximum bight and enter it in the task box to check. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 11-1，可以自己动手", "Interactive slides and Lab 11-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和虚拟实验都可以自己打开，拖动摆动区间、换运动规律，看惯性力和线迹怎样跟着变。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the virtual lab yourself, drag the swing interval, change the motion law, and watch the inertia force and the stitches change with them."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 11：之字缝机加大摆宽的可行性核算", "Assignment 11: can the zigzag bight be widened?"]
+      points:
+        - ["摆宽 10 mm：两种规律的惯性力与最高转速", "A 10 mm bight: force and top speed under two laws"]
+        - ["摆宽 6 mm、10 mm 的钩线时刻差；10 mm 两端能否都钩住", "Catch difference at 6 and 10 mm; can 10 mm be caught at both ends?"]
+        - ["套结机步距 5 mm → 8 mm 的降速；刺绣机提速的两条措施", "Bartacker step 5 → 8 mm: how much slower; two ways to speed up embroidery"]
+      foot: ["计算过程与结果表、实验 11-1 任务二和任务三截图、2 页以内的讨论，在问渠学习平台提交。", "Working and a results table, Lab 11-1 Task 2 and 3 screenshots, and up to 2 pages of discussion, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，摆宽加到 10 毫米，其余同开头的问题，分别按修正梯形和摆线，求每分钟 5000 转时的惯性力和不超限的最高转速。"
+        - ">第二题，旋梭半径 13.5 毫米，求摆宽 6 毫米和 10 毫米时两端钩线的时刻差；按本讲借用的窗口，右端最早约 198 度、左端最晚约 218 度，判断 10 毫米能不能两端都钩住，和说明书的最大摆宽比一比，说明为什么要实测。"
+        - ">第三题，电子套结机压框每步 5 毫米，移动区间 170 度、修正梯形，求每分钟 3200 针时的峰值加速度；步距加大到 8 毫米、加速度不许超过这个值，转速要降到多少？第四题讨论：刺绣机只有平缝机四分之一左右的转速，提出两条提速措施，说明各自的代价。"
+        - 计算过程、实验截图和讨论，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: the bight grows to 10 millimetres, with everything else as in the opening problem. For the modified-trapezoid and the cycloidal laws, find the inertia force at 5000 r/min and the highest speed that stays within the limit."
+        - ">Two: the hook radius is 13.5 millimetres. Find the catch difference between the two ends for bights of 6 and 10 millimetres. Using the loop window borrowed in this lecture, right end at the earliest about 198 degrees and left end at the latest about 218, decide whether 10 millimetres can be caught at both ends. Compare with the manual, and explain why it has to be measured."
+        - ">Three: an electronic bartacker moves its clamp 5 millimetres a step, over 170 degrees, with a modified trapezoid. Find the peak acceleration at 3200 stitches a minute. If the step grows to 8 millimetres with no more acceleration allowed, how far must the speed drop? Four, for discussion: an embroidery machine runs at about a quarter of lockstitch speed. Propose two ways to speed it up, and the cost of each."
+        - Submit your working, the lab screenshots and the discussion on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["8 mm、5000 r/min、170°，修正梯形：峰值加速度约多少？", "8 mm, 5000 r/min, 170°, modified trapezoid: peak acceleration?"]
+        - ["转速 5000 → 6000 r/min：加速度变为几倍？", "5000 → 6000 r/min: by what factor does it grow?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：摆宽 8 毫米、每分钟 5000 转、摆动区间 170 度，修正梯形的峰值加速度约是多少？"
+        - ">再比如：其他不变，转速从 5000 提到 6000，峰值加速度变为原来的几倍？还有一道判断题：梭尖从右向左扫，是不是左端先被钩住？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, with an 8-millimetre bight, 5000 r/min and a 170-degree swing, what is the peak acceleration under the modified trapezoid?"
+        - ">Or, with everything else the same, the speed goes from 5000 to 6000. By what factor does the peak acceleration grow? And a true-or-false: the hook point sweeps right to left, so is the left end caught first?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲我们见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - See you next time.

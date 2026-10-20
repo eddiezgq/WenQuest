@@ -115,15 +115,15 @@ slides:
       - ["送布和摆针共用这个窗口；布越厚越窄", "Feed and swing share it; thicker fabric narrows it"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <circle cx="330" cy="320" r="230" fill="none" stroke="#1c2a42" stroke-width="60"/>
           <path d="M103.5 359.9 A230 230 0 1 1 556.5 359.9" fill="none" stroke="#2ec4b6" stroke-width="60"/>
           <path d="M556.5 359.9 A230 230 0 0 1 103.5 359.9" fill="none" stroke="#c8d2de" stroke-width="60" opacity=".55"/>
-          <text x="330" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">0°（针杆最高）</text>
+          <text x="330" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">0°（针杆最高）</text><text x="330" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">0° (needle bar at top)</text>
           <text x="330" y="626" font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">180°</text>
           <text x="330" y="300" font-size="40" font-weight="800" fill="#5ee0d2" text-anchor="middle">≈ {{ch11.win:.0f}}°</text>
           <text x="330" y="340" font-size="24" fill="#d3deea" text-anchor="middle">针在布外 · out of fabric</text>
-          <text x="330" y="470" font-size="26" fill="#c8d2de" text-anchor="middle">针在布中</text>
+          <text x="330" y="470" font-size="26" fill="#c8d2de" text-anchor="middle">针在布中</text><text x="330" y="470" font-size="26" fill="#c8d2de" text-anchor="middle" class="eo">in fabric</text>
           <text x="620" y="200" font-size="30" font-weight="800" fill="#5ee0d2">送布 + 横摆</text>
           <text x="620" y="236" font-size="22" fill="#8fa3ba" class="en">feed + swing share it</text>
           <text x="600" y="400" font-size="26" fill="#d3deea" class="en">{{ch11.win_enter:.0f}}°</text>
@@ -165,7 +165,7 @@ slides:
       - ["右端先钩：针回升只有 {{ch11.riseR:.1f}} mm", "The right end is caught first: only {{ch11.riseR:.1f}} mm of rise"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <circle cx="450" cy="380" r="220" fill="none" stroke="#4b5f7d" stroke-width="4" stroke-dasharray="12 10"/>
           <circle cx="450" cy="380" r="10" fill="#8fa3ba"/>
           <path d="M450 380 L344 187" stroke="#ff7a45" stroke-width="4"/><path d="M450 380 L556 187" stroke="#4c8dff" stroke-width="4"/>
@@ -174,17 +174,17 @@ slides:
           <g stroke="#c8d2de" stroke-width="12" stroke-linecap="round"><path d="M344 40 L344 175"/><path d="M556 40 L556 175"/></g>
           <path d="M344 120 L556 120" stroke="#f2b705" stroke-width="3" stroke-dasharray="8 6"/>
           <text x="450" y="108" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">w</text>
-          <text x="300" y="40" font-size="26" fill="#ffb38f" text-anchor="end">左端：后钩</text>
-          <text x="600" y="40" font-size="26" fill="#8fbaff">右端：先钩</text>
+          <text x="300" y="40" font-size="26" fill="#ffb38f" text-anchor="end">左端：后钩</text><text x="300" y="40" font-size="26" fill="#ffb38f" text-anchor="end" class="eo">left: caught later</text>
+          <text x="600" y="40" font-size="26" fill="#8fbaff">右端：先钩</text><text x="600" y="40" font-size="26" fill="#8fbaff" class="eo">right: caught first</text>
           <path d="M700 260 A220 220 0 0 0 600 190" fill="none" stroke="#2ec4b6" stroke-width="8"/>
           <path d="M600 190 l30 -2 l-14 26 z" fill="#2ec4b6"/>
           <text x="640" y="330" font-size="26" fill="#5ee0d2">梭尖 · hook</text>
           <text x="450" y="460" font-size="28" fill="#d3deea" text-anchor="middle">R = 13.5 mm</text>
-          <text x="450" y="560" font-size="22" fill="#8fa3ba" text-anchor="middle">梭尖转过 w/R，主轴只转一半：Δφ = w/(2R)</text>
+          <text x="450" y="628" font-size="22" fill="#8fa3ba" text-anchor="middle" class="zh">梭尖转过 w/R，主轴只转一半：Δφ = w/(2R)</text><text x="450" y="628" font-size="22" fill="#8fa3ba" text-anchor="middle" class="eo">The hook turns w/R, the shaft half that: Δφ = w/(2R)</text>
         </svg>
     notes:
       - "旋梭轴前后布置，梭尖经过针时沿左右方向运动。针在左右两端，梭尖要多转 w 比 R 的角度才能从一端走到另一端；旋梭转速是主轴 2 倍，所以主轴只差一半：Δφ 等于 w 比 2R。R 等于 13.5 毫米、摆宽 8 毫米时约 {{ch11.dphi8:.0f}} 度。梭尖从右向左，右端先钩，那时针回升只有约 {{ch11.riseR:.1f}} 毫米，左端回升 3.8，两端差近 3 毫米。"
-      - "The hook shaft runs front to back, so as the hook point passes the needle it moves left to right. With the needle at the two ends, the point has to turn an extra w over R to get from one to the other; the hook turns twice as fast as the shaft, so the shaft angle differs by half that: delta phi equals w over 2R. With R 13.5 millimetres and an 8-millimetre bight, that's about {{ch11.dphi8:.0f}} degrees. The point sweeps right to left, so the right end is caught first, when the needle has risen only about {{ch11.riseR:.1f}} millimetres, against 3.8 at the left: nearly 3 millimetres apart."
+      - "The hook shaft runs front to back, so as the hook point passes the needle it moves sideways. With the needle at the two ends, the point has to turn an extra w over R to get from one to the other; the hook turns twice as fast as the shaft, so the shaft angle differs by half that: delta phi equals w over 2R. With R 13.5 millimetres and an 8-millimetre bight, that's about {{ch11.dphi8:.0f}} degrees. The point sweeps right to left, so the right end is caught first, when the needle has risen only about {{ch11.riseR:.1f}} millimetres, against 3.8 at the left: nearly 3 millimetres apart."
 
   - layout: bignum
     title: ["摆宽上限，由钩线窗口决定", "The maximum bight is set by the catching window"]
@@ -309,7 +309,7 @@ slides:
       - ["绣框重：约 1200 r/min，只有平缝机的 1/4", "A heavy frame: about 1200 r/min, a quarter of a lockstitch"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="60" y="40" width="780" height="110" rx="16" fill="#2a3a55"/>
           <g fill="#c8d2de"><rect x="110" y="150" width="14" height="80"/><rect x="170" y="150" width="14" height="80"/><rect x="230" y="150" width="14" height="80"/><rect x="290" y="150" width="14" height="150" fill="#f2b705"/><rect x="350" y="150" width="14" height="80"/><rect x="410" y="150" width="14" height="80"/><rect x="470" y="150" width="14" height="80"/><rect x="530" y="150" width="14" height="80"/><rect x="590" y="150" width="14" height="80"/></g>
           <text x="450" y="105" font-size="28" font-weight="700" fill="#d3deea" text-anchor="middle">针杆箱 · needle-bar case</text>
@@ -318,7 +318,7 @@ slides:
           <rect x="100" y="320" width="700" height="250" rx="12" fill="none" stroke="#ff7a45" stroke-width="12"/>
           <rect x="112" y="332" width="676" height="226" fill="#e9dcc0" opacity=".85"/>
           <path d="M300 400 C 360 360, 420 470, 480 420 S 600 380, 640 460" fill="none" stroke="#2c6fd6" stroke-width="7"/>
-          <text x="450" y="610" font-size="26" fill="#ffb38f" text-anchor="middle">绣框 X、Y 移动：每针几毫米都要在针离布时走完</text>
+          <text x="450" y="610" font-size="26" fill="#ffb38f" text-anchor="middle">绣框 X、Y 移动：每针几毫米都要在针离布时走完</text><text x="450" y="610" font-size="26" fill="#ffb38f" text-anchor="middle" class="eo">Frame moves in X, Y: a few mm per stitch, all with the needle out</text>
         </svg>
     notes:
       - "多针绗缝机一根横梁上装几十根针，每根针一根弯针，一次缝多道平行的 401。电脑刺绣机每个机头有 9 到 15 根针杆，一个驱动器只带动对准的那一根，换色时整个针杆箱横移。多头机共用上轴和下轴。刺绣机转速只有平缝机的四分之一左右，某型每分钟 1200 转，因为绣框很重，每针几毫米的移动都要在针离开布料的时候走完。"
@@ -336,8 +336,8 @@ slides:
       - {n: "{{ch11.FCY120:.0f}} N", label: ["摆线，压到 120°：×{{ch11.r120:.1f}}", "Cycloidal at 120°: ×{{ch11.r120:.1f}}"]}
     foot: ["F = m · C w ω² / β²，m = 0.15 kg，ω = {{ch11.omega:.0f}} rad/s，β = {{ch11.beta:.2f}} rad；限值 250 N", "F = m · C w ω² / β², m = 0.15 kg, ω = {{ch11.omega:.0f}} rad/s, β = {{ch11.beta:.2f}} rad; limit 250 N"]
     notes:
-      - "代数算。主轴角速度 {{ch11.omega:.0f}} 弧度每秒，170 度是 {{ch11.beta:.2f}} 弧度。修正梯形，峰值加速度约 {{ch11.aMT:.0f}} 米每二次方秒，乘 0.15 千克，惯性力约 {{ch11.FMT:.0f}} 牛；摆线约 {{ch11.aCY:.0f}}，惯性力约 {{ch11.FCY:.0f}} 牛，都在 250 牛以内。压到 120 度，加速度乘 170 比 120 的平方，约 {{ch11.r120:.1f}} 倍，摆线约 {{ch11.FCY120:.0f}} 牛，修正梯形约 {{ch11.FMT120:.0f}} 牛，都超限。"
-      - "Let's compute. The shaft turns at {{ch11.omega:.0f}} radians per second, and 170 degrees is {{ch11.beta:.2f}} radians. Modified trapezoid: a peak of about {{ch11.aMT:.0f}} metres per second squared; times 0.15 kilograms, about {{ch11.FMT:.0f}} newtons. Cycloidal: about {{ch11.aCY:.0f}}, giving about {{ch11.FCY:.0f}} newtons. Both are under 250. Squeeze to 120 degrees and the acceleration is multiplied by 170 over 120 squared, about {{ch11.r120:.1f}}: about {{ch11.FCY120:.0f}} newtons cycloidal and {{ch11.FMT120:.0f}} modified trapezoid, both over the limit."
+      - "回到开头的车间问题，代入数字算。主轴角速度 {{ch11.omega:.0f}} 弧度每秒，170 度是 {{ch11.beta:.2f}} 弧度。修正梯形，峰值加速度约 {{ch11.aMT:.0f}} 米每二次方秒，乘 0.15 千克，惯性力约 {{ch11.FMT:.0f}} 牛；摆线约 {{ch11.aCY:.0f}}，惯性力约 {{ch11.FCY:.0f}} 牛，都在 250 牛以内。压到 120 度，加速度乘 170 比 120 的平方，约 {{ch11.r120:.1f}} 倍，摆线约 {{ch11.FCY120:.0f}} 牛，修正梯形约 {{ch11.FMT120:.0f}} 牛，都超限。"
+      - "Back to the shop-floor problem, with numbers. The shaft turns at {{ch11.omega:.0f}} radians per second, and 170 degrees is {{ch11.beta:.2f}} radians. Modified trapezoid: a peak of about {{ch11.aMT:.0f}} metres per second squared; times 0.15 kilograms, about {{ch11.FMT:.0f}} newtons. Cycloidal: about {{ch11.aCY:.0f}}, giving about {{ch11.FCY:.0f}} newtons. Both are under 250. Squeeze to 120 degrees and the acceleration is multiplied by 170 over 120 squared, about {{ch11.r120:.1f}}: about {{ch11.FCY120:.0f}} newtons cycloidal and {{ch11.FMT120:.0f}} modified trapezoid, both over the limit."
 
   - layout: split
     title: ["机器人联系：时间标定与 S 形加减速", "Robot link: time scaling and S-curves"]
@@ -347,16 +347,16 @@ slides:
       - ["点胶、焊接：工具离开工件时才大幅横移", "Dispensing, welding: big moves only with the tool off the part"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <text x="0" y="40" font-size="26" fill="#8fa3ba">加速度曲线 · acceleration profiles</text>
           <path d="M40 220 L860 220" stroke="#2c3e5c" stroke-width="2"/>
           <path d="M40 220 L40 100 L240 100 L240 340 L440 340 L440 220" fill="none" stroke="#8fa3ba" stroke-width="6"/>
-          <text x="140" y="85" font-size="26" fill="#c8d2de" text-anchor="middle">梯形速度：加速度突变</text>
+          <text x="140" y="85" font-size="26" fill="#c8d2de" text-anchor="middle">梯形速度：加速度突变</text><text x="140" y="85" font-size="26" fill="#c8d2de" text-anchor="middle" class="eo">trapezoid: jumps</text>
           <path d="M460 220 C 490 220, 500 110, 540 110 L 600 110 C 640 110, 650 220, 660 220 C 670 220, 680 330, 720 330 L 780 330 C 820 330, 830 220, 860 220" fill="none" stroke="#2ec4b6" stroke-width="6"/>
-          <text x="660" y="85" font-size="26" fill="#5ee0d2" text-anchor="middle">S 形：加速度连续</text>
+          <text x="660" y="85" font-size="26" fill="#5ee0d2" text-anchor="middle" class="zh">S 形：加速度连续</text><text x="660" y="85" font-size="26" fill="#5ee0d2" text-anchor="middle" class="eo">S-curve: continuous</text>
           <rect x="40" y="420" width="820" height="170" rx="20" fill="#111d31" stroke="#22324d"/>
           <text x="450" y="490" font-size="40" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">a_peak ∝ w / T²</text>
-          <text x="450" y="545" font-size="24" fill="#8fa3ba" text-anchor="middle">时间减半 → 加速度、电机力矩 ×4</text>
+          <text x="450" y="545" font-size="24" fill="#8fa3ba" text-anchor="middle">时间减半 → 加速度、电机力矩 ×4</text><text x="450" y="545" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">half the time → 4× acceleration and motor torque</text>
         </svg>
     notes:
       - "选摆针规律，就是机器人轨迹规划里的时间标定：同样走 w 的距离、限定在时间 T 内完成，峰值加速度和 w 比 T 平方成正比，时间压缩一半，加速度和电机力矩就变成 4 倍。伺服驱动器常用的 S 形加减速，限制加加速度，和修正梯形是同一个思路：加速度连续、不激起冲击，峰值又不太高。点胶、焊接机器人只能在工具离开工件时大幅横移，和针在布外才能摆是同一条约束。"
@@ -370,13 +370,13 @@ slides:
       - ["摆针、扣夹、绣框都一样：针离布时才能动", "Needle, clamp, frame: they move only when the needle is out"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="60" y="420" width="780" height="20" rx="4" fill="#e9dcc0"/>
           <path d="M200 400 L560 330 L560 360 L200 410 Z" fill="#ff7a45"/>
           <rect x="180" y="400" width="420" height="20" rx="6" fill="#8fa3ba"/>
           <circle cx="210" cy="400" r="18" fill="#4b5f7d"/>
           <path d="M640 380 L800 380 M790 370 L805 380 L790 390" stroke="#2ec4b6" stroke-width="6" fill="none"/>
-          <text x="720" y="350" font-size="26" fill="#5ee0d2" text-anchor="middle">抬起时挪纸</text>
+          <text x="720" y="350" font-size="26" fill="#5ee0d2" text-anchor="middle">抬起时挪纸</text><text x="720" y="350" font-size="26" fill="#5ee0d2" text-anchor="middle" class="eo">move while up</text>
           <g stroke="#2c6fd6" stroke-width="6"><path d="M140 432 l24 0"/><path d="M640 432 l24 0"/><path d="M720 432 l24 0"/></g>
           <text x="450" y="520" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">压下 = 针在布中：不许动</text>
           <text x="450" y="560" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">pressed = needle in the fabric: no moving</text>
@@ -389,9 +389,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["摆线勉强可以，压到 120° 不行", "Cycloid just about; 120° no"]
     rows:
-      - ["修正梯形，170°", "{{ch11.FMT:.0f}} N"]
-      - ["摆线，170°", "{{ch11.FCY:.0f}} N"]
-      - ["摆线，120°", "{{ch11.FCY120:.0f}} N"]
+      - [["修正梯形，170°", "Modified trapezoid, 170°"], "{{ch11.FMT:.0f}} N"]
+      - [["摆线，170°", "Cycloidal, 170°"], "{{ch11.FCY:.0f}} N"]
+      - [["摆线，120°", "Cycloidal, 120°"], "{{ch11.FCY120:.0f}} N"]
     side: {big: "{{ch11.dphi8:.0f}}°", text: ["两端钩线时刻差 Δφ = w/(2R) = 8/27 rad，右端先钩", "The two ends are caught Δφ = w/(2R) = 8/27 rad apart, right first"]}
     foot: ["送布和摆针本来就在同一个窗口里同时进行：压缩摆针区间并不能给送布多出时间", "Feed and swing already share one window: a shorter swing gives the feed no extra time"]
     notes:
