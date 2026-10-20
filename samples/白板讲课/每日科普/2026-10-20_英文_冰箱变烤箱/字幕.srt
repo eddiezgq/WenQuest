@@ -1,0 +1,350 @@
+1
+00:00:00,300 --> 00:00:04,340
+On the night of October 11, freezers in hundreds of French supermarkets
+10月11日夜里，法国几百家超市的冰柜，
+
+2
+00:00:04,340 --> 00:00:06,910
+were remotely heated to 50 degrees Celsius.
+被黑客远程加热到了50度。
+
+3
+00:00:06,910 --> 00:00:08,420
+That's 122 Fahrenheit.
+那是122华氏度。
+
+4
+00:00:08,420 --> 00:00:10,600
+The ice cream did not survive.
+冰淇淋表示：我不干了。
+
+5
+00:00:10,600 --> 00:00:12,960
+Today's question: a freezer makes cold, right?
+今天的问题：冰柜明明是造冷的，
+
+6
+00:00:12,960 --> 00:00:14,870
+So how do you turn it into an oven?
+它怎么能变成烤箱？
+
+7
+00:00:14,870 --> 00:00:15,520
+Meet Scoop.
+认识一下小勺。
+
+8
+00:00:15,520 --> 00:00:18,880
+Scoop is an ice cream cone, and Scoop is nervous today.
+小勺是一个冰淇淋，今天它很紧张。
+
+9
+00:00:18,880 --> 00:00:22,570
+According to reports, at least 300 Intermarché and Netto stores
+据报道，光是英特马歇和奈拓，
+
+10
+00:00:22,570 --> 00:00:23,220
+were hit.
+就至少有300家店中招。
+
+11
+00:00:23,220 --> 00:00:25,840
+Carrefour said 80 more, plus several other chains.
+家乐福说80家，还有好几家连锁也中招。
+
+12
+00:00:25,840 --> 00:00:28,160
+Some equipment even started to catch fire.
+有的设备甚至开始冒火。
+
+13
+00:00:28,160 --> 00:00:29,880
+One boss estimated the damage:
+老板估计：一天之内，
+
+14
+00:00:29,880 --> 00:00:32,480
+tens of millions of euros, in a single day.
+损失几千万欧元。
+
+15
+00:00:32,480 --> 00:00:35,420
+First, a surprise: a fridge doesn't make cold at all.
+先说一个反常识：冰箱根本不会“造冷”。
+
+16
+00:00:35,420 --> 00:00:36,320
+It moves heat.
+它只会搬热。
+
+17
+00:00:36,320 --> 00:00:38,000
+Like bailing a boat with a sponge:
+就像用海绵从船里舀水：
+
+18
+00:00:38,000 --> 00:00:40,190
+soak it up inside, squeeze it out outside.
+在里面吸饱，到外面拧干。
+
+19
+00:00:40,190 --> 00:00:42,760
+The refrigerant evaporates inside and soaks up heat.
+冷媒在柜子里蒸发，吸走热量，
+
+20
+00:00:42,760 --> 00:00:46,090
+The compressor squeezes it, and the coils outside dump that heat.
+压缩机一挤，在外面的管子上把热放掉。
+
+21
+00:00:46,090 --> 00:00:48,180
+That's why the back of a fridge feels warm.
+所以冰箱背后总是热乎乎的。
+
+22
+00:00:48,180 --> 00:00:49,460
+That's your food's heat.
+那是你食物的热。
+
+23
+00:00:49,460 --> 00:00:51,780
+Twist one: every freezer already has a heater
+反转一：每个冰柜里，
+
+24
+00:00:51,780 --> 00:00:52,670
+built right in.
+本来就装着一个加热器。
+
+25
+00:00:52,670 --> 00:00:54,950
+Freezers grow frost, and the thicker the frost,
+因为冷柜会结霜，霜越厚，
+
+26
+00:00:54,950 --> 00:00:56,280
+the worse they move heat.
+搬热就越慢。
+
+27
+00:00:56,280 --> 00:00:59,040
+So every so often a heater melts the ice away.
+所以它定时开一会儿加热，把霜化掉，
+
+28
+00:00:59,040 --> 00:01:00,370
+It's called defrost.
+这叫除霜。
+
+29
+00:01:00,370 --> 00:01:03,580
+French media reported that's exactly what the attackers did:
+据法国媒体报道，黑客做的就是：
+
+30
+00:01:03,580 --> 00:01:05,360
+forced defrost, and kept it on.
+强行除霜，一直不停。
+
+31
+00:01:05,360 --> 00:01:08,080
+All of this runs on a small connected controller,
+控制这一切的，是一个联网的小盒子，
+
+32
+00:01:08,080 --> 00:01:10,600
+so repair companies can manage it remotely.
+好让维修公司远程管理。
+
+33
+00:01:10,600 --> 00:01:12,620
+Most of the hit units were old models
+中招的大多是老型号，
+
+34
+00:01:12,620 --> 00:01:14,990
+the maker had stopped updating years ago.
+厂家早就不再给它们更新。
+
+35
+00:01:14,990 --> 00:01:17,380
+Twist two: if a freezer simply loses power,
+反转二：其实冰柜停电，
+
+36
+00:01:17,380 --> 00:01:18,500
+it's usually fine.
+问题并不大。
+
+37
+00:01:18,500 --> 00:01:22,660
+The US Department of Agriculture says a full freezer, door closed,
+美国农业部说，装满的冰柜关着门，
+
+38
+00:01:22,660 --> 00:01:24,360
+holds for about 48 hours.
+能撑大约48小时。
+
+39
+00:01:24,360 --> 00:01:27,260
+Because melting ice swallows a lot of heat:
+因为冰要化，得先吃进一大口热：
+
+40
+00:01:27,260 --> 00:01:29,130
+334 joules for every gram.
+每克334焦耳。
+
+41
+00:01:29,130 --> 00:01:30,370
+Ice is a heat sponge.
+冰就是一块热量海绵，
+
+42
+00:01:30,370 --> 00:01:31,840
+It buys your food time.
+替食物挡时间。
+
+43
+00:01:31,840 --> 00:01:33,830
+But a heater cooks it from the inside.
+可加热器是从里面往上烤。
+
+44
+00:01:33,830 --> 00:01:35,630
+No sponge can keep up with that.
+海绵再大，也扛不住。
+
+45
+00:01:35,630 --> 00:01:37,200
+50 degrees is almost as hot
+50度，差不多是死亡谷
+
+46
+00:01:37,200 --> 00:01:39,420
+as Death Valley on its hottest days.
+最热那几天的温度。
+
+47
+00:01:39,420 --> 00:01:41,750
+Twist three: even if the food freezes again,
+反转三：就算东西又冻回去了，
+
+48
+00:01:41,750 --> 00:01:43,190
+it all goes in the trash.
+也得全扔。
+
+49
+00:01:43,190 --> 00:01:45,810
+Between 4 and 60 degrees is the danger zone.
+4到60度是危险区，
+
+50
+00:01:45,810 --> 00:01:48,320
+Bacteria can double in about 20 minutes.
+细菌大约20分钟就能翻一倍。
+
+51
+00:01:48,320 --> 00:01:50,130
+One becomes two, two becomes four.
+一个变两个，两个变四个，
+
+52
+00:01:50,130 --> 00:01:52,120
+In two hours, that's six doublings.
+两个小时，翻六次。
+
+53
+00:01:52,120 --> 00:01:54,120
+Freezing only puts bacteria to sleep.
+冷冻只能让细菌睡觉，
+
+54
+00:01:54,120 --> 00:01:55,370
+It doesn't kill them.
+杀不死它们。
+
+55
+00:01:55,370 --> 00:01:57,780
+So the rule is: two hours in the danger zone,
+所以规矩是：在危险区待过两小时，
+
+56
+00:01:57,780 --> 00:01:58,760
+and out it goes.
+就扔掉。
+
+57
+00:01:58,760 --> 00:01:59,780
+That's why overnight,
+这就是为什么一夜之间，
+
+58
+00:01:59,780 --> 00:02:01,120
+whole shelves went empty.
+货架全空了。
+
+59
+00:02:01,120 --> 00:02:05,640
+One security analyst says stores in Spain, Portugal, Poland, Germany and Belgium
+据一位安全分析师说，西班牙、葡萄牙、波兰、德国、比利时
+
+60
+00:02:05,640 --> 00:02:06,780
+were affected too.
+也有超市受影响。
+
+61
+00:02:06,780 --> 00:02:09,980
+Friendly fine print: so far, officials haven't said who did it,
+友情提示：到目前为止，是谁干的、
+
+62
+00:02:09,980 --> 00:02:11,060
+or how they got in.
+怎么进去的，官方都还没说。
+
+63
+00:02:11,060 --> 00:02:13,380
+France's cyber agency gave simple advice:
+法国网络安全部门的建议很朴素：
+
+64
+00:02:13,380 --> 00:02:16,620
+unplug those boxes from the internet, or lock the door.
+把这些盒子从网上断开，或者把门锁好。
+
+65
+00:02:16,620 --> 00:02:18,620
+Anything you can control from far away,
+能远程控制的东西，
+
+66
+00:02:18,620 --> 00:02:19,960
+someone else might, too.
+别人也可能远程控制。
+
+67
+00:02:19,960 --> 00:02:21,690
+So, your smart gadgets at home?
+所以，你家的智能设备，
+
+68
+00:02:21,690 --> 00:02:22,810
+Keep them updated.
+记得更新。
+
+69
+00:02:22,810 --> 00:02:25,420
+Scoop is fine. Scoop lives in a home freezer.
+小勺没事，它在家里的冰箱里。
+
+70
+00:02:25,420 --> 00:02:27,390
+Yours isn't online... is it?
+你家冰箱，没联网吧？
+
