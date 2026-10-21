@@ -1,0 +1,340 @@
+1
+00:00:00,300 --> 00:00:03,830
+Google's quantum chip just threw away 92 percent of its work.
+谷歌的量子芯片，刚刚把92%的成果扔掉了。
+
+2
+00:00:03,830 --> 00:00:04,580
+On purpose.
+故意的。
+
+3
+00:00:04,580 --> 00:00:05,830
+And that's the good news.
+而且这是个好消息。
+
+4
+00:00:05,830 --> 00:00:07,350
+It made the journal Science.
+登上了《科学》杂志。
+
+5
+00:00:07,350 --> 00:00:09,190
+Today's question: how does a computer
+今天的问题：一台电脑，
+
+6
+00:00:09,190 --> 00:00:11,050
+get better by throwing things away?
+怎么靠“扔东西”变强？
+
+7
+00:00:11,050 --> 00:00:11,750
+Meet Qubie.
+认识一下小比特。
+
+8
+00:00:11,750 --> 00:00:15,080
+Qubie is a qubit, and Qubie is very, very fragile.
+它是一个量子比特，非常非常脆弱。
+
+9
+00:00:15,080 --> 00:00:17,080
+A normal bit is like a light switch:
+普通的比特像电灯开关：
+
+10
+00:00:17,080 --> 00:00:17,860
+zero or one.
+0 或者 1。
+
+11
+00:00:17,860 --> 00:00:19,760
+A qubit is more like a spinning coin:
+量子比特更像一枚旋转的硬币：
+
+12
+00:00:19,760 --> 00:00:21,410
+a bit of both, until you look.
+看之前，两样都沾一点。
+
+13
+00:00:21,410 --> 00:00:23,190
+But a little heat or a little noise,
+可一点点热、一点点噪声，
+
+14
+00:00:23,190 --> 00:00:24,900
+and the coin wobbles off course.
+硬币就转歪了。
+
+15
+00:00:24,900 --> 00:00:25,750
+That's an error.
+这就是错误。
+
+16
+00:00:25,750 --> 00:00:27,790
+And quantum chips make lots of them.
+量子芯片犯的错可多了。
+
+17
+00:00:27,790 --> 00:00:29,950
+So Google groups many qubits together
+所以谷歌把很多量子比特编成一组，
+
+18
+00:00:29,950 --> 00:00:32,230
+to act like one sturdy logical qubit.
+当一个结实的“逻辑比特”用。
+
+19
+00:00:32,230 --> 00:00:33,310
+Like a group of friends
+就像一群朋友，
+
+20
+00:00:33,310 --> 00:00:35,200
+remembering one phone number together.
+一起记一个电话号码。
+
+21
+00:00:35,200 --> 00:00:37,690
+Twist one: the team is great at the easy moves,
+反转一：这一组人做简单动作很拿手，
+
+22
+00:00:37,690 --> 00:00:38,820
+but not every move.
+但不是所有动作都行。
+
+23
+00:00:38,820 --> 00:00:40,280
+To compute anything at all,
+想算任何题目，
+
+24
+00:00:40,280 --> 00:00:42,120
+it needs one special ingredient.
+还缺一样特殊材料。
+
+25
+00:00:42,120 --> 00:00:43,900
+Physicists call it a magic state.
+物理学家管它叫“魔法态”。
+
+26
+00:00:43,900 --> 00:00:45,420
+Yes, that's the real name.
+没错，真叫这个名字。
+
+27
+00:00:45,420 --> 00:00:47,220
+Think of it as the yeast in bread:
+就像面包里的酵母：
+
+28
+00:00:47,220 --> 00:00:48,720
+without it, nothing rises.
+没有它，面发不起来。
+
+29
+00:00:48,720 --> 00:00:51,320
+The problem: fresh magic states come out messy,
+麻烦是：魔法态刚做出来，
+
+30
+00:00:51,320 --> 00:00:52,280
+full of errors.
+总是乱糟糟的，全是错。
+
+31
+00:00:52,280 --> 00:00:55,430
+The old fix is called distillation: make lots of messy ones,
+老办法叫“蒸馏”：做一大堆烂的，
+
+32
+00:00:55,430 --> 00:00:57,610
+then boil them down to a few good ones.
+再熬成几个好的。
+
+33
+00:00:57,610 --> 00:00:59,780
+Some estimates say it could eat up
+有估算说，它可能要吃掉
+
+34
+00:00:59,780 --> 00:01:02,960
+90 to 95 percent of a quantum computer's qubits.
+一台量子计算机90%到95%的比特。
+
+35
+00:01:02,960 --> 00:01:05,340
+Twist two: this time Google tried a new trick
+反转二：谷歌这次试了个新办法，
+
+36
+00:01:05,340 --> 00:01:06,470
+called cultivation.
+叫“培育”。
+
+37
+00:01:06,470 --> 00:01:08,460
+Grow one magic state in a small patch,
+在一小块地方，种出一个魔法态，
+
+38
+00:01:08,460 --> 00:01:10,300
+and keep checking it as it grows.
+一边长，一边检查。
+
+39
+00:01:10,300 --> 00:01:11,530
+If any check looks wrong,
+只要有一项检查不对劲，
+
+40
+00:01:11,530 --> 00:01:12,770
+toss it and start over.
+扔掉，重来。
+
+41
+00:01:12,770 --> 00:01:13,750
+Like baking cookies,
+就像烤饼干，
+
+42
+00:01:13,750 --> 00:01:16,460
+and tossing every one that looks even a little burnt.
+稍微有点焦的，统统扔掉。
+
+43
+00:01:16,460 --> 00:01:18,300
+Only about 8 percent survive.
+最后只留下大约8%，
+
+44
+00:01:18,300 --> 00:01:20,140
+92 percent go in the trash.
+92%进了垃圾桶。
+
+45
+00:01:20,140 --> 00:01:22,460
+But the survivors are excellent:
+可留下来的特别好：
+
+46
+00:01:22,460 --> 00:01:24,240
+99.99 percent fidelity.
+保真度99.99%。
+
+47
+00:01:24,240 --> 00:01:25,470
+That's roughly one error
+差不多一万次
+
+48
+00:01:25,470 --> 00:01:26,410
+in ten thousand.
+才错一次。
+
+49
+00:01:26,410 --> 00:01:28,130
+Compared with no cultivation,
+比不培育的，
+
+50
+00:01:28,130 --> 00:01:29,850
+errors drop about 40 times.
+错误少了大约40倍。
+
+51
+00:01:29,850 --> 00:01:31,780
+And it fits in a small corner of the chip,
+而且它只占芯片的一个小角落，
+
+52
+00:01:31,780 --> 00:01:33,330
+instead of most of the machine.
+不用占掉大半台机器。
+
+53
+00:01:33,330 --> 00:01:34,790
+Twist three, the weird part:
+反转三，最反直觉：
+
+54
+00:01:34,790 --> 00:01:37,350
+throwing away is cheap. Mistakes are expensive.
+扔掉很便宜，犯错很贵。
+
+55
+00:01:37,350 --> 00:01:38,950
+A failed try wastes a blink.
+失败一次，只浪费一眨眼。
+
+56
+00:01:38,950 --> 00:01:41,710
+One hidden error can ruin a whole calculation.
+藏着一个错，能毁掉整道题。
+
+57
+00:01:41,710 --> 00:01:42,720
+That's why factories
+这就是为什么工厂
+
+58
+00:01:42,720 --> 00:01:44,870
+check the parts before building the car.
+先检查零件，再装汽车。
+
+59
+00:01:44,870 --> 00:01:46,330
+The chip is called Willow.
+这块芯片叫 Willow。
+
+60
+00:01:46,330 --> 00:01:50,090
+Google says it's the first time cultivation ran on real hardware.
+谷歌说，这是培育第一次在真硬件上跑通。
+
+61
+00:01:50,090 --> 00:01:52,360
+Friendly fine print: this is one ingredient,
+友情提示：这只是一样材料，
+
+62
+00:01:52,360 --> 00:01:54,130
+not a finished quantum computer.
+不是一台造好的量子计算机。
+
+63
+00:01:54,130 --> 00:01:56,440
+Truly useful quantum computers still need
+真正有用的量子计算机，
+
+64
+00:01:56,440 --> 00:01:58,240
+many more, much better qubits.
+还需要多得多、好得多的比特。
+
+65
+00:01:58,240 --> 00:01:59,350
+So no, it won't crack
+所以不，它明天
+
+66
+00:01:59,350 --> 00:02:00,670
+your password tomorrow.
+破解不了你的密码。
+
+67
+00:02:00,670 --> 00:02:02,230
+Qubie passed every check.
+小比特通过了检查。
+
+68
+00:02:02,230 --> 00:02:04,080
+Qubie is now unbearable.
+现在它骄傲得不得了。
+
