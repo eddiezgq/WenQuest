@@ -6,28 +6,28 @@ lesson: 12
 code: [ch12]
 
 clips:
-  hero:          # 封面：实验 12-2 吊挂线俯视，衣架在主轨和工位间流动；每 30 秒重新开始
+  hero:          # 封面：实验 12-2 吊挂线俯视，衣架在主轨和工位间流动；每 30 秒重新开始（不画环线里的仿真时间、件数文字：封面标题压在那里）
     page: hang
     selector: "#rail"
     cover: true
     dur: 30
     loop: 30
     steps:
-      - {at: 0, set: {rule: "最短队列"}, press: "#resetA", js: "var p=document.getElementById('playA');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, set: {rule: "最短队列"}, press: "#resetA", js: "(function(){var g=document.getElementById('rail').getContext('2d');if(g.__wqHide)return;g.__wqHide=1;var f=g.fillText;g.fillText=function(t){if(/^(仿真时间|Simulation time)/.test(String(t)))return;return f.apply(this,arguments)}})();var p=document.getElementById('playA');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   floor:         # 车间俯视：看 2 台
     page: tend
     selector: "#floor"
     dur: 20
     loop: 20
     steps:
-      - {at: 0, set: {N: 2}, press: "#restart", js: "var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, set: {N: 2}, press: "#restart", js: "var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   gantt:         # 甘特图：看 2 台 ↔ 看 3 台，每 7 秒切换一次（人等机器 ↔ 机器等人）
     page: tend
     selector: "#gantt"
     dur: 14
     loop: 14
     steps:
-      - {at: 0, set: {N: 2}, press: "#restart", js: "var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, set: {N: 2}, press: "#restart", js: "var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
       - {at: 7, set: {N: 3}, press: "#restart"}
   rail:          # 实验 12-2：吊挂线俯视，衣架在主轨和工位间流动；每 30 秒重新开始
     page: hang
@@ -35,14 +35,14 @@ clips:
     dur: 30
     loop: 30
     steps:
-      - {at: 0, set: {rule: "最短队列"}, press: "#resetA", js: "var p=document.getElementById('playA');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, set: {rule: "最短队列"}, press: "#resetA", js: "var p=document.getElementById('playA');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   bucket:        # 接力式单元（整页②）：从慢到快，交接位置收敛；每 30 秒从头开始
     page: hang
     selector: "#pageB"
     dur: 30
     loop: 30
     steps:
-      - {at: 0, press: ["#tabB", "#s2f", "#restartB"], js: "var p=document.getElementById('playB');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: ["#tabB", "#s2f", "#restartB"], js: "var p=document.getElementById('playB');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
 slides:
   - layout: cover
     video: hero
@@ -86,7 +86,7 @@ slides:
       - ["1600–2300 件/8 h：价值在夹具和程序", "1600–2300 a shift: the value is in fixtures and program"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="40" y="60" width="820" height="460" rx="20" fill="#e9dcc0"/>
           <g stroke="#2c6fd6" stroke-width="7" stroke-dasharray="14 6"><path d="M200 250 L700 250"/><path d="M200 330 L700 330"/></g>
           <path d="M250 290 L650 290" stroke="#ff7a45" stroke-width="6"/>
@@ -94,7 +94,7 @@ slides:
           <rect x="230" y="150" width="440" height="80" rx="10" fill="#8fa3ba" opacity=".55"/>
           <text x="450" y="200" font-size="28" font-weight="700" fill="#08101d" text-anchor="middle">袋盖 · flap</text>
           <text x="450" y="400" font-size="26" fill="#2c4a7a" text-anchor="middle">两道线 · two rows</text>
-          <text x="450" y="440" font-size="26" fill="#b5532a" text-anchor="middle">中刀 + 角刀：Y 形口</text>
+          <text x="450" y="440" font-size="26" fill="#b5532a" text-anchor="middle">中刀 + 角刀：Y 形口</text><text class="eo" x="450" y="440" font-size="26" fill="#b5532a" text-anchor="middle">centre knife + corner knives: Y cut</text>
           <text x="450" y="580" font-size="26" fill="#d3deea" text-anchor="middle">每件约 12.5–18 s：上料由人做</text>
           <text x="450" y="614" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">about 12.5–18 s a piece; a person loads it</text>
         </svg>
@@ -114,22 +114,22 @@ slides:
       - ["N < N* 人等机器；N > N* 机器等人", "N < N*: the operator waits; N > N*: the machines wait"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <text x="0" y="50" font-size="30" font-weight="800" fill="#f3f6fa">看 2 台 · N = 2</text>
-          <g font-size="22" fill="#8fa3ba"><text x="0" y="110">人</text><text x="0" y="180">机器</text></g>
+          <g font-size="22" fill="#8fa3ba"><text x="0" y="110">人</text><text x="0" y="180">机器</text><text class="eo" x="0" y="96" font-size="18">oper-</text><text class="eo" x="0" y="118" font-size="18">ator</text><text class="eo" x="0" y="166" font-size="18">mach-</text><text class="eo" x="0" y="188" font-size="18">ine</text></g>
           <g><rect x="80" y="80" width="100" height="44" fill="#4c8dff"/><rect x="180" y="80" width="40" height="44" fill="#8fa3ba"/><rect x="220" y="80" width="100" height="44" fill="#4c8dff"/><rect x="320" y="80" width="40" height="44" fill="#8fa3ba"/><rect x="360" y="80" width="60" height="44" fill="#22324d"/></g>
           <g><rect x="80" y="150" width="100" height="44" fill="#4c8dff"/><rect x="180" y="150" width="240" height="44" fill="#2ec4b6"/></g>
-          <text x="440" y="112" font-size="24" fill="#ffb38f">人空 3 s</text><text x="440" y="182" font-size="24" fill="#5ee0d2">a + m = 17 s 定循环</text>
+          <text x="440" y="112" font-size="24" fill="#ffb38f">人空 3 s</text><text class="eo" x="440" y="112" font-size="24" fill="#ffb38f">operator idle 3 s</text><text class="zh" x="440" y="182" font-size="24" fill="#5ee0d2">a + m = 17 s 定循环</text><text class="eo" x="440" y="182" font-size="24" fill="#5ee0d2">a + m = 17 s sets the cycle</text>
           <text x="0" y="300" font-size="30" font-weight="800" fill="#f3f6fa">看 3 台 · N = 3</text>
-          <g font-size="22" fill="#8fa3ba"><text x="0" y="360">人</text><text x="0" y="430">机器</text></g>
+          <g font-size="22" fill="#8fa3ba"><text x="0" y="360">人</text><text x="0" y="430">机器</text><text class="eo" x="0" y="346" font-size="18">oper-</text><text class="eo" x="0" y="368" font-size="18">ator</text><text class="eo" x="0" y="416" font-size="18">mach-</text><text class="eo" x="0" y="438" font-size="18">ine</text></g>
           <g><rect x="80" y="330" width="100" height="44" fill="#4c8dff"/><rect x="180" y="330" width="40" height="44" fill="#8fa3ba"/><rect x="220" y="330" width="100" height="44" fill="#4c8dff"/><rect x="320" y="330" width="40" height="44" fill="#8fa3ba"/><rect x="360" y="330" width="100" height="44" fill="#4c8dff"/><rect x="460" y="330" width="40" height="44" fill="#8fa3ba"/></g>
           <g><rect x="80" y="400" width="100" height="44" fill="#4c8dff"/><rect x="180" y="400" width="240" height="44" fill="#2ec4b6"/><rect x="420" y="400" width="80" height="44" fill="#ff7a45"/></g>
-          <text x="520" y="362" font-size="24" fill="#8fbaff">N(a + w) = 21 s 定循环</text><text x="520" y="432" font-size="24" fill="#ffb38f">机器等人 4 s</text>
-          <g font-size="22" fill="#d3deea"><rect x="0" y="540" width="30" height="20" fill="#4c8dff"/><text x="40" y="558">装卸 a</text><rect x="170" y="540" width="30" height="20" fill="#8fa3ba"/><text x="210" y="558">走动 w</text><rect x="340" y="540" width="30" height="20" fill="#2ec4b6"/><text x="380" y="558">自动 m</text><rect x="510" y="540" width="30" height="20" fill="#ff7a45"/><text x="550" y="558">等待</text></g>
+          <text class="zh" x="520" y="362" font-size="24" fill="#8fbaff">N(a + w) = 21 s 定循环</text><text class="eo" x="520" y="362" font-size="24" fill="#8fbaff">N(a + w) = 21 s sets the cycle</text><text x="520" y="432" font-size="24" fill="#ffb38f">机器等人 4 s</text><text class="eo" x="520" y="432" font-size="24" fill="#ffb38f">machines wait 4 s</text>
+          <g font-size="22" fill="#d3deea"><rect x="0" y="540" width="30" height="20" fill="#4c8dff"/><text x="40" y="558">装卸 a</text><text class="eo" x="40" y="558">load a</text><rect x="170" y="540" width="30" height="20" fill="#8fa3ba"/><text x="210" y="558">走动 w</text><text class="eo" x="210" y="558">walk w</text><rect x="340" y="540" width="30" height="20" fill="#2ec4b6"/><text x="380" y="558">自动 m</text><text class="eo" x="380" y="558">auto m</text><rect x="510" y="540" width="30" height="20" fill="#ff7a45"/><text x="550" y="558">等待</text><text class="eo" x="550" y="558">waiting</text></g>
           <text x="0" y="610" font-size="20" fill="#8fa3ba" class="en">a = 5 s · w = 2 s · m = 12 s (20 px per second)</text>
         </svg>
     notes:
-      - "一台单元的周期是 a 加 m：人上料 a，机器自动 m。一个人看 N 台，走一圈要 N 乘 a 加 w；机器的周期至少 a 加 m。两者取大的，就是循环时间。平衡点 N* 等于 a 加 m 除以 a 加 w：台数少于 N*，人空闲，在等机器；多于 N*，机器做完了在等人。右边把看 2 台和看 3 台的一个循环画了出来。"
+      - "一台单元的周期是 a 加 m：人上料 a，机器自动 m。一个人看 N 台，走一圈要 N 乘 a 加 w；机器的周期至少 a 加 m。两者取大的，就是循环时间。平衡点 N* 等于 a 加 m 除以 a 加 w。台数少于 N*，人空闲，在等机器；多于 N*，机器做完了在等人。右边把看 2 台和看 3 台的一个循环画了出来。"
       - "One unit's cycle is a plus m: the operator loads for a, the machine runs for m. Tending N machines, the operator's round takes N times a plus w, while each machine needs at least a plus m. The larger of the two is the cycle time. The balance point N-star is a plus m over a plus w. Below N-star the operator is idle, waiting for machines; above it, finished machines wait for the operator. On the right, one cycle with two machines and with three."
 
   - layout: figure
@@ -139,7 +139,7 @@ slides:
     caption: ["蓝点是工人，进度条是自动缝制", "Blue dot: operator; bars: automatic sewing"]
     notes:
       - "这是虚拟实验 12-1 的车间俯视。蓝点是工人，在两台自动开袋机之间走动；走到一台，先取下成品、放好新的料，按下启动，机器上的进度条就是它自己在缝。看两台的时候，工人走完一圈回来，第一台还没缝完，所以工人要在那里等几秒。这就是“人等机器”。"
-      - "This is the floor view from Virtual Lab 12-1. The blue dot is the operator walking between two automatic pocket welters. At each one she unloads the finished part, loads the next, and starts it; the bar on the machine is it sewing by itself. With two machines, by the time she has gone round and come back, the first machine hasn't finished, so she waits a few seconds there. That's the operator waiting for the machine."
+      - "This is the floor view from Virtual Lab 12-1. The blue dot is the operator walking between two automatic pocket welters. At each one she unloads the finished part, loads the next, and starts it; the bar shows the machine sewing on its own. With two machines, by the time she has gone round and come back, the first machine hasn't finished, so she waits a few seconds there. That's the operator waiting for the machine."
 
   - layout: figure
     title: ["看 2 台还是 3 台：甘特图", "Two machines or three: the Gantt chart"]
@@ -263,8 +263,8 @@ slides:
     visual: {video: bucket}
     caption: ["三人从慢到快 0.5、1.0、1.5：最后一人做完就往回接，交接位置收敛", "Slowest to fastest, 0.5, 1.0, 1.5: the last walks back to take over; hand-offs converge"]
     notes:
-      - "接力式生产的规则只有一条：最后一个人做完就往回走，接过前一个人手里的那件；前一个人再往回接，依次类推，后面的人不能超过前面的人。按从慢到快排列，交接位置会自己收敛。上面是三个人在 0 到 1 的工作量上来回，下面是每件衣服的交接位置，很快稳定在 {{ch12.bb1:.2f}} 和 {{ch12.bb2:.2f}}。"
-      - "A bucket brigade has one rule: when the last worker finishes a piece, they walk back and take over the piece from the worker before them, who walks back in turn, and nobody may pass the person ahead. Ordered from slowest to fastest, the hand-off points settle by themselves. At the top, three workers move along the job from 0 to 1; below, the hand-off position for each garment, quickly settling at {{ch12.bb1:.2f}} and {{ch12.bb2:.2f}}."
+      - "接力式生产的规则只有一条：最后一个人做完就往回走，接过前一个人手里的那件；前一个人再往回接，依次类推，后面的人不能超过前面的人。按从慢到快排列，交接位置会自己收敛。上面是三个人在 0 到 1 的工作量上来回，下面是每件衣服的交接位置，很快稳定在 {{ch12.bb1:.2f}} 和 {{ch12.bb2:.2f}}，也就是六分之一和二分之一。"
+      - "A bucket brigade has one rule: when the last worker finishes a piece, they walk back and take over the piece from the worker before them, who walks back in turn, and nobody may pass the person ahead. Ordered from slowest to fastest, the hand-off points settle by themselves. At the top, three workers move along the job from 0 to 1; below, the hand-off position for each garment, quickly settling at {{ch12.bb1:.2f}} and {{ch12.bb2:.2f}}, that is, one sixth and one half."
 
   - layout: bignum
     title: ["接力式：产量等于各人速度之和", "Bucket brigade: output equals the sum of speeds"]
@@ -311,19 +311,19 @@ slides:
       - ["AGV 派工：最短队列、最早完工、在途上限", "AGV dispatching: shortest queue, earliest finish, a WIP cap"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <g fill="#111d31" stroke="#4c8dff" stroke-width="3"><rect x="60" y="60" width="200" height="140" rx="16"/><rect x="350" y="60" width="200" height="140" rx="16"/><rect x="640" y="60" width="200" height="140" rx="16"/></g>
-          <g font-size="26" fill="#d3deea" text-anchor="middle"><text x="160" y="140">单元 1</text><text x="450" y="140">单元 2</text><text x="740" y="140">单元 3</text></g>
+          <g font-size="26" fill="#d3deea" text-anchor="middle"><text x="160" y="140">单元 1</text><text x="450" y="140">单元 2</text><text x="740" y="140">单元 3</text><text class="eo" x="160" y="140">Unit 1</text><text class="eo" x="450" y="140">Unit 2</text><text class="eo" x="740" y="140">Unit 3</text></g>
           <path d="M160 200 L160 300 L740 300 L740 200" fill="none" stroke="#f2b705" stroke-width="5" stroke-dasharray="14 10"/>
           <g transform="translate(450,330)"><rect x="-40" y="0" width="80" height="40" rx="8" fill="#ff7a45"/><path d="M0 0 L0 -40 L60 -60" stroke="#ff7a45" stroke-width="14" stroke-linecap="round" fill="none"/></g>
-          <text x="450" y="420" font-size="26" fill="#ffb38f" text-anchor="middle">机器人巡回 N(a + w)</text>
+          <text x="450" y="420" font-size="26" fill="#ffb38f" text-anchor="middle">机器人巡回 N(a + w)</text><text class="eo" x="450" y="420" font-size="26" fill="#ffb38f" text-anchor="middle">robot round: N(a + w)</text>
           <rect x="60" y="470" width="780" height="130" rx="20" fill="#111d31" stroke="#22324d"/>
           <text x="450" y="530" font-size="32" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">N* = (a + m) / (a + w)</text>
-          <text x="450" y="575" font-size="22" fill="#8fa3ba" text-anchor="middle">人、机器人一样用</text>
+          <text x="450" y="575" font-size="22" fill="#8fa3ba" text-anchor="middle">人、机器人一样用</text><text class="eo" x="450" y="575" font-size="22" fill="#8fa3ba" text-anchor="middle">the same for people and robots</text>
         </svg>
     notes:
-      - "一台协作机器人给几台数控机床或自动缝制单元上下料，就是一人多机：机器人巡回一圈的时间和机床周期比大小，平衡点公式照样适用。机器人装卸和移动的时间波动小，所以能比工人更贴近平衡点工作。吊挂的派工规则在 AGV、AMR 车队调度里几乎原样出现：任务派给队列最短或预计最早完工的小车，在途托盘数相当于在制品上限，利特尔法则同样决定周期。"
-      - "A cobot loading several CNC machines or automatic sewing units is multi-machine tending: its round time is compared with the machine cycle, and the balance-point formula applies unchanged. A robot's loading and travel times vary little, so it can work closer to the balance point than a person. Hanger dispatching rules reappear almost unchanged in AGV and AMR fleet dispatching: a job goes to the vehicle with the shortest queue or the earliest predicted finish, pallets in transit play the role of the WIP limit, and Little's law sets the throughput time."
+      - "最后把这几条规律放到机器人身上。一台协作机器人给几台数控机床或自动缝制单元上下料，就是一人多机：机器人巡回一圈的时间和机床周期比大小，平衡点公式照样适用。机器人装卸和移动的时间波动小，人和机器之间不必留那么多余量，所以能比工人更贴近平衡点工作。吊挂的派工规则在 AGV、AMR 车队调度里几乎原样出现：任务派给队列最短或预计最早完工的小车，在途托盘数相当于在制品上限，利特尔法则同样决定周期。"
+      - "Finally, let's carry these rules over to robots. A cobot loading several CNC machines or automatic sewing units is multi-machine tending: its round time is compared with the machine cycle, and the balance-point formula applies unchanged. A robot's loading and travel times vary little, so less slack is needed between it and the machines, and it can work closer to the balance point than a person. Hanger dispatching rules reappear almost unchanged in AGV and AMR fleet dispatching: a job goes to the vehicle with the shortest queue or the earliest predicted finish, pallets in transit play the role of the WIP limit, and Little's law sets the throughput time."
 
   - layout: split
     title: ["生活中：咖啡店门口的利特尔法则", "Everyday: Little's law at the coffee shop"]
@@ -333,15 +333,15 @@ slides:
       - ["人越多等得越久，出杯却不会更快", "A longer queue means a longer wait, not faster coffee"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="640" y="200" width="220" height="200" rx="20" fill="#2a3a55"/>
-          <text x="750" y="290" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">柜台</text>
-          <text x="750" y="330" font-size="24" fill="#8fa3ba" text-anchor="middle">2 杯/分</text>
+          <text x="750" y="290" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">柜台</text><text class="eo" x="750" y="290" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">counter</text>
+          <text x="750" y="330" font-size="24" fill="#8fa3ba" text-anchor="middle">2 杯/分</text><text class="eo" x="750" y="330" font-size="24" fill="#8fa3ba" text-anchor="middle">2 cups/min</text>
           <g fill="#2ec4b6"><circle cx="590" cy="300" r="22"/><circle cx="535" cy="300" r="22"/><circle cx="480" cy="300" r="22"/><circle cx="425" cy="300" r="22"/><circle cx="370" cy="300" r="22"/><circle cx="315" cy="300" r="22"/><circle cx="260" cy="300" r="22"/><circle cx="205" cy="300" r="22"/><circle cx="150" cy="300" r="22"/></g>
-          <circle cx="95" cy="300" r="26" fill="#f2b705"/><text x="95" y="370" font-size="24" fill="#f2b705" text-anchor="middle">你</text>
-          <text x="370" y="200" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">排队 10 人</text>
+          <circle cx="95" cy="300" r="26" fill="#f2b705"/><text x="95" y="370" font-size="24" fill="#f2b705" text-anchor="middle">你</text><text class="eo" x="95" y="370" font-size="24" fill="#f2b705" text-anchor="middle">you</text>
+          <text x="370" y="200" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">排队 10 人</text><text class="eo" x="370" y="200" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">10 in the queue</text>
           <rect x="60" y="440" width="800" height="150" rx="20" fill="#111d31" stroke="#22324d"/>
-          <text x="460" y="510" font-size="34" font-weight="800" fill="#f2b705" text-anchor="middle">等待 = 10 ÷ 2 = {{ch12.coffee:.0f}} 分钟</text>
+          <text x="460" y="510" font-size="34" font-weight="800" fill="#f2b705" text-anchor="middle">等待 = 10 ÷ 2 = {{ch12.coffee:.0f}} 分钟</text><text class="eo" x="460" y="510" font-size="34" font-weight="800" fill="#f2b705" text-anchor="middle">wait = 10 ÷ 2 = {{ch12.coffee:.0f}} min</text>
           <text x="460" y="560" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">time = WIP ÷ throughput</text>
         </svg>
     notes:
@@ -352,14 +352,14 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["看 2 还是 3 台，看机器和人工哪个贵", "Two or three machines depends on what costs more"]
     rows:
-      - ["看 2 台", "{{ch12.o2:.0f}} 件/h"]
-      - ["看 3 台", "{{ch12.o3:.0f}} 件/h"]
-      - ["3 台 + 改夹具", "{{ch12.f3:.0f}} 件/h"]
+      - [["看 2 台", "Two machines"], ["{{ch12.o2:.0f}} 件/h", "{{ch12.o2:.0f}} pcs/h"]]
+      - [["看 3 台", "Three machines"], ["{{ch12.o3:.0f}} 件/h", "{{ch12.o3:.0f}} pcs/h"]]
+      - [["3 台 + 改夹具", "Three + fixture"], ["{{ch12.f3:.0f}} 件/h", "{{ch12.f3:.0f}} pcs/h"]]
     side: {big: "{{ch12.Nstar:.2f}}", text: ["平衡点 N* = (5 + 12)/(5 + 2)", "Balance point N* = (5 + 12)/(5 + 2)"]}
     foot: ["两项一起做增产 {{ch12.g_both:.0f}}，大于单做之和（{{ch12.g_mach:.0f}} + {{ch12.g_fix:.0f}}）", "Both together add {{ch12.g_both:.0f}}, more than the two alone ({{ch12.g_mach:.0f}} + {{ch12.g_fix:.0f}})"]
     notes:
-      - "回到开头。平衡点 N* 等于 17 比 7，约 {{ch12.Nstar:.2f}}。看 2 台每小时约 {{ch12.o2:.0f}} 件，人每圈空 {{ch12.idle2:.0f}} 秒；看 3 台约 {{ch12.o3:.0f}} 件，每台每循环等人 {{ch12.wait3:.0f}} 秒。机器贵就看 2 台，人工贵就看 3 台。两个提产方案：加一台机器增 {{ch12.g_mach:.0f}}，只改夹具增 {{ch12.g_fix:.0f}}，两者一起增 {{ch12.g_both:.0f}}，大于两者之和。"
-      - "Back to the start. The balance point is 17 over 7, about {{ch12.Nstar:.2f}}. Two machines give about {{ch12.o2:.0f}} pieces an hour, with the operator idle {{ch12.idle2:.0f}} seconds a round; three give about {{ch12.o3:.0f}}, each machine waiting {{ch12.wait3:.0f}} seconds a cycle. If machines are dear, tend two; if labour is dear, tend three. As for the two improvements: one more machine adds {{ch12.g_mach:.0f}}, the fixture alone {{ch12.g_fix:.0f}}, and both together {{ch12.g_both:.0f}}, more than the sum."
+      - "回到开头。平衡点 N* 等于 17 比 7，约 {{ch12.Nstar:.2f}}。看 2 台每小时约 {{ch12.o2:.0f}} 件，人每圈空 {{ch12.idle2:.0f}} 秒；看 3 台约 {{ch12.o3:.0f}} 件，每台每循环等人 {{ch12.wait3:.0f}} 秒。机器贵就看 2 台，人工贵就看 3 台。两个提产方案：加一台机器增 {{ch12.g_mach:.0f}}，只改夹具增 {{ch12.g_fix:.0f}}，两者一起达到约 {{ch12.f3:.0f}} 件，增 {{ch12.g_both:.0f}}，大于两者之和。因为缩短上料把平衡点推到约 {{ch12.Nstar35:.1f}}，看 3 台时每台机器每圈只等 {{ch12.wait3f:.0f}} 秒。"
+      - "Back to the start. The balance point is 17 over 7, about {{ch12.Nstar:.2f}}. Two machines give about {{ch12.o2:.0f}} pieces an hour, with the operator idle {{ch12.idle2:.0f}} seconds a round; three give about {{ch12.o3:.0f}}, each machine waiting {{ch12.wait3:.0f}} seconds a cycle. If machines are dear, tend two; if labour is dear, tend three. As for the two improvements: one more machine adds {{ch12.g_mach:.0f}}, the fixture alone {{ch12.g_fix:.0f}}, and both together reach about {{ch12.f3:.0f}}, a gain of {{ch12.g_both:.0f}}, more than the sum. Shorter loading pushes the balance point to about {{ch12.Nstar35:.1f}}, so with three machines each waits only {{ch12.wait3f:.0f}} seconds a cycle."
 
   - layout: summary
     title: ["本讲小结", "Summary"]

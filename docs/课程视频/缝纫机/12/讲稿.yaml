@@ -1,0 +1,155 @@
+# 《缝纫机设计与制造》公开课 第 12 讲：自动缝制单元与柔性制衣单元
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch12.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 12-1（一人多机）、12-2（吊挂派工与接力单元）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch12.py 算出（{{ch12.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "12"
+deck: ch12
+skip: [4, 11, 22, 23]   # 自动单元的共同结构、时间波动、第五节章节页、两种提产方案：控制课程部分约 10 分钟（课件与教材里都有；开袋机一页讲到上料、定位、缝制、切割、堆叠，波动留在实验 12-1 任务二里试，两种提产方案的数字在回答页都讲到）
+code: [ch12]
+title: ["自动缝制单元与柔性制衣单元：机器怎样摆，活怎样分", "Automatic Sewing Units and Flexible Cells: Placing the Machines, Sharing the Work"]
+chapter: ["第四篇 特种机与自动单元 · 第 12 章", "Part IV Special Machines and Automatic Units · Chapter 12"]
+next: ["第 13 讲", "Lecture 13"]
+cover_formula: 'N^{*} = \frac{a + m}{a + w}'
+tags:
+  zh: [自动开袋机, 一人多机, 吊挂系统, 利特尔法则, 接力式生产, U型单元, 服装生产, 缝纫机设计]
+  en: [automatic pocket welter, multi-machine tending, hanger system, Little's law, bucket brigade, U-cell, garment production, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十二讲，自动缝制单元与柔性制衣单元。
+    - 一件衣服要经过十几道到几百道工序。今天从一台机器走到车间，看机器怎样摆、活怎样分。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 12, automatic sewing units and flexible cells.
+    - A garment passes through anywhere from a dozen to several hundred operations. Today we step from a single machine out onto the shop floor, and ask how to place the machines and share the work.
+
+after:
+  - id: lab121
+    kind: lab
+    lab: tend
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checks, #curve, #msg { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; })()"
+        press: "#reset"
+      - set: {N: 3}
+      - set: {cv: 0.3}
+      - set: {cv: 0, a: 3.5}
+    say:
+      zh:
+        - ">下面是虚拟实验 12-1，一人多机，在问渠平台上可以亲手做。结果读数、产量曲线和任务这里先遮住，留给你自己读。左边上面是车间俯视，下面是甘特图。"
+        - ">任务一，先按公式算出平衡点，填进去核对；再把看机台数从 1 拖到 4。这里拖到 3 台，看甘特图上的等待色块从“工人”那一行挪到了机器那几行，记下谁在等谁、等多少秒。"
+        - ">任务二，把时间波动调到 0.3，分别看 2 台、3 台、4 台少了百分之几，想一想哪个台数损失最大、为什么。"
+        - ">任务三，波动调回 0，把装卸时间缩到 3.5 秒，用实验核对回答页的三个产量，再在甘特图上看看 3 台时每台机器每圈还等多久。"
+      en:
+        - ">Now Virtual lab 12-1, multi-machine tending. On the WenQuest platform you can do it yourself. The results, the output curve and the tasks are blurred here, so you can find them on your own. On the left, the floor view is on top and the Gantt chart below."
+        - ">Task one: work out the balance point with the formula and enter it to check. Then drag the number of machines from 1 to 4. Here we go to three. On the Gantt chart, watch the waiting blocks move from the operator's row to the machine rows, and note who waits for whom, and for how many seconds a round."
+        - ">Task two: set the variation to 0.3. Read how much two, three and four machines lose, and think about which loses most, and why."
+        - ">Task three: set the variation back to zero and cut the loading time to 3.5 seconds. Check the three outputs from the answer slide, and on the Gantt chart see how long each of three machines still waits a round."
+
+  - id: lab122
+    kind: lab
+    lab: hang
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checksA, #capc, #msgA, #checksB { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); ['tasksA', 'tasksB'].forEach(id => { const p = document.getElementById(id).closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; }); })()"
+        press: "#resetA"
+      - set: {rule: "最短队列"}
+      - set: {abs: 1}
+      - set: {abs: 0, rule: "最早完工"}
+        sweep: {cap: [40, 14]}
+        dur: 7
+      - press: ["#tabB", "#s2f", "#restartB"]
+        js: "window.scrollTo(0, 0)"
+      - press: ["#f2s", "#restartB"]
+        js: "window.scrollTo(0, 0)"
+    say:
+      zh:
+        - ">再看虚拟实验 12-2，吊挂派工与接力单元。第一页是吊挂线俯视，结果、产量曲线和任务同样先遮住。"
+        - ">任务一，派工规则在固定工位、最短队列、最早完工之间切换。这里换成最短队列，看衣架怎样流向排队少的工位。"
+        - ">再让 5 号工人第 2 个小时离岗，三种规则各跑一遍，记下六种组合的产量，用利特尔法则核对。"
+        - ">任务二，回到没人离岗，派工规则换成最早完工，把在制品上限往下调，找出产量不低于最高 98% 的最小上限，填进任务框核对。"
+        - ">任务三在第二页，接力式单元。先按从慢到快排好三个人，看交接位置怎样收敛。"
+        - ">再换成从快到慢，看快的人追上慢的人以后发生了什么，比较两种排法的产量。指导书和报告模板在平台上下载。"
+      en:
+        - ">Next, Virtual lab 12-2, hanger dispatching and bucket brigades. Page one is a top view of the hanger line. The results, the output curve and the tasks are blurred here too."
+        - ">Task one: switch the dispatching rule between fixed stations, shortest queue and earliest finish. Here we switch to shortest queue. Watch the carriers flow to the stations with the shortest queues."
+        - ">Then take worker 5 off the line for the second hour and run each rule again. Record the output of all six cases, and check each with Little's law."
+        - ">Task two: with nobody away, switch the rule to earliest finish and lower the WIP limit. Find the smallest limit that still gives 98 percent of the best output, and enter it in the task box to check."
+        - ">Task three is on page two, the bucket brigade. First order the three workers from slowest to fastest and watch the hand-off points settle."
+        - ">Then switch to fastest first. Watch what happens when a fast worker catches up with a slow one, and compare the output of the two orders. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 12-1、12-2，可以自己动手", "Interactive slides and Labs 12-1 and 12-2, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和两个虚拟实验都可以自己打开，改台数、改上料时间、换派工规则，看产量和等待时间怎样跟着变。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and both virtual labs yourself. Change the number of machines, the loading time or the dispatching rule, and watch the output and the waiting change with them."
+        - ">You submit the assignment and the lab reports on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 12：开袋工段与吊挂线的产能核算", "Assignment 12: capacity of a welting section and a hanger line"]
+      points:
+        - ["贴袋机 a = 4 s、m = 20 s、w = 1 s：N*，看 4 台和 5 台", "Pocket setter, a = 4 s, m = 20 s, w = 1 s: N*, four and five machines"]
+        - ["主轨 10 m/min、间距 0.4 m、9 段：能力与利用率", "Rail at 10 m/min, 0.4 m spacing, 9 legs: capacity and utilisation"]
+        - ["利特尔法则求周期；接力式 0.7、0.9、1.4", "Little's law for throughput time; a brigade at 0.7, 0.9, 1.4"]
+      foot: ["计算过程与结论、实验 12-1 和 12-2 核对截图各一张、1–2 页说明，在问渠学习平台提交。", "Working and conclusions, one screenshot each from Labs 12-1 and 12-2, and a 1–2 page explanation, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，自动贴袋机上料 4 秒、自动 20 秒、走动 1 秒，求平衡点，算看 4 台和 5 台时的循环时间、产量和空等时间；机器贵、人工便宜，你建议看几台？"
+        - ">第二题，吊挂主轨链速每分钟 10 米、衣架间距 0.4 米，一件衣服共走 9 段，求主轨每小时最多支持多少件，计划 150 件时利用率合不合适。"
+        - ">第三题，用利特尔法则，求每小时 126 件、线上 30 个衣架时一件衣服在线多久，上限降到 20 个又是多久，说说对小批量快速反应有什么意义。第四题，接力式单元三人速度 0.7、0.9、1.4，求交接位置和产量，和固定各做三分之一比较，用实验 12-2 第二页核对。"
+        - 计算过程、实验截图和说明，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: an automatic pocket setter loads in 4 seconds, sews for 20, and the walk is 1 second. Find the balance point, then the cycle time, output and idle time for four and five machines. If machines are dear and labour cheap, how many would you recommend?"
+        - ">Two: a hanger main rail runs at 10 metres a minute with carriers 0.4 metres apart, and each garment travels 9 legs. How many garments an hour can the rail support, and at a planned 150 an hour, is the utilisation acceptable?"
+        - ">Three: by Little's law, how long does a garment spend on a line making 126 an hour with 30 carriers on it, and how long with 20, and what does that mean for small, quick-response orders? Four: a bucket brigade has speeds 0.7, 0.9 and 1.4. Find the hand-offs and the output, and compare with fixed thirds, checking on page two of Lab 12-2."
+        - Submit your working, the lab screenshots and the explanation on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["a = 6 s、m = 15 s、w = 1.5 s：平衡点 N* 是多少？", "a = 6 s, m = 15 s, w = 1.5 s: what is N*?"]
+        - ["每小时 120 件、线上 50 个衣架：一件在线多少分钟？", "120 pieces an hour, 50 carriers: how many minutes on the line?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：上料 6 秒、自动 15 秒、走动 1.5 秒，平衡点是多少？"
+        - ">再比如：吊挂线每小时 120 件、线上 50 个衣架，一件衣服在线多少分钟？还有一道判断题：台数大于平衡点时，工人每圈都有空闲，对不对？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, loading takes 6 seconds, sewing 15, and the walk 1.5. What is the balance point?"
+        - ">Or, a hanger line makes 120 pieces an hour with 50 carriers on it. How many minutes does a garment spend on the line? And a true-or-false: above the balance point, the operator has idle time every round. True or false?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲进入电气控制：电机、驱动与传感。我们下一讲见。
+  en:
+    - The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time we move on to electrical control, with motors, drives and sensors. See you then.

@@ -9,7 +9,7 @@ deck: ch11
 skip: [4, 14, 19, 21]   # 六种机器一览、两端高度与间隙的调法、机械凸轮到电子凸轮、第五节章节页：控制课程部分约 10 分钟（课件与教材里都有；六种机器在开场里说到，“针在布外才能移动”的约束在第 18、20、24 页都讲到）
 code: [ch11]
 title: ["典型特种机的机构：一个缝纫头，加一套平面运动", "Mechanisms of Typical Special Machines: a Sewing Head plus a Planar Motion"]
-chapter: ["第三篇 包缝、绷缝与链缝 · 第 11 章", "Part III Overlock, Coverstitch and Chainstitch · Chapter 11"]
+chapter: ["第四篇 特种机与自动单元 · 第 11 章", "Part IV Special Machines and Automatic Units · Chapter 11"]
 next: ["第 12 讲", "Lecture 12"]
 cover_formula: 'a_{\max} = C\,\frac{w\,\omega^2}{\beta^2}'
 tags:
