@@ -1,0 +1,891 @@
+1
+00:00:00,600 --> 00:00:01,643
+Hi everyone,
+
+2
+00:00:01,663 --> 00:00:08,020
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,420 --> 00:00:13,955
+This is Lecture 12, automatic sewing units and flexible cells.
+
+4
+00:00:14,355 --> 00:00:20,749
+A garment passes through anywhere from a dozen to several hundred operations.
+
+5
+00:00:20,769 --> 00:00:25,747
+Today we step from a single machine out onto the shop floor,
+
+6
+00:00:25,767 --> 00:00:30,162
+and ask how to place the machines and share the work.
+
+7
+00:00:31,682 --> 00:00:33,222
+The shop-floor problem.
+
+8
+00:00:33,622 --> 00:00:42,042
+A trouser factory has put several automatic pocket welters in a U.
+
+9
+00:00:42,442 --> 00:00:47,386
+Stopwatch timing: unloading the finished part and loading the panel,
+
+10
+00:00:47,406 --> 00:00:52,935
+welt strip and flap takes about 5 seconds; the machine's automatic locating,
+
+11
+00:00:52,955 --> 00:00:56,220
+sewing, corner cutting and stacking about 12;
+
+12
+00:00:56,240 --> 00:00:59,578
+walking between neighbouring machines about 2.
+
+13
+00:00:59,978 --> 00:01:04,541
+The supervisor wants to know how many machines one operator should tend.
+
+14
+00:01:04,941 --> 00:01:11,305
+And there are two ways to raise output: give the operator one more machine,
+
+15
+00:01:11,325 --> 00:01:16,752
+or invest in a loading fixture that cuts loading to 3.5 seconds.
+
+16
+00:01:17,152 --> 00:01:18,012
+Which pays?
+
+17
+00:01:19,532 --> 00:01:20,891
+Automatic sewing units.
+
+18
+00:01:22,411 --> 00:01:27,191
+Take one unit: the automatic pocket welter.
+
+19
+00:01:27,591 --> 00:01:34,140
+The operator lays down the panel, flap and welt strip; the clamp drops,
+
+20
+00:01:34,160 --> 00:01:41,448
+sensors read the flap position and work out where the seams and corner cuts go;
+
+21
+00:01:41,468 --> 00:01:47,369
+folding plates fold the welt, two needles sew both rows at once,
+
+22
+00:01:47,389 --> 00:01:53,938
+a centre knife slits between them, corner knives cut the Y at each end,
+
+23
+00:01:53,958 --> 00:01:57,731
+and the part is flipped onto the stacker.
+
+24
+00:01:58,131 --> 00:02:02,962
+One model sews 3000 stitches a minute,
+
+25
+00:02:02,982 --> 00:02:12,791
+and the catalogue gives 1600 to 2300 pieces a shift, 12.5 to 18 seconds each.
+
+26
+00:02:13,191 --> 00:02:18,851
+Its value lies in fixtures and program, not sewing speed.
+
+27
+00:02:20,371 --> 00:02:23,031
+Multi-machine tending: how many machines.
+
+28
+00:02:24,551 --> 00:02:31,842
+One unit's cycle is a plus m: the operator loads for a, the machine runs for m.
+
+29
+00:02:32,242 --> 00:02:39,350
+Tending N machines, the operator's round takes N times a plus w,
+
+30
+00:02:39,370 --> 00:02:44,138
+while each machine needs at least a plus m.
+
+31
+00:02:44,538 --> 00:02:48,195
+The larger of the two is the cycle time.
+
+32
+00:02:48,595 --> 00:02:53,900
+The balance point N-star is a plus m over a plus w.
+
+33
+00:02:54,300 --> 00:03:00,280
+Below N-star the operator is idle, waiting for machines; above it,
+
+34
+00:03:00,300 --> 00:03:03,916
+finished machines wait for the operator.
+
+35
+00:03:04,316 --> 00:03:09,513
+On the right, one cycle with two machines and with three.
+
+36
+00:03:11,033 --> 00:03:16,900
+This is the floor view from Virtual Lab 12-1.
+
+37
+00:03:17,300 --> 00:03:23,096
+The blue dot is the operator walking between two automatic pocket welters.
+
+38
+00:03:23,496 --> 00:03:29,021
+At each one she unloads the finished part, loads the next, and starts it;
+
+39
+00:03:29,041 --> 00:03:32,363
+the bar shows the machine sewing on its own.
+
+40
+00:03:32,763 --> 00:03:38,309
+With two machines, by the time she has gone round and come back,
+
+41
+00:03:38,329 --> 00:03:44,223
+the first machine hasn't finished, so she waits a few seconds there.
+
+42
+00:03:44,623 --> 00:03:47,323
+That's the operator waiting for the machine.
+
+43
+00:03:48,843 --> 00:03:54,644
+Watch the Gantt chart switching every 7 seconds between two and three machines.
+
+44
+00:03:55,044 --> 00:04:00,593
+With two, the operator's round is 14 seconds and the machine cycle 17,
+
+45
+00:04:00,613 --> 00:04:06,400
+so the machines set the pace and the operator waits 3 seconds each round,
+
+46
+00:04:06,420 --> 00:04:09,104
+busy about 82 percent of the time.
+
+47
+00:04:09,504 --> 00:04:16,097
+With three, the round is 21 seconds, longer than the machine cycle,
+
+48
+00:04:16,117 --> 00:04:23,401
+so the operator sets the pace and each machine waits 4 seconds a cycle for
+
+49
+00:04:23,421 --> 00:04:24,684
+the operator.
+
+50
+00:04:26,204 --> 00:04:28,064
+Put the numbers in.
+
+51
+00:04:28,464 --> 00:04:34,124
+The balance point is 17 over 7, about 2.43.
+
+52
+00:04:34,524 --> 00:04:47,080
+One machine gives about 212 pieces an hour; two about 424; three about 514;
+
+53
+00:04:47,100 --> 00:04:51,104
+four still 514, no more.
+
+54
+00:04:51,504 --> 00:04:59,955
+Per machine, two give 212 each and three only 171.
+
+55
+00:05:00,355 --> 00:05:07,639
+So if machines are expensive, tend fewer, two; if labour is expensive,
+
+56
+00:05:07,659 --> 00:05:09,412
+tend more, three.
+
+57
+00:05:10,932 --> 00:05:16,232
+Hanger systems: who gets the carrier, how many.
+
+58
+00:05:17,752 --> 00:05:23,852
+A hanger system changes the unit of production from a bundle to a single piece:
+
+59
+00:05:23,872 --> 00:05:26,873
+each cut part rides on its own carrier.
+
+60
+00:05:27,273 --> 00:05:31,139
+The main-rail chain circulates the carriers,
+
+61
+00:05:31,159 --> 00:05:35,379
+a reader identifies each one by barcode or RFID,
+
+62
+00:05:35,399 --> 00:05:40,590
+and the system decides whether to switch it into a station.
+
+63
+00:05:40,990 --> 00:05:45,765
+The spur is that station's buffer; when the operator presses done,
+
+64
+00:05:45,785 --> 00:05:51,650
+a lift returns the carrier to the main rail and records who finished it and when.
+
+65
+00:05:52,050 --> 00:05:57,732
+Main-rail capacity is chain speed over spacing:
+
+66
+00:05:57,752 --> 00:06:05,860
+at 12 metres a minute and 0.3-metre spacing, 2400 carriers an hour,
+
+67
+00:06:05,880 --> 00:06:08,529
+rarely the bottleneck.
+
+68
+00:06:10,049 --> 00:06:13,269
+Who gets the carrier after each operation?
+
+69
+00:06:13,669 --> 00:06:21,186
+The example is a T-shirt with 6 operations totalling 260 standard seconds and
+
+70
+00:06:21,206 --> 00:06:22,262
+10 workers,
+
+71
+00:06:22,282 --> 00:06:29,408
+each able to do one or two operations, with efficiencies from 0.8 to 1.1.
+
+72
+00:06:29,808 --> 00:06:36,645
+Fixed dispatching sends work only to the worker whose main job it is;
+
+73
+00:06:36,665 --> 00:06:43,602
+shortest queue sends it to a qualified worker with the fewest waiting;
+
+74
+00:06:43,622 --> 00:06:48,373
+earliest finish estimates who will finish first.
+
+75
+00:06:48,773 --> 00:06:58,433
+Simulated over 4 hours: about 111, 126 and 124 pieces an hour.
+
+76
+00:06:58,833 --> 00:07:06,236
+With fixed stations the bottleneck is sleeve hemming, done only by worker 8,
+
+77
+00:07:06,256 --> 00:07:13,074
+capped at about 113; dynamic dispatching lets worker 7 help when idle.
+
+78
+00:07:14,593 --> 00:07:17,600
+How many carriers should be on the line?
+
+79
+00:07:18,000 --> 00:07:25,058
+Too few and workers run out of work; beyond about 20 to 25,
+
+80
+00:07:25,078 --> 00:07:27,457
+output stops rising.
+
+81
+00:07:27,857 --> 00:07:33,757
+Little's law: WIP equals throughput times average throughput time.
+
+82
+00:07:34,157 --> 00:07:39,178
+Under earliest finish the line makes 124 pieces an hour,
+
+83
+00:07:39,198 --> 00:07:44,130
+and a garment spends on average 0.31 hours on the line;
+
+84
+00:07:44,150 --> 00:07:50,251
+multiply and you get about 38, matching the 40 carriers on the line.
+
+85
+00:07:50,651 --> 00:07:57,231
+Cut the limit to 20 and output barely changes, but the throughput time halves.
+
+86
+00:07:57,631 --> 00:08:01,491
+So set the limit where output has just levelled off.
+
+87
+00:08:03,011 --> 00:08:05,078
+U-cells and bucket brigades.
+
+88
+00:08:06,598 --> 00:08:13,963
+A flexible U-cell places a dozen or so machines close together in a U,
+
+89
+00:08:13,983 --> 00:08:17,866
+with entry and exit on the same side.
+
+90
+00:08:18,266 --> 00:08:21,908
+Each part goes straight to the next machine,
+
+91
+00:08:21,928 --> 00:08:28,232
+so the only work in process is what's in people's hands and on the machines.
+
+92
+00:08:28,632 --> 00:08:34,613
+Operators are multi-skilled: whoever is free helps the next operation,
+
+93
+00:08:34,633 --> 00:08:39,156
+and one person can cover both the first and the last.
+
+94
+00:08:39,556 --> 00:08:43,554
+A style change means moving just a few machines,
+
+95
+00:08:43,574 --> 00:08:47,656
+which suits small orders of a few hundred pieces.
+
+96
+00:08:49,176 --> 00:08:53,881
+A bucket brigade has one rule: when the last worker finishes a piece,
+
+97
+00:08:53,901 --> 00:08:58,469
+they walk back and take over the piece from the worker before them,
+
+98
+00:08:58,489 --> 00:09:02,646
+who walks back in turn, and nobody may pass the person ahead.
+
+99
+00:09:03,046 --> 00:09:10,322
+Ordered from slowest to fastest, the hand-off points settle by themselves.
+
+100
+00:09:10,722 --> 00:09:16,708
+At the top, three workers move along the job from 0 to 1; below,
+
+101
+00:09:16,728 --> 00:09:23,652
+the hand-off position for each garment, quickly settling at 0.17 and 0.50,
+
+102
+00:09:23,672 --> 00:09:26,655
+that is, one sixth and one half.
+
+103
+00:09:28,175 --> 00:09:30,715
+Why one sixth and one half?
+
+104
+00:09:31,115 --> 00:09:39,052
+The hand-offs converge to x-i equals the sum of the first i speeds over the
+
+105
+00:09:39,072 --> 00:09:40,962
+sum of all speeds:
+
+106
+00:09:40,982 --> 00:09:46,055
+0.5 over 3 is one sixth, 1.5 over 3 is one half.
+
+107
+00:09:46,455 --> 00:09:51,184
+Each person's share is proportional to their speed,
+
+108
+00:09:51,204 --> 00:09:55,934
+and output equals the sum of the three speeds, 3.0.
+
+109
+00:09:56,334 --> 00:10:03,994
+If each did a fixed third, the slowest would set the pace: only 1.5.
+
+110
+00:10:04,394 --> 00:10:09,334
+The beauty is that nobody needs to know the speeds in advance;
+
+111
+00:10:09,354 --> 00:10:12,454
+the work balances without a supervisor.
+
+112
+00:10:13,974 --> 00:10:18,373
+Finally, let's carry these rules over to robots.
+
+113
+00:10:18,773 --> 00:10:23,699
+A cobot loading several CNC machines or automatic sewing units is
+
+114
+00:10:23,719 --> 00:10:25,373
+multi-machine tending:
+
+115
+00:10:25,393 --> 00:10:29,177
+its round time is compared with the machine cycle,
+
+116
+00:10:29,197 --> 00:10:32,829
+and the balance-point formula applies unchanged.
+
+117
+00:10:33,229 --> 00:10:37,609
+A robot's loading and travel times vary little,
+
+118
+00:10:37,629 --> 00:10:42,477
+so less slack is needed between it and the machines,
+
+119
+00:10:42,497 --> 00:10:47,907
+and it can work closer to the balance point than a person.
+
+120
+00:10:48,307 --> 00:10:56,201
+Hanger dispatching rules reappear almost unchanged in AGV and AMR fleet dispatching:
+
+121
+00:10:56,221 --> 00:11:04,021
+a job goes to the vehicle with the shortest queue or the earliest predicted finish,
+
+122
+00:11:04,041 --> 00:11:08,731
+pallets in transit play the role of the WIP limit,
+
+123
+00:11:08,751 --> 00:11:12,689
+and Little's law sets the throughput time.
+
+124
+00:11:14,208 --> 00:11:16,757
+Little's law at the coffee shop:
+
+125
+00:11:16,777 --> 00:11:22,134
+ten people are queuing and the baristas turn out two cups a minute,
+
+126
+00:11:22,154 --> 00:11:26,228
+so you'll wait about ten divided by two, 5 minutes.
+
+127
+00:11:26,628 --> 00:11:32,444
+WIP equals throughput times throughput time.
+
+128
+00:11:32,844 --> 00:11:39,886
+With the same staff, a longer queue means a longer wait, but not faster coffee.
+
+129
+00:11:40,286 --> 00:11:46,217
+Hanging more carriers on a hanger line is the same: the same output,
+
+130
+00:11:46,237 --> 00:11:48,404
+a longer throughput time.
+
+131
+00:11:49,924 --> 00:11:51,144
+Back to the start.
+
+132
+00:11:51,544 --> 00:11:57,204
+The balance point is 17 over 7, about 2.43.
+
+133
+00:11:57,604 --> 00:12:01,779
+Two machines give about 424 pieces an hour,
+
+134
+00:12:01,799 --> 00:12:07,924
+with the operator idle 3 seconds a round; three give about 514,
+
+135
+00:12:07,944 --> 00:12:11,729
+each machine waiting 4 seconds a cycle.
+
+136
+00:12:12,129 --> 00:12:19,004
+If machines are dear, tend two; if labour is dear, tend three.
+
+137
+00:12:19,404 --> 00:12:27,575
+As for the two improvements: one more machine adds 91, the fixture alone 41,
+
+138
+00:12:27,595 --> 00:12:34,904
+and both together reach about 655, a gain of 231, more than the sum.
+
+139
+00:12:35,304 --> 00:12:40,752
+Shorter loading pushes the balance point to about 2.8,
+
+140
+00:12:40,772 --> 00:12:46,524
+so with three machines each waits only 1 seconds a cycle.
+
+141
+00:12:48,044 --> 00:12:51,631
+Now Virtual lab 12-1, multi-machine tending.
+
+142
+00:12:51,651 --> 00:12:56,632
+On the WenQuest platform you can do it yourself. The results,
+
+143
+00:12:56,652 --> 00:13:00,567
+the output curve and the tasks are blurred here,
+
+144
+00:13:00,587 --> 00:13:04,338
+so you can find them on your own. On the left,
+
+145
+00:13:04,358 --> 00:13:08,519
+the floor view is on top and the Gantt chart below.
+
+146
+00:13:08,919 --> 00:13:14,253
+Task one: work out the balance point with the formula and enter it to check.
+
+147
+00:13:14,273 --> 00:13:18,901
+Then drag the number of machines from 1 to 4. Here we go to three.
+
+148
+00:13:18,921 --> 00:13:20,240
+On the Gantt chart,
+
+149
+00:13:20,260 --> 00:13:25,452
+watch the waiting blocks move from the operator's row to the machine rows,
+
+150
+00:13:25,472 --> 00:13:29,819
+and note who waits for whom, and for how many seconds a round.
+
+151
+00:13:30,219 --> 00:13:35,031
+Task two: set the variation to 0.3. Read how much two,
+
+152
+00:13:35,051 --> 00:13:41,474
+three and four machines lose, and think about which loses most, and why.
+
+153
+00:13:41,874 --> 00:13:42,835
+Task three:
+
+154
+00:13:42,855 --> 00:13:49,164
+set the variation back to zero and cut the loading time to 3.5 seconds.
+
+155
+00:13:49,184 --> 00:13:53,264
+Check the three outputs from the answer slide,
+
+156
+00:13:53,284 --> 00:14:00,307
+and on the Gantt chart see how long each of three machines still waits a round.
+
+157
+00:14:01,827 --> 00:14:07,364
+Next, Virtual lab 12-2, hanger dispatching and bucket brigades.
+
+158
+00:14:07,384 --> 00:14:12,216
+Page one is a top view of the hanger line. The results,
+
+159
+00:14:12,236 --> 00:14:16,802
+the output curve and the tasks are blurred here too.
+
+160
+00:14:17,202 --> 00:14:21,937
+Task one: switch the dispatching rule between fixed stations,
+
+161
+00:14:21,957 --> 00:14:27,316
+shortest queue and earliest finish. Here we switch to shortest queue.
+
+162
+00:14:27,336 --> 00:14:32,382
+Watch the carriers flow to the stations with the shortest queues.
+
+163
+00:14:32,782 --> 00:14:39,815
+Then take worker 5 off the line for the second hour and run each rule again.
+
+164
+00:14:39,835 --> 00:14:46,217
+Record the output of all six cases, and check each with Little's law.
+
+165
+00:14:46,617 --> 00:14:49,192
+Task two: with nobody away,
+
+166
+00:14:49,212 --> 00:14:54,862
+switch the rule to earliest finish and lower the WIP limit.
+
+167
+00:14:54,882 --> 00:15:01,685
+Find the smallest limit that still gives 98 percent of the best output,
+
+168
+00:15:01,705 --> 00:15:05,337
+and enter it in the task box to check.
+
+169
+00:15:05,737 --> 00:15:10,019
+Task three is on page two, the bucket brigade.
+
+170
+00:15:10,039 --> 00:15:17,127
+First order the three workers from slowest to fastest and watch the hand-off
+
+171
+00:15:17,147 --> 00:15:18,437
+points settle.
+
+172
+00:15:18,837 --> 00:15:21,022
+Then switch to fastest first.
+
+173
+00:15:21,042 --> 00:15:25,966
+Watch what happens when a fast worker catches up with a slow one,
+
+174
+00:15:25,986 --> 00:15:29,084
+and compare the output of the two orders.
+
+175
+00:15:29,104 --> 00:15:33,191
+The guide and the report template are on the platform.
+
+176
+00:15:34,711 --> 00:15:41,131
+Everything in this lecture is on the WenQuest learning platform.
+
+177
+00:15:41,531 --> 00:15:47,488
+You can open today's interactive slides and both virtual labs yourself.
+
+178
+00:15:47,508 --> 00:15:53,550
+Change the number of machines, the loading time or the dispatching rule,
+
+179
+00:15:53,570 --> 00:15:58,096
+and watch the output and the waiting change with them.
+
+180
+00:15:58,496 --> 00:16:02,874
+You submit the assignment and the lab reports on the platform,
+
+181
+00:16:02,894 --> 00:16:05,144
+and get marks and comments back.
+
+182
+00:16:05,544 --> 00:16:09,987
+Questions go to the course discussion forum,
+
+183
+00:16:10,007 --> 00:16:16,581
+and the grades page shows your mark on every assignment and quiz.
+
+184
+00:16:18,101 --> 00:16:21,353
+Your assignment has four questions. One:
+
+185
+00:16:21,373 --> 00:16:26,179
+an automatic pocket setter loads in 4 seconds, sews for 20,
+
+186
+00:16:26,199 --> 00:16:31,905
+and the walk is 1 second. Find the balance point, then the cycle time,
+
+187
+00:16:31,925 --> 00:16:35,832
+output and idle time for four and five machines.
+
+188
+00:16:35,852 --> 00:16:41,394
+If machines are dear and labour cheap, how many would you recommend?
+
+189
+00:16:41,794 --> 00:16:42,146
+Two:
+
+190
+00:16:42,166 --> 00:16:49,300
+a hanger main rail runs at 10 metres a minute with carriers 0.4 metres apart,
+
+191
+00:16:49,320 --> 00:16:52,273
+and each garment travels 9 legs.
+
+192
+00:16:52,293 --> 00:16:59,427
+How many garments an hour can the rail support, and at a planned 150 an hour,
+
+193
+00:16:59,447 --> 00:17:02,214
+is the utilisation acceptable?
+
+194
+00:17:02,614 --> 00:17:04,752
+Three: by Little's law,
+
+195
+00:17:04,772 --> 00:17:12,444
+how long does a garment spend on a line making 126 an hour with 30 carriers on it,
+
+196
+00:17:12,464 --> 00:17:19,855
+and how long with 20, and what does that mean for small, quick-response orders?
+
+197
+00:17:19,875 --> 00:17:24,639
+Four: a bucket brigade has speeds 0.7, 0.9 and 1.4.
+
+198
+00:17:24,659 --> 00:17:30,737
+Find the hand-offs and the output, and compare with fixed thirds,
+
+199
+00:17:30,757 --> 00:17:33,832
+checking on page two of Lab 12-2.
+
+200
+00:17:34,232 --> 00:17:35,902
+Submit your working,
+
+201
+00:17:35,922 --> 00:17:41,395
+the lab screenshots and the explanation on the WenQuest platform.
+
+202
+00:17:42,915 --> 00:17:50,399
+There's also a ten-question quiz. For example, loading takes 6 seconds,
+
+203
+00:17:50,419 --> 00:17:56,211
+sewing 15, and the walk 1.5. What is the balance point?
+
+204
+00:17:56,611 --> 00:18:01,908
+Or, a hanger line makes 120 pieces an hour with 50 carriers on it.
+
+205
+00:18:01,928 --> 00:18:07,628
+How many minutes does a garment spend on the line? And a true-or-false:
+
+206
+00:18:07,648 --> 00:18:13,992
+above the balance point, the operator has idle time every round. True or false?
+
+207
+00:18:14,392 --> 00:18:19,132
+You get three attempts, and the explanations appear as soon as you submit.
+
+208
+00:18:20,652 --> 00:18:22,432
+Three things to remember.
+
+209
+00:18:22,832 --> 00:18:25,376
+One: in multi-machine tending,
+
+210
+00:18:25,396 --> 00:18:31,360
+the cycle is the larger of the operator's round and the machine cycle,
+
+211
+00:18:31,380 --> 00:18:38,028
+the balance point is a plus m over a plus w, and variation hurts most near it.
+
+212
+00:18:38,428 --> 00:18:38,791
+Two:
+
+213
+00:18:38,811 --> 00:18:46,832
+hanger systems should dispatch dynamically and cap WIP where output just levels off;
+
+214
+00:18:46,852 --> 00:18:51,045
+WIP equals throughput times throughput time.
+
+215
+00:18:51,445 --> 00:18:51,921
+Three:
+
+216
+00:18:51,941 --> 00:18:58,786
+a bucket brigade ordered slowest to fastest shares the work in proportion to speed,
+
+217
+00:18:58,806 --> 00:19:02,095
+and output equals the sum of the speeds.
+
+218
+00:19:02,495 --> 00:19:09,301
+The assignment, quiz and both labs are on WenQuest.
+
+219
+00:19:09,701 --> 00:19:13,279
+The slides, the virtual labs,
+
+220
+00:19:13,299 --> 00:19:21,966
+the assignment and the quiz are all on the WenQuest learning platform,
+
+221
+00:19:21,986 --> 00:19:30,281
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+222
+00:19:30,681 --> 00:19:38,079
+Next time we move on to electrical control, with motors, drives and sensors.
+
+223
+00:19:38,099 --> 00:19:39,348
+See you then.
