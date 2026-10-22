@@ -65,9 +65,13 @@ STEPS = [
      ("圆柱槽凸轮的包络面、接触检查、三维模型和加工程序",
       "Cylindrical groove cams: enveloped flanks, contact checks, 3D model and machining program"),
      "next"),
-    (("FreeCAD 工作台与 AI 起草", "FreeCAD workbench and AI drafts"),
-     ("同一个计算内核进 FreeCAD；一句话要求变成运动程序草稿，由代码检查后人确认",
-      "The same kernel inside FreeCAD; a one-sentence requirement becomes a draft motion program, checked by code and confirmed by you"),
+    (("FreeCAD 工作台", "FreeCAD workbench"),
+     ("同一个计算内核进 FreeCAD，结果与网页版逐项相同；精确实体（弧面凸轮按加工方法），凸轮系统装配可转动，零件工作图、STEP、加工程序",
+      "The same kernel inside FreeCAD, results identical to the web app; exact solids (the globoidal cam as it is machined), a cam system assembly you can turn, part drawings, STEP and programs"),
+     "now"),
+    (("AI 起草", "AI drafts"),
+     ("一句话要求变成运动程序草稿，由代码检查后人确认；校核结果的白话解释",
+      "A one-sentence requirement becomes a draft motion program, checked by code and confirmed by you; plain-language explanations of the checks"),
      "next"),
 ]
 
