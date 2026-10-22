@@ -1,0 +1,340 @@
+1
+00:00:00,300 --> 00:00:02,740
+两天，七张显卡送进维修店，
+Two days, seven graphics cards at one repair shop,
+
+2
+00:00:02,740 --> 00:00:04,370
+供电插头全烧了。
+every power plug burned.
+
+3
+00:00:04,370 --> 00:00:06,660
+每一张都是上万块的高端卡，
+Each one a top-end card worth thousands,
+
+4
+00:00:06,660 --> 00:00:08,890
+烧的却是一个小小的插头。
+and what burned was a tiny plug.
+
+5
+00:00:08,890 --> 00:00:11,060
+今天的问题：一个小插头，
+Today's question: how does one little plug
+
+6
+00:00:11,060 --> 00:00:12,980
+凭什么烧掉一张显卡？
+take down a whole graphics card?
+
+7
+00:00:12,980 --> 00:00:14,310
+认识一下小卡。
+Meet Xiaoka.
+
+8
+00:00:14,310 --> 00:00:17,070
+小卡是一张显卡，胃口特别大。
+Xiaoka is a graphics card with a huge appetite.
+
+9
+00:00:17,070 --> 00:00:19,890
+RTX 5090 满载的时候，
+At full load, an RTX 5090
+
+10
+00:00:19,890 --> 00:00:22,080
+一张卡要吃掉575瓦。
+eats 575 watts.
+
+11
+00:00:22,080 --> 00:00:24,350
+可显卡只吃12伏的低压电。
+But it only eats 12-volt power.
+
+12
+00:00:24,350 --> 00:00:26,220
+电压低，电流就得大。
+Low voltage means high current.
+
+13
+00:00:26,220 --> 00:00:27,710
+575除以12，
+575 divided by 12
+
+14
+00:00:27,710 --> 00:00:29,510
+差不多就是48安。
+is about 48 amps.
+
+15
+00:00:29,510 --> 00:00:32,460
+家里两千瓦的电水壶，也就九安左右。
+A 2,000-watt kettle at home draws about 9 amps.
+
+16
+00:00:32,460 --> 00:00:34,140
+小卡要它的五倍多。
+Xiaoka wants over five times that.
+
+17
+00:00:34,140 --> 00:00:36,630
+这48安，全从一个插头过去，
+All 48 amps squeeze through one plug,
+
+18
+00:00:36,630 --> 00:00:38,890
+插头里只有六根细细的针。
+through just six thin pins.
+
+19
+00:00:38,890 --> 00:00:39,820
+平均下来，
+On average,
+
+20
+00:00:39,820 --> 00:00:41,240
+一根针扛8安。
+each pin carries 8 amps.
+
+21
+00:00:41,240 --> 00:00:42,860
+规范说，一根针最多
+The spec says each pin can handle
+
+22
+00:00:42,860 --> 00:00:44,610
+能扛9.2安左右。
+about 9.2 amps at most.
+
+23
+00:00:44,610 --> 00:00:46,110
+反转一：算一算，
+Twist one: do the math,
+
+24
+00:00:46,110 --> 00:00:47,740
+余量只有一成多。
+the safety margin is only about 15 percent.
+
+25
+00:00:47,740 --> 00:00:50,020
+据估算，老式8针插头的余量
+By common estimates, the old 8-pin plug
+
+26
+00:00:50,020 --> 00:00:51,020
+接近一倍。
+had nearly double.
+
+27
+00:00:51,020 --> 00:00:52,900
+可平均8安不到上限啊，
+But 8 amps is under the limit.
+
+28
+00:00:52,900 --> 00:00:54,050
+怎么还会烧？
+So why does it burn?
+
+29
+00:00:54,050 --> 00:00:55,200
+想象六个人，
+Picture six people
+
+30
+00:00:55,200 --> 00:00:56,850
+一起抬一架钢琴。
+carrying one piano.
+
+31
+00:00:56,850 --> 00:00:58,580
+要是有两个人手一松，
+If two of them loosen their grip,
+
+32
+00:00:58,580 --> 00:01:00,600
+重量就全压到别人身上。
+the weight lands on everyone else.
+
+33
+00:01:00,600 --> 00:01:03,010
+电流也一样：六根针并排走，
+Current is the same: six pins side by side,
+
+34
+00:01:03,010 --> 00:01:05,530
+哪根接触好，电就往哪根挤。
+and it crowds into whichever pin touches best.
+
+35
+00:01:05,530 --> 00:01:08,060
+插头没插到底、针脚松一点，
+A plug not pushed all the way in, a loose pin,
+
+36
+00:01:08,060 --> 00:01:09,340
+接触就变差。
+and the contact gets worse.
+
+37
+00:01:09,340 --> 00:01:11,300
+反转二：硬件媒体实测，
+Twist two: when reviewers measured it,
+
+38
+00:01:11,300 --> 00:01:13,200
+有的线几乎没有电流。
+some wires carried almost nothing.
+
+39
+00:01:13,200 --> 00:01:14,080
+而有一根，
+And one wire
+
+40
+00:01:14,080 --> 00:01:15,250
+高达22安！
+carried 22 amps!
+
+41
+00:01:15,250 --> 00:01:16,570
+比规范的上限，
+That's more than double
+
+42
+00:01:16,570 --> 00:01:17,830
+高出两倍多。
+the spec limit.
+
+43
+00:01:17,830 --> 00:01:20,680
+反转三，最反直觉：电流翻一倍，
+Twist three, the weird part: double the current,
+
+44
+00:01:20,680 --> 00:01:21,950
+发热翻四倍。
+and you get four times the heat.
+
+45
+00:01:21,950 --> 00:01:23,720
+因为发热等于电流的平方
+Because heat equals current squared
+
+46
+00:01:23,720 --> 00:01:24,650
+再乘电阻。
+times resistance.
+
+47
+00:01:24,650 --> 00:01:26,820
+22安只是8安的不到三倍，
+22 amps is less than three times 8,
+
+48
+00:01:26,820 --> 00:01:28,280
+发热却是七倍多。
+but the heat is over seven times.
+
+49
+00:01:28,280 --> 00:01:30,640
+更糟的是：热了，接触更差；
+Worse: heat makes the contact worse,
+
+50
+00:01:30,640 --> 00:01:32,400
+接触差了，又更热。
+and worse contact makes more heat.
+
+51
+00:01:32,400 --> 00:01:33,970
+一圈一圈往上滚，
+Round and round it climbs,
+
+52
+00:01:33,970 --> 00:01:35,270
+就像滚雪球。
+like a snowball rolling downhill.
+
+53
+00:01:35,270 --> 00:01:36,450
+热像仪一拍，
+The thermal camera says
+
+54
+00:01:36,450 --> 00:01:38,340
+插头烫到175度。
+the plug hit 175 degrees Celsius.
+
+55
+00:01:38,340 --> 00:01:40,180
+塑料外壳就这样化了，
+The plastic melts,
+
+56
+00:01:40,180 --> 00:01:41,950
+线和插头熔成一坨。
+and cable and plug fuse into one lump.
+
+57
+00:01:41,950 --> 00:01:43,840
+怎么防？第一，插到底，
+How to prevent it? First, push it all the way in
+
+58
+00:01:43,840 --> 00:01:45,170
+听见咔哒一声。
+until it clicks.
+
+59
+00:01:45,170 --> 00:01:46,780
+第二，线别贴着插头
+Second, don't bend the cable sharply
+
+60
+00:01:46,780 --> 00:01:47,440
+硬弯。
+right at the plug.
+
+61
+00:01:47,440 --> 00:01:50,150
+第三，有的高端卡会逐根测电流，
+Third, some high-end cards measure each wire
+
+62
+00:01:50,150 --> 00:01:51,350
+不均就报警。
+and warn you when they're uneven.
+
+63
+00:01:51,350 --> 00:01:54,120
+友情提示：每张卡到底为什么烧，
+Friendly fine print: why each card burned
+
+64
+00:01:54,120 --> 00:01:55,710
+厂商还没有定论。
+hasn't been settled by the makers.
+
+65
+00:01:55,710 --> 00:01:58,930
+我们讲的只是物理：余量小、电流不均，
+This is just the physics: thin margins, uneven current,
+
+66
+00:01:58,930 --> 00:02:00,660
+发热按平方往上涨。
+and heat that grows with the square.
+
+67
+00:02:00,660 --> 00:02:02,200
+小卡的新年愿望：
+Xiaoka's new year's wish:
+
+68
+00:02:02,200 --> 00:02:04,270
+少吃一点，别上火。
+eat a little less, and keep cool.
+
