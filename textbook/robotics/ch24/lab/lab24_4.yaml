@@ -1,0 +1,32 @@
+# 实验 24.4 的指导书与报告模板。目的、场景、参数、任务取自 lab24_4.js。
+原理:
+  - ["功率平衡（定理 24.4.1）：电机的功率等于机械能的变化率；速度项与惯性项合起来恰好是动能的变化率。", "Power balance (Theorem 24.4.1): the motors' power equals the rate of change of mechanical energy; the velocity and inertial terms together are exactly the rate of change of kinetic energy."]
+  - 式: "dE/dt = θ̇ᵀτ，E = ½ θ̇ᵀ M θ̇ + U"
+  - ["不加驱动、没有摩擦时机械能守恒；关节有黏性阻尼 b 时单调减少：", "With no drive and no friction the energy is conserved; with viscous joint damping b it decreases monotonically:"]
+  - 式: "dE/dt = −b |θ̇|²"
+  - ["数值积分会破坏守恒：显式欧拉法的能量误差持续累积；半隐式欧拉法（MuJoCo 的 Euler）的误差增长得慢得多（质量矩阵随姿态变化时它不是严格的辛方法，仍会慢慢漂移）；RK4 的误差与步长的四次方成正比。没有执行器速度项等时，MuJoCo 的 implicitfast 与 Euler 相同（本实验关掉了执行器）。", "Numerical integration breaks conservation: explicit Euler's energy error keeps growing; semi-implicit Euler — MuJoCo's Euler — grows far more slowly (with a pose-dependent mass matrix it is not strictly symplectic and still drifts slowly); RK4's error scales with the fourth power of the step. Without actuator velocity terms (the lab switches the actuators off) MuJoCo's implicitfast equals Euler."]
+  - ["双摆是混沌的：初值的微小差别随时间指数放大，长时间的轨迹无法预测，但能量照样守恒。", "A double pendulum is chaotic: tiny differences at the start grow exponentially, so long-term paths cannot be predicted, yet energy is still conserved."]
+步骤:
+  - ["场景“UR5e 自由下落”：RK4、1 ms、无阻尼，按“开始”，仿真 10 s 后读出机械能的最大偏差（任务 1），填入表 1。", "Scene “UR5e falling freely”: RK4, 1 ms, no damping; press Start and after 10 s record the largest energy error (task 1) in Table 1."]
+  - ["依次换成表 1 中的积分器和步长（任务 2、3），填入表 1。", "Repeat with the integrators and steps of Table 1 (tasks 2 and 3)."]
+  - ["RK4、1 ms，阻尼依次取 0.2、0.5、1.0 N·m·s/rad，记录 10 s 内机械能的减少量，观察它是否单调减少（任务 4），填入表 2。", "RK4, 1 ms, damping 0.2, 0.5 and 1.0 N·m·s/rad: record the energy lost in 10 s and whether it decreases monotonically (task 4), Table 2."]
+  - ["场景“两个双摆”：按“开始”，记录两者相差超过 0.1 rad 的时刻和机械能的最大偏差（任务 5），填入表 3。", "Scene “Two double pendulums”: press Start and record when they differ by more than 0.1 rad and the largest energy error (task 5) in Table 3."]
+数据表:
+  - 标题: ["表 1  积分器、步长与能量误差（10 s，无阻尼）", "Table 1  Integrator, step and energy error (10 s, no damping)"]
+    表头: ["积分器", "h / ms", "机械能最大偏差 / J", "与 h = 1 ms 之比"]
+    表头英文: ["Integrator", "h / ms", "Largest energy error / J", "Ratio to h = 1 ms"]
+    行: [["RK4", "1", "", "1"], ["RK4", "2", "", ""], ["RK4", "4", "", ""], ["Euler", "1", "", "1"], ["Euler", "2", "", ""], ["Euler", "4", "", ""], ["implicitfast", "1", "", "1"], ["implicitfast", "4", "", ""]]
+  - 标题: ["表 2  阻尼与能量耗散（RK4，1 ms）", "Table 2  Damping and energy loss (RK4, 1 ms)"]
+    表头: ["b / (N·m·s/rad)", "10 s 内机械能减少 / J", "是否单调减少"]
+    表头英文: ["b / (N·m·s/rad)", "Energy lost in 10 s / J", "Monotonic decrease?"]
+    行: [["0.2", "", ""], ["0.5", "", ""], ["1.0", "", ""]]
+  - 标题: ["表 3  双摆的混沌", "Table 3  Chaos in the double pendulum"]
+    表头: ["初值差 / rad", "相差超过 0.1 rad 的时刻 / s", "机械能最大偏差 / J"]
+    表头英文: ["Initial difference / rad", "Time the difference passes 0.1 rad / s", "Largest energy error / J"]
+    行: [["10⁻⁹", "", ""]]
+注意:
+  - ["为了自由下落，实验关掉了模型中的位置伺服（执行器）、取消了转角限位并关闭碰撞；真实的 UR5e 断电时刹车会抱住关节，不要这样试。", "For the free fall the lab switches off the model's position servos, removes the joint limits and disables collisions; a real UR5e's brakes lock the joints when power is off, so do not try this."]
+  - ["模型文件自带的积分器设置（implicitfast）已删去，改为实验中选择的积分器。", "The model file's own integrator setting (implicitfast) is removed and replaced by the one chosen in the lab."]
+  - ["表 1 的偏差由另一份数据从同一初始状态逐步计算 10 s 得到，与画面的帧率无关；双摆的尺寸是示意值。", "The errors in Table 1 are computed step by step over 10 s from the same initial state on a separate copy of the data, independent of the frame rate; the pendulum's size is illustrative."]
+思考题:
+  - ["为什么步长为 4 ms 的 Euler 仿真看上去“正常”，能量却已偏差几焦耳？只看动画能不能发现积分误差？", "Why does the Euler run at 4 ms look “normal” while its energy is already several joules off? Can the animation alone reveal the integration error?"]

@@ -1,0 +1,34 @@
+# 实验 24.3 的指导书与报告模板。目的、场景、参数、任务取自 lab24_3.js。
+原理:
+  - ["机械臂的动能为 K = ½ θ̇ᵀ M(θ) θ̇，质量矩阵由各连杆的空间惯量和物体雅可比组装（式 (24.3.2)），再加上电机转子的等效惯量 k_r²J_m（式 (24.3.7)）：", "The kinetic energy is K = ½ θ̇ᵀ M(θ) θ̇; the mass matrix is assembled from each link's spatial inertia and body Jacobian (Eq. 24.3.2), plus the rotors' reflected inertia k_r²J_m (Eq. 24.3.7):"]
+  - 式: "M(θ) = Σ J_iᵀ 𝒢_i J_i + diag(k_r,i² J_m,i)"
+  - ["M 对称正定，与 θ₁ 无关（定理 24.3.2）。M_ii 是锁住其他关节、只转关节 i 时它推动的惯量。", "M is symmetric positive definite and independent of θ₁ (Theorem 24.3.2). M_ii is the inertia joint i drives with the other joints locked."]
+  - ["速度为零时，令加速度为第 j 个单位矢量，逆动力学给出的力矩减去重力项就是 M 的第 j 列。", "At zero speed, with the acceleration equal to the j-th unit vector, the inverse-dynamics torque minus the gravity term is the j-th column of M."]
+  - ["其他关节不动时，关节 1 受冲量 ∫τ₁dt 后获得的转速为：", "With the other joints still, the speed joint 1 gains from an impulse ∫τ₁dt is:"]
+  - 式: "Δθ̇₁ = ∫τ₁dt / M₁₁"
+  - ["负载惯量比 = 关节推动的连杆惯量 / 转子等效惯量，它决定一套伺服参数能否适应各种姿态和负载（第 43 章）。", "The load-to-rotor inertia ratio = link inertia driven / reflected rotor inertia; it decides whether one set of servo gains suits all poses and payloads (Chapter 43)."]
+步骤:
+  - ["场景“质量矩阵”：按表 1 的姿态拖动滑块，记录 M₁₁、M₂₂、特征值的范围、条件数（含与不含转子），填入表 1；找出 M₁₁ < 0.5 kg·m² 的姿态（任务 1）。", "Scene “Mass matrix”: set the poses of Table 1 and record M₁₁, M₂₂, the range of eigenvalues and the condition numbers (with and without rotors); find a pose with M₁₁ < 0.5 kg·m² (task 1)."]
+  - ["保持 θ₂、θ₃、θ₅ 不变，把 θ₁ 转过 30° 以上，看质量矩阵是否改变（任务 2）。", "Keep θ₂, θ₃, θ₅ and turn θ₁ by more than 30°: does the mass matrix change (task 2)?"]
+  - ["θ₂ = θ₃ = 0，负载依次为 0、2、3.8、5 kg，记录 M₁₁ 和负载惯量比（任务 3），填入表 2。", "With θ₂ = θ₃ = 0 set the payload to 0, 2, 3.8 and 5 kg and record M₁₁ and the inertia ratio (task 3) in Table 2."]
+  - ["场景“推一下关节 1”：按“开始”，记录两次推动的冲量、获得的转速、预测值和两个比值（任务 4），填入表 3。", "Scene “A push on joint 1”: press Start and record the impulse, the speed gained, the prediction and the two ratios for both pushes (task 4) in Table 3."]
+数据表:
+  - 标题: ["表 1  姿态与质量矩阵（无负载，θ₄ = −90°）", "Table 1  Pose and mass matrix (no payload, θ₄ = −90°)"]
+    表头: ["θ₂ / (°)", "θ₃ / (°)", "θ₅ / (°)", "M₁₁ / (kg·m²)", "M₂₂ / (kg·m²)", "条件数（不含 / 含转子）"]
+    表头英文: ["θ₂ / (°)", "θ₃ / (°)", "θ₅ / (°)", "M₁₁ / (kg·m²)", "M₂₂ / (kg·m²)", "Condition (without / with rotors)"]
+    行: [["0", "0", "-90", "", "", ""], ["-90", "90", "-90", "", "", ""], ["-90", "150", "-90", "", "", ""], ["-90", "0", "-90", "", "", ""], ["-45", "-90", "0", "", "", ""]]
+  - 标题: ["表 2  负载的影响（θ₂ = θ₃ = 0）", "Table 2  Effect of the payload (θ₂ = θ₃ = 0)"]
+    表头: ["负载 / kg", "M₁₁ / (kg·m²)", "负载惯量比", "比无负载增加"]
+    表头英文: ["Payload / kg", "M₁₁ / (kg·m²)", "Inertia ratio", "Increase over no payload"]
+    行: [["0", "", "", ""], ["2", "", "", ""], ["3.8", "", "", ""], ["5", "", "", ""]]
+  - 标题: ["表 3  推一下关节 1", "Table 3  A push on joint 1"]
+    表头: ["姿态", "冲量 / (N·m·s)", "实测 Δθ̇₁ / (rad/s)", "M₁₁（含转子）/ (kg·m²)", "预测 Δθ̇₁ / (rad/s)"]
+    表头英文: ["Pose", "Impulse / (N·m·s)", "Measured Δθ̇₁ / (rad/s)", "M₁₁ (with rotor) / (kg·m²)", "Predicted Δθ̇₁ / (rad/s)"]
+    行: [["伸直", "", "", "", ""], ["收拢", "", "", "", ""]]
+    行英文: [["Stretched", "", "", "", ""], ["Folded", "", "", "", ""]]
+注意:
+  - ["UR5e 的质量、惯量来自书中的模型（MuJoCo Menagerie），转子等效惯量是模型中的 armature = 0.1 kg·m²，不是厂家数据；负载是示意值。", "The UR5e's masses and inertias come from the book's model (MuJoCo Menagerie); the rotor inertia is the model's armature of 0.1 kg·m², not manufacturer data; the payload is illustrative."]
+  - ["表 1 中的 M 不含转子惯量；“推一下”用的是含转子的 M₁₁，因为电机转子跟着一起转。", "M in Table 1 excludes the rotors; the push uses M₁₁ with the rotor, since the motor rotor turns too."]
+  - ["推一下时其他关节由模型自带的位置伺服保持，并非真正焊死。", "During the push the other joints are held by the model's position servos, not truly welded."]
+思考题:
+  - ["关节 6 推动的连杆惯量只有 10⁻⁴ kg·m² 的量级，而转子等效惯量是 0.1 kg·m²。这对关节 6 的控制意味着什么？", "Joint 6 drives a link inertia of order 10⁻⁴ kg·m² while its rotor inertia is 0.1 kg·m². What does this mean for controlling joint 6?"]

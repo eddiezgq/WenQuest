@@ -1,0 +1,33 @@
+# 实验 24.1 的指导书与报告模板。目的、场景、参数、任务取自 lab24_1.js。
+原理:
+  - ["桁架小车（位置 x）吊着一个质点（吊绳长 l，摆角 φ），以 x、φ 为广义坐标，由拉格朗日方程得到两个耦合的方程（式 (24.1.18)、(24.1.19)）。吊绳的拉力不出现。", "A gantry cart (position x) carries a point load on a rope of length l (angle φ). With x and φ as generalized coordinates, Lagrange's equations give two coupled equations (Eqs. 24.1.18 and 24.1.19); the rope tension does not appear."]
+  - 式: "l φ̈ + ẍ cos φ + 𝔤 sin φ = 0"
+  - ["小车按给定的加速度运动时，这个方程单独决定吊重怎样摆。摆角小时化为受迫振动：", "When the cart follows a given acceleration, this equation alone decides the swing. For small angles it becomes a forced oscillator:"]
+  - 式: "φ̈ + ω² φ = −ẍ/l，ω = √(𝔤/l)，摆动周期 T_p = 2π/ω"
+  - ["小车以 a 加速 t_a 秒后匀速，吊重残留的摆幅为：", "If the cart accelerates at a for t_a seconds and then cruises, the residual swing is:"]
+  - 式: "φ_res = (2a/𝔤) |sin(ω t_a / 2)|（式 (24.1.21)）"
+  - ["t_a 取 T_p 的整数倍时不残留摆动；取半个周期时残留最大。秋千是单摆：大摆角时周期为 T = 4√(l/𝔤) K(sin²(φ₀/2))，K(m) 是第一类完全椭圆积分（式 (24.1.14)）。", "No swing remains when t_a is a whole number of periods; half a period leaves the most. A swing is a simple pendulum: at large angles T = 4√(l/𝔤) K(sin²(φ₀/2)), with K(m) the complete elliptic integral of the first kind (Eq. 24.1.14)."]
+步骤:
+  - ["场景“桁架吊运”：l = 1 m、a = 0.5 m/s²、t_a = 1.0 s（约半个周期），按“开始”，读出残留摆幅和式 (24.1.21) 的预测（任务 1），填入表 1。", "Scene “Gantry transfer”: l = 1 m, a = 0.5 m/s², t_a = 1.0 s (about half a period); press Start and record the residual swing and the prediction of Eq. (24.1.21) (task 1) in Table 1."]
+  - ["把 t_a 依次改为 0.5、1.5、2.0、2.01、3.0 s，重复，填入表 1；找出不残留摆动的加速时间（任务 2）。", "Repeat with t_a = 0.5, 1.5, 2.0, 2.01 and 3.0 s (Table 1) and find the acceleration time that leaves no swing (task 2)."]
+  - ["把吊绳改为 2.0 m，由 T_p = 2π√(l/𝔤) 算出加速时间，验证不残留摆动（任务 3），填入表 2；再试 a = 1.0 m/s²。", "Change the rope to 2.0 m, compute the acceleration time from T_p = 2π√(l/𝔤) and check that no swing remains (task 3), Table 2; then try a = 1.0 m/s²."]
+  - ["场景“秋千”：φ₀ 依次为 10°、30°、60°、80°，按“开始”，读出测得的周期、小摆角公式与式 (24.1.14) 的值（任务 4），填入表 3。", "Scene “A swing”: φ₀ = 10°, 30°, 60° and 80°; press Start and record the measured period, the small-angle formula and Eq. (24.1.14) (task 4) in Table 3."]
+数据表:
+  - 标题: ["表 1  加速时间与残留摆幅（l = 1 m，a = 0.5 m/s²）", "Table 1  Acceleration time and residual swing (l = 1 m, a = 0.5 m/s²)"]
+    表头: ["t_a / s", "t_a / T_p", "预测残留摆幅 / (°)", "实测残留摆幅 / (°)"]
+    表头英文: ["t_a / s", "t_a / T_p", "Predicted residual / (°)", "Measured residual / (°)"]
+    行: [["0.5", "", "", ""], ["1.0", "", "", ""], ["1.5", "", "", ""], ["2.0", "", "", ""], ["2.01", "", "", ""], ["3.0", "", "", ""]]
+  - 标题: ["表 2  吊绳长度与加速度的影响", "Table 2  Effect of rope length and acceleration"]
+    表头: ["l / m", "a / (m/s²)", "T_p / s", "所取 t_a / s", "实测残留摆幅 / (°)"]
+    表头英文: ["l / m", "a / (m/s²)", "T_p / s", "t_a used / s", "Measured residual / (°)"]
+    行: [["1.0", "0.5", "", "", ""], ["2.0", "0.5", "", "", ""], ["2.0", "1.0", "", "", ""]]
+  - 标题: ["表 3  秋千的周期与摆幅（l = 2.5 m）", "Table 3  Period of the swing against amplitude (l = 2.5 m)"]
+    表头: ["φ₀ / (°)", "小摆角公式 / s", "式 (24.1.14) / s", "实测 T / s", "T / 小摆角周期"]
+    表头英文: ["φ₀ / (°)", "Small-angle formula / s", "Eq. (24.1.14) / s", "Measured T / s", "T / small-angle period"]
+    行: [["10", "", "", "", ""], ["30", "", "", "", ""], ["60", "", "", "", ""], ["80", "", "", "", ""]]
+注意:
+  - ["小车 50 kg、吊重 20 kg、秋千 30 kg 都是示意值。吊重和秋千都看作挂在无质量绳上的质点。", "The 50 kg cart, the 20 kg load and the 30 kg swing are illustrative. The load and the swing are point masses on massless ropes."]
+  - ["仿真中小车由伺服电机驱动、严格按设定的加速度运动（滑动关节加了很大的等效惯量），所以吊重的摆动几乎不影响小车；真实的小车电机要出的力见式 (24.1.18)。", "In the simulation the cart is servo-driven and follows the set acceleration exactly (its slide joint carries a large reflected inertia), so the swing hardly affects the cart; the force a real cart motor must give is Eq. (24.1.18)."]
+  - ["残留摆幅在加速结束后由能量换算，不必等吊重摆到最高点。", "The residual swing is computed from the energy right after the acceleration, without waiting for the load to reach its highest point."]
+思考题:
+  - ["为什么吊重的摆动与它的质量无关？小车电机要出的力与吊重的质量有关吗？", "Why does the swing not depend on the load's mass? Does the force the cart motor must give depend on it?"]

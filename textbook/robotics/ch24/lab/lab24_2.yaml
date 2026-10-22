@@ -1,0 +1,32 @@
+# 实验 24.2 的指导书与报告模板。目的、场景、参数、任务取自 lab24_2.js。
+原理:
+  - ["关节 1 和手腕不动时，UR5e 的关节 2、3 是竖直平面内的两连杆臂，运动方程为（式 (24.2.9)）：", "With joint 1 and the wrist still, the UR5e's joints 2 and 3 form a two-link arm in a vertical plane, whose equation of motion is (Eq. 24.2.9):"]
+  - 式: "M(φ) φ̈ + c(φ, φ̇) + g(φ) = τ"
+  - ["M φ̈ 是惯性项，与加速度成正比；c 是速度项（离心项与科氏项），与速度的平方成正比；g 是重力项，只与姿态有关。动作用时缩短为 1/k，惯性项、速度项变为 k² 倍，重力项不变。", "M φ̈ is the inertial term, proportional to acceleration; c is the velocity term (centrifugal and Coriolis), proportional to the square of speed; g is the gravity term, depending only on the pose. Making the move k times faster multiplies the inertial and velocity terms by k² and leaves gravity unchanged."]
+  - ["实验用 MuJoCo 的逆动力学分出三项：加速度、速度都为零 → g；只令加速度为零 → c + g；全部 → τ。", "The lab separates the three terms with MuJoCo's inverse dynamics: zero acceleration and speed → g; zero acceleration only → c + g; everything → τ."]
+  - ["甩手臂：肩匀速转动、肘角不变时，肘关节要出的力矩只剩离心项（式 (24.2.7)）：", "Swinging the arm: with the shoulder turning steadily and the elbow angle fixed, the elbow torque is just the centrifugal term (Eq. 24.2.7):"]
+  - 式: "τ₂ = h φ̇₁²，h = m₂ a₁ r₂ sin φ₂"
+步骤:
+  - ["场景“把毛坯送向卡盘”：负载 3.8 kg、T = 1 s，按“开始”（动画放慢 3 倍），读出两个关节的力矩峰值以及关节 2 的惯性项、重力项峰值（任务 1），填入表 1。", "Scene “Feeding the blank to the chuck”: payload 3.8 kg, T = 1 s; press Start (played 3x slower) and record both joints' peak torques and joint 2's inertial and gravity peaks (task 1) in Table 1."]
+  - ["T 依次取 1.5、0.8、0.7、0.66、0.6、0.5 s，重复，填入表 1；找出力矩不超过 150 N·m 的最短用时（任务 2）和惯性项超过重力项的用时（任务 4）。", "Repeat with T = 1.5, 0.8, 0.7, 0.66, 0.6 and 0.5 s (Table 1); find the shortest duration within 150 N·m (task 2) and the duration at which the inertial term exceeds gravity (task 4)."]
+  - ["T = 1 s，负载依次取 0、2、5 kg，填入表 2（任务 3）。", "With T = 1 s set the payload to 0, 2 and 5 kg (Table 2, task 3)."]
+  - ["场景“甩手臂”：肘关节力矩依次取 0、5、9.6、12 N·m，按“开始”，记录 1.5 s 内肘角的变化（任务 5），填入表 3。", "Scene “Swinging the arm”: elbow torque 0, 5, 9.6 and 12 N·m; press Start and record how the elbow angle changes in 1.5 s (task 5) in Table 3."]
+数据表:
+  - 标题: ["表 1  动作用时与力矩（负载 3.8 kg）", "Table 1  Duration of the move and torques (payload 3.8 kg)"]
+    表头: ["T / s", "峰值速度 / (°/s)", "关节 2 峰值 / (N·m)", "关节 3 峰值 / (N·m)", "关节 2 惯性项峰值", "关节 2 重力项峰值"]
+    表头英文: ["T / s", "Peak speed / (°/s)", "Joint 2 peak / (N·m)", "Joint 3 peak / (N·m)", "Joint 2 inertial peak", "Joint 2 gravity peak"]
+    行: [["1.5", "", "", "", "", ""], ["1.0", "", "", "", "", ""], ["0.8", "", "", "", "", ""], ["0.7", "", "", "", "", ""], ["0.66", "", "", "", "", ""], ["0.6", "", "", "", "", ""], ["0.5", "", "", "", "", ""]]
+  - 标题: ["表 2  负载的影响（T = 1 s）", "Table 2  Effect of the payload (T = 1 s)"]
+    表头: ["负载 / kg", "关节 2 峰值 / (N·m)", "关节 3 峰值 / (N·m)", "关节 2 重力项峰值 / (N·m)"]
+    表头英文: ["Payload / kg", "Joint 2 peak / (N·m)", "Joint 3 peak / (N·m)", "Joint 2 gravity peak / (N·m)"]
+    行: [["0", "", "", ""], ["2", "", "", ""], ["3.8", "", "", ""], ["5", "", "", ""]]
+  - 标题: ["表 3  甩手臂（肩 10 rad/s，肘从 90° 开始）", "Table 3  Swinging the arm (shoulder 10 rad/s, elbow starting at 90°)"]
+    表头: ["肘关节力矩 / (N·m)", "1.5 s 内肘角的范围 / (°)", "偏离 90° 的最大值 / (°)", "前臂被甩开还是收拢"]
+    表头英文: ["Elbow torque / (N·m)", "Elbow angle range in 1.5 s / (°)", "Largest departure from 90° / (°)", "Flung open or pulled in"]
+    行: [["0", "", "", ""], ["5", "", "", ""], ["9.6", "", "", ""], ["12", "", "", ""]]
+注意:
+  - ["UR5e 的质量、惯量来自书中的模型（MuJoCo Menagerie，连杆质量沿用上一代 UR5 的数值，23.5 节）；夹爪、毛坯和人的手臂是示意值。", "The UR5e's masses and inertias come from the book's model (MuJoCo Menagerie; link masses of the earlier UR5, Section 23.5); the gripper, blank and human arm are illustrative."]
+  - ["显示的力矩按书中平面坐标的符号（φ = −θ，τ = −τ_UR，式 (24.2.10)），与图 24.2.2 相同。", "Torques are shown with the sign of the book's planar coordinates (φ = −θ, τ = −τ_UR, Eq. 24.2.10), as in Figure 24.2.2."]
+  - ["150 N·m 是模型中关节 2、3 的力矩上限；UR5e 各关节的速度上限是 180 °/s，T 小于 0.94 s 时这个动作已经超速。", "150 N·m is the model's torque limit of joints 2 and 3; the UR5e's joint speed limit is 180 °/s, so below T = 0.94 s this move is already too fast."]
+思考题:
+  - ["为什么关节 3 的重力项在整个动作中不变？如果终点改为 (−30°, 60°)，还会不变吗？", "Why does joint 3's gravity term stay constant during the move? Would it if the end were (−30°, 60°)?"]
