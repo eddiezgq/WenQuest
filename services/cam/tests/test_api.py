@@ -105,3 +105,13 @@ def test_freecad_pack():
     ignore = (here / "Dockerfile.dockerignore").read_text(encoding="utf-8")
     docker = (here / "Dockerfile").read_text(encoding="utf-8")
     assert "!services/cam/freecad" in ignore and "wq_workbench.py" in ignore and "wq_workbench.py" in docker
+
+
+def test_app_imports_at_the_image_path():
+    """2026-10-22：镜像里 app.py 在 /srv，没有上两级目录，WORKBENCH 取 parents[1] 时启动就崩（线上 /cam/ 502）。"""
+    from pathlib import Path
+
+    import app as A
+
+    assert A.workbench_dirs(Path("/srv")) == [Path("/srv/freecad/workbench")]
+    assert len(A.workbench_dirs(Path("/a/b/c"))) == 2

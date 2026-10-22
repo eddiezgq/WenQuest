@@ -344,7 +344,16 @@ async def synthetic_ep(request: Request):
 # --------------------------------------------------------------------------------------- step 5: FreeCAD
 
 FREECAD = HERE / "freecad"
-WORKBENCH = [HERE / "freecad" / "workbench", HERE.parents[1] / "factory" / "digital" / "freecad" / "Mod" / "WenQuest"]
+def workbench_dirs(here: Path) -> list[Path]:
+    """Where the workbench files are: in the image /srv/freecad/workbench (copied there by the Dockerfile); in the
+    repository factory/digital/freecad/Mod/WenQuest. The image's /srv has no grandparent, so look it up safely."""
+    out = [here / "freecad" / "workbench"]
+    if len(here.parents) >= 2:
+        out.append(here.parents[1] / "factory" / "digital" / "freecad" / "Mod" / "WenQuest")
+    return out
+
+
+WORKBENCH = workbench_dirs(HERE)
 FREECAD_README = """问渠凸轮 · FreeCAD 工作台（第 39 轮第 5 步）
 
 1. 安装 FreeCAD 1.1（https://www.freecad.org/downloads.php）。
