@@ -1,0 +1,947 @@
+1
+00:00:00,600 --> 00:00:01,673
+Hi everyone,
+
+2
+00:00:01,693 --> 00:00:08,228
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,628 --> 00:00:16,739
+This is Lecture 13, control basics, with motors, drives and sensors.
+
+4
+00:00:17,139 --> 00:00:23,163
+Today we move into electrical control, with two questions running through it.
+
+5
+00:00:23,183 --> 00:00:26,852
+How does the shaft stop precisely at needle-up?
+
+6
+00:00:26,872 --> 00:00:32,661
+And how many degrees of shaft rotation do the actuators' delays amount to?
+
+7
+00:00:34,181 --> 00:00:35,521
+The shop-floor problem.
+
+8
+00:00:35,921 --> 00:00:39,001
+To shorten the stop at the end of each seam,
+
+9
+00:00:39,021 --> 00:00:43,864
+a sewing floor raised the trimming speed of its electronic lockstitch
+
+10
+00:00:43,884 --> 00:00:46,048
+machines from 400 to 600 r/min,
+
+11
+00:00:46,068 --> 00:00:48,021
+and trimming became erratic.
+
+12
+00:00:48,421 --> 00:00:56,040
+The trimming solenoid has an 8-ohm coil, a 24-volt boost then 1-amp hold,
+
+13
+00:00:56,060 --> 00:01:00,226
+and a pull-in delay of 6.9 milliseconds;
+
+14
+00:01:00,246 --> 00:01:06,191
+with diode freewheeling it releases in 12.9 milliseconds,
+
+15
+00:01:06,211 --> 00:01:09,121
+with a 48-volt Zener in 5.1.
+
+16
+00:01:09,521 --> 00:01:16,957
+The mechanism needs both pull-in and release within 20 degrees of shaft angle.
+
+17
+00:01:17,357 --> 00:01:21,234
+What's wrong, and what's the highest trimming speed?
+
+18
+00:01:22,754 --> 00:01:27,534
+What's inside an electronic lockstitch machine.
+
+19
+00:01:29,054 --> 00:01:34,560
+An electronic lockstitch machine has three kinds of parts: sensors,
+
+20
+00:01:34,580 --> 00:01:37,034
+the controller, and actuators.
+
+21
+00:01:37,434 --> 00:01:43,471
+The sensors are the shaft encoder, the pedal, thread-break detection,
+
+22
+00:01:43,491 --> 00:01:48,738
+bobbin-thread monitoring, fabric thickness and edge sensors.
+
+23
+00:01:49,138 --> 00:01:53,918
+The controller holds the servo drive and the control program.
+
+24
+00:01:54,318 --> 00:02:01,469
+The actuators are the main-shaft servo, the trimming and reverse solenoids,
+
+25
+00:02:01,489 --> 00:02:06,538
+the foot-lift cylinder and the stitch-length stepper.
+
+26
+00:02:06,938 --> 00:02:11,216
+The mechanisms are still those driven by the shaft;
+
+27
+00:02:11,236 --> 00:02:14,165
+the shaft is now driven by a servo,
+
+28
+00:02:14,185 --> 00:02:20,318
+and the extra actions are carried out by actuators at given shaft angles.
+
+29
+00:02:21,838 --> 00:02:26,495
+The shaft servo: three loops and needle positioning.
+
+30
+00:02:28,015 --> 00:02:32,804
+The shaft motor is a permanent-magnet synchronous motor,
+
+31
+00:02:32,824 --> 00:02:37,355
+and i_q is the part of its current that makes torque.
+
+32
+00:02:37,755 --> 00:02:41,375
+The shaft servo nests three control loops.
+
+33
+00:02:41,775 --> 00:02:50,566
+Innermost is the current loop, the fastest, around 0.1 milliseconds,
+
+34
+00:02:50,586 --> 00:02:54,583
+holding i_q, and so the torque.
+
+35
+00:02:54,983 --> 00:03:01,225
+In the middle is the velocity loop, a PI controller.
+
+36
+00:03:01,625 --> 00:03:05,725
+Outermost is the position loop.
+
+37
+00:03:06,125 --> 00:03:10,707
+Each outer loop's output is the inner loop's command:
+
+38
+00:03:10,727 --> 00:03:16,785
+position error becomes a speed command, speed error a current command.
+
+39
+00:03:17,185 --> 00:03:25,098
+The velocity-loop bandwidth is roughly K_v over the inertia J:
+
+40
+00:03:25,118 --> 00:03:31,495
+in the example 0.2 over 6 times 10 to the minus 4,
+
+41
+00:03:31,515 --> 00:03:35,205
+about 333 radians per second.
+
+42
+00:03:35,605 --> 00:03:38,278
+The shaft load changes every revolution,
+
+43
+00:03:38,298 --> 00:03:42,585
+and the velocity loop has to suppress that periodic disturbance.
+
+44
+00:03:44,105 --> 00:03:47,591
+Needle positioning has two stages.
+
+45
+00:03:47,991 --> 00:03:54,177
+First the velocity loop slows the shaft to the positioning speed,
+
+46
+00:03:54,197 --> 00:04:01,146
+200 r/min in the example; then, 45 degrees short of the needle-up target,
+
+47
+00:04:01,166 --> 00:04:08,593
+the position loop takes over, with its output capped at the positioning speed.
+
+48
+00:04:08,993 --> 00:04:16,003
+With the standard gains, K_p 200, K_v 0.2 and T_i 12 milliseconds,
+
+49
+00:04:16,023 --> 00:04:24,203
+it overshoots about 0.1 degrees and is within plus or minus 0.5 degrees in 38
+
+50
+00:04:24,223 --> 00:04:25,588
+milliseconds.
+
+51
+00:04:25,988 --> 00:04:34,456
+On the right, the handwheel animation from Virtual Lab 13-1, slowed 20 times,
+
+52
+00:04:34,476 --> 00:04:40,408
+with the tolerance band magnified 10 times, replaying.
+
+53
+00:04:41,928 --> 00:04:48,457
+Compare the position-error curves: 500 on the left, 200 on the right;
+
+54
+00:04:48,477 --> 00:04:52,348
+the lower half magnifies the final stage.
+
+55
+00:04:52,748 --> 00:04:55,398
+With a position gain of 200,
+
+56
+00:04:55,418 --> 00:05:01,978
+the overshoot is about 0.1 degrees and it settles in 38 milliseconds.
+
+57
+00:05:02,378 --> 00:05:10,550
+Raise only that gain to 500 and it overshoots about 1.8 degrees and takes 50
+
+58
+00:05:10,570 --> 00:05:11,951
+milliseconds:
+
+59
+00:05:11,971 --> 00:05:13,998
+slower, not faster.
+
+60
+00:05:14,398 --> 00:05:19,824
+The position loop is now too stiff for the velocity loop to follow,
+
+61
+00:05:19,844 --> 00:05:22,181
+and the torque hits its peak.
+
+62
+00:05:22,581 --> 00:05:28,471
+The rule of thumb is a position gain of a quarter to a half of K_v over J:
+
+63
+00:05:28,491 --> 00:05:33,263
+stiffen the velocity loop first, then add the position loop.
+
+64
+00:05:33,663 --> 00:05:40,047
+Fit a heavier handwheel and the inertia grows, so the gains must be retuned.
+
+65
+00:05:41,567 --> 00:05:45,467
+Why does the velocity loop need PI?
+
+66
+00:05:45,867 --> 00:05:48,744
+At standstill the speed is zero,
+
+67
+00:05:48,764 --> 00:05:54,085
+and without an integral only the proportional term is left:
+
+68
+00:05:54,105 --> 00:05:59,607
+motor torque equals K_v times K_p times the position error e.
+
+69
+00:06:00,007 --> 00:06:07,076
+As long as that torque is below the Coulomb friction T_f, nothing moves,
+
+70
+00:06:07,096 --> 00:06:11,507
+and the shaft can stop anywhere in that band.
+
+71
+00:06:11,907 --> 00:06:22,601
+In the example, 0.15 over 0.2 times 200, about 0.21 degrees.
+
+72
+00:06:23,001 --> 00:06:27,696
+On the right the integral time is set to zero:
+
+73
+00:06:27,716 --> 00:06:34,050
+watch the error curve stop short of the target and stay there.
+
+74
+00:06:34,450 --> 00:06:42,030
+An integral slowly builds the small error into torque until the shaft moves.
+
+75
+00:06:43,550 --> 00:06:47,336
+Encoders and sensors.
+
+76
+00:06:48,856 --> 00:06:52,297
+The shaft angle comes from an incremental encoder.
+
+77
+00:06:52,697 --> 00:06:57,985
+Channels A and B are square waves a quarter period apart:
+
+78
+00:06:58,005 --> 00:07:05,157
+turning forward A leads, turning backward B leads, which gives the direction.
+
+79
+00:07:05,557 --> 00:07:11,206
+Counting both rising and falling edges gives four counts per period,
+
+80
+00:07:11,226 --> 00:07:13,457
+called times-four decoding.
+
+81
+00:07:13,857 --> 00:07:21,412
+A 1024-line encoder then gives 4096 counts per revolution,
+
+82
+00:07:21,432 --> 00:07:24,677
+about 0.088 degrees each.
+
+83
+00:07:25,077 --> 00:07:30,207
+An index pulse fixes the absolute angle, and U,
+
+84
+00:07:30,227 --> 00:07:37,660
+V and W commutation signals let the motor start turning at power-up.
+
+85
+00:07:39,180 --> 00:07:44,871
+Actuators: steppers, solenoids and power circuits.
+
+86
+00:07:46,391 --> 00:07:49,731
+Trimming and reverse use solenoids.
+
+87
+00:07:50,131 --> 00:07:55,571
+When energised, the current rises with time constant L over R;
+
+88
+00:07:55,591 --> 00:07:58,741
+the force goes with current squared,
+
+89
+00:07:58,761 --> 00:08:03,409
+and the armature moves only once it beats the spring.
+
+90
+00:08:03,809 --> 00:08:11,257
+As it moves it generates a back EMF, which puts a notch in the current curve.
+
+91
+00:08:11,657 --> 00:08:15,360
+A 1-amp hold current alone won't pull it in;
+
+92
+00:08:15,380 --> 00:08:19,677
+3 amps all the time would dissipate about 70 watts.
+
+93
+00:08:20,077 --> 00:08:27,003
+The answer is a 24-volt boost that pulls in within 6.9 milliseconds,
+
+94
+00:08:27,023 --> 00:08:31,395
+then chopping to hold 1 amp, about 8 watts.
+
+95
+00:08:31,795 --> 00:08:38,331
+On the right the boost time sweeps between 0 and 20 milliseconds;
+
+96
+00:08:38,351 --> 00:08:41,962
+watch whether the armature pulls in.
+
+97
+00:08:43,482 --> 00:08:48,582
+At switch-off the coil current needs somewhere to go.
+
+98
+00:08:48,982 --> 00:08:53,363
+With a diode it decays slowly with L over R,
+
+99
+00:08:53,383 --> 00:08:56,963
+and release takes 12.9 milliseconds;
+
+100
+00:08:56,983 --> 00:09:03,364
+with a 48-volt Zener it collapses quickly and release takes 5.1,
+
+101
+00:09:03,384 --> 00:09:10,465
+at the cost of 72 volts, 24 plus 48, across the transistor at turn-off,
+
+102
+00:09:10,485 --> 00:09:14,865
+and about 40 millijoules absorbed each time.
+
+103
+00:09:15,265 --> 00:09:21,064
+Delays convert to shaft angle as theta equals 6 n t:
+
+104
+00:09:21,084 --> 00:09:25,987
+at 400 r/min one millisecond is 2.4 degrees,
+
+105
+00:09:26,007 --> 00:09:31,805
+so pull-in is about 17 degrees and release 31 or 12.
+
+106
+00:09:32,205 --> 00:09:37,185
+On the right the freewheeling voltage sweeps back and forth.
+
+107
+00:09:38,705 --> 00:09:47,126
+The power circuit: 220 volts rectified gives a DC link of about 310 volts,
+
+108
+00:09:47,146 --> 00:09:52,829
+and a six-switch inverter bridge drives the motor.
+
+109
+00:09:53,229 --> 00:09:57,421
+In an emergency stop the motor becomes a generator,
+
+110
+00:09:57,441 --> 00:10:00,724
+but the rectifier only conducts one way,
+
+111
+00:10:00,744 --> 00:10:04,110
+so the energy can't go back to the mains;
+
+112
+00:10:04,130 --> 00:10:07,249
+it can only charge the link capacitor.
+
+113
+00:10:07,649 --> 00:10:17,052
+At 5000 r/min the kinetic energy is about 82 joules; with 70 percent fed back,
+
+114
+00:10:17,072 --> 00:10:26,354
+a 470-microfarad capacitor would rise to about 584 volts, which is dangerous.
+
+115
+00:10:26,754 --> 00:10:35,748
+So the link carries a braking resistor that switches in at about 400 volts
+
+116
+00:10:35,768 --> 00:10:38,793
+and burns the energy off;
+
+117
+00:10:38,813 --> 00:10:45,614
+any emergency stop above about 2554 r/min depends on it.
+
+118
+00:10:47,134 --> 00:10:55,009
+Every joint of a robot arm is a permanent-magnet synchronous motor with an encoder,
+
+119
+00:10:55,029 --> 00:11:01,287
+and its drive nests the same current, velocity and position loops,
+
+120
+00:11:01,307 --> 00:11:06,994
+with vector control making joint torque proportional to i_q.
+
+121
+00:11:07,394 --> 00:11:14,067
+Stopping the shaft at needle-up corresponds to stopping a joint at its target angle:
+
+122
+00:11:14,087 --> 00:11:18,768
+too much position gain overshoots, and without an integral,
+
+123
+00:11:18,788 --> 00:11:21,238
+friction leaves a steady error.
+
+124
+00:11:21,638 --> 00:11:27,452
+When the arm picks up a heavy part its inertia grows and the velocity
+
+125
+00:11:27,472 --> 00:11:28,805
+bandwidth falls,
+
+126
+00:11:28,825 --> 00:11:32,017
+just like fitting a heavier handwheel;
+
+127
+00:11:32,037 --> 00:11:38,190
+that's why robot drives also have a load-inertia ratio and online inertia
+
+128
+00:11:38,210 --> 00:11:39,458
+identification.
+
+129
+00:11:39,858 --> 00:11:44,039
+Emergency stops need braking resistors here too,
+
+130
+00:11:44,059 --> 00:11:50,253
+and gripper valves must be commanded early according to the belt speed.
+
+131
+00:11:51,773 --> 00:11:58,593
+Needle positioning in everyday life: an elevator levelling at a floor.
+
+132
+00:11:58,993 --> 00:12:03,388
+As it approaches, it first slows to a low creep speed,
+
+133
+00:12:03,408 --> 00:12:09,110
+and only a short distance before the levelling point does it switch to
+
+134
+00:12:09,130 --> 00:12:11,154
+precise position control,
+
+135
+00:12:11,174 --> 00:12:15,323
+stopping with the car floor flush with the landing.
+
+136
+00:12:15,723 --> 00:12:20,898
+That's exactly the two-stage method of needle positioning: slow down,
+
+137
+00:12:20,918 --> 00:12:23,383
+then switch to the position loop.
+
+138
+00:12:23,783 --> 00:12:26,614
+With more passengers the inertia grows,
+
+139
+00:12:26,634 --> 00:12:29,683
+and a good elevator controller adapts too.
+
+140
+00:12:31,203 --> 00:12:32,743
+Back to the start.
+
+141
+00:12:33,143 --> 00:12:42,566
+At 600 r/min the pull-in takes 24.8 degrees and the diode release 46.4,
+
+142
+00:12:42,586 --> 00:12:49,083
+both over 20: that's why trimming became erratic.
+
+143
+00:12:49,483 --> 00:12:56,338
+The 48-volt Zener brings release down to 18.4 degrees,
+
+144
+00:12:56,358 --> 00:12:59,648
+but pull-in is still 24.8.
+
+145
+00:13:00,048 --> 00:13:07,831
+The longer pull-in sets the limit: 20 over 6 times 0.0069, about 483 r/min,
+
+146
+00:13:07,851 --> 00:13:12,201
+so set the trimming speed below about 480,
+
+147
+00:13:12,221 --> 00:13:16,987
+or raise the drive voltage to shorten pull-in.
+
+148
+00:13:17,387 --> 00:13:23,607
+At turn-off the transistor sees 72 volts, so choose it with a margin.
+
+149
+00:13:25,127 --> 00:13:28,372
+Now Virtual lab 13-1, tuning needle positioning.
+
+150
+00:13:28,392 --> 00:13:33,200
+On the WenQuest platform you can do it yourself. The criteria readings,
+
+151
+00:13:33,220 --> 00:13:38,301
+the hints and the tasks are blurred here, so you can find them on your own.
+
+152
+00:13:38,321 --> 00:13:42,110
+Top left is the handwheel, top right the position error,
+
+153
+00:13:42,130 --> 00:13:44,966
+and below are the speed and torque curves.
+
+154
+00:13:45,366 --> 00:13:50,486
+Task one: press Scramble. The gains become 450, 0.05 and zero,
+
+155
+00:13:50,506 --> 00:13:53,967
+and the error curve overshoots and swings.
+
+156
+00:13:53,987 --> 00:13:58,692
+Adjust only the three gains until all four criteria pass.
+
+157
+00:13:58,712 --> 00:14:03,583
+Here we raise the velocity gain; the rest is yours to tune.
+
+158
+00:14:03,983 --> 00:14:05,306
+Task two: reset,
+
+159
+00:14:05,326 --> 00:14:11,435
+then set the integral time to zero and see where the shaft finally stops.
+
+160
+00:14:11,455 --> 00:14:14,709
+Then raise the Coulomb friction to 0.3,
+
+161
+00:14:14,729 --> 00:14:21,090
+work out the largest steady error as the friction torque over the product of
+
+162
+00:14:21,110 --> 00:14:22,265
+the two gains,
+
+163
+00:14:22,285 --> 00:14:26,043
+convert it to degrees, and enter it to check.
+
+164
+00:14:26,443 --> 00:14:30,723
+Task three: set the referred inertia to 12.
+
+165
+00:14:30,743 --> 00:14:38,323
+Leave the gains alone at first and see what happens to the overshoot and the
+
+166
+00:14:38,343 --> 00:14:39,723
+settling time,
+
+167
+00:14:39,743 --> 00:14:42,323
+then retune them yourself.
+
+168
+00:14:43,843 --> 00:14:50,505
+Next, Virtual lab 13-2, driving a solenoid. The criteria, the shaft-angle bars,
+
+169
+00:14:50,525 --> 00:14:54,312
+the hints and the tasks are blurred here too.
+
+170
+00:14:54,332 --> 00:15:00,148
+First find three moments on the upper plot: the notch in the current,
+
+171
+00:15:00,168 --> 00:15:05,223
+the force overtaking the spring, and the armature bottoming.
+
+172
+00:15:05,623 --> 00:15:11,514
+Task one: adjust only the freewheeling voltage until all four criteria pass.
+
+173
+00:15:11,534 --> 00:15:14,625
+Here we raise it from the diode setting.
+
+174
+00:15:14,645 --> 00:15:18,513
+Watch how fast the current falls after switch-off,
+
+175
+00:15:18,533 --> 00:15:21,702
+and how much sooner the armature returns.
+
+176
+00:15:22,102 --> 00:15:24,138
+Then push it to 80 volts,
+
+177
+00:15:24,158 --> 00:15:30,551
+and think about why the fourth criterion won't let you raise it without limit.
+
+178
+00:15:30,951 --> 00:15:34,863
+Task two: raise the trimming speed to 600,
+
+179
+00:15:34,883 --> 00:15:41,697
+keep the hold current at or below 1.1 amps, and adjust the drive voltage,
+
+180
+00:15:41,717 --> 00:15:45,815
+the boost time and the freewheeling voltage.
+
+181
+00:15:45,835 --> 00:15:53,491
+Here we raise the drive voltage and watch the current climb faster during pull-in.
+
+182
+00:15:53,891 --> 00:15:59,631
+Task three: with the settings you found for 600 r/min in task two,
+
+183
+00:15:59,651 --> 00:16:05,826
+read the longer of the two delays, work out the highest trimming speed,
+
+184
+00:16:05,846 --> 00:16:12,545
+and enter it to check. The guide and the report template are on the platform.
+
+185
+00:16:14,065 --> 00:16:19,163
+Everything in this lecture is on the WenQuest learning platform.
+
+186
+00:16:19,563 --> 00:16:25,495
+You can open today's interactive slides and both virtual labs yourself.
+
+187
+00:16:25,515 --> 00:16:30,357
+Change the gains, the inertia or the freewheeling voltage,
+
+188
+00:16:30,377 --> 00:16:35,303
+and watch needle positioning and trimming change with them.
+
+189
+00:16:35,703 --> 00:16:40,713
+You submit the assignment and the lab reports on the platform,
+
+190
+00:16:40,733 --> 00:16:43,308
+and get marks and comments back.
+
+191
+00:16:43,708 --> 00:16:47,741
+Questions go to the course discussion forum,
+
+192
+00:16:47,761 --> 00:16:53,728
+and the grades page shows your mark on every assignment and quiz.
+
+193
+00:16:55,248 --> 00:16:58,545
+Your assignment has four questions. One:
+
+194
+00:16:58,565 --> 00:17:02,278
+a 2500-line encoder with times-four decoding.
+
+195
+00:17:02,298 --> 00:17:08,581
+Find the speed-measurement error of the M method and the T method at 150 and
+
+196
+00:17:08,601 --> 00:17:09,742
+at 3000 r/min,
+
+197
+00:17:09,762 --> 00:17:15,962
+and say which belongs in needle positioning and which in high-speed sewing.
+
+198
+00:17:15,982 --> 00:17:19,528
+The M method counts pulses in a fixed time;
+
+199
+00:17:19,548 --> 00:17:24,836
+the T method times the gap between two pulses with a fast clock.
+
+200
+00:17:25,236 --> 00:17:30,301
+Two: with today's trimming solenoid and a trimming speed of 450 r/min,
+
+201
+00:17:30,321 --> 00:17:34,442
+does each freewheeling scheme meet the limit? Choose one,
+
+202
+00:17:34,462 --> 00:17:40,035
+and give the transistor's voltage rating and the energy the Zener absorbs per
+
+203
+00:17:40,055 --> 00:17:40,616
+release.
+
+204
+00:17:41,016 --> 00:17:45,574
+Three: the shaft makes an emergency stop from 4500 r/min.
+
+205
+00:17:45,594 --> 00:17:50,553
+Without a braking resistor, how high does the link voltage go,
+
+206
+00:17:50,573 --> 00:17:55,854
+and above what speed is the resistor needed? Four is a discussion:
+
+207
+00:17:55,874 --> 00:17:59,950
+should an electronic feed use a stepper or a servo?
+
+208
+00:17:59,970 --> 00:18:05,973
+A stepper moves one step per pulse, but can lose steps under too much load.
+
+209
+00:18:05,993 --> 00:18:11,996
+Compare positioning, the risk of lost steps, low-speed smoothness and cost.
+
+210
+00:18:12,396 --> 00:18:18,179
+Submit the calculation report and the lab screenshots on the WenQuest platform.
+
+211
+00:18:19,699 --> 00:18:24,733
+There's also a ten-question quiz. For example,
+
+212
+00:18:24,753 --> 00:18:29,677
+a 2048-line encoder with times-four decoding:
+
+213
+00:18:29,697 --> 00:18:33,413
+what is its resolution in degrees?
+
+214
+00:18:33,813 --> 00:18:34,133
+Or,
+
+215
+00:18:34,153 --> 00:18:42,645
+the shaft turns at 500 r/min and the trimming solenoid takes 8 milliseconds
+
+216
+00:18:42,665 --> 00:18:43,894
+to pull in.
+
+217
+00:18:43,914 --> 00:18:49,228
+How many degrees does the shaft turn meanwhile?
+
+218
+00:18:49,628 --> 00:18:55,726
+You get three attempts, and the explanations appear as soon as you submit.
+
+219
+00:18:57,246 --> 00:18:58,820
+Three things to remember.
+
+220
+00:18:59,220 --> 00:19:04,528
+One: the shaft servo nests current, velocity and position loops;
+
+221
+00:19:04,548 --> 00:19:10,772
+needle positioning slows down first and then switches to the position loop,
+
+222
+00:19:10,792 --> 00:19:15,600
+with a position gain of a quarter to a half of K_v over J,
+
+223
+00:19:15,620 --> 00:19:18,680
+retuned whenever the inertia changes.
+
+224
+00:19:19,080 --> 00:19:24,457
+Two: without a velocity-loop integral,
+
+225
+00:19:24,477 --> 00:19:31,701
+friction leaves a steady error of T_f over K_v K_p.
+
+226
+00:19:32,101 --> 00:19:36,634
+Three: solenoids use a boost plus chopped hold,
+
+227
+00:19:36,654 --> 00:19:39,928
+Zener freewheeling speeds release,
+
+228
+00:19:39,948 --> 00:19:45,353
+and delays convert to shaft angle by theta equals 6 n t,
+
+229
+00:19:45,373 --> 00:19:48,841
+which sets the trimming-speed limit.
+
+230
+00:19:49,241 --> 00:19:54,741
+The assignment, quiz and both labs are on WenQuest.
+
+231
+00:19:55,141 --> 00:19:57,982
+The slides, the virtual labs,
+
+232
+00:19:58,002 --> 00:20:04,888
+the assignment and the quiz are all on the WenQuest learning platform,
+
+233
+00:20:04,908 --> 00:20:11,498
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+234
+00:20:11,898 --> 00:20:16,808
+Next time it's the control of the industrial lockstitch machine,
+
+235
+00:20:16,828 --> 00:20:22,432
+and how actions like trimming and reverse stitching are timed against the
+
+236
+00:20:22,452 --> 00:20:23,356
+shaft angle.
+
+237
+00:20:23,376 --> 00:20:24,358
+See you then.
