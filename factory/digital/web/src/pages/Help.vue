@@ -144,7 +144,8 @@ const vars = computed(() => ({ 厂名: plantName.value, 公司: cfg.value?.plant
 const chapters = computed(() => chapterFiles(ed.value).map((f) => {
   const d = parse(f.src, vars.value);
   const kinds = new Set(d.segments.filter((s) => s.type === 'block').map((s) => s.kind));
-  const has = [['goto', '带我去做'], ['video', '视频'], ['anim', '动画'], ['live', '实时数据']].filter(([k]) => kinds.has(k)).map(([, n]) => n);
+  const has = [['goto', '带我去做'], ['video', '视频'], ['anim', '动画'], ['lab', '拖着玩'], ['try', '当场动手'], ['quiz', '你来选'], ['live', '实时数据']]
+    .filter(([k]) => kinds.has(k)).map(([, n]) => n);
   return { slug: f.slug, ...d, has };
 }));
 const chapter = computed(() => chapters.value.find((c) => c.slug === route.params.ch) || null);
@@ -192,6 +193,17 @@ function pickStage(i) {
   if (slug) router.push(`/help/${ed.value}/${slug}`);
 }
 function jump(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+// 地址里的 #：小节编号（#s3）或小节标题（#三个方案，“你来选”答错时链回那一段用）
+function jumpHash() {
+  const h = decodeURIComponent((route.hash || '').slice(1));
+  if (!h || !chapter.value) return;
+  nextTick(() => {
+    const el = document.getElementById(h)
+      || [...document.querySelectorAll('.doc h2, .doc h3')].find((x) => x.textContent.trim() === h);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+watch(() => route.hash, jumpHash);
 // 正文里的站内链接不整页刷新
 function onLink(e) {
   const a = e.target.closest('a');
@@ -212,7 +224,7 @@ async function mount3d() {
 }
 
 watch(() => [route.params.ed, route.params.ch], () => {
-  if (!route.params.ch && !isDocs.value) mount3d(); else { ws?.dispose(); ws = null; window.scrollTo(0, 0); }
+  if (!route.params.ch && !isDocs.value) mount3d(); else { ws?.dispose(); ws = null; window.scrollTo(0, 0); jumpHash(); }
 });
 onMounted(async () => {
   legacy();
@@ -226,6 +238,7 @@ onMounted(async () => {
   if (!route.params.ch && !isDocs.value) mount3d();
   loadDocList();
   loadDoc();
+  jumpHash();
 });
 onUnmounted(() => { ws?.dispose(); off?.(); });
 </script>

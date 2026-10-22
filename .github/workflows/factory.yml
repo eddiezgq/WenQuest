@@ -32,6 +32,8 @@ on:
       - "docs/帮助/零件与机器人库.md"
       - "docs/帮助/数字工厂企业版使用说明.md"
       - "docs/帮助/数字工厂课程接口.md"
+      # 帮助里嵌的虚拟实验（第 30 轮 §八）：工作台 web/public/labs/ 是这些原件的副本（tools/sync_help_labs.py 同步，tests/test_help.py 核对一致）
+      - "textbook/web-editions/dfactory/src/zh/labs/**"
   workflow_dispatch:
 
 permissions:

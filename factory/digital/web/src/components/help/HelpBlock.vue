@@ -5,6 +5,7 @@
       <b>{{ args.label || def?.title || '带我去做' }}</b>
       <span class="small muted">{{ def ? `打开“${pageName}”，分 ${def.steps.length} 步指给你看` : '' }}</span>
     </div>
+    <span v-if="checks" class="chk small" :title="'这个引导会检测你是不是真做了'">{{ doneBefore ? '✓ 做过了' : '做完打勾' }}</span>
     <button v-if="loggedIn" class="btn primary" :disabled="!def" @click="go">带我去做</button>
     <router-link v-else class="btn" :to="{ path: '/login', query: { next: $route.fullPath } }">登录后可以跟着做</router-link>
   </div>
@@ -59,6 +60,11 @@
     </template>
   </div>
 
+  <!-- 第 30 轮 §八：拖着玩（嵌虚拟实验）、当场动手、你来选 -->
+  <LabBlock v-else-if="kind === 'lab'" :args="args" />
+  <TryBlock v-else-if="kind === 'try'" :args="args" />
+  <QuizBlock v-else-if="kind === 'quiz'" :args="args" />
+
   <!-- 问 AI -->
   <div v-else-if="kind === 'ask'" class="hb ask">
     <span class="small muted">还不清楚？</span>
@@ -75,7 +81,10 @@ import { bus } from '../../lib/bus';
 import { ask } from '../../lib/ai';
 import { HEX } from '../../lib/workshop3d';
 import { STATE } from '../../lib/fmt';
-import { startTour, tourDef } from '../../lib/tour';
+import { hasDone, startTour, tourDef, tourDoneBefore } from '../../lib/tour';
+import LabBlock from './LabBlock.vue';
+import TryBlock from './TryBlock.vue';
+import QuizBlock from './QuizBlock.vue';
 import { pageTitle } from '../../help/pages';
 
 const props = defineProps({ kind: String, args: { type: Object, default: () => ({}) }, media: { type: Array, default: () => [] } });
@@ -83,6 +92,8 @@ const router = useRouter();
 const loggedIn = computed(() => !!session.token);
 const def = computed(() => (props.kind === 'goto' ? tourDef(props.args.tour) : null));
 const pageName = computed(() => (def.value ? pageTitle(def.value.path) : ''));
+const checks = computed(() => hasDone(def.value));
+const doneBefore = computed(() => props.kind === 'goto' && tourDoneBefore(props.args.tour));
 const hasVideo = computed(() => props.media.includes(props.args.name + '.webm'));
 const cfg = ref(null);
 const layout = ref(null);
@@ -109,6 +120,7 @@ onMounted(async () => {
 .goto { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border-radius: 10px; background: var(--task-bg);
   border-left: 4px solid var(--brand); }
 .g-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.chk { padding: 2px 8px; border-radius: 999px; background: var(--good-bg); color: var(--good); white-space: nowrap; }
 .video video { width: 100%; border-radius: 10px; background: #17212B; display: block; }
 .novid { border-radius: 10px; background: var(--surface-2); color: var(--ink); padding: 12px 16px 12px 52px; position: relative; border: 1px dashed var(--line); }
 .novid::before { content: ''; position: absolute; left: 18px; top: 50%; transform: translateY(-50%); border-left: 16px solid var(--idle);
