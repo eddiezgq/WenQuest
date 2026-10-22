@@ -1,0 +1,400 @@
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:52,951 INFO synthesis text Simulated over four hours: about one hundred and eleven, one hundred and twenty-six and one hundred and twenty-four pieces an hour.
+2026-10-22 02:51:57,822 INFO yield speech len 9.68, rtf 0.5031675346626723
+
+100%|██████████| 1/1 [00:05<00:00,  5.05s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:58,006 INFO synthesis text With fixed stations the bottleneck is sleeve hemming, done only by worker eight, capped at about one hundred and thirteen; dynamic dispatching lets worker seven help when idle.
+2026-10-22 02:52:05,306 INFO yield speech len 14.32, rtf 0.509795946115888
+
+100%|██████████| 1/1 [00:07<00:00,  7.48s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:05,362 WARNING synthesis text How many carriers should be on the line? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:52:05,500 INFO synthesis text How many carriers should be on the line?
+2026-10-22 02:52:07,386 INFO yield speech len 3.04, rtf 0.6203954941348025
+
+100%|██████████| 1/1 [00:02<00:00,  2.07s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:07,558 INFO synthesis text Too few and workers run out of work; beyond about twenty to twenty-five, output stops rising.
+2026-10-22 02:52:12,520 INFO yield speech len 9.52, rtf 0.5212454735731878
+
+100%|██████████| 1/1 [00:05<00:00,  5.13s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.13s/it]
+cv2: 150/208 句，用时 12.3 分钟，预计还要 4.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:12,697 INFO synthesis text Little's law: WIP equals throughput times average throughput time.
+2026-10-22 02:52:15,890 INFO yield speech len 5.92, rtf 0.5393545369844179
+
+100%|██████████| 1/1 [00:03<00:00,  3.37s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:16,070 INFO synthesis text Under earliest finish the line makes one hundred and twenty-four pieces an hour, and a garment spends on average zero.thirty-one hours on the line; multiply and you get about thirty-eight, matching the forty carriers on the line.
+2026-10-22 02:52:24,430 INFO yield speech len 16.12, rtf 0.5185698309252339
+
+100%|██████████| 1/1 [00:08<00:00,  8.54s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:24,625 INFO synthesis text Cut the limit to twenty and output barely changes, but the throughput time halves.
+2026-10-22 02:52:28,160 INFO yield speech len 6.6, rtf 0.5356582367058956
+
+100%|██████████| 1/1 [00:03<00:00,  3.71s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:28,340 INFO synthesis text So set the limit where output has just levelled off.
+2026-10-22 02:52:30,591 INFO yield speech len 3.88, rtf 0.5800436452491996
+
+100%|██████████| 1/1 [00:02<00:00,  2.42s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:30,637 WARNING synthesis text U-cells and bucket brigades. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:52:30,768 INFO synthesis text U-cells and bucket brigades.
+2026-10-22 02:52:32,221 INFO yield speech len 2.12, rtf 0.6854780440060597
+
+100%|██████████| 1/1 [00:01<00:00,  1.63s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:32,395 INFO synthesis text A flexible U-cell places a dozen or so machines close together in a U, with entry and exit on the same side.
+2026-10-22 02:52:38,240 INFO yield speech len 11.32, rtf 0.516327594278558
+
+100%|██████████| 1/1 [00:06<00:00,  6.02s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:38,423 INFO synthesis text Each part goes straight to the next machine, so the only work in process is what's in people's hands and on the machines.
+2026-10-22 02:52:43,663 INFO yield speech len 10.08, rtf 0.5198675252142406
+
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:43,846 INFO synthesis text Operators are multi-skilled: whoever is free helps the next operation, and one person can cover both the first and the last.
+2026-10-22 02:52:49,389 INFO yield speech len 10.56, rtf 0.5249341780489141
+
+100%|██████████| 1/1 [00:05<00:00,  5.72s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.72s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:49,570 INFO synthesis text A style change means moving just a few machines, which suits small orders of a few hundred pieces.
+2026-10-22 02:52:53,939 INFO yield speech len 8.12, rtf 0.5380583807752638
+
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:54,126 INFO synthesis text A bucket brigade has one rule: when the last worker finishes a piece, they walk back and take over the piece from the worker before them, who walks back in turn, and nobody may pass the person ahead.
+2026-10-22 02:53:01,072 INFO yield speech len 13.52, rtf 0.5137504028850759
+
+100%|██████████| 1/1 [00:07<00:00,  7.13s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.13s/it]
+cv2: 160/208 句，用时 13.1 分钟，预计还要 3.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:01,264 INFO synthesis text Ordered from slowest to fastest, the hand-off points settle by themselves.
+2026-10-22 02:53:05,155 INFO yield speech len 7.36, rtf 0.5286038245843804
+
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:05,340 INFO synthesis text At the top, three workers move along the job from zero to one; below, the hand-off position for each garment, quickly settling at zero.seventeen and zero.fifty, that is, one sixth and one half.
+2026-10-22 02:53:13,631 INFO yield speech len 15.96, rtf 0.5195328615661851
+
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:13,691 WARNING synthesis text Why one sixth and one half? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:53:13,818 INFO synthesis text Why one sixth and one half?
+2026-10-22 02:53:15,478 INFO yield speech len 2.56, rtf 0.6484123878180981
+
+100%|██████████| 1/1 [00:01<00:00,  1.83s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:15,652 INFO synthesis text The hand-offs converge to x-i equals the sum of the first i speeds over the sum of all speeds: zero.five over three is one sixth, one.five over three is one half.
+2026-10-22 02:53:23,202 INFO yield speech len 14.96, rtf 0.5046620566577197
+
+100%|██████████| 1/1 [00:07<00:00,  7.73s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:23,389 INFO synthesis text Each person's share is proportional to their speed, and output equals the sum of the three speeds, three.zero.
+2026-10-22 02:53:28,425 INFO yield speech len 9.64, rtf 0.5223996164393128
+
+100%|██████████| 1/1 [00:05<00:00,  5.22s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:28,608 INFO synthesis text If each did a fixed third, the slowest would set the pace: only one.five.
+2026-10-22 02:53:32,746 INFO yield speech len 7.68, rtf 0.5388451119263967
+
+100%|██████████| 1/1 [00:04<00:00,  4.31s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:32,928 INFO synthesis text The beauty is that nobody needs to know the speeds in advance; the work balances without a supervisor.
+2026-10-22 02:53:37,067 INFO yield speech len 8.08, rtf 0.512349782603802
+
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:37,244 INFO synthesis text Finally, let's carry these rules over to robots.
+2026-10-22 02:53:39,764 INFO yield speech len 4.48, rtf 0.5624447017908096
+
+100%|██████████| 1/1 [00:02<00:00,  2.69s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:39,937 INFO synthesis text A cobot loading several CNC machines or automatic sewing units is multi-machine tending: its round time is compared with the machine cycle, and the balance-point formula applies unchanged.
+2026-10-22 02:53:47,029 INFO yield speech len 14.16, rtf 0.500868437653881
+
+100%|██████████| 1/1 [00:07<00:00,  7.28s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:47,220 INFO synthesis text A robot's loading and travel times vary little, so less slack is needed between it and the machines, and it can work closer to the balance point than a person.
+2026-10-22 02:53:54,855 INFO yield speech len 14.72, rtf 0.5186570889276007
+
+100%|██████████| 1/1 [00:07<00:00,  7.81s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.81s/it]
+cv2: 170/208 句，用时 14.0 分钟，预计还要 3.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:55,040 INFO synthesis text Hanger dispatching rules reappear almost unchanged in AGV and AMR fleet dispatching: a job goes to the vehicle with the shortest queue or the earliest predicted finish, pallets in transit play the role of the WIP limit, and Little's law sets the throughput time.
+2026-10-22 02:54:07,744 INFO yield speech len 24.44, rtf 0.5197973961525775
+
+100%|██████████| 1/1 [00:12<00:00, 12.89s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:07,942 INFO synthesis text Little's law at the coffee shop: ten people are queuing and the baristas turn out two cups a minute, so you'll wait about ten divided by two, five minutes.
+2026-10-22 02:54:14,186 INFO yield speech len 12.04, rtf 0.5185681918134721
+
+100%|██████████| 1/1 [00:06<00:00,  6.41s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:14,237 WARNING synthesis text WIP equals throughput times throughput time. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:54:14,453 INFO synthesis text WIP equals throughput times throughput time.
+2026-10-22 02:54:17,501 INFO yield speech len 5.84, rtf 0.5218636907943308
+
+100%|██████████| 1/1 [00:03<00:00,  3.31s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:17,675 INFO synthesis text With the same staff, a longer queue means a longer wait, but not faster coffee.
+2026-10-22 02:54:21,423 INFO yield speech len 7.08, rtf 0.5294487974737997
+
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:21,601 INFO synthesis text Hanging more carriers on a hanger line is the same: the same output, a longer throughput time.
+2026-10-22 02:54:25,854 INFO yield speech len 8.16, rtf 0.5211232047454983
+
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:25,906 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:54:26,031 INFO synthesis text Back to the start.
+2026-10-22 02:54:27,123 INFO yield speech len 1.24, rtf 0.8799574067515712
+
+100%|██████████| 1/1 [00:01<00:00,  1.26s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:27,294 INFO synthesis text Two machines give about four hundred and twenty-four pieces an hour, with the operator idle three seconds a round; three give about five hundred and fourteen, each machine waiting four seconds a cycle.
+2026-10-22 02:54:34,413 INFO yield speech len 14.16, rtf 0.5027553287603087
+
+100%|██████████| 1/1 [00:07<00:00,  7.30s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:34,604 INFO synthesis text If machines are dear, tend two; if labour is dear, tend three.
+2026-10-22 02:54:38,326 INFO yield speech len 6.92, rtf 0.5378402037427604
+
+100%|██████████| 1/1 [00:03<00:00,  3.89s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:38,502 INFO synthesis text As for the two improvements: one more machine adds ninety-one, the fixture alone forty-one, and both together reach about six hundred and fifty-five, a gain of two hundred and thirty-one, more than the sum.
+2026-10-22 02:54:46,503 INFO yield speech len 15.52, rtf 0.5155364877169895
+
+100%|██████████| 1/1 [00:08<00:00,  8.18s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:46,690 INFO synthesis text Shorter loading pushes the balance point to about two.eight, so with three machines each waits only one seconds a cycle.
+2026-10-22 02:54:52,532 INFO yield speech len 11.24, rtf 0.5196992612818382
+
+100%|██████████| 1/1 [00:06<00:00,  6.01s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.01s/it]
+cv2: 180/208 句，用时 15.0 分钟，预计还要 2.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:52,708 INFO synthesis text Now Virtual lab twelve-one, multi-machine tending. On the WenQuest platform you can do it yourself. The results, the output curve and the tasks are blurred here, so you can find them on your own. On the left, the floor view is on top and the Gantt chart below.
+2026-10-22 02:55:03,409 INFO yield speech len 20.52, rtf 0.5214598792338232
+
+100%|██████████| 1/1 [00:10<00:00, 10.89s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:03,604 INFO synthesis text Task one: work out the balance point with the formula and enter it to check. Then drag the number of machines from one to four. Here we go to three. On the Gantt chart, watch the waiting blocks move from the operator's row to the machine rows, and note who waits for whom, and for how many seconds a round.
+2026-10-22 02:55:14,434 INFO yield speech len 20.92, rtf 0.5176834121033065
+
+100%|██████████| 1/1 [00:11<00:00, 11.02s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:14,628 INFO synthesis text Task two: set the variation to zero.three. Read how much two, three and four machines lose, and think about which loses most, and why.
+2026-10-22 02:55:20,521 INFO yield speech len 11.32, rtf 0.5205573757629933
+
+100%|██████████| 1/1 [00:06<00:00,  6.07s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:20,705 INFO synthesis text Task three: set the variation back to zero and cut the loading time to three.five seconds. Check the three outputs from the answer slide, and on the Gantt chart see how long each of three machines still waits a round.
+2026-10-22 02:55:30,053 INFO yield speech len 18.48, rtf 0.5058269093046973
+
+100%|██████████| 1/1 [00:09<00:00,  9.53s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:30,250 INFO synthesis text Next, Virtual lab twelve-two, hanger dispatching and bucket brigades. Page one is a top view of the hanger line. The results, the output curve and the tasks are blurred here too.
+2026-10-22 02:55:38,143 INFO yield speech len 15.0, rtf 0.526165755589803
+
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:38,345 INFO synthesis text Task one: switch the dispatching rule between fixed stations, shortest queue and earliest finish. Here we switch to shortest queue. Watch the carriers flow to the stations with the shortest queues.
+2026-10-22 02:55:46,098 INFO yield speech len 15.2, rtf 0.5100295418187192
+
+100%|██████████| 1/1 [00:07<00:00,  7.94s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:46,285 INFO synthesis text Then take worker five off the line for the second hour and run each rule again. Record the output of all six cases, and check each with Little's law.
+2026-10-22 02:55:53,372 INFO yield speech len 13.48, rtf 0.5257311489886275
+
+100%|██████████| 1/1 [00:07<00:00,  7.26s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:53,552 INFO synthesis text Task two: with nobody away, switch the rule to earliest finish and lower the WIP limit. Find the smallest limit that still gives ninety-eight percent of the best output, and enter it in the task box to check.
+2026-10-22 02:56:03,270 INFO yield speech len 18.76, rtf 0.518023128956874
+
+100%|██████████| 1/1 [00:09<00:00,  9.90s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:03,462 INFO synthesis text Task three is on page two, the bucket brigade. First order the three workers from slowest to fastest and watch the hand-off points settle.
+2026-10-22 02:56:09,954 INFO yield speech len 12.72, rtf 0.5104141602726102
+
+100%|██████████| 1/1 [00:06<00:00,  6.67s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:10,135 INFO synthesis text Then switch to fastest first. Watch what happens when a fast worker catches up with a slow one, and compare the output of the two orders. The guide and the report template are on the platform.
+2026-10-22 02:56:17,664 INFO yield speech len 14.4, rtf 0.5228753553496467
+
+100%|██████████| 1/1 [00:07<00:00,  7.71s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.71s/it]
+cv2: 190/208 句，用时 16.4 分钟，预计还要 1.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:17,851 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-22 02:56:21,416 INFO yield speech len 6.44, rtf 0.5535986852942045
+
+100%|██████████| 1/1 [00:03<00:00,  3.74s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:21,591 INFO synthesis text You can open today's interactive slides and both virtual labs yourself. Change the number of machines, the loading time or the dispatching rule, and watch the output and the waiting change with them.
+2026-10-22 02:56:30,170 INFO yield speech len 16.6, rtf 0.5168046146990305
+
+100%|██████████| 1/1 [00:08<00:00,  8.76s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.76s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:30,374 INFO synthesis text You submit the assignment and the lab reports on the platform, and get marks and comments back.
+2026-10-22 02:56:33,943 INFO yield speech len 6.68, rtf 0.5342390009029183
+
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:34,120 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-22 02:56:39,915 INFO yield speech len 11.08, rtf 0.5229597487604575
+
+100%|██████████| 1/1 [00:05<00:00,  5.97s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:40,093 INFO synthesis text Your assignment has four questions. One: an automatic pocket setter loads in four seconds, sews for twenty, and the walk is one second. Find the balance point, then the cycle time, output and idle time for four and five machines. If machines are dear and labour cheap, how many would you recommend?
+2026-10-22 02:56:52,282 INFO yield speech len 23.32, rtf 0.522724719235664
+
+100%|██████████| 1/1 [00:12<00:00, 12.38s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:52,484 INFO synthesis text Two: a hanger main rail runs at ten metres a minute with carriers zero.four metres apart, and each garment travels nine legs. How many garments an hour can the rail support, and at a planned one hundred and fifty an hour, is the utilisation acceptable?
+2026-10-22 02:57:03,105 INFO yield speech len 20.44, rtf 0.5196439076776374
+
+100%|██████████| 1/1 [00:10<00:00, 10.81s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.81s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-22 02:57:03,322 INFO synthesis text Three: by Little's law, how long does a garment spend on a line making one hundred and twenty-six an hour with thirty carriers on it, and how long with twenty, and what does that mean for small, quick-response orders? Four: a bucket brigade has speeds zero.seven, zero.nine and one.four.
+2026-10-22 02:57:14,735 INFO yield speech len 22.48, rtf 0.5076827103557111
+
+ 50%|█████     | 1/2 [00:11<00:11, 11.62s/it]2026-10-22 02:57:14,923 INFO synthesis text  Find the hand-offs and the output, and compare with fixed thirds, checking on page two of Lab twelve-two.
+2026-10-22 02:57:19,623 INFO yield speech len 8.76, rtf 0.5365236164772348
+
+100%|██████████| 2/2 [00:16<00:00,  7.65s/it]
+100%|██████████| 2/2 [00:16<00:00,  8.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:19,807 INFO synthesis text Submit your working, the lab screenshots and the explanation on the WenQuest platform.
+2026-10-22 02:57:23,740 INFO yield speech len 7.2, rtf 0.5462720990180969
+
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:23,917 INFO synthesis text There's also a ten-question quiz. For example, loading takes six seconds, sewing fifteen, and the walk one.five. What is the balance point?
+2026-10-22 02:57:30,843 INFO yield speech len 13.32, rtf 0.5199438458806401
+
+100%|██████████| 1/1 [00:07<00:00,  7.10s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:31,023 INFO synthesis text Or, a hanger line makes one hundred and twenty pieces an hour with fifty carriers on it. How many minutes does a garment spend on the line? And a true-or-false: above the balance point, the operator has idle time every round. True or false?
+2026-10-22 02:57:40,169 INFO yield speech len 17.44, rtf 0.5244562248571203
+
+100%|██████████| 1/1 [00:09<00:00,  9.33s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.33s/it]
+cv2: 200/208 句，用时 17.8 分钟，预计还要 0.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:40,358 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-22 02:57:43,033 INFO yield speech len 4.76, rtf 0.5619247921374666
+
+100%|██████████| 1/1 [00:02<00:00,  2.84s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:43,080 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:57:43,207 INFO synthesis text Three things to remember.
+2026-10-22 02:57:44,558 INFO yield speech len 1.8, rtf 0.7505590385860866
+
+100%|██████████| 1/1 [00:01<00:00,  1.52s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:44,731 INFO synthesis text One: in multi-machine tending, the cycle is the larger of the operator's round and the machine cycle, the balance point is a plus m over a plus w, and variation hurts most near it.
+2026-10-22 02:57:52,595 INFO yield speech len 15.24, rtf 0.5160075003706565
+
+100%|██████████| 1/1 [00:08<00:00,  8.04s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:52,780 INFO synthesis text Two: hanger systems should dispatch dynamically and cap WIP where output just levels off; WIP equals throughput times throughput time.
+2026-10-22 02:57:59,391 INFO yield speech len 12.68, rtf 0.5214140618261103
+
+100%|██████████| 1/1 [00:06<00:00,  6.78s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:59,572 INFO synthesis text Three: a bucket brigade ordered slowest to fastest shares the work in proportion to speed, and output equals the sum of the speeds.
+2026-10-22 02:58:05,228 INFO yield speech len 10.76, rtf 0.5257189938570044
+
+100%|██████████| 1/1 [00:05<00:00,  5.83s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:58:05,405 INFO synthesis text The assignment, quiz and both labs are on WenQuest.
+2026-10-22 02:58:09,106 INFO yield speech len 6.96, rtf 0.5317988751948565
+
+100%|██████████| 1/1 [00:03<00:00,  3.87s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:58:09,293 INFO synthesis text The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-22 02:58:20,032 INFO yield speech len 20.6, rtf 0.521326666896783
+
+100%|██████████| 1/1 [00:10<00:00, 10.94s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:58:20,230 INFO synthesis text Next time we move on to electrical control, with motors, drives and sensors. See you then.
+2026-10-22 02:58:24,737 INFO yield speech len 8.72, rtf 0.5168130091570933
+
+100%|██████████| 1/1 [00:04<00:00,  4.68s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.68s/it]
+cv2: 208/208 句，用时 18.5 分钟，预计还要 0.0 分钟
+cv2: 208 句完成
+2026-10-22 02:58:24,792 DEBUG Attempting to acquire lock 131085626052560 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:24,792 DEBUG Lock 131085626052560 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:24,792 DEBUG Attempting to release lock 131085626052560 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:24,792 DEBUG Lock 131085626052560 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:24,794 DEBUG Attempting to acquire lock 131085626059424 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:58:24,795 DEBUG Lock 131085626059424 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:58:24,795 DEBUG Attempting to release lock 131085626059424 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:58:24,795 DEBUG Lock 131085626059424 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+
+Downloading [en/tn/prefix.fst]:   0%|          | 0.00/4.83M [18:34<?, ?B/s]
+GPU 机器已关机，用时 30 分钟
