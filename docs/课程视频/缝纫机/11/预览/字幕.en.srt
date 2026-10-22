@@ -1,0 +1,927 @@
+1
+00:00:00,600 --> 00:00:01,620
+Hi everyone,
+
+2
+00:00:01,640 --> 00:00:07,860
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,260 --> 00:00:14,931
+This is Lecture 11, the mechanisms of typical special machines.
+
+4
+00:00:15,331 --> 00:00:19,100
+The buttonholes on a shirt, the buttons sewn on it,
+
+5
+00:00:19,120 --> 00:00:22,072
+the bartacks at the ends of a belt loop,
+
+6
+00:00:22,092 --> 00:00:25,564
+the zigzag that holds the elastic in underwear.
+
+7
+00:00:25,584 --> 00:00:30,393
+All of them come from special machines. They look very different,
+
+8
+00:00:30,413 --> 00:00:33,662
+but they share one structure. A sewing head,
+
+9
+00:00:33,682 --> 00:00:37,600
+plus a motion of the needle or the fabric in a plane.
+
+10
+00:00:37,620 --> 00:00:40,201
+Today we follow the zigzag machine.
+
+11
+00:00:40,221 --> 00:00:44,138
+Where in the turn of the shaft does the swing belong,
+
+12
+00:00:44,158 --> 00:00:48,671
+which motion law should it follow, and what limits the bight?
+
+13
+00:00:50,191 --> 00:00:51,491
+The shop-floor problem.
+
+14
+00:00:51,891 --> 00:00:59,033
+An underwear factory sews elastic on an electronic zigzag machine:
+
+15
+00:00:59,053 --> 00:01:02,397
+8 millimetre bight, 5000 r/min,
+
+16
+00:01:02,417 --> 00:01:09,776
+the needle swings from 275 to 85 degrees of shaft angle, 170 in all,
+
+17
+00:01:09,796 --> 00:01:13,791
+with a modified-trapezoid motion law.
+
+18
+00:01:14,191 --> 00:01:21,455
+The frame's mass referred to the needle is about 150 grams,
+
+19
+00:01:21,475 --> 00:01:28,492
+and the sideways inertia force is limited to 250 newtons,
+
+20
+00:01:28,512 --> 00:01:31,208
+an illustrative value.
+
+21
+00:01:31,608 --> 00:01:36,516
+The process engineer proposes the smoother cycloidal law,
+
+22
+00:01:36,536 --> 00:01:42,222
+and squeezing the swing to 120 degrees to give the feed more time.
+
+23
+00:01:42,622 --> 00:01:43,722
+Will it work?
+
+24
+00:01:44,122 --> 00:01:48,622
+And how far apart are the catching moments at the two ends?
+
+25
+00:01:50,142 --> 00:01:53,739
+Special machines: a head plus planar motion.
+
+26
+00:01:55,259 --> 00:02:01,727
+Every special machine obeys one hard rule: while the needle is in the fabric,
+
+27
+00:02:01,747 --> 00:02:07,119
+needle and fabric must not move sideways relative to each other.
+
+28
+00:02:07,519 --> 00:02:11,321
+Break it and the needle bends, stitches go astray,
+
+29
+00:02:11,341 --> 00:02:14,379
+or the needle hits the plate and breaks.
+
+30
+00:02:14,779 --> 00:02:20,919
+This is Virtual Lab 11-1, with the swing interval opening and closing.
+
+31
+00:02:21,319 --> 00:02:27,264
+Too wide, and the swing runs into the time the needle is in the fabric:
+
+32
+00:02:27,284 --> 00:02:28,860
+the path turns red.
+
+33
+00:02:29,260 --> 00:02:33,603
+Too narrow, and the same bight is crammed into fewer degrees,
+
+34
+00:02:33,623 --> 00:02:36,536
+so the inertia force goes over the limit.
+
+35
+00:02:38,056 --> 00:02:42,556
+The zigzag machine: when and how to swing.
+
+36
+00:02:44,076 --> 00:02:48,330
+The zigzag stitch 304 is still a lockstitch;
+
+37
+00:02:48,350 --> 00:02:52,895
+the interlocks simply alternate left and right,
+
+38
+00:02:52,915 --> 00:02:59,598
+so it stretches more than a straight 301 and suits elastic and knits.
+
+39
+00:02:59,998 --> 00:03:05,658
+The needle bar sits in a frame that swings about a pivot at its top.
+
+40
+00:03:06,058 --> 00:03:11,960
+On mechanical machines a zigzag cam drives it through a lever and link,
+
+41
+00:03:11,980 --> 00:03:16,715
+and changing the link's working radius changes the bight;
+
+42
+00:03:16,735 --> 00:03:21,636
+electronic machines drive it directly with a stepper motor,
+
+43
+00:03:21,656 --> 00:03:26,558
+up to 8 millimetres at 5000 stitches a minute on one model.
+
+44
+00:03:26,958 --> 00:03:32,628
+On the right, the bight sweeps between 2 and 10 millimetres.
+
+45
+00:03:34,147 --> 00:03:40,144
+The sideways swing has to fit into the part of the turn when the needle is
+
+46
+00:03:40,164 --> 00:03:41,607
+out of the fabric.
+
+47
+00:03:42,007 --> 00:03:45,008
+In the worked example,
+
+48
+00:03:45,028 --> 00:03:52,971
+with a 31-millimetre stroke and 1.5 millimetres of fabric,
+
+49
+00:03:52,991 --> 00:04:03,543
+the needle leaves the surface at 258.3 degrees and touches it again at 101.7.
+
+50
+00:04:03,943 --> 00:04:11,383
+Require the point to be at least 0.5 millimetres clear while swinging,
+
+51
+00:04:11,403 --> 00:04:17,243
+and the usable window is 260 to 100 degrees, about 200.
+
+52
+00:04:17,643 --> 00:04:23,038
+Note that the feed happens in this same window, shared with the swing,
+
+53
+00:04:23,058 --> 00:04:25,358
+and thicker fabric narrows it.
+
+54
+00:04:26,878 --> 00:04:31,847
+Same 8-millimetre bight, same 170 degrees,
+
+55
+00:04:31,867 --> 00:04:36,599
+but the swing can follow different laws.
+
+56
+00:04:36,999 --> 00:04:43,083
+Harmonic: the acceleration is a cosine, jumping at both ends,
+
+57
+00:04:43,103 --> 00:04:46,485
+which causes shocks and vibration.
+
+58
+00:04:46,885 --> 00:04:53,404
+Cycloidal: the acceleration is a sine, zero at both ends, very smooth,
+
+59
+00:04:53,424 --> 00:04:55,833
+but with the highest peak.
+
+60
+00:04:56,233 --> 00:05:01,889
+Modified trapezoid: a flat-topped acceleration, continuous at both ends,
+
+61
+00:05:01,909 --> 00:05:04,964
+with a peak about the same as harmonic.
+
+62
+00:05:05,364 --> 00:05:09,866
+The three laws are cycling now; watch how the lower curve,
+
+63
+00:05:09,886 --> 00:05:12,984
+the needle's sideways position, changes.
+
+64
+00:05:14,504 --> 00:05:22,087
+The peak acceleration is C times the bight w times the shaft angular speed squared,
+
+65
+00:05:22,107 --> 00:05:26,300
+divided by the square of the swing angle beta.
+
+66
+00:05:26,700 --> 00:05:36,692
+C depends on the motion law: about 4.93 harmonic, 2 pi or about 6.28 cycloidal,
+
+67
+00:05:36,712 --> 00:05:40,494
+about 4.89 modified trapezoid.
+
+68
+00:05:40,894 --> 00:05:45,197
+So acceleration goes with the bight and with speed squared,
+
+69
+00:05:45,217 --> 00:05:48,347
+and inversely with the swing angle squared.
+
+70
+00:05:48,747 --> 00:05:53,568
+The cycloid the engineer calls smoother is smooth at the ends,
+
+71
+00:05:53,588 --> 00:05:55,754
+but its peak is the highest;
+
+72
+00:05:55,774 --> 00:06:01,767
+the modified trapezoid peaks about 22 percent lower and has the best of both.
+
+73
+00:06:03,287 --> 00:06:05,016
+Both ends must be caught.
+
+74
+00:06:06,536 --> 00:06:09,655
+The hook shaft runs front to back,
+
+75
+00:06:09,675 --> 00:06:14,918
+so as the hook point passes the needle it moves sideways.
+
+76
+00:06:15,318 --> 00:06:17,977
+With the needle at the two ends,
+
+77
+00:06:17,997 --> 00:06:23,754
+the point has to turn an extra w over R to get from one to the other;
+
+78
+00:06:23,774 --> 00:06:27,271
+the hook turns twice as fast as the shaft,
+
+79
+00:06:27,291 --> 00:06:32,964
+so the shaft angle differs by half that: delta phi equals w over 2R.
+
+80
+00:06:33,364 --> 00:06:42,899
+With R 13.5 millimetres and an 8-millimetre bight, that's about 17 degrees.
+
+81
+00:06:43,299 --> 00:06:48,916
+The point sweeps right to left, so the right end is caught first,
+
+82
+00:06:48,936 --> 00:06:55,681
+when the needle has risen only about 1.1 millimetres, against 3.8 at the left:
+
+83
+00:06:55,701 --> 00:06:58,023
+nearly 3 millimetres apart.
+
+84
+00:06:59,543 --> 00:07:04,337
+Both ends must be caught while the loop is big enough,
+
+85
+00:07:04,357 --> 00:07:06,655
+and that limits the bight.
+
+86
+00:07:07,055 --> 00:07:15,834
+With Lecture 5's hook window, a rise of about 1.5 to 2.8 millimetres,
+
+87
+00:07:15,854 --> 00:07:21,955
+the maximum bight is only about 4.0 millimetres.
+
+88
+00:07:22,355 --> 00:07:27,871
+With Lecture 10's illustrative criterion, 1.0 to 4.2,
+
+89
+00:07:27,891 --> 00:07:32,467
+the two ends can differ by about 20 degrees,
+
+90
+00:07:32,487 --> 00:07:36,123
+which allows about 9.5 millimetres.
+
+91
+00:07:36,523 --> 00:07:38,805
+The manual goes up to 10,
+
+92
+00:07:38,825 --> 00:07:45,344
+so the real loop window is clearly much wider than the Lecture 5 model;
+
+93
+00:07:45,364 --> 00:07:47,370
+it has to be measured.
+
+94
+00:07:48,890 --> 00:07:53,148
+Buttonholes, buttons, bartacks and embroidery.
+
+95
+00:07:54,668 --> 00:07:56,888
+Buttonholers come in two kinds.
+
+96
+00:07:57,288 --> 00:08:04,207
+The straight buttonhole on shirts is 304 zigzag: one row of zigzag, a bartack,
+
+97
+00:08:04,227 --> 00:08:09,989
+the other row and the other bartack, then the knife cuts it open,
+
+98
+00:08:10,009 --> 00:08:11,590
+five steps in all.
+
+99
+00:08:11,990 --> 00:08:17,810
+Sewing first and then cutting gives neat edges; cutting first frays less.
+
+100
+00:08:18,210 --> 00:08:23,245
+The keyhole buttonhole on suits, coats and jeans is 404,
+
+101
+00:08:23,265 --> 00:08:29,743
+a single-needle two-thread zigzag chainstitch wrapped round a gimp cord;
+
+102
+00:08:29,763 --> 00:08:36,242
+around the round end, needle and looper have to rotate about its centre.
+
+103
+00:08:37,762 --> 00:08:42,825
+Mechanical button sewers and bartackers are built alike:
+
+104
+00:08:42,845 --> 00:08:48,906
+the shaft drives a pattern cam through a large worm-gear reduction,
+
+105
+00:08:48,926 --> 00:08:53,262
+and one turn of the cam is one complete pattern.
+
+106
+00:08:53,662 --> 00:09:00,558
+Two grooves on the cam drive the button clamp or work clamp through X and Y levers.
+
+107
+00:09:00,958 --> 00:09:04,870
+Each step of the cam moves the clamp one stitch,
+
+108
+00:09:04,890 --> 00:09:11,177
+and the rising part of every step must line up with the angle when the needle
+
+109
+00:09:11,197 --> 00:09:12,898
+is out of the fabric.
+
+110
+00:09:13,298 --> 00:09:21,128
+Button sewers often use a single-thread 101 chainstitch with an anti-unravel device;
+
+111
+00:09:21,148 --> 00:09:26,641
+bartackers use lockstitch, an underlay first, then a cover.
+
+112
+00:09:28,161 --> 00:09:33,917
+A multi-needle quilter carries dozens of needles on one beam,
+
+113
+00:09:33,937 --> 00:09:40,261
+each with its own looper, sewing many parallel rows of 401 at once.
+
+114
+00:09:40,661 --> 00:09:44,579
+An embroidery head has 9 to 15 needle bars;
+
+115
+00:09:44,599 --> 00:09:48,883
+one driver works only the bar lined up with it,
+
+116
+00:09:48,903 --> 00:09:54,652
+and to change colour the whole needle-bar case shifts sideways.
+
+117
+00:09:55,052 --> 00:10:00,278
+Multi-head machines share upper and lower shafts.
+
+118
+00:10:00,678 --> 00:10:06,161
+Embroidery machines run at only about a quarter of lockstitch speed,
+
+119
+00:10:06,181 --> 00:10:08,589
+about 1200 r/min on one model,
+
+120
+00:10:08,609 --> 00:10:14,254
+because the frame is heavy and every move of a few millimetres must be
+
+121
+00:10:14,274 --> 00:10:18,058
+finished while the needle is out of the fabric.
+
+122
+00:10:19,578 --> 00:10:23,594
+Back to the shop-floor problem, with numbers.
+
+123
+00:10:23,994 --> 00:10:34,401
+The shaft turns at 524 radians per second, and 170 degrees is 2.97 radians.
+
+124
+00:10:34,801 --> 00:10:42,646
+Modified trapezoid: a peak of about 1218 metres per second squared;
+
+125
+00:10:42,666 --> 00:10:47,341
+times 0.15 kilograms, about 183 newtons.
+
+126
+00:10:47,741 --> 00:10:55,868
+Cycloidal: about 1565, giving about 235 newtons.
+
+127
+00:10:56,268 --> 00:10:58,568
+Both are under 250.
+
+128
+00:10:58,968 --> 00:11:09,427
+Squeeze to 120 degrees and the acceleration is multiplied by 170 over 120 squared,
+
+129
+00:11:09,447 --> 00:11:17,862
+about 2.0: about 471 newtons cycloidal and 367 modified trapezoid,
+
+130
+00:11:17,882 --> 00:11:20,418
+both over the limit.
+
+131
+00:11:21,937 --> 00:11:28,743
+Choosing a swing law is the time-scaling step of robot trajectory planning:
+
+132
+00:11:28,763 --> 00:11:31,837
+to cover a distance w in a time T,
+
+133
+00:11:31,857 --> 00:11:36,297
+the peak acceleration goes with w over T squared,
+
+134
+00:11:36,317 --> 00:11:42,576
+so halving the time quadruples the acceleration and the motor torque.
+
+135
+00:11:42,976 --> 00:11:48,005
+The S-curve profiles of servo drives, which limit jerk,
+
+136
+00:11:48,025 --> 00:11:54,613
+follow the same idea as the modified trapezoid: continuous acceleration,
+
+137
+00:11:54,633 --> 00:11:57,367
+no shock, and a moderate peak.
+
+138
+00:11:57,767 --> 00:12:04,892
+A dispensing or welding robot may make big sideways moves only while its tool
+
+139
+00:12:04,912 --> 00:12:06,841
+is off the workpiece:
+
+140
+00:12:06,861 --> 00:12:13,707
+the same rule as a needle that may swing only when it's out of the fabric.
+
+141
+00:12:15,227 --> 00:12:17,847
+The same rule shows up at home.
+
+142
+00:12:18,247 --> 00:12:21,507
+Stapling a row along the edge of a sheet,
+
+143
+00:12:21,527 --> 00:12:27,107
+you can slide the paper to the next spot only while the stapler is up;
+
+144
+00:12:27,127 --> 00:12:31,826
+move it while pressing down and the staple goes in crooked.
+
+145
+00:12:32,226 --> 00:12:33,530
+The zigzag needle,
+
+146
+00:12:33,550 --> 00:12:39,195
+the button clamp and the embroidery frame likewise may move only in the short
+
+147
+00:12:39,215 --> 00:12:41,916
+time the needle is out of the fabric.
+
+148
+00:12:43,436 --> 00:12:44,596
+Back to the start.
+
+149
+00:12:44,996 --> 00:12:52,928
+Modified trapezoid gives about 183 newtons and the cycloid about 235,
+
+150
+00:12:52,948 --> 00:12:59,496
+both under 250: the switch is possible, with less margin.
+
+151
+00:12:59,896 --> 00:13:08,767
+Squeezed to 120 degrees, about 471 cycloidal and 367 modified trapezoid,
+
+152
+00:13:08,787 --> 00:13:11,236
+both over the limit.
+
+153
+00:13:11,636 --> 00:13:18,594
+And the feed and the swing already happen together in the same out-of-fabric window,
+
+154
+00:13:18,614 --> 00:13:23,163
+so a shorter swing gives the feed no extra time at all.
+
+155
+00:13:23,563 --> 00:13:31,115
+The two ends are caught 8 over 27 radians apart, about 17 degrees,
+
+156
+00:13:31,135 --> 00:13:32,951
+right end first.
+
+157
+00:13:34,471 --> 00:13:39,212
+Now Virtual lab 11-1, zigzag swing timing and loop catching.
+
+158
+00:13:39,232 --> 00:13:43,021
+On the WenQuest platform you can do it yourself.
+
+159
+00:13:43,041 --> 00:13:45,719
+The readings of the four criteria,
+
+160
+00:13:45,739 --> 00:13:50,321
+the values of the settings and the tasks are blurred here,
+
+161
+00:13:50,341 --> 00:13:53,971
+so you can read them yourself on the platform.
+
+162
+00:13:54,371 --> 00:13:59,698
+First set the swing start to 250 degrees and the end to 110.
+
+163
+00:13:59,718 --> 00:14:04,421
+A red segment appears on the needle path on the left:
+
+164
+00:14:04,441 --> 00:14:09,768
+the swing has run into the time the needle is in the fabric.
+
+165
+00:14:10,168 --> 00:14:13,530
+Task one: press Scramble. The interval,
+
+166
+00:14:13,550 --> 00:14:17,604
+the law and the hook timing are all thrown off.
+
+167
+00:14:17,624 --> 00:14:24,280
+Adjust the swing start and end first, until the swing leaves the red segment,
+
+168
+00:14:24,300 --> 00:14:28,701
+then the hook timing, until all four criteria pass.
+
+169
+00:14:29,102 --> 00:14:34,520
+Reset, and switch the motion law to cycloidal. On the platform,
+
+170
+00:14:34,540 --> 00:14:39,269
+try modified trapezoid, cycloidal and harmonic in turn.
+
+171
+00:14:39,289 --> 00:14:42,031
+Note the sideways inertia force,
+
+172
+00:14:42,051 --> 00:14:46,694
+divide by 0.15 kilograms to get the peak acceleration,
+
+173
+00:14:46,714 --> 00:14:49,802
+and compare with the worked example.
+
+174
+00:14:50,202 --> 00:14:56,111
+Task two: with the cycloidal law, narrow the interval step by step.
+
+175
+00:14:56,131 --> 00:15:02,837
+Find the narrowest interval that keeps the force at or under 250 newtons and
+
+176
+00:15:02,857 --> 00:15:06,112
+the swing entirely out of the fabric.
+
+177
+00:15:06,132 --> 00:15:09,917
+Read it yourself and put it in your report.
+
+178
+00:15:10,317 --> 00:15:13,267
+Finally, reset and slowly widen the bight.
+
+179
+00:15:13,287 --> 00:15:18,642
+Watch how crosses for missed catches appear in the stitch view on the right.
+
+180
+00:15:18,662 --> 00:15:21,683
+This only shows the effect. For task three,
+
+181
+00:15:21,703 --> 00:15:25,290
+first set the hook timing to the top of the window,
+
+182
+00:15:25,310 --> 00:15:29,958
+then find the maximum bight and enter it in the task box to check.
+
+183
+00:15:29,978 --> 00:15:33,777
+The guide and the report template are on the platform.
+
+184
+00:15:35,297 --> 00:15:40,051
+Everything in this lecture is on the WenQuest learning platform.
+
+185
+00:15:40,451 --> 00:15:45,957
+You can open today's interactive slides and the virtual lab yourself,
+
+186
+00:15:45,977 --> 00:15:49,721
+drag the swing interval, change the motion law,
+
+187
+00:15:49,741 --> 00:15:54,686
+and watch the inertia force and the stitches change with them.
+
+188
+00:15:55,086 --> 00:15:59,263
+You submit the assignment and the lab report on the platform,
+
+189
+00:15:59,283 --> 00:16:01,464
+and get marks and comments back.
+
+190
+00:16:01,864 --> 00:16:05,484
+Questions go to the course discussion forum,
+
+191
+00:16:05,504 --> 00:16:10,861
+and the grades page shows your mark on every assignment and quiz.
+
+192
+00:16:12,381 --> 00:16:17,846
+Your assignment has four questions. One: the bight grows to 10 millimetres,
+
+193
+00:16:17,866 --> 00:16:21,283
+with everything else as in the opening problem.
+
+194
+00:16:21,303 --> 00:16:24,940
+For the modified-trapezoid and the cycloidal laws,
+
+195
+00:16:24,960 --> 00:16:30,498
+find the inertia force at 5000 r/min and the highest speed that stays within
+
+196
+00:16:30,518 --> 00:16:31,229
+the limit.
+
+197
+00:16:31,629 --> 00:16:34,440
+Two: the hook radius is 13.5 millimetres.
+
+198
+00:16:34,460 --> 00:16:40,100
+Find the catch difference between the two ends for bights of 6 and 10 millimetres.
+
+199
+00:16:40,120 --> 00:16:43,345
+Using the loop window borrowed in this lecture,
+
+200
+00:16:43,365 --> 00:16:48,936
+right end at the earliest about 198 degrees and left end at the latest about 218,
+
+201
+00:16:48,956 --> 00:16:52,871
+decide whether 10 millimetres can be caught at both ends.
+
+202
+00:16:52,891 --> 00:16:57,220
+Compare with the manual, and explain why it has to be measured.
+
+203
+00:16:57,620 --> 00:17:03,114
+Three: an electronic bartacker moves its clamp 5 millimetres a step,
+
+204
+00:17:03,134 --> 00:17:06,682
+over 170 degrees, with a modified trapezoid.
+
+205
+00:17:06,702 --> 00:17:10,979
+Find the peak acceleration at 3200 stitches a minute.
+
+206
+00:17:10,999 --> 00:17:16,575
+If the step grows to 8 millimetres with no more acceleration allowed,
+
+207
+00:17:16,595 --> 00:17:20,629
+how far must the speed drop? Four, for discussion:
+
+208
+00:17:20,649 --> 00:17:25,981
+an embroidery machine runs at about a quarter of lockstitch speed.
+
+209
+00:17:26,001 --> 00:17:30,360
+Propose two ways to speed it up, and the cost of each.
+
+210
+00:17:30,760 --> 00:17:32,388
+Submit your working,
+
+211
+00:17:32,408 --> 00:17:37,663
+the lab screenshots and the discussion on the WenQuest platform.
+
+212
+00:17:39,183 --> 00:17:47,232
+There's also a ten-question quiz. For example, with an 8-millimetre bight,
+
+213
+00:17:47,252 --> 00:17:50,939
+5000 r/min and a 170-degree swing,
+
+214
+00:17:50,959 --> 00:17:57,372
+what is the peak acceleration under the modified trapezoid?
+
+215
+00:17:57,772 --> 00:18:03,139
+Or, with everything else the same, the speed goes from 5000 to 6000.
+
+216
+00:18:03,159 --> 00:18:08,526
+By what factor does the peak acceleration grow? And a true-or-false:
+
+217
+00:18:08,546 --> 00:18:13,992
+the hook point sweeps right to left, so is the left end caught first?
+
+218
+00:18:14,392 --> 00:18:19,878
+You get three attempts, and the explanations appear as soon as you submit.
+
+219
+00:18:21,398 --> 00:18:22,898
+Three things to remember.
+
+220
+00:18:23,298 --> 00:18:27,192
+One: every special machine obeys the same rule:
+
+221
+00:18:27,212 --> 00:18:33,604
+no sideways relative motion between needle and fabric while the needle is in,
+
+222
+00:18:33,624 --> 00:18:38,933
+so every sideways move is squeezed into the out-of-fabric angle.
+
+223
+00:18:39,333 --> 00:18:46,761
+Two: peak acceleration is C times w times omega squared over beta squared,
+
+224
+00:18:46,781 --> 00:18:49,176
+so use the whole window,
+
+225
+00:18:49,196 --> 00:18:54,913
+and the modified trapezoid is both low-peaked and smooth.
+
+226
+00:18:55,313 --> 00:19:01,156
+Three: the two ends of a zigzag are caught w over 2R apart,
+
+227
+00:19:01,176 --> 00:19:05,827
+so the bight is limited by the catching window.
+
+228
+00:19:06,227 --> 00:19:10,967
+The assignment, quiz and lab are on WenQuest.
+
+229
+00:19:11,367 --> 00:19:13,933
+The slides, the virtual lab,
+
+230
+00:19:13,953 --> 00:19:20,399
+the assignment and the quiz are all on the WenQuest learning platform,
+
+231
+00:19:20,419 --> 00:19:26,587
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+232
+00:19:26,987 --> 00:19:28,039
+See you next time.
