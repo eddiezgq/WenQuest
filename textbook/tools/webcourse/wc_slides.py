@@ -148,7 +148,7 @@ html,body{width:1920px;height:1080px;background:var(--bg0);overflow:hidden}
 .duo .col .lab .en{font-family:var(--enf);font-size:24px;color:var(--en);margin-top:6px}
 .duo .col .note{margin-top:18px;display:inline-block;padding:10px 20px;border-radius:12px;font-size:28px;background:rgba(255,122,69,.12);color:#ffb38f}
 .duo .col.ok .note{background:rgba(46,196,182,.12);color:#7fe3d8}
-.duo .col .note span{font-family:var(--enf);font-size:20px;margin-left:12px;opacity:.85}
+.duo .col .note .ne{font-family:var(--enf);font-size:20px;margin-left:12px;opacity:.85}
 /* lab */
 .lab .body{display:grid;grid-template-columns:1150px 1fr;gap:60px;top:280px}
 .lab .media{height:650px}
@@ -418,7 +418,7 @@ def L_split(s, ctx):
 def L_duo(s, ctx):
     def col(c, ok):
         return (f'<div class="col{" ok" if ok else ""}">{media(c, ctx, 460)}<div class="lab"><div class="zh">{e(c["label"][0])}</div>'
-                f'<div class="en">{e(c["label"][1])}</div></div><div class="note">{e(c["note"][0])}<span>{e(c["note"][1])}</span></div></div>')
+                f'<div class="en">{e(c["label"][1])}</div></div><div class="note"><span class="zh">{e(c["note"][0])}</span><span class="en ne">{e(c["note"][1])}</span></div></div>')
     return f'<div class="slide duo"><div class="grain"></div>{head(s["title"])}<div class="body">{col(s["left"], False)}{col(s["right"], True)}</div>{ctx["foot"]}</div>'
 
 
@@ -702,6 +702,7 @@ def en_only_css() -> str:
            "html.en-only .cover .h1en{font-size:96px;line-height:1.08;font-weight:800;color:var(--ink);margin-top:26px}",
            "html.en-only .cover .suben{font-size:38px;color:#dbe4ef;margin-top:54px}",
            "html.en-only .answer .row .a .en,html.en-only .answer .row .b .en{display:inline}",
+           "html.en-only .duo .col .note .ne{font-size:26px;margin-left:0;opacity:1;color:inherit}",
            "html.en-only .tag .t-zh{display:none}html.en-only .tag .t-en{margin-left:0;font-size:26px;color:#0b1220}"]
     for sel, props in re.findall(r"([^{}]*?)\.zh\{([^}]*)\}", CSS + DECK_CSS):
         sel = sel.strip().split("}")[-1].strip()

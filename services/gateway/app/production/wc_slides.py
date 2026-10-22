@@ -148,7 +148,7 @@ html,body{width:1920px;height:1080px;background:var(--bg0);overflow:hidden}
 .duo .col .lab .en{font-family:var(--enf);font-size:24px;color:var(--en);margin-top:6px}
 .duo .col .note{margin-top:18px;display:inline-block;padding:10px 20px;border-radius:12px;font-size:28px;background:rgba(255,122,69,.12);color:#ffb38f}
 .duo .col.ok .note{background:rgba(46,196,182,.12);color:#7fe3d8}
-.duo .col .note span{font-family:var(--enf);font-size:20px;margin-left:12px;opacity:.85}
+.duo .col .note .ne{font-family:var(--enf);font-size:20px;margin-left:12px;opacity:.85}
 /* lab */
 .lab .body{display:grid;grid-template-columns:1150px 1fr;gap:60px;top:280px}
 .lab .media{height:650px}
@@ -202,7 +202,7 @@ html,body{width:1920px;height:1080px;background:var(--bg0);overflow:hidden}
 .chain .arr{flex:none;color:#f2b705;font-size:44px;font-weight:700;opacity:.7}
 .chain .brace{position:absolute;top:640px;font-size:30px;color:var(--amber);text-align:center;font-weight:700}
 /* answer */
-.answer .row .a .en{display:none}.answer .rows{position:absolute;left:110px;top:330px;width:1100px}
+.answer .row .a .en,.answer .row .b .en{display:none}.answer .rows{position:absolute;left:110px;top:330px;width:1100px}
 .answer .row{display:flex;justify-content:space-between;align-items:baseline;padding:26px 10px;border-bottom:1px solid var(--line)}
 .answer .row .a{font-size:46px}
 .answer .row .b{font-family:var(--enf);font-size:64px;font-weight:800}
@@ -418,7 +418,7 @@ def L_split(s, ctx):
 def L_duo(s, ctx):
     def col(c, ok):
         return (f'<div class="col{" ok" if ok else ""}">{media(c, ctx, 460)}<div class="lab"><div class="zh">{e(c["label"][0])}</div>'
-                f'<div class="en">{e(c["label"][1])}</div></div><div class="note">{e(c["note"][0])}<span>{e(c["note"][1])}</span></div></div>')
+                f'<div class="en">{e(c["label"][1])}</div></div><div class="note"><span class="zh">{e(c["note"][0])}</span><span class="en ne">{e(c["note"][1])}</span></div></div>')
     return f'<div class="slide duo"><div class="grain"></div>{head(s["title"])}<div class="body">{col(s["left"], False)}{col(s["right"], True)}</div>{ctx["foot"]}</div>'
 
 
@@ -515,9 +515,9 @@ def L_chain(s, ctx):
 
 
 def L_answer(s, ctx):
-    def left(x):   # 左栏可写成 [中文, English]（英文版课件显示英文）
+    def left(x):   # 左、右栏都可写成 [中文, English]（英文版课件显示英文）
         return f'<span class="zh">{e(x[0])}</span><span class="en">{e(x[1])}</span>' if isinstance(x, list) else e(x)
-    rows = "".join(f'<div class="row"><div class="a">{left(r[0])}</div><div class="b">{e(r[1])}</div></div>' for r in s["rows"])
+    rows = "".join(f'<div class="row"><div class="a">{left(r[0])}</div><div class="b">{left(r[1])}</div></div>' for r in s["rows"])
     return (f'<div class="slide answer"><div class="grain"></div>{head(s["title"], s.get("tag"))}<div class="rows">{rows}</div>'
             + (f'<div class="side card"><div class="big">{e(s["side"]["big"])}</div><div class="zh">{e(s["side"]["text"][0])}</div>'
                f'<div class="en">{e(s["side"]["text"][1])}</div></div>' if s.get("side") else "") +
@@ -701,7 +701,8 @@ def en_only_css() -> str:
            "html.en-only .cover h1,html.en-only .cover .sub,html.en-only .cover .kick>i{display:none}",
            "html.en-only .cover .h1en{font-size:96px;line-height:1.08;font-weight:800;color:var(--ink);margin-top:26px}",
            "html.en-only .cover .suben{font-size:38px;color:#dbe4ef;margin-top:54px}",
-           "html.en-only .answer .row .a .en{display:inline}",
+           "html.en-only .answer .row .a .en,html.en-only .answer .row .b .en{display:inline}",
+           "html.en-only .duo .col .note .ne{font-size:26px;margin-left:0;opacity:1;color:inherit}",
            "html.en-only .tag .t-zh{display:none}html.en-only .tag .t-en{margin-left:0;font-size:26px;color:#0b1220}"]
     for sel, props in re.findall(r"([^{}]*?)\.zh\{([^}]*)\}", CSS + DECK_CSS):
         sel = sel.strip().split("}")[-1].strip()

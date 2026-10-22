@@ -6,14 +6,14 @@ lesson: 13
 code: [ch13]
 
 clips:
-  hero:          # 封面：实验 13-1 手轮停针动画（慢放 20 倍），每 7 秒重放一次
+  hero:          # 封面：实验 13-1 手轮停针动画（慢放 20 倍），每 7 秒重放一次；手轮左、上、下留白，挪到右边、缩小，不压封面标题；不画左上角的时间、误差文字
     page: servo
     selector: "#wheel"
     cover: true
     dur: 7
     loop: 7
     steps:
-      - {at: 0, press: "#play"}
+      - {at: 0, press: "#play", js: "(function(){var c=document.getElementById('wheel');c.style.cssText+=';position:fixed;left:0;top:0;z-index:9999;background:#fff;box-sizing:content-box;padding:140px 0 140px 260px;width:540px;height:420px;max-width:none';var g=c.getContext('2d');if(g.__wqHide)return;g.__wqHide=1;var f=g.fillText;g.fillText=function(t){if(/^(t = |误差|Error)/.test(String(t)))return;return f.apply(this,arguments)}})()"}
   wheel:         # 停针动画：标准增益，每 7 秒重放
     page: servo
     selector: "#wheel"
@@ -90,17 +90,20 @@ slides:
       - ["两个问题：主轴怎样停准；执行器延迟多少度", "Two questions: stopping precisely; how many degrees of lag"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <defs><marker id="s13" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
           <rect x="20" y="40" width="250" height="560" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
           <rect x="325" y="200" width="250" height="240" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="4"/>
           <rect x="630" y="40" width="250" height="560" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
           <g font-size="30" font-weight="800" text-anchor="middle"><text x="145" y="95" fill="#5ee0d2">传感器</text><text x="450" y="300" fill="#f2b705">控制箱</text><text x="755" y="95" fill="#ff9c75">执行器</text></g>
-          <g font-size="20" fill="#8fa3ba" text-anchor="middle" class="en"><text x="145" y="125" class="en">sensors</text><text x="450" y="330" class="en">controller · drive</text><text x="755" y="125" class="en">actuators</text></g>
+          <g font-size="20" fill="#8fa3ba" text-anchor="middle" class="en zo"><text x="145" y="125" class="en zo">sensors</text><text x="450" y="330" class="en zo">controller · drive</text><text x="755" y="125" class="en zo">actuators</text></g>
+          <g font-size="30" font-weight="800" text-anchor="middle"><text class="eo" x="145" y="95" fill="#5ee0d2">Sensors</text><text class="eo" x="450" y="300" fill="#f2b705">Controller</text><text class="eo" x="755" y="95" fill="#ff9c75">Actuators</text></g>
+          <g font-size="23" fill="#d3deea" text-anchor="middle"><text class="eo" x="145" y="200">shaft encoder</text><text class="eo" x="145" y="270">pedal</text><text class="eo" x="145" y="340">thread break</text><text class="eo" x="145" y="410">bobbin thread</text><text class="eo" x="145" y="480">thickness, edge</text>
+            <text class="eo" x="755" y="200">shaft servo</text><text class="eo" x="755" y="270">trim solenoid</text><text class="eo" x="755" y="340">reverse solenoid</text><text class="eo" x="755" y="410">foot-lift cylinder</text><text class="eo" x="755" y="480">stitch-length stepper</text></g>
           <g font-size="26" fill="#d3deea" text-anchor="middle"><text x="145" y="200">主轴编码器</text><text x="145" y="270">脚踏</text><text x="145" y="340">断线检测</text><text x="145" y="410">底线余量</text><text x="145" y="480">布厚、布边</text>
             <text x="755" y="200">主轴伺服</text><text x="755" y="270">剪线电磁铁</text><text x="755" y="340">倒缝电磁铁</text><text x="755" y="410">抬压脚气缸</text><text x="755" y="480">针距步进电机</text></g>
           <g stroke="#f2b705" stroke-width="6" marker-end="url(#s13)"><path d="M275 320 L318 320"/><path d="M580 320 L623 320"/></g>
-          <text x="450" y="390" font-size="22" fill="#8fa3ba" text-anchor="middle">按主轴角度发令</text>
+          <text x="450" y="390" font-size="22" fill="#8fa3ba" text-anchor="middle">按主轴角度发令</text><text class="eo" x="450" y="390" font-size="22" fill="#8fa3ba" text-anchor="middle">by shaft angle</text>
         </svg>
     notes:
       - "一台电控平缝机分三类部件：传感器、控制箱、执行器。传感器有主轴编码器、脚踏、断线检测、底线余量、布厚和布边；控制箱里是伺服驱动和控制程序；执行器有主轴伺服电机、剪线和倒缝电磁铁、抬压脚气缸、针距步进电机。机构还是主轴带动的那些机构，只是主轴改由伺服电机驱动，附加动作由执行器按主轴角度完成。"
@@ -114,7 +117,7 @@ slides:
       - ["矢量控制：i_d = 0，转矩 T = k_t · i_q", "Vector control: i_d = 0, torque T = k_t · i_q"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <defs><marker id="v13" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker>
             <marker id="v13b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2ec4b6"/></marker></defs>
           <circle cx="400" cy="340" r="230" fill="none" stroke="#22324d" stroke-width="4"/>
@@ -126,10 +129,10 @@ slides:
           <text x="620" y="390" font-size="22" fill="#8fa3ba">转子磁场 · rotor flux</text>
           <path d="M400 340 L400 60" stroke="#f2b705" stroke-width="10" marker-end="url(#v13)"/>
           <text x="420" y="80" font-size="34" font-weight="800" fill="#f2b705" class="en">i_q</text>
-          <text x="420" y="120" font-size="22" fill="#d3deea">正交：转矩最大</text>
+          <text x="420" y="120" font-size="22" fill="#d3deea">正交：转矩最大</text><text class="eo" x="420" y="120" font-size="22" fill="#d3deea">at 90°: most torque</text>
           <path d="M530 340 A130 130 0 0 0 400 210" fill="none" stroke="#d3deea" stroke-width="3"/><text x="510" y="240" font-size="24" fill="#d3deea" class="en">90°</text>
           <rect x="40" y="560" width="820" height="60" rx="14" fill="#111d31" stroke="#22324d"/>
-          <text x="450" y="600" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle">T = k_t · i_q　（i_d = 0）</text>
+          <text x="450" y="600" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle">T = k_t · i_q&#160;&#160;&#160;(i_d = 0)</text>
         </svg>
     notes:
       - "早期的离合器电机一直空转，踩脚踏才通过离合器带动主轴，费电、发热，停车位置靠运气。现在是直驱：电机转子直接装在主轴上，没有皮带的弹性和打滑。电机是永磁同步电机，电流产生的磁场和转子磁场正交时转矩最大。矢量控制把电流分成沿转子磁场的 i_d 和垂直的 i_q，让 i_d 为零，转矩就只和 i_q 成正比，像直流电机一样好控制。"
@@ -148,19 +151,20 @@ slides:
     visual:
       svg: |
         <svg viewBox="0 0 900 640" width="100%" height="640">
+          <style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <rect x="20" y="40" width="860" height="560" rx="30" fill="none" stroke="#4c8dff" stroke-width="4"/>
           <rect x="90" y="140" width="720" height="400" rx="26" fill="none" stroke="#2ec4b6" stroke-width="4"/>
           <rect x="170" y="240" width="560" height="200" rx="22" fill="rgba(242,183,5,.1)" stroke="#f2b705" stroke-width="4"/>
-          <text x="50" y="100" font-size="30" font-weight="800" fill="#8fbaff">位置环 · K_p</text><text x="560" y="100" font-size="22" fill="#8fa3ba" class="en">position: outermost</text>
-          <text x="120" y="200" font-size="30" font-weight="800" fill="#5ee0d2">速度环 · PI（K_v, T_i）</text><text x="560" y="200" font-size="22" fill="#8fa3ba" class="en">velocity</text>
-          <text x="450" y="320" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">电流环 · 约 0.1 ms</text>
-          <text x="450" y="370" font-size="24" fill="#d3deea" text-anchor="middle">i_q → 转矩 → 主轴</text>
-          <text x="450" y="410" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en">current loop: fastest</text>
-          <text x="450" y="500" font-size="24" fill="#d3deea" text-anchor="middle">越靠里越快</text>
+          <text class="zh" x="50" y="100" font-size="30" font-weight="800" fill="#8fbaff">位置环 · K_p</text><text class="eo" x="50" y="100" font-size="28" font-weight="800" fill="#8fbaff">Position loop · K_p</text><text x="560" y="100" font-size="22" fill="#8fa3ba" class="en zo">position: outermost</text><text class="eo" x="600" y="100" font-size="22" fill="#8fa3ba">outermost</text>
+          <text class="zh" x="120" y="200" font-size="30" font-weight="800" fill="#5ee0d2">速度环 · PI（K_v, T_i）</text><text class="eo" x="120" y="200" font-size="28" font-weight="800" fill="#5ee0d2">Velocity loop · PI (K_v, T_i)</text><text x="560" y="200" font-size="22" fill="#8fa3ba" class="en zo">velocity</text>
+          <text class="zh" x="450" y="320" font-size="30" font-weight="800" fill="#f2b705" text-anchor="middle">电流环 · 约 0.1 ms</text><text class="eo" x="450" y="320" font-size="28" font-weight="800" fill="#f2b705" text-anchor="middle">Current loop · ~0.1 ms</text>
+          <text class="zh" x="450" y="370" font-size="24" fill="#d3deea" text-anchor="middle">i_q → 转矩 → 主轴</text><text class="eo" x="450" y="370" font-size="24" fill="#d3deea" text-anchor="middle">i_q → torque → shaft</text>
+          <text x="450" y="410" font-size="20" fill="#8fa3ba" text-anchor="middle" class="en zo">current loop: fastest</text>
+          <text x="450" y="500" font-size="24" fill="#d3deea" text-anchor="middle">越靠里越快</text><text class="eo" x="450" y="500" font-size="24" fill="#d3deea" text-anchor="middle">the further in, the faster</text>
         </svg>
     notes:
-      - "主轴伺服是三个嵌套的控制环。最里面是电流环，最快，约 0.1 毫秒，管住 i_q 也就是转矩；中间是速度环，用 PI 控制；最外面是位置环。外环的输出就是内环的指令：位置误差变成速度指令，速度误差变成电流指令。速度环带宽约等于 K_v 除以转动惯量 J，算例 0.2 除以 6 乘 10 的负 4 次方，约 {{ch13.bw:.0f}} 弧度每秒。主轴负载每转都在变，速度环要压住这种周期扰动。"
-      - "The shaft servo nests three control loops. Innermost is the current loop, the fastest, around 0.1 milliseconds, holding i_q, and so the torque. In the middle is the velocity loop, a PI controller. Outermost is the position loop. Each outer loop's output is the inner loop's command: position error becomes a speed command, speed error a current command. The velocity-loop bandwidth is roughly K_v over the inertia J: in the example 0.2 over 6 times 10 to the minus 4, about {{ch13.bw:.0f}} radians per second. The shaft load changes every revolution, and the velocity loop has to suppress that periodic disturbance."
+      - "主轴电机是永磁同步电机，i_q 是电流里产生转矩的那一部分。主轴伺服是三个嵌套的控制环。最里面是电流环，最快，约 0.1 毫秒，管住 i_q 也就是转矩；中间是速度环，用 PI 控制；最外面是位置环。外环的输出就是内环的指令：位置误差变成速度指令，速度误差变成电流指令。速度环带宽约等于 K_v 除以转动惯量 J，算例 0.2 除以 6 乘 10 的负 4 次方，约 {{ch13.bw:.0f}} 弧度每秒。主轴负载每转都在变，速度环要压住这种周期扰动。"
+      - "The shaft motor is a permanent-magnet synchronous motor, and i_q is the part of its current that makes torque. The shaft servo nests three control loops. Innermost is the current loop, the fastest, around 0.1 milliseconds, holding i_q, and so the torque. In the middle is the velocity loop, a PI controller. Outermost is the position loop. Each outer loop's output is the inner loop's command: position error becomes a speed command, speed error a current command. The velocity-loop bandwidth is roughly K_v over the inertia J: in the example 0.2 over 6 times 10 to the minus 4, about {{ch13.bw:.0f}} radians per second. The shaft load changes every revolution, and the velocity loop has to suppress that periodic disturbance."
 
   - layout: split
     title: ["停针定位：先降速，再切位置环", "Needle positioning: slow down, then switch to position"]
@@ -178,8 +182,8 @@ slides:
     left: {video: err500, label: ["K_p = 500 s⁻¹", "K_p = 500 s⁻¹"], note: ["超调约 1.8°，50 ms", "About 1.8° overshoot, 50 ms"]}
     right: {video: err200, label: ["K_p = 200 s⁻¹", "K_p = 200 s⁻¹"], note: ["超调约 0.1°，38 ms 停稳", "About 0.1° overshoot, settled in 38 ms"]}
     notes:
-      - "左右对比位置误差曲线：左边 500，右边 200；下半是最后阶段放大。位置增益 200，超调约 0.1 度，38 毫秒停稳；只把它加到 500，超调约 1.8 度，50 毫秒才停稳，反而更慢。原因是位置环太硬，速度环跟不上，转矩也顶到峰值。经验是位置增益取 K_v 比 J 的四分之一到二分之一，先把速度环调硬，再加位置环。"
-      - "Compare the position-error curves: 500 on the left, 200 on the right; the lower half magnifies the final stage. With a position gain of 200, the overshoot is about 0.1 degrees and it settles in 38 milliseconds. Raise only that gain to 500 and it overshoots about 1.8 degrees and takes 50 milliseconds: slower, not faster. The position loop is now too stiff for the velocity loop to follow, and the torque hits its peak. The rule of thumb is a position gain of a quarter to a half of K_v over J: stiffen the velocity loop first, then add the position loop."
+      - "左右对比位置误差曲线：左边 500，右边 200；下半是最后阶段放大。位置增益 200，超调约 0.1 度，38 毫秒停稳；只把它加到 500，超调约 1.8 度，50 毫秒才停稳，反而更慢。原因是位置环太硬，速度环跟不上，转矩也顶到峰值。经验是位置增益取 K_v 比 J 的四分之一到二分之一，先把速度环调硬，再加位置环。换了更重的手轮，惯量变大，增益也要重调。"
+      - "Compare the position-error curves: 500 on the left, 200 on the right; the lower half magnifies the final stage. With a position gain of 200, the overshoot is about 0.1 degrees and it settles in 38 milliseconds. Raise only that gain to 500 and it overshoots about 1.8 degrees and takes 50 milliseconds: slower, not faster. The position loop is now too stiff for the velocity loop to follow, and the torque hits its peak. The rule of thumb is a position gain of a quarter to a half of K_v over J: stiffen the velocity loop first, then add the position loop. Fit a heavier handwheel and the inertia grows, so the gains must be retuned."
 
   - layout: points
     title: ["增益不能太大，惯量变了要重调", "Don't overdo the gain; retune when inertia changes"]
@@ -276,17 +280,18 @@ slides:
     visual:
       svg: |
         <svg viewBox="0 0 900 640" width="100%" height="640">
+          <style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <path d="M100 520 L860 520 M100 520 L100 60" stroke="#4b5f7d" stroke-width="3"/>
           <path d="M100 120 L300 125 C 420 140, 560 260, 840 430" fill="none" stroke="#2ec4b6" stroke-width="8"/>
           <path d="M100 330 L860 330" stroke="#ff7a45" stroke-width="5" stroke-dasharray="14 10"/>
           <circle cx="620" cy="330" r="14" fill="#ff7a45"/>
           <path d="M620 330 L620 520" stroke="#ff7a45" stroke-width="3" stroke-dasharray="6 6"/>
-          <text x="640" y="300" font-size="28" font-weight="800" fill="#ff9c75">此后失步</text>
-          <text x="640" y="560" font-size="22" fill="#8fa3ba">最高可用频率</text>
+          <text x="640" y="300" font-size="28" font-weight="800" fill="#ff9c75">此后失步</text><text class="eo" x="640" y="300" font-size="26" font-weight="800" fill="#ff9c75">lost steps</text>
+          <text x="640" y="560" font-size="22" fill="#8fa3ba">最高可用频率</text><text class="eo" x="640" y="560" font-size="22" fill="#8fa3ba">top usable rate</text>
           <text x="120" y="100" font-size="26" fill="#5ee0d2">可用转矩 · pull-out torque</text>
           <text x="120" y="310" font-size="26" fill="#ffb38f">负载转矩 · load</text>
           <text x="480" y="610" font-size="24" fill="#8fa3ba" text-anchor="middle">步进频率 · step rate</text>
-          <text x="60" y="80" font-size="22" fill="#8fa3ba">转矩</text>
+          <text x="60" y="80" font-size="22" fill="#8fa3ba">转矩</text><text class="eo" x="30" y="50" font-size="22" fill="#8fa3ba">torque</text>
         </svg>
     notes:
       - "针距、压脚压力这些动作常用步进电机。两相混合式步进电机每步 1.8 度，不用编码器，发多少脉冲就走多少步；16 细分时每转 3200 步，更平稳，但精度不按细分比例提高。步进电机的可用转矩随频率升高而下降，负载一旦超过可用转矩就失步，控制器还不知道。对策是留足余量、用高压斩波驱动、加阻尼，或者做成闭环步进。"
@@ -334,16 +339,17 @@ slides:
     visual:
       svg: |
         <svg viewBox="0 0 900 640" width="100%" height="640">
+          <style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <path d="M120 540 L860 540 M120 540 L120 60" stroke="#4b5f7d" stroke-width="3"/>
-          <path d="M120 410 L860 410" stroke="#8fa3ba" stroke-width="3" stroke-dasharray="10 8"/><text x="130" y="400" font-size="24" fill="#8fa3ba">母线 310 V</text>
-          <path d="M120 300 L860 300" stroke="#2ec4b6" stroke-width="4" stroke-dasharray="14 8"/><text x="130" y="290" font-size="24" fill="#5ee0d2">制动电阻导通 400 V</text>
+          <path d="M120 410 L860 410" stroke="#8fa3ba" stroke-width="3" stroke-dasharray="10 8"/><text class="zh" x="130" y="400" font-size="24" fill="#8fa3ba">母线 310 V</text><text class="eo" x="130" y="400" font-size="24" fill="#8fa3ba">DC link 310 V</text>
+          <path d="M120 300 L860 300" stroke="#2ec4b6" stroke-width="4" stroke-dasharray="14 8"/><text class="zh" x="130" y="290" font-size="24" fill="#5ee0d2">制动电阻导通 400 V</text><text class="eo" x="130" y="290" font-size="24" fill="#5ee0d2">braking resistor on at 400 V</text>
           <path d="M120 410 L300 410 C 420 400, 520 180, 640 110 L860 108" fill="none" stroke="#ff7a45" stroke-width="7"/>
           <text x="660" y="95" font-size="28" font-weight="800" fill="#ff9c75">≈ {{ch13.V2:.0f}} V</text>
           <path d="M300 410 C 400 380, 440 310, 480 300 L860 300" fill="none" stroke="#2ec4b6" stroke-width="7"/>
-          <text x="560" y="350" font-size="24" fill="#5ee0d2">有制动电阻：钳在 400 V</text>
-          <text x="560" y="160" font-size="24" fill="#ffb38f">没有：电容充到危险电压</text>
-          <text x="490" y="590" font-size="24" fill="#8fa3ba" text-anchor="middle">急停开始 → 时间</text>
-          <text x="60" y="80" font-size="22" fill="#8fa3ba">电压</text>
+          <text class="zh" x="560" y="350" font-size="24" fill="#5ee0d2">有制动电阻：钳在 400 V</text><text class="eo" x="560" y="350" font-size="24" fill="#5ee0d2">with resistor: held at 400 V</text>
+          <text x="630" y="160" font-size="22" fill="#ffb38f">没有：电容充到危险电压</text><text class="eo" x="640" y="155" font-size="22" fill="#ffb38f">no resistor:</text><text class="eo" x="640" y="183" font-size="22" fill="#ffb38f">unsafe voltage</text>
+          <text x="490" y="590" font-size="24" fill="#8fa3ba" text-anchor="middle">急停开始 → 时间</text><text class="eo" x="490" y="590" font-size="24" fill="#8fa3ba" text-anchor="middle">e-stop begins → time</text>
+          <text x="60" y="80" font-size="22" fill="#8fa3ba">电压</text><text class="eo" x="112" y="80" font-size="22" fill="#8fa3ba" text-anchor="end">voltage</text>
         </svg>
     notes:
       - "功率电路：220 伏整流后母线约 310 伏，逆变桥六个开关管驱动电机。急停时电机变成发电机，可整流桥是单向的，能量送不回电网，只能充进母线电容。算例 5000 转的动能约 {{ch13.KE:.0f}} 焦，七成回馈，470 微法电容会升到约 {{ch13.V2:.0f}} 伏，危险。所以母线上装制动电阻，约 400 伏导通把能量烧掉；急停转速超过约 {{ch13.nbrake:.0f}} 转，就必须靠它。"
@@ -373,14 +379,15 @@ slides:
     visual:
       svg: |
         <svg viewBox="0 0 900 640" width="100%" height="640">
+          <style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <rect x="60" y="520" width="240" height="60" rx="12" fill="#2a3a55"/>
           <path d="M180 520 L260 300 L560 200" stroke="#f2b705" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           <g fill="#08101d" stroke="#2ec4b6" stroke-width="8"><circle cx="180" cy="520" r="30"/><circle cx="260" cy="300" r="30"/><circle cx="560" cy="200" r="26"/></g>
           <path d="M560 200 L640 240 M560 200 L620 140" stroke="#8fa3ba" stroke-width="10" stroke-linecap="round"/>
           <rect x="640" y="200" width="70" height="70" rx="8" fill="#ff7a45"/>
-          <text x="720" y="250" font-size="24" fill="#ffb38f">重物 → J 变大</text>
-          <text x="300" y="300" font-size="24" fill="#5ee0d2">关节：电流 · 速度 · 位置</text>
-          <text x="450" y="420" font-size="26" fill="#d3deea" text-anchor="middle">带宽 ≈ K_v / J ↓</text>
+          <text class="zh" x="720" y="250" font-size="24" fill="#ffb38f">重物 → J 变大</text><text class="eo" x="720" y="250" font-size="24" fill="#ffb38f">load → J grows</text>
+          <text class="zh" x="300" y="350" font-size="24" fill="#5ee0d2">关节：电流 · 速度 · 位置</text><text class="eo" x="300" y="350" font-size="24" fill="#5ee0d2">joint: current · velocity · position</text>
+          <text class="zh" x="450" y="420" font-size="26" fill="#d3deea" text-anchor="middle">带宽 ≈ K_v / J ↓</text><text class="eo" x="450" y="420" font-size="26" fill="#d3deea" text-anchor="middle">bandwidth ≈ K_v / J ↓</text>
         </svg>
     notes:
       - "机械臂每个关节都是一台永磁同步电机加编码器，驱动器里也是电流、速度、位置三环嵌套，矢量控制让关节转矩正比于 i_q。主轴停在上针位，对应关节停在目标角：位置增益太大会冲过头，没有积分摩擦会留下静差。机械臂抓起重物，惯量变大，速度环带宽下降，和换了更重的手轮一样，所以机器人驱动器也有负载惯量比参数和在线惯量辨识。急停同样靠制动电阻，夹爪电磁阀也要按带速提前发令。"
@@ -395,17 +402,18 @@ slides:
     visual:
       svg: |
         <svg viewBox="0 0 900 640" width="100%" height="640">
+          <style>html:not(.en-only) .eo{display:none}html.en-only .zo{display:none}</style>
           <rect x="300" y="40" width="300" height="550" rx="10" fill="none" stroke="#4b5f7d" stroke-width="4"/>
           <path d="M240 380 L660 380" stroke="#f2b705" stroke-width="6"/>
           <text x="680" y="388" font-size="26" font-weight="700" fill="#f2b705">楼层 · floor</text>
           <rect x="340" y="260" width="220" height="118" rx="10" fill="#2a3a55" stroke="#2ec4b6" stroke-width="4"/>
           <path d="M450 80 L450 260" stroke="#8fa3ba" stroke-width="4"/>
           <path d="M650 120 L650 240" stroke="#5ee0d2" stroke-width="5"/><path d="M640 228 L650 246 L660 228" stroke="#5ee0d2" stroke-width="5" fill="none"/>
-          <text x="680" y="170" font-size="24" fill="#5ee0d2">① 减到爬行速度</text>
-          <text x="680" y="300" font-size="24" fill="#ffb38f">② 切位置控制</text>
+          <text class="zh" x="680" y="170" font-size="24" fill="#5ee0d2">① 减到爬行速度</text><text class="eo" x="680" y="170" font-size="24" fill="#5ee0d2">① slow to a crawl</text>
+          <text class="zh" x="680" y="300" font-size="24" fill="#ffb38f">② 切位置控制</text><text class="eo" x="680" y="300" font-size="24" fill="#ffb38f">② position control</text>
           <text x="40" y="320" font-size="24" fill="#d3deea">平层对齐</text>
-          <text x="40" y="350" font-size="20" fill="#8fa3ba" class="en">flush with the floor</text>
-          <text x="450" y="632" font-size="24" fill="#8fa3ba" text-anchor="middle">= 停针：先降速，再切位置环</text>
+          <text x="40" y="350" font-size="20" fill="#8fa3ba" class="en zo">flush with the floor</text><text class="eo" x="40" y="320" font-size="24" fill="#d3deea">flush with</text><text class="eo" x="40" y="350" font-size="24" fill="#d3deea">the floor</text>
+          <text class="zh" x="450" y="632" font-size="24" fill="#8fa3ba" text-anchor="middle">= 停针：先降速，再切位置环</text><text class="eo" x="450" y="632" font-size="24" fill="#8fa3ba" text-anchor="middle">= needle positioning: slow, then switch to position</text>
         </svg>
     notes:
       - "生活中的停针定位：电梯平层。电梯快到楼层时先减到很低的爬行速度，离平层位置还差一小段，才切换到精确的位置控制，停稳时轿厢地面和楼层地面对齐。这正是停针定位“先降速、再切位置环”的两步法。乘客多了，惯量变大，好的电梯控制器同样要自动调整。"
@@ -415,8 +423,8 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["剪线转速设在 480 r/min 以下", "Set trimming below 480 r/min"]
     rows:
-      - ["600：吸合", "{{ch13.p600:.1f}}°"]
-      - ["600：稳压管释放", "{{ch13.z600:.1f}}°"]
+      - [["600 r/min：吸合", "600 r/min: pull-in"], "{{ch13.p600:.1f}}°"]
+      - [["600 r/min：稳压管释放", "600 r/min: Zener release"], "{{ch13.z600:.1f}}°"]
       - ["n_max = 20 ÷ (6 × 0.0069)", "{{ch13.nmax:.0f}} r/min"]
     side: {big: "{{ch13.vce:.0f}} V", text: ["稳压管续流时功率管承受 24 + 48 V，选管要留余量", "With the Zener the transistor sees 24 + 48 V; allow a margin"]}
     foot: ["只换稳压管不够；要么降到约 480 r/min，要么提高驱动电压缩短吸合", "The Zener alone isn't enough: drop to about 480 r/min, or raise the drive voltage to shorten pull-in"]

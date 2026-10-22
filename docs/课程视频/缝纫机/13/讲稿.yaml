@@ -1,0 +1,154 @@
+# 《缝纫机设计与制造》公开课 第 13 讲：控制基础：电机、驱动与传感
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch13.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 13-1（停针定位调参）、13-2（电磁铁驱动）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch13.py 算出（{{ch13.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "13"
+deck: ch13
+skip: [5, 10, 15, 16, 18, 23, 24]   # 离合器电机到直驱、增益的两条限制、低速测速 M/T 法、其他传感器、步进电机、第五节章节页与 600 r/min 转角数字页：控制课程部分约 10 分钟（课件与教材里都有；增益经验值在第 9 页讲到，惯量加倍留在实验 13-1 任务三里试，M/T 法留给作业第一题，600 r/min 的三个转角在回答页都讲到）
+code: [ch13]
+title: ["控制基础：电机、驱动与传感——主轴怎样停准，执行器慢多少度", "Control Basics: Motors, Drives and Sensors — Stopping the Shaft Precisely, and How Many Degrees the Actuators Lag"]
+chapter: ["第五篇 电气控制 · 第 13 章", "Part V Electrical Control · Chapter 13"]
+next: ["第 14 讲", "Lecture 14"]
+cover_formula: '\theta = 6\,n\,t'
+tags:
+  zh: [伺服电机, 停针定位, PI 控制, 编码器, 电磁铁驱动, 稳压管续流, 制动电阻, 缝纫机设计]
+  en: [servo motor, needle positioning, PI control, encoder, solenoid drive, Zener freewheeling, braking resistor, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十三讲，控制基础：电机、驱动与传感。
+    - 从这一讲开始进入电控。我们抓两个问题：主轴怎样停准在上针位，执行器的延迟折合成多少度主轴转角。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 13, control basics, with motors, drives and sensors.
+    - Today we move into electrical control, with two questions running through it. How does the shaft stop precisely at needle-up? And how many degrees of shaft rotation do the actuators' delays amount to?
+
+after:
+  - id: lab131
+    kind: lab
+    lab: servo
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checks, #msg { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; var c = document.getElementById('wheel').getContext('2d'); if (!c.__wqHide) { c.__wqHide = 1; const f = c.fillText; c.fillText = function (t) { if (/^(t = |误差|Error)/.test(String(t))) return; return f.apply(this, arguments); }; } document.getElementById('play').click(); })()"
+        press: "#reset"
+      - press: "#mess"
+        js: "document.getElementById('play').click()"
+        sweep: {Kv: [0.05, 0.12]}
+        dur: 6
+      - js: "document.getElementById('reset').click();var e=document.getElementById('Ti');e.value=0;e.dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('play').click()"
+      - js: "document.getElementById('reset').click();var e=document.getElementById('J');e.value=12;e.dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('play').click()"
+    say:
+      zh:
+        - ">下面是虚拟实验 13-1，停针定位的伺服调参，在问渠平台上可以亲手做。判据读数、提示和任务这里先遮住，留给你自己读。左上是手轮动画，右上是位置误差，下面是速度和转矩曲线。"
+        - ">任务一，按“打乱”，增益变成 450、0.05 和 0，误差曲线冲过头、来回摆。只调三个增益，让四条判据都满足。这里先把速度增益往上加，剩下的留给你自己调。"
+        - ">任务二，恢复标准后把积分时间调到 0，看主轴最后停在哪里。再把库仑摩擦调到 0.3，用摩擦转矩除以速度增益和位置增益的乘积，算出最大静差，换算成度，填进去核对。"
+        - ">任务三，把折算惯量调到 12，先不改增益，看超调和停稳时间变成什么样，再自己重调。"
+      en:
+        - ">Now Virtual lab 13-1, tuning needle positioning. On the WenQuest platform you can do it yourself. The criteria readings, the hints and the tasks are blurred here, so you can find them on your own. Top left is the handwheel, top right the position error, and below are the speed and torque curves."
+        - ">Task one: press Scramble. The gains become 450, 0.05 and zero, and the error curve overshoots and swings. Adjust only the three gains until all four criteria pass. Here we raise the velocity gain; the rest is yours to tune."
+        - ">Task two: reset, then set the integral time to zero and see where the shaft finally stops. Then raise the Coulomb friction to 0.3, work out the largest steady error as the friction torque over the product of the two gains, convert it to degrees, and enter it to check."
+        - ">Task three: set the referred inertia to 12. Leave the gains alone at first and see what happens to the overshoot and the settling time, then retune them yourself."
+
+  - id: lab132
+    kind: lab
+    lab: solenoid
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checks, #deg, #msg { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; })()"
+        press: "#reset"
+      - sweep: {Vz: [0.7, 5]}
+        dur: 6
+      - set: {Vz: 80}
+      - js: "document.getElementById('reset').click();var e=document.getElementById('n');e.value=600;e.dispatchEvent(new Event('input',{bubbles:true}));"
+        sweep: {V: [24, 27]}
+        dur: 5
+      - js: "window.scrollTo(0, 0)"
+    say:
+      zh:
+        - ">再看虚拟实验 13-2，电磁铁驱动。判据、主轴转角折算、提示和任务同样先遮住。先在上方曲线上找三个时刻：电流的凹口，电磁力超过弹簧力，衔铁吸到底。"
+        - ">任务一，只调续流电压，让四条判据都满足。这里把续流电压从二极管往上加，看断电以后电流掉得多快、衔铁多早回位。"
+        - ">再把它加到 80 伏，想一想第四条判据为什么不让电压无限加高。"
+        - ">任务二，把剪线转速提到 600，维持电流不超过 1.1 安，调驱动电压、强激磁时间和续流电压。这里先把驱动电压往上加，看吸合段的电流爬得多快。"
+        - ">任务三，用任务二在 600 转下调好的那组参数，读出吸合和释放里较长的那个延迟，算出最高剪线转速，填进去核对。指导书和报告模板在平台上下载。"
+      en:
+        - ">Next, Virtual lab 13-2, driving a solenoid. The criteria, the shaft-angle bars, the hints and the tasks are blurred here too. First find three moments on the upper plot: the notch in the current, the force overtaking the spring, and the armature bottoming."
+        - ">Task one: adjust only the freewheeling voltage until all four criteria pass. Here we raise it from the diode setting. Watch how fast the current falls after switch-off, and how much sooner the armature returns."
+        - ">Then push it to 80 volts, and think about why the fourth criterion won't let you raise it without limit."
+        - ">Task two: raise the trimming speed to 600, keep the hold current at or below 1.1 amps, and adjust the drive voltage, the boost time and the freewheeling voltage. Here we raise the drive voltage and watch the current climb faster during pull-in."
+        - ">Task three: with the settings you found for 600 r/min in task two, read the longer of the two delays, work out the highest trimming speed, and enter it to check. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 13-1、13-2，可以自己动手", "Interactive slides and Labs 13-1 and 13-2, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和两个虚拟实验都可以自己打开，调增益、改惯量、换续流电压，看停针和剪线怎样跟着变。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and both virtual labs yourself. Change the gains, the inertia or the freewheeling voltage, and watch needle positioning and trimming change with them."
+        - ">You submit the assignment and the lab reports on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 13：编码器测速、剪线电磁铁与急停制动", "Assignment 13: encoder speed, the trimming solenoid and braking"]
+      points:
+        - ["2500 线编码器：M 法、T 法在 150、3000 r/min 的误差", "2500-line encoder: M and T errors at 150 and 3000 r/min"]
+        - ["450 r/min 剪线：哪种续流够用，耐压与能量", "Trimming at 450 r/min: which freewheeling, voltage and energy"]
+        - ["4500 r/min 急停的母线电压；步进还是伺服", "Link voltage after a 4500 r/min stop; stepper or servo"]
+      foot: ["2–4 页计算报告（PDF），附实验 13-1、13-2 的任务截图，在问渠学习平台提交。", "A 2–4 page calculation report (PDF) with task screenshots from Labs 13-1 and 13-2, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，2500 线的编码器四倍频，分别用 M 法和 T 法测速，算出 150 转和 3000 转时的相对误差，说明停针段和高速段各用哪种。M 法在固定时间里数脉冲，T 法用高频时钟量两个脉冲之间的时间。"
+        - ">第二题，剪线电磁铁同今天的算例，剪线转速 450 转时，两种续流各满不满足，选定方案，给出功率管的耐压和稳压管每次吸收的能量。"
+        - ">第三题，主轴从 4500 转急停，求不加制动电阻时母线电压升到多少，多高转速以上必须靠制动电阻。第四题是讨论：电子送布用步进电机还是伺服电机。步进电机发多少脉冲走多少步，负载太大会丢步；请从定位方式、失步风险、低速平稳和成本四方面比较。"
+        - 计算报告和两个实验的截图，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: a 2500-line encoder with times-four decoding. Find the speed-measurement error of the M method and the T method at 150 and at 3000 r/min, and say which belongs in needle positioning and which in high-speed sewing. The M method counts pulses in a fixed time; the T method times the gap between two pulses with a fast clock."
+        - ">Two: with today's trimming solenoid and a trimming speed of 450 r/min, does each freewheeling scheme meet the limit? Choose one, and give the transistor's voltage rating and the energy the Zener absorbs per release."
+        - ">Three: the shaft makes an emergency stop from 4500 r/min. Without a braking resistor, how high does the link voltage go, and above what speed is the resistor needed? Four is a discussion: should an electronic feed use a stepper or a servo? A stepper moves one step per pulse, but can lose steps under too much load. Compare positioning, the risk of lost steps, low-speed smoothness and cost."
+        - Submit the calculation report and the lab screenshots on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["2048 线编码器四倍频：分辨率是多少度？", "A 2048-line encoder with ×4 decoding: what is the resolution?"]
+        - ["500 r/min 时吸合 8 ms：主轴转过多少度？", "An 8 ms pull-in at 500 r/min: how many degrees of shaft?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：每转 2048 线的编码器四倍频以后，分辨率是多少度？"
+        - ">再比如：主轴每分钟 500 转，剪线电磁铁吸合要 8 毫秒，这段时间主轴转过多少度？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, a 2048-line encoder with times-four decoding: what is its resolution in degrees?"
+        - ">Or, the shaft turns at 500 r/min and the trimming solenoid takes 8 milliseconds to pull in. How many degrees does the shaft turn meanwhile?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲工业平缝机的电控：剪线、倒缝这些动作怎样按主轴角度排好时序。我们下一讲见。
+  en:
+    - The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's the control of the industrial lockstitch machine, and how actions like trimming and reverse stitching are timed against the shaft angle. See you then.
