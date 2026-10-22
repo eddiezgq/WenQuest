@@ -165,6 +165,12 @@
    "elastic": {
     "fn": 45,
     "zeta": 0.03
+   },
+   "mfg": {
+    "blank": {
+     "radius": 220,
+     "plate": 30
+    }
    }
   }
  ],

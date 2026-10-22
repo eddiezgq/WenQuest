@@ -8,6 +8,7 @@ import { t, lang } from '../i18n'
 import MfgView from './MfgView.vue'
 import Checks from './Checks.vue'
 import LineChart from './LineChart.vue'
+const fcHref = import.meta.env.BASE_URL + 'api/freecad.zip'
 
 const mf = computed(() => project.mfg)
 const groove = computed(() => !!project.mechanism.groove)
@@ -140,7 +141,9 @@ const simSeries = computed(() => {
         <button type="button" class="ghost" @click="download('dxf')">{{ t('dlDxf') }}</button>
         <button type="button" class="ghost" @click="download('csv')">{{ t('dlCsv') }}</button>
         <button type="button" class="ghost" @click="download('step')">{{ t('dlStep') }}</button>
+        <a class="ghost fc" :href="fcHref" download>{{ t('fcPack') }}</a>
       </div>
+      <p class="note">{{ t('fcNote') }}</p>
       <p v-if="msg" class="note">{{ msg }}</p>
     </aside>
 
@@ -171,6 +174,7 @@ h4 small { font-weight: 400; color: var(--hold); margin-left: 6px; }
 .bad { font-size: 12.5px; color: var(--bad); margin: 0; }
 .hint { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); margin: 0; padding: 20px; text-align: center; }
 .dl { display: grid; gap: 6px; margin-top: 6px; }
+.dl .fc { text-align: center; text-decoration: none; display: block; }
 .side h4 { margin-top: 14px; }
 .bottom { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
 .prog { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; grid-column: 1 / -1; }

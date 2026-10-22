@@ -16,6 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY services/cam/camkit ./camkit
 COPY services/cam/examples ./examples
 COPY services/cam/*.py ./
+COPY services/cam/freecad/*.py ./freecad/
+COPY factory/digital/freecad/Mod/WenQuest/InitGui.py factory/digital/freecad/Mod/WenQuest/wq_workbench.py ./freecad/workbench/
 COPY --from=web /app/dist ./web
 RUN useradd -r -u 10006 cam
 USER cam
