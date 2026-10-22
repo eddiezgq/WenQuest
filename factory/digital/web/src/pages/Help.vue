@@ -97,10 +97,17 @@
         <p class="kicker small muted">{{ edName }} · 第 {{ idx + 1 }} 章</p>
         <h1>{{ chapter.title }}</h1>
         <p v-if="chapter.lead" class="lead">{{ chapter.lead }}</p>
-        <template v-for="(s, i) in chapter.segments" :key="i">
+        <template v-for="(s, i) in chapter.segments.filter((x) => !x.fold)" :key="i">
           <div v-if="s.type === 'md'" class="md" v-html="s.html"></div>
           <HelpBlock v-else :kind="s.kind" :args="s.args" :media="media" />
         </template>
+        <details v-if="chapter.segments.some((x) => x.fold)" class="fold">
+          <summary>查表：页面、规则、谁做什么、处理方案</summary>
+          <template v-for="(s, i) in chapter.segments.filter((x) => x.fold)" :key="'f' + i">
+            <div v-if="s.type === 'md'" class="md" v-html="s.html"></div>
+            <HelpBlock v-else :kind="s.kind" :args="s.args" :media="media" />
+          </template>
+        </details>
         <footer class="pn">
           <router-link v-if="idx > 0" :to="`/help/${ed}/${chapters[idx - 1].slug}`" class="prev">
             <span class="small muted">上一章</span><b>{{ chapters[idx - 1].title }}</b></router-link>
@@ -192,7 +199,9 @@ function pickStage(i) {
   const slug = (STAGE_CHAPTER[ed.value] || [])[i];
   if (slug) router.push(`/help/${ed.value}/${slug}`);
 }
-function jump(id) { document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+// 小节在折叠的“查表”里：先展开
+function reveal(el) { const d = el?.closest('details'); if (d) d.open = true; return el; }
+function jump(id) { reveal(document.getElementById(id))?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 // 地址里的 #：小节编号（#s3）或小节标题（#三个方案，“你来选”答错时链回那一段用）
 function jumpHash() {
   const h = decodeURIComponent((route.hash || '').slice(1));
@@ -200,7 +209,7 @@ function jumpHash() {
   nextTick(() => {
     const el = document.getElementById(h)
       || [...document.querySelectorAll('.doc h2, .doc h3')].find((x) => x.textContent.trim() === h);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    reveal(el)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 }
 watch(() => route.hash, jumpHash);
@@ -304,6 +313,9 @@ onUnmounted(() => { ws?.dispose(); off?.(); });
 .kicker { margin: 0 0 6px; }
 .doc h1 { font-size: clamp(24px, 3vw, 34px); line-height: 1.2; }
 .doc .lead { font-size: 16px; color: var(--muted); line-height: 1.7; margin: 10px 0 8px; }
+.fold { margin: 30px 0 10px; border: 1px solid var(--line); border-radius: 10px; padding: 4px 16px; background: var(--surface); }
+.fold > summary { cursor: pointer; padding: 10px 0; font-weight: 600; color: var(--muted); }
+.fold[open] > summary { border-bottom: 1px solid var(--line-soft); }
 .md :deep(h2) { font-size: 20px; margin: 34px 0 10px; scroll-margin-top: 16px; }
 .md :deep(h3) { font-size: 16px; margin: 22px 0 8px; }
 .md :deep(p), .md :deep(li) { line-height: 1.8; font-size: 15px; }

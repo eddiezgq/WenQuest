@@ -9,7 +9,7 @@
   页面改了把标记弄丢，这里会报出来。
 - 第 30 轮 §八 8-1：新块 lab（嵌虚拟实验，副本与课程原件一致、预置按钮真有）/ try（当场动手，动作在白名单里）/ quiz（你来选，
   选项格式、至少一个对的、链回的小节存在）；带我去做的“做完检测”（done 条件指向真地址、真接口、真元素）；逐章覆盖统计
-  （WQ_HELP_STRICT=1 时强制，8-3 改写完各章后打开）。"""
+  （8-3 起强制；只数“:::查表”以上的正文）；领域实时数据（live kind: domain）取的字段是接口真给的。"""
 import importlib.util
 import json
 import os
@@ -25,12 +25,24 @@ HELP = os.path.join(WEB, "help")
 EDITIONS = ("teach", "enterprise")
 FENCE = re.compile(r"^```(\w+)[ \t]*\n(.*?)^```[ \t]*$", re.M | re.S)
 BLOCKS = {"goto", "anim", "video", "live", "ask", "lab", "try", "quiz"}
-LIVE = {"plant", "machines", "kpi"}
+LIVE = {"plant", "machines", "kpi", "domain"}
 
 
 def _read(*p):
     with open(os.path.join(*p), encoding="utf-8") as f:
         return f.read()
+
+
+def _domain_live():
+    """web/src/lib/domainlive.js：领域 → (接口, [字段])"""
+    src = _read(WEB, "lib", "domainlive.js")
+    out = {}
+    for m in re.finditer(r"^  (\w+): \{ api: '([^']+)'.*?items: \[(.*?)\] \},?$", src, re.M | re.S):
+        out[m.group(1)] = (m.group(2), re.findall(r"\['(\w+)', '", m.group(3)))
+    return out
+
+
+DOMAIN_LIVE = _domain_live()
 
 
 def _sync():
@@ -203,6 +215,8 @@ def test_blocks_point_at_real_things(ed, slug, fn, src):
             assert VIDEOS[a["name"]]["edition"] == ed, (fn, a)
         elif kind == "live":
             assert a.get("kind") in LIVE, (fn, a)
+            if a["kind"] == "domain":     # 领域数据：domain 要在 web/src/lib/domainlive.js 里，取的字段要是接口真给的
+                assert a.get("domain") in DOMAIN_LIVE, (fn, a)
         elif kind == "ask":
             assert a.get("q"), fn
         elif kind == "lab":
@@ -469,6 +483,7 @@ HANDS_ON = ("try", "goto_done")                                     # 在真工�
 def coverage(src):
     """一章里各种块有几个：anim / video / goto / goto_done（带“做完检测”的带我去做）/ lab / try / quiz / live / ask"""
     n = {k: 0 for k in ("anim", "video", "goto", "goto_done", "lab", "try", "quiz", "live", "ask")}
+    src = re.split(r"^:::查表[ \t]*$", src, maxsplit=1, flags=re.M)[0]       # 折叠的“查表”里的块不算：要放在正文里
     for kind, body in FENCE.findall(src):
         if kind not in n:
             continue
@@ -479,9 +494,9 @@ def coverage(src):
 
 
 def coverage_gaps(n):
-    """按细则 §八 验收：动画 ≥ 1；视频或“做完打勾”的带我去做 ≥ 1；互动 ≥ 2 种且至少一种是当场动手或做完打勾；实时数据 ≥ 1"""
+    """按细则 §八 验收：动画 ≥ 1（anim，或 lab 嵌课程的动画页）；视频或“做完打勾”的带我去做 ≥ 1；互动 ≥ 2 种且至少一种是当场动手或做完打勾；实时数据 ≥ 1"""
     gaps = []
-    if n["anim"] < 1:
+    if n["anim"] < 1 and n["lab"] < 1:
         gaps.append("没有动画")
     if n["video"] < 1 and n["goto_done"] < 1:
         gaps.append("没有视频，也没有做完打勾的带我去做")
@@ -511,8 +526,19 @@ def test_coverage_rule_itself():
     assert coverage_gaps(coverage("```ask\nq: 问\n```"))[-1] == "没有实时数据"
 
 
+def test_domain_live_fields_are_real():
+    """帮助里“本厂此刻”的领域数据：每个领域的接口真有、取的字段是这个接口的 kpis 真返回的（查 hub 源码里的键名）"""
+    assert set(DOMAIN_LIVE) == {"service", "supply", "maint", "people", "ehs", "energy", "finance"}
+    for dom, (api, fields) in DOMAIN_LIVE.items():
+        api_src = _read(DIGITAL, "hub", dom + "_api.py")
+        assert '"/api{}"'.format(api) in api_src, (dom, api)
+        mod = _read(DIGITAL, "hub", dom + ".py") + api_src + (_read(DIGITAL, "hub", "crm.py") if dom == "service" else "")
+        for f in fields:
+            assert re.search(r'["\']{}["\']\s*:|\b{}=' .format(f, f), mod), (dom, f)
+
+
 def test_every_chapter_covered():
-    """教学版每章：动画、视频或做完打勾、两种互动（其一在真工厂动手）、实时数据。8-3 逐章改写完以后设 WQ_HELP_STRICT=1 强制"""
+    """教学版每章：动画、视频或做完打勾、两种互动（其一在真工厂动手）、实时数据。第 30 轮 §八 8-3 逐章改写完，起强制（少一样不通过）"""
     report = {}
     for ed, slug, fn, src in _chapters():
         if ed != "teach" or (ed, slug) in COVER_EXEMPT:
@@ -520,9 +546,6 @@ def test_every_chapter_covered():
         gaps = coverage_gaps(coverage(src))
         if gaps:
             report[fn] = gaps
-    if os.environ.get("WQ_HELP_STRICT") != "1":
-        pytest.skip("逐章覆盖还没强制（第 30 轮 §八 8-3 改写各章后设 WQ_HELP_STRICT=1）：{} 章没达到——{}".format(
-            len(report), "；".join("{} {}".format(k, "、".join(v)) for k, v in sorted(report.items()))[:600]))
     assert not report, "；".join("{}：{}".format(k, "、".join(v)) for k, v in sorted(report.items()))
 
 

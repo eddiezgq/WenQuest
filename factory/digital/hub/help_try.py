@@ -7,6 +7,8 @@
 - rush-order     下一张急单：与两周情景第 1 幕同一条路（算料 → 计划员的“下单并算料”提议 → 确认，桥接写进 ERPNext）
 - overdue-pm     磨床保养逾期：与两周情景第 6 幕同一条路（maint.inject_overdue）
 - overdue-invoice 一张应收发票逾期 15 天：与两周情景第 8 幕同一条路（finance.make_overdue）
+- major-hazard   磨床防护门联锁被短接（重大隐患）：与两周情景第 5 幕同一条路（ehs.inject_major）——第 30 轮 §八 8-3 加
+- idle-saw       带锯床下班忘关、空转 4 小时：与两周情景第 7 幕同一条路（energy.inject forgot）——8-3 加
 
 规矩：
 - 只在演示工厂（企业工厂整组接口 404，见 app.py TEACH_ONLY_API）、只在教学模式（生产模式 403）；
@@ -65,6 +67,20 @@ def _overdue_invoice(H, u, who):
     return FN.make_overdue(H, MODE, x["id"], 15, who)
 
 
+def _major_hazard(H, u, who):
+    from hub import ehs as EH
+    iid = EH.inject_major(H, MODE, GRINDER, "guard", who)
+    return {"text": "已报重大隐患 SI-{:05d}：GRD-01 防护门联锁被短接。厂情中枢报“重大隐患未关闭”，处理方案里先停机挂牌整改。".format(iid),
+            "issue_id": iid}
+
+
+def _idle_saw(H, u, who):
+    from hub import energy as EN
+    EN.set_sim(H.db, MODE, True)
+    res = EN.inject(H, MODE, "forgot", who, unit="saw-01", hours=4)
+    return {"text": res["text"] + "：带锯床开着没活，空转 4 小时（工厂时间）。几个读数以后能源页的空转电量涨上来，厂情中枢报“空转能耗高”。"}
+
+
 # 动作 → 名字、允许的学生岗位（老师都能做）、做完去哪看、实现
 def _roles():
     from hub.maint_api import MANAGE                      # 设备维护：维修工、厂长
@@ -74,6 +90,8 @@ def _roles():
         "rush-order": INITIATORS,                          # 接单算料：计划员（与厂情中枢发起动作同一张表）
         "overdue-pm": MANAGE,
         "overdue-invoice": FINANCE_INITIATORS,
+        "major-hazard": tuple(ROLE_NAME),                  # 隐患谁都能报
+        "idle-saw": ("operator", "lead", "maintenance", "planner", "manager"),   # 设备开关在操作工手上；发起节能设定的是计划员、维修工、厂长
     }
 
 
@@ -82,6 +100,8 @@ ACTIONS = {
     "rush-order": {"label": "下一张急单", "look": "/work/planner", "fn": _rush_order},
     "overdue-pm": {"label": "让磨床保养逾期", "look": "/maint", "fn": _overdue_pm},
     "overdue-invoice": {"label": "让一张发票逾期 15 天", "look": "/finance", "fn": _overdue_invoice},
+    "major-hazard": {"label": "报一条重大隐患", "look": "/ehs", "fn": _major_hazard},
+    "idle-saw": {"label": "让带锯床下班忘关", "look": "/energy", "fn": _idle_saw},
 }
 ROLE_NAME = {"planner": "计划员", "engineer": "工艺员", "operator": "操作工", "quality": "质检员", "manager": "厂长", "sales": "销售",
              "service": "售后", "safety": "安全员", "maintenance": "维修工", "lead": "班组长", "approver": "审批人"}

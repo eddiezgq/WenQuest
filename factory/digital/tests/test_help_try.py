@@ -4,7 +4,8 @@
 - 只在教学模式（生产模式 403）、只在演示工厂（企业工厂整组接口 404：TEACH_ONLY_API）；
 - 学生只能按自己岗位能做的，老师都能做；没登记的动作 404；
 - 每人 60 秒一次（老师 5 秒，防连点）；失败的不算一次；
-- 各动作走的是现成的路：磨床停机 = 教师控制台的 inject_fault；急单 = 两周情景第 1 幕的下单算料提议；保养逾期、发票逾期 = 情景第 6、8 幕。"""
+- 各动作走的是现成的路：磨床停机 = 教师控制台的 inject_fault；急单 = 两周情景第 1 幕的下单算料提议；保养逾期、发票逾期 = 情景第 6、8 幕；
+  重大隐患、带锯床忘关 = 情景第 5、7 幕（8-3 加）。"""
 import json
 import os
 
@@ -105,8 +106,9 @@ def test_listing_tells_why():
     call = _client(FakeH())
     lst = call(dict(STU, role="quality"), "", method="get").json()
     assert lst["enabled"] and not lst["teacher"]
-    assert set(lst["actions"]) == {"stop-grinder", "rush-order", "overdue-pm", "overdue-invoice"}
-    assert all(not a["ok"] and "你现在是质检员" in a["why"] for a in lst["actions"].values())
+    assert set(lst["actions"]) == {"stop-grinder", "rush-order", "overdue-pm", "overdue-invoice", "major-hazard", "idle-saw"}
+    assert lst["actions"]["major-hazard"]["ok"]                                  # 隐患谁都能报
+    assert all(not a["ok"] and "你现在是质检员" in a["why"] for n, a in lst["actions"].items() if n != "major-hazard")
     lst = call(dict(TEA, mode="prod"), "", method="get").json()
     assert not lst["enabled"] and all(not a["ok"] for a in lst["actions"].values())
     lst = call(TEA, "", method="get").json()
@@ -170,3 +172,22 @@ def test_actions_do_the_real_thing(env):
     assert r.status_code == 200, r.text
     assert r.json()["invoice_id"] == x["id"] and "逾期 15 天" in r.json()["text"]
     assert H.db.one("select no_pay from invoice where id=%s", (x["id"],))["no_pay"] is True
+
+
+def test_hazard_and_idle_do_the_real_thing(env):
+    """8-3 加的两个：重大隐患（谁都能报）、带锯床下班忘关（操作工等能按，质检员不能）"""
+    from hub import ehs as EH
+    from hub import energy as EN
+    H, _ = env
+    call = _client(H)
+    EH.init(H.db)
+    n0 = EH.kpis(H.db, "teach")["major_open"]
+    r = call(dict(STU, uid="h1", role="quality"), "major-hazard")
+    assert r.status_code == 200, r.text
+    assert EH.kpis(H.db, "teach")["major_open"] == n0 + 1 and r.json()["look"] == "/ehs"
+    assert call(dict(STU, uid="h2", role="quality"), "idle-saw").status_code == 403
+    r = call(dict(STU, uid="h3", role="operator"), "idle-saw")
+    assert r.status_code == 200, r.text
+    f = (EN._state(H.db, "teach").get("faults") or {})["forgot:saw-01"]
+    assert f["hours"] == 4 and EN.sim_on(H.db, "teach")
+    assert any(c.get("command") == "set_energy" and c.get("inject") == [{"kind": "forgot", "unit": "saw-01", "hours": 4.0}] for c in H.mes.sent)

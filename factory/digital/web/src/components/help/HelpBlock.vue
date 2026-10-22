@@ -37,7 +37,16 @@
         <div v-if="layout"><dt>车间</dt><dd>{{ layout.floor[0] }} × {{ layout.floor[1] }} 米，{{ Object.keys(layout.units).length }} 台设备</dd></div>
       </dl>
     </template>
-    <p v-else-if="!loggedIn" class="small muted">登录后这里显示本厂此刻的{{ args.kind === 'kpi' ? '指标' : '设备状态' }}。</p>
+    <p v-else-if="!loggedIn" class="small muted">登录后这里显示本厂此刻的{{ args.kind === 'kpi' ? '指标' : args.kind === 'domain' ? (DOMAINS[args.domain]?.name || '') + '数据' : '设备状态' }}。</p>
+    <template v-else-if="args.kind === 'domain'">
+      <div v-if="dom" class="kgrid">
+        <div v-for="[k, label, f] in DOMAINS[args.domain].items" :key="k" class="k" :class="{ warn: warnOf(k, dom[k]) }">
+          <span class="small muted">{{ label }}</span><b>{{ fmtItem(dom[k], f, cfg?.plant?.currency) }}</b>
+        </div>
+      </div>
+      <p v-else class="small muted">{{ domErr || '正在取数……' }}</p>
+      <router-link v-if="dom" class="small" :to="DOMAINS[args.domain].page">去“{{ DOMAINS[args.domain].name }}”页看全部 →</router-link>
+    </template>
     <template v-else-if="args.kind === 'machines'">
       <div v-if="machineList.length" class="mgrid">
         <div v-for="m in machineList" :key="m.unit" class="m" :title="m.reason || ''">
@@ -73,7 +82,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { ANIMS } from './anim';
 import { get, loadConfig, session } from '../../lib/api';
@@ -86,6 +95,7 @@ import LabBlock from './LabBlock.vue';
 import TryBlock from './TryBlock.vue';
 import QuizBlock from './QuizBlock.vue';
 import { pageTitle } from '../../help/pages';
+import { DOMAINS, fmtItem, warnOf } from '../../lib/domainlive';
 
 const props = defineProps({ kind: String, args: { type: Object, default: () => ({}) }, media: { type: Array, default: () => [] } });
 const router = useRouter();
@@ -98,6 +108,9 @@ const hasVideo = computed(() => props.media.includes(props.args.name + '.webm'))
 const cfg = ref(null);
 const layout = ref(null);
 const kpis = ref([]);
+const dom = ref(null);
+const domErr = ref('');
+let domTimer;
 const machineList = computed(() => Object.entries(bus.machines).map(([unit, m]) => ({ unit, ...m })).sort((a, b) => a.unit.localeCompare(b.unit)));
 
 function go() { startTour(router, props.args.tour); }
@@ -112,7 +125,17 @@ onMounted(async () => {
   try { cfg.value = await loadConfig(); } catch { /* 没连上就不显示 */ }
   if (props.args.kind === 'plant') { try { layout.value = await get('/layout'); } catch { /* 同上 */ } }
   if (props.args.kind === 'kpi' && loggedIn.value) { try { kpis.value = (await get('/overview')).kpis || []; } catch { /* 同上 */ } }
+  if (props.args.kind === 'domain' && loggedIn.value && DOMAINS[props.args.domain]) {
+    // 每 10 秒刷新一次：上面“当场动手”按下去，这里跟着变
+    const pull = async () => {
+      try { dom.value = await get(DOMAINS[props.args.domain].api); domErr.value = ''; }
+      catch (e) { domErr.value = /403|404/.test(String(e?.message || e)) ? '这一块只在教学模式的演示工厂里有。' : '暂时取不到数据。'; }
+    };
+    await pull();
+    domTimer = setInterval(pull, 10000);
+  }
 });
+onUnmounted(() => clearInterval(domTimer));
 </script>
 
 <style scoped>
