@@ -108,8 +108,10 @@ def roller_angles(g: Globoid, phi: np.ndarray) -> np.ndarray:
 
 
 def engaged(g: Globoid, ang: np.ndarray, rho: float | None = None) -> np.ndarray:
-    """A roller can touch the cam while its axis points at the cam (cos φ > 0) and lies within the cam length."""
-    r = g.rho2 if rho is None else rho
+    """A roller can touch the cam while its axis points at the cam (cos φ > 0) and lies within the cam length. By
+    default the test is at the roller's inner end (ρ1), the part that stays in the cam longest near its end faces
+    (round 39 step 5a: with ρ2 here, the passages near the end faces were left out of the program and the checks)."""
+    r = g.rho1 if rho is None else rho
     a = np.angle(np.exp(1j * ang))
     return (np.cos(a) > 0) & (np.abs(r * np.sin(a)) <= g.L / 2 + g.rr)
 
