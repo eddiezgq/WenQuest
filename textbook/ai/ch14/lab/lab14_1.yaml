@@ -1,0 +1,26 @@
+# 实验 14.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_1.js。
+原理:
+  - ["对比学习（CLIP 一类）要做的事只有一件：学两个投影，使配对的图与文在同一个空间里靠近、同批里其余的推开。损失用 InfoNCE：分子是配对的那一对，分母是这个批里全部候选（14.1 节）。", "Contrastive learning trains two projections so that a matching image and caption land close together while the rest of the batch is pushed apart, using the InfoNCE loss (Section 14.1)."]
+  - ["批大小就是“一步能比较多少个不是它”。但在看过的样本数固定时，批越大训练步数越少，所以命中率先涨后落——SigLIP 的论文也只说“32k 已经够用”，没说越大越好。", "The batch size is how many negatives each step sees; at a fixed sample budget a larger batch also means fewer steps, so recall rises and then falls. SigLIP's paper says 32k is already enough, not that bigger is always better."]
+  - ["温度决定梯度压在“最像的那个负样本”上有多少：温度太低，几乎全压在一个样本上，训练不稳；太高则人人有份、推不开。CLIP 把温度做成可学习的，初值等效 0.07。", "The temperature decides how much gradient falls on the hardest negative: too low and almost all of it lands on one sample, too high and nothing gets pushed apart. CLIP makes it learnable, initialised at 0.07."]
+  - 式: "InfoNCE：L = −(1/B)Σ log[ exp(zᵢ·tᵢ/τ) / Σⱼ exp(zᵢ·tⱼ/τ) ]；什么都没学会时 L = ln B"
+步骤:
+  - ["“同一个空间”场景：噪声 0.5、批 64，看相似度矩阵的对角线，记下配对与不配对的平均相似度（任务 1），填表 1。", "Shared-space scene with noise 0.5 and batch 64: record the matching and non-matching similarity (task 1), fill Table 1."]
+  - ["把噪声从 0.1 调到 1.5，每档记一次两者之差：拍摄条件差到什么程度就对不上了。", "Raise the noise from 0.1 to 1.5 and record the gap at each step: how bad can the imaging get before alignment breaks down."]
+  - ["切到“检索命中率”场景，把批从 8 一档一档加到 512（看过的样本数固定），记下 R@1 与训练步数（任务 2），填表 2。", "Switch to the retrieval scene and step the batch from 8 to 512 at a fixed sample budget, recording R@1 and the number of steps (task 2); fill Table 2."]
+  - ["把温度从 0.01 调到 1，找出命中率最高的那一档（任务 3）；再把检索池从 100 加到 10000，记下瞎猜的基线与“比瞎猜好多少倍”（任务 4）。", "Sweep the temperature from 0.01 to 1 and find the best setting (task 3); then grow the pool from 100 to 10,000 and record the chance baseline and the times-better-than-chance line (task 4)."]
+数据表:
+  - 标题: ["表 1  噪声与对齐", "Table 1  Noise and alignment"]
+    表头: ["拍摄噪声", "配对的相似度", "不配对的相似度", "两者之差"]
+    表头英文: ["imaging noise", "matching", "non-matching", "gap"]
+    行: [["0.1", "", "", ""], ["0.5", "", "", ""], ["1.0", "", "", ""], ["1.5", "", "", ""]]
+  - 标题: ["表 2  批大小、温度与命中率", "Table 2  Batch size, temperature and recall"]
+    表头: ["批大小", "一步的负样本数", "训练步数", "R@1", "温度 0.01 时的 R@1", "温度 1 时的 R@1"]
+    表头英文: ["batch", "negatives", "steps", "R@1", "R@1 at τ=0.01", "R@1 at τ=1"]
+    行: [["8", "", "", "", "", ""], ["32", "", "", "", "", ""], ["128", "", "", "", "", ""], ["512", "", "", "", "", ""]]
+注意:
+  - ["实验里的“图像特征”是按属性合成的，不是真的视觉编码器输出；真模型的对齐要难得多，CLIP 用了 4 亿对图文、批 32768、几百块 V100 训了十几天（见章末公开数字）。", "The image features here are synthesised from attributes, not produced by a real vision encoder; real alignment is far harder — CLIP used 400M pairs, a batch of 32,768 and hundreds of V100s for over a week."]
+  - ["命中率按“取回的那条说的是不是同一件事”算，与 COCO、Flickr30K 每张图配五句话的口径一致；不能与“只认第 i 条”的口径混比。", "Recall counts a hit when the retrieved item describes the same thing, matching the convention of COCO and Flickr30K; do not mix it with an exact-index criterion."]
+思考题:
+  - ["同样看过的样本数下，为什么批大到一定程度反而变差？把“每步的负样本数”与“总共走了多少步”放在一起说明。", "At a fixed sample budget, why does an over-large batch hurt? Argue it from negatives per step versus the number of steps taken."]
+  - ["检索池从 100 加到 10000，瞎猜的基线掉了几十倍，而模型的 R@1 掉得少得多。这说明模型学到的是什么？报成绩时为什么必须把池子大小一起写上？", "The chance baseline falls far faster than the model's R@1 as the pool grows. What does that say about what the model learned, and why must the pool size always be reported?"]

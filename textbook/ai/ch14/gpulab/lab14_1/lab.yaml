@@ -1,0 +1,41 @@
+标题: ["GPU 实验 14.1 零样本分类：提示怎么写，差几个点", "GPU Lab 14.1 Zero-shot classification: how much the prompt is worth"]
+目的: ["把真正的 CLIP 类模型接到 14.1 节的零样本做法上：同一批合成零件图，换几种提示模板，量出准确率差多少；再看温度与相似度分布，确认书中的结论在真模型上也成立。",
+       "Run a real CLIP-style model through the zero-shot recipe of Section 14.1: with the same synthetic part images, measure how much the prompt template changes accuracy, and check the temperature and similarity distribution against the chapter's claims."]
+显卡: basic
+结果:
+  - {名: acc_bare, 说明: ["只写类别名时的准确率", "accuracy, bare class name"], 单位: "%"}
+  - {名: acc_photo, 说明: ["“一张……的照片”模板", "accuracy, a-photo-of template"], 单位: "%"}
+  - {名: acc_domain, 说明: ["带车间语境的模板", "accuracy, shop-floor template"], 单位: "%"}
+  - {名: acc_ensemble, 说明: ["多模板取平均", "accuracy, prompt ensemble"], 单位: "%"}
+  - {名: gap_pp, 说明: ["最好与最差模板相差", "best minus worst template"], 单位: "个百分点"}
+  - {名: ms_per_img, 说明: ["每张图的编码耗时", "ms per image"], 单位: "ms"}
+文件: []
+实际问题:
+  标题: ["新缺陷类型没有标注数据", "A new defect type with no labelled data"]
+  内容: ["车间新上一种工艺，出现一类以前没见过的缺陷。按第 11 章的做法要先标几千张图才能训分类器；零样本分类不用标注，把类别写成一句话就能先用起来——前提是那句话要写对。",
+         "A new process brings a defect nobody has labelled. The Chapter 11 recipe needs thousands of labelled images first; zero-shot classification needs none — you just write each class as a sentence. The catch is writing it well."]
+原理:
+  - ["CLIP 把图与文投到同一个空间，零样本分类就是：把每个类别写成一句话，取与图像相似度最高的那一句（14.1.5 节）。", "CLIP puts images and text in one space; zero-shot classification writes each class as a sentence and takes the closest one (Section 14.1.5)."]
+  - ["提示模板会改变文本那一端的嵌入，于是改变结果。CLIP 原论文报告的 ImageNet 零样本 76.2% 就是在特定模板下得到的。", "The prompt template moves the text embedding and therefore the answer; CLIP's reported 76.2% ImageNet zero-shot number comes with a particular template."]
+  - ["多模板取平均（把同一类的几种说法的嵌入平均起来）通常比任何单一模板稳。", "Averaging the embeddings of several phrasings per class is usually steadier than any single template."]
+步骤:
+  - ["运行第 1 节，生成合成零件图并载入模型（任务 1）。", "Run section 1 to generate the synthetic part images and load the model (task 1)."]
+  - ["运行第 2 节，四种提示模板各算一次准确率（任务 2，填表 1）。", "Run section 2 to score four prompt templates (task 2, Table 1)."]
+  - ["运行第 3 节，画出配对与不配对的相似度分布，与书中图 14.1.1 对照（任务 3）。", "Run section 3 to plot matching and non-matching similarity and compare with Figure 14.1.1 (task 3)."]
+  - ["运行第 4 节，记下每张图的编码耗时与一天一万张的总时间（任务 4，填表 2）。", "Run section 4 to record encoding time per image and the total for ten thousand images a day (task 4, Table 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  提示模板与准确率", "Table 1  Prompt template and accuracy"]
+    表头: ["模板", "准确率（%）", "与最好的差（个百分点）"]
+    表头英文: ["Template", "Accuracy (%)", "Gap to best (pp)"]
+    行: [["只写类别名", "", ""], ["一张……的照片", "", ""], ["车间语境模板", "", ""], ["多模板取平均", "", ""]]
+  - 标题: ["表 2  编码代价", "Table 2  Encoding cost"]
+    表头: ["批大小", "每张图耗时（ms）", "一万张的总时间（min）"]
+    表头英文: ["Batch", "ms/image", "10k images (min)"]
+    行: [["1", "", ""], ["16", "", ""], ["64", "", ""]]
+注意:
+  - ["图像由程序合成（与第 11 章同一套做法），仓库里不放照片；真实照片上的零样本准确率一般低得多，要以自己的数据为准。", "The images are synthesised as in Chapter 11; no photographs are stored in the repository. Zero-shot accuracy on real photographs is usually much lower — measure on your own data."]
+  - ["只下载公开权重的开源模型。国内部署要用已备案的模型，图像不出厂。", "Only open-weight public models are downloaded. For deployment in China use a filed model and keep the images on site."]
+思考题:
+  - ["为什么“一张……的照片”这种模板通常比只写类别名好？与训练数据里图文对的写法有什么关系？", "Why does an a-photo-of template usually beat the bare class name? How does it relate to how captions are written in the training data?"]
+  - ["零样本准确率够不够上线，由什么决定？如果不够，是先标数据训分类器，还是先改提示？", "What decides whether zero-shot accuracy is good enough to deploy? If it is not, do you label data or fix the prompt first?"]

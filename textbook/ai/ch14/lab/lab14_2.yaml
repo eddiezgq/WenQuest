@@ -1,0 +1,26 @@
+# 实验 14.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_2.js。
+原理:
+  - ["视觉塔把图切成块，每块一个词元：ViT 给的公式是 N = HW/P²，另加一个 [CLS]（14.2 节）。分辨率翻一倍，词元数是四倍。", "A vision tower cuts the image into patches, one token each: ViT's formula is N = HW/P^2 plus a [CLS] token (Section 14.2). Double the resolution and you get four times the tokens."]
+  - ["注意力里“注意力矩阵”那两步的乘加按词元数的平方涨，所以分辨率翻一倍，这两项是十六倍；键值缓存按词元数线性涨（9.4 节）。", "The two attention steps cost grows with the square of the token count, so doubling the resolution costs sixteen times more; the KV cache grows linearly (Section 9.4)."]
+  - ["两条省词元的路：把相邻 2×2 的词元合成一个（Qwen2-VL 报告的做法，省四倍），或者把变长特征重采样成固定条数（Flamingo 固定 64 个）。切片（InternVL 1.5：448×448 一片、每片 256 个词元、最多 40 片加一张缩略图）则是反过来——用更多词元换“字看得清”。", "Two ways to save: merge each 2x2 block of tokens into one (Qwen2-VL, a 4x saving) or resample variable-length features into a fixed count (Flamingo's 64). Tiling (InternVL 1.5: 448x448 tiles, 256 tokens each, up to 40 plus a thumbnail) goes the other way — more tokens to keep small print legible."]
+  - 式: "词元数 = (边长 / 块大小)² / 合并²；切片时 = (片数 + 1) × 每片词元数；注意力两项 ≈ 2 × 层数 × 词元² × 模型维度"
+步骤:
+  - ["“一页图纸”场景：关掉切片、分辨率 336，记下词元数与“尺寸数字还剩几个像素”（任务 1），填表 1。", "Drawing scene with tiling off at 336: record the token count and how many pixels a dimension label has left (task 1); fill Table 1."]
+  - ["把分辨率一档一档加到 1344，看字什么时候才认得出，代价涨了多少倍。", "Raise the resolution step by step to 1344: when does the label become legible, and how much has the cost risen?"]
+  - ["把切片边长设回 448（任务 2），再把“相邻几×几合成一个”调到 2（任务 3），与 InternVL 1.5 报告的 256 词元/片、测试上限 10496 对照。", "Set the tile size back to 448 (task 2) and the merge factor to 2 (task 3); compare with InternVL 1.5's reported 256 tokens per tile and 10,496 test cap."]
+  - ["切到“一天的量”，40 页图纸 / 300 页文字记一次，再把图纸加到 200 页（任务 4），填表 2。", "Switch to the daily scene, record 40 drawings with 300 text pages, then raise the drawings to 200 (task 4); fill Table 2."]
+数据表:
+  - 标题: ["表 1  一页图纸的几种读法", "Table 1  Ways to read one drawing"]
+    表头: ["做法", "词元数", "尺寸数字的像素高", "读得出吗", "注意力（万亿次乘加）", "键值缓存 MB"]
+    表头英文: ["setting", "tokens", "label height (px)", "legible?", "attention (T MACs)", "KV cache (MB)"]
+    行: [["整页 336", "", "", "", "", ""], ["整页 896", "", "", "", "", ""], ["切片 448，不合并", "", "", "", "", ""], ["切片 448，2×2 合并", "", "", "", "", ""]]
+  - 标题: ["表 2  一天的词元账", "Table 2  A day's token bill"]
+    表头: ["图纸页数", "文字页数", "图纸词元", "文字词元", "图纸占比", "键值缓存 GB"]
+    表头英文: ["drawings", "text pages", "drawing tokens", "text tokens", "share", "KV cache (GB)"]
+    行: [["40", "300", "", "", "", ""], ["200", "300", "", "", "", ""]]
+注意:
+  - ["键值缓存按分组查询注意力（8 组）折算，与 9.4 节同一口径；不同模型的层数、维度、分组数不同，换一个模型这笔账要重算。", "The KV cache here assumes grouped-query attention with 8 groups, matching Section 9.4; layer count, width and group count differ by model, so recompute for yours."]
+  - ["“尺寸数字还剩几个像素”只是一个粗略的可读性判据（这里取 8 个像素为界）。真实可读性还取决于字体、线宽、扫描质量与模型本身，要以实测为准。", "The pixel-height rule (8 px here) is only a rough legibility proxy; real legibility also depends on the font, line width, scan quality and the model itself — measure it."]
+思考题:
+  - ["同样要把一页图纸读清楚，“整页高分辨率”与“切片”两条路在词元数、注意力代价、显存上各是什么量级？你会选哪一条，为什么？", "To read one drawing accurately, compare the whole-page high-resolution route with tiling in tokens, attention cost and memory. Which would you choose and why?"]
+  - ["车间一天的图纸占了全部词元的九成以上。如果只能降一半成本，你会降分辨率、降页数，还是先做一道“这页值不值得送进模型”的筛选？", "Drawings account for over 90% of the daily tokens. To halve the cost, would you lower the resolution, process fewer pages, or first triage which pages are worth sending to the model at all?"]

@@ -409,3 +409,12 @@ M4,顺序求和,sequential summation,
 M4,成对求和,pairwise summation,分治地两两相加，NumPy 的默认做法
 M4,补偿求和,compensated summation,也称卡亨求和（Kahan summation）
 M4,梯度裁剪,gradient clipping,
+14,多模态,multimodal,
+14,对比学习,contrastive learning,
+14,温度,temperature,softmax 中的温度系数；与《大学物理》的温度含义不同
+14,零样本分类,zero-shot classification,把类别写成一句话，看哪句离图最近
+14,视觉语言模型,vision-language model (VLM),视觉塔 + 连接器 + 语言模型的三段式
+14,视觉词元,visual token,图被切成的块，每块在语言模型里占一个词元
+14,跨模态检索,cross-modal retrieval,
+14,视觉—语言—动作模型,vision-language-action model (VLA),把动作也写成词元
+14,关键帧,keyframe,

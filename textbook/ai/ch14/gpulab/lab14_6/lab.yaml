@@ -1,0 +1,45 @@
+标题: ["GPU 实验 14.6 让视觉语言模型读检验报告", "GPU Lab 14.6 Reading inspection reports with a VLM"]
+目的: ["把 14.6 节的那条线真跑一遍：用开源视觉语言模型从合成的检验报告图片里抽七个字段，量出字段准确率、整份全对率、以及按模型自己的把握拒答之后覆盖率与正确率各是多少；再看分辨率与切片对结果的影响。",
+       "Run the pipeline of Section 14.6 for real: have an open vision-language model pull seven fields out of synthetic inspection reports, measure field accuracy, whole-record accuracy and what abstention buys, then vary the resolution and tiling."]
+显卡: basic
+结果:
+  - {名: field_acc, 说明: ["字段级准确率", "field-level accuracy"], 单位: "%"}
+  - {名: all_ok, 说明: ["七个字段全对的比例", "whole-record accuracy"], 单位: "%"}
+  - {名: acc_scan, 说明: ["扫描件的整份全对率", "whole-record accuracy, scans"], 单位: "%"}
+  - {名: acc_phone, 说明: ["手机照片的整份全对率", "whole-record accuracy, phone photos"], 单位: "%"}
+  - {名: cov_best, 说明: ["按最优阈值自动放行的比例", "auto-accepted share at the best threshold"], 单位: "%"}
+  - {名: acc_best, 说明: ["放行那些的整份全对率", "accuracy among accepted"], 单位: "%"}
+  - {名: tok_per_page, 说明: ["每页的视觉词元数", "visual tokens per page"], 单位: "个"}
+  - {名: ms_per_page, 说明: ["每页耗时", "ms per page"], 单位: "ms"}
+文件: []
+实际问题:
+  标题: ["把图纸和报告读进质量系统", "Getting drawings and reports into the quality system"]
+  内容: ["车间每天几十页检验报告：一部分是扫描件，一部分是手机拍的，有折痕、有手写。要抽出七个字段进系统。错一条的代价远高于人工复核一条，所以系统必须能说“这一处读不清”。",
+         "Dozens of inspection reports a day, part scanned and part photographed with creases and handwriting. Seven fields must reach the quality system. A wrong record costs far more than a human review, so the system must be able to say it cannot read a field."]
+原理:
+  - ["视觉语言模型是三段式：视觉塔把图切成词元、连接器投进词嵌入空间、语言模型按提示作答（14.2 节）。", "A VLM is three parts: a vision tower that turns the image into tokens, a connector into the word-embedding space, and a language model that answers the prompt (Section 14.2)."]
+  - ["小字读不读得出，取决于它在模型眼里还剩几个像素；整页缩小会把 3 毫米的尺寸数字压到几个像素（算例 14.2.3）。", "Whether small print survives depends on how many pixels it still has; shrinking a whole page leaves a 3 mm label with about three pixels (Example 14.2.3)."]
+  - ["整份全对的概率约等于单字段准确率的七次方，所以要按整条记录报成绩（算例 14.6.1）。", "Whole-record accuracy is roughly the field accuracy to the seventh power, so report per record (Example 14.6.1)."]
+  - ["拒答阈值由代价定：错一条的代价除以复核一条的代价（14.6.5 节，与 11.8、12.7 节同一套做法）。", "The abstention threshold follows the cost ratio of a wrong record to a human review (Section 14.6.5, as in Sections 11.8 and 12.7)."]
+步骤:
+  - ["运行第 1 节，生成检验报告图片（一半扫描件、一半手机照片）并载入模型（任务 1）。", "Run section 1 to render the report images (half scans, half phone photos) and load the model (task 1)."]
+  - ["运行第 2 节，抽七个字段，记下字段准确率与整份全对率，按来源分开（任务 2，填表 1）。", "Run section 2 to extract the fields and record field and whole-record accuracy by source (task 2, Table 1)."]
+  - ["运行第 3 节，按模型给出的把握定拒答阈值，记下覆盖率与正确率（任务 3，填表 2）。", "Run section 3 to set the abstention threshold from the model's own confidence and record coverage and accuracy (task 3, Table 2)."]
+  - ["运行第 4 节，把输入分辨率降一半再跑一遍，看字段准确率掉多少、词元省多少（任务 4）。", "Run section 4 at half the input resolution and see how much accuracy falls and how many tokens are saved (task 4)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  来源与正确率", "Table 1  Source and accuracy"]
+    表头: ["来源", "份数", "字段准确率（%）", "整份全对（%）"]
+    表头英文: ["Source", "Count", "Field accuracy (%)", "Whole record (%)"]
+    行: [["扫描件", "", "", ""], ["手机照片", "", "", ""], ["合计", "", "", ""]]
+  - 标题: ["表 2  拒答阈值", "Table 2  Abstention threshold"]
+    表头: ["阈值", "自动放行（%）", "放行的全对率（%）", "转人工份数"]
+    表头英文: ["Threshold", "Accepted (%)", "Accuracy among accepted (%)", "Sent to review"]
+    行: [["不拒答", "", "", ""], ["最优阈值", "", "", ""], ["0.9", "", "", ""]]
+注意:
+  - ["报告图片由程序现画（字段、印章、手写批注、折痕与倾斜都是合成的），仓库里不放任何真实报告。", "The report images are rendered by the notebook — fields, stamps, handwriting, creases and skew are all synthetic. No real documents are stored."]
+  - ["开源小模型的准确率低于商用大模型；这里要看的是流程、相对差别与拒答带来的变化，不是绝对分数。", "An open small model scores below a commercial one; read the pipeline, the relative differences and what abstention buys, not the absolute numbers."]
+  - ["国内部署只用已备案的模型；本实验用公开权重在自己的机器上跑，图纸与报告不出厂。", "For deployment in China use a filed model; this lab runs open weights locally so the documents never leave the plant."]
+思考题:
+  - ["字段准确率 96% 听起来不错，整份全对却只有八成。向车间承诺指标时，应该报哪一个？为什么？", "A 96% field accuracy sounds good while only 80% of records are fully correct. Which number should you promise, and why?"]
+  - ["模型给出的把握要不要先校准？怎样用一批标注过的报告检查它准不准？", "Should the model's confidence be calibrated first, and how would you check it against a labelled batch?"]
