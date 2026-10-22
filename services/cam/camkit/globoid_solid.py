@@ -201,6 +201,26 @@ def blank_profile(g: G.Globoid) -> dict:
 # ----------------------------------------------------------------------------------- OpenCASCADE (OCP) builder
 
 
+def ruled_patches(gr: dict) -> list[dict]:
+    """The four closing faces of a passage's swept volume as B-splines (degree 3 along the wall's boundary, 1 across):
+    top (ρ_t) and bottom (ρ_r) between the two walls' boundary curves, and the two end caps. Built from the walls'
+    own poles, so their edges coincide exactly with the walls' boundaries."""
+    from scipy.interpolate import BSpline
+
+    out = []
+    a, b = gr["plus"], gr["minus"]
+    tu, tv = a["tu"], a["tv"]
+    for v in (tv[0], tv[-1]):
+        w = BSpline.design_matrix(np.array([v]), tv, 3).toarray()[0]
+        ca, cb = np.einsum("ijk,j->ik", a["poles"], w), np.einsum("ijk,j->ik", b["poles"], w)
+        out.append({"tu": tu, "tv": np.array([0.0, 0.0, 1.0, 1.0]), "poles": np.stack([ca, cb], axis=1), "deg": (3, 1)})
+    for u in (tu[0], tu[-1]):
+        w = BSpline.design_matrix(np.array([u]), tu, 3).toarray()[0]
+        ca, cb = np.einsum("ijk,i->jk", a["poles"], w), np.einsum("ijk,i->jk", b["poles"], w)
+        out.append({"tu": tv, "tv": np.array([0.0, 0.0, 1.0, 1.0]), "poles": np.stack([ca, cb], axis=1), "deg": (3, 1)})
+    return out
+
+
 def knots_mults(t: np.ndarray) -> tuple[list[float], list[int]]:
     """A full knot vector as distinct knots and their multiplicities (what CAD kernels take)."""
     ks, ms = [], []
@@ -220,7 +240,6 @@ def build_ocp(g: G.Globoid, prog: Program, bore: float = 0.0, tol: float = 0.25e
     from OCP.BRepBuilderAPI import (BRepBuilderAPI_MakeEdge, BRepBuilderAPI_MakeFace, BRepBuilderAPI_MakeSolid,
                                     BRepBuilderAPI_MakeWire, BRepBuilderAPI_Sewing)
     from OCP.BRepCheck import BRepCheck_Analyzer
-    from OCP.BRepFill import BRepFill
     from OCP.BRepPrimAPI import BRepPrimAPI_MakeCylinder, BRepPrimAPI_MakeRevol
     from OCP.GC import GC_MakeArcOfCircle
     from OCP.Geom import Geom_BSplineSurface
@@ -257,7 +276,8 @@ def build_ocp(g: G.Globoid, prog: Program, bore: float = 0.0, tol: float = 0.25e
                 poles.SetValue(i + 1, j + 1, gp_Pnt(*map(float, P[i, j])))
         ku, mu = knots_mults(sf["tu"])
         kv, mv = knots_mults(sf["tv"])
-        return Geom_BSplineSurface(poles, arr1(A1R, ku), arr1(A1R, kv), arr1(A1I, mu), arr1(A1I, mv), 3, 3)
+        du, dv = sf.get("deg", (3, 3)) if isinstance(sf.get("deg"), tuple) else (3, 3)
+        return Geom_BSplineSurface(poles, arr1(A1R, ku), arr1(A1R, kv), arr1(A1I, mu), arr1(A1I, mv), du, dv)
 
     info = {"grooves": []}
     h = g.L / 2
@@ -275,17 +295,8 @@ def build_ocp(g: G.Globoid, prog: Program, bore: float = 0.0, tol: float = 0.25e
         shape = BRepAlgoAPI_Cut(shape, cyl).Shape()
 
     for gr in grids(g, prog, tol):
-        sp, sm = bspline(gr["plus"]), bspline(gr["minus"])
-        faces = [BRepBuilderAPI_MakeFace(sp, 1e-7).Face(), BRepBuilderAPI_MakeFace(sm, 1e-7).Face()]
-        u0, u1, v0, v1 = sp.Bounds()
-        edges = {}
-        for name, s in (("p", sp), ("m", sm)):
-            edges[name + "top"] = BRepBuilderAPI_MakeEdge(s.VIso(v0)).Edge()
-            edges[name + "bot"] = BRepBuilderAPI_MakeEdge(s.VIso(v1)).Edge()
-            edges[name + "in"] = BRepBuilderAPI_MakeEdge(s.UIso(u0)).Edge()
-            edges[name + "out"] = BRepBuilderAPI_MakeEdge(s.UIso(u1)).Edge()
-        for e in ("top", "bot", "in", "out"):
-            faces.append(static(BRepFill, "Face")(edges["p" + e], edges["m" + e]))
+        faces = [BRepBuilderAPI_MakeFace(bspline(sf), 1e-7).Face()
+                 for sf in [gr["plus"], gr["minus"], *ruled_patches(gr)]]
         sew = BRepBuilderAPI_Sewing(1e-5)
         for f in faces:
             sew.Add(f)
@@ -409,3 +420,44 @@ def bottom_check(g: G.Globoid, prog: Program, gr: dict, n_theta: int = 25, n_s: 
             if inside.any():
                 worst = max(worst, float(-np.maximum(dr, de)[inside].min()))
     return worst
+
+
+# ----------------------------------------------------------------------------------- FreeCAD (Part) builder
+
+
+def build_part(g: G.Globoid, prog: Program, Part, Vector, bore: float = 0.0, tol: float = 0.25e-3):
+    """The same solid with FreeCAD's Part module (passed in, so camkit does not import FreeCAD). Cam frame, axis z.
+    Returns (shape, info)."""
+    info = {"grooves": []}
+    h = g.L / 2
+    r0 = g.C - math.sqrt(g.rho1**2 - h * h)
+    arc = Part.Arc(Vector(r0, 0, -h), Vector(g.C - g.rho1, 0, 0), Vector(r0, 0, h))
+    w = Part.Wire([Part.LineSegment(Vector(0, 0, -h), Vector(r0, 0, -h)).toShape(), arc.toShape(),
+                   Part.LineSegment(Vector(r0, 0, h), Vector(0, 0, h)).toShape(),
+                   Part.LineSegment(Vector(0, 0, h), Vector(0, 0, -h)).toShape()])
+    shape = Part.Face(w).revolve(Vector(0, 0, 0), Vector(0, 0, 1), 360)
+    if bore > 0:
+        shape = shape.cut(Part.makeCylinder(bore / 2, g.L + 2, Vector(0, 0, -h - 1), Vector(0, 0, 1)))
+
+    def bspline(sf):
+        ku, mu = knots_mults(sf["tu"])
+        kv, mv = knots_mults(sf["tv"])
+        P = sf["poles"]
+        du, dv = sf["deg"] if isinstance(sf.get("deg"), tuple) else (3, 3)
+        poles = [[Vector(*map(float, P[i, j])) for j in range(P.shape[1])] for i in range(P.shape[0])]
+        s = Part.BSplineSurface()
+        s.buildFromPolesMultsKnots(poles, mu, mv, ku, kv, False, False, du, dv)
+        return s
+
+    for gr in grids(g, prog, tol):
+        sh = Part.Shell([bspline(sf).toShape() for sf in [gr["plus"], gr["minus"], *ruled_patches(gr)]])
+        sh.sewShape()
+        tool = Part.Solid(sh)
+        if tool.Volume < 0:
+            tool.reverse()
+        shape = shape.cut(tool)
+        info["grooves"].append({"roller": gr["roller"], "deg0": math.degrees(gr["theta0"]),
+                                "deg1": math.degrees(gr["theta1"]), "sites": len(gr["theta"]),
+                                "fit_err_um": gr["fit_err"] * 1000})
+    info["valid"] = bool(shape.isValid())
+    return shape, info

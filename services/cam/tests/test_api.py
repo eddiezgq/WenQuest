@@ -82,3 +82,26 @@ def test_image_copies_every_service_module():
     # 构建上下文的白名单（Dockerfile.dockerignore）也要放行：只改 Dockerfile 时线上仍然缺 system_api.py
     ignore = (here / "Dockerfile.dockerignore").read_text(encoding="utf-8").splitlines()
     assert "!services/cam/*.py" in ignore or all(f"!services/cam/{m}" in ignore for m in mods), mods
+
+
+def test_freecad_pack():
+    """第 39 轮第 5 步：FreeCAD 工作台包——工作台（InitGui + wq_workbench）、凸轮页、camkit、示例项目、说明。"""
+    import io
+    import zipfile
+    from pathlib import Path
+
+    r = client.get("/api/freecad.zip")
+    assert r.status_code == 200 and r.headers["content-type"] == "application/zip"
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    names = set(z.namelist())
+    root = "wenquest-cam-freecad/Mod/WenQuest/"
+    for f in ("InitGui.py", "wq_workbench.py", "wq_cam.py", "wq_cam_drawing.py", "camkit/globoid_solid.py",
+              "camkit/__init__.py", "examples/atc-globoidal.wqcam.json"):
+        assert root + f in names, f
+    assert not any("__pycache__" in n or n.endswith(".cae.wqcam.json") for n in names)
+    here = Path(__file__).resolve().parents[1]
+    assert {root + "camkit/" + f.name for f in (here / "camkit").glob("*.py")} <= names
+    # the image gets the workbench files too (the build allow-list and the Dockerfile name them)
+    ignore = (here / "Dockerfile.dockerignore").read_text(encoding="utf-8")
+    docker = (here / "Dockerfile").read_text(encoding="utf-8")
+    assert "!services/cam/freecad" in ignore and "wq_workbench.py" in ignore and "wq_workbench.py" in docker

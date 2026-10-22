@@ -8,6 +8,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { system, sysResult, sysPayload } from '../sysstore'
 import { api, saveText } from '../api'
 import { t, lang } from '../i18n'
+const fcHref = import.meta.env.BASE_URL + 'api/freecad.zip'
 
 const box = ref(null)
 const theta = ref(0)
@@ -199,7 +200,9 @@ async function download(kind) {
         <button type="button" class="ghost" :disabled="!glob" @click="download('stl')">{{ t('stl') }}</button>
         <button type="button" class="ghost" :disabled="!glob" @click="download('nc4')">{{ t('nc4') }}</button>
         <button type="button" class="ghost" :disabled="!system.arm" @click="download('arm-step')">{{ t('armStep') }}</button>
+        <a class="ghost fc" :href="fcHref" download>{{ t('fcPack') }}</a>
       </div>
+      <p class="note">{{ t('fcNote') }}</p>
       <p v-if="msg" class="note">{{ msg }}</p>
       <p class="note">{{ t('model3dNote') }}</p>
       <p class="note">{{ lang === 'zh' ? '鼠标拖动旋转、滚轮缩放。三维画面里的换刀臂、刀具、轴是示意；弧面凸轮和滚子按实际尺寸。' : 'Drag to turn, scroll to zoom. The arm, tools and shafts are schematic; the globoidal cam and rollers are to size.' }}</p>
@@ -214,6 +217,7 @@ async function download(kind) {
 .three { width: 100%; height: 100%; min-height: 380px; min-width: 0; overflow: hidden; }
 .three :deep(canvas) { display: block; max-width: 100%; }
 .dl { display: grid; gap: 6px; margin: 6px 0; }
+.dl .fc { text-align: center; text-decoration: none; display: block; }
 .note { font-size: 12.5px; color: var(--muted); }
 @media (max-width: 760px) { .s3d { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; } .s3d .side, .view3d { grid-column: 1; grid-row: auto; } .view3d { height: 70vh; } }
 </style>

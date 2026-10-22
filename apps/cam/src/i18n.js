@@ -113,6 +113,7 @@ const W = {
   searchNote: ['每种运动规律都试一遍；填了允许振动或电机额定值时，再求能满足它们的最高转速。只用你填的限值。', 'Tries every motion law; with an allowed vibration or motor ratings, also finds the highest speed that meets them. Only your own limits are used.'],
   adopt: ['采用', 'Adopt'], rpmMax: ['最高转速', 'Top speed'], atRpm: ['当前转速下', 'At the current speed'],
   stl: ['弧面凸轮三维模型 .stl', 'Globoidal cam 3D model .stl'], nc4: ['四轴加工程序 .nc', '4-axis program .nc'], armStep: ['换刀臂 .step', 'Arm .step'],
+  fcPack: ['FreeCAD 工作台 .zip', 'FreeCAD workbench .zip'], fcNote: ['在 FreeCAD 里打开本项目（先“保存为文件”）：同一个计算内核重算校核，建精确实体（弧面凸轮按加工方法），凸轮系统装配可拖转角，出工作图。', 'Open this project in FreeCAD (save it as a file first): the same kernel recomputes the checks, builds exact solids (the globoidal cam as machined), assembles a cam system you can turn, and draws the parts.'],
   model3dNote: ['弧面凸轮模型按加工方法生成：与滚子同尺寸的刀具沿每个滚子的路径扫过毛坯。', 'The globoidal cam is made the way it is machined: a cutter the size of a roller sweeps every roller\'s path through the blank.'],
   simResult: ['程序仿真', 'Program simulation'], arm: ['换刀臂', 'Tool-changer arm'],
   armRtip: ['刀爪中心半径', 'Gripper centre radius'], armRhub: ['轮毂半径', 'Hub radius'], armBore: ['轴孔半径', 'Bore radius'],
