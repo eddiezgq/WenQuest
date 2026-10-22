@@ -1,0 +1,31 @@
+# 实验 25.1 的指导书与报告模板。目的、场景、参数、任务取自 lab25_1.js。
+原理:
+  - ["连杆坐标系 {i} 固定在连杆 i 上，原点在关节 i 的轴上；关节 i 的旋量轴在 {i} 中是常数 𝒜_i = (ω_i, 0)。相邻两个连杆坐标系的位姿为：", "Frame {i} is fixed to link i with its origin on joint i's axis; joint i's screw axis in {i} is the constant 𝒜_i = (ω_i, 0). The pose between neighbouring frames is:"]
+  - 式: "T_{i,i−1} = e^{−[𝒜_i]θ_i} M_{i,i−1}"
+  - ["前向递推（式 (25.1.3)、(25.1.4)）：从基座出发，每过一个关节，把上一个连杆的运动旋量换到本连杆的坐标系，再加上这个关节自己的转动：", "Forward recursion (Eqs. 25.1.3 and 25.1.4): start at the base, carry the previous link's twist into this link's frame and add this joint's own motion:"]
+  - 式: "𝒱_i = [Ad_{T_{i,i−1}}]𝒱_{i−1} + 𝒜_i θ̇_i，𝒱̇_i = [Ad_{T_{i,i−1}}]𝒱̇_{i−1} + [ad_{𝒱_i}]𝒜_i θ̇_i + 𝒜_i θ̈_i"
+  - ["𝒱̇_i 是运动旋量分量的导数。连杆原点的加速度还要加上 ω × v（式 (25.1.6)）；关节都匀速转动时它一般也不为零。取 𝒱̇₀ = (0, −𝔤)（基座以 𝔤 向上加速）代替重力，MuJoCo 也是这样做的。", "𝒱̇_i is the derivative of the twist's components. The acceleration of the link origin adds ω × v (Eq. 25.1.6); it is generally non-zero even with every joint at constant speed. Taking 𝒱̇₀ = (0, −g) (the base accelerating upward at g) replaces gravity; MuJoCo does the same."]
+步骤:
+  - ["场景“关节匀速转动”：只让关节 1 以 1 rad/s 转动，按“开始”，读出六个连杆的角速度（任务 1），填入表 1。", "Scene “Joints at constant speed”: turn joint 1 only at 1 rad/s, press Start and record the six links' angular rates (task 1) in Table 1."]
+  - ["只让关节 2、3 各以 1 rad/s 转动，读出各连杆的角速度（任务 2），填入表 1；再试关节 2 为 1 rad/s、关节 3 为 −1 rad/s。", "Turn joints 2 and 3 only at 1 rad/s each and record the angular rates (task 2) in Table 1; then try joint 2 at 1 rad/s and joint 3 at −1 rad/s."]
+  - ["按表 2 设置角速度，读出连杆 6 原点（腕 3 中心）的加速度（含与不含“向上 𝔤”），找出使它超过 1 m/s² 的一组（任务 3）。", "Set the rates of Table 2, record the acceleration of link 6's origin (the wrist 3 centre) (with and without the upward g) and find a setting that makes it exceed 1 m/s² (task 3)."]
+  - ["场景“上下料动作中的速度”：按“开始”，读出 TCP 速度的最大值和时刻，以及递推与 MuJoCo 的最大差别（任务 4），填入表 3。", "Scene “Speeds during the loading move”: press Start and record the peak TCP speed, its time, and the largest difference between the recursion and MuJoCo (task 4) in Table 3."]
+数据表:
+  - 标题: ["表 1  各连杆的角速度 |ω_i|（θ = θ_A）", "Table 1  Angular rates |ω_i| of the links (θ = θ_A)"]
+    表头: ["θ̇ / (rad/s)", "|ω₁|", "|ω₂|", "|ω₃|", "|ω₄|", "|ω₅|", "|ω₆|"]
+    表头英文: ["θ̇ / (rad/s)", "|ω₁|", "|ω₂|", "|ω₃|", "|ω₄|", "|ω₅|", "|ω₆|"]
+    行: [["(1, 0, 0, 0, 0, 0)", "", "", "", "", "", ""], ["(0, 1, 1, 0, 0, 0)", "", "", "", "", "", ""], ["(0, 1, −1, 0, 0, 0)", "", "", "", "", "", ""]]
+  - 标题: ["表 2  关节匀速转动时连杆 6 原点的加速度", "Table 2  Acceleration of link 6's origin with the joints at constant speed"]
+    表头: ["θ̇ / (rad/s)", "含“向上 𝔤” / (m/s²)", "不含 / (m/s²)", "与 MuJoCo 的差别"]
+    表头英文: ["θ̇ / (rad/s)", "With upward g / (m/s²)", "Without / (m/s²)", "Difference from MuJoCo"]
+    行: [["(0, 0, 0, 0, 0, 0)", "", "", ""], ["(1, 0, 0, 0, 0, 0)", "", "", ""], ["(1.5, 0.5, 0, 0, 0, 0)", "", "", ""], ["(自选)", "", "", ""]]
+    行英文: [["(0, 0, 0, 0, 0, 0)", "", "", ""], ["(1, 0, 0, 0, 0, 0)", "", "", ""], ["(1.5, 0.5, 0, 0, 0, 0)", "", "", ""], ["(your choice)", "", "", ""]]
+  - 标题: ["表 3  上下料动作中的速度", "Table 3  Speeds during the loading move"]
+    表头: ["TCP 速度最大值 / (m/s)", "时刻 / s", "速度的最大差别", "加速度的最大差别"]
+    表头英文: ["Peak TCP speed / (m/s)", "Time / s", "Largest velocity difference", "Largest acceleration difference"]
+    行: [["", "", "", ""]]
+注意:
+  - ["关节角、角速度由页面直接写进 MuJoCo（运动学回放），MuJoCo 只用来算各连杆的运动作比较；递推用的连杆数据也从同一个模型读出。", "The joint angles and rates are written into MuJoCo directly (kinematic playback); MuJoCo is used only to compute the links' motion for comparison, and the recursion reads its link data from the same model."]
+  - ["上下料动作的位姿和时间取自第 22 章（算例 22.1.1），放慢 2 倍播放；速度的数值与播放快慢无关。", "The poses and timing of the loading move come from Chapter 22 (Example 22.1.1) and are played back 2x slower; the speeds do not depend on the playback rate."]
+思考题:
+  - ["关节都匀速转动时，法兰的加速度是从哪里来的？把式 (25.1.4) 中的 [ad_𝒱]𝒜θ̇ 项和第 10 章的向心加速度、科氏加速度对照一下。", "Where does the flange's acceleration come from when every joint turns steadily? Compare the [ad_𝒱]𝒜θ̇ term of Eq. (25.1.4) with the centripetal and Coriolis accelerations of Chapter 10."]

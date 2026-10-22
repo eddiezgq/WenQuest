@@ -1,0 +1,35 @@
+# 实验 25.2 的指导书与报告模板。目的、场景、参数、任务取自 lab25_2.js。
+原理:
+  - ["反向递推（式 (25.2.1)）：从末端出发，每个连杆的牛顿-欧拉方程给出关节 i 传给连杆 i 的力旋量：", "Backward recursion (Eq. 25.2.1): from the tip inward, each link's Newton–Euler equation gives the wrench that joint i passes to link i:"]
+  - 式: "ℱ_i = [Ad_{T_{i+1,i}}]ᵀℱ_{i+1} + 𝒢_i𝒱̇_i − [ad_{𝒱_i}]ᵀ𝒢_i𝒱_i"
+  - ["关节力矩是 ℱ_i 在关节轴上的分量，加上电机转子的惯性力矩（式 (25.2.2)、(25.2.3)）：", "The joint torque is the component of ℱ_i along the joint axis, plus the rotor's inertial torque (Eqs. 25.2.2 and 25.2.3):"]
+  - 式: "τ_i = 𝒜_iᵀℱ_i + k_r²J_m θ̈_i"
+  - ["ℱ_i 的其余五个分量由轴承和减速器承受：沿轴的力（轴向力）、垂直于轴的力（径向力）、垂直于轴的力矩（弯曲或倾覆力矩，相对关节坐标系的原点）。", "The other five components of ℱ_i are carried by the bearings and gearbox: the force along the axis (axial), the force across it (radial) and the moment across it (tilting, about the joint frame's origin)."]
+步骤:
+  - ["场景“静止地拿着”：装 3.8 kg，换一个姿态，比较递推与 MuJoCo 的关节力矩和关节力旋量（任务 1），填入表 1。", "Scene “Holding still”: with 3.8 kg and a new pose, compare the recursion's joint torques and joint wrenches with MuJoCo (task 1), Table 1."]
+  - ["看关节 1，改变姿态和负载，读出轴向力，与手臂（16.99 kg）加负载的重力比较（任务 2），填入表 2。", "Inspect joint 1, change the pose and payload, and compare its axial force with the weight of the arm (16.99 kg) plus the payload (task 2), Table 2."]
+  - ["θ₂ = θ₃ = 0、θ₄ = −90°，负载依次为 0 和 5 kg，读出关节 2 的力矩（任务 3），填入表 3。", "With θ₂ = θ₃ = 0 and θ₄ = −90°, set the payload to 0 and 5 kg and record joint 2's torque (task 3), Table 3."]
+  - ["场景“上下料动作中的关节受力”：装 3.8 kg，看关节 2，按“开始”，读出弯曲力矩与径向力的峰值以及只有重力时的值（任务 4），填入表 4。", "Scene “Joint loads during the loading move”: with 3.8 kg, inspect joint 2, press Start and record the peak tilting moment and radial force and their gravity-only values (task 4), Table 4."]
+数据表:
+  - 标题: ["表 1  递推与 MuJoCo 的比较（3.8 kg）", "Table 1  Recursion against MuJoCo (3.8 kg)"]
+    表头: ["θ₂, θ₃, θ₄ / (°)", "τ₂ / (N·m)", "τ₃ / (N·m)", "τ 的最大差别", "ℱ 的最大差别"]
+    表头英文: ["θ₂, θ₃, θ₄ / (°)", "τ₂ / (N·m)", "τ₃ / (N·m)", "Largest τ difference", "Largest ℱ difference"]
+    行: [["", "", "", "", ""], ["", "", "", "", ""]]
+  - 标题: ["表 2  关节 1 的轴向力", "Table 2  Axial force at joint 1"]
+    表头: ["姿态", "负载 / kg", "轴向力 / N", "(16.99 + 负载) × 9.81 / N", "弯曲力矩 / (N·m)"]
+    表头英文: ["Pose", "Payload / kg", "Axial force / N", "(16.99 + payload) × 9.81 / N", "Tilting moment / (N·m)"]
+    行: [["", "0", "", "", ""], ["", "3.8", "", "", ""], ["", "8", "", "", ""]]
+  - 标题: ["表 3  手臂水平伸直时关节 2 的力矩", "Table 3  Joint 2 torque with the arm stretched horizontally"]
+    表头: ["负载 / kg", "τ₂ / (N·m)", "其中负载的部分 / (N·m)"]
+    表头英文: ["Payload / kg", "τ₂ / (N·m)", "Payload's share / (N·m)"]
+    行: [["0", "", "—"], ["5", "", ""]]
+  - 标题: ["表 4  上下料动作中关节 2 的受力（3.8 kg）", "Table 4  Loads at joint 2 during the loading move (3.8 kg)"]
+    表头: ["", "弯曲力矩峰值 / (N·m)", "径向力峰值 / N"]
+    表头英文: ["", "Peak tilting moment / (N·m)", "Peak radial force / N"]
+    行: [["实际动作", "", ""], ["只有重力", "", ""], ["之比", "", ""]]
+    行英文: [["Actual move", "", ""], ["Gravity only", "", ""], ["Ratio", "", ""]]
+注意:
+  - ["手臂的质量、惯量来自书中的模型（MuJoCo Menagerie），不含基座；转子等效惯量是模型中的 armature = 0.1 kg·m²。负载是算例 23.2.2 的夹爪 + 毛坯按质量等比缩放，是示意值。", "The arm's masses and inertias come from the book's model (MuJoCo Menagerie), base excluded; the rotor inertia is the model's armature of 0.1 kg·m². The payload is Example 23.2.2's gripper and blank scaled by mass, an illustrative value."]
+  - ["弯曲力矩是相对关节坐标系原点（模型中 body 坐标系的原点）计算的；轴承的实际位置不同，弯曲力矩也不同，但力和绕轴力矩不变。", "The tilting moment is taken about the joint frame's origin (the model's body origin); about the real bearing position it would differ, while the forces and the moment about the axis would not."]
+思考题:
+  - ["关节 1 的轴向力等于整条手臂的重力，与姿态无关；它的弯曲力矩却随姿态变化很大。选关节 1 的轴承时，哪个量更要紧？", "Joint 1's axial force equals the whole arm's weight whatever the pose, but its tilting moment varies greatly with pose. Which matters more when choosing joint 1's bearing?"]
