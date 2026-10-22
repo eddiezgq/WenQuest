@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:01<00:00,  1.55s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:50:57,219 INFO synthesis text The hook shaft runs front to back, so as the hook point passes the needle it moves sideways.
+2026-10-22 02:51:01,786 INFO yield speech len 8.52, rtf 0.5360413325224684
+
+100%|██████████| 1/1 [00:04<00:00,  4.74s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:01,965 INFO synthesis text With the needle at the two ends, the point has to turn an extra w over R to get from one to the other; the hook turns twice as fast as the shaft, so the shaft angle differs by half that: delta phi equals w over twoR.
+2026-10-22 02:51:11,264 INFO yield speech len 17.72, rtf 0.5247710924385364
+
+100%|██████████| 1/1 [00:09<00:00,  9.48s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:11,514 INFO synthesis text With R thirteen.five millimetres and an eight-millimetre bight, that's about seventeen degrees.
+2026-10-22 02:51:16,545 INFO yield speech len 9.56, rtf 0.5262065881465768
+
+100%|██████████| 1/1 [00:05<00:00,  5.27s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:16,731 INFO synthesis text The point sweeps right to left, so the right end is caught first, when the needle has risen only about one.one millimetres, against three.eight at the left: nearly three millimetres apart.
+2026-10-22 02:51:24,615 INFO yield speech len 14.76, rtf 0.534199569929583
+
+100%|██████████| 1/1 [00:08<00:00,  8.06s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:24,802 INFO synthesis text Both ends must be caught while the loop is big enough, and that limits the bight.
+2026-10-22 02:51:28,678 INFO yield speech len 7.16, rtf 0.5413264868645694
+
+100%|██████████| 1/1 [00:04<00:00,  4.05s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:28,857 INFO synthesis text With Lecture five's hook window, a rise of about one.five to two.eight millimetres, the maximum bight is only about four.zero millimetres.
+2026-10-22 02:51:36,682 INFO yield speech len 14.92, rtf 0.5244328413188617
+
+100%|██████████| 1/1 [00:08<00:00,  8.01s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:36,871 INFO synthesis text With Lecture ten's illustrative criterion, one.zero to four.two, the two ends can differ by about twenty degrees, which allows about nine.five millimetres.
+2026-10-22 02:51:44,110 INFO yield speech len 13.8, rtf 0.5245413987532905
+
+100%|██████████| 1/1 [00:07<00:00,  7.42s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.42s/it]
+cv2: 130/185 句，用时 12.4 分钟，预计还要 5.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:44,292 INFO synthesis text The manual goes up to ten, so the real loop window is clearly much wider than the Lecture five model; it has to be measured.
+2026-10-22 02:51:50,011 INFO yield speech len 10.88, rtf 0.5256304626955706
+
+100%|██████████| 1/1 [00:05<00:00,  5.89s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:50,191 INFO synthesis text Buttonholes, buttons, bartacks and embroidery.
+2026-10-22 02:51:52,679 INFO yield speech len 4.28, rtf 0.5812034428676712
+
+100%|██████████| 1/1 [00:02<00:00,  2.66s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:52,727 WARNING synthesis text Buttonholers come in two kinds. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:51:52,856 INFO synthesis text Buttonholers come in two kinds.
+2026-10-22 02:51:54,428 INFO yield speech len 2.24, rtf 0.701809674501419
+
+100%|██████████| 1/1 [00:01<00:00,  1.74s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:54,607 INFO synthesis text The straight buttonhole on shirts is three hundred and four zigzag: one row of zigzag, a bartack, the other row and the other bartack, then the knife cuts it open, five steps in all.
+2026-10-22 02:52:02,246 INFO yield speech len 14.36, rtf 0.5319854509199562
+
+100%|██████████| 1/1 [00:07<00:00,  7.82s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:02,430 INFO synthesis text Sewing first and then cutting gives neat edges; cutting first frays less.
+2026-10-22 02:52:05,550 INFO yield speech len 5.84, rtf 0.5342310422087369
+
+100%|██████████| 1/1 [00:03<00:00,  3.29s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:05,730 INFO synthesis text The keyhole buttonhole on suits, coats and jeans is four hundred and four, a single-needle two-thread zigzag chainstitch wrapped round a gimp cord; around the round end, needle and looper have to rotate about its centre.
+2026-10-22 02:52:15,167 INFO yield speech len 18.12, rtf 0.520826004462
+
+100%|██████████| 1/1 [00:09<00:00,  9.63s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:15,364 INFO synthesis text Mechanical button sewers and bartackers are built alike: the shaft drives a pattern cam through a large worm-gear reduction, and one turn of the cam is one complete pattern.
+2026-10-22 02:52:23,531 INFO yield speech len 15.52, rtf 0.52627977943912
+
+100%|██████████| 1/1 [00:08<00:00,  8.35s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:23,718 INFO synthesis text Two grooves on the cam drive the button clamp or work clamp through X and Y levers.
+2026-10-22 02:52:27,612 INFO yield speech len 7.04, rtf 0.5531184713948857
+
+100%|██████████| 1/1 [00:04<00:00,  4.07s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.07s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:27,789 INFO synthesis text Each step of the cam moves the clamp one stitch, and the rising part of every step must line up with the angle when the needle is out of the fabric.
+2026-10-22 02:52:34,036 INFO yield speech len 11.96, rtf 0.5222626354383385
+
+100%|██████████| 1/1 [00:06<00:00,  6.43s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:34,223 INFO synthesis text Button sewers often use a single-thread one hundred and one chainstitch with an anti-unravel device; bartackers use lockstitch, an underlay first, then a cover.
+2026-10-22 02:52:41,420 INFO yield speech len 13.4, rtf 0.5370236688585424
+
+100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+cv2: 140/185 句，用时 13.3 分钟，预计还要 4.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:41,604 INFO synthesis text A multi-needle quilter carries dozens of needles on one beam, each with its own looper, sewing many parallel rows of four hundred and one at once.
+2026-10-22 02:52:48,114 INFO yield speech len 12.12, rtf 0.537139393708887
+
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:48,296 INFO synthesis text An embroidery head has nine to fifteen needle bars; one driver works only the bar lined up with it, and to change colour the whole needle-bar case shifts sideways.
+2026-10-22 02:52:55,781 INFO yield speech len 14.08, rtf 0.5316377871415832
+
+100%|██████████| 1/1 [00:07<00:00,  7.66s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:55,964 INFO synthesis text Multi-head machines share upper and lower shafts.
+2026-10-22 02:52:58,932 INFO yield speech len 5.28, rtf 0.5621016928643892
+
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:59,109 INFO synthesis text Embroidery machines run at only about a quarter of lockstitch speed, about one thousand, two hundred r/min on one model, because the frame is heavy and every move of a few millimetres must be finished while the needle is out of the fabric.
+2026-10-22 02:53:08,392 INFO yield speech len 17.4, rtf 0.5335268069957865
+
+100%|██████████| 1/1 [00:09<00:00,  9.47s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:08,587 INFO synthesis text Back to the shop-floor problem, with numbers.
+2026-10-22 02:53:11,045 INFO yield speech len 4.16, rtf 0.590874942449423
+
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:11,221 INFO synthesis text The shaft turns at five hundred and twenty-four radians per second, and one hundred and seventy degrees is two.ninety-seven radians.
+2026-10-22 02:53:16,786 INFO yield speech len 10.44, rtf 0.5330765384367143
+
+100%|██████████| 1/1 [00:05<00:00,  5.74s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:16,973 INFO synthesis text Modified trapezoid: a peak of about one thousand, two hundred and eighteen metres per second squared; times zero.fifteen kilograms, about one hundred and eighty-three newtons.
+2026-10-22 02:53:23,732 INFO yield speech len 12.6, rtf 0.5364176016005259
+
+100%|██████████| 1/1 [00:06<00:00,  6.94s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:23,914 INFO synthesis text Cycloidal: about one thousand, five hundred and sixty-five, giving about two hundred and thirty-five newtons.
+2026-10-22 02:53:28,327 INFO yield speech len 8.2, rtf 0.5382171200542916
+
+100%|██████████| 1/1 [00:04<00:00,  4.59s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:28,376 WARNING synthesis text Both are under two hundred and fifty. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:53:28,506 INFO synthesis text Both are under two hundred and fifty.
+2026-10-22 02:53:30,123 INFO yield speech len 2.32, rtf 0.6967216730117798
+
+100%|██████████| 1/1 [00:01<00:00,  1.79s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:30,301 INFO synthesis text Squeeze to one hundred and twenty degrees and the acceleration is multiplied by one hundred and seventy over one hundred and twenty squared, about two.zero: about four hundred and seventy-one newtons cycloidal and three hundred and sixty-seven modified trapezoid, both over the limit.
+2026-10-22 02:53:41,552 INFO yield speech len 21.48, rtf 0.5238297709317624
+
+100%|██████████| 1/1 [00:11<00:00, 11.44s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.44s/it]
+cv2: 150/185 句，用时 14.3 分钟，预计还要 3.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:41,747 INFO synthesis text Choosing a swing law is the time-scaling step of robot trajectory planning: to cover a distance w in a time T, the peak acceleration goes with w over T squared, so halving the time quadruples the acceleration and the motor torque.
+2026-10-22 02:53:52,644 INFO yield speech len 20.68, rtf 0.5269766891486871
+
+100%|██████████| 1/1 [00:11<00:00, 11.08s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:52,837 INFO synthesis text The S-curve profiles of servo drives, which limit jerk, follow the same idea as the modified trapezoid: continuous acceleration, no shock, and a moderate peak.
+2026-10-22 02:54:00,499 INFO yield speech len 14.56, rtf 0.5262608056540018
+
+100%|██████████| 1/1 [00:07<00:00,  7.84s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:00,683 INFO synthesis text A dispensing or welding robot may make big sideways moves only while its tool is off the workpiece: the same rule as a needle that may swing only when it's out of the fabric.
+2026-10-22 02:54:09,091 INFO yield speech len 15.96, rtf 0.5268011923720664
+
+100%|██████████| 1/1 [00:08<00:00,  8.59s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:09,154 WARNING synthesis text The same rule shows up at home. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:54:09,368 INFO synthesis text The same rule shows up at home.
+2026-10-22 02:54:11,115 INFO yield speech len 2.64, rtf 0.6618472662839022
+
+100%|██████████| 1/1 [00:02<00:00,  2.00s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:11,285 INFO synthesis text Stapling a row along the edge of a sheet, you can slide the paper to the next spot only while the stapler is up; move it while pressing down and the staple goes in crooked.
+2026-10-22 02:54:18,607 INFO yield speech len 13.6, rtf 0.538393539540908
+
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:18,799 INFO synthesis text The zigzag needle, the button clamp and the embroidery frame likewise may move only in the short time the needle is out of the fabric.
+2026-10-22 02:54:23,916 INFO yield speech len 9.72, rtf 0.5263607933688065
+
+100%|██████████| 1/1 [00:05<00:00,  5.30s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:23,972 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:54:24,098 INFO synthesis text Back to the start.
+2026-10-22 02:54:25,161 INFO yield speech len 1.2, rtf 0.8857482671737671
+
+100%|██████████| 1/1 [00:01<00:00,  1.23s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:25,331 INFO synthesis text Modified trapezoid gives about one hundred and eighty-three newtons and the cycloid about two hundred and thirty-five, both under two hundred and fifty: the switch is possible, with less margin.
+2026-10-22 02:54:33,098 INFO yield speech len 14.52, rtf 0.5348707033582956
+
+100%|██████████| 1/1 [00:07<00:00,  7.94s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:33,279 INFO synthesis text Squeezed to one hundred and twenty degrees, about four hundred and seventy-one cycloidal and three hundred and sixty-seven modified trapezoid, both over the limit.
+2026-10-22 02:54:39,326 INFO yield speech len 11.36, rtf 0.5323292084143195
+
+100%|██████████| 1/1 [00:06<00:00,  6.22s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:39,503 INFO synthesis text And the feed and the swing already happen together in the same out-of-fabric window, so a shorter swing gives the feed no extra time at all.
+2026-10-22 02:54:45,567 INFO yield speech len 11.6, rtf 0.5227685796803442
+
+100%|██████████| 1/1 [00:06<00:00,  6.24s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.24s/it]
+cv2: 160/185 句，用时 15.4 分钟，预计还要 2.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:45,746 INFO synthesis text The two ends are caught eight over twenty-seven radians apart, about seventeen degrees, right end first.
+2026-10-22 02:54:50,781 INFO yield speech len 9.44, rtf 0.5332995269258144
+
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:50,962 INFO synthesis text Now Virtual lab eleven-one, zigzag swing timing and loop catching. On the WenQuest platform you can do it yourself. The readings of the four criteria, the values of the settings and the tasks are blurred here, so you can read them yourself on the platform.
+2026-10-22 02:55:01,119 INFO yield speech len 19.52, rtf 0.5203022820050599
+
+100%|██████████| 1/1 [00:10<00:00, 10.35s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:01,311 INFO synthesis text First set the swing start to two hundred and fifty degrees and the end to one hundred and ten. A red segment appears on the needle path on the left: the swing has run into the time the needle is in the fabric.
+2026-10-22 02:55:09,400 INFO yield speech len 15.6, rtf 0.5185500627908951
+
+100%|██████████| 1/1 [00:08<00:00,  8.27s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:09,584 INFO synthesis text Task one: press Scramble. The interval, the law and the hook timing are all thrown off. Adjust the swing start and end first, until the swing leaves the red segment, then the hook timing, until all four criteria pass.
+2026-10-22 02:55:19,328 INFO yield speech len 18.6, rtf 0.5238657869318479
+
+100%|██████████| 1/1 [00:09<00:00,  9.93s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:19,521 INFO synthesis text Reset, and switch the motion law to cycloidal. On the platform, try modified trapezoid, cycloidal and harmonic in turn. Note the sideways inertia force, divide by zero.fifteen kilograms to get the peak acceleration, and compare with the worked example.
+2026-10-22 02:55:30,035 INFO yield speech len 20.72, rtf 0.5074205315711415
+
+100%|██████████| 1/1 [00:10<00:00, 10.70s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:30,226 INFO synthesis text Task two: with the cycloidal law, narrow the interval step by step. Find the narrowest interval that keeps the force at or under two hundred and fifty newtons and the swing entirely out of the fabric. Read it yourself and put it in your report.
+2026-10-22 02:55:40,298 INFO yield speech len 19.76, rtf 0.509724901755329
+
+100%|██████████| 1/1 [00:10<00:00, 10.26s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:40,492 INFO synthesis text Finally, reset and slowly widen the bight. Watch how crosses for missed catches appear in the stitch view on the right. This only shows the effect. For task three, first set the hook timing to the top of the window, then find the maximum bight and enter it in the task box to check. The guide and the report template are on the platform.
+2026-10-22 02:55:52,673 INFO yield speech len 23.48, rtf 0.5187999349233442
+
+100%|██████████| 1/1 [00:12<00:00, 12.37s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:52,871 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-22 02:55:55,663 INFO yield speech len 4.92, rtf 0.5675533922707162
+
+100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:55,834 INFO synthesis text You can open today's interactive slides and the virtual lab yourself, drag the swing interval, change the motion law, and watch the inertia force and the stitches change with them.
+2026-10-22 02:56:03,452 INFO yield speech len 14.28, rtf 0.5334716050230822
+
+100%|██████████| 1/1 [00:07<00:00,  7.79s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:03,634 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-22 02:56:07,096 INFO yield speech len 6.4, rtf 0.5410127341747284
+
+100%|██████████| 1/1 [00:03<00:00,  3.64s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.64s/it]
+cv2: 170/185 句，用时 16.8 分钟，预计还要 1.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:07,274 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-22 02:56:12,146 INFO yield speech len 9.08, rtf 0.5365431833897393
+
+100%|██████████| 1/1 [00:05<00:00,  5.05s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:12,330 INFO synthesis text Your assignment has four questions. One: the bight grows to ten millimetres, with everything else as in the opening problem. For the modified-trapezoid and the cycloidal laws, find the inertia force at five thousand r/min and the highest speed that stays within the limit.
+2026-10-22 02:56:22,038 INFO yield speech len 18.96, rtf 0.5120540344262424
+
+100%|██████████| 1/1 [00:09<00:00,  9.89s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:22,241 INFO synthesis text Two: the hook radius is thirteen.five millimetres. Find the catch difference between the two ends for bights of six and ten millimetres. Using the loop window borrowed in this lecture, right end at the earliest about one hundred and ninety-eight degrees and left end at the latest about two hundred and eighteen, decide whether ten millimetres can be caught at both ends. Compare with the manual, and explain why it has to be measured.
+2026-10-22 02:56:35,967 INFO yield speech len 25.64, rtf 0.5353346908706212
+
+100%|██████████| 1/1 [00:13<00:00, 13.93s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.93s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-22 02:56:36,180 INFO synthesis text Three: an electronic bartacker moves its clamp five millimetres a step, over one hundred and seventy degrees, with a modified trapezoid. Find the peak acceleration at three thousand, two hundred stitches a minute. If the step grows to eight millimetres with no more acceleration allowed, how far must the speed drop? Four, for discussion:
+2026-10-22 02:56:47,279 INFO yield speech len 21.68, rtf 0.5119598439698729
+
+ 50%|█████     | 1/2 [00:11<00:11, 11.30s/it]2026-10-22 02:56:47,468 INFO synthesis text  an embroidery machine runs at about a quarter of lockstitch speed. Propose two ways to speed it up, and the cost of each.
+2026-10-22 02:56:53,279 INFO yield speech len 11.08, rtf 0.5244428930730165
+
+100%|██████████| 2/2 [00:17<00:00,  8.17s/it]
+100%|██████████| 2/2 [00:17<00:00,  8.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:53,462 INFO synthesis text Submit your working, the lab screenshots and the discussion on the WenQuest platform.
+2026-10-22 02:56:57,168 INFO yield speech len 6.96, rtf 0.5324852535094338
+
+100%|██████████| 1/1 [00:03<00:00,  3.88s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:57,347 INFO synthesis text There's also a ten-question quiz. For example, with an eight-millimetre bight, five thousand r/min and a one hundred and seventy-degree swing, what is the peak acceleration under the modified trapezoid?
+2026-10-22 02:57:06,911 INFO yield speech len 18.24, rtf 0.5243799142670214
+
+100%|██████████| 1/1 [00:09<00:00,  9.75s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:07,100 INFO synthesis text Or, with everything else the same, the speed goes from five thousand to six thousand. By what factor does the peak acceleration grow? And a true-or-false: the hook point sweeps right to left, so is the left end caught first?
+2026-10-22 02:57:15,490 INFO yield speech len 16.24, rtf 0.5166554832693392
+
+100%|██████████| 1/1 [00:08<00:00,  8.57s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:15,677 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-22 02:57:18,804 INFO yield speech len 5.56, rtf 0.5624638615752297
+
+100%|██████████| 1/1 [00:03<00:00,  3.30s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:18,851 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:57:18,981 INFO synthesis text Three things to remember.
+2026-10-22 02:57:20,191 INFO yield speech len 1.52, rtf 0.7959467800039994
+
+100%|██████████| 1/1 [00:01<00:00,  1.38s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:20,361 INFO synthesis text One: every special machine obeys the same rule: no sideways relative motion between needle and fabric while the needle is in, so every sideways move is squeezed into the out-of-fabric angle.
+2026-10-22 02:57:28,750 INFO yield speech len 15.68, rtf 0.5350200345321577
+
+100%|██████████| 1/1 [00:08<00:00,  8.57s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.57s/it]
+cv2: 180/185 句，用时 18.1 分钟，预计还要 0.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:28,941 INFO synthesis text Two: peak acceleration is C times w times omega squared over beta squared, so use the whole window, and the modified trapezoid is both low-peaked and smooth.
+2026-10-22 02:57:36,957 INFO yield speech len 15.6, rtf 0.5138146265959128
+
+100%|██████████| 1/1 [00:08<00:00,  8.20s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:37,143 INFO synthesis text Three: the two ends of a zigzag are caught w over twoR apart, so the bight is limited by the catching window.
+2026-10-22 02:57:42,812 INFO yield speech len 10.56, rtf 0.5368616319063938
+
+100%|██████████| 1/1 [00:05<00:00,  5.84s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:42,993 INFO synthesis text The assignment, quiz and lab are on WenQuest.
+2026-10-22 02:57:45,714 INFO yield speech len 4.76, rtf 0.5714495642846372
+
+100%|██████████| 1/1 [00:02<00:00,  2.89s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:45,886 INFO synthesis text The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-22 02:57:53,892 INFO yield speech len 15.24, rtf 0.5253215161521291
+
+100%|██████████| 1/1 [00:08<00:00,  8.18s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:53,948 WARNING synthesis text See you next time. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:57:54,078 INFO synthesis text See you next time.
+2026-10-22 02:57:55,056 INFO yield speech len 1.12, rtf 0.8732310363224574
+
+100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.15s/it]
+cv2: 185/185 句，用时 18.6 分钟，预计还要 0.0 分钟
+cv2: 185 句完成
+2026-10-22 02:57:55,212 DEBUG Attempting to acquire lock 123940523282384 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:57:55,212 DEBUG Lock 123940523282384 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:57:55,212 DEBUG Attempting to release lock 123940523282384 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:57:55,213 DEBUG Lock 123940523282384 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:57:55,215 DEBUG Attempting to acquire lock 123940523289248 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:57:55,215 DEBUG Lock 123940523289248 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:57:55,215 DEBUG Attempting to release lock 123940523289248 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:57:55,215 DEBUG Lock 123940523289248 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 30 分钟

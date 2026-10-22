@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:05<00:00,  5.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:50:55,093 INFO synthesis text On the right the integral time is set to zero: watch the error curve stop short of the target and stay there.
+2026-10-22 02:51:00,743 INFO yield speech len 11.12, rtf 0.5081494935124898
+
+100%|██████████| 1/1 [00:05<00:00,  5.89s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:00,924 INFO synthesis text An integral slowly builds the small error into torque until the shaft moves.
+2026-10-22 02:51:04,895 INFO yield speech len 7.6, rtf 0.5224136302345678
+
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:04,944 WARNING synthesis text Encoders and sensors. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:51:05,070 INFO synthesis text Encoders and sensors.
+2026-10-22 02:51:07,325 INFO yield speech len 3.88, rtf 0.5811982548113951
+
+100%|██████████| 1/1 [00:02<00:00,  2.42s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:07,498 INFO synthesis text The shaft angle comes from an incremental encoder.
+2026-10-22 02:51:09,585 INFO yield speech len 3.6, rtf 0.579716960589091
+
+100%|██████████| 1/1 [00:02<00:00,  2.26s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:09,759 INFO synthesis text Channels A and B are square waves a quarter period apart: turning forward A leads, turning backward B leads, which gives the direction.
+2026-10-22 02:51:16,343 INFO yield speech len 12.48, rtf 0.5276112029185662
+
+100%|██████████| 1/1 [00:06<00:00,  6.76s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.76s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:16,528 INFO synthesis text Counting both rising and falling edges gives four counts per period, called times-four decoding.
+2026-10-22 02:51:20,608 INFO yield speech len 7.92, rtf 0.5151773643011999
+
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:20,789 INFO synthesis text A one thousand and twenty-four-line encoder then gives four thousand and ninety-six counts per revolution, about zero.eighty-eight degrees each.
+2026-10-22 02:51:26,465 INFO yield speech len 10.84, rtf 0.5236160931112142
+
+100%|██████████| 1/1 [00:05<00:00,  5.85s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:26,644 INFO synthesis text An index pulse fixes the absolute angle, and U, V and W commutation signals let the motor start turning at power-up.
+2026-10-22 02:51:33,337 INFO yield speech len 12.84, rtf 0.5212096410377003
+
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+cv2: 140/195 句，用时 12.6 分钟，预计还要 4.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:33,516 INFO synthesis text Actuators: steppers, solenoids and power circuits.
+2026-10-22 02:51:36,701 INFO yield speech len 5.88, rtf 0.5416298399166185
+
+100%|██████████| 1/1 [00:03<00:00,  3.35s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:36,746 WARNING synthesis text Trimming and reverse use solenoids. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:51:36,873 INFO synthesis text Trimming and reverse use solenoids.
+2026-10-22 02:51:38,891 INFO yield speech len 3.36, rtf 0.6008377387410119
+
+100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:39,066 INFO synthesis text When energised, the current rises with time constant L over R; the force goes with current squared, and the armature moves only once it beats the spring.
+2026-10-22 02:51:45,887 INFO yield speech len 13.32, rtf 0.5120731330848671
+
+100%|██████████| 1/1 [00:07<00:00,  7.00s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:46,071 INFO synthesis text As it moves it generates a back EMF, which puts a notch in the current curve.
+2026-10-22 02:51:50,027 INFO yield speech len 7.48, rtf 0.528991126759167
+
+100%|██████████| 1/1 [00:04<00:00,  4.13s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:50,274 INFO synthesis text A one-amp hold current alone won't pull it in; three amps all the time would dissipate about seventy watts.
+2026-10-22 02:51:54,585 INFO yield speech len 8.04, rtf 0.5361513711919833
+
+100%|██████████| 1/1 [00:04<00:00,  4.55s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:51:54,759 INFO synthesis text The answer is a twenty-four-volt boost that pulls in within six.nine milliseconds, then chopping to hold one amp, about eight watts.
+2026-10-22 02:52:00,711 INFO yield speech len 11.4, rtf 0.5221169873287803
+
+100%|██████████| 1/1 [00:06<00:00,  6.13s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:00,896 INFO synthesis text On the right the boost time sweeps between zero and twenty milliseconds; watch whether the armature pulls in.
+2026-10-22 02:52:06,186 INFO yield speech len 10.2, rtf 0.5185855136198156
+
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:06,370 INFO synthesis text At switch-off the coil current needs somewhere to go.
+2026-10-22 02:52:09,261 INFO yield speech len 5.12, rtf 0.5646572448313236
+
+100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:09,436 INFO synthesis text With a diode it decays slowly with L over R, and release takes twelve.nine milliseconds; with a forty-eight-volt Zener it collapses quickly and release takes five.one, at the cost of seventy-two volts, twenty-four plus forty-eight, across the transistor at turn-off, and about forty millijoules absorbed each time.
+2026-10-22 02:52:22,899 INFO yield speech len 25.96, rtf 0.5186001490371069
+
+100%|██████████| 1/1 [00:13<00:00, 13.66s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:23,102 INFO synthesis text Delays convert to shaft angle as theta equals six n t: at four hundred r/min one millisecond is two.four degrees, so pull-in is about seventeen degrees and release thirty-one or twelve.
+2026-10-22 02:52:31,421 INFO yield speech len 16.56, rtf 0.5023715720660445
+
+100%|██████████| 1/1 [00:08<00:00,  8.50s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.50s/it]
+cv2: 150/195 句，用时 13.5 分钟，预计还要 4.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:31,612 INFO synthesis text On the right the freewheeling voltage sweeps back and forth.
+2026-10-22 02:52:34,351 INFO yield speech len 5.0, rtf 0.5478196144104004
+
+100%|██████████| 1/1 [00:02<00:00,  2.91s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:34,523 INFO synthesis text The power circuit: two hundred and twenty volts rectified gives a DC link of about three hundred and ten volts, and a six-switch inverter bridge drives the motor.
+2026-10-22 02:52:42,038 INFO yield speech len 14.24, rtf 0.5277785524893343
+
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:42,221 INFO synthesis text In an emergency stop the motor becomes a generator, but the rectifier only conducts one way, so the energy can't go back to the mains; it can only charge the link capacitor.
+2026-10-22 02:52:49,587 INFO yield speech len 14.04, rtf 0.5245940807538155
+
+100%|██████████| 1/1 [00:07<00:00,  7.54s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:49,766 INFO synthesis text At five thousand r/min the kinetic energy is about eighty-two joules; with seventy percent fed back, a four hundred and seventy-microfarad capacitor would rise to about five hundred and eighty-four volts, which is dangerous.
+2026-10-22 02:52:59,417 INFO yield speech len 18.8, rtf 0.5133512172293155
+
+100%|██████████| 1/1 [00:09<00:00,  9.84s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:52:59,610 INFO synthesis text So the link carries a braking resistor that switches in at about four hundred volts and burns the energy off; any emergency stop above about two thousand, five hundred and fifty-four r/min depends on it.
+2026-10-22 02:53:09,468 INFO yield speech len 18.88, rtf 0.5221297175197278
+
+100%|██████████| 1/1 [00:10<00:00, 10.04s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:09,657 INFO synthesis text Every joint of a robot arm is a permanent-magnet synchronous motor with an encoder, and its drive nests the same current, velocity and position loops, with vector control making joint torque proportional to i_q.
+2026-10-22 02:53:19,997 INFO yield speech len 19.88, rtf 0.520104865432985
+
+100%|██████████| 1/1 [00:10<00:00, 10.52s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:20,190 INFO synthesis text Stopping the shaft at needle-up corresponds to stopping a joint at its target angle: too much position gain overshoots, and without an integral, friction leaves a steady error.
+2026-10-22 02:53:27,401 INFO yield speech len 13.88, rtf 0.5195816586958916
+
+100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:27,579 INFO synthesis text When the arm picks up a heavy part its inertia grows and the velocity bandwidth falls, just like fitting a heavier handwheel; that's why robot drives also have a load-inertia ratio and online inertia identification.
+2026-10-22 02:53:36,571 INFO yield speech len 17.84, rtf 0.5040034718577637
+
+100%|██████████| 1/1 [00:09<00:00,  9.17s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:36,759 INFO synthesis text Emergency stops need braking resistors here too, and gripper valves must be commanded early according to the belt speed.
+2026-10-22 02:53:42,018 INFO yield speech len 10.48, rtf 0.5017550619503923
+
+100%|██████████| 1/1 [00:05<00:00,  5.43s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:42,195 INFO synthesis text Needle positioning in everyday life: an elevator levelling at a floor.
+2026-10-22 02:53:45,806 INFO yield speech len 6.84, rtf 0.5279979859179224
+
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+cv2: 160/195 句，用时 14.8 分钟，预计还要 3.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:45,983 INFO synthesis text As it approaches, it first slows to a low creep speed, and only a short distance before the levelling point does it switch to precise position control, stopping with the car floor flush with the landing.
+2026-10-22 02:53:54,419 INFO yield speech len 16.36, rtf 0.5156353662532815
+
+100%|██████████| 1/1 [00:08<00:00,  8.62s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:54,606 INFO synthesis text That's exactly the two-stage method of needle positioning: slow down, then switch to the position loop.
+2026-10-22 02:53:58,616 INFO yield speech len 7.68, rtf 0.522153110553821
+
+100%|██████████| 1/1 [00:04<00:00,  4.19s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:53:58,798 INFO synthesis text With more passengers the inertia grows, and a good elevator controller adapts too.
+2026-10-22 02:54:01,973 INFO yield speech len 5.92, rtf 0.5364794586155865
+
+100%|██████████| 1/1 [00:03<00:00,  3.35s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:02,026 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:54:02,152 INFO synthesis text Back to the start.
+2026-10-22 02:54:03,388 INFO yield speech len 1.56, rtf 0.7917129076444186
+
+100%|██████████| 1/1 [00:01<00:00,  1.40s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:03,562 INFO synthesis text At six hundred r/min the pull-in takes twenty-four.eight degrees and the diode release forty-six.four, both over twenty: that's why trimming became erratic.
+2026-10-22 02:54:11,847 INFO yield speech len 15.96, rtf 0.5190774462276831
+
+100%|██████████| 1/1 [00:08<00:00,  8.46s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:12,102 INFO synthesis text The forty-eight-volt Zener brings release down to eighteen.four degrees, but pull-in is still twenty-four.eight.
+2026-10-22 02:54:17,515 INFO yield speech len 10.24, rtf 0.5286140833050013
+
+100%|██████████| 1/1 [00:05<00:00,  5.65s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:17,692 INFO synthesis text The longer pull-in sets the limit: twenty over six times zero.sixty-nine, about four hundred and eighty-three r/min, so set the trimming speed below about four hundred and eighty, or raise the drive voltage to shorten pull-in.
+2026-10-22 02:54:26,437 INFO yield speech len 16.96, rtf 0.5155991692588014
+
+100%|██████████| 1/1 [00:08<00:00,  8.93s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:26,625 INFO synthesis text At turn-off the transistor sees seventy-two volts, so choose it with a margin.
+2026-10-22 02:54:29,995 INFO yield speech len 6.24, rtf 0.5399547326259124
+
+100%|██████████| 1/1 [00:03<00:00,  3.54s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:30,170 INFO synthesis text Now Virtual lab thirteen-one, tuning needle positioning. On the WenQuest platform you can do it yourself. The criteria readings, the hints and the tasks are blurred here, so you can find them on your own. Top left is the handwheel, top right the position error, and below are the speed and torque curves.
+2026-10-22 02:54:40,307 INFO yield speech len 19.88, rtf 0.509894218003486
+
+100%|██████████| 1/1 [00:10<00:00, 10.32s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:40,503 INFO synthesis text Task one: press Scramble. The gains become four hundred and fifty, zero.five and zero, and the error curve overshoots and swings. Adjust only the three gains until all four criteria pass. Here we raise the velocity gain; the rest is yours to tune.
+2026-10-22 02:54:49,973 INFO yield speech len 18.24, rtf 0.5192063879548459
+
+100%|██████████| 1/1 [00:09<00:00,  9.65s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.65s/it]
+cv2: 170/195 句，用时 15.8 分钟，预计还要 2.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:54:50,164 INFO synthesis text Task two: reset, then set the integral time to zero and see where the shaft finally stops. Then raise the Coulomb friction to zero.three, work out the largest steady error as the friction torque over the product of the two gains, convert it to degrees, and enter it to check.
+2026-10-22 02:55:01,662 INFO yield speech len 22.08, rtf 0.5207546271275784
+
+100%|██████████| 1/1 [00:11<00:00, 11.68s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:01,856 INFO synthesis text Task three: set the referred inertia to twelve. Leave the gains alone at first and see what happens to the overshoot and the settling time, then retune them yourself.
+2026-10-22 02:55:10,123 INFO yield speech len 15.96, rtf 0.5179780617094876
+
+100%|██████████| 1/1 [00:08<00:00,  8.45s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:10,312 INFO synthesis text Next, Virtual lab thirteen-two, driving a solenoid. The criteria, the shaft-angle bars, the hints and the tasks are blurred here too. First find three moments on the upper plot: the notch in the current, the force overtaking the spring, and the armature bottoming.
+2026-10-22 02:55:21,328 INFO yield speech len 21.4, rtf 0.514782644877924
+
+100%|██████████| 1/1 [00:11<00:00, 11.21s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:21,525 INFO synthesis text Task one: adjust only the freewheeling voltage until all four criteria pass. Here we raise it from the diode setting. Watch how fast the current falls after switch-off, and how much sooner the armature returns.
+2026-10-22 02:55:29,827 INFO yield speech len 16.12, rtf 0.5150236651560213
+
+100%|██████████| 1/1 [00:08<00:00,  8.49s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:30,019 INFO synthesis text Then push it to eighty volts, and think about why the fourth criterion won't let you raise it without limit.
+2026-10-22 02:55:34,550 INFO yield speech len 8.48, rtf 0.5342907500716875
+
+100%|██████████| 1/1 [00:04<00:00,  4.70s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:34,725 INFO synthesis text Task two: raise the trimming speed to six hundred, keep the hold current at or below one.one amps, and adjust the drive voltage, the boost time and the freewheeling voltage. Here we raise the drive voltage and watch the current climb faster during pull-in.
+2026-10-22 02:55:46,266 INFO yield speech len 22.56, rtf 0.5115545599173147
+
+100%|██████████| 1/1 [00:11<00:00, 11.73s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:46,466 INFO synthesis text Task three: with the settings you found for six hundred r/min in task two, read the longer of the two delays, work out the highest trimming speed, and enter it to check. The guide and the report template are on the platform.
+2026-10-22 02:55:56,231 INFO yield speech len 18.68, rtf 0.5227636346469855
+
+100%|██████████| 1/1 [00:09<00:00,  9.95s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:56,422 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-22 02:55:59,176 INFO yield speech len 5.12, rtf 0.5378506612032652
+
+100%|██████████| 1/1 [00:02<00:00,  2.93s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:55:59,355 INFO synthesis text You can open today's interactive slides and both virtual labs yourself. Change the gains, the inertia or the freewheeling voltage, and watch needle positioning and trimming change with them.
+2026-10-22 02:56:07,359 INFO yield speech len 15.76, rtf 0.5078731000725993
+
+100%|██████████| 1/1 [00:08<00:00,  8.18s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:07,545 INFO synthesis text You submit the assignment and the lab reports on the platform, and get marks and comments back.
+2026-10-22 02:56:11,613 INFO yield speech len 7.64, rtf 0.5323628480521796
+
+100%|██████████| 1/1 [00:04<00:00,  4.24s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.24s/it]
+cv2: 180/195 句，用时 17.2 分钟，预计还要 1.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:11,790 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-22 02:56:16,983 INFO yield speech len 10.04, rtf 0.5171991914391993
+
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:17,161 INFO synthesis text Your assignment has four questions. One: a two thousand, five hundred-line encoder with times-four decoding. Find the speed-measurement error of the M method and the T method at one hundred and fifty and at three thousand r/min, and say which belongs in needle positioning and which in high-speed sewing. The M method counts pulses in a fixed time; the T method times the gap between two pulses with a fast clock.
+2026-10-22 02:56:32,515 INFO yield speech len 29.72, rtf 0.5165946275035915
+
+100%|██████████| 1/1 [00:15<00:00, 15.55s/it]
+100%|██████████| 1/1 [00:15<00:00, 15.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:32,723 INFO synthesis text Two: with today's trimming solenoid and a trimming speed of four hundred and fifty r/min, does each freewheeling scheme meet the limit? Choose one, and give the transistor's voltage rating and the energy the Zener absorbs per release.
+2026-10-22 02:56:40,817 INFO yield speech len 15.4, rtf 0.5255837719161789
+
+100%|██████████| 1/1 [00:08<00:00,  8.27s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:41,004 INFO synthesis text Three: the shaft makes an emergency stop from four thousand, five hundred r/min. Without a braking resistor, how high does the link voltage go, and above what speed is the resistor needed? Four is a discussion: should an electronic feed use a stepper or a servo? A stepper moves one step per pulse, but can lose steps under too much load. Compare positioning, the risk of lost steps, low-speed smoothness and cost.
+2026-10-22 02:56:56,972 INFO yield speech len 31.0, rtf 0.5150954492630497
+
+100%|██████████| 1/1 [00:16<00:00, 16.17s/it]
+100%|██████████| 1/1 [00:16<00:00, 16.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:56:57,177 INFO synthesis text Submit the calculation report and the lab screenshots on the WenQuest platform.
+2026-10-22 02:57:00,469 INFO yield speech len 5.96, rtf 0.552358923342404
+
+100%|██████████| 1/1 [00:03<00:00,  3.46s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:00,643 INFO synthesis text There's also a ten-question quiz. For example, a two thousand and forty-eight-line encoder with times-four decoding: what is its resolution in degrees?
+2026-10-22 02:57:07,700 INFO yield speech len 13.76, rtf 0.5128443760927334
+
+100%|██████████| 1/1 [00:07<00:00,  7.24s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:07,891 INFO synthesis text Or, the shaft turns at five hundred r/min and the trimming solenoid takes eight milliseconds to pull in. How many degrees does the shaft turn meanwhile?
+2026-10-22 02:57:15,599 INFO yield speech len 15.44, rtf 0.49922873936786555
+
+100%|██████████| 1/1 [00:07<00:00,  7.89s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:15,791 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-22 02:57:19,137 INFO yield speech len 6.12, rtf 0.5468440211676304
+
+100%|██████████| 1/1 [00:03<00:00,  3.52s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:19,183 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-22 02:57:19,311 INFO synthesis text Three things to remember.
+2026-10-22 02:57:20,503 INFO yield speech len 1.6, rtf 0.7449157536029816
+
+100%|██████████| 1/1 [00:01<00:00,  1.36s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:20,677 INFO synthesis text One: the shaft servo nests current, velocity and position loops; needle positioning slows down first and then switches to the position loop, with a position gain of a quarter to a half of K_v over J, retuned whenever the inertia changes.
+2026-10-22 02:57:30,682 INFO yield speech len 19.48, rtf 0.5136227338465822
+
+100%|██████████| 1/1 [00:10<00:00, 10.19s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.19s/it]
+cv2: 190/195 句，用时 18.5 分钟，预计还要 0.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:30,875 INFO synthesis text Two: without a velocity-loop integral, friction leaves a steady error of T_f over K_v K_p.
+2026-10-22 02:57:37,445 INFO yield speech len 12.68, rtf 0.518160325119548
+
+100%|██████████| 1/1 [00:06<00:00,  6.74s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:37,625 INFO synthesis text Three: solenoids use a boost plus chopped hold, Zener freewheeling speeds release, and delays convert to shaft angle by theta equals six n t, which sets the trimming-speed limit.
+2026-10-22 02:57:46,211 INFO yield speech len 16.76, rtf 0.5122852922908445
+
+100%|██████████| 1/1 [00:08<00:00,  8.77s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:46,401 INFO synthesis text The assignment, quiz and both labs are on WenQuest.
+2026-10-22 02:57:49,352 INFO yield speech len 5.52, rtf 0.5345987668935804
+
+100%|██████████| 1/1 [00:03<00:00,  3.12s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:49,524 INFO synthesis text The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-22 02:57:58,033 INFO yield speech len 16.44, rtf 0.5175891438829927
+
+100%|██████████| 1/1 [00:08<00:00,  8.69s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-22 02:57:58,222 INFO synthesis text Next time it's the control of the industrial lockstitch machine, and how actions like trimming and reverse stitching are timed against the shaft angle. See you then.
+2026-10-22 02:58:04,734 INFO yield speech len 12.48, rtf 0.5218347486777183
+
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.69s/it]
+cv2: 195/195 句，用时 19.1 分钟，预计还要 0.0 分钟
+cv2: 195 句完成
+2026-10-22 02:58:04,905 DEBUG Attempting to acquire lock 131494578048976 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:04,905 DEBUG Lock 131494578048976 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:04,905 DEBUG Attempting to release lock 131494578048976 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:04,905 DEBUG Lock 131494578048976 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-22 02:58:04,908 DEBUG Attempting to acquire lock 131494578055840 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:58:04,908 DEBUG Lock 131494578055840 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:58:04,908 DEBUG Attempting to release lock 131494578055840 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-22 02:58:04,908 DEBUG Lock 131494578055840 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 31 分钟

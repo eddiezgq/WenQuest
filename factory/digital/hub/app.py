@@ -79,7 +79,7 @@ WEB_DIST = os.environ.get("WQ_WEB_DIST", os.path.join(os.path.dirname(HERE), "we
 # 企业工厂（WQ_PLANT_FILE 指定、demo_data: false）里这些接口一律 404，网页按 /api/config 的 plant.hidden 不显示入口
 DEMO_PLANT = PLANT.is_demo()
 TEACH_ONLY_API = tuple("/api/lab{}".format(n) for n in range(15, 24)) + (
-    "/api/labs", "/api/story", "/api/scenario", "/api/teach/batch-complaint",
+    "/api/labs", "/api/story", "/api/scenario", "/api/teach/batch-complaint", "/api/help/try",       # 帮助里的“当场动手”（第 30 轮 §八）
     "/api/complaints", "/api/crm", "/api/followups", "/api/ont/customer360", "/api/service",     # E1 客户与服务
     "/api/ehs", "/api/maint", "/api/people", "/api/supply", "/api/energy", "/api/finance")      # E2–E7
 TEACH_ONLY_NAV = ("/service", "/supply", "/finance", "/maint", "/people", "/ehs", "/energy", "/director", "/labs", "/teach",
@@ -686,11 +686,19 @@ def health():
             "ai": (H.ai.llm.name.split(":")[0] if H.ai else "rules")}       # 第 17 轮 D 期：AI 代理用的引擎种类（claude / deepseek / rules），不含密钥
 
 
+def _pm_h(u):
+    """标准保养周期（运行小时）：3D 车间、首页点设备时和状态里的 run_h_pm 比，显示“保养逾期”（第 30 轮 §八 8-1）"""
+    from sim import reliability as REL
+    rp = REL.params(u)
+    return {"pm_h": rp["pm_h"]} if rp else {}
+
+
 @app.get("/api/layout")
 def get_layout():
     return {"floor": L.FLOOR, "units": {u: {"x": v[0], "y": v[1], "w": v[2], "d": v[3],
                                            "name": wqbus.UNITS[u][1], "en": wqbus.UNITS[u][2],
-                                           **({"h": L.HEIGHT[u]} if L.HEIGHT and u in L.HEIGHT else {})}
+                                           **({"h": L.HEIGHT[u]} if L.HEIGHT and u in L.HEIGHT else {}),
+                                           **_pm_h(u)}
                                        for u, v in L.LAYOUT.items()},
             "agv_home": L.AGV_HOME, "aisles": L.AISLES, "cross_x": L.CROSS_X}
 
@@ -2157,6 +2165,8 @@ from hub import story_api as _story_api  # noqa: E402
 _story_api.mount(app, H, user_of, who, reset_teach)   # 第 19 轮：情景导演（两周情景）
 from hub import help_api as _help_api  # noqa: E402
 _help_api.mount(app, user_of)                          # 第 19 轮：帮助在网页里读；第 30 轮：/api/help/docs、帮助视频 /api/help/media、/help-media/
+from hub import help_try as _help_try  # noqa: E402
+_help_try.mount(app, H, user_of, who)                  # 第 30 轮 §八 8-1：帮助里的“当场动手”（只在演示工厂、教学模式）
 from hub import labs_api as _labs_api  # noqa: E402
 _labs_api.mount(app, H, user_of)                       # 第 19 轮：“实验与任务”一个入口
 from hub.ont import agent_api as _agent_api  # noqa: E402
