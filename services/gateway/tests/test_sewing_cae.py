@@ -135,6 +135,8 @@ def cae(client, monkeypatch):  # noqa: F811
         fk.desc = d
         return b"ISO-10303-21;"
     monkeypatch.setattr(CS, "part_step", part_step)
+    from app.sewcore import template as TPL
+    monkeypatch.setattr(TPL, "step", lambda g: b"ISO-10303-21;")      # CI 里没装 build123d；真实的 STEP 见 test_template_step
     admin, user = login(client), login(client, "s")
     UID["s"] = client.get("/api/v1/me", headers=user).json()["id"]
     client.post("/api/v1/admin/sewing/licenses", json={"username": "s", "org": "甲缝纫机厂"}, headers=admin)
@@ -335,3 +337,10 @@ def test_template_geometry():
     assert all(max(xs) + 2 < abs(x) - r and abs(x) + r < W / 2 - 2 for x, _, r in g["pins"])   # 定位销孔在边距里，不碰槽、不出板
     g = T.geom({"pat": "zig"}, 5, 3)
     assert not g["closed"] and len(g["slots"]) == 1                        # 之字花样合成一整块开口
+
+
+def test_template_step():
+    pytest.importorskip("build123d")
+    from app.sewcore import template as T
+    step = T.step(T.geom({"pat": "circle"}))
+    assert step.startswith(b"ISO-10303-21") and b"CYLINDRICAL_SURFACE" in step     # 定位销孔是真圆柱
