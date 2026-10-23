@@ -70,9 +70,9 @@ STEPS = [
       "The same kernel inside FreeCAD, results identical to the web app; exact solids (the globoidal cam as it is machined), a cam system assembly you can turn, part drawings, STEP and programs"),
      "now"),
     (("AI 起草", "AI drafts"),
-     ("一句话要求变成运动程序草稿，由代码检查后人确认；校核结果的白话解释",
-      "A one-sentence requirement becomes a draft motion program, checked by code and confirmed by you; plain-language explanations of the checks"),
-     "next"),
+     ("一句话要求变成运动程序草稿，由代码检查后人确认；校核结果的白话解释和计算书设计说明，数字逐个核对",
+      "A one-sentence requirement becomes a draft motion program, checked by code and confirmed by you; plain-language explanations of the checks and the report's design description, every number checked"),
+     "now"),
 ]
 
 
