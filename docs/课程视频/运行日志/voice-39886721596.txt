@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:23:29,363 INFO synthesis text Also: after the cut at fifty-five degrees, stop before ninety-six.seven degrees; keep the tension open from at least three hundred and thirty-five degrees to fifty-five degrees; and wipe after stopping.
+2026-10-23 02:23:37,466 INFO yield speech len 15.4, rtf 0.5261813820182503
+
+100%|██████████| 1/1 [00:08<00:00,  8.28s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:23:37,652 INFO synthesis text The controller commands at a chosen command angle, and during delay t the shaft turns another six n t degrees, so the knife actually enters at the command angle plus six n t.
+2026-10-23 02:23:45,927 INFO yield speech len 15.68, rtf 0.5276932704205416
+
+100%|██████████| 1/1 [00:08<00:00,  8.45s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:23:46,113 INFO synthesis text Here the command stays at two hundred and ninety degrees with a six to ten millisecond delay.
+2026-10-23 02:23:50,734 INFO yield speech len 8.8, rtf 0.5251923203468323
+
+100%|██████████| 1/1 [00:04<00:00,  4.79s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:23:50,913 INFO synthesis text At three hundred r/min the knife enters between three hundred.eight degrees and three hundred and eight degrees, inside the window.
+2026-10-23 02:23:57,131 INFO yield speech len 11.72, rtf 0.5305331925076429
+
+100%|██████████| 1/1 [00:06<00:00,  6.39s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.39s/it]
+cv2: 150/208 句，用时 12.4 分钟，预计还要 4.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:23:57,310 INFO synthesis text As the speed steps up to seven hundred, the red bar moves right to three hundred and fifteen.two degrees to three hundred and thirty-two degrees: too late.
+2026-10-23 02:24:03,821 INFO yield speech len 12.12, rtf 0.5372087750891255
+
+100%|██████████| 1/1 [00:06<00:00,  6.68s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:04,001 INFO synthesis text The command would have to move before two hundred and eighty-eight degrees.
+2026-10-23 02:24:06,626 INFO yield speech len 4.48, rtf 0.5859619804791041
+
+100%|██████████| 1/1 [00:02<00:00,  2.80s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:06,801 INFO synthesis text Notice too that the red bar widens, from seven to seventeen degrees.
+2026-10-23 02:24:10,427 INFO yield speech len 6.8, rtf 0.5331426858901978
+
+100%|██████████| 1/1 [00:03<00:00,  3.80s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:10,600 INFO synthesis text The average delay is not the problem: the command angle can be advanced automatically for speed and mean delay.
+2026-10-23 02:24:15,390 INFO yield speech len 9.04, rtf 0.5298851338108029
+
+100%|██████████| 1/1 [00:04<00:00,  4.96s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.96s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:15,621 INFO synthesis text The problem is that the delay varies; on each trim it falls somewhere in a range.
+2026-10-23 02:24:19,170 INFO yield speech len 6.6, rtf 0.537743243304166
+
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:19,348 INFO synthesis text Both sides run at five hundred r/min with the command at two hundred and ninety-one degrees, trying fifty cuts over and over; green is a clean cut, red a miss.
+2026-10-23 02:24:28,268 INFO yield speech len 17.16, rtf 0.5198278349318427
+
+100%|██████████| 1/1 [00:09<00:00,  9.10s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:28,457 INFO synthesis text On the left the delay is six to ten milliseconds; on the right low voltage and a worn spring have stretched it to five to fifteen.
+2026-10-23 02:24:34,626 INFO yield speech len 11.8, rtf 0.522746130571527
+
+100%|██████████| 1/1 [00:06<00:00,  6.35s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:34,685 WARNING synthesis text Compare the red on the two sides. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:24:34,929 INFO synthesis text Compare the red on the two sides.
+2026-10-23 02:24:36,530 INFO yield speech len 2.32, rtf 0.6899496604656351
+
+100%|██████████| 1/1 [00:01<00:00,  1.89s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:36,576 WARNING synthesis text Two limits. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:24:36,704 INFO synthesis text Two limits.
+2026-10-23 02:24:37,560 INFO yield speech len 0.68, rtf 1.2595408103045294
+
+100%|██████████| 1/1 [00:01<00:00,  1.03s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:37,732 INFO synthesis text The first is the window: the entry range is sixn times the delay spread wide and must fit inside thirty degrees.
+2026-10-23 02:24:42,795 INFO yield speech len 9.48, rtf 0.5340736878069141
+
+100%|██████████| 1/1 [00:05<00:00,  5.23s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.23s/it]
+cv2: 160/208 句，用时 13.2 分钟，预计还要 4.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:42,972 INFO synthesis text With six to ten milliseconds that allows one thousand, two hundred and fifty r/min; with five to fifteen, only five hundred.
+2026-10-23 02:24:49,064 INFO yield speech len 11.72, rtf 0.5197589307921738
+
+100%|██████████| 1/1 [00:06<00:00,  6.27s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:24:49,255 INFO synthesis text The second is stopping: cut at fifty-five degrees, stop before ninety-six.seven degrees, so within forty-one.seven degrees; at the maximum deceleration of about four thousand, four hundred and seventeen radians per second squared, trimming speed can't exceed about seven hundred and sixty-six r/min.
+2026-10-23 02:25:00,917 INFO yield speech len 23.12, rtf 0.5044254361551938
+
+100%|██████████| 1/1 [00:11<00:00, 11.85s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:00,987 WARNING synthesis text Take the lower of the two. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:25:01,113 INFO synthesis text Take the lower of the two.
+2026-10-23 02:25:02,977 INFO yield speech len 3.12, rtf 0.597348350744981
+
+100%|██████████| 1/1 [00:02<00:00,  2.03s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:03,150 INFO synthesis text That's why a regulated supply, boost drive and Zener freewheeling matter most for making the delay consistent.
+2026-10-23 02:25:09,070 INFO yield speech len 11.44, rtf 0.5174709783567415
+
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:09,249 INFO synthesis text Worked example: trimming at five hundred r/min.
+2026-10-23 02:25:12,221 INFO yield speech len 5.32, rtf 0.5587472503346608
+
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:12,271 WARNING synthesis text Back to the problem: the command angle. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:25:12,398 INFO synthesis text Back to the problem: the command angle.
+2026-10-23 02:25:14,342 INFO yield speech len 3.08, rtf 0.6312764310217522
+
+100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:14,515 INFO synthesis text Even with the shortest delay the knife must not enter before three hundred degrees, so the angle plus six times five hundred times zero.six must be at least three hundred: the angle at least two hundred and eighty-two degrees.
+2026-10-23 02:25:22,742 INFO yield speech len 15.56, rtf 0.5286783669479095
+
+100%|██████████| 1/1 [00:08<00:00,  8.40s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:22,927 INFO synthesis text Even with the longest delay it must not enter after three hundred and thirty degrees, so the angle plus six times five hundred times zero.ten must be at most three hundred and thirty: the angle at most three hundred degrees.
+2026-10-23 02:25:32,246 INFO yield speech len 17.72, rtf 0.5258869371349602
+
+100%|██████████| 1/1 [00:09<00:00,  9.50s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:32,437 INFO synthesis text Take the middle, about two hundred and ninety-one degrees, leaving a margin at both ends.
+2026-10-23 02:25:35,824 INFO yield speech len 6.04, rtf 0.5606743673615108
+
+100%|██████████| 1/1 [00:03<00:00,  3.56s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:36,002 INFO synthesis text The three bars show the actual entry range for each of these command angles.
+2026-10-23 02:25:39,021 INFO yield speech len 5.56, rtf 0.542933091842871
+
+100%|██████████| 1/1 [00:03<00:00,  3.19s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.19s/it]
+cv2: 170/208 句，用时 14.1 分钟，预计还要 3.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:39,198 INFO synthesis text A robot picking parts off a conveyor faces the same problem as trimming.
+2026-10-23 02:25:41,950 INFO yield speech len 4.96, rtf 0.5548674252725416
+
+100%|██████████| 1/1 [00:02<00:00,  2.92s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:42,126 INFO synthesis text The gripper's solenoid valve has a delay, so the controller commands early according to belt speed, just as the trimming command angle moves with shaft speed.
+2026-10-23 02:25:48,882 INFO yield speech len 12.76, rtf 0.5294576520830112
+
+100%|██████████| 1/1 [00:06<00:00,  6.93s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:49,068 INFO synthesis text The mean delay can be compensated, but its spread scatters the grip point over the belt speed times that spread, which has to fit the gripper's window, so the belt speed limit is set by the spread.
+2026-10-23 02:25:56,744 INFO yield speech len 14.6, rtf 0.5257445492156565
+
+100%|██████████| 1/1 [00:07<00:00,  7.86s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:25:56,927 INFO synthesis text The cell's pick, carry, place and return are sequenced by a state machine too, and a robot senses contact force through joint current or a force sensor.
+2026-10-23 02:26:03,834 INFO yield speech len 13.08, rtf 0.5280726728818468
+
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:04,018 INFO synthesis text In everyday life, the closest thing to trimming timing is the baton change in a relay.
+2026-10-23 02:26:08,122 INFO yield speech len 7.56, rtf 0.542854695093064
+
+100%|██████████| 1/1 [00:04<00:00,  4.28s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:08,300 INFO synthesis text The receiver must take the baton inside the changeover zone, so they start running when their teammate passes a mark: that's the early command angle.
+2026-10-23 02:26:14,032 INFO yield speech len 10.84, rtf 0.5287749960853605
+
+100%|██████████| 1/1 [00:05<00:00,  5.91s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:14,212 INFO synthesis text The faster the teammate, the further back the mark, just as a faster shaft needs an earlier command.
+2026-10-23 02:26:18,850 INFO yield speech len 8.76, rtf 0.5294491983439824
+
+100%|██████████| 1/1 [00:04<00:00,  4.81s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:19,032 INFO synthesis text Coaches know most failed changes come not from a slow reaction but from an inconsistent one.
+2026-10-23 02:26:23,212 INFO yield speech len 7.64, rtf 0.5471053235817954
+
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:23,389 INFO synthesis text Same as trimming: the spread of the delay hurts more than the delay itself.
+2026-10-23 02:26:26,619 INFO yield speech len 5.84, rtf 0.5530410433468753
+
+100%|██████████| 1/1 [00:03<00:00,  3.40s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:26,665 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:26:26,794 INFO synthesis text Back to the opening question.
+2026-10-23 02:26:28,006 INFO yield speech len 1.72, rtf 0.7044244644253753
+
+100%|██████████| 1/1 [00:01<00:00,  1.38s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.38s/it]
+cv2: 180/208 句，用时 15.0 分钟，预计还要 2.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:28,269 INFO synthesis text Raising the trimming speed from three hundred to five hundred cuts one stop-and-trim from zero.thirty-eight to zero.twenty-nine seconds, about four.eight minutes a day.
+2026-10-23 02:26:35,687 INFO yield speech len 14.16, rtf 0.5239128224593771
+
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:35,873 INFO synthesis text With a six to ten millisecond delay the window limit is one thousand, two hundred and fifty r/min and the stopping limit about seven hundred and sixty-six, so five hundred is within both.
+2026-10-23 02:26:43,582 INFO yield speech len 15.28, rtf 0.5045539889660181
+
+100%|██████████| 1/1 [00:07<00:00,  7.89s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:43,769 INFO synthesis text The command angle can be two hundred and eighty-two degrees to three hundred degrees; take two hundred and ninety-one degrees.
+2026-10-23 02:26:49,861 INFO yield speech len 11.64, rtf 0.5234314608819706
+
+100%|██████████| 1/1 [00:06<00:00,  6.27s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:50,042 INFO synthesis text One warning: if low voltage stretches the delay to five to fifteen milliseconds, the window limit drops to exactly five hundred, with no margin.
+2026-10-23 02:26:56,872 INFO yield speech len 13.04, rtf 0.5237763279054795
+
+100%|██████████| 1/1 [00:07<00:00,  7.00s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:56,925 WARNING synthesis text So steady the delay before you speed up. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:26:57,055 INFO synthesis text So steady the delay before you speed up.
+2026-10-23 02:26:59,187 INFO yield speech len 3.48, rtf 0.6128426255850956
+
+100%|██████████| 1/1 [00:02<00:00,  2.30s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:26:59,364 INFO synthesis text Now Virtual lab fourteen-one, the trimming sequence editor. On the WenQuest platform you can do it yourself. The verdicts, the hints and the tasks on the right are blurred here, so you can read them on your own. Top left is the timing chart. Green is the window where the knife may enter, and red is the actual entry range once the delay is counted.
+2026-10-23 02:27:11,706 INFO yield speech len 23.48, rtf 0.525655687566104
+
+100%|██████████| 1/1 [00:12<00:00, 12.53s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:27:11,907 INFO synthesis text Press Another fifty trials. Each delay falls at random between six and ten milliseconds, and the row of cells at the bottom left shows the fifty trial cuts.
+2026-10-23 02:27:18,343 INFO yield speech len 12.16, rtf 0.5292665605482302
+
+100%|██████████| 1/1 [00:06<00:00,  6.62s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:27:18,528 INFO synthesis text Task one: press Scramble. The command jumps to two hundred and fifty degrees, the release range gets shorter, and wiping is switched off. Here we drag the command angle a little later and watch the red bar move toward the window. The rest of the command angle, the release and the wiper are yours to fix, until every verdict passes.
+2026-10-23 02:27:29,766 INFO yield speech len 21.6, rtf 0.5202779946503816
+
+100%|██████████| 1/1 [00:11<00:00, 11.42s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:27:29,962 INFO synthesis text Task two: reset, and raise the trimming speed to seven hundred or more with the same delay. The red bar moves right, out of the window, and gets wider. The slides gave the upper end; work out how early the command may go, then check it with the slider. All fifty trials must cut.
+2026-10-23 02:27:40,047 INFO yield speech len 18.92, rtf 0.5330228402297038
+
+100%|██████████| 1/1 [00:10<00:00, 10.27s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:27:40,238 INFO synthesis text Task three: set the delay to five to fifteen milliseconds. The red bar widens at once, and some of the fifty trials start to fail. The slides worked out the window limit; compare it with the stopping limit, enter the result to check, then confirm with the slider and the trials. The guide and the report template are on the platform.
+2026-10-23 02:27:52,375 INFO yield speech len 23.52, rtf 0.5160461173576563
+
+100%|██████████| 1/1 [00:12<00:00, 12.33s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.33s/it]
+cv2: 190/208 句，用时 16.4 分钟，预计还要 1.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:27:52,572 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-23 02:27:55,514 INFO yield speech len 5.24, rtf 0.5615139280566732
+
+100%|██████████| 1/1 [00:03<00:00,  3.11s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:27:55,686 INFO synthesis text You can open today's interactive slides and the trimming sequence editor yourself, and watch the entry range and the trial cuts change as you go.
+2026-10-23 02:28:02,298 INFO yield speech len 12.64, rtf 0.5231524570078789
+
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:28:02,477 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-23 02:28:05,558 INFO yield speech len 5.84, rtf 0.5275247439946213
+
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:28:05,733 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-23 02:28:11,833 INFO yield speech len 11.52, rtf 0.5295018355051677
+
+100%|██████████| 1/1 [00:06<00:00,  6.27s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:28:12,101 INFO synthesis text Your assignment has four questions. One: sewing at three thousand, five hundred r/min, work out stage by stage the stop-and-trim time for trimming speeds of two hundred and fifty and four hundred r/min. With two thousand, five hundred trims a day, how many minutes a day separate them?
+2026-10-23 02:28:23,977 INFO yield speech len 22.36, rtf 0.5311422996316272
+
+100%|██████████| 1/1 [00:12<00:00, 12.16s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:28:24,177 INFO synthesis text Two: trimming at four hundred and fifty r/min with a six to nine millisecond delay. Find the allowed range of command angles and choose one. After a while a low voltage stretches the delay to five to thirteen milliseconds. Does your angle still work? If not, change it, and explain why.
+2026-10-23 02:28:36,980 INFO yield speech len 24.52, rtf 0.5221505927417252
+
+100%|██████████| 1/1 [00:12<00:00, 12.99s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.99s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-23 02:28:37,187 INFO synthesis text Three: with an idle angle of two hundred and eleven.six degrees and a ten-degree margin, find the backtack speed limits for a reverse-feed solenoid with a sixteen millisecond delay and a feed stepper with a five millisecond delay, then say why an electronic-feed machine may still default to only one thousand, eight hundred stitches a minute for the start backtack.
+2026-10-23 02:28:51,390 INFO yield speech len 27.04, rtf 0.5252360504054459
+
+ 50%|█████     | 1/2 [00:14<00:14, 14.40s/it]2026-10-23 02:28:51,582 INFO synthesis text  Four is a discussion. At a cross seam the machine lowers the speed, adds foot pressure and changes the needle-thread tension. Say which fault each one prevents, which way it goes, and its side effects.
+2026-10-23 02:28:58,349 INFO yield speech len 13.0, rtf 0.5205062352693998
+
+100%|██████████| 2/2 [00:21<00:00, 10.02s/it]
+100%|██████████| 2/2 [00:21<00:00, 10.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:28:58,539 INFO synthesis text Submit the calculation report and the lab screenshots on the WenQuest platform.
+2026-10-23 02:29:01,872 INFO yield speech len 6.12, rtf 0.5445990297529433
+
+100%|██████████| 1/1 [00:03<00:00,  3.50s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:02,047 INFO synthesis text There's also a ten-question quiz. For example, trimming at five hundred r/min with the command at two hundred and eighty-five degrees and a six to ten millisecond delay: at what angle does the knife enter at the latest?
+2026-10-23 02:29:11,296 INFO yield speech len 17.76, rtf 0.5208088068274764
+
+100%|██████████| 1/1 [00:09<00:00,  9.43s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:11,483 INFO synthesis text Or, the delay varies between seven and twelve milliseconds and the window is thirty degrees wide. Considering only the window, what is the highest trimming speed?
+2026-10-23 02:29:18,485 INFO yield speech len 13.32, rtf 0.5256317041299723
+
+100%|██████████| 1/1 [00:07<00:00,  7.18s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.18s/it]
+cv2: 200/208 句，用时 17.8 分钟，预计还要 0.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:18,666 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-23 02:29:21,351 INFO yield speech len 4.92, rtf 0.5456042968160738
+
+100%|██████████| 1/1 [00:02<00:00,  2.85s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:21,398 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-23 02:29:21,523 INFO synthesis text Three things to remember.
+2026-10-23 02:29:23,008 INFO yield speech len 2.32, rtf 0.6399599642589175
+
+100%|██████████| 1/1 [00:01<00:00,  1.65s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:23,178 INFO synthesis text One: a state machine sequences the working cycle, and in stop-and-trim the trimming stitch takes most of the time.
+2026-10-23 02:29:28,271 INFO yield speech len 10.0, rtf 0.5092913389205933
+
+100%|██████████| 1/1 [00:05<00:00,  5.27s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:28,451 INFO synthesis text Two: every action lines up with the mechanical timing chart: reversal inside the feed dog's idle angle, knife entry inside the three hundred-to-three hundred and thirty-degree window.
+2026-10-23 02:29:38,124 INFO yield speech len 18.8, rtf 0.5145526820040763
+
+100%|██████████| 1/1 [00:09<00:00,  9.86s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:38,315 INFO synthesis text Three: entry angle equals command angle plus six n t; the mean delay can be compensated, but its spread can only be absorbed by slowing down, so keep the delay steady.
+2026-10-23 02:29:45,729 INFO yield speech len 14.32, rtf 0.5177495033381372
+
+100%|██████████| 1/1 [00:07<00:00,  7.59s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:45,913 INFO synthesis text The assignment, quiz and Lab fourteen-one report are on WenQuest.
+2026-10-23 02:29:49,394 INFO yield speech len 6.48, rtf 0.5372006952026743
+
+100%|██████████| 1/1 [00:03<00:00,  3.65s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:49,568 INFO synthesis text The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-23 02:29:57,468 INFO yield speech len 14.84, rtf 0.5323434133092669
+
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-23 02:29:57,653 INFO synthesis text Next time it's the control of pattern sewers, buttonholers and bartackers, where the fabric is no longer pushed by a feed dog but clamped in a frame that follows a pattern. See you then.
+2026-10-23 02:30:06,188 INFO yield speech len 16.04, rtf 0.5321427919620885
+
+100%|██████████| 1/1 [00:08<00:00,  8.71s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.71s/it]
+cv2: 208/208 句，用时 18.6 分钟，预计还要 0.0 分钟
+cv2: 208 句完成
+2026-10-23 02:30:06,358 DEBUG Attempting to acquire lock 139646969139152 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-23 02:30:06,359 DEBUG Lock 139646969139152 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-23 02:30:06,359 DEBUG Attempting to release lock 139646969139152 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-23 02:30:06,359 DEBUG Lock 139646969139152 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-23 02:30:06,361 DEBUG Attempting to acquire lock 139646969146016 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-23 02:30:06,361 DEBUG Lock 139646969146016 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-23 02:30:06,361 DEBUG Attempting to release lock 139646969146016 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-23 02:30:06,361 DEBUG Lock 139646969146016 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 35 分钟
