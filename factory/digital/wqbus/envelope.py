@@ -130,6 +130,19 @@ _ENV_V = _V(ENVELOPE)
 _DATA_V = {k: _V(v) for k, v in DATA_SCHEMAS.items()}
 
 
+def register(type_, schema):
+    """登记一种新消息类型（第 30 轮 H-8：freecad-ai-parts 独有的企业模块用，如 cad.release）。已有的类型不能改。"""
+    global _ENV_V
+    if type_ in DATA_SCHEMAS:
+        if DATA_SCHEMAS[type_] != schema:
+            raise ValueError("消息类型 {} 已有，不能改".format(type_))
+        return
+    DATA_SCHEMAS[type_] = schema
+    ENVELOPE["properties"]["type"]["enum"] = sorted(DATA_SCHEMAS)
+    _ENV_V = _V(ENVELOPE)
+    _DATA_V[type_] = _V(schema)
+
+
 def validate(msg):
     """校验一条消息（dict），不合格抛 ValidationError，合格返回原消息。"""
     try:

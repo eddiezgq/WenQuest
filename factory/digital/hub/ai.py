@@ -20,6 +20,9 @@ from hub.llm import LLM
 from hub.privacy import actor
 
 log = logging.getLogger("ai")
+# 扩展（第 30 轮 H-8）：提议在 ERP 里执行完以后要做的事 fn(db, action, preview, mode)。
+# freecad-ai-parts 的新产品登记（hub/products.py）挂在这里；问渠这边为空
+ON_PROPOSAL_DONE = []
 
 LEVEL_RANK = {"info": 0, "warn": 1, "critical": 2}
 
@@ -213,6 +216,10 @@ class Assistant:
         elif d.get("proposal_done"):
             self.db.x("update ai_proposal set status='executed', result=%s where proposal_id=%s and status<>'failed'",
                       (json.dumps({"created": d.get("created", [])}, ensure_ascii=False), pid))
+            if ON_PROPOSAL_DONE:
+                p = self.db.one("select action, preview, mode from ai_proposal where proposal_id=%s", (pid,))
+                for fn in ON_PROPOSAL_DONE if p else ():
+                    fn(self.db, p["action"], p["preview"], p["mode"])
 
     # ================================================================ 问答
     def chat(self, messages, mode="teach", role="manager", user="user"):

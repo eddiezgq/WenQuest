@@ -61,6 +61,9 @@ from factory import plant as _plant  # noqa: E402  工厂清单（第 30 轮；f
 if _plant.active():
     STAGE = dict(_plant.active()["STAGE"])
     WORKCENTER_POWER = dict(_plant.active()["WORKCENTER_POWER"])
+# 扩展（第 30 轮 H-8）：起草工艺规程时给自制件补粗基准与装夹，fn(item) → {datum?, clamping?}（写到第一道机加工工序上）。
+# freecad-ai-parts 的新产品登记（hub/products.py）挂在这里；问渠这边为空
+PLAN_HINTS = []
 ECON_METHOD = {"粗车 Rough turning": "od_rough_turn", "精车 Finish turning": "od_finish_turn"}
 MATERIAL_KIENZLE = {"45": "C45E", "45 钢": "C45E", "40Cr": "C45E", "20CrMnTi": "C45E"}
 
@@ -460,6 +463,10 @@ def active_routing(db, mode, item):
 def factory_plan(item):
     """工厂数据里的现行工艺（第 0 版），新建工艺规程时作为起点。"""
     rt = F.BOMS[item][0]
-    return {"item": item, "routing": rt, "operations": [
-        {"seq": 10 * (i + 1), "operation": op, "workstation": F.OPERATIONS[op], "minutes": m, "content": ""}
-        for i, (op, m) in enumerate(F.ROUTINGS[rt])]}
+    ops = [{"seq": 10 * (i + 1), "operation": op, "workstation": F.OPERATIONS[op], "minutes": m, "content": ""}
+           for i, (op, m) in enumerate(F.ROUTINGS[rt])]
+    hint = {k: v for fn in PLAN_HINTS for k, v in (fn(item) or {}).items()}
+    first = next((o for o in ops if STAGE.get(o["operation"]) in ("rough", "finish", "keyway", "gear", "grind")), None)
+    if hint and first:
+        first.update(hint)
+    return {"item": item, "routing": rt, "operations": ops}

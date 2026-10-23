@@ -5,7 +5,10 @@
 //   done: { api: '/ehs/issues', path: 'issues.length', grew: true }  接口里的数比这一步开始时多了（也可以 gt / gte / eq 一个数）
 //   done: { api: '/proposals', path: '0.proposal_id', changed: true } 接口里的这个值和这一步开始时不一样了（列表有条数上限时用：最新一条换了）
 import { reactive } from 'vue';
-import TOURS from '../help/tours.json';
+import BASE from '../help/tours.json';
+import EXTRA from '../help/extra.json';        // 本仓库独有的引导（freecad-ai-parts 的企业功能；问渠这边是空的，factory/SYNC.md）
+
+const TOURS = { ...BASE, ...(EXTRA.tours || {}) };
 
 export const tour = reactive({ id: null, i: 0, steps: [], title: '', ok: [], finished: false });
 

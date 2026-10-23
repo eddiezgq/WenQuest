@@ -556,9 +556,31 @@ SCRIPTS = {
     "ent-ai": ent_ai,
 }
 AFTER = {"teach-maint": teach_maint_after, "teach-director": teach_director_after}   # 录完的收尾（录失败也做）
-ROLE = {"teach-order": "planner", "teach-dispatch": "operator", "teach-8d": "quality"}
-# 第 30 轮 8-4 的几段用老师（厂长）：要按“当场动手”、要能登记投诉、检验来料   # 学生岗位；其余用厂长（老师）
+ROLE = {"teach-order": "planner", "teach-dispatch": "operator", "teach-8d": "quality"}   # 学生岗位；其余用厂长（老师）
+# （第 30 轮 8-4 的几段用老师：要按“当场动手”、要能登记投诉、检验来料）
 ORDER_LAST = ("teach-director",)       # 会重置情景，放最后
+
+# 只在 freecad-ai-parts 的企业功能视频（企业账号、新产品进工厂）：剧本在它独有的 tools/help_videos_enterprise.py，
+# 清单在各自的 web/src/help/extra.json（factory/SYNC.md）；问渠这边两样都是空的
+_ENT = os.path.join(HERE, "help_videos_enterprise.py")
+if os.path.exists(_ENT):
+    import importlib.util  # noqa: E402
+    _spec = importlib.util.spec_from_file_location("help_videos_enterprise", _ENT)
+    _ent = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_ent)
+    SCRIPTS.update(_ent.SCRIPTS)                           # 剧本只用传进来的录制助手 r（Rec）
+    ROLE.update(getattr(_ent, "ROLE", {}))
+EXTRA = os.path.join(os.path.dirname(HERE), "web", "src", "help", "extra.json")
+
+
+def manifest():
+    """视频清单：共有的 videos.json 加上本仓库 extra.json 里的 videos"""
+    with open(MANIFEST, encoding="utf-8") as f:
+        out = json.load(f)
+    if os.path.exists(EXTRA):
+        with open(EXTRA, encoding="utf-8") as f:
+            out.update(json.load(f).get("videos") or {})
+    return out
 
 
 def _api(hub, path, body, ctx, token=None):
@@ -584,9 +606,7 @@ def order(names):
 async def record(args):
     from playwright.async_api import async_playwright
 
-    with open(MANIFEST, encoding="utf-8") as f:
-        manifest = json.load(f)
-    names = order([n for n, v in manifest.items() if v["edition"] == args.edition and (not args.only or n in args.only)])
+    names = order([n for n, v in manifest().items() if v["edition"] == args.edition and (not args.only or n in args.only)])
     missing = [n for n in names if n not in SCRIPTS]
     if missing:
         raise SystemExit("清单里这些视频没有剧本：" + "、".join(missing))

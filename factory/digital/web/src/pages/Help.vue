@@ -196,7 +196,8 @@ watch(() => route.params.ed, legacy);
 
 function setEd(k) { router.push(`/help/${k}`); }
 function pickStage(i) {
-  const slug = (STAGE_CHAPTER[ed.value] || [])[i];
+  const have = new Set(chapterFiles(ed.value).map((c) => c.slug));
+  const slug = ((STAGE_CHAPTER[ed.value] || [])[i] || '').split('|').find((s) => have.has(s));
   if (slug) router.push(`/help/${ed.value}/${slug}`);
 }
 // 小节在折叠的“查表”里：先展开

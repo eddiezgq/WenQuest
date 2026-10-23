@@ -600,7 +600,7 @@ def config(request: Request):
         "erpnext_url": ((os.environ.get("WQ_PUBLIC_URL", "").rstrip("/") + "/api/erp/sso") if AUTH == "wenquest" and erp_sso.enabled()
                         else lan(os.environ.get("WQ_ERPNEXT_URL", "http://localhost:8090"))),   # 线上：经单点登录入口（第 7 轮）
         "nodered_url": lan(os.environ.get("WQ_NODERED_URL", "http://localhost:1880")),   # 线上设为空：不对外（D8）
-        "auth": AUTH, "login_url": LOGIN_URL, "edition": EDITION,
+        "auth": AUTH, "login_url": LOGIN_URL, "edition": os.environ.get("WQ_EDITION", EDITION),   # 每次现读（测试、企业版改环境变量后不用重载）
         "default_mode": DEFAULT_MODE, "roles": ROLE_NAMES, "factory_name": FACTORY_NAME, "ai_engine": H.ai.llm.name if H.ai else "rules",
         "tz": str(kpi.TZ), "customers": F.CUSTOMERS, "fg": [{"item_code": "WQR-105", "name": F.ITEMS["WQR-105"][0],
                                                                "price": F.FG_SELLING_PRICE}],
@@ -2192,6 +2192,14 @@ try:                                       # 只在问渠这边（见 SYNC.md）
     _design_sw.mount(app)
 except ImportError:
     pass
+
+
+# ---------------------------------------------------------------- 企业功能（第 30 轮 H-8）：freecad-ai-parts 独有的 hub/enterprise_api.py
+# （企业账号、CAD 方案、选型零件库、新产品进工厂、浮动席位）有就挂上；问渠这边没有这个文件
+import importlib.util  # noqa: E402
+if importlib.util.find_spec("hub.enterprise_api"):
+    from hub import enterprise_api as _enterprise  # noqa: E402
+    _enterprise.mount(app, H, sys.modules[__name__])
 
 
 # ---------------------------------------------------------------- 网页

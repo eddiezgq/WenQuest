@@ -86,7 +86,8 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}",
           "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
-            "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name"}
+            "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name",
+            "Item": "item_code"}                                  # 真 ERPNext：物料按物料编号命名
 
 
 def now_str():
@@ -162,12 +163,19 @@ class Mock:
         self.db.setdefault(dt_, {})[doc["name"]] = doc
         return doc
 
+    def _uom(self, item):
+        """物料的库存单位：先看物料主数据（新建的物料，如 freecad-ai-parts 的新产品），再看工厂代码数据"""
+        it = self.db.get("Item", {}).get(item)
+        if it and it.get("stock_uom"):
+            return it["stock_uom"]
+        return F.ITEMS[item][2]
+
     def bin_add(self, item, wh, qty):
         name = "{}@{}".format(item, wh)
         b = self.db.setdefault("Bin", {}).get(name)
         if b is None:
             b = self.put("Bin", {"name": name, "item_code": item, "warehouse": wh, "actual_qty": 0.0, "ordered_qty": 0.0,
-                                 "reserved_qty": 0.0, "projected_qty": 0.0, "stock_uom": F.ITEMS[item][2]})
+                                 "reserved_qty": 0.0, "projected_qty": 0.0, "stock_uom": self._uom(item)})
         if b["actual_qty"] + qty < -1e-9:
             raise Err(417, "InsufficientStock", "{} 在 {} 库存不足：现有 {:g}，需要 {:g}".format(
                 item, wh, b["actual_qty"], -qty))
@@ -417,6 +425,10 @@ class Mock:
                               "completed_qty": 0, "sequence_id": op.get("idx") or i + 1,
                               "quality_inspection_required": op.get("quality_inspection_required", 0)}
                              for i, op in enumerate(bom["operations"])]
+        # 与 ERPNext 一样带出所需物料（每行可另指领料仓库）
+        doc["required_items"] = [{"item_code": b["item_code"], "required_qty": round(b["qty"] * float(doc.get("qty") or 1), 6),
+                                  "source_warehouse": doc.get("source_warehouse"), "stock_uom": b.get("stock_uom")}
+                                 for b in bom["items"]]
         return doc
 
     def make_stock_entry(self, work_order_id, purpose, qty):
@@ -425,8 +437,10 @@ class Mock:
             raise Err(404, "DoesNotExistError", "工单 {} 不存在".format(work_order_id))
         bom = self.db["BOM"][wo["bom_no"]]
         qty = float(qty)
-        items = [{"item_code": b["item_code"], "qty": round(b["qty"] * qty, 6), "s_warehouse": wo.get("source_warehouse")
-                  or "{} - {}".format(F.WAREHOUSES[0], ABBR), "uom": b["stock_uom"], "stock_uom": b["stock_uom"],
+        per_item = {r["item_code"]: r.get("source_warehouse") for r in wo.get("required_items") or []}
+        items = [{"item_code": b["item_code"], "qty": round(b["qty"] * qty, 6),
+                  "s_warehouse": per_item.get(b["item_code"]) or wo.get("source_warehouse") or "{} - {}".format(F.WAREHOUSES[0], ABBR),
+                  "uom": b.get("stock_uom") or self._uom(b["item_code"]), "stock_uom": b.get("stock_uom") or self._uom(b["item_code"]),
                   "conversion_factor": 1} for b in bom["items"]]
         items.append({"item_code": wo["production_item"], "qty": qty, "t_warehouse": wo["fg_warehouse"],
                       "is_finished_item": 1, "uom": "Nos", "stock_uom": "Nos", "conversion_factor": 1})

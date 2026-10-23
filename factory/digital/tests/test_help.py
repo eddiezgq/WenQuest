@@ -87,14 +87,19 @@ def _quiz_option(s):
     return {"text": parts[0], "verdict": parts[1] if len(parts) > 1 else "", "why": " | ".join(parts[2:])}
 
 
-TOURS = json.loads(_read(HELP, "tours.json"))
+EXTRA = json.loads(_read(HELP, "extra.json"))          # 本仓库独有的引导与视频（问渠这边空，freecad-ai-parts 是企业功能的）
+TOURS = dict(json.loads(_read(HELP, "tours.json")), **EXTRA.get("tours", {}))
 LAB_PUBLIC = os.path.join(DIGITAL, "web", "public", "labs")
 LABS = dict(re.findall(r"^  (\w+): \{ title: '[^']+'.*?presets: \[([^\]]*)\] \}", _read(HELP, "labs.js"), re.M | re.S))
 LABS = {k: re.findall(r"'([\w-]+)'", v) for k, v in LABS.items()}
-VIDEOS = json.loads(_read(HELP, "videos.json"))
+VIDEOS = dict(json.loads(_read(HELP, "videos.json")), **EXTRA.get("videos", {}))
 ANIMS = set(re.findall(r"^\s+'?([\w-]+)'?: defineAsyncComponent", _read(WEB, "components", "help", "anim", "index.js"), re.M))
 ROUTES = dict(re.findall(r"path: '([^']+)', component: \(\) => import\('\./pages/(\w+)\.vue'\)", _read(WEB, "main.js")))
 REDIRECTS = set(re.findall(r"path: '([^']+)', redirect:", _read(WEB, "main.js")))
+# 企业页面（main.js 的 ENTERPRISE_PAGES）：页面文件在（freecad-ai-parts）才有这条路由
+for _f, _p in re.findall(r"'\./pages/(\w+)\.vue': '([^']+)'", _read(WEB, "main.js").split("ENTERPRISE_PAGES = ", 1)[1].split("\n", 1)[0]):
+    if os.path.exists(os.path.join(WEB, "pages", _f + ".vue")):
+        ROUTES[_p] = _f
 
 
 def _route_ok(path):
@@ -353,10 +358,10 @@ def test_front_page_stages_open_existing_chapters():
     have = {(c[0], c[1]) for c in _chapters()}
     for ed in EDITIONS:
         m = re.search(ed + r": \[([^\]]*)\]", src)
-        slugs = re.findall(r"'([a-z0-9-]+)'", m.group(1))
+        slugs = re.findall(r"'([a-z0-9|-]+)'", m.group(1))
         assert len(slugs) == 7, ed
-        for s in slugs:
-            assert (ed, s) in have, (ed, s)
+        for s in slugs:                       # “a|b”：有 a 用 a，没有用 b——至少一个是真有的章
+            assert any((ed, x) in have for x in s.split("|")), (ed, s)
 
 
 def test_videos_listed_and_used():

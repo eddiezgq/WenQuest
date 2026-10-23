@@ -24,6 +24,13 @@ const QI_PARAM = {
 };
 const QI_TEMPLATE = { 'SH-301': '零件检验-输出轴' };
 const MAKE_WH = { 'SH-301': WH.semi };
+// 扩展（第 30 轮 H-8）：freecad-ai-parts 独有的提议（CAD 方案转为生产物料、到货入库）在它的 lib/erp_enterprise.js；问渠这边没有这个文件
+const EXTRA_ACTIONS = {};
+try {
+  Object.assign(EXTRA_ACTIONS, require('./erp_enterprise')({ WH }));
+} catch (e) {
+  if (e.code !== 'MODULE_NOT_FOUND' || !String(e.message).includes('erp_enterprise')) throw e;
+}
 
 // ERPNext 的日期时间：站点时区的 "YYYY-MM-DD HH:MM:SS"
 function erpDatetime(iso) {
@@ -182,9 +189,14 @@ class ERP {
             ...(direct ? { sales_order: soDoc.name } : { wq_sales_order: soDoc.name }),
             planned_start_date: `${w.planned_start_date} 08:00:00`,
             expected_delivery_date: w.expected_delivery_date, skip_transfer: 1,
-            source_warehouse: WH.raw, wip_warehouse: WH.wip, fg_warehouse: MAKE_WH[w.production_item] || WH.semi,
+            source_warehouse: WH.raw, wip_warehouse: WH.wip,
+            fg_warehouse: MAKE_WH[w.production_item] || (w.warehouse === 'fg' ? WH.fg : WH.semi),
             use_multi_level_bom: 0,
           });
+          if (w.sources) {     // 成品工单领料：自制件从半成品库，其余从原材料库（算料给出 sources）
+            wo.required_items = (wo.required_items || []).map((r) => ({ ...r,
+              source_warehouse: w.sources[r.item_code] === 'semi' ? WH.semi : WH.raw }));
+          }
           const woDoc = await this.insert('Work Order', { ...wo, docstatus: 1 });
           out.push(this.doc('Work Order', woDoc, 'submitted', opt));
           created.push(['Work Order', woDoc.name]);
@@ -253,6 +265,8 @@ class ERP {
           out.push(this.doc(r[0], r[1], r[2], opt));
           created.push([r[0], r[1].name]);
         }
+      } else if (EXTRA_ACTIONS[d.action]) {
+        await EXTRA_ACTIONS[d.action].call(this, d.preview, { out, created, opt });
       } else {
         return [];      // 其他提议（如下达工单）由工作台的 MES 执行
       }
