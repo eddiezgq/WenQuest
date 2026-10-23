@@ -1,0 +1,26 @@
+# 实验 26.4 的指导书与报告模板。目的、场景、参数、任务取自 lab26_4.js。
+原理:
+  - ["关节匀速转动时没有惯性力矩；关节 1 的轴竖直，也没有重力力矩。其余关节不动时速度项也为零，电机的力矩全部用来克服摩擦。", "At constant speed there is no inertial torque, and joint 1's vertical axis carries no gravity torque; with the other joints still the velocity terms vanish too, so the motor torque is all friction."]
+  - ["库仑摩擦加黏性摩擦的模型（式 (26.4.1)）：", "The Coulomb-plus-viscous model (Eq. 26.4.1):"]
+  - 式: "τ_f = f_c sign θ̇ + f_v θ̇"
+  - ["正、负速度两边各是一条直线：截距是 ±f_c，斜率是 f_v。用最小二乘拟合两条直线（共用 f_c、f_v）。", "Each side of zero speed is a straight line: the intercept is ±f_c and the slope f_v. Fit both lines by least squares with shared f_c and f_v."]
+步骤:
+  - ["关节 1、转速 0.5 rad/s，按“开始”，记下平均摩擦力矩（任务 1），填入表 1。", "Joint 1 at 0.5 rad/s: press Start and record the mean friction torque (task 1) in Table 1."]
+  - ["换不同的转速，正、负各测两个以上（或勾选“一次测一组”），记下拟合的 f_c、f_v（任务 2），填入表 1。", "Measure at other speeds, two or more on each side (or tick “Measure a set in one go”), and record the fitted f_c and f_v (task 2) in Table 1."]
+  - ["换成关节 6，重复（任务 3），填入表 2。", "Repeat for joint 6 (task 3) in Table 2."]
+数据表:
+  - 标题: ["表 1  关节 1 的恒速试验", "Table 1  Constant-speed tests on joint 1"]
+    表头: ["θ̇ / (rad/s)", "平均摩擦力矩 / (N·m)"]
+    表头英文: ["θ̇ / (rad/s)", "Mean friction torque / (N·m)"]
+    行: [["0.2", ""], ["0.5", ""], ["1.0", ""], ["−0.2", ""], ["−0.5", ""], ["−1.0", ""], ["拟合 f_c / f_v", ""]]
+    行英文: [["0.2", ""], ["0.5", ""], ["1.0", ""], ["−0.2", ""], ["−0.5", ""], ["−1.0", ""], ["Fitted f_c / f_v", ""]]
+  - 标题: ["表 2  关节 6 的恒速试验", "Table 2  Constant-speed tests on joint 6"]
+    表头: ["θ̇ / (rad/s)", "平均摩擦力矩 / (N·m)"]
+    表头英文: ["θ̇ / (rad/s)", "Mean friction torque / (N·m)"]
+    行: [["0.2", ""], ["0.5", ""], ["1.0", ""], ["−0.2", ""], ["−0.5", ""], ["−1.0", ""], ["拟合 f_c / f_v", ""]]
+    行英文: [["0.2", ""], ["0.5", ""], ["1.0", ""], ["−0.2", ""], ["−0.5", ""], ["−1.0", ""], ["Fitted f_c / f_v", ""]]
+注意:
+  - ["仿真中的摩擦由 MuJoCo 的 frictionloss（干摩擦）和 damping（黏性摩擦）给出，数值是示意值；它没有斯特里贝克效应，也不随温度、负载变化。", "Friction in the simulation comes from MuJoCo's frictionloss (dry) and damping (viscous) with illustrative values; it has no Stribeck effect and does not vary with temperature or load."]
+  - ["每次取 3 s 中后 1.5 s 的平均，并减去模型的重力项和速度项；测得的点保留到重新载入页面为止。", "Each run averages the last 1.5 s of 3 s and subtracts the model's gravity and velocity terms; the points are kept until the page is reloaded."]
+思考题:
+  - ["恒速试验测得的点正好落在两条直线上，是因为仿真中的摩擦本来就是这样设的。真实的减速器在低速处还有斯特里贝克效应，摩擦还随温度变化。你会怎样安排速度点，才能看出这些效应？", "The points fall exactly on two straight lines because that is how friction is set in the simulation. A real gearbox shows the Stribeck effect at low speed and changes with temperature. How would you choose the test speeds to reveal these effects?"]

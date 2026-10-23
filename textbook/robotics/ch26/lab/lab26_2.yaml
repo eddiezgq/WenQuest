@@ -1,0 +1,21 @@
+# 实验 26.2 的指导书与报告模板。目的、场景、参数、任务取自 lab26_2.js。
+原理:
+  - ["关节力矩对惯性参数和摩擦参数是线性的（式 (26.1.5)）。把许多时刻的回归矩阵叠起来，只留基参数的列，得到超定方程组：", "The joint torques are linear in the inertial and friction parameters (Eq. 26.1.5). Stacking the regressors of many instants and keeping only the base-parameter columns gives an overdetermined system:"]
+  - 式: "W π_b = y，W = [Y_b(t₁); Y_b(t₂); …]"
+  - ["最小二乘估计的协方差为 σ²(WᵀW)⁻¹。W 的条件数 κ = σ_max/σ_min 越大，测量噪声被放大得越厉害；W 秩亏时，有的参数组合根本测不出来。", "The least-squares estimate has covariance σ²(WᵀW)⁻¹. The larger W's condition number κ = σ_max/σ_min, the more the noise is amplified; when W is rank deficient some parameter combinations cannot be measured at all."]
+  - ["激励轨迹（式 (26.2.1)）：每个关节是有限项傅里叶级数，系数经优化使 κ 尽量小，同时满足转角、速度、加速度和离地高度的限制（26.2.3 节）。", "Exciting trajectory (Eq. 26.2.1): each joint follows a finite Fourier series whose coefficients are optimized to make κ small while respecting angle, speed, acceleration and clearance limits (Section 26.2.3)."]
+步骤:
+  - ["场景“激励轨迹”：幅度 1，按“开始”，跑完一个周期（10 s），记下条件数和前半个周期结束时的条件数（任务 1、2），填入表 1。", "Scene “Exciting trajectory”: amplitude 1, press Start and run one period (10 s); record the condition number and its value after half a period (tasks 1 and 2) in Table 1."]
+  - ["把幅度依次改为 0.7、0.5、0.3，各跑一个周期（任务 3），填入表 1。", "Set the amplitude to 0.7, 0.5 and 0.3 and run a period each (task 3); Table 1."]
+  - ["场景“拿日常动作来辨识”：按“开始”，记下条件数（任务 4），填入表 1。", "Scene “Using an everyday move”: press Start and record the condition number (task 4) in Table 1."]
+数据表:
+  - 标题: ["表 1  轨迹与条件数（每 0.05 s 取一个时刻，52 个基参数）", "Table 1  Trajectory and condition number (an instant every 0.05 s, 52 base parameters)"]
+    表头: ["轨迹", "幅度", "时长 / s", "最大关节速度 / (rad/s)", "条件数 κ"]
+    表头英文: ["Trajectory", "Amplitude", "Duration / s", "Largest joint rate / (rad/s)", "Condition number κ"]
+    行: [["激励轨迹", "1", "10", "", ""], ["激励轨迹", "1", "5", "", ""], ["激励轨迹", "0.7", "10", "", ""], ["激励轨迹", "0.5", "10", "", ""], ["激励轨迹", "0.3", "10", "", ""], ["上下料动作（往返）", "—", "2.6", "", ""]]
+    行英文: [["Exciting trajectory", "1", "10", "", ""], ["Exciting trajectory", "1", "5", "", ""], ["Exciting trajectory", "0.7", "10", "", ""], ["Exciting trajectory", "0.5", "10", "", ""], ["Exciting trajectory", "0.3", "10", "", ""], ["Loading move (there and back)", "—", "2.6", "", ""]]
+注意:
+  - ["机器人按轨迹回放（不计动力学），回归矩阵由轨迹的 θ、θ̇、θ̈ 直接算出，没有测量噪声；条件数只取决于轨迹本身。", "The robot is played back along the trajectory (no dynamics); the regressors come straight from the trajectory's θ, θ̇, θ̈ with no measurement noise, so the condition number depends only on the trajectory."]
+  - ["各列的单位不同（kg、kg·m、kg·m²、N·m 等），条件数与参数的单位选取有关；比较不同轨迹时单位要一致。", "The columns have different units (kg, kg·m, kg·m², N·m and so on), so the condition number depends on the choice of units; compare trajectories with the same units."]
+思考题:
+  - ["上下料动作每天重复几千次，数据量很大，为什么仍然测不出全部基参数？如果把多种生产动作的数据合在一起呢？", "The loading move repeats thousands of times a day, so why can it still not reveal all the base parameters? What if data from several production moves were combined?"]

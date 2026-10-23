@@ -1,0 +1,24 @@
+# 实验 26.3 的指导书与报告模板。目的、场景、参数、任务取自 lab26_3.js。
+原理:
+  - ["手臂的模型已知时，负载只改变最后一个连杆的十个惯性参数（质量 m、m c、对连杆 6 坐标系原点的惯量）。关节摩擦也未知，一起辨识：", "With the arm's model known, the payload only changes the ten inertial parameters of the last link (mass m, m c, inertia about the link 6 frame origin). Joint friction is unknown too and is identified at the same time:"]
+  - 式: "τ − τ_手臂(θ, θ̇, θ̈) = [Y₆(θ, θ̇, θ̈), diag(sign θ̇), diag(θ̇)] x"
+  - 式: ["x = (π_负载, f_c1…f_c6, f_v1…f_v6)，共 22 个未知数", "x = (π_payload, f_c1…f_c6, f_v1…f_v6), 22 unknowns"]
+  - ["由 m 和 m c 得到质量和质心；用正规方程 (Σ YᵀY) x = Σ Yᵀy 边测边解。", "Mass and centre of gravity follow from m and m c; the normal equations (Σ YᵀY) x = Σ Yᵀy are solved as the data come in."]
+步骤:
+  - ["负载 3.8 kg、质心不偏移、实验时长 10 s，按“开始”，记下质量、质心、摩擦的估计和误差（任务 1、4），填入表 1。", "Payload 3.8 kg, no extra offset, duration 10 s: press Start and record the estimates and errors of mass, CoG and friction (tasks 1 and 4) in Table 1."]
+  - ["换一个负载（改质量，让质心偏到一侧），跑 10 s（任务 2），填入表 1。", "Change the payload (another mass and an off-centre CoG) and run 10 s (task 2); Table 1."]
+  - ["负载 3.8 kg，实验时长依次取 1.5 s、5 s、10 s，比较误差（任务 3），填入表 2。", "With 3.8 kg, run for 1.5 s, 5 s and 10 s and compare the errors (task 3) in Table 2."]
+数据表:
+  - 标题: ["表 1  负载辨识（10 s）", "Table 1  Payload identification (10 s)"]
+    表头: ["真值：质量 / kg", "真值：质心 / mm", "估计：质量 / kg", "估计：质心 / mm", "质量误差 / %", "质心误差 / mm"]
+    表头英文: ["True mass / kg", "True CoG / mm", "Estimated mass / kg", "Estimated CoG / mm", "Mass error / %", "CoG error / mm"]
+    行: [["3.8", "(0, 161.1, 0)", "", "", "", ""], ["", "", "", "", "", ""]]
+  - 标题: ["表 2  实验时长的影响（3.8 kg）", "Table 2  Effect of the duration (3.8 kg)"]
+    表头: ["时长 / s", "质量误差 / %", "质心误差 / mm", "f_c1 的估计 / (N·m)"]
+    表头英文: ["Duration / s", "Mass error / %", "CoG error / mm", "Estimate of f_c1 / (N·m)"]
+    行: [["1.5", "", "", ""], ["5", "", "", ""], ["10", "", "", ""]]
+注意:
+  - ["θ̇、θ̈ 直接读自 MuJoCo，没有数值微分的误差；电机力矩加了测量噪声（示意值）。真实机器人要由编码器的读数数值微分，见 26.3.3 节。", "θ̇ and θ̈ are read directly from MuJoCo, so there is no differentiation error; measurement noise (illustrative) is added to the motor torques. On a real robot they come from differentiating encoder readings (Section 26.3.3)."]
+  - ["负载的惯量按夹爪 + 毛坯的组合体等比缩放；摩擦是仿真中设定的干摩擦和黏性摩擦，都是示意值。", "The payload's inertia is the gripper-and-blank assembly scaled by mass; the friction is the dry and viscous friction set in the simulation; both are illustrative."]
+思考题:
+  - ["实验中控制器只知道手臂、不知道负载，跟踪误差有 1° 量级，可辨识用的是实际测到的运动，不是指令。为什么跟踪得不准并不妨碍辨识？", "The controller knows only the arm, not the payload, so tracking errors reach about 1°; but identification uses the measured motion, not the command. Why does poor tracking not spoil the identification?"]
