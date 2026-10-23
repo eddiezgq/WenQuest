@@ -126,6 +126,20 @@ def test_local_without_teacher_password_nobody_is_teacher(monkeypatch):
         importlib.reload(app_mod)
 
 
+def test_local_roles_can_be_turned_off(monkeypatch):
+    """WQ_LOCAL_ROLES=0（freecad-ai-parts 给企业工程师的本地版）：本地版也不分老师学生，填名字就能当厂长"""
+    monkeypatch.setenv("WQ_LOCAL_ROLES", "0")
+    app_mod = _hub(monkeypatch, "local", None)
+    try:
+        c = TestClient(app_mod.app)
+        assert c.get("/api/login/info").json()["teacher_password"] is False
+        r = _login(c, name="工程师", role="manager")
+        assert r.status_code == 200 and r.json()["user"]["teacher"] is True
+    finally:
+        monkeypatch.undo()
+        importlib.reload(app_mod)
+
+
 def test_local_old_token_without_teacher_flag_is_student(local):
     raw = base64.urlsafe_b64encode(json.dumps({"name": "旧凭证", "role": "manager", "mode": "teach"}).encode()).decode()
     tok = raw + "." + hmac.new(b"test-secret", raw.encode(), hashlib.sha256).hexdigest()[:32]
