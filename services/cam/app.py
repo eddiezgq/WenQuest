@@ -408,5 +408,9 @@ import system_api  # noqa: E402  (cam systems, round 39 step 4)
 
 system_api.register(app, run, project_of)
 
+import ai_api  # noqa: E402  (AI drafting, round 39 step 6)
+
+ai_api.register(app, run, MAX_BODY)
+
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")

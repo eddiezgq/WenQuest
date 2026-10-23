@@ -8,6 +8,7 @@ import { t, lang } from '../i18n'
 import Checks from './Checks.vue'
 import LineChart from './LineChart.vue'
 import TimingDiagram from './TimingDiagram.vue'
+import DesignNote from './DesignNote.vue'
 
 const emit = defineEmits(['close'])
 const doPrint = () => window.print()
@@ -32,6 +33,7 @@ const cae = computed(() => caeExample.value)
         <h1>{{ nm(system.title) }}</h1>
         <p class="meta mono">{{ today }} · camkit 0.4 · {{ zh ? '计算由确定性程序完成，未经 AI' : 'Computed by deterministic code, not by AI' }}</p>
       </header>
+      <DesignNote :target="system" system />
       <section>
         <h2>1 {{ t('camshaft') }}</h2>
         <table class="kv">

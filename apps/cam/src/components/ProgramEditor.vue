@@ -3,8 +3,9 @@
 import { computed, ref, watch } from 'vue'
 import { project, laws } from '../store'
 import { t, lang } from '../i18n'
+import AiDraft from './AiDraft.vue'
 
-const props = defineProps({ program: { type: Object, default: null }, indexing: Boolean })
+const props = defineProps({ program: { type: Object, default: null }, indexing: Boolean, camId: { type: String, default: '' } })
 const prog = computed(() => props.program || project.program)
 const rad = computed(() => prog.value.unit === 'rad')
 const liftKey = computed(() => (rad.value ? 'h_deg' : 'h'))
@@ -48,6 +49,7 @@ const lawName = (l) => (lang.value === 'zh' ? l.zh : l.en)
 
 <template>
   <div class="prog">
+    <AiDraft v-if="!useTable" :program="prog" :cam-id="camId" />
     <label class="check"><input v-model="useTable" type="checkbox"> {{ t('useTable') }}</label>
     <template v-if="!useTable">
       <table class="segs">

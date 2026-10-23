@@ -24,3 +24,17 @@ export function saveText(name, text, mime = 'text/plain') {
   a.click()
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
+
+// POST an object as it is (the AI calls send the project with a sentence or the language beside it).
+export async function apiPost(path, obj) {
+  const r = await fetch(BASE + path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(obj) })
+  const data = await r.json().catch(() => ({}))
+  if (!r.ok) {
+    const d = data.detail || {}
+    const e = new Error(typeof d === 'string' ? d : d.en || 'error')
+    e.zh = typeof d === 'string' ? d : d.zh || d.en
+    e.status = r.status
+    throw e
+  }
+  return data
+}

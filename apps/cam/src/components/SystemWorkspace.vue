@@ -8,6 +8,7 @@ import { api } from '../api'
 import { t, lang } from '../i18n'
 import NumField from './NumField.vue'
 import ProgramEditor from './ProgramEditor.vue'
+import AiExplain from './AiExplain.vue'
 import TimingDiagram from './TimingDiagram.vue'
 import Checks from './Checks.vue'
 import LineChart from './LineChart.vue'
@@ -67,7 +68,7 @@ const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFix
         </template>
         <template v-else-if="cam">
           <p class="kind">{{ cam.type === 'globoidal' ? t('globoidal') : t('disk') }}</p>
-          <ProgramEditor :program="cam.program" :indexing="cam.type === 'globoidal'" />
+          <ProgramEditor :program="cam.program" :indexing="cam.type === 'globoidal'" :cam-id="cam.id" />
           <template v-if="cam.type === 'globoidal'">
             <h4>{{ t('globoidal') }}</h4>
             <NumField :obj="cam.globoidal" k="C" :label="t('gC')" unit="mm" />
@@ -125,6 +126,7 @@ const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFix
     <aside class="side">
       <p v-if="res" class="cycle">{{ lang === 'zh' ? '循环时间' : 'Cycle time' }} <b class="mono">{{ fmt(res.cycle, 3) }} s</b></p>
       <section v-for="g in groups" :key="g.title" class="grp"><h4>{{ g.title }}</h4><Checks :result="g.result" /></section>
+      <AiExplain v-if="res" system />
     </aside>
 
     <section class="curves bottom">
