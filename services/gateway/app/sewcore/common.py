@@ -52,10 +52,14 @@ def result(zh, en, value, unit=""):
     return dict(zh=zh, en=en, value=value, unit=unit)
 
 
-def line_chart(key, zh, en, phi, series, ref=None, zero=False):
-    """series: [(中文, English, 颜色, y 列表)]"""
-    return dict(key=key, kind="line", zh=zh, en=en, x=list(phi),
-                series=[dict(zh=a, en=b, color=c, y=[round(v, 4) for v in y]) for a, b, c, y in series], ref=ref, zero=zero)
+def line_chart(key, zh, en, phi, series, ref=None, zero=False, xr=None, xl=None):
+    """series: [(中文, English, 颜色, y 列表)]。横轴缺省是主轴转角 0–360°；xr = [起, 止]、xl = (中文, English) 时是别的量（例如针号）"""
+    d = dict(key=key, kind="line", zh=zh, en=en, x=list(phi),
+             series=[dict(zh=a, en=b, color=c, y=[round(v, 4) for v in y]) for a, b, c, y in series], ref=ref, zero=zero)
+    if xr:
+        d["xr"] = [xr[0], xr[1]]
+        d["xl"] = dict(zh=xl[0], en=xl[1]) if xl else dict(zh="", en="")
+    return d
 
 
 def xy_chart(key, zh, en, x, y, color="#2e9e6a", ref_zh="", ref_en=""):

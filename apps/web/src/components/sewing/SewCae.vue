@@ -23,8 +23,8 @@
 
       <!-- 机壳固有频率 -->
       <view class="box">
-        <text class="bt">{{ t("sew.cae.frame") }}</text>
-        <text class="hint">{{ t("sew.cae.frameNote") }}</text>
+        <text class="bt">{{ xy ? t("sew.cae.frameXY") : t("sew.cae.frame") }}</text>
+        <text class="hint">{{ xy ? t("sew.cae.frameXYNote") : t("sew.cae.frameNote") }}</text>
         <!-- #ifdef H5 -->
         <view class="row">
           <view class="btn ghost sm" @click="chooseFile">{{ t("sew.cae.choose") }}</view>
@@ -37,19 +37,37 @@
 
       <!-- 机构动力学 + 主轴电机 -->
       <view v-if="opt && (opt.kinds.mbd || opt.kinds.motor)" class="box">
-        <text class="bt">{{ t("sew.cae.drive") }}</text>
-        <text class="hint">{{ t("sew.cae.driveNote") }}</text>
+        <text class="bt">{{ xy ? t("sew.cae.driveXY") : t("sew.cae.drive") }}</text>
+        <text class="hint">{{ xy ? t("sew.cae.driveXYNote") : t("sew.cae.driveNote") }}</text>
         <view class="row">
           <view v-if="opt.kinds.mbd" class="btn" :class="{ disabled: !canRun }" @click="submit('mbd')">{{ t("sew.cae.runMbd") }}</view>
           <view v-if="opt.kinds.motor" class="btn ghost" :class="{ disabled: !canRun }" @click="pickMotor">{{ busy === "motor" ? t("sew.making") : t("sew.cae.runMotor") }}</view>
         </view>
-        <view v-if="motor" class="res">
+        <view v-if="motor && motor.axes" class="res">
+          <view v-for="ax in motor.axes" :key="ax.key" class="res">
+            <text class="st">{{ L(ax) }}</text>
+            <text class="para">{{ t("sew.cae.axisSum", { m: n1(ax.mass), a: n1(ax.accel), s: motor.safety }) }}<text v-if="ax.force"> · {{ t("sew.cae.axisForce", { f: Math.round(ax.force) }) }}</text></text>
+            <text v-if="ax.current" class="para" :class="ax.current.rms <= ax.current.rated && ax.current.peak <= ax.current.peakmax ? '' : 'badc'">
+              {{ t("sew.cae.axisCur", { p: n2(ax.current.peak), r: n2(ax.current.rms), pr: ax.current.peakmax, rr: ax.current.rated }) }}</text>
+            <text class="para strong">{{ ax.pick ? t("sew.cae.motorPick", { name: mn(ax.pick.name) }) : t("sew.cae.motorNone") }}</text>
+            <view class="tbl">
+              <view class="tr th"><text class="td">{{ t("sew.cae.motorName") }}</text><text class="td">{{ t("sew.cae.motorRated") }} / {{ t("sew.cae.motorPeak") }}</text>
+                <text class="td">{{ t("sew.cae.motorNeed") }}</text><text class="td">r/min</text><text class="td" /></view>
+              <view v-for="r in ax.rows" :key="r.name" class="tr"><text class="td">{{ mn(r.name) }}</text><text class="td">{{ r.rated_nm }} / {{ r.peak_nm }} N·m</text>
+                <text class="td">{{ n2(r.need_rms) }} / {{ n2(r.need_peak) }}</text><text class="td">{{ Math.round(r.rpm) }}</text>
+                <text class="td" :class="r.ok ? 'okc' : 'badc'">{{ r.ok ? "✓" : "✕" }}</text></view>
+            </view>
+            <text v-if="ax.r_opt" class="hint">{{ t("sew.cae.rOpt", { r: n1(ax.r_opt), now: ax.r_mm }) }}</text>
+          </view>
+          <text class="hint">{{ t("sew.cae.motorSrcXY", { s: motor.source }) }}</text>
+        </view>
+        <view v-else-if="motor" class="res">
           <text class="para">{{ t("sew.cae.motorSum", { peak: motor.peak_nm.toFixed(2), rms: motor.rms_nm.toFixed(2), p: Math.round(motor.power_w), n: motor.n, s: motor.safety }) }}</text>
-          <text class="para strong">{{ motor.pick ? t("sew.cae.motorPick", { name: motor.pick.name }) : t("sew.cae.motorNone") }}</text>
+          <text class="para strong">{{ motor.pick ? t("sew.cae.motorPick", { name: mn(motor.pick.name) }) : t("sew.cae.motorNone") }}</text>
           <view class="tbl">
             <view class="tr th"><text class="td">{{ t("sew.cae.motorName") }}</text><text class="td">{{ t("sew.cae.motorRated") }}</text>
               <text class="td">{{ t("sew.cae.motorPeak") }}</text><text class="td">{{ t("sew.cae.motorMax") }}</text><text class="td" /></view>
-            <view v-for="r in motor.rows" :key="r.name" class="tr"><text class="td">{{ r.name }}</text><text class="td">{{ r.rated_nm }} N·m</text>
+            <view v-for="r in motor.rows" :key="r.name" class="tr"><text class="td">{{ mn(r.name) }}</text><text class="td">{{ r.rated_nm }} N·m</text>
               <text class="td">{{ r.peak_nm }} N·m</text><text class="td">{{ r.max_rpm }}</text><text class="td" :class="r.ok ? 'okc' : 'badc'">{{ r.ok ? "✓" : "✕" }}</text></view>
           </view>
           <svg class="svg" viewBox="0 0 300 120" v-html="spark(motor.torque, 'N·m')" />
@@ -93,10 +111,16 @@
         </template>
         <template v-if="opt.kinds.cam">
           <text class="st">{{ t("sew.cae.cam") }}</text>
-          <text class="hint">{{ t("sew.cae.camNote") }}</text>
+          <text class="hint">{{ cpart === "template" ? t("sew.cae.tplNote") : t("sew.cae.camNote") }}</text>
           <view class="row">
             <text v-for="p in opt.cam_parts" :key="p.key" class="opt" :class="{ on: cpart === p.key }" @click="cpart = p.key">{{ L(p) }}</text>
           </view>
+          <template v-if="cpart === 'template'">
+            <view class="row"><text class="muted small">{{ t("sew.cae.slotW") }}</text>
+              <text v-for="v in [4, 5, 6, 8]" :key="v" class="opt" :class="{ on: slotW === v }" @click="slotW = v">{{ v }} mm</text></view>
+            <view class="row"><text class="muted small">{{ t("sew.cae.plateT") }}</text>
+              <text v-for="v in [2, 3, 5, 6]" :key="v" class="opt" :class="{ on: plateT === v }" @click="plateT = v">{{ v }} mm</text></view>
+          </template>
           <view class="btn" :class="{ disabled: !canRun }" @click="submitCam('')">{{ busy === "cam" ? t("sew.making") : t("sew.cae.runCam") }}</view>
         </template>
       </view>
@@ -149,13 +173,16 @@
               <text class="hint">{{ t("sew.cae.topoAfter") }}</text>
             </view>
             <view v-if="sel.kind === 'cam'" class="res">
+              <text v-if="sel.result.template" class="para">{{ t("sew.cae.tplSum", { w: sel.result.template.plate[0].toFixed(0), h: sel.result.template.plate[1].toFixed(0),
+                t: sel.result.template.plate[2], s: sel.result.template.slot_w, b: sel.result.template.bridges }) }}</text>
               <text class="para">{{ t("sew.cae.camSum", { s: Math.round(sel.result.time_s), n: sel.result.tools.length }) }}</text>
               <text class="para muted">{{ sel.result.tools.map((x: any) => (x.kind === "drill" ? t("sew.cae.drill") : t("sew.cae.endmill")) + " Ø" + x.d).join("，") }}</text>
               <text v-for="(x, i) in sel.result.issues" :key="i" class="para badc">{{ x }}</text>
               <text v-if="sel.result.features && sel.result.features.narrow" class="para badc">{{ t("sew.cae.narrow", { n: sel.result.features.narrow }) }}</text>
               <svg class="svg path" viewBox="0 0 300 200" v-html="pathSvg(sel.result.path)" />
               <text class="hint">{{ t("sew.cae.pathNote") }}</text>
-              <view class="row"><view class="btn ghost" @click="getFile(`/api/v1/sewing/cae/jobs/${sel.id}/program.nc`, 'program.nc')">{{ t("sew.cae.nc") }}</view></view>
+              <view class="row"><view class="btn ghost" @click="getFile(`/api/v1/sewing/cae/jobs/${sel.id}/program.nc`, 'program.nc')">{{ t("sew.cae.nc") }}</view>
+                <view v-if="sel.part === 'template'" class="btn ghost" @click="getFile(`/api/v1/sewing/cae/jobs/${sel.id}/part.step`, 'template.step')">STEP ↓</view></view>
             </view>
             <!-- #ifdef H5 -->
             <image v-if="img" class="img" :src="img" mode="widthFix" />
@@ -189,6 +216,9 @@ const part = ref("");
 const tpart = ref("");
 const cpart = ref("");
 const vf = ref(0.5);
+const slotW = ref(5);
+const plateT = ref(3);
+const xy = computed(() => !!opt.value?.kinds?.xy);
 const allJobs = ref(false);
 const goal = ref("");
 const optRes = ref<any>(null);
@@ -204,6 +234,8 @@ const lang = computed(() => (locale.value === "en" ? "en" : "zh"));
 const L = (x: { zh: string; en: string }) => (lang.value === "en" ? x.en || x.zh : x.zh || x.en);
 const canRun = computed(() => !!opt.value?.connected && !busy.value);
 const n1 = (v: number | null | undefined) => (v == null ? "—" : Number(v).toFixed(1));
+const mn = (x: string) => (lang.value === "en" ? String(x).replace("伺服", "Servo") : x);   // 工厂电机表的名字是中文
+const n2 = (v: number | null | undefined) => (v == null ? "—" : Number(v).toFixed(2));
 const n3 = (v: number | null | undefined) => (v == null ? "—" : Number(v).toFixed(3));
 const fail = (e: unknown) => { msg.value = errorText(e instanceof ApiError ? e.code : "unknown"); };
 
@@ -214,6 +246,7 @@ async function load() {
     opt.value = await request<Opt>("GET", `/api/v1/sewing/cae/options?machine=${props.machine}`);
     part.value = tpart.value = opt.value.parts[0]?.key || "";
     cpart.value = opt.value.cam_parts?.[0]?.key || "";
+    fmat.value = opt.value.kinds?.xy ? "6061-T6" : "HT200";
   } catch (e) { fail(e); }
   goal.value = "";
   optRes.value = motor.value = sel.value = null;
@@ -265,7 +298,7 @@ async function submitCam(topo: string) {
   busy.value = "cam";
   msg.value = "";
   try {
-    const r = await request<{ id: string }>("POST", "/api/v1/sewing/cae/cam", { machine: props.machine, params: { ...props.params }, part: cpart.value, topo }, 180000);
+    const r = await request<{ id: string }>("POST", "/api/v1/sewing/cae/cam", { machine: props.machine, params: { ...props.params }, part: cpart.value, topo, slot_w: slotW.value, plate_t: plateT.value }, 180000);
     await loadJobs();
     await openJob(r.id);
   } catch (e) { fail(e); }

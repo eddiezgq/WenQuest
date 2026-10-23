@@ -64,7 +64,10 @@ def figures(R, lang="zh"):
         if c["kind"] == "xy":
             fig, ax = plt.subplots(figsize=(5, 3.4))
             sr = c["series"][0]
-            ax.plot(c["x"] + c["x"][:1], sr["y"] + sr["y"][:1], color=sr["color"])
+            if c.get("open"):
+                ax.plot(c["x"], sr["y"], color=sr["color"], marker=".", ms=3)
+            else:
+                ax.plot(c["x"] + c["x"][:1], sr["y"] + sr["y"][:1], color=sr["color"])
             ax.axhline(0, color="#8a9aa8", lw=0.8)
             ax.set_aspect("equal", adjustable="datalim")
         else:
@@ -75,9 +78,13 @@ def figures(R, lang="zh"):
                 ax.axhline(c["ref"], color="#c0392b", lw=0.8, ls="--")
             if c.get("zero"):
                 ax.axhline(0, color="#8a9aa8", lw=0.8)
-            ax.set_xlim(0, 360)
-            ax.set_xticks(range(0, 361, 45))
-            ax.set_xlabel(_t("主轴转角 °", "Main-shaft angle, °", lang))
+            if c.get("xr"):
+                ax.set_xlim(*c["xr"])
+                ax.set_xlabel(c["xl"][lang])
+            else:
+                ax.set_xlim(0, 360)
+                ax.set_xticks(range(0, 361, 45))
+                ax.set_xlabel(_t("主轴转角 °", "Main-shaft angle, °", lang))
             if len(c["series"]) > 1:
                 ax.legend()
         ax.grid(alpha=0.3)
@@ -299,15 +306,21 @@ def params_xlsx(params=None, lang="zh", project="", machine="lockstitch"):
         ws3.append([c["lecture"], c["name"][lang], c["value"][lang], c["limit"][lang], STATE[c["state"]][1 if lang == "en" else 0]])
         ws3.cell(ws3.max_row, 5).font = Font(bold=True, color=STATE[c["state"]][2])
     ws4 = wb.create_sheet(_t("运动曲线", "Curves", lang))
-    lines = [c for c in R.get("charts", []) if c["kind"] == "line"]
+    lines = [c for c in R.get("charts", []) if c["kind"] == "line" and not c.get("xr")]
     if lines:
         cols = [(c, sr) for c in lines for sr in c["series"]]
         ws4.append([_t("主轴转角 °", "Shaft angle °", lang)] + [f"{_t(c['zh'], c['en'], lang)} · {sr[lang]}" for c, sr in cols])
         for i, x in enumerate(lines[0]["x"]):
             ws4.append([x] + [sr["y"][i] for _, sr in cols])
     sheets = [ws, ws2, ws3, ws4]
+    for c in [c for c in R.get("charts", []) if c["kind"] == "line" and c.get("xr")]:      # 横轴不是转角的曲线（例如每针转速）：各占一页，全部数据
+        w = wb.create_sheet(_t(c["zh"], c["en"], lang).split("（")[0].split(" (")[0][:30])
+        w.append([c["xl"][lang]] + [sr[lang] for sr in c["series"]])
+        for i, x in enumerate(c["x"]):
+            w.append([x] + [sr["y"][i] for sr in c["series"]])
+        sheets.append(w)
     for tb in R.get("tables", []):
-        w = wb.create_sheet(_t(tb["zh"], tb["en"], lang)[:30])
+        w = wb.create_sheet(_t(tb["zh"], tb["en"], lang).split("（")[0].split(" (")[0][:30])
         w.append([_t(a, b, lang) for a, b in tb["head"]])
         for r in tb["rows"]:
             w.append([_t(*c, lang) if isinstance(c, (list, tuple)) else c for c in r])

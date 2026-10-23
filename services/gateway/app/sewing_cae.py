@@ -33,8 +33,9 @@ from .moodle import EngineError
 from .session import Session
 from .sewcore import cae_setup as CS
 from .sewcore import optimize as OPT
+from .sewcore import template as TPL
 
-MACHINE_RE = "^(lockstitch|overlock|cover)$"
+MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid)$"
 SF_MIN = 2.0
 LIFE_MIN_Y = 5.0
 
@@ -47,6 +48,21 @@ class DesignIn(BaseModel):
     project: str = Field(default="", max_length=80)
     volfrac: float = Field(default=0.5, ge=0.3, le=0.8)
     topo: str = Field(default="", max_length=40)        # 数控编程：用这个拓扑优化任务减重后的零件
+    slot_w: float = Field(default=5.0, ge=3.2, le=12)   # 花样模板：槽宽（压脚外径 + 1–2 mm），第 42 轮
+    plate_t: float = Field(default=3.0, ge=1, le=12)    # 花样模板：板厚
+
+
+XY = ("pattern", "embroid")        # 第 42 轮：缝纫头 + X–Y 平面运动的机型
+XY_RATIO = 1.5                     # 绷架 / 横梁一阶固有频率 × 移动一针的时间 ≥ 1.5（同教材第 15 讲同步带的判据）
+
+
+def move_time(machine: str, p: dict) -> float | None:
+    """移动一针可用的时间（s）：时序里“移动”那一段的角度 / (6n)"""
+    try:
+        mv = next(x for x in sewcore.get(machine).analyze(p)["timing"] if x["key"] == "move")
+    except StopIteration:
+        return None
+    return ((mv["b"] - mv["a"]) % 360) / (6 * p["n"])
 
 
 def phash(machine: str, p: dict) -> str:
@@ -210,7 +226,8 @@ def register(app, m) -> None:
                 q = None
         return {"connected": connected(), "parts": CS.parts(machine), "cam_parts": CS.cam_parts(machine), "goals": OPT.goals(machine), "quota": q,
                 "kinds": {"fea": bool(CS.parts(machine)), "frame": True, "mbd": machine in ("lockstitch", "overlock"),
-                          "motor": machine in ("lockstitch", "overlock"), "topo": bool(CS.parts(machine)), "cam": bool(CS.cam_parts(machine))}}
+                          "motor": machine in ("lockstitch", "overlock", "pattern", "embroid"), "xy": machine in XY,
+                          "topo": bool(CS.parts(machine)), "cam": bool(CS.cam_parts(machine))}}
 
     # ---------- 强度 + 疲劳 ----------
     @app.post("/api/v1/sewing/cae/fea")
@@ -257,10 +274,12 @@ def register(app, m) -> None:
             raise EngineError("factory_error", str(e), 400) from e
         mat = material if material in ("HT200", "QT500-7", "Q235", "6061-T6", "45-QT") else "HT200"
         setup = dict(fs, material_id=mat)
-        j = await factory("POST", "/jobs", json=submit_body(lic, sess, "fea", f"{M.NAME[0]} · 机壳固有频率", "frame",
-                                                             step_sha=g["sha"], setup=setup))
-        save(j["id"], lic, sess, machine, "frame", "frame", f"{M.NAME[0]} · 机壳固有频率", p,
-             {"file": (file.filename or "")[:80], "material": mat, "n": p["n"]})
+        title = f"{M.NAME[0]} · {'绷架 / 横梁固有频率' if machine in XY else '机壳固有频率'}"
+        j = await factory("POST", "/jobs", json=submit_body(lic, sess, "fea", title, "frame", step_sha=g["sha"], setup=setup))
+        ctx = {"file": (file.filename or "")[:80], "material": mat, "n": p["n"]}
+        if machine in XY:
+            ctx["t_move"] = move_time(machine, p)
+        save(j["id"], lic, sess, machine, "frame", "frame", title, p, ctx)
         return {"id": j["id"], "status": j["status"]}
 
     # ---------- 动力学 ----------
@@ -284,6 +303,11 @@ def register(app, m) -> None:
         await m.sewing_need_license(sess)
         M = sewcore.get(body.machine)
         p = M.clean(body.params)
+        if body.machine in XY:
+            tab = await factory("GET", "/motors")
+            res = CS.axis_motors(body.machine, p, tab["motors"])
+            res["source"] = "通用典型值 / typical catalogue values"
+            return res
         T = CS.spindle_torque(body.machine, p)
         if T is None:
             raise EngineError("not_found", "no spindle model for this machine yet", 404)
@@ -346,6 +370,17 @@ def register(app, m) -> None:
                 raise EngineError("not_found", "the optimisation has not finished", 404)
             sha, part, name = t["result"]["geometry"]["sha"], t["part"], t["ctx"].get("part_zh", t["part"]) + "（减重后）"
             p = t["params"]
+        elif body.machine == "pattern" and body.part == "template":
+            try:
+                tg = await asyncio.to_thread(TPL.geom, p, body.slot_w, body.plate_t)
+            except ValueError as e:
+                raise EngineError("bad_pattern", str(e), 400) from e
+            step = await asyncio.to_thread(TPL.step, tg)
+            if not step:
+                raise EngineError("unavailable", "3D part generation is not installed on this server", 503)
+            sha = (await factory("POST", "/geometry", content=step))["sha"]
+            part, name = "template", f"花样模板（槽宽 {body.slot_w:g}、板厚 {body.plate_t:g}）"
+            p = dict(p, mat="6061")
         else:
             dsc = CS.cam_desc(body.machine, p, body.part)
             if not dsc:
@@ -360,7 +395,16 @@ def register(app, m) -> None:
         j = await factory("POST", "/cam", json=dict(org=lic["org"], user=str(sess.user_id), user_name=lic.get("name") or "", title=title,
                                                     sha=sha, name=name[:40], material=("7075" if mat.startswith("7075") else "6061" if mat.startswith("6061") else "45")))
         res = cam_result(j)
-        save(j["id"], lic, sess, body.machine, "cam", part, title, p, {"sha": sha, "topo": body.topo or None})
+        ctx = {"sha": sha, "topo": body.topo or None}
+        if part == "template":
+            tinfo = {k: tg[k] for k in ("plate", "slot_w", "bridges", "bridge_at", "bridge_w", "closed", "stitches", "area_mm2", "pins")}
+            res["template"] = dict(tinfo, slots=tg["slots"], path=tg["path"])
+            res["checks"].append(dict(key="tpl_bridge", zh="模板连接桥", en="Template bridges",
+                                      value=f"{tg['bridges']} 处 / places × {tg['bridge_w']:g} mm" if tg["bridges"] else "0（开口花样）/ 0 (open pattern)",
+                                      limit="封闭花样要留桥，桥处缝针要跳过或补缝 / closed patterns need bridges; skip or re-sew there",
+                                      state="warn" if tg["bridges"] else "ok"))
+            ctx.update(template=tinfo)
+        save(j["id"], lic, sess, body.machine, "cam", part, title, p, ctx)
         with db() as c:
             c.execute("update cae_jobs set result=? where jid=?", (json.dumps(res), j["id"]))
         return {"id": j["id"], "status": "done" if j.get("status") == "done" else j.get("status")}
@@ -398,10 +442,13 @@ def register(app, m) -> None:
     async def topo_part(jid: str, ext: str, sess: Annotated[Session, Depends(m.current)]):
         lic = await m.sewing_need_license(sess)
         d = row(jid, lic["org"])
-        if d["kind"] != "topo" or not d["result"] or ext not in ("dxf", "step"):
-            raise EngineError("not_found", "no optimised part", 404)
         from urllib.parse import quote
         name = quote(d["title"] + "." + ext)
+        if d["kind"] == "cam" and d["part"] == "template" and ext == "step":       # 花样模板的三维模型（第 42 轮）
+            r = await factory("GET", f"/geometry/{d['ctx']['sha']}/step", raw=True)
+            return Response(r.content, media_type="application/step", headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
+        if d["kind"] != "topo" or not d["result"] or ext not in ("dxf", "step"):
+            raise EngineError("not_found", "no optimised part", 404)
         if ext == "dxf":
             data = CS.outline_dxf(d["result"]["outline"], d["result"]["inner"], d["ctx"]["holes"], d["part"], d["ctx"]["t"])
             return Response(data, media_type="application/dxf", headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
@@ -453,8 +500,16 @@ def register(app, m) -> None:
             r2 = (2 * n / 60 / f1) if f1 else None
             res = {"freqs_hz": fr, "f1": f1, "r2": r2,
                    "apply": {"fn": round(f1)} if (f1 and d["machine"] == "lockstitch" and 120 <= f1 <= 320) else None}
-            res["checks"] = [dict(key="frame_res", zh="二阶激振频率 / 机壳一阶固有频率（实算）", en="2nd-order excitation / frame 1st mode (computed)",
-                                  value=f"{r2:.3f}" if r2 else "—", limit="≤ 0.90", state="ok" if r2 and r2 <= 0.9 else "bad")]
+            if d["machine"] in XY:
+                tm = ctx.get("t_move") or 0
+                k = f1 * tm if f1 else None
+                res.update(r2=None, t_move=tm, ft=k)
+                res["checks"] = [dict(key="xy_res", zh="一阶固有频率 × 移动一针的时间（实算）", en="1st mode × time to move one stitch (computed)",
+                                      value=f"{f1:.0f} Hz × {tm * 1000:.1f} ms = {k:.2f}" if k else "—", limit=f"≥ {XY_RATIO:g}",
+                                      state="ok" if k and k >= XY_RATIO else ("warn" if k and k >= 1 else "bad"))]
+            else:
+                res["checks"] = [dict(key="frame_res", zh="二阶激振频率 / 机壳一阶固有频率（实算）", en="2nd-order excitation / frame 1st mode (computed)",
+                                      value=f"{r2:.3f}" if r2 else "—", limit="≤ 0.90", state="ok" if r2 and r2 <= 0.9 else "bad")]
         elif d["kind"] == "mbd":
             raw = await factory("GET", f"/jobs/{d['jid']}/series.bin", params={"org": d["org"]}, raw=True)
             ser = read_series(raw.content)
@@ -497,9 +552,9 @@ def register(app, m) -> None:
         lic = await m.sewing_need_license(sess)
         d = row(jid, lic["org"])
         if d["result"] is not None:
-            return {"id": jid, "status": "done", "kind": d["kind"], "title": d["title"], "machine": d["machine"], "result": d["result"]}
+            return {"id": jid, "status": "done", "kind": d["kind"], "part": d["part"], "title": d["title"], "machine": d["machine"], "result": d["result"]}
         j = await factory("GET", f"/jobs/{jid}", params={"org": lic["org"]})
-        out = {"id": jid, "status": j.get("status"), "kind": d["kind"], "title": d["title"], "machine": d["machine"],
+        out = {"id": jid, "status": j.get("status"), "kind": d["kind"], "part": d["part"], "title": d["title"], "machine": d["machine"],
                "position": j.get("position"), "error": j.get("error")}
         if j.get("status") == "done":
             out["result"] = await finish(d, j)

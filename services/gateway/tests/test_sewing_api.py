@@ -115,7 +115,7 @@ def test_machines_overlock_and_cover(sc):
     """第 40 轮：包缝机、绷缝机——参数表、计算、项目记机型、出件（绷缝机没有三维零件）"""
     client = sc
     s = client.get("/api/v1/sewing/schema?machine=overlock").json()
-    assert [m["key"] for m in s["machines"]] == ["lockstitch", "overlock", "cover"] and s["machine"] == "overlock"
+    assert [m["key"] for m in s["machines"]] == ["lockstitch", "overlock", "cover", "pattern", "embroid"] and s["machine"] == "overlock"
     assert "ll_r" in [p["key"] for g in s["groups"] for p in g["params"]] and "step" in s["kinds"]
     s = client.get("/api/v1/sewing/schema?machine=cover").json()
     assert "Lcm" in [p["key"] for g in s["groups"] for p in g["params"]] and "step" not in s["kinds"]
@@ -139,3 +139,37 @@ def test_machines_overlock_and_cover(sc):
     j = client.post("/api/v1/sewing/export/json", json={"machine": "cover", "params": {}}, headers=admin).json()
     assert j["machine"] == "cover"
     assert client.get("/api/v1/sewing/proto?page=../../etc").status_code == 404
+
+
+def test_machines_pattern_and_embroid(sc, tmp_path):
+    """第 42 轮：电子花样机、多头刺绣机——参数表、上传针位表、项目存针位表、出件、样机页"""
+    client = sc
+    s = client.get("/api/v1/sewing/schema?machine=pattern").json()
+    keys = [p["key"] for g in s["groups"] for p in g["params"]]
+    assert {"pat", "TxR", "EA"} <= set(keys) and "step" not in s["kinds"] and "dxf" not in s["kinds"]
+    csv = "x,y\n0,0\n3,0\n6,0\n9,0\n19,0\n22,0\n"
+    r = client.post("/api/v1/sewing/analyze", json={"machine": "pattern", "params": {"pat": "csv", "pts": csv}}).json()
+    assert r["params"]["pts"][4] == [19.0, 0.0] and r["view"]["page"] == "model-pattern"
+    assert next(c for c in r["charts"] if c["key"] == "speed")["xr"][1] == 6
+    r = client.post("/api/v1/sewing/analyze", json={"machine": "embroid", "params": {"n": 800}}).json()
+    assert r["view"] == {"page": "embroid", "sync": "A", "cfg": {"H": 8, "F": 800, "s": 7.0, "n": 800}} and not r["ok"]
+    admin = login(client)
+    p = client.post("/api/v1/sewing/projects", json={"name": "PT-1", "machine": "pattern", "params": {"pat": "csv", "pts": csv}}, headers=admin).json()
+    assert p["machine"] == "pattern" and p["params"]["pts"][4] == [19.0, 0.0]
+    got = client.get(f"/api/v1/sewing/projects/{p['id']}", headers=admin).json()
+    assert got["params"]["pat"] == "csv" and len(got["params"]["pts"]) == 6
+    for m in ("pattern", "embroid"):
+        for kind, magic in (("report", b"PK"), ("card", b"PK"), ("params", b"PK")):
+            r = client.post(f"/api/v1/sewing/export/{kind}", json={"machine": m, "params": {"pat": "csv", "pts": csv} if m == "pattern" else {}, "project": "X"}, headers=admin)
+            assert r.status_code == 200 and r.content.startswith(magic), (m, kind)
+        assert client.post("/api/v1/sewing/export/step", json={"machine": m, "params": {}}, headers=admin).status_code == 404
+        j = client.post("/api/v1/sewing/export/json", json={"machine": m, "params": {}}, headers=admin).json()
+        assert j["machine"] == m
+    z = zipfile.ZipFile(io.BytesIO(client.get("/api/v1/sewing/freecad.zip", headers=admin).content))
+    assert {"Mod/WenQuestSewing/sewcore/pattern.py", "Mod/WenQuestSewing/sewcore/embroid.py"} <= set(z.namelist())
+    d = tmp_path / "textbook" / "sewing" / "webed" / "labs"
+    d.mkdir(parents=True)
+    for page in ("model-pattern", "embroid"):
+        (d / f"{page}.html").write_text(f"<html>{page}</html>", encoding="utf-8")
+        r = client.get(f"/api/v1/sewing/proto?page={page}")
+        assert r.status_code == 200 and page in r.text

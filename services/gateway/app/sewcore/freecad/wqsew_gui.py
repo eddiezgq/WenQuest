@@ -265,6 +265,8 @@ def register():
     cmds = [("WQS_New", Cmd("新建平缝机设计", "按默认（教材算例）参数生成平缝机机构零件和校核", new_design)),
             ("WQS_NewOverlock", Cmd("新建包缝机设计", "按教材第 9 讲算例机生成包缝机机构零件和校核", lambda: new_design("overlock"))),
             ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机弯针定时校核与耗线量、线团计划（第一期没有三维零件）", lambda: new_design("cover"))),
+            ("WQS_NewPattern", Cmd("新建花样机设计", "电子花样机：离布窗口、转速上限、前瞻调速、X/Y 伺服与同步带校核（没有三维零件）", lambda: new_design("pattern"))),
+            ("WQS_NewEmbroid", Cmd("新建刺绣机设计", "多头刺绣机：绷架加速度、转速上限、断线补绣与全机效率（没有三维零件）", lambda: new_design("embroid"))),
             ("WQS_Recompute", Cmd("重新计算", "改了参数后重算零件与校核（Ctrl+R 也可以）", recompute)),
             ("WQS_Checks", Cmd("校核结果", "红绿灯列表：惯性力、钩线、挑线、送布、张力、共振、尺寸链", show_checks)),
             ("WQS_Timing", Cmd("时序图", "针杆、钩线窗口、送布、挑线的时序", show_timing)),

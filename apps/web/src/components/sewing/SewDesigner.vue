@@ -49,7 +49,11 @@
               <view v-if="p.choices.length" class="chips">
                 <text v-for="c in p.choices" :key="c.key" class="opt" :class="{ on: params[p.key] === c.key }" @click="setv(p.key, c.key)">{{ L(c) }}</text>
               </view>
-              <view v-else class="num">
+              <view v-if="p.key === 'pat' && params.pat === 'csv'" class="csv">
+                <view class="btn ghost" @click="pickCsv">{{ t("sew.csvPick") }}</view>
+                <text class="hint">{{ csvInfo || t("sew.csvHint") }}</text>
+              </view>
+              <view v-else-if="!p.choices.length" class="num">
                 <slider class="sl" :min="p.min" :max="p.max" :step="p.step" :value="Number(params[p.key])" block-size="16"
                   activeColor="#1d6fa5" @changing="(e: any) => setv(p.key, e.detail.value)" @change="(e: any) => setv(p.key, e.detail.value)" />
                 <input class="input ni" type="digit" :value="String(params[p.key])" @blur="(e: any) => typed(p, e.detail.value)"
@@ -75,7 +79,7 @@
         <!-- 三维样机 -->
         <view v-show="tab === 'proto'" class="pane">
           <!-- #ifdef H5 -->
-          <view class="frame" :class="{ flat: R && R.view.page === 'looper' }">
+          <view class="frame" :class="{ flat: R && ['looper', 'embroid'].includes(R.view.page) }">
             <iframe v-if="protoOk" :key="protoSrc" ref="frame" class="proto" :src="protoSrc" title="3D" @load="syncProto" />
             <view v-else class="empty">{{ t("sew.protoMissing") }}</view>
           </view>
@@ -110,7 +114,7 @@
         <!-- 时序与曲线 -->
         <view v-if="R" v-show="tab === 'timing'" class="pane">
           <text class="ct">{{ t("sew.chart.timing") }}</text>
-          <svg class="svg" viewBox="0 0 640 170" v-html="timingSvg()" />
+          <svg class="svg" :viewBox="`0 0 640 ${timingH()}`" v-html="timingSvg()" />
           <text class="hint">{{ t("sew.chart.angle") }}</text>
           <view class="charts">
             <view v-for="c in R.charts" :key="c.key" class="chart"><text class="ct">{{ lang === "en" ? c.en : c.zh }}</text>
@@ -197,7 +201,7 @@ interface Check { key: string; group: string; name: { zh: string; en: string }; 
   advice: { zh: string; en: string } }
 interface Project { id: number; name: string; note?: string; machine?: string; params?: Record<string, number | string>; updated?: number }
 interface Chart { key: string; kind: "line" | "xy"; zh: string; en: string; x: number[]; series: { zh: string; en: string; color: string; y: number[] }[];
-  ref?: number | null; zero?: boolean; ref_zh?: string; ref_en?: string }
+  ref?: number | null; zero?: boolean; ref_zh?: string; ref_en?: string; xr?: [number, number]; xl?: { zh: string; en: string }; open?: boolean }
 
 const props = defineProps<{ startTab?: string; startMachine?: string }>();
 const kinds = ref<string[]>(["report", "card", "params", "step", "macro", "dxf", "json"]);
@@ -235,7 +239,8 @@ const mname = (k?: string) => { const m = machines.value.find((x) => x.key === (
 const projectNames = computed(() => projects.value.map((p) => `${p.name}（${mname(p.machine)}）`));
 const plabels = computed(() => { const o: Record<string, string> = {}; for (const grp of schema.value) for (const x of grp.params) o[x.key] = L(x); return o; });
 const pIndex = computed(() => Math.max(0, projects.value.findIndex((p) => p.id === current.value?.id)));
-const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper" };
+const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper", pattern: "model-pattern", embroid: "embroid" };
+const MACHINE_KEYS = Object.keys(PAGES);
 const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${PAGES[machine.value] || PAGES.lockstitch}`);
 
 // ---------- 计算 ----------
@@ -281,9 +286,34 @@ function applyParams(p: Record<string, number | string>) {
   compute();
 }
 function reset() {
+  delete params.pts;
+  csvInfo.value = "";
   Object.assign(params, defaults);
   compute();
 }
+
+// 花样机：上传针位表（CSV：每行 x, y，单位 mm；最多 3000 针）。原文交给后端整理，存项目时一起存
+const csvInfo = ref("");
+function pickCsv() {
+  // #ifdef H5
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".csv,.txt,text/csv,text/plain";
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0];
+    if (!f) return;
+    if (f.size > 200000) { csvInfo.value = t("sew.csvBig"); return; }
+    const txt = await f.text();
+    params.pts = txt;
+    csvInfo.value = t("sew.csvLoaded", { name: f.name });
+    compute();
+  };
+  inp.click();
+  // #endif
+}
+watch(R, (r) => {
+  if (r && machine.value === "pattern" && params.pat === "csv" && r.params?.pts) csvInfo.value = t("sew.csvCount", { n: r.params.pts.length });
+});
 
 // 三维样机 / 动画：同源页面。平缝机调 __api.setCfg；绷缝机弯针动画改 __api.ST 再 changed()；包缝机三维结构模型不用同步
 function syncProto() {
@@ -294,6 +324,7 @@ function syncProto() {
     if (!w || !w.__api || !v) return;
     if (v.sync === "setCfg") w.__api.setCfg(v.cfg);
     else if (v.sync === "ST") { Object.assign(w.__api.ST, v.cfg); w.__api.changed(); }
+    else if (v.sync === "A") { Object.assign(w.__api.A, v.cfg); w.__api.changedA(); }   // 刺绣机：头数、框驱动力、针距、转速
   } catch { /* the page is still loading */ }
   // #endif
 }
@@ -328,10 +359,13 @@ function segs(r: { a: number; b: number }) {
   if (r.a === r.b) return [[r.a - 1, r.a + 1]];
   return r.b >= r.a ? [[r.a, r.b]] : [[r.a, 360], [0, r.b]];
 }
+// 时序图高度随行数变（花样机、刺绣机只有两行）
+const timingH = () => 30 + 28 * Math.max(2, (R.value?.timing || []).length);
 function timingSvg() {
   let s = "";
+  const h = timingH();
   for (const a of [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360]) {
-    s += `<line x1="${tx(a)}" x2="${tx(a)}" y1="8" y2="148" stroke="#e1e6ea"/><text x="${tx(a)}" y="164" font-size="10" text-anchor="middle" fill="#6b7b88">${a}</text>`;
+    s += `<line x1="${tx(a)}" x2="${tx(a)}" y1="8" y2="${h - 22}" stroke="#e1e6ea"/><text x="${tx(a)}" y="${h - 6}" font-size="10" text-anchor="middle" fill="#6b7b88">${a}</text>`;
   }
   (R.value.timing as any[]).forEach((r, i) => {
     s += `<text x="4" y="${24 + i * 28}" font-size="10.5" fill="#1f2a33">${esc(r[lang.value])}</text>`;
@@ -347,9 +381,12 @@ function line(c: Chart) {
   const all = series.flat().concat(ref != null ? [ref] : []).concat(zero ? [0] : []);
   let lo = Math.min(...all), hi = Math.max(...all);
   if (hi - lo < 1e-6) hi = lo + 1;
-  const X = (a: number) => 34 + (258 * a) / 360, Y = (v: number) => 132 - (120 * (v - lo)) / (hi - lo);
+  const [x0, x1] = c.xr || [0, 360];
+  const X = (a: number) => 34 + (258 * (a - x0)) / (x1 - x0 || 1), Y = (v: number) => 132 - (120 * (v - lo)) / (hi - lo);
   let s = `<rect x="34" y="12" width="258" height="120" fill="#fff" stroke="#e1e6ea"/>`;
-  for (const a of [0, 90, 180, 270, 360]) s += `<text x="${X(a)}" y="146" font-size="9" text-anchor="middle" fill="#6b7b88">${a}</text>`;
+  const ticks = c.xr ? [0, 0.25, 0.5, 0.75, 1].map((q) => x0 + q * (x1 - x0)) : [0, 90, 180, 270, 360];
+  for (const a of ticks) s += `<text x="${X(a)}" y="146" font-size="9" text-anchor="middle" fill="#6b7b88">${Math.round(a)}</text>`;
+  if (c.xl) s += `<text x="292" y="10" font-size="9" text-anchor="end" fill="#6b7b88">${esc(lang.value === "en" ? c.xl.en : c.xl.zh)} →</text>`;
   s += `<text x="30" y="${Y(hi) + 4}" font-size="9" text-anchor="end" fill="#6b7b88">${hi.toFixed(hi > 100 ? 0 : 1)}</text>`;
   s += `<text x="30" y="${Y(lo) + 3}" font-size="9" text-anchor="end" fill="#6b7b88">${lo.toFixed(lo < -100 ? 0 : 1)}</text>`;
   if (zero && lo < 0 && hi > 0) s += `<line x1="34" x2="292" y1="${Y(0)}" y2="${Y(0)}" stroke="#8a9aa8" stroke-width="0.6"/>`;
@@ -367,7 +404,7 @@ function path(c: Chart) {
   let s = `<rect x="4" y="4" width="292" height="142" fill="#fff" stroke="#e1e6ea"/>`;
   s += `<line x1="8" x2="292" y1="${Y(0)}" y2="${Y(0)}" stroke="#8a9aa8" stroke-width="0.8"/>`;
   s += `<text x="290" y="${Y(0) - 3}" font-size="9" text-anchor="end" fill="#6b7b88">${esc(lang.value === "en" ? c.ref_en || "" : c.ref_zh || "")}</text>`;
-  s += `<polygon fill="none" stroke="#2e9e6a" stroke-width="1.6" points="${xs.map((v, j) => `${X(v).toFixed(1)},${Y(ys[j]).toFixed(1)}`).join(" ")}"/>`;
+  s += `<${c.open ? "polyline" : "polygon"} fill="none" stroke="#2e9e6a" stroke-width="1.6" points="${xs.map((v, j) => `${X(v).toFixed(1)},${Y(ys[j]).toFixed(1)}`).join(" ")}"/>`;
   return s;
 }
 
@@ -489,7 +526,7 @@ function contact() {
 }
 
 async function init() {
-  if (props.startMachine && ["lockstitch", "overlock", "cover"].includes(props.startMachine)) machine.value = props.startMachine;
+  if (props.startMachine && MACHINE_KEYS.includes(props.startMachine)) machine.value = props.startMachine;
   await loadSchema();
   compute();
   loadMe();
@@ -556,6 +593,7 @@ init();
 .td { flex: 1; padding: 6px 8px; min-width: 0; }
 .tr:last-child { font-weight: 600; }
 .frame.flat { aspect-ratio: 4 / 3; }
+.csv { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
 .frame { position: relative; width: 100%; aspect-ratio: 16 / 10; background: #0b1220; border-radius: 6px; overflow: hidden; }
 .proto { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .empty { color: #c9d4d8; padding: 40px; text-align: center; }

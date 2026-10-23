@@ -285,3 +285,53 @@ def test_topo_verify_cam(cae):
     assert fk.posted[-1]["sha"] == "topo-sha" and m2["status"] == "done"
     assert c.post("/api/v1/sewing/cae/cam", json={"machine": "overlock", "part": "Nope"}, headers=h).status_code == 404
     assert c.post("/api/v1/sewing/cae/cam", json={"machine": "cover", "part": "LL_Rocker"}, headers=h).status_code == 404
+
+
+def test_pattern_embroid_cae(cae):
+    """第 42 轮：花样机 X/Y 轴、刺绣机绷架的电机选型（每台电机用自己的转子惯量）、花样模板数控编程、绷架 / 横梁模态"""
+    c, h, fk = cae
+    o = c.get("/api/v1/sewing/cae/options?machine=pattern", headers=h).json()
+    assert o["parts"] == [] and o["kinds"]["motor"] and o["kinds"]["xy"] and not o["kinds"]["mbd"] and not o["kinds"]["topo"]
+    assert [p["key"] for p in o["cam_parts"]] == ["template"]
+    assert c.get("/api/v1/sewing/cae/options?machine=embroid", headers=h).json()["cam_parts"] == []
+    m = c.post("/api/v1/sewing/cae/motor", json={"machine": "pattern", "params": {}}, headers=h).json()
+    x, y = m["axes"]
+    assert x["key"] == "x" and x["rows"][0]["need_peak"] == pytest.approx(151.5 * 0.01 + 1e-4 * 50 / 0.01, abs=1e-3)
+    assert not x["rows"][0]["ok"] and x["pick"]["name"] == "伺服 1.5 kW" and m["safety"] == 1.2
+    assert x["current"]["rated"] == 1.27 and y["mass"] == 6
+    m = c.post("/api/v1/sewing/cae/motor", json={"machine": "embroid", "params": {}}, headers=h).json()
+    fr = m["axes"][0]
+    assert fr["force"] == pytest.approx(725.1, abs=0.2) and fr["rows"][0]["need_peak"] == pytest.approx(3.62, abs=0.01)
+    assert fr["pick"]["name"] == "伺服 1.5 kW"
+    # 模态：绷架 / 横梁，判据 f1 × 移动一针的时间 ≥ 1.5
+    fk.desc = None
+    r = c.post("/api/v1/sewing/cae/frame", files={"file": ("beam.step", b"ISO-10303-21;", "application/step")},
+               data={"machine": "embroid", "params": json.dumps({}), "material": "6061-T6"}, headers=h).json()
+    j = done(c, h, fk, r["id"])
+    assert "绷架" in j["title"] and j["result"]["checks"][0]["key"] == "xy_res" and j["result"]["checks"][0]["state"] == "ok"
+    assert j["result"]["ft"] == pytest.approx(210 * 204 / (6 * 650), abs=0.01)
+    # 模板数控编程
+    m = c.post("/api/v1/sewing/cae/cam", json={"machine": "pattern", "part": "template", "params": {"pat": "circle"}, "slot_w": 5, "plate_t": 3},
+               headers=h).json()
+    assert fk.posted[-1]["material"] == "6061" and m["status"] == "done"
+    j = c.get(f"/api/v1/sewing/cae/jobs/{m['id']}", headers=h).json()
+    assert j["part"] == "template" and j["result"]["template"]["bridges"] == 2 and j["result"]["template"]["closed"]
+    assert {x["key"]: x["state"] for x in j["result"]["checks"]}["tpl_bridge"] == "warn"
+    assert c.get(f"/api/v1/sewing/cae/jobs/{m['id']}/part.step", headers=h).content.startswith(b"ISO-10303-21")
+    m = c.post("/api/v1/sewing/cae/cam", json={"machine": "pattern", "part": "template", "params": {"pat": "flap"}}, headers=h).json()
+    j = c.get(f"/api/v1/sewing/cae/jobs/{m['id']}", headers=h).json()
+    assert j["result"]["template"]["bridges"] == 0 and {x["key"]: x["state"] for x in j["result"]["checks"]}["tpl_bridge"] == "ok"
+    assert c.post("/api/v1/sewing/cae/cam", json={"machine": "pattern", "part": "template", "slot_w": 2}, headers=h).status_code == 422
+
+
+def test_template_geometry():
+    from app.sewcore import template as T
+    g = T.geom({"pat": "rect"}, 5, 3)
+    assert g["closed"] and g["bridges"] == 2 and len(g["slots"]) == 2
+    W, H, t = g["plate"]
+    assert W == pytest.approx(80 + 5 + 40, abs=0.1) and H == pytest.approx(50 + 5 + 40, abs=0.1) and t == 3
+    xs = [q[0] for r in g["slots"] for q in r]
+    assert abs(min(xs) + max(xs)) < 0.01                                   # 槽在板中心（工件零点）
+    assert all(max(xs) + 2 < abs(x) - r and abs(x) + r < W / 2 - 2 for x, _, r in g["pins"])   # 定位销孔在边距里，不碰槽、不出板
+    g = T.geom({"pat": "zig"}, 5, 3)
+    assert not g["closed"] and len(g["slots"]) == 1                        # 之字花样合成一整块开口

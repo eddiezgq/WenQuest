@@ -42,7 +42,7 @@ class SewDesign:
     def __init__(self, obj, params=None, machine="lockstitch"):
         M = sewcore.get(machine)
         p = M.clean(params)
-        obj.addProperty("App::PropertyString", "Machine", "机型", "lockstitch 平缝机 / overlock 包缝机 / cover 绷缝机")
+        obj.addProperty("App::PropertyString", "Machine", "机型", "lockstitch 平缝机 / overlock 包缝机 / cover 绷缝机 / pattern 花样机 / embroid 刺绣机")
         obj.Machine = M.MACHINE
         obj.setEditorMode("Machine", 1)
         for g, gzh, gen, items in M.GROUPS:
@@ -55,6 +55,9 @@ class SewDesign:
                 else:
                     obj.addProperty(PROP, _pname(k), gzh, tip)
                     setattr(obj, _pname(k), float(p[k]))
+        if "pts" in p:                          # 花样机上传的针位表（第 42 轮）：不在参数表里，存成一个 JSON 文字
+            obj.addProperty("App::PropertyString", "PatternPoints", "花样", "上传的针位表（JSON：[[x, y], …]，mm）")
+            obj.PatternPoints = json.dumps(p["pts"])
         obj.addProperty("App::PropertyAngle", "Phi", "显示", "零件摆放时的主轴转角（0° = 针杆上止点）")
         obj.addProperty("App::PropertyLinkList", "Parts", "零件", "机构零件")
         obj.addProperty("App::PropertyString", "Status", "结果", "校核结论")
@@ -75,6 +78,11 @@ class SewDesign:
             v = getattr(obj, _pname(k), None)
             if v is not None:
                 p[k] = v
+        if getattr(obj, "PatternPoints", ""):
+            try:
+                p["pts"] = json.loads(obj.PatternPoints)
+            except ValueError:
+                pass
         return M.clean(p)
 
     def execute(self, obj):
@@ -171,7 +179,13 @@ def import_params(obj, path):
             sewcore.get(d.get("machine")).NAME[0], M.NAME[0]))
     p = M.clean(d.get("params") or d)
     for k, v in p.items():
+        if k not in M.PARAMS:
+            continue
         setattr(obj, _pname(k), v if k in M.CHOICES else float(v))
+    if "pts" in p:
+        if not hasattr(obj, "PatternPoints"):
+            obj.addProperty("App::PropertyString", "PatternPoints", "花样", "上传的针位表（JSON：[[x, y], …]，mm）")
+        obj.PatternPoints = json.dumps(p["pts"])
     if d.get("project"):
         obj.Label = d["project"]
     obj.Document.recompute()

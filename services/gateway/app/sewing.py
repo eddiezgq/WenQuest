@@ -40,8 +40,8 @@ MIME = {"docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.
         "FCMacro": "text/x-python; charset=utf-8", "dxf": "image/vnd.dxf", "wqsew.json": "application/json"}
 
 
-MACHINE_RE = "^(lockstitch|overlock|cover)$"
-NO_CAD = {"cover"}                   # 绷缝机第一期没有三维零件（第 40 轮 Q2）
+MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid)$"
+NO_CAD = {"cover", "pattern", "embroid"}   # 没有三维零件：绷缝机（第 40 轮 Q2）；花样机、刺绣机的价值在运动与电控（第 42 轮 Q3）
 
 
 class AnalyzeIn(BaseModel):
@@ -143,7 +143,7 @@ def register(app, m) -> None:
         r["proto"] = r["view"]["cfg"]                 # 第 39 轮的字段名，网页旧版本还在用
         return r
 
-    PAGES = {"proto-lockstitch", "model-overlock", "looper"}
+    PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-pattern", "embroid"}
 
     @app.get("/api/v1/sewing/proto")
     async def proto(lang: str = "zh", page: str = "proto-lockstitch"):
@@ -316,7 +316,7 @@ def workbench_zip() -> bytes:
         for f in sorted((core / "freecad").glob("*")):
             if f.is_file() and f.suffix in (".py", ".svg", ".txt") and f.name != "使用说明.txt":
                 z.write(f, root + f.name)
-        for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "machines.py", "cad.py"):
+        for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "machines.py", "cad.py"):
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")
     return b.getvalue()

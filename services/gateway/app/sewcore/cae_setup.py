@@ -20,6 +20,8 @@ PARTS = {
     "overlock": [("OL_NeedleRod", "引针连杆", "Needle drive connecting rod"), ("OL_NeedleCrank", "引针曲柄", "Needle drive crank"),
                  ("LL_Rocker", "下弯针摆杆", "Lower looper rocker")],
     "cover": [],
+    "pattern": [],          # 花样机、刺绣机不出机构零件（第 42 轮 Q3）；CAE 做电机选型、模板数控编程、绷架 / 横梁模态
+    "embroid": [],
 }
 
 
@@ -290,6 +292,42 @@ def select_motor(T, n, motors, safety=1.2):
     return dict(peak_nm=peak, rms_nm=rms, n=n, power_w=rms * 2 * math.pi * n / 60, pick=pick, rows=rows, safety=safety)
 
 
+def axis_motors(machine, params, motors, safety=1.2):
+    """花样机 X、Y 轴 / 刺绣机绷架的伺服选型（第 42 轮）：每台电机用它自己的转子惯量重算峰值、有效转矩和转速；
+    峰值 × 安全系数 ≤ 电机峰值、有效 × 安全系数 ≤ 额定、转速 ≤ 最高转速。表按功率从小到大，第一台合格的就是推荐"""
+    M = get(machine)
+    p = M.clean(params)
+    axes = []
+    if machine == "pattern":
+        from . import pattern as P
+        W = max(10.0, P.window(p["t"])[2] - 2 * p["mg"])
+        duty = W / 360
+        for ax, zh, en in (("x", "X 轴", "X axis"), ("y", "Y 轴", "Y axis")):
+            m, a, r = p["m" + ax], p["a" + ax], p["r" + ax]
+            rows = []
+            for mo in motors:
+                q = P.axis_motor(m, a, r, mo["inertia_kgm2"] * 1e4, mo["rated_nm"], mo["peak_nm"], p["mu"], p["v"], mo["max_rpm"], duty)
+                rows.append(dict(mo, need_peak=q["Tpk"], need_rms=q["Trms"], rpm=q["rpm"],
+                                 ok=q["Tpk"] * safety <= mo["peak_nm"] and q["Trms"] * safety <= mo["rated_nm"] and q["rpm"] <= mo["max_rpm"]))
+            cur = P.axis_motor(m, a, r, p["J" + ax], p["T" + ax + "R"], p["T" + ax + "P"], p["mu"], p["v"], p["Nmot"], duty)
+            axes.append(dict(key=ax, zh=zh, en=en, mass=m, accel=a, r_mm=r, rows=rows, pick=next((x for x in rows if x["ok"]), None),
+                             current=dict(peak=cur["Tpk"], rms=cur["Trms"], rated=p["T" + ax + "R"], peakmax=p["T" + ax + "P"]),
+                             r_opt=cur["r_opt"]))
+    elif machine == "embroid":
+        from . import embroid as E
+        rows = []
+        for mo in motors:
+            q = E.servo(p, mo["inertia_kgm2"])
+            rows.append(dict(mo, need_peak=q["Tpk"], need_rms=q["Trms"], rpm=q["rpm"],
+                             ok=q["Tpk"] * safety <= mo["peak_nm"] and q["Trms"] * safety <= mo["rated_nm"] and q["rpm"] <= mo["max_rpm"]))
+        q0 = E.servo(p)
+        axes.append(dict(key="frame", zh="绷架（Y 轴，较重的一轴）", en="Frame (Y axis, the heavier one)", mass=E.mass(p["H"], p["m0"], p["mh"]),
+                         accel=q0["a"], force=q0["F"], rows=rows, pick=next((x for x in rows if x["ok"]), None)))
+    else:
+        return None
+    return dict(axes=axes, safety=safety)
+
+
 def life_years(summary):
     if summary.get("infinite"):
         return float("inf")
@@ -357,8 +395,13 @@ CAM_EN = {"NeedleCrank": "Needle crank", "ConnectingRod": "Needle-bar link", "Ta
           "FeedArmMain": "Main feed arm", "FeedArmDiff": "Differential feed arm"}
 
 
+TEMPLATE = dict(key="template", zh="花样模板（槽板）", en="Pattern template (slotted plate)")
+
+
 def cam_parts(machine):
-    """可以出铣削程序的平板零件（本软件三维模型里的平板件；旋梭不是板件，不算；绷缝机没有三维零件）"""
+    """可以出铣削程序的平板零件（本软件三维模型里的平板件；旋梭不是板件，不算；绷缝机没有三维零件）；花样机出模板（第 42 轮）"""
+    if machine == "pattern":
+        return [dict(TEMPLATE)]
     if machine not in ("lockstitch", "overlock"):
         return []
     model = cad.parts3d({}, 0.0, machine)
