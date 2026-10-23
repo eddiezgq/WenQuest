@@ -1,0 +1,899 @@
+1
+00:00:00,600 --> 00:00:01,840
+Hi everyone,
+
+2
+00:00:01,860 --> 00:00:09,401
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,801 --> 00:00:16,221
+This is Lecture 14, the control of the industrial lockstitch machine.
+
+4
+00:00:16,621 --> 00:00:19,723
+Last time we met servo motors and solenoids.
+
+5
+00:00:19,743 --> 00:00:23,058
+Today we put them together with the mechanisms,
+
+6
+00:00:23,078 --> 00:00:25,470
+and see how the machine backtacks,
+
+7
+00:00:25,490 --> 00:00:30,792
+trims and wipes automatically by shaft angle. One idea runs through it all.
+
+8
+00:00:30,812 --> 00:00:35,121
+Every action has to line up with the mechanical timing chart.
+
+9
+00:00:36,641 --> 00:00:39,741
+Here is the shop-floor problem.
+
+10
+00:00:40,141 --> 00:00:48,034
+On a shirt floor the electronically controlled lockstitch machines sew at
+
+11
+00:00:48,054 --> 00:00:49,226
+4000 r/min,
+
+12
+00:00:49,246 --> 00:00:54,321
+and each operator trims about 3000 times a day.
+
+13
+00:00:54,721 --> 00:01:03,981
+The engineer wants to raise the trimming speed from 300 to 500 r/min.
+
+14
+00:01:04,381 --> 00:01:09,607
+The trimming solenoid has a 6 to 10 millisecond delay,
+
+15
+00:01:09,627 --> 00:01:14,367
+the knife must enter between 300 and 330 degrees,
+
+16
+00:01:14,387 --> 00:01:20,001
+and after the cut the shaft must stop before 96.7 degrees.
+
+17
+00:01:20,401 --> 00:01:23,052
+How much time does it save?
+
+18
+00:01:23,452 --> 00:01:25,232
+Will it still cut every time?
+
+19
+00:01:25,632 --> 00:01:27,692
+What command angle should we use?
+
+20
+00:01:28,092 --> 00:01:29,432
+We'll answer at the end.
+
+21
+00:01:30,952 --> 00:01:33,892
+One working cycle: a state machine.
+
+22
+00:01:35,412 --> 00:01:40,429
+At the end of a seam the operator presses back with the heel,
+
+23
+00:01:40,449 --> 00:01:45,300
+and within half a second the machine backtacks, slows down,
+
+24
+00:01:45,320 --> 00:01:50,832
+sews one trimming stitch, cuts and stops, wipes and lifts the foot.
+
+25
+00:01:51,232 --> 00:01:56,314
+A forward press drops the foot, backtacks, starts slowly,
+
+26
+00:01:56,334 --> 00:01:58,372
+then follows the pedal.
+
+27
+00:01:58,772 --> 00:02:03,846
+The controller runs this as a state machine: boxes are states,
+
+28
+00:02:03,866 --> 00:02:08,529
+arrows are triggers such as pedal position, stitch count,
+
+29
+00:02:08,549 --> 00:02:12,472
+shaft angle or an actuator's in-position signal.
+
+30
+00:02:12,872 --> 00:02:20,972
+Every step is explicit, so if one hangs, the controller reports exactly which.
+
+31
+00:02:22,492 --> 00:02:27,404
+Let's account for that half-second.
+
+32
+00:02:27,804 --> 00:02:35,016
+Stopping and trimming from 4000 r/min has three parts.
+
+33
+00:02:35,416 --> 00:02:42,492
+First, decelerate to 300 r/min at 60% of the servo's capability,
+
+34
+00:02:42,512 --> 00:02:48,701
+about 2650 radians per second squared: 146 milliseconds.
+
+35
+00:02:49,101 --> 00:02:51,980
+Then the trimming stitch,
+
+36
+00:02:52,000 --> 00:02:59,867
+from 0° all the way to the cut at 55° of the next turn, 415° in all:
+
+37
+00:02:59,887 --> 00:03:04,043
+231 milliseconds, the biggest share.
+
+38
+00:03:04,443 --> 00:03:09,783
+Finally a stop at maximum deceleration: just 7 milliseconds.
+
+39
+00:03:10,183 --> 00:03:18,645
+About 0.38 seconds; add wiping and foot lift and it is roughly half a second.
+
+40
+00:03:20,165 --> 00:03:24,078
+Automatic backtack: reverse inside the idle angle.
+
+41
+00:03:25,598 --> 00:03:31,818
+A few reverse stitches at the start and end lock the seam: that's backtacking.
+
+42
+00:03:32,218 --> 00:03:38,479
+Mechanical feed uses a reverse-feed solenoid to shift the stitch regulator;
+
+43
+00:03:38,499 --> 00:03:42,163
+electronic feed reverses a stepper directly.
+
+44
+00:03:42,563 --> 00:03:44,498
+Timing is everything.
+
+45
+00:03:44,898 --> 00:03:49,040
+While the feed dog is above the plate it is pushing the fabric,
+
+46
+00:03:49,060 --> 00:03:53,533
+and a reversal then gives a stitch that is neither forward nor back.
+
+47
+00:03:53,933 --> 00:04:05,105
+In the Lecture 6 example the dog drops at 114.2° and rises at 325.8°;
+
+48
+00:04:05,125 --> 00:04:11,593
+the 211.6° in between is the idle angle.
+
+49
+00:04:11,993 --> 00:04:19,069
+Command at 114.2°, the shaft turns 6 n t degrees during delay t,
+
+50
+00:04:19,089 --> 00:04:22,285
+and we keep 10 degrees spare.
+
+51
+00:04:23,805 --> 00:04:29,279
+Take the idle angle, subtract the 10-degree margin and divide by 6t:
+
+52
+00:04:29,299 --> 00:04:31,865
+that's the backtack speed limit.
+
+53
+00:04:32,265 --> 00:04:41,562
+A reverse-feed solenoid has to push links and a spring, so its delay is long:
+
+54
+00:04:41,582 --> 00:04:47,491
+at 18 milliseconds the limit is about 1867 r/min,
+
+55
+00:04:47,511 --> 00:04:51,121
+at 20 milliseconds about 1680.
+
+56
+00:04:51,521 --> 00:05:01,662
+A feed stepper reverses in 5 milliseconds, which allows 6720 r/min,
+
+57
+00:05:01,682 --> 00:05:07,121
+faster than the sewing speed itself.
+
+58
+00:05:07,521 --> 00:05:09,861
+Delay is no longer the limit.
+
+59
+00:05:11,381 --> 00:05:13,801
+Trimming: on the timing chart.
+
+60
+00:05:15,321 --> 00:05:17,141
+Here is one trim.
+
+61
+00:05:17,541 --> 00:05:23,152
+Under the throat plate there is a fixed knife and a moving knife;
+
+62
+00:05:23,172 --> 00:05:28,610
+here a solenoid drives the moving knife directly through links.
+
+63
+00:05:29,010 --> 00:05:32,601
+The last stitch is sewn as usual,
+
+64
+00:05:32,621 --> 00:05:38,950
+and the hook point catches the needle-thread loop at 206°.
+
+65
+00:05:39,350 --> 00:05:45,826
+When the needle has risen about 10 millimetres above the plate,
+
+66
+00:05:45,846 --> 00:05:53,250
+about 291° in our model, the controller energises the trimming solenoid.
+
+67
+00:05:53,650 --> 00:05:59,260
+After the delay the knife swings in under the supply side of the loop,
+
+68
+00:05:59,280 --> 00:06:05,373
+and the fabric-side needle thread and the bobbin thread fall into its notch.
+
+69
+00:06:05,773 --> 00:06:12,953
+At 341° the loop slips off and the tension opens.
+
+70
+00:06:13,353 --> 00:06:20,877
+On its return the knife cuts both threads at the take-up lever's top,
+
+71
+00:06:20,897 --> 00:06:23,173
+55° of the next turn.
+
+72
+00:06:23,573 --> 00:06:28,953
+The supply-side thread stays in the eye for the next seam.
+
+73
+00:06:30,473 --> 00:06:35,339
+Put the trim on the Lecture 8 timing chart and four criteria appear;
+
+74
+00:06:35,359 --> 00:06:38,573
+the values are this book's illustrative ones.
+
+75
+00:06:38,973 --> 00:06:46,195
+Here is the lab's timing chart: green is the window where the knife may enter,
+
+76
+00:06:46,215 --> 00:06:51,117
+red the actual entry range once the delay is counted.
+
+77
+00:06:51,517 --> 00:06:53,777
+Watch the command angle change.
+
+78
+00:06:54,177 --> 00:06:58,730
+Too early, and the loop hasn't reached the knife's path,
+
+79
+00:06:58,750 --> 00:07:01,424
+so only the bobbin thread is cut.
+
+80
+00:07:01,824 --> 00:07:06,044
+Too late, and the loop has already slipped off.
+
+81
+00:07:06,444 --> 00:07:12,377
+Also: after the cut at 55°, stop before 96.7°;
+
+82
+00:07:12,397 --> 00:07:21,824
+keep the tension open from at least 335° to 55°; and wipe after stopping.
+
+83
+00:07:23,344 --> 00:07:27,985
+The controller commands at a chosen command angle,
+
+84
+00:07:28,005 --> 00:07:33,298
+and during delay t the shaft turns another 6 n t degrees,
+
+85
+00:07:33,318 --> 00:07:38,984
+so the knife actually enters at the command angle plus 6 n t.
+
+86
+00:07:39,384 --> 00:07:48,144
+Here the command stays at 290° with a 6 to 10 millisecond delay.
+
+87
+00:07:48,544 --> 00:08:00,226
+At 300 r/min the knife enters between 300.8° and 308°, inside the window.
+
+88
+00:08:00,626 --> 00:08:11,379
+As the speed steps up to 700, the red bar moves right to 315.2° to 332°:
+
+89
+00:08:11,399 --> 00:08:12,726
+too late.
+
+90
+00:08:13,126 --> 00:08:17,586
+The command would have to move before 288°.
+
+91
+00:08:17,986 --> 00:08:24,683
+Notice too that the red bar widens, from 7 to 17 degrees.
+
+92
+00:08:26,203 --> 00:08:29,224
+The average delay is not the problem:
+
+93
+00:08:29,244 --> 00:08:35,223
+the command angle can be advanced automatically for speed and mean delay.
+
+94
+00:08:35,623 --> 00:08:38,655
+The problem is that the delay varies;
+
+95
+00:08:38,675 --> 00:08:42,203
+on each trim it falls somewhere in a range.
+
+96
+00:08:42,603 --> 00:08:50,396
+Both sides run at 500 r/min with the command at 291°,
+
+97
+00:08:50,416 --> 00:08:59,683
+trying 50 cuts over and over; green is a clean cut, red a miss.
+
+98
+00:09:00,083 --> 00:09:04,663
+On the left the delay is 6 to 10 milliseconds;
+
+99
+00:09:04,683 --> 00:09:11,863
+on the right low voltage and a worn spring have stretched it to 5 to 15.
+
+100
+00:09:12,263 --> 00:09:14,563
+Compare the red on the two sides.
+
+101
+00:09:16,083 --> 00:09:16,676
+Two limits.
+
+102
+00:09:17,076 --> 00:09:19,207
+The first is the window:
+
+103
+00:09:19,227 --> 00:09:26,466
+the entry range is 6n times the delay spread wide and must fit inside 30 degrees.
+
+104
+00:09:26,866 --> 00:09:38,566
+With 6 to 10 milliseconds that allows 1250 r/min; with 5 to 15, only 500.
+
+105
+00:09:38,966 --> 00:09:47,868
+The second is stopping: cut at 55°, stop before 96.7°, so within 41.7°;
+
+106
+00:09:47,888 --> 00:09:56,538
+at the maximum deceleration of about 4417 radians per second squared,
+
+107
+00:09:56,558 --> 00:10:02,066
+trimming speed can't exceed about 766 r/min.
+
+108
+00:10:02,466 --> 00:10:05,565
+Take the lower of the two.
+
+109
+00:10:05,965 --> 00:10:09,091
+That's why a regulated supply,
+
+110
+00:10:09,111 --> 00:10:17,376
+boost drive and Zener freewheeling matter most for making the delay consistent.
+
+111
+00:10:18,896 --> 00:10:24,176
+Worked example: trimming at 500 r/min.
+
+112
+00:10:25,696 --> 00:10:28,720
+Back to the problem: the command angle.
+
+113
+00:10:29,120 --> 00:10:35,766
+Even with the shortest delay the knife must not enter before 300°,
+
+114
+00:10:35,786 --> 00:10:42,128
+so the angle plus 6 times 500 times 0.006 must be at least 300:
+
+115
+00:10:42,148 --> 00:10:44,552
+the angle at least 282°.
+
+116
+00:10:44,952 --> 00:10:52,008
+Even with the longest delay it must not enter after 330°,
+
+117
+00:10:52,028 --> 00:10:59,704
+so the angle plus 6 times 500 times 0.010 must be at most 330:
+
+118
+00:10:59,724 --> 00:11:02,559
+the angle at most 300°.
+
+119
+00:11:02,959 --> 00:11:08,979
+Take the middle, about 291°, leaving a margin at both ends.
+
+120
+00:11:09,379 --> 00:11:14,919
+The three bars show the actual entry range for each of these command angles.
+
+121
+00:11:16,439 --> 00:11:21,379
+A robot picking parts off a conveyor faces the same problem as trimming.
+
+122
+00:11:21,779 --> 00:11:25,113
+The gripper's solenoid valve has a delay,
+
+123
+00:11:25,133 --> 00:11:29,775
+so the controller commands early according to belt speed,
+
+124
+00:11:29,795 --> 00:11:34,519
+just as the trimming command angle moves with shaft speed.
+
+125
+00:11:34,919 --> 00:11:37,453
+The mean delay can be compensated,
+
+126
+00:11:37,473 --> 00:11:43,238
+but its spread scatters the grip point over the belt speed times that spread,
+
+127
+00:11:43,258 --> 00:11:46,093
+which has to fit the gripper's window,
+
+128
+00:11:46,113 --> 00:11:49,474
+so the belt speed limit is set by the spread.
+
+129
+00:11:49,874 --> 00:11:56,611
+The cell's pick, carry, place and return are sequenced by a state machine too,
+
+130
+00:11:56,631 --> 00:12:02,934
+and a robot senses contact force through joint current or a force sensor.
+
+131
+00:12:04,454 --> 00:12:05,937
+In everyday life,
+
+132
+00:12:05,957 --> 00:12:11,951
+the closest thing to trimming timing is the baton change in a relay.
+
+133
+00:12:12,351 --> 00:12:16,756
+The receiver must take the baton inside the changeover zone,
+
+134
+00:12:16,776 --> 00:12:20,885
+so they start running when their teammate passes a mark:
+
+135
+00:12:20,905 --> 00:12:23,171
+that's the early command angle.
+
+136
+00:12:23,571 --> 00:12:28,064
+The faster the teammate, the further back the mark,
+
+137
+00:12:28,084 --> 00:12:32,311
+just as a faster shaft needs an earlier command.
+
+138
+00:12:32,711 --> 00:12:38,904
+Coaches know most failed changes come not from a slow reaction but from an
+
+139
+00:12:38,924 --> 00:12:40,331
+inconsistent one.
+
+140
+00:12:40,731 --> 00:12:46,551
+Same as trimming: the spread of the delay hurts more than the delay itself.
+
+141
+00:12:48,071 --> 00:12:49,771
+Back to the opening question.
+
+142
+00:12:50,171 --> 00:12:59,350
+Raising the trimming speed from 300 to 500 cuts one stop-and-trim from 0.38
+
+143
+00:12:59,370 --> 00:13:01,312
+to 0.29 seconds,
+
+144
+00:13:01,332 --> 00:13:04,255
+about 4.8 minutes a day.
+
+145
+00:13:04,655 --> 00:13:13,786
+With a 6 to 10 millisecond delay the window limit is 1250 r/min and the
+
+146
+00:13:13,806 --> 00:13:17,008
+stopping limit about 766,
+
+147
+00:13:17,028 --> 00:13:19,843
+so 500 is within both.
+
+148
+00:13:20,243 --> 00:13:31,835
+The command angle can be 282° to 300°; take 291°.
+
+149
+00:13:32,235 --> 00:13:39,666
+One warning: if low voltage stretches the delay to 5 to 15 milliseconds,
+
+150
+00:13:39,686 --> 00:13:45,255
+the window limit drops to exactly 500, with no margin.
+
+151
+00:13:45,655 --> 00:13:49,115
+So steady the delay before you speed up.
+
+152
+00:13:50,635 --> 00:13:54,151
+Now Virtual lab 14-1, the trimming sequence editor.
+
+153
+00:13:54,171 --> 00:13:58,450
+On the WenQuest platform you can do it yourself. The verdicts,
+
+154
+00:13:58,470 --> 00:14:02,194
+the hints and the tasks on the right are blurred here,
+
+155
+00:14:02,214 --> 00:14:06,563
+so you can read them on your own. Top left is the timing chart.
+
+156
+00:14:06,583 --> 00:14:09,752
+Green is the window where the knife may enter,
+
+157
+00:14:09,772 --> 00:14:13,912
+and red is the actual entry range once the delay is counted.
+
+158
+00:14:14,312 --> 00:14:16,291
+Press Another 50 trials.
+
+159
+00:14:16,311 --> 00:14:21,038
+Each delay falls at random between 6 and 10 milliseconds,
+
+160
+00:14:21,058 --> 00:14:26,369
+and the row of cells at the bottom left shows the 50 trial cuts.
+
+161
+00:14:26,769 --> 00:14:30,868
+Task one: press Scramble. The command jumps to 250 degrees,
+
+162
+00:14:30,888 --> 00:14:34,988
+the release range gets shorter, and wiping is switched off.
+
+163
+00:14:35,008 --> 00:14:40,015
+Here we drag the command angle a little later and watch the red bar move
+
+164
+00:14:40,035 --> 00:14:41,272
+toward the window.
+
+165
+00:14:41,292 --> 00:14:46,439
+The rest of the command angle, the release and the wiper are yours to fix,
+
+166
+00:14:46,459 --> 00:14:48,324
+until every verdict passes.
+
+167
+00:14:48,724 --> 00:14:49,858
+Task two: reset,
+
+168
+00:14:49,878 --> 00:14:54,475
+and raise the trimming speed to 700 or more with the same delay.
+
+169
+00:14:54,495 --> 00:14:58,730
+The red bar moves right, out of the window, and gets wider.
+
+170
+00:14:58,750 --> 00:15:03,707
+The slides gave the upper end; work out how early the command may go,
+
+171
+00:15:03,727 --> 00:15:07,602
+then check it with the slider. All 50 trials must cut.
+
+172
+00:15:08,002 --> 00:15:13,749
+Task three: set the delay to 5 to 15 milliseconds. The red bar widens at once,
+
+173
+00:15:13,769 --> 00:15:16,706
+and some of the 50 trials start to fail.
+
+174
+00:15:16,726 --> 00:15:22,251
+The slides worked out the window limit; compare it with the stopping limit,
+
+175
+00:15:22,271 --> 00:15:27,500
+enter the result to check, then confirm with the slider and the trials.
+
+176
+00:15:27,520 --> 00:15:31,493
+The guide and the report template are on the platform.
+
+177
+00:15:33,013 --> 00:15:38,193
+Everything in this lecture is on the WenQuest learning platform.
+
+178
+00:15:38,593 --> 00:15:45,766
+You can open today's interactive slides and the trimming sequence editor yourself,
+
+179
+00:15:45,786 --> 00:15:51,205
+and watch the entry range and the trial cuts change as you go.
+
+180
+00:15:51,605 --> 00:15:55,416
+You submit the assignment and the lab report on the platform,
+
+181
+00:15:55,436 --> 00:15:57,425
+and get marks and comments back.
+
+182
+00:15:57,825 --> 00:16:02,437
+Questions go to the course discussion forum,
+
+183
+00:16:02,457 --> 00:16:09,280
+and the grades page shows your mark on every assignment and quiz.
+
+184
+00:16:10,800 --> 00:16:17,407
+Your assignment has four questions. One: sewing at 3500 r/min,
+
+185
+00:16:17,427 --> 00:16:25,638
+work out stage by stage the stop-and-trim time for trimming speeds of 250 and
+
+186
+00:16:25,658 --> 00:16:26,707
+400 r/min.
+
+187
+00:16:26,727 --> 00:16:33,121
+With 2500 trims a day, how many minutes a day separate them?
+
+188
+00:16:33,521 --> 00:16:39,288
+Two: trimming at 450 r/min with a 6 to 9 millisecond delay.
+
+189
+00:16:39,308 --> 00:16:44,780
+Find the allowed range of command angles and choose one.
+
+190
+00:16:44,800 --> 00:16:51,842
+After a while a low voltage stretches the delay to 5 to 13 milliseconds.
+
+191
+00:16:51,862 --> 00:16:58,021
+Does your angle still work? If not, change it, and explain why.
+
+192
+00:16:58,421 --> 00:17:03,581
+Three: with an idle angle of 211.6 degrees and a 10-degree margin,
+
+193
+00:17:03,601 --> 00:17:08,918
+find the backtack speed limits for a reverse-feed solenoid with a 16
+
+194
+00:17:08,938 --> 00:17:13,941
+millisecond delay and a feed stepper with a 5 millisecond delay,
+
+195
+00:17:13,961 --> 00:17:19,436
+then say why an electronic-feed machine may still default to only 1800
+
+196
+00:17:19,456 --> 00:17:22,653
+stitches a minute for the start backtack.
+
+197
+00:17:22,673 --> 00:17:27,912
+Four is a discussion. At a cross seam the machine lowers the speed,
+
+198
+00:17:27,932 --> 00:17:32,386
+adds foot pressure and changes the needle-thread tension.
+
+199
+00:17:32,406 --> 00:17:38,272
+Say which fault each one prevents, which way it goes, and its side effects.
+
+200
+00:17:38,672 --> 00:17:44,772
+Submit the calculation report and the lab screenshots on the WenQuest platform.
+
+201
+00:17:46,292 --> 00:17:50,793
+There's also a ten-question quiz. For example,
+
+202
+00:17:50,813 --> 00:17:57,378
+trimming at 500 r/min with the command at 285 degrees and a 6 to 10
+
+203
+00:17:57,398 --> 00:17:59,147
+millisecond delay:
+
+204
+00:17:59,167 --> 00:18:03,963
+at what angle does the knife enter at the latest?
+
+205
+00:18:04,363 --> 00:18:04,611
+Or,
+
+206
+00:18:04,631 --> 00:18:11,842
+the delay varies between 7 and 12 milliseconds and the window is 30 degrees wide.
+
+207
+00:18:11,862 --> 00:18:17,555
+Considering only the window, what is the highest trimming speed?
+
+208
+00:18:17,955 --> 00:18:22,855
+You get three attempts, and the explanations appear as soon as you submit.
+
+209
+00:18:24,375 --> 00:18:26,675
+Three things to remember.
+
+210
+00:18:27,075 --> 00:18:31,376
+One: a state machine sequences the working cycle,
+
+211
+00:18:31,396 --> 00:18:37,020
+and in stop-and-trim the trimming stitch takes most of the time.
+
+212
+00:18:37,420 --> 00:18:44,904
+Two: every action lines up with the mechanical timing chart:
+
+213
+00:18:44,924 --> 00:18:50,156
+reversal inside the feed dog's idle angle,
+
+214
+00:18:50,176 --> 00:18:56,159
+knife entry inside the 300-to-330-degree window.
+
+215
+00:18:56,559 --> 00:19:01,015
+Three: entry angle equals command angle plus 6 n t;
+
+216
+00:19:01,035 --> 00:19:03,999
+the mean delay can be compensated,
+
+217
+00:19:04,019 --> 00:19:10,844
+but its spread can only be absorbed by slowing down, so keep the delay steady.
+
+218
+00:19:11,244 --> 00:19:17,685
+The assignment, quiz and Lab 14-1 report are on WenQuest.
+
+219
+00:19:18,085 --> 00:19:20,584
+The slides, the virtual lab,
+
+220
+00:19:20,604 --> 00:19:26,879
+the assignment and the quiz are all on the WenQuest learning platform,
+
+221
+00:19:26,899 --> 00:19:32,905
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+222
+00:19:33,305 --> 00:19:39,758
+Next time it's the control of pattern sewers, buttonholers and bartackers,
+
+223
+00:19:39,778 --> 00:19:46,143
+where the fabric is no longer pushed by a feed dog but clamped in a frame
+
+224
+00:19:46,163 --> 00:19:48,155
+that follows a pattern.
+
+225
+00:19:48,175 --> 00:19:49,292
+See you then.
