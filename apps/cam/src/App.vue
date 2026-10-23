@@ -9,6 +9,7 @@ import Fields from './components/Fields.vue'
 import CamView from './components/CamView.vue'
 import Charts from './components/Charts.vue'
 import Checks from './components/Checks.vue'
+import AiExplain from './components/AiExplain.vue'
 import Report from './components/Report.vue'
 import MfgWorkspace from './components/MfgWorkspace.vue'
 import MeasureWorkspace from './components/MeasureWorkspace.vue'
@@ -143,7 +144,7 @@ onMounted(async () => {
         </div>
       </section>
 
-      <aside class="side"><Checks :result="result" /></aside>
+      <aside class="side"><Checks :result="result" /><AiExplain v-if="result && !embed" /></aside>
 
       <section class="curves"><Charts v-model:theta="theta" :result="result" /></section>
     </main>

@@ -8,6 +8,7 @@ import Checks from './Checks.vue'
 import Charts from './Charts.vue'
 import LineChart from './LineChart.vue'
 import BarChart from './BarChart.vue'
+import DesignNote from './DesignNote.vue'
 
 const emit = defineEmits(['close'])
 const doPrint = () => window.print()
@@ -64,6 +65,7 @@ const rows = computed(() => {
         <h1>{{ zh ? project.title.zh : project.title.en }}</h1>
         <p class="meta mono">{{ today }} · camkit 0.1 · {{ zh ? '计算由确定性程序完成，未经 AI' : 'Computed by deterministic code, not by AI' }}</p>
       </header>
+      <DesignNote :target="project" />
       <section>
         <h2>1 {{ zh ? '机构与载荷' : 'Mechanism and loads' }}</h2>
         <table class="kv"><tr v-for="row in rows" :key="row[0]"><th>{{ row[0] }}</th><td>{{ row[1] }}</td></tr></table>
