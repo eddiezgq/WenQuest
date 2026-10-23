@@ -1,0 +1,129 @@
+# 《缝纫机设计与制造》公开课 第 14 讲：工业平缝机电控
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch14.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 14-1（剪线时序编辑器）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch14.py 算出（{{ch14.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "14"
+deck: ch14
+skip: [6, 10, 12, 19, 20, 21, 22, 24]   # 主轴速度曲线、回针为什么还会对不齐、剪线器结构、第四节（电子针距、电子夹线器、过梗自适应）、停车剪线时间数字页：控制课程部分约 10 分钟（课件与教材里都有；剪线器结构在第 13 页讲稿开头补一句，回针补偿与过梗留给作业第三、四题，电子夹线器留给测验，停车剪线时间在回答页讲到）
+code: [ch14]
+title: ["工业平缝机电控——剪线转速提到 500，值不值", "Control of the Industrial Lockstitch Machine — Is Trimming at 500 r/min Worth It?"]
+chapter: ["第五篇 电气控制 · 第 14 章", "Part V Electrical Control · Chapter 14"]
+next: ["第 15 讲", "Lecture 15"]
+cover_formula: '\varphi_{in} = \varphi_c + 6\,n\,t'
+tags:
+  zh: [电控平缝机, 状态机, 自动剪线, 自动回针, 剪线时序, 电磁铁延迟, 发令角, 缝纫机设计]
+  en: [electronic lockstitch machine, state machine, automatic thread trimming, automatic backtack, trimming timing, solenoid delay, command angle, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十四讲，工业平缝机电控。
+    - 上一讲讲了伺服电机和电磁铁，今天把它们和机构合起来：电控平缝机怎样按主轴转角自动回针、剪线、拨线。贯穿全讲的一句话是：每个动作都要对准机械时刻表。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 14, the control of the industrial lockstitch machine.
+    - Last time we met servo motors and solenoids. Today we put them together with the mechanisms, and see how the machine backtacks, trims and wipes automatically by shaft angle. One idea runs through it all. Every action has to line up with the mechanical timing chart.
+
+after:
+  - id: lab141
+    kind: lab
+    lab: trim
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checks, #verdict, #msg, #trialtxt { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); const p = document.getElementById('tasks').closest('section'); p.style.filter = 'blur(7px) grayscale(1)'; })()"
+        press: "#reset"
+      - press: "#try"
+      - press: "#mess"
+        sweep: {pc: [250, 268]}
+        dur: 6
+      - js: "document.getElementById('reset').click()"
+        sweep: {n: [300, 700]}
+        dur: 7
+      - js: "(() => { document.getElementById('reset').click(); for (const [k, v] of [['pc', 285], ['t1', 5], ['t2', 15]]) { const e = document.getElementById(k); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); } document.getElementById('try').click(); window.scrollTo(0, 0); })()"
+    say:
+      zh:
+        - ">下面是虚拟实验 14-1，剪线时序编辑器，在问渠平台上可以亲手做。右边的判定、提示和任务这里先遮住，留给你自己读。左上是时刻表：绿色是允许进刀的窗口，红色是算上延迟的实际进刀范围。"
+        - ">按“再试 50 次”，延迟在 6 到 10 毫秒之间随机，左下是 50 次试剪的结果。"
+        - ">任务一，按“打乱”，发令角跳到 250°，松线范围变短，也不拨线了。这里先把发令角往后拖一点，看红条朝窗口移动；剩下的留给你自己调，让判定全部通过。"
+        - ">任务二，恢复标准，把剪线转速提到每分钟 700 转以上，延迟不变。看红条往右走、出了窗口，还变宽了。课件里算过上限，你再算出发令角最早能取多少，拖滑块验证，50 次都要剪断。"
+        - ">任务三，把延迟改成 5 到 15 毫秒，红条一下子变宽，50 次里开始有失败。课件里算过窗口上限，这里再和停车限制比一比，把结果填进去核对，再用滑块和试剪验证。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 14-1, the trimming sequence editor. On the WenQuest platform you can do it yourself. The verdicts, the hints and the tasks on the right are blurred here, so you can read them on your own. Top left is the timing chart. Green is the window where the knife may enter, and red is the actual entry range once the delay is counted."
+        - ">Press Another 50 trials. Each delay falls at random between 6 and 10 milliseconds, and the row of cells at the bottom left shows the 50 trial cuts."
+        - ">Task one: press Scramble. The command jumps to 250 degrees, the release range gets shorter, and wiping is switched off. Here we drag the command angle a little later and watch the red bar move toward the window. The rest of the command angle, the release and the wiper are yours to fix, until every verdict passes."
+        - ">Task two: reset, and raise the trimming speed to 700 or more with the same delay. The red bar moves right, out of the window, and gets wider. The slides gave the upper end; work out how early the command may go, then check it with the slider. All 50 trials must cut."
+        - ">Task three: set the delay to 5 to 15 milliseconds. The red bar widens at once, and some of the 50 trials start to fail. The slides worked out the window limit; compare it with the stopping limit, enter the result to check, then confirm with the slider and the trials. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 14-1，可以自己动手", "Interactive slides and Lab 14-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和剪线时序编辑器都可以自己打开，边调边看进刀范围和试剪结果。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the trimming sequence editor yourself, and watch the entry range and the trial cuts change as you go."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 14：停车剪线时间、发令角与回针转速", "Assignment 14: stop-and-trim time, command angle, backtack speed"]
+      points:
+        - ["3500 r/min 缝纫：剪线转速 250 与 400 各要多久", "Sewing at 3500 r/min: stop-and-trim at 250 vs 400 r/min"]
+        - ["450 r/min 的发令角；延迟漂到 5–13 ms 还行吗", "Command angle at 450 r/min; still fine if delay drifts to 5–13 ms?"]
+        - ["回针转速上限；过梗时三项调整的利弊", "Backtack speed limits; pros and cons of the cross-seam fixes"]
+      foot: ["2–4 页计算报告（PDF），附实验 14-1 三个任务和任务 2 时刻表的截图，在问渠学习平台提交。", "A 2–4 page calculation report (PDF) with screenshots of the three Lab 14-1 tasks and the Task 2 chart, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，每分钟 3500 转缝纫，分段算出剪线转速 250 和 400 时一次停车剪线的时间；每天剪线 2500 次，一天差几分钟。"
+        - ">第二题，剪线转速 450，延迟 6 到 9 毫秒，求发令角的允许范围并选一个值。用久了电压偏低，延迟变成 5 到 13 毫秒，你选的发令角还行不行？不行就改，并说明理由。"
+        - ">第三题，空闲角 211.6°、留 10° 余量，分别求倒缝电磁铁延迟 16 毫秒和步进电机延迟 5 毫秒时的回针转速上限，再说说电子送布机型的起缝回针为什么默认仍可能只有每分钟 1800 针。第四题是讨论：过梗时降转速、加压脚压力、改面线张力，各防什么故障、往哪边调、有什么副作用。"
+        - 计算报告和实验截图，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: sewing at 3500 r/min, work out stage by stage the stop-and-trim time for trimming speeds of 250 and 400 r/min. With 2500 trims a day, how many minutes a day separate them?"
+        - ">Two: trimming at 450 r/min with a 6 to 9 millisecond delay. Find the allowed range of command angles and choose one. After a while a low voltage stretches the delay to 5 to 13 milliseconds. Does your angle still work? If not, change it, and explain why."
+        - ">Three: with an idle angle of 211.6 degrees and a 10-degree margin, find the backtack speed limits for a reverse-feed solenoid with a 16 millisecond delay and a feed stepper with a 5 millisecond delay, then say why an electronic-feed machine may still default to only 1800 stitches a minute for the start backtack. Four is a discussion. At a cross seam the machine lowers the speed, adds foot pressure and changes the needle-thread tension. Say which fault each one prevents, which way it goes, and its side effects."
+        - Submit the calculation report and the lab screenshots on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["500 r/min、285° 发令、延迟 6–10 ms：最晚几度进刀？", "500 r/min, command at 285°, 6–10 ms: latest entry angle?"]
+        - ["延迟 7–12 ms，只看窗口：剪线转速最高多少？", "Delay 7–12 ms, window only: highest trimming speed?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：剪线转速每分钟 500 转，在 285° 发令，延迟 6 到 10 毫秒，动刀最晚在多少度进刀？"
+        - ">再比如：延迟在 7 到 12 毫秒之间变化，窗口宽 30°，只看窗口这一条，剪线转速最高是多少？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, trimming at 500 r/min with the command at 285 degrees and a 6 to 10 millisecond delay: at what angle does the knife enter at the latest?"
+        - ">Or, the delay varies between 7 and 12 milliseconds and the window is 30 degrees wide. Considering only the window, what is the highest trimming speed?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲花样机和锁眼、钉扣、套结机的控制：布料不再由送布牙推，而是夹在框里按图形走。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's the control of pattern sewers, buttonholers and bartackers, where the fabric is no longer pushed by a feed dog but clamped in a frame that follows a pattern. See you then.

@@ -79,29 +79,29 @@ slides:
     h: 600
     visual:
       svg: |
-        <svg viewBox="0 0 1700 600">
+        <svg viewBox="0 0 1700 600"><style>html:not(.en-only) .eo{display:none}</style>
           <defs><marker id="m14a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6f84a3"/></marker></defs>
           <g font-weight="700" text-anchor="middle">
             <rect x="20" y="40" width="250" height="140" rx="20" fill="#111d31" stroke="#8fa3ba" stroke-width="3"/>
-            <text x="145" y="102" font-size="36" fill="#f3f6fa">待机</text><text x="145" y="144" font-size="22" fill="#8fa3ba" font-weight="400">上针位·压脚抬起</text>
+            <text x="145" y="102" font-size="36" fill="#f3f6fa" class="zh">待机</text><text x="145" y="102" font-size="36" fill="#f3f6fa" class="eo">Idle</text><text x="145" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">上针位·压脚抬起</text><text x="145" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">needle up, foot up</text>
             <rect x="377" y="40" width="250" height="140" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="502" y="102" font-size="36" fill="#ffb38f">压脚落下</text><text x="502" y="144" font-size="22" fill="#8fa3ba" font-weight="400">电磁铁 / 气缸</text>
+            <text x="502" y="102" font-size="36" fill="#ffb38f" class="zh">压脚落下</text><text x="502" y="102" font-size="36" fill="#ffb38f" class="eo">Foot down</text><text x="502" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">电磁铁 / 气缸</text><text x="502" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">solenoid / cylinder</text>
             <rect x="734" y="40" width="250" height="140" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="859" y="102" font-size="36" fill="#ffb38f">起缝回针</text><text x="859" y="144" font-size="22" fill="#8fa3ba" font-weight="400">倒 → 正 各几针</text>
+            <text x="859" y="102" font-size="36" fill="#ffb38f" class="zh">起缝回针</text><text x="859" y="102" font-size="29" fill="#ffb38f" class="eo">Start backtack</text><text x="859" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">倒 → 正 各几针</text><text x="859" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">back, then forward</text>
             <rect x="1091" y="40" width="250" height="140" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="1216" y="102" font-size="36" fill="#9cc0ff">慢起针</text><text x="1216" y="144" font-size="22" fill="#8fa3ba" font-weight="400">头几针限速</text>
+            <text x="1216" y="102" font-size="36" fill="#9cc0ff" class="zh">慢起针</text><text x="1216" y="102" font-size="36" fill="#9cc0ff" class="eo">Soft start</text><text x="1216" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">头几针限速</text><text x="1216" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">first stitches slow</text>
             <rect x="1448" y="40" width="250" height="140" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="1573" y="102" font-size="36" fill="#9cc0ff">缝纫</text><text x="1573" y="144" font-size="22" fill="#8fa3ba" font-weight="400">转速跟着脚踏</text>
+            <text x="1573" y="102" font-size="36" fill="#9cc0ff" class="zh">缝纫</text><text x="1573" y="102" font-size="36" fill="#9cc0ff" class="eo">Sewing</text><text x="1573" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">转速跟着脚踏</text><text x="1573" y="144" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">speed follows pedal</text>
             <rect x="1448" y="400" width="250" height="140" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="1573" y="462" font-size="36" fill="#ffb38f">结束回针</text><text x="1573" y="504" font-size="22" fill="#8fa3ba" font-weight="400">先回几针</text>
+            <text x="1573" y="462" font-size="36" fill="#ffb38f" class="zh">结束回针</text><text x="1573" y="462" font-size="29" fill="#ffb38f" class="eo">End backtack</text><text x="1573" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">先回几针</text><text x="1573" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">a few reverse</text>
             <rect x="1091" y="400" width="250" height="140" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="1216" y="462" font-size="36" fill="#9cc0ff">减速</text><text x="1216" y="504" font-size="22" fill="#8fa3ba" font-weight="400">降到剪线转速</text>
+            <text x="1216" y="462" font-size="36" fill="#9cc0ff" class="zh">减速</text><text x="1216" y="462" font-size="36" fill="#9cc0ff" class="eo">Slow down</text><text x="1216" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">降到剪线转速</text><text x="1216" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">to trimming speed</text>
             <rect x="734" y="400" width="250" height="140" rx="20" fill="#2a1a14" stroke="#f2b705" stroke-width="4"/>
-            <text x="859" y="462" font-size="36" fill="#f2b705">剪线针</text><text x="859" y="504" font-size="22" fill="#8fa3ba" font-weight="400">发令·松线·进刀</text>
+            <text x="859" y="462" font-size="36" fill="#f2b705" class="zh">剪线针</text><text x="859" y="462" font-size="36" fill="#f2b705" class="eo">Trim stitch</text><text x="859" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">发令·松线·进刀</text><text x="859" y="504" font-size="19" fill="#8fa3ba" font-weight="400" class="eo">command, knife in</text>
             <rect x="377" y="400" width="250" height="140" rx="20" fill="#2a1a14" stroke="#f2b705" stroke-width="4"/>
-            <text x="502" y="462" font-size="36" fill="#f2b705">剪断、停针</text><text x="502" y="504" font-size="22" fill="#8fa3ba" font-weight="400">停在上针位</text>
+            <text x="502" y="462" font-size="36" fill="#f2b705" class="zh">剪断、停针</text><text x="502" y="462" font-size="36" fill="#f2b705" class="eo">Cut, stop</text><text x="502" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">停在上针位</text><text x="502" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">stop at needle-up</text>
             <rect x="20" y="400" width="250" height="140" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="145" y="462" font-size="36" fill="#ffb38f">拨线·抬压脚</text><text x="145" y="504" font-size="22" fill="#8fa3ba" font-weight="400">线头拨到压脚上</text>
+            <text x="145" y="462" font-size="36" fill="#ffb38f" class="zh">拨线·抬压脚</text><text x="145" y="462" font-size="36" fill="#ffb38f" class="eo">Wipe, lift</text><text x="145" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">线头拨到压脚上</text><text x="145" y="504" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">end onto the foot</text>
           </g>
           <g stroke="#6f84a3" stroke-width="4" marker-end="url(#m14a)">
             <path d="M275 125 L370 125"/><path d="M632 125 L727 125"/><path d="M989 125 L1084 125"/><path d="M1346 125 L1441 125"/>
@@ -110,11 +110,11 @@ slides:
             <path d="M145 395 L145 187"/>
           </g>
           <g font-size="22" fill="#d3deea" text-anchor="middle">
-            <text x="323" y="108">前掌踩</text><text x="680" y="108">压脚到位</text><text x="1037" y="108">回针完</text><text x="1394" y="108">针数到</text>
-            <text x="1394" y="468">回针完</text><text x="1037" y="468">到转速</text><text x="680" y="468">到剪线角</text><text x="323" y="468">停稳</text>
+            <text x="323" y="108" class="zh">前掌踩</text><text x="323" y="108" font-size="19" class="eo">press</text><text x="680" y="108" class="zh">压脚到位</text><text x="680" y="108" font-size="19" class="eo">foot set</text><text x="1037" y="108" class="zh">回针完</text><text x="1037" y="108" font-size="19" class="eo">tacked</text><text x="1394" y="108" class="zh">针数到</text><text x="1394" y="108" font-size="16" class="eo">stitches done</text>
+            <text x="1394" y="468" class="zh">回针完</text><text x="1394" y="468" font-size="19" class="eo">tacked</text><text x="1037" y="468" class="zh">到转速</text><text x="1037" y="468" font-size="19" class="eo">at speed</text><text x="680" y="468" class="zh">到剪线角</text><text x="680" y="468" font-size="16" class="eo">at trim angle</text><text x="323" y="468" class="zh">停稳</text><text x="323" y="468" font-size="19" class="eo">stopped</text>
           </g>
           <g font-size="26" font-weight="700" fill="#f2b705">
-            <text x="1595" y="300">后跟踩到底</text><text x="165" y="300">松开脚踏</text>
+            <text x="1595" y="300" class="zh">后跟踩到底</text><text x="1595" y="300" text-anchor="end" dx="-50" class="eo">heel back</text><text x="165" y="300" class="zh">松开脚踏</text><text x="165" y="300" class="eo">pedal up</text>
           </g>
           <text x="850" y="300" font-size="30" fill="#8fa3ba" text-anchor="middle">方框 = 状态　箭头 = 触发条件</text>
           <text x="850" y="338" font-size="22" fill="#5f7189" text-anchor="middle" class="en">boxes are states · arrows are triggers</text>
@@ -132,9 +132,9 @@ slides:
       - ["一天剪几千次，半秒乘起来就是几十分钟", "Thousands of trims a day: half-seconds become tens of minutes"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M40 470 L880 470 M40 470 L40 60" stroke="#4b5f7d" stroke-width="3"/>
-          <text x="52" y="78" font-size="24" fill="#8fa3ba">主轴转速 · r/min</text>
+          <text x="52" y="78" font-size="24" fill="#8fa3ba" class="zh">主轴转速 · r/min</text><text x="52" y="78" font-size="24" fill="#8fa3ba" class="eo">shaft speed · r/min</text>
           <path d="M40 110 L337 446 L810 446 L824 470" fill="none" stroke="#f3f6fa" stroke-width="6" stroke-linejoin="round"/>
           <circle cx="40" cy="110" r="10" fill="#f3f6fa"/>
           <text x="62" y="128" font-size="28" fill="#f3f6fa" font-weight="700" class="en">4000</text>
@@ -146,16 +146,16 @@ slides:
             <text x="188" y="548" class="en">{{ch14.d300:.0f}} ms</text><text x="573" y="548" class="en">{{ch14.c300:.0f}} ms</text>
           </g>
           <g text-anchor="middle" font-size="26">
-            <text x="188" y="606" fill="#9cc0ff">减速</text><text x="573" y="606" fill="#ffb38f">剪线一针（大头）</text>
-            <text x="818" y="606" fill="#f2b705">停针 {{ch14.p300:.0f}} ms</text>
+            <text x="188" y="606" fill="#9cc0ff" class="zh">减速</text><text x="188" y="606" fill="#9cc0ff" class="eo">Slow down</text><text x="573" y="606" fill="#ffb38f" class="zh">剪线一针（大头）</text><text x="573" y="606" fill="#ffb38f" class="eo">trimming stitch (largest)</text>
+            <text x="818" y="606" fill="#f2b705" class="zh">停针 {{ch14.p300:.0f}} ms</text><text x="818" y="606" fill="#f2b705" class="eo">stop {{ch14.p300:.0f}} ms</text>
           </g>
           <rect x="560" y="140" width="320" height="120" rx="20" fill="rgba(242,183,5,.12)" stroke="#f2b705" stroke-width="2"/>
           <text x="720" y="200" font-size="44" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">≈ {{ch14.T300:.2f}} s</text>
-          <text x="720" y="240" font-size="22" fill="#c9a94a" text-anchor="middle">4000 → 300 r/min 剪线</text>
+          <text x="720" y="240" font-size="22" fill="#c9a94a" text-anchor="middle" class="zh">4000 → 300 r/min 剪线</text><text x="720" y="240" font-size="22" fill="#c9a94a" text-anchor="middle" class="eo">trim at 300 from 4000 r/min</text>
         </svg>
     notes:
-      - "算算这半秒钟。从 4000 转停车剪线分三段：先按伺服能力的六成，约 {{ch14.A60:.0f}} rad/s² 减速到 300 转，要 {{ch14.d300:.0f}} 毫秒；然后是剪线那一针，从 0° 一直转到下一转 55° 剪断，共 415°，要 {{ch14.c300:.0f}} 毫秒，这是大头；最后以最大减速度停车，只要 {{ch14.p300:.0f}} 毫秒。合计约 {{ch14.T300:.2f}} 秒，再加拨线、抬压脚，约半秒。"
-      - "Let's account for that half-second. Stopping and trimming from 4000 r/min has three parts. First, decelerate to 300 r/min at 60% of the servo's capability, about {{ch14.A60:.0f}} rad/s²: {{ch14.d300:.0f}} milliseconds. Then the trimming stitch, from 0° all the way to the cut at 55° of the next turn, 415° in all: {{ch14.c300:.0f}} milliseconds, the biggest share. Finally a stop at maximum deceleration: just {{ch14.p300:.0f}} milliseconds. About {{ch14.T300:.2f}} seconds; add wiping and foot lift and it is roughly half a second."
+      - "算算这半秒钟。从 4000 转停车剪线分三段：先按伺服能力的六成，约 {{ch14.A60:.0f}} 弧度每二次方秒 减速到 300 转，要 {{ch14.d300:.0f}} 毫秒；然后是剪线那一针，从 0° 一直转到下一转 55° 剪断，共 415°，要 {{ch14.c300:.0f}} 毫秒，这是大头；最后以最大减速度停车，只要 {{ch14.p300:.0f}} 毫秒。合计约 {{ch14.T300:.2f}} 秒，再加拨线、抬压脚，约半秒。"
+      - "Let's account for that half-second. Stopping and trimming from 4000 r/min has three parts. First, decelerate to 300 r/min at 60% of the servo's capability, about {{ch14.A60:.0f}} radians per second squared: {{ch14.d300:.0f}} milliseconds. Then the trimming stitch, from 0° all the way to the cut at 55° of the next turn, 415° in all: {{ch14.c300:.0f}} milliseconds, the biggest share. Finally a stop at maximum deceleration: just {{ch14.p300:.0f}} milliseconds. About {{ch14.T300:.2f}} seconds; add wiping and foot lift and it is roughly half a second."
 
   - layout: split
     title: ["主轴速度曲线：慢起针与短缝", "Shaft speed profile: soft start and short seams"]
@@ -165,19 +165,19 @@ slides:
       - ["短缝里最高转速只占不到三成", "In a short seam, top speed is under 30% of the time"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M40 520 L880 520 M40 520 L40 60" stroke="#4b5f7d" stroke-width="3"/>
-          <text x="52" y="78" font-size="24" fill="#8fa3ba">转速</text>
-          <text x="860" y="560" font-size="24" fill="#8fa3ba" text-anchor="end">时间 →</text>
+          <text x="52" y="78" font-size="24" fill="#8fa3ba" class="zh">转速</text><text x="52" y="78" font-size="24" fill="#8fa3ba" class="eo">speed</text>
+          <text x="860" y="560" font-size="24" fill="#8fa3ba" text-anchor="end" class="zh">时间 →</text><text x="860" y="560" font-size="24" fill="#8fa3ba" text-anchor="end" class="eo">time →</text>
           <path d="M40 520 L60 474 L230 474 L320 130 L520 130 L640 486 L770 486 L782 520" fill="none" stroke="#f3f6fa" stroke-width="6" stroke-linejoin="round"/>
           <rect x="60" y="474" width="170" height="46" fill="rgba(76,141,255,.3)"/>
           <rect x="320" y="130" width="200" height="390" fill="rgba(46,196,182,.12)"/>
           <rect x="640" y="486" width="130" height="34" fill="rgba(255,122,69,.35)"/>
           <g font-size="26" font-weight="700">
             <text x="145" y="450" fill="#9cc0ff" text-anchor="middle">慢起针</text>
-            <text x="230" y="300" fill="#f2b705" text-anchor="middle">加速</text>
+            <text x="230" y="300" fill="#f2b705" text-anchor="middle" class="zh">加速</text><text x="230" y="300" fill="#f2b705" text-anchor="end" class="eo">speed up</text>
             <text x="420" y="110" fill="#5ee0d2" text-anchor="middle">最高转速</text>
-            <text x="620" y="300" fill="#f2b705">减速</text>
+            <text x="620" y="300" fill="#f2b705" class="zh">减速</text><text x="620" y="300" fill="#f2b705" class="eo">Slow down</text>
             <text x="705" y="460" fill="#ffb38f" text-anchor="middle">剪线</text>
           </g>
           <g font-size="22" fill="#8fa3ba" class="en">
@@ -202,24 +202,24 @@ slides:
       - ["114.2° 发令，延迟内主轴转 6nt 度，留 10°", "Command at 114.2°; the shaft turns 6nt in the delay; keep 10°"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <circle cx="450" cy="330" r="220" fill="none" stroke="#22324d" stroke-width="30"/>
           <path d="M650.7 420.2 A220 220 0 1 1 326.3 148.0" fill="none" stroke="#2ec4b6" stroke-width="30"/>
           <path d="M326.3 148.0 A220 220 0 0 1 650.7 420.2" fill="none" stroke="#f2b705" stroke-width="30"/>
           <path d="M605.1 399.7 A170 170 0 1 1 331.5 208.1" fill="none" stroke="#ff7a45" stroke-width="8" stroke-dasharray="16 10"/>
           <circle cx="650.7" cy="420.2" r="16" fill="#ff7a45"/>
           <circle cx="331.5" cy="208.1" r="10" fill="#ff7a45"/>
-          <text x="450" y="322" font-size="34" font-weight="700" fill="#f3f6fa" text-anchor="middle">主轴一转</text>
-          <text x="450" y="362" font-size="26" fill="#ffb38f" text-anchor="middle">延迟 t：转过 6nt 度</text>
-          <text x="660" y="90" font-size="28" font-weight="700" fill="#f2b705">送布牙推布</text>
-          <text x="690" y="470" font-size="28" font-weight="700" fill="#ff9c75">114.2° 发令</text>
-          <text x="300" y="120" font-size="26" fill="#5ee0d2" text-anchor="end">325.8° 升出</text>
-          <text x="236" y="236" font-size="24" fill="#ffb38f" text-anchor="end">留 10°</text>
-          <text x="450" y="615" font-size="32" font-weight="800" fill="#5ee0d2" text-anchor="middle">空闲角 211.6°</text>
+          <text x="450" y="322" font-size="34" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="zh">主轴一转</text><text x="450" y="322" font-size="34" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="eo">one shaft turn</text>
+          <text x="450" y="362" font-size="26" fill="#ffb38f" text-anchor="middle" class="zh">延迟 t：转过 6nt 度</text><text x="450" y="362" font-size="26" fill="#ffb38f" text-anchor="middle" class="eo">delay t: turns 6nt°</text>
+          <text x="660" y="90" font-size="28" font-weight="700" fill="#f2b705" class="zh">送布牙推布</text><text x="660" y="90" font-size="28" font-weight="700" fill="#f2b705" class="eo">feed dog pushing</text>
+          <text x="690" y="470" font-size="28" font-weight="700" fill="#ff9c75" class="zh">114.2° 发令</text><text x="690" y="470" font-size="24" font-weight="700" fill="#ff9c75" class="eo">114.2° command</text>
+          <text x="300" y="120" font-size="26" fill="#5ee0d2" text-anchor="end" class="zh">325.8° 升出</text><text x="300" y="120" font-size="26" fill="#5ee0d2" text-anchor="end" class="eo">325.8° rises</text>
+          <text x="236" y="236" font-size="24" fill="#ffb38f" text-anchor="end" class="zh">留 10°</text><text x="236" y="236" font-size="21" fill="#ffb38f" text-anchor="end" dx="-6" class="eo">10° spare</text>
+          <text x="450" y="615" font-size="32" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="zh">空闲角 211.6°</text><text x="450" y="615" font-size="32" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="eo">idle angle 211.6°</text>
         </svg>
     notes:
-      - "起缝和结束各回几针，把线迹锁住，叫回针。机械送布靠倒缝电磁铁拨动针距调节机构，电子送布由步进电机直接换向。关键是时机：送布牙在针板上面时正在推布，这时换向，这一针既不是正向也不是反向。第 6 讲算例里，送布牙 114.2° 沉下去，325.8° 升上来，中间 211.6° 叫空闲角。控制器在 114.2° 发令，延迟 t 里主轴转过 6nt 度，再留 10° 余量。"
-      - "A few reverse stitches at the start and end lock the seam: that's backtacking. Mechanical feed uses a reverse-feed solenoid to shift the stitch regulator; electronic feed reverses a stepper directly. Timing is everything. While the feed dog is above the plate it is pushing the fabric, and a reversal then gives a stitch that is neither forward nor back. In the Lecture 6 example the dog drops at 114.2° and rises at 325.8°; the 211.6° in between is the idle angle. Command at 114.2°, the shaft turns 6nt degrees during delay t, and we keep 10 degrees spare."
+      - "起缝和结束各回几针，把线迹锁住，叫回针。机械送布靠倒缝电磁铁拨动针距调节机构，电子送布由步进电机直接换向。关键是时机：送布牙在针板上面时正在推布，这时换向，这一针既不是正向也不是反向。第 6 讲算例里，送布牙 114.2° 沉下去，325.8° 升上来，中间 211.6° 叫空闲角。控制器在 114.2° 发令，延迟 t 里主轴转过 6 乘 n 乘 t 度，再留 10° 余量。"
+      - "A few reverse stitches at the start and end lock the seam: that's backtacking. Mechanical feed uses a reverse-feed solenoid to shift the stitch regulator; electronic feed reverses a stepper directly. Timing is everything. While the feed dog is above the plate it is pushing the fabric, and a reversal then gives a stitch that is neither forward nor back. In the Lecture 6 example the dog drops at 114.2° and rises at 325.8°; the 211.6° in between is the idle angle. Command at 114.2°, the shaft turns 6 n t degrees during delay t, and we keep 10 degrees spare."
 
   - layout: bignum
     title: ["回针转速上限 n = (211.6 − 10) / 6t", "Backtack speed limit n = (211.6 − 10) / 6t"]
@@ -254,7 +254,7 @@ slides:
       - ["直接驱动：进刀 = 发令 + 延迟（本讲）", "Direct drive: entry = command + delay (this lecture)"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <circle cx="430" cy="360" r="190" fill="#16243b" stroke="#6f84a3" stroke-width="4"/>
           <circle cx="430" cy="360" r="110" fill="#0d1626" stroke="#4b5f7d" stroke-width="3"/>
           <circle cx="430" cy="360" r="30" fill="#4b5f7d"/>
@@ -262,17 +262,17 @@ slides:
           <path d="M455 172 C 300 150, 210 300, 240 420 C 270 540, 520 560, 600 440 C 640 380, 600 250, 470 175" fill="none" stroke="#4c8dff" stroke-width="6"/>
           <circle cx="458" cy="172" r="12" fill="none" stroke="#f3f6fa" stroke-width="4"/>
           <polygon points="700,150 820,150 820,190 700,200" fill="#c8d2de"/>
-          <text x="760" y="130" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle">定刀</text>
+          <text x="760" y="130" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="zh">定刀</text><text x="760" y="130" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="eo">fixed knife</text>
           <circle cx="90" cy="250" r="22" fill="#f2b705"/>
           <polygon points="90,240 560,180 575,200 90,262" fill="#ff7a45"/>
           <path d="M130 330 A170 170 0 0 0 210 160" fill="none" stroke="#f2b705" stroke-width="4" stroke-dasharray="10 8"/>
-          <text x="60" y="310" font-size="28" font-weight="700" fill="#f2b705">摆轴</text>
-          <text x="230" y="190" font-size="28" font-weight="700" fill="#ff9c75">动刀</text>
-          <text x="430" y="600" font-size="28" fill="#8fa3ba" text-anchor="middle">旋梭（俯视）</text>
-          <text x="650" y="470" font-size="26" fill="#9cc0ff">面线线环</text>
-          <text x="520" y="300" font-size="24" fill="#ffb38f">底线</text>
+          <text x="60" y="310" font-size="28" font-weight="700" fill="#f2b705" class="zh">摆轴</text><text x="60" y="310" font-size="28" font-weight="700" fill="#f2b705" class="eo">shaft</text>
+          <text x="230" y="190" font-size="28" font-weight="700" fill="#ff9c75" class="zh">动刀</text><text x="230" y="190" font-size="28" font-weight="700" fill="#ff9c75" dy="-34" class="eo">moving knife</text>
+          <text x="430" y="600" font-size="28" fill="#8fa3ba" text-anchor="middle" class="zh">旋梭（俯视）</text><text x="430" y="600" font-size="28" fill="#8fa3ba" text-anchor="middle" class="eo">rotary hook (top view)</text>
+          <text x="650" y="470" font-size="26" fill="#9cc0ff" class="zh">面线线环</text><text x="650" y="470" font-size="26" fill="#9cc0ff" class="eo">needle-thread loop</text>
+          <text x="520" y="300" font-size="24" fill="#ffb38f" class="zh">底线</text><text x="520" y="300" font-size="24" fill="#ffb38f" dx="40" dy="-40" class="eo">bobbin thread</text>
           <g transform="translate(40,500)"><rect width="190" height="90" rx="14" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="95" y="56" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle">电磁铁</text></g>
+            <text x="95" y="56" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">电磁铁</text><text x="95" y="56" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">Solenoid</text></g>
           <path d="M135 500 L100 280" stroke="#2ec4b6" stroke-width="5" stroke-dasharray="8 6"/>
         </svg>
     notes:
@@ -286,8 +286,8 @@ slides:
     mark: ["动刀：进刀 → 挂线 → 剪断", "knife: in, catch, cut"]
     foot: ["341° 起夹线器松开，线从线团那边抽；停稳后拨线，把线头拨到压脚上面", "From 341° the tension opens so thread comes from the spool; after stopping, wipe the end onto the foot"]
     notes:
-      - "一次剪线是这样的。最后一针照常缝，梭尖在 206° 钩住面线线环。机针升到针板上方约 10 毫米，本书模型里约 291°，控制器给剪线电磁铁通电。经过延迟，动刀转进来，从线环供线侧那根线下面穿过，连布的面线和底线落进刀的钩槽。341° 线环脱出，夹线器松开。动刀回程，在挑线杆最高点、下一转 55° 剪断两根线。供线侧那根留在针眼里，做下一道的线头。"
-      - "Here is one trim. The last stitch is sewn as usual, and the hook point catches the needle-thread loop at 206°. When the needle has risen about 10 millimetres above the plate, about 291° in our model, the controller energises the trimming solenoid. After the delay the knife swings in under the supply side of the loop, and the fabric-side needle thread and the bobbin thread fall into its notch. At 341° the loop slips off and the tension opens. On its return the knife cuts both threads at the take-up lever's top, 55° of the next turn. The supply-side thread stays in the eye for the next seam."
+      - "一次剪线是这样的。针板下面有一把定刀和一把动刀，本讲的动刀由电磁铁经连杆直接推动。最后一针照常缝，梭尖在 206° 钩住面线线环。机针升到针板上方约 10 毫米，本书模型里约 291°，控制器给剪线电磁铁通电。经过延迟，动刀转进来，从线环供线侧那根线下面穿过，连布的面线和底线落进刀的钩槽。341° 线环脱出，夹线器松开。动刀回程，在挑线杆最高点、下一转 55° 剪断两根线。供线侧那根留在针眼里，做下一道的线头。"
+      - "Here is one trim. Under the throat plate there is a fixed knife and a moving knife; here a solenoid drives the moving knife directly through links. The last stitch is sewn as usual, and the hook point catches the needle-thread loop at 206°. When the needle has risen about 10 millimetres above the plate, about 291° in our model, the controller energises the trimming solenoid. After the delay the knife swings in under the supply side of the loop, and the fabric-side needle thread and the bobbin thread fall into its notch. At 341° the loop slips off and the tension opens. On its return the knife cuts both threads at the take-up lever's top, 55° of the next turn. The supply-side thread stays in the eye for the next seam."
 
   - layout: figure
     title: ["四条判据画在时刻表上", "The four criteria on the timing chart"]
@@ -304,8 +304,8 @@ slides:
     visual: {video: speed}
     caption: ["同样 290° 发令：300 r/min 进刀 {{ch14.e300lo:.1f}}°–{{ch14.e300hi:.0f}}°，700 r/min 变成 {{ch14.e700lo:.1f}}°–{{ch14.e700hi:.0f}}°", "Command at 290°: entry {{ch14.e300lo:.1f}}°–{{ch14.e300hi:.0f}}° at 300, {{ch14.e700lo:.1f}}°–{{ch14.e700hi:.0f}}° at 700 r/min"]
     notes:
-      - "控制器在转角 φc 发令，延迟 t 里主轴又转了 6nt 度，所以实际进刀角是 φc 加 6nt。看图，同样在 290° 发令，延迟 6 到 10 毫秒。300 转时进刀在 {{ch14.e300lo:.1f}}° 到 {{ch14.e300hi:.0f}}°，在窗口里；转速一步步提到 700，红条往右走，变成 {{ch14.e700lo:.1f}}° 到 {{ch14.e700hi:.0f}}°，晚了，发令角要提前到 {{ch14.adv700:.0f}}° 以前。还要注意红条变宽了，从 {{ch14.w300:.0f}}° 宽到 {{ch14.w700:.0f}}°。"
-      - "The controller commands at angle φc, and during delay t the shaft turns another 6nt degrees, so the knife actually enters at φc plus 6nt. Here the command stays at 290° with a 6 to 10 millisecond delay. At 300 r/min the knife enters between {{ch14.e300lo:.1f}}° and {{ch14.e300hi:.0f}}°, inside the window. As the speed steps up to 700, the red bar moves right to {{ch14.e700lo:.1f}}° to {{ch14.e700hi:.0f}}°: too late. The command would have to move before {{ch14.adv700:.0f}}°. Notice too that the red bar widens, from {{ch14.w300:.0f}} to {{ch14.w700:.0f}} degrees."
+      - "控制器在发令角发令，延迟 t 里主轴又转了 6 乘 n 乘 t 度，所以实际进刀角是发令角加上 6 乘 n 乘 t。看图，同样在 290° 发令，延迟 6 到 10 毫秒。300 转时进刀在 {{ch14.e300lo:.1f}}° 到 {{ch14.e300hi:.0f}}°，在窗口里；转速一步步提到 700，红条往右走，变成 {{ch14.e700lo:.1f}}° 到 {{ch14.e700hi:.0f}}°，晚了，发令角要提前到 {{ch14.adv700:.0f}}° 以前。还要注意红条变宽了，从 {{ch14.w300:.0f}}° 宽到 {{ch14.w700:.0f}}°。"
+      - "The controller commands at a chosen command angle, and during delay t the shaft turns another 6 n t degrees, so the knife actually enters at the command angle plus 6 n t. Here the command stays at 290° with a 6 to 10 millisecond delay. At 300 r/min the knife enters between {{ch14.e300lo:.1f}}° and {{ch14.e300hi:.0f}}°, inside the window. As the speed steps up to 700, the red bar moves right to {{ch14.e700lo:.1f}}° to {{ch14.e700hi:.0f}}°: too late. The command would have to move before {{ch14.adv700:.0f}}°. Notice too that the red bar widens, from {{ch14.w300:.0f}} to {{ch14.w700:.0f}} degrees."
 
   - layout: duo
     title: ["可怕的不是延迟，而是延迟的波动", "The danger is not the delay but its spread"]
@@ -323,19 +323,19 @@ slides:
       - {n: "{{ch14.stoplim:.0f}}", n_en: "r/min", label: ["停车限制：41.7° 内停住", "Stop limit: stop within 41.7°"]}
     foot: ["窗口：6n(t_max − t_min) ≤ 30°。稳压、强激磁、稳压管续流——让延迟一致比让它快更重要", "Window: 6n(t_max − t_min) ≤ 30°. Regulated supply, boost, Zener: consistency beats speed"]
     notes:
-      - "两条上限。第一条是窗口：进刀范围宽 6n 乘延迟差，必须装进 30° 的窗口。6 到 10 毫秒时上限 {{ch14.win610:.0f}} 转；变成 5 到 15 毫秒，只剩 {{ch14.win515:.0f}} 转。第二条是停车：55° 剪断，要在 96.7° 前、也就是 41.7° 内停住，按最大减速度约 {{ch14.AMAX:.0f}} rad/s²，剪线转速不能超过约 {{ch14.stoplim:.0f}} 转。两条取低的。所以稳压电源、强激磁、稳压管续流，最大价值是让延迟一致。"
-      - "Two limits. The first is the window: the entry range is 6n times the delay spread wide and must fit inside 30 degrees. With 6 to 10 milliseconds that allows {{ch14.win610:.0f}} r/min; with 5 to 15, only {{ch14.win515:.0f}}. The second is stopping: cut at 55°, stop before 96.7°, so within 41.7°; at the maximum deceleration of about {{ch14.AMAX:.0f}} rad/s², trimming speed can't exceed about {{ch14.stoplim:.0f}} r/min. Take the lower of the two. That's why a regulated supply, boost drive and Zener freewheeling matter most for making the delay consistent."
+      - "两条上限。第一条是窗口：进刀范围宽 6n 乘延迟差，必须装进 30° 的窗口。6 到 10 毫秒时上限 {{ch14.win610:.0f}} 转；变成 5 到 15 毫秒，只剩 {{ch14.win515:.0f}} 转。第二条是停车：55° 剪断，要在 96.7° 前、也就是 41.7° 内停住，按最大减速度约 {{ch14.AMAX:.0f}} 弧度每二次方秒，剪线转速不能超过约 {{ch14.stoplim:.0f}} 转。两条取低的。所以稳压电源、强激磁、稳压管续流，最大价值是让延迟一致。"
+      - "Two limits. The first is the window: the entry range is 6n times the delay spread wide and must fit inside 30 degrees. With 6 to 10 milliseconds that allows {{ch14.win610:.0f}} r/min; with 5 to 15, only {{ch14.win515:.0f}}. The second is stopping: cut at 55°, stop before 96.7°, so within 41.7°; at the maximum deceleration of about {{ch14.AMAX:.0f}} radians per second squared, trimming speed can't exceed about {{ch14.stoplim:.0f}} r/min. Take the lower of the two. That's why a regulated supply, boost drive and Zener freewheeling matter most for making the delay consistent."
 
   - layout: lab
     title: ["动手试一试：剪线时序编辑器", "Try it: the trimming sequence editor"]
     shot: {page: trim, set: [press: "#reset"]}
     tasks:
-      - ["按“恢复标准”，看时刻表和右边五项判定", "Press Reset; read the chart and the five checks"]
-      - ["按“打乱”，调发令角、松线、拨线，让判定全通过", "Press Shuffle; fix command, release and wiping until all pass"]
+      - ["按“恢复标准”，看时刻表和右边五项判定", "Press Reset to standard; read the chart and the five checks"]
+      - ["按“打乱”，调发令角、松线、拨线，让判定全通过", "Press Scramble; fix command, release and wiping until all pass"]
       - ["改转速和延迟，用“再试 50 次”找剪线转速上限", "Vary speed and delay; find the limit with 50 trial cuts"]
     notes:
       - "这个剪线时序编辑器在问渠平台上可以自己动手。先按恢复标准，对照时刻表看右边五项判定各是什么意思。再按打乱，自己把发令角、松线范围和拨线调回来，让五项全部通过。最后改剪线转速和延迟范围，用再试 50 次检验，找出每次都能剪断的最高剪线转速，把数据填进实验报告。"
-      - "You can work this trimming sequence editor yourself on WenQuest. First press Reset and use the chart to understand each of the five checks on the right. Then press Shuffle and set the command angle, the release range and wiping until all five pass. Finally vary the trimming speed and the delay range, test with fifty trial cuts each time, and find the highest trimming speed that always cuts. Put the numbers in your lab report."
+      - "You can work this trimming sequence editor yourself on WenQuest. First press Reset to standard and use the chart to understand each of the five checks on the right. Then press Scramble and set the command angle, the release range and wiping until all five pass. Finally vary the trimming speed and the delay range, test with fifty trial cuts each time, and find the highest trimming speed that always cuts. Put the numbers in your lab report."
 
   - layout: section
     num: "04"
@@ -349,17 +349,17 @@ slides:
       - ["逐段改针距、转角加密、对条对格", "Per-section length, denser corners, matched stripes"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <defs><marker id="m14b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6f84a3"/></marker></defs>
           <g text-anchor="middle" font-weight="700">
             <rect x="30" y="40" width="380" height="120" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="220" y="96" font-size="34" fill="#f3f6fa">面板：针距 2.5 mm</text><text x="220" y="134" font-size="22" fill="#8fa3ba" font-weight="400" class="en">stitch length on the panel</text>
+            <text x="220" y="96" font-size="34" fill="#f3f6fa" class="zh">面板：针距 2.5 mm</text><text x="220" y="96" font-size="34" fill="#f3f6fa" class="eo">Panel: 2.5 mm</text><text x="220" y="134" font-size="22" fill="#8fa3ba" font-weight="400" class="en">stitch length on the panel</text>
             <rect x="490" y="40" width="380" height="120" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-            <text x="680" y="96" font-size="34" fill="#f3f6fa">控制器</text><text x="680" y="134" font-size="22" fill="#8fa3ba" font-weight="400">等送布牙沉下去</text>
+            <text x="680" y="96" font-size="34" fill="#f3f6fa" class="zh">控制器</text><text x="680" y="96" font-size="34" fill="#f3f6fa" class="eo">Controller</text><text x="680" y="134" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">等送布牙沉下去</text><text x="680" y="134" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">waits for the dog to drop</text>
             <rect x="490" y="250" width="380" height="120" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="680" y="306" font-size="34" fill="#f3f6fa">步进电机</text><text x="680" y="344" font-size="22" fill="#8fa3ba" font-weight="400">转一个角度</text>
+            <text x="680" y="306" font-size="34" fill="#f3f6fa" class="zh">步进电机</text><text x="680" y="306" font-size="34" fill="#f3f6fa" class="eo">Stepper</text><text x="680" y="344" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">转一个角度</text><text x="680" y="344" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">turns an angle</text>
             <rect x="30" y="250" width="380" height="120" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="220" y="306" font-size="34" fill="#f3f6fa">针距摆杆</text><text x="220" y="344" font-size="22" fill="#8fa3ba" font-weight="400">送布量和方向</text>
+            <text x="220" y="306" font-size="34" fill="#f3f6fa" class="zh">针距摆杆</text><text x="220" y="306" font-size="34" fill="#f3f6fa" class="eo">Regulator</text><text x="220" y="344" font-size="22" fill="#8fa3ba" font-weight="400" class="zh">送布量和方向</text><text x="220" y="344" font-size="22" fill="#8fa3ba" font-weight="400" class="eo">feed amount and direction</text>
           </g>
           <g stroke="#6f84a3" stroke-width="5" marker-end="url(#m14b)"><path d="M415 100 L482 100"/><path d="M680 165 L680 242"/><path d="M485 310 L418 310"/><path d="M220 375 L220 442"/></g>
           <rect x="30" y="455" width="840" height="40" rx="6" fill="#2a3a55"/>
@@ -367,7 +367,7 @@ slides:
           <g stroke="#f3f6fa" stroke-width="6" stroke-linecap="round">
             <path d="M330 540 L370 540"/><path d="M400 540 L440 540"/><path d="M470 540 L490 540"/><path d="M510 540 L530 540"/><path d="M550 540 L570 540"/><path d="M600 540 L640 540"/><path d="M670 540 L710 540"/>
           </g>
-          <text x="520" y="600" font-size="26" fill="#f2b705" text-anchor="middle">转角处加密 · denser at the corner</text>
+          <text x="520" y="600" font-size="26" fill="#f2b705" text-anchor="middle" class="zh">转角处加密</text><text x="520" y="600" font-size="26" fill="#f2b705" text-anchor="middle" class="eo">denser at the corner</text>
         </svg>
     notes:
       - "机械送布的平缝机，针距靠一个可以转动的摆杆，操作工拧旋钮、按倒缝扳手。电子送布把这个摆杆交给步进电机：电机转一个角度，送布量和方向就变了，针距在面板上直接输入。改针距和换向一样，要在送布牙沉在针板下面的空闲角里完成，下一针生效。于是可以一道缝里逐段改针距，起缝和转角加密，按条格间距设针数对条对格。有的机型连送布牙升降也交给电机。"
@@ -381,17 +381,17 @@ slides:
       - ["按段设定，剪线时自动松开", "Set per section; released automatically for trimming"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M110 540 L860 540 M110 540 L110 60" stroke="#4b5f7d" stroke-width="3"/>
           <g font-size="24" fill="#8fa3ba" text-anchor="middle" class="en"><text x="110" y="578" class="en">0</text><text x="460" y="578" class="en">0.5</text><text x="810" y="578" class="en">1.0 A</text></g>
           <g font-size="24" fill="#8fa3ba" text-anchor="end" class="en"><text x="96" y="520" class="en">20</text><text x="96" y="128" class="en">{{ch14.T1A:.0f}}</text></g>
-          <text x="120" y="50" font-size="24" fill="#8fa3ba">面线张力 · cN</text>
+          <text x="120" y="50" font-size="24" fill="#8fa3ba" class="zh">面线张力 · cN</text><text x="120" y="50" font-size="24" fill="#8fa3ba" class="eo">needle-thread tension · cN</text>
           <path d="M110 120 L810 120 M810 540 L810 120" stroke="#2c3e5c" stroke-width="2" stroke-dasharray="8 8"/>
           <path d="M110 512 L810 120" stroke="#2ec4b6" stroke-width="7" stroke-linecap="round"/>
           <path d="M110 512 Q 520 520 810 120" fill="none" stroke="#ff7a45" stroke-width="6" stroke-dasharray="14 10"/>
           <circle cx="810" cy="120" r="12" fill="#f2b705"/>
-          <text x="330" y="300" font-size="28" font-weight="700" fill="#5ee0d2">音圈电机：力 ∝ i</text>
-          <text x="520" y="470" font-size="28" font-weight="700" fill="#ff9c75">电磁铁：力 ∝ i²，要标定</text>
+          <text x="330" y="300" font-size="28" font-weight="700" fill="#5ee0d2" class="zh">音圈电机：力 ∝ i</text><text x="330" y="300" font-size="28" font-weight="700" fill="#5ee0d2" dx="-90" dy="-20" class="eo">voice coil: F ∝ i</text>
+          <text x="520" y="470" font-size="28" font-weight="700" fill="#ff9c75" class="zh">电磁铁：力 ∝ i²，要标定</text><text x="520" y="470" font-size="28" font-weight="700" fill="#ff9c75" class="eo">solenoid: F ∝ i², calibrate</text>
         </svg>
     notes:
       - "第 7 讲讲过，面线张力等于预张力加上 2μ 乘夹紧力。电子夹线器用比例电磁铁或音圈电机产生夹紧力，电流越大夹得越紧。音圈电机的力和电流成正比，线性好，但行程小、价格高；普通电磁铁的力大致和电流的平方成正比，还和间隙有关，要标定。算例：预张力 20 厘牛，摩擦系数 0.2，每安培 4 牛，电流从 0 到 1 安，张力升到 {{ch14.T1A:.0f}} 厘牛。张力变成数，就能按段切换，剪线时自动松开。"
@@ -405,19 +405,19 @@ slides:
       - ["调整：降转速、加压脚压力、改张力", "Adjust: lower speed, more foot pressure, new tension"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <g fill="#e9dcc0"><rect x="30" y="400" width="840" height="34" rx="4"/><rect x="30" y="364" width="840" height="34" rx="4" fill="#d9c9a5"/></g>
           <rect x="360" y="292" width="200" height="70" rx="6" fill="#cdbb95"/>
           <rect x="390" y="256" width="140" height="34" rx="6" fill="#bfa97f"/>
-          <text x="460" y="470" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle">过梗：2 → 6 层</text>
+          <text x="460" y="470" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="zh">过梗：2 → 6 层</text><text x="460" y="470" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="eo">cross seam: 2 → 6 plies</text>
           <path d="M30 230 L340 230 C 360 230, 370 200, 400 200 L520 200 C 550 200, 560 230, 580 230 L870 230" fill="none" stroke="#2ec4b6" stroke-width="5"/>
-          <text x="40" y="216" font-size="24" fill="#5ee0d2">压脚高度 h</text>
+          <text x="40" y="216" font-size="24" fill="#5ee0d2" class="zh">压脚高度 h</text><text x="40" y="216" font-size="24" fill="#5ee0d2" class="eo">foot height h</text>
           <path d="M30 120 L360 120 L390 70 L530 70 L560 120 L870 120" fill="none" stroke="#ff7a45" stroke-width="5"/>
-          <text x="40" y="106" font-size="24" fill="#ff9c75">主轴电流 i_q（阻力矩）</text>
+          <text x="40" y="106" font-size="24" fill="#ff9c75" class="zh">主轴电流 i_q（阻力矩）</text><text x="40" y="106" font-size="20" fill="#ff9c75" dy="-12" class="eo">spindle current i_q (load torque)</text>
           <g transform="translate(30,520)">
-            <rect width="260" height="80" rx="16" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="2"/><text x="130" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle">降转速</text>
-            <rect x="290" width="260" height="80" rx="16" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="2"/><text x="420" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle">加压脚压力</text>
-            <rect x="580" width="260" height="80" rx="16" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="2"/><text x="710" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle">改面线张力</text>
+            <rect width="260" height="80" rx="16" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="2"/><text x="130" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="zh">降转速</text><text x="130" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="eo">Slow down</text>
+            <rect x="290" width="260" height="80" rx="16" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="2"/><text x="420" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="zh">加压脚压力</text><text x="420" y="52" font-size="25" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="eo">More foot force</text>
+            <rect x="580" width="260" height="80" rx="16" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="2"/><text x="710" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="zh">改面线张力</text><text x="710" y="52" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="eo">New tension</text>
           </g>
         </svg>
     notes:
@@ -444,9 +444,9 @@ slides:
     h: 560
     visual:
       svg: |
-        <svg viewBox="0 0 1700 560">
+        <svg viewBox="0 0 1700 560"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="700" y="70" width="600" height="420" rx="10" fill="rgba(46,196,182,.14)" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="1000" y="52" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">进刀窗口 300°–330°</text>
+          <text x="1000" y="52" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">进刀窗口 300°–330°</text><text x="1000" y="52" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">entry window 300°–330°</text>
           <g font-size="30" font-weight="700" text-anchor="end">
             <text x="320" y="170" fill="#f3f6fa">φ = {{ch14.cmdlo:.0f}}°</text>
             <text x="680" y="290" fill="#f3f6fa">φ = {{ch14.cmdhi:.0f}}°</text>
@@ -458,8 +458,8 @@ slides:
           <rect x="1060" y="258" width="240" height="44" rx="8" fill="#ff7a45"/>
           <circle cx="520" cy="400" r="16" fill="#f2b705"/><path d="M536 400 L880 400" stroke="#f2b705" stroke-width="3" stroke-dasharray="8 8"/>
           <rect x="880" y="376" width="240" height="48" rx="8" fill="#f2b705"/>
-          <g font-size="24" fill="#ffb38f"><text x="960" y="168">刚好不早</text><text x="1320" y="288">刚好不晚</text></g>
-          <text x="1140" y="410" font-size="24" fill="#f2b705">两头各留余量</text>
+          <g font-size="24" fill="#ffb38f"><text x="960" y="168" class="zh">刚好不早</text><text x="960" y="168" class="eo">earliest allowed</text><text x="1320" y="288" class="zh">刚好不晚</text><text x="1320" y="288" class="eo">latest allowed</text></g>
+          <text x="1140" y="410" font-size="24" fill="#f2b705" class="zh">两头各留余量</text><text x="1140" y="410" font-size="24" fill="#f2b705" class="eo">margin at both ends</text>
           <path d="M100 520 L1600 520" stroke="#4b5f7d" stroke-width="3"/>
           <g font-size="24" fill="#8fa3ba" text-anchor="middle" class="en">
             <text x="100" y="552" class="en">270°</text><text x="400" y="552" class="en">285°</text><text x="700" y="552" class="en">300°</text><text x="1000" y="552" class="en">315°</text><text x="1300" y="552" class="en">330°</text><text x="1600" y="552" class="en">345°</text>
@@ -467,8 +467,8 @@ slides:
         </svg>
     caption: ["延迟 6–10 ms：φ + 6·500·0.006 ≥ 300°，φ + 6·500·0.010 ≤ 330°", "6–10 ms: φ + 6·500·0.006 ≥ 300°, φ + 6·500·0.010 ≤ 330°"]
     notes:
-      - "再定发令角。最短延迟时也不能早于 300°，所以 φ 加 6 乘 500 乘 0.006 要不小于 300，φ 不小于 {{ch14.cmdlo:.0f}}°；最长延迟时也不能晚于 330°，φ 加 6 乘 500 乘 0.010 不大于 330，φ 不大于 {{ch14.cmdhi:.0f}}°。取中间约 {{ch14.cmdmid:.0f}}°，两头各留余量。图上三条红黄色的条就是三种发令角对应的实际进刀范围。"
-      - "Now the command angle. Even with the shortest delay the knife must not enter before 300°, so φ plus 6 times 500 times 0.006 must be at least 300: φ at least {{ch14.cmdlo:.0f}}°. Even with the longest delay it must not enter after 330°, so φ plus 6 times 500 times 0.010 must be at most 330: φ at most {{ch14.cmdhi:.0f}}°. Take the middle, about {{ch14.cmdmid:.0f}}°, leaving a margin at both ends. The three bars show the actual entry range for each of these command angles."
+      - "回到车间问题，定发令角。最短延迟时也不能早于 300°，所以 发令角加 6 乘 500 乘 0.006 要不小于 300，发令角不小于 {{ch14.cmdlo:.0f}}°；最长延迟时也不能晚于 330°，发令角加 6 乘 500 乘 0.010 不大于 330，发令角不大于 {{ch14.cmdhi:.0f}}°。取中间约 {{ch14.cmdmid:.0f}}°，两头各留余量。图上三条红黄色的条就是三种发令角对应的实际进刀范围。"
+      - "Back to the problem: the command angle. Even with the shortest delay the knife must not enter before 300°, so the angle plus 6 times 500 times 0.006 must be at least 300: the angle at least {{ch14.cmdlo:.0f}}°. Even with the longest delay it must not enter after 330°, so the angle plus 6 times 500 times 0.010 must be at most 330: the angle at most {{ch14.cmdhi:.0f}}°. Take the middle, about {{ch14.cmdmid:.0f}}°, leaving a margin at both ends. The three bars show the actual entry range for each of these command angles."
 
   - layout: split
     title: ["机器人联系：传送带上抓工件", "Robot link: picking from a conveyor"]
@@ -478,7 +478,7 @@ slides:
       - ["工作站同样用状态机；关节电流感知接触力", "Cells use state machines too; joint current senses contact"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="30" y="430" width="840" height="60" rx="30" fill="#1b2a44" stroke="#4b5f7d" stroke-width="3"/>
           <circle cx="60" cy="460" r="22" fill="#4b5f7d"/><circle cx="840" cy="460" r="22" fill="#4b5f7d"/>
           <rect x="120" y="370" width="90" height="60" rx="8" fill="#4c8dff"/>
@@ -489,15 +489,15 @@ slides:
           <path d="M615 60 L615 200" stroke="#c8d2de" stroke-width="18"/>
           <path d="M565 200 L665 200 L665 280 M565 200 L565 280" fill="none" stroke="#c8d2de" stroke-width="12"/>
           <rect x="525" y="350" width="190" height="100" rx="12" fill="none" stroke="#2ec4b6" stroke-width="4" stroke-dasharray="12 8"/>
-          <text x="620" y="530" font-size="26" fill="#5ee0d2" text-anchor="middle">夹爪允许的位置窗口</text>
+          <text x="620" y="530" font-size="26" fill="#5ee0d2" text-anchor="middle" class="zh">夹爪允许的位置窗口</text><text x="620" y="530" font-size="26" fill="#5ee0d2" text-anchor="middle" class="eo">the gripper's position window</text>
           <path d="M540 330 L690 330" stroke="#ff7a45" stroke-width="4"/><path d="M540 318 L540 342 M690 318 L690 342" stroke="#ff7a45" stroke-width="4"/>
           <text x="720" y="320" font-size="28" font-weight="700" fill="#ff9c75">v·Δt</text>
-          <text x="165" y="350" font-size="26" fill="#f2b705" text-anchor="middle">到标记就发令</text>
-          <text x="450" y="600" font-size="26" fill="#8fa3ba" text-anchor="middle">带速上限由延迟的波动决定</text>
+          <text x="165" y="350" font-size="26" fill="#f2b705" text-anchor="middle" class="zh">到标记就发令</text><text x="165" y="350" font-size="26" fill="#f2b705" text-anchor="middle" class="eo">command at the mark</text>
+          <text x="450" y="600" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">带速上限由延迟的波动决定</text><text x="450" y="600" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">the delay spread limits belt speed</text>
         </svg>
     notes:
-      - "机器人从传送带上抓工件，和平缝机剪线是同一类问题。夹爪的电磁阀有延迟，控制器要按带速提前发令，就像按主轴转速提前剪线发令角。平均延迟可以补偿，延迟的波动 Δt 却会让抓取位置散开 v 乘 Δt，它必须装进夹爪允许的窗口，所以带速上限由波动决定。整个工作站的取料、搬运、放料、回位同样用状态机编排；机器人用关节电流或力传感器感知接触力。"
-      - "A robot picking parts off a conveyor faces the same problem as trimming. The gripper's solenoid valve has a delay, so the controller commands early according to belt speed, just as the trimming command angle moves with shaft speed. The mean delay can be compensated, but its spread Δt scatters the grip point over v times Δt, which has to fit the gripper's window, so the belt speed limit is set by the spread. The cell's pick, carry, place and return are sequenced by a state machine too, and a robot senses contact force through joint current or a force sensor."
+      - "机器人从传送带上抓工件，和平缝机剪线是同一类问题。夹爪的电磁阀有延迟，控制器要按带速提前发令，就像按主轴转速提前剪线发令角。平均延迟可以补偿，延迟的波动却会让抓取位置散开“带速乘波动”这么远，它必须装进夹爪允许的窗口，所以带速上限由波动决定。整个工作站的取料、搬运、放料、回位同样用状态机编排；机器人用关节电流或力传感器感知接触力。"
+      - "A robot picking parts off a conveyor faces the same problem as trimming. The gripper's solenoid valve has a delay, so the controller commands early according to belt speed, just as the trimming command angle moves with shaft speed. The mean delay can be compensated, but its spread scatters the grip point over the belt speed times that spread, which has to fit the gripper's window, so the belt speed limit is set by the spread. The cell's pick, carry, place and return are sequenced by a state machine too, and a robot senses contact force through joint current or a force sensor."
 
   - layout: split
     title: ["生活中的例子：接力赛交棒", "Everyday example: the relay baton change"]
@@ -507,18 +507,18 @@ slides:
       - ["反应快慢不稳，才是掉棒的主因", "An inconsistent reaction, not a slow one, drops the baton"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="20" y="250" width="860" height="200" fill="#7a3b2a"/>
           <path d="M20 250 L880 250 M20 350 L880 350 M20 450 L880 450" stroke="#f3f6fa" stroke-width="4"/>
           <rect x="520" y="250" width="300" height="200" fill="rgba(242,183,5,.2)"/>
           <path d="M520 240 L520 460 M820 240 L820 460" stroke="#f2b705" stroke-width="6"/>
-          <text x="670" y="230" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle">交接区 = 窗口</text>
+          <text x="670" y="230" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="zh">交接区 = 窗口</text><text x="670" y="230" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="eo">zone = window</text>
           <path d="M300 240 L300 460" stroke="#2ec4b6" stroke-width="6" stroke-dasharray="14 10"/>
-          <text x="300" y="230" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle">标记 = 发令角</text>
+          <text x="300" y="230" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">标记 = 发令角</text><text x="300" y="230" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">mark = command angle</text>
           <circle cx="180" cy="300" r="26" fill="#ff7a45"/><path d="M200 300 L270 300" stroke="#ff7a45" stroke-width="6"/><path d="M270 300 l-16 -11 l0 22z" fill="#ff7a45"/>
           <circle cx="560" cy="300" r="26" fill="#4c8dff"/>
-          <text x="180" y="400" font-size="26" fill="#ffb38f" text-anchor="middle">队友</text>
-          <text x="600" y="405" font-size="26" fill="#9cc0ff" text-anchor="start">接棒人</text>
+          <text x="180" y="400" font-size="26" fill="#ffb38f" text-anchor="middle" class="zh">队友</text><text x="180" y="400" font-size="26" fill="#ffb38f" text-anchor="middle" class="eo">teammate</text>
+          <text x="600" y="405" font-size="26" fill="#9cc0ff" text-anchor="start" class="zh">接棒人</text><text x="600" y="405" font-size="26" fill="#9cc0ff" text-anchor="start" class="eo">receiver</text>
           <text x="450" y="540" font-size="28" fill="#d3deea" text-anchor="middle">起跑反应 = 电磁铁延迟</text>
           <text x="450" y="580" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">reaction time = solenoid delay</text>
         </svg>
@@ -547,5 +547,5 @@ slides:
       - ["进刀角 = 发令角 + 6nt：延迟要稳，不只要快", "Entry = command + 6nt: a steady delay, not just a short one"]
     after: ["作业 14 · 测验 · 虚拟实验 14-1 实验报告 —— 在问渠学习平台完成", "Assignment 14 · quiz · Lab 14-1 report — on WenQuest"]
     notes:
-      - "这一讲记住三件事。第一，电控平缝机的工作周期由状态机编排，停车剪线里剪线那一针占大头。第二，每个动作都要对准机械时刻表：回针换向装进送布牙的空闲角，剪线进刀装进 300° 到 330° 的窗口。第三，进刀角等于发令角加 6nt，平均延迟能补偿，延迟的波动只能靠降速容纳，所以延迟要稳。作业、测验和实验 14-1 的报告在问渠平台完成。"
-      - "Three things to remember. One: a state machine sequences the working cycle, and in stop-and-trim the trimming stitch takes most of the time. Two: every action lines up with the mechanical timing chart: reversal inside the feed dog's idle angle, knife entry inside the 300-to-330-degree window. Three: entry angle equals command angle plus 6nt; the mean delay can be compensated, but its spread can only be absorbed by slowing down, so keep the delay steady. The assignment, quiz and Lab 14-1 report are on WenQuest."
+      - "这一讲记住三件事。第一，电控平缝机的工作周期由状态机编排，停车剪线里剪线那一针占大头。第二，每个动作都要对准机械时刻表：回针换向装进送布牙的空闲角，剪线进刀装进 300° 到 330° 的窗口。第三，进刀角等于发令角加 6 乘 n 乘 t，平均延迟能补偿，延迟的波动只能靠降速容纳，所以延迟要稳。作业、测验和实验 14-1 的报告在问渠平台完成。"
+      - "Three things to remember. One: a state machine sequences the working cycle, and in stop-and-trim the trimming stitch takes most of the time. Two: every action lines up with the mechanical timing chart: reversal inside the feed dog's idle angle, knife entry inside the 300-to-330-degree window. Three: entry angle equals command angle plus 6 n t; the mean delay can be compensated, but its spread can only be absorbed by slowing down, so keep the delay steady. The assignment, quiz and Lab 14-1 report are on WenQuest."
