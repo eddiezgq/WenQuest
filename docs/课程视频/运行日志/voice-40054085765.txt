@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:04<00:00,  4.03s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:00,400 WARNING synthesis text Stitch lengths vary within a pattern. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:50:00,540 INFO synthesis text Stitch lengths vary within a pattern.
+2026-10-24 02:50:02,580 INFO yield speech len 3.12, rtf 0.6539433430402707
+
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:02,626 WARNING synthesis text Can each stitch just use its own limit? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:50:02,759 INFO synthesis text Can each stitch just use its own limit?
+2026-10-24 02:50:05,163 INFO yield speech len 4.0, rtf 0.6012214422225952
+
+100%|██████████| 1/1 [00:02<00:00,  2.58s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:05,210 WARNING synthesis text No. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:50:05,351 INFO synthesis text No.
+2026-10-24 02:50:06,023 INFO yield speech len 0.24, rtf 2.797109882036845
+
+100%|██████████| 1/1 [00:00<00:00,  1.18it/s]
+100%|██████████| 1/1 [00:00<00:00,  1.18it/s]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:06,194 INFO synthesis text The shaft and hook have inertia, so the speed can change only by a limited amount per stitch.
+2026-10-24 02:50:10,163 INFO yield speech len 6.92, rtf 0.5735665387500918
+
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:10,351 INFO synthesis text The controller looks a few stitches ahead and slows early, just like look-ahead in CNC: compute each stitch's own limit, sweep backwards so a slow stitch pulls the ones before it down, then sweep forwards so speed doesn't rise too fast.
+2026-10-24 02:50:19,697 INFO yield speech len 17.08, rtf 0.5472241017522522
+
+100%|██████████| 1/1 [00:09<00:00,  9.54s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:19,901 INFO synthesis text On the right the orange line is each stitch's limit and the blue line the actual speed, switching between fixed speed and look-ahead.
+2026-10-24 02:50:26,562 INFO yield speech len 12.28, rtf 0.542464687303922
+
+100%|██████████| 1/1 [00:06<00:00,  6.86s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.86s/it]
+cv2: 170/226 句，用时 13.9 分钟，预计还要 4.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:26,622 WARNING synthesis text Watch the blue line drop below the orange. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:50:26,813 INFO synthesis text Watch the blue line drop below the orange.
+2026-10-24 02:50:28,727 INFO yield speech len 2.88, rtf 0.6644863221380446
+
+100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:28,773 WARNING synthesis text Here's the example. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:50:28,972 INFO synthesis text Here's the example.
+2026-10-24 02:50:30,024 INFO yield speech len 1.0, rtf 1.0521647930145264
+
+100%|██████████| 1/1 [00:01<00:00,  1.29s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:30,210 INFO synthesis text With two-millimetre stitches the machine runs at two thousand, six hundred and eighty r/min; stitch five is ten millimetres with a limit of only one thousand, one hundred and ninety-eight, and the speed may change by three hundred per stitch.
+2026-10-24 02:50:40,595 INFO yield speech len 19.48, rtf 0.5331159984306633
+
+100%|██████████| 1/1 [00:10<00:00, 10.58s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:40,797 INFO synthesis text After the backward pass the controller starts braking at stitch one: two thousand, three hundred and ninety-eight, two thousand and ninety-eight, one thousand, seven hundred and ninety-eight, one thousand, four hundred and ninety-eight, and exactly one thousand, one hundred and ninety-eight at stitch five, then climbs back stitch by stitch.
+2026-10-24 02:50:52,097 INFO yield speech len 20.64, rtf 0.5475075901016708
+
+100%|██████████| 1/1 [00:11<00:00, 11.50s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:52,295 INFO synthesis text Without look-ahead, stitch five would try a ten-millimetre move at over two thousand, six hundred r/min, far too little time, the template would still be moving when the needle entered, and the needle would break.
+2026-10-24 02:50:59,755 INFO yield speech len 14.32, rtf 0.5209091821862333
+
+100%|██████████| 1/1 [00:07<00:00,  7.65s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:50:59,817 WARNING synthesis text Programming, templates and special machines. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:50:59,948 INFO synthesis text Programming, templates and special machines.
+2026-10-24 02:51:02,385 INFO yield speech len 4.08, rtf 0.5970947882708381
+
+100%|██████████| 1/1 [00:02<00:00,  2.61s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.61s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:02,569 INFO synthesis text File formats differ between makers, but the content is much the same: a header, then a list of records, each a command plus ΔX and ΔY, the step from the previous stitch, stored as integers in units of zero.one millimetre.
+2026-10-24 02:51:13,268 INFO yield speech len 19.64, rtf 0.5447781255920161
+
+100%|██████████| 1/1 [00:10<00:00, 10.89s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:13,458 INFO synthesis text Integer steps are compact and never accumulate rounding error.
+2026-10-24 02:51:16,841 INFO yield speech len 6.16, rtf 0.5492291667244651
+
+100%|██████████| 1/1 [00:03<00:00,  3.55s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:17,023 INFO synthesis text The programming software works in six steps: take the outline, split it into segments, divide them, add backtacks, order them, and simulate.
+2026-10-24 02:51:23,362 INFO yield speech len 11.68, rtf 0.5426886555266707
+
+100%|██████████| 1/1 [00:06<00:00,  6.53s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:23,553 INFO synthesis text Dividing uses n equals L over s rounded up, so every segment end gets a stitch and corners stay sharp.
+2026-10-24 02:51:28,791 INFO yield speech len 9.72, rtf 0.538920448640737
+
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.42s/it]
+cv2: 180/226 句，用时 14.9 分钟，预计还要 3.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:28,983 INFO synthesis text Between segments it trims, then jumps; the order decides how far it jumps.
+2026-10-24 02:51:32,209 INFO yield speech len 5.84, rtf 0.5524388323091481
+
+100%|██████████| 1/1 [00:03<00:00,  3.41s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:32,390 INFO synthesis text Bartackers, button sewers and buttonholers are the most numerous special machines in a garment plant.
+2026-10-24 02:51:37,302 INFO yield speech len 8.68, rtf 0.5658402970309632
+
+100%|██████████| 1/1 [00:05<00:00,  5.09s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:37,485 INFO synthesis text For control purposes they're small-field pattern sewers with a handful of fixed patterns where only length, width and stitch count change.
+2026-10-24 02:51:43,812 INFO yield speech len 12.0, rtf 0.5272992451985677
+
+100%|██████████| 1/1 [00:06<00:00,  6.50s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:43,991 INFO synthesis text On mechanical machines a new pattern means a new cam; electronic ones use two steppers and a program, an electronic cam in the literal sense.
+2026-10-24 02:51:51,256 INFO yield speech len 14.0, rtf 0.5189269951411656
+
+100%|██████████| 1/1 [00:07<00:00,  7.44s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:51,457 INFO synthesis text A bartack's stitches are generated from the parameters: a narrow base layer first, then a wide covering layer.
+2026-10-24 02:51:56,466 INFO yield speech len 9.08, rtf 0.55168315702598
+
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:51:56,656 INFO synthesis text On a buttonholer the knife may cut only when the shaft has stopped at needle-up, and the machine can't start until the knife is back; both interlocks live in the state machine.
+2026-10-24 02:52:03,317 INFO yield speech len 12.48, rtf 0.5337556776327964
+
+100%|██████████| 1/1 [00:06<00:00,  6.85s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:03,379 WARNING synthesis text These methods carry straight over to robots. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:52:03,509 INFO synthesis text These methods carry straight over to robots.
+2026-10-24 02:52:06,361 INFO yield speech len 4.6, rtf 0.6198727047961692
+
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:06,547 INFO synthesis text A robot tracking a conveyor, gluing or sewing a moving panel, writes its position as a function of the belt encoder reading: an electronic cam, again with a predicted position to cover drive lag.
+2026-10-24 02:52:15,381 INFO yield speech len 16.88, rtf 0.523327298073972
+
+100%|██████████| 1/1 [00:09<00:00,  9.03s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:15,571 INFO synthesis text An arm following a path with sharp corners has to slow down a few segments early, exactly like look-ahead.
+2026-10-24 02:52:19,956 INFO yield speech len 8.24, rtf 0.5322197397935737
+
+100%|██████████| 1/1 [00:04<00:00,  4.56s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:20,139 INFO synthesis text Point-to-point moves use S-curves with continuous acceleration, for the same reason a pattern sewer picks a cycloid: no ringing.
+2026-10-24 02:52:26,363 INFO yield speech len 12.08, rtf 0.5152836935409647
+
+100%|██████████| 1/1 [00:06<00:00,  6.41s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.41s/it]
+cv2: 190/226 句，用时 15.8 分钟，预计还要 3.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:26,565 INFO synthesis text And joint motors are sized by peak torque first, then RMS torque, which is what decides heating.
+2026-10-24 02:52:32,243 INFO yield speech len 10.52, rtf 0.5397258602620985
+
+100%|██████████| 1/1 [00:05<00:00,  5.87s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:32,428 INFO synthesis text The everyday version of a pattern sewer is long-rope skipping.
+2026-10-24 02:52:35,278 INFO yield speech len 4.92, rtf 0.5792499073152619
+
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:35,458 INFO synthesis text Two people turn the rope, and the jumper can run in or change places only while the rope is off the ground: that's the off-fabric window.
+2026-10-24 02:52:41,106 INFO yield speech len 10.4, rtf 0.543058468745305
+
+100%|██████████| 1/1 [00:05<00:00,  5.83s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:41,290 INFO synthesis text The faster the rope turns, the shorter that window, just like a faster shaft.
+2026-10-24 02:52:44,375 INFO yield speech len 5.4, rtf 0.5711479540224428
+
+100%|██████████| 1/1 [00:03<00:00,  3.26s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:44,553 INFO synthesis text And the bigger the step you need, the less likely you'll make it, just like a longer stitch needing a longer move.
+2026-10-24 02:52:48,943 INFO yield speech len 8.08, rtf 0.5433748264123898
+
+100%|██████████| 1/1 [00:04<00:00,  4.57s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:49,128 INFO synthesis text When the rope spins fast, everyone takes small steps.
+2026-10-24 02:52:52,205 INFO yield speech len 5.24, rtf 0.5872067604356139
+
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:52,251 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:52:52,384 INFO synthesis text Back to the opening question.
+2026-10-24 02:52:54,073 INFO yield speech len 2.44, rtf 0.6923689216863914
+
+100%|██████████| 1/1 [00:01<00:00,  1.86s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:52:54,256 INFO synthesis text A three-millimetre stitch takes fifteen.five milliseconds to move, a limit of two thousand, one hundred and eighty-eight r/min, so two thousand was fine.
+2026-10-24 02:53:01,667 INFO yield speech len 13.4, rtf 0.5530461624487122
+
+100%|██████████| 1/1 [00:07<00:00,  7.59s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:01,863 INFO synthesis text At six millimetres the move takes twenty-one.nine, the limit is only one thousand, five hundred and forty-seven, and at two thousand the template is still moving after the needle enters, which breaks needles.
+2026-10-24 02:53:09,987 INFO yield speech len 14.92, rtf 0.544451964125237
+
+100%|██████████| 1/1 [00:08<00:00,  8.32s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:10,177 INFO synthesis text Slow down to about one thousand, five hundred and forty-seven or below, or switch on automatic look-ahead.
+2026-10-24 02:53:14,789 INFO yield speech len 8.44, rtf 0.5463826712838846
+
+100%|██████████| 1/1 [00:04<00:00,  4.80s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.80s/it]
+cv2: 200/226 句，用时 16.7 分钟，预计还要 2.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:14,979 INFO synthesis text On six-millimetre stock it could only reach one thousand, two hundred and ninety-seven.
+2026-10-24 02:53:19,059 INFO yield speech len 7.44, rtf 0.5483608092031171
+
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:19,249 INFO synthesis text And for output: sixty stitches sew in one.eight seconds, while loading takes eight to ten, so raising the speed buys very little.
+2026-10-24 02:53:25,836 INFO yield speech len 12.28, rtf 0.5364288918746799
+
+100%|██████████| 1/1 [00:06<00:00,  6.78s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:26,027 INFO synthesis text Now Virtual lab fifteen-one, the pattern-sewer simulation. On the WenQuest platform you can do it yourself. The results and tasks on the right, and the per-stitch speed chart at lower left, are blurred here, so you can read them on your own. On the left are the pocket-flap stitches, and in the dial the blue arc is the window when the template may move.
+2026-10-24 02:53:36,530 INFO yield speech len 20.0, rtf 0.5251208424568177
+
+100%|██████████| 1/1 [00:10<00:00, 10.69s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:36,727 INFO synthesis text Task one: at a fixed two thousand r/min, change the stitch from three to six millimetres. Some of the points turn red at once. Those are the moves that can't finish.
+2026-10-24 02:53:46,033 INFO yield speech len 17.96, rtf 0.5181601291775437
+
+100%|██████████| 1/1 [00:09<00:00,  9.49s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:46,225 INFO synthesis text Now drag the speed down, and the red stitches start to thin out. How far down until they're all blue is yours to find; then compare it with the formula.
+2026-10-24 02:53:52,154 INFO yield speech len 11.36, rtf 0.5219563002317724
+
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:53:52,345 INFO synthesis text Task two: back to three millimetres and two thousand r/min, and raise the thickness from one.five to six millimetres. Watch the dial. The blue window keeps shrinking, and stitches that were all blue start turning red. Read the window angle in the results.
+2026-10-24 02:54:02,792 INFO yield speech len 20.0, rtf 0.5223677039146424
+
+100%|██████████| 1/1 [00:10<00:00, 10.64s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:02,988 INFO synthesis text Task three: switch to the star with six-millimetre stitches, and raise the speed from one thousand, two hundred r/min. Keep going, find which stitches turn red first, the horizontal and vertical ones or the diagonal ones, and think about why.
+2026-10-24 02:54:13,423 INFO yield speech len 20.56, rtf 0.5075169328585674
+
+100%|██████████| 1/1 [00:10<00:00, 10.62s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:13,619 INFO synthesis text Task four: switch to automatic look-ahead, try the three motion laws and compare the sewing times; then set the end margin to fifteen degrees and see how much time it adds. The guide and the report template are on the platform.
+2026-10-24 02:54:22,741 INFO yield speech len 17.44, rtf 0.523043184652241
+
+100%|██████████| 1/1 [00:09<00:00,  9.31s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:22,931 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-24 02:54:26,834 INFO yield speech len 7.24, rtf 0.539034637956988
+
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:27,013 INFO synthesis text You can open today's interactive slides, the pattern-sewer simulation and Lab fifteen-two on pattern programming, and work them yourself.
+2026-10-24 02:54:32,951 INFO yield speech len 11.32, rtf 0.5245025292723423
+
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+cv2: 210/226 句，用时 18.0 分钟，预计还要 1.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:33,130 INFO synthesis text You submit the assignment and the lab reports on the platform, and get marks and comments back.
+2026-10-24 02:54:36,936 INFO yield speech len 7.28, rtf 0.5227607030134934
+
+100%|██████████| 1/1 [00:03<00:00,  3.98s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:37,118 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-24 02:54:42,233 INFO yield speech len 9.64, rtf 0.5305225671079643
+
+100%|██████████| 1/1 [00:05<00:00,  5.29s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:42,481 INFO synthesis text Your assignment has four questions. One: with fabric plus lower template three millimetres thick, use constant acceleration and a cycloid to find the speed limits for two, four and eight millimetre stitches along X, then for a four millimetre stitch at forty-five degrees, and explain why the axis components matter.
+2026-10-24 02:54:55,132 INFO yield speech len 24.44, rtf 0.5176139443673791
+
+100%|██████████| 1/1 [00:12<00:00, 12.91s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:54:55,349 INFO synthesis text Two: the look-ahead example from the slides again, but now the speed may change by only two hundred r/min per stitch. Find the speeds of stitches one to eight. How many stitches ahead must braking start?
+2026-10-24 02:55:02,945 INFO yield speech len 14.52, rtf 0.5231684068674556
+
+100%|██████████| 1/1 [00:07<00:00,  7.78s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:03,193 INFO synthesis text Three is motor sizing, which this video skipped; it's in the slides and the textbook. For a four hundred watt servo, check the peak and RMS torque on both the X and Y axes. Peak torque decides whether it can accelerate; RMS torque decides whether it overheats. For any axis that fails, give two ways to fix it. Four is in Lab fifteen-two, pattern programming: get the cycle time under four.seven seconds.
+2026-10-24 02:55:20,620 INFO yield speech len 34.32, rtf 0.507778957451418
+
+100%|██████████| 1/1 [00:17<00:00, 17.69s/it]
+100%|██████████| 1/1 [00:17<00:00, 17.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:20,841 INFO synthesis text Submit the report, the pattern file and the screenshots on the WenQuest platform.
+2026-10-24 02:55:24,149 INFO yield speech len 6.32, rtf 0.5234000803549078
+
+100%|██████████| 1/1 [00:03<00:00,  3.49s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:24,330 INFO synthesis text There's also a ten-question quiz. For example, with a two hundred and three.four-degree window and fifty metres per second squared per axis, what is the speed limit for a four millimetre stitch along X?
+2026-10-24 02:55:31,464 INFO yield speech len 13.84, rtf 0.5154168330176028
+
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:31,649 INFO synthesis text Or, the shaft turns at two thousand, four hundred r/min and the drive lags by one.two milliseconds. Without compensation, how many degrees of shaft angle does the template fall behind? Another asks about centre-foot timing.
+2026-10-24 02:55:40,292 INFO yield speech len 16.16, rtf 0.5348838349380115
+
+100%|██████████| 1/1 [00:08<00:00,  8.83s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:40,490 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-24 02:55:43,867 INFO yield speech len 6.12, rtf 0.5516774903715046
+
+100%|██████████| 1/1 [00:03<00:00,  3.56s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:43,916 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-24 02:55:44,049 INFO synthesis text Three things to remember.
+2026-10-24 02:55:45,266 INFO yield speech len 1.6, rtf 0.7608300447463989
+
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+cv2: 220/226 句，用时 19.2 分钟，预计还要 0.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:45,455 INFO synthesis text One: a pattern sewer replaces the feed dog with an X–Y table, and the shaft-encoder angle is the machine's clock.
+2026-10-24 02:55:50,842 INFO yield speech len 9.88, rtf 0.5452485702298431
+
+100%|██████████| 1/1 [00:05<00:00,  5.58s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:51,024 INFO synthesis text Two: the template must be still while the needle is in the fabric; the speed limit is the window over six times the move time, inversely proportional to root stitch length, and lower for thicker stock.
+2026-10-24 02:55:59,530 INFO yield speech len 14.84, rtf 0.5731268552435698
+
+100%|██████████| 1/1 [00:08<00:00,  8.69s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:55:59,732 INFO synthesis text Three: electronic cams run by shaft angle, and look-ahead slows down early for slow stitches.
+2026-10-24 02:56:04,863 INFO yield speech len 9.2, rtf 0.5577012248661207
+
+100%|██████████| 1/1 [00:05<00:00,  5.31s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:56:05,044 INFO synthesis text The assignment, quiz and both lab reports are on WenQuest.
+2026-10-24 02:56:08,033 INFO yield speech len 5.36, rtf 0.5577936546126409
+
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:56:08,221 INFO synthesis text The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-24 02:56:17,106 INFO yield speech len 16.76, rtf 0.5301332416853074
+
+100%|██████████| 1/1 [00:09<00:00,  9.08s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-24 02:56:17,390 INFO synthesis text Next time it's computerised embroidery machines. Again an X–Y frame carries the fabric, but one machine may have anywhere from a few heads to a dozen or more, all stitching together, and it changes colours on its own. See you then.
+2026-10-24 02:56:26,143 INFO yield speech len 16.8, rtf 0.521029858362107
+
+100%|██████████| 1/1 [00:09<00:00,  9.03s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.03s/it]
+cv2: 226/226 句，用时 19.8 分钟，预计还要 0.0 分钟
+cv2: 226 句完成
+2026-10-24 02:56:26,315 DEBUG Attempting to acquire lock 123774917496784 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-24 02:56:26,315 DEBUG Lock 123774917496784 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-24 02:56:26,315 DEBUG Attempting to release lock 123774917496784 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-24 02:56:26,315 DEBUG Lock 123774917496784 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-24 02:56:26,318 DEBUG Attempting to acquire lock 123774917503648 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-24 02:56:26,318 DEBUG Lock 123774917503648 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-24 02:56:26,318 DEBUG Attempting to release lock 123774917503648 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-24 02:56:26,318 DEBUG Lock 123774917503648 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 31 分钟
