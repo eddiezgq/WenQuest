@@ -671,8 +671,8 @@ shots:
   page: 67
   part: *id002
   steps:
-  - {show: 0.42}
-  - {show: 0.56}
+  - {show: 0.6}
+  - {show: 0.8}
   - {show: 1}
   say:
     en: ['>First, sewing machine design. Five machine types: lockstitch, overlock, coverstitch, pattern sewers and multi-head embroidery.', '>Change a number, and every check updates. Raise the top speed
@@ -684,8 +684,8 @@ shots:
   page: 68
   part: *id002
   steps:
-  - {show: 0.42}
-  - {show: 0.56}
+  - {show: 0.6}
+  - {show: 0.8}
   - {show: 1}
   say:
     en: ['>Next, cams. From a motion requirement to the cam profile, with pressure angle, curvature, jump and contact stress checked by code.', '>Whole cam systems too: a timing diagram for every cam on
