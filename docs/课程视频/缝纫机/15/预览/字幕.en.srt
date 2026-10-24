@@ -1,0 +1,991 @@
+1
+00:00:00,600 --> 00:00:01,526
+Hi everyone,
+
+2
+00:00:01,546 --> 00:00:07,199
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:07,599 --> 00:00:14,828
+This is Lecture 15, pattern sewers, buttonholers, button sewers and bartackers.
+
+4
+00:00:15,228 --> 00:00:20,393
+The electronic lockstitch machine from last time still needs the operator's
+
+5
+00:00:20,413 --> 00:00:22,052
+hands to feed and steer.
+
+6
+00:00:22,072 --> 00:00:24,056
+Today the program takes over.
+
+7
+00:00:24,076 --> 00:00:28,481
+The fabric is clamped in a template and an X–Y table carries it.
+
+8
+00:00:28,881 --> 00:00:35,155
+One rule runs through the whole lecture. While the needle is in the fabric,
+
+9
+00:00:35,175 --> 00:00:37,422
+the template must not move.
+
+10
+00:00:38,942 --> 00:00:40,922
+Here's the problem.
+
+11
+00:00:41,322 --> 00:00:48,770
+A denim floor uses an electronic pattern sewer for the decorative stitching
+
+12
+00:00:48,790 --> 00:00:50,363
+on pocket flaps:
+
+13
+00:00:50,383 --> 00:00:54,943
+about 60 stitches a flap, shaft at 2000 r/min,
+
+14
+00:00:54,963 --> 00:00:59,822
+fabric plus lower template 1.5 millimetres thick.
+
+15
+00:01:00,222 --> 00:01:02,831
+The customer wanted a bolder look,
+
+16
+00:01:02,851 --> 00:01:08,709
+so the technician changed the stitch length from 3 to 6 millimetres and left
+
+17
+00:01:08,729 --> 00:01:09,946
+the speed alone.
+
+18
+00:01:10,346 --> 00:01:11,726
+Needles started breaking.
+
+19
+00:01:12,126 --> 00:01:14,619
+Why does a longer stitch break needles?
+
+20
+00:01:15,019 --> 00:01:16,566
+What speed should it run at?
+
+21
+00:01:16,966 --> 00:01:21,386
+And how much does speed matter for output anyway?
+
+22
+00:01:21,786 --> 00:01:23,046
+We'll answer at the end.
+
+23
+00:01:24,566 --> 00:01:28,226
+The pattern sewer: the template carries the fabric.
+
+24
+00:01:29,746 --> 00:01:31,410
+Look at this exploded view.
+
+25
+00:01:31,810 --> 00:01:38,010
+Compared with a lockstitch machine, the head has no feed dog; the needle,
+
+26
+00:01:38,030 --> 00:01:42,185
+take-up and hook mechanisms are exactly the same.
+
+27
+00:01:42,585 --> 00:01:49,265
+At the end of the upper shaft is a direct-drive servo with an encoder,
+
+28
+00:01:49,285 --> 00:01:55,677
+and the shaft angle it reads is the time base of the whole machine.
+
+29
+00:01:56,077 --> 00:02:02,070
+The X–Y table takes over feeding: the Y beam moves front to back,
+
+30
+00:02:02,090 --> 00:02:06,234
+the X slide moves left and right on the beam,
+
+31
+00:02:06,254 --> 00:02:11,137
+and the clamp frame and template ride on the X slide.
+
+32
+00:02:11,537 --> 00:02:15,486
+A normal presser foot would block the template,
+
+33
+00:02:15,506 --> 00:02:20,637
+so a small centre foot rides up and down with the needle bar.
+
+34
+00:02:22,157 --> 00:02:25,577
+Needle in the fabric: the template stays still.
+
+35
+00:02:27,097 --> 00:02:33,647
+On a lockstitch machine the feed dog only pushes once the needle has left the
+
+36
+00:02:33,667 --> 00:02:34,244
+fabric;
+
+37
+00:02:34,264 --> 00:02:37,316
+the eccentric's angle guarantees it.
+
+38
+00:02:37,716 --> 00:02:43,763
+A pattern sewer has to obey the same rule in software: once the needle enters,
+
+39
+00:02:43,783 --> 00:02:45,862
+the template must be still.
+
+40
+00:02:46,262 --> 00:02:48,222
+Otherwise the hole is torn,
+
+41
+00:02:48,242 --> 00:02:52,842
+and at worst the needle is bent into the hook point and breaks.
+
+42
+00:02:53,242 --> 00:02:58,746
+Watch the close-up: the template stays still while the needle is in,
+
+43
+00:02:58,766 --> 00:03:01,102
+and moves only once it's out.
+
+44
+00:03:01,502 --> 00:03:03,322
+How big is the window?
+
+45
+00:03:03,722 --> 00:03:09,981
+At top dead centre the point is 18 millimetres above the plate,
+
+46
+00:03:10,001 --> 00:03:15,563
+so its height is 18 minus the needle-bar displacement x.
+
+47
+00:03:15,963 --> 00:03:23,124
+It enters when that falls to the thickness t and leaves when it rises back.
+
+48
+00:03:24,644 --> 00:03:29,905
+With the window known, how long does one stitch move take?
+
+49
+00:03:30,305 --> 00:03:35,706
+Each axis has a maximum acceleration a and top speed v.
+
+50
+00:03:36,106 --> 00:03:40,733
+Over a short distance it has to start braking before it reaches v,
+
+51
+00:03:40,753 --> 00:03:45,450
+so the speed profile is a triangle whose area is the stitch length,
+
+52
+00:03:45,470 --> 00:03:48,971
+and the time is twice the square root of s over a.
+
+53
+00:03:49,371 --> 00:03:55,978
+In the example a is 50 metres per second squared and v is 1 metre per second,
+
+54
+00:03:55,998 --> 00:03:59,248
+so v squared over a is 20 millimetres,
+
+55
+00:03:59,268 --> 00:04:03,896
+and every pattern stitch falls in the triangle region.
+
+56
+00:04:04,296 --> 00:04:07,556
+Acceleration is what decides.
+
+57
+00:04:07,956 --> 00:04:17,656
+A 3-millimetre stitch takes 15.5 milliseconds, a 6-millimetre one 21.9.
+
+58
+00:04:19,176 --> 00:04:24,883
+The time to turn through the window can't be shorter than the move,
+
+59
+00:04:24,903 --> 00:04:26,593
+which rearranges to:
+
+60
+00:04:26,613 --> 00:04:31,636
+speed limit equals the window W over 6 times the move time.
+
+61
+00:04:32,036 --> 00:04:44,929
+At 1.5 millimetres thick, a 2-millimetre stitch allows 2680 r/min,
+
+62
+00:04:44,949 --> 00:04:53,734
+3 millimetres 2188, 10 millimetres only 1198.
+
+63
+00:04:54,134 --> 00:05:00,994
+Speed goes with one over root s: four times the stitch, half the speed.
+
+64
+00:05:01,394 --> 00:05:06,149
+A 6-millimetre stack is about 16 percent slower.
+
+65
+00:05:06,549 --> 00:05:12,593
+And a 45-degree stitch is about 19 percent faster,
+
+66
+00:05:12,613 --> 00:05:17,809
+because each axis only moves s over root 2.
+
+67
+00:05:19,329 --> 00:05:24,589
+This is the pattern-sewer simulation slowed down twenty times.
+
+68
+00:05:24,989 --> 00:05:35,089
+On the left the stitches are 6 millimetres, on the right 3, both at 2000 r/min.
+
+69
+00:05:35,489 --> 00:05:42,173
+In the dial, the blue arc is the window when the template may move,
+
+70
+00:05:42,193 --> 00:05:47,077
+the grey arc is when the needle is in the fabric.
+
+71
+00:05:47,477 --> 00:05:53,218
+Each dot is a needle point: blue means that move finishes inside the window,
+
+72
+00:05:53,238 --> 00:05:59,131
+red means it doesn't, so the template is still moving when the needle goes in.
+
+73
+00:05:59,531 --> 00:06:03,551
+Those red dots are the broken needles on the shop floor.
+
+74
+00:06:05,071 --> 00:06:07,731
+Electronic cams and look-ahead.
+
+75
+00:06:09,251 --> 00:06:15,118
+The shaft speed isn't constant: slow at the start, fast in the middle,
+
+76
+00:06:15,138 --> 00:06:19,071
+slow before trimming, and it wobbles with load.
+
+77
+00:06:19,471 --> 00:06:23,109
+If the X–Y moves were launched by time,
+
+78
+00:06:23,129 --> 00:06:27,423
+any speed change would throw them out of step.
+
+79
+00:06:27,823 --> 00:06:32,205
+So X and Y are written as functions of shaft angle:
+
+80
+00:06:32,225 --> 00:06:38,763
+the shaft is the camshaft and the table stored in memory is its cam profile.
+
+81
+00:06:39,163 --> 00:06:40,823
+That's an electronic cam.
+
+82
+00:06:41,223 --> 00:06:47,551
+Every 250 microseconds the motion layer reads the encoder,
+
+83
+00:06:47,571 --> 00:06:52,039
+looks up the table and sends the command.
+
+84
+00:06:52,439 --> 00:06:57,787
+The drives lag by half to two milliseconds,
+
+85
+00:06:57,807 --> 00:07:04,030
+and at 2800 r/min one millisecond is 16.8 degrees,
+
+86
+00:07:04,050 --> 00:07:08,899
+so the lookup uses the predicted angle.
+
+87
+00:07:10,419 --> 00:07:15,078
+This is really the cam chapter of mechanism design.
+
+88
+00:07:15,478 --> 00:07:18,901
+Moving a distance s in a given time,
+
+89
+00:07:18,921 --> 00:07:25,023
+the peak acceleration is always C times s over the time squared;
+
+90
+00:07:25,043 --> 00:07:26,458
+only C changes.
+
+91
+00:07:26,858 --> 00:07:32,518
+Constant acceleration, C equals 4, has the lowest peak and the highest speed,
+
+92
+00:07:32,538 --> 00:07:38,051
+but the acceleration jumps at both ends, which rings the template and beam,
+
+93
+00:07:38,071 --> 00:07:43,805
+and a belt-driven table is itself a spring, the last thing you want to excite.
+
+94
+00:07:44,205 --> 00:07:50,536
+The modified trapezoid, 4.89, and the cycloid, 6.28,
+
+95
+00:07:50,556 --> 00:07:54,811
+start and end at zero acceleration.
+
+96
+00:07:55,211 --> 00:07:56,889
+With a cycloid,
+
+97
+00:07:56,909 --> 00:08:05,151
+the move time grows 1.25 times and the speed limit is multiplied by 0.80.
+
+98
+00:08:05,551 --> 00:08:12,291
+Hard laws for thin stock and short stitches; smooth ones for big templates.
+
+99
+00:08:13,811 --> 00:08:16,887
+Stitch lengths vary within a pattern.
+
+100
+00:08:17,287 --> 00:08:21,267
+Can each stitch just use its own limit?
+
+101
+00:08:21,667 --> 00:08:21,847
+No.
+
+102
+00:08:22,247 --> 00:08:24,626
+The shaft and hook have inertia,
+
+103
+00:08:24,646 --> 00:08:29,125
+so the speed can change only by a limited amount per stitch.
+
+104
+00:08:29,525 --> 00:08:33,756
+The controller looks a few stitches ahead and slows early,
+
+105
+00:08:33,776 --> 00:08:38,228
+just like look-ahead in CNC: compute each stitch's own limit,
+
+106
+00:08:38,248 --> 00:08:42,846
+sweep backwards so a slow stitch pulls the ones before it down,
+
+107
+00:08:42,866 --> 00:08:46,585
+then sweep forwards so speed doesn't rise too fast.
+
+108
+00:08:46,985 --> 00:08:53,808
+On the right the orange line is each stitch's limit and the blue line the
+
+109
+00:08:53,828 --> 00:08:55,026
+actual speed,
+
+110
+00:08:55,046 --> 00:08:59,245
+switching between fixed speed and look-ahead.
+
+111
+00:08:59,645 --> 00:09:02,505
+Watch the blue line drop below the orange.
+
+112
+00:09:04,025 --> 00:09:05,005
+Here's the example.
+
+113
+00:09:05,405 --> 00:09:12,691
+With 2-millimetre stitches the machine runs at 2680 r/min;
+
+114
+00:09:12,711 --> 00:09:19,368
+stitch 5 is 10 millimetres with a limit of only 1198,
+
+115
+00:09:19,388 --> 00:09:24,784
+and the speed may change by 300 per stitch.
+
+116
+00:09:25,184 --> 00:09:35,618
+After the backward pass the controller starts braking at stitch 1: 2398, 2098,
+
+117
+00:09:35,638 --> 00:09:45,804
+1798, 1498, and exactly 1198 at stitch 5, then climbs back stitch by stitch.
+
+118
+00:09:46,204 --> 00:09:52,299
+Without look-ahead, stitch 5 would try a 10-millimetre move at over 2600 r/min,
+
+119
+00:09:52,319 --> 00:09:53,848
+far too little time,
+
+120
+00:09:53,868 --> 00:09:58,414
+the template would still be moving when the needle entered,
+
+121
+00:09:58,434 --> 00:10:00,504
+and the needle would break.
+
+122
+00:10:02,024 --> 00:10:06,065
+Programming, templates and special machines.
+
+123
+00:10:07,585 --> 00:10:14,849
+File formats differ between makers, but the content is much the same: a header,
+
+124
+00:10:14,869 --> 00:10:19,828
+then a list of records, each a command plus ΔX and ΔY,
+
+125
+00:10:19,848 --> 00:10:22,963
+the step from the previous stitch,
+
+126
+00:10:22,983 --> 00:10:27,205
+stored as integers in units of 0.1 millimetre.
+
+127
+00:10:27,605 --> 00:10:33,697
+Integer steps are compact and never accumulate rounding error.
+
+128
+00:10:34,097 --> 00:10:39,286
+The programming software works in six steps: take the outline,
+
+129
+00:10:39,306 --> 00:10:45,757
+split it into segments, divide them, add backtacks, order them, and simulate.
+
+130
+00:10:46,157 --> 00:10:50,275
+Dividing uses n equals L over s rounded up,
+
+131
+00:10:50,295 --> 00:10:55,857
+so every segment end gets a stitch and corners stay sharp.
+
+132
+00:10:56,257 --> 00:11:02,028
+Between segments it trims, then jumps; the order decides how far it jumps.
+
+133
+00:11:03,548 --> 00:11:04,492
+Bartackers,
+
+134
+00:11:04,512 --> 00:11:10,981
+button sewers and buttonholers are the most numerous special machines in a
+
+135
+00:11:11,001 --> 00:11:12,208
+garment plant.
+
+136
+00:11:12,608 --> 00:11:19,024
+For control purposes they're small-field pattern sewers with a handful of
+
+137
+00:11:19,044 --> 00:11:21,933
+fixed patterns where only length,
+
+138
+00:11:21,953 --> 00:11:24,578
+width and stitch count change.
+
+139
+00:11:24,978 --> 00:11:30,289
+On mechanical machines a new pattern means a new cam;
+
+140
+00:11:30,309 --> 00:11:35,017
+electronic ones use two steppers and a program,
+
+141
+00:11:35,037 --> 00:11:38,940
+an electronic cam in the literal sense.
+
+142
+00:11:39,340 --> 00:11:43,901
+A bartack's stitches are generated from the parameters:
+
+143
+00:11:43,921 --> 00:11:48,400
+a narrow base layer first, then a wide covering layer.
+
+144
+00:11:48,800 --> 00:11:54,517
+On a buttonholer the knife may cut only when the shaft has stopped at needle-up,
+
+145
+00:11:54,537 --> 00:11:58,247
+and the machine can't start until the knife is back;
+
+146
+00:11:58,267 --> 00:12:01,260
+both interlocks live in the state machine.
+
+147
+00:12:02,779 --> 00:12:07,284
+These methods carry straight over to robots.
+
+148
+00:12:07,684 --> 00:12:12,999
+A robot tracking a conveyor, gluing or sewing a moving panel,
+
+149
+00:12:13,019 --> 00:12:18,421
+writes its position as a function of the belt encoder reading:
+
+150
+00:12:18,441 --> 00:12:24,544
+an electronic cam, again with a predicted position to cover drive lag.
+
+151
+00:12:24,944 --> 00:12:31,280
+An arm following a path with sharp corners has to slow down a few segments early,
+
+152
+00:12:31,300 --> 00:12:33,164
+exactly like look-ahead.
+
+153
+00:12:33,564 --> 00:12:39,536
+Point-to-point moves use S-curves with continuous acceleration,
+
+154
+00:12:39,556 --> 00:12:45,624
+for the same reason a pattern sewer picks a cycloid: no ringing.
+
+155
+00:12:46,024 --> 00:12:53,185
+And joint motors are sized by peak torque first, then RMS torque,
+
+156
+00:12:53,205 --> 00:12:56,499
+which is what decides heating.
+
+157
+00:12:58,019 --> 00:13:02,919
+The everyday version of a pattern sewer is long-rope skipping.
+
+158
+00:13:03,319 --> 00:13:05,220
+Two people turn the rope,
+
+159
+00:13:05,240 --> 00:13:11,443
+and the jumper can run in or change places only while the rope is off the ground:
+
+160
+00:13:11,463 --> 00:13:13,671
+that's the off-fabric window.
+
+161
+00:13:14,071 --> 00:13:19,444
+The faster the rope turns, the shorter that window, just like a faster shaft.
+
+162
+00:13:19,844 --> 00:13:24,472
+And the bigger the step you need, the less likely you'll make it,
+
+163
+00:13:24,492 --> 00:13:27,904
+just like a longer stitch needing a longer move.
+
+164
+00:13:28,304 --> 00:13:33,387
+When the rope spins fast, everyone takes small steps.
+
+165
+00:13:34,907 --> 00:13:37,327
+Back to the opening question.
+
+166
+00:13:37,727 --> 00:13:48,638
+A 3-millimetre stitch takes 15.5 milliseconds to move, a limit of 2188 r/min,
+
+167
+00:13:48,658 --> 00:13:51,051
+so 2000 was fine.
+
+168
+00:13:51,451 --> 00:13:57,614
+At 6 millimetres the move takes 21.9, the limit is only 1547,
+
+169
+00:13:57,634 --> 00:14:04,201
+and at 2000 the template is still moving after the needle enters,
+
+170
+00:14:04,221 --> 00:14:06,330
+which breaks needles.
+
+171
+00:14:06,730 --> 00:14:15,150
+Slow down to about 1547 or below, or switch on automatic look-ahead.
+
+172
+00:14:15,550 --> 00:14:22,970
+On 6-millimetre stock it could only reach 1297.
+
+173
+00:14:23,370 --> 00:14:31,511
+And for output: 60 stitches sew in 1.8 seconds, while loading takes 8 to 10,
+
+174
+00:14:31,531 --> 00:14:35,592
+so raising the speed buys very little.
+
+175
+00:14:37,112 --> 00:14:40,074
+Now Virtual lab 15-1, the pattern-sewer simulation.
+
+176
+00:14:40,094 --> 00:14:42,881
+On the WenQuest platform you can do it yourself.
+
+177
+00:14:42,901 --> 00:14:44,928
+The results and tasks on the right,
+
+178
+00:14:44,948 --> 00:14:48,612
+and the per-stitch speed chart at lower left, are blurred here,
+
+179
+00:14:48,632 --> 00:14:52,998
+so you can read them on your own. On the left are the pocket-flap stitches,
+
+180
+00:14:53,018 --> 00:14:57,092
+and in the dial the blue arc is the window when the template may move.
+
+181
+00:14:57,492 --> 00:15:06,452
+Task one: at a fixed 2000 r/min, change the stitch from 3 to 6 millimetres.
+
+182
+00:15:06,472 --> 00:15:15,432
+Some of the points turn red at once. Those are the moves that can't finish.
+
+183
+00:15:15,832 --> 00:15:20,646
+Now drag the speed down, and the red stitches start to thin out.
+
+184
+00:15:20,666 --> 00:15:24,650
+How far down until they're all blue is yours to find;
+
+185
+00:15:24,670 --> 00:15:27,143
+then compare it with the formula.
+
+186
+00:15:27,543 --> 00:15:31,574
+Task two: back to 3 millimetres and 2000 r/min,
+
+187
+00:15:31,594 --> 00:15:37,264
+and raise the thickness from 1.5 to 6 millimetres. Watch the dial.
+
+188
+00:15:37,284 --> 00:15:40,023
+The blue window keeps shrinking,
+
+189
+00:15:40,043 --> 00:15:44,333
+and stitches that were all blue start turning red.
+
+190
+00:15:44,353 --> 00:15:47,523
+Read the window angle in the results.
+
+191
+00:15:47,923 --> 00:15:53,423
+Task three: switch to the star with 6-millimetre stitches,
+
+192
+00:15:53,443 --> 00:15:57,992
+and raise the speed from 1200 r/min. Keep going,
+
+193
+00:15:58,012 --> 00:16:01,324
+find which stitches turn red first,
+
+194
+00:16:01,344 --> 00:16:08,463
+the horizontal and vertical ones or the diagonal ones, and think about why.
+
+195
+00:16:08,863 --> 00:16:12,184
+Task four: switch to automatic look-ahead,
+
+196
+00:16:12,204 --> 00:16:16,560
+try the three motion laws and compare the sewing times;
+
+197
+00:16:16,580 --> 00:16:21,971
+then set the end margin to 15 degrees and see how much time it adds.
+
+198
+00:16:21,991 --> 00:16:26,267
+The guide and the report template are on the platform.
+
+199
+00:16:27,787 --> 00:16:34,873
+Everything in this lecture is on the WenQuest learning platform.
+
+200
+00:16:35,273 --> 00:16:38,782
+You can open today's interactive slides,
+
+201
+00:16:38,802 --> 00:16:44,516
+the pattern-sewer simulation and Lab 15-2 on pattern programming,
+
+202
+00:16:44,536 --> 00:16:46,545
+and work them yourself.
+
+203
+00:16:46,945 --> 00:16:51,726
+You submit the assignment and the lab reports on the platform,
+
+204
+00:16:51,746 --> 00:16:54,205
+and get marks and comments back.
+
+205
+00:16:54,605 --> 00:16:58,435
+Questions go to the course discussion forum,
+
+206
+00:16:58,455 --> 00:17:04,123
+and the grades page shows your mark on every assignment and quiz.
+
+207
+00:17:05,643 --> 00:17:09,021
+Your assignment has four questions. One:
+
+208
+00:17:09,041 --> 00:17:13,437
+with fabric plus lower template 3 millimetres thick,
+
+209
+00:17:13,457 --> 00:17:19,468
+use constant acceleration and a cycloid to find the speed limits for 2,
+
+210
+00:17:19,488 --> 00:17:22,526
+4 and 8 millimetre stitches along X,
+
+211
+00:17:22,546 --> 00:17:26,348
+then for a 4 millimetre stitch at 45 degrees,
+
+212
+00:17:26,368 --> 00:17:30,000
+and explain why the axis components matter.
+
+213
+00:17:30,400 --> 00:17:34,263
+Two: the look-ahead example from the slides again,
+
+214
+00:17:34,283 --> 00:17:38,766
+but now the speed may change by only 200 r/min per stitch.
+
+215
+00:17:38,786 --> 00:17:44,900
+Find the speeds of stitches 1 to 8. How many stitches ahead must braking start?
+
+216
+00:17:45,300 --> 00:17:49,673
+Three is motor sizing, which this video skipped;
+
+217
+00:17:49,693 --> 00:17:54,981
+it's in the slides and the textbook. For a 400 watt servo,
+
+218
+00:17:55,001 --> 00:18:00,015
+check the peak and RMS torque on both the X and Y axes.
+
+219
+00:18:00,035 --> 00:18:04,225
+Peak torque decides whether it can accelerate;
+
+220
+00:18:04,245 --> 00:18:10,174
+RMS torque decides whether it overheats. For any axis that fails,
+
+221
+00:18:10,194 --> 00:18:16,214
+give two ways to fix it. Four is in Lab 15-2, pattern programming:
+
+222
+00:18:16,234 --> 00:18:19,600
+get the cycle time under 4.7 seconds.
+
+223
+00:18:20,000 --> 00:18:21,392
+Submit the report,
+
+224
+00:18:21,412 --> 00:18:26,253
+the pattern file and the screenshots on the WenQuest platform.
+
+225
+00:18:27,773 --> 00:18:31,417
+There's also a ten-question quiz. For example,
+
+226
+00:18:31,437 --> 00:18:36,912
+with a 203.4-degree window and 50 metres per second squared per axis,
+
+227
+00:18:36,932 --> 00:18:41,532
+what is the speed limit for a 4 millimetre stitch along X?
+
+228
+00:18:41,932 --> 00:18:47,981
+Or, the shaft turns at 2400 r/min and the drive lags by 1.2 milliseconds.
+
+229
+00:18:48,001 --> 00:18:49,727
+Without compensation,
+
+230
+00:18:49,747 --> 00:18:54,882
+how many degrees of shaft angle does the template fall behind?
+
+231
+00:18:54,902 --> 00:18:58,041
+Another asks about centre-foot timing.
+
+232
+00:18:58,441 --> 00:19:04,463
+You get three attempts, and the explanations appear as soon as you submit.
+
+233
+00:19:05,983 --> 00:19:07,520
+Three things to remember.
+
+234
+00:19:07,920 --> 00:19:13,281
+One: a pattern sewer replaces the feed dog with an X–Y table,
+
+235
+00:19:13,301 --> 00:19:17,779
+and the shaft-encoder angle is the machine's clock.
+
+236
+00:19:18,179 --> 00:19:23,065
+Two: the template must be still while the needle is in the fabric;
+
+237
+00:19:23,085 --> 00:19:27,451
+the speed limit is the window over six times the move time,
+
+238
+00:19:27,471 --> 00:19:32,952
+inversely proportional to root stitch length, and lower for thicker stock.
+
+239
+00:19:33,352 --> 00:19:37,532
+Three: electronic cams run by shaft angle,
+
+240
+00:19:37,552 --> 00:19:42,532
+and look-ahead slows down early for slow stitches.
+
+241
+00:19:42,932 --> 00:19:48,260
+The assignment, quiz and both lab reports are on WenQuest.
+
+242
+00:19:48,660 --> 00:19:51,561
+The slides, the virtual labs,
+
+243
+00:19:51,581 --> 00:19:58,611
+the assignment and the quiz are all on the WenQuest learning platform,
+
+244
+00:19:58,631 --> 00:20:05,359
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+245
+00:20:05,759 --> 00:20:09,275
+Next time it's computerised embroidery machines.
+
+246
+00:20:09,295 --> 00:20:12,075
+Again an X–Y frame carries the fabric,
+
+247
+00:20:12,095 --> 00:20:17,233
+but one machine may have anywhere from a few heads to a dozen or more,
+
+248
+00:20:17,253 --> 00:20:22,538
+all stitching together, and it changes colours on its own. See you then.
