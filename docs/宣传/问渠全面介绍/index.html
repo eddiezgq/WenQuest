@@ -1,0 +1,1443 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>问渠 WenQuest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@700;900&family=Oswald:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* 问渠 WenQuest 全面介绍：一页一屏、可键盘翻页的长网页。深色“机加车间”基调，琥珀色与青色两种强调色；少数“纸面”浅色页做节奏。 */
+:root{
+  --bg:#0D1318; --bg2:#101A21; --panel:#141E26; --panel2:#1A2731; --line:#2A3A47;
+  --fg:#ECE6DA; --muted:#A3B0BA; --dim:#76858F;
+  --amber:#E8B04B; --teal:#45ADA5; --warn:#E0784F; --blue:#6FA3E8;
+  --paper:#F2EDE3; --ink:#1A1E21; --inkm:#535C63;
+  --f-display:"Oswald","Noto Sans SC","PingFang SC",Arial,sans-serif;
+  --f-serif:"Noto Serif SC","Songti SC","STSong",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+:root:not([data-theme="light"]){color-scheme:dark}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0D1318}}
+:root[data-theme="dark"]{--bg:#0D1318}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+@media (min-width:900px) and (min-height:640px){html{scroll-snap-type:y proximity}}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 var(--f-body);-webkit-font-smoothing:antialiased}
+html[data-l="en"] .zh,html:not([data-l="en"]) .en{display:none!important}
+a{color:var(--amber)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+img,video{max-width:100%;display:block}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+
+/* ---------- top bar ---------- */
+.bar{position:fixed;inset:0 0 auto 0;z-index:50;height:56px;display:flex;align-items:center;gap:14px;padding:0 20px;padding-top:env(safe-area-inset-top,0px);background:rgba(13,19,24,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;gap:9px;color:var(--fg);text-decoration:none;white-space:nowrap}
+.brand b{font:900 20px/1 var(--f-serif);letter-spacing:.12em}
+.brand span{font:600 13px/1 var(--f-display);letter-spacing:.2em;color:var(--muted)}
+.bar .sp{flex:1}
+.pageno{font:600 14px/1 var(--f-mono);color:var(--muted);white-space:nowrap}
+.pageno b{color:var(--amber)}
+.tb{background:none;border:1px solid var(--line);color:var(--fg);border-radius:999px;font:600 13px/1 var(--f-body);padding:8px 13px;cursor:pointer;white-space:nowrap}
+.tb:hover{border-color:var(--muted)}
+.lang{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:var(--muted);font:600 13px/1 var(--f-body);padding:8px 12px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--amber);color:#14110A}
+.prog{position:fixed;left:0;top:calc(56px + env(safe-area-inset-top,0px));height:2px;background:var(--amber);z-index:51;width:0;transition:width .3s}
+@media (max-width:640px){.brand span,.hide-s{display:none}.bar{gap:8px;padding:0 12px}}
+
+/* ---------- table of contents ---------- */
+.toc{position:fixed;inset:0;z-index:60;background:rgba(9,13,16,.96);display:none;overflow:auto;padding:80px 20px 40px}
+.toc.on{display:block}
+.toc .in{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px 28px}
+.toc h3{font:600 13px/1.2 var(--f-display);letter-spacing:.2em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.toc a{display:flex;gap:10px;color:var(--fg);text-decoration:none;font-size:15px;padding:4px 0;line-height:1.4}
+.toc a i{font:normal 12px/1.6 var(--f-mono);color:var(--dim);min-width:22px}
+.toc a:hover{color:var(--amber)}
+.toc .x{position:fixed;top:14px;right:20px}
+
+/* ---------- pages ---------- */
+.pg{min-height:100vh;min-height:100svh;scroll-snap-align:start;position:relative;display:flex;align-items:center;padding:96px 0 64px;border-bottom:1px solid var(--line);overflow:hidden}
+.pg>.in{width:100%;max-width:1280px;margin:0 auto;padding:0 32px;position:relative;z-index:2}
+@media (max-width:640px){.pg{padding:80px 0 48px}.pg>.in{padding:0 16px}}
+.pg.alt{background:var(--bg2)}
+.pg.paper{background:var(--paper);color:var(--ink)}
+.pg.paper .lead,.pg.paper .muted,.pg.paper p.s{color:var(--inkm)}
+.pg.paper .ey{color:#9A6B12}
+.pg .num-tag{position:absolute;left:32px;bottom:20px;font:600 13px/1 var(--f-mono);color:var(--dim);z-index:3}
+.pg.paper .num-tag{color:#8D8577}
+.ey{font:600 13px/1.2 var(--f-display);letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:16px}
+.ey .k{color:var(--dim);margin-right:10px}
+h2.t{font-size:clamp(30px,3.8vw,52px);line-height:1.18;font-weight:900;letter-spacing:.01em}
+h2.t .hl{color:var(--amber)}
+.lead{font-size:clamp(17px,1.5vw,21px);color:var(--muted);margin-top:18px;max-width:46em}
+.muted{color:var(--muted)}
+p.s{font-size:15px;color:var(--muted)}
+.foot{font-size:13px;color:var(--dim);margin-top:22px}
+.pg.paper .foot{color:#857D70}
+
+/* layouts */
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:48px;align-items:center}
+.split.r{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.split.w{grid-template-columns:minmax(0,4fr) minmax(0,8fr)}
+.split.eq{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media (max-width:960px){.split,.split.r,.split.eq,.split.w{grid-template-columns:minmax(0,1fr);gap:28px}}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media (max-width:960px){.g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.g2,.g3,.g4,.g5{grid-template-columns:minmax(0,1fr)}}
+.mt{margin-top:32px}.mt2{margin-top:48px}
+
+/* cards & facts */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px;display:grid;gap:6px;align-content:start}
+.pg.paper .card{background:#FBF8F2;border-color:#DCD4C6}
+.card h3{font-size:18px;line-height:1.35}
+.card p{font-size:15px;color:var(--muted);line-height:1.6}
+.pg.paper .card p{color:var(--inkm)}
+.card .pill{justify-self:start}
+.card .tag{font:600 11px/1 var(--f-display);letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
+.card .big{font:600 34px/1.05 var(--f-display);color:var(--amber);font-variant-numeric:tabular-nums}
+.facts{display:grid;gap:14px;margin-top:26px}
+.fact{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:baseline;padding-top:14px;border-top:1px solid var(--line)}
+.pg.paper .fact{border-color:#D6CDBE}
+.fact b{font:600 clamp(26px,2.6vw,38px)/1 var(--f-display);color:var(--amber);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pg.paper .fact b{color:#A46F0C}
+.fact span{color:var(--muted);font-size:16px;line-height:1.5}
+.pg.paper .fact span{color:var(--inkm)}
+ul.ck{list-style:none;padding:0;margin:22px 0 0;display:grid;gap:10px}
+ul.ck li{position:relative;padding-left:26px;color:var(--muted);line-height:1.55}
+ul.ck li b{color:var(--fg);font-weight:600}
+.pg.paper ul.ck li{color:var(--inkm)}.pg.paper ul.ck li b{color:var(--ink)}
+ul.ck li::before{content:"";position:absolute;left:2px;top:.62em;width:12px;height:2px;background:var(--amber)}
+.pill{display:inline-block;font:600 12px/1 var(--f-body);padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;vertical-align:2px}
+.pill.live{border-color:var(--teal);color:var(--teal)}
+.pill.plan{border-color:var(--warn);color:var(--warn)}
+.pill.ready{border-color:var(--blue);color:var(--blue)}
+
+/* screenshots */
+.shot{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0A0F13;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.pg.paper .shot{border-color:#CFC6B6;box-shadow:0 20px 50px rgba(60,45,20,.18)}
+.chrome{display:flex;align-items:center;gap:6px;padding:8px 12px;border-bottom:1px solid var(--line);font:12px/1 var(--f-mono);color:var(--dim);background:#111A20}
+.chrome i{width:9px;height:9px;border-radius:50%;background:#2E3E4B;display:block}
+.chrome span{margin-left:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shot img,.shot video{width:100%;height:auto;max-height:64vh;object-fit:cover;object-position:top left}
+.shot.fix img{aspect-ratio:16/10;object-fit:cover;object-position:top left}
+.shot.short img{max-height:40vh}
+.shot.white{background:#fff}
+figure{margin:0}
+figcaption{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.5}
+.pg.paper figcaption{color:var(--inkm)}
+figcaption b{color:var(--fg)}
+.pg.paper figcaption b{color:var(--ink)}
+.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:700px){.duo{grid-template-columns:minmax(0,1fr)}}
+
+/* dividers */
+.pg.div{background:radial-gradient(1200px 600px at 80% 20%,rgba(232,176,75,.10),transparent 60%),var(--bg)}
+.pg.div .part{font:600 clamp(80px,13vw,200px)/.9 var(--f-display);color:transparent;-webkit-text-stroke:1.5px rgba(232,176,75,.55);letter-spacing:.02em}
+.pg.div h2{font-size:clamp(36px,5vw,72px);font-weight:900;line-height:1.12;margin-top:18px}
+.pg.div .lead{max-width:40em}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--muted)}
+
+/* hero */
+.hero h1{font-family:var(--f-serif);font-weight:900;font-size:clamp(36px,5.4vw,78px);line-height:1.12;letter-spacing:.04em}
+.hero h1 span{white-space:nowrap}
+.hero .en-h{font:600 clamp(36px,5.2vw,74px)/1.02 var(--f-display);text-transform:uppercase;letter-spacing:.01em}
+.hero .poem{font-family:var(--f-serif);color:var(--muted);font-size:15px;margin-top:14px}
+.hero .lead{color:var(--fg)}
+.hero canvas{width:100%;height:auto}
+.readout{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:6px;font-size:13px;color:var(--muted)}
+.readout b{color:var(--fg)}
+.hint{display:inline-flex;gap:10px;align-items:center;margin-top:30px;font-size:14px;color:var(--dim)}
+.hint kbd{font:600 12px/1 var(--f-mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:4px 7px;color:var(--muted)}
+
+/* number wall */
+.wall{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:34px}
+.wall div{background:var(--bg);padding:24px 22px;display:grid;gap:6px;align-content:start}
+.wall b{font:600 clamp(38px,4.4vw,62px)/1 var(--f-display);font-variant-numeric:tabular-nums}
+.wall span{color:var(--muted);font-size:14px;line-height:1.45}
+@media (max-width:800px){.wall{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* flow / chain */
+.flow{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0;margin-top:36px;counter-reset:f}
+.flow>div{padding:18px 16px 18px 0;border-top:3px solid var(--line);position:relative}
+.flow>div:first-child{border-top-color:var(--amber)}
+.flow>div::before{counter-increment:f;content:"0" counter(f);font:600 12px/1 var(--f-mono);color:var(--amber);display:block;margin-bottom:8px}
+.flow b{display:block;font-size:18px;line-height:1.3}
+.flow span{display:block;color:var(--muted);font-size:14px;line-height:1.5;margin-top:6px}
+.pg.paper .flow>div{border-top-color:#D3C9B8}.pg.paper .flow>div:first-child{border-top-color:#C48A1C}.pg.paper .flow>div::before{color:#A46F0C}.pg.paper .flow span{color:var(--inkm)}
+@media (max-width:800px){.flow{grid-auto-flow:row}}
+
+/* architecture */
+.arch{position:relative;margin-top:30px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.arch .m{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;font-size:14px;color:var(--muted);line-height:1.45}
+.arch .m b{display:block;color:var(--fg);font-size:16px;margin-bottom:4px}
+.arch .bus{grid-column:1/-1;border:1px solid var(--teal);background:rgba(69,173,165,.10);border-radius:8px;padding:14px 18px;color:var(--fg);font-weight:600;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+.arch .bus span{font:500 13px/1.5 var(--f-mono);color:var(--teal)}
+.arch .ai{grid-column:1/-1;border:1px dashed var(--amber);border-radius:8px;padding:12px 18px;color:var(--amber);font-weight:600;text-align:center}
+@media (max-width:800px){.arch{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:28px}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:15px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 12px/1.2 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);background:var(--panel)}
+td.n{font-family:var(--f-mono);text-align:right;white-space:nowrap}
+th.n{text-align:right}
+tr:last-child td{border-bottom:0}
+td:first-child{white-space:nowrap;font-weight:600}
+tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
+
+/* quote */
+.quote{font:900 clamp(30px,4vw,58px)/1.25 var(--f-serif);letter-spacing:.02em}
+.quote .hl{color:var(--amber)}
+
+/* video tiles */
+.vt{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#000;cursor:pointer}
+.vt video{width:100%;aspect-ratio:16/9;object-fit:cover}
+.vt .cap{position:absolute;left:0;right:0;bottom:0;padding:26px 14px 10px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-size:14px;color:#eee}
+.vt .cap b{display:block;font-size:16px;color:#fff}
+
+/* lab demo */
+.lab{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-top:26px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.btn{background:var(--panel2);border:1px solid var(--line);color:var(--fg);font:500 14px/1 var(--f-body);padding:10px 14px;border-radius:6px;cursor:pointer}
+.btn[aria-pressed="true"]{border-color:var(--amber);color:var(--amber)}
+.btn.hot{background:var(--amber);border-color:var(--amber);color:#14110A;font-weight:700}
+.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scrollx canvas{display:block;width:100%;min-width:680px;height:auto}
+
+/* steps (order story) */
+.stepk{font:600 14px/1 var(--f-mono);color:var(--amber);letter-spacing:.1em}
+.stepbar{display:flex;gap:6px;margin-top:22px}
+.stepbar i{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.stepbar i.on{background:var(--amber)}
+
+/* contacts */
+.mail{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font:15px/1.3 var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-top:10px}
+.mail span{user-select:all;overflow-wrap:anywhere}
+.mail button{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);font:12px/1 var(--f-body);padding:6px 9px;border-radius:4px;cursor:pointer}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}}
+.nav-btns{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;flex-direction:column;gap:8px}
+.nav-btns button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(20,30,38,.85);color:var(--fg);font-size:18px;cursor:pointer}
+@media (max-width:640px){.nav-btns{display:none}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a class="brand" href="#p1"><b>问渠</b><span>WENQUEST</span></a>
+  <div class="sp"></div>
+  <span class="pageno"><b id="pn">01</b> / <span id="pt">00</span></span>
+  <button class="tb" id="tocbtn" type="button"><span class="zh">目录</span><span class="en">Contents</span></button>
+  <button class="tb hide-s" id="fsbtn" type="button"><span class="zh">全屏</span><span class="en">Full screen</span></button>
+  <div class="lang" role="group" aria-label="Language"><button type="button" data-l="zh" aria-pressed="true">中</button><button type="button" data-l="en" aria-pressed="false">EN</button></div>
+</header>
+<div class="prog" id="prog"></div>
+<nav class="toc" id="toc" aria-label="Contents"><button class="tb x" id="tocx" type="button">✕</button><div class="in" id="tocin"></div></nav>
+<div class="nav-btns"><button type="button" id="prevb" aria-label="Previous page">↑</button><button type="button" id="nextb" aria-label="Next page">↓</button></div>
+
+<main id="deck">
+
+<!-- ================= 开场 ================= -->
+<section class="pg hero" data-part="开场|Opening" data-t="问渠：源头活水|WenQuest">
+<div class="in split">
+  <div class="rv">
+    <p class="ey">Model it · Simulate it · Build it</p>
+    <h1 class="zh"><span>问渠那得清如许，</span><br><span>为有源头活水来</span></h1>
+    <h1 class="en en-h">Learn it in simulation.<br>Build it for real.</h1>
+    <p class="poem"><span class="zh">—— 朱熹《观书有感》</span><span class="en">“How is the channel so clear? Fresh water flows in from the source.” — Zhu Xi</span></p>
+    <p class="lead"><span class="zh">问渠 WenQuest：一个 <b>AI 原生</b>的工程教育与工业软件平台。自编教材、动画、浏览器虚拟实验、学习平台、一座真实运转的数字工厂和行业专用设计软件，连成一体。</span><span class="en">WenQuest is an <b>AI-native</b> platform for engineering education and industrial software: its own textbooks, animations, in-browser labs, a learning platform, a working digital factory and industry design software, all connected.</span></p>
+    <p class="hint"><kbd>↓</kbd><kbd>Space</kbd><span class="zh">翻页 · 共 <b class="mono" data-total></b> 页</span><span class="en">to turn pages · <b class="mono" data-total></b> pages</span></p>
+  </div>
+  <div class="rv">
+    <canvas id="gears" width="1100" height="700" aria-label="WQR-105 两级减速器齿轮传动动画"></canvas>
+    <div class="readout mono"><span><span class="zh">输入</span><span class="en">In</span> <b style="color:var(--amber)">1450</b> r/min</span><span>i = 3.0 × 3.5 = <b>10.5</b></span><span><span class="zh">输出</span><span class="en">Out</span> <b style="color:var(--teal)">138</b> r/min</span><span><span class="zh">数字工厂的产品：WQR-105 二级圆柱齿轮减速器</span><span class="en">The digital factory's product: WQR-105 reducer</span></span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="开场|Opening" data-t="一句话说清|In one sentence">
+<div class="in">
+  <p class="ey rv"><span class="k">02</span><span class="zh">一句话</span><span class="en">In one sentence</span></p>
+  <p class="quote rv"><span class="zh">学校用它<span class="hl">开课、做实训</span>；<br>企业用它把<span class="hl">设计、仿真、加工、ERP、车间和售后</span><br>连成一条数字主线。</span><span class="en">Schools use it to <span class="hl">teach and train</span>.<br>Companies use it to join <span class="hl">design, simulation, machining, ERP, the shop floor and service</span> into one digital thread.</span></p>
+  <div class="grid g3 mt2 rv">
+    <div class="card"><span class="tag">wenquestrobotics.com</span><h3><span class="zh">官网 · 问渠机器人学院</span><span class="en">Academy website</span></h3><p><span class="zh">课程、解决方案、典型应用、三维仿真视频、问渠凸轮</span><span class="en">Courses, solutions, case studies, 3D videos, WenQuest Cam</span></p></div>
+    <div class="card"><span class="tag">learn.wenquestrobotics.com</span><h3><span class="zh">学习平台</span><span class="en">Learning platform</span></h3><p><span class="zh">AI 建课、教材、虚拟实验、白板课、三维视频、缝纫机设计软件</span><span class="en">AI course building, textbooks, labs, whiteboard lessons, 3D video, sewing-machine software</span></p></div>
+    <div class="card"><span class="tag">factory.wenquestrobotics.com</span><h3><span class="zh">数字工厂</span><span class="en">Digital factory</span></h3><p><span class="zh">设计、CAE、CAM、ERP、MES、质量、数字孪生、厂情中枢</span><span class="en">Design, CAE, CAM, ERP, MES, quality, digital twins, the factory hub</span></p></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="开场|Opening" data-t="我们要解决的问题|The problems">
+<div class="in">
+  <p class="ey rv"><span class="k">03</span><span class="zh">问题</span><span class="en">The problems</span></p>
+  <h2 class="t rv"><span class="zh">学校和工厂，卡在同一个地方：<span class="hl">懂的东西连不起来</span></span><span class="en">Schools and factories are stuck at the same place: <span class="hl">knowledge that doesn't connect</span></span></h2>
+  <div class="split eq mt2">
+    <div class="rv">
+      <p class="ey"><span class="zh">学校的老板 · 院长</span><span class="en">For school leaders</span></p>
+      <ul class="ck">
+        <li><span class="zh"><b>建一门好课太累</b>：讲义、课件、动画、实验、作业、测验，一个老师做不完。</span><span class="en"><b>A good course is too much work</b>: notes, slides, animations, labs, homework and quizzes are beyond one teacher.</span></li>
+        <li><span class="zh"><b>实验室贵、排不开</b>：机器人、数控机床、芯片流片，学生摸不到。</span><span class="en"><b>Labs are expensive and scarce</b>: robots, CNC machines and chip tape-outs are out of students' reach.</span></li>
+        <li><span class="zh"><b>学生没见过真正的工厂</b>：课本里的公式，和订单、BOM、车间、质量对不上。</span><span class="en"><b>Students never see a real factory</b>: textbook formulas never meet orders, BOMs, the shop floor or quality.</span></li>
+      </ul>
+    </div>
+    <div class="rv">
+      <p class="ey"><span class="zh">企业的老板 · 工程师</span><span class="en">For companies and engineers</span></p>
+      <ul class="ck">
+        <li><span class="zh"><b>不缺 CAD，缺打通</b>：改一个设计，ERP、工艺、车间要人一遍遍去追。</span><span class="en"><b>CAD isn't missing, the links are</b>: one design change has to be chased through ERP, process plans and the shop floor by hand.</span></li>
+        <li><span class="zh"><b>仿真软件贵又难用</b>：会用的人少，结果没人讲得清。</span><span class="en"><b>Simulation is costly and hard</b>: few can run it, fewer can explain the results.</span></li>
+        <li><span class="zh"><b>经验在老师傅脑子里</b>：设计计算、校核、调机诀窍没变成软件，人一走就没了。</span><span class="en"><b>Know-how lives in veterans' heads</b>: design checks and tuning tricks never became software, and leave with the people.</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="开场|Opening" data-t="问渠的全景|The whole picture">
+<div class="in">
+  <p class="ey rv"><span class="k">04</span><span class="zh">全景</span><span class="en">The whole picture</span></p>
+  <h2 class="t rv"><span class="zh">一个平台：从<span class="hl">第一节课</span>到<span class="hl">售出产品的售后</span></span><span class="en">One platform, from <span class="hl">the first lesson</span> to <span class="hl">after-sales service</span></span></h2>
+  <div class="arch rv">
+    <div class="ai"><span class="zh">AI 原生：建课、出题、评审、排产、追因、解释，都由 AI 起草，人来拍板</span><span class="en">AI-native: the AI drafts courses, questions, reviews, schedules, root causes and explanations; people decide</span></div>
+    <div class="m"><b><span class="zh">教材</span><span class="en">Textbooks</span></b><span class="zh">9 本主教材 + 2 本网页版，中英对照，数字由程序算出</span><span class="en">9 books + 2 web editions, bilingual, numbers computed by code</span></div>
+    <div class="m"><b><span class="zh">动画与实验</span><span class="en">Animation &amp; labs</span></b><span class="zh">281 段动画、273 个浏览器虚拟实验（含 MuJoCo 物理仿真）</span><span class="en">281 animations, 273 in-browser labs incl. MuJoCo physics</span></div>
+    <div class="m"><b><span class="zh">学习平台</span><span class="en">Learning platform</span></b><span class="zh">Canvas 风格界面，AI 建课、课程委员会、白板课、三维视频</span><span class="en">Canvas-style UI, AI course building, review committee, whiteboard lessons, 3D video</span></div>
+    <div class="m"><b><span class="zh">行业专用软件</span><span class="en">Industry software</span></b><span class="zh">缝纫机设计与制造（5 种机型）、问渠凸轮</span><span class="en">Sewing-machine design (5 machine types), WenQuest Cam</span></div>
+    <div class="bus"><span class="zh">统一数据总线 · 数字工厂</span><span class="en">One data bus · Digital factory</span><span>MQTT · PostgreSQL · ERPNext</span></div>
+    <div class="m"><b>CAD · PLM</b><span class="zh">网页设计台、FreeCAD、SolidWorks 宏</span><span class="en">Web design desk, FreeCAD, SolidWorks macro</span></div>
+    <div class="m"><b>CAE · CAM</b><span class="zh">有限元、疲劳、CFD、多体动力学、数控编程</span><span class="en">FEA, fatigue, CFD, multibody, CNC programming</span></div>
+    <div class="m"><b>ERP · MES · QMS</b><span class="zh">MRP、车间终端、控制图、8D</span><span class="en">MRP, shop terminals, control charts, 8D</span></div>
+    <div class="m"><b><span class="zh">孪生 · 中枢</span><span class="en">Twin · Hub</span></b><span class="zh">数字孪生、预测维护、厂情中枢 AI 代理</span><span class="en">Digital twins, predictive maintenance, AI agents</span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="开场|Opening" data-t="已经做出来的|What's built">
+<div class="in">
+  <p class="ey rv"><span class="k">05</span><span class="zh">截至 2026 年 10 月 24 日 · 全部从仓库实算</span><span class="en">As of 24 October 2026 · counted from the repository</span></p>
+  <h2 class="t rv"><span class="zh">不是规划，是<span class="hl">已经做出来的</span></span><span class="en">Not a plan. <span class="hl">Already built.</span></span></h2>
+  <div class="wall rv">
+    <div><b data-n="695">695</b><span><span class="zh">节教材已写成（103 章，9 本书），中文约 185 万字</span><span class="en">textbook sections written (103 chapters, 9 books)</span></span></div>
+    <div><b data-n="281">281</b><span><span class="zh">段动画：269 段 3Blue1Brown 风格 Manim + 12 段三维渲染</span><span class="en">animations: 269 Manim in 3Blue1Brown style + 12 3D renders</span></span></div>
+    <div><b data-n="273">273</b><span><span class="zh">个浏览器虚拟实验，每个都配指导书和报告模板</span><span class="en">in-browser virtual labs, each with a guide and report template</span></span></div>
+    <div><b data-n="699">699</b><span><span class="zh">个算例程序：书里的数字都由程序算出</span><span class="en">worked-example programs: every number in the books is computed</span></span></div>
+    <div><b data-n="5878">5878</b><span><span class="zh">条中英对照术语</span><span class="en">bilingual terms</span></span></div>
+    <div><b data-n="1258">1258</b><span><span class="zh">个标准件规格，另有 167 台机器人模型</span><span class="en">standard-part sizes, plus 167 robot models</span></span></div>
+    <div><b data-n="58">58</b><span><span class="zh">项缝纫机设计校核，5 种机型</span><span class="en">sewing-machine design checks across 5 machine types</span></span></div>
+    <div><b data-n="1285" data-pre="~">~1285</b><span><span class="zh">项自动测试，每次推送都跑</span><span class="en">automated tests, run on every push</span></span></div>
+  </div>
+  <p class="foot"><span class="zh">统计方法：按 GitHub 仓库 eddiezgq/WenQuest 的 main 分支逐项计数（文件数、表格行数、测试收集数）。教材规划共 426 章，已写约四分之一，仍在持续建设。</span><span class="en">Counted item by item from the main branch of github.com/eddiezgq/WenQuest. 426 chapters are planned; about a quarter are written.</span></p>
+</div>
+</section>
+
+<section class="pg" data-part="开场|Opening" data-t="AI 原生的开发速度|AI-native speed">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">06</span><span class="zh">速度</span><span class="en">Speed</span></p>
+    <h2 class="t"><span class="zh">四周，<span class="hl">903 次提交</span></span><span class="en">Four weeks, <span class="hl">903 commits</span></span></h2>
+    <p class="lead"><span class="zh">仓库 2026 年 9 月 26 日建立。一位创始人带着一支 AI 工程团队，按“先定方案、再施工、逐条验收”的规矩，每天把新的教材、实验和工厂功能推上线。</span><span class="en">The repository was created on 26 September 2026. One founder and a team of AI engineers ship new chapters, labs and factory features daily, under a strict plan → build → check routine.</span></p>
+  </div>
+  <div class="facts rv">
+    <div class="fact"><b><span class="zh">32.4万</span><span class="en">324k</span></b><span><span class="zh">行 Python，另有约 6.2 万行 JavaScript、3.1 万行 Vue</span><span class="en">lines of Python, plus about 62k lines of JavaScript and 31k of Vue</span></span></div>
+    <div class="fact"><b>710</b><span><span class="zh">个接口：学习平台网关 278、数字工厂枢纽 406、凸轮服务 26</span><span class="en">API endpoints: gateway 278, factory hub 406, cam service 26</span></span></div>
+    <div class="fact"><b>83</b><span><span class="zh">份实施细则（平台 54、数字工厂 29），每一轮先写方案、再施工、再逐条验收</span><span class="en">implementation plans (54 platform, 29 factory): plan, build, then check item by item</span></span></div>
+    <div class="fact"><b>47</b><span><span class="zh">份帮助文件，推送到 main 即自动测试、构建、部署</span><span class="en">help documents; a push to main tests, builds and deploys automatically</span></span></div>
+  </div>
+</div>
+</section>
+
+<!-- ================= 第一部分 AI 原生教学平台 ================= -->
+<section class="pg div" data-part="AI 原生教学平台|AI-native teaching" data-t="第一部分：AI 原生教学平台|Part 1: AI-native teaching">
+<div class="in rv">
+  <div class="part">01</div>
+  <h2><span class="zh">AI 原生教学平台</span><span class="en">AI-native teaching platform</span></h2>
+  <p class="lead"><span class="zh">老师的资料再乱，由 AI 整理、分类、用好；没有资料、只说要求，也能建出完整课程。负担在 AI，不在老师。</span><span class="en">However messy the teacher's materials, the AI sorts and uses them; with no materials at all, a short brief still yields a full course. The load is on the AI, not the teacher.</span></p>
+  <div class="chips"><span class="zh">学习平台</span><span class="en">Platform</span><span class="zh">AI 建课</span><span class="en">AI course building</span><span class="zh">课程委员会</span><span class="en">Review committee</span><span class="zh">网页互动课件</span><span class="en">Web slides</span><span class="zh">讲解视频</span><span class="en">Lecture video</span><span class="zh">白板课</span><span class="en">Whiteboard</span><span class="zh">三维仿真视频</span><span class="en">3D video</span></div>
+</div>
+</section>
+
+<section class="pg" data-part="AI 原生教学平台|AI-native teaching" data-t="学习平台|Learning platform">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">08</span><span class="zh">学习平台</span><span class="en">Learning platform</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">像 Canvas 一样好用，<span class="hl">比 Canvas 多一个 AI 大脑</span></span><span class="en">As easy as Canvas, <span class="hl">with an AI brain</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh"><b>自研前端</b>，一套代码出网页和微信小程序；Moodle 5.2 只做幕后引擎。</span><span class="en"><b>Our own front end</b>, one codebase for web and WeChat mini-program; Moodle 5.2 runs behind it.</span></li>
+      <li><span class="zh"><b>13 项课程菜单</b>：公告、讨论、在线课堂、分组（AI 分组）、作业（AI 评分建议）、测验（五种题型，AI 出题）、成绩、日历、收件箱……</span><span class="en"><b>13 course tools</b>: announcements, discussions, live class, groups (AI grouping), assignments (AI grading suggestions), quizzes (5 types, AI questions), grades, calendar, inbox…</span></li>
+      <li><span class="zh"><b>中英双语</b>：界面、课程名称和正文都按用户语言显示。</span><span class="en"><b>Bilingual</b>: interface, course names and content follow the user's language.</span></li>
+      <li><span class="zh"><b>注册与审核</b>：学校邮箱的老师自动通过，其余由 AI 预审、管理员一键批准。</span><span class="en"><b>Sign-up</b>: teachers with a school address are approved automatically; others are pre-screened by AI.</span></li>
+    </ul>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>learn.wenquestrobotics.com</span></div><img src="m/pl_course.webp" alt="学习平台课程首页" loading="lazy"></div><figcaption><span class="zh"><b>课程首页</b>：深色标题栏、教学大纲、单元列表，以 Canvas 为样板。</span><span class="en"><b>Course home</b>, modelled on Canvas.</span></figcaption></figure>
+</div>
+</section>
+
+<section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="把资料交给 AI|Hand the AI your files">
+<div class="in split r">
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">AI 建课 · 资料自动分类</span><span class="en">AI course building · file sorting</span></span></div><img src="m/ai_sort.webp" alt="AI 自动分类资料" loading="lazy"></div><figcaption><span class="zh"><b>拖进一个文件夹</b>：PDF、Word、PPT、Excel、图片、扫描件都认得，自动分 12 类、识别章节。</span><span class="en"><b>Drop in a folder</b>: PDFs, Word, PowerPoint, Excel, images and scans are read, sorted into 12 types and split by chapter.</span></figcaption></figure>
+  <div class="rv">
+    <p class="ey"><span class="k">09</span><span class="zh">AI 建课 · 有资料</span><span class="en">AI course building · with files</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">资料再乱，<span class="hl">AI 来整理</span></span><span class="en">Messy files? <span class="hl">The AI sorts them</span></span></h2>
+    <div class="facts">
+      <div class="fact"><b>42/43</b><span><span class="zh">大学物理样例：上传 43 个文件，42 个自动分对，1 个标“请确认”</span><span class="en">Physics sample: 43 files uploaded, 42 sorted correctly, 1 flagged for review</span></span></div>
+      <div class="fact"><b>15</b><span><span class="zh">节课按资料写成（3 章），39 个附件发布，4 个教师文件自动对学生隐藏</span><span class="en">lessons written from those files (3 chapters); 39 attachments published, 4 teacher-only files hidden</span></span></div>
+      <div class="fact"><b>0</b><span><span class="zh">课白写：离开页面、某课超时、服务器重启，回来都接着写，已写好的不重写</span><span class="en">lessons lost: leave the page, time out or restart the server, and it picks up where it stopped</span></span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="AI 原生教学平台|AI-native teaching" data-t="一支 AI 教授团队|An AI faculty team">
+<div class="in">
+  <p class="ey rv"><span class="k">10</span><span class="zh">AI 建课 · 没有资料</span><span class="en">AI course building · from a brief</span></p>
+  <h2 class="t rv"><span class="zh">只说一句要求，<span class="hl">一支 AI 教授团队</span>开工</span><span class="en">Say one sentence, and <span class="hl">an AI faculty team</span> gets to work</span></h2>
+  <p class="lead rv"><span class="zh">例：“移动机器人运动学入门”——实测建出 4 章 8 课。课程负责人由 AI 内核担任，按《课程负责人守则》和老师对话：读资料再说话、有主见、老师拍板。</span><span class="en">Example: “Intro to mobile-robot kinematics” produced 4 chapters and 8 lessons. An AI course lead talks it through with the teacher: reads first, has opinions, and the teacher decides.</span></p>
+  <div class="grid g4 mt rv">
+    <div class="card"><span class="tag">Librarian</span><h3><span class="zh">资料馆员</span><span class="en">Librarian</span></h3><p><span class="zh">读资料、分类、识别章节</span><span class="en">Reads and sorts materials</span></p></div>
+    <div class="card"><span class="tag">Designer</span><h3><span class="zh">课程设计师</span><span class="en">Course designer</span></h3><p><span class="zh">课程设计书、大纲、教学日历</span><span class="en">Course design, syllabus, calendar</span></p></div>
+    <div class="card"><span class="tag">Lecturer</span><h3><span class="zh">主讲教授</span><span class="en">Lecturer</span></h3><p><span class="zh">逐课写中英讲义</span><span class="en">Bilingual notes, lesson by lesson</span></p></div>
+    <div class="card"><span class="tag">Animator</span><h3><span class="zh">动画师</span><span class="en">Animator</span></h3><p><span class="zh">Manim 动画，服务器渲染</span><span class="en">Manim animations, rendered on the server</span></p></div>
+    <div class="card"><span class="tag">Lab engineer</span><h3><span class="zh">实验师</span><span class="en">Lab engineer</span></h3><p><span class="zh">虚拟实验，无头浏览器试做通过才交</span><span class="en">Virtual labs, test-run headlessly before delivery</span></p></div>
+    <div class="card"><span class="tag">Illustrator</span><h3><span class="zh">插图师</span><span class="en">Illustrator</span></h3><p><span class="zh">插图、图表，数字取自数字工厂</span><span class="en">Figures and charts, data from the factory</span></p></div>
+    <div class="card"><span class="tag">Assessment</span><h3><span class="zh">习题与测评</span><span class="en">Assessment</span></h3><p><span class="zh">练习、答案、测验题库</span><span class="en">Exercises, answers, quiz banks</span></p></div>
+    <div class="card"><span class="tag">Reviewer</span><h3><span class="zh">审稿人</span><span class="en">Reviewer</span></h3><p><span class="zh">相似度、切题检查，每课一张审稿清单</span><span class="en">Similarity and relevance checks, one checklist per lesson</span></p></div>
+  </div>
+</div>
+</section>
+
+<section class="pg paper" data-part="AI 原生教学平台|AI-native teaching" data-t="每一课自动出的成品|What every lesson gets">
+<div class="in">
+  <p class="ey rv"><span class="k">11</span><span class="zh">每一课的成品</span><span class="en">Every lesson ships with</span></p>
+  <h2 class="t rv"><span class="zh">一课一套，<span style="color:#A46F0C">十样齐全</span></span><span class="en">Ten deliverables, <span style="color:#A46F0C">every lesson</span></span></h2>
+  <div class="grid g5 mt2 rv">
+    <div class="card"><span class="big">01</span><h3><span class="zh">中英讲义</span><span class="en">Bilingual notes</span></h3></div>
+    <div class="card"><span class="big">02</span><h3><span class="zh">网页互动课件</span><span class="en">Interactive web slides</span></h3></div>
+    <div class="card"><span class="big">03</span><h3><span class="zh">Manim 动画</span><span class="en">Manim animations</span></h3></div>
+    <div class="card"><span class="big">04</span><h3><span class="zh">虚拟实验</span><span class="en">Virtual lab</span></h3></div>
+    <div class="card"><span class="big">05</span><h3><span class="zh">插图</span><span class="en">Figures</span></h3></div>
+    <div class="card"><span class="big">06</span><h3><span class="zh">实验指导书</span><span class="en">Lab guide</span></h3></div>
+    <div class="card"><span class="big">07</span><h3><span class="zh">报告模板</span><span class="en">Report template</span></h3></div>
+    <div class="card"><span class="big">08</span><h3><span class="zh">教案</span><span class="en">Lesson plan</span></h3></div>
+    <div class="card"><span class="big">09</span><h3><span class="zh">练习与答案</span><span class="en">Exercises &amp; answers</span></h3></div>
+    <div class="card"><span class="big">10</span><h3><span class="zh">讲解视频（中英配音）</span><span class="en">Narrated video (zh/en)</span></h3></div>
+  </div>
+  <p class="foot rv"><span class="zh">之后还能改：只改一课的局部，就只重做受影响的成品；已发布的课做新版本，审核后替换；最多 30 份快照，随时撤销。</span><span class="en">Edits are surgical: change part of a lesson and only the affected pieces are redone; published lessons get a new version after review; up to 30 snapshots for undo.</span></p>
+</div>
+</section>
+
+<section class="pg" data-part="AI 原生教学平台|AI-native teaching" data-t="AI 先审，委员会拍板|AI pre-review, committee decides">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">12</span><span class="zh">课程委员会</span><span class="en">Course committee</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">AI 先审，<span class="hl">委员会拍板</span>，每一步留痕</span><span class="en">AI reviews first, <span class="hl">the committee decides</span>, every step logged</span></h2>
+    <p class="lead"><span class="zh">质量不能只靠 AI。老师提交后，独立 AI 从六个方面打 ✓ / ✗ / ?，列出问题清单（严重程度、位置、改法）；任何委员可以退回，主任批准后才发布。审核期间课程锁定。</span><span class="en">Quality can't rest on AI alone. An independent AI marks six criteria ✓ / ✗ / ? and lists each issue with severity, location and fix; any member can return it, and only the chair's approval publishes it.</span></p>
+  </div>
+  <div class="rv">
+    <div class="flow" style="grid-auto-flow:row">
+      <div><b><span class="zh">老师提交审核</span><span class="en">Teacher submits</span></b><span><span class="zh">课程锁定</span><span class="en">Course locked</span></span></div>
+      <div><b><span class="zh">AI 预审</span><span class="en">AI pre-review</span></b><span><span class="zh">实测：给出“建议修改后批准”和 2 条意见</span><span class="en">Test run: “approve after changes”, 2 issues</span></span></div>
+      <div><b><span class="zh">委员退回</span><span class="en">Member returns it</span></b><span><span class="zh">“例题 2 的单位写错了”——必须写意见</span><span class="en">“Example 2 has the wrong unit” — a comment is required</span></span></div>
+      <div><b><span class="zh">修改后再提交，主任批准</span><span class="en">Fixed, resubmitted, approved</span></b><span><span class="zh">学生只看到批准过的课</span><span class="en">Students only see approved content</span></span></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="网页互动课件取代 PPT|Web slides replace PowerPoint">
+<div class="in split r">
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">AI 建出的网页互动课件</span><span class="en">Web slides built by the AI</span></span></div><img src="m/ai_deck.webp" alt="网页互动课件" loading="lazy"></div></figure>
+  <div class="rv">
+    <p class="ey"><span class="k">13</span><span class="zh">网页互动课件</span><span class="en">Interactive web slides</span></p>
+    <h2 class="t"><span class="zh">课件里的动画和实验，<span class="hl">能当场操作</span></span><span class="en">Animations and labs <span class="hl">you can operate</span> mid-lecture</span></h2>
+    <ul class="ck">
+      <li><span class="zh">像 PPT 一样翻页、逐条出现、讲者窗口、全屏。</span><span class="en">Turns pages like PowerPoint, with builds, presenter view and full screen.</span></li>
+      <li><span class="zh"><b>动画、虚拟实验、三维模型嵌在页里</b>，讲到哪里调到哪里。</span><span class="en"><b>Animations, labs and 3D models live inside the slides.</b></span></li>
+      <li><span class="zh">中英对照。2026 年 10 月起，平台一律用网页互动课件取代 PPT。</span><span class="en">Bilingual. Since October 2026 the platform makes web slides only, no PowerPoint.</span></li>
+      <li><span class="zh">缝纫机课已做 29 讲网页课件。</span><span class="en">29 lectures of the sewing-machine course are already in this format.</span></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="AI 原生教学平台|AI-native teaching" data-t="讲解视频与公开课|Narrated video">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">14</span><span class="zh">讲解视频</span><span class="en">Narrated lectures</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">每一课自动配上<span class="hl">中英两种讲解</span></span><span class="en">Every lesson gets <span class="hl">Chinese and English narration</span></span></h2>
+    <p class="lead"><span class="zh">语音合成和识别都在自己的服务器上用开源模型运行（Kokoro-82M、SenseVoice），不连外网。字幕可选中文、English、中英、关闭。老师也可上传自己的讲课录像，自动出中文字幕、英文翻译和英文配音。</span><span class="en">Speech synthesis and recognition run on our own server with open models (Kokoro-82M, SenseVoice), offline. Subtitles in Chinese, English, both or none. Teachers can also upload their own lecture video for automatic subtitles, translation and English voice-over.</span></p>
+  </div>
+  <div class="facts rv">
+    <div class="fact"><b>3 <span class="zh">分钟</span><span class="en">min</span></b><span><span class="zh">合成一课：11 页、55 句、时长 2 分 34 秒；再识别一遍，与字幕逐句对得上</span><span class="en">to voice a lesson of 11 slides, 55 sentences, 2:34; re-transcribed, it matches the subtitles line by line</span></span></div>
+    <div class="fact"><b>15 <span class="zh">讲</span><span class="en">lectures</span></b><span><span class="zh">缝纫机公开课已出成片，每讲中文约 16 分钟、英文约 19 分钟；配音用讲者本人声音（开源模型克隆，注明 AI 合成）</span><span class="en">of the sewing-machine course are finished, ~16 min in Chinese, ~19 min in English, voiced in the lecturer's own cloned voice (labelled as AI)</span></span></div>
+    <div class="fact"><b>$0.4</b><span><span class="zh">约合一讲的 GPU 配音成本（临时租用 A10，约半小时）</span><span class="en">GPU cost to voice one lecture (rented A10, about half an hour)</span></span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="白板课|Whiteboard lessons">
+<div class="in split r">
+  <figure class="rv"><div class="vt" data-v><video src="m/whiteboard.mp4" poster="m/whiteboard.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">白板课样片</span><span class="en">Whiteboard sample</span></b><span class="zh">按配音时间一笔一笔画出来</span><span class="en">Drawn stroke by stroke in time with the voice</span></div></div></figure>
+  <div class="rv">
+    <p class="ey"><span class="k">15</span><span class="zh">白板课</span><span class="en">Whiteboard lessons</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">像 VideoScribe 那样<span class="hl">边讲边画</span>，但由 AI 起稿</span><span class="en">Draw while you talk, like VideoScribe, <span class="hl">drafted by AI</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh">老师给题目或上传录音，AI 写分段讲稿、排画板；老师改哪一段，只重配哪一段。</span><span class="en">Give a topic or a recording; the AI writes the script and lays out the boards. Edit one part and only that part is re-voiced.</span></li>
+      <li><span class="zh">能插入问渠自己的<b>虚拟实验、动画、数字工厂视频和三维视频</b>，画的东西会动。</span><span class="en">Drop in WenQuest's own <b>labs, animations, factory footage and 3D videos</b>; drawings move.</span></li>
+      <li><span class="zh">输出网页版（可暂停、拖动、放大板书）和 MP4。</span><span class="en">Outputs a web version (pause, scrub, zoom) and MP4.</span></li>
+      <li><span class="zh"><b>每日热点科普</b>：已做 18 期，中英各一；有量化标准——每分钟 ≥ 90 个动作、≥ 16 张画板，不达标不交付。</span><span class="en"><b>Daily science shorts</b>: 18 episodes, zh and en; measured pace of ≥ 90 actions and ≥ 16 boards per minute, or it doesn't ship.</span></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="AI 原生教学平台|AI-native teaching" data-t="三维仿真视频|3D simulation video">
+<div class="in">
+  <p class="ey rv"><span class="k">16</span><span class="zh">三维仿真视频</span><span class="en">3D simulation video</span></p>
+  <div class="split">
+    <div class="rv">
+      <h2 class="t"><span class="zh">一句话，要一段<span class="hl">工程级三维仿真视频</span></span><span class="en">One sentence, one <span class="hl">engineering-grade 3D video</span></span></h2>
+      <p class="lead"><span class="zh">动作由求解器算出（逆运动学、虚拟样机、MuJoCo），不是手调动画，所以读数可信。可以剖开、透视、慢放，带中英标注和读数。SolidWorks 负责设计和算，问渠负责讲出来、教出去。</span><span class="en">Motion comes from solvers (inverse kinematics, virtual prototypes, MuJoCo), not hand animation, so the readouts are real. Cut-aways, x-ray, slow motion, bilingual labels. SolidWorks designs it; WenQuest explains it.</span></p>
+      <div class="facts">
+        <div class="fact"><b>2000×</b><span><span class="zh">平缝机一针慢放约 2000 倍，读数与教材算例一致</span><span class="en">slow-motion of one stitch, readouts matching the textbook</span></span></div>
+        <div class="fact"><b>10 <span class="zh">分钟</span><span class="en">min</span></b><span><span class="zh">43 秒高清样片 20 份并行出完；单机要 2 小时 15 分</span><span class="en">to render a 43 s HD clip in 20 parallel jobs (2 h 15 min on one machine)</span></span></div>
+      </div>
+    </div>
+    <figure class="rv"><div class="vt" data-v data-auto><video src="../../../site/cases/video3d/lockstitch-cinematic.mp4" poster="m/v_lockstitch-cinematic.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">写实版：一针 12 毫秒</span><span class="en">Cinematic: one stitch in 12 ms</span></b><span class="zh">电影光照、景深、运动模糊</span><span class="en">Film lighting, depth of field, motion blur</span></div></div></figure>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="三维样片|3D samples">
+<div class="in">
+  <p class="ey rv"><span class="k">17</span><span class="zh">样片 · 点开播放</span><span class="en">Samples · click to play</span></p>
+  <h2 class="t rv"><span class="zh">看得见<span class="hl">机器里面</span>发生了什么</span><span class="en">See <span class="hl">inside the machine</span></span></h2>
+  <div class="grid g3 mt rv">
+    <div class="vt" data-v><video src="../../../site/cases/video3d/lockstitch-one-stitch.mp4" poster="m/v_lockstitch-one-stitch.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">平缝机怎样缝一针</span><span class="en">How a lockstitch machine makes one stitch</span></b><span class="zh">剖开机头，慢放</span><span class="en">Cut-away, slow motion</span></div></div>
+    <div class="vt" data-v><video src="../../../site/cases/video3d/hook-loop-machine.mp4" poster="m/v_hook-loop-machine.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">旋梭钩线整机</span><span class="en">Rotary hook catching the loop</span></b><span class="zh">从机头到线结</span><span class="en">From head to knot</span></div></div>
+    <div class="vt" data-v><video src="../../../site/cases/video3d/arm-pick-place.mp4" poster="m/v_arm-pick-place.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">六轴机械臂抓取放料</span><span class="en">Six-axis arm pick and place</span></b><span class="zh">逆运动学驱动，透视电机和减速器</span><span class="en">Driven by IK, x-ray of motors and gearboxes</span></div></div>
+    
+  </div>
+  <div class="card mt rv"><span class="tag"><span class="zh">流水线</span><span class="en">Pipeline</span></span><h3><span class="zh">一句话 → AI 写场景数据 → 6 张关键画面 → 小样 960×540 → 高清 1920×1080 → 素材库</span><span class="en">Sentence → AI writes scene data → 6 key frames → 960×540 preview → 1920×1080 HD → asset library</span></h3><p><span class="zh">AI 只写数据、不写代码，程序先检查合法再渲染（Blender 4.2）。成片可直接插进白板课和课件。老师开课免费使用，企业申请开通。</span><span class="en">The AI writes data, never code; it is validated before rendering in Blender 4.2. Clips drop straight into lessons. Free for teaching; companies apply for access.</span></p></div>
+</div>
+</section>
+
+<!-- ================= 第二部分 教材、动画与实验 ================= -->
+<section class="pg div" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="第二部分：教材、动画与实验|Part 2: Books, animation and labs">
+<div class="in rv">
+  <div class="part">02</div>
+  <h2><span class="zh">教材、动画与虚拟实验</span><span class="en">Textbooks, animation and virtual labs</span></h2>
+  <p class="lead"><span class="zh">每节课走同一条线：实际问题 → 概念 → 动画 → 虚拟实验 → 建模求解。实际问题以机器人为主，保留一个生活中的例子。</span><span class="en">Every lesson follows one line: a real problem → concepts → animation → virtual lab → modelling. Problems come mostly from robotics, plus one everyday example.</span></p>
+  <div class="chips"><span>9 <span class="zh">本教材</span><span class="en">books</span></span><span>281 <span class="zh">段动画</span><span class="en">animations</span></span><span>273 <span class="zh">个实验</span><span class="en">labs</span></span><span>MuJoCo</span><span>PLC</span><span><span class="zh">微电子</span><span class="en">Microelectronics</span></span></div>
+</div>
+</section>
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="九本自编教材|Nine textbooks">
+<div class="in">
+  <p class="ey rv"><span class="k">19</span><span class="zh">自编教材</span><span class="en">Our textbooks</span></p>
+  <h2 class="t rv"><span class="zh">九本书，<span class="hl">一套标准</span></span><span class="en">Nine books, <span class="hl">one standard</span></span></h2>
+  <div class="tbl rv"><table>
+    <thead><tr><th><span class="zh">教材</span><span class="en">Book</span></th><th class="n"><span class="zh">规划章</span><span class="en">Planned ch.</span></th><th class="n"><span class="zh">已写章 / 节</span><span class="en">Written ch. / sec.</span></th><th class="n"><span class="zh">动画</span><span class="en">Anim.</span></th><th class="n"><span class="zh">实验</span><span class="en">Labs</span></th><th class="n"><span class="zh">算例</span><span class="en">Programs</span></th><th><span class="zh">英文版</span><span class="en">English</span></th></tr></thead>
+    <tbody>
+      <tr><td><span class="zh">机器人学</span><span class="en">Robotics</span></td><td class="n">61</td><td class="n">27 / 143</td><td class="n">135</td><td class="n">134</td><td class="n">144</td><td><span class="zh">15 章</span><span class="en">15 ch.</span></td></tr>
+      <tr><td><span class="zh">大学物理</span><span class="en">University Physics</span></td><td class="n">49</td><td class="n">10 / 65</td><td class="n">26</td><td class="n">29</td><td class="n">65</td><td>—</td></tr>
+      <tr><td><span class="zh">线性代数</span><span class="en">Linear Algebra</span></td><td class="n">42</td><td class="n">15 / 106</td><td class="n">24</td><td class="n">30</td><td class="n">109</td><td>—</td></tr>
+      <tr><td><span class="zh">微积分</span><span class="en">Calculus</span></td><td class="n">49</td><td class="n">13 / 87</td><td class="n">29</td><td class="n">16</td><td class="n">100</td><td>—</td></tr>
+      <tr><td><span class="zh">机械设计</span><span class="en">Mechanical Design</span></td><td class="n">52</td><td class="n">7 / 62</td><td class="n">11</td><td class="n">9</td><td class="n">49</td><td><span class="zh">7 章</span><span class="en">7 ch.</span></td></tr>
+      <tr><td><span class="zh">机械制造技术</span><span class="en">Manufacturing Technology</span></td><td class="n">77</td><td class="n">4 / 37</td><td class="n">6+12</td><td class="n">14</td><td class="n">33</td><td>—</td></tr>
+      <tr><td><span class="zh">人工智能（含 CUDA）</span><span class="en">AI (with CUDA)</span></td><td class="n">36</td><td class="n">18 / 140</td><td class="n">24</td><td class="n">23</td><td class="n">136</td><td>—</td></tr>
+      <tr><td><span class="zh">PLC 原理及实践</span><span class="en">PLC Principles</span></td><td class="n">48</td><td class="n">5 / 36</td><td class="n">5</td><td class="n">6</td><td class="n">40</td><td>—</td></tr>
+      <tr><td><span class="zh">数字集成电路设计</span><span class="en">Digital IC Design</span></td><td class="n">12</td><td class="n">4 / 19</td><td class="n">9</td><td class="n">12</td><td class="n">23</td><td><span class="zh">1 章</span><span class="en">1 ch.</span></td></tr>
+      <tr class="sum"><td><span class="zh">合计</span><span class="en">Total</span></td><td class="n">426</td><td class="n">103 / 695</td><td class="n">281</td><td class="n">273</td><td class="n">699</td><td><span class="zh">23 章</span><span class="en">23 ch.</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="foot rv"><span class="zh">另有两本网页版教材：《缝纫机设计与制造》31 章（中英全文，43 个动画、实验和三维模型），《数字工厂实训》12 章（已写 3 章）。章的审定状态：初审 26 章、AI 审稿 62 章、草稿 15 章。</span><span class="en">Plus two web editions: Sewing Machine Design and Manufacturing (31 chapters, bilingual, 43 interactive pieces) and Digital Factory Practice (12 chapters, 3 written). Review status: 26 chapters editor-reviewed, 62 AI-reviewed, 15 drafts.</span></p>
+</div>
+</section>
+
+<section class="pg paper" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="一节课的学习链|How a lesson works">
+<div class="in">
+  <p class="ey rv"><span class="k">20</span><span class="zh">课程标准</span><span class="en">The lesson standard</span></p>
+  <h2 class="t rv"><span class="zh">每一节，都是一条<span style="color:#A46F0C">完整的学习链</span></span><span class="en">Every lesson is <span style="color:#A46F0C">one complete chain</span></span></h2>
+  <div class="flow rv">
+    <div><b><span class="zh">实际问题</span><span class="en">A real problem</span></b><span><span class="zh">带真实数据的工程场景：UR5e 上下料、减速器、缝纫机</span><span class="en">An engineering scene with real data: a UR5e loading cell, a reducer, a sewing machine</span></span></div>
+    <div><b><span class="zh">概念</span><span class="en">Concepts</span></b><span><span class="zh">讲清楚用到的原理，定理有证明</span><span class="en">The principles it needs, with proofs</span></span></div>
+    <div><b><span class="zh">动画</span><span class="en">Animation</span></b><span><span class="zh">3Blue1Brown 风格，30–60 秒只讲一个概念</span><span class="en">3Blue1Brown style, one idea in 30–60 s</span></span></div>
+    <div><b><span class="zh">虚拟实验</span><span class="en">Virtual lab</span></b><span><span class="zh">浏览器里调参数、看现象，任务自动判定</span><span class="en">Tune it in the browser; tasks are checked automatically</span></span></div>
+    <div><b><span class="zh">建模求解</span><span class="en">Model and solve</span></b><span><span class="zh">再指出模型在哪里失效</span><span class="en">Then show where the model breaks</span></span></div>
+  </div>
+  <div class="grid g3 mt2 rv">
+    <div class="card"><h3><span class="zh">每节都有“来龙去脉”</span><span class="en">History in every section</span></h3><p><span class="zh">谁、哪一年、为什么想到这个办法，附原始文献</span><span class="en">Who found it, when and why, with primary sources</span></p></div>
+    <div class="card"><h3><span class="zh">每节都有“工程师笔记”</span><span class="en">Engineer's notes</span></h3><p><span class="zh">工厂里真正会踩的坑</span><span class="en">The pitfalls you meet on a real shop floor</span></p></div>
+    <div class="card"><h3><span class="zh">中英对照，术语统一</span><span class="en">Bilingual, consistent terms</span></h3><p><span class="zh">5,878 条术语表，两本书同一术语的英文名必须一致</span><span class="en">5,878 glossary entries, enforced across books</span></p></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="课程与专业|Courses and programmes">
+<div class="in">
+  <p class="ey rv"><span class="k">00</span><span class="zh">课程</span><span class="en">Courses</span></p>
+  <h2 class="t rv"><span class="zh">四个专业、四层课程，<span class="hl">从物理基础到人形机器人</span></span><span class="en">Four programmes, four layers, <span class="hl">from physics to humanoids</span></span></h2>
+  <div class="tbl rv"><table>
+    <thead><tr><th><span class="zh">课程</span><span class="en">Course</span></th><th><span class="zh">内容</span><span class="en">Content</span></th><th><span class="zh">状态</span><span class="en">Status</span></th></tr></thead>
+    <tbody>
+      <tr><td><span class="zh">缝纫机设计与制造</span><span class="en">Sewing Machine Design &amp; Manufacturing</span></td><td><span class="zh">31 讲：机构、电控、样机、零件制造到数字工厂；网页课件、动画、实验、作业、测验、教案，期中 48 题、期末 50 题；公开课视频</span><span class="en">31 lectures from mechanisms and controls to prototypes, part making and the digital factory; slides, labs, homework, quizzes, exams, public video</span></td><td><span class="pill live"><span class="zh">已上线 · 免费</span><span class="en">Live · free</span></span></td></tr>
+      <tr><td><span class="zh">大学物理 A（上）</span><span class="en">University Physics A (I)</span></td><td><span class="zh">由 43 个样例文件建成第 1–3 章 15 课；第 1 章 5 段双语动画、5 个机器人场景实验</span><span class="en">Chapters 1–3 (15 lessons) built from 43 files; chapter 1 has 5 bilingual animations and 5 robot-scenario labs</span></td><td><span class="pill live"><span class="zh">第 1 章已上线</span><span class="en">Ch. 1 live</span></span></td></tr>
+      <tr><td><span class="zh">数字工厂实训</span><span class="en">Digital Factory Practice</span></td><td><span class="zh">12 讲；第 3、6、10 讲完整（课件、作业、测验、讲课视频）</span><span class="en">12 lectures; 3 complete with slides, homework, quizzes and video</span></td><td><span class="pill ready"><span class="zh">已做，待发布</span><span class="en">Built, pending</span></span></td></tr>
+      <tr><td><span class="zh">专业课程体系</span><span class="en">Programme design</span></td><td><span class="zh">机器人工程、电子信息与微电子、智能制造工程、计算机科学与技术 × 通识、基础、专业、特色四层；微电子 21 门课方案已定</span><span class="en">Robotics, electronics &amp; microelectronics, smart manufacturing and computer science × general, foundation, major and specialty layers; 21 microelectronics courses designed</span></td><td><span class="pill plan"><span class="zh">方案已定，逐门建设</span><span class="en">Designed, being built</span></span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="foot rv"><span class="zh">九本自编教材就是这些课程的底座：老师选一本书、一个专业，AI 建课按同一套标准把它变成完整的课。</span><span class="en">The nine textbooks underpin these courses: pick a book and a programme, and AI course building turns it into a complete course to the same standard.</span></p>
+</div>
+</section>
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="书里的数字由程序算出|Numbers come from code">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">21</span><span class="zh">质量关</span><span class="en">Quality gates</span></p>
+    <h2 class="t"><span class="zh">书里的每个数字，<span class="hl">都由程序算出</span></span><span class="en">Every number in the books <span class="hl">is computed</span></span></h2>
+    <p class="lead"><span class="zh">正文不手写结果，而是引用程序的输出；手写 4 位以上有效数字会被构建拦下。每次推送都自动构建全书，不通过不上线。</span><span class="en">The text cites program output instead of typing results; a hand-typed number with four or more significant digits fails the build. Every push rebuilds the whole book.</span></p>
+    <div class="facts">
+      <div class="fact"><b>1</b><span><span class="zh">自动检查：程序能运行、公式编号、引用、术语，每个实验在无头浏览器里试做</span><span class="en">Automatic checks: programs run, equations, references and terms check out, every lab is test-run</span></span></div>
+      <div class="fact"><b>2</b><span><span class="zh">独立 AI 审稿：另一个 AI 通读，查推导、数值、史实；例：PLC 第 4 章提出必改 20 条，还查出一个平台 bug</span><span class="en">Independent AI review: e.g. 20 must-fix items in PLC chapter 4, including a platform bug</span></span></div>
+      <div class="fact"><b>3</b><span><span class="zh">主编初审 → 4 教师团队审阅 → 定稿</span><span class="en">Editor review → 4 faculty review → final</span></span></div>
+    </div>
+  </div>
+  <figure class="rv"><div class="shot white"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">《机器人学》第 26 章 · 网页版</span><span class="en">Robotics, chapter 26 · web</span></span></div><img src="m/book26.webp" alt="机器人学第 26 章页面" loading="lazy"></div><figcaption><span class="zh"><b>真实页面</b>：定理有证明；“相差 1.4×10⁻¹⁴ N·m”是程序与 MuJoCo 核对的结果，不是手写的。</span><span class="en"><b>A real page</b>: the theorem is proved; the “1.4×10⁻¹⁴ N·m” agreement with MuJoCo is printed by the program.</span></figcaption></figure>
+</div>
+</section>
+
+<section class="pg alt" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="3Blue1Brown 风格动画|3Blue1Brown-style animation">
+<div class="in split r">
+  <figure class="rv"><div class="vt" data-v data-auto><video src="m/manim_observer.mp4" poster="m/manim_observer.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">动画 26.1.1：用广义动量检测碰撞</span><span class="en">Animation 26.1.1: detecting a collision with generalized momentum</span></b><span class="zh">Manim 渲染，中英字幕</span><span class="en">Rendered with Manim, bilingual captions</span></div></div></figure>
+  <div class="rv">
+    <p class="ey"><span class="k">22</span><span class="zh">动画</span><span class="en">Animation</span></p>
+    <h2 class="t"><span class="zh"><span class="hl">281 段</span>动画，讲静态图讲不了的</span><span class="en"><span class="hl">281 animations</span> for what a still picture can't show</span></h2>
+    <ul class="ck">
+      <li><span class="zh">269 段 Manim（3Blue1Brown 用的工具），12 段三维渲染（机械制造）。</span><span class="en">269 in Manim (the tool behind 3Blue1Brown), 12 rendered in 3D for manufacturing.</span></li>
+      <li><span class="zh">服务器自动渲染：1080p、30 帧，中英字幕，结尾一张公式卡。</span><span class="en">Rendered automatically on the server: 1080p, 30 fps, bilingual captions, a formula card at the end.</span></li>
+      <li><span class="zh">动画里的数值和教材算例是同一组数。</span><span class="en">The numbers in the animation are the same as in the worked example.</span></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="浏览器虚拟实验|In-browser virtual labs">
+<div class="in">
+  <p class="ey rv"><span class="k">23</span><span class="zh">虚拟实验</span><span class="en">Virtual labs</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+  <h2 class="t rv"><span class="zh">打开网页就是实验室，<span class="hl">手机也能做</span></span><span class="en">A lab in a web page, <span class="hl">even on a phone</span></span></h2>
+  <div class="wall rv" style="grid-template-columns:repeat(5,minmax(0,1fr))">
+    <div><b data-n="273">273</b><span><span class="zh">个实验，每个 3–4 个自动判定任务 + 1 个开放问题</span><span class="en">labs, each with 3–4 auto-checked tasks + 1 open question</span></span></div>
+    <div><b data-n="55">55</b><span><span class="zh">个三维实验，用零件库里真实的机器人模型</span><span class="en">3D labs using real robot models</span></span></div>
+    <div><b data-n="15">15</b><span><span class="zh">个 MuJoCo 物理仿真实验</span><span class="en">MuJoCo physics labs</span></span></div>
+    <div><b data-n="5">5</b><span><span class="zh">个 PLC 实验台</span><span class="en">PLC benches</span></span></div>
+    <div><b data-n="546">546</b><span><span class="zh">份 Word：每个实验一份指导书、一份报告模板</span><span class="en">Word files: a guide and a report template per lab</span></span></div>
+  </div>
+  <div class="grid g3 mt rv">
+    <div class="card"><h3><span class="zh">安全：一个网络请求都发不出</span><span class="en">Safe: not one network request</span></h3><p><span class="zh">页面自带内容安全策略；AI 写的实验先过静态检查，16 种危险写法全部拒绝。</span><span class="en">Built-in content security policy; AI-written labs are statically checked and 16 unsafe patterns are refused.</span></p></div>
+    <div class="card"><h3><span class="zh">可靠：交付前先自动试做</span><span class="en">Reliable: test-run before delivery</span></h3><p><span class="zh">无头浏览器按“示范做法”把每个任务做一遍，报错、空白、做不到、偷偷联网都查得出。</span><span class="en">A headless browser performs every task; errors, blank screens, impossible tasks and hidden network calls are caught.</span></p></div>
+    <div class="card"><h3><span class="zh">规范：报告按工程写法</span><span class="en">Rigorous: engineering reports</span></h3><p><span class="zh">报告模板八栏正文、五步建模、AI 使用声明、评分量规。</span><span class="en">Templates with eight sections, five-step modelling, an AI-use statement and a rubric.</span></p></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="现在就试一试|Try it now">
+<div class="in">
+  <p class="ey rv"><span class="k">24</span><span class="zh">现场演示 · 本页实时计算</span><span class="en">Live demo · computed in this page</span></p>
+  <h2 class="t rv"><span class="zh">会失败，<span class="hl">才学得会</span>：倒立摆调参</span><span class="en">Failure teaches: <span class="hl">tune an inverted pendulum</span></span></h2>
+  <div class="lab rv">
+    <div class="btns">
+      <button type="button" class="btn" id="cp-a" aria-pressed="true"><span class="zh">只控制摆角</span><span class="en">Angle loop only</span></button>
+      <button type="button" class="btn" id="cp-b" aria-pressed="false"><span class="zh">加入小车位置环</span><span class="en">Add cart position loop</span></button>
+      <button type="button" class="btn hot" id="cp-push"><span class="zh">推一下 25 N</span><span class="en">Push 25 N</span></button>
+    </div>
+    <div class="scrollx"><canvas id="cart" width="1200" height="430" aria-label="倒立摆仿真"></canvas></div>
+  </div>
+  <p class="foot rv"><span class="zh">RK4 积分、步长 2 ms、控制周期 10 ms。只控摆角时摆能立住，小车却冲出导轨；加上位置环，冲击后能恢复。平台上的实验还会采集指标、按量规给出评语。</span><span class="en">RK4, 2 ms step, 10 ms control period. With the angle loop alone the pole stays up but the cart runs off the rail; add the position loop and it recovers.</span></p>
+</div>
+</section>
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="浏览器里的 MuJoCo|MuJoCo in the browser">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">25</span><span class="zh">物理仿真实验</span><span class="en">Physics labs</span></p>
+    <h2 class="t"><span class="zh">DeepMind 的 MuJoCo，<span class="hl">在浏览器里逐位一致</span></span><span class="en">DeepMind's MuJoCo, <span class="hl">bit-identical in the browser</span></span></h2>
+    <p class="lead"><span class="zh">用官方浏览器版 MuJoCo 3.14.0，自己托管、不连外网。UR5e、FR3 的模型取自 MuJoCo Menagerie，质量、惯量与原版逐位相同。</span><span class="en">The official MuJoCo 3.14.0 for the browser, self-hosted. UR5e and FR3 models come from MuJoCo Menagerie with identical mass properties.</span></p>
+    <div class="facts">
+      <div class="fact"><b>5000</b><span><span class="zh">步：同一个翻滚长方体，网页版与 Python 版角速度逐位相同</span><span class="en">steps of a tumbling box: angular velocity bit-identical between browser and Python</span></span></div>
+      <div class="fact"><b>−98.77</b><span><span class="zh">N·m：UR5e 带 5 kg、手臂水平时关节 2 的重力矩，两版相同</span><span class="en">N·m: joint-2 gravity torque of a UR5e with 5 kg, arm level, the same in both</span></span></div>
+      <div class="fact"><b>&lt; 1%</b><span><span class="zh">实验 26.3：浏览器里跑激励轨迹，边测边辨识出负载质量</span><span class="en">Lab 26.3: identify the payload mass live from an excitation run</span></span></div>
+    </div>
+  </div>
+  <figure class="rv"><div class="shot white"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">实验 26.3 · 辨识负载</span><span class="en">Lab 26.3 · payload identification</span></span></div><img src="m/lab26_3.webp" alt="实验 26.3" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg alt" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="机器人实验一览|Robot labs">
+<div class="in">
+  <p class="ey rv"><span class="k">26</span><span class="zh">《机器人学》实验一览</span><span class="en">A few Robotics labs</span></p>
+  <h2 class="t rv"><span class="zh">每个实验都从<span class="hl">一个机器人问题</span>开始</span><span class="en">Every lab starts from <span class="hl">a robot problem</span></span></h2>
+  <div class="grid g4 mt rv">
+    <figure><div class="shot white fix"><img src="m/lab25_5.webp" alt="实验 25.5" loading="lazy"></div><figcaption><span class="zh"><b>换一个更重的工件，这台 UR5e 还行吗？</b>负载加到多少、哪个关节先超限。</span><span class="en"><b>Heavier part — can this UR5e still cope?</b> Which joint hits its limit first.</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/lab24_1.webp" alt="实验 24.1" loading="lazy"></div><figcaption><span class="zh"><b>吊着的毛坯箱一路晃</b>：桁架吊运怎样加速才不晃。</span><span class="en"><b>A hanging crate keeps swinging</b>: how to accelerate a gantry without sway.</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/lab22_6.webp" alt="实验 22.6" loading="lazy"></div><figcaption><span class="zh"><b>从料架到卡盘，怎样最快又不晃</b>：四种轨迹做法比节拍。</span><span class="en"><b>Rack to chuck, fast and steady</b>: four trajectory methods compared.</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/lab13_1.webp" alt="实验 13.1" loading="lazy"></div><figcaption><span class="zh"><b>手册上的 DH 表按哪种约定</b>：标准 DH 与改进 DH 对照。</span><span class="en"><b>Which DH convention is the manual using?</b> Standard vs modified.</span></figcaption></figure>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="PLC 实验台|PLC bench">
+<div class="in split eq">
+  <div class="rv">
+    <p class="ey"><span class="k">27</span><span class="zh">PLC 实验台</span><span class="en">PLC bench</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">写的 PLC 程序，<span class="hl">让工厂跑满一个班</span></span><span class="en">Your PLC program <span class="hl">runs a full shift</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh">自研引擎：IEC 61131-3 结构化文本、梯形图（运行时能流绿色显示）、SFC，标准功能块。</span><span class="en">Own engine: IEC 61131-3 structured text, ladder (live power flow), SFC, standard blocks.</span></li>
+      <li><span class="zh">扫描周期、输入映像、看门狗、强制、时序图；可注入故障做自动化测试；PLCopen XML 导入导出。</span><span class="en">Scan cycle, image table, watchdog, forcing, timing charts; fault injection; PLCopen XML.</span></li>
+      <li><span class="zh">OpenPLC 兼容：MatIEC 编译，经 Modbus 控制同一台虚拟设备。</span><span class="en">OpenPLC check: compiled with MatIEC, driving the same virtual machine over Modbus.</span></li>
+    </ul>
+  </div>
+  <div class="facts rv">
+    <div class="fact"><b>1,760</b><span><span class="zh">件：书中程序在数字工厂虚拟压装工位跑 8 小时（约 20 秒算完），合格率 96.7%</span><span class="en">parts in an 8-hour shift on the virtual press station (computed in ~20 s), 96.7% good</span></span></div>
+    <div class="fact"><b>108 <span class="zh">分钟</span><span class="en">min</span></b><span><span class="zh">停机：没有故障处理的对照程序，问题一目了然</span><span class="en">of downtime for the same program without fault handling</span></span></div>
+    <div class="fact"><b>226/301</b><span><span class="zh">输送带 5 m/s 时普通输入只数到 226 件，高速计数器一个不漏——扫描周期的道理一试就懂</span><span class="en">At 5 m/s a normal input counts 226 of 301 parts; a high-speed counter misses none</span></span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="芯片：从晶体管到版图|Chips: transistor to layout">
+<div class="in split eq">
+  <div class="rv">
+    <p class="ey"><span class="k">28</span><span class="zh">微电子</span><span class="en">Microelectronics</span></p>
+    <h2 class="t"><span class="zh">在浏览器里，<span class="hl">从晶体管做到可流片的版图</span></span><span class="en">In the browser, <span class="hl">from transistor to tape-out-ready layout</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh"><b>浏览器 SPICE</b>（ngspice）与实验台模型最大偏差 0.01 mV。</span><span class="en"><b>Browser SPICE</b> (ngspice), within 0.01 mV of the lab's own models.</span></li>
+      <li><span class="zh"><b>浏览器 Verilog</b>：Yosys 综合 → 门级电路图；手机改为服务器综合。</span><span class="en"><b>Browser Verilog</b>: Yosys synthesis → gate-level schematic; phones use server synthesis.</span></li>
+      <li><span class="zh"><b>开源工艺 SKY130</b>：Xschem、Magic、KLayout、LibreLane 全套镜像；教材器件参数按 SKY130 校准，误差 ≤ 1%。</span><span class="en"><b>Open SKY130 process</b> with the full open toolchain; textbook device parameters calibrated within 1%.</span></li>
+    </ul>
+  </div>
+  <div class="facts rv">
+    <div class="fact"><b>0 / 0</b><span><span class="zh">反相器 DRC 违例 0、LVS 一致，面积 17.38 μm²</span><span class="en">DRC errors and LVS mismatches for the inverter; area 17.38 μm²</span></span></div>
+    <div class="fact"><b>28.1 ns</b><span><span class="zh">setup 余量：一个只看指导书的 AI“测试学生”从头做到 Tiny Tapeout 格式的流片就绪版图，DRC、LVS、天线都为 0</span><span class="en">setup slack: an AI “test student” given only the lab guide reached a Tiny Tapeout-ready layout, clean DRC, LVS and antenna</span></span></div>
+    <div class="fact"><b>~2 <span class="zh">分钟</span><span class="en">min</span></b><span><span class="zh">计数器 RTL → GDS，内存峰值 654 MB</span><span class="en">counter RTL → GDS, 654 MB peak memory</span></span></div>
+  </div>
+</div>
+</section>
+
+<!-- ================= 第三部分 数字工厂 ================= -->
+<section class="pg div" data-part="数字工厂|Digital factory" data-t="第三部分：数字工厂|Part 3: Digital factory">
+<div class="in rv">
+  <div class="part">03</div>
+  <h2><span class="zh">一座真实运转的数字工厂</span><span class="en">A digital factory that really runs</span></h2>
+  <p class="lead"><span class="zh">问渠减速器厂：产品是 WQR-105 二级圆柱齿轮减速器，12 个工作单元、2 台 AGV、三坐标测量。教学模式下学生扮演计划员、工艺员、操作工、质检员、厂长；生产模式就是企业的日常工作台。</span><span class="en">The WenQuest reducer plant builds the WQR-105 two-stage reducer, with 12 work cells, 2 AGVs and a CMM. In teaching mode students play planner, process engineer, operator, inspector and plant manager; in production mode it is a company's daily workbench.</span></p>
+  <div class="chips"><span>CAD · PLM</span><span>CAE · CFD · MBD</span><span>CAM</span><span>ERPNext</span><span>MES</span><span>QMS</span><span><span class="zh">数字孪生</span><span class="en">Digital twin</span></span><span><span class="zh">厂情中枢</span><span class="en">Factory hub</span></span></div>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="一条数据总线|One data bus">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">30</span><span class="zh">架构</span><span class="en">Architecture</span></p>
+    <h2 class="t"><span class="zh">所有软件、设备和 AI，<span class="hl">只走一条数据总线</span></span><span class="en">Every program, machine and AI <span class="hl">talks over one bus</span></span></h2>
+    <p class="lead"><span class="zh">统一数据总线 MQTT，每条消息存进历史库。改一次设计，下游自动跟着变；车间只拿到批准过的版本。</span><span class="en">One MQTT bus; every message is stored. Change a design once and everything downstream follows; the shop floor only ever receives approved revisions.</span></p>
+    <div class="facts">
+      <div class="fact"><b>57</b><span><span class="zh">个工作台页面，406 个接口</span><span class="en">workbench pages, 406 endpoints</span></span></div>
+      <div class="fact"><b>13</b><span><span class="zh">个 BOM 在 ERPNext 里，WQR-105 标准成本约 1,232 美元</span><span class="en">BOMs in ERPNext; WQR-105 standard cost about $1,232</span></span></div>
+      <div class="fact"><b>17</b><span><span class="zh">个数字工厂实验，从闭环、强度疲劳到订单毛利与现金</span><span class="en">factory labs, from closed-loop control to order margin and cash</span></span></div>
+    </div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">三维车间 · 设备状态与 AGV 实时同步</span><span class="en">3D shop · live machine states and AGVs</span></span></div><img src="m/fx_3d.webp" alt="三维车间" loading="lazy"></div></figure>
+</div>
+</section>
+
+<!-- order story: 7 pages -->
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="一张订单 · 1 接单|One order · 1 Order in">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">01 · ORDER</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">接单，<span class="hl">一屏看清工厂</span></span><span class="en">Order in, <span class="hl">the plant at a glance</span></span></h2>
+    <p class="lead"><span class="zh">跟着减速器 WQR-105 的输出轴 SH-301，从接单走到交付之后。客户下单，或用参数配置器报价；首页一屏看清准时交付率、在制品、OEE、一次合格率，还有 AI 今日简报，每 5 秒刷新。</span><span class="en">Follow output shaft SH-301 of the WQR-105 from order to after-sales. A customer orders, or the configurator quotes; the home screen shows on-time delivery, WIP, OEE and first-pass yield plus an AI daily brief, refreshed every 5 s.</span></p>
+    <div class="stepbar"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/home.jpg" alt="运营总览" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="一张订单 · 2 设计|One order · 2 Design">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">02 · DESIGN</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">改参数、校核、<span class="hl">发布即生成图纸和 G 代码</span></span><span class="en">Change, check, <span class="hl">release drawings and G-code</span></span></h2>
+    <p class="lead"><span class="zh">按轴段改直径、长度和键槽，系统按国标自动校核。批准后自动生成 STEP 模型、零件图和铣键槽 G 代码，ERPNext 物料版本加一、BOM 更新，新程序随工单派到车间，全程留痕。也接 FreeCAD、SolidWorks 宏和任何 CAD 导出的 STEP。</span><span class="en">Edit each step's diameter, length and keyway; standards are checked automatically. On approval the STEP model, drawing and keyway G-code are generated, the ERPNext item revision and BOM update, and the new program goes to the shop with the work order. FreeCAD, SolidWorks and any STEP file plug in too.</span></p>
+    <div class="stepbar"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/design.jpg" alt="设计" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="一张订单 · 3 仿真|One order · 3 Simulate">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">03 · SIMULATE</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">一句话设置，<span class="hl">AI 解释结果</span></span><span class="en">Set it up in a sentence, <span class="hl">the AI explains it</span></span></h2>
+    <p class="lead"><span class="zh">Gmsh 网格 + CalculiX 求解：应力、变形、安全系数云图和 Word 报告；疲劳用博世开源的 pyLife，载荷谱可以直接用仿真车间里真实的转矩记录。图中是尖角设计的 SH-301 在 350 N·m 下的结果：最大应力 267.3 MPa、安全系数 1.33，界面直接提示加圆角。</span><span class="en">Gmsh + CalculiX: stress, deflection, safety-factor maps and a Word report; fatigue with Bosch's open-source pyLife, using real torque records from the virtual shop. Shown: SH-301 with a sharp corner at 350 N·m — 267.3 MPa peak, safety factor 1.33, and a prompt to add a fillet.</span></p>
+    <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/cae.jpg" alt="有限元" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="一张订单 · 4 计划|One order · 4 Plan">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">04 · PLAN</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">先算料，<span class="hl">人确认后再写入 ERP</span></span><span class="en">Plan materials, <span class="hl">confirm, then write to ERP</span></span></h2>
+    <p class="lead"><span class="zh">净需求 = 毛需求 + 占用 + 安全库存 − 库存 − 在途。系统生成工单和请购<b>提议</b>，人确认后才经桥接写进 ERPNext，再下达车间。AI 只提议，不越权。</span><span class="en">Net need = gross + allocated + safety stock − on hand − on order. The system <b>proposes</b> work orders and purchase requests; nothing reaches ERPNext until a person confirms. The AI proposes, never overreaches.</span></p>
+    <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/mrp.jpg" alt="MRP" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="一张订单 · 5 生产|One order · 5 Make">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">05 · MAKE</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">车间开工，<span class="hl">数据实时推送</span></span><span class="en">The shop runs, <span class="hl">data streams live</span></span></h2>
+    <p class="lead"><span class="zh">工单按工序派到 12 个工作单元。车间终端派工、报工、换刀、停机、复位；主轴转速、刀具寿命、最近事件经 MQTT 实时推送，三维车间同步显示。</span><span class="en">Work orders go to 12 work cells. Terminals dispatch, report, change tools, stop and reset; spindle speed, tool life and events stream live over MQTT, mirrored in the 3D shop.</span></p>
+    <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/mes.jpg" alt="车间终端" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="一张订单 · 6 质量|One order · 6 Quality">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">06 · QUALITY</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">控制图、不合格品、<span class="hl">8D</span></span><span class="en">Control charts, NCRs, <span class="hl">8D</span></span></h2>
+    <p class="lead"><span class="zh">控制图盯住轴承位 Ø35 k6 等 6 个关键特性；超差自动开不合格品单，严重问题走 8D。教学模式下，老师可以埋一个隐藏问题让学生去找。</span><span class="en">Charts watch six key features such as the Ø35 k6 bearing seat; out-of-tolerance parts open an NCR automatically, serious ones go to 8D. In teaching mode the instructor can plant a hidden fault.</span></p>
+    <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/quality.jpg" alt="质量" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="一张订单 · 7 售后|One order · 7 Service">
+<div class="in split w">
+  <div class="rv">
+    <p class="stepk">07 · SERVICE</p>
+    <h2 class="t" style="margin-top:12px"><span class="zh">卖出去的每一台，<span class="hl">都有一个数字分身</span></span><span class="en">Every unit sold <span class="hl">has a digital twin</span></span></h2>
+    <p class="lead"><span class="zh">出厂数据 + 现场数据 + 寿命模型（轴承 L10、轴疲劳、热平衡、润滑油）→ 健康度、剩余寿命、报警和“假如”分析；振动按 ISO 10816-1 分区；一键开维修单进 ERPNext。</span><span class="en">Factory data + field data + life models (bearing L10, shaft fatigue, heat balance, oil) → health, remaining life, alarms and what-ifs; vibration zoned per ISO 10816-1; one click opens a service order in ERPNext.</span></p>
+    <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/twin.jpg" alt="数字孪生" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="CAE 全家|The CAE suite">
+<div class="in">
+  <p class="ey rv"><span class="k">38</span><span class="zh">仿真与制造</span><span class="en">Simulation and manufacturing</span></p>
+  <h2 class="t rv"><span class="zh">不装软件，<span class="hl">浏览器里做全套仿真</span></span><span class="en">No installs. <span class="hl">The full simulation suite in a browser</span></span></h2>
+  <div class="grid g3 mt rv">
+    <figure><div class="shot fix"><img src="img/cfd.jpg" alt="CFD" loading="lazy"></div><figcaption><span class="zh"><b>CFD</b>：OpenFOAM 虚拟风洞，算阻力和每个面的散热系数，一键送温度场。</span><span class="en"><b>CFD</b>: an OpenFOAM wind tunnel; drag and per-face heat transfer feed the thermal model.</span></figcaption></figure>
+    <figure><div class="shot fix"><img src="img/mbd.jpg" alt="多体动力学" loading="lazy"></div><figcaption><span class="zh"><b>多体动力学（类 ADAMS）</b>：MuJoCo 算关节力矩、功率，自动选电机和减速器。</span><span class="en"><b>Multibody (ADAMS-like)</b>: MuJoCo torques and power, then motor and gearbox selection.</span></figcaption></figure>
+    <figure><div class="shot fix"><img src="img/cam.jpg" alt="CAM" loading="lazy"></div><figcaption><span class="zh"><b>CAM</b>：数控车、2.5 轴铣，FANUC G 代码；浏览器里试切，查超程、超速、撞刀。</span><span class="en"><b>CAM</b>: CNC turning and 2.5-axis milling, FANUC G-code, simulated cutting with crash checks.</span></figcaption></figure>
+  </div>
+  <div class="grid g3 mt rv">
+    <div class="fact"><b>89.6 ℃</b><span><span class="zh">减速器箱体有限元外表面平均温度，与教材公式 89.6 ℃ 一致</span><span class="en">FEA casing temperature, equal to the textbook formula</span></span></div>
+    <div class="fact"><b>16</b><span><span class="zh">次有限元，Optuna 找到更轻的轴：1.204 kg、安全系数 1.46、无限寿命（原设计 0.82 不合格）</span><span class="en">FEA runs for Optuna to find a lighter shaft: 1.204 kg, SF 1.46, infinite life (the original's 0.82 failed)</span></span></div>
+    <div class="fact"><b>SIMP</b><span><span class="zh">拓扑优化减重，减完再用有限元复核</span><span class="en">topology optimization, always re-checked by FEA</span></span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="厂情中枢|The factory hub">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">39</span><span class="zh">厂情中枢 · 对标 Palantir</span><span class="en">Factory hub · Palantir-class</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">看见问题、追到原因、<span class="hl">推演方案、人批准再执行</span></span><span class="en">Spot it, trace it, <span class="hl">simulate options, act on approval</span></span></h2>
+    <div class="facts">
+      <div class="fact"><b>97</b><span><span class="zh">类对象、114 种关系的工厂本体，覆盖 15 个领域，可按时间回看</span><span class="en">object types and 114 relations in the factory ontology, across 15 domains, with time travel</span></span></div>
+      <div class="fact"><b>61</b><span><span class="zh">条异常规则 + 因果链追因 + 指挥台 + 推演工作台</span><span class="en">anomaly rules + causal tracing + command desk + scenario bench</span></span></div>
+      <div class="fact"><b>74</b><span><span class="zh">道 AI 代理评测题：调工具、带引用、数字由程序核对，写操作必须人批准</span><span class="en">AI-agent evaluation cases: tool use, citations, numbers checked by code, writes require approval</span></span></div>
+    </div>
+    <p class="foot"><span class="zh">提醒和日报周报可推送到企业微信、钉钉、飞书群机器人和邮件。没接大模型时，规则版照样能用。</span><span class="en">Alerts and reports go to WeCom, DingTalk, Feishu or email. Without a model, the rule-based version still works.</span></p>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">指挥台 · 因果链</span><span class="en">Command desk · causal chain</span></span></div><img src="m/f_hub.webp" alt="厂情中枢指挥台" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="磨床停机之后|After the grinder stops">
+<div class="in">
+  <p class="ey rv"><span class="k">40</span><span class="zh">示意动画 · 本页实时运行</span><span class="en">Illustration · running live</span></p>
+  <h2 class="t rv"><span class="zh">磨床停机之后：<span class="hl">追因、推演、建议</span></span><span class="en">After the grinder stops: <span class="hl">trace, simulate, recommend</span></span></h2>
+  <p class="lead rv"><span class="zh">零件流经 8 个工作中心；圆点是排队的零件，橙色是停机。磨床停下后积压、订单延期风险上升；中枢提议“换砂轮 + 重排工单”，计划员确认后执行。</span><span class="en">Parts flow through 8 work centres; dots are queued parts, orange means down. The grinder stops, the queue builds, the order is at risk; the hub proposes a wheel change and reschedule, and the planner approves.</span></p>
+  <div class="lab rv" style="padding:8px"><div class="scrollx"><canvas id="cq" width="1664" height="600" aria-label="厂情中枢示意动画"></canvas></div></div>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="一个电话追到一片砂轮|From one phone call to one grinding wheel">
+<div class="in">
+  <p class="ey rv"><span class="k">41</span><span class="zh">数字主线 · 教学情景</span><span class="en">Digital thread · teaching scenario</span></p>
+  <h2 class="t rv"><span class="zh">一个客户电话，<span class="hl">追到一片砂轮</span></span><span class="en">One customer call, <span class="hl">traced to one grinding wheel</span></span></h2>
+  <div class="flow rv">
+    <div><b><span class="zh">客户来电</span><span class="en">Customer calls</span></b><span><span class="zh">减速器振动报警</span><span class="en">A reducer vibration alarm</span></span></div>
+    <div><b><span class="zh">追到那根轴</span><span class="en">To the shaft</span></b><span><span class="zh">序列号 → 批次 → 工序记录</span><span class="en">Serial → lot → operations</span></span></div>
+    <div><b><span class="zh">那台磨床、那片砂轮</span><span class="en">The grinder, the wheel</span></b><span><span class="zh">设备与刀具记录</span><span class="en">Machine and tool records</span></span></div>
+    <div><b><span class="zh">同一片砂轮还磨了谁</span><span class="en">What else it ground</span></b><span><span class="zh">装进了哪些客户的设备</span><span class="en">And which customers got them</span></span></div>
+    <div><b><span class="zh">三个服务方案</span><span class="en">Three service options</span></b><span><span class="zh">按孪生健康度排序</span><span class="en">Ranked by twin health</span></span></div>
+  </div>
+  <div class="split eq mt2 rv">
+    <p class="quote" style="font-size:clamp(24px,2.6vw,38px)"><span class="zh">推荐方案 B：比 C <span class="hl">少通知一家客户、少花 $480</span>，也不漏掉高风险的那台。</span><span class="en">Recommended option B notifies <span class="hl">one fewer customer and costs $480 less</span> than C, without missing the high-risk unit.</span></p>
+    <figure><div class="shot"><img src="m/f_hub2.webp" alt="指挥台" loading="lazy"></div></figure>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="七个领域包|Seven domain packs">
+<div class="in">
+  <p class="ey rv"><span class="k">42</span><span class="zh">领域包</span><span class="en">Domain packs</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+  <h2 class="t rv"><span class="zh">不止生产：<span class="hl">一座工厂的七个侧面</span></span><span class="en">Beyond production: <span class="hl">seven sides of a plant</span></span></h2>
+  <div class="grid g4 mt rv">
+    <div class="card"><span class="tag">E1</span><h3><span class="zh">客户与服务</span><span class="en">Customers &amp; service</span></h3><p><span class="zh">投诉、追溯、召回</span><span class="en">Complaints, traceability, recalls</span></p></div>
+    <div class="card"><span class="tag">E2</span><h3><span class="zh">安全环保</span><span class="en">Safety &amp; environment</span></h3><p><span class="zh">挂牌上锁、隐患随手拍</span><span class="en">Lockout-tagout, hazard snapshots</span></p></div>
+    <div class="card"><span class="tag">E3</span><h3><span class="zh">设备维护与资产</span><span class="en">Maintenance &amp; assets</span></h3><p><span class="zh">维护策略、备件</span><span class="en">Strategies, spares</span></p></div>
+    <div class="card"><span class="tag">E4</span><h3><span class="zh">人员与排班</span><span class="en">People &amp; shifts</span></h3><p><span class="zh">技能矩阵、缺人应对</span><span class="en">Skills matrix, absences</span></p></div>
+    <div class="card"><span class="tag">E5</span><h3><span class="zh">供应链</span><span class="en">Supply chain</span></h3><p><span class="zh">来料检验、供应商选择</span><span class="en">Incoming inspection, supplier choice</span></p></div>
+    <div class="card"><span class="tag">E6</span><h3><span class="zh">能源与环境</span><span class="en">Energy</span></h3><p><span class="zh">空转、错峰、单件碳足迹</span><span class="en">Idling, peak shifting, carbon per part</span></p></div>
+    <div class="card"><span class="tag">E7</span><h3><span class="zh">经营与财务</span><span class="en">Business &amp; finance</span></h3><p><span class="zh">订单毛利、应收、现金</span><span class="en">Order margin, receivables, cash</span></p></div>
+    <div class="card" style="border-color:var(--amber)"><span class="tag" style="color:var(--amber)">+</span><h3><span class="zh">每个领域都配实验</span><span class="en">A lab for each</span></h3><p><span class="zh">实验 15–23：追因、召回、隐患、维护、排班、来料、碳足迹、毛利</span><span class="en">Labs 15–23 cover each domain</span></p></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="两周情景|A two-week scenario">
+<div class="in split r">
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">情景导演</span><span class="en">Scenario director</span></span></div><img src="m/sc_director.webp" alt="情景导演" loading="lazy"></div></figure>
+  <div class="rv">
+    <p class="ey"><span class="k">43</span><span class="zh">情景教学</span><span class="en">Scenario teaching</span></p>
+    <h2 class="t"><span class="zh">一张急单，<span class="hl">八幕戏</span>演完一座工厂</span><span class="en">One rush order, <span class="hl">eight acts</span>, the whole plant</span></h2>
+    <ol class="ck" style="list-style:none;padding:0;margin:20px 0 0;display:grid;gap:8px;color:var(--muted)">
+      <li><span class="zh">① 客户下急单　② 缺料　③ 来料不合格　④ 缺人</span><span class="en">① Rush order ② Shortage ③ Bad incoming lot ④ Short-staffed</span></li>
+      <li><span class="zh">⑤ 赶工时的安全隐患　⑥ 设备劣化　⑦ 空转与峰时　⑧ 交付开票，应收逾期</span><span class="en">⑤ Safety hazard under pressure ⑥ Machine wear ⑦ Idling and peak power ⑧ Invoiced, payment late</span></li>
+    </ol>
+    <p class="lead"><span class="zh">最后自动复盘。老师可以快进、自动演示；手机上也能当导演。每次部署前，系统都在真 ERPNext 上把八幕走一遍才放行。</span><span class="en">It ends with an automatic debrief. Teachers can fast-forward or auto-play, even from a phone. Every deployment first plays all eight acts against a real ERPNext.</span></p>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="典型应用：从空库到交付|Case studies: from empty to delivered">
+<div class="in">
+  <p class="ey rv"><span class="k">44</span><span class="zh">典型应用</span><span class="en">Case studies</span></p>
+  <h2 class="t rv"><span class="zh">从空库开始，<span class="hl">10 分钟跑完 34 步</span></span><span class="en">From an empty database, <span class="hl">34 steps in about 10 minutes</span></span></h2>
+  <p class="lead rv"><span class="zh">“设计院 → 工厂”全流程：选型、计算、建模、仿真、工艺、BOM、进 ERP、排产、加工、检验。数据不够就停下来写明缺什么，不估一个数凑结论。</span><span class="en">The full “design office → factory” flow: selection, calculation, modelling, simulation, process plan, BOM, ERP, scheduling, machining, inspection. Missing data stops the run with a note, rather than a guessed number.</span></p>
+  <div class="grid g3 mt rv">
+    <div class="card"><span class="tag">COBOT-J2</span><h3><span class="zh">协作机器人关节</span><span class="en">Cobot joint</span></h3><p><span class="zh">电机、谐波减速器、编码器、刹车；谐波减速器缺输入侧惯量时，惯量比判“待确认”</span><span class="en">Motor, harmonic drive, encoder, brake; a missing inertia value yields “to be confirmed”</span></p></div>
+    <div class="card"><span class="tag">SCARA-600</span><h3>SCARA</h3><p><span class="zh">四轴水平关节机器人从选型到装配</span><span class="en">A four-axis SCARA from selection to assembly</span></p></div>
+    <div class="card"><span class="tag">LOCKSTITCH</span><h3><span class="zh">直驱平缝机</span><span class="en">Direct-drive lockstitch machine</span></h3><p><span class="zh">机构、电控、零件制造进同一座工厂</span><span class="en">Mechanism, controls and parts in one plant</span></p></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="数字工厂|Digital factory" data-t="零件与机器人库|Parts and robot library">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">45</span><span class="zh">零件与机器人库</span><span class="en">Parts and robot library</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">课程、工厂、实验、视频，<span class="hl">共用一个零件库</span></span><span class="en">Courses, factory, labs and video <span class="hl">share one library</span></span></h2>
+    <div class="facts">
+      <div class="fact"><b>1,258</b><span><span class="zh">个标准件规格（20 个族：螺栓、轴承、导轨、丝杠、联轴器……），尺寸按国标、DIN、ISO</span><span class="en">standard-part sizes in 20 families, dimensions per GB, DIN and ISO</span></span></div>
+      <div class="fact"><b>167</b><span><span class="zh">台机器人模型：Menagerie、ROS-Industrial（ABB、FANUC、KUKA、安川）、优傲官方参数，许可证逐个核对</span><span class="en">robot models from Menagerie, ROS-Industrial (ABB, FANUC, KUKA, Yaskawa) and UR's published data; every licence checked</span></span></div>
+      <div class="fact"><b>61</b><span><span class="zh">个工装夹具，另有 10 个机构、12 类机器人零部件（93 个规格）</span><span class="en">fixtures and jigs, plus 10 mechanisms and 12 robot components (93 sizes)</span></span></div>
+    </div>
+    <p class="foot"><span class="zh">按名称、标准号、规格或 ERP 物料号检索（6207、GB/T 1096、M8x25、UR5e）；ERPNext 物料页直接链到零件库。</span><span class="en">Search by name, standard, size or ERP item; ERPNext item pages link straight to it.</span></p>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/library</span></div><img src="img/library.jpg" alt="零件库" loading="lazy"></div></figure>
+</div>
+</section>
+
+<section class="pg" data-part="数字工厂|Digital factory" data-t="一个班一座工厂|A factory per class">
+<div class="in">
+  <p class="ey rv"><span class="k">46</span><span class="zh">部署方式</span><span class="en">Deployment</span></p>
+  <h2 class="t rv"><span class="zh">一个班一座工厂，<span class="hl">一家企业一座工厂</span></span><span class="en">A plant per class, <span class="hl">a plant per company</span></span></h2>
+  <div class="grid g4 mt2 rv">
+    <div class="card"><span class="big">10 <span style="font-size:18px">min</span></span><h3><span class="zh">班级工厂</span><span class="en">Class plants</span></h3><p><span class="zh">每个班一座独立工厂，加一行配置、推送即建好</span><span class="en">One independent plant per class, built from one config line</span></p></div>
+    <div class="card"><span class="big">ERP</span><h3><span class="zh">企业演示工厂</span><span class="en">Company demo plant</span></h3><p><span class="zh">生产模式，自己的 ERPNext，与教学工厂完全分开</span><span class="en">Production mode with its own ERPNext, fully separate</span></p></div>
+    <div class="card"><span class="big">1</span><h3><span class="zh">份工厂清单</span><span class="en">plant manifest</span></h3><p><span class="zh">一份 plant.yaml（可从 Excel 导入）描述一座工厂，新厂不改代码</span><span class="en">One plant.yaml (Excel import) describes a plant; no code changes</span></p></div>
+    <div class="card"><span class="big">USB</span><h3><span class="zh">本地版</span><span class="en">On-premise</span></h3><p><span class="zh">一条命令在机房起整座工厂，U 盘导入镜像，可完全断网</span><span class="en">One command starts the whole plant in a lab, from a USB stick, fully offline</span></p></div>
+  </div>
+  <figure class="mt rv"><div class="duo"><div class="shot fix"><img src="m/sc_review.webp" alt="复盘" loading="lazy"></div><div class="shot fix"><img src="m/f_fin.webp" alt="经营与财务" loading="lazy"></div></div><figcaption><span class="zh"><b>左</b>：情景结束后的自动复盘；<b>右</b>：经营与财务——每张订单的毛利。</span><span class="en"><b>Left</b>: automatic debrief; <b>right</b>: margin per order.</span></figcaption></figure>
+</div>
+</section>
+
+<!-- ================= 第四部分 行业专用软件 ================= -->
+<section class="pg div" data-part="行业专用软件|Industry software" data-t="第四部分：行业专用软件|Part 4: Industry software">
+<div class="in rv">
+  <div class="part">04</div>
+  <h2><span class="zh">把老师傅的经验，<br>做成软件</span><span class="en">Turning veterans' know-how<br>into software</span></h2>
+  <p class="lead"><span class="zh">通用 CAD 能画出零件，但不管它在 5000 r/min 下会不会跳、会不会磨坏。行业专用软件从工作要求出发，校核全做，结果写进计算书，加工误差能拿回来算补偿。</span><span class="en">General CAD can draw the part but won't tell you whether it jumps or wears out at 5000 r/min. Industry software starts from the duty, runs every check, writes the calculation report, and feeds measured errors back into compensation.</span></p>
+  <div class="chips"><span><span class="zh">缝纫机设计与制造</span><span class="en">Sewing-machine design</span></span><span><span class="zh">问渠凸轮</span><span class="en">WenQuest Cam</span></span><span><span class="zh">为企业定制</span><span class="en">Custom for your company</span></span></div>
+</div>
+</section>
+
+<section class="pg" data-part="行业专用软件|Industry software" data-t="缝纫机：改参数当场变红|Sewing: red the moment it's wrong">
+<div class="in">
+  <p class="ey rv"><span class="k">48</span><span class="zh">缝纫机设计与制造软件</span><span class="en">Sewing-machine design software</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+  <h2 class="t rv"><span class="zh">改一个参数，<span class="hl">58 项校核当场亮红绿灯</span></span><span class="en">Change one parameter, <span class="hl">58 checks light up at once</span></span></h2>
+  <div class="duo mt rv">
+    <figure><div class="shot"><img src="m/ls_green.webp" alt="全绿" loading="lazy"></div><figcaption><span class="zh"><b>默认设计</b>：平缝机 21 项全绿，虚拟试缝 30 针全成缝。</span><span class="en"><b>Default</b>: 21 lockstitch checks green, 30 virtual stitches all formed.</span></figcaption></figure>
+    <figure><div class="shot"><img src="m/ls_red.webp" alt="出红灯" loading="lazy"></div><figcaption><span class="zh"><b>转速改 6000、旋梭定时 −20°</b>：4 红 1 黄，30 针全跳针，并给出改法。</span><span class="en"><b>6000 r/min and hook timing −20°</b>: 4 red, 1 amber, all 30 stitches skipped — with the fix.</span></figcaption></figure>
+  </div>
+  <p class="foot rv"><span class="zh">5 种机型：平缝机（21 项）、包缝机（11）、绷缝机（7）、电子花样机（14）、多头刺绣机（5）。每项写数值、判据、出自教材第几讲；不合格时给出改法。</span><span class="en">Five machine types: lockstitch (21 checks), overlock (11), coverstitch (7), electronic pattern (14), multi-head embroidery (5). Each shows the value, the criterion and the lecture it comes from.</span></p>
+</div>
+</section>
+
+<section class="pg alt" data-part="行业专用软件|Industry software" data-t="缝纫机：七种出件|Sewing: seven outputs">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">49</span><span class="zh">出件</span><span class="en">Outputs</span></p>
+    <h2 class="t"><span class="zh">算完直接出<span class="hl">计算书、三维模型和调机卡</span></span><span class="en">Straight to <span class="hl">reports, 3D models and set-up cards</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh"><b>设计计算书、调机卡</b>（Word），参数表与运动曲线（Excel）。</span><span class="en"><b>Design calculation report and set-up card</b> (Word); parameter tables and motion curves (Excel).</span></li>
+      <li><span class="zh"><b>STEP 三维模型</b>：平缝机 16 个零件、包缝机 23 个；FreeCAD 宏、DXF 平板零件。</span><span class="en"><b>STEP models</b>: 16 parts for lockstitch, 23 for overlock; FreeCAD macro and DXF flats.</span></li>
+      <li><span class="zh">花样机出每针转速与用时表、X/Y 轴电机表；刺绣机出针长、转速、头数与效率表。</span><span class="en">Pattern machines get per-stitch speed and X/Y motor tables; embroidery gets needle stroke, speed and head-count tables.</span></li>
+      <li><span class="zh"><b>FreeCAD 工作台</b>与网页版同一个计算核心：导入参数后 21 项校核的结论和数值完全相同。</span><span class="en"><b>FreeCAD workbench</b> on the same core: all 21 checks give identical results.</span></li>
+    </ul>
+  </div>
+  <figure class="rv"><div class="shot white"><img src="m/fig_ps3d_iso.webp" alt="花样机三维模型" loading="lazy"></div><figcaption><span class="zh"><b>电子花样机三维模型</b>：由参数自动生成。</span><span class="en"><b>Electronic pattern sewer</b>, generated from parameters.</span></figcaption></figure>
+</div>
+</section>
+
+<section class="pg" data-part="行业专用软件|Industry software" data-t="缝纫机：接入 CAE|Sewing: plugged into CAE">
+<div class="in">
+  <p class="ey rv"><span class="k">50</span><span class="zh">接入问渠 CAE</span><span class="en">Plugged into WenQuest CAE</span></p>
+  <h2 class="t rv"><span class="zh">减重一定要复核，<span class="hl">软件会直接说不合格</span></span><span class="en">Lightweighting gets re-checked, <span class="hl">and the software says no</span></span></h2>
+  <div class="grid g4 mt rv">
+    <figure><div class="shot white fix"><img src="m/fea.webp" alt="有限元" loading="lazy"></div><figcaption><span class="zh"><b>零件有限元</b>与疲劳</span><span class="en"><b>Part FEA</b> and fatigue</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/topo.webp" alt="拓扑减重" loading="lazy"></div><figcaption><span class="zh"><b>拓扑减重</b> + 有限元复核</span><span class="en"><b>Topology</b> + FEA re-check</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/opt.webp" alt="设计优化" loading="lazy"></div><figcaption><span class="zh"><b>设计优化</b>：7 个目标</span><span class="en"><b>Optimization</b>: 7 objectives</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/tpl_cam.webp" alt="花样模板数控" loading="lazy"></div><figcaption><span class="zh"><b>花样模板</b>数控编程</span><span class="en"><b>Pattern template</b> CNC</span></figcaption></figure>
+  </div>
+  <div class="split eq mt rv">
+    <div class="fact"><b>50% → ✓</b><span><span class="zh">包缝机下弯针摆杆留 50% 材料：复核安全系数 2.9、寿命约 32 年，合格</span><span class="en">Overlock looper rocker at 50% material: SF 2.9, ~32-year life — pass</span></span></div>
+    <div class="fact"><b style="color:var(--warn)">40% → ✗</b><span><span class="zh">留 40%：安全系数 1.1、寿命不到 1 年，不合格。机构动力学与公式对照差 0.9%–1.1%</span><span class="en">At 40%: SF 1.1, under one year — fail. Multibody vs formula: 0.9–1.1% apart</span></span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="行业专用软件|Industry software" data-t="问渠凸轮：设计|WenQuest Cam: design">
+<div class="in split r">
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>wenquestrobotics.com/cam</span></div><img src="m/cam_design.webp" alt="问渠凸轮设计" loading="lazy"></div><figcaption><span class="zh"><b>平缝机挑线槽凸轮</b>：压力角、根切、曲率逐项判定；缺许用值就是“未知”，软件不编。</span><span class="en"><b>A take-up groove cam</b>: pressure angle, undercut and curvature checked; with no allowable value given the verdict is “unknown” — nothing is made up.</span></figcaption></figure>
+  <div class="rv">
+    <p class="ey"><span class="k">51</span><span class="zh">问渠凸轮</span><span class="en">WenQuest Cam</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
+    <h2 class="t"><span class="zh">从运动要求，<span class="hl">一条线做到加工和补偿</span></span><span class="en">From motion requirement <span class="hl">to machining and compensation</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh"><b>8 种运动规律</b>，盘形凸轮（直动/摆动，滚子/平底/尖顶）、槽凸轮、弧面分度凸轮。</span><span class="en"><b>8 motion laws</b>; disc cams (translating/oscillating; roller/flat/knife), groove cams, globoidal indexing cams.</span></li>
+      <li><span class="zh">压力角、根切、曲率、赫兹接触应力、高速跳离转速、驱动力矩。</span><span class="en">Pressure angle, undercut, curvature, Hertz stress, jump speed, drive torque.</span></li>
+      <li><span class="zh">一根轴上多个凸轮：时序图、联锁、电机转矩、停歇段残余振动。</span><span class="en">Multi-cam shafts: timing, interlocks, motor torque, residual vibration.</span></li>
+      <li><span class="zh"><b>AI 起草</b>：一句话出运动程序草稿，句子里没有的数会被清空，不补不猜，点“采用”才替换。</span><span class="en"><b>AI drafting</b>: a sentence becomes a motion program; numbers not in the sentence are cleared, never guessed.</span></li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="行业专用软件|Industry software" data-t="问渠凸轮：测量与补偿|WenQuest Cam: measure and compensate">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">52</span><span class="zh">测量与补偿</span><span class="en">Measure and compensate</span></p>
+    <h2 class="t"><span class="zh">把加工误差拿回来，<span class="hl">算出补偿再磨一遍</span></span><span class="en">Bring the measured error back, <span class="hl">grind it out</span></span></h2>
+    <div class="facts">
+      <div class="fact"><b>&lt;0.02 µm</b><span><span class="zh">补偿 1–6 阶后，1、3 阶剩余误差；17 阶（机床、颤振）原样保留不乱补</span><span class="en">residual 1st/3rd-order error after compensating orders 1–6; order 17 (machine chatter) left alone</span></span></div>
+      <div class="fact"><b>1.0%</b><span><span class="zh">与 MuJoCo 整机多体动力学对照：凸轮轴转矩峰值 374.7 vs 378.5 N·m</span><span class="en">vs MuJoCo multibody: peak camshaft torque 374.7 vs 378.5 N·m</span></span></div>
+      <div class="fact"><b>53/53</b><span><span class="zh">项校核，FreeCAD 版与网页版逐项相同（相对差 ≤ 1×10⁻⁹）；101 项自动测试</span><span class="en">checks identical between FreeCAD and web (≤ 1×10⁻⁹); 101 automated tests</span></span></div>
+    </div>
+    <p class="foot"><span class="zh">出磨床 X–C 程序、铣削程序、慢走丝 DXF、STEP（B 样条偏差 0.007–0.013 µm）。</span><span class="en">Outputs grinder X–C programs, milling programs, wire-EDM DXF and STEP (B-spline deviation 0.007–0.013 µm).</span></p>
+  </div>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>wenquestrobotics.com/cam</span></div><img src="m/cam_comp.webp" alt="测量与补偿" loading="lazy"></div><figcaption><span class="zh"><b>误差谐波分解</b>：1 阶偏心装夹、低阶热处理变形、高阶机床颤振，分得清清楚楚（演示用合成数据）。</span><span class="en"><b>Harmonic breakdown</b> of the error: set-up eccentricity, heat-treat distortion and machine chatter (synthetic demo data).</span></figcaption></figure>
+</div>
+</section>
+
+<!-- ================= 第五部分 为什么可信 ================= -->
+<section class="pg div" data-part="为什么可信|Why trust it" data-t="第五部分：为什么可信|Part 5: Why trust it">
+<div class="in rv">
+  <div class="part">05</div>
+  <h2><span class="zh">AI 原生，<br>但结果可以复核</span><span class="en">AI-native,<br>yet every result checks out</span></h2>
+  <p class="lead"><span class="zh">AI 负责设置和解释，计算交给成熟的求解器；每次改动都自动测试；数据和模型守规矩。</span><span class="en">The AI sets up and explains; proven solvers compute; every change is tested; data and models follow the rules.</span></p>
+</div>
+</section>
+
+<section class="pg" data-part="为什么可信|Why trust it" data-t="站在成熟求解器肩上|On proven solvers">
+<div class="in">
+  <p class="ey rv"><span class="k">54</span><span class="zh">求解器</span><span class="en">Solvers</span></p>
+  <h2 class="t rv"><span class="zh">AI 不算力学：<span class="hl">计算交给工业界验证过的求解器</span></span><span class="en">The AI doesn't do the mechanics: <span class="hl">proven solvers do</span></span></h2>
+  <div class="grid g4 mt2 rv">
+    <div class="card"><span class="tag">FEA</span><h3>CalculiX · Gmsh</h3><p><span class="zh">应力、模态、热、疲劳（pyLife）</span><span class="en">Stress, modal, thermal, fatigue (pyLife)</span></p></div>
+    <div class="card"><span class="tag">CFD</span><h3>OpenFOAM</h3><p><span class="zh">四道标准题核对</span><span class="en">Checked on four benchmarks</span></p></div>
+    <div class="card"><span class="tag">Dynamics</span><h3>MuJoCo 3.14</h3><p><span class="zh">网页版与 Python 版逐位一致</span><span class="en">Browser and Python bit-identical</span></p></div>
+    <div class="card"><span class="tag">ERP</span><h3>ERPNext v16</h3><p><span class="zh">物料、BOM、工单、质检、财务</span><span class="en">Items, BOMs, work orders, QC, finance</span></p></div>
+    <div class="card"><span class="tag">CAD</span><h3>build123d · FreeCAD</h3><p><span class="zh">STEP、零件图、工作台</span><span class="en">STEP, drawings, workbenches</span></p></div>
+    <div class="card"><span class="tag">Render</span><h3>Blender · Manim</h3><p><span class="zh">三维视频、教学动画</span><span class="en">3D video, teaching animation</span></p></div>
+    <div class="card"><span class="tag">EDA</span><h3>ngspice · Yosys · SKY130</h3><p><span class="zh">电路、综合、版图</span><span class="en">Circuits, synthesis, layout</span></p></div>
+    <div class="card"><span class="tag">Optimize</span><h3>Optuna · SIMP</h3><p><span class="zh">参数优化、拓扑优化</span><span class="en">Parameter and topology optimization</span></p></div>
+  </div>
+  <p class="foot rv"><span class="zh">GPL 软件作为服务器上的独立程序调用、以在线服务方式提供，不分发软件本身；不用 AGPL 软件做核心。</span><span class="en">GPL tools run as separate server programs offered as a service, never redistributed; no AGPL software in the core.</span></p>
+</div>
+</section>
+
+<section class="pg alt" data-part="为什么可信|Why trust it" data-t="每次推送全部检查|Every push, fully checked">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">55</span><span class="zh">工程纪律</span><span class="en">Engineering discipline</span></p>
+    <h2 class="t"><span class="zh">推送即上线，<span class="hl">所以每次都要全检</span></span><span class="en">Push means production, <span class="hl">so everything is checked</span></span></h2>
+    <p class="lead"><span class="zh">推送到主分支后自动测试 → 构建网页版、小程序版和 7 个平台镜像 → 部署 → 部署后检查。每周自动重建一次，拿到 Moodle 安全更新。</span><span class="en">A push to main runs tests → builds web, mini-program and 7 platform images → deploys → verifies. A weekly rebuild picks up Moodle security updates.</span></p>
+  </div>
+  <div class="tbl rv" style="margin-top:0"><table style="min-width:0">
+    <thead><tr><th><span class="zh">部分</span><span class="en">Part</span></th><th class="n"><span class="zh">测试项</span><span class="en">Tests</span></th></tr></thead>
+    <tbody>
+      <tr><td><span class="zh">数字工厂</span><span class="en">Digital factory</span></td><td class="n">587</td></tr>
+      <tr><td><span class="zh">学习平台网关</span><span class="en">Platform gateway</span></td><td class="n">291</td></tr>
+      <tr><td><span class="zh">零件库</span><span class="en">Parts library</span></td><td class="n">165</td></tr>
+      <tr><td><span class="zh">凸轮计算内核</span><span class="en">Cam kernel</span></td><td class="n">101</td></tr>
+      <tr><td><span class="zh">教材构建工具、实验、动画、语音等</span><span class="en">Book tools, labs, animation, voice…</span></td><td class="n">95</td></tr>
+      <tr><td><span class="zh">PLC 引擎、前端、Moodle 插件</span><span class="en">PLC engine, front end, Moodle plugin</span></td><td class="n">46</td></tr>
+      <tr class="sum"><td><span class="zh">合计</span><span class="en">Total</span></td><td class="n">~1,285</td></tr>
+    </tbody>
+  </table></div>
+</div>
+</section>
+
+<section class="pg" data-part="为什么可信|Why trust it" data-t="合规与国内部署|Compliance and China deployment">
+<div class="in">
+  <p class="ey rv"><span class="k">56</span><span class="zh">合规</span><span class="en">Compliance</span></p>
+  <h2 class="t rv"><span class="zh">国内部署<span class="hl">只用已备案模型</span>，数据不出平台</span><span class="en">In China, <span class="hl">only registered models</span>; data stays on the platform</span></h2>
+  <div class="grid g3 mt2 rv">
+    <div class="card"><span class="tag">Region switch</span><h3><span class="zh">一个开关切地区</span><span class="en">One region switch</span></h3><p><span class="zh">国内只用 DeepSeek，出错也不换境外模型；Claude 只用于美国。备份可选阿里云 OSS、腾讯云 COS。</span><span class="en">China uses DeepSeek only, with no fallback abroad; Claude is US-only. Backups to Alibaba OSS or Tencent COS.</span></p></div>
+    <div class="card"><span class="tag">Zero external</span><h3><span class="zh">零外部请求</span><span class="en">Zero external requests</span></h3><p><span class="zh">字体、three.js、KaTeX、MuJoCo 全部放本站；CI 检查页面里不许出现公共 CDN。</span><span class="en">Fonts, three.js, KaTeX and MuJoCo are self-hosted; CI fails any page that calls a public CDN.</span></p></div>
+    <div class="card"><span class="tag">Local AI</span><h3><span class="zh">关键服务本地运行</span><span class="en">Key services run locally</span></h3><p><span class="zh">语音合成与识别、动画渲染、实验检查都在自己的服务器上，不经第三方。</span><span class="en">Speech, animation rendering and lab checking run on our own servers.</span></p></div>
+  </div>
+  <p class="foot rv"><span class="zh">国内正式上线（ICP 备案、国内服务器、小程序备案）按《国内部署指南》推进，属于下一步工作。</span><span class="en">Formal launch in China (ICP filing, local servers, mini-program filing) follows the China deployment guide and is the next step.</span></p>
+</div>
+</section>
+
+<section class="pg paper" data-part="为什么可信|Why trust it" data-t="中英双语全覆盖|Bilingual throughout">
+<div class="in split eq">
+  <div class="rv">
+    <p class="ey"><span class="k">57</span><span class="zh">双语</span><span class="en">Bilingual</span></p>
+    <h2 class="t"><span class="zh">中文、English，<span style="color:#A46F0C">一键切换</span></span><span class="en">Chinese and English, <span style="color:#A46F0C">one click</span></span></h2>
+    <p class="lead"><span class="zh">中国的学校、美国的学校、走出去的企业，用的是同一套内容。</span><span class="en">Chinese schools, American schools and exporting companies all use the same content.</span></p>
+  </div>
+  <ul class="ck rv">
+    <li><span class="zh"><b>平台</b>：界面、课程名称、正文按用户语言显示</span><span class="en"><b>Platform</b>: UI, course names and content follow the user</span></li>
+    <li><span class="zh"><b>教材</b>：23 章英文全文，5,878 条中英术语</span><span class="en"><b>Books</b>: 23 chapters in English, 5,878 bilingual terms</span></li>
+    <li><span class="zh"><b>动画、课件、讲解视频</b>：中英字幕、中英配音，可从同一时刻切换</span><span class="en"><b>Animation, slides, video</b>: bilingual captions and voice, switchable mid-play</span></li>
+    <li><span class="zh"><b>软件</b>：官网、凸轮、缝纫机软件、数字工厂帮助都有中英文</span><span class="en"><b>Software</b>: website, Cam, sewing software and factory help in both languages</span></li>
+  </ul>
+</div>
+</section>
+
+<!-- ================= 第六部分 合作 ================= -->
+<section class="pg div" data-part="合作|Work with us" data-t="第六部分：合作|Part 6: Work with us">
+<div class="in rv">
+  <div class="part">06</div>
+  <h2><span class="zh">给学校、给企业、给老师</span><span class="en">For schools, companies and teachers</span></h2>
+  <p class="lead"><span class="zh">每个模块都能单独用，也能任意组合、整套上，或者为你定制。</span><span class="en">Use any module on its own, combine them, take the whole platform, or have it tailored.</span></p>
+</div>
+</section>
+
+<section class="pg" data-part="合作|Work with us" data-t="给学校|For schools">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">59</span><span class="zh">学校</span><span class="en">Schools</span></p>
+    <h2 class="t"><span class="zh">合作学校<span class="hl">首年免费</span></span><span class="en">Partner schools: <span class="hl">first year free</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh">老师负担交给 AI：有资料、没资料，都能建出完整的课（内容、课件、视频、作业、测验、考试）。</span><span class="en">The AI carries the teacher's load: complete courses with or without materials.</span></li>
+      <li><span class="zh">学生在会运转的数字工厂里扮演岗位，每班一座工厂，老师看得到每个人做了什么。</span><span class="en">Students take real roles in a working factory, one per class, with every action visible.</span></li>
+      <li><span class="zh">可申报“人工智能 + 高等教育”应用场景典型案例、虚拟仿真实验教学一流课程、教改项目。</span><span class="en">Supports applications for AI-in-education showcases, first-class virtual-lab courses and teaching-reform projects.</span></li>
+      <li><span class="zh">试点方式：一个学院、3–5 门课、一个学期。</span><span class="en">Pilot: one school, 3–5 courses, one term.</span></li>
+    </ul>
+  </div>
+  <div class="facts rv">
+    <div class="fact"><b>¥100</b><span><span class="zh">每生每年（国内），首年之后按在用学生人数收费，不足 300 人按 300 人计</span><span class="en">per student per year in China after year one; minimum 300 students</span></span></div>
+    <div class="fact"><b>$20</b><span><span class="zh">每生每年（美国）</span><span class="en">per student per year in the US</span></span></div>
+    <div class="fact"><b><span class="zh">全含</span><span class="en">All in</span></b><span><span class="zh">全部课程、虚拟实验、班级数字工厂；云端 GPU、微电子容器按用量另计；学校老师用问渠开课不收课程费、不分成</span><span class="en">All courses, labs and class factories; cloud GPU and chip-design containers billed by use; no fees or revenue share on your teachers' courses</span></span></div>
+  </div>
+</div>
+</section>
+
+<section class="pg alt" data-part="合作|Work with us" data-t="给企业|For companies">
+<div class="in split">
+  <div class="rv">
+    <p class="ey"><span class="k">60</span><span class="zh">企业</span><span class="en">Companies</span></p>
+    <h2 class="t"><span class="zh">不换你的 CAD，<span class="hl">把它和 ERP、车间接起来</span></span><span class="en">Keep your CAD. <span class="hl">Connect it to ERP and the shop</span></span></h2>
+    <ul class="ck">
+      <li><span class="zh"><b>数字工厂企业版</b>：设计、计算、仿真、ERP/MES、厂情中枢，按模块订阅，计算按时长。</span><span class="en"><b>Digital factory, enterprise</b>: design, calculation, simulation, ERP/MES and the hub, by module, compute by time.</span></li>
+      <li><span class="zh"><b>行业专用软件</b>：缝纫机设计软件来宾可免费试算，企业开通后保存、导出、下载工作台、接 CAE；凸轮教学版免费，企业版含加工程序、误差补偿和 FreeCAD 工作台。</span><span class="en"><b>Industry software</b>: try the sewing software free; enterprise accounts save, export and use CAE. Cam is free for teaching; enterprise adds machining, compensation and FreeCAD.</span></li>
+      <li><span class="zh"><b>为你定制</b>：把你们的设计计算、校核和工艺经验做成软件——凸轮和缝纫机就是样板。</span><span class="en"><b>Built for you</b>: your design rules and process know-how as software, as we did for cams and sewing machines.</span></li>
+      <li><span class="zh"><b>员工培训</b>：用同一套课程和工厂。</span><span class="en"><b>Staff training</b> on the same courses and factory.</span></li>
+    </ul>
+  </div>
+  <figure class="rv"><div class="shot"><img src="m/f_cost.webp" alt="成本" loading="lazy"></div><figcaption><span class="zh"><b>经营与成本</b>：订单、成本、毛利在同一条数据主线上。</span><span class="en"><b>Business and cost</b> on the same digital thread.</span></figcaption></figure>
+</div>
+</section>
+
+<section class="pg" data-part="合作|Work with us" data-t="给老师与学员|For teachers and learners">
+<div class="in">
+  <p class="ey rv"><span class="k">61</span><span class="zh">老师与个人学员</span><span class="en">Teachers and learners</span></p>
+  <h2 class="t rv"><span class="zh">老师入驻开课，<span class="hl">课程收入的 40% 归老师</span></span><span class="en">Teach here and <span class="hl">keep 40% of course revenue</span></span></h2>
+  <div class="grid g3 mt2 rv">
+    <div class="card"><span class="big">40%</span><h3><span class="zh">入驻老师</span><span class="en">Instructors</span></h3><p><span class="zh">AI 建课工具、虚拟实验、数字工厂免费使用；也欢迎审阅一章教材，署名致谢。</span><span class="en">AI tools, labs and the factory are free to use; reviewers of a chapter are credited by name.</span></p></div>
+    <div class="card"><span class="big">$39</span><h3><span class="zh">每学分（个人学员）</span><span class="en">per credit (individuals)</span></h3><p><span class="zh">年度封顶 $600，不自动续费；每门收费课前 2 讲免费试听，14 天无理由退款。</span><span class="en">Capped at $600 a year, no auto-renewal; first 2 lectures free, 14-day refund.</span></p></div>
+    <div class="card"><span class="big"><span class="zh">免费</span><span class="en">Free</span></span><h3><span class="zh">公开内容</span><span class="en">Open content</span></h3><p><span class="zh">注册、在线读教材、浏览器实验、公开课视频免费；缝纫机课和每个专业第一门基础课免费。</span><span class="en">Sign-up, online books, browser labs and public lectures are free; so are the sewing course and each major's first foundation course.</span></p></div>
+  </div>
+  <p class="foot rv"><span class="zh">首期小班由创始人张国庆亲自授课，项目驱动。在线付款尚未开通，现阶段报名请来信。</span><span class="en">The first small cohort is taught by founder Guoqing (Eddie) Zhang, project-driven. Online payment is not open yet; please write to enrol.</span></p>
+</div>
+</section>
+
+<section class="pg alt" data-part="合作|Work with us" data-t="下一步|What's next">
+<div class="in">
+  <p class="ey rv"><span class="k">62</span><span class="zh">路线图 · 以下均为计划或待上线</span><span class="en">Roadmap · planned or pending</span></p>
+  <h2 class="t rv"><span class="zh">接下来要做的，<span class="hl">也写在明处</span></span><span class="en">What comes next, <span class="hl">stated plainly</span></span></h2>
+  <div class="grid g3 mt2 rv">
+    <div class="card"><span class="pill ready"><span class="zh">已做，待上线</span><span class="en">Built, pending</span></span><h3><span class="zh">数字工厂实训课程包、缝纫机第 4–15 讲公开视频、微信小程序</span><span class="en">Digital-factory course pack, sewing lectures 4–15, WeChat mini-program</span></h3></div>
+    <div class="card"><span class="pill plan"><span class="zh">计划</span><span class="en">Planned</span></span><h3><span class="zh">机器人厂：数字工业园第二座厂</span><span class="en">A robot plant: the second factory in the park</span></h3></div>
+    <div class="card"><span class="pill plan"><span class="zh">计划</span><span class="en">Planned</span></span><h3><span class="zh">横机：缝纫机软件的第六种机型；圆柱凸轮</span><span class="en">Flat knitting machines; cylindrical cams</span></h3></div>
+    <div class="card"><span class="pill plan"><span class="zh">计划</span><span class="en">Planned</span></span><h3><span class="zh">云端 GPU 实验真机实测（《人工智能》第 4–9 章）</span><span class="en">Cloud-GPU labs measured on real hardware (AI ch. 4–9)</span></h3></div>
+    <div class="card"><span class="pill plan"><span class="zh">计划</span><span class="en">Planned</span></span><h3><span class="zh">国内正式部署、在线支付、对接学校教务系统</span><span class="en">China launch, online payment, school SIS integration</span></h3></div>
+    <div class="card"><span class="pill plan"><span class="zh">计划</span><span class="en">Planned</span></span><h3><span class="zh">课程 AI 助教、学情分析与学业预警</span><span class="en">Course AI tutor, learning analytics and early warning</span></h3></div>
+  </div>
+</div>
+</section>
+
+<section class="pg" data-part="合作|Work with us" data-t="联系我们|Contact">
+<div class="in split">
+  <div class="rv">
+    <p class="ey">Model it · Simulate it · Build it</p>
+    <h2 class="t" style="font-size:clamp(32px,3.6vw,56px)"><span class="zh">先在仿真里学懂，<br><span class="hl">再到真机上做成。</span></span><span class="en">Understand it in simulation.<br><span class="hl">Build it for real.</span></span></h2>
+    <p class="lead"><span class="zh">欢迎学校试点、企业合作开发与案例共建、老师入驻开课。</span><span class="en">We welcome school pilots, joint development and case studies with companies, and teachers who want to teach here.</span></p>
+    <p class="mono muted" style="margin-top:24px;line-height:1.9">wenquestrobotics.com<br>learn.wenquestrobotics.com<br>factory.wenquestrobotics.com</p>
+  </div>
+  <div class="rv">
+    <div class="card">
+      <h3><span class="zh">问渠机器人学院 · 联系人 张国庆</span><span class="en">WenQuest Robotics Academy · Guoqing (Eddie) Zhang</span></h3>
+      <p><span class="zh">合作、试点、入驻：</span><span class="en">Partnerships, pilots, teaching:</span></p>
+      <div class="mail"><span>eddiezgq@gmail.com</span><button type="button" data-copy="eddiezgq@gmail.com"><span class="zh">复制</span><span class="en">Copy</span></button></div>
+      <p style="margin-top:10px"><span class="zh">学员咨询：</span><span class="en">Learners:</span></p>
+      <div class="mail"><span>info@wenquestrobotics.com</span><button type="button" data-copy="info@wenquestrobotics.com"><span class="zh">复制</span><span class="en">Copy</span></button></div>
+      <p style="margin-top:14px"><span class="zh">公开课：</span><span class="en">Public lectures:</span> <a href="https://www.bilibili.com/video/BV1Q3pu6KEH5" target="_blank" rel="noopener">bilibili</a> · <a href="https://youtu.be/KUBf6cWYeik" target="_blank" rel="noopener">YouTube</a> · <span class="zh">总览片</span><span class="en">Overview</span> <a href="https://www.bilibili.com/video/BV1LSHt6FERr/" target="_blank" rel="noopener">bilibili</a> · <a href="https://youtu.be/vT70pgLZKk4" target="_blank" rel="noopener">YouTube</a></p>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<script>
+(function(){
+const root=document.documentElement;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const F='"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif', MONO='"JetBrains Mono",ui-monospace,monospace';
+let L='zh';
+try{const s=localStorage.getItem('wq-lang');if(s)L=s;else if(!/^zh/i.test(navigator.language||''))L='en';}catch(e){if(!/^zh/i.test(navigator.language||''))L='en';}
+const T=(z,e)=>L==='zh'?z:e;
+function setL(l){L=l;root.setAttribute('data-l',l);root.lang=l==='zh'?'zh-CN':'en';
+  document.querySelectorAll('.lang button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===l?'true':'false'));
+  try{localStorage.setItem('wq-lang',l)}catch(e){} buildToc();}
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>setL(b.dataset.l)));
+
+/* pages, numbering, toc */
+const pages=[...document.querySelectorAll('.pg')];
+const N=pages.length;
+document.getElementById('pt').textContent=String(N).padStart(2,'0');
+document.querySelectorAll('[data-total]').forEach(e=>e.textContent=N);
+pages.forEach((p,i)=>{p.id='p'+(i+1);const t=document.createElement('span');t.className='num-tag';t.textContent=String(i+1).padStart(2,'0')+' / '+N;p.appendChild(t);
+  const k=p.querySelector('.ey .k');if(k)k.textContent=String(i+1).padStart(2,'0');});
+function buildToc(){const box=document.getElementById('tocin');box.innerHTML='';let cur=null,col=null;
+  pages.forEach((p,i)=>{const part=(p.dataset.part||'').split('|')[L==='zh'?0:1];
+    if(part!==cur){cur=part;col=document.createElement('div');const h=document.createElement('h3');h.textContent=part;col.appendChild(h);box.appendChild(col);}
+    const a=document.createElement('a');a.href='#p'+(i+1);a.innerHTML='<i>'+String(i+1).padStart(2,'0')+'</i>';a.appendChild(document.createTextNode((p.dataset.t||'').split('|')[L==='zh'?0:1]));
+    a.addEventListener('click',()=>toc.classList.remove('on'));col.appendChild(a);});}
+const toc=document.getElementById('toc');
+document.getElementById('tocbtn').addEventListener('click',()=>toc.classList.toggle('on'));
+document.getElementById('tocx').addEventListener('click',()=>toc.classList.remove('on'));
+setL(L);
+
+let curIdx=0;
+const pn=document.getElementById('pn'),prog=document.getElementById('prog');
+function setCur(i){curIdx=i;pn.textContent=String(i+1).padStart(2,'0');prog.style.width=((i+1)/N*100)+'%';}
+const po=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setCur(pages.indexOf(e.target));});},{rootMargin:'-45% 0px -45% 0px'});
+pages.forEach(p=>po.observe(p));
+function go(i){i=Math.max(0,Math.min(N-1,i));pages[i].scrollIntoView({behavior:reduce?'auto':'smooth'});}
+function nearest(){let best=0,bd=1e9;pages.forEach((p,i)=>{const d=Math.abs(p.getBoundingClientRect().top-56);if(d<bd){bd=d;best=i;}});return best;}
+function step(dir){const i=nearest();const r=pages[i].getBoundingClientRect();
+  // a page taller than the screen scrolls within itself first
+  if(dir>0&&r.bottom>innerHeight+8&&r.top<=60){scrollBy({top:innerHeight*0.85,behavior:reduce?'auto':'smooth'});return;}
+  if(dir<0&&r.top<50&&r.top<-8){go(i);return;}
+  go(i+dir);}
+addEventListener('keydown',e=>{if(e.target.closest('input,textarea,button,select'))if(e.key===' ')return;
+  if(toc.classList.contains('on')){if(e.key==='Escape')toc.classList.remove('on');return;}
+  if(['ArrowDown','PageDown','ArrowRight'].includes(e.key)||(e.key===' '&&!e.shiftKey)){e.preventDefault();step(1);}
+  else if(['ArrowUp','PageUp','ArrowLeft'].includes(e.key)||(e.key===' '&&e.shiftKey)){e.preventDefault();step(-1);}
+  else if(e.key==='Home'){e.preventDefault();go(0);}else if(e.key==='End'){e.preventDefault();go(N-1);}});
+document.getElementById('nextb').addEventListener('click',()=>step(1));
+document.getElementById('prevb').addEventListener('click',()=>step(-1));
+document.getElementById('fsbtn').addEventListener('click',()=>{try{document.fullscreenElement?document.exitFullscreen():root.requestFullscreen();}catch(e){}});
+if(location.hash&&/^#p\d+$/.test(location.hash)){const i=+location.hash.slice(2)-1;if(pages[i])setTimeout(()=>pages[i].scrollIntoView(),50);}
+
+/* reveal */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+
+/* count-up */
+const co=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;co.unobserve(e.target);if(reduce)return;
+  const el=e.target,n=+el.dataset.n,pre=el.dataset.pre||'',t0=performance.now();
+  (function s(t){const k=Math.min(1,(t-t0)/1200),v=n*(1-Math.pow(1-k,3));el.textContent=pre+Math.round(v);if(k<1)requestAnimationFrame(s);})(t0);}),{threshold:.5});
+document.querySelectorAll('[data-n]').forEach(el=>co.observe(el));
+
+/* copy */
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.copy,o=b.innerHTML;
+  const done=()=>{b.textContent=T('已复制','Copied');setTimeout(()=>b.innerHTML=o,1400);};
+  try{navigator.clipboard.writeText(v).then(done,()=>{});}catch(e){}}));
+
+/* videos: autoplay the marked ones when visible; others play on click */
+const vo=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target.querySelector('video');if(!v)return;
+  if(e.isIntersecting&&e.target.hasAttribute('data-auto')&&!reduce){v.preload='auto';v.play().catch(()=>{});}else if(!e.isIntersecting)v.pause();}),{threshold:.4});
+document.querySelectorAll('[data-v]').forEach(t=>{vo.observe(t);t.addEventListener('click',()=>{const v=t.querySelector('video');v.preload='auto';v.paused?v.play().catch(()=>{}):v.pause();});});
+
+/* visibility-gated animation loop */
+const vis=new Map();
+const io=new IntersectionObserver(es=>es.forEach(e=>vis.set(e.target,e.isIntersecting)),{rootMargin:'100px'});
+function loop(el,fn){vis.set(el,false);io.observe(el);function f(t){if(vis.get(el))fn(t);requestAnimationFrame(f)}requestAnimationFrame(f);}
+
+/* ---------- hero gears ---------- */
+(function(){
+const c=document.getElementById('gears'),g=c.getContext('2d');
+const m=6.2,A='#E8B04B',B='#45ADA5';
+const G1={x:228,y:250,z:20},G2={x:228+m*40,y:250,z:60},G4={z:70};
+const a2=m*(20+70)/2,th=0.52; G4.x=G2.x+a2*Math.cos(th);G4.y=G2.y+a2*Math.sin(th);
+const t12=0,t34=th;
+function gear(x,y,z,ang,col,fill,lw){const r=m*z/2,ra=r+m,rf=r-1.25*m,p=2*Math.PI/z;g.beginPath();
+  for(let k=0;k<z;k++){const a=ang+k*p;const pts=[[rf,a-p*0.30],[ra,a-p*0.16],[ra,a+p*0.16],[rf,a+p*0.30],[rf,a+p*0.5]];
+    pts.forEach(([rr,aa],i)=>{const X=x+rr*Math.cos(aa),Y=y+rr*Math.sin(aa);(k===0&&i===0)?g.moveTo(X,Y):g.lineTo(X,Y);});}
+  g.closePath();g.fillStyle=fill;g.fill();g.strokeStyle=col;g.lineWidth=lw;g.stroke();
+  g.setLineDash([3,6]);g.beginPath();g.arc(x,y,r,0,7);g.strokeStyle=col+'66';g.lineWidth=1;g.stroke();g.setLineDash([]);
+  g.beginPath();g.arc(x,y,rf*0.62,0,7);g.strokeStyle=col+'88';g.lineWidth=1.2;g.stroke();
+  for(let s=0;s<(z>30?5:0);s++){const a=ang+s*2*Math.PI/5;g.beginPath();g.moveTo(x+rf*0.25*Math.cos(a),y+rf*0.25*Math.sin(a));g.lineTo(x+rf*0.62*Math.cos(a),y+rf*0.62*Math.sin(a));g.stroke();}
+  g.beginPath();g.arc(x,y,Math.max(9,m*2.4),0,7);g.fillStyle='#0D1318';g.fill();g.strokeStyle=col;g.lineWidth=1.5;g.stroke();
+  g.fillStyle=col;g.fillRect(x-2,y-Math.max(9,m*2.4)-3,4,6);}
+function label(x,y,t,col,al){g.font='500 22px '+MONO;g.fillStyle=col;g.textAlign=al||'left';g.fillText(t,x,y);}
+function dim(x1,y1,x2,y2,t){g.strokeStyle='#4A5C69';g.lineWidth=1;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke();
+  [[x1,y1],[x2,y2]].forEach(([x,y])=>{g.beginPath();g.moveTo(x-5,y-5);g.lineTo(x+5,y+5);g.stroke();});
+  g.font='19px '+MONO;g.fillStyle='#6E7E8A';g.textAlign='center';g.fillText(t,(x1+x2)/2,(y1+y2)/2-12);}
+const W=0.9;let phi=0,last=0;
+function draw(t){const dt=last?Math.min(0.05,(t-last)/1000):0;last=t;if(!reduce)phi+=W*dt;
+  g.clearRect(0,0,c.width,c.height);
+  g.strokeStyle='#16222B';g.lineWidth=1;for(let x=0;x<=c.width;x+=40){g.beginPath();g.moveTo(x,0);g.lineTo(x,c.height);g.stroke();}
+  for(let y=0;y<=c.height;y+=40){g.beginPath();g.moveTo(0,y);g.lineTo(c.width,y);g.stroke();}
+  const p1=phi,p2=t12+Math.PI+Math.PI/60-(p1-t12)*20/60,p3=p2,p4=t34+Math.PI+Math.PI/70-(p3-t34)*20/70;
+  g.setLineDash([14,5,3,5]);g.strokeStyle='#3A4B58';g.lineWidth=1;
+  g.beginPath();g.moveTo(40,G1.y);g.lineTo(G2.x+40,G2.y);g.moveTo(G2.x,G2.y);g.lineTo(G4.x,G4.y);g.stroke();g.setLineDash([]);
+  gear(G4.x,G4.y,70,p4,B,'rgba(20,40,42,0.9)',1.8);
+  gear(G2.x,G2.y,60,p2,A,'rgba(232,176,75,0.07)',1.8);
+  gear(G2.x,G2.y,20,p3,B,'#0F1A20',1.6);
+  gear(G1.x,G1.y,20,p1,A,'#15130D',2);
+  dim(G1.x,G1.y+222,G2.x,G2.y+222,'a1 = '+(m*40).toFixed(0)+' mm');
+  label(G1.x,G1.y-94,'z1 = 20',A,'center');label(G2.x-120,G2.y-170,'z2 = 60',A,'right');
+  label(G2.x-60,G2.y+100,'z3 = 20',B,'right');label(G4.x+150,G4.y+190,'z4 = 70',B);
+  label(26,40,T('输入轴  1450 r/min','INPUT  1450 r/min'),A);
+  label(c.width-26,c.height-22,T('输出轴  ≈138 r/min','OUTPUT  ≈138 r/min'),B,'right');
+  label(c.width-26,40,'WQR-105 · i = 3.0 × 3.5 = 10.5','#9AA8B3','right');}
+draw(0);if(!reduce)loop(c,draw);
+})();
+
+/* ---------- cart-pole ---------- */
+(function(){
+const c=document.getElementById('cart'),g=c.getContext('2d'),W=c.width,H=c.height;
+const M=1,m=0.2,Lp=0.3,G=9.81,DT=0.002;
+const R=[{Kp:30,Kd:2,Kx:0,Kv:0,col:'#C8D1D8'},{Kp:60,Kd:8,Kx:3,Kv:4.5,col:'#E8B04B'}];
+let ri=0,s,hist,fail,hold,push=-1;
+const bA=document.getElementById('cp-a'),bB=document.getElementById('cp-b');
+function init(i){ri=i;s={x:0,xd:0,th:6*Math.PI/180,thd:0,t:0,u:0,k:0};hist=[];fail=false;hold=0;push=5;
+  bA.setAttribute('aria-pressed',i===0);bB.setAttribute('aria-pressed',i===1);}
+function f(x,xd,th,thd,Fo){const sn=Math.sin(th),cs=Math.cos(th),tmp=(Fo+m*Lp*thd*thd*sn)/(M+m);const thdd=(G*sn-cs*tmp)/(Lp*(4/3-m*cs*cs/(M+m)));return[xd,tmp-m*Lp*thdd*cs/(M+m),thd,thdd];}
+function sub(){const r=R[ri];if(s.k%5==0)s.u=Math.max(-30,Math.min(30,r.Kp*s.th+r.Kd*s.thd+r.Kx*s.x+r.Kv*s.xd));
+  const Fo=s.u+((push>=0&&s.t>=push&&s.t<push+0.1)?25:0),y=[s.x,s.xd,s.th,s.thd];
+  const a=f(...y,Fo),b=f(...y.map((v,i)=>v+DT/2*a[i]),Fo),cc=f(...y.map((v,i)=>v+DT/2*b[i]),Fo),d=f(...y.map((v,i)=>v+DT*cc[i]),Fo);
+  const n=y.map((v,i)=>v+DT/6*(a[i]+2*b[i]+2*cc[i]+d[i]));s.x=n[0];s.xd=n[1];s.th=n[2];s.thd=n[3];s.t+=DT;s.k++;
+  if(s.k%10==0)hist.push([s.t,s.th*180/Math.PI]);if(Math.abs(s.th)>Math.PI/4||Math.abs(s.x)>2.4)fail=true;}
+function draw(){const r=R[ri];g.fillStyle='#141E26';g.fillRect(0,0,W,H);g.textBaseline='middle';g.textAlign='left';
+  g.font='600 22px '+F;g.fillStyle=r.col;
+  g.fillText(ri===0?T('第 1 次：只控制摆角  Kp=30  Kd=2','Run 1: angle loop only  Kp=30  Kd=2'):T('第 2 次：Kp=60 Kd=8，加位置环 Kx=3 Kv=4.5','Run 2: Kp=60 Kd=8, plus position loop Kx=3 Kv=4.5'),16,22);
+  const ox=270,oy=290,sc=105;g.strokeStyle='#3A4B58';g.lineWidth=4;g.beginPath();g.moveTo(ox-2.4*sc,oy+30);g.lineTo(ox+2.4*sc,oy+30);g.stroke();
+  g.fillStyle='#3A4B58';g.fillRect(ox-2.4*sc-6,oy+12,6,36);g.fillRect(ox+2.4*sc,oy+12,6,36);
+  const cx=ox+Math.max(-2.5,Math.min(2.5,s.x))*sc;g.fillStyle='#45ADA5';g.fillRect(cx-46,oy-8,92,36);
+  const len=160,px=cx+Math.sin(s.th)*len,py=oy-8-Math.cos(s.th)*len;g.strokeStyle=r.col;g.lineWidth=10;g.lineCap='round';g.beginPath();g.moveTo(cx,oy-8);g.lineTo(px,py);g.stroke();
+  if(push>=0&&s.t>=push&&s.t<push+0.6){g.fillStyle='#E0784F';g.font='600 20px '+F;g.fillText(T('25 N 冲击 →','25 N push →'),cx-190,oy+10);}
+  const X0=600,Y0=60,PW=570,PH=270,Xs=t=>X0+t/10*PW,Ys=a=>Y0+PH/2-a/25*(PH/2);
+  g.strokeStyle='#2A3A47';g.lineWidth=2;g.strokeRect(X0,Y0,PW,PH);g.beginPath();g.moveTo(X0,Ys(0));g.lineTo(X0+PW,Ys(0));g.stroke();
+  g.fillStyle='rgba(232,176,75,0.12)';g.fillRect(X0,Ys(1),PW,Ys(-1)-Ys(1));
+  if(push>=0&&push<=10){g.strokeStyle='#45ADA5';g.setLineDash([6,6]);g.beginPath();g.moveTo(Xs(push),Y0);g.lineTo(Xs(push),Y0+PH);g.stroke();g.setLineDash([]);}
+  g.strokeStyle=r.col;g.lineWidth=3;g.beginPath();hist.forEach((h,i)=>{const yy=Math.max(Y0,Math.min(Y0+PH,Ys(h[1])));i?g.lineTo(Xs(h[0]),yy):g.moveTo(Xs(h[0]),yy);});g.stroke();
+  g.font='16px '+F;g.fillStyle='#9AA8B3';g.fillText(T('摆角（°）· 0–10 s · 阴影为 ±1°','Pole angle (°) · 0–10 s · band = ±1°'),X0,Y0+PH+22);
+  g.font='14px '+MONO;g.textAlign='right';g.fillText('+25°',X0-8,Y0+10);g.fillText('−25°',X0-8,Y0+PH-10);g.textAlign='left';
+  let msg,mc='#9AA8B3';
+  if(fail){msg=Math.abs(s.x)>2.4?T('失败：摆立住了，小车却冲出导轨（第 '+s.t.toFixed(1)+' 秒）','Fail: the pole stayed up but the cart ran off the rail ('+s.t.toFixed(1)+' s)'):T('失败：摆角超过 45°','Fail: pole angle passed 45°');mc='#E0784F';}
+  else if(s.t>=10){msg=T('成功：冲击后恢复，摆角回到 ±1° 以内','Success: recovered from the push, back within ±1°');mc='#E8B04B';}
+  else msg=T('RK4 积分 · 步长 2 ms · 第 ','RK4 · 2 ms step · t = ')+s.t.toFixed(1)+T(' 秒',' s');
+  g.font='600 22px '+F;g.fillStyle=mc;g.fillText(msg,16,H-28);}
+init(0);
+bA.addEventListener('click',()=>init(0));bB.addEventListener('click',()=>init(1));
+document.getElementById('cp-push').addEventListener('click',()=>{if(fail||s.t>=10){const i=ri;init(i);}push=s.t+0.05;});
+draw();
+loop(c,()=>{if(!fail&&s.t<10){for(let k=0;k<9;k++){if(fail||s.t>=10)break;sub();}}else{hold+=1/60;if(hold>3)init((ri+1)%2);}draw();});
+})();
+
+/* ---------- factory hub ---------- */
+(function(){
+const c=document.getElementById('cq'),g=c.getContext('2d');
+const NN=['SAW-01','CNC-L01','HOB-01','HT-01','GRD-01','QC-01','ASM-01','TEST-01'],P=[10,22,30,16,20,14,16,10];
+let st,tk,done,spawn;
+function init(){st=NN.map(()=>({b:0,l:0,q:0}));tk=0;done=0;spawn=0;}
+function gs(){if(tk>=400&&tk<620)return'down';if(tk>=620&&tk<680)return'chg';return'run';}
+function stp(){tk++;if(tk-spawn>=31){spawn=tk;st[0].q++;}
+  for(let i=NN.length-1;i>=0;i--){const s=st[i];const bl=(i==4&&gs()!='run');
+    if(s.b&&!bl){s.l--;if(s.l<=0){s.b=0;if(i<NN.length-1)st[i+1].q++;else done++;}}
+    if(!s.b&&s.q>0&&!bl){s.q--;s.b=1;s.l=(i==4&&tk>=680&&tk<900)?13:P[i];}}}
+function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+function draw(){g.fillStyle='#101820';g.fillRect(0,0,1664,600);g.textAlign='center';g.textBaseline='middle';
+  const day=1+Math.floor(tk/130),s0=gs();
+  g.font='600 30px '+F;g.fillStyle='#F3EFE6';g.textAlign='left';g.fillText(T('工厂时间：第 '+day+' 天','Factory time: day '+day),20,30);g.textAlign='center';
+  for(let i=0;i<NN.length;i++){const x=20+i*204,y=70,w=170,h=96,s=st[i],down=(i==4&&s0!='run');
+    g.strokeStyle='#35505F';g.lineWidth=3;if(i<NN.length-1){g.beginPath();g.moveTo(x+w,y+h/2);g.lineTo(x+204,y+h/2);g.stroke();}
+    rr(x,y,w,h,14);g.fillStyle=down?'#E08A2E':(s.b?'#1F4A4F':'#1C3040');g.fill();g.strokeStyle=down?'#E08A2E':(i==2?'#7FCFC8':'#3FA7A0');g.stroke();
+    g.fillStyle=down?'#101820':'#F3EFE6';g.font='600 26px '+MONO;g.fillText(NN[i],x+w/2,y+34);
+    g.font='22px '+F;g.fillStyle=down?'#101820':'#A9BCC8';g.fillText(down?(s0=='chg'?T('换砂轮','New wheel'):T('停机','Down')):(s.b?T('加工中','Running'):T('空闲','Idle')),x+w/2,y+70);
+    const qn=Math.min(s.q,12);for(let k=0;k<qn;k++){g.beginPath();g.arc(x+30+(k%4)*36,y+h+34+Math.floor(k/4)*34,12,0,7);g.fillStyle=i==4&&s.q>5?'#E08A2E':'#3FA7A0';g.fill();}
+    g.font='22px '+F;g.fillStyle='#A9BCC8';g.fillText(T('排队 ','Queue ')+s.q,x+w/2,y+h+150);}
+  g.fillStyle='#7FCFC8';g.font='22px '+F;g.fillText(T('瓶颈','Bottleneck'),20+2*204+85,44);
+  const wip=st.reduce((a,s)=>a+s.q+s.b,0),risk=st[4].q>5;
+  const K=[[T('在制品','WIP'),wip+T(' 件',' parts')],[T('已完工','Completed'),done+T(' 件',' parts')],[T('磨床 GRD-01','Grinder GRD-01'),s0=='run'?T('运行','Running'):(s0=='chg'?T('换砂轮','New wheel'):T('停机','Down'))],[T('订单 SO-0012 延期风险','Order SO-0012 late risk'),risk?T('高','High'):T('低','Low')]];
+  K.forEach((k,j)=>{const x=20+j*412,y=400;rr(x,y,388,96,14);g.fillStyle='#1C3040';g.fill();g.textAlign='left';g.fillStyle='#A9BCC8';g.font='24px '+F;g.fillText(k[0],x+24,y+32);
+    const hot=(j==2&&s0!='run')||(j==3&&risk);g.fillStyle=hot?'#F0A040':'#F3EFE6';g.font='700 32px '+F;g.fillText(k[1],x+24,y+70);});
+  let mm='',mc='#A9BCC8';if(tk<400)mm=T('正常生产：滚齿机 HOB-01 满负荷','Normal: hobber HOB-01 at full load');
+  else if(tk<560){mm=T('异常：磨床停机，磨外圆前积压，订单延期风险上升','Alert: grinder down, queue building, order at risk');mc='#F0A040';}
+  else if(tk<620){mm=T('提议：换砂轮 + 重排工单 —— 计划员已确认','Proposal: change wheel + reschedule. Planner approved');mc='#7FCFC8';}
+  else if(tk<900){mm=T('执行中：换砂轮后恢复，积压逐步消化','Executing: grinder back, queue clearing');mc='#7FCFC8';}
+  else{mm=T('效果：积压清零，延期风险解除 → 记入工厂知识库','Result: queue cleared, risk gone → saved to factory knowledge base');mc='#F0A040';}
+  g.textAlign='left';g.font='600 28px '+F;g.fillStyle=mc;g.fillText(mm,20,560);}
+init();draw();
+loop(c,()=>{stp();if(tk>1300)init();draw();});
+})();
+})();
+</script>
+</body>
+</html>
