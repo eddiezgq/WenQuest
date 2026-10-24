@@ -92,7 +92,7 @@ def glint(a, x, y, k=1.0, mood="happy", d=None, tilt=0):
     E += [P(a, m, c="ink", w=5, idp=i), wig(a, wl, (x - 100 * k, y), 12, 1.6), wig(a, wr, (x + 100 * k, y), 12, 1.6),
           bob(a, i, 8 * k, 1.2)]
     if tilt:
-        E.append(rot(a, [i], tilt, (x, y), 0.3, 0.8))
+        E.append(rot(a, [i, wl, wr], tilt, (x, y), 0.3, 0.8))
     if d is not None:
         E.append(pop(a, [i, wl, wr], d))
     return E, i
@@ -164,7 +164,7 @@ def zz(a, x, y, d=0.0):
 
 # 0 sell sunlight
 g_, gi = glint(0, 960, 420, 1.2, d=0.0)
-bd(0, g_, sun(0, 300, 260, 180, 0.1), BIG(0, 960, 800, "SUNLIGHT FOR SALE", c="gold", d=0.2, s=110), [sh(0, gi, 0, -40, 0.6, 0.6)])
+bd(0, g_, sun(0, 300, 260, 180, 0.1), BIG(0, 960, 800, "SUNLIGHT FOR SALE", c="gold", d=0.2, s=110), [sh(0, [gi, gi + "wl", gi + "wr"], 0, -40, 0.6, 0.6)])
 # 0.5 at night
 bd(0.5, earth(0.5, 780, night=True), moonish(0.5, 1500, 250, 140, 0.0), beam(0.5, 960, 200, 960, 760, 140, d=0.2), glint(0.5, 960, 200, 0.6)[0],
    BIG(0.5, 450, 400, "at NIGHT", c="blue", d=0.4, s=110))
@@ -194,7 +194,7 @@ bd(4, icon(4, "building", 600, 520, 300, 0.0, mv="bob"), T(4, 1250, 420, 80, "Re
    icon(4, "map_pin", 600, 280, 100, 0.3, c="red"))
 # 4.5 Earendil-1
 g_, gi = glint(4.5, 960, 480, 1.4)
-bd(4.5, g_, [rot(4.5, gi, 15, (960, 480), 0.3, 0.6)], BIG(4.5, 960, 860, "Earendil-1", c="blue", d=0.2, s=120), T(4.5, 1550, 300, 44, "demo", c="muted", d=0.5))
+bd(4.5, g_, [rot(4.5, [gi, gi + "wl", gi + "wr"], 15, (960, 480), 0.3, 0.6)], BIG(4.5, 960, 860, "Earendil-1", c="blue", d=0.2, s=120), T(4.5, 1550, 300, 44, "demo", c="muted", d=0.5))
 # 5 July FCC
 bd(5, BIG(5, 600, 400, "July", c="blue", d=0.1, s=130), BIG(5, 1300, 400, "FCC", c="red", d=0.2, s=150), icon(5, "signal", 960, 700, 180, 0.3, mv="wig"),
    icon(5, "satellite", 1500, 750, 140, 0.4, mv="spin"))
@@ -431,14 +431,14 @@ g_, gi = glint(40.5, 1500, 300, 0.5, mood="sad")
 e2 = uid("e")
 bd(40.5, [O(40.5, 760, 560, 240, c="blue", fill="blue", idp=e2), spin(40.5, e2, (760, 560), 6),
           P(40.5, "M760,320 L1850,280 L1850,840 L760,800 Z", c="ink", w=3, fill="ink", idp=(s2 := uid("sd")), opacity=60), pop(40.5, s2, 0.0)],
-   g_, [sh(40.5, gi, 0, 200, 0.3, 1.0)], sun(40.5, 200, 560, 120, 0.1), T(40.5, 1500, 940, 48, "lights out", c="ink", d=0.6))
+   g_, [sh(40.5, [gi, gi + "wl", gi + "wr"], 0, 200, 0.3, 1.0)], sun(40.5, 200, 560, 120, 0.1), T(40.5, 1500, 940, 48, "lights out", c="ink", d=0.6))
 # 41 7-8 km per second
 g_, gi = glint(41, 300, 300, 0.5)
-bd(41, g_, [sh(41, gi, 1300, 0, 0.1, 1.2)], BIG(41, 960, 600, "~7.5 km/s", c="red", d=0.2, s=150), earth(41, 860),
+bd(41, g_, [sh(41, [gi, gi + "wl", gi + "wr"], 1300, 0, 0.1, 1.2)], BIG(41, 960, 600, "~7.5 km/s", c="red", d=0.2, s=150), earth(41, 860),
    [e for q in range(3) for e in icon(41, "wind", 500 + 300 * q, 300, 100, 0.3 + 0.1 * q, c="blue", mv="wig")])
 # 41.5 minutes
 g_, gi = glint(41.5, 500, 260, 0.5)
-bd(41.5, g_, [sh(41.5, gi, 900, 0, 0.2, 2.2), rot(41.5, gi, -40, (500, 260), 0.2, 2.2)], icon(41.5, "clock", 960, 640, 200, 0.1, mv="spin"),
+bd(41.5, g_, [sh(41.5, [gi, gi + "wl", gi + "wr"], 900, 0, 0.2, 2.2), rot(41.5, [gi, gi + "wl", gi + "wr"], -40, (500, 260), 0.2, 2.2)], icon(41.5, "clock", 960, 640, 200, 0.1, mv="spin"),
    BIG(41.5, 1500, 640, "minutes", c="red", d=0.4, s=100), earth(41.5, 900))
 # 42 just a test
 bd(42, icon(42, "flask", 700, 500, 260, 0.0, mv="wig"), glint(42, 1300, 480, 1.0, d=0.2)[0], T(42, 960, 860, 60, "first mirror = a test", c="blue", d=0.4))

@@ -734,7 +734,9 @@
      "at": 0,
      "kind": "shift",
      "targets": [
-      "gl1z_"
+      "gl1z_",
+      "gl1z_wl",
+      "gl1z_wr"
      ],
      "dx": 0,
      "dy": -40,
@@ -3203,7 +3205,9 @@
      "at": 9,
      "kind": "rotate",
      "targets": [
-      "gl70z_"
+      "gl70z_",
+      "gl70z_wl",
+      "gl70z_wr"
      ],
      "to": 15,
      "pivot": [
@@ -8911,7 +8915,9 @@
      "at": 27,
      "kind": "rotate",
      "targets": [
-      "gl221z_"
+      "gl221z_",
+      "gl221z_wl",
+      "gl221z_wr"
      ],
      "to": 25,
      "pivot": [
@@ -24628,7 +24634,9 @@
      "at": 81,
      "kind": "shift",
      "targets": [
-      "gl675z_"
+      "gl675z_",
+      "gl675z_wl",
+      "gl675z_wr"
      ],
      "dx": 0,
      "dy": 200,
@@ -24906,7 +24914,9 @@
      "at": 82,
      "kind": "shift",
      "targets": [
-      "gl683z_"
+      "gl683z_",
+      "gl683z_wl",
+      "gl683z_wr"
      ],
      "dx": 1300,
      "dy": 0,
@@ -25271,7 +25281,9 @@
      "at": 83,
      "kind": "shift",
      "targets": [
-      "gl692z_"
+      "gl692z_",
+      "gl692z_wl",
+      "gl692z_wr"
      ],
      "dx": 900,
      "dy": 0,
@@ -25283,7 +25295,9 @@
      "at": 83,
      "kind": "rotate",
      "targets": [
-      "gl692z_"
+      "gl692z_",
+      "gl692z_wl",
+      "gl692z_wr"
      ],
      "to": -40,
      "pivot": [
