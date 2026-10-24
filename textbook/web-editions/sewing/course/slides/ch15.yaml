@@ -180,7 +180,7 @@ slides:
           <text x="440" y="570" font-size="26" fill="#5ee0d2" text-anchor="middle" class="en">{{ch15.tm3:.1f}} ms</text>
           <text x="600" y="600" font-size="26" fill="#ff9c75" text-anchor="middle" class="en">{{ch15.tm6:.1f}} ms</text>
           <text x="150" y="400" font-size="24" fill="#d3deea" text-anchor="middle" class="zh">加速 a</text><text x="150" y="400" font-size="24" fill="#d3deea" text-anchor="middle" class="eo">accel. a</text>
-          <text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705" class="zh">面积 = 针距 s</text><text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705" class="eo">area = stitch length s</text>
+          <text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705" class="zh">面积 = 针距 s</text><text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705" class="eo">area = stitch s</text>
           <text x="660" y="300" font-size="32" font-weight="800" fill="#f2b705" class="en">t = 2√(s/a)</text>
         </svg>
     notes:
@@ -286,7 +286,7 @@ slides:
 
   - layout: chain
     title: ["前瞻算例：第 5 针是 10 mm 长针", "Look-ahead example: stitch 5 is 10 mm"]
-    steps: [["{{ch15.la1}}", "stitch 1"], ["{{ch15.la2}}", "stitch 2"], ["{{ch15.la3}}", "stitch 3"], ["{{ch15.la4}}", "stitch 4"], ["{{ch15.la5}}", "stitch 5"], ["{{ch15.la6}}", "stitch 6"], ["{{ch15.la7}}", "stitch 7"], ["{{ch15.la8}}", "stitch 8"]]
+    steps: [["{{ch15.la1}}", "stitch 1: {{ch15.la1}}"], ["{{ch15.la2}}", "stitch 2: {{ch15.la2}}"], ["{{ch15.la3}}", "stitch 3: {{ch15.la3}}"], ["{{ch15.la4}}", "stitch 4: {{ch15.la4}}"], ["{{ch15.la5}}", "stitch 5: {{ch15.la5}}"], ["{{ch15.la6}}", "stitch 6: {{ch15.la6}}"], ["{{ch15.la7}}", "stitch 7: {{ch15.la7}}"], ["{{ch15.la8}}", "stitch 8: {{ch15.la8}}"]]
     hot: [4]
     mark: ["10 mm 长针", "long stitch"]
     foot: ["2 mm 针稳定 {{ch15.n2:.0f}} r/min，Δn = 300：从第 1 针就开始降。不前瞻，第 5 针必然断针", "2 mm at {{ch15.n2:.0f}} r/min, Δn = 300: braking starts at stitch 1. Without look-ahead, stitch 5 breaks a needle"]
