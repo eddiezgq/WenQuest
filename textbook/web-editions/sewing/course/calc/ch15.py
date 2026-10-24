@@ -87,7 +87,7 @@ if __import__("os").environ.get("WQ_BOOK_OUT"):
     mo15, mo10 = motor(3, 50, 0.015), motor(3, 50, 0.010)
     out(W15=W15, W3=W3, W6=W6, phi1=window(1.5)[0], phi2=window(1.5)[1],
         tm3=tmove(3) * 1000, tm6=tmove(6) * 1000, v2a=1 / 50 * 1000,
-        n2=nmax(W15, 2), n3=nmax(W15, 3), n6=nmax(W15, 6), n10=nmax(W15, 10), n6t6=nmax(W6, 6), n3t6=nmax(W6, 3),
+        n2=nmax(W15, 2), n3=nmax(W15, 3), n6=nmax(W15, 6), n10=nmax(W15, 10), n10i=int(nmax(W15, 10)), n6t6=nmax(W6, 6), n3t6=nmax(W6, 3),
         thick=(1 - W6 / W15) * 100, diag=(2 ** 0.25 - 1) * 100, cyc=sqrt(4 / 6.283), cycdt=sqrt(6.283 / 4),
         k=(150e3 / 0.3 + 150e3 / 0.5) / 1000, fn=sqrt(800e3 / 3) / 2 / pi, Tn=1000 / (sqrt(800e3 / 3) / 2 / pi),
         cyl=0.5e6 * pi * 0.032 ** 2 / 4, deg1ms=6 * 2800 * 1e-3,

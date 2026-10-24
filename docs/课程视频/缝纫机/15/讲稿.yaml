@@ -1,0 +1,136 @@
+# 《缝纫机设计与制造》公开课 第 15 讲：花样机与锁眼、钉扣、套结机控制
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch15.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 15-1（花样机仿真）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch15.py 算出（{{ch15.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "15"
+deck: ch15
+skip: [5, 6, 9, 22, 24, 25, 26]   # 同步带刚度、中压脚与气动压框、三种布厚的窗口数字页（也是实验任务二的读数）、模板与周期时间、第五节（章节页、X 轴电机选型、控制箱）：控制课程部分约 10 分钟（课件与教材里都有；同步带激振在运动规律页讲稿里带一句，中压脚时序留给测验，电机选型留给作业第三题，周期时间在回答页讲到）
+code: [ch15]
+title: ["花样机与锁眼、钉扣、套结机控制——针距一大为什么断针", "Pattern Sewers, Buttonholers and Bartackers — Why Longer Stitches Break Needles"]
+chapter: ["第五篇 电气控制 · 第 15 章", "Part V Electrical Control · Chapter 15"]
+next: ["第 16 讲", "Lecture 16"]
+cover_formula: 'n_{max} = \frac{W}{6\,t_{move}}'
+tags:
+  zh: [花样机, 锁眼机, 钉扣机, 套结机, 离布窗口, 电子凸轮, 前瞻调速, 运动规律, 缝纫机设计]
+  en: [pattern sewer, buttonholer, button sewer, bartacker, off-fabric window, electronic cam, look-ahead speed control, motion law, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十五讲，花样机与锁眼、钉扣、套结机控制。
+    - 上一讲的电控平缝机，还是靠人手送布、转方向。今天布交给程序：夹在模板里，由 X–Y 工作台带着走。
+    - 整讲围绕一条规矩：机针在布中，模板不能动。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 15, pattern sewers, buttonholers, button sewers and bartackers.
+    - The electronic lockstitch machine from last time still needs the operator's hands to feed and steer. Today the program takes over. The fabric is clamped in a template and an X–Y table carries it.
+    - One rule runs through the whole lecture. While the needle is in the fabric, the template must not move.
+
+after:
+  - id: lab151
+    kind: lab
+    lab: pattern
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '1'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '.kpi, #verdict { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); document.querySelector('.tasks').closest('section').style.filter = 'blur(7px) grayscale(1)'; document.getElementById('sp').closest('section').style.filter = 'blur(7px) grayscale(1)'; window.__go = () => { const b = document.getElementById('play'); if (/^(播放|Play)$/.test(b.textContent.trim())) b.click(); }; })()"
+        press: ["[data-slow='20']", "#play"]
+      - js: "(() => { const e = document.getElementById('s'); e.value = 6; e.dispatchEvent(new Event('input', {bubbles: true})); window.__go(); })()"
+      - js: "window.__go()"
+        sweep: {n: [2000, 1650]}
+        dur: 6
+      - js: "(() => { for (const [k, v] of [['s', 3], ['n', 2000]]) { const e = document.getElementById(k); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); } window.__go(); })()"
+        sweep: {t: [1.5, 6]}
+        dur: 7
+      - js: "(() => { const p = document.getElementById('preset'); p.value = 'star'; p.dispatchEvent(new Event('change', {bubbles: true})); for (const [k, v] of [['t', 1.5], ['s', 6], ['n', 1200]]) { const e = document.getElementById(k); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); } const b = document.getElementById('play'); if (/^(播放|Play)$/.test(b.textContent.trim())) b.click(); })()"
+        sweep: {n: [1200, 1400]}
+        dur: 6
+      - js: "(() => { document.querySelector('[data-mode=auto]').click(); const l = document.getElementById('law'); l.value = '6.283'; l.dispatchEvent(new Event('change', {bubbles: true})); window.__go(); })()"
+    say:
+      zh:
+        - ">下面是虚拟实验 15-1，花样机仿真，在问渠平台上可以亲手做。右边的结果和任务、左下的每针转速图这里先遮住，留给你自己读。左边是口袋盖的针点，右上角表盘里蓝色弧是模板可以动的窗口。"
+        - ">任务一，固定 2000 转，把针距从 3 毫米调到 6 毫米，一部分针点马上变红，这些是走不完的针。"
+        - ">再把转速往下拖，红针开始变少。降到多少才全部变蓝，留给你自己调，再和公式对照。"
+        - ">任务二，回到 3 毫米、2000 转，把布厚从 1.5 毫米加到 6 毫米。看表盘：蓝色窗口越缩越短，原来全蓝的针也开始变红。窗口是多少度，在结果里读。"
+        - ">任务三，换五角星，针距 6 毫米，从每分钟 1200 转往上加。继续加下去，哪些针先变红，是横竖的还是斜的，自己找出来，再想想为什么。"
+        - ">任务四，切到自动前瞻，换着试三种运动规律，比较缝制时间；再把窗口两端余量调到 15°，看时间增加多少。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 15-1, the pattern-sewer simulation. On the WenQuest platform you can do it yourself. The results and tasks on the right, and the per-stitch speed chart at lower left, are blurred here, so you can read them on your own. On the left are the pocket-flap stitches, and in the dial the blue arc is the window when the template may move."
+        - ">Task one: at a fixed 2000 r/min, change the stitch from 3 to 6 millimetres. Some of the points turn red at once. Those are the moves that can't finish."
+        - ">Now drag the speed down, and the red stitches start to thin out. How far down until they're all blue is yours to find; then compare it with the formula."
+        - ">Task two: back to 3 millimetres and 2000 r/min, and raise the thickness from 1.5 to 6 millimetres. Watch the dial. The blue window keeps shrinking, and stitches that were all blue start turning red. Read the window angle in the results."
+        - ">Task three: switch to the star with 6-millimetre stitches, and raise the speed from 1200 r/min. Keep going, find which stitches turn red first, the horizontal and vertical ones or the diagonal ones, and think about why."
+        - ">Task four: switch to automatic look-ahead, try the three motion laws and compare the sewing times; then set the end margin to 15 degrees and see how much time it adds. The guide and the report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 15-1、15-2，可以自己动手", "Interactive slides and Labs 15-1 and 15-2, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件、花样机仿真和花样编程实验 15-2，都可以自己打开动手做。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides, the pattern-sewer simulation and Lab 15-2 on pattern programming, and work them yourself."
+        - ">You submit the assignment and the lab reports on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 15：花样机的转速规划与 X–Y 电机选型", "Assignment 15: speed planning and X–Y motor sizing"]
+      points:
+        - ["3 mm 厚：2、4、8 mm 针与 45° 斜针的转速上限", "3 mm stack: limits for 2, 4, 8 mm and a 45° stitch"]
+        - ["Δn = 200 时的前瞻：第 1–8 针的转速", "Look-ahead with Δn = 200: speeds of stitches 1–8"]
+        - ["X、Y 轴电机：峰值、均方根；实验 15-2 周期 < 4.7 s", "X and Y motors: peak, RMS; Lab 15-2 cycle < 4.7 s"]
+      foot: ["3–5 页报告（PDF），附计算表格、选型结论和实验 15-2 的花样文件与截图，在问渠学习平台提交。", "A 3–5 page report (PDF) with tables, motor conclusions, and the Lab 15-2 pattern file and screenshot, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，布加下模板 3 毫米厚，按等加速等减速和摆线两种规律，算沿 X 方向针距 2、4、8 毫米的转速上限，再算 4 毫米的 45° 斜针，说明为什么要按各轴分量算。"
+        - ">第二题，还是课上的前瞻算例，但每针只许变 200 转。算出第 1 到 8 针的转速，要提前几针开始减速？"
+        - ">第三题是电机选型，这段视频里没讲，课件和教材里有：一台 400 瓦伺服，核算 X、Y 两轴的峰值转矩和均方根转矩。峰值管能不能加速，均方根管会不会过热；不满足的轴给出两种改进办法。第四题在花样编程实验 15-2 里，把周期时间做到 4.7 秒以内。"
+        - 计算报告、花样文件和截图，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: with fabric plus lower template 3 millimetres thick, use constant acceleration and a cycloid to find the speed limits for 2, 4 and 8 millimetre stitches along X, then for a 4 millimetre stitch at 45 degrees, and explain why the axis components matter."
+        - ">Two: the look-ahead example from the slides again, but now the speed may change by only 200 r/min per stitch. Find the speeds of stitches 1 to 8. How many stitches ahead must braking start?"
+        - ">Three is motor sizing, which this video skipped; it's in the slides and the textbook. For a 400 watt servo, check the peak and RMS torque on both the X and Y axes. Peak torque decides whether it can accelerate; RMS torque decides whether it overheats. For any axis that fails, give two ways to fix it. Four is in Lab 15-2, pattern programming: get the cycle time under 4.7 seconds."
+        - Submit the report, the pattern file and the screenshots on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["W = {{ch15.W15:.1f}}°、a = 50 m/s²：4 mm 针的转速上限？", "W = {{ch15.W15:.1f}}°, a = 50 m/s²: limit for a 4 mm stitch?"]
+        - ["2400 r/min、驱动延迟 1.2 ms：模板滞后几度？", "2400 r/min, 1.2 ms drive lag: how many degrees behind?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：窗口 {{ch15.W15:.1f}}°，每轴加速度 50 米每秒平方，沿 X 方向 4 毫米一针，转速上限大约多少？"
+        - ">再比如：主轴每分钟 2400 转，驱动延迟 1.2 毫秒，不做补偿，模板会滞后多少度主轴转角？还有一题问中压脚的时序。"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, with a {{ch15.W15:.1f}}-degree window and 50 metres per second squared per axis, what is the speed limit for a 4 millimetre stitch along X?"
+        - ">Or, the shaft turns at 2400 r/min and the drive lags by 1.2 milliseconds. Without compensation, how many degrees of shaft angle does the template fall behind? Another asks about centre-foot timing."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲电脑绣花机：同样是 X–Y 工作台带着布走，但一台机器有几个到十几个机头一起绣，还要自动换色。我们下一讲见。
+  en:
+    - The slides, the virtual labs, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's computerised embroidery machines. Again an X–Y frame carries the fabric, but one machine may have anywhere from a few heads to a dozen or more, all stitching together, and it changes colours on its own. See you then.

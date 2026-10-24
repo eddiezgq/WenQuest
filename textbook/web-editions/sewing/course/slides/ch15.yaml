@@ -7,11 +7,11 @@ code: [ch15]
 lab: {no: "15-1", id: pattern, title: ["虚拟实验 15-1 花样机仿真", "Virtual lab 15-1 Pattern-sewer simulation"]}
 
 clips:
-  hero:          # 封面：花样机三维模型，主轴转、模板走（关掉标注）
+  hero:          # 封面：花样机三维模型，主轴转、模板走（关掉标注）；镜头拉远、模型挪到右边，不压封面标题和副标题
     page: model-pattern
     selector: "#stage"
     steps:
-      - {at: 0, press: ["#play", "#labels"], js: "document.querySelector('.stage').style.background='radial-gradient(120% 90% at 60% 35%,#22324d 0%,#0b1220 75%)'"}
+      - {at: 0, press: ["#play", "#labels"], js: "document.querySelector('.stage').style.background='radial-gradient(120% 90% at 60% 35%,#22324d 0%,#0b1220 75%)';window.__set({cam:[-0.5,0.55,2700],target:[-330,40,-160]})"}
   parts:         # 爆炸图：机头、X–Y 工作台、模板、压框、中压脚
     page: model-pattern
     selector: "#stage"
@@ -27,13 +27,13 @@ clips:
     selector: ".viewrow"
     loop: 5
     steps:
-      - {at: 0, press: "[data-slow='20']", js: "var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: "[data-slow='20']", js: "var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   s6:            # 同上，针距 6 mm：红点是走不完的针
     page: pattern
     selector: ".viewrow"
     loop: 5
     steps:
-      - {at: 0, press: "[data-slow='20']", js: "var s=document.getElementById('s');if(s.value!='6'){s.value=6;s.dispatchEvent(new Event('input',{bubbles:true}))}var p=document.getElementById('play');if(p.textContent.trim()==='播放')p.click()"}
+      - {at: 0, press: "[data-slow='20']", js: "var s=document.getElementById('s');if(s.value!='6'){s.value=6;s.dispatchEvent(new Event('input',{bubbles:true}))}var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
   ahead:         # 五角星、针距 6 mm：固定转速 ↔ 自动前瞻，来回切换
     page: pattern
     selector: ".col:first-child .panel:nth-child(2)"
@@ -46,7 +46,7 @@ slides:
   - layout: cover
     video: hero
     kicker: ["第 15 讲", "Lecture 15"]
-    title: ["花样机与锁眼、 钉扣、套结机控制", "Pattern Sewers, Buttonholers and Bartackers"]
+    title: ["花样机与锁眼、钉⁠扣、套结机控制", "Pattern Sewers, Buttonholers and Bartackers"]
     sub: ["机针在布中，模板不能动", "While the needle is in the fabric, the template must not move"]
     notes:
       - "同学们好。上一讲的平缝机靠人手送布、转方向。今天看另一类机器：花样机。布夹在模板里，由 X–Y 工作台按程序带着走，口袋盖、鞋面、座椅上的装饰线，一件和一件完全一样。锁眼、钉扣、套结机是它的特例。整讲围绕一条规矩：机针在布中，模板不能动。"
@@ -75,8 +75,8 @@ slides:
       - ["中压脚随针跳，压框由气缸压紧", "A centre foot rides with the needle; air cylinders clamp"]
     visual: {video: parts}
     notes:
-      - "看这张爆炸图。和平缝机比，花样机的机头少了送布牙，刺布、挑线、钩线三个机构完全一样。上轴末端是带编码器的直驱伺服，编码器读出的主轴角 φ 是整台机器的时间基准。送布的活由 X–Y 工作台接了：Y 横梁前后走，X 滑座在横梁上左右走，压框和模板装在 X 滑座上。普通压脚会挡住模板，所以换成随针杆跳动的中压脚。"
-      - "Look at this exploded view. Compared with a lockstitch machine, the head has no feed dog; the needle, take-up and hook mechanisms are exactly the same. At the end of the upper shaft is a direct-drive servo with an encoder, and the shaft angle φ it reads is the time base of the whole machine. The X–Y table takes over feeding: the Y beam moves front to back, the X slide moves left and right on the beam, and the clamp frame and template ride on the X slide. A normal presser foot would block the template, so a small centre foot rides up and down with the needle bar."
+      - "看这张爆炸图。和平缝机比，花样机的机头少了送布牙，刺布、挑线、钩线三个机构完全一样。上轴末端是带编码器的直驱伺服，编码器读出的主轴转角是整台机器的时间基准。送布的活由 X–Y 工作台接了：Y 横梁前后走，X 滑座在横梁上左右走，压框和模板装在 X 滑座上。普通压脚会挡住模板，所以换成随针杆跳动的中压脚。"
+      - "Look at this exploded view. Compared with a lockstitch machine, the head has no feed dog; the needle, take-up and hook mechanisms are exactly the same. At the end of the upper shaft is a direct-drive servo with an encoder, and the shaft angle it reads is the time base of the whole machine. The X–Y table takes over feeding: the Y beam moves front to back, the X slide moves left and right on the beam, and the clamp frame and template ride on the X slide. A normal presser foot would block the template, so a small centre foot rides up and down with the needle bar."
 
   - layout: split
     title: ["同步带是一根弹簧", "A timing belt is a spring"]
@@ -86,7 +86,7 @@ slides:
       - ["周期 {{ch15.Tn:.0f}} ms，与一针移动同量级", "Period {{ch15.Tn:.0f}} ms, the same order as one move"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="20" y="170" width="30" height="180" fill="#4b5f7d"/><rect x="850" y="170" width="30" height="180" fill="#4b5f7d"/>
           <path d="M50 260 L70 260 l12 -34 l24 68 l24 -68 l24 68 l24 -68 l24 68 l24 -68 l24 68 l24 -68 l12 34 L370 260" fill="none" stroke="#2ec4b6" stroke-width="6" stroke-linejoin="round"/>
           <path d="M530 260 L545 260 l14 -34 l28 68 l28 -68 l28 68 l28 -68 l28 68 l28 -68 l28 68 l28 -68 l14 34 L850 260" fill="none" stroke="#2ec4b6" stroke-width="6" stroke-linejoin="round"/>
@@ -95,12 +95,12 @@ slides:
           <text x="450" y="292" font-size="24" font-weight="700" fill="#08101d" text-anchor="middle">3 kg</text>
           <text x="210" y="160" font-size="28" fill="#5ee0d2" text-anchor="middle" class="en">L₁ = 0.3 m</text>
           <text x="690" y="160" font-size="28" fill="#5ee0d2" text-anchor="middle" class="en">L₂ = 0.5 m</text>
-          <text x="450" y="390" font-size="26" fill="#8fa3ba" text-anchor="middle">滑座 + 压框 + 模板，两侧两段带并联</text>
+          <text x="450" y="390" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">滑座 + 压框 + 模板，两侧两段带并联</text><text x="450" y="390" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">slide + clamp + template; two belts in parallel</text>
           <text x="450" y="470" font-size="40" font-weight="800" fill="#f2b705" text-anchor="middle" class="en">k = EA/L₁ + EA/L₂</text>
           <rect x="100" y="520" width="300" height="80" rx="16" fill="rgba(46,196,182,.15)" stroke="#2ec4b6" stroke-width="2"/>
           <text x="250" y="572" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">fₙ ≈ {{ch15.fn:.0f}} Hz</text>
           <rect x="500" y="520" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="2"/>
-          <text x="650" y="572" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle">周期 {{ch15.Tn:.0f}} ms</text>
+          <text x="650" y="572" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle" class="zh">周期 {{ch15.Tn:.0f}} ms</text><text x="650" y="572" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle" class="eo">period {{ch15.Tn:.0f}} ms</text>
         </svg>
     notes:
       - "工作台常用同步带传动，轻快便宜，但带有弹性。滑座两侧各有一段带，可以看成两根并联的弹簧。算例里 EA 是 150 千牛，两段带长 0.3 和 0.5 米，合起来刚度 {{ch15.k:.0f}} 千牛每米；运动质量 3 公斤，固有频率约 {{ch15.fn:.0f}} 赫兹，周期 {{ch15.Tn:.0f}} 毫秒，和走一针的十几毫秒同一个量级。移动一停，模板就晃，晃没停就入布，针位就不准。"
@@ -114,21 +114,21 @@ slides:
       - ["32 mm 缸、0.5 MPa：压紧力约 {{ch15.cyl:.0f}} N", "32 mm cylinder at 0.5 MPa: about {{ch15.cyl:.0f}} N"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <defs><marker id="m15a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6f84a3"/></marker></defs>
           <g text-anchor="middle">
             <rect x="60" y="20" width="560" height="96" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="340" y="66" font-size="32" font-weight="700" fill="#f3f6fa">过滤减压阀 0.5–0.6 MPa</text><text x="340" y="100" font-size="22" fill="#8fa3ba" class="en">filter-regulator</text>
+            <text x="340" y="66" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">过滤减压阀 0.5–0.6 MPa</text><text x="340" y="66" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">Filter-regulator 0.5–0.6 MPa</text><text x="340" y="100" font-size="22" fill="#8fa3ba" class="zh">filter-regulator</text>
             <rect x="60" y="170" width="560" height="96" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="340" y="216" font-size="32" font-weight="700" fill="#f3f6fa">二位五通电磁阀</text><text x="340" y="250" font-size="22" fill="#8fa3ba" class="en">5/2 solenoid valve</text>
+            <text x="340" y="216" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">二位五通电磁阀</text><text x="340" y="216" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">5/2 solenoid valve</text><text x="340" y="250" font-size="22" fill="#8fa3ba" class="zh">5/2 solenoid valve</text>
             <rect x="60" y="320" width="560" height="96" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="340" y="366" font-size="32" font-weight="700" fill="#f3f6fa">单向节流阀</text><text x="340" y="400" font-size="22" fill="#8fa3ba" class="en">one-way flow control</text>
+            <text x="340" y="366" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">单向节流阀</text><text x="340" y="366" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">One-way flow control</text><text x="340" y="400" font-size="22" fill="#8fa3ba" class="zh">one-way flow control</text>
             <rect x="60" y="470" width="560" height="110" rx="20" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/>
-            <text x="340" y="520" font-size="34" font-weight="800" fill="#ff9c75">双作用气缸 + 磁性开关</text><text x="340" y="558" font-size="22" fill="#8fa3ba" class="en">cylinder + reed switch</text>
+            <text x="340" y="520" font-size="34" font-weight="800" fill="#ff9c75" class="zh">双作用气缸 + 磁性开关</text><text x="340" y="520" font-size="26" font-weight="800" fill="#ff9c75" class="eo">Double-acting cylinder + reed switch</text><text x="340" y="558" font-size="22" fill="#8fa3ba" class="zh">cylinder + reed switch</text>
           </g>
           <g stroke="#6f84a3" stroke-width="5" marker-end="url(#m15a)"><path d="M340 118 L340 162"/><path d="M340 268 L340 312"/><path d="M340 418 L340 462"/></g>
           <text x="660" y="515" font-size="44" font-weight="800" fill="#f2b705" class="en">≈ {{ch15.cyl:.0f}} N</text>
-          <text x="660" y="560" font-size="24" fill="#c9a94a">到位信号 → 才能启动</text>
+          <text x="660" y="560" font-size="24" fill="#c9a94a" class="zh">到位信号 → 才能启动</text><text x="660" y="560" font-size="21" fill="#c9a94a" class="eo">clamp ready → start</text>
         </svg>
     notes:
       - "中压脚套在机针外面，和针杆同步跳，机针上提时压住布，不让布被带起来，否则线环不好、容易跳针。它有两条硬要求：入布前压下，出布后才抬起，抬起以后模板才能动。电子中压脚用步进电机设定最低点，可以按段改。压框由气缸压紧：减压阀、二位五通电磁阀、单向节流阀、气缸。32 毫米缸径、0.5 兆帕约 {{ch15.cyl:.0f}} 牛。压力不够，布会在模板里慢慢溜。"
@@ -168,9 +168,9 @@ slides:
       - ["3 mm：{{ch15.tm3:.1f}} ms；6 mm：{{ch15.tm6:.1f}} ms", "3 mm: {{ch15.tm3:.1f}} ms; 6 mm: {{ch15.tm6:.1f}} ms"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M60 520 L870 520 M60 520 L60 60" stroke="#4b5f7d" stroke-width="3"/>
-          <text x="72" y="80" font-size="24" fill="#8fa3ba">速度 v</text><text x="860" y="560" font-size="24" fill="#8fa3ba" text-anchor="end">时间 t</text>
+          <text x="72" y="80" font-size="24" fill="#8fa3ba" class="zh">速度 v</text><text x="72" y="80" font-size="24" fill="#8fa3ba" class="eo">speed v</text><text x="860" y="560" font-size="24" fill="#8fa3ba" text-anchor="end" class="zh">时间 t</text><text x="860" y="560" font-size="24" fill="#8fa3ba" text-anchor="end" class="eo">time t</text>
           <path d="M60 140 L870 140" stroke="#4b5f7d" stroke-width="2" stroke-dasharray="10 8"/>
           <text x="860" y="128" font-size="24" fill="#8fa3ba" text-anchor="end" class="en">v = 1 m/s</text>
           <path d="M60 520 L250 360 L440 520 Z" fill="rgba(46,196,182,.25)" stroke="#2ec4b6" stroke-width="6" stroke-linejoin="round"/>
@@ -179,32 +179,32 @@ slides:
           <text x="420" y="330" font-size="30" font-weight="800" fill="#ff9c75">6 mm</text>
           <text x="440" y="570" font-size="26" fill="#5ee0d2" text-anchor="middle" class="en">{{ch15.tm3:.1f}} ms</text>
           <text x="600" y="600" font-size="26" fill="#ff9c75" text-anchor="middle" class="en">{{ch15.tm6:.1f}} ms</text>
-          <text x="150" y="400" font-size="24" fill="#d3deea" text-anchor="middle">加速 a</text>
-          <text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705">面积 = 针距 s</text>
+          <text x="150" y="400" font-size="24" fill="#d3deea" text-anchor="middle" class="zh">加速 a</text><text x="150" y="400" font-size="24" fill="#d3deea" text-anchor="middle" class="eo">accel. a</text>
+          <text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705" class="zh">面积 = 针距 s</text><text x="660" y="250" font-size="30" font-weight="700" fill="#f2b705" class="eo">area = stitch length s</text>
           <text x="660" y="300" font-size="32" font-weight="800" fill="#f2b705" class="en">t = 2√(s/a)</text>
         </svg>
     notes:
-      - "知道了窗口，再看走一针要多久。每轴有最大加速度 a 和最高速度 v。距离短，还没加速到 v 就得减速，速度曲线是三角形，三角形面积就是针距，时间是 2 倍根号 s 除以 a。算例 a 取 50 米每秒平方，v 取 1 米每秒，v 平方除以 a 是 {{ch15.v2a:.0f}} 毫米，花样机的针距全落在三角形区。所以决定快慢的是加速度。3 毫米一针 {{ch15.tm3:.1f}} 毫秒，6 毫米 {{ch15.tm6:.1f}} 毫秒。"
-      - "With the window known, how long does one stitch move take? Each axis has a maximum acceleration a and top speed v. Over a short distance it has to start braking before it reaches v, so the speed profile is a triangle whose area is the stitch length, and the time is 2 root s over a. In the example a is 50 metres per second squared and v is 1 metre per second, so v squared over a is {{ch15.v2a:.0f}} millimetres, and every pattern stitch falls in the triangle region. Acceleration is what decides. A 3-millimetre stitch takes {{ch15.tm3:.1f}} milliseconds, a 6-millimetre one {{ch15.tm6:.1f}}."
+      - "知道了窗口，再看走一针要多久。每轴有最大加速度 a 和最高速度 v。距离短，还没加速到 v 就得减速，速度曲线是三角形，三角形面积就是针距，时间是 2 倍的根号下 s 比 a。算例 a 取 50 米每秒平方，v 取 1 米每秒，v 平方除以 a 是 {{ch15.v2a:.0f}} 毫米，花样机的针距全落在三角形区。所以决定快慢的是加速度。3 毫米一针 {{ch15.tm3:.1f}} 毫秒，6 毫米 {{ch15.tm6:.1f}} 毫秒。"
+      - "With the window known, how long does one stitch move take? Each axis has a maximum acceleration a and top speed v. Over a short distance it has to start braking before it reaches v, so the speed profile is a triangle whose area is the stitch length, and the time is twice the square root of s over a. In the example a is 50 metres per second squared and v is 1 metre per second, so v squared over a is {{ch15.v2a:.0f}} millimetres, and every pattern stitch falls in the triangle region. Acceleration is what decides. A 3-millimetre stitch takes {{ch15.tm3:.1f}} milliseconds, a 6-millimetre one {{ch15.tm6:.1f}}."
 
   - layout: bignum
     title: ["每针转速上限 n = W / 6t", "Per-stitch speed limit n = W / 6t"]
     nums:
       - {n: "{{ch15.n2:.0f}}", n_en: "r/min · 2 mm", label: ["针距 2 mm（1.5 mm 厚）", "2 mm stitch, 1.5 mm stack"]}
       - {n: "{{ch15.n3:.0f}}", n_en: "r/min · 3 mm", label: ["针距 3 mm", "3 mm stitch"]}
-      - {n: "{{ch15.n10:.0f}}", n_en: "r/min · 10 mm", label: ["针距 10 mm", "10 mm stitch"]}
+      - {n: "{{ch15.n10i}}", n_en: "r/min · 10 mm", label: ["针距 10 mm", "10 mm stitch"]}
     foot: ["n ∝ 1/√s：针距 4 倍，转速减半；6 mm 厚比 1.5 mm 低约 {{ch15.thick:.0f}}%；45° 斜针反而高约 {{ch15.diag:.0f}}%", "n ∝ 1/√s: 4× the stitch, half the speed; 6 mm stock −{{ch15.thick:.0f}}%; a 45° stitch +{{ch15.diag:.0f}}%"]
     notes:
-      - "转过窗口的时间不能小于走一针的时间，整理一下，转速上限等于 W 除以 6 倍 t_move。1.5 毫米厚，2 毫米针距 {{ch15.n2:.0f}} 转，3 毫米 {{ch15.n3:.0f}} 转，10 毫米只有 {{ch15.n10:.0f}} 转。转速和根号针距成反比，针距变 4 倍转速减半；6 毫米厚料低约 {{ch15.thick:.0f}}%；45° 的斜针每轴只走 s 除以根号 2，反而快约 {{ch15.diag:.0f}}%。"
-      - "The time to turn through the window can't be shorter than the move, which rearranges to: speed limit equals W over 6 times t_move. At 1.5 millimetres thick, a 2-millimetre stitch allows {{ch15.n2:.0f}} r/min, 3 millimetres {{ch15.n3:.0f}}, 10 millimetres only {{ch15.n10:.0f}}. Speed goes with one over root s: four times the stitch, half the speed. A 6-millimetre stack is about {{ch15.thick:.0f}} percent slower. And a 45-degree stitch is about {{ch15.diag:.0f}} percent faster, because each axis only moves s over root 2."
+      - "转过窗口的时间不能小于走一针的时间，整理一下，转速上限等于窗口 W 除以 6 倍的移动时间。1.5 毫米厚，2 毫米针距 {{ch15.n2:.0f}} 转，3 毫米 {{ch15.n3:.0f}} 转，10 毫米只有 {{ch15.n10i}} 转。转速和根号针距成反比，针距变 4 倍转速减半；6 毫米厚料低约 {{ch15.thick:.0f}}%；45° 的斜针每轴只走 s 除以根号 2，反而快约 {{ch15.diag:.0f}}%。"
+      - "The time to turn through the window can't be shorter than the move, which rearranges to: speed limit equals the window W over 6 times the move time. At 1.5 millimetres thick, a 2-millimetre stitch allows {{ch15.n2:.0f}} r/min, 3 millimetres {{ch15.n3:.0f}}, 10 millimetres only {{ch15.n10i}}. Speed goes with one over root s: four times the stitch, half the speed. A 6-millimetre stack is about {{ch15.thick:.0f}} percent slower. And a 45-degree stitch is about {{ch15.diag:.0f}} percent faster, because each axis only moves s over root 2."
 
   - layout: duo
-    title: ["同样 2000 r/min：3 mm 与 6 mm", "Both at 2000 r/min: 3 mm and 6 mm"]
-    left: {video: s3, label: ["针距 3 mm", "3 mm stitches"], note: ["蓝点：能在窗口里走完", "Blue: finished inside the window"]}
-    right: {video: s6, label: ["针距 6 mm", "6 mm stitches"], note: ["红点：走不完的针", "Red: moves that can't finish"]}
+    title: ["同样 2000 r/min：6 mm 与 3 mm", "Both at 2000 r/min: 6 mm and 3 mm"]
+    left: {video: s6, label: ["针距 6 mm", "6 mm stitches"], note: ["红点：走不完的针", "Red: moves that can't finish"]}
+    right: {video: s3, label: ["针距 3 mm", "3 mm stitches"], note: ["蓝点：能在窗口里走完", "Blue: finished inside the window"]}
     notes:
-      - "这是花样机仿真，慢放 20 倍。左边针距 3 毫米，右边 6 毫米，主轴都是 2000 转。右上角的表盘里，蓝色弧是模板可以动的窗口，灰色弧是机针在布中。图上的点是针位：蓝点表示这一针能在窗口里走完，红点表示走不完，机针入布时模板还在动。车间里的断针，就是这些红点。"
-      - "This is the pattern-sewer simulation slowed down twenty times. On the left the stitches are 3 millimetres, on the right 6, both at 2000 r/min. In the dial, the blue arc is the window when the template may move, the grey arc is when the needle is in the fabric. Each dot is a needle point: blue means that move finishes inside the window, red means it doesn't, so the template is still moving when the needle goes in. Those red dots are the broken needles on the shop floor."
+      - "这是花样机仿真，慢放 20 倍。左边针距 6 毫米，右边 3 毫米，主轴都是 2000 转。右上角的表盘里，蓝色弧是模板可以动的窗口，灰色弧是机针在布中。图上的点是针位：蓝点表示这一针能在窗口里走完，红点表示走不完，机针入布时模板还在动。车间里的断针，就是这些红点。"
+      - "This is the pattern-sewer simulation slowed down twenty times. On the left the stitches are 6 millimetres, on the right 3, both at 2000 r/min. In the dial, the blue arc is the window when the template may move, the grey arc is when the needle is in the fabric. Each dot is a needle point: blue means that move finishes inside the window, red means it doesn't, so the template is still moving when the needle goes in. Those red dots are the broken needles on the shop floor."
 
   - layout: lab
     title: ["动手试一试：花样机仿真", "Try it: the pattern-sewer simulation"]
@@ -229,26 +229,26 @@ slides:
       - ["驱动延迟：用预测角 φ + ωT_d 查表", "Drive lag: look up at the predicted angle φ + ωT_d"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="60" y="80" width="153" height="420" fill="rgba(143,163,186,.12)"/>
           <rect x="713" y="80" width="157" height="420" fill="rgba(143,163,186,.12)"/>
           <rect x="213" y="80" width="500" height="420" fill="rgba(76,141,255,.12)"/>
           <path d="M60 500 L870 500" stroke="#4b5f7d" stroke-width="3"/>
           <path d="M60 420 L240 420 C 400 420, 520 160, 690 160 L870 160" fill="none" stroke="#f2b705" stroke-width="7"/>
-          <text x="463" y="60" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle">离布窗口 W：模板走</text>
-          <text x="136" y="300" font-size="24" fill="#8fa3ba" text-anchor="middle">针在布中</text>
-          <text x="791" y="300" font-size="24" fill="#8fa3ba" text-anchor="middle">针在布中</text>
+          <text x="463" y="60" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="zh">离布窗口 W：模板走</text><text x="463" y="60" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="eo">Off-fabric window W: template moves</text>
+          <text x="136" y="300" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">针在布中</text><text x="136" y="300" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">needle in</text>
+          <text x="791" y="300" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">针在布中</text><text x="791" y="300" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">needle in</text>
           <text x="80" y="405" font-size="26" fill="#f3f6fa" class="en">x₍ᵢ₋₁₎</text>
           <text x="760" y="145" font-size="26" fill="#f3f6fa" class="en">xᵢ</text>
           <text x="470" y="300" font-size="30" font-weight="700" fill="#f2b705">x = f(τ)</text>
           <g font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">
             <text x="213" y="536" class="en">{{ch15.phi2:.0f}}°</text><text x="463" y="536" class="en">360°</text><text x="713" y="536" class="en">{{ch15.phi1:.0f}}°</text>
           </g>
-          <text x="463" y="590" font-size="26" fill="#d3deea" text-anchor="middle">主轴转角 φ（不是时间）</text>
+          <text x="463" y="590" font-size="26" fill="#d3deea" text-anchor="middle" class="zh">主轴转角 φ（不是时间）</text><text x="463" y="590" font-size="26" fill="#d3deea" text-anchor="middle" class="eo">shaft angle φ (not time)</text>
         </svg>
     notes:
-      - "主轴转速不是恒定的：起针慢、中间快、剪线前慢，负载一变也会波动。如果 X–Y 按时间出发，主轴一变速就错位了。做法是把 X、Y 的位置写成主轴角度的函数：主轴就是凸轮轴，f(τ) 就是存在内存里的凸轮廓线，这叫电子凸轮。运动控制层每 250 微秒读一次编码器、查表、发指令。驱动有 0.5 到 2 毫秒延迟，2800 转时 1 毫秒就是 {{ch15.deg1ms:.1f}}°，所以要用预测角去查表。"
-      - "The shaft speed isn't constant: slow at the start, fast in the middle, slow before trimming, and it wobbles with load. If the X–Y moves were launched by time, any speed change would throw them out of step. So X and Y are written as functions of shaft angle: the shaft is the camshaft and f(τ) is a cam profile stored in memory. That's an electronic cam. Every 250 microseconds the motion layer reads the encoder, looks up the table and sends the command. The drives lag by half to two milliseconds, and at 2800 r/min one millisecond is {{ch15.deg1ms:.1f}} degrees, so the lookup uses the predicted angle."
+      - "主轴转速不是恒定的：起针慢、中间快、剪线前慢，负载一变也会波动。如果 X–Y 按时间出发，主轴一变速就错位了。做法是把 X、Y 的位置写成主轴角度的函数：主轴就是凸轮轴，存在内存里的这张表就是凸轮廓线，这叫电子凸轮。运动控制层每 250 微秒读一次编码器、查表、发指令。驱动有 0.5 到 2 毫秒延迟，2800 转时 1 毫秒就是 {{ch15.deg1ms:.1f}}°，所以要用预测角去查表。"
+      - "The shaft speed isn't constant: slow at the start, fast in the middle, slow before trimming, and it wobbles with load. If the X–Y moves were launched by time, any speed change would throw them out of step. So X and Y are written as functions of shaft angle: the shaft is the camshaft and the table stored in memory is its cam profile. That's an electronic cam. Every 250 microseconds the motion layer reads the encoder, looks up the table and sends the command. The drives lag by half to two milliseconds, and at 2800 r/min one millisecond is {{ch15.deg1ms:.1f}} degrees, so the lookup uses the predicted angle."
 
   - layout: split
     title: ["选哪种运动规律：a = C·s/Δt²", "Which motion law: a = C·s/Δt²"]
@@ -258,20 +258,20 @@ slides:
       - ["摆线：转速上限 × {{ch15.cyc:.2f}}，换来不晃", "Cycloid: speed limit × {{ch15.cyc:.2f}}, for no ringing"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M60 320 L840 320 M80 60 L80 590" stroke="#4b5f7d" stroke-width="3"/>
-          <text x="92" y="70" font-size="24" fill="#8fa3ba">加速度 a</text><text x="840" y="356" font-size="24" fill="#8fa3ba" text-anchor="end">τ = 0 → 1</text>
+          <text x="92" y="70" font-size="24" fill="#8fa3ba" class="zh">加速度 a</text><text x="92" y="70" font-size="24" fill="#8fa3ba" class="eo">accel. a</text><text x="840" y="356" font-size="24" fill="#8fa3ba" text-anchor="end">τ = 0 → 1</text>
           <path d="M80 320 L80 160 L440 160 L440 480 L800 480 L800 320" fill="none" stroke="#ff7a45" stroke-width="6" stroke-linejoin="round"/>
           <polyline points="80,320 98,281 116,242 134,206 152,172 170,143 188,117 206,96 224,81 242,72 260,69 278,72 296,81 314,96 332,117 350,143 368,172 386,206 404,242 422,281 440,320 458,359 476,398 494,434 512,468 530,497 548,523 566,544 584,559 602,568 620,571 638,568 656,559 674,544 692,523 710,497 728,468 746,434 764,398 782,359 800,320" fill="none" stroke="#2ec4b6" stroke-width="6"/>
           <path d="M80 320 L170 124 L350 124 L530 516 L710 516 L800 320" fill="none" stroke="#f2b705" stroke-width="4" stroke-dasharray="12 8"/>
           <text x="455" y="150" font-size="28" font-weight="700" fill="#ff9c75">C = 4</text>
-          <text x="275" y="55" font-size="28" font-weight="700" fill="#5ee0d2">摆线 C = 6.28</text>
-          <text x="560" y="610" font-size="28" font-weight="700" fill="#f2b705">修正梯形 C = 4.89</text>
-          <text x="120" y="420" font-size="24" fill="#ff9c75">两端突变 → 激振</text>
+          <text x="275" y="55" font-size="28" font-weight="700" fill="#5ee0d2" class="zh">摆线 C = 6.28</text><text x="275" y="55" font-size="28" font-weight="700" fill="#5ee0d2" class="eo">cycloid C = 6.28</text>
+          <text x="560" y="610" font-size="28" font-weight="700" fill="#f2b705" class="zh">修正梯形 C = 4.89</text><text x="560" y="610" font-size="28" font-weight="700" fill="#f2b705" class="eo">mod. trapezoid C = 4.89</text>
+          <text x="120" y="420" font-size="24" fill="#ff9c75" class="zh">两端突变 → 激振</text><text x="120" y="420" font-size="24" fill="#ff9c75" class="eo">jumps → ringing</text>
         </svg>
     notes:
-      - "这其实是机械原理里凸轮那一章的问题。用时 Δt 走距离 s，峰值加速度都能写成 C 乘 s 除以 Δt 平方。等加速等减速 C 等于 4，峰值最小、转速最高，但两端加速度突变，会激起模板和横梁振动，前面 {{ch15.fn:.0f}} 赫兹的同步带就是隐患。修正梯形 4.89、摆线 6.28，两端加速度为零，最平滑。换成摆线，Δt 要放大 {{ch15.cycdt:.2f}} 倍，转速上限乘 {{ch15.cyc:.2f}}。薄料小针距用硬规律争转速，大模板用平滑规律换稳定。"
-      - "This is really the cam chapter of mechanism design. Moving s in time Δt, the peak acceleration is always C times s over Δt squared; only C changes. Constant acceleration, C equals 4, has the lowest peak and the highest speed, but the acceleration jumps at both ends, which rings the template and beam, and remember that {{ch15.fn:.0f}}-hertz belt. The modified trapezoid, 4.89, and the cycloid, 6.28, start and end at zero acceleration. With a cycloid, Δt grows {{ch15.cycdt:.2f}} times and the speed limit is multiplied by {{ch15.cyc:.2f}}. Hard laws for thin stock and short stitches; smooth ones for big templates."
+      - "这其实是机械原理里凸轮那一章的问题。用一段时间走距离 s，峰值加速度都能写成 C 乘 s、除以时间的平方。等加速等减速 C 等于 4，峰值最小、转速最高，但两端加速度突变，会激起模板和横梁振动，而同步带传动的工作台本身就像一根弹簧，最怕这种激振。修正梯形 4.89、摆线 6.28，两端加速度为零，最平滑。换成摆线，移动时间要放大 {{ch15.cycdt:.2f}} 倍，转速上限乘 {{ch15.cyc:.2f}}。薄料小针距用硬规律争转速，大模板用平滑规律换稳定。"
+      - "This is really the cam chapter of mechanism design. Moving a distance s in a given time, the peak acceleration is always C times s over the time squared; only C changes. Constant acceleration, C equals 4, has the lowest peak and the highest speed, but the acceleration jumps at both ends, which rings the template and beam, and a belt-driven table is itself a spring, the last thing you want to excite. The modified trapezoid, 4.89, and the cycloid, 6.28, start and end at zero acceleration. With a cycloid, the move time grows {{ch15.cycdt:.2f}} times and the speed limit is multiplied by {{ch15.cyc:.2f}}. Hard laws for thin stock and short stitches; smooth ones for big templates."
 
   - layout: split
     title: ["前瞻调速：先往后看几针", "Look-ahead: read a few stitches ahead"]
@@ -281,8 +281,8 @@ slides:
       - ["图：固定转速 ↔ 自动前瞻，来回切换", "Chart: fixed speed ↔ automatic look-ahead"]
     visual: {video: ahead}
     notes:
-      - "一个花样里针距各不相同，每针用自己的上限行不行？不行。主轴连同旋梭有惯量，每针只能改变有限的转速 Δn。所以控制器先往后看几针，提前减速：先算每针自己的上限，反向扫描一遍，后面有慢针前面就提前降；再正向扫描一遍，加速不能太猛。右图橙线是每针上限，蓝线是实际转速，在固定转速和自动前瞻之间来回切换，看蓝线怎样钻到橙线下面。"
-      - "Stitch lengths vary within a pattern. Can each stitch just use its own limit? No. The shaft and hook have inertia, so the speed can change only by Δn per stitch. The controller looks a few stitches ahead and slows early, just like look-ahead in CNC: compute each stitch's own limit, sweep backwards so a slow stitch pulls the ones before it down, then sweep forwards so speed doesn't rise too fast. On the right the orange line is each stitch's limit and the blue line the actual speed, switching between fixed speed and look-ahead. Watch the blue line drop below the orange."
+      - "一个花样里针距各不相同，每针用自己的上限行不行？不行。主轴连同旋梭有惯量，每针只能改变有限的转速。所以控制器先往后看几针，提前减速：先算每针自己的上限，反向扫描一遍，后面有慢针前面就提前降；再正向扫描一遍，加速不能太猛。右图橙线是每针上限，蓝线是实际转速，在固定转速和自动前瞻之间来回切换，看蓝线怎样钻到橙线下面。"
+      - "Stitch lengths vary within a pattern. Can each stitch just use its own limit? No. The shaft and hook have inertia, so the speed can change only by a limited amount per stitch. The controller looks a few stitches ahead and slows early, just like look-ahead in CNC: compute each stitch's own limit, sweep backwards so a slow stitch pulls the ones before it down, then sweep forwards so speed doesn't rise too fast. On the right the orange line is each stitch's limit and the blue line the actual speed, switching between fixed speed and look-ahead. Watch the blue line drop below the orange."
 
   - layout: chain
     title: ["前瞻算例：第 5 针是 10 mm 长针", "Look-ahead example: stitch 5 is 10 mm"]
@@ -291,8 +291,8 @@ slides:
     mark: ["10 mm 长针", "long stitch"]
     foot: ["2 mm 针稳定 {{ch15.n2:.0f}} r/min，Δn = 300：从第 1 针就开始降。不前瞻，第 5 针必然断针", "2 mm at {{ch15.n2:.0f}} r/min, Δn = 300: braking starts at stitch 1. Without look-ahead, stitch 5 breaks a needle"]
     notes:
-      - "看算例。2 毫米针距稳定在 {{ch15.n2:.0f}} 转，第 5 针是 10 毫米的长针，上限只有 {{ch15.n10:.0f}} 转，每针最多变 300 转。反向扫描以后，控制器从第 1 针就开始降：{{ch15.la1}}、{{ch15.la2}}、{{ch15.la3}}、{{ch15.la4}}，到第 5 针正好 {{ch15.la5}}，然后再一针针加回去。没有前瞻，第 5 针会在两千六百多转下走 10 毫米，时间远远不够，模板入布时还在动，结果就是断针。"
-      - "Here's the example. With 2-millimetre stitches the machine runs at {{ch15.n2:.0f}} r/min; stitch 5 is 10 millimetres with a limit of only {{ch15.n10:.0f}}, and the speed may change by 300 per stitch. After the backward pass the controller starts braking at stitch 1: {{ch15.la1}}, {{ch15.la2}}, {{ch15.la3}}, {{ch15.la4}}, and exactly {{ch15.la5}} at stitch 5, then climbs back stitch by stitch. Without look-ahead, stitch 5 would try a 10-millimetre move at over 2600 r/min, far too little time, the template would still be moving when the needle entered, and the needle would break."
+      - "看算例。2 毫米针距稳定在 {{ch15.n2:.0f}} 转，第 5 针是 10 毫米的长针，上限只有 {{ch15.n10i}} 转，每针最多变 300 转。反向扫描以后，控制器从第 1 针就开始降：{{ch15.la1}}、{{ch15.la2}}、{{ch15.la3}}、{{ch15.la4}}，到第 5 针正好 {{ch15.la5}}，然后再一针针加回去。没有前瞻，第 5 针会在两千六百多转下走 10 毫米，时间远远不够，模板入布时还在动，结果就是断针。"
+      - "Here's the example. With 2-millimetre stitches the machine runs at {{ch15.n2:.0f}} r/min; stitch 5 is 10 millimetres with a limit of only {{ch15.n10i}}, and the speed may change by 300 per stitch. After the backward pass the controller starts braking at stitch 1: {{ch15.la1}}, {{ch15.la2}}, {{ch15.la3}}, {{ch15.la4}}, and exactly {{ch15.la5}} at stitch 5, then climbs back stitch by stitch. Without look-ahead, stitch 5 would try a 10-millimetre move at over 2600 r/min, far too little time, the template would still be moving when the needle entered, and the needle would break."
 
   - layout: section
     num: "04"
@@ -306,18 +306,18 @@ slides:
       - ["空走前先剪线；分段越少越好", "Trim before a jump; the fewer segments the better"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="20" y="20" width="860" height="600" rx="22" fill="#0b1424" stroke="#22324d" stroke-width="2"/>
           <g font-family="DejaVu Sans Mono, monospace" font-size="27">
             <text x="50" y="80" fill="#f2b705">HEAD  ORG=(0,0)  UNIT=0.1mm</text>
-            <text x="50" y="140" fill="#f3f6fa">SEW    +0   +30   <tspan fill="#8fa3ba">; 回针 ↓</tspan></text>
-            <text x="50" y="190" fill="#f3f6fa">SEW    +0   -30   <tspan fill="#8fa3ba">; 回针 ↑</tspan></text>
+            <text x="50" y="140" fill="#f3f6fa">SEW    +0   +30   <tspan fill="#8fa3ba" class="zh">; 回针 ↓</tspan><tspan fill="#8fa3ba" class="eo">; backtack ↓</tspan></text>
+            <text x="50" y="190" fill="#f3f6fa">SEW    +0   -30   <tspan fill="#8fa3ba" class="zh">; 回针 ↑</tspan><tspan fill="#8fa3ba" class="eo">; backtack ↑</tspan></text>
             <text x="50" y="240" fill="#f3f6fa">SEW    +0   +30   <tspan fill="#8fa3ba">; 3.0 mm</tspan></text>
             <text x="50" y="290" fill="#5f7189">  …</text>
-            <text x="50" y="340" fill="#f3f6fa">SEW   +26   +10   <tspan fill="#8fa3ba">; 圆角上一针</tspan></text>
+            <text x="50" y="340" fill="#f3f6fa">SEW   +26   +10   <tspan fill="#8fa3ba" class="zh">; 圆角上一针</tspan><tspan fill="#8fa3ba" class="eo">; one stitch on the corner</tspan></text>
             <text x="50" y="390" fill="#5f7189">  …</text>
-            <text x="50" y="450" fill="#ff9c75">TRIM              <tspan fill="#8fa3ba">; 剪线</tspan></text>
-            <text x="50" y="500" fill="#5ee0d2">JUMP -150  +155   <tspan fill="#8fa3ba">; 空走</tspan></text>
+            <text x="50" y="450" fill="#ff9c75">TRIM              <tspan fill="#8fa3ba" class="zh">; 剪线</tspan><tspan fill="#8fa3ba" class="eo">; trim</tspan></text>
+            <text x="50" y="500" fill="#5ee0d2">JUMP -150  +155   <tspan fill="#8fa3ba" class="zh">; 空走</tspan><tspan fill="#8fa3ba" class="eo">; jump</tspan></text>
             <text x="50" y="560" fill="#f2b705">END</text>
           </g>
         </svg>
@@ -344,18 +344,18 @@ slides:
       - ["缝 60 针只要 {{ch15.sew60:.1f}} s，上下料 8–10 s", "60 stitches take {{ch15.sew60:.1f}} s; loading takes 8–10 s"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
-          <text x="40" y="70" font-size="26" fill="#8fa3ba">一个口袋盖的周期（示意）</text>
-          <text x="40" y="160" font-size="30" font-weight="700" fill="#5ee0d2">缝 60 针</text>
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
+          <text x="40" y="70" font-size="26" fill="#8fa3ba" class="zh">一个口袋盖的周期（示意）</text><text x="40" y="70" font-size="26" fill="#8fa3ba" class="eo">One pocket-flap cycle (sketch)</text>
+          <text x="40" y="160" font-size="30" font-weight="700" fill="#5ee0d2" class="zh">缝 60 针</text><text x="40" y="160" font-size="30" font-weight="700" fill="#5ee0d2" class="eo">Sew 60 stitches</text>
           <rect x="40" y="180" width="97" height="60" rx="8" fill="#2ec4b6"/>
           <text x="150" y="222" font-size="30" font-weight="800" fill="#5ee0d2" class="en">{{ch15.sew60:.1f}} s</text>
-          <text x="40" y="310" font-size="30" font-weight="700" fill="#9cc0ff">剪线、空走、起停</text>
+          <text x="40" y="310" font-size="30" font-weight="700" fill="#9cc0ff" class="zh">剪线、空走、起停</text><text x="40" y="310" font-size="30" font-weight="700" fill="#9cc0ff" class="eo">Trim, jump, start/stop</text>
           <rect x="40" y="330" width="80" height="60" rx="8" fill="#4c8dff" opacity=".7"/>
-          <text x="40" y="460" font-size="30" font-weight="700" fill="#ff9c75">人工取放模板</text>
+          <text x="40" y="460" font-size="30" font-weight="700" fill="#ff9c75" class="zh">人工取放模板</text><text x="40" y="460" font-size="30" font-weight="700" fill="#ff9c75" class="eo">Load/unload the template by hand</text>
           <rect x="40" y="480" width="432" height="60" rx="8" fill="#ff7a45"/>
           <rect x="472" y="480" width="108" height="60" rx="8" fill="#ff7a45" opacity=".45"/>
           <text x="600" y="522" font-size="30" font-weight="800" fill="#ff9c75" class="en">8–10 s</text>
-          <text x="40" y="605" font-size="28" font-weight="700" fill="#f2b705">瓶颈在上下料 → 双工位、自动上料</text>
+          <text x="40" y="605" font-size="28" font-weight="700" fill="#f2b705" class="zh">瓶颈在上下料 → 双工位、自动上料</text><text x="40" y="605" font-size="28" font-weight="700" fill="#f2b705" class="eo">Bottleneck: handling → dual stations, auto-loading</text>
         </svg>
     notes:
       - "花样机的精度不只看电机，也看模板，模板设计是工艺的一半。模板用 PVC、亚克力或环氧板激光切割，下片越薄越好；槽宽等于中压脚外径加 1 到 2 毫米，内侧贴防滑层。控制器只在压框到位、气压正常、光幕无遮挡时才启动。再算笔账：口袋盖 60 针，2000 转缝 {{ch15.sew60:.1f}} 秒，加上剪线、空走也就几秒，而人工取放模板要 8 到 10 秒。瓶颈在上下料，所以用双工位、自动上料。"
@@ -369,17 +369,17 @@ slides:
       - ["锁眼切刀：主轴停在上针位才能切", "Buttonhole knife: cut only at needle-up stop"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
-          <text x="60" y="70" font-size="28" font-weight="700" fill="#f3f6fa">套结：先打底，再覆盖</text>
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
+          <text x="60" y="70" font-size="28" font-weight="700" fill="#f3f6fa" class="zh">套结：先打底，再覆盖</text><text x="60" y="70" font-size="28" font-weight="700" fill="#f3f6fa" class="eo">Bartack: base layer, then cover layer</text>
           <rect x="80" y="160" width="740" height="200" rx="10" fill="#1b2a44"/>
           <polyline points="100,200 140,320 180,200 220,320 260,200 300,320 340,200 380,320 420,200 460,320 500,200 540,320 580,200 620,320 660,200 700,320 740,200 780,320 800,200" fill="none" stroke="#f2b705" stroke-width="5"/>
           <polyline points="100,230 170,290 240,230 310,290 380,230 450,290 520,230 590,290 660,230 730,290 800,230" fill="none" stroke="#2ec4b6" stroke-width="5"/>
           <path d="M100 400 L800 400" stroke="#8fa3ba" stroke-width="2"/><path d="M100 388 L100 412 M800 388 L800 412" stroke="#8fa3ba" stroke-width="2"/>
           <text x="450" y="440" font-size="26" fill="#8fa3ba" text-anchor="middle" class="en">L</text>
           <path d="M850 200 L850 320" stroke="#8fa3ba" stroke-width="2"/><text x="862" y="270" font-size="26" fill="#8fa3ba" class="en">W</text>
-          <text x="80" y="510" font-size="26" fill="#5ee0d2">打底：y = ±0.3W</text>
-          <text x="480" y="510" font-size="26" fill="#f2b705">覆盖：y = ±W/2</text>
-          <text x="450" y="590" font-size="26" fill="#d3deea" text-anchor="middle">改参数，就是另一个尺寸的套结</text>
+          <text x="80" y="510" font-size="26" fill="#5ee0d2" class="zh">打底：y = ±0.3W</text><text x="80" y="510" font-size="26" fill="#5ee0d2" class="eo">base: y = ±0.3W</text>
+          <text x="480" y="510" font-size="26" fill="#f2b705" class="zh">覆盖：y = ±W/2</text><text x="480" y="510" font-size="26" fill="#f2b705" class="eo">cover: y = ±W/2</text>
+          <text x="450" y="590" font-size="26" fill="#d3deea" text-anchor="middle" class="zh">改参数，就是另一个尺寸的套结</text><text x="450" y="590" font-size="26" fill="#d3deea" text-anchor="middle" class="eo">New parameters → a bartack of another size</text>
         </svg>
     notes:
       - "套结机、钉扣机、锁眼机是服装厂里数量最多的特种机。从控制看，它们都是小幅面、少针数的花样机，只调长度、宽度、针数。机械式的换花样要换凸轮；电子式换成两台步进电机加程序，这就是字面意义的电子凸轮。套结开机按参数实时生成针点：先窄幅打底，再宽幅覆盖。锁眼机的切刀必须在主轴停在上针位时才能切，刀没回位不许启动，这两个联锁用状态机实现。"
@@ -408,18 +408,18 @@ slides:
       - ["编码器差分双绞屏蔽；强弱分区、单点接地", "Differential, shielded encoder; split power, one ground"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M80 560 L860 560 M80 560 L80 80" stroke="#4b5f7d" stroke-width="3"/>
-          <text x="92" y="96" font-size="24" fill="#8fa3ba">线圈电流 i（A）</text><text x="860" y="600" font-size="24" fill="#8fa3ba" text-anchor="end">t（ms）</text>
+          <text x="92" y="96" font-size="24" fill="#8fa3ba" class="zh">线圈电流 i（A）</text><text x="92" y="96" font-size="24" fill="#8fa3ba" class="eo">coil current i (A)</text><text x="860" y="600" font-size="24" fill="#8fa3ba" text-anchor="end" class="zh">t（ms）</text><text x="860" y="600" font-size="24" fill="#8fa3ba" text-anchor="end" class="eo">t (ms)</text>
           <path d="M80 284 L860 284" stroke="#f2b705" stroke-width="3" stroke-dasharray="12 8"/>
-          <text x="400" y="268" font-size="26" font-weight="700" fill="#f2b705">吸合电流 3 A</text>
+          <text x="400" y="268" font-size="26" font-weight="700" fill="#f2b705" class="zh">吸合电流 3 A</text><text x="400" y="268" font-size="26" font-weight="700" fill="#f2b705" class="eo">pull-in current 3 A</text>
           <polyline points="80,560 118,525 156,493 194,465 232,439 270,415 308,394 346,375 384,357 422,342 460,327 498,314 536,303 574,292 612,283 650,274 688,266 726,259 764,253 802,247 840,242" fill="none" stroke="#ff7a45" stroke-width="6"/>
           <polyline points="80,560 88,537 95,515 103,493 110,472 118,451 126,430 133,410 141,390 148,371 156,352 164,333 171,315 179,297 186,279" fill="none" stroke="#2ec4b6" stroke-width="7"/>
           <path d="M186 279 L220 450 L860 450" fill="none" stroke="#2ec4b6" stroke-width="4" stroke-dasharray="10 8"/>
           <circle cx="607" cy="284" r="12" fill="#ff7a45"/><circle cx="184" cy="284" r="12" fill="#2ec4b6"/>
-          <text x="620" y="340" font-size="28" font-weight="700" fill="#ff9c75">24 V：{{ch15.sol24:.1f}} ms</text>
-          <text x="210" y="220" font-size="28" font-weight="700" fill="#5ee0d2">75 V：{{ch15.sol75:.2f}} ms</text>
-          <text x="420" y="500" font-size="24" fill="#5ee0d2">吸合后 PWM 保持</text>
+          <text x="620" y="340" font-size="28" font-weight="700" fill="#ff9c75" class="zh">24 V：{{ch15.sol24:.1f}} ms</text><text x="620" y="340" font-size="28" font-weight="700" fill="#ff9c75" class="eo">24 V: {{ch15.sol24:.1f}} ms</text>
+          <text x="210" y="220" font-size="28" font-weight="700" fill="#5ee0d2" class="zh">75 V：{{ch15.sol75:.2f}} ms</text><text x="210" y="220" font-size="28" font-weight="700" fill="#5ee0d2" class="eo">75 V: {{ch15.sol75:.2f}} ms</text>
+          <text x="420" y="500" font-size="24" fill="#5ee0d2" class="zh">吸合后 PWM 保持</text><text x="420" y="500" font-size="24" fill="#5ee0d2" class="eo">PWM hold after pull-in</text>
         </svg>
     notes:
       - "最后看控制箱。硬件三原则：强电弱电分区、单点接地；编码器走 RS-422 差分和双绞屏蔽线，丢一个脉冲电子凸轮就错位；输入光耦隔离，电感负载要续流。剪线电磁铁线圈 6 欧、30 毫亨，要 3 安才吸合。24 伏直接驱动要 {{ch15.sol24:.1f}} 毫秒；75 伏过压启动只要 {{ch15.sol75:.2f}} 毫秒，吸合后改 PWM 保持，关断串 48 伏 TVS，约 {{ch15.tvs:.0f}} 毫秒释放。制造时还要过贴片检测、在线测试、功能测试和老化。"
@@ -433,7 +433,7 @@ slides:
       - ["点到点用 S 形规律；电机按峰值和均方根选", "S-curves point to point; size motors by peak and RMS"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="30" y="470" width="840" height="60" rx="30" fill="#1b2a44" stroke="#4b5f7d" stroke-width="3"/>
           <rect x="560" y="420" width="220" height="50" rx="6" fill="#e9dcc0"/>
           <path d="M180 470 L180 330 L330 200 L540 230" fill="none" stroke="#c8d2de" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
@@ -441,13 +441,13 @@ slides:
           <path d="M540 230 L640 410" stroke="#c8d2de" stroke-width="16" stroke-linecap="round"/>
           <path d="M560 360 L620 330 L700 360 L760 330" fill="none" stroke="#f2b705" stroke-width="5" stroke-dasharray="12 8"/>
           <path d="M600 500 L760 500" stroke="#f3f6fa" stroke-width="5"/><path d="M760 500 l-16 -11 l0 22z" fill="#f3f6fa"/>
-          <text x="680" y="580" font-size="26" fill="#d3deea" text-anchor="middle">传送带编码器 = 主令</text>
-          <text x="720" y="300" font-size="26" fill="#f2b705" text-anchor="middle">尖角前先减速</text>
-          <text x="200" y="600" font-size="26" fill="#8fa3ba" text-anchor="middle">关节电机：峰值 + 均方根</text>
+          <text x="680" y="580" font-size="26" fill="#d3deea" text-anchor="middle" class="zh">传送带编码器 = 主令</text><text x="680" y="580" font-size="26" fill="#d3deea" text-anchor="middle" class="eo">belt encoder = master</text>
+          <text x="720" y="300" font-size="26" fill="#f2b705" text-anchor="middle" class="zh">尖角前先减速</text><text x="720" y="300" font-size="26" fill="#f2b705" text-anchor="middle" class="eo">slow before corners</text>
+          <text x="200" y="600" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">关节电机：峰值 + 均方根</text><text x="200" y="600" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">joint motors: peak + RMS</text>
         </svg>
     notes:
-      - "这些方法在机器人上一模一样。机器人跟随传送带在移动的衣片上涂胶或缝合，把位置写成传送带编码器读数的函数，就是电子凸轮，同样要用预测位置补偿驱动延迟。机械臂走带尖角的路径，控制器也要像前瞻调速那样提前几段减速。点到点运动常用加速度连续的 S 形规律，原因和花样机选摆线一样，避免激振。给关节选电机，同样先核峰值转矩、再核均方根转矩。"
-      - "These methods carry straight over to robots. A robot tracking a conveyor, gluing or sewing a moving panel, writes its position as a function of the belt encoder reading: an electronic cam, again with a predicted position to cover drive lag. An arm following a path with sharp corners has to slow down a few segments early, exactly like look-ahead. Point-to-point moves use S-curves with continuous acceleration, for the same reason a pattern sewer picks a cycloid: no ringing. And joint motors are sized the same way, peak torque first, then RMS torque."
+      - "这些方法在机器人上一模一样。机器人跟随传送带在移动的衣片上涂胶或缝合，把位置写成传送带编码器读数的函数，就是电子凸轮，同样要用预测位置补偿驱动延迟。机械臂走带尖角的路径，控制器也要像前瞻调速那样提前几段减速。点到点运动常用加速度连续的 S 形规律，原因和花样机选摆线一样，避免激振。给关节选电机，也是先核峰值转矩，再核均方根转矩，也就是发热。"
+      - "These methods carry straight over to robots. A robot tracking a conveyor, gluing or sewing a moving panel, writes its position as a function of the belt encoder reading: an electronic cam, again with a predicted position to cover drive lag. An arm following a path with sharp corners has to slow down a few segments early, exactly like look-ahead. Point-to-point moves use S-curves with continuous acceleration, for the same reason a pattern sewer picks a cycloid: no ringing. And joint motors are sized by peak torque first, then RMS torque, which is what decides heating."
 
   - layout: split
     title: ["生活中的例子：跳大绳", "Everyday example: long-rope skipping"]
@@ -457,7 +457,7 @@ slides:
       - ["一步迈得越大越来不及：针距", "The bigger the step, the less time: stitch length"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M40 520 L860 520" stroke="#4b5f7d" stroke-width="4"/>
           <circle cx="90" cy="380" r="26" fill="#ff7a45"/><path d="M90 406 L90 520" stroke="#ff7a45" stroke-width="10"/>
           <circle cx="810" cy="380" r="26" fill="#ff7a45"/><path d="M810 406 L810 520" stroke="#ff7a45" stroke-width="10"/>
@@ -465,8 +465,8 @@ slides:
           <path d="M110 420 Q 450 640 790 420" fill="none" stroke="#f2b705" stroke-width="4" stroke-dasharray="12 10" opacity=".5"/>
           <circle cx="450" cy="400" r="24" fill="#4c8dff"/><path d="M450 424 L450 500 M450 500 L420 520 M450 500 L480 520" stroke="#4c8dff" stroke-width="9" stroke-linecap="round"/>
           <path d="M300 590 L600 590" stroke="#2ec4b6" stroke-width="6"/><path d="M300 576 L300 604 M600 576 L600 604" stroke="#2ec4b6" stroke-width="6"/>
-          <text x="450" y="570" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle">绳在上面 = 窗口</text>
-          <text x="450" y="160" font-size="26" fill="#f2b705" text-anchor="middle">摇得越快，窗口越短</text>
+          <text x="450" y="570" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">绳在上面 = 窗口</text><text x="450" y="570" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">rope up = window</text>
+          <text x="450" y="160" font-size="26" fill="#f2b705" text-anchor="middle" class="zh">摇得越快，窗口越短</text><text x="450" y="160" font-size="26" fill="#f2b705" text-anchor="middle" class="eo">faster rope, shorter window</text>
         </svg>
     notes:
       - "生活里最像花样机的是跳大绳。两个人摇长绳，跳绳的人只能在绳子离开地面那段时间跑进去或者换位置，这就是离布窗口。绳摇得越快，这个窗口越短，就像主轴转得越快。一步迈得越大，越来不及，就像针距越大，走一针要的时间越长。所以绳摇得快的时候，大家都只敢小步跑。"
@@ -476,9 +476,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["6 mm 针距：转速要降到约 {{ch15.n6:.0f}}", "6 mm stitches: slow to about {{ch15.n6:.0f}}"]
     rows:
-      - ["针距 3 mm（1.5 mm 厚）", "{{ch15.n3:.0f}} r/min"]
-      - ["针距 6 mm（1.5 mm 厚）", "{{ch15.n6:.0f}} r/min"]
-      - ["针距 6 mm（6 mm 厚料）", "{{ch15.n6t6:.0f}} r/min"]
+      - [["针距 3 mm（1.5 mm 厚）", "3 mm stitch, 1.5 mm stack"], "{{ch15.n3:.0f}} r/min"]
+      - [["针距 6 mm（1.5 mm 厚）", "6 mm stitch, 1.5 mm stack"], "{{ch15.n6:.0f}} r/min"]
+      - [["针距 6 mm（6 mm 厚料）", "6 mm stitch, 6 mm stock"], "{{ch15.n6t6:.0f}} r/min"]
     side: {big: "{{ch15.sew60:.1f}} s", text: ["缝 60 针只要这么久，上下料却要 8–10 s", "That's all the sewing takes; loading takes 8–10 s"]}
     foot: ["降速或打开自动前瞻；要提产能，先改上下料（双工位、自动上料），不是提转速", "Slow down or use look-ahead; for output, fix the handling, not the speed"]
     notes:
@@ -493,5 +493,5 @@ slides:
       - ["电子凸轮按角度走，前瞻提前为慢针减速", "Electronic cams run by angle; look-ahead brakes early"]
     after: ["作业 15 · 测验 · 虚拟实验 15-1、15-2 实验报告 —— 在问渠学习平台完成", "Assignment 15 · quiz · Labs 15-1 and 15-2 reports — on WenQuest"]
     notes:
-      - "这一讲记住三件事。第一，花样机用 X–Y 工作台代替送布牙，主轴编码器的角度是全机的时间基准。第二，机针在布中模板不能动：转速上限等于窗口除以 6 倍移动时间，和根号针距成反比，布越厚越低。第三，电子凸轮按主轴角度走，前瞻调速提前为慢针减速。作业、测验和两个实验的报告在问渠平台完成。下一讲看电脑绣花机。"
-      - "Three things to remember. One: a pattern sewer replaces the feed dog with an X–Y table, and the shaft-encoder angle is the machine's clock. Two: the template must be still while the needle is in the fabric; the speed limit is the window over six times the move time, inversely proportional to root stitch length, and lower for thicker stock. Three: electronic cams run by shaft angle, and look-ahead slows down early for slow stitches. The assignment, quiz and both lab reports are on WenQuest. Next time: computerised embroidery machines."
+      - "这一讲记住三件事。第一，花样机用 X–Y 工作台代替送布牙，主轴编码器的角度是全机的时间基准。第二，机针在布中模板不能动：转速上限等于窗口除以 6 倍移动时间，和根号针距成反比，布越厚越低。第三，电子凸轮按主轴角度走，前瞻调速提前为慢针减速。作业、测验和两个实验的报告在问渠平台完成。"
+      - "Three things to remember. One: a pattern sewer replaces the feed dog with an X–Y table, and the shaft-encoder angle is the machine's clock. Two: the template must be still while the needle is in the fabric; the speed limit is the window over six times the move time, inversely proportional to root stitch length, and lower for thicker stock. Three: electronic cams run by shaft angle, and look-ahead slows down early for slow stitches. The assignment, quiz and both lab reports are on WenQuest."
