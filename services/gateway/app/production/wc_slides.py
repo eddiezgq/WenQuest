@@ -512,7 +512,7 @@ def L_chain(s, ctx):
         parts.append(f'<div class="step{" hot" if k in hot else ""}"><div class="zh">{e(st[0])}</div><div class="en">{e(st[1])}</div></div>')
     fn = f'<div class="footnote"><div class="zh">{e(s["foot"][0])}</div><div class="en">{e(s["foot"][1])}</div></div>'
     return (f'<div class="slide chain"><div class="grain"></div>{head(s["title"])}<div class="flow">{"".join(parts)}</div>'
-            + (f'<div class="brace" style="left:{70 + 1780 * min(hot) / len(s["steps"]):.0f}px;width:{1780 * len(hot) / len(s["steps"]):.0f}px">▲ {e(s.get("mark", ["本课程", "this course"])[0])} · {e(s.get("mark", ["本课程", "this course"])[1])}</div>' if hot else "")
+            + (f'<div class="brace" style="left:{70 + 1780 * min(hot) / len(s["steps"]):.0f}px;width:{1780 * len(hot) / len(s["steps"]):.0f}px">▲ {" · ".join(e(x) for x in s.get("mark", ["本课程", "this course"]) if x)}</div>' if hot else "")
             + f'{fn}{ctx["foot"]}</div>')
 
 

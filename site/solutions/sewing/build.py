@@ -48,6 +48,10 @@ def script_html(sp) -> str:
             pts = [f'{n["label"][0]} {n["n"]} 项' for n in sl["nums"]]
         if sl["layout"] == "chain":
             pts = [" → ".join(x[0] for x in sl["steps"])]
+        if sl["layout"] == "tiles":
+            pts = [f'{t["name"][0]}：{t["use"][0]}' for t in sl["tiles"]]
+        if sl["layout"] == "answer":
+            pts = [f"{r[0]}：{r[1]}" for r in sl["rows"]]
         if sl["layout"] == "duo":
             pts = [f'{sl[c]["label"][0]}：{sl[c]["note"][0]}' for c in ("left", "right")]
         ul = "".join(f"<li>{e(p)}</li>" for p in pts)
@@ -71,7 +75,7 @@ ul{{margin:4px 0 8px;padding-left:1.2em;color:var(--muted)}}.say{{margin:6px 0 0
 @media print{{.bar{{display:none}}body{{background:#fff;color:#000}}}}
 </style></head><body><main>
 <h1>缝纫机企业解决方案 · 讲稿全文</h1>
-<p class="lede">共 {len(sp["slides"])} 页，讲稿约 {n} 字，讲下来十分钟左右。放映时按 S 键打开讲者窗口，看到的是同一份讲稿。数字都由问渠缝纫机设计软件的计算核心算出。</p>
+<p class="lede">共 {len(sp["slides"])} 页，讲稿约 {n} 字，讲下来约 {round(n / 250)} 分钟。放映时按 S 键打开讲者窗口，看到的是同一份讲稿。数字都由问渠缝纫机设计软件的计算核心算出。</p>
 <div class="bar"><a href="deck.html">放映演示稿 →</a><a href="./">回到方案介绍</a><a href="javascript:print()">打印</a></div>
 {"".join(secs)}
 </main></body></html>"""
