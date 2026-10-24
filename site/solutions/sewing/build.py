@@ -145,7 +145,7 @@ section{{padding-block:52px}}h2{{margin:0 0 6px;font:700 clamp(22px,3vw,30px)/1.
   <h2>演示稿</h2>
   <p class="sub">像幻灯片一样一页一页翻（→ 或空格下一步，F 全屏）；三维样机、花样机、刺绣机这些页面是活的，可以直接拖动、操作。去企业讲的时候按 S 键打开讲者窗口，看着讲稿讲。</p>
   <div class="deck"><iframe src="deck.html" title="缝纫机企业解决方案 · 演示稿" loading="lazy" allow="fullscreen"></iframe></div>
-  <div class="links"><a href="deck.html" target="_blank" rel="noopener">新窗口全屏放映 →</a><a href="script.html">讲稿全文（可打印）→</a></div>
+  <div class="links"><a href="deck.html" target="_blank" rel="noopener">新窗口全屏放映 →</a><a href="script.html">讲稿全文（可打印）→</a><a href="缝纫机企业解决方案-演示稿-离线版.html" download>下载离线版（双击就能放映，不用联网）→</a></div>
 </div></section>
 <section id="fullV"><div class="wrap"><h2>介绍片</h2><p class="sub">配音：AI 合成（讲者本人声音）。画面就是上面的演示稿，数字由软件的计算核心算出。</p>{full}</div></section>
 <section><div class="wrap">
@@ -178,11 +178,26 @@ document.querySelectorAll('figure.vid').forEach(function (f) {{
 """
 
 
+def offline(deck: Path, out: Path):
+    """离线版（双击就能放映，不用联网）：嵌在里面的实验页、三维页引用的 three.js 直接内联，字体链接去掉（用系统字体）"""
+    import base64
+    three = (ROOT / "site" / "vendor" / "three" / "r128" / "three.min.js").read_text(encoding="utf-8")
+
+    def fix(m):
+        src = base64.b64decode(m.group(2)).decode("utf-8")
+        src = re.sub(r'<link[^>]+href="/vendor/fonts/[^"]+"[^>]*>', "", src)
+        src = re.sub(r'<script[^>]*src="/vendor/three/r128/three\.min\.js"[^>]*></script>', lambda _: "<script>" + three.replace("</script", "<\\/script") + "</script>", src)
+        return f'<script type="text/plain" data-page="{m.group(1)}">{base64.b64encode(src.encode("utf-8")).decode("ascii")}</script>'
+    s = re.sub(r'<script type="text/plain" data-page="([^"]+)">([^<]+)</script>', fix, deck.read_text(encoding="utf-8"))
+    out.write_text(s, encoding="utf-8")
+
+
 def main():
     sp, _ = spec()
     B.make_deck(DECK, HERE, "zh", name="deck.html")
     (HERE / "script.html").write_text(script_html(sp), encoding="utf-8")
     (HERE / "index.html").write_text(index_html(sp), encoding="utf-8")
+    offline(HERE / "deck.html", HERE / "缝纫机企业解决方案-演示稿-离线版.html")
     print("deck.html", round((HERE / "deck.html").stat().st_size / 1e6, 2), "MB · script.html · index.html")
 
 
