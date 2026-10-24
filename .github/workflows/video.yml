@@ -182,13 +182,22 @@ jobs:
               cp "$v/lecture.srt" "$d/预览/字幕.$lang.srt"
               cp "$RUNNER_TEMP/videos/$name/layout_$lang.log" "$d/预览/版面.$lang.log" 2>/dev/null || true
               echo "$lang: $(python -c "t=float('$len'); print(f'{int(t//60)}:{int(t%60):02d}')")（${{ inputs.voice }}，run ${{ github.run_id }}）" >> "$d/预览/说明.txt"
+              # 第 44 轮：讲稿里写了 web（官网放的网页版），压成 720p 连同封面、字幕放进去，随预览一起提交
+              web=$(python -c "import yaml,sys; w=(yaml.safe_load(open(sys.argv[1]+'/讲稿.yaml')).get('web') or {}); print(w.get('dir','') + ' ' + w.get('name',''))" "$d")
+              set -- $web
+              if [ -n "${1:-}" ] && [ -n "${2:-}" ]; then
+                mkdir -p "$1"
+                ffmpeg -y -loglevel error -i "$v/lecture.mp4" -vf scale=-2:720 -c:v libx264 -crf 28 -preset slow -c:a aac -b:a 96k -movflags +faststart "$1/$2.mp4"
+                ffmpeg -y -loglevel error -i "$v/cover.png" -vf scale=1280:-2 -q:v 3 "$1/$2.jpg" 2>/dev/null || ffmpeg -y -loglevel error -ss 4 -i "$v/lecture.mp4" -frames:v 1 -vf scale=1280:-2 -q:v 3 "$1/$2.jpg"
+                ffmpeg -y -loglevel error -i "$v/lecture.srt" "$1/$2.vtt"
+              fi
             done
           done
       - name: Commit the previews
         run: |
           git config user.name "WenQuest video"
           git config user.email "noreply@wenquestrobotics.com"
-          git add docs/课程视频
+          git add docs/课程视频 site/solutions
           git diff --cached --quiet && exit 0
           git commit -q -m "公开课视频预览：${{ inputs.lectures }}（${{ inputs.voice }}）"
           git pull -q --rebase origin main && git push -q origin HEAD:main
@@ -205,6 +214,8 @@ jobs:
           for v in "$RUNNER_TEMP"/videos/*/*; do
             [ -f "$v/lecture.mp4" ] || continue
             lec=$(basename "$(dirname "$v")"); lang=$(basename "$v")
+            # 发布页的文件名要 ASCII（中文目录名会被改名、互相撞名，第 44 轮）
+            lec=$(python -c "import sys,hashlib; n=sys.argv[1]; print(n if n.isascii() else 'v' + hashlib.md5(n.encode()).hexdigest()[:6])" "$lec")
             for f in lecture.mp4 lecture.srt cover_bilibili.png cover_youtube.png upload.md; do
               [ -f "$v/$f" ] && cp "$v/$f" "$RUNNER_TEMP/lecture-$lec-$lang-$f" && files+=("$RUNNER_TEMP/lecture-$lec-$lang-$f")
             done
@@ -251,6 +262,8 @@ jobs:
           for v in videos/*/*; do
             [ -f "$v/lecture.mp4" ] || continue
             lec=$(basename "$(dirname "$v")"); lang=$(basename "$v")
+            # 发布页的文件名要 ASCII（中文目录名会被改名、互相撞名，第 44 轮）
+            lec=$(python -c "import sys,hashlib; n=sys.argv[1]; print(n if n.isascii() else 'v' + hashlib.md5(n.encode()).hexdigest()[:6])" "$lec")
             for f in lecture.mp4 lecture.srt cover_bilibili.png cover_youtube.png upload.md; do
               [ -f "$v/$f" ] && cp "$v/$f" "lecture-$lec-$lang-$f" && files+=("lecture-$lec-$lang-$f")
             done

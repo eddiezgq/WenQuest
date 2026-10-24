@@ -78,12 +78,9 @@ ul{{margin:4px 0 8px;padding-left:1.2em;color:var(--muted)}}.say{{margin:6px 0 0
 
 
 def video_block(name, title, note):
-    mp4 = HERE / "video" / f"{name}.mp4"
-    if not mp4.exists():
-        return ""
-    poster = f' poster="video/{name}.jpg"' if (HERE / "video" / f"{name}.jpg").exists() else ""
-    vtt = f'<track kind="subtitles" srclang="zh" label="中文字幕" src="video/{name}.vtt" default>' if (HERE / "video" / f"{name}.vtt").exists() else ""
-    return (f'<figure class="vid"><video controls preload="metadata" playsinline{poster} src="video/{name}.mp4">{vtt}</video>'
+    """视频由工作流压好放进 video/（可能比页面晚到）：文件还没有时这块自己隐藏（短版的位置换成演示稿）"""
+    return (f'<figure class="vid" data-v="{name}"><video controls preload="metadata" playsinline poster="video/{name}.jpg">'
+            f'<source src="video/{name}.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文字幕" src="video/{name}.vtt"></video>'
             f'<figcaption><b>{e(title)}</b>　{e(note)}</figcaption></figure>')
 
 
@@ -141,7 +138,7 @@ section{{padding-block:52px}}h2{{margin:0 0 6px;font:700 clamp(22px,3vw,30px)/1.
     <dl class="facts">{dl}</dl>
     <div class="btns"><a class="btn pri" href="deck.html" target="_blank" rel="noopener">放映演示稿</a><a class="btn" href="script.html">讲稿全文</a><a class="btn" href="/#contact">预约演示</a></div>
   </div>
-  <div>{short or '<div class="deck"><iframe src="deck.html" title="演示稿" loading="lazy" allow="fullscreen"></iframe></div>'}</div>
+  <div id="heroV">{short}</div>
 </div></div>
 <main>
 <section><div class="wrap">
@@ -150,7 +147,7 @@ section{{padding-block:52px}}h2{{margin:0 0 6px;font:700 clamp(22px,3vw,30px)/1.
   <div class="deck"><iframe src="deck.html" title="缝纫机企业解决方案 · 演示稿" loading="lazy" allow="fullscreen"></iframe></div>
   <div class="links"><a href="deck.html" target="_blank" rel="noopener">新窗口全屏放映 →</a><a href="script.html">讲稿全文（可打印）→</a></div>
 </div></section>
-{f'<section><div class="wrap"><h2>介绍片</h2><p class="sub">配音：AI 合成（讲者本人声音）。画面就是上面的演示稿，数字由软件的计算核心算出。</p>{full}</div></section>' if full else ""}
+<section id="fullV"><div class="wrap"><h2>介绍片</h2><p class="sub">配音：AI 合成（讲者本人声音）。画面就是上面的演示稿，数字由软件的计算核心算出。</p>{full}</div></section>
 <section><div class="wrap">
   <h2>方案里有什么</h2>
   <p class="sub">每一块都能单独用，也能连成一条线。</p>
@@ -166,6 +163,16 @@ section{{padding-block:52px}}h2{{margin:0 0 6px;font:700 clamp(22px,3vw,30px)/1.
 </div></section>
 <section class="cta"><div class="wrap"><h2>预约演示</h2><p>我们可以上门或在线演示，用贵厂的机型现场算一遍。</p><div class="btns"><a class="btn pri" href="/#contact">联系我们</a></div></div></section>
 </main>
+<script>
+// 视频还没放上来时：短版的位置换成演示稿，完整版那一节不显示
+document.querySelectorAll('figure.vid').forEach(function (f) {{
+  var src = f.querySelector('source');
+  src.addEventListener('error', function () {{
+    if (f.dataset.v === 'short') document.getElementById('heroV').innerHTML = '<div class="deck"><iframe src="deck.html" title="演示稿" loading="lazy" allow="fullscreen"></iframe></div>';
+    else document.getElementById('fullV').style.display = 'none';
+  }});
+}});
+</script>
 </body>
 </html>
 """
