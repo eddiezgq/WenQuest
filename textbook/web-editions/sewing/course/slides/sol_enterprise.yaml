@@ -1,0 +1,247 @@
+# 缝纫机企业解决方案 · 演示稿（第 44 轮）
+# 不是课程的一讲（没有 lessons/ 文件）：talk 模式，页脚写方案名；only_zh：只显示中文，内容只写中文。
+# 每页的 notes 就是讲稿（S 键讲者窗口里看；录介绍视频时当配音稿）。
+# {{sol_enterprise.键:格式}} 由 course/calc/sol_enterprise.py 用缝纫机设计软件的计算核心算出，不手写数字。
+# 截图都是本地完整环境里软件的真实界面和真实计算结果（img/sol_*.webp）。不点任何企业、品牌的名字。
+talk: {id: sol-sewing, name: 缝纫机企业解决方案}
+only_zh: true
+code: [sol_enterprise]
+
+clips:
+  hero:          # 封面：平缝机三维样机开窗剖切，慢慢环绕
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "#shell [data-k=window]"}
+  chains:        # 四条传动链轮流突出
+    page: proto-lockstitch
+    selector: "#stage"
+    loop: 16
+    steps:
+      - {at: 0, press: ["#shell [data-k=xray]", "#chains [data-k=needle]"]}
+      - {at: 2, js: "var t=document.getElementById('tableOn');t.checked=false;t.onchange();window.__api.cam(-0.6,0.3,820,[110,80,0])"}
+      - {at: 4, press: "#chains [data-k=takeup]"}
+      - {at: 8, press: "#chains [data-k=hook]"}
+      - {at: 12, press: "#chains [data-k=feed]"}
+  pattern:       # 花样机三维模型：主轴转、模板走
+    page: model-pattern
+    selector: "#stage"
+    steps:
+      - {at: 0, press: ["#play", "#labels"], js: "document.querySelector('.stage').style.background='radial-gradient(120% 90% at 60% 35%,#22324d 0%,#0b1220 75%)'"}
+  embroid:       # 刺绣机：一针里绷架的运动，针长 3 → 5 → 7 mm，加速度越过可用线
+    page: embroid
+    selector: "#win"
+    loop: 10
+    steps:
+      - {at: 0, js: "document.documentElement.setAttribute('data-theme','dark')"}
+      - {at: 0.1, set: {s: 3, n: 800}}
+      - {at: 3.3, set: {s: 5}}
+      - {at: 6.6, set: {s: 7}}
+  overlock:      # 包缝机三维结构模型：透视、主轴一直转
+    page: model-overlock
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "[data-m=xray]", js: "document.getElementById('stage').style.background='radial-gradient(120% 90% at 55% 35%,#2a3d5c 0%,#13213a 60%,#08101d 100%)';var l=document.getElementById('labels');if(l.checked)l.click();var p=document.getElementById('play');if(/^(播放|Play)$/.test(p.textContent.trim()))p.click()"}
+  factory:       # 数字工厂：测量值和控制图逐台播放（深色显示）
+    page: factory
+    selector: "#pageA .col"
+    cover: true
+    vh: 1300
+    loop: 21
+    steps:
+      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('log').parentElement.style.display='none';document.getElementById('replay').click()"}
+  iot:           # 设备联网：事件流
+    page: iot
+    selector: "#pageA .col"
+    cover: true
+    vh: 1300
+    loop: 3
+    steps:
+      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('msgjson').parentElement.style.display='none';document.getElementById('rerun').click()"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: 企业解决方案
+    title: 缝纫机企业解决方案
+    sub: 从设计、校核、加工到车间和售后，一条线、一套数据
+    notes: "各位好，我是问渠的张国庆。今天用十来分钟，介绍问渠给缝纫机企业做的一套解决方案：从新机型的设计和校核，到仿真、加工、车间、售后，再到人才培养，用一条线、一套数据连起来。"
+
+  - layout: question
+    tag: 企业的难处
+    title: 新机型为什么总是慢、贵、靠试
+    facts:
+      - 改一个尺寸，要做出样机才知道行不行
+      - 仿真软件贵、难学，设计和车间是两张皮
+      - 调机靠老师傅，人难招，也难带
+    notes: "先说企业的难处。做一台新机型，改一个曲柄半径、提一档转速，往往要等样机做出来、试缝了才知道行不行，一轮下来几个星期。仿真软件贵，会用的人少，算完的结果到不了车间。装配调机靠老师傅的手感，老师傅难招，新人也难带。"
+
+  - layout: chain
+    title: 问渠：一条线连起来
+    steps: [设计, 校核, 仿真, 数控, 审批, 车间, 售后, 培训]
+    foot: 同一套数据：改一次设计，下游自动跟着变；全部在浏览器里用
+    notes: "问渠的办法是一条线：设计、校核、仿真、数控编程、发布审批、车间生产、售后服务，最后是人才培养，用的是同一套数据。设计改一次，下游的物料、工艺、程序自动跟着变，车间只拿到批准过的版本。全部在浏览器里用，不用装软件。"
+
+  - layout: section
+    num: "01"
+    title: 缝纫机设计软件
+
+  - layout: bignum
+    title: "{{sol_enterprise.machines}} 种机型，{{sol_enterprise.checks_all}} 项红绿灯校核"
+    nums:
+      - {n: "{{sol_enterprise.ck_ls}}", label: 平缝机}
+      - {n: "{{sol_enterprise.ck_ol}}", label: 包缝机}
+      - {n: "{{sol_enterprise.ck_cv}}", label: 绷缝机}
+      - {n: "{{sol_enterprise.ck_pt}}", label: 电子花样机}
+      - {n: "{{sol_enterprise.ck_em}}", label: 多头刺绣机}
+    foot: 每一项都有数值、判据、出处和改法；计算模型和教材算例逐项对得上
+    notes: "第一块是缝纫机设计软件。现在有五种机型：平缝机、包缝机、绷缝机、电子花样机和多头刺绣机，一共 {{sol_enterprise.checks_all}} 项校核。每一项都给出数值、判据、出自哪一讲，不合格的还告诉你怎么改。计算模型和我们教材里的算例逐项对得上。"
+
+  - layout: figure
+    title: 改参数，当场看结果
+    visual: {fig: sol_ls_whole}
+    h: 700
+    caption: 左边设计参数，右边运动时序、曲线和校核，改一个数马上重算
+    notes: "这是软件的样子。左边是设计参数，按机构分组，拖滑块或者直接输数字；右边马上重算，全机运动时序、针杆的位移速度加速度、挑线的供线和耗线、送布牙轨迹、整机惯性力，一目了然。"
+
+  - layout: duo
+    title: "例子：转速提到 {{sol_enterprise.n6}} r/min"
+    left:
+      fig: sol_ls_red
+      label: "{{sol_enterprise.red6_bad}} 项不合格、{{sol_enterprise.red6_warn}} 项注意"
+      note: "针杆惯性力 {{sol_enterprise.F6:.0f}} N，超过 {{sol_enterprise.Flim}} N；离机壳共振太近"
+    right:
+      fig: sol_ls_green
+      label: 全部合格
+      note: "针杆组件 {{sol_enterprise.mr0:.0f}} → {{sol_enterprise.mr1:.0f}} g，机壳一阶频率 {{sol_enterprise.fn0}} → {{sol_enterprise.fn1}} Hz"
+    notes: "举个例子。平缝机的最高转速从五千提到六千，马上有三项亮灯：针杆惯性力 {{sol_enterprise.F6:.0f}} 牛，超过轴套允许的 {{sol_enterprise.Flim}} 牛；整机惯性力偏大；离机壳共振太近。软件同时告诉你怎么改。把针杆组件从 {{sol_enterprise.mr0:.0f}} 克减到 {{sol_enterprise.mr1:.0f}} 克，机壳加筋，一阶固有频率从 {{sol_enterprise.fn0}} 提到 {{sol_enterprise.fn1}} 赫兹，二十一项全部合格。这些在样机做出来之前就知道了。"
+
+  - layout: split
+    title: 三维样机：调机参数与设计同步
+    points:
+      - 定时、间隙、张力、送布跟着设计变
+      - 虚拟试缝 30 针，跳针、碰针当场标红
+      - 透视、剖切，看清每一条传动链
+    visual: {video: chains}
+    notes: "每种机型都有三维样机。平缝机的样机里，定时、间隙、张力、送布、转速这些调机参数跟着你的设计变，可以虚拟试缝三十针，跳针、碰针、划线当场标红。透视、剖切，刺布、挑线、钩线、送布四条传动链一条条看清楚。"
+
+  - layout: split
+    title: 包缝机、绷缝机：弯针与用线
+    points:
+      - 弯针摆角、传动角、差动送布、切刀时机
+      - 绷缝机五种线迹的弯针定时
+      - "一单 {{sol_enterprise.cv_q}} 件：用线 {{sol_enterprise.cv_m:,.0f}} m、{{sol_enterprise.cv_cones}} 个线团"
+    visual: {video: overlock}
+    notes: "包缝机校核弯针的摆角、传动角、针尖速度，差动送布和切刀的时机。绷缝机校核五种线迹的弯针定时和间隙，还能做用线计划：比如一单 {{sol_enterprise.cv_q}} 件 T 恤下摆，每件缝长 {{sol_enterprise.cv_len}} 厘米，算出来一共要 {{sol_enterprise.cv_m:,.0f}} 米线、{{sol_enterprise.cv_cones}} 个线团，每根线各多少，采购直接照着下单。"
+
+  - layout: split
+    title: 电子花样机：每针的转速和伺服
+    points:
+      - "针距 3 mm、布厚 1.5 mm：转速上限 {{sol_enterprise.nmax3:.0f}} r/min"
+      - 上传针位表，按每针长短自动前瞻调速
+      - "同一台电机，带轮半径 15 → 10 mm，发热从超标到合格"
+    visual: {video: pattern}
+    notes: "电子花样机的核心是一条规矩：机针在布中，模板不能动。软件按布厚算出模板能动的时间窗口，针距三毫米时转速上限 {{sol_enterprise.nmax3:.0f}} 转。花样可以选现成的，也可以上传针位表，按每一针的长短自动前瞻调速。伺服也一起校核：同一台电机，带轮半径从十五毫米改成十毫米，有效转矩从 {{sol_enterprise.rms15:.2f}} 降到 {{sol_enterprise.rms10:.2f}} 牛米，发热就从超标变成合格。"
+
+  - layout: split
+    title: 多头刺绣机：头数、针长与转速
+    points:
+      - "8 头、7 mm 缎纹、800 r/min：需要 {{sol_enterprise.a7:.1f}}，可用 {{sol_enterprise.am8:.1f}} m/s²"
+      - "这一针的转速上限 {{sol_enterprise.n8_7:.0f}} r/min"
+      - "4、8、15、20 头：效率 {{sol_enterprise.eff4:.0f}}%、{{sol_enterprise.eff8:.0f}}%、{{sol_enterprise.eff15:.0f}}%、{{sol_enterprise.eff20:.0f}}%"
+    visual: {video: embroid}
+    notes: "多头刺绣机的头越多，绷架越重。八头机绣七毫米的缎纹，转速八百时绷架需要 {{sol_enterprise.a7:.1f}} 的加速度，可是驱动力只给得出 {{sol_enterprise.am8:.1f}}，跟不上，这一针转速要降到 {{sol_enterprise.n8_7:.0f}} 转以下。头数和效率也要算：同样的断线率，四头机效率 {{sol_enterprise.eff4:.0f}}%，二十头只有 {{sol_enterprise.eff20:.0f}}%。买几头机、怎么排花样，心里有数。"
+
+  - layout: duo
+    title: 出件：拿去就能用
+    left:
+      fig: sol_step
+      label: 三维模型、零件轮廓
+      note: STEP 任何 CAD 都能打开；DXF 直接下料、线切割
+    right:
+      fig: sol_freecad
+      label: FreeCAD 工作台
+      note: 同一份计算核心，结果和网页版一样
+    notes: "算好了直接出件：设计计算书、装配调机卡、参数表，三维模型 STEP 任何 CAD 都能打开，平板零件的 DXF 轮廓可以直接下料、线切割。习惯在桌面上画图的工程师，可以装 FreeCAD 工作台，同一份计算核心，结果和网页版完全一样，还能一键提交到工厂审批。"
+
+  - layout: section
+    num: "02"
+    title: 仿真与加工
+
+  - layout: duo
+    title: 强度、疲劳与减重
+    left:
+      fig: sol_fea
+      label: 有限元强度与疲劳寿命
+      note: 受力按一转里最大的时刻，自动加约束和载荷
+    right:
+      fig: sol_topo
+      label: 拓扑减重，再送有限元复核
+      note: 减掉的材料不靠猜，复核合格才算数
+    notes: "第二块是仿真和加工。关键零件一键送有限元：软件按一转里受力最大的时刻自动加约束和载荷，算强度安全系数和疲劳寿命。想减重，做拓扑优化，看材料该留在哪里，减完再送有限元复核，合格才算数。机壳上传模型就能算固有频率，机构动力学和主轴电机选型也在这里。"
+
+  - layout: duo
+    title: 伺服选型与数控编程
+    left:
+      fig: sol_pattern_motor
+      label: X、Y 轴伺服选型
+      note: 每台电机用自己的转子惯量重算，留 1.2 倍余量
+    right:
+      fig: sol_tpl_cam
+      label: 花样模板直接出数控程序
+      note: 针迹轨迹变成模板上的槽，试切检查后下载
+    notes: "花样机和刺绣机的伺服，用电机表一台台比，每台用它自己的转子惯量重算，峰值和有效值都留一点二倍余量，推荐最小的够用的那台。花样模板也不用再手工画：按针迹轨迹在模板板上开槽，出三维模型，交给数控编程，自动选刀、试切检查撞刀和过切，合格了下载程序就能上机床。平板零件也一样直接出程序。"
+
+  - layout: section
+    num: "03"
+    title: 设计到车间，再到售后
+
+  - layout: split
+    title: 数字工厂：车间只拿批准过的版本
+    points:
+      - 设计发布、看图、批注，批准才生效
+      - 物料版本、BOM、工单、数控程序自动更新
+      - 报工、质检、追溯，出了问题追得到根源
+    visual: {video: factory}
+    notes: "第三块，设计到车间。设计发布后在网页上看图、批注、审批，批准才生效；批准后物料版本、BOM、工单和数控程序自动更新，车间终端只拿到批准过的版本。报工、质检的数据回到同一个平台，出了质量问题，从一台机器一路追到哪一批料、哪一道工序。"
+
+  - layout: split
+    title: 售后：每台机器一个数字分身
+    points:
+      - 卖出的机器联网上报运行数据
+      - 健康度、剩余寿命，提前安排维护
+      - 维修单直接进系统，现场数据反馈设计
+    visual: {video: iot}
+    notes: "售后也在这条线上。卖出去的机器联网上报运行数据，平台给每台机器建一个数字分身，算健康度和剩余寿命，提前安排维护，而不是等坏了再修。维修单直接进系统，现场的数据再反馈给设计，下一代机型就有了依据。"
+
+  - layout: split
+    title: 人才：教材、课程、实验一整套
+    points:
+      - "教材《缝纫机设计与制造》{{sol_enterprise.lessons}} 讲"
+      - "网页课件、公开课视频，{{sol_enterprise.labs}} 个虚拟实验和三维模型"
+      - 真机拆装套件：先在虚拟样机上调，再上真机
+    visual: {video: hero}
+    notes: "最后是人。我们写了一本《缝纫机设计与制造》，{{sol_enterprise.lessons}} 讲，配网页课件、公开课视频和 {{sol_enterprise.labs}} 个虚拟实验和三维模型；还有真机拆装套件，新人先在虚拟样机上把调机练熟，再上真机。软件里每一项校核都标着出自哪一讲，工程师用软件的时候，随时能回到书里看为什么。"
+
+  - layout: points
+    title: 怎么部署
+    points:
+      - 浏览器里就能用，不装软件；习惯桌面的装 FreeCAD 工作台
+      - 计算在自己的服务器上做，企业数据不出平台
+      - 国内部署只用已备案的大模型；也能接企业已有的 CAD 和 ERP
+    notes: "部署上很简单：浏览器里就能用，不用装软件；习惯桌面的工程师装 FreeCAD 工作台。计算在我们自己的服务器上做，企业的数据不出平台；国内部署只用已备案的大模型。企业已有的 CAD 和 ERP 也可以接进来，不用换。"
+
+  - layout: chain
+    title: 怎么开始
+    steps: [免费试算, 开通企业账号, 演示与培训, 按需定制, 接入已有系统]
+    foot: 来宾不登录就能改参数、看样机和校核；开通后保存项目、导出文件、用仿真
+    notes: "怎么开始？第一步免费试算：不用登录，打开缝纫机设计软件就能改参数、看样机和校核。觉得有用，开通企业账号，就能保存项目、导出文件、用仿真。我们上门或者在线做演示和培训，再按企业的机型和流程定制，接进企业已有的系统。"
+
+  - layout: summary
+    title: 小结
+    points:
+      - 设计时就知道行不行，少做样机、少走弯路
+      - 设计、仿真、加工、车间、售后，一条线、一套数据
+      - 教材、课程、实验配齐，人才跟得上
+    after: 预约演示：问渠官网首页“联系我们”
+    notes: "总结一下：问渠让缝纫机企业在设计时就知道行不行，少做样机、少走弯路；设计、仿真、加工、车间、售后用一条线、一套数据连起来；教材、课程、实验配齐，人才跟得上。欢迎到问渠官网首页预约演示，谢谢大家。"

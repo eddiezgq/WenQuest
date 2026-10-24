@@ -349,7 +349,9 @@ CUSTOM = {"needle_idea": vis_needle_idea, "feed_box": vis_feed_box, "encoder_flo
 
 
 # ---------------------------------------------------------------- layouts
-def foot(no, page, total):
+def foot(no, page, total, talk=None):
+    if talk:                     # 演讲稿模式（第 44 轮：行业解决方案介绍）：页脚写方案名，不写“第 N 讲”
+        return f'<div class="foot"><div><b>{e(talk["name"])}</b></div><div>问渠 WenQuest · {page}/{total}</div></div>'
     return (f'<div class="foot"><div><b>{COURSE_NAME[0]}</b> · {COURSE_NAME[1]} · 第 {no} 讲 Lecture {no}</div>'
             f'<div>问渠 WenQuest · {page}/{total}</div></div>')
 
@@ -395,7 +397,7 @@ def L_cover(s, ctx):
     return (f'<div class="slide cover"><div class="bgv live" data-live="{s["video"]}"></div><div class="shade"></div>'
             f'<div class="txt"><div class="kick"><i style="font-style:normal">{e(s["kicker"][0])}</i><span>{e(s["kicker"][1])}</span></div><h1>{e(s["title"][0])}</h1>'
             f'<div class="h1en">{e(s["title"][1])}</div><div class="sub">{e(s["sub"][0])}</div><div class="suben">{e(s["sub"][1])}</div></div>'
-            f'<div class="brand"><b>问渠 WenQuest</b>{COURSE_NAME[0]} · {COURSE_NAME[1]}</div></div>')
+            f'<div class="brand"><b>问渠 WenQuest</b>{e(ctx.get("brand") or COURSE_NAME[0] + " · " + COURSE_NAME[1])}</div></div>')
 
 
 def L_section(s, ctx):
@@ -717,6 +719,26 @@ list.forEach(function(t){var x=t.nodeValue;if(!C.test(x))return;
  if(x.indexOf('·')>=0){var keep=x.split('·').filter(function(p){return !C.test(p)});t.nodeValue=keep.join(' · ').trim();return;}
  if(/[A-Za-z]{2,}|[A-Za-z]\s*=/.test(x)){t.nodeValue=x.replace(/[　-〿一-鿿＀-￯]+/g,' ').replace(/^[\s:：,，]+|[\s:：,，]+$/g,'').replace(/\s{2,}/g,' ');return;}
  t.nodeValue='';});})();</script>"""
+# 只显示中文（第 44 轮）：英文行一律不出；内容可以只写中文（zh_pairs 补成 [中文, ""]）
+ZH_ONLY_CSS = ("html.zh-only .en,html.zh-only .t-en,html.zh-only .h1en,html.zh-only .suben,html.zh-only .ne,"
+               "html.zh-only .kick>span,html.zh-only .tile .nm>span,html.zh-only .tile .use>span,html.zh-only .tasks .h>span{display:none!important}")
+PAIR_KEYS = {"title", "kicker", "sub", "tag", "label", "note", "name", "use", "foot", "after", "caption", "text", "what", "who", "notes", "mark"}
+PAIR_LIST_KEYS = {"points", "facts", "steps", "tasks", "parts"}
+
+
+def zh_pairs(x, key=None):
+    """只写中文的内容补成引擎要的 [中文, 英文] 对（英文留空）"""
+    if isinstance(x, dict):
+        return {k: (v if k in ("talk", "clips") else zh_pairs(v, k)) for k, v in x.items()}
+    if isinstance(x, str) and key in PAIR_KEYS:
+        return [x, ""]
+    if isinstance(x, list):
+        if key in PAIR_LIST_KEYS:
+            return [[v, ""] if isinstance(v, str) else zh_pairs(v) for v in x]
+        return [zh_pairs(v) for v in x]
+    return x
+
+
 VIDEO_CSS = "html.video #nav,html.video #bar,html.video .foot{display:none!important}html.video *{cursor:none!important}"
 
 
@@ -753,7 +775,8 @@ def use_stills(slides_html: list[str], stills: dict) -> list[str]:
 
 
 def build_deck(spec, lesson, slides_html, out: Path, lang: str = "zh", stills: dict | None = None) -> Path:
-    no = spec["lesson"]
+    talk = spec.get("talk")
+    no = talk["id"] if talk else spec["lesson"]
     clips = dict(spec.get("clips") or {})
     for lab in (s for s in spec["slides"] if s["layout"] == "lab"):
         clips["lab:" + lab["shot"]["page"]] = {"page": lab["shot"]["page"], "vw": lab["shot"].get("vw", 1400), "vh": lab["shot"].get("vh", 830),
@@ -773,10 +796,11 @@ def build_deck(spec, lesson, slides_html, out: Path, lang: str = "zh", stills: d
     pages = sorted({c["page"] for c in clips.values()})
     scripts = "".join(f'<script type="text/plain" data-page="{p}">{page_b64(p, lang)}</script>' for p in pages)
     body = "".join(slides_html)
-    title = f"第 {no} 讲 {lesson['title'][0]} · 课件"
+    title = f"{talk['name']} · 演示稿" if talk else f"第 {no} 讲 {lesson['title'][0]} · 课件"
     en = lang == "en"
-    doc = (f'<!doctype html><html lang="{"en" if en else "zh-CN"}"{" class=\"en-only\"" if en else ""}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-           f'<title>{e(title)}</title><style>{CSS}{DECK_CSS}{VIDEO_CSS}{en_only_css() if en else ""}</style></head><body><div id="stage">{body}</div>'
+    cls = "en-only" if en else ("zh-only" if spec.get("only_zh") else "")
+    doc = (f'<!doctype html><html lang="{"en" if en else "zh-CN"}"{f" class=\"{cls}\"" if cls else ""}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+           f'<title>{e(title)}</title><style>{CSS}{DECK_CSS}{VIDEO_CSS}{en_only_css() if en else ""}{ZH_ONLY_CSS if cls == "zh-only" else ""}</style></head><body><div id="stage">{body}</div>'
            f'<div id="bar"></div><div id="nav"><button id="bp" title="上一步 ←">◀</button><span id="pg"></span><button id="bn" title="下一步 → / 空格">▶</button>'
            f'<button id="bs" title="讲者视图（S）">讲者</button><button id="bf" title="全屏（F）">全屏</button></div>'
            f'<div id="fl"><button>返回课件（Esc）</button><iframe></iframe></div>'
@@ -818,17 +842,22 @@ def make_deck(lesson_id: str, out: Path, lang: str = "zh", extra: list | None = 
     第 25 轮（讲课视频）：lang="en" 出英文版（只显示英文、嵌英文实验页）；extra = 追加的页（视频课后部分：作业、测验等）。"""
     spec = yaml.safe_load((COURSE / "slides" / f"{lesson_id}.yaml").read_text(encoding="utf-8"))
     spec["slides"] = spec["slides"] + list(extra or [])
+    if spec.get("only_zh"):
+        spec = zh_pairs(spec)
     values = run_programs(spec.get("code") or [])
     spec = fill(spec, values)
-    lesson = json.loads((COURSE / "lessons" / f"{lesson_id}.json").read_text(encoding="utf-8"))
+    talk = spec.get("talk")      # 演讲稿模式：不是课程的一讲，没有 lessons/ 文件
+    lesson = {"title": [talk["name"], ""]} if talk else json.loads((COURSE / "lessons" / f"{lesson_id}.json").read_text(encoding="utf-8"))
     out.mkdir(parents=True, exist_ok=True)
     slides = spec["slides"]
     pages = []
     for k, s in enumerate(slides):
         if s["layout"] == "formula":
             s["formula_html"] = formula_html(s["formula"])
-        ctx = {"foot": foot(spec["lesson"], k + 1, len(slides)), "v": values, "lang": lang}
+        ctx = {"foot": foot(spec.get("lesson"), k + 1, len(slides), talk), "v": values, "lang": lang, "brand": talk and talk["name"]}
         pages.append(mark_frags(LAYOUTS[s["layout"]](s, ctx), s["layout"]))
+    if talk:
+        return build_deck(spec, lesson, pages, out / (name or f"{talk['id']}.html"), lang, stills)
     no = spec["lesson"]
     return build_deck(spec, lesson, pages, out / (name or f"第{no}讲-{lesson['title'][0]}-课件.html"), lang, stills)
 

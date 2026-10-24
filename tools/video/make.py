@@ -488,6 +488,28 @@ def mmss(t):
     return f"{t // 60}:{t % 60:02d}" if t < 3600 else f"{t // 3600}:{t // 60 % 60:02d}:{t % 60:02d}"
 
 
+def covers_talk(mp4: Path, out_dir: Path):
+    """演讲稿（第 44 轮：行业解决方案介绍片）：封面取片头那一页（活的三维样机）的画面"""
+    png = out_dir / "cover.png"
+    sh("ffmpeg", "-y", "-loglevel", "error", "-ss", "4", "-i", mp4, "-frames:v", "1", png)
+    sh("ffmpeg", "-y", "-loglevel", "error", "-i", png, "-vf", "scale=1280:720", out_dir / "cover_youtube.png")
+    sh("ffmpeg", "-y", "-loglevel", "error", "-i", png, "-vf", "scale=1146:645,pad=1146:717:0:36:color=0x0f1419", out_dir / "cover_bilibili.png")
+
+
+def upload_text_talk(lec, lang, chapters, total, voice_backend, out_dir):
+    d = lec.data
+    t = lec.t(d["title"], lang)
+    desc = [lec.t(d.get("desc", ["", ""]), lang), "", "章节：" if lang == "zh" else "Chapters:"] + [f"{mmss(a)} {p}" for a, p in chapters] + [
+        "", lec.t(VOICE_NOTE[voice_backend], lang) + ("。数字均由问渠缝纫机设计软件的计算核心算出。" if lang == "zh" else ".")]
+    tags = list((d.get("tags") or {}).get(lang, []))
+    extra = ["分区：知识 → 职业职场", "投稿时勾选“作者声明：使用 AI 合成技术”（配音）"] if lang == "zh" else ["Altered or synthetic content: Yes (AI voice)"]
+    md = [f"# {t}", "", "## 标题", t, "", "## 简介", *desc, "", "## 标签", ", ".join(tags), "", "## 设置", *[f"- {x}" for x in extra],
+          "", f"<!-- length {mmss(total)} -->"]
+    (out_dir / "upload.md").write_text("\n".join(md) + "\n", encoding="utf-8")
+    (out_dir / "upload.json").write_text(json.dumps({"title": t, "description": "\n".join(desc), "tags": tags, "lang": lang},
+                                                    ensure_ascii=False, indent=1), encoding="utf-8")
+
+
 def covers(lec, lang, work, out_dir, quality):
     spec = {"kind": "cover", "lang": lang, "total": 0.05, "steps": [],
             "course": lec.t(COURSE.get(lec.book, [lec.book, lec.book]), lang), "title": lec.t(lec.data["title"], lang),
@@ -613,8 +635,12 @@ def main():
             continue
         d = out / lang
         mp4, chapters, total = compose(lec, lang, tls, files, d, work, a.voice)
-        covers(lec, lang, work, d, a.quality)
-        upload_text(lec, lang, chapters, total, a.voice, d)
+        if lec.data.get("talk"):
+            covers_talk(mp4, d)
+            upload_text_talk(lec, lang, chapters, total, a.voice, d)
+        else:
+            covers(lec, lang, work, d, a.quality)
+            upload_text(lec, lang, chapters, total, a.voice, d)
         print(f"{lang}: {mp4}  {mmss(total)}", flush=True)
 
 

@@ -145,7 +145,8 @@ def load(lecture_dir: str | Path) -> Lecture:
         if k not in raw:
             raise ScriptError(f"讲稿缺少 {k}")
     book, sec = raw["book"], str(raw["section"])
-    ch = int(sec.split(".")[0])
+    ch = int(sec.split(".")[0]) if sec.split(".")[0].isdigit() else 0     # 演讲稿（第 44 轮）的 section 不是讲号
+    langs = tuple(raw.get("langs") or LANGS)                                # 只出中文：langs: [zh]
     if raw.get("deck"):
         raw = from_deck(raw)
     values = run_programs(book, ch, raw.get("code") or [])
@@ -161,20 +162,20 @@ def load(lecture_dir: str | Path) -> Lecture:
             raise ScriptError(f"镜头 {sid}：kind 应为 {sorted(KINDS)} 之一")
         body = fill_tree({k: v for k, v in s.items() if k != "say"}, values, f"镜头 {sid}")
         say = s.get("say") or {}
-        lines = {}
-        for lang in LANGS:
+        lines = {lang: [] for lang in LANGS}
+        for lang in langs:
             if not say.get(lang):
                 raise ScriptError(f"镜头 {sid}：缺少 say.{lang}")
             lines[lang] = [split_line(fill(str(x), values, f"镜头 {sid} say.{lang}")) for x in say[lang]]
         shot = Shot(id=sid, kind=kind, data=body, lines=lines)
         nz, ne = shot.steps("zh"), shot.steps("en")
-        if nz != ne:
+        if nz != ne and len(langs) > 1:
             raise ScriptError(f"镜头 {sid}：中文 {nz} 个“>”，英文 {ne} 个，应相同")
         need = {"slide": len(body.get("items") or []), "homework": len(body.get("items") or []),
                 "outro": len(body.get("points") or []), "lab": len(body.get("steps") or [])}.get(kind)
         if need is not None and nz > need:
             raise ScriptError(f"镜头 {sid}：“>” 有 {nz} 个，多于可显示的 {need} 项")
-        for lang in LANGS:
+        for lang in langs:
             for ln in lines[lang]:
                 if "[" in ln.shown and "|" in ln.shown:
                     raise ScriptError(f"镜头 {sid}：“[字幕|读法]” 写法不完整：{ln.shown[:40]}")
@@ -203,6 +204,8 @@ def from_deck(raw: dict) -> dict:
     deck = yaml.safe_load(dy.read_text(encoding="utf-8"))
     code = list(dict.fromkeys(list(raw.get("code") or []) + list(deck.get("code") or [])))
     slides = deck["slides"]
+    if deck.get("only_zh"):              # 只写中文的演示稿（第 44 轮）：讲稿、标题补成 [中文, ""]
+        slides = [{k: ([v, ""] if k in ("notes", "title") and isinstance(v, str) else v) for k, v in sl.items()} for sl in slides]
     extra = [a["slide"] for a in raw.get("after") or [] if "slide" in a]
     tools = TEXTBOOK / "tools" / "webcourse" / "wc_slides.py"       # 公用课件引擎（第 29 轮）
     import hashlib
@@ -212,7 +215,7 @@ def from_deck(raw: dict) -> dict:
     def say_of(notes, zh_extra=(), en_extra=()):
         zh = sentences(notes[0], "zh") + list(zh_extra) if notes else list(zh_extra)
         en = sentences(notes[1], "en") + list(en_extra) if notes else list(en_extra)
-        k = min(len(zh), len(en))
+        k = min(len(zh), len(en)) if en else len(zh)        # 只有中文（第 44 轮）：每句都让下一个要点出现
         return {"zh": [(">" if i < k else "") + x for i, x in enumerate(zh)],
                 "en": [(">" if i < k else "") + x for i, x in enumerate(en)]}
 
@@ -229,11 +232,13 @@ def from_deck(raw: dict) -> dict:
             summary = (n, sl)
             continue
         if lay == "cover":
-            say = {"zh": raw["intro"]["zh"], "en": raw["intro"]["en"]}
+            say = {"zh": raw["intro"]["zh"], "en": raw["intro"].get("en") or []}
         elif lay == "section":
             say = {"zh": [sl["title"][0] + "。"], "en": [sl["title"][1] + "."]}
         else:
             say = say_of(sl.get("notes"))
+        if n in (raw.get("say") or {}):          # 短版（第 44 轮）：这一页换一段更短的话
+            say = say_of([raw["say"][n], ""])
         if not say["zh"]:
             continue
         shots.append({"id": f"p{n:02d}", "kind": "deck", "slide": n, "stamp": stamp,
@@ -250,9 +255,12 @@ def from_deck(raw: dict) -> dict:
     if summary:
         n, sl = summary
         out = raw.get("outro") or {"zh": [], "en": []}
+        notes = [raw["say"][n], ""] if n in (raw.get("say") or {}) else sl.get("notes")
         shots.append({"id": "summary", "kind": "deck", "slide": n, "stamp": stamp, "part": ["小结", "Summary"],
-                      "say": say_of(sl.get("notes"), out["zh"], out["en"])})
-    new = {k_: v for k_, v in raw.items() if k_ not in ("intro", "after", "outro", "skip")}
+                      "say": say_of(notes, out["zh"], out.get("en") or [])})
+    new = {k_: v for k_, v in raw.items() if k_ not in ("intro", "after", "outro", "skip", "say")}
+    if deck.get("talk"):
+        new["talk"] = deck["talk"]
     new.update(code=code, shots=shots, deck_extra=extra)
     return new
 
