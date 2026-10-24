@@ -285,6 +285,24 @@ label.calc { margin-top: 14px; grid-template-columns: 1fr 260px; }
 .win.f { zoom: 1.4; }   /* the replica is laid out at its real size and enlarged so its text reads on a projector */
 .pg:has(.win) .head h2 { font-size: 60px; }
 .pg:has(.win) .head { gap: 8px; }
+
+/* round 46: part 11, real screens and outputs of the other WenQuest tools */
+.shot { display: block; width: 100%; border-radius: 14px; box-shadow: 0 30px 70px rgba(0,0,0,.45), 0 0 0 2px rgba(79,209,224,.25); background: #fff; }
+.duo { display: grid; grid-template-columns: 500px 1fr; gap: 50px; align-items: start; }
+.pts { list-style: none; margin: 0; padding: 0; display: grid; gap: 28px; }
+.pts li { font-size: 30px; line-height: 1.38; color: var(--soft); padding-left: 26px; border-left: 4px solid var(--gold); }
+.pts li b { display: block; color: var(--ink); font-size: 34px; margin-bottom: 4px; }
+.stack { position: relative; height: 800px; }
+.stack .shot:nth-child(1) { position: absolute; left: 0; top: 0; width: 76%; }
+.stack .shot:nth-child(2) { position: absolute; right: 0; top: 230px; width: 64%; }
+.tool { background: rgba(20,45,87,.75); border: 2px solid var(--line); border-radius: 14px; overflow: hidden; display: grid; grid-template-rows: 250px auto; }
+.tool .th { background-size: cover; background-position: center top; }
+.tool .tx { padding: 22px 28px 26px; display: grid; gap: 8px; }
+.tool .tx .n { font-family: var(--mono); font-size: 22px; color: var(--cyan); letter-spacing: .1em; }
+.tool .tx h3 { font-size: 40px; }
+.tool .tx p { font-size: 26px; color: var(--soft); line-height: 1.38; }
+.seq { width: 1120px; height: 630px; border-radius: 14px; background-repeat: no-repeat; box-shadow: 0 30px 70px rgba(0,0,0,.45), 0 0 0 2px rgba(79,209,224,.25); }
+.wbwrap.sm .wbf { width: 1040px; height: 634px; }
 </style>
 
 <div id="view"><div id="stage">
@@ -857,7 +875,65 @@ Authorization: Bearer wqo_…
     <div class="wbwrap"><iframe class="wbf" data-t0="102.22" data-t1="129.25" title="The data hub: a closed loop (whiteboard animation)" loading="lazy"></iframe></div>
     <aside class="notes">Finally, the hub: orders, inventory, machines and quality, in one connected web of data. A digital twin draws the whole plant live on screen: where it&#x27;s slow, where it&#x27;s jammed, at a glance. When something&#x27;s off, AI suggests a fix: change the tool, slow down, restock. A person approves at the key step, robots carry it out, and the results flow back to the hub. A closed loop. Fully integrated, fully automated. People are freed from hauling and watching, to focus on judgment.</aside>
   </section>
-  <section class="pg" data-ch="10 · The future factory" data-title="Questions">
+  <section class="pg" data-ch="11 · One platform, more tools" data-title="One platform, more tools">
+    <div class="head"><p class="kick f">Part 11 · Beyond the ERP</p><h2 class="f">The same platform, the same rule, built for manufacturers</h2></div>
+    <div class="cols c4">
+      <div class="tool f"><div class="th" style="background-image:url(media/sew-checks-en.jpg)"></div><div class="tx"><span class="n">INDUSTRY SOFTWARE</span><h3>Sewing machine design</h3><p>Five machine types, checked as you change them.</p></div></div>
+      <div class="tool f"><div class="th" style="background-image:url(media/cam-3d-en.jpg)"></div><div class="tx"><span class="n">INDUSTRY SOFTWARE</span><h3>Cam design and manufacturing</h3><p>From a motion requirement to the machined cam.</p></div></div>
+      <div class="tool f"><div class="th" style="background-image:url(media/v3d-arm-sprite.jpg);background-size:1200% 800%;background-position:-500% -300%"></div><div class="tx"><span class="n">VIDEO</span><h3>3D simulation videos</h3><p>One sentence in, an engineering 3D film out.</p></div></div>
+      <div class="tool f"><div class="th" style="background-image:url(media/wb-en.jpg)"></div><div class="tx"><span class="n">VIDEO</span><h3>Whiteboard explainers</h3><p>A topic or a recording becomes a drawn lecture.</p></div></div>
+    </div>
+    <aside class="notes">The same platform, the same rule, built for manufacturers</aside>
+  </section>
+  <section class="pg" data-ch="11 · One platform, more tools" data-title="Sewing machine design software">
+    <div class="head"><p class="kick f">Part 11 · Industry software · Live today</p><h2 class="f">Sewing machine design software</h2></div>
+    <div class="duo">
+        <ul class="pts">
+          <li class="f"><b>Five machine types</b>Lockstitch, overlock, coverstitch, pattern sewer, multi-head embroidery.</li>
+          <li class="f"><b>Change a number, see every check</b>Speed up to 6000 r/min: two fail, one needs attention, each with the fix.</li>
+          <li class="f"><b>Into your tools</b>Calculation report, 3D model, adjustment card; strength and fatigue on WenQuest CAE; a FreeCAD workbench.</li>
+        </ul>
+        <div class="stack"><img class="shot f" src="media/sew-checks-en.jpg" alt=""><img class="shot f" src="media/sew-timing-en.jpg" alt=""></div>
+    </div>
+    <aside class="notes">Sewing machine design software</aside>
+  </section>
+  <section class="pg" data-ch="11 · One platform, more tools" data-title="Cam design and manufacturing software">
+    <div class="head"><p class="kick f">Part 11 · Industry software · Live today</p><h2 class="f">Cam design and manufacturing software</h2></div>
+    <div class="duo">
+        <ul class="pts">
+          <li class="f"><b>From motion to profile</b>Rise, dwell, return; pressure angle, curvature, jump and contact stress, checked by code.</li>
+          <li class="f"><b>Whole cam systems</b>A timing diagram for every cam on the shaft, interlocks, motor torque.</li>
+          <li class="f"><b>Made as it is machined</b>Machining programs, error and compensation, exact globoidal solids in FreeCAD. AI drafts the motion from one sentence; code checks every number.</li>
+        </ul>
+        <div class="stack"><img class="shot f" src="media/cam-sys-en.jpg" alt=""><img class="shot f" src="media/cam-3d-en.jpg" alt=""></div>
+    </div>
+    <aside class="notes">Cam design and manufacturing software</aside>
+  </section>
+  <section class="pg" data-ch="11 · One platform, more tools" data-title="3D simulation videos, from one sentence">
+    <div class="head"><p class="kick f">Part 11 · Video · Live today</p><h2 class="f">3D simulation videos, from one sentence</h2></div>
+    <div class="duo" style="grid-template-columns:520px 1fr">
+        <ul class="pts">
+          <li class="f"><b>Ask in a sentence</b>AI writes the scene; the motion itself is computed, not drawn.</li>
+          <li class="f"><b>Engineering detail</b>Cutaways, X-ray, slow motion, readouts and bilingual labels.</li>
+          <li class="f"><b>Check, then render</b>Key frames first, then a draft and HD on our servers. For training, sales and service.</li>
+        </ul>
+        <div class="seq f" data-n="96" data-cols="12" data-fps="8" style="background-image:url(media/v3d-arm-sprite.jpg)"></div>
+    </div>
+    <aside class="notes">3D simulation videos, from one sentence</aside>
+  </section>
+  <section class="pg" data-ch="11 · One platform, more tools" data-title="Whiteboard explainer videos">
+    <div class="head"><p class="kick f">Part 11 · Video · Live today</p><h2 class="f">Whiteboard explainer videos</h2></div>
+    <div class="duo" style="grid-template-columns:520px 1fr">
+        <ul class="pts">
+          <li class="f"><b>A topic, or your own recording</b>AI writes the script, voices it and lays out the boards; you edit any part.</li>
+          <li class="f"><b>Drawings that move</b>Insert the course's labs, animations and videos into the board.</li>
+          <li class="f"><b>You have already seen one</b>The future-factory boards earlier in this talk were drawn this way.</li>
+        </ul>
+        <div class="wbwrap sm f"><iframe class="wbf" data-src="wb/demo-en.html" data-t0="40.0" data-t1="64.0" title="Whiteboard explainer videos" loading="lazy"></iframe></div>
+    </div>
+    <aside class="notes">Whiteboard explainer videos</aside>
+  </section>
+  <section class="pg" data-ch="11 · One platform, more tools" data-title="Questions">
     <div style="display:grid;gap:34px;margin-top:150px;max-width:1300px">
       <p class="kick f">Thank you</p>
       <h1 class="f">One record. AI drafts. People decide.</h1>
@@ -903,7 +979,7 @@ Authorization: Bearer wqo_…
     if (p.dataset.ch !== last) { const h = document.createElement('div'); h.className = 'ch'; h.textContent = p.dataset.ch; $('#tocList').appendChild(h); last = p.dataset.ch }
     const b = document.createElement('button'); b.type = 'button'; b.innerHTML = `<b>${i + 1}</b><span>${esc(p.dataset.title)}</span>`; b.onclick = () => { go(i); panel() }; $('#tocList').appendChild(b)
   })
-  const MIN = { 'Opening': 3, '1 · The problem': 4, '2 · The idea': 7, '3 · The base: ERPNext': 12, '4 · The hub': 10, '5 · Operations': 6, '6 · Quality that runs': 8, '7 · Regulated products': 4, '8 · Digital factory': 4, '9 · Deploy, change, start': 7, '10 · The future factory': 4 }
+  const MIN = { 'Opening': 3, '1 · The problem': 4, '2 · The idea': 7, '3 · The base: ERPNext': 12, '4 · The hub': 10, '5 · Operations': 6, '6 · Quality that runs': 8, '7 · Regulated products': 4, '8 · Digital factory': 4, '9 · Deploy, change, start': 7, '10 · The future factory': 4, '11 · One platform, more tools': 3 }
   chapters.slice(1).forEach((c, k) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'f'; b.innerHTML = `<b>${k + 1}</b><span>${esc(c.name.replace(/^\d · /, ''))}</span><i>${MIN[c.name]} min</i>`; b.onclick = () => go(c.first); $('#agenda').appendChild(b) })
 
   // ---------- navigation with step-by-step reveal
@@ -922,7 +998,7 @@ Authorization: Bearer wqo_…
     $$('iframe.wbf').forEach((f) => { if (!pages[cur].contains(f) && f.dataset.on) f.contentWindow?.postMessage({ wb: 'stop' }, '*') })
     $$('iframe.wbf', pages[cur]).forEach((f) => {
       const show = () => f.contentWindow?.postMessage({ wb: 'show', t0: +f.dataset.t0, t1: +f.dataset.t1, autoplay: !!window.__wbAutoplay }, '*')
-      if (!f.dataset.on) { f.dataset.on = '1'; f.addEventListener('load', show); f.src = 'wb/future-factory-en.html' } else show()
+      if (!f.dataset.on) { f.dataset.on = '1'; f.addEventListener('load', show); f.src = f.dataset.src || 'wb/future-factory-en.html' } else show()
     })
     try { history.replaceState(null, '', `#p${cur + 1}`) } catch { /* the frame may refuse */ }
   }
@@ -1841,4 +1917,16 @@ Authorization: Bearer wqo_…
 })()
 </script>
 
+<script>
+/* round 46: a short clip of a rendered 3D simulation video, shown as a sprite of frames (works with the recorder's virtual clock) */
+(() => {
+  const step = () => document.querySelectorAll('.pg.on .seq').forEach((e) => {
+    const n = +e.dataset.n, cols = +e.dataset.cols, k = Math.floor(performance.now() / 1000 * +e.dataset.fps) % n
+    const w = e.clientWidth, h = e.clientHeight
+    e.style.backgroundSize = `${w * cols}px ${h * Math.ceil(n / cols)}px`
+    e.style.backgroundPosition = `${-(k % cols) * w}px ${-Math.floor(k / cols) * h}px`
+  })
+  setInterval(step, 40)
+})()
+</script>
 </body></html>

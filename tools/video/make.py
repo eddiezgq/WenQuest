@@ -295,7 +295,7 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
                     cta2=lec.t(["实验 · 程序 · 讲义 · 作业 · AI 反馈", "Labs · programs · notes · exercises · instant AI feedback"], lang),
                     cta_at=max(0.5, tl_lines[n]["start"] - LEAD) if len(tl_lines) > n else tl["total"] - 3)
     key = h([spec, (HERE / "slides.py").read_text(encoding="utf-8"), quality] + ([d, (HERE / "labrec.py").read_text(encoding="utf-8")] if shot.kind in ("lab", "clip", "deck", "page") else [])
-            + ([hashlib.sha1((lec.dir / lec.data["deck_html"]).read_bytes()).hexdigest(), PAGE_INIT] if shot.kind == "page" else []))   # 实验镜头：步骤或录屏程序变了要重录；网页课件改了也重录
+            + ([hashlib.sha1((lec.dir / deck_of(lec, lang)).read_bytes()).hexdigest(), PAGE_INIT] if shot.kind == "page" else []))   # 实验镜头：步骤或录屏程序变了要重录；网页课件改了也重录
     out = work / "shots" / f"{shot.id}.{lang}.{key}.mp4"
     if out.exists():
         return out
@@ -334,9 +334,9 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
     elif shot.kind == "page":
         # 第 38 轮：独立视频，画面是外部网页课件（讲座网页），翻到 page 页，每个 “>” 做 steps 的下一步
         import labrec
-        deck = (lec.dir / lec.data["deck_html"]).resolve()
+        deck = (lec.dir / deck_of(lec, lang)).resolve()
         n = int(d["page"])
-        steps = [{"js": page_step(n, st)} for st in d.get("steps") or []]
+        steps = [{"js": page_step(n, st)} for st in (d.get(f"steps_{lang}") or d.get("steps") or [])]
         raw = work / "shots" / f"page_{shot.id}_{lang}.mp4"
         labrec.run(deck.as_uri() + f"#p{n}", "page", steps, tl["steps"], tl["total"], raw, standalone=True,
                    viewport=(1920, 1080), fps=15, init_js=PAGE_INIT.replace("__N__", str(n)).replace("__T__", str(tl["total"])))
@@ -414,6 +414,12 @@ PAGE_INIT = r"""(() => {
     f.contentWindow.postMessage({wb: 'at', t: t0 + (t1 - t0) * Math.min(1, t / __T__)}, '*');
   };
 })()"""
+
+
+def deck_of(lec, lang: str) -> str:
+    """网页课件的路径（相对讲稿目录）；第 46 轮起 deck_html 可以按语言给 {en: …, zh: …}。"""
+    d = lec.data["deck_html"]
+    return d.get(lang) or d.get("en") or next(iter(d.values())) if isinstance(d, dict) else d
 
 
 def page_step(n: int, st: dict) -> str:

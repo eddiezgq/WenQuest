@@ -112,3 +112,7 @@ shots:
 - 课件页里的白板动画（`iframe.wbf`，`data-t0`/`data-t1` 是白板上的起止秒）随镜头时长同步画完，不出白板自己的声音。
 - 先在本机检查每步操作：`python3 tools/video/make.py <讲稿目录> --lang en --voice kokoro --out /tmp/v --only s01,s15`。
 - 从分支运行工作流时，运行记录和预览提交回那个分支，不进 main。
+- 中英两版各用自己的课件（第 46 轮）：`deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}`，`langs: [en, zh]`。
+  英文版仍按 `subs: en+zh` 出双语字幕；中文版中文配音、中文字幕。中文课件里按文字点的步骤，文字不同时另写 `steps_zh`（步数与 “>” 相同）。
+- 课件页里的序列帧（`div.seq`，一张拼图 + `data-n`、`data-cols`、`data-fps`）跟着页面时钟换帧，录制时与虚拟时钟同步，不会抖。
+- 本机先把每个镜头的操作在两版课件里各跑一遍（不出声音、只截终态）：见第 46 轮细则的“干跑”做法。

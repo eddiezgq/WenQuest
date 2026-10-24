@@ -195,9 +195,10 @@ def load_standalone(d: Path, raw: dict) -> Lecture:
     for k in ("title", "deck_html", "shots"):
         if k not in raw:
             raise ScriptError(f"讲稿缺少 {k}")
-    deck = d / raw["deck_html"]
-    if not deck.exists():
-        raise ScriptError(f"找不到网页课件 {deck}")
+    decks = raw["deck_html"] if isinstance(raw["deck_html"], dict) else {"": raw["deck_html"]}   # 第 46 轮：可按语言给课件 {en: …, zh: …}
+    for deck in decks.values():
+        if not (d / deck).exists():
+            raise ScriptError(f"找不到网页课件 {d / deck}")
     data = {k: v for k, v in raw.items() if k != "shots"}
     shots, seen = [], set()
     for i, s in enumerate(raw["shots"]):
@@ -220,8 +221,11 @@ def load_standalone(d: Path, raw: dict) -> Lecture:
         n = shot.steps("en")
         if n != shot.steps("zh"):
             raise ScriptError(f"镜头 {sid}：中文 {shot.steps('zh')} 个“>”，英文 {n} 个，应相同")
-        if n != len(s.get("steps") or []):
-            raise ScriptError(f"镜头 {sid}：“>” 有 {n} 个，steps 有 {len(s.get('steps') or [])} 步，应相同")
+        for k in ("steps", "steps_zh", "steps_en"):   # 第 46 轮：中文课件里按文字点的步骤可另写 steps_zh
+            if k in s and n != len(s.get(k) or []):
+                raise ScriptError(f"镜头 {sid}：“>” 有 {n} 个，{k} 有 {len(s.get(k) or [])} 步，应相同")
+        if "steps" not in s and n:
+            raise ScriptError(f"镜头 {sid}：“>” 有 {n} 个，没有 steps")
         shots.append(shot)
     return Lecture(dir=d, book="", section="", chapter_no=0, data=data, shots=shots, values={})
 
