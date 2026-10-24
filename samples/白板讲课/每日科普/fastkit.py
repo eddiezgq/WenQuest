@@ -169,6 +169,69 @@ def fit(boards, segs):
     return boards
 
 
+# 英文配音的词典补丁（2026-10-24）：sherpa-onnx 的 kokoro 英文只查 lexicon-us-en.txt，查不到的词（复数、过去式、X's、阿拉伯数字）
+# 会被直接跳过、不读出来。这里把数字写成英文单词，并按词根 + 词尾给查不到的词补读音，写进 _tts/lex-extra.txt 先查。
+VOICELESS, SIBILANT = set("ptkfθ"), {"s", "z", "ʃ", "ʒ", "ʧ", "ʤ"}
+
+
+def _num_words(line):
+    import re
+    try:
+        from num2words import num2words
+    except ImportError:
+        return line
+    return re.sub(r"\d[\d,]*(\.\d+)?", lambda m: num2words(float(m.group().replace(",", "")) if "." in m.group() else int(m.group().replace(",", ""))).replace("-", " "), line)
+
+
+def _derive(w, lex):
+    lw = w.lower()
+    if lw in lex:
+        return lex[lw]
+    def tail(ph, kind):
+        last = ph.split()[-1]
+        if kind == "s":
+            return ph + (" ɪ z" if last in SIBILANT else " s" if last in VOICELESS else " z")
+        if kind == "d":
+            return ph + (" ɪ d" if last in ("t", "d") else " t" if last in VOICELESS | {"s", "ʃ", "ʧ"} else " d")
+        return ph + kind
+    for suf, cut, kind in (("'s", 2, "s"), ("ies", 3, "y_s"), ("es", 2, "s"), ("s", 1, "s"), ("ied", 3, "y_d"), ("ed", 2, "d"), ("ed", 1, "d"),
+                           ("ing", 3, " ɪ ŋ"), ("ing", 3, "e ɪ ŋ"), ("er", 2, " ə ɹ"), ("ly", 2, " l i")):
+        if not lw.endswith(suf):
+            continue
+        base = lw[:-cut]
+        if kind.startswith("y_"):
+            base, kind = base + "y", kind[2:]
+        if kind == "e ɪ ŋ":
+            base, kind = base + "e", " ɪ ŋ"
+        if base in lex:
+            return tail(lex[base], kind)
+    return None
+
+
+def en_lexicon(lines, d, here):
+    """把这一期英文讲稿里查不到的词补进 _tts/lex-extra.txt；返回补不上的词（交付前要换写法）。"""
+    import re
+    lex = {}
+    for ln in open(d + "lexicon-us-en.txt", encoding="utf8"):
+        k, _, v = ln.rstrip("\n").partition(" ")
+        lex.setdefault(k.lower(), v)
+    extra, miss = {}, set()
+    for line in lines:
+        for w in re.findall(r"[A-Za-z']+", line):
+            w = w.strip("'")
+            if not w or w.lower() in lex:
+                continue
+            ph = _derive(w, lex)
+            if ph:
+                extra[w] = extra[w.lower()] = ph
+            else:
+                miss.add(w)
+    (here / "_tts").mkdir(exist_ok=True)
+    f = here / "_tts" / "lex-extra.txt"
+    f.write_text("".join(f"{k} {v}\n" for k, v in extra.items()), encoding="utf8")
+    return str(f), miss
+
+
 def main(here, S, B, title, lang, say=None):
     """S: [(中文, English)]; lang 'zh' speaks the Chinese (zm_yunjian sid 49), 'en' the English (am_michael sid 16)."""
     say = say or {}
@@ -207,15 +270,24 @@ def main(here, S, B, title, lang, say=None):
     import soundfile as sf
     d = sys.argv[1].rstrip("/") + "/"
     kw = dict(rule_fsts=d + "date-zh.fst," + d + "number-zh.fst," + d + "phone-zh.fst") if lang == "zh" else {}
-    tts = so.OfflineTts(so.OfflineTtsConfig(model=so.OfflineTtsModelConfig(kokoro=so.OfflineTtsKokoroModelConfig(
-        model=d + "model.int8.onnx", voices=d + "voices.bin", tokens=d + "tokens.txt", data_dir=d + "espeak-ng-data", dict_dir=d + "dict",
-        lexicon=d + "lexicon-us-en.txt," + d + "lexicon-zh.txt"), num_threads=4), max_num_sentences=1, **kw))
-    sid = 49 if lang == "zh" else 16
-    t, parts, segs, sr = 0.3, [], [], 24000
+    lines = []
     for zh, en in S:
         line = (zh if lang == "zh" else en).replace("| ", "").replace("|", "")
         for k, v in say.items():
             line = line.replace(k, v)
+        lines.append(_num_words(line) if lang == "en" else line)
+    extra = ""
+    if lang == "en":
+        f, miss = en_lexicon(lines, d, here)
+        extra = f + ","
+        if miss:
+            print("配音词典里没有、也补不上的词（会被跳过）：", sorted(miss))
+    tts = so.OfflineTts(so.OfflineTtsConfig(model=so.OfflineTtsModelConfig(kokoro=so.OfflineTtsKokoroModelConfig(
+        model=d + "model.int8.onnx", voices=d + "voices.bin", tokens=d + "tokens.txt", data_dir=d + "espeak-ng-data", dict_dir=d + "dict",
+        lexicon=extra + d + "lexicon-us-en.txt," + d + "lexicon-zh.txt"), num_threads=4), max_num_sentences=1, **kw))
+    sid = 49 if lang == "zh" else 16
+    t, parts, segs, sr = 0.3, [], [], 24000
+    for (zh, en), line in zip(S, lines):
         cache = here / "_tts" / (hashlib.md5(f"{sid}{line}".encode()).hexdigest()[:16] + ".wav")
         if cache.exists():
             x, sr = sf.read(cache, dtype="float32")
