@@ -50,8 +50,8 @@ jobs:
             | sed 's/^/copy: /' | while IFS= read -r l; do echo "::notice::$l"; done
           ssh "deploy@$HOST" 'tar xzf /dev/null -C /opt/wenquest 2>&1; touch /opt/wenquest/site/index.html 2>&1 && echo touch-site OK; touch /opt/wenquest/docker-compose.yml 2>&1 && echo touch-compose OK' \
             | sed 's/^/real: /' | while IFS= read -r l; do echo "::notice::$l"; done
-      - name: Clean (only when asked)
-        if: inputs.clean == 'yes'
+      - name: Clean (only when asked) — 先于试传文件执行
+        if: always() && inputs.clean == 'yes'
         run: |
           ssh "deploy@$HOST" 'docker image prune -af 2>&1 | tail -1; docker builder prune -af 2>&1 | tail -1; df -h / | tail -1' \
             | sed 's/^/clean: /' | while IFS= read -r l; do echo "::notice::$l"; done
