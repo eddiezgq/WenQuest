@@ -218,6 +218,11 @@ jobs:
           hubp=$((8102 + n)); erpp=$((8093 + n))
           up=$(echo "$id" | tr '[:lower:]' '[:upper:]')
           export FACTORY_COMPOSE="docker-compose.yml ci.yml docker-compose.classes.yml"
+          # 和 deploy/update.sh 一样先给每个班级工厂生成工作台密钥：服务配置里所有班的密钥都是必填（只演练一座也要）
+          for c in $(cat "$FACTORY_DIR/classes.ids"); do
+            k="WQ_C_$(echo "$c" | tr '[:lower:]' '[:upper:]')_SECRET"
+            grep -q "^$k=." /tmp/fac/.env || echo "$k=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)" >> /tmp/fac/.env
+          done
           bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$id'" 2>&1 | tee /tmp/logs/class_setup.log
           st=${PIPESTATUS[0]}
           if [ "$st" = 0 ]; then
