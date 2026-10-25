@@ -1,0 +1,57 @@
+# 服务器体检（第 44 轮，2026-10-25）：部署从 10-24 起卡在“往服务器传文件”一步，会话里拿不到作业日志，
+# 这里把检查结果写成注解（annotation），不下载日志也能看到。只读；clean=yes 时才清理不用的 Docker 镜像和构建缓存。
+name: Server check 服务器体检
+on:
+  workflow_dispatch:
+    inputs:
+      clean:
+        description: "yes：清理不用的 Docker 镜像和构建缓存（只在磁盘满时用）"
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    env:
+      HOST: ${{ secrets.DEPLOY_HOST }}
+    steps:
+      - name: Set up SSH
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null
+          fi
+      - name: Check
+        run: |
+          note() { while IFS= read -r l; do echo "::notice::$l"; done; }
+          if ! ssh -o ConnectTimeout=20 -o BatchMode=yes "deploy@$HOST" true 2>ssh.err; then
+            echo "::error::SSH 连不上：$(tr '\n' ' ' < ssh.err | sed -E 's/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/x.x.x.x/g')"
+            exit 1
+          fi
+          echo "SSH OK" | note
+          ssh "deploy@$HOST" 'df -h / /opt 2>/dev/null; df -i / | tail -1' | sed 's/^/disk: /' | note
+          ssh "deploy@$HOST" 'docker system df 2>&1 | head -6' | sed 's/^/docker: /' | note
+          ssh "deploy@$HOST" 'ls -ld /opt/wenquest /opt/wenquest/site /opt/wenquest/deploy 2>&1; find /opt/wenquest/site /opt/wenquest/deploy -maxdepth 2 ! -user deploy 2>/dev/null | head -5' | sed 's/^/perm: /' | note
+          ssh "deploy@$HOST" 'p=/opt/wenquest/site/.probe; (echo x > $p && rm -f $p && echo write OK) 2>&1' | sed 's/^/write: /' | note
+      - uses: actions/checkout@v4
+      - name: Try the real copy (dry) — 和部署同样的打包，解到临时目录
+        run: |
+          set -o pipefail
+          tar czf - --exclude=site/vendor docker-compose.yml docker-compose.prod.yml .env.example deploy site \
+            | ssh "deploy@$HOST" 'd=$(mktemp -d /opt/wenquest/.probe.XXXX 2>/dev/null || mktemp -d) && tar xzf - -C "$d" 2>&1 | tail -5; echo "exit=${PIPESTATUS[0]} dir=$d"; du -sh "$d"; rm -rf "$d"' 2>&1 \
+            | sed 's/^/copy: /' | while IFS= read -r l; do echo "::notice::$l"; done
+          ssh "deploy@$HOST" 'tar xzf /dev/null -C /opt/wenquest 2>&1; touch /opt/wenquest/site/index.html 2>&1 && echo touch-site OK; touch /opt/wenquest/docker-compose.yml 2>&1 && echo touch-compose OK' \
+            | sed 's/^/real: /' | while IFS= read -r l; do echo "::notice::$l"; done
+      - name: Clean (only when asked)
+        if: inputs.clean == 'yes'
+        run: |
+          ssh "deploy@$HOST" 'docker image prune -af 2>&1 | tail -1; docker builder prune -af 2>&1 | tail -1; df -h / | tail -1' \
+            | sed 's/^/clean: /' | while IFS= read -r l; do echo "::notice::$l"; done
