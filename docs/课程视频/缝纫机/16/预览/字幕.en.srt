@@ -1,0 +1,875 @@
+1
+00:00:00,600 --> 00:00:01,631
+Hi everyone,
+
+2
+00:00:01,651 --> 00:00:07,935
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,335 --> 00:00:14,495
+This is Lecture 16, control of computerised embroidery machines.
+
+4
+00:00:14,895 --> 00:00:19,879
+The pattern sewer from last time sews one piece at a time.
+
+5
+00:00:19,899 --> 00:00:24,279
+Today's multi-head embroidery machine drives eight,
+
+6
+00:00:24,299 --> 00:00:27,557
+even twenty heads from one main shaft,
+
+7
+00:00:27,577 --> 00:00:32,475
+and one big frame carries every piece of fabric together.
+
+8
+00:00:32,875 --> 00:00:36,081
+Two questions today. How fast can a big frame go?
+
+9
+00:00:36,101 --> 00:00:40,426
+And when one head breaks a thread, what does the whole machine do,
+
+10
+00:00:40,446 --> 00:00:42,269
+and are more heads worth it?
+
+11
+00:00:42,289 --> 00:00:47,141
+Colour changes and design files are left to the slides and the assignment.
+
+12
+00:00:48,661 --> 00:00:50,201
+Here's the problem.
+
+13
+00:00:50,601 --> 00:00:56,672
+An embroidery shop runs an eight-head machine on jacket backs,
+
+14
+00:00:56,692 --> 00:01:01,781
+and the design includes a 7-millimetre satin column.
+
+15
+00:01:02,181 --> 00:01:09,253
+The frame has to complete each stitch move in a window of about 204 degrees,
+
+16
+00:01:09,273 --> 00:01:15,226
+following a cycloidal law, with 800 newtons of drive force on Y.
+
+17
+00:01:15,626 --> 00:01:21,043
+The design has 20 000 stitches at 800 r/min,
+
+18
+00:01:21,063 --> 00:01:28,086
+and threads break 0.5 times per head per 10 000 stitches.
+
+19
+00:01:28,486 --> 00:01:31,706
+Can the satin column run at 800?
+
+20
+00:01:32,106 --> 00:01:33,606
+If not, how slow?
+
+21
+00:01:34,006 --> 00:01:39,666
+And what are the machine's overall efficiency and pieces per hour?
+
+22
+00:01:40,066 --> 00:01:41,479
+We'll answer at the end.
+
+23
+00:01:42,999 --> 00:01:45,343
+A multi-head embroidery machine.
+
+24
+00:01:46,863 --> 00:01:47,963
+Here's the structure.
+
+25
+00:01:48,363 --> 00:01:53,013
+A row of heads hangs from one beam, and one main shaft,
+
+26
+00:01:53,033 --> 00:01:57,342
+driven by the main servo, runs through all of them;
+
+27
+00:01:57,362 --> 00:02:02,097
+under the table one hook shaft drives every head's hook.
+
+28
+00:02:02,497 --> 00:02:06,740
+Each head's needle-bar case has 9 to 15 needle bars,
+
+29
+00:02:06,760 --> 00:02:11,577
+but the shaft drives only the one lined up with the driver,
+
+30
+00:02:11,597 --> 00:02:14,037
+the yellow one in the picture.
+
+31
+00:02:14,437 --> 00:02:21,719
+The frame is one big frame across all heads, with a piece of fabric under each,
+
+32
+00:02:21,739 --> 00:02:26,711
+carried through the same design by the X and Y servos.
+
+33
+00:02:27,111 --> 00:02:32,251
+The shafts are shared, yet each head must be able to stop sewing on its own.
+
+34
+00:02:33,771 --> 00:02:37,938
+The control layers resemble the pattern sewer's:
+
+35
+00:02:37,958 --> 00:02:41,601
+the main controller reads the design file,
+
+36
+00:02:41,621 --> 00:02:45,091
+sets speed and runs the colour sequence;
+
+37
+00:02:45,111 --> 00:02:51,109
+motion control interpolates X and Y within the window by shaft angle.
+
+38
+00:02:51,509 --> 00:02:54,761
+What's new is a head board on every head,
+
+39
+00:02:54,781 --> 00:02:58,591
+handling the needle-bar jump solenoid, trimming,
+
+40
+00:02:58,611 --> 00:03:02,262
+thread-break detection and the indicator lamp,
+
+41
+00:03:02,282 --> 00:03:07,449
+so one head can stop sewing while the shared shafts keep turning.
+
+42
+00:03:07,849 --> 00:03:12,181
+The operator mostly watches colour changes,
+
+43
+00:03:12,201 --> 00:03:16,229
+rethreads broken heads and swaps frames.
+
+44
+00:03:16,629 --> 00:03:24,213
+So output depends on speed, colour changes and trims, thread-break stops,
+
+45
+00:03:24,233 --> 00:03:25,463
+and loading.
+
+46
+00:03:26,983 --> 00:03:28,923
+How fast can a big frame go.
+
+47
+00:03:30,443 --> 00:03:32,249
+As on a pattern sewer,
+
+48
+00:03:32,269 --> 00:03:37,312
+the frame may move only in the window when the needle is out,
+
+49
+00:03:37,332 --> 00:03:41,546
+which we borrow from Lecture 15: about 204 degrees.
+
+50
+00:03:41,946 --> 00:03:46,886
+At 800 r/min a turn takes 75 milliseconds,
+
+51
+00:03:46,906 --> 00:03:51,611
+so the window is only 42.5 milliseconds.
+
+52
+00:03:52,011 --> 00:04:01,626
+Moving s along a cycloid, the peak acceleration is 2π s over T squared.
+
+53
+00:04:02,026 --> 00:04:14,266
+At 800 r/min a 3-millimetre stitch needs 10.4 metres per second squared and a
+
+54
+00:04:14,286 --> 00:04:18,246
+7-millimetre stitch 24.4.
+
+55
+00:04:18,646 --> 00:04:23,842
+Acceleration goes with stitch length and with speed squared,
+
+56
+00:04:23,862 --> 00:04:29,057
+so 10 percent more speed needs 21 percent more acceleration.
+
+57
+00:04:30,577 --> 00:04:38,037
+This is one stitch's frame motion from the virtual lab.
+
+58
+00:04:38,437 --> 00:04:43,298
+The green area is the window, needle out, frame free to move;
+
+59
+00:04:43,318 --> 00:04:47,859
+the solid curve is position, the dashed one acceleration,
+
+60
+00:04:47,879 --> 00:04:53,140
+and the red dashed line is what this eight-head frame can deliver.
+
+61
+00:04:53,540 --> 00:04:59,773
+With a 7-millimetre stitch, watch the speed step from 600 up to 900:
+
+62
+00:04:59,793 --> 00:05:03,451
+the window shrinks, the motion steepens,
+
+63
+00:05:03,471 --> 00:05:09,152
+and the acceleration peak quickly breaks through the red line.
+
+64
+00:05:09,552 --> 00:05:14,349
+On those stitches the frame is still moving after the needle enters:
+
+65
+00:05:14,369 --> 00:05:16,898
+crooked stitches and broken needles.
+
+66
+00:05:18,418 --> 00:05:22,078
+Now what the frame can deliver.
+
+67
+00:05:22,478 --> 00:05:29,089
+Available acceleration is drive force minus friction, divided by moving mass.
+
+68
+00:05:29,489 --> 00:05:34,696
+A multi-head frame spans every head, so more heads means a longer,
+
+69
+00:05:34,716 --> 00:05:35,805
+heavier frame.
+
+70
+00:05:36,205 --> 00:05:45,204
+The example uses the heavier Y axis, with mass 10 plus 4 per head in kilograms,
+
+71
+00:05:45,224 --> 00:05:51,825
+800 newtons of drive and 50 of friction, all illustrative.
+
+72
+00:05:52,225 --> 00:05:59,148
+With eight heads the frame is about 42 kilograms and gets 17.9 metres per
+
+73
+00:05:59,168 --> 00:06:00,575
+second squared;
+
+74
+00:06:00,595 --> 00:06:05,045
+with fifteen, about 70 kilograms and only 10.7.
+
+75
+00:06:05,445 --> 00:06:12,308
+Same motors and drive: double the heads and you roughly halve the acceleration.
+
+76
+00:06:13,828 --> 00:06:20,147
+Set required equal to available and solve for speed: n equals 204 over 6,
+
+77
+00:06:20,167 --> 00:06:24,576
+times the root of available acceleration over 2π s,
+
+78
+00:06:24,596 --> 00:06:29,092
+inversely proportional to the root of stitch length,
+
+79
+00:06:29,112 --> 00:06:31,697
+just as for the pattern sewer.
+
+80
+00:06:32,097 --> 00:06:41,655
+Here the horizontal axis is stitch length and the blue line the speed limit;
+
+81
+00:06:41,675 --> 00:06:48,586
+the flat part on the left is the head's own 1100 r/min.
+
+82
+00:06:48,986 --> 00:06:53,886
+Watch the curve fall as the heads go from 4 to 20.
+
+83
+00:06:54,286 --> 00:07:04,407
+An eight-head machine manages about 1046 at 3 millimetres, 811 at 5,
+
+84
+00:07:04,427 --> 00:07:06,346
+and 685 at 7.
+
+85
+00:07:07,866 --> 00:07:10,646
+One head breaks a thread: what then.
+
+86
+00:07:12,166 --> 00:07:17,883
+When one head breaks its needle thread, the whole machine stops,
+
+87
+00:07:17,903 --> 00:07:21,379
+the frame backs up along the sewn path,
+
+88
+00:07:21,399 --> 00:07:27,026
+and only the broken head stitches while the other bars stay up.
+
+89
+00:07:27,426 --> 00:07:29,606
+Follow it along the stitch path.
+
+90
+00:07:30,006 --> 00:07:36,028
+Between the actual break and the stop, d stitches have already been missed:
+
+91
+00:07:36,048 --> 00:07:37,639
+the detection delay,
+
+92
+00:07:37,659 --> 00:07:44,405
+made of the stitches needed to decide it's a break plus those turned while stopping;
+
+93
+00:07:44,425 --> 00:07:47,386
+one patent's example totals about 10.
+
+94
+00:07:47,786 --> 00:07:50,704
+The back-up b must be at least d,
+
+95
+00:07:50,724 --> 00:07:56,046
+ideally two or three more so the mend overlaps the original.
+
+96
+00:07:56,446 --> 00:08:02,519
+If b is less than d, the mend falls short and leaves a gap, a reject;
+
+97
+00:08:02,539 --> 00:08:07,906
+if b is too large, it wastes time and the overlap gets thick.
+
+98
+00:08:08,306 --> 00:08:15,406
+On the floor, a gap means too little back-up; a bump means too much.
+
+99
+00:08:16,926 --> 00:08:19,946
+More heads cut both ways.
+
+100
+00:08:20,346 --> 00:08:26,762
+This is the second page of the lab: sewing a 20 000-stitch design,
+
+101
+00:08:26,782 --> 00:08:28,907
+with green for sewing,
+
+102
+00:08:28,927 --> 00:08:34,465
+red for thread-break stops and purple for colour changes.
+
+103
+00:08:34,865 --> 00:08:42,313
+Each head breaks 0.5 times per 10 000 stitches, independently and at random.
+
+104
+00:08:42,713 --> 00:08:49,453
+Left, four heads; right, twenty; each sewn over and over.
+
+105
+00:08:49,853 --> 00:08:53,108
+Any break stops the whole machine,
+
+106
+00:08:53,128 --> 00:08:58,984
+so an H-head machine stops H times as often as a single head.
+
+107
+00:08:59,384 --> 00:09:02,644
+Look how much more red there is on the right.
+
+108
+00:09:04,164 --> 00:09:08,495
+When an arc-welding robot loses its arc mid-seam,
+
+109
+00:09:08,515 --> 00:09:15,244
+the controller backs the torch up a little way along the path it has already
+
+110
+00:09:15,264 --> 00:09:16,132
+travelled,
+
+111
+00:09:16,152 --> 00:09:20,483
+restrikes the arc and overlaps the existing weld.
+
+112
+00:09:20,883 --> 00:09:26,938
+That's the same idea as an embroidery frame backing up and mending to the break:
+
+113
+00:09:26,958 --> 00:09:33,166
+the back-up must cover at least the distance travelled during the detection delay,
+
+114
+00:09:33,186 --> 00:09:34,457
+or a gap remains.
+
+115
+00:09:34,857 --> 00:09:41,538
+Put several robots in series on a paced line and any one stopping makes the
+
+116
+00:09:41,558 --> 00:09:42,968
+whole line wait,
+
+117
+00:09:42,988 --> 00:09:48,597
+so stoppages grow with the number of stations, just like heads.
+
+118
+00:09:48,997 --> 00:09:54,621
+Either make each machine more reliable or make each recovery shorter.
+
+119
+00:09:56,141 --> 00:09:57,689
+In everyday life,
+
+120
+00:09:57,709 --> 00:10:04,881
+the closest thing to a multi-head embroidery machine is a metro train's doors.
+
+121
+00:10:05,281 --> 00:10:11,780
+A train has many cars, and if any one door gets stuck, the whole train waits;
+
+122
+00:10:11,800 --> 00:10:15,421
+the more cars, the more often it's delayed.
+
+123
+00:10:15,821 --> 00:10:21,441
+That's exactly why any one head breaking a thread stops the whole machine.
+
+124
+00:10:21,841 --> 00:10:28,342
+So the metro makes every door more reliable and clears problems faster,
+
+125
+00:10:28,362 --> 00:10:31,464
+and so should the embroidery shop:
+
+126
+00:10:31,484 --> 00:10:35,781
+lower the break rate and shorten each recovery.
+
+127
+00:10:37,301 --> 00:10:39,241
+Back to the opening question.
+
+128
+00:10:39,641 --> 00:10:44,089
+At 800 r/min the window is 42.5 milliseconds,
+
+129
+00:10:44,109 --> 00:10:51,138
+and the 7-millimetre satin stitch needs 24.4 metres per second squared;
+
+130
+00:10:51,158 --> 00:10:58,981
+the eight-head frame, at 42 kilograms, can give only 17.9, which is not enough.
+
+131
+00:10:59,381 --> 00:11:02,951
+The limit is about 685 r/min,
+
+132
+00:11:02,971 --> 00:11:09,761
+so the controller should slow down automatically there.
+
+133
+00:11:10,161 --> 00:11:19,370
+To reach 850 the drive force would have to rise to about 1205 newtons.
+
+134
+00:11:19,770 --> 00:11:22,846
+Efficiency: 8 expected breaks,
+
+135
+00:11:22,866 --> 00:11:30,483
+each costing 40 seconds of handling plus about 1.6 of back-up and mending,
+
+136
+00:11:30,503 --> 00:11:36,366
+about 333 seconds in all; six colour changes, 36 seconds;
+
+137
+00:11:36,386 --> 00:11:43,590
+1500 seconds of sewing: about 80 percent, roughly 15.4 pieces an hour.
+
+138
+00:11:45,110 --> 00:11:48,644
+Now Virtual lab 16-1, the multi-head embroidery machine.
+
+139
+00:11:48,664 --> 00:11:51,690
+On the WenQuest platform you can do it yourself.
+
+140
+00:11:51,710 --> 00:11:55,688
+The criteria on the right and the tasks below are blurred here,
+
+141
+00:11:55,708 --> 00:12:00,130
+so you can read them on your own. Page one is frame and speed: on top,
+
+142
+00:12:00,150 --> 00:12:02,986
+the frame's motion through one stitch; below,
+
+143
+00:12:03,006 --> 00:12:05,398
+the speed limit against stitch length.
+
+144
+00:12:05,798 --> 00:12:09,797
+First, pull the stitch length from 3 up to 7 millimetres.
+
+145
+00:12:09,817 --> 00:12:15,438
+In the top chart the dashed acceleration climbs and breaks through the red line,
+
+146
+00:12:15,458 --> 00:12:19,458
+and in the lower chart the red dot moves above the curve.
+
+147
+00:12:19,858 --> 00:12:25,854
+Task one: at 7 millimetres, raise the heads from 8. The curve keeps falling.
+
+148
+00:12:25,874 --> 00:12:32,107
+Work out the limit for fifteen heads with the formula, enter it below to check,
+
+149
+00:12:32,127 --> 00:12:34,481
+then confirm with the sliders.
+
+150
+00:12:34,881 --> 00:12:41,839
+Task two: back to eight heads, set the speed to 850 and raise the drive force.
+
+151
+00:12:41,859 --> 00:12:48,728
+Check that the force from the answer slide is just enough for every criterion
+
+152
+00:12:48,748 --> 00:12:49,444
+to pass,
+
+153
+00:12:49,464 --> 00:12:51,501
+and record the minimum.
+
+154
+00:12:51,901 --> 00:12:55,638
+Now push the stitch length past 12.1 millimetres.
+
+155
+00:12:55,658 --> 00:13:00,621
+In the lower chart the dot enters the shaded Over DST limit zone.
+
+156
+00:13:00,641 --> 00:13:04,761
+How such a stitch must be handled goes in your report.
+
+157
+00:13:05,161 --> 00:13:12,055
+Page two is thread breaks and repair. On top is the timeline of one design,
+
+158
+00:13:12,075 --> 00:13:19,337
+green for sewing, red for thread-break stops, purple for colour changes; below,
+
+159
+00:13:19,357 --> 00:13:22,103
+efficiency against head count.
+
+160
+00:13:22,503 --> 00:13:27,783
+Press Run again, and the breaks land somewhere different each time.
+
+161
+00:13:27,803 --> 00:13:30,473
+Then raise the heads from 8 to 20,
+
+162
+00:13:30,493 --> 00:13:34,033
+and the dot slides down the efficiency curve.
+
+163
+00:13:34,433 --> 00:13:38,402
+Task three: set the detection delay to 6 stitches,
+
+164
+00:13:38,422 --> 00:13:41,752
+then raise the back-up count step by step.
+
+165
+00:13:41,772 --> 00:13:46,618
+How many leave no missed stitches without backing up too far?
+
+166
+00:13:46,638 --> 00:13:48,293
+That's yours to find.
+
+167
+00:13:48,693 --> 00:13:50,727
+Task four: on twenty heads,
+
+168
+00:13:50,747 --> 00:13:55,139
+lower the break rate bit by bit and watch efficiency rise.
+
+169
+00:13:55,159 --> 00:13:58,105
+How low must it go to reach 80 percent?
+
+170
+00:13:58,125 --> 00:14:01,604
+Then try shortening the handling time instead,
+
+171
+00:14:01,624 --> 00:14:04,190
+and compare which pays off better.
+
+172
+00:14:04,210 --> 00:14:07,993
+The guide and report template are on the platform.
+
+173
+00:14:09,513 --> 00:14:14,647
+Everything in this lecture is on the WenQuest learning platform.
+
+174
+00:14:15,047 --> 00:14:20,858
+You can open today's interactive slides and the embroidery-machine lab,
+
+175
+00:14:20,878 --> 00:14:22,747
+and work them yourself.
+
+176
+00:14:23,147 --> 00:14:26,958
+You submit the assignment and the lab report on the platform,
+
+177
+00:14:26,978 --> 00:14:28,967
+and get marks and comments back.
+
+178
+00:14:29,367 --> 00:14:34,175
+Questions go to the course discussion forum,
+
+179
+00:14:34,195 --> 00:14:41,307
+and the grades page shows your mark on every assignment and quiz.
+
+180
+00:14:42,827 --> 00:14:46,036
+Your assignment has four questions. One:
+
+181
+00:14:46,056 --> 00:14:52,008
+a 12-head machine with 1000 newtons of drive. Find the speed limits for 3,
+
+182
+00:14:52,028 --> 00:14:54,268
+5 and 7 millimetre stitches,
+
+183
+00:14:54,288 --> 00:15:00,887
+and the minimum drive force that lets the 7 millimetre satin run at 800 r/min too.
+
+184
+00:15:01,287 --> 00:15:06,214
+Two is about design files, which this video skipped;
+
+185
+00:15:06,234 --> 00:15:09,639
+it's in the slides and the textbook.
+
+186
+00:15:09,659 --> 00:15:14,776
+A DST record allows at most 12.1 millimetres per axis.
+
+187
+00:15:14,796 --> 00:15:19,533
+How many records for a 45 millimetre jump along X,
+
+188
+00:15:19,553 --> 00:15:23,053
+and for 40 millimetres at 45 degrees?
+
+189
+00:15:23,073 --> 00:15:27,334
+And how does the machine decide when to trim?
+
+190
+00:15:27,734 --> 00:15:31,181
+Three: a 12-head machine sews 15 000 stitches.
+
+191
+00:15:31,201 --> 00:15:34,195
+Estimate efficiency and pieces per hour,
+
+192
+00:15:34,215 --> 00:15:39,621
+then compare cutting handling to 20 seconds with halving the break rate.
+
+193
+00:15:39,641 --> 00:15:43,540
+Which is more worth the money? Four is a discussion:
+
+194
+00:15:43,560 --> 00:15:48,438
+what does cutting the detection delay from 6 stitches to 2 bring,
+
+195
+00:15:48,458 --> 00:15:51,754
+and how could a detector find breaks faster?
+
+196
+00:15:52,154 --> 00:15:57,591
+Submit the report and the lab screenshots on the WenQuest platform.
+
+197
+00:15:59,111 --> 00:16:07,084
+There's also a nine-question quiz. For example, with a 204-degree window,
+
+198
+00:16:07,104 --> 00:16:13,326
+the shaft at 900 r/min and a 4 millimetre cycloidal move,
+
+199
+00:16:13,346 --> 00:16:16,611
+what is the peak acceleration?
+
+200
+00:16:17,011 --> 00:16:23,600
+Or, if the back-up count is smaller than the detection delay, what happens?
+
+201
+00:16:23,620 --> 00:16:28,271
+Another asks whether a DST file stores colour values.
+
+202
+00:16:28,671 --> 00:16:35,171
+You get three attempts, and the explanations appear as soon as you submit.
+
+203
+00:16:36,691 --> 00:16:38,031
+Three things to remember.
+
+204
+00:16:38,431 --> 00:16:43,265
+One: a multi-head machine shares its shafts and frame,
+
+205
+00:16:43,285 --> 00:16:49,197
+and each head stops sewing on its own through the needle-bar jump,
+
+206
+00:16:49,217 --> 00:16:53,332
+trimmer and break detection on its head board.
+
+207
+00:16:53,732 --> 00:16:59,571
+Two: the frame must finish each move in about a 204-degree window,
+
+208
+00:16:59,591 --> 00:17:03,832
+available acceleration falls as heads are added,
+
+209
+00:17:03,852 --> 00:17:10,401
+and the speed limit goes with the root of acceleration over stitch length.
+
+210
+00:17:10,801 --> 00:17:16,313
+Three: after a break, back up at least the detection delay;
+
+211
+00:17:16,333 --> 00:17:22,781
+any one break stops every head, so more heads means lower efficiency.
+
+212
+00:17:23,181 --> 00:17:28,397
+The assignment, quiz and lab report are on WenQuest.
+
+213
+00:17:28,797 --> 00:17:31,296
+The slides, the virtual lab,
+
+214
+00:17:31,316 --> 00:17:37,591
+the assignment and the quiz are all on the WenQuest learning platform,
+
+215
+00:17:37,611 --> 00:17:43,617
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+216
+00:17:44,017 --> 00:17:47,995
+Next time it's computerised flat knitting machines,
+
+217
+00:17:48,015 --> 00:17:53,560
+the machines that knit sweaters. The carriage knits a row on each pass.
+
+218
+00:17:53,580 --> 00:17:58,890
+How long does a front panel take, and is a faster carriage worth it?
+
+219
+00:17:58,910 --> 00:17:59,909
+See you then.
