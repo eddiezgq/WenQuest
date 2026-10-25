@@ -489,7 +489,7 @@ def item_doc(code, name, kind, uom, price, qit, note, company, warehouse, suppli
             doc["inspection_required_before_purchase"] = 1
         if kind == "fg":
             doc["inspection_required_before_delivery"] = 1
-    if kind == "fg":
+    if kind == "fg" and PLANT.is_demo():          # 序列号追溯是减速器厂的（E1 客户与服务）；清单里的成品不设，免得完工入库要序列号（第 45 轮）
         doc["has_serial_no"] = 1
         doc["serial_no_series"] = "WQR105-.#####"
     return doc

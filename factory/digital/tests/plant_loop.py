@@ -64,6 +64,28 @@ def erp_doc(doctype, name):
                 headers={"Authorization": "token {}:{}".format(A.erp_key, A.erp_secret)})["data"]
 
 
+def erp_error_log(n=4):
+    """真 ERPNext 的错误日志：最近几条出错的最后几行（等不到完工入库时打印，CI 诊断用）"""
+    if not REAL:
+        return
+    q = urllib.parse.urlencode({"fields": '["name","method","error","creation"]', "order_by": "creation desc", "limit_page_length": 20})
+    try:
+        rows = call("GET", "{}/api/resource/Error%20Log?{}".format(A.erp, q),
+                    headers={"Authorization": "token {}:{}".format(A.erp_key, A.erp_secret)})["data"]
+    except RuntimeError as e:
+        rows = [{"method": "读不到 Error Log", "error": str(e), "creation": ""}]
+    seen = set()
+    for r in rows:
+        tail = [x for x in (r.get("error") or "").strip().splitlines() if x.strip()][-4:]
+        key = tail[-1] if tail else r.get("method")
+        if key in seen:
+            continue
+        seen.add(key)
+        print("  ✗ 诊断 ERPNext 错误日志 {} {}：{}".format(str(r.get("creation", ""))[:19], r.get("method") or "", " | ".join(x.strip()[:200] for x in tail)))
+        if len(seen) >= n:
+            break
+
+
 def check(cond, what):
     print(("  ✓ " if cond else "  ✗ ") + what)
     if not cond:
@@ -162,6 +184,10 @@ def one(item, mgr):
             break
         if not wait(lambda: all(erp_completed(i) for i in ready), "ERPNext 完工入库：" + "、".join(ready),
                     600 if REAL else 120, 10 if REAL else 3):
+            for i in ready:
+                jcs = [j for j in erp_docs("Job Card") if j.get("work_order") == wos[i]]
+                check(False, "诊断 {} 的作业卡：{}".format(i, "，".join("{} {}".format(j.get("operation"), j.get("docstatus")) for j in jcs)))
+            erp_error_log()
             break
         check(True, "完工入库：{}".format("、".join(ready)))
         pending -= set(ready)
