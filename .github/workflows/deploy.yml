@@ -399,11 +399,39 @@ jobs:
             ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
           fi
 
+      # 2026-10-25：服务器磁盘满到 99%，从 10-24 05:17 起每次部署都在“Copy deployment files”解包时失败。
+      # 磁盘用到 85% 以上时先清掉能重新取回的东西：构建缓存、停用的容器、不在用且 3 天以上的镜像（回滚要用时会从 ghcr.io 重新拉）、
+      # deploy 用户 /tmp 里 2 天前的文件。清理前后的用量和占地最多的地方作为注释发出来（会话里看不到任务日志）。
+      - name: Free disk space when the server is nearly full
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          used=$(ssh "deploy@$HOST" "df -P / | awk 'NR==2 {sub(\"%\", \"\", \$5); print \$5}'")
+          echo "Server disk used before: ${used}%"
+          if [ "${used:-0}" -ge 85 ]; then
+            ssh "deploy@$HOST" 'set +e
+              docker builder prune -af >/dev/null 2>&1
+              docker container prune -f >/dev/null 2>&1
+              docker image prune -af --filter "until=72h" >/dev/null 2>&1
+              find /tmp -maxdepth 1 -user "$(id -un)" -mtime +2 -exec rm -rf {} + 2>/dev/null
+              echo "--- docker"; docker system df 2>/dev/null
+              echo "--- /opt/wenquest"; du -xsh /opt/wenquest/* 2>/dev/null | sort -h | tail -n 8
+              echo "--- largest under /var/lib/docker/volumes"; du -xsh /var/lib/docker/volumes/* 2>/dev/null | sort -h | tail -n 5' > /tmp/disk.txt 2>&1 || true
+            after=$(ssh "deploy@$HOST" "df -P / | awk 'NR==2 {sub(\"%\", \"\", \$5); print \$5}'")
+            echo "Server disk used after: ${after}%"
+            body=$(tr '\n' ' ' < /tmp/disk.txt | cut -c1-3500)
+            echo "::warning title=Server disk ${used}% → ${after}% after cleanup::${body}"
+          fi
+
       - name: Copy deployment files
         if: env.SKIP != '1'
         run: |
-          tar czf - --exclude=site/vendor docker-compose.yml docker-compose.prod.yml .env.example deploy site \
-            | ssh "deploy@$HOST" 'tar xzf - -C /opt/wenquest && chmod +x /opt/wenquest/deploy/*.sh'
+          set -o pipefail
+          if ! tar czf - --exclude=site/vendor docker-compose.yml docker-compose.prod.yml .env.example deploy site \
+            | ssh "deploy@$HOST" 'tar xzf - -C /opt/wenquest 2>/tmp/deploy-copy.log && chmod +x /opt/wenquest/deploy/*.sh'; then
+            ssh "deploy@$HOST" 'tail -n 5 /tmp/deploy-copy.log; df -h / | tail -n 1' | sed 's/^/::error title=Copy deployment files::/' || true
+            exit 1
+          fi
 
       - name: Fonts and libraries for the pages (第 34 轮：site/vendor，版本没变就不复制)
         if: env.SKIP != '1'
