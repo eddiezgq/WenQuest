@@ -25,7 +25,6 @@
 :root[data-theme="dark"]{--bg:#0D1318}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;background:var(--bg)}
-@media (min-width:900px) and (min-height:640px){html{scroll-snap-type:y proximity}}
 body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.65 var(--f-body);-webkit-font-smoothing:antialiased}
 html[data-l="en"] .zh,html:not([data-l="en"]) .en{display:none!important}
 a{color:var(--amber)}
@@ -49,7 +48,6 @@ img,video{max-width:100%;display:block}
 .lang button{background:none;border:0;color:var(--muted);font:600 13px/1 var(--f-body);padding:8px 12px;cursor:pointer}
 .lang button[aria-pressed="true"]{background:var(--amber);color:#14110A}
 .prog{position:fixed;left:0;top:calc(56px + env(safe-area-inset-top,0px));height:2px;background:var(--amber);z-index:51;width:0;transition:width .3s}
-@media (max-width:640px){.brand span,.hide-s{display:none}.bar{gap:8px;padding:0 12px}}
 
 /* ---------- table of contents ---------- */
 .toc{position:fixed;inset:0;z-index:60;background:rgba(9,13,16,.96);display:none;overflow:auto;padding:80px 20px 40px}
@@ -64,7 +62,6 @@ img,video{max-width:100%;display:block}
 /* ---------- pages ---------- */
 .pg{min-height:100vh;min-height:100svh;scroll-snap-align:start;position:relative;display:flex;align-items:center;padding:96px 0 64px;border-bottom:1px solid var(--line);overflow:hidden}
 .pg>.in{width:100%;max-width:1280px;margin:0 auto;padding:0 32px;position:relative;z-index:2}
-@media (max-width:640px){.pg{padding:80px 0 48px}.pg>.in{padding:0 16px}}
 .pg.alt{background:var(--bg2)}
 .pg.paper{background:var(--paper);color:var(--ink)}
 .pg.paper .lead,.pg.paper .muted,.pg.paper p.s{color:var(--inkm)}
@@ -86,11 +83,8 @@ p.s{font-size:15px;color:var(--muted)}
 .split.r{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
 .split.w{grid-template-columns:minmax(0,4fr) minmax(0,8fr)}
 .split.eq{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-@media (max-width:960px){.split,.split.r,.split.eq,.split.w{grid-template-columns:minmax(0,1fr);gap:28px}}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
-@media (max-width:960px){.g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:600px){.g2,.g3,.g4,.g5{grid-template-columns:minmax(0,1fr)}}
 .mt{margin-top:32px}.mt2{margin-top:48px}
 
 /* cards & facts */
@@ -135,7 +129,6 @@ figcaption{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.5}
 figcaption b{color:var(--fg)}
 .pg.paper figcaption b{color:var(--ink)}
 .duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
-@media (max-width:700px){.duo{grid-template-columns:minmax(0,1fr)}}
 
 /* dividers */
 .pg.div{background:radial-gradient(1200px 600px at 80% 20%,rgba(232,176,75,.10),transparent 60%),var(--bg)}
@@ -162,7 +155,6 @@ figcaption b{color:var(--fg)}
 .wall div{background:var(--bg);padding:24px 22px;display:grid;gap:6px;align-content:start}
 .wall b{font:600 clamp(38px,4.4vw,62px)/1 var(--f-display);font-variant-numeric:tabular-nums}
 .wall span{color:var(--muted);font-size:14px;line-height:1.45}
-@media (max-width:800px){.wall{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* flow / chain */
 .flow{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0;margin-top:36px;counter-reset:f}
@@ -172,7 +164,6 @@ figcaption b{color:var(--fg)}
 .flow b{display:block;font-size:18px;line-height:1.3}
 .flow span{display:block;color:var(--muted);font-size:14px;line-height:1.5;margin-top:6px}
 .pg.paper .flow>div{border-top-color:#D3C9B8}.pg.paper .flow>div:first-child{border-top-color:#C48A1C}.pg.paper .flow>div::before{color:#A46F0C}.pg.paper .flow span{color:var(--inkm)}
-@media (max-width:800px){.flow{grid-auto-flow:row}}
 
 /* architecture */
 .arch{position:relative;margin-top:30px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
@@ -181,7 +172,6 @@ figcaption b{color:var(--fg)}
 .arch .bus{grid-column:1/-1;border:1px solid var(--teal);background:rgba(69,173,165,.10);border-radius:8px;padding:14px 18px;color:var(--fg);font-weight:600;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
 .arch .bus span{font:500 13px/1.5 var(--f-mono);color:var(--teal)}
 .arch .ai{grid-column:1/-1;border:1px dashed var(--amber);border-radius:8px;padding:12px 18px;color:var(--amber);font-weight:600;text-align:center}
-@media (max-width:800px){.arch{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* tables */
 .tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:28px}
@@ -230,7 +220,133 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}}
 .nav-btns{position:fixed;right:18px;bottom:18px;z-index:40;display:flex;flex-direction:column;gap:8px}
 .nav-btns button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(20,30,38,.85);color:var(--fg);font-size:18px;cursor:pointer}
-@media (max-width:640px){.nav-btns{display:none}}
+
+/* ================= deck mode (2026-10-24 v2): one slide per screen, 1920x1080 stage ================= */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{font-size:19px}
+.bar{height:52px}
+.prog{top:auto;bottom:0;height:3px;z-index:52}
+#view{position:fixed;left:0;right:0;top:calc(52px + env(safe-area-inset-top,0px));bottom:0;overflow:hidden;background:#05080A}
+html.fs #view{top:0}
+html.fs .bar{transform:translateY(-100%);transition:transform .3s}
+html.fs .bar:hover{transform:none}
+#deck{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;overflow:clip;background:var(--bg)}
+#view,.pg{overflow:hidden;overflow:clip}
+.pg{position:absolute;inset:0;width:1920px;height:1080px;min-height:0;padding:92px 0 72px;border:0;background:var(--bg);
+  opacity:0;visibility:hidden;transform:translateX(90px);transition:opacity .55s ease,transform .7s cubic-bezier(.2,.7,.2,1),visibility 0s linear .7s}
+.pg.before{transform:translateX(-90px)}
+.pg.on{opacity:1;visibility:visible;transform:none;transition:opacity .55s ease,transform .7s cubic-bezier(.2,.7,.2,1),visibility 0s}
+.pg>.in{max-width:1680px;padding:0 96px}
+.pg .num-tag{left:96px;bottom:26px;font-size:15px}
+h2.t{font-size:58px}
+.lead{font-size:23px;max-width:48em}
+p.s{font-size:17px}
+.foot{font-size:16px}
+.ey{font-size:15px}
+.card h3{font-size:21px}
+.card p{font-size:17px}
+.card .big{font-size:40px}
+.fact b{font-size:42px}
+.fact span{font-size:18px}
+ul.ck li{font-size:19px}
+figcaption{font-size:16px}
+.wall b{font-size:68px}
+.wall span{font-size:16px}
+.quote{font-size:58px}
+.flow b{font-size:21px}.flow span{font-size:16px}
+.arch .m{font-size:16px}.arch .m b{font-size:19px}
+table{font-size:18px}
+.toc a{font-size:16px}
+.hero h1{font-size:80px}
+.hero .en-h{font-size:76px}
+.hero .poem{font-size:17px}
+.pg.div .part{font-size:230px}
+.pg.div h2{font-size:80px}
+.shot img,.shot video{max-height:660px}
+.shot.short img{max-height:420px}
+.shot.fix video{width:100%;aspect-ratio:16/10;object-fit:cover;object-position:top left;display:block}
+.shot video{width:100%;display:block;background:#fff}
+.chips span{font-size:16px}
+
+/* builds: every .rv and grid item animates in each time its slide is shown */
+.rv,.bi{opacity:0;transform:translateY(26px)}
+.pg.built .rv,.pg.built .bi{opacity:1;transform:none;transition:opacity .7s ease var(--d,0s),transform .8s cubic-bezier(.2,.7,.2,1) var(--d,0s)}
+.pg.built .shot,.pg.built .vt{box-shadow:0 30px 70px rgba(0,0,0,.5)}
+/* Ken Burns on screenshots */
+.shot{position:relative}
+.shot>img{transform-origin:35% 25%}
+.pg.on .shot>img{animation:kb 18s ease-in-out infinite alternate}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.075) translate(-1.2%,-.8%)}}
+/* divider pages: drifting blueprint grid + sweeping light */
+.pg.div::before{content:"";position:absolute;inset:-80px;background-image:linear-gradient(rgba(232,176,75,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(232,176,75,.07) 1px,transparent 1px);background-size:80px 80px;animation:drift 22s linear infinite;z-index:0}
+.pg.div::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-40%;background:linear-gradient(90deg,transparent,rgba(232,176,75,.10),transparent);animation:sweep 7s ease-in-out infinite;z-index:1}
+@keyframes drift{to{transform:translate(80px,80px)}}
+@keyframes sweep{0%{left:-40%}60%,100%{left:110%}}
+.pg.div .part{transform:translateX(-60px);opacity:0}
+.pg.div.built .part{transform:none;opacity:1;transition:transform 1.1s cubic-bezier(.2,.7,.2,1),opacity 1.1s}
+/* data-bus pulse on the architecture slide */
+.arch .bus{position:relative;overflow:hidden}
+.arch .bus::after{content:"";position:absolute;top:0;bottom:0;width:22%;left:-25%;background:linear-gradient(90deg,transparent,rgba(69,173,165,.45),transparent);animation:bus 2.6s linear infinite}
+@keyframes bus{to{left:105%}}
+.arch .ai{animation:aiglow 3s ease-in-out infinite}
+@keyframes aiglow{50%{box-shadow:0 0 30px rgba(232,176,75,.35);background:rgba(232,176,75,.06)}}
+/* flow lines draw themselves */
+.flow>div{border-top-color:var(--line);background:linear-gradient(var(--amber),var(--amber)) 0 -3px/0 3px no-repeat}
+.pg.built .flow>div{background-size:100% 3px;transition:background-size .9s ease calc(var(--d,0s) + .3s),opacity .7s ease var(--d,0s),transform .8s ease var(--d,0s)}
+.pg.paper .flow>div{background-image:linear-gradient(#C48A1C,#C48A1C)}
+/* order-story progress bar fills */
+.stepbar i.on{transform-origin:left;transform:scaleX(0)}
+.pg.built .stepbar i.on{transform:none;transition:transform .5s ease calc(.5s + var(--k,0)*.12s)}
+.wall b,.fact b{transition:color .4s}
+/* live dot on "live" pills */
+.pill.live::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--teal);margin-right:6px;vertical-align:1px;animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{50%{opacity:.2}}
+
+/* video tiles */
+.vt video{display:block;background:#0A0F13}
+.vt .cap{padding:30px 16px 12px;font-size:15px}
+.vt .cap b{font-size:18px}
+.vt.light video{background:#fff}
+.vwall{display:grid;gap:16px;margin-top:30px}
+.vwall.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.vwall.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.vwall.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.vwall .vt .cap{font-size:14px;padding:26px 12px 9px}.vwall .vt .cap b{font-size:16px}
+.tagline{display:flex;align-items:center;gap:12px;margin-top:22px;color:var(--muted);font-size:17px}
+.tagline i{width:10px;height:10px;border-radius:50%;background:#E0574F;box-shadow:0 0 0 0 rgba(224,87,79,.6);animation:rec 1.6s infinite}
+@keyframes rec{70%{box-shadow:0 0 0 12px rgba(224,87,79,0)}}
+
+/* cinema slides: full-bleed film with sound */
+.pg.cine{padding:0;background:#000}
+.pg.cine>.in{max-width:none;width:1920px;height:1080px;padding:0;position:relative}
+.pg.cine video{position:absolute;inset:0;width:1920px;height:1080px;max-height:none;object-fit:contain;background:#000}
+.pg.cine .lbl{position:absolute;left:0;right:0;top:0;padding:30px 48px 70px;background:linear-gradient(rgba(0,0,0,.72),transparent);color:#fff;display:flex;align-items:baseline;gap:18px;z-index:3;pointer-events:none;transition:opacity .8s}
+.pg.cine .lbl b{font:900 34px/1.2 var(--f-serif);letter-spacing:.04em}
+.pg.cine .lbl span{font-size:18px;color:#D5DCE1}
+.pg.cine.playing .lbl{opacity:0;transition-delay:4s}
+.pg.cine .num-tag{display:none}
+.sndbtn{position:absolute;right:40px;bottom:40px;z-index:4;background:var(--amber);color:#14110A;border:0;border-radius:999px;font:700 24px/1 var(--f-body);padding:18px 30px;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.5);display:none}
+.pg.cine.muted .sndbtn{display:block;animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.vbar{position:absolute;left:0;right:0;bottom:0;height:5px;background:rgba(255,255,255,.12);z-index:4}
+.vbar i{display:block;height:100%;width:0;background:var(--amber)}
+
+/* nav chrome */
+.edge{position:fixed;top:calc(52px + env(safe-area-inset-top,0px));bottom:0;width:56px;z-index:30;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;font-size:34px;transition:background .2s,color .2s;user-select:none}
+.edge:hover{background:linear-gradient(90deg,rgba(0,0,0,.35),transparent);color:#fff}
+.edge.r:hover{background:linear-gradient(270deg,rgba(0,0,0,.35),transparent)}
+.edge.l{left:0}.edge.r{right:0}
+html.fs .edge{top:0}
+.nav-btns{flex-direction:row;right:72px;bottom:16px}
+.nav-btns button{width:46px;height:46px;font-size:22px;line-height:1}
+.tb.on{background:var(--amber);border-color:var(--amber);color:#14110A}
+.abar{position:fixed;left:0;top:calc(52px + env(safe-area-inset-top,0px));height:3px;background:var(--teal);z-index:52;width:0}
+html.fs .abar{top:0}
+.go-auto{display:inline-flex;align-items:center;gap:12px;margin-top:30px;background:var(--amber);color:#14110A;border:0;border-radius:999px;font:700 22px/1 var(--f-body);padding:18px 30px;cursor:pointer;box-shadow:0 12px 30px rgba(232,176,75,.25)}
+.go-auto:hover{filter:brightness(1.08)}
+.hint{font-size:17px}
+@media (max-width:700px){.bar .tb.hide-s,.bar .lang{display:none}.nav-btns{display:flex;right:12px;bottom:10px}.edge{width:36px}}
+@media (prefers-reduced-motion:reduce){.rv,.bi{opacity:1;transform:none}.pg{transition:opacity .2s}.pg.on .shot>img,.pg.div::before,.pg.div::after{animation:none}}
 </style>
 </head>
 <body>
@@ -239,15 +355,15 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
   <a class="brand" href="#p1"><b>问渠</b><span>WENQUEST</span></a>
   <div class="sp"></div>
   <span class="pageno"><b id="pn">01</b> / <span id="pt">00</span></span>
-  <button class="tb" id="tocbtn" type="button"><span class="zh">目录</span><span class="en">Contents</span></button>
+  <button class="tb hide-s" id="autobtn" type="button" title="A"><span class="zh">▶ 自动放映</span><span class="en">▶ Auto-play</span></button><button class="tb" id="sndbtn" type="button" title="M" aria-label="Sound">🔊</button><button class="tb" id="tocbtn" type="button"><span class="zh">目录</span><span class="en">Contents</span></button>
   <button class="tb hide-s" id="fsbtn" type="button"><span class="zh">全屏</span><span class="en">Full screen</span></button>
   <div class="lang" role="group" aria-label="Language"><button type="button" data-l="zh" aria-pressed="true">中</button><button type="button" data-l="en" aria-pressed="false">EN</button></div>
 </header>
 <div class="prog" id="prog"></div>
 <nav class="toc" id="toc" aria-label="Contents"><button class="tb x" id="tocx" type="button">✕</button><div class="in" id="tocin"></div></nav>
-<div class="nav-btns"><button type="button" id="prevb" aria-label="Previous page">↑</button><button type="button" id="nextb" aria-label="Next page">↓</button></div>
+<div class="abar" id="abar"></div><div class="edge l" id="edgel" aria-hidden="true">‹</div><div class="edge r" id="edger" aria-hidden="true">›</div><div class="nav-btns"><button type="button" id="prevb" aria-label="Previous page">‹</button><button type="button" id="nextb" aria-label="Next page">›</button></div>
 
-<main id="deck">
+<div id="view"><main id="deck">
 
 <!-- ================= 开场 ================= -->
 <section class="pg hero" data-part="开场|Opening" data-t="问渠：源头活水|WenQuest">
@@ -258,7 +374,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <h1 class="en en-h">Learn it in simulation.<br>Build it for real.</h1>
     <p class="poem"><span class="zh">—— 朱熹《观书有感》</span><span class="en">“How is the channel so clear? Fresh water flows in from the source.” — Zhu Xi</span></p>
     <p class="lead"><span class="zh">问渠 WenQuest：一个 <b>AI 原生</b>的工程教育与工业软件平台。自编教材、动画、浏览器虚拟实验、学习平台、一座真实运转的数字工厂和行业专用设计软件，连成一体。</span><span class="en">WenQuest is an <b>AI-native</b> platform for engineering education and industrial software: its own textbooks, animations, in-browser labs, a learning platform, a working digital factory and industry design software, all connected.</span></p>
-    <p class="hint"><kbd>↓</kbd><kbd>Space</kbd><span class="zh">翻页 · 共 <b class="mono" data-total></b> 页</span><span class="en">to turn pages · <b class="mono" data-total></b> pages</span></p>
+    <button type="button" class="go-auto" data-go-auto><span class="zh">▶ 自动放映（约 15 分钟）</span><span class="en">▶ Play the show (about 15 min)</span></button><p class="hint"><kbd>→</kbd><kbd>←</kbd><kbd>Space</kbd><span class="zh">翻页 · <kbd>A</kbd> 自动放映 · <kbd>F</kbd> 全屏 · 共 <b class="mono" data-total></b> 页</span><span class="en">to turn pages · <kbd>A</kbd> auto-play · <kbd>F</kbd> full screen · <b class="mono" data-total></b> pages</span></p>
   </div>
   <div class="rv">
     <canvas id="gears" width="1100" height="700" aria-label="WQR-105 两级减速器齿轮传动动画"></canvas>
@@ -357,6 +473,25 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 </div>
 </section>
 
+
+<section class="pg" data-part="开场|Opening" data-t="都在动：先看一眼|Everything moves: a first look">
+<div class="in" style="max-width:1800px">
+  <p class="ey rv"><span class="k">07</span><span class="zh">先看一眼 · 全部是问渠自己的页面和渲染</span><span class="en">A first look · all captured from WenQuest itself</span></p>
+  <h2 class="t rv"><span class="zh">动画、实验、工厂、三维视频、白板课，<span class="hl">此刻都在动</span></span><span class="en">Animation, labs, factory, 3D video, whiteboard: <span class="hl">all of it running</span></span></h2>
+  <div class="vwall c4">
+    <div class="vt"><video src="m/mn_a24_4_1.mp4" poster="m/mn_a24_4_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">动画 · 双摆的混沌</span><span class="en">Animation · double-pendulum chaos</span></b><span class="zh">Manim，3Blue1Brown 风格</span><span class="en">Manim, 3Blue1Brown style</span></div></div>
+    <div class="vt"><video src="../../../site/cases/video3d/lockstitch-one-stitch.mp4" poster="m/v_lockstitch-one-stitch.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">三维视频 · 平缝机一针</span><span class="en">3D video · one lockstitch</span></b><span class="zh">剖开机头，慢放约 2000 倍</span><span class="en">Cut-away, ~2000× slow motion</span></div></div>
+    <div class="vt light"><video src="m/r_factory.mp4" poster="m/r_factory.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">数字工厂 · 车间实时演示</span><span class="en">Digital factory · live shop</span></b><span class="zh">12 个工作单元，数据实时推送</span><span class="en">12 cells, live data</span></div></div>
+    <div class="vt"><video src="m/wb_factory.mp4" poster="m/wb_factory.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">白板课 · 未来工厂</span><span class="en">Whiteboard · the future factory</span></b><span class="zh">边讲边画，中英字幕</span><span class="en">Drawn as it is told, bilingual</span></div></div>
+    <div class="vt"><video src="m/mn_a14_5_1.mp4" poster="m/mn_a14_5_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">动画 · UR5e 一个位姿八种手臂</span><span class="en">Animation · UR5e, one pose, eight arms</span></b><span class="zh">逆运动学的 8 组解</span><span class="en">All 8 inverse-kinematics solutions</span></div></div>
+    <div class="vt light"><video src="m/r_lab26-3.mp4" poster="m/r_lab26-3.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">MuJoCo 实验 · 边测边辨识负载</span><span class="en">MuJoCo lab · identify the payload</span></b><span class="zh">浏览器里跑物理仿真</span><span class="en">Physics simulation in the browser</span></div></div>
+    <div class="vt light"><video src="m/r_plc15-6.mp4" poster="m/r_plc15-6.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">PLC 实验台 · 三层电梯</span><span class="en">PLC bench · three-floor elevator</span></b><span class="zh">你写的程序驱动三维电梯</span><span class="en">Your program drives a 3D elevator</span></div></div>
+    <div class="vt light"><video src="m/r_sew_hook.mp4" poster="m/r_sew_hook.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">缝纫机实验 · 旋梭钩线</span><span class="en">Sewing lab · hook timing</span></b><span class="zh">改定时，当场看能否钩住线</span><span class="en">Change timing, see if the loop is caught</span></div></div>
+  </div>
+  <p class="tagline rv"><i></i><span class="zh">以上 8 段都是从问渠的真实页面录屏或渲染输出，没有一帧是后期合成。</span><span class="en">All eight are screen captures or render outputs from WenQuest — nothing composited.</span></p>
+</div>
+</section>
+
 <!-- ================= 第一部分 AI 原生教学平台 ================= -->
 <section class="pg div" data-part="AI 原生教学平台|AI-native teaching" data-t="第一部分：AI 原生教学平台|Part 1: AI-native teaching">
 <div class="in rv">
@@ -379,13 +514,13 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <li><span class="zh"><b>注册与审核</b>：学校邮箱的老师自动通过，其余由 AI 预审、管理员一键批准。</span><span class="en"><b>Sign-up</b>: teachers with a school address are approved automatically; others are pre-screened by AI.</span></li>
     </ul>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>learn.wenquestrobotics.com</span></div><img src="m/pl_course.webp" alt="学习平台课程首页" loading="lazy"></div><figcaption><span class="zh"><b>课程首页</b>：深色标题栏、教学大纲、单元列表，以 Canvas 为样板。</span><span class="en"><b>Course home</b>, modelled on Canvas.</span></figcaption></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>learn.wenquestrobotics.com</span></div><img src="m/pl_course.webp" alt="学习平台课程首页"></div><figcaption><span class="zh"><b>课程首页</b>：深色标题栏、教学大纲、单元列表，以 Canvas 为样板。</span><span class="en"><b>Course home</b>, modelled on Canvas.</span></figcaption></figure>
 </div>
 </section>
 
 <section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="把资料交给 AI|Hand the AI your files">
 <div class="in split r">
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">AI 建课 · 资料自动分类</span><span class="en">AI course building · file sorting</span></span></div><img src="m/ai_sort.webp" alt="AI 自动分类资料" loading="lazy"></div><figcaption><span class="zh"><b>拖进一个文件夹</b>：PDF、Word、PPT、Excel、图片、扫描件都认得，自动分 12 类、识别章节。</span><span class="en"><b>Drop in a folder</b>: PDFs, Word, PowerPoint, Excel, images and scans are read, sorted into 12 types and split by chapter.</span></figcaption></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">AI 建课 · 资料自动分类</span><span class="en">AI course building · file sorting</span></span></div><img src="m/ai_sort.webp" alt="AI 自动分类资料"></div><figcaption><span class="zh"><b>拖进一个文件夹</b>：PDF、Word、PPT、Excel、图片、扫描件都认得，自动分 12 类、识别章节。</span><span class="en"><b>Drop in a folder</b>: PDFs, Word, PowerPoint, Excel, images and scans are read, sorted into 12 types and split by chapter.</span></figcaption></figure>
   <div class="rv">
     <p class="ey"><span class="k">09</span><span class="zh">AI 建课 · 有资料</span><span class="en">AI course building · with files</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
     <h2 class="t"><span class="zh">资料再乱，<span class="hl">AI 来整理</span></span><span class="en">Messy files? <span class="hl">The AI sorts them</span></span></h2>
@@ -456,7 +591,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 
 <section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="网页互动课件取代 PPT|Web slides replace PowerPoint">
 <div class="in split r">
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">AI 建出的网页互动课件</span><span class="en">Web slides built by the AI</span></span></div><img src="m/ai_deck.webp" alt="网页互动课件" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">AI 建出的网页互动课件</span><span class="en">Web slides built by the AI</span></span></div><img src="m/ai_deck.webp" alt="网页互动课件"></div></figure>
   <div class="rv">
     <p class="ey"><span class="k">13</span><span class="zh">网页互动课件</span><span class="en">Interactive web slides</span></p>
     <h2 class="t"><span class="zh">课件里的动画和实验，<span class="hl">能当场操作</span></span><span class="en">Animations and labs <span class="hl">you can operate</span> mid-lecture</span></h2>
@@ -487,7 +622,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 
 <section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="白板课|Whiteboard lessons">
 <div class="in split r">
-  <figure class="rv"><div class="vt" data-v><video src="m/whiteboard.mp4" poster="m/whiteboard.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">白板课样片</span><span class="en">Whiteboard sample</span></b><span class="zh">按配音时间一笔一笔画出来</span><span class="en">Drawn stroke by stroke in time with the voice</span></div></div></figure>
+  <figure class="rv"><div class="vt" data-v><video src="m/wb_factory.mp4" poster="m/wb_factory.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">白板课成片：《未来工厂》</span><span class="en">Whiteboard film: The Future Factory</span></b><span class="zh">按配音一笔一笔画出来 · 下一页完整有声放映</span><span class="en">Drawn in time with the voice · full film with sound on the next slide</span></div></div></figure>
   <div class="rv">
     <p class="ey"><span class="k">15</span><span class="zh">白板课</span><span class="en">Whiteboard lessons</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
     <h2 class="t"><span class="zh">像 VideoScribe 那样<span class="hl">边讲边画</span>，但由 AI 起稿</span><span class="en">Draw while you talk, like VideoScribe, <span class="hl">drafted by AI</span></span></h2>
@@ -498,6 +633,16 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <li><span class="zh"><b>每日热点科普</b>：已做 18 期，中英各一；有量化标准——每分钟 ≥ 90 个动作、≥ 16 张画板，不达标不交付。</span><span class="en"><b>Daily science shorts</b>: 18 episodes, zh and en; measured pace of ≥ 90 actions and ≥ 16 boards per minute, or it doesn't ship.</span></li>
     </ul>
   </div>
+</div>
+</section>
+
+
+<section class="pg cine" data-part="AI 原生教学平台|AI-native teaching" data-t="白板课成片：未来工厂（有声）|Whiteboard film: The Future Factory (sound)">
+<div class="in">
+  <video src="m/wb_factory.mp4" poster="m/wb_factory.jpg" playsinline preload="none" data-sound data-hold></video>
+  <div class="lbl"><b><span class="zh">白板课成片 · 未来工厂</span><span class="en">Whiteboard film · The Future Factory</span></b><span><span class="zh">2 分 03 秒 · AI 起稿、自动配音、按配音时间作画 · 中英字幕</span><span class="en">2:03 · AI-drafted, auto-voiced, drawn to the voice · bilingual captions</span></span></div>
+  <button type="button" class="sndbtn"><span class="zh">🔊 点这里打开声音</span><span class="en">🔊 Tap for sound</span></button>
+  <div class="vbar"><i></i></div>
 </div>
 </section>
 
@@ -513,14 +658,14 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
         <div class="fact"><b>10 <span class="zh">分钟</span><span class="en">min</span></b><span><span class="zh">43 秒高清样片 20 份并行出完；单机要 2 小时 15 分</span><span class="en">to render a 43 s HD clip in 20 parallel jobs (2 h 15 min on one machine)</span></span></div>
       </div>
     </div>
-    <figure class="rv"><div class="vt" data-v data-auto><video src="../../../site/cases/video3d/lockstitch-cinematic.mp4" poster="m/v_lockstitch-cinematic.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">写实版：一针 12 毫秒</span><span class="en">Cinematic: one stitch in 12 ms</span></b><span class="zh">电影光照、景深、运动模糊</span><span class="en">Film lighting, depth of field, motion blur</span></div></div></figure>
+    <figure class="rv"><div class="vt" data-v><video src="../../../site/cases/video3d/lockstitch-cinematic.mp4" poster="m/v_lockstitch-cinematic.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">写实版：一针 12 毫秒</span><span class="en">Cinematic: one stitch in 12 ms</span></b><span class="zh">电影光照、景深、运动模糊</span><span class="en">Film lighting, depth of field, motion blur</span></div></div></figure>
   </div>
 </div>
 </section>
 
 <section class="pg alt" data-part="AI 原生教学平台|AI-native teaching" data-t="三维样片|3D samples">
 <div class="in">
-  <p class="ey rv"><span class="k">17</span><span class="zh">样片 · 点开播放</span><span class="en">Samples · click to play</span></p>
+  <p class="ey rv"><span class="k">17</span><span class="zh">样片 · 自动播放</span><span class="en">Samples · playing</span></p>
   <h2 class="t rv"><span class="zh">看得见<span class="hl">机器里面</span>发生了什么</span><span class="en">See <span class="hl">inside the machine</span></span></h2>
   <div class="grid g3 mt rv">
     <div class="vt" data-v><video src="../../../site/cases/video3d/lockstitch-one-stitch.mp4" poster="m/v_lockstitch-one-stitch.webp" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">平缝机怎样缝一针</span><span class="en">How a lockstitch machine makes one stitch</span></b><span class="zh">剖开机头，慢放</span><span class="en">Cut-away, slow motion</span></div></div>
@@ -613,13 +758,13 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <div class="fact"><b>3</b><span><span class="zh">主编初审 → 4 教师团队审阅 → 定稿</span><span class="en">Editor review → 4 faculty review → final</span></span></div>
     </div>
   </div>
-  <figure class="rv"><div class="shot white"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">《机器人学》第 26 章 · 网页版</span><span class="en">Robotics, chapter 26 · web</span></span></div><img src="m/book26.webp" alt="机器人学第 26 章页面" loading="lazy"></div><figcaption><span class="zh"><b>真实页面</b>：定理有证明；“相差 1.4×10⁻¹⁴ N·m”是程序与 MuJoCo 核对的结果，不是手写的。</span><span class="en"><b>A real page</b>: the theorem is proved; the “1.4×10⁻¹⁴ N·m” agreement with MuJoCo is printed by the program.</span></figcaption></figure>
+  <figure class="rv"><div class="shot white"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">《机器人学》第 26 章 · 网页版</span><span class="en">Robotics, chapter 26 · web</span></span></div><img src="m/book26.webp" alt="机器人学第 26 章页面"></div><figcaption><span class="zh"><b>真实页面</b>：定理有证明；“相差 1.4×10⁻¹⁴ N·m”是程序与 MuJoCo 核对的结果，不是手写的。</span><span class="en"><b>A real page</b>: the theorem is proved; the “1.4×10⁻¹⁴ N·m” agreement with MuJoCo is printed by the program.</span></figcaption></figure>
 </div>
 </section>
 
 <section class="pg alt" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="3Blue1Brown 风格动画|3Blue1Brown-style animation">
 <div class="in split r">
-  <figure class="rv"><div class="vt" data-v data-auto><video src="m/manim_observer.mp4" poster="m/manim_observer.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">动画 26.1.1：用广义动量检测碰撞</span><span class="en">Animation 26.1.1: detecting a collision with generalized momentum</span></b><span class="zh">Manim 渲染，中英字幕</span><span class="en">Rendered with Manim, bilingual captions</span></div></div></figure>
+  <figure class="rv"><div class="vt" data-v><video src="m/manim_observer.mp4" poster="m/manim_observer.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">动画 26.1.1：用广义动量检测碰撞</span><span class="en">Animation 26.1.1: detecting a collision with generalized momentum</span></b><span class="zh">Manim 渲染，中英字幕</span><span class="en">Rendered with Manim, bilingual captions</span></div></div></figure>
   <div class="rv">
     <p class="ey"><span class="k">22</span><span class="zh">动画</span><span class="en">Animation</span></p>
     <h2 class="t"><span class="zh"><span class="hl">281 段</span>动画，讲静态图讲不了的</span><span class="en"><span class="hl">281 animations</span> for what a still picture can't show</span></h2>
@@ -628,6 +773,22 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <li><span class="zh">服务器自动渲染：1080p、30 帧，中英字幕，结尾一张公式卡。</span><span class="en">Rendered automatically on the server: 1080p, 30 fps, bilingual captions, a formula card at the end.</span></li>
       <li><span class="zh">动画里的数值和教材算例是同一组数。</span><span class="en">The numbers in the animation are the same as in the worked example.</span></li>
     </ul>
+  </div>
+</div>
+</section>
+
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="六段动画同时放|Six animations at once">
+<div class="in" style="max-width:1800px">
+  <p class="ey rv"><span class="k">00</span><span class="zh">动画墙 · 五本书里随手挑的六段</span><span class="en">Animation wall · six picked from five books</span></p>
+  <h2 class="t rv"><span class="zh">一段只讲一个概念，<span class="hl">数字和书里的算例同一组</span></span><span class="en">One idea per clip, <span class="hl">the same numbers as the worked example</span></span></h2>
+  <div class="vwall c3">
+    <div class="vt"><video src="m/mn_a26_1_1.mp4" poster="m/mn_a26_1_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">机器人学 26.1 · 用广义动量检测碰撞</span><span class="en">Robotics 26.1 · collision detection</span></b><span class="zh">模型准不准，残差一看便知</span><span class="en">Model error shows up in the residual</span></div></div>
+    <div class="vt"><video src="m/mn_a24_4_1.mp4" poster="m/mn_a24_4_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">机器人学 24.4 · 双摆的混沌</span><span class="en">Robotics 24.4 · double-pendulum chaos</span></b><span class="zh">轨迹分道扬镳，能量始终守恒</span><span class="en">Paths part, energy stays</span></div></div>
+    <div class="vt"><video src="m/mn_a14_5_1.mp4" poster="m/mn_a14_5_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">机器人学 14.5 · 一个位姿，八种手臂</span><span class="en">Robotics 14.5 · one pose, eight arms</span></b><span class="zh">UR5e 逆运动学全部 8 组解</span><span class="en">All 8 UR5e IK solutions</span></div></div>
+    <div class="vt"><video src="m/mn_a9_1_1.mp4" poster="m/mn_a9_1_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">线性代数 9.1 · 线性映射</span><span class="en">Linear algebra 9.1 · linear maps</span></b><span class="zh">网格仍是网格，原点不动</span><span class="en">Grids stay grids, the origin stays</span></div></div>
+    <div class="vt"><video src="m/mn_a9_5_1.mp4" poster="m/mn_a9_5_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">微积分 9.5 · 泰勒公式</span><span class="en">Calculus 9.5 · Taylor’s formula</span></b><span class="zh">多项式一阶一阶贴上 sin x</span><span class="en">Polynomials hug sin x order by order</span></div></div>
+    <div class="vt"><video src="m/mn_a10_6_1.mp4" poster="m/mn_a10_6_1.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">机器人学 10.6 · 转台上的科氏偏转</span><span class="en">Robotics 10.6 · Coriolis on a turntable</span></b><span class="zh">地面上走直线，转台上看在拐弯</span><span class="en">Straight on the ground, curving on the table</span></div></div>
   </div>
 </div>
 </section>
@@ -679,7 +840,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <div class="fact"><b>&lt; 1%</b><span><span class="zh">实验 26.3：浏览器里跑激励轨迹，边测边辨识出负载质量</span><span class="en">Lab 26.3: identify the payload mass live from an excitation run</span></span></div>
     </div>
   </div>
-  <figure class="rv"><div class="shot white"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">实验 26.3 · 辨识负载</span><span class="en">Lab 26.3 · payload identification</span></span></div><img src="m/lab26_3.webp" alt="实验 26.3" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot white"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">实验 26.3 · 辨识负载</span><span class="en">Lab 26.3 · payload identification</span></span></div><video src="m/r_lab26-3.mp4" poster="m/r_lab26-3.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>实时录屏</b>：机械臂按激励轨迹运动，负载质量边测边估出来。</span><span class="en"><b>Live capture</b>: the arm runs the excitation trajectory while the payload mass is estimated.</span></figcaption></figure>
 </div>
 </section>
 
@@ -688,10 +849,10 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
   <p class="ey rv"><span class="k">26</span><span class="zh">《机器人学》实验一览</span><span class="en">A few Robotics labs</span></p>
   <h2 class="t rv"><span class="zh">每个实验都从<span class="hl">一个机器人问题</span>开始</span><span class="en">Every lab starts from <span class="hl">a robot problem</span></span></h2>
   <div class="grid g4 mt rv">
-    <figure><div class="shot white fix"><img src="m/lab25_5.webp" alt="实验 25.5" loading="lazy"></div><figcaption><span class="zh"><b>换一个更重的工件，这台 UR5e 还行吗？</b>负载加到多少、哪个关节先超限。</span><span class="en"><b>Heavier part — can this UR5e still cope?</b> Which joint hits its limit first.</span></figcaption></figure>
-    <figure><div class="shot white fix"><img src="m/lab24_1.webp" alt="实验 24.1" loading="lazy"></div><figcaption><span class="zh"><b>吊着的毛坯箱一路晃</b>：桁架吊运怎样加速才不晃。</span><span class="en"><b>A hanging crate keeps swinging</b>: how to accelerate a gantry without sway.</span></figcaption></figure>
-    <figure><div class="shot white fix"><img src="m/lab22_6.webp" alt="实验 22.6" loading="lazy"></div><figcaption><span class="zh"><b>从料架到卡盘，怎样最快又不晃</b>：四种轨迹做法比节拍。</span><span class="en"><b>Rack to chuck, fast and steady</b>: four trajectory methods compared.</span></figcaption></figure>
-    <figure><div class="shot white fix"><img src="m/lab13_1.webp" alt="实验 13.1" loading="lazy"></div><figcaption><span class="zh"><b>手册上的 DH 表按哪种约定</b>：标准 DH 与改进 DH 对照。</span><span class="en"><b>Which DH convention is the manual using?</b> Standard vs modified.</span></figcaption></figure>
+    <figure><div class="shot white fix"><video src="m/r_lab25-5.mp4" poster="m/r_lab25-5.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>换一个更重的工件，这台 UR5e 还行吗？</b>负载加到多少、哪个关节先超限。</span><span class="en"><b>Heavier part — can this UR5e still cope?</b> Which joint hits its limit first.</span></figcaption></figure>
+    <figure><div class="shot white fix"><video src="m/r_lab24-1.mp4" poster="m/r_lab24-1.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>吊着的毛坯箱一路晃</b>：桁架吊运怎样加速才不晃。</span><span class="en"><b>A hanging crate keeps swinging</b>: how to accelerate a gantry without sway.</span></figcaption></figure>
+    <figure><div class="shot white fix"><video src="m/r_lab22-6.mp4" poster="m/r_lab22-6.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>从料架到卡盘，怎样最快又不晃</b>：四种轨迹做法比节拍。</span><span class="en"><b>Rack to chuck, fast and steady</b>: four trajectory methods compared.</span></figcaption></figure>
+    <figure><div class="shot white fix"><video src="m/r_lab13-1.mp4" poster="m/r_lab13-1.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>手册上的 DH 表按哪种约定</b>：标准 DH 与改进 DH 对照。</span><span class="en"><b>Which DH convention is the manual using?</b> Standard vs modified.</span></figcaption></figure>
   </div>
 </div>
 </section>
@@ -711,6 +872,18 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <div class="fact"><b>1,760</b><span><span class="zh">件：书中程序在数字工厂虚拟压装工位跑 8 小时（约 20 秒算完），合格率 96.7%</span><span class="en">parts in an 8-hour shift on the virtual press station (computed in ~20 s), 96.7% good</span></span></div>
     <div class="fact"><b>108 <span class="zh">分钟</span><span class="en">min</span></b><span><span class="zh">停机：没有故障处理的对照程序，问题一目了然</span><span class="en">of downtime for the same program without fault handling</span></span></div>
     <div class="fact"><b>226/301</b><span><span class="zh">输送带 5 m/s 时普通输入只数到 226 件，高速计数器一个不漏——扫描周期的道理一试就懂</span><span class="en">At 5 m/s a normal input counts 226 of 301 parts; a high-speed counter misses none</span></span></div>
+  </div>
+</div>
+</section>
+
+
+<section class="pg" data-part="教材、动画与实验|Books, animation &amp; labs" data-t="PLC 实验台在跑|PLC benches running">
+<div class="in" style="max-width:1800px">
+  <p class="ey rv"><span class="k">00</span><span class="zh">PLC 实验台 · 三维虚拟设备</span><span class="en">PLC benches · 3D virtual machines</span></p>
+  <h2 class="t rv"><span class="zh">程序一按运行，<span class="hl">三维设备就照着你的程序动</span></span><span class="en">Press Run and <span class="hl">the 3D machine follows your program</span></span></h2>
+  <div class="vwall c2">
+    <div class="vt light"><video src="m/r_plc15-3.mp4" poster="m/r_plc15-3.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">实验 15.3 · 压装工位的顺序控制</span><span class="en">Lab 15.3 · press-fit station</span></b><span class="zh">状态机写自动循环：合格亮绿灯，挡光立即停，双手按钮相隔太久不启动</span><span class="en">A state machine for the cycle: green for good parts, instant stop on the light curtain, two-hand timing</span></div></div>
+    <div class="vt light"><video src="m/r_plc15-6.mp4" poster="m/r_plc15-6.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">实验 15.6 · 三层电梯</span><span class="en">Lab 15.6 · three-floor elevator</span></b><span class="zh">1 楼呼 3 楼平层开门；门卡住绝不运行；注入“2 楼平层传感器坏”看程序怎么发现</span><span class="en">Call from 1 to 3; never move with a jammed door; inject a failed level sensor and see if the program notices</span></div></div>
   </div>
 </div>
 </section>
@@ -756,7 +929,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <div class="fact"><b>17</b><span><span class="zh">个数字工厂实验，从闭环、强度疲劳到订单毛利与现金</span><span class="en">factory labs, from closed-loop control to order margin and cash</span></span></div>
     </div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">三维车间 · 设备状态与 AGV 实时同步</span><span class="en">3D shop · live machine states and AGVs</span></span></div><img src="m/fx_3d.webp" alt="三维车间" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">车间实时演示 · 工厂时钟在走</span><span class="en">Live shop demo · the plant clock is running</span></span></div><video src="m/r_factory.mp4" poster="m/r_factory.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>实时录屏</b>：订单进来，工单按工序流过 12 个工作单元，OEE 和事件实时刷新。</span><span class="en"><b>Live capture</b>: orders arrive, work flows through 12 cells, OEE and events update live.</span></figcaption></figure>
 </div>
 </section>
 
@@ -769,7 +942,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">跟着减速器 WQR-105 的输出轴 SH-301，从接单走到交付之后。客户下单，或用参数配置器报价；首页一屏看清准时交付率、在制品、OEE、一次合格率，还有 AI 今日简报，每 5 秒刷新。</span><span class="en">Follow output shaft SH-301 of the WQR-105 from order to after-sales. A customer orders, or the configurator quotes; the home screen shows on-time delivery, WIP, OEE and first-pass yield plus an AI daily brief, refreshed every 5 s.</span></p>
     <div class="stepbar"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/home.jpg" alt="运营总览" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/home.jpg" alt="运营总览"></div></figure>
 </div>
 </section>
 
@@ -781,7 +954,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">按轴段改直径、长度和键槽，系统按国标自动校核。批准后自动生成 STEP 模型、零件图和铣键槽 G 代码，ERPNext 物料版本加一、BOM 更新，新程序随工单派到车间，全程留痕。也接 FreeCAD、SolidWorks 宏和任何 CAD 导出的 STEP。</span><span class="en">Edit each step's diameter, length and keyway; standards are checked automatically. On approval the STEP model, drawing and keyway G-code are generated, the ERPNext item revision and BOM update, and the new program goes to the shop with the work order. FreeCAD, SolidWorks and any STEP file plug in too.</span></p>
     <div class="stepbar"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/design.jpg" alt="设计" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/design.jpg" alt="设计"></div></figure>
 </div>
 </section>
 
@@ -793,7 +966,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">Gmsh 网格 + CalculiX 求解：应力、变形、安全系数云图和 Word 报告；疲劳用博世开源的 pyLife，载荷谱可以直接用仿真车间里真实的转矩记录。图中是尖角设计的 SH-301 在 350 N·m 下的结果：最大应力 267.3 MPa、安全系数 1.33，界面直接提示加圆角。</span><span class="en">Gmsh + CalculiX: stress, deflection, safety-factor maps and a Word report; fatigue with Bosch's open-source pyLife, using real torque records from the virtual shop. Shown: SH-301 with a sharp corner at 350 N·m — 267.3 MPa peak, safety factor 1.33, and a prompt to add a fillet.</span></p>
     <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/cae.jpg" alt="有限元" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/cae.jpg" alt="有限元"></div></figure>
 </div>
 </section>
 
@@ -805,7 +978,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">净需求 = 毛需求 + 占用 + 安全库存 − 库存 − 在途。系统生成工单和请购<b>提议</b>，人确认后才经桥接写进 ERPNext，再下达车间。AI 只提议，不越权。</span><span class="en">Net need = gross + allocated + safety stock − on hand − on order. The system <b>proposes</b> work orders and purchase requests; nothing reaches ERPNext until a person confirms. The AI proposes, never overreaches.</span></p>
     <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/mrp.jpg" alt="MRP" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/mrp.jpg" alt="MRP"></div></figure>
 </div>
 </section>
 
@@ -817,7 +990,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">工单按工序派到 12 个工作单元。车间终端派工、报工、换刀、停机、复位；主轴转速、刀具寿命、最近事件经 MQTT 实时推送，三维车间同步显示。</span><span class="en">Work orders go to 12 work cells. Terminals dispatch, report, change tools, stop and reset; spindle speed, tool life and events stream live over MQTT, mirrored in the 3D shop.</span></p>
     <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/mes.jpg" alt="车间终端" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/mes.jpg" alt="车间终端"></div></figure>
 </div>
 </section>
 
@@ -829,7 +1002,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">控制图盯住轴承位 Ø35 k6 等 6 个关键特性；超差自动开不合格品单，严重问题走 8D。教学模式下，老师可以埋一个隐藏问题让学生去找。</span><span class="en">Charts watch six key features such as the Ø35 k6 bearing seat; out-of-tolerance parts open an NCR automatically, serious ones go to 8D. In teaching mode the instructor can plant a hidden fault.</span></p>
     <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/quality.jpg" alt="质量" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/quality.jpg" alt="质量"></div></figure>
 </div>
 </section>
 
@@ -841,7 +1014,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <p class="lead"><span class="zh">出厂数据 + 现场数据 + 寿命模型（轴承 L10、轴疲劳、热平衡、润滑油）→ 健康度、剩余寿命、报警和“假如”分析；振动按 ISO 10816-1 分区；一键开维修单进 ERPNext。</span><span class="en">Factory data + field data + life models (bearing L10, shaft fatigue, heat balance, oil) → health, remaining life, alarms and what-ifs; vibration zoned per ISO 10816-1; one click opens a service order in ERPNext.</span></p>
     <div class="stepbar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/twin.jpg" alt="数字孪生" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><img src="img/twin.jpg" alt="数字孪生"></div></figure>
 </div>
 </section>
 
@@ -850,9 +1023,9 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
   <p class="ey rv"><span class="k">38</span><span class="zh">仿真与制造</span><span class="en">Simulation and manufacturing</span></p>
   <h2 class="t rv"><span class="zh">不装软件，<span class="hl">浏览器里做全套仿真</span></span><span class="en">No installs. <span class="hl">The full simulation suite in a browser</span></span></h2>
   <div class="grid g3 mt rv">
-    <figure><div class="shot fix"><img src="img/cfd.jpg" alt="CFD" loading="lazy"></div><figcaption><span class="zh"><b>CFD</b>：OpenFOAM 虚拟风洞，算阻力和每个面的散热系数，一键送温度场。</span><span class="en"><b>CFD</b>: an OpenFOAM wind tunnel; drag and per-face heat transfer feed the thermal model.</span></figcaption></figure>
-    <figure><div class="shot fix"><img src="img/mbd.jpg" alt="多体动力学" loading="lazy"></div><figcaption><span class="zh"><b>多体动力学（类 ADAMS）</b>：MuJoCo 算关节力矩、功率，自动选电机和减速器。</span><span class="en"><b>Multibody (ADAMS-like)</b>: MuJoCo torques and power, then motor and gearbox selection.</span></figcaption></figure>
-    <figure><div class="shot fix"><img src="img/cam.jpg" alt="CAM" loading="lazy"></div><figcaption><span class="zh"><b>CAM</b>：数控车、2.5 轴铣，FANUC G 代码；浏览器里试切，查超程、超速、撞刀。</span><span class="en"><b>CAM</b>: CNC turning and 2.5-axis milling, FANUC G-code, simulated cutting with crash checks.</span></figcaption></figure>
+    <figure><div class="shot fix"><img src="img/cfd.jpg" alt="CFD"></div><figcaption><span class="zh"><b>CFD</b>：OpenFOAM 虚拟风洞，算阻力和每个面的散热系数，一键送温度场。</span><span class="en"><b>CFD</b>: an OpenFOAM wind tunnel; drag and per-face heat transfer feed the thermal model.</span></figcaption></figure>
+    <figure><div class="shot fix"><img src="img/mbd.jpg" alt="多体动力学"></div><figcaption><span class="zh"><b>多体动力学（类 ADAMS）</b>：MuJoCo 算关节力矩、功率，自动选电机和减速器。</span><span class="en"><b>Multibody (ADAMS-like)</b>: MuJoCo torques and power, then motor and gearbox selection.</span></figcaption></figure>
+    <figure><div class="shot fix"><img src="img/cam.jpg" alt="CAM"></div><figcaption><span class="zh"><b>CAM</b>：数控车、2.5 轴铣，FANUC G 代码；浏览器里试切，查超程、超速、撞刀。</span><span class="en"><b>CAM</b>: CNC turning and 2.5-axis milling, FANUC G-code, simulated cutting with crash checks.</span></figcaption></figure>
   </div>
   <div class="grid g3 mt rv">
     <div class="fact"><b>89.6 ℃</b><span><span class="zh">减速器箱体有限元外表面平均温度，与教材公式 89.6 ℃ 一致</span><span class="en">FEA casing temperature, equal to the textbook formula</span></span></div>
@@ -874,7 +1047,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     </div>
     <p class="foot"><span class="zh">提醒和日报周报可推送到企业微信、钉钉、飞书群机器人和邮件。没接大模型时，规则版照样能用。</span><span class="en">Alerts and reports go to WeCom, DingTalk, Feishu or email. Without a model, the rule-based version still works.</span></p>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">指挥台 · 因果链</span><span class="en">Command desk · causal chain</span></span></div><img src="m/f_hub.webp" alt="厂情中枢指挥台" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">指挥台 · 因果链</span><span class="en">Command desk · causal chain</span></span></div><img src="m/f_hub.webp" alt="厂情中枢指挥台"></div></figure>
 </div>
 </section>
 
@@ -900,7 +1073,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
   </div>
   <div class="split eq mt2 rv">
     <p class="quote" style="font-size:clamp(24px,2.6vw,38px)"><span class="zh">推荐方案 B：比 C <span class="hl">少通知一家客户、少花 $480</span>，也不漏掉高风险的那台。</span><span class="en">Recommended option B notifies <span class="hl">one fewer customer and costs $480 less</span> than C, without missing the high-risk unit.</span></p>
-    <figure><div class="shot"><img src="m/f_hub2.webp" alt="指挥台" loading="lazy"></div></figure>
+    <figure><div class="shot"><img src="m/f_hub2.webp" alt="指挥台"></div></figure>
   </div>
 </div>
 </section>
@@ -924,7 +1097,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 
 <section class="pg alt" data-part="数字工厂|Digital factory" data-t="两周情景|A two-week scenario">
 <div class="in split r">
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">情景导演</span><span class="en">Scenario director</span></span></div><img src="m/sc_director.webp" alt="情景导演" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span><span class="zh">情景导演</span><span class="en">Scenario director</span></span></div><img src="m/sc_director.webp" alt="情景导演"></div></figure>
   <div class="rv">
     <p class="ey"><span class="k">43</span><span class="zh">情景教学</span><span class="en">Scenario teaching</span></p>
     <h2 class="t"><span class="zh">一张急单，<span class="hl">八幕戏</span>演完一座工厂</span><span class="en">One rush order, <span class="hl">eight acts</span>, the whole plant</span></h2>
@@ -962,7 +1135,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     </div>
     <p class="foot"><span class="zh">按名称、标准号、规格或 ERP 物料号检索（6207、GB/T 1096、M8x25、UR5e）；ERPNext 物料页直接链到零件库。</span><span class="en">Search by name, standard, size or ERP item; ERPNext item pages link straight to it.</span></p>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/library</span></div><img src="img/library.jpg" alt="零件库" loading="lazy"></div></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/library</span></div><img src="img/library.jpg" alt="零件库"></div></figure>
 </div>
 </section>
 
@@ -976,7 +1149,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     <div class="card"><span class="big">1</span><h3><span class="zh">份工厂清单</span><span class="en">plant manifest</span></h3><p><span class="zh">一份 plant.yaml（可从 Excel 导入）描述一座工厂，新厂不改代码</span><span class="en">One plant.yaml (Excel import) describes a plant; no code changes</span></p></div>
     <div class="card"><span class="big">USB</span><h3><span class="zh">本地版</span><span class="en">On-premise</span></h3><p><span class="zh">一条命令在机房起整座工厂，U 盘导入镜像，可完全断网</span><span class="en">One command starts the whole plant in a lab, from a USB stick, fully offline</span></p></div>
   </div>
-  <figure class="mt rv"><div class="duo"><div class="shot fix"><img src="m/sc_review.webp" alt="复盘" loading="lazy"></div><div class="shot fix"><img src="m/f_fin.webp" alt="经营与财务" loading="lazy"></div></div><figcaption><span class="zh"><b>左</b>：情景结束后的自动复盘；<b>右</b>：经营与财务——每张订单的毛利。</span><span class="en"><b>Left</b>: automatic debrief; <b>right</b>: margin per order.</span></figcaption></figure>
+  <figure class="mt rv"><div class="duo"><div class="shot fix"><img src="m/sc_review.webp" alt="复盘"></div><div class="shot fix"><img src="m/f_fin.webp" alt="经营与财务"></div></div><figcaption><span class="zh"><b>左</b>：情景结束后的自动复盘；<b>右</b>：经营与财务——每张订单的毛利。</span><span class="en"><b>Left</b>: automatic debrief; <b>right</b>: margin per order.</span></figcaption></figure>
 </div>
 </section>
 
@@ -995,8 +1168,8 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
   <p class="ey rv"><span class="k">48</span><span class="zh">缝纫机设计与制造软件</span><span class="en">Sewing-machine design software</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
   <h2 class="t rv"><span class="zh">改一个参数，<span class="hl">58 项校核当场亮红绿灯</span></span><span class="en">Change one parameter, <span class="hl">58 checks light up at once</span></span></h2>
   <div class="duo mt rv">
-    <figure><div class="shot"><img src="m/ls_green.webp" alt="全绿" loading="lazy"></div><figcaption><span class="zh"><b>默认设计</b>：平缝机 21 项全绿，虚拟试缝 30 针全成缝。</span><span class="en"><b>Default</b>: 21 lockstitch checks green, 30 virtual stitches all formed.</span></figcaption></figure>
-    <figure><div class="shot"><img src="m/ls_red.webp" alt="出红灯" loading="lazy"></div><figcaption><span class="zh"><b>转速改 6000、旋梭定时 −20°</b>：4 红 1 黄，30 针全跳针，并给出改法。</span><span class="en"><b>6000 r/min and hook timing −20°</b>: 4 red, 1 amber, all 30 stitches skipped — with the fix.</span></figcaption></figure>
+    <figure><div class="shot"><img src="m/ls_green.webp" alt="全绿"></div><figcaption><span class="zh"><b>默认设计</b>：平缝机 21 项全绿，虚拟试缝 30 针全成缝。</span><span class="en"><b>Default</b>: 21 lockstitch checks green, 30 virtual stitches all formed.</span></figcaption></figure>
+    <figure><div class="shot"><img src="m/ls_red.webp" alt="出红灯"></div><figcaption><span class="zh"><b>转速改 6000、旋梭定时 −20°</b>：4 红 1 黄，30 针全跳针，并给出改法。</span><span class="en"><b>6000 r/min and hook timing −20°</b>: 4 red, 1 amber, all 30 stitches skipped — with the fix.</span></figcaption></figure>
   </div>
   <p class="foot rv"><span class="zh">5 种机型：平缝机（21 项）、包缝机（11）、绷缝机（7）、电子花样机（14）、多头刺绣机（5）。每项写数值、判据、出自教材第几讲；不合格时给出改法。</span><span class="en">Five machine types: lockstitch (21 checks), overlock (11), coverstitch (7), electronic pattern (14), multi-head embroidery (5). Each shows the value, the criterion and the lecture it comes from.</span></p>
 </div>
@@ -1014,7 +1187,30 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <li><span class="zh"><b>FreeCAD 工作台</b>与网页版同一个计算核心：导入参数后 21 项校核的结论和数值完全相同。</span><span class="en"><b>FreeCAD workbench</b> on the same core: all 21 checks give identical results.</span></li>
     </ul>
   </div>
-  <figure class="rv"><div class="shot white"><img src="m/fig_ps3d_iso.webp" alt="花样机三维模型" loading="lazy"></div><figcaption><span class="zh"><b>电子花样机三维模型</b>：由参数自动生成。</span><span class="en"><b>Electronic pattern sewer</b>, generated from parameters.</span></figcaption></figure>
+  <figure class="rv"><div class="shot white"><img src="m/fig_ps3d_iso.webp" alt="花样机三维模型"></div><figcaption><span class="zh"><b>电子花样机三维模型</b>：由参数自动生成。</span><span class="en"><b>Electronic pattern sewer</b>, generated from parameters.</span></figcaption></figure>
+</div>
+</section>
+
+
+<section class="pg" data-part="行业专用软件|Industry software" data-t="缝纫机实验在动|Sewing labs in motion">
+<div class="in" style="max-width:1800px">
+  <p class="ey rv"><span class="k">00</span><span class="zh">《缝纫机设计与制造》虚拟实验</span><span class="en">Sewing Machine Design &amp; Manufacturing · virtual labs</span></p>
+  <h2 class="t rv"><span class="zh">机构在转，<span class="hl">读数跟着变</span>：老师傅的手感变成看得见的数</span><span class="en">The mechanism turns and <span class="hl">the readings follow</span>: a veteran's feel made visible</span></h2>
+  <div class="vwall c2">
+    <div class="vt light"><video src="m/r_sew_hook.mp4" poster="m/r_sew_hook.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">实验 5-1 · 旋梭定时与针杆高度联调</span><span class="en">Lab 5-1 · hook timing and needle-bar height</span></b><span class="zh">梭尖什么时候、在什么高度、离机针多远，才能钩住线环</span><span class="en">When, how high and how close the hook must be to catch the loop</span></div></div>
+    <div class="vt light"><video src="m/r_sew_takeup.mp4" poster="m/r_sew_takeup.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">实验 4-1 · 挑线机构与供线量</span><span class="en">Lab 4-1 · take-up and thread supply</span></b><span class="zh">挑线杆放多少线、什么时候收，够不够用</span><span class="en">How much thread the take-up gives and when it pulls back</span></div></div>
+    <div class="vt light"><video src="m/r_sew_pattern.mp4" poster="m/r_sew_pattern.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">实验 15-1 · 花样机仿真</span><span class="en">Lab 15-1 · pattern sewer simulation</span></b><span class="zh">每一针能否在机针离布的窗口内走完</span><span class="en">Can every stitch finish while the needle is out of the cloth?</span></div></div>
+    <div class="vt light"><video src="m/r_sew_embroid.mp4" poster="m/r_sew_embroid.jpg" muted loop playsinline preload="none"></video><div class="cap"><b><span class="zh">实验 16-1 · 多头刺绣机</span><span class="en">Lab 16-1 · multi-head embroidery</span></b><span class="zh">针长、转速与断线补绣</span><span class="en">Stitch length, speed and thread-break repair</span></div></div>
+  </div>
+</div>
+</section>
+
+<section class="pg cine" data-part="行业专用软件|Industry software" data-t="缝纫机企业解决方案短片（有声）|Sewing-machine solution film (sound)">
+<div class="in">
+  <video src="../../../site/solutions/sewing/video/short.mp4" poster="m/sew_short.jpg" playsinline preload="none" data-sound data-hold></video>
+  <div class="lbl"><b><span class="zh">缝纫机企业解决方案 · 短片</span><span class="en">Sewing-machine solution · short film</span></b><span><span class="zh">3 分 18 秒 · 设计软件、信息化、AI 一条线</span><span class="en">3:18 · design software, IT and AI on one thread</span></span></div>
+  <button type="button" class="sndbtn"><span class="zh">🔊 点这里打开声音</span><span class="en">🔊 Tap for sound</span></button>
+  <div class="vbar"><i></i></div>
 </div>
 </section>
 
@@ -1023,10 +1219,10 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
   <p class="ey rv"><span class="k">50</span><span class="zh">接入问渠 CAE</span><span class="en">Plugged into WenQuest CAE</span></p>
   <h2 class="t rv"><span class="zh">减重一定要复核，<span class="hl">软件会直接说不合格</span></span><span class="en">Lightweighting gets re-checked, <span class="hl">and the software says no</span></span></h2>
   <div class="grid g4 mt rv">
-    <figure><div class="shot white fix"><img src="m/fea.webp" alt="有限元" loading="lazy"></div><figcaption><span class="zh"><b>零件有限元</b>与疲劳</span><span class="en"><b>Part FEA</b> and fatigue</span></figcaption></figure>
-    <figure><div class="shot white fix"><img src="m/topo.webp" alt="拓扑减重" loading="lazy"></div><figcaption><span class="zh"><b>拓扑减重</b> + 有限元复核</span><span class="en"><b>Topology</b> + FEA re-check</span></figcaption></figure>
-    <figure><div class="shot white fix"><img src="m/opt.webp" alt="设计优化" loading="lazy"></div><figcaption><span class="zh"><b>设计优化</b>：7 个目标</span><span class="en"><b>Optimization</b>: 7 objectives</span></figcaption></figure>
-    <figure><div class="shot white fix"><img src="m/tpl_cam.webp" alt="花样模板数控" loading="lazy"></div><figcaption><span class="zh"><b>花样模板</b>数控编程</span><span class="en"><b>Pattern template</b> CNC</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/fea.webp" alt="有限元"></div><figcaption><span class="zh"><b>零件有限元</b>与疲劳</span><span class="en"><b>Part FEA</b> and fatigue</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/topo.webp" alt="拓扑减重"></div><figcaption><span class="zh"><b>拓扑减重</b> + 有限元复核</span><span class="en"><b>Topology</b> + FEA re-check</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/opt.webp" alt="设计优化"></div><figcaption><span class="zh"><b>设计优化</b>：7 个目标</span><span class="en"><b>Optimization</b>: 7 objectives</span></figcaption></figure>
+    <figure><div class="shot white fix"><img src="m/tpl_cam.webp" alt="花样模板数控"></div><figcaption><span class="zh"><b>花样模板</b>数控编程</span><span class="en"><b>Pattern template</b> CNC</span></figcaption></figure>
   </div>
   <div class="split eq mt rv">
     <div class="fact"><b>50% → ✓</b><span><span class="zh">包缝机下弯针摆杆留 50% 材料：复核安全系数 2.9、寿命约 32 年，合格</span><span class="en">Overlock looper rocker at 50% material: SF 2.9, ~32-year life — pass</span></span></div>
@@ -1037,7 +1233,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 
 <section class="pg alt" data-part="行业专用软件|Industry software" data-t="问渠凸轮：设计|WenQuest Cam: design">
 <div class="in split r">
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>wenquestrobotics.com/cam</span></div><img src="m/cam_design.webp" alt="问渠凸轮设计" loading="lazy"></div><figcaption><span class="zh"><b>平缝机挑线槽凸轮</b>：压力角、根切、曲率逐项判定；缺许用值就是“未知”，软件不编。</span><span class="en"><b>A take-up groove cam</b>: pressure angle, undercut and curvature checked; with no allowable value given the verdict is “unknown” — nothing is made up.</span></figcaption></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>wenquestrobotics.com/cam</span></div><video src="m/r_cam.mp4" poster="m/r_cam.jpg" muted loop playsinline preload="none"></video></div><figcaption><span class="zh"><b>实时录屏</b>：凸轮转起来，从动件与位移、速度、加速度曲线同步走；压力角、根切、曲率逐项判定，缺许用值就是“未知”，软件不编。</span><span class="en"><b>Live capture</b>: the cam turns with the follower and its motion curves; pressure angle, undercut and curvature are checked, and a missing allowable is “unknown”, never made up.</span></figcaption></figure>
   <div class="rv">
     <p class="ey"><span class="k">51</span><span class="zh">问渠凸轮</span><span class="en">WenQuest Cam</span> <span class="pill live"><span class="zh">已上线</span><span class="en">Live</span></span></p>
     <h2 class="t"><span class="zh">从运动要求，<span class="hl">一条线做到加工和补偿</span></span><span class="en">From motion requirement <span class="hl">to machining and compensation</span></span></h2>
@@ -1063,7 +1259,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
     </div>
     <p class="foot"><span class="zh">出磨床 X–C 程序、铣削程序、慢走丝 DXF、STEP（B 样条偏差 0.007–0.013 µm）。</span><span class="en">Outputs grinder X–C programs, milling programs, wire-EDM DXF and STEP (B-spline deviation 0.007–0.013 µm).</span></p>
   </div>
-  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>wenquestrobotics.com/cam</span></div><img src="m/cam_comp.webp" alt="测量与补偿" loading="lazy"></div><figcaption><span class="zh"><b>误差谐波分解</b>：1 阶偏心装夹、低阶热处理变形、高阶机床颤振，分得清清楚楚（演示用合成数据）。</span><span class="en"><b>Harmonic breakdown</b> of the error: set-up eccentricity, heat-treat distortion and machine chatter (synthetic demo data).</span></figcaption></figure>
+  <figure class="rv"><div class="shot"><div class="chrome"><i></i><i></i><i></i><span>wenquestrobotics.com/cam</span></div><img src="m/cam_comp.webp" alt="测量与补偿"></div><figcaption><span class="zh"><b>误差谐波分解</b>：1 阶偏心装夹、低阶热处理变形、高阶机床颤振，分得清清楚楚（演示用合成数据）。</span><span class="en"><b>Harmonic breakdown</b> of the error: set-up eccentricity, heat-treat distortion and machine chatter (synthetic demo data).</span></figcaption></figure>
 </div>
 </section>
 
@@ -1186,7 +1382,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
       <li><span class="zh"><b>员工培训</b>：用同一套课程和工厂。</span><span class="en"><b>Staff training</b> on the same courses and factory.</span></li>
     </ul>
   </div>
-  <figure class="rv"><div class="shot"><img src="m/f_cost.webp" alt="成本" loading="lazy"></div><figcaption><span class="zh"><b>经营与成本</b>：订单、成本、毛利在同一条数据主线上。</span><span class="en"><b>Business and cost</b> on the same digital thread.</span></figcaption></figure>
+  <figure class="rv"><div class="shot"><img src="m/f_cost.webp" alt="成本"></div><figcaption><span class="zh"><b>经营与成本</b>：订单、成本、毛利在同一条数据主线上。</span><span class="en"><b>Business and cost</b> on the same digital thread.</span></figcaption></figure>
 </div>
 </section>
 
@@ -1239,7 +1435,7 @@ tr.sum td{font-weight:700;color:var(--amber);background:rgba(232,176,75,.06)}
 </div>
 </section>
 
-</main>
+</main></div>
 
 <script>
 (function(){
@@ -1259,7 +1455,7 @@ const pages=[...document.querySelectorAll('.pg')];
 const N=pages.length;
 document.getElementById('pt').textContent=String(N).padStart(2,'0');
 document.querySelectorAll('[data-total]').forEach(e=>e.textContent=N);
-pages.forEach((p,i)=>{p.id='p'+(i+1);const t=document.createElement('span');t.className='num-tag';t.textContent=String(i+1).padStart(2,'0')+' / '+N;p.appendChild(t);
+pages.forEach((p,i)=>{p.dataset.no=i+1;const t=document.createElement('span');t.className='num-tag';t.textContent=String(i+1).padStart(2,'0')+' / '+N;p.appendChild(t);
   const k=p.querySelector('.ey .k');if(k)k.textContent=String(i+1).padStart(2,'0');});
 function buildToc(){const box=document.getElementById('tocin');box.innerHTML='';let cur=null,col=null;
   pages.forEach((p,i)=>{const part=(p.dataset.part||'').split('|')[L==='zh'?0:1];
@@ -1271,52 +1467,121 @@ document.getElementById('tocbtn').addEventListener('click',()=>toc.classList.tog
 document.getElementById('tocx').addEventListener('click',()=>toc.classList.remove('on'));
 setL(L);
 
-let curIdx=0;
-const pn=document.getElementById('pn'),prog=document.getElementById('prog');
-function setCur(i){curIdx=i;pn.textContent=String(i+1).padStart(2,'0');prog.style.width=((i+1)/N*100)+'%';}
-const po=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)setCur(pages.indexOf(e.target));});},{rootMargin:'-45% 0px -45% 0px'});
-pages.forEach(p=>po.observe(p));
-function go(i){i=Math.max(0,Math.min(N-1,i));pages[i].scrollIntoView({behavior:reduce?'auto':'smooth'});}
-function nearest(){let best=0,bd=1e9;pages.forEach((p,i)=>{const d=Math.abs(p.getBoundingClientRect().top-56);if(d<bd){bd=d;best=i;}});return best;}
-function step(dir){const i=nearest();const r=pages[i].getBoundingClientRect();
-  // a page taller than the screen scrolls within itself first
-  if(dir>0&&r.bottom>innerHeight+8&&r.top<=60){scrollBy({top:innerHeight*0.85,behavior:reduce?'auto':'smooth'});return;}
-  if(dir<0&&r.top<50&&r.top<-8){go(i);return;}
-  go(i+dir);}
-addEventListener('keydown',e=>{if(e.target.closest('input,textarea,button,select'))if(e.key===' ')return;
+/* ================= deck engine ================= */
+const view=document.getElementById('view'),deck=document.getElementById('deck');
+const pn=document.getElementById('pn'),prog=document.getElementById('prog'),abar=document.getElementById('abar');
+function layout(){root.classList.toggle('fs',!!document.fullscreenElement);
+  const W=view.clientWidth,H=view.clientHeight,s=Math.min(W/1920,H/1080);
+  deck.style.transform='translate('+((W-1920*s)/2)+'px,'+((H-1080*s)/2)+'px) scale('+s+')';}
+addEventListener('resize',layout);document.addEventListener('fullscreenchange',()=>{layout();});layout();
+[view,deck].forEach(el=>el.addEventListener('scroll',()=>{el.scrollLeft=0;el.scrollTop=0;}));
+
+/* shrink a slide's content if it is taller than the stage */
+function fit(p){if(p.classList.contains('cine'))return;const inn=p.querySelector(':scope>.in');if(!inn)return;
+  const cs=getComputedStyle(p),avail=1080-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom),h=inn.scrollHeight;
+  const w=inn.offsetWidth-parseFloat(getComputedStyle(inn).paddingLeft)*2;
+  let k=Math.min(1.16,avail/h,1780/Math.max(1,w));if(Math.abs(k-1)<0.01)k=1;
+  inn.style.transform=k!==1?'scale('+k.toFixed(4)+')':'';inn.style.transformOrigin='50% 50%';inn.dataset.k=k.toFixed(3);}
+
+/* build-in order: .rv blocks, plus the items of grids, lists and walls */
+pages.forEach(p=>{let k=0;
+  p.querySelectorAll('.rv').forEach(el=>{el.style.setProperty('--d',(0.12+k*0.13).toFixed(2)+'s');k++;});
+  p.querySelectorAll('.grid>*,.wall>*,.flow>*,.facts>*,ul.ck>li,.chips>*,.arch>*,.vwall>*,.duo>*,.btns>*').forEach((el,j)=>{
+    if(el.classList.contains('rv'))return;el.classList.add('bi');el.style.setProperty('--d',(0.25+j*0.08).toFixed(2)+'s');});
+  p.querySelectorAll('.stepbar i.on').forEach((el,j)=>el.style.setProperty('--k',j));});
+
+/* count-ups: walls, facts and big numbers */
+pages.forEach(p=>p.querySelectorAll('.wall b,.fact b,.card .big').forEach(el=>{if(el.dataset.n||el.querySelector('*'))return;
+  const m=el.textContent.trim().match(/^([~<>]?\s?)([\d,]+)(\.\d+)?$/);if(!m)return;el.dataset.n=m[2].replace(/,/g,'')+(m[3]||'');el.dataset.pre=m[1];el.dataset.comma=m[2].includes(',')?'1':'';}));
+function countUp(p){if(reduce)return;p.querySelectorAll('[data-n]').forEach(el=>{const n=+el.dataset.n,pre=el.dataset.pre||'',dec=(el.dataset.n.split('.')[1]||'').length,t0=performance.now();
+  const fmt=v=>{let s=v.toFixed(dec);if(el.dataset.comma)s=s.replace(/\B(?=(\d{3})+(?!\d))/g,',');return pre+s;};
+  (function s(t){if(!p.classList.contains('on'))return el.textContent=fmt(n);const k=Math.min(1,(t-t0)/1400),v=n*(1-Math.pow(1-k,3));el.textContent=fmt(k<1?v:n);if(k<1)requestAnimationFrame(s);})(t0);});}
+
+/* video */
+let soundOn=true;
+const sndb=document.getElementById('sndbtn');
+function setSound(on){soundOn=on;sndb.textContent=on?'🔊':'🔇';const p=pages[cur];if(!p)return;
+  p.querySelectorAll('video[data-sound]').forEach(v=>{v.muted=!on;if(on&&v.paused)v.play().catch(()=>{});});p.classList.toggle('muted',!on);}
+sndb.addEventListener('click',()=>setSound(!soundOn));
+function warm(i){[i,i+1,i+2,i-1].forEach(k=>{const p=pages[k];if(!p)return;p.querySelectorAll('video').forEach(v=>{if(v.preload!=='auto'){v.preload='auto';try{v.load()}catch(e){}}});});}
+function playIn(p){p.querySelectorAll('video').forEach(v=>{
+  try{v.currentTime=0}catch(e){}
+  const snd=v.hasAttribute('data-sound');v.muted=!(snd&&soundOn);
+  const ok=()=>{if(snd){p.classList.toggle('muted',v.muted);p.classList.add('playing');}};
+  const pr=v.play();if(pr&&pr.then)pr.then(ok,()=>{v.muted=true;v.play().then(()=>{if(snd)p.classList.add('muted','playing');},()=>{});});else ok();});}
+function stopIn(p){p.querySelectorAll('video').forEach(v=>{v.pause();});p.classList.remove('playing');}
+document.querySelectorAll('.pg.cine').forEach(p=>{const v=p.querySelector('video'),bar=p.querySelector('.vbar i'),b=p.querySelector('.sndbtn');
+  v.addEventListener('timeupdate',()=>{if(v.duration)bar.style.width=(v.currentTime/v.duration*100)+'%';});
+  v.addEventListener('ended',()=>{p.classList.remove('playing');if(auto)next();});
+  b.addEventListener('click',e=>{e.stopPropagation();setSound(true);v.muted=false;v.play().catch(()=>{});p.classList.remove('muted');});
+  v.addEventListener('click',()=>{v.paused?v.play().catch(()=>{}):v.pause();});});
+document.querySelectorAll('.vt').forEach(t=>{if(t.closest('.cine'))return;t.addEventListener('click',()=>{const v=t.querySelector('video');v.paused?v.play().catch(()=>{}):v.pause();});});
+
+/* navigation */
+let cur=-1;
+function go(i){i=Math.max(0,Math.min(N-1,i));if(i===cur)return;const old=pages[cur];
+  pages.forEach((p,k)=>{p.classList.toggle('on',k===i);p.classList.toggle('before',k<i);});
+  if(old){stopIn(old);const o=old;setTimeout(()=>{if(!o.classList.contains('on'))o.classList.remove('built');},750);}
+  cur=i;const p=pages[i];fit(p);p.classList.remove('built');void p.offsetWidth;requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.add('built')));
+  countUp(p);warm(i);playIn(p);
+  pn.textContent=String(i+1).padStart(2,'0');prog.style.width=((i+1)/N*100)+'%';
+  try{history.replaceState(null,'','#p'+(i+1));}catch(e){}
+  if(auto)schedule();}
+function next(){go(cur>=N-1?0:cur+1);}
+function prev(){go(cur-1);}
+addEventListener('keydown',e=>{if(e.target.closest('input,textarea,select'))return;
   if(toc.classList.contains('on')){if(e.key==='Escape')toc.classList.remove('on');return;}
-  if(['ArrowDown','PageDown','ArrowRight'].includes(e.key)||(e.key===' '&&!e.shiftKey)){e.preventDefault();step(1);}
-  else if(['ArrowUp','PageUp','ArrowLeft'].includes(e.key)||(e.key===' '&&e.shiftKey)){e.preventDefault();step(-1);}
-  else if(e.key==='Home'){e.preventDefault();go(0);}else if(e.key==='End'){e.preventDefault();go(N-1);}});
-document.getElementById('nextb').addEventListener('click',()=>step(1));
-document.getElementById('prevb').addEventListener('click',()=>step(-1));
-document.getElementById('fsbtn').addEventListener('click',()=>{try{document.fullscreenElement?document.exitFullscreen():root.requestFullscreen();}catch(e){}});
-if(location.hash&&/^#p\d+$/.test(location.hash)){const i=+location.hash.slice(2)-1;if(pages[i])setTimeout(()=>pages[i].scrollIntoView(),50);}
+  const k=e.key;
+  if(['ArrowDown','PageDown','ArrowRight','Enter'].includes(k)||(k===' '&&!e.shiftKey)){e.preventDefault();next();}
+  else if(['ArrowUp','PageUp','ArrowLeft','Backspace'].includes(k)||(k===' '&&e.shiftKey)){e.preventDefault();prev();}
+  else if(k==='Home'){e.preventDefault();go(0);}else if(k==='End'){e.preventDefault();go(N-1);}
+  else if(k==='a'||k==='A'){setAuto(!auto);}else if(k==='f'||k==='F'){fs();}else if(k==='m'||k==='M'){setSound(!soundOn);}
+  else if(k==='Escape'&&auto){setAuto(false);}});
+/* wheel / trackpad: one page per gesture */
+let wReady=true,wLast=0,wAcc=0,wLock=0;
+addEventListener('wheel',e=>{if(toc.classList.contains('on'))return;e.preventDefault();const now=performance.now();
+  if(now-wLast>200)wReady=true;wLast=now;if(!wReady||now<wLock)return;
+  wAcc+=Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+  if(Math.abs(wAcc)>=30){(wAcc>0?next:prev)();wAcc=0;wReady=false;wLock=now+450;}},{passive:false});
+/* touch swipe */
+let tx=0,ty=0,tt=0;
+view.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty=t.clientY;tt=Date.now();},{passive:true});
+view.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;if(Date.now()-tt>900)return;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<45)return;(Math.abs(dx)>Math.abs(dy)?(dx<0?next:prev):(dy<0?next:prev))();},{passive:true});
+document.getElementById('nextb').addEventListener('click',next);
+document.getElementById('prevb').addEventListener('click',prev);
+document.getElementById('edger').addEventListener('click',next);
+document.getElementById('edgel').addEventListener('click',prev);
+function fs(){try{document.fullscreenElement?document.exitFullscreen():root.requestFullscreen().catch(()=>{});}catch(e){}}
+document.getElementById('fsbtn').addEventListener('click',fs);
+document.getElementById('tocin').addEventListener('click',e=>{const a=e.target.closest('a');if(!a)return;e.preventDefault();toc.classList.remove('on');go(+a.getAttribute('href').slice(2)-1);});
 
-/* reveal */
-const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target);}}),{threshold:.12});
-document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+/* auto-play */
+let auto=false,aT=null,aStart=0,aDur=0;
+const ab=document.getElementById('autobtn');
+function dwell(p){if(p.dataset.dur)return +p.dataset.dur;
+  const txt=[...p.querySelectorAll(L==='zh'?'.zh':'.en')].map(e=>e.textContent).join('').replace(/\s+/g,'').length;
+  let s=6+Math.min(10,txt/(L==='zh'?55:150));if(p.querySelector('video'))s=Math.max(s,11);if(p.querySelector('canvas'))s=Math.max(s,14);
+  if(p.classList.contains('div'))s=Math.min(s,7);return s;}
+function schedule(){clearTimeout(aT);if(!auto)return;const p=pages[cur];
+  if(p.classList.contains('cine')){aDur=0;return;}
+  aDur=dwell(p)*1000;aStart=performance.now();aT=setTimeout(next,aDur);}
+function setAuto(on){auto=on;ab.classList.toggle('on',on);ab.innerHTML=on?'<span class="zh">❚❚ 停止放映</span><span class="en">❚❚ Stop</span>':'<span class="zh">▶ 自动放映</span><span class="en">▶ Auto-play</span>';
+  if(on){if(!document.fullscreenElement&&innerWidth>900)fs();schedule();}else{clearTimeout(aT);abar.style.width='0';}}
+ab.addEventListener('click',()=>setAuto(!auto));
+document.querySelectorAll('[data-go-auto]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();setSound(true);setAuto(true);next();}));
+(function tick(){if(auto){if(aDur){abar.style.width=Math.min(100,(performance.now()-aStart)/aDur*100)+'%';}else{const v=pages[cur].querySelector('video[data-hold]');abar.style.width=v&&v.duration?(v.currentTime/v.duration*100)+'%':'0';}}requestAnimationFrame(tick);})();
 
-/* count-up */
-const co=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;co.unobserve(e.target);if(reduce)return;
-  const el=e.target,n=+el.dataset.n,pre=el.dataset.pre||'',t0=performance.now();
-  (function s(t){const k=Math.min(1,(t-t0)/1200),v=n*(1-Math.pow(1-k,3));el.textContent=pre+Math.round(v);if(k<1)requestAnimationFrame(s);})(t0);}),{threshold:.5});
-document.querySelectorAll('[data-n]').forEach(el=>co.observe(el));
-
-/* copy */
+/* re-fit when fonts arrive, images load or language changes */
+document.querySelectorAll('.pg img').forEach(im=>{if(!im.complete)im.addEventListener('load',()=>{const p=im.closest('.pg');if(p===pages[cur])fit(p);});});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(pages[cur])fit(pages[cur]);});
+document.querySelectorAll('.lang button').forEach(b=>b.addEventListener('click',()=>{setTimeout(()=>{fit(pages[cur]);if(auto)schedule();},30);}));
 document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.copy,o=b.innerHTML;
   const done=()=>{b.textContent=T('已复制','Copied');setTimeout(()=>b.innerHTML=o,1400);};
   try{navigator.clipboard.writeText(v).then(done,()=>{});}catch(e){}}));
-
-/* videos: autoplay the marked ones when visible; others play on click */
-const vo=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target.querySelector('video');if(!v)return;
-  if(e.isIntersecting&&e.target.hasAttribute('data-auto')&&!reduce){v.preload='auto';v.play().catch(()=>{});}else if(!e.isIntersecting)v.pause();}),{threshold:.4});
-document.querySelectorAll('[data-v]').forEach(t=>{vo.observe(t);t.addEventListener('click',()=>{const v=t.querySelector('video');v.preload='auto';v.paused?v.play().catch(()=>{}):v.pause();});});
-
-/* visibility-gated animation loop */
-const vis=new Map();
-const io=new IntersectionObserver(es=>es.forEach(e=>vis.set(e.target,e.isIntersecting)),{rootMargin:'100px'});
-function loop(el,fn){vis.set(el,false);io.observe(el);function f(t){if(vis.get(el))fn(t);requestAnimationFrame(f)}requestAnimationFrame(f);}
+let start=0;if(location.hash&&/^#p\d+$/.test(location.hash)){const i=+location.hash.slice(2)-1;if(pages[i])start=i;}
+/* animation loop runs only while its slide is on screen */
+function loop(el,fn){const p=el.closest('.pg');function f(t){if(p.classList.contains('on'))fn(t);requestAnimationFrame(f)}requestAnimationFrame(f);}
 
 /* ---------- hero gears ---------- */
 (function(){
@@ -1437,6 +1702,7 @@ function draw(){g.fillStyle='#101820';g.fillRect(0,0,1664,600);g.textAlign='cent
 init();draw();
 loop(c,()=>{stp();if(tk>1300)init();draw();});
 })();
+go(start);
 })();
 </script>
 </body>
