@@ -203,24 +203,36 @@ jobs:
             python3 factory/deploy/ci_annotate.py 演示工厂诊断 /tmp/logs/demo_diag.log 200
           fi
           exit "$st"
-      - name: 班级工厂（第 10 轮）
+      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）
         run: |
           set +e
           val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
           pip install -q pyyaml
           python3 factory/deploy/classes.py factory/deploy/classes.yaml "$FACTORY_DIR/docker-compose.classes.yml" --ci-ports
           python3 factory/deploy/classes.py factory/deploy/classes.yaml --ids > "$FACTORY_DIR/classes.ids"
-          id=$(cut -d' ' -f1 "$FACTORY_DIR/classes.ids")
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml --plants > "$FACTORY_DIR/classes.plants"
+          # 演练按清单起的那座（机器人厂）：减速器厂的闭环已由教学工厂、演示工厂两步覆盖；没有按清单的班级时演练第一个
+          id=$(cut -f1 "$FACTORY_DIR/classes.plants" | head -n 1)
+          [ -n "$id" ] || id=$(cut -d' ' -f1 "$FACTORY_DIR/classes.ids")
+          n=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$id" ] && break; n=$((n + 1)); done
+          hubp=$((8102 + n)); erpp=$((8093 + n))
           up=$(echo "$id" | tr '[:lower:]' '[:upper:]')
           export FACTORY_COMPOSE="docker-compose.yml ci.yml docker-compose.classes.yml"
           bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$id'" 2>&1 | tee /tmp/logs/class_setup.log
           st=${PIPESTATUS[0]}
           if [ "$st" = 0 ]; then
-            for i in $(seq 1 40); do curl -fsS localhost:8102/api/health && break; sleep 5; done
+            for i in $(seq 1 40); do curl -fsS localhost:$hubp/api/health && break; sleep 5; done
             cd factory/digital
-            python tests/closed_loop.py --hub http://localhost:8102 --erp http://localhost:8093 --erp-kind real \
-              --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-              2>&1 | tee /tmp/logs/class_loop.log
+            if grep -q "^$id	" "$FACTORY_DIR/classes.plants"; then
+              python tests/plant_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
+                --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
+                --item WQ-AGV300 --item WQ-CR5 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S \
+                2>&1 | tee /tmp/logs/class_loop.log
+            else
+              python tests/closed_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
+                --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
+                2>&1 | tee /tmp/logs/class_loop.log
+            fi
             st=${PIPESTATUS[0]}
             cd -
           fi
@@ -473,6 +485,7 @@ jobs:
           python3 factory/deploy/classes.py factory/deploy/classes.yaml stage/docker-compose.classes.yml
           python3 factory/deploy/classes.py factory/deploy/classes.yaml --ids > stage/classes.ids
           python3 factory/deploy/classes.py factory/deploy/classes.yaml --names > stage/classes.names
+          python3 factory/deploy/classes.py factory/deploy/classes.yaml --plants > stage/classes.plants
           tar czf - -C stage . | ssh "deploy@$HOST" \
             'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh'
       - name: 更新数字工厂

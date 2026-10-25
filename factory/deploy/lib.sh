@@ -68,7 +68,7 @@ site_setup() {
             "{'system_settings_data': {'language': 'en', 'country': 'United States', 'currency': 'USD', 'time_zone': 'America/New_York'}, 'user_data': {}}"
         ERP_SITE=$site bench_exec frappe.desk.page.setup_wizard.setup_wizard.setup_complete --kwargs \
             "{'args': {'language': 'English', 'country': 'United States', 'timezone': 'America/New_York', 'currency': 'USD',
-              'company_name': '问渠减速器厂 WenQuest Gearbox', 'company_abbr': 'WQ', 'chart_of_accounts': 'Standard',
+              'company_name': '${SETUP_COMPANY:-问渠减速器厂 WenQuest Gearbox}', 'company_abbr': '${SETUP_ABBR:-WQ}', 'chart_of_accounts': 'Standard',
               'fy_start_date': '$year-01-01', 'fy_end_date': '$year-12-31', 'setup_demo': 0, 'enable_telemetry': 0}}"
     fi
     dc exec -T erp-backend bench --site "$site" set-config host_name "$erppub" >/dev/null
@@ -82,14 +82,14 @@ site_setup() {
     local seedargs=(python seed.py --url "http://$front:8080" --user Administrator --password "$(envval ERP_ADMIN_PASSWORD)"
                     --factory-url "$pub")
     if [ "$(envval "${pre}_SEEDED")" != 1 ]; then
-        log "$label：导入减速器厂数据..."
+        log "$label：导入工厂数据（${SEED_PLANT:-问渠减速器厂}）..."
         for i in 1 2 3 4 5 6; do
             # shellcheck disable=SC2086
-            if dc run --rm seed "${seedargs[@]}" $seedopt; then envset "${pre}_SEEDED" 1; break; fi
+            if dc run --rm ${SEED_PLANT:+-e WQ_PLANT_FILE=$SEED_PLANT} seed "${seedargs[@]}" $seedopt; then envset "${pre}_SEEDED" 1; break; fi
             log "导入没成功，20 秒后重试（第 $i 次）..."; sleep 20
         done
     fi
-    dc run --rm seed "${seedargs[@]}" --erp-sso-only --sso-secret "$(envval "${pre}_ERP_OAUTH_SECRET")" \
+    dc run --rm ${SEED_PLANT:+-e WQ_PLANT_FILE=$SEED_PLANT} seed "${seedargs[@]}" --erp-sso-only --sso-secret "$(envval "${pre}_ERP_OAUTH_SECRET")" \
         --hub-internal "$hubint" > "/tmp/wq-sso-$site.log" 2>&1 \
         && log "$label：单点登录已配置。" || { log "警告：$label 单点登录没配置成功："; tail -5 "/tmp/wq-sso-$site.log"; }
     dc up -d "$@"                 # 钥匙刚生成时让它们带上新配置
@@ -107,9 +107,17 @@ demo_setup() {
 
 # 班级（小组）工厂（第 10 轮）：class_setup <编号>
 class_setup() {
-    local id=$1 up domain
+    local id=$1 up domain line
     up=$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')
     domain=$(envval SITE_DOMAIN)
+    # 第 45 轮：按清单起的班级工厂（classes.plants 由 classes.py --plants 生成）：ERPNext 公司、导数据都按清单
+    line=$(awk -F'\t' -v id="$id" '$1 == id' classes.plants 2>/dev/null | head -n 1 || true)
+    if [ -n "$line" ]; then
+        SEED_PLANT=$(printf '%s' "$line" | cut -f2)
+        SETUP_COMPANY=$(printf '%s' "$line" | cut -f3)
+        SETUP_ABBR=$(printf '%s' "$line" | cut -f4)
+        export SEED_PLANT SETUP_COMPANY SETUP_ABBR
+    fi
     site_setup "班级工厂 $id" "c-$id" "wq_c_$id" "erp-frontend-c-$id" "http://wqf-hub-c-$id:8100" "https://$id.factory.$domain" \
         "https://$id.erp.$domain" "WQ_C_$up" "--opening-stock --teach-stock" "hub-c-$id" "sim-c-$id" "bridge-c-$id" "bus-c-$id"
 }

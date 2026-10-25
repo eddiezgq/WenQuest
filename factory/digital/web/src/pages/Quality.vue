@@ -6,20 +6,22 @@
       <section class="card grow" data-help="q-chart">
         <div class="card-head">
           <h2>控制图</h2>
-          <select v-model="ch" @change="load">
-            <option v-for="c in CHARS" :key="c.key" :value="c.key">{{ c.name }}</option>
+          <select v-model="sel" @change="load" aria-label="测量特性">
+            <option v-for="c in chars" :key="c.item + '|' + c.key" :value="c.item + '|' + c.key">{{ c.name }}</option>
           </select>
           <span class="muted small">quality/qc-01/measurement · 最近 {{ rows.length }} 件</span>
         </div>
         <ControlChart v-if="chart.points.length" :chart="chart" :height="220" />
         <div v-else class="empty">还没有这个特性的测量值。</div>
-        <p v-if="chart.points.length" class="small">最近 5 件均值 <b class="mono">{{ mean5.toFixed(4) }}</b> mm，偏离公差中值
+        <p v-if="chart.points.length && unit === 'mm'" class="small">最近 5 件均值 <b class="mono">{{ mean5.toFixed(4) }}</b> mm，偏离公差中值
           <b class="mono">{{ ((mean5 - chart.center) * 1000).toFixed(1) }}</b> µm，距上限 <b class="mono">{{ ((chart.upper - max5) * 1000).toFixed(1) }}</b> µm。</p>
+        <p v-else-if="chart.points.length" class="small">最近 5 件均值 <b class="mono">{{ mean5.toFixed(3) }}</b> {{ unit }}，偏离公差中值
+          <b class="mono">{{ (mean5 - chart.center).toFixed(3) }}</b> {{ unit }}，距上限 <b class="mono">{{ (chart.upper - max5).toFixed(3) }}</b> {{ unit }}。</p>
         <table class="t">
-          <thead><tr><th>时间</th><th>零件</th><th>工单</th><th class="num">实测 mm</th><th class="num">公差</th><th>判定</th></tr></thead>
+          <thead><tr><th>时间</th><th>零件</th><th>工单</th><th class="num">实测 {{ unit }}</th><th class="num">公差</th><th>判定</th></tr></thead>
           <tbody><tr v-for="r in rows.slice().reverse().slice(0, 30)" :key="r.id">
             <td class="small">{{ timeOf(r.ts) }}</td><td class="mono small"><ObjLink type="PartSerial" :k="r.part_serial" /></td><td class="mono small"><ObjLink v-if="r.work_order" type="WorkOrder" :k="r.work_order" /></td>
-            <td class="num">{{ r.value_mm.toFixed(4) }}</td><td class="num small">{{ r.lower_tol_mm }}–{{ r.upper_tol_mm }}</td>
+            <td class="num">{{ r.value_mm.toFixed(unit === 'mm' ? 4 : 3) }}</td><td class="num small">{{ r.lower_tol_mm }}–{{ r.upper_tol_mm }}</td>
             <td><span class="pill" :class="r.result === 'pass' ? 'good' : 'bad'">{{ r.result === 'pass' ? '合格' : '超差' }}</span></td>
           </tr></tbody>
         </table>
@@ -84,17 +86,14 @@ import ControlChart from '../components/ControlChart.vue';
 import TaskBar from '../components/TaskBar.vue';
 import ObjLink from '../components/ObjLink.vue';
 
-const CHARS = [
-  { key: 'bearing_seat_d35', name: '轴承位直径 Ø35 k6' },
-  { key: 'gear_seat_d40', name: '齿轮位直径 Ø40 k6' },
-  { key: 'keyway_width_12', name: '键槽宽 12 N9' },
-  { key: 'bearing_seat_d35_r', name: '右轴承位直径 Ø35 k6' },
-  { key: 'runout_bearing', name: '轴承位径向圆跳动 ≤ 0.012' },
-  { key: 'keyway_sym', name: '键槽对称度 ≤ 0.02' },
-];
+// 能选的测量特性：/api/quality/characteristics（第 45 轮：演示工厂是输出轴 SH-301 的三坐标特性，别的工厂来自工厂清单）
+const chars = ref([{ item: 'SH-301', key: 'bearing_seat_d35', name: '轴承位直径 Ø35 k6（左）', unit: 'mm' }]);
+const sel = ref('SH-301|bearing_seat_d35');
+const cur = computed(() => chars.value.find((c) => c.item + '|' + c.key === sel.value) || chars.value[0]);
+const unit = computed(() => cur.value?.unit || 'mm');
 const DISP = { open: '待评审', rework: '返修', scrap: '报废', use_as_is: '让步接收' };
 const STATUS8D = { open: '填写中', submitted: '措施待批准', approved: '措施已实施', rejected: '措施退回', closed: '已关闭' };
-const ch = ref('bearing_seat_d35');
+const ch = computed(() => cur.value?.key || 'bearing_seat_d35');
 const q8d = ref([]);
 const newTitle = ref('');
 const problems = ref([]);
@@ -123,14 +122,14 @@ const grdLife = computed(() => {
   return g ? Math.round(g.tool_life_left * 100) + '%' : '—';
 });
 async function load() {
-  [rows.value, ncr.value] = await Promise.all([get('/quality/measurements?characteristic=' + ch.value + '&limit=60'), get('/ncr')]);
+  [rows.value, ncr.value] = await Promise.all([get('/quality/measurements?characteristic=' + ch.value + '&item=' + encodeURIComponent(cur.value?.item || '') + '&limit=60'), get('/ncr')]);
 }
 async function load8d() {
   q8d.value = await get('/quality/8d');
   if (isTeacher.value) problems.value = await get('/quality/problems');
 }
 async function open8d() {
-  const r = await post('/quality/8d', { item: 'SH-301', characteristic: ch.value, title: newTitle.value });
+  const r = await post('/quality/8d', { item: cur.value?.item || 'SH-301', characteristic: ch.value, title: newTitle.value });
   newTitle.value = '';
   router.push('/quality/8d/' + r.id);
 }
@@ -152,6 +151,10 @@ async function answer() {
   teachStatus.value = await get('/teach');
 }
 onMounted(async () => {
+  try {
+    const cs = await get('/quality/characteristics');
+    if (cs.length) { chars.value = cs; sel.value = cs[0].item + '|' + cs[0].key; }
+  } catch { /* 取不到就用缺省（输出轴） */ }
   load();
   catalog.value = await get('/quality/problems/catalog');
   load8d();

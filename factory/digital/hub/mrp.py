@@ -38,6 +38,9 @@ def std_unit_cost(item):
     return round(mat, 2), round(ops, 2)
 
 
+SOURCE_OF = {"make": "semi", "sub": "semi", "buy": "purchased", "raw": "raw"}   # 物料类别 → 领料仓库（桥接按它填工单）
+
+
 def plan_order(db, customer, item, qty, delivery_date, mode="teach", now=None):
     o = Overview(db, now, mode)
     today = o.now.astimezone(TZ).date()
@@ -117,9 +120,9 @@ def plan_order(db, customer, item, qty, delivery_date, mode="teach", now=None):
             w = {"production_item": code, "qty": int(q), "bom_no": None, "planned_start_date": start.isoformat(),
                  "expected_delivery_date": end.isoformat(), "est_minutes": mins,
                  "routing": [op for op, _ in routing_for(code)]}
-            if whole:   # 成品进成品库、自制件进半成品库；成品领料：自制件从半成品库，其余从原材料库
+            if whole:   # 成品进成品库、自制件进半成品库；领料：自制件、部件从半成品库，外购件从外购件库，原材料从原材料库
                 w["warehouse"] = "fg" if code == item else "semi"
-                w["sources"] = {c: ("semi" if F.ITEMS[c][1] in ("make", "sub") else "raw") for c, _ in F.BOMS[code][1]}
+                w["sources"] = {c: SOURCE_OF.get(F.ITEMS[c][1], "raw") for c, _ in F.BOMS[code][1]}
             wos.append(w)
         else:
             deferred.append({"item_code": code, "qty": q, "name": F.ITEMS[code][0]})
@@ -127,11 +130,11 @@ def plan_order(db, customer, item, qty, delivery_date, mode="teach", now=None):
     if _plant.is_demo():                # 演示工厂的输出轴标准成本；企业工厂没有这道工艺
         mat, ops = std_unit_cost("SH-301")
         std = {"material": mat, "operations": ops, "total": round(mat + ops, 2)}
-    price = (F.ITEMS.get(item) or (None,) * 4)[3]       # 其他产品的售价取物料主数据（没有就不填）
+    # 售价：可接单成品的售价（清单 products；演示工厂 WQR-105 = FG_SELLING_PRICE），没有再取物料主数据（都没有就不填）
+    price = F.PRODUCTS.get(item) if F.PRODUCTS.get(item) is not None else (F.ITEMS.get(item) or (None,) * 4)[3]
     preview = {
         "sales_order": {"customer": customer, "company": COMPANY, "item_code": item, "qty": qty,
-                        "rate": F.FG_SELLING_PRICE if item == "WQR-105" else price,
-                        "amount": F.FG_SELLING_PRICE * qty if item == "WQR-105" else (price * qty if price else None),
+                        "rate": price, "amount": price * qty if price is not None else None,
                         "delivery_date": due.isoformat(), "transaction_date": today.isoformat()},
         "mrp": rows,
         "work_orders": wos,

@@ -22,7 +22,7 @@ DIGITAL = os.path.dirname(HERE)
 REPO = os.path.dirname(os.path.dirname(DIGITAL))
 WEB = os.path.join(DIGITAL, "web", "src")
 HELP = os.path.join(WEB, "help")
-EDITIONS = ("teach", "enterprise")
+EDITIONS = ("teach", "enterprise", "robot")          # robot：机器人厂一册（第 45 轮）
 FENCE = re.compile(r"^```(\w+)[ \t]*\n(.*?)^```[ \t]*$", re.M | re.S)
 BLOCKS = {"goto", "anim", "video", "live", "ask", "lab", "try", "quiz"}
 LIVE = {"plant", "machines", "kpi", "domain"}
@@ -543,10 +543,10 @@ def test_domain_live_fields_are_real():
 
 
 def test_every_chapter_covered():
-    """教学版每章：动画、视频或做完打勾、两种互动（其一在真工厂动手）、实时数据。第 30 轮 §八 8-3 逐章改写完，起强制（少一样不通过）"""
+    """教学版、机器人厂每章：动画、视频或做完打勾、两种互动（其一在真工厂动手）、实时数据。第 30 轮 §八 8-3 逐章改写完，起强制（少一样不通过）"""
     report = {}
     for ed, slug, fn, src in _chapters():
-        if ed != "teach" or (ed, slug) in COVER_EXEMPT:
+        if ed not in ("teach", "robot") or (ed, slug) in COVER_EXEMPT:
             continue
         gaps = coverage_gaps(coverage(src))
         if gaps:

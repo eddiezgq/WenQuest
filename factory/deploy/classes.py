@@ -4,15 +4,40 @@
 每个班一座独立的教学工厂：总线、枢纽、仿真车间、桥接、ERPNext 站点入口；历史库 wq_c_<编号>，ERPNext 站点 c-<编号>。
 网址：<编号>.factory.<域名>（工作台）、<编号>.erp.<域名>（ERPNext），由学习平台的 Caddy 按需申请证书。
 
+第 45 轮：一行可以写 plant（工厂清单，factory/plants/<plant>.yaml），这座厂就按那份清单起（如机器人厂）；
+不写 = 问渠减速器厂。清单只在第一次建站时决定 ERPNext 里的公司名和缩写，已建好的班级工厂不要再改 plant。
+
 用法：python3 classes.py classes.yaml docker-compose.classes.yml [--ci-ports]
       python3 classes.py classes.yaml --ids        # 只打印编号（空格分隔），部署脚本用
+      python3 classes.py classes.yaml --plants     # 用清单的班级：编号<TAB>镜像里的清单路径<TAB>公司名<TAB>缩写<TAB>国家<TAB>币种<TAB>时区
 """
+import os
 import re
 import sys
 
 import yaml
 
 ID = re.compile(r"^[a-z][a-z0-9]{1,19}$")
+PLANTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "plants")    # 仓库里的 factory/plants
+IMAGE_PLANTS = "/app/plants"                                                       # 镜像里（Dockerfile：COPY plants/ plants/）
+
+
+def plant_info(name):
+    """班级工厂的清单：只认 factory/plants 里有的文件名（不带 .yaml）；返回公司信息（建 ERPNext 站点用）"""
+    if not re.match(r"^[a-z0-9][a-z0-9-]{0,40}$", name):
+        raise SystemExit("清单名 {!r} 不合规：写 factory/plants 里的文件名，不带 .yaml，如 wenquest-robot".format(name))
+    path = os.path.join(PLANTS, name + ".yaml")
+    if not os.path.exists(path):
+        raise SystemExit("找不到清单 factory/plants/{}.yaml".format(name))
+    raw = yaml.safe_load(open(path, encoding="utf-8")) or {}
+    c = raw.get("company") or {}
+    for k in ("name", "abbr", "country", "currency", "timezone"):
+        if not c.get(k):
+            raise SystemExit("清单 {} 的 company.{} 没填".format(name, k))
+    if not raw.get("items") or not raw.get("products"):
+        raise SystemExit("清单 {} 没有产品（items、products）：班级工厂接不了单".format(name))
+    return {"file": "{}/{}.yaml".format(IMAGE_PLANTS, name), "company": str(c["name"]), "abbr": str(c["abbr"]),
+            "country": str(c["country"]), "currency": str(c["currency"]), "timezone": str(c["timezone"])}
 
 
 def load(path):
@@ -24,8 +49,9 @@ def load(path):
             raise SystemExit("班级编号 {!r} 不合规：小写字母开头，只用小写字母和数字，2～20 位".format(cid))
         if cid in ("demo", "www", "learn", "classic", "factory", "erp"):
             raise SystemExit("班级编号 {} 是保留名".format(cid))
+        plant = str(c.get("plant") or "").strip()
         out.append({"id": cid, "name": str(c.get("name") or cid), "teachers": [str(t) for t in c.get("teachers") or []],
-                    "course": str(c.get("course") or "")})
+                    "course": str(c.get("course") or ""), "plant": plant, "plant_info": plant_info(plant) if plant else None})
     if len({c["id"] for c in out}) != len(out):
         raise SystemExit("班级编号有重复")
     return out
@@ -40,6 +66,9 @@ def services(c, ci_ports=None):
     log = {"driver": "json-file", "options": {"max-size": "10m", "max-file": "3"}}
     base_env = {"WQ_DB": "postgresql://wq:${WQ_DB_PASSWORD:?}@db:5432/wq_c_" + cid, "WQ_MQTT_HOST": "bus-c-" + cid,
                 "WQ_MQTT_PORT": "1883", "WQ_MODE": "teach", "WQ_TZ": "${WQ_TZ:-America/New_York}"}
+    pi = c.get("plant_info")
+    if pi:                                   # 第 45 轮：按清单起的厂（枢纽、仿真车间都读它）
+        base_env["WQ_PLANT_FILE"] = pi["file"]
     app = {"image": "${FACTORY_APP_IMAGE:?FACTORY_APP_IMAGE}", "restart": "unless-stopped", "logging": log}
     s = {}
     s["bus-c-" + cid] = {"image": "eclipse-mosquitto:2.0.20", "restart": "unless-stopped", "logging": log,
@@ -90,6 +119,8 @@ def services(c, ci_ports=None):
     if ci_ports:
         s["hub-c-" + cid]["ports"] = ["{}:8100".format(ci_ports[0])]
         s["erp-frontend-c-" + cid]["ports"] = ["{}:8080".format(ci_ports[1])]
+    if pi:                                   # 桥接：ERPNext 里的公司和仓库后缀按清单
+        s["bridge-c-" + cid]["environment"].update({"WQ_ERP_ABBR": pi["abbr"], "WQ_ERP_COMPANY": pi["company"]})
     return s
 
 
@@ -107,10 +138,17 @@ if __name__ == "__main__":
     if "--ids" in sys.argv:
         print(" ".join(c["id"] for c in cls))
         sys.exit(0)
+    if "--plants" in sys.argv:
+        for c in cls:
+            if c["plant_info"]:
+                pi = c["plant_info"]
+                print("\t".join([c["id"], pi["file"], pi["company"], pi["abbr"], pi["country"], pi["currency"], pi["timezone"]]))
+        sys.exit(0)
     if "--names" in sys.argv:                 # 学习平台下达任务单时选班级工厂用（第 11 轮 2.7（5））：编号:名称,编号:名称
         print(",".join("{}:{}".format(c["id"], str(c["name"]).replace(",", "，").replace(":", "：")) for c in cls))
         sys.exit(0)
     head = "# 由 deploy/classes.py 按 classes.yaml 生成（第 10 轮），不要手改\n"
     open(sys.argv[2], "w", encoding="utf-8").write(head + yaml.safe_dump(compose(cls, "--ci-ports" in sys.argv),
                                                                          allow_unicode=True, sort_keys=False))
-    print("班级工厂 {} 个：{}".format(len(cls), "、".join("{}（{}）".format(c["id"], c["name"]) for c in cls)))
+    print("班级工厂 {} 个：{}".format(len(cls), "、".join("{}（{}{}）".format(c["id"], c["name"], "，清单 " + c["plant"] if c["plant"] else "")
+                                                         for c in cls)))
