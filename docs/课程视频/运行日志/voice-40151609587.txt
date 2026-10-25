@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:03<00:00,  3.85s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:27:32,579 INFO synthesis text Left, four heads; right, twenty; each sewn over and over.
+2026-10-25 02:27:36,243 INFO yield speech len 6.76, rtf 0.5420253827021673
+
+100%|██████████| 1/1 [00:03<00:00,  3.84s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:27:36,830 INFO synthesis text Any break stops the whole machine, so an H-head machine stops H times as often as a single head.
+2026-10-25 02:27:41,714 INFO yield speech len 9.16, rtf 0.533177394533782
+
+100%|██████████| 1/1 [00:05<00:00,  5.06s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:27:42,386 INFO synthesis text Look how much more red there is on the right.
+2026-10-25 02:27:44,459 INFO yield speech len 3.28, rtf 0.6319128885501769
+
+100%|██████████| 1/1 [00:02<00:00,  2.25s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.25s/it]
+cv2: 150/190 句，用时 33.8 分钟，预计还要 9.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:27:44,903 INFO synthesis text When an arc-welding robot loses its arc mid-seam, the controller backs the torch up a little way along the path it has already travelled, restrikes the arc and overlaps the existing weld.
+2026-10-25 02:27:53,608 INFO yield speech len 16.36, rtf 0.5321118971537845
+
+100%|██████████| 1/1 [00:08<00:00,  8.88s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:27:54,504 INFO synthesis text That's the same idea as an embroidery frame backing up and mending to the break: the back-up must cover at least the distance travelled during the detection delay, or a gap remains.
+2026-10-25 02:28:01,520 INFO yield speech len 13.68, rtf 0.5128976720118383
+
+100%|██████████| 1/1 [00:07<00:00,  7.19s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:02,253 INFO synthesis text Put several robots in series on a paced line and any one stopping makes the whole line wait, so stoppages grow with the number of stations, just like heads.
+2026-10-25 02:28:09,488 INFO yield speech len 13.76, rtf 0.5258469387542369
+
+100%|██████████| 1/1 [00:07<00:00,  7.41s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:10,281 INFO synthesis text Either make each machine more reliable or make each recovery shorter.
+2026-10-25 02:28:13,263 INFO yield speech len 5.68, rtf 0.5248442082337931
+
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:13,712 INFO synthesis text In everyday life, the closest thing to a multi-head embroidery machine is a metro train's doors.
+2026-10-25 02:28:18,513 INFO yield speech len 9.0, rtf 0.5334951877593994
+
+100%|██████████| 1/1 [00:04<00:00,  4.97s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:19,245 INFO synthesis text In everyday life, the closest thing to a multi-head embroidery machine is a metro train's doors.
+2026-10-25 02:28:23,847 INFO yield speech len 8.76, rtf 0.5254201420910283
+
+100%|██████████| 1/1 [00:04<00:00,  4.78s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:24,421 INFO synthesis text A train has many cars, and if any one door gets stuck, the whole train waits; the more cars, the more often it's delayed.
+2026-10-25 02:28:29,677 INFO yield speech len 10.16, rtf 0.5172993254473829
+
+100%|██████████| 1/1 [00:05<00:00,  5.43s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:30,288 INFO synthesis text That's exactly why any one head breaking a thread stops the whole machine.
+2026-10-25 02:28:33,339 INFO yield speech len 5.64, rtf 0.5409592432333222
+
+100%|██████████| 1/1 [00:03<00:00,  3.22s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:33,816 INFO synthesis text So the metro makes every door more reliable and clears problems faster, and so should the embroidery shop: lower the break rate and shorten each recovery.
+2026-10-25 02:28:41,151 INFO yield speech len 13.96, rtf 0.5254411424128579
+
+100%|██████████| 1/1 [00:07<00:00,  7.51s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.51s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:41,719 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-25 02:28:41,844 INFO synthesis text Back to the opening question.
+2026-10-25 02:28:43,474 INFO yield speech len 2.56, rtf 0.6364558823406696
+
+100%|██████████| 1/1 [00:01<00:00,  1.80s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:43,767 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-25 02:28:43,895 INFO synthesis text Back to the opening question.
+2026-10-25 02:28:45,223 INFO yield speech len 1.96, rtf 0.6773879333418243
+
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:45,625 INFO synthesis text At eight hundred r/min the window is forty-two.five milliseconds, and the seven-millimetre satin stitch needs twenty-four.four metres per second squared; the eight-head frame, at forty-two kilograms, can give only seventeen.nine, which is not enough.
+2026-10-25 02:28:56,913 INFO yield speech len 21.32, rtf 0.5294593145431318
+
+100%|██████████| 1/1 [00:11<00:00, 11.49s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:28:57,931 INFO synthesis text At eight hundred r/min the window is forty-two.five milliseconds, and the seven-millimetre satin stitch needs twenty-four.four metres per second squared; the eight-head frame, at forty-two kilograms, can give only seventeen.nine, which is not enough.
+2026-10-25 02:29:08,153 INFO yield speech len 19.36, rtf 0.5279499390893732
+
+100%|██████████| 1/1 [00:10<00:00, 10.41s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:29:09,106 INFO synthesis text At eight hundred r/min the window is forty-two.five milliseconds, and the seven-millimetre satin stitch needs twenty-four.four metres per second squared; the eight-head frame, at forty-two kilograms, can give only seventeen.nine, which is not enough.
+2026-10-25 02:29:19,593 INFO yield speech len 20.16, rtf 0.5202177261549329
+
+100%|██████████| 1/1 [00:10<00:00, 10.67s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.67s/it]
+cv2: 160/190 句，用时 35.4 分钟，预计还要 6.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:29:20,522 INFO synthesis text The limit is about six hundred and eighty-five r/min, so the controller should slow down automatically there.
+2026-10-25 02:29:25,514 INFO yield speech len 9.4, rtf 0.5310052252830343
+
+100%|██████████| 1/1 [00:05<00:00,  5.16s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:29:26,014 INFO synthesis text The limit is about six hundred and eighty-five r/min, so the controller should slow down automatically there.
+2026-10-25 02:29:31,465 INFO yield speech len 10.4, rtf 0.5241306699239291
+
+100%|██████████| 1/1 [00:05<00:00,  5.63s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:29:31,997 INFO synthesis text To reach eight hundred and fifty the drive force would have to rise to about one thousand, two hundred and five newtons.
+2026-10-25 02:29:36,910 INFO yield speech len 9.24, rtf 0.53170116948875
+
+100%|██████████| 1/1 [00:05<00:00,  5.09s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:29:37,465 INFO synthesis text Efficiency: eight expected breaks, each costing forty seconds of handling plus about one.six of back-up and mending, about three hundred and thirty-three seconds in all; six colour changes, thirty-six seconds; one thousand, five hundred seconds of sewing: about eighty percent, roughly fifteen.four pieces an hour.
+2026-10-25 02:29:48,836 INFO yield speech len 20.6, rtf 0.5520184526165712
+
+100%|██████████| 1/1 [00:11<00:00, 11.56s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:29:49,805 INFO synthesis text Efficiency: eight expected breaks, each costing forty seconds of handling plus about one.six of back-up and mending, about three hundred and thirty-three seconds in all; six colour changes, thirty-six seconds; one thousand, five hundred seconds of sewing: about eighty percent, roughly fifteen.four pieces an hour.
+2026-10-25 02:30:03,029 INFO yield speech len 23.84, rtf 0.5547056362132898
+
+100%|██████████| 1/1 [00:13<00:00, 13.42s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:30:04,260 INFO synthesis text Efficiency: eight expected breaks, each costing forty seconds of handling plus about one.six of back-up and mending, about three hundred and thirty-three seconds in all; six colour changes, thirty-six seconds; one thousand, five hundred seconds of sewing: about eighty percent, roughly fifteen.four pieces an hour.
+2026-10-25 02:30:17,451 INFO yield speech len 23.8, rtf 0.5542450391945719
+
+100%|██████████| 1/1 [00:13<00:00, 13.39s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:30:18,448 INFO synthesis text Now Virtual lab sixteen-one, the multi-head embroidery machine. On the WenQuest platform you can do it yourself. The criteria on the right and the tasks below are blurred here, so you can read them on your own. Page one is frame and speed: on top, the frame's motion through one stitch; below, the speed limit against stitch length.
+2026-10-25 02:30:30,918 INFO yield speech len 23.76, rtf 0.524840210423325
+
+100%|██████████| 1/1 [00:12<00:00, 12.66s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:30:32,169 INFO synthesis text Now Virtual lab sixteen-one, the multi-head embroidery machine. On the WenQuest platform you can do it yourself. The criteria on the right and the tasks below are blurred here, so you can read them on your own. Page one is frame and speed: on top, the frame's motion through one stitch; below, the speed limit against stitch length.
+2026-10-25 02:30:43,177 INFO yield speech len 20.36, rtf 0.5406541182624802
+
+100%|██████████| 1/1 [00:11<00:00, 11.20s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:30:44,645 INFO synthesis text Now Virtual lab sixteen-one, the multi-head embroidery machine. On the WenQuest platform you can do it yourself. The criteria on the right and the tasks below are blurred here, so you can read them on your own. Page one is frame and speed: on top, the frame's motion through one stitch; below, the speed limit against stitch length.
+2026-10-25 02:30:57,457 INFO yield speech len 23.48, rtf 0.5456410741887263
+
+100%|██████████| 1/1 [00:13<00:00, 13.00s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.00s/it]
+！听着不清（0.715，试了 3 次）：Now Virtual lab 16-1, the multi-head embroidery machine. On  → Virtual Lab 16.1. The Multi-Head Embroidery Machine. On the 
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:30:58,808 INFO synthesis text First, pull the stitch length from three up to seven millimetres. In the top chart the dashed acceleration climbs and breaks through the red line, and in the lower chart the red dot moves above the curve.
+2026-10-25 02:31:05,988 INFO yield speech len 13.68, rtf 0.5248410137076127
+
+100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:31:06,921 INFO synthesis text Task one: at seven millimetres, raise the heads from eight. The curve keeps falling. Work out the limit for fifteen heads with the formula, enter it below to check, then confirm with the sliders.
+2026-10-25 02:31:15,601 INFO yield speech len 15.88, rtf 0.5465533481136677
+
+100%|██████████| 1/1 [00:08<00:00,  8.86s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:31:16,500 INFO synthesis text Task one: at seven millimetres, raise the heads from eight. The curve keeps falling. Work out the limit for fifteen heads with the formula, enter it below to check, then confirm with the sliders.
+2026-10-25 02:31:24,459 INFO yield speech len 14.72, rtf 0.5406539887189865
+
+100%|██████████| 1/1 [00:08<00:00,  8.14s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:31:25,327 INFO synthesis text Task two: back to eight heads, set the speed to eight hundred and fifty and raise the drive force. Check that the force from the answer slide is just enough for every criterion to pass, and record the minimum.
+2026-10-25 02:31:34,244 INFO yield speech len 16.64, rtf 0.5358586231103311
+
+100%|██████████| 1/1 [00:09<00:00,  9.11s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:31:35,118 INFO synthesis text Now push the stitch length past twelve.one millimetres. In the lower chart the dot enters the shaded Over DST limit zone. How such a stitch must be handled goes in your report.
+2026-10-25 02:31:42,181 INFO yield speech len 13.36, rtf 0.5286459972758494
+
+100%|██████████| 1/1 [00:07<00:00,  7.24s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:31:43,035 INFO synthesis text Now push the stitch length past twelve.one millimetres. In the lower chart the dot enters the shaded Over DST limit zone. How such a stitch must be handled goes in your report.
+2026-10-25 02:31:49,932 INFO yield speech len 12.88, rtf 0.5354792434976707
+
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:31:50,772 INFO synthesis text Page two is thread breaks and repair. On top is the timeline of one design, green for sewing, red for thread-break stops, purple for colour changes; below, efficiency against head count.
+2026-10-25 02:31:59,930 INFO yield speech len 17.0, rtf 0.5387560900519875
+
+100%|██████████| 1/1 [00:09<00:00,  9.34s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:00,827 INFO synthesis text Press Run again, and the breaks land somewhere different each time. Then raise the heads from eight to twenty, and the dot slides down the efficiency curve.
+2026-10-25 02:32:06,905 INFO yield speech len 11.6, rtf 0.5240234013261467
+
+100%|██████████| 1/1 [00:06<00:00,  6.26s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.26s/it]
+cv2: 170/190 句，用时 38.2 分钟，预计还要 4.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:07,656 INFO synthesis text Task three: set the detection delay to six stitches, then raise the back-up count step by step. How many leave no missed stitches without backing up too far? That's yours to find.
+2026-10-25 02:32:15,166 INFO yield speech len 13.88, rtf 0.5411142059293191
+
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:16,028 INFO synthesis text Task four: on twenty heads, lower the break rate bit by bit and watch efficiency rise. How low must it go to reach eighty percent? Then try shortening the handling time instead, and compare which pays off better. The guide and report template are on the platform.
+2026-10-25 02:32:26,488 INFO yield speech len 19.32, rtf 0.5414136695072024
+
+100%|██████████| 1/1 [00:10<00:00, 10.65s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:27,581 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-25 02:32:30,560 INFO yield speech len 5.16, rtf 0.577353738075079
+
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:31,106 INFO synthesis text You can open today's interactive slides and the embroidery-machine lab, and work them yourself.
+2026-10-25 02:32:35,431 INFO yield speech len 7.72, rtf 0.5602917214131726
+
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:35,991 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-25 02:32:39,817 INFO yield speech len 6.96, rtf 0.5496299814903873
+
+100%|██████████| 1/1 [00:04<00:00,  4.00s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:40,357 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-25 02:32:43,619 INFO yield speech len 5.84, rtf 0.5585011554090944
+
+100%|██████████| 1/1 [00:03<00:00,  3.44s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:44,137 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-25 02:32:50,519 INFO yield speech len 11.96, rtf 0.5336238389031145
+
+100%|██████████| 1/1 [00:06<00:00,  6.56s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:32:51,101 INFO synthesis text Your assignment has four questions. One: a twelve-head machine with one thousand newtons of drive. Find the speed limits for three, five and seven millimetre stitches, and the minimum drive force that lets the seven millimetre satin run at eight hundred r/min too.
+2026-10-25 02:33:00,865 INFO yield speech len 18.08, rtf 0.5400294619323933
+
+100%|██████████| 1/1 [00:09<00:00,  9.95s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:33:01,918 INFO synthesis text Your assignment has four questions. One: a twelve-head machine with one thousand newtons of drive. Find the speed limits for three, five and seven millimetre stitches, and the minimum drive force that lets the seven millimetre satin run at eight hundred r/min too.
+2026-10-25 02:33:12,852 INFO yield speech len 20.2, rtf 0.5412879674741538
+
+100%|██████████| 1/1 [00:11<00:00, 11.12s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:33:13,951 INFO synthesis text Your assignment has four questions. One: a twelve-head machine with one thousand newtons of drive. Find the speed limits for three, five and seven millimetre stitches, and the minimum drive force that lets the seven millimetre satin run at eight hundred r/min too.
+2026-10-25 02:33:24,875 INFO yield speech len 19.72, rtf 0.5539626427161041
+
+100%|██████████| 1/1 [00:11<00:00, 11.12s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.12s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:33:26,039 INFO synthesis text Two is about design files, which this video skipped; it's in the slides and the textbook. A DST record allows at most twelve.one millimetres per axis. How many records for a forty-five millimetre jump along X, and for forty millimetres at forty-five degrees? And how does the machine decide when to trim?
+2026-10-25 02:33:40,821 INFO yield speech len 26.4, rtf 0.5599604592178807
+
+100%|██████████| 1/1 [00:14<00:00, 14.99s/it]
+100%|██████████| 1/1 [00:14<00:00, 14.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:33:42,053 INFO synthesis text Two is about design files, which this video skipped; it's in the slides and the textbook. A DST record allows at most twelve.one millimetres per axis. How many records for a forty-five millimetre jump along X, and for forty millimetres at forty-five degrees? And how does the machine decide when to trim?
+2026-10-25 02:33:56,293 INFO yield speech len 26.08, rtf 0.5459889860972306
+
+100%|██████████| 1/1 [00:14<00:00, 14.44s/it]
+100%|██████████| 1/1 [00:14<00:00, 14.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:33:57,481 INFO synthesis text Two is about design files, which this video skipped; it's in the slides and the textbook. A DST record allows at most twelve.one millimetres per axis. How many records for a forty-five millimetre jump along X, and for forty millimetres at forty-five degrees? And how does the machine decide when to trim?
+2026-10-25 02:34:08,575 INFO yield speech len 20.04, rtf 0.5535805534697816
+
+100%|██████████| 1/1 [00:11<00:00, 11.28s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:09,765 INFO synthesis text Three: a twelve-head machine sews fifteen zero stitches. Estimate efficiency and pieces per hour, then compare cutting handling to twenty seconds with halving the break rate. Which is more worth the money? Four is a discussion: what does cutting the detection delay from six stitches to two bring, and how could a detector find breaks faster?
+2026-10-25 02:34:22,563 INFO yield speech len 24.04, rtf 0.532332811498404
+
+100%|██████████| 1/1 [00:13<00:00, 13.04s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:23,846 INFO synthesis text Submit the report and the lab screenshots on the WenQuest platform.
+2026-10-25 02:34:26,909 INFO yield speech len 5.52, rtf 0.5548078080882197
+
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:27,559 INFO synthesis text Submit the report and the lab screenshots on the WenQuest platform.
+2026-10-25 02:34:30,676 INFO yield speech len 5.68, rtf 0.5487088166492087
+
+100%|██████████| 1/1 [00:03<00:00,  3.31s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:31,171 INFO synthesis text Submit the report and the lab screenshots on the WenQuest platform.
+2026-10-25 02:34:34,524 INFO yield speech len 6.0, rtf 0.5588070154190063
+
+100%|██████████| 1/1 [00:03<00:00,  3.54s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.54s/it]
+cv2: 180/190 句，用时 40.6 分钟，预计还要 2.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:35,058 INFO synthesis text There's also a nine-question quiz. For example, with a two hundred and four-degree window, the shaft at nine hundred r/min and a four millimetre cycloidal move, what is the peak acceleration?
+2026-10-25 02:34:43,399 INFO yield speech len 15.52, rtf 0.5374756209629098
+
+100%|██████████| 1/1 [00:08<00:00,  8.53s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:44,222 INFO synthesis text There's also a nine-question quiz. For example, with a two hundred and four-degree window, the shaft at nine hundred r/min and a four millimetre cycloidal move, what is the peak acceleration?
+2026-10-25 02:34:53,564 INFO yield speech len 17.08, rtf 0.5469721988436769
+
+100%|██████████| 1/1 [00:09<00:00,  9.53s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:34:54,335 INFO synthesis text There's also a nine-question quiz. For example, with a two hundred and four-degree window, the shaft at nine hundred r/min and a four millimetre cycloidal move, what is the peak acceleration?
+2026-10-25 02:35:03,570 INFO yield speech len 17.52, rtf 0.5270896845212266
+
+100%|██████████| 1/1 [00:09<00:00,  9.42s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:04,346 INFO synthesis text Or, if the back-up count is smaller than the detection delay, what happens? Another asks whether a DST file stores colour values.
+2026-10-25 02:35:10,348 INFO yield speech len 11.28, rtf 0.5320593609032056
+
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:11,027 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-25 02:35:14,782 INFO yield speech len 6.52, rtf 0.5758387545135124
+
+100%|██████████| 1/1 [00:03<00:00,  3.93s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:15,126 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-25 02:35:15,253 INFO synthesis text Three things to remember.
+2026-10-25 02:35:16,469 INFO yield speech len 1.36, rtf 0.8943782133214613
+
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:16,859 INFO synthesis text One: a multi-head machine shares its shafts and frame, and each head stops sewing on its own through the needle-bar jump, trimmer and break detection on its head board.
+2026-10-25 02:35:24,627 INFO yield speech len 14.96, rtf 0.5192377509917805
+
+100%|██████████| 1/1 [00:07<00:00,  7.95s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:25,513 INFO synthesis text Two: the frame must finish each move in about a two hundred and four-degree window, available acceleration falls as heads are added, and the speed limit goes with the root of acceleration over stitch length.
+2026-10-25 02:35:34,271 INFO yield speech len 16.72, rtf 0.5237804502961738
+
+100%|██████████| 1/1 [00:08<00:00,  8.95s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:35,152 INFO synthesis text Three: after a break, back up at least the detection delay; any one break stops every head, so more heads means lower efficiency.
+2026-10-25 02:35:41,587 INFO yield speech len 12.0, rtf 0.5362040996551514
+
+100%|██████████| 1/1 [00:06<00:00,  6.61s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.61s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:42,303 INFO synthesis text The assignment, quiz and lab report are on WenQuest.
+2026-10-25 02:35:45,366 INFO yield speech len 5.28, rtf 0.5802444436333396
+
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:45,885 INFO synthesis text The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-10-25 02:35:54,022 INFO yield speech len 14.84, rtf 0.5483716645973391
+
+100%|██████████| 1/1 [00:08<00:00,  8.32s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-25 02:35:54,907 INFO synthesis text Next time it's computerised flat knitting machines, the machines that knit sweaters. The carriage knits a row on each pass. How long does a front panel take, and is a faster carriage worth it? See you then.
+2026-10-25 02:36:03,306 INFO yield speech len 15.92, rtf 0.5276000679437839
+
+100%|██████████| 1/1 [00:08<00:00,  8.58s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.58s/it]
+cv2: 190/190 句，用时 42.1 分钟，预计还要 0.0 分钟
+cv2: 190 句完成
+cv2: 听写核对 190 句，平均 0.851，不清 56 句
+2026-10-25 02:36:04,110 DEBUG Attempting to acquire lock 140009652703184 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-25 02:36:04,110 DEBUG Lock 140009652703184 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-25 02:36:04,110 DEBUG Attempting to release lock 140009652703184 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-25 02:36:04,111 DEBUG Lock 140009652703184 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-25 02:36:04,113 DEBUG Attempting to acquire lock 140009652710048 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-25 02:36:04,113 DEBUG Lock 140009652710048 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-25 02:36:04,113 DEBUG Attempting to release lock 140009652710048 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-25 02:36:04,113 DEBUG Lock 140009652710048 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 55 分钟
