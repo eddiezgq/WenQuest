@@ -82,32 +82,32 @@ slides:
     h: 600
     visual:
       svg: |
-        <svg viewBox="0 0 1700 600">
+        <svg viewBox="0 0 1700 600"><style>html:not(.en-only) .eo{display:none}</style>
           <rect x="40" y="20" width="1620" height="44" rx="10" fill="#22324d"/>
-          <text x="60" y="51" font-size="24" fill="#8fa3ba">横梁</text>
+          <text x="60" y="51" font-size="24" fill="#8fa3ba" class="zh">横梁</text><text x="60" y="51" font-size="24" fill="#8fa3ba" class="eo">beam</text>
           <path d="M40 92 L1660 92" stroke="#4c8dff" stroke-width="8"/>
-          <text x="60" y="134" font-size="26" font-weight="700" fill="#9cc0ff">上轴</text>
+          <text x="60" y="134" font-size="26" font-weight="700" fill="#9cc0ff" class="zh">上轴</text><text x="60" y="128" font-size="24" font-weight="700" fill="#9cc0ff" class="eo">main<tspan x="60" dy="26">shaft</tspan></text>
           <defs><g id="c16hd">
             <rect x="0" y="70" width="190" height="190" rx="14" fill="#111d31" stroke="#8fa3ba" stroke-width="3"/>
             <path d="M30 110 L30 230 M58 110 L58 230 M86 110 L86 230 M142 110 L142 230 M170 110 L170 230" stroke="#4b5f7d" stroke-width="7"/>
             <path d="M114 100 L114 250" stroke="#f2b705" stroke-width="9"/>
           </g></defs>
           <use href="#c16hd" x="150"/><use href="#c16hd" x="410"/><use href="#c16hd" x="670"/><use href="#c16hd" x="930"/><use href="#c16hd" x="1190"/><use href="#c16hd" x="1450"/>
-          <text x="245" y="296" font-size="22" fill="#f2b705" text-anchor="middle">只带对准的那根针杆</text>
+          <text x="245" y="296" font-size="22" fill="#f2b705" text-anchor="middle" class="zh">只带对准的那根针杆</text><text x="245" y="296" font-size="22" fill="#f2b705" text-anchor="middle" class="eo">drives only the aligned bar</text>
           <rect x="60" y="320" width="1580" height="84" rx="16" fill="rgba(46,196,182,.18)" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="850" y="372" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle">绷架：跨过全部机头，各头下面各绷一片布</text>
+          <text x="850" y="372" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">绷架：跨过全部机头，各头下面各绷一片布</text><text x="850" y="372" font-size="30" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">Frame: spans every head, a piece of fabric under each</text>
           <g fill="#16243b" stroke="#6f84a3" stroke-width="3"><circle cx="245" cy="455" r="24"/><circle cx="505" cy="455" r="24"/><circle cx="765" cy="455" r="24"/><circle cx="1025" cy="455" r="24"/><circle cx="1285" cy="455" r="24"/><circle cx="1545" cy="455" r="24"/></g>
           <path d="M40 492 L1660 492" stroke="#ff7a45" stroke-width="8"/>
-          <text x="1650" y="530" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="end">下轴：带各头旋梭</text>
+          <text x="1650" y="530" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="end" class="zh">下轴：带各头旋梭</text><text x="1650" y="530" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="end" class="eo">hook shaft: drives every hook</text>
           <rect x="40" y="520" width="220" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-          <text x="150" y="565" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle">主轴伺服</text>
+          <text x="150" y="565" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="zh">主轴伺服</text><text x="150" y="565" font-size="28" font-weight="700" fill="#9cc0ff" text-anchor="middle" class="eo">main servo</text>
           <rect x="560" y="520" width="300" height="70" rx="14" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="710" y="565" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle">X、Y 伺服 → 绷架</text>
+          <text x="710" y="565" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">X、Y 伺服 → 绷架</text><text x="710" y="565" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">X, Y servos → frame</text>
         </svg>
     caption: ["每头 9–15 根针杆；绷架由 X、Y 伺服带着走同一个图案", "9–15 needle bars per head; X–Y servos carry the frame through one design"]
     notes:
       - "看结构。一根横梁上排着一列机头，一根上轴贯穿所有机头，由主伺服驱动；台面下一根下轴带各头的旋梭。每个机头的针杆箱里有 9 到 15 根针杆，上轴只通过针杆驱动器带动对准它的那一根，图上黄色那根。绷架是一个跨过所有机头的大框，各头下面各绷一片布，由 X、Y 伺服带着走同一个图案。轴是共用的，可每个头又必须能单独不缝。"
-      - "Here's the structure. A row of heads hangs from one beam, and one upper shaft, driven by the main servo, runs through all of them; under the table one lower shaft drives every head's hook. Each head's needle-bar case has 9 to 15 needle bars, but the shaft drives only the one lined up with the driver, the yellow one in the picture. The frame is one big frame across all heads, with a piece of fabric under each, carried through the same design by the X and Y servos. The shafts are shared, yet each head must be able to stop sewing on its own."
+      - "Here's the structure. A row of heads hangs from one beam, and one main shaft, driven by the main servo, runs through all of them; under the table one hook shaft drives every head's hook. Each head's needle-bar case has 9 to 15 needle bars, but the shaft drives only the one lined up with the driver, the yellow one in the picture. The frame is one big frame across all heads, with a piece of fabric under each, carried through the same design by the X and Y servos. The shafts are shared, yet each head must be able to stop sewing on its own."
 
   - layout: points
     title: ["共用的轴，每个头却要能单独“不缝”", "Shared shafts, yet each head must be able to stop"]
@@ -132,7 +132,7 @@ slides:
     foot: ["a ∝ 针长 × 转速²：转速提一成，加速度要多 {{ch16.sq:.0f}}%", "a ∝ stitch × speed²: 10% more speed needs {{ch16.sq:.0f}}% more acceleration"]
     notes:
       - "和花样机一样，绷架只能在针离布的窗口里走完一针，借用第 15 讲的窗口，约 204°。800 转时一转 75 毫秒，窗口只有 {{ch16.T800:.1f}} 毫秒。绷架按摆线规律走完一针 s，峰值加速度是 2π 乘 s 除以 T 平方。800 转时，3 毫米的一针要 {{ch16.a3:.1f}} 米每秒平方，7 毫米要 {{ch16.a7:.1f}}。加速度和针长成正比，和转速平方成正比，转速提一成，加速度要多 {{ch16.sq:.0f}}%。"
-      - "As on a pattern sewer, the frame may move only in the window when the needle is out, which we borrow from Lecture 15: about 204 degrees. At 800 r/min a turn takes 75 milliseconds, so the window is only {{ch16.T800:.1f}}. Moving s along a cycloid, the peak acceleration is 2π s over T squared. At 800 r/min a 3-millimetre stitch needs {{ch16.a3:.1f}} metres per second squared and a 7-millimetre stitch {{ch16.a7:.1f}}. Acceleration goes with stitch length and with speed squared, so 10 percent more speed needs {{ch16.sq:.0f}} percent more acceleration."
+      - "As on a pattern sewer, the frame may move only in the window when the needle is out, which we borrow from Lecture 15: about 204 degrees. At 800 r/min a turn takes 75 milliseconds, so the window is only {{ch16.T800:.1f}} milliseconds. Moving s along a cycloid, the peak acceleration is 2π s over T squared. At 800 r/min a 3-millimetre stitch needs {{ch16.a3:.1f}} metres per second squared and a 7-millimetre stitch {{ch16.a7:.1f}}. Acceleration goes with stitch length and with speed squared, so 10 percent more speed needs {{ch16.sq:.0f}} percent more acceleration."
 
   - layout: figure
     title: ["7 mm 一针：转速 600 → 900 r/min", "A 7 mm stitch at 600 → 900 r/min"]
@@ -151,7 +151,7 @@ slides:
     foot: ["Y 轴折算质量 10 + 4 × 头数 kg，驱动力 800 N，摩擦 50 N（示意值）：头数翻倍，加速度差不多减半", "Y mass 10 + 4 × heads kg, 800 N drive, 50 N friction (illustrative): double the heads, roughly half the acceleration"]
     notes:
       - "需要的有了，再看绷架能给多少。可用加速度等于驱动力减摩擦，再除以运动质量。多头机的绷架跨过所有机头，头越多越长越重。算例取较重的 Y 轴，折算质量按 10 加 4 乘头数公斤，驱动力 800 牛，摩擦 50 牛，都是示意值。8 头机约 {{ch16.m8}} 公斤，可用 {{ch16.am8:.1f}}；15 头机约 {{ch16.m15}} 公斤，只剩 {{ch16.am15:.1f}}。同样的电机和传动，头数翻倍，加速度差不多减半。"
-      - "Now what the frame can deliver. Available acceleration is drive force minus friction, divided by moving mass. A multi-head frame spans every head, so more heads means a longer, heavier frame. The example uses the heavier Y axis, with mass 10 plus 4 per head in kilograms, 800 newtons of drive and 50 of friction, all illustrative. Eight heads weigh about {{ch16.m8}} kilograms and get {{ch16.am8:.1f}}; fifteen heads, about {{ch16.m15}} kilograms, get only {{ch16.am15:.1f}}. Same motors and drive: double the heads and you roughly halve the acceleration."
+      - "Now what the frame can deliver. Available acceleration is drive force minus friction, divided by moving mass. A multi-head frame spans every head, so more heads means a longer, heavier frame. The example uses the heavier Y axis, with mass 10 plus 4 per head in kilograms, 800 newtons of drive and 50 of friction, all illustrative. With eight heads the frame is about {{ch16.m8}} kilograms and gets {{ch16.am8:.1f}} metres per second squared; with fifteen, about {{ch16.m15}} kilograms and only {{ch16.am15:.1f}}. Same motors and drive: double the heads and you roughly halve the acceleration."
 
   - layout: figure
     title: ["转速上限：针越长、头越多，转得越慢", "Speed limit: longer stitches, more heads, slower"]
@@ -205,13 +205,13 @@ slides:
       - ["填充：平行短针交错，铺大面积", "Fill: staggered short rows for large areas"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
-          <text x="40" y="60" font-size="30" font-weight="700" fill="#f3f6fa">平针 <tspan class="en" font-size="22" fill="#8fa3ba">run</tspan></text>
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
+          <text x="40" y="60" font-size="30" font-weight="700" fill="#f3f6fa" class="zh">平针 <tspan class="en" font-size="22" fill="#8fa3ba">run</tspan></text><text x="40" y="60" font-size="30" font-weight="700" fill="#f3f6fa" class="eo">Run stitch</text>
           <path d="M60 110 C 250 60, 450 160, 840 100" fill="none" stroke="#4c8dff" stroke-width="7" stroke-dasharray="34 10"/>
-          <text x="40" y="230" font-size="30" font-weight="700" fill="#f3f6fa">缎纹 <tspan class="en" font-size="22" fill="#8fa3ba">satin</tspan></text>
+          <text x="40" y="230" font-size="30" font-weight="700" fill="#f3f6fa" class="zh">缎纹 <tspan class="en" font-size="22" fill="#8fa3ba">satin</tspan></text><text x="40" y="230" font-size="30" font-weight="700" fill="#f3f6fa" class="eo">Satin</text>
           <polyline points="60,260 75,350 90,260 105,350 120,260 135,350 150,260 165,350 180,260 195,350 210,260 225,350 240,260 255,350 270,260 285,350 300,260 315,350 330,260 345,350 360,260 375,350 390,260 405,350 420,260 435,350 450,260 465,350 480,260 495,350 510,260 525,350 540,260 555,350 570,260 585,350 600,260 615,350 630,260 645,350 660,260 675,350 690,260 705,350 720,260 735,350 750,260 765,350 780,260 795,350 810,260 825,350 840,260" fill="none" stroke="#f2b705" stroke-width="5"/>
-          <path d="M870 260 L870 350" stroke="#ff7a45" stroke-width="4"/><text x="860" y="390" font-size="22" fill="#ff9c75" text-anchor="end">针长 = 柱宽</text>
-          <text x="40" y="450" font-size="30" font-weight="700" fill="#f3f6fa">填充 <tspan class="en" font-size="22" fill="#8fa3ba">fill</tspan></text>
+          <path d="M870 260 L870 350" stroke="#ff7a45" stroke-width="4"/><text x="860" y="390" font-size="22" fill="#ff9c75" text-anchor="end" class="zh">针长 = 柱宽</text><text x="860" y="390" font-size="22" fill="#ff9c75" text-anchor="end" class="eo">stitch = column width</text>
+          <text x="40" y="450" font-size="30" font-weight="700" fill="#f3f6fa" class="zh">填充 <tspan class="en" font-size="22" fill="#8fa3ba">fill</tspan></text><text x="40" y="450" font-size="30" font-weight="700" fill="#f3f6fa" class="eo">Fill</text>
           <g stroke="#2ec4b6" stroke-width="6" stroke-dasharray="44 8">
             <path d="M60 480 L840 480"/><path d="M78 506 L840 506"/><path d="M96 532 L840 532"/><path d="M60 558 L840 558"/><path d="M78 584 L840 584"/><path d="M96 610 L840 610"/>
           </g>
@@ -228,20 +228,20 @@ slides:
       - ["只有换色命令，没有颜色值和剪线命令", "Colour-change commands, but no colours and no trim"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <g font-weight="700" text-anchor="middle">
             <rect x="60" y="60" width="240" height="120" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="180" y="132" font-size="34" fill="#9cc0ff">Δx</text>
             <rect x="320" y="60" width="240" height="120" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="440" y="132" font-size="34" fill="#9cc0ff">Δy</text>
-            <rect x="580" y="60" width="260" height="120" rx="14" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="710" y="122" font-size="30" fill="#f2b705">标志</text>
+            <rect x="580" y="60" width="260" height="120" rx="14" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="710" y="122" font-size="30" fill="#f2b705" class="zh">标志</text><text x="710" y="122" font-size="30" fill="#f2b705" class="eo">flags</text>
           </g>
-          <text x="710" y="160" font-size="22" fill="#8fa3ba" text-anchor="middle">针 · 跳步 · 换色</text>
-          <text x="450" y="230" font-size="26" fill="#8fa3ba" text-anchor="middle">一条记录 = 3 个字节（编码交织在三个字节里）</text>
+          <text x="710" y="160" font-size="22" fill="#8fa3ba" text-anchor="middle" class="zh">针 · 跳步 · 换色</text><text x="710" y="160" font-size="22" fill="#8fa3ba" text-anchor="middle" class="eo">stitch · jump · colour</text>
+          <text x="450" y="230" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">一条记录 = 3 个字节（编码交织在三个字节里）</text><text x="450" y="230" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">one record = 3 bytes (bits interleaved across them)</text>
           <path d="M80 400 L800 400" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="10 8"/>
           <g stroke-width="8" stroke-linecap="round"><path d="M80 400 L370 400" stroke="#2ec4b6"/><path d="M370 400 L660 400" stroke="#4c8dff"/><path d="M660 400 L800 400" stroke="#ff7a45"/></g>
           <g fill="#f3f6fa"><circle cx="80" cy="400" r="12"/><circle cx="370" cy="400" r="12"/><circle cx="660" cy="400" r="12"/><circle cx="800" cy="400" r="12"/></g>
           <g font-size="26" fill="#d3deea" text-anchor="middle" class="en"><text x="225" y="380" class="en">≤ 12.1 mm</text><text x="515" y="380" class="en">≤ 12.1 mm</text><text x="730" y="380" class="en">rest</text></g>
-          <text x="440" y="480" font-size="32" font-weight="700" fill="#f2b705" text-anchor="middle">30 mm 的移动 → 拆成 {{ch16.rec30}} 条记录</text>
-          <text x="440" y="560" font-size="26" fill="#8fa3ba" text-anchor="middle">连续几条跳步，机器自动剪线</text>
+          <text x="440" y="480" font-size="32" font-weight="700" fill="#f2b705" text-anchor="middle" class="zh">30 mm 的移动 → 拆成 {{ch16.rec30}} 条记录</text><text x="440" y="480" font-size="32" font-weight="700" fill="#f2b705" text-anchor="middle" class="eo">a 30 mm move → {{ch16.rec30}} records</text>
+          <text x="440" y="560" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">连续几条跳步，机器自动剪线</text><text x="440" y="560" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">several jumps in a row → automatic trim</text>
         </svg>
     notes:
       - "制版软件最后输出给机器的是一串针迹命令。行业里通用的一种格式是 DST：512 字节的文件头之后，每条记录 3 个字节，记一针相对上一针的位移 Δx、Δy，单位 0.1 毫米，每个方向最大正负 121，就是 12.1 毫米。文件里没有颜色值，哪根针杆用哪种颜色在机器上设定；也没有单独的剪线命令，常见做法是遇到连续几条跳步就自动剪线。30 毫米的移动要拆成 {{ch16.rec30}} 条。"
@@ -266,27 +266,27 @@ slides:
     h: 560
     visual:
       svg: |
-        <svg viewBox="0 0 1700 560">
+        <svg viewBox="0 0 1700 560"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M100 200 L900 200" stroke="#f3f6fa" stroke-width="5"/>
           <path d="M900 200 L1600 200" stroke="#4b5f7d" stroke-width="4" stroke-dasharray="10 10"/>
           <rect x="900" y="150" width="250" height="100" rx="12" fill="rgba(255,122,69,.22)"/>
           <g fill="#f3f6fa"><circle cx="100" cy="200" r="11"/><circle cx="150" cy="200" r="11"/><circle cx="200" cy="200" r="11"/><circle cx="250" cy="200" r="11"/><circle cx="300" cy="200" r="11"/><circle cx="350" cy="200" r="11"/><circle cx="400" cy="200" r="11"/><circle cx="450" cy="200" r="11"/><circle cx="500" cy="200" r="11"/><circle cx="550" cy="200" r="11"/><circle cx="600" cy="200" r="11"/><circle cx="650" cy="200" r="11"/><circle cx="700" cy="200" r="11"/><circle cx="750" cy="200" r="11"/><circle cx="800" cy="200" r="11"/><circle cx="850" cy="200" r="11"/></g>
           <g fill="none" stroke="#ff7a45" stroke-width="4"><circle cx="900" cy="200" r="11"/><circle cx="950" cy="200" r="11"/><circle cx="1000" cy="200" r="11"/><circle cx="1050" cy="200" r="11"/><circle cx="1100" cy="200" r="11"/><circle cx="1150" cy="200" r="11"/></g>
-          <text x="1025" y="125" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle">漏缝 d 针</text>
-          <path d="M900 260 L900 300" stroke="#ff7a45" stroke-width="5"/><text x="900" y="335" font-size="26" fill="#ff9c75" text-anchor="middle">实际断线</text>
-          <path d="M1150 260 L1150 300" stroke="#4c8dff" stroke-width="5"/><text x="1150" y="335" font-size="26" fill="#9cc0ff" text-anchor="middle">停车处</text>
+          <text x="1025" y="125" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle" class="zh">漏缝 d 针</text><text x="1025" y="125" font-size="30" font-weight="700" fill="#ff9c75" text-anchor="middle" class="eo">d stitches missed</text>
+          <path d="M900 260 L900 300" stroke="#ff7a45" stroke-width="5"/><text x="900" y="335" font-size="26" fill="#ff9c75" text-anchor="middle" class="zh">实际断线</text><text x="900" y="335" font-size="26" fill="#ff9c75" text-anchor="middle" class="eo">actual break</text>
+          <path d="M1150 260 L1150 300" stroke="#4c8dff" stroke-width="5"/><text x="1150" y="335" font-size="26" fill="#9cc0ff" text-anchor="middle" class="zh">停车处</text><text x="1150" y="335" font-size="26" fill="#9cc0ff" text-anchor="middle" class="eo">stop point</text>
           <path d="M1150 400 L780 400" stroke="#2ec4b6" stroke-width="7"/><path d="M770 400 l24 -16 l0 32z" fill="#2ec4b6"/>
-          <text x="965" y="385" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle">① 回退 b 针（多退两三针）</text>
+          <text x="965" y="385" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">① 回退 b 针（多退两三针）</text><text x="965" y="385" font-size="28" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">① back up b stitches (2–3 extra)</text>
           <path d="M780 480 L1140 480" stroke="#f2b705" stroke-width="7"/><path d="M1150 480 l-24 -16 l0 32z" fill="#f2b705"/>
-          <text x="965" y="535" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle">② 断线头单独补绣回停车处</text>
-          <text x="120" y="420" font-size="28" fill="#d3deea">b &lt; d：留下缺口，次品</text>
-          <text x="120" y="480" font-size="28" fill="#d3deea">b 太大：费时，重叠处变厚</text>
-          <text x="1600" y="160" font-size="24" fill="#8fa3ba" text-anchor="end">还没绣</text>
+          <text x="965" y="535" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="zh">② 断线头单独补绣回停车处</text><text x="965" y="535" font-size="28" font-weight="700" fill="#f2b705" text-anchor="middle" class="eo">② broken head mends alone to the stop</text>
+          <text x="120" y="420" font-size="28" fill="#d3deea" class="zh">b &lt; d：留下缺口，次品</text><text x="120" y="420" font-size="28" fill="#d3deea" class="eo">b &lt; d: a gap, a reject</text>
+          <text x="120" y="480" font-size="28" fill="#d3deea" class="zh">b 太大：费时，重叠处变厚</text><text x="120" y="480" font-size="28" fill="#d3deea" class="eo">b too large: slow, thick overlap</text>
+          <text x="1600" y="160" font-size="24" fill="#8fa3ba" text-anchor="end" class="zh">还没绣</text><text x="1600" y="160" font-size="24" fill="#8fa3ba" text-anchor="end" class="eo">not yet sewn</text>
         </svg>
     caption: ["回退针数 d ≤ b ≤ d + 3；检测越快，d 越小，要退的越少", "d ≤ b ≤ d + 3; faster detection, less backing up"]
     notes:
-      - "沿针迹看这个过程。从实际断线到停车，已经漏缝了 d 针，这叫检测延迟，包括判断断线要等的几针和停车要转的几针，专利举的例子合计约 10 针。回退针数 b 必须不少于 d，最好再多两三针，让补绣和原针迹重叠一点。b 小于 d，补绣接不上，留下缺口，就是次品；b 太大，浪费时间，重叠处变厚。现场看到缺口说明退少了，看到凸起说明退多了。"
-      - "Follow it along the stitch path. Between the actual break and the stop, d stitches have already been missed: the detection delay, made of the stitches needed to decide it's a break plus those turned while stopping; the patent's example totals about 10. The back-up b must be at least d, ideally two or three more so the mend overlaps the original. If b is less than d, the mend falls short and leaves a gap: a reject. If b is too large, it wastes time and the overlap gets thick. On the floor, a gap means too little back-up; a bump means too much."
+      - "一个头断了面线，全机停车，绷架沿缝过的针迹倒走，只让断线头补绣，其他头针杆不动。沿针迹看这个过程。从实际断线到停车，已经漏缝了 d 针，这叫检测延迟，包括判断断线要等的几针和停车要转的几针，有一份专利举的例子，合计约 10 针。回退针数 b 必须不少于 d，最好再多两三针，让补绣和原针迹重叠一点。b 小于 d，补绣接不上，留下缺口，就是次品；b 太大，浪费时间，重叠处变厚。现场看到缺口说明退少了，看到凸起说明退多了。"
+      - "When one head breaks its needle thread, the whole machine stops, the frame backs up along the sewn path, and only the broken head stitches while the other bars stay up. Follow it along the stitch path. Between the actual break and the stop, d stitches have already been missed: the detection delay, made of the stitches needed to decide it's a break plus those turned while stopping; one patent's example totals about 10. The back-up b must be at least d, ideally two or three more so the mend overlaps the original. If b is less than d, the mend falls short and leaves a gap, a reject; if b is too large, it wastes time and the overlap gets thick. On the floor, a gap means too little back-up; a bump means too much."
 
   - layout: duo
     title: ["任何一头断线，全机都停", "Any head breaks, the whole machine stops"]
@@ -326,22 +326,22 @@ slides:
       - ["节拍线上一台停，全线都等", "On a paced line, one robot stops and all wait"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M60 160 L560 160" stroke="#f2b705" stroke-width="12" stroke-linecap="round"/>
           <path d="M560 160 L760 160" stroke="#4b5f7d" stroke-width="6" stroke-dasharray="12 10"/>
           <path d="M660 110 L480 110" stroke="#2ec4b6" stroke-width="6"/><path d="M470 110 l22 -14 l0 28z" fill="#2ec4b6"/>
-          <text x="570" y="90" font-size="26" font-weight="700" fill="#5ee0d2" text-anchor="middle">倒退一小段</text>
-          <text x="560" y="220" font-size="26" fill="#ff9c75" text-anchor="middle">断弧处</text>
+          <text x="570" y="90" font-size="26" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">倒退一小段</text><text x="570" y="90" font-size="26" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">back up a little</text>
+          <text x="560" y="220" font-size="26" fill="#ff9c75" text-anchor="middle" class="zh">断弧处</text><text x="560" y="220" font-size="26" fill="#ff9c75" text-anchor="middle" class="eo">arc lost</text>
           <path d="M560 130 L560 190" stroke="#ff7a45" stroke-width="5"/>
-          <text x="60" y="230" font-size="26" fill="#f2b705">已焊</text>
+          <text x="60" y="230" font-size="26" fill="#f2b705" class="zh">已焊</text><text x="60" y="230" font-size="26" fill="#f2b705" class="eo">welded</text>
           <g font-weight="700" text-anchor="middle" font-size="28">
             <rect x="40" y="380" width="140" height="110" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="110" y="445" fill="#5ee0d2">R1</text>
             <rect x="220" y="380" width="140" height="110" rx="16" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="290" y="445" fill="#5ee0d2">R2</text>
-            <rect x="400" y="380" width="140" height="110" rx="16" fill="rgba(255,122,69,.25)" stroke="#ff7a45" stroke-width="4"/><text x="470" y="445" fill="#ff9c75">停</text>
-            <rect x="580" y="380" width="140" height="110" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="650" y="445" fill="#8fa3ba">等</text>
-            <rect x="760" y="380" width="120" height="110" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="820" y="445" fill="#8fa3ba">等</text>
+            <rect x="400" y="380" width="140" height="110" rx="16" fill="rgba(255,122,69,.25)" stroke="#ff7a45" stroke-width="4"/><text x="470" y="445" fill="#ff9c75" class="zh">停</text><text x="470" y="445" fill="#ff9c75" class="eo">stop</text>
+            <rect x="580" y="380" width="140" height="110" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="650" y="445" fill="#8fa3ba" class="zh">等</text><text x="650" y="445" fill="#8fa3ba" class="eo">wait</text>
+            <rect x="760" y="380" width="120" height="110" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="820" y="445" fill="#8fa3ba" class="zh">等</text><text x="820" y="445" fill="#8fa3ba" class="eo">wait</text>
           </g>
-          <text x="450" y="570" font-size="28" fill="#d3deea" text-anchor="middle">停线次数随工位数增加，和多头机一样</text>
+          <text x="450" y="570" font-size="28" fill="#d3deea" text-anchor="middle" class="zh">停线次数随工位数增加，和多头机一样</text><text x="450" y="570" font-size="28" fill="#d3deea" text-anchor="middle" class="eo">stoppages grow with stations, as with heads</text>
         </svg>
     notes:
       - "弧焊机器人焊接中途断弧，控制器让焊枪沿已经走过的轨迹倒退一小段，重新起弧，和原焊缝搭接。这和刺绣机断线后绷架回退、补绣到断点是同一个思路：回退量必须不少于检测延迟期间走过的距离，否则留下缺口。多台机器人串在一条节拍线上，任何一台停下全线都要等，停线次数随工位数增加，和多头机一样。要么提高单机可靠性，要么缩短每次恢复时间。"
@@ -355,7 +355,7 @@ slides:
       - ["多头机：任何一头断线，全机停", "Multi-head: any break stops all heads"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640">
+        <svg viewBox="0 0 900 640"><style>html:not(.en-only) .eo{display:none}</style>
           <path d="M20 430 L880 430" stroke="#4b5f7d" stroke-width="6"/>
           <g>
             <rect x="30" y="230" width="200" height="180" rx="22" fill="#1b2a44" stroke="#8fa3ba" stroke-width="3"/>
@@ -365,9 +365,9 @@ slides:
           </g>
           <g fill="#2ec4b6"><rect x="105" y="300" width="50" height="110"/><rect x="320" y="300" width="50" height="110"/><rect x="750" y="300" width="50" height="110"/></g>
           <rect x="535" y="300" width="50" height="110" fill="#ff7a45"/>
-          <text x="560" y="210" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle">卡住</text>
-          <text x="450" y="520" font-size="30" font-weight="700" fill="#f2b705" text-anchor="middle">整列车都在等</text>
-          <text x="450" y="565" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">the whole train waits</text>
+          <text x="560" y="210" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle" class="zh">卡住</text><text x="560" y="210" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle" class="eo">stuck</text>
+          <text x="450" y="520" font-size="30" font-weight="700" fill="#f2b705" text-anchor="middle" class="zh">整列车都在等</text><text x="450" y="520" font-size="30" font-weight="700" fill="#f2b705" text-anchor="middle" class="eo">The whole train waits</text>
+          <text x="450" y="565" font-size="22" fill="#8fa3ba" text-anchor="middle" class="zh">the whole train waits</text>
         </svg>
     notes:
       - "生活里最像多头刺绣机的，是一列地铁的车门。一列车有很多节车厢，任何一扇门被卡住，整列车都要等，车厢越多，被耽误的次数越多。多头刺绣机任何一头断线全机停，就是这个道理。所以地铁要让每扇门都更可靠、出了问题处理更快，刺绣机也一样：降低断线率，缩短每次处理时间。"
@@ -375,16 +375,16 @@ slides:
 
   - layout: answer
     tag: ["回到车间问题", "Back to the problem"]
-    title: ["跑不了 800：这段降到约 {{ch16.n8_7:.0f}} r/min", "Not 800: slow this column to about {{ch16.n8_7:.0f}}"]
+    title: ["跑不了 800：这段降到约 {{ch16.n8_7:.0f}} r/min", "Not 800: slow this column to about {{ch16.n8_7:.0f}} r/min"]
     rows:
-      - ["需要 / 可用加速度", "{{ch16.a7:.1f}} / {{ch16.am8:.1f}}"]
-      - ["7 mm 缎纹转速上限", "{{ch16.n8_7:.0f}} r/min"]
-      - ["要跑 850：驱动力", "≈ {{ch16.F850:.0f}} N"]
+      - [["需要 / 可用加速度", "Needed / available accel."], "{{ch16.a7:.1f}} / {{ch16.am8:.1f}}"]
+      - [["7 mm 缎纹转速上限", "7 mm satin speed limit"], "{{ch16.n8_7:.0f}} r/min"]
+      - [["要跑 850：驱动力", "Drive force for 850"], "≈ {{ch16.F850:.0f}} N"]
     side: {big: "{{ch16.eff8:.0f}}%", text: ["全机效率；每小时约 {{ch16.pph8:.1f}} 件", "Machine efficiency; about {{ch16.pph8:.1f}} pieces an hour"]}
     foot: ["控制器在长缎纹段自动降速；要提产能，先降断线率、缩短处理时间", "The controller slows on long satin; for output, cut breaks and handling time first"]
     notes:
-      - "回到开头的问题。800 转时窗口 {{ch16.T800:.1f}} 毫秒，7 毫米的缎纹针需要 {{ch16.a7:.1f}} 的加速度；八头机 {{ch16.m8}} 公斤，只能给 {{ch16.am8:.1f}}，不够。转速上限约 {{ch16.n8_7:.0f}}，控制器应在这段自动降速。要到 850 转，驱动力得加到约 {{ch16.F850:.0f}} 牛。效率：期望断线 {{ch16.Nb8:.0f}} 次，缝纫 1500 秒，断线约 {{ch16.Tb8:.0f}} 秒，换色 36 秒，全机效率约 {{ch16.eff8:.0f}}%，每小时约 {{ch16.pph8:.1f}} 件。"
-      - "Back to the opening question. At 800 r/min the window is {{ch16.T800:.1f}} milliseconds, and the 7-millimetre satin stitch needs {{ch16.a7:.1f}} metres per second squared; the eight-head frame, at {{ch16.m8}} kilograms, can give only {{ch16.am8:.1f}}. Not enough. The limit is about {{ch16.n8_7:.0f}} r/min, so the controller should slow down automatically there. To reach 850 the drive force would need about {{ch16.F850:.0f}} newtons. Efficiency: {{ch16.Nb8:.0f}} expected breaks, 1500 seconds of sewing, about {{ch16.Tb8:.0f}} seconds lost to breaks and 36 to colour changes: about {{ch16.eff8:.0f}} percent, roughly {{ch16.pph8:.1f}} pieces an hour."
+      - "回到开头的问题。800 转时窗口 {{ch16.T800:.1f}} 毫秒，7 毫米的缎纹针需要 {{ch16.a7:.1f}} 的加速度；八头机 {{ch16.m8}} 公斤，只能给 {{ch16.am8:.1f}}，不够。转速上限约 {{ch16.n8_7:.0f}}，控制器应在这段自动降速。要到 850 转，驱动力得加到约 {{ch16.F850:.0f}} 牛。效率：期望断线 {{ch16.Nb8:.0f}} 次，每次处理 40 秒加回退补绣约 {{ch16.resew:.1f}} 秒，共约 {{ch16.Tb8:.0f}} 秒；换色 6 次共 36 秒；缝纫 1500 秒，全机效率约 {{ch16.eff8:.0f}}%，每小时约 {{ch16.pph8:.1f}} 件。"
+      - "Back to the opening question. At 800 r/min the window is {{ch16.T800:.1f}} milliseconds, and the 7-millimetre satin stitch needs {{ch16.a7:.1f}} metres per second squared; the eight-head frame, at {{ch16.m8}} kilograms, can give only {{ch16.am8:.1f}}, which is not enough. The limit is about {{ch16.n8_7:.0f}} r/min, so the controller should slow down automatically there. To reach 850 the drive force would have to rise to about {{ch16.F850:.0f}} newtons. Efficiency: {{ch16.Nb8:.0f}} expected breaks, each costing 40 seconds of handling plus about {{ch16.resew:.1f}} of back-up and mending, about {{ch16.Tb8:.0f}} seconds in all; six colour changes, 36 seconds; 1500 seconds of sewing: about {{ch16.eff8:.0f}} percent, roughly {{ch16.pph8:.1f}} pieces an hour."
 
   - layout: summary
     title: ["本讲小结", "Summary"]

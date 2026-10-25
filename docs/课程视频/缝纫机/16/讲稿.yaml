@@ -1,0 +1,150 @@
+# 《缝纫机设计与制造》公开课 第 16 讲：电脑刺绣机控制
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch16.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 16-1（多头刺绣机）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch16.py 算出（{{ch16.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "16"
+deck: ch16
+skip: [11, 12, 13, 14, 15, 16, 18, 21]   # 三种头数的 7 mm 上限、加强驱动、第三节（章节页、换色、三种针迹、DST 文件）、断线七步、头数与效率数字页：控制课程部分约 10 分钟（课件与教材里都有；第三节 DST 留给作业第二题和测验，7 mm 的 850 转驱动力在回答页讲到，断线七步在第 19 页讲稿开头带一句，头数与效率是实验任务四）
+code: [ch16]
+title: ["电脑刺绣机控制——八个机头、一个绷架，能转多快", "Computerised Embroidery Machines — Eight Heads, One Frame: How Fast?"]
+chapter: ["第五篇 电气控制 · 第 16 章", "Part V Electrical Control · Chapter 16"]
+next: ["第 17 讲", "Lecture 17"]
+cover_formula: 'n_{max} = \frac{204}{6}\sqrt{\frac{a_{max}}{2\pi s}}'
+tags:
+  zh: [电脑刺绣机, 多头刺绣机, 绷架, 离布窗口, 转速上限, 断线检测, 回退补绣, 全机效率, 缝纫机设计]
+  en: [embroidery machine, multi-head embroidery, embroidery frame, off-fabric window, speed limit, thread-break detection, back-up and mending, machine efficiency, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十六讲，电脑刺绣机控制。
+    - 上一讲的花样机，一台机器缝一片布。今天的多头刺绣机，一根上轴带着八个、甚至二十个机头，一个大绷架带着所有布一起走。
+    - 今天讲两件事：大绷架能转多快；一个头断线，全机怎么办，头数多了值不值。换色和绣花文件留给课件和作业。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 16, control of computerised embroidery machines.
+    - The pattern sewer from last time sews one piece at a time. Today's multi-head embroidery machine drives eight, even twenty heads from one main shaft, and one big frame carries every piece of fabric together.
+    - Two questions today. How fast can a big frame go? And when one head breaks a thread, what does the whole machine do, and are more heads worth it? Colour changes and design files are left to the slides and the assignment.
+
+after:
+  - id: lab161
+    kind: lab
+    lab: embroid
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '1'; window.scrollTo(0, 0); const s = document.createElement('style'); s.textContent = '#checksA, #checksB { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); document.getElementById('tasks').closest('section').style.filter = 'blur(7px) grayscale(1)'; window.__mask = () => { const c = document.getElementById('tl'); const sec = c.parentElement; sec.style.position = 'relative'; let m = document.getElementById('wqmask'); if (!m) { m = document.createElement('div'); m.id = 'wqmask'; sec.appendChild(m); } m.style.cssText = 'position:absolute;left:' + c.offsetLeft + 'px;top:' + c.offsetTop + 'px;width:' + c.offsetWidth + 'px;height:' + Math.round(c.offsetHeight * 0.24) + 'px;backdrop-filter:blur(7px) grayscale(1);-webkit-backdrop-filter:blur(7px) grayscale(1);background:rgba(240,242,240,.35)'; }; })()"
+        press: ["#tabA", "#resetA"]
+      - sweep: {s: [3, 7]}
+        dur: 6
+      - sweep: {H: [8, 13]}
+        dur: 6
+      - set: {H: 8, n: 850}
+        sweep: {F: [800, 1050]}
+        dur: 6
+      - sweep: {s: [7, 12.5]}
+        dur: 4
+      - js: "(() => { document.getElementById('tabB').click(); document.getElementById('resetB').click(); window.__mask(); })()"
+      - press: "#rerun"
+        sweep: {H2: [8, 20]}
+        dur: 6
+      - set: {H2: 8, d: 6}
+        sweep: {b: [2, 5]}
+        dur: 5
+      - set: {H2: 20, b: 8}
+        sweep: {lam: [0.5, 0.3]}
+        dur: 6
+    say:
+      zh:
+        - ">下面是虚拟实验 16-1，多头刺绣机，在问渠平台上可以亲手做。右边的判据和下面的任务这里先遮住，留给你自己读。第一页是绷架与转速：上面是一针里的绷架运动，下面是转速上限随针长变化的曲线。"
+        - ">先把针长从 3 毫米拉到 7 毫米。看上图，虚线加速度越来越高，顶破了红线；下图的红点也跑到了曲线上方。"
+        - ">任务一，针长 7 毫米，把头数从 8 往上加，曲线一路往下掉。15 头时上限是多少，先用公式算，填进下面核对，再拖滑块验证。"
+        - ">任务二，回到 8 头，转速定在 850，把驱动力往上加，验证刚才回答页算的驱动力是不是正好让判据全部通过，记下最小值。"
+        - ">再把针长拉过 12.1 毫米，看下图，红点走进右边“单方向超过 DST 上限”的阴影区。这样的一针该怎么处理，写进报告。"
+        - ">第二页是断线与补绣。上面是绣一个花样的时间线，绿色缝纫、红色断线停车、紫色换色；下面是头数和全机效率的曲线。"
+        - ">按“再绣一次”，断线位置每次都不一样；再把头数从 8 加到 20，效率曲线上的点一路往下走。"
+        - ">任务三，检测延迟设成 6 针，从小往大调回退针数。退几针才不留漏针、又不多退，自己找。"
+        - ">任务四，20 头机，把断线率一点点往下调，看效率怎么涨；降到多少才到 80%，再改成缩短处理时间试一次，比较哪种办法更划算。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 16-1, the multi-head embroidery machine. On the WenQuest platform you can do it yourself. The criteria on the right and the tasks below are blurred here, so you can read them on your own. Page one is frame and speed: on top, the frame's motion through one stitch; below, the speed limit against stitch length."
+        - ">First, pull the stitch length from 3 up to 7 millimetres. In the top chart the dashed acceleration climbs and breaks through the red line, and in the lower chart the red dot moves above the curve."
+        - ">Task one: at 7 millimetres, raise the heads from 8. The curve keeps falling. Work out the limit for fifteen heads with the formula, enter it below to check, then confirm with the sliders."
+        - ">Task two: back to eight heads, set the speed to 850 and raise the drive force. Check that the force from the answer slide is just enough for every criterion to pass, and record the minimum."
+        - ">Now push the stitch length past 12.1 millimetres. In the lower chart the dot enters the shaded Over DST limit zone. How such a stitch must be handled goes in your report."
+        - ">Page two is thread breaks and repair. On top is the timeline of one design, green for sewing, red for thread-break stops, purple for colour changes; below, efficiency against head count."
+        - ">Press Run again, and the breaks land somewhere different each time. Then raise the heads from 8 to 20, and the dot slides down the efficiency curve."
+        - ">Task three: set the detection delay to 6 stitches, then raise the back-up count step by step. How many leave no missed stitches without backing up too far? That's yours to find."
+        - ">Task four: on twenty heads, lower the break rate bit by bit and watch efficiency rise. How low must it go to reach 80 percent? Then try shortening the handling time instead, and compare which pays off better. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 16-1，可以自己动手", "Interactive slides and Lab 16-1, to work yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和多头刺绣机实验，都可以自己打开动手做。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the embroidery-machine lab, and work them yourself."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 16：转速、绣花文件与效率核算", "Assignment 16: speed, design files and efficiency"]
+      points:
+        - ["12 头机：3、5、7 mm 的转速上限与驱动力", "12 heads: limits for 3, 5, 7 mm, and the drive force"]
+        - ["DST：45 mm 跳步、45° 走 40 mm 要几条记录", "DST: records for a 45 mm jump and 40 mm at 45°"]
+        - ["效率：缩短处理时间，还是降低断线率", "Efficiency: shorter handling or fewer breaks?"]
+      foot: ["2–3 页计算报告（PDF），附虚拟实验 16-1 四个任务完成状态的截图，在问渠学习平台提交。", "A 2–3 page calculation report (PDF) with screenshots of the four Lab 16-1 tasks, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，一台 12 头机，驱动力 1000 牛，求 3、5、7 毫米针长的转速上限；要让 7 毫米缎纹也跑 800 转，驱动力至少多大？"
+        - ">第二题是绣花文件，这段视频里没讲，课件和教材里有：DST 文件每条记录每个方向最多 12.1 毫米，沿 X 方向 45 毫米的跳步、沿 45° 走 40 毫米，各要几条记录？机器又怎样判断什么时候剪线？"
+        - ">第三题，12 头机绣 15000 针，估算全机效率和每小时件数，再比较把处理时间缩短到 20 秒和把断线率减半，哪种更值得投入。第四题讨论：检测延迟从 6 针降到 2 针有什么好处，断线检测器怎样设计才能更快发现断线。"
+        - 计算报告和实验截图，都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: a 12-head machine with 1000 newtons of drive. Find the speed limits for 3, 5 and 7 millimetre stitches, and the minimum drive force that lets the 7 millimetre satin run at 800 r/min too."
+        - ">Two is about design files, which this video skipped; it's in the slides and the textbook. A DST record allows at most 12.1 millimetres per axis. How many records for a 45 millimetre jump along X, and for 40 millimetres at 45 degrees? And how does the machine decide when to trim?"
+        - ">Three: a 12-head machine sews 15 000 stitches. Estimate efficiency and pieces per hour, then compare cutting handling to 20 seconds with halving the break rate. Which is more worth the money? Four is a discussion: what does cutting the detection delay from 6 stitches to 2 bring, and how could a detector find breaks faster?"
+        - Submit the report and the lab screenshots on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：9 题，即时反馈", "After-class quiz: 9 questions, instant feedback"]
+      points:
+        - ["窗口 204°、900 r/min、4 mm：峰值加速度？", "204° window, 900 r/min, 4 mm: peak acceleration?"]
+        - ["回退针数 b 小于检测延迟 d：结果是什么？", "Back-up b less than delay d: what happens?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份九道题的测验，比如：窗口 204°，主轴每分钟 900 转，绷架按摆线规律走 4 毫米一针，峰值加速度大约多少？"
+        - ">再比如：回退针数比检测延迟少，会出现什么结果？还有题问 DST 文件里有没有颜色值。"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a nine-question quiz. For example, with a 204-degree window, the shaft at 900 r/min and a 4 millimetre cycloidal move, what is the peak acceleration?"
+        - ">Or, if the back-up count is smaller than the detection delay, what happens? Another asks whether a DST file stores colour values."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲电脑横机，也就是毛衣编织机：机头来回跑一趟织一行，前片要织多久，机头提速值不值，我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's computerised flat knitting machines, the machines that knit sweaters. The carriage knits a row on each pass. How long does a front panel take, and is a faster carriage worth it? See you then.
