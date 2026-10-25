@@ -80,3 +80,39 @@ outro: {zh: [...], en: [...]}      # 小结页讲稿之后再说的话（注册�
 - 课件里的整页实验（`lab` 版式）和小结页不按原位置出现：实验放到课后部分用实验录屏，小结放在最后。
 - 中文版录双语课件，英文版录 `make_deck(..., lang="en")` 生成的英文版课件（只显示英文、嵌英文实验页）。
 - 三维片段（`proto-*`、`model-*`）先在三维页上逐帧录好，课件录屏时按帧换图（`__wqFrame`），其余动画按虚拟时钟实时运行。
+
+## 独立视频：外部网页课件（第 38 轮）
+
+不属于哪本教材的视频（如《WenQuest Ops 介绍》），画面直接录一份做好的网页课件（每页一个 `section.pg`，带 `window.__deck`：
+`go(页下标, 步)`、`next()`、`fragments(页下标)`、`state()`）。讲稿放 `docs/课程视频/<名字>/讲稿.yaml`：
+
+```yaml
+standalone: true
+langs: [en]                 # 只配这几种语言（clone.py 也只合成这些）
+subs: en+zh                 # 英文配音，字幕英文在上、中文在下；画面缩到 85 % 放上面，下面是字幕带
+title: [中文名, English title]
+deck_html: 课件/index.html  # 相对讲稿目录
+contact: someone@example.com   # 写进上传资料（可不写）
+pace: {speed: 1.3, head: 0.45, pause: 0.12, tail: 0.45, hold: 0.25, xfade: 0.4}   # 可选：语速倍数，镜头头尾、句间、每步后停顿与转场（秒）
+shots:
+  - id: s01
+    kind: page
+    page: 28                # 课件第几页（从 1 起）
+    part: [中枢, The hub]   # 章节时间点
+    steps:                  # 与 “>” 一一对应
+      - {show: 1}                                  # 要点出现到这一页的 100 %（0.5 = 一半）
+      - {click: "tr.click", text: "SO-1042"}       # 点这一页里含这段字的元素（金色框提示点了哪里；i: 第几个）
+      - {type: ["#dohS", 0, "0"]}                  # 在输入框里填值
+      - {js: "__C(28, '#nx'); __C(28, '#nx')"}     # 直接执行（__C 点击、__Y 填值、__N 出要点）
+    say:
+      en: [">Back to Tuesday.", ">Click the late order and follow the chain."]
+      zh: [">回到那个周二。", ">点开迟到的订单，顺着链往下看。"]     # 双语字幕时只作字幕，与英文逐句对应
+```
+
+- 课件页里的白板动画（`iframe.wbf`，`data-t0`/`data-t1` 是白板上的起止秒）随镜头时长同步画完，不出白板自己的声音。
+- 先在本机检查每步操作：`python3 tools/video/make.py <讲稿目录> --lang en --voice kokoro --out /tmp/v --only s01,s15`。
+- 从分支运行工作流时，运行记录和预览提交回那个分支，不进 main。
+- 中英两版各用自己的课件（第 46 轮）：`deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}`，`langs: [en, zh]`。
+  英文版仍按 `subs: en+zh` 出双语字幕；中文版中文配音、中文字幕。中文课件里按文字点的步骤，文字不同时另写 `steps_zh`（步数与 “>” 相同）。
+- 课件页里的序列帧（`div.seq`，一张拼图 + `data-n`、`data-cols`、`data-fps`）跟着页面时钟换帧，录制时与虚拟时钟同步，不会抖。
+- 本机先把每个镜头的操作在两版课件里各跑一遍（不出声音、只截终态）：见第 46 轮细则的“干跑”做法。
