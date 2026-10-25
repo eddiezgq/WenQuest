@@ -29,6 +29,7 @@ P.add_argument("--expect-buy", action="append", default=[], help="算料的请�
 P.add_argument("--expect-products", default="", help="“订单与计划”里必须有的产品，逗号分隔")
 P.add_argument("--speed", type=float, default=300)
 P.add_argument("--timeout", type=float, default=900)
+P.add_argument("--teacher-password", default="", help="本地版（WQ_EDITION=local）当厂长要的老师密码")
 A = P.parse_args()
 REAL = A.erp_kind == "real"
 FAILS = []
@@ -115,7 +116,10 @@ def delivery_date():
 
 
 def login(role):
-    return hub("POST", "/api/login", {"name": "清单演练", "role": role, "mode": "teach"})["token"]
+    body = {"name": "清单演练", "role": role, "mode": "teach"}
+    if A.teacher_password:
+        body["teacher_password"] = A.teacher_password
+    return hub("POST", "/api/login", body)["token"]
 
 
 def release(wo, tok):

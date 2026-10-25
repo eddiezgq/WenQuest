@@ -575,7 +575,11 @@ async def robot_joint(r):
     await r.go("/work/quality", 2500)
     await r.title("关节测试与整机标定", "测试台的数据进控制图，异常开 8D")
     await r.point("[data-help=q-chart]")
-    await r.cap("特性里选“WQJ-L · 背隙”：每个点是一台大关节在测试台上量出的回差", 4000)
+    sel = r.pg.locator("select[aria-label='测量特性']")
+    if await sel.count():
+        await sel.select_option("WQJ-S|joint_backlash")
+        await r.pg.wait_for_timeout(1500)
+    await r.cap("特性里选“WQJ-S · 背隙”：每个点是一台小关节在测试台上量出的回差", 4000)
     await r.cap("还有空载摩擦力矩、编码器零位标定残差，整机的位置重复精度和标定后绝对定位误差", 4000)
     await r.point("[data-help=q-8d]")
     await r.cap("点子一路偏向公差线，就为这个特性开一张质量异常单（8D）", 3500)

@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <TaskBar v-if="teachStatus" :t="teachStatus" />
-    <div class="page-title"><h1>质量</h1><span class="muted">质检员工作区 · 三坐标测量值、控制图、不合格品评审</span></div>
+    <div class="page-title"><h1>质量</h1><span class="muted">质检员工作区 · {{ demo ? '三坐标测量值' : '测量值' }}、控制图、不合格品评审</span></div>
     <div class="row">
       <section class="card grow" data-help="q-chart">
         <div class="card-head">
@@ -9,7 +9,7 @@
           <select v-model="sel" @change="load" aria-label="测量特性">
             <option v-for="c in chars" :key="c.item + '|' + c.key" :value="c.item + '|' + c.key">{{ c.name }}</option>
           </select>
-          <span class="muted small">quality/qc-01/measurement · 最近 {{ rows.length }} 件</span>
+          <span class="muted small">{{ demo ? 'quality/qc-01/measurement · ' : '' }}最近 {{ rows.length }} 件</span>
         </div>
         <ControlChart v-if="chart.points.length" :chart="chart" :height="220" />
         <div v-else class="empty">还没有这个特性的测量值。</div>
@@ -27,12 +27,12 @@
         </table>
       </section>
       <section class="card side">
-        <div class="card-head"><h2>不合格品</h2><span class="muted small">超差零件自动开单（quality/qc-01/ncr）</span></div>
+        <div class="card-head"><h2>不合格品</h2><span class="muted small">超差零件自动开单{{ demo ? '（quality/qc-01/ncr）' : '' }}</span></div>
         <div v-if="!ncr.length" class="empty">没有不合格品。</div>
         <div v-for="n in ncr" :key="n.ncr_id" class="ncr">
           <div><b class="mono"><ObjLink type="Ncr" :k="n.ncr_id" /></b> <span class="mono small"><ObjLink type="PartSerial" :k="n.part_serial" /></span>
             <span class="pill" :class="n.status === 'open' ? 'bad' : 'good'">{{ DISP[n.status] }}</span></div>
-          <div class="small muted">{{ n.detail.name }} 实测 {{ n.detail.value_mm }} mm（{{ n.detail.lower_tol_mm }}–{{ n.detail.upper_tol_mm }}）</div>
+          <div class="small muted">{{ n.detail.name }} 实测 {{ n.detail.value_mm }} {{ n.detail.unit || 'mm' }}（{{ n.detail.lower_tol_mm }}–{{ n.detail.upper_tol_mm }}）</div>
           <div v-if="n.status === 'open'" class="acts">
             <button class="btn" @click="decide(n, 'rework')">返修</button>
             <button class="btn danger" @click="decide(n, 'scrap')">报废</button>
@@ -51,7 +51,7 @@
           <router-link :to="'/quality/8d/' + q.id"><b class="mono">{{ q.id }}</b> {{ q.title }}</router-link>
           <span class="small muted">{{ STATUS8D[q.status] }} · {{ q.author }}</span>
         </div>
-        <template v-if="isTeacher">
+        <template v-if="isTeacher && demo">
           <div class="card-head" data-help="q-problems" style="margin-top: 18px;"><h2>问题情景（老师）</h2></div>
           <p class="small muted">注入一个隐藏的加工问题，学生只能从数据里找原因。学生看不到这一栏。</p>
           <div v-for="a in problems" :key="a.id" class="small">● {{ a.name }}（量值 {{ a.magnitude }}，{{ timeOf(a.injected_at) }}）</div>
@@ -62,8 +62,10 @@
             <button class="btn ghost" @click="clearProblems">全部清除</button>
           </div>
         </template>
-        <div class="card-head" style="margin-top: 18px;"><h2>砂轮</h2></div>
-        <p class="small">磨床 GRD-01 砂轮剩余寿命 <b class="mono">{{ grdLife }}</b>。砂轮越磨损，磨出的轴承位直径越偏大；寿命低于 8% 时自动修整。</p>
+        <template v-if="demo">     <!-- 问题情景、砂轮是减速器厂输出轴的（第 45 轮：别的工厂不显示） -->
+          <div class="card-head" style="margin-top: 18px;"><h2>砂轮</h2></div>
+          <p class="small">磨床 GRD-01 砂轮剩余寿命 <b class="mono">{{ grdLife }}</b>。砂轮越磨损，磨出的轴承位直径越偏大；寿命低于 8% 时自动修整。</p>
+        </template>
         <template v-if="teachStatus">
           <div class="card-head" style="margin-top: 18px;"><h2>任务 5 问答</h2></div>
           <p class="small">轴承位直径为什么会逐渐变大？</p>
@@ -79,7 +81,7 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { get, post, session } from '../lib/api';
+import { get, loadConfig, post, session } from '../lib/api';
 import { bus } from '../lib/bus';
 import { timeOf } from '../lib/fmt';
 import ControlChart from '../components/ControlChart.vue';
@@ -150,7 +152,9 @@ async function answer() {
   fbOk.value = r.score >= 8;
   teachStatus.value = await get('/teach');
 }
+const demo = ref(true);                     // 演示工厂（减速器厂）；别的工厂不显示问题情景、砂轮
 onMounted(async () => {
+  loadConfig().then((c) => { demo.value = c?.plant?.demo !== false; }).catch(() => {});
   try {
     const cs = await get('/quality/characteristics');
     if (cs.length) { chars.value = cs; sel.value = cs[0].item + '|' + cs[0].key; }

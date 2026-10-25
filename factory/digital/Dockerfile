@@ -55,7 +55,7 @@ COPY --from=web /web/dist digital/web/dist
 # HELP_VIDEOS_STAMP 每次构建不同（工作流传提交号），让这一步不走缓存
 ARG HELP_VIDEOS_STAMP=none
 ENV WQ_HELP_MEDIA=/app/digital/help-media
-RUN mkdir -p "$WQ_HELP_MEDIA" && for src in eddiezgq/WenQuest:teach eddiezgq/freecad-ai-parts:enterprise; do \
+RUN mkdir -p "$WQ_HELP_MEDIA" && for src in eddiezgq/WenQuest:teach eddiezgq/WenQuest:robot eddiezgq/freecad-ai-parts:enterprise; do \
       repo="${src%%:*}"; ed="${src##*:}"; \
       python -c "import sys, urllib.request; urllib.request.urlretrieve(sys.argv[1], '/tmp/hv.tgz')" \
         "https://github.com/$repo/releases/download/help-videos/help-videos-$ed.tar.gz" 2>/dev/null \

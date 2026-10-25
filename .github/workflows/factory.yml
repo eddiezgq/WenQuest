@@ -386,10 +386,21 @@ jobs:
           python factory/digital/tools/help_videos.py --hub http://localhost:8100 --edition teach --out help-media \
             --teacher-password "$(sed -n 's/^WQ_TEACHER_PASSWORD=//p' factory/digital/.env)" 2>&1 | tee "$RUNNER_TEMP/videos.log"
           tar czf help-videos-teach.tar.gz -C help-media . && ls -la help-media
+      - name: 录机器人厂帮助视频（第 45 轮：本地版换成机器人厂清单，先做一台关节出测量数据）
+        run: |
+          factory/local/stop.sh --reset
+          factory/local/start.sh --plant factory/plants/wenquest-robot.yaml
+          for i in $(seq 1 60); do curl -fsS http://localhost:8100/api/health >/dev/null && break; sleep 5; done
+          pw="$(sed -n 's/^WQ_TEACHER_PASSWORD=//p' factory/digital/.env)"
+          (cd factory/digital && python tests/plant_loop.py --hub http://localhost:8100 --erp http://localhost:8091 --item WQJ-S \
+            --qty 3 --timeout 600 --teacher-password "$pw" 2>&1 | tail -n 15) || true
+          python factory/digital/tools/help_videos.py --hub http://localhost:8100 --edition robot --out help-media-robot \
+            --teacher-password "$pw" 2>&1 | tee -a "$RUNNER_TEMP/videos.log"
+          tar czf help-videos-robot.tar.gz -C help-media-robot . && ls -la help-media-robot
       - uses: actions/upload-artifact@v4
         with:
           name: help-videos-teach
-          path: help-videos-teach.tar.gz
+          path: help-videos-*.tar.gz
       - name: 推送到 main 时发布帮助视频
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
@@ -397,7 +408,7 @@ jobs:
         run: |
           gh release view help-videos >/dev/null 2>&1 || gh release create help-videos --title "帮助的操作视频" \
             --notes "CI 在本地版上自动录制（第 30 轮 H-4），数字工厂镜像构建时取用。" --prerelease
-          gh release upload help-videos help-videos-teach.tar.gz --clobber
+          gh release upload help-videos help-videos-teach.tar.gz help-videos-robot.tar.gz --clobber
       - name: 视频没录成时的输出（写成注释）
         if: failure()
         run: '[ ! -f "$RUNNER_TEMP/videos.log" ] || python3 factory/deploy/ci_annotate.py 录视频 "$RUNNER_TEMP/videos.log" 60'
