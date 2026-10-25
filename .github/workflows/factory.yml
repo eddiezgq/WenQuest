@@ -486,13 +486,16 @@ jobs:
           cp factory/deploy/*.sh stage/deploy/
           cp factory/digital/mosquitto/server/* stage/mosquitto/
           # 班级工厂（第 10 轮）：按 classes.yaml 生成服务配置和编号表
-          pip install -q pyyaml
-          python3 factory/deploy/classes.py factory/deploy/classes.yaml stage/docker-compose.classes.yml
-          python3 factory/deploy/classes.py factory/deploy/classes.yaml --ids > stage/classes.ids
-          python3 factory/deploy/classes.py factory/deploy/classes.yaml --names > stage/classes.names
-          python3 factory/deploy/classes.py factory/deploy/classes.yaml --plants > stage/classes.plants
+          python3 -c "import yaml" 2>/dev/null || pip install -q pyyaml || pip install -q --break-system-packages pyyaml \
+            || { echo "::error::装不上 pyyaml"; exit 1; }
+          for a in "stage/docker-compose.classes.yml" "--ids" "--names" "--plants"; do
+            case "$a" in --*) out="stage/classes.${a#--}";; *) out=/dev/null;; esac
+            python3 factory/deploy/classes.py factory/deploy/classes.yaml $a > "$out" 2> /tmp/classes.err \
+              || { echo "::error::classes.py $a 出错：$(tail -c 400 /tmp/classes.err | tr '\n' ' ')"; exit 1; }
+          done
           tar czf - -C stage . | ssh "deploy@$HOST" \
-            'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh'
+            'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh' 2> /tmp/copy.err \
+            || { echo "::error::复制到服务器出错：$(tail -c 600 /tmp/copy.err | tr '\n' ' ')"; exit 1; }
       - name: 更新数字工厂
         if: env.SKIP != '1'
         run: |
