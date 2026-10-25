@@ -1,0 +1,27 @@
+# 实验 27.3 的指导书与报告模板。目的、场景、参数、任务取自 lab27_3.js。
+原理:
+  - ["恢复系数是碰撞后分开的相对速度与碰撞前接近的相对速度之比（式 (27.3.1)）；每次弹起的高度是上一次的 e² 倍。", "The coefficient of restitution is the ratio of the separation speed after impact to the approach speed before it (Eq. 27.3.1); each bounce reaches e² of the previous height."]
+  - ["MuJoCo 的软接触在碰撞中相当于一个质量归一的弹簧-阻尼器：solref 的第一个数是时间常数 τ，第二个数是阻尼比 ζ，固有频率约为 1/(τζ)（式 (27.1.6)）。线性弹簧-阻尼器的恢复系数（式 (27.3.4)）：", "In an impact MuJoCo's soft contact acts as a mass-normalised spring-damper: solref's first number is the time constant τ, the second the damping ratio ζ, and the natural frequency is about 1/(τζ) (Eq. 27.1.6). The restitution of a linear spring-damper (Eq. 27.3.4):"]
+  - 式: "e = exp(−πζ/√(1 − ζ²))"
+  - ["接触力降为零时物体就分开，所以实测的 e 比上式略大。接触持续约半个阻尼振动周期，与 τ 成正比；峰值力与 τ 成反比。", "The bodies separate when the contact force reaches zero, so the measured e is a little larger. The contact lasts about half a damped period, proportional to τ; the peak force is inversely proportional to τ."]
+步骤:
+  - ["毛坯场景，h = 0.3 m，τ = 0.02 s，ζ = 1（默认），按“开始”，观察毛坯是否反弹（任务 1）。", "Blank scene, h = 0.3 m, τ = 0.02 s, ζ = 1 (default): press Start and see whether the blank bounces (task 1)."]
+  - ["把 ζ 改为 0.5、0.3、0.2、0.1，各做一次，记下第一次碰撞的 e 和式 (27.3.4) 的预测，填入表 1；调 ζ 使 e 在 0.45～0.55 之间（任务 2）。", "Set ζ to 0.5, 0.3, 0.2 and 0.1 in turn; record the first impact's e and the prediction of Eq. (27.3.4) in Table 1; tune ζ so that e lies between 0.45 and 0.55 (task 2)."]
+  - ["ζ 不变，τ 由 0.02 s 改为 0.01 s，比较接触时间和峰值力（任务 3），填入表 2。", "Keep ζ and change τ from 0.02 s to 0.01 s; compare the contact time and the peak force (task 3) in Table 2."]
+  - ["换成皮球场景，改变落下高度，检查 e 是否随高度变化。", "Switch to the ball scene and change the drop height; check whether e changes with height."]
+数据表:
+  - 标题: ["表 1  阻尼比与恢复系数（τ = 0.02 s，h = 0.3 m）", "Table 1  Damping ratio and restitution (τ = 0.02 s, h = 0.3 m)"]
+    表头: ["ζ", "实测 e", "式 (27.3.4) 的 e"]
+    表头英文: ["ζ", "Measured e", "e by Eq. (27.3.4)"]
+    行: [["1.0", "", ""], ["0.5", "", ""], ["0.3", "", ""], ["0.2", "", ""], ["0.1", "", ""]]
+    行英文: [["1.0", "", ""], ["0.5", "", ""], ["0.3", "", ""], ["0.2", "", ""], ["0.1", "", ""]]
+  - 标题: ["表 2  时间常数的影响（ζ 与 h 不变）", "Table 2  Effect of the time constant (same ζ and h)"]
+    表头: ["τ / s", "接触时间 / ms", "峰值力 / N"]
+    表头英文: ["τ / s", "Contact time / ms", "Peak force / N"]
+    行: [["0.02", "", ""], ["0.01", "", ""]]
+    行英文: [["0.02", "", ""], ["0.01", "", ""]]
+注意:
+  - ["这里的接触参数是 MuJoCo 的数值参数，不是钢的真实刚度；真实钢件相撞的接触时间只有几十微秒（27.3.3 节）。", "These are MuJoCo's numerical contact parameters, not the true stiffness of steel; real steel impacts last only tens of microseconds (Section 27.3.3)."]
+  - ["峰值力由零件的竖直加速度算出：λ = m(z̈ + 𝔤)。毛坯横着落下时，两端几乎同时着地。", "The peak force is computed from the part's vertical acceleration: λ = m(z̈ + 𝔤). The horizontal blank lands on both ends almost at once."]
+思考题:
+  - ["线性弹簧-阻尼器的恢复系数与撞击速度无关，而实验中恢复系数随速度增大而减小。在皮球场景中改变落下高度，e 变了吗？要让仿真反映这一点，可以怎样做（27.3.4 节）？", "A linear spring-damper gives a restitution independent of impact speed, while experiments show it falling as speed rises. In the ball scene, does e change with the drop height? How could a simulation capture the effect (Section 27.3.4)?"]

@@ -1,0 +1,29 @@
+# 实验 27.2 的指导书与报告模板。目的、场景、参数、任务取自 lab27_2.js。
+原理:
+  - ["夹爪的指只能沿夹紧方向推零件，托住零件的是指面上的摩擦力。库仑摩擦要求切向力不超过 μ 乘法向力（式 (27.2.1)）。", "The jaws can only push along the grip direction; friction on the pads carries the part. Coulomb friction limits the tangential force to μ times the normal force (Eq. 27.2.1)."]
+  - ["零件竖直、以加速度 a 提起时，平口夹爪与 V 形夹爪（接触线法向与夹紧方向成 γ）所需的最小夹紧力（式 (27.2.4)）：", "Minimum grip force for a vertical part lifted with acceleration a, flat jaws and V-jaws whose contact normals make γ with the grip direction (Eq. 27.2.4):"]
+  - 式: "F ≥ m(𝔤 + a)/(2μ)（平口）；F ≥ m(𝔤 + a) cos γ/(2μ)（V 形）"
+  - ["零件水平时，重力还绕夹紧方向产生力矩 m𝔤d，平口夹爪要用接触线两端方向相反的摩擦力去平衡（式 (27.2.5)），ℓ 是指面长度：", "With the part horizontal, gravity also twists about the grip axis by m𝔤d; flat jaws balance it with opposite friction at the two ends of the pad (Eq. 27.2.5), ℓ being the pad length:"]
+  - 式: "F ≥ m𝔤(1/2 + d/ℓ)/μ"
+步骤:
+  - ["平口指、竖直、μ = 0.2、a = 3 m/s²。从 100 N 起逐步减小夹紧力，每次按“开始”，找出刚好不滑的力（任务 1），填入表 1。", "Flat jaws, vertical, μ = 0.2, a = 3 m/s². Starting from 100 N, reduce the grip force step by step, pressing Start each time, until it just holds (task 1); fill in Table 1."]
+  - ["换成 V 形指，重复上一步（任务 2）。", "Switch to V-jaws and repeat (task 2)."]
+  - ["毛坯改为水平，a 取 0，分别找出平口和 V 形指刚好不滑的力（任务 3），填入表 1。", "Make the blank horizontal with a = 0, and find the just-holding force for flat and V-jaws (task 3); fill in Table 1."]
+  - ["把 μ 改为 0.4，重做平口竖直的情况，检查所需的力是否减半，填入表 2。", "Set μ = 0.4 and redo the flat vertical case; check whether the force halves, and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  刚好不滑的夹紧力（μ = 0.2）", "Table 1  Grip force that just holds (μ = 0.2)"]
+    表头: ["情况", "仿真值 / N", "公式值 / N", "相对差"]
+    表头英文: ["Case", "Simulation / N", "Formula / N", "Relative difference"]
+    行: [["平口、竖直、a = 3 m/s²", "", "", ""], ["V 形、竖直、a = 3 m/s²", "", "", ""], ["平口、水平、a = 0", "", "", ""], ["V 形、水平、a = 0", "", "—", "—"]]
+    行英文: [["Flat, vertical, a = 3 m/s²", "", "", ""], ["V, vertical, a = 3 m/s²", "", "", ""], ["Flat, horizontal, a = 0", "", "", ""], ["V, horizontal, a = 0", "", "—", "—"]]
+  - 标题: ["表 2  摩擦系数的影响（平口、竖直、a = 3 m/s²）", "Table 2  Effect of the friction coefficient (flat, vertical, a = 3 m/s²)"]
+    表头: ["μ", "仿真值 / N", "公式值 / N"]
+    表头英文: ["μ", "Simulation / N", "Formula / N"]
+    行: [["0.2", "", ""], ["0.4", "", ""]]
+    行英文: [["0.2", "", ""], ["0.4", "", ""]]
+注意:
+  - ["每次改参数或按“开始”，仿真都从指面刚贴着零件、夹紧力和重力同时加上的状态重新开始。", "Each change of a parameter or press of Start restarts the simulation with the pads just touching the part and the grip force and gravity applied together."]
+  - ["零件相对夹爪的位移超过 2 mm 判为滑落；夹住时的位移只有百分之几毫米，是接触的弹性变形。", "A displacement of more than 2 mm counts as slipping; when held, the displacement is a few hundredths of a millimetre, the contact deforming elastically."]
+  - ["摩擦系数是示意值。仿真用圆锥摩擦锥、impratio = 10 和 noslip，否则零件会在指间慢慢蠕滑（27.2.3 节）。", "The friction coefficients are illustrative. The simulation uses elliptic friction cones, impratio = 10 and noslip; otherwise the part would creep slowly in the jaws (Section 27.2.3)."]
+思考题:
+  - ["实际选夹爪时为什么要在公式上再乘安全系数？列出至少三个让实际所需夹紧力变大的因素。", "Why multiply the formula by a safety factor when choosing a gripper? List at least three factors that make the actual force needed larger."]

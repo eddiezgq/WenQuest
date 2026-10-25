@@ -1,0 +1,28 @@
+# 实验 27.4 的指导书与报告模板。目的、场景、参数、任务取自 lab27_4.js。
+原理:
+  - ["每个接触能对物体施加的力在它的摩擦锥内；平面上摩擦锥是一个半顶角为 arctan μ 的角，用两条母线 n ± μt 表示。每条母线对应一个平面力旋量 (m_z, f_x, f_y)（式 (27.4.1)）。", "Each contact can push on the object with a force inside its friction cone; in the plane the cone is an angle of half-width arctan μ, represented by its two edges n ± μt. Each edge gives a planar wrench (m_z, f_x, f_y) (Eq. 27.4.1)."]
+  - ["一组接触力封闭，当且仅当这些母线力旋量的非负组合能取遍整个三维力旋量空间（定理 27.4.1），等价于它们的凸包以原点为内点：", "A set of contacts is in force closure exactly when non-negative combinations of the edge wrenches fill the whole three-dimensional wrench space (Theorem 27.4.1), that is, when their convex hull contains the origin in its interior:"]
+  - 式: "rank W = 3，且存在 k_j > 0 使 Σ k_j w_j = 0"
+  - ["两指的判据（定理 27.4.2）：两个接触点的连线同时在两个摩擦锥内。上下两面平行时，错开 Δ ≤ μw（w 为两面的距离）。", "Two-finger test (Theorem 27.4.2): the line between the contacts lies inside both friction cones. For parallel top and bottom faces this means an offset Δ ≤ μw, w being the distance between the faces."]
+  - ["没有摩擦（μ = 0）时只有法向力，平面物体形封闭至少要 4 个接触；圆形物体无论多少个都不行。", "Without friction (μ = 0) only normal forces act; a planar object needs at least 4 contacts for form closure, and a round one can never have it."]
+步骤:
+  - ["夹零件场景，两个接触，μ = 0.2，s₁ = 0.15（下边中点）、s₂ = 0.65（上边中点），判断是否力封闭（任务 1），记下 ε，填入表 1。", "Part scene, two contacts, μ = 0.2, s₁ = 0.15 (middle of the bottom edge), s₂ = 0.65 (middle of the top edge): is it force closure (task 1)? Record ε in Table 1."]
+  - ["逐步增大 s₂，使上面的接触点向左错开，找到刚好失去力封闭的 Δ（任务 2），与 μw 比较。改 μ 为 0.4，再找一次。", "Increase s₂ step by step so that the top contact moves left, and find the Δ at which force closure is just lost (task 2); compare with μw. Repeat with μ = 0.4."]
+  - ["把 μ 改为 0，接触点改为 4 个，摆出形封闭（任务 3），记下 ε；再试一组不是形封闭的 4 个点。", "Set μ = 0 and use 4 contacts; find a form-closure placement (task 3) and record ε; then try a set of 4 contacts that is not form closure."]
+  - ["换到捏硬币场景，μ = 0 时摆 4 个接触，验证不能形封闭。", "Switch to the coin scene and check that 4 frictionless contacts cannot give form closure."]
+数据表:
+  - 标题: ["表 1  不同摆法的力封闭与抓取质量", "Table 1  Force closure and grasp quality of different placements"]
+    表头: ["接触点（s₁, s₂, …）", "μ", "是否力封闭", "ε"]
+    表头英文: ["Contacts (s₁, s₂, …)", "μ", "Force closure?", "ε"]
+    行: [["0.15, 0.65", "0.2", "", ""], ["", "0.2", "", ""], ["", "0.4", "", ""], ["", "0", "", ""]]
+    行英文: [["0.15, 0.65", "0.2", "", ""], ["", "0.2", "", ""], ["", "0.4", "", ""], ["", "0", "", ""]]
+  - 标题: ["表 2  两指错开的极限", "Table 2  Limit of the two-finger offset"]
+    表头: ["μ", "实测的 Δ / mm", "μw / mm"]
+    表头英文: ["μ", "Measured Δ / mm", "μw / mm"]
+    行: [["0.2", "", ""], ["0.4", "", ""]]
+    行英文: [["0.2", "", ""], ["0.4", "", ""]]
+注意:
+  - ["接触点恰好在矩形的角上时，法向取它所在那条边的法向；实际夹持时应避开棱角。", "A contact exactly at a corner of the rectangle takes the normal of the edge it belongs to; real grips should avoid corners."]
+  - ["抓取质量 ε 中，力矩除以特征长度（矩形取 30 mm，硬币取半径），所以只能在同一个物体的不同摆法之间比较。", "In ε the moment is divided by a characteristic length (30 mm for the rectangle, the radius for the coin), so compare ε only between placements on the same object."]
+思考题:
+  - ["两指对径的抓取在平面上只要很小的摩擦就能力封闭，为什么实际中仍要较大的夹紧力？力封闭说明了什么，没有说明什么？", "An antipodal two-finger grasp is in force closure with very little friction, so why are large grip forces still used in practice? What does force closure tell you, and what does it not?"]
