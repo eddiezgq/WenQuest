@@ -1,0 +1,410 @@
+1
+00:00:00,300 --> 00:00:02,640
+一台一米八的机器人空翻落地，
+A 1.8-meter robot lands a flip,
+
+2
+00:00:02,640 --> 00:00:04,090
+一条腿飞了出去。
+and one of its legs flies off.
+
+3
+00:00:04,090 --> 00:00:05,390
+腿说：我先走了。
+The leg: I'm out.
+
+4
+00:00:05,390 --> 00:00:06,820
+机器人：等等我！
+The robot: wait for me!
+
+5
+00:00:06,820 --> 00:00:09,390
+这是10月22日，宇树H2-X
+This was Unitree's H2-X on October 22,
+
+6
+00:00:09,390 --> 00:00:11,390
+在自家发布会上的表演。
+live at the company's own launch event.
+
+7
+00:00:11,390 --> 00:00:13,760
+今天的问题：机器人那么硬，
+Today's question: robots are so tough,
+
+8
+00:00:13,760 --> 00:00:15,340
+腿怎么说掉就掉？
+so how does a leg just fall off?
+
+9
+00:00:15,340 --> 00:00:16,580
+认识一下小翻，
+Meet Flip,
+
+10
+00:00:16,580 --> 00:00:18,830
+一个热爱空翻的小机器人。
+a little robot who loves flips.
+
+11
+00:00:18,830 --> 00:00:21,670
+据报道，H2-X身高大约1米82，
+Reportedly, the H2-X is about 1.82 meters tall
+
+12
+00:00:21,670 --> 00:00:23,290
+体重大约70公斤。
+and weighs about 70 kilos.
+
+13
+00:00:23,290 --> 00:00:25,870
+宣传片里，它从4米高台翻下来，
+In its promo video, it flips off a 4-meter platform
+
+14
+00:00:25,870 --> 00:00:26,860
+稳稳落地。
+and sticks the landing.
+
+15
+00:00:26,860 --> 00:00:29,790
+可现场这一次，侧空翻转到一半，
+But live on stage, halfway through a side flip,
+
+16
+00:00:29,790 --> 00:00:30,890
+姿态乱了。
+it lost its balance.
+
+17
+00:00:30,890 --> 00:00:34,080
+落地没站稳，右边小腿从关节处脱落，
+It landed badly, and the right lower leg came off at the joint
+
+18
+00:00:34,080 --> 00:00:35,510
+滑到了垫子上。
+and slid across the mat.
+
+19
+00:00:35,510 --> 00:00:37,360
+第一个道理：一跳起来，
+Lesson one: once you leave the ground,
+
+20
+00:00:37,360 --> 00:00:38,660
+转多少就定了。
+your spin is locked in.
+
+21
+00:00:38,660 --> 00:00:40,590
+空中没有东西可以推，
+There's nothing to push on in midair.
+
+22
+00:00:40,590 --> 00:00:42,250
+这叫角动量守恒。
+That's conservation of angular momentum.
+
+23
+00:00:42,250 --> 00:00:45,010
+就像花样滑冰：手一收转得快，
+Like a figure skater: arms in, faster.
+
+24
+00:00:45,010 --> 00:00:46,510
+手一伸转得慢。
+Arms out, slower.
+
+25
+00:00:46,510 --> 00:00:47,600
+但总的转动，
+But the total spin
+
+26
+00:00:47,600 --> 00:00:49,530
+起跳那一刻就交了卷。
+is handed in at takeoff, like an exam.
+
+27
+00:00:49,530 --> 00:00:50,840
+起跳差一点点，
+A tiny error at takeoff
+
+28
+00:00:50,840 --> 00:00:52,470
+落地就歪一大截。
+becomes a big tilt at landing.
+
+29
+00:00:52,470 --> 00:00:55,480
+我们估算：侧空翻在空中大约只有半秒，
+Our estimate: a side flip is airborne for about half a second.
+
+30
+00:00:55,480 --> 00:00:57,280
+想纠正，几乎来不及。
+Barely any time to fix it.
+
+31
+00:00:57,280 --> 00:00:59,490
+再烧一点：猫从空中掉下，
+Even weirder: a falling cat
+
+32
+00:00:59,490 --> 00:01:01,270
+却能在半空翻个身。
+can still turn itself over in midair.
+
+33
+00:01:01,270 --> 00:01:03,880
+它先扭前半身、再扭后半身，
+It twists its front half, then its back half.
+
+34
+00:01:03,880 --> 00:01:06,820
+总转动一直是零，照样翻过来。
+Total spin stays zero, and it still flips over.
+
+35
+00:01:06,820 --> 00:01:08,500
+机器人也能学这招，
+Robots can learn that trick too,
+
+36
+00:01:08,500 --> 00:01:10,690
+可只有半秒钟，太紧了。
+but half a second is tight.
+
+37
+00:01:10,690 --> 00:01:12,880
+第二个道理：落地那一下，
+Lesson two: how hard
+
+38
+00:01:12,880 --> 00:01:13,910
+力有多大？
+is the landing?
+
+39
+00:01:13,910 --> 00:01:15,900
+我们估算：从半米高落下，
+Our estimate: falling half a meter,
+
+40
+00:01:15,900 --> 00:01:17,840
+落地速度大约每秒3米。
+you hit the ground at about 3 meters a second.
+
+41
+00:01:17,840 --> 00:01:20,920
+如果膝盖弯一弯，用30厘米慢慢停，
+Bend the knees and stop over 30 centimeters:
+
+42
+00:01:20,920 --> 00:01:23,390
+冲击大约是体重的2.7倍。
+the force is about 2.7 times body weight.
+
+43
+00:01:23,390 --> 00:01:26,160
+如果腿绷直，只用5厘米就停住，
+Lock the legs and stop in 5 centimeters:
+
+44
+00:01:26,160 --> 00:01:28,300
+冲击就是体重的11倍！
+11 times body weight!
+
+45
+00:01:28,300 --> 00:01:29,910
+70公斤的机器人，
+For a 70-kilo robot,
+
+46
+00:01:29,910 --> 00:01:32,360
+一条腿要扛七百多公斤的力。
+one leg takes the force of over 700 kilos.
+
+47
+00:01:32,360 --> 00:01:34,090
+所以人落地都会屈膝，
+That's why we bend our knees:
+
+48
+00:01:34,090 --> 00:01:35,940
+时间拉长，力就变小。
+stretch the time, shrink the force.
+
+49
+00:01:35,940 --> 00:01:37,830
+人跑步时，每一步脚下，
+When you run, each step pushes on the ground
+
+50
+00:01:37,830 --> 00:01:39,670
+大约是体重的两三倍。
+with about two to three times your weight.
+
+51
+00:01:39,670 --> 00:01:41,030
+体操运动员落地，
+Gymnasts land with knees, ankles and hips
+
+52
+00:01:41,030 --> 00:01:43,530
+膝盖、脚踝、髋部一起当弹簧。
+all working as springs.
+
+53
+00:01:43,530 --> 00:01:45,550
+第三个道理，最反直觉：
+Lesson three, the weirdest:
+
+54
+00:01:45,550 --> 00:01:47,130
+腿不怕压，怕掰。
+legs don't mind squeezing. They hate bending.
+
+55
+00:01:47,130 --> 00:01:49,810
+就像一根筷子：顺着压很难压断，
+Like a chopstick: push along it, it holds.
+
+56
+00:01:49,810 --> 00:01:51,180
+横着一掰就断。
+Bend it sideways, snap.
+
+57
+00:01:51,180 --> 00:01:53,960
+我们推测：姿态一歪，力从侧面来，
+Our guess: with the body tilted, the force comes sideways,
+
+58
+00:01:53,960 --> 00:01:56,340
+整条腿就成了被横掰的筷子。
+and the leg becomes a bent chopstick.
+
+59
+00:01:56,340 --> 00:01:57,800
+而最先吃不住的，
+And the first thing to give
+
+60
+00:01:57,800 --> 00:01:59,750
+往往是关节这种接缝。
+is usually a seam, like a joint.
+
+61
+00:01:59,750 --> 00:02:03,080
+据报道，它腿部关节扭矩大约360牛米，
+Reportedly its leg joints make about 360 newton-meters,
+
+62
+00:02:03,080 --> 00:02:04,600
+能一脚踢开车门。
+enough to kick in a car door.
+
+63
+00:02:04,600 --> 00:02:06,360
+可力气大不等于扛得住：
+But strong isn't the same as tough:
+
+64
+00:02:06,360 --> 00:02:08,240
+齿轮、螺栓，都有极限。
+gears and bolts all have limits.
+
+65
+00:02:08,240 --> 00:02:10,540
+机器人腿里，电机就是肌肉，
+In a robot leg, the motors are the muscles.
+
+66
+00:02:10,540 --> 00:02:12,970
+落地时要像弹簧一样往回收。
+On landing they have to give, like springs.
+
+67
+00:02:12,970 --> 00:02:14,970
+要是这一刻控制没算准，
+If the control gets that moment wrong,
+
+68
+00:02:14,970 --> 00:02:16,370
+电机就会硬顶。
+the motors push back stiff.
+
+69
+00:02:16,370 --> 00:02:19,370
+工程上还有一招：故意留个保险丝，
+Engineers also have a trick: a built-in fuse.
+
+70
+00:02:19,370 --> 00:02:21,920
+先坏便宜的零件，保住贵的。
+A cheap part breaks first to save the expensive ones.
+
+71
+00:02:21,920 --> 00:02:23,910
+这次是故障还是保护设计？
+Was this a failure, or a safety feature?
+
+72
+00:02:23,910 --> 00:02:26,180
+截至报道，宇树还没有回应。
+As of the reports, Unitree hasn't said.
+
+73
+00:02:26,180 --> 00:02:28,460
+友情提示：官方原因还没公布，
+Friendly fine print: no official cause yet.
+
+74
+00:02:28,460 --> 00:02:31,020
+今天讲的是我们按物理做的推测。
+Today's story is our physics-based guess.
+
+75
+00:02:31,020 --> 00:02:32,700
+机器人摔一跤不丢人，
+A robot falling isn't shameful.
+
+76
+00:02:32,700 --> 00:02:35,160
+每一跤，工程师都能学到东西。
+Every fall teaches the engineers something.
+
+77
+00:02:35,160 --> 00:02:36,950
+据研究，学走路的小孩，
+Studies find toddlers learning to walk
+
+78
+00:02:36,950 --> 00:02:38,540
+一小时能摔十几次。
+fall more than ten times an hour.
+
+79
+00:02:38,540 --> 00:02:39,880
+所以别笑小翻，
+So don't laugh at Flip.
+
+80
+00:02:39,880 --> 00:02:41,520
+它只是在交学费。
+It's just paying tuition.
+
+81
+00:02:41,520 --> 00:02:44,360
+下次再空翻，记得：屈膝、站稳，
+Next flip, remember: bend, land, stay together.
+
+82
+00:02:44,360 --> 00:02:45,660
+腿别先走。
+Legs, don't leave first.
+
