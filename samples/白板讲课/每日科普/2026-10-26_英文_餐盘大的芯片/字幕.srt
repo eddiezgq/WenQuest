@@ -1,0 +1,400 @@
+1
+00:00:00,300 --> 00:00:01,270
+Why is this AI chip
+这块AI芯片，
+
+2
+00:00:01,270 --> 00:00:02,770
+the size of a dinner plate?
+为什么有餐盘那么大？
+
+3
+00:00:02,770 --> 00:00:04,230
+Line up fifty nine of them,
+排上59块，
+
+4
+00:00:04,230 --> 00:00:06,660
+and they run a three trillion parameter AI.
+就能跑一个三万亿参数的AI。
+
+5
+00:00:06,660 --> 00:00:09,840
+Cerebras says it can write up to two thousand tokens a second.
+Cerebras说，一秒能吐上千到两千个词元，
+
+6
+00:00:09,840 --> 00:00:11,750
+That's pages of text, every second.
+差不多每秒好几页字。
+
+7
+00:00:11,750 --> 00:00:12,670
+Today's question:
+今天的问题：
+
+8
+00:00:12,670 --> 00:00:14,860
+why does a bigger chip make AI faster?
+芯片做大，AI为什么就变快？
+
+9
+00:00:14,860 --> 00:00:15,520
+Meet Chippy.
+认识一下小芯，
+
+10
+00:00:15,520 --> 00:00:18,220
+A normal chip, about as big as a postage stamp.
+一块普通芯片，跟邮票差不多大。
+
+11
+00:00:18,220 --> 00:00:19,990
+Chippy does math insanely fast.
+小芯算数快得吓人，
+
+12
+00:00:19,990 --> 00:00:22,280
+Trillions of multiplications a second.
+一秒几万亿次乘法。
+
+13
+00:00:22,280 --> 00:00:23,330
+But here's the catch:
+可问题是：
+
+14
+00:00:23,330 --> 00:00:25,250
+most of the time, Chippy is waiting.
+小芯大部分时间在等。
+
+15
+00:00:25,250 --> 00:00:26,080
+Waiting for what?
+等什么？
+
+16
+00:00:26,080 --> 00:00:27,860
+For numbers to arrive from memory.
+等内存把数字送过来。
+
+17
+00:00:27,860 --> 00:00:29,900
+Picture a chef who cooks in one second,
+想象一个厨师，一秒就能炒好菜，
+
+18
+00:00:29,900 --> 00:00:31,690
+but the fridge is down the hall.
+可冰箱在走廊尽头。
+
+19
+00:00:31,690 --> 00:00:33,600
+To write each word, an AI must read
+AI每写一个词，
+
+20
+00:00:33,600 --> 00:00:35,840
+a huge pile of its numbers from memory.
+都要把一大堆参数从内存读一遍。
+
+21
+00:00:35,840 --> 00:00:37,440
+It's like running to the fridge
+就像每做一道菜，
+
+22
+00:00:37,440 --> 00:00:39,360
+for every ingredient of every dish.
+每样食材都得跑一趟冰箱。
+
+23
+00:00:39,360 --> 00:00:41,280
+So the speed limit isn't the cooking.
+所以限速的不是炒菜，
+
+24
+00:00:41,280 --> 00:00:42,280
+It's the walking.
+是走路。
+
+25
+00:00:42,280 --> 00:00:44,050
+Engineers have a name for this:
+这个问题有个名字：
+
+26
+00:00:44,050 --> 00:00:45,080
+the memory wall.
+内存墙。
+
+27
+00:00:45,080 --> 00:00:46,990
+For years, chips got faster at math
+这些年芯片算得越来越快，
+
+28
+00:00:46,990 --> 00:00:49,410
+much faster than memory got at delivering.
+内存送货却跟不上。
+
+29
+00:00:49,410 --> 00:00:49,870
+Twist one:
+反转一：
+
+30
+00:00:49,870 --> 00:00:52,010
+what if the fridge sat right on the counter?
+要是冰箱就在灶台边呢？
+
+31
+00:00:52,010 --> 00:00:53,430
+That's the Cerebras idea:
+这就是Cerebras的思路：
+
+32
+00:00:53,430 --> 00:00:56,160
+don't cut the silicon wafer into little chips.
+硅晶圆不切成小芯片。
+
+33
+00:00:56,160 --> 00:00:57,320
+Keep the whole wafer:
+整片留着，
+
+34
+00:00:57,320 --> 00:01:00,270
+one giant chip, about twenty centimeters on a side.
+一块巨大的芯片，边长二十多厘米。
+
+35
+00:01:00,270 --> 00:01:02,660
+Memory sits right beside every tiny core.
+内存就贴在每个小核旁边，
+
+36
+00:01:02,660 --> 00:01:04,770
+Forty four gigabytes on one wafer.
+一片晶圆上有44个G。
+
+37
+00:01:04,770 --> 00:01:06,940
+The ingredients are within arm's reach.
+食材就在手边，
+
+38
+00:01:06,940 --> 00:01:07,960
+No more hallway.
+不用走廊了。
+
+39
+00:01:07,960 --> 00:01:08,470
+Twist two:
+反转二：
+
+40
+00:01:08,470 --> 00:01:10,630
+forty four gigabytes still isn't enough.
+44个G还是不够。
+
+41
+00:01:10,630 --> 00:01:12,170
+Even at four bits per number,
+每个参数用4个比特存，
+
+42
+00:01:12,170 --> 00:01:14,830
+the model weighs about one and a half terabytes.
+整个模型也有大约1.5个T。
+
+43
+00:01:14,830 --> 00:01:16,850
+That's about sixteen gigabytes per layer,
+一层大约16个G，
+
+44
+00:01:16,850 --> 00:01:18,650
+and there are ninety three layers.
+一共93层。
+
+45
+00:01:18,650 --> 00:01:20,140
+So build an assembly line:
+那就搭一条流水线：
+
+46
+00:01:20,140 --> 00:01:22,270
+each wafer holds one or two layers.
+每片晶圆管一两层。
+
+47
+00:01:22,270 --> 00:01:23,780
+Wafer one runs its layers,
+第一片算完自己的层，
+
+48
+00:01:23,780 --> 00:01:25,940
+then hands the result to wafer two.
+把结果交给第二片。
+
+49
+00:01:25,940 --> 00:01:28,320
+Only small results travel between wafers.
+晶圆之间只传小小的中间结果，
+
+50
+00:01:28,320 --> 00:01:30,130
+The heavy numbers never move.
+沉重的参数一动不动。
+
+51
+00:01:30,130 --> 00:01:32,180
+Each hop takes about two microseconds.
+每传一次大约两微秒，
+
+52
+00:01:32,180 --> 00:01:34,530
+One blink fits tens of thousands of hops.
+眨一下眼，够传几万次。
+
+53
+00:01:34,530 --> 00:01:36,520
+If the heavy numbers had to travel too,
+要是参数也得搬来搬去，
+
+54
+00:01:36,520 --> 00:01:38,380
+we'd be right back in the hallway.
+那就又回到走廊了。
+
+55
+00:01:38,380 --> 00:01:39,870
+Twist three, the sneaky one:
+反转三，最鸡贼的一个：
+
+56
+00:01:39,870 --> 00:01:43,020
+while wafer two works, wafer one starts the next request.
+第二片在忙，第一片已经开始下一单。
+
+57
+00:01:43,020 --> 00:01:44,080
+Like a car factory:
+就像汽车厂，
+
+58
+00:01:44,080 --> 00:01:46,050
+lots of cars on the line at once.
+流水线上同时好多辆车。
+
+59
+00:01:46,050 --> 00:01:47,380
+A fifty nine station line
+一条59站的流水线，
+
+60
+00:01:47,380 --> 00:01:50,210
+serves lots of people's questions at the same time.
+同时处理好多人的问题。
+
+61
+00:01:50,210 --> 00:01:52,850
+Count them: twenty four wafers for the big layers,
+算一下：24片放大层，
+
+62
+00:01:52,850 --> 00:01:55,250
+thirty five for the light ones. Fifty nine.
+35片放小层，正好59。
+
+63
+00:01:55,250 --> 00:01:57,480
+The light layers keep a small fixed notebook,
+小层只记一个固定大小的小本子，
+
+64
+00:01:57,480 --> 00:01:59,340
+so two of them can share one wafer.
+所以两层能挤一片。
+
+65
+00:01:59,340 --> 00:02:01,200
+The result: for a model this huge,
+结果：这么大的模型，
+
+66
+00:02:01,200 --> 00:02:04,060
+the target is one to two thousand tokens a second.
+目标一秒一千到两千个词元。
+
+67
+00:02:04,060 --> 00:02:05,590
+For comparison: when you read,
+对比一下：你读书，
+
+68
+00:02:05,590 --> 00:02:08,000
+you manage maybe four or five words a second.
+一秒大约读四五个词。
+
+69
+00:02:08,000 --> 00:02:09,290
+What it writes in one second
+它一秒写的，
+
+70
+00:02:09,290 --> 00:02:11,200
+would take you several minutes to read.
+够你读好几分钟。
+
+71
+00:02:11,200 --> 00:02:13,830
+Friendly fine print: this is the company's own blog.
+友情提示：这是公司自己的博客，
+
+72
+00:02:13,830 --> 00:02:16,380
+It's a deployment plan, not an independent test.
+例子是一份部署方案，还没有第三方实测。
+
+73
+00:02:16,380 --> 00:02:18,100
+And a whole wafer is hard to make.
+而且整片晶圆很难造，
+
+74
+00:02:18,100 --> 00:02:20,610
+It carries spare cores to route around defects.
+它得留备用的核，绕开坏点。
+
+75
+00:02:20,610 --> 00:02:22,250
+So the secret isn't just bigger.
+所以秘诀不是越大越好，
+
+76
+00:02:22,250 --> 00:02:24,000
+It's stop running to the fridge.
+是别再跑冰箱。
+
+77
+00:02:24,000 --> 00:02:25,600
+Inside computers, moving data
+在电脑里，搬数据
+
+78
+00:02:25,600 --> 00:02:27,770
+often costs more than doing the math.
+常常比算数还贵。
+
+79
+00:02:27,770 --> 00:02:29,800
+So next time your AI answers instantly,
+下次AI秒回你的时候，
+
+80
+00:02:29,800 --> 00:02:32,440
+thank the chef who never leaves the kitchen.
+谢谢那个从不出厨房的厨师。
+
