@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:14,884 WARNING synthesis text Needle beds, latch needles and cams. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:42:15,011 INFO synthesis text Needle beds, latch needles and cams.
+2026-10-26 07:42:17,118 INFO yield speech len 3.44, rtf 0.6126600642536962
+
+100%|██████████| 1/1 [00:02<00:00,  2.28s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:17,503 WARNING synthesis text First the structure. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:42:17,631 INFO synthesis text First the structure.
+2026-10-26 07:42:19,219 INFO yield speech len 2.28, rtf 0.6964713857884993
+
+100%|██████████| 1/1 [00:01<00:00,  1.76s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.76s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:19,453 WARNING synthesis text First the structure. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:42:19,580 INFO synthesis text First the structure.
+2026-10-26 07:42:20,860 INFO yield speech len 1.6, rtf 0.799751877784729
+
+100%|██████████| 1/1 [00:01<00:00,  1.45s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:21,218 INFO synthesis text A flat machine has a front and a back needle bed forming an inverted V, about one hundred degrees apart.
+2026-10-26 07:42:25,943 INFO yield speech len 8.96, rtf 0.5273450432079179
+
+100%|██████████| 1/1 [00:04<00:00,  4.90s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.90s/it]
+cv2: 110/193 句，用时 28.7 分钟，预计还要 21.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:26,505 INFO synthesis text Each bed has hundreds of slots with a latch needle in each.
+2026-10-26 07:42:30,084 INFO yield speech len 6.56, rtf 0.5455620405150623
+
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:30,587 INFO synthesis text The gap at the top is the trick plate gap where loops form, and the knitted fabric hangs down from it, pulled by take-down rollers.
+2026-10-26 07:42:35,673 INFO yield speech len 9.64, rtf 0.5275965231582831
+
+100%|██████████| 1/1 [00:05<00:00,  5.26s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:36,366 INFO synthesis text The carriage rides over both beds; its cams push the needles up and down, and the yarn carriers travel with it, laying yarn into the hooks.
+2026-10-26 07:42:42,391 INFO yield speech len 11.52, rtf 0.5229610949754715
+
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:42:43,115 INFO synthesis text How dense the needles are is the gauge E, needles per inch, and the pitch p is twenty-five.four millimetres over E.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:43:15,449 INFO synthesis text Two selection points work together: selected at Sone and Stwo, the needle rises to clearing height and knits; selected only at Sone, it rises to tuck height; not selected at Sone, it stays put.
+2026-10-26 07:43:23,637 INFO yield speech len 15.4, rtf 0.5316680437558657
+
+100%|██████████| 1/1 [00:08<00:00,  8.37s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:43:24,503 INFO synthesis text Two selection points work together: selected at Sone and Stwo, the needle rises to clearing height and knits; selected only at Sone, it rises to tuck height; not selected at Sone, it stays put.
+2026-10-26 07:43:33,087 INFO yield speech len 16.36, rtf 0.524680145212374
+
+100%|██████████| 1/1 [00:08<00:00,  8.76s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.76s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:43:34,134 INFO synthesis text The electronics makes just one or two yes-or-no decisions per needle; the hard part is making them at exactly the right position.
+2026-10-26 07:43:39,472 INFO yield speech len 10.12, rtf 0.5274882900856229
+
+100%|██████████| 1/1 [00:05<00:00,  5.51s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.51s/it]
+cv2: 120/193 句，用时 29.9 分钟，预计还要 18.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:43:40,002 WARNING synthesis text Selecting by position. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:43:40,130 INFO synthesis text Selecting by position.
+2026-10-26 07:43:41,557 INFO yield speech len 2.08, rtf 0.6861730263783381
+
+100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:43:41,843 WARNING synthesis text Selecting by position. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:43:41,968 INFO synthesis text Selecting by position.
+2026-10-26 07:43:43,183 INFO yield speech len 1.48, rtf 0.8210370669493804
+
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:43:43,497 WARNING synthesis text Selecting by position. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:43:43,624 INFO synthesis text Selecting by position.
+2026-10-26 07:43:44,915 INFO yield speech len 1.68, rtf 0.7683526901971727
+
+100%|██████████| 1/1 [00:01<00:00,  1.46s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.46s/it]
+
+100%|██████████| 1/1 [00:01<00:00,  1.59s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:44:26,814 WARNING synthesis text Timing is set by position, not by the clock. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:44:26,943 INFO synthesis text Timing is set by position, not by the clock.
+2026-10-26 07:44:29,389 INFO yield speech len 4.28, rtf 0.5716050339636402
+
+100%|██████████| 1/1 [00:02<00:00,  2.62s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:44:29,700 WARNING synthesis text How do we fire at the right place? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:44:29,828 INFO synthesis text How do we fire at the right place?
+2026-10-26 07:44:31,686 INFO yield speech len 2.92, rtf 0.6364516199451603
+
+100%|██████████| 1/1 [00:02<00:00,  2.03s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:44:32,120 INFO synthesis text The controller always knows carriage position x from the motor encoder or a linear scale.
+2026-10-26 07:44:36,183 INFO yield speech len 7.52, rtf 0.5402521567141756
+
+100%|██████████| 1/1 [00:04<00:00,  4.23s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:44:36,690 INFO synthesis text The controller always knows carriage position x from the motor encoder or a linear scale.
+2026-10-26 07:44:40,955 INFO yield speech len 8.0, rtf 0.5331562161445618
+
+100%|██████████| 1/1 [00:04<00:00,  4.44s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:44:41,485 INFO synthesis text Needle i is at xzero plus i times p; the selection point is offset c on the carriage, so the ideal action point is xi minus c; subtract the distance covered during the delay, v times T_d, and that's where to fire.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:09,281 INFO synthesis text This is the knitting simulation, slowed five times.
+2026-10-26 07:45:12,030 INFO yield speech len 4.76, rtf 0.5775807284507432
+
+100%|██████████| 1/1 [00:02<00:00,  2.92s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:12,470 INFO synthesis text The upper row is the back bed, the lower row the front bed; the grey zones are the reversal margins, where the carriage slows, turns and speeds up again.
+2026-10-26 07:45:18,035 INFO yield speech len 10.4, rtf 0.5351604635898883
+
+100%|██████████| 1/1 [00:05<00:00,  5.74s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:18,853 INFO synthesis text A red dot marks a needle whose selection position error is out of tolerance.
+2026-10-26 07:45:23,325 INFO yield speech len 8.28, rtf 0.5401224041906533
+
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:23,840 INFO synthesis text On the left, no lead: as soon as the carriage gets up to speed, red dots appear in patches.
+2026-10-26 07:45:28,680 INFO yield speech len 9.12, rtf 0.5306762038615712
+
+100%|██████████| 1/1 [00:05<00:00,  5.02s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:29,310 INFO synthesis text On the right, lead by real-time speed: selection is on target whether accelerating or at full speed.
+2026-10-26 07:45:33,984 INFO yield speech len 8.68, rtf 0.5385292565218315
+
+100%|██████████| 1/1 [00:04<00:00,  4.84s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:34,580 INFO synthesis text The key is that the v in the lead must be the real-time speed.
+2026-10-26 07:45:37,571 INFO yield speech len 5.4, rtf 0.5537957615322536
+
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:38,076 INFO synthesis text The carriage reverses every pass, and after each reversal there's an acceleration zone.
+2026-10-26 07:45:41,379 INFO yield speech len 6.32, rtf 0.5227237562590007
+
+100%|██████████| 1/1 [00:03<00:00,  3.48s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:45:41,941 INFO synthesis text The carriage reverses every pass, and after each reversal there's an acceleration zone.
+2026-10-26 07:45:45,227 INFO yield speech len 6.08, rtf 0.5405284072223463
+
+100%|██████████| 1/1 [00:03<00:00,  3.46s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.46s/it]
+2026-10-26 07:46:35,229 INFO yield speech len 17.64, rtf 0.5280801363272462
+
+100%|██████████| 1/1 [00:09<00:00,  9.50s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:46:36,116 INFO synthesis text A course takes hundreds of milliseconds, plenty of time.
+2026-10-26 07:46:38,680 INFO yield speech len 4.48, rtf 0.5722820226635251
+
+100%|██████████| 1/1 [00:02<00:00,  2.74s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:46:39,137 INFO synthesis text The carriage board works per needle: its FPGA fires the selectors by carriage position, with only a millisecond or two per needle.
+2026-10-26 07:46:44,578 INFO yield speech len 10.48, rtf 0.5192396294979649
+
+100%|██████████| 1/1 [00:05<00:00,  5.62s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:46:45,257 INFO synthesis text The board rides on the carriage so dozens of coils wire up locally and only power and one bus go through the cable chain.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:00,153 INFO synthesis text Now tie it together to answer the opening question.
+2026-10-26 07:47:02,138 INFO yield speech len 3.44, rtf 0.5769934765128202
+
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+cv2: 150/193 句，用时 33.3 分钟，预计还要 9.5 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:02,505 WARNING synthesis text Step one: can the selector keep up? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:47:02,632 INFO synthesis text Step one: can the selector keep up?
+2026-10-26 07:47:04,703 INFO yield speech len 3.36, rtf 0.6161952302569434
+
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:05,142 INFO synthesis text Each needle gets one.seventy-six milliseconds, more than the selector's one.two-millisecond engage–release cycle T_c, so yes.
+2026-10-26 07:47:12,015 INFO yield speech len 12.96, rtf 0.5303031868404812
+
+100%|██████████| 1/1 [00:07<00:00,  7.05s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:12,725 INFO synthesis text Each needle gets one.seventy-six milliseconds, more than the selector's one.two-millisecond engage–release cycle T_c, so yes.
+2026-10-26 07:47:19,696 INFO yield speech len 13.16, rtf 0.5297408459034372
+
+100%|██████████| 1/1 [00:07<00:00,  7.15s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:20,434 INFO synthesis text Each needle gets one.seventy-six milliseconds, more than the selector's one.two-millisecond engage–release cycle T_c, so yes.
+2026-10-26 07:47:28,009 INFO yield speech len 14.36, rtf 0.5275190872734303
+
+100%|██████████| 1/1 [00:07<00:00,  7.75s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.75s/it]
+！听着不清（0.847，试了 3 次）：Each needle gets 1.76 milliseconds, more than the selector's → each needle gets 176 milliseconds. More than the selector's 
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:28,704 INFO synthesis text Step two: a fixed lead needs full speed before the first needle, so the margin is at least v squared over twoa, seventy-two millimetres, and one pass is the five hundred and eighty-two-millimetre fabric, plus the one hundred and fifty-millimetre span of the cam plate, plus two seventy-twos: eight hundred and seventy-six millimetres.
+2026-10-26 07:47:39,015 INFO yield speech len 19.32, rtf 0.5337200549818714
+
+100%|██████████| 1/1 [00:10<00:00, 10.49s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:47:39,974 INFO synthesis text Step two: a fixed lead needs full speed before the first needle, so the margin is at least v squared over twoa, seventy-two millimetres, and one pass is the five hundred and eighty-two-millimetre fabric, plus the one hundred and fifty-millimetre span of the cam plate, plus two seventy-twos: eight hundred and seventy-six millimetres.
+
+100%|██████████| 1/1 [00:08<00:00,  8.88s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:48:49,977 INFO synthesis text Cameras and valves have delays as well, so when belt speed varies they too must lead by the real-time speed.
+2026-10-26 07:48:55,509 INFO yield speech len 10.36, rtf 0.5340441313489523
+
+100%|██████████| 1/1 [00:05<00:00,  5.70s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:48:56,141 INFO synthesis text In everyday life the closest thing to a flat knitting machine is an inkjet printer.
+2026-10-26 07:48:59,889 INFO yield speech len 6.92, rtf 0.5415789998335645
+
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:00,454 INFO synthesis text The print head sweeps back and forth across the paper, printing a band each pass, and every nozzle decides to fire or not when it reaches exactly the right spot, almost exactly like the carriage sweeping the beds and each needle deciding whether to knit.
+2026-10-26 07:49:09,816 INFO yield speech len 17.72, rtf 0.5283146760264584
+
+100%|██████████| 1/1 [00:09<00:00,  9.54s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.54s/it]
+cv2: 160/193 句，用时 35.4 分钟，预计还要 7.3 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:10,834 INFO synthesis text The head's position comes from an encoder strip, and it fires by position, not by time, which is why the text isn't skewed even while the head is accelerating at the start of a pass.
+2026-10-26 07:49:18,041 INFO yield speech len 14.0, rtf 0.5147484881537301
+
+100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:18,761 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:49:18,888 INFO synthesis text Back to the opening question.
+2026-10-26 07:49:20,627 INFO yield speech len 2.56, rtf 0.679258443415165
+
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:21,017 INFO synthesis text Now each pass takes zero.ninety seconds and a panel eleven.four minutes.
+2026-10-26 07:49:25,268 INFO yield speech len 8.08, rtf 0.5260820140933046
+
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:25,784 INFO synthesis text Now each pass takes zero.ninety seconds and a panel eleven.four minutes.
+2026-10-26 07:49:30,039 INFO yield speech len 8.04, rtf 0.5291386326747155
+
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:30,545 INFO synthesis text Option A, a real-time lead, needn't reach full speed before the first needle, so the margin drops to twenty millimetres: ten.three minutes.
+2026-10-26 07:49:36,368 INFO yield speech len 11.28, rtf 0.5161795633059022
+
+100%|██████████| 1/1 [00:06<00:00,  6.00s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:37,133 INFO synthesis text Option A, a real-time lead, needn't reach full speed before the first needle, so the margin drops to twenty millimetres: ten.three minutes.
+2026-10-26 07:49:42,990 INFO yield speech len 11.44, rtf 0.5119917901245864
+
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:49:43,728 INFO synthesis text Option C, one.six metres per second, needs a one hundred and twenty-eight-millimetre margin and gives ten.five minutes.
+cv2: 170/193 句，用时 37.5 分钟，预计还要 5.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:51:15,212 INFO synthesis text Task one: choose no lead and raise the carriage speed from zero.four metres per second. No red dots yet. Keep going; at which step do mis-selections start? Find it yourself, then explain it with p over v and v times T_d.
+2026-10-26 07:51:26,006 INFO yield speech len 21.36, rtf 0.5053050620725539
+
+100%|██████████| 1/1 [00:10<00:00, 10.98s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:51:27,133 INFO synthesis text Task two: back to a fixed lead at one.two, and shrink the reversal margin from two hundred millimetres. Where do errors start, on which side of the fabric and which needles, and why? That goes in your report.
+2026-10-26 07:51:37,227 INFO yield speech len 19.36, rtf 0.5213885267903983
+
+100%|██████████| 1/1 [00:10<00:00, 10.28s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.28s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:51:38,153 INFO synthesis text Task two: back to a fixed lead at one.two, and shrink the reversal margin from two hundred millimetres. Where do errors start, on which side of the fabric and which needles, and why? That goes in your report.
+
+100%|██████████| 1/1 [00:08<00:00,  8.66s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:52:07,589 INFO synthesis text Finally, change the selector delay from zero.eight to zero.six milliseconds and repeat task one. How does the speed where errors begin change? The guide and report template are on the platform.
+2026-10-26 07:52:16,328 INFO yield speech len 16.68, rtf 0.5239427661438354
+
+100%|██████████| 1/1 [00:08<00:00,  8.92s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:52:17,215 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-26 07:52:20,814 INFO yield speech len 6.56, rtf 0.5487003340953734
+
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:52:21,327 INFO synthesis text You can open today's interactive slides, the knitting simulation, and the FPGA lab where you write the selection channel in Verilog, and work them yourself.
+2026-10-26 07:52:28,027 INFO yield speech len 12.88, rtf 0.5202029247461638
+
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:52:28,773 INFO synthesis text You submit the assignment and the lab reports on the platform, and get marks and comments back.
+2026-10-26 07:52:32,634 INFO yield speech len 7.16, rtf 0.5392538768619133
+
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:52:33,201 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-26 07:52:38,611 INFO yield speech len 10.36, rtf 0.5222496378836025
+
+100%|██████████| 1/1 [00:05<00:00,  5.59s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:52:39,193 INFO synthesis text Your assignment has four questions, all about knitting sleeves on an Efourteen single-system machine. One: with the carriage at one metre per second, a zero.five millisecond selector delay and a one.three millisecond cycle, find the pitch, the time per needle, the lag without compensation and whether it exceeds a quarter pitch, and the highest carriage speed allowed.
+！听着不清（0.38，试了 3 次）：Three is closed-loop control of loop length, which this vide → 3. Closed Loop Control of Loop Length. Which this video skip
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:08,461 WARNING synthesis text Submit the report on the WenQuest platform. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:54:08,588 INFO synthesis text Submit the report on the WenQuest platform.
+2026-10-26 07:54:10,822 INFO yield speech len 3.8, rtf 0.58796857532702
+
+100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:11,366 INFO synthesis text There's also a ten-question quiz. For example, a needle is selected at Sone but not at Stwo. What does it do in this course?
+2026-10-26 07:54:17,137 INFO yield speech len 10.84, rtf 0.5324180495694995
+
+100%|██████████| 1/1 [00:05<00:00,  5.94s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:17,856 INFO synthesis text There's also a ten-question quiz. For example, a needle is selected at Sone but not at Stwo. What does it do in this course?
+2026-10-26 07:54:22,854 INFO yield speech len 9.4, rtf 0.5317406705085267
+
+100%|██████████| 1/1 [00:05<00:00,  5.17s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.17s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:23,564 INFO synthesis text There's also a ten-question quiz. For example, a needle is selected at Sone but not at Stwo. What does it do in this course?
+2026-10-26 07:54:28,949 INFO yield speech len 10.36, rtf 0.5197541824178806
+
+100%|██████████| 1/1 [00:05<00:00,  5.56s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:29,660 INFO synthesis text Or, on an Eseven machine with the carriage at one metre per second, what is the selection time per needle? Another asks why take-down uses torque control.
+2026-10-26 07:54:36,230 INFO yield speech len 12.16, rtf 0.5402442852133199
+
+100%|██████████| 1/1 [00:06<00:00,  6.74s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:37,012 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-26 07:54:40,339 INFO yield speech len 5.96, rtf 0.5581128117222114
+
+100%|██████████| 1/1 [00:03<00:00,  3.50s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:40,832 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-26 07:54:43,965 INFO yield speech len 5.84, rtf 0.5365686873867087
+
+100%|██████████| 1/1 [00:03<00:00,  3.31s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:44,306 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:54:44,432 INFO synthesis text Three things to remember.
+2026-10-26 07:54:46,411 INFO yield speech len 3.04, rtf 0.6509457763872648
+
+100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.15s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-26 07:54:46,709 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-26 07:54:46,836 INFO synthesis text Three things to remember.
+2026-10-26 07:55:32,770 DEBUG Lock 129450714681296 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-26 07:55:32,770 DEBUG Attempting to release lock 129450714681296 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-26 07:55:32,770 DEBUG Lock 129450714681296 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-26 07:55:32,773 DEBUG Attempting to acquire lock 129450714688160 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-26 07:55:32,773 DEBUG Lock 129450714688160 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-26 07:55:32,773 DEBUG Attempting to release lock 129450714688160 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-26 07:55:32,773 DEBUG Lock 129450714688160 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 51 分钟
