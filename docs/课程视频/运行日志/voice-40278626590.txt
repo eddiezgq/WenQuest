@@ -1,0 +1,31 @@
+193 句，引擎 ['cv2']
+Warning: Permanently added 'x.x.x.x' (ED25519) to the list of known hosts.
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+（取日志失败，稍后再试） 
+GPU 机器已关机，用时 26 分钟
+Traceback (most recent call last):
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 384, in <module>
+    main()
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 380, in main
+    gpu_session(job, work, out)
+  File "/home/runner/work/WenQuest/WenQuest/tools/video/clone.py", line 313, in gpu_session
+    raise RuntimeError("GPU 机器连续 20 分钟连不上（SSH 取日志失败），放弃这次合成")
+RuntimeError: GPU 机器连续 20 分钟连不上（SSH 取日志失败），放弃这次合成
