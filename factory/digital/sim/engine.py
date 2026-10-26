@@ -973,11 +973,13 @@ class Engine:
         result = "pass"
         drift = self.__dict__.setdefault("_meas_drift", {})
         tmpl = (data.ITEMS.get(job.wo.item) or (None,) * 6)[5]      # ERPNext 检验模板（桥接建检验单用）
+        st = getattr(p, "err", None) or {}
+        trace = {k: v for k, v in (("assembled_on", st.get("_ja")), ("lot", getattr(p, "hd_lot", None))) if v}   # 分层用（第 47 轮）
         for c in spec:
             key = (job.wo.item, c["code"])
-            d = drift.get(key, 0.0) * 0.98 + self.rng.gauss(0, c["sigma"] * 0.15)   # 均值慢慢游走、有回复
+            d = drift.get(key, 0.0) * 0.95 + self.rng.gauss(0, c["sigma"] * 0.1)    # 均值慢慢游走、有回复（稳态约 0.3σ，第 47 轮从 0.75σ 调小）
             drift[key] = d
-            v = round(c["nominal"] + d + self.rng.gauss(0, c["sigma"]), 4)
+            v = round(c["nominal"] + d + self.rng.gauss(0, c["sigma"]) + self.errors.plant_offset(p, c["code"]), 4)
             r = "pass" if c["lo"] <= v <= c["hi"] else "fail"
             if r == "fail":
                 result = "fail"
@@ -986,7 +988,8 @@ class Engine:
                       "characteristic": c["code"], "name": c["name"], "unit": c.get("unit") or "mm",
                       "nominal_mm": c["nominal"], "lower_tol_mm": c["lo"], "upper_tol_mm": c["hi"], "value_mm": v, "result": r,
                       "n_chars": len(spec), "factory_ts": self.factory_ts(),
-                      **({"template": tmpl, "spec": "{} ({})".format(c["name"], c.get("unit") or "mm")} if tmpl else {})}, corr)
+                      **({"template": tmpl, "spec": "{} ({})".format(c["name"], c.get("unit") or "mm")} if tmpl else {}),
+                      **trace}, corr)
         return result
 
     # ------------------------------------------------------------ 停机

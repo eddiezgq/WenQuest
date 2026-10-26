@@ -17,6 +17,12 @@
           <b class="mono">{{ ((mean5 - chart.center) * 1000).toFixed(1) }}</b> µm，距上限 <b class="mono">{{ ((chart.upper - max5) * 1000).toFixed(1) }}</b> µm。</p>
         <p v-else-if="chart.points.length" class="small">最近 5 件均值 <b class="mono">{{ mean5.toFixed(3) }}</b> {{ unit }}，偏离公差中值
           <b class="mono">{{ (mean5 - chart.center).toFixed(3) }}</b> {{ unit }}，距上限 <b class="mono">{{ (chart.upper - max5).toFixed(3) }}</b> {{ unit }}。</p>
+        <div v-if="strata.length" class="strata" data-help="q-strata">
+          <div v-for="g in strata" :key="g.by"><b class="small">按{{ g.label }}分层</b>
+            <table class="t small"><thead><tr><th>{{ g.label }}</th><th class="num">件数</th><th class="num">均值 {{ unit }}</th><th class="num">超差</th></tr></thead>
+              <tbody><tr v-for="x in g.rows" :key="x.k"><td class="mono">{{ x.k }}</td><td class="num">{{ x.n }}</td><td class="num">{{ x.mean }}</td>
+                <td class="num">{{ x.fails }}</td></tr></tbody></table></div>
+        </div>
         <table class="t">
           <thead><tr><th>时间</th><th>零件</th><th>工单</th><th class="num">实测 {{ unit }}</th><th class="num">公差</th><th>判定</th></tr></thead>
           <tbody><tr v-for="r in rows.slice().reverse().slice(0, 30)" :key="r.id">
@@ -124,7 +130,7 @@ const grdLife = computed(() => {
   return g ? Math.round(g.tool_life_left * 100) + '%' : '—';
 });
 async function load() {
-  [rows.value, ncr.value] = await Promise.all([get('/quality/measurements?characteristic=' + ch.value + '&item=' + encodeURIComponent(cur.value?.item || '') + '&limit=60'), get('/ncr')]);
+  [rows.value, ncr.value] = await Promise.all([get('/quality/measurements?characteristic=' + ch.value + '&item=' + encodeURIComponent(cur.value?.item || '') + '&limit=' + (demo.value ? 60 : 200)), get('/ncr')]);
 }
 async function load8d() {
   q8d.value = await get('/quality/8d');
@@ -152,9 +158,20 @@ async function answer() {
   fbOk.value = r.score >= 8;
   teachStatus.value = await get('/teach');
 }
+// 分层（第 47 轮实验 25）：机器人厂的关节记了装配工位、谐波减速器批次，按它们分组比均值
+const strata = computed(() => [['assembled_on', '装配工位'], ['lot', '减速器批次']].map(([by, label]) => {
+  const m = {};
+  for (const r of rows.value) {
+    const k = r[by];
+    if (!k) continue;
+    const x = m[k] || (m[k] = { k, n: 0, sum: 0, fails: 0 });
+    x.n += 1; x.sum += r.value_mm; x.fails += r.result === 'fail' ? 1 : 0;
+  }
+  return { by, label, rows: Object.values(m).sort((a, b) => a.k.localeCompare(b.k)).map((x) => ({ ...x, mean: (x.sum / x.n).toFixed(3) })) };
+}).filter((g) => g.rows.length));
 const demo = ref(true);                     // 演示工厂（减速器厂）；别的工厂不显示问题情景、砂轮
 onMounted(async () => {
-  loadConfig().then((c) => { demo.value = c?.plant?.demo !== false; }).catch(() => {});
+  try { demo.value = (await loadConfig())?.plant?.demo !== false; } catch { /* 取不到按演示工厂 */ }
   try {
     const cs = await get('/quality/characteristics');
     if (cs.length) { chars.value = cs; sel.value = cs[0].item + '|' + cs[0].key; }
@@ -168,6 +185,7 @@ onMounted(async () => {
 
 <style scoped>
 .grow { flex-grow: 1; min-width: 0; }
+.strata { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 10px 0; }
 .side { width: 380px; flex-shrink: 0; }
 .card-head select { height: 32px; border: 1px solid var(--line); border-radius: 6px; }
 .ncr { padding: 10px 0; border-top: 1px solid var(--line-soft); display: flex; flex-direction: column; gap: 4px; }

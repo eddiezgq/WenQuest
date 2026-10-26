@@ -28,14 +28,23 @@ def lot_size(code):
     return LOT["raw_kg"] if F.ITEMS[code][2] == "Kg" else LOT["default"]
 
 
+def std_rollup(item):
+    """多层标准成本（第 47 轮）：材料按物料清单逐层累加到外购件、原材料；工序分本层和含下层的合计"""
+    if item not in F.BOMS:
+        return {"material": float(F.ITEMS[item][3] or 0), "operations_own": 0.0, "operations": 0.0}
+    mat = below = 0.0
+    for c, q in F.BOMS[item][1]:
+        r = std_rollup(c)
+        mat += q * r["material"]
+        below += q * r["operations"]
+    own = sum(mins / 60 * rate_per_hour(OP_UNITS[op][0]) for op, mins in routing_for(item))
+    return {"material": mat, "operations_own": own, "operations": own + below}
+
+
 def std_unit_cost(item):
-    """标准成本：材料 + 各工序（工时 × 工位小时费率）。"""
-    mat = sum(q * (F.ITEMS[c][3] or 0) for c, q in F.BOMS[item][1])
-    ops = 0.0
-    for op, mins in routing_for(item):
-        unit = OP_UNITS[op][0]
-        ops += mins / 60 * rate_per_hour(unit)
-    return round(mat, 2), round(ops, 2)
+    """标准成本：材料（逐层累加）+ 本层各工序（工时 × 工位小时费率）。输出轴这类只有原材料的件与原来一样。"""
+    r = std_rollup(item)
+    return round(r["material"], 2), round(r["operations_own"], 2)
 
 
 SOURCE_OF = {"make": "semi", "sub": "semi", "buy": "purchased", "raw": "raw"}   # 物料类别 → 领料仓库（桥接按它填工单）

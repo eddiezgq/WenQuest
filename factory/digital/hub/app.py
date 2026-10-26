@@ -81,7 +81,7 @@ WEB_DIST = os.environ.get("WQ_WEB_DIST", os.path.join(os.path.dirname(HERE), "we
 # 企业工厂（WQ_PLANT_FILE 指定、demo_data: false）里这些接口一律 404，网页按 /api/config 的 plant.hidden 不显示入口
 DEMO_PLANT = PLANT.is_demo()
 TEACH_ONLY_API = tuple("/api/lab{}".format(n) for n in range(15, 24)) + (
-    "/api/labs", "/api/story", "/api/scenario", "/api/teach/batch-complaint", "/api/help/try",       # 帮助里的“当场动手”（第 30 轮 §八）
+    "/api/story", "/api/scenario", "/api/teach/batch-complaint", "/api/help/try",       # 帮助里的“当场动手”（第 30 轮 §八）
     "/api/complaints", "/api/crm", "/api/followups", "/api/ont/customer360", "/api/service",     # E1 客户与服务
     "/api/ehs", "/api/maint", "/api/people", "/api/supply", "/api/energy", "/api/finance")      # E2–E7
 TEACH_ONLY_NAV = ("/service", "/supply", "/finance", "/maint", "/people", "/ehs", "/energy", "/director", "/labs", "/teach",
@@ -386,7 +386,7 @@ def teach_only(path):
 
 @app.middleware("http")
 async def _demo_plant_only(request: Request, call_next):
-    if not DEMO_PLANT and teach_only(request.url.path):
+    if not DEMO_PLANT and (teach_only(request.url.path) or (request.url.path == "/api/labs" and not _labs_api.has_labs())):
         return JSONResponse({"detail": "这项功能只属于演示工厂（问渠减速器厂），本厂没有"}, 404)
     return await call_next(request)
 
@@ -631,7 +631,9 @@ def _plant_cfg():
     act = PLANT.active()
     return {"name": PLANT.display_name(), "company": c["name"], "currency": c["currency"], "demo": DEMO_PLANT,
             "id": act["ID"] if act else "wenquest-gearbox",          # 第 45 轮：帮助按它显示“机器人厂”一册
-            "shift": "{}–{}".format(cal.DEF_START, cal.DEF_END), "hidden": [] if DEMO_PLANT else list(TEACH_ONLY_NAV)}
+            "shift": "{}–{}".format(cal.DEF_START, cal.DEF_END),
+            # “实验与任务”：本厂有自己的实验（机器人厂的实验 24、25，第 47 轮）就显示
+            "hidden": [] if DEMO_PLANT else [p for p in TEACH_ONLY_NAV if not (p == "/labs" and _labs_api.has_labs())]}
 
 
 # ---------------------------------------------------------------- AI 模型选择（第 30 轮 H-6；freecad-ai-parts ADR-0063）
@@ -2193,6 +2195,77 @@ from hub import help_try as _help_try  # noqa: E402
 _help_try.mount(app, H, user_of, who)                  # 第 30 轮 §八 8-1：帮助里的“当场动手”（只在演示工厂、教学模式）
 from hub import labs_api as _labs_api  # noqa: E402
 _labs_api.mount(app, H, user_of)                       # 第 19 轮：“实验与任务”一个入口
+
+
+# ---------------------------------------------------------------- 实验 24、25（第 47 轮，机器人厂）
+def _robot_lab(n):
+    from hub import lab24, lab25
+    if _labs_api.plant_id() != "wenquest-robot":
+        raise HTTPException(404, "实验 {} 只在机器人厂".format(n))
+    return lab24 if n == 24 else lab25
+
+
+@app.get("/api/lab24")
+def lab24_status(u=Depends(user_of)):
+    m = _robot_lab(24)
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = m.check(H.db, u["name"])
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = m.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab24/{tid}")
+def lab24_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    m = _robot_lab(24)
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return m.answer(H.db, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
+
+
+@app.get("/api/lab25")
+def lab25_status(u=Depends(user_of)):
+    m = _robot_lab(25)
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    m.check(H.db, u["name"])
+    out = m.status(H.db, u["name"], teacher=bool(u.get("teacher")))
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = m.class_view(H.db)
+    return out
+
+
+@app.get("/api/lab25/strata")
+def lab25_strata(sel: str, u=Depends(user_of)):
+    return _robot_lab(25).strata(H.db, sel)
+
+
+@app.post("/api/lab25/inject")
+def lab25_inject(body: dict = Body(default={}), u=Depends(user_of)):
+    m = _robot_lab(25)
+    try:
+        return m.inject(H.db, _sim_sender(u), u, body.get("kind"))
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except (ValueError, KeyError) as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/lab25/{tid}")
+def lab25_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    m = _robot_lab(25)
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return m.answer(H.db, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
 from hub.ont import agent_api as _agent_api  # noqa: E402
 _agent_api.mount(app, H, user_of, who, ai_quota)  # 第 17 轮 D 期：AI 代理（要在 mount_anomaly 之前）
 _ont.mount_anomaly(app, H, user_of, who)          # 第 17 轮 B 期：异常、追因、态势、规则

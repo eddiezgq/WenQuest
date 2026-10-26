@@ -403,7 +403,7 @@ def test_page_help_button_targets_exist():
 
 
 def test_old_help_links_moved():
-    """以前的 /help/<文件名> 链接都改成了 /help/teach/<章>、/help/docs/<名字>"""
+    """以前的 /help/<文件名> 链接都改成了 /help/teach/<章>、/help/docs/<名字>（第 45 轮加机器人厂一册 /help/robot）"""
     bad = []
     for root, _, files in os.walk(WEB):
         for fn in files:
@@ -412,7 +412,7 @@ def test_old_help_links_moved():
                 for m in re.findall(r"""['"`](/help/[^'"`]*)""", t):
                     if fn == "main.js" or (fn == "Help.vue" and m == "/help/media") or (fn == "TryBlock.vue" and m.startswith("/help/try")):     # 路由定义；视频清单、当场动手接口
                         continue
-                    if not re.match(r"^/help/(teach|enterprise|docs)(/|$)", m) and "${" not in m and m != "/help/":
+                    if not re.match(r"^/help/(teach|enterprise|robot|docs)(/|$)", m) and "${" not in m and m != "/help/":
                         bad.append("{}：{}".format(fn, m))
     assert not bad, bad
     assert "'/api/help'" not in _read(WEB, "pages", "Help.vue")

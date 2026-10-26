@@ -30,6 +30,7 @@ P.add_argument("--expect-products", default="", help="“订单与计划”里�
 P.add_argument("--speed", type=float, default=300)
 P.add_argument("--timeout", type=float, default=900)
 P.add_argument("--teacher-password", default="", help="本地版（WQ_EDITION=local）当厂长要的老师密码")
+P.add_argument("--lab24", action="store_true", help="接 WQ-CR5 后按实验 24 的六个任务答题，核对拿满 60 分（第 47 轮）")
 A = P.parse_args()
 REAL = A.erp_kind == "real"
 FAILS = []
@@ -217,6 +218,33 @@ def one(item, mgr):
                "订单做完开票", 300, 5)
     price = next((f.get("price") for f in cfg["fg"] if f["item_code"] == item), None)
     check(inv is not None, "开票 {}：${}（售价 {} × {}）".format((inv or {}).get("name"), (inv or {}).get("grand_total"), price, A.qty))
+    if A.lab24 and item == "WQ-CR5":
+        lab24(mgr, made)
+
+
+def lab24(mgr, made):
+    """实验 24：用同一个账号（就是下单的人）按六个任务答题，满分 60"""
+    print("— 实验 24")
+    st = hub("GET", "/api/lab24", token=mgr)
+    exp_joints = {"WQJ-L": 2, "WQJ-M": 1, "WQJ-S": 3}
+    hub("POST", "/api/lab24/l24_t1", {"work_orders": len(made), "joints": sum(exp_joints.values())}, mgr)
+    js = wait(lambda: (lambda x: x["joints"] or None)(hub("GET", "/api/lab24", token=mgr)), "关节测量值", 60, 3) or []
+    j = js[0]
+    bad = [k for k, c in j["chars"].items() if not (c["lo"] <= c["value"] <= c["hi"])]
+    hub("POST", "/api/lab24/l24_t3", {"serial": j["serial"], "verdict": "fail" if bad else "pass", "char": bad[0] if bad else ""}, mgr)
+    st = hub("GET", "/api/lab24", token=mgr)
+    mat = st["std"]["material"]
+    lines = [dict(hub("GET", "/api/work_orders/{}/cost".format(urllib.parse.quote(wo)), token=mgr), item=it)
+             for it, wo in st["order"]["work_orders"].items()]
+    std = mat + sum(x["std_cost"] for x in lines)
+    act = mat + sum(x["actual_cost"] for x in lines)
+    worst = max(lines, key=lambda x: x["variance"])["item"]
+    hub("POST", "/api/lab24/l24_t5", {"variance_pct": round((act - std) / std * 100, 1), "worst": worst}, mgr)
+    hub("POST", "/api/lab24/l24_t6", {"choices": ["bom", "layers", "joint_test", "calib"]}, mgr)
+    st = wait(lambda: (lambda x: x if x["score"] >= 60 else None)(hub("GET", "/api/lab24", token=mgr)), "实验 24 满分", 120, 5) \
+        or hub("GET", "/api/lab24", token=mgr)
+    check(st["score"] == 60, "实验 24 自动评分 {} / 60（{}）".format(
+        st["score"], "、".join("{} {}".format(t["title"], t["score"]) for t in st["tasks"])))
 
 
 def item_needs(item, buy, cfg):

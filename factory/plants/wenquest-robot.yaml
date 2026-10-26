@@ -204,19 +204,19 @@ measurements:
 - item: WQJ-L
   operation: 关节测试 Joint test
   chars:
-  - {code: joint_backlash, name: 背隙, unit: arcmin, nominal: 0.6, lo: 0.0, hi: 1.0, sigma: 0.12}
-  - {code: joint_friction, name: 空载摩擦力矩, unit: N·m, nominal: 1.2, lo: 0.0, hi: 2.0, sigma: 0.2}
+  - {code: joint_backlash, name: 背隙, unit: arcmin, nominal: 0.6, lo: 0.0, hi: 1.0, sigma: 0.06}
+  - {code: joint_friction, name: 空载摩擦力矩, unit: N·m, nominal: 1.2, lo: 0.0, hi: 2.0, sigma: 0.15}
   - {code: joint_zero, name: 编码器零位标定残差, unit: arcsec, nominal: 0, lo: -20, hi: 20, sigma: 4}
 - item: WQJ-M
   operation: 关节测试 Joint test
   chars:
-  - {code: joint_backlash, name: 背隙, unit: arcmin, nominal: 0.6, lo: 0.0, hi: 1.0, sigma: 0.12}
-  - {code: joint_friction, name: 空载摩擦力矩, unit: N·m, nominal: 0.8, lo: 0.0, hi: 1.4, sigma: 0.15}
+  - {code: joint_backlash, name: 背隙, unit: arcmin, nominal: 0.6, lo: 0.0, hi: 1.0, sigma: 0.06}
+  - {code: joint_friction, name: 空载摩擦力矩, unit: N·m, nominal: 0.8, lo: 0.0, hi: 1.4, sigma: 0.1}
   - {code: joint_zero, name: 编码器零位标定残差, unit: arcsec, nominal: 0, lo: -20, hi: 20, sigma: 4}
 - item: WQJ-S
   operation: 关节测试 Joint test
   chars:
-  - {code: joint_backlash, name: 背隙, unit: arcmin, nominal: 0.7, lo: 0.0, hi: 1.2, sigma: 0.14}
+  - {code: joint_backlash, name: 背隙, unit: arcmin, nominal: 0.7, lo: 0.0, hi: 1.2, sigma: 0.07}
   - {code: joint_friction, name: 空载摩擦力矩, unit: N·m, nominal: 0.4, lo: 0.0, hi: 0.8, sigma: 0.08}
   - {code: joint_zero, name: 编码器零位标定残差, unit: arcsec, nominal: 0, lo: -25, hi: 25, sigma: 5}
 - item: WQ-CR5
