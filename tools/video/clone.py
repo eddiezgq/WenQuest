@@ -300,7 +300,7 @@ def gpu_session(job: dict, work: Path, out: Path):
         subprocess.run(["ssh", *G._opts(), f"ubuntu@{ip}",
                         "cd wqv; nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' "
                         "> run.log 2>&1 < /dev/null & disown; exit 0"], check=True, timeout=60)
-        seen, deadline = 0, time.time() + 200 * 60
+        seen, deadline, fails = 0, time.time() + 200 * 60, 0
         while True:
             time.sleep(60)
             r = subprocess.run(["ssh", *G._opts(), "-o", "ServerAliveInterval=30", f"ubuntu@{ip}",
@@ -308,9 +308,13 @@ def gpu_session(job: dict, work: Path, out: Path):
                                capture_output=True, text=True)
             if r.returncode != 0:
                 print("（取日志失败，稍后再试）", r.stderr.strip()[-200:], flush=True)
+                fails += 1
+                if fails >= 20:         # 10-26：机器连不上，白等了 200 分钟才超时；连续 20 分钟取不到日志就放弃，免得空付 GPU 钱
+                    raise RuntimeError("GPU 机器连续 20 分钟连不上（SSH 取日志失败），放弃这次合成")
                 if time.time() > deadline:
                     raise RuntimeError("GPU 上的合成超时")
                 continue
+            fails = 0
             body, _, done = r.stdout.partition("@@DONE@@\n")
             lines = body.splitlines()
             seen += len(lines)
