@@ -1,0 +1,887 @@
+1
+00:00:00,600 --> 00:00:01,603
+Hi everyone,
+
+2
+00:00:01,623 --> 00:00:07,740
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,140 --> 00:00:14,858
+This is Lecture 17, control of computerised flat knitting machines,
+
+4
+00:00:14,878 --> 00:00:18,076
+the machines that knit sweaters.
+
+5
+00:00:18,476 --> 00:00:24,879
+On every sewing machine so far the needle works in one place while the fabric moves.
+
+6
+00:00:24,899 --> 00:00:29,390
+A flat machine turns that around. The needle beds stay put,
+
+7
+00:00:29,410 --> 00:00:31,684
+the carriage sweeps over them,
+
+8
+00:00:31,704 --> 00:00:37,037
+and on every pass each of hundreds of needles decides whether to knit.
+
+9
+00:00:37,437 --> 00:00:40,870
+Three questions today. How is a needle selected?
+
+10
+00:00:40,890 --> 00:00:44,252
+Why must the command go out early, by position?
+
+11
+00:00:44,272 --> 00:00:49,073
+And how long does one front panel take? The FPGA selection channel,
+
+12
+00:00:49,093 --> 00:00:54,398
+patterns and closed-loop control of loop length are left to the slides and
+
+13
+00:00:54,418 --> 00:00:55,477
+the assignment.
+
+14
+00:00:56,997 --> 00:00:58,217
+Here's the problem.
+
+15
+00:00:58,617 --> 00:01:08,755
+A knitwear floor is making jacquard sweater fronts on an E12 single-system
+
+16
+00:01:08,775 --> 00:01:11,776
+flat knitting machine:
+
+17
+00:01:11,795 --> 00:01:16,168
+275 needles, 760 courses in all.
+
+18
+00:01:16,568 --> 00:01:23,281
+The carriage tops out at 1.2 metres per second with 10 metres per second squared,
+
+19
+00:01:23,301 --> 00:01:27,188
+and the controller uses a fixed selection lead.
+
+20
+00:01:27,588 --> 00:01:30,824
+Engineering has three proposals.
+
+21
+00:01:31,224 --> 00:01:36,364
+A: compensate by real-time speed and shorten the reversal margin.
+
+22
+00:01:36,764 --> 00:01:44,400
+B: a two-system carriage that knits both colours in one pass.
+
+23
+00:01:44,800 --> 00:01:50,220
+C: raise carriage speed to 1.6 metres per second.
+
+24
+00:01:50,620 --> 00:01:55,800
+How long does a panel take now, and which option is worth it?
+
+25
+00:01:56,200 --> 00:01:58,180
+We'll answer at the end.
+
+26
+00:01:59,700 --> 00:02:04,080
+Needle beds, latch needles and cams.
+
+27
+00:02:05,600 --> 00:02:07,078
+First the structure.
+
+28
+00:02:07,478 --> 00:02:14,155
+A flat machine has a front and a back needle bed forming an inverted V,
+
+29
+00:02:14,175 --> 00:02:16,418
+about 100 degrees apart.
+
+30
+00:02:16,818 --> 00:02:23,306
+Each bed has hundreds of slots with a latch needle in each.
+
+31
+00:02:23,706 --> 00:02:28,061
+The gap at the top is the trick plate gap where loops form,
+
+32
+00:02:28,081 --> 00:02:33,326
+and the knitted fabric hangs down from it, pulled by take-down rollers.
+
+33
+00:02:33,726 --> 00:02:39,742
+The carriage rides over both beds; its cams push the needles up and down,
+
+34
+00:02:39,762 --> 00:02:45,117
+and the yarn carriers travel with it, laying yarn into the hooks.
+
+35
+00:02:45,517 --> 00:02:51,015
+How dense the needles are is the gauge E, needles per inch,
+
+36
+00:02:51,035 --> 00:02:55,036
+and the pitch p is 25.4 millimetres over E.
+
+37
+00:02:56,556 --> 00:03:03,416
+Unroll the carriage's cam plate onto a flat sheet and you get this picture.
+
+38
+00:03:03,816 --> 00:03:07,042
+The cams are just the cams of Lecture 6,
+
+39
+00:03:07,062 --> 00:03:10,612
+except the feed cam rotates and these slide,
+
+40
+00:03:10,632 --> 00:03:15,561
+and the followers are hundreds of needles, one after another,
+
+41
+00:03:15,581 --> 00:03:17,914
+all tracing the same profile.
+
+42
+00:03:18,314 --> 00:03:21,315
+How do different needles take different paths?
+
+43
+00:03:21,715 --> 00:03:22,270
+Selection.
+
+44
+00:03:22,670 --> 00:03:27,143
+Two selection points work together: selected at S1 and S2,
+
+45
+00:03:27,163 --> 00:03:32,333
+the needle rises to clearing height and knits; selected only at S1,
+
+46
+00:03:32,353 --> 00:03:36,825
+it rises to tuck height; not selected at S1, it stays put.
+
+47
+00:03:37,225 --> 00:03:42,655
+The electronics makes just one or two yes-or-no decisions per needle;
+
+48
+00:03:42,675 --> 00:03:47,315
+the hard part is making them at exactly the right position.
+
+49
+00:03:48,835 --> 00:03:50,291
+Selecting by position.
+
+50
+00:03:51,811 --> 00:04:01,911
+As the carriage sweeps at speed v, the time between two needles is p over v.
+
+51
+00:04:02,311 --> 00:04:08,646
+At E12 and 1.2 metres per second that's only 1.76 milliseconds,
+
+52
+00:04:08,666 --> 00:04:16,413
+and the action has to land in the short stretch where the selector jack lines
+
+53
+00:04:16,433 --> 00:04:18,531
+up with the selector.
+
+54
+00:04:18,931 --> 00:04:22,141
+The selector lags 0.6 milliseconds,
+
+55
+00:04:22,161 --> 00:04:28,969
+during which the carriage moves another 0.72 millimetres, 0.34 of a pitch,
+
+56
+00:04:28,989 --> 00:04:31,461
+more than the 0.25 allowed.
+
+57
+00:04:31,861 --> 00:04:33,921
+So the command must go out early.
+
+58
+00:04:34,321 --> 00:04:38,581
+Timing is set by position, not by the clock.
+
+59
+00:04:40,101 --> 00:04:42,923
+How do we fire at the right place?
+
+60
+00:04:43,323 --> 00:04:50,111
+The controller always knows carriage position x from the motor encoder or a
+
+61
+00:04:50,131 --> 00:04:51,291
+linear scale.
+
+62
+00:04:51,691 --> 00:04:55,022
+Needle i is at x0 plus i times p;
+
+63
+00:04:55,042 --> 00:04:59,897
+the selection point is offset c on the carriage,
+
+64
+00:04:59,917 --> 00:05:03,959
+so the ideal action point is xi minus c;
+
+65
+00:05:03,979 --> 00:05:10,052
+subtract the distance covered during the delay, v times T_d,
+
+66
+00:05:10,072 --> 00:05:12,591
+and that's where to fire.
+
+67
+00:05:12,991 --> 00:05:18,194
+Before each course the selection data is loaded into the FPGA,
+
+68
+00:05:18,214 --> 00:05:23,839
+which compares on every encoder count and fires when it gets there,
+
+69
+00:05:23,859 --> 00:05:25,524
+within microseconds.
+
+70
+00:05:25,924 --> 00:05:30,180
+Software only prepares the data once per course.
+
+71
+00:05:31,700 --> 00:05:36,440
+This is the knitting simulation, slowed five times.
+
+72
+00:05:36,840 --> 00:05:40,865
+The upper row is the back bed, the lower row the front bed;
+
+73
+00:05:40,885 --> 00:05:45,389
+the grey zones are the reversal margins, where the carriage slows,
+
+74
+00:05:45,409 --> 00:05:47,172
+turns and speeds up again.
+
+75
+00:05:47,572 --> 00:05:55,832
+A red dot marks a needle whose selection position error is out of tolerance.
+
+76
+00:05:56,232 --> 00:06:02,581
+On the left, no lead: as soon as the carriage gets up to speed,
+
+77
+00:06:02,601 --> 00:06:05,310
+red dots appear in patches.
+
+78
+00:06:05,710 --> 00:06:09,022
+On the right, lead by real-time speed:
+
+79
+00:06:09,042 --> 00:06:14,370
+selection is on target whether accelerating or at full speed.
+
+80
+00:06:15,890 --> 00:06:21,270
+The key is that the v in the lead must be the real-time speed.
+
+81
+00:06:21,670 --> 00:06:23,983
+The carriage reverses every pass,
+
+82
+00:06:24,003 --> 00:06:27,730
+and after each reversal there's an acceleration zone.
+
+83
+00:06:28,130 --> 00:06:35,054
+With no lead it lags 0.34 of a pitch at full speed, beyond the 0.25 allowed,
+
+84
+00:06:35,074 --> 00:06:38,069
+so the machine has to run slowly.
+
+85
+00:06:38,469 --> 00:06:42,509
+A fixed lead tuned for full speed is exact there,
+
+86
+00:06:42,529 --> 00:06:47,978
+but in the acceleration zone the slower it goes the more it leads,
+
+87
+00:06:47,998 --> 00:06:51,209
+so right after reversal it fires early.
+
+88
+00:06:51,609 --> 00:06:57,837
+Only a real-time lead leaves nothing but the uncertainty in T_d itself,
+
+89
+00:06:57,857 --> 00:07:02,237
+and since T_d drifts with temperature and voltage,
+
+90
+00:07:02,257 --> 00:07:05,229
+it has to be calibrated regularly.
+
+91
+00:07:06,749 --> 00:07:10,049
+Two-level control and FPGA selection.
+
+92
+00:07:11,569 --> 00:07:15,569
+Control is split into two levels with very different time scales.
+
+93
+00:07:15,969 --> 00:07:22,140
+The main controller works per course: it parses the knitting program and,
+
+94
+00:07:22,160 --> 00:07:27,737
+before each reversal, prepares the next course's direction, speed,
+
+95
+00:07:27,757 --> 00:07:33,589
+selection data, stitch setting, yarn carriers, racking and take-down.
+
+96
+00:07:33,989 --> 00:07:38,449
+A course takes hundreds of milliseconds, plenty of time.
+
+97
+00:07:38,849 --> 00:07:41,776
+The carriage board works per needle:
+
+98
+00:07:41,796 --> 00:07:45,869
+its FPGA fires the selectors by carriage position,
+
+99
+00:07:45,889 --> 00:07:49,307
+with only a millisecond or two per needle.
+
+100
+00:07:49,707 --> 00:07:55,764
+The board rides on the carriage so dozens of coils wire up locally and only
+
+101
+00:07:55,784 --> 00:07:59,411
+power and one bus go through the cable chain.
+
+102
+00:07:59,811 --> 00:08:03,322
+The price is vibration and acceleration;
+
+103
+00:08:03,342 --> 00:08:09,679
+typical faults are loose connectors and broken cores in the chain cable.
+
+104
+00:08:11,199 --> 00:08:15,671
+Worked example: time per front panel.
+
+105
+00:08:17,191 --> 00:08:20,459
+Now tie it together to answer the opening question.
+
+106
+00:08:20,859 --> 00:08:24,184
+Step one: can the selector keep up?
+
+107
+00:08:24,584 --> 00:08:28,701
+Each needle gets 1.76 milliseconds,
+
+108
+00:08:28,721 --> 00:08:37,448
+more than the selector's 1.2-millisecond engage–release cycle T_c, so yes.
+
+109
+00:08:37,848 --> 00:08:43,602
+Step two: a fixed lead needs full speed before the first needle,
+
+110
+00:08:43,622 --> 00:08:49,014
+so the margin is at least v squared over 2a, 72 millimetres,
+
+111
+00:08:49,034 --> 00:08:52,803
+and one pass is the 582-millimetre fabric,
+
+112
+00:08:52,823 --> 00:08:59,748
+plus the 150-millimetre span of the cam plate, plus two 72s: 876 millimetres.
+
+113
+00:09:00,148 --> 00:09:09,733
+Time is D over v, plus v over a, plus a 0.05-second dwell at reversal:
+
+114
+00:09:09,753 --> 00:09:16,867
+about 0.90 seconds, so 760 passes take 11.4 minutes.
+
+115
+00:09:18,387 --> 00:09:25,005
+On a robot sorting line, the conveyor motor's encoder gives belt position;
+
+116
+00:09:25,025 --> 00:09:30,387
+the camera must fire when a part reaches the centre of view,
+
+117
+00:09:30,407 --> 00:09:37,474
+and the dispensing robot must open its valve when the part reaches a set point.
+
+118
+00:09:37,874 --> 00:09:43,191
+It's the same problem as needle selection: timing by position,
+
+119
+00:09:43,211 --> 00:09:44,654
+not by the clock.
+
+120
+00:09:45,054 --> 00:09:47,727
+The engineering is the same too:
+
+121
+00:09:47,747 --> 00:09:54,796
+load the target positions into the position-compare output of a motion card or FPGA,
+
+122
+00:09:54,816 --> 00:10:01,613
+which checks every encoder count in hardware and fires a trigger when it arrives.
+
+123
+00:10:02,012 --> 00:10:05,769
+Cameras and valves have delays as well,
+
+124
+00:10:05,789 --> 00:10:12,353
+so when belt speed varies they too must lead by the real-time speed.
+
+125
+00:10:13,872 --> 00:10:20,772
+In everyday life the closest thing to a flat knitting machine is an inkjet printer.
+
+126
+00:10:21,172 --> 00:10:24,980
+The print head sweeps back and forth across the paper,
+
+127
+00:10:25,000 --> 00:10:26,822
+printing a band each pass,
+
+128
+00:10:26,842 --> 00:10:32,422
+and every nozzle decides to fire or not when it reaches exactly the right spot,
+
+129
+00:10:32,442 --> 00:10:37,738
+almost exactly like the carriage sweeping the beds and each needle deciding
+
+130
+00:10:37,758 --> 00:10:38,872
+whether to knit.
+
+131
+00:10:39,272 --> 00:10:45,024
+The head's position comes from an encoder strip, and it fires by position,
+
+132
+00:10:45,044 --> 00:10:45,960
+not by time,
+
+133
+00:10:45,980 --> 00:10:51,967
+which is why the text isn't skewed even while the head is accelerating at the
+
+134
+00:10:51,987 --> 00:10:53,215
+start of a pass.
+
+135
+00:10:54,735 --> 00:10:57,275
+Back to the opening question.
+
+136
+00:10:57,675 --> 00:11:05,658
+Now each pass takes 0.90 seconds and a panel 11.4 minutes.
+
+137
+00:11:06,058 --> 00:11:12,860
+Option A, a real-time lead, needn't reach full speed before the first needle,
+
+138
+00:11:12,880 --> 00:11:17,467
+so the margin drops to 20 millimetres: 10.3 minutes.
+
+139
+00:11:17,867 --> 00:11:21,746
+Option C, 1.6 metres per second,
+
+140
+00:11:21,766 --> 00:11:28,204
+needs a 128-millimetre margin and gives 10.5 minutes.
+
+141
+00:11:28,604 --> 00:11:32,645
+A third more speed buys only about 8 percent,
+
+142
+00:11:32,665 --> 00:11:37,699
+because v over a and v squared over 2a both grow with v,
+
+143
+00:11:37,719 --> 00:11:42,572
+and the time per needle approaches the selector cycle.
+
+144
+00:11:42,972 --> 00:11:49,758
+Option B, a two-system carriage, knits both colours in one pass,
+
+145
+00:11:49,778 --> 00:11:55,819
+460 passes instead of 760: 7.9 minutes, the biggest gain,
+
+146
+00:11:55,839 --> 00:12:00,072
+because it reduces the number of passes.
+
+147
+00:12:00,472 --> 00:12:05,012
+Its price is a longer, heavier carriage.
+
+148
+00:12:05,412 --> 00:12:11,408
+Option A is little more than a software change, so do it first.
+
+149
+00:12:12,928 --> 00:12:17,377
+Now Virtual lab 17-1, the flat knitting simulation.
+
+150
+00:12:17,397 --> 00:12:21,584
+On the WenQuest platform you can do it yourself.
+
+151
+00:12:21,604 --> 00:12:26,666
+The results and tasks at the lower right are blurred here,
+
+152
+00:12:26,686 --> 00:12:29,558
+so you can read them on your own.
+
+153
+00:12:29,578 --> 00:12:33,589
+Top left are the needle beds and the carriage,
+
+154
+00:12:33,609 --> 00:12:38,058
+with the red line at the selection point; below it,
+
+155
+00:12:38,078 --> 00:12:44,631
+the loops as they're knitted; on the right, the pattern and the parameters.
+
+156
+00:12:44,651 --> 00:12:51,028
+It's knitting a two-colour jacquard with a fixed lead, slowed five times.
+
+157
+00:12:51,428 --> 00:12:52,319
+Task one:
+
+158
+00:12:52,339 --> 00:12:59,507
+choose no lead and raise the carriage speed from 0.4 metres per second.
+
+159
+00:12:59,527 --> 00:13:06,289
+No red dots yet. Keep going; at which step do mis-selections start?
+
+160
+00:13:06,309 --> 00:13:12,768
+Find it yourself, then explain it with p over v and v times T_d.
+
+161
+00:13:13,168 --> 00:13:16,734
+Task two: back to a fixed lead at 1.2,
+
+162
+00:13:16,754 --> 00:13:23,811
+and shrink the reversal margin from 200 millimetres. Where do errors start,
+
+163
+00:13:23,831 --> 00:13:29,001
+on which side of the fabric and which needles, and why?
+
+164
+00:13:29,021 --> 00:13:31,360
+That goes in your report.
+
+165
+00:13:31,760 --> 00:13:38,276
+Task three: switch to the real-time lead and try a few gauges,
+
+166
+00:13:38,296 --> 00:13:42,494
+comparing how the maximum error changes.
+
+167
+00:13:42,514 --> 00:13:48,820
+How fast the carriage can go on each gauge is yours to find.
+
+168
+00:13:49,220 --> 00:13:56,252
+Task four: back to E12, widen the reversal margin from 40 to 150 millimetres,
+
+169
+00:13:56,272 --> 00:14:02,663
+and compare the time per course and the panel estimate in the results.
+
+170
+00:14:02,683 --> 00:14:05,320
+How big should the margin be?
+
+171
+00:14:05,720 --> 00:14:06,449
+Finally,
+
+172
+00:14:06,469 --> 00:14:13,477
+change the selector delay from 0.8 to 0.6 milliseconds and repeat task one.
+
+173
+00:14:13,497 --> 00:14:17,694
+How does the speed where errors begin change?
+
+174
+00:14:17,714 --> 00:14:22,380
+The guide and report template are on the platform.
+
+175
+00:14:23,900 --> 00:14:30,409
+Everything in this lecture is on the WenQuest learning platform.
+
+176
+00:14:30,809 --> 00:14:36,225
+You can open today's interactive slides, the knitting simulation,
+
+177
+00:14:36,245 --> 00:14:41,745
+and the FPGA lab where you write the selection channel in Verilog,
+
+178
+00:14:41,765 --> 00:14:43,669
+and work them yourself.
+
+179
+00:14:44,069 --> 00:14:48,768
+You submit the assignment and the lab reports on the platform,
+
+180
+00:14:48,788 --> 00:14:51,204
+and get marks and comments back.
+
+181
+00:14:51,604 --> 00:14:55,745
+Questions go to the course discussion forum,
+
+182
+00:14:55,765 --> 00:15:01,892
+and the grades page shows your mark on every assignment and quiz.
+
+183
+00:15:03,412 --> 00:15:06,186
+Your assignment has four questions,
+
+184
+00:15:06,206 --> 00:15:11,295
+all about knitting sleeves on an E14 single-system machine. One:
+
+185
+00:15:11,315 --> 00:15:14,488
+with the carriage at 1 metre per second,
+
+186
+00:15:14,508 --> 00:15:20,635
+a 0.5 millisecond selector delay and a 1.3 millisecond cycle, find the pitch,
+
+187
+00:15:20,655 --> 00:15:22,232
+the time per needle,
+
+188
+00:15:22,252 --> 00:15:27,660
+the lag without compensation and whether it exceeds a quarter pitch,
+
+189
+00:15:27,680 --> 00:15:30,773
+and the highest carriage speed allowed.
+
+190
+00:15:31,173 --> 00:15:36,698
+Two: the sleeve is 180 needles and 500 courses with a fixed lead.
+
+191
+00:15:36,718 --> 00:15:41,475
+Find one pass's travel and time and the time per sleeve,
+
+192
+00:15:41,495 --> 00:15:47,788
+then estimate how much a real-time lead with a 20 millimetre margin saves.
+
+193
+00:15:48,188 --> 00:15:53,729
+Three is closed-loop control of loop length, which this video skipped;
+
+194
+00:15:53,749 --> 00:15:59,449
+it's in the slides and the textbook. The yarn measures 1026 millimetres:
+
+195
+00:15:59,469 --> 00:16:05,010
+deeper or shallower, by how many steps, and why is the gain below one?
+
+196
+00:16:05,030 --> 00:16:06,678
+Four is a discussion:
+
+197
+00:16:06,698 --> 00:16:11,842
+what do you gain by knitting two sleeves side by side on one bed,
+
+198
+00:16:11,862 --> 00:16:16,688
+and what must the program and the yarn carriers take care of?
+
+199
+00:16:17,088 --> 00:16:20,790
+Submit the report on the WenQuest platform.
+
+200
+00:16:22,310 --> 00:16:26,480
+There's also a ten-question quiz. For example,
+
+201
+00:16:26,500 --> 00:16:33,130
+a needle is selected at S1 but not at S2. What does it do in this course?
+
+202
+00:16:33,530 --> 00:16:38,528
+Or, on an E7 machine with the carriage at 1 metre per second,
+
+203
+00:16:38,548 --> 00:16:41,654
+what is the selection time per needle?
+
+204
+00:16:41,674 --> 00:16:45,521
+Another asks why take-down uses torque control.
+
+205
+00:16:45,921 --> 00:16:51,741
+You get three attempts, and the explanations appear as soon as you submit.
+
+206
+00:16:53,261 --> 00:16:55,161
+Three things to remember.
+
+207
+00:16:55,561 --> 00:17:00,437
+One: on a flat knitting machine the carriage moves,
+
+208
+00:17:00,457 --> 00:17:05,429
+its cams are sliding cams that fix how needles move,
+
+209
+00:17:05,449 --> 00:17:12,437
+and the electronics only makes one or two yes-or-no decisions per needle,
+
+210
+00:17:12,457 --> 00:17:13,589
+by position.
+
+211
+00:17:13,989 --> 00:17:19,538
+Two: selection fires by position; each needle gets only p over v,
+
+212
+00:17:19,558 --> 00:17:22,794
+and the lead must use real-time speed.
+
+213
+00:17:23,194 --> 00:17:25,125
+Three: two-level control,
+
+214
+00:17:25,145 --> 00:17:30,980
+with the main controller preparing each course and the FPGA on the carriage
+
+215
+00:17:31,000 --> 00:17:32,854
+firing needle by needle.
+
+216
+00:17:33,254 --> 00:17:39,243
+The assignment, quiz and both lab reports are on WenQuest.
+
+217
+00:17:39,643 --> 00:17:42,656
+The slides, the virtual labs,
+
+218
+00:17:42,676 --> 00:17:49,976
+the assignment and the quiz are all on the WenQuest learning platform,
+
+219
+00:17:49,996 --> 00:17:56,983
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+220
+00:17:57,383 --> 00:18:03,022
+Next time it's designing, building and testing the control box.
+
+221
+00:18:03,042 --> 00:18:09,578
+Every summer the control boxes on a sewing floor report overheating. Why,
+
+222
+00:18:09,598 --> 00:18:12,722
+and how do we fix it? See you then.
