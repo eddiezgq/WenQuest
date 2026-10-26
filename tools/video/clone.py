@@ -300,14 +300,14 @@ def gpu_session(job: dict, work: Path, out: Path):
         subprocess.run(["ssh", *G._opts(), f"ubuntu@{ip}",
                         "cd wqv; nohup bash -c 'bash setup.sh && . ~/cv/bin/activate && python -u remote.py; echo $? > done' "
                         "> run.log 2>&1 < /dev/null & disown; exit 0"], check=True, timeout=60)
-        seen, deadline, fails = 0, time.time() + 200 * 60, 0
+        seen, deadline, fails, quiet = 0, time.time() + 200 * 60, 0, 0
         while True:
             time.sleep(60)
             r = subprocess.run(["ssh", *G._opts(), "-o", "ServerAliveInterval=30", f"ubuntu@{ip}",
-                                f"tail -n +{seen + 1} wqv/run.log; echo '@@DONE@@'; cat wqv/done 2>/dev/null"],
+                                f"tail -n +{seen + 1} wqv/run.log; echo '@@DONE@@'; cat wqv/done 2>/dev/null; true"],   # 10-26：没完成时 cat 返回 1，不能当成连不上
                                capture_output=True, text=True)
             if r.returncode != 0:
-                print("（取日志失败，稍后再试）", r.stderr.strip()[-200:], flush=True)
+                print(f"（取日志失败，稍后再试；退出码 {r.returncode}）", r.stderr.strip()[-200:], r.stdout.strip()[-300:], flush=True)
                 fails += 1
                 if fails >= 20:         # 10-26：机器连不上，白等了 200 分钟才超时；连续 20 分钟取不到日志就放弃，免得空付 GPU 钱
                     raise RuntimeError("GPU 机器连续 20 分钟连不上（SSH 取日志失败），放弃这次合成")
@@ -318,6 +318,9 @@ def gpu_session(job: dict, work: Path, out: Path):
             body, _, done = r.stdout.partition("@@DONE@@\n")
             lines = body.splitlines()
             seen += len(lines)
+            quiet = 0 if lines else quiet + 1
+            if quiet >= 30:             # 30 分钟没有一行新日志：卡住了，别再空付 GPU 钱
+                raise RuntimeError("GPU 上的合成 30 分钟没有新日志，放弃这次合成")
             for ln in lines:
                 if not ln.startswith(("debconf", "dpkg-preconfigure")):
                     print(ln, flush=True)
