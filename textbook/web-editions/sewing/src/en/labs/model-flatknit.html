@@ -280,8 +280,11 @@ stage.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){const d=M
 stage.addEventListener('touchend',()=>pinch=null);
 function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
 new ResizeObserver(resize).observe(stage); resize();
-let last=performance.now(), dirty=true;
-function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(!window.__still||dirty){pose(window.__still?0:dt);placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}requestAnimationFrame(frame);}
+let last=performance.now(), dirty=true, manual=false;
+// 录视频用（与 proto-lockstitch、model-pattern 相同）：__api.manual(true) 后页面不再自己走帧，由 __api.step(dt) 一帧一帧推进
+function tick(dt){if(!window.__still||dirty){pose(window.__still?0:dt);placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(!manual)tick(dt);requestAnimationFrame(frame);}
+window.__api={manual:on=>{manual=!!on;},step:dt=>tick(dt)};
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;}if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;}applyMode();applyExplode();});
 document.getElementById('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();};
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);});
