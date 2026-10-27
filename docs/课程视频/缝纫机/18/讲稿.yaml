@@ -1,0 +1,144 @@
+# 《缝纫机设计与制造》公开课 第 18 讲：电控系统的设计、制造与测试
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch18.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 18-1（电控箱：热设计、干扰与老化）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch18.py 算出（{{ch18.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "18"
+deck: ch18
+skip: [3, 4, 5, 13, 15, 17, 18]   # 第一节（章节页、说明书数字、V 模型）、对策三条、45 °C 开关时间窗口数字页（20 kHz 窗口也是实验任务二答案）、嵌入式软件分层、生产测试链：控制课程部分约 10 分钟；这几页留给课件和作业
+code: [ch18]
+title: ["电控系统的设计、制造与测试——台板底下的那只箱子，要用十年", "Designing, Building and Testing the Control Box — The Box Under the Table Has to Last Ten Years"]
+chapter: ["第五篇 电气控制 · 第 18 章", "Part V Electrical Control · Chapter 18"]
+next: ["第 19 讲", "Lecture 19"]
+cover_formula: 'T_j = T_a + \sum R_{th}\,P'
+tags:
+  zh: [电控箱, 伺服驱动器, 热设计, 热阻, 结温, 电磁兼容, 共模电流, 开关速度, 老化, 浴盆曲线, 缝纫机设计]
+  en: [control box, servo drive, thermal design, thermal resistance, junction temperature, EMC, common-mode current, switching speed, burn-in, bathtub curve, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十八讲，电控系统的设计、制造与测试。
+    - 前面几讲我们一直默认电控箱是可靠的。可它实际放在台板底下：夏天车间三四十度，周围飘着飞絮，主轴一天起停上千次，还要用十年。
+    - 今天讲三条主线：热、干扰、老化。需求与标准、V 模型、软件分层和生产测试流程留给课件和测验。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 18, designing, building and testing the control box.
+    - So far we've assumed the control box just works. In reality it sits under the table, thirty or forty degrees in summer, lint floating around, the main shaft starting and stopping a thousand times a day, and it has to last ten years.
+    - Three threads today, heat, interference and burn-in. Requirements and standards, the V-model, software layers and the production test flow are left to the slides and the quiz.
+
+after:
+  - id: lab181
+    kind: lab
+    lab: ebox
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.7'; window.scrollTo(0, 0); for (const id of ['checksA', 'checksB', 'tasks']) document.getElementById(id).closest('section').style.filter = 'blur(7px) grayscale(1)'; const g = document.getElementById('cyc').getContext('2d'); if (!g.__wqHide) { g.__wqHide = 1; const f = g.fillText; g.fillText = function (t) { if (/^(散热器 |Heat sink )/.test(String(t))) return; return f.apply(this, arguments); }; } })()"
+        press: "#resetA"
+      - press: "#summer"
+        sweep: {clog: [0.5, 0.8]}
+        dur: 6
+      - set: {clog: 0.5}
+        sweep: {rhs: [1.5, 1.4]}
+        dur: 6
+      - js: "(() => { document.getElementById('resetA').click(); const e = document.getElementById('Ta'); e.value = 45; e.dispatchEvent(new Event('input', {bubbles: true})); })()"
+        sweep: {tsw: [100, 700]}
+        dur: 7
+      - js: "(() => { document.getElementById('trade').closest('section').style.filter = 'blur(7px) grayscale(1)'; const e = document.getElementById('tsw'); e.value = 300; e.dispatchEvent(new Event('input', {bubbles: true})); })()"
+        sweep: {fsw: [12, 20]}
+        dur: 5
+      - js: "(() => { document.getElementById('tabB').click(); document.getElementById('cost').closest('section').style.filter = 'blur(7px) grayscale(1)'; window.scrollTo(0, 0); })()"
+        sweep: {tbi: [0, 24]}
+        dur: 7
+      - sweep: {Tbi: [55, 62]}
+        dur: 5
+    say:
+      zh:
+        - ">下面是虚拟实验 18-1，电控箱，在问渠平台上可以亲手做。右边的判据和下面的任务先遮住，留给你自己读。左上是两个缝纫周期里的电流和温度，下面是开关时间的折中图。"
+        - ">先按“夏天加堵塞”，38 度、堵塞 0.5，再把堵塞往上加：蓝线、红线一起往上走。哪些判据不过，自己记下来。"
+        - ">任务一：环境和工况不动，只改设计参数，让判据全部通过。比如把散热器热阻往下调；回答页的 1.0 是一种改法，还有哪些设计参数也能做到、哪一项最管用，自己比。"
+        - ">恢复标准，车间 45 度，把开关时间从 100 纳秒拉到 700，看折中图上的圆点：一头干扰大，一头结温高。"
+        - ">任务二：开关频率改成 20 千赫，重新选开关时间，量出绿色窗口有多宽，和 12 千赫比一比，再说清楚窗口两头分别由哪个判据定。"
+        - ">切到第二页，老化与返修。55 度下把老化时间从 0 加到 24 小时，灰色的等效时间越来越宽。任务三：选老化温度和时间，让第一年返修率低于 1%、每台成本不超过 9 元。"
+        - ">比如把老化箱温度往上调；最省钱的那一组留给你自己找。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 18-1, the control box, which you can do yourself on WenQuest. The criteria on the right and the tasks below are blurred, so you can read them on your own. Top left are current and temperature over two sewing cycles; below, the switching-time trade-off."
+        - ">First press Summer plus clogging, 38 degrees and a blockage of 0.5, then raise the blockage further. The blue and red lines climb together. Which criteria fail? Note them down."
+        - ">Task one: leave the room and the duty cycle alone and change only design parameters until every criterion passes. Try lowering the heat-sink resistance. The 1.0 on the answer slide is one fix; which other design changes also work, and which helps most, is yours to compare."
+        - ">Reset to standard, set the room to 45 degrees, and stretch the switching time from 100 nanoseconds to 700. Watch the dot on the trade-off chart: noisy at one end, hot at the other."
+        - ">Task two: raise the switching frequency to 20 kilohertz and re-select the switching time. Measure how wide the green window is, compare it with 12 kilohertz, and say which criterion sets each end."
+        - ">Then page two, burn-in and returns. At 55 degrees, take the burn-in time from 0 to 24 hours, and the grey equivalent time widens. Task three: choose a temperature and a time that keep first-year returns under 1 percent at no more than 9 yuan per unit."
+        - ">Try raising the chamber temperature; the cheapest combination is yours to find. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 18-1，可以自己动手", "Interactive slides and Lab 18-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和电控箱虚拟实验，都可以自己打开动手做，视频里跳过的 V 模型、软件分层和生产测试也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the control-box lab and work them yourself; the V-model, software layers and production tests that this video skipped are in the slides."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 18：伺服电控箱的热校核与改进", "Assignment 18: thermal check and improvement of a servo box"]
+      points:
+        - ["45 °C 热校核：散热器、结温、电容寿命", "Thermal check at 45 °C: sink, junction, capacitor life"]
+        - ["38 °C、堵塞 0.5：散热器热阻最大取多少", "38 °C, blockage 0.5: largest allowed sink resistance"]
+        - ["16 kHz 开关时间窗口；讨论：老化不坏、返修却高", "Switching window at 16 kHz; discussion: burn-in passes, returns high"]
+      foot: ["3–4 页 PDF 报告，附热阻网络图和实验截图，在问渠学习平台提交。", "A 3–4 page PDF with the thermal network and lab screenshots, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题，都是一只伺服电控箱。第一题，车间 45 度，平均损耗约 {{ch18.std45_Pavg:.0f}} 瓦，起停时单管损耗约 {{ch18.as_dev_peak:.1f}} 瓦，按热阻网络求箱内空气、散热器温度、结温峰值和电容寿命，判断过不过 100 度报警和 125 度上限。"
+        - ">第二题，38 度、飞絮堵塞 0.5，为了散热器不超过 100 度，干净散热器的热阻最大能取多少；再加上结温不超过 125 度，又是多少，哪一条更紧。"
+        - ">第三题用虚拟实验，45 度、16 千赫，找出三条判据都满足的开关时间范围，和 12 千赫的 {{ch18.window_45_lo}} 到 {{ch18.window_45_hi}} 纳秒比。第四题讨论：老化工序里几乎不坏，出厂第一年返修却到 2%，可能是什么原因，测试和老化流程怎么改。"
+        - 报告在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions about one servo control box. One: in a 45-degree room, with an average loss of about {{ch18.std45_Pavg:.0f}} watts and about {{ch18.as_dev_peak:.1f}} watts per switch during starts, use the thermal network to find the box air, heat-sink and peak junction temperatures and the capacitor life, and check them against the 100-degree alarm and the 125-degree limit."
+        - ">Two: at 38 degrees with a lint blockage of 0.5, what is the largest clean heat-sink resistance that keeps the sink at or below 100 degrees? If the junction must also stay at or below 125, what then, and which constraint is tighter?"
+        - ">Three uses the lab: at 45 degrees and 16 kilohertz, find the switching-time range that meets all three criteria and compare it with {{ch18.window_45_lo}} to {{ch18.window_45_hi}} nanoseconds at 12 kilohertz. Four is a discussion: boxes almost never fail in burn-in, yet first-year returns reach 2 percent. What could cause that, and how would you change the test and burn-in flow?"
+        - Submit the report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["310 V、12 kHz、3 A、300 ns：开关损耗多少？", "310 V, 12 kHz, 3 A, 300 ns: switching loss?"]
+        - ["程序跑飞后，什么保证电机一定停下？", "If the program runs away, what guarantees the motor stops?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：310 伏母线、12 千赫、平均电流 3 安、开关时间 300 纳秒，一只管子的开关损耗是多少？"
+        - ">再比如：主控程序跑飞了，靠什么保证电机一定停下来？还有题问在线测试到底测什么，老化条件怎么定。"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, with a 310-volt DC link, 12 kilohertz, an average current of 3 amps and 300 nanoseconds of switching, what is one switch's switching loss?"
+        - ">Or, if the main program runs away, what guarantees that the motor stops? Others ask what in-circuit test actually measures and how burn-in conditions are chosen."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲讲电控原型平台与零件库：12 周做出一台能缝的电控平缝机原型，该选哪些模块，我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - Next time it's the prototyping platform and the parts library. Twelve weeks to build a lockstitch prototype that actually sews; which modules would you choose? See you then.
