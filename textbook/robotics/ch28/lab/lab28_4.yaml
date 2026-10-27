@@ -1,0 +1,26 @@
+# 实验 28.4 的指导书与报告模板。目的、场景、参数、任务取自 lab28_4.js。
+原理:
+  - ["机身的 6 个自由度没有电机，质心只能靠地面的力减速（质心动力学，式 (28.4.3)）。从高 h 处落下，着地速度为 √(2𝔤h)；若从着地到停住质心又下沉了 s，而地面的力近似不变，则（式 (28.4.6)）：", "The base's six freedoms have no motors, so only the ground can slow the centre of mass (centroidal dynamics, Eq. (28.4.3)). Dropped from h, it lands at √(2𝔤h); if the CoM sinks a further s before stopping under a roughly constant ground force, then (Eq. (28.4.6)):"]
+  - 式: "F/(m𝔤) ≈ 1 + h/s"
+  - ["腿越硬，下沉越少，冲击力越大，电机所需的力矩也越大；腿越软则相反。电机力矩有上限，超过就饱和，腿会被压弯。", "Stiffer legs sink less but take a larger impact and need more motor torque; softer legs the opposite. Motor torque is limited, and beyond the limit the motor saturates and the leg buckles."]
+步骤:
+  - ["Go2 场景，h = 0.3 m，kp = 60、kd = 2，按“开始”，记下冲击力、下沉量和小腿力矩（任务 1），填入表 1，与 1 + h/s 比较。", "Go2 scene, h = 0.3 m, kp = 60, kd = 2: press Start and record the impact, the sink and the calf torque (task 1) in Table 1; compare with 1 + h/s."]
+  - ["保持 h = 0.3 m，kp 取 30、45、100，kd 取 1～3，各做一次，找出冲击力不超过体重 7.2 倍、下沉不超过 85 mm 的组合（任务 2）。", "Keep h = 0.3 m and try kp = 30, 45 and 100 with kd between 1 and 3; find a combination with an impact below 7.2 body weights and a sink of at most 85 mm (task 2)."]
+  - ["h 改为 0.5 m，找一个使小腿电机不饱和、机身不趴下的关节刚度（任务 3），填入表 2。", "Set h = 0.5 m and find a joint stiffness that keeps the calf motors unsaturated without the body collapsing (task 3), in Table 2."]
+  - ["换到“人从台阶上跳下”场景，改变腿的刚度，看冲击力怎样变化。", "Switch to the person scene and change the leg stiffness; see how the impact changes."]
+数据表:
+  - 标题: ["表 1  从 0.3 m 落下", "Table 1  Dropped from 0.3 m"]
+    表头: ["kp", "kd", "冲击力 / 体重", "下沉 s / mm", "1 + h/s", "小腿力矩 / (N·m)"]
+    表头英文: ["kp", "kd", "Impact / weight", "Sink s / mm", "1 + h/s", "Calf torque / (N·m)"]
+    行: [["60", "2", "", "", "", ""], ["30", "", "", "", "", ""], ["45", "", "", "", "", ""], ["100", "", "", "", "", ""]]
+    行英文: [["60", "2", "", "", "", ""], ["30", "", "", "", "", ""], ["45", "", "", "", "", ""], ["100", "", "", "", "", ""]]
+  - 标题: ["表 2  从 0.5 m 落下", "Table 2  Dropped from 0.5 m"]
+    表头: ["kp", "kd", "冲击力 / 体重", "下沉 / mm", "小腿力矩 / (N·m)", "是否饱和"]
+    表头英文: ["kp", "kd", "Impact / weight", "Sink / mm", "Calf torque / (N·m)", "Saturated?"]
+    行: [["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+    行英文: [["", "", "", "", "", ""], ["", "", "", "", "", ""]]
+注意:
+  - ["冲击力按 10 ms 平均：脚刚碰地的一瞬间，小腿和脚的质量突然停下，会有一个很窄的尖峰，它对电机和结构的意义不大。", "The impact is averaged over 10 ms: at the instant of touchdown the calf and foot stop abruptly and give a very narrow spike that matters little to the motors and structure."]
+  - ["下沉量从脚刚着地时（机身原点高 0.288 m）算起，包括了站稳以后关节弹性造成的下垂（kp = 60 时约 33 mm）。", "The sink is measured from touchdown (base origin at 0.288 m) and includes the sag of the standing posture from the joint compliance (about 33 mm at kp = 60)."]
+思考题:
+  - ["真实的四足机器人落地时常常在着地前“预先屈腿”、着地瞬间降低刚度，再慢慢站起来。为什么这样做能同时减小冲击力和电机力矩？", "Real quadrupeds often pre-bend their legs before touchdown and lower the stiffness at impact, then stand up slowly. Why does this reduce both the impact and the motor torque?"]

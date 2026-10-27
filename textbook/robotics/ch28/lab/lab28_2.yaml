@@ -1,0 +1,32 @@
+# 实验 28.2 的指导书与报告模板。目的、场景、参数、任务取自 lab28_2.js。
+原理:
+  - ["质心保持高度 z_c、忽略身体转动的角动量，零力矩点与质心的关系是线性倒立摆（式 (28.2.4)）：", "Keeping the centre of mass at height z_c and neglecting the angular momentum of the body, the ZMP and the CoM obey the linear inverted pendulum (Eq. (28.2.4)):"]
+  - 式: "ẍ = ω₀²(x − x_Z)，ω₀ = √(𝔤/z_c)"
+  - ["捕获点 ξ = x + ẋ/ω₀（式 (28.2.7)）满足 ξ̇ = ω₀(ξ − x_Z)：把零力矩点放到捕获点上，捕获点就停住，质心随之停在它上方。捕获点在脚掌内时站得住，在脚掌外时必须迈步。", "The capture point ξ = x + ẋ/ω₀ (Eq. (28.2.7)) obeys ξ̇ = ω₀(ξ − x_Z): put the ZMP on it and it stops, and the CoM comes to rest above it. Inside the foot the robot can stand; outside it must step."]
+  - ["步行时零力矩点在左右脚之间换，质心是它的加权平均（式 (28.2.8)），摆幅比零力矩点小得多；每步越慢，摆幅越大。", "While walking the ZMP switches between the feet and the CoM is its weighted average (Eq. (28.2.8)), swaying much less; the slower each step, the larger the sway."]
+步骤:
+  - ["“推一下”场景，不迈步，推后速度从 0.3 m/s 起每次加 0.02 m/s，按“开始”，记下结果，找出能站住的最大速度（任务 1），填入表 1。", "Push scene, no step: raise the push speed from 0.3 m/s in steps of 0.02 m/s, press Start, record the result and find the largest speed G1 survives (task 1) in Table 1."]
+  - ["推后速度 0.8 m/s，打开迈步，调迈步距离，找出能站住的范围（任务 2），与捕获点比较，填入表 2。", "Push speed 0.8 m/s, stepping on: change the step length and find the range that lets G1 stand (task 2); compare with the capture point in Table 2."]
+  - ["把质心高度改为 0.6 m 和 0.9 m，重复第一步，看能承受的推力怎样变化。", "Set the CoM height to 0.6 m and 0.9 m and repeat the first step; see how the survivable push changes."]
+  - ["换到“步行”场景，改变每步时间和双脚支撑时间，记下侧向摆幅（任务 3），填入表 3。", "Switch to the walking scene, change the step time and the double-support time, and record the sideways sway (task 3) in Table 3."]
+数据表:
+  - 标题: ["表 1  不迈步能承受的推力", "Table 1  Push survivable without a step"]
+    表头: ["z_c / m", "实测最大速度 / (m/s)", "ω₀(脚尖 − x₀) / (m/s)"]
+    表头英文: ["z_c / m", "Measured largest speed / (m/s)", "ω₀(toe − x₀) / (m/s)"]
+    行: [["0.692", "", ""], ["0.6", "", ""], ["0.9", "", ""]]
+    行英文: [["0.692", "", ""], ["0.6", "", ""], ["0.9", "", ""]]
+  - 标题: ["表 2  推到 0.8 m/s 时的迈步", "Table 2  Stepping after a push to 0.8 m/s"]
+    表头: ["迈步距离 d / m", "结果", "推后瞬间的捕获点 / m"]
+    表头英文: ["Step length d / m", "Result", "Capture point right after the push / m"]
+    行: [["0.15", "", ""], ["0.25", "", ""], ["0.35", "", ""], ["0.45", "", ""]]
+    行英文: [["0.15", "", ""], ["0.25", "", ""], ["0.35", "", ""], ["0.45", "", ""]]
+  - 标题: ["表 3  步行时质心的侧向摆幅", "Table 3  Sideways sway of the CoM while walking"]
+    表头: ["每步时间 / s", "双脚支撑时间 / s", "摆幅 / mm", "公式（不计双脚支撑） / mm"]
+    表头英文: ["Step time / s", "Double support / s", "Sway / mm", "Formula (no double support) / mm"]
+    行: [["0.4", "0.1", "", ""], ["0.6", "0.1", "", ""], ["0.9", "0.1", "", ""], ["0.6", "0.25", "", ""]]
+    行英文: [["0.4", "0.1", "", ""], ["0.6", "0.1", "", ""], ["0.9", "0.1", "", ""], ["0.6", "0.25", "", ""]]
+注意:
+  - ["本实验假定零力矩点可以瞬间移到脚掌内的任何地方，迈步也是瞬间完成的（0.2 s 时新脚落地）；真实的机器人做不到，能承受的推力要小一些。", "This lab assumes the ZMP can jump anywhere in the foot instantly and the step lands at 0.2 s; a real robot cannot, so it survives smaller pushes."]
+  - ["迈步距离是从原来的踝关节到新的踝关节；新脚的脚掌在新踝关节前 125 mm、后 55 mm。", "The step length is measured ankle to ankle; the new foot extends 125 mm in front of and 55 mm behind the new ankle."]
+思考题:
+  - ["走得快时身体晃得少，走得慢时晃得多，这与直觉是否相符？人在冰上走路为什么要小步快走？", "Walking fast makes the body sway less and walking slowly more—does that match your intuition? Why do people take short quick steps on ice?"]

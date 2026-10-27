@@ -1,0 +1,34 @@
+# 实验 28.1 的指导书与报告模板。目的、场景、参数、任务取自 lab28_1.js。
+原理:
+  - ["车转弯时，质心有指向圆心的加速度 a_y = v²/R，它要由地面对车轮的侧向摩擦力提供；侧向力作用在地面上、比质心低 h，使外侧车轮压得更紧、内侧车轮变轻（式 (28.1.7)）：", "In a turn the centre of mass accelerates towards the centre at a_y = v²/R, and the lateral friction of the ground on the wheels must provide it. That force acts at the ground, h below the centre of mass, so the outer wheels are pressed harder and the inner wheels unloaded (Eq. (28.1.7)):"]
+  - 式: "F_z,内 = m𝔤/2 − m a_y h / w"
+  - ["内侧车轮的法向力降为零就侧翻；各轮侧向力之和达到 μm𝔤 就侧滑（式 (28.1.6)）。质心高于 w/(2μ) 的车先翻后滑。", "The vehicle rolls over when the inner normal force reaches zero, and skids when the lateral forces reach μm𝔤 (Eq. (28.1.6)). A vehicle whose centre of mass is above w/(2μ) rolls before it skids."]
+  - ["轮胎的侧向力要靠侧偏角才能产生（式 (28.1.2)），车速高时所需的转向角比运动学的 L/R 大，这叫不足转向（式 (28.1.10)）。", "A tyre needs a slip angle to produce a lateral force (Eq. (28.1.2)), so at speed the steering angle needed exceeds the kinematic L/R: this is understeer (Eq. (28.1.10))."]
+步骤:
+  - ["AGV 场景，干地面 μ = 0.7、R = 3 m、质心 0.65 m。车速从 2 m/s 起每次加 0.1 m/s，按“开始”，记下侧向加速度和内侧车轮的法向力，填入表 1；找出不翻车的最高车速（任务 1）。", "AGV scene, dry floor μ = 0.7, R = 3 m, CoM at 0.65 m. Raise the speed from 2 m/s in steps of 0.1 m/s, press Start, and record the lateral acceleration and the inner normal force in Table 1; find the highest speed without rollover (task 1)."]
+  - ["把 μ 改为 0.4，重复上一步，看车先滑还是先翻（任务 2），记下侧滑时的车速和侧向加速度，与式 (28.1.6) 的 μ𝔤 比较。", "Set μ to 0.4 and repeat; see whether the AGV skids or rolls first (task 2); record the speed and lateral acceleration at which it slides and compare with μ𝔤 from Eq. (28.1.6)."]
+  - ["μ 改回 0.7，质心升到 0.9 m，求新的极限车速（任务 3），与式 (28.1.6) 比较，填入表 2。", "Back to μ = 0.7, raise the CoM to 0.9 m and find the new limiting speed (task 3); compare with Eq. (28.1.6) in Table 2."]
+  - ["换到轿车场景，R = 200 m，车速取 60、80、100、120 km/h，记下平均转向角，与运动学值 L/R 比较（任务 4）。", "Switch to the car scene, R = 200 m, and drive at 60, 80, 100 and 120 km/h; record the mean steering angle and compare it with the kinematic L/R (task 4)."]
+数据表:
+  - 标题: ["表 1  AGV 的侧向加速度与内侧车轮的法向力（R = 3 m）", "Table 1  AGV lateral acceleration and inner normal force (R = 3 m)"]
+    表头: ["μ", "v / (m/s)", "a_y / (m/s²)", "内侧法向力 / N", "式 (28.1.7) / N", "状态"]
+    表头英文: ["μ", "v / (m/s)", "a_y / (m/s²)", "Inner normal force / N", "Eq. (28.1.7) / N", "Status"]
+    行: [["0.7", "2.0", "", "", "", ""], ["0.7", "3.0", "", "", "", ""], ["0.7", "4.0", "", "", "", ""], ["0.4", "3.0", "", "", "", ""], ["0.4", "", "", "", "", ""]]
+    行英文: [["0.7", "2.0", "", "", "", ""], ["0.7", "3.0", "", "", "", ""], ["0.7", "4.0", "", "", "", ""], ["0.4", "3.0", "", "", "", ""], ["0.4", "", "", "", "", ""]]
+  - 标题: ["表 2  极限车速与质心高度（干地面，R = 3 m）", "Table 2  Limiting speed and height of the centre of mass (dry, R = 3 m)"]
+    表头: ["h / m", "实测极限车速 / (m/s)", "式 (28.1.6) 的值 / (m/s)", "先滑还是先翻"]
+    表头英文: ["h / m", "Measured limit / (m/s)", "From Eq. (28.1.6) / (m/s)", "Skid or roll first"]
+    行: [["0.65", "", "", ""], ["0.9", "", "", ""]]
+    行英文: [["0.65", "", "", ""], ["0.9", "", "", ""]]
+  - 标题: ["表 3  轿车的转向角（R = 200 m）", "Table 3  Steering angle of the car (R = 200 m)"]
+    表头: ["v / (km/h)", "平均转向角 / (°)", "L/R / (°)", "比值"]
+    表头英文: ["v / (km/h)", "Mean steering angle / (°)", "L/R / (°)", "Ratio"]
+    行: [["60", "", "", ""], ["80", "", "", ""], ["100", "", "", ""], ["120", "", "", ""]]
+    行英文: [["60", "", "", ""], ["80", "", "", ""], ["100", "", "", ""], ["120", "", "", ""]]
+注意:
+  - ["车先以较低的速度进弯，再慢慢加速到设定的车速，避免一开始就冲击；读数取最后几秒的值。", "The vehicle enters the bend slowly and then accelerates to the set speed, so there is no initial jolt; read the values from the last few seconds."]
+  - ["本实验的轮胎用刷子模型，侧向力接近摩擦上限时不再线性，所以轿车的转向角比线性模型的式 (28.1.10) 稍大。", "The tyres here follow the brush model, which is no longer linear near the friction limit, so the car's steering angle is a little larger than the linear Eq. (28.1.10)."]
+  - ["侧翻按刚体的静力条件判断，没有计入悬架的侧倾和货物的晃动；实际车辆的侧翻车速更低。", "Rollover is judged by the rigid-body static condition, without suspension roll or load sway; real vehicles roll over at lower speeds."]
+  - ["式 (28.1.6) 把整车当作一个质点，湿地面上给出 a_y ≤ μ𝔤。本实验的自行车模型中前轴只承担 46% 的载荷，转向角又大，前轮的侧向力先达到上限，所以车在 a_y 约 3.3 m/s² 时就向外滑了。", "Eq. (28.1.6) treats the vehicle as one point mass and gives a_y ≤ μ𝔤 on the wet floor. In this lab's bicycle model the front axle carries only 46% of the load and the steering angle is large, so the front tyres reach their limit first and the AGV slides out at about 3.3 m/s²."]
+思考题:
+  - ["算例 28.1.3 说，AGV 低速过弯时实际的转弯半径与运动学的只差 0.3%，里程计却每过一个 90° 的弯偏十几厘米。把车速调低、侧偏刚度调小，看后轮的侧偏角怎样变化，并说明里程计的误差从哪里来。", "Example 28.1.3 says that at low speed the AGV's turning radius differs from the kinematic one by only 0.3%, yet odometry drifts by over ten centimetres per 90° bend. Lower the speed and the cornering stiffness, watch the rear slip angle, and explain where the odometry error comes from."]

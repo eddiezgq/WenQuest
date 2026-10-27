@@ -1,0 +1,28 @@
+# 实验 28.3 的指导书与报告模板。目的、场景、参数、任务取自 lab28_3.js。
+原理:
+  - ["X2 是一个刚体，转动服从欧拉方程（式 (28.3.3)）。从悬停（ω = 0）开始，角加速度就是惯量张量的逆乘力矩：", "X2 is a rigid body whose rotation obeys Euler's equation (Eq. (28.3.3)). Starting from hover (ω = 0), the angular acceleration is the inverse inertia times the torque:"]
+  - 式: "ω̇_b = I_b⁻¹ m_b"
+  - ["X2 的惯量张量有惯量积 I_xz，所以只加横滚力矩，机身也会有一点偏航的角加速度。", "X2's inertia tensor has a product of inertia I_xz, so a pure roll torque also produces a little yaw acceleration."]
+  - ["匀速平飞时，推力、重力与空气阻力平衡（式 (28.3.6)）：f sin θ = D，f cos θ = m𝔤 − L_a。阻力与速度的平方成正比，飞得越快机身越要低头；逆风悬停与以同样的速度平飞相同。", "In steady level flight thrust, weight and drag balance (Eq. (28.3.6)): f sin θ = D, f cos θ = m𝔤 − L_a. Drag grows with the square of speed, so the faster X2 flies the more it pitches down; hovering in a headwind is the same as flying at that speed."]
+步骤:
+  - ["手动，横滚力矩为零，调总推力，按“开始”，使 X2 悬停（任务 1），记下所需的推力，与 m𝔤 比较。", "Manual, zero roll torque: set the total thrust, press Start and make X2 hover (task 1); record the thrust and compare it with m𝔤."]
+  - ["手动，横滚力矩取 0.2、0.5、1.0 N·m，读出起始的角加速度 ω̇_x、ω̇_z，填入表 1（任务 2）。", "Manual, roll torque 0.2, 0.5 and 1.0 N·m: read the initial angular accelerations ω̇_x and ω̇_z into Table 1 (task 2)."]
+  - ["姿态保持，俯仰角取 3°、6°、9°、11°、14°，每次飞 20 s，记下最后的平飞速度，填入表 2；找出 10 m/s 所需的俯仰角（任务 3）。", "Attitude hold, pitch 3°, 6°, 9°, 11° and 14°, flying 20 s each time: record the final speed in Table 2 and find the pitch for 10 m/s (task 3)."]
+  - ["换到逆风场景，风速 5 m/s，调俯仰角使飞机停在原地（任务 4），与表 2 中 5 m/s 附近的俯仰角比较。", "Switch to the headwind scene with 5 m/s of wind and choose the pitch that keeps the drone in place (task 4); compare with the pitch near 5 m/s in Table 2."]
+数据表:
+  - 标题: ["表 1  横滚力矩与角加速度", "Table 1  Roll torque and angular acceleration"]
+    表头: ["m_x / (N·m)", "实测 ω̇_x / (rad/s²)", "m_x/I_xx / (rad/s²)", "实测 ω̇_z / (rad/s²)"]
+    表头英文: ["m_x / (N·m)", "Measured ω̇_x / (rad/s²)", "m_x/I_xx / (rad/s²)", "Measured ω̇_z / (rad/s²)"]
+    行: [["0.2", "", "", ""], ["0.5", "", "", ""], ["1.0", "", "", ""]]
+    行英文: [["0.2", "", "", ""], ["0.5", "", "", ""], ["1.0", "", "", ""]]
+  - 标题: ["表 2  俯仰角与平飞速度", "Table 2  Pitch and level-flight speed"]
+    表头: ["θ* / (°)", "平飞速度 / (m/s)", "四个推力 / N"]
+    表头英文: ["θ* / (°)", "Level-flight speed / (m/s)", "Four thrusts / N"]
+    行: [["3", "", ""], ["6", "", ""], ["9", "", ""], ["11", "", ""], ["14", "", ""]]
+    行英文: [["3", "", ""], ["6", "", ""], ["9", "", ""], ["11", "", ""], ["14", "", ""]]
+注意:
+  - ["手动加横滚力矩时，X2 会不停地翻滚，1 s 后自动停止；角加速度只看起始的那一步。", "With a manual roll torque X2 keeps tumbling and the run stops after 1 s; read the angular acceleration from the first step only."]
+  - ["MuJoCo 的空气阻力只有机身的压差阻力（与速度平方成正比），没有旋翼阻力，数值只用来说明道理。", "MuJoCo's drag here is only the body's pressure drag (proportional to the square of speed), with no rotor drag; the numbers illustrate the idea only."]
+  - ["本页比实时快 3 倍地推进仿真，每次飞 20 s。", "This page runs the simulation three times faster than real time, 20 s per flight."]
+思考题:
+  - ["真实四旋翼的阻力中有很大一部分来自旋翼，大致与速度成正比。如果阻力与速度成正比，低速时所需的倾角会比本实验的大还是小？", "Much of a real quadrotor's drag comes from the rotors and is roughly proportional to speed. With drag proportional to speed, would the tilt needed at low speed be larger or smaller than here?"]

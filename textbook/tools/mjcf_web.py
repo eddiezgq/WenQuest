@@ -5,6 +5,7 @@
 做了什么（物理参数一个不改）：
 - 去掉全部网格（原版 UR5e 32 MB、FR3 57 MB，网页装不下）：可视几何删掉，外观用零件库的 glTF（节点名 = MJCF 的 body 名）；
 - 网格做的碰撞几何换成胶囊：在原模型编译后的几何坐标系里，按顶点的主方向拟合（包住全部顶点）；原来就是简单形体的保留；
+  胶囊比网格胖，G1 这样全身网格的机器人改为只与外界碰撞、自身各连杆之间不碰撞（NO_SELF）；
 - 质量、惯量、关节、阻尼、执行器、关键帧照原样（各 body 都有显式 <inertial>，碰撞几何不计质量）；
 - 留三个占位注释给实验拼模型：<!--OPTION-->（compiler 之后）、<!--WORLD-->（worldbody 末尾）、<!--TOOL-->（末端连杆里）、<!--ACTUATOR-->。
 来源与许可证写在文件头；许可证原文一起复制。生成后检查：同一组关节角下，网页版与原版的重力项 qfrc_bias 逐位相同。
@@ -24,7 +25,16 @@ MODELS = {
     # 名字: (Menagerie 文件夹, 文件, 末端连杆, 许可证, 碰撞几何颜色)
     "ur5e": ("universal_robots_ur5e", "ur5e.xml", "wrist_3_link", "BSD-3-Clause（Copyright 2018 ROS Industrial Consortium）", "0.72 0.80 0.86 1"),
     "fr3": ("franka_fr3", "fr3.xml", "fr3_link7", "Apache-2.0（Franka Robotics GmbH）", "0.90 0.90 0.90 1"),
+    # 第 28 章：浮动基座的机器人（没有末端连杆，不留 TOOL 占位）
+    "go2": ("unitree_go2", "go2.xml", None, "BSD-3-Clause（Copyright (c) 2016-2022 HangZhou YuShu TECHNOLOGY CO.,LTD.）", "0.30 0.30 0.32 1"),
+    "g1": ("unitree_g1", "g1.xml", None, "BSD-3-Clause（Copyright (c) 2016-2023 HangZhou YuShu TECHNOLOGY CO.,LTD.）", "0.70 0.70 0.72 1"),
+    "x2": ("skydio_x2", "x2.xml", None, "Apache-2.0（Skydio）", "0.25 0.25 0.28 1"),
 }
+
+
+# 包住网格的胶囊比原来的网格胖，相邻而不相连的连杆（如骨盆与髋横滚连杆）会互相穿入、一开始就互相推开。
+# 这些机器人的碰撞几何只与外界碰撞、彼此不碰（contype=1、conaffinity=0；地面与实验里的物体用默认值 1、1）。
+NO_SELF = {"g1"}
 
 
 def capsule(verts: np.ndarray) -> tuple[np.ndarray, np.ndarray, float]:
@@ -57,8 +67,14 @@ def build(name: str, men: Path) -> str:
     root = tree.getroot()
     asset = root.find("asset")
     if asset is not None:
+        gone = set()
         for e in list(asset):
-            if e.tag == "mesh":
+            if e.tag == "mesh" or (e.tag == "texture" and e.get("file")):     # 网格与贴图文件都不带
+                if e.tag == "texture":
+                    gone.add(e.get("name") or Path(e.get("file")).stem)
+                asset.remove(e)
+        for e in list(asset):
+            if e.tag == "material" and e.get("texture") in gone:
                 asset.remove(e)
     world = root.find("worldbody")
     for light in world.iter("light"):
@@ -102,6 +118,9 @@ def build(name: str, men: Path) -> str:
             else:
                 g.attrib.pop("material", None)
                 g.set("rgba", rgba)
+            if not visual and name in NO_SELF:
+                g.set("contype", "1")
+                g.set("conaffinity", "0")
             gid += 1
     # visual default classes may set type="mesh": keep them harmless (no geom uses them now)
     for d in root.iter("default"):
@@ -109,7 +128,7 @@ def build(name: str, men: Path) -> str:
             for g in d.findall("geom"):
                 g.set("type", "sphere")
     for b in world.iter("body"):
-        if b.get("name") == tool:
+        if tool and b.get("name") == tool:
             b.append(ET.Comment("TOOL"))
     world.append(ET.Comment("WORLD"))
     act = root.find("actuator")
@@ -123,9 +142,10 @@ def build(name: str, men: Path) -> str:
     root.insert(idx + 1, ET.Comment("OPTION"))
     ET.indent(tree, space="  ")
     body = ET.tostring(root, encoding="unicode")
+    selfnote = "（只与外界碰撞，自身各连杆之间不碰撞）" if name in NO_SELF else ""
     head = (f"<!-- 问渠《机器人学》网页物理仿真用的精简模型（textbook/tools/mjcf_web.py 生成，不要手改）。\n"
             f"     来源：MuJoCo Menagerie（Google DeepMind）{folder}/{file}，提交 {COMMIT}；许可证 {lic}，原文见同目录 LICENSE-{name}。\n"
-            f"     改动：去掉网格与可视几何（外观用零件库 glTF）；网格碰撞几何换成包住它的胶囊；质量、惯量、关节、执行器不变。 -->\n")
+            f"     改动：去掉网格与可视几何（外观用零件库 glTF）；网格碰撞几何换成包住它的胶囊{selfnote}；质量、惯量、关节、执行器不变。 -->\n")
     return head + body + "\n"
 
 
