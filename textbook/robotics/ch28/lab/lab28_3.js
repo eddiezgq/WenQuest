@@ -6,7 +6,7 @@
 //   姿态保持（hold = 1）：给俯仰角 θ*（低头为正），控制器保持横滚、偏航为零、俯仰为 θ*，并用总推力保持 1.5 m 的高度：
 //     力矩 m_b = −K_R e_R − K_ω ω_b + ω_b × I_b ω_b（e_R 为 SO(3) 上的姿态误差，K_R = 225 I_b、K_ω = 27 I_b），
 //     总推力 f = m(𝔤 + 4(1.5 − z) − 3ż)/R₃₃。四个推力截断在 0～13 N。
-// 风：MuJoCo 的 <option wind>，风速 w 从机头方向吹来（wind = (−w, 0, 0)）。本页自己逐步推进，比实时快 3 倍，每次 20 s。
+// 风：MuJoCo 的 opt.wind，风速 w 从机头方向吹来（wind = (−w, 0, 0)），在 reset 中直接写入模型的 opt.wind（不必重新编译模型）。本页自己逐步推进，比实时快 3 倍，每次 20 s。
 // 由 ex28_3.py 与本页的流程在 Python 中核算：θ* = 11.03° 时平飞速度趋于 9.98 m/s；逆风 5 m/s、θ* = 2.79° 时悬停不动；
 //   手动给 m_x 时第一步的角加速度与 I_b⁻¹ m_b 相同（含惯量积引起的偏航）。
 WQ.lab({
@@ -37,7 +37,7 @@ WQ.lab({
     camera: [-60, 15, 0.7],
     rate: 1e-9,                                   // 本页自己逐步推进
     DT: 0.01, G: 9.81, Z0: 1.5, SPEED: 3, TE: 20,
-    xml(api) { return api.mjcf("x2", { option: `<option wind="${-api.p.wind} 0 0"/>` }); },
+    xml(api) { return api.mjcf("x2"); },          // 风不写进模型（改风速不必重新编译模型），在 reset 里设 m.opt.wind
   },
   P: {                                            // X2 的参数：与 ex28_3.py 由 x2.xml 读出的相同
     m: 1.325,
@@ -69,6 +69,7 @@ WQ.lab({
     const { mj, m, d } = api.sim, ph = this.physics;
     d.qpos[0] = 0; d.qpos[1] = 0; d.qpos[2] = ph.Z0; d.qpos[3] = 1; d.qpos[4] = 0; d.qpos[5] = 0; d.qpos[6] = 0;
     for (let i = 0; i < 6; i++) d.qvel[i] = 0;
+    const wv = m.opt.wind; wv[0] = -api.p.wind; wv[1] = 0; wv[2] = 0;
     mj.mj_forward(m, d);
     s.t = 0; s.hist = []; s.acc0 = null; s.fin = false; s.fi = [0, 0, 0, 0]; s.vxs = []; s.zds = [];
     s.lastView = -1;
