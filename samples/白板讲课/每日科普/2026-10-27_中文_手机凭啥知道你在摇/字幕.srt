@@ -1,0 +1,420 @@
+1
+00:00:00,300 --> 00:00:02,000
+你只是把手机拿起来，
+You just pick up your phone,
+
+2
+00:00:02,000 --> 00:00:04,150
+屏幕就跳进了购物App。
+and it jumps into a shopping app.
+
+3
+00:00:04,150 --> 00:00:04,990
+罪魁祸首：
+The culprit:
+
+4
+00:00:04,990 --> 00:00:06,130
+摇一摇广告。
+shake-to-open ads.
+
+5
+00:00:06,130 --> 00:00:08,280
+而且常常是你根本没想摇，
+And often you never meant to shake it.
+
+6
+00:00:08,280 --> 00:00:09,300
+它就跳了。
+It jumps anyway.
+
+7
+00:00:09,300 --> 00:00:10,640
+这回苹果出手了：
+Now Apple steps in:
+
+8
+00:00:10,640 --> 00:00:14,790
+iOS 27.2测试版里，多了一个国行专属开关。
+a China-only switch in the iOS 27.2 beta.
+
+9
+00:00:14,790 --> 00:00:16,130
+在运动与健身里，
+Under Motion & Fitness,
+
+10
+00:00:16,130 --> 00:00:18,930
+可以不让某个App读运动传感器。
+you can block an app from the motion sensors.
+
+11
+00:00:18,930 --> 00:00:20,340
+今天的烧脑问题：
+Today's brain-teaser:
+
+12
+00:00:20,340 --> 00:00:22,580
+手机凭什么知道你在摇它？
+how does a phone know you shook it?
+
+13
+00:00:22,580 --> 00:00:25,820
+答案藏在一个你天天都在用的物理定律里：
+The answer hides in a law of physics you use every day:
+
+14
+00:00:25,820 --> 00:00:26,450
+惯性。
+inertia.
+
+15
+00:00:26,450 --> 00:00:29,440
+手机里藏着一杆比芝麻还小的弹簧秤，
+Inside hides a spring scale smaller than a sesame seed:
+
+16
+00:00:29,440 --> 00:00:30,610
+叫加速度计。
+the accelerometer.
+
+17
+00:00:30,610 --> 00:00:32,400
+一小块硅做的质量块，
+A tiny block of silicon
+
+18
+00:00:32,400 --> 00:00:34,670
+挂在几根细细的硅弹簧上。
+hangs on thin silicon springs.
+
+19
+00:00:34,670 --> 00:00:36,010
+手机往右一冲，
+The phone jerks right;
+
+20
+00:00:36,010 --> 00:00:38,630
+质量块因为惯性，往左一躲。
+inertia makes the block lag to the left.
+
+21
+00:00:38,630 --> 00:00:40,250
+就像公交车一起步，
+Like when a bus pulls away
+
+22
+00:00:40,250 --> 00:00:41,630
+你会往后一仰。
+and you lean back.
+
+23
+00:00:41,630 --> 00:00:44,140
+质量块旁边有一排梳子一样的电极，
+Comb-shaped electrodes sit beside it.
+
+24
+00:00:44,140 --> 00:00:45,820
+它一躲，缝隙就变了。
+When it moves, the gaps change.
+
+25
+00:00:45,820 --> 00:00:47,660
+缝隙一变，电容就变，
+Gaps change, capacitance changes,
+
+26
+00:00:47,660 --> 00:00:49,990
+芯片就算出：加速了多少。
+and the chip computes the acceleration.
+
+27
+00:00:49,990 --> 00:00:51,690
+没有齿轮，没有线圈，
+No gears, no coils.
+
+28
+00:00:51,690 --> 00:00:53,690
+全是在硅片上刻出来的。
+It's all carved into a silicon chip.
+
+29
+00:00:53,690 --> 00:00:54,370
+反转一：
+Twist one:
+
+30
+00:00:54,370 --> 00:00:56,520
+你一动不动，它也有读数。
+even sitting still, it reads something.
+
+31
+00:00:56,520 --> 00:00:58,880
+读多少？每秒平方9.8米，
+9.8 meters per second squared:
+
+32
+00:00:58,880 --> 00:01:00,450
+那是地球在拽它。
+that's Earth pulling on it.
+
+33
+00:01:00,450 --> 00:01:02,440
+所以手机知道哪边是下，
+So the phone knows which way is down,
+
+34
+00:01:02,440 --> 00:01:04,910
+你一横过来，屏幕就跟着转。
+and the screen turns when you do.
+
+35
+00:01:04,910 --> 00:01:06,020
+计步也靠它：
+Your step counter uses it too:
+
+36
+00:01:06,020 --> 00:01:08,730
+你每走一步，质量块就晃一下。
+every step jiggles the block.
+
+37
+00:01:08,730 --> 00:01:10,090
+可光有加速度，
+But acceleration alone
+
+38
+00:01:10,090 --> 00:01:12,720
+分不清你是在摇，还是在转。
+can't tell a shake from a turn.
+
+39
+00:01:12,720 --> 00:01:14,630
+所以还有第二个小家伙：
+So there's a second little guy:
+
+40
+00:01:14,630 --> 00:01:15,440
+陀螺仪。
+the gyroscope.
+
+41
+00:01:15,440 --> 00:01:17,770
+里面的小质量块一直来回振动，
+Its tiny block vibrates back and forth nonstop.
+
+42
+00:01:17,770 --> 00:01:20,380
+手机一转，它就被往旁边推一把。
+Turn the phone, and it gets pushed sideways.
+
+43
+00:01:20,380 --> 00:01:22,070
+这一推叫科里奥利力，
+That push is the Coriolis force.
+
+44
+00:01:22,070 --> 00:01:24,220
+推得越狠，说明转得越快。
+The harder the push, the faster the turn.
+
+45
+00:01:24,220 --> 00:01:27,190
+加速度计管往哪冲，陀螺仪管怎么转，
+The accelerometer feels pushes, the gyroscope feels turns.
+
+46
+00:01:27,190 --> 00:01:30,110
+两个一起，手机就知道自己在干嘛。
+Together, the phone knows what it's doing.
+
+47
+00:01:30,110 --> 00:01:31,670
+那多大才算“摇”？
+So how hard counts as a shake?
+
+48
+00:01:31,670 --> 00:01:34,570
+2022年，一个行业标准给了数。
+A 2022 industry standard set numbers.
+
+49
+00:01:34,570 --> 00:01:37,090
+加速度至少每秒平方15米，
+At least 15 meters per second squared,
+
+50
+00:01:37,090 --> 00:01:40,110
+转过至少35度，或者摇满3秒。
+at least 35 degrees of turn, or 3 seconds of shaking.
+
+51
+00:01:40,110 --> 00:01:42,330
+15，大约是一点五倍重力，
+15 is about one and a half g.
+
+52
+00:01:42,330 --> 00:01:44,160
+正常拿手机，碰不到。
+Normal handling shouldn't reach it.
+
+53
+00:01:44,160 --> 00:01:44,960
+粗略估算，
+As a rough estimate,
+
+54
+00:01:44,960 --> 00:01:47,020
+差不多是使劲甩一下手腕。
+that's about a hard flick of the wrist.
+
+55
+00:01:47,020 --> 00:01:47,710
+反转二：
+Twist two:
+
+56
+00:01:47,710 --> 00:01:50,780
+这只是团体标准，自愿执行，不强制。
+it's a voluntary standard. Nothing forces it.
+
+57
+00:01:50,780 --> 00:01:53,490
+2023年，工信部就点过名：
+In 2023, China's tech ministry called out
+
+58
+00:01:53,490 --> 00:01:55,940
+有的摇一摇，灵敏得过头。
+shake prompts that were far too sensitive.
+
+59
+00:01:55,940 --> 00:01:57,760
+门槛一调低，走路一颠、
+Set the bar too low, and a step
+
+60
+00:01:57,760 --> 00:02:00,360
+坐车一晃，都可能被当成“摇”。
+or a bumpy ride might count as a shake.
+
+61
+00:02:00,360 --> 00:02:02,710
+而且苹果的审核规则本来就不许
+And Apple's own rules already forbid
+
+62
+00:02:02,710 --> 00:02:05,190
+拿陀螺仪这类硬件功能来变现。
+making money off hardware like the gyroscope.
+
+63
+00:02:05,190 --> 00:02:06,230
+所以这个开关，
+So this switch
+
+64
+00:02:06,230 --> 00:02:08,270
+等于拔掉了广告的“耳朵”。
+basically unplugs the ad's ears.
+
+65
+00:02:08,270 --> 00:02:10,060
+反转三，最妙的一个：
+Twist three, the best one:
+
+66
+00:02:10,060 --> 00:02:13,030
+这套传感器，正是机器人的平衡感。
+these sensors are a robot's sense of balance.
+
+67
+00:02:13,030 --> 00:02:15,560
+人形机器人、无人机、平衡车，
+Humanoid robots, drones, self-balancing scooters
+
+68
+00:02:15,560 --> 00:02:17,660
+都靠它知道自己歪没歪。
+all use them to know if they're tilting.
+
+69
+00:02:17,660 --> 00:02:19,260
+一秒读几百上千次，
+Hundreds to thousands of readings a second,
+
+70
+00:02:19,260 --> 00:02:20,980
+一歪就马上掰回来。
+correcting every wobble.
+
+71
+00:02:20,980 --> 00:02:22,050
+你的手机里，
+Inside your phone
+
+72
+00:02:22,050 --> 00:02:24,120
+住着一个机器人的小脑。
+lives a robot's sense of balance.
+
+73
+00:02:24,120 --> 00:02:25,960
+没有它，机器人站不住，
+Without it, robots can't stand,
+
+74
+00:02:25,960 --> 00:02:27,430
+无人机也飞不稳。
+and drones can't fly steady.
+
+75
+00:02:27,430 --> 00:02:30,190
+友情提示：这个开关还在测试版里，
+Friendly fine print: this switch is still in beta.
+
+76
+00:02:30,190 --> 00:02:33,080
+叫什么、放哪儿，正式版都可能变。
+Its name and place may change.
+
+77
+00:02:33,080 --> 00:02:33,840
+关掉以后，
+Block an app,
+
+78
+00:02:33,840 --> 00:02:35,630
+个别App可能会闪退。
+and it may crash.
+
+79
+00:02:35,630 --> 00:02:38,460
+安卓的小米、华为、vivo、OPPO，
+Android makers like Xiaomi, Huawei, vivo and OPPO
+
+80
+00:02:38,460 --> 00:02:40,210
+早就有类似的权限开关。
+already have similar switches.
+
+81
+00:02:40,210 --> 00:02:41,570
+手机知道你在摇，
+Your phone knows you shook it
+
+82
+00:02:41,570 --> 00:02:44,080
+是因为里面有一杆会晃的小秤。
+because a tiny scale inside wobbled.
+
+83
+00:02:44,080 --> 00:02:45,770
+下次再被摇进广告，
+So next time an ad ambushes you,
+
+84
+00:02:45,770 --> 00:02:47,620
+别怪手，怪惯性。
+don't blame your hand. Blame inertia.
+
