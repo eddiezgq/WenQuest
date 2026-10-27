@@ -45,7 +45,8 @@ def test_plants_listing_for_setup_script():
     assert rows[0][1:4] == ["/app/plants/wenquest-robot.yaml", "问渠机器人厂 WenQuest Robotics (Demo)", "WQRB"]
 
 
-@pytest.mark.parametrize("plant, msg", [("no-such-plant", "找不到清单"), ("../etc", "不合规"), ("wenquest-gearbox", None)])
+@pytest.mark.parametrize("plant, msg", [("no-such-plant", "找不到清单"), ("../etc", "不合规"), ("wenquest-gearbox", None),
+                                       ("example-sewing", "没有产品")])
 def test_bad_plant_rejected(tmp_path, plant, msg):
     f = tmp_path / "c.yaml"
     f.write_text(yaml.safe_dump({"classes": [{"id": "abc", "name": "x", "plant": plant}]}, allow_unicode=True), encoding="utf-8")
@@ -59,5 +60,5 @@ def test_bad_plant_rejected(tmp_path, plant, msg):
 
 def test_sewing_plant_accepted(tmp_path):
     f = tmp_path / "c.yaml"
-    f.write_text(yaml.safe_dump({"classes": [{"id": "abc", "name": "x", "plant": "example-sewing"}]}, allow_unicode=True), encoding="utf-8")
-    assert C.load(str(f))[0]["plant_info"]["abbr"]           # 缝纫机厂补了产品（第 45 轮），能用
+    f.write_text(yaml.safe_dump({"classes": [{"id": "abc", "name": "x", "plant": "example-sewing-products"}]}, allow_unicode=True), encoding="utf-8")
+    assert C.load(str(f))[0]["plant_info"]["abbr"]           # 写了产品的缝纫机厂清单（第 45 轮）能用
