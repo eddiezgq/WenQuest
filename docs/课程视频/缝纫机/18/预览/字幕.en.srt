@@ -1,0 +1,943 @@
+1
+00:00:00,600 --> 00:00:01,734
+Hi everyone,
+
+2
+00:00:01,754 --> 00:00:08,660
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,060 --> 00:00:16,080
+This is Lecture 18, designing, building and testing the control box.
+
+4
+00:00:16,480 --> 00:00:20,557
+So far we've assumed the control box just works.
+
+5
+00:00:20,577 --> 00:00:26,532
+In reality it sits under the table, thirty or forty degrees in summer,
+
+6
+00:00:26,552 --> 00:00:28,324
+lint floating around,
+
+7
+00:00:28,344 --> 00:00:33,446
+the main shaft starting and stopping a thousand times a day,
+
+8
+00:00:33,466 --> 00:00:35,921
+and it has to last ten years.
+
+9
+00:00:36,321 --> 00:00:40,882
+Three threads today, heat, interference and burn-in.
+
+10
+00:00:40,902 --> 00:00:44,406
+Requirements and standards, the V-model,
+
+11
+00:00:44,426 --> 00:00:51,541
+software layers and the production test flow are left to the slides and the quiz.
+
+12
+00:00:53,061 --> 00:00:54,032
+Here's the problem.
+
+13
+00:00:54,432 --> 00:01:01,666
+A model of servo control box for lockstitch machines has been in service for
+
+14
+00:01:01,686 --> 00:01:02,812
+a few years.
+
+15
+00:01:03,212 --> 00:01:05,321
+Spring and autumn are fine,
+
+16
+00:01:05,341 --> 00:01:11,234
+but every summer several factories report frequent overheating fault codes;
+
+17
+00:01:11,254 --> 00:01:14,152
+after a rest the machine works again.
+
+18
+00:01:14,552 --> 00:01:20,132
+Some returned units also have bulging DC-link capacitors.
+
+19
+00:01:20,532 --> 00:01:25,541
+These floors have no air conditioning and reach about 38 degrees on summer
+
+20
+00:01:25,561 --> 00:01:26,288
+afternoons.
+
+21
+00:01:26,688 --> 00:01:35,708
+The heat sink alarms at 100 degrees, and the switches' junction limit is 125.
+
+22
+00:01:36,108 --> 00:01:41,208
+Is the design inadequate, or is something else going on?
+
+23
+00:01:41,608 --> 00:01:42,827
+We'll answer at the end.
+
+24
+00:01:44,347 --> 00:01:47,588
+Heat: losses and thermal resistance.
+
+25
+00:01:49,108 --> 00:01:50,808
+Where does the heat come from?
+
+26
+00:01:51,208 --> 00:01:56,686
+Each switch in the inverter bridge has two kinds of loss.
+
+27
+00:01:57,086 --> 00:02:02,408
+Conduction loss: roughly a 1-volt drop plus a resistive drop,
+
+28
+00:02:02,428 --> 00:02:05,824
+so one term grows with current squared.
+
+29
+00:02:06,224 --> 00:02:10,116
+Switching loss: while a switch turns on or off,
+
+30
+00:02:10,136 --> 00:02:14,360
+voltage and current are both non-zero for a moment,
+
+31
+00:02:14,380 --> 00:02:20,437
+and the average power is about half the DC-link voltage times the average
+
+32
+00:02:20,457 --> 00:02:25,764
+current times the transition time times the switching frequency.
+
+33
+00:02:26,164 --> 00:02:35,399
+In the example the whole power stage dissipates about 20 watts at 3 amps and
+
+34
+00:02:35,419 --> 00:02:37,103
+about 74 at 9.
+
+35
+00:02:37,504 --> 00:02:42,331
+Three times the current, nearly four times the loss.
+
+36
+00:02:43,851 --> 00:02:47,024
+Heat leaves the switch's chip, the junction,
+
+37
+00:02:47,044 --> 00:02:51,815
+passes through the package and thermal interface to the heat sink,
+
+38
+00:02:51,835 --> 00:02:54,210
+then into the air inside the box,
+
+39
+00:02:54,230 --> 00:02:57,911
+and finally out through the case into the workshop.
+
+40
+00:02:58,311 --> 00:03:03,731
+Each stage is a thermal resistance in kelvin per watt.
+
+41
+00:03:04,131 --> 00:03:10,195
+Treat it like a circuit: temperature is voltage, heat is current,
+
+42
+00:03:10,215 --> 00:03:17,777
+and the junction temperature is the ambient plus the rise across each resistance.
+
+43
+00:03:18,177 --> 00:03:25,290
+In the example: 3.5 from junction to sink, 1.5 from sink to internal air,
+
+44
+00:03:25,310 --> 00:03:31,739
+and the internal air sits 0.6 times the total heat above the room.
+
+45
+00:03:32,139 --> 00:03:37,447
+Note that the heat sink carries the whole power stage's heat,
+
+46
+00:03:37,467 --> 00:03:42,599
+while the junction-to-sink stage carries only one switch's.
+
+47
+00:03:44,119 --> 00:03:50,259
+Here are current and temperature over two sewing cycles from the lab.
+
+48
+00:03:50,659 --> 00:03:52,710
+Grey is phase current,
+
+49
+00:03:52,730 --> 00:03:58,641
+highest during the fraction of a second of each start and stop;
+
+50
+00:03:58,661 --> 00:04:03,159
+red is junction temperature, blue the heat sink.
+
+51
+00:04:03,559 --> 00:04:09,532
+The heat sink has a large thermal mass and a time constant of minutes,
+
+52
+00:04:09,552 --> 00:04:14,926
+so its temperature follows the average loss and is almost flat.
+
+53
+00:04:15,326 --> 00:04:16,672
+The chip is tiny,
+
+54
+00:04:16,692 --> 00:04:22,134
+with a junction-to-sink time constant of only about 50 milliseconds,
+
+55
+00:04:22,154 --> 00:04:25,106
+so the junction jumps at every start.
+
+56
+00:04:25,506 --> 00:04:30,105
+Watch the starts per minute go from 15 to 60:
+
+57
+00:04:30,125 --> 00:04:35,340
+the blue line rises and the red peaks rise with it.
+
+58
+00:04:36,860 --> 00:04:43,328
+Run at 9 amps continuously and the heat sink would reach 200 degrees:
+
+59
+00:04:43,348 --> 00:04:44,362
+impossible.
+
+60
+00:04:44,762 --> 00:04:48,582
+It works only because sewing is intermittent.
+
+61
+00:04:48,982 --> 00:04:52,843
+With 30 starts a minute and sewing half the time,
+
+62
+00:04:52,863 --> 00:04:57,673
+the average loss is about 18 watts, and the starts and stops,
+
+63
+00:04:57,693 --> 00:05:03,137
+only 15 percent of the time, contribute about 62 percent of the heat.
+
+64
+00:05:03,537 --> 00:05:10,842
+In a 40-degree room the heat sink is about 83 degrees and the junction peaks
+
+65
+00:05:10,862 --> 00:05:12,095
+at about 110.
+
+66
+00:05:12,495 --> 00:05:18,158
+Thermal design has two layers: average loss sets the sink,
+
+67
+00:05:18,178 --> 00:05:23,450
+peak current sets how far the junction jumps above it.
+
+68
+00:05:24,970 --> 00:05:30,142
+Interference: common-mode current and switching speed.
+
+69
+00:05:31,662 --> 00:05:34,722
+Now electromagnetic compatibility.
+
+70
+00:05:35,122 --> 00:05:37,884
+The box is itself a noise source:
+
+71
+00:05:37,904 --> 00:05:42,773
+the inverter switches tens of thousands of times a second,
+
+72
+00:05:42,793 --> 00:05:49,010
+each time swinging from 0 to 310 volts in tens to hundreds of nanoseconds.
+
+73
+00:05:49,410 --> 00:05:56,902
+It must also withstand others' noise: sags and surges, fast transient bursts,
+
+74
+00:05:56,922 --> 00:05:58,853
+kilovolts of static.
+
+75
+00:05:59,253 --> 00:06:02,493
+The key idea is common-mode current.
+
+76
+00:06:02,893 --> 00:06:09,991
+There's parasitic capacitance between the motor winding and the earthed frame,
+
+77
+00:06:10,011 --> 00:06:15,923
+so every voltage step pushes a current pulse through it to earth,
+
+78
+00:06:15,943 --> 00:06:21,307
+which then loops back through the earth wire and the mains.
+
+79
+00:06:21,707 --> 00:06:34,268
+With 300 picofarads and 310 volts in 150 nanoseconds, that's about 0.6 amps.
+
+80
+00:06:35,788 --> 00:06:38,888
+Now connect heat and interference.
+
+81
+00:06:39,288 --> 00:06:45,892
+The horizontal axis is switching time; red is peak junction temperature,
+
+82
+00:06:45,912 --> 00:06:48,468
+blue is common-mode current.
+
+83
+00:06:48,868 --> 00:06:55,089
+A longer switching time means lower dv/dt and less common-mode current,
+
+84
+00:06:55,109 --> 00:06:59,747
+but switching loss is proportional to switching time,
+
+85
+00:06:59,767 --> 00:07:02,208
+so the junction gets hotter.
+
+86
+00:07:02,608 --> 00:07:08,001
+Watch the green dot move from 100 nanoseconds to 300 to 600:
+
+87
+00:07:08,021 --> 00:07:14,406
+at one end the noise is too high, at the other the junction is too hot,
+
+88
+00:07:14,426 --> 00:07:19,548
+and only the green window in between meets both criteria.
+
+89
+00:07:21,068 --> 00:07:24,317
+Software, production and burn-in.
+
+90
+00:07:25,837 --> 00:07:26,617
+Why burn in?
+
+91
+00:07:27,017 --> 00:07:30,727
+Failure rate over time looks like a bathtub:
+
+92
+00:07:30,747 --> 00:07:36,152
+early failures from bad joints and defective parts at the start,
+
+93
+00:07:36,172 --> 00:07:40,983
+which factory tests can't always catch; then a long, low,
+
+94
+00:07:41,003 --> 00:07:46,662
+flat stretch of random failures; and finally wear-out as parts age.
+
+95
+00:07:47,062 --> 00:07:52,497
+The chart shows the first half of the bathtub on log scales.
+
+96
+00:07:52,897 --> 00:07:58,587
+Burn-in means the box spends part of its early life at the factory:
+
+97
+00:07:58,607 --> 00:08:02,849
+watch the burn-in time go from 0 to 8 to 24 hours,
+
+98
+00:08:02,869 --> 00:08:05,917
+the grey equivalent-use area widens,
+
+99
+00:08:05,937 --> 00:08:09,837
+and early failures are caught before shipping.
+
+100
+00:08:11,357 --> 00:08:17,342
+Burn-in at room temperature is too slow, so it's done hot and under load,
+
+101
+00:08:17,362 --> 00:08:22,854
+with the acceleration factor estimated from the Arrhenius relation.
+
+102
+00:08:23,254 --> 00:08:27,433
+Note that T_bi is the component temperature, not the oven's.
+
+103
+00:08:27,833 --> 00:08:29,307
+In the example,
+
+104
+00:08:29,327 --> 00:08:36,576
+with 0.7 electron-volts activation energy and parts at 55 degrees in use,
+
+105
+00:08:36,596 --> 00:08:40,957
+a 70-degree oven puts the parts at about 85,
+
+106
+00:08:40,977 --> 00:08:45,238
+giving an acceleration factor of about 8.0:
+
+107
+00:08:45,258 --> 00:08:49,420
+8 hours of burn-in equals 64 hours of use.
+
+108
+00:08:49,820 --> 00:08:54,639
+If 1 percent of boxes have early defects,
+
+109
+00:08:54,659 --> 00:09:03,136
+first-year returns are about 1.47 percent without burn-in and about 0.92
+
+110
+00:09:03,156 --> 00:09:06,440
+percent after 8 hours at 70.
+
+111
+00:09:07,960 --> 00:09:11,119
+Case: overheating every summer.
+
+112
+00:09:12,639 --> 00:09:14,339
+Back to the opening question.
+
+113
+00:09:14,739 --> 00:09:20,847
+A clean box at 38 degrees has its heat sink at about 81 and its junction
+
+114
+00:09:20,867 --> 00:09:22,634
+peaking at about 108,
+
+115
+00:09:22,654 --> 00:09:28,251
+with margin to both the 100-degree alarm and the 125-degree limit,
+
+116
+00:09:28,271 --> 00:09:30,719
+so the design itself is fine.
+
+117
+00:09:31,119 --> 00:09:33,353
+Open a returned unit, though,
+
+118
+00:09:33,373 --> 00:09:37,939
+and the fins and vents are matted with lint like a blanket.
+
+119
+00:09:38,339 --> 00:09:43,409
+Watch the blockage go from 0 to 0.3 to 0.5:
+
+120
+00:09:43,429 --> 00:09:52,524
+the blue heat-sink line climbs over the 100-degree alarm and the red junction
+
+121
+00:09:52,544 --> 00:09:54,655
+peaks go past 125.
+
+122
+00:09:56,175 --> 00:10:04,489
+At a blockage of 0.5 the heat sink is about 109 degrees, over the alarm,
+
+123
+00:10:04,509 --> 00:10:10,508
+and the junction peaks at about 136, over the limit.
+
+124
+00:10:10,908 --> 00:10:15,888
+So the overheating alarm is protection doing exactly its job.
+
+125
+00:10:16,288 --> 00:10:21,589
+The bulging capacitors have the same cause: by the ten-degree rule,
+
+126
+00:10:21,609 --> 00:10:24,290
+life halves with every 10 degrees.
+
+127
+00:10:24,690 --> 00:10:33,072
+Clean, the capacitor runs at about 59 degrees and lasts about 10.4 years;
+
+128
+00:10:33,092 --> 00:10:40,092
+at 0.5 blockage it runs at about 66 and lasts only about 6.1.
+
+129
+00:10:41,612 --> 00:10:46,903
+The servo drives of collaborative robots and handling arms are thermally
+
+130
+00:10:46,923 --> 00:10:49,116
+designed exactly the same way.
+
+131
+00:10:49,516 --> 00:10:55,543
+In one pick-and-place cycle every joint accelerates, cruises, brakes and stops,
+
+132
+00:10:55,563 --> 00:10:59,371
+and current peaks during acceleration and braking,
+
+133
+00:10:59,391 --> 00:11:02,892
+just like a sewing machine's starts and stops.
+
+134
+00:11:03,292 --> 00:11:08,400
+The drive's heat-sink temperature follows the average loss over a cycle,
+
+135
+00:11:08,420 --> 00:11:13,456
+while the switches' junction temperature follows the peak current while
+
+136
+00:11:13,476 --> 00:11:14,382
+accelerating,
+
+137
+00:11:14,402 --> 00:11:19,581
+so you size a drive from the real cycle's average loss and then check the
+
+138
+00:11:19,601 --> 00:11:20,579
+peak junction.
+
+139
+00:11:20,979 --> 00:11:24,882
+Many cobots put the drive inside the joint,
+
+140
+00:11:24,902 --> 00:11:29,079
+where the only heat sink is the joint housing.
+
+141
+00:11:30,599 --> 00:11:34,876
+The everyday version of this case is a laptop.
+
+142
+00:11:35,276 --> 00:11:40,904
+After two or three years the fan vents are packed with dust;
+
+143
+00:11:40,924 --> 00:11:48,056
+under a heavy program the fan roars, the machine gets hot and it slows down.
+
+144
+00:11:48,456 --> 00:11:56,514
+That's the thermal resistance going up and the processor throttling itself to
+
+145
+00:11:56,534 --> 00:11:58,403
+avoid overheating,
+
+146
+00:11:58,423 --> 00:12:03,124
+exactly like a control box derating when hot.
+
+147
+00:12:03,524 --> 00:12:08,544
+Blow out the dust and both temperature and speed come back.
+
+148
+00:12:08,944 --> 00:12:13,561
+On the shop floor, lint is the control box's dust.
+
+149
+00:12:15,081 --> 00:12:17,780
+Answering the opening question:
+
+150
+00:12:17,800 --> 00:12:24,272
+a clean box at 38 degrees has its heat sink at about 81 and doesn't alarm,
+
+151
+00:12:24,292 --> 00:12:26,202
+so the design is fine.
+
+152
+00:12:26,602 --> 00:12:34,829
+At a lint blockage of 0.5 the heat sink reaches 109 and alarms,
+
+153
+00:12:34,849 --> 00:12:40,981
+and the junction and capacitor life suffer too.
+
+154
+00:12:41,381 --> 00:12:49,103
+Cut the heat-sink resistance from 1.5 to 1.0 and the sink drops to about 93
+
+155
+00:12:49,123 --> 00:12:53,128
+with the junction peaking at about 120:
+
+156
+00:12:53,148 --> 00:12:54,677
+no more alarms.
+
+157
+00:12:55,077 --> 00:12:58,598
+Add regular lint cleaning, thermal derating,
+
+158
+00:12:58,618 --> 00:13:04,233
+long-life capacitors and conformal coating, and the problem is solved.
+
+159
+00:13:05,753 --> 00:13:11,030
+Now Virtual lab 18-1, the control box, which you can do yourself on WenQuest.
+
+160
+00:13:11,050 --> 00:13:15,019
+The criteria on the right and the tasks below are blurred,
+
+161
+00:13:15,039 --> 00:13:17,289
+so you can read them on your own.
+
+162
+00:13:17,309 --> 00:13:21,898
+Top left are current and temperature over two sewing cycles; below,
+
+163
+00:13:21,918 --> 00:13:23,893
+the switching-time trade-off.
+
+164
+00:13:24,293 --> 00:13:29,723
+First press Summer plus clogging, 38 degrees and a blockage of 0.5,
+
+165
+00:13:29,743 --> 00:13:35,499
+then raise the blockage further. The blue and red lines climb together.
+
+166
+00:13:35,519 --> 00:13:38,428
+Which criteria fail? Note them down.
+
+167
+00:13:38,828 --> 00:13:39,545
+Task one:
+
+168
+00:13:39,565 --> 00:13:45,526
+leave the room and the duty cycle alone and change only design parameters
+
+169
+00:13:45,546 --> 00:13:47,902
+until every criterion passes.
+
+170
+00:13:47,922 --> 00:13:54,293
+Try lowering the heat-sink resistance. The 1.0 on the answer slide is one fix;
+
+171
+00:13:54,313 --> 00:13:59,127
+which other design changes also work, and which helps most,
+
+172
+00:13:59,147 --> 00:14:00,765
+is yours to compare.
+
+173
+00:14:01,165 --> 00:14:05,747
+Reset to standard, set the room to 45 degrees,
+
+174
+00:14:05,767 --> 00:14:11,650
+and stretch the switching time from 100 nanoseconds to 700.
+
+175
+00:14:11,670 --> 00:14:18,953
+Watch the dot on the trade-off chart: noisy at one end, hot at the other.
+
+176
+00:14:19,353 --> 00:14:20,136
+Task two:
+
+177
+00:14:20,156 --> 00:14:27,181
+raise the switching frequency to 20 kilohertz and re-select the switching time.
+
+178
+00:14:27,201 --> 00:14:33,155
+Measure how wide the green window is, compare it with 12 kilohertz,
+
+179
+00:14:33,175 --> 00:14:36,544
+and say which criterion sets each end.
+
+180
+00:14:36,944 --> 00:14:40,746
+Then page two, burn-in and returns. At 55 degrees,
+
+181
+00:14:40,766 --> 00:14:46,708
+take the burn-in time from 0 to 24 hours, and the grey equivalent time widens.
+
+182
+00:14:46,728 --> 00:14:47,548
+Task three:
+
+183
+00:14:47,568 --> 00:14:53,358
+choose a temperature and a time that keep first-year returns under 1 percent
+
+184
+00:14:53,378 --> 00:14:55,803
+at no more than 9 yuan per unit.
+
+185
+00:14:56,203 --> 00:15:02,029
+Try raising the chamber temperature; the cheapest combination is yours to find.
+
+186
+00:15:02,049 --> 00:15:05,729
+The guide and report template are on the platform.
+
+187
+00:15:07,249 --> 00:15:13,272
+Everything in this lecture is on the WenQuest learning platform.
+
+188
+00:15:13,672 --> 00:15:20,957
+You can open today's interactive slides and the control-box lab and work them
+
+189
+00:15:20,977 --> 00:15:21,811
+yourself;
+
+190
+00:15:21,831 --> 00:15:22,950
+the V-model,
+
+191
+00:15:22,970 --> 00:15:30,445
+software layers and production tests that this video skipped are in the slides.
+
+192
+00:15:30,845 --> 00:15:36,256
+You submit the assignment and the lab report on the platform,
+
+193
+00:15:36,276 --> 00:15:39,105
+and get marks and comments back.
+
+194
+00:15:39,505 --> 00:15:43,958
+Questions go to the course discussion forum,
+
+195
+00:15:43,978 --> 00:15:50,565
+and the grades page shows your mark on every assignment and quiz.
+
+196
+00:15:52,085 --> 00:15:57,304
+Your assignment has four questions about one servo control box. One:
+
+197
+00:15:57,324 --> 00:15:58,845
+in a 45-degree room,
+
+198
+00:15:58,865 --> 00:16:05,317
+with an average loss of about 18 watts and about 8.3 watts per switch during starts,
+
+199
+00:16:05,337 --> 00:16:08,707
+use the thermal network to find the box air,
+
+200
+00:16:08,727 --> 00:16:13,637
+heat-sink and peak junction temperatures and the capacitor life,
+
+201
+00:16:13,657 --> 00:16:18,953
+and check them against the 100-degree alarm and the 125-degree limit.
+
+202
+00:16:19,353 --> 00:16:23,392
+Two: at 38 degrees with a lint blockage of 0.5,
+
+203
+00:16:23,412 --> 00:16:29,610
+what is the largest clean heat-sink resistance that keeps the sink at or
+
+204
+00:16:29,630 --> 00:16:31,165
+below 100 degrees?
+
+205
+00:16:31,185 --> 00:16:36,174
+If the junction must also stay at or below 125, what then,
+
+206
+00:16:36,194 --> 00:16:38,937
+and which constraint is tighter?
+
+207
+00:16:39,337 --> 00:16:43,797
+Three uses the lab: at 45 degrees and 16 kilohertz,
+
+208
+00:16:43,817 --> 00:16:50,297
+find the switching-time range that meets all three criteria and compare it
+
+209
+00:16:50,317 --> 00:16:54,161
+with 235 to 470 nanoseconds at 12 kilohertz.
+
+210
+00:16:54,181 --> 00:16:59,168
+Four is a discussion: boxes almost never fail in burn-in,
+
+211
+00:16:59,188 --> 00:17:04,614
+yet first-year returns reach 2 percent. What could cause that,
+
+212
+00:17:04,634 --> 00:17:09,094
+and how would you change the test and burn-in flow?
+
+213
+00:17:09,494 --> 00:17:13,073
+Submit the report on the WenQuest platform.
+
+214
+00:17:14,593 --> 00:17:20,951
+There's also a ten-question quiz. For example, with a 310-volt DC link,
+
+215
+00:17:20,971 --> 00:17:27,779
+12 kilohertz, an average current of 3 amps and 300 nanoseconds of switching,
+
+216
+00:17:27,799 --> 00:17:31,013
+what is one switch's switching loss?
+
+217
+00:17:31,413 --> 00:17:37,720
+Or, if the main program runs away, what guarantees that the motor stops?
+
+218
+00:17:37,740 --> 00:17:44,399
+Others ask what in-circuit test actually measures and how burn-in conditions
+
+219
+00:17:44,419 --> 00:17:45,366
+are chosen.
+
+220
+00:17:45,766 --> 00:17:51,386
+You get three attempts, and the explanations appear as soon as you submit.
+
+221
+00:17:52,906 --> 00:17:54,606
+Three things to remember.
+
+222
+00:17:55,006 --> 00:18:01,241
+One: a control box has to last ten years through voltage swings, heat, lint,
+
+223
+00:18:01,261 --> 00:18:07,660
+interference and constant starts and stops, and it's developed on the V-model,
+
+224
+00:18:07,680 --> 00:18:13,586
+with design and verification matched level by level, as the slides show.
+
+225
+00:18:13,986 --> 00:18:22,264
+Two: sewing is an intermittent load; average loss sets the heat sink,
+
+226
+00:18:22,284 --> 00:18:26,594
+peak current sets the junction jump,
+
+227
+00:18:26,614 --> 00:18:31,766
+and lint on the shop floor eats the margin.
+
+228
+00:18:32,166 --> 00:18:38,201
+Three: switching speed trades heat against noise and must sit in a window,
+
+229
+00:18:38,221 --> 00:18:42,621
+and hot burn-in catches early failures at the factory.
+
+230
+00:18:43,021 --> 00:18:48,653
+The assignment, quiz and lab report are on WenQuest.
+
+231
+00:18:49,053 --> 00:18:51,640
+The slides, the virtual lab,
+
+232
+00:18:51,660 --> 00:18:58,156
+the assignment and the quiz are all on the WenQuest learning platform,
+
+233
+00:18:58,176 --> 00:19:04,393
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+234
+00:19:04,793 --> 00:19:09,356
+Next time it's the prototyping platform and the parts library.
+
+235
+00:19:09,376 --> 00:19:14,087
+Twelve weeks to build a lockstitch prototype that actually sews;
+
+236
+00:19:14,107 --> 00:19:17,413
+which modules would you choose? See you then.
