@@ -210,6 +210,11 @@ async def run(html: str, lab: str) -> dict:
                 await page.click(f'{sec} [data-scene="{sc}"]')
                 await page.wait_for_timeout(350)
                 colours = await page.evaluate(BLANK_JS, f"{sec} canvas")
+                for _ in range(4):           # a slow runner may not have drawn the new scene yet: look again before calling it blank
+                    if colours >= 3:
+                        break
+                    await page.wait_for_timeout(500)
+                    colours = await page.evaluate(BLANK_JS, f"{sec} canvas")
                 if colours < 3:
                     problems.append(f"scene '{sc}': the picture is blank")
                 for pid in info["params"]:
