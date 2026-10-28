@@ -455,7 +455,7 @@ function tick(dt,t){
   placeCam();R.render(scene,cam);drawTags();drawTiming();if(measKey)drawMeas();}
 requestAnimationFrame(frame);
 window.__api={pose,setShell:k=>{shell=k;applyShell();},setChain:k=>{chain=k;applyChain();},setExplode:v=>{ex=v;applyExplode();},
-  setPhi,setCfg:o=>{Object.assign(cfg,o);changed();},cfg:()=>cfg,ev:()=>EV,sew:()=>$('sew').click(),zoom:()=>$('zoomBtn').click(),meas:k=>{measKey=k;$('meas').hidden=false;},cam:(y,p,d,t)=>{yaw=y;pitch=p;dist=d;if(t)target.set(...t);$('spin').checked=false;},tags:v=>{$('tagsOn').checked=v;},
+  setPhi,setCfg:o=>{Object.assign(cfg,o);changed();},cfg:()=>cfg,ev:()=>EV,sew:()=>$('sew').click(),zoom:()=>$('zoomBtn').click(),meas:k=>{measKey=k;$('meas').hidden=false;},viewOffset:x=>{const a=cam.aspect;if(x)cam.setViewOffset(a,1,x*a,0,a,1);else cam.clearViewOffset();},cam:(y,p,d,t)=>{yaw=y;pitch=p;dist=d;if(t)target.set(...t);$('spin').checked=false;},tags:v=>{$('tagsOn').checked=v;},
   manual:on=>{manual=!!on;},step:dt=>{vt+=dt*1000;tick(dt,vt);},
   // 出三维视频用（第 37 轮）：主轴累计转角 a（度）时每个零件的世界矩阵（mm，y 向上）、线的路径点、读数；Blender 照此摆放
   dump:a=>{A=a;phi=((A%360)+360)%360;const P=pose(phi);threads(A,P.x);root.updateMatrixWorld(true);

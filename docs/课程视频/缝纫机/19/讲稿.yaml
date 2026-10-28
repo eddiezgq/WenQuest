@@ -1,0 +1,136 @@
+# 《缝纫机设计与制造》公开课 第 19 讲：电控原型平台与零件库
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch19.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 19-1（零件库快速配套器）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch19.py 算出（{{ch19.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "19"
+deck: ch19
+skip: [3, 4, 8, 9, 10, 13, 16, 18, 19, 22, 24]   # 第一节章节页、原型与产品的确定性、第二节（章节页、需求表、零件库条目）、驱动器数字页（并进回答页讲稿和第 14 页判据动画）、一份数据生成三样、换机种（也是实验任务二答案）、AI 选型助手、状态机、五道门：控制课程部分约 10 分钟；这几页留给课件和测验
+code: [ch19]
+title: ["电控原型平台与零件库——12 周，做出一台能缝的样机", "The Prototyping Platform and the Parts Library — Twelve Weeks to a Prototype That Sews"]
+chapter: ["第五篇 电气控制 · 第 19 章", "Part V Electrical Control · Chapter 19"]
+next: ["第 20 讲", "Lecture 20"]
+cover_formula: 'T = J\,\alpha + T_f \le 0.8\,T_{peak}'
+tags:
+  zh: [电控原型, 零件库, 快速配套, 伺服选型, 惯量比, 等效转矩, 急停回馈, 电磁铁, 事件表, 硬件在环, 缝纫机设计]
+  en: [control prototype, parts library, rapid configuration, servo sizing, inertia ratio, RMS torque, regenerative energy, solenoid, event table, hardware in the loop, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第十九讲，电控原型平台与零件库。
+    - 前面几讲把电机、电磁铁、控制和电控箱一样样讲完了。今天把它们攒成一台真能缝的样机：选什么模块，怎么算，固件怎么写，怎么测。
+    - 需求表和零件库条目的写法、AI 选型助手、状态机和从原型到产品的五道门，留给课件。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 19, the prototyping platform and the parts library.
+    - Over the last few lectures we covered motors, solenoids, control and the control box one by one. Today we put them together into a prototype that really sews. Which modules, how to size them, how to write the firmware, and how to test it.
+    - How to write requirements and library entries, the AI selection assistant, the state machine and the five gates from prototype to product are left to the slides.
+
+after:
+  - id: lab191
+    kind: lab
+    lab: config
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.documentElement.setAttribute('data-theme', 'dark'); document.body.style.zoom = '0.7'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#bom tr:last-child{filter:blur(7px)}'; document.head.appendChild(st); for (const id of ['checks', 'tasks', 'cost']) document.getElementById(id).closest('section').style.filter = 'blur(7px) grayscale(1)'; if (!window.__wqIn) { window.__wqIn = 1; document.addEventListener('input', e => { if (e.target.closest && e.target.closest('#req')) { e.target.value = Math.round(+e.target.value); e.target.dispatchEvent(new Event('change', {bubbles: true})); } }, true); } })()"
+      - press: "#btnAuto"
+      - js: "(() => { const d = document.querySelector('#bom [data-slot=drv]'); d.value = '1A5'; d.dispatchEvent(new Event('change', {bubbles: true})); })()"
+      - js: "(() => { const d = document.querySelector('#bom [data-slot=drv]'); d.value = '3A'; d.dispatchEvent(new Event('change', {bubbles: true})); })()"
+        sweep: {f_n_trim: [300, 440]}
+        dur: 6
+      - press: ["[data-k=OL]", "#btnReset", "#btnAuto"]
+        sweep: {f_n_max: [6000, 7000]}
+        dur: 6
+      - press: ["[data-k=PS]", "#btnReset", "#btnAuto"]
+      - js: "(() => { const e = document.getElementById('f_transY'); e.value = 'screw:16x10'; e.dispatchEvent(new Event('change', {bubbles: true})); })()"
+    say:
+      zh:
+        - ">下面是虚拟实验 19-1，零件库快速配套器，在问渠平台上可以亲手做。右边的判据、任务和总价先遮住，留给你自己读。左上是需求表，中间是 BOM。打开时是一台“上一代样机”的配置，先别急着配套，看看哪些判据不满足。"
+        - ">点“自动配套”，配套器对每一类模块逐个规格查判据，挑出全部满足的规格里最便宜的。对照课件里的算例核对。"
+        - ">任务一：在 BOM 的下拉框里把伺服驱动器手动换成 1.5 安那档，看哪几条判据变成叉、差多少，和课件里的算例对一对。"
+        - ">换回 3 安，再把剪线转速从 300 往上调，盯着剪线电磁铁的折算转角，看它在哪儿超过 20 度，和课件里算出的最高剪线转速对一对。"
+        - ">任务二：切到包缝机，恢复默认需求、自动配套，记下方案和总价；再只把最高转速改成 7000、不换件，看哪些判据变成叉。之后再自动配套，要换哪些模块、多花多少钱，留给你自己找。"
+        - ">任务三：切到花样机，自动配套，记下 X、Y 两根轴的传动、电机和固有频率。"
+        - ">再把 Y 轴传动改成丝杠，看哪些判据失败，想一想导程怎样把电机转速放大。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 19-1, the parts-library configurator, which you can do yourself on WenQuest. The criteria, tasks and total on the right are blurred; they're for you to work out in the lab. Top left is the requirements table, in the middle the BOM. It opens with a previous prototype's parts; before configuring, check which criteria fail."
+        - ">Click Configure automatically. For each category the configurator checks every size against the criteria and takes the cheapest that passes. Check it against the worked example in the slides."
+        - ">Task one: in the BOM drop-down, swap the servo drive to the 1.5-amp size by hand see which criteria fail and by how much, and compare with the worked example in the slides."
+        - ">Put the 3-amp drive back, then raise the trimming speed from 300 and watch the trim solenoid's angle check. See where it goes past 20 degrees, and compare with the top trimming speed worked out in the slides."
+        - ">Task two: switch to the overlock, reset the requirements, auto-configure, and note the design and total. Then change only the top speed to 7000 without swapping parts and see which checks fail. Which modules a new configuration replaces, and what it costs, is yours to find."
+        - ">Task three: switch to the pattern sewer, auto-configure, and note each axis's drive, motor and natural frequency."
+        - ">Then change the Y drive to a ball screw, see which checks fail, and think about how the lead multiplies motor speed. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 19-1，可以自己动手", "Interactive slides and Lab 19-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和零件库快速配套器，都可以自己打开动手做，视频里跳过的需求表、零件库条目、状态机和五道门也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the parts-library configurator and work them yourself; the requirements table, library entries, state machine and five gates that this video skipped are in the slides."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 19：厚料平缝机原型的快速配套", "Assignment 19: rapid configuration for a heavy-fabric prototype"]
+      points:
+        - ["4500 r/min、0.12 s：七条判据选电机 + 驱动器", "4500 r/min in 0.12 s: seven criteria pick motor + drive"]
+        - ["400 r/min 剪线：M15 还是 L30；写事件表剪线行", "Trim at 400 r/min: M15 or L30; write the trim row"]
+        - ["讨论：剪线率从 99.7% 掉到 98%，怎样查得出来", "Discussion: trims drop from 99.7% to 98%; how to trace it"]
+      foot: ["3–5 页 PDF 报告，附计算表和实验截图，在问渠学习平台提交。", "A 3–5 page PDF with calculation tables and lab screenshots, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题，都围绕一台厚料平缝机头。第一题，负载惯量 6 乘 10 的负 4 次方，最高 4500 转，0.12 秒内加速到位，按七条判据把每档电机算一遍，选出最便宜的电机加驱动器。"
+        - ">第二题，厚料剪线要在 400 转下动作，M15 和 L30 哪个满足 20 度，用虚拟实验验证时需求表要改哪几项。第三题，改用直接驱动动刀，剪线起始角在 290 到 300 度，写出事件表里剪线这一行，说清楚为什么不能写成松开脚踏后延时 180 毫秒通电。"
+        - ">第四题讨论：原型剪线成功率 99.7%，组员改了拨线角度后掉到 98%，却说不清改了什么。按本讲版本、测试和上报的做法，设计一套能把问题查出来的办法。"
+        - 报告在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions about one heavy-fabric lockstitch head. One: with a load inertia of 6 times 10 to the minus 4, a top speed of 4500 r/min reached in 0.12 seconds, run every motor size through the seven criteria and choose the cheapest motor and drive pair."
+        - ">Two: heavy-fabric trimming happens at 400 r/min. Which of M15 and L30 stays within 20 degrees, and which requirement fields would you change to check it in the lab? Three: with a directly driven knife the trim starts between 290 and 300 degrees. Write the trim row of the event table, and explain why it must not be written as energise 180 milliseconds after the pedal is released."
+        - ">Four is a discussion: the prototype trims at 99.7 percent, a teammate changes the wiper angle, success drops to 98, and nobody can say what changed. Using this lecture's approach to versions, tests and reporting, design a way to trace such problems."
+        - Submit the report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["7×10⁻⁴ kg·m²、0.15 s 到 4500 r/min：要多大转矩？", "7×10⁻⁴ kg·m², 4500 r/min in 0.15 s: what torque?"]
+        - ["事件调度能不能放在 1 ms 的任务里轮询角度？", "Can event scheduling poll the angle in a 1 ms task?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：主轴总惯量 7 乘 10 的负 4 次方，0.15 秒内从静止加速到 4500 转，再加 0.15 牛米摩擦，要多大的加速转矩？"
+        - ">再比如：5000 转时主轴转过 0.1 度只要三微秒多，事件调度能不能放在 1 毫秒一次的任务里轮询角度？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, a spindle with a total inertia of 7 times 10 to the minus 4 must reach 4500 r/min from rest in 0.15 seconds, with 0.15 newton-metres of friction. What acceleration torque does it need?"
+        - ">Or, at 5000 r/min the spindle turns 0.1 degree in just over three microseconds; can event scheduling poll the angle in a task that runs once a millisecond?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲把今天的方法用到底：平缝机和包缝机的电控原型，从接线、固件到上台测试，我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "Next time we carry today's method all the way through: control prototypes for the lockstitch and the overlock, from wiring and firmware to the test bench. See you then."
