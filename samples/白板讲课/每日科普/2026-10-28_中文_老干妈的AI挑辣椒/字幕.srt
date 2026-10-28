@@ -1,0 +1,410 @@
+1
+00:00:00,300 --> 00:00:02,690
+据报道，老干妈挑辣椒的工人，
+Reportedly, Laoganma's chili sorters
+
+2
+00:00:02,690 --> 00:00:05,030
+从六百多人变成了四十八人。
+went from over six hundred to forty-eight.
+
+3
+00:00:05,030 --> 00:00:08,350
+顶替他们的，是传送带上方的高速相机，
+Replacing them: high-speed cameras over the belt,
+
+4
+00:00:08,350 --> 00:00:10,120
+每零点三秒扫一遍。
+scanning every 0.3 seconds.
+
+5
+00:00:10,120 --> 00:00:12,140
+据报道，挑出来的坏辣椒，
+Reportedly, the bad chilies
+
+6
+00:00:12,140 --> 00:00:14,280
+是被一股气流直接吹走的。
+are simply blown away by a jet of air.
+
+7
+00:00:14,280 --> 00:00:16,260
+公司回应：裁员传闻不实，
+The company says the layoff rumor is false,
+
+8
+00:00:16,260 --> 00:00:18,700
+而且从来没用过这么多拣椒工。
+and it never had that many sorters.
+
+9
+00:00:18,700 --> 00:00:20,590
+人数之争我们先放一边，
+Let's leave the head count aside
+
+10
+00:00:20,590 --> 00:00:22,610
+今天只问一个烧脑问题：
+and ask one brain-teaser:
+
+11
+00:00:22,610 --> 00:00:24,570
+一台机器，从没吃过辣椒，
+A machine that has never tasted a chili —
+
+12
+00:00:24,570 --> 00:00:26,810
+凭什么一眼看出哪颗是坏的？
+how does it spot a bad one at a glance?
+
+13
+00:00:26,810 --> 00:00:28,560
+第一步，先说个秘密：
+First, a secret:
+
+14
+00:00:28,560 --> 00:00:30,950
+在相机眼里，根本没有辣椒。
+to a camera, there is no chili.
+
+15
+00:00:30,950 --> 00:00:33,290
+只有几百万个小格子，叫像素，
+Only millions of tiny squares called pixels,
+
+16
+00:00:33,290 --> 00:00:36,090
+每一格，就是三个数：红、绿、蓝。
+each just three numbers: red, green, blue.
+
+17
+00:00:36,090 --> 00:00:38,510
+你的手机屏幕也是这么拼出来的，
+Your phone screen works the same way:
+
+18
+00:00:38,510 --> 00:00:40,730
+凑近看，全是红绿蓝的小点。
+up close, it's all red, green and blue dots.
+
+19
+00:00:40,730 --> 00:00:43,120
+好辣椒的格子，红的数很大，
+Good chili pixels: big red,
+
+20
+00:00:43,120 --> 00:00:44,540
+绿和蓝都很小。
+small green and blue.
+
+21
+00:00:44,540 --> 00:00:45,790
+霉斑、黑斑呢？
+Mold and black spots?
+
+22
+00:00:45,790 --> 00:00:48,250
+三个数都很小，黑乎乎一片。
+All three numbers small. Dark.
+
+23
+00:00:48,250 --> 00:00:50,890
+有的分拣机还看人眼看不见的光，
+Some sorters even see light our eyes can't,
+
+24
+00:00:50,890 --> 00:00:53,300
+有些毛病在那种光下更显眼。
+where some flaws stand out more.
+
+25
+00:00:53,300 --> 00:00:55,860
+最笨的办法：数一数黑格子，
+The dumbest method: count dark pixels;
+
+26
+00:00:55,860 --> 00:00:58,350
+超过一定数量，就判它坏。
+too many, and it's bad.
+
+27
+00:00:58,350 --> 00:00:59,030
+反转一：
+Twist one:
+
+28
+00:00:59,030 --> 00:01:00,510
+这招很快就翻车。
+that trick breaks fast.
+
+29
+00:01:00,510 --> 00:01:03,360
+辣椒的影子是黑的，蒂把也是深色的，
+Shadows are dark. Stems are dark.
+
+30
+00:01:03,360 --> 00:01:05,160
+一颗好椒也会被冤枉。
+A perfectly good chili gets framed.
+
+31
+00:01:05,160 --> 00:01:06,580
+所以现在用AI：
+So now we use AI:
+
+32
+00:01:06,580 --> 00:01:09,180
+给它看成千上万张标好的照片。
+show it thousands of labeled photos.
+
+33
+00:01:09,180 --> 00:01:10,530
+这叫监督学习：
+That's called supervised learning:
+
+34
+00:01:10,530 --> 00:01:13,170
+人先把答案标好，它照着学。
+people label the answers, and it learns from them.
+
+35
+00:01:13,170 --> 00:01:14,520
+这张好，那张坏，
+This one good, that one bad,
+
+36
+00:01:14,520 --> 00:01:16,850
+它自己琢磨出霉斑长什么样。
+and it works out what mold looks like.
+
+37
+00:01:16,850 --> 00:01:18,360
+就像老师傅带徒弟：
+Like a master training an apprentice:
+
+38
+00:01:18,360 --> 00:01:20,670
+不讲规则，只让你看一万颗。
+no rules, just look at ten thousand.
+
+39
+00:01:20,670 --> 00:01:22,520
+徒弟看多了就有了手感，
+Look long enough and you get a feel.
+
+40
+00:01:22,520 --> 00:01:25,500
+AI的手感，就是一大堆调好的数字。
+An AI's feel is a pile of tuned numbers.
+
+41
+00:01:25,500 --> 00:01:27,180
+反转二，最反直觉：
+Twist two, the weird one:
+
+42
+00:01:27,180 --> 00:01:29,730
+看出来不难，难的是追上它。
+spotting is easy. Catching is hard.
+
+43
+00:01:29,730 --> 00:01:31,090
+传送带一直在跑，
+The belt never stops.
+
+44
+00:01:31,090 --> 00:01:33,760
+等算完，那颗辣椒已经往前走了。
+By the time the math is done, the chili has moved.
+
+45
+00:01:33,760 --> 00:01:34,930
+这就像接球：
+It's like catching a ball:
+
+46
+00:01:34,930 --> 00:01:38,170
+你不是追着球跑，是先猜它落在哪。
+you don't chase it, you guess where it will land.
+
+47
+00:01:38,170 --> 00:01:40,770
+所以机器要算准：它现在在哪，
+So the machine works out where it is now,
+
+48
+00:01:40,770 --> 00:01:42,760
+几分之一秒后会到哪。
+and where it'll be a split second later.
+
+49
+00:01:42,760 --> 00:01:45,020
+到了那一点，一个小喷嘴，
+At that spot, a tiny nozzle
+
+50
+00:01:45,020 --> 00:01:46,460
+噗，吹一口气。
+goes pfft: one puff of air.
+
+51
+00:01:46,460 --> 00:01:49,400
+色选机的喷气阀，开关只要几毫秒，
+A sorter's air valve opens in a few milliseconds,
+
+52
+00:01:49,400 --> 00:01:51,360
+比眨一下眼快几十倍。
+dozens of times faster than a blink.
+
+53
+00:01:51,360 --> 00:01:53,940
+坏辣椒被吹飞，掉进废料槽，
+The bad chili flies into the reject bin;
+
+54
+00:01:53,940 --> 00:01:55,850
+好辣椒继续往前走。
+the good ones roll on.
+
+55
+00:01:55,850 --> 00:01:57,980
+据报道，从看见到吹走，
+Reportedly, from spotted to blown away
+
+56
+00:01:57,980 --> 00:01:59,840
+也就零点三秒左右。
+takes about 0.3 seconds.
+
+57
+00:01:59,840 --> 00:02:02,640
+吹早了吹到邻居，吹晚了吹个空，
+Too early hits the neighbor, too late hits air.
+
+58
+00:02:02,640 --> 00:02:04,250
+这是一道物理题。
+It's a physics problem.
+
+59
+00:02:04,250 --> 00:02:06,300
+假如传送带每秒走一米，
+If the belt moves one meter a second,
+
+60
+00:02:06,300 --> 00:02:08,830
+晚百分之一秒，就偏一厘米。
+a hundredth of a second late is a centimeter off.
+
+61
+00:02:08,830 --> 00:02:09,520
+反转三：
+Twist three:
+
+62
+00:02:09,520 --> 00:02:11,860
+机器看得见，不等于看得懂。
+seeing isn't understanding.
+
+63
+00:02:11,860 --> 00:02:13,630
+颜色怪、其实没坏的，
+Odd color but perfectly fine?
+
+64
+00:02:13,630 --> 00:02:14,810
+它可能吹掉。
+It might blow it away.
+
+65
+00:02:14,810 --> 00:02:16,860
+坏在里面、外面看不出的，
+Rotten inside, clean outside?
+
+66
+00:02:16,860 --> 00:02:18,010
+它可能放过。
+It might let it pass.
+
+67
+00:02:18,010 --> 00:02:20,290
+所以还留着四十八位老师傅，
+That's why forty-eight experienced workers remain
+
+68
+00:02:20,290 --> 00:02:21,640
+守最后一道关。
+on the final check.
+
+69
+00:02:21,640 --> 00:02:23,820
+据报道，关键工序的不良率，
+Reportedly, the defect rate at the key step
+
+70
+00:02:23,820 --> 00:02:25,280
+降到了万分之二。
+fell to 0.02 percent.
+
+71
+00:02:25,280 --> 00:02:27,680
+友情提示：这是公司说的数字，
+Fine print: that's the company's figure,
+
+72
+00:02:27,680 --> 00:02:29,680
+不是食品安全抽检结果。
+not a food safety test result.
+
+73
+00:02:29,680 --> 00:02:32,110
+人数怎么变的，各方说法不一，
+Accounts of the head count differ;
+
+74
+00:02:32,110 --> 00:02:33,970
+我们只讲机器怎么看。
+we only explain how the machine sees.
+
+75
+00:02:33,970 --> 00:02:37,950
+同样的办法，早就用在挑米、挑豆、挑茶叶，
+The same trick sorts rice, beans and tea,
+
+76
+00:02:37,950 --> 00:02:40,060
+也帮机器人分拣快递。
+and helps robots sort parcels.
+
+77
+00:02:40,060 --> 00:02:43,210
+机器人学里，这叫感知、决策、执行：
+In robotics it's called sense, think, act:
+
+78
+00:02:43,210 --> 00:02:45,000
+看见、算好、出手。
+see it, work it out, make the move.
+
+79
+00:02:45,000 --> 00:02:47,210
+所以答案是：机器不懂辣，
+So the answer: the machine knows nothing about spice.
+
+80
+00:02:47,210 --> 00:02:49,730
+它只认得三个数，和一口气。
+Just three numbers, and one puff of air.
+
+81
+00:02:49,730 --> 00:02:52,290
+下次你吃到一瓶没有坏椒的辣酱，
+Next time your chili sauce has no bad chili,
+
+82
+00:02:52,290 --> 00:02:54,180
+记得谢谢那一口气。
+thank that puff of air.
+

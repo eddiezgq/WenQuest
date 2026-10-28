@@ -1,0 +1,440 @@
+1
+00:00:00,300 --> 00:00:03,660
+Google built an AI that dreams up a world you can walk around in.
+谷歌造了一个AI，能凭空“梦”出一个你能走进去的世界。
+
+2
+00:00:03,660 --> 00:00:06,270
+But turn around too long, and the world forgets.
+可你转身太久，这个世界就忘了。
+
+3
+00:00:06,270 --> 00:00:07,450
+It's called Genie four.
+它叫Genie 4，
+
+4
+00:00:07,450 --> 00:00:09,780
+It was announced on October twenty seventh.
+10月27号发布。
+
+5
+00:00:09,780 --> 00:00:11,700
+Type a sentence, and it paints a world,
+打一句话，它就画出一个世界，
+
+6
+00:00:11,700 --> 00:00:14,080
+with sound, weather, and people who talk back.
+有声音、有天气，还有会搭话的人。
+
+7
+00:00:14,080 --> 00:00:16,170
+You can walk around with the arrow keys,
+你可以用方向键在里面走来走去，
+
+8
+00:00:16,170 --> 00:00:17,540
+just like a normal game.
+就像玩普通游戏。
+
+9
+00:00:17,540 --> 00:00:19,160
+Every picture and sound it makes
+每一帧画面和声音，
+
+10
+00:00:19,160 --> 00:00:20,860
+carries an invisible watermark.
+都打了看不见的水印。
+
+11
+00:00:20,860 --> 00:00:22,080
+It's called SynthID,
+它叫SynthID，
+
+12
+00:00:22,080 --> 00:00:24,220
+so people can tell an AI made it.
+好让大家认出这是AI做的。
+
+13
+00:00:24,220 --> 00:00:26,490
+Today's brain-teaser: it's not a game engine,
+今天的烧脑问题：它不是游戏引擎，
+
+14
+00:00:26,490 --> 00:00:28,430
+so how does it know what comes next?
+它怎么知道下一秒该是什么样？
+
+15
+00:00:28,430 --> 00:00:30,710
+First, a secret: there's no map inside.
+先说个秘密：它里面没有地图，
+
+16
+00:00:30,710 --> 00:00:32,350
+No walls. No physics code.
+没有墙，也没有物理公式。
+
+17
+00:00:32,350 --> 00:00:34,370
+A normal video game stores everything:
+普通游戏把一切都存着：
+
+18
+00:00:34,370 --> 00:00:36,610
+where the tree is, how heavy the box is.
+树在哪，箱子多重。
+
+19
+00:00:36,610 --> 00:00:38,190
+Genie stores nothing like that.
+Genie什么都不存，
+
+20
+00:00:38,190 --> 00:00:39,990
+It just guesses the next picture.
+它只猜下一张画面。
+
+21
+00:00:39,990 --> 00:00:41,500
+Then it guesses the next one,
+猜完一张，再猜下一张，
+
+22
+00:00:41,500 --> 00:00:43,380
+and the next, many times a second.
+一秒钟猜很多张。
+
+23
+00:00:43,380 --> 00:00:45,580
+Your phone's keyboard guesses the next word.
+手机输入法猜下一个字，
+
+24
+00:00:45,580 --> 00:00:47,540
+Genie guesses the next whole picture.
+Genie猜的是下一整张画。
+
+25
+00:00:47,540 --> 00:00:48,940
+It's like a flip book artist
+就像一个画翻页小人书的画家，
+
+26
+00:00:48,940 --> 00:00:51,310
+drawing each page by looking at the last few.
+每页都照着前几页画。
+
+27
+00:00:51,310 --> 00:00:53,210
+So how does it know a ball falls down?
+那它怎么知道球会往下掉？
+
+28
+00:00:53,210 --> 00:00:55,020
+It watched a huge amount of video.
+因为它看过海量的视频。
+
+29
+00:00:55,020 --> 00:00:57,160
+After enough video, falling looks normal,
+看多了，往下掉就显得正常，
+
+30
+00:00:57,160 --> 00:00:58,580
+and floating looks wrong.
+飘在空中就显得不对劲。
+
+31
+00:00:58,580 --> 00:00:59,370
+No equations.
+没有公式，
+
+32
+00:00:59,370 --> 00:01:01,530
+Just patterns, seen over and over.
+只有看了一遍又一遍的规律。
+
+33
+00:01:01,530 --> 00:01:02,100
+Twist one:
+反转一：
+
+34
+00:01:02,100 --> 00:01:03,640
+nobody taught it gravity.
+没有人教过它重力。
+
+35
+00:01:03,640 --> 00:01:05,590
+Its physics is a habit, not a law.
+它的物理是习惯，不是定律，
+
+36
+00:01:05,590 --> 00:01:08,470
+Like a toddler who knows cups fall, but not why.
+就像小娃娃知道杯子会掉，却不知道为什么。
+
+37
+00:01:08,470 --> 00:01:11,630
+So tricky physics, like splashing water or stacking blocks,
+所以水花四溅、积木叠高这种复杂的物理，
+
+38
+00:01:11,630 --> 00:01:12,710
+is where it slips.
+最容易露馅。
+
+39
+00:01:12,710 --> 00:01:14,100
+Twist two, the weird one:
+反转二，最反直觉：
+
+40
+00:01:14,100 --> 00:01:16,500
+the hard part isn't drawing. It's memory.
+最难的不是画，是记性。
+
+41
+00:01:16,500 --> 00:01:17,860
+To keep the world the same,
+想让世界保持一致，
+
+42
+00:01:17,860 --> 00:01:20,240
+it has to look back at pages it already drew.
+它得回头翻已经画过的页。
+
+43
+00:01:20,240 --> 00:01:22,020
+Every extra second it remembers
+多记一秒，每画一页
+
+44
+00:01:22,020 --> 00:01:24,780
+means more pages to check, for every new page.
+就要多翻好多页。
+
+45
+00:01:24,780 --> 00:01:26,380
+It's like rereading the whole book
+就像每写一个新字，
+
+46
+00:01:26,380 --> 00:01:28,090
+every time you write one new word.
+都要把整本书重读一遍。
+
+47
+00:01:28,090 --> 00:01:30,670
+That's why its memory is measured in minutes,
+所以记性是按分钟算的，
+
+48
+00:01:30,670 --> 00:01:31,360
+not hours.
+不是按小时。
+
+49
+00:01:31,360 --> 00:01:34,350
+Genie four keeps a scene consistent for up to two minutes,
+Genie 4能让一个场景保持一致最多两分钟，
+
+50
+00:01:34,350 --> 00:01:35,750
+about double Genie three.
+大约是Genie 3的两倍。
+
+51
+00:01:35,750 --> 00:01:37,330
+After that, details can drift:
+再久一点，细节就会漂：
+
+52
+00:01:37,330 --> 00:01:39,510
+the tree behind you might quietly move.
+你身后的树，可能悄悄挪了地方。
+
+53
+00:01:39,510 --> 00:01:40,690
+It's the telephone game:
+这就像传话游戏：
+
+54
+00:01:40,690 --> 00:01:43,070
+every copy of a copy gets a little more wrong.
+每传一次，就错一点点。
+
+55
+00:01:43,070 --> 00:01:44,850
+A real game engine never forgets.
+真正的游戏引擎从来不忘，
+
+56
+00:01:44,850 --> 00:01:46,850
+It just looks up where the tree is.
+它直接去查那棵树的位置。
+
+57
+00:01:46,850 --> 00:01:49,000
+Google itself says objects can drift,
+谷歌自己也说，物体会漂，
+
+58
+00:01:49,000 --> 00:01:51,920
+especially in long runs and after lots of edits.
+尤其是跑得久、改得多的时候。
+
+59
+00:01:51,920 --> 00:01:53,540
+And you can edit while you play:
+而且你可以边玩边改：
+
+60
+00:01:53,540 --> 00:01:55,290
+type make it rain, and it rains.
+打一句“下雨”，就下雨了。
+
+61
+00:01:55,290 --> 00:01:55,910
+Twist three:
+反转三：
+
+62
+00:01:55,910 --> 00:01:57,960
+the biggest customer might be robots.
+最大的用户，可能是机器人。
+
+63
+00:01:57,960 --> 00:02:00,230
+Training a robot in the real world is slow,
+在真实世界里训练机器人很慢，
+
+64
+00:02:00,230 --> 00:02:02,040
+and broken robots are expensive.
+摔坏一台还很贵。
+
+65
+00:02:02,040 --> 00:02:04,080
+In a dream world, a robot can drop a cup
+在梦里，机器人可以把杯子摔一千次，
+
+66
+00:02:04,080 --> 00:02:05,520
+a thousand times for free.
+一分钱不花。
+
+67
+00:02:05,520 --> 00:02:07,240
+It could also invent rare moments,
+它还可以编出少见的场面，
+
+68
+00:02:07,240 --> 00:02:09,480
+like a cat darting under the robot's feet.
+比如一只猫突然钻到机器人脚下。
+
+69
+00:02:09,480 --> 00:02:12,610
+In one Google test, Gemini split a robot task into steps,
+谷歌试过：Gemini把机器人的任务拆成几步，
+
+70
+00:02:12,610 --> 00:02:15,310
+and Genie four acted out each step on the spot.
+Genie 4当场把每一步演出来。
+
+71
+00:02:15,310 --> 00:02:16,160
+A planner on top,
+上面一个会计划的，
+
+72
+00:02:16,160 --> 00:02:17,340
+a dreamer underneath.
+下面一个会做梦的。
+
+73
+00:02:17,340 --> 00:02:19,390
+Fine print: it's a research preview,
+友情提示：现在只是研究预览，
+
+74
+00:02:19,390 --> 00:02:21,500
+only for invited testers right now.
+只给受邀测试者用。
+
+75
+00:02:21,500 --> 00:02:23,420
+Google says that in the coming weeks
+谷歌说，接下来几周
+
+76
+00:02:23,420 --> 00:02:26,170
+it opens to some paid subscribers and developers.
+会开放给部分付费用户和开发者。
+
+77
+00:02:26,170 --> 00:02:29,330
+Writing inside the world, accurate sound, and tricky physics
+世界里的文字、声音准不准、复杂的物理，
+
+78
+00:02:29,330 --> 00:02:31,030
+are all still being worked on.
+都还在研究。
+
+79
+00:02:31,030 --> 00:02:33,240
+Genie three came out just over a year ago.
+Genie 3一年多前才出来，
+
+80
+00:02:33,240 --> 00:02:34,730
+This field is moving fast.
+这一行跑得飞快。
+
+81
+00:02:34,730 --> 00:02:37,830
+Our worry, not a finding: a robot that trusts a bad dream
+我们的担心是：机器人要是信了一个错的梦，
+
+82
+00:02:37,830 --> 00:02:39,150
+might learn bad moves.
+可能学会错的动作。
+
+83
+00:02:39,150 --> 00:02:41,020
+So how does it know what comes next?
+所以它怎么知道下一秒？
+
+84
+00:02:41,020 --> 00:02:43,620
+It doesn't. It just guesses really, really well.
+它不知道，它只是猜得非常非常好。
+
+85
+00:02:43,620 --> 00:02:44,870
+And when you turn around,
+而你转身的时候，
+
+86
+00:02:44,870 --> 00:02:46,380
+it's hoping you won't check.
+它只盼着你别回头检查。
+
+87
+00:02:46,380 --> 00:02:46,990
+Just like me
+就像我说“我记得你的名字”的时候，
+
+88
+00:02:46,990 --> 00:02:48,940
+when I say I remember your name.
+一样。
+
