@@ -1,0 +1,400 @@
+
+100%|██████████| 1/1 [00:03<00:00,  3.07s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.07s/it]
+cv2: 100/171 句，用时 28.4 分钟，预计还要 20.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:34:59,429 INFO synthesis text Watch the parts-library configurator set up the four machines in turn.
+2026-10-28 02:35:02,773 INFO yield speech len 6.08, rtf 0.5500201331941705
+
+100%|██████████| 1/1 [00:03<00:00,  3.51s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.51s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:03,304 INFO synthesis text Watch the parts-library configurator set up the four machines in turn.
+2026-10-28 02:35:06,762 INFO yield speech len 6.64, rtf 0.5208304847579405
+
+100%|██████████| 1/1 [00:03<00:00,  3.63s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:07,275 INFO synthesis text Watch the parts-library configurator set up the four machines in turn.
+2026-10-28 02:35:10,743 INFO yield speech len 6.64, rtf 0.5222241562533092
+
+100%|██████████| 1/1 [00:03<00:00,  3.64s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:11,226 INFO synthesis text Controller, gateway, solenoid drive, power supply and firmware framework are fully shared; the differences are concentrated in three places: what the master is, how many position axes there are, and which actions the solenoids perform.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:41,910 WARNING synthesis text Now the spindle. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:35:42,035 INFO synthesis text Now the spindle.
+2026-10-28 02:35:43,023 INFO yield speech len 1.0, rtf 0.9880752563476562
+
+100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:43,305 WARNING synthesis text Now the spindle. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:35:43,434 INFO synthesis text Now the spindle.
+2026-10-28 02:35:45,131 INFO yield speech len 2.6, rtf 0.6527145092303936
+
+100%|██████████| 1/1 [00:01<00:00,  1.87s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.87s/it]
+！听着不清（0.815，试了 3 次）：Now the spindle. → now the spin door.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:45,505 INFO synthesis text Accelerating from rest to top speed takes total inertia times angular acceleration, plus zero.fifteen newton-metres of Coulomb friction.
+2026-10-28 02:35:52,452 INFO yield speech len 13.08, rtf 0.5310921129465832
+
+100%|██████████| 1/1 [00:07<00:00,  7.13s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:53,061 INFO synthesis text Accelerating from rest to top speed takes total inertia times angular acceleration, plus zero.fifteen newton-metres of Coulomb friction.
+2026-10-28 02:35:59,121 INFO yield speech len 11.56, rtf 0.524208702430593
+
+100%|██████████| 1/1 [00:06<00:00,  6.24s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:35:59,793 INFO synthesis text Accelerating from rest to top speed takes total inertia times angular acceleration, plus zero.fifteen newton-metres of Coulomb friction.
+2026-10-28 02:36:06,416 INFO yield speech len 12.52, rtf 0.5290393821728496
+
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:36:07,065 INFO synthesis text For the four hundred-watt motor the total inertia is six times ten to the minus four, the angular acceleration about three thousand, four hundred and ninety-one, and the torque about two.twenty-four newton-metres, within zero.eight of the three.two peak, two.fifty-six.
+
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+cv2: 110/171 句，用时 30.4 分钟，预计还要 16.9 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:36:58,550 INFO synthesis text This is the criteria column of the configurator: spindle, servo drive, solenoids and solenoid driver, each showing what's needed and what's available.
+2026-10-28 02:37:05,706 INFO yield speech len 13.84, rtf 0.5171009743144747
+
+100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:37:06,496 INFO synthesis text Auto-configure first and everything is ticked.
+2026-10-28 02:37:08,478 INFO yield speech len 3.16, rtf 0.627380760410164
+
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:37:08,930 INFO synthesis text Swap the motor to two hundred and fifty watts and the acceleration torque and RMS torque checks fail.
+2026-10-28 02:37:14,948 INFO yield speech len 11.6, rtf 0.5188187442976853
+
+100%|██████████| 1/1 [00:06<00:00,  6.19s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:37:15,550 INFO synthesis text Swap the motor to two hundred and fifty watts and the acceleration torque and RMS torque checks fail.
+2026-10-28 02:37:50,064 INFO yield speech len 19.8, rtf 0.5302139845761386
+
+100%|██████████| 1/1 [00:10<00:00, 10.69s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:37:50,995 INFO synthesis text Trimming happens at three hundred r/min; the Mfifteen pulls in in six.nine milliseconds and releases in five.one, which is twelve.four and nine.two degrees, both within twenty, and it works up to about four hundred and eighty-three r/min.
+2026-10-28 02:38:02,479 INFO yield speech len 22.48, rtf 0.5108696391998236
+
+100%|██████████| 1/1 [00:11<00:00, 11.67s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:38:03,465 INFO synthesis text Trimming happens at three hundred r/min; the Mfifteen pulls in in six.nine milliseconds and releases in five.one, which is twelve.four and nine.two degrees, both within twenty, and it works up to about four hundred and eighty-three r/min.
+2026-10-28 02:38:14,951 INFO yield speech len 21.8, rtf 0.5268751153158485
+
+100%|██████████| 1/1 [00:11<00:00, 11.68s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:38:15,940 INFO synthesis text Backtack switching happens at one thousand, eight hundred r/min; the Lthirty takes one hundred and eighteen.eight degrees, which fits in the two hundred and one.six-degree idle angle.
+2026-10-28 02:38:52,790 INFO yield speech len 13.4, rtf 0.5277944856615209
+
+100%|██████████| 1/1 [00:07<00:00,  7.25s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:38:53,321 WARNING synthesis text Firmware and testing. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:38:53,447 INFO synthesis text Firmware and testing.
+2026-10-28 02:38:54,794 INFO yield speech len 1.68, rtf 0.8012638205573672
+
+100%|██████████| 1/1 [00:01<00:00,  1.52s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.52s/it]
+cv2: 120/171 句，用时 32.4 分钟，预计还要 13.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:38:55,104 WARNING synthesis text Now the firmware. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:38:55,229 INFO synthesis text Now the firmware.
+2026-10-28 02:38:56,990 INFO yield speech len 2.68, rtf 0.6569700454598042
+
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.93s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:38:57,228 WARNING synthesis text Now the firmware. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:38:57,352 INFO synthesis text Now the firmware.
+2026-10-28 02:38:58,526 INFO yield speech len 1.48, rtf 0.793164807396966
+
+100%|██████████| 1/1 [00:01<00:00,  1.34s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:38:58,882 INFO synthesis text The process layer revolves around three data-driven things: counts to angle, an event table looked up by angle, and a state machine that governs the cycle.
+2026-10-28 02:39:05,262 INFO yield speech len 12.16, rtf 0.5247122951244053
+
+100%|██████████| 1/1 [00:06<00:00,  6.56s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:39:06,009 INFO synthesis text The encoder gives ten thousand counts a turn; the firmware's angle unit is zero.one degree, zero to three thousand, five hundred and ninety-nine per turn, and the conversion is counts times nine over twenty-five, in integers.
+2026-10-28 02:39:15,463 INFO yield speech len 17.88, rtf 0.5287886465955901
+
+100%|██████████| 1/1 [00:09<00:00,  9.64s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:39:16,288 INFO synthesis text The encoder gives ten thousand counts a turn; the firmware's angle unit is zero.one degree, zero to three thousand, five hundred and ninety-nine per turn, and the conversion is counts times nine over twenty-five, in integers.
+2026-10-28 02:40:22,599 INFO yield speech len 5.44, rtf 0.5592432092217837
+
+100%|██████████| 1/1 [00:03<00:00,  3.21s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:40:23,120 INFO synthesis text There are three levels running the same test cases, with only the unit under test and the plant model changing.
+2026-10-28 02:40:28,125 INFO yield speech len 9.32, rtf 0.5371099377906373
+
+100%|██████████| 1/1 [00:05<00:00,  5.18s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:40:28,703 INFO synthesis text Level one, software in the loop: compile the process layer, state machine and event table for a PC, replace the hardware abstraction layer with simulated drivers and connect the book's lab models, fifty microseconds a step, run on every commit.
+2026-10-28 02:40:38,149 INFO yield speech len 18.8, rtf 0.5024258887514155
+
+100%|██████████| 1/1 [00:09<00:00,  9.63s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:40:39,167 INFO synthesis text Level two, hardware in the loop: the real controller and firmware against a plant model on a real-time simulator, which at five thousand r/min must interpolate about forty-two encoder counts evenly every fifty microseconds; its biggest use is fault injection.
+2026-10-28 02:40:50,217 INFO yield speech len 22.0, rtf 0.5022816549647938
+
+100%|██████████| 1/1 [00:11<00:00, 11.23s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:40:51,185 INFO synthesis text Level two, hardware in the loop: the real controller and firmware against a plant model on a real-time simulator, which at five thousand r/min must interpolate about forty-two encoder counts evenly every fifty microseconds; its biggest use is fault injection.
+2026-10-28 02:41:02,582 INFO yield speech len 21.4, rtf 0.532576202232147
+
+100%|██████████| 1/1 [00:11<00:00, 11.58s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:41:03,584 INFO synthesis text Level two, hardware in the loop: the real controller and firmware against a plant model on a real-time simulator, which at five thousand r/min must interpolate about forty-two encoder counts evenly every fifty microseconds; its biggest use is fault injection.
+2026-10-28 02:41:13,738 INFO yield speech len 19.64, rtf 0.5169758971499814
+
+100%|██████████| 1/1 [00:10<00:00, 10.34s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:41:14,635 WARNING synthesis text Level three is the test bench. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:41:14,761 INFO synthesis text Level three is the test bench.
+2026-10-28 02:41:16,897 INFO yield speech len 3.6, rtf 0.5935228533214992
+
+100%|██████████| 1/1 [00:02<00:00,  2.31s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:41:17,235 WARNING synthesis text Level three is the test bench. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:41:17,360 INFO synthesis text Level three is the test bench.
+
+100%|██████████| 1/1 [00:12<00:00, 12.16s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.16s/it]
+！听着不清（0.803，试了 3 次）：Size a servo or closed-loop stepper for each axis with T equ → Size a Serbo or Closed loop stepper for each axis with T equ
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:10,521 INFO synthesis text The glue valve isn't timed either: it's written as open while X is between one hundred and twenty and one hundred and eighty millimetres, the position cam switch of a motion controller, a one-to-one match with this lecture's angle event table.
+2026-10-28 02:42:24,507 INFO yield speech len 5.28, rtf 0.5664980772769812
+
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:24,928 INFO synthesis text Decide the needs first: which games, which software.
+2026-10-28 02:42:27,352 INFO yield speech len 4.16, rtf 0.5826650330653558
+
+100%|██████████| 1/1 [00:02<00:00,  2.60s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:27,829 INFO synthesis text Decide the needs first: which games, which software.
+2026-10-28 02:42:30,398 INFO yield speech len 4.44, rtf 0.5787319965190715
+
+100%|██████████| 1/1 [00:02<00:00,  2.74s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:30,869 INFO synthesis text Decide the needs first: which games, which software.
+2026-10-28 02:42:34,123 INFO yield speech len 5.8, rtf 0.5610521086331072
+
+100%|██████████| 1/1 [00:03<00:00,  3.43s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:34,603 INFO synthesis text Then choose the motherboard, CPU and graphics card by interface and power.
+2026-10-28 02:42:38,960 INFO yield speech len 8.32, rtf 0.5236750898452905
+
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:39,467 INFO synthesis text Finally add up every part's power, add a margin, and pick the power supply.
+2026-10-28 02:42:42,881 INFO yield speech len 6.48, rtf 0.5268287143589537
+
+100%|██████████| 1/1 [00:03<00:00,  3.59s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:43,424 INFO synthesis text That's exactly how this lecture sized the twenty-four-volt supply: logic plus hold plus half the boost, times one.two.
+2026-10-28 02:42:49,510 INFO yield speech len 11.76, rtf 0.51753040479154
+
+100%|██████████| 1/1 [00:06<00:00,  6.26s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:50,131 INFO synthesis text And PC builders make the same mistakes: they look only at peak performance, forget the power supply and cooling, and the machine reboots under a heavy load.
+2026-10-28 02:42:56,828 INFO yield speech len 13.2, rtf 0.5073788671782523
+
+100%|██████████| 1/1 [00:06<00:00,  6.88s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.88s/it]
+cv2: 140/171 句，用时 36.4 分钟，预计还要 8.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:57,457 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:42:57,584 INFO synthesis text Back to the opening question.
+2026-10-28 02:42:58,867 INFO yield speech len 1.64, rtf 0.7828584531458413
+
+100%|██████████| 1/1 [00:01<00:00,  1.46s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:42:59,199 WARNING synthesis text Back to the opening question. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-28 02:42:59,329 INFO synthesis text Back to the opening question.
+2026-10-28 02:43:00,636 INFO yield speech len 1.84, rtf 0.7102871718613998
+
+100%|██████████| 1/1 [00:01<00:00,  1.48s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:43:01,121 INFO synthesis text Choose the four hundred-watt motor with the three-amp drive: acceleration torque two.twenty-four, within two.fifty-six; RMS torque zero.eighty-nine, within one.twenty-seven; inertia ratio five.
+2026-10-28 02:43:09,817 INFO yield speech len 16.64, rtf 0.5225453239220839
+
+100%|██████████| 1/1 [00:08<00:00,  8.88s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.88s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:43:10,566 INFO synthesis text Choose the four hundred-watt motor with the three-amp drive: acceleration torque two.twenty-four, within two.fifty-six; RMS torque zero.eighty-nine, within one.twenty-seven; inertia ratio five.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:44:19,760 INFO synthesis text Now Virtual lab nineteen-one, the parts-library configurator, which you can do yourself on WenQuest. The criteria, tasks and total on the right are blurred; they're for you to work out in the lab. Top left is the requirements table, in the middle the BOM. It opens with a previous prototype's parts; before configuring, check which criteria fail.
+2026-10-28 02:44:31,817 INFO yield speech len 23.44, rtf 0.5143688603879648
+
+100%|██████████| 1/1 [00:12<00:00, 12.24s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:44:33,034 INFO synthesis text Now Virtual lab nineteen-one, the parts-library configurator, which you can do yourself on WenQuest. The criteria, tasks and total on the right are blurred; they're for you to work out in the lab. Top left is the requirements table, in the middle the BOM. It opens with a previous prototype's parts; before configuring, check which criteria fail.
+2026-10-28 02:44:46,049 INFO yield speech len 25.16, rtf 0.517287731928742
+
+100%|██████████| 1/1 [00:13<00:00, 13.21s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:44:47,404 INFO synthesis text Now Virtual lab nineteen-one, the parts-library configurator, which you can do yourself on WenQuest. The criteria, tasks and total on the right are blurred; they're for you to work out in the lab. Top left is the requirements table, in the middle the BOM. It opens with a previous prototype's parts; before configuring, check which criteria fail.
+2026-10-28 02:45:01,141 INFO yield speech len 26.2, rtf 0.5242987716470966
+
+100%|██████████| 1/1 [00:13<00:00, 13.93s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.93s/it]
+！听着不清（0.097，试了 3 次）：Now Virtual lab 19-1, the parts-library configurator, which  → Virtual Lab 19.1, the PASS library confedulator, which you c
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:45:02,631 INFO synthesis text Click Configure automatically. For each category the configurator checks every size against the criteria and takes the cheapest that passes. Check it against the worked example in the slides.
+2026-10-28 02:45:10,939 INFO yield speech len 16.04, rtf 0.5179449061205857
+
+100%|██████████| 1/1 [00:08<00:00,  8.49s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:45:11,750 INFO synthesis text Task one: in the BOM drop-down, swap the servo drive to the one.five-amp size by hand see which criteria fail and by how much, and compare with the worked example in the slides.
+2026-10-28 02:45:59,755 INFO yield speech len 8.96, rtf 0.5238769309861319
+
+100%|██████████| 1/1 [00:04<00:00,  4.87s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.87s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:46:00,441 INFO synthesis text Task three: switch to the pattern sewer, auto-configure, and note each axis's drive, motor and natural frequency.
+2026-10-28 02:46:06,943 INFO yield speech len 12.32, rtf 0.5277372993432082
+
+100%|██████████| 1/1 [00:06<00:00,  6.67s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:46:07,676 INFO synthesis text Then change the Y drive to a ball screw, see which checks fail, and think about how the lead multiplies motor speed. The guide and report template are on the platform.
+2026-10-28 02:46:14,952 INFO yield speech len 13.96, rtf 0.5211732619812973
+
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:46:15,722 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-28 02:46:18,980 INFO yield speech len 6.16, rtf 0.5289054923243337
+
+100%|██████████| 1/1 [00:03<00:00,  3.43s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:46:19,468 INFO synthesis text You can open today's interactive slides and the parts-library configurator and work them yourself; the requirements table, library entries, state machine and five gates that this video skipped are in the slides.
+2026-10-28 02:46:58,696 INFO yield speech len 26.92, rtf 0.5289910541069631
+
+100%|██████████| 1/1 [00:14<00:00, 14.44s/it]
+100%|██████████| 1/1 [00:14<00:00, 14.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:46:59,876 INFO synthesis text Your assignment has four questions about one heavy-fabric lockstitch head. One: with a load inertia of six times ten to the minus four, a top speed of four thousand, five hundred r/min reached in zero.twelve seconds, run every motor size through the seven criteria and choose the cheapest motor and drive pair.
+2026-10-28 02:47:13,247 INFO yield speech len 25.32, rtf 0.5280789794138446
+
+100%|██████████| 1/1 [00:13<00:00, 13.56s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:47:14,363 INFO synthesis text Your assignment has four questions about one heavy-fabric lockstitch head. One: with a load inertia of six times ten to the minus four, a top speed of four thousand, five hundred r/min reached in zero.twelve seconds, run every motor size through the seven criteria and choose the cheapest motor and drive pair.
+
+100%|██████████| 2/2 [00:18<00:00,  8.77s/it]
+100%|██████████| 2/2 [00:18<00:00,  9.23s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-28 02:47:45,765 INFO synthesis text Two: heavy-fabric trimming happens at four hundred r/min. Which of Mfifteen and Lthirty stays within twenty degrees, and which requirement fields would you change to check it in the lab? Three: with a directly driven knife the trim starts between two hundred and ninety and three hundred degrees.
+2026-10-28 02:47:57,420 INFO yield speech len 22.52, rtf 0.5175442509286993
+
+ 50%|█████     | 1/2 [00:11<00:11, 11.84s/it]2026-10-28 02:47:57,610 INFO synthesis text  Write the trim row of the event table, and explain why it must not be written as energise one hundred and eighty milliseconds after the pedal is released.
+2026-10-28 02:48:03,758 INFO yield speech len 11.52, rtf 0.5336882960465219
+
+100%|██████████| 2/2 [00:18<00:00,  8.60s/it]
+100%|██████████| 2/2 [00:18<00:00,  9.08s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-28 02:48:05,231 INFO synthesis text Two: heavy-fabric trimming happens at four hundred r/min. Which of Mfifteen and Lthirty stays within twenty degrees, and which requirement fields would you change to check it in the lab? Three: with a directly driven knife the trim starts between two hundred and ninety and three hundred degrees.
+2026-10-28 02:48:16,200 INFO yield speech len 21.0, rtf 0.5223382200513568
+
+ 50%|█████     | 1/2 [00:11<00:11, 11.15s/it]2026-10-28 02:48:16,384 INFO synthesis text  Write the trim row of the event table, and explain why it must not be written as energise one hundred and eighty milliseconds after the pedal is released.
+2026-10-28 02:48:37,546 INFO yield speech len 3.2, rtf 0.6293640285730362
+
+100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:48:38,059 INFO synthesis text There's also a ten-question quiz. For example, a spindle with a total inertia of seven times ten to the minus four must reach four thousand, five hundred r/min from rest in zero.fifteen seconds, with zero.fifteen newton-metres of friction. What acceleration torque does it need?
+2026-10-28 02:48:48,844 INFO yield speech len 20.48, rtf 0.5266067921184003
+
+100%|██████████| 1/1 [00:10<00:00, 10.97s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:48:49,956 INFO synthesis text Or, at five thousand r/min the spindle turns zero.one degree in just over three microseconds; can event scheduling poll the angle in a task that runs once a millisecond?
+2026-10-28 02:48:58,351 INFO yield speech len 15.84, rtf 0.5299927158789202
+
+100%|██████████| 1/1 [00:08<00:00,  8.57s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.57s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:48:59,180 INFO synthesis text Or, at five thousand r/min the spindle turns zero.one degree in just over three microseconds; can event scheduling poll the angle in a task that runs once a millisecond?
+2026-10-28 02:49:09,134 INFO yield speech len 19.08, rtf 0.5216797817678072
+
+100%|██████████| 1/1 [00:10<00:00, 10.14s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:49:10,084 INFO synthesis text Or, at five thousand r/min the spindle turns zero.one degree in just over three microseconds; can event scheduling poll the angle in a task that runs once a millisecond?
+2026-10-28 02:49:19,917 INFO yield speech len 19.28, rtf 0.5099704280433813
+
+100%|██████████| 1/1 [00:10<00:00, 10.02s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:49:20,771 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:49:59,112 INFO synthesis text Two: rapid configuration: numbers in the requirements table, compute the criteria, take the cheapest size that passes, and generate BOM, wiring and firmware configuration from the same data, without forgetting E-stop energy and RMS torque.
+2026-10-28 02:50:10,041 INFO yield speech len 21.36, rtf 0.5116377765319767
+
+100%|██████████| 1/1 [00:11<00:00, 11.11s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:50:11,040 INFO synthesis text Three: the firmware writes its event table by shaft angle and runs the cycle with a state machine, verified step by step through software in the loop, hardware in the loop and the test bench.
+2026-10-28 02:50:19,445 INFO yield speech len 16.04, rtf 0.523998761117607
+
+100%|██████████| 1/1 [00:08<00:00,  8.63s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-28 02:50:20,275 INFO synthesis text The assignment, quiz and lab report are on WenQuest.
+2026-10-28 02:50:41,015 INFO yield speech len 15.04, rtf 0.5305662751197815
+
+100%|██████████| 1/1 [00:08<00:00,  8.15s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.15s/it]
+cv2: 171/171 句，用时 44.1 分钟，预计还要 0.0 分钟
+cv2: 171 句完成
+cv2: 听写核对 171 句，平均 0.825，不清 60 句
+2026-10-28 02:50:41,772 DEBUG Attempting to acquire lock 138823570640848 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-28 02:50:41,772 DEBUG Lock 138823570640848 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-28 02:50:41,773 DEBUG Attempting to release lock 138823570640848 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-28 02:50:41,773 DEBUG Lock 138823570640848 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-28 02:50:41,775 DEBUG Attempting to acquire lock 138823570647712 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-28 02:50:41,775 DEBUG Lock 138823570647712 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-28 02:50:41,775 DEBUG Attempting to release lock 138823570647712 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-28 02:50:41,775 DEBUG Lock 138823570647712 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 56 分钟
