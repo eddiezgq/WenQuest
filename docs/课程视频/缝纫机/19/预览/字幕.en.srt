@@ -1,0 +1,887 @@
+1
+00:00:00,600 --> 00:00:01,566
+Hi everyone,
+
+2
+00:00:01,586 --> 00:00:07,485
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:07,885 --> 00:00:15,216
+This is Lecture 19, the prototyping platform and the parts library.
+
+4
+00:00:15,616 --> 00:00:19,201
+Over the last few lectures we covered motors, solenoids,
+
+5
+00:00:19,221 --> 00:00:21,711
+control and the control box one by one.
+
+6
+00:00:21,731 --> 00:00:26,603
+Today we put them together into a prototype that really sews. Which modules,
+
+7
+00:00:26,623 --> 00:00:30,723
+how to size them, how to write the firmware, and how to test it.
+
+8
+00:00:31,123 --> 00:00:37,638
+How to write requirements and library entries, the AI selection assistant,
+
+9
+00:00:37,658 --> 00:00:44,172
+the state machine and the five gates from prototype to product are left to
+
+10
+00:00:44,192 --> 00:00:45,143
+the slides.
+
+11
+00:00:46,663 --> 00:00:47,963
+Here's the problem.
+
+12
+00:00:48,363 --> 00:00:54,149
+A team wants to turn a lockstitch head, its clutch motor removed,
+
+13
+00:00:54,169 --> 00:00:59,955
+into an electronically controlled prototype: pedal speed control,
+
+14
+00:00:59,975 --> 00:01:04,957
+5000 r/min top speed, 0 to 5000 in at most 0.15 seconds,
+
+15
+00:01:04,977 --> 00:01:10,227
+load inertia 5 times 10 to the minus 4; 30 starts a minute,
+
+16
+00:01:10,247 --> 00:01:16,301
+sewing half the time; automatic trimming when the pedal is released,
+
+17
+00:01:16,321 --> 00:01:22,196
+with a trimming solenoid needing 3 millimetres and 12 newtons and,
+
+18
+00:01:22,216 --> 00:01:28,181
+at 300 r/min, pull-in and release within 20 degrees of shaft angle.
+
+19
+00:01:28,581 --> 00:01:39,773
+The library offers 250, 400, 550 and 750-watt motors and 1.5,
+
+20
+00:01:39,793 --> 00:01:43,265
+3 and 5-amp drives.
+
+21
+00:01:43,665 --> 00:01:45,044
+How do we choose?
+
+22
+00:01:46,564 --> 00:01:51,918
+The four machines look very different, but their control skeleton is the same:
+
+23
+00:01:51,938 --> 00:01:53,640
+one master sets the time,
+
+24
+00:01:53,660 --> 00:01:57,567
+several actuators act according to the master's position,
+
+25
+00:01:57,587 --> 00:01:59,083
+sensors report status,
+
+26
+00:01:59,103 --> 00:02:04,733
+the controller schedules everything in between and sends data to the plant system.
+
+27
+00:02:05,133 --> 00:02:11,593
+WQ-SC fixes that skeleton as five layers plus mechanics.
+
+28
+00:02:11,993 --> 00:02:15,517
+At the bottom, actuators and sensors:
+
+29
+00:02:15,537 --> 00:02:22,797
+the spindle is a permanent-magnet synchronous servo whose 2500-line encoder,
+
+30
+00:02:22,817 --> 00:02:27,874
+multiplied by four, gives ten thousand counts a turn;
+
+31
+00:02:27,894 --> 00:02:31,515
+feed and X–Y use closed-loop steppers;
+
+32
+00:02:31,535 --> 00:02:35,730
+trimming and wiping use push-pull solenoids.
+
+33
+00:02:36,130 --> 00:02:41,553
+Above that come the drive layer, the real-time control layer,
+
+34
+00:02:41,573 --> 00:02:47,978
+the HMI and network layer, and at the top the digital-factory interface.
+
+35
+00:02:49,498 --> 00:02:52,958
+Why make shaft angle the time base?
+
+36
+00:02:53,358 --> 00:03:00,200
+Because shaft speed isn't constant: slow at the start, fast in the middle,
+
+37
+00:03:00,220 --> 00:03:02,704
+slow again before trimming.
+
+38
+00:03:03,104 --> 00:03:10,032
+Trimming, backtacking and X–Y moves must line up with mechanism positions,
+
+39
+00:03:10,052 --> 00:03:17,450
+such as whether the needle is in the fabric or the feed dog is below the plate.
+
+40
+00:03:17,850 --> 00:03:24,284
+So the firmware says energise when the shaft reaches 205 degrees,
+
+41
+00:03:24,304 --> 00:03:30,142
+not 8 milliseconds after top dead centre; written by angle,
+
+42
+00:03:30,162 --> 00:03:32,625
+it lines up at any speed.
+
+43
+00:03:33,025 --> 00:03:38,761
+Actuators have delays, so convert the delay into an angle,
+
+44
+00:03:38,781 --> 00:03:46,501
+6 times n times t degrees, and check it at the speed where the action happens.
+
+45
+00:03:46,901 --> 00:03:52,021
+The flat knitter has no shaft, so its master is the carriage position.
+
+46
+00:03:53,541 --> 00:04:00,161
+Watch the parts-library configurator set up the four machines in turn.
+
+47
+00:04:00,561 --> 00:04:03,254
+Controller, gateway, solenoid drive,
+
+48
+00:04:03,274 --> 00:04:07,248
+power supply and firmware framework are fully shared;
+
+49
+00:04:07,268 --> 00:04:12,448
+the differences are concentrated in three places: what the master is,
+
+50
+00:04:12,468 --> 00:04:18,025
+how many position axes there are, and which actions the solenoids perform.
+
+51
+00:04:18,425 --> 00:04:20,910
+After the lockstitch machine,
+
+52
+00:04:20,930 --> 00:04:28,166
+the overlock is just a new requirements table with fewer solenoids and an air valve;
+
+53
+00:04:28,186 --> 00:04:31,621
+the pattern sewer adds two stepper axes;
+
+54
+00:04:31,641 --> 00:04:36,285
+the knitter swaps the spindle master for the carriage.
+
+55
+00:04:36,685 --> 00:04:40,691
+Blue part numbers are existing library entries;
+
+56
+00:04:40,711 --> 00:04:44,545
+yellow rows differ from the default solution.
+
+57
+00:04:46,065 --> 00:04:53,156
+Rapid configuration: compute criteria, take the cheapest that passes.
+
+58
+00:04:54,676 --> 00:04:55,656
+Now the spindle.
+
+59
+00:04:56,056 --> 00:05:04,215
+Accelerating from rest to top speed takes total inertia times angular acceleration,
+
+60
+00:05:04,235 --> 00:05:08,551
+plus 0.15 newton-metres of Coulomb friction.
+
+61
+00:05:08,951 --> 00:05:16,160
+For the 400-watt motor the total inertia is 6 times 10 to the minus 4,
+
+62
+00:05:16,180 --> 00:05:24,113
+the angular acceleration about 3491, and the torque about 2.24 newton-metres,
+
+63
+00:05:24,133 --> 00:05:27,521
+within 0.8 of the 3.2 peak, 2.56.
+
+64
+00:05:27,921 --> 00:05:35,354
+The RMS torque over the duty cycle is 0.89, within the 1.27 rating,
+
+65
+00:05:35,374 --> 00:05:39,581
+and the inertia ratio is 5, within 10.
+
+66
+00:05:39,981 --> 00:05:47,397
+The 250-watt motor falls short on both acceleration and RMS torque;
+
+67
+00:05:47,417 --> 00:05:51,281
+the 550 passes too, but costs more.
+
+68
+00:05:52,801 --> 00:05:59,249
+This is the criteria column of the configurator: spindle, servo drive,
+
+69
+00:05:59,269 --> 00:06:06,549
+solenoids and solenoid driver, each showing what's needed and what's available.
+
+70
+00:06:06,949 --> 00:06:10,089
+Auto-configure first and everything is ticked.
+
+71
+00:06:10,489 --> 00:06:19,823
+Swap the motor to 250 watts and the acceleration torque and RMS torque checks fail.
+
+72
+00:06:20,223 --> 00:06:25,275
+Put the 400 back and swap the drive to 1.5 amps,
+
+73
+00:06:25,295 --> 00:06:31,299
+and the continuous current and E-stop energy checks fail.
+
+74
+00:06:31,698 --> 00:06:34,239
+Every verdict can point to a number,
+
+75
+00:06:34,258 --> 00:06:39,999
+and that's the difference between rapid configuration and picking by gut feeling.
+
+76
+00:06:41,519 --> 00:06:45,721
+Each solenoid action gets three checks: enough stroke,
+
+77
+00:06:45,741 --> 00:06:51,508
+enough force at the end of stroke, and, for actions while the shaft turns,
+
+78
+00:06:51,528 --> 00:06:53,619
+the angle it turns through.
+
+79
+00:06:54,019 --> 00:06:57,892
+Trimming happens at 300 r/min;
+
+80
+00:06:57,912 --> 00:07:05,288
+the M15 pulls in in 6.9 milliseconds and releases in 5.1,
+
+81
+00:07:05,308 --> 00:07:11,257
+which is 12.4 and 9.2 degrees, both within 20,
+
+82
+00:07:11,277 --> 00:07:15,799
+and it works up to about 483 r/min.
+
+83
+00:07:16,199 --> 00:07:26,937
+Backtack switching happens at 1800 r/min; the L30 takes 118.8 degrees,
+
+84
+00:07:26,957 --> 00:07:33,391
+which fits in the 201.6-degree idle angle.
+
+85
+00:07:33,791 --> 00:07:42,216
+The power supply: logic plus hold plus half the boost, times 1.2,
+
+86
+00:07:42,236 --> 00:07:47,153
+about 132 watts, so a 150-watt supply.
+
+87
+00:07:48,673 --> 00:07:50,333
+Firmware and testing.
+
+88
+00:07:51,853 --> 00:07:53,313
+Now the firmware.
+
+89
+00:07:53,713 --> 00:07:59,681
+The process layer revolves around three data-driven things: counts to angle,
+
+90
+00:07:59,701 --> 00:08:05,827
+an event table looked up by angle, and a state machine that governs the cycle.
+
+91
+00:08:06,227 --> 00:08:11,136
+The encoder gives ten thousand counts a turn;
+
+92
+00:08:11,156 --> 00:08:17,708
+the firmware's angle unit is 0.1 degree, 0 to 3599 per turn,
+
+93
+00:08:17,728 --> 00:08:24,061
+and the conversion is counts times 9 over 25, in integers.
+
+94
+00:08:24,461 --> 00:08:32,756
+At 300 r/min 0.1 degree lasts about 56 microseconds, at 5000 only about 3.3,
+
+95
+00:08:32,776 --> 00:08:34,944
+so polling won't do:
+
+96
+00:08:34,964 --> 00:08:43,149
+compute the count for the next event angle in advance and write it into the
+
+97
+00:08:43,169 --> 00:08:46,759
+encoder timer's compare register.
+
+98
+00:08:47,159 --> 00:08:55,259
+One action per row of the event table; a new head means new data, not new code.
+
+99
+00:08:56,779 --> 00:09:02,199
+Most of the firmware logic can be tested before the prototype is even assembled.
+
+100
+00:09:02,599 --> 00:09:06,890
+There are three levels running the same test cases,
+
+101
+00:09:06,910 --> 00:09:11,876
+with only the unit under test and the plant model changing.
+
+102
+00:09:12,276 --> 00:09:16,931
+Level one, software in the loop: compile the process layer,
+
+103
+00:09:16,951 --> 00:09:20,022
+state machine and event table for a PC,
+
+104
+00:09:20,042 --> 00:09:26,123
+replace the hardware abstraction layer with simulated drivers and connect the
+
+105
+00:09:26,143 --> 00:09:27,550
+book's lab models,
+
+106
+00:09:27,570 --> 00:09:31,036
+50 microseconds a step, run on every commit.
+
+107
+00:09:31,436 --> 00:09:34,079
+Level two, hardware in the loop:
+
+108
+00:09:34,099 --> 00:09:40,737
+the real controller and firmware against a plant model on a real-time simulator,
+
+109
+00:09:40,757 --> 00:09:47,062
+which at 5000 r/min must interpolate about 42 encoder counts evenly every 50
+
+110
+00:09:47,082 --> 00:09:48,143
+microseconds;
+
+111
+00:09:48,163 --> 00:09:51,056
+its biggest use is fault injection.
+
+112
+00:09:51,456 --> 00:09:53,556
+Level three is the test bench.
+
+113
+00:09:55,076 --> 00:10:04,176
+Building a gantry glue-dispensing robot follows the same process as WQ-SC.
+
+114
+00:10:04,576 --> 00:10:11,197
+Write a numeric requirements table: stroke, speed, acceleration, payload,
+
+115
+00:10:11,217 --> 00:10:12,471
+repeatability.
+
+116
+00:10:12,871 --> 00:10:19,854
+Size a servo or closed-loop stepper for each axis with T equals J alpha plus
+
+117
+00:10:19,874 --> 00:10:24,277
+T_f and the inertia-ratio and RMS-torque checks,
+
+118
+00:10:24,297 --> 00:10:30,544
+pick the cheapest size in the library that passes, and generate BOM,
+
+119
+00:10:30,564 --> 00:10:35,888
+I/O table and controller configuration from the same data.
+
+120
+00:10:36,288 --> 00:10:39,477
+The glue valve isn't timed either:
+
+121
+00:10:39,497 --> 00:10:45,517
+it's written as open while X is between 120 and 180 millimetres,
+
+122
+00:10:45,537 --> 00:10:49,953
+the position cam switch of a motion controller,
+
+123
+00:10:49,973 --> 00:10:55,333
+a one-to-one match with this lecture's angle event table.
+
+124
+00:10:56,853 --> 00:11:02,075
+Building your own PC is rapid configuration too.
+
+125
+00:11:02,475 --> 00:11:08,255
+Decide the needs first: which games, which software.
+
+126
+00:11:08,655 --> 00:11:16,948
+Then choose the motherboard, CPU and graphics card by interface and power.
+
+127
+00:11:17,348 --> 00:11:23,808
+Finally add up every part's power, add a margin, and pick the power supply.
+
+128
+00:11:24,208 --> 00:11:30,633
+That's exactly how this lecture sized the 24-volt supply:
+
+129
+00:11:30,653 --> 00:11:35,948
+logic plus hold plus half the boost, times 1.2.
+
+130
+00:11:36,348 --> 00:11:42,756
+And PC builders make the same mistakes: they look only at peak performance,
+
+131
+00:11:42,776 --> 00:11:45,842
+forget the power supply and cooling,
+
+132
+00:11:45,862 --> 00:11:49,528
+and the machine reboots under a heavy load.
+
+133
+00:11:51,048 --> 00:11:52,860
+Back to the opening question.
+
+134
+00:11:53,260 --> 00:12:04,067
+Choose the 400-watt motor with the 3-amp drive: acceleration torque 2.24,
+
+135
+00:12:04,087 --> 00:12:12,818
+within 2.56; RMS torque 0.89, within 1.27; inertia ratio 5.
+
+136
+00:12:13,218 --> 00:12:22,037
+The 250 fails both torque checks; the 550 passes but costs more.
+
+137
+00:12:22,437 --> 00:12:30,691
+The cheaper 1.5-amp drive exceeds its continuous rating at 1.79 amps and
+
+138
+00:12:30,711 --> 00:12:35,518
+can't absorb the 57.6-joule E-stop energy.
+
+139
+00:12:35,918 --> 00:12:44,297
+The M15 takes 12.4 and 9.2 degrees at 300 r/min, within 20.
+
+140
+00:12:44,697 --> 00:12:51,369
+The whole BOM comes to about 2455 yuan.
+
+141
+00:12:52,889 --> 00:12:56,582
+Now Virtual lab 19-1, the parts-library configurator,
+
+142
+00:12:56,602 --> 00:13:00,225
+which you can do yourself on WenQuest. The criteria,
+
+143
+00:13:00,245 --> 00:13:03,097
+tasks and total on the right are blurred;
+
+144
+00:13:03,117 --> 00:13:08,351
+they're for you to work out in the lab. Top left is the requirements table,
+
+145
+00:13:08,371 --> 00:13:12,974
+in the middle the BOM. It opens with a previous prototype's parts;
+
+146
+00:13:12,994 --> 00:13:16,197
+before configuring, check which criteria fail.
+
+147
+00:13:16,597 --> 00:13:19,130
+Click Configure automatically.
+
+148
+00:13:19,150 --> 00:13:25,683
+For each category the configurator checks every size against the criteria and
+
+149
+00:13:25,703 --> 00:13:28,322
+takes the cheapest that passes.
+
+150
+00:13:28,342 --> 00:13:32,577
+Check it against the worked example in the slides.
+
+151
+00:13:32,977 --> 00:13:36,316
+Task one: in the BOM drop-down,
+
+152
+00:13:36,336 --> 00:13:44,550
+swap the servo drive to the 1.5-amp size by hand see which criteria fail and
+
+153
+00:13:44,570 --> 00:13:45,850
+by how much,
+
+154
+00:13:45,870 --> 00:13:51,268
+and compare with the worked example in the slides.
+
+155
+00:13:51,668 --> 00:13:53,642
+Put the 3-amp drive back,
+
+156
+00:13:53,662 --> 00:14:00,105
+then raise the trimming speed from 300 and watch the trim solenoid's angle check.
+
+157
+00:14:00,125 --> 00:14:02,818
+See where it goes past 20 degrees,
+
+158
+00:14:02,838 --> 00:14:08,004
+and compare with the top trimming speed worked out in the slides.
+
+159
+00:14:08,404 --> 00:14:14,100
+Task two: switch to the overlock, reset the requirements, auto-configure,
+
+160
+00:14:14,120 --> 00:14:16,450
+and note the design and total.
+
+161
+00:14:16,470 --> 00:14:22,323
+Then change only the top speed to 7000 without swapping parts and see which
+
+162
+00:14:22,343 --> 00:14:23,263
+checks fail.
+
+163
+00:14:23,283 --> 00:14:28,118
+Which modules a new configuration replaces, and what it costs,
+
+164
+00:14:28,138 --> 00:14:29,449
+is yours to find.
+
+165
+00:14:29,849 --> 00:14:35,989
+Task three: switch to the pattern sewer, auto-configure,
+
+166
+00:14:36,009 --> 00:14:42,149
+and note each axis's drive, motor and natural frequency.
+
+167
+00:14:42,549 --> 00:14:47,859
+Then change the Y drive to a ball screw, see which checks fail,
+
+168
+00:14:47,879 --> 00:14:52,259
+and think about how the lead multiplies motor speed.
+
+169
+00:14:52,279 --> 00:14:56,489
+The guide and report template are on the platform.
+
+170
+00:14:58,009 --> 00:15:03,965
+Everything in this lecture is on the WenQuest learning platform.
+
+171
+00:15:04,365 --> 00:15:10,308
+You can open today's interactive slides and the parts-library configurator
+
+172
+00:15:10,328 --> 00:15:12,161
+and work them yourself;
+
+173
+00:15:12,181 --> 00:15:15,384
+the requirements table, library entries,
+
+174
+00:15:15,404 --> 00:15:21,105
+state machine and five gates that this video skipped are in the slides.
+
+175
+00:15:21,505 --> 00:15:25,762
+You submit the assignment and the lab report on the platform,
+
+176
+00:15:25,782 --> 00:15:28,005
+and get marks and comments back.
+
+177
+00:15:28,405 --> 00:15:32,215
+Questions go to the course discussion forum,
+
+178
+00:15:32,235 --> 00:15:37,874
+and the grades page shows your mark on every assignment and quiz.
+
+179
+00:15:39,394 --> 00:15:45,281
+Your assignment has four questions about one heavy-fabric lockstitch head. One:
+
+180
+00:15:45,301 --> 00:15:48,945
+with a load inertia of 6 times 10 to the minus 4,
+
+181
+00:15:48,965 --> 00:15:52,684
+a top speed of 4500 r/min reached in 0.12 seconds,
+
+182
+00:15:52,704 --> 00:15:58,441
+run every motor size through the seven criteria and choose the cheapest motor
+
+183
+00:15:58,461 --> 00:15:59,563
+and drive pair.
+
+184
+00:15:59,963 --> 00:16:04,102
+Two: heavy-fabric trimming happens at 400 r/min.
+
+185
+00:16:04,122 --> 00:16:08,000
+Which of M15 and L30 stays within 20 degrees,
+
+186
+00:16:08,020 --> 00:16:14,585
+and which requirement fields would you change to check it in the lab? Three:
+
+187
+00:16:14,605 --> 00:16:20,909
+with a directly driven knife the trim starts between 290 and 300 degrees.
+
+188
+00:16:20,929 --> 00:16:24,202
+Write the trim row of the event table,
+
+189
+00:16:24,222 --> 00:16:30,873
+and explain why it must not be written as energise 180 milliseconds after the
+
+190
+00:16:30,893 --> 00:16:32,432
+pedal is released.
+
+191
+00:16:32,832 --> 00:16:37,564
+Four is a discussion: the prototype trims at 99.7 percent,
+
+192
+00:16:37,584 --> 00:16:42,152
+a teammate changes the wiper angle, success drops to 98,
+
+193
+00:16:42,172 --> 00:16:48,296
+and nobody can say what changed. Using this lecture's approach to versions,
+
+194
+00:16:48,316 --> 00:16:52,966
+tests and reporting, design a way to trace such problems.
+
+195
+00:16:53,366 --> 00:16:56,533
+Submit the report on the WenQuest platform.
+
+196
+00:16:58,053 --> 00:17:02,165
+There's also a ten-question quiz. For example,
+
+197
+00:17:02,185 --> 00:17:08,902
+a spindle with a total inertia of 7 times 10 to the minus 4 must reach 4500
+
+198
+00:17:08,922 --> 00:17:11,776
+r/min from rest in 0.15 seconds,
+
+199
+00:17:11,796 --> 00:17:18,513
+with 0.15 newton-metres of friction. What acceleration torque does it need?
+
+200
+00:17:18,913 --> 00:17:27,019
+Or, at 5000 r/min the spindle turns 0.1 degree in just over three microseconds;
+
+201
+00:17:27,039 --> 00:17:34,733
+can event scheduling poll the angle in a task that runs once a millisecond?
+
+202
+00:17:35,133 --> 00:17:40,833
+You get three attempts, and the explanations appear as soon as you submit.
+
+203
+00:17:42,353 --> 00:17:44,448
+Three things to remember.
+
+204
+00:17:44,848 --> 00:17:51,249
+One: WQ-SC uses a five-layer reference architecture plus mechanics,
+
+205
+00:17:51,269 --> 00:17:55,562
+building four prototypes from one controller,
+
+206
+00:17:55,582 --> 00:18:02,463
+module set and firmware framework, differing in master and actuator mix.
+
+207
+00:18:02,863 --> 00:18:08,265
+Two: rapid configuration: numbers in the requirements table,
+
+208
+00:18:08,285 --> 00:18:15,042
+compute the criteria, take the cheapest size that passes, and generate BOM,
+
+209
+00:18:15,062 --> 00:18:19,832
+wiring and firmware configuration from the same data,
+
+210
+00:18:19,852 --> 00:18:24,170
+without forgetting E-stop energy and RMS torque.
+
+211
+00:18:24,570 --> 00:18:25,064
+Three:
+
+212
+00:18:25,084 --> 00:18:31,583
+the firmware writes its event table by shaft angle and runs the cycle with a
+
+213
+00:18:31,603 --> 00:18:32,784
+state machine,
+
+214
+00:18:32,804 --> 00:18:37,159
+verified step by step through software in the loop,
+
+215
+00:18:37,179 --> 00:18:40,590
+hardware in the loop and the test bench.
+
+216
+00:18:40,990 --> 00:18:46,645
+The assignment, quiz and lab report are on WenQuest.
+
+217
+00:18:47,045 --> 00:18:49,835
+The slides, the virtual lab,
+
+218
+00:18:49,855 --> 00:18:56,861
+the assignment and the quiz are all on the WenQuest learning platform,
+
+219
+00:18:56,881 --> 00:19:03,585
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+220
+00:19:03,985 --> 00:19:08,857
+Next time we carry today's method all the way through:
+
+221
+00:19:08,877 --> 00:19:13,841
+control prototypes for the lockstitch and the overlock,
+
+222
+00:19:13,861 --> 00:19:19,005
+from wiring and firmware to the test bench. See you then.
