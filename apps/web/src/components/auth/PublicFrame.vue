@@ -12,12 +12,14 @@
       </view>
     </view>
     <view class="body"><slot /></view>
+    <SiteFooter />
   </view>
 </template>
 
 <script setup lang="ts">
 import { siteUrl } from "../../accountApi";
 import { t, toggleLocale } from "../../i18n";
+import SiteFooter from "../SiteFooter.vue";
 
 const props = defineProps<{ back?: string }>();
 const go = (url: string) => uni.navigateTo({ url: `${url}?back=${encodeURIComponent(props.back || "/pages/catalog/catalog")}` });

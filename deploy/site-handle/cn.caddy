@@ -1,0 +1,29 @@
+# 国内版官网“问渠科技”（第 48 轮，WQ_REGION=cn）：页面在 site/cn/，由 tools/site_cn/build.py 生成。
+# 公司名、电话、备案号等在访问时由 Caddy 模板从环境变量填入（.env 的 WQ_COMPANY、WQ_ICP……，见 docker-compose.prod.yml）。
+# 页面里引用的少量美国版共用素材（如缝纫机介绍视频）不在 site/cn/ 时，只按图片、视频、脚本等素材从 site/ 取，不提供美国版的网页。
+@cn_page file {
+	root /srv/site/cn
+	try_files {path} {path}/index.html {path}.html
+}
+handle @cn_page {
+	root * /srv/site/cn
+	rewrite * {file_match.relative}
+	templates {
+		mime text/html
+	}
+	header /assets/* Cache-Control "public, max-age=86400"
+	file_server
+}
+@shared_asset path_regexp \.(jpg|jpeg|png|webp|svg|mp4|webm|vtt|js|json|glb|woff2)$
+handle @shared_asset {
+	root * /srv/site
+	file_server
+}
+handle {
+	root * /srv/site/cn
+	rewrite * /404.html
+	templates
+	file_server {
+		status 404
+	}
+}

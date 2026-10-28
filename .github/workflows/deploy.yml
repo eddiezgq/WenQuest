@@ -50,6 +50,12 @@ jobs:
           docker run --rm -v "$PWD/deploy:/d:ro" -e SITE_DOMAIN=example.cn -e ACME_EMAIL=ci@example.cn -e WQ_REGION=cn caddy:2 caddy validate --config /d/Caddyfile --adapter caddyfile
       - name: Pages that go live load no Google Fonts or public CDN (第 34 轮：国内访问不了)
         run: python3 tools/vendor/check_external.py
+      - name: China website 问渠科技 is up to date and compliant (第 48 轮)
+        run: |
+          python3 tools/site_cn/build.py
+          git diff --exit-code --stat -- site/cn || { echo "::error::site/cn 与 tools/site_cn 不一致：本地运行 python3 tools/site_cn/build.py 后提交"; exit 1; }
+          test -z "$(git status --porcelain -- site/cn)" || { echo "::error::site/cn 有未提交的生成文件"; git status --porcelain -- site/cn; exit 1; }
+          python3 tools/site_cn/check_cn.py
       - name: Cam design kernel and API tests (问渠凸轮, 第 39 轮)
         working-directory: services/cam
         run: |

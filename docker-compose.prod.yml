@@ -18,6 +18,14 @@ services:
       ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
       # 按地区引入 deploy/caddy-extra/<us|cn>/ 里的站点（第 34 轮）
       WQ_REGION: ${WQ_REGION:-us}
+      # 国内版官网（第 48 轮，deploy/site-handle/cn.caddy）：页面里的公司信息与备案号由 Caddy 模板读这些变量
+      WQ_COMPANY: ${WQ_COMPANY:-}
+      WQ_ADDRESS: ${WQ_ADDRESS:-}
+      WQ_CONTACT_PHONE: ${WQ_CONTACT_PHONE:-}
+      WQ_CONTACT_EMAIL: ${WQ_CONTACT_EMAIL:-}
+      WQ_ICP: ${WQ_ICP:-}
+      WQ_PSB: ${WQ_PSB:-}
+      WQ_AI_REG: ${WQ_AI_REG:-}
     volumes:
       # The folder, not the single file: a deploy replaces deploy/Caddyfile with a new file, and a
       # single-file mount would keep showing Caddy the old one (so "caddy reload" changed nothing).

@@ -64,6 +64,7 @@ if [ "$REGION" = cn ]; then
     set_env DEEPSEEK_API_KEY "$DEEPSEEK"
     set_env BACKUP_S3_PROVIDER Alibaba
     set_env WQ_LIBRARY_URL "https://factory.$DOMAIN"   # the parts library of this server's own digital factory
+    set_env WQ_BRAND "问渠科技"                        # 国内版官网（第 48 轮）；公司全称、电话、备案号等之后在 .env 里填
     if [ -n "$CN_REG" ]; then
         CN_REG="${CN_REG%/}"
         set_env DB_IMAGE "$CN_REG/postgres:16-alpine"
@@ -89,5 +90,6 @@ echo "  Database:        moodle / $DB_PASS"
 echo "Email (SMTP_*) and off-site backup (BACKUP_S3_*) settings can be added later with: nano .env"
 if [ "$REGION" = cn ]; then
     echo "China deployment (WQ_REGION=cn): see docs/帮助/国内部署指南.html. First deploy:"
+    echo "  (公司全称、地址、电话、邮箱、ICP/公安备案号、生成式 AI 登记编号：在 .env 的 WQ_COMPANY … WQ_AI_REG 里填)"
     echo "  deploy/update.sh ${CN_REG:-<registry prefix>}/engine:<version>"
 fi

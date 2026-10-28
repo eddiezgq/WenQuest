@@ -11,18 +11,24 @@
       <slot />
     </view>
     <view class="foot">
-      <text class="flink" @click="open('/terms.html')">{{ t("auth.terms") }}</text>
-      <text class="dot">·</text>
-      <text class="flink" @click="open('/privacy.html')">{{ t("auth.privacy") }}</text>
-      <text class="dot">·</text>
+      <!-- 国内服务器上协议和隐私政策在下面的页脚里（第 48 轮） -->
+      <template v-if="!isCN">
+        <text class="flink" @click="open('/terms.html')">{{ t("auth.terms") }}</text>
+        <text class="dot">·</text>
+        <text class="flink" @click="open('/privacy.html')">{{ t("auth.privacy") }}</text>
+        <text class="dot">·</text>
+      </template>
       <text class="flink" @click="catalog">{{ t("catalog.title") }}</text>
     </view>
+    <SiteFooter />
   </view>
 </template>
 
 <script setup lang="ts">
 import { siteUrl } from "../../accountApi";
 import { t, toggleLocale } from "../../i18n";
+import { isCN } from "../../site";
+import SiteFooter from "../SiteFooter.vue";
 
 defineProps<{ wide?: boolean }>();
 function open(path: string) {

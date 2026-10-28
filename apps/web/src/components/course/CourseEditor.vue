@@ -24,10 +24,10 @@
           <text v-for="m in MODES" :key="m" class="lchip" :class="{ on: listing.mode === m }" @click="listing.mode = m">{{ t("listing." + m) }}</text>
         </view>
         <view v-if="listing.mode === 'paid'" class="wq-row lrow">
-          <picker :range="['CNY ¥', 'USD $']" @change="(e: any) => (listing.currency = e.detail.value == 1 ? 'USD' : 'CNY')">
+          <picker v-if="!isCN" :range="['CNY ¥', 'USD $']" @change="(e: any) => (listing.currency = e.detail.value == 1 ? 'USD' : 'CNY')">
             <view class="wq-input pk">{{ listing.currency === 'USD' ? 'USD $' : 'CNY ¥' }} ▾</view>
           </picker>
-          <input v-model.number="listing.price" type="digit" class="wq-input price" :placeholder="t('listing.price')" />
+          <input v-if="!isCN" v-model.number="listing.price" type="digit" class="wq-input price" :placeholder="t('listing.price')" />
           <text class="wq-muted">{{ t("listing.payLater") }}</text>
         </view>
         <template v-if="listing.mode !== 'private'">
@@ -111,6 +111,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { isCN } from "../../site";
 import BiField from "../edit/BiField.vue";
 import { ApiError } from "../../api";
 import { type Bi, confirmAction, editApi, type EditModule, type EditSection, pickFiles, type Structure, uploadToSection } from "../../courseApi";

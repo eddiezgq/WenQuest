@@ -30,6 +30,12 @@ class Settings(BaseSettings):
     # Where this server runs (round 34): us (default) or cn. In China only registered models may be called, so with
     # cn the gateway never uses Claude, even if an Anthropic key was left in .env.
     region: str = "us"
+    # China website and platform (round 48, only shown with region cn): brand, company and filing numbers for the footer.
+    brand: str = "问渠科技"
+    company: str = ""
+    icp: str = ""
+    psb: str = ""
+    ai_reg: str = ""
 
     # --- AI models (see app/ai.py) ---
     # auto = Claude if a key is set, else DeepSeek; or claude / deepseek / fake (tests and demos)

@@ -4,7 +4,7 @@
     <view class="gnav">
       <view class="logo" @click="go('dashboard')">
         <text class="logo-mark">问渠</text>
-        <text class="logo-sub">WenQuest</text>
+        <text class="logo-sub">{{ isCN ? "科技" : "WenQuest" }}</text>
       </view>
       <view class="gitem" :class="{ on: nav === 'account' || accountOpen }" @click="accountOpen = !accountOpen">
         <view class="avatar">{{ initial }}</view>
@@ -119,6 +119,7 @@
             <text class="pv-exit" @click="studentPreview = false">{{ t("shell.exitPreview") }}</text>
           </view>
           <slot />
+          <SiteFooter />
         </view>
         <view v-if="$slots.side" class="side"><slot name="side" /></view>
       </view>
@@ -131,6 +132,8 @@ import { computed, onMounted, ref } from "vue";
 import { admin, accountApi, loadAdmin } from "../accountApi";
 import { api, request, user, v3Allowed } from "../api";
 import { t, toggleLocale } from "../i18n";
+import { isCN } from "../site";
+import SiteFooter from "./SiteFooter.vue";
 import { type CourseData, courseMenu, studentPreview } from "../store";
 
 const props = defineProps<{

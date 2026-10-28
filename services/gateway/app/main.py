@@ -29,6 +29,7 @@ from . import video3d_api
 from . import catalog_api
 from . import course_pack
 from . import kit_interest
+from . import demo_request
 from . import sewing
 from . import sewing_cae
 from . import cam_ai
@@ -134,6 +135,7 @@ def create_app() -> FastAPI:
     textbook_api.register(app, sys.modules[__name__])
     course_pack.register(app, sys.modules[__name__])
     kit_interest.register(app, sys.modules[__name__])
+    demo_request.register(app, sys.modules[__name__])
     sewing.register(app, sys.modules[__name__])
     sewing_cae.register(app, sys.modules[__name__])
     cam_ai.register(app, sys.modules[__name__])

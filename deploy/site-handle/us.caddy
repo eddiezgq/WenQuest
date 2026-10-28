@@ -1,0 +1,13 @@
+# 主域名的网页（第 48 轮把这一段从 Caddyfile 挪到这里，内容不变）：美国版官网 site/。
+# 国内版的 site/cn/ 在美国服务器上不提供。
+handle /cn/* {
+	respond 404
+}
+handle /cn-preview/* {
+	respond 404
+}
+handle {
+	root * /srv/site
+	try_files {path} {path}/ {path}.html
+	file_server
+}

@@ -12,7 +12,7 @@
       <view class="grid">
         <view v-for="(c, i) in courses" :key="c.id" class="cc">
           <view class="cover" :style="{ background: covers[i % covers.length] }">
-            <text class="price" :class="c.mode">{{ c.mode === "free" ? t("catalog.free") : money(c) }}</text>
+            <text class="price" :class="c.mode">{{ c.mode === "free" ? t("catalog.free") : isCN ? t("catalog.paid") : money(c) }}</text>
             <text class="cover-name">{{ c.name }}</text>
           </view>
           <view class="cc-body">
@@ -42,6 +42,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import { isCN } from "../../site";
 import { type CatalogCourse, accountApi } from "../../accountApi";
 import { ApiError, token } from "../../api";
 import { errorText, t } from "../../i18n";

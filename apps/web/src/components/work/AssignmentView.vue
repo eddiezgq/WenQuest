@@ -120,6 +120,7 @@
                 <text class="wq-muted">{{ t("work.aiNote") }}</text>
               </view>
               <view v-if="criteria.length" class="criteria">
+                <AiBadge />
                 <view v-for="c in criteria" :key="c.name" class="crit"><text>{{ c.name }}</text><text class="c-s">{{ c.score }}/{{ c.max }}</text><text class="wq-muted">{{ c.note }}</text></view>
               </view>
 
@@ -142,6 +143,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import AiBadge from "../AiBadge.vue";
 import MathContent from "../MathContent.vue";
 import { absolute, ApiError } from "../../api";
 import {

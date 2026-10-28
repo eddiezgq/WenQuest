@@ -84,7 +84,7 @@
             <view class="r-main">
               <text class="a-name">{{ r.name }}</text>
               <text class="wq-muted">{{ r.email }} · {{ day(r.created) }}</text>
-              <text class="r-course">{{ t("admin.wants") }}《{{ r.course }}》 · {{ money(r.price, r.currency) }}</text>
+              <text class="r-course">{{ t("admin.wants") }}《{{ r.course }}》 · {{ isCN ? t("catalog.paid") : money(r.price, r.currency) }}</text>
               <text v-if="r.note" class="a-note">“{{ r.note }}”</text>
             </view>
             <view class="wq-row">
@@ -184,6 +184,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { isCN } from "../../site";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { type AdminUser, type Application, type EnrolRequest, accountApi, loadAdmin } from "../../accountApi";

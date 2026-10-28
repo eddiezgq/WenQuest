@@ -33,7 +33,7 @@
         <view class="chat" :class="{ hide: mpane !== 'chat' }">
           <scroll-view class="msgs" scroll-y :scroll-into-view="lastMsgId">
             <view v-for="m in p.messages" :id="'m' + m.id" :key="m.id" class="msg" :class="[m.role, m.kind]">
-              <text v-if="m.role === 'lead'" class="who">{{ t("studio.role.lead") }}</text>
+              <text v-if="m.role === 'lead'" class="who">{{ t("studio.role.lead") }}<AiBadge /></text>
               <text class="bubble">{{ m.text }}</text>
               <!-- round 31: what the course lead changed in the draft (undo is at the top) -->
               <view v-if="m.kind === 'change' && (m.lines || []).length" class="chg">
@@ -516,6 +516,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref, watch } from "vue";
+import AiBadge from "../../components/AiBadge.vue";
 import { onHide, onLoad, onShow, onUnload } from "@dcloudio/uni-app";
 import { confirmAction } from "../../courseApi";
 import AppShell from "../../components/AppShell.vue";

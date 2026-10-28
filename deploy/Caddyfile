@@ -46,11 +46,8 @@
 	handle_path /cam/* {
 		reverse_proxy cam:8000
 	}
-	handle {
-		root * /srv/site
-		try_files {path} {path}/ {path}.html
-		file_server
-	}
+	# 网页：美国版 site/，国内版 site/cn/（第 48 轮，按 WQ_REGION 选，见 site-handle/）
+	import site-handle/{$WQ_REGION:us}.caddy
 }
 
 www.{$SITE_DOMAIN} {

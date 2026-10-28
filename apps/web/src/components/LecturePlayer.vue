@@ -10,6 +10,7 @@
       </video>
     </view>
     <view class="bar">
+      <AiBadge />
       <view v-if="dubs.length > 1" class="group">
         <text class="label">{{ t("lecture.voice") }}</text>
         <view v-for="d in dubs" :key="d" class="seg" :class="{ on: dub === d }" @click="setDub(d)">{{ LANG_NAME[d] }}</view>
@@ -28,6 +29,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { absolute } from "../api";
 import { locale, t } from "../i18n";
+import AiBadge from "./AiBadge.vue";
 
 type Lang = "zh" | "en";
 interface Cue { start: number; end: number; text: string }

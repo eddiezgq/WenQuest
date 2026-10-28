@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { onLaunch, onShow } from "@dcloudio/uni-app";
 import { syncSiteSignIn } from "./accountApi";
-onLaunch(() => {});
+import { loadSite } from "./site";
+// 第 48 轮：国内服务器的品牌、备案号与 AI 标识（美国服务器上什么也不变）
+onLaunch(() => { loadSite(); });
 // Signed out on the academy website? Then this platform signs out too (web only, on the site's domain).
 onShow(() => syncSiteSignIn());
 </script>

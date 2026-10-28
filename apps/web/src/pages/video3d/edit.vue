@@ -12,6 +12,7 @@
           <text class="label">{{ t("v3.talk") }}</text>
           <scroll-view scroll-y class="msgs">
             <view v-for="(c, i) in v.chat" :key="i" class="msg" :class="c.who">
+              <AiBadge v-if="c.who === 'ai'" />
               <text>{{ c.text }}</text>
             </view>
             <view v-if="v.busy" class="msg ai muted">{{ t("v3.aiWriting") }}…</view>
@@ -92,6 +93,7 @@
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref } from "vue";
+import AiBadge from "../../components/AiBadge.vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { api, ApiError, token, type V3Video } from "../../api";
