@@ -1165,6 +1165,21 @@ window.WQ = {
     });
     return { errors: errors.slice(), active, labs };
   },
+  // What the checker reports when a scene's picture is blank (round 48): drawing context, camera, the simulated bodies.
+  probe(id) {
+    const L = LABS[id];
+    if (!L) return null;
+    const out = { running: !!(L.api && L.api.running), ready: !!L.ready, broken: !!L.broken, scene: L.api && L.api.scene };
+    try {
+      const c = L.dom && L.dom.canvas, g = c && (c.getContext("webgl2") || c.getContext("webgl"));
+      out.canvas = c ? [c.width, c.height] : null;
+      out.lost = g && g.isContextLost ? g.isContextLost() : null;
+      if (L.st && L.st.camera) { const q = L.st.camera.position; out.cam = [q.x, q.y, q.z].map((v) => +v.toFixed(2)); }
+      if (L.sim) { const d = L.sim.d; out.qpos = Array.from(d.qpos.slice(0, 3)).map((v) => +(+v).toFixed(3)); out.t = L.api.t; }
+      if (L.world) out.children = L.world.children.length;
+    } catch (e) { out.err = String(e); }
+    return out;
+  },
   // Do what a task's demo says, through the same controls a student uses (for the automatic trial run).
   demo(id, tid) {
     const L = LABS[id]; show(id);

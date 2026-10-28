@@ -216,7 +216,8 @@ async def run(html: str, lab: str) -> dict:
                     await page.wait_for_timeout(500)
                     colours = await page.evaluate(BLANK_JS, f"{sec} canvas")
                 if colours < 3:
-                    problems.append(f"scene '{sc}': the picture is blank")
+                    probe = await page.evaluate(f"() => WQ.probe ? JSON.stringify(WQ.probe({lab!r})) : ''")
+                    problems.append(f"scene '{sc}': the picture is blank ({colours} colours; {probe})")
                 for pid in info["params"]:
                     visible = await page.is_visible(f'{sec} [data-param="{pid}"]')
                     if not visible:
