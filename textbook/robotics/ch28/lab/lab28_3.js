@@ -128,6 +128,9 @@ WQ.lab({
       api.stop();
     }
   },
+  draw(api, s) {                                  // 刚重置（换场景、改参数）时也重新取景：不然相机还对着上一次飞远的地方
+    if (s.lastView === -1) { api.view(-60, 15, 0.55); s.lastView = s.t || 0; }
+  },
   chart(api, s, ctx, w, h) {
     const H = s.hist || [];
     api.cplot(48, 10, w - 60, h - 34, [{ pts: H.map((r) => [r[0], r[1]]), color: "#1f77b4" }, { pts: H.map((r) => [r[0], r[2]]), color: "#d62728" }],
