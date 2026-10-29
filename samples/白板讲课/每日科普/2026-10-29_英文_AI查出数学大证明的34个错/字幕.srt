@@ -1,0 +1,350 @@
+1
+00:00:00,300 --> 00:00:01,550
+Fifteen thousand pages.
+一万五千页。
+
+2
+00:00:01,550 --> 00:00:04,930
+That's one math proof, and almost nobody has read all of it.
+这是一个数学证明，几乎没人把它从头读到尾。
+
+3
+00:00:04,930 --> 00:00:09,340
+This week, an AI startup called Axiom says its AI agents checked every line.
+这周，一家叫Axiom的AI公司说，它的AI把每一行都查了一遍，
+
+4
+00:00:09,340 --> 00:00:10,620
+In twenty four days.
+只用了24天。
+
+5
+00:00:10,620 --> 00:00:12,670
+And it found thirty four real mistakes.
+还查出了34个真错误，
+
+6
+00:00:12,670 --> 00:00:14,950
+One of them needed brand new math to fix.
+其中一个得靠全新的数学才补得上。
+
+7
+00:00:14,950 --> 00:00:15,960
+Today's brain teaser:
+今天的烧脑问题：
+
+8
+00:00:15,960 --> 00:00:18,740
+how do you check a proof too big for any human to read?
+一个大到没人读得完的证明，怎么检查？
+
+9
+00:00:18,740 --> 00:00:20,260
+First, what was being proved?
+先说它证明了什么：
+
+10
+00:00:20,260 --> 00:00:23,270
+It's called the classification of finite simple groups.
+有限单群分类定理。
+
+11
+00:00:23,270 --> 00:00:25,750
+A group is just a set of moves you can combine,
+“群”就是一套能组合的动作，
+
+12
+00:00:25,750 --> 00:00:28,030
+like all the ways to twist a puzzle cube.
+比如拧魔方的各种转法。
+
+13
+00:00:28,030 --> 00:00:30,080
+Simple groups are the building blocks,
+单群是积木块，
+
+14
+00:00:30,080 --> 00:00:32,740
+the way prime numbers build every other number.
+就像质数能拼出所有的数。
+
+15
+00:00:32,740 --> 00:00:35,530
+The theorem says: here is the complete list of blocks.
+这个定理说：积木块的完整清单就在这，
+
+16
+00:00:35,530 --> 00:00:36,630
+Nothing is missing.
+一块都不少。
+
+17
+00:00:36,630 --> 00:00:38,710
+The list has a few infinite families,
+清单里有几大无穷家族，
+
+18
+00:00:38,710 --> 00:00:41,750
+plus twenty six weird loners called sporadic groups.
+外加26个怪家伙，叫“散在群”。
+
+19
+00:00:41,750 --> 00:00:43,780
+The biggest loner is called the Monster.
+最大的怪家伙叫“魔群”，
+
+20
+00:00:43,780 --> 00:00:46,810
+It has about eight times ten to the fifty three elements.
+大约有8乘10的53次方个元素。
+
+21
+00:00:46,810 --> 00:00:48,440
+That's more than the number of atoms
+这比整个地球的原子
+
+22
+00:00:48,440 --> 00:00:49,470
+in the entire Earth.
+还多。
+
+23
+00:00:49,470 --> 00:00:52,150
+Proving the list took about a hundred mathematicians
+证完这张清单，用了大约一百位数学家，
+
+24
+00:00:52,150 --> 00:00:54,020
+and more than five hundred papers.
+五百多篇论文。
+
+25
+00:00:54,020 --> 00:00:55,710
+It started in the nineteen fifties.
+五十年代开工，
+
+26
+00:00:55,710 --> 00:00:58,440
+People announced it was done in nineteen eighty three.
+一九八三年宣布完工。
+
+27
+00:00:58,440 --> 00:00:59,840
+Twist one: it wasn't done.
+反转一：其实没完工，
+
+28
+00:00:59,840 --> 00:01:02,540
+One gap stayed open until two thousand and four.
+有个缺口一直到2004年才补上。
+
+29
+00:01:02,540 --> 00:01:04,770
+So how do you check fifteen thousand pages?
+那一万五千页怎么查？
+
+30
+00:01:04,770 --> 00:01:07,370
+Stop trusting. Start checking every single step.
+别信，一步一步查。
+
+31
+00:01:07,370 --> 00:01:10,090
+Axiom rewrote the proof in a language called Lean.
+Axiom把证明翻译成一种叫Lean的语言，
+
+32
+00:01:10,090 --> 00:01:11,850
+Lean is a super picky referee.
+Lean是个超级较真的裁判。
+
+33
+00:01:11,850 --> 00:01:14,560
+Every step has to follow from the steps before it,
+每一步都必须从前面推出来，
+
+34
+00:01:14,560 --> 00:01:16,030
+or Lean flat out says no.
+不然Lean直接说不行。
+
+35
+00:01:16,030 --> 00:01:17,120
+It's like dominoes:
+就像多米诺骨牌：
+
+36
+00:01:17,120 --> 00:01:19,970
+if one domino is missing, the whole chain stops.
+少一块，整条链就停了。
+
+37
+00:01:19,970 --> 00:01:21,190
+Here's the clever part:
+妙就妙在：
+
+38
+00:01:21,190 --> 00:01:22,960
+the AI writes, and Lean checks.
+AI负责写，Lean负责查。
+
+39
+00:01:22,960 --> 00:01:24,150
+AI can make things up.
+AI会瞎编，
+
+40
+00:01:24,150 --> 00:01:25,950
+But Lean can't be sweet talked.
+可Lean不吃这一套。
+
+41
+00:01:25,950 --> 00:01:29,320
+Swarms of AI agents wrote about forty three million lines.
+一群AI写了大约四千三百万行，
+
+42
+00:01:29,320 --> 00:01:30,600
+In twenty four days.
+只用了24天。
+
+43
+00:01:30,600 --> 00:01:32,240
+Twist two, the surprising one:
+反转二，最意外：
+
+44
+00:01:32,240 --> 00:01:34,980
+the proof people trusted for decades had cracks.
+大家信了几十年的证明，有裂缝。
+
+45
+00:01:34,980 --> 00:01:37,150
+Thirty four errors needed real repair.
+34个错误需要真修，
+
+46
+00:01:37,150 --> 00:01:40,690
+Most were typos, mislabeled tables, and missing assumptions.
+大多是笔误、表格标错、漏了条件。
+
+47
+00:01:40,690 --> 00:01:43,870
+But one, deep inside a piece called the Unbalanced Group Theorem,
+但有一个，藏在“非平衡群定理”里，
+
+48
+00:01:43,870 --> 00:01:45,850
+could not be fixed with a quick patch.
+改个笔误救不回来。
+
+49
+00:01:45,850 --> 00:01:50,000
+Axiom called in two of the original authors, Richard Lyons and Ronald Solomon,
+Axiom请来当年的两位作者，莱昂斯和所罗门，
+
+50
+00:01:50,000 --> 00:01:51,780
+and they found a way around it.
+绕过了这个坑。
+
+51
+00:01:51,780 --> 00:01:53,820
+That fix is now a new result of its own.
+这个补丁成了一个新结果，
+
+52
+00:01:53,820 --> 00:01:56,250
+And the list of building blocks still stands.
+积木清单依然成立。
+
+53
+00:01:56,250 --> 00:01:56,960
+Twist three:
+反转三：
+
+54
+00:01:56,960 --> 00:01:59,400
+this might be how we check robots, too.
+将来查机器人，可能也靠这个。
+
+55
+00:01:59,400 --> 00:02:03,510
+A self driving car or a surgical robot runs millions of lines of code.
+自动驾驶、手术机器人跑着几百万行代码，
+
+56
+00:02:03,510 --> 00:02:05,570
+Testing can never try every case.
+测试不可能试遍所有情况。
+
+57
+00:02:05,570 --> 00:02:08,870
+In principle, a checker like Lean can prove a rule always holds,
+原理上，像Lean这样的检查器能证明一条规矩永远成立，
+
+58
+00:02:08,870 --> 00:02:11,150
+like this arm never swings into that wall.
+比如机械臂永远不撞墙。
+
+59
+00:02:11,150 --> 00:02:13,300
+Fine print: this is Axiom's own announcement.
+友情提示：这是Axiom自己宣布的，
+
+60
+00:02:13,300 --> 00:02:15,430
+Mathematicians are still going through it.
+数学家们还在细看。
+
+61
+00:02:15,430 --> 00:02:17,380
+And Lean only checks the question you wrote.
+而且Lean只查你问的问题，
+
+62
+00:02:17,380 --> 00:02:19,980
+Write the question wrong, and you prove the wrong thing.
+问题写错了，证出来的也是错的东西。
+
+63
+00:02:19,980 --> 00:02:22,140
+So how do you check a proof nobody can read?
+所以，没人读得完的证明怎么查？
+
+64
+00:02:22,140 --> 00:02:24,820
+Cut every step small enough for a computer to check.
+把每一步切到小得电脑能查。
+
+65
+00:02:24,820 --> 00:02:26,150
+Fifteen thousand pages,
+一万五千页，
+
+66
+00:02:26,150 --> 00:02:28,940
+turned into forty three million tiny dominoes.
+变成四千三百万块小骨牌。
+
+67
+00:02:28,940 --> 00:02:31,070
+The tallest stack of paper in math history
+数学史上最高的那摞纸，
+
+68
+00:02:31,070 --> 00:02:32,610
+finally got a second reader.
+终于有了第二个读者。
+
+69
+00:02:32,610 --> 00:02:33,050
+It just
+只不过，
+
+70
+00:02:33,050 --> 00:02:34,350
+wasn't a human.
+不是人。
+
