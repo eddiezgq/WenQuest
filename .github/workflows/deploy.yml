@@ -534,16 +534,24 @@ jobs:
           ssh "deploy@$HOST" '/opt/wenquest/deploy/textbook-media.sh 600' 2>&1 | tee /tmp/media.log
           grep '^FAILED' /tmp/media.log | head -n 9 | while read -r l; do echo "::warning title=Textbook animation::${l:0:1500}"; done || true
 
-  # ===== 国内部署（第 34 轮）：没有设置国内仓库、国内服务器时两个任务都跳过；美国的 build、deploy 不受影响 =====
-  # 仓库变量（Settings → Secrets and variables → Actions → Variables）：CN_REGISTRY，如 registry.cn-hangzhou.aliyuncs.com/wenquest
-  # 加密变量（Secrets）：CN_REGISTRY_USER、CN_REGISTRY_PASSWORD；部署到国内服务器再加 CN_DEPLOY_HOST、CN_DEPLOY_SSH_KEY（可选 CN_DEPLOY_KNOWN_HOSTS）
+  # ===== 国内部署（第 34 轮；第 53 轮加“自带仓库”）：没有设置 CN_REGISTRY 时两个任务都跳过；美国的 build、deploy 不受影响 =====
+  # 仓库变量（Settings → Secrets and variables → Actions → Variables）CN_REGISTRY：
+  #   local = 国内服务器自带的镜像仓库（第 53 轮，推荐）：只监听服务器的 127.0.0.1:5000，GitHub 经 SSH 通道把镜像复制进去；
+  #           要 Secrets CN_DEPLOY_HOST、CN_DEPLOY_SSH_KEY（可选 CN_DEPLOY_KNOWN_HOSTS），不要仓库账号
+  #   registry.cn-xxx.aliyuncs.com/命名空间 = 阿里云 ACR（第 34 轮）：另要 Secrets CN_REGISTRY_USER、CN_REGISTRY_PASSWORD
   mirror-cn:
     needs: build
     if: vars.CN_REGISTRY != ''
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 240   # 自带仓库第一次要跨境传十几 GB；以后只传变化的层
     outputs:
       image: ${{ steps.copy.outputs.image }}
+    env:
+      CN: ${{ vars.CN_REGISTRY }}
+      HOST: ${{ secrets.CN_DEPLOY_HOST }}
+      IMAGE: ${{ needs.build.outputs.image }}
+      PLATFORM: engine gateway web animator labcheck micro-synth voice blender cam
+      BASE: postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1
     steps:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -551,25 +559,113 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Copy the images to the China registry (platform images of this build + the base images)
-        id: copy
+      - name: Copy the images to the China registry (ACR)
+        if: vars.CN_REGISTRY != 'local'
+        id: acr
         env:
-          CN: ${{ vars.CN_REGISTRY }}
           CN_USER: ${{ secrets.CN_REGISTRY_USER }}
           CN_PASS: ${{ secrets.CN_REGISTRY_PASSWORD }}
-          IMAGE: ${{ needs.build.outputs.image }}
         run: |
           set -euo pipefail
-          [ -n "$CN_USER" ] && [ -n "$CN_PASS" ] || { echo "::error::CN_REGISTRY is set but CN_REGISTRY_USER / CN_REGISTRY_PASSWORD are not"; exit 1; }
+          [ -n "$CN_USER" ] && [ -n "$CN_PASS" ] || { echo "::error::CN_REGISTRY is set but CN_REGISTRY_USER / CN_REGISTRY_PASSWORD are not (or set CN_REGISTRY=local for the server's own registry)"; exit 1; }
           CN="${CN%/}"
           printf '%s' "$CN_PASS" | docker login "${CN%%/*}" -u "$CN_USER" --password-stdin
           TAG="${IMAGE##*:}"; SRC="${IMAGE%/engine:*}"
           copy() { for i in 1 2 3; do docker buildx imagetools create --tag "$2" "$1" && return 0; echo "retry $i: $1"; sleep 20; done; return 1; }
-          for n in engine gateway web animator labcheck micro-synth voice blender; do copy "$SRC/$n:$TAG" "$CN/$n:$TAG"; done
+          for n in $PLATFORM; do copy "$SRC/$n:$TAG" "$CN/$n:$TAG"; done
           # 基础镜像：国内拉不动 Docker Hub；.env 的 DB_IMAGE、REDIS_IMAGE、CADDY_IMAGE、RCLONE_IMAGE 指向这里
-          for b in postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1; do copy "docker.io/library/$b" "$CN/${b##*/}" 2>/dev/null || copy "docker.io/$b" "$CN/${b##*/}"; done
+          for b in $BASE; do copy "docker.io/library/$b" "$CN/${b##*/}" 2>/dev/null || copy "docker.io/$b" "$CN/${b##*/}"; done
           echo "image=$CN/engine:$TAG" >> "$GITHUB_OUTPUT"
           echo "Copied to $CN (tag $TAG)"
+      - name: SSH to the China server (own registry)
+        if: vars.CN_REGISTRY == 'local'
+        run: |
+          set -euo pipefail
+          [ -n "$HOST" ] || { echo "::error::CN_REGISTRY=local needs the secrets CN_DEPLOY_HOST and CN_DEPLOY_SSH_KEY"; exit 1; }
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CN_DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+          printf 'Host cn\n  HostName %s\n  User deploy\n  ServerAliveInterval 30\n  ServerAliveCountMax 6\n' "$HOST" > ~/.ssh/config
+          ssh cn 'echo connected; df -h / | tail -1'
+      - name: Start the server's own registry (127.0.0.1:5000, first time only)
+        if: vars.CN_REGISTRY == 'local'
+        run: |
+          set -euo pipefail
+          if ssh cn 'docker inspect wq-registry >/dev/null 2>&1'; then
+            ssh cn 'docker start wq-registry >/dev/null; echo "registry already there"'
+          else
+            # 国内服务器拉不到 Docker Hub：在这里拉 registry:2，打包传过去
+            docker pull registry:2
+            docker save registry:2 | gzip | ssh cn 'gunzip | docker load'
+            ssh cn 'mkdir -p /opt/wenquest/registry && docker run -d --name wq-registry --restart always -p 127.0.0.1:5000:5000 \
+              -v /opt/wenquest/registry:/var/lib/registry -e REGISTRY_STORAGE_DELETE_ENABLED=true registry:2'
+          fi
+          ssh cn 'for i in $(seq 1 30); do curl -sf http://127.0.0.1:5000/v2/ >/dev/null && { echo "registry up"; exit 0; }; sleep 2; done; docker logs --tail 30 wq-registry; exit 1'
+      - name: Copy the images into the server's own registry (through an SSH tunnel; only missing layers travel)
+        if: vars.CN_REGISTRY == 'local'
+        id: local
+        run: |
+          set -euo pipefail
+          command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -yq skopeo; }
+          ssh -fN -o ExitOnForwardFailure=yes -L 5000:127.0.0.1:5000 cn
+          for i in $(seq 1 15); do curl -sf http://localhost:5000/v2/ >/dev/null && break; sleep 2; done
+          TAG="${IMAGE##*:}"; SRC="${IMAGE%/engine:*}"
+          creds="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
+          copy() {   # $1 source, $2 destination path in the registry
+            for i in 1 2 3 4; do
+              # 隧道断了就重建
+              curl -sf http://localhost:5000/v2/ >/dev/null || ssh -fN -o ExitOnForwardFailure=yes -L 5000:127.0.0.1:5000 cn || true
+              start=$(date +%s)
+              if skopeo copy --retry-times 3 --dest-tls-verify=false ${3:+--src-creds "$3"} "docker://$1" "docker://localhost:5000/$2"; then
+                echo "  $2  $(( $(date +%s) - start )) s"; return 0
+              fi
+              echo "retry $i: $1"; sleep 20
+            done
+            return 1
+          }
+          for n in $PLATFORM; do copy "$SRC/$n:$TAG" "$n:$TAG" "$creds"; done
+          for b in $BASE; do
+            case "$b" in */*) src="docker.io/$b" ;; *) src="docker.io/library/$b" ;; esac
+            copy "$src" "${b##*/}"
+          done
+          echo "image=127.0.0.1:5000/engine:$TAG" >> "$GITHUB_OUTPUT"
+          echo "Copied into the server's registry (tag $TAG)"
+      - name: Keep the last 3 versions in the server's registry
+        if: vars.CN_REGISTRY == 'local'
+        continue-on-error: true
+        run: |
+          TAG="${IMAGE##*:}"
+          ssh cn "PLATFORM='$PLATFORM' TAG='$TAG' bash -s" <<'EOF'
+          set -u
+          R=http://127.0.0.1:5000
+          H='Accept: application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json'
+          L=/opt/wenquest/registry/.tags
+          { grep -vx "$TAG" "$L" 2>/dev/null; echo "$TAG"; } > "$L.new" && mv "$L.new" "$L"
+          keep=$(tail -n 3 "$L")
+          old=$(head -n -3 "$L")
+          digest() { curl -sfI -H "$H" "$R/v2/$1/manifests/$2" | tr -d '\r' | awk -F': ' 'tolower($1)=="docker-content-digest"{print $2}'; }
+          n_del=0
+          for n in $PLATFORM; do
+            kept=$(for t in $keep; do digest "$n" "$t"; done)
+            for t in $old; do
+              d=$(digest "$n" "$t") || continue
+              [ -n "$d" ] || continue
+              echo "$kept" | grep -qx "$d" && continue   # 同一个镜像还被保留的版本用着
+              curl -sf -X DELETE "$R/v2/$n/manifests/$d" >/dev/null && n_del=$((n_del+1))
+            done
+          done
+          printf '%s\n' $keep > "$L"
+          docker exec wq-registry registry garbage-collect --delete-untagged /etc/docker/registry/config.yml >/dev/null 2>&1 || true
+          echo "removed $n_del old manifests; registry size: $(du -sh /opt/wenquest/registry | cut -f1); disk: $(df -h / | tail -1 | awk '{print $5}') used"
+          EOF
+      - name: Image address for the China server
+        id: copy
+        run: echo "image=${{ steps.local.outputs.image || steps.acr.outputs.image }}" >> "$GITHUB_OUTPUT"
 
   deploy-cn:
     needs: [mirror-cn, textbook, webeditions]
@@ -630,8 +726,13 @@ jobs:
           fi
           CN="${CN%/}"
           set +e
-          printf '%s' "$CN_PASS" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ${CN%%/*} -u $CN_USER --password-stdin && /opt/wenquest/deploy/update.sh ${{ needs.mirror-cn.outputs.image }}'" 2>&1 | tee /tmp/update.log
-          st=${PIPESTATUS[1]}
+          if [ "$CN" = local ]; then   # 第 53 轮：服务器自带仓库，不用登录
+            ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock /opt/wenquest/deploy/update.sh ${{ needs.mirror-cn.outputs.image }}" 2>&1 | tee /tmp/update.log
+            st=${PIPESTATUS[0]}
+          else
+            printf '%s' "$CN_PASS" | ssh "deploy@$HOST" "flock -w 1500 /tmp/wenquest-deploy.lock sh -c 'docker login ${CN%%/*} -u $CN_USER --password-stdin && /opt/wenquest/deploy/update.sh ${{ needs.mirror-cn.outputs.image }}'" 2>&1 | tee /tmp/update.log
+            st=${PIPESTATUS[1]}
+          fi
           if [ "$st" != 0 ]; then
             python3 factory/deploy/ci_annotate.py "China server update" /tmp/update.log 180
             exit "$st"

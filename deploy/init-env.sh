@@ -27,7 +27,7 @@ if [ "$REGION" = cn ]; then
     TZ_DEFAULT=$(ask "Time zone" "Asia/Shanghai")
     ANTHROPIC=""   # only registered models in China
     DEEPSEEK=$(ask "DeepSeek API key (can be added later)" "")
-    CN_REG=$(ask "China image registry prefix, e.g. registry.cn-hangzhou.aliyuncs.com/wenquest (empty = Docker Hub)" "")
+    CN_REG=$(ask "Image registry prefix: 127.0.0.1:5000 = this server's own registry (round 53); or ACR, e.g. registry.cn-shanghai.aliyuncs.com/wenquest" "127.0.0.1:5000")
 else
     LANG_DEFAULT=$(ask "Default language: en or zh_cn (users can switch)" "en")
     TZ_DEFAULT=$(ask "Time zone" "America/New_York")

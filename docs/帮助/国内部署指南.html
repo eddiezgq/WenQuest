@@ -364,7 +364,16 @@ ssh deploy@&lt;服务器IP&gt; 'cd /opt/wenquest &amp;&amp; tar xzf wq-deploy.tg
     <div class="seg" data-i="4"><b>上线</b>deploy/update.sh</div>
   </div>
   <div id="flowNote" class="out"></div>
-  <h3>路线 A（推荐）：GitHub 自动同步到阿里云 ACR，并自动部署到国内服务器</h3>
+  <h3>路线 A0（推荐，第 53 轮）：镜像仓库就在国内服务器上</h3>
+  <p>阿里云 ACR 对企业认证账号只开放收费的企业版。问渠的自动部署可以改用服务器自带的仓库：它只在服务器内部监听 <code>127.0.0.1:5000</code>，不新开端口；GitHub 每次构建后通过 SSH 安全通道把 9 个平台镜像和 4 个基础镜像复制进去（已有的部分不再传），只保留最近 3 个版本。第一次要跨境传十几 GB，可能一两个小时；以后每次只传变化的部分。国内服务器连不上 GitHub 也没关系，所有东西都由 GitHub 推过去。</p>
+  <ol>
+    <li>服务器按第 7 节初始化（Docker 用 <code>apt-get install -y docker.io docker-compose-v2</code> 装最省事；<code>bootstrap.sh</code> 在服务器上下载不了时，在自己电脑上打开文件、复制，在服务器上 <code>nano /root/bootstrap.sh</code> 粘贴保存）。</li>
+    <li>GitHub 仓库 → Settings → Secrets and variables → Actions：Variables 加 <code>CN_REGISTRY = local</code>；Secrets 加 <code>CN_DEPLOY_HOST</code>（服务器公网 IP）、<code>CN_DEPLOY_SSH_KEY</code>（第 7 节第 3 步公钥对应的私钥）。不要仓库账号密码。</li>
+    <li>推送一次（或在 Actions 页面手动运行）：镜像和部署文件传到服务器后，第一次会报“缺 .env”。</li>
+    <li>在服务器上 <code>su - deploy</code>，再 <code>cd /opt/wenquest &amp;&amp; deploy/init-env.sh</code>（第 9 节），镜像地址前缀那一问直接回车（<code>127.0.0.1:5000</code>）。</li>
+    <li>再运行一次部署，整套平台启动。</li>
+  </ol>
+  <h3>路线 A：GitHub 自动同步到阿里云 ACR，并自动部署到国内服务器</h3>
   <p>部署工作流里有两个国内专用的步骤：<b>同步到国内仓库</b>（每次构建后把 7 个平台镜像和 postgres、redis、caddy、rclone 4 个基础镜像复制到 ACR）和<b>部署到国内服务器</b>。没有设置下面这些变量时它们自动跳过，美国的部署照常。</p>
   <ol>
     <li>阿里云开通“容器镜像服务”，建一个命名空间（如 <code>wenquest</code>），设置“访问凭证”的固定密码。仓库不用一个个建：命名空间里打开“自动创建仓库”，设为<b>私有</b>。</li>
