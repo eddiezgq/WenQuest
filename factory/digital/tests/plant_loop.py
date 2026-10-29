@@ -284,6 +284,13 @@ def park(mgr):
     gtok = gb("POST", "/api/login", dict({"name": "工业园演练", "role": "manager", "mode": "teach"},
                                          **({"teacher_password": A.teacher_password} if A.teacher_password else {})))["token"]
     gb("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": A.speed}, token=gtok)
+    try:                                      # 前面的演练（两周情景第 6 幕的保养）可能给磨床留了挂牌上锁：验收、解锁，免得这张单做不完
+        for p in gb("GET", "/api/ehs/permits", token=gtok)["permits"]:
+            if p.get("kind") == "loto" and p.get("status") in ("active", "planned"):
+                gb("POST", "/api/ehs/permits/{}/close".format(p["id"]), {}, token=gtok)
+                print("  （减速器厂：关闭挂牌上锁许可 {}，{} 解锁）".format(p.get("key"), p.get("unit")))
+    except RuntimeError as e:
+        print("  （减速器厂：没能检查挂牌上锁：{}）".format(str(e)[:120]))
     o = wait(lambda: next((x for x in gb("GET", "/api/park", token=gtok)["orders"] if x["po"] == lot["po"] and x["status"] in ("released", "shipped")),
                           None), "减速器厂接单、订单和工单写进 ERPNext", 600, 5)
     if not check(bool(o), "减速器厂自动接单：{}".format(o and "订单 {}，工单 {}".format(o["so"], "、".join(o["work_orders"])))):
