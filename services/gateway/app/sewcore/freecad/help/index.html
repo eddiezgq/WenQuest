@@ -311,7 +311,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>FreeCAD 里“导出参数”，网页版保存项目时可以照着填，或者直接交给同事在网页版打开。</li>
 <li>花样机上传的针位表存在设计对象的 <code>PatternPoints</code> 属性里，随参数文件一起带。</li>
 </ul>
-<a class="try" href="https://learn.wenquestrobotics.com/#/pages/sewing/sewing?machine=lockstitch&amp;tab=checks" target="_blank" rel="noopener">▶ 试一试：在网页版打开同样的教材算例（对照结果）</a>
+<a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=lockstitch&amp;tab=checks" target="_blank" rel="noopener">▶ 试一试：在网页版打开同样的教材算例（对照结果）</a>
 <figure class="vid"><video controls preload="none" playsinline poster="media/fc-03-checks.jpg"><source src="media/fc-03-checks.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/fc-03-checks.vtt"></video><figcaption>▶ 校核结果与时序图；导入网页版的参数文件，结果一致</figcaption></figure>
 <h3 id="use-3">提交到问渠工厂</h3>
 <p>要先装数字工厂企业版的“问渠”工作台（数字工厂“设计与工艺”页下载宏包）。点“提交到问渠工厂”，整套零件合成一个组件，弹出提交对话框：填物料编号和改动说明，进设计审批；批准后版本号加一，STEP 挂到 ERP 物料上。没装“问渠”工作台时，先“导出 STEP”，再到数字工厂网页上传。</p></section>
@@ -981,7 +981,7 @@ spy();
       ["人看对照表", "改前 / 改后、每项为什么"],
       ["点“采用”", "这时才回填参数"],
     ];
-    const S = canvas(el, 250), b = bar(el, '<button>重播</button><span class="cap">AI 只起草；能不能用，由计算核心重算决定，最后由人点“采用”。</span>');
+    const S = canvas(el, 250), b = bar(el, '<button>重播</button><span class="cap">一个例子。AI 只起草；能不能用，由计算核心重算决定，最后由人点“采用”。</span>');
     let t0 = performance.now();
     b.querySelector("button").onclick = () => (t0 = performance.now());
     visible(el, (t) => {
@@ -1252,6 +1252,8 @@ spy();
 
   document.querySelectorAll(".anim").forEach((el) => { const f = A[el.dataset.anim]; if (f) f(el); });
   document.querySelectorAll(".calc").forEach((el) => { const f = CALC[el.dataset.calc]; if (f) f(el); });
+  // 动画、计算器插进页面后高度变了：带 #节 打开时再对准一次
+  if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) setTimeout(() => t.scrollIntoView(), 60); }
 })();
 
 </script>

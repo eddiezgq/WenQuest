@@ -107,15 +107,18 @@ def run(obj=None, part="", mesh_mm=1.2, solve=True, workdir=None):
     smax = max(res.vonMises)
     out.update(vm_max_mpa=round(smax, 1), disp_max_mm=round(max(res.DisplacementLengths), 5), yield_mpa=sy,
                sf=round(sy / smax, 1) if smax > 0 else None)
-    try:
+    try:                                        # 有界面时：结果网格按等效应力上色，零件和原网格藏起来
         import FreeCADGui as Gui
-        import femresult.resulttools as rt  # noqa: F401
-        me.ViewObject.setNodeColorByScalars(list(res.NodeNumbers), list(res.vonMises))
-        me.ViewObject.Visibility = True
-        body.ViewObject.Visibility = False
+        rm = res.Mesh or me
+        rm.ViewObject.setNodeColorByScalars(list(res.NodeNumbers), list(res.vonMises))
+        rm.ViewObject.Visibility = True
+        for o in (body, me, fix, fo):
+            if o is not rm:
+                o.ViewObject.Visibility = False
+        Gui.activeDocument().activeView().viewIsometric()
         Gui.SendMsgToActiveView("ViewFit")
-    except Exception:  # noqa: BLE001
-        pass
+    except Exception as e:  # noqa: BLE001
+        App.Console.PrintWarning("问渠缝纫机：结果上色没成功（%s），可在 FEM 工作台里双击结果对象查看。\n" % e)
     return out
 
 

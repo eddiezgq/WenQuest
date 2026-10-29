@@ -6,7 +6,7 @@
 生成：
   apps/web/src/static/help/sewing/index.html            网页版帮助（learn.wenquestrobotics.com/static/help/sewing/）
   apps/web/src/static/help/sewing-freecad/index.html    FreeCAD 版帮助的在线一份
-  apps/web/src/static/help/media/…                      两份共用的视频、封面、字幕、截图
+  apps/web/src/static/help/media/…                      两份共用的视频、封面、字幕（原件就放这里，tools/ 里的录屏程序生成）
   services/gateway/app/sewcore/freecad/help/…           FreeCAD 版帮助的离线一份（随工作台安装包，带 FreeCAD 的视频）
 
 源文件：sections/*.md（Markdown + 几种指令，见 README.md）、template.html（版式）、anim.js（动画与小计算器）。
@@ -162,7 +162,7 @@ def directive(name, a, ed, media_prefix):
         if a.get("p"):
             from urllib.parse import quote
             q.append("p=" + quote(a["p"]))
-        url = ("/" if ed == "web" else ONLINE + "/") + "#/pages/sewing/sewing?" + "&".join(q)
+        url = ("/" if ed == "web" else ONLINE + "/") + "pages/sewing/sewing?" + "&".join(q)     # 网页端用 history 路由
         return f'<a class="try" href="{e(url)}" target="_blank" rel="noopener">▶ 试一试：{e(a["label"])}</a>'
     raise ValueError("unknown directive " + name)
 
@@ -241,13 +241,8 @@ def main():
     data["cats"] = PL.cats_public()
     data["ai"] = {k: vals[k] for k in ("bad6", "n_bad6", "ok6b", "mbd_diff", "checks_lockstitch")}
     data["fatigue"] = json.loads((HERE / "data/web_cae.json").read_text())["fatigue"]
-    media = HERE / "media"
-    if MEDIA_OUT.exists():
-        shutil.rmtree(MEDIA_OUT)
-    MEDIA_OUT.mkdir(parents=True)
-    for f in media.glob("*"):
-        if f.is_file():
-            shutil.copy2(f, MEDIA_OUT / f.name)
+    media = MEDIA_OUT                    # 视频、封面、字幕只存一份：就放在网页版的静态目录里（录屏程序在 tools/ 里）
+    media.mkdir(parents=True, exist_ok=True)
     build("web", vals, data, WEB_OUT, "../media/")
     build("freecad", vals, data, FC_ONLINE, "../media/")
     # 离线版：只带 FreeCAD 的视频（fc-*）和截图，网页版的视频点了就去在线

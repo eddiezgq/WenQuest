@@ -528,11 +528,11 @@ def open_help():
 
 
 def register():
-    cmds = [("WQS_New", Cmd("新建平缝机设计", "按默认（教材算例）参数生成平缝机机构零件和校核", new_design)),
-            ("WQS_NewOverlock", Cmd("新建包缝机设计", "按教材第 9 讲算例机生成包缝机机构零件和校核", lambda: new_design("overlock"))),
-            ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机弯针定时校核与耗线量、线团计划（第一期没有三维零件）", lambda: new_design("cover"))),
-            ("WQS_NewPattern", Cmd("新建花样机设计", "电子花样机：离布窗口、转速上限、前瞻调速、X/Y 伺服与同步带校核（没有三维零件）", lambda: new_design("pattern"))),
-            ("WQS_NewEmbroid", Cmd("新建刺绣机设计", "多头刺绣机：绷架加速度、转速上限、断线补绣与全机效率（没有三维零件）", lambda: new_design("embroid"))),
+    cmds = [("WQS_New", Cmd("新建平缝机设计", "按默认（教材算例）参数生成平缝机机构零件和校核", new_design, needs=False)),
+            ("WQS_NewOverlock", Cmd("新建包缝机设计", "按教材第 9 讲算例机生成包缝机机构零件和校核", lambda: new_design("overlock"), needs=False)),
+            ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机弯针定时校核与耗线量、线团计划（第一期没有三维零件）", lambda: new_design("cover"), needs=False)),
+            ("WQS_NewPattern", Cmd("新建花样机设计", "电子花样机：离布窗口、转速上限、前瞻调速、X/Y 伺服与同步带校核（没有三维零件）", lambda: new_design("pattern"), needs=False)),
+            ("WQS_NewEmbroid", Cmd("新建刺绣机设计", "多头刺绣机：绷架加速度、转速上限、断线补绣与全机效率（没有三维零件）", lambda: new_design("embroid"), needs=False)),
             ("WQS_Recompute", Cmd("重新计算", "改了参数后重算零件与校核（Ctrl+R 也可以）", recompute)),
             ("WQS_Checks", Cmd("校核结果", "红绿灯列表：惯性力、钩线、挑线、送布、张力、共振、尺寸链", show_checks)),
             ("WQS_Timing", Cmd("时序图", "针杆、钩线窗口、送布、挑线的时序", show_timing)),
@@ -542,7 +542,7 @@ def register():
             ("WQS_Export", Cmd("导出参数", "存成参数文件，可在问渠网页版打开", export_params)),
             ("WQS_Submit", Cmd("提交到问渠工厂", "用“问渠”工作台把整套零件提交到数字工厂审批", submit)),
             ("WQS_Ai", Cmd("AI 助手", "一句话改设计、解释红黄灯、写设计说明（要联网和钥匙；判定由计算核心做，点“采用”才改）", ai_dialog)),
-            ("WQS_Parts", Cmd("插入本单位零件", "从本单位零件库查找零件，插入三维或把参数用到当前设计（要联网和钥匙）", insert_part)),
+            ("WQS_Parts", Cmd("插入本单位零件", "从本单位零件库查找零件，插入三维或把参数用到当前设计（要联网和钥匙）", insert_part, needs=False)),
             ("WQS_Help", Cmd("帮助", "打开帮助：怎么用、内核、零件库、AI、CAE 快速上手（断网也能看）", open_help, needs=False))]
     for name, c in cmds:
         Gui.addCommand(name, c)

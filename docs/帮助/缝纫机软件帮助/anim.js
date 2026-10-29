@@ -378,4 +378,6 @@
 
   document.querySelectorAll(".anim").forEach((el) => { const f = A[el.dataset.anim]; if (f) f(el); });
   document.querySelectorAll(".calc").forEach((el) => { const f = CALC[el.dataset.calc]; if (f) f(el); });
+  // 动画、计算器插进页面后高度变了：带 #节 打开时再对准一次
+  if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) setTimeout(() => t.scrollIntoView(), 60); }
 })();
