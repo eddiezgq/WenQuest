@@ -38,10 +38,12 @@ ONLINE = "https://learn.wenquestrobotics.com"
 # 两份帮助各自的章节顺序：(文件, 编号)。common/ 两份都有；web/、freecad/ 各自的
 EDITIONS = {
     "web": dict(title="缝纫机设计软件 · 网页版帮助", short="网页版帮助", other=("FreeCAD 版帮助", "../sewing-freecad/index.html"),
-                files=["web/00-intro", "web/01-start", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
+                files=["web/00-intro", "web/01-start", "common/cases", "common/case-lockstitch", "common/case-overlock", "common/case-cover",
+                       "common/case-pattern", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
                        "common/kernel", "common/arch", "web/04-account", "common/faq"]),
     "freecad": dict(title="缝纫机设计软件 · FreeCAD 工作台帮助", short="FreeCAD 版帮助", other=("网页版帮助", ONLINE + "/static/help/sewing/index.html"),
-                    files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "freecad/03-console", "common/ai", "common/cae",
+                    files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "common/cases", "common/case-lockstitch",
+                               "common/case-overlock", "common/case-cover", "common/case-pattern", "freecad/03-console", "common/ai", "common/cae",
                            "common/lib", "common/kernel", "common/arch", "common/faq"]),
 }
 
@@ -90,7 +92,84 @@ def numbers():
     v["motor_peak"] = round(cae["motor"]["peak_nm"], 2)
     v["motor_rms"] = round(cae["motor"]["rms_nm"], 2)
     v["cae_date"] = cae["date"]
+    v.update(case_numbers())
     return v
+
+
+def case_numbers():
+    """四个典型案例（第 52 轮）：tools/run_cases.py 真算的结果；文中用 {{ls.crank_fea.vm}} 这样的路径取，派生的数在这里算"""
+    d = json.loads((HERE / "data/cases.json").read_text())
+    v = {"ls": d["lockstitch"], "ol": d["overlock"], "cv": d["cover"], "pt": d["pattern"], "case_date": d["date"]}
+    L, O, P = d["lockstitch"], d["overlock"], d["pattern"]
+    pct = lambda x: round((1 - x) * 100)                                       # noqa: E731
+    v["ls_topo_cut"] = pct(L["crank_topo"]["mass_ratio"])
+    v["ls_cam_save"] = round(L["crank_cam"]["time_s"] - L["crank_cam_topo"]["time_s"], 1)
+    v["ls_mbd_diff"] = round(L["mbd"]["diff"] * 100, 1)
+    v["ls_need_rms"] = round(L["up6000_motor"]["rms"] * L["up6000_motor"]["safety"], 1)
+    v["ls_need_peak"] = round(L["up6000_motor"]["peak"] * L["up6000_motor"]["safety"], 1)
+    v["ls_lib_rms"] = round(L["up6000_motor_lib"]["rms_use"] * 100)
+    v["ls_lib_peak"] = round(L["up6000_motor_lib"]["peak_use"] * 100)
+    v["ls_chain"] = round(L["base"]["chain"]["y_int"] * 100, 1)
+    v["ol_cut50"] = pct(O["rocker_topo50"]["mass_ratio"])
+    v["ol_cut40"] = pct(O["rocker_topo40"]["mass_ratio"])
+    v["ol_life50"] = round(O["rocker_topo50"]["verify"]["life_y"], 1)
+    v["ol_opt_gamma"] = round(O["opt_upper"]["candidates"][0]["value"], 1)
+    lab = {k: zh for g in MS.get("overlock").GROUPS for k, zh, *_ in g[3]}
+    best = O["opt_upper"]["candidates"][0]["params"]
+    v["ol_opt"] = "，".join(f"{lab[k]} = {x}" for k, x in best.items())
+    Ro = MS.get("overlock").analyze(MS.get("overlock").clean(best))
+    v["ol_ulswing_opt"] = next(r["value"] for r in Ro["results"] if r["zh"] == "上弯针摆角") + "°"
+    tools = lambda c: "、".join(c["tools"]) + f"，{len(c['tools'])} 把刀，约 {round(c['time_s'])} 秒"     # noqa: E731
+    v.update(ls_cam=tools(L["crank_cam"]), ls_cam_topo=round(L["crank_cam_topo"]["time_s"]), ol_cam_topo=tools(O["rocker_cam_topo50"]),
+             ol_cam=round(O["rocker_cam"]["time_s"]), pt_cam=tools(P["template_cam"]))
+    v["ls_fix_margin"] = round((1 - float(L["up6000_fix"]["F"].split("/")[0]) / 800) * 100)
+    xa = P["motor_ry8"][0]["current"]
+    v["pt_x_margin"] = round((xa["rated"] / xa["rms"] - 1) * 100)
+    res = O["base"]["results"]
+    v.update(ol_D=res["平整差动比 D*"], ol_ld=res["差动臂长 l_d = D·l_m"], ol_swing=res["下弯针摆角"], ol_tipv=res["下弯针尖最高速度"],
+             ol_crit=res["下弯针偏心临界半径"], ol_ulswing=res["上弯针摆角"], ol_stroke=res["针杆行程（沿针）"])
+    for k in ("ol_swing", "ol_ulswing"):
+        v[k] = v[k].replace(" °", "°")
+    v["ol_ratio40"] = round(O["rocker_topo40"]["verify"]["vm"] / O["rocker_topo50"]["verify"]["vm"], 1)
+    for name, rec in (("ls6000", L["up6000"]),):
+        for c in rec.get("warn", []) + rec.get("bad", []):
+            v[f"{name}_{c['key']}"] = c["value"]
+    C = d["cover"]
+    rows = ["| 线迹 | 针线（每根） | 弯针线 | 覆盖线 | 每厘米线迹总耗线 | 订单总用线 | 线团 |", "|---|---|---|---|---|---|---|"]
+    for st in C["stitches"]:
+        need = [r for r in st["rows"] if r[0].startswith("针线")]
+        lp = next((r for r in st["rows"] if r[0] == "弯针线"), None)
+        cov = next((r for r in st["rows"] if r[0] == "覆盖线"), None)
+        tot = next(r for r in st["rows"] if r[0] == "合计")
+        rows.append(f"| {st['zh']} | {len(need)} 根 × {need[0][1]} | {lp[1] if lp else '—'} | {cov[1] if cov else '—'} | **{tot[1]}** cm/cm | {tot[2]} m | **{tot[3]}** 个 |")
+    v["cv_table"] = "\n".join(rows)
+    v["cv_window"] = C["window"]
+    for k in ("dphi_m6", "dphi_p6"):
+        v["cv_" + k] = "；".join(f"{c['name']} {c['value']}（要求 {c['limit']}）" for c in C[k]["bad"])
+    v["cv_opt"] = C["opt_timing"][0]["params"]["dphi"]
+    lo, hi = (float(x) for x in C["window"].split("…"))
+    v["cv_wwidth"] = round(hi - lo, 1)
+    v["cv_W"] = round(C["order"]["W"] * 100)
+    v["cv_tol"] = round((hi - lo) / 2 - 1.5, 2)
+    v.update(cv_Q=f'{C["order"]["Q"]:,.0f}', cv_L=f'{C["order"]["Lcm"]:g}', cv_cone=f'{C["order"]["cone"]:,.0f}')
+    for st in C["stitches"]:
+        tot = next(r for r in st["rows"] if r[0] == "合计")
+        v[f"cv_m_{st['key']}"], v[f"cv_c_{st['key']}"] = tot[2], tot[3]
+    m = lambda k: float(v[f"cv_m_{k}"].replace(",", ""))                   # noqa: E731
+    v["cv_ratio"] = round(m("605") / m("401"), 1)
+    v["pt_r_opt"] = round(P["motor_ay50"][1]["r_opt"], 1)
+    v["pt_gain"] = int(P["ry8"]["per_h"]) - int(P["base"]["per_h"])
+    y = P["motor_ry8"][1]["current"]
+    v["pt_y8_margin"] = round((y["rated"] / y["rms"] - 1) * 100)
+    v["pt_tpl"] = "{:.0f} × {:.0f} × {:.0f}".format(*P["template_cam"]["template"]["plate"])
+    return v
+
+
+def lookup(vals, path):
+    x = vals
+    for k in path.split("."):
+        x = x[int(k)] if isinstance(x, list) else x[k]
+    return x
 
 
 # ---------- 动画用的数据 ----------
@@ -130,7 +209,8 @@ def anim_data():
     return {"crank": {"r": p["r"], "l": p["l"], "n": p["n"], "mr": p["mr"], "pos": [round(x, 3) for x in pos],
                       "rod": [round(x, 1) for x in rod], "torque": [round(x, 4) for x in torque], "mujoco": [round(x, 4) for x in mj]},
             "fea": {k: fc[k] for k in ("x", "z", "s", "t", "max", "force")},
-            "frame": {"fn": p["fn"], "n": p["n"]}}
+            "frame": {"fn": p["fn"], "n": p["n"]},
+            "explode": json.loads((HERE / "data/explode.json").read_text())}
 
 
 # ---------- Markdown + 指令 ----------
@@ -173,7 +253,7 @@ ONLY = re.compile(r"^::only\{(\w+)\}\s*\n(.*?)^::end\s*$", re.M | re.S)
 
 def render(md, ed, vals, media_prefix):
     md = ONLY.sub(lambda m: m.group(2) if m.group(1) == ed else "", md)
-    md = re.sub(r"\{\{(\w+)\}\}", lambda m: str(vals[m.group(1)]), md)
+    md = re.sub(r"\{\{([\w.]+)\}\}", lambda m: str(lookup(vals, m.group(1))), md)
     blocks = {}
 
     def keep(m):
@@ -261,6 +341,7 @@ def main():
         return f'src="data:text/vtt;base64,{base64.b64encode(p.read_bytes()).decode()}"' if p.exists() else m.group(0)
     page = re.sub(r'src="media/([^"]+\.vtt)"', inline_vtt, page)
     # 离线版里网页版的视频改成在线地址
+    page = page.replace('href="../media/', f'href="{ONLINE}/static/help/media/')          # 下载件（如案例机壳 STEP）走在线地址
     page = re.sub(r'(src|poster)="media/(web-[^"]+)"', lambda m: f'{m.group(1)}="{ONLINE}/static/help/media/{m.group(2)}"', page)
     (FC_OFFLINE / "index.html").write_text(page, encoding="utf-8")
     print("web", (WEB_OUT / "index.html").stat().st_size // 1024, "KB · freecad", (FC_OFFLINE / "index.html").stat().st_size // 1024, "KB ·",

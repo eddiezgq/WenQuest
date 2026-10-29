@@ -1,0 +1,31 @@
+// 第 52 轮 案例二：包缝机——上弯针传动角黄灯、设计优化消掉；下弯针摆杆留 50% / 40% 减重复核
+const { clip } = require('./rec.js');
+clip('web-10-case-ol', 'teacher1', 'Test#2026', async (r) => {
+  const p = r.p, tab = (t) => p.locator('.tab', { hasText: t }).click();
+  await r.sewing(); await p.locator('.mopt', { hasText: '包缝机' }).click(); await r.wait(3000); await tab('校核'); await r.wait(1500);
+  r.cue('案例二：504 三线包缝机，一盏黄灯——上弯针最小传动角 39°，要求 ≥ 40°'); await r.wait(6000);
+  r.cue('下弯针摆大一点行不行？偏心半径 4.36 → 8 mm'); await r.param('下弯针', '偏心半径', 8); await r.wait(1500);
+  r.cue('弧长、弯针尖速度超标，传动角掉下来，离卡死越来越近：五盏黄灯'); await p.evaluate(() => scrollTo(0, 0)); await r.wait(6500);
+  r.cue('点“恢复教材算例参数”回到 4.36 mm'); await p.getByText('恢复教材算例参数').click(); await r.wait(2500);
+  await tab('CAE 分析'); await r.wait(3000);
+  const opt = p.locator('.cae .box', { hasText: '设计优化' }).first(); await opt.scrollIntoViewIfNeeded();
+  r.cue('设计优化，目标：上弯针摆角不变时传动角最大'); await opt.locator('.opt', { hasText: '上弯针' }).click(); await r.wait(6000);
+  r.cue('三组方案，每组都整机校核过；最好的一组传动角 46.7°，红灯 0、黄灯 0。点“采用”'); await r.wait(5000);
+  await opt.locator('.btn', { hasText: '采用' }).first().click(); await r.wait(2000);
+  await tab('校核'); await p.evaluate(() => scrollTo(0, 0)); r.cue('11 项全部合格'); await r.wait(4000);
+  await tab('CAE 分析'); await r.wait(2500);
+  const tp = p.locator('.cae .box', { hasText: '减重与加工' }).first(); await tp.scrollIntoViewIfNeeded();
+  r.cue('零件：下弯针摆杆减重。先留 50%'); await tp.locator('.opt', { hasText: '下弯针摆杆' }).first().click(); await tp.locator('.opt', { hasText: '50%' }).click(); await r.wait(1500);
+  await tp.locator('.btn', { hasText: '提交计算' }).first().click(); await r.wait(2000);
+  await r.job('overlock');
+  r.cue('拓扑优化给出材料该留的地方；减完一定要“送有限元复核”'); await r.wait(4500);
+  await p.locator('.cae .res .btn', { hasText: '送有限元复核' }).first().click(); await r.wait(2000);
+  await r.job('overlock');
+  r.cue('留 50%：安全系数 2.93，寿命 31.9 年——合格'); await r.wait(6500);
+  await tp.scrollIntoViewIfNeeded(); r.cue('再试留 40%'); await tp.locator('.opt', { hasText: '40%' }).click(); await r.wait(1200);
+  await tp.locator('.btn', { hasText: '提交计算' }).first().click(); await r.wait(2000);
+  await r.job('overlock');
+  await p.locator('.cae .res .btn', { hasText: '送有限元复核' }).first().click(); await r.wait(2000);
+  await r.job('overlock');
+  r.cue('留 40%：应力涨到 2.6 倍，安全系数 1.13，寿命不到一年——不合格。用 50% 的那个'); await r.wait(7500);
+});

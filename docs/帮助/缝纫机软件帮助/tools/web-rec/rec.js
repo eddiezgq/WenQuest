@@ -26,6 +26,30 @@ async function clip(name, user, pass, body) {
     cut(on) { if (on) cutStart = now(); else if (cutStart != null) { cuts.push([cutStart, now()]); cutStart = null; } },
     async sewing() { await p.goto('http://localhost:8088/'); await p.waitForTimeout(2500); await p.getByText('缝纫机设计').first().click(); await p.waitForTimeout(3000); },
     async type(loc, text) { await loc.click(); await loc.fill(''); await loc.pressSequentially(text, { delay: 60 }); },
+    async choose(group, label, opt) {   // 选项参数（线迹、花样……）
+      const g = p.locator('.grp', { hasText: group }).first();
+      if (!(await g.locator('.prm').count())) { await g.locator('.gt').click(); await p.waitForTimeout(300); }
+      const o = g.locator('.prm', { hasText: label }).locator('.opt', { hasText: opt }).first();
+      await o.scrollIntoViewIfNeeded(); await o.click(); await p.waitForTimeout(900);
+    },
+    async api(method, url, body) {     // 幕后调接口（录屏前后准备、清理数据），用同一个账号
+      if (!api._tok) api._tok = (await (await fetch('http://localhost:8090/api/v1/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username: user, password: pass }) })).json()).token;
+      const r = await fetch('http://localhost:8090' + url, { method, headers: { authorization: 'Bearer ' + api._tok, 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+      return r.json();
+    },
+    async job(machine) {               // 等最新的 CAE 任务算完（等待段剪掉），再在“计算任务”里点开它
+      api.cut(true);
+      for (let i = 0; i < 300; i++) {
+        const j = (await api.api('GET', '/api/v1/sewing/cae/jobs?machine=' + machine)).jobs[0];
+        if (j && (j.status === 'done' || j.status === 'failed')) break;
+        await p.waitForTimeout(2000);
+      }
+      const box = p.locator('.cae .box', { hasText: '计算任务' }).first();
+      await box.locator('.link', { hasText: '刷新' }).click(); await p.waitForTimeout(1500);
+      await box.locator('.job').first().click(); await p.waitForTimeout(3500);
+      api.cut(false);
+      await p.evaluate(() => { const x = [...document.querySelectorAll('.cae .res')].find((e) => e.querySelector(':scope > .ct')); x && x.scrollIntoView({ block: 'start' }); });
+    },
     async param(group, label, value) {
       const g = p.locator('.grp', { hasText: group }).first();
       if (!(await g.locator('.prm').count())) { await g.locator('.gt').click(); await p.waitForTimeout(300); }

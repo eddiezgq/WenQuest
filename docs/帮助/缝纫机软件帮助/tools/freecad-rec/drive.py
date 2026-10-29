@@ -28,8 +28,10 @@ def console():
     return mw.findChild(QtW.QPlainTextEdit, "Python console")
 
 def typecmd(cmd):
+    """往控制台里一个字一个字写（不用模拟按键：虚拟显示器的键盘布局会把 ; = 这类符号打错），再回车"""
     c = console(); c.setFocus()
-    QtTest.QTest.keyClicks(c, cmd, delay=45)
+    for ch in cmd:
+        c.insertPlainText(ch); QtW.QApplication.processEvents(); time.sleep(0.03)
     QtTest.QTest.keyClick(c, QtCore.Qt.Key_Return)
 
 def design():
@@ -175,7 +177,33 @@ def S_fem():
         (5000, None),
     ]
 
-SCRIPTS = {"fc-01-install": S_install, "fc-02-design": S_design, "fc-03-checks": S_checks, "fc-04-ai": S_ai, "fc-05-parts": S_parts, "fc-06-fem": S_fem}
+def S_case_ls():   # 第 52 轮 案例一（FreeCAD）
+    os.makedirs("/home/claude/fc/out", exist_ok=True)
+    def setp(**kw):
+        d = design()
+        for k, v in kw.items():
+            setattr(d, "P_" + k, float(v))
+        App.ActiveDocument.recompute(); select(d)
+    return [
+        (1200, lambda: (Gui.activateWorkbench("WenQuestSewingWorkbench"), cue("案例一（FreeCAD）：点“新建平缝机设计”，生成 16 个机构零件和 21 项校核"))),
+        (1500, lambda: (action("新建平缝机设计"), fit())),
+        (4000, lambda: (select(design()), show_props(), cue("选中“平缝机设计”，属性里把转速 P_n 改成 6000，Ctrl+R 重算"))),
+        (2500, lambda: setp(n=6000)),
+        (1500, lambda: (cue("不合格 2 项：针杆惯性力、机壳共振。和网页版一样"), action("校核结果"))),
+        (5500, lambda: (close_dialogs(), cue("P_mr 改成 0.10（针杆组件减重），P_fn 改成 240（机壳加筋），再重算"))),
+        (2500, lambda: setp(mr=0.10, fn=240)),
+        (1500, lambda: (cue("全部合格"), action("校核结果"))),
+        (4500, lambda: (close_dialogs(), cue("本机有限元：控制台一行，FreeCAD 自带的 Gmsh + CalculiX，受力按 6000 r/min 自动加"), console())),
+        (1500, lambda: typecmd("import wqsew_gui, wqsew_feature as F, wqsew_fem; d = wqsew_gui.design(True); r = wqsew_fem.run(d); print(r)")),
+        (3000, "wait_fem"),
+        (500, lambda: (fit(), cue("针杆曲柄的应力云图；控制台打印了最大应力和安全系数"))),
+        (6500, lambda: cue("导出 STEP：16 个零件，交给结构设计或任何 CAD")),
+        (1500, lambda: typecmd('F.export_step(d, "/home/claude/fc/out/ls-6000.step")')),
+        (4000, lambda: cue("服务器上的 CAE（模态、动力学、减重、数控、电机选型）在网页版做；参数文件两边互通")),
+        (5000, None),
+    ]
+
+SCRIPTS = {"fc-07-case-ls": S_case_ls, "fc-01-install": S_install, "fc-02-design": S_design, "fc-03-checks": S_checks, "fc-04-ai": S_ai, "fc-05-parts": S_parts, "fc-06-fem": S_fem}
 
 def run():
     mw.setGeometry(0, 0, 1280, 720); mw.showMaximized()
@@ -196,7 +224,7 @@ def run():
                     cue("__cut_end__"); QtCore.QTimer.singleShot(1500, lambda: nxt(i + 1))
                 else:
                     QtCore.QTimer.singleShot(500, poll)
-            cue("__cut_start__"); QtCore.QTimer.singleShot(delay, poll)
+            QtCore.QTimer.singleShot(delay, lambda: (cue("__cut_start__"), poll()))   # 从真正开始等的时候剪（上一步打字时不剪）
             return
         def go():
             nxt(i + 1)                      # 先排好下一步：这一步可能打开模态对话框（exec_ 会卡住）

@@ -11,6 +11,9 @@ FreeCAD 是开源的参数化三维 CAD。“问渠缝纫机”工作台把问�
 | 适合 | 在三维 CAD 里继续建模、出图、本机有限元 | 方案比较、团队共享项目、CAE、零件库管理 |
 | 结果 | 同一组参数，两边结果完全一样（参数文件互通） | |
 
+**第一次用？从案例开始**：[典型案例](#cases)里有平缝、包缝、绷缝、花样四个案例；案例一另有 FreeCAD 里的做法和录屏。
+{: .start }
+
 五种机型：{{name_lockstitch}}（{{checks_lockstitch}} 项校核）、{{name_overlock}}（{{checks_overlock}} 项）、{{name_cover}}（{{checks_cover}} 项）、{{name_pattern}}（{{checks_pattern}} 项）、{{name_embroid}}（{{checks_embroid}} 项）。平缝机、包缝机有三维机构零件；另外三种是校核和计划（没有三维零件）。
 
 ### 一张图看懂整套系统

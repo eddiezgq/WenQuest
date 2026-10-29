@@ -376,6 +376,62 @@
     run();
   };
 
+  // ---------- 整机拆装：教材平缝机虚拟样机的 27 个零件，按七组拆开再装回（第 52 轮） ----------
+  A.explode = (el) => {
+    const D0 = DATA.explode, S = canvas(el, 430);
+    const GR = { F: "机壳", N: "刺布", T: "挑线", H: "钩线", D: "送布", S: "传动", X: "附件" };
+    const COL = { F: "#7f97ad", N: "#c8453b", T: "#d99a1e", H: "#2f9a5a", D: "#8b5cc4", S: "#3b4650", X: "#a07a4f" };
+    const SHELL = ["body", "face", "top", "rear"];
+    const b = bar(el, `<button data-k="auto" class="on">自动拆装</button><span>拆开</span><input type="range" min="0" max="100" value="0"><span>只看</span>` +
+      ["all", ...Object.keys(GR)].map((k) => `<button data-g="${k}" class="${k === "all" ? "on" : ""}">${k === "all" ? "全部" : k + " " + GR[k]}</button>`).join(""));
+    const ci = cap(el, "鼠标移到零件上看编号和名称。");
+    const rg = b.querySelector("input");
+    let auto = true, grp = "all", t0 = performance.now(), hover = null, mx = -1, my = -1;
+    b.querySelector("[data-k=auto]").onclick = (e) => { auto = !auto; e.target.classList.toggle("on", auto); t0 = performance.now(); };
+    rg.oninput = () => { auto = false; b.querySelector("[data-k=auto]").classList.remove("on"); };
+    b.querySelectorAll("[data-g]").forEach((x) => (x.onclick = () => { grp = x.dataset.g; b.querySelectorAll("[data-g]").forEach((y) => y.classList.toggle("on", y === x)); }));
+    S.cv.addEventListener("mousemove", (e) => { const r = S.cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; });
+    S.cv.addEventListener("mouseleave", () => { mx = my = -1; });
+    const parts = D0.parts.filter((p) => p.rings.length).sort((a, b2) => (a.key === "table" ? -1e9 : a.depth) - (b2.key === "table" ? -1e9 : b2.depth));
+    const L = (p) => p.code[0];
+    visible(el, (t) => {
+      let e = +rg.value / 100;
+      if (auto) { const s = ((t - t0) / 1000) % 9; e = s < 1.5 ? 0 : s < 4 ? (s - 1.5) / 2.5 : s < 6 ? 1 : s < 8.5 ? 1 - (s - 6) / 2.5 : 0; e = e * e * (3 - 2 * e); rg.value = Math.round(e * 100); }
+      const c = C(), g = S.g; S.begin();
+      const W = S.W(), H = S.H, bx = D0.view;
+      const k = Math.min((W - 20) / (bx[2] - bx[0]), (H - 20) / (bx[3] - bx[1]));
+      const ox = (W - k * (bx[2] - bx[0])) / 2 - k * bx[0], oy = 10 - k * bx[1];
+      const P = (p, x, y) => [ox + k * (x + e * p.ex[0]), oy + k * (y + e * p.ex[1])];
+      hover = null;
+      for (const p of parts) {
+        const on = grp === "all" || L(p) === grp;
+        const shell = SHELL.includes(p.key);
+        g.globalAlpha = p.key === "table" ? 0.25 : shell ? (on && grp !== "all" ? 0.55 : 0.18) : on ? 0.92 : 0.12;
+        g.fillStyle = COL[L(p)]; g.strokeStyle = c.ink; g.lineWidth = 0.6;
+        for (const r of p.rings) {
+          g.beginPath(); r.forEach(([x, y], i) => { const [u, v] = P(p, x, y); i ? g.lineTo(u, v) : g.moveTo(u, v); }); g.closePath(); g.fill();
+          g.globalAlpha = Math.min(1, g.globalAlpha + 0.2); g.stroke();
+          if (mx >= 0 && p.key !== "table" && (!shell || grp !== "all") && on && g.isPointInPath(mx * devicePixelRatio, my * devicePixelRatio)) hover = p;
+        }
+      }
+      g.globalAlpha = 1;
+      if (e > 0.6) { // 拆开时标出编号
+        for (const p of parts) {
+          if (p.key === "table" || (grp !== "all" && L(p) !== grp) || (grp === "all" && "FX".includes(L(p)) && !["face", "top", "rear", "plate"].includes(p.key))) continue;
+          const r = p.rings[0], cx = r.reduce((s, q) => s + q[0], 0) / r.length, cy = r.reduce((s, q) => s + q[1], 0) / r.length;
+          const [u, v] = P(p, cx, cy);
+          txt(g, p.code, u, v - 4, c.ink, 11, "center", true);
+        }
+      }
+      if (hover) {
+        rbox(g, 10, H - 34, Math.min(W - 20, 420), 26, 6, c.paper, COL[L(hover)], 1.5);
+        txt(g, `${hover.code}　${hover.zh}（${GR[L(hover)]}）`, 20, H - 16, c.ink, 13, "left", true);
+      }
+      txt(g, `教材平缝机虚拟样机 · ${D0.parts.length} 个零件编号`, W - 10, 18, c.muted, 12, "right");
+      ci.textContent = hover ? "" : "鼠标移到零件上看编号和名称；点上面的分组只看一组。机壳、面板、顶盖、后盖画成半透明，好看见里面的机构。";
+    });
+  };
+
   document.querySelectorAll(".anim").forEach((el) => { const f = A[el.dataset.anim]; if (f) f(el); });
   document.querySelectorAll(".calc").forEach((el) => { const f = CALC[el.dataset.calc]; if (f) f(el); });
   // 动画、计算器插进页面后高度变了：带 #节 打开时再对准一次
