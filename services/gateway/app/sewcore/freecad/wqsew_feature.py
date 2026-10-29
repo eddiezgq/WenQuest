@@ -194,3 +194,16 @@ def import_params(obj, path):
 def export_step(obj, path):
     import Import
     Import.export(list(obj.Parts), path)
+
+
+def apply_params(obj, changes):
+    """第 49 轮：AI 助手“采用”、插入本单位零件“用到设计”——把几个参数写进设计对象并重算（夹到范围里）"""
+    M = SewDesign.machine(obj)
+    p = M.clean(dict(obj.Proxy.params(obj), **{k: v for k, v in (changes or {}).items() if k in M.PARAMS}))
+    done = {}
+    for k in changes or {}:
+        if k in M.PARAMS:
+            setattr(obj, _pname(k), p[k] if k in M.CHOICES else float(p[k]))
+            done[k] = p[k]
+    obj.Document.recompute()
+    return done

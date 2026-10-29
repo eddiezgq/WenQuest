@@ -5,6 +5,9 @@
       <text class="h1">{{ t("sew.title") }}</text>
       <text class="lead">{{ t("sew.lead") }}</text>
       <view class="who">
+        <!-- #ifdef H5 -->
+        <text class="link help" @click="help">？{{ t("sew.help") }}</text>
+        <!-- #endif -->
         <text v-if="me.licensed" class="chip ok">{{ t("sew.licensed", { org: me.org || "" }) }}</text>
         <template v-else>
           <text class="chip">{{ me.login ? t("sew.notLicensed") : t("sew.guest") }}</text>
@@ -43,6 +46,12 @@
           <view class="gt" @click="open[g.key] = !open[g.key]">
             <text>{{ L(g) }}</text><text class="muted">{{ open[g.key] ? "−" : "+" }}</text>
           </view>
+          <view v-if="open[g.key] && libFor(g).length" class="libpick">
+            <text class="link small" @click="libOpen[g.key] = !libOpen[g.key]">{{ t("sew.lib.pick", { n: libFor(g).length }) }} {{ libOpen[g.key] ? "▴" : "▾" }}</text>
+            <view v-if="libOpen[g.key]">
+              <text v-for="it in libFor(g)" :key="it.id + it.label" class="libitem" @click="applyParams(it.params)">{{ it.code }} {{ it.name }} · {{ it.label }}</text>
+            </view>
+          </view>
           <view v-if="open[g.key]">
             <view v-for="p in g.params" :key="p.key" class="prm">
               <text class="pl">{{ L(p) }}<text v-if="p.unit" class="muted"> · {{ p.unit }}</text></text>
@@ -66,6 +75,7 @@
 
       <!-- 结果 -->
       <view class="right">
+        <SewAi :machine="machine" :params="params" :licensed="me.licensed" @apply="applyParams" @desc="(s: string[]) => { desc = s; tab = 'export'; msg = t('sew.ai.descReady'); }" />
         <view class="summary" :class="R ? (R.ok ? (warns ? 'warn' : 'ok') : 'bad') : ''">
           <text v-if="!R">{{ t("sew.computing") }}</text>
           <text v-else-if="R.ok && !warns">✓ {{ t("sew.allOk", { n: R.checks.length }) }}</text>
@@ -148,12 +158,19 @@
           <SewCae :machine="machine" :params="params" :licensed="me.licensed" :active="tab === 'cae'" :labels="plabels" @apply="applyParams" />
         </view>
 
+        <!-- 本单位零件库（第 49 轮） -->
+        <view v-show="tab === 'lib'" class="pane">
+          <SewParts :machine="machine" :licensed="me.licensed" :active="tab === 'lib'" @apply="applyParams" @changed="loadLib" />
+        </view>
+
         <!-- 导出 -->
         <view v-show="tab === 'export'" class="pane">
           <view v-if="!me.licensed" class="note">{{ t("sew.expLocked") }} <text class="link" @click="contact">{{ t("sew.contact") }} →</text></view>
           <view class="lrow"><text class="muted">{{ t("sew.lang") }}</text>
             <text class="opt" :class="{ on: flang === 'zh' }" @click="flang = 'zh'">中文</text>
             <text class="opt" :class="{ on: flang === 'en' }" @click="flang = 'en'">English</text></view>
+          <view v-if="desc.length" class="lrow"><text class="opt" :class="{ on: withDesc }" @click="withDesc = !withDesc">{{ withDesc ? "✓ " : "" }}{{ t("sew.ai.withDesc") }}</text>
+            <text class="muted small">{{ desc.join("").slice(0, 60) }}…</text></view>
           <view v-for="k in kinds" :key="k" class="exp" :class="{ locked: !me.licensed }" @click="download(k)">
             <text>{{ t("sew.exp." + k) }}</text><text class="muted">{{ making === k ? t("sew.making") : "↓" }}</text>
           </view>
@@ -192,7 +209,9 @@ import { computed, reactive, ref, watch } from "vue";
 import { ApiError, BASE, request, token } from "../../api";
 import { siteUrl } from "../../accountApi";
 import { errorText, locale, t } from "../../i18n";
+import SewAi from "./SewAi.vue";
 import SewCae from "./SewCae.vue";
+import SewParts from "./SewParts.vue";
 
 interface Choice { key: string; zh: string; en: string }
 interface Param { key: string; zh: string; en: string; unit: string; default: number | string; min: number; max: number; step: number; choices: Choice[] }
@@ -208,7 +227,7 @@ const kinds = ref<string[]>(["report", "card", "params", "step", "macro", "dxf",
 const machines = ref<Choice[]>([]);
 const machine = ref("lockstitch");
 const COLORS = ["#2d6fb3", "#7d5ba6", "#c0392b", "#2e9e6a", "#e8913a"];
-const tabs = ["proto", "checks", "timing", "parts", "cae", "export"];
+const tabs = ["proto", "checks", "timing", "parts", "cae", "lib", "export"];
 
 const schema = ref<Group[]>([]);
 const params = reactive<Record<string, number | string>>({});
@@ -408,10 +427,32 @@ function path(c: Chart) {
   return s;
 }
 
+// ---------- 第 49 轮：AI 设计说明、本单位零件库、帮助 ----------
+const desc = ref<string[]>([]);
+const withDesc = ref(true);
+watch(machine, () => { desc.value = []; });
+const libItems = ref<{ id: number; code: string; name: string; label: string; params: Record<string, number> }[]>([]);
+const libOpen = reactive<Record<string, boolean>>({});
+async function loadLib() {
+  if (!me.value.licensed) { libItems.value = []; return; }
+  try { libItems.value = (await request<{ items: any[] }>("GET", `/api/v1/sewing/parts/for?machine=${machine.value}`)).items; } catch { libItems.value = []; }
+}
+watch(machine, loadLib);
+function libFor(g: Group) {
+  const keys = new Set(g.params.map((p) => p.key));
+  return libItems.value.filter((it) => Object.keys(it.params).some((k) => keys.has(k)));
+}
+const HELP: Record<string, string> = { proto: "proto", checks: "checks", timing: "timing", parts: "parts", cae: "cae", lib: "lib", export: "export" };
+function help() {
+  // #ifdef H5
+  window.open(`/static/help/sewing/index.html#${HELP[tab.value] || ""}`, "_blank", "noopener");
+  // #endif
+}
+
 // ---------- 账号、项目 ----------
 async function loadMe() {
   try { me.value = await request("GET", "/api/v1/sewing/me"); } catch { /* guest */ }
-  if (me.value.licensed) await loadProjects();
+  if (me.value.licensed) { await loadProjects(); loadLib(); }
   if (me.value.admin) await loadLicenses();
 }
 async function loadProjects() {
@@ -471,7 +512,8 @@ async function download(kind: string) {
     const res = await fetch(`${BASE}${isZip ? "/api/v1/sewing/freecad.zip" : `/api/v1/sewing/export/${kind}`}`, {
       method: isZip ? "GET" : "POST",
       headers: { Authorization: `Bearer ${token.value}`, "Content-Type": "application/json" },
-      body: isZip ? undefined : JSON.stringify({ machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value }),
+      body: isZip ? undefined : JSON.stringify({ machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value,
+        desc: kind === "report" && withDesc.value ? desc.value : [] }),
     });
     if (!res.ok) {
       let code = `http_${res.status}`;
@@ -550,6 +592,10 @@ init();
 .chip.ok { background: #e6f4ea; color: #2e7d4f; }
 .link { color: var(--wq-link); font-size: 14px; cursor: pointer; white-space: nowrap; }
 .link.danger { color: var(--wq-muted); }
+.link.help { font-weight: 600; }
+.libpick { margin: -2px 0 6px; }
+.libitem { display: block; font-size: 12.5px; padding: 4px 8px; margin-top: 4px; border: 1px dashed #b9cfe4; border-radius: 6px; cursor: pointer; color: #1d4e75; }
+.libitem:hover { background: #f3f7fb; }
 .muted { color: var(--wq-muted); }
 .small { font-size: 12px; }
 .hint { display: block; color: var(--wq-muted); font-size: 13px; line-height: 1.6; margin-top: 8px; }

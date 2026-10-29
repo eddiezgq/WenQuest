@@ -112,13 +112,17 @@ def check_fields(cat, fields):
 
 def param_values(cat, fields, machine):
     """这个零件接进某机型的哪些参数：[{label, params}]"""
+    from .machines import MACHINES
     c = CATS.get(cat) or {}
     res = []
     for m, zh, mp in c.get("uses", []):
         if m != machine:
             continue
         ps = {pk: fields[fk] for pk, fk in mp.items() if fk in fields}
-        if len(ps) == len(mp):
+        if len(ps) != len(mp):
+            continue
+        spec = MACHINES[m].PARAMS                     # 值超出这个参数的范围就不给（例：孔距 55 的连杆不能当曲柄半径用）
+        if all(spec[k][5] is None or spec[k][5] <= v <= spec[k][6] for k, v in ps.items()):
             res.append(dict(label=zh, params=ps))
     return res
 

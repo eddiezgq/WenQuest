@@ -28,10 +28,15 @@
         <!-- #ifdef H5 -->
         <view class="row">
           <view class="btn ghost sm" @click="chooseFile">{{ t("sew.cae.choose") }}</view>
-          <text class="file">{{ frameFile ? frameFile.name : t("sew.cae.noFile") }}</text>
+          <text class="file">{{ frameFile ? frameFile.name : framePart ? framePartName : t("sew.cae.noFile") }}</text>
           <text v-for="m in FRAME_MATS" :key="m" class="opt" :class="{ on: fmat === m }" @click="fmat = m">{{ m }}</text>
         </view>
-        <view class="btn" :class="{ disabled: !canRun || !frameFile }" @click="submitFrame">{{ t("sew.cae.run") }}</view>
+        <!-- 第 49 轮：直接用本单位零件库里的机壳 / 绷架 -->
+        <view v-if="frameParts.length" class="row">
+          <text class="hint">{{ t("sew.cae.fromLib") }}</text>
+          <text v-for="p in frameParts" :key="p.id" class="opt" :class="{ on: framePart === p.id }" @click="pickFramePart(p)">{{ p.code }} {{ p.name }}</text>
+        </view>
+        <view class="btn" :class="{ disabled: !canRun || (!frameFile && !framePart) }" @click="submitFrame">{{ t("sew.cae.run") }}</view>
         <!-- #endif -->
       </view>
 
@@ -234,7 +239,7 @@ const lang = computed(() => (locale.value === "en" ? "en" : "zh"));
 const L = (x: { zh: string; en: string }) => (lang.value === "en" ? x.en || x.zh : x.zh || x.en);
 const canRun = computed(() => !!opt.value?.connected && !busy.value);
 const n1 = (v: number | null | undefined) => (v == null ? "—" : Number(v).toFixed(1));
-const mn = (x: string) => (lang.value === "en" ? String(x).replace("伺服", "Servo") : x);   // 工厂电机表的名字是中文
+const mn = (x: string) => (lang.value === "en" ? String(x).replace("伺服", "Servo").replace("本单位 · ", "Own · ") : x);   // 工厂电机表的名字是中文
 const n2 = (v: number | null | undefined) => (v == null ? "—" : Number(v).toFixed(2));
 const n3 = (v: number | null | undefined) => (v == null ? "—" : Number(v).toFixed(3));
 const fail = (e: unknown) => { msg.value = errorText(e instanceof ApiError ? e.code : "unknown"); };
@@ -310,18 +315,34 @@ function chooseFile() {
   const el = document.createElement("input");
   el.type = "file";
   el.accept = ".step,.stp";
-  el.onchange = () => { frameFile.value = el.files?.[0] || null; };
+  el.onchange = () => { frameFile.value = el.files?.[0] || null; if (frameFile.value) framePart.value = 0; };
   el.click();
   // #endif
 }
+// 第 49 轮：本单位零件库里有 STEP 的机壳 / 绷架
+const frameParts = ref<{ id: number; code: string; name: string }[]>([]);
+const framePart = ref(0);
+const framePartName = computed(() => { const p = frameParts.value.find((x) => x.id === framePart.value); return p ? `${p.code} ${p.name}` : ""; });
+async function loadFrameParts() {
+  if (!props.licensed) return;
+  try {
+    const r = await request<{ parts: any[] }>("GET", "/api/v1/sewing/parts?cat=frame&status=ok");
+    frameParts.value = r.parts.filter((p) => p.has_step).map((p) => ({ id: p.id, code: p.code, name: p.name }));
+  } catch { frameParts.value = []; }
+}
+function pickFramePart(p: { id: number }) {
+  framePart.value = framePart.value === p.id ? 0 : p.id;
+  if (framePart.value) frameFile.value = null;
+}
 async function submitFrame() {
-  if (!canRun.value || !frameFile.value) return;
+  if (!canRun.value || (!frameFile.value && !framePart.value)) return;
   busy.value = "frame";
   msg.value = "";
   // #ifdef H5
   try {
     const fd = new FormData();
-    fd.append("file", frameFile.value);
+    if (framePart.value) fd.append("part_id", String(framePart.value));
+    else if (frameFile.value) fd.append("file", frameFile.value);
     fd.append("machine", props.machine);
     fd.append("params", JSON.stringify(props.params));
     fd.append("material", fmat.value);
@@ -459,6 +480,7 @@ function spark(ys: number[], unit: string) {
 }
 
 watch(() => [props.machine, props.licensed], load, { immediate: true });
+watch(() => [props.licensed, props.active], () => { if (props.active) loadFrameParts(); }, { immediate: true });
 onBeforeUnmount(() => clearTimeout(timer));
 </script>
 

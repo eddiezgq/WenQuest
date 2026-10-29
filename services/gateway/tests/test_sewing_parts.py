@@ -93,7 +93,9 @@ def test_table_import(sc):  # noqa: F811
     ps = c.get("/api/v1/sewing/parts?cat=link", headers=user).json()["parts"]
     assert {p["code"] for p in ps} == {"CR-15", "CR-16"} and all(p["source"] == "table" and p["has_step"] == HAS_BD for p in ps)
     use = c.get("/api/v1/sewing/parts/for?machine=lockstitch", headers=user).json()["items"]
-    assert {(u["code"], u["label"], json.dumps(u["params"])) for u in use} >= {("CR-15", "刺布曲柄", '{"r": 15.5}'), ("CR-16", "针杆连杆", '{"l": 16}')}
+    got = {(u["code"], u["label"], json.dumps(u["params"])) for u in use}
+    assert ("CR-15", "刺布曲柄", '{"r": 15.5}') in got and ("CR-16", "刺布曲柄", '{"r": 16}') in got
+    assert not any(u["label"] == "针杆连杆" for u in use)            # 孔距 16 不在连杆长 35–90 的范围里，不给
     # 拿别的类别的模板来导不行
     other = c.get("/api/v1/sewing/parts/template.xlsx?cat=motor", headers=user).content
     r = c.post("/api/v1/sewing/parts/import", files={"file": ("m.xlsx", other, "application/x")}, data={"cat": "link"}, headers=user)

@@ -261,6 +261,272 @@ def submit():
     importlib.import_module("wq_submit").run_dialog()
 
 
+
+# ---------- 第 49 轮：AI 助手、本单位零件库、帮助 ----------
+import html as _html  # noqa: E402
+import json as _json  # noqa: E402
+
+import wqsew_net as N  # noqa: E402
+
+
+def key_dialog(parent=None):
+    """填钥匙和服务器地址（只在本机保存）"""
+    st = N.settings()
+    d = QtW.QDialog(parent or Gui.getMainWindow())
+    d.setWindowTitle("问渠缝纫机 · 设置钥匙")
+    lay = QtW.QFormLayout(d)
+    tip = QtW.QLabel("钥匙在问渠网页版“缝纫机设计 → 零件库 → FreeCAD 钥匙”里生成，每人一把，只显示一次。")
+    tip.setWordWrap(True)
+    lay.addRow(tip)
+    k = QtW.QLineEdit(st["key"])
+    k.setEchoMode(QtW.QLineEdit.Password)
+    sv = QtW.QLineEdit(st["server"])
+    lay.addRow("钥匙", k)
+    lay.addRow("服务器", sv)
+    bb = QtW.QDialogButtonBox(QtW.QDialogButtonBox.Ok | QtW.QDialogButtonBox.Cancel)
+    bb.accepted.connect(d.accept)
+    bb.rejected.connect(d.reject)
+    lay.addRow(bb)
+    if d.exec_():
+        N.save_settings(sv.text(), k.text())
+        return True
+    return False
+
+
+def _need_key():
+    return bool(N.settings()["key"]) or key_dialog()
+
+
+class AiDialog(QtW.QDialog):
+    """一句话改设计、解释红黄灯、写设计说明；判定由问渠服务器上的计算核心做，人点“采用”才改属性"""
+
+    def __init__(self, obj):
+        super().__init__(Gui.getMainWindow())
+        self.obj, self.adopt = obj, None
+        self.setWindowTitle("问渠缝纫机 · AI 助手（" + obj.Label + "）")
+        self.resize(720, 560)
+        lay = QtW.QVBoxLayout(self)
+        self.ed = QtW.QPlainTextEdit()
+        self.ed.setPlaceholderText("例：转速提到 6000，其他尽量不动，全部合格")
+        self.ed.setMaximumHeight(70)
+        lay.addWidget(self.ed)
+        row = QtW.QHBoxLayout()
+        for text, kind in (("起草改法", "draft"), ("解释红黄灯", "explain"), ("写设计说明", "describe")):
+            b = QtW.QPushButton(text)
+            b.clicked.connect(lambda _=False, k=kind: self.run(k))
+            row.addWidget(b)
+        self.ok = QtW.QPushButton("采用")
+        self.ok.setEnabled(False)
+        self.ok.clicked.connect(self.apply)
+        row.addStretch(1)
+        row.addWidget(self.ok)
+        kb = QtW.QPushButton("设置钥匙")
+        kb.clicked.connect(lambda: key_dialog(self))
+        row.addWidget(kb)
+        lay.addLayout(row)
+        self.out = QtW.QTextBrowser()
+        lay.addWidget(self.out, 1)
+
+    def run(self, kind):
+        if kind == "draft" and len(self.ed.toPlainText().strip()) < 2:
+            self.out.setHtml("先写一句你要什么。")
+            return
+        M = F.SewDesign.machine(self.obj)
+        p = self.obj.Proxy.params(self.obj)
+        self.out.setHtml("AI 在想…")
+        QtW.QApplication.processEvents()
+        try:
+            r = N.Client().ai(kind, M.MACHINE, p, self.ed.toPlainText())
+        except N.NetError as e:
+            self.out.setHtml(_html.escape(str(e)))
+            return
+        self.adopt = None
+        e = _html.escape
+        h = []
+        if kind == "draft":
+            b, a = r["before"], r["after"]
+            h.append("<p><b style='color:{}'>{}</b>　改前 红 {} 黄 {} → 改后 红 {} 黄 {}</p>".format(
+                COLOR["ok" if r["status"] == "ok" else "bad"], "通过计算核心校核" if r["status"] == "ok" else "没通过：改完红灯变多了",
+                b["bad"], b["warn"], a["bad"], a["warn"]))
+            h.append("<table border=1 cellspacing=0 cellpadding=4><tr><th>参数</th><th>原来</th><th>改成</th><th>为什么</th></tr>")
+            for c in r["changes"]:
+                h.append("<tr><td>{} {}</td><td>{}</td><td><b>{}</b></td><td>{}{}</td></tr>".format(e(c["name"]), e(c["unit"]), c["old"], c["new"],
+                                                                                                e(c["why"]), ("（" + e(c["note"]) + "）") if c["note"] else ""))
+            h.append("</table>")
+            if r["new_bad"]:
+                h.append("<p style='color:#c0392b'>新出现的红灯：" + "、".join(e(x["name"]) for x in r["new_bad"]) + "</p>")
+            h += ["<p>· " + e(x) + "</p>" for x in r["assumptions"]] + ["<p>？" + e(x) + "</p>" for x in r["questions"]]
+            if r["status"] == "ok" and r["changes"]:
+                self.adopt = {c["key"]: c["new"] for c in r["changes"]}
+        elif kind == "explain":
+            if r.get("all_ok"):
+                h.append("<p>现在全部合格，没有要解释的。</p>")
+            for it in r["items"]:
+                h.append("<p><b style='color:{}'>●</b> <b>{}</b>　{}（判据 {}）<br>{}</p>".format(COLOR[it["state"]], e(it["name"]), e(it["value"]),
+                                                                                             e(it["limit"]), e(it["why"])))
+                for fx in it["fixes"]:
+                    ok = fx["clears"] and fx["params"]
+                    h.append("<p style='margin-left:16px'>→ {} {} → <b>{}</b> {}：{}　<span style='color:{}'>{}</span></p>".format(
+                        e(fx["name"]), fx["old"], fx["new"], e(fx["unit"]), e(fx["how"]), COLOR["ok" if ok else "bad"],
+                        "试算过：能消掉这盏灯" if ok else "试算过：消不掉或会出新红灯"))
+                    if ok and self.adopt is None:
+                        self.adopt = {fx["key"]: fx["new"]}
+            if self.adopt:
+                h.append("<p>“采用”用第一条能消灯的改法。</p>")
+        else:
+            h.append("<p>" + e("".join(r["sentences"])) + "</p>")
+            if r["dropped"]:
+                h.append("<p style='color:#8a4b00'>有 {} 句里的数在这组设计里找不到出处，已删掉。</p>".format(len(r["dropped"])))
+        h.append("<p style='color:#888'>今天还能用 {} 次 · {}</p>".format(r.get("left_today"), "规则版" if r.get("model") == "rules" else r.get("model") or ""))
+        self.out.setHtml("".join(h))
+        self.ok.setEnabled(bool(self.adopt))
+
+    def apply(self):
+        if self.adopt:
+            done = F.apply_params(self.obj, self.adopt)
+            self.out.append("<p><b>已采用：</b>" + "，".join("{} = {}".format(k, v) for k, v in done.items()) + "</p>")
+            self.ok.setEnabled(False)
+            self.adopt = None
+
+
+def ai_dialog():
+    obj = design()
+    if obj and _need_key():
+        AiDialog(obj).exec_()
+
+
+class PartsDialog(QtW.QDialog):
+    """查本单位零件库，插入 STEP；能接进当前设计的，可以直接“用到设计”"""
+
+    def __init__(self):
+        super().__init__(Gui.getMainWindow())
+        self.setWindowTitle("问渠缝纫机 · 插入本单位零件")
+        self.resize(760, 480)
+        self.items = []
+        lay = QtW.QVBoxLayout(self)
+        row = QtW.QHBoxLayout()
+        self.q = QtW.QLineEdit()
+        self.q.setPlaceholderText("编号、名称或 ERP 物料号")
+        self.q.returnPressed.connect(self.load)
+        b = QtW.QPushButton("查找")
+        b.clicked.connect(self.load)
+        kb = QtW.QPushButton("设置钥匙")
+        kb.clicked.connect(lambda: key_dialog(self))
+        row.addWidget(self.q, 1)
+        row.addWidget(b)
+        row.addWidget(kb)
+        lay.addLayout(row)
+        self.lst = QtW.QListWidget()
+        lay.addWidget(self.lst, 1)
+        self.info = QtW.QLabel("")
+        self.info.setWordWrap(True)
+        lay.addWidget(self.info)
+        row = QtW.QHBoxLayout()
+        self.ins = QtW.QPushButton("插入三维")
+        self.ins.clicked.connect(self.insert)
+        self.use = QtW.QPushButton("用到当前设计")
+        self.use.clicked.connect(self.use_in_design)
+        row.addStretch(1)
+        row.addWidget(self.use)
+        row.addWidget(self.ins)
+        lay.addLayout(row)
+        self.lst.currentRowChanged.connect(self.pick)
+        self.load()
+
+    def load(self):
+        try:
+            r = N.Client().parts(self.q.text())
+        except N.NetError as e:
+            self.info.setText(str(e))
+            return
+        self.items = r["parts"]
+        self.lst.clear()
+        for p in self.items:
+            self.lst.addItem("{}　{}　{}{}".format(p["code"], p["name"], "" if p["has_step"] else "（没有三维）", "　ERP " + p["erp"] if p["erp"] else ""))
+        self.info.setText("{} 的零件库：可用的 {} 个。".format(r["org"], len(self.items)))
+
+    def cur(self):
+        i = self.lst.currentRow()
+        return self.items[i] if 0 <= i < len(self.items) else None
+
+    def pick(self, _i):
+        p = self.cur()
+        if not p:
+            return
+        obj = design(True)
+        uses = []
+        if obj:
+            try:
+                uses = N.Client().part(p["id"], F.SewDesign.machine(obj).MACHINE).get("uses") or []
+            except N.NetError:
+                uses = []
+        self._uses = uses
+        f = "，".join("{} {}".format(k, v) for k, v in p["fields"].items())
+        self.info.setText("{} {}：{}{}".format(p["code"], p["name"], f, ("\n能用到当前设计：" + "；".join(
+            "{}（{}）".format(u["label"], "，".join("{} = {}".format(k, v) for k, v in u["params"].items())) for u in uses)) if uses else ""))
+        self.ins.setEnabled(p["has_step"])
+        self.use.setEnabled(bool(uses))
+
+    def insert(self):
+        p = self.cur()
+        if not p:
+            return
+        try:
+            data = N.Client().step(p["id"])
+        except N.NetError as e:
+            self.info.setText(str(e))
+            return
+        path = os.path.join(N.cache_dir(), "{}-{}.step".format(p["id"], "".join(ch for ch in p["code"] if ch.isalnum() or ch in "-_") or "part"))
+        with open(path, "wb") as fh:
+            fh.write(data)
+        doc = App.ActiveDocument or App.newDocument("WenQuestSewing")
+        before = set(o.Name for o in doc.Objects)
+        import Part
+        shape = Part.read(path)
+        o = doc.addObject("Part::Feature", "OrgPart")
+        o.Shape = shape
+        o.Label = "{} {}".format(p["code"], p["name"])
+        o.addProperty("App::PropertyString", "WQ_OrgPart", "问渠", "本单位零件库编号")
+        o.addProperty("App::PropertyString", "WQ_ErpItem", "问渠", "ERP 物料号")
+        o.WQ_OrgPart, o.WQ_ErpItem = p["code"], p["erp"] or ""
+        doc.recompute()
+        self.info.setText("已插入：{}（{}）".format(o.Label, len(set(x.Name for x in doc.Objects) - before)))
+        try:
+            Gui.SendMsgToActiveView("ViewFit")
+        except Exception:  # noqa: BLE001
+            pass
+
+    def use_in_design(self):
+        obj = design()
+        uses = getattr(self, "_uses", [])
+        if not obj or not uses:
+            return
+        u = uses[0]
+        if len(uses) > 1:
+            names = [x["label"] for x in uses]
+            name, ok = QtW.QInputDialog.getItem(self, "用到当前设计", "用作：", names, 0, False)
+            if not ok:
+                return
+            u = uses[names.index(name)]
+        done = F.apply_params(obj, u["params"])
+        self.info.setText("已用到设计（{}）：{}".format(u["label"], "，".join("{} = {}".format(k, v) for k, v in done.items())))
+
+
+def insert_part():
+    if _need_key():
+        PartsDialog().exec_()
+
+
+HELP_ONLINE = "https://learn.wenquestrobotics.com/static/help/sewing-freecad/index.html"
+
+
+def open_help():
+    """本机的帮助（随安装包，断网也能看）；没有就开在线版"""
+    p = os.path.join(HERE, "help", "index.html")
+    url = QtCore.QUrl.fromLocalFile(p) if os.path.exists(p) else QtCore.QUrl(HELP_ONLINE)
+    QtGui.QDesktopServices.openUrl(url)
+
+
 def register():
     cmds = [("WQS_New", Cmd("新建平缝机设计", "按默认（教材算例）参数生成平缝机机构零件和校核", new_design)),
             ("WQS_NewOverlock", Cmd("新建包缝机设计", "按教材第 9 讲算例机生成包缝机机构零件和校核", lambda: new_design("overlock"))),
@@ -274,7 +540,10 @@ def register():
             ("WQS_Step", Cmd("导出 STEP", "整套机构零件导出 STEP", export_step)),
             ("WQS_Import", Cmd("导入参数", "读入问渠网页版导出的参数文件（.wqsew.json）", import_params)),
             ("WQS_Export", Cmd("导出参数", "存成参数文件，可在问渠网页版打开", export_params)),
-            ("WQS_Submit", Cmd("提交到问渠工厂", "用“问渠”工作台把整套零件提交到数字工厂审批", submit))]
+            ("WQS_Submit", Cmd("提交到问渠工厂", "用“问渠”工作台把整套零件提交到数字工厂审批", submit)),
+            ("WQS_Ai", Cmd("AI 助手", "一句话改设计、解释红黄灯、写设计说明（要联网和钥匙；判定由计算核心做，点“采用”才改）", ai_dialog)),
+            ("WQS_Parts", Cmd("插入本单位零件", "从本单位零件库查找零件，插入三维或把参数用到当前设计（要联网和钥匙）", insert_part)),
+            ("WQS_Help", Cmd("帮助", "打开帮助：怎么用、内核、零件库、AI、CAE 快速上手（断网也能看）", open_help, needs=False))]
     for name, c in cmds:
         Gui.addCommand(name, c)
     return [n for n, _ in cmds]

@@ -372,4 +372,9 @@ def workbench_zip() -> bytes:
         for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "machines.py", "cad.py"):
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")
+        hd = core / "freecad" / "help"                # 第 49 轮：帮助随安装包（断网也能看）
+        if hd.is_dir():
+            for f in sorted(hd.rglob("*")):
+                if f.is_file():
+                    z.write(f, root + "help/" + f.relative_to(hd).as_posix())
     return b.getvalue()
