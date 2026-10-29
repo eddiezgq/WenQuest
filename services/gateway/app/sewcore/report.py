@@ -151,7 +151,7 @@ def _table(d, head, rows, widths=None):
 NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 
 
-def calc_report(params=None, lang="zh", project="", company="", machine="lockstitch", cae=None):
+def calc_report(params=None, lang="zh", project="", company="", machine="lockstitch", cae=None, desc=None):
     from docx.shared import Cm, RGBColor
     M = get(machine)
     R = M.analyze(params)
@@ -184,6 +184,14 @@ def calc_report(params=None, lang="zh", project="", company="", machine="locksti
         cn = R["trial"]["counts"]
         d.add_paragraph(_t(f"虚拟试缝 30 针：成缝 {cn['ok']}，跳针 {cn['skip']}，碰针 {cn['hit']}，划线 {cn['cut']}，断线 {cn['break']}。",
                            f"Virtual test seam, 30 stitches: good {cn['ok']}, skipped {cn['skip']}, needle hit {cn['hit']}, split {cn['cut']}, broken {cn['break']}.", lang))
+    if desc:                                    # 第 49 轮：AI 助手起草的设计说明（数字已由 aicheck 与本组结果核对）
+        from .aicheck import verify
+        keep, _ = verify(desc, R, M.NAME[0])
+        if keep:
+            head("设计说明", "Design description")
+            d.add_paragraph("".join(keep))
+            d.add_paragraph(_t("（AI 起草，文中数字已由程序与本计算书逐个核对。）",
+                               "(Drafted by AI; every number has been checked by the software against this calculation sheet.)", lang))
     head("设计参数", "Design parameters")
     rows = []
     for gk, gzh, gen, items in M.GROUPS:

@@ -256,15 +256,20 @@ def register(app, m) -> None:
 
     # ---------- 机壳模态 ----------
     @app.post("/api/v1/sewing/cae/frame")
-    async def frame(sess: Annotated[Session, Depends(m.current)], file: UploadFile = File(...), machine: str = Form("lockstitch"),
-                    params: str = Form("{}"), material: str = Form("HT200")):
+    async def frame(sess: Annotated[Session, Depends(m.current)], file: UploadFile | None = File(None), machine: str = Form("lockstitch"),
+                    params: str = Form("{}"), material: str = Form("HT200"), part_id: int = Form(0)):
         lic = await m.sewing_need_license(sess)
         M = sewcore.get(machine)
         try:
             p = M.clean(json.loads(params or "{}"))
         except ValueError:
             p = M.clean({})
-        data = await file.read()
+        if part_id:                                   # 第 49 轮：直接用本单位零件库里的机壳 / 绷架
+            data, fname = m.sewing_part_step(part_id, lic)
+        elif file is not None:
+            data, fname = await file.read(), file.filename or ""
+        else:
+            raise EngineError("bad_file", "upload a STEP file or pick one from your parts library", 400)
         if not data or len(data) > 30 * 1024 * 1024:
             raise EngineError("bad_file", "the STEP file is empty or larger than 30 MB", 400)
         g = await factory("POST", "/geometry", content=data)
@@ -276,7 +281,7 @@ def register(app, m) -> None:
         setup = dict(fs, material_id=mat)
         title = f"{M.NAME[0]} · {'绷架 / 横梁固有频率' if machine in XY else '机壳固有频率'}"
         j = await factory("POST", "/jobs", json=submit_body(lic, sess, "fea", title, "frame", step_sha=g["sha"], setup=setup))
-        ctx = {"file": (file.filename or "")[:80], "material": mat, "n": p["n"]}
+        ctx = {"file": fname[:80], "material": mat, "n": p["n"]}
         if machine in XY:
             ctx["t_move"] = move_time(machine, p)
         save(j["id"], lic, sess, machine, "frame", "frame", title, p, ctx)
@@ -300,19 +305,22 @@ def register(app, m) -> None:
     # ---------- 主轴电机 ----------
     @app.post("/api/v1/sewing/cae/motor")
     async def motor(body: DesignIn, sess: Annotated[Session, Depends(m.current)]):
-        await m.sewing_need_license(sess)
+        lic = await m.sewing_need_license(sess)
         M = sewcore.get(body.machine)
         p = M.clean(body.params)
+
+        async def motors():                           # 第 49 轮：本单位零件库里的电机一起比（按功率从小到大排）
+            tab = (await factory("GET", "/motors"))["motors"]
+            own = m.sewing_org_motors(lic["org"]) if hasattr(m, "sewing_org_motors") else []
+            return sorted(tab + own, key=lambda x: (x["power_w"], x["name"]))
         if body.machine in XY:
-            tab = await factory("GET", "/motors")
-            res = CS.axis_motors(body.machine, p, tab["motors"])
+            res = CS.axis_motors(body.machine, p, await motors())
             res["source"] = "通用典型值 / typical catalogue values"
             return res
         T = CS.spindle_torque(body.machine, p)
         if T is None:
             raise EngineError("not_found", "no spindle model for this machine yet", 404)
-        tab = await factory("GET", "/motors")
-        sel = CS.select_motor(T, p["n"], tab["motors"])
+        sel = CS.select_motor(T, p["n"], await motors())
         sel["torque"] = [round(x, 4) for x in T[::2]]
         sel["source"] = "通用典型值 / typical catalogue values"      # 工厂表里的来源写了品牌名，平台内容不点名
         return sel

@@ -9,12 +9,15 @@
                                               step 三维模型、macro FreeCAD 宏、dxf 平板零件轮廓、json 参数文件（已开通才能导出）
   GET  /api/v1/sewing/freecad.zip             FreeCAD 工作台“问渠缝纫机”安装包（已开通）
   GET/POST/DELETE /api/v1/admin/sewing/licenses  管理员手动开通 / 收回（价格未定，先手动授权）
+  GET/POST/DELETE /api/v1/sewing/keys         FreeCAD 钥匙（第 49 轮）：每人一把，只显示一次；工作台用它读本单位零件库、用 AI 助手
 
 数据：<data_dir>/sewing.db（SQLite）。计算核心 app/sewcore 与 FreeCAD 工作台共用，两边同一组参数结果一致。
 """
 
+import hashlib
 import io
 import json
+import secrets
 import sqlite3
 import time
 import zipfile
@@ -61,6 +64,7 @@ class ExportIn(BaseModel):
     params: dict[str, Any] = Field(default_factory=dict)
     project: str = Field(default="", max_length=80)
     lang: str = "zh"
+    desc: list[str] = Field(default_factory=list, max_length=8)   # 第 49 轮：计算书带 AI 起草的设计说明
 
 
 class LicenseIn(BaseModel):
@@ -84,6 +88,7 @@ def register(app, m) -> None:
                      note text, params text, created integer, updated integer)""")
         if "machine" not in [r[1] for r in c.execute("pragma table_info(projects)")]:      # 第 40 轮加机型
             c.execute("alter table projects add column machine text default 'lockstitch'")
+        c.execute("""create table if not exists keys(user_id integer primary key, hash text, created integer, org text, admin integer)""")   # 第 49 轮
         return c
 
     def ip(req: Request) -> str:
@@ -119,9 +124,57 @@ def register(app, m) -> None:
             return {"user_id": sess.user_id, "org": "问渠", "name": "", "note": "admin"}
         raise EngineError("not_licensed", "this feature is for activated enterprise accounts", 403)
 
-    # 第 41 轮：CAE 接口（sewing_cae.py）共用开通检查和数据库
+    def key_hash(k: str) -> str:
+        return hashlib.sha256(k.strip().encode()).hexdigest()
+
+    async def who(req: Request, authorization: Annotated[str | None, Header()] = None,
+                  x_wq_key: Annotated[str | None, Header()] = None) -> dict:
+        """第 49 轮：已开通的人——网页的登录凭证（Bearer 或全站 cookie），或 FreeCAD 钥匙（X-WQ-Key）。返回开通记录。"""
+        if x_wq_key:
+            with db() as c:
+                r = c.execute("select user_id, org, admin from keys where hash=?", (key_hash(x_wq_key),)).fetchone()
+            lic = (license_of(r[0]) or ({"user_id": r[0], "org": r[1], "name": "", "note": "admin"} if r[2] else None)) if r else None
+            if not lic:
+                raise EngineError("bad_key", "this FreeCAD key is not valid; make a new one on the web page", 401)
+            return lic
+        sess = None
+        if authorization and authorization.lower().startswith("bearer "):
+            sess = state.codec.read(authorization.split(" ", 1)[1].strip())
+        if not sess:
+            tok = req.cookies.get("wq_sso", "")
+            sess = state.codec.read(tok) if tok else None
+        if not sess:
+            raise EngineError("not_logged_in", "sign in first", 401)
+        return await need_license(sess)
+
+    # 第 41 轮：CAE 接口（sewing_cae.py）共用开通检查和数据库；第 49 轮：AI 助手、本单位零件库共用 who
     m.sewing_need_license = need_license
     m.sewing_db = db
+    m.sewing_who = who
+
+    # ---------- FreeCAD 钥匙（第 49 轮） ----------
+    @app.get("/api/v1/sewing/keys")
+    async def key_info(sess: Annotated[Session, Depends(m.current)]):
+        lic = await need_license(sess)
+        with db() as c:
+            r = c.execute("select created from keys where user_id=?", (lic["user_id"],)).fetchone()
+        return {"has_key": bool(r), "created": r[0] if r else None}
+
+    @app.post("/api/v1/sewing/keys")
+    async def key_new(sess: Annotated[Session, Depends(m.current)]):
+        lic = await need_license(sess)
+        k = "wqs_" + secrets.token_urlsafe(24)
+        with db() as c:
+            c.execute("insert or replace into keys(user_id,hash,created,org,admin) values(?,?,?,?,?)",
+                      (lic["user_id"], key_hash(k), int(time.time()), lic["org"], int(lic.get("note") == "admin" and not license_of(lic["user_id"]))))
+        return {"key": k}
+
+    @app.delete("/api/v1/sewing/keys")
+    async def key_drop(sess: Annotated[Session, Depends(m.current)]):
+        lic = await need_license(sess)
+        with db() as c:
+            c.execute("delete from keys where user_id=?", (lic["user_id"],))
+        return {"ok": True}
 
     # ---------- 来宾也能用 ----------
     @app.get("/api/v1/sewing/schema")
@@ -246,7 +299,7 @@ def register(app, m) -> None:
         from .sewcore import cad, report
         if kind == "report":
             cae = m.sewing_cae_results(lic["org"], M.MACHINE, p) if hasattr(m, "sewing_cae_results") else []
-            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE, cae=cae)
+            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE, cae=cae, desc=[x[:400] for x in body.desc])
         elif kind == "card":
             data = report.card_docx(p, lang, body.project, machine=M.MACHINE)
         elif kind == "params":
