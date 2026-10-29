@@ -250,7 +250,8 @@ jobs:
             dc() { docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml -f /tmp/fac/docker-compose.classes.yml "$@"; }
             { tail -n 60 /tmp/logs/class_setup.log; echo "---- 闭环 ----"; grep -v "ERPNext 进度" /tmp/logs/class_loop.log 2>/dev/null | tail -n 60;
               echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub-c-$id; echo "---- 桥接（出错的行）----"; dc logs --no-color bridge-c-$id | grep -E "\[error\]" | tail -n 30;
-              echo "---- 公共工厂枢纽（工业园）----"; dc logs --no-color hub | grep -iE "park|工业园|error" | tail -n 30;
+              echo "---- 枢纽报错（供应链、工业园）----"; dc logs --no-color hub-c-$id | grep -A14 -E "供应链出错|工业园出错|开票出错|AI 巡检出错" | tail -n 60;
+              echo "---- 公共工厂枢纽（工业园）----"; dc logs --no-color hub | grep -A10 -iE "park|工业园" | tail -n 30;
               echo "---- 公共工厂桥接（出错的行）----"; dc logs --no-color bridge | grep -E "\[error\]" | tail -n 20;
               echo "---- 车间仿真 ----"; dc logs --no-color --tail 60 sim-c-$id; } > /tmp/logs/class_diag.log 2>&1
             # 闭环测试的失败项单独发一条注释（混在长日志里会被截掉）

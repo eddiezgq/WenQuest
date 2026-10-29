@@ -264,6 +264,19 @@ def park(mgr):
                              if x["item"] == "WQR-105" and (x.get("park") or {}).get("state") in ("sent", "shipped", "fallback")), None),
                "WQR-105 的采购单送到减速器厂", 600, 5)
     if not check(bool(lot), "WQR-105 请购转成采购单（采购员模拟器）"):
+        try:                                  # 诊断：批次、还没转的请购、供应链相关的提议
+            lt = hub("GET", "/api/supply/lots", token=mgr)
+            print("    诊断 批次：{}".format([(x["item"], x["status"], x.get("park")) for x in lt["lots"][:12]]))
+            print("    诊断 供应链态势：{}".format(lt["kpis"]))
+            print("    诊断 还没转的请购：{}".format(json.dumps(hub("GET", "/api/supply/requests", token=mgr)["requests"][:6], ensure_ascii=False)[:800]))
+            ps = [p for p in hub("GET", "/api/proposals", token=mgr) if p.get("action") in ("purchase_order", "supply_setup", "create_order_and_plan")]
+            for p in ps[:8]:
+                print("    诊断 提议 {} {} {}：{}".format(p.get("proposal_id"), p.get("action"), p.get("status"),
+                                                   json.dumps(p.get("result"), ensure_ascii=False)[:300]))
+            mrs = [(m["name"], m.get("status"), m.get("docstatus")) for m in erp_docs("Material Request")]
+            print("    诊断 ERPNext 请购单：{}".format(mrs[:10]))
+        except Exception as e:  # noqa: BLE001
+            print("    诊断失败：{}".format(e))
         return
     check(lot["park"]["state"] != "fallback", "采购单送到减速器厂：{}".format(lot.get("note") or ""))
     def gb(m, p, b=None, token=None):
