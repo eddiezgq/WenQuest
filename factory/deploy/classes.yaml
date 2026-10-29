@@ -3,6 +3,8 @@
 #   name：显示名；course：对应的问渠课程（备注）；teachers：任课老师的问渠账号编号（能建课的老师账号本来就是厂长，可不填）
 #   plant：用哪座厂的清单（factory/plants 里的文件名，不带 .yaml；第 45 轮）。不写 = 问渠减速器厂。
 #          只在第一次建好这座厂时生效（ERPNext 的公司名、缩写按清单建），建好以后不要再改。
+#   park：true = 接入问渠数字工业园（第 51 轮）：清单里写了 park 的供应商（如问渠减速器厂）不再是纸面供应商，
+#         采购单送到公共工厂的教学模式成为销售订单，做完发货回传。要和 plant 一起写。
 # 删掉一行不会删数据（防误删）；要清理请运行 deploy/class_remove.sh <id>。
 classes:
   - id: pilot
@@ -15,3 +17,4 @@ classes:
     course: ""
     teachers: []
     plant: wenquest-robot
+    park: true             # 第 51 轮：接入工业园，WQR-105 向问渠减速器厂（factory.wenquestrobotics.com 的教学模式）下单

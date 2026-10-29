@@ -123,7 +123,7 @@ jobs:
           cp factory/digital/mosquitto/server/* "$FACTORY_DIR/mosquitto/"
           # 演练时把端口开到本机，登录用本地方式（CI 没有学习平台）
           printf 'services:\n  hub: {ports: ["8100:8100"]}\n  erp-frontend: {ports: ["8090:8080"]}\n  bus: {ports: ["1883:1883", "9001:9001"]}\n  hub-demo: {ports: ["8101:8100"]}\n  erp-frontend-demo: {ports: ["8092:8080"]}\n' > "$FACTORY_DIR/ci.yml"
-          printf 'FACTORY_APP_IMAGE=wqf-app:ci\nFACTORY_BRIDGE_IMAGE=wqf-bridge:ci\nFACTORY_OPENPLC_IMAGE=wqf-openplc:ci\nSITE_DOMAIN=example.test\nWQ_AUTH=local\nWQ_AI_PER_HOUR=0\nWQ_ERP_OAUTH_SECRET=ci-sso-secret\n' > "$FACTORY_DIR/.env"
+          printf 'FACTORY_APP_IMAGE=wqf-app:ci\nFACTORY_BRIDGE_IMAGE=wqf-bridge:ci\nFACTORY_OPENPLC_IMAGE=wqf-openplc:ci\nSITE_DOMAIN=example.test\nWQ_AUTH=local\nWQ_AI_PER_HOUR=0\nWQ_ERP_OAUTH_SECRET=ci-sso-secret\nWQ_SUPPLY_AUTO_S=20\nWQ_PARK_AUTO_S=20\n' > "$FACTORY_DIR/.env"
       - name: 首次安装（建站、设置向导、API 钥匙、导入数据）
         run: mkdir -p /tmp/logs && bash "$FACTORY_DIR/deploy/install.sh" 2>&1 | tee /tmp/logs/install.log
       - name: 启动全部服务
@@ -226,12 +226,17 @@ jobs:
           bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$id'" 2>&1 | tee /tmp/logs/class_setup.log
           st=${PIPESTATUS[0]}
           if [ "$st" = 0 ]; then
+            # 第 51 轮：公共工厂的枢纽带上班级工厂的配置重启（工业园：接入的班级工厂来下单、收发货回传）
+            (cd "$FACTORY_DIR" && docker compose -p wq-factory -f docker-compose.yml -f ci.yml -f docker-compose.classes.yml up -d hub)
+            for i in $(seq 1 40); do curl -fsS localhost:8100/api/health && break; sleep 5; done
+            park=""
+            grep -q "park: true" factory/deploy/classes.yaml && park="--park-hub http://localhost:8100"
             for i in $(seq 1 40); do curl -fsS localhost:$hubp/api/health && break; sleep 5; done
             cd factory/digital
             if grep -q "^$id	" "$FACTORY_DIR/classes.plants"; then
               python tests/plant_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
                 --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-                --item WQ-AGV300 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S \
+                --item WQ-AGV300 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $park \
                 2>&1 | tee /tmp/logs/class_loop.log
             else
               python tests/closed_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
@@ -245,6 +250,8 @@ jobs:
             dc() { docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml -f /tmp/fac/docker-compose.classes.yml "$@"; }
             { tail -n 60 /tmp/logs/class_setup.log; echo "---- 闭环 ----"; grep -v "ERPNext 进度" /tmp/logs/class_loop.log 2>/dev/null | tail -n 60;
               echo "---- 枢纽 ----"; dc logs --no-color --tail 40 hub-c-$id; echo "---- 桥接（出错的行）----"; dc logs --no-color bridge-c-$id | grep -E "\[error\]" | tail -n 30;
+              echo "---- 公共工厂枢纽（工业园）----"; dc logs --no-color hub | grep -iE "park|工业园|error" | tail -n 30;
+              echo "---- 公共工厂桥接（出错的行）----"; dc logs --no-color bridge | grep -E "\[error\]" | tail -n 20;
               echo "---- 车间仿真 ----"; dc logs --no-color --tail 60 sim-c-$id; } > /tmp/logs/class_diag.log 2>&1
             # 闭环测试的失败项单独发一条注释（混在长日志里会被截掉）
             grep -v "ERPNext 进度" /tmp/logs/class_loop.log 2>/dev/null | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/class_fail.log

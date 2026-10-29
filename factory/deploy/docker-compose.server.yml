@@ -93,6 +93,8 @@ services:
       WQ_LIBRARY_ORIGINS: https://learn.${SITE_DOMAIN},https://factory.${SITE_DOMAIN}
       WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}      # 课程接口只读钥匙（第 4 轮 C2）
       WQ_FACTORY_TASK_KEY: ${WQ_FACTORY_TASK_KEY:-}      # 工程任务单钥匙（第 11 轮 2.7（5））
+      WQ_PARK_KEY: ${WQ_PARK_KEY:-}                      # 工业园（第 51 轮）：接入的班级工厂（机器人厂）来下单、收发货回传
+      WQ_PARK_AUTO_S: ${WQ_PARK_AUTO_S:-180}             # 工业园订单待接多久平台代接（CI 演练调短）
       WQ_FACTORY_CAE_KEY: ${WQ_FACTORY_CAE_KEY:-}        # 设计软件提交 CAE（第 39 轮第 4 步 / 第 41 轮）
       WQ_TWIN_DEVICE_KEY: ${WQ_TWIN_DEVICE_KEY:-}        # 数字孪生真设备接入钥匙（第 15 轮）
       WQ_PUBLIC_URL: https://factory.${SITE_DOMAIN}

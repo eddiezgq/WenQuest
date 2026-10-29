@@ -18,6 +18,8 @@ APP="${1:-}"; BRIDGE="${2:-}"; OPENPLC="${3:-}"
 [ -n "$(envval WQ_FACTORY_CAE_KEY)" ] || envset WQ_FACTORY_CAE_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 数字孪生真设备接入钥匙（第 15 轮）：现场采集器 POST /api/twin/telemetry 时用
 [ -n "$(envval WQ_TWIN_DEVICE_KEY)" ] || envset WQ_TWIN_DEVICE_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
+# 工业园密钥（第 51 轮）：公共工厂与接入工业园的班级工厂（机器人厂）互发订单、发货回传时认证
+[ -n "$(envval WQ_PARK_KEY)" ] || envset WQ_PARK_KEY "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # ERPNext 单点登录密钥（第 7 轮 E5）：枢纽与 ERPNext 社交登录共用；没有就生成
 [ -n "$(envval WQ_ERP_OAUTH_SECRET)" ] || envset WQ_ERP_OAUTH_SECRET "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
 # 企业版演示工厂（第 9 轮）的工作台密钥：启动前要有

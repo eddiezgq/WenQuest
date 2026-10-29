@@ -4,6 +4,8 @@
 每个班一座独立的教学工厂：总线、枢纽、仿真车间、桥接、ERPNext 站点入口；历史库 wq_c_<编号>，ERPNext 站点 c-<编号>。
 网址：<编号>.factory.<域名>（工作台）、<编号>.erp.<域名>（ERPNext），由学习平台的 Caddy 按需申请证书。
 
+第 51 轮：写了 plant 的一行可以再写 park: true，接入工业园：这座厂向公共工厂（问渠减速器厂）下的采购单在那边成为销售订单。
+
 第 45 轮：一行可以写 plant（工厂清单，factory/plants/<plant>.yaml），这座厂就按那份清单起（如机器人厂）；
 不写 = 问渠减速器厂。清单只在第一次建站时决定 ERPNext 里的公司名和缩写，已建好的班级工厂不要再改 plant。
 
@@ -50,8 +52,12 @@ def load(path):
         if cid in ("demo", "www", "learn", "classic", "factory", "erp"):
             raise SystemExit("班级编号 {} 是保留名".format(cid))
         plant = str(c.get("plant") or "").strip()
+        park = bool(c.get("park"))
+        if park and not plant:
+            raise SystemExit("班级工厂 {}：park（接入工业园）要和 plant（清单）一起写".format(cid))
         out.append({"id": cid, "name": str(c.get("name") or cid), "teachers": [str(t) for t in c.get("teachers") or []],
-                    "course": str(c.get("course") or ""), "plant": plant, "plant_info": plant_info(plant) if plant else None})
+                    "course": str(c.get("course") or ""), "plant": plant, "plant_info": plant_info(plant) if plant else None,
+                    "park": park})
     if len({c["id"] for c in out}) != len(out):
         raise SystemExit("班级编号有重复")
     return out
@@ -89,7 +95,8 @@ def services(c, ci_ports=None):
         WQ_SMTP_HOST="${WQ_SMTP_HOST:-}", WQ_SMTP_PORT="${WQ_SMTP_PORT:-2525}", WQ_SMTP_SECURE="${WQ_SMTP_SECURE:-tls}",
         WQ_SMTP_USER="${WQ_SMTP_USER:-}", WQ_SMTP_PASSWORD="${WQ_SMTP_PASSWORD:-}", WQ_MAIL_FROM="${WQ_MAIL_FROM:-}",
         WQ_FACTORY_NAME=c["name"], WQ_CLASS_TEACHERS=",".join(c["teachers"]),
-        WQ_FACTORY_TASK_KEY="${WQ_FACTORY_TASK_KEY:-}"),          # 工程任务单钥匙（第 11 轮 2.7（5））：学习平台下达、读进度
+        WQ_FACTORY_TASK_KEY="${WQ_FACTORY_TASK_KEY:-}",
+        WQ_SUPPLY_AUTO_S="${WQ_SUPPLY_AUTO_S:-180}"),          # 第 51 轮：请购转采购单、到货检验的模拟器等多久（CI 演练调短）          # 工程任务单钥匙（第 11 轮 2.7（5））：学习平台下达、读进度
         volumes=["./library:/library:ro"],
         depends_on={"db": {"condition": "service_healthy"}, "bus-c-" + cid: {"condition": "service_started"}},
         healthcheck={"test": ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen("
@@ -121,6 +128,9 @@ def services(c, ci_ports=None):
         s["erp-frontend-c-" + cid]["ports"] = ["{}:8080".format(ci_ports[1])]
     if pi:                                   # 桥接：ERPNext 里的公司和仓库后缀按清单
         s["bridge-c-" + cid]["environment"].update({"WQ_ERP_ABBR": pi["abbr"], "WQ_ERP_COMPANY": pi["company"]})
+    if c.get("park"):                        # 第 51 轮：接入工业园——向公共工厂（问渠减速器厂）下单、收它的发货回传
+        s["hub-c-" + cid]["environment"].update({"WQ_PARK_KEY": "${WQ_PARK_KEY:-}", "WQ_PARK_ME": cid,
+                                                 "WQ_PARK_PEERS": "wenquest-gearbox=http://hub:8100"})
     return s
 
 
@@ -129,7 +139,9 @@ def compose(classes, ci_ports=False):
     for i, c in enumerate(classes):
         svc.update(services(c, (8102 + i, 8093 + i) if ci_ports else None))
     # 公共工厂的枢纽回答 Caddy“这个网址能不能发证书”（按需申请证书）
-    svc["hub"] = {"environment": {"WQ_CLASS_IDS": " ".join(c["id"] for c in classes)}}
+    svc["hub"] = {"environment": {"WQ_CLASS_IDS": " ".join(c["id"] for c in classes),
+                                  # 第 51 轮：工业园里向本厂下单的班级工厂（classes.yaml 写了 park: true 的）
+                                  "WQ_PARK_PEERS": " ".join("{0}=http://hub-c-{0}:8100".format(c["id"]) for c in classes if c.get("park"))}}
     return {"services": svc}
 
 
