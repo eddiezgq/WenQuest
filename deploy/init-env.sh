@@ -21,7 +21,8 @@ case "$REGION" in cn|CN|china|China|中国*) REGION=cn ;; *) REGION=us ;; esac
 DOMAIN=$(ask "Main domain, without www (e.g. myacademy.com)" "")
 [ -n "$DOMAIN" ] || { echo "A domain is required." >&2; exit 1; }
 EMAIL=$(ask "Administrator email" "admin@$DOMAIN")
-SITE_NAME=$(ask "Learning platform name" "Robotics Academy 机器人学院")
+if [ "$REGION" = cn ]; then NAME_DEFAULT="问渠 AI 学习平台"; else NAME_DEFAULT="Robotics Academy 机器人学院"; fi
+SITE_NAME=$(ask "Learning platform name" "$NAME_DEFAULT")
 if [ "$REGION" = cn ]; then
     LANG_DEFAULT=$(ask "Default language: en or zh_cn (users can switch)" "zh_cn")
     TZ_DEFAULT=$(ask "Time zone" "Asia/Shanghai")
