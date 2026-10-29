@@ -7,7 +7,7 @@
 import re
 
 _SEP = re.compile(r"(?<=\d)[,   ](?=\d{3}\b)")      # 6,000 / 6 000（千位分隔）
-_NUM = re.compile(r"-?\d+(?:\.\d+)?")
+_NUM = re.compile(r"(?<![\d第–—~])-?\d+(?:\.\d+)?|(?<=[\d第–—~])\d+(?:\.\d+)?")   # “第 3-10 讲”里的 -10 不当负数
 
 
 def numbers_in(text):
@@ -59,6 +59,8 @@ def allowed_numbers(R, machine_name=""):
 
 
 def found(v, dec, bag):
+    if dec == 0 and abs(v) <= 3:                         # 0、1、2、3 这样的小整数要原样出现，不能靠四舍五入凑
+        return any(abs(b - v) < 1e-9 for b in bag)
     for b in bag:
         if abs(b - v) < 1e-9 or abs(round(b, dec) - v) < 1e-9:
             return True

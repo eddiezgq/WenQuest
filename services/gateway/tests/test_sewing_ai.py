@@ -10,6 +10,7 @@ from app import main
 from app.sewcore import aicheck
 from app.sewcore import design as D
 from tests.test_course_pack import client  # noqa: F401
+from tests.test_sewing_api import UID, sc  # noqa: F401
 from tests.test_materials import login
 
 
@@ -105,19 +106,35 @@ def test_quota_and_log(client, monkeypatch):  # noqa: F811
     assert rows[-1] == ("draft", "转速 5000", "问渠", 1)
 
 
-def test_freecad_key(client, monkeypatch):  # noqa: F811
+def test_freecad_key(sc, monkeypatch):  # noqa: F811
+    client = sc
     fake(monkeypatch, [{"changes": [{"key": "n", "value": 4500, "why": ""}], "assumptions": [], "questions": []}])
-    h = login(client)
+    admin, h = login(client), login(client, "s")
+    UID["s"] = client.get("/api/v1/me", headers=h).json()["id"]
+    assert client.post("/api/v1/sewing/keys", headers=h).status_code == 403                 # 还没开通
+    assert client.post("/api/v1/sewing/keys", headers=admin).status_code == 403             # 管理员也要先给自己开通一个单位
+    client.post("/api/v1/admin/sewing/licenses", json={"username": "s", "org": "甲缝纫机厂"}, headers=admin)
     assert client.get("/api/v1/sewing/keys", headers=h).json()["has_key"] is False
     k = client.post("/api/v1/sewing/keys", headers=h).json()["key"]
     assert k.startswith("wqs_") and client.get("/api/v1/sewing/keys", headers=h).json()["has_key"] is True
     r = client.post("/api/v1/sewing/ai/draft", json={"params": {}, "sentence": "转速 4500"}, headers={"X-WQ-Key": k})
     assert r.status_code == 200 and r.json()["changes"][0]["new"] == 4500
+    # 钥匙只能读零件库，不能增删改（FreeCAD 不带网页的登录 cookie）
+    client.cookies.clear()
+    assert client.get("/api/v1/sewing/parts", headers={"X-WQ-Key": k}).status_code == 200
+    body = {"cat": "needle", "code": "N1", "name": "机针", "fields": {"nm": 90, "blade_d": 0.9}}
+    assert client.post("/api/v1/sewing/parts", json=body, headers={"X-WQ-Key": k}).status_code == 401
     k2 = client.post("/api/v1/sewing/keys", headers=h).json()["key"]          # 重发：旧钥匙作废
     assert client.post("/api/v1/sewing/ai/draft", json={"params": {}, "sentence": "x 1"}, headers={"X-WQ-Key": k}).status_code == 401
-    client.delete("/api/v1/sewing/keys", headers=h)
-    assert client.post("/api/v1/sewing/ai/draft", json={"params": {}, "sentence": "x 1"}, headers={"X-WQ-Key": k2}).status_code == 401
-    assert client.post("/api/v1/sewing/keys", headers=login(client, "s")).status_code == 403
+    assert client.get("/api/v1/sewing/parts", headers={"X-WQ-Key": k2}).status_code == 200
+    # 改单位、收回开通：钥匙作废
+    client.post("/api/v1/admin/sewing/licenses", json={"username": "s", "org": "乙缝纫机厂"}, headers=admin)
+    assert client.get("/api/v1/sewing/parts", headers={"X-WQ-Key": k2}).status_code == 401
+    k3 = client.post("/api/v1/sewing/keys", headers=h).json()["key"]
+    client.delete(f"/api/v1/admin/sewing/licenses/{UID['s']}", headers=admin)
+    assert client.get("/api/v1/sewing/parts", headers={"X-WQ-Key": k3}).status_code == 401
+    client.post("/api/v1/admin/sewing/licenses", json={"username": "s", "org": "乙缝纫机厂"}, headers=admin)
+    assert client.get("/api/v1/sewing/parts", headers={"X-WQ-Key": k3}).status_code == 401     # 重新开通，旧钥匙不复活
 
 
 def test_report_carries_the_checked_description(client):  # noqa: F811
@@ -136,3 +153,5 @@ def test_number_check_allows_rounding_only():
     assert aicheck.found(5000, 0, bag) and aicheck.found(654, 0, bag)
     keep, drop = aicheck.verify(["转速 5,000 r/min。", "惯性力 655 N。"], R)
     assert keep == ["转速 5,000 r/min。"] and drop[0]["missing"] == [655]
+    assert aicheck.numbers_in("见第 3-10 讲") == [(3.0, 0), (10.0, 0)]
+    assert not aicheck.found(1, 0, {0.6, 1.4}) and aicheck.found(941, 0, {941.3})       # 小整数要原样有

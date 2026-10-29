@@ -234,7 +234,11 @@ def read_xlsx(cat, data):
     from openpyxl import load_workbook
     wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
     ws = wb.worksheets[0]
-    rows = list(ws.iter_rows(values_only=True))
+    rows = []
+    for r in ws.iter_rows(values_only=True):              # 边读边数：最多读 2 002 行（表头两行 + 2 000 个规格）
+        rows.append(r)
+        if len(rows) >= 2002:
+            break
     if len(rows) < 2:
         return []
     keys = [str(x).strip() if x is not None else "" for x in rows[1]]
@@ -273,11 +277,15 @@ def erp_xlsx(parts):
     ws = wb.active
     ws.title = "Item"
     ws.append(["Item Code", "Item Name", "Item Group", "Stock UOM", "Is Stock Item", "Description"])
+
+    def safe(v):                                          # 以 = + - @ 开头的文字前面加 '，Excel 不当公式
+        v = "" if v is None else str(v)
+        return "'" + v if v[:1] in ("=", "+", "-", "@") else v
     for p in parts:
         c = CATS.get(p["cat"], {})
         spec = "；".join(f"{zh} {p['fields'][k]}{(' ' + u) if u else ''}" for k, zh, u, *_ in c.get("fields", []) if k in p["fields"])
-        ws.append([p["erp"] or p["code"], p["name"], "Sub Assemblies", "Nos", 1,
-                   f"本单位编号 {p['code']}；{c.get('zh', '')}；{spec}"])
+        ws.append([safe(p["erp"] or p["code"]), safe(p["name"]), "Sub Assemblies", "Nos", 1,
+                   safe(f"本单位编号 {p['code']}；{c.get('zh', '')}；{spec}")])
     b = io.BytesIO()
     wb.save(b)
     return b.getvalue()

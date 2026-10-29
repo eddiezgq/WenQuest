@@ -127,14 +127,19 @@ def register(app, m) -> None:
     def key_hash(k: str) -> str:
         return hashlib.sha256(k.strip().encode()).hexdigest()
 
+    async def who_web(req: Request, authorization: Annotated[str | None, Header()] = None) -> dict:
+        """已开通的人，只认网页的登录凭证（Bearer 或全站 cookie）：零件库的增、改、删、导入、AI 整理用它（第 49 轮复核）"""
+        return await who(req, authorization, None)
+
     async def who(req: Request, authorization: Annotated[str | None, Header()] = None,
                   x_wq_key: Annotated[str | None, Header()] = None) -> dict:
-        """第 49 轮：已开通的人——网页的登录凭证（Bearer 或全站 cookie），或 FreeCAD 钥匙（X-WQ-Key）。返回开通记录。"""
+        """第 49 轮：已开通的人——网页的登录凭证（Bearer 或全站 cookie），或 FreeCAD 钥匙（X-WQ-Key）。返回开通记录。
+        钥匙只认真开通了的账号（收回开通、改单位时钥匙一并删掉），只用在读零件库、下载 STEP、AI 助手这几处。"""
         if x_wq_key:
             with db() as c:
-                r = c.execute("select user_id, org, admin from keys where hash=?", (key_hash(x_wq_key),)).fetchone()
-            lic = (license_of(r[0]) or ({"user_id": r[0], "org": r[1], "name": "", "note": "admin"} if r[2] else None)) if r else None
-            if not lic:
+                r = c.execute("select user_id, org from keys where hash=?", (key_hash(x_wq_key),)).fetchone()
+            lic = license_of(r[0]) if r else None
+            if not lic or lic["org"] != r[1]:
                 raise EngineError("bad_key", "this FreeCAD key is not valid; make a new one on the web page", 401)
             return lic
         sess = None
@@ -151,6 +156,7 @@ def register(app, m) -> None:
     m.sewing_need_license = need_license
     m.sewing_db = db
     m.sewing_who = who
+    m.sewing_who_web = who_web
 
     # ---------- FreeCAD 钥匙（第 49 轮） ----------
     @app.get("/api/v1/sewing/keys")
@@ -162,11 +168,13 @@ def register(app, m) -> None:
 
     @app.post("/api/v1/sewing/keys")
     async def key_new(sess: Annotated[Session, Depends(m.current)]):
-        lic = await need_license(sess)
+        lic = license_of(sess.user_id)
+        if not lic:                                   # 管理员要用 FreeCAD 钥匙，先在下面“开通企业账号”里给自己开通一个单位
+            raise EngineError("not_licensed", "FreeCAD keys are for activated company accounts", 403)
         k = "wqs_" + secrets.token_urlsafe(24)
         with db() as c:
-            c.execute("insert or replace into keys(user_id,hash,created,org,admin) values(?,?,?,?,?)",
-                      (lic["user_id"], key_hash(k), int(time.time()), lic["org"], int(lic.get("note") == "admin" and not license_of(lic["user_id"]))))
+            c.execute("insert or replace into keys(user_id,hash,created,org,admin) values(?,?,?,?,0)",
+                      (lic["user_id"], key_hash(k), int(time.time()), lic["org"]))
         return {"key": k}
 
     @app.delete("/api/v1/sewing/keys")
@@ -350,6 +358,7 @@ def register(app, m) -> None:
         with db() as c:
             c.execute("insert or replace into licenses(user_id,org,name,note,granted_by,ts) values(?,?,?,?,?,?)",
                       (int(u["id"]), body.org.strip(), name, body.note.strip(), sess.user_id, int(time.time())))
+            c.execute("delete from keys where user_id=? and org<>?", (int(u["id"]), body.org.strip()))   # 改了单位：旧钥匙作废
         return {"ok": True, "user_id": int(u["id"]), "name": name}
 
     @app.delete("/api/v1/admin/sewing/licenses/{uid}")
@@ -357,6 +366,7 @@ def register(app, m) -> None:
         await m.accounts_require_admin(sess)
         with db() as c:
             c.execute("delete from licenses where user_id=?", (uid,))
+            c.execute("delete from keys where user_id=?", (uid,))       # 第 49 轮：收回开通，钥匙一并作废
         return {"ok": True}
 
 

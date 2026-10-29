@@ -47,7 +47,7 @@
             <view v-for="(f, j) in it.fixes" :key="j" class="fix">
               <text class="para">→ {{ f.name }} {{ f.old }} → <text class="strong">{{ f.new }}</text> {{ f.unit }}：{{ f.how }}</text>
               <text class="small" :class="f.clears && f.params ? 'okc' : 'badc'">{{ f.clears ? (f.params ? t("sew.ai.clears") : t("sew.ai.clearsBut", { n: f.new_bad.join("、") })) : t("sew.ai.notClears") }}</text>
-              <text v-if="f.params" class="link" @click="adopt(only([f]))">{{ t("sew.ai.adopt") }}</text>
+              <text v-if="f.clears && f.params" class="link" @click="adopt(only([f]))">{{ t("sew.ai.adopt") }}</text>
             </view>
           </view>
         </view>

@@ -265,9 +265,9 @@ def register(app, m) -> None:
         except ValueError:
             p = M.clean({})
         if part_id:                                   # 第 49 轮：直接用本单位零件库里的机壳 / 绷架
-            data, fname = m.sewing_part_step(part_id, lic)
+            data, fname = m.sewing_part_step(part_id, lic, "frame")
         elif file is not None:
-            data, fname = await file.read(), file.filename or ""
+            data, fname = await file.read(30 * 1024 * 1024 + 1), file.filename or ""
         else:
             raise EngineError("bad_file", "upload a STEP file or pick one from your parts library", 400)
         if not data or len(data) > 30 * 1024 * 1024:

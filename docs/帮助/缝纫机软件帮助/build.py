@@ -253,6 +253,13 @@ def main():
         if f.is_file() and (f.name.startswith("fc-") or f.suffix in (".png", ".webp", ".jpg") and not f.name.startswith("web-")):
             shutil.copy2(f, FC_OFFLINE / "media" / f.name)
     page = build("freecad", vals, data, FC_OFFLINE, "media/")
+    # 离线版用 file:// 打开时浏览器多半不读旁边的字幕文件：把字幕直接写进页面（data URI）
+    import base64
+
+    def inline_vtt(m):
+        p = FC_OFFLINE / "media" / m.group(1)
+        return f'src="data:text/vtt;base64,{base64.b64encode(p.read_bytes()).decode()}"' if p.exists() else m.group(0)
+    page = re.sub(r'src="media/([^"]+\.vtt)"', inline_vtt, page)
     # 离线版里网页版的视频改成在线地址
     page = re.sub(r'(src|poster)="media/(web-[^"]+)"', lambda m: f'{m.group(1)}="{ONLINE}/static/help/media/{m.group(2)}"', page)
     (FC_OFFLINE / "index.html").write_text(page, encoding="utf-8")

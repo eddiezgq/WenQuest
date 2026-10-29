@@ -19,6 +19,7 @@
 上限：每单位 5 000 件，STEP 30 MB，AI 整理每单位每天 20 份。待复核的零件不进设计和选型。
 """
 
+import asyncio
 import hashlib
 import json
 import re
@@ -44,8 +45,8 @@ EXTRACT_SYSTEM = """You read a component catalogue or drawing (the text of a PDF
 company's own parts library. One row per distinct model / size in the document that belongs to the category asked for.
 Rules — they matter more than anything else:
 1. Never invent a value. Every number must be written in the document. If a field is not in the document, use null.
-2. Convert units only by plain arithmetic and only when the document gives the value in another unit; then say so in
-   the quote (e.g. "0.637 N·m" stays 0.637; "6.37 kgf·cm" is not converted — leave it null and ask in notes).
+2. Never convert units. If the document gives a value in a different unit from the field's unit, leave the field null and
+   say so in notes (e.g. "6.37 kgf·cm" for a field in N·m stays null).
 3. For every non-null field give `quote`: the short exact text from the document the value comes from (≤ 80 chars).
 4. code = the model number as written in the document; name = a short Chinese name.
 Answer only with the JSON object."""
@@ -58,6 +59,20 @@ class PartIn(BaseModel):
     erp: str = Field(default="", max_length=60)
     fields: dict[str, Any] = Field(default_factory=dict)
     confirm: bool = False
+
+
+async def read_limited(file: UploadFile, limit: int) -> bytes:
+    """分块读上传的文件，超过上限就停（不把超大的文件整个读进内存）"""
+    out, n = [], 0
+    while True:
+        chunk = await file.read(1024 * 1024)
+        if not chunk:
+            break
+        n += len(chunk)
+        if n > limit:
+            raise EngineError("bad_file", f"the file is larger than {limit // (1024 * 1024)} MB", 400)
+        out.append(chunk)
+    return b"".join(out)
 
 
 def extract_schema(cat: str) -> dict:
@@ -115,6 +130,8 @@ def register(app, m) -> None:
                      erp text, source text, status text, evidence text, step text, step_name text, created_by integer,
                      created integer, updated integer)""")
         c.execute("create unique index if not exists parts_code on parts(org, code)")
+        if "step_uploaded" not in [r[1] for r in c.execute("pragma table_info(parts)")]:
+            c.execute("alter table parts add column step_uploaded integer default 0")     # 1 = 三维是用户上传的，改字段时不重新生成
         c.execute("create table if not exists part_extracts(id integer primary key, org text, user_id integer, ts real, file text, rows integer)")
         return c
 
@@ -125,6 +142,7 @@ def register(app, m) -> None:
 
     def row(r) -> dict:
         d = dict(r)
+        d.pop("step_uploaded", None)
         d["fields"] = json.loads(d["fields"] or "{}")
         d["evidence"] = json.loads(d["evidence"] or "{}")
         d["has_step"] = bool(d.pop("step"))
@@ -150,13 +168,19 @@ def register(app, m) -> None:
             n += 1
         return code
 
-    def insert(c, lic, cat, code, name, erp, fields, source, status, ev=None) -> int:
-        if c.execute("select count(*) from parts where org=?", (lic["org"],)).fetchone()[0] >= MAX_PARTS:
+    def make_step(cat, fields, code):
+        """有造型程序的类别生成 STEP（在线程里调，不卡网关）"""
+        if not PL.can_shape(cat, fields):
+            return None
+        data = PL.to_step(cat, fields, code)
+        return save_step(data) if data else None
+
+    def room(c, org, n=1):
+        if c.execute("select count(*) from parts where org=?", (org,)).fetchone()[0] + n > MAX_PARTS:
             raise EngineError("too_many", f"at most {MAX_PARTS} parts per company", 400)
-        step = None
-        if PL.can_shape(cat, fields):
-            data = PL.to_step(cat, fields, code)
-            step = save_step(data) if data else None
+
+    def insert(c, lic, cat, code, name, erp, fields, source, status, ev=None, step=None) -> int:
+        room(c, lic["org"])
         now = int(time.time())
         return c.execute("""insert into parts(org,code,name,cat,fields,erp,source,status,evidence,step,step_name,created_by,created,updated)
                             values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
@@ -186,14 +210,17 @@ def register(app, m) -> None:
         return {"org": lic["org"], "parts": rs, "total": n, "review": nr}
 
     @app.post("/api/v1/sewing/parts")
-    async def create(body: PartIn, lic: Annotated[dict, Depends(who)]):
+    async def create(body: PartIn, lic: Annotated[dict, Depends(m.sewing_who_web)]):
         fields, errs = PL.check_fields(body.cat, body.fields)
         if errs:
             raise EngineError("bad_fields", "；".join(errs), 400)
         with db() as c:
             if c.execute("select 1 from parts where org=? and code=?", (lic["org"], body.code.strip())).fetchone():
                 raise EngineError("duplicate", "this code is already in your library", 409)
-            pid = insert(c, lic, body.cat, body.code.strip(), body.name.strip(), body.erp.strip(), fields, "manual", "ok")
+            room(c, lic["org"])
+        step = await asyncio.to_thread(make_step, body.cat, fields, body.code.strip())
+        with db() as c:
+            pid = insert(c, lic, body.cat, body.code.strip(), body.name.strip(), body.erp.strip(), fields, "manual", "ok", step=step)
             return row(c.execute("select * from parts where id=?", (pid,)).fetchone())
 
     @app.get("/api/v1/sewing/parts/for")
@@ -215,15 +242,15 @@ def register(app, m) -> None:
                         headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(name)}"})
 
     @app.post("/api/v1/sewing/parts/import")
-    async def import_xlsx(lic: Annotated[dict, Depends(who)], file: UploadFile = File(...), cat: str = Form(...),
+    async def import_xlsx(lic: Annotated[dict, Depends(m.sewing_who_web)], file: UploadFile = File(...), cat: str = Form(...),
                           commit: bool = Form(False)):
         if cat not in PL.CATS:
             raise EngineError("not_found", "no such category", 404)
-        data = await file.read()
-        if not data or len(data) > 10 * 1024 * 1024:
-            raise EngineError("bad_file", "the table is empty or larger than 10 MB", 400)
+        data = await read_limited(file, 10 * 1024 * 1024)
+        if not data:
+            raise EngineError("bad_file", "the table is empty", 400)
         try:
-            rows = PL.read_xlsx(cat, data)
+            rows = await asyncio.to_thread(PL.read_xlsx, cat, data)
         except ValueError as e:
             raise EngineError("bad_table", str(e), 400) from e
         except Exception as e:  # noqa: BLE001
@@ -235,39 +262,51 @@ def register(app, m) -> None:
             bad = sum(1 for x in rows if x["errors"])
             if not commit or bad or not rows:
                 return {"rows": rows, "bad": bad, "imported": 0}
-            for x in rows:
-                insert(c, lic, cat, x["code"], x["name"], x["erp"], x["fields"], "table", "ok")
+            room(c, lic["org"], len(rows))                    # 放不下就一个都不入库
+        steps = await asyncio.to_thread(lambda: [make_step(cat, x["fields"], x["code"]) for x in rows])
+        with db() as c:
+            c.execute("begin")
+            try:
+                for x, st in zip(rows, steps):
+                    insert(c, lic, cat, x["code"], x["name"], x["erp"], x["fields"], "table", "ok", step=st)
+                c.execute("commit")
+            except Exception:
+                c.execute("rollback")
+                raise
         return {"rows": rows, "bad": 0, "imported": len(rows)}
 
     @app.post("/api/v1/sewing/parts/extract")
-    async def extract(lic: Annotated[dict, Depends(who)], file: UploadFile = File(...), cat: str = Form(...)):
+    async def extract(lic: Annotated[dict, Depends(m.sewing_who_web)], file: UploadFile = File(...), cat: str = Form(...)):
         if cat not in PL.CATS:
             raise EngineError("not_found", "no such category", 404)
         if not state.ai.available:
             raise EngineError("ai_unavailable", "no AI model is configured on this server", 503)
-        data = await file.read()
-        if not data or len(data) > MAX_PDF or not data.startswith(b"%PDF"):
+        data = await read_limited(file, MAX_PDF)
+        if not data.startswith(b"%PDF"):
             raise EngineError("bad_file", "upload a PDF under 30 MB", 400)
         try:
-            text = pdf_text(data)
+            text = await asyncio.to_thread(pdf_text, data)
         except Exception as e:  # noqa: BLE001
             raise EngineError("bad_file", "cannot read this PDF", 400) from e
         if len(text.strip()) < 40:
             raise EngineError("no_text", "this PDF has no text layer (a scan); scanned catalogues are not supported yet", 400)
-        with db() as c:
+        with db() as c:                               # 先占一个名额再调模型（同时几份也不会超）
             n = c.execute("select count(*) from part_extracts where org=? and ts>?", (lic["org"], time.time() - 86400)).fetchone()[0]
-        if n >= EXTRACT_DAILY:
-            raise EngineError("quota", f"today's catalogue reads are used up ({EXTRACT_DAILY} a day per company)", 429)
+            if n >= EXTRACT_DAILY:
+                raise EngineError("quota", f"today's catalogue reads are used up ({EXTRACT_DAILY} a day per company)", 429)
+            run_id = c.execute("insert into part_extracts(org,user_id,ts,file,rows) values(?,?,?,?,0)",
+                               (lic["org"], lic["user_id"], time.time(), (file.filename or "")[:80])).lastrowid
         c0 = PL.CATS[cat]
         fl = "\n".join(f"{k}\t{zh}\t{u}" for k, zh, u, *_ in c0["fields"])
         out = await state.ai.json(system=EXTRACT_SYSTEM, schema=extract_schema(cat), max_tokens=8000,
                                   prompt=f"Category: {c0['zh']}\nFields (key, name, unit):\n{fl}\n\nDocument text:\n{text}",
                                   fake=lambda: {"rows": [], "notes": []})
         made = []
+        rows_in = (out.get("rows") or [])[:200]
         with db() as c:
-            c.execute("insert into part_extracts(org,user_id,ts,file,rows) values(?,?,?,?,?)",
-                      (lic["org"], lic["user_id"], time.time(), (file.filename or "")[:80], len(out.get("rows") or [])))
-            for r in (out.get("rows") or [])[:200]:
+            c.execute("update part_extracts set rows=? where id=?", (len(rows_in), run_id))
+            room(c, lic["org"], len(rows_in))
+            for r in rows_in:
                 raw = {k: v for k, v in (r.get("fields") or {}).items() if v is not None}
                 fields, errs = PL.check_fields(cat, raw)
                 # 必填没找到也照样进“待复核”，复核时补
@@ -290,12 +329,12 @@ def register(app, m) -> None:
     async def get_part(pid: int, lic: Annotated[dict, Depends(who)], machine: str = ""):
         with db() as c:
             p = row(own(c, pid, lic))
-        if machine:
-            p["uses"] = PL.param_values(p["cat"], p["fields"], machine)
+        if machine:                                   # 待复核的零件不给“用到当前设计”
+            p["uses"] = PL.param_values(p["cat"], p["fields"], machine) if p["status"] == "ok" else []
         return p
 
     @app.put("/api/v1/sewing/parts/{pid}")
-    async def update(pid: int, body: PartIn, lic: Annotated[dict, Depends(who)]):
+    async def update(pid: int, body: PartIn, lic: Annotated[dict, Depends(m.sewing_who_web)]):
         fields, errs = PL.check_fields(body.cat, body.fields)
         with db() as c:
             old = row(own(c, pid, lic))
@@ -304,38 +343,41 @@ def register(app, m) -> None:
             if c.execute("select 1 from parts where org=? and code=? and id<>?", (lic["org"], body.code.strip(), pid)).fetchone():
                 raise EngineError("duplicate", "this code is already in your library", 409)
             status = "ok" if (old["status"] == "ok" or body.confirm) else "review"
-            step = c.execute("select step, step_name from parts where id=?", (pid,)).fetchone()
-            sh, sn = step[0], step[1]
-            if PL.can_shape(body.cat, fields) and (fields != old["fields"] or not sh) and old["source"] != "upload":
-                data = PL.to_step(body.cat, fields, body.code.strip())
-                if data:
-                    sh, sn = save_step(data), f"{body.code.strip()}.step"
+            step = c.execute("select step, step_name, step_uploaded from parts where id=?", (pid,)).fetchone()
+            sh, sn, up = step[0], step[1], step[2]
+        if PL.can_shape(body.cat, fields) and (fields != old["fields"] or not sh) and not up:
+            new = await asyncio.to_thread(make_step, body.cat, fields, body.code.strip())
+            if new:
+                sh, sn = new, f"{body.code.strip()}.step"
+        with db() as c:
             c.execute("update parts set code=?, name=?, cat=?, fields=?, erp=?, status=?, step=?, step_name=?, updated=? where id=?",
                       (body.code.strip(), body.name.strip(), body.cat, json.dumps(fields, ensure_ascii=False), body.erp.strip(), status,
                        sh, sn, int(time.time()), pid))
             return row(c.execute("select * from parts where id=?", (pid,)).fetchone())
 
     @app.delete("/api/v1/sewing/parts/{pid}")
-    async def remove(pid: int, lic: Annotated[dict, Depends(who)]):
+    async def remove(pid: int, lic: Annotated[dict, Depends(m.sewing_who_web)]):
         with db() as c:
             own(c, pid, lic)
             c.execute("delete from parts where id=?", (pid,))
         return {"ok": True}
 
     @app.post("/api/v1/sewing/parts/{pid}/step")
-    async def upload_step(pid: int, lic: Annotated[dict, Depends(who)], file: UploadFile = File(...)):
-        data = await file.read()
-        if not data or len(data) > MAX_STEP or b"ISO-10303-21" not in data[:200]:
+    async def upload_step(pid: int, lic: Annotated[dict, Depends(m.sewing_who_web)], file: UploadFile = File(...)):
+        data = await read_limited(file, MAX_STEP)
+        if b"ISO-10303-21" not in data[:200]:
             raise EngineError("bad_file", "upload a STEP file (.step / .stp) under 30 MB", 400)
         with db() as c:
             own(c, pid, lic)
-            c.execute("update parts set step=?, step_name=?, source=case when source='manual' then 'upload' else source end, updated=? where id=?",
-                      (save_step(data), (file.filename or "part.step")[:80], int(time.time()), pid))
+            c.execute("update parts set step=?, step_name=?, step_uploaded=1, source=case when source='manual' then 'upload' else source end, "
+                      "updated=? where id=?", (save_step(data), (file.filename or "part.step")[:80], int(time.time()), pid))
             return row(c.execute("select * from parts where id=?", (pid,)).fetchone())
 
-    def step_bytes(pid: int, lic: dict) -> tuple[bytes, str]:
+    def step_bytes(pid: int, lic: dict, cat: str = "") -> tuple[bytes, str]:
         with db() as c:
             r = own(c, pid, lic)
+        if cat and (r["cat"] != cat or r["status"] != "ok"):   # CAE 用：只认这一类、复核过的件
+            raise EngineError("not_found", "pick an approved part of this kind", 404)
         if not r["step"]:
             raise EngineError("not_found", "this part has no 3D model", 404)
         p = store() / f"{r['step']}.step"
@@ -356,7 +398,7 @@ def register(app, m) -> None:
         if cache.exists():
             return Response(cache.read_bytes(), media_type="application/json")
         try:
-            out = step_mesh(data)
+            out = await asyncio.to_thread(step_mesh, data)
         except Exception as e:  # noqa: BLE001
             raise EngineError("unavailable", "3D preview is not available on this server", 503) from e
         cache.write_text(json.dumps(out))

@@ -73,7 +73,8 @@
       <view v-if="cur" class="box detail">
         <view class="dh"><text class="bt">{{ cur.id ? cur.code : t("sew.lib.add") }}</text><text class="link" @click="cur = null">{{ t("sew.lib.close") }}</text></view>
         <view v-if="!cur.id" class="row"><text v-for="c in cats" :key="c.key" class="opt" :class="{ on: cur.cat === c.key }" @click="cur.cat = c.key">{{ c.zh }}</text></view>
-        <view v-if="cur.status === 'review'" class="note">{{ t("sew.lib.reviewNote") }}<text v-if="cur.evidence && cur.evidence._file"> · {{ cur.evidence._file }}</text></view>
+        <view v-if="cur.status === 'review'" class="note">{{ t("sew.lib.reviewNote") }}<text v-if="cur.evidence && cur.evidence._file"> · {{ cur.evidence._file }}</text>
+          <text v-if="cur.evidence && cur.evidence._errors && cur.evidence._errors.length" class="badc">　{{ t("sew.lib.aiErrors") }}{{ cur.evidence._errors.join("；") }}</text></view>
         <view class="grid">
           <view class="f"><text class="fl">{{ t("sew.lib.code") }} *</text><input v-model="cur.code" class="input" maxlength="60" /></view>
           <view class="f"><text class="fl">{{ t("sew.lib.name") }} *</text><input v-model="cur.name" class="input" maxlength="80" /></view>

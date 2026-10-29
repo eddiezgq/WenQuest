@@ -105,6 +105,14 @@ def test_table_import(sc):  # noqa: F811
     rows = list(x.iter_rows(values_only=True))
     assert rows[0][:4] == ("Item Code", "Item Name", "Item Group", "Stock UOM") and {r[0] for r in rows[1:]} == {"CR-15", "CR-16"}
     assert "孔距 15.5 mm" in next(r[5] for r in rows[1:] if r[0] == "CR-15")
+    c.post("/api/v1/sewing/parts", json={"cat": "other", "code": "=1+1", "name": "@x", "fields": {}}, headers=user)
+    x = load_workbook(io.BytesIO(c.get("/api/v1/sewing/parts/erp.xlsx", headers=user).content)).active
+    assert ("'=1+1", "'@x") in {(r[0], r[1]) for r in x.iter_rows(values_only=True)}        # 不会被 Excel 当公式
+    # 上传了自己的 STEP，再改字段也不被自动生成的盖掉
+    cr = next(p for p in ps if p["code"] == "CR-15")
+    up = c.post(f"/api/v1/sewing/parts/{cr['id']}/step", files={"file": ("mine.step", b"ISO-10303-21;\nHEADER;", "model/step")}, headers=user).json()
+    q = c.put(f"/api/v1/sewing/parts/{cr['id']}", json={"cat": "link", "code": "CR-15", "name": "改名", "fields": dict(cr["fields"], t=9)}, headers=user).json()
+    assert q["step_name"] == "mine.step" and up["step_name"] == "mine.step"
 
 
 def pdf_with_text(lines):
@@ -143,8 +151,9 @@ def test_ai_reads_a_catalogue_into_review(sc, monkeypatch):  # noqa: F811
     p = r.json()["parts"][0]
     assert "SV-400" in calls[0]["prompt"] and p["status"] == "review" and p["source"] == "ai"
     assert p["evidence"]["rated_nm"]["found"] is True and p["evidence"]["length"]["found"] is False      # 95 在样本里找不到
-    # 待复核的不进设计、不进选型
+    # 待复核的不进设计、不进选型、详情里也不给“用到当前设计”
     assert c.get("/api/v1/sewing/parts/for?machine=pattern", headers=user).json()["items"] == []
+    assert c.get(f"/api/v1/sewing/parts/{p['id']}?machine=pattern", headers=user).json()["uses"] == []
     assert c.get("/api/v1/sewing/parts?status=review", headers=user).json()["review"] == 1
     body = {"cat": "motor", "code": p["code"], "name": p["name"], "fields": dict(p["fields"], length=90), "confirm": True}
     q = c.put(f"/api/v1/sewing/parts/{p['id']}", json=body, headers=user).json()
@@ -178,6 +187,9 @@ def test_parts_in_cae(cae):  # noqa: F811
     r = c.post("/api/v1/sewing/cae/frame", data={"machine": "lockstitch", "part_id": str(f["id"])}, headers=user)
     assert r.status_code == 200 and fk.posted[-1]["kind"] == "fea"
     assert c.post("/api/v1/sewing/cae/frame", data={"machine": "lockstitch"}, headers=user).status_code == 400
+    # 不是机壳的件不能拿去算模态
+    m0 = c.get("/api/v1/sewing/parts?cat=motor", headers=user).json()["parts"][0]
+    assert c.post("/api/v1/sewing/cae/frame", data={"machine": "lockstitch", "part_id": str(m0["id"])}, headers=user).status_code == 404
 
 
 def test_partlib_checks():

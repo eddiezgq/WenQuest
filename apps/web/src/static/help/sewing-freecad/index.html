@@ -271,7 +271,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tr>
 <tr>
 <td>导出参数</td>
-<td>存成参数文件，网页版能打开</td>
+<td>存成参数文件（存档，或交给同事在 FreeCAD 里导入）</td>
 <td>—</td>
 </tr>
 <tr>
@@ -308,7 +308,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <h3 id="use-2">和网页版互通</h3>
 <ul>
 <li>网页版“导出 → 参数文件”得到 <code>.wqsew.json</code>，FreeCAD 里选中同机型的设计点“导入参数”，58 项校核的结论和数值完全相同。</li>
-<li>FreeCAD 里“导出参数”，网页版保存项目时可以照着填，或者直接交给同事在网页版打开。</li>
+<li>FreeCAD 里“导出参数”得到同样格式的文件，存档或交给同事在 FreeCAD 里导入；网页版目前没有导入参数文件的入口。</li>
 <li>花样机上传的针位表存在设计对象的 <code>PatternPoints</code> 属性里，随参数文件一起带。</li>
 </ul>
 <a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=lockstitch&amp;tab=checks" target="_blank" rel="noopener">▶ 试一试：在网页版打开同样的教材算例（对照结果）</a>
@@ -596,7 +596,7 @@ print(r)
 <li>要管版本、走审批的图纸（例如自制曲柄改了尺寸），照旧在问渠数字工厂“设计发布与审批”上传，或 FreeCAD“提交到问渠工厂”；批准后版本号加一、STEP 和图纸挂到物料上、新程序随工单到车间。</li>
 </ul>
 <h3 id="lib-6">FreeCAD 钥匙</h3>
-<p>“零件库”页签 → “FreeCAD 钥匙” → “生成钥匙”。每人一把，<strong>只显示一次</strong>，复制到 FreeCAD 工作台里；丢了就重新生成，旧的自动作废。钥匙只能做三件事：读本单位零件库、下载零件的 STEP、用 AI 助手。账号被收回开通，钥匙同时失效。</p>
+<p>“零件库”页签 → “FreeCAD 钥匙” → “生成钥匙”（已开通的企业账号）。每人一把，<strong>只显示一次</strong>，复制到 FreeCAD 工作台里；丢了就重新生成，旧的自动作废。钥匙只能做三件事：读本单位零件库、下载零件的 STEP、用 AI 助手——增、改、删、导入零件都要在网页上登录做。账号被收回开通或换了单位，钥匙同时作废。</p>
 <h3 id="lib-7">上限与安全</h3>
 <ul>
 <li>每单位 5000 个零件；STEP 每个 30 MB 以内。</li>
@@ -739,7 +739,7 @@ print(r)
 <h3 id="kernel-4">为什么用开源内核</h3>
 <ul>
 <li><strong>成熟</strong>：这些求解器和几何内核，全世界的大学、研究所、工厂用了很多年，结果有大量文献可对照。</li>
-<li><strong>透明</strong>：算法公开，结果可复核；需要时可以拿同一个 STEP 在别的软件里核对（比如本节前面 FreeCAD 本机和服务器的有限元对照）。</li>
+<li><strong>透明</strong>：算法公开，结果可复核；需要时可以拿同一个 STEP 在别的软件里核对（例如“复杂 CAE 快速上手”一节里 FreeCAD 本机和服务器的有限元对照）。</li>
 <li><strong>不被卡脖子</strong>：没有按席位收费的商业许可，部署在国内服务器也不受限制；数据在自己手里。</li>
 </ul></section>
 <section id="arch"><h2><span class="n">08</span>完整系统设计</h2><p class="lead">从浏览器、FreeCAD 到计算核心、求解器、大模型、ERP，一次改参数，数据怎么走。</p><div class="anim" data-anim="arch"></div>
@@ -814,7 +814,7 @@ print(r)
 <h3 id="faq-2">常见问题</h3>
 <p><strong>来宾为什么不能导出？</strong> 导出、CAE、AI、零件库是企业版功能，开通后可用（见“账号与开通”）。</p>
 <p><strong>两个人同时改一个项目会怎样？</strong> 后保存的覆盖先保存的；要保留两版就“另存为”。</p>
-<p><strong>CAE 页签提示“数字工厂没接上”？</strong> 计算服务暂时不可用；设计优化和电机选型照常能用，稍后再提交。</p>
+<p><strong>CAE 页签提示“数字工厂没接上”？</strong> 计算服务暂时不可用；设计优化照常能用（它在网关里直接算），有限元、模态、动力学、电机选型稍后再提交。</p>
 <p><strong>AI 说“没通过”怎么办？</strong> 看它列出的新红灯，改一下那句话（例如加上“针杆可以换轻的”“机壳可以加筋”），或直接按“解释红黄灯”给的改法逐项改。</p>
 <p><strong>表格导入总说表头不对？</strong> 用这一类的模板，别删第 2 行的灰字（字段键）；可以调列的顺序，可以删可选的列。</p>
 <p><strong>AI 整理样本说“没有文字层”？</strong> 是扫描件。请供应商给电子版 PDF，或先用手填 / 表格。</p>
