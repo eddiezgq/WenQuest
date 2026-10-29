@@ -224,3 +224,5 @@ footer.site .base img { display: inline-block; width: 16px; height: 16px; vertic
 .casecards .shot img { object-position: center; }
 ol.plain { padding-left: 1.3em; }
 ol.plain li { margin: 6px 0; }
+
+form.demo select { font: 400 16px/1.4 var(--body); padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); margin-left: 6px; }

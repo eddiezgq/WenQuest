@@ -26,7 +26,8 @@ from .moodle import EngineError
 from .session import Session
 
 PRODUCTS = ("问渠质量 ERP", "问渠数字工厂集成平台", "缝纫机设计与制造软件", "凸轮设计与制造软件", "制造业专用软件定制",
-            "技术服务", "问渠 AI 学习平台", "数字工厂教学版与虚拟实验室", "咨询")
+            "学习系统", "电子教材开发", "虚拟实验开发", "数字工厂开发", "CAD/CAM/CAE 集成化解决方案", "技术服务", "咨询",
+            "问渠 AI 学习平台", "数字工厂教学版与虚拟实验室")           # 最后两项是第 48 轮的旧名称，旧页面提交时仍认
 PHONE_RE = re.compile(r"^(?:\+?86[- ]?)?(?:1[3-9]\d{9}|0\d{2,3}-?\d{7,8}(?:-\d{1,6})?)$")
 EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[A-Za-z0-9.-]{1,190}\.[A-Za-z]{2,24}$")
 IP_HOURLY = 6
@@ -41,6 +42,8 @@ class DemoIn(BaseModel):
     products: list[str] = Field(default_factory=list, max_length=len(PRODUCTS))
     note: str = Field(default="", max_length=2000)
     consent: bool = False
+    trial: bool = False                              # round 50: the organisation asks for online trial accounts
+    seats: int = Field(default=0, ge=0, le=5)
     website: str = ""                                # honeypot: people never fill it
 
 
@@ -54,7 +57,11 @@ def register(app, m) -> None:
         c = sqlite3.connect(str(d / "demo-request.db"), isolation_level=None)
         c.row_factory = sqlite3.Row
         c.execute("""create table if not exists request(id integer primary key, ts integer, org text, name text, phone text,
-                     email text, industry text, products text, note text)""")
+                     email text, industry text, products text, note text, trial integer default 0, seats integer default 0)""")
+        cols = {r[1] for r in c.execute("pragma table_info(request)")}
+        for col in ("trial", "seats"):                 # databases from round 48
+            if col not in cols:
+                c.execute(f"alter table request add column {col} integer default 0")
         return c
 
     def ip(req: Request) -> str:
@@ -87,9 +94,9 @@ def register(app, m) -> None:
         q.append(now)
         products = [p for p in dict.fromkeys(body.products) if p in PRODUCTS]
         with db() as c:
-            c.execute("insert into request(ts,org,name,phone,email,industry,products,note) values(?,?,?,?,?,?,?,?)",
+            c.execute("insert into request(ts,org,name,phone,email,industry,products,note,trial,seats) values(?,?,?,?,?,?,?,?,?,?)",
                       (int(now), org[:100], name[:40], phone, email, body.industry.strip()[:60], "、".join(products),
-                       body.note.strip()[:2000]))
+                       body.note.strip()[:2000], 1 if body.trial else 0, (body.seats or 5) if body.trial else 0))
         return {"ok": True}
 
     @app.get("/api/v1/public/site")
@@ -100,7 +107,7 @@ def register(app, m) -> None:
         if st.region.strip().lower() != "cn":
             return {"region": "us"}
         return {"region": "cn", "brand": st.brand or "问渠科技", "company": st.company, "icp": st.icp, "psb": st.psb,
-                "ai_reg": st.ai_reg, "ai_model": "DeepSeek", "ai_label": True}
+                "ai_reg": st.ai_reg, "ai_model": "DeepSeek", "ai_label": True, "signup": False}
 
     @app.get("/api/v1/admin/demo-request")
     async def listing(sess: Annotated[Session, Depends(m.current)], format: str = "json"):
@@ -110,10 +117,10 @@ def register(app, m) -> None:
         if format == "csv":
             buf = io.StringIO()
             w = csv.writer(buf)
-            w.writerow(["时间（UTC）", "单位", "姓名", "电话", "邮箱", "行业", "想了解", "需求说明"])
+            w.writerow(["时间（UTC）", "单位", "姓名", "电话", "邮箱", "行业", "想了解", "需求说明", "申请体验", "账号数"])
             for r in rows:
                 w.writerow([time.strftime("%Y-%m-%d %H:%M", time.gmtime(r["ts"])), r["org"], r["name"], r["phone"], r["email"],
-                            r["industry"], r["products"], r["note"]])
+                            r["industry"], r["products"], r["note"], "是" if r["trial"] else "", r["seats"] or ""])
             return Response("﻿" + buf.getvalue(), media_type="text/csv; charset=utf-8",
                             headers={"Content-Disposition": "attachment; filename=demo-requests.csv"})
         return {"count": len(rows), "rows": rows[:500]}

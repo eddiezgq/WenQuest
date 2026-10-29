@@ -1,7 +1,13 @@
 <template>
   <AuthCard wide>
     <!-- done: what happens next -->
-    <template v-if="done">
+    <!-- 第 50 轮：国内服务器上不接受个人注册，账号按单位开通 -->
+    <template v-if="isCN">
+      <text class="title">{{ t("reg.cnClosedTitle") }}</text>
+      <text class="lead">{{ t("reg.cnClosedText") }}</text>
+      <view class="submit" @click="goContact">{{ t("reg.cnClosedGo") }}</view>
+    </template>
+    <template v-else-if="done">
       <text class="title">{{ done === "student" ? t("reg.doneStudent") : done === "approved" ? t("reg.doneTeacher") : t("reg.doneApplied") }}</text>
       <text class="lead">{{ done === "student" ? t("reg.doneStudentText") : done === "approved" ? t("reg.doneTeacherText") : t("reg.doneAppliedText") }}</text>
       <view v-if="appStatus === 'need_more'" class="note warn">
@@ -116,6 +122,12 @@ import AuthCard from "../../components/auth/AuthCard.vue";
 import { PASSWORD_OK, accountApi, afterLogin, siteUrl } from "../../accountApi";
 import { ApiError } from "../../api";
 import { errorText, t } from "../../i18n";
+import { isCN } from "../../site";
+function goContact() {
+  // #ifdef H5
+  window.location.href = siteUrl("/contact/");
+  // #endif
+}
 
 const role = ref<"student" | "teacher">("student");
 const lastname = ref("");

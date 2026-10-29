@@ -23,6 +23,12 @@ def test_submit_validate_and_export(client):  # noqa: F811
     assert row["phone"] == "13800138000" and row["email"] == "wang@example.cn" and row["products"] == "问渠质量 ERP、缝纫机设计与制造软件"
     csv = client.get("/api/v1/admin/demo-request?format=csv", headers=h)
     assert csv.headers["content-type"].startswith("text/csv") and "某某缝纫机有限公司" in csv.text
+    # round 50: a request for online trial accounts
+    assert client.post("/api/v1/public/demo-request", json={**GOOD, "trial": True, "seats": 3,
+                                                           "products": ["学习系统", "虚拟实验开发"]}).json() == {"ok": True}
+    row = client.get("/api/v1/admin/demo-request", headers=h).json()["rows"][0]
+    assert row["trial"] == 1 and row["seats"] == 3 and row["products"] == "学习系统、虚拟实验开发"
+    assert client.post("/api/v1/public/demo-request", json={**GOOD, "trial": True, "seats": 9}).status_code == 422
 
 
 def test_rate_limit(client):  # noqa: F811

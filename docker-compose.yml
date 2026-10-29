@@ -61,6 +61,11 @@ services:
       WQ_ICP: ${WQ_ICP:-}
       WQ_PSB: ${WQ_PSB:-}
       WQ_AI_REG: ${WQ_AI_REG:-}
+      # 国内在线体验按单位开通（第 50 轮）：最多几家单位、每家默认几个账号（最多几个）、体验期几天
+      WQ_CN_MAX_ORGS: ${WQ_CN_MAX_ORGS:-100}
+      WQ_CN_ORG_SEATS: ${WQ_CN_ORG_SEATS:-5}
+      WQ_CN_ORG_SEATS_MAX: ${WQ_CN_ORG_SEATS_MAX:-20}
+      WQ_CN_TRIAL_DAYS: ${WQ_CN_TRIAL_DAYS:-90}
       WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
       # The course lead (专家版) and the AI pre-review use the strongest model.
       WQ_LEAD_MODEL: ${LEAD_MODEL:-claude-opus-5-5}

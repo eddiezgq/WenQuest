@@ -19,7 +19,10 @@
       <view class="submit" role="button" :class="{ disabled: busy || !username || !password }" @click="submit">
         {{ busy ? t("login.busy") : t("login.submit") }}
       </view>
-      <view class="alt">
+      <view v-if="isCN" class="alt">
+        <text class="wq-muted">{{ t("reg.cnClosedTitle") }}</text>
+      </view>
+      <view v-if="!isCN" class="alt">
         <text class="wq-muted">{{ t("login.noAccount") }}</text>
         <text class="wq-link strong" @click="register">{{ t("login.register") }}</text>
       </view>
@@ -29,6 +32,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { isCN } from "../../site";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AuthCard from "../../components/auth/AuthCard.vue";
 import { accountApi, afterLogin } from "../../accountApi";

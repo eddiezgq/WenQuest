@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "48a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "50a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -56,9 +56,9 @@ ENTERPRISE = [
     ("/solutions/custom/", "制造业专用软件定制", "按企业需求定制"),
 ]
 EDUCATION = [
-    ("/education/platform/", "问渠 AI 学习平台", "AI 原生的在线学习平台"),
-    ("/education/#factory", "数字工厂教学版与虚拟实验室", "实训平台"),
-    ("/education/#resources", "课程资源定制与教学咨询", "教材、动画、互动课件"),
+    ("/education/platform/", "学习系统：问渠 AI 学习平台", "AI 原生的在线学习平台"),
+    ("/education/#dev", "电子教材、虚拟实验、数字工厂开发", "按单位需求开发"),
+    ("/education/#trial", "在线体验", "按单位申请，审核后开通"),
 ]
 
 
@@ -228,7 +228,7 @@ def home():
 </div><p class="note">案例使用虚构的演示企业和数据。</p>"""
     three = """<div class="cards">
   <article class="card"><h3>技术服务</h3><p>工程仿真（有限元强度、疲劳、温度场、流体、多体动力学）、设计优化、数控编程、工业设计。</p><a class="more" href="/services/">了解 →</a></article>
-  <article class="card"><h3>教育服务 · 问渠 AI 学习平台</h3><p>AI 原生的在线学习平台：老师交来一堆资料，或只说一句要求，AI 就整理出一门完整的课；AI 助教只依据课程资料回答并注明出处。供高校、职业院校和企业使用。</p><a class="more" href="/education/platform/">了解 →</a></article>
+  <article class="card"><h3>教育服务</h3><p>学习系统（问渠 AI 学习平台）、电子教材开发、虚拟实验开发、数字工厂开发、CAD/CAM/CAE 集成化解决方案；学校和企业可按单位申请在线体验。</p><a class="more" href="/education/">了解 →</a></article>
   <article class="card"><h3>咨询</h3><p>数字化转型与智能制造诊断，ERP / MES 选型与实施规划，工业软件方案咨询。</p><a class="more" href="/consulting/">了解 →</a></article>
 </div>"""
     body = f"""<section class="hero"><canvas id="thread" aria-hidden="true"></canvas><div class="wrap">
@@ -392,28 +392,40 @@ def services():
     page("/services/", "技术服务", "问渠科技技术服务：工程仿真、设计优化、数控编程与工艺、工业设计、三维仿真视频、系统集成与数据服务。", body, "/services/")
 
 
+EDU_SERVICES = [
+    ("dev-lms", "学习系统", "问渠 AI 学习平台：AI 建课、AI 助教、AI 批改建议、网页互动课件，网页与微信小程序一套。",
+     ["按单位部署（国内服务器或单位自己的机房）", "与单位已有的账号、课程对接", "老师和单位审核后才发布，全程留痕"], "/education/platform/"),
+    ("dev-book", "电子教材开发", "按专业和课程标准编写电子教材：每章配程序、动画和实验，书里的数字由程序算出、逐条核对。",
+     ["网页版、PDF 与课程包（课件、作业、测验）", "中英对照可选", "现有样书可看简介、目录、样章"], None),
+    ("dev-lab", "虚拟实验开发", "物理仿真在浏览器里运行：机器人、力学、电路、PLC、Verilog 芯片设计等。",
+     ["每个实验配指导书和报告模板", "任务自动判定，AI 助教讲原因不代做", "可嵌进课件当场操作"], None),
+    ("dev-factory", "数字工厂开发", "按真实企业数据运转的教学或企业数字工厂：设计、工艺、计划、采购、质检、设备等岗位都在里面。",
+     ["每班或每个部门一座自己的工厂", "基于开源 ERPNext，数据与业务真实", "可接集成平台与数字孪生"], "/solutions/platform/"),
+    ("dev-cax", "CAD、CAM、CAE 集成化解决方案", "接企业或学校已有的 CAD，数控编程与仿真在浏览器里完成，结果走审批、进 ERP。",
+     ["SolidWorks、FreeCAD，或任何能导出 STEP 的软件", "有限元、疲劳、温度场、流体、多体动力学", "缝纫机、凸轮等行业软件可按需求定制"], "/solutions/platform/"),
+]
+
+
 def education():
-    plat = f"""<div class="split"><div><h3>问渠 AI 学习平台</h3><p>AI 原生的在线学习平台：AI 建课、AI 助教、AI 批改建议，老师和单位来把关。供高校、职业院校和企业使用。</p>
-<p><a class="btn solid" href="/education/platform/">了解学习平台 →</a></p></div>{shot("edu-slides.jpg", "网页互动课件：动画、虚拟实验嵌在课件里")}</div>"""
-    factory = f"""<div class="split rev"><div>
-<h3>数字工厂教学版</h3><p>按真实企业数据运转的教学工业园，学生扮演设计、工艺、计划、采购、质检、设备等岗位；每班一座自己的工厂，老师看得到每个人做了什么。</p>
-<h3 style="margin-top:28px">虚拟实验室</h3><p>物理仿真在浏览器里运行，机器人、力学、电路、PLC、Verilog 芯片设计等；每个实验配指导书和报告模板，任务自动判定。</p></div>
-{shot("edu-lab.jpg", "虚拟实验：机器人场景")}</div>"""
-    res = """<div class="cards">
-  <article class="card"><h3>课程资源定制</h3><p>教材、动画、互动课件、实验，按学校的专业和课程标准制作。现有资源可看简介、目录、样章：《机器人学》《机械设计》《机械制造技术》《人工智能》《PLC》等；全文只给合同客户在平台内使用。</p></article>
-  <article class="card"><h3>教学方案与专业建设咨询</h3><p>智能制造、机器人、电子信息方向的实训方案、课程体系。</p></article>
-  <article class="card"><h3>教学设备</h3><p>教学用机器人与实训套件、教学模型与教具（询价）。</p></article>
-  <article class="card"><h3>企业：技术交流与上线讲解</h3><p>新系统上线时的操作讲解和技术交流；员工上手课程放在问渠 AI 学习平台的企业版里。</p></article>
-</div>
-<p class="note">本公司提供教学软件、课程资源和教育咨询，不从事需要审批的教育培训活动，只与单位签约、不面向个人，不颁发证书。</p>"""
-    body = f"""{hero("教育服务", "教育服务：学习平台、实训平台和课程资源", "面向高校、职业院校和企业，按单位签合同；平台作为软件提供，部署在国内服务器或客户自己的机房。", "教育服务", [("联系我们", "/contact/")])}
-{part("一", "问渠 AI 学习平台", None, plat)}
-<div id="factory"></div>
-{part("二", "数字工厂教学版与虚拟实验室", None, factory, "alt")}
-<div id="resources"></div>
-{part("三", "课程资源定制与教学咨询", None, res)}
-{cta("想看一门课是怎样建出来的？", "我们用你的一门课的资料现场演示 AI 建课。", "预约演示")}"""
-    page("/education/", "教育服务", "问渠科技教育服务：问渠 AI 学习平台、数字工厂教学版、虚拟实验室、课程资源定制与教学咨询。", body, "/education/")
+    cards = ""
+    for aid, h, p, pts, link in EDU_SERVICES:
+        more = f'<a class="more" href="{link}">了解 →</a>' if link else ""
+        cards += f'<article class="card" id="{aid}"><h3>{h}</h3><p>{p}</p>{ul(pts)}{more}</article>'
+    dev = f'<div class="cards">{cards}</div>'
+    trial = f"""<div class="split"><div>
+<h3>先在线体验，再谈合同</h3>
+<p>学校和企业可以先在我们的服务器上在线体验：学习系统（AI 建课、AI 助教、互动课件、虚拟实验）、缝纫机与凸轮设计软件、演示数字工厂。</p>
+{ul(["按单位申请：由单位联系人在“预约演示”里勾选“申请在线体验账号”", "审核后为单位开通若干体验账号，体验期 90 天，可以申请延长", "名额有限，按申请先后开通；不接受个人申请", "正式使用时按合同为单位单独部署"])}
+<p><a class="btn solid" href="/contact/">申请在线体验 →</a></p></div>
+{shot("edu-slides.jpg", "在线体验：网页互动课件，动画和实验在页里当场操作")}</div>"""
+    body = f"""{hero("教育服务", "教育服务：学习系统与教学资源开发", "为学校和企业开发学习系统、电子教材、虚拟实验、数字工厂和 CAD、CAM、CAE 集成化解决方案；国内服务器上提供按单位开通的在线体验。", "教育服务", [("申请在线体验", "/contact/"), ("学习系统", "/education/platform/")])}
+<div id="dev"></div>
+{part("一", "我们为你开发什么", "每一项都按单位的需求做，交付后归单位使用；可以单独做，也可以合在一起。", dev)}
+<div id="trial"></div>
+{part("二", "在线体验", None, trial, "alt")}
+{part("三", "边界", None, '<p class="note" style="margin-top:0">本公司提供教学软件开发、数字内容制作和教育咨询，不从事需要审批的教育培训活动；只与单位签约、不面向个人，不颁发证书。电子教材全文只给合同单位在平台内使用。</p>')}
+{cta("想看一门课是怎样建出来的？", "申请在线体验，或预约我们用你的资料现场演示。", "申请在线体验")}"""
+    page("/education/", "教育服务", "问渠科技教育服务：学习系统、电子教材开发、虚拟实验开发、数字工厂开发、CAD/CAM/CAE 集成化解决方案；按单位开通在线体验。", body, "/education/")
 
 
 def edu_platform():
@@ -433,8 +445,8 @@ def edu_platform():
         ("为课件生成动画、讲解视频、虚拟实验（标注“AI 生成”）", "老师选用"),
     ]))}
 {part("二", "特点", None, f'<div class="split"><div>{feats}</div>{shot("edu-slides.jpg", "网页互动课件：每页的动画和实验当场操作")}</div>', "alt")}
-{part("三", "谁在用", "高校和职业院校用它开课、做实训；企业用它做员工上手和技术交流。平台作为软件按单位签约提供，不面向个人。", "", "")}
-{cta("用你自己的一门课试一试。", "交来资料，我们现场建一门课给你看。")}"""
+{part("三", "谁在用", "高校和职业院校用它开课、做实训；企业用它做员工上手和技术交流。平台作为软件按单位签约提供，不面向个人；国内服务器上可按单位申请在线体验（90 天）。", "", "")}
+{cta("用你自己的一门课试一试。", "按单位申请在线体验，或交来资料，我们现场建一门课给你看。", "申请在线体验")}"""
     page("/education/platform/", "问渠 AI 学习平台", "问渠 AI 学习平台：AI 原生的在线学习平台，AI 建课、AI 助教、AI 批改建议，老师和单位把关；企业版与质量 ERP 培训确认连通。", body, "/education/platform/")
 
 
@@ -487,7 +499,7 @@ def about():
 
 
 PRODUCTS = ["问渠质量 ERP", "问渠数字工厂集成平台", "缝纫机设计与制造软件", "凸轮设计与制造软件", "制造业专用软件定制",
-            "技术服务", "问渠 AI 学习平台", "数字工厂教学版与虚拟实验室", "咨询"]
+            "学习系统", "电子教材开发", "虚拟实验开发", "数字工厂开发", "CAD/CAM/CAE 集成化解决方案", "技术服务", "咨询"]
 
 
 def contact():
@@ -499,6 +511,10 @@ def contact():
   <label>邮箱<input type="email" name="email" maxlength="254" autocomplete="email"></label>
   <label class="full">所在行业<input type="text" name="industry" maxlength="60" placeholder="如：缝制机械、减速器、电子装配、职业院校"></label>
   <fieldset><legend>想了解的产品或服务</legend>{boxes}</fieldset>
+  <fieldset class="trial"><legend>在线体验</legend>
+    <label><input type="checkbox" name="trial" value="1"> 申请在线体验账号（按单位开通，体验期 90 天）</label>
+    <label>需要几个账号 <select name="seats"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option></select></label>
+  </fieldset>
   <label class="full">需求说明<textarea name="note" maxlength="2000" placeholder="说说你的工厂或学校现在最想解决的一件事"></textarea></label>
   <label class="hp" aria-hidden="true">网站<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
   <label class="agree full"><input type="checkbox" name="consent" required> <span>我已阅读并同意<a href="/privacy/" target="_blank">《隐私政策》</a>，同意问渠科技为安排演示和联系我使用以上信息。</span></label>

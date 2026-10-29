@@ -30,6 +30,7 @@ from . import catalog_api
 from . import course_pack
 from . import kit_interest
 from . import demo_request
+from . import orgs
 from . import sewing
 from . import sewing_cae
 from . import cam_ai
@@ -136,6 +137,7 @@ def create_app() -> FastAPI:
     course_pack.register(app, sys.modules[__name__])
     kit_interest.register(app, sys.modules[__name__])
     demo_request.register(app, sys.modules[__name__])
+    orgs.register(app, sys.modules[__name__])
     sewing.register(app, sys.modules[__name__])
     sewing_cae.register(app, sys.modules[__name__])
     cam_ai.register(app, sys.modules[__name__])
@@ -154,12 +156,21 @@ def lang_of(req_lang: str | None, sess: Session | None = None) -> str:
     return "zh" if lang.startswith("zh") else "en"
 
 
+def org_gate(user_id: int) -> None:          # replaced by orgs.register (round 50); a no-op until then
+    return None
+
+
+async def orgs_sweep() -> None:              # replaced by orgs.register (round 50)
+    return None
+
+
 async def current(authorization: Annotated[str | None, Header()] = None) -> Session:
     if not authorization or not authorization.lower().startswith("bearer "):
         raise EngineError("not_logged_in", "missing bearer token", 401)
     sess = state.codec.read(authorization.split(" ", 1)[1].strip())
     if not sess:
         raise EngineError("session_expired", "invalid or expired session", 401)
+    org_gate(sess.user_id)                       # China server: an organisation's trial has ended (round 50)
     return sess
 
 
@@ -293,6 +304,7 @@ def register(app: FastAPI) -> None:
         # User name or email (Moodle's authloginviaemail is on).
         mtoken = await state.moodle.login(body.username.strip(), body.password)
         info = await state.moodle.site_info(mtoken)
+        org_gate(int(info["userid"]))
         lang = lang_of(body.lang or info.get("lang"))
         token = state.codec.issue(Session(moodle_token=mtoken, user_id=int(info["userid"]), lang=lang))
         set_sso_cookie(response, token)  # signed in on the academy website and every platform too
@@ -937,6 +949,7 @@ async def _accounts_loop() -> None:
         await asyncio.sleep(300)
         try:
             await accounts_sweep()
+            await orgs_sweep()                   # round 50: trials that ended are suspended in Moodle too
         except Exception:  # noqa: BLE001 - keep the loop alive
             log.exception("accounts sweep failed")
 

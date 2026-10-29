@@ -36,6 +36,11 @@ class Settings(BaseSettings):
     icp: str = ""
     psb: str = ""
     ai_reg: str = ""
+    # China server: online trial accounts go to organisations (round 50, app/orgs.py)
+    cn_max_orgs: int = 100
+    cn_org_seats: int = 5
+    cn_org_seats_max: int = 20
+    cn_trial_days: int = 90
 
     # --- AI models (see app/ai.py) ---
     # auto = Claude if a key is set, else DeepSeek; or claude / deepseek / fake (tests and demos)

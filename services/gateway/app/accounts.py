@@ -379,6 +379,7 @@ def register(app, m) -> None:  # noqa: C901 - one place for all account routes
     async def sign_in(resp: Response, login: str, password: str, lang: str) -> dict:
         mtoken = await state.moodle.login(login, password)
         info = await state.moodle.site_info(mtoken)
+        m.org_gate(int(info["userid"]))
         lg = m.lang_of(lang or info.get("lang"))
         token = state.codec.issue(Session(moodle_token=mtoken, user_id=int(info["userid"]), lang=lg))
         set_cookie(resp, token)
@@ -404,8 +405,14 @@ def register(app, m) -> None:  # noqa: C901 - one place for all account routes
 
     # --- codes, sign-up, sign-in ---------------------------------------
 
+    def signup_closed() -> bool:
+        """China server (round 50): trial accounts are opened for organisations by an administrator, not by sign-up."""
+        return state.settings.region.strip().lower() == "cn"
+
     @app.post("/api/v1/auth/code")
     async def send_code(body: CodeIn, req: Request):
+        if body.purpose == "register" and signup_closed():
+            raise EngineError("signup_closed", "体验账号按单位开通，请到官网预约演示", 403)
         email = norm(body.email)
         now = time.time()
         last = st().one("SELECT MAX(created) AS t FROM codes WHERE email = ?", email)
@@ -431,6 +438,8 @@ def register(app, m) -> None:  # noqa: C901 - one place for all account routes
 
     @app.post("/api/v1/auth/register")
     async def sign_up(body: RegisterIn, resp: Response):
+        if signup_closed():
+            raise EngineError("signup_closed", "体验账号按单位开通，请到官网预约演示", 403)
         email = norm(body.email)
         if not body.agree:
             raise EngineError("must_agree", "accept the terms first", 400)

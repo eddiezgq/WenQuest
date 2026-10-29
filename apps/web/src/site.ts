@@ -8,7 +8,7 @@ import { setRegionOverrides } from "./i18n";
 
 export interface SiteInfo {
   region: "us" | "cn";
-  brand?: string; company?: string; icp?: string; psb?: string; ai_reg?: string; ai_model?: string; ai_label?: boolean;
+  brand?: string; company?: string; icp?: string; psb?: string; ai_reg?: string; ai_model?: string; ai_label?: boolean; signup?: boolean;
 }
 
 export const site = ref<SiteInfo>({ region: "us" });

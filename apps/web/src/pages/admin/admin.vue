@@ -11,6 +11,7 @@
       <text v-if="denied" class="wq-error">{{ t("admin.denied") }}</text>
       <template v-else>
         <view class="wq-tabs">
+          <text v-if="isCN" class="wq-tab" :class="{ on: tab === 'orgs' }" @click="setTab('orgs')">{{ t("admin.orgs") }}</text>
           <text class="wq-tab" :class="{ on: tab === 'apps' }" @click="setTab('apps')">{{ t("admin.apps") }}<text v-if="info?.applications" class="count">{{ info.applications }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'requests' }" @click="setTab('requests')">{{ t("admin.requests") }}<text v-if="info?.requests" class="count">{{ info.requests }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'users' }" @click="setTab('users')">{{ t("admin.users") }}</text>
@@ -19,6 +20,7 @@
         </view>
 
         <!-- teacher applications -->
+        <OrgAdmin v-if="tab === 'orgs'" />
         <template v-if="tab === 'apps'">
           <view class="wq-row filter">
             <text class="chip" :class="{ on: appFilter === 'open' }" @click="appFilter = 'open'; loadApps()">{{ t("admin.open") }}</text>
@@ -183,16 +185,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { isCN } from "../../site";
+import { ref, watch } from "vue";
+import { isCN, loadSite } from "../../site";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
+import OrgAdmin from "../../components/admin/OrgAdmin.vue";
 import { type AdminUser, type Application, type EnrolRequest, accountApi, loadAdmin } from "../../accountApi";
 import { api, ApiError, BASE, type CoursePack, type KitInterest, token } from "../../api";
 import { confirmAction } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 
-const tab = ref<"apps" | "requests" | "users" | "committee" | "packs">("apps");
+const tab = ref<"orgs" | "apps" | "requests" | "users" | "committee" | "packs">(isCN.value ? "orgs" : "apps");
 const packs = ref<CoursePack[]>([]);
 const kits = ref<KitInterest | null>(null);
 async function loadKits() {
@@ -297,6 +300,7 @@ async function loadUsers(p: number) {
 function setTab(x: typeof tab.value) {
   tab.value = x;
   error.value = "";
+  if (x === "orgs") return;               // OrgAdmin loads itself
   if (x === "apps") loadApps();
   else if (x === "requests") loadReqs();
   else if (x === "committee") loadCommittee();
@@ -359,6 +363,9 @@ function openFile(url: string) {
 }
 
 onLoad((qq: any) => { if (qq?.tab) tab.value = qq.tab; });
+// 第 50 轮：国内服务器上默认打开“体验单位”（站点信息可能晚一点到）
+loadSite();
+watch(isCN, (v) => { if (v && tab.value === "apps") tab.value = "orgs"; });
 onShow(async () => {
   if (!token.value) return uni.reLaunch({ url: "/pages/login/login?back=" + encodeURIComponent("/pages/admin/admin") });
   try { await refreshInfo(); } catch (e) { fail(e); }

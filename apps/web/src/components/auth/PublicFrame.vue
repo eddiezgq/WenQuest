@@ -8,7 +8,7 @@
       <view class="right">
         <text class="lang" @click="toggleLocale">{{ t("lang.switch") }}</text>
         <text class="in" @click="go('/pages/login/login')">{{ t("login.submit") }}</text>
-        <text class="up" @click="go('/pages/register/register')">{{ t("login.register") }}</text>
+        <text v-if="!isCN" class="up" @click="go('/pages/register/register')">{{ t("login.register") }}</text>
       </view>
     </view>
     <view class="body"><slot /></view>
@@ -20,6 +20,7 @@
 import { siteUrl } from "../../accountApi";
 import { t, toggleLocale } from "../../i18n";
 import SiteFooter from "../SiteFooter.vue";
+import { isCN } from "../../site";
 
 const props = defineProps<{ back?: string }>();
 const go = (url: string) => uni.navigateTo({ url: `${url}?back=${encodeURIComponent(props.back || "/pages/catalog/catalog")}` });

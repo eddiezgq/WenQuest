@@ -423,6 +423,8 @@ cd /opt/wenquest &amp;&amp; deploy/update.sh $R/engine:$TAG</pre>
   <code>WQ_ICP=</code>ICP 备案号（如 沪ICP备XXXXXXXX号-1）　<code>WQ_PSB=</code>公安联网备案号　<code>WQ_AI_REG=</code>生成式人工智能服务登记编号<br>
   填好后运行 <code>deploy/update.sh</code>（让网页服务和网关读到新值）。没填的项在页面上显示【占位】，备案号没填就不显示。官网和学习平台的页脚都会显示这些信息；学习平台上 AI 生成的内容标“AI 生成”。<br>
   预约演示表单提交的信息存在服务器上，管理员登录学习平台后从 <code>/api/v1/admin/demo-request?format=csv</code> 下载。</div></div>
+  <div class="step"><div class="k">✓</div><div><b>在线体验账号按单位开通（第 50 轮）</b>：国内服务器上学习平台不接受个人注册（注册页改为说明，指向官网“预约演示”）。管理员登录学习平台 → 管理 → <b>体验单位</b>：从官网的申请一键带入，或手工填单位名称、联系人，点“开通体验”；再在单位下“添加账号”（姓名、手机、邮箱），平台生成密码，只显示一次，交给本人。<br>
+  默认：最多 100 家单位同时体验，每家 5 个账号（最多 20），体验期 90 天；到期后账号自动停用、数据保留，“延长 30 天 / 90 天”即恢复。这几个数在 <code>.env</code> 的 <code>WQ_CN_MAX_ORGS</code>、<code>WQ_CN_ORG_SEATS</code>、<code>WQ_CN_ORG_SEATS_MAX</code>、<code>WQ_CN_TRIAL_DAYS</code> 里改。</div></div>
 </section>
 
 <section id="s10" class="fade">

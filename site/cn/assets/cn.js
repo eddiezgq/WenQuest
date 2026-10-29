@@ -114,7 +114,8 @@
         org: (fd.get('org') || '').trim(), name: (fd.get('name') || '').trim(), phone: (fd.get('phone') || '').trim(),
         email: (fd.get('email') || '').trim(), industry: (fd.get('industry') || '').trim(),
         products: fd.getAll('products'), note: (fd.get('note') || '').trim(),
-        consent: !!fd.get('consent'), website: fd.get('website') || ''
+        consent: !!fd.get('consent'), website: fd.get('website') || '',
+        trial: !!fd.get('trial'), seats: parseInt(fd.get('seats') || '0', 10) || 0
       };
       msg.className = 'msg'; msg.textContent = '正在提交…';
       fetch('/api/v1/public/demo-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
