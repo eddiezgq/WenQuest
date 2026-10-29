@@ -552,6 +552,7 @@ jobs:
       IMAGE: ${{ needs.build.outputs.image }}
       PLATFORM: engine gateway web animator labcheck micro-synth voice blender cam
       BASE: postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1
+      FIRST: gateway web cam engine labcheck micro-synth voice animator blender   # 自带仓库先传小的、必需的，大的放后面
     steps:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
@@ -612,6 +613,9 @@ jobs:
         run: |
           set -euo pipefail
           command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -yq skopeo; }
+          # 跨境速度：传 50 MB 随机数据计时（日志看不到时，结果作为注释出现在运行页面上）
+          t0=$(date +%s.%N); head -c 50000000 /dev/urandom | ssh cn 'cat > /dev/null'; t1=$(date +%s.%N)
+          echo "::notice title=国内仓库::跨境速度约 $(python3 -c "print(round(50/($t1-$t0),2))") MB/s；仓库已有 $(ssh cn 'du -sh /opt/wenquest/registry | cut -f1')"
           ssh -fN -o ExitOnForwardFailure=yes -L 5000:127.0.0.1:5000 cn
           for i in $(seq 1 15); do curl -sf http://localhost:5000/v2/ >/dev/null && break; sleep 2; done
           TAG="${IMAGE##*:}"; SRC="${IMAGE%/engine:*}"
@@ -622,17 +626,17 @@ jobs:
               curl -sf http://localhost:5000/v2/ >/dev/null || ssh -fN -o ExitOnForwardFailure=yes -L 5000:127.0.0.1:5000 cn || true
               start=$(date +%s)
               if skopeo copy --retry-times 3 --dest-tls-verify=false ${3:+--src-creds "$3"} "docker://$1" "docker://localhost:5000/$2"; then
-                echo "  $2  $(( $(date +%s) - start )) s"; return 0
+                echo "  $2  $(( $(date +%s) - start )) s"; echo "::notice title=国内仓库::$2 已复制（$(( $(date +%s) - start )) 秒）"; return 0
               fi
               echo "retry $i: $1"; sleep 20
             done
             return 1
           }
-          for n in $PLATFORM; do copy "$SRC/$n:$TAG" "$n:$TAG" "$creds"; done
           for b in $BASE; do
             case "$b" in */*) src="docker.io/$b" ;; *) src="docker.io/library/$b" ;; esac
             copy "$src" "${b##*/}"
           done
+          for n in $FIRST; do copy "$SRC/$n:$TAG" "$n:$TAG" "$creds"; done
           echo "image=127.0.0.1:5000/engine:$TAG" >> "$GITHUB_OUTPUT"
           echo "Copied into the server's registry (tag $TAG)"
       - name: Keep the last 3 versions in the server's registry
