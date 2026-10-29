@@ -25,10 +25,20 @@ _spec.loader.exec_module(F)
 
 def _consts(path, names, ns=None):
     """只读模块里的常数（不导入：这些模块要连数据库）；值里可以引用 F（如 F.DEMO_CUSTOMERS[0]）"""
-    out = {}
+    out, g = {}, {"F": F, **(ns or {})}
     for node in ast.parse(path.read_text(encoding="utf-8")).body:
-        if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name) and node.targets[0].id in names:
-            out[node.targets[0].id] = eval(compile(ast.Expression(node.value), str(path), "eval"), {"F": F, **(ns or {})})
+        if isinstance(node, ast.FunctionDef):            # 常数可能由模块里的小函数算出（第 51 轮 supply.py 的 _alts）
+            exec(compile(ast.Module([node], []), str(path), "exec"), g)
+        elif isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
+            k = node.targets[0].id
+            try:                                         # 别的常数也算进来（要的常数可能引用它们）；算不出的（要连库的）跳过
+                g[k] = eval(compile(ast.Expression(node.value), str(path), "eval"), g)
+            except Exception:  # noqa: BLE001
+                if k in names:
+                    raise
+                continue
+            if k in names:
+                out[k] = g[k]
     return out
 
 
