@@ -24,13 +24,13 @@ clips:
     steps:
       - {at: 0, set: {n: 300}}
       - {at: 4, set: {n: 700}}
-  sew:           # 实验 20-1 ③：先把编码器标好，再试缝一次（慢放剪线那一针），放完马上再来
+  sew:           # 实验 20-1 ③：先把编码器标好（直接写入正确的方向和偏置，不靠读数，10-29 改：原来按读数推算有时没写上），再试缝一次（慢放剪线那一针），放完马上再来
     page: proto-ls
     selector: "#anim"
     vh: 1600
     loop: 6
     steps:
-      - {at: 0, js: "var $=function(i){return document.getElementById(i)};function sv(id,v){$(id).value=v;$(id).dispatchEvent(new Event('input',{bubbles:true}))}function rd(){return parseFloat($('enc').textContent)}sv('hw',30);var a=rd();sv('hw',31);var b=rd();if(((b-a+540)%360)-180<0){$('dir').value='-1';$('dir').dispatchEvent(new Event('change'))}sv('hw',30);var r=rd();$('off').value=((((30-r)%360)+360)%360).toFixed(1);$('write').click();"}
+      - {at: 0, js: "var A=window.__api;A.ST.dir=A.HID.d;A.ST.off=A.HID.z;document.getElementById('dir').value=String(A.HID.d);A.changed();"}
       - {at: 0.5, press: "#sew"}
   stat:          # 实验 20-1 ③：试缝 100 次的统计，每轮重新随机
     page: proto-ls
@@ -38,7 +38,7 @@ clips:
     vh: 1600
     loop: 6
     steps:
-      - {at: 0, js: "var $=function(i){return document.getElementById(i)};function sv(id,v){$(id).value=v;$(id).dispatchEvent(new Event('input',{bubbles:true}))}function rd(){return parseFloat($('enc').textContent)}sv('hw',30);var a=rd();sv('hw',31);var b=rd();if(((b-a+540)%360)-180<0){$('dir').value='-1';$('dir').dispatchEvent(new Event('change'))}sv('hw',30);var r=rd();$('off').value=((((30-r)%360)+360)%360).toFixed(1);$('write').click();"}
+      - {at: 0, js: "var A=window.__api;A.ST.dir=A.HID.d;A.ST.off=A.HID.z;document.getElementById('dir').value=String(A.HID.d);A.changed();"}
       - {at: 0.5, press: "#sew100"}
 
 slides:
