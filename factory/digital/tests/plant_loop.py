@@ -289,10 +289,22 @@ def park(mgr):
     if not check(bool(o), "减速器厂自动接单：{}".format(o and "订单 {}，工单 {}".format(o["so"], "、".join(o["work_orders"])))):
         print("    工业园订单：{}".format(json.dumps(gb("GET", "/api/park", token=gtok)["orders"][:3], ensure_ascii=False)[:600]))
         return
+    wos = o["work_orders"]
     o = wait(lambda: next((x for x in gb("GET", "/api/park", token=gtok)["orders"] if x["po"] == lot["po"] and x["status"] == "shipped"), None),
-             "减速器厂做完发货", A.timeout, 5)
+             "减速器厂做完发货", max(A.timeout, 1200), 5)
     if not check(bool(o), "减速器厂做完发货：批 {}".format(o and o["shipment"]["lot"])):
         print("    工业园订单：{}".format(json.dumps(gb("GET", "/api/park", token=gtok)["orders"][:3], ensure_ascii=False)[:600]))
+        try:                                  # 诊断：减速器厂车间里这张工单走到哪一步、设备状态
+            for w in wos:
+                evs = gb("GET", "/api/history?type=machine.event&corr={}&limit=500".format(urllib.parse.quote(w)), token=gtok)
+                done = [e["data"]["operation"] for e in evs if e["data"].get("event") == "op_complete"]
+                ends = sum(1 for e in evs if e["data"].get("event") == "cycle_end")
+                print("    诊断 {}：完工工序 {}；加工完成 {} 件次".format(w, done, ends))
+            ov = gb("GET", "/api/overview", token=gtok)
+            print("    诊断 减速器厂设备：{}".format([(m.get("unit"), m.get("state"), m.get("down_until_s"), m.get("queue") or m.get("inbox"))
+                                                 for m in ov.get("machines", [])]))
+        except Exception as e:  # noqa: BLE001
+            print("    诊断失败：{}".format(e))
         return
     got = wait(lambda: next((x for x in hub("GET", "/api/supply/lots", token=mgr)["lots"] if x["id"] == lot["id"] and x["status"] == "accepted"), None),
                "机器人厂到货、来料检验入库", 900, 5)
