@@ -1,0 +1,887 @@
+1
+00:00:00,600 --> 00:00:01,700
+Hi everyone,
+
+2
+00:00:01,720 --> 00:00:08,420
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,820 --> 00:00:14,591
+This is Lecture 20, lockstitch and overlock control prototypes.
+
+4
+00:00:14,991 --> 00:00:18,473
+Last time we built a platform for prototypes.
+
+5
+00:00:18,493 --> 00:00:23,453
+Today we use it on a real machine head. How to wire the encoder,
+
+6
+00:00:23,473 --> 00:00:28,355
+how to write the trim event table, how to find top dead centre,
+
+7
+00:00:28,375 --> 00:00:33,490
+how to run acceptance, and finally what changes for an overlocker.
+
+8
+00:00:33,890 --> 00:00:39,944
+The mechanical retrofit, power budget, E-stop, firmware state machine,
+
+9
+00:00:39,964 --> 00:00:41,158
+auto backtack,
+
+10
+00:00:41,178 --> 00:00:47,752
+solenoid calibration and stopping at the fabric edge are left to the slides.
+
+11
+00:00:49,272 --> 00:00:55,423
+The equipment department will turn a mechanical lockstitch head with a
+
+12
+00:00:55,443 --> 00:00:58,332
+trimmer into a control prototype.
+
+13
+00:00:58,732 --> 00:01:02,002
+Trimming runs at 300 r/min,
+
+14
+00:01:02,022 --> 00:01:09,312
+and the moving knife must enter between 300 and 330 degrees.
+
+15
+00:01:09,712 --> 00:01:16,529
+The trim solenoid pulls in in 6.2 to 9.4 milliseconds,
+
+16
+00:01:16,549 --> 00:01:22,732
+depending on supply voltage and coil temperature.
+
+17
+00:01:23,132 --> 00:01:28,632
+At what angle should it be energised?
+
+18
+00:01:29,032 --> 00:01:36,252
+And the shop would like to trim at 700 r/min.
+
+19
+00:01:36,652 --> 00:01:38,152
+Is that acceptable?
+
+20
+00:01:38,552 --> 00:01:40,136
+We'll answer at the end.
+
+21
+00:01:41,656 --> 00:01:44,636
+Build-up: get the hardware right first.
+
+22
+00:01:46,156 --> 00:01:47,926
+Here's the build-up.
+
+23
+00:01:48,326 --> 00:01:53,082
+The servo motor carries a 2500-line encoder:
+
+24
+00:01:53,102 --> 00:01:59,702
+ten thousand counts per revolution after times-four decoding,
+
+25
+00:01:59,722 --> 00:02:01,765
+0.036 degrees each.
+
+26
+00:02:02,165 --> 00:02:08,322
+The encoder plugs into the drive, which needs it for vector control,
+
+27
+00:02:08,342 --> 00:02:14,044
+and the drive forwards A, B and Z one-to-one to the controller,
+
+28
+00:02:14,064 --> 00:02:16,225
+whose timer counts them.
+
+29
+00:02:16,625 --> 00:02:19,435
+So the angle lives in the controller.
+
+30
+00:02:19,835 --> 00:02:23,446
+Why not let the drive report the angle over the bus?
+
+31
+00:02:23,846 --> 00:02:29,906
+Each frame can carry hundreds of microseconds of random delay.
+
+32
+00:02:30,306 --> 00:02:35,917
+At 300 r/min, half a millisecond is 0.9 degrees,
+
+33
+00:02:35,937 --> 00:02:40,726
+added straight to the knife-entry spread.
+
+34
+00:02:42,246 --> 00:02:44,866
+Firmware: acting by angle.
+
+35
+00:02:46,386 --> 00:02:50,399
+This is the trim event table from Lab 20-1.
+
+36
+00:02:50,799 --> 00:02:55,676
+Orange is the trim command, teal the tension release,
+
+37
+00:02:55,696 --> 00:02:58,818
+pale green the Chapter 14 windows,
+
+38
+00:02:58,838 --> 00:03:06,211
+and the dark bars are the actual action ranges computed from the solenoid delay.
+
+39
+00:03:06,611 --> 00:03:11,210
+Watch the speed switch between 300 and 700:
+
+40
+00:03:11,230 --> 00:03:15,507
+the dark bars slide later and get wider.
+
+41
+00:03:15,907 --> 00:03:20,487
+The faster the spindle, the more degrees the same milliseconds cover.
+
+42
+00:03:20,887 --> 00:03:25,340
+So the table is written in angle, and when the trimming speed changes,
+
+43
+00:03:25,360 --> 00:03:26,747
+the table must change.
+
+44
+00:03:27,147 --> 00:03:34,447
+Wipe and foot lift come after the spindle stops, timed in milliseconds.
+
+45
+00:03:35,967 --> 00:03:38,521
+Now the initial value.
+
+46
+00:03:38,921 --> 00:03:45,222
+The actual knife entry equals the command angle plus six times n times t.
+
+47
+00:03:45,623 --> 00:03:52,411
+At 300 r/min the spindle turns 1.8 degrees per millisecond;
+
+48
+00:03:52,431 --> 00:03:59,220
+pull-in of 6.2 to 9.4 milliseconds is 11.2 to 17.0 degrees,
+
+49
+00:03:59,240 --> 00:04:02,683
+with a midpoint of about 14.1.
+
+50
+00:04:03,082 --> 00:04:12,102
+Take that from the window centre, 315, and you get 301; we use 300.
+
+51
+00:04:12,503 --> 00:04:18,751
+The knife then enters between 311 and 317 degrees,
+
+52
+00:04:18,771 --> 00:04:25,396
+more than ten degrees inside the window on each side.
+
+53
+00:04:26,916 --> 00:04:29,757
+Bring-up: one new thing at a time.
+
+54
+00:04:31,277 --> 00:04:37,160
+The encoder's Z mark has nothing to do with needle-bar top dead centre,
+
+55
+00:04:37,180 --> 00:04:40,486
+and the count direction may be reversed.
+
+56
+00:04:40,886 --> 00:04:47,186
+Check direction first: turn the handwheel forward, and the reading must rise.
+
+57
+00:04:47,586 --> 00:04:52,246
+If it falls, invert it in the parameters; reversed,
+
+58
+00:04:52,266 --> 00:04:58,670
+the velocity loop becomes positive feedback and the machine runs away.
+
+59
+00:04:59,070 --> 00:05:02,804
+Then find TDC.
+
+60
+00:05:03,204 --> 00:05:10,043
+The obvious idea is to find the highest point with a dial gauge.
+
+61
+00:05:10,443 --> 00:05:15,578
+But watch the animation: near TDC the slider-crank hardly moves.
+
+62
+00:05:15,978 --> 00:05:23,128
+1.8 degrees from TDC the needle bar has dropped only 0.01 millimetres,
+
+63
+00:05:23,148 --> 00:05:26,201
+below what the gauge can read.
+
+64
+00:05:27,721 --> 00:05:32,257
+The trick is to measure where the needle bar moves fast.
+
+65
+00:05:32,657 --> 00:05:38,019
+The displacement curve is symmetric about the dead centres.
+
+66
+00:05:38,419 --> 00:05:43,218
+Pick the reading 12 millimetres below TDC;
+
+67
+00:05:43,238 --> 00:05:49,759
+note r1 as the bar passes it going down and r2 coming up.
+
+68
+00:05:50,159 --> 00:05:57,446
+Their average is bottom dead centre, and the offset is 180 degrees minus that.
+
+69
+00:05:57,846 --> 00:06:04,945
+Here 0.01 millimetre on the gauge is only about 0.04 degrees,
+
+70
+00:06:04,965 --> 00:06:10,546
+dozens of times better than hunting for the top.
+
+71
+00:06:12,066 --> 00:06:13,258
+A worked example.
+
+72
+00:06:13,658 --> 00:06:23,331
+Going down the encoder reads 307.6 degrees, coming up 137.2.
+
+73
+00:06:23,731 --> 00:06:27,592
+The reading wrapped through 360 in between,
+
+74
+00:06:27,612 --> 00:06:32,646
+so add 360 to the second before averaging: 42.4 degrees,
+
+75
+00:06:32,666 --> 00:06:36,798
+the bottom dead centre in the current reading.
+
+76
+00:06:37,198 --> 00:06:45,098
+The offset is 180 minus 42.4, which is 137.6 degrees.
+
+77
+00:06:45,498 --> 00:06:51,996
+Write that into the parameters, and the reading follows the book's convention:
+
+78
+00:06:52,016 --> 00:06:54,921
+zero is needle-bar top dead centre.
+
+79
+00:06:56,441 --> 00:06:59,763
+Acceptance: running is not meeting spec.
+
+80
+00:07:01,283 --> 00:07:07,304
+Acceptance runs automatically on the test bench: a script sends commands,
+
+81
+00:07:07,324 --> 00:07:13,263
+reads back measurements, judges by requirement ID and writes the report.
+
+82
+00:07:13,663 --> 00:07:18,004
+On the left, one trim: a few fast stitches,
+
+83
+00:07:18,024 --> 00:07:23,987
+then the trim stitch in slow motion, with knife entry, cut,
+
+84
+00:07:24,007 --> 00:07:27,537
+release and stop judged one by one.
+
+85
+00:07:27,937 --> 00:07:33,664
+On the right, a hundred trims, each with random supply voltage,
+
+86
+00:07:33,684 --> 00:07:40,597
+coil temperature, speed and friction; look at the pass count and the spread.
+
+87
+00:07:40,997 --> 00:07:46,853
+Before the bench exists, the same script can run in software.
+
+88
+00:07:48,373 --> 00:07:51,558
+Run in software under different conditions,
+
+89
+00:07:51,578 --> 00:07:56,553
+the most interesting case is a calibration residual of 0.7 degrees.
+
+90
+00:07:56,953 --> 00:08:02,547
+Every trim succeeds, yet every stop falls outside plus or minus one degree.
+
+91
+00:08:02,947 --> 00:08:09,999
+The trim window has over ten degrees of margin, so 0.7 doesn't matter there;
+
+92
+00:08:10,019 --> 00:08:16,793
+the stop tolerance is one degree, and the residual adds straight onto it.
+
+93
+00:08:17,193 --> 00:08:24,745
+That's why stop error and trim success must be two separate requirements,
+
+94
+00:08:24,765 --> 00:08:26,613
+judged separately.
+
+95
+00:08:27,013 --> 00:08:29,746
+And what the model can't give,
+
+96
+00:08:29,766 --> 00:08:35,160
+such as backtack alignment or a four-hour temperature rise,
+
+97
+00:08:35,180 --> 00:08:37,638
+is marked 'to be measured'.
+
+98
+00:08:38,038 --> 00:08:38,978
+No made-up numbers.
+
+99
+00:08:40,498 --> 00:08:43,442
+The overlock prototype: what changes.
+
+100
+00:08:44,962 --> 00:08:49,142
+Most of the overlock prototype carries over.
+
+101
+00:08:49,542 --> 00:08:52,600
+The first difference is speed:
+
+102
+00:08:52,620 --> 00:08:57,832
+the example machine runs at 7000 stitches a minute,
+
+103
+00:08:57,852 --> 00:09:02,551
+but the platform motor tops out at 6000 r/min,
+
+104
+00:09:02,571 --> 00:09:05,936
+so we gear up with a timing belt.
+
+105
+00:09:06,336 --> 00:09:09,516
+Here's an easily missed point.
+
+106
+00:09:09,916 --> 00:09:16,114
+At a ratio of 1.4, one spindle revolution is 7142.857 counts,
+
+107
+00:09:16,134 --> 00:09:18,051
+not a whole number,
+
+108
+00:09:18,071 --> 00:09:25,899
+so the Z mark lands at a different spindle angle every turn and can't correct
+
+109
+00:09:25,919 --> 00:09:26,817
+anything,
+
+110
+00:09:26,837 --> 00:09:29,773
+and rounding error builds up.
+
+111
+00:09:30,173 --> 00:09:35,742
+At 1.25, 30 teeth to 24, it's exactly 8000.
+
+112
+00:09:36,142 --> 00:09:39,300
+Even then a belt can skip a tooth,
+
+113
+00:09:39,320 --> 00:09:43,600
+so a needle-up sensor checks every revolution.
+
+114
+00:09:44,000 --> 00:09:52,347
+And a count: 11 of the overlocker's 19 items are the same as the lockstitch's;
+
+115
+00:09:52,367 --> 00:10:00,500
+control, drive, power, networking and the firmware framework all carry over.
+
+116
+00:10:02,020 --> 00:10:08,880
+A newly assembled robot joint is brought up just like today's prototype.
+
+117
+00:10:09,280 --> 00:10:15,939
+Control power only first, checking that the E-stop really removes drive enable.
+
+118
+00:10:16,339 --> 00:10:21,662
+Then a slow jog to confirm encoder direction; reversed,
+
+119
+00:10:21,682 --> 00:10:28,559
+the velocity loop turns into positive feedback and the joint runs away.
+
+120
+00:10:28,959 --> 00:10:32,436
+Joint zeroing also averages from both sides:
+
+121
+00:10:32,456 --> 00:10:38,556
+approach the home switch slowly from the positive and the negative direction,
+
+122
+00:10:38,576 --> 00:10:44,040
+and average the two trigger readings to cancel the switch hysteresis.
+
+123
+00:10:44,440 --> 00:10:48,900
+And when a gripper valve picks parts off a conveyor,
+
+124
+00:10:48,920 --> 00:10:55,620
+its delay is calibrated as a distance at belt speed, not just in milliseconds.
+
+125
+00:10:57,139 --> 00:11:01,239
+The two-point idea works in everyday life too.
+
+126
+00:11:01,639 --> 00:11:04,642
+To hang a hook in the middle of a door frame,
+
+127
+00:11:04,662 --> 00:11:07,128
+eyeballing the middle is usually off.
+
+128
+00:11:07,528 --> 00:11:12,453
+Measure the same distance in from each side, mark both,
+
+129
+00:11:12,473 --> 00:11:17,308
+and take the midpoint of the marks: far more accurate.
+
+130
+00:11:17,708 --> 00:11:21,488
+Calibrating the needle bar works the same way.
+
+131
+00:11:21,888 --> 00:11:25,701
+Take the same reading on the two steep sides and average,
+
+132
+00:11:25,721 --> 00:11:29,670
+instead of hunting for the top where the curve is flattest.
+
+133
+00:11:31,190 --> 00:11:32,793
+Back to our problem.
+
+134
+00:11:33,193 --> 00:11:43,118
+At 300 r/min pull-in is 11.2 to 17.0 degrees.
+
+135
+00:11:43,518 --> 00:11:53,938
+Firing the trim solenoid at 300 puts knife entry at 311 to 317.
+
+136
+00:11:54,338 --> 00:12:03,651
+The release pulls in at most about 17 degrees late, so it must fire by 318;
+
+137
+00:12:03,671 --> 00:12:05,144
+we take 310.
+
+138
+00:12:05,544 --> 00:12:12,787
+At 700 r/min pull-in becomes 26 to 40 degrees.
+
+139
+00:12:13,187 --> 00:12:16,333
+Fire earlier and the window can still be met,
+
+140
+00:12:16,353 --> 00:12:19,499
+but the 20 degree platform limit is exceeded.
+
+141
+00:12:19,899 --> 00:12:30,737
+With the slowest 9.4 milliseconds, trimming can go to only about 353 r/min.
+
+142
+00:12:31,137 --> 00:12:35,981
+To go faster, make the solenoid faster and more consistent first.
+
+143
+00:12:37,501 --> 00:12:41,404
+Now Virtual lab 20-1, the lockstitch prototype bench,
+
+144
+00:12:41,424 --> 00:12:45,105
+which you can do yourself on WenQuest. The checks,
+
+145
+00:12:45,125 --> 00:12:48,139
+the tasks and a few readouts are blurred;
+
+146
+00:12:48,159 --> 00:12:53,098
+they're for you to work out in the lab. Top left are the handwheel,
+
+147
+00:12:53,118 --> 00:12:57,613
+needle bar and dial gauge, and below is the trim event table.
+
+148
+00:12:57,633 --> 00:13:02,646
+This prototype has just been built: its encoder is fitted backwards,
+
+149
+00:13:02,666 --> 00:13:05,681
+and the Z mark is not at top dead centre.
+
+150
+00:13:06,081 --> 00:13:08,876
+Task one starts with direction.
+
+151
+00:13:08,896 --> 00:13:16,140
+Turn the handwheel forward and watch whether the encoder reading rises or falls.
+
+152
+00:13:16,540 --> 00:13:20,305
+If it falls, set the count direction to inverted.
+
+153
+00:13:20,325 --> 00:13:26,022
+Then keep turning until the gauge reads 12 millimetres with the needle bar
+
+154
+00:13:26,042 --> 00:13:26,872
+going down,
+
+155
+00:13:26,892 --> 00:13:32,743
+and note the encoder reading. Turn on until it reads 12 again on the way up,
+
+156
+00:13:32,763 --> 00:13:34,133
+and note it again.
+
+157
+00:13:34,153 --> 00:13:39,232
+How to average them and what offset to write is yours to work out.
+
+158
+00:13:39,632 --> 00:13:43,498
+With the offset written, task two: press Scramble,
+
+159
+00:13:43,518 --> 00:13:48,082
+and the dark actual-action bars slide out of their windows.
+
+160
+00:13:48,102 --> 00:13:54,532
+Follow the red crosses in the checks and drag the bars until all seven checks pass.
+
+161
+00:13:54,932 --> 00:13:58,572
+Task three: reset to the standard table,
+
+162
+00:13:58,592 --> 00:14:05,341
+then raise the trimming speed from 300 towards 700 and watch the dark bars
+
+163
+00:14:05,361 --> 00:14:07,354
+slide later and widen.
+
+164
+00:14:07,374 --> 00:14:13,392
+Work out how far to advance the commands from six times n times t.
+
+165
+00:14:13,792 --> 00:14:19,888
+Below is the trial-sewing panel, back at 300 r/min. Click Sew once:
+
+166
+00:14:19,908 --> 00:14:26,916
+a few fast stitches, then the trim stitch in slow motion, with spindle angle,
+
+167
+00:14:26,936 --> 00:14:30,476
+commands, armature motion and the stop.
+
+168
+00:14:30,876 --> 00:14:32,599
+Then Sew 100 times,
+
+169
+00:14:32,619 --> 00:14:38,654
+and count the passes and the spread of entry angle and stop error.
+
+170
+00:14:38,674 --> 00:14:43,241
+The guide and report template are on the platform.
+
+171
+00:14:44,761 --> 00:14:49,181
+Everything in this lecture is on the WenQuest learning platform.
+
+172
+00:14:49,581 --> 00:14:56,299
+You can open today's interactive slides and the prototype bench and work them
+
+173
+00:14:56,319 --> 00:14:57,087
+yourself;
+
+174
+00:14:57,107 --> 00:15:00,587
+the power budget, E-stop, state machine,
+
+175
+00:15:00,607 --> 00:15:06,713
+auto backtack and edge stop that this video skipped are in the slides.
+
+176
+00:15:07,113 --> 00:15:11,973
+You submit the assignment and the lab report on the platform,
+
+177
+00:15:11,993 --> 00:15:14,533
+and get marks and comments back.
+
+178
+00:15:14,933 --> 00:15:19,044
+Questions go to the course discussion forum,
+
+179
+00:15:19,064 --> 00:15:25,146
+and the grades page shows your mark on every assignment and quiz.
+
+180
+00:15:26,666 --> 00:15:33,008
+Your assignment has four questions. One: the trimming speed becomes 350 r/min,
+
+181
+00:15:33,028 --> 00:15:38,636
+with the same 6.2 to 9.4 millisecond pull-in. Find the pull-in angle,
+
+182
+00:15:38,656 --> 00:15:44,916
+the trim command that centres the knife entry and the latest release command,
+
+183
+00:15:44,936 --> 00:15:48,831
+check them against the 20 degree platform limit,
+
+184
+00:15:48,851 --> 00:15:51,686
+and verify them in the virtual lab.
+
+185
+00:15:52,086 --> 00:15:57,667
+Two: on another prototype, 12 millimetres below top dead centre,
+
+186
+00:15:57,687 --> 00:16:03,180
+the encoder reads 296.3 degrees going down and 125.9 coming up.
+
+187
+00:16:03,200 --> 00:16:05,367
+Find the offset to write.
+
+188
+00:16:05,387 --> 00:16:10,706
+There the needle bar moves about 0.28 millimetres per degree;
+
+189
+00:16:10,726 --> 00:16:14,906
+how many degrees is the gauge's 0.01 millimetre?
+
+190
+00:16:15,306 --> 00:16:22,004
+Three: the overlock prototype sews at 6000 r/min with a 2.5 millimetre stitch,
+
+191
+00:16:22,024 --> 00:16:28,636
+the edge sensor 30 millimetres ahead of the needle and a 35 millimetre chain;
+
+192
+00:16:28,656 --> 00:16:35,096
+braking from 7000 r/min takes 15.8 revolutions, scaling with speed squared.
+
+193
+00:16:35,116 --> 00:16:40,006
+How many stitches after the fabric leaves until it stops,
+
+194
+00:16:40,026 --> 00:16:43,020
+at which stitch does braking start,
+
+195
+00:16:43,040 --> 00:16:48,963
+and how much extra chain without early braking? Four is a discussion:
+
+196
+00:16:48,983 --> 00:16:54,303
+why are stop error and trim success two separate requirements,
+
+197
+00:16:54,323 --> 00:17:01,366
+and which three tests would you add first to take the prototype to the next stage?
+
+198
+00:17:01,766 --> 00:17:05,546
+Submit the report on the WenQuest platform.
+
+199
+00:17:07,066 --> 00:17:12,168
+There's also a ten-question quiz. For example,
+
+200
+00:17:12,188 --> 00:17:20,631
+trimming at 500 r/min with a 6.2 to 9.4 millisecond pull-in and a 300 to 330
+
+201
+00:17:20,651 --> 00:17:22,858
+degree knife window,
+
+202
+00:17:22,878 --> 00:17:26,978
+what command angle centres the entry?
+
+203
+00:17:27,378 --> 00:17:32,868
+Or, why are the wiper and the foot lift timed from the stopped flag,
+
+204
+00:17:32,888 --> 00:17:35,380
+rather than scheduled by angle?
+
+205
+00:17:35,780 --> 00:17:42,400
+You get three attempts, and the explanations appear as soon as you submit.
+
+206
+00:17:43,920 --> 00:17:45,695
+Three things to remember.
+
+207
+00:17:46,095 --> 00:17:53,740
+One: the encoder is forwarded one-to-one, so the controller owns the angle.
+
+208
+00:17:54,140 --> 00:17:58,231
+Two: the trim event table is written in angle;
+
+209
+00:17:58,251 --> 00:18:03,950
+the actual action angle is the command plus six times n times t,
+
+210
+00:18:03,970 --> 00:18:06,988
+and a new speed means a new table.
+
+211
+00:18:07,388 --> 00:18:11,454
+Three: bring a prototype up step by step,
+
+212
+00:18:11,474 --> 00:18:15,839
+zero it with the symmetric two-point method,
+
+213
+00:18:15,859 --> 00:18:20,623
+and judge acceptance requirement by requirement,
+
+214
+00:18:20,643 --> 00:18:24,808
+keeping stop error and trim success apart.
+
+215
+00:18:25,208 --> 00:18:30,908
+The assignment, quiz and Lab 20-1 report are on WenQuest.
+
+216
+00:18:31,308 --> 00:18:36,728
+Next time: prototypes of the pattern sewer and the flat-knitting machine.
+
+217
+00:18:37,128 --> 00:18:39,491
+The slides, the virtual lab,
+
+218
+00:18:39,511 --> 00:18:45,447
+the assignment and the quiz are all on the WenQuest learning platform,
+
+219
+00:18:45,467 --> 00:18:51,148
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+220
+00:18:51,548 --> 00:18:54,519
+Next time we keep building prototypes:
+
+221
+00:18:54,539 --> 00:19:00,185
+the electronic pattern sewer and the computerised flat-knitting machine.
+
+222
+00:19:00,205 --> 00:19:01,208
+See you then.
