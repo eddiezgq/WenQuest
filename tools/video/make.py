@@ -200,6 +200,8 @@ def deck_stills(lec, lang, work: Path) -> dict:
     for name, c in (spec.get("clips") or {}).items():
         if not c["page"].startswith(("proto-", "model-")):
             continue
+        if "three" not in (lec.web / "src" / lang / "labs" / f"{c['page']}.html").read_text(encoding="utf-8"):
+            continue                      # proto-ls、proto-fk 是二维实验页（第 20、21 讲），按虚拟时钟实时录，不预录
         d = work / f"still_{lang}_{name}"
         if not (d / "00000.jpg").exists():
             page = lec.web / "src" / lang / "labs" / f"{c['page']}.html"

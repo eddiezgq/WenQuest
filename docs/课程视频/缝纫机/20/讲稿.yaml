@@ -1,0 +1,138 @@
+# 《缝纫机设计与制造》公开课 第 20 讲：平缝机与包缝机电控原型
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch20.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 20-1（平缝机原型调试台）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch20.py 算出（{{ch20.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "20"
+deck: ch20
+skip: [5, 6, 7, 9, 12, 14, 18, 22, 26]   # 机械改装、电源预算、急停、状态机与三层任务、自动回针、六步上电、电磁铁标定、软件在环 1000 次、布走即停：控制课程部分约 10 分钟；这几页留给课件和测验
+code: [ch20]
+title: ["平缝机与包缝机原型——两周，让机械机头变成电控原型", "Lockstitch and Overlock Control Prototypes — Two Weeks from a Mechanical Head to a Control Prototype"]
+chapter: ["第五篇 电气控制 · 第 20 章", "Part V Electrical Control · Chapter 20"]
+next: ["第 21 讲", "Lecture 21"]
+cover_formula: '\varphi_{act} = \varphi_{cmd} + 6\,n\,t'
+tags:
+  zh: [电控原型, 剪线事件表, 电磁铁延迟, 编码器标定, 对称两点法, 上止点, 验收测试, 停针误差, 包缝机, 同步带传动比, 缝纫机设计]
+  en: [control prototype, trim event table, solenoid delay, encoder calibration, symmetric two-point method, top dead centre, acceptance testing, needle-stop error, overlock, timing-belt ratio, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十讲，平缝机与包缝机电控原型。
+    - 上一讲给了一套搭原型的平台。今天把它用到一台真机头上：编码器怎么接、剪线事件表怎么写、上止点怎么标、怎样验收，最后看包缝机原型差在哪里。
+    - 机械改装、电源预算、急停、固件状态机、自动回针、电磁铁标定和布走即停，留给课件。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 20, lockstitch and overlock control prototypes.
+    - Last time we built a platform for prototypes. Today we use it on a real machine head. How to wire the encoder, how to write the trim event table, how to find top dead centre, how to run acceptance, and finally what changes for an overlocker.
+    - The mechanical retrofit, power budget, E-stop, firmware state machine, auto backtack, solenoid calibration and stopping at the fabric edge are left to the slides.
+
+after:
+  - id: lab201
+    kind: lab
+    lab: proto-ls
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.7'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#calmsg,#off,#stattxt,#stat,#tpv,#trv,#dpm{filter:blur(7px)}'; document.head.appendChild(st); for (const id of ['checks', 'tasks']) document.getElementById(id).closest('section').style.filter = 'blur(7px) grayscale(1)'; })()"
+      - sweep: {hw: [20, 60]}
+        dur: 6
+      - js: "(() => { const d = document.getElementById('dir'); d.value = '-1'; d.dispatchEvent(new Event('change', {bubbles: true})); })()"
+        sweep: {hw: [60, 300]}
+        dur: 10
+      - js: "(() => { const A = window.__api; A.ST.off = A.HID.z; A.changed(); })()"
+        press: "#mess"
+      - press: "#reset"
+        sweep: {n: [300, 700]}
+        dur: 6
+      - js: "(() => { for (const id of ['cal', 'evc']) document.getElementById(id).closest('section').style.display = 'none'; window.scrollTo(0, 0); const n = document.getElementById('n'); n.value = 300; n.dispatchEvent(new Event('input', {bubbles: true})); document.getElementById('sew').click(); })()"
+      - press: "#sew100"
+    say:
+      zh:
+        - ">下面是虚拟实验 20-1，平缝机原型调试台，在问渠平台上可以亲手做。右边的判定、任务和几处读数先遮住，留给你自己读。左上是手轮、针杆和百分表，下面是剪线事件表。这台原型刚装好，编码器装反了，Z 相也不在上止点。"
+        - ">任务一先看方向：让手轮正转，盯着编码器读数，看它是增大还是减小。"
+        - ">要是读数在减小，就把计数方向改成取反。然后继续转，让百分表在针杆下行时读到 12 毫米，记下编码器读数；再转到上行，又读到 12 毫米，再记一次。两次怎么平均、偏置写多少，留给你自己算。"
+        - ">偏置写好以后，任务二：按“打乱事件表”，深色的实际动作范围跑到了窗口外面。照判定区的红叉拖动色条，把表改回七项全过。"
+        - ">任务三：先恢复标准表，再把剪线转速从 300 往 700 提，看深色条怎样往后移、怎样变宽。通电角要提前多少，自己按 6 乘 n 乘 t 算。"
+        - ">下面是试缝区，剪线转速回到 300。点“试缝一次”，先快放几针，再慢放剪线那一针，看主轴角、指令、衔铁动作和停针。"
+        - ">再点“试缝 100 次”，统计合格数和进刀角、停针误差的分布。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 20-1, the lockstitch prototype bench, which you can do yourself on WenQuest. The checks, the tasks and a few readouts are blurred; they're for you to work out in the lab. Top left are the handwheel, needle bar and dial gauge, and below is the trim event table. This prototype has just been built: its encoder is fitted backwards, and the Z mark is not at top dead centre."
+        - ">Task one starts with direction. Turn the handwheel forward and watch whether the encoder reading rises or falls."
+        - ">If it falls, set the count direction to inverted. Then keep turning until the gauge reads 12 millimetres with the needle bar going down, and note the encoder reading. Turn on until it reads 12 again on the way up, and note it again. How to average them and what offset to write is yours to work out."
+        - ">With the offset written, task two: press Scramble, and the dark actual-action bars slide out of their windows. Follow the red crosses in the checks and drag the bars until all seven checks pass."
+        - ">Task three: reset to the standard table, then raise the trimming speed from 300 towards 700 and watch the dark bars slide later and widen. Work out how far to advance the commands from six times n times t."
+        - ">Below is the trial-sewing panel, back at 300 r/min. Click Sew once: a few fast stitches, then the trim stitch in slow motion, with spindle angle, commands, armature motion and the stop."
+        - ">Then Sew 100 times, and count the passes and the spread of entry angle and stop error. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 20-1，可以自己动手", "Interactive slides and Lab 20-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和原型调试台，都可以自己打开动手做，视频里跳过的电源预算、急停、状态机、自动回针和布走即停也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the prototype bench and work them yourself; the power budget, E-stop, state machine, auto backtack and edge stop that this video skipped are in the slides."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 20：事件表、标定与包缝机链线", "Assignment 20: event table, calibration and overlock chain"]
+      points:
+        - ["350 r/min 剪线：通电角、松线最晚角、≤ 20°？", "Trim at 350 r/min: command, latest release, ≤ 20°?"]
+        - ["下行 296.3°、上行 125.9°：偏置写多少", "296.3° down, 125.9° up: what offset?"]
+        - ["包缝机 6000 r/min：几针停车、何时减速", "Overlock at 6000 r/min: stitches to stop, when to brake"]
+      foot: ["3–4 页 PDF 报告，附实验 20-1 截图，在问渠学习平台提交。", "A 3–4 page PDF with Lab 20-1 screenshots, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，剪线转速改成 350 转，吸合延迟还是 6.2 到 9.4 毫秒，求吸合折算转角、使进刀居中的剪线通电角和松线通电角的最晚值，看满不满足 20 度的平台指标，并在虚拟实验里验证。"
+        - ">第二题，另一台原型在针杆离上止点 12 毫米处，下行读到 296.3 度，上行读到 125.9 度，求应写入的偏置；那里针杆每度走约 0.28 毫米，百分表 0.01 毫米对应多少度？"
+        - ">第三题，包缝机原型以 6000 转缝纫，针距 2.5 毫米，布边传感器在针前 30 毫米，链线要 35 毫米，7000 转减速到停要 15.8 转、与转速平方成正比，求布走后缝几针停车、第几针开始减速，不提前减速链线多出多长。第四题讨论：为什么停针误差和剪线成功率要分成两条需求，要把原型推进到下一阶段，你先补哪三项测试。"
+        - 报告在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: the trimming speed becomes 350 r/min, with the same 6.2 to 9.4 millisecond pull-in. Find the pull-in angle, the trim command that centres the knife entry and the latest release command, check them against the 20 degree platform limit, and verify them in the virtual lab."
+        - ">Two: on another prototype, 12 millimetres below top dead centre, the encoder reads 296.3 degrees going down and 125.9 coming up. Find the offset to write. There the needle bar moves about 0.28 millimetres per degree; how many degrees is the gauge's 0.01 millimetre?"
+        - ">Three: the overlock prototype sews at 6000 r/min with a 2.5 millimetre stitch, the edge sensor 30 millimetres ahead of the needle and a 35 millimetre chain; braking from 7000 r/min takes 15.8 revolutions, scaling with speed squared. How many stitches after the fabric leaves until it stops, at which stitch does braking start, and how much extra chain without early braking? Four is a discussion: why are stop error and trim success two separate requirements, and which three tests would you add first to take the prototype to the next stage?"
+        - Submit the report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["500 r/min 剪线：通电角取多少？", "Trimming at 500 r/min: what command angle?"]
+        - ["拨线、抬压脚为什么按时间而不按转角？", "Why are wipe and foot lift timed, not angled?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：剪线转速 500 转，吸合延迟 6.2 到 9.4 毫秒，动刀窗口 300 到 330 度，使进刀居中的剪线通电角是多少？"
+        - ">再比如：事件表里拨线和抬压脚，为什么以停稳为起点、按时间安排，而不按转角？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, trimming at 500 r/min with a 6.2 to 9.4 millisecond pull-in and a 300 to 330 degree knife window, what command angle centres the entry?"
+        - ">Or, why are the wiper and the foot lift timed from the stopped flag, rather than scheduled by angle?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 下一讲继续搭原型：电子花样机和电脑横机，我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "Next time we keep building prototypes: the electronic pattern sewer and the computerised flat-knitting machine. See you then."
