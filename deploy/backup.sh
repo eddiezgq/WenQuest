@@ -95,8 +95,10 @@ dc exec -T moodle tar czf - -C /var/www/moodledata \
     --exclude=./cache --exclude=./localcache --exclude=./sessions --exclude=./temp --exclude=./trashdir . \
     > "$OUT/moodledata.tgz"
 
-log "Archiving sign-up records (teacher applications, course catalogue)..."
-dc exec -T gateway tar czf - -C /data accounts settings.json 2>/dev/null > "$OUT/gateway.tgz" || true
+log "Archiving sign-up records (teacher applications, course catalogue) and the sewing software's company data..."
+# 第 49 轮：缝纫机设计软件的企业项目、开通记录、FreeCAD 钥匙（sewing.db）、本单位零件库的 STEP（sewing_parts/）、AI 调用记录
+dc exec -T gateway tar czf - --ignore-failed-read --exclude='sewing_parts/*.mesh.json' \
+    -C /data accounts settings.json sewing.db sewing_ai.db sewing_parts 2>/dev/null > "$OUT/gateway.tgz" || true
 
 log "Archiving AI course projects and teachers' materials..."
 # Everything the AI course builder made (lessons, videos, labs, chat, decisions) and the materials teachers uploaded.

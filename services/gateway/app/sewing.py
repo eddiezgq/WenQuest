@@ -369,7 +369,8 @@ def workbench_zip() -> bytes:
         for f in sorted((core / "freecad").glob("*")):
             if f.is_file() and f.suffix in (".py", ".svg", ".txt") and f.name != "使用说明.txt":
                 z.write(f, root + f.name)
-        for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "machines.py", "cad.py"):
+        for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "machines.py", "cad.py",
+                  "cae_setup.py"):                                  # 第 49 轮：本机有限元算例（wqsew_fem）和网页版同一份工况
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")
         hd = core / "freecad" / "help"                # 第 49 轮：帮助随安装包（断网也能看）

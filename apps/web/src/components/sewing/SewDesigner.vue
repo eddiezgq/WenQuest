@@ -222,7 +222,7 @@ interface Project { id: number; name: string; note?: string; machine?: string; p
 interface Chart { key: string; kind: "line" | "xy"; zh: string; en: string; x: number[]; series: { zh: string; en: string; color: string; y: number[] }[];
   ref?: number | null; zero?: boolean; ref_zh?: string; ref_en?: string; xr?: [number, number]; xl?: { zh: string; en: string }; open?: boolean }
 
-const props = defineProps<{ startTab?: string; startMachine?: string }>();
+const props = defineProps<{ startTab?: string; startMachine?: string; startParams?: string }>();
 const kinds = ref<string[]>(["report", "card", "params", "step", "macro", "dxf", "json"]);
 const machines = ref<Choice[]>([]);
 const machine = ref("lockstitch");
@@ -567,9 +567,23 @@ function contact() {
   // #endif
 }
 
+// 帮助里的“试一试”：?p= 后面是参数 JSON（例 {"n":6000}），夹到范围里再算
+function startWith(raw?: string) {
+  if (!raw) return;
+  try {
+    const p = JSON.parse(decodeURIComponent(raw));
+    for (const grp of schema.value) for (const x of grp.params) {
+      if (!(x.key in p)) continue;
+      const v = p[x.key];
+      params[x.key] = x.choices.length ? v : Math.min(x.max, Math.max(x.min, Number(v)));
+      open[grp.key] = true;
+    }
+  } catch { /* not JSON: ignore */ }
+}
 async function init() {
   if (props.startMachine && MACHINE_KEYS.includes(props.startMachine)) machine.value = props.startMachine;
   await loadSchema();
+  startWith(props.startParams);
   compute();
   loadMe();
   // #ifdef H5
