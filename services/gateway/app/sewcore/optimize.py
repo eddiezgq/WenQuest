@@ -23,6 +23,9 @@ GOALS = {
     "cover": [
         ("timing", "弯针定时：放在窗口正中", "Looper timing: centre of the window"),
     ],
+    "flatknit": [
+        ("time", "一片用时最短（选针、摇床、制动、电机都不出红灯）", "Shortest time per piece (no red on selection, racking, braking, motor)"),
+    ],
 }
 
 
@@ -148,6 +151,31 @@ def run(machine, params, goal):
         win = [d / 2 for d in range(-30, 31) if all(C.evaluate(dict(st, dphi=d / 2))["ok"])]
         res = [dict(value=(win[-1] - win[0]) / 2, params={"dphi": math.floor((win[0] + win[-1]) / 2 * 2 + 0.5) / 2}, note=dict(window=[win[0], win[-1]]))] if win else []
         unit = ("离窗口边缘 °", "margin to edges °")
+    elif machine == "flatknit" and goal == "time":
+        from . import flatknit as K     # 第 54 轮：补偿方式 × 系统数逐个试，机头速度、加速度在范围里找
+        res = []
+        for comp in ("none", "fixed", "realtime"):
+            for sy in (1, 2, 3):
+                base = dict(p, comp=comp, sys=sy)
+
+                def score(q):
+                    if K._bad(q) or K.width(q) > q["B"]:
+                        return None
+                    t = K.production(q)["t_piece"] / 60
+                    return -t, {}
+                for r in _search(base, {"v": (0.4, 2.0), "a": (5.0, 20.0)}, score, n_rand=60, n_refine=30):
+                    # 落到参数的步长上（速度 0.05 m/s、加速度 0.5 m/s²），往小取：转矩、误差、制动只会更小；再核一遍
+                    q = dict(base, v=math.floor(r["params"]["v"] / 0.05 + 1e-9) * 0.05, a=math.floor(r["params"]["a"] / 0.5 + 1e-9) * 0.5)
+                    q["v"], q["a"] = round(q["v"], 2), round(q["a"], 1)
+                    sc = score(q)
+                    if sc is None or any(x["params"] == {"v": q["v"], "a": q["a"], "comp": comp, "sys": sy} for x in res):
+                        continue
+                    res.append(dict(value=sc[0], params={"v": q["v"], "a": q["a"], "comp": comp, "sys": sy}, note={}))
+        res.sort(key=lambda r: -r["value"])
+        res = res[:3]
+        for r in res:
+            r["value"] = -r["value"]
+        unit = ("一片用时 min", "time per piece min")
     else:
         raise ValueError("no such goal")
     # 每组候选再整体校核一次（红灯数），网页上一起显示

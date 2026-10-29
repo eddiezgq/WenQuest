@@ -35,7 +35,7 @@ from .sewcore import cae_setup as CS
 from .sewcore import optimize as OPT
 from .sewcore import template as TPL
 
-MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid)$"
+MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid|flatknit)$"
 SF_MIN = 2.0
 LIFE_MIN_Y = 5.0
 
@@ -52,12 +52,16 @@ class DesignIn(BaseModel):
     plate_t: float = Field(default=3.0, ge=1, le=12)    # 花样模板：板厚
 
 
-XY = ("pattern", "embroid")        # 第 42 轮：缝纫头 + X–Y 平面运动的机型
+XY = ("pattern", "embroid", "flatknit")   # 第 42 轮：缝纫头 + X–Y 平面运动的机型；第 54 轮横机（机头直线往复）同一套：伺服选型、长件模态
 XY_RATIO = 1.5                     # 绷架 / 横梁一阶固有频率 × 移动一针的时间 ≥ 1.5（同教材第 15 讲同步带的判据）
 
 
 def move_time(machine: str, p: dict) -> float | None:
-    """移动一针可用的时间（s）：时序里“移动”那一段的角度 / (6n)"""
+    """移动一针可用的时间（s）：时序里“移动”那一段的角度 / (6n)。横机（第 54 轮）没有主轴转角，用机头加速时间 v/a：
+    针床、机架要在机头一次加速的时间里来得及跟上、停稳（同一个判据：一阶固有频率 × 这段时间 ≥ 1.5）"""
+    if machine == "flatknit":
+        q = sewcore.get(machine).clean(p)
+        return q["v"] / q["a"]
     try:
         mv = next(x for x in sewcore.get(machine).analyze(p)["timing"] if x["key"] == "move")
     except StopIteration:
@@ -226,7 +230,7 @@ def register(app, m) -> None:
                 q = None
         return {"connected": connected(), "parts": CS.parts(machine), "cam_parts": CS.cam_parts(machine), "goals": OPT.goals(machine), "quota": q,
                 "kinds": {"fea": bool(CS.parts(machine)), "frame": True, "mbd": machine in ("lockstitch", "overlock"),
-                          "motor": machine in ("lockstitch", "overlock", "pattern", "embroid"), "xy": machine in XY,
+                          "motor": machine in ("lockstitch", "overlock", "pattern", "embroid", "flatknit"), "xy": machine in XY,
                           "topo": bool(CS.parts(machine)), "cam": bool(CS.cam_parts(machine))}}
 
     # ---------- 强度 + 疲劳 ----------
@@ -279,9 +283,9 @@ def register(app, m) -> None:
             raise EngineError("factory_error", str(e), 400) from e
         mat = material if material in ("HT200", "QT500-7", "Q235", "6061-T6", "45-QT") else "HT200"
         setup = dict(fs, material_id=mat)
-        title = f"{M.NAME[0]} · {'绷架 / 横梁固有频率' if machine in XY else '机壳固有频率'}"
+        title = f"{M.NAME[0]} · {'针床 / 机架固有频率' if machine == 'flatknit' else '绷架 / 横梁固有频率' if machine in XY else '机壳固有频率'}"
         j = await factory("POST", "/jobs", json=submit_body(lic, sess, "fea", title, "frame", step_sha=g["sha"], setup=setup))
-        ctx = {"file": fname[:80], "material": mat, "n": p["n"]}
+        ctx = {"file": fname[:80], "material": mat, "n": p.get("n")}
         if machine in XY:
             ctx["t_move"] = move_time(machine, p)
         save(j["id"], lic, sess, machine, "frame", "frame", title, p, ctx)
@@ -512,7 +516,9 @@ def register(app, m) -> None:
                 tm = ctx.get("t_move") or 0
                 k = f1 * tm if f1 else None
                 res.update(r2=None, t_move=tm, ft=k)
-                res["checks"] = [dict(key="xy_res", zh="一阶固有频率 × 移动一针的时间（实算）", en="1st mode × time to move one stitch (computed)",
+                fk = d["machine"] == "flatknit"                # 横机：教材第 17 讲没有针床的振动判据，借用花样机、刺绣机的（写明“借用”）
+                res["checks"] = [dict(key="xy_res", zh="一阶固有频率 × 机头加速时间（实算，借用花样机判据）" if fk else "一阶固有频率 × 移动一针的时间（实算）",
+                                      en="1st mode × carriage acceleration time (computed; criterion borrowed from the pattern sewer)" if fk else "1st mode × time to move one stitch (computed)",
                                       value=f"{f1:.0f} Hz × {tm * 1000:.1f} ms = {k:.2f}" if k else "—", limit=f"≥ {XY_RATIO:g}",
                                       state="ok" if k and k >= XY_RATIO else ("warn" if k and k >= 1 else "bad"))]
             else:

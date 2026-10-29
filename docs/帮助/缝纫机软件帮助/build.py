@@ -39,11 +39,11 @@ ONLINE = "https://learn.wenquestrobotics.com"
 EDITIONS = {
     "web": dict(title="缝纫机设计软件 · 网页版帮助", short="网页版帮助", other=("FreeCAD 版帮助", "../sewing-freecad/index.html"),
                 files=["web/00-intro", "web/01-start", "common/cases", "common/case-lockstitch", "common/case-overlock", "common/case-cover",
-                       "common/case-pattern", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
+                       "common/case-pattern", "common/case-flatknit", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
                        "common/kernel", "common/arch", "web/04-account", "common/faq"]),
     "freecad": dict(title="缝纫机设计软件 · FreeCAD 工作台帮助", short="FreeCAD 版帮助", other=("网页版帮助", ONLINE + "/static/help/sewing/index.html"),
                     files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "common/cases", "common/case-lockstitch",
-                               "common/case-overlock", "common/case-cover", "common/case-pattern", "freecad/03-console", "common/ai", "common/cae",
+                               "common/case-overlock", "common/case-cover", "common/case-pattern", "common/case-flatknit", "freecad/03-console", "common/ai", "common/cae",
                            "common/lib", "common/kernel", "common/arch", "common/faq"]),
 }
 
@@ -159,6 +159,27 @@ def case_numbers():
     v["cv_ratio"] = round(m("605") / m("401"), 1)
     v["pt_r_opt"] = round(P["motor_ay50"][1]["r_opt"], 1)
     v["pt_gain"] = int(P["ry8"]["per_h"]) - int(P["base"]["per_h"])
+    K = d["flatknit"]
+    v["fk"] = K
+    sh = lambda r: round((r["timing"]["knit"][1] - r["timing"]["knit"][0]) / 3.6)          # noqa: E731
+    v.update(fk_knit=sh(K["base"]), fk_knit_best=sh(K["best"]), fk_knit_cuff=sh(K["cuff1"]))
+    rows = ["| 方案 | 一趟 s | 趟数 | 一片 min | 比当前 | 红灯 |", "|---|---|---|---|---|---|"]
+    for r in K["base"]["variants"]:
+        rows.append(f"| {r[0][0]} | {r[1]} | {r[2]} | {r[3]} | {r[4]} | {r[5]} |")
+    v["fk_variants"] = "\n".join(rows)
+    v["fk_v_gain"] = round((1 - K["v16"]["t_piece"] / K["base"]["t_piece"]) * 100)
+    v["fk_best_gain"] = round((1 - K["best"]["t_piece"] / K["base"]["t_piece"]) * 100)
+    bp = K["best"]["params"]
+    v["fk_best"] = f"{bp['sys']} 个系统、按实时速度补偿、机头 {bp['v']:g} m/s、加速度 {bp['a']:g} m/s²"
+    v.update(fk_tpass=f'{K["base"]["t_pass"]:.2f}', fk_D=f'{K["base"]["D"]:.0f}', fk_mass=f'{K["best_motor"]["mass"]:.0f}',
+             fk_bed_tm=f'{K["bed"]["t_move"]:.2f}', fk_bed_k=K["bed"]["checks"][0]["value"].split("=")[-1].strip(),
+             fk_cuff3_gap=round(K["cuff3"]["t_piece"], 2), fk_vp=round(K["best"]["params"]["v"] / (25.4 / 12) * 1000))
+    cm = K["best_motor"]["current"]
+    v["fk_motor_margin"] = round((cm["rated"] / cm["rms"] - 1) * 100)
+    v["fk_cuff_ratio"] = round(K["cuff3"]["t_piece"] / K["cuff1"]["t_piece"] * 100)
+    g = K["base"]["garment"]
+    v.update(fk_g_pieces=round(g["knit_pieces"]), fk_g_link=round(g["link"]), fk_g_tot=round(g["total_pieces"]), fk_g_whole=round(g["total_whole"]),
+             fk_g_E=f"{g['E_eff']:g}")
     y = P["motor_ry8"][1]["current"]
     v["pt_y8_margin"] = round((y["rated"] / y["rms"] - 1) * 100)
     v["pt_tpl"] = "{:.0f} × {:.0f} × {:.0f}".format(*P["template_cam"]["template"]["plate"])

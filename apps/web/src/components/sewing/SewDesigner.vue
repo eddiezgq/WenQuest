@@ -123,9 +123,9 @@
 
         <!-- 时序与曲线 -->
         <view v-if="R" v-show="tab === 'timing'" class="pane">
-          <text class="ct">{{ t("sew.chart.timing") }}</text>
+          <text class="ct">{{ R.timing_x === "pass" ? t("sew.chart.timingPass") : t("sew.chart.timing") }}</text>
           <svg class="svg" :viewBox="`0 0 640 ${timingH()}`" v-html="timingSvg()" />
-          <text class="hint">{{ t("sew.chart.angle") }}</text>
+          <text class="hint">{{ R.timing_x === "pass" ? t("sew.chart.pass") : t("sew.chart.angle") }}</text>
           <view class="charts">
             <view v-for="c in R.charts" :key="c.key" class="chart"><text class="ct">{{ lang === "en" ? c.en : c.zh }}</text>
               <svg class="svg" viewBox="0 0 300 150" v-html="c.kind === 'xy' ? path(c) : line(c)" /></view>
@@ -256,9 +256,9 @@ const bads = computed(() => (R.value ? R.value.checks.filter((c: Check) => c.sta
 const warns = computed(() => (R.value ? R.value.checks.filter((c: Check) => c.state === "warn").length : 0));
 const mname = (k?: string) => { const m = machines.value.find((x) => x.key === (k || "lockstitch")); return m ? L(m) : ""; };
 const projectNames = computed(() => projects.value.map((p) => `${p.name}（${mname(p.machine)}）`));
-const plabels = computed(() => { const o: Record<string, string> = {}; for (const grp of schema.value) for (const x of grp.params) o[x.key] = L(x); return o; });
+const plabels = computed(() => { const o: Record<string, string> = {}; for (const grp of schema.value) for (const x of grp.params) { o[x.key] = L(x); for (const c of x.choices || []) o[`${x.key}:${c.key}`] = L(c); } return o; });
 const pIndex = computed(() => Math.max(0, projects.value.findIndex((p) => p.id === current.value?.id)));
-const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper", pattern: "model-pattern", embroid: "embroid" };
+const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper", pattern: "model-pattern", embroid: "embroid", flatknit: "model-flatknit" };
 const MACHINE_KEYS = Object.keys(PAGES);
 const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${PAGES[machine.value] || PAGES.lockstitch}`);
 
@@ -384,7 +384,7 @@ function timingSvg() {
   let s = "";
   const h = timingH();
   for (const a of [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360]) {
-    s += `<line x1="${tx(a)}" x2="${tx(a)}" y1="8" y2="${h - 22}" stroke="#e1e6ea"/><text x="${tx(a)}" y="${h - 6}" font-size="10" text-anchor="middle" fill="#6b7b88">${a}</text>`;
+    s += `<line x1="${tx(a)}" x2="${tx(a)}" y1="8" y2="${h - 22}" stroke="#e1e6ea"/><text x="${tx(a)}" y="${h - 6}" font-size="10" text-anchor="middle" fill="#6b7b88">${R.value?.timing_x === "pass" ? Math.round(a / 3.6) + "%" : a}</text>`;
   }
   (R.value.timing as any[]).forEach((r, i) => {
     s += `<text x="4" y="${24 + i * 28}" font-size="10.5" fill="#1f2a33">${esc(r[lang.value])}</text>`;
@@ -404,7 +404,8 @@ function line(c: Chart) {
   const X = (a: number) => 34 + (258 * (a - x0)) / (x1 - x0 || 1), Y = (v: number) => 132 - (120 * (v - lo)) / (hi - lo);
   let s = `<rect x="34" y="12" width="258" height="120" fill="#fff" stroke="#e1e6ea"/>`;
   const ticks = c.xr ? [0, 0.25, 0.5, 0.75, 1].map((q) => x0 + q * (x1 - x0)) : [0, 90, 180, 270, 360];
-  for (const a of ticks) s += `<text x="${X(a)}" y="146" font-size="9" text-anchor="middle" fill="#6b7b88">${Math.round(a)}</text>`;
+  const fine = c.xr && x1 - x0 < 10;            // 横轴范围小（例如横机机头速度 0.4–2.0 m/s）：标一位小数
+  for (const a of ticks) s += `<text x="${X(a)}" y="146" font-size="9" text-anchor="middle" fill="#6b7b88">${fine ? a.toFixed(1) : Math.round(a)}</text>`;
   if (c.xl) s += `<text x="292" y="10" font-size="9" text-anchor="end" fill="#6b7b88">${esc(lang.value === "en" ? c.xl.en : c.xl.zh)} →</text>`;
   s += `<text x="30" y="${Y(hi) + 4}" font-size="9" text-anchor="end" fill="#6b7b88">${hi.toFixed(hi > 100 ? 0 : 1)}</text>`;
   s += `<text x="30" y="${Y(lo) + 3}" font-size="9" text-anchor="end" fill="#6b7b88">${lo.toFixed(lo < -100 ? 0 : 1)}</text>`;

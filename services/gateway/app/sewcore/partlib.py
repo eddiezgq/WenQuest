@@ -20,7 +20,8 @@ CATS = {
         ("length", "机身长", "mm", 20, 600, False),
         ("shaft_d", "轴径", "mm", 3, 60, False)],
         uses=[("pattern", "X 轴电机", {"TxR": "rated_nm", "TxP": "peak_nm", "Jx": "inertia", "Nmot": "rated_rpm"}),
-              ("pattern", "Y 轴电机", {"TyR": "rated_nm", "TyP": "peak_nm", "Jy": "inertia", "Nmot": "rated_rpm"})],
+              ("pattern", "Y 轴电机", {"TyR": "rated_nm", "TyP": "peak_nm", "Jy": "inertia", "Nmot": "rated_rpm"}),
+              ("flatknit", "机头电机", {"TmR": "rated_nm", "TmP": "peak_nm", "Jm": "inertia", "Nm": "max_rpm"})],
         cae="电机选型的候选表里一起比", shape=True),
     "needle": dict(zh="机针", fields=[
         ("nm", "针号 Nm", "", 40, 250, True),
@@ -49,7 +50,7 @@ CATS = {
         ("teeth", "齿数", "", 8, 200, False),
         ("width", "带宽", "mm", 3, 100, False),
         ("bore", "孔径", "mm", 2, 60, False)],
-        uses=[("pattern", "X 轴带轮", {"rx": "r"}), ("pattern", "Y 轴带轮", {"ry": "r"}), ("embroid", "绷架带轮", {"rf": "r"})], shape=True),
+        uses=[("pattern", "X 轴带轮", {"rx": "r"}), ("pattern", "Y 轴带轮", {"ry": "r"}), ("embroid", "绷架带轮", {"rf": "r"}), ("flatknit", "机头带轮", {"r": "r"})], shape=True),
     "link": dict(zh="曲柄 / 连杆（两孔板）", fields=[
         ("L", "孔距", "mm", 5, 200, True),
         ("d1", "大孔径", "mm", 2, 60, False),

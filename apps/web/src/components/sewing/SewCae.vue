@@ -23,8 +23,8 @@
 
       <!-- 机壳固有频率 -->
       <view class="box">
-        <text class="bt">{{ xy ? t("sew.cae.frameXY") : t("sew.cae.frame") }}</text>
-        <text class="hint">{{ xy ? t("sew.cae.frameXYNote") : t("sew.cae.frameNote") }}</text>
+        <text class="bt">{{ machine === "flatknit" ? t("sew.cae.frameFK") : xy ? t("sew.cae.frameXY") : t("sew.cae.frame") }}</text>
+        <text class="hint">{{ machine === "flatknit" ? t("sew.cae.frameFKNote") : xy ? t("sew.cae.frameXYNote") : t("sew.cae.frameNote") }}</text>
         <!-- #ifdef H5 -->
         <view class="row">
           <view class="btn ghost sm" @click="chooseFile">{{ t("sew.cae.choose") }}</view>
@@ -43,7 +43,7 @@
       <!-- 机构动力学 + 主轴电机 -->
       <view v-if="opt && (opt.kinds.mbd || opt.kinds.motor)" class="box">
         <text class="bt">{{ xy ? t("sew.cae.driveXY") : t("sew.cae.drive") }}</text>
-        <text class="hint">{{ xy ? t("sew.cae.driveXYNote") : t("sew.cae.driveNote") }}</text>
+        <text class="hint">{{ machine === "flatknit" ? t("sew.cae.driveFKNote") : xy ? t("sew.cae.driveXYNote") : t("sew.cae.driveNote") }}</text>
         <view class="row">
           <view v-if="opt.kinds.mbd" class="btn" :class="{ disabled: !canRun }" @click="submit('mbd')">{{ t("sew.cae.runMbd") }}</view>
           <view v-if="opt.kinds.motor" class="btn ghost" :class="{ disabled: !canRun }" @click="pickMotor">{{ busy === "motor" ? t("sew.making") : t("sew.cae.runMotor") }}</view>
@@ -251,7 +251,7 @@ async function load() {
     opt.value = await request<Opt>("GET", `/api/v1/sewing/cae/options?machine=${props.machine}`);
     part.value = tpart.value = opt.value.parts[0]?.key || "";
     cpart.value = opt.value.cam_parts?.[0]?.key || "";
-    fmat.value = opt.value.kinds?.xy ? "6061-T6" : "HT200";
+    fmat.value = opt.value.kinds?.xy && props.machine !== "flatknit" ? "6061-T6" : "HT200";   // 横机针床、机架是铸铁 / 钢件
   } catch (e) { fail(e); }
   goal.value = "";
   optRes.value = motor.value = sel.value = null;
@@ -442,7 +442,7 @@ function statusText(j: any) {
 
 // ---------- 显示 ----------
 function fmtParams(p: Record<string, number | string>) {
-  return Object.entries(p).map(([k, v]) => `${props.labels?.[k] || k} = ${v}`).join("，");
+  return Object.entries(p).map(([k, v]) => `${props.labels?.[k] || k} = ${props.labels?.[`${k}:${v}`] || v}`).join("，");
 }
 const NOTES = ["fmax", "mu_min", "margin", "pre", "neg", "gamma_min", "swing", "arc", "eps_pct", "window"];
 function noteText(n: Record<string, unknown>) {

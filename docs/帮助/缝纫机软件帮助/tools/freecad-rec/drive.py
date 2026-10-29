@@ -69,7 +69,7 @@ def S_install():
         (3500, lambda: cue("在这个文件夹里的 Mod 文件夹中，放进压缩包里的 WenQuestSewing 文件夹，然后重启 FreeCAD")),
         (5000, lambda: (cue("重启后，在工作台下拉列表里选“问渠缝纫机”"), wb_combo_popup())),
         (3000, lambda: (wb_combo_close(), Gui.activateWorkbench("WenQuestSewingWorkbench"))),
-        (1500, lambda: cue("工具栏出现 16 个中文按钮：新建五种机型、重算、校核、时序、转动、导出导入、提交、AI、零件库、帮助")),
+        (1500, lambda: cue("工具栏出现 17 个中文按钮：新建六种机型、重算、校核、时序、转动、导出导入、提交、AI、零件库、帮助")),
         (6000, None),
     ]
 

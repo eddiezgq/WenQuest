@@ -25,7 +25,7 @@ from . import sewcore
 from .moodle import EngineError
 from .sewcore import aicheck
 
-MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid)$"
+MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid|flatknit)$"
 SKIP = {"pts"}                      # 花样机上传的针位表：不让 AI 改
 
 DRAFT_SYSTEM = """You help an engineer change a sewing-machine design in the WenQuest design software.
@@ -154,7 +154,9 @@ _ALIAS = {"lockstitch": {"转速": "n", "针距": "s", "曲柄": "r", "连杆": 
           "overlock": {"转速": "n", "针距": "s", "差动比": "D", "曲柄": "r", "连杆": "l", "布厚": "t"},
           "cover": {"转速": "n", "针密": "spc", "针距": "g", "件数": "Q", "缝长": "Lcm", "损耗": "W"},
           "pattern": {"转速": "n", "针距": "s", "机头最高转速": "n_head"},
-          "embroid": {"头数": "H", "转速": "n", "针长": "s", "缎纹宽": "s"}}
+          "embroid": {"头数": "H", "转速": "n", "针长": "s", "缎纹宽": "s"},
+          "flatknit": {"机号": "E", "机头速度": "v", "加速度": "a", "系统": "sys", "针数": "N", "片数": "pcs", "选针器延迟": "Td", "段数": "seg",
+                       "颜色": "col"}}      # 不放单独的“速度”：会把“加速度”里的“速度”也认成机头速度
 
 
 def rule_draft(M, sentence: str) -> list[dict]:

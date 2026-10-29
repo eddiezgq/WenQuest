@@ -22,6 +22,7 @@ PARTS = {
     "cover": [],
     "pattern": [],          # 花样机、刺绣机不出机构零件（第 42 轮 Q3）；CAE 做电机选型、模板数控编程、绷架 / 横梁模态
     "embroid": [],
+    "flatknit": [],         # 横机不出机构零件（第 54 轮 Q2）；CAE 做机头伺服选型、设计优化、针床 / 机架模态
 }
 
 
@@ -323,6 +324,17 @@ def axis_motors(machine, params, motors, safety=1.2):
         q0 = E.servo(p)
         axes.append(dict(key="frame", zh="绷架（Y 轴，较重的一轴）", en="Frame (Y axis, the heavier one)", mass=E.mass(p["H"], p["m0"], p["mh"]),
                          accel=q0["a"], force=q0["F"], rows=rows, pick=next((x for x in rows if x["ok"]), None)))
+    elif machine == "flatknit":                       # 第 54 轮：机头往复，按一趟的加减速算（17.8 节的一趟）
+        from . import flatknit as K
+        rows = []
+        for mo in motors:
+            q = K.drive(p, Jm=mo["inertia_kgm2"] * 1e4)
+            rows.append(dict(mo, need_peak=q["Tpk"], need_rms=q["Trms"], rpm=q["rpm"],
+                             ok=q["Tpk"] * safety <= mo["peak_nm"] and q["Trms"] * safety <= mo["rated_nm"] and q["rpm"] <= mo["max_rpm"]))
+        q0 = K.drive(p)
+        axes.append(dict(key="carriage", zh="机头", en="Carriage", mass=q0["m"], accel=p["a"], force=q0["F"], rows=rows,
+                         pick=next((x for x in rows if x["ok"]), None),
+                         current=dict(peak=q0["Tpk"], rms=q0["Trms"], rated=p["TmR"], peakmax=p["TmP"])))
     else:
         return None
     return dict(axes=axes, safety=safety)

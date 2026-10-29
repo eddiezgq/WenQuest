@@ -213,6 +213,50 @@ PT["motor_ry8"] = [dict(axis=a["zh"], pick=(a.get("pick") or {}).get("name"), r_
 PT["template_cam"] = cam("pattern", {"n": 2000, "ay": 50, "ry": 8}, "template", slot_w=5.0, plate_t=3.0)
 out["pattern"] = PT
 
+# ---------- 案例五 电脑横机：一片前片要织多久（第 54 轮，教材 17.8 节） ----------
+from app.sewcore import flatknit as FK  # noqa: E402
+K = {}
+
+
+def fk_brief(params):
+    R = analyze("flatknit", params)
+    return dict(params=params, counts=counts(R), vals=vals(R), bad=checks_brief(R, ("bad",)), warn=checks_brief(R, ("warn",)),
+                t_piece=round(R["production"]["t_piece_min"], 2), t_pass=round(R["production"]["t_pass"], 3), D=round(R["production"]["D"], 1),
+                passes=R["production"]["passes"], per_day=round(R["production"]["per_day"]), timing={t["key"]: [t["a"], t["b"]] for t in R["timing"]},
+                results={r["zh"]: f'{r["value"]} {r["unit"]}'.strip() for r in R["results"]})
+
+
+K["base"] = fk_brief({})
+K["base"]["variants"] = next(t for t in analyze("flatknit", {})["tables"] if t["key"] == "variants")["rows"]
+K["base"]["garment"] = analyze("flatknit", {})["garment"]
+K["E18"] = fk_brief({"E": 18})
+K["E18_seg2"] = fk_brief({"E": 18, "seg": 2})
+K["none"] = fk_brief({"comp": "none"})
+K["v16"] = fk_brief({"v": 1.6})
+K["sys2"] = fk_brief({"sys": 2, "comp": "realtime"})
+K["sys3"] = fk_brief({"sys": 3, "comp": "realtime"})
+opt = req("POST", "/api/v1/sewing/optimize", {"machine": "flatknit", "params": {}, "goal": "time"})
+K["opt"] = [dict(params=c["params"], value=c["value"], bad=c["bad"], warn=c["warn"]) for c in opt["candidates"]]
+best = opt["candidates"][0]["params"]
+K["best"] = fk_brief(best)
+mo = req("POST", "/api/v1/sewing/cae/motor", {"machine": "flatknit", "params": best})
+ax = mo["axes"][0]
+K["best_motor"] = dict(mass=ax["mass"], force=round(ax["force"]), pick=(ax.get("pick") or {}).get("name"), current=ax["current"])
+K["cuff1"] = fk_brief({"N": 100})
+K["cuff3"] = fk_brief({"N": 100, "pcs": 3, "gap": 0})
+# 针床模态：简化的针床梁架在两根立柱上（梁 1500 × 200 × 80，立柱 100 × 200 × 700，铸铁；立柱底面固定）
+leg = lambda x: bd.Pos(x, 0, 0) * bd.Box(100, 200, 700, align=(bd.Align.MIN, bd.Align.CENTER, bd.Align.MIN))   # noqa: E731
+bed = leg(0) + leg(1400) + bd.Pos(0, 0, 700) * bd.Box(1500, 200, 80, align=(bd.Align.MIN, bd.Align.CENTER, bd.Align.MIN))
+with tempfile.TemporaryDirectory() as t:
+    bd.export_step(bed, t + "/b.step")
+    stepb = Path(t + "/b.step").read_bytes()
+(ROOT / "apps/web/src/static/help/media/case-fk-bed.step").write_bytes(stepb)
+fj = req("POST", "/api/v1/sewing/cae/frame", files={"file": ("针床-简化.step", stepb), "machine": "flatknit", "params": json.dumps(best), "material": "HT200"})
+fr = wait(fj["id"])
+K["bed"] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or [])[:4]], t_move=fr.get("t_move"),
+                checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
+out["flatknit"] = K
+
 dest = HERE.parent / "data" / "cases.json"
 if "--check" in sys.argv:
     print("check only")

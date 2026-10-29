@@ -127,8 +127,10 @@ def show_timing():
     dlg = QtW.QDialog(Gui.getMainWindow())
     dlg.setWindowTitle("全机运动时序 · " + obj.Label)
     lay = QtW.QVBoxLayout(dlg)
-    lay.addWidget(TimingView(F.result(obj)))
-    lay.addWidget(QtW.QLabel("横轴：主轴转角（°），0° = 针杆上止点。黑线：实际钩线角。"))
+    R = F.result(obj)
+    lay.addWidget(TimingView(R))
+    lay.addWidget(QtW.QLabel("横轴：机头走一趟的时间（0–360 表示 0–100%）。" if R.get("timing_x") == "pass"
+                             else "横轴：主轴转角（°），0° = 针杆上止点。黑线：实际钩线角。"))
     dlg.show()
     dlg.exec_() if hasattr(dlg, "exec_") else dlg.exec()
 
@@ -533,6 +535,7 @@ def register():
             ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机弯针定时校核与耗线量、线团计划（第一期没有三维零件）", lambda: new_design("cover"), needs=False)),
             ("WQS_NewPattern", Cmd("新建花样机设计", "电子花样机：离布窗口、转速上限、前瞻调速、X/Y 伺服与同步带校核（没有三维零件）", lambda: new_design("pattern"), needs=False)),
             ("WQS_NewEmbroid", Cmd("新建刺绣机设计", "多头刺绣机：绷架加速度、转速上限、断线补绣与全机效率（没有三维零件）", lambda: new_design("embroid"), needs=False)),
+            ("WQS_NewFlatknit", Cmd("新建横机设计", "电脑横机：选针时间与提前量、换向余量、摇床、机头电机、一片用时与改进方案（没有三维零件）", lambda: new_design("flatknit"), needs=False)),
             ("WQS_Recompute", Cmd("重新计算", "改了参数后重算零件与校核（Ctrl+R 也可以）", recompute)),
             ("WQS_Checks", Cmd("校核结果", "红绿灯列表：惯性力、钩线、挑线、送布、张力、共振、尺寸链", show_checks)),
             ("WQS_Timing", Cmd("时序图", "针杆、钩线窗口、送布、挑线的时序", show_timing)),

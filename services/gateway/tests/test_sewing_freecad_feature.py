@@ -55,7 +55,7 @@ def feature(monkeypatch, tmp_path):
     return importlib.import_module("wqsew_feature")
 
 
-@pytest.mark.parametrize("m", ["cover", "pattern", "embroid"])
+@pytest.mark.parametrize("m", ["cover", "pattern", "embroid", "flatknit"])
 def test_build_compute_export_import(feature, tmp_path, m):
     doc = Doc()
     o = feature.add_design(doc, machine=m)

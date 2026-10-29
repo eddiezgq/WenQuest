@@ -42,7 +42,7 @@ class SewDesign:
     def __init__(self, obj, params=None, machine="lockstitch"):
         M = sewcore.get(machine)
         p = M.clean(params)
-        obj.addProperty("App::PropertyString", "Machine", "机型", "lockstitch 平缝机 / overlock 包缝机 / cover 绷缝机 / pattern 花样机 / embroid 刺绣机")
+        obj.addProperty("App::PropertyString", "Machine", "机型", "lockstitch 平缝机 / overlock 包缝机 / cover 绷缝机 / pattern 花样机 / embroid 刺绣机 / flatknit 横机")
         obj.Machine = M.MACHINE
         obj.setEditorMode("Machine", 1)
         for g, gzh, gen, items in M.GROUPS:

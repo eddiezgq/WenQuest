@@ -30,11 +30,11 @@
 
 ## 典型案例（第 52 轮）
 
-四个案例 `sections/common/case-*.md`（总览 `cases.md`）里的数全部来自 `data/cases.json`，文中写成路径：`{{ls.crank_fea.vm}}`（`ls` 平缝、`ol` 包缝、`cv` 绷缝、`pt` 花样），派生的数（百分比、表格、刀具清单）在 `build.py` 的 `case_numbers()` 里算。
+五个案例 `sections/common/case-*.md`（总览 `cases.md`；案例五电脑横机第 54 轮加）里的数全部来自 `data/cases.json`，文中写成路径：`{{ls.crank_fea.vm}}`（`ls` 平缝、`ol` 包缝、`cv` 绷缝、`pt` 花样、`fk` 横机），派生的数（百分比、表格、刀具清单）在 `build.py` 的 `case_numbers()` 里算。
 
 - **`tools/run_cases.py`**：用网页版同一套接口把四个案例从头跑到尾（有限元、疲劳、减重与复核、数控、动力学、电机选型、机壳模态、设计优化交给数字工厂计算服务；不联网的校核直接调计算核心），写 `data/cases.json`，并把案例用的简化机壳 STEP 写到 `media/case-ls-frame.step` 给读者下载。也是回归检查：改了计算核心，重跑（`--check` 只跑不写），再 `build.py`，帮助里的数跟着变；结论变了就要改案例的文字。要起本地完整环境和数字工厂 cae、hub；一次要二十来个计算任务，hub 的每日上限要调高：`WQ_DESIGN_SW_DAILY=500 WQ_DESIGN_SW_OPT_DAILY=50`。中途会在本单位零件库里临时录一台示例电机 SV-3000H，跑完删掉。
 - **`tools/explode_data.py`**：整机拆装动画的数据。读教材平缝机虚拟样机的三维模型（`textbook/web-editions/sewing/models/proto_lockstitch.py`，27 个零件编号），按样机的机构库摆到主轴 0°，投影成斜视图取每个零件的外轮廓，写 `data/explode.json`（约 12 KB）。
-- 录屏：网页版 `tools/web-rec/w09.js`–`w12.js`（`web-09-case-ls` … `web-12-case-pt`），FreeCAD `drive.py` 的 `fc-07-case-ls`。`rec.js` 加了 `choose`（选项参数）、`api`（幕后调接口）、`job`（等 CAE 算完、剪掉等待、点开结果）。
+- 录屏：网页版 `tools/web-rec/w09.js`–`w13.js`（`web-09-case-ls` … `web-13-case-fk`），FreeCAD `drive.py` 的 `fc-07-case-ls`。`rec.js` 加了 `choose`（选项参数）、`api`（幕后调接口）、`job`（等 CAE 算完、剪掉等待、点开结果）。
 
 ## 重录视频
 

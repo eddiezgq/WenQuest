@@ -115,7 +115,7 @@ def test_machines_overlock_and_cover(sc):
     """第 40 轮：包缝机、绷缝机——参数表、计算、项目记机型、出件（绷缝机没有三维零件）"""
     client = sc
     s = client.get("/api/v1/sewing/schema?machine=overlock").json()
-    assert [m["key"] for m in s["machines"]] == ["lockstitch", "overlock", "cover", "pattern", "embroid"] and s["machine"] == "overlock"
+    assert [m["key"] for m in s["machines"]] == ["lockstitch", "overlock", "cover", "pattern", "embroid", "flatknit"] and s["machine"] == "overlock"
     assert "ll_r" in [p["key"] for g in s["groups"] for p in g["params"]] and "step" in s["kinds"]
     s = client.get("/api/v1/sewing/schema?machine=cover").json()
     assert "Lcm" in [p["key"] for g in s["groups"] for p in g["params"]] and "step" not in s["kinds"]
