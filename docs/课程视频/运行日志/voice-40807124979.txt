@@ -1,0 +1,400 @@
+2026-10-29 03:15:35,220 INFO yield speech len 6.36, rtf 0.5744010022601241
+
+100%|██████████| 1/1 [00:03<00:00,  3.83s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:15:35,710 INFO synthesis text At three hundred r/min the spindle turns one.eight degrees per millisecond; pull-in of six.two to nine.four milliseconds is eleven.two to seventeen.zero degrees, with a midpoint of about fourteen.one.
+
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:16:50,845 WARNING synthesis text Then find TDC. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:16:50,974 INFO synthesis text Then find TDC.
+2026-10-29 03:16:53,308 INFO yield speech len 3.8, rtf 0.614084381806223
+
+100%|██████████| 1/1 [00:02<00:00,  2.51s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.51s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:16:53,726 INFO synthesis text The obvious idea is to find the highest point with a dial gauge.
+2026-10-29 03:16:57,428 INFO yield speech len 6.96, rtf 0.5320251673117451
+
+100%|██████████| 1/1 [00:03<00:00,  3.88s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.88s/it]
+cv2: 130/205 句，用时 32.2 分钟，预计还要 18.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:16:57,902 INFO synthesis text But watch the animation: near TDC the slider-crank hardly moves.
+2026-10-29 03:17:00,858 INFO yield speech len 5.2, rtf 0.5684477549332838
+
+100%|██████████| 1/1 [00:03<00:00,  3.13s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:01,385 INFO synthesis text one.eight degrees from TDC the needle bar has dropped only zero.one millimetres, below what the gauge can read.
+2026-10-29 03:17:06,947 INFO yield speech len 10.44, rtf 0.5327696316086926
+
+100%|██████████| 1/1 [00:05<00:00,  5.75s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.75s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:07,598 INFO synthesis text The trick is to measure where the needle bar moves fast.
+2026-10-29 03:17:10,235 INFO yield speech len 4.64, rtf 0.5682664698567884
+
+100%|██████████| 1/1 [00:02<00:00,  2.82s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:10,695 INFO synthesis text The displacement curve is symmetric about the dead centres.
+2026-10-29 03:17:13,717 INFO yield speech len 5.4, rtf 0.5595924236156322
+
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:14,205 INFO synthesis text Pick the reading twelve millimetres below TDC; note rone as the bar passes it going down and rtwo coming up.
+2026-10-29 03:17:20,122 INFO yield speech len 10.84, rtf 0.545893735991193
+
+100%|██████████| 1/1 [00:06<00:00,  6.16s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:20,810 INFO synthesis text Pick the reading twelve millimetres below TDC; note rone as the bar passes it going down and rtwo coming up.
+2026-10-29 03:17:26,881 INFO yield speech len 11.36, rtf 0.5343820637380573
+
+100%|██████████| 1/1 [00:06<00:00,  6.25s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:27,581 INFO synthesis text Their average is bottom dead centre, and the offset is one hundred and eighty degrees minus that.
+2026-10-29 03:17:31,607 INFO yield speech len 7.32, rtf 0.5500091229631601
+
+100%|██████████| 1/1 [00:04<00:00,  4.21s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:32,148 INFO synthesis text Here zero.one millimetre on the gauge is only about zero.four degrees, dozens of times better than hunting for the top.
+2026-10-29 03:17:37,698 INFO yield speech len 10.36, rtf 0.5357536109718117
+
+100%|██████████| 1/1 [00:05<00:00,  5.73s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:17:38,358 INFO synthesis text Here zero.one millimetre on the gauge is only about zero.four degrees, dozens of times better than hunting for the top.
+2026-10-29 03:18:35,525 INFO yield speech len 9.52, rtf 0.5256496307228794
+
+100%|██████████| 1/1 [00:05<00:00,  5.18s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:18:36,109 WARNING synthesis text Acceptance: running is not meeting spec. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:18:36,236 INFO synthesis text Acceptance: running is not meeting spec.
+2026-10-29 03:18:38,326 INFO yield speech len 3.4, rtf 0.6147310313056498
+
+100%|██████████| 1/1 [00:02<00:00,  2.26s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:18:38,609 WARNING synthesis text Acceptance: running is not meeting spec. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:18:38,735 INFO synthesis text Acceptance: running is not meeting spec.
+2026-10-29 03:18:40,897 INFO yield speech len 3.64, rtf 0.5938218190119816
+
+100%|██████████| 1/1 [00:02<00:00,  2.34s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.34s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:18:41,267 WARNING synthesis text Acceptance: running is not meeting spec. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:18:41,396 INFO synthesis text Acceptance: running is not meeting spec.
+2026-10-29 03:19:06,400 INFO yield speech len 12.68, rtf 0.5426436944714856
+
+100%|██████████| 1/1 [00:07<00:00,  7.06s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:07,130 INFO synthesis text Before the bench exists, the same script can run in software.
+2026-10-29 03:19:10,385 INFO yield speech len 5.88, rtf 0.5536333638794568
+
+100%|██████████| 1/1 [00:03<00:00,  3.43s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:10,868 INFO synthesis text Run in software under different conditions, the most interesting case is a calibration residual of zero.seven degrees.
+2026-10-29 03:19:15,307 INFO yield speech len 8.2, rtf 0.5413284534361305
+
+100%|██████████| 1/1 [00:04<00:00,  4.62s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:15,899 INFO synthesis text Every trim succeeds, yet every stop falls outside plus or minus one degree.
+2026-10-29 03:19:19,210 INFO yield speech len 5.64, rtf 0.5870882078265468
+
+100%|██████████| 1/1 [00:03<00:00,  3.48s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:19,705 INFO synthesis text The trim window has over ten degrees of margin, so zero.seven doesn't matter there; the stop tolerance is one degree, and the residual adds straight onto it.
+2026-10-29 03:19:27,167 INFO yield speech len 13.92, rtf 0.5360687601155248
+
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.64s/it]
+cv2: 150/205 句，用时 34.7 分钟，预计还要 12.7 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:27,902 INFO synthesis text That's why stop error and trim success must be two separate requirements, judged separately.
+2026-10-29 03:19:31,985 INFO yield speech len 7.52, rtf 0.5428888379259312
+
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:32,518 INFO synthesis text That's why stop error and trim success must be two separate requirements, judged separately.
+2026-10-29 03:19:37,674 INFO yield speech len 9.44, rtf 0.5461821364144148
+
+100%|██████████| 1/1 [00:05<00:00,  5.33s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:38,254 INFO synthesis text And what the model can't give, such as backtack alignment or a four-hour temperature rise, is marked 'to be measured'.
+
+100%|██████████| 1/1 [00:02<00:00,  2.70s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.70s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:19:54,522 INFO synthesis text The first difference is speed: the example machine runs at seven thousand stitches a minute, but the platform motor tops out at six thousand r/min, so we gear up with a timing belt.
+2026-10-29 03:20:03,399 INFO yield speech len 16.44, rtf 0.5399358533594729
+
+100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:04,221 WARNING synthesis text Here's an easily missed point. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:20:04,349 INFO synthesis text Here's an easily missed point.
+2026-10-29 03:20:06,388 INFO yield speech len 3.36, rtf 0.6068039508092972
+
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:06,649 WARNING synthesis text Here's an easily missed point. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:20:06,779 INFO synthesis text Here's an easily missed point.
+2026-10-29 03:20:08,742 INFO yield speech len 3.2, rtf 0.6135132163763046
+
+100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.14s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:09,149 INFO synthesis text At a ratio of one.four, one spindle revolution is seven thousand, one hundred and forty-two.eight hundred and fifty-seven counts, not a whole number, so the Z mark lands at a different spindle angle every turn and can't correct anything, and rounding error builds up.
+2026-10-29 03:20:19,941 INFO yield speech len 19.88, rtf 0.5428667879200557
+
+100%|██████████| 1/1 [00:10<00:00, 10.98s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:20,946 INFO synthesis text At one.twenty-five, thirty teeth to twenty-four, it's exactly eight thousand.
+2026-10-29 03:20:24,517 INFO yield speech len 6.48, rtf 0.5510872896806693
+
+100%|██████████| 1/1 [00:03<00:00,  3.74s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:24,999 INFO synthesis text At one.twenty-five, thirty teeth to twenty-four, it's exactly eight thousand.
+2026-10-29 03:20:28,019 INFO yield speech len 5.4, rtf 0.5592580194826479
+
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:28,493 INFO synthesis text At one.twenty-five, thirty teeth to twenty-four, it's exactly eight thousand.
+2026-10-29 03:20:31,616 INFO yield speech len 5.6, rtf 0.5577270048005241
+
+100%|██████████| 1/1 [00:03<00:00,  3.30s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:32,059 INFO synthesis text Even then a belt can skip a tooth, so a needle-up sensor checks every revolution.
+2026-10-29 03:20:36,201 INFO yield speech len 7.52, rtf 0.5508312519560469
+
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.32s/it]
+cv2: 160/205 句，用时 35.8 分钟，预计还要 10.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:20:36,728 INFO synthesis text And a count: eleven of the overlocker's nineteen items are the same as the lockstitch's; control, drive, power, networking and the firmware framework all carry over.
+2026-10-29 03:21:32,534 INFO yield speech len 3.8, rtf 0.5934744132192512
+
+100%|██████████| 1/1 [00:02<00:00,  2.43s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.43s/it]
+cv2: 170/205 句，用时 36.8 分钟，预计还要 7.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:21:33,002 INFO synthesis text Take the same reading on the two steep sides and average, instead of hunting for the top where the curve is flattest.
+2026-10-29 03:21:37,371 INFO yield speech len 8.08, rtf 0.5407031219784576
+
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.54s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:21:37,883 WARNING synthesis text Back to our problem. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:21:38,012 INFO synthesis text Back to our problem.
+2026-10-29 03:21:39,228 INFO yield speech len 1.64, rtf 0.7413385844812161
+
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:21:39,605 INFO synthesis text At three hundred r/min pull-in is eleven.two to seventeen.zero degrees.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:21:55,825 INFO synthesis text Firing the trim solenoid at three hundred puts knife entry at three hundred and eleven to three hundred and seventeen.
+2026-10-29 03:22:01,417 INFO yield speech len 10.44, rtf 0.535618756465985
+
+100%|██████████| 1/1 [00:05<00:00,  5.77s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:01,976 INFO synthesis text The release pulls in at most about seventeen degrees late, so it must fire by three hundred and eighteen; we take three hundred and ten.
+2026-10-29 03:22:07,890 INFO yield speech len 10.88, rtf 0.5435938125147539
+
+100%|██████████| 1/1 [00:06<00:00,  6.10s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:08,609 INFO synthesis text At seven hundred r/min pull-in becomes twenty-six to forty degrees.
+2026-10-29 03:22:12,329 INFO yield speech len 6.96, rtf 0.534455700852405
+
+100%|██████████| 1/1 [00:03<00:00,  3.90s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.90s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:12,875 INFO synthesis text At seven hundred r/min pull-in becomes twenty-six to forty degrees.
+2026-10-29 03:22:16,947 INFO yield speech len 7.32, rtf 0.5562069637527882
+
+100%|██████████| 1/1 [00:04<00:00,  4.25s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:17,500 INFO synthesis text At seven hundred r/min pull-in becomes twenty-six to forty degrees.
+2026-10-29 03:22:22,528 INFO yield speech len 9.12, rtf 0.5513534211275871
+
+100%|██████████| 1/1 [00:05<00:00,  5.21s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:23,072 INFO synthesis text Fire earlier and the window can still be met, but the twenty degree platform limit is exceeded.
+2026-10-29 03:22:26,575 INFO yield speech len 6.36, rtf 0.5508791350718564
+
+100%|██████████| 1/1 [00:03<00:00,  3.68s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:27,198 INFO synthesis text With the slowest nine.four milliseconds, trimming can go to only about three hundred and fifty-three r/min.
+2026-10-29 03:22:32,996 INFO yield speech len 10.84, rtf 0.5348317737508964
+
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:33,662 INFO synthesis text With the slowest nine.four milliseconds, trimming can go to only about three hundred and fifty-three r/min.
+2026-10-29 03:22:39,665 INFO yield speech len 10.92, rtf 0.5498002082000285
+
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.18s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:40,313 INFO synthesis text To go faster, make the solenoid faster and more consistent first.
+2026-10-29 03:22:43,184 INFO yield speech len 4.92, rtf 0.5835632483164469
+
+100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.04s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:22:43,690 INFO synthesis text Now Virtual lab twenty-one, the lockstitch prototype bench, which you can do yourself on WenQuest. The checks, the tasks and a few readouts are blurred; they're for you to work out in the lab. Top left are the handwheel, needle bar and dial gauge, and below is the trim event table. This prototype has just been built: its encoder is fitted backwards, and the Z mark is not at top dead centre.
+2026-10-29 03:24:42,413 INFO yield speech len 16.88, rtf 0.5189568651795953
+
+100%|██████████| 1/1 [00:08<00:00,  8.95s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:24:43,364 INFO synthesis text Task three: reset to the standard table, then raise the trimming speed from three hundred towards seven hundred and watch the dark bars slide later and widen. Work out how far to advance the commands from six times n times t.
+2026-10-29 03:25:02,864 INFO yield speech len 16.76, rtf 0.5292292995498402
+
+100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:03,859 INFO synthesis text Then Sew one hundred times, and count the passes and the spread of entry angle and stop error. The guide and report template are on the platform.
+2026-10-29 03:25:10,731 INFO yield speech len 12.44, rtf 0.5524529138178688
+
+100%|██████████| 1/1 [00:07<00:00,  7.05s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:11,422 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-29 03:25:14,958 INFO yield speech len 6.36, rtf 0.5559321844352866
+
+100%|██████████| 1/1 [00:03<00:00,  3.71s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:15,541 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-29 03:25:18,182 INFO yield speech len 4.44, rtf 0.5949004276378734
+
+100%|██████████| 1/1 [00:02<00:00,  2.82s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:19,260 INFO synthesis text You can open today's interactive slides and the prototype bench and work them yourself; the power budget, E-stop, state machine, auto backtack and edge stop that this video skipped are in the slides.
+2026-10-29 03:25:28,562 INFO yield speech len 17.16, rtf 0.5420325380383115
+
+100%|██████████| 1/1 [00:09<00:00,  9.48s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:30,838 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-10-29 03:25:34,855 INFO yield speech len 7.44, rtf 0.539897878964742
+
+100%|██████████| 1/1 [00:04<00:00,  4.19s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.19s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:35,562 INFO synthesis text Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz.
+2026-10-29 03:25:41,168 INFO yield speech len 10.24, rtf 0.5473878467455506
+
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+cv2: 190/205 句，用时 40.9 分钟，预计还要 3.2 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:25:42,279 INFO synthesis text Your assignment has four questions. One: the trimming speed becomes three hundred and fifty r/min, with the same six.two to nine.four millisecond pull-in. Find the pull-in angle, the trim command that centres the knife entry and the latest release command, check them against the twenty degree platform limit, and verify them in the virtual lab.
+
+ 50%|█████     | 1/2 [00:19<00:19, 19.57s/it]2026-10-29 03:27:29,844 INFO synthesis text  Four is a discussion: why are stop error and trim success two separate requirements, and which three tests would you add first to take the prototype to the next stage?
+2026-10-29 03:27:37,200 INFO yield speech len 13.56, rtf 0.5425199119038989
+
+100%|██████████| 2/2 [00:27<00:00, 12.49s/it]
+100%|██████████| 2/2 [00:27<00:00, 13.55s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-29 03:27:39,222 INFO synthesis text Three: the overlock prototype sews at six thousand r/min with a two.five millimetre stitch, the edge sensor thirty millimetres ahead of the needle and a thirty-five millimetre chain; braking from seven thousand r/min takes fifteen.eight revolutions, scaling with speed squared. How many stitches after the fabric leaves until it stops, at which stitch does braking start, and how much extra chain without early braking?
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-10-29 03:28:09,084 INFO synthesis text Three: the overlock prototype sews at six thousand r/min with a two.five millimetre stitch, the edge sensor thirty millimetres ahead of the needle and a thirty-five millimetre chain; braking from seven thousand r/min takes fifteen.eight revolutions, scaling with speed squared. How many stitches after the fabric leaves until it stops, at which stitch does braking start, and how much extra chain without early braking?
+2026-10-29 03:28:26,819 INFO yield speech len 33.84, rtf 0.5240827023842092
+
+ 50%|█████     | 1/2 [00:17<00:17, 17.94s/it]2026-10-29 03:28:27,025 INFO synthesis text  Four is a discussion: why are stop error and trim success two separate requirements, and which three tests would you add first to take the prototype to the next stage?
+2026-10-29 03:28:33,588 INFO yield speech len 12.24, rtf 0.5361318393470415
+
+100%|██████████| 2/2 [00:24<00:00, 11.36s/it]
+100%|██████████| 2/2 [00:24<00:00, 12.34s/it]
+！听着不清（0.735，试了 3 次）：Three: the overlock prototype sews at 6000 r/min with a 2.5  → the Overlock prototype so at 6,000 other 8 ton with a 2 e-fe
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:28:35,480 WARNING synthesis text Submit the report on the WenQuest platform. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:28:35,608 INFO synthesis text Submit the report on the WenQuest platform.
+2026-10-29 03:28:37,871 INFO yield speech len 3.8, rtf 0.5954431232653167
+
+100%|██████████| 1/1 [00:02<00:00,  2.44s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:28:38,604 INFO synthesis text There's also a ten-question quiz. For example, trimming at five hundred r/min with a six.two to nine.four millisecond pull-in and a three hundred to three hundred and thirty degree knife window, what command angle centres the entry?
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:12,600 INFO synthesis text Or, why are the wiper and the foot lift timed from the stopped flag, rather than scheduled by angle?
+2026-10-29 03:29:16,983 INFO yield speech len 8.04, rtf 0.5451479954506034
+
+100%|██████████| 1/1 [00:04<00:00,  4.56s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:17,550 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-29 03:29:20,971 INFO yield speech len 6.12, rtf 0.5590397548052221
+
+100%|██████████| 1/1 [00:03<00:00,  3.60s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:21,430 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-29 03:29:25,028 INFO yield speech len 6.64, rtf 0.5417821996183281
+
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.78s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:25,393 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-29 03:29:25,522 INFO synthesis text Three things to remember.
+2026-10-29 03:29:26,833 INFO yield speech len 1.84, rtf 0.7123796836189601
+
+100%|██████████| 1/1 [00:01<00:00,  1.49s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:27,196 INFO synthesis text One: the encoder is forwarded one-to-one, so the controller owns the angle.
+2026-10-29 03:29:31,405 INFO yield speech len 7.68, rtf 0.5480447163184484
+
+100%|██████████| 1/1 [00:04<00:00,  4.39s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:31,975 INFO synthesis text Two: the trim event table is written in angle; the actual action angle is the command plus six times n times t, and a new speed means a new table.
+2026-10-29 03:29:39,033 INFO yield speech len 12.92, rtf 0.5462834155965516
+
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.23s/it]
+cv2: 200/205 句，用时 44.9 分钟，预计还要 1.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-29 03:29:39,752 INFO synthesis text Three: bring a prototype up step by step, zero it with the symmetric two-point method, and judge acceptance requirement by requirement, keeping stop error and trim success apart.
+
+100%|██████████| 1/1 [00:05<00:00,  5.50s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.50s/it]
+cv2: 205/205 句，用时 45.6 分钟，预计还要 0.0 分钟
+cv2: 205 句完成
+cv2: 听写核对 205 句，平均 0.838，不清 70 句
+2026-10-29 03:30:20,226 DEBUG Attempting to acquire lock 131468036476880 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-29 03:30:20,226 DEBUG Lock 131468036476880 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-29 03:30:20,226 DEBUG Attempting to release lock 131468036476880 on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-29 03:30:20,226 DEBUG Lock 131468036476880 released on /home/ubuntu/.triton/autotune/Fp16Matmul_2d_kernel.pickle.lock
+2026-10-29 03:30:20,229 DEBUG Attempting to acquire lock 131468036483744 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-29 03:30:20,229 DEBUG Lock 131468036483744 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-29 03:30:20,229 DEBUG Attempting to release lock 131468036483744 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-10-29 03:30:20,229 DEBUG Lock 131468036483744 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 56 分钟
