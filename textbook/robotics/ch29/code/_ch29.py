@@ -1064,6 +1064,32 @@ def pd_delay_margin(I, kp, kd):
     return wc, pm, pm / wc
 
 
+def pd_discrete_rho(I, kp, kd, nd, nc=4, h=0.0005):
+    """单关节 I θ̈ = τ 的离散控制（与 cr_track 相同：每 h 一步，每 nc 步更新一次力矩并保持；测量延迟 nd 步）：
+    τ = −kp θ_{k−nd} − kd ω_{k−nd}。返回一个控制周期的转移矩阵的谱半径（> 1 不稳定）。状态：[x_k, x_{k−1}, …, x_{k−nd}, τ]。"""
+    n = 2 + 2 * nd + 1
+    A = np.array([[1.0, h], [0.0, 1.0]])
+    B = np.array([h * h / 2 / I, h / I])
+
+    def one(sample):
+        S = np.zeros((n, n))
+        u = np.zeros(n)
+        if sample:
+            u[2 * nd], u[2 * nd + 1] = -kp, -kd
+        else:
+            u[n - 1] = 1.0
+        S[0:2, 0:2] = A
+        S[0:2, :] += np.outer(B, u)
+        for i in range(nd):
+            S[2 + 2 * i:4 + 2 * i, 2 * i:2 * i + 2] = np.eye(2)
+        S[n - 1, :] = u
+        return S
+    T = np.eye(n)
+    for k in range(nc):
+        T = one(k == 0) @ T
+    return float(max(abs(np.linalg.eigvals(T))))
+
+
 def pd_gains(Mdiag, wn, zeta=1.0):
     """按质量矩阵的对角元设计各关节的 PD：kp = M_ii ω_n²，kd = 2ζω_n M_ii。"""
     Mdiag = np.asarray(Mdiag, float)
@@ -1132,3 +1158,181 @@ def track(kp, kd, ff_model=None, fric_ff=None, payload=None, fc=FC_NOM, fv=FV_NO
         if d.time > Ttot - 0.5:
             v_tail = max(v_tail, float(np.abs(d.qvel).max()))
     return dict(e_tcp=e_tcp, v_tail=v_tail, t=np.array(ts), e=np.array(es))
+
+
+# ================================================================ 第 58 轮：问渠机器人厂的 WQ-CR5（本章的主角）
+# 模型由 factory/digital/cae/wqcr5.py 生成（零件库 B-ARM-WQCR5，教材 models/mjcf/wqcr5.xml）；这里直接读那个模块的常数，
+# 与机器人厂、问渠 CAE 用的是同一台机器人。全部是示例值。
+
+def wqcr5():
+    """原件模块（只用 numpy）"""
+    p = str(ROOT / "factory" / "digital" / "cae")
+    if p not in sys.path:
+        sys.path.insert(0, p)
+    import wqcr5 as W                    # noqa: E402
+    return W
+
+
+CR_NAMES = ["J1", "J2", "J3", "J4", "J5", "J6"]
+Q_CR = np.radians([0.0, -60.0, 80.0, -110.0, -90.0, 0.0])   # 本章 WQ-CR5 的工作姿态（手臂前伸、工具朝下），rad
+
+
+def cr_text(tool="", option="", world="", actuator=""):
+    return mjcf_text("wqcr5", tool=tool, option=option, world=world, actuator=actuator)
+
+
+def cr_flange():
+    """法兰坐标系 {f} 在连杆 6 坐标系中的位姿：方向相同，原点在 (0, 0, d6)，工具方向 +z"""
+    return tf(None, np.array([0, 0, wqcr5().DH[5]["d"]]))
+
+
+def cr_load():
+    """负载跑合台的标准负载（钢块约 5 kg）：质量、对法兰的质心、对质心的惯量（方向同 {f}）"""
+    L = wqcr5().RUNIN_LOAD
+    a, b, c = L["size"]
+    return L["mass"], np.array(L["com"], float), box_inertia(L["mass"], a, b, c)
+
+
+def cr_load_xml():
+    return wqcr5().runin_load_xml()
+
+
+def cr_chain(payload=None, friction=False):
+    """WQ-CR5 的递推数据：连杆参数从 MJCF 读出（与网页实验、零件库同一份），转子惯量取 MJCF 的 armature。"""
+    W = wqcr5()
+    return Chain(parse_links(cr_text()), payload=payload, arm=np.array(W.armature()), Mf=cr_flange())
+
+
+def cr_model(timestep=0.002, integrator="implicitfast", flags='contact="disable"', tool="", actuator="", extra=""):
+    import mujoco
+    m = mujoco.MjModel.from_xml_string(cr_text(tool=tool, actuator=actuator, option=mj_option(timestep, integrator, flags, extra)))
+    return mujoco, m, mujoco.MjData(m)
+
+
+def cr_servo_xml(kp=None, kv=None):
+    """出厂位置环写成 MJCF 的 position 执行器（放在 <!--ACTUATOR--> 处）：force = kp(ctrl − q) − kv q̇"""
+    W = wqcr5()
+    kp = W.SERVO_KP if kp is None else kp
+    kv = W.SERVO_KV if kv is None else kv
+    lim = W.torque_limit()
+    return "".join(f'<position name="pos_{n}" joint="{n}" kp="{float(a)!r}" kv="{float(b)!r}" forcerange="{-l!r} {l!r}"/>'
+                   for n, a, b, l in zip(CR_NAMES, kp, kv, lim))
+
+
+def cr_tau_max():
+    return np.array(wqcr5().torque_limit())
+
+
+def cr_linear(q=Q_CR, payload=False, kp=None, kv=None):
+    """WQ-CR5 在姿态 q 附近：质量矩阵 M（含转子惯量）、位置环的刚度 K = diag(kp)、阻尼 D = diag(kv)（加上关节的黏性摩擦）"""
+    W = wqcr5()
+    _, m, d = cr_model(tool=cr_load_xml() if payload else "")
+    import mujoco
+    d.qpos[:] = q
+    mujoco.mj_forward(m, d)
+    M = np.zeros((6, 6))
+    mujoco.mj_fullM(m, d, M)
+    kp = np.array(W.SERVO_KP if kp is None else kp, float)
+    kv = np.array(W.SERVO_KV if kv is None else kv, float)
+    return M, np.diag(kp), np.diag(kv + m.dof_damping)
+
+
+def cr_friction():
+    """名义摩擦（MJCF 的 frictionloss、damping；库仑摩擦 = 机器人厂关节测试台“空载摩擦力矩”的名义值）"""
+    W = wqcr5()
+    fc = np.array([W.MODULES[s]["frictionloss"] for s in W.JOINT_MODULE])
+    fv = np.array([W.MODULES[s]["damping"] for s in W.JOINT_MODULE])
+    return fc, fv
+
+
+def cr_test_sigma():
+    """关节测试台的散布（plants/wenquest-robot.yaml）：每个关节的空载摩擦力矩名义值、σ，背隙名义值、σ（arcmin）"""
+    import yaml
+    W = wqcr5()
+    plant = yaml.safe_load((ROOT / "factory" / "plants" / "wenquest-robot.yaml").read_text(encoding="utf-8"))
+    ch = {m["item"]: {c["code"]: c for c in m["chars"]} for m in plant["measurements"]}
+    out = []
+    for s in W.JOINT_MODULE:
+        c = ch[W.MODULES[s]["code"]]
+        out.append(dict(fric=c["joint_friction"]["nominal"], fric_sigma=c["joint_friction"]["sigma"], fric_hi=c["joint_friction"]["hi"],
+                        backlash=c["joint_backlash"]["nominal"], backlash_sigma=c["joint_backlash"]["sigma"],
+                        backlash_hi=c["joint_backlash"]["hi"]))
+    return out
+
+
+def real_cr(payload=True, fc=None, fv=None, h=0.0005):
+    """“现场”的 WQ-CR5：零件库模型，关节摩擦取给定值，关掉执行器（力矩由程序经 qfrc_applied 施加）、关节限位。"""
+    import mujoco
+    fc0, fv0 = cr_friction()
+    fc = fc0 if fc is None else fc
+    fv = fv0 if fv is None else fv
+    _, m, d = cr_model(timestep=h, flags='contact="disable" actuation="disable"', tool=cr_load_xml() if payload else "")
+    m.dof_frictionloss[:] = fc
+    m.dof_damping[:] = fv
+    m.jnt_limited[:] = 0
+    return mujoco, m, d
+
+
+def cr_tcp(ch, q):
+    """TCP：法兰前 0.1 m、偏 0.05 m（与整机标定的工具点相同）"""
+    return (ch.flange_pose(q) @ np.array([0.05, 0, 0.10, 1.0]))[:3]
+
+
+def cr_track(kp, kd, ff_model=None, fric_ff=None, scale=1.0, fc=None, fv=None, delay=0.0, Tc=0.002, h=0.0005,
+             ref=None, T=None, every=0.01, backlash=None):
+    """跟踪负载跑合台的标准动作（wqcr5.runin_ref）：控制器每 Tc 采样一次，用 delay 秒以前的关节角和角速度，
+    τ = K_p(θ_d − θ) + K_d(θ̇_d − θ̇) [+ 名义模型的逆动力学] [+ 摩擦前馈]，限幅后零阶保持。
+    scale：负载的质量、惯量是名义的几倍（模型误差）；backlash：各关节的背隙（rad），编码器在电机侧，测得的关节角有 ±backlash/2 的死区。
+    返回 dict：TCP 的最大误差（m）、最后 0.3 s 关节角速度的最大值（rad/s，振荡的指标）、记录。"""
+    W = wqcr5()
+    ref = W.runin_ref if ref is None else ref
+    T = W.runin_duration() if T is None else T
+    import mujoco
+    m_l, c_l, I_l = cr_load()
+    mj, m, d = real_cr(True, fc, fv, h)
+    bid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "load")
+    m.body_mass[bid] *= scale
+    m.body_inertia[bid] *= scale
+    ch_true = cr_chain(payload=(m_l * scale, c_l, I_l * scale))
+    q0, _, _ = ref(0.0)
+    d.qpos[:] = q0
+    nd, nc, ne = int(round(delay / h)), int(round(Tc / h)), int(round(every / h))
+    buf = [(q0.copy(), np.zeros(6))] * (nd + 1)
+    tau = np.zeros(6)
+    tmax = cr_tau_max()
+    e_tcp = v_tail = 0.0
+    vj_tail = np.zeros(6)
+    ts, es = [], []
+    gap = np.zeros(6) if backlash is None else np.asarray(backlash, float) / 2
+    motor = q0.copy()                                     # 电机侧（减速前）的位置：关节角在 motor ± gap 之内自由
+    k = 0
+    while d.time < T - 1e-12:
+        if backlash is not None:                          # 齿隙：关节角离电机侧超出间隙时，电机侧被带着走
+            motor = np.clip(motor, d.qpos - gap, d.qpos + gap)
+        meas = motor if backlash is not None else d.qpos
+        buf.append((meas.copy(), d.qvel.copy()))
+        buf.pop(0)
+        if k % nc == 0:
+            q, qd = buf[0]
+            qr, vr, ar = ref(d.time)
+            tau = kp * (qr - q) + kd * (vr - qd)
+            if ff_model is not None:
+                tau = tau + ff_model.rnea(qr, vr, ar)
+            if fric_ff is not None:
+                tau = tau + fric_ff[0] * np.tanh(vr / 0.01) + fric_ff[1] * vr
+            tau = np.clip(tau, -tmax, tmax)
+        d.qfrc_applied[:] = tau
+        mujoco.mj_step(m, d)
+        k += 1
+        if not np.isfinite(d.qpos).all() or np.abs(d.qvel).max() > 100:
+            return dict(e_tcp=math.inf, v_tail=math.inf, t=np.array(ts), e=np.array(es))
+        if k % ne == 0:
+            qr, _, _ = ref(d.time)
+            e = float(np.linalg.norm(cr_tcp(ch_true, d.qpos) - cr_tcp(ch_true, qr)))
+            e_tcp = max(e_tcp, e)
+            ts.append(d.time)
+            es.append(e)
+        if d.time > T - 0.3:
+            v_tail = max(v_tail, float(np.abs(d.qvel).max()))
+            vj_tail = np.maximum(vj_tail, np.abs(d.qvel))
+    return dict(e_tcp=e_tcp, v_tail=v_tail, vj_tail=vj_tail, t=np.array(ts), e=np.array(es))

@@ -40,17 +40,21 @@ PAYLOAD_KG = 5.0
 GEAR_RATIO = 100
 ETA = 0.75                                      # 谐波减速器效率（与电机选型助手相同）
 LIMIT_DEG = 175.0                               # 各关节的软限位（示例）
+# 出厂的位置环（关节 PD，示例值）：τ = kp(θ_d − θ) − kv θ̇（教材 29.2～29.4 节的“控制器 A”）
+SERVO_KP = (2000.0, 2000.0, 1000.0, 300.0, 300.0, 300.0)
+SERVO_KV = (400.0, 400.0, 200.0, 40.0, 40.0, 40.0)
 BASE_TOP = 0.095                                # 底座上 J1 模组的顶面（J2 模组在 0.15 m 处横着，半径 0.055）
 
 # 关节模组（示例）：质量 kg、外形（实心圆柱）半径、长 m；电机（名称、峰值力矩 N·m、转子惯量 kg·m²，取自 motors.MOTORS）；
-# 谐波减速器（名称、额定、重复峰值 N·m，取自 motors.HARMONIC）；名义摩擦：粘性 N·m·s/rad、库仑 N·m（关节侧）
+# 谐波减速器（名称、额定、重复峰值 N·m，取自 motors.HARMONIC）；名义摩擦：粘性 N·m·s/rad（示例）、库仑 N·m（关节侧，
+# = 机器人厂关节测试台“空载摩擦力矩”的名义值，plants/wenquest-robot.yaml 的 joint_friction）
 MODULES = {
     "L": {"code": "WQJ-L", "mass": 3.0, "r": 0.055, "h": 0.110, "motor": ("伺服 400 W", 4.46, 0.42e-4),
-          "gear": ("谐波 32 号", 137.0, 333.0), "damping": 2.0, "frictionloss": 5.0},
+          "gear": ("谐波 32 号", 137.0, 333.0), "damping": 2.0, "frictionloss": 1.2},
     "M": {"code": "WQJ-M", "mass": 2.0, "r": 0.045, "h": 0.095, "motor": ("伺服 200 W", 2.23, 0.26e-4),
-          "gear": ("谐波 25 号", 67.0, 178.0), "damping": 1.0, "frictionloss": 2.5},
+          "gear": ("谐波 25 号", 67.0, 178.0), "damping": 1.0, "frictionloss": 0.8},
     "S": {"code": "WQJ-S", "mass": 1.2, "r": 0.035, "h": 0.080, "motor": ("伺服 100 W", 1.11, 0.04e-4),
-          "gear": ("谐波 17 号", 24.0, 54.0), "damping": 0.3, "frictionloss": 0.8},
+          "gear": ("谐波 17 号", 24.0, 54.0), "damping": 0.3, "frictionloss": 0.4},
 }
 JOINT_MODULE = ("L", "L", "M", "S", "S", "S")    # 与清单、sim/calib.py 的 JOINT_SIZE 相同
 RHO_AL = 2700.0                                  # 臂管：铝合金
@@ -264,7 +268,6 @@ def mjcf(actuator="motor", kp=None, kv=None, payload_kg=0.0, timestep=0.002, int
             out.append('    <motor name="{0}" joint="{0}" ctrlrange="{1:.6g} {2:.6g}"/>'.format(jn, -torque_limit()[i], torque_limit()[i]))
     out.append('    <!--ACTUATOR-->')
     out.append('  </actuator>')
-    out.append('  <sensor><force name="flange_force" site="flange"/><torque name="flange_torque" site="flange"/></sensor>')
     out.append('  <keyframe><key name="home" qpos="{}"/></keyframe>'.format(_f([math.radians(d) for d in HOME_DEG])))
     out.append('</mujoco>')
     return "\n".join(out) + "\n"
@@ -282,6 +285,49 @@ def summary():
                         "torque_limit_Nm": round(torque_limit()[i], 2), "damping_Nms_rad": MODULES[s]["damping"],
                         "frictionloss_Nm": MODULES[s]["frictionloss"]} for i, s in enumerate(JOINT_MODULE)],
             "dh": DH, "note": "示例值：量级与常见 5 kg 协作臂相同，不照抄任何厂商的数"}
+
+
+# ---------------------------------------------------------------- 负载跑合台的标准动作与标准负载（实验 28、教材 29.4 节）
+# 标准负载：钢块 100 × 100 × 64 mm（约 5 kg），装在法兰上，质心在法兰前 0.06 m（沿工具方向 z）。示例值
+RUNIN_LOAD = {"mass": 5.0, "com": (0.0, 0.0, 0.06), "size": (0.10, 0.10, 0.064)}
+# 标准动作：从初始位姿出发，经过三个位姿再回来；每段关节空间五次多项式（起止速度、加速度为零），段间停 DWELL 秒
+RUNIN_POSES_DEG = [HOME_DEG, (90, -45, 60, -105, -90, 45), (-60, -110, 120, -100, -60, -45), HOME_DEG]
+RUNIN_SEG_S = 1.2
+RUNIN_DWELL_S = 0.3
+
+
+def runin_duration():
+    n = len(RUNIN_POSES_DEG) - 1
+    return n * RUNIN_SEG_S + (n + 1) * RUNIN_DWELL_S
+
+
+def runin_ref(t):
+    """标准动作在时刻 t 的关节角、角速度、角加速度（rad、rad/s、rad/s²）"""
+    P = [np.radians(p) for p in RUNIN_POSES_DEG]
+    T, Dw = RUNIN_SEG_S, RUNIN_DWELL_S
+    t = max(0.0, float(t))
+    for k in range(len(P) - 1):
+        t0 = Dw + k * (T + Dw)
+        if t < t0:
+            return P[k].copy(), np.zeros(6), np.zeros(6)
+        if t <= t0 + T:
+            s = (t - t0) / T
+            d = P[k + 1] - P[k]
+            return (P[k] + d * (10 * s ** 3 - 15 * s ** 4 + 6 * s ** 5), d * (30 * s ** 2 - 60 * s ** 3 + 30 * s ** 4) / T,
+                    d * (60 * s - 180 * s ** 2 + 120 * s ** 3) / T ** 2)
+    return P[-1].copy(), np.zeros(6), np.zeros(6)
+
+
+def runin_load_xml():
+    """标准负载写成法兰上的 body（放在 MJCF 的 <!--TOOL--> 处）"""
+    L = RUNIN_LOAD
+    a, b, c = L["size"]
+    m = L["mass"]
+    r = lambda v: " ".join(repr(float(x)) for x in v)  # noqa: E731   全精度：与教材按公式算的惯量逐位一致
+    return ('<body name="load" pos="0 0 {}"><inertial pos="{}" mass="{}" diaginertia="{}"/>'
+            '<geom type="box" size="{}" pos="{}" rgba="{}"/></body>').format(
+        repr(float(DH[5]["d"])), r(L["com"]), repr(float(m)), r([m / 12 * (b * b + c * c), m / 12 * (a * a + c * c), m / 12 * (a * a + b * b)]),
+        _f([a / 2, b / 2, c / 2]), _f(L["com"]), ORANGE)
 
 
 def sync():

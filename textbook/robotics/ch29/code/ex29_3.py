@@ -2,9 +2,9 @@
 
 (1) 单自由度弹簧-阻尼器 ẍ = −ω²x − cẋ（c = 2ζω）的稳定步长：半隐式欧拉（阻尼显式）(hω)² + 2hc ≤ 4，阻尼隐式 (hω)² ≤ 4 + 2hc，
     显式欧拉 h ≤ 2ζ/ω（ζ ≤ 1），RK4（无阻尼时 hω ≤ 2√2）；公式与放大矩阵谱半径的数值结果核对。
-(2) 算例 29.3.1：书中 UR5e 的执行器是 PD（kp = 2000、500 N·m/rad，kd = 400、100 N·m·s/rad）。在工作姿态线性化，
+(2) 算例 29.3.1：问渠 WQ-CR5 的出厂位置环是 PD（kp = 2000、1000、300 N·m/rad，kv = 400、200、40 N·m·s/rad）。在工作姿态线性化，
     各关节的 ω、c、ζ，按单关节公式估计的临界步长；6 个关节耦合后的临界步长（Euler、RK4；implicitfast 不受限）。
-    MuJoCo 中 h = 1、1.5、2、2.5、3、5 ms 各仿真 2 s，最后 1 s 的关节速度幅值；把阻尼改写成关节的 damping（Euler 隐式处理）后的结果。
+    MuJoCo 中 h = 1～8 ms 各仿真 2 s，最后 1 s 的关节速度幅值；把阻尼改写成关节的 damping（Euler 隐式处理）后的结果。
 (3) 算例 29.3.2：能量漂移。不加驱动的单摆（两连杆臂的连杆 1）从水平放开，两连杆臂从“连杆 1 水平、连杆 2 下垂 0.5 rad”放开，仿真 20 s：Euler、implicit、RK4，
     h = 4、2、1、0.5 ms 的能量误差；单摆的误差有界，两连杆臂的 Euler 能量随时间线性增长（速度形式的半隐式欧拉在 M 随位形变化时不是辛方法）。
 (4) 算例 29.3.3：混沌。两连杆臂从两杆水平放开，用 RK4，h = 1 ms 与 0.5 ms 两次仿真的关节角何时相差 0.1 rad；初值差 1e−9 rad 时又如何；
@@ -17,7 +17,7 @@ import math
 import mujoco
 import numpy as np
 
-from _ch29 import ARM2, Q_WORK, amp_matrix, arm2_xml, h_limit, mjcf_text, ur_h_limit, ur_linear
+from _ch29 import ARM2, CR_NAMES, Q_CR, amp_matrix, arm2_xml, cr_linear, cr_model, cr_servo_xml, h_limit, ur_h_limit, wqcr5
 from bookout import out
 
 # ---------------------------------------------------------------- (1) 单自由度的稳定步长
@@ -47,52 +47,64 @@ rk4_real = h_limit(1e-6, 1.0, "rk4", hmax=5.0)                # 纯阻尼（实�
 out(stab_err=err, rk4_imag=rk4_0, rk4_real=rk4_real)
 out(z_lim_euler1=h_formula(1, 2, "euler"), z_lim_impl1=h_formula(1, 2, "implicit"))   # ζ = 1 时的 hω
 
-# ---------------------------------------------------------------- (2) UR5e
-M, K, D = ur_linear(Q_WORK)
-kp, kd, Mii = np.diag(K), np.diag(D), np.diag(M)
+# ---------------------------------------------------------------- (2) WQ-CR5 的位置环
+# 线性化：M q̈ = −K q − D q̇，K = diag(kp)，D = diag(kv) + 关节的黏性摩擦（MJCF 的 damping）。
+# MuJoCo 的 Euler 把关节的 damping 隐式处理，执行器的 kv 显式处理：稳定性由执行器的 kv 决定。
+M, K, D = cr_linear(Q_CR)
+W = wqcr5()
+kp, kv, Mii = np.diag(K), np.array(W.SERVO_KV), np.diag(M)
+Dx = np.diag(kv)                                        # 显式处理的那部分阻尼
 w_j = np.sqrt(kp / Mii)
-c_j = kd / Mii
+c_j = kv / Mii
 z_j = c_j / (2 * w_j)
 h_j = np.array([h_formula(w, c, "euler") for w, c in zip(w_j, c_j)])
-h_eu = ur_h_limit(M, K, D, "euler")
+h_eu = ur_h_limit(M, K, Dx, "euler")
 h_rk = ur_h_limit(M, K, D, "rk4")
 h_im = ur_h_limit(M, K, D, "implicit", hmax=0.2)
 assert h_im == math.inf
-eigD = np.sort(np.linalg.eigvals(np.linalg.solve(M, D)).real)
+eigD = np.sort(np.linalg.eigvals(np.linalg.solve(M, Dx)).real)
 out(Mii=Mii.tolist(), w_j=w_j.tolist(), c_j=c_j.tolist(), z_j=z_j.tolist(), h_j_ms=(h_j * 1000).tolist(),
     w6=w_j[5], c6=c_j[5], z6=z_j[5], h6_ms=h_j[5] * 1000, h_eu_ms=h_eu * 1000, h_rk_ms=h_rk * 1000, eigD_max=eigD[-1],
-    I6=Mii[5], h_eu_est_ms=2 / eigD[-1] * 1000, h_rk_est_ms=rk4_real / eigD[-1] * 1000)
+    I6=Mii[5], h_eu_est_ms=2 / eigD[-1] * 1000, h_rk_est_ms=rk4_real / np.sort(np.linalg.eigvals(np.linalg.solve(M, D)).real)[-1] * 1000,
+    w2=w_j[1], z2=z_j[1], I2=Mii[1])
+
+NOFRIC = 'contact="disable" frictionloss="disable"'
 
 
-def ur_run(h, integ, T=2.0, damping_in_joint=False):
-    t = mjcf_text(option=f'<option timestep="{h!r}" integrator="{integ}"><flag contact="disable"/></option>')
-    m = mujoco.MjModel.from_xml_string(t)
-    if damping_in_joint:                                 # 阻尼从执行器挪到关节：biasprm 的速度项置零，dof_damping = kd
-        m.dof_damping[:] = -m.actuator_biasprm[:, 2]
-        m.actuator_biasprm[:, 2] = 0.0
-    d = mujoco.MjData(m)
-    d.qpos[:] = Q_WORK
-    d.ctrl[:] = Q_WORK + 0.05
+def cr_run(h, integ, T=2.0, damping_in_joint=False):
+    _, m, d = cr_model(timestep=h, integrator=integ, flags=NOFRIC, actuator=cr_servo_xml())
+    act = [mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_ACTUATOR, "pos_" + n) for n in CR_NAMES]
+    if damping_in_joint:                                 # 阻尼从执行器挪到关节：biasprm 的速度项置零，加到 dof_damping
+        m.dof_damping[:] += -m.actuator_biasprm[act, 2]
+        m.actuator_biasprm[act, 2] = 0.0
+    d.qpos[:] = Q_CR
+    d.ctrl[act] = Q_CR + 0.05
     vmax = 0.0
     n = int(round(T / h))
     for k in range(n):
         mujoco.mj_step(m, d)
+        if not np.isfinite(d.qvel).all():
+            return math.inf
         if k >= n // 2:
             vmax = max(vmax, float(np.abs(d.qvel).max()))
     return vmax
 
 
-HS = (0.001, 0.0015, 0.002, 0.0025, 0.003, 0.005)
-runs = {(integ, h): ur_run(h, integ) for integ in ("Euler", "implicitfast", "RK4") for h in HS}
-runs_j = {h: ur_run(h, "Euler", damping_in_joint=True) for h in (0.002, 0.005, 0.01)}
-for h in HS:                                            # 稳定时最后 1 s 只剩慢模态的残余速度（约 0.002 rad/s），不稳定时在力矩上限之间来回振荡
+HS = (0.001, 0.0015, 0.0018, 0.0022, 0.0025, 0.003, 0.004, 0.005, 0.008)
+runs = {(integ, h): cr_run(h, integ) for integ in ("Euler", "implicitfast", "RK4") for h in HS}
+runs_j = {h: cr_run(h, "Euler", damping_in_joint=True) for h in (0.002, 0.005, 0.01)}
+for h in HS:                                            # 稳定时最后 1 s 只剩很小的残余速度，不稳定时在力矩上限之间来回振荡
     assert runs[("implicitfast", h)] < 0.01
-assert runs[("Euler", 0.0015)] < 0.01 and runs[("Euler", 0.002)] > 0.1
-assert runs[("RK4", 0.0025)] < 0.01 and runs[("RK4", 0.003)] > 0.1
+h_ok_eu = max(h for h in HS if runs[("Euler", h)] < 0.01)
+h_bad_eu = min(h for h in HS if runs[("Euler", h)] > 0.1)
+h_ok_rk = max(h for h in HS if runs[("RK4", h)] < 0.01)
+h_bad_rk = min(h for h in HS if runs[("RK4", h)] > 0.1)
+assert h_ok_eu <= h_eu < h_bad_eu and h_ok_rk <= h_rk < h_bad_rk, (h_eu, h_ok_eu, h_bad_eu, h_rk, h_ok_rk, h_bad_rk)
 assert all(v < 0.01 for v in runs_j.values())
-out(ur_hs_ms=[h * 1000 for h in HS], ur_v_euler=[runs[("Euler", h)] for h in HS], ur_v_impl=[runs[("implicitfast", h)] for h in HS],
-    ur_v_rk4=[runs[("RK4", h)] for h in HS], v_eu2=runs[("Euler", 0.002)], v_eu25=runs[("Euler", 0.0025)],
-    v_eu3=runs[("Euler", 0.003)], v_rk3=runs[("RK4", 0.003)], v_j10=runs_j[0.01])
+fin = lambda v: v if v < math.inf else -1               # noqa: E731   −1：算飞了
+out(cr_hs_ms=[h * 1000 for h in HS], cr_v_euler=[fin(runs[("Euler", h)]) for h in HS], cr_v_impl=[runs[("implicitfast", h)] for h in HS],
+    cr_v_rk4=[fin(runs[("RK4", h)]) for h in HS], h_ok_eu_ms=h_ok_eu * 1000, h_bad_eu_ms=h_bad_eu * 1000,
+    h_ok_rk_ms=h_ok_rk * 1000, h_bad_rk_ms=h_bad_rk * 1000, v_j10=runs_j[0.01])
 
 # ---------------------------------------------------------------- (3) 能量漂移
 FREE = 'energy="enable" limit="disable"'               # 关掉关节限位：摆过 ±170° 也不碰

@@ -178,7 +178,7 @@
     "dynamics": {
      "armature": 0.42,
      "damping": 2.0,
-     "frictionloss": 5.0,
+     "frictionloss": 1.2,
      "effort": 333.0,
      "module": "WQJ-L"
     }
@@ -213,7 +213,7 @@
     "dynamics": {
      "armature": 0.42,
      "damping": 2.0,
-     "frictionloss": 5.0,
+     "frictionloss": 1.2,
      "effort": 333.0,
      "module": "WQJ-L"
     }
@@ -248,7 +248,7 @@
     "dynamics": {
      "armature": 0.26,
      "damping": 1.0,
-     "frictionloss": 2.5,
+     "frictionloss": 0.8,
      "effort": 167.25,
      "module": "WQJ-M"
     }
@@ -283,7 +283,7 @@
     "dynamics": {
      "armature": 0.04,
      "damping": 0.3,
-     "frictionloss": 0.8,
+     "frictionloss": 0.4,
      "effort": 54.0,
      "module": "WQJ-S"
     }
@@ -318,7 +318,7 @@
     "dynamics": {
      "armature": 0.04,
      "damping": 0.3,
-     "frictionloss": 0.8,
+     "frictionloss": 0.4,
      "effort": 54.0,
      "module": "WQJ-S"
     }
@@ -353,7 +353,7 @@
     "dynamics": {
      "armature": 0.04,
      "damping": 0.3,
-     "frictionloss": 0.8,
+     "frictionloss": 0.4,
      "effort": 54.0,
      "module": "WQJ-S"
     }

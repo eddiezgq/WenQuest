@@ -1,10 +1,10 @@
 """29.1 节的计算：物理引擎原理。
 
-(1) 算例 29.1.1：铰接体算法（ABA，算法 29.1.1）求 UR5e 的关节角加速度，与闭式 M θ̈ = τ − c − g（第 25 章）、MuJoCo 的 qacc 核对
-    （随机姿态、速度和力矩，带与不带负载）。
-(2) 算例 29.1.2：数一数运算次数：ABA 与“牛顿-欧拉求 c + g、复合刚体算法求 M、楚列斯基分解解方程”，n = 6 的 UR5e 与 n 个关节的随机串联臂
-    （按稠密的 6×6 矩阵运算计数）；MuJoCo 中 UR5e、Go2、G1 的质量矩阵有多少个非零元（树状结构使 M 稀疏）。
-(3) 算例 29.1.3：叠放的料箱（只考虑竖直方向的刚性接触）：时间步进得到的 LCP，投影高斯-赛德尔法（PGS）的收敛速度与料箱数 N、
+(1) 算例 29.1.1：铰接体算法（ABA，算法 29.1.1）求问渠 WQ-CR5（零件库 B-ARM-WQCR5）的关节角加速度，与闭式 M θ̈ = τ − c − g（第 25 章）、
+    MuJoCo 的 qacc 核对（随机姿态、速度和力矩，带与不带负载跑合台的标准负载；关节摩擦关掉，只比较刚体动力学）。
+(2) 算例 29.1.2：数一数运算次数：ABA 与“牛顿-欧拉求 c + g、复合刚体算法求 M、楚列斯基分解解方程”，n = 6 的 WQ-CR5 与 n 个关节的随机串联臂
+    （按稠密的 6×6 矩阵运算计数）；MuJoCo 中 WQ-CR5、Go2、G1 的质量矩阵有多少个非零元（树状结构使 M 稀疏）。
+(3) 算例 29.1.3：机器人厂成品库叠放的料箱（只考虑竖直方向的刚性接触）：时间步进得到的 LCP，投影高斯-赛德尔法（PGS）的收敛速度与料箱数 N、
     顶上料箱的质量的关系，谱半径 cos²(π/2N)；每步只迭代 k 次时，冷启动与热启动 1 s 后的下沉量。
 (4) 算例 29.1.4：MuJoCo 中叠放 10 个料箱，求解器取 Newton（默认）与 PGS（迭代 5、10、20、100 次），2 s 后顶上料箱的下沉量、
     最大倾角、每步的迭代次数；接触点数与约束行数。
@@ -14,18 +14,18 @@ import math
 import mujoco
 import numpy as np
 
-from _ch29 import (Count, aba, aba_counted, crba_counted, mjcf_text, payload_parts, payload_xml, pgs, random_chain, run_stack,
-                   stack_delassus, ur_chain, ur_model, MJCF_DIR)
+from _ch29 import (Count, aba, aba_counted, cr_chain, cr_load, cr_load_xml, cr_model, cr_text, crba_counted, pgs, random_chain,
+                   run_stack, stack_delassus, MJCF_DIR)
 from bookout import out
 
 # ---------------------------------------------------------------- (1) ABA 与 MuJoCo
 rng = np.random.default_rng(29)
-flags = 'contact="disable" actuation="disable"'
+flags = 'contact="disable" actuation="disable" frictionloss="disable" damper="disable" limit="disable"'
 err_cf = err_mj = 0.0
-for payload in (None, payload_parts()):
-    ch = ur_chain(payload=payload)
-    tool = payload_xml(*payload) if payload is not None else ""
-    _, m, d = ur_model(flags=flags, tool=tool)
+for payload in (None, cr_load()):
+    ch = cr_chain(payload=payload)
+    tool = cr_load_xml() if payload is not None else ""
+    _, m, d = cr_model(flags=flags, tool=tool)
     for _ in range(50):
         th = rng.uniform(-math.pi, math.pi, 6)
         thd = rng.uniform(-2, 2, 6)
@@ -52,7 +52,7 @@ def counts(ch, th, thd, tau):
     return a, b, parts, rel
 
 
-ch = ur_chain()
+ch = cr_chain()
 th = rng.uniform(-math.pi, math.pi, 6)
 thd = rng.uniform(-2, 2, 6)
 tau = rng.uniform(-60, 60, 6)
@@ -89,7 +89,7 @@ def model_text(name):
     return (MJCF_DIR / f"{name}.xml").read_text(encoding="utf-8")
 
 
-nv_ur, nM_ur = nM(mjcf_text())
+nv_ur, nM_ur = nM(cr_text())
 nv_go, nM_go = nM(model_text("go2"))
 nv_g1, nM_g1 = nM(model_text("g1"))
 assert nM_ur == nv_ur * (nv_ur + 1) // 2

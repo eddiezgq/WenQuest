@@ -33,6 +33,11 @@ def test_same_robot_as_the_factory():
         gn, rated, rep = mod["gear"]
         assert gear[gn][1] == rated and gear[gn][2] == rep
     assert W.ETA == motors.ETA and W.GEAR_RATIO in motors.RATIOS
+    import yaml
+    plant = yaml.safe_load((REPO / "factory" / "plants" / "wenquest-robot.yaml").read_text(encoding="utf-8"))
+    fr = {m["item"]: next(c["nominal"] for c in m["chars"] if c["code"] == "joint_friction")
+          for m in plant["measurements"] if any(c["code"] == "joint_friction" for c in m["chars"])}
+    assert {mod["code"]: mod["frictionloss"] for mod in W.MODULES.values()} == fr      # 名义库仑摩擦 = 关节测试台的空载摩擦力矩
 
 
 def test_mass_and_inertia_match_mujoco():
