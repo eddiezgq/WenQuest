@@ -221,3 +221,15 @@ def test_api_and_a_system_with_a_cylindrical_cam():
     )
     out = S.analyse(sysp, quick=True)
     assert any(x.get("id") == "barrel" for x in out["cams"])
+
+
+def test_ai_drafting_reads_the_cylindrical_follower():
+    import ai_api
+
+    p = json.loads((EX / "barrel-fork.json").read_text(encoding="utf-8"))
+    p["mechanism"] = {"follower": "translating"}  # the page also keeps disk fields; they are not this cam's
+    follower, put, run = ai_api._target(p, "")
+    assert follower == "oscillating"
+    assert run(put(p["program"]))["type"] == "cylindrical"
+    s = ai_api._summary(p)
+    assert s["type"] == "cylindrical" and "cylindrical" in s and "mechanism" not in s

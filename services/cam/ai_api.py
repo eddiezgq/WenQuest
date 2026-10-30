@@ -72,14 +72,16 @@ def _target(p: dict, cam_id: str):
         if c.get("type") == "globoidal":
             follower = "indexing"
         else:
-            follower = (c.get("mechanism") or {}).get("follower") or "translating"
+            follower = (c.get("cylindrical" if c.get("type") == "cylindrical" else "mechanism") or {}).get(
+                "follower") or "translating"
 
         def put(prog):
             q = copy.deepcopy(p)
             next(x for x in q["cams"] if x.get("id") == cam_id)["program"] = prog
             return q
         return follower, put, lambda q: S.analyse(q, quick=True)
-    follower = (p.get("mechanism") or {}).get("follower") or "translating"
+    follower = (p.get("cylindrical" if p.get("type") == "cylindrical" else "mechanism") or {}).get(
+        "follower") or "translating"
 
     def put1(prog):
         q = copy.deepcopy(p)
@@ -120,11 +122,13 @@ def _numbers(x) -> list[float]:
 
 
 def _summary(p: dict) -> dict:
-    keep = ("program", "mechanism", "loads", "globoidal", "camshaft", "output", "drive")
+    keep = ("program", "mechanism", "loads", "globoidal", "cylindrical", "camshaft", "output", "drive")
     if p.get("kind") == "system" or "cams" in p:
         return {"camshaft": p.get("camshaft"), "drive": p.get("drive"),
                 "cams": [{k: c.get(k) for k in ("id", "type", *keep) if c.get(k) is not None} for c in p["cams"]]}
-    return {k: p.get(k) for k in keep if p.get(k) is not None}
+    if p.get("type") == "cylindrical":  # round 39 step 8: the disk fields the page also keeps are not this cam's
+        keep = tuple(k for k in keep if k != "mechanism")
+    return {k: p.get(k) for k in (("type",) + keep) if p.get(k) is not None}
 
 
 # ------------------------------------------------------------------------------------------------ endpoints

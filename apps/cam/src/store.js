@@ -19,6 +19,35 @@ export function blank() {
   }
 }
 
+// A cylindrical (barrel) cam (round 39, step 8): a groove around a cylinder; sizes are a starting point to change.
+export function blankCylFields() {
+  return { follower: 'translating', roller: 'cylinder', Rp: 60, rr: 10, b: 12, gap: 0.05, bottom: 1.5, length: 120, arm: null, sigma: 1 }
+}
+export function blankCyl() {
+  const p = blank()
+  p.type = 'cylindrical'
+  p.title = { zh: '新圆柱凸轮', en: 'New cylindrical cam' }
+  p.program = { unit: 'mm', segments: [
+    { kind: 'rise', deg: 120, h: 40, law: 'cycloidal' }, { kind: 'dwell', deg: 60 },
+    { kind: 'return', deg: 120, h: 40, law: 'cycloidal' }, { kind: 'dwell', deg: 60 }] }
+  p.cylindrical = blankCylFields()
+  return p
+}
+export const isCylProject = (p) => p?.type === 'cylindrical'
+
+// Switching between a translating and an oscillating follower changes the program's unit: lifts become angles.
+export function convertProgram(toRad) {
+  project.program.unit = toRad ? 'rad' : 'mm'
+  for (const s of project.program.segments || []) {
+    if (s.kind === 'dwell') continue
+    if (toRad) { s.h_deg = s.h ?? 15; delete s.h } else { s.h = s.h_deg ?? 10; delete s.h_deg }
+  }
+  if (project.program.table) {
+    const tb = project.program.table
+    if (toRad) { tb.s_deg = tb.s; delete tb.s } else { tb.s = tb.s_deg; delete tb.s_deg }
+  }
+}
+
 // Manufacturing settings (step 3). Machine values are examples, to be set to the shop's machine.
 export function blankMfg() {
   return {
@@ -51,6 +80,8 @@ export function normalise(p) {
   out.measure.comp = { ...b.measure.comp, ...((p.measure || {}).comp || {}) }
   if (!Array.isArray(out.measure.records)) out.measure.records = []
   out.program = p.program || b.program
+  if (p.type === 'cylindrical') out.cylindrical = { ...blankCylFields(), ...(p.cylindrical || {}) }
+  else { delete out.type; delete out.cylindrical }
   if (!out.title || typeof out.title !== 'object') out.title = { zh: String(out.title || '凸轮'), en: String(out.title || 'Cam') }
   return out
 }
@@ -65,6 +96,12 @@ export function replace(p) {
 export function payload() {
   const strip = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v !== null && v !== '' && v !== undefined))
   const p = JSON.parse(JSON.stringify(project))
+  if (p.type === 'cylindrical') {               // a groove: form-closed, so no spring
+    const c = strip(p.cylindrical)
+    if (c.follower !== 'oscillating') delete c.arm
+    const { k, preload, ...ld } = strip(p.loads); void k; void preload
+    return { type: 'cylindrical', program: p.program, cylindrical: c, loads: ld, material: strip(p.material), limits: strip(p.limits) }
+  }
   const m = strip(p.mechanism)
   if (m.follower === 'translating') { delete m.a; delete m.L } else delete m.e
   if (m.contact !== 'roller') { delete m.rr; m.groove = false }

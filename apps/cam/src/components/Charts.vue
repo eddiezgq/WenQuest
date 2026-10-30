@@ -22,7 +22,7 @@ const charts = computed(() => {
   ]
   if (c.vel) out.splice(4, 0, { key: 'vel', y: c.vel, unit: rad ? 'rad/s' : 'm/s' }, { key: 'accel', y: c.acc, unit: rad ? 'rad/s²' : 'm/s²' })
   if (c.force) out.push({ key: 'force', y: c.force, unit: rad ? 'N·mm' : 'N', zero: true }, { key: 'torqueC', y: c.torque_Nm, unit: 'N·m' })
-  return out.map((ch) => {
+  return out.filter((ch) => Array.isArray(ch.y)).map((ch) => {   // a cylindrical cam has no disk profile radius
     let ys = ch.y.map((v) => (v == null ? NaN : v))
     if (ch.clip) {                       // radius of curvature: very flat parts would squash the plot
       const sorted = ys.filter(Number.isFinite).map(Math.abs).sort((a, b) => a - b)

@@ -416,8 +416,11 @@ def freecad_pack() -> bytes:
         for f in sorted((HERE / "camkit").glob("*.py")):
             z.write(f, root + "camkit/" + f.name)
         for f in sorted(EXAMPLES.glob("*.json")):
-            if not f.name.endswith(".cae.json"):
-                z.write(f, root + "examples/" + f.stem + ".wqcam.json")
+            if f.name.endswith(".cae.json"):
+                continue
+            if json.loads(f.read_text(encoding="utf-8")).get("type") == "cylindrical":
+                continue  # round 39 step 8: FreeCAD builds cylindrical cams from step 8d on
+            z.write(f, root + "examples/" + f.stem + ".wqcam.json")
         z.writestr("wenquest-cam-freecad/使用说明.txt", FREECAD_README)
     return buf.getvalue()
 

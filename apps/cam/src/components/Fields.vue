@@ -1,13 +1,14 @@
 <script setup>
 // Mechanism, loads and material, and limits: plain labelled number fields (round 39).
 import { computed, ref } from 'vue'
-import { project, payload } from '../store'
+import { project, payload, convertProgram, isCylProject } from '../store'
 import { api } from '../api'
 import { t, lang } from '../i18n'
 
 const props = defineProps({ part: String })
 const m = computed(() => project.mechanism)
-const osc = computed(() => m.value.follower === 'oscillating')
+const cylP = computed(() => isCylProject(project))
+const osc = computed(() => (cylP.value ? project.cylindrical.follower : m.value.follower) === 'oscillating')
 const searching = ref(false)
 const searchMsg = ref('')
 
@@ -15,15 +16,7 @@ function follower(f) {
   if (m.value.follower === f) return
   m.value.follower = f
   const toRad = f === 'oscillating'
-  project.program.unit = toRad ? 'rad' : 'mm'
-  for (const s of project.program.segments || []) {
-    if (s.kind === 'dwell') continue
-    if (toRad) { s.h_deg = s.h ?? 15; delete s.h } else { s.h = s.h_deg ?? 10; delete s.h_deg }
-  }
-  if (project.program.table) {
-    const tb = project.program.table
-    if (toRad) { tb.s_deg = tb.s; delete tb.s } else { tb.s = tb.s_deg; delete tb.s_deg }
-  }
+  convertProgram(toRad)
   if (toRad && !(m.value.a > 0)) { m.value.a = 2.5 * (m.value.rb || 40); m.value.L = 2 * (m.value.rb || 40) }
 }
 function steel() { Object.assign(project.material, { E1: 206000, nu1: 0.3, E2: 206000, nu2: 0.3 }) }
@@ -69,10 +62,11 @@ const num = (v) => (v === '' || v === null ? null : Number(v))
     <label>{{ t('rpm') }} <span class="u">r/min</span><input :value="project.loads.rpm" type="number" step="any" min="0" @input="project.loads.rpm = num($event.target.value)"></label>
     <label v-if="!osc">{{ t('mass') }} <span class="u">kg</span><input :value="project.loads.mass" type="number" step="any" min="0" @input="project.loads.mass = num($event.target.value)"></label>
     <label v-else>{{ t('inertia') }} <span class="u">kg·m²</span><input :value="project.loads.inertia" type="number" step="any" min="0" @input="project.loads.inertia = num($event.target.value)"></label>
-    <label>{{ t('k') }} <span class="u">{{ osc ? 'N·mm/rad' : 'N/mm' }}</span><input :value="project.loads.k" type="number" step="any" min="0" @input="project.loads.k = num($event.target.value)"></label>
-    <label>{{ t('preload') }} <span class="u">{{ osc ? 'rad' : 'mm' }}</span><input :value="project.loads.preload" type="number" step="any" @input="project.loads.preload = num($event.target.value)"></label>
+    <label v-if="!cylP">{{ t('k') }} <span class="u">{{ osc ? 'N·mm/rad' : 'N/mm' }}</span><input :value="project.loads.k" type="number" step="any" min="0" @input="project.loads.k = num($event.target.value)"></label>
+    <label v-if="!cylP">{{ t('preload') }} <span class="u">{{ osc ? 'rad' : 'mm' }}</span><input :value="project.loads.preload" type="number" step="any" @input="project.loads.preload = num($event.target.value)"></label>
     <label>{{ t('load') }} <span class="u">{{ osc ? 'N·mm' : 'N' }}</span><input :value="project.loads.load" type="number" step="any" @input="project.loads.load = num($event.target.value)"></label>
     <p class="note">{{ t('speedNote') }}</p>
+    <p v-if="cylP" class="note">{{ t('cylLoadNote') }}</p>
     <h4>{{ t('matRoller') }}</h4>
     <label>{{ t('E') }} <span class="u">MPa</span><input :value="project.material.E1" type="number" step="any" min="0" @input="project.material.E1 = num($event.target.value)"></label>
     <label>{{ t('nu') }}<input :value="project.material.nu1" type="number" step="any" min="0" max="0.5" @input="project.material.nu1 = num($event.target.value)"></label>

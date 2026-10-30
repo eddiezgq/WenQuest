@@ -603,7 +603,7 @@ def analyse(project: dict, m: int = 1440, k: int = 9, undercut_check: bool = Tru
     }
 
 
-def geometry(c: Cyl, prog: Program, sfs: list[dict] | None = None, m: int = 720) -> dict:
+def geometry(c: Cyl, prog: Program, sfs: list[dict] | None = None, m: int = 360) -> dict:
     """What the page draws: the groove development at the outer radius and at the pitch radius (arc length u = R·θ
     against z, both flanks), the roller centre over the turn, and the sizes."""
     th = np.linspace(0, 2 * math.pi, m + 1)
@@ -640,6 +640,31 @@ def geometry(c: Cyl, prog: Program, sfs: list[dict] | None = None, m: int = 720)
             sides.append({"u": (x * ang).round(4).tolist(), "z": (Q[2, :, 0] + 0 * g).round(4).tolist()})
         dev[name] = sides
     out["development"] = dev
+    out["rings"] = rings(c, prog)
+    return out
+
+
+def rings(c: Cyl, prog: Program, m: int = 2880) -> dict:
+    """For the page's 3D view: in the cam frame, at every degree of azimuth (0…360), the z of both flanks at the outer
+    radius and at the roller's inner end (the groove continues straight down to its bottom). The side clearance opens
+    the two flanks by gap/2 each."""
+    th = np.linspace(0, 2 * math.pi, m, endpoint=False)
+    ps = pose(c, prog, th[:, None])
+    az = np.radians(np.arange(0, 361, 1.0))
+    out = {"az_deg": list(range(0, 361))}
+    for name, x in (("outer", c.x2), ("inner", c.x1)):
+        zs = []
+        for side in (1, -1):
+            P, *_ = contact(c, ps, np.array([[x]]), side)
+            Q = cam_frame(c, P, th[:, None])[:, :, 0]
+            a = np.mod(np.arctan2(Q[1], Q[0]), 2 * math.pi)
+            o = np.argsort(a)
+            a2 = np.concatenate([a[o][-1:] - 2 * math.pi, a[o], a[o][:1] + 2 * math.pi])
+            z2 = np.concatenate([Q[2][o][-1:], Q[2][o], Q[2][o][:1]])
+            z = np.interp(az, a2, z2)
+            zs.append(z)
+        lo, hi = np.minimum(zs[0], zs[1]) - c.gap / 2, np.maximum(zs[0], zs[1]) + c.gap / 2
+        out[name] = {"lo": lo.round(4).tolist(), "hi": hi.round(4).tolist()}
     return out
 
 

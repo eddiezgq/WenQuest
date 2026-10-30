@@ -165,6 +165,24 @@ const W = {
   cloudKindCam: ['单个凸轮', 'Cam'], cloudKindSys: ['凸轮系统', 'Cam system'],
   cloudDel: ['删除', 'Delete'], cloudDelSure: ['确定删除？', 'Delete for sure?'],
   cloudLinked: ['云端：{name}，第 {v} 版（改动先存在本机，点“云端项目”保存）', 'Cloud: {name}, version {v} (changes stay here until you save in Cloud projects)'],
+  // cylindrical (barrel) cams, round 39 step 8
+  newDisk: ['盘形凸轮', 'Disk cam'], newCyl: ['圆柱凸轮', 'Cylindrical cam'],
+  cylRoller: ['滚子', 'Roller'], cylRollerCyl: ['圆柱滚子', 'Cylindrical roller'], cylRollerCone: ['锥形滚子', 'Tapered roller'],
+  cylRp: ['节圆柱半径 R_p（滚子中点）', 'Pitch radius R_p (roller middle)'], cylRr: ['滚子半径 r_r（锥形取中点）', 'Roller radius r_r (mid-length for a taper)'],
+  cylB: ['滚子在槽里的长度 b', 'Roller length in the groove b'], cylGap: ['槽侧间隙（槽宽减滚子直径）', 'Side clearance (groove width − roller diameter)'],
+  cylBottom: ['滚子端到槽底间隙', 'Roller end to groove bottom'], cylLength: ['凸轮长度', 'Cam length'],
+  cylArm: ['摆杆长（支点到滚子轴线）', 'Arm length (pivot to roller axis)'], cylPsiMid: ['摆杆与凸轮轴垂直时的程序摆角', 'Program angle with the arm square to the cam'],
+  cylPsiMidNote: ['不填时取摆角范围的中间，摆杆左右对称摆动。', 'Empty: the middle of the swing, so the arm swings evenly to both sides.'],
+  cylCylNote: ['圆柱滚子：槽口和槽底线速度不同，滚子会滑动（见校核“滚子滑动”）。', 'Cylindrical roller: the groove moves faster at its top than at its bottom, so the roller slides (see the sliding check).'],
+  cylConeNote: ['锥形滚子：锥顶在凸轮轴线上，停歇时纯滚动，运动时滑动也比圆柱滚子小。', 'Tapered roller: apex on the cam axis, it rolls without sliding in the dwells and slides less while moving.'],
+  findRp: ['求最小节圆柱半径', 'Find smallest pitch radius'],
+  cylLoadNote: ['圆柱凸轮的槽两侧形封闭，不用弹簧。', 'The groove holds the roller on both sides: no spring.'],
+  cyl3d: ['三维', '3D'], cylDev: ['槽展开图', 'Groove unrolled'],
+  cylDevNote: ['外圆展开；虚线为滚子内端处槽侧；点击移动转角', 'Unrolled at the outer radius; dashed: flanks at the roller\'s inner end; click to move'],
+  cylDevTitle: ['槽展开图（凸轮外圆，θ = 0）', 'Groove unrolled (outer radius, θ = 0)'],
+  cylDevCaption: ['横轴为凸轮坐标系里的方位角，纵轴为沿凸轮轴线的位置（mm）；实线为外圆处槽侧，虚线为滚子内端处槽侧。', 'Across: azimuth in the cam frame; up: position along the cam axis (mm). Solid: flanks at the outer radius; dashed: at the roller\'s inner end.'],
+  cylMethod: ['槽侧面由啮合条件求出（滚子表面上法向与相对速度正交），直动、摆动从动件，圆柱、锥形滚子都是闭式解；压力角为接触力在垂直于滚子轴线的平面内与滚子中心运动方向的夹角，沿槽深取最大；根切由让滚子扫过整圈、检查槽侧点是否被切掉判断；曲率为槽侧面垂直于接触线方向的法曲率；接触应力按赫兹线接触，长度取滚子在槽里的长度；力矩由功率平衡求出。未计导轨摩擦和重力。',
+    'The groove flanks follow from the condition of meshing (on the roller surface the normal is square to the relative velocity), a closed form for translating and oscillating followers and for cylindrical and tapered rollers; the pressure angle is between the contact force in the plane square to the roller axis and the direction the roller centre moves, the largest along the groove depth; undercut by sweeping the roller through a whole turn and checking whether flank points are cut away; curvature is the flanks\' normal curvature across the contact line; contact stress by Hertz line contact over the roller length in the groove; torque from the power balance. Guide friction and gravity are not included.'],
 }
 
 export function t(key) {

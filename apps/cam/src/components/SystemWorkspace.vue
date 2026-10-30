@@ -67,7 +67,7 @@ const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFix
           <p class="note">{{ t('motorNote') }}</p>
         </template>
         <template v-else-if="cam">
-          <p class="kind">{{ cam.type === 'globoidal' ? t('globoidal') : t('disk') }}</p>
+          <p class="kind">{{ cam.type === 'globoidal' ? t('globoidal') : cam.type === 'cylindrical' ? t('newCyl') : t('disk') }}</p>
           <ProgramEditor :program="cam.program" :indexing="cam.type === 'globoidal'" :cam-id="cam.id" />
           <template v-if="cam.type === 'globoidal'">
             <h4>{{ t('globoidal') }}</h4>
@@ -79,6 +79,14 @@ const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFix
             <NumField :obj="cam.globoidal" k="L" :label="t('gL')" unit="mm" />
             <NumField :obj="cam.globoidal" k="clearance" :label="t('gclr')" unit="mm" />
             <NumField :obj="cam.globoidal" k="phase_deg" :label="t('gphase')" unit="°" />
+          </template>
+          <template v-else-if="cam.type === 'cylindrical'">
+            <h4>{{ t('newCyl') }}（{{ t(cam.cylindrical.roller === 'cone' ? 'cylRollerCone' : 'cylRollerCyl') }}）</h4>
+            <NumField :obj="cam.cylindrical" k="Rp" :label="t('cylRp')" unit="mm" />
+            <NumField :obj="cam.cylindrical" k="rr" :label="t('cylRr')" unit="mm" />
+            <NumField :obj="cam.cylindrical" k="b" :label="t('cylB')" unit="mm" />
+            <NumField :obj="cam.cylindrical" k="length" :label="t('cylLength')" unit="mm" />
+            <NumField v-if="cam.cylindrical.follower === 'oscillating'" :obj="cam.cylindrical" k="arm" :label="t('cylArm')" unit="mm" />
           </template>
           <template v-else>
             <h4>{{ t('tabMech') }}</h4>
