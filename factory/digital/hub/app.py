@@ -81,6 +81,9 @@ WEB_DIST = os.environ.get("WQ_WEB_DIST", os.path.join(os.path.dirname(HERE), "we
 # 企业工厂（WQ_PLANT_FILE 指定、demo_data: false）里这些接口一律 404，网页按 /api/config 的 plant.hidden 不显示入口
 DEMO_PLANT = PLANT.is_demo()
 SUPPLY_ON = PLANT.has_supply()            # 第 51 轮：采购与来料（E5）也在清单写了产品的厂开（机器人厂）
+DOMAINS_ON = PLANT.has_domains()          # 第 59 轮：设备维护（E3）、能源（E6）、经营财务（E7）也在清单写了产品的厂开（教学模式）
+DOMAIN_API = ("/api/maint", "/api/energy", "/api/finance")
+DOMAIN_NAV = ("/maint", "/energy", "/finance")
 TEACH_ONLY_API = tuple("/api/lab{}".format(n) for n in range(15, 24)) + (
     "/api/story", "/api/scenario", "/api/teach/batch-complaint", "/api/help/try",       # 帮助里的“当场动手”（第 30 轮 §八）
     "/api/complaints", "/api/crm", "/api/followups", "/api/ont/customer360", "/api/service",     # E1 客户与服务
@@ -342,10 +345,22 @@ class Hub:
                                 ST.tick(self, mode)
                         except Exception:  # noqa: BLE001
                             log.exception("情景出错")
-                    elif mode == "teach":             # 其他工厂的教学版（第 45 轮）：只做“订单做完开票”，闭环走到开票
+                    elif mode == "teach":             # 其他工厂的教学版（第 45 轮）：订单做完开票；第 59 轮起设备维护、能源、经营财务也开
+                        if DOMAINS_ON:
+                            try:
+                                from hub import maint as MT
+                                MT.ensure_setup(self, mode)
+                                MT.tick(self, mode)
+                            except Exception:  # noqa: BLE001
+                                log.exception("设备维护出错")
+                            try:
+                                from hub import energy as EG
+                                EG.tick(self, mode)
+                            except Exception:  # noqa: BLE001
+                                log.exception("能源出错")
                         try:
                             from hub import finance as FN
-                            FN.bill_orders(self, mode)
+                            FN.tick(self, mode) if DOMAINS_ON else FN.bill_orders(self, mode)
                         except Exception:  # noqa: BLE001
                             log.exception("开票出错")
                         if SUPPLY_ON:                 # 第 51 轮：采购到货、来料检验；向工业园兄弟厂下单、收货
@@ -395,7 +410,8 @@ app = FastAPI(title="问渠数字工厂枢纽 WenQuest Digital Factory Hub", ver
 
 def teach_only(path):
     """只属于演示工厂的接口（E1–E7、实验 15–23、情景）"""
-    return any(path == p or path.startswith(p + "/") for p in TEACH_ONLY_API) and not (SUPPLY_ON and path.startswith("/api/supply"))
+    return any(path == p or path.startswith(p + "/") for p in TEACH_ONLY_API) and not (SUPPLY_ON and path.startswith("/api/supply")) \
+        and not (DOMAINS_ON and any(path == p or path.startswith(p + "/") for p in DOMAIN_API))
 
 
 @app.middleware("http")
@@ -647,7 +663,8 @@ def _plant_cfg():
             "id": act["ID"] if act else "wenquest-gearbox",          # 第 45 轮：帮助按它显示“机器人厂”一册
             "shift": "{}–{}".format(cal.DEF_START, cal.DEF_END),
             # “实验与任务”：本厂有自己的实验（机器人厂的实验 24、25，第 47 轮）就显示
-            "hidden": [] if DEMO_PLANT else [p for p in TEACH_ONLY_NAV if not (p == "/labs" and _labs_api.has_labs()) and not (p == "/supply" and SUPPLY_ON)]}
+            "hidden": [] if DEMO_PLANT else [p for p in TEACH_ONLY_NAV if not (p == "/labs" and _labs_api.has_labs()) and not (p == "/supply" and SUPPLY_ON)
+                                         and not (p in DOMAIN_NAV and DOMAINS_ON)]}
 
 
 # ---------------------------------------------------------------- AI 模型选择（第 30 轮 H-6；freecad-ai-parts ADR-0063）

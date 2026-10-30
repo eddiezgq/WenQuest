@@ -249,7 +249,7 @@ jobs:
             if grep -q "^$id	" "$FACTORY_DIR/classes.plants"; then
               python tests/plant_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
                 --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-                --item WQ-AGV300:2 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $extra $park \
+                --item WQ-AGV300:2 --item WQ-CR5 --lab24 --reliability 0 --domains --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $extra $park \
                 2>&1 | tee /tmp/logs/class_loop.log
             else
               python tests/closed_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
