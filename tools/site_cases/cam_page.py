@@ -72,6 +72,9 @@ STEPS = [
     (("AI 起草", "AI drafts"),
      ("一句话要求变成运动程序草稿，由代码检查后人确认；校核结果的白话解释和计算书设计说明，数字逐个核对",
       "A one-sentence requirement becomes a draft motion program, checked by code and confirmed by you; plain-language explanations of the checks and the report's design description, every number checked"),
+     "now"),    (("云端项目", "Cloud projects"),
+     ("开通的企业登录后把项目存到云端，同单位的人共用；每次保存留一版、保留最近 20 版可恢复；两人同时改时不会互相覆盖",
+      "Activated companies sign in and keep projects in the cloud, shared within the company; every save is a version, the last 20 kept and restorable; two people editing at once never overwrite each other"),
      "now"),
 ]
 
@@ -108,7 +111,7 @@ def page(head, topbar, bi, script):
       <a class="btn pri" href="{APP}" target="_blank" rel="noopener">{bi(("打开软件", "Open the software"))}</a>
       <a class="btn line" href="{mail}">{bi(("预约演示", "Book a demo"))}</a>
     </div>
-    <p class="sub" style="margin-top:14px;font-size:14px">{bi(("演示免登录，项目存在你自己的浏览器里，也可以存成文件。", "No sign-in for the demo: projects stay in your own browser, or save them as a file."))}</p>
+    <p class="sub" style="margin-top:14px;font-size:14px">{bi(("演示免登录，项目存在你自己的浏览器里，也可以存成文件；开通的企业登录后可存到云端，多人共用。", "No sign-in for the demo: projects stay in your own browser, or save them as a file; activated companies sign in to keep them in the cloud and share them."))}</p>
   </div>
   <div><iframe class="camframe" src="{APP}?example=sewing-takeup-groove&amp;embed=1" title="问渠凸轮 WenQuest Cam" loading="lazy"></iframe></div>
 </div></div>

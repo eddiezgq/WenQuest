@@ -39,6 +39,10 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .tools { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .tools button, .modes button { white-space: nowrap; }
 .tools select.dark { max-width: 220px; }
+.cloud-btn.linked { border-color: var(--accent); }
+.who { display: inline-flex; flex-direction: column; line-height: 1.15; font-size: 13px; color: var(--night-ink); max-width: 14ch; text-decoration: none; }
+.who small { font-size: 11px; color: var(--night-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who.in { color: var(--accent); }
 
 .work { display: grid; grid-template-columns: 340px minmax(0, 1fr) 320px; grid-template-rows: minmax(420px, 58vh) auto; gap: 12px; padding: 12px; }
 .edit { grid-row: 1 / span 2; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; min-height: 0; }

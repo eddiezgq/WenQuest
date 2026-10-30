@@ -412,5 +412,9 @@ import ai_api  # noqa: E402  (AI drafting, round 39 step 6)
 
 ai_api.register(app, run, MAX_BODY)
 
+import projects_api  # noqa: E402  (cloud projects, round 39 step 7)
+
+projects_api.register(app, MAX_BODY)
+
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")
