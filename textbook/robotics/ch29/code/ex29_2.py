@@ -88,6 +88,7 @@ out(kp_arm=KP_A, kv_arm=KV_A, sag1_deg=math.degrees(sag_arm[0]), sag2_deg=math.d
 
 # WQ-CR5 的位置环：出厂增益写成 position 执行器，带负载跑合台的标准负载停在工作姿态
 W = wqcr5()
+out(mass_total=W.total_mass(), mass_moving=sum(l["mass"] for l in W.links()))
 mp = cr_load()
 tool = cr_load_xml().replace("<inertial", '<site name="ft" pos="0 0 0"/><inertial')
 sensors = '</actuator><sensor><force name="f" site="ft"/><torque name="t" site="ft"/></sensor>'

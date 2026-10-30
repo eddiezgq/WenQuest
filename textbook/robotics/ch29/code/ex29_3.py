@@ -66,7 +66,9 @@ eigD = np.sort(np.linalg.eigvals(np.linalg.solve(M, Dx)).real)
 out(Mii=Mii.tolist(), w_j=w_j.tolist(), c_j=c_j.tolist(), z_j=z_j.tolist(), h_j_ms=(h_j * 1000).tolist(),
     w6=w_j[5], c6=c_j[5], z6=z_j[5], h6_ms=h_j[5] * 1000, h_eu_ms=h_eu * 1000, h_rk_ms=h_rk * 1000, eigD_max=eigD[-1],
     I6=Mii[5], h_eu_est_ms=2 / eigD[-1] * 1000, h_rk_est_ms=rk4_real / np.sort(np.linalg.eigvals(np.linalg.solve(M, D)).real)[-1] * 1000,
-    w2=w_j[1], z2=z_j[1], I2=Mii[1])
+    w2=w_j[1], z2=z_j[1], I2=Mii[1], h2_ms=h_j[1] * 1000, I6_noarm=Mii[5] - W.armature()[5],
+    arm_ratio6=Mii[5] / (Mii[5] - W.armature()[5]), h6_noarm_ms=h_formula(math.sqrt(kp[5] / (Mii[5] - W.armature()[5])),
+                                                                      kv[5] / (Mii[5] - W.armature()[5]), "euler") * 1000)
 
 NOFRIC = 'contact="disable" frictionloss="disable"'
 

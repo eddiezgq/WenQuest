@@ -126,7 +126,7 @@ assert rhoA[2] < 1 < rhoA[3]
 osc_dl = sorted(c["delay"] for c, r in zip(cases, res["A"]) if r["v_tail"] > OSC)
 ok_dl = sorted(c["delay"] for c, r in zip(cases, res["A"]) if r["v_tail"] <= OSC)
 assert ok_dl[-1] < osc_dl[0]
-out(rhoA=rhoA, ndA_ms=nd_crit * 0.5, A_ok_max_ms=ok_dl[-1] * 1000, A_osc_min_ms=osc_dl[0] * 1000,
+out(rhoA=rhoA, rho_nd2=rhoA[2], rho_nd3=rhoA[3], ndA_ms=nd_crit * 0.5, A_ok_max_ms=ok_dl[-1] * 1000, A_osc_min_ms=osc_dl[0] * 1000,
     kdTc_I6=KV_A[5] * 0.002 / MdP[5], Ieff=(1 / np.diag(np.linalg.inv(MP))).tolist(), C_vj=res["C"][int(np.argmax([c["delay"] for c in cases]))]["vj_tail"].tolist())
 
 # 图 29.4.2 用：一个延迟 2.5 ms 的典型情形（名义负载与摩擦）下三种控制器的 TCP 误差随时间

@@ -74,7 +74,7 @@ B_ = np.array([t[2] for t in table])
 ca = np.polyfit(N_, A_, 1)
 cb = np.polyfit(N_, B_, 3)
 assert np.allclose(np.polyval(ca, N_), A_) and np.allclose(np.polyval(cb, N_), B_)
-out(aba_k=round(ca[0]), aba_b=round(ca[1]), crba_c3=cb[0], crba_c2=cb[1], crba_c1=cb[2], crba_c0=cb[3],
+out(aba_k=round(ca[0]), aba_b=round(ca[1]), aba_b_neg=-round(ca[1]), crba_c3=cb[0], crba_c2=cb[1], crba_c1=cb[2], crba_c0=cb[3],
     ratio30=B_[N_ == 30][0] / A_[N_ == 30][0], ratio6=b6[0] / a6[0], ratio50=B_[N_ == 50][0] / A_[N_ == 50][0],
     chol_share30=table[6][3][2] / B_[N_ == 30][0] * 100, crb_share30=table[6][3][1] / B_[N_ == 30][0] * 100,
     ops_n=N_.tolist(), ops_aba=A_.tolist(), ops_crba=B_.tolist())
@@ -129,7 +129,7 @@ for N in (2, 5, 10, 20):
 out(pgs_N=[r[0] for r in pgs_rows], pgs_k=[r[1] for r in pgs_rows], pgs_rho=[r[2] for r in pgs_rows],
     pgs_kh=[r[3] for r in pgs_rows], pgs_est=[r[5] for r in pgs_rows],
     k10=pgs_rows[2][1], k20=pgs_rows[3][1], k10h=pgs_rows[2][3], rho10=pgs_rows[2][2], k5=pgs_rows[1][1], k2=pgs_rows[0][1],
-    k20h=pgs_rows[3][3], k5h=pgs_rows[1][3])
+    k20h=pgs_rows[3][3], k5h=pgs_rows[1][3], rho2=pgs_rows[0][2], est5=pgs_rows[1][5])
 
 
 def stepping(N, k, warm, T=1.0):
