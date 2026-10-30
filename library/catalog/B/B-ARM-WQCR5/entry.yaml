@@ -1,0 +1,57 @@
+# B-ARM-WQCR5 · 问渠 WQ-CR5 六轴协作机器人（自建，第 58 轮：机器人厂的产品，带动力学模型）
+schema: 1
+id: B-ARM-WQCR5
+kind: robot
+name:
+  zh: 问渠 WQ-CR5 六轴协作机器人
+  en: WenQuest WQ-CR5 6-axis cobot
+category: ARM
+tags:
+- 机械臂
+- 协作机器人
+- arm
+- cobot
+- 动力学
+- 自建
+- 问渠机器人厂
+standards: []
+params: []
+defaults: {}
+model:
+  engine: wqrobot:cobot6
+  formats:
+  - glb
+  - urdf
+  - mjcf
+  origin: 基座坐标系（Z 向上）；每个连杆一个节点，节点坐标系 = MJCF 的构件坐标系（DH 坐标系 i−1 绕关节轴转 θ_i）
+  note: 几何取整机标定的名义 DH（第 55 轮）；质量、惯量由关节模组、铝管、壳体逐项相加；电机转子惯量折算到关节侧（armature）、力矩上限、名义摩擦都写在 MJCF 里。全部是示例值，量级与常见 5 kg 协作臂相同，不照抄任何厂商的数
+robot:
+  type: arm
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（生成程序 generators/wqcr5.py，原件 factory/digital/cae/wqcr5.py）
+  checked:
+    by: Claude
+    'on': '2026-10-30'
+    note: 自建；正运动学与整机标定一致、质量惯量与手算一致、电机与减速器参数与电机选型助手一致，由测试核对
+teaching:
+  principle: 六个转动关节串联，前三个关节决定末端位置，后三个（腕部）决定姿态；每个关节是一台关节模组（伺服电机 + 谐波减速器），减速比 100 使电机转子的惯量折算到关节侧放大一万倍，常常比连杆本身的惯量还大。
+  uses:
+  - 机床上下料
+  - 装配
+  - 人机协作
+  courses:
+  - course: 机器人技术
+    chapter: 动力学仿真
+  - course: 机器人技术
+    chapter: 正运动学：DH 参数
+  labs:
+  - 实验 29.1 积分方法与步长
+  - 实验 29.2 仿真与现实
+  - 数字工厂实验 24、26、28
+factory:
+  erp_items:
+  - item_code: WQ-CR5
+    size: default
+  suppliers: []

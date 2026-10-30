@@ -359,3 +359,28 @@ def test_joint_series_for_fatigue(tmp_path, monkeypatch):
         r = c.get("/mbd/jobs/{}/joint-series".format(j["id"]), params={"joint": "crank"}).json()
         assert r["peak"] > 10 and len(r["values"]) > 10 and 0.9 < r["duration_s"] <= 1.0 and "crank" in r["joints"]
         assert c.get("/mbd/jobs/{}/joint-series".format(j["id"]), params={"joint": "nope"}).status_code == 404
+
+
+def test_wqcr5_from_the_library_gravity_torque_and_listing(tmp_path, monkeypatch):
+    """第 58 轮 D-2：问渠 WQ-CR5（零件库 B-ARM-WQCR5）不靠 Menagerie，动力学能直接选；保持姿态时驱动力矩 = −重力矩"""
+    from cae import wqcr5 as W
+    pose = {n: math.radians(d) for n, d in zip(W.JOINTS, (20, -70, 80, -100, -90, 0))}
+    pay = [{"body": "link6", "mass": 5, "pos": [0, 0, 0.19]}]
+    spec = lambda: mbd.load_spec(path=MM.robot_path("B-ARM-WQCR5"))  # noqa: E731
+    s, ch, _ = mbd.simulate(spec(), {"duration_s": 0.5, "initial": pose, "payloads": pay,
+                                     "drives": [{"joint": j, "kind": "hold"} for j in pose]})
+    model, _ = mbd.build(spec(), {"payloads": pay})
+    qp = np.zeros(model.nq)
+    for j, v in pose.items():
+        qp[model.jnt_qposadr[mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, j)]] = v
+    g = mbd.gravity_torques(model, qp)
+    for j in ("J2", "J3"):
+        assert abs(ch["drive." + j][-1] + g[j]) / abs(g[j]) < 0.02
+    from fastapi.testclient import TestClient
+    from cae import service
+    monkeypatch.setattr(service, "DATA", str(tmp_path))
+    with TestClient(service.app) as c:
+        rs = c.get("/mbd/robots").json()["robots"]
+        assert rs[0]["id"] == "B-ARM-WQCR5" and rs[0]["own"] and rs[0]["end_body"] == "link6"
+        info = c.post("/mbd/models/load", json={"source": "library", "id": "B-ARM-WQCR5"}).json()
+        assert [j["name"] for j in info["joints"]] == list(W.JOINTS)

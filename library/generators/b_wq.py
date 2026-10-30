@@ -610,7 +610,69 @@ def stewart(p):
             "mechanism": mech, "motion": (header, rows)}
 
 
-BUILDERS = {"scara": scara, "delta": delta, "diff_cart": diff_cart, "cartesian": cartesian, "planar_2r": planar_2r,
+# ---------------------------------------------------------------- WQ-CR5 协作机器人（第 58 轮）：几何、质量与 MJCF 来自 wqcr5.py
+def cobot6(p):
+    """问渠机器人厂 WQ-CR5：每个构件一个节点（节点坐标系 = MJCF 的构件坐标系，零位），关节表、URDF、MJCF 与动力学数据"""
+    from generators import wqcr5 as W
+    import trimesh
+    col = lambda rgba: [int(255 * float(x)) for x in rgba.split()]  # noqa: E731
+
+    def mesh_of(g):
+        if g[0] == "cylinder":
+            _, r, h, c, axis, rgba = g
+            m = trimesh.creation.cylinder(radius=r, height=h, sections=40)
+            M = np.eye(4)
+            M[:3, :3] = W._axis_frame(axis)
+            M[:3, 3] = c
+        elif g[0] == "capsule":
+            _, r, _, p0, p1, rgba = g
+            p0, p1 = np.asarray(p0, float), np.asarray(p1, float)
+            m = trimesh.creation.capsule(radius=r, height=float(np.linalg.norm(p1 - p0)), count=[24, 12])
+            M = np.eye(4)
+            M[:3, :3] = W._axis_frame(p1 - p0)
+            M[:3, 3] = (p0 + p1) / 2
+        else:
+            _, half, c, rgba = g
+            m = trimesh.creation.box(extents=[2 * v for v in half])
+            M = np.eye(4)
+            M[:3, 3] = c
+        m.apply_transform(M)
+        m.visual.face_colors = col(rgba)
+        return m
+
+    base = _cat(_cyl(0.075, 0.04, DARK, center=(0, 0, 0.02)),
+                _cyl(W.MODULES["L"]["r"], W.MODULES["L"]["h"], BLUE, center=(0, 0, 0.04 + W.MODULES["L"]["h"] / 2)))
+    bodies = [_body("base", None, [0, 0, 0], base)]
+    joints = []
+    vis = {}
+    lim = math.radians(W.LIMIT_DEG)
+    for i in range(6):
+        name, parent = "link{}".format(i + 1), ("base" if i == 0 else "link{}".format(i))
+        pos = [0, 0, 0] if i == 0 else list(W._child_pos(i - 1))
+        R = None if i == 0 else W._Rx(W.DH[i - 1]["alpha"])
+        geoms = [g for _, _, g in W.link_parts(i) if g]
+        bodies.append(_body(name, parent, pos, _cat(*[mesh_of(g) for g in geoms]), R))
+        joints.append(_joint(W.JOINTS[i], "revolute", parent, name, pos, [0, 0, 1],
+                             rpy=(0 if i == 0 else W.DH[i - 1]["alpha"], 0, 0), lower=-lim, upper=lim, velocity=math.pi))
+        vis[name] = []
+    S = W.summary()
+    for j, lk, js in zip(joints, S["links"], S["joints"]):
+        j["dynamics"] = {"armature": js["armature_kg_m2"], "damping": js["damping_Nms_rad"], "frictionloss": js["frictionloss_Nm"],
+                         "effort": js["torque_limit_Nm"], "module": js["module"]}
+    robot = {"type": "arm", "dof": 6,
+             "links": [{"name": "base", "node": "base", "mass_kg": round(W.base_mass(), 3)}] +
+                      [{"name": lk["name"], "node": lk["name"], "mass_kg": lk["mass_kg"], "com_m": lk["com_m"], "inertia_kg_m2": lk["inertia_kg_m2"]}
+                       for lk in S["links"]],
+             "joints": joints, "rest": {n: round(math.radians(d), 6) for n, d in zip(W.JOINTS, W.HOME_DEG)},
+             "rest_source": "整机标定的初始位姿（第 55 轮）",
+             "kinematics": {"type": "dh_standard", "dh": [{k: round(v, 6) for k, v in d.items()} for d in W.DH]},
+             "dynamics": {k: S[k] for k in ("payload_kg", "mass_kg", "moving_mass_kg", "note")}}
+    return {"bodies": bodies, "world": _world(bodies, {"link{}".format(i + 1): _hom(_Rz(math.radians(d)))
+                                                       for i, d in enumerate(W.HOME_DEG)}),
+            "robot": robot, "urdf": _urdf("wq_cr5", bodies, joints, vis), "mjcf": W.mjcf()}
+
+
+BUILDERS = {"cobot6": cobot6, "scara": scara, "delta": delta, "diff_cart": diff_cart, "cartesian": cartesian, "planar_2r": planar_2r,
             "cart_pole": cart_pole, "stewart": stewart}
 
 

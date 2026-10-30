@@ -168,6 +168,9 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             if part.get("urdf"):                       # 自建机器人：URDF（第 5 轮 P9）
                 (d / (code + ".urdf")).write_text(part["urdf"], encoding="utf-8")
                 extra["urdf"] = "{}/{}.urdf".format(e["id"], code)
+            if part.get("mjcf"):                       # 带动力学的自建机器人：MJCF（第 58 轮 WQ-CR5）
+                (d / (code + ".xml")).write_text(part["mjcf"], encoding="utf-8")
+                extra["mjcf"] = "{}/{}.xml".format(e["id"], code)
             if part.get("motion"):                     # 并联机构：运动表（R5）
                 import csv
                 with open(d / "motion.csv", "w", newline="", encoding="utf-8") as f:
@@ -197,6 +200,8 @@ def build_variant(entry_dir, size, out_ver, cad_dir):
             files["urdf"] = extra.pop("urdf")
         if extra.get("svg"):
             files["svg"] = extra.pop("svg")
+        if extra.get("mjcf"):
+            files["mjcf"] = extra.pop("mjcf")
         if extra.get("mechanism"):
             files["motion"] = "{}/motion.csv".format(e["id"])
         return dict({"ref": wqlib.ref(e, size), "ok": True, "files": files, "s": round(time.time() - t0, 2),
