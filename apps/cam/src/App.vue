@@ -1,11 +1,13 @@
 <script setup>
 // 问渠凸轮 (round 39, step 2): edit on the left, the cam turning in the middle, checks on the right, curves below.
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { project, result, error, busy, analyseSoon, loadLaws, replace, blank, mode, mfgResult, measResult, compResult } from './store'
+import { project, result, error, busy, analyseSoon, loadLaws, replace, blank, blankCyl, mode, mfgResult, measResult, compResult } from './store'
 import { api } from './api'
 import { t, lang, setLang } from './i18n'
 import ProgramEditor from './components/ProgramEditor.vue'
 import Fields from './components/Fields.vue'
+import CylFields from './components/CylFields.vue'
+import CylView from './components/CylView.vue'
 import CamView from './components/CamView.vue'
 import Charts from './components/Charts.vue'
 import Checks from './components/Checks.vue'
@@ -51,9 +53,11 @@ async function openExample(id) {
     replace(p); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
   } catch (e) { error.value = e }
 }
-function fresh() { detach(); kind.value = 'cam'; replace(blank()); mfgResult.value = null; measResult.value = null; compResult.value = null }
+function fresh(what = 'disk') { detach(); kind.value = 'cam'; replace(what === 'cylindrical' ? blankCyl() : blank()); mfgResult.value = null; measResult.value = null; compResult.value = null; theta.value = 0 }
 const isSys = computed(() => kind.value === 'system' && system.cams)
-const modeList = computed(() => (isSys.value ? [['sys', 'modeSys'], ['sys3d', 'modeSys3d'], ['cae', 'modeCae']] : [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]))
+const isCylP = computed(() => !isSys.value && project.type === 'cylindrical')   // round 39 step 8
+const modeList = computed(() => (isSys.value ? [['sys', 'modeSys'], ['sys3d', 'modeSys3d'], ['cae', 'modeCae']] : isCylP.value ? [['design', 'modeDesign']] : [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]))
+watch(isCylP, (c) => { if (c && mode.value !== 'design') mode.value = 'design' }, { immediate: true })
 const curMode = computed({ get: () => (isSys.value ? sysMode.value : mode.value), set: (v) => { if (isSys.value) sysMode.value = v; else mode.value = v } })
 function saveFile() {
   const blob = new Blob([JSON.stringify(isSys.value ? system : project, null, 1)], { type: 'application/json' })
@@ -118,7 +122,11 @@ onMounted(async () => {
           <option v-for="e in examples" :key="e.id" :value="e.id">{{ lang === 'zh' ? e.title.zh : e.title.en }}</option>
         </select>
         <template v-if="!embed">
-          <button type="button" class="dark" @click="fresh">{{ t('newProject') }}</button>
+          <select class="dark new" :aria-label="t('newProject')" @change="fresh($event.target.value); $event.target.value = ''">
+            <option value="">{{ t('newProject') }}…</option>
+            <option value="disk">{{ t('newDisk') }}</option>
+            <option value="cylindrical">{{ t('newCyl') }}</option>
+          </select>
           <button type="button" class="dark" @click="fileInput.click()">{{ t('open') }}</button>
           <input ref="fileInput" type="file" accept=".json,application/json" hidden @change="openFile">
           <button type="button" class="dark" @click="saveFile">{{ t('save') }}</button>
@@ -137,8 +145,8 @@ onMounted(async () => {
       <System3D v-else-if="sysMode === 'sys3d'" />
       <CaePanel v-else />
     </template>
-    <MfgWorkspace v-else-if="mode === 'mfg' && !embed" />
-    <MeasureWorkspace v-else-if="mode === 'measure' && !embed" />
+    <MfgWorkspace v-else-if="mode === 'mfg' && !embed && !isCylP" />
+    <MeasureWorkspace v-else-if="mode === 'measure' && !embed && !isCylP" />
     <main v-else class="work">
       <aside class="edit">
         <nav class="tabs">
@@ -146,6 +154,7 @@ onMounted(async () => {
         </nav>
         <div class="pane">
           <ProgramEditor v-if="tab === 'program'" />
+          <CylFields v-else-if="tab === 'mech' && isCylP" />
           <Fields v-else :part="tab" />
         </div>
         <p class="saved">{{ linked || t('savedLocal') }}</p>
@@ -153,7 +162,8 @@ onMounted(async () => {
 
       <section class="stage">
         <div class="canvas">
-          <CamView v-model:theta="theta" :result="result" />
+          <CylView v-if="isCylP" v-model:theta="theta" :result="result?.type === 'cylindrical' ? result : null" />
+          <CamView v-else v-model:theta="theta" :result="result?.type === 'cylindrical' ? null : result" />
           <p v-if="error" class="err">{{ t('error') }}：{{ lang === 'zh' ? error.zh || error.message : error.message }}</p>
           <p v-else-if="busy && !result" class="busy">{{ t('computing') }}</p>
         </div>

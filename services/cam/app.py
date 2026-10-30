@@ -85,6 +85,23 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^give the actual wheel radius$", "请填修整后的实际砂轮半径"),
     (r"^a disk cam brings its follower back", "盘形凸轮每转一圈从动件都回到原位：净分度的运动程序要用弧面分度凸轮"),
     (r"^the net movement over a cycle differs from the index advance by (.*)$", r"一个循环的净转角与分度角相差 \1"),
+    # cylindrical cams (step 8)
+    (r"^the follower of a cylindrical cam is translating or oscillating$", "圆柱凸轮的从动件是直动或摆动"),
+    (r"^the roller is a cylinder or a cone$", "滚子是圆柱形或锥形"),
+    (r"^a translating follower's program is in mm", "直动从动件的运动程序用毫米，摆动的用角度"),
+    (r"^give the pitch radius$", "请填节圆柱半径"),
+    (r"^give the roller length$", "请填滚子长度（槽里的部分）"),
+    (r"^give the cam length$", "请填凸轮长度"),
+    (r"^give the arm length$", "请填摆杆长度"),
+    (r"^the roller is longer than the pitch radius", "滚子比节圆柱半径还长：槽会通到凸轮轴线"),
+    (r"^the groove reaches the cam axis", "槽底到了凸轮轴线：加大节圆柱半径或缩短滚子"),
+    (r"^the side clearance and the bottom clearance", "槽侧间隙和槽底间隙不能为负"),
+    (r"^the cam turns \+1 or", "凸轮转向是 +1 或 −1"),
+    (r"^unknown cylindrical cam field: (.*)$", r"不认识的圆柱凸轮参数：\1"),
+    (r"^an indexing program needs a globoidal cam: a cylindrical",
+     "圆柱凸轮每转一圈从动件回到原位：净分度的运动程序要用弧面分度凸轮"),
+    (r"^give the allowed pressure angle first$", "求最小节圆半径前，先填许用压力角"),
+    (r"^no pitch radius up to 2000 mm meets the limits$", "节圆半径到 2000 mm 也满足不了这些限值，请改运动规律或限值"),
     (r"^the tool centre path is not star-shaped", "刀心轨迹对凸轮中心不是星形，X–C 磨削走不了，请改用铣削或小砂轮"),
 ]
 
@@ -171,6 +188,15 @@ async def analyse_ep(request: Request):
 async def min_rb(request: Request):
     p = await project_of(request)
     return run(lambda: min_base_radius(p))
+
+
+@app.post("/api/min-pitch-radius")
+async def min_rp(request: Request):
+    """Cylindrical cam (round 39 step 8): the smallest pitch radius that meets the pressure angle and undercut."""
+    from camkit import cylindrical as CY
+
+    p = await project_of(request)
+    return run(lambda: CY.min_pitch_radius(p))
 
 
 # --------------------------------------------------------------------------------------- step 3: manufacturing
@@ -390,8 +416,11 @@ def freecad_pack() -> bytes:
         for f in sorted((HERE / "camkit").glob("*.py")):
             z.write(f, root + "camkit/" + f.name)
         for f in sorted(EXAMPLES.glob("*.json")):
-            if not f.name.endswith(".cae.json"):
-                z.write(f, root + "examples/" + f.stem + ".wqcam.json")
+            if f.name.endswith(".cae.json"):
+                continue
+            if json.loads(f.read_text(encoding="utf-8")).get("type") == "cylindrical":
+                continue  # round 39 step 8: FreeCAD builds cylindrical cams from step 8d on
+            z.write(f, root + "examples/" + f.stem + ".wqcam.json")
         z.writestr("wenquest-cam-freecad/使用说明.txt", FREECAD_README)
     return buf.getvalue()
 

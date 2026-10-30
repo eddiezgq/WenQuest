@@ -1,0 +1,59 @@
+{
+ "title": {
+  "zh": "示例：摆动拨叉圆柱凸轮（摆动、圆柱滚子，参数为虚构）",
+  "en": "Example: swinging fork barrel cam (oscillating, cylindrical roller; fictional numbers)"
+ },
+ "type": "cylindrical",
+ "program": {
+  "unit": "rad",
+  "segments": [
+   {
+    "kind": "rise",
+    "deg": 100,
+    "h_deg": 24,
+    "law": "poly345"
+   },
+   {
+    "kind": "dwell",
+    "deg": 80
+   },
+   {
+    "kind": "return",
+    "deg": 100,
+    "h_deg": 24,
+    "law": "poly345"
+   },
+   {
+    "kind": "dwell",
+    "deg": 80
+   }
+  ]
+ },
+ "cylindrical": {
+  "follower": "oscillating",
+  "roller": "cylinder",
+  "Rp": 75,
+  "rr": 10,
+  "b": 12,
+  "gap": 0.05,
+  "bottom": 1.5,
+  "length": 110,
+  "arm": 120,
+  "sigma": 1
+ },
+ "loads": {
+  "rpm": 150,
+  "inertia": 0.012,
+  "load": 4000
+ },
+ "material": {
+  "E1": 206000,
+  "nu1": 0.3,
+  "E2": 206000,
+  "nu2": 0.3
+ },
+ "limits": {
+  "phi_rise_deg": 40,
+  "phi_return_deg": 40
+ }
+}

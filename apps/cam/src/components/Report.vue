@@ -39,7 +39,27 @@ const mfgRows = computed(() => {
   if (s) out.push([t('maxOver'), `${(s.over[0] * 1000).toFixed(3)} µm`], [t('maxUnder'), `${(s.under[0] * 1000).toFixed(3)} µm`])
   return out
 })
+const cylP = computed(() => project.type === 'cylindrical')
+const cylRows = computed(() => {                      // round 39 step 8: a cylindrical (barrel) cam
+  const c = project.cylindrical, L = project.loads, mat = project.material, osc = c.follower === 'oscillating'
+  const out = [[t('follower'), `${t(c.follower)} · ${t(c.roller === 'cone' ? 'cylRollerCone' : 'cylRollerCyl')}`], [t('sigma'), c.sigma === 1 ? t('ccw') : t('cw')],
+    [t('cylRp'), `${c.Rp} mm`], [t('cylRr'), `${c.rr} mm`], [t('cylB'), `${c.b} mm`], [t('cylGap'), `${c.gap ?? 0} mm`], [t('cylBottom'), `${c.bottom ?? 1} mm`], [t('cylLength'), `${c.length} mm`]]
+  if (osc) out.push([t('cylArm'), `${c.arm} mm`])
+  const opt = (k, v, u) => out.push([t(k), v == null || v === '' ? (zh.value ? '未填' : 'not given') : `${v} ${u}`])
+  opt('rpm', L.rpm, 'r/min'); osc ? opt('inertia', L.inertia, 'kg·m²') : opt('mass', L.mass, 'kg'); opt('load', L.load, osc ? 'N·mm' : 'N')
+  opt('E', mat.E1 && `${mat.E1} / ${mat.E2}`, 'MPa'); opt('nu', mat.nu1 && `${mat.nu1} / ${mat.nu2}`, '')
+  return out
+})
+const devFig = computed(() => {                        // the groove unrolled at the outer radius (u = R·azimuth, z)
+  const G = r.value?.geometry
+  if (!cylP.value || !G) return null
+  const ri = G.rings, W = 640, H = 220, L = G.length / 2
+  const X = (a) => 30 + (a / 360) * (W - 40), Y = (z) => 10 + (1 - (z + L) / (2 * L)) * (H - 30)
+  const line = (zs) => 'M' + ri.az_deg.map((a, j) => `${X(a).toFixed(1)},${Y(zs[j]).toFixed(1)}`).join('L')
+  return { W, H, X, top: Y(L), bot: Y(-L), lo: line(ri.outer.lo), hi: line(ri.outer.hi), ilo: line(ri.inner.lo), ihi: line(ri.inner.hi) }
+})
 const rows = computed(() => {
+  if (cylP.value) return cylRows.value
   const mm = m.value, L = project.loads, mat = project.material
   const osc = mm.follower === 'oscillating'
   const out = [[t('follower'), `${t(mm.follower)} · ${t(mm.contact)}${mm.groove ? ' · ' + t('groove') : ''}`], [t('sigma'), mm.sigma === 1 ? t('ccw') : t('cw')],
@@ -94,6 +114,15 @@ const rows = computed(() => {
           <circle :r="outline.R * 0.01" />
         </svg>
       </section>
+      <section v-if="devFig">
+        <h2>5 {{ t('cylDevTitle') }}</h2>
+        <svg class="dev" :viewBox="`0 0 ${devFig.W} ${devFig.H}`">
+          <rect :x="devFig.X(0)" :y="devFig.top" :width="devFig.X(360) - devFig.X(0)" :height="devFig.bot - devFig.top" class="b" />
+          <path :d="devFig.lo" class="o" /><path :d="devFig.hi" class="o" /><path :d="devFig.ilo" class="i" /><path :d="devFig.ihi" class="i" />
+          <text v-for="d in [0, 90, 180, 270, 360]" :key="d" :x="devFig.X(d)" :y="devFig.H - 4" text-anchor="middle">{{ d }}°</text>
+        </svg>
+        <p class="small">{{ t('cylDevCaption') }}</p>
+      </section>
       <section v-if="mr">
         <h2>6 {{ t('mfgSection') }}</h2>
         <table class="kv"><tr v-for="row in mfgRows" :key="row[0]"><th>{{ row[0] }}</th><td>{{ row[1] }}</td></tr></table>
@@ -115,11 +144,12 @@ const rows = computed(() => {
       </section>
       <section class="small">
         <h2>{{ nMethod }} {{ zh ? '方法与依据' : 'Method and references' }}</h2>
-        <p>{{ zh ? '理论廓线由从动件位置经坐标变换得出，实际廓线为其等距线；压力角由接触点相对速度与从动件运动方向求出；曲率半径由廓线一、二阶导数求出；接触应力按赫兹线接触；跳离按弹簧力、载荷与惯性力之和是否始终大于 0 判断。未计导轨摩擦和重力。'
+        <p v-if="cylP">{{ t('cylMethod') }}</p>
+        <p v-else>{{ zh ? '理论廓线由从动件位置经坐标变换得出，实际廓线为其等距线；压力角由接触点相对速度与从动件运动方向求出；曲率半径由廓线一、二阶导数求出；接触应力按赫兹线接触；跳离按弹簧力、载荷与惯性力之和是否始终大于 0 判断。未计导轨摩擦和重力。'
           : 'The pitch curve comes from the follower position by a change of frame, the profile is its offset; the pressure angle from the relative velocity at the contact and the follower’s direction of motion; the radius of curvature from the first and second derivatives; contact stress by Hertz line contact; jump by whether spring force, load and inertia force together stay above zero. Guide friction and gravity are not included.' }}</p>
         <p v-if="mr || me">{{ zh ? '制造：刀心轨迹为加工面沿法向等距刀具半径；按机床插补方式（X–C 线性或 XY 直线）以弦高公差布点；程序仿真独立读回程序文本，让刀具扫过毛坯求剩余材料边界，与设计廓线比法向偏差。测量：误差按转角均匀重采样后做傅里叶分解；加速度误差为误差二阶导数乘 ω²；补偿把所选阶次误差反向加到运动程序后重新出程序。'
           : 'Manufacturing: the tool centre path is the machined surface offset by the tool radius; points by chord tolerance under the machine\'s own interpolation (X–C linear or XY lines); the simulation reads the program text back and sweeps the tool through the blank, comparing the material left with the design along the normal. Measurement: the error resampled by cam angle and Fourier-analysed; acceleration error = second derivative × ω²; compensation subtracts the selected orders from the motion and makes the program again.' }}</p>
-        <p>R. L. Norton, Cam Design and Manufacturing Handbook, 3rd ed., 2020 · F. Y. Chen, Mechanics and Design of Cam Mechanisms, 1982 · J. Angeles, C. S. López-Cajún, Optimization of Cam Mechanisms, 1991 · 孙桓《机械原理》</p>
+        <p>R. L. Norton, Cam Design and Manufacturing Handbook, 3rd ed., 2020<span v-if="cylP"> · F. L. Litvin, A. Fuentes, Gear Geometry and Applied Theory, 2nd ed., 2004</span> · F. Y. Chen, Mechanics and Design of Cam Mechanisms, 1982 · J. Angeles, C. S. López-Cajún, Optimization of Cam Mechanisms, 1991 · 孙桓《机械原理》</p>
         <p v-if="project.title.zh?.startsWith('示例')">{{ t('fictional') }}</p>
       </section>
     </article>
@@ -140,7 +170,12 @@ h2 { font-size: 15px; margin: 22px 0 8px; border-bottom: 1px solid var(--line); 
 .outline { width: 60%; display: block; margin: 0 auto; }
 .outline .o { fill: none; stroke: var(--ink); stroke-width: .4; }
 .outline .p { fill: none; stroke: var(--accent); stroke-width: .3; stroke-dasharray: 2 1.5; }
-.small p { font-size: 12.5px; color: var(--muted); }
+.small p, p.small { font-size: 12.5px; color: var(--muted); }
+.dev { width: 100%; display: block; }
+.dev .b { fill: var(--cam); opacity: .5; }
+.dev .o { fill: none; stroke: var(--ink); stroke-width: 1; }
+.dev .i { fill: none; stroke: var(--muted); stroke-width: .7; stroke-dasharray: 4 3; }
+.dev text { font: 10px var(--mono); fill: var(--muted); }
 @media print {
   .noprint { display: none !important; }
   article { max-width: none; padding: 0; }

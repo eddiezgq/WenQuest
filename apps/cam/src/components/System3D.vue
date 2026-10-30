@@ -19,8 +19,8 @@ const busy = ref(false)
 const msg = ref('')
 const meshData = shallowRef(null)
 const glob = computed(() => (system.cams || []).find((c) => c.type === 'globoidal'))
-const plunge = computed(() => (sysResult.value?.cams || []).find((c) => c.type !== 'globoidal'))
-const plungeSrc = computed(() => (system.cams || []).find((c) => c.type !== 'globoidal'))
+const plunge = computed(() => (sysResult.value?.cams || []).find((c) => c.type !== 'globoidal' && c.type !== 'cylindrical'))
+const plungeSrc = computed(() => (system.cams || []).find((c) => c.type !== 'globoidal' && c.type !== 'cylindrical'))
 let renderer, scene, camera, controls, raf = 0, last = 0, ro
 const parts = {}
 

@@ -341,6 +341,10 @@ def checks(prog: Program, m: D.Mechanism, geo: dict, ld: Y.Loads, mat: Y.Materia
 
 
 def analyse(project: dict, n: int = 3600, out_n: int = 361) -> dict:
+    if project.get("type") == "cylindrical":  # round 39 step 8: a groove around a cylinder
+        from camkit import cylindrical as CY
+
+        return CY.analyse(project)
     prog = Program.from_dict(project.get("program") or {})
     if prog.advance:
         raise ValueError("a disk cam brings its follower back every turn: an indexing program needs a globoidal cam")
