@@ -641,7 +641,7 @@ def cobot6(p):
         return m
 
     base = _cat(_cyl(0.075, 0.04, DARK, center=(0, 0, 0.02)),
-                _cyl(W.MODULES["L"]["r"], W.MODULES["L"]["h"], BLUE, center=(0, 0, 0.04 + W.MODULES["L"]["h"] / 2)))
+                _cyl(W.MODULES["L"]["r"], W.BASE_TOP - 0.04, BLUE, center=(0, 0, (0.04 + W.BASE_TOP) / 2)))
     bodies = [_body("base", None, [0, 0, 0], base)]
     joints = []
     vis = {}

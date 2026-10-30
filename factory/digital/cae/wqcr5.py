@@ -40,6 +40,7 @@ PAYLOAD_KG = 5.0
 GEAR_RATIO = 100
 ETA = 0.75                                      # 谐波减速器效率（与电机选型助手相同）
 LIMIT_DEG = 175.0                               # 各关节的软限位（示例）
+BASE_TOP = 0.095                                # 底座上 J1 模组的顶面（J2 模组在 0.15 m 处横着，半径 0.055）
 
 # 关节模组（示例）：质量 kg、外形（实心圆柱）半径、长 m；电机（名称、峰值力矩 N·m、转子惯量 kg·m²，取自 motors.MOTORS）；
 # 谐波减速器（名称、额定、重复峰值 N·m，取自 motors.HARMONIC）；名义摩擦：粘性 N·m·s/rad、库仑 N·m（关节侧）
@@ -171,6 +172,25 @@ def torque_limit():
 
 
 # ---------------------------------------------------------------- MJCF
+def principal(I):
+    """主惯量（升序）与主轴坐标系的四元数（w, x, y, z）：I = R diag Rᵀ，R 的列是主轴（右手系）"""
+    ev, R = np.linalg.eigh(I)
+    if np.linalg.det(R) < 0:
+        R[:, 2] = -R[:, 2]
+    w = math.sqrt(max(0.0, 1 + R[0, 0] + R[1, 1] + R[2, 2])) / 2
+    if w > 1e-6:
+        q = np.array([w, (R[2, 1] - R[1, 2]) / (4 * w), (R[0, 2] - R[2, 0]) / (4 * w), (R[1, 0] - R[0, 1]) / (4 * w)])
+    else:                                        # 转角接近 180°：从最大的对角元求
+        k = int(np.argmax(np.diag(R)))
+        i, j = (k + 1) % 3, (k + 2) % 3
+        v = np.zeros(3)
+        v[k] = math.sqrt(max(0.0, 1 + R[k, k] - R[i, i] - R[j, j])) / 2
+        v[i] = (R[i, k] + R[k, i]) / (4 * v[k])
+        v[j] = (R[j, k] + R[k, j]) / (4 * v[k])
+        q = np.array([(R[j, i] - R[i, j]) / (4 * v[k]), *v])
+    return ev, q / np.linalg.norm(q)
+
+
 def _f(v):
     return " ".join("%.6g" % x for x in v)
 
@@ -195,38 +215,38 @@ def _geom_xml(g, ind):
 
 def mjcf(actuator="motor", kp=None, kv=None, payload_kg=0.0, timestep=0.002, integrator="implicitfast", friction=True):
     """WQ-CR5 的 MJCF。actuator："motor"（给力矩）或 "position"（位置伺服 = PD：kp、kv 每个关节一个，N·m/rad、N·m·s/rad）。
-    payload_kg：法兰上挂的负载（质点，在工具点上）。friction=False 去掉关节摩擦（核对教材算例用）。"""
+    payload_kg：法兰上挂的负载（质点，在工具点上）。friction=False 去掉关节摩擦（核对教材算例用）。
+    不带地面和灯（要的话由使用者在 <!--WORLD--> 处加）；四个占位注释与教材网页实验的模型约定相同（textbook/tools/mjcf_web.py）。"""
     L = links()
     arm, lim = armature(), torque_limit()
     out = ['<mujoco model="wq_cr5">',
            '  <!-- 问渠机器人厂 WQ-CR5 六轴协作机器人（示例值，第 58 轮）。由 factory/digital/cae/wqcr5.py 生成，不要手改 -->',
            '  <compiler angle="radian" inertiafromgeom="false" autolimits="true"/>',
-           '  <option timestep="{:g}" integrator="{}"/>'.format(timestep, integrator),
+           '  <!--OPTION-->',
+           ('  <option integrator="{}" />'.format(integrator) if timestep == 0.002 else
+            '  <option timestep="{:g}" integrator="{}" />'.format(timestep, integrator)),
            '  <default><geom contype="0" conaffinity="0" group="1"/></default>',
            '  <worldbody>',
-           '    <light pos="0 0 3" dir="0 0 -1"/>',
-           '    <geom name="floor" type="plane" size="2 2 0.05" rgba="0.92 0.93 0.94 1" contype="1" conaffinity="1" group="0"/>',
            '    <body name="base" pos="0 0 0">',
            '      <inertial pos="0 0 0.06" mass="{:.4g}" diaginertia="0.03 0.03 0.02"/>'.format(base_mass()),
            '      <geom type="cylinder" fromto="0 0 0 0 0 0.04" size="0.075" rgba="{}"/>'.format(DARK),
-           '      <geom type="cylinder" fromto="0 0 0.04 0 0 {:.4g}" size="{:.4g}" rgba="{}"/>'.format(0.04 + MODULES["L"]["h"], MODULES["L"]["r"], BLUE)]
+           '      <geom type="cylinder" fromto="0 0 0.04 0 0 {:.4g}" size="{:.4g}" rgba="{}"/>'.format(BASE_TOP, MODULES["L"]["r"], BLUE)]
     def body(i, ind):
         l, jn, mod = L[i], JOINTS[i], MODULES[JOINT_MODULE[i]]
-        I = l["I"]
-        lines = ['{}<body name="link{}">'.format(ind, i + 1),
-                 '{}  <inertial pos="{}" mass="{:.6g}" fullinertia="{}"/>'.format(
-                     ind, _f(l["com"]), l["mass"], _f([I[0, 0], I[1, 1], I[2, 2], I[0, 1], I[0, 2], I[1, 2]]))]
+        diag, quat = principal(l["I"])
+        place = "" if i == 0 else ' pos="{}" quat="{}"'.format(_f(_child_pos(i - 1)), _f(_quat_x(DH[i - 1]["alpha"])))
+        lines = ['{}<body name="link{}"{}>'.format(ind, i + 1, place),
+                 '{}  <inertial pos="{}" quat="{}" mass="{:.6g}" diaginertia="{}"/>'.format(ind, _f(l["com"]), _f(quat), l["mass"], _f(diag))]
         fr = ' damping="{:.4g}" frictionloss="{:.4g}"'.format(mod["damping"], mod["frictionloss"]) if friction else ""
         lines.append('{}  <joint name="{}" axis="0 0 1" range="{:.6g} {:.6g}" armature="{:.6g}"{} actuatorfrcrange="{:.6g} {:.6g}"/>'.format(
             ind, jn, -math.radians(LIMIT_DEG), math.radians(LIMIT_DEG), arm[i], fr, -lim[i], lim[i]))
         lines += [_geom_xml(g, ind + "  ") for _, _, g in link_parts(i) if g]
         if i < 5:                                # 下一个构件放在 (a_i, 0, d_i)，绕 x 转 α_i
-            lines.append('{}  <frame pos="{}" quat="{}">'.format(ind, _f(_child_pos(i)), _f(_quat_x(DH[i]["alpha"]))))
-            lines += body(i + 1, ind + "    ")
-            lines.append('{}  </frame>'.format(ind))
+            lines += body(i + 1, ind + "  ")
         else:
             lines.append('{}  <site name="flange" pos="0 0 {:.6g}"/>'.format(ind, DH[5]["d"]))
             lines.append('{}  <site name="tcp" pos="0.05 0 {:.6g}"/>'.format(ind, DH[5]["d"] + 0.10))
+            lines.append('{}  <!--TOOL-->'.format(ind))
             if payload_kg > 0:
                 lines.append('{}  <body name="payload" pos="0.05 0 {:.6g}"><inertial pos="0 0 0" mass="{:.6g}" diaginertia="1e-4 1e-4 1e-4"/>'
                              '<geom type="sphere" size="0.03" rgba="{}"/></body>'.format(ind, DH[5]["d"] + 0.10, payload_kg, ORANGE))
@@ -234,7 +254,7 @@ def mjcf(actuator="motor", kp=None, kv=None, payload_kg=0.0, timestep=0.002, int
         return lines
 
     out += body(0, "      ")
-    out += ['    </body>', '  </worldbody>']
+    out += ['    </body>', '    <!--WORLD-->', '  </worldbody>']
     out.append('  <actuator>')
     for i, jn in enumerate(JOINTS):
         if actuator == "position":
@@ -242,6 +262,7 @@ def mjcf(actuator="motor", kp=None, kv=None, payload_kg=0.0, timestep=0.002, int
                 jn, kp[i], kv[i], -torque_limit()[i], torque_limit()[i]))
         else:
             out.append('    <motor name="{0}" joint="{0}" ctrlrange="{1:.6g} {2:.6g}"/>'.format(jn, -torque_limit()[i], torque_limit()[i]))
+    out.append('    <!--ACTUATOR-->')
     out.append('  </actuator>')
     out.append('  <sensor><force name="flange_force" site="flange"/><torque name="flange_torque" site="flange"/></sensor>')
     out.append('  <keyframe><key name="home" qpos="{}"/></keyframe>'.format(_f([math.radians(d) for d in HOME_DEG])))

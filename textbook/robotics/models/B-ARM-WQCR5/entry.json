@@ -1,0 +1,470 @@
+{
+ "schema": 1,
+ "id": "B-ARM-WQCR5",
+ "kind": "robot",
+ "name": {
+  "zh": "问渠 WQ-CR5 六轴协作机器人",
+  "en": "WenQuest WQ-CR5 6-axis cobot"
+ },
+ "category": "ARM",
+ "tags": [
+  "机械臂",
+  "协作机器人",
+  "arm",
+  "cobot",
+  "动力学",
+  "自建",
+  "问渠机器人厂"
+ ],
+ "standards": [],
+ "params": [],
+ "defaults": {},
+ "model": {
+  "engine": "wqrobot:cobot6",
+  "formats": [
+   "glb",
+   "urdf",
+   "mjcf"
+  ],
+  "origin": "基座坐标系（Z 向上）；每个连杆一个节点，节点坐标系 = MJCF 的构件坐标系（DH 坐标系 i−1 绕关节轴转 θ_i）",
+  "note": "几何取整机标定的名义 DH（第 55 轮）；质量、惯量由关节模组、铝管、壳体逐项相加；电机转子惯量折算到关节侧（armature）、力矩上限、名义摩擦都写在 MJCF 里。全部是示例值，量级与常见 5 kg 协作臂相同，不照抄任何厂商的数"
+ },
+ "robot": {
+  "type": "arm",
+  "dof": 6,
+  "links": [
+   {
+    "name": "base",
+    "node": "base",
+    "mass_kg": 5.5
+   },
+   {
+    "name": "link1",
+    "node": "link1",
+    "mass_kg": 3.5,
+    "com_m": [
+     0.0,
+     0.0,
+     0.13857
+    ],
+    "inertia_kg_m2": [
+     0.009053,
+     0.008297,
+     0.006127,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "name": "link2",
+    "node": "link2",
+    "mass_kg": 3.1856,
+    "com_m": [
+     -0.32557,
+     0.0,
+     0.0
+    ],
+    "inertia_kg_m2": [
+     0.004514,
+     0.045256,
+     0.044764,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "name": "link3",
+    "node": "link3",
+    "mass_kg": 2.0596,
+    "com_m": [
+     -0.28488,
+     0.0,
+     0.0
+    ],
+    "inertia_kg_m2": [
+     0.002077,
+     0.024999,
+     0.024727,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "name": "link4",
+    "node": "link4",
+    "mass_kg": 1.4,
+    "com_m": [
+     0.0,
+     0.0,
+     0.11143
+    ],
+    "inertia_kg_m2": [
+     0.001788,
+     0.001515,
+     0.001171,
+     0.0,
+     0.0,
+     0.0
+    ]
+   },
+   {
+    "name": "link5",
+    "node": "link5",
+    "mass_kg": 1.4,
+    "com_m": [
+     0.0,
+     0.0,
+     0.09286
+    ],
+    "inertia_kg_m2": [
+     0.001599,
+     0.001327,
+     0.001171,
+     0.0,
+     0.0,
+     -0.0
+    ]
+   },
+   {
+    "name": "link6",
+    "node": "link6",
+    "mass_kg": 0.35,
+    "com_m": [
+     0.0,
+     0.0,
+     0.075
+    ],
+    "inertia_kg_m2": [
+     0.000133,
+     0.000133,
+     0.000214,
+     0.0,
+     0.0,
+     0.0
+    ]
+   }
+  ],
+  "joints": [
+   {
+    "name": "J1",
+    "type": "revolute",
+    "parent": "base",
+    "child": "link1",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.054326,
+     "upper": 3.054326,
+     "velocity": 3.141593
+    },
+    "dynamics": {
+     "armature": 0.42,
+     "damping": 2.0,
+     "frictionloss": 5.0,
+     "effort": 333.0,
+     "module": "WQJ-L"
+    }
+   },
+   {
+    "name": "J2",
+    "type": "revolute",
+    "parent": "link1",
+    "child": "link2",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.15
+     ],
+     "rpy": [
+      1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.054326,
+     "upper": 3.054326,
+     "velocity": 3.141593
+    },
+    "dynamics": {
+     "armature": 0.42,
+     "damping": 2.0,
+     "frictionloss": 5.0,
+     "effort": 333.0,
+     "module": "WQJ-L"
+    }
+   },
+   {
+    "name": "J3",
+    "type": "revolute",
+    "parent": "link2",
+    "child": "link3",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.4,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.054326,
+     "upper": 3.054326,
+     "velocity": 3.141593
+    },
+    "dynamics": {
+     "armature": 0.26,
+     "damping": 1.0,
+     "frictionloss": 2.5,
+     "effort": 167.25,
+     "module": "WQJ-M"
+    }
+   },
+   {
+    "name": "J4",
+    "type": "revolute",
+    "parent": "link3",
+    "child": "link4",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      -0.36,
+      0.0,
+      0.0
+     ],
+     "rpy": [
+      0.0,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.054326,
+     "upper": 3.054326,
+     "velocity": 3.141593
+    },
+    "dynamics": {
+     "armature": 0.04,
+     "damping": 0.3,
+     "frictionloss": 0.8,
+     "effort": 54.0,
+     "module": "WQJ-S"
+    }
+   },
+   {
+    "name": "J5",
+    "type": "revolute",
+    "parent": "link4",
+    "child": "link5",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.12
+     ],
+     "rpy": [
+      1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.054326,
+     "upper": 3.054326,
+     "velocity": 3.141593
+    },
+    "dynamics": {
+     "armature": 0.04,
+     "damping": 0.3,
+     "frictionloss": 0.8,
+     "effort": 54.0,
+     "module": "WQJ-S"
+    }
+   },
+   {
+    "name": "J6",
+    "type": "revolute",
+    "parent": "link5",
+    "child": "link6",
+    "axis": [
+     0.0,
+     0.0,
+     1.0
+    ],
+    "origin": {
+     "xyz": [
+      0.0,
+      0.0,
+      0.1
+     ],
+     "rpy": [
+      -1.570796,
+      0.0,
+      0.0
+     ]
+    },
+    "limit": {
+     "lower": -3.054326,
+     "upper": 3.054326,
+     "velocity": 3.141593
+    },
+    "dynamics": {
+     "armature": 0.04,
+     "damping": 0.3,
+     "frictionloss": 0.8,
+     "effort": 54.0,
+     "module": "WQJ-S"
+    }
+   }
+  ],
+  "rest": {
+   "J1": 0.0,
+   "J2": -1.570796,
+   "J3": 1.570796,
+   "J4": -1.570796,
+   "J5": -1.570796,
+   "J6": 0.0
+  },
+  "rest_source": "整机标定的初始位姿（第 55 轮）",
+  "kinematics": {
+   "type": "dh_standard",
+   "dh": [
+    {
+     "a": 0.0,
+     "alpha": 1.570796,
+     "d": 0.15
+    },
+    {
+     "a": -0.4,
+     "alpha": 0.0,
+     "d": 0.0
+    },
+    {
+     "a": -0.36,
+     "alpha": 0.0,
+     "d": 0.0
+    },
+    {
+     "a": 0.0,
+     "alpha": 1.570796,
+     "d": 0.12
+    },
+    {
+     "a": 0.0,
+     "alpha": -1.570796,
+     "d": 0.1
+    },
+    {
+     "a": 0.0,
+     "alpha": 0.0,
+     "d": 0.09
+    }
+   ]
+  },
+  "dynamics": {
+   "payload_kg": 5.0,
+   "mass_kg": 17.4,
+   "moving_mass_kg": 11.895,
+   "note": "示例值：量级与常见 5 kg 协作臂相同，不照抄任何厂商的数"
+  }
+ },
+ "source": {
+  "origin": "wenquest",
+  "license": "Apache-2.0",
+  "attribution": "问渠零件库（生成程序 generators/wqcr5.py，原件 factory/digital/cae/wqcr5.py）",
+  "checked": {
+   "by": "Claude",
+   "on": "2026-10-30",
+   "note": "自建；正运动学与整机标定一致、质量惯量与手算一致、电机与减速器参数与电机选型助手一致，由测试核对"
+  }
+ },
+ "teaching": {
+  "principle": "六个转动关节串联，前三个关节决定末端位置，后三个（腕部）决定姿态；每个关节是一台关节模组（伺服电机 + 谐波减速器），减速比 100 使电机转子的惯量折算到关节侧放大一万倍，常常比连杆本身的惯量还大。",
+  "uses": [
+   "机床上下料",
+   "装配",
+   "人机协作"
+  ],
+  "courses": [
+   {
+    "course": "机器人技术",
+    "chapter": "动力学仿真"
+   },
+   {
+    "course": "机器人技术",
+    "chapter": "正运动学：DH 参数"
+   }
+  ],
+  "labs": [
+   "实验 29.1 积分方法与步长",
+   "实验 29.2 仿真与现实",
+   "数字工厂实验 24、26、28"
+  ]
+ },
+ "factory": {
+  "erp_items": [
+   {
+    "item_code": "WQ-CR5",
+    "size": "default"
+   }
+  ],
+  "suppliers": []
+ },
+ "version": "2026.10.30",
+ "package": "https://github.com/eddiezgq/WenQuest/blob/main/library/generators/b_wq.py",
+ "sizes": [
+  {
+   "size": "default",
+   "params": {},
+   "files": {
+    "glb": "B-ARM-WQCR5/default.glb",
+    "png": "B-ARM-WQCR5/default.png",
+    "urdf": "B-ARM-WQCR5/default.urdf",
+    "svg": "B-ARM-WQCR5/default.svg",
+    "mjcf": "B-ARM-WQCR5/default.xml"
+   }
+  }
+ ]
+}
