@@ -3,7 +3,7 @@
       --draft   960×540、15 帧/秒的小样          --still  只出这几秒的单帧（_frames/still_*.png）
       --resume  接着画：_frames 里已有的帧跳过（本机渲染被打断时用）
       --shard   并行：只画第 k 份（GitHub 工作流 video3d.yml 用）     --encode  帧齐了以后只合成
-场景文件写什么，见 tools/blender/场景格式.md。模型只用已有的：程序生成的机构（gen:arm6、gen:conveyor）、简单形体（box、cyl）、
+场景文件写什么，见 tools/blender/场景格式.md。模型只用已有的：程序生成的机构（gen:arm6、gen:conveyor、gen:sewdesign 设计软件的这台设计）、简单形体（box、cyl）、
 已有虚拟实验里的整机模型（weblab:…，运动也取自实验本身）。运动都由程序算（逆运动学、实验的机构计算），不手调。"""
 import json
 import math
@@ -61,7 +61,7 @@ MATS = {}
 
 def mat(name):
     if name not in MATS:
-        m = bpy.data.materials.new(name)
+        m = bpy.data.materials.new(name if isinstance(name, str) else "rgb%s" % (tuple(round(x, 3) for x in name),))   # 颜色也可以直接给 (r, g, b)
         c = PALETTE.get(name, (0.7, 0.7, 0.7)) if isinstance(name, str) else name
         m.diffuse_color = (*c, 1)
         MATS[name] = m
@@ -456,6 +456,9 @@ for m in SPEC["models"]:
         OBJ[mid] = Seam(mid, m)
     elif use.startswith("weblab:"):
         OBJ[mid] = WebLab(mid, use[7:], m)
+    elif use == "gen:sewdesign":                  # 第 56 轮：缝纫机设计软件里这一台设计的零件（尺寸、运动由计算核心给）
+        from sewdesign import SewDesign
+        OBJ[mid] = SewDesign(mid, m, bpy, mat, add_group, Matrix, Vector)
     elif use == "item":
         OBJ[mid] = Item(mid, m)
     elif use in ("box", "cyl"):
@@ -589,14 +592,24 @@ def hud(img, t, read):
     d.rectangle([0, 0, W, 160 * s], fill=(251, 250, 247, 225))
     title = [L for L in labels(t, read) if L.get("where", "title") == "title"]
     zh, en = (title[-1]["zh"], title[-1]["en"]) if title else (SPEC["title"]["zh"], SPEC["title"]["en"])
-    d.text((60 * s, 40 * s), zh, font=font(FONT_B, 54), fill=(29, 35, 41))
-    d.text((62 * s, 112 * s), en, font=font(FONT_R, 30), fill=(95, 107, 118))
+    lang = SPEC.get("lang", "both")          # 第 56 轮：zh / en 只出一种文字（英文行长，字号小一点、上下居中）
+    tone = title[-1].get("tone") if title else None
+    ink = {"bad": (196, 43, 34), "warn": (176, 106, 0)}.get(tone, (29, 35, 41))          # 第 56 轮：红黄灯项的标题标红、标黄
+    if lang == "both":
+        d.text((60 * s, 40 * s), zh, font=font(FONT_B, 54), fill=ink)
+        d.text((62 * s, 112 * s), en, font=font(FONT_R, 30), fill=(95, 107, 118))
+    else:
+        d.text((60 * s, 80 * s), zh if lang == "zh" else en, font=font(FONT_B, 54 if lang == "zh" else 44), fill=ink, anchor="lm")
     caps = [L for L in labels(t, read) if L.get("where") == "bottom"]
     if caps:
         c = caps[-1]
         d.rounded_rectangle([W / 2 - 700 * s, H - 150 * s, W / 2 + 700 * s, H - 40 * s], 18 * s, fill=(29, 35, 41, 210))
-        d.text((W / 2, H - 128 * s), c["zh"], font=font(FONT_B, 40), fill=(255, 255, 255), anchor="ma")
-        d.text((W / 2, H - 78 * s), c["en"], font=font(FONT_R, 26), fill=(205, 212, 218), anchor="ma")
+        if lang == "both":
+            d.text((W / 2, H - 128 * s), c["zh"], font=font(FONT_B, 40), fill=(255, 255, 255), anchor="ma")
+            d.text((W / 2, H - 78 * s), c["en"], font=font(FONT_R, 26), fill=(205, 212, 218), anchor="ma")
+        else:
+            d.text((W / 2, H - 95 * s), c["zh"] if lang == "zh" else c["en"], font=font(FONT_B, 40 if lang == "zh" else 26),
+                   fill=(255, 255, 255), anchor="mm")
     pan = SPEC.get("panel")
     if not pan:
         return img
@@ -608,7 +621,7 @@ def hud(img, t, read):
         rows = [(n, math.degrees(v), "{:+6.1f}°", 180) for n, v in zip(names, arm.q)]
         head = "关节角  Joint angles"
     else:
-        rows = [(f"{r['zh']} {r['en']}", read.get(r["key"], 0) or 0, r.get("fmt", "{:6.1f}") + r.get("unit", ""), r.get("scale", 0))
+        rows = [(f"{r['zh']} {r['en']}".strip(), read.get(r["key"], 0) or 0, r.get("fmt", "{:6.1f}") + r.get("unit", ""), r.get("scale", 0))
                 for r in pan["items"]]
         head = pan.get("head", "读数  Readouts")
     hgt = len(rows) * 74 * s + 40 * s + (230 * s if pan.get("plot") else 0) + (34 * s if pan["kind"] == "joints" else 0)
@@ -643,7 +656,8 @@ def hud(img, t, read):
             d.text((mx + 4 * s, py + (4 + 24 * k) * s), m["zh"], font=font(FONT_R, 18), fill=(217, 56, 46))
         cx = px + pw * (read.get("phi", 0) % 360) / 359
         d.line([cx, py, cx, py + ph], fill=(29, 35, 41), width=max(1, int(3 * s)))
-        d.text((px, py + ph + 8 * s), f"{pl['zh']} {pl['en']}（横轴：主轴转角 0–360°）", font=font(FONT_R, 20), fill=(95, 107, 118))
+        foot = ("(x: shaft angle 0–360°)" if SPEC.get("lang") == "en" else "（横轴：主轴转角 0–360°）")
+        d.text((px, py + ph + 8 * s), f"{pl['zh']} {pl['en']}".strip() + foot, font=font(FONT_R, 20), fill=(95, 107, 118))
     d.text((W - 60 * s, H - 20 * s), "问渠 WenQuest · 三维仿真", font=font(FONT_R, 22), fill=(140, 146, 152), anchor="rs")
     return img
 
@@ -677,6 +691,13 @@ def subtimes(t):
 DUMPS = {}
 for mid in WEBLAB_A:
     lab = OBJ[mid]
+    if not isinstance(lab, WebLab):               # gen:sewdesign 每帧直接算，不用预取；曲线一圈也直接算
+        pan = SPEC.get("panel") or {}
+        if pan.get("plot") and jobs:
+            from sewdesign import poses, reads
+            CURVES[pan["plot"]["key"]] = [reads(lab.machine, poses(lab.machine, lab.params, a), lab.params).get(pan["plot"]["key"], 0)
+                                          for a in range(360)]
+        continue
     angles = sorted({round(shaft_angle(mid, ts), 3) for _, t in jobs for ts in subtimes(t) + [t]})
     for a, d in zip(angles, lab.lab.dumps(angles)):
         DUMPS[(mid, a)] = d
@@ -698,6 +719,9 @@ def pose_at(t):
             o.update(t)
         if isinstance(o, WebLab) and mid in WEBLAB_A:
             o.set(DUMPS[(mid, round(shaft_angle(mid, t), 3))])
+            read = o.read
+        elif mid in WEBLAB_A and hasattr(o, "set_phi"):
+            o.set_phi(shaft_angle(mid, t))
             read = o.read
     xu, top = effect(t)
     if STYLE != "cinematic":

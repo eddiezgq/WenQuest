@@ -381,7 +381,7 @@ export interface CoursePack {
 }
 
 // --- 三维仿真视频 (round 38) ---
-export interface V3Access { allowed: boolean; admin: boolean; teacher: boolean; granted: boolean }
+export interface V3Access { allowed: boolean; admin: boolean; teacher: boolean; granted: boolean; sewing?: boolean; general?: boolean }
 export interface V3Sample { id: string; title: { zh: string; en: string }; duration: number }
 export interface V3RenderState { state: string; done?: number; total?: number }
 export interface V3Summary { id: string; title: { zh: string; en: string }; updated: number; busy: string; poster: string;
@@ -470,7 +470,7 @@ export const api = {
   studioRedoLab: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lab`, {}),
   // --- 三维仿真视频 (round 38) ---
   v3Access: () => request<V3Access>("GET", "/api/v1/video3d/access"),
-  v3Index: () => request<{ samples: V3Sample[]; videos: V3Summary[]; render_on: boolean; stills_on: boolean; admin: boolean }>("GET", "/api/v1/video3d"),
+  v3Index: () => request<{ samples: V3Sample[]; videos: V3Summary[]; render_on: boolean; stills_on: boolean; admin: boolean; general?: boolean }>("GET", "/api/v1/video3d"),
   v3Create: (b: { prompt?: string; sample?: string }) => request<V3Video>("POST", "/api/v1/video3d", b),
   v3Get: (id: string) => request<V3Video>("GET", `/api/v1/video3d/${id}`),
   v3Delete: (id: string) => request<{ ok: boolean }>("DELETE", `/api/v1/video3d/${id}`),

@@ -18,6 +18,8 @@ COPY tools/blender /srv/wq/tools/blender
 COPY tools/site_cases/assets/three.min.js /srv/wq/tools/site_cases/assets/three.min.js
 COPY textbook/web-editions/sewing/src/zh/labs/proto-lockstitch.html /srv/wq/textbook/web-editions/sewing/src/zh/labs/proto-lockstitch.html
 COPY textbook/web-editions/sewing/src/lib/lockstitch-kit.js textbook/web-editions/sewing/src/lib/proto-lockstitch-mesh.js /srv/wq/textbook/web-editions/sewing/src/lib/
+# 缝纫机设计软件的计算核心（第 56 轮 gen:sewdesign：按企业自己的设计尺寸摆零件；纯 Python，只用 math）
+COPY services/gateway/app/sewcore/*.py /srv/wq/services/gateway/app/sewcore/
 COPY video3d /srv/wq/video3d
 COPY services/blender/app.py services/blender/run.sh ./
 RUN useradd -r -u 10005 -m b3d && rm -rf /srv/wq/tools/blender/__pycache__

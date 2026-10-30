@@ -174,6 +174,12 @@
           <view v-for="k in kinds" :key="k" class="exp" :class="{ locked: !me.licensed }" @click="download(k)">
             <text>{{ t("sew.exp." + k) }}</text><text class="muted">{{ making === k ? t("sew.making") : "↓" }}</text>
           </view>
+          <!-- 第 56 轮：按这台设计一键出三维讲解片（有三维零件的平缝机、包缝机） -->
+          <view v-if="machine === 'lockstitch' || machine === 'overlock'" class="fc">
+            <text class="pt">{{ t("sew.video") }}</text>
+            <text class="para">{{ t("sew.videoText") }}</text>
+            <view class="btn" :class="{ disabled: !me.licensed }" @click="makeVideo">{{ making === "video" ? t("sew.videoMaking") : t("sew.videoBtn") }}</view>
+          </view>
           <view class="fc">
             <text class="pt">{{ t("sew.freecad") }}</text>
             <text class="para">{{ t("sew.freecadText") }}</text>
@@ -536,6 +542,21 @@ async function download(kind: string) {
     msg.value = errorText(e instanceof ApiError ? e.code : "unknown");
   }
   // #endif
+  making.value = "";
+}
+
+// ---------- 三维讲解片（第 56 轮）：网关按设计写好场景、开始出关键画面，跳到三维视频页 ----------
+async function makeVideo() {
+  if (!me.value.licensed) return (msg.value = t("sew.expLocked"));
+  if (making.value) return;
+  making.value = "video";
+  msg.value = "";
+  try {
+    const r = await request<{ id: string }>("POST", "/api/v1/sewing/video", { machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value });
+    uni.navigateTo({ url: `/pages/video3d/edit?id=${encodeURIComponent(r.id)}` });
+  } catch (e) {
+    msg.value = errorText(e instanceof ApiError ? e.code : "unknown");
+  }
   making.value = "";
 }
 

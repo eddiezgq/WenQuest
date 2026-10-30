@@ -172,6 +172,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#lib-6" data-s="lib">FreeCAD 钥匙</a>
 <a class="sub" href="#lib-7" data-s="lib">上限与安全</a>
 <a href="#export" data-s="export"><span class="n">12</span>导出</a>
+<a class="sub" href="#export-video" data-s="export">三维讲解片</a>
 <a href="#kernel" data-s="kernel"><span class="n">13</span>内核：流行的开源软件</a>
 <a class="sub" href="#kernel-1" data-s="kernel">缝纫机设计软件直接用到的</a>
 <a class="sub" href="#kernel-2" data-s="kernel">整个平台用到的（设计软件连着的那些）</a>
@@ -528,6 +529,10 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <tr>
 <td>采购、ERP</td>
 <td>零件库“导出 ERPNext 物料表”</td>
+</tr>
+<tr>
+<td>客户、车间看机构怎么动</td>
+<td>三维讲解片（网页版“导出 → 出三维讲解片”）：按这台的尺寸自动出片，改型前（全部合格）和 6000 r/min 未改那一版对比——后者会在 180° 慢放“针杆下止点惯性力”那盏红灯</td>
 </tr>
 </tbody>
 </table>
@@ -1169,7 +1174,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>按单位隔离：查、改、下载都只认本单位；别的单位连有没有这个编号都看不到。</li>
 <li>文件存在问渠服务器上（国内部署存在国内服务器）；数据随问渠的日常备份。</li>
 </ul></section>
-<section id="export"><h2><span class="n">12</span>导出</h2><p class="lead">一组参数，出七种文件（已开通的企业）。</p><table>
+<section id="export"><h2><span class="n">12</span>导出</h2><p class="lead">一组参数，出七种文件；平缝机、包缝机还能一键出三维讲解片（已开通的企业）。</p><table>
 <thead>
 <tr>
 <th>文件</th>
@@ -1209,6 +1214,18 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </table>
 <p>绷缝机、花样机、刺绣机、横机没有三维零件，不出 STEP、宏、DXF。“文件语言”可选中文或英文。</p>
 <p>FreeCAD 工作台安装包也在这一页下载，安装见 FreeCAD 版帮助。</p>
+<h3 id="export-video">三维讲解片</h3>
+<p>平缝机、包缝机（有三维零件的两种）在这一页还有“出三维讲解片”：给客户、车间看“我们这台的机构怎么动”。不用写一句话，软件按当前这组参数自动写好讲解片——</p>
+<ol>
+<li><strong>整机</strong>（约 6 秒）：零件就是导出 STEP 的那些，尺寸、每个主轴转角的位置都按你的设计。</li>
+<li><strong>各机构</strong>（每个约 8 秒）：平缝机刺布、挑线、钩线、送布，包缝机刺布、下弯针、上弯针、送布与差动、切边；其余零件变半透明，底部字幕写这个机构的主要结果（数由计算核心给）。</li>
+<li><strong>红黄灯项</strong>（有的话，最多三项，每项约 7 秒）：在出问题的转角慢放，标题写“⚠ 不合格”或“注意”，字幕写数值和判据。例如 6000 r/min 时“针杆下止点惯性力”在 180° 附近慢放。</li>
+<li><strong>结论</strong>：全部合格，或几项不合格、几项注意。</li>
+</ol>
+<p>右边的读数面板随主轴转：主轴转角；平缝机另有针尖高出针板、旋梭转角和针尖高度曲线（标着最低点和钩线时刻）。字幕跟“文件语言”走，只出中文或只出英文。</p>
+<p>点按钮后跳到平台的“三维视频”页：先出关键画面（自己服务器，免费，一两分钟），看过再出小样、高清（租云端 GPU，几分钟到十几分钟），可下载 MP4。还可以在左边对 AI 说“第 3 段慢一点”“钩线那段镜头拉近”，AI 改镜头、节奏和字幕；<strong>设计参数和数值改不了</strong>——场景里那台机器每次都按你的设计重置。片子只有自己和平台管理员看得到。眼下出片先不收费，平台计费上线后按机器时间计。国内站暂时只出关键画面。</p>
+<p>绷缝机、花样机、刺绣机、横机没有三维零件，不出讲解片。线环只在教材的平缝机虚拟样机里有，讲解片只讲机构。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-14-video.jpg"><source src="../media/web-14-video.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-14-video.vtt"></video><figcaption>▶ 6000 r/min 未改那一版：导出 → 出三维讲解片 → 关键画面（红灯停在 180°）</figcaption></figure>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-08-export.jpg"><source src="../media/web-08-export.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-08-export.vtt"></video><figcaption>▶ 导出计算书（带 AI 设计说明）和 STEP</figcaption></figure></section>
 <section id="kernel"><h2><span class="n">13</span>内核：流行的开源软件</h2><p class="lead">求解和建模交给全世界工程师用了多年的开源软件；我们做的是把它们和教材、工厂、AI 接成一条线。</p><h3 id="kernel-1">缝纫机设计软件直接用到的</h3>
 <table>

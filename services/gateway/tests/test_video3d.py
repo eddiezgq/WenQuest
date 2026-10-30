@@ -126,7 +126,8 @@ def test_students_cannot_use_it_until_an_admin_enables_the_account(v3c):
     assert a["allowed"] and a["teacher"]
     r = v3c.post("/api/v1/video3d/admin/grants", headers=t, json={"username": "s", "note": "某缝纫机厂"})
     assert r.status_code == 200 and r.json()["user_id"] == 6
-    assert v3c.get("/api/v1/video3d/access", headers=s).json() == {"allowed": True, "admin": False, "teacher": False, "granted": True}
+    assert v3c.get("/api/v1/video3d/access", headers=s).json() == {"allowed": True, "admin": False, "teacher": False, "granted": True,
+                                                                    "sewing": False, "general": True}
     assert v3c.get("/api/v1/video3d", headers=s).status_code == 200
     assert v3c.delete("/api/v1/video3d/admin/grants/6", headers=t).status_code == 200
     assert v3c.get("/api/v1/video3d", headers=s).status_code == 403

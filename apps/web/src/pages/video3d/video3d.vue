@@ -11,8 +11,10 @@
       <view v-if="error" class="alert">{{ errorText(error) }}</view>
       <view v-if="!loading && !error && !renderOn" class="note">{{ t("v3.noMachines") }}</view>
 
+      <!-- 第 56 轮：只开通了缝纫机设计软件的单位，从设计软件一键出讲解片，这里只看、改自己的讲解片 -->
+      <view v-if="!loading && !error && !general" class="note">{{ t("v3.sewingOnly") }}</view>
       <!-- 一句话新建 -->
-      <view v-if="!error" class="card new">
+      <view v-if="!error && general" class="card new">
         <text class="label">{{ t("v3.ask") }}</text>
         <textarea v-model="prompt" class="area" :placeholder="t('v3.askPh')" maxlength="2000" />
         <view class="row-end">
@@ -96,6 +98,7 @@ const loading = ref(true);
 const error = ref("");
 const busy = ref("");
 const prompt = ref("");
+const general = ref(true);
 const renderOn = ref(true);
 const isAdmin = ref(false);
 const ov = ref<V3AdminOverview | null>(null);
@@ -114,6 +117,7 @@ async function load() {
     videos.value = r.videos;
     renderOn.value = r.render_on;
     isAdmin.value = r.admin;
+    general.value = r.general !== false;
     if (r.admin) ov.value = await api.v3Admin();
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";

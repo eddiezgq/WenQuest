@@ -154,6 +154,7 @@ def register(app, m) -> None:
 
     # 第 41 轮：CAE 接口（sewing_cae.py）共用开通检查和数据库；第 49 轮：AI 助手、本单位零件库共用 who
     m.sewing_need_license = need_license
+    m.sewing_license_of = license_of
     m.sewing_db = db
     m.sewing_who = who
     m.sewing_who_web = who_web

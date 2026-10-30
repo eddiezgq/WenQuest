@@ -85,8 +85,11 @@ def register(app, m) -> None:
         teacher = await m.can_create(sess.moodle_token)
         admin = await m.accounts_is_admin(sess)
         granted = service(m).store.granted(sess.user_id)
-        return {"allowed": bool(teacher or admin or granted), "admin": bool(admin), "teacher": bool(teacher),
-                "granted": bool(granted)}
+        lic = getattr(m, "sewing_license_of", None)
+        sewing = bool(lic and lic(sess.user_id))          # 第 56 轮：缝纫机设计软件已开通的单位，用来看、改自己的讲解片
+        general = bool(teacher or admin or granted)
+        return {"allowed": general or sewing, "admin": bool(admin), "teacher": bool(teacher),
+                "granted": bool(granted), "sewing": sewing, "general": general}
 
     async def need(sess: Session) -> dict:
         a = await access(sess)
@@ -105,6 +108,8 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no such video", 404)
         if V["owner"] != sess.user_id and not a["admin"]:
             raise EngineError("forbidden", "not your video", 403)
+        if not a.get("general", True) and not V.get("sewing"):
+            raise EngineError("forbidden", "sewing-design accounts can only open their sewing explainer videos", 403)
         return V
 
     def sign(d: dict) -> str:
@@ -154,13 +159,14 @@ def register(app, m) -> None:
     async def index(sess: Annotated[Session, Depends(current)]):
         a = await need(sess)
         svc = service(m)
-        samples = [{"id": s["id"], "title": s.get("title"), "duration": s.get("duration")} for s in await svc.blender.samples()]
+        samples = [{"id": s["id"], "title": s.get("title"), "duration": s.get("duration")} for s in await svc.blender.samples()] if a["general"] else []
         return {"samples": samples, "videos": [summary(V) for V in svc.store.list(sess.user_id)],
-                "render_on": svc.render_on, "stills_on": svc.blender.on, "admin": a["admin"]}
+                "render_on": svc.render_on, "stills_on": svc.blender.on, "admin": a["admin"], "general": a["general"]}
 
     @app.post("/api/v1/video3d")
     async def create(body: NewIn, sess: Annotated[Session, Depends(current)]):
-        await need(sess)
+        if not (await need(sess))["general"]:          # 缝纫机设计软件的单位只能从设计软件一键出讲解片（第 56 轮）
+            raise EngineError("forbidden", "start explainer videos from the sewing design software", 403)
         if not body.prompt.strip() and not body.sample:
             raise EngineError("bad_request", "write what you want, or start from a sample", 400)
         if body.prompt.strip() and not m.state.ai.available:

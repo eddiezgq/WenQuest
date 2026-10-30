@@ -109,6 +109,22 @@ def _P(fr, a, b, h=0.0):
     return (o[0] + a * u[0] + b * v[0] + h * n[0], o[1] + a * u[1] + b * v[1] + h * n[1], o[2] + a * u[2] + b * v[2] + h * n[2])
 
 
+# 零件 → 机构（三维讲解片按机构透视、慢放用，第 56 轮；tools/blender/sewdesign.py 也用这张表）
+GROUPS = {
+    # 平缝机
+    "UpperShaft": "drive", "LowerShaft": "drive",
+    "NeedleCrank": "needle", "ConnectingRod": "needle", "CrankPin": "needle", "NeedleBar": "needle", "Needle": "needle",
+    "TakeupCrank": "takeup", "TakeupLever": "takeup", "TakeupRocker": "takeup", "RockerPivot": "takeup",
+    "RotaryHook": "hook", "LiftEccentric": "feed", "FeedEccentric": "feed", "FeedDog": "feed", "NeedlePlate": "frame",
+    # 包缝机
+    "OL_MainShaft": "drive", "OL_UpperShaft": "drive", "OL_NeedleCrank": "needle", "OL_NeedleRod": "needle", "OL_NeedleBar": "needle",
+    "LL_Eccentric": "looper", "LL_BallA": "looper", "LL_BallB": "looper", "LL_Link": "looper", "LL_Rocker": "looper",
+    "LL_Shaft": "looper", "LL_Looper": "looper", "UL_Eccentric": "looper", "UL_BallA": "looper", "UL_BallB": "looper",
+    "UL_Link": "looper", "UL_Rocker": "looper", "UL_Shaft": "looper", "FeedArmMain": "feed", "FeedArmDiff": "feed",
+    "FeedShaft": "feed", "LowerKnife": "knife", "UpperKnife": "knife",
+}
+
+
 def parts3d(params=None, phi=0.0, machine="lockstitch"):
     if machine == "overlock":
         return _parts_overlock(params, phi)

@@ -10,4 +10,5 @@
 !textbook/web-editions/sewing/src/zh/labs/proto-lockstitch.html
 !textbook/web-editions/sewing/src/lib/lockstitch-kit.js
 !textbook/web-editions/sewing/src/lib/proto-lockstitch-mesh.js
+!services/gateway/app/sewcore/*.py
 !video3d/*/scene.yaml

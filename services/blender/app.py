@@ -70,6 +70,10 @@ def bundle():
             p = ROOT / rel
             if p.exists():
                 t.add(p, arcname=rel, filter=lambda i: None if "__pycache__" in i.name or "/_" in i.name else i)
+        # 第 56 轮 gen:sewdesign 要的计算核心：只带 .py（不带 FreeCAD 插件那 3 MB）
+        core = ROOT / "services/gateway/app/sewcore"
+        for f in sorted(core.glob("*.py")):
+            t.add(f, arcname=f"services/gateway/app/sewcore/{f.name}")
     return Response(buf.getvalue(), media_type="application/gzip")
 
 

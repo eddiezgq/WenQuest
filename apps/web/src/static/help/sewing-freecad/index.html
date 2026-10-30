@@ -588,6 +588,10 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <td>采购、ERP</td>
 <td>零件库“导出 ERPNext 物料表”</td>
 </tr>
+<tr>
+<td>客户、车间看机构怎么动</td>
+<td>三维讲解片（网页版“导出 → 出三维讲解片”）：按这台的尺寸自动出片，改型前（全部合格）和 6000 r/min 未改那一版对比——后者会在 180° 慢放“针杆下止点惯性力”那盏红灯</td>
+</tr>
 </tbody>
 </table>
 <p>在 FreeCAD 里走同一条线：“新建平缝机设计”出 16 个零件 → 属性里改 <code>P_n</code> = 6000、<code>P_mr</code> = 0.10、<code>P_fn</code> = 240 → Ctrl+R 重算，点“校核结果”看：全部合格 → Python 控制台输入 <code>import wqsew_fem; wqsew_fem.run()</code>，本机算针杆曲柄有限元（受力按 6000 r/min）→ “导出 STEP”。服务器上的 CAE（模态、动力学、减重、数控、电机选型）在网页版做，参数用“导出参数 / 导入参数”两边互通。</p>

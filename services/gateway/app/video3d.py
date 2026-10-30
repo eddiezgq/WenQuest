@@ -30,7 +30,9 @@ import yaml
 
 log = logging.getLogger("wenquest.video3d")
 
-USES = {"gen:arm6", "gen:conveyor", "gen:seam", "box", "cyl", "item", "weblab:sewing/proto-lockstitch"}
+USES = {"gen:arm6", "gen:conveyor", "gen:seam", "box", "cyl", "item", "weblab:sewing/proto-lockstitch",
+        "gen:sewdesign"}        # 第 56 轮：缝纫机设计软件里这一台设计（只由缝纫机软件自动写，参数锁定）
+ANGLE_MODELS = ("weblab:", "gen:sewdesign")
 DRIVES = {"pick_place", "weblab"}
 EFFECTS = {"xray", "cutaway", "blur", "flash"}
 COLORS = {"body", "joint", "accent", "part", "table", "belt", "frame", "floor", "motor", "gear", "needle", "takeup", "hook",
@@ -74,6 +76,10 @@ def check(text: str) -> tuple[dict | None, list[str]]:
     t = s.get("title")
     if not (isinstance(t, dict) and isinstance(t.get("zh"), str) and isinstance(t.get("en"), str)):
         errs.append("title 要写成 {zh: 中文标题, en: English title}")
+    if "stills" in s and not (isinstance(s["stills"], list) and 1 <= len(s["stills"]) <= 6 and all(_num(x) for x in s["stills"])):
+        errs.append("stills（可选）是 1–6 个秒数：关键画面取在这几秒")
+    if s.get("lang") not in (None, "both", "zh", "en"):
+        errs.append("lang 只能是 both（默认，中英两行）、zh 或 en（只出一种文字）")
     if s.get("style") not in (None, "engineering", "cinematic"):
         errs.append("style 只能是 engineering（默认）或 cinematic")
     if "fps" in s and not (_num(s["fps"]) and 10 <= s["fps"] <= 60):
@@ -106,6 +112,11 @@ def check(text: str) -> tuple[dict | None, list[str]]:
                 errs.append(f"model {mid} 的颜色 {k}: {v} 不在颜色名表里")
         if "color" in mo and mo["color"] not in COLORS:
             errs.append(f"model {mid} 的 color={mo['color']!r} 不在颜色名表里")
+        if use == "gen:sewdesign":
+            if mo.get("machine") not in ("lockstitch", "overlock"):
+                errs.append(f"model {mid}（gen:sewdesign）的 machine 只能是 lockstitch 或 overlock")
+            if not isinstance(mo.get("params", {}), dict) or len(mo.get("params") or {}) > 80:
+                errs.append(f"model {mid}（gen:sewdesign）的 params 要是设计参数字典")
         if use == "item":
             for k in ("pick", "drop"):
                 if not _num(mo.get(k)):
@@ -127,8 +138,8 @@ def check(text: str) -> tuple[dict | None, list[str]]:
             errs.append(f"motion 第 {i + 1} 项的 model={mid!r} 没有这个模型")
             continue
         if d["drive"] == "weblab":
-            if not ids[mid].startswith("weblab:"):
-                errs.append(f"drive: weblab 要配 weblab: 模型（{mid} 是 {ids[mid]}）")
+            if not str(ids[mid]).startswith(ANGLE_MODELS):
+                errs.append(f"drive: weblab 要配 weblab: 或 gen:sewdesign 模型（{mid} 是 {ids[mid]}）")
             ang = d.get("angle")
             if not (isinstance(ang, list) and ang and all(isinstance(p, list) and len(p) == 2 and all(_num(x) for x in p) for p in ang)):
                 errs.append("weblab 的 angle 要写成 [[秒, 主轴累计转角°], …]")
@@ -178,10 +189,63 @@ def check(text: str) -> tuple[dict | None, list[str]]:
             errs.append(f"labels 第 {i + 1} 条太长（中文最多 46 字、英文 120 字符），会出框：{lb['zh'][:20]}…")
         if "phi" in lb and not (isinstance(lb["phi"], list) and len(lb["phi"]) == 2 and all(_num(x) for x in lb["phi"])):
             errs.append(f"labels 第 {i + 1} 条的 phi 要是 [起, 止]（度）")
+        if lb.get("tone") not in (None, "bad", "warn"):
+            errs.append(f"labels 第 {i + 1} 条的 tone 只能是 bad（红）或 warn（黄）")
     p = s.get("panel")
     if p is not None and not (isinstance(p, dict) and p.get("kind") in ("joints", "readouts")):
         errs.append("panel 的 kind 只能是 joints 或 readouts")
     return s, errs
+
+
+def apply_lock(text: str, lock: dict | None) -> str:
+    """缝纫机软件写的讲解片（第 56 轮）：AI 或人改场景时，设计模型的机型和参数改回原样——只许改镜头、节奏、字"""
+    if not lock:
+        return text
+    try:
+        s = yaml.safe_load(text)
+    except yaml.YAMLError:
+        return text
+    if not isinstance(s, dict):
+        return text
+    changed = False
+    for mo in s.get("models") or []:
+        if isinstance(mo, dict) and mo.get("use") == "gen:sewdesign":
+            if mo.get("machine") != lock["machine"] or mo.get("params") != lock["params"]:
+                mo["machine"], mo["params"] = lock["machine"], dict(lock["params"])
+                changed = True
+    return yaml.safe_dump(s, allow_unicode=True, sort_keys=False, width=200) if changed else text
+
+
+NUM_RE = re.compile(r"\d+(?:\.\d+)?")
+
+
+def label_numbers(spec: dict) -> set[str]:
+    """标题、字幕里出现的数（讲解片锁定用）"""
+    out: set[str] = set()
+    texts = [spec.get("title") or {}] + [x for x in spec.get("labels") or [] if isinstance(x, dict)]
+    for x in texts:
+        for k in ("zh", "en"):
+            out |= set(NUM_RE.findall(str(x.get(k) or "")))
+    return out
+
+
+def lock_errors(spec: dict, lock: dict | None) -> list[str]:
+    """缝纫机软件写的讲解片：设计模型不能删、不能换成别的模型；字幕里的数只能是计算核心给的那些（AI 只改镜头、节奏、字）"""
+    if not lock:
+        return []
+    errs = []
+    models = [mo for mo in spec.get("models") or [] if isinstance(mo, dict)]
+    if not any(mo.get("id") == lock["model"] and mo.get("use") == "gen:sewdesign" for mo in models):
+        errs.append(f"这是缝纫机设计软件的讲解片：模型 {lock['model']}（gen:sewdesign）不能删、不能换")
+    other = sorted({str(mo.get("use")) for mo in models if mo.get("use") not in ("gen:sewdesign", "box", "cyl")})
+    if other or sum(mo.get("use") == "gen:sewdesign" for mo in models) > 1:
+        errs.append("这是缝纫机设计软件的讲解片：除了这台设计，只能加 box、cyl 做标示，不能加别的模型（" + "、".join(other) + "）")
+    allowed = set(lock.get("numbers") or [])
+    if allowed:
+        bad = sorted(label_numbers(spec) - allowed)
+        if bad:
+            errs.append("这是缝纫机设计软件的讲解片：字幕、标题里的数只能用计算核心给的（原字幕里有的），不能写 " + "、".join(bad[:6]))
+    return errs
 
 
 def normalized(text: str) -> str:
@@ -193,8 +257,12 @@ def normalized(text: str) -> str:
 
 
 def still_times(spec: dict, n: int = 6) -> list[float]:
-    """关键画面取在哪几秒：镜头关键点之间的中点和整段均分点合起来，挑 n 个。"""
+    """关键画面取在哪几秒：场景写了 stills 就用它（第 56 轮：讲解片要停在出问题的转角）；
+    否则镜头关键点之间的中点和整段均分点合起来，挑 n 个。"""
     dur = float(spec.get("duration") or 10)
+    own = spec.get("stills")
+    if isinstance(own, list) and own and all(_num(x) for x in own):
+        return sorted({round(min(max(float(x), 0.2), dur - 0.2), 1) for x in own})[:n]
     cand = [dur * (k + 0.5) / n for k in range(n)]
     keys = sorted({float(k["t"]) for k in spec.get("camera") or [] if isinstance(k, dict) and _num(k.get("t"))})
     mids = [(a + b) / 2 for a, b in zip(keys, keys[1:]) if b - a > 1.5]
@@ -663,13 +731,18 @@ class Service:
                     + "\n\n".join(f"### {x['id']}\n{x['scene']}" for x in refs)
                     + ("\n\n## 当前场景（在它上面改）\n" + cur if cur else "")
                     + ("\n\n## 之前的对话\n" + hist if hist else "")
+                    + ("\n\n## 注意\n这是缝纫机设计软件按企业的设计自动写的讲解片：模型 " + V["lock"]["model"]
+                       + "（gen:sewdesign）的 machine、params 不能改，不能删、不能加别的模型（只能加 box、cyl 做标示）；"
+                       "字幕、标题里的数只能用原字幕里已有的数。只改镜头、节奏、透视剖开、字幕措辞。" if V.get("lock") else "")
                     + "\n\n## 这次的要求\n" + instruction)
             prompt, last_errs = base, []
             for _ in range(3):
                 res = await self.ai.json(system=SYSTEM, prompt=prompt, schema=scene_schema(), max_tokens=8000,
                                          fake=lambda: fake_scene(samples, instruction) if not cur else {"scene": cur, "reply": "好的，已按你的意见改了。"})
                 text = re.sub(r"^```(?:yaml)?\s*|\s*```\s*$", "", str(res.get("scene") or "").strip())
+                text = apply_lock(text, V.get("lock"))
                 spec, errs = check(text)
+                errs = errs or lock_errors(spec, V.get("lock"))
                 if not errs:
                     V = self.store.load(vid)
                     self.store.set_scene(V, text)
@@ -695,7 +768,9 @@ class Service:
                 pass
 
     def set_scene(self, V: dict, text: str) -> list[str]:
+        text = apply_lock(text, V.get("lock"))
         spec, errs = check(text)
+        errs = errs or lock_errors(spec, V.get("lock"))
         if errs:
             return errs
         self.store.set_scene(V, text)

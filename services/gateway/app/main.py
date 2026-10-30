@@ -35,6 +35,7 @@ from . import sewing
 from . import sewing_cae
 from . import sewing_ai
 from . import sewing_parts
+from . import sewing_video
 from . import cam_ai
 from . import content
 from . import course_api
@@ -144,6 +145,7 @@ def create_app() -> FastAPI:
     sewing_cae.register(app, sys.modules[__name__])
     sewing_parts.register(app, sys.modules[__name__])
     sewing_ai.register(app, sys.modules[__name__])
+    sewing_video.register(app, sys.modules[__name__])
     cam_ai.register(app, sys.modules[__name__])
     tasks_api.register(app, sys.modules[__name__])
     gpulab.register(app, sys.modules[__name__])
