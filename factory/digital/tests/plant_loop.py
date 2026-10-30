@@ -32,6 +32,7 @@ P.add_argument("--timeout", type=float, default=900)
 P.add_argument("--teacher-password", default="", help="本地版（WQ_EDITION=local）当厂长要的老师密码")
 P.add_argument("--lab24", action="store_true", help="接 WQ-CR5 后按实验 24 的六个任务答题，核对拿满 60 分（第 47 轮）")
 P.add_argument("--lab26", action="store_true", help="WQ-CR5 做到整机标定后，看标定页、按实验 26 的六个任务答题，核对拿满 60 分（第 55 轮）")
+P.add_argument("--lab28", action="store_true", help="WQ-CR5 做到整机标定后，看负载跑合页、按实验 28 的六个任务答题，核对拿满 60 分（第 58 轮）")
 P.add_argument("--lab27", action="store_true", help="工业园那一段走完后，按实验 27 的六个任务答题（AGV 订单要 2 台：--item WQ-AGV300:2），核对 60 分（第 57 轮）")
 P.add_argument("--park-hub", default="", help="工业园兄弟厂（问渠减速器厂）的枢纽：核对 WQR-105 的采购单送过去、那边接单生产发货、"
                                               "这边到货检验入库（第 51 轮）")
@@ -292,6 +293,30 @@ def lab26(mgr):
         st["score"], "、".join("{} {}".format(t["title"], t["score"]) for t in st["tasks"]), few["after_mean_mm"]))
 
 
+def lab28(mgr):
+    """实验 28：负载跑合页（实测与仿真、辨识、力矩裕量）+ 六个任务，满分 60；辨识出的 f_c 与关节测试台的值一致"""
+    print("— 实验 28（负载跑合）")
+    lst = wait(lambda: (lambda x: x if x["robots"] else None)(hub("GET", "/api/runin", token=mgr)), "负载跑合有机器人", 300, 5)
+    if not check(bool(lst), "负载跑合页有机器人"):
+        return
+    r0 = lst["robots"][0]
+    check(r0["bench"], "{} 带着关节测试台的空载摩擦力矩".format(r0["serial"]))
+    c = hub("GET", "/api/runin/{}".format(urllib.parse.quote(r0["serial"])), token=mgr)
+    J = {j["joint"]: j for j in c["joints"]}
+    worst = max(abs(j["fc_hat"] - j["fc_bench"]) for j in c["joints"])
+    check(worst < 0.1 and all(j["rms_diff_updated"] < 2 * j["noise_sigma"] for j in c["joints"]),
+          "辨识 f_c 与测试台最多差 {:.3f} N·m；写回模型后均方根差 ≈ 噪声（{}）".format(worst, "、".join(str(j["rms_diff_updated"]) for j in c["joints"])))
+    hub("POST", "/api/lab28/pick", {"serial": r0["serial"]}, mgr)
+    hub("POST", "/api/lab28/l28_t1", {"peak": J["J2"]["peak_meas"]}, mgr)
+    hub("POST", "/api/lab28/l28_t2", {"joint": max(c["joints"], key=lambda j: j["rms_diff"])["joint"]}, mgr)
+    hub("POST", "/api/lab28/l28_t3", {"fc": J["J1"]["fc_hat"], "fv": J["J1"]["fv_hat"]}, mgr)
+    hub("POST", "/api/lab28/l28_t4", {"choice": "viscous"}, mgr)
+    hub("POST", "/api/lab28/l28_t5", {"rms": J["J2"]["rms_meas"], "pass": c["pass"]}, mgr)
+    hub("POST", "/api/lab28/l28_t6", {"choice": "noise"}, mgr)
+    st = hub("GET", "/api/lab28", token=mgr)
+    check(st["score"] == 60, "实验 28 自动评分 {} / 60（{}）".format(st["score"], "、".join("{} {}".format(t["title"], t["score"]) for t in st["tasks"])))
+
+
 def lab27(mgr):
     """实验 27：用接 AGV 的同一个账号答题（AGV 那一单要 2 台），WQR-105 那一批到货检验入库后满分 60"""
     import math
@@ -413,6 +438,8 @@ def main():
         one(it, mgr)
     if A.lab26:
         lab26(mgr)
+    if A.lab28:
+        lab28(mgr)
     if A.park_hub:
         park(mgr)
     if A.lab27:

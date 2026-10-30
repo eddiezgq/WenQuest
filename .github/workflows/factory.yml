@@ -240,10 +240,10 @@ jobs:
               park="--park-hub http://localhost:8100 --lab27"
             fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE \
-                "sim/(calib|errors|engine)\.py|hub/lab26\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
-              extra="--lab26"
+                "sim/(calib|errors|engine|runin)\.py|hub/lab2[68]\.py|cae/wqcr5\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
+              extra="--lab26 --lab28"
             fi
-            echo "本次演练：两厂互发订单 $([ -n "$park" ] && echo 跑 || echo 不跑)；整机标定 $([ -n "$extra" ] && echo 跑 || echo 不跑)"
+            echo "本次演练：两厂互发订单 $([ -n "$park" ] && echo 跑 || echo 不跑)；整机标定与负载跑合 $([ -n "$extra" ] && echo 跑 || echo 不跑)"
             for i in $(seq 1 40); do curl -fsS localhost:$hubp/api/health && break; sleep 5; done
             cd factory/digital
             if grep -q "^$id	" "$FACTORY_DIR/classes.plants"; then

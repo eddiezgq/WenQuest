@@ -2332,6 +2332,72 @@ def lab26_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(404, "没有这个任务")
 
 
+# ---------------------------------------------------------------- 负载跑合：仿真与实测、实验 28（第 58 轮，机器人厂）
+def _runin():
+    from hub import lab28
+    if _labs_api.plant_id() != "wenquest-robot":
+        raise HTTPException(404, "负载跑合只在机器人厂")
+    return lab28
+
+
+@app.get("/api/runin")
+def runin_list(u=Depends(user_of)):
+    m = _runin()
+    return {"robots": [{"serial": r["serial"], "work_order": r["work_order"], "ts": r["ts"], "bench": r.get("friction_nm") is not None}
+                       for r in m.robots(H.db, u["mode"])]}
+
+
+@app.get("/api/runin/{serial}")
+def runin_case(serial: str, u=Depends(user_of)):
+    m = _runin()
+    try:
+        return m.case(H.db, u["mode"], serial, teacher=bool(u.get("teacher")))
+    except KeyError:
+        raise HTTPException(404, "没有这台机器人：{}".format(serial))
+
+
+@app.get("/api/runin/{serial}/data.csv")
+def runin_csv(serial: str, u=Depends(user_of)):
+    m = _runin()
+    try:
+        txt = m.csv_text(H.db, u["mode"], serial)
+    except KeyError:
+        raise HTTPException(404, "没有这台机器人：{}".format(serial))
+    return Response(txt.encode("utf-8-sig"), media_type="text/csv",
+                    headers={"Content-Disposition": 'attachment; filename="runin-{}.csv"'.format(serial)})
+
+
+@app.get("/api/lab28")
+def lab28_status(u=Depends(user_of)):
+    m = _runin()
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = m.status(H.db, u["name"], teacher=bool(u.get("teacher")))
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = m.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab28/pick")
+def lab28_pick(body: dict = Body(...), u=Depends(user_of)):
+    try:
+        return _runin().pick(H.db, u["name"], str(body.get("serial") or ""), u["mode"])
+    except KeyError:
+        raise HTTPException(404, "没有这台机器人")
+
+
+@app.post("/api/lab28/{tid}")
+def lab28_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    m = _runin()
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return m.answer(H.db, u["name"], tid, body, u["mode"])
+    except KeyError:
+        raise HTTPException(404, "没有这个任务")
+
+
 # ---------------------------------------------------------------- 实验 27（第 57 轮，机器人厂）
 @app.get("/api/lab27")
 def lab27_status(u=Depends(user_of)):
