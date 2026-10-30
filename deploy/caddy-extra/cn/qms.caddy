@@ -1,0 +1,11 @@
+# 问渠质量 ERP（WenQuest Ops，另一个仓库 wenquest-ops 的 ADR-0024）：装在本服务器 /opt/wenquest/qms，compose 项目 qms，
+# 对外的容器 qms-demo-edge 接在外部网络 qms-edge 上、只在容器内监听 80，按访问的域名分给中枢和 ERPNext。
+# 两个网址都转给它：qms.<主域名>（WenQuest Ops）和 qms-erp.<主域名>（ERPNext，中枢的“打开 ERPNext”和单点登录要用）。
+# 约定见 docs/帮助/国内服务器加模块（质量ERP等）.md。备案号下来、域名解析到本服务器之前，证书办不下来，外人打不开。
+qms.{$SITE_DOMAIN}, qms-erp.{$SITE_DOMAIN} {
+	encode gzip
+	request_body {
+		max_size 100MB
+	}
+	reverse_proxy qms-demo-edge:80
+}

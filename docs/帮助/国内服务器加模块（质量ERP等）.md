@@ -48,4 +48,5 @@
 1. 模块那边：按上面写好它的国内部署步骤（复制镜像 → 传 compose 文件到 `/opt/qms` → `docker compose up -d`）。
 2. Eddie：生成模块专用的 SSH 钥匙，填进模块仓库的 Secrets。
 3. 问渠主仓库这边：加 `deploy/caddy-extra/cn/qms.caddy`（`qms.<主域名>` → `qms-demo-edge:80`）。
+   - **已加（2026-10-30）**：质量 ERP 第一次部署成功后（wenquest-ops 的 ADR-0024，装在 `/opt/wenquest/qms`，因为 deploy 用户不能建 `/opt/qms`），`qms.caddy` 转两个名字：`qms.<主域名>`（WenQuest Ops）和 `qms-erp.<主域名>`（ERPNext），都给 `qms-demo-edge:80`。
 4. 备案号下来、域名解析后，`https://qms.<主域名>` 就能访问。

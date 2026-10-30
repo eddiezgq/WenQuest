@@ -1,1 +1,1 @@
-# 国内服务器（WQ_REGION=cn）上没有额外的站点。需要时在这个目录加 <名称>.caddy。
+# 国内服务器（WQ_REGION=cn）上的额外站点：每个 <名称>.caddy 一个模块。现有：qms.caddy（问渠质量 ERP）。
