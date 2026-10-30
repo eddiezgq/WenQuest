@@ -236,8 +236,8 @@ jobs:
             fi
             park=""; extra=""
             if grep -q "park: true" factory/deploy/classes.yaml && { [ -z "$changed" ] || echo "$changed" | grep -qE \
-                "hub/(park|supply|supply_api|finance|mrp)\.py|bridge/|plants/wenquest-|deploy/classes|tests/plant_loop\.py|workflows/factory\.yml"; }; then
-              park="--park-hub http://localhost:8100"
+                "hub/(park|supply|supply_api|finance|mrp|lab27)\.py|bridge/|plants/wenquest-|deploy/classes|tests/plant_loop\.py|workflows/factory\.yml"; }; then
+              park="--park-hub http://localhost:8100 --lab27"
             fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE \
                 "sim/(calib|errors|engine)\.py|hub/lab26\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
@@ -249,7 +249,7 @@ jobs:
             if grep -q "^$id	" "$FACTORY_DIR/classes.plants"; then
               python tests/plant_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
                 --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-                --item WQ-AGV300 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $extra $park \
+                --item WQ-AGV300:2 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $extra $park \
                 2>&1 | tee /tmp/logs/class_loop.log
             else
               python tests/closed_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
