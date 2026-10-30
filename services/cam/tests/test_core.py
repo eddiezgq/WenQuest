@@ -349,6 +349,6 @@ def test_examples_run():
         if d.get("kind") == "system" or f.name.endswith(".cae.json"):
             continue  # a cam system (tests/test_system.py)
         res[f.stem] = analyse(d)
-    assert set(res) == {"packaging-plate", "sewing-feed", "sewing-takeup-groove"}
+    assert set(res) == {"packaging-plate", "sewing-feed", "sewing-takeup-groove", "barrel-feed", "barrel-fork"}
     assert {c["id"]: c["status"] for c in res["sewing-feed"]["checks"]}["jump"] == "fail"
     assert all({c["id"]: c["status"] for c in r["checks"]}["stress"] == "unknown" for r in res.values())

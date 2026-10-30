@@ -10,7 +10,8 @@ c = client = TestClient(app)
 
 def test_examples_and_laws():
     ex = c.get("/api/examples").json()
-    assert {e["id"] for e in ex} == {"packaging-plate", "sewing-feed", "sewing-takeup-groove", "atc-globoidal"}
+    assert {e["id"] for e in ex} == {"packaging-plate", "sewing-feed", "sewing-takeup-groove", "atc-globoidal",
+                                     "barrel-feed", "barrel-fork"}
     assert {e["id"]: e["kind"] for e in ex}["atc-globoidal"] == "system"
     assert ex[0]["title"]["zh"].startswith("示例")
     assert c.get("/api/examples/../app").status_code == 404

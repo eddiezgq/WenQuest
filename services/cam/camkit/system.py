@@ -8,8 +8,8 @@ A system (dict):
                   "stop_deg": braking angle},
      "drive": {"ratio": motor turns per camshaft turn, "eta": efficiency 0–1, "J_motor": kg·m² (motor side),
                "rated_Nm", "peak_Nm", "max_rpm": the motor's ratings (optional; empty = unknown)},
-     "cams": [{"id", "name": {zh, en}, "type": "globoidal" | "disk", "program": {...},
-               "globoidal": {...} | "mechanism": {...}, "material": {...}, "limits": {...},
+     "cams": [{"id", "name": {zh, en}, "type": "globoidal" | "disk" | "cylindrical", "program": {...},
+               "globoidal": {...} | "mechanism": {...} | "cylindrical": {...}, "material": {...}, "limits": {...},
                "output": {"J": kg·m² about the output axis (rotating) or "m": kg (translating),
                           "load": N·m or N (steady, against the motion), "radius": mm (lever / fork radius that turns
                           the output angle into a stroke, for reporting), "tip": mm (radius of the point whose
@@ -308,12 +308,19 @@ def _cam_checks(c: dict, prog: Program, cs: dict, o: dict, quick: bool = False) 
         return r
     sub = {"program": c.get("program"), "mechanism": c.get("mechanism"), "material": c.get("material"),
            "limits": c.get("limits"), "loads": {"rpm": rpm}}
+    if c.get("type") == "cylindrical":  # round 39 step 8
+        sub = {"type": "cylindrical", "program": c.get("program"), "cylindrical": c.get("cylindrical"),
+               "material": c.get("material"), "limits": c.get("limits"), "loads": {"rpm": rpm}}
     if prog.unit == "rad":
         sub["loads"]["inertia"] = o["inertia"]
         sub["loads"]["load"] = o["load"] * 1e3  # N·m → N·mm
     else:
         sub["loads"]["mass"] = o["inertia"]
         sub["loads"]["load"] = o["load"]
+    if sub.get("type") == "cylindrical":
+        from camkit import cylindrical as CY
+
+        return CY.analyse(sub, m=720 if quick else 1440, undercut_check=not quick)
     return A.analyse(sub, n=720 if quick else 1440, out_n=361)
 
 

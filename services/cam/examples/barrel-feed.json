@@ -1,0 +1,58 @@
+{
+ "title": {
+  "zh": "示例：自动机送料圆柱凸轮（直动、锥形滚子，参数为虚构）",
+  "en": "Example: automatic machine feed barrel cam (translating, tapered roller; fictional numbers)"
+ },
+ "type": "cylindrical",
+ "program": {
+  "unit": "mm",
+  "segments": [
+   {
+    "kind": "rise",
+    "deg": 150,
+    "h": 60,
+    "law": "mod_sine"
+   },
+   {
+    "kind": "dwell",
+    "deg": 40
+   },
+   {
+    "kind": "return",
+    "deg": 130,
+    "h": 60,
+    "law": "mod_sine"
+   },
+   {
+    "kind": "dwell",
+    "deg": 40
+   }
+  ]
+ },
+ "cylindrical": {
+  "follower": "translating",
+  "roller": "cone",
+  "Rp": 75,
+  "rr": 12,
+  "b": 16,
+  "gap": 0.05,
+  "bottom": 1.5,
+  "length": 130,
+  "sigma": 1
+ },
+ "loads": {
+  "rpm": 120,
+  "mass": 3.5,
+  "load": 120
+ },
+ "material": {
+  "E1": 206000,
+  "nu1": 0.3,
+  "E2": 206000,
+  "nu2": 0.3
+ },
+ "limits": {
+  "phi_rise_deg": 35,
+  "phi_return_deg": 35
+ }
+}
