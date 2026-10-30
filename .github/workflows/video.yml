@@ -1,7 +1,7 @@
 # 公开课视频（第 22 轮）：手动触发。讲稿在 docs/课程视频/<课>/<节>/讲稿.yaml，工具在 tools/video/。
 #   task = audition：用 Eddie 的样音在租用的 GPU 上试合成同一段中英文（Fun-CosyVoice3 与 CosyVoice2 各一份），供试听选定
 #   task = render  ：做成片（中英两版，字幕、封面、上传资料）。voice = kokoro（开源占位声音）或 clone（Eddie 本人声音，先在 GPU 上合成）
-# 结果在本次运行页面的 Artifacts 里下载（保留 14 天）。upload = youtube 时英文版私密上传到 YouTube（要 YT_* 三个密钥）；
+# 结果在本次运行页面的 Artifacts 里下载（保留 14 天）。upload = youtube 时中文版、英文版都私密上传到 YouTube（要 YT_* 三个密钥）；
 # B 站开放平台批下来之前，中文版由 Eddie 从 Artifacts 下载后自己上传。
 # 需要的仓库密钥：VOICE_KEY（样音密码）；clone 和 audition 还要 LAMBDA_KEY、LAMBDA_SSH_KEY_NAME、LAMBDA_SSH_PRIVATE_KEY（与 GPU 实测相同）。
 name: Lecture videos 公开课视频
@@ -28,7 +28,7 @@ on:
         options: [cv2, cv3]
         default: cv2
       upload:
-        description: "做完后上传：none（只出文件）或 youtube（英文版私密上传到 YouTube）"
+        description: "做完后上传：none（只出文件）或 youtube（中文版、英文版都私密上传到 YouTube）"
         type: choice
         options: [none, youtube]
         default: none
@@ -240,14 +240,14 @@ jobs:
         with:
           name: videos
           path: ${{ runner.temp }}/videos
-      - name: Upload the English versions to YouTube (private until Eddie publishes)
+      - name: Upload the Chinese and English versions to YouTube (private until Eddie publishes)
         env:
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
         run: |
           pip install -q google-api-python-client google-auth
-          for d in "$RUNNER_TEMP"/videos/*/en; do python tools/video/upload_youtube.py "$d" --privacy private; done
+          for d in "$RUNNER_TEMP"/videos/*/en "$RUNNER_TEMP"/videos/*/zh; do [ -f "$d/upload.json" ] || continue; python tools/video/upload_youtube.py "$d" --privacy private; done
 
   release:
     if: inputs.task == 'release' && inputs.run != ''
