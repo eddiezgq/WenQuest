@@ -51,7 +51,5 @@ teaching:
   - 实验 29.2 仿真与现实
   - 数字工厂实验 24、26、28
 factory:
-  erp_items:
-  - item_code: WQ-CR5
-    size: default
+  erp_items: []          # 机器人厂的物料在清单里指到零件库：factory/plants/wenquest-robot.yaml 的 WQ-CR5 写了 library: B-ARM-WQCR5/default
   suppliers: []
