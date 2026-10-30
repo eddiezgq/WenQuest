@@ -21,7 +21,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Annotated, Any
 
-from fastapi import Depends
+from fastapi import Depends, Header, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -71,6 +71,20 @@ def register(app, m) -> None:
         finally:
             c.close()
 
+    async def who(req: Request, authorization: Annotated[str | None, Header()] = None) -> dict:
+        """开通记录；没登记名字的（如管理员）用本人 Moodle 资料里的姓名，让历史版本、顶栏显示人名而不是编号。"""
+        lic = await m.sewing_who_web(req, authorization)
+        if (lic.get("name") or "").strip():
+            return lic
+        tok = authorization.split(" ", 1)[1].strip() if authorization and authorization.lower().startswith("bearer ") \
+            else req.cookies.get("wq_sso", "")
+        sess = state.codec.read(tok) if tok else None
+        try:
+            name = (await state.moodle.site_info(sess.moodle_token)).get("fullname") if sess else ""
+        except Exception:  # noqa: BLE001  (名字拿不到不影响保存)
+            name = ""
+        return {**lic, "name": name or ""}
+
     def me(lic: dict) -> tuple[str, int, str]:
         """(单位, 用户号, 显示的名字)"""
         return lic["org"], int(lic["user_id"]), (lic.get("name") or "").strip() or f"#{lic['user_id']}"
@@ -111,14 +125,14 @@ def register(app, m) -> None:
                              "updated": r["updated"], "updated_name": r["updated_name"], "updated_by": r["updated_by"]}, status_code=409)
 
     @app.get("/api/v1/cam/projects")
-    async def list_projects(lic: Annotated[dict, Depends(m.sewing_who_web)]):
+    async def list_projects(lic: Annotated[dict, Depends(who)]):
         org, _uid, name = me(lic)
         with db() as c:
             rs = c.execute("select * from projects where org=? and deleted=0 order by updated desc", (org,))
             return {"org": org, "me": name, "projects": [meta(r) for r in rs]}
 
     @app.post("/api/v1/cam/projects")
-    async def create(body: NewIn, lic: Annotated[dict, Depends(m.sewing_who_web)]):
+    async def create(body: NewIn, lic: Annotated[dict, Depends(who)]):
         org, uid, name = me(lic)
         text = body_text(body.body)
         now = int(time.time())
@@ -133,7 +147,7 @@ def register(app, m) -> None:
             return {**meta(own(c, pid, org)), "opened": 1, "history": history(c, pid)}
 
     @app.get("/api/v1/cam/projects/{pid}")
-    async def open_project(pid: int, lic: Annotated[dict, Depends(m.sewing_who_web)], version: int | None = None):
+    async def open_project(pid: int, lic: Annotated[dict, Depends(who)], version: int | None = None):
         org, _uid, _name = me(lic)
         with db() as c:
             r = own(c, pid, org)
@@ -144,7 +158,7 @@ def register(app, m) -> None:
             return {**meta(r), "opened": v, "body": json.loads(row["body"]), "history": history(c, pid)}
 
     @app.put("/api/v1/cam/projects/{pid}")
-    async def save(pid: int, body: SaveIn, lic: Annotated[dict, Depends(m.sewing_who_web)]):
+    async def save(pid: int, body: SaveIn, lic: Annotated[dict, Depends(who)]):
         org, uid, name = me(lic)
         text = body_text(body.body)
         with db() as c:
@@ -167,7 +181,7 @@ def register(app, m) -> None:
             return {**meta(r), "opened": r["version"], "history": history(c, pid)}
 
     @app.post("/api/v1/cam/projects/{pid}/restore")
-    async def restore(pid: int, body: RestoreIn, lic: Annotated[dict, Depends(m.sewing_who_web)]):
+    async def restore(pid: int, body: RestoreIn, lic: Annotated[dict, Depends(who)]):
         org, uid, name = me(lic)
         with db() as c:
             c.execute("begin immediate")
@@ -191,7 +205,7 @@ def register(app, m) -> None:
             return {**meta(r), "opened": r["version"], "body": json.loads(row["body"]), "history": history(c, pid)}
 
     @app.delete("/api/v1/cam/projects/{pid}")
-    async def remove(pid: int, lic: Annotated[dict, Depends(m.sewing_who_web)]):
+    async def remove(pid: int, lic: Annotated[dict, Depends(who)]):
         org, uid, name = me(lic)
         with db() as c:
             r = own(c, pid, org)

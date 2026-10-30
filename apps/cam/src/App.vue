@@ -17,6 +17,8 @@ import SystemWorkspace from './components/SystemWorkspace.vue'
 import System3D from './components/System3D.vue'
 import CaePanel from './components/CaePanel.vue'
 import SystemReport from './components/SystemReport.vue'
+import CloudPanel from './components/CloudPanel.vue'
+import { me, link, detach, loadMe, loginUrl } from './cloud'
 import { kind, system, openSystem, sysMode, analyseSystemSoon, loadExampleCae, sysResult } from './sysstore'
 
 const tab = ref('program')
@@ -27,6 +29,7 @@ const examples = ref([])
 const showReport = ref(false)
 const embed = new URLSearchParams(location.search).has('embed')
 const fileInput = ref(null)
+const showCloud = ref(false)
 
 let raf = 0, last = 0
 function loop(ts) {
@@ -42,12 +45,13 @@ async function openExample(id) {
   if (!id) return
   try {
     const p = await api('/examples/' + id)
+    detach()
     if (p.kind === 'system') { openSystem(p, id); return }
     kind.value = 'cam'
     replace(p); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
   } catch (e) { error.value = e }
 }
-function fresh() { kind.value = 'cam'; replace(blank()); mfgResult.value = null; measResult.value = null; compResult.value = null }
+function fresh() { detach(); kind.value = 'cam'; replace(blank()); mfgResult.value = null; measResult.value = null; compResult.value = null }
 const isSys = computed(() => kind.value === 'system' && system.cams)
 const modeList = computed(() => (isSys.value ? [['sys', 'modeSys'], ['sys3d', 'modeSys3d'], ['cae', 'modeCae']] : [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]))
 const curMode = computed({ get: () => (isSys.value ? sysMode.value : mode.value), set: (v) => { if (isSys.value) sysMode.value = v; else mode.value = v } })
@@ -64,6 +68,7 @@ async function openFile(e) {
   if (!f) return
   try {
     const p = JSON.parse(await f.text())
+    detach()
     if (p.kind === 'system') openSystem(p, p.example_id || '')
     else { kind.value = 'cam'; replace(p) }
   } catch { error.value = { message: 'not a project file', zh: '不是问渠凸轮的项目文件' } }
@@ -74,7 +79,18 @@ const titleText = computed({
   set: (v) => { if (isSys.value) system.title = { ...(system.title || {}), [lang.value]: v }; else project.title = { ...project.title, [lang.value]: v } },
 })
 
+// Cloud projects: what is open now, and how a project from the cloud is put into the editor.
+function work() {
+  return isSys.value ? { kind: 'system', body: JSON.parse(JSON.stringify(system)) } : { kind: 'cam', body: JSON.parse(JSON.stringify(project)) }
+}
+function loadWork(k, body) {
+  if (k === 'system' || body.kind === 'system') { openSystem(body, body.example_id || ''); return }
+  kind.value = 'cam'; replace(body); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
+}
+const linked = computed(() => (link.id ? t('cloudLinked').replace('{name}', link.name).replace('{v}', link.version) : ''))
+
 onMounted(async () => {
+  if (!embed) loadMe()
   await loadLaws()
   try { examples.value = await api('/examples') } catch { examples.value = [] }
   const ex = new URLSearchParams(location.search).get('example')
@@ -89,6 +105,7 @@ onMounted(async () => {
   <SystemReport v-if="showReport && isSys" @close="showReport = false" />
   <Report v-else-if="showReport" @close="showReport = false" />
   <div v-else class="shell" :class="{ embed }">
+    <CloudPanel v-if="showCloud" :work="work" :load="loadWork" :name="titleText" @close="showCloud = false" />
     <header class="top">
       <a class="brand" :href="embed ? '/cam/' : '/cases/cam.html'" :target="embed ? '_blank' : null" rel="noopener"><b>{{ t('app') }}</b><small>{{ t('tagline') }}</small></a>
       <input v-if="!embed" v-model="titleText" class="title" :aria-label="t('title')">
@@ -105,8 +122,11 @@ onMounted(async () => {
           <button type="button" class="dark" @click="fileInput.click()">{{ t('open') }}</button>
           <input ref="fileInput" type="file" accept=".json,application/json" hidden @change="openFile">
           <button type="button" class="dark" @click="saveFile">{{ t('save') }}</button>
+          <button type="button" class="dark cloud-btn" :class="{ linked: link.id }" :title="linked || t('cloud')" @click="showCloud = true">{{ t('cloud') }}</button>
           <button type="button" class="accent" :disabled="isSys ? !sysResult : !result" @click="showReport = true">{{ t('report') }}</button>
         </template>
+        <span v-if="!embed && me?.login" class="who" :title="me.org">{{ me.name || '…' }}<small v-if="me.org">{{ me.org }}</small></span>
+        <a v-else-if="!embed && me && me.reachable" class="who in" :href="loginUrl()">{{ t('signIn') }}</a>
         <button type="button" class="dark lang" @click="setLang(lang === 'zh' ? 'en' : 'zh')">{{ lang === 'zh' ? 'EN' : '中' }}</button>
       </div>
     </header>
@@ -128,7 +148,7 @@ onMounted(async () => {
           <ProgramEditor v-if="tab === 'program'" />
           <Fields v-else :part="tab" />
         </div>
-        <p class="saved">{{ t('savedLocal') }}</p>
+        <p class="saved">{{ linked || t('savedLocal') }}</p>
       </aside>
 
       <section class="stage">

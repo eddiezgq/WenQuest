@@ -237,8 +237,14 @@ def register(app, m) -> None:
             return {"login": False, "licensed": False, "org": "", "user_id": None, "name": ""}
         admin = await m.accounts_is_admin(sess)
         lic = license_of(sess.user_id)
+        name = (lic or {}).get("name") or ""
+        if not name:                                  # 第 39 轮第 7 步：凸轮顶栏显示登录名
+            try:
+                name = (await state.moodle.site_info(sess.moodle_token)).get("fullname") or ""
+            except Exception:  # noqa: BLE001
+                name = ""
         return {"login": True, "licensed": bool(lic) or admin, "org": (lic or {}).get("org") or ("问渠" if admin else ""),
-                "user_id": sess.user_id, "name": (lic or {}).get("name") or ""}
+                "user_id": sess.user_id, "name": name}
 
     # ---------- 机型项目（已开通） ----------
     def row(r) -> dict:

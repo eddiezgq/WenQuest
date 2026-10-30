@@ -46,6 +46,7 @@ def test_share_versions_conflicts_and_isolation(sc):  # noqa: F811
     # 管理员先存（第 2 版）；张工手里还是第 1 版，再存被拦下，告诉他谁、第几版
     r = c.put(f"/api/v1/cam/projects/{q['id']}", json={"body": {"cams": [1]}, "base": 1}, headers=admin)
     assert r.status_code == 200 and r.json()["version"] == 2
+    assert r.json()["updated_name"] and not r.json()["updated_name"].startswith("#")   # 管理员没登记名字：用 Moodle 姓名
     r = c.put(f"/api/v1/cam/projects/{q['id']}", json={"body": {"cams": [2]}, "base": 1}, headers=s)
     assert r.status_code == 409
     cf = r.json()
