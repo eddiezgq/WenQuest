@@ -1,0 +1,25 @@
+# 实验 29.2 的指导书与报告模板。目的、场景、参数、任务取自 lab29_2.js。
+原理:
+  - ["单关节的位置伺服 Iθ̈ = −kp θ(t − T) − kv θ̇(t − T)：延迟不改变开环的幅频特性，只让相位多滞后 ωT。开环增益在穿越频率 ω_c 处等于 1，延迟吃掉的相位达到相位裕度 φ_m 时失稳：", "A joint's position servo Iθ̈ = −kp θ(t − T) − kv θ̇(t − T): a delay leaves the open-loop gain unchanged but adds a phase lag ωT. The loop goes unstable when the lag at the crossover frequency ω_c uses up the phase margin φ_m:"]
+  - 式: "T* = φ_m / ω_c"
+  - ["控制周期 T_c 的零阶保持相当于又加了约半个周期的延迟。增益越高，ω_c 越高，能容忍的延迟越短；惯量小的腕关节最危险。", "The zero-order hold of a control period T_c adds roughly half a period of delay. Higher gains raise ω_c and shorten the tolerable delay; the light wrist joints are the most sensitive."]
+  - ["控制器 B 用零件库的名义模型算逆动力学作前馈，PD 只管剩下的误差：kp = M_ii ω_n²，kv = 2ω_n M_ii（ζ = 1）。现场的负载、摩擦与名义值不同，延迟和控制周期也在回路里；“随机一台”按机器人厂关节测试台的散布抽摩擦，负载在名义值的 ±30% 内、延迟在 0～3 ms 内。", "Controller B feeds forward the inverse dynamics of the library's nominal model and leaves only the residual to a PD: kp = M_ii ω_n², kv = 2ω_n M_ii (ζ = 1). In the field the payload and friction differ from nominal and delays and the control period are in the loop; “Draw a robot” draws the friction from the robot factory's joint-test-bench spread, the payload within ±30 % and the delay within 0–3 ms."]
+步骤:
+  - ["名义条件（负载、摩擦倍数 1，延迟 0，控制周期 2 ms）：控制器 A、B 各跑一遍标准动作，读出 TCP 的最大误差（任务 1、2），填入表 1。", "Nominal conditions (payload and friction factors 1, no delay, 2 ms period): run the standard motion with A and with B and record the largest TCP error (tasks 1 and 2) in Table 1."]
+  - ["用 B（ω_n = 25 rad/s）：延迟取 1、2、3、4 ms，负载倍数取 0.7、1.3，摩擦倍数取 0.5、1.5，各跑一遍，填入表 1（任务 3）。", "With B (ω_n = 25 rad/s) try delays of 1, 2, 3 and 4 ms, payload factors 0.7 and 1.3 and friction factors 0.5 and 1.5, filling Table 1 (task 3)."]
+  - ["ω_n 改为 50、80、120 rad/s，延迟从 0 起每次加 0.5 ms，找出开始振荡的延迟，填入表 2（任务 4）。", "Set ω_n to 50, 80 and 120 rad/s and raise the delay from 0 in 0.5 ms steps to find where it starts to oscillate, in Table 2 (task 4)."]
+  - ["回到 B（ω_n = 25 rad/s），按“随机一台”再按“开始”，连续抽 5 台，记下每台的误差和是否振荡（任务 5）；再用 ω_n = 80 rad/s 抽 5 台比较。", "Back to B (ω_n = 25 rad/s): press “Draw a robot” and then Start, five times, recording each robot's error and whether it oscillates (task 5); then draw five with ω_n = 80 rad/s for comparison."]
+数据表:
+  - 标题: ["表 1  标准动作的 TCP 最大误差", "Table 1  Largest TCP error over the standard motion"]
+    表头: ["控制器", "负载倍数", "摩擦倍数", "延迟 / ms", "TCP 最大误差 / mm", "振荡？"]
+    表头英文: ["Controller", "Payload factor", "Friction factor", "Delay / ms", "Largest TCP error / mm", "Oscillating?"]
+    行: [["A", "1", "1", "0", "", ""], ["B", "1", "1", "0", "", ""], ["B", "1", "1", "3", "", ""], ["B", "0.7", "1", "0", "", ""], ["B", "1.3", "1", "0", "", ""], ["B", "1", "1.5", "0", "", ""]]
+  - 标题: ["表 2  B 的固有频率与开始振荡的延迟", "Table 2  B's natural frequency and the delay at which it starts to oscillate"]
+    表头: ["ω_n / (rad/s)", "名义误差 / mm", "开始振荡的延迟 / ms"]
+    表头英文: ["ω_n / (rad/s)", "Nominal error / mm", "Delay at onset of oscillation / ms"]
+    行: [["25", "", ""], ["50", "", ""], ["80", "", ""], ["120", "", ""]]
+注意:
+  - ["本页每帧推进 0.2 s 的仿真（400 步），一遍标准动作 4.8 s；随机抽的那一台只用一次，再按“开始”回到滑块的设置。", "The page advances 0.2 s of simulation (400 steps) per frame, 4.8 s for one standard motion; a robot drawn at random is used once, and the next Start uses the sliders again."]
+  - ["这里只有关节的库仑、黏性摩擦和负载、延迟的差别；真机还有背隙、柔度、电机电流环等，误差会更大。", "Only joint Coulomb and viscous friction, payload and delay differ here; a real robot also has backlash, compliance and current loops, and its errors are larger."]
+思考题:
+  - ["机器人厂关节测试台的摩擦数据只有出厂时的一次测量。机器人用了一年，减速器磨合、润滑脂变化，摩擦会变。你会怎样让仿真里的随机化范围跟上？", "The joint test bench measures friction once, at the factory. After a year in service the gearboxes run in and the grease changes. How would you keep the simulation's randomisation range up to date?"]

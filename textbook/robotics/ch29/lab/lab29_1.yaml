@@ -1,0 +1,25 @@
+# 实验 29.1 的指导书与报告模板。目的、场景、参数、任务取自 lab29_1.js。
+原理:
+  - ["关节的位置伺服在目标附近线性化就是一个弹簧-阻尼器（式 (29.3.1)）。MuJoCo 的 Euler 是半隐式欧拉法：先用当前加速度更新速度，再用新速度更新位置（式 (29.3.2)）。执行器的 kv 产生的阻尼力用当前速度显式计算，稳定条件是：", "A joint's position servo linearised about its target is a spring-damper (Eq. 29.3.1). MuJoCo's Euler is the semi-implicit Euler method: velocity first from the current acceleration, then position from the new velocity (Eq. 29.3.2). The damping force from the actuator's kv uses the current velocity explicitly, and the stability condition is:"]
+  - 式: "(hω)² + 2hc ≤ 4，ω² = kp/I，c = kv/I"
+  - ["阻尼越大，允许的步长反而越小；阻尼很大时 h ≤ 1/c。把阻尼隐式处理（implicitfast，或把阻尼写在关节的 damping 上），条件变成 (hω)² ≤ 4 + 2hc，阻尼越大越稳。整台机器人的步长上限由最快的模态决定：WQ-CR5 的腕关节 J6 惯量小（八成是电机转子），c = kv/I 约 1000 s⁻¹。", "The more damping, the smaller the allowed step; with heavy damping h ≤ 1/c. With implicit damping (implicitfast, or damping written on the joint) the condition becomes (hω)² ≤ 4 + 2hc and more damping only helps. The whole robot's limit is set by its fastest mode: the WQ-CR5's wrist joint J6 is light (four fifths of it is the motor rotor) and c = kv/I is about 1000 s⁻¹."]
+  - ["没有控制的多体系统，Euler 的能量会线性漂移（质量矩阵随姿态变化时半隐式欧拉法不再是辛方法）；RK4 的误差约与 h⁴ 成正比。", "In an uncontrolled multibody system Euler's energy drifts linearly (the semi-implicit Euler method is no longer symplectic when the mass matrix depends on the configuration); RK4's error scales roughly with h⁴."]
+步骤:
+  - ["场景“荡秋千”，连杆数 2，Euler，h = 2 ms，按“开始”，跑满 20 s，读出能量的增加量（任务 1），填入表 1。", "Scene “A swing”, two links, Euler, h = 2 ms: press Start, run the full 20 s and record the energy gain (task 1) in Table 1."]
+  - ["h 改为 1 ms、0.5 ms 各跑一次（任务 2），再换成 implicit、RK4（任务 3），填入表 1；连杆数改为 1（单摆）再做一遍 Euler，比较。", "Repeat with h = 1 ms and 0.5 ms (task 2), then with implicit and RK4 (task 3), filling Table 1; then set one link (a pendulum) and repeat Euler for comparison."]
+  - ["场景“WQ-CR5 的手腕”，Euler，h 从 1.5 ms 起每次加 0.2 ms，读出最后 1 s 关节速度的幅值和判断，填入表 2，找出开始振荡的步长（任务 4、5）。", "Scene “The WQ-CR5's wrist”, Euler: starting from h = 1.5 ms add 0.2 ms each time, record the joint-speed amplitude and the verdict in Table 2, and find where it starts to oscillate (tasks 4 and 5)."]
+  - ["同样的步长换成 RK4、implicitfast，填入表 2；implicitfast 取 3 ms、5 ms、8 ms（任务 6）。", "Repeat the same steps with RK4 and implicitfast in Table 2; with implicitfast try 3, 5 and 8 ms (task 6)."]
+数据表:
+  - 标题: ["表 1  两连杆臂 20 s 后的能量误差", "Table 1  Energy error of the two-link arm after 20 s"]
+    表头: ["积分方法", "h / ms", "ΔE（20 s 时）/ J", "|ΔE| 最大 / J"]
+    表头英文: ["Integrator", "h / ms", "ΔE at 20 s / J", "Largest |ΔE| / J"]
+    行: [["Euler", "2", "", ""], ["Euler", "1", "", ""], ["Euler", "0.5", "", ""], ["implicit", "1", "", ""], ["RK4", "2", "", ""], ["RK4", "1", "", ""]]
+  - 标题: ["表 2  WQ-CR5 出厂位置环：最后 1 s 关节速度的幅值", "Table 2  WQ-CR5 stock position loop: joint-speed amplitude in the last 1 s"]
+    表头: ["h / ms", "Euler / (rad/s)", "RK4 / (rad/s)", "implicitfast / (rad/s)"]
+    表头英文: ["h / ms", "Euler / (rad/s)", "RK4 / (rad/s)", "implicitfast / (rad/s)"]
+    行: [["1.5", "", "", ""], ["1.8", "", "", ""], ["2.0", "", "", ""], ["2.2", "", "", ""], ["2.5", "", "", ""], ["3.0", "", "", ""], ["5.0", "", "", ""]]
+注意:
+  - ["“稳定”时最后 1 s 仍有约 0.002 rad/s 的残余速度：慢模态还在收敛，不是不稳定。", "Even when stable about 0.002 rad/s remains in the last second: the slow mode is still settling, not unstable."]
+  - ["场景 2 本页比实时快 5 倍；步长很小时每帧要算很多步，慢的电脑会比实时慢。", "Scene 2 runs five times faster than real time; with very small steps each frame needs many steps and a slow computer falls behind."]
+思考题:
+  - ["为什么把执行器的 kv 挪到关节的 damping 上，Euler 取 10 ms 也稳定？这样改变了模型的物理意义吗？", "Why does moving the actuator's kv onto the joint's damping make Euler stable even at 10 ms? Does it change the model's physics?"]
