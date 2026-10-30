@@ -1,0 +1,137 @@
+# 《缝纫机设计与制造》公开课 第 21 讲：电子花样机与电脑横机电控原型
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch21.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 21-1（缩比横机原型）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch21.py 算出（{{ch21.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "21"
+deck: ch21
+skip: [3, 5, 6, 12, 13, 19, 20, 22, 23]   # 两台原型总述、花样机结构、丝杠与同步带、预测角插补、同步验证、单针放大、误差带动画、产量、两速扫描：课程部分约 10 分钟；这几页留给课件
+code: [ch21]
+title: ["电子花样机与电脑横机电控原型——动作落进位置窗口", "Pattern Sewer and Flat-Knitting Control Prototypes — Landing Every Action in a Position Window"]
+chapter: ["第六篇 电控原型机开发与自动化测试 · 第 21 章", "Part VI Control Prototyping and Automated Testing · Chapter 21"]
+next: ["第 22 讲", "Lecture 22"]
+cover_formula: 'x_{cmd} = x_i - v\,(T_r + T_q/2)'
+tags:
+  zh: [电子花样机, 电脑横机, 时序预算, X–Y 平台, 滚珠丝杠, S 形加减速, rms 转矩, 前瞻限速, 选针器, 提前量, FPGA, 缝纫机设计]
+  en: [pattern sewer, flat-knitting machine, timing budget, X–Y table, ball screw, S-curve motion, rms torque, look-ahead, needle selector, trigger lead, FPGA, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十一讲，电子花样机与电脑横机电控原型。
+    - 今天两台原型：花样机从窗口算到电机，横机从提前量算到机头最高速度。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 21, control prototypes of the pattern sewer and the flat-knitting machine.
+    - Two prototypes today. For the pattern sewer we work from the window to the motor; for the knitting machine, from the lead to the carriage's top speed.
+
+after:
+  - id: lab211
+    kind: lab
+    lab: proto-fk
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.7'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#kpi,#tasks{filter:blur(7px) grayscale(1)}#checks{filter:blur(7px)}'; document.head.appendChild(st); const s = document.getElementById('slow'); s.value = '5'; s.dispatchEvent(new Event('change', {bubbles: true})); })()"
+      - press: "#play"
+        dur: 1
+      - sweep: {vmax: [0.6, 1.0]}
+        dur: 8
+      - press: "#tofpga"
+        sweep: {vmax: [1.0, 2.0]}
+        dur: 8
+      - press: "#stat"
+      - js: "(() => { const v = document.getElementById('vmax'); v.value = 1; v.dispatchEvent(new Event('input', {bubbles: true})); const e = document.getElementById('E'); e.value = '7'; e.dispatchEvent(new Event('change', {bubbles: true})); const m = document.getElementById('mode'); m.value = 'fixed'; m.dispatchEvent(new Event('change', {bubbles: true})); })()"
+        sweep: {Lf: [0.5, 1.5]}
+        dur: 8
+      - sweep: {c: [40, 50]}
+        dur: 5
+    say:
+      zh:
+        - ">下面是虚拟实验 21-1，缩比横机原型，在问渠平台上可以亲手做。右边的判据、几项读数和任务先遮住，留给你自己读。左上是针床和机头，中间是每枚针的选针误差，下面是放大的一枚针。"
+        - ">先按“织一行”，看机头加速、匀速、减速，选针点一枚针一枚针地作决定，误差图跟着画出来。"
+        - ">任务一：标准参数下，把机头最高速度从 0.6 往上提，看误差带什么时候冲出绿色的验收带。满足验收的最高速度是多少，先用公式估一估，再在实验里找准。"
+        - ">任务二：点“改用 FPGA”，逐计数触发，再往上提速度。量化几乎没有了，上限由什么决定、每小时能多织多少行，自己比较。"
+        - ">点“统计 1000 行”，看错选和超出验收的针各有多少，分清这两条判据。"
+        - ">任务三：换成更细的 E7 针床，仍用 FPGA，机头速度 1 米每秒，提前量改成固定值，再拖固定提前量，找它的最佳值。固定提前量只在一种速度下准，加减速段的针最容易出错。"
+        - ">再调换向余量，让机头在第一枚针之前就跑到匀速，直到 60 针全部合格。指导书和报告模板在平台上下载。"
+      en:
+        - ">Now Virtual lab 21-1, the scaled knitting prototype, which you can do yourself on WenQuest. The checks, a few readouts and the tasks are blurred; they're for you to work out in the lab. Top left are the needle bed and carriage, in the middle the selection error of every needle, and below a zoom on one needle."
+        - ">Press Knit one course first. The carriage accelerates, cruises and slows, the selection point decides needle by needle, and the error chart fills in."
+        - ">Task one: with standard settings, raise the top speed from 0.6 and watch when the error band breaks out of the green acceptance band. What's the highest speed that still passes? Estimate it from the formula first, then pin it down in the lab."
+        - ">Task two: press Switch to FPGA, firing at every count, and raise the speed again. Quantisation almost disappears. What sets the limit now, and how many more courses an hour do you get? Compare for yourself."
+        - ">Press Run 1000 courses, and count the mis-selected needles and those outside acceptance. Keep the two criteria apart."
+        - ">Task three: change to the finer E7 bed, still with the FPGA, at 1 metre per second, and switch to a fixed lead, then drag the fixed lead to find its best value. A fixed lead is right at only one speed, so needles on the ramps go wrong first."
+        - ">Then adjust the reversal margin so the carriage reaches cruising speed before the first needle, until all 60 needles pass. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 21-1，可以自己动手", "Interactive slides and Lab 21-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和缩比横机原型，都可以自己打开动手做，视频里跳过的几页也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the knitting prototype and work them yourself, including the pages this video skipped."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 21：花样机与缩比横机的时序预算", "Assignment 21: timing budgets for both prototypes"]
+      points:
+        - ["布加模板 3 mm：各针距沿 X、Y 的转速上限", "3 mm fabric and template: speed limits along X and Y"]
+        - ["Y 轴也用 50 m/s²：400 W 电机还行吗", "Y at 50 m/s² too: is the 400 W motor still enough?"]
+        - ["E6 横机：MCU、FPGA 的最高速度 · 急停距离", "E6 knitter: MCU and FPGA top speeds · stopping distance"]
+      foot: ["不超过 4 页的计算书，附实验 21-1 截图，在问渠学习平台提交。", "A calculation report of at most 4 pages with Lab 21-1 screenshots, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，布加下模板厚 3 毫米，几何窗口变成 192.6 度，两端仍各留 10 度，算出 2、3、4 毫米针距沿 X、沿 Y 的转速上限，看 3 毫米的针沿 X 还能不能到 1600 转，前瞻怎样处理沿 Y 的针。"
+        - ">第二题，12 公斤的 Y 轴也想用 50 米每二次方秒，算峰值转矩和最坏的均方根转矩，判断 400 瓦电机能不能用，至少给出两种改法和各自的代价。"
+        - ">第三题，横机改成 E6，针距 4.23 毫米，算 MCU 1 毫秒、0.5 毫秒和 FPGA 三种方案的最高机头速度，在虚拟实验里核对，再选一个方案。第四题，急停按 20 米每二次方秒，算 0.6、1.0、1.66 米每秒的制动距离，限位开关该装多远。"
+        - 报告在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: fabric plus template is now 3 millimetres thick, so the geometric window becomes 192.6 degrees, still with 10 at each end. Find the speed limits for 2, 3 and 4 millimetre stitches along X and along Y, decide whether 3 millimetres along X still reaches 1600, and explain how look-ahead handles the Y stitches."
+        - ">Two: the 12 kilogram Y axis should also run at 50 metres per second squared. Find the peak and the worst-case rms torque, decide whether the 400 watt motor will do, and give at least two remedies with their costs."
+        - ">Three: the knitter becomes E6, a 4.23 millimetre pitch. Find the top carriage speed with a 1 millisecond MCU, a 0.5 millisecond MCU and an FPGA, check them in the virtual lab, and choose one. Four: with a 20 metres per second squared emergency stop, find the braking distance from 0.6, 1.0 and 1.66 metres per second, and where the limit switches should go."
+        - Submit the report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["2000 r/min：模板走一针有几毫秒？", "At 2000 r/min: how many ms per stitch?"]
+        - ["出错针号除以 8 余数总相同：为什么？", "Errors always on the same needle mod 8: why?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：实用窗口 183.4 度，主轴每分钟 2000 转，模板走一针可用的时间是多少毫秒？"
+        - ">再比如：横机样片上出错的针号除以 8，余数总是相同，最可能的原因是什么？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, with a usable window of 183.4 degrees and the spindle at 2000 r/min, how many milliseconds does the template have for one stitch?"
+        - ">Or, on a knitted sample, the needle numbers that go wrong always leave the same remainder when divided by 8. What's the most likely cause?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 今天算出的转速上限和速度上限，下一讲就要变成自动化测试的期望值。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "The speed limits we worked out today become the expected values of next lecture's automated tests. See you then."
