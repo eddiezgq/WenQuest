@@ -1,0 +1,360 @@
+1
+00:00:00,300 --> 00:00:01,580
+八千个红绿灯，
+Eight thousand traffic lights.
+
+2
+00:00:01,580 --> 00:00:03,710
+北京让它们全部联了网。
+Beijing has networked all of them.
+
+3
+00:00:03,710 --> 00:00:05,640
+现在AI开始管红绿灯，
+Now AI is running the lights.
+
+4
+00:00:05,640 --> 00:00:07,680
+有的路口车速提了两成。
+Some junctions got about twenty percent faster.
+
+5
+00:00:07,680 --> 00:00:09,110
+今天的烧脑问题：
+Today's brain teaser:
+
+6
+00:00:09,110 --> 00:00:11,190
+红绿灯怎么知道你要来？
+how does a traffic light know you're coming?
+
+7
+00:00:11,190 --> 00:00:12,630
+先说老式红绿灯：
+First, the old lights:
+
+8
+00:00:12,630 --> 00:00:15,280
+一天二十四小时，一个死节奏。
+one fixed rhythm, twenty four hours a day.
+
+9
+00:00:15,280 --> 00:00:16,720
+路上一辆车也好，
+One car or
+
+10
+00:00:16,720 --> 00:00:19,350
+一百辆车也好，红灯都那么长。
+a hundred cars, the red lasts just as long.
+
+11
+00:00:19,350 --> 00:00:21,470
+就像食堂只开一个窗口，
+Like a canteen with one window open,
+
+12
+00:00:21,470 --> 00:00:23,320
+队排多长都不加人。
+no matter how long the line gets.
+
+13
+00:00:23,320 --> 00:00:25,400
+于是有了你最熟悉的场景：
+So you get the classic scene:
+
+14
+00:00:25,400 --> 00:00:28,280
+空荡荡的路口，等一个超长的红灯。
+an empty junction, and a really long red.
+
+15
+00:00:28,280 --> 00:00:29,680
+秘密武器一：绿波。
+Secret weapon one: the green wave.
+
+16
+00:00:29,680 --> 00:00:31,670
+让一串红绿灯按顺序变绿。
+A row of lights turns green one after another.
+
+17
+00:00:31,670 --> 00:00:33,350
+就像体育场里的人浪，
+Like a stadium wave,
+
+18
+00:00:33,350 --> 00:00:34,970
+一个接一个站起来。
+people standing up one after another.
+
+19
+00:00:34,970 --> 00:00:37,090
+你踩着这道波浪的速度开，
+Drive at the speed of the wave,
+
+20
+00:00:37,090 --> 00:00:38,610
+就一路都是绿灯。
+and every light is green.
+
+21
+00:00:38,610 --> 00:00:40,920
+算笔账：两个路口相距五百米，
+Do the math: two junctions five hundred meters apart,
+
+22
+00:00:40,920 --> 00:00:42,690
+车速每小时五十公里。
+cars at fifty kilometers an hour.
+
+23
+00:00:42,690 --> 00:00:45,480
+五十公里每小时，大约每秒十四米，
+Fifty an hour is about fourteen meters a second,
+
+24
+00:00:45,480 --> 00:00:47,350
+五百米要开三十六秒。
+so five hundred meters takes thirty six seconds.
+
+25
+00:00:47,350 --> 00:00:48,710
+所以下一个路口，
+So the next light
+
+26
+00:00:48,710 --> 00:00:51,040
+要比上一个晚三十六秒变绿。
+turns green thirty six seconds later.
+
+27
+00:00:51,040 --> 00:00:51,820
+北京已经有
+Beijing already has
+
+28
+00:00:51,820 --> 00:00:53,490
+五百条这样的绿波路。
+five hundred green wave roads.
+
+29
+00:00:53,490 --> 00:00:55,380
+反转一：绿波怕堵车。
+Twist one: green waves hate traffic jams.
+
+30
+00:00:55,380 --> 00:00:57,770
+前面一排队，波浪就断了。
+A queue ahead breaks the wave.
+
+31
+00:00:57,770 --> 00:00:59,520
+堵车本身也是一种波，
+A traffic jam is a wave too,
+
+32
+00:00:59,520 --> 00:01:01,040
+而且是往后传的。
+and it travels backward.
+
+33
+00:01:01,040 --> 00:01:02,360
+前车一脚刹车，
+One driver taps the brakes,
+
+34
+00:01:02,360 --> 00:01:04,190
+后面一辆接一辆刹。
+and the cars behind brake one by one.
+
+35
+00:01:04,190 --> 00:01:06,450
+所以有时候前面根本没事故，
+That's why sometimes there's no accident at all,
+
+36
+00:01:06,450 --> 00:01:08,300
+你却莫名其妙地堵着。
+and you're still stuck.
+
+37
+00:01:08,300 --> 00:01:10,780
+秘密武器二：给路口装眼睛。
+Secret weapon two: give the junction eyes.
+
+38
+00:01:10,780 --> 00:01:13,950
+摄像头和雷达，数清每条车道的车。
+Cameras and radar count every lane.
+
+39
+00:01:13,950 --> 00:01:16,180
+系统把每辆车的轨迹拼起来，
+The system stitches every car's path together,
+
+40
+00:01:16,180 --> 00:01:18,370
+在电脑里造一个全息路口。
+into a digital twin of the junction.
+
+41
+00:01:18,370 --> 00:01:19,900
+然后大模型来排班：
+Then a big AI model makes the schedule:
+
+42
+00:01:19,900 --> 00:01:22,410
+五十秒内算出大约两百套方案。
+about two hundred plans in fifty seconds.
+
+43
+00:01:22,410 --> 00:01:23,730
+挑出最好的一套，
+It picks the best one.
+
+44
+00:01:23,730 --> 00:01:26,320
+堵的方向，绿灯多给一到十五秒。
+The jammed direction gets one to fifteen extra seconds of green.
+
+45
+00:01:26,320 --> 00:01:27,870
+反转二，最反直觉：
+Twist two, the surprising one:
+
+46
+00:01:27,870 --> 00:01:29,530
+绿灯不是越长越好。
+longer green is not always better.
+
+47
+00:01:29,530 --> 00:01:30,990
+你这边多绿一秒，
+Every extra second of green for you
+
+48
+00:01:30,990 --> 00:01:32,930
+横着那边就多红一秒。
+is an extra second of red for the cross street.
+
+49
+00:01:32,930 --> 00:01:34,550
+路口就像一块蛋糕，
+A junction is like a cake.
+
+50
+00:01:34,550 --> 00:01:38,080
+一分钟就这么大，切给谁都是从别人那抢。
+A minute is a minute, and every slice comes from someone else.
+
+51
+00:01:38,080 --> 00:01:39,770
+所以AI真正在做的，
+So what the AI really does
+
+52
+00:01:39,770 --> 00:01:42,080
+是让整片路网的总等待最少。
+is shrink the total waiting across the whole network.
+
+53
+00:01:42,080 --> 00:01:44,430
+结果：四道口一带十三个路口，
+The result: thirteen junctions in one Beijing district,
+
+54
+00:01:44,430 --> 00:01:47,070
+整体车速提了大约百分之二十一。
+traffic about twenty one percent faster.
+
+55
+00:01:47,070 --> 00:01:47,740
+拥堵指数
+And the congestion index
+
+56
+00:01:47,740 --> 00:01:49,530
+降了大约百分之十九。
+fell about nineteen percent.
+
+57
+00:01:49,530 --> 00:01:51,430
+反转三：将来的红绿灯，
+Twist three: future traffic lights
+
+58
+00:01:51,430 --> 00:01:53,280
+也许要和车直接说话。
+may talk to cars directly.
+
+59
+00:01:53,280 --> 00:01:54,820
+车说：我十秒后到。
+The car says: I'll arrive in ten seconds.
+
+60
+00:01:54,820 --> 00:01:58,550
+路口说：开每小时四十八公里，正好赶上绿灯。
+The light says: drive forty eight, and you'll catch the green.
+
+61
+00:01:58,550 --> 00:02:00,130
+到那时，自动驾驶的车
+Then self driving cars
+
+62
+00:02:00,130 --> 00:02:01,990
+就是踩着绿波的冲浪手。
+become surfers riding the green wave.
+
+63
+00:02:01,990 --> 00:02:04,890
+友情提示：这些是官方报道的试点数字，
+Fine print: these are reported pilot numbers.
+
+64
+00:02:04,890 --> 00:02:07,430
+别的城市、别的时段不一定一样。
+Other cities and other hours may differ.
+
+65
+00:02:07,430 --> 00:02:08,790
+而且再聪明的灯，
+And no light, however smart,
+
+66
+00:02:08,790 --> 00:02:11,620
+也救不了所有人同时出门的早高峰。
+can save a rush hour when everyone leaves at once.
+
+67
+00:02:11,620 --> 00:02:13,540
+红绿灯怎么知道你要来？
+So how does the light know you're coming?
+
+68
+00:02:13,540 --> 00:02:16,270
+它数车、算账，给你留一道波浪。
+It counts, it calculates, and it saves you a wave.
+
+69
+00:02:16,270 --> 00:02:17,480
+下次一路绿灯，
+Next time you hit every green,
+
+70
+00:02:17,480 --> 00:02:18,980
+别以为是运气好。
+don't call it luck.
+
+71
+00:02:18,980 --> 00:02:19,930
+那是一个AI
+That's an AI
+
+72
+00:02:19,930 --> 00:02:21,700
+在后面替你打节拍。
+keeping the beat for you.
+
