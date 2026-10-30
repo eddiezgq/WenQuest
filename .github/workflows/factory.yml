@@ -229,14 +229,27 @@ jobs:
             # 第 51 轮：公共工厂的枢纽带上班级工厂的配置重启（工业园：接入的班级工厂来下单、收发货回传）
             (cd "$FACTORY_DIR" && docker compose -p wq-factory -f docker-compose.yml -f ci.yml -f docker-compose.classes.yml up -d hub)
             for i in $(seq 1 40); do curl -fsS localhost:8100/api/health && break; sleep 5; done
-            park=""
-            grep -q "park: true" factory/deploy/classes.yaml && park="--park-hub http://localhost:8100"
+            # 第 55 轮 K-7（效率）：两厂互发订单、整机标定这两段只在相关文件改动时演练；取不到改动清单（手动运行等）就都跑
+            before="${{ github.event.before }}"; changed=""
+            if [ -n "$before" ] && [ "$before" != "0000000000000000000000000000000000000000" ]; then
+              git fetch -q --depth=1 origin "$before" 2>/dev/null && changed=$(git diff --name-only "$before" HEAD)
+            fi
+            park=""; extra=""
+            if grep -q "park: true" factory/deploy/classes.yaml && { [ -z "$changed" ] || echo "$changed" | grep -qE \
+                "hub/(park|supply|supply_api|finance|mrp)\.py|bridge/|plants/wenquest-|deploy/classes|tests/plant_loop\.py|workflows/factory\.yml"; }; then
+              park="--park-hub http://localhost:8100"
+            fi
+            if [ -z "$changed" ] || echo "$changed" | grep -qE \
+                "sim/(calib|errors|engine)\.py|hub/lab26\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
+              extra="--lab26"
+            fi
+            echo "本次演练：两厂互发订单 $([ -n "$park" ] && echo 跑 || echo 不跑)；整机标定 $([ -n "$extra" ] && echo 跑 || echo 不跑)"
             for i in $(seq 1 40); do curl -fsS localhost:$hubp/api/health && break; sleep 5; done
             cd factory/digital
             if grep -q "^$id	" "$FACTORY_DIR/classes.plants"; then
               python tests/plant_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
                 --erp-key "$(val WQ_C_${up}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${up}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-                --item WQ-AGV300 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $park \
+                --item WQ-AGV300 --item WQ-CR5 --lab24 --expect-buy WQR-105 --expect-products WQ-CR5,WQ-AGV300,WQJ-L,WQJ-M,WQJ-S $extra $park \
                 2>&1 | tee /tmp/logs/class_loop.log
             else
               python tests/closed_loop.py --hub http://localhost:$hubp --erp http://localhost:$erpp --erp-kind real \
