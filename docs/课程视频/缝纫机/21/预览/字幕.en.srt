@@ -1,0 +1,875 @@
+1
+00:00:00,600 --> 00:00:01,702
+Hi everyone,
+
+2
+00:00:01,722 --> 00:00:08,434
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,834 --> 00:00:10,829
+This is Lecture 21,
+
+4
+00:00:10,849 --> 00:00:18,254
+control prototypes of the pattern sewer and the flat-knitting machine.
+
+5
+00:00:18,654 --> 00:00:20,414
+Two prototypes today.
+
+6
+00:00:20,434 --> 00:00:25,415
+For the pattern sewer we work from the window to the motor;
+
+7
+00:00:25,435 --> 00:00:31,180
+for the knitting machine, from the lead to the carriage's top speed.
+
+8
+00:00:32,700 --> 00:00:39,104
+A shirt factory sews thousands of pocket flaps a day and asks the lab for a
+
+9
+00:00:39,124 --> 00:00:41,160
+pattern-sewer prototype.
+
+10
+00:00:41,560 --> 00:00:50,349
+It uses a standard lockstitch head and an X–Y table on 10 mm lead ball screws,
+
+11
+00:00:50,369 --> 00:00:57,578
+with a 400 W servo per axis: 1.27 newton-metres rated, 3.8 peak.
+
+12
+00:00:57,978 --> 00:01:05,998
+The shop wants 3 mm stitches at 1600 r/min.
+
+13
+00:01:06,398 --> 00:01:13,457
+The template may move only during the 183.4 degrees when the needle is out of
+
+14
+00:01:13,477 --> 00:01:14,376
+the cloth.
+
+15
+00:01:14,776 --> 00:01:18,360
+Is the motor big enough, and how fast can it sew?
+
+16
+00:01:18,760 --> 00:01:19,963
+We'll answer at the end.
+
+17
+00:01:21,483 --> 00:01:24,583
+Pattern sewer: from window to motor.
+
+18
+00:01:26,103 --> 00:01:27,875
+The chain starts from the window.
+
+19
+00:01:28,275 --> 00:01:36,132
+With 1.5 millimetres of fabric and template, and 10 degrees kept at each end,
+
+20
+00:01:36,152 --> 00:01:39,712
+the usable window is 183.4 degrees.
+
+21
+00:01:40,112 --> 00:01:46,819
+At n r/min each degree takes one over 6n seconds,
+
+22
+00:01:46,839 --> 00:01:52,859
+so at 1600 there are only 19.1 milliseconds.
+
+23
+00:01:53,259 --> 00:01:59,830
+The firmware uses an S-curve so the table isn't excited;
+
+24
+00:01:59,850 --> 00:02:05,479
+the price is a peak factor of 5.33 instead of 4.
+
+25
+00:02:05,879 --> 00:02:13,266
+A 3 mm stitch then needs 43.8 metres per second squared,
+
+26
+00:02:13,286 --> 00:02:22,657
+a peak speed of 0.314 metres per second, about 1884 r/min at the motor,
+
+27
+00:02:22,677 --> 00:02:25,699
+well below rated speed.
+
+28
+00:02:27,219 --> 00:02:32,079
+The torque goes almost entirely into the rotor and the screw.
+
+29
+00:02:32,479 --> 00:02:39,089
+The four inertias add to about 0.664 times ten to the minus four;
+
+30
+00:02:39,109 --> 00:02:45,108
+times the angular acceleration, plus a small friction term,
+
+31
+00:02:45,128 --> 00:02:51,432
+the X axis needs about 1.84 newton-metres peak, far below 3.8.
+
+32
+00:02:51,832 --> 00:02:54,480
+But will it overheat in continuous sewing?
+
+33
+00:02:54,880 --> 00:02:56,613
+Look at rms torque.
+
+34
+00:02:57,013 --> 00:03:00,717
+The S-curve form factor is 0.816,
+
+35
+00:03:00,737 --> 00:03:07,148
+and in the worst case every stitch uses the whole window:
+
+36
+00:03:07,168 --> 00:03:14,934
+together 0.58 times the peak, which must stay within the 1.27 rating.
+
+37
+00:03:15,334 --> 00:03:18,954
+So the peak may only reach 2.18.
+
+38
+00:03:19,354 --> 00:03:26,241
+Working back gives the design accelerations: 50 for X, 40 for Y.
+
+39
+00:03:27,761 --> 00:03:33,181
+Turn the chain around and every stitch length gets a speed limit.
+
+40
+00:03:33,581 --> 00:03:39,852
+The time to move s is the square root of C times s over a;
+
+41
+00:03:39,872 --> 00:03:45,168
+the window over six times that time is the limit,
+
+42
+00:03:45,188 --> 00:03:48,639
+capped by the head's 2500 r/min.
+
+43
+00:03:49,039 --> 00:03:58,139
+A 3 mm stitch along X can run at 1709, meeting 1600.
+
+44
+00:03:58,539 --> 00:04:08,396
+Along Y the mass is bigger and the design acceleration only 40, so 1528.
+
+45
+00:04:08,796 --> 00:04:19,216
+At 45 degrees each axis moves s over root two, and it reaches 1818.
+
+46
+00:04:19,616 --> 00:04:24,880
+This table goes into the firmware for automatic slow-down,
+
+47
+00:04:24,900 --> 00:04:30,254
+and becomes the expected values of Chapter 22's test cases.
+
+48
+00:04:31,774 --> 00:04:35,834
+Pattern-sewer firmware: interpolating by angle.
+
+49
+00:04:37,354 --> 00:04:40,874
+Each stitch has its own cap,
+
+50
+00:04:40,894 --> 00:04:48,334
+but the spindle can't jump from 2092 to 1080 in one stitch.
+
+51
+00:04:48,734 --> 00:04:50,914
+Look-ahead runs two passes.
+
+52
+00:04:51,314 --> 00:04:58,920
+Backward: no stitch may be more than 300 r/min faster than the next,
+
+53
+00:04:58,940 --> 00:05:04,303
+so a slow stitch ahead brakes the spindle early.
+
+54
+00:05:04,703 --> 00:05:10,882
+Forward: no stitch may be more than 300 faster than the one before,
+
+55
+00:05:10,902 --> 00:05:13,843
+so acceleration isn't too harsh.
+
+56
+00:05:14,243 --> 00:05:23,080
+In the chart, a run of 2 mm stitches has one 6 mm stitch along Y.
+
+57
+00:05:23,480 --> 00:05:30,702
+Braking starts four stitches early, reaches 1080 right at the long stitch,
+
+58
+00:05:30,722 --> 00:05:34,420
+then climbs back one stitch at a time.
+
+59
+00:05:34,820 --> 00:05:41,400
+This is computed once per pattern segment, in the background.
+
+60
+00:05:42,920 --> 00:05:46,820
+Scaled knitting machine: needle-by-needle timing.
+
+61
+00:05:48,340 --> 00:05:53,294
+Industrial flat-knitting machines have hundreds of needles,
+
+62
+00:05:53,314 --> 00:05:56,160
+two or three systems and two beds.
+
+63
+00:05:56,560 --> 00:06:03,856
+The teaching prototype shrinks it to the minimum: one system, one bed,
+
+64
+00:06:03,876 --> 00:06:06,051
+60 needles, gauge E5.
+
+65
+00:06:06,451 --> 00:06:09,988
+The coarse gauge means big needle slots,
+
+66
+00:06:10,008 --> 00:06:16,301
+cams and selector jacks that an ordinary mill or laser cutter can make,
+
+67
+00:06:16,321 --> 00:06:18,791
+and generous selection time.
+
+68
+00:06:19,191 --> 00:06:26,078
+The carriage is driven by a 200 watt servo through a belt,
+
+69
+00:06:26,098 --> 00:06:29,531
+at 0.01 millimetre per count.
+
+70
+00:06:29,931 --> 00:06:36,506
+The selector has 8 segments, so neighbouring needles go to different segments;
+
+71
+00:06:36,526 --> 00:06:39,381
+one segment fires every 8 needles,
+
+72
+00:06:39,401 --> 00:06:43,525
+67.7 milliseconds apart at 0.6 metres per second,
+
+73
+00:06:43,545 --> 00:06:48,260
+far more than the 3 milliseconds to pull in and release.
+
+74
+00:06:49,780 --> 00:07:00,438
+This is the needle bed and carriage of Lab 21-1, slowed twenty times.
+
+75
+00:07:00,838 --> 00:07:06,680
+On top, the carriage speed: accelerate, cruise, decelerate,
+
+76
+00:07:06,700 --> 00:07:10,258
+with a pause at each end to reverse.
+
+77
+00:07:10,658 --> 00:07:16,361
+Below, the red line is the selection point; as the carriage passes each needle,
+
+78
+00:07:16,381 --> 00:07:19,042
+the selector must decide right there.
+
+79
+00:07:19,442 --> 00:07:25,088
+The time base is no longer spindle angle but carriage position:
+
+80
+00:07:25,108 --> 00:07:30,843
+needle i should be selected at c plus, i plus one half, pitches.
+
+81
+00:07:31,243 --> 00:07:42,787
+One row is 464.8 millimetres and takes about 0.935 seconds.
+
+82
+00:07:44,307 --> 00:07:47,967
+The knitting firmware changes only one thing:
+
+83
+00:07:47,987 --> 00:07:53,283
+the time base becomes carriage position instead of spindle angle.
+
+84
+00:07:53,683 --> 00:07:58,682
+The selector takes Tr from command to armature motion,
+
+85
+00:07:58,702 --> 00:08:02,120
+so the command goes v times Tr early.
+
+86
+00:08:02,520 --> 00:08:05,240
+There's one more term, half of Tq:
+
+87
+00:08:05,260 --> 00:08:08,945
+an MCU checks position once per control cycle,
+
+88
+00:08:08,965 --> 00:08:14,504
+so after passing the command point it still waits for the next cycle,
+
+89
+00:08:14,524 --> 00:08:16,840
+half a cycle late on average.
+
+90
+00:08:17,240 --> 00:08:22,741
+An FPGA compares at every count, so that term almost vanishes.
+
+91
+00:08:23,141 --> 00:08:26,144
+A lead can cancel a fixed delay;
+
+92
+00:08:26,164 --> 00:08:33,135
+what it can't cancel is the quantisation of plus or minus half a cycle and
+
+93
+00:08:33,155 --> 00:08:36,441
+the scatter J of the response time.
+
+94
+00:08:37,961 --> 00:08:46,486
+Run the standard numbers: 0.6 metres per second, Tr 1.5 milliseconds,
+
+95
+00:08:46,506 --> 00:08:49,706
+a 1 millisecond MCU cycle.
+
+96
+00:08:50,106 --> 00:08:56,882
+The lead is 1.20 millimetres, about 0.24 of a pitch; uncompensated,
+
+97
+00:08:56,902 --> 00:09:01,446
+we'd already be at the edge of mis-selection.
+
+98
+00:09:01,846 --> 00:09:06,582
+After compensation two terms remain:
+
+99
+00:09:06,602 --> 00:09:16,358
+quantisation 0.30 millimetres and scatter 0.18, together 0.48 millimetres,
+
+100
+00:09:16,378 --> 00:09:19,396
+about 0.094 of a pitch.
+
+101
+00:09:19,796 --> 00:09:26,040
+Two criteria: within a quarter pitch the jack is still pushed correctly;
+
+102
+00:09:26,060 --> 00:09:31,521
+acceptance is stricter, a tenth of a pitch, a 2.5 times margin.
+
+103
+00:09:33,041 --> 00:09:39,490
+Set the worst error equal to a tenth of a pitch and you get the speed limit:
+
+104
+00:09:39,510 --> 00:09:43,660
+0.635 metres per second with a 1 millisecond MCU;
+
+105
+00:09:43,680 --> 00:09:48,682
+with a 0.25 millisecond cycle the formula gives about 1.20;
+
+106
+00:09:48,702 --> 00:09:51,917
+with an FPGA comparing at every count,
+
+107
+00:09:51,937 --> 00:09:58,981
+quantisation shrinks to half a count and the selector's own scatter sets the limit,
+
+108
+00:09:59,001 --> 00:09:59,918
+about 1.68.
+
+109
+00:10:00,318 --> 00:10:04,167
+Counter-intuitively, a smaller Tr doesn't help,
+
+110
+00:10:04,187 --> 00:10:07,131
+because the lead already cancels it;
+
+111
+00:10:07,151 --> 00:10:11,906
+the scatter J and the control period are what limit speed.
+
+112
+00:10:12,306 --> 00:10:16,088
+So the E5 prototype starts with an MCU,
+
+113
+00:10:16,108 --> 00:10:20,279
+and an FPGA is the first step to go faster.
+
+114
+00:10:21,799 --> 00:10:24,936
+When a robot picks parts from a conveyor,
+
+115
+00:10:24,956 --> 00:10:30,788
+the camera and the gripper are triggered by the conveyor encoder's position,
+
+116
+00:10:30,808 --> 00:10:35,794
+not by time, exactly like selecting needles by carriage position.
+
+117
+00:10:36,194 --> 00:10:42,247
+The controller adds a lead of speed times the response time plus half a
+
+118
+00:10:42,267 --> 00:10:43,444
+polling cycle,
+
+119
+00:10:43,464 --> 00:10:46,609
+the same formula as needle selection.
+
+120
+00:10:47,009 --> 00:10:53,526
+And the lead can't cancel jitter: at 0.6 metres per second,
+
+121
+00:10:53,546 --> 00:11:02,832
+a valve scatter of plus or minus 0.3 milliseconds is plus or minus 0.18 millimetres.
+
+122
+00:11:03,232 --> 00:11:09,497
+That's why high-speed picking robots use the motion card's hardware
+
+123
+00:11:09,517 --> 00:11:11,748
+position-compare output,
+
+124
+00:11:11,768 --> 00:11:16,532
+the equivalent of an FPGA comparing at every count.
+
+125
+00:11:18,052 --> 00:11:24,232
+In everyday life the closest thing to needle selection is a basketball pass.
+
+126
+00:11:24,632 --> 00:11:27,510
+You throw ahead of a running teammate;
+
+127
+00:11:27,530 --> 00:11:32,161
+the lead is roughly their speed times the ball's flight time,
+
+128
+00:11:32,181 --> 00:11:34,372
+just like the selection lead.
+
+129
+00:11:34,772 --> 00:11:38,562
+But your release is always a little early or late,
+
+130
+00:11:38,582 --> 00:11:43,592
+and the faster your teammate runs, the further off the ball lands.
+
+131
+00:11:43,992 --> 00:11:49,315
+That's exactly the scatter J that limits the carriage speed.
+
+132
+00:11:50,835 --> 00:11:53,295
+Back to our problem.
+
+133
+00:11:53,695 --> 00:12:00,849
+At 1600 r/min the template has 19.1 milliseconds per stitch;
+
+134
+00:12:00,869 --> 00:12:06,947
+a 3 mm stitch needs 43.8 metres per second squared,
+
+135
+00:12:06,967 --> 00:12:14,600
+and the X axis peaks at about 1.84 newton-metres, far below 3.8.
+
+136
+00:12:15,000 --> 00:12:16,420
+The motor is big enough.
+
+137
+00:12:16,820 --> 00:12:21,865
+But continuous sewing is limited by rms torque,
+
+138
+00:12:21,885 --> 00:12:28,225
+so the design accelerations are only 50 for X and 40 for Y.
+
+139
+00:12:28,625 --> 00:12:38,358
+A 3 mm stitch along X can then run at 1709, meeting 1600; along Y only 1528,
+
+140
+00:12:38,378 --> 00:12:46,699
+and the firmware's look-ahead slows those stitches automatically.
+
+141
+00:12:48,219 --> 00:12:52,370
+Now Virtual lab 21-1, the scaled knitting prototype,
+
+142
+00:12:52,390 --> 00:12:56,380
+which you can do yourself on WenQuest. The checks,
+
+143
+00:12:56,400 --> 00:12:59,669
+a few readouts and the tasks are blurred;
+
+144
+00:12:59,689 --> 00:13:02,797
+they're for you to work out in the lab.
+
+145
+00:13:02,817 --> 00:13:06,085
+Top left are the needle bed and carriage,
+
+146
+00:13:06,105 --> 00:13:10,095
+in the middle the selection error of every needle,
+
+147
+00:13:10,115 --> 00:13:12,582
+and below a zoom on one needle.
+
+148
+00:13:12,982 --> 00:13:18,979
+Press Knit one course first. The carriage accelerates, cruises and slows,
+
+149
+00:13:18,999 --> 00:13:25,162
+the selection point decides needle by needle, and the error chart fills in.
+
+150
+00:13:25,562 --> 00:13:28,370
+Task one: with standard settings,
+
+151
+00:13:28,390 --> 00:13:34,885
+raise the top speed from 0.6 and watch when the error band breaks out of the
+
+152
+00:13:34,905 --> 00:13:36,770
+green acceptance band.
+
+153
+00:13:36,790 --> 00:13:43,542
+What's the highest speed that still passes? Estimate it from the formula first,
+
+154
+00:13:43,562 --> 00:13:45,942
+then pin it down in the lab.
+
+155
+00:13:46,342 --> 00:13:50,929
+Task two: press Switch to FPGA, firing at every count,
+
+156
+00:13:50,949 --> 00:13:55,878
+and raise the speed again. Quantisation almost disappears.
+
+157
+00:13:55,898 --> 00:14:01,850
+What sets the limit now, and how many more courses an hour do you get?
+
+158
+00:14:01,870 --> 00:14:03,642
+Compare for yourself.
+
+159
+00:14:04,042 --> 00:14:06,414
+Press Run 1000 courses,
+
+160
+00:14:06,434 --> 00:14:13,070
+and count the mis-selected needles and those outside acceptance.
+
+161
+00:14:13,090 --> 00:14:15,982
+Keep the two criteria apart.
+
+162
+00:14:16,382 --> 00:14:21,152
+Task three: change to the finer E7 bed, still with the FPGA,
+
+163
+00:14:21,172 --> 00:14:25,143
+at 1 metre per second, and switch to a fixed lead,
+
+164
+00:14:25,163 --> 00:14:28,975
+then drag the fixed lead to find its best value.
+
+165
+00:14:28,995 --> 00:14:32,168
+A fixed lead is right at only one speed,
+
+166
+00:14:32,188 --> 00:14:35,282
+so needles on the ramps go wrong first.
+
+167
+00:14:35,682 --> 00:14:42,020
+Then adjust the reversal margin so the carriage reaches cruising speed before
+
+168
+00:14:42,040 --> 00:14:43,424
+the first needle,
+
+169
+00:14:43,444 --> 00:14:49,782
+until all 60 needles pass. The guide and report template are on the platform.
+
+170
+00:14:51,302 --> 00:14:56,295
+Everything in this lecture is on the WenQuest learning platform.
+
+171
+00:14:56,695 --> 00:15:03,120
+You can open today's interactive slides and the knitting prototype and work
+
+172
+00:15:03,140 --> 00:15:04,323
+them yourself,
+
+173
+00:15:04,343 --> 00:15:07,675
+including the pages this video skipped.
+
+174
+00:15:08,075 --> 00:15:13,049
+You submit the assignment and the lab report on the platform,
+
+175
+00:15:13,069 --> 00:15:15,669
+and get marks and comments back.
+
+176
+00:15:16,069 --> 00:15:20,819
+Questions go to the course discussion forum,
+
+177
+00:15:20,839 --> 00:15:27,865
+and the grades page shows your mark on every assignment and quiz.
+
+178
+00:15:29,385 --> 00:15:32,802
+Your assignment has four questions. One:
+
+179
+00:15:32,822 --> 00:15:36,927
+fabric plus template is now 3 millimetres thick,
+
+180
+00:15:36,947 --> 00:15:43,200
+so the geometric window becomes 192.6 degrees, still with 10 at each end.
+
+181
+00:15:43,220 --> 00:15:49,816
+Find the speed limits for 2, 3 and 4 millimetre stitches along X and along Y,
+
+182
+00:15:49,836 --> 00:15:54,628
+decide whether 3 millimetres along X still reaches 1600,
+
+183
+00:15:54,648 --> 00:15:58,925
+and explain how look-ahead handles the Y stitches.
+
+184
+00:15:59,325 --> 00:16:05,754
+Two: the 12 kilogram Y axis should also run at 50 metres per second squared.
+
+185
+00:16:05,774 --> 00:16:09,488
+Find the peak and the worst-case rms torque,
+
+186
+00:16:09,508 --> 00:16:13,052
+decide whether the 400 watt motor will do,
+
+187
+00:16:13,072 --> 00:16:17,125
+and give at least two remedies with their costs.
+
+188
+00:16:17,525 --> 00:16:21,737
+Three: the knitter becomes E6, a 4.23 millimetre pitch.
+
+189
+00:16:21,757 --> 00:16:25,815
+Find the top carriage speed with a 1 millisecond MCU,
+
+190
+00:16:25,835 --> 00:16:30,815
+a 0.5 millisecond MCU and an FPGA, check them in the virtual lab,
+
+191
+00:16:30,835 --> 00:16:36,432
+and choose one. Four: with a 20 metres per second squared emergency stop,
+
+192
+00:16:36,452 --> 00:16:41,587
+find the braking distance from 0.6, 1.0 and 1.66 metres per second,
+
+193
+00:16:41,607 --> 00:16:44,587
+and where the limit switches should go.
+
+194
+00:16:44,987 --> 00:16:48,047
+Submit the report on the WenQuest platform.
+
+195
+00:16:49,567 --> 00:16:53,497
+There's also a ten-question quiz. For example,
+
+196
+00:16:53,517 --> 00:16:59,336
+with a usable window of 183.4 degrees and the spindle at 2000 r/min,
+
+197
+00:16:59,356 --> 00:17:04,489
+how many milliseconds does the template have for one stitch?
+
+198
+00:17:04,889 --> 00:17:06,799
+Or, on a knitted sample,
+
+199
+00:17:06,819 --> 00:17:13,474
+the needle numbers that go wrong always leave the same remainder when divided by 8.
+
+200
+00:17:13,494 --> 00:17:15,806
+What's the most likely cause?
+
+201
+00:17:16,206 --> 00:17:21,699
+You get three attempts, and the explanations appear as soon as you submit.
+
+202
+00:17:23,219 --> 00:17:24,719
+Three things to remember.
+
+203
+00:17:25,119 --> 00:17:29,142
+One: both prototypes share one control problem,
+
+204
+00:17:29,162 --> 00:17:32,841
+actions landing in windows set by position,
+
+205
+00:17:32,861 --> 00:17:36,540
+so budget the timing before choosing parts.
+
+206
+00:17:36,940 --> 00:17:42,019
+Two: for the pattern sewer the window gives time and acceleration,
+
+207
+00:17:42,039 --> 00:17:46,731
+inertia gives peak torque, heat sets the design acceleration,
+
+208
+00:17:46,751 --> 00:17:52,447
+and look-ahead and angle-based interpolation keep the template still while
+
+209
+00:17:52,467 --> 00:17:53,760
+the needle is in.
+
+210
+00:17:54,160 --> 00:17:59,111
+Three: the knitting machine's lead cancels delay,
+
+211
+00:17:59,131 --> 00:18:06,820
+and its top speed is set by the scatter J and the control period, not by Tr.
+
+212
+00:18:07,220 --> 00:18:13,304
+The assignment, quiz and lab report are on WenQuest.
+
+213
+00:18:13,704 --> 00:18:18,135
+Next time: automated testing and continuous iteration.
+
+214
+00:18:18,535 --> 00:18:21,013
+The slides, the virtual lab,
+
+215
+00:18:21,033 --> 00:18:27,258
+the assignment and the quiz are all on the WenQuest learning platform,
+
+216
+00:18:27,278 --> 00:18:33,235
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+217
+00:18:33,635 --> 00:18:40,095
+The speed limits we worked out today become the expected values of next
+
+218
+00:18:40,115 --> 00:18:42,468
+lecture's automated tests.
+
+219
+00:18:42,488 --> 00:18:43,655
+See you then.
