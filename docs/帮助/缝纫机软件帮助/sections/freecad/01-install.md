@@ -16,7 +16,7 @@ App.getUserAppDataDir()
 <ol class="steps" start="2">
 <li>在这个文件夹里找到（没有就新建）<code>Mod</code> 文件夹。</li>
 <li>把压缩包里的 <code>Mod\WenQuestSewing</code> 整个文件夹复制进去，结果应是 <code>…\Mod\WenQuestSewing\InitGui.py</code>。</li>
-<li>重启 FreeCAD，在工作台下拉列表里选“问渠缝纫机”。工具栏出现 17 个中文按钮。</li>
+<li>重启 FreeCAD，在工作台下拉列表里选“问渠缝纫机”。工具栏出现 18 个中文按钮。</li>
 </ol>
 
 ::video{src=fc-01-install title="安装：找到用户数据文件夹，复制工作台，重启后选“问渠缝纫机”"}

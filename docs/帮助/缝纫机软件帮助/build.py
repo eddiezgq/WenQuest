@@ -39,11 +39,11 @@ ONLINE = "https://learn.wenquestrobotics.com"
 EDITIONS = {
     "web": dict(title="缝纫机设计软件 · 网页版帮助", short="网页版帮助", other=("FreeCAD 版帮助", "../sewing-freecad/index.html"),
                 files=["web/00-intro", "web/01-start", "common/cases", "common/case-lockstitch", "common/case-overlock", "common/case-cover",
-                       "common/case-pattern", "common/case-flatknit", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
+                       "common/case-pattern", "common/case-flatknit", "common/case-ebox", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
                        "common/kernel", "common/arch", "web/04-account", "common/faq"]),
     "freecad": dict(title="缝纫机设计软件 · FreeCAD 工作台帮助", short="FreeCAD 版帮助", other=("网页版帮助", ONLINE + "/static/help/sewing/index.html"),
                     files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "common/cases", "common/case-lockstitch",
-                               "common/case-overlock", "common/case-cover", "common/case-pattern", "common/case-flatknit", "freecad/03-console", "common/ai", "common/cae",
+                               "common/case-overlock", "common/case-cover", "common/case-pattern", "common/case-flatknit", "common/case-ebox", "freecad/03-console", "common/ai", "common/cae",
                            "common/lib", "common/kernel", "common/arch", "common/faq"]),
 }
 
@@ -180,6 +180,17 @@ def case_numbers():
     g = K["base"]["garment"]
     v.update(fk_g_pieces=round(g["knit_pieces"]), fk_g_link=round(g["link"]), fk_g_tot=round(g["total_pieces"]), fk_g_whole=round(g["total_whole"]),
              fk_g_E=f"{g['E_eff']:g}")
+    if "ebox" in d:                                  # 案例六 电控箱（第 62 轮）
+        EB = d["ebox"]
+        v["eb"] = EB
+        rows = ["| 改法 | 散热器 °C | 结温峰值 °C | 电容寿命 年 | 红灯 | 黄灯 |", "|---|---|---|---|---|---|"]
+        for r in EB["summer"]["variants"]:
+            rows.append(f"| {r[0]} | {r[2]} | {r[3]} | {r[4]} | {r[6]} | {r[7]} |")
+        v["eb_variants"] = "\n".join(rows)
+        v["eb_summer_bad"] = "；".join(f"{b['name']} {b['value']}（{b['limit']}）" for b in EB["summer"]["bad"])
+        c = EB["cae"]
+        v.update(eb_diff=f"{c['diff'] * 100:+.0f}%", eb_h=f"{c['cfd']['h_mean']:.1f}", eb_hr=f"{c['h_rad']:.1f}", eb_min=round(c["cfd"]["seconds"] / 60),
+                 eb_cells=f"{c['cfd']['cells'] / 10000:.0f} 万", eb_lint=next(w["value"] for w in EB["fix"]["warn"] if w["key"] == "lint"))
     y = P["motor_ry8"][1]["current"]
     v["pt_y8_margin"] = round((y["rated"] / y["rms"] - 1) * 100)
     v["pt_tpl"] = "{:.0f} × {:.0f} × {:.0f}".format(*P["template_cam"]["template"]["plate"])

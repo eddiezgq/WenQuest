@@ -5,6 +5,7 @@
 
 用法（本地完整环境 tools/local + 数字工厂 cae、hub 都起来）：
   python3 run_cases.py [网关地址] [账号] [密码]
+  python3 run_cases.py --only ebox     只（重）算案例六电控箱（第 62 轮），其余案例沿用 data/cases.json 里的结果
 """
 import json
 import sys
@@ -44,6 +45,7 @@ def req(m, p, b=None, raw=False, files=None):
 
 TOKEN = ""
 TOKEN = req("POST", "/api/v1/auth/login", {"username": U, "password": P})["token"]
+ONLY = sys.argv[sys.argv.index("--only") + 1] if "--only" in sys.argv else ""
 
 
 def wait(jid):
@@ -106,7 +108,40 @@ def cam(machine, params, part, topo_jid="", **kw):
                 {k: r["template"][k] for k in ("plate", "slot_w", "bridges", "stitches", "pins") if k in r["template"]})
 
 
+
+# ---------- 案例六 电控箱夏天频繁报过热（第 62 轮，教材 18.7 节） ----------
+def case_ebox():
+    """从案例一的 6000 r/min 改型出发：电控箱默认 → 夏天 38 °C、飞絮堵塞 0.5 → 改进方案 → 清理 + 加翅片 → CAE 复核（自然对流 + 温度场）"""
+    D = {"n": 6000, "mr": 0.1, "fn": 240}
+
+    def eb(q):
+        r = req("POST", "/api/v1/sewing/ebox/analyze", {"machine": "lockstitch", "params": D, "ebox": q})
+        t = r["thermal"]
+        return dict(q=q, Irun=r["drives"][0]["Irun"], Ipk=r["drives"][0]["Ipk"], Pavg=round(t["Pavg"], 1), acc=round(t["acc_share"] * 100),
+                    Tin=round(t["Tin"], 1), Ths=round(t["Ths"], 1), Tj=round(t["Tjpk"], 1), life=round(t["life_y"], 1), Tcap=round(t["Tcap"], 1),
+                    icm=round(t["icm"], 2), Rbox=round(t["Rbox"], 3), Rgeo=round(r["geometry"]["R"], 3), window=r["window"],
+                    bad=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"], limit=c["limit"]["zh"]) for c in r["checks"] if c["state"] == "bad"],
+                    warn=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"], limit=c["limit"]["zh"]) for c in r["checks"] if c["state"] == "warn"],
+                    variants=r["variants"]["rows"])
+    E = {"design": D, "base": eb({}), "summer": eb({"Ta": 38, "clog": 0.5}), "clean": eb({"Ta": 38, "clog": 0.1})}
+    fix = {"Ta": 38, "clog": 0.1, "rbox_src": "geometry", "fins": 10}
+    E["fix"] = eb(fix)
+    j = req("POST", "/api/v1/sewing/cae/ebox", {"machine": "lockstitch", "params": D, "ebox": fix})
+    r = wait(j["id"])
+    E["cae"] = {k: r.get(k) for k in ("R_cae", "R_geo", "diff", "T_shell", "T_hot", "T_est", "Ptot", "h_rad", "with_cae", "cfd")}
+    E["cae"]["checks"] = [dict(name=c["zh"], value=c["value"], state=c["state"]) for c in r.get("checks") or []]
+    return E
+
+
 out = {"date": time.strftime("%Y-%m-%d")}
+if ONLY == "ebox":
+    dest = HERE.parent / "data" / "cases.json"
+    out = json.loads(dest.read_text())
+    out["ebox"] = case_ebox()
+    out["ebox_date"] = time.strftime("%Y-%m-%d")
+    dest.write_text(json.dumps(out, ensure_ascii=False, indent=1))
+    print(json.dumps(out["ebox"]["cae"], ensure_ascii=False))
+    sys.exit(0)
 
 # ---------- 案例一 平缝机：从零件到整机 ----------
 L = {}
@@ -256,6 +291,7 @@ fr = wait(fj["id"])
 K["bed"] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or [])[:4]], t_move=fr.get("t_move"),
                 checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
 out["flatknit"] = K
+out["ebox"] = case_ebox()
 
 dest = HERE.parent / "data" / "cases.json"
 if "--check" in sys.argv:
