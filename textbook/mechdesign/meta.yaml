@@ -36,3 +36,4 @@ program_deps:
   - factory/digital/hub/__init__.py
   - library/catalog/A/A-BLT-HEX/specs.csv
   - library/catalog/A/A-SPR-CMP/specs.csv
+  - library/catalog/D/D-RDC-HD-CSF/specs.csv      # 第 33 章：谐波减速器的规格（电机选型）
