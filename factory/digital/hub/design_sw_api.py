@@ -20,7 +20,7 @@ from hub import cae_api
 
 FACTORY = "wq_sewing_saas"
 APPS = {"sewing": "wq_sewing_saas", "cam": "wq_cam_saas"}
-KINDS = ("fea", "mbd")
+KINDS = ("fea", "mbd", "cfd")          # cfd：第 62 轮电控箱的流体分析（自然对流 / 风扇），和有限元一起计数
 
 
 def factory_of(app):
@@ -123,7 +123,29 @@ def mount(app):
                   "title": str(body.get("title") or "")[:80], "item": str(body.get("item") or "")[:40] or None}
         if kind == "fea":
             return cae_api.call("POST", "/jobs", json=dict(common, step_sha=body.get("step_sha"), setup=body.get("setup") or {})).json()
+        if kind == "cfd":
+            return cae_api.call("POST", "/cfd/jobs", json=dict(common, kind="cfd", step_sha=body.get("step_sha"), setup=body.get("setup") or {})).json()
         return cae_api.call("POST", "/mbd/jobs", json=dict(common, model=body.get("model") or {}, setup=body.get("setup") or {})).json()
+
+    # ---------- 电控箱（学习平台第 62 轮）：参数化外壳 → STEP、面分组、热载荷；流体结果 ----------
+    @app.post("/api/design-sw/ebox/geometry", dependencies=dep)
+    def ds_ebox_geometry(body: dict = Body(...)):
+        """body.params：外形、壁厚、翅片、功率模块与其他电路发热、外表面 h、车间温度（thermal_parts 的 sew_ebox）"""
+        from cae import thermal_parts as TP
+        try:
+            p = TP.params_of("sew_ebox", body.get("params"))
+        except ValueError as e:
+            raise HTTPException(400, str(e)) from None
+        step = TP.build("sew_ebox", p)
+        g = cae_api.call("POST", "/geometry", content=step).json()
+        return {"sha": g["sha"], "faces": g["faces"], "params": p, "example": TP.example("sew_ebox", p, g["faces"])}
+
+    @app.get("/api/design-sw/cfd/{jid}/result", dependencies=dep)
+    def ds_cfd_result(jid: str, org: str):
+        """流体分析结果：每个面的 h、散热量（不带几十万个表面点）"""
+        j = _mine(jid, org)
+        r = cae_api.call("GET", "/cfd/jobs/{}/result".format(j["id"])).json()
+        return {"stats": j.get("stats"), "faces": (r.get("aux") or {}).get("faces") or [], "slice": (r.get("aux") or {}).get("slice")}
 
     # ---------- 拓扑优化（两孔平板）、数控编程（学习平台第 41 轮第二批） ----------
     def _quota(org, factory, kind="fea"):

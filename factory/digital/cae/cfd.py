@@ -338,6 +338,9 @@ def plan(box, setup):
 
 def solve(step_bytes, setup, workdir, progress=None):
     """返回 (stats, surface, aux)。surface：零件表面三角形和每个顶点的 p、h；aux：速度截面、流线"""
+    if (setup.get("flow") or {}).get("mode") == "natural":            # 第 62 轮：静止空气里的自然对流（没有风扇的电控箱）
+        from cae import cfd_natural
+        return cfd_natural.solve(step_bytes, setup, workdir, progress)
     import time
     from scipy.spatial import cKDTree
     from cae import cfd_heat as CH

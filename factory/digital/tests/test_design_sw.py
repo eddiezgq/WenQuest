@@ -162,3 +162,16 @@ def test_topo_plate_step_and_cam(ds):
     assert lst["used_today"] == 1 and lst["cam_used_today"] == 1 and lst["cam_daily_limit"] == 100
     assert c.post("/api/design-sw/topo", headers=H, json={"org": "甲厂", "spec": {"plate": _rod_plate()}}).status_code == 200
     assert c.post("/api/design-sw/topo", headers=H, json={"org": "甲厂", "spec": {"plate": _rod_plate()}}).status_code == 429
+
+
+def test_ebox_geometry_and_cfd_kind(ds):
+    """学习平台第 62 轮：电控箱参数化外壳读入（面分组、热载荷）；流体分析也能从设计软件提交（自然对流要表面比空气热）"""
+    pytest.importorskip("build123d")
+    c = ds
+    g = c.post("/api/design-sw/ebox/geometry", json={"params": {"fins": 4, "p_ipm": 20, "p_aux": 8, "t_air": 38}}, headers=H).json()
+    ex = g["example"]
+    assert g["sha"] and len(ex["groups"]["ipm"]) == 5 and ex["formula"]["loss_w"] == 28
+    assert c.post("/api/design-sw/ebox/geometry", json={"params": {"L": 50}}, headers=H).status_code == 400
+    bad = {"org": "甲厂", "kind": "cfd", "step_sha": g["sha"], "setup": {"flow": {"mode": "natural", "air_t_c": 38}, "heat": {"wall_t_c": 38.5}}}
+    assert c.post("/api/design-sw/jobs", json=bad, headers=H).status_code == 400
+    assert c.post("/api/design-sw/jobs", json=dict(bad, kind="cfx"), headers=H).status_code == 400
