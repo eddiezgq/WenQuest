@@ -295,3 +295,75 @@ def cute_guide(cx, cy, k, at, idp="gd", mood="happy", moves=True, sweat=False):
               {"t": "move", "at": at, "kind": "pulse", "targets": [idp + "_ant"], "dur": 0.6},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 8 * k, "hz": 1.0}]
     return E
+
+
+def cute_croc(cx, cy, k, at, idp="cr", mood="happy", moves=True):
+    """小鳄 Croc: a cute side-view crocodile facing right, belly on the ground at (cx, cy).
+    Ids: <idp>_b (body), <idp>_t (tail; wiggles about the hip), <idp>_j (lower jaw; wiggles = chomping). "<idp>*" moves the whole croc."""
+    def P(d, c="ink", w=3.6, part="_b", **kw):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d, **kw}
+    X = lambda v: cx + v * k   # noqa: E731
+    Y = lambda v: cy - v * k   # noqa: E731
+    E = [P(f"M{X(-120)},{Y(40)} Q{X(-260)},{Y(50)} {X(-340)},{Y(10)} Q{X(-250)},{Y(10)} {X(-120)},{Y(0)} Z", fill="green", part="_t"),
+         P(f"M{X(-130)},{Y(0)} Q{X(-140)},{Y(90)} {X(-20)},{Y(100)} L{X(90)},{Y(95)} Q{X(130)},{Y(90)} {X(150)},{Y(70)} "
+           f"L{X(300)},{Y(60)} Q{X(320)},{Y(45)} {X(300)},{Y(36)} L{X(150)},{Y(30)} L{X(140)},{Y(0)} Z", fill="green"),
+         P(f"M{X(150)},{Y(30)} L{X(300)},{Y(26)} Q{X(310)},{Y(10)} {X(290)},{Y(4)} L{X(140)},{Y(0)}", fill="green", part="_j"),
+         P(f"M{X(170)},{Y(36)} L{X(185)},{Y(22)} L{X(200)},{Y(36)} L{X(215)},{Y(22)} L{X(230)},{Y(36)} L{X(245)},{Y(22)} L{X(260)},{Y(36)}", c="ink", w=2.6, fill="paper"),
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(95), "y": Y(135), "w": 50 * k, "h": 50 * k, "c": "ink", "fill": "paper"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(112), "y": Y(122), "w": 20 * k, "h": 22 * k, "c": "ink", "fill": "ink"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(60), "y": Y(70), "w": 26 * k, "h": 12 * k, "c": "red", "fill": "red"}]
+    for x in (-100, -20, 60):
+        E.append(P(f"M{X(x)},{Y(98)} L{X(x + 15)},{Y(118)} L{X(x + 30)},{Y(98)}", w=3))
+    for x in (-90, 70):
+        E.append(P(f"M{X(x)},{Y(10)} L{X(x - 10)},{Y(-30)} L{X(x + 20)},{Y(-30)}", w=4))
+    if mood != "happy":
+        E.append(P(f"M{X(95)},{Y(150)} L{X(140)},{Y(140)}", w=4))
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_t"], "pivot": [X(-120), Y(20)], "amp": 10, "hz": 1.6},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_j"], "pivot": [X(145), Y(15)], "amp": 6, "hz": 2.4},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 5 * k, "hz": 1.1}]
+    return E
+
+
+def cute_chip(cx, cy, k, at, idp="cp", mood="happy", moves=True, label=None):
+    """小芯 Chip: a square chip with pins and a face, centred at (cx, cy). Ids: <idp>_b (body), <idp>_p (pins; wiggle). "<idp>*" moves it all."""
+    s = 120 * k
+    E = [{"t": "rect", "at": at, "id": idp + "_b", "x": cx - s, "y": cy - s, "w": 2 * s, "h": 2 * s, "c": "ink", "fill": "blue"}]
+    pins = []
+    for q in range(5):
+        o = -s * 0.8 + q * s * 0.4
+        pins.append(f"M{cx + o},{cy - s} L{cx + o},{cy - s - 30 * k} M{cx + o},{cy + s} L{cx + o},{cy + s + 30 * k} "
+                    f"M{cx - s},{cy + o} L{cx - s - 30 * k},{cy + o} M{cx + s},{cy + o} L{cx + s + 30 * k},{cy + o}")
+    E.append({"t": "path", "at": at, "id": idp + "_p", "c": "ink", "w": 4, "d": " ".join(pins)})
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": cx + side * 40 * k - 16 * k, "y": cy - 50 * k, "w": 32 * k, "h": 36 * k, "c": "ink", "fill": "paper"})
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": cx + side * 40 * k - 7 * k, "y": cy - 40 * k, "w": 14 * k, "h": 16 * k, "c": "ink", "fill": "ink"})
+    mouth = {"happy": f"M{cx - 30 * k},{cy + 30 * k} Q{cx},{cy + 60 * k} {cx + 30 * k},{cy + 30 * k}",
+             "sad": f"M{cx - 30 * k},{cy + 50 * k} Q{cx},{cy + 25 * k} {cx + 30 * k},{cy + 50 * k}",
+             "o": f"M{cx - 12 * k},{cy + 40 * k} a12,12 0 1,0 {24 * k},0 a12,12 0 1,0 {-24 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": mouth})
+    if label:
+        E.append(txt(cx, cy + s * 0.62, 30 * k, label, at, c="paper", id=idp + "_b", font="en"))
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_p"], "pivot": [cx, cy], "amp": 3, "hz": 3},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 7 * k, "hz": 1.2}]
+    return E
+
+
+def balloon_cow(cx, cy, k, at, idp="cow", moves=True):
+    """吹牛 balloon: a round cow balloon on a string, centred at (cx, cy). Ids: <idp>_b (balloon), <idp>_s (string).
+    Grow <idp>_b about (cx, cy) to show the boast inflating."""
+    r = 110 * k
+    E = [{"t": "ellipse", "at": at, "id": idp + "_b", "x": cx - r, "y": cy - r, "w": 2 * r, "h": 2 * r, "c": "ink", "fill": "paper"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": cx - 60 * k, "y": cy - 70 * k, "w": 50 * k, "h": 40 * k, "c": "ink", "fill": "ink"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": cx + 25 * k, "y": cy + 10 * k, "w": 40 * k, "h": 50 * k, "c": "ink", "fill": "ink"},
+         {"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4,
+          "d": f"M{cx - 80 * k},{cy - 90 * k} L{cx - 110 * k},{cy - 140 * k} L{cx - 50 * k},{cy - 105 * k} M{cx + 80 * k},{cy - 90 * k} L{cx + 110 * k},{cy - 140 * k} L{cx + 50 * k},{cy - 105 * k}"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": cx - 55 * k, "y": cy + 40 * k, "w": 110 * k, "h": 60 * k, "c": "ink", "fill": "red"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": cx - 30 * k, "y": cy - 30 * k, "w": 14 * k, "h": 16 * k, "c": "ink", "fill": "ink"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": cx + 16 * k, "y": cy - 30 * k, "w": 14 * k, "h": 16 * k, "c": "ink", "fill": "ink"},
+         {"t": "path", "at": at, "id": idp + "_s", "c": "ink", "w": 3, "d": f"M{cx},{cy + r} Q{cx - 30 * k},{cy + r + 80 * k} {cx},{cy + r + 160 * k}"}]
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 12 * k, "hz": 0.9},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_s"], "pivot": [cx, cy + r], "amp": 6, "hz": 1.5}]
+    return E

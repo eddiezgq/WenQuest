@@ -1,0 +1,340 @@
+1
+00:00:00,300 --> 00:00:01,760
+智驾芯片的算力，
+Self-driving chips:
+
+2
+00:00:01,760 --> 00:00:03,880
+有人能吹到真实的七倍。
+some makers inflate compute to seven times the real number.
+
+3
+00:00:03,880 --> 00:00:05,220
+这话不是我说的，
+Not my words.
+
+4
+00:00:05,220 --> 00:00:08,370
+是地平线创始人余凯昨晚在微博上说的。
+Horizon Robotics founder Yu Kai said it on Weibo last night.
+
+5
+00:00:08,370 --> 00:00:10,690
+他还给这种数字起了个名字：
+He even gave that number a name:
+
+6
+00:00:10,690 --> 00:00:11,700
+吹牛算力。
+bragging compute.
+
+7
+00:00:11,700 --> 00:00:13,190
+今天的烧脑问题：
+Today's brain teaser:
+
+8
+00:00:13,190 --> 00:00:16,470
+同一块芯片，算力怎么能有好几个数？
+how can one chip have several compute numbers?
+
+9
+00:00:16,470 --> 00:00:17,730
+先说算力是啥。
+First, what is compute?
+
+10
+00:00:17,730 --> 00:00:20,910
+单位叫TOPS，每秒一万亿次运算。
+The unit is TOPS: a trillion operations per second.
+
+11
+00:00:20,910 --> 00:00:23,760
+车上的AI看路，靠的是神经网络，
+Car AI sees the road with neural networks,
+
+12
+00:00:23,760 --> 00:00:26,550
+而神经网络几乎全是乘法和加法。
+and those are almost all multiply and add.
+
+13
+00:00:26,550 --> 00:00:29,040
+想象芯片里有一大群搬砖工人，
+Picture a crowd of brick carriers inside the chip,
+
+14
+00:00:29,040 --> 00:00:30,760
+每人每次搬一块砖。
+each carrying one brick at a time.
+
+15
+00:00:30,760 --> 00:00:32,800
+工人数乘以每秒搬几趟，
+Workers times trips per second
+
+16
+00:00:32,800 --> 00:00:35,150
+就是稠密算力，实打实的。
+is dense compute. The honest number.
+
+17
+00:00:35,150 --> 00:00:37,330
+反转一：英伟达自己就先乘了二。
+Twist one: Nvidia already doubles it.
+
+18
+00:00:37,330 --> 00:00:40,940
+Orin X稠密算力一百二十七，标称二百五十四。
+Orin X: 127 dense, 254 on the label.
+
+19
+00:00:40,940 --> 00:00:41,900
+为啥能乘二？
+Why double?
+
+20
+00:00:41,900 --> 00:00:45,050
+一般认为，是因为神经网络里很多数是零。
+Generally, because many numbers in a neural network are zero.
+
+21
+00:00:45,050 --> 00:00:46,590
+零乘什么都是零，
+Zero times anything is zero,
+
+22
+00:00:46,590 --> 00:00:49,010
+这块砖不用搬，直接跳过。
+so that brick can be skipped.
+
+23
+00:00:49,010 --> 00:00:50,490
+要是一半的数是零，
+If half the numbers are zero,
+
+24
+00:00:50,490 --> 00:00:52,410
+搬一半，就算搬了全部。
+carrying half counts as carrying all.
+
+25
+00:00:52,410 --> 00:00:53,550
+这叫稀疏算力。
+That's sparse compute.
+
+26
+00:00:53,550 --> 00:00:55,960
+前提是，砖真的有一半是空的。
+It only works if half the bricks really are empty.
+
+27
+00:00:55,960 --> 00:00:57,880
+反转二：有人乘了六七倍。
+Twist two: some multiply by six or seven.
+
+28
+00:00:57,880 --> 00:00:59,920
+余凯说，这就叫等效算力。
+Yu calls that equivalent compute.
+
+29
+00:00:59,920 --> 00:01:02,130
+比如地平线自家的征程6P，
+Take Horizon's own Journey 6P:
+
+30
+00:01:02,130 --> 00:01:04,120
+等效算力一千九百六十。
+1960 equivalent TOPS.
+
+31
+00:01:04,120 --> 00:01:05,560
+按英伟达的算法，
+By Nvidia's method,
+
+32
+00:01:05,560 --> 00:01:06,950
+它是五百六十。
+it is 560.
+
+33
+00:01:06,950 --> 00:01:09,480
+再除以二，稠密算力大约二百八十，
+Halve that: about 280 dense.
+
+34
+00:01:09,480 --> 00:01:11,820
+一千九百六十正好是它的七倍。
+1960 is exactly seven times that.
+
+35
+00:01:11,820 --> 00:01:13,530
+多出来的倍数从哪来？
+Where do the extra multiples come from?
+
+36
+00:01:13,530 --> 00:01:15,530
+各家没公开统一的算法。
+There's no public, shared formula.
+
+37
+00:01:15,530 --> 00:01:16,780
+大致的思路是：
+Roughly, the idea is:
+
+38
+00:01:16,780 --> 00:01:19,560
+我的工人更聪明，一个顶好几个。
+my workers are smarter, one does the job of several.
+
+39
+00:01:19,560 --> 00:01:21,560
+比如用更短的数字来算，
+Say, computing with shorter numbers,
+
+40
+00:01:21,560 --> 00:01:24,760
+或者架构更省事，就说相当于多少倍。
+or a leaner design, then claiming it equals more.
+
+41
+00:01:24,760 --> 00:01:26,430
+就像一台发动机说：
+Like an engine saying:
+
+42
+00:01:26,430 --> 00:01:29,340
+我特别省油，所以等效一千马力。
+I'm so fuel efficient, call me a thousand horsepower.
+
+43
+00:01:29,340 --> 00:01:30,970
+听着好像有点道理，
+Sounds almost reasonable,
+
+44
+00:01:30,970 --> 00:01:33,080
+可马力表上不能这么写。
+but you can't print that on a spec sheet.
+
+45
+00:01:33,080 --> 00:01:34,780
+反转三，最反直觉：
+Twist three, the most surprising:
+
+46
+00:01:34,780 --> 00:01:37,740
+就算是稠密算力，也常常用不满。
+even dense compute often goes unused.
+
+47
+00:01:37,740 --> 00:01:38,610
+工人再多，
+However many workers you have,
+
+48
+00:01:38,610 --> 00:01:40,810
+砖送不过来，也只能干等。
+if bricks don't arrive, they just wait.
+
+49
+00:01:40,810 --> 00:01:42,330
+这个送砖的速度，
+That brick delivery speed
+
+50
+00:01:42,330 --> 00:01:43,600
+叫内存带宽。
+is called memory bandwidth.
+
+51
+00:01:43,600 --> 00:01:46,560
+报道里说，真实效果还要看芯片利用率、
+Reports note real performance also depends on utilization,
+
+52
+00:01:46,560 --> 00:01:47,830
+编译器和软件。
+compilers and software.
+
+53
+00:01:47,830 --> 00:01:48,880
+所以，纸面算力
+So, paper compute
+
+54
+00:01:48,880 --> 00:01:50,340
+不等于能用的算力。
+is not usable compute.
+
+55
+00:01:50,340 --> 00:01:51,920
+余凯的办法很直接：
+Yu's fix is simple:
+
+56
+00:01:51,920 --> 00:01:54,140
+以后地平线两个数一起标。
+Horizon will print both numbers.
+
+57
+00:01:54,140 --> 00:01:55,580
+一个叫NV算力，
+One is Nvidia-style compute:
+
+58
+00:01:55,580 --> 00:01:56,950
+就是稠密乘二。
+dense times two.
+
+59
+00:01:56,950 --> 00:01:58,610
+另一个叫等效算力，
+The other is equivalent compute,
+
+60
+00:01:58,610 --> 00:02:00,750
+他自己管它叫吹牛算力。
+which he himself calls bragging compute.
+
+61
+00:02:00,750 --> 00:02:03,210
+友情提示：等效算力怎么折算，
+Fine print: how equivalent compute is calculated,
+
+62
+00:02:03,210 --> 00:02:06,320
+今天讲的是大致思路，不是官方公式。
+today is the rough idea, not an official formula.
+
+63
+00:02:06,320 --> 00:02:07,520
+芯片好不好，
+Is a chip good?
+
+64
+00:02:07,520 --> 00:02:10,040
+最后还得看车开得好不好。
+In the end, ask how well the car drives.
+
+65
+00:02:10,040 --> 00:02:12,730
+同一块芯片，为啥有好几个算力？
+Why does one chip have several numbers?
+
+66
+00:02:12,730 --> 00:02:14,820
+因为数砖的方法不一样。
+Because people count bricks differently.
+
+67
+00:02:14,820 --> 00:02:16,760
+下次看到几千TOPS，
+Next time you see thousands of TOPS,
+
+68
+00:02:16,760 --> 00:02:20,120
+先问一句：这是搬的砖，还是吹的牛？
+ask: bricks carried, or bull blown?
+
