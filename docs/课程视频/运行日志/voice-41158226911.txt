@@ -1,0 +1,400 @@
+100%|██████████| 1/1 [00:04<00:00,  4.95s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.95s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:44:17,273 INFO synthesis text Watch the bench run vone.three.two, vone.four.zero, vone.four.one and vone.four.two in turn.
+2026-10-31 02:44:22,449 INFO yield speech len 10.16, rtf 0.5094713582767276
+
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.36s/it]
+！听着不清（0.629，试了 3 次）：Watch the bench run v1.3.2, v1.4.0, v1.4.1 and v1.4.2 in tur → watch the Bench-Rang, Von Viad, Von Pu, Von Pu and Von Pu in
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:44:23,050 INFO synthesis text On vone.four.zero the trim sweep turns red; the regression is caught by the four thousand, seven hundred and fifty and five thousand points.
+2026-10-31 02:44:29,579 INFO yield speech len 12.16, rtf 0.5369516775796288
+
+100%|██████████| 1/1 [00:06<00:00,  6.71s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:44:30,293 INFO synthesis text On vone.four.zero the trim sweep turns red; the regression is caught by the four thousand, seven hundred and fifty and five thousand points.
+2026-10-31 02:44:37,518 INFO yield speech len 14.16, rtf 0.510242783417136
+
+100%|██████████| 1/1 [00:07<00:00,  7.41s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:44:38,155 INFO synthesis text On vone.four.zero the trim sweep turns red; the regression is caught by the four thousand, seven hundred and fifty and five thousand points.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:44:59,863 WARNING synthesis text No. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:44:59,993 INFO synthesis text No.
+2026-10-31 02:45:00,953 INFO yield speech len 0.92, rtf 1.042744906052299
+
+100%|██████████| 1/1 [00:01<00:00,  1.13s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:01,212 WARNING synthesis text No. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:45:01,366 INFO synthesis text No.
+2026-10-31 02:45:01,999 INFO yield speech len 0.2, rtf 3.165144920349121
+
+100%|██████████| 1/1 [00:00<00:00,  1.21it/s]
+100%|██████████| 1/1 [00:00<00:00,  1.20it/s]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:02,200 WARNING synthesis text No. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:45:02,330 INFO synthesis text No.
+2026-10-31 02:45:03,234 INFO yield speech len 0.64, rtf 1.412692666053772
+
+100%|██████████| 1/1 [00:01<00:00,  1.08s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:03,564 INFO synthesis text In statistical terms we must show, at confidence C, that reliability is at least R.
+2026-10-31 02:45:08,202 INFO yield speech len 8.6, rtf 0.5392822276714236
+
+100%|██████████| 1/1 [00:04<00:00,  4.82s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:08,740 INFO synthesis text Argue by contradiction: if reliability were only R, n straight successes would have probability R to the n, and we require that to be at most one minus C.
+2026-10-31 02:45:16,412 INFO yield speech len 14.76, rtf 0.5198088603291086
+
+100%|██████████| 1/1 [00:07<00:00,  7.85s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:17,126 INFO synthesis text With ninety-nine.five and ninety-five percent that gives five hundred and ninety-seven.six, so five hundred and ninety-eight trials.
+2026-10-31 02:45:22,684 INFO yield speech len 10.76, rtf 0.5165659805212766
+
+100%|██████████| 1/1 [00:05<00:00,  5.73s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:23,260 INFO synthesis text With ninety-nine.five and ninety-five percent that gives five hundred and ninety-seven.six, so five hundred and ninety-eight trials.
+2026-10-31 02:45:28,705 INFO yield speech len 10.36, rtf 0.5255465802078542
+
+100%|██████████| 1/1 [00:05<00:00,  5.62s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:29,202 INFO synthesis text With ninety-nine.five and ninety-five percent that gives five hundred and ninety-seven.six, so five hundred and ninety-eight trials.
+2026-10-31 02:45:33,639 INFO yield speech len 8.28, rtf 0.535869080087413
+
+100%|██████████| 1/1 [00:04<00:00,  4.61s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.61s/it]
+！听着不清（0.827，试了 3 次）：With 99.5 and 95 percent that gives 597.6, so 598 trials. → with 99.95% that gives 597, X, so 598 trials.
+cv2: 130/195 句，用时 31.6 分钟，预计还要 15.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:34,144 INFO synthesis text A handy approximation is three times the reciprocal of the failure rate.
+2026-10-31 02:45:36,959 INFO yield speech len 5.0, rtf 0.5629022598266602
+
+100%|██████████| 1/1 [00:02<00:00,  2.99s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:37,420 INFO synthesis text A handy approximation is three times the reciprocal of the failure rate.
+2026-10-31 02:45:40,485 INFO yield speech len 5.56, rtf 0.5512919786165087
+
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:45:40,955 INFO synthesis text Allowing one failure needs nine hundred and forty-seven, two one thousand, two hundred and fifty-eight, three one thousand, five hundred and forty-nine.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:46:23,904 INFO synthesis text On the right, the bench calculator cycles through zero, one, two and three failures in one thousand.
+2026-10-31 02:46:29,399 INFO yield speech len 10.44, rtf 0.526313466587286
+
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:46:29,902 INFO synthesis text On the right, the bench calculator cycles through zero, one, two and three failures in one thousand.
+2026-10-31 02:46:34,736 INFO yield speech len 8.92, rtf 0.5419929465905433
+
+100%|██████████| 1/1 [00:05<00:00,  5.01s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:46:35,281 INFO synthesis text On the right, the bench calculator cycles through zero, one, two and three failures in one thousand.
+2026-10-31 02:46:40,662 INFO yield speech len 10.44, rtf 0.5154921862357421
+
+100%|██████████| 1/1 [00:05<00:00,  5.56s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.56s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:46:41,258 INFO synthesis text One failure: lower bound ninety-nine.fifty-three percent, which passes.
+2026-10-31 02:46:45,025 INFO yield speech len 6.96, rtf 0.5413034524040661
+
+100%|██████████| 1/1 [00:03<00:00,  3.94s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:46:45,532 INFO synthesis text One failure: lower bound ninety-nine.fifty-three percent, which passes.
+
+100%|██████████| 1/1 [00:05<00:00,  5.33s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.33s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:47:11,666 INFO synthesis text So one thousand trials can allow at most one failure.
+2026-10-31 02:47:13,659 INFO yield speech len 3.44, rtf 0.5791395209556403
+
+100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+cv2: 140/195 句，用时 33.3 分钟，预计还要 13.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:47:14,113 INFO synthesis text Continuous integration asks a second question: if it got worse, how many trials until we see it?
+2026-10-31 02:47:18,395 INFO yield speech len 8.0, rtf 0.5353180170059204
+
+100%|██████████| 1/1 [00:04<00:00,  4.46s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:47:18,961 INFO synthesis text The chance of at least one failure is one minus (one minus p) to the n.
+2026-10-31 02:47:23,135 INFO yield speech len 7.72, rtf 0.540640687695439
+
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:47:23,692 INFO synthesis text At four thousand, seven hundred and fifty r/min, with a one.two percent failure rate, two hundred and fifty trials give ninety-five percent; at five thousand, with seventeen percent, just ten trials give eighty-four percent.
+2026-10-31 02:47:32,034 INFO yield speech len 16.56, rtf 0.5037171829149919
+
+100%|██████████| 1/1 [00:08<00:00,  8.53s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:47:32,778 INFO synthesis text At four thousand, seven hundred and fifty r/min, with a one.two percent failure rate, two hundred and fifty trials give ninety-five percent; at five thousand, with seventeen percent, just ten trials give eighty-four percent.
+2026-10-31 02:47:43,645 INFO yield speech len 20.68, rtf 0.5254829529406254
+
+100%|██████████| 1/1 [00:11<00:00, 11.06s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:47:44,384 INFO synthesis text At four thousand, seven hundred and fifty r/min, with a one.two percent failure rate, two hundred and fifty trials give ninety-five percent; at five thousand, with seventeen percent, just ten trials give eighty-four percent.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:48:23,617 INFO synthesis text It has only an upper limit, one degree, so we use one-sided Cpk: upper limit minus mean, over three standard deviations.
+2026-10-31 02:48:29,071 INFO yield speech len 10.2, rtf 0.5347444029415356
+
+100%|██████████| 1/1 [00:05<00:00,  5.63s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:48:29,768 INFO synthesis text At least one.thirty-three means four sigma between the mean and the limit.
+2026-10-31 02:48:33,576 INFO yield speech len 7.04, rtf 0.5409074100581083
+
+100%|██████████| 1/1 [00:03<00:00,  3.99s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:48:34,078 INFO synthesis text Our case hides a second problem: vone.three.two raised the position gain to three hundred, and a single stop at zero.ninety-one degrees passed every time.
+2026-10-31 02:48:41,213 INFO yield speech len 13.84, rtf 0.515551408591298
+
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.31s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:48:41,944 INFO synthesis text Our case hides a second problem: vone.three.two raised the position gain to three hundred, and a single stop at zero.ninety-one degrees passed every time.
+2026-10-31 02:49:04,596 INFO synthesis text When is a prototype finished?
+2026-10-31 02:49:06,259 INFO yield speech len 2.48, rtf 0.6707937486710087
+
+100%|██████████| 1/1 [00:01<00:00,  1.84s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.84s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:06,517 WARNING synthesis text When is a prototype finished? too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:49:06,644 INFO synthesis text When is a prototype finished?
+2026-10-31 02:49:08,467 INFO yield speech len 2.84, rtf 0.641716114232238
+
+100%|██████████| 1/1 [00:01<00:00,  2.00s/it]
+100%|██████████| 1/1 [00:01<00:00,  2.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:08,878 INFO synthesis text Leave it to gut feeling and it stays at 'almost' forever.
+2026-10-31 02:49:11,654 INFO yield speech len 4.96, rtf 0.5597835106234397
+
+100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.96s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:12,140 INFO synthesis text Leave it to gut feeling and it stays at 'almost' forever.
+2026-10-31 02:49:15,329 INFO yield speech len 5.88, rtf 0.5424290287251375
+
+100%|██████████| 1/1 [00:03<00:00,  3.36s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.36s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:15,808 INFO synthesis text Electronics uses a ladder of maturity stages: Pzero runs, Pone has all features, then engineering validation, EVT; design validation, DVT; production validation, PVT; then mass production.
+2026-10-31 02:49:25,947 INFO yield speech len 19.2, rtf 0.5280681575338046
+
+100%|██████████| 1/1 [00:10<00:00, 10.32s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:26,902 INFO synthesis text Electronics uses a ladder of maturity stages: Pzero runs, Pone has all features, then engineering validation, EVT; design validation, DVT; production validation, PVT; then mass production.
+2026-10-31 02:49:35,695 INFO yield speech len 17.36, rtf 0.5065335244077691
+
+100%|██████████| 1/1 [00:08<00:00,  8.99s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:36,585 INFO synthesis text Electronics uses a ladder of maturity stages: Pzero runs, Pone has all features, then engineering validation, EVT; design validation, DVT; production validation, PVT; then mass production.
+2026-10-31 02:49:47,619 INFO yield speech len 21.32, rtf 0.5175290367169407
+
+100%|██████████| 1/1 [00:11<00:00, 11.22s/it]
+100%|██████████| 1/1 [00:11<00:00, 11.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:49:48,579 INFO synthesis text Here each stage's exit criteria are written as numbers an automated test can decide.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:50:43,361 INFO synthesis text And proving ninety-nine.five percent grasp success also takes five hundred and ninety-eight straight successes.
+2026-10-31 02:50:48,510 INFO yield speech len 9.6, rtf 0.5363619327545166
+
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.32s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:50:48,865 WARNING synthesis text Everyday life works the same way. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:50:48,990 INFO synthesis text Everyday life works the same way.
+2026-10-31 02:50:55,508 INFO yield speech len 8.52, rtf 0.5294478275406529
+
+100%|██████████| 1/1 [00:04<00:00,  4.69s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.69s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:50:56,195 INFO synthesis text To test it, pick the worst weather on purpose, and try enough times.
+2026-10-31 02:50:59,223 INFO yield speech len 5.68, rtf 0.5330500048650822
+
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.20s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:50:59,699 INFO synthesis text How many times and under what conditions matter far more than the words 'we tried it'.
+2026-10-31 02:51:03,319 INFO yield speech len 6.72, rtf 0.5387355174337115
+
+100%|██████████| 1/1 [00:03<00:00,  3.79s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:03,704 WARNING synthesis text Back to the start. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:51:03,830 INFO synthesis text Back to the start.
+2026-10-31 02:51:04,872 INFO yield speech len 1.32, rtf 0.7896965200250798
+
+100%|██████████| 1/1 [00:01<00:00,  1.22s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:05,281 INFO synthesis text With a ten millisecond delay, a command speed above six hundred and sixty-seven r/min means a failed trim, and vone.four.zero stopping from five thousand at low voltage commands at about one thousand, one hundred and fifty.
+2026-10-31 02:51:14,043 INFO yield speech len 17.04, rtf 0.514175466528521
+
+100%|██████████| 1/1 [00:08<00:00,  8.94s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:14,867 INFO synthesis text Someone trying fifty times at four thousand, seven hundred and fifty has a fifty-five percent chance of seeing no failure at all.
+2026-10-31 02:51:20,982 INFO yield speech len 11.52, rtf 0.5308356136083603
+
+100%|██████████| 1/1 [00:06<00:00,  6.30s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:21,609 INFO synthesis text Someone trying fifty times at four thousand, seven hundred and fifty has a fifty-five percent chance of seeing no failure at all.
+2026-10-31 02:51:26,837 INFO yield speech len 9.76, rtf 0.5356500871845933
+
+100%|██████████| 1/1 [00:05<00:00,  5.40s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.40s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:27,431 INFO synthesis text Proving ninety-nine.five percent at ninety-five percent confidence takes five hundred and ninety-eight straight successes.
+2026-10-31 02:51:32,499 INFO yield speech len 9.6, rtf 0.5280193438132604
+
+100%|██████████| 1/1 [00:05<00:00,  5.25s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.25s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:33,018 INFO synthesis text Proving ninety-nine.five percent at ninety-five percent confidence takes five hundred and ninety-eight straight successes.
+2026-10-31 02:51:37,729 INFO yield speech len 9.2, rtf 0.512088355810746
+
+100%|██████████| 1/1 [00:04<00:00,  4.89s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:38,258 INFO synthesis text Proving ninety-nine.five percent at ninety-five percent confidence takes five hundred and ninety-eight straight successes.
+2026-10-31 02:51:42,875 INFO yield speech len 8.88, rtf 0.519962622238709
+
+100%|██████████| 1/1 [00:04<00:00,  4.79s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:51:43,388 INFO synthesis text Testing two hundred and fifty times a night at four thousand, seven hundred and fifty catches it with about ninety-five percent probability; at five thousand a handful of trials will do.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:53:19,094 INFO synthesis text Task three: in the calculator enter ninety-nine.five percent reliability and ninety-five percent confidence, with zero and then one failure allowed, and read off the trials needed, then the lower bound for zero, one and two failures in one thousand. The guide and report template are on the platform.
+2026-10-31 02:53:31,120 INFO yield speech len 23.76, rtf 0.5061471703076603
+
+100%|██████████| 1/1 [00:12<00:00, 12.22s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:53:32,033 INFO synthesis text Task three: in the calculator enter ninety-nine.five percent reliability and ninety-five percent confidence, with zero and then one failure allowed, and read off the trials needed, then the lower bound for zero, one and two failures in one thousand. The guide and report template are on the platform.
+2026-10-31 02:53:43,939 INFO yield speech len 22.88, rtf 0.5203440264388398
+
+100%|██████████| 1/1 [00:12<00:00, 12.09s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:53:45,023 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-10-31 02:53:48,767 INFO yield speech len 6.8, rtf 0.5505522209055284
+
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:53:49,246 INFO synthesis text You can open today's interactive slides and the test bench and work them yourself, including the pages this video skipped.
+
+100%|██████████| 1/1 [00:05<00:00,  5.91s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.91s/it]
+cv2: 180/195 句，用时 40.3 分钟，预计还要 3.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:54:13,286 INFO synthesis text Your assignment has four questions. One: a customer wants ninety-nine.eight percent trim success at ninety percent confidence. How many trims, and how many minutes, with zero failures and with one allowed, and over which conditions should they go?
+2026-10-31 02:54:22,479 INFO yield speech len 17.76, rtf 0.517617340560432
+
+100%|██████████| 1/1 [00:09<00:00,  9.37s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:54:23,442 INFO synthesis text Your assignment has four questions. One: a customer wants ninety-nine.eight percent trim success at ninety percent confidence. How many trims, and how many minutes, with zero failures and with one allowed, and over which conditions should they go?
+2026-10-31 02:54:32,468 INFO yield speech len 17.28, rtf 0.5223434694387294
+
+100%|██████████| 1/1 [00:09<00:00,  9.21s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:54:33,434 INFO synthesis text Two: a change may raise the trim failure rate at four thousand, seven hundred and fifty r/min to one.two percent. To be ninety-nine percent sure of catching it each night, how many trims are needed, and what if they run at four thousand instead? Three: two candidate builds each stop fifty times. Find the one-sided Cpk and judge it against one.thirty-three.
+2026-10-31 02:54:46,949 INFO yield speech len 25.92, rtf 0.521421883209252
+
+100%|██████████| 1/1 [00:13<00:00, 13.71s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.71s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:54:48,272 INFO synthesis text Two: a change may raise the trim failure rate at four thousand, seven hundred and fifty r/min to one.two percent. To be ninety-nine percent sure of catching it each night, how many trims are needed, and what if they run at four thousand instead? Three: two candidate builds each stop fifty times. Find the one-sided Cpk and judge it against one.thirty-three.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:55:35,855 INFO synthesis text There's also a ten-question quiz. For example, to show at least ninety-nine percent success at ninety-five percent confidence with zero failures, how many trials do you need?
+2026-10-31 02:55:42,103 INFO yield speech len 12.04, rtf 0.5188991857129475
+
+100%|██████████| 1/1 [00:06<00:00,  6.42s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:55:42,836 INFO synthesis text There's also a ten-question quiz. For example, to show at least ninety-nine percent success at ninety-five percent confidence with zero failures, how many trials do you need?
+2026-10-31 02:55:49,422 INFO yield speech len 12.44, rtf 0.5294395221391291
+
+100%|██████████| 1/1 [00:06<00:00,  6.77s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.77s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:55:50,190 INFO synthesis text There's also a ten-question quiz. For example, to show at least ninety-nine percent success at ninety-five percent confidence with zero failures, how many trials do you need?
+
+100%|██████████| 1/1 [00:07<00:00,  7.55s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:14,203 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-10-31 02:56:17,132 INFO yield speech len 5.2, rtf 0.5633385823323176
+
+100%|██████████| 1/1 [00:03<00:00,  3.10s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:17,479 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-10-31 02:56:17,607 INFO synthesis text Three things to remember.
+2026-10-31 02:56:18,838 INFO yield speech len 1.76, rtf 0.6992203268137845
+
+100%|██████████| 1/1 [00:01<00:00,  1.41s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.41s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:19,207 INFO synthesis text One: the test pyramid, unit, SIL, HIL, full machine and end-of-line, and catch each defect at the lowest layer that can.
+2026-10-31 02:56:25,717 INFO yield speech len 12.52, rtf 0.5199915113540503
+
+100%|██████████| 1/1 [00:06<00:00,  6.68s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:26,419 INFO synthesis text Two: statistics decides how many trials: zero-failure n is at least ln of one minus C over ln R; with failures use the lower bound; to catch regressions, spend trials on the most sensitive conditions.
+2026-10-31 02:56:35,237 INFO yield speech len 17.12, rtf 0.5150733985633493
+
+100%|██████████| 1/1 [00:09<00:00,  9.00s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.00s/it]
+cv2: 190/195 句，用时 42.6 分钟，预计还要 1.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:36,112 INFO synthesis text Three: continuous integration tests every commit, every night and every week, and every maturity stage exits on numbers.
+2026-10-31 02:56:41,160 INFO yield speech len 9.64, rtf 0.523674389138756
+
+100%|██████████| 1/1 [00:05<00:00,  5.23s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:41,869 INFO synthesis text The assignment, quiz and lab report are on WenQuest.
+2026-10-31 02:56:44,560 INFO yield speech len 5.0, rtf 0.5382294178009033
+
+100%|██████████| 1/1 [00:02<00:00,  2.86s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.86s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:45,011 INFO synthesis text The assignment, quiz and lab report are on WenQuest.
+2026-10-31 02:56:48,262 INFO yield speech len 5.8, rtf 0.5605706264232767
+
+100%|██████████| 1/1 [00:03<00:00,  3.42s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:48,748 INFO synthesis text Next time: how the sewing machine is designed, built and inspected.
+2026-10-31 02:56:52,078 INFO yield speech len 6.08, rtf 0.5476867682055423
+
+100%|██████████| 1/1 [00:03<00:00,  3.52s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.52s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-10-31 02:56:52,567 INFO synthesis text The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+GPU 机器已关机，用时 54 分钟
