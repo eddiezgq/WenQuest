@@ -63,9 +63,18 @@ def upload(d: Path, privacy: str, playlist: str | None) -> str:
     if (d / "lecture.srt").exists():
         yt.captions().insert(part="snippet", body={"snippet": {"videoId": vid, "language": yl, "name": "中文" if zh else "English"}},
                              media_body=MediaFileUpload(str(d / "lecture.srt"), mimetype="application/octet-stream")).execute()
-    if playlist:
-        yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": playlist_id(yt, playlist, yl),
-                                                                    "resourceId": {"kind": "youtube#video", "videoId": vid}}}).execute()
+    if playlist:   # 视频已经传上去了：加播放列表遇到临时错误（2026-10-31 HTTP 409 SERVICE_UNAVAILABLE）就重试，仍失败只警告、不让整个作业失败
+        import time
+        for k in range(4):
+            try:
+                yt.playlistItems().insert(part="snippet", body={"snippet": {"playlistId": playlist_id(yt, playlist, yl),
+                                                                            "resourceId": {"kind": "youtube#video", "videoId": vid}}}).execute()
+                break
+            except Exception as e:   # noqa: BLE001
+                if k == 3:
+                    print(f"::warning title=没加进播放列表::{vid} 加入“{playlist}”失败：{e}；请在 YouTube Studio 里手动加入", flush=True)
+                else:
+                    time.sleep(20 * (k + 1))
     print(f"https://youtu.be/{vid}  ({privacy})")
     return vid
 

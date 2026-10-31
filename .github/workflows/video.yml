@@ -11,7 +11,7 @@ on:
       task:
         description: "audition（试听）或 render（成片）"
         type: choice
-        options: [render, audition, ytcheck, release]
+        options: [render, audition, ytcheck, release, upload]
         default: render
       lectures:
         description: "讲稿目录，空格分隔（如 docs/课程视频/线性代数/14-2）"
@@ -33,7 +33,7 @@ on:
         options: [none, youtube]
         default: none
       run:
-        description: "release：把以前某次运行（run id）的成片做成直接下载页"
+        description: "release：把以前某次运行（run id）的成片做成直接下载页；upload：把以前某次运行的成片补传 YouTube（按 lang 选语言）"
         required: false
         default: ""
       lang:
@@ -271,3 +271,25 @@ jobs:
           gh release create "lecture-video-${{ inputs.run }}" "${files[@]}" --repo "${{ github.repository }}" \
             --title "公开课视频（run ${{ inputs.run }}）" --notes "成片直接下载（中文 zh、英文 en）：mp4、字幕、封面、上传资料。" \
             --prerelease --latest=false
+
+  # 补传（2026-10-31 第 22 讲：英文版传完后加播放列表一步遇到 YouTube 临时错误，中文版没传；重跑整个上传作业会重复传英文版）
+  reupload:
+    if: inputs.task == 'upload' && inputs.run != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Upload an earlier run's videos to YouTube (private), only the chosen language(s)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          pip install -q google-api-python-client google-auth
+          gh run download "${{ inputs.run }}" --repo "${{ github.repository }}" -n videos -D "$RUNNER_TEMP/videos"
+          case "${{ inputs.lang }}" in both) langs="en zh";; *) langs="${{ inputs.lang }}";; esac
+          for l in $langs; do for d in "$RUNNER_TEMP"/videos/*/$l; do [ -f "$d/upload.json" ] || continue; python tools/video/upload_youtube.py "$d" --privacy private; done; done
