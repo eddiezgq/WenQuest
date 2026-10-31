@@ -21,6 +21,12 @@ def _bbox(svg):
         v = [float(x) for x in NUM.findall(d)]
         xs += v[0::2]
         ys += v[1::2]
+    # full circles and ellipses come as their own elements (the outer edge of a cylindrical cam seen along its axis)
+    for el in re.findall(r"<(?:circle|ellipse)\b[^>]*>", svg):
+        a = {k: float(v) for k, v in re.findall(r'\b(cx|cy|r|rx|ry)\s*=\s*"([-0-9.eE+]+)"', el)}
+        rx, ry = a.get("rx", a.get("r", 0.0)), a.get("ry", a.get("r", 0.0))
+        xs += [a.get("cx", 0.0) - rx, a.get("cx", 0.0) + rx]
+        ys += [a.get("cy", 0.0) - ry, a.get("cy", 0.0) + ry]
     if not xs:
         return 0, 0, 1, 1
     return min(xs), min(ys), max(xs), max(ys)
@@ -188,3 +194,37 @@ def arm_rows(arm):
     names = {"R_tip": "刀爪中心半径", "R_hub": "轮毂半径", "bore": "轴孔半径", "w_root": "臂根宽", "w_tip": "臂端宽",
              "R_grip": "刀爪外半径", "r_fork": "叉口半径", "thickness": "厚度", "fillet": "倒圆半径"}
     return [(names[k], _f(arm.get(k))) for k in names if arm.get(k) not in (None, "")]
+
+
+def cyl_rows(sub):
+    """圆柱凸轮（第 39 轮第 8 步）的主要参数。"""
+    from camkit import cylindrical as C
+    from camkit.program import Program
+    prog = Program.from_dict(sub.get("program") or {})
+    c = C.cyl(sub.get("cylindrical"), prog.unit)
+    rows = [("从动件", "直动" if c.follower == "translating" else "摆动"),
+            ("滚子", "锥形（锥顶在凸轮轴线上）" if c.roller == "cone" else "圆柱"),
+            ("节圆柱半径 R_p", _f(c.Rp)), ("滚子半径 r_r" + ("（中点）" if c.roller == "cone" else ""), _f(c.rr)),
+            ("滚子在槽里的长度 b", _f(c.b)), ("外圆半径", _f(c.x2)), ("槽底半径", _f(c.core)),
+            ("槽侧间隙", _f(c.gap)), ("凸轮长度", _f(c.length)), ("转向", "逆时针" if c.sigma == 1 else "顺时针")]
+    if c.follower == "oscillating":
+        rows.append(("摆杆长", _f(c.arm)))
+    rows.append(("槽侧面", "啮合方程精确曲面 ≤0.25µm"))
+    return rows
+
+
+def cyl_coords(sub, step_deg=20.0):
+    """槽中心线（滚子中点处）展开坐标：凸轮坐标系里的方位角、沿凸轮轴线的位置（两侧槽侧的中点）。"""
+    import numpy as np
+
+    from camkit import cylindrical as C
+    from camkit.program import Program
+    prog = Program.from_dict(sub.get("program") or {})
+    c = C.cyl(sub.get("cylindrical"), prog.unit)
+    r = C.rings(c, prog)
+    lo, hi = np.array(r["outer"]["lo"]), np.array(r["outer"]["hi"])
+    rows = []
+    for a in range(0, 360, int(step_deg)):
+        rows.append(("{}°".format(a), "z {}  槽宽 {}".format(_f((lo[a] + hi[a]) / 2), _f(hi[a] - lo[a]))))
+    return rows
+

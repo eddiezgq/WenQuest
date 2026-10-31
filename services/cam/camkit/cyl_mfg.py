@@ -12,8 +12,10 @@ what this leaves. Points by chord tolerance: X and Y interpolated linearly in A 
 
 Simulation reads the program text back, sweeps the cutter through the program's positions and measures, along the normal
 at points of the exact flanks (camkit.cylindrical), how far the machined surface is: + material left, − overcut.
-Model: the blank (radius = outer, the cam length) with everything the cutter passes through removed, kept as a height
-field over (cam angle, z): the radius of the material along each ray from the cam axis.
+Model: the STL is the blank minus the groove ring the cutter sweeps (camkit.cyl_solid). height_field() below is an
+independent check for translating followers: everything the cutter passes through removed from the blank, kept as the
+radius of the material along each ray from the cam axis (it cannot hold the overhanging walls an off-axis cutter
+leaves with an oscillating follower).
 
 Plain code: no AI, no network. Lengths mm, angles degrees at the edge.
 """
@@ -63,8 +65,11 @@ def tool_path(c: C.Cyl, prog: Program, side: int, rt: float, dense: int = 14400)
         _, n, *_ = C.contact(c, ps, np.array([[c.Rp]]), side)
         ny, nz = n[1][:, 0], n[2][:, 0]
         ln = np.hypot(ny, nz)
-        y += (c.rr - rt) * ny / ln  # n points from the roller into the cam: move towards that flank
-        z += (c.rr - rt) * nz / ln
+        # n points from the roller into the cam: move towards that flank. A cone's normal leans by its taper, so a
+        # sideways shift s moves its surface s / √(1 + k²) along the normal: shift by √(1 + k²) · gap/2
+        d = (c.rr - rt) + c.gap / 2 * math.sqrt(1 + c.k * c.k)
+        y += d * ny / ln
+        z += d * nz / ln
     return th, y, z
 
 
@@ -109,10 +114,13 @@ def select_with_joints(A, Y, X, tol, brk):
 def program(c: C.Cyl, prog: Program, st: dict, title: str = "") -> str:
     s = settings(c, st)
     rt, tol = s["tool_r"], s["chord_tol"]
-    sides = (0,) if abs(rt - c.rr) < 1e-9 else (1, -1)
+    sides = (0,) if abs(rt - c.rr) < 1e-9 and c.gap == 0 else (1, -1)  # a side clearance: one pass per flank
     useY = c.follower == "oscillating" or len(sides) > 1
     tool = (f"TAPERED CUTTER, APEX ON THE CAM AXIS, RADIUS {c.rr:.4f} MM AT {c.Rp:.4f} MM" if c.roller == "cone"
-            else f"CUTTER RADIUS {rt:.4f} MM" + (" = ROLLER RADIUS" if not sides[0] else " - ONE PASS PER FLANK"))
+            else f"CUTTER RADIUS {rt:.4f} MM" + (" = ROLLER RADIUS" if abs(rt - c.rr) < 1e-9 else "")
+            + ("" if not sides[0] else " - ONE PASS PER FLANK"))
+    if c.gap:
+        tool += f") (SIDE CLEARANCE {c.gap:.4f} MM: EACH FLANK {c.gap / 2:.4f} MM AWAY FROM THE ROLLER"
     out = ["%", f"O{s['prog_no']:04d} (WENQUEST CAM CYLINDRICAL 4-AXIS)", f"({_ascii(title)})",
            "(A: BLANK ABOUT THE CAM AXIS - X: ALONG THE CAM AXIS - Y: ACROSS - TOOL AXIS Z RADIAL)",
            f"(X0 AT THE MIDDLE OF THE CAM LENGTH {c.length:.4f} MM, Y0 ON THE CAM AXIS)",
@@ -224,7 +232,8 @@ def simulate(c: C.Cyl, prog: Program, text: str, tool_r: float | None = None, st
                 continue
             ths, ys, xs = th_c[near], Yc[near], Xc[near]
             for i in range(k):
-                q, ng = Q[:, j, i:i + 1], -N[:, j, i:i + 1]  # out of the material, into the groove
+                ng = -N[:, j, i:i + 1]  # out of the material, into the groove
+                q = Q[:, j, i:i + 1] - (c.gap / 2) * ng  # the flank as made: half the clearance away from the roller
                 P = C.fixed_frame(c, q, ths)
                 D = C.fixed_frame(c, ng, ths)
                 t1, t2 = _cutter_hit(c, rt, P, D, ys, xs)
@@ -254,45 +263,51 @@ def height_field(c: C.Cyl, text: str, d_theta: float = 0.5, dz: float = 0.5, ste
     reach = max(c.rr, c.k * c.x2) + 1.0
     half = math.asin(min(1.0, (reach + abs(c.arm * 0.5)) / c.core)) + 2 * dt if c.follower == "oscillating" else \
         math.asin(min(1.0, reach / c.core)) + 2 * dt
-    for j in range(len(th_c)):
-        th, Y, X = th_c[j], Yc[j], Xc[j]
-        pol = -c.sigma * th  # the cutter's axis direction (x̂) seen in the cam frame
-        k0, k1 = int(math.floor((pol - half) / dt)), int(math.ceil((pol + half) / dt))
-        ks = np.mod(np.arange(k0, k1 + 1), nt)
-        zsel = np.flatnonzero(np.abs(zs - X) <= reach + dz)
-        if not len(zsel):
-            continue
-        beta = tc[ks][:, None] + c.sigma * th  # the ray's direction in the fixed frame
-        cb, sb = np.cos(beta), np.sin(beta)
-        dzz = zs[zsel][None, :] - X
-        if c.roller == "cone":
-            a2 = sb * sb - c.k * c.k * cb * cb
-            a1 = -2 * sb * Y
-            a0 = Y * Y + dzz * dzz
-        else:
-            a2 = sb * sb + 0 * dzz
-            a1 = -2 * sb * Y + 0 * dzz
-            a0 = Y * Y + dzz * dzz - rt * rt
-        disc = a1 * a1 - 4 * a2 * a0
-        with np.errstate(divide="ignore", invalid="ignore"):
-            sq = np.sqrt(np.maximum(disc, 0))
-            ra, rb = (-a1 - sq) / (2 * a2), (-a1 + sq) / (2 * a2)
-        lo_r, hi_r = np.minimum(ra, rb), np.maximum(ra, rb)
-        # inside the cutter where a2 r² + a1 r + a0 < 0: between the roots (a2 > 0), beyond them (a2 < 0)
-        small = np.abs(a2) < 1e-12
-        lo = np.where(a2 > 0, lo_r, hi_r)
-        hi = np.where(a2 > 0, hi_r, np.inf)
-        lo = np.where(small, np.where(a0 < 0, 0.0, np.inf), lo)
-        hi = np.where(small, np.where(a0 < 0, np.inf, -np.inf), hi)
-        lo = np.where((disc < 0) & (a2 < 0), 0.0, lo)  # always inside (cone, ray near its axis)
-        hi = np.where((disc < 0) & (a2 > 0), -np.inf, hi)
-        # the cutter's end at the groove bottom: r cos β ≥ core
-        with np.errstate(divide="ignore", invalid="ignore"):
-            r_end = np.where(cb > 1e-9, c.core / cb, np.inf)
-        lo = np.maximum(lo, r_end)
-        cur = top[np.ix_(ks, zsel)]
-        cut = (hi > lo) & (hi >= cur - 1e-9)  # opens to the outside of the material
-        top[np.ix_(ks, zsel)] = np.where(cut, np.minimum(cur, np.maximum(lo, 0.0)), cur)
+    # a cut counts once it opens to the outside; with the cutter axis off the cam axis (oscillating follower) a cut
+    # can come before the one that opens the column above it, so the sweep is repeated until nothing changes
+    for _sweep in range(4):
+        before = top.copy()
+        for j in range(len(th_c)):
+            th, Y, X = th_c[j], Yc[j], Xc[j]
+            pol = -c.sigma * th  # the cutter's axis direction (x̂) seen in the cam frame
+            k0, k1 = int(math.floor((pol - half) / dt)), int(math.ceil((pol + half) / dt))
+            ks = np.mod(np.arange(k0, k1 + 1), nt)
+            zsel = np.flatnonzero(np.abs(zs - X) <= reach + dz)
+            if not len(zsel):
+                continue
+            beta = tc[ks][:, None] + c.sigma * th  # the ray's direction in the fixed frame
+            cb, sb = np.cos(beta), np.sin(beta)
+            dzz = zs[zsel][None, :] - X
+            if c.roller == "cone":
+                a2 = sb * sb - c.k * c.k * cb * cb
+                a1 = -2 * sb * Y
+                a0 = Y * Y + dzz * dzz
+            else:
+                a2 = sb * sb + 0 * dzz
+                a1 = -2 * sb * Y + 0 * dzz
+                a0 = Y * Y + dzz * dzz - rt * rt
+            disc = a1 * a1 - 4 * a2 * a0
+            with np.errstate(divide="ignore", invalid="ignore"):
+                sq = np.sqrt(np.maximum(disc, 0))
+                ra, rb = (-a1 - sq) / (2 * a2), (-a1 + sq) / (2 * a2)
+            lo_r, hi_r = np.minimum(ra, rb), np.maximum(ra, rb)
+            # inside the cutter where a2 r² + a1 r + a0 < 0: between the roots (a2 > 0), beyond them (a2 < 0)
+            small = np.abs(a2) < 1e-12
+            lo = np.where(a2 > 0, lo_r, hi_r)
+            hi = np.where(a2 > 0, hi_r, np.inf)
+            lo = np.where(small, np.where(a0 < 0, 0.0, np.inf), lo)
+            hi = np.where(small, np.where(a0 < 0, np.inf, -np.inf), hi)
+            lo = np.where((disc < 0) & (a2 < 0), 0.0, lo)  # always inside (cone, ray near its axis)
+            hi = np.where((disc < 0) & (a2 > 0), -np.inf, hi)
+            # the cutter's end at the groove bottom: r cos β ≥ core
+            with np.errstate(divide="ignore", invalid="ignore"):
+                r_end = np.where(cb > 1e-9, c.core / cb, np.inf)
+            lo = np.maximum(lo, r_end)
+            cur = top[np.ix_(ks, zsel)]
+            cut = (hi > lo) & (hi >= cur - 1e-9)  # opens to the outside of the material
+            top[np.ix_(ks, zsel)] = np.where(cut, np.minimum(cur, np.maximum(lo, 0.0)), cur)
+        if np.array_equal(before, top):
+            break
     return np.degrees(tc), zs, top
 
 
@@ -330,10 +345,13 @@ def manufacture(project: dict) -> dict:
 
 
 def model_stl(project: dict, fine: bool = True) -> bytes:
+    """The cam as machined, as STL: the blank minus the groove ring the cutter sweeps (camkit.cyl_solid, the same faces
+    as the exact solid). Not the height field above: with an oscillating follower the cutter axis is off the cam axis
+    and the groove walls overhang, which a height field cannot hold."""
+    from camkit import cyl_solid as CS
+
     prog = Program.from_dict(project.get("program") or {})
     c = C.cyl(project.get("cylindrical"), prog.unit)
-    st = settings(c, (project.get("mfg") or {}).get("four") or {})
-    text = program(c, prog, st, "")
-    tc, zs, top = height_field(c, text, d_theta=0.5 if fine else 1.0, dz=0.5 if fine else 1.0)
-    V, F = mesh(tc, zs, top)
+    settings(c, (project.get("mfg") or {}).get("four") or {})
+    V, F, _ = CS.mesh_part(c, prog, segments=720 if fine else 360)
     return stl(V, F, "cylindrical")

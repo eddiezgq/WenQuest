@@ -4,3 +4,4 @@ shapely==2.1.2
 httpx==0.28.1
 fastapi==0.141.1
 uvicorn==0.46.0
+manifold3d==3.5.4
