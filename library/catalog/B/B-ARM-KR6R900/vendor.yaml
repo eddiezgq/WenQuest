@@ -14,6 +14,8 @@ datasheet:
     reach_mm: 901
     dof: 6
     ip: IP65/IP67
+    weight_kg: 55
+    repeatability_mm: 0.02
   labels:
     payload_kg:
       zh: 额定负载
@@ -31,12 +33,23 @@ datasheet:
       zh: 防护等级
       en: IP rating
       unit: ''
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
   src: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/kr-agilus
   note: 官网已不列 KR 6 R900 sixx，只剩新一代 KR 6 R900-2，此条取 KR 6 R900-2 的参数（sixx 老型号数据未取）。Total
     load 6 kg、Maximum reach 901 mm 三个地区页读取一致；页面未写明工作半径参考点。轴数：表内无此字段，取页面正文 "The KR
     AGILUS is our compact six-axis robot"（系列通用）。Protection class 原文 "IP 65, IP 67"，未分部位（不确定是本体与手腕分别对应，还是可选两档）。控制柜
     KR C5 micro / KR C5 micro-2。重复精度、重量、底座、轴范围与速度官网页无，未收。
 data_sources:
+- title: RoboDK 机器人库：KUKA KR 6 R900-2（重量 55 kg、重复精度 0.02 mm，取自 KUKA 规格书）
+  url: https://robodk.com/robot/KUKA/KR-6-R900-2
+  retrieved: '2026-10-31'
 - title: KUKA 官网 KR AGILUS 产品页（技术数据表；en-us、en-gb、en-at 三个地区页内容一致）
   url: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/kr-agilus
   retrieved: '2026-09-30'

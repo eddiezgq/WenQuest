@@ -12,6 +12,8 @@ datasheet:
   values:
     payload_kg: 5
     reach_mm: 950
+    dof: 6
+    weight_kg: 28
   labels:
     payload_kg:
       zh: 额定负载
@@ -21,11 +23,25 @@ datasheet:
       zh: 工作半径
       en: Reach
       unit: mm
+    dof:
+      zh: 自由度
+      en: DOF
+      unit: ''
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
   src: https://www.abb.com/global/en/areas/robotics/products/robots/collaborative-robots/gofa
   note: 工作半径 0.95 m 到手腕中心（官网原文 0.95 (wrist) | 1.05 (flange)）。CRB 15000 产品规格书（library.e.abb.com）返回
     403、new.abb.com 产品页权限请求超时，只能用 abb.com 产品页，故其余参数未收：官网只给全系列 up to 值（重复精度 0.02 mm、TCP
     速度 up to 2.2 m/s、防护 up to IP67），不能确定适用 5/0.95；页面未写轴数。
 data_sources:
+- title: ABB Collaborative robotics portfolio（9AKK108471A7656，产品对比表：GoFa 5 重 28 kg、6 轴）
+  url: https://library.e.abb.com/public/544f24358c4d4cfdba7375ad5de30707/9AKK108471A7656_en_A_ABB%20Collaborative%20robotics%20portfolio.pdf
+  retrieved: '2026-10-31'
+- title: RBTX：ABB GoFa CRB 15000-5/0.95（重量 28 kg）
+  url: https://rbtx.de/en-GB/components/robots/abb-gofa-cbr-15000-6-dof-950-mm-5-kg
+  retrieved: '2026-10-31'
 - title: ABB 官网 GoFa 产品页（变体表）
   url: https://www.abb.com/global/en/areas/robotics/products/robots/collaborative-robots/gofa
   retrieved: '2026-09-30'

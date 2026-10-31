@@ -14,6 +14,7 @@ datasheet:
     reach_mm: 820
     dof: 7
     ip: IP54
+    weight_kg: 30
   labels:
     payload_kg:
       zh: 额定负载
@@ -31,12 +32,19 @@ datasheet:
       zh: 防护等级
       en: IP rating
       unit: ''
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
   src: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa
   note: Total load 14 kg、Maximum reach 820 mm、Protection class IP 54，四个地区页读取一致；页面未写明工作半径参考点，IP
     未分部位。轴数 7 取页面正文 "joint torque sensors in all seven axes"。页面另写 axis-specific torque
     accuracy ±2% of the maximum torque（未收）。控制柜 KUKA Sunrise Cabinet。重复精度、重量、底座、轴范围与速度、TCP
     速度官网页无（官方宣传册 PDF 链接未能取到），未收。
 data_sources:
+- title: RoboDK 机器人库：KUKA LBR iiwa 14 R820（重量 30 kg）
+  url: https://robodk.com/robot/KUKA/LBR-iiwa-14-R820
+  retrieved: '2026-10-31'
 - title: KUKA 官网 LBR iiwa 产品页（技术数据表；en-us、en-de、en-hu、kuka.cn en-cn 四个地区页内容一致）
   url: https://www.kuka.com/en-us/products/robotics-systems/industrial-robots/lbr-iiwa
   retrieved: '2026-09-30'

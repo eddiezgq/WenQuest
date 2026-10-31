@@ -1,0 +1,26 @@
+# 实验 30.2 的指导书与报告模板。目的、场景、参数、任务取自 lab30_2.js。
+原理:
+  - ["选型的顺序：先算最重的零件（加上夹爪、快换盘），与额定负载比；再看臂展够不够到最远的取放点；再看能不能与人同场（协作机器人的功率与力限制），不能就要围栏或光幕；最后看节拍和价格。", "The selection order: first the heaviest part (plus gripper and tool changer) against the rated payload; then whether the reach covers the farthest point; then whether the robot may work beside people (power and force limiting) or needs guarding; finally cycle time and price."]
+  - 式: "负载裕量 = (额定负载 − 零件 − 夹爪) / 额定负载"
+  - ["一段点到点运动先加速到最高速度、匀速、再减速；距离短时走不到最高速度。一次取放 = 两段大范围转动 + 四段短的接近 + 两次夹爪开合：", "A point-to-point move accelerates to top speed, cruises and decelerates; a short move never reaches top speed. One pick and place = two large rotations + four short approaches + two gripper actions:"]
+  - 式: "t = s/v + v/a（s ≥ v²/a），t = 2√(s/a)（s < v²/a）"
+步骤:
+  - ["场景“部件装配工位”，WQ-CR5、与人同场：依次选六种零件，记录负载合格与否和裕量，填入表 1（任务 1、2）。", "Scene “Assembly station”, WQ-CR5 beside people: go through the six parts, recording whether the payload passes and its margin, in Table 1 (tasks 1 and 2)."]
+  - ["零件选 GR-302，依次换各台机器人，找出能搬它的，记下裕量（任务 3）。", "With GR-302 selected, try every robot, find those that can carry it and note the margin (task 3)."]
+  - ["选 IRB 1200 和 SCARA，看哪一项不合格（任务 4）。把八台机器人的负载、臂展、能否与人同场、结论填入表 2。", "Choose the IRB 1200 and the SCARA and see which check fails (task 4). Fill in Table 2 for all eight robots: payload, reach, sharing, verdict."]
+  - ["WQ-CR5 分别用“与人同场”和“围栏内全速”，记下一次取放和一套 SA-200 的时间，与人工部件装配的 15 min 比较（任务 5）。", "With the WQ-CR5, record one pick and place and one SA-200 in both modes and compare with the 15 min of manual sub-assembly (task 5)."]
+  - ["场景“搬家选车”：为冰箱、洗衣机、沙发各选能运的最小的车（任务 6）。", "Scene “Choosing a moving van”: pick the smallest vehicle for the fridge, the washing machine and the sofa (task 6)."]
+数据表:
+  - 标题: ["表 1  WQ-CR5 搬各种零件", "Table 1  WQ-CR5 with each part"]
+    表头: ["零件", "质量上限 / kg", "加夹爪 / kg", "合格？", "裕量 / %"]
+    表头英文: ["Part", "Mass bound / kg", "With gripper / kg", "Pass?", "Margin / %"]
+    行: [["SH-201", "", "", "", ""], ["SH-301", "", "", "", ""], ["GR-203", "", "", "", ""], ["GR-202", "", "", "", ""], ["SH-101", "", "", "", ""], ["GR-302", "", "", "", ""]]
+  - 标题: ["表 2  候选机器人", "Table 2  Candidate robots"]
+    表头: ["机器人", "负载 / kg", "臂展 / mm", "自重 / kg", "与人同场？", "能搬 GR-302？", "结论（搬 SH-201）"]
+    表头英文: ["Robot", "Payload / kg", "Reach / mm", "Own mass / kg", "Beside people?", "Carries GR-302?", "Verdict (SH-201)"]
+    行: [["WQ-CR5", "", "", "", "", "", ""], ["UR5e", "", "", "", "", "", ""], ["UR10e", "", "", "", "", "", ""], ["GoFa", "", "", "", "", "", ""], ["LR Mate 200iD/7L", "", "", "", "", "", ""], ["KR 6 R900", "", "", "", "", "", ""], ["IRB 1200", "", "", "", "", "", ""], ["SCARA", "", "", "", "", "", ""]]
+注意:
+  - ["零件质量是上限：棒料零件取每件的耗料，锻坯按毛坯尺寸；GR-302 是按齿顶圆、齿宽估算的成品。实际选型要用成品的实测质量。", "Part masses are upper bounds: bar parts use the material per piece, forgings the blank size; GR-302 is an estimate of the finished gear. Real selection uses the measured finished mass."]
+  - ["厂商参数取自零件库（各条目注明来源）；价格没有列入，选型时向厂商询价。与人同场的限速 0.25 m/s 是示例，实际按风险评估定。", "Datasheet values come from the parts library (each entry cites its source); prices are not listed and must be quoted by the vendors. The 0.25 m/s speed limit beside people is an example; the real one comes from a risk assessment."]
+思考题:
+  - ["如果 GR-302 一定要由机器人装，除了换大负载的机器人，还有哪些办法（例如改夹爪、改工艺、加辅助装置）？各有什么代价？", "If GR-302 must be handled by a robot, what options besides a heavier robot are there (gripper, process, assisting devices)? What does each cost?"]

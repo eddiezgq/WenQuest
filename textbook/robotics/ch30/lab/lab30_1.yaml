@@ -1,0 +1,27 @@
+# 实验 30.1 的指导书与报告模板。目的、场景、参数、任务取自 lab30_1.js。
+原理:
+  - ["偏置腕的手臂，工具竖直朝下、TCP 离 J1 轴 r、高 z 时，J4 轴上、手臂平面里的点 P4 相对肩关节 J2 的位置（两种手腕取 ∓）：", "For an offset-wrist arm with the tool pointing down and the TCP at distance r from J1's axis and height z, the point P4 on J4's axis in the arm plane lies, relative to the shoulder J2, at (∓ for the two wrist choices):"]
+  - 式: "P4 = (√(r² − d4²) ∓ d5,  z + l_t + d6 − d1)"
+  - ["P4 由大臂 a2、小臂 a3 组成的两连杆去够，它到 J2 的距离必须在一个圆环里；内圈 |a2 − a3| 是肩部的死区，外圈是伸直的奇异位形：", "P4 is reached by the two-link chain a2, a3, so its distance from J2 must lie in an annulus; the inner circle |a2 − a3| is the shoulder hole and the outer one the singular outstretched pose:"]
+  - 式: "|a2 − a3| ≤ |P4| ≤ a2 + a3"
+  - ["手臂水平伸直时肩关节、肘关节的重力矩按各部分的质量乘力臂相加；模组的额定能力 τr = min(电机额定 × i × η，减速器额定)。重力矩超过额定能力，模组就不能长期保持这个姿态。", "With the arm held out horizontally the shoulder and elbow gravity torques are the sums of each part's weight times its lever arm; a module's rating is τr = min(motor rating × i × η, gearbox rating). Above that rating the module cannot hold the pose for long."]
+步骤:
+  - ["场景“部件装配工位”，标准尺寸 a2 = 0.40 m、a3 = 0.36 m、负载 5 kg：记录够得着的点数、最小裕量、死区、J2 与 J3 的重力矩（任务 1），填入表 1。改“画出手臂去第几个点”，逐个看手臂的姿态。", "Scene “Assembly station”, standard sizes a2 = 0.40 m, a3 = 0.36 m, payload 5 kg: record the reachable points, smallest margin, hole and the J2 and J3 gravity torques (task 1) in Table 1. Change “Draw the arm at point no.” to see the pose at each point."]
+  - ["保持 a2 − a3 = 0.04 m，把两段之和从 0.76 m 逐步减小，直到有点够不着；记下仍全部够得着的最小长度（任务 2）。", "Keep a2 − a3 = 0.04 m and shorten the sum from 0.76 m step by step until a point is lost; note the shortest sum that still reaches all points (task 2)."]
+  - ["两段之和保持 0.76 m，大臂取 0.30、0.34、0.38、0.43、0.48 m，记录死区和 J2、J3 的重力矩，填入表 2（任务 3）。", "Keep the sum at 0.76 m and set the upper arm to 0.30, 0.34, 0.38, 0.43 and 0.48 m, recording the hole and the J2 and J3 torques in Table 2 (task 3)."]
+  - ["回到标准尺寸，负载从 5 kg 每次加 0.1 kg，找出 J3 的重力矩超出中模组额定能力的负载；J2 在 5 kg 时已略超大模组的额定能力，想一想为什么额定负载仍定为 5 kg（任务 4）。", "Back to the standard sizes, raise the payload from 5 kg in 0.1 kg steps to find where J3's torque exceeds the medium module's rating (task 4)."]
+  - ["场景“台灯”：调两节灯臂，找出两节之和最短、又能照到四个角和中心的长度（任务 5）。", "Scene “A desk lamp”: adjust the two arms to find the shortest pair that still reaches the four corners and the centre (task 5)."]
+数据表:
+  - 标题: ["表 1  标准尺寸与缩短后的手臂", "Table 1  Standard and shortened arm"]
+    表头: ["a2 / m", "a3 / m", "够得着的点", "最小裕量 / %", "死区 / cm", "J2 / (N·m)", "J3 / (N·m)"]
+    表头英文: ["a2 / m", "a3 / m", "Points reached", "Smallest margin / %", "Hole / cm", "J2 / (N·m)", "J3 / (N·m)"]
+    行: [["0.40", "0.36", "", "", "", "", ""], ["", "", "", "", "", "", ""], ["", "", "", "", "", "", ""]]
+  - 标题: ["表 2  两段之和 0.76 m 时大臂长度的影响", "Table 2  Effect of the upper-arm length with the sum fixed at 0.76 m"]
+    表头: ["a2 / m", "a3 / m", "死区 / cm", "超出 J1 模组？", "J2 / (N·m)", "J3 / (N·m)"]
+    表头英文: ["a2 / m", "a3 / m", "Hole / cm", "Beyond the J1 module?", "J2 / (N·m)", "J3 / (N·m)"]
+    行: [["0.30", "0.46", "", "", "", ""], ["0.34", "0.42", "", "", "", ""], ["0.38", "0.38", "", "", "", ""], ["0.43", "0.33", "", "", "", ""], ["0.48", "0.28", "", "", "", ""]]
+注意:
+  - ["重力矩按集中质量近似，与程序 30.3.1 的完整模型相差不到 0.5%；本页只看静态重力矩，不含加速时的惯性力矩（30.3.4 节的峰值需求）。", "Gravity torques use lumped masses and agree with the full model of Program 30.3.1 within 0.5 %; only static gravity is shown here, not the inertial torque of accelerating (the peak need of Section 30.3.4)."]
+  - ["模组和手臂的质量按标准 WQ-CR5 的零件；改长度时铝管的质量跟着变，模组不变。", "Module and arm masses follow the standard WQ-CR5's parts; changing a length changes the tube mass but not the modules."]
+思考题:
+  - ["如果把工位的料箱从台面下 0.3 m 改放到台面上，需要的臂展会变成多少？用本页的方法估一估。", "If the tote moved from 0.3 m below the bench up onto the bench, what reach would the station need? Estimate it with this page."]

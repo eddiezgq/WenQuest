@@ -8,3 +8,6 @@ program_deps:
   - factory/digital/wqbus/*.py             # 统一数据总线的主题与车间布局（第 1、19 章）
   - factory/digital/std/SH-301_process.yaml   # 输出轴的工艺规程（第 23 章）
   - factory/digital/cae/wqcr5.py           # WQ-CR5 的动力学模型原件（第 29 章）
+  - factory/digital/cae/motors.py           # 电机选型助手的电机、减速器表（第 30 章）
+  - library/catalog/B/B-ARM-*/vendor.yaml    # 零件库各机械臂的厂商参数（第 30 章选型）
+  - library/catalog/B/B-SCA-WQ4/entry.yaml   # SCARA 的默认参数（第 30 章构型选择）

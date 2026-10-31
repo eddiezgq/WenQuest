@@ -16,6 +16,8 @@ datasheet:
     ip: IP67
     footprint_mm: Ø190
     tcp_speed_m_s: 2.0
+    weight_kg: 39
+    repeatability_mm: 0.05
   labels:
     payload_kg:
       zh: 额定负载
@@ -41,6 +43,14 @@ datasheet:
       zh: 末端最大速度
       en: TCP speed
       unit: m/s
+    weight_kg:
+      zh: 重量
+      en: Weight
+      unit: kg
+    repeatability_mm:
+      zh: 重复定位精度 ±
+      en: Pose repeatability ±
+      unit: mm
   src: https://www.fanucamerica.com/products/robot/crx-10ia-l
   note: 协作机器人；工作半径到手腕中心；ip 为本体及手腕/J3 臂 IP67；tcp_speed 取 High Speed Mode 2000 mm/s，协作模式
     1000 mm/s（fanucamerica 主站与 crx.fanucamerica 子站一致）；footprint 为圆形底座直径 190 mm，出处
@@ -48,6 +58,9 @@ datasheet:
     主站 ±0.05 mm / 39 kg，crx.fanuc.eu 39 kg；日本总部 fanuc.co.jp 与 crx.fanucamerica 子站
     ±0.04 mm / 40 kg（可能是规格修订，未能确认）。
 data_sources:
+- title: FANUC America：CRX-10iA/L 产品页（机械重量 39 kg、重复精度 ±0.05 mm）
+  url: https://www.fanucamerica.com/products/robot/crx-10ia-l
+  retrieved: '2026-10-31'
 - title: FANUC America 产品页 CRX-10iA/L（Specifications 规格表）
   url: https://www.fanucamerica.com/products/robot/crx-10ia-l
   retrieved: '2026-09-30'
