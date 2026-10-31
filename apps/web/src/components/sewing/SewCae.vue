@@ -81,6 +81,9 @@
       </view>
 
       <!-- 设计优化 -->
+      <!-- 第 62 轮：电控箱的热与流体 -->
+      <SewEbox v-if="opt && opt.kinds.ebox" :machine="machine" :params="params" :can-run="canRun" :active="active" @submitted="onEbox" />
+
       <view v-if="opt && opt.goals.length" class="box">
         <text class="bt">{{ t("sew.cae.opt") }}</text>
         <text class="hint">{{ t("sew.cae.optNote") }}</text>
@@ -167,6 +170,27 @@
               <text class="para">{{ t("sew.cae.mbdSum", { a: n3(sel.result.torque_peak_mbd), b: n3(sel.result.torque_peak_formula) }) }}</text>
               <svg class="svg" viewBox="0 0 300 120" v-html="spark(sel.result.series, 'N·m')" />
             </view>
+            <view v-if="sel.kind === 'ebox' && sel.result.R_cae" class="res">
+              <view class="kgrid">
+                <view class="kc"><text class="kl">{{ t("sew.ebox.rCae") }}</text><text class="kv">{{ n3(sel.result.R_cae) }} K/W</text></view>
+                <view class="kc"><text class="kl">{{ t("sew.ebox.rGeo") }}</text><text class="kv">{{ n3(sel.result.R_geo) }} K/W</text></view>
+                <view class="kc"><text class="kl">{{ t("sew.ebox.tShell") }}</text><text class="kv">{{ n1(sel.result.T_shell) }} °C</text></view>
+                <view class="kc"><text class="kl">{{ t("sew.ebox.tHot") }}</text><text class="kv">{{ n1(sel.result.T_hot) }} °C</text></view>
+                <view class="kc"><text class="kl">{{ t("sew.ebox.withCae") }}</text>
+                  <text class="kv">{{ n1(sel.result.with_cae.Ths) }} / {{ n1(sel.result.with_cae.Tjpk) }} °C</text></view>
+                <view class="kc"><text class="kl">{{ t("sew.ebox.capCae") }}</text><text class="kv">{{ n1(sel.result.with_cae.life_y) }} {{ t("sew.ebox.years") }}</text></view>
+              </view>
+              <text class="para">{{ t(sel.result.cfd && sel.result.cfd.mode === "natural" ? "sew.ebox.cfdNat" : "sew.ebox.cfdFan",
+                { h: n2(sel.result.cfd && sel.result.cfd.h_mean), r: n2(sel.result.h_rad), c: sel.result.cfd ? sel.result.cfd.cells : "—",
+                  w: n1(sel.result.T_est), q: n1(sel.result.Ptot) }) }}</text>
+              <view class="tbl">
+                <view class="tr th"><text class="td">{{ t("sew.ebox.face") }}</text><text class="td">{{ t("sew.ebox.area") }}</text>
+                  <text class="td">{{ t("sew.ebox.hConv") }}</text></view>
+                <view v-for="f in (sel.result.faces || []).slice(0, 12)" :key="f.id" class="tr">
+                  <text class="td">#{{ f.id }}</text><text class="td">{{ Math.round(f.area_mm2) }} mm²</text><text class="td">{{ n2(f.h) }} W/(m²·K)</text></view>
+              </view>
+              <text class="hint">{{ t("sew.ebox.caeNote") }}</text>
+            </view>
             <view v-if="sel.kind === 'topo'" class="res">
               <text class="para">{{ t("sew.cae.topoSum", { r: pct(sel.result.mass_ratio), a0: n1(sel.result.area0), a: n1(sel.result.area), it: sel.result.iterations }) }}</text>
               <view class="row">
@@ -193,7 +217,7 @@
             <image v-if="img" class="img" :src="img" mode="widthFix" />
             <!-- #endif -->
             <view class="row">
-              <view v-if="sel.kind !== 'topo' && sel.kind !== 'cam'" class="btn ghost" @click="getReport">{{ busy === "report" ? t("sew.making") : t("sew.cae.report") }}</view>
+              <view v-if="sel.kind !== 'topo' && sel.kind !== 'cam' && sel.kind !== 'ebox'" class="btn ghost" @click="getReport">{{ busy === "report" ? t("sew.making") : t("sew.cae.report") }}</view>
               <text class="hint">{{ t("sew.cae.inCalc") }}</text>
             </view>
           </template>
@@ -208,6 +232,7 @@
 import { computed, onBeforeUnmount, ref, watch } from "vue";
 import { ApiError, BASE, request, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
+import SewEbox from "./SewEbox.vue";
 
 const props = defineProps<{ machine: string; params: Record<string, number | string>; licensed: boolean; active: boolean; labels?: Record<string, string> }>();
 const emit = defineEmits<{ (e: "apply", p: Record<string, number | string>): void }>();
@@ -386,6 +411,10 @@ function poll() {
     if (sel.value && sel.value.status !== "done" && sel.value.status !== "failed") await openJob(sel.value.id, true);
   }, 4000);
 }
+async function onEbox(jid: string) {
+  await loadJobs();
+  await openJob(jid);
+}
 async function openJob(id: string, quiet = false) {
   try {
     const j = await request<any>("GET", `/api/v1/sewing/cae/jobs/${id}`, undefined, 180000);
@@ -436,6 +465,7 @@ async function getFile(path: string, fallback: string) {
   // #endif
 }
 function statusText(j: any) {
+  if (j.kind === "ebox" && j.stage && j.status !== "done" && j.status !== "failed") return t("sew.ebox.stage." + j.stage);   // 电控箱：流体 → 温度场
   if (j.status === "queued") return j.position ? t("sew.cae.queued", { n: j.position }) : t("sew.cae.st.queued");
   return t("sew.cae.st." + (["running", "done", "failed"].includes(j.status) ? j.status : "unknown"));
 }

@@ -94,6 +94,8 @@ def test_natural_convection_box(tmp_path):
     st, surf, aux = N.solve(step, {"flow": {"mode": "natural", "air_t_c": 25}, "heat": {"wall_t_c": 55},
                                    "mesh": {"cells_target": 25000, "level": 2}, "solver": {"t_end_s": 8}}, str(tmp_path / "nat"))
     assert st["mode"] == "natural" and st["heat_w"] > 0 and st["Ra"] < 1e9
+    import json
+    json.dumps(st)                                   # 计算服务要把它写成 JSON（numpy 的 bool、float 都不行）
     f = sorted(aux["faces"], key=lambda x: x["area_mm2"])
     assert len(f) == 6
     ref = N.h_vertical_plate(30, 0.06)

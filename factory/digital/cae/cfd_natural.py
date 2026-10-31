@@ -174,11 +174,11 @@ def solve(step_bytes, setup, workdir, progress=None):
     Ra = G * (1 / Tf) * (t_wall - t_air) * float(size[2]) ** 3 / (nu * alpha)
     vmax = float(np.linalg.norm(U, axis=1).max())
     stats = {"cells": int(mesh.n_cells), "cell_mm": round(cell * 1000, 2), "level": level, "iterations": len(times),
-             "converged": spread < 0.05, "heat_spread": spread, "t_end_s": t_end, "averaged_s": [use[0], use[-1]],
+             "converged": bool(spread < 0.05), "heat_spread": float(spread), "t_end_s": t_end, "averaged_s": [float(use[0]), float(use[-1])],
              "residuals": res, "turbulence": "laminar", "mode": "natural",
-             "Ra": Ra, "Re": None, "L_char_mm": round(Lc * 1000, 1), "velocity_ms": vmax, "direction": "+z", "air_t_c": t_air,
+             "Ra": float(Ra), "Re": None, "L_char_mm": round(Lc * 1000, 1), "velocity_ms": vmax, "direction": "+z", "air_t_c": t_air,
              "drag_n": 0.0, "drag_pressure_n": 0.0, "drag_friction_n": 0.0, "frontal_m2": 0.0, "Cd": None, "q_dyn_pa": 0.0,
-             "wall_t_c": t_wall, "heat_w": Qt, "h_mean": Qt / (At * (t_wall - t_air)), "area_m2": At,
+             "wall_t_c": t_wall, "heat_w": float(Qt), "h_mean": float(Qt / (At * (t_wall - t_air))), "area_m2": float(At),
              "T_out_max_c": float(T.max() - 273.15)}
     fc, vh = [], []
     for pn in parts:
