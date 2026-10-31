@@ -1,0 +1,20 @@
+# 实验 15.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_8.js。
+原理:
+  - ["动能 T = ½q̇ᵀM(q)q̇。只要关节在动，某个连杆就在动，动能为正，所以质量矩阵 M 在任何姿态下都对称正定，与是否处于奇异姿态无关。", "Kinetic energy is T = ½q̇ᵀM(q)q̇. If any joint moves some link moves, so T > 0 and the mass matrix M is symmetric positive definite in every pose, singular or not."]
+  - 式: "M = Σ(mᵢJᵥᵢᵀJᵥᵢ + J_ωᵢᵀIᵢJ_ωᵢ)；  速度椭圆 vᵀ(JJᵀ)⁻¹v ≤ 1，半轴 = J 的奇异值；  可操作度 w = |det J| = l₁l₂|sin q₂|；  等效质量 Λ = (JM⁻¹Jᵀ)⁻¹，沿单位方向 u 为 1/(uᵀΛ⁻¹u)"
+  - ["m₁₂ 是两个关节之间的惯性耦合。m₁₂ = 0 时 M 是对角的，两个关节的动力学互不干扰。", "m₁₂ is the inertial coupling between the joints. With m₁₂ = 0, M is diagonal and the joints do not disturb each other."]
+步骤:
+  - ["无负载、q₁ = 30°，把 q₂ 依次取 10°、45°、90°、120°、150°，记录 M 的特征值、m₁₂、可操作度 w、等效质量 Λ 的特征值，填入表 1。", "With no load and q₁ = 30° set q₂ to 10°, 45°, 90°, 120°, 150°; record the eigenvalues of M, m₁₂, w and the eigenvalues of Λ in Table 1."]
+  - ["保持 q₂ = 90°，改变 q₁，观察哪些读数不变、哪些图形只是转动。", "Keep q₂ = 90° and vary q₁; note which readings stay the same and which pictures merely rotate."]
+  - ["完成任务 1～3。", "Complete tasks 1–3."]
+数据表:
+  - 标题: ["表 1  姿态与质量矩阵、可操作度、等效质量（q₁ = 30°，无负载）", "Table 1  Pose versus mass matrix, manipulability and effective mass (q₁ = 30°, no load)"]
+    表头: ["q₂ / °", "M 的特征值 / kg·m²", "m₁₂ / kg·m²", "w / m²", "Λ 的特征值 / kg", "沿手臂方向的等效质量 / kg"]
+    表头英文: ["q₂ / °", "Eigenvalues of M / kg·m²", "m₁₂ / kg·m²", "w / m²", "Eigenvalues of Λ / kg", "Effective mass along the arm / kg"]
+    行: [["10", "", "", "", "", ""], ["45", "", "", "", "", ""], ["90", "", "", "", "", ""], ["120", "", "", "", "", ""], ["150", "", "", "", "", ""]]
+注意:
+  - ["实验中臂水平放置，不计重力；等效质量是臂静止时、关节不加力矩的情况。", "The arm lies in a horizontal plane, gravity is ignored, and the effective mass is for an arm at rest with no joint torques."]
+  - ["关节角 q₂ 不能取 0° 和 ±180°：那里 J 奇异，Λ 不存在（某个方向的等效质量无穷大），但 M 仍然正定。", "q₂ cannot be 0° or ±180°: J is singular there and Λ does not exist (infinite effective mass in one direction), yet M stays positive definite."]
+思考题:
+  - ["为什么 M、w 和 Λ 的特征值都与 q₁ 无关？（提示：J(q₁, q₂) = R(q₁)J(0, q₂)，R 为旋转矩阵。）", "Why do M, w and the eigenvalues of Λ not depend on q₁? (Hint: J(q₁, q₂) = R(q₁)J(0, q₂) with R a rotation.)"]
+  - ["协作机器人沿哪个方向运动时，万一碰到人，冲击最小？结合表 1 说明。", "In which direction should a collaborative robot move so that an accidental contact with a person is gentlest? Use Table 1."]

@@ -1,0 +1,20 @@
+# 实验 15.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_6.js。
+原理:
+  - ["直立姿态 θ = 0 是平衡点。总势能 = 扭簧的弹性势能 + 重力势能，它在 θ = 0 处的黑塞矩阵 H = diag(k₁, k₂) − G，G 是重力造成的“负刚度”。", "The upright pose θ = 0 is an equilibrium. The total potential is spring energy plus gravity; its Hessian at θ = 0 is H = diag(k₁, k₂) − G, where G is the 'negative stiffness' of gravity."]
+  - 式: "G = [[a + b, b], [b, b]]，a = (m₁c₁ + (m₂ + mp)l₁)g，b = (m₂c₂ + mp·l₂)g；  直立稳定 ⇔ H 正定 ⇔ H₁₁ > 0 且 det H > 0；  临界 k₁* = G₁₁ + G₁₂²/(k₂ − G₂₂)"
+  - ["H 的对角元都为正只说明“单独锁住另一个关节时，这个关节撑得住”，并不保证两个关节一起动时撑得住；还要 det H > 0。", "A positive diagonal of H only says each joint holds when the other is locked; both joints moving together also need det H > 0."]
+步骤:
+  - ["无负载、k₂ = 5，把 k₁ 依次取 20、15、12、10.5、10、9.5，记录 H 的特征值、主元、det H，并点“轻推一下”观察结果，填入表 1。", "With no load and k₂ = 5 set k₁ to 20, 15, 12, 10.5, 10, 9.5; record the eigenvalues, pivots and det H, nudge the arm and note the outcome in Table 1."]
+  - ["在表 1 中找出 det H 变号的位置，与读数中的“k₁ 的临界值”及式 (15.6.4) 比较。", "Locate the sign change of det H in Table 1 and compare with the displayed critical k₁ and with (15.6.4)."]
+  - ["先完成任务 1～3；再挂 0.5 kg 负载，重复步骤 1 的部分取值，完成任务 4。", "Complete tasks 1–3; then hang the 0.5 kg load, repeat part of step 1 and complete task 4."]
+数据表:
+  - 标题: ["表 1  扭簧刚度与直立稳定性（k₂ = 5 N·m/rad，无负载）", "Table 1  Spring stiffness and upright stability (k₂ = 5 N·m/rad, no load)"]
+    表头: ["k₁ / N·m·rad⁻¹", "特征值 λ₁, λ₂", "主元 d₁, d₂", "det H", "H₁₁ > 0 且 H₂₂ > 0？", "轻推后的结果"]
+    表头英文: ["k₁ / N·m·rad⁻¹", "Eigenvalues λ₁, λ₂", "Pivots d₁, d₂", "det H", "H₁₁ > 0 and H₂₂ > 0?", "After a nudge"]
+    行: [["20", "", "", "", "", ""], ["15", "", "", "", "", ""], ["12", "", "", "", "", ""], ["10.5", "", "", "", "", ""], ["10", "", "", "", "", ""], ["9.5", "", "", "", "", ""]]
+注意:
+  - ["仿真用的是完整的非线性方程，稳定性判断用的是 θ = 0 处的线性化（黑塞矩阵）。接近临界时，小扰动后臂会摆得很慢，需要多看几秒。", "The simulation uses the full nonlinear equations while the test uses the linearization (Hessian) at θ = 0. Near the critical value the arm moves very slowly after a nudge; watch for a few seconds."]
+  - ["不稳定时臂会倒向一边，倒到扭簧和重力重新平衡的位置附近摆动；这个新的平衡点处的黑塞矩阵是正定的。", "When unstable the arm falls to one side and swings near a new equilibrium where springs and gravity balance; the Hessian there is positive definite."]
+思考题:
+  - ["不稳定时臂倒下的方向接近 H 的负特征值的特征向量。读出这个方向，说明为什么是两个关节同向偏转。", "When unstable the arm falls roughly along the eigenvector of the negative eigenvalue of H. Read it off and explain why both joints tilt the same way."]
+  - ["加负载后临界 k₁ 变大了多少？为什么负载对关节 1 的影响比对关节 2 大？", "How much does the load raise the critical k₁? Why does the load affect joint 1 more than joint 2?"]
