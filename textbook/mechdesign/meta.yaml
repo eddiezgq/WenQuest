@@ -27,3 +27,12 @@ program_deps:
   - factory/digital/std/econ_accuracy.yaml
   - library/catalog/D/D-ACT-ROBOTIS-X/specs.csv
   - factory/digital/freecad/wq_shaft.py
+  # 第 60 轮 D-1：构建时记录到的其余书外文件（各章程序经 sys.path 导入数字工厂的包、读零件库的规格表）
+  - docs/教材/机械设计/00_提纲.md
+  - factory/factory/*.py
+  - factory/digital/cae/*.py
+  - factory/digital/sim/*.py
+  - factory/digital/wqbus/*.py
+  - factory/digital/hub/__init__.py
+  - library/catalog/A/A-BLT-HEX/specs.csv
+  - library/catalog/A/A-SPR-CMP/specs.csv

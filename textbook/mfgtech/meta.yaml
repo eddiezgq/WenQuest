@@ -21,3 +21,10 @@ program_deps:
   - factory/digital/hub/accuracy.py
   - textbook/tools/render3d.py         # 三维渲染（R2）
   - textbook/tools/render3d.js
+  # 第 60 轮 D-1：构建时记录到的其余书外文件（经 sys.path 导入数字工厂的包）
+  - factory/factory/*.py
+  - factory/digital/cae/__init__.py
+  - factory/digital/sim/*.py
+  - factory/digital/wqbus/*.py
+  - factory/digital/hub/__init__.py
+  - factory/digital/std/stdtab.py

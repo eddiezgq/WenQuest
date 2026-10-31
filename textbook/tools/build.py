@@ -36,6 +36,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -58,6 +59,8 @@ _ANIM_CHECK = None
 
 _LABKIT = None
 
+
+TIMES: dict = {}     # 第 60 轮 D-5：各阶段用时（秒）与缓存命中数，构建结束时打印
 
 FIG_MAX, FIG_WARN = 1_500_000, 600_000     # 一张图的 SVG 字节数上限与提醒线
 
@@ -100,10 +103,34 @@ def book_models(book: dict) -> dict:
     return _MODELS[key]
 
 
-def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str) -> None:
-    """Run every lab's tasks in headless Chromium with the lab checker's own code (services/labcheck)."""
+_LABDEPS: list = []
+
+
+def lab_deps() -> bytes:
+    """实验试做的结果还取决于实验检查器、实验工具包的代码（第 60 轮 D-4：试做缓存的散列里要有它们）"""
+    if not _LABDEPS:
+        files = sorted(p for d in (ROOT / "services" / "labcheck", ROOT / "services" / "gateway" / "app" / "production")
+                       for p in d.rglob("*") if p.is_file() and p.suffix in (".py", ".js", ".json", ".txt", ".css", ".html")
+                       and "__pycache__" not in p.parts and "node_modules" not in p.parts)
+        _LABDEPS.append(b"".join(p.read_bytes() for p in files))
+    return _LABDEPS[0]
+
+
+def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str, book: dict | None = None) -> None:
+    """Run every lab's tasks in headless Chromium with the lab checker's own code (services/labcheck).
+    第 60 轮 D-4：这一章的实验页、实验检查器和工具包都没变、上次全部通过的，不再试做（WQ_NO_CACHE=1 时照做）。"""
     import asyncio
     import importlib.util
+    ok = None
+    if book is not None:
+        h = hashlib.sha256(page_html.encode() + lab_deps() + "|".join(ids).encode()).hexdigest()[:20]
+        okdir = book["root"].parent / "build" / book["book"] / "labok"
+        okdir.mkdir(parents=True, exist_ok=True)
+        ok = okdir / f"{h}.ok"
+        if ok.exists() and not os.environ.get("WQ_NO_CACHE"):
+            TIMES["实验试做（缓存命中）"] = TIMES.get("实验试做（缓存命中）", 0) + 1
+            return
+    n0 = len(rep.errors)
     spec = importlib.util.spec_from_file_location("wq_labcheck", ROOT / "services" / "labcheck" / "app.py")
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
@@ -120,6 +147,8 @@ def trial_labs(page_html: str, ids: list[str], rep: "Report", where: str) -> Non
             continue
         for p in res.get("problems") or []:
             rep.add("error", "实验", where, f"实验 {lab.replace('-', '.')}：{p}")
+    if ok is not None and len(rep.errors) == n0:
+        ok.write_text(where, encoding="utf-8")
 
 
 _A3D: dict = {}
@@ -395,7 +424,49 @@ def check_other_books(book: dict, rep: Report) -> None:
 
 # ---------------------------------------------------------------- programs and placeholders
 
+def registered_deps(book: dict) -> set[Path]:
+    """书外依赖里已登记的文件（第 60 轮 D-1）：meta.yaml 的 program_deps，加上构建程序本来就算进散列的几个共用文件"""
+    out: set[Path] = set()
+    meta_p = book["root"] / "meta.yaml"
+    if meta_p.exists():
+        for pat in (yaml.safe_load(meta_p.read_text(encoding="utf-8")) or {}).get("program_deps") or []:
+            out |= {p.resolve() for p in ROOT.glob(pat) if p.is_file()}
+    out.add((ROOT / "textbook" / "mechdesign" / "conventions" / "calcsheet.py").resolve())
+    if (book["root"] / "conventions" / "mdstd.py").exists():
+        for rel in ("cae/materials.py", "cae/solve.py", "cae/fatigue.py", "cae/geometry.py", "sim/engine.py"):
+            out.add((ROOT / "factory" / "digital" / rel).resolve())
+    return out
+
+
+def outside_book(book: dict, paths) -> list[Path]:
+    """程序读到的仓库内文件里，哪些在这本书和构建工具之外（书自己的文件、textbook/tools、构建输出不算）"""
+    mine = (book["root"].resolve(), TOOLS.resolve(), (ROOT / "textbook" / "build").resolve())
+    out = []
+    for p in paths:
+        p = Path(p)
+        if not p.is_file() or any(p == m or m in p.parents for m in mine):
+            continue
+        out.append(p)
+    return sorted(set(out))
+
+
+def _sha(p: Path) -> str:
+    try:
+        return hashlib.sha256(p.read_bytes()).hexdigest()[:16]
+    except OSError:
+        return ""
+
+
 def run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") -> dict[str, dict]:
+    t0 = time.perf_counter()
+    try:
+        return _run_programs(book, chapters, rep, lang)
+    finally:
+        k = "跑算例程序" + ("（英文版）" if lang == "en" else "")
+        TIMES[k] = TIMES.get(k, 0) + time.perf_counter() - t0
+
+
+def _run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") -> dict[str, dict]:
     """Runs every program of these chapters; lang "en" runs them for the English edition (English figure labels and
     text values, figures in figs/en/)."""
     values: dict[str, dict] = {}
@@ -422,15 +493,22 @@ def run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") 
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
             hit = cache / f"{prog.stem}.{digest}.json"
-            if hit.exists():
-                values[prog.stem] = json.loads(hit.read_text(encoding="utf-8"))
-                continue
+            deps_f = cache / f"{prog.stem}.{digest}.deps"          # 第 60 轮：这个程序上次读过的书外文件和它们的散列
+            if hit.exists() and deps_f.exists() and not os.environ.get("WQ_NO_CACHE"):
+                recorded = json.loads(deps_f.read_text(encoding="utf-8"))
+                if all(_sha(ROOT / rel) == h for rel, h in recorded.items()):
+                    values[prog.stem] = json.loads(hit.read_text(encoding="utf-8"))
+                    TIMES["算例程序（缓存命中）"] = TIMES.get("算例程序（缓存命中）", 0) + 1
+                    continue
             outp = cache / f"{prog.stem}.out.json"
             outp.unlink(missing_ok=True)
+            trace = cache / f"{prog.stem}.trace"
+            trace.unlink(missing_ok=True)
             figs = cache.parent / "figs" / ("" if lang == "zh" else "en")
             figs.mkdir(parents=True, exist_ok=True)
-            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "PYTHONPATH": os.pathsep.join([str(TOOLS), str(book["root"] / "conventions")]), "MPLBACKEND": "Agg",
-                   "WQ_LANG": lang}
+            env = {**os.environ, "WQ_BOOK_OUT": str(outp), "WQ_BOOK_FIGDIR": str(figs), "MPLBACKEND": "Agg", "WQ_LANG": lang,
+                   "PYTHONPATH": os.pathsep.join([str(TOOLS / "deptrace"), str(TOOLS), str(book["root"] / "conventions")]),
+                   "WQ_BOOK_DEPS": str(trace), "WQ_REPO_ROOT": str(ROOT)}
             try:
                 r = subprocess.run([sys.executable, prog.name], cwd=prog.parent, env=env, capture_output=True, text=True, timeout=300)
             except subprocess.TimeoutExpired:
@@ -443,9 +521,20 @@ def run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") 
                 rep.add("error", "程序", where, "没有用 bookout.out(...) 交出结果")
                 continue
             v = json.loads(outp.read_text(encoding="utf-8"))
-            for old in cache.glob(f"{prog.stem}.*.json"):
+            ext = outside_book(book, trace.read_text(encoding="utf-8").splitlines()) if trace.exists() else []
+            trace.unlink(missing_ok=True)
+            reg = registered_deps(book)
+            unreg = [p for p in ext if p.resolve() not in reg]
+            for p in unreg:
+                rep.add("error", "程序", where, f"读了书外文件 {p.relative_to(ROOT)}，没有在 meta.yaml 的 program_deps 里登记"
+                                                 "（登记了，改它时才会重算、才会触发这本书的检查）")
+            values[prog.stem] = v
+            if unreg:                                              # 不进缓存：下次还要报
+                continue
+            for old in list(cache.glob(f"{prog.stem}.*.json")) + list(cache.glob(f"{prog.stem}.*.deps")):
                 old.unlink()
             hit.write_text(json.dumps(v, ensure_ascii=False), encoding="utf-8")
+            deps_f.write_text(json.dumps({str(p.relative_to(ROOT)): _sha(p) for p in ext}, ensure_ascii=False, indent=0), encoding="utf-8")
             values[prog.stem] = v
     return values
 
@@ -1193,7 +1282,9 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 labdocs.guide_en(m, g, lab_dir / f"{stem}-guide.en.docx", no, where[0])
                 labdocs.report_en(m, g, lab_dir / f"{stem}-report.en.docx", no, where[0])
         if labs:
-            trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页")
+            t0 = time.perf_counter()
+            trial_labs(page_html, [no.replace(".", "-") for no, _ in items], rep, f"第 {ch} 章实验页", book)
+            TIMES["实验试做"] = TIMES.get("实验试做", 0) + time.perf_counter() - t0
     gl = [x for sec in sections for x in sec.gpulabs]       # 云端 GPU 实验：笔记本、文件、指导书与报告模板
     index["gpulabs"] = {}
     if gl:
@@ -1235,8 +1326,10 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
                 + "".join(f"<section class='wq-sec' lang='en'><h2>{html.escape(s.title) if s.id.endswith(('.0', '.end')) else s.id + '&nbsp; ' + html.escape(s.title)}</h2>{s.html}</section>" for s in secs))
         (out / f"{chdir(ch)}.en.html").write_text(page(f"Chapter {ch} {t_en}", body, "en"), encoding="utf-8")
     if pdf and not rep.errors:
+        t0 = time.perf_counter()
         make_pdfs(out, sorted(by_ch, key=chkey), rep)
         make_pdfs(out, sorted(by_ch_en, key=chkey), rep, ".en")
+        TIMES["生成 PDF"] = time.perf_counter() - t0
     (out / "report.txt").write_text("\n".join(map(str, rep.problems)) or "全部检查通过", encoding="utf-8")
     return rep
 
@@ -1264,9 +1357,16 @@ def main() -> int:
     ap.add_argument("--only", help="只构建这些节，逗号分隔，如 4.1,4.2")
     ap.add_argument("--labs", action="store_true", help="在无头浏览器里试做每个虚拟实验的全部任务")
     a = ap.parse_args()
+    t0 = time.perf_counter()
     rep = build(a.book, a.pdf, set(a.only.split(",")) if a.only else None, labs=a.labs)
+    total = time.perf_counter() - t0
     for p in rep.problems:
         print(p)
+    phases = [f"{k} {v / 60:.1f}" for k, v in TIMES.items() if "命中" not in k]
+    rest = total - sum(v for k, v in TIMES.items() if "命中" not in k)
+    hits = "，".join(f"{k} {v}" for k, v in TIMES.items() if "命中" in k)
+    print("\n用时（分钟）：" + "；".join(phases + [f"其余（页面与检查） {rest / 60:.1f}", f"合计 {total / 60:.1f}"])
+          + (f"。缓存命中：{hits}" if hits else ""))
     n_err, n_warn = len(rep.errors), len(rep.problems) - len(rep.errors)
     print(f"\n{'未通过' if n_err else '通过'}：{n_err} 个错误，{n_warn} 个提醒。输出在 textbook/build/{a.book}/")
     return 1 if n_err else 0

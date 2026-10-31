@@ -209,3 +209,24 @@ def test_a_law_is_a_numbered_item(book):
     rep = run(book, only={"4.1"})
     bad = [p.text for p in rep.errors if p.kind == "引用"]
     assert bad == ["定律 4.1.2 不存在"], bad
+
+
+def test_files_outside_the_book_must_be_registered_and_are_rechecked(book):
+    """第 60 轮 D-1、D-2：程序读到的书外文件要在 meta.yaml 的 program_deps 里登记；登记了才进缓存，缓存命中时还核对它没变"""
+    line = "\nimport os as _os\nopen(_os.path.join(_os.environ['WQ_REPO_ROOT'], 'factory', 'digital', 'hub', 'kpi.py')).read()\n"
+    p = book / "ch04" / "code" / "ex4_1_1.py"
+    for q in (p, p.parent / "en" / p.name):
+        q.write_text(q.read_text(encoding="utf-8") + line, encoding="utf-8")
+    rep = run(book)
+    bad = [e for e in rep.errors if e.kind == "程序" and "factory/digital/hub/kpi.py" in e.text and "program_deps" in e.text]
+    assert bad, "\n".join(map(str, rep.errors))
+    meta = book / "meta.yaml"
+    meta.write_text(meta.read_text(encoding="utf-8") + "  - factory/digital/hub/kpi.py\n", encoding="utf-8")
+    rep = run(book)
+    assert not [e for e in rep.errors if e.kind == "程序"], "\n".join(map(str, rep.errors))
+    cache = book.parent / "build" / "robotics" / "values"
+    deps = [f for f in cache.glob("ex4_1_1.*.deps")]
+    assert len(deps) == 1 and "factory/digital/hub/kpi.py" in deps[0].read_text(encoding="utf-8")
+    build.TIMES.clear()
+    run(book)
+    assert build.TIMES.get("算例程序（缓存命中）", 0) >= 1

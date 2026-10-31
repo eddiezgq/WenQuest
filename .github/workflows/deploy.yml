@@ -123,15 +123,32 @@ jobs:
           import json, os, sys
           books = sys.argv[1].split()
           changed = os.environ["CHANGED"]
-          shared = ("textbook/tools/", "services/labcheck/", "services/gateway/app/production/labkit/", "factory/")
+          import glob
+          try:
+              import yaml
+          except ImportError:            # 万一构建机没有 PyYAML：按改动全查
+              yaml = None
+          # 第 60 轮 D-3：真正共用的只有构建工具、实验检查器和实验工具包；书外的其他文件看各书 meta.yaml 登记的 program_deps
+          # （构建时会核对程序读到的书外文件都登记了）。数字工厂、零件库别的文件改了，不再九本书全查
+          shared = ("textbook/tools/", "services/labcheck/", "services/gateway/app/production/",
+                    "textbook/mechdesign/conventions/calcsheet.py", ".github/workflows/deploy.yml")
+          def deps(b):
+              m = f"textbook/{b}/meta.yaml"
+              pats = []
+              if os.path.exists(m):
+                  pats = (yaml.safe_load(open(m, encoding="utf-8")) or {}).get("program_deps") or []
+              out = {f for pat in pats for f in glob.glob(pat)}
+              if os.path.exists(f"textbook/{b}/conventions/mdstd.py"):
+                  out |= {"factory/digital/cae/" + x for x in ("materials.py", "solve.py", "fatigue.py", "geometry.py")} | {"factory/digital/sim/engine.py"}
+              return out
           if changed == "ALL":
               pick = books
           else:
               files = [f for f in changed.splitlines() if f.strip()]
-              if any(f.startswith(shared) for f in files):
+              if yaml is None or any(f.startswith(shared) for f in files):
                   pick = books
               else:
-                  pick = [b for b in books if any(f.startswith(f"textbook/{b}/") for f in files)]
+                  pick = [b for b in books if any(f.startswith(f"textbook/{b}/") or f in deps(b) for f in files)]
           print("Books to check:", pick or "none", file=sys.stderr)
           print("list=" + json.dumps(pick))
           ' "$all" >> "$GITHUB_OUTPUT"
@@ -159,6 +176,22 @@ jobs:
         with:
           path: ~/.cache/wq-cuda-headers
           key: wq-cuda-headers-v1
+      # 第 60 轮 D-2：算例程序的结果、图、三维动画、编译检查、实验试做的缓存（都按内容散列命中）。只在推送时取回；
+      # 每周定时运行和手动运行不取回，九本书从头全量检查（D-6）。改了这个工作流（包的版本在这里）也从头算
+      - name: Restore the build cache (push only)
+        if: github.event_name == 'push'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            textbook/build/${{ matrix.book }}/values
+            textbook/build/${{ matrix.book }}/values-en
+            textbook/build/${{ matrix.book }}/figs
+            textbook/build/${{ matrix.book }}/anim3d
+            textbook/build/${{ matrix.book }}/cucheck
+            textbook/build/${{ matrix.book }}/hipcheck
+            textbook/build/${{ matrix.book }}/labok
+          key: tb-${{ matrix.book }}-${{ hashFiles('.github/workflows/deploy.yml', 'services/labcheck/requirements.txt') }}-${{ github.run_id }}
+          restore-keys: tb-${{ matrix.book }}-${{ hashFiles('.github/workflows/deploy.yml', 'services/labcheck/requirements.txt') }}-
       - name: Textbook build and checks (programs, numbers, formulas, references, terms) — ${{ matrix.book }}
         working-directory: textbook/tools
         run: |
@@ -206,6 +239,20 @@ jobs:
           fi
           b="${{ matrix.book }}"
           python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }
+          grep "^用时" /tmp/build.log | sed "s/^/::notice::$b /" || true      # 第 60 轮 D-5：各阶段用时、缓存命中数
+      - name: Save the build cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            textbook/build/${{ matrix.book }}/values
+            textbook/build/${{ matrix.book }}/values-en
+            textbook/build/${{ matrix.book }}/figs
+            textbook/build/${{ matrix.book }}/anim3d
+            textbook/build/${{ matrix.book }}/cucheck
+            textbook/build/${{ matrix.book }}/hipcheck
+            textbook/build/${{ matrix.book }}/labok
+          key: tb-${{ matrix.book }}-${{ hashFiles('.github/workflows/deploy.yml', 'services/labcheck/requirements.txt') }}-${{ github.run_id }}
       - name: Keep the built textbook for the deploy
         uses: actions/upload-artifact@v4
         with:

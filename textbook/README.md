@@ -94,6 +94,11 @@ python3 textbook/tools/build.py robotics --only 4.1
 
 **任何错误都会让构建失败，推送后 CI 也会跑同样的检查。**
 
+**缓存与书外文件（第 60 轮）。** 程序没改、它读的文件也没改，就直接用上次的结果（`textbook/build/<书>/values/` 等）；实验页没改、上次试做全部通过，也不再试做。
+`WQ_NO_CACHE=1 python3 textbook/tools/build.py <书>` 不用缓存、从头算。程序读到的**书外文件**（数字工厂、零件库、`docs/` 里的文件，
+包括经 `sys.path` 导入的模块）都要登记在这本书 `meta.yaml` 的 `program_deps` 里（可以写 `*` 通配），没登记的构建报错：
+登记了，改那个文件时程序才会重算，部署时也才会重查这本书。构建结束时打印各阶段的用时和缓存命中数。
+
 **提纲改了以后**，运行 `python3 textbook/tools/outline.py robotics` 重新生成 `book.yaml`。
 
 ## 英文版（第 8 轮）

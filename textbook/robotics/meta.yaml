@@ -1,0 +1,10 @@
+# 《机器人学》的提纲、书名写在 tools/outline.py 里（第一本书，早于 meta.yaml）；这里只登记程序读到的书外文件（第 60 轮 D-1）：
+# 改了它们，程序要重算（缓存键包含它们）、部署时要重查这本书。构建时会核对：程序读到的书外文件都要在这里登记。
+program_deps:
+  - docs/教材/机器人学/00_提纲.md          # 第 1 章：全书的结构
+  - factory/factory/*.py                   # 数字工厂的物料清单、工厂清单读取（第 1、23–25 章的毛坯、工件）
+  - factory/plants/wenquest-robot.yaml     # 机器人厂：关节测试台的摩擦、背隙散布（第 29 章）
+  - factory/digital/sim/*.py               # 仿真车间（第 1 章的车间一班、试验台记录）
+  - factory/digital/wqbus/*.py             # 统一数据总线的主题与车间布局（第 1、19 章）
+  - factory/digital/std/SH-301_process.yaml   # 输出轴的工艺规程（第 23 章）
+  - factory/digital/cae/wqcr5.py           # WQ-CR5 的动力学模型原件（第 29 章）
