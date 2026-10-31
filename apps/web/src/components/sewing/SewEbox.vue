@@ -78,10 +78,12 @@
     <view class="cae">
       <text class="st">{{ t("sew.ebox.caeTitle") }}</text>
       <text class="hint">{{ ep.air === "fan" ? t("sew.ebox.caeFan") : t("sew.ebox.caeNatural") }}</text>
+      <text class="hint">{{ t("sew.ebox.ownNote") }}</text>
       <view class="row">
         <view class="btn" :class="{ disabled: !canRun }" @click="runCae">{{ busy ? t("sew.making") : t("sew.ebox.runCae") }}</view>
         <!-- #ifdef H5 -->
         <view class="btn ghost" :class="{ disabled: !canRun }" @click="stepFile">{{ t("sew.ebox.step") }}</view>
+        <view class="btn ghost" :class="{ disabled: !canRun }" @click="uploadOwn">{{ t("sew.ebox.own") }}</view>
         <!-- #endif -->
       </view>
     </view>
@@ -119,7 +121,7 @@ const fail = (e: unknown) => { msg.value = errorText(e instanceof ApiError ? e.c
 
 // 手填电流时才显示运行电流；按尺寸算热阻时才显示给定热阻；风扇时才显示风速
 function visible(k: string) {
-  if (k === "Irun") return ep.src === "manual";
+  if (k === "Irun") return ep.src === "manual" || !["lockstitch", "overlock"].includes(props.machine);   // 绷缝、花样、刺绣机的主轴没有转矩模型，主轴电流手填
   if (k === "Rbox") return ep.rbox_src === "given";
   if (k === "vfan") return ep.air === "fan";
   return true;
@@ -144,10 +146,14 @@ function setv(k: string, v: number | string) {
   ep[k] = v;
   later();
 }
+let seq = 0;
 async function calc() {
   msg.value = "";
+  const n = ++seq;
   try {
-    R.value = await request("POST", "/api/v1/sewing/ebox/analyze", { machine: props.machine, params: { ...props.params }, ebox: { ...ep } });
+    const r = await request("POST", "/api/v1/sewing/ebox/analyze", { machine: props.machine, params: { ...props.params }, ebox: { ...ep } });
+    if (n !== seq) return;                         // 已经有更新的一次在算
+    R.value = r;
     emit("change", { ...ep });                    // 设计页导出计算书、参数表时带上电控箱这一节
   } catch (e) { fail(e); }
 }
@@ -184,6 +190,34 @@ async function runCae() {
     emit("submitted", r.id);
   } catch (e) { fail(e); }
   busy.value = false;
+}
+
+function uploadOwn() {
+  if (!props.canRun) return;
+  // #ifdef H5
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".step,.stp";
+  inp.onchange = async () => {
+    const f = inp.files?.[0];
+    if (!f) return;
+    busy.value = true;
+    msg.value = "";
+    try {
+      const fd = new FormData();
+      fd.append("file", f);
+      fd.append("machine", props.machine);
+      fd.append("params", JSON.stringify({ ...props.params }));
+      fd.append("ebox", JSON.stringify({ ...ep }));
+      const res = await fetch(`${BASE}/api/v1/sewing/cae/ebox/upload`, { method: "POST", headers: { Authorization: `Bearer ${token.value}` }, body: fd });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ApiError(j.error || `http_${res.status}`, res.status);
+      emit("submitted", j.id);
+    } catch (e) { fail(e); }
+    busy.value = false;
+  };
+  inp.click();
+  // #endif
 }
 
 async function stepFile() {
@@ -228,7 +262,11 @@ function line(c: Chart) {
   return s;
 }
 
-watch(() => [props.machine, props.active], () => { if (props.active) loadSchema(); }, { immediate: true });
+// 换机型才重新载入（恢复这台机型的默认）；切走页签再回来，改过的电控箱参数还在
+let loadedFor = "";
+watch(() => [props.machine, props.active], () => {
+  if (props.active && loadedFor !== props.machine) { loadedFor = props.machine; loadSchema(); }
+}, { immediate: true });
 watch(() => JSON.stringify(props.params), () => { if (props.active && schema.value.length) later(); });     // 设计改了，电流跟着变
 </script>
 

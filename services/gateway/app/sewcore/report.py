@@ -288,14 +288,15 @@ def calc_report(params=None, lang="zh", project="", company="", machine="locksti
     if cae:
         head("CAE 分析结果（问渠数字工厂）", "CAE results (WenQuest digital factory)")
         d.add_paragraph(_t("以下是同一组设计参数在问渠数字工厂计算服务里算出的结果：有限元强度与疲劳（Gmsh + CalculiX + pyLife）、"
-                           "机壳模态、机构动力学（MuJoCo）、电控箱散热（OpenFOAM 流体 + CalculiX 温度场）。详细报告在设计页“CAE 分析”里下载。",
+                           "机壳模态、机构动力学（MuJoCo）、电控箱散热（OpenFOAM 流体 + CalculiX 温度场）。详细结果在设计页“CAE 分析”里看。",
                            "Results computed for this same set of design parameters by the WenQuest digital-factory computing service: "
-                           "FEA strength and fatigue (Gmsh + CalculiX + pyLife), frame modes, mechanism dynamics (MuJoCo). "
-                           "Full reports can be downloaded from the CAE tab of the design page.", lang))
+                           "FEA strength and fatigue (Gmsh + CalculiX + pyLife), frame modes, mechanism dynamics (MuJoCo), control-box cooling "
+                           "(OpenFOAM CFD + CalculiX temperature field). Details are on the CAE tab of the design page.", lang))
         rows = []
         for x in cae:
             for c in (x["result"] or {}).get("checks", []):
-                rows.append([x["title"], _t(c["zh"], c["en"], lang), c["value"], c["limit"], STATE[c["state"]][1 if lang == "en" else 0]])
+                v_, l_ = (c.get("value_en", c["value"]), c.get("limit_en", c["limit"])) if lang == "en" else (c["value"], c["limit"])
+                rows.append([x["title"], _t(c["zh"], c["en"], lang), v_, l_, STATE[c["state"]][1 if lang == "en" else 0]])
         if rows:
             _table(d, [_t("分析", "Analysis", lang), _t("项目", "Item", lang), _t("数值", "Value", lang), _t("判据", "Criterion", lang),
                        _t("结论", "Result", lang)], rows)

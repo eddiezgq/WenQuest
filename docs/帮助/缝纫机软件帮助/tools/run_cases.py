@@ -124,12 +124,23 @@ def case_ebox():
                     warn=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"], limit=c["limit"]["zh"]) for c in r["checks"] if c["state"] == "warn"],
                     variants=r["variants"]["rows"])
     E = {"design": D, "base": eb({}), "summer": eb({"Ta": 38, "clog": 0.5}), "clean": eb({"Ta": 38, "clog": 0.1})}
-    fix = {"Ta": 38, "clog": 0.1, "rbox_src": "geometry", "fins": 10}
-    E["fix"] = eb(fix)
-    j = req("POST", "/api/v1/sewing/cae/ebox", {"machine": "lockstitch", "params": D, "ebox": fix})
-    r = wait(j["id"])
-    E["cae"] = {k: r.get(k) for k in ("R_cae", "R_geo", "diff", "T_shell", "T_hot", "T_est", "Ptot", "h_rad", "with_cae", "cfd")}
-    E["cae"]["checks"] = [dict(name=c["zh"], value=c["value"], state=c["state"]) for c in r.get("checks") or []]
+    fix = {"Ta": 38, "clog": 0.1, "rbox_src": "geometry"}                 # 定期清理，热阻按外壳尺寸算（没有翅片）
+    fins = dict(fix, fins=10)                                              # 再在顶面加 10 片翅片
+    E["fix"], E["fins"] = eb(fix), eb(fins)
+
+    def cae(q):
+        j = req("POST", "/api/v1/sewing/cae/ebox", {"machine": "lockstitch", "params": D, "ebox": q})
+        r = wait(j["id"])
+        out = {k: r.get(k) for k in ("R_cae", "R_geo", "diff", "T_shell", "T_hot", "T_est", "Ptot", "h_rad", "with_cae", "cfd", "missing_faces")}
+        out["checks"] = [dict(name=c["zh"], value=c["value"], state=c["state"]) for c in r.get("checks") or []]
+        fs = r.get("faces") or []
+        big = [f for f in fs if f["area_mm2"] > 10000]                     # 外壳的大面（顶、底、四个侧面）
+        out["h_top"] = round(max(big, key=lambda f: f["area_mm2"])["h"], 2) if big else None
+        out["h_side"] = round(sum(f["h"] for f in big if f["area_mm2"] < 30000) / max(1, len([f for f in big if f["area_mm2"] < 30000])), 2)
+        fin = [f for f in fs if 2000 < f["area_mm2"] < 5000 and abs(f["area_mm2"] - 3950.4) > 1]
+        out["h_fin"] = round(sum(f["h"] for f in fin) / len(fin), 2) if fin else None
+        return out
+    E["cae"], E["cae_fins"] = cae(fix), cae(fins)
     return E
 
 

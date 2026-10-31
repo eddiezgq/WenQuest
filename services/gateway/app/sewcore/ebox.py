@@ -20,8 +20,9 @@
   - 电流从这台机的设计来：主轴（平缝、包缝）按一转的转矩均方根 ÷ 转矩常数 K_t；花样机 X / Y、刺绣机绷架、横机机头按各自伺服的
     有效 / 峰值转矩 ÷ K_t（这些轴一直在加减速，按“连续运行”算平均损耗）。默认 K_t = 1 N·m/A，平缝机教材算例正好是 3 A；
   - 箱体到车间的热阻可以按外壳尺寸算：每个外表面的自然对流（竖板 1.42·(ΔT/H)^¼、热面朝上 1.32·(ΔT/L)^¼、朝下 0.59·(ΔT/L)^¼，
-    常用简化式）或风扇吹（平板强制对流 h ≈ 3.9·√(v/L)）+ 辐射 εσ(T_s² + T_a²)(T_s + T_a)；翅片按效率 0.85 计面积，不计辐射。
-    默认外壳 260 × 160 × 90 mm 算出约 0.57 K/W，和教材给的 0.6 K/W 相近。CAE 复核（流体 + 温度场）替换的就是这一段。
+    常用简化式；顶面、顶面翅片泡在侧面升上来的热空气里，按自然对流 CFD 标定打 0.5、0.4 的折扣）或风扇吹（平板强制对流 h ≈ 3.9·√(v/L)）
+    + 辐射 εσ(T_s² + T_a²)(T_s + T_a)；翅片按效率 0.85 计面积，不计辐射（翅片之间互相辐射）。
+    默认外壳 260 × 160 × 90 mm 算出约 0.6 K/W，和教材给的 0.6 K/W 相近。CAE 复核（流体 + 温度场）替换的就是这一段。
 """
 import math
 
@@ -31,11 +32,12 @@ VERSION = "1.0"
 LECTURES = ("第 18 章", "chapter 18")
 MCOS, RRF = 0.6, 0.3
 SIGMA = 5.670e-8
+TOP_PLUME, FIN_PLUME = 0.5, 0.4      # 自然对流：顶面、顶面翅片相对经验式的折扣（第 62 轮 CFD 标定，见 box_resistance）
 
 GROUPS = [
     ("load", "工况（默认取本机的设计）", "Duty (taken from this machine's design by default)", [
         ("src", "电流从哪里来", "Where the currents come from", "", "design", None, None, None),
-        ("Irun", "缝纫时相电流（有效值，手填时用）", "Phase current while sewing (rms, when entered by hand)", "A", 3.0, 0.2, 40, 0.1),
+        ("Irun", "主轴缝纫时相电流（有效值；绷缝、花样、刺绣机的主轴和手填时用）", "Spindle phase current while sewing (rms; cover, pattern, embroidery spindles and when entered by hand)", "A", 3.0, 0.2, 40, 0.1),
         ("Ipk", "起停时相电流（驱动器限流值）", "Phase current at start and stop (drive current limit)", "A", 9.0, 0.5, 80, 0.1),
         ("Kt", "电机转矩常数 K_t（示例值）", "Motor torque constant K_t (example value)", "N·m/A", 1.0, 0.1, 5.0, 0.05),
         ("tacc", "每次加速 / 减速时间", "Each acceleration / deceleration", "s", 0.15, 0.02, 1.0, 0.01),
@@ -92,7 +94,7 @@ GROUPS = [
 ]
 CHOICES = {
     "src": [("design", "按本机设计算（主轴转矩 ÷ K_t）", "From this machine's design (torque ÷ K_t)"),
-            ("manual", "手填", "Entered by hand")],
+            ("manual", "主轴电流手填", "Spindle current by hand")],
     "rbox_src": [("given", "给定（教材 0.6 K/W）", "Given (textbook 0.6 K/W)"),
                  ("geometry", "按外壳尺寸算", "From the enclosure size")],
     "air": [("natural", "自然对流（没有风扇）", "Natural convection (no fan)"),
@@ -147,9 +149,9 @@ def drives_of(machine, design_params, p):
         T = spindle_torque(machine, design_params)
         Trms = math.sqrt(sum(x * x for x in T) / len(T))
         spindle.update(Irun=min(Trms / Kt, p["Ipk"]), src="design", Trms=Trms)
-    if machine != "flatknit":
-        out.append(spindle)
-    if manual:
+    if machine != "flatknit" or manual:            # 横机没有主轴；手填时就是一台手填电流的驱动
+        out.append(spindle if machine != "flatknit" else dict(spindle, key="main", zh="主驱动（手填）", en="Main drive (by hand)"))
+    if machine == "flatknit" and manual:
         return out
     M = get(machine)
     d = M.clean(design_params or {})
@@ -195,9 +197,11 @@ def box_resistance(p, P_total, clog=None):
             h_up = h_dn = h_v = h_fin = hc
         else:
             h_v = 1.42 * (dT / H) ** 0.25
-            h_up = 1.32 * (dT / Lc) ** 0.25
+            # 盒子顶面和顶面翅片泡在从四个侧面升上来的热空气里，比孤立平板的经验式差得多：
+            # 第 62 轮自然对流 CFD（教材那只 260 × 160 × 90 mm 电控箱）顶面约一半、翅片约 0.4 倍，按这个折扣
+            h_up = 1.32 * (dT / Lc) ** 0.25 * TOP_PLUME
             h_dn = 0.59 * (dT / Lc) ** 0.25
-            h_fin = 1.42 * (dT / max(fh, 0.005)) ** 0.25 * (0.75 if n else 1)      # 翅片间空气流动差，打个折扣
+            h_fin = 1.42 * (dT / max(fh, 0.005)) ** 0.25 * FIN_PLUME
         faces = {"top": ((h_up + hr) * top, top), "bottom": ((h_dn + hr) * top, top),
                  "sides": ((h_v + hr) * (2 * side_LH + 2 * side_WH), 2 * side_LH + 2 * side_WH),
                  "fins": (h_fin * A_fin, A_fin)}
@@ -243,9 +247,10 @@ def thermal(p, drives, Ta=None, clog=None, tsw=None, Rbox=None):
     for r in rows:
         pc, ps, _ = switch_losses(q, r["Ipk"])
         tpk = q["tacc"] if r["mode"] == "startstop" else min(q["tacc"], 0.05)
-        r["Tjpk"] = Ths + (pc + ps) * q["Rjc"] * (1 - math.exp(-tpk / q["tau"]))
+        peak = Ths + (pc + ps) * q["Rjc"] * (1 - math.exp(-tpk / q["tau"]))
         pc, ps, _ = switch_losses(q, r["Irun"])
         r["Tjrun"] = Ths + (pc + ps) * q["Rjc"]
+        r["Tjpk"] = max(peak, r["Tjrun"])             # 加速时间很短、或一直在动的伺服轴：稳态运行的结温可能更高
         if r["Tjpk"] > Tj:
             Tj, worst = r["Tjpk"], r
     Tcap = Tin + q["dTc"]
@@ -256,15 +261,15 @@ def thermal(p, drives, Ta=None, clog=None, tsw=None, Rbox=None):
                 acc_share=(sum(facc * r["Pk"] for r in rows if r["mode"] == "startstop") / Pavg) if Pavg > 0 else 0.0)
 
 
-def tsw_window(p, drives, Ta=None):
-    """开关时间 t_sw 能选的范围（ns）：下限由共模电流定，上限由结温定（在最热的车间里）"""
+def tsw_window(p, drives, Ta=None, Rbox=None):
+    """开关时间 t_sw 能选的范围（ns）：下限由共模电流定，上限由结温定（在最热的车间里）。下限超过参数表上限 1500 ns 就没有窗口"""
     lo = 2 * p["Cp"] * 1e-12 * p["Vdc"] / p["Icmmax"] * 1e9
-    Ta = p["Thot"] if Ta is None else Ta
+    Ta = max(p["Ta"], p["Thot"]) if Ta is None else Ta
 
     def ok(t):
-        r = thermal(p, drives, Ta=Ta, tsw=t)
+        r = thermal(p, drives, Ta=Ta, tsw=t, Rbox=Rbox)
         return r["Tjpk"] <= p["Tjmax"] and r["Ths"] <= p["Thsmax"]
-    if not ok(max(lo, 50)):
+    if lo > 1500 or not ok(max(lo, 50)):
         return lo, None
     a, b = max(lo, 50), 1500.0                  # 参数表上限；到这里还合格，上限就只受参数表限制
     if ok(b):
@@ -320,12 +325,10 @@ def analyze(p, machine="lockstitch", design_params=None, Rbox=None):
     p = clean(p, machine)
     design_params = design_params or {}
     drives = drives_of(machine, design_params, p)
-    if not drives:
-        drives = [dict(key="spindle", zh="主轴伺服", en="Spindle servo", Irun=p["Irun"], Ipk=p["Ipk"], mode="startstop", src="manual")]
     r = thermal(p, drives, Rbox=Rbox)
     hot = thermal(p, drives, Ta=max(p["Ta"], p["Thot"]), Rbox=Rbox)
     dirty = thermal(p, drives, clog=max(p["clog"], p["clog_m"]), Rbox=Rbox)
-    lo, hi = tsw_window(p, drives)
+    lo, hi = tsw_window(p, drives, Rbox=Rbox)
     geo = box_resistance(p, r["Ptot"])
     C = Checks()
     st = lambda ok, warn=False: "ok" if ok else ("warn" if warn else "bad")  # noqa: E731
@@ -420,7 +423,7 @@ def analyze_light(p, machine, design_params, Rbox=None):
     r = thermal(p, drives, Rbox=Rbox)
     hot = thermal(p, drives, Ta=max(p["Ta"], p["Thot"]), Rbox=Rbox)
     dirty = thermal(p, drives, clog=max(p["clog"], p["clog_m"]), Rbox=Rbox)
-    lo, hi = tsw_window(p, drives)
+    lo, hi = tsw_window(p, drives, Rbox=Rbox)
     bad = sum([r["Ths"] > p["Thsmax"], r["Tjpk"] > p["Tjmax"], r["life_y"] < p["lifemin"], r["icm"] > p["Icmmax"], p["fsw"] < p["fswmin"],
                hi is None])
     warn = sum([hot["Ths"] > p["Thsmax"] or hot["Tjpk"] > p["Tjmax"], dirty["Ths"] > p["Thsmax"] or dirty["Tjpk"] > p["Tjmax"],
@@ -431,10 +434,16 @@ def analyze_light(p, machine, design_params, Rbox=None):
 def variants(p, machine, design_params, Rbox=None):
     """改进方案对照（同第 54 轮横机的做法）：每行一种改法，给关键数和还剩几盏红 / 黄灯"""
     drives = drives_of(machine, design_params, p)
-    lo, hi = tsw_window(p, drives)
+    lo, hi = tsw_window(p, drives, Rbox=Rbox)
     rows = []
+    base = thermal(p, drives, Rbox=Rbox)
+    # 改成“按外壳尺寸算”的那几行（加翅片、加风扇）：按现在用的热阻和按尺寸公式的比例缩放，只比改法本身带来的变化，不混进换模型的差别
+    scale = base["Rbox"] / max(box_resistance(p, base["Ptot"])["R"], 1e-9)
 
     def add(zh, en, q, rb=Rbox):
+        if rb is None and q.get("rbox_src") == "geometry" and (p["rbox_src"] != "geometry" or Rbox is not None):
+            rq = thermal(q, drives_of(machine, design_params, q))
+            rb = box_resistance(q, rq["Ptot"])["R"] * scale
         a = analyze_light(q, machine, design_params, rb)
         r = a["r"]
         rows.append([zh, en, f"{r['Ths']:.1f}", f"{r['Tjpk']:.1f}", f"{r['life_y']:.1f}", f"{r['icm']:.2f}", str(a["bad"]), str(a["warn"])])
@@ -454,11 +463,17 @@ def variants(p, machine, design_params, Rbox=None):
         add("起停限流降 20%、加速时间 +25%", "Start current −20%, acceleration time +25%", dict(p, Ipk=p["Ipk"] * 0.8, tacc=min(1.0, p["tacc"] * 1.25)))
     if p["clog"] > 0.1:
         add("定期清理飞絮（堵塞降到 0.1）", "Clean out lint regularly (clogging down to 0.1)", dict(p, clog=0.1))
-    if int(rows[0][6]) + int(rows[0][7]) > 0:          # 有红黄灯：再给一行“几条一起用”
-        q = dict(p, clog=min(p["clog"], 0.1), rbox_src="geometry", air="fan", vfan=max(p["vfan"], 2.0))
-        zh = ("定期清理 + 加风扇" if p["clog"] > 0.1 else "加风扇") + "，并加 10 片翅片"
-        en = ("Regular cleaning + fan" if p["clog"] > 0.1 else "Fan") + ", plus 10 fins"
-        add(zh, en, dict(q, fins=p["fins"] + 10), None)
+    if int(rows[0][6]) + int(rows[0][7]) > 0:          # 有红黄灯：再给一行“上面几条一起用”
+        q = dict(p, clog=min(p["clog"], 0.1), rbox_src="geometry", air="fan", vfan=max(p["vfan"], 2.0), fins=p["fins"] + 10)
+        zh, en = ["加风扇", "加 10 片翅片"], ["fan", "10 more fins"]
+        if p["clog"] > 0.1:
+            zh.insert(0, "定期清理")
+            en.insert(0, "regular cleaning")
+        if any(d["mode"] == "startstop" for d in drives):
+            q.update(Ipk=p["Ipk"] * 0.8, tacc=min(1.0, p["tacc"] * 1.25))
+            zh.append("起停限流降 20%")
+            en.append("start current −20%")
+        add("几条一起：" + " + ".join(zh), "All together: " + " + ".join(en), q, None)
     return dict(key="variants", zh="改进方案对照", en="Improvement options",
                 cols=[["改法", "Change"], ["", ""], ["散热器 °C", "Heatsink °C"], ["结温峰值 °C", "Peak junction °C"], ["电容寿命 年", "Cap life yrs"],
                       ["共模电流 A", "CM current A"], ["红灯", "Red"], ["黄灯", "Yellow"]], rows=rows)

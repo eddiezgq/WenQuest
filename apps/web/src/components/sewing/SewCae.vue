@@ -170,6 +170,7 @@
               <text class="para">{{ t("sew.cae.mbdSum", { a: n3(sel.result.torque_peak_mbd), b: n3(sel.result.torque_peak_formula) }) }}</text>
               <svg class="svg" viewBox="0 0 300 120" v-html="spark(sel.result.series, 'N·m')" />
             </view>
+            <text v-if="sel.kind === 'ebox' && sel.result.error" class="para badc">{{ sel.result.error }}</text>
             <view v-if="sel.kind === 'ebox' && sel.result.R_cae" class="res">
               <view class="kgrid">
                 <view class="kc"><text class="kl">{{ t("sew.ebox.rCae") }}</text><text class="kv">{{ n3(sel.result.R_cae) }} K/W</text></view>
@@ -189,7 +190,8 @@
                 <view v-for="f in (sel.result.faces || []).slice(0, 12)" :key="f.id" class="tr">
                   <text class="td">#{{ f.id }}</text><text class="td">{{ Math.round(f.area_mm2) }} mm²</text><text class="td">{{ n2(f.h) }} W/(m²·K)</text></view>
               </view>
-              <text class="hint">{{ t("sew.ebox.caeNote") }}</text>
+              <text v-if="sel.result.missing_faces" class="hint">{{ t("sew.ebox.missing", { n: sel.result.missing_faces }) }}</text>
+              <text class="hint">{{ sel.result.upload ? t("sew.ebox.ownCaeNote") : t("sew.ebox.caeNote") }}</text>
             </view>
             <view v-if="sel.kind === 'topo'" class="res">
               <text class="para">{{ t("sew.cae.topoSum", { r: pct(sel.result.mass_ratio), a0: n1(sel.result.area0), a: n1(sel.result.area), it: sel.result.iterations }) }}</text>

@@ -314,7 +314,7 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no 3D parts for this machine yet", 404)
         from .sewcore import cad, report
         if kind == "report":
-            cae = m.sewing_cae_results(lic["org"], M.MACHINE, p) if hasattr(m, "sewing_cae_results") else []
+            cae = m.sewing_cae_results(lic["org"], M.MACHINE, p, body.ebox) if hasattr(m, "sewing_cae_results") else []
             data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE, cae=cae, desc=[x[:400] for x in body.desc],
                                       ebox=body.ebox)
         elif kind == "card":

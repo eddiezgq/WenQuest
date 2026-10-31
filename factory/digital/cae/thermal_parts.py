@@ -190,7 +190,7 @@ def groups(key, p, faces):
     elif key == "sew_ebox":
         L, W, H, t = p["L"], p["W"], p["H"], p["wall"]
         il, iw, ih = SEW_IPM
-        out = {"ipm": [], "inner_bottom": [], "inner": [], "outer": []}
+        out = {"ipm": [], "inner_bottom": [], "inner": [], "outer": [], "fins": []}
         for f in faces:
             c = f["center"]
             if abs(c[0]) <= il / 2 + 1e-3 and abs(c[1]) <= iw / 2 + 1e-3 and H - t - ih - 1e-3 <= c[2] < H - t - 1e-3:
@@ -201,6 +201,8 @@ def groups(key, p, faces):
                 out["inner"].append(f["id"])
             else:
                 out["outer"].append(f["id"])
+                if c[2] > H + 1e-3:                      # 顶面以上的面就是翅片（侧面、顶端）：翅片之间互相辐射，算对流不算辐射
+                    out["fins"].append(f["id"])
     elif key == "agv_box":
         L, W, H, t = p["L"], p["W"], p["H"], p["wall"]
         out = {"drive": [], "pc": [], "inner": [], "outer": [], "bottom": []}

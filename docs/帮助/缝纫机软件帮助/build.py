@@ -188,9 +188,13 @@ def case_numbers():
             rows.append(f"| {r[0]} | {r[2]} | {r[3]} | {r[4]} | {r[6]} | {r[7]} |")
         v["eb_variants"] = "\n".join(rows)
         v["eb_summer_bad"] = "；".join(f"{b['name']} {b['value']}（{b['limit']}）" for b in EB["summer"]["bad"])
-        c = EB["cae"]
-        v.update(eb_diff=f"{c['diff'] * 100:+.0f}%", eb_h=f"{c['cfd']['h_mean']:.1f}", eb_hr=f"{c['h_rad']:.1f}", eb_min=round(c["cfd"]["seconds"] / 60),
-                 eb_cells=f"{c['cfd']['cells'] / 10000:.0f} 万", eb_lint=next(w["value"] for w in EB["fix"]["warn"] if w["key"] == "lint"))
+        c, cf = EB["cae"], EB["cae_fins"]
+        v.update(eb_diff=f"{c['diff'] * 100:+.0f}%", eb_diff_fins=f"{cf['diff'] * 100:+.0f}%", eb_h=f"{c['cfd']['h_mean']:.1f}",
+                 eb_hr=f"{c['h_rad']:.1f}", eb_min=round(c["cfd"]["seconds"] / 60), eb_cells=f"{c['cfd']['cells'] / 10000:.0f} 万",
+                 eb_lint=next(w["value"] for w in EB["fix"]["warn"] if w["key"] == "lint"),
+                 eb_fin_gain=f"{(1 - cf['R_cae'] / c['R_cae']) * 100:.0f}%",
+                 eb_fin_gain_f=f"{(1 - EB['fins']['Rgeo'] / EB['fix']['Rgeo']) * 100:.0f}%",
+                 eb_hot_cae=next((x["value"] for x in c["checks"] if x["name"].startswith("最热车间") and x["state"] != "ok"), ""))
     y = P["motor_ry8"][1]["current"]
     v["pt_y8_margin"] = round((y["rated"] / y["rms"] - 1) * 100)
     v["pt_tpl"] = "{:.0f} × {:.0f} × {:.0f}".format(*P["template_cam"]["template"]["plate"])

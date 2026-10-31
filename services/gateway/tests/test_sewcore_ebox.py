@@ -56,11 +56,11 @@ def test_currents_come_from_this_design():
 
 
 def test_enclosure_resistance_from_size():
-    """默认外壳 260 × 160 × 90 mm 自然对流 + 辐射约 0.58 K/W（教材给 0.6）；加翅片、风扇都降；本色铝（发射率低）升"""
+    """默认外壳 260 × 160 × 90 mm 自然对流 + 辐射约 0.6 K/W（教材给 0.6）；顶面翅片降得不多、风扇降得多；本色铝（发射率低）升"""
     P = th()["Ptot"]
     R0 = E.box_resistance(TB, P)["R"]
     assert R0 == pytest.approx(0.6, abs=0.05)
-    assert E.box_resistance(dict(TB, fins=10), P)["R"] < R0 * 0.9
+    assert R0 * 0.85 < E.box_resistance(dict(TB, fins=10), P)["R"] < R0 * 0.95       # 顶面翅片泡在热羽流里，自然对流时帮助不大
     assert E.box_resistance(dict(TB, air="fan", vfan=2), P)["R"] < R0
     assert E.box_resistance(dict(TB, eps=0.1), P)["R"] > R0 * 1.3
 

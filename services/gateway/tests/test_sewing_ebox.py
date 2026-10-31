@@ -28,6 +28,8 @@ class EboxFactory(FakeFactory):
             b = json.loads(req.content)
             self.posted.append(b)
             return httpx.Response(200, json={"sha": "ebox-sha", "faces": [], "params": b["params"], "example": EXAMPLE})
+        if path == "/geometry":                          # 上传的外壳：六个面（和流体结果的面号对得上）
+            return httpx.Response(200, json={"sha": "own-sha", "faces": [dict(id=i, kind="plane") for i in range(1, 7)]})
         if path.startswith("/cfd/") and path.endswith("/result"):
             return httpx.Response(200, json={"stats": {"mode": "natural", "wall_t_c": 56.0, "h_mean": 3.5, "heat_w": 9.0, "converged": True},
                                              "faces": CFD_FACES})
@@ -146,3 +148,59 @@ def test_freecad_package_has_the_control_box(ebox):
     names = z.namelist()
     assert "Mod/WenQuestSewing/sewcore/ebox.py" in names
     assert "WQS_Ebox" in z.read("Mod/WenQuestSewing/wqsew_gui.py").decode()
+
+
+def test_chain_submits_thermal_once_and_reports_failures(ebox):
+    """流体算完后连着两次打开：温度场只交一次；温度场失败 → 任务标失败、写明原因（不再一直“计算中”）"""
+    c, h, fk = ebox
+    jid = c.post("/api/v1/sewing/cae/ebox", json={"machine": "lockstitch", "ebox": {}}, headers=h).json()["id"]
+    fk.jobs[jid]["status"] = "done"
+    c.get(f"/api/v1/sewing/cae/jobs/{jid}", headers=h)
+    c.get(f"/api/v1/sewing/cae/jobs/{jid}", headers=h)
+    thermal = [k for k, v in fk.jobs.items() if v["kind"] == "fea"]
+    assert len(thermal) == 1
+    fk.jobs[thermal[0]].update(status="failed", error="网格划不出来")
+    s = c.get(f"/api/v1/sewing/cae/jobs/{jid}", headers=h).json()
+    assert s["status"] == "failed" and "网格划不出来" in s["error"]
+    assert next(x for x in c.get("/api/v1/sewing/cae/jobs", headers=h).json()["jobs"] if x["jid"] == jid)["status"] == "failed"
+
+
+def test_report_takes_cae_only_for_the_same_box(ebox):
+    """计算书的“CAE 分析结果”只带电控箱参数一样的那次复核（换了外壳、车间温度，旧结果不算数）"""
+    import io
+    import zipfile
+    c, h, fk = ebox
+    box = {"fins": 4}
+    jid = c.post("/api/v1/sewing/cae/ebox", json={"machine": "lockstitch", "params": {}, "ebox": box}, headers=h).json()["id"]
+    fk.jobs[jid]["status"] = "done"
+    c.get(f"/api/v1/sewing/cae/jobs/{jid}", headers=h)
+    fk.jobs[next(k for k, v in fk.jobs.items() if v["kind"] == "fea")]["status"] = "done"
+    assert c.get(f"/api/v1/sewing/cae/jobs/{jid}", headers=h).json()["status"] == "done"
+
+    def doc(e):
+        r = c.post("/api/v1/sewing/export/report", json={"machine": "lockstitch", "params": {}, "ebox": e}, headers=h)
+        return zipfile.ZipFile(io.BytesIO(r.content)).read("word/document.xml").decode()
+    assert "箱子到车间热阻：CAE 与按尺寸公式对照" in doc(box)
+    assert "箱子到车间热阻：CAE 与按尺寸公式对照" not in doc({"fins": 8})
+    assert "箱子到车间热阻：CAE 与按尺寸公式对照" not in doc(None)
+
+
+def test_own_enclosure_step(ebox):
+    """企业自己的外壳 STEP：读入、流体、温度场按整体均匀发热"""
+    import json as js
+    c, h, fk = ebox
+    r = c.post("/api/v1/sewing/cae/ebox/upload", headers=h, files={"file": ("box.step", b"ISO-10303-21;", "application/step")},
+               data={"machine": "lockstitch", "params": js.dumps({}), "ebox": js.dumps({"Ta": 38})}).json()
+    jid = r["id"]
+    assert fk.posted[-1]["kind"] == "cfd" and fk.posted[-1]["setup"]["flow"]["air_t_c"] == 38
+    fk.jobs[jid]["status"] = "done"
+    c.get(f"/api/v1/sewing/cae/jobs/{jid}", headers=h)
+    th = fk.posted[-1]
+    assert th["setup"]["thermal"][0]["type"] == "heat_body" and th["setup"]["thermal"][0]["power_w"] > 20
+    assert c.post("/api/v1/sewing/cae/ebox/upload", headers=h, files={"file": ("x.step", b"", "application/step")},
+                  data={"machine": "lockstitch"}).status_code == 400
+
+
+def test_thermal_rows_need_matching_faces():
+    with pytest.raises(ValueError):
+        ebox_thermal_rows(EXAMPLE, [dict(id=99, area_mm2=1, h_w_m2k=3.0)], 6.0, 40)

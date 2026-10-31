@@ -520,7 +520,7 @@ def insert_part():
 
 
 # ---------- 第 62 轮：电控箱（热、电容寿命、开关时间；参数化外壳）----------
-EBOX_FIELDS = ["src", "Ipk", "Kt", "starts", "duty", "Ta", "tsw", "fsw", "clog", "rbox_src", "L", "W", "H", "wall", "fins", "fin_h", "fin_t",
+EBOX_FIELDS = ["src", "Irun", "Ipk", "Kt", "starts", "duty", "Ta", "tsw", "fsw", "clog", "rbox_src", "L", "W", "H", "wall", "fins", "fin_h", "fin_t",
                "air", "vfan"]
 
 
