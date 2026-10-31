@@ -1,0 +1,34 @@
+# 实验 7.4 的指导书与报告模板。目的、场景、参数、任务取自 lab7_4.js。
+原理:
+  - ["载荷的“大小”用几个数概括：最大值（管静强度和过载）、平均值（管磨损和发热）、稳定运行的平均值（名义载荷）；轴承寿命要按转数求当量载荷（7.3 节）。起动冲击系数 = 最大值 / 稳定运行的平均值。", "A load's size is summarized by a few numbers: the maximum (static strength and overload), the mean (wear and heat) and the steady-running mean (the nominal load); bearing life needs an equivalent load per revolution (Section 7.3). Start impact factor = maximum / steady-running mean."]
+  - ["疲劳看的是循环。雨流计数（ASTM E1049）把不规则的时间历程拆成一个个闭合的循环，每个循环有范围（峰谷差）和平均值；同一段记录里，大循环少、小循环多。", "Fatigue counts cycles. Rainflow counting (ASTM E1049) splits an irregular history into closed cycles, each with a range (peak minus valley) and a mean; a record has few large cycles and many small ones."]
+  - 式: ["当量幅值 Sₑ = (Σ nᵢ Sᵢ^m / Σ nᵢ)^(1/m)，Sᵢ = 范围ᵢ / 2", "Equivalent amplitude Sₑ = (Σ nᵢ Sᵢ^m / Σ nᵢ)^(1/m), Sᵢ = rangeᵢ / 2"]
+  - ["指数 m 来自 S-N 曲线的斜率：m 越大，大循环的分量越重。轴的扭转疲劳取 m ≈ 9（数字孪生的输出轴），轴承寿命取 3（按转数，不按雨流）。", "m comes from the slope of the S-N curve: the larger m, the more the large cycles weigh. Torsional fatigue of the shaft uses m ≈ 9 (the twin's output shaft); bearing life uses 3 (per revolution, not per rainflow cycle)."]
+步骤:
+  - ["打开实验 7.4，场景“WQR-105 跑合试验台”，参数取默认（额定 350 N·m、3 次起停、m = 9、记录 1），点“读取记录”（任务 1），把读数填入表 1 第一行。", "Open Lab 7.4, scene “WQR-105 run-in bench”, defaults (350 N·m, 3 start–stops, m = 9, record 1); press Read record (task 1) and fill in the first row of Table 1."]
+  - ["把 m 改成 3 再读（任务 2），填表 1 第二行；再把记录编号改成 2、3 各读一次，看起动冲击系数变化多少。", "Change m to 3 and read again (task 2), filling in the second row; then try record numbers 2 and 3 and see how much the start impact factor varies."]
+  - ["切换到“码垛机器人的肩关节”，第一个参数是运动时间 × 10（12 即 1.2 s），负载 5 kg、10 kg 各读一次（任务 3），填表 2。", "Switch to “Palletizing robot shoulder”; the first parameter is move time × 10 (12 means 1.2 s); read with 5 kg and 10 kg (task 3) and fill in Table 2."]
+  - ["切换到“自行车的曲柄”，第一个参数是踩踏的转矩峰值，取 60 N·m（任务 4），填表 3。", "Switch to “Bicycle crank”; the first parameter is the pedal torque peak; use 60 N·m (task 4) and fill in Table 3."]
+  - ["（选做）在自己的电脑上运行程序 7.4.1，换一个序列号读数字工厂的转矩记录，与本实验的结果比较。", "(Optional) Run Program 7.4.1 on your computer with another serial number to read a factory torque record, and compare with this lab."]
+数据表:
+  - 标题: ["表 1  WQR-105 跑合试验台的转矩记录", "Table 1  WQR-105 run-in bench torque record"]
+    表头: ["m", "最大 / N·m", "平均 / N·m", "稳定运行平均 / N·m", "起动冲击系数", "雨流循环数", "大循环数", "当量幅值 / N·m"]
+    表头英文: ["m", "Max / N·m", "Mean / N·m", "Steady mean / N·m", "Start impact factor", "Rainflow cycles", "Large cycles", "Equivalent amplitude / N·m"]
+    行: [["9", "", "", "", "", "", "", ""], ["3", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  码垛机器人肩关节（运动 1.2 s）", "Table 2  Palletizing robot shoulder (1.2 s move)"]
+    表头: ["负载 / kg", "最大 / N·m", "静止持重 / N·m", "动载系数", "每个工作循环的大循环数"]
+    表头英文: ["Payload / kg", "Max / N·m", "Static holding / N·m", "Dynamic factor", "Large cycles per work cycle"]
+    行: [["5", "", "", "", ""], ["10", "", "", "", ""]]
+  - 标题: ["表 3  自行车曲柄（峰值 60 N·m，踏频 80 r/min）", "Table 3  Bicycle crank (60 N·m peak, 80 r/min cadence)"]
+    表头: ["最大 / N·m", "稳定运行平均 / N·m", "起动冲击系数", "每秒的雨流循环数", "每转的雨流循环数"]
+    表头英文: ["Max / N·m", "Steady mean / N·m", "Start impact factor", "Rainflow cycles per second", "Cycles per revolution"]
+    行: [["", "", "", "", ""]]
+注意:
+  - ["试验台场景与数字工厂的转矩记录同一个模型，但随机数发生器不同，读数与程序 7.2.1、7.4.1 那一条记录不完全一样。", "The bench scene uses the same model as the factory record but a different random generator, so the numbers differ slightly from the record in Programs 7.2.1 and 7.4.1."]
+  - ["本实验的当量幅值按全部循环的次数取参考次数，所以比 7.4.3 节（按起停次数取）小；比较时要用同一个参考次数。码垛机器人每个工作循环的“大循环”可能出现半循环（0.5），这是雨流计数在记录两端的规则。", "This lab takes all cycles as the reference number for the equivalent amplitude, so it is smaller than in Section 7.4.3 (which uses the number of start–stops); compare only with the same reference. Large cycles per work cycle of the robot may include halves (0.5), a rule of rainflow counting at the ends of a record."]
+  - ["“稳定运行平均”按去掉停机段和起动峰以后的数据算，是本实验的简单约定；工程上要按工况说明书的定义取名义载荷。", "The steady mean excludes the stopped periods and start peaks — a simple convention of this lab; in practice the nominal load follows the definition in the duty specification."]
+  - ["机器人场景只算肩关节的重力矩和惯性力矩（集中质量、单关节运动），不计摩擦和其他关节的耦合；自行车场景是示意模型。", "The robot scene includes only gravity and inertia torques at the shoulder (lumped masses, single-joint motion), without friction or coupling; the bicycle scene is a sketch."]
+思考题:
+  - ["程序 7.4.1 的雨流计数与本实验同一算法。数字孪生的边缘端把每次起停简化成一个 0 → 峰值 → 0 的循环、把运行波动简化成固定幅值的小循环。和本实验逐点计数的结果比，这样简化在什么情况下会出错？", "Program 7.4.1 uses the same rainflow algorithm. The twin's edge device simplifies each start–stop to one 0 → peak → 0 cycle and the running ripple to small cycles of fixed amplitude. Compared with the full count in this lab, when would that simplification go wrong?"]
+  - ["负载 10 kg 时，机器人肩关节的力矩最大值和模型的关节力矩限值 150 N·m 比怎样？这说明额定负载是怎样定的？", "With 10 kg, how does the robot's peak shoulder torque compare with the model's joint limit of 150 N·m? What does that say about how the rated payload is set?"]
+  - ["码垛机器人的减速器每天要做几万次工作循环，而 WQR-105 每天只起停几次。按表 1、表 2，哪一个更需要按疲劳设计？", "A palletizing robot's reducer does tens of thousands of work cycles a day, a WQR-105 only a few start–stops. From Tables 1 and 2, which needs fatigue design more?"]
