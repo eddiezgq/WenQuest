@@ -97,7 +97,8 @@ def test_freecad_pack():
     names = set(z.namelist())
     root = "wenquest-cam-freecad/Mod/WenQuest/"
     for f in ("InitGui.py", "wq_workbench.py", "wq_cam.py", "wq_cam_drawing.py", "camkit/globoid_solid.py",
-              "camkit/__init__.py", "examples/atc-globoidal.wqcam.json"):
+              "camkit/__init__.py", "examples/atc-globoidal.wqcam.json",
+              "camkit/cyl_solid.py", "camkit/cylindrical.py", "examples/barrel-fork.wqcam.json"):  # step 8d
         assert root + f in names, f
     assert not any("__pycache__" in n or n.endswith(".cae.wqcam.json") for n in names)
     here = Path(__file__).resolve().parents[1]

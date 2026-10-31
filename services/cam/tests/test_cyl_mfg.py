@@ -31,7 +31,9 @@ def test_the_cutter_copies_the_roller_within_the_chord_tolerance(eid):
         text = M.program(c, prog, {"chord_tol": tol})
         s = M.simulate(c, prog, text)
         assert s["unreached"] == 0
-        floor = 1.5e-4  # the program keeps 4 decimals: 0.0001° of A at the outer radius is ~0.14 µm
+        # the program keeps 4 decimals (0.0001° of A at the outer radius is ~0.14 µm); with a side clearance each flank
+        # pass is offset by the normal at the pitch radius, which turns slightly along the roller (< 0.001 × clearance)
+        floor = 1.5e-4 + 1e-3 * c.gap
         assert -s["max_over"] <= tol * 1.05 + floor and s["max_under"] <= tol * 1.05 + floor
     # a tighter tolerance needs more points
     fine, coarse = M.program(c, prog, {"chord_tol": 0.0002}), M.program(c, prog, {"chord_tol": 0.002})
@@ -40,11 +42,14 @@ def test_the_cutter_copies_the_roller_within_the_chord_tolerance(eid):
 
 def test_axes_follow_the_follower():
     p, prog, c = load("barrel-feed")
-    t = M.program(c, prog, {})
+    c0 = C.cyl(dict(p["cylindrical"], gap=0), "mm")                        # no side clearance: one pass along the axis
+    t = M.program(c0, prog, {})
     moves = [ln for ln in t.splitlines() if ln.startswith(("G00", "G01"))]
     assert not any(" Y" in ln for ln in moves) and all(" A" in ln for ln in moves)   # translating: A + X only
     assert "TAPERED CUTTER" in t
+    assert len(M.parse(M.program(c, prog, {}))) == 2                       # with the clearance: one pass per flank
     p, prog, c = load("barrel-fork")
+    c = C.cyl(dict(p["cylindrical"], gap=0), "rad")
     t = M.program(c, prog, {})
     passes = M.parse(t)
     assert len(passes) == 1 and np.ptp(passes[0][:, 2]) > 1               # oscillating: Y moves with the arm
@@ -108,3 +113,13 @@ def test_dwells_are_cut_exactly():
         deg = f["deg"]
         dwell = ((deg > 103) & (deg < 177)) | ((deg > 283) & (deg < 357))
         assert np.nanmax(np.abs(f["dev"][dwell])) < 2e-5
+
+
+@pytest.mark.parametrize("roller", ["cylinder", "cone"])
+def test_side_clearance_is_cut(roller):
+    # the groove is the roller's diameter plus the clearance: each flank half the clearance away along its normal
+    p, prog, _ = load("barrel-feed")
+    for gap in (0.05, 0.5):
+        c = C.cyl(dict(p["cylindrical"], roller=roller, gap=gap), "mm")
+        s = M.simulate(c, prog, M.program(c, prog, {"chord_tol": 0.00005}))
+        assert abs(s["max_over"]) < 2e-4 and s["max_under"] < 2e-4 + 1e-3 * gap

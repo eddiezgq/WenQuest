@@ -140,6 +140,29 @@ def globoid_shape(Part, Vector, c, bore=0.0):
     return GS.build_part(g, Program.from_dict(c.get("program") or {}), Part, Vector, bore=bore)
 
 
+def is_cyl(p):
+    return (p or {}).get("type") == "cylindrical"
+
+
+def cyl_shape(Part, Vector, sub):
+    """圆柱凸轮（第 39 轮第 8 步）：按加工方法的精确实体，与 camkit.cyl_solid 的 OpenCASCADE 版同一组曲面。"""
+    from camkit import cyl_solid as CS
+    c, prog = CS.build(sub)
+    shape, info = CS.build_part(c, prog, Part, Vector)
+    if not info["valid"]:
+        raise RuntimeError("圆柱凸轮实体检查不通过")
+    return shape, "圆柱凸轮：槽侧面拟合偏差 {:.2f} µm（{} 个站位）".format(info["fit_err_um"], info["sites"])
+
+
+def roller_shape(Part, Vector, sub):
+    """滚子（真实尺寸，沿 x 轴，从滚子内端到外端；锥形的锥顶在凸轮轴线上）。"""
+    from camkit import cyl_solid as CS
+    c, _ = CS.build(sub)
+    if c.roller == "cone":
+        return Part.makeCone(c.k * c.x1, c.k * c.x2, c.b, Vector(c.x1, 0, 0), Vector(1, 0, 0))
+    return Part.makeCylinder(c.rr, c.b, Vector(c.x1, 0, 0), Vector(1, 0, 0))
+
+
 def arm_shape(Part, arm):
     from camkit import atc_arm as AR
     text, rep = AR.step(arm)
@@ -148,8 +171,11 @@ def arm_shape(Part, arm):
 
 def _sub_project(p, c):
     """系统里的一个盘形 / 槽凸轮，换成单个凸轮项目（与网页版系统计算里一样）。"""
-    return {"title": {"en": c.get("id") or "cam"}, "program": c.get("program"), "mechanism": c.get("mechanism"),
-            "material": c.get("material"), "limits": c.get("limits"), "mfg": c.get("mfg") or {}}
+    out = {"title": {"en": c.get("id") or "cam"}, "program": c.get("program"), "mechanism": c.get("mechanism"),
+           "material": c.get("material"), "limits": c.get("limits"), "mfg": c.get("mfg") or {}}
+    if is_cyl(c):
+        out.update(type="cylindrical", cylindrical=c.get("cylindrical"))
+    return out
 
 
 # ---------------------------------------------------------------------------------- 文档、装配与转角
@@ -158,6 +184,25 @@ def _sub_project(p, c):
 def build(doc, p, Part, Vector, Placement, Rotation, log=print):
     """在 FreeCAD 文档里建出项目的零件；凸轮系统再按网页版三维里的布置装配。返回 {名称: 对象} 和说明。"""
     objs, notes = {}, []
+    if not is_system(p) and is_cyl(p):  # 圆柱凸轮：凸轮、滚子；“凸轮系统”对象的转角让凸轮转、滚子跟着走
+        shape, note = cyl_shape(Part, Vector, p)
+        o = doc.addObject("Part::Feature", "Cam")
+        o.Shape = shape
+        o.Label = title(p)
+        objs["cam"] = o
+        r = doc.addObject("Part::Feature", "Roller")
+        r.Shape = roller_shape(Part, Vector, p)
+        r.Label = "滚子"
+        objs["roller"] = r
+        notes.append(note)
+        drv = doc.addObject("App::FeaturePython", "CamSystem")
+        CamDriver(drv)
+        drv.Label = "转角"
+        drv.Project = json.dumps(p, ensure_ascii=False)
+        objs["driver"] = drv
+        doc.recompute()
+        set_angle(doc, p, 0.0, Placement, Rotation, Vector)
+        return objs, notes
     if not is_system(p):
         shape, sketch, note = cam_shape(Part, p, "cam")
         o = doc.addObject("Part::Feature", "Cam")
@@ -193,7 +238,11 @@ def build(doc, p, Part, Vector, Placement, Rotation, log=print):
     for c in p.get("cams") or []:
         if c.get("type") == "globoidal":
             continue
-        shape, sketch, note = cam_shape(Part, _sub_project(p, c), c.get("id") or "cam")
+        if is_cyl(c):
+            shape, note = cyl_shape(Part, Vector, _sub_project(p, c))
+            sketch = False
+        else:
+            shape, sketch, note = cam_shape(Part, _sub_project(p, c), c.get("id") or "cam")
         notes.append(note)
         o = doc.addObject("Part::Feature", "Cam_" + (c.get("id") or "x"))
         o.Shape = shape
@@ -222,6 +271,16 @@ def poses(p, theta_deg):
     from camkit.program import Program
     th = math.radians(theta_deg)
     out = {}
+    if not is_system(p) and is_cyl(p):  # 圆柱凸轮：凸轮绕 z 转 σθ；滚子平移到滚子轴线的位置（轴线方向不变，沿 x）
+        import numpy as np
+
+        from camkit import cyl_solid as CS
+        from camkit import cylindrical as C
+        c, prog = CS.build(p)
+        ps = C.pose(c, prog, np.array([[th]]))
+        out["cam"] = ((0.0, 0.0, 0.0), (0, 0, 1), c.sigma * theta_deg)
+        out["roller"] = ((0.0, float(ps["cy"][0, 0]), float(ps["cz"][0, 0])), (0, 0, 1), 0.0)
+        return out
     glob = next((c for c in p.get("cams") or [] if c.get("type") == "globoidal"), None)
     turret, C = 0.0, 0.0
     if glob:
@@ -252,7 +311,7 @@ def poses(p, theta_deg):
 
 def set_angle(doc, p, theta_deg, Placement, Rotation, Vector):
     ps = poses(p, theta_deg)
-    names = {"turret": "Turret", "arm": "Arm"}
+    names = {"turret": "Turret", "arm": "Arm", "cam": "Cam", "roller": "Roller"}
     for key, (t, ax, ang) in ps.items():
         o = doc.getObject(names.get(key) or ("GloboidalCam" if key == _glob_id(p) else "Cam_" + key))
         if o is None:
@@ -300,7 +359,7 @@ def export(objs, p, outdir, log=print):
     os.makedirs(outdir, exist_ok=True)
     files = []
     for key, o in objs.items():
-        if key == "driver" or "示意" in o.Label or key == "turret":
+        if key in ("driver", "turret", "roller") or "示意" in o.Label:
             continue
         sh = o.Shape.copy()
         sh.Placement = type(sh.Placement)()
@@ -319,6 +378,16 @@ def export(objs, p, outdir, log=print):
         with open(path, "w", encoding="ascii") as f:
             f.write(text)
         files.append(path)
+    if not is_system(p) and is_cyl(p):  # 圆柱凸轮的四轴程序（网页版“制造”里的设置；没填用示例值）
+        from camkit import cyl_mfg as CM
+        from camkit import cyl_solid as CS
+        c, prog = CS.build(p)
+        text = CM.program(c, prog, (p.get("mfg") or {}).get("four") or {}, title(p, "en"))
+        path = os.path.join(outdir, "cylindrical-4axis.nc")
+        with open(path, "w", encoding="ascii") as f:
+            f.write(text)
+        files.append(path)
+        return files
     if not is_system(p) and p.get("mfg"):  # 制造设置（刀具、机床）是网页版“制造”里填的；没填就不出程序
         from camkit import mfg as MF
         try:
@@ -342,11 +411,23 @@ def drawings(objs, p, outdir, log=print):
     files = []
     cams = {c.get("id"): c for c in p.get("cams") or []} if is_system(p) else {}
     for key, o in objs.items():
-        if key in ("driver", "turret") or "示意" in o.Label:
+        if key in ("driver", "turret", "roller") or "示意" in o.Label:
             continue
         sh = o.Shape.copy()
         sh.Placement = FreeCAD.Placement()
         c = cams.get(key)
+        src = c if c is not None else p
+        if is_cyl(src):  # 圆柱凸轮：端视图和侧视图、参数、运动程序、槽中心线展开坐标
+            sub = _sub_project(p, c) if c is not None else p
+            rows = D.cyl_rows(sub)
+            extra = [("运动程序", D.program_rows(src)), ("槽中心线（外圆处，每 20°）", D.cyl_coords(sub, 20.0))]
+            svg, k = D.sheet(TechDraw, FreeCAD.Vector, sh, o.Label, rows, extra, ((0, 0, 1), (0, -1, 0)),
+                             project_title=title(p))
+            path = os.path.join(outdir, "{}-drawing.svg".format(o.Name))
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(svg)
+            files.append(path)
+            continue
         if key == "arm":
             rows, extra, dirs = D.arm_rows(p["arm"]), [], ((0, 0, 1), (0, -1, 0))
         elif c is not None and c.get("type") == "globoidal":

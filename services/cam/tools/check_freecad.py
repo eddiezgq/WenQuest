@@ -38,6 +38,8 @@ try:
             got[str(a)] = {o.Name: [list(o.Placement.Base), list(o.Placement.Rotation.Q)] for o in doc.Objects
                            if hasattr(o, "Placement") and o.TypeId == "Part::Feature"}
             cam, tur = doc.getObject("GloboidalCam"), doc.getObject("Turret")
+            if not (cam and tur):  # a cylindrical cam and its roller (round 39 step 8)
+                cam, tur = doc.getObject("Cam"), doc.getObject("Roller")
             if cam and tur:  # rollers and the cam at this angle: they touch, they must not overlap
                 got[str(a)]["overlap_mm3"] = cam.Shape.common(tur.Shape).Volume
                 got[str(a)]["gap_mm"] = cam.Shape.distToShape(tur.Shape)[0]
@@ -69,7 +71,9 @@ def main(fc, names):
         out = tmp / name
         env = dict(os.environ, WQ_PACK=str(pack), WQ_CAM_PROJECT=str(proj), WQ_CAM_OUT=str(out), LANG="C.UTF-8",
                    QT_QPA_PLATFORM="offscreen", WQ_CAM_ANGLES="[0, 37, 90, 160, 200, 275, 330]")
-        r = subprocess.run([fc, str(tmp / "run.py")], env=env, capture_output=True, text=True, timeout=1800)
+        # FreeCAD 1.0 does not print from a script given as a file argument; -c works in every version
+        r = subprocess.run([fc, "-c", f"exec(open({str(tmp / 'run.py')!r}, encoding='utf-8').read())"], env=env,
+                           capture_output=True, text=True, timeout=1800)
         line = next((x for x in r.stdout.splitlines() if x.startswith(("RESULT ", "FAILED "))), None)
         if not line or line.startswith("FAILED"):
             print(f"{name}: FreeCAD run failed\n{r.stdout[r.stdout.find('FAILED'):][-3000:]}\n{r.stderr[-1000:]}")
@@ -90,10 +94,14 @@ def main(fc, names):
             print("    FreeCAD", a, "web", b)
         if res.get("placements"):
             (tmp / f"{name}-placements.json").write_text(json.dumps(res["placements"]), encoding="utf-8")
-            ov = {a: round(v.get("overlap_mm3", 0.0), 4) for a, v in res["placements"].items()}
-            gap = {a: round(v.get("gap_mm", 0.0), 4) for a, v in res["placements"].items()}
-            print(f"    smallest gap rollers–cam (mm, 0 = touching): {gap}")
-            good_ov = all(v < 1.0 for v in ov.values()) and all(v < 0.01 for v in gap.values())
+            ov = {a: round(v["overlap_mm3"], 4) for a, v in res["placements"].items() if "overlap_mm3" in v}
+            gap = {a: round(v["gap_mm"], 4) for a, v in res["placements"].items() if "gap_mm" in v}
+            pj = json.loads(proj.read_text(encoding="utf-8"))
+            cyl = pj.get("type") == "cylindrical"
+            want = float((pj.get("cylindrical") or {}).get("gap") or 0.0) / 2 if cyl else 0.0
+            print(f"    smallest gap rollers–cam (mm, expected {want}: half the side clearance, 0 = touching): {gap}")
+            good_ov = (bool(gap) and all(v < 1.0 for v in ov.values())
+                       and all(abs(v - want) < 0.003 for v in gap.values()))
             ok &= good_ov
             print(f"    rollers in the cam's grooves, overlap by camshaft angle (mm³): {ov}",
                   "OK" if good_ov else "TOO MUCH")

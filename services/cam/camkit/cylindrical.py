@@ -200,6 +200,13 @@ def contact(c: Cyl, ps: dict, x, side: int):
     return P, n, t, alpha, vrel
 
 
+def flank(c: Cyl, ps: dict, x, side: int):
+    """The groove flank as made (fixed frame): the roller's envelope moved away from the roller by half the side
+    clearance along its normal, so the groove is the roller's diameter plus the clearance wide. Returns (P, n)."""
+    P, n, *_ = contact(c, ps, x, side)
+    return P + (c.gap / 2) * n, n
+
+
 def cam_frame(c: Cyl, V, theta):
     """Fixed-frame points or vectors at cam angle θ into the cam's own frame (the cam turned back by σθ)."""
     a = -c.sigma * np.asarray(theta, dtype=float)
@@ -646,8 +653,8 @@ def geometry(c: Cyl, prog: Program, sfs: list[dict] | None = None, m: int = 360)
 
 def rings(c: Cyl, prog: Program, m: int = 2880) -> dict:
     """For the page's 3D view: in the cam frame, at every degree of azimuth (0…360), the z of both flanks at the outer
-    radius and at the roller's inner end (the groove continues straight down to its bottom). The side clearance opens
-    the two flanks by gap/2 each."""
+    radius and at the roller's inner end (the groove continues straight down to its bottom); flanks as made (with the
+    side clearance)."""
     th = np.linspace(0, 2 * math.pi, m, endpoint=False)
     ps = pose(c, prog, th[:, None])
     az = np.radians(np.arange(0, 361, 1.0))
@@ -655,7 +662,7 @@ def rings(c: Cyl, prog: Program, m: int = 2880) -> dict:
     for name, x in (("outer", c.x2), ("inner", c.x1)):
         zs = []
         for side in (1, -1):
-            P, *_ = contact(c, ps, np.array([[x]]), side)
+            P, _ = flank(c, ps, np.array([[x]]), side)
             Q = cam_frame(c, P, th[:, None])[:, :, 0]
             a = np.mod(np.arctan2(Q[1], Q[0]), 2 * math.pi)
             o = np.argsort(a)
@@ -663,7 +670,7 @@ def rings(c: Cyl, prog: Program, m: int = 2880) -> dict:
             z2 = np.concatenate([Q[2][o][-1:], Q[2][o], Q[2][o][:1]])
             z = np.interp(az, a2, z2)
             zs.append(z)
-        lo, hi = np.minimum(zs[0], zs[1]) - c.gap / 2, np.maximum(zs[0], zs[1]) + c.gap / 2
+        lo, hi = np.minimum(zs[0], zs[1]), np.maximum(zs[0], zs[1])
         out[name] = {"lo": lo.round(4).tolist(), "hi": hi.round(4).tolist()}
     return out
 
