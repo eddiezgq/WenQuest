@@ -1,0 +1,42 @@
+标题: ["GPU 实验 15.2 深度 Q 网络：那两条技巧各值多少", "GPU Lab 15.2 DQN: what the two tricks are actually worth"]
+目的: ["在一个小游戏上训一个深度 Q 网络，把经验回放与目标网络各关掉一次，量出三件事：学得快不快、稳不稳、价值会不会发散。书里的 Baird 反例说明了“会发散”，这里看它在真网络上长什么样。",
+       "Train a DQN on a small game and ablate experience replay and the target network, measuring learning speed, stability and whether the value estimates blow up. The chapter proves divergence is possible; here you see what it looks like with a real network."]
+显卡: basic
+结果:
+  - {名: ret_full, 说明: ["回放 + 目标网络的平均回报", "return with replay and target network"], 单位: "分"}
+  - {名: ret_noreplay, 说明: ["去掉经验回放", "without replay"], 单位: "分"}
+  - {名: ret_notarget, 说明: ["去掉目标网络", "without target network"], 单位: "分"}
+  - {名: qmax_full, 说明: ["Q 值的最大绝对值（回放 + 目标网络）", "max |Q| with both"], 单位: "—"}
+  - {名: qmax_notarget, 说明: ["Q 值的最大绝对值（无目标网络）", "max |Q| without target network"], 单位: "—"}
+  - {名: steps_per_s, 说明: ["每秒多少环境步", "environment steps per second"], 单位: "步/秒"}
+文件: []
+实际问题:
+  标题: ["表格记不下的时候", "When the table no longer fits"]
+  内容: ["车间调度的状态一多（几台车、几十个工位、队列长度），表格就记不下了，只能用网络去拟合。可是一换成网络，训练就可能既慢又不稳。DQN 当年把这件事做成的，靠的就是经验回放与目标网络这两条。",
+         "Once the state is a fleet, dozens of stations and a queue, no table fits and a network must approximate the values. Training then becomes slow and unstable, which is exactly what experience replay and the target network were introduced to fix."]
+原理:
+  - ["Q 学习用自己的估计去更新自己（自举）。配上函数逼近与离策略取样，三件事凑在一起可以发散（15.2 节的 Baird 反例）。", "Q-learning bootstraps from its own estimates; together with function approximation and off-policy sampling this can diverge (Baird's counterexample, Section 15.2)."]
+  - ["经验回放把样本存起来随机取，打散了前后相关；目标网络把自举用的那一份权重冻住一段时间，让目标别跟着自己跑。", "Replay breaks the correlation between consecutive samples; the target network freezes the bootstrap weights so the target stops chasing the estimate."]
+  - ["DQN 的公开数字：49 款游戏、每款 5000 万帧、回放池 100 万帧、ε 在前 100 万帧从 1.0 降到 0.1（见章末）。", "DQN's published setup: 49 games, 50M frames each, a one-million-frame replay buffer and epsilon annealed from 1.0 to 0.1 over the first million frames."]
+步骤:
+  - ["运行第 1 节，装好环境、确认显卡（任务 1）。", "Run section 1 to install the environment and check the GPU (task 1)."]
+  - ["运行第 2 节，用回放 + 目标网络训一遍，记下学习曲线与最终回报（任务 2，填表 1）。", "Run section 2 to train with both tricks and record the curve and the final return (task 2, Table 1)."]
+  - ["运行第 3 节，分别关掉回放与目标网络各训一遍，记下三条曲线与各自的最大 |Q|（任务 3，填表 1、表 2）。", "Run section 3 to ablate each trick and record the three curves and the largest |Q| values (task 3, Tables 1 and 2)."]
+  - ["运行第 4 节，把每秒环境步与显卡利用率记下来，与 15.7 节的并行仿真对照（任务 4，填表 2）。", "Run section 4 to record the environment steps per second and GPU utilisation, comparing with the parallel simulation of Section 15.7 (task 4, Table 2)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  两条技巧的消融", "Table 1  Ablating the two tricks"]
+    表头: ["设置", "最终平均回报", "达到及格线用了多少步", "训练耗时（s）"]
+    表头英文: ["setting", "final return", "steps to the pass mark", "wall time (s)"]
+    行: [["回放 + 目标网络", "", "", ""], ["去掉回放", "", "", ""], ["去掉目标网络", "", "", ""], ["两个都去掉", "", "", ""]]
+  - 标题: ["表 2  价值估计与吞吐", "Table 2  Value estimates and throughput"]
+    表头: ["设置", "最大 |Q|", "Q 的真实量级（回报上限）", "每秒环境步"]
+    表头英文: ["setting", "max |Q|", "true scale of Q", "env steps/s"]
+    行: [["回放 + 目标网络", "", "", ""], ["去掉目标网络", "", "", ""]]
+注意:
+  - ["小游戏上的结论不能直接搬到 Atari：那里图像观测更大、回报更稀疏，两条技巧的作用也更大。这里看的是方向与量级。", "Conclusions from a small game do not transfer directly to Atari, where observations are images and rewards far sparser; read the direction and the order of magnitude."]
+  - ["关掉目标网络之后 Q 值可能飞起来，也可能只是震荡——随机种子不同结果不同，至少跑三个种子再下结论。", "Without a target network the values may blow up or merely oscillate depending on the seed; run at least three seeds before concluding."]
+  - ["只用公开的开源环境与权重；本实验不下载任何游戏 ROM。", "Only open environments are used; no game ROMs are downloaded."]
+思考题:
+  - ["经验回放与目标网络，哪一条更像是在治“相关的数据”，哪一条更像是在治“自己追自己”？用你量到的曲线说明。", "Which trick addresses correlated data and which addresses the target chasing the estimate? Argue from your own curves."]
+  - ["如果环境是非平稳的（车间里新加了一条产线），经验回放里的旧样本会不会变成拖累？该怎么处理？", "If the environment is non-stationary — a new line opens in the shop — do old samples in the replay buffer become a liability, and what would you do about it?"]

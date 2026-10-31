@@ -1,0 +1,27 @@
+# 实验 15.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_8.js。
+原理:
+  - ["车间搬运调度可以写成马尔可夫决策过程：状态是各车位置与等待队列，动作是“这台空车去接哪一单”，奖励由等待时间与空驶距离组成（15.8 节）。", "AGV dispatching is a Markov decision process: the state is where the vehicles are and what is queued, the action is which order the next free vehicle takes, and the reward combines waiting time with empty travel (Section 15.8)."]
+  - ["学出来的策略在这里就是一个打分函数：−w_dist×空驶距离 + w_wait×已等时间，取分最高的那一单。w_wait = 0 时就退化成“最近任务优先”。", "The learned policy here is a scoring rule: minus the empty travel plus a weight times the waiting time. With that weight at zero it degenerates into nearest-first."]
+  - ["指标要看分布的尾巴，不要只看平均。95 分位与“最久的那一单”才是车间记住的数（与 11.8、12.7、14.6 节看阈值同理）。", "Judge by the tail, not the mean: the 95th percentile and the worst case are what the shop floor remembers."]
+  - 式: "打分 = −w_dist · 空驶距离 + w_wait · 已等时间；队列稳定的条件：到达率 < 车数 / 单均服务时间"
+步骤:
+  - ["“三种调度”场景：按默认设置记下三种调度的平均 / 95 分位 / 最久与每单空驶（任务 1），填表 1。", "Comparison scene: at the default settings record mean, p95, worst case and empty travel for the three dispatchers (task 1); fill Table 1."]
+  - ["把权重从 0 调到 0.05、0.1、0.2、0.4，每档记一次四个指标（任务 2），填表 2，找出“平均只差一点、最久降得最多”的那一档。", "Sweep the weight through 0, 0.05, 0.1, 0.2 and 0.4, recording all four numbers at each step (task 2); fill Table 2 and find the setting that cuts the worst case most for the least increase in the mean."]
+  - ["把车数从 2 加到 6，看三种调度的差别怎样随车数变化（任务 3）。", "Raise the fleet from two to six and watch how the gap between dispatchers changes (task 3)."]
+  - ["切到“那条尾巴”，记下权重 0 与所选权重在 1% 那一行各对应多少秒（任务 4）。", "Switch to the tail scene and read off the 1% line for weight 0 and for your chosen weight (task 4)."]
+数据表:
+  - 标题: ["表 1  三种调度", "Table 1  Three dispatchers"]
+    表头: ["调度", "平均等待（s）", "95 分位（s）", "最久的那一单（s）", "每单空驶（m）"]
+    表头英文: ["dispatcher", "mean wait (s)", "p95 (s)", "worst case (s)", "empty travel per job (m)"]
+    行: [["最近任务优先", "", "", "", ""], ["最久等待优先", "", "", "", ""], ["按权重打分", "", "", "", ""]]
+  - 标题: ["表 2  权重扫一遍", "Table 2  Sweeping the weight"]
+    表头: ["w_wait", "平均等待（s）", "95 分位（s）", "最久的那一单（s）", "每单空驶（m）"]
+    表头英文: ["weight", "mean wait (s)", "p95 (s)", "worst case (s)", "empty travel (m)"]
+    行: [["0", "", "", "", ""], ["0.05", "", "", "", ""], ["0.1", "", "", "", ""], ["0.2", "", "", "", ""], ["0.4", "", "", "", ""]]
+注意:
+  - ["仿真里订单按泊松过程生成、路径走直角通道、不考虑堵车与电量。真实车间里这几件事都会改变结论，上线前要用自己的数据重跑一遍。", "The simulation draws orders from a Poisson process, routes along rectangular aisles and ignores congestion and battery charge. All three change the conclusion in a real shop, so rerun it on your own data."]
+  - ["订单密度接近车队能力上限时，队列会积起来，等待时间对调度最敏感；车队富余时三种调度几乎一样——那时该做的是别的事，不是换调度。", "Near capacity the queue builds up and the dispatcher matters most; with spare capacity the three are nearly identical and the right fix lies elsewhere."]
+  - ["上线的调度策略必须可解释、可接管：打分规则要能写在一张纸上，调度员要能随时改成手动。", "A dispatcher that goes live must be explainable and overridable: the scoring rule should fit on one page and a human must be able to take over."]
+思考题:
+  - ["奖励里只写“少空驶”，学出来的调度会是什么样？车间主任第二天先抱怨哪一件事？", "If the reward only rewards low empty travel, what dispatcher do you get and what does the shop floor complain about first?"]
+  - ["把“最久的那一单不超过 6 分钟”写成硬约束，和把它写进奖励，两种做法各有什么好处与风险？", "Compare writing a six-minute cap on the worst case as a hard constraint versus folding it into the reward: what does each buy and what does each risk?"]

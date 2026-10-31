@@ -1,0 +1,26 @@
+# 实验 15.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_1.js。
+原理:
+  - ["把一件事写成马尔可夫决策过程，要定四样东西：状态、动作、转移概率、奖励。本实验的车间里，状态是格子、动作是四个方向、转移在油污格上有随机性、奖励是每步 −1 加到出口 +20（15.1 节）。", "A Markov decision process needs four things: states, actions, transition probabilities and rewards. Here they are the cells, the four directions, the slip on the oily cell, and a cost of 1 per step plus 20 at the exit (Section 15.1)."]
+  - ["一个格子的价值，是从它出发照最优走法走下去能拿到的折扣回报。折扣因子 γ 决定“看多远”：有效视野大约 1/(1−γ) 步。γ 太小时连走过去都不值得，价值会是负的。", "A cell's value is the discounted return obtainable from it under the best policy. The discount factor sets the horizon — roughly 1/(1-gamma) steps. If it is too small, even walking to the exit is not worth the cost and values go negative."]
+  - ["价值迭代反复用贝尔曼最优方程更新。贝尔曼算子是 γ-压缩映射，所以每一轮的变化量大约乘以 γ——这是定理，不是经验；实验里能把这个比值量出来。", "Value iteration applies the Bellman optimality backup repeatedly. That operator is a gamma-contraction, so the change per round shrinks by about gamma — a theorem you can measure here."]
+  - 式: "贝尔曼最优方程 V(s) = max_a [ R(s,a) + γ Σ_s' P(s'|s,a) V(s') ]；有效视野 ≈ 1/(1−γ)"
+步骤:
+  - ["“价值与路线”场景：按默认设置记下入口价值、到出口的步数、路线躲不躲油污（任务 1），填表 1。", "Value scene: at the default settings record the entrance value, the number of steps and whether the route avoids the oil (task 1); fill Table 1."]
+  - ["把 γ 从 0.995 一档一档降到 0.5，每档记一次入口价值，找出它由正变负的那一档（任务 2）。", "Lower gamma from 0.995 to 0.5 and record the entrance value at each step, finding where it turns negative (task 2)."]
+  - ["把滑移概率从 0 调到 0.6，看最优路线从哪一档起绕开油污（任务 3），记进表 1。", "Raise the slip probability from 0 to 0.6 and find where the best route starts to detour around the oily cell (task 3)."]
+  - ["切到“一轮一轮算出来”，对每个 γ 记下收敛轮数与第八轮比第七轮的比值，与 γ 对照（任务 4），填表 2。", "Switch to the iteration scene and, for each gamma, record the number of rounds and the ratio of round 8 to round 7, comparing it with gamma (task 4); fill Table 2."]
+数据表:
+  - 标题: ["表 1  折扣因子、滑移与路线", "Table 1  Discount, slip and route"]
+    表头: ["γ", "滑移概率", "入口的价值", "到出口的步数", "绕开油污了吗"]
+    表头英文: ["gamma", "slip", "value at entrance", "steps to exit", "detour around oil?"]
+    行: [["0.95", "0.1", "", "", ""], ["0.6", "0.1", "", "", ""], ["0.95", "0", "", "", ""], ["0.95", "0.5", "", "", ""]]
+  - 标题: ["表 2  收敛有多快", "Table 2  How fast it converges"]
+    表头: ["γ", "收敛轮数", "第八轮 / 第七轮", "与 γ 差多少", "有效视野 1/(1−γ)"]
+    表头英文: ["gamma", "rounds", "round 8 / round 7", "difference from gamma", "horizon"]
+    行: [["0.6", "", "", "", ""], ["0.8", "", "", "", ""], ["0.95", "", "", "", ""], ["0.99", "", "", "", ""]]
+注意:
+  - ["这个车间里收敛轮数与 γ 无关（出口是吸收态、大部分转移是确定的，价值沿着最长的一条路传过去就不再变了）。一般的马尔可夫决策过程不是这样，γ 越接近 1 轮数越多。", "In this shop the number of rounds does not depend on gamma, because the exit absorbs and most transitions are deterministic. In a general MDP the count grows as gamma approaches 1."]
+  - ["这里的价值是算出来的（知道转移与奖励），不是学出来的。真实车间里转移要从数据估，或者干脆不估、直接试——那是 15.2 节的事。", "Here the values are computed from a known model. In a real shop the model must be estimated from data, or skipped entirely in favour of trial and error (Section 15.2)."]
+思考题:
+  - ["把每步代价改成 0（只有到出口才给奖励），价值图会变成什么样？这时还看得出哪条路更短吗？由此说明“奖励怎么写”比“用什么算法”更要紧。", "Set the per-step cost to zero so only the exit pays. What happens to the value map, and can you still tell which route is shorter? What does that say about reward design versus algorithm choice?"]
+  - ["滑移概率到多大时，绕开油污才划算？用“绕路多走几步”与“滑一次多走几步”算一笔账，与实验结果对照。", "At what slip probability does the detour become worthwhile? Do the arithmetic from the extra steps of the detour versus the expected cost of slipping, and compare with the experiment."]

@@ -418,3 +418,26 @@ M4,梯度裁剪,gradient clipping,
 14,跨模态检索,cross-modal retrieval,
 14,视觉—语言—动作模型,vision-language-action model (VLA),把动作也写成词元
 14,关键帧,keyframe,
+15,马尔可夫决策过程,Markov decision process (MDP),状态、动作、转移概率、奖励四样东西
+15,状态,state,
+15,动作,action,
+15,转移概率,transition probability,
+15,奖励,reward,
+15,回报,return,从现在起全部奖励的折扣和
+15,折扣因子,discount factor,有效视野约 1/(1−γ)
+15,策略,policy,
+15,价值函数,value function,
+15,价值迭代,value iteration,
+15,策略迭代,policy iteration,
+15,压缩映射,contraction mapping,
+15,时序差分误差,temporal-difference error,
+15,离策略,off-policy,取样的策略与要学的策略不是同一个
+15,经验回放,experience replay,
+15,目标网络,target network,把自举用的那份参数冻住
+15,蒙特卡洛树搜索,Monte Carlo tree search (MCTS),选择、扩展、模拟、回传四步
+15,自我对弈,self-play,
+15,纳什均衡,Nash equilibrium,
+15,可利用度,exploitability,被最优应对时比均衡多输多少
+15,反事实遗憾最小化,counterfactual regret minimization (CFR),
+15,完全信息,perfect information,棋盘上的一切双方都看得见
+15,样本效率,sample efficiency,
