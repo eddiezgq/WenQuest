@@ -1,0 +1,136 @@
+# 《缝纫机设计与制造》公开课 第 22 讲：自动化测试与持续迭代
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch22.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 22-1（自动化测试台）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch22.py 算出（{{ch22.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "22"
+deck: ch22
+skip: [5, 7, 8, 9, 11, 17, 18, 19, 20, 21, 22, 24, 25]   # 节标题页、最低一层（要点并入第 6 页讲稿）、编号需求、测试台、三条流水线、两组用例对比、240 min 分配、二分、DVT/PVT、出厂测试：课程部分约 10 分钟；这几页留给课件
+code: [ch22]
+title: ["自动化测试与持续迭代——工况、次数、模型都要够", "Automated Testing and Continuous Iteration — The Right Conditions, Enough Trials, Realistic Models"]
+chapter: ["第六篇 电控原型机开发与自动化测试 · 第 22 章", "Part VI Control Prototyping and Automated Testing · Chapter 22"]
+next: ["第 23 讲", "Lecture 23"]
+cover_formula: 'n \ge \frac{\ln(1-C)}{\ln R}'
+tags:
+  zh: [自动化测试, 测试金字塔, 硬件在环, HIL, SIL, 持续集成, 零失效验证, 置信下限, Cpk, 二分定位, EVT, DVT, 缝纫机设计]
+  en: [automated testing, test pyramid, hardware-in-the-loop, HIL, SIL, continuous integration, zero-failure test, confidence bound, Cpk, bisection, EVT, DVT, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十二讲，自动化测试与持续迭代。
+    - 今天从一次升级后偶尔剪不断线的故障讲起，回答三个问题：在什么工况下测，测多少次，用多真实的模型测。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 22, automated testing and continuous iteration.
+    - We start from a firmware update that made trims fail now and then, and answer three questions. Under what conditions do we test, how many times, and with how realistic a model?
+
+after:
+  - id: lab221
+    kind: lab
+    lab: testbench
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.85'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#tasks,#cN,#dR{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); })()"
+      - js: "document.querySelector('[data-v=\"v1.4.0\"]').click();document.querySelector('[data-l=sil]').click();document.getElementById('def').click();document.getElementById('run').click();setTimeout(function(){window.scrollTo(0, 420)},1500)"
+        dur: 4
+      - js: "window.scrollTo(0, 0);document.querySelector('[data-l=hil]').click();document.getElementById('def').click();document.getElementById('run').click();setTimeout(function(){window.scrollTo(0, 560)},2000)"
+        dur: 5
+      - js: "window.scrollTo(0, 0);document.querySelector('[data-v=\"v1.3.2\"]').click();document.getElementById('none').click();document.querySelector('[data-c=HIL-TRM-SW]').click();document.getElementById('run').click();setTimeout(function(){window.scrollTo(0, 420)},2000)"
+        dur: 5
+      - js: "window.scrollTo(0, 0);document.querySelector('[data-v=\"v1.4.0\"]').click();document.getElementById('def').click();setTimeout(function(){document.querySelector('[data-c=HIL-TRM-SW]').click()},1500)"
+        dur: 4
+      - js: "(() => { const st = document.createElement('style'); st.textContent = '#tbody,#sum,#trend,#trendnote{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.querySelector('[data-l=bench]').click();document.getElementById('def').click();document.getElementById('run').click();setTimeout(function(){document.querySelector('[data-v=\"v1.4.2\"]').click();document.getElementById('def').click();document.getElementById('run').click();window.scrollTo(0, 99999)},4500); })()"
+        dur: 7
+      - js: "(() => { window.scrollTo(0, 0); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('cR', 99.5); f('cC', 95); f('cX', 0); f('dN', 1000); f('dX', 0); setTimeout(function(){f('cX', 1)}, 2500); setTimeout(function(){f('dX', 1)}, 4500); setTimeout(function(){f('dX', 2)}, 6500); })()"
+        dur: 8
+    say:
+      zh:
+        - ">下面是虚拟实验 22-1，自动化测试台，在问渠平台上可以亲手做。任务和计算结果先遮住。左边选版本、层级和用例，右上是版本记录。"
+        - ">先选 v1.4.0、软件在环 SIL，跑默认用例集。理想电机模型下，三条用例全部通过。"
+        - ">换成硬件在环 HIL，再跑默认用例集。剪线定在 4000 转、停针只停一次，七条用例也全是绿的，这正是开头漏掉的情况。"
+        - ">任务一：只勾选剪线转速扫描，先在 v1.3.2 上跑，看各转速点的失败数和置信下限；再逐个换版本比较，找出引入回归的版本和需求编号。"
+        - ">任务二：回到 v1.4.0 的默认用例集，再加上剪线扫描，预算条变红，超过了每晚 240 分钟。怎样删换，才能留住故障注入、又抓住剪线和停针两个回归，自己挑。"
+        - ">再换到整机测试台，分别在 v1.4.0 和 v1.4.2 上跑一遍，到下面的版本趋势图里比较剪线最差点的失败率和停针最大值。结果先遮住，你自己跑了再比。"
+        - ">任务三：在计算器里填可靠度 99.5%、置信度 95%，失败次数填 0 和 1，读出试验次数；再看 1000 次失败 0、1、2 次的置信下限。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 22-1, the automated test bench, which you can do yourself on WenQuest. Tasks and results are blurred. Pick a version, a level and cases on the left; top right is the change log."
+        - ">First choose v1.4.0 and software-in-the-loop, and run the default set. With an ideal motor model, all three cases pass."
+        - ">Switch to hardware-in-the-loop and run the default set again. With trimming fixed at 4000 r/min and a single stop, all seven cases are green too: exactly how the regression slipped through."
+        - ">Task one: tick only the trim speed sweep and run it on v1.3.2 first. Read the failures at each speed and the lower bound, then compare the other versions to find which one introduced the regression, and which requirement fails."
+        - ">Task two: back to the default set on v1.4.0, add the trim sweep, and the budget bar turns red, over 240 minutes a night. What would you swap so that fault injection stays and both the trim and stop regressions are caught? Your call."
+        - ">Then switch to the machine test bench, run v1.4.0 and v1.4.2, and compare the worst-point trim failure rate and the maximum stop error in the trend chart below. The results are blurred; run it yourself and compare."
+        - ">Task three: in the calculator enter 99.5 percent reliability and 95 percent confidence, with 0 and then 1 failure allowed, and read off the trials needed, then the lower bound for 0, 1 and 2 failures in 1000. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 22-1，可以自己动手", "Interactive slides and Lab 22-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">今天的互动课件和自动化测试台，都可以自己打开动手做，视频里跳过的几页也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到课程讨论区提问，每项作业、测验的得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open today's interactive slides and the test bench and work them yourself, including the pages this video skipped."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the course discussion forum, and the grades page shows your mark on every assignment and quiz."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 22：剪线可靠性验证与每晚测试设计", "Assignment 22: trim reliability and nightly test design"]
+      points:
+        - ["99.8%/90%：零失效、允许 1 次各剪多少次", "99.8% at 90%: trials with 0 and with 1 failure"]
+        - ["99% 把握抓住 1.2% 的回归 · 两个固件的 Cpk", "99% sure to catch a 1.2% regression · Cpk of two builds"]
+        - ["包缝原型：4 条需求和每晚 240 min 的分配", "Overlock prototype: 4 requirements, 240 min a night"]
+      foot: ["不超过 5 页的报告，附实验 22-1 计算器截图，在问渠学习平台提交。", "A report of at most 5 pages with Lab 22-1 calculator screenshots, submitted on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，客户要求剪线成功率 99.8%、置信度 90%，零失效和允许 1 次失败各要剪多少次、多少分钟，次数该分到哪些工况上。"
+        - ">第二题，某次改动可能让 4750 转的剪线失效率变成 1.2%，每晚要有 99% 的把握抓住它，至少剪多少次，放在 4000 转又如何。第三题，两个候选固件各停车 50 次，求单侧 Cpk，判断能否过 1.33。"
+        - ">第四题，为包缝原型写 4 条验收需求，说明每条在哪一层、用什么用例验证，再给出每晚 240 分钟的 HIL 时间分配表和理由。"
+        - 报告在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: a customer wants 99.8 percent trim success at 90 percent confidence. How many trims, and how many minutes, with zero failures and with one allowed, and over which conditions should they go?"
+        - ">Two: a change may raise the trim failure rate at 4750 r/min to 1.2 percent. To be 99 percent sure of catching it each night, how many trims are needed, and what if they run at 4000 instead? Three: two candidate builds each stop 50 times. Find the one-sided Cpk and judge it against 1.33."
+        - ">Four: write 4 acceptance requirements for the overlock prototype, say at which level and with which case each is verified, and give a 240-minute nightly HIL allocation with your reasons."
+        - Submit the report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["99%、置信度 95%：零失效至少试几次？", "99% at 95% confidence: how many zero-failure trials?"]
+        - ["停车 50 次：均值 0.40°、σ 0.12°，Cpk 是多少？", "50 stops, mean 0.40°, σ 0.12°: what is Cpk?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：要以 95% 的置信度证明成功率不低于 99%，零失效验证至少要做多少次？"
+        - ">再比如：HIL 上停车 50 次，停针误差均值 0.40 度、标准差 0.12 度，上限 1 度，单侧 Cpk 是多少？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, to show at least 99 percent success at 95 percent confidence with zero failures, how many trials do you need?"
+        - ">Or, 50 stops on HIL give a mean stop error of 0.40 degrees and a standard deviation of 0.12, with a 1 degree limit. What's the one-sided Cpk?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 今天讲的是怎样证明原型可靠；下一讲回到整台缝纫机，看它怎样设计、制造和检测。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "Today was about proving a prototype reliable. Next time we return to the whole sewing machine: how it is designed, built and inspected. See you then."
