@@ -8,6 +8,8 @@ import ProgramEditor from './components/ProgramEditor.vue'
 import Fields from './components/Fields.vue'
 import CylFields from './components/CylFields.vue'
 import CylView from './components/CylView.vue'
+import CylMfg from './components/CylMfg.vue'
+import { cylMfgResult } from './cylmfg'
 import CamView from './components/CamView.vue'
 import Charts from './components/Charts.vue'
 import Checks from './components/Checks.vue'
@@ -47,17 +49,17 @@ async function openExample(id) {
   if (!id) return
   try {
     const p = await api('/examples/' + id)
-    detach()
+    detach(); cylMfgResult.value = null
     if (p.kind === 'system') { openSystem(p, id); return }
     kind.value = 'cam'
     replace(p); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
   } catch (e) { error.value = e }
 }
-function fresh(what = 'disk') { detach(); kind.value = 'cam'; replace(what === 'cylindrical' ? blankCyl() : blank()); mfgResult.value = null; measResult.value = null; compResult.value = null; theta.value = 0 }
+function fresh(what = 'disk') { detach(); cylMfgResult.value = null; kind.value = 'cam'; replace(what === 'cylindrical' ? blankCyl() : blank()); mfgResult.value = null; measResult.value = null; compResult.value = null; theta.value = 0 }
 const isSys = computed(() => kind.value === 'system' && system.cams)
 const isCylP = computed(() => !isSys.value && project.type === 'cylindrical')   // round 39 step 8
-const modeList = computed(() => (isSys.value ? [['sys', 'modeSys'], ['sys3d', 'modeSys3d'], ['cae', 'modeCae']] : isCylP.value ? [['design', 'modeDesign']] : [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]))
-watch(isCylP, (c) => { if (c && mode.value !== 'design') mode.value = 'design' }, { immediate: true })
+const modeList = computed(() => (isSys.value ? [['sys', 'modeSys'], ['sys3d', 'modeSys3d'], ['cae', 'modeCae']] : isCylP.value ? [['design', 'modeDesign'], ['mfg', 'modeMfg']] : [['design', 'modeDesign'], ['mfg', 'modeMfg'], ['measure', 'modeMeasure']]))
+watch(isCylP, (c) => { if (c && mode.value === 'measure') mode.value = 'design' }, { immediate: true })
 const curMode = computed({ get: () => (isSys.value ? sysMode.value : mode.value), set: (v) => { if (isSys.value) sysMode.value = v; else mode.value = v } })
 function saveFile() {
   const blob = new Blob([JSON.stringify(isSys.value ? system : project, null, 1)], { type: 'application/json' })
@@ -72,7 +74,7 @@ async function openFile(e) {
   if (!f) return
   try {
     const p = JSON.parse(await f.text())
-    detach()
+    detach(); cylMfgResult.value = null
     if (p.kind === 'system') openSystem(p, p.example_id || '')
     else { kind.value = 'cam'; replace(p) }
   } catch { error.value = { message: 'not a project file', zh: '不是问渠凸轮的项目文件' } }
@@ -88,6 +90,7 @@ function work() {
   return isSys.value ? { kind: 'system', body: JSON.parse(JSON.stringify(system)) } : { kind: 'cam', body: JSON.parse(JSON.stringify(project)) }
 }
 function loadWork(k, body) {
+  cylMfgResult.value = null
   if (k === 'system' || body.kind === 'system') { openSystem(body, body.example_id || ''); return }
   kind.value = 'cam'; replace(body); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
 }
@@ -145,6 +148,7 @@ onMounted(async () => {
       <System3D v-else-if="sysMode === 'sys3d'" />
       <CaePanel v-else />
     </template>
+    <CylMfg v-else-if="mode === 'mfg' && !embed && isCylP" />
     <MfgWorkspace v-else-if="mode === 'mfg' && !embed && !isCylP" />
     <MeasureWorkspace v-else-if="mode === 'measure' && !embed && !isCylP" />
     <main v-else class="work">

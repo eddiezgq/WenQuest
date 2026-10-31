@@ -102,6 +102,8 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
      "圆柱凸轮每转一圈从动件回到原位：净分度的运动程序要用弧面分度凸轮"),
     (r"^give the allowed pressure angle first$", "求最小节圆半径前，先填许用压力角"),
     (r"^no pitch radius up to 2000 mm meets the limits$", "节圆半径到 2000 mm 也满足不了这些限值，请改运动规律或限值"),
+    (r"^a tapered roller is copied by a tapered cutter", "锥形滚子要用同样大小的锥度刀加工：刀具半径不填"),
+    (r"^the cutter radius is more than 0 and not more than the roller radius$", "刀具半径要大于 0、不大于滚子半径"),
     (r"^the tool centre path is not star-shaped", "刀心轨迹对凸轮中心不是星形，X–C 磨削走不了，请改用铣削或小砂轮"),
 ]
 
@@ -188,6 +190,31 @@ async def analyse_ep(request: Request):
 async def min_rb(request: Request):
     p = await project_of(request)
     return run(lambda: min_base_radius(p))
+
+
+@app.post("/api/cyl/manufacture")
+async def cyl_mfg_ep(request: Request):
+    """Cylindrical cam (round 39 step 8c): the 4-axis program, its simulation and the checks."""
+    from camkit import cyl_mfg as CM
+
+    p = await project_of(request)
+    return run(lambda: CM.manufacture(p))
+
+
+@app.post("/api/cyl/stl")
+async def cyl_stl_ep(request: Request):
+    """The cylindrical cam made the way it is machined, as STL."""
+    from fastapi.responses import Response
+
+    from camkit import cyl_mfg as CM
+
+    p = await project_of(request)
+    try:
+        data = CM.model_stl(p)
+    except ValueError as exc:
+        raise HTTPException(422, {"en": str(exc), "zh": zh(str(exc))}) from exc
+    return Response(data, media_type="model/stl",
+                    headers={"Content-Disposition": "attachment; filename=cylindrical-cam.stl"})
 
 
 @app.post("/api/min-pitch-radius")
