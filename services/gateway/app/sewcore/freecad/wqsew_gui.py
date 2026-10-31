@@ -519,6 +519,101 @@ def insert_part():
         PartsDialog().exec_()
 
 
+# ---------- 第 62 轮：电控箱（热、电容寿命、开关时间；参数化外壳）----------
+EBOX_FIELDS = ["src", "Ipk", "Kt", "starts", "duty", "Ta", "tsw", "fsw", "clog", "rbox_src", "L", "W", "H", "wall", "fins", "fin_h", "fin_t",
+               "air", "vfan"]
+
+
+class EboxDialog(QtW.QDialog):
+    """电控箱：常改的几项参数（其余用默认，网页版能改全部）→ 计算核心算结温、电容寿命、开关时间窗口和改进方案；在文档里建外壳"""
+
+    def __init__(self, obj):
+        from sewcore import ebox as EB
+        super().__init__(Gui.getMainWindow())
+        self.obj, self.EB = obj, EB
+        M = F.SewDesign.machine(obj)
+        self.q = EB.defaults_for(M.MACHINE)
+        self.setWindowTitle("电控箱 · " + obj.Label)
+        self.resize(900, 720)
+        lay = QtW.QHBoxLayout(self)
+        left = QtW.QFormLayout()
+        self.w = {}
+        for k in EBOX_FIELDS:
+            sp = EB.PARAMS[k]
+            if k in EB.CHOICES:
+                cb = QtW.QComboBox()
+                for c in EB.CHOICES[k]:
+                    cb.addItem(c[1], c[0])
+                cb.setCurrentIndex([c[0] for c in EB.CHOICES[k]].index(self.q[k]))
+                self.w[k] = cb
+            else:
+                box = QtW.QDoubleSpinBox()
+                box.setRange(sp[5], sp[6])
+                box.setSingleStep(sp[7])
+                box.setDecimals(3 if sp[7] < 0.01 else 2 if sp[7] < 1 else 0)
+                box.setValue(float(self.q[k]))
+                self.w[k] = box
+            left.addRow("{}{}".format(sp[1], " · " + sp[3] if sp[3] else ""), self.w[k])
+        lw = QtW.QWidget()
+        lw.setLayout(left)
+        sc = QtW.QScrollArea()
+        sc.setWidget(lw)
+        sc.setWidgetResizable(True)
+        sc.setMinimumWidth(380)
+        lay.addWidget(sc)
+        right = QtW.QVBoxLayout()
+        self.out = QtW.QTextBrowser()
+        right.addWidget(self.out)
+        row = QtW.QHBoxLayout()
+        for text, fn in (("计算", self.calc), ("在文档里建外壳", self.build), ("关闭", self.accept)):
+            b = QtW.QPushButton(text)
+            b.clicked.connect(fn)
+            row.addWidget(b)
+        right.addLayout(row)
+        lay.addLayout(right, 1)
+        self.calc()
+
+    def values(self):
+        q = dict(self.q)
+        for k, wdg in self.w.items():
+            q[k] = wdg.currentData() if isinstance(wdg, QtW.QComboBox) else wdg.value()
+        return q
+
+    def calc(self):
+        R = F.ebox_analyze(self.obj, self.values())
+        drv = "".join("<tr><td>{}</td><td>{:.2f} A</td><td>{:.2f} A</td><td>{:.1f} W</td><td>{:.1f} °C</td></tr>".format(
+            d["zh"], d["Irun"], d["Ipk"], d["Pavg"], d["Tjpk"]) for d in R["drives"])
+        res = "　".join("{} <b>{}</b> {}".format(r["zh"], r["value"], r["unit"].replace("年 / years", "年")) for r in R["results"])
+        chk = "".join("<tr><td style='color:{}'><b>{}</b></td><td>{}</td><td>{}</td><td>{}</td></tr>".format(
+            COLOR[c["state"]], WORD[c["state"]], c["name"]["zh"], c["value"]["zh"], c["limit"]["zh"]) for c in R["checks"])
+        v = R["variants"]
+        var = "".join("<tr>{}</tr>".format("".join("<td>{}</td>".format(x) for i, x in enumerate(r) if i != 1)) for r in v["rows"])
+        self.out.setHtml(
+            "<p>教材第 18 章：电流取这台设计（主轴转矩 ÷ K<sub>t</sub>），判据是教材的示意值。外壳尺寸、翅片、风扇只在“箱内空气到车间的热阻”"
+            "选“按外壳尺寸算”时起作用；网页版“CAE 分析 → 电控箱”能用数字工厂的流体 + 温度场复核。</p>"
+            "<table border='1' cellspacing='0' cellpadding='3'><tr><th>驱动</th><th>运行电流</th><th>峰值电流</th><th>平均损耗</th><th>结温峰值</th></tr>{}</table>"
+            "<p>{}</p><table border='1' cellspacing='0' cellpadding='3'><tr><th>结论</th><th>校核项</th><th>数值</th><th>判据</th></tr>{}</table>"
+            "<p><b>{}</b></p><table border='1' cellspacing='0' cellpadding='3'><tr>{}</tr>{}</table>".format(
+                drv, res, chk, v["zh"], "".join("<th>{}</th>".format(h[0]) for i, h in enumerate(v["cols"]) if i != 1), var))
+
+    def build(self):
+        f = F.add_ebox(self.obj, self.values())
+        try:
+            Gui.Selection.clearSelection()
+            Gui.Selection.addSelection(f)
+            Gui.SendMsgToActiveView("ViewFit")
+        except Exception:  # noqa: BLE001
+            pass
+        self.out.append("<p>已在文档里建好“{}”，可以用“文件 → 导出”存成 STEP。</p>".format(f.Label))
+
+
+def ebox_dialog():
+    obj = design()
+    if obj:
+        d = EboxDialog(obj)
+        d.exec_() if hasattr(d, "exec_") else d.exec()
+
+
 HELP_ONLINE = "https://learn.wenquestrobotics.com/static/help/sewing-freecad/index.html"
 
 
@@ -541,6 +636,7 @@ def register():
             ("WQS_Timing", Cmd("时序图", "针杆、钩线窗口、送布、挑线的时序", show_timing)),
             ("WQS_Spin", Cmd("转动机构", "让主轴转起来看运动（再点一次停止）", toggle_spin)),
             ("WQS_Step", Cmd("导出 STEP", "整套机构零件导出 STEP", export_step)),
+            ("WQS_Ebox", Cmd("电控箱", "这台机配的电控箱：结温、电容寿命、开关时间窗口、改进方案；在文档里建参数化外壳（第 18 章）", ebox_dialog)),
             ("WQS_Import", Cmd("导入参数", "读入问渠网页版导出的参数文件（.wqsew.json）", import_params)),
             ("WQS_Export", Cmd("导出参数", "存成参数文件，可在问渠网页版打开", export_params)),
             ("WQS_Submit", Cmd("提交到问渠工厂", "用“问渠”工作台把整套零件提交到数字工厂审批", submit)),

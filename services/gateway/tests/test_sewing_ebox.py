@@ -136,3 +136,13 @@ def test_ai_drafts_control_box_changes(ebox, monkeypatch):
                                                  "sentence": "车间夏天 40 度，飞絮堵塞 0.5，电控箱会不会报过热"}, headers=h).json()
     assert r["status"] == "ok" and {x["key"]: x["new"] for x in r["changes"]} == {"Ta": 40, "clog": 0.5}
     assert r["params"]["Ta"] == 40 and {x["key"] for x in r["after_bad"]} >= {"ths", "tj"}
+
+
+def test_freecad_package_has_the_control_box(ebox):
+    import io
+    import zipfile
+    c, h, _ = ebox
+    z = zipfile.ZipFile(io.BytesIO(c.get("/api/v1/sewing/freecad.zip", headers=h).content))
+    names = z.namelist()
+    assert "Mod/WenQuestSewing/sewcore/ebox.py" in names
+    assert "WQS_Ebox" in z.read("Mod/WenQuestSewing/wqsew_gui.py").decode()

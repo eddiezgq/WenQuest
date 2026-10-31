@@ -207,3 +207,41 @@ def apply_params(obj, changes):
             done[k] = p[k]
     obj.Document.recompute()
     return done
+
+
+# ---------- 第 62 轮：电控箱 ----------
+EBOX_IPM = (60.0, 45.0, 12.0)          # 功率模块简化成实心块（长、宽、高 mm），贴在顶板里面正中——和数字工厂 CAE 复核用的同一只外壳
+
+
+def ebox_shape(q):
+    """参数化电控箱外壳：铝盒（外壳兼散热器）+ 顶面沿宽度方向的翅片 + 功率模块块。q 是计算核心 ebox 的参数（mm）"""
+    import Part
+    L, W, H, t = float(q["L"]), float(q["W"]), float(q["H"]), float(q["wall"])
+    V = App.Vector
+    sh = Part.makeBox(L, W, H, V(-L / 2, -W / 2, 0)).cut(Part.makeBox(L - 2 * t, W - 2 * t, H - 2 * t, V(-L / 2 + t, -W / 2 + t, t)))
+    il, iw, ih = EBOX_IPM
+    sh = sh.fuse(Part.makeBox(il, iw, ih, V(-il / 2, -iw / 2, H - t - ih)))
+    n = int(q.get("fins") or 0)
+    if n:
+        pitch, ft, fh = L / n, float(q["fin_t"]), float(q["fin_h"])
+        for i in range(n):
+            sh = sh.fuse(Part.makeBox(ft, W, fh, V(-L / 2 + pitch * (i + 0.5) - ft / 2, -W / 2, H)))
+    return sh.removeSplitter()
+
+
+def ebox_analyze(obj, q):
+    """这台设计的电控箱：电流取设计（同网页版“CAE 分析 → 电控箱”）"""
+    from sewcore import ebox as EB
+    M = SewDesign.machine(obj)
+    return EB.analyze(q, M.MACHINE, obj.Proxy.params(obj))
+
+
+def add_ebox(obj, q):
+    """在文档里建（或更新）电控箱外壳，返回 Part::Feature"""
+    doc = obj.Document
+    name = "WQS_Ebox"
+    f = doc.getObject(name) or doc.addObject("Part::Feature", name)
+    f.Label = "电控箱外壳 {:g}×{:g}×{:g}".format(float(q["L"]), float(q["W"]), float(q["H"]))
+    f.Shape = ebox_shape(q)
+    doc.recompute()
+    return f

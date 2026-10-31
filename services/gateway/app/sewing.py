@@ -389,6 +389,7 @@ def workbench_zip() -> bytes:
             if f.is_file() and f.suffix in (".py", ".svg", ".txt") and f.name != "使用说明.txt":
                 z.write(f, root + f.name)
         for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "flatknit.py", "machines.py", "cad.py",
+                  "ebox.py",                                      # 第 62 轮：电控箱
                   "cae_setup.py"):                                  # 第 49 轮：本机有限元算例（wqsew_fem）和网页版同一份工况
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")
