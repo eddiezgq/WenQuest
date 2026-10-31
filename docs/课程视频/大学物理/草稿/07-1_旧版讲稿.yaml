@@ -1,0 +1,201 @@
+# 公开课视频讲稿 · 《大学物理》第 41 讲 = 教材 7.1 节（第 21 轮）。
+# 每个镜头（shot）一种画面，say 是这一镜头的逐句讲稿（中英各一句，字幕与配音同文）。
+# {{exN_M.名:格式}} 由教材程序的输出填入（textbook/build/physics/values），与教材一致。
+# slide 的 items 可含 $LaTeX$；某句加 show: n 表示说这句时显示前 n 条（默认全部已显示到上一句的数目）。
+# zh_say / en_say：配音的读法与字幕不同时才写。
+book: physics
+lecture: 41
+section: "7.1"
+title: {zh: "摩擦：静摩擦、动摩擦与摩擦因数的测量", en: "Friction: Static, Kinetic, and How to Measure It"}
+chapter: {zh: "第 7 章 牛顿定律的应用", en: "Chapter 7 Applying Newton's Laws"}
+next: {zh: "第 42 讲 流体阻力与终端速度", en: "Lecture 42: Fluid Drag and Terminal Speed"}
+tags:
+  zh: [大学物理, 摩擦力, 静摩擦, 动摩擦, 摩擦因数, 机器人, 夹爪, AGV, 虚拟实验, 问渠]
+  en: [university physics, friction, static friction, kinetic friction, coefficient of friction, robotics, gripper, AGV, virtual lab]
+
+shots:
+  - type: title
+    say:
+      - {zh: "大家好，欢迎来到问渠公开课《大学物理》。这是第 41 讲：摩擦。", en: "Hello, and welcome to the WenQuest Open Course in University Physics. This is Lecture 41: Friction."}
+
+  - type: lab_still
+    lab: "7-3"
+    scene: lift
+    set: {m: 0.8, az: 4, ax: 3, FN: 6}
+    press: [start]
+    wait: 1.4
+    caption: {zh: "实际问题：夹爪要夹多紧？", en: "The problem: how hard must a gripper squeeze?"}
+    say:
+      - {zh: "先看一个机器人问题。二指夹爪夹住一个零件，两个指面只是从两边把它压紧，并没有从下面托住它。", en: "Let's start with a robot problem. A two-finger gripper holds a part. The fingers only squeeze it from the sides; nothing supports it from below."}
+      - {zh: "零件为什么不掉下来？靠的是指面和零件之间的摩擦力。", en: "So why doesn't the part fall? Because of friction between the finger pads and the part."}
+      - {zh: "机械臂快速向上提、同时水平移动的时候，摩擦力不但要托住重量，还要给零件加速。", en: "When the arm lifts quickly and moves sideways at the same time, friction must not only hold the weight, it must also accelerate the part."}
+      - {zh: "夹得太松，零件会滑落；夹得太紧，薄壁零件会被压坏。到底要夹多紧？这一讲就来回答。", en: "Squeeze too lightly and the part slips; squeeze too hard and a thin-walled part gets crushed. How hard is just right? That's what this lecture answers."}
+
+  - type: slide
+    heading: {zh: "静摩擦：需要多少，给多少", en: "Static friction: as much as needed"}
+    image: fig7_1_1
+    say:
+      - {zh: "做一个简单的实验。用拉力计水平拉一个放在台面上的零件盒，拉力从零慢慢增大。", en: "Here's a simple experiment. Pull on a parts box sitting on a table with a spring scale, slowly increasing the force from zero."}
+      - {zh: "开始时盒子不动。按牛顿第一定律，台面一定给了它一个和拉力大小相等、方向相反的力，这就是静摩擦力。", en: "At first the box doesn't move. By Newton's first law, the table must be pushing back with a force equal and opposite to the pull. That's static friction."}
+      - {zh: "拉力增大，静摩擦力跟着增大。所以静摩擦力不是一个固定的数，而是需要多少，就给多少。", en: "Pull harder, and static friction grows to match. So static friction isn't a fixed number; it supplies whatever is needed."}
+      - {zh: "但它有上限。图中这个盒子质量 2 千克，最大静摩擦力约 {{ex7_1.fs_max:.1f}} 牛。拉力一旦超过它，盒子就开始滑动。", en: "But there's a limit. For this 2-kilogram box, the maximum static friction is about {{ex7_1.fs_max:.1f}} newtons. Once the pull exceeds that, the box starts to slide."}
+      - {zh: "滑动以后，摩擦力降到大约 {{ex7_1.fk:.1f}} 牛，这叫动摩擦力。所以推动一个箱子，起步比维持滑动更费力。", en: "Once it slides, friction drops to about {{ex7_1.fk:.1f}} newtons. This is kinetic friction. That's why getting a heavy box moving is harder than keeping it moving."}
+
+  - type: anim
+    src: a7_1_1
+    say:
+      - {zh: "这个动画把整个过程放慢了。蓝色箭头是拉力，红色箭头是摩擦力，右边同时画出摩擦力随拉力的变化。", en: "This animation slows the whole process down. The blue arrow is the pull, the red arrow is friction, and the graph on the right tracks friction against the pull."}
+      - {zh: "注意看：拉力增大的时候，红色箭头一直和蓝色箭头一样长，直到最大静摩擦力。", en: "Watch: as the pull grows, the red arrow keeps exactly the same length as the blue one, all the way up to the maximum static friction."}
+      - {zh: "到了这一点，盒子开始滑动，摩擦力突然下降，此后基本保持不变。", en: "At that point the box breaks loose, friction suddenly drops, and from then on it stays roughly constant."}
+
+  - type: slide
+    heading: {zh: "摩擦的两条规律", en: "Two laws of friction"}
+    math: "F_\\mathrm f \\le \\mu_\\mathrm s F_\\mathrm N \\qquad\\qquad F_\\mathrm f = \\mu_\\mathrm k F_\\mathrm N"
+    items:
+      - {zh: "$\\mu_\\mathrm s$ 静摩擦因数，$\\mu_\\mathrm k$ 动摩擦因数，一般 $\\mu_\\mathrm k < \\mu_\\mathrm s$", en: "$\\mu_\\mathrm s$: coefficient of static friction; $\\mu_\\mathrm k$: kinetic; usually $\\mu_\\mathrm k < \\mu_\\mathrm s$"}
+      - {zh: "静摩擦是不等式：实际大小由运动方程决定", en: "Static friction is an inequality: its actual size comes from the equations of motion"}
+      - {zh: "$F_\\mathrm N$ 是两表面间的支持力，不一定等于重力", en: "$F_\\mathrm N$ is the normal force between the surfaces, not always the weight"}
+      - {zh: "与接触面积几乎无关；同一对材料实测值可差 20%～30%", en: "Almost independent of contact area; measured values for the same pair can differ by 20–30%"}
+    say:
+      - {zh: "实验总结出两条规律。没有相对滑动时，静摩擦力不超过静摩擦因数乘以支持力；滑动时，动摩擦力等于动摩擦因数乘以支持力。", en: "Experiments give two rules. Without sliding, static friction is at most the coefficient of static friction times the normal force. While sliding, kinetic friction equals the coefficient of kinetic friction times the normal force.", show: 1}
+      - {zh: "用这两条规律时要注意三点。第一，静摩擦那一条是不等式，它只告诉你上限，实际有多大，要由平衡条件或者牛顿第二定律求出来。", en: "Three things to keep in mind. First, the static rule is an inequality. It only gives the upper limit; the actual value comes from equilibrium or Newton's second law.", show: 2}
+      - {zh: "第二，支持力不一定等于重力。在斜面上，它是重力垂直于斜面的分量；在夹爪上，它就是夹紧力。", en: "Second, the normal force is not always the weight. On a slope it's the component of weight perpendicular to the surface; in a gripper, it's the squeezing force itself.", show: 3}
+      - {zh: "第三，摩擦力与接触面积几乎无关，而摩擦因数随表面状态变化很大，有油、有灰尘、磨损了，都会变。", en: "Third, friction hardly depends on contact area, but the coefficient changes a lot with the surface condition: oil, dust, and wear all change it.", show: 4}
+      - {zh: "为什么和面积无关？在显微镜下，两个表面只在一些微小的凸起处真正接触。压力越大，凸起压得越扁，真正的接触面积越大，摩擦力也越大。所以真正接触的面积只看压力有多大，和表面看上去有多大没有关系。", en: "Why not area? Under a microscope, two surfaces touch only at tiny bumps. Press harder and the bumps flatten, the real contact area grows, and so does friction. So the real contact area depends on the load, not on how big the surfaces look."}
+      - {zh: "在这些真正接触的地方，两种材料的原子靠得很近，相互吸引，像一个个微小的焊点。要让表面滑动，就得把这些焊点剪断。", en: "At those real contact points, the atoms of the two materials come very close and attract each other, like tiny welds. To make the surfaces slide, those welds have to be sheared."}
+      - {zh: "表面静止接触的时间越长，焊点长得越牢，所以最大静摩擦力往往比动摩擦力大一些。", en: "The longer the surfaces sit still together, the stronger the welds grow. That's why maximum static friction is usually a bit larger than kinetic friction."}
+
+  - type: slide
+    heading: {zh: "常见材料的摩擦因数（典型值）", en: "Typical friction coefficients"}
+    items:
+      - {zh: "钢—钢：0.7 / 0.6；加润滑：0.1 / 0.05", en: "Steel on steel: 0.7 / 0.6; lubricated: 0.1 / 0.05"}
+      - {zh: "橡胶—干水泥：0.8～1.0；湿水泥：0.5～0.7", en: "Rubber on dry concrete: 0.8–1.0; wet: 0.5–0.7"}
+      - {zh: "聚氨酯轮—环氧地坪：0.5～0.7（车间 AGV）", en: "Polyurethane wheel on epoxy floor: 0.5–0.7 (factory AGVs)"}
+      - {zh: "硅胶指垫—塑料件：0.5～0.8（夹爪）", en: "Silicone pad on plastic: 0.5–0.8 (grippers)"}
+      - {zh: "冰—冰：0.1 / 0.03；聚四氟乙烯—钢：0.04", en: "Ice on ice: 0.1 / 0.03; PTFE on steel: 0.04"}
+    say:
+      - {zh: "摩擦因数有多大？这里列了几种常见材料的典型值，斜杠前面是静摩擦因数，后面是动摩擦因数。", en: "How big are friction coefficients? Here are typical values for some common pairs. Before the slash is the static coefficient, after it the kinetic one.", show: 0}
+      - {zh: "钢对钢大约是零点七，加了润滑油，一下子降到零点一。这就是机器里要加油的原因。", en: "Steel on steel is about 0.7, but add lubricant and it drops to about 0.1. That's why machines are oiled.", show: 1}
+      - {zh: "橡胶轮胎在干燥的水泥地上可以接近一，地面一湿就明显下降，所以下雨天要减速慢行。", en: "A rubber tire on dry concrete can approach 1, but it drops noticeably when the road is wet. That's why we slow down in the rain.", show: 2}
+      - {zh: "车间里的 AGV 多用聚氨酯轮，在环氧地坪上大约零点五到零点七；夹爪的硅胶指垫夹塑料件，也在这个范围。", en: "Factory AGVs mostly use polyurethane wheels, around 0.5 to 0.7 on epoxy floors; a silicone gripper pad on a plastic part is in the same range.", show: 4}
+      - {zh: "冰和聚四氟乙烯特别滑：冰的静摩擦因数只有零点一，滑动起来只有百分之三；聚四氟乙烯，也就是不粘锅的涂层，只有百分之四。", en: "Ice and PTFE are especially slippery: ice is about 0.1 at rest and just 0.03 sliding, and PTFE, the nonstick coating, is about 0.04.", show: 5}
+      - {zh: "不过要记住，这些只是典型值。同一对材料，实测相差两三成很常见，设计时一定要用实测的数据。", en: "But remember these are only typical values. Measurements on the same pair often differ by 20 or 30 percent, so always design with measured data."}
+
+  - type: slide
+    heading: {zh: "用斜面测摩擦因数", en: "Measuring friction on an incline"}
+    math: "\\tan\\theta_\\mathrm c = \\mu_\\mathrm s \\qquad\\qquad \\mu_\\mathrm k = \\frac{g\\sin\\theta - a}{g\\cos\\theta}"
+    items:
+      - {zh: "慢慢抬高斜面，刚开始滑动的倾角 $\\theta_\\mathrm c$ 称为摩擦角", en: "Raise the incline slowly; the angle $\\theta_\\mathrm c$ where sliding starts is the angle of friction"}
+      - {zh: "算例：$\\theta_\\mathrm c$ = {{ex7_1.thc:.0f}}°，$\\mu_\\mathrm s$ = {{ex7_1.mus:.3f}} ± {{ex7_1.u_mus:.3f}}", en: "Example: $\\theta_\\mathrm c$ = {{ex7_1.thc:.0f}}°, $\\mu_\\mathrm s$ = {{ex7_1.mus:.3f}} ± {{ex7_1.u_mus:.3f}}"}
+      - {zh: "{{ex7_1.th2:.0f}}° 斜面滑下 {{ex7_1.L:.2f}} m 用时 {{ex7_1.tL:.2f}} s：$\\mu_\\mathrm k$ = {{ex7_1.muk:.2f}} ± {{ex7_1.u_muk:.2f}}", en: "At {{ex7_1.th2:.0f}}°, {{ex7_1.L:.2f}} m in {{ex7_1.tL:.2f}} s: $\\mu_\\mathrm k$ = {{ex7_1.muk:.2f}} ± {{ex7_1.u_muk:.2f}}"}
+      - {zh: "最大的误差来源：手按秒表计时", en: "Biggest error source: timing by hand with a stopwatch"}
+    say:
+      - {zh: "摩擦因数怎么测？最简单的办法是用斜面。把零件放在可调倾角的板上，慢慢抬高。", en: "How do we measure a friction coefficient? The simplest way is an incline. Put the part on a tilting plate and raise it slowly.", show: 0}
+      - {zh: "刚开始滑动时，重力沿斜面的分量正好等于最大静摩擦力。由此可以推出：这个倾角的正切，就等于静摩擦因数。这个倾角叫摩擦角，它和零件的质量无关。", en: "At the moment it starts to slide, the weight's component along the slope just equals maximum static friction. That gives a neat result: the tangent of this angle equals the static coefficient. The angle is called the angle of friction, and it doesn't depend on the mass.", show: 1}
+      - {zh: "例如读得摩擦角是 {{ex7_1.thc:.0f}} 度，静摩擦因数就是 {{ex7_1.mus:.3f}}。角度读数差半度，结果大约差 {{ex7_1.u_mus:.2f}}。", en: "For example, an angle of {{ex7_1.thc:.0f}} degrees gives a static coefficient of {{ex7_1.mus:.3f}}. Half a degree of reading error changes it by about {{ex7_1.u_mus:.2f}}.", show: 2}
+      - {zh: "动摩擦因数呢？把斜面固定在比摩擦角更陡的角度，让零件滑下来，测出加速度，用牛顿第二定律就能算出来。", en: "And the kinetic coefficient? Fix the incline steeper than the angle of friction, let the part slide, measure its acceleration, and Newton's second law gives the answer."}
+      - {zh: "算例中，{{ex7_1.th2:.0f}} 度的斜面上，零件滑下 {{ex7_1.L:.1f}} 米用了 {{ex7_1.tL:.2f}} 秒，算出动摩擦因数约 {{ex7_1.muk:.2f}}，不确定度约 {{ex7_1.u_muk:.2f}}。", en: "In the worked example, on a {{ex7_1.th2:.0f}}-degree slope the part slides {{ex7_1.L:.1f}} meters in {{ex7_1.tL:.2f}} seconds, giving a kinetic coefficient of about {{ex7_1.muk:.2f}}, with an uncertainty of about {{ex7_1.u_muk:.2f}}.", show: 3}
+      - {zh: "其中绝大部分误差来自手按秒表。加速度和时间的平方成反比，计时误差会被放大一倍；算动摩擦因数时还要做一次减法，误差又被放大。所以要加长斜面、用光电门，或者多测几次取平均。", en: "Almost all of that uncertainty comes from the hand-held stopwatch. Acceleration goes as one over time squared, which amplifies the error, and a subtraction amplifies it again. So use a longer incline, light gates, or average several runs.", show: 4}
+
+  - type: slide
+    heading: {zh: "回到夹爪：最小夹紧力", en: "Back to the gripper: minimum grip"}
+    math: "F_\\mathrm N \\ge \\frac{m\\sqrt{(g + a_z)^2 + a_x^2}}{2\\mu_\\mathrm s}"
+    image: fig7_1_2
+    items:
+      - {zh: "m = {{ex7_1.m:.1f}} kg，$\\mu_\\mathrm s$ = {{ex7_1.mu:.2f}}，$a_z$ = {{ex7_1.az:.0f}} m/s²，$a_x$ = {{ex7_1.ax:.0f}} m/s²", en: "m = {{ex7_1.m:.1f}} kg, $\\mu_\\mathrm s$ = {{ex7_1.mu:.2f}}, $a_z$ = {{ex7_1.az:.0f}} m/s², $a_x$ = {{ex7_1.ax:.0f}} m/s²"}
+      - {zh: "每指至少 {{ex7_1.FN_min:.1f}} N；乘安全系数 2：{{ex7_1.FN:.1f}} N", en: "At least {{ex7_1.FN_min:.1f}} N per finger; with safety factor 2: {{ex7_1.FN:.1f}} N"}
+      - {zh: "静止时只要 {{ex7_1.FN_static:.1f}} N", en: "At rest only {{ex7_1.FN_static:.1f}} N"}
+    say:
+      - {zh: "现在回到夹爪。每个指面上的静摩擦力可以朝指面内的任何方向，但大小不能超过静摩擦因数乘以夹紧力，两个指面加起来就是两倍。", en: "Now back to the gripper. Static friction on each finger pad can point in any direction within the pad, but its size can't exceed the static coefficient times the grip force. Two fingers give twice that.", show: 0}
+      - {zh: "零件需要多大的摩擦力？竖直方向，要托住重量并向上加速；水平方向，零件要沿着指面跟机械臂一起加速，这一部分也靠摩擦力。两者合起来，就得到这个式子。", en: "How much friction does the part need? Vertically it must hold the weight and accelerate upward; horizontally, along the finger pads, it must keep up with the arm, and that also takes friction. Combining the two gives this formula."}
+      - {zh: "代入算例的数字：零件 0.8 千克，摩擦因数 0.5，向上加速 4 米每二次方秒，水平加速 3 米每二次方秒。", en: "Plug in the example: a 0.8-kilogram part, a friction coefficient of 0.5, an upward acceleration of 4 meters per second squared, and 3 meters per second squared sideways.", zh_say: "代入算例的数字：零件零点八千克，摩擦因数零点五，向上加速四米每二次方秒，水平加速三米每二次方秒。", show: 1}
+      - {zh: "每个指面至少要 {{ex7_1.FN_min:.1f}} 牛。考虑到摩擦因数会变、加速度可能超过计划，再乘以安全系数 2，取 {{ex7_1.FN:.1f}} 牛。机械臂静止时，只要 {{ex7_1.FN_static:.1f}} 牛就够了。", en: "Each finger needs at least {{ex7_1.FN_min:.1f}} newtons. Since friction varies and accelerations can overshoot the plan, multiply by a safety factor of 2: {{ex7_1.FN:.1f}} newtons. With the arm at rest, only {{ex7_1.FN_static:.1f}} newtons would do.", show: 3}
+      - {zh: "右边的图画出了所需夹紧力随加速度的变化。向上加速最费力。向下加速时虽然省力，但别忘了：向下的运动最后要减速停下，那时加速度向上。所以，夹紧力要按整个运动过程中最大的需要来取。", en: "The graph shows how the required grip varies with acceleration. Accelerating upward is the hardest case. Accelerating downward needs less, but remember: a downward move must decelerate to a stop, and then the acceleration points up. So size the grip for the worst moment of the whole motion."}
+
+  - type: slide
+    heading: {zh: "驱动、制动与滚动阻力", en: "Driving, braking, and rolling resistance"}
+    items:
+      - {zh: "驱动轮与地面不打滑：地面对轮子的是静摩擦力", en: "A driving wheel that doesn't slip gets static friction from the floor"}
+      - {zh: "AGV 500 kg，驱动轮承担 60%，$\\mu_\\mathrm s$ = 0.60：最大加速度 {{ex7_1.a_drive:.2f}} m/s²", en: "500 kg AGV, 60% on driving wheels, $\\mu_\\mathrm s$ = 0.60: max acceleration {{ex7_1.a_drive:.2f}} m/s²"}
+      - {zh: "滚动阻力 $F_\\mathrm{roll} = C_\\mathrm{rr}F_\\mathrm N$，$C_\\mathrm{rr}$ ≈ 0.015：约 {{ex7_1.F_roll:.0f}} N", en: "Rolling resistance $F_\\mathrm{roll} = C_\\mathrm{rr}F_\\mathrm N$, $C_\\mathrm{rr}$ ≈ 0.015: about {{ex7_1.F_roll:.0f}} N"}
+      - {zh: "ABS：让车轮保持“将滑未滑”，用更大的静摩擦", en: "ABS keeps wheels on the edge of slipping to use the larger static friction"}
+    say:
+      - {zh: "摩擦不只是阻碍运动。AGV 的驱动轮转动时，轮胎和地面的接触点并不滑动，地面对轮子的是静摩擦力，正是它推着车往前走。", en: "Friction doesn't only resist motion. When an AGV's driving wheel turns, the contact point doesn't slip, so the floor applies static friction to the wheel, and that's exactly what pushes the vehicle forward.", show: 1}
+      - {zh: "它的上限是摩擦因数乘以驱动轮对地面的压力，而不是整车的重力。一台 500 千克的 AGV，驱动轮承担 60% 的重量，最大加速度只有 {{ex7_1.a_drive:.2f}} 米每二次方秒。电机再强，也只会让车轮打滑。", en: "Its limit is the friction coefficient times the load on the driving wheels, not the whole vehicle's weight. For a 500-kilogram AGV with 60 percent of the weight on its driving wheels, the maximum acceleration is only {{ex7_1.a_drive:.2f}} meters per second squared. A stronger motor would just spin the wheels.", show: 2}
+      - {zh: "车轮滚动时还有滚动阻力，主要来自轮胎和地面的形变。它比滑动摩擦小一两个数量级，这正是轮子的好处。这台 AGV 的滚动阻力约 {{ex7_1.F_roll:.0f}} 牛。", en: "Rolling wheels also feel rolling resistance, mainly from deformation of the tire and floor. It's one or two orders of magnitude smaller than sliding friction, which is the whole point of wheels. For this AGV it's about {{ex7_1.F_roll:.0f}} newtons.", show: 3}
+      - {zh: "刹车也一样。车轮抱死时只剩动摩擦，而且失去转向能力。汽车的防抱死系统让车轮保持在将滑未滑的状态，利用更大的静摩擦力。", en: "Braking works the same way. A locked wheel has only kinetic friction and can't steer. Anti-lock brakes keep the wheels right on the edge of slipping, to use the larger static friction.", show: 4}
+      - {zh: "生活中，冰面上的摩擦因数只有 0.1 左右，能得到的水平加速度大约只有重力加速度的十分之一，所以在冰上只能小步慢走。", en: "In everyday life, ice has a friction coefficient of only about 0.1, so you can get a horizontal acceleration of only about a tenth of g. That's why you shuffle slowly on ice."}
+
+  - type: slide
+    heading: {zh: "估一估：AGV 能爬多陡的坡？", en: "Estimate: how steep a ramp can an AGV climb?"}
+    items:
+      - {zh: "驱动轮承担 60% 的重量，$\\mu_\\mathrm s$ ≈ 0.6", en: "60% of the weight on the driving wheels, $\\mu_\\mathrm s$ ≈ 0.6"}
+      - {zh: "最大驱动力 ≈ 0.36 Mg cos θ，要大于 Mg sin θ", en: "Maximum drive ≈ 0.36 Mg cos θ, which must exceed Mg sin θ"}
+      - {zh: "tan θ ≤ 0.36，θ 约 20°；地面有油时只剩约 7°", en: "tan θ ≤ 0.36, so θ is about 20°; on an oily floor, only about 7°"}
+      - {zh: "车间坡道一般不超过 5°：要给加速、制动、货物留余量", en: "Factory ramps rarely exceed 5°: leave margin for acceleration, braking and cargo"}
+    say:
+      - {zh: "来估一估：这台 AGV 能爬多陡的坡？", en: "Let's estimate: how steep a ramp can this AGV climb?", show: 0}
+      - {zh: "驱动轮承担 60% 的重量，轮胎的静摩擦因数约 0.6。在坡上，驱动轮的压力还要乘以坡角的余弦。", en: "The driving wheels carry 60 percent of the weight, and the tires' static coefficient is about 0.6. On a slope, the load on those wheels is also multiplied by the cosine of the slope angle.", show: 1}
+      - {zh: "所以最大驱动力大约是 0.36 乘以重力再乘以余弦，它要大于重力沿坡向下的分量。", en: "So the maximum drive force is about 0.36 times the weight times the cosine, and it must beat the weight's component down the slope.", show: 2}
+      - {zh: "两边一比，坡角的正切不能超过 0.36，大约 20 度。可如果地面有油，摩擦因数降到 0.2，就只剩 7 度左右了。", en: "Compare the two and the tangent of the slope angle can't exceed 0.36, about 20 degrees. But on an oily floor, with the coefficient down to 0.2, you're left with only about 7 degrees.", show: 3}
+      - {zh: "实际的车间坡道一般不超过 5 度，因为还要给加速、刹车和货物不滑留出余量。", en: "Real factory ramps rarely exceed 5 degrees, because you also need margin for acceleration, braking, and keeping the cargo from sliding.", show: 4}
+
+  - type: slide
+    heading: {zh: "工程师笔记", en: "Engineer's notes"}
+    items:
+      - {zh: "按摩擦因数可能的最小值设计；安全系数一般取 1.5～3", en: "Design with the smallest likely friction coefficient; safety factors of 1.5 to 3 are typical"}
+      - {zh: "怕夹坏：换高摩擦指垫、仿形指，或用真空吸盘", en: "Afraid of crushing? Use high-friction pads, form-fitting fingers, or a vacuum cup"}
+      - {zh: "快速搬运掉件：先查加速度最大的时刻", en: "Parts dropping during fast moves? Check the moment of peak acceleration first"}
+      - {zh: "空载的 AGV 更容易打滑：驱动轮压力小", en: "An empty AGV slips more easily: less load on its driving wheels"}
+    say:
+      - {zh: "最后是几条工程师笔记。第一，按摩擦设计时，要用摩擦因数可能的最小值。指垫磨损、零件有油、地面潮湿，都会让它下降。安全系数一般取 1.5 到 3。", en: "Finally, a few engineer's notes. First, when designing with friction, use the smallest coefficient you might see. Worn pads, oily parts, and wet floors all lower it. Safety factors of 1.5 to 3 are typical.", show: 1}
+      - {zh: "第二，夹紧力不是越大越好。薄壁件和软包装会被夹变形，这时可以换摩擦因数大的指垫，把指面做成和零件形状吻合的仿形指，或者干脆改用真空吸盘。", en: "Second, more grip isn't always better. Thin-walled parts and soft packaging get deformed. Instead, use high-friction pads, form-fitting fingers that cradle the part, or switch to a vacuum cup.", show: 2}
+      - {zh: "第三，机械臂快速搬运时掉件，先检查加速度最大的那个时刻。降低那一刻的加速度，往往比加大夹紧力更有效。", en: "Third, if a robot drops parts during fast moves, look first at the moment of peak acceleration. Reducing that peak often works better than squeezing harder.", show: 3}
+      - {zh: "第四，空载的 AGV 车轻，驱动轮的压力小，反而更容易打滑。有的 AGV 用弹簧把驱动轮压在地面上，就是这个道理。", en: "Fourth, an empty AGV is light, so its driving wheels press less on the floor, and it actually slips more easily. That's why some AGVs use springs to press the drive wheels down.", show: 4}
+
+  - type: lab
+    lab: "7-1"
+    steps:
+      - {scene: tilt, set: {mat: 0, th: 10}}
+    caption: {zh: "虚拟实验 7.1 斜面测摩擦因数", en: "Virtual Lab 7.1: Measuring friction on an incline"}
+    say:
+      - {zh: "这一讲配套的虚拟实验是：斜面测摩擦因数。", en: "This lecture comes with a virtual lab: measuring friction on an incline."}
+      - {zh: "第一个场景，慢慢抬高斜面，看零件在哪个角度开始滑动。实验里的三种材料，摩擦因数都是保密的，要你自己测出来。", en: "In the first scene, raise the incline slowly and watch for the angle where the part starts to slide. The friction coefficients of the three materials are hidden; you have to measure them yourself.", do: [{slide: {th: [10, 20]}, dur: 8}]}
+      - {zh: "蓝色箭头是重力沿斜面的分量，红色箭头是静摩擦力，现在两者一样长，零件不动。再往上抬，到某个角度它就会突然滑下去。那个角度是多少，留给你自己去找。建议每次只抬高半度，取最后一个静止角度和第一个滑动角度的中点。", en: "The blue arrow is the weight's component along the slope and the red one is static friction. Right now they're equal, so the part stays put. Keep going and at some angle it suddenly lets go. Finding that angle is your job. Raise it half a degree at a time and take the midpoint between the last angle where it stays and the first where it slides.", do: [{slide: {th: [20, 25]}, dur: 10}]}
+      - {zh: "第二个场景，让零件滑下来，用秒表计时。注意每次的读数都不一样，这就是人手计时的误差。", en: "In the second scene, let the part slide and time it with a stopwatch. Notice that every reading is different. That's the human timing error.", do: [{scene: slide, set: {mat: 2, th2: 30, L: 0.6, timer: 0}, wait: 1}, {press: start, wait: 2.5}, {press: start}]}
+      - {zh: "右边的表格会记下同一设置下的每一次读数。任务要求同一设置至少测五次，用平均时间来算，看看平均以后结果稳定了多少。", en: "The table on the right records every reading at the same setting. The task asks for at least five runs at one setting and a calculation from the mean time; see how much steadier the result becomes."}
+      - {zh: "计时方式还可以换成光电门，它的误差不到千分之一秒。你可以比较两种计时方法算出的动摩擦因数差多少。", en: "You can also switch the timer to light gates, which are accurate to better than a millisecond, and compare how much the two timing methods change your kinetic coefficient.", do: [{set: {timer: 1}, wait: 1}]}
+      - {zh: "最后一个场景是滑梯：调倾角，让孩子被轻推一下以后匀速滑下。太陡了越滑越快，太平了滑一段就停。想一想，匀速的时候，倾角的正切等于什么？", en: "The last scene is a playground slide. Adjust the angle so the child slides at constant speed after a gentle push. Too steep and the child speeds up; too shallow and the child stops. Think about it: at constant speed, what does the tangent of the angle equal?", do: [{scene: life, set: {ths: 26}, wait: 0.5}, {press: start, wait: 4}, {set: {ths: 12}, wait: 0.5}, {press: start}]}
+      - {zh: "每个任务都要你自己算出结果、点提交才判定。在问渠网站上，你可以亲手做这个实验，还能下载实验指导书和报告模板。", en: "Each task is checked only when you work out the answer and press Submit. On the WenQuest website you can do this lab yourself, and download the lab guide and report template."}
+
+  - type: slide
+    heading: {zh: "作业", en: "Homework"}
+    items:
+      - {zh: "7.1.6 估一估：一只手按住书、另一只手推书侧面，书为什么更难推动？要多大的推力？", en: "7.1.6 Estimate: with one hand pressing a book down and the other pushing its side, why is it harder to move, and how hard must you push?"}
+      - {zh: "7.1.4 机械臂向下加速放下零件：只看加速段要多大夹紧力？为什么设计时仍不能低于 $mg/(2\\mu_\\mathrm s)$？", en: "7.1.4 The arm accelerates downward: how much grip does that stage need, and why can't the design go below $mg/(2\\mu_\\mathrm s)$?"}
+      - {zh: "7.1.7 编程题：光电门计时与加长斜面，哪个改进对 $u(\\mu_\\mathrm k)$ 更有效？", en: "7.1.7 Programming: which helps $u(\\mu_\\mathrm k)$ more, light gates or a longer incline?"}
+      - {zh: "实验 7.1：完成四个任务，提交实验报告", en: "Lab 7.1: complete the four tasks and submit the lab report"}
+    say:
+      - {zh: "这一讲的作业有三道题，加一份实验报告。", en: "This lecture's homework: three problems, plus a lab report.", show: 0}
+      - {zh: "第一题是估一估：一只手按住书，另一只手推书的侧面，为什么书更难推动了？至少要多大的推力？", en: "Problem one is an estimate: with one hand pressing a book down and the other pushing its side, why does the book get harder to move, and how hard must you push at least?", show: 1}
+      - {zh: "第二题，机械臂向下放零件时，加速段需要的夹紧力会变小，但为什么设计时还是不能低于静止时的值。", en: "Problem two: when the arm lowers a part, the accelerating stage needs less grip. But why can't the design go below the value at rest?", show: 2}
+      - {zh: "第三题是编程题：修改配套程序，看看光电门计时和加长斜面，哪个更能减小误差。", en: "Problem three is a programming exercise: modify the companion program and see whether light gates or a longer incline reduces the error more.", show: 3}
+      - {zh: "最后，完成虚拟实验的四个任务，写一份实验报告。作业和实验报告都可以在问渠上提交。", en: "Finally, complete the four tasks of the virtual lab and write a lab report. Homework and lab reports can be submitted on WenQuest.", show: 4}
+
+  - type: image
+    path: factory/digital/docs/截图/6-3D车间.png
+    caption: {zh: "问渠数字工厂 · 3D 车间", en: "WenQuest Digital Factory · 3D Workshop"}
+    say:
+      - {zh: "再到问渠的数字工厂看一看。这是一个减速器工厂的三维车间，这辆黄色的小车，就是在工位之间运送零件的 AGV。", en: "Now let's visit the WenQuest Digital Factory. This is the 3D workshop of a gearbox plant. The small yellow cart is an AGV carrying parts between stations."}
+      - {zh: "AGV 能跑多快、拐弯能多急、料箱会不会在车上滑动，都和今天讲的摩擦有关。", en: "How fast an AGV can go, how sharply it can turn, and whether a parts bin slides on its deck all come down to today's topic: friction."}
+      - {zh: "在数字工厂里，你可以扮演计划员、工艺员、操作工或质检员，从订单、设计一直做到车间加工和质量检验，把课堂上学的物理用到真实的生产流程里。", en: "In the digital factory you can play planner, process engineer, operator, or inspector, following an order from design all the way to machining and inspection, and apply the physics you learn in class to a realistic production process."}
+
+  - type: outro
+    points:
+      - {zh: "静摩擦：需要多少给多少，上限 $\\mu_\\mathrm s F_\\mathrm N$；动摩擦 $\\mu_\\mathrm k F_\\mathrm N$", en: "Static friction gives what's needed, up to $\\mu_\\mathrm s F_\\mathrm N$; kinetic friction is $\\mu_\\mathrm k F_\\mathrm N$"}
+      - {zh: "斜面测量：$\\tan\\theta_\\mathrm c = \\mu_\\mathrm s$；计时误差最关键", en: "On an incline, $\\tan\\theta_\\mathrm c = \\mu_\\mathrm s$; timing error matters most"}
+      - {zh: "按最大加速度和安全系数设计夹紧力与驱动力", en: "Size grip and drive force for the largest acceleration, with a safety factor"}
+    say:
+      - {zh: "总结一下。静摩擦力需要多少给多少，但有上限；滑动以后是动摩擦力，一般比最大静摩擦力小。", en: "To sum up. Static friction supplies whatever is needed, up to a limit; once sliding, kinetic friction takes over, usually a bit smaller."}
+      - {zh: "用斜面可以测出摩擦因数，关键是控制好计时误差。设计夹爪和驱动轮时，要按最大的加速度和安全系数来算。", en: "An incline lets you measure friction coefficients, as long as you control the timing error. And when you design a gripper or a drive wheel, size it for the largest acceleration, with a safety factor."}
+      - {zh: "想亲手做今天的虚拟实验、提交作业、阅读整本教材，请到 learn.wenquestrobotics.com 免费注册，选择《大学物理》。下一讲，我们讨论流体阻力和终端速度。我们下次见。", en: "To try today's virtual lab yourself, submit homework, and read the whole textbook, register for free at learn.wenquestrobotics.com and choose University Physics. Next time: fluid drag and terminal speed. See you then.", zh_say: "想亲手做今天的虚拟实验、提交作业、阅读整本教材，请到问渠网站，learn 点 wenquest robotics 点 com，免费注册，选择《大学物理》。下一讲，我们讨论流体阻力和终端速度。我们下次见。", en_say: "To try today's virtual lab yourself, submit homework, and read the whole textbook, register for free at learn dot wenquest robotics dot com, and choose University Physics. Next time: fluid drag and terminal speed. See you then."}
