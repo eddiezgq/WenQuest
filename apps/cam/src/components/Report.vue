@@ -9,6 +9,7 @@ import Charts from './Charts.vue'
 import LineChart from './LineChart.vue'
 import BarChart from './BarChart.vue'
 import DesignNote from './DesignNote.vue'
+import { cylMfgResult } from '../cylmfg'
 
 const emit = defineEmits(['close'])
 const doPrint = () => window.print()
@@ -28,7 +29,8 @@ const outline = computed(() => {
 const mr = computed(() => mfgResult.value)
 const me = computed(() => measResult.value)
 const cp = computed(() => compResult.value)
-const nMethod = computed(() => 6 + (mr.value ? 1 : 0) + (me.value ? 1 : 0))
+const cm = computed(() => (cylP.value ? cylMfgResult.value : null))
+const nMethod = computed(() => 6 + (mr.value || cm.value ? 1 : 0) + (me.value ? 1 : 0))
 const mfgRows = computed(() => {
   const f = project.mfg, r = mr.value
   if (!r) return []
@@ -122,6 +124,15 @@ const rows = computed(() => {
           <text v-for="d in [0, 90, 180, 270, 360]" :key="d" :x="devFig.X(d)" :y="devFig.H - 4" text-anchor="middle">{{ d }}°</text>
         </svg>
         <p class="small">{{ t('cylDevCaption') }}</p>
+      </section>
+      <section v-if="cm">
+        <h2>6 {{ t('cylMfg') }}</h2>
+        <table class="kv">
+          <tr><th>{{ t('cylAxes') }}</th><td>{{ cm.settings.tool_r }} mm · {{ t('chordTol') }} {{ cm.settings.chord_tol }} mm</td></tr>
+          <tr><th>{{ zh ? '仿真：最大过切 / 最大残留' : 'Simulation: largest overcut / material left' }}</th><td>{{ Math.max(cm.sim.over_um, 0).toFixed(3) }} / {{ Math.max(cm.sim.under_um, 0).toFixed(3) }} µm</td></tr>
+        </table>
+        <Checks :result="{ status: cm.checks.some((c) => c.status === 'fail') ? 'fail' : 'pass', checks: cm.checks }" />
+        <p class="small mono">{{ zh ? '程序' : 'Program' }}: O{{ cm.settings.prog_no }}, {{ cm.lines }} {{ zh ? '行（另附 .nc 文件）' : 'lines (see the .nc file)' }}</p>
       </section>
       <section v-if="mr">
         <h2>6 {{ t('mfgSection') }}</h2>
