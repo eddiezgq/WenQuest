@@ -156,7 +156,41 @@ def _table(d, head, rows, widths=None):
 NUM = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 
 
-def calc_report(params=None, lang="zh", project="", company="", machine="lockstitch", cae=None, desc=None):
+def ebox_section(d, head, E, lang):
+    """第 62 轮：电控箱的热与流体（教材第 18 章）——参数、结果、校核、改进方案"""
+    from .ebox import CHOICES as EC, GROUPS as EG
+    q = E["params"]
+    head("电控箱：热、电容寿命、开关时间", "Control box: heat, capacitor life, switching time")
+    d.add_paragraph(_t("模型见教材第 18 章（功率级损耗、热阻网络、间歇缝纫负载、电解电容十度法则、开关时间与共模电流的折中），"
+                       "电流取本机的设计（主轴转矩或伺服轴转矩 ÷ 转矩常数）；判据是教材的示意值，按本单位的器件资料改。",
+                       "Models follow chapter 18 (power-stage loss, thermal network, intermittent sewing load, the 10-degree rule for "
+                       "electrolytic capacitors, switching time vs common-mode current); currents come from this design (spindle or servo-axis "
+                       "torque ÷ torque constant); the criteria are the textbook's illustrative values — replace them with your parts' data.", lang))
+    _table(d, [_t("驱动", "Drive", lang), _t("运行电流 A", "Run current A", lang), _t("峰值电流 A", "Peak current A", lang),
+               _t("平均损耗 W", "Average loss W", lang), _t("结温峰值 °C", "Peak junction °C", lang)],
+           [[_t(x["zh"], x["en"], lang), x["Irun"], x["Ipk"], x["Pavg"], x["Tjpk"]] for x in E["drives"]])
+    d.add_paragraph("")
+    _table(d, [_t("项目", "Item", lang), _t("数值", "Value", lang), _t("单位", "Unit", lang)],
+           [[_t(r["zh"], r["en"], lang), r["value"], r["unit"]] for r in E["results"]])
+    d.add_paragraph("")
+    _table(d, [_t("校核项", "Check", lang), _t("数值", "Value", lang), _t("判据", "Criterion", lang), _t("结论", "Result", lang)],
+           [[c["name"][lang], c["value"][lang], c["limit"][lang], STATE[c["state"]][1 if lang == "en" else 0]] for c in E["checks"]])
+    v = E["variants"]
+    d.add_paragraph(_t(v["zh"], v["en"], lang))
+    _table(d, [h[1] if lang == "en" else h[0] for i, h in enumerate(v["cols"]) if i != 1],
+           [[r[1] if lang == "en" else r[0]] + r[2:] for r in v["rows"]])
+    rows = []
+    for gk, gzh, gen, items in EG:
+        for k, zh, en, unit, *_ in items:
+            val = q[k]
+            if k in EC:
+                val = next((c[2] if lang == "en" else c[1] for c in EC[k] if c[0] == val), val)
+            rows.append([_t(gzh, gen, lang), _t(zh, en, lang), val, unit])
+    d.add_paragraph(_t("电控箱参数", "Control-box parameters", lang))
+    _table(d, [_t("部分", "Group", lang), _t("参数", "Parameter", lang), _t("取值", "Value", lang), _t("单位", "Unit", lang)], rows)
+
+
+def calc_report(params=None, lang="zh", project="", company="", machine="lockstitch", cae=None, desc=None, ebox=None):
     from docx.shared import Cm, RGBColor
     M = get(machine)
     R = M.analyze(params)
@@ -248,10 +282,13 @@ def calc_report(params=None, lang="zh", project="", company="", machine="locksti
         _table(d, [_t("环", "Link", lang), _t("公差 ±mm", "Tolerance ±mm", lang), _t("装配调整吸收", "Absorbed by adjustment", lang),
                    _t("换针时变化", "Changes with needle", lang)],
                [[_t(c[0], c[1], lang), c[2], "✓" if c[3] else "", "✓" if c[4] else ""] for c in CHAIN])
+    if ebox is not None:
+        from . import ebox as EBX
+        ebox_section(d, head, EBX.analyze(ebox, machine, p), lang)
     if cae:
         head("CAE 分析结果（问渠数字工厂）", "CAE results (WenQuest digital factory)")
         d.add_paragraph(_t("以下是同一组设计参数在问渠数字工厂计算服务里算出的结果：有限元强度与疲劳（Gmsh + CalculiX + pyLife）、"
-                           "机壳模态、机构动力学（MuJoCo）。详细报告在设计页“CAE 分析”里下载。",
+                           "机壳模态、机构动力学（MuJoCo）、电控箱散热（OpenFOAM 流体 + CalculiX 温度场）。详细报告在设计页“CAE 分析”里下载。",
                            "Results computed for this same set of design parameters by the WenQuest digital-factory computing service: "
                            "FEA strength and fatigue (Gmsh + CalculiX + pyLife), frame modes, mechanism dynamics (MuJoCo). "
                            "Full reports can be downloaded from the CAE tab of the design page.", lang))
@@ -297,7 +334,7 @@ def card_docx(params=None, lang="zh", project="", machine="lockstitch"):
     return b.getvalue()
 
 
-def params_xlsx(params=None, lang="zh", project="", machine="lockstitch"):
+def params_xlsx(params=None, lang="zh", project="", machine="lockstitch", ebox=None):
     from openpyxl import Workbook
     from openpyxl.styles import Font, PatternFill
     M = get(machine)
@@ -342,6 +379,20 @@ def params_xlsx(params=None, lang="zh", project="", machine="lockstitch"):
         w.append([_t(a, b, lang) for a, b in tb["head"]])
         for r in tb["rows"]:
             w.append([_t(*c, lang) if isinstance(c, (list, tuple)) else c for c in r])
+        sheets.append(w)
+    if ebox is not None:                            # 第 62 轮：电控箱一页（参数、结果、校核）
+        from . import ebox as EBX
+        from .ebox import GROUPS as EG
+        E = EBX.analyze(ebox, machine, p)
+        w = wb.create_sheet(_t("电控箱", "Control box", lang))
+        w.append([_t("键", "Key", lang), _t("部分", "Group", lang), _t("项目", "Item", lang), _t("数值", "Value", lang), _t("单位", "Unit", lang)])
+        for gk, gzh, gen, items in EG:
+            for k, zh, en, unit, *_ in items:
+                w.append([k, _t(gzh, gen, lang), _t(zh, en, lang), E["params"][k], unit])
+        for r in E["results"]:
+            w.append(["", _t("结果", "Result", lang), _t(r["zh"], r["en"], lang), r["value"], r["unit"]])
+        for c in E["checks"]:
+            w.append([c["key"], _t("校核", "Check", lang), c["name"][lang], c["value"][lang], f"{c['limit'][lang]} · {STATE[c['state']][1 if lang == 'en' else 0]}"])
         sheets.append(w)
     for w in sheets:
         for cell in w[1]:

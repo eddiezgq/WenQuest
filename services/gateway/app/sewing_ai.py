@@ -81,6 +81,23 @@ class AiIn(BaseModel):
     machine: str = Field(default="lockstitch", pattern=MACHINE_RE)
     params: dict[str, Any] = Field(default_factory=dict)
     sentence: str = Field(default="", max_length=600)
+    target: str = Field(default="design", pattern="^(design|ebox)$")     # 第 62 轮：ebox = 改电控箱的参数（设计参数不动，只用来算电流）
+    ebox: dict[str, Any] = Field(default_factory=dict)
+
+
+class EboxModel:
+    """第 62 轮：把电控箱包成和机型模块一样的接口（GROUPS、CHOICES、clean、analyze），起草、把关的代码不用改"""
+    def __init__(self, machine: str, design: dict):
+        from .sewcore import ebox as EB
+        self.EB, self.machine, self.design = EB, machine, design
+        self.GROUPS, self.CHOICES = EB.GROUPS, EB.CHOICES
+        self.NAME, self.MACHINE = ("缝纫机电控箱", "sewing-machine control box"), "ebox"
+
+    def clean(self, p):
+        return self.EB.clean(p, self.machine)
+
+    def analyze(self, p, **_kw):
+        return self.EB.analyze(p, self.machine, self.design)
 
 
 # ---------- 计算核心把关（纯函数，单元测试直接调） ----------
@@ -155,6 +172,8 @@ _ALIAS = {"lockstitch": {"转速": "n", "针距": "s", "曲柄": "r", "连杆": 
           "cover": {"转速": "n", "针密": "spc", "针距": "g", "件数": "Q", "缝长": "Lcm", "损耗": "W"},
           "pattern": {"转速": "n", "针距": "s", "机头最高转速": "n_head"},
           "embroid": {"头数": "H", "转速": "n", "针长": "s", "缎纹宽": "s"},
+          "ebox": {"车间温度": "Ta", "环境温度": "Ta", "车间": "Ta", "飞絮": "clog", "堵塞": "clog", "开关时间": "tsw", "开关频率": "fsw",
+                   "起停": "starts", "翅片": "fins", "风速": "vfan", "限流": "Ipk", "峰值电流": "Ipk", "加速时间": "tacc"},
           "flatknit": {"机号": "E", "机头速度": "v", "加速度": "a", "系统": "sys", "针数": "N", "片数": "pcs", "选针器延迟": "Td", "段数": "seg",
                        "颜色": "col"}}      # 不放单独的“速度”：会把“加速度”里的“速度”也认成机头速度
 
@@ -242,8 +261,12 @@ def register(app, m) -> None:
         if len(body.sentence.strip()) < 2:
             raise EngineError("empty", "write what you want first", 400)
         left = quota(lic)
-        M = sewcore.get(body.machine)
-        p0 = M.clean(body.params)
+        if body.target == "ebox":
+            M = EboxModel(body.machine, sewcore.get(body.machine).clean(body.params))
+            p0 = M.clean(body.ebox)
+        else:
+            M = sewcore.get(body.machine)
+            p0 = M.clean(body.params)
         R0 = M.analyze(p0)
         keys = list(spec_of(M))
         t0 = time.time()
@@ -266,6 +289,8 @@ def register(app, m) -> None:
                 p1, rows = apply_changes(M, p0, changes)
                 R1 = M.analyze(p1)
                 ok, new_bad = judge(R0, R1)
+                if body.target == "ebox":                  # 电控箱多是“假如车间 40 度会怎样”：照算照给，红灯列在 after_bad 里，不退回
+                    ok = True
                 if ok or provider() == "rules":
                     break
                 feedback = ("Your last draft was rejected: these checks failed that did not fail before (JSON): "
@@ -327,8 +352,12 @@ def register(app, m) -> None:
     @app.post("/api/v1/sewing/ai/describe")
     async def describe(body: AiIn, lic: Annotated[dict, Depends(m.sewing_who)]):
         left = quota(lic)
-        M = sewcore.get(body.machine)
-        p0 = M.clean(body.params)
+        if body.target == "ebox":
+            M = EboxModel(body.machine, sewcore.get(body.machine).clean(body.params))
+            p0 = M.clean(body.ebox)
+        else:
+            M = sewcore.get(body.machine)
+            p0 = M.clean(body.params)
         R0 = M.analyze(p0)
         data = {"machine": M.NAME[0], "params": {spec_of(M).get(k, (k,))[0]: v for k, v in p0.items() if k not in SKIP},
                 "results": [{"name": r["zh"], "value": r["value"], "unit": r["unit"]} for r in R0["results"]],

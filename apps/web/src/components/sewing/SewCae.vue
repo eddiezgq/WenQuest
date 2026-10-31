@@ -82,7 +82,7 @@
 
       <!-- 设计优化 -->
       <!-- 第 62 轮：电控箱的热与流体 -->
-      <SewEbox v-if="opt && opt.kinds.ebox" :machine="machine" :params="params" :can-run="canRun" :active="active" @submitted="onEbox" />
+      <SewEbox v-if="opt && opt.kinds.ebox" :machine="machine" :params="params" :can-run="canRun" :active="active" @submitted="onEbox" @change="(e: Record<string, number | string>) => emit('ebox', e)" />
 
       <view v-if="opt && opt.goals.length" class="box">
         <text class="bt">{{ t("sew.cae.opt") }}</text>
@@ -235,7 +235,7 @@ import { errorText, locale, t } from "../../i18n";
 import SewEbox from "./SewEbox.vue";
 
 const props = defineProps<{ machine: string; params: Record<string, number | string>; licensed: boolean; active: boolean; labels?: Record<string, string> }>();
-const emit = defineEmits<{ (e: "apply", p: Record<string, number | string>): void }>();
+const emit = defineEmits<{ (e: "apply", p: Record<string, number | string>): void; (e: "ebox", p: Record<string, number | string>): void }>();
 
 interface Opt { connected: boolean; parts: { key: string; zh: string; en: string }[]; cam_parts: { key: string; zh: string; en: string }[];
   goals: { key: string; zh: string; en: string }[];

@@ -107,3 +107,32 @@ def test_cae_chain_cfd_then_thermal_then_resistance(ebox):
 
 def test_cae_needs_license(client):  # noqa: F811
     assert client.post("/api/v1/sewing/cae/ebox", json={"machine": "lockstitch"}).status_code == 401
+
+
+def test_exports_carry_the_control_box_and_step(ebox):
+    """计算书、参数表带上“电控箱”一节（网页看过电控箱才带）；外壳 STEP 由数字工厂按尺寸现做"""
+    import io
+    import zipfile
+    c, h, fk = ebox
+    body = {"machine": "lockstitch", "params": {"n": 6000}, "project": "LS", "ebox": {"Ta": 38, "clog": 0.5}}
+    r = c.post("/api/v1/sewing/export/report", json=body, headers=h)
+    assert r.status_code == 200
+    xml = zipfile.ZipFile(io.BytesIO(r.content)).read("word/document.xml").decode()
+    assert "电控箱：热、电容寿命、开关时间" in xml and "定期清理" in xml
+    r0 = c.post("/api/v1/sewing/export/report", json=dict(body, ebox=None), headers=h)
+    assert "电控箱：热" not in zipfile.ZipFile(io.BytesIO(r0.content)).read("word/document.xml").decode()
+    x = c.post("/api/v1/sewing/export/params", json=dict(body, lang="en"), headers=h)
+    assert b"Control box" in zipfile.ZipFile(io.BytesIO(x.content)).read("xl/workbook.xml")
+    s = c.post("/api/v1/sewing/cae/ebox/step", json={"machine": "lockstitch", "ebox": {"L": 300, "fins": 6}}, headers=h)
+    assert s.status_code == 200 and s.content.startswith(b"ISO-10303-21") and "300x160x90" in s.headers["content-disposition"]
+    assert fk.posted[-1]["params"]["fins"] == 6
+
+
+def test_ai_drafts_control_box_changes(ebox, monkeypatch):
+    """一句话改电控箱参数（规则版）：“车间 40 度、飞絮堵塞 0.5”→ Ta、clog；假如题照算照给，红灯列出来，不退回"""
+    c, h, _ = ebox
+    monkeypatch.setattr(main.state.ai, "provider", "none")
+    r = c.post("/api/v1/sewing/ai/draft", json={"machine": "lockstitch", "params": {"n": 6000}, "target": "ebox", "ebox": {},
+                                                 "sentence": "车间夏天 40 度，飞絮堵塞 0.5，电控箱会不会报过热"}, headers=h).json()
+    assert r["status"] == "ok" and {x["key"]: x["new"] for x in r["changes"]} == {"Ta": 40, "clog": 0.5}
+    assert r["params"]["Ta"] == 40 and {x["key"] for x in r["after_bad"]} >= {"ths", "tj"}

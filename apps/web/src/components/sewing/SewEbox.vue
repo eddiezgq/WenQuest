@@ -41,6 +41,18 @@
       </view>
     </view>
 
+    <!-- AI：一句话改电控箱参数（计算核心重算，人点“采用”） -->
+    <view class="ai">
+      <input class="ainp" :value="say" :placeholder="t('sew.ebox.aiPh')" maxlength="300" @input="(e: any) => (say = e.detail.value)" @confirm="draft" />
+      <view class="btn ghost" :class="{ disabled: !say.trim() || aiBusy }" @click="draft">{{ aiBusy ? t("sew.making") : t("sew.ebox.aiGo") }}</view>
+    </view>
+    <view v-if="ai" class="aires">
+      <text v-for="r in ai.changes" :key="r.key" class="para">{{ r.name }}：{{ r.old }} → <text class="strong">{{ r.new }}</text> {{ r.unit }}<text class="muted">　{{ r.why }}</text></text>
+      <text v-for="(q, i) in ai.questions" :key="'q' + i" class="para muted">{{ q }}</text>
+      <text v-if="ai.after_bad.length" class="para badc">{{ t("sew.ebox.aiBad", { n: ai.after_bad.length }) }}{{ ai.after_bad.map((x: any) => x.name).join("、") }}</text>
+      <view v-if="ai.params" class="btn sm" @click="adopt">{{ t("sew.ebox.adopt") }}</view>
+    </view>
+
     <!-- 参数 -->
     <view v-for="g in schema" :key="g.key" class="grp">
       <view class="gt" @click="open[g.key] = !open[g.key]"><text>{{ L(g) }}</text><text class="muted">{{ open[g.key] ? "−" : "+" }}</text></view>
@@ -66,7 +78,12 @@
     <view class="cae">
       <text class="st">{{ t("sew.ebox.caeTitle") }}</text>
       <text class="hint">{{ ep.air === "fan" ? t("sew.ebox.caeFan") : t("sew.ebox.caeNatural") }}</text>
-      <view class="btn" :class="{ disabled: !canRun }" @click="runCae">{{ busy ? t("sew.making") : t("sew.ebox.runCae") }}</view>
+      <view class="row">
+        <view class="btn" :class="{ disabled: !canRun }" @click="runCae">{{ busy ? t("sew.making") : t("sew.ebox.runCae") }}</view>
+        <!-- #ifdef H5 -->
+        <view class="btn ghost" :class="{ disabled: !canRun }" @click="stepFile">{{ t("sew.ebox.step") }}</view>
+        <!-- #endif -->
+      </view>
     </view>
     <text v-if="msg" class="hint err">{{ msg }}</text>
   </view>
@@ -74,11 +91,11 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from "vue";
-import { ApiError, request } from "../../api";
+import { ApiError, BASE, request, token } from "../../api";
 import { errorText, locale, t } from "../../i18n";
 
 const props = defineProps<{ machine: string; params: Record<string, number | string>; canRun: boolean; active: boolean }>();
-const emit = defineEmits<{ (e: "submitted", jid: string): void }>();
+const emit = defineEmits<{ (e: "submitted", jid: string): void; (e: "change", p: Record<string, number | string>): void }>();
 
 interface Choice { key: string; zh: string; en: string }
 interface Param { key: string; zh: string; en: string; unit: string; default: number | string; min: number; max: number; step: number; choices: Choice[] }
@@ -131,11 +148,32 @@ async function calc() {
   msg.value = "";
   try {
     R.value = await request("POST", "/api/v1/sewing/ebox/analyze", { machine: props.machine, params: { ...props.params }, ebox: { ...ep } });
+    emit("change", { ...ep });                    // 设计页导出计算书、参数表时带上电控箱这一节
   } catch (e) { fail(e); }
 }
 function reset() { Object.assign(ep, defaults.value); calc(); }
 // 教材 18.7 节：夏天午后车间 38 °C，散热片糊了一层飞絮（堵塞 0.5）
 function caseSix() { Object.assign(ep, { Ta: 38, clog: 0.5 }); calc(); }
+
+const say = ref("");
+const ai = ref<any>(null);
+const aiBusy = ref(false);
+async function draft() {
+  if (!say.value.trim() || aiBusy.value) return;
+  aiBusy.value = true;
+  msg.value = "";
+  try {
+    ai.value = await request("POST", "/api/v1/sewing/ai/draft", { machine: props.machine, params: { ...props.params }, target: "ebox", ebox: { ...ep },
+      sentence: say.value.trim() });
+  } catch (e) { fail(e); }
+  aiBusy.value = false;
+}
+function adopt() {
+  if (!ai.value?.params) return;
+  Object.assign(ep, ai.value.params);
+  ai.value = null;
+  calc();
+}
 
 async function runCae() {
   if (!props.canRun || busy.value) return;
@@ -146,6 +184,27 @@ async function runCae() {
     emit("submitted", r.id);
   } catch (e) { fail(e); }
   busy.value = false;
+}
+
+async function stepFile() {
+  if (!props.canRun) return;
+  // #ifdef H5
+  try {
+    const res = await fetch(`${BASE}/api/v1/sewing/cae/ebox/step`, { method: "POST", headers: { Authorization: `Bearer ${token.value}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ machine: props.machine, params: { ...props.params }, ebox: { ...ep } }) });
+    if (!res.ok) {
+      let code = `http_${res.status}`;
+      try { code = (await res.json()).error || code; } catch { /* not json */ }
+      throw new ApiError(code, res.status);
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(await res.blob());
+    a.download = `ebox-${ep.L}x${ep.W}x${ep.H}.step`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (e) { fail(e); }
+  // #endif
 }
 
 const esc = (x: string) => String(x).replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -184,6 +243,7 @@ watch(() => JSON.stringify(props.params), () => { if (props.active && schema.val
 .opt.on { background: #1d4e75; border-color: #1d4e75; color: #fff; }
 .btn { background: var(--wq-accent); color: var(--wq-ink); font-weight: 600; padding: 7px 14px; border-radius: 6px; cursor: pointer; white-space: nowrap; font-size: 14px; display: inline-block; margin-top: 6px; }
 .btn.disabled { opacity: .5; cursor: not-allowed; }
+.btn.ghost { background: #fff; border: 1px solid var(--wq-line); }
 .link { color: var(--wq-link); font-size: 13px; cursor: pointer; }
 .muted { color: var(--wq-muted); }
 .small { font-size: 12px; }
@@ -220,4 +280,10 @@ watch(() => JSON.stringify(props.params), () => { if (props.active && schema.val
 .badc { color: var(--wq-danger); font-weight: 700; }
 .warnc { color: #b66a12; font-weight: 700; }
 .cae { margin-top: 10px; }
+.ai { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+.ainp { flex: 1; border: 1px solid var(--wq-line); border-radius: 6px; padding: 6px 10px; font-size: 14px; background: #fff; }
+.aires { background: #f6f9fc; border-radius: 6px; padding: 8px 10px; margin-top: 6px; }
+.para { display: block; font-size: 13px; line-height: 1.7; }
+.strong { font-weight: 600; color: var(--wq-ink); }
+.btn.sm { padding: 4px 10px; font-size: 13px; }
 </style>

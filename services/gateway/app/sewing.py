@@ -65,6 +65,7 @@ class ExportIn(BaseModel):
     project: str = Field(default="", max_length=80)
     lang: str = "zh"
     desc: list[str] = Field(default_factory=list, max_length=8)   # 第 49 轮：计算书带 AI 起草的设计说明
+    ebox: dict[str, Any] | None = None                             # 第 62 轮：电控箱参数（看过“电控箱”才有），计算书、参数表加一节
 
 
 class LicenseIn(BaseModel):
@@ -314,11 +315,12 @@ def register(app, m) -> None:
         from .sewcore import cad, report
         if kind == "report":
             cae = m.sewing_cae_results(lic["org"], M.MACHINE, p) if hasattr(m, "sewing_cae_results") else []
-            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE, cae=cae, desc=[x[:400] for x in body.desc])
+            data = report.calc_report(p, lang, body.project, lic["org"], machine=M.MACHINE, cae=cae, desc=[x[:400] for x in body.desc],
+                                      ebox=body.ebox)
         elif kind == "card":
             data = report.card_docx(p, lang, body.project, machine=M.MACHINE)
         elif kind == "params":
-            data = report.params_xlsx(p, lang, body.project, machine=M.MACHINE)
+            data = report.params_xlsx(p, lang, body.project, machine=M.MACHINE, ebox=body.ebox)
         elif kind == "step":
             data = cad.to_step(p, machine=M.MACHINE)
             if data is None:

@@ -155,7 +155,8 @@
 
         <!-- CAE 分析（第 41 轮） -->
         <view v-show="tab === 'cae'" class="pane">
-          <SewCae :machine="machine" :params="params" :licensed="me.licensed" :active="tab === 'cae'" :labels="plabels" @apply="applyParams" />
+          <SewCae :machine="machine" :params="params" :licensed="me.licensed" :active="tab === 'cae'" :labels="plabels" @apply="applyParams"
+            @ebox="(e: Record<string, number | string>) => (eboxP = e)" />
         </view>
 
         <!-- 本单位零件库（第 49 轮） -->
@@ -436,6 +437,8 @@ function path(c: Chart) {
 
 // ---------- 第 49 轮：AI 设计说明、本单位零件库、帮助 ----------
 const desc = ref<string[]>([]);
+const eboxP = ref<Record<string, number | string> | null>(null);       // 第 62 轮：看过“电控箱”后，计算书和参数表带上这一节
+watch(() => machine.value, () => { eboxP.value = null; });
 const withDesc = ref(true);
 watch(machine, () => { desc.value = []; });
 const libItems = ref<{ id: number; code: string; name: string; label: string; params: Record<string, number> }[]>([]);
@@ -520,7 +523,8 @@ async function download(kind: string) {
       method: isZip ? "GET" : "POST",
       headers: { Authorization: `Bearer ${token.value}`, "Content-Type": "application/json" },
       body: isZip ? undefined : JSON.stringify({ machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value,
-        desc: kind === "report" && withDesc.value ? desc.value : [] }),
+        desc: kind === "report" && withDesc.value ? desc.value : [],
+        ebox: (kind === "report" || kind === "params") && eboxP.value ? eboxP.value : null }),
     });
     if (!res.ok) {
       let code = `http_${res.status}`;

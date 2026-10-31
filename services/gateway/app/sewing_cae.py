@@ -526,6 +526,18 @@ def register(app, m) -> None:
         save(j["id"], lic, sess, body.machine, "ebox", "ebox", title, p, ctx)
         return {"id": j["id"], "status": j["status"]}
 
+    @app.post("/api/v1/sewing/cae/ebox/step")
+    async def ebox_step_file(body: EboxCaeIn, sess: Annotated[Session, Depends(m.current)]):
+        """参数化电控箱外壳的 STEP（数字工厂按尺寸现做；铝外壳、顶面翅片、功率模块块）"""
+        await m.sewing_need_license(sess)
+        q = EB.clean(body.ebox, body.machine)
+        g = await factory("POST", "/ebox/geometry", json={"params": {
+            "L": q["L"], "W": q["W"], "H": q["H"], "wall": q["wall"], "fins": int(q["fins"]), "fin_h": q["fin_h"], "fin_t": q["fin_t"]}})
+        r = await factory("GET", f"/geometry/{g['sha']}/step", raw=True)
+        from urllib.parse import quote
+        name = f"电控箱-{q['L']:g}x{q['W']:g}x{q['H']:g}.step"
+        return Response(r.content, media_type="application/step", headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quote(name)}"})
+
     def set_ctx(jid: str, ctx: dict) -> None:
         with db() as c:
             c.execute("update cae_jobs set ctx=? where jid=?", (json.dumps(ctx), jid))
