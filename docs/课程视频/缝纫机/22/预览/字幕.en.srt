@@ -1,0 +1,815 @@
+1
+00:00:00,600 --> 00:00:01,782
+Hi everyone,
+
+2
+00:00:01,802 --> 00:00:08,995
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,395 --> 00:00:15,895
+This is Lecture 22, automated testing and continuous iteration.
+
+4
+00:00:16,295 --> 00:00:21,500
+We start from a firmware update that made trims fail now and then,
+
+5
+00:00:21,520 --> 00:00:27,597
+and answer three questions. Under what conditions do we test, how many times,
+
+6
+00:00:27,617 --> 00:00:30,051
+and with how realistic a model?
+
+7
+00:00:31,572 --> 00:00:40,248
+A trouser factory updated its lockstitch firmware from v1.3.2 to v1.4.0.
+
+8
+00:00:40,648 --> 00:00:52,741
+The new fast trim cut stop-and-trim from 4000 r/min from 0.38 seconds to about 0.22.
+
+9
+00:00:53,141 --> 00:00:54,587
+Before release,
+
+10
+00:00:54,607 --> 00:01:02,796
+the engineer tried dozens of trims at three to four thousand r/min on the prototype;
+
+11
+00:01:02,816 --> 00:01:04,262
+not one failed.
+
+12
+00:01:04,662 --> 00:01:11,193
+But on the floor operators often floor the pedal to 5000 and let go,
+
+13
+00:01:11,213 --> 00:01:14,084
+and the mains voltage wanders.
+
+14
+00:01:14,484 --> 00:01:19,164
+Within days, occasional failed trims were reported.
+
+15
+00:01:19,564 --> 00:01:24,224
+Why didn't testing catch it, and how many trials would be enough?
+
+16
+00:01:24,624 --> 00:01:25,924
+That's today.
+
+17
+00:01:27,444 --> 00:01:29,159
+Here's the cause.
+
+18
+00:01:29,559 --> 00:01:38,206
+The trim solenoid is commanded at 290 degrees of the trim stitch;
+
+19
+00:01:38,226 --> 00:01:45,807
+knife entry is 290 plus 6nt, and past 330 the trim fails.
+
+20
+00:01:46,207 --> 00:01:52,861
+With a 10 millisecond delay the command speed must be at most 667 r/min.
+
+21
+00:01:52,881 --> 00:01:58,238
+v1.4.0 planned braking at 100 percent of servo capability,
+
+22
+00:01:58,258 --> 00:02:05,655
+but above base speed the servo enters its constant-power region and brakes less,
+
+23
+00:02:05,675 --> 00:02:09,827
+and the base speed itself moves with voltage.
+
+24
+00:02:10,227 --> 00:02:19,327
+Stopping from 5000, the command comes at about 514 r/min at normal voltage,
+
+25
+00:02:19,347 --> 00:02:28,083
+but about 1150 when the voltage is 10 percent low: entry at 345 degrees,
+
+26
+00:02:28,103 --> 00:02:30,272
+a certain failure.
+
+27
+00:02:31,792 --> 00:02:35,194
+Why did hand trials miss it?
+
+28
+00:02:35,594 --> 00:02:39,814
+Three reasons, and each is a problem we solve today.
+
+29
+00:02:40,214 --> 00:02:46,106
+Conditions: people habitually try three to four thousand r/min,
+
+30
+00:02:46,126 --> 00:02:50,234
+rarely floor it to five thousand and let go,
+
+31
+00:02:50,254 --> 00:02:53,612
+and never pick a low-voltage moment.
+
+32
+00:02:54,012 --> 00:03:01,126
+Count: even at 4750, with a 1.2 percent failure rate,
+
+33
+00:03:01,146 --> 00:03:09,472
+fifty tries have about a 55 percent chance of showing nothing.
+
+34
+00:03:09,872 --> 00:03:16,115
+Model: the SIL used an ideal motor with no constant-power region,
+
+35
+00:03:16,135 --> 00:03:19,006
+so everything passed; the HIL,
+
+36
+00:03:19,026 --> 00:03:24,884
+with the prototype's measured torque–speed curve, exposed it.
+
+37
+00:03:26,404 --> 00:03:30,344
+Layer the tests by how far they are from the real machine.
+
+38
+00:03:30,744 --> 00:03:37,655
+At the bottom, unit tests: hundreds of cases in a minute,
+
+39
+00:03:37,675 --> 00:03:45,316
+catching logic errors such as the wrap from 359.9 to 0 degrees.
+
+40
+00:03:45,716 --> 00:03:53,736
+SIL connects the firmware to a machine model for big parameter sweeps,
+
+41
+00:03:53,756 --> 00:03:58,100
+but can't see physics the model lacks.
+
+42
+00:03:58,500 --> 00:04:04,524
+HIL uses the real controller and driver boards on a real-time simulator,
+
+43
+00:04:04,544 --> 00:04:10,903
+so interrupts, bus and solenoid delays are real, and faults can be injected.
+
+44
+00:04:11,303 --> 00:04:15,283
+The full-machine bench measures what no model has,
+
+45
+00:04:15,303 --> 00:04:17,683
+like stitch quality and noise.
+
+46
+00:04:18,083 --> 00:04:24,183
+And end-of-line testing checks that this particular unit was assembled right.
+
+47
+00:04:24,583 --> 00:04:28,820
+The rule: catch each defect at the lowest layer that can see it.
+
+48
+00:04:30,340 --> 00:04:35,394
+Test scripts are Python with pytest.
+
+49
+00:04:35,794 --> 00:04:40,279
+Fixtures connect to the prototype, read the serial number,
+
+50
+00:04:40,299 --> 00:04:43,308
+firmware version and parameter version,
+
+51
+00:04:43,328 --> 00:04:48,046
+and always switch the actuators off afterwards, pass or fail;
+
+52
+00:04:48,066 --> 00:04:53,094
+results go onto the bus in the WenQuest digital-factory envelope.
+
+53
+00:04:53,494 --> 00:04:58,528
+Parametrisation turns one case into a set:
+
+54
+00:04:58,548 --> 00:05:06,832
+the trim case runs 250 times at each of six speeds from 3000 to 5000.
+
+55
+00:05:07,232 --> 00:05:17,356
+Watch the bench run v1.3.2, v1.4.0, v1.4.1 and v1.4.2 in turn.
+
+56
+00:05:17,756 --> 00:05:23,259
+On v1.4.0 the trim sweep turns red;
+
+57
+00:05:23,279 --> 00:05:31,623
+the regression is caught by the 4750 and 5000 points.
+
+58
+00:05:32,023 --> 00:05:36,283
+Testing only at 4000 would have missed it.
+
+59
+00:05:37,803 --> 00:05:42,303
+Trim success must be at least 99.5 percent.
+
+60
+00:05:42,703 --> 00:05:46,243
+Two hundred straight successes: is that enough?
+
+61
+00:05:46,643 --> 00:05:47,158
+No.
+
+62
+00:05:47,558 --> 00:05:52,887
+In statistical terms we must show, at confidence C,
+
+63
+00:05:52,907 --> 00:05:56,138
+that reliability is at least R.
+
+64
+00:05:56,538 --> 00:06:01,536
+Argue by contradiction: if reliability were only R,
+
+65
+00:06:01,556 --> 00:06:06,948
+n straight successes would have probability R to the n,
+
+66
+00:06:06,968 --> 00:06:11,278
+and we require that to be at most 1 minus C.
+
+67
+00:06:11,678 --> 00:06:22,418
+With 99.5 and 95 percent that gives 597.6, so 598 trials.
+
+68
+00:06:22,818 --> 00:06:28,296
+A handy approximation is three times the reciprocal of the failure rate.
+
+69
+00:06:28,696 --> 00:06:41,067
+Allowing one failure needs 947, two 1258, three 1549.
+
+70
+00:06:42,587 --> 00:06:46,389
+What if x of the n trials fail?
+
+71
+00:06:46,789 --> 00:06:50,640
+The point estimate is 1 minus x over n,
+
+72
+00:06:50,660 --> 00:06:55,106
+but decisions use the lower confidence bound.
+
+73
+00:06:55,506 --> 00:06:59,101
+Failures follow a binomial distribution;
+
+74
+00:06:59,121 --> 00:07:05,607
+the failure rate at which 'at most x failures' has probability exactly 1
+
+75
+00:07:05,627 --> 00:07:08,046
+minus C is the upper bound.
+
+76
+00:07:08,446 --> 00:07:09,946
+That's the Clopper–Pearson method.
+
+77
+00:07:10,346 --> 00:07:17,486
+On the right, the bench calculator cycles through 0, 1,
+
+78
+00:07:17,506 --> 00:07:20,741
+2 and 3 failures in 1000.
+
+79
+00:07:21,141 --> 00:07:27,983
+One failure: lower bound 99.53 percent, which passes.
+
+80
+00:07:28,383 --> 00:07:35,423
+Two failures: the estimate of 99.8 percent looks fine,
+
+81
+00:07:35,443 --> 00:07:39,083
+but the bound is only 99.37.
+
+82
+00:07:39,483 --> 00:07:42,899
+So 1000 trials can allow at most one failure.
+
+83
+00:07:44,419 --> 00:07:49,704
+Continuous integration asks a second question: if it got worse,
+
+84
+00:07:49,724 --> 00:07:52,399
+how many trials until we see it?
+
+85
+00:07:52,799 --> 00:08:00,499
+The chance of at least one failure is 1 minus (1 minus p) to the n.
+
+86
+00:08:00,899 --> 00:08:12,620
+At 4750 r/min, with a 1.2 percent failure rate, 250 trials give 95 percent;
+
+87
+00:08:12,640 --> 00:08:21,544
+at 5000, with 17 percent, just 10 trials give 84 percent.
+
+88
+00:08:21,944 --> 00:08:29,866
+To be 95 percent sure of catching a 0.5 percent regression takes 598 trials,
+
+89
+00:08:29,886 --> 00:08:34,151
+the same formula as zero-failure testing.
+
+90
+00:08:34,551 --> 00:08:41,171
+The principle: spend your limited trials on the conditions most likely to fail.
+
+91
+00:08:42,691 --> 00:08:48,891
+Stop error is a continuous measurement, so we can use a variables index.
+
+92
+00:08:49,291 --> 00:08:54,676
+It has only an upper limit, 1 degree, so we use one-sided Cpk:
+
+93
+00:08:54,696 --> 00:08:59,471
+upper limit minus mean, over three standard deviations.
+
+94
+00:08:59,871 --> 00:09:06,891
+At least 1.33 means four sigma between the mean and the limit.
+
+95
+00:09:07,291 --> 00:09:15,274
+Our case hides a second problem: v1.3.2 raised the position gain to 300,
+
+96
+00:09:15,294 --> 00:09:21,053
+and a single stop at 0.91 degrees passed every time.
+
+97
+00:09:21,453 --> 00:09:30,367
+Switch to 50 stops and Cpk is only 0.34; the maximum, 1.13 degrees,
+
+98
+00:09:30,387 --> 00:09:34,233
+was over the limit all along.
+
+99
+00:09:35,753 --> 00:09:38,554
+When is a prototype finished?
+
+100
+00:09:38,954 --> 00:09:44,752
+Leave it to gut feeling and it stays at 'almost' forever.
+
+101
+00:09:45,152 --> 00:09:53,951
+Electronics uses a ladder of maturity stages: P0 runs, P1 has all features,
+
+102
+00:09:53,971 --> 00:10:00,653
+then engineering validation, EVT; design validation, DVT;
+
+103
+00:10:00,673 --> 00:10:06,415
+production validation, PVT; then mass production.
+
+104
+00:10:06,815 --> 00:10:13,075
+Here each stage's exit criteria are written as numbers an automated test can decide.
+
+105
+00:10:13,475 --> 00:10:18,202
+EVT, for example: stop Cpk at least 1.33,
+
+106
+00:10:18,222 --> 00:10:23,759
+at most one failure in 1000 trims at each speed,
+
+107
+00:10:23,779 --> 00:10:27,695
+and ten green HIL nights in a row.
+
+108
+00:10:28,095 --> 00:10:30,515
+Reviews look only at the data.
+
+109
+00:10:32,035 --> 00:10:37,155
+Robot arm and mobile robot software is tested on the same pyramid:
+
+110
+00:10:37,175 --> 00:10:41,282
+unit tests for inverse kinematics and state machines,
+
+111
+00:10:41,302 --> 00:10:44,943
+SIL with the controller on a physics simulator,
+
+112
+00:10:44,963 --> 00:10:51,095
+HIL with real joint drivers on a motor simulator, and only then the real robot.
+
+113
+00:10:51,495 --> 00:10:54,836
+Today's regression has a near-twin there:
+
+114
+00:10:54,856 --> 00:10:59,181
+plan trajectories at 100 percent of motor capability,
+
+115
+00:10:59,201 --> 00:11:05,494
+and when the battery sags the base speed drops and fast segments fall behind;
+
+116
+00:11:05,514 --> 00:11:11,315
+only HIL with measured torque–speed curves, or the real robot, sees it.
+
+117
+00:11:11,715 --> 00:11:21,295
+And proving 99.5 percent grasp success also takes 598 straight successes.
+
+118
+00:11:22,815 --> 00:11:25,320
+Everyday life works the same way.
+
+119
+00:11:25,720 --> 00:11:32,753
+A new umbrella that kept out a few drizzles tells you nothing about a gale
+
+120
+00:11:32,773 --> 00:11:34,182
+and a downpour.
+
+121
+00:11:34,582 --> 00:11:40,221
+To test it, pick the worst weather on purpose, and try enough times.
+
+122
+00:11:40,621 --> 00:11:46,530
+How many times and under what conditions matter far more than the words 'we
+
+123
+00:11:46,550 --> 00:11:47,321
+tried it'.
+
+124
+00:11:48,841 --> 00:11:50,133
+Back to the start.
+
+125
+00:11:50,533 --> 00:11:53,737
+With a 10 millisecond delay,
+
+126
+00:11:53,757 --> 00:11:59,724
+a command speed above 667 r/min means a failed trim,
+
+127
+00:11:59,744 --> 00:12:07,553
+and v1.4.0 stopping from 5000 at low voltage commands at about 1150.
+
+128
+00:12:07,953 --> 00:12:17,693
+Someone trying 50 times at 4750 has a 55 percent chance of seeing no failure at all.
+
+129
+00:12:18,093 --> 00:12:26,924
+Proving 99.5 percent at 95 percent confidence takes 598 straight successes.
+
+130
+00:12:27,324 --> 00:12:37,795
+Testing 250 times a night at 4750 catches it with about 95 percent probability;
+
+131
+00:12:37,815 --> 00:12:42,576
+at 5000 a handful of trials will do.
+
+132
+00:12:42,976 --> 00:12:47,227
+The fix plans at 90 percent of the measured curve,
+
+133
+00:12:47,247 --> 00:12:50,986
+with a backstop that trims one stitch later.
+
+134
+00:12:52,506 --> 00:12:56,481
+Now Virtual lab 22-1, the automated test bench,
+
+135
+00:12:56,501 --> 00:13:02,346
+which you can do yourself on WenQuest. Tasks and results are blurred.
+
+136
+00:13:02,366 --> 00:13:08,722
+Pick a version, a level and cases on the left; top right is the change log.
+
+137
+00:13:09,122 --> 00:13:15,366
+First choose v1.4.0 and software-in-the-loop, and run the default set.
+
+138
+00:13:15,386 --> 00:13:19,661
+With an ideal motor model, all three cases pass.
+
+139
+00:13:20,061 --> 00:13:24,804
+Switch to hardware-in-the-loop and run the default set again.
+
+140
+00:13:24,824 --> 00:13:28,864
+With trimming fixed at 4000 r/min and a single stop,
+
+141
+00:13:28,884 --> 00:13:34,642
+all seven cases are green too: exactly how the regression slipped through.
+
+142
+00:13:35,041 --> 00:13:40,789
+Task one: tick only the trim speed sweep and run it on v1.3.2 first.
+
+143
+00:13:40,809 --> 00:13:45,199
+Read the failures at each speed and the lower bound,
+
+144
+00:13:45,219 --> 00:13:51,645
+then compare the other versions to find which one introduced the regression,
+
+145
+00:13:51,665 --> 00:13:54,020
+and which requirement fails.
+
+146
+00:13:54,420 --> 00:13:59,689
+Task two: back to the default set on v1.4.0, add the trim sweep,
+
+147
+00:13:59,709 --> 00:14:04,233
+and the budget bar turns red, over 240 minutes a night.
+
+148
+00:14:04,253 --> 00:14:10,513
+What would you swap so that fault injection stays and both the trim and stop
+
+149
+00:14:10,533 --> 00:14:12,414
+regressions are caught?
+
+150
+00:14:12,434 --> 00:14:13,240
+Your call.
+
+151
+00:14:13,640 --> 00:14:19,203
+Then switch to the machine test bench, run v1.4.0 and v1.4.2,
+
+152
+00:14:19,223 --> 00:14:26,067
+and compare the worst-point trim failure rate and the maximum stop error in
+
+153
+00:14:26,087 --> 00:14:28,081
+the trend chart below.
+
+154
+00:14:28,101 --> 00:14:32,932
+The results are blurred; run it yourself and compare.
+
+155
+00:14:33,332 --> 00:14:34,297
+Task three:
+
+156
+00:14:34,317 --> 00:14:41,015
+in the calculator enter 99.5 percent reliability and 95 percent confidence,
+
+157
+00:14:41,035 --> 00:14:46,928
+with 0 and then 1 failure allowed, and read off the trials needed,
+
+158
+00:14:46,948 --> 00:14:51,675
+then the lower bound for 0, 1 and 2 failures in 1000.
+
+159
+00:14:51,695 --> 00:14:56,154
+The guide and report template are on the platform.
+
+160
+00:14:57,674 --> 00:15:04,425
+Everything in this lecture is on the WenQuest learning platform.
+
+161
+00:15:04,825 --> 00:15:11,649
+You can open today's interactive slides and the test bench and work them yourself,
+
+162
+00:15:11,669 --> 00:15:14,904
+including the pages this video skipped.
+
+163
+00:15:15,304 --> 00:15:19,220
+You submit the assignment and the lab report on the platform,
+
+164
+00:15:19,240 --> 00:15:21,284
+and get marks and comments back.
+
+165
+00:15:21,684 --> 00:15:26,016
+Questions go to the course discussion forum,
+
+166
+00:15:26,036 --> 00:15:32,445
+and the grades page shows your mark on every assignment and quiz.
+
+167
+00:15:33,965 --> 00:15:36,990
+Your assignment has four questions. One:
+
+168
+00:15:37,010 --> 00:15:42,166
+a customer wants 99.8 percent trim success at 90 percent confidence.
+
+169
+00:15:42,186 --> 00:15:48,104
+How many trims, and how many minutes, with zero failures and with one allowed,
+
+170
+00:15:48,124 --> 00:15:51,225
+and over which conditions should they go?
+
+171
+00:15:51,625 --> 00:15:59,205
+Two: a change may raise the trim failure rate at 4750 r/min to 1.2 percent.
+
+172
+00:15:59,225 --> 00:16:06,804
+To be 99 percent sure of catching it each night, how many trims are needed,
+
+173
+00:16:06,824 --> 00:16:11,263
+and what if they run at 4000 instead? Three:
+
+174
+00:16:11,283 --> 00:16:15,316
+two candidate builds each stop 50 times.
+
+175
+00:16:15,336 --> 00:16:20,281
+Find the one-sided Cpk and judge it against 1.33.
+
+176
+00:16:20,681 --> 00:16:26,398
+Four: write 4 acceptance requirements for the overlock prototype,
+
+177
+00:16:26,418 --> 00:16:31,341
+say at which level and with which case each is verified,
+
+178
+00:16:31,361 --> 00:16:36,901
+and give a 240-minute nightly HIL allocation with your reasons.
+
+179
+00:16:37,301 --> 00:16:41,123
+Submit the report on the WenQuest platform.
+
+180
+00:16:42,643 --> 00:16:46,645
+There's also a ten-question quiz. For example,
+
+181
+00:16:46,665 --> 00:16:53,640
+to show at least 99 percent success at 95 percent confidence with zero failures,
+
+182
+00:16:53,660 --> 00:16:56,088
+how many trials do you need?
+
+183
+00:16:56,488 --> 00:16:56,768
+Or,
+
+184
+00:16:56,788 --> 00:17:03,668
+50 stops on HIL give a mean stop error of 0.40 degrees and a standard
+
+185
+00:17:03,688 --> 00:17:05,468
+deviation of 0.12,
+
+186
+00:17:05,488 --> 00:17:10,268
+with a 1 degree limit. What's the one-sided Cpk?
+
+187
+00:17:10,668 --> 00:17:15,837
+You get three attempts, and the explanations appear as soon as you submit.
+
+188
+00:17:17,357 --> 00:17:19,059
+Three things to remember.
+
+189
+00:17:19,459 --> 00:17:26,589
+One: the test pyramid, unit, SIL, HIL, full machine and end-of-line,
+
+190
+00:17:26,609 --> 00:17:31,951
+and catch each defect at the lowest layer that can.
+
+191
+00:17:32,351 --> 00:17:35,826
+Two: statistics decides how many trials:
+
+192
+00:17:35,846 --> 00:17:40,457
+zero-failure n is at least ln of 1 minus C over ln R;
+
+193
+00:17:40,477 --> 00:17:45,350
+with failures use the lower bound; to catch regressions,
+
+194
+00:17:45,370 --> 00:17:49,369
+spend trials on the most sensitive conditions.
+
+195
+00:17:49,769 --> 00:17:55,986
+Three: continuous integration tests every commit, every night and every week,
+
+196
+00:17:56,006 --> 00:17:59,389
+and every maturity stage exits on numbers.
+
+197
+00:17:59,789 --> 00:18:05,507
+The assignment, quiz and lab report are on WenQuest.
+
+198
+00:18:05,907 --> 00:18:11,967
+Next time: how the sewing machine is designed, built and inspected.
+
+199
+00:18:12,367 --> 00:18:14,736
+The slides, the virtual lab,
+
+200
+00:18:14,756 --> 00:18:20,709
+the assignment and the quiz are all on the WenQuest learning platform,
+
+201
+00:18:20,729 --> 00:18:26,427
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+202
+00:18:26,827 --> 00:18:30,738
+Today was about proving a prototype reliable.
+
+203
+00:18:30,758 --> 00:18:36,679
+Next time we return to the whole sewing machine: how it is designed,
+
+204
+00:18:36,699 --> 00:18:39,649
+built and inspected. See you then.
