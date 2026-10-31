@@ -1,0 +1,24 @@
+# 实验 14.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_7.js。
+原理:
+  - ["单摆（或绕一端摆动的均匀细杆，等效摆长 2l/3）从振幅 θ₀ 处静止释放，周期 T = 4√(L/g)·K(k)，k = sin(θ₀/2)，K 是第一类完全椭圆积分 ∫₀^{π/2} dφ/√(1 − k² sin² φ)（14.7 节）。它不是初等函数，但可以用算术—几何平均等方法很快地算到任意精度。", "A pendulum (or a uniform rod pivoting at one end, equivalent length 2l/3) released from rest at amplitude θ₀ has period T = 4√(L/g)·K(k), k = sin(θ₀/2), where K is the complete elliptic integral of the first kind ∫₀^{π/2} dφ/√(1 − k² sin² φ) (Section 14.7). It is not elementary, but the arithmetic–geometric mean and other methods compute it quickly to any precision."]
+  - 式: "T/T₀ = (2/π)K(sin(θ₀/2))，T₀ = 2π√(L/g)；小振幅时 T/T₀ ≈ 1 + θ₀²/16"
+  - ["检验不定积分最可靠的方法是求导：F′ = f 处处成立，F 才是原函数（13.3 节）。求导容易，求积分难，所以积分的答案总要用导数来验收。", "The surest check of an antiderivative is to differentiate it: F is an antiderivative only if F′ = f everywhere (Section 13.3). Differentiation is easy and integration is hard, so integrals are always checked by derivatives."]
+步骤:
+  - ["在“连杆自由摆动”场景中，杆长取 0.4 m，振幅取 10°、30°、60°、90°、120°、150°，把真实周期和 T/T₀ 填入表 1（任务 1、2）。", "In 'Free-swinging link', with l = 0.4 m and amplitudes 10°, 30°, 60°, 90°, 120°, 150°, record the true period and T/T₀ in Table 1 (tasks 1 and 2)."]
+  - ["振幅取 90°，杆长取 0.4 m 和 0.8 m，比较周期和 T/T₀，说明 T/T₀ 只与振幅有关（任务 2）。", "At 90°, compare l = 0.4 m and 0.8 m and show that T/T₀ depends only on the amplitude (task 2)."]
+  - ["在“积分检验”场景中，对四个被积函数逐个试三个候选答案，把 max |F′ − f| 和结论填入表 2（任务 3、4）。", "In 'Checking integrals', try the three candidates for each of the four integrands and record max |F′ − f| and the verdict in Table 2 (tasks 3 and 4)."]
+数据表:
+  - 标题: ["表 1  连杆自由摆动的周期（l = 0.4 m）", "Table 1  Swing period of the link (l = 0.4 m)"]
+    表头: ["θ₀ / (°)", "真实周期 T / s", "T/T₀", "近似 1 + θ₀²/16（θ₀ 用弧度）"]
+    表头英文: ["θ₀ / (°)", "true period T / s", "T/T₀", "approximation 1 + θ₀²/16 (θ₀ in radians)"]
+    行: [["10", "", "", ""], ["30", "", "", ""], ["60", "", "", ""], ["90", "", "", ""], ["120", "", "", ""], ["150", "", "", ""]]
+  - 标题: ["表 2  不定积分的候选答案检验", "Table 2  Checking candidate antiderivatives"]
+    表头: ["被积函数", "正确的候选", "错误候选的 max |F′ − f|", "错在哪里"]
+    表头英文: ["integrand", "correct candidate", "max |F′ − f| of wrong ones", "what went wrong"]
+    行: [["x eˣ", "", "", ""], ["ln x", "", "", ""], ["x cos x", "", "", ""], ["1/(x² − 1)", "", "", ""]]
+注意:
+  - ["摆动曲线用数值方法（四阶龙格–库塔法）解运动方程得到，周期用算术—几何平均算椭圆积分；两者应当吻合。虚线是小振幅近似 θ₀ cos ω₀t。", "The swing curve comes from solving the equation of motion numerically (fourth-order Runge–Kutta); the period comes from the elliptic integral via the arithmetic–geometric mean, and the two should agree. The dashed curve is the small-angle approximation θ₀ cos ω₀t."]
+  - ["连杆当作均匀细杆、忽略关节摩擦，是理想化的模型；真实的断电摆动会因摩擦和刹车逐渐衰减。", "Treating the link as a uniform rod without joint friction is an idealization; a real unpowered swing decays because of friction and braking."]
+思考题:
+  - ["椭圆积分、误差函数、正弦积分都“积不出来”，计算器和数学库却能算到十几位有效数字。它们用的是什么方法？（第 15 章数值积分、第 24 章幂级数）", "Elliptic integrals, the error function and the sine integral have no elementary form, yet calculators give them to 15 digits. What methods do they use? (Chapter 15: numerical integration; Chapter 24: power series)"]
+  - ["钟摆计时要求周期稳定。为什么摆钟的摆幅都很小？振幅从 2° 变到 3°，每天快慢多少秒？", "Pendulum clocks need a steady period. Why do they swing through small angles? If the amplitude drifts from 2° to 3°, how many seconds a day does the clock gain or lose?"]
