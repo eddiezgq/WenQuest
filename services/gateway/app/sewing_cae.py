@@ -11,6 +11,8 @@
   GET  /api/v1/sewing/cae/jobs/{jid}/image.png    应力云图（服务器画）
   GET  /api/v1/sewing/cae/jobs/{jid}/report.docx  数字工厂的分析报告（附云图）
   POST /api/v1/sewing/optimize                    设计优化（本软件公式，网关里直接算）
+  POST /api/v1/sewing/cae/ebox                    电控箱（第 62 轮）：参数化外壳 → 流体（自然对流 / 风扇）算每个外表面的 h
+                                                  → 温度场（功率模块、其他电路发热）→ 箱子到车间的热阻，代回公式重算结温、电容寿命
 
 来宾不能用；企业开通后才能用（第 41 轮 Q4）。任务记在 <data_dir>/sewing.db 的 cae_jobs 表里，结果算完后缓存。
 """
@@ -32,6 +34,7 @@ from . import sewcore
 from .moodle import EngineError
 from .session import Session
 from .sewcore import cae_setup as CS
+from .sewcore import ebox as EB
 from .sewcore import optimize as OPT
 from .sewcore import template as TPL
 
@@ -50,6 +53,34 @@ class DesignIn(BaseModel):
     topo: str = Field(default="", max_length=40)        # 数控编程：用这个拓扑优化任务减重后的零件
     slot_w: float = Field(default=5.0, ge=3.2, le=12)   # 花样模板：槽宽（压脚外径 + 1–2 mm），第 42 轮
     plate_t: float = Field(default=3.0, ge=1, le=12)    # 花样模板：板厚
+
+
+class EboxCaeIn(BaseModel):
+    machine: str = Field(default="lockstitch", pattern=MACHINE_RE)
+    params: dict[str, Any] = Field(default_factory=dict)
+    ebox: dict[str, Any] = Field(default_factory=dict)
+
+
+EBOX_DIFF = 0.15                   # CAE 算的箱子热阻和按尺寸公式算的相差 15% 以内算对得上（第 62 轮验收）
+
+
+def ebox_thermal_rows(example: dict, faces: list, h_rad: float, t_air: float) -> list:
+    """流体算出的每个外表面 h（+ 辐射）→ 温度场的对流行（h 相近的面合成一行）；功率模块、底板的发热照示例"""
+    rows = [dict(t) for t in example["thermal"] if t["type"] == "heat_flux"]
+    outer = set(example["groups"]["outer"])
+    hs = {f["id"]: f["h_w_m2k"] for f in faces if f.get("h_w_m2k") is not None and f["id"] in outer}
+    if hs:
+        mean = sum(hs.values()) / len(hs)
+        for fid in outer - set(hs):
+            hs[fid] = mean
+    else:
+        hs = {fid: 5.0 for fid in outer}
+    groups: dict[float, list[int]] = {}
+    for fid, h in hs.items():
+        groups.setdefault(round(h * 2) / 2, []).append(fid)
+    for h, fids in sorted(groups.items()):
+        rows.append({"type": "convection", "faces": sorted(fids), "h_w_m2k": round(h + h_rad, 3), "t_inf_c": t_air})
+    return rows
 
 
 XY = ("pattern", "embroid", "flatknit")   # 第 42 轮：缝纫头 + X–Y 平面运动的机型；第 54 轮横机（机头直线往复）同一套：伺服选型、长件模态
@@ -231,7 +262,7 @@ def register(app, m) -> None:
         return {"connected": connected(), "parts": CS.parts(machine), "cam_parts": CS.cam_parts(machine), "goals": OPT.goals(machine), "quota": q,
                 "kinds": {"fea": bool(CS.parts(machine)), "frame": True, "mbd": machine in ("lockstitch", "overlock"),
                           "motor": machine in ("lockstitch", "overlock", "pattern", "embroid", "flatknit"), "xy": machine in XY,
-                          "topo": bool(CS.parts(machine)), "cam": bool(CS.cam_parts(machine))}}
+                          "topo": bool(CS.parts(machine)), "cam": bool(CS.cam_parts(machine)), "ebox": True}}
 
     # ---------- 强度 + 疲劳 ----------
     @app.post("/api/v1/sewing/cae/fea")
@@ -468,6 +499,93 @@ def register(app, m) -> None:
         return Response(r.content, media_type="application/step", headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
 
     # ---------- 结果 ----------
+    # ---------- 电控箱（第 62 轮）：流体 → 温度场 → 箱子热阻代回公式 ----------
+    @app.post("/api/v1/sewing/cae/ebox")
+    async def ebox_cae(body: EboxCaeIn, sess: Annotated[Session, Depends(m.current)]):
+        lic = await m.sewing_need_license(sess)
+        M = sewcore.get(body.machine)
+        p = M.clean(body.params)
+        R = EB.analyze(body.ebox, body.machine, p)
+        q, t, geo = R["params"], R["thermal"], R["geometry"]
+        Ta = q["Ta"]
+        T_est = Ta + max(3.0, geo["R"] * t["Ptot"])             # 外壳平均温度的估计（按尺寸的公式）；自然对流 h ∝ ΔT^¼，估差了影响很小
+        g = await factory("POST", "/ebox/geometry", json={"params": {
+            "L": q["L"], "W": q["W"], "H": q["H"], "wall": q["wall"], "fins": int(q["fins"]), "fin_h": q["fin_h"], "fin_t": q["fin_t"],
+            "p_ipm": round(t["Pavg"], 3), "p_aux": q["Paux"], "h_out": 10.0, "t_air": Ta}})
+        natural = q["air"] != "fan"
+        if natural:
+            setup = {"flow": {"mode": "natural", "air_t_c": Ta}, "heat": {"wall_t_c": round(T_est, 2)},
+                     "mesh": {"cells_target": 80000, "level": 3}, "solver": {"t_end_s": 20}}
+        else:
+            setup = {"flow": {"velocity_ms": q["vfan"], "direction": "+x", "air_t_c": Ta}, "heat": {"wall_t_c": round(T_est, 2)},
+                     "mesh": {"cells_target": 120000, "level": 3}}
+        title = f"{M.NAME[0]} · 电控箱 {'自然对流' if natural else '风扇'} + 温度场"
+        j = await factory("POST", "/jobs", json=submit_body(lic, sess, "cfd", title, "ebox", step_sha=g["sha"], setup=setup))
+        ctx = {"stage": "cfd", "sha": g["sha"], "example": g["example"], "ebox": q, "T_est": T_est, "Ta": Ta, "air": q["air"],
+               "Ptot": t["Ptot"], "Pavg": t["Pavg"], "R_used": t["Rbox"], "R_geo": geo["R"], "eps": q["eps"]}
+        save(j["id"], lic, sess, body.machine, "ebox", "ebox", title, p, ctx)
+        return {"id": j["id"], "status": j["status"]}
+
+    def set_ctx(jid: str, ctx: dict) -> None:
+        with db() as c:
+            c.execute("update cae_jobs set ctx=? where jid=?", (json.dumps(ctx), jid))
+
+    async def ebox_step(d: dict) -> dict:
+        """电控箱任务往前走一步：流体算完 → 交温度场；温度场算完 → 出结果。返回 {status, stage, position?, error?, result?}"""
+        ctx, org = d["ctx"], d["org"]
+        if ctx.get("stage") == "cfd":
+            j = await factory("GET", f"/jobs/{d['jid']}", params={"org": org})
+            if j.get("status") != "done":
+                return {"status": j.get("status"), "stage": "cfd", "position": j.get("position"), "error": j.get("error")}
+            r = await factory("GET", f"/cfd/{d['jid']}/result", params={"org": org})
+            st = r.get("stats") or j.get("stats") or {}
+            Tw = st.get("wall_t_c") or ctx["T_est"]
+            from math import isfinite
+            hr = ctx["eps"] * 5.670e-8 * ((Tw + 273.15) ** 2 + (ctx["Ta"] + 273.15) ** 2) * ((Tw + 273.15) + (ctx["Ta"] + 273.15))
+            rows = ebox_thermal_rows(ctx["example"], r.get("faces") or [], hr, ctx["Ta"])
+            setup = {"analysis": "thermal", "material_id": "6061-T6", "thermal": rows, "mesh": {"size_mm": ctx["example"].get("mesh_mm", 4.5)}}
+            lic = {"org": org, "name": ""}
+            sess = Session(moodle_token="", user_id=d["user_id"], lang="zh")          # 提交人记原来那位
+            tj = await factory("POST", "/jobs", json=submit_body(lic, sess, "fea", d["title"].replace("+ 温度场", "· 温度场"), "ebox_t",
+                                                                   step_sha=ctx["sha"], setup=setup))
+            faces = [dict(id=f["id"], area_mm2=round(f["area_mm2"], 1), h=round(f["h_w_m2k"], 3), heat_w=round(f.get("heat_w") or 0, 3))
+                     for f in r.get("faces") or [] if f.get("h_w_m2k") is not None and isfinite(f["h_w_m2k"])]
+            ctx.update(stage="thermal", thermal_jid=tj["id"], h_rad=hr,
+                       cfd={k: st.get(k) for k in ("mode", "h_mean", "heat_w", "area_m2", "Ra", "Re", "cells", "converged", "heat_spread",
+                                                   "seconds", "velocity_ms", "wall_t_c", "turbulence")}, faces=faces)
+            set_ctx(d["jid"], ctx)
+            return {"status": "running", "stage": "thermal"}
+        j = await factory("GET", f"/jobs/{ctx['thermal_jid']}", params={"org": org})
+        if j.get("status") != "done":
+            return {"status": "running" if j.get("status") in ("queued", "running") else j.get("status"), "stage": "thermal",
+                    "position": j.get("position"), "error": j.get("error")}
+        st = j.get("stats") or {}
+        fg = st.get("film_groups") or []
+        A = sum(g["area_m2"] for g in fg)
+        T_shell = sum(g["mean_c"] * g["area_m2"] for g in fg) / A if A else None
+        R_cae = (T_shell - ctx["Ta"]) / ctx["Ptot"] if T_shell is not None and ctx["Ptot"] > 0 else None
+        if R_cae is None or R_cae <= 0:
+            res = {"error": "温度场没有算出外壳温度", "checks": []}
+        else:
+            E2 = EB.analyze(ctx["ebox"], d["machine"], d["params"], Rbox=R_cae)
+            diff = (R_cae - ctx["R_geo"]) / ctx["R_geo"]
+            t2 = E2["thermal"]
+            res = {"R_cae": round(R_cae, 4), "R_geo": round(ctx["R_geo"], 4), "R_used": round(ctx["R_used"], 4), "diff": round(diff, 4),
+                   "T_shell": round(T_shell, 2), "T_hot": st.get("t_max_c"), "T_est": round(ctx["T_est"], 2), "Ta": ctx["Ta"],
+                   "Ptot": round(ctx["Ptot"], 2), "Pavg": round(ctx["Pavg"], 2), "h_rad": round(ctx["h_rad"], 3), "cfd": ctx.get("cfd"),
+                   "faces": ctx.get("faces"), "thermal_jid": ctx["thermal_jid"], "elements": st.get("elements"),
+                   "with_cae": {"Tin": round(t2["Tin"], 1), "Ths": round(t2["Ths"], 1), "Tjpk": round(t2["Tjpk"], 1), "life_y": round(t2["life_y"], 1)},
+                   "ebox_checks": E2["checks"], "ok": E2["ok"]}
+            res["checks"] = [
+                dict(key="ebox_r", zh="箱子到车间热阻：CAE 与按尺寸公式对照", en="Enclosure-to-workshop resistance: CAE vs size-based formula",
+                     value=f"{R_cae:.3f} / {ctx['R_geo']:.3f} K/W（{diff:+.0%}）", limit=f"相差 ≤ {EBOX_DIFF:.0%} / within {EBOX_DIFF:.0%}",
+                     state="ok" if abs(diff) <= EBOX_DIFF else "warn")] + [
+                dict(key="cae_" + c["key"], zh=c["name"]["zh"] + "（用 CAE 热阻）", en=c["name"]["en"] + " (with the CAE resistance)",
+                     value=c["value"]["zh"], limit=c["limit"]["zh"], state=c["state"]) for c in E2["checks"] if c["group"] in ("heat", "margin")]
+        with db() as c:
+            c.execute("update cae_jobs set result=? where jid=?", (json.dumps(res), d["jid"]))
+        return {"status": "done", "stage": "done", "result": res}
+
     async def finish(d: dict, j: dict) -> dict | None:
         """任务算完后补算（疲劳、模态、对照）并给出判定；结果缓存"""
         if d["result"] is not None:
@@ -546,7 +664,7 @@ def register(app, m) -> None:
     async def jobs(sess: Annotated[Session, Depends(m.current)], machine: str = ""):
         lic = await m.sewing_need_license(sess)
         with db() as c:
-            rs = [dict(r) for r in c.execute("select jid,machine,kind,part,title,phash,created,result from cae_jobs where org=? order by created desc limit 100",
+            rs = [dict(r) for r in c.execute("select jid,machine,kind,part,title,phash,created,result,ctx from cae_jobs where org=? order by created desc limit 100",
                                              (lic["org"],)) if not machine or r["machine"] == machine]
         remote = {}
         if connected() and rs:
@@ -555,7 +673,12 @@ def register(app, m) -> None:
             except EngineError:
                 remote = {}
         for r in rs:
+            ctx = json.loads(r.pop("ctx") or "{}")
             j = remote.get(r["jid"]) or {}
+            if r["kind"] == "ebox" and not r["result"] and ctx.get("thermal_jid"):         # 电控箱：流体算完后看温度场那一个
+                j = remote.get(ctx["thermal_jid"]) or {"status": "running"}
+            elif r["kind"] == "ebox" and not r["result"] and j.get("status") == "done":
+                j = {"status": "running"}                                                   # 流体算完、还没交温度场（打开就会交）
             r["status"] = "done" if r["result"] else j.get("status", "unknown")
             r["position"] = j.get("position")
             r["has_result"] = bool(r.pop("result"))
@@ -567,6 +690,9 @@ def register(app, m) -> None:
         d = row(jid, lic["org"])
         if d["result"] is not None:
             return {"id": jid, "status": "done", "kind": d["kind"], "part": d["part"], "title": d["title"], "machine": d["machine"], "result": d["result"]}
+        if d["kind"] == "ebox":
+            st = await ebox_step(d)
+            return dict(st, id=jid, kind="ebox", part=d["part"], title=d["title"], machine=d["machine"])
         j = await factory("GET", f"/jobs/{jid}", params={"org": lic["org"]})
         out = {"id": jid, "status": j.get("status"), "kind": d["kind"], "part": d["part"], "title": d["title"], "machine": d["machine"],
                "position": j.get("position"), "error": j.get("error")}
