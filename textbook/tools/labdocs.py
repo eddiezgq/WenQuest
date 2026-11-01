@@ -88,6 +88,12 @@ def _env_rows(m: dict) -> list[list[str]]:
 def _table(d, t: dict) -> None:
     d.p(f"{t['标题'][0]}  {t['标题'][1]}", indent=False)
     n = len(t["表头"])
+    # 行与表头的列数必须一致：不一致时 docgen 会抛 IndexError，看不出是哪张表，所以这里先报清楚
+    for i, r in enumerate(t["行"], 1):
+        if len(r) != n:
+            raise ValueError(f"数据表《{t['标题'][0]}》第 {i} 行有 {len(r)} 格，表头有 {n} 格——两者必须一致")
+    if t.get("表头英文") and len(t["表头英文"]) != n:
+        raise ValueError(f"数据表《{t['标题'][0]}》的表头英文有 {len(t['表头英文'])} 格，表头有 {n} 格")
     d.table([str(h) for h in t["表头"]], [[str(c) for c in r] for r in t["行"]], widths=[round(16.0 / n, 2)] * n, font_size=9.5)
 
 

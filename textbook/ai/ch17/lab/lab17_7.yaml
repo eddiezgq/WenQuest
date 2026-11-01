@@ -1,0 +1,29 @@
+# 实验 17.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_7.js。
+原理:
+  - ["日报智能体做的事很直白：对每条线取最近 7 天与前 7 天的平均产量，算变化，挑掉得最狠的那条。这件事数据里有定论，所以结论对不对是能判的——这正是能做这个实验的前提（17.7 节）。", "The daily-report agent does something simple: for each line it averages the output over the last seven days and the seven before, computes the change, and names the worst. The data settles the answer, so the conclusion can be judged right or wrong — which is what makes this lab possible (Section 17.7)."]
+  - ["三种工具毛病都是真实系统里会遇到的，而且**都不报错**：时间窗口写错（取成上一周）、分页没翻完（只取回四天）、某条线的数来自另一个系统（单位是箱不是件）。不报错这一点最要命——智能体照样把日报写得斩钉截铁。", "The three faults are ones real systems hit, and none of them raises an error: the wrong time window, an unfinished pagination, and one line whose numbers come from another system in different units. Raising no error is the dangerous part: the agent writes the report just as confidently."]
+  - ["三道检查各管一件事：查取回来的天数够不够（管“少了”）、查量级对不对（管“单位错了”）、换一个口径交叉核对（管“整批都偏了”）。没有哪一道能单独挡住全部三种。", "Each check covers one thing: the number of days covers missing data, the magnitude check covers wrong units, and the cross-check covers a whole batch being off. No single check catches all three."]
+  - ["这与第 11 章的“捷径”、第 16.8 节的“合成数据偏了”是同一类问题：**系统不报错，不等于结果是对的**。", "This is the same class of problem as the shortcut in Chapter 11 and the biased synthetic data in Section 16.8: a system that does not complain is not thereby correct."]
+  - 式: "变化 = (最近 7 天均值 − 前 7 天均值) / 前 7 天均值 × 100%"
+步骤:
+  - ["“数据与标准答案”场景：记下三条线的变化与标准答案，并看出二号线从第几天开始掉（任务 1），填表 1 第一行。", "Data scene: record the change for each line and the ground truth, and note the day line 2 starts to drop (task 1)."]
+  - ["切到“工具出毛病时”，三道检查全关，毛病依次设成 1、2、3，每一种记下日报的结论、幅度与报警数（任务 2、3），填满表 1。", "Switch to the agent scene with all checks off, set the fault to 1, 2 and 3 in turn, recording the conclusion, the magnitude and the number of warnings each time (tasks 2 and 3)."]
+  - ["毛病固定在 2，一道一道单独打开三个检查，记下哪一道挡得住（任务 4），填表 2 的“只取四天”那一行。", "Fix the fault at 2 and switch each check on by itself, recording which one catches it (task 4)."]
+  - ["对毛病 1 与毛病 3 重复上一步，填满表 2。", "Repeat for faults 1 and 3 to complete Table 2."]
+  - ["三道全开，把毛病从 0 过到 3，再换五批数据（改“换一批数据”）看有没有误报（任务 5）。", "Turn all three checks on, step the fault from 0 to 3, and then try five different batches of data to see whether any false alarm appears (task 5)."]
+数据表:
+  - 标题: ["表 1  工具出毛病时，不查会怎样", "Table 1  What happens with no checks"]
+    表头: ["工具的毛病", "日报说哪条线", "日报说掉了多少", "标准答案", "对不对", "报了几个警"]
+    表头英文: ["fault", "line named", "change reported", "ground truth", "right?", "warnings"]
+    行: [["一切正常", "", "", "", "", ""], ["取成上一周", "", "", "", "", ""], ["只取回四天", "", "", "", "", ""], ["一条线单位是箱", "", "", "", "", ""]]
+  - 标题: ["表 2  哪一道检查挡得住哪一种毛病", "Table 2  Which check catches which fault"]
+    表头: ["毛病", "只查天数", "只查量级", "只交叉核对", "三道全开"]
+    表头英文: ["fault", "length only", "magnitude only", "cross-check only", "all three"]
+    行: [["取成上一周", "", "", "", ""], ["只取回四天", "", "", "", ""], ["一条线单位是箱", "", "", "", ""]]
+注意:
+  - ["本实验的“智能体”是一个规则脚手架，不含任何模型。这样做是为了把“脚手架与检查各值多少”单独量出来——模型再强，脚手架没有这几道检查，一样会把错结论写得斩钉截铁。真模型上的对照见云端实验 17.1 与 17.3。", "The agent here is a rule-based scaffold with no model in it. That isolates what the scaffold and the checks are worth: however strong the model, a scaffold without these checks will state a wrong conclusion just as confidently. The comparison with a real model is in cloud labs 17.1 and 17.3."]
+  - ["交叉核对用的是另一个口径（按节拍而不是按产量）。它能挡住两种毛病，但它也有盲区：如果两个口径取的是同一批坏数，它就什么都查不出来。", "The cross-check uses a second view of the data (cadence rather than output). It catches two of the faults, but it has a blind spot: if both views read the same bad batch, it sees nothing."]
+  - ["换一批数据（改随机种子）标准答案会变，但三种毛病的性质不变。至少看三批再下结论。", "Changing the batch changes the ground truth but not the nature of the faults. Look at three batches before concluding."]
+思考题:
+  - ["这三道检查都是事前想得到的。再想两种这个脚手架挡不住的毛病，说明为什么光加检查不够，还要配什么（提示：17.6 节那道人工确认的闸）。", "All three checks are things you could anticipate. Name two faults this scaffold would still miss, and say what is needed besides more checks (hint: the human-approval gate of Section 17.6)."]
+  - ["如果日报每天自动发给厂长，而智能体每 100 天错一次，你会怎样设计“发出去之前”的那一步？把你的方案写成一条规则，并说明它会带来多少误报。", "If the report goes to the plant manager automatically and the agent is wrong once in a hundred days, how would you design the last step before it is sent? Write your rule down and say how many false alarms it would cause."]

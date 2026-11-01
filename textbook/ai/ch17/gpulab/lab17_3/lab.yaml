@@ -1,0 +1,47 @@
+标题: ["GPU 实验 17.3 多步工具调用的时间都花在哪", "GPU Lab 17.3 Where the time goes in a multi-step tool loop"]
+目的: ["在真模型上把 17.3 节那笔账测出来：一个智能体每走一步，都要把前面所有东西重新过一遍，所以每一步都比上一步慢。量出单步时延随上下文长度怎么长、前缀复用（KV 缓存）省了多少，再折算“一个 20 步的任务要多久”。",
+       "Measure the accounting of Section 17.3 on a real model: at every step the agent re-reads everything that came before, so each step is slower than the last. Measure how the per-step latency grows with context length, how much reusing the prefix (the KV cache) saves, and work out how long a twenty-step task takes."]
+显卡: basic
+结果:
+  - {名: prefill_short, 说明: ["短上下文的预填充时延", "prefill latency at the short context"], 单位: "毫秒"}
+  - {名: prefill_long, 说明: ["长上下文的预填充时延", "prefill latency at the long context"], 单位: "毫秒"}
+  - {名: prefill_ratio, 说明: ["长比短慢几倍", "how many times slower"], 单位: "倍"}
+  - {名: ctx_short, 说明: ["短上下文多少词元", "short context length"], 单位: "词元"}
+  - {名: ctx_long, 说明: ["长上下文多少词元", "long context length"], 单位: "词元"}
+  - {名: decode_rate, 说明: ["每秒生成多少词元", "decode throughput"], 单位: "词元/秒"}
+  - {名: step_no_cache, 说明: ["不复用前缀时走完 20 步要多久", "20 steps without prefix reuse"], 单位: "秒"}
+  - {名: step_with_cache, 说明: ["复用前缀时走完 20 步要多久", "20 steps with prefix reuse"], 单位: "秒"}
+  - {名: cache_speedup, 说明: ["复用前缀省了几倍", "speed-up from reusing the prefix"], 单位: "倍"}
+  - {名: tokens_20_steps, 说明: ["20 步一共要处理多少输入词元（不复用）", "input tokens over 20 steps without reuse"], 单位: "词元"}
+文件: []
+实际问题:
+  标题: ["智能体为什么越跑越慢", "Why an agent slows down as it runs"]
+  内容: ["把日报智能体挂上线之后，工程师发现一件怪事：前几步很快，越往后越慢，到第二十步时一步要等好几秒。模型没变、工具没变，慢在哪里？答案在上下文上——每走一步，前面所有的提示、工具定义、工具返回的内容都要重新过一遍。",
+         "After the daily-report agent goes live the first steps are quick and the later ones crawl, until one step takes several seconds. The model has not changed and neither have the tools, so where does the time go? In the context: at every step the whole prompt, the tool definitions and every tool result so far are processed again."]
+原理:
+  - ["官方文档的原话：**请求里的一切都计入上下文窗口**——系统提示、每一条消息、工具定义、工具结果、以及生成的响应。所以第 n 步要处理的输入词元大致随 n 线性增长，整个任务的总量随 n² 增长（17.3 节）。", "The official wording is that everything in the request counts towards the context window: the system prompt, every message, the tool definitions, the tool results and the generated response. The input at step n therefore grows roughly linearly with n, and the total over a task grows as n squared (Section 17.3)."]
+  - ["一次生成分两段：预填充（把整段上下文过一遍，算力与长度成正比）与逐词元解码（每个新词元一次前向，受显存带宽限制）。上下文一长，预填充那一段就开始主导——这与第 8、13 章是同一笔账。", "A generation has two phases: prefill, which processes the whole context and scales with its length, and token-by-token decoding, which is bandwidth-bound. As the context grows, prefill starts to dominate — the same accounting as in Chapters 8 and 13."]
+  - ["前缀复用（KV 缓存）把已经算过的那一段键值留着，下一步只算新增的部分。官方文档给了价格倍数，但**没给任何“省多少”的百分比**，所以时延这一侧只能自己测——这就是本实验要做的事。", "Reusing the prefix keeps the already-computed keys and values so that only the new part is processed. The official documentation gives price multipliers but no percentage for the saving, so the latency side has to be measured — which is what this lab does."]
+  - ["工具定义本身也是前缀的一部分。工具一多，这一段就越长，而它每一步都一模一样——所以它是最该被缓存的那一段（17.5 节）。", "The tool definitions are part of that prefix too. The more tools, the longer it is, and it is identical at every step — which makes it the single best thing to cache (Section 17.5)."]
+步骤:
+  - ["运行第 1 节，装环境、确认显卡、下载模型（任务 1）。", "Run section 1 to set up, check the GPU and download the model (task 1)."]
+  - ["运行第 2 节，量预填充时延随上下文长度怎么长，记下几档的数（任务 2），填表 1。", "Run section 2 to measure how prefill latency grows with context length, recording several settings (task 2) in Table 1."]
+  - ["运行第 3 节，模拟一个 20 步的智能体循环，分别在“每步重算”与“复用前缀”两种做法下计时（任务 3），填表 2。", "Run section 3 to simulate a twenty-step agent loop, timing it both with and without prefix reuse (task 3) in Table 2."]
+  - ["运行第 4 节，把工具定义加长一倍再跑一次，看它对两种做法各有多大影响（任务 4）。", "Run section 4 with the tool definitions doubled in length and see how each approach is affected (task 4)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  预填充时延随上下文长度", "Table 1  Prefill latency versus context length"]
+    表头: ["上下文词元数", "预填充时延（ms）", "比最短那档慢几倍", "每词元多少微秒"]
+    表头英文: ["context tokens", "prefill latency (ms)", "times the shortest", "microseconds per token"]
+    行: [["512", "", "", ""], ["1024", "", "", ""], ["2048", "", "", ""], ["4096", "", "", ""], ["8192", "", "", ""]]
+  - 标题: ["表 2  一个 20 步的任务", "Table 2  A twenty-step task"]
+    表头: ["做法", "总耗时（s）", "最后一步耗时（s）", "一共处理多少输入词元"]
+    表头英文: ["approach", "total (s)", "last step (s)", "input tokens processed"]
+    行: [["每步重算", "", "", ""], ["复用前缀", "", "", ""], ["复用前缀 + 工具定义加倍", "", "", ""]]
+注意:
+  - ["本实验测的是**一块卡上的单次推理**，没有批处理、没有并发。线上服务会把多个请求凑成一批，单请求的时延会比这里高，吞吐则高得多（第 9 章）。这里要看的是**随上下文长度怎么长**，不是绝对值。", "This measures a single inference on one GPU with no batching or concurrency. A served system batches requests, so per-request latency is higher and throughput far higher (Chapter 9). What transfers is the shape of the curve, not the absolute numbers."]
+  - ["小模型上预填充那一段占比没有大模型高。换一个更大的模型重跑，表 1 的倍数会更陡。", "On a small model prefill is a smaller share than on a large one. Repeating this with a bigger model makes the ratios in Table 1 steeper."]
+  - ["这里的“复用前缀”是本地 KV 缓存，与各家 API 的提示缓存不是一回事：后者还涉及写入成本与存活时间（17.3 节给了价格倍数的折算）。", "The prefix reuse here is a local KV cache, which is not the same thing as a vendor's prompt caching: that also involves a write cost and a time-to-live (Section 17.3 gives the price arithmetic)."]
+思考题:
+  - ["按表 1 的“每词元多少微秒”估一下：如果智能体每一步往上下文里加 800 个词元，走到第几步时单步时延会超过一秒？与表 2 的实测对一对。", "From the microseconds-per-token column, estimate at which step the per-step latency passes one second if each step adds 800 tokens, and compare with Table 2."]
+  - ["如果把“工具返回的大段内容”换成“返回一个摘要 + 一个可再查的句柄”，表 2 的两列会怎样变？这个改法的代价是什么？", "What happens to Table 2 if a tool returns a summary plus a handle to fetch more, rather than the full content? What does that design cost you?"]

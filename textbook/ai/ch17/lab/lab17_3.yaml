@@ -1,0 +1,29 @@
+# 实验 17.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_3.js。
+原理:
+  - ["智能体一圈一圈地做事：规划（下一步做什么）、调工具（取数、改文件、跑测试）、读结果、修正。转一圈算一步，一件真事要转几十圈（17.3 节）。", "An agent works in laps: plan what to do next, act with a tool, observe what came back, revise. One lap is one step, and a real task takes dozens of them (Section 17.3)."]
+  - ["每一步都可能出错。单看一步出错率也许只有百分之几，但这些小毛病是**乘**起来的：每步出错率 p、走 n 步，整件事做成的概率是 (1−p)ⁿ。这是把“每一步都得对”写成概率的恒等式，不是从实验里总结出来的规律。", "Each step can go wrong. Per step the rate may be a few percent, but the errors multiply: with error rate p over n steps, the whole task succeeds with probability (1-p)^n. That is an identity obtained by writing down 'every step must be right', not an empirical law."]
+  - ["由此解出一条很有用的式子：要保住成功率不低于 s，最多能走 n = ln s / ln(1−p) 步。它说明**每步出错率降到五分之一，能走的步数就长五倍**——这比“多试几次”有用得多。", "Solving for n gives a useful formula: to keep the success rate at s you can afford at most n = ln s / ln(1-p) steps. Cutting the per-step error to a fifth buys five times the length — a far better lever than retrying."]
+  - ["三种救法治的不是同一件事：整件事重试（要求失败看得出来、而且能重来）、每步自检（把每步的有效出错率压下去）、末端校验（在交付前把错的拦住）。校验器会把对的判成错，误判率一高就开始帮倒忙。", "The three remedies address different things: retrying the whole task (which assumes failure is visible and the work is repeatable), checking after each step (which lowers the effective per-step error), and verifying the finished result. A verifier also rejects correct results, and too many false rejections make it counterproductive."]
+  - 式: "(1−p)ⁿ；能走的步数 n = ln s / ln(1−p)；每步自检后的有效出错率 p·(1 − d(1−p))"
+步骤:
+  - ["“错误怎么累积”场景：按默认设置（每步出错 5%、走 20 步）记下成功率；再把步数拖到 40（任务 1），填表 1。", "Decay scene: record the success rate at the defaults (5% per step, 20 steps), then at 40 steps (task 1); fill Table 1."]
+  - ["把每步出错率依次设成 10%、5%、2%、1%，每一档记下成功率与“保住 80% 能走几步”（任务 2），填满表 1。", "Set the per-step error to 10%, 5%, 2% and 1% in turn, recording the success rate and the affordable number of steps at each (task 2)."]
+  - ["切到“三种救法”，先只开“整件事重试”，次数从 1 加到 4，记一行（任务 3）。", "Switch to the remedies scene, turn on only the retries and raise them from 1 to 4, recording a row (task 3)."]
+  - ["把重试调回 1，只开“每步自检”，查出率从 0.5 到 0.95 各记一次（任务 4），填表 2。", "Set the retries back to 1, turn on only the per-step check and record it at detection rates from 0.5 to 0.95 (task 4) in Table 2."]
+  - ["最后只开末端校验（查错能力 0.95），把“把对的判成错”从 0 拖到 0.9，找出好处被吃光的那一档；再把查错能力降到 0.8 重做一遍（任务 5）。", "Finally turn on only the verifier at a detection rate of 0.95 and sweep the false-rejection rate from 0 to 0.9 to find where the gain disappears; then repeat at a detection rate of 0.8 (task 5)."]
+数据表:
+  - 标题: ["表 1  每步出错率与能走的步数", "Table 1  Per-step error and the steps you can afford"]
+    表头: ["每步出错率", "走 20 步的成功率", "走 40 步的成功率", "保住 80% 能走几步", "保住 50% 能走几步"]
+    表头英文: ["per-step error", "success at 20 steps", "success at 40 steps", "steps at 80%", "steps at 50%"]
+    行: [["10%", "", "", "", ""], ["5%", "", "", "", ""], ["2%", "", "", "", ""], ["1%", "", "", "", ""]]
+  - 标题: ["表 2  三种救法各买回多少（每步出错 5%、走 20 步）", "Table 2  What each remedy buys (5% per step, 20 steps)"]
+    表头: ["救法", "设置", "做成的概率", "比什么都不做多几个点"]
+    表头英文: ["remedy", "setting", "success probability", "gain over doing nothing"]
+    行: [["什么都不做", "—", "", "—"], ["整件事重试", "2 次", "", ""], ["整件事重试", "4 次", "", ""], ["每步自检", "查出率 0.5", "", ""], ["每步自检", "查出率 0.8", "", ""], ["每步自检", "查出率 0.95", "", ""], ["末端校验", "0.95 / 0.05", "", ""], ["末端校验", "0.95 / 0.90", "", ""]]
+注意:
+  - ["本实验按解析式算，不做采样，所以读数没有随机抖动。真实智能体的每步出错率不是常数（难的步骤更容易错），也不是相互独立的（一步错了后面更容易接着错），所以这里给的是**乐观**的估计。", "This lab evaluates closed-form expressions, so the readouts have no sampling noise. In a real agent the per-step error is neither constant nor independent across steps, so these numbers are the optimistic case."]
+  - ["“整件事重试”有两个前提：失败要看得出来，而且重做一遍是可以的。改了数据库、发了邮件这类动作不满足第二条——所以它在真实系统里远不如看上去好用。", "Retrying the whole task assumes two things: failures are visible, and the work can simply be done again. Actions that changed a database or sent an email break the second assumption."]
+  - ["没有任何论文给出过“逐步成功率曲线”，所以本书只把 (1−p)ⁿ 当数学恒等式用，不挂任何引文。相近的两个公开量（τ-bench 的 pass^k、METR 的时间视界）口径都不是“步数”，见 17.3、17.6 节。", "No paper gives a per-step success curve, so this book treats (1-p)^n purely as an identity, with no citation attached. The two closest published quantities are measured against repeated trials and task length, not steps."]
+思考题:
+  - ["把每步出错率从 5% 降到 2.5%（减一半），与“整件事重试两次”相比，哪一个买回来的多？在什么步数上两者打平？这件事对“该把力气花在哪”有什么提示？", "Compare halving the per-step error with retrying the whole task twice. Which buys more, and at what number of steps do they tie? What does that say about where to spend effort?"]
+  - ["每步自检本身也要调一次模型。把“调用次数”算进来重做表 2：每步自检的真实代价是多少倍？在什么情况下它仍然划算？", "A per-step check costs an extra model call. Redo Table 2 counting calls: how much more expensive is per-step checking, and when is it still worth it?"]

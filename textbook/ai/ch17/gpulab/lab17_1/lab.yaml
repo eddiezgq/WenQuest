@@ -1,0 +1,47 @@
+标题: ["GPU 实验 17.1 pass@1 与 pass@10：温度该调多少", "GPU Lab 17.1 pass@1 versus pass@10: where to set the temperature"]
+目的: ["在一个公开权重的小代码模型上把 17.1 节那两条曲线真的测出来：自写一组编程题，扫采样温度，算 pass@1 与 pass@10，看两条曲线的最优温度分别落在哪。顺带把“执行模型生成的代码”这件事按 17.6 节的规矩做一遍：子进程、超时、无网络。",
+       "Measure the two curves of Section 17.1 on a real open-weights code model: write your own set of programming problems, sweep the sampling temperature, compute pass@1 and pass@10, and find where each one peaks. Along the way, run the generated code the way Section 17.6 says to: a separate process, a timeout, and no network."]
+显卡: basic
+结果:
+  - {名: best_t_pass1, 说明: ["pass@1 最高的那个温度", "temperature with the best pass@1"], 单位: "—"}
+  - {名: best_t_pass10, 说明: ["pass@10 最高的那个温度", "temperature with the best pass@10"], 单位: "—"}
+  - {名: pass1_best, 说明: ["pass@1 的最高值", "best pass@1"], 单位: "%"}
+  - {名: pass10_best, 说明: ["pass@10 的最高值", "best pass@10"], 单位: "%"}
+  - {名: pass1_at_hot, 说明: ["高温那一档的 pass@1", "pass@1 at the hottest setting"], 单位: "%"}
+  - {名: n_problems, 说明: ["自写了多少道题", "number of problems written"], 单位: "道"}
+  - {名: n_samples, 说明: ["每道题采了多少个样本", "samples per problem"], 单位: "个"}
+  - {名: timeouts, 说明: ["执行时超时的样本数", "samples that timed out"], 单位: "个"}
+  - {名: crashes, 说明: ["执行时直接报错的样本数", "samples that raised"], 单位: "个"}
+  - {名: sec_per_sample, 说明: ["生成一个样本要多久", "seconds per generated sample"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["温度该调多少", "Where to set the temperature"]
+  内容: ["要把代码模型接进工具链，第一件要定的事就是采样温度。调低了每次都给同一个答案，错了也只能一直错；调高了单次命中率掉下来，可多采几个总有一个对。到底该调多少，取决于你打算采几次——而这件事是能测出来的。",
+         "The first setting to fix when wiring a code model into a toolchain is the sampling temperature. Low means the same answer every time, wrong ones included; high means a lower single-shot hit rate but a better chance that one of several samples works. Which is right depends on how many samples you intend to draw, and that can be measured."]
+原理:
+  - ["pass@k 的无偏估计量：一道题采 n 个样本、c 个通过，这道题的 pass@k 是 1 − C(n−c,k)/C(n,k)。用经验 pass@1 去算 1 − (1−p̂)^k 是有偏的（17.1 节，Chen 等 2021）。", "The unbiased estimator: with c of n samples passing, a problem's pass@k is 1 - C(n-c,k)/C(n,k). Using the empirical pass@1 in 1 - (1-p)^k is biased (Section 17.1, Chen et al. 2021)."]
+  - ["温度越高，采样分布越平，单次采对的概率越低，但 k 次里“有一个对”的概率可能更高。所以 pass@1 与 pass@k 的最优温度不是同一个——Codex 论文给的那一组是 pass@1 用 0.2、pass@100 用 0.8。", "A higher temperature flattens the sampling distribution: each sample is less likely to be right, but the chance that one of k is right can go up. So pass@1 and pass@k peak at different temperatures; the Codex paper reports 0.2 and 0.8."]
+  - ["题目要自己写。公开基准很可能已经进过训练数据（17.1 节给了重叠率的原始数字），用它测出来的分数会虚高。自写的题目数量少、噪声大，但口径是干净的。", "Write your own problems. Public benchmarks have very likely been seen in training (Section 17.1 gives the measured overlap rates), so scores on them run high. Your own set is small and noisy but has a clean provenance."]
+  - ["执行模型生成的代码**本身就是安全风险**（Codex 论文第 2.3 节的原话）。本实验按最小的一套来：单独的子进程、硬超时、不给网络。", "Executing generated code is itself a security risk, as the Codex paper states. This lab uses the minimum: a separate process, a hard timeout and no network."]
+步骤:
+  - ["运行第 1 节，装环境、确认显卡、下载模型（任务 1）。", "Run section 1 to set up, check the GPU and download the model (task 1)."]
+  - ["读第 2 节的题目与执行器：题目是自己写的，执行在子进程里带超时（任务 2）。按自己的方向再加两道题。", "Read the problems and the runner in section 2 — the problems are hand-written and execution is in a subprocess with a timeout (task 2). Add two problems of your own."]
+  - ["运行第 3 节，扫温度采样，记下每一档的 pass@1 与 pass@10（任务 3），填表 1。", "Run section 3 to sweep the temperature, recording pass@1 and pass@10 at each setting (task 3) in Table 1."]
+  - ["运行第 4 节，看超时与报错的样本数、生成速度，并把“用 1−(1−p̂)^k 算”与无偏估计量对照（任务 4），填表 2。", "Run section 4 for the timeout and crash counts, the generation speed, and the comparison between the biased formula and the unbiased estimator (task 4) in Table 2."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  温度扫描", "Table 1  Temperature sweep"]
+    表头: ["温度", "pass@1（%）", "pass@10（%）", "两者之差", "超时样本数"]
+    表头英文: ["temperature", "pass@1 (%)", "pass@10 (%)", "gap", "timeouts"]
+    行: [["0.0", "", "", "", ""], ["0.2", "", "", "", ""], ["0.4", "", "", "", ""], ["0.6", "", "", "", ""], ["0.8", "", "", "", ""], ["1.0", "", "", "", ""]]
+  - 标题: ["表 2  估计量与执行", "Table 2  Estimator and execution"]
+    表头: ["项目", "数值", "说明"]
+    表头英文: ["item", "value", "note"]
+    行: [["pass@10（无偏估计量）", "", ""], ["pass@10（用 1−(1−p̂)^10 算）", "", "差几个点"], ["超时的样本数", "", ""], ["直接报错的样本数", "", ""], ["生成一个样本要多久", "", ""]]
+注意:
+  - ["自写的题目只有十几道，所以每一档的 pass@k 都带着不小的随机误差。把同一档跑两次，看看两次差多少，再决定表里的差值能不能当真。", "With only a dozen hand-written problems the error bars are wide. Run one setting twice and compare before taking any difference in the table seriously."]
+  - ["本实验测出来的绝对值不能与任何论文里的 HumanEval 分数比：题目不同、模型不同、提示不同。能比的是**两条曲线的形状**。", "The absolute numbers here cannot be compared with any published HumanEval score: different problems, model and prompt. What transfers is the shape of the two curves."]
+  - ["生成的代码一律在子进程里跑、带超时。不要为了省事直接 exec——这一条不是客套话，17.6 节有专门的讨论。", "Always run generated code in a subprocess with a timeout. Do not exec it inline for convenience; Section 17.6 explains why."]
+思考题:
+  - ["如果你的工具链每道题只采一次，温度该定在哪？如果采十次再挑一个能过测试的，又该定在哪？用表 1 的数回答，并说明“能不能跑测试”为什么会改变这个选择。", "If your toolchain draws one sample per problem, where should the temperature sit? And if it draws ten and keeps one that passes the tests? Answer from Table 1, and explain why being able to run tests changes the choice."]
+  - ["把你自己加的两道题拿掉再算一遍 pass@1，变化有多大？由此说明“自写十几道题”这种评测的误差有多大，以及该怎样报这种结果。", "Recompute pass@1 without the two problems you added. How much does it move, and what does that say about reporting results from a dozen hand-written problems?"]
