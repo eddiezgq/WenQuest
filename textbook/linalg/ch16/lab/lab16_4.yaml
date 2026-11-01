@@ -1,0 +1,20 @@
+# 实验 16.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_4.js。
+原理:
+  - ["腿的竖直振动满足 Mq̈ + Cq̇ + Kq = 0。不计阻尼时，Kv = ω²Mv 的三个解给出固有频率与振型，振型关于 M 正交，模态坐标把方程解耦成三个独立的单自由度振子。", "The leg's vertical motion obeys Mq̈ + Cq̇ + Kq = 0. Without damping the three solutions of Kv = ω²Mv give natural frequencies and mode shapes; the modes are M-orthogonal and modal coordinates decouple the equations into three independent oscillators."]
+  - 式: "q = Σ φⱼηⱼ，φᵢᵀMφⱼ = δᵢⱼ，φᵢᵀKφⱼ = ωⱼ²δᵢⱼ；  ζⱼ ≈ φⱼᵀCφⱼ / (2ωⱼ)；  有阻尼的特征值 −ζω ± iω√(1 − ζ²)"
+  - ["初始状态按某一个振型摆放时，运动只含这个振型的频率；一般的初始状态（如落地）是各振型的叠加，各分量按 φⱼᵀMq̇₀ 分配。", "If the initial state is one mode shape only that mode's frequency appears; a general start (such as a landing) is a sum of modes weighted by φⱼᵀMq̇₀."]
+步骤:
+  - ["默认参数下依次点“激发振型 1”“激发振型 2”“激发振型 3”，记录三个固有频率、振型和模态阻尼比，填入表 1。", "With default values press Excite mode 1, 2, 3 in turn and record the frequencies, shapes and modal damping ratios in Table 1."]
+  - ["把 k₃ 从 20000 改到 10000 和 40000，重复步骤 1，看哪个频率变化最大。", "Change k₃ from 20000 to 10000 and 40000, repeat step 1 and note which frequency changes most."]
+  - ["完成任务 1～4。", "Complete tasks 1–4."]
+数据表:
+  - 标题: ["表 1  Go2 腿部的模态（k₁ = 3000、k₂ = 2000 N/m）", "Table 1  Modes of a Go2 leg (k₁ = 3000, k₂ = 2000 N/m)"]
+    表头: ["k₃ / N·m⁻¹", "f₁, f₂, f₃ / Hz", "振型 1", "振型 2", "振型 3", "ζ₁, ζ₂, ζ₃"]
+    表头英文: ["k₃ / N·m⁻¹", "f₁, f₂, f₃ / Hz", "Mode 1", "Mode 2", "Mode 3", "ζ₁, ζ₂, ζ₃"]
+    行: [["10000", "", "", "", "", ""], ["20000", "", "", "", "", ""], ["40000", "", "", "", "", ""]]
+注意:
+  - ["“落地”时弹簧尚未受力，所以相对静平衡位置有一个向上的初位移 K⁻¹Mg，最大下沉量从静平衡位置量起。", "At touchdown the springs are unloaded, so relative to static equilibrium there is an upward initial offset K⁻¹Mg; the largest sink is measured from equilibrium."]
+  - ["质量取自 Go2 的 MuJoCo 模型；刚度和阻尼是示意值，用来说明方法，不是 Go2 的实测参数。", "Masses come from the Go2 MuJoCo model; stiffness and damping are illustrative values, not measured Go2 parameters."]
+  - ["阻尼不与 M、K 成比例时，振型不能严格解耦阻尼，读数中的模态阻尼比是近似值；阻尼比超过 1 表示该模态不再振荡。", "When damping is not proportional to M and K the modes do not decouple it exactly; the displayed modal damping ratios are approximations, and values above 1 mean that mode no longer oscillates."]
+思考题:
+  - ["加大膝关节阻尼 c₂ 能显著提高第 1 模态的阻尼比。如果改为加大髋–大腿阻尼 c₁（实验中固定为 30 N·s/m），效果会小得多。用第 1 振型中各弹簧两端的相对位移解释。", "Raising the knee damping c₂ greatly increases the first modal damping ratio; raising the hip–thigh damping c₁ (fixed at 30 N·s/m here) would do much less. Explain with the relative motion across each spring in mode 1."]

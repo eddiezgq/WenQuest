@@ -1,0 +1,20 @@
+# 实验 16.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_3.js。
+原理:
+  - ["关节在 PD 控制下满足 θ̈ + K_dθ̇ + (K_p − a)θ = 0（惯量归一化为 1；关节 a = 0，倒立摆 a = 3g/(2l) = 29.43 s⁻²）。取状态 x = (θ, ω)，x' = Ax，解为 x(t) = e^{At}x₀。", "Under PD control the joint obeys θ̈ + K_dθ̇ + (K_p − a)θ = 0 (unit inertia; a = 0 for the joint, a = 3g/(2l) = 29.43 s⁻² for the inverted pendulum). With x = (θ, ω), x' = Ax and x(t) = e^{At}x₀."]
+  - 式: "A = [[0, 1], [a − K_p, −K_d]]；  tr A = −K_d，det A = K_p − a；  稳定 ⇔ tr A < 0 且 det A > 0；  ζ = K_d / (2√(K_p − a))"
+  - ["特征值的实部决定收敛还是发散，虚部决定振荡的快慢：复特征值是焦点，实特征值是结点，一正一负是鞍点，纯虚数是中心。", "The real parts of the eigenvalues decide convergence and the imaginary parts the oscillation rate: complex gives a focus, real gives a node, opposite signs a saddle, purely imaginary a center."]
+步骤:
+  - ["关节场景，K_p = 100，K_d 依次取 0、4、10、14、20、30，记录特征值、相图类型、阻尼比、超调量，填入表 1。", "Joint scene, K_p = 100; set K_d to 0, 4, 10, 14, 20, 30 and record the eigenvalues, portrait type, damping ratio and overshoot in Table 1."]
+  - ["倒立摆场景，K_d = 4，K_p 依次取 10、29、30、60，观察相图类型的变化。", "Inverted pendulum, K_d = 4; set K_p to 10, 29, 30, 60 and watch the portrait type change."]
+  - ["完成任务 1～5。", "Complete tasks 1–5."]
+数据表:
+  - 标题: ["表 1  微分增益与关节的响应（K_p = 100 s⁻²）", "Table 1  Derivative gain and joint response (K_p = 100 s⁻²)"]
+    表头: ["K_d / s⁻¹", "特征值", "相图类型", "阻尼比 ζ", "超调量 / %", "衰减时间 / s"]
+    表头英文: ["K_d / s⁻¹", "Eigenvalues", "Portrait type", "Damping ratio ζ", "Overshoot / %", "Settling time / s"]
+    行: [["0", "", "", "", "", ""], ["4", "", "", "", "", ""], ["10", "", "", "", "", ""], ["14", "", "", "", "", ""], ["20", "", "", "", "", ""], ["30", "", "", "", "", ""]]
+注意:
+  - ["相平面的纵轴 ω 按 K_p 自动缩放，不同增益下纵轴的刻度不同。", "The ω axis of the phase plane rescales with K_p, so its scale differs between gains."]
+  - ["实验中的 K_p、K_d 已除以转动惯量 J（单位 s⁻²、s⁻¹）；16.3.5 节正文的 K_p 以 N·m/rad 计，两者相差 J = 0.0833 kg·m²，所以正文的临界值 2.45 N·m/rad 对应这里的 29.43 s⁻²。", "In the lab K_p and K_d are divided by the inertia J (units s⁻², s⁻¹); Section 16.3.5 uses N·m/rad, so its threshold 2.45 N·m/rad corresponds to 29.43 s⁻² here."]
+  - ["这里的系统是线性化后的模型；倒立摆偏离竖直太多时，线性模型不再准确。", "The model is linearized; for large deviations of the inverted pendulum it is no longer accurate."]
+思考题:
+  - ["阻尼比从 0.7 增大到 2，超调没有了，衰减时间却变长了。用两个实特征值中较慢的那个解释。", "Raising ζ from 0.7 to 2 removes the overshoot but lengthens the settling time. Explain with the slower of the two real eigenvalues."]
