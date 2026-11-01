@@ -1,0 +1,32 @@
+# 实验 11.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab11_3.js。
+原理:
+  - ["气垫导轨上滑块所受的摩擦可以忽略，两个滑块组成的系统水平方向不受外力，碰撞前后总动量不变：m₁v₁ + m₂v₂ = m₁v₁′ + m₂v₂′。",
+     "On an air track friction is negligible; the two gliders feel no horizontal external force, so their total momentum is the same before and after: m₁v₁ + m₂v₂ = m₁v₁′ + m₂v₂′."]
+  - ["恢复系数 e 是碰后分离的相对速度与碰前接近的相对速度之比。e = 1 为弹性碰撞，0 < e < 1 为非弹性碰撞，e = 0 为完全非弹性碰撞（碰后一起运动）。",
+     "The coefficient of restitution e is the ratio of the separation speed after to the approach speed before. e = 1 is elastic, 0 < e < 1 inelastic, e = 0 perfectly inelastic (moving together afterwards)."]
+  - 式: "e = (v₂′ − v₁′)/(v₁ − v₂)        (11.3.1)"
+  - ["完全非弹性碰撞中，物体 2 原来静止时，损失的动能占碰前动能的比例为 m₂/(m₁ + m₂)。",
+     "In a perfectly inelastic collision with body 2 initially at rest, the fraction of kinetic energy lost is m₂/(m₁ + m₂)."]
+  - 式: "ΔE_k/E_k = m₂/(m₁ + m₂)        (11.3.3)"
+  - ["光电门测速：v = d/Δt，挡光片宽 d = 50.0 mm。滑块 1 碰后若反弹，会反向再次通过光电门 A；若继续向前，会在滑块 2 之后通过光电门 B。",
+     "Gate timing: v = d/Δt with a 50.0 mm flag. If glider 1 rebounds it passes gate A again going back; if it keeps going it passes gate B after glider 2."]
+步骤:
+  - ["选“气垫导轨”，缓冲用弹簧片，m₁ = m₂ = 0.20 kg，点“开始”，读各光电门的读数，求碰前、碰后的速度和总动量，填入表 1。",
+     "Choose “Air track”, spring bumper, m₁ = m₂ = 0.20 kg; press “Start”, read the gates, work out the velocities and total momentum before and after, in Table 1."]
+  - ["改用橡皮圈，取两组不同的质量各做一次，求恢复系数 e，调到“你测得的结果”（读数会保留），提交（任务 1）。",
+     "Switch to the rubber band, do two different mass pairs, find e, set it as “Your result” (the readings stay) and submit (task 1)."]
+  - ["改用魔术贴，m₁ = 0.20 kg、m₂ = 0.30 kg，求碰撞中损失的动能占碰前动能的比例，调到“你测得的结果”，提交（任务 2），再与式 (11.3.3) 比较。",
+     "Switch to Velcro, m₁ = 0.20 kg and m₂ = 0.30 kg; find the fraction of kinetic energy lost, submit (task 2) and compare with Eq. (11.3.3)."]
+  - ["选“追尾事故”，点“开始”，读出两车一起滑行的距离 s，由 v′ = √(2μgs) 和动量守恒求 A 车碰前的速度，提交（任务 3）。",
+     "Choose “Rear-end crash”, press “Start”, read the joint skid s; with v′ = √(2μgs) and momentum conservation find car A's speed before impact, and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  碰撞前后的速度与动量", "Table 1  Velocities and momentum before and after"]
+    表头: ["缓冲", "m₁ / kg", "m₂ / kg", "v₁ / (m/s)", "v₁′ / (m/s)", "v₂′ / (m/s)", "碰前总动量 / (kg·m/s)", "碰后总动量 / (kg·m/s)", "e"]
+    表头英文: ["Bumper", "m₁ / kg", "m₂ / kg", "v₁ / (m/s)", "v₁′ / (m/s)", "v₂′ / (m/s)", "Momentum before / (kg·m/s)", "Momentum after / (kg·m/s)", "e"]
+    行: [["弹簧片", "0.20", "0.20", "", "", "", "", "", ""], ["橡皮圈", "", "", "", "", "", "", "", ""], ["橡皮圈", "", "", "", "", "", "", "", ""], ["魔术贴", "0.20", "0.30", "", "", "", "", "", ""]]
+注意:
+  - ["三种缓冲的恢复系数不显示，要靠测量求出。读数带有 ±0.05 ms 以内的误差。", "The bumpers' coefficients are not shown; you measure them. The readings carry errors up to ±0.05 ms."]
+  - ["速度有方向：反弹的速度取负值。", "Velocities have signs: a rebound is negative."]
+思考题:
+  - ["碰前、碰后的总动量差多少？误差主要来自哪里？", "How far apart are the momenta before and after? Where does the error mainly come from?"]
+  - ["用弹簧片时，m₂ 比 m₁ 大得多，滑块 1 会怎样？m₂ 比 m₁ 小得多呢？用质心系解释（11.5 节）。", "With the spring and m₂ much larger than m₁, what does glider 1 do? And with m₂ much smaller? Explain with the centre-of-mass frame (Section 11.5)."]

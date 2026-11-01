@@ -1,0 +1,33 @@
+# 实验 11.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab11_1.js。
+原理:
+  - ["动量定理：合力的冲量等于动量的变化。落地时机器人受地面力 F（向上）和重力 mg（向下）。从落地（速度 v₀ 向下）到身体停止下降（速度为零），取向上为正：∫F dt − mgΔt = 0 − (−mv₀) = mv₀。",
+     "Impulse–momentum theorem: the impulse of the net force equals the change of momentum. On landing the robot feels the ground force F (up) and its weight mg (down). From touchdown (speed v₀ downward) until the body stops sinking, taking up as positive: ∫F dt − mgΔt = 0 − (−mv₀) = mv₀."]
+  - 式: "∫F dt = mv₀ + mgΔt        （由式 (11.1.3)，计入重力）"
+  - ["动量的变化一定时，力作用的时间越长，平均力越小。腿越软，停下所用的时间越长，地面力的峰值越小；但身体下沉越多，超过腿的行程就会“到底”，这时力反而急剧增大。",
+     "For a given change of momentum, the longer the force acts, the smaller its average. Softer legs take longer to stop the body and lower the peak force, but the body sinks further; beyond the leg's travel it bottoms out and the force shoots up."]
+  - ["腿的模型：控制器让腿表现为弹簧—阻尼器，F = kx + cẋ，c = 2ζ√(km)，阻尼比 ζ = 0.3。人跳下的估算：设下蹲距离 d 内地面力不变，由动能定理 (F − mg)d = mgh，F/mg = 1 + h/d。",
+     "Leg model: the controller makes each leg a spring–damper, F = kx + cẋ with c = 2ζ√(km) and damping ratio ζ = 0.3. For a person jumping down, take the ground force constant over the crouch d; the work–energy theorem gives (F − mg)d = mgh, so F/mg = 1 + h/d."]
+步骤:
+  - ["选“腿的软硬”，h = 0.30 m，k 从 20000 N/m 起，每次减小一些，点“开始”，记下地面力峰值（以体重计）和身体最大下降量，填入表 1。",
+     "Choose “Leg stiffness”, h = 0.30 m, start at k = 20000 N/m and lower it step by step; press “Start” each time and record the peak force (in body weights) and the largest body drop in Table 1."]
+  - ["找出峰值不超过 4.5 倍体重、下降量不超过 120 mm 的 k，运行后提交（任务 1）。再把 h 改为 0.40 m，同样的 k 还行吗？",
+     "Find a k with peak at most 4.5 body weights and drop at most 120 mm; run it and submit (task 1). Change h to 0.40 m: does the same k still work?"]
+  - ["选“测力台”，点“开始”，读冲量和时间，填入表 2。由式 (11.1.3)（计入重力）求 v₀，调到“你算的落地速度”（读数会保留），提交（任务 2）。再按 0.25 m 高度算 √(2gh)，与 v₀ 比较，求出起跳时向上的速度。",
+     "Choose “Force plate”, press “Start”, read the impulse and time into Table 2. Find v₀ with Eq. (11.1.3), set “Your landing speed” (the readings stay) and submit (task 2). Compare with √(2gh) for 0.25 m and deduce the upward take-off speed."]
+  - ["选“人跳下”，先由 F/mg = 1 + h/d 算出所需的最小 d，再调好运行、提交（任务 3）。",
+     "Choose “A person jumping down”; compute the smallest d from F/mg = 1 + h/d, set it, run and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  腿的刚度与落地冲击（h = 0.30 m）", "Table 1  Leg stiffness and landing impact (h = 0.30 m)"]
+    表头: ["k / (N/m)", "地面力峰值 / 体重", "最大下降量 / mm", "是否到底"]
+    表头英文: ["k / (N/m)", "Peak force / body weight", "Largest drop / mm", "Bottomed out?"]
+    行: [["20000", "", "", ""], ["10000", "", "", ""], ["6000", "", "", ""], ["5000", "", "", ""], ["4000", "", "", ""], ["3000", "", "", ""]]
+  - 标题: ["表 2  测力台", "Table 2  Force plate"]
+    表头: ["∫F dt / (N·s)", "Δt / ms", "mgΔt / (N·s)", "v₀ / (m/s)", "√(2gh) / (m/s)", "起跳时向上的速度 / (m/s)"]
+    表头英文: ["∫F dt / (N·s)", "Δt / ms", "mgΔt / (N·s)", "v₀ / (m/s)", "√(2gh) / (m/s)", "Upward take-off speed / (m/s)"]
+    行: [["", "", "", "", "", ""]]
+注意:
+  - ["机器人质量按 15 kg 计，g 取 9.81 m/s²。", "Take the robot as 15 kg and g = 9.81 m/s²."]
+  - ["画面中红线是地面力（以体重计），蓝线是身体下降量（以 20 mm 为 1 格）；两条水平虚线分别是 4.5 倍体重和 120 mm 的行程。", "In the plot, red is the ground force (in body weights) and blue the body drop (one unit = 20 mm); the dashed lines mark 4.5 body weights and the 120 mm travel."]
+思考题:
+  - ["测力台的冲量为什么比 mv₀ 大？多出来的 mgΔt 是什么意思？如果只看曲线的峰值，能求出 v₀ 吗？", "Why is the plate's impulse larger than mv₀? What does the extra mgΔt mean? Could you get v₀ from the peak alone?"]
+  - ["阻尼比从 0.3 加大到 0.7，峰值力和下降量各怎样变？为什么？", "Raising the damping ratio from 0.3 to 0.7, how do the peak force and the drop change, and why?"]
