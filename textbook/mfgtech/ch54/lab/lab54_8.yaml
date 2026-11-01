@@ -1,0 +1,20 @@
+# 实验 54.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab54_8.js。
+原理:
+  - ["不同的误差来源在零件上留下不同的“指纹”：沿轴向的形状（锥度、鼓形、鞍形）、截面的形状（椭圆、棱圆）、逐件序列的形态（漂移、锯齿、预热段、跳变、分散变大），以及哪个特性变、哪个不变。先找形态，再列出能产生这种形态的原因，用别的数据排除，最后选措施。", "Each source of error leaves its own fingerprint: the shape along the axis (taper, barrel, saddle), of the section (oval, lobes), the pattern part by part (drift, saw, warm-up, jump, wider spread), and which characteristics change and which do not. Find the pattern first, list the causes that can produce it, rule some out with other data, then choose the action."]
+  - ["两个轴承位相减，砂轮磨损、热变形这类“两处一起变”的误差就消掉了，剩下的是两处变得不一样的部分（锥度：离头架越远变得越多）。", "Subtracting one bearing seat from the other cancels errors that move both together (wear, thermal growth); what remains is the part that differs between them (taper: more change farther from the headstock)."]
+步骤:
+  - ["每个批次先逐项看 5 个特性（参数“看哪个特性”0–4），记下哪个特性变了、从第几件开始、是什么形态，填表 1。", "For each batch, go through the five characteristics (0–4); record which changed, from which part and how (Table 1)."]
+  - ["列出可能的原因，用其他特性排除，选措施；系统判断是否对症（任务 1–4）。", "List possible causes, rule out with other characteristics, choose an action; the system judges (tasks 1–4)."]
+  - ["对每个批次写一句诊断：“××特性从第×件起××，××特性不变，所以是××。”", "Write one sentence per batch: 'X changed from part n in this way, Y did not, so the cause is Z.'"]
+数据表:
+  - 标题: ["表 1  诊断记录", "Table 1  Diagnosis record"]
+    表头: ["批次", "变化的特性", "从第几件起", "形态", "不变的特性", "原因", "措施编号"]
+    表头英文: ["Batch", "Changed", "From part", "Pattern", "Unchanged", "Cause", "Action no."]
+    行: [["A", "", "", "", "", "", ""], ["B", "", "", "", "", "", ""], ["C", "", "", "", "", "", ""], ["D", "", "", "", "", "", ""]]
+    行英文: [["A", "", "", "", "", "", ""], ["B", "", "", "", "", "", ""], ["C", "", "", "", "", "", ""], ["D", "", "", "", "", "", ""]]
+注意:
+  - ["数据按仿真车间的误差模型生成，四个问题与数字工厂里老师能注入的问题情景相同；工程任务单 TS-54-1 要在数字工厂里用真实的（仿真车间的）数据再做一次。", "The data follow the simulated shop's error model; the four problems are the scenarios a teacher can inject in the digital factory. Task sheet TS-54-1 repeats this with the shop's data."]
+  - ["工件形状只放大了“后 20 件比前 20 件”的变化，所以只有沿轴向的形状变化看得出来；逐件的变化要看数据板。", "The shape only magnifies the change from parts 1–20 to 21–40, so only changes along the axis show; part-by-part changes are on the data board."]
+思考题:
+  - ["批次 B 与正常状态都是锯齿，靠什么区分？", "Batch B and the normal process both show a saw: how do you tell them apart?"]
+  - ["如果两个问题同时存在（如尾座偏移和砂轮磨损加快），诊断时先看哪个特性？", "If two problems occur together (tailstock offset and faster wheel wear), which characteristic do you look at first?"]

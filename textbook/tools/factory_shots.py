@@ -233,11 +233,11 @@ def seed54(teacher, student):
     q = call("POST", "/api/quality/8d", {"item": "SH-301", "characteristic": "bearing_seat_d35_r", "title": title}, token=student)
     sec = {
         "d1": "工艺员学生甲（组长）、质检员、磨工、设备员；老师审批",
-        "d2": ("第 31 件起，右轴承位均值比前 30 件大 {:.4f} mm，左轴承位只变 {:+.4f} mm，圆跳动不变；之后 {} 件里右轴承位超差 {} 件，"
-               "全在上限一侧。都在磨床 GRD-01 工序 60 上。").format(dr, dl, n2, fails),
+        "d2": ("第 31 件起，右轴承位均值比前 30 件大 {:.4f} mm，左轴承位大 {:.4f} mm，离头架越远变得越多；右减左从这一件起跳变，"
+               "圆跳动不变；之后 {} 件里右轴承位超差 {} 件，全在上限一侧。都在磨床 GRD-01 工序 60 上。").format(dr, dl, n2, fails),
         "d3": "工序 60 之后对右轴承位 100% 检验；已磨的 " + str(n2) + " 件隔离，超差件开不合格品单返修评审。",
-        "d4": ("左轴承位不变、右轴承位变大，两处直径差是锥度（右端大），不是逐件漂移，也不是分散变大：砂轮磨损、未预热会让两处一起变；"
-               "中心孔不好会让跳动变大。锥度来自两顶尖连线与工作台运动方向不平行——尾座偏移。估算偏移 Δ ≈ 直径差 × L ÷ (2 × 两轴承位距离)。"),
+        "d4": ("两处都变大，但变化与到头架的距离成正比（右减左跳变），是锥度（尾座端大），不是逐件漂移，也不是分散变大：砂轮磨损、未预热"
+               "会让两处一样变；中心孔不好会让跳动变大。锥度来自两顶尖连线与工作台运动方向不平行——尾座偏移。估算偏移 e ≈ 直径差 × L ÷ (2 × 两轴承位距离)。"),
         "d5": "选“校正磨床尾座”：用标准检验棒和千分表把两顶尖连线调到与工作台运动方向平行，能消除锥度的根本原因。",
         "d7": "工序 60 的首件检验加测左右两个轴承位的直径差（≤ 0.004 mm）；设备点检表加“检验棒校尾座”，每班开机检一次。",
         "d8": "数据的形态（哪处变、怎么变）指向原因：只看超差件会以为是砂轮磨损。",
@@ -272,6 +272,8 @@ def shots_list(d):
         ("shot52_2", 52, "teacher", f"/tasks/review/{d['review52']}", None, "任务单 TS-52-1 的老师审阅页：交付物、AI 评审员的意见、评分"),
         ("shot53_1", 53, "student", f"/process/{s['chart']}", None, d["notes"]["chart"]),
         ("shot53_2", 53, "student", f"/tasks/{t[53]}", "precheck_task", "任务单 TS-53-1 的学生页：选定工艺规程提交，AI 预检"),
+        ("shot54_0", 54, "student", "/work/quality", "clip",
+         "质量页：左轴承位的单值控制图（砂轮每 10 件修整一次的锯齿），右栏是不合格品单和质量异常单"),
         ("shot54_1", 54, "student", "/work/quality", "select_r",
          "质量页：右轴承位的单值控制图（老师注入“尾座偏移”以后偏大），右栏自动开的不合格品单和学生开的 8D"),
         ("shot54_2", 54, "teacher", f"/quality/8d/{d['q8d']}", None, "学生填好 D1–D5、提交纠正措施，老师审批前的 8D 页"),
@@ -317,7 +319,7 @@ def take(book, d, only=None):
             x0 = min(b["x"] for b in boxes) - 8
             clip = {"x": x0, "y": top["y"] - 8, "width": max(b["x"] + b["width"] for b in boxes) + 8 - x0,
                     "height": max(b["y"] + b["height"] for b in boxes) + 8 - top["y"] + 8}
-            if act == "select_r":           # 质量页只截控制图、前几行测量值和右栏的不合格品、8D
+            if act in ("select_r", "clip"):   # 质量页只截控制图、前几行测量值和右栏的不合格品、8D
                 clip["height"] = min(clip["height"], 760)
             pg.screenshot(path=str(out / f"{name}.png"), clip=clip, full_page=True)
             done.append({"名称": name, "章": ch, "账号": "教师" if who == "teacher" else "学生甲", "页面": path,

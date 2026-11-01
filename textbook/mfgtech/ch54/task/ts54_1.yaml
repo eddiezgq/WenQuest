@@ -1,0 +1,34 @@
+# 工程任务单 TS-54-1（配 54.1–54.9 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-54-1
+标题: [质量异常单与 8D：从仿真车间的数据找出加工问题, "Quality problem report and 8D: find the machining problem in the shop data"]
+角色: [质量工程师（质量异常处理）, quality engineer (problem solving)]
+背景:
+  - "数字工厂的仿真车间正在磨削 SH-301。老师在车间里注入了一个隐藏的加工问题（不告诉你是什么），从注入的那一件起，质量数据就变了，可能出现超差件，也可能只是 Cpk 下降。你作为质量工程师，要从质量页的数据里找出问题，开一张质量异常单（8D），找到根本原因、选对纠正措施，经老师批准在车间实施后，再用措施以后的数据证明问题已经消除，并修改工艺文件防止再发生。"
+  - "SH-301 is being ground in the digital factory's simulated shop. The teacher has injected a hidden machining problem (not disclosed); from that part on the quality data change — there may be rejects, or just a drop in Cpk. As the quality engineer, find the problem in the quality page's data, open a quality problem report (8D), find the root cause and the right corrective action, have the teacher approve it for the shop, then prove with the data after the action that the problem is gone, and change the process documents so it does not recur."
+输入:
+  - {名称: [数字工厂质量页与质量异常单（8D）页, "Quality page and the 8D page of the digital factory"], 来源: [数字工厂 → 质量；质量异常单, "Digital factory → Quality; 8D"]}
+  - {名称: [SH-301 工艺规程（工序 60 的精度预算、检验卡）, "SH-301 process plan (operation 60 accuracy budget, inspection card)"], 来源: [factory/digital/std/SH-301_process.yaml, factory/digital/std/SH-301_process.yaml]}
+  - {名称: [加工精度库与实验 54.3、54.7、54.8, "Accuracy library and Labs 54.3, 54.7, 54.8"], 来源: [factory/digital/hub/accuracy.py、hub/spc.py；本章, "factory/digital/hub/accuracy.py, hub/spc.py; this chapter"]}
+交付物:
+  - {名称: [质量异常单（8D 报告）, "Quality problem report (8D)"], 验收: [在数字工厂里填写并提交；D2 用数据描述现象（哪个特性、偏多少、从第几件起、哪台设备），D4 写出形态—原因的推理（为什么是它、为什么不是别的），D5 的措施经老师批准，D6 的验证结论为“措施有效”，D7 写明改了哪些工艺文件；导出或截图交上, "Filled in and submitted in the digital factory: D2 describes the problem with data (which characteristic, how much, from which part, which machine); D4 gives the reasoning from pattern to cause (why this one, why not the others); the D5 action approved by the teacher; D6 verified as effective; D7 lists the documents changed; export or screenshot it"]}
+  - {名称: [数据分析与诊断计算书（2–4 页）, "Data analysis and diagnosis (2–4 pages)"], 验收: [有各特性的逐件图（至少包括变化的特性和一个没变的特性）、控制图与判异结果、注入前后的均值、标准差、Cpk 对比；用本章的公式（如锥度—尾座偏移、预热的指数拟合、修整间隔）定量地说明原因, "Part-by-part plots (at least the changed characteristic and one that did not change), control chart and run rules, mean, standard deviation and Cpk before and after; a quantitative argument with this chapter's formulas (taper vs tailstock offset, warm-up fit, dressing interval)"]}
+  - {名称: [工艺规程修改与 AI 预检记录, Plan changes and pre-check record], 验收: [按 D7 修改 SH-301 工艺规程（如工序 60 的检验项目与频次、点检要求、修整间隔或精度预算），提交 AI 预检，没有“必须改”的意见；说明改动怎样防止问题再发生, "Change the SH-301 plan per D7 (e.g. operation 60's inspection items and frequency, checks, dressing interval or the accuracy budget), run the AI pre-check with no must-fix comments, and explain how the change prevents recurrence"], 类型: 工艺规程, 零件: SH-301}
+  - {名称: [一个“不对症”的对照, A wrong-action comparison], 验收: [写出一项看起来有道理但不对症的措施，说明如果用了它，数据会怎样、为什么, "Name a plausible but wrong action and explain what the data would do if it were applied, and why"]}
+工位: [QMS, PY]
+步骤:
+  - ["在质量页逐个看测量特性的控制图和测量值，找出变化的特性、开始的件号和形态；看一下没有变的特性。", "Go through every characteristic on the quality page; find what changed, from which part and how; note what did not change."]
+  - ["用实验 54.8 的思路列出可能的原因，用其他特性和本章的公式排除。", "List possible causes as in Lab 54.8 and rule them out with the other characteristics and this chapter's formulas."]
+  - ["在质量页为该特性开质量异常单，填 D1–D5，选纠正措施，提交老师批准。", "Open an 8D for that characteristic on the quality page, fill D1–D5, choose the action and submit it for approval."]
+  - ["措施实施后等车间再磨至少 10 件，点“用措施后的数据验证（D6）”；不有效就回到 D4。", "After the action, wait for at least 10 more parts and run the D6 verification; if not effective, go back to D4."]
+  - ["写 D7：修改工艺规程并 AI 预检；写 D8，关闭质量异常单。", "Write D7: change the plan and pre-check it; write D8 and close the 8D."]
+评审要点:
+  - ["〔数字工厂检查〕D6 验证：措施后至少 10 件、全部合格且 Cpk ≥ 1.33。", "[Factory] D6: at least 10 parts after the action, all good and Cpk ≥ 1.33."]
+  - ["〔AI 检查〕修改后的工艺规程没有“必须改”的意见。", "[AI] The changed plan has no must-fix comments."]
+  - ["〔老师检查〕D4 的推理：从形态到原因，排除了其他可能；措施对症。", "[Teacher] D4 reasoning goes from pattern to cause and rules out the others; the action fits."]
+  - ["〔老师检查〕D7 的改动能防止再发生，不只是“加强检验”。", "[Teacher] D7 prevents recurrence rather than just 'inspect more'."]
+评分:
+  - {项: [问题描述与数据分析, Description and analysis], 分: 30, 标准: [特性、件号、形态、注入前后的统计量都对, "Characteristic, part number, pattern and statistics correct"]}
+  - {项: [根本原因与措施, Root cause and action], 分: 30, 标准: [推理完整，措施对症，一次批准, "Complete reasoning, right action, approved first time"]}
+  - {项: [验证与防止再发生, Verification and prevention], 分: 25, 标准: [D6 有效，工艺规程修改合理、预检通过, "D6 effective; sound plan change; pre-check passes"]}
+  - {项: [不对症措施的对照, Wrong-action comparison], 分: 15, 标准: [说清数据会怎样、为什么, "Clear about what the data would do and why"]}
+学时: 4

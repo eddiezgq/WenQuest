@@ -1,0 +1,22 @@
+# 实验 54.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab54_3.js。
+原理:
+  - ["原始误差对工件的影响取决于它在误差敏感方向（加工表面的法向）上的分量。两顶尖装夹磨（车）外圆时，砂轮（刀具）在水平面内，水平方向的误差 1:1 地改变半径、2:1 地改变直径；垂直方向的误差只使直径变化约 δ²/R。", "An error matters by its component along the error-sensitive direction, the normal to the machined surface. Grinding (turning) between centres with the wheel (tool) in the horizontal plane, a horizontal error changes the radius one-for-one and the diameter two-for-one; a vertical error changes the diameter only by about δ²/R."]
+  - 式: "尾座偏移：Δd(z₂) − Δd(z₁) = 2e(z₂ − z₁)/L        (54.3.2)"
+  - 式: "导轨水平面直线度 Δy：Δd = 2Δy；垂直面 Δz：Δd ≈ Δz²/R        (54.3.1)"
+  - ["车削时切削力方向不变，工件的圆度误差反映主轴颈的形状；镗削时反映轴承孔的形状。", "In turning the force direction is fixed and the work's roundness reflects the journal; in boring it reflects the bearing bore."]
+步骤:
+  - ["每次只加一项误差（任务 1–4），记下工件形状、左右轴承位的直径误差、右减左和圆度，填表 1。", "Add one error at a time (tasks 1–4); record the shape, both seats' diameter errors, right − left and roundness in Table 1."]
+  - ["把任务 1 的“右减左”与式 (54.3.2) 的计算值、仿真车间的实测值（图 54.3.6）比较。", "Compare task 1's right − left with Eq. (54.3.2) and with the shop data (Fig. 54.3.6)."]
+  - ["做任务 5（两项误差同时存在），说明合成后的形状，判断两个轴承位能否用同一次调整都磨合格。", "Do task 5 (two errors at once); describe the combined shape and judge whether one setting can hold both seats."]
+数据表:
+  - 标题: ["表 1  机床几何误差与工件形状", "Table 1  Machine errors and the shape of the work"]
+    表头: ["误差", "量值 / µm", "形状", "左轴承位 / µm", "右轴承位 / µm", "右减左 / µm", "圆度 / µm"]
+    表头英文: ["Error", "Size / µm", "Shape", "Left seat / µm", "Right seat / µm", "Right − left / µm", "Roundness / µm"]
+    行: [["尾座偏移", "8", "", "", "", "", ""], ["导轨水平面", "10", "", "", "", "", ""], ["导轨垂直面", "10", "", "", "", "", ""], ["主轴颈椭圆", "3", "", "", "", "", ""], ["尾座 −6 + 水平面 4", "", "", "", "", "", ""]]
+    行英文: [["Tailstock offset", "8", "", "", "", "", ""], ["Horizontal bow", "10", "", "", "", "", ""], ["Vertical bow", "10", "", "", "", "", ""], ["Oval journal", "3", "", "", "", "", ""], ["Tailstock −6 + horizontal 4", "", "", "", "", "", ""]]
+注意:
+  - ["画面上的误差放大了几百倍（“显示放大倍数”），读数是真实值。模型是零件库的两顶尖 E-ACC-CENTERS，工件按误差模型实时生成。", "Errors are drawn hundreds of times larger (display magnification); the readings are true values. The centres are library model E-ACC-CENTERS; the work is generated from the error model."]
+  - ["两个轴承位若分别调整（数控磨床每个轴承位有自己的横进给目标值），常值的尾座偏移在首件调整时会被补偿掉，留下的只是每个轴承位长度内的锥度；问题在调整以后才出现时，左右轴承位就会差开（本章提要、54.8 节）。", "If each seat has its own infeed target, a constant tailstock offset is absorbed at the first-part setting and only the taper within each seat remains; when the problem appears after setting, the two seats drift apart (54.0, 54.8)."]
+思考题:
+  - ["为什么磨床、车床的导轨在水平面内的直线度要求比垂直面内高得多？平面磨床呢？", "Why do lathe and grinder guideways need much better straightness in the horizontal plane than in the vertical? What about a surface grinder?"]
+  - ["尾座偏移和“头架、尾座刚度不同”都会产生锥度。怎样用试验把两者区分开？", "Both a tailstock offset and unequal head/tail stiffness give a taper. How would you tell them apart by experiment?"]

@@ -1,6 +1,6 @@
 # 数字工厂界面截图清单（由 textbook/tools/factory_shots.py 生成，不要手改）
 日期: '2026-10-31'
-数字工厂版本: 7bbd8270
+数字工厂版本: 476e25aa
 截图:
 - 名称: shot50_1
   章: 50
@@ -11,50 +11,56 @@
 - 名称: shot50_2
   章: 50
   账号: 学生甲
-  页面: /process/544fd95078b7
+  页面: /process/0437bc71dbeb
   说明: 按参照工艺规程提交后，AI 工艺评审员的意见与建议分
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot50_3
   章: 50
   账号: 学生甲
-  页面: /tasks/7c1db4055490
+  页面: /tasks/e25b17ba5b05
   说明: 工程任务单 TS-50-1 在数字工厂的学生页：交付物、验收标准、进度
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot51_1
   章: 51
   账号: 学生甲
-  页面: /process/0154cb2730af
+  页面: /process/530e251aa0b7
   说明: 工序 50 的 locate_check 中 Td 由 0.039 改为 0.3（TS-51-1 的“故意改坏”）
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot51_2
   章: 51
   账号: 学生甲
-  页面: /tasks/01f19ae17db5
+  页面: /tasks/39f22355e17e
   说明: 任务单 TS-51-1 的学生页：选定自己的工艺规程提交，点“AI 预检”
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot52_1
   章: 52
   账号: 学生甲
-  页面: /process/dbd3f521e8d6
+  页面: /process/87e05ef0e772
   说明: 工序 50 写入夹具数据（同 JJ-301-50），hand_force 由 50 改为 10，即拧紧扭矩 1 N·m（TS-52-1 的“故意改坏”）
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot52_2
   章: 52
   账号: 教师
-  页面: /tasks/review/1263609038a6
+  页面: /tasks/review/bdf6fb7f233c
   说明: 任务单 TS-52-1 的老师审阅页：交付物、AI 评审员的意见、评分
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot53_1
   章: 53
   账号: 学生甲
-  页面: /process/588c84e014b7
+  页面: /process/d742cd3177ea
   说明: tolerance_chart 第 40.3 刀（工序 40 总长）的公差由 ±0.2 改为 ±0.3（TS-53-1 的“故意改坏”）
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot53_2
   章: 53
   账号: 学生甲
-  页面: /tasks/c2261c395360
+  页面: /tasks/7b9302c8915a
   说明: 任务单 TS-53-1 的学生页：选定工艺规程提交，AI 预检
+  数据: 测试数据（factory_shots.py 灌入，见程序说明）
+- 名称: shot54_0
+  章: 54
+  账号: 学生甲
+  页面: /work/quality
+  说明: 质量页：左轴承位的单值控制图（砂轮每 10 件修整一次的锯齿），右栏是不合格品单和质量异常单
   数据: 测试数据（factory_shots.py 灌入，见程序说明）
 - 名称: shot54_1
   章: 54

@@ -19,6 +19,7 @@ program_deps:
   - factory/digital/models3d/*.py      # 三维模型（第 13 轮 8.3 R1）
   - factory/digital/drawings/*.py      # 工程图（R3）
   - factory/digital/hub/accuracy.py
+  - factory/digital/hub/spc.py         # 质量统计（第 54 章）
   - textbook/tools/render3d.py         # 三维渲染（R2）
   - textbook/tools/render3d.js
   # 第 60 轮 D-1：构建时记录到的其余书外文件（经 sys.path 导入数字工厂的包）

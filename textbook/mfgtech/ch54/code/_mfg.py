@@ -122,3 +122,35 @@ def loc():
 
 
 ISO = [0.9, -1.25, 0.95]          # 书中三维图的常用视向（从右前上方看）
+
+
+# ---------------------------------------------------------------- 第 54 章：加工精度库、仿真车间的误差模型、误差放大的工件形状
+def acc():
+    from hub import accuracy
+    return accuracy
+
+
+def errs():
+    from sim import errors
+    return errors
+
+
+def spc():
+    from hub import spc as _spc
+    return _spc
+
+
+def x3d():
+    from models3d import errors3d
+    return errors3d
+
+
+def shift(problem="tailstock_offset", n_ok=30, n_bad=30, seeds=(541, 542), dress_every=10, magnitude=None):
+    """仿真车间的一个班次（与 textbook/tools/factory_shots.py 灌进数字工厂的数据同一个模型）：先正常磨 n_ok 件，
+    再在问题情景 problem 下磨 n_bad 件；砂轮每 dress_every 件修整一次。返回各特性的测得值、修整后第一件的序号（resets）、问题开始的序号。"""
+    ER = errs()
+    a = ER.simulate(n_ok, None, seed=seeds[0], dress_every=dress_every)
+    b = ER.simulate(n_bad, problem, magnitude=magnitude, seed=seeds[1], dress_every=dress_every) if n_bad else {"values": {c[0]: [] for c in ER.CHARS}, "dress_after": []}
+    vals = {c[0]: a["values"][c[0]] + b["values"][c[0]] for c in ER.CHARS}
+    resets = [i + 1 for i in a["dress_after"] if i + 1 < n_ok] + [n_ok] + [n_ok + i + 1 for i in b["dress_after"] if i + 1 < n_bad]
+    return {"values": vals, "resets": sorted(set(r for r in resets if 0 < r < n_ok + n_bad)), "start": n_ok, "chars": ER.CHARS}

@@ -1,0 +1,26 @@
+# 实验 54.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab54_4.js。
+原理:
+  - ["两顶尖车外圆时，背向力 Fp 使刀具与工件在误差敏感方向上相对让开 y。y 由头架、尾座、刀架的变形和工件的弯曲四部分组成，随刀具位置 x 变化；车出的直径误差为 2y，沿轴向的变化就是形状误差。", "Turning between centres, the radial force Fp pushes tool and work apart by y along the sensitive direction. y is the sum of the headstock, tailstock and tool-post deflections and the bending of the work, and varies with the tool position x; the diameter error is 2y, and its variation along the axis is the form error."]
+  - 式: "y(x) = Fp[((L − x)/L)²/k头 + (x/L)²/k尾 + 1/k刀 + x²(L − x)²/(3EIL)]        (54.4.2)"
+  - 式: "误差复映系数 ε = Δ工件/Δ毛坯 = C/k；n 次走刀 ε总 = ε₁ε₂…εₙ        (54.4.4)"
+步骤:
+  - ["场景“SH-301 精车”，默认参数，读出两端和中间的直径误差，记入表 1（任务 1）。", "Scene SH-301, defaults: read the diameter errors at both ends and the middle into Table 1 (task 1)."]
+  - ["把尾座刚度降到 5 kN/mm（任务 2），记下形状和锥度。", "Drop the tailstock stiffness to 5 kN/mm (task 2); record the shape and taper."]
+  - ["场景“细长轴”，先不用、再用跟刀架（任务 3、4），比较直径误差。", "Scene slender shaft, without and with a follow rest (tasks 3, 4); compare."]
+  - ["回到 SH-301，毛坯跳动 1 mm，改走刀次数，找出降到 0.01 mm 以下的最少次数（任务 5），记入表 2。", "Back to SH-301 with 1 mm of blank runout, change the number of passes and find the fewest that get below 0.01 mm (task 5); Table 2."]
+数据表:
+  - 标题: ["表 1  让刀量与形状", "Table 1  Deflection and shape"]
+    表头: ["情况", "k头 / kN·mm⁻¹", "k尾 / kN·mm⁻¹", "头架端 / µm", "中间 / µm", "尾座端 / µm", "形状"]
+    表头英文: ["Case", "k head", "k tail", "Head end / µm", "Middle / µm", "Tail end / µm", "Shape"]
+    行: [["SH-301", "20", "20", "", "", "", ""], ["SH-301 尾座软", "20", "5", "", "", "", ""], ["细长轴", "20", "20", "", "", "", ""], ["细长轴 + 跟刀架", "20", "20", "", "", "", ""]]
+    行英文: [["SH-301", "20", "20", "", "", "", ""], ["SH-301 soft tail", "20", "5", "", "", "", ""], ["Slender", "20", "20", "", "", "", ""], ["Slender + rest", "20", "20", "", "", "", ""]]
+  - 标题: ["表 2  误差复映", "Table 2  Error reflection"]
+    表头: ["走刀", "C / N·mm⁻¹", "ε", "走刀后的跳动 / µm"]
+    表头英文: ["Pass", "C / N·mm⁻¹", "ε", "Runout after / µm"]
+    行: [["粗车", "404", "", ""], ["半精车", "270", "", ""], ["精车", "174", "", ""]]
+    行英文: [["Rough", "404", "", ""], ["Semi-finish", "270", "", ""], ["Finish", "174", "", ""]]
+注意:
+  - ["刚度、背向力是教学用的示例值；实际机床的刚度要测（54.4.5 节的生产法），背向力按刀具和切削用量估计或测量。", "Stiffness and force values are for teaching; measure real machines (the cutting method of 54.4.5) and estimate or measure the force."]
+思考题:
+  - ["复映系数很小，是不是说毛坯误差可以不管？想一想毛坯的硬度不均、余量不均会怎样。", "If ε is so small, can the blank's error be ignored? Think about uneven hardness and allowance."]
+  - ["为什么精车 SH-301 用两顶尖而不用一夹一顶？从刚度和基准两方面回答。", "Why is SH-301 finish-turned between centres rather than chuck-and-centre? Answer from stiffness and datums."]

@@ -1,0 +1,27 @@
+# 实验 54.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab54_7.js。
+原理:
+  - ["均值–极差图把一批零件按子组（同一条件下连续加工的几件）抽检：均值图看过程的中心有没有变，极差图看过程的分散有没有变。控制限由过程正常时的数据求出，与公差无关。", "An X̄–R chart samples the process in subgroups (a few parts made consecutively under the same conditions): the X̄ chart watches the centre, the R chart the spread. The limits come from data of the normal process and have nothing to do with the tolerance."]
+  - 式: "X̄ 图：x̿ ± A₂R̄；R 图：D₃R̄ ～ D₄R̄；组内 σ̂ = R̄/d₂        (54.7.4)"
+  - ["点出控制限，或点的排列不随机（规则 2–4），说明有系统性的原因（异常原因），要停下来找。", "A point outside the limits, or a non-random pattern (rules 2–4), signals a special cause: stop and find it."]
+  - 式: "Cp = T/(6σ)，Cpk = min(USL − μ, μ − LSL)/(3σ)        (54.7.3)"
+步骤:
+  - ["默认参数下先看前 10 组（正常过程）：有没有误报警？", "With the defaults, look at the first 10 subgroups (normal process): any false alarms?"]
+  - ["依次做任务 1–3：每次只加一种变化，记下均值图、极差图第一次报警的组号和规则，填表 1。", "Tasks 1–3: one change at a time; record the first alarm on each chart and the rule in Table 1."]
+  - ["任务 4：均值偏移 1σ，子组容量取 2、5、8，比较报警的快慢，填表 2。", "Task 4: a 1σ shift with n = 2, 5, 8; compare how fast the alarm comes (Table 2)."]
+  - ["任务 5：分散 1.5 倍，找出使 Cpk 降到 1.33 的均值偏移。", "Task 5: with spread × 1.5, find the shift that brings Cpk down to 1.33."]
+数据表:
+  - 标题: ["表 1  不同变化的报警", "Table 1  Alarms for different changes"]
+    表头: ["变化", "均值图报警（组号、规则）", "极差图报警（组号）", "变化后第几组", "Cpk（变化后）"]
+    表头英文: ["Change", "X̄ alarm (subgroup, rule)", "R alarm (subgroup)", "Delay", "Cpk after"]
+    行: [["均值偏移 1.5σ", "", "", "", ""], ["分散 2 倍", "", "", "", ""], ["漂移 0.3σ/组", "", "", "", ""]]
+    行英文: [["Shift 1.5σ", "", "", "", ""], ["Spread × 2", "", "", "", ""], ["Drift 0.3σ per subgroup", "", "", "", ""]]
+  - 标题: ["表 2  子组容量与报警快慢（均值偏移 1σ）", "Table 2  Subgroup size and detection speed (1σ shift)"]
+    表头: ["n", "种子 1", "种子 2", "种子 3", "平均"]
+    表头英文: ["n", "Seed 1", "Seed 2", "Seed 3", "Mean"]
+    行: [["2", "", "", "", ""], ["5", "", "", "", ""], ["8", "", "", "", ""]]
+    行英文: [["2", "", "", "", ""], ["5", "", "", "", ""], ["8", "", "", "", ""]]
+注意:
+  - ["数据是按 SH-301 正常过程（均值 35.009、σ = 1.2 µm）随机生成的，换种子就是换一批零件；报警的组号会随批次变化，要多换几个种子再下结论。", "Data are generated from SH-301's normal process (mean 35.009, σ = 1.2 µm); a new seed is a new batch. Alarm positions vary from batch to batch — try several seeds before concluding."]
+思考题:
+  - ["控制限和公差有什么区别？点都在控制限内，零件就一定合格吗？反过来呢？", "How do control limits differ from tolerances? If all points are within the limits, are all parts good? And conversely?"]
+  - ["为什么 SH-301 的子组按一个修整周期取？", "Why are SH-301's subgroups one dressing cycle?"]
