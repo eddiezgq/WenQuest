@@ -5,8 +5,8 @@
     铺层 [0, 90, 0, 90, 0]）：比刚度 E/ρ、比强度 σ/ρ；外径 90 mm 不变、弯曲刚度与铝管 Ø90×3 相同时要多厚的壁、每米多重、抗扭刚度是多少。
 (2) 算例 31.4.2：改截面（铝合金）：Ø90×3（标准）、Ø90×5、Ø100×3、Ø100×2、Ø110×2——大臂的质量、弯曲刚度、负载引起的下沉中大臂弯曲的部分、J2 的重力矩。
 (3) 算例 31.4.3：两根管都换成同样弯曲刚度的碳纤维管，整机轻多少、J2 的重力矩小多少：对照关节模组的质量。
-(4) 算例 31.4.4：拓扑优化（问渠 CAE 的平面 SIMP，topo.py 的 run_plate）：如果大臂用一块板做，材料用量 30%，左端 J2 的毂固定、
-    右端 J3 的毂受向下的力，材料长在哪里。图 31.4.1。
+(4) 算例 31.4.4：拓扑优化（问渠 CAE 的平面 SIMP，topo.py 的“悬臂梁”算例）：如果大臂用一块 480 × 100 mm 的板做，材料用量 30%，
+    左边整条边固定（装在 J2 上）、右端中点受向下的力（J3），材料长在哪里。图 31.4.1。
 """
 import math
 
@@ -91,18 +91,16 @@ import sys  # noqa: E402
 sys.path.insert(0, str(CAE.parent))
 from cae import topo as TO  # noqa: E402
 L = a2 * 1000
-spec = {"domain": [[-40, -50], [L + 40, -50], [L + 40, 50], [-40, 50]], "support": [0, 0, 28], "load": {"at": [L, 0, 24], "f": [0, -120]},
-        "cell_mm": 5}
-r = TO.run_plate(spec, volfrac=0.3)
+NX, NY, C5 = 96, 20, 5.0                                   # 480 × 100 mm 的板，单元 5 mm
+r = TO.run("cantilever", nelx=NX, nely=NY, volfrac=0.3, max_iter=400)   # 问渠 CAE 的“悬臂梁”算例：左边固定，右端中点向下的力
 dens = np.asarray(r["density"])
-assert r["converged"]
-# 材料长在上下两边：两毂之间（x = 100–300 mm），离中线最远的上下各四分之一高度里的材料占了一半以上
+assert r["converged"] and dens.shape == (NY, NX)
+# 材料长在上下两边：中段（x = 100–380 mm），离中线最远的上下各四分之一高度里的材料占了一半以上
 ny = dens.shape[0]
-c, (x0, y0) = r["plate"]["cell_mm"], r["plate"]["origin"]
-mid = dens[:, int((100 - x0) / c): int((300 - x0) / c)]
+mid = dens[:, int(100 / C5): int(380 / C5)]
 edge = np.r_[mid[: ny // 4], mid[-(ny // 4):]].sum() / mid.sum()
 assert edge > 0.5
-out(topo_vol=30, topo_iter=r["iterations"], topo_edge=edge * 100, topo_nx=dens.shape[1], topo_ny=ny)
+out(topo_vol=30, topo_iter=r["iterations"], topo_edge=edge * 100, topo_nx=NX, topo_ny=NY)
 
 plt = style()
 fig, axs = plt.subplots(1, 2, figsize=(12.0, 3.9), gridspec_kw={"width_ratios": [1.0, 1.25]})
@@ -118,15 +116,17 @@ ax.set_xlim(0, 65)
 ax.set_ylim(0, 520)
 ax.set_title(T("(a) 比刚度与比强度", "(a) specific stiffness and strength"), fontsize=11)
 ax = axs[1]
-ax.imshow(dens, cmap="Greys", vmin=0, vmax=1, extent=[x0, x0 + dens.shape[1] * c, y0, y0 + dens.shape[0] * c], origin="upper")
-ax.add_patch(plt.Circle((0, 0), 28, fill=False, color=C["z"], lw=1.5))
-ax.add_patch(plt.Circle((L, 0), 24, fill=False, color=C["x"], lw=1.5))
-ax.annotate("", xy=(L, -45), xytext=(L, 5), arrowprops=dict(arrowstyle="->", color=C["x"], lw=1.6))
-ax.text(0, 58, T("J2 毂（固定）", "J2 hub (fixed)"), ha="center", fontsize=8, color=C["z"])
-ax.text(L, 58, T("J3 毂（受力）", "J3 hub (loaded)"), ha="center", fontsize=8, color=C["x"])
+ax.imshow(dens, cmap="Greys", vmin=0, vmax=1, extent=[0, NX * C5, -NY * C5 / 2, NY * C5 / 2], origin="upper")
+for yy in np.linspace(-NY * C5 / 2, NY * C5 / 2, 9):
+    ax.plot([-12, 0], [yy - 6, yy], color=C["z"], lw=1)
+ax.plot([0, 0], [-NY * C5 / 2, NY * C5 / 2], color=C["z"], lw=2)
+ax.annotate("", xy=(NX * C5, -45), xytext=(NX * C5, 5), arrowprops=dict(arrowstyle="->", color=C["x"], lw=1.6))
+ax.text(0, 58, T("左边固定（装在 J2 上）", "left edge fixed (on J2)"), ha="left", fontsize=8, color=C["z"])
+ax.text(NX * C5, 58, T("右端受力（J3）", "loaded at the right (J3)"), ha="right", fontsize=8, color=C["x"])
 ax.set_ylim(-60, 72)
+ax.set_xlim(-15, NX * C5 + 5)
 ax.set_aspect("equal")
 ax.set_xlabel("mm")
-ax.set_title(T("(b) 大臂做成一块板：材料用量 30% 的拓扑优化", "(b) the upper arm as a plate: topology optimisation, 30 % material"), fontsize=11)
+ax.set_title(T("(b) 大臂做成一块板：材料用量 30% 的拓扑优化（问渠 CAE 悬臂梁算例）", "(b) the upper arm as a plate: topology optimisation, 30 % material"), fontsize=11)
 fig.tight_layout()
 figure(fig, "fig31_4_1")
