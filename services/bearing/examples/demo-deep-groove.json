@@ -1,0 +1,12 @@
+{
+  "title": {"zh": "示例（虚构）：减速器输入轴深沟球轴承", "en": "Example (fictional): deep groove ball bearing on a gearbox input shaft"},
+  "note": {"zh": "尺寸和参数为演示虚构，不是任何厂家或标准中的型号。", "en": "Made-up sizes and data for the demo: not a catalogue or standard bearing."},
+  "type": "deep_groove",
+  "size": {"d": 30, "D": 58, "B": 16},
+  "inner": {"Dw": 8.5, "Z": 10, "dm": 44, "fi": 0.515, "fo": 0.525, "Pd": 0.015, "h_i": 1.8, "h_o": 1.8},
+  "material": {"E": 206000, "nu": 0.3},
+  "loads": {"Fr": 2500, "Fa": 400, "M": 0, "n": 3000},
+  "fits": {"shaft_I": 0.012, "housing_I": 0, "T_i": 60, "T_o": 50},
+  "lube": {"eta0": 0.02, "alpha_p": 2.0e-8, "sigma": 0.1},
+  "limits": {"p_max": 2500, "gap_min": 1.0, "wall_min": 2.0}
+}

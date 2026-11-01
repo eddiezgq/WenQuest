@@ -239,6 +239,23 @@ services:
       - no-new-privileges:true
     cap_drop: [ALL]
 
+  # 问渠轴承（第 64 轮）：轴承设计网页版与计算内核 bearingkit，网址 <主域名>/bearing/。只计算，不联网、不调 AI。
+  bearing:
+    build:
+      context: .
+      dockerfile: services/bearing/Dockerfile
+    image: ${BEARING_IMAGE:-wenquest/bearing:0.1}
+    restart: unless-stopped
+    cpus: 1
+    mem_limit: 512m
+    pids_limit: 64
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+
   # WenQuest web app (static files) with /api forwarded to the gateway.
   web:
     build: apps/web

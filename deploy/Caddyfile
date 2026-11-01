@@ -46,6 +46,11 @@
 	handle_path /cam/* {
 		reverse_proxy cam:8000
 	}
+	# 问渠轴承（第 64 轮）：轴承设计网页版，容器 bearing 自己出页面和接口
+	redir /bearing /bearing/ 308
+	handle_path /bearing/* {
+		reverse_proxy bearing:8000
+	}
 	# 网页：美国版 site/，国内版 site/cn/（第 48 轮，按 WQ_REGION 选，见 site-handle/）
 	import site-handle/{$WQ_REGION:us}.caddy
 }

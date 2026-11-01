@@ -35,6 +35,7 @@ set_images() {
     envset VOICE_IMAGE "${1/\/engine:/\/voice:}"
     envset BLENDER_IMAGE "${1/\/engine:/\/blender:}"
     envset CAM_IMAGE "${1/\/engine:/\/cam:}"
+    envset BEARING_IMAGE "${1/\/engine:/\/bearing:}"
 }
 
 dc() {

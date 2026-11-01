@@ -1,0 +1,48 @@
+// The project being edited, kept in this browser; every change is sent to the kernel after a short pause.
+import { reactive, ref, watch } from 'vue'
+import { api } from './api'
+
+const KEY = 'wqbearing-project'
+export function blank() {
+  return {
+    title: { zh: '', en: '' }, type: 'deep_groove',
+    size: { d: null, D: null, B: null },
+    inner: { Dw: null, Z: null, dm: null, fi: null, fo: null, Pd: null, alpha0_deg: null, h_i: null, h_o: null },
+    material: { E: 206000, nu: 0.3 },
+    loads: { Fr: null, Fa: null, M: null, n: null },
+    fits: { shaft_I: null, housing_I: null, T_i: 20, T_o: 20 },
+    lube: { eta0: null, alpha_p: null, sigma: null },
+    limits: { p_max: null, gap_min: null, wall_min: null },
+  }
+}
+function loadSaved() {
+  try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null } catch { return null }
+}
+export const project = reactive(Object.assign(blank(), loadSaved() || {}))
+export const result = ref(null)
+export const error = ref(null)
+export const busy = ref(false)
+
+export function replace(p) {
+  const b = blank()
+  for (const k of Object.keys(b)) project[k] = typeof b[k] === 'object' && b[k] ? { ...b[k], ...(p[k] || {}) } : p[k] ?? b[k]
+  project.note = p.note || null
+}
+
+let timer = 0, seq = 0
+export function analyseSoon() {
+  clearTimeout(timer)
+  timer = setTimeout(async () => {
+    const my = ++seq
+    busy.value = true
+    try {
+      const r = await api('/analyse', JSON.parse(JSON.stringify(project)))
+      if (my === seq) { result.value = r; error.value = null }
+    } catch (e) { if (my === seq) { error.value = e } }
+    finally { if (my === seq) busy.value = false }
+  }, 250)
+}
+watch(project, () => {
+  try { localStorage.setItem(KEY, JSON.stringify(project)) } catch { /* private mode */ }
+  analyseSoon()
+}, { deep: true })
