@@ -22,7 +22,7 @@ import math
 from dataclasses import dataclass, field
 
 import numpy as np
-from scipy.optimize import fsolve
+from scipy.optimize import brentq, fsolve
 
 from bearingkit import hertz as H
 
@@ -90,9 +90,13 @@ class BallBearing:
 
 
 def bearing(d: dict) -> BallBearing:
-    b = BallBearing(**{k: d[k] for k in ("D", "Z", "dm", "fi", "fo") if k in d},
-                    Pd=float(d.get("Pd") or 0.0), alpha0_deg=d.get("alpha0_deg"),
-                    E=float(d.get("E") or 206000.0), nu=float(d.get("nu") or 0.3))
+    b = BallBearing(
+        **{k: d[k] for k in ("D", "Z", "dm", "fi", "fo") if k in d},
+        Pd=float(d.get("Pd") or 0.0),
+        alpha0_deg=d.get("alpha0_deg"),
+        E=float(d.get("E") or 206000.0),
+        nu=float(d.get("nu") or 0.3),
+    )
     b.Z = int(b.Z)
     b.check()
     return b
@@ -113,8 +117,9 @@ def _balls(b: BallBearing, x, psi):
     return Q, alpha, dl, Ri
 
 
-def distribute(b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0, psi0_deg: float = 0.0,
-               tilt: str = "free") -> dict:
+def distribute(
+    b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0, psi0_deg: float = 0.0, tilt: str = "free"
+) -> dict:
     """Ball loads under radial force Fr (N, along ψ = 0), axial force Fa (N, pushing the contact angle side) and
     moment M (N·mm). The first ball at ψ0. tilt "free": the inner ring tilts until the moment balances M; "fixed":
     the shaft holds it square (θ = 0), M is not used and the moment the bearing puts on the shaft is returned.
@@ -128,20 +133,35 @@ def distribute(b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0,
 
     def eqs(x):
         Q, al, _, Ri = _balls(b, x, psi)
-        return [(np.sum(Q * np.sin(al)) - Fa) / scale, (np.sum(Q * np.cos(al) * np.cos(psi)) - Fr) / scale,
-                (np.sum(Q * np.sin(al) * Ri * np.cos(psi)) - M) / (scale * b.dm)]
+        return [
+            (np.sum(Q * np.sin(al)) - Fa) / scale,
+            (np.sum(Q * np.cos(al) * np.cos(psi)) - Fr) / scale,
+            (np.sum(Q * np.sin(al) * Ri * np.cos(psi)) - M) / (scale * b.dm),
+        ]
 
     g = 1e-3 * b.D
     if Fa == 0 and (M == 0 or tilt == "fixed") and b.alpha0_deg is None:
         # deep groove, radial only: the balls sit at the groove bottoms (α = 0), δ_a = −A sin α₀ takes up the
         # clearance's axial share; solve δ_r alone (Stribeck with clearance)
         da = -b.A * math.sin(b.alpha0)
-        sol = fsolve(lambda v: [eqs([da, v[0], 0.0])[1]], [max(b.Pd / 2, 0) + g], full_output=True, xtol=1e-13)
-        x, ok = np.array([da, sol[0][0], 0.0]), sol[2] == 1
-        res = abs(eqs(x)[1])
+        # ΣQ cos ψ grows steadily once δ_r passes half the clearance: bracket the root and bisect (a Newton step
+        # from a guess can land in the no-contact range, where the sum is flat at zero)
+        def fr(v):
+            return eqs([da, v, 0.0])[1]
+
+        lo, hi = max(b.Pd / 2, 0.0), max(b.Pd / 2, 0.0) + g
+        while fr(hi) < 0 and hi < 10 * b.D:
+            lo, hi = hi, lo + 2 * (hi - lo)
+        ok = fr(hi) >= 0
+        x = np.array([da, brentq(fr, lo, hi, xtol=1e-15, rtol=1e-14) if ok else hi, 0.0])
+        res = abs(fr(x[1]))
     elif tilt == "fixed":
-        sol = fsolve(lambda v: eqs([v[0], v[1], 0.0])[:2], [g if Fa > 0 else 0.0, g if Fr > 0 else 0.0],
-                     full_output=True, xtol=1e-13)
+        sol = fsolve(
+            lambda v: eqs([v[0], v[1], 0.0])[:2],
+            [g if Fa > 0 else 0.0, g if Fr > 0 else 0.0],
+            full_output=True,
+            xtol=1e-13,
+        )
         x, ok = np.array([sol[0][0], sol[0][1], 0.0]), sol[2] == 1
         res = np.max(np.abs(eqs(x)[:2]))
     else:
@@ -151,11 +171,22 @@ def distribute(b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0,
         res = np.max(np.abs(eqs(x)))
     Q, al, dl, Ri = _balls(b, x, psi)
     if not ok or res > 1e-8 or not np.any(Q > 0):
-        raise BallError("the load distribution did not converge (the load may be more than the bearing can carry "
-                        "with this clearance, or there is no axial support for the moment)")
-    return {"psi_deg": np.degrees(psi), "Q": Q, "alpha_deg": np.degrees(al), "delta": dl,
-            "da": float(x[0]), "dr": float(x[1]), "theta": float(x[2]), "Qmax": float(Q.max()),
-            "loaded": int(np.count_nonzero(Q > 0)), "M": float(np.sum(Q * np.sin(al) * Ri * np.cos(psi)))}
+        raise BallError(
+            "the load distribution did not converge (the load may be more than the bearing can carry "
+            "with this clearance, or there is no axial support for the moment)"
+        )
+    return {
+        "psi_deg": np.degrees(psi),
+        "Q": Q,
+        "alpha_deg": np.degrees(al),
+        "delta": dl,
+        "da": float(x[0]),
+        "dr": float(x[1]),
+        "theta": float(x[2]),
+        "Qmax": float(Q.max()),
+        "loaded": int(np.count_nonzero(Q > 0)),
+        "M": float(np.sum(Q * np.sin(al) * Ri * np.cos(psi))),
+    }
 
 
 def contacts(b: BallBearing, Q: float, alpha: float) -> dict:
@@ -179,5 +210,10 @@ def frequencies(b: BallBearing, n_rpm: float, alpha_deg: float | None = None, ou
     else:
         ftf = fr / 2 * (1 - g)
         rel_out, rel_in = ftf, fr - ftf
-    return {"FTF": ftf, "BPFO": b.Z * rel_out, "BPFI": b.Z * rel_in,
-            "BSF": b.dm / (2 * b.D) * fr * (1 - g * g), "shaft": fr}
+    return {
+        "FTF": ftf,
+        "BPFO": b.Z * rel_out,
+        "BPFI": b.Z * rel_in,
+        "BSF": b.dm / (2 * b.D) * fr * (1 - g * g),
+        "shaft": fr,
+    }

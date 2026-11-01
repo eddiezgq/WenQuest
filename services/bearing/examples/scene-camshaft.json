@@ -1,0 +1,57 @@
+{
+  "title": {
+    "zh": "示例（虚构）：缝纫机凸轮轴（一圈内变化的力）",
+    "en": "Example (fictional): sewing machine camshaft (force changing round the turn)"
+  },
+  "note": {
+    "zh": "尺寸、设备参数和限值均为演示虚构，不是任何厂家、标准或企业的数据。",
+    "en": "Sizes, machine data and limits are made up for the demo: not any maker's, standard's or company's data."
+  },
+  "type": "deep_groove",
+  "size": {
+    "d": 30,
+    "D": 58,
+    "B": 16
+  },
+  "inner": {
+    "Dw": 8.5,
+    "Z": 10,
+    "dm": 44,
+    "fi": 0.515,
+    "fo": 0.525,
+    "Pd": 0.015,
+    "h_i": 1.8,
+    "h_o": 1.8
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "fits": {
+    "shaft_I": 0.012,
+    "housing_I": 0,
+    "T_i": 60,
+    "T_o": 50
+  },
+  "lube": {
+    "eta0": 0.02,
+    "alpha_p": 2e-08,
+    "sigma": 0.1
+  },
+  "limits": {
+    "p_static": 2500,
+    "p_fatigue": 2000,
+    "gap_min": 1.0,
+    "wall_min": 2.0
+  },
+  "scenario": {
+    "kind": "camshaft",
+    "fp": 1.2,
+    "x": 40,
+    "L": 160,
+    "n": 3000,
+    "this": "A",
+    "fixed": "A",
+    "table": "0, -0.0, 600.0\n15, -155.3, 566.5\n30, -300.0, 475.0\n45, -424.3, 350.0\n60, -519.6, 225.0\n75, -579.6, 133.5\n90, -600.0, 100.0\n105, -579.6, 133.5\n120, -519.6, 225.0\n135, -424.3, 350.0\n150, -300.0, 475.0\n165, -155.3, 566.5\n180, 0, 600.0\n195, 0, 566.5\n210, 0, 475.0\n225, 0, 350.0\n240, 0, 225.0\n255, 0, 133.5\n270, 0, 100.0\n285, 0, 133.5\n300, 0, 225.0\n315, 0, 350.0\n330, 0, 475.0\n345, 0, 566.5"
+  }
+}

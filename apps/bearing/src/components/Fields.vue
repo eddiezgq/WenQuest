@@ -3,6 +3,7 @@
 import { project } from '../store'
 import { t } from '../i18n'
 import Num from './Num.vue'
+import Scenario from './Scenario.vue'
 </script>
 
 <template>
@@ -11,6 +12,8 @@ import Num from './Num.vue'
       <button v-for="k in ['deep_groove', 'angular']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
               :class="{ on: project.type === k }" @click="project.type = k">{{ t(k) }}</button>
     </div>
+
+    <Scenario />
 
     <fieldset><legend>{{ t('gSize') }}</legend>
       <Num v-model="project.size.d" :label="t('d')" unit="mm" />
@@ -35,7 +38,7 @@ import Num from './Num.vue'
       <Num v-model="project.material.nu" :label="t('nu')" step="0.01" />
     </fieldset>
 
-    <fieldset><legend>{{ t('gLoads') }}</legend>
+    <fieldset v-if="project.scenario.kind === 'generic'"><legend>{{ t('gLoads') }}</legend>
       <Num v-model="project.loads.Fr" :label="t('Fr')" unit="N" />
       <Num v-model="project.loads.Fa" :label="t('Fa')" unit="N" />
       <Num v-model="project.loads.M" :label="t('M')" unit="N·mm" :hint="t('MHint')" />
@@ -60,7 +63,8 @@ import Num from './Num.vue'
 
     <fieldset><legend>{{ t('gLimits') }}</legend>
       <p class="hint">{{ t('limitsHint') }}</p>
-      <Num v-model="project.limits.p_max" :label="t('p_max')" unit="MPa" />
+      <Num v-model="project.limits.p_static" :label="t('p_static')" unit="MPa" />
+      <Num v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
       <Num v-model="project.limits.gap_min" :label="t('gap_min')" unit="mm" />
       <Num v-model="project.limits.wall_min" :label="t('wall_min')" unit="mm" />
     </fieldset>

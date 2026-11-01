@@ -42,7 +42,7 @@ def test_angular_equilibrium():
 
 def test_missing_stress_limit_is_unknown():
     p = load("demo-deep-groove")
-    del p["limits"]["p_max"]
+    del p["limits"]["p_static"]
     c = by_id(analyse(p))
     assert c["p_inner"]["status"] == "unknown" and c["p_outer"]["status"] == "unknown"
 
@@ -107,7 +107,8 @@ client = TestClient(app)
 def test_api():
     assert client.get("/api/health").json() == {"ok": True}
     ids = [e["id"] for e in client.get("/api/examples").json()]
-    assert ids == ["demo-angular", "demo-deep-groove"]
+    assert ids[:2] == ["demo-angular", "demo-deep-groove"]
+    assert {"scene-gearbox", "scene-motor", "scene-spindle", "scene-hub", "scene-joint", "scene-camshaft"} <= set(ids)
     assert client.get("/api/examples/nope").status_code == 404
     assert client.get("/api/examples/..%2Fapp").status_code == 404
     r = client.post("/api/analyse", json={"project": load("demo-angular")})

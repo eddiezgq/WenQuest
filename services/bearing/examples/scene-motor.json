@@ -1,0 +1,61 @@
+{
+  "title": {
+    "zh": "示例（虚构）：电机转子（带传动、不平衡）",
+    "en": "Example (fictional): Motor rotor (belt drive, unbalance)"
+  },
+  "note": {
+    "zh": "尺寸、设备参数和限值均为演示虚构，不是任何厂家、标准或企业的数据。",
+    "en": "Sizes, machine data and limits are made up for the demo: not any maker's, standard's or company's data."
+  },
+  "type": "deep_groove",
+  "size": {
+    "d": 30,
+    "D": 58,
+    "B": 16
+  },
+  "inner": {
+    "Dw": 8.5,
+    "Z": 10,
+    "dm": 44,
+    "fi": 0.515,
+    "fo": 0.525,
+    "Pd": 0.015,
+    "h_i": 1.8,
+    "h_o": 1.8
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "fits": {
+    "shaft_I": 0.012,
+    "housing_I": 0,
+    "T_i": 60,
+    "T_o": 50
+  },
+  "lube": {
+    "eta0": 0.02,
+    "alpha_p": 2e-08,
+    "sigma": 0.1
+  },
+  "limits": {
+    "p_static": 2500,
+    "p_fatigue": 2000,
+    "gap_min": 1.0,
+    "wall_min": 2.0
+  },
+  "scenario": {
+    "kind": "motor",
+    "fp": 1.1,
+    "m": 9,
+    "U": 600,
+    "x": 80,
+    "L": 160,
+    "F_belt": 900,
+    "x_belt": 215,
+    "belt_deg": 30,
+    "Fa": 100,
+    "n": 2900,
+    "this": "B"
+  }
+}

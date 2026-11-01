@@ -18,8 +18,16 @@ from __future__ import annotations
 import math
 
 
-def fit_inner(interference: float, d: float, d_ie: float, d_s: float = 0.0, E_r: float = 206000.0,
-              nu_r: float = 0.3, E_s: float = 206000.0, nu_s: float = 0.3) -> dict:
+def fit_inner(
+    interference: float,
+    d: float,
+    d_ie: float,
+    d_s: float = 0.0,
+    E_r: float = 206000.0,
+    nu_r: float = 0.3,
+    E_s: float = 206000.0,
+    nu_s: float = 0.3,
+) -> dict:
     """Inner ring pressed on a shaft: fit pressure p (MPa) and the growth of the raceway diameter (mm)."""
     if interference <= 0:
         return {"p": 0.0, "growth": 0.0}
@@ -31,8 +39,16 @@ def fit_inner(interference: float, d: float, d_ie: float, d_s: float = 0.0, E_r:
     return {"p": p, "growth": 2 * u_b}
 
 
-def fit_outer(interference: float, D: float, d_oe: float, D_h: float = math.inf, E_r: float = 206000.0,
-              nu_r: float = 0.3, E_h: float = 206000.0, nu_h: float = 0.3) -> dict:
+def fit_outer(
+    interference: float,
+    D: float,
+    d_oe: float,
+    D_h: float = math.inf,
+    E_r: float = 206000.0,
+    nu_r: float = 0.3,
+    E_h: float = 206000.0,
+    nu_h: float = 0.3,
+) -> dict:
     """Outer ring pressed in a housing: fit pressure p (MPa) and the shrinkage of the raceway diameter (mm)."""
     if interference <= 0:
         return {"p": 0.0, "shrink": 0.0}
@@ -48,13 +64,28 @@ def fit_outer(interference: float, D: float, d_oe: float, D_h: float = math.inf,
     return {"p": p, "shrink": 2 * u_a}
 
 
-def chain(Pd0: float, d_i: float, d_o: float, inner: dict | None = None, outer: dict | None = None,
-          T_i: float = 20.0, T_o: float = 20.0, T_ref: float = 20.0, alpha_t: float = 11.5e-6) -> dict:
+def chain(
+    Pd0: float,
+    d_i: float,
+    d_o: float,
+    inner: dict | None = None,
+    outer: dict | None = None,
+    T_i: float = 20.0,
+    T_o: float = 20.0,
+    T_ref: float = 20.0,
+    alpha_t: float = 11.5e-6,
+) -> dict:
     """Initial → mounted → operating diametral clearance. inner/outer: the fit_inner/fit_outer arguments (or None).
     α_t defaults to a common value for bearing steel; give the real one."""
     gi = fit_inner(**inner)["growth"] if inner else 0.0
     so = fit_outer(**outer)["shrink"] if outer else 0.0
     mounted = Pd0 - gi - so
     thermal = alpha_t * ((T_o - T_ref) * d_o - (T_i - T_ref) * d_i)
-    return {"initial": Pd0, "fit_inner": gi, "fit_outer": so, "mounted": mounted, "thermal": thermal,
-            "operating": mounted + thermal}
+    return {
+        "initial": Pd0,
+        "fit_inner": gi,
+        "fit_outer": so,
+        "mounted": mounted,
+        "thermal": thermal,
+        "operating": mounted + thermal,
+    }

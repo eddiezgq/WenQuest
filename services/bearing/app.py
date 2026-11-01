@@ -40,10 +40,45 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     ),
     (r"^the shoulder height is above zero and below the groove radius$", "挡肩高度要大于 0、小于沟道半径"),
     (r"^the bodies do not form a contact", "几何不成立：接触曲率和不大于 0"),
+    # application scenarios (step 3)
+    (r"^scenario: give (\w+)$", r"应用场景：请填 \1"),
+    (r"^scenario: the bearing span L is more than 0$", "应用场景：两轴承跨距 L 要大于 0"),
+    (r"^scenario: give at least one operating case$", "应用场景：至少要有一个工况"),
+    (r"^scenario: the time shares add up to more than 0$", "应用场景：各工况时间占比之和要大于 0"),
+    (r"^scenario: each case has a power", "应用场景：每个工况的功率 ≥ 0、转速 > 0"),
+    (r"^scenario: gear module", "应用场景：齿轮模数、齿数、压力角（0–45°）、螺旋角（0–45°）"),
+    (r"^scenario: rotor mass", "应用场景：转子质量 ≥ 0、不平衡量 ≥ 0、转速 > 0"),
+    (r"^scenario: at least 4 lines", "应用场景：力表至少 4 行，每行：转角, Fx, Fy（可加 Fz）"),
+    (r"^scenario: each line of the table", "应用场景：力表每行是 转角, Fx, Fy（可加 Fz）"),
+    (r"^scenario: unknown kind (.*)$", r"应用场景：没有这种场景（\1）"),
+    (r"^scenario: this bearing is A or B$", "应用场景：本轴承是 A 或 B"),
+    (r"^scenario: the row is outboard or inboard$", "应用场景：轴承排是外排或内排"),
+    (r"^scenario: the joint axis is horizontal or vertical$", "应用场景：关节轴线是水平或竖直"),
 ]
 
 
+SCN_ZH = {  # scenario field names in the Chinese messages
+    "mn": "法向模数 mn",
+    "z": "齿数 z",
+    "alpha_n_deg": "法向压力角 αn",
+    "x": "载荷位置 x",
+    "L": "两轴承跨距 L",
+    "P": "功率 P",
+    "n": "转速 n",
+    "m": "转子质量 m",
+    "a": "悬伸 a",
+    "Fr": "径向力",
+    "W": "载荷 W",
+    "ay": "侧向加速度 ay",
+    "R": "车轮滚动半径 R",
+    "r": "力臂 r",
+}
+
+
 def zh(msg: str) -> str:
+    m = re.fullmatch(r"scenario: give (\w+)", msg)
+    if m:
+        return "应用场景：请填" + SCN_ZH.get(m.group(1), m.group(1))
     for pat, rep in ERR_ZH:
         if re.search(pat, msg):
             return re.sub(pat, rep, msg)
