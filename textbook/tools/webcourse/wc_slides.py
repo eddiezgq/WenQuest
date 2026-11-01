@@ -182,7 +182,7 @@ html,body{width:1920px;height:1080px;background:var(--bg0);overflow:hidden}
 .tiles .grid{position:absolute;left:110px;right:110px;top:300px;display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
 .tiles .tile{padding:32px 36px;min-height:290px}
 .tiles .tile.hot{border-color:var(--amber);box-shadow:0 0 0 2px var(--amber),0 30px 80px rgba(0,0,0,.45)}
-.tiles .tile .k{font-family:var(--enf);font-size:70px;font-weight:800;color:var(--amber);line-height:1}
+.tiles .tile .k{font-family:var(--enf);font-size:70px;font-weight:800;color:var(--amber);line-height:1}.tiles .tile .k .ke{display:none}html.en-only .tiles .tile .k .kz{display:none}html.en-only .tiles .tile .k .ke{display:inline}
 .tiles .tile .nm{font-size:40px;font-weight:700;margin-top:16px}
 .tiles .tile .nm span{display:block;font-family:var(--enf);font-size:22px;font-weight:500;color:var(--en);margin-top:4px}
 .tiles .tile .use{font-size:28px;color:#c7d3e2;margin-top:18px;line-height:1.4}
@@ -492,8 +492,15 @@ def L_formula(s, ctx):
             f'<div class="footnote"><div class="zh">{e(s["foot"][0])}</div><div class="en">{e(s["foot"][1])}</div></div>{ctx["foot"]}</div>')
 
 
+
+def tile_k(k) -> str:
+    """六宫格的大字：一个字符串，或 [中文, English]（英文版课件显示英文，第 23 讲起）。"""
+    if isinstance(k, (list, tuple)):
+        return f'<span class="kz">{e(k[0])}</span><span class="ke">{e(k[1])}</span>'
+    return e(k)
+
 def L_tiles(s, ctx):
-    t = "".join(f'<div class="tile card{" hot" if x.get("hot") else ""}"><div class="k">{e(x["k"])}</div><div class="nm">{e(x["name"][0])}<span>{e(x["name"][1])}</span></div>'
+    t = "".join(f'<div class="tile card{" hot" if x.get("hot") else ""}"><div class="k">{tile_k(x["k"])}</div><div class="nm">{e(x["name"][0])}<span>{e(x["name"][1])}</span></div>'
                 f'<div class="use">{e(x["use"][0])}<span>{e(x["use"][1])}</span></div></div>' for x in s["tiles"])
     return f'<div class="slide tiles"><div class="grain"></div>{head(s["title"])}<div class="grid">{t}</div>{ctx["foot"]}</div>'
 

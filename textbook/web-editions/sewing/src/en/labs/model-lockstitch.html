@@ -473,7 +473,11 @@ function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSiz
 new ResizeObserver(resize).observe(stage); resize();
 let last=performance.now();
 let dirty=true;
-function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(playing){phi+=speed*dt;}if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}requestAnimationFrame(frame);}
+let manual=false,exW=0,exP=0;
+function exStep(dt){if(!exW)return;exP+=exW*dt;exT=0.5-0.5*Math.cos(exP);document.getElementById('ex').value=exT.toFixed(3);if(mode==='solid')mode='explode';applyMode();applyExplode();}
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(manual){requestAnimationFrame(frame);return;}if(playing){phi+=speed*dt;}if(exW){exStep(dt);dirty=true;}if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}requestAnimationFrame(frame);}
+// 录课接口（第 23 讲视频）：manual(true) 后由 step(dt) 逐帧推进；exCycle(w) 让爆炸图按角速度 w（rad/s）一开一合
+window.__api={manual:on=>{manual=!!on;},step:dt=>{if(playing)phi+=speed*dt;exStep(dt);pose();placeCam();renderer.render(scene,cam);drawLabels();},exCycle:w=>{exW=w||0;exP=0;}};
 // ---------- controls ----------
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m; if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;} if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;} applyMode();applyExplode();});
 document.getElementById('ex').oninput=e=>{exT=+e.target.value; if(exT>0&&mode==='solid'){mode='explode';} applyMode(); applyExplode();};
@@ -484,6 +488,7 @@ document.getElementById('spd').onchange=e=>speed=+e.target.value;
 document.getElementById('ang').oninput=e=>{playing=false;document.getElementById('play').textContent='Play';phi=+e.target.value;};
 document.querySelectorAll('.chain').forEach(c=>c.onclick=()=>{focus=focus===c.dataset.c?null:c.dataset.c;document.querySelectorAll('.chain').forEach(x=>x.classList.toggle('on',x.dataset.c===focus));if(mode==='solid')mode='xray';applyMode();});
 // deep link / capture hooks
+window.__view=x=>{const a=cam.aspect;if(x)cam.setViewOffset(a,1,x*a,0,a,1);else cam.clearViewOffset();dirty=true;};
 window.__set=(o)=>{if('mode' in o)mode=o.mode;if('ex' in o){exT=o.ex;}if('view' in o){[th,ph,dist]=o.view;}if('phi' in o)phi=o.phi;if('table' in o)document.getElementById('table').checked=o.table;if('focus' in o)focus=o.focus;if('ovr' in o)OVR=o.ovr;if('hide' in o)HIDE=new Set(o.hide);if('only' in o)ONLY=o.only?new Set(o.only):null;if('target' in o)target.set(...o.target);if('hideAsm' in o){Object.entries(asm).forEach(([k,g])=>g.visible=!o.hideAsm.includes(k));}applyMode();applyExplode();dirty=true;};
 applyMode(); applyExplode(); requestAnimationFrame(frame);
 })();

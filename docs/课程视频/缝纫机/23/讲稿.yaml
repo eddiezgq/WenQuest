@@ -1,0 +1,132 @@
+# 《缝纫机设计与制造》公开课 第 23 讲：缝纫机的设计、制造与检测
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch23.yaml），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 23-1（尺寸链与共振）录屏、数字工厂（第 23 轮 3.4：第 23–25 讲演示；示例是缝纫机总装线的梭尖间隙质量闭环与追溯，同第 8 讲）、作业页、测验页。
+# 数字一律由 course/calc/ch23.py 算出（{{ch23.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "23"
+deck: ch23
+skip: [4, 5, 9, 11, 15, 17, 22, 23]   # 评审三问、关键零件、99% 的代价、各环贡献、装配调试、噪声模态寿命、加筋前后、标准与专利：课程部分约 10 分钟；这几页留给课件
+code: [ch23]
+title: ["缝纫机的设计、制造与检测——图纸上算对，不等于造出来能用", "Designing, Building and Testing the Sewing Machine — Right on Paper Is Not Yet Right in the Machine"]
+chapter: ["第七篇 制造与数字工厂 · 第 23 章", "Part VII Manufacturing and the Digital Factory · Chapter 23"]
+next: ["第 24 讲", "Lecture 24"]
+cover_formula: 'A = \frac{1}{\sqrt{(1-r^{2})^{2} + (2\zeta r)^{2}}}'
+tags:
+  zh: [尺寸链, 极值法, 统计公差, 蒙特卡罗, 装配调整法, 梭尖间隙, 振动频谱, 共振, 放大倍数, 固有频率, 机器人标定, 缝纫机设计]
+  en: [tolerance chain, worst case, statistical tolerancing, Monte Carlo, adjustment at assembly, hook clearance, vibration spectrum, resonance, amplification, natural frequency, robot calibration, sewing machine design]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十三讲，缝纫机的设计、制造与检测。
+    - 前面几讲把平缝机的机构一个个算清楚了，可图纸上算对，不等于造出来能用。今天看一台平缝机怎样从图纸走到量产：几十微米的间隙怎样保证，提速以后机器为什么会“叫”。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 23, designing, building and testing the sewing machine.
+    - We've worked out the lockstitch mechanisms one by one, but right on paper is not yet right in the machine. Today we follow a lockstitch machine from drawing to production. How is a gap of tens of microns guaranteed, and why does a machine start to scream after a speed-up?
+
+after:
+  - id: lab231
+    kind: lab
+    lab: tol
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '1'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checksA,#checksB,#tasks,#msg,#simtxt,#pageB .note{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.getElementById('resetA').click(); })()"
+        dur: 4
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; setTimeout(function(){f('t0', 0.025)}, 800); setTimeout(function(){f('t5', 0.025)}, 2000); setTimeout(function(){f('t3', 0.015)}, 3200); })()"
+        dur: 6
+      - js: "(() => { const s = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('change', {bubbles: true})); e.dispatchEvent(new Event('input', {bubbles: true})); }; s('adjust', '1'); })()"
+        dur: 5
+      - js: "(() => { const s = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('change', {bubbles: true})); e.dispatchEvent(new Event('input', {bubbles: true})); }; s('swap', '1'); })()"
+        dur: 5
+      - js: "(() => { document.getElementById('tabB').click(); document.getElementById('resetB').click(); const n = document.getElementById('n'); let v = 5000; n.value = v; n.dispatchEvent(new Event('input', {bubbles: true})); const t = setInterval(function(){ v += 50; n.value = v; n.dispatchEvent(new Event('input', {bubbles: true})); if (v >= 5500) clearInterval(t); }, 300); })()"
+        dur: 6
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; setTimeout(function(){f('zeta', 0.06)}, 1000); setTimeout(function(){f('zeta', 0.03); f('mass', 0.8)}, 3500); setTimeout(function(){f('mass', 1)}, 6000); })()"
+        dur: 8
+    say:
+      zh:
+        - ">下面是虚拟实验 23-1，尺寸链与共振，在问渠平台上可以亲手做。结果和任务先遮住。第一页左边是 4000 台机器的梭尖间隙分布和各环的贡献，右边调八个环的公差。"
+        - ">任务一：不调整、不换针，拖动公差滑块，把合格率做到 99%、每台成本不超过 33 元。先想想哪几环方差占比大、收紧又不太贵。"
+        - ">任务二：装配时调整间隙。被吸收的环在贡献图里变灰，它们还需要那么准吗？在 28 元以内做到 99%。"
+        - ">任务三：调整好以后，在车间换一根新针，看哪两环又回来了，再想办法在 30 元以内把合格率拉回 99%。"
+        - ">切到第二页，提速与共振。把最高转速从 5000 拖到 5500，看扫描曲线上的工作点怎样爬上共振峰的山坡。"
+        - ">任务四：分别改阻尼比、往复质量和机臂固有频率，比较三种办法，让 5500 转时振动和噪声都达标。达标结果先遮住，你自己试。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 23-1, tolerance chains and resonance, which you can do yourself on WenQuest. Results and tasks are blurred. On page one, the left shows the hook-gap distribution of 4000 machines and each link's contribution; on the right you set the eight tolerances."
+        - ">Task one: no adjustment and no needle change. Move the tolerance sliders to reach a 99 percent yield at no more than 33 yuan per machine. First ask which links have a big variance share and are cheap to tighten."
+        - ">Task two: adjust the gap at assembly. The absorbed links turn grey in the contribution chart. Do they still need to be so precise? Reach a 99 percent yield at 28 yuan or less per machine."
+        - ">Task three: after adjusting, change to a new needle on the shop floor, see which two links come back, and find a way back to a 99 percent yield within 30 yuan."
+        - ">Switch to page two, speed and resonance. Drag the top speed from 5000 to 5500 and watch the operating point climb the slope of the resonance peak."
+        - ">Task four: change the damping ratio, the reciprocating mass and the arm's natural frequency in turn, and compare the three fixes to bring vibration and noise into spec at 5500. The results are blurred; try it yourself. The guide and report template are on the platform."
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    steps:
+      - js: "document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); document.getElementById('checksA').style.filter = 'blur(7px) grayscale(1)'"
+        press: "#play"
+      - press: "#tabB"
+        js: "setTimeout(() => { document.querySelectorAll('svg text').forEach(t => { if (!/已装整机|Built #|仓库剩余|Left in stores|已发货|Shipped/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }); document.querySelectorAll('svg text').forEach(t => { if (/装用起点|first used at/.test(t.textContent)) t.style.filter = 'blur(6px)'; }); ['cv3', 'checksL', 'late', 'latev', 'affIn'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; }); const s = document.createElement('style'); s.textContent = '#arch tr:nth-child(4) td.m, #arch tr:nth-child(11) td.m { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); }, 800)"
+      - sweep: {sn: [60, 100]}
+        dur: 8
+    say:
+      zh:
+        - ">装配时调出来的间隙，到了工厂要逐台记下来。这是问渠数字工厂：总装调试工位逐台测量梭尖间隙，读数经过总线进入控制图，数据一漂移，系统就报警。"
+        - ">切到追溯页。右边是整机档案：每台机器的旋梭批次、梭尖间隙、钩线定时和出厂测试，都是历史库里的一条记录。"
+        - ">拖动序列号，一台一台地看。今天讲的装配调整、出厂检验，在工厂里就是这样逐台调、逐台记，出了问题逐台追。第二十七讲会完整地走一遍数字工厂。"
+      en:
+        - ">The gap set at assembly has to be recorded, machine by machine, in the factory. This is the WenQuest digital factory. The adjustment station measures the hook gap on every machine, the readings go over the bus into a control chart, and if the data drifts the system raises an alarm."
+        - ">Switch to the trace page. On the right is the machine record: each machine's hook batch, hook gap, hook timing and final test, each one a record in the history database."
+        - ">Drag the serial number and look at them one by one. Today's adjustment at assembly and final inspection are done, logged and, if something goes wrong, traced like this, one machine at a time. We'll walk through the whole digital factory in Lecture 27."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 23：间隙尺寸链与提速共振分析", "Assignment 23: clearance chain and speed-up resonance"]
+      points:
+        - ["五环尺寸链：极值、统计、调整后的合格率", "Five-link chain: worst case, statistics, after adjustment"]
+        - ["200 Hz 机臂提速到 5800：加筋到 250 Hz 又如何", "A 200 Hz arm at 5800 r/min, then ribs to 250 Hz"]
+        - ["实验 23-1 四个任务 · 新机型的标准与专利清单", "Lab 23-1's four tasks · standards and patents for a new model"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，一个间隙由五个环决定，用极值法和统计法求变化范围和合格率；前三环由装配调整吸收以后，标准差和合格率变成多少，哪些环还值得控制精度。"
+        - ">第二题，机臂固有频率 200 赫兹、阻尼比 0.03，计划最高转速 5800 转，求二阶激振的频率比和放大倍数；加筋到 250 赫兹再算一遍，并比较三类改进的适用条件和代价。"
+        - ">第三题完成虚拟实验 23-1 的四个任务；第四题为一款新的高速平缝机列出要满足的标准和知识产权工作，说明各在哪个阶段、由谁负责。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: a gap set by five links. Find its range and yield by worst case and by statistics; then, with the first three absorbed by adjustment, find the new sigma and yield, and say which links still deserve accuracy control."
+        - ">Two: an arm with a 200 hertz natural frequency and a damping ratio of 0.03, planned for 5800 r/min. Find the second-order frequency ratio and amplification, recompute with ribs that raise it to 250 hertz, and compare the three kinds of fix by when they work and what they cost."
+        - ">Three: complete the four tasks of Virtual lab 23-1. Four: for a new high-speed lockstitch machine, list the standards and the IP work it needs, and say at which stage and by whom each is done."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["三环 ±0.03、±0.03、±0.02：统计法范围是多少？", "Links ±0.03, ±0.03, ±0.02: the statistical range?"]
+        - ["主轴 4800 r/min：二阶激振频率是多少赫兹？", "Shaft at 4800 r/min: second-order frequency in hertz?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：一条尺寸链三个环，公差正负 0.03、0.03、0.02 毫米，按统计法，封闭环的范围是正负多少？"
+        - ">再比如：主轴每分钟 4800 转，针杆惯性力二阶分量的激振频率是多少赫兹？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, a chain has three links with tolerances of plus or minus 0.03, 0.03 and 0.02 millimetre. By the statistical method, what is the range of the closing link?"
+        - ">Or, with the shaft at 4800 r/min, what is the frequency of the second-order needle-bar inertia force, in hertz?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - See you next time.
