@@ -1,0 +1,827 @@
+1
+00:00:00,600 --> 00:00:01,475
+Hi everyone,
+
+2
+00:00:01,495 --> 00:00:06,848
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:07,248 --> 00:00:13,708
+This is Lecture 23, designing, building and testing the sewing machine.
+
+4
+00:00:14,108 --> 00:00:17,622
+We've worked out the lockstitch mechanisms one by one,
+
+5
+00:00:17,642 --> 00:00:20,960
+but right on paper is not yet right in the machine.
+
+6
+00:00:20,980 --> 00:00:25,149
+Today we follow a lockstitch machine from drawing to production.
+
+7
+00:00:25,169 --> 00:00:27,964
+How is a gap of tens of microns guaranteed,
+
+8
+00:00:27,984 --> 00:00:31,629
+and why does a machine start to scream after a speed-up?
+
+9
+00:00:33,149 --> 00:00:40,752
+A garment factory bought sped-up lockstitch machines:
+
+10
+00:00:40,772 --> 00:00:46,649
+top speed raised from 5000 to 5500 r/min.
+
+11
+00:00:47,049 --> 00:00:51,069
+Operators say the machines scream at high speed.
+
+12
+00:00:51,469 --> 00:01:00,625
+On the test stand, vibration at 5500 is more than three times that at 5000,
+
+13
+00:01:00,645 --> 00:01:06,009
+and noise rises from 83.5 to about 94 dB(A).
+
+14
+00:01:06,409 --> 00:01:10,215
+The spectrum shows the second order growing,
+
+15
+00:01:10,235 --> 00:01:16,389
+and a modal test puts the arm's first bending frequency near 190 hertz.
+
+16
+00:01:16,789 --> 00:01:23,348
+Why does 10 percent more speed triple the vibration, and how do we fix it?
+
+17
+00:01:23,748 --> 00:01:25,088
+We'll answer at the end.
+
+18
+00:01:26,608 --> 00:01:30,308
+A new model goes from launch to production like this.
+
+19
+00:01:30,708 --> 00:01:35,501
+First the design inputs: the speed, stitch length, fabrics,
+
+20
+00:01:35,521 --> 00:01:40,802
+noise and price the market wants, and the standards it must meet.
+
+21
+00:01:41,202 --> 00:01:45,958
+Then concept and detailed design, with process,
+
+22
+00:01:45,978 --> 00:01:51,342
+quality and service engineers reviewing the drawings.
+
+23
+00:01:51,742 --> 00:01:57,207
+Then prototypes, tests and redesign, often several rounds;
+
+24
+00:01:57,227 --> 00:02:02,691
+a pilot batch to prove the tooling and inspection methods;
+
+25
+00:02:02,711 --> 00:02:04,866
+and finally production.
+
+26
+00:02:05,266 --> 00:02:12,337
+The most common lesson: the later a problem is found, the more it costs to fix.
+
+27
+00:02:12,737 --> 00:02:17,366
+So standards and patents are design inputs from day one:
+
+28
+00:02:17,386 --> 00:02:23,677
+search patents by sales region, design around them, and file your own early.
+
+29
+00:02:25,197 --> 00:02:30,726
+Tolerance chains: where a gap of microns comes from.
+
+30
+00:02:32,246 --> 00:02:40,008
+Chapter 5 said the gap between hook point and needle scarf must stay between
+
+31
+00:02:40,028 --> 00:02:42,466
+0.04 and 0.1 millimetre.
+
+32
+00:02:42,866 --> 00:02:49,549
+Those tens of microns depend on a long string of part sizes and positions.
+
+33
+00:02:49,949 --> 00:02:54,685
+On one side: the needle-bar bush bore in the housing,
+
+34
+00:02:54,705 --> 00:02:59,979
+the needle bar's play in its bush, the needle clamp offset,
+
+35
+00:02:59,999 --> 00:03:05,542
+the needle's scarf dimension and how it's twisted when fitted.
+
+36
+00:03:05,943 --> 00:03:12,476
+On the other: the hook shaft bore, the hook point to its mounting datum,
+
+37
+00:03:12,496 --> 00:03:15,479
+and the hook shaft's radial play.
+
+38
+00:03:15,879 --> 00:03:22,139
+Eight links end to end, closing on the gap: that's a tolerance chain.
+
+39
+00:03:23,659 --> 00:03:28,345
+The example gives each of the eight links a tolerance,
+
+40
+00:03:28,365 --> 00:03:30,873
+around a nominal gap of 0.07.
+
+41
+00:03:31,273 --> 00:03:38,788
+The most cautious method is worst case: every link at its worst extreme,
+
+42
+00:03:38,808 --> 00:03:44,962
+so the range is the sum of tolerances, plus or minus 0.153,
+
+43
+00:03:44,982 --> 00:03:47,893
+far beyond the allowed 0.03.
+
+44
+00:03:48,293 --> 00:03:53,767
+But all links at their limits at once almost never happens.
+
+45
+00:03:54,167 --> 00:04:01,284
+The statistical method treats each link as a normal variable with tolerance
+
+46
+00:04:01,304 --> 00:04:02,712
+at three sigma;
+
+47
+00:04:02,732 --> 00:04:09,183
+the gap's sigma is the root sum of squares, about 0.0194 millimetre.
+
+48
+00:04:09,583 --> 00:04:16,292
+A Monte Carlo run of 4000 machines gives about 87 percent good;
+
+49
+00:04:16,312 --> 00:04:23,342
+about 129 in every thousand either hit the needle or tend to skip.
+
+50
+00:04:24,862 --> 00:04:32,082
+What industrial lockstitch machines actually do is adjust at assembly.
+
+51
+00:04:32,482 --> 00:04:35,554
+The hook can slide along its shaft;
+
+52
+00:04:35,574 --> 00:04:41,473
+the fitter sets the gap to 0.07 against the needle actually fitted,
+
+53
+00:04:41,493 --> 00:04:44,742
+with a feeler gauge, and tightens up.
+
+54
+00:04:45,142 --> 00:04:53,501
+On the right, the distribution of 4000 machines cycles through three cases.
+
+55
+00:04:53,901 --> 00:04:57,801
+Fully interchangeable: big red tails.
+
+56
+00:04:58,201 --> 00:05:01,924
+Adjusted: the bore positions, clamp offset,
+
+57
+00:05:01,944 --> 00:05:08,712
+hook dimension and needle links are all absorbed, sigma drops to about 0.0054,
+
+58
+00:05:08,732 --> 00:05:10,453
+and almost all pass.
+
+59
+00:05:10,853 --> 00:05:17,713
+But change the needle and its two links come back: about 98 percent.
+
+60
+00:05:19,233 --> 00:05:23,733
+Adjustment has a catch: it only holds for the needle fitted at the time.
+
+61
+00:05:24,133 --> 00:05:29,413
+On the floor, needles are changed when they break or blunt,
+
+62
+00:05:29,433 --> 00:05:36,509
+and a new needle's scarf dimension and twist differ, so those two links return.
+
+63
+00:05:36,909 --> 00:05:41,741
+To stay good after a change, either demand tighter needle accuracy,
+
+64
+00:05:41,761 --> 00:05:46,593
+which lands on the needle maker's tolerances, next lecture's topic,
+
+65
+00:05:46,613 --> 00:05:49,779
+or reset the gap after changing needle size.
+
+66
+00:05:50,179 --> 00:05:53,571
+That's the real value of chain analysis:
+
+67
+00:05:53,591 --> 00:06:00,737
+it separates links fixed once by adjustment from links that keep coming back in use.
+
+68
+00:06:02,257 --> 00:06:04,397
+Assembly, inspection and testing.
+
+69
+00:06:05,917 --> 00:06:13,441
+Finished machines get vibration tests: by QB/T 1178-2006,
+
+70
+00:06:13,461 --> 00:06:21,117
+an accelerometer at set points on the head, at set speeds.
+
+71
+00:06:21,517 --> 00:06:25,393
+More useful than the overall value is the spectrum:
+
+72
+00:06:25,413 --> 00:06:31,657
+how big the first order at shaft frequency and the second order at twice that are.
+
+73
+00:06:32,057 --> 00:06:40,397
+On the right, the speed sweeps back and forth from 3000 to 6500.
+
+74
+00:06:40,797 --> 00:06:44,821
+Blue is the first order, orange the second,
+
+75
+00:06:44,841 --> 00:06:49,617
+and the grey line is the arm's amplification curve.
+
+76
+00:06:50,017 --> 00:06:54,878
+The needle bar's inertia force has first- and second-order parts,
+
+77
+00:06:54,898 --> 00:06:58,632
+and balance weights cancel only part of the first,
+
+78
+00:06:58,652 --> 00:07:04,339
+so when the second order nears the arm's natural frequency, vibration soars.
+
+79
+00:07:05,859 --> 00:07:11,639
+Case: why it screams after the speed-up.
+
+80
+00:07:13,159 --> 00:07:14,699
+Back to our problem.
+
+81
+00:07:15,099 --> 00:07:20,597
+On the right, the speed sweep, with the dot moving back and forth.
+
+82
+00:07:20,997 --> 00:07:28,129
+Vibration is almost flat below 5000, rises steeply above it,
+
+83
+00:07:28,149 --> 00:07:34,685
+peaks near 5710 r/min, and falls again beyond the peak.
+
+84
+00:07:35,085 --> 00:07:37,814
+The growth is in the second order.
+
+85
+00:07:38,214 --> 00:07:46,519
+A 10 percent speed rise adds only about 21 percent to the inertia force,
+
+86
+00:07:46,539 --> 00:07:54,036
+368 to about 445 newtons, yet vibration becomes 3.3 times larger.
+
+87
+00:07:54,436 --> 00:07:58,256
+What grew isn't the force; it's the amplification.
+
+88
+00:07:59,776 --> 00:08:03,883
+Treat the arm as a single-degree-of-freedom system:
+
+89
+00:08:03,903 --> 00:08:08,254
+response equals static deflection times amplification,
+
+90
+00:08:08,274 --> 00:08:13,838
+which is 1 over the square root of: one minus r squared, all squared,
+
+91
+00:08:13,858 --> 00:08:19,908
+plus two zeta r, all squared; where r is excitation over natural frequency.
+
+92
+00:08:20,308 --> 00:08:36,248
+At 5000 r/min the second order is 167 hertz, r is 0.88, amplification 4.2.
+
+93
+00:08:36,648 --> 00:08:47,577
+At 5500 it's 183 hertz, r is 0.96, amplification about 11.
+
+94
+00:08:47,977 --> 00:08:55,477
+Ten percent more speed, about 2.6 times the amplification: that's resonance.
+
+95
+00:08:56,997 --> 00:08:59,602
+There are three kinds of fix.
+
+96
+00:09:00,002 --> 00:09:02,689
+One, change the structure:
+
+97
+00:09:02,709 --> 00:09:10,393
+ribs and thicker walls inside the arm raise modal stiffness 30 percent and
+
+98
+00:09:10,413 --> 00:09:14,662
+the natural frequency to about 217 hertz;
+
+99
+00:09:14,682 --> 00:09:20,805
+at 5500, vibration drops to about 3.4 millimetres a second.
+
+100
+00:09:21,205 --> 00:09:31,804
+Two, add damping: a damping ratio of 0.06 only gets to 9.0, and 0.10 to 6.1.
+
+101
+00:09:32,204 --> 00:09:36,296
+Three, cut the excitation at its source:
+
+102
+00:09:36,316 --> 00:09:43,184
+20 percent less reciprocating mass gives 10.6, 40 percent less 8.0.
+
+103
+00:09:43,584 --> 00:09:50,237
+Conclusion: moving the natural frequency out of the working range works best;
+
+104
+00:09:50,257 --> 00:09:51,884
+the other two help.
+
+105
+00:09:53,404 --> 00:09:57,828
+Now back to tolerance chains, on a robot.
+
+106
+00:09:58,228 --> 00:10:05,517
+A robot's tool-centre-point error is a tolerance chain too: link lengths,
+
+107
+00:10:05,537 --> 00:10:11,324
+joint zeros, gearbox backlash and tool length, end to end.
+
+108
+00:10:11,724 --> 00:10:17,693
+Making every part precise enough for a tenth of a millimetre is expensive,
+
+109
+00:10:17,713 --> 00:10:22,144
+so industry does what we did with the hook gap: adjust.
+
+110
+00:10:22,544 --> 00:10:28,783
+After assembly a laser tracker calibrates the kinematics and the errors go
+
+111
+00:10:28,803 --> 00:10:31,574
+into the controller's parameters,
+
+112
+00:10:31,594 --> 00:10:32,759
+absorbed once.
+
+113
+00:10:33,159 --> 00:10:38,569
+But the calibration holds only for the tool fitted then,
+
+114
+00:10:38,589 --> 00:10:42,738
+just as the gap holds only for that needle,
+
+115
+00:10:42,758 --> 00:10:47,489
+so every tool change needs a new TCP calibration.
+
+116
+00:10:49,009 --> 00:10:52,101
+The most familiar resonance is the washing machine.
+
+117
+00:10:52,501 --> 00:10:57,454
+As it spins up, at one particular speed it suddenly shudders,
+
+118
+00:10:57,474 --> 00:11:01,041
+and once it's faster it runs smoothly again.
+
+119
+00:11:01,441 --> 00:11:07,873
+At that moment the drum's excitation frequency is passing the machine's
+
+120
+00:11:07,893 --> 00:11:09,509
+natural frequency:
+
+121
+00:11:09,529 --> 00:11:10,417
+resonance.
+
+122
+00:11:10,817 --> 00:11:14,245
+Our sewing-machine arm is exactly the same,
+
+123
+00:11:14,265 --> 00:11:19,697
+except that its operating point happened to sit halfway up the peak.
+
+124
+00:11:21,217 --> 00:11:22,517
+Back to the start.
+
+125
+00:11:22,917 --> 00:11:34,022
+At 5000 r/min the second-order excitation is 167 hertz, frequency ratio 0.88,
+
+126
+00:11:34,042 --> 00:11:43,558
+amplification about 4.2, vibration about 4.0 millimetres a second.
+
+127
+00:11:43,958 --> 00:11:52,583
+At 5500 it's 183 hertz, ratio 0.96, amplification about 11,
+
+128
+00:11:52,603 --> 00:11:59,469
+vibration about 13.3, and noise about 94 dB(A).
+
+129
+00:11:59,869 --> 00:12:03,911
+The inertia force grew only about 21 percent;
+
+130
+00:12:03,931 --> 00:12:10,049
+the second-order excitation crept up to the arm's natural frequency.
+
+131
+00:12:10,449 --> 00:12:11,889
+That's resonance.
+
+132
+00:12:12,289 --> 00:12:21,313
+Ribs that raise stiffness 30 percent lift the natural frequency to about 217 hertz:
+
+133
+00:12:21,333 --> 00:12:25,890
+vibration about 3.4, noise about 82 dB(A).
+
+134
+00:12:27,410 --> 00:12:31,978
+Now Virtual lab 23-1, tolerance chains and resonance,
+
+135
+00:12:31,998 --> 00:12:37,951
+which you can do yourself on WenQuest. Results and tasks are blurred.
+
+136
+00:12:37,971 --> 00:12:38,990
+On page one,
+
+137
+00:12:39,010 --> 00:12:45,309
+the left shows the hook-gap distribution of 4000 machines and each link's
+
+138
+00:12:45,329 --> 00:12:46,434
+contribution;
+
+139
+00:12:46,454 --> 00:12:50,070
+on the right you set the eight tolerances.
+
+140
+00:12:50,470 --> 00:12:55,374
+Task one: no adjustment and no needle change.
+
+141
+00:12:55,394 --> 00:13:03,362
+Move the tolerance sliders to reach a 99 percent yield at no more than 33
+
+142
+00:13:03,382 --> 00:13:05,222
+yuan per machine.
+
+143
+00:13:05,242 --> 00:13:13,210
+First ask which links have a big variance share and are cheap to tighten.
+
+144
+00:13:13,610 --> 00:13:16,863
+Task two: adjust the gap at assembly.
+
+145
+00:13:16,883 --> 00:13:21,729
+The absorbed links turn grey in the contribution chart.
+
+146
+00:13:21,749 --> 00:13:24,914
+Do they still need to be so precise?
+
+147
+00:13:24,934 --> 00:13:29,868
+Reach a 99 percent yield at 28 yuan or less per machine.
+
+148
+00:13:30,268 --> 00:13:36,972
+Task three: after adjusting, change to a new needle on the shop floor,
+
+149
+00:13:36,992 --> 00:13:39,854
+see which two links come back,
+
+150
+00:13:39,874 --> 00:13:45,328
+and find a way back to a 99 percent yield within 30 yuan.
+
+151
+00:13:45,728 --> 00:13:49,786
+Switch to page two, speed and resonance.
+
+152
+00:13:49,806 --> 00:13:57,534
+Drag the top speed from 5000 to 5500 and watch the operating point climb the
+
+153
+00:13:57,554 --> 00:14:00,388
+slope of the resonance peak.
+
+154
+00:14:00,788 --> 00:14:03,822
+Task four: change the damping ratio,
+
+155
+00:14:03,842 --> 00:14:09,167
+the reciprocating mass and the arm's natural frequency in turn,
+
+156
+00:14:09,187 --> 00:14:15,529
+and compare the three fixes to bring vibration and noise into spec at 5500.
+
+157
+00:14:15,549 --> 00:14:19,007
+The results are blurred; try it yourself.
+
+158
+00:14:19,027 --> 00:14:23,248
+The guide and report template are on the platform.
+
+159
+00:14:24,768 --> 00:14:30,250
+The gap set at assembly has to be recorded, machine by machine, in the factory.
+
+160
+00:14:30,270 --> 00:14:32,826
+This is the WenQuest digital factory.
+
+161
+00:14:32,846 --> 00:14:37,144
+The adjustment station measures the hook gap on every machine,
+
+162
+00:14:37,164 --> 00:14:40,626
+the readings go over the bus into a control chart,
+
+163
+00:14:40,646 --> 00:14:44,108
+and if the data drifts the system raises an alarm.
+
+164
+00:14:44,508 --> 00:14:49,935
+Switch to the trace page. On the right is the machine record:
+
+165
+00:14:49,955 --> 00:14:55,649
+each machine's hook batch, hook gap, hook timing and final test,
+
+166
+00:14:55,669 --> 00:14:59,400
+each one a record in the history database.
+
+167
+00:14:59,800 --> 00:15:03,638
+Drag the serial number and look at them one by one.
+
+168
+00:15:03,658 --> 00:15:09,160
+Today's adjustment at assembly and final inspection are done, logged and,
+
+169
+00:15:09,180 --> 00:15:14,077
+if something goes wrong, traced like this, one machine at a time.
+
+170
+00:15:14,097 --> 00:15:18,540
+We'll walk through the whole digital factory in Lecture 27.
+
+171
+00:15:20,060 --> 00:15:24,552
+Your assignment has four questions. One: a gap set by five links.
+
+172
+00:15:24,572 --> 00:15:28,925
+Find its range and yield by worst case and by statistics; then,
+
+173
+00:15:28,945 --> 00:15:34,062
+with the first three absorbed by adjustment, find the new sigma and yield,
+
+174
+00:15:34,082 --> 00:15:37,602
+and say which links still deserve accuracy control.
+
+175
+00:15:38,002 --> 00:15:45,488
+Two: an arm with a 200 hertz natural frequency and a damping ratio of 0.03,
+
+176
+00:15:45,508 --> 00:15:47,789
+planned for 5800 r/min.
+
+177
+00:15:47,809 --> 00:15:53,393
+Find the second-order frequency ratio and amplification,
+
+178
+00:15:53,413 --> 00:15:58,097
+recompute with ribs that raise it to 250 hertz,
+
+179
+00:15:58,117 --> 00:16:05,302
+and compare the three kinds of fix by when they work and what they cost.
+
+180
+00:16:05,702 --> 00:16:10,869
+Three: complete the four tasks of Virtual lab 23-1. Four:
+
+181
+00:16:10,889 --> 00:16:14,510
+for a new high-speed lockstitch machine,
+
+182
+00:16:14,530 --> 00:16:18,514
+list the standards and the IP work it needs,
+
+183
+00:16:18,534 --> 00:16:22,882
+and say at which stage and by whom each is done.
+
+184
+00:16:23,282 --> 00:16:28,342
+Submit the assignment and the lab report on the WenQuest platform.
+
+185
+00:16:29,862 --> 00:16:34,386
+There's also a ten-question quiz. For example,
+
+186
+00:16:34,406 --> 00:16:40,511
+a chain has three links with tolerances of plus or minus 0.03,
+
+187
+00:16:40,531 --> 00:16:45,648
+0.03 and 0.02 millimetre. By the statistical method,
+
+188
+00:16:45,668 --> 00:16:49,402
+what is the range of the closing link?
+
+189
+00:16:49,802 --> 00:16:53,850
+Or, with the shaft at 4800 r/min,
+
+190
+00:16:53,870 --> 00:17:03,342
+what is the frequency of the second-order needle-bar inertia force, in hertz?
+
+191
+00:17:03,742 --> 00:17:08,425
+You get three attempts, and the explanations appear as soon as you submit.
+
+192
+00:17:09,945 --> 00:17:11,525
+Three things to remember.
+
+193
+00:17:11,925 --> 00:17:15,447
+One: from design inputs to production,
+
+194
+00:17:15,467 --> 00:17:19,827
+the later a problem is found the more it costs,
+
+195
+00:17:19,847 --> 00:17:25,140
+and standards and patents are design inputs from day one.
+
+196
+00:17:25,540 --> 00:17:29,107
+Two: analyse tolerance chains statistically;
+
+197
+00:17:29,127 --> 00:17:35,140
+adjustment at assembly absorbs most of the error with one adjustable link,
+
+198
+00:17:35,160 --> 00:17:38,564
+but a needle change brings two links back.
+
+199
+00:17:38,964 --> 00:17:44,902
+Three: when excitation nears a natural frequency vibration soars;
+
+200
+00:17:44,922 --> 00:17:51,777
+fix resonance first by changing the structure to move the natural frequency
+
+201
+00:17:51,797 --> 00:17:52,968
+out of range.
+
+202
+00:17:53,368 --> 00:17:59,079
+The assignment, quiz and lab report are on WenQuest.
+
+203
+00:17:59,479 --> 00:18:05,255
+Next time: how needles and rotary hooks are made.
+
+204
+00:18:05,655 --> 00:18:08,167
+The slides, the virtual lab,
+
+205
+00:18:08,187 --> 00:18:14,497
+the assignment and the quiz are all on the WenQuest learning platform,
+
+206
+00:18:14,517 --> 00:18:20,557
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+207
+00:18:20,957 --> 00:18:21,809
+See you next time.
