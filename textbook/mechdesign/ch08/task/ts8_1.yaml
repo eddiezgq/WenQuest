@@ -1,0 +1,33 @@
+# 工程任务单 TS-8-1（配第 8 章）：为协作机器人肩关节设计应变片测力矩的方案。格式见 textbook/tools/tasksheet.py。
+编号: TS-8-1
+标题: ["为协作机器人肩关节设计应变片测力矩的方案", "Design a strain-gauge torque measurement for a cobot shoulder joint"]
+角色: ["机器人关节的结构工程师", "robot joint design engineer"]
+背景:
+  - "协作机器人要能“感觉到”碰撞：每个关节测出实际的力矩，与动力学模型算出的力矩比较，差得多就停机。肩关节的输出轴 RJ-201（第 33 章：Ø50/Ø30 空心轴，40Cr 调质）是现成的弹性体，项目组想在它上面贴应变片测力矩，不另加传感器。8.1 节已经算过：假设 Ø50/Ø30 截面的表面能贴片，±45° 全桥在起停峰值时的输出只有零点零几 mV/V，太小；而且现结构里这一段被轴承和隔套占满，根本没有地方贴。你作为结构工程师，要给出一个可行的方案：在哪里贴、怎样贴、要不要改结构（加长轴、留出专门的测量段并局部做薄，或改成辐条式法兰弹性体）、灵敏度多大、弯矩和温度的干扰怎样消除、强度和刚度还够不够，写一份方案说明。"
+  - "A cobot must “feel” collisions: each joint measures its actual torque and compares it with the dynamic model, stopping on a large difference. The shoulder output shaft RJ-201 (Chapter 33: Ø50/Ø30 hollow, 40Cr Q&T) is a ready elastic body, and the team wants gauges on it rather than a separate sensor. Section 8.1 showed that, even assuming the Ø50/Ø30 surface could take gauges, a ±45° full bridge gives only a few hundredths of a mV/V at the start–stop peak — too little; and in the present design that portion is fully occupied by bearings and the spacer, so there is no room to bond gauges. As design engineer, propose a workable scheme: where and how to bond the gauges, whether to change the structure (lengthen the shaft and add a thinned measuring section, or switch to a spoked flange elastic body), the sensitivity, how to reject bending and temperature, and whether strength and stiffness remain adequate; write a scheme description."
+输入:
+  - {名称: ["RJ-201 的结构与尺寸（第 33 章，数字工厂案例件 RJ-201 第 1 版模型）；谐波减速器 CSF-25-100 的额定、起停允许峰值、瞬时允许最大转矩（零件库）；一个节拍的力矩与大臂传来的力（第 33 章“运动与动力分析”的结果）", "RJ-201 structure and dimensions (Chapter 33; factory case part RJ-201 rev 1 model); CSF-25-100 rated, start–stop and momentary torques (parts library); torque and arm force over one cycle (Chapter 33 motion and dynamics results)"], 来源: ["教材第 33 章；数字工厂零件库与案例件", "Chapter 33; factory parts library and case parts"]}
+  - {名称: ["应变片：金属箔式，灵敏系数 K ≈ 2.0，按钢自补偿；电桥激励 5 V；放大与采集系统的分辨率 1 µV（本书设定）", "Gauges: metal foil, gauge factor K ≈ 2.0, self-compensated for steel; bridge excitation 5 V; amplifier and acquisition resolution 1 µV (set by this book)"], 来源: ["项目任务书", "Project brief"]}
+  - {名称: ["程序 8.1.1、8.6.1、8.10.1；数字工厂“仿真与分析”（有限元）", "Programs 8.1.1, 8.6.1, 8.10.1; factory “Simulation & analysis” (finite elements)"], 来源: ["教材第 8 章；数字工厂", "Chapter 8; digital factory"]}
+交付物:
+  - {名称: ["方案说明（3 页以内）：贴片位置与方向、电桥接法（画桥路图）、弹性体的修改（如有）、额定和起停峰值下的应变与电桥输出、分辨率对应的力矩、弯矩与温度干扰的消除方法、修改后的强度和扭转刚度核算", "Scheme description (up to 3 pages): gauge locations and directions, bridge wiring (with a bridge diagram), changes to the elastic body (if any), strains and bridge output at rated and start–stop peak, torque resolution, how bending and temperature are rejected, strength and torsional stiffness after the change"], 验收: ["应变按胡克定律和扭转公式算对（ε45 = τ/2G）；说明 ±45° 全桥为什么不受弯矩和均匀温度的影响（用 8.6 节的应变花关系）；满量程输出不低于 0.5 mV/V，或说明为什么接受更低；做薄后按瞬时允许最大转矩核算强度（第 10 章的思路，按第四强度理论），并核算扭转刚度的变化对第 33.10 节末端偏移的影响", "Strains correct by Hooke's law and torsion (ε45 = τ/2G); why a ±45° full bridge rejects bending and uniform temperature explained with the rosette relations of Section 8.6; full-scale output at least 0.5 mV/V or a reason to accept less; strength after thinning checked at the momentary torque (von Mises), and the effect of the torsional stiffness change on the end-point offset of Section 33.10 checked"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["有限元核对：在数字工厂“仿真与分析”里对（修改后的）RJ-201 加起停峰值转矩，读出贴片处表面的应力（“仿真与分析”只给冯·米塞斯应力：纯扭段 τ = σ_vM/√3），按胡克定律换算成 ±45° 方向的应变；修改后的模型可以在“仿真与分析”里上传 STEP 文件，与手算比较", "FE check: in Simulation & analysis, load the (modified) RJ-201 with the start–stop peak torque, read the surface stress at the gauge location (Simulation & analysis reports only von Mises stress: in a pure-torsion section τ = σ_vM/√3), convert it to ±45° strains by Hooke's law; a modified model can be uploaded to Simulation & analysis as a STEP file, and compare with hand calculation"], 验收: ["截图含模型、约束、载荷、读数位置；手算与有限元差别在 10% 以内，或解释原因（台阶、花键附近的局部效应）", "Screenshots of model, supports, load, read-out location; hand and FE within 10%, or the difference explained (local effects near steps and the spline)"], 类型: 分析, 零件: RJ-201}
+  - {名称: ["计算书（Python 或计算表）", "Calculation (Python or spreadsheet)"], 验收: ["能复现方案说明里的数", "Reproduces the numbers in the scheme description"], 类型: 文件, 格式: [zip, txt, xlsx]}
+工位: [PY, FEA]
+步骤:
+  - ["用程序 8.1.1 复核现有 Ø50/Ø30 段的应变和电桥输出，算出分辨率 1 µV 对应的力矩", "Recheck the strain and bridge output of the present Ø50/Ø30 portion with Program 8.1.1 and find the torque resolution for 1 µV"]
+  - ["找出能贴片的位置（加长轴留测量段、改辐条式法兰等），提出提高灵敏度的办法，算出起停峰值时达到 0.5 mV/V（定为满量程）需要的尺寸，核算瞬时允许最大转矩下的强度和扭转刚度", "Find a place for the gauges (a lengthened shaft with a measuring section, a spoked flange, …), propose ways to raise sensitivity, size them for 0.5 mV/V at the start–stop peak (taken as full scale), and check strength at the momentary torque and torsional stiffness"]
+  - ["用 8.6 节的应变花关系说明 ±45° 全桥怎样消除弯矩和温度的影响；用一个节拍里的大臂力（第 33 章）估算弯矩造成的单片应变有多大", "Explain with the rosette relations of Section 8.6 how a ±45° full bridge rejects bending and temperature; estimate the single-gauge strain from bending with the arm force of one cycle (Chapter 33)"]
+  - ["在“仿真与分析”里核对贴片处的应变", "Check the strain at the gauge location in Simulation & analysis"]
+  - ["写方案说明；评审后在“我的任务”里提交三份交付物", "Write the scheme; submit the three deliverables in My tasks after the review"]
+评审要点:
+  - ["应变、灵敏度计算正确，单位清楚（µε、mV/V）", "Strain and sensitivity correct, units clear (µε, mV/V)"]
+  - ["贴片方向和桥路接法正确，能说明抵消弯矩和温度的原理", "Gauge directions and bridge wiring correct, rejection of bending and temperature explained"]
+  - ["做薄或改结构后，强度、刚度和装配（花键、轴承位）都核算过，没有为灵敏度牺牲安全", "After thinning or redesign, strength, stiffness and assembly (spline, bearing seats) are checked; safety not traded for sensitivity"]
+  - ["有限元与手算对照，差别有解释", "FE compared with hand calculation, differences explained"]
+评分:
+  - {项: ["应变与灵敏度", "Strain and sensitivity"], 分: 25, 标准: ["计算正确、单位清楚", "Correct, clear units"]}
+  - {项: ["方案与干扰抑制", "Scheme and interference rejection"], 分: 30, 标准: ["贴片与桥路合理，原理说清", "Sound gauging and bridge, principle explained"]}
+  - {项: ["强度与刚度核算", "Strength and stiffness"], 分: 25, 标准: ["修改后的核算完整", "Complete checks after the change"]}
+  - {项: ["有限元核对与答辩", "FE check and defense"], 分: 20, 标准: ["对照合理、答辩清楚", "Sound comparison, clear defense"]}
+学时: 4

@@ -1,0 +1,31 @@
+# 实验 8.9 的指导书与报告模板。目的、场景、参数、任务取自 lab8_9.js。
+原理:
+  - ["两个弹性体在一条线（或一个点）上接触，受压后接触区变成一条很窄的带（或一个椭圆），压力按半椭圆分布，中间最大。赫兹在 1882 年给出了解。", "Two elastic bodies touching along a line (or at a point) flatten into a narrow strip (or an ellipse) under load; the pressure is semi-elliptical, highest in the middle. Hertz gave the solution in 1882."]
+  - 式: ["R = 1/(1/R1 + 1/R2)，1/E* = (1 − ν1²)/E1 + (1 − ν2²)/E2；a = √(4F′R/(πE*))，p0 = 2F′/(πa)，F′ = F/b", "R = 1/(1/R1 + 1/R2), 1/E* = (1 − ν1²)/E1 + (1 − ν2²)/E2; a = √(4F′R/(πE*)), p0 = 2F′/(πa), F′ = F/b"]
+  - ["p0 与 √F′ 成正比：载荷加倍，压力只增加约 41%，因为接触宽度也变宽了。最大主切应力约 0.30 p0，在表面以下约 0.78a 处。", "p0 grows as √F′: double the load and the pressure rises only about 41%, because the contact also widens. The maximum principal shear is about 0.30 p0, some 0.78a below the surface."]
+步骤:
+  - ["打开实验 8.9，场景“WQR-105 第二级齿面”，参数取默认（与程序 8.9.1 相同：F = 3694 N、b = 40 mm、R1 = 10.26 mm、R2 = 35.91 mm、钢对钢），点“计算”（任务 1），把读数填入表 1 第一行。", "Open Lab 8.9, scene “WQR-105 stage-2 tooth flanks”, defaults (as in Program 8.9.1: F = 3694 N, b = 40 mm, R1 = 10.26 mm, R2 = 35.91 mm, steel on steel); press Compute (task 1) and fill in the first row of Table 1."]
+  - ["把 F 改为 7388 N（任务 2），填表 1 第二行，算出 p0 之比，与 √2 比较。", "Set F to 7388 N (task 2), fill in the second row, and compare the ratio of p0 with √2."]
+  - ["切换到“AGV 驱动轮”，R1 = 75 mm、R2 = 0（平面）、b = 50 mm、F = 1500 N，材料取 1（尼龙）和 0（钢）各算一次（任务 3），填表 2。", "Switch to “AGV drive wheel”: R1 = 75 mm, R2 = 0 (flat), b = 50 mm, F = 1500 N; compute with material 1 (nylon) and 0 (steel) (task 3) and fill in Table 2."]
+  - ["切换到“火车车轮与钢轨”，R1 = 460 mm、R2 = 0、b = 12 mm、F = 80 000 N（任务 4），填表 3。", "Switch to “Train wheel on rail”: R1 = 460 mm, R2 = 0, b = 12 mm, F = 80 000 N (task 4), and fill in Table 3."]
+数据表:
+  - 标题: ["表 1  WQR-105 第二级齿面（节点）", "Table 1  WQR-105 stage-2 flanks (pitch point)"]
+    表头: ["F / N", "a / mm", "p0 / MPa", "τ1max / MPa", "深度 / mm", "p0 之比"]
+    表头英文: ["F / N", "a / mm", "p0 / MPa", "τ1max / MPa", "Depth / mm", "Ratio of p0"]
+    行: [["3694", "", "", "", "", "1"], ["7388", "", "", "", "", ""]]
+  - 标题: ["表 2  AGV 驱动轮（1500 N）", "Table 2  AGV drive wheel (1500 N)"]
+    表头: ["轮子材料", "E* / MPa", "a / mm", "p0 / MPa", "τ1max / MPa"]
+    表头英文: ["Wheel material", "E* / MPa", "a / mm", "p0 / MPa", "τ1max / MPa"]
+    行: [["尼龙", "", "", "", ""], ["钢", "", "", "", ""]]
+    行英文: [["nylon", "", "", "", ""], ["steel", "", "", "", ""]]
+  - 标题: ["表 3  火车车轮与钢轨（线接触示意）", "Table 3  Train wheel on rail (line-contact sketch)"]
+    表头: ["a / mm", "p0 / MPa", "τ1max / MPa", "深度 / mm"]
+    表头英文: ["a / mm", "p0 / MPa", "τ1max / MPa", "Depth / mm"]
+    行: [["", "", "", ""]]
+注意:
+  - ["齿面的接触强度计算还要考虑重合度、载荷沿齿宽的分布、动载等，见第 29 章；这里只算“两个圆柱压在一起”本身。", "Tooth-flank contact strength also involves contact ratio, face load distribution, dynamic load and more (Chapter 29); here only the two-cylinder contact itself."]
+  - ["火车轮轨实际是两个曲面交叉的椭圆接触，这里按线接触粗略示意，压力会偏低；AGV 轮和火车轮轨的尺寸、载荷是本书设定的示意值。", "The wheel–rail contact is really elliptical (crossed curved surfaces); the line-contact sketch here underestimates the pressure. AGV and train dimensions and loads are illustrative values."]
+  - ["尼龙轮的接触变形较大，赫兹理论只能给出量级；轮缘很薄的轮子（包胶轮）不能用这组公式。", "Nylon wheels deform more and Hertz theory gives only the order of magnitude; thin-tread (rubber-covered) wheels are outside these formulas."]
+思考题:
+  - ["程序 8.9.1 和本实验用同一组公式。最大切应力在表面以下约 0.78a 处，所以接触疲劳的裂纹常从表面以下开始，长到表面掉下一小块——这就是点蚀和剥落。表面硬化层（第 5 章的渗碳）至少要多深？", "Program 8.9.1 and this lab use the same formulas. The maximum shear lies about 0.78a below the surface, so contact-fatigue cracks often start below and grow up until a flake falls out — pitting and spalling. How deep must a hardened case (carburizing, Chapter 5) be at least?"]
+  - ["为什么 AGV 常用聚氨酯或尼龙轮，而不用钢轮？从接触压力、地面、噪声和承载能力几方面比较。", "Why do AGVs usually run on polyurethane or nylon wheels rather than steel? Compare contact pressure, floor, noise and capacity."]

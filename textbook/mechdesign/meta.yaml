@@ -31,6 +31,8 @@ program_deps:
   - factory/digital/twin/field.py
   - factory/digital/twin/models.py
   - factory/digital/twin/__init__.py
+  # 第 8 章：第 7 章的载荷模块（试验台记录、现场数据、UR5e 质量）
+  - textbook/mechdesign/ch07/code/_ch7.py
   # 第 60 轮 D-1：构建时记录到的其余书外文件（各章程序经 sys.path 导入数字工厂的包、读零件库的规格表）
   - docs/教材/机械设计/00_提纲.md
   - factory/factory/*.py
