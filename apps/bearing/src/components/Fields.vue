@@ -6,7 +6,8 @@ import Num from './Num.vue'
 import Scenario from './Scenario.vue'
 import { computed } from 'vue'
 
-const cyl = computed(() => project.type === 'cylindrical')
+const cyl = computed(() => ['cylindrical', 'tapered'].includes(project.type))
+const tap = computed(() => project.type === 'tapered')
 // the crown profile table: "x, drop" lines ↔ [[x, drop], …]
 const pts = computed({
   get: () => (project.profile?.points || []).map((r) => r.join(', ')).join('\n'),
@@ -19,7 +20,7 @@ const pts = computed({
 <template>
   <div class="fields">
     <div class="seg" role="radiogroup" :aria-label="t('type')">
-      <button v-for="k in ['deep_groove', 'angular', 'cylindrical']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
+      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
               :class="{ on: project.type === k }" @click="project.type = k">{{ t(k) }}</button>
     </div>
 
@@ -43,12 +44,18 @@ const pts = computed({
       <Num v-model="project.inner.h_o" :label="t('h_o')" unit="mm" />
     </fieldset>
     <fieldset v-else><legend>{{ t('gRollers') }}</legend>
-      <Num v-model="project.inner.Dw" :label="t('DwR')" unit="mm" />
+      <Num v-model="project.inner.Dw" :label="tap ? t('DwT') : t('DwR')" unit="mm" />
       <Num v-model="project.inner.Lw" :label="t('Lw')" unit="mm" />
       <Num v-model="project.inner.Lwe" :label="t('Lwe')" unit="mm" :hint="t('LweHint')" />
       <Num v-model="project.inner.Z" :label="t('ZR')" step="1" />
       <Num v-model="project.inner.dm" :label="t('dm')" unit="mm" :hint="t('dmHint')" />
-      <Num v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
+      <Num v-if="!tap" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
+      <template v-else>
+        <Num v-model="project.inner.alpha_o_deg" :label="t('cupAngle')" unit="°" :hint="t('cupHint')" />
+        <Num v-model="project.inner.alpha_i_deg" :label="t('coneAngle')" unit="°" />
+        <Num v-model="project.inner.alpha_f_deg" :label="t('ribAngle')" unit="°" :hint="t('ribHint')" />
+        <Num v-model="project.inner.R_end" :label="t('rEnd')" unit="mm" />
+      </template>
       <label class="num"><span class="lab">{{ t('crown') }}</span>
         <select v-model="project.profile.kind"><option v-for="k in ['straight', 'arc', 'partial', 'table']" :key="k" :value="k">{{ t('crown_' + k) }}</option></select></label>
       <Num v-if="['arc', 'partial'].includes(project.profile.kind)" v-model="project.profile.R" :label="t('crownR')" unit="mm" />
@@ -71,13 +78,13 @@ const pts = computed({
     </fieldset>
 
     <fieldset><legend>{{ t('gFits') }}</legend>
-      <template v-if="project.type !== 'angular'">
+      <template v-if="!['angular', 'tapered'].includes(project.type)">
         <Num v-model="project.fits.shaft_I" :label="t('shaft_I')" unit="mm" step="0.001" />
         <Num v-model="project.fits.housing_I" :label="t('housing_I')" unit="mm" step="0.001" />
         <Num v-model="project.fits.T_i" :label="t('T_i')" unit="°C" />
         <Num v-model="project.fits.T_o" :label="t('T_o')" unit="°C" />
       </template>
-      <p v-else class="hint">{{ t('fitsAngular') }}</p>
+      <p v-else class="hint">{{ tap ? t('fitsTapered') : t('fitsAngular') }}</p>
     </fieldset>
 
     <fieldset><legend>{{ t('gLube') }}</legend>

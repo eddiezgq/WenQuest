@@ -1,0 +1,83 @@
+{
+  "title": {
+    "zh": "示例（虚构）：减速器斜齿轮轴圆锥滚子轴承（固定端）",
+    "en": "Example (fictional): tapered roller bearing on a helical gear shaft (fixed end)"
+  },
+  "note": {
+    "zh": "尺寸、设备参数和限值均为演示虚构，不是任何厂家、标准或企业的数据。",
+    "en": "Sizes, machine data and limits are made up for the demo: not any maker's, standard's or company's data."
+  },
+  "type": "tapered",
+  "size": {
+    "d": 35,
+    "D": 72,
+    "B": 19
+  },
+  "inner": {
+    "Dw": 8.5,
+    "Lw": 13,
+    "Lwe": 12,
+    "Z": 16,
+    "dm": 54,
+    "alpha_o_deg": 15,
+    "alpha_i_deg": 12,
+    "R_end": 45
+  },
+  "profile": {
+    "kind": "partial",
+    "R": 400,
+    "flat": 6
+  },
+  "alignment": {
+    "theta_arcmin": 2
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "scenario": {
+    "kind": "gearbox",
+    "fp": 1.2,
+    "mn": 3,
+    "z": 34,
+    "alpha_n_deg": 20,
+    "beta_deg": 14,
+    "x": 55,
+    "L": 160,
+    "this": "A",
+    "fixed": "A",
+    "axial_to": "A",
+    "cases": [
+      {
+        "label": {
+          "zh": "额定",
+          "en": "rated"
+        },
+        "P": 18,
+        "n": 960,
+        "share": 0.85
+      },
+      {
+        "label": {
+          "zh": "过载",
+          "en": "overload"
+        },
+        "P": 26,
+        "n": 960,
+        "share": 0.15
+      }
+    ]
+  },
+  "fits": {},
+  "lube": {
+    "eta0": 0.04,
+    "alpha_p": 2e-08,
+    "sigma": 0.15
+  },
+  "limits": {
+    "p_static": 2500,
+    "p_fatigue": 1800,
+    "gap_min": 1.0,
+    "wall_min": 2.0
+  }
+}

@@ -25,7 +25,7 @@ const v = computed(() => {
 
 <template>
   <figure class="ldring">
-    <figcaption>{{ r?.type === 'cylindrical' ? t('rollerLoads') : t('loadRing') }}</figcaption>
+    <figcaption>{{ ['cylindrical', 'tapered'].includes(r?.type) ? t('rollerLoads') : t('loadRing') }}</figcaption>
     <svg v-if="v" :viewBox="`0 0 ${S} ${S}`" role="img" :aria-label="t('loadRing')">
       <circle :cx="C" :cy="C" :r="v.rD" class="ringline" /><circle :cx="C" :cy="C" :r="v.ro" class="ringline thin" />
       <circle :cx="C" :cy="C" :r="v.rdi" class="ringline thin" /><circle :cx="C" :cy="C" :r="v.rd" class="ringline" />

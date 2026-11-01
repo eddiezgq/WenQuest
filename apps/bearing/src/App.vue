@@ -8,6 +8,7 @@ import Fields from './components/Fields.vue'
 import Section from './components/Section.vue'
 import SectionCyl from './components/SectionCyl.vue'
 import SliceChart from './components/SliceChart.vue'
+import SectionTaper from './components/SectionTaper.vue'
 import LoadRing from './components/LoadRing.vue'
 import Checks from './components/Checks.vue'
 import Extras from './components/Extras.vue'
@@ -84,6 +85,7 @@ onMounted(async () => {
         <p v-if="note" class="fict">{{ t('fictional') }}：{{ note }}</p>
         <div class="figs">
           <SectionCyl v-if="result?.type === 'cylindrical'" :r="result" />
+          <SectionTaper v-else-if="result?.type === 'tapered'" :r="result" />
           <Section v-else :r="result" />
           <LoadRing :r="result" />
         </div>
