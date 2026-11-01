@@ -121,7 +121,7 @@ const fail = (e: unknown) => { msg.value = errorText(e instanceof ApiError ? e.c
 
 // 手填电流时才显示运行电流；按尺寸算热阻时才显示给定热阻；风扇时才显示风速
 function visible(k: string) {
-  if (k === "Irun") return ep.src === "manual" || !["lockstitch", "overlock"].includes(props.machine);   // 绷缝、花样、刺绣机的主轴没有转矩模型，主轴电流手填
+  if (k === "Irun") return ep.src === "manual" || !["lockstitch", "overlock", "embroid"].includes(props.machine);   // 绷缝、花样机的主轴没有转矩模型，主轴电流手填（刺绣机第 69 轮有了）
   if (k === "Rbox") return ep.rbox_src === "given";
   if (k === "vfan") return ep.air === "fan";
   return true;

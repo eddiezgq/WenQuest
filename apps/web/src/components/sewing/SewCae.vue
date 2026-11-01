@@ -92,7 +92,7 @@
         </view>
         <text v-if="busy === 'opt'" class="hint">{{ t("sew.computing") }}</text>
         <view v-if="optRes && !busy" class="res">
-          <text v-if="!optRes.candidates.length" class="hint">{{ t("sew.cae.optNone") }}</text>
+          <text v-if="!optRes.candidates.length" class="hint">{{ optRes.why ? L(optRes.why) : t("sew.cae.optNone") }}</text>
           <view v-for="(c, i) in optRes.candidates" :key="i" class="cand">
             <view class="cbody">
               <text class="para strong">{{ i + 1 }}. {{ fmtParams(c.params) }}</text>
@@ -476,7 +476,7 @@ function statusText(j: any) {
 function fmtParams(p: Record<string, number | string>) {
   return Object.entries(p).map(([k, v]) => `${props.labels?.[k] || k} = ${props.labels?.[`${k}:${v}`] || v}`).join("，");
 }
-const NOTES = ["fmax", "mu_min", "margin", "pre", "neg", "gamma_min", "swing", "arc", "eps_pct", "window"];
+const NOTES = ["fmax", "mu_min", "margin", "pre", "neg", "gamma_min", "swing", "arc", "eps_pct", "window", "F_min", "pph", "days", "eff"];
 function noteText(n: Record<string, unknown>) {
   return Object.entries(n || {}).map(([k, v]) => `${NOTES.includes(k) ? t("sew.cae.note." + k) : k} ${Array.isArray(v) ? v.join("…") : v}`).join("，");
 }

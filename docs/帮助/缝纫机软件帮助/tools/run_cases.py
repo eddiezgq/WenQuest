@@ -151,33 +151,42 @@ ORDER = {"pieces": 20000, "hours_day": 16}                 # 示例订单：2 �
 
 
 def case_embroid():
+    """案例七（第 65 轮，第 69 轮改用花样文件）：示例徽章花样 DST、订单 2 万件、要求 45 天"""
+    import base64 as _b64
     import tempfile as _tf
     import build123d as _bd
-    EM = {"order": ORDER}
-    LOGO = {"N": 12000, "s": 8}                              # 示例花样：1.2 万针，带一段 8 mm 宽的缎纹边
+    sample = req("GET", "/api/v1/sewing/embroid/sample")
+    (ROOT / "apps/web/src/static/help/media/case-em-logo.dst").write_bytes(_b64.b64decode(sample["dst"]))   # 读者下载，照着做
+    FILE = {"src": "file", "dst": sample["dst"], "fname": sample["name"], "Q": ORDER["pieces"], "days": 45, "hday": ORDER["hours_day"]}
+    EM = {"order": dict(ORDER, days=45)}
 
-    def em(p):
-        R = analyze("embroid", dict(LOGO, **p))
+    def em(p, base=FILE):
+        R = analyze("embroid", dict(base, **p))
         res = {r["zh"]: f'{r["value"]} {r["unit"]}'.strip() for r in R["results"]}
-        num = lambda k: float(res[k].split()[0].split("/")[0])          # noqa: E731
         per_h = float(res["全机效率 / 每小时件数"].split("/")[1].split()[0])
-        return dict(params=dict(LOGO, **p), counts=counts(R), bad=checks_brief(R, ("bad",)), warn=checks_brief(R, ("warn",)),
-                    res=res, limit=num("最长针的转速上限"), per_h=per_h, eff=res["全机效率 / 每小时件数"].split("/")[0].strip(),
-                    days=round(ORDER["pieces"] / per_h / ORDER["hours_day"], 1), mass=num("绷架折算质量"),
-                    tables={t["key"] if "key" in t else t["zh"]: t["rows"] for t in R.get("tables", [])})
+        dk = next((k for k in res if k.startswith("这张订单")), None)
+        out = dict(params={k: v for k, v in dict(base, **p).items() if k not in ("dst",)}, counts=counts(R), bad=checks_brief(R, ("bad",)),
+                   warn=checks_brief(R, ("warn",)), res=res, per_h=per_h, eff=res["全机效率 / 每小时件数"].split("/")[0].strip(),
+                   days=float(res[dk].split()[0]) if dk else None, mass=float(res["绷架折算质量"].split()[0]),
+                   tables={t["key"]: t["rows"] for t in R.get("tables", [])}, design=R.get("design"))
+        return out
     EM["h8"] = em({})
-    EM["h8_640"] = em({"n": 640})
     EM["h12"] = em({"H": 12})
-    EM["h12_F1200"] = em({"H": 12, "F": 1200})
-    EM["h12_800"] = em({"H": 12, "F": 1200, "n": 800})
-    best = {"N": 12000, "s": 8, "H": 12, "F": 1200}
+    EM["h12_800"] = em({"H": 12, "n": 800})
+    d = EM["h8"]["design"]
+    one = {"N": d["stitches"], "s": d["s_max"], "colors": d["colors"], "Q": ORDER["pieces"], "days": 45, "hday": ORDER["hours_day"]}
+    EM["m8"] = em({"n": 640}, one)                      # 对照：手填、整个花样一个转速
+    EM["m12"] = em({"H": 12}, one)
+    o = req("POST", "/api/v1/sewing/optimize", {"machine": "embroid", "goal": "order", "params": FILE})
+    EM["opt"] = [dict(H=c["params"]["H"], F=c["params"]["F"], n=c["params"]["n"], **c["note"], bad=c["bad"], warn=c["warn"]) for c in o["candidates"]]
+    best = dict(FILE, H=12)
     mo = req("POST", "/api/v1/sewing/cae/motor", {"machine": "embroid", "params": best})
     ax = mo["axes"][0]
     EM["motor"] = dict(mass=ax["mass"], accel=ax["accel"], force=round(ax["force"]), pick=(ax.get("pick") or {}).get("name"),
                        rows=[dict(name=r["name"], peak=round(r["need_peak"], 2), rms=round(r["need_rms"], 2), ok=r["ok"]) for r in ax["rows"]])
-    mo8 = req("POST", "/api/v1/sewing/cae/motor", {"machine": "embroid", "params": {"N": 12000, "s": 8, "n": 640}})
-    EM["motor8"] = dict(pick=(mo8["axes"][0].get("pick") or {}).get("name"), mass=mo8["axes"][0]["mass"])
-    # 横梁：12 头机的绷架横梁简化成 4.2 m 长的方钢（160 × 100 mm 实心截面，示意），两端立柱；再试中间加一根立柱
+    mo1 = req("POST", "/api/v1/sewing/cae/motor", {"machine": "embroid", "params": {k: v for k, v in one.items()} | {"H": 12, "n": 545}})
+    EM["motor_one"] = dict(pick=(mo1["axes"][0].get("pick") or {}).get("name"))
+    # 横梁：12 头机的绷架横梁简化成 4.2 m 长、160 × 100 mm 的矩形实心截面（示意），两根立柱；再试中间加一根立柱
     def beam(legs):
         leg = lambda x: _bd.Pos(x, 0, 0) * _bd.Box(100, 160, 900, align=(_bd.Align.MIN, _bd.Align.CENTER, _bd.Align.MIN))   # noqa: E731
         shape = _bd.Pos(0, 0, 900) * _bd.Box(4200, 160, 100, align=(_bd.Align.MIN, _bd.Align.CENTER, _bd.Align.MIN))
@@ -193,12 +202,12 @@ def case_embroid():
         fr = wait(fj["id"])
         EM[key] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or [])[:4]], t_move=fr.get("t_move"),
                        checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
-    # 电控箱：主轴 + 绷架 X / Y 三台驱动（第 62 轮，公式）
-    for key, q in (("ebox", {}), ("ebox38", {"Ta": 38, "clog": 0.3})):
-        r = req("POST", "/api/v1/sewing/ebox/analyze", {"machine": "embroid", "params": best, "ebox": q})
+    # 电控箱：主轴（按设计）+ 绷架 X / Y 三台驱动；对照：手填、按最长针一个转速算的电流
+    for key, prm, q in (("ebox", best, {}), ("ebox38", best, {"Ta": 38, "clog": 0.3}), ("ebox38_one", dict(one, H=12, n=545), {"Ta": 38, "clog": 0.3})):
+        r = req("POST", "/api/v1/sewing/ebox/analyze", {"machine": "embroid", "params": prm, "ebox": q})
         t = r["thermal"]
-        EM[key] = dict(drives=[dict(name=d["zh"], Irun=d["Irun"], Ipk=d["Ipk"], Pavg=d["Pavg"]) for d in r["drives"]], Pavg=round(t["Pavg"], 1),
-                       Ths=round(t["Ths"], 1), Tj=round(t["Tjpk"], 1), life=round(t["life_y"], 1),
+        EM[key] = dict(drives=[dict(name=d["zh"], Irun=round(d["Irun"], 2), Ipk=round(d["Ipk"], 2), Pavg=d["Pavg"]) for d in r["drives"]],
+                       Pavg=round(t["Pavg"], 1), Ths=round(t["Ths"], 1), Tj=round(t["Tjpk"], 1), life=round(t["life_y"], 1),
                        bad=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"]) for c in r["checks"] if c["state"] == "bad"],
                        warn=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"]) for c in r["checks"] if c["state"] == "warn"])
     return EM

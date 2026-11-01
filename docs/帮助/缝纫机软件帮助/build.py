@@ -204,31 +204,33 @@ def case_numbers():
         v["em"] = M
         v["em_motor_acc"] = f"{M['motor']['accel']:.1f}"
         v["em_tmove"] = f"{M['beam2']['t_move'] * 1000:.1f}"
-        v["em_gain"] = round((M["h12_F1200"]["per_h"] / M["h8_640"]["per_h"] - 1) * 100)
-        v["em_gain12"] = round((M["h12"]["per_h"] / M["h8_640"]["per_h"] - 1) * 100)
-        rows = ["| 头数 | 最长针转速上限 r/min | 全机效率 | 每小时件数 |", "|---|---|---|---|"]
-        rows += [f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} |" for r in M["h12"]["tables"]["heads_table"]]
-        v["em_heads"] = "\n".join(rows)
-        rows = ["| 针长 mm | 转速上限 r/min | 设计转速下所需加速度 m/s² | 所需推力 N |", "|---|---|---|---|"]
-        rows += [f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} |" for r in M["h8"]["tables"]["speed_table"]]
-        v["em_speeds"] = "\n".join(rows)
-        v["em_accel"] = M["h12"]["res"]["可用加速度 / 最长针所需"]
-        v["em_accel8"] = M["h8"]["res"]["可用加速度 / 最长针所需"]
-        v["em_accelF"] = M["h12_F1200"]["res"]["可用加速度 / 最长针所需"]
-        v["em_F800"] = M["h12_800"]["res"]["设计转速下这一针需要的推力"]
         v["em_beam2"] = M["beam2"]["checks"][0]["value"]
         v["em_beam3"] = M["beam3"]["checks"][0]["value"]
-        from app.sewcore import ebox as EBX
-        best = {"N": 12000, "s": 8, "H": 12, "F": 1200}
-        Rb = EBX.analyze({"Ta": 38, "clog": 0.3}, "embroid", best)
-        rows = ["| 改法 | 散热器 °C | 结温峰值 °C | 电容寿命 年 | 红灯 | 黄灯 |", "|---|---|---|---|---|---|"]
-        rows += [f"| {r[0]} | {r[2]} | {r[3]} | {r[4]} | {r[6]} | {r[7]} |" for r in Rb["variants"]["rows"]]
-        v["em_ebox_variants"] = "\n".join(rows)
-        from app.sewcore import embroid as EMB         # 对照：8 头机只加推力（不加头）
-        r8 = EMB.analyze(EMB.clean({"N": 12000, "s": 8, "F": 1200}))
-        v["em_h8F"] = next(x["value"] for x in r8["results"] if x["zh"] == "全机效率 / 每小时件数").split(" / ")[1]
-        v["em_ebox_lint"] = next(x["value"] for x in M["ebox"]["warn"] if x["key"] == "lint")
-        v["em_ebox_bad"] = "；".join(f"{b['name']} {b['value']}" for b in M["ebox38"]["bad"])
+
+        def bins(rows):
+            out = ["| 针长 mm | 针数（含跳步） | 占针数 | 平均转速 r/min | 用时 min | 占用时 |", "|---|---|---|---|---|---|"]
+            return "\n".join(out + [f"| {' | '.join(r)} |" for r in rows])
+        v["em_bins8"] = bins(M["h8"]["tables"]["bins_table"])
+        v["em_bins12"] = bins(M["h12"]["tables"]["bins_table"])
+        rows = ["| 头数 | 最长针转速上限 r/min | 全机效率 | 每小时件数 | 这张订单 天 |", "|---|---|---|---|---|"]
+        rows += [f"| {' | '.join(r)} |" for r in M["h12"]["tables"]["heads_table"]]
+        v["em_heads"] = "\n".join(rows)
+        rows = ["| 头数 | 推力 N（至少要） | 每小时件数 | 全机效率 | 这张订单 天 |", "|---|---|---|---|---|"]
+        rows += [f"| {o['H']} | {o['F']}（{o['F_min']}） | {o['pph']} | {o['eff']}% | {o['days']} |" for o in M["opt"]]
+        v["em_opt"] = "\n".join(rows)
+        v["em_opt12"] = next(o["days"] for o in M["opt"] if o["H"] == 12)
+        v["em_slack"] = f"{M['order']['days'] - M['opt'][0]['days']:.1f}".rstrip("0").rstrip(".")
+        v["em_gain"] = round((M["h12"]["per_h"] / M["h8"]["per_h"] - 1) * 100)
+        v["em_stats"] = M["h8"]["res"]["花样：针数 / 跳步 / 换色"]
+        v["em_long8"] = M["h8"]["res"]["最长针 / 它的转速上限"].split(" / ")[1]
+        v["em_long12"] = M["h12"]["res"]["最长针 / 它的转速上限"].split(" / ")[1]
+        v["em_avg8"] = M["h8"]["res"]["按每针调速：平均转速"]
+        v["em_avg12"] = M["h12"]["res"]["按每针调速：平均转速"]
+        v["em_breaks8"] = M["h8"]["res"]["每批断线次数"]
+        v["em_breaks12"] = M["h12"]["res"]["每批断线次数"]
+        v["em_spin12"] = M["h12"]["res"]["主轴伺服：缝纫时 / 起停峰值转矩（电机侧，示例）"]
+        v["em_sv12"] = M["h12"]["res"]["绷架伺服峰值 / 有效转矩（电机侧，不含转子）"]
+        v["em_one_warn"] = "；".join(f"{w['name']}（{w['value']}）" for w in M["ebox38_one"]["warn"]) or "没有"
     y = P["motor_ry8"][1]["current"]
     v["pt_y8_margin"] = round((y["rated"] / y["rms"] - 1) * 100)
     v["pt_tpl"] = "{:.0f} × {:.0f} × {:.0f}".format(*P["template_cam"]["template"]["plate"])

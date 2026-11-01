@@ -61,7 +61,15 @@ def figures(R, lang="zh"):
     no = 0
     for c in R.get("charts", []):
         no += 1
-        if c["kind"] == "xy":
+        if c["kind"] == "stitch":                     # 第 69 轮：刺绣花样（按颜色，降速的针红色）
+            fig, ax = plt.subplots(figsize=(6, 3.8))
+            for g in c["segs"]:
+                ax.plot([q[0] for q in g["pts"]], [q[1] for q in g["pts"]], color=g["color"], lw=0.5)
+            for x1, y1, x2, y2 in c.get("longs", []):
+                ax.plot([x1, x2], [y1, y2], color="#c0392b", lw=0.6)
+            ax.set_aspect("equal", adjustable="datalim")
+            ax.set_xlabel("mm")
+        elif c["kind"] == "xy":
             fig, ax = plt.subplots(figsize=(5, 3.4))
             sr = c["series"][0]
             if c.get("open"):

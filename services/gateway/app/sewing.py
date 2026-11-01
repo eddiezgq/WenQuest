@@ -14,6 +14,7 @@
 数据：<data_dir>/sewing.db（SQLite）。计算核心 app/sewcore 与 FreeCAD 工作台共用，两边同一组参数结果一致。
 """
 
+import asyncio
 import hashlib
 import io
 import json
@@ -202,9 +203,17 @@ def register(app, m) -> None:
     @app.post("/api/v1/sewing/analyze")
     async def analyze(body: AnalyzeIn, req: Request):
         limit(req)
-        r = sewcore.get(body.machine).analyze(body.params)
+        # 第 69 轮：刺绣机带花样文件时要逐针调速（大花样一两秒），放到线程里算，不堵别的请求
+        r = await asyncio.to_thread(sewcore.get(body.machine).analyze, body.params)
         r["proto"] = r["view"]["cfg"]                 # 第 39 轮的字段名，网页旧版本还在用
         return r
+
+    @app.get("/api/v1/sewing/embroid/sample")
+    async def embroid_sample():
+        """第 69 轮：示例刺绣花样（程序生成的徽章，约 1 万针、六种颜色、8 mm 缎纹边框），网页“用示例花样”"""
+        import base64
+        from .sewcore import emb_samples
+        return {"name": "wq-logo.dst", "dst": base64.b64encode(emb_samples.logo_dst()).decode()}
 
     PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-pattern", "embroid", "model-flatknit"}
 
@@ -390,6 +399,7 @@ def workbench_zip() -> bytes:
                 z.write(f, root + f.name)
         for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "flatknit.py", "machines.py", "cad.py",
                   "ebox.py",                                      # 第 62 轮：电控箱
+                  "stitchfile.py",                                # 第 69 轮：刺绣花样文件
                   "cae_setup.py"):                                  # 第 49 轮：本机有限元算例（wqsew_fem）和网页版同一份工况
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")

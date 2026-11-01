@@ -53,7 +53,7 @@
             </view>
           </view>
           <view v-if="open[g.key]">
-            <view v-for="p in g.params" :key="p.key" class="prm">
+            <view v-for="p in g.params" :key="p.key" class="prm" v-show="shown(p.key)">
               <text class="pl">{{ L(p) }}<text v-if="p.unit" class="muted"> · {{ p.unit }}</text></text>
               <view v-if="p.choices.length" class="chips">
                 <text v-for="c in p.choices" :key="c.key" class="opt" :class="{ on: params[p.key] === c.key }" @click="setv(p.key, c.key)">{{ L(c) }}</text>
@@ -61,6 +61,13 @@
               <view v-if="p.key === 'pat' && params.pat === 'csv'" class="csv">
                 <view class="btn ghost" @click="pickCsv">{{ t("sew.csvPick") }}</view>
                 <text class="hint">{{ csvInfo || t("sew.csvHint") }}</text>
+              </view>
+              <view v-else-if="p.key === 'src' && machine === 'embroid' && params.src === 'file'" class="csv">
+                <!-- #ifdef H5 -->
+                <view class="btn ghost" @click="pickStitch">{{ t("sew.emb.pick") }}</view>
+                <!-- #endif -->
+                <view class="btn ghost" @click="sampleStitch">{{ t("sew.emb.sample") }}</view>
+                <text class="hint">{{ stitchInfo || t("sew.emb.hint") }}</text>
               </view>
               <view v-else-if="!p.choices.length" class="num">
                 <slider class="sl" :min="p.min" :max="p.max" :step="p.step" :value="Number(params[p.key])" block-size="16"
@@ -128,7 +135,7 @@
           <text class="hint">{{ R.timing_x === "pass" ? t("sew.chart.pass") : t("sew.chart.angle") }}</text>
           <view class="charts">
             <view v-for="c in R.charts" :key="c.key" class="chart"><text class="ct">{{ lang === "en" ? c.en : c.zh }}</text>
-              <svg class="svg" viewBox="0 0 300 150" v-html="c.kind === 'xy' ? path(c) : line(c)" /></view>
+              <svg class="svg" viewBox="0 0 300 150" v-html="c.kind === 'xy' ? path(c) : c.kind === 'stitch' ? stitchSvg(c) : line(c)" /></view>
           </view>
         </view>
 
@@ -226,7 +233,7 @@ interface Group { key: string; zh: string; en: string; params: Param[] }
 interface Check { key: string; group: string; name: { zh: string; en: string }; value: { zh: string; en: string }; limit: { zh: string; en: string }; state: "ok" | "warn" | "bad"; lecture: number;
   advice: { zh: string; en: string } }
 interface Project { id: number; name: string; note?: string; machine?: string; params?: Record<string, number | string>; updated?: number }
-interface Chart { key: string; kind: "line" | "xy"; zh: string; en: string; x: number[]; series: { zh: string; en: string; color: string; y: number[] }[];
+interface Chart { key: string; kind: "line" | "xy" | "stitch"; segs?: { color: string; pts: number[][] }[]; longs?: number[][]; zh: string; en: string; x: number[]; series: { zh: string; en: string; color: string; y: number[] }[];
   ref?: number | null; zero?: boolean; ref_zh?: string; ref_en?: string; xr?: [number, number]; xl?: { zh: string; en: string }; open?: boolean }
 
 const props = defineProps<{ startTab?: string; startMachine?: string; startParams?: string }>();
@@ -313,6 +320,9 @@ function applyParams(p: Record<string, number | string>) {
 }
 function reset() {
   delete params.pts;
+  delete params.dst;
+  delete params.fname;
+  stitchInfo.value = "";
   csvInfo.value = "";
   Object.assign(params, defaults);
   compute();
@@ -339,7 +349,56 @@ function pickCsv() {
 }
 watch(R, (r) => {
   if (r && machine.value === "pattern" && params.pat === "csv" && r.params?.pts) csvInfo.value = t("sew.csvCount", { n: r.params.pts.length });
+  if (r && machine.value === "embroid") {
+    const d = (r as any).design;
+    stitchInfo.value = d ? t("sew.emb.info", { name: d.fname || "", n: d.stitches, j: d.jumps, c: d.colors, w: d.w, h: d.h, s: d.s_max })
+      : params.src === "file" && (params.dst || params.pts) ? t("sew.emb.bad") : "";
+  }
 });
+
+// 第 69 轮：刺绣机上传花样文件（DST 用 base64 传，CSV 传原文；后端读，项目里一起存）。有文件时针数、最长针、换色从文件来
+const stitchInfo = ref("");
+const FROM_FILE = new Set(["N", "s", "colors"]);
+function shown(k: string) {
+  if (machine.value === "embroid" && params.src === "file" && (R.value as any)?.design) return !FROM_FILE.has(k);   // 文件读出来了才藏手填的三项
+  if (machine.value === "embroid" && params.src !== "file" && k === "dn") return false;
+  return true;
+}
+function pickStitch() {
+  // #ifdef H5
+  const inp = document.createElement("input");
+  inp.type = "file";
+  inp.accept = ".dst,.DST,.csv,.txt,text/csv,text/plain";
+  inp.onchange = async () => {
+    const f = inp.files && inp.files[0];
+    if (!f) return;
+    if (f.size > 600000) { stitchInfo.value = t("sew.emb.big"); return; }
+    delete params.dst; delete params.pts;
+    if (/\.dst$/i.test(f.name)) {
+      const b = new Uint8Array(await f.arrayBuffer());
+      let bin = "";
+      for (let i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode(...b.subarray(i, i + 0x8000));
+      params.dst = btoa(bin);
+    } else {
+      params.pts = await f.text();
+    }
+    params.fname = f.name;
+    stitchInfo.value = t("sew.csvLoaded", { name: f.name });
+    compute();
+  };
+  inp.click();
+  // #endif
+}
+async function sampleStitch() {
+  try {
+    const r = await request<{ name: string; dst: string }>("GET", "/api/v1/sewing/embroid/sample");
+    delete params.pts;
+    params.dst = r.dst;
+    params.fname = r.name;
+    params.src = "file";
+    compute();
+  } catch (e: any) { stitchInfo.value = e?.message || String(e); }
+}
 
 // 三维样机 / 动画：同源页面。平缝机调 __api.setCfg；绷缝机弯针动画改 __api.ST 再 changed()；包缝机三维结构模型不用同步
 function syncProto() {
@@ -423,6 +482,19 @@ function line(c: Chart) {
   });
   return s;
 }
+// 第 69 轮：刺绣花样——按颜色画针迹（跳步不画），要降速的针红色
+function stitchSvg(c: Chart) {
+  const all = (c.segs || []).flatMap((g) => g.pts);
+  if (!all.length) return "";
+  const xs = all.map((q) => q[0]), ys = all.map((q) => q[1]);
+  const xl = Math.min(...xs), xh = Math.max(...xs), yl = Math.min(...ys), yh = Math.max(...ys);
+  const sc = Math.min(280 / (xh - xl || 1), 136 / (yh - yl || 1));
+  const X = (v: number) => 150 + (v - (xl + xh) / 2) * sc, Y = (v: number) => 75 - (v - (yl + yh) / 2) * sc;
+  let s = `<rect x="2" y="2" width="296" height="146" fill="#fff" stroke="#e1e6ea"/>`;
+  for (const g of c.segs || []) s += `<polyline fill="none" stroke="${g.color}" stroke-width="0.5" points="${g.pts.map((q) => `${X(q[0]).toFixed(1)},${Y(q[1]).toFixed(1)}`).join(" ")}"/>`;
+  for (const q of c.longs || []) s += `<line x1="${X(q[0]).toFixed(1)}" y1="${Y(q[1]).toFixed(1)}" x2="${X(q[2]).toFixed(1)}" y2="${Y(q[3]).toFixed(1)}" stroke="#c0392b" stroke-width="0.6"/>`;
+  return s;
+}
 function path(c: Chart) {
   const xs = c.x, ys = c.series[0].y;
   const xl = Math.min(...xs), xh = Math.max(...xs), yl = Math.min(...ys, 0), yh = Math.max(...ys, 0);
@@ -475,6 +547,7 @@ async function pickProject(e: any) {
   await switchMachine(full.machine || "lockstitch", true);
   current.value = full;
   pname.value = full.name;
+  for (const k of ["pts", "dst", "fname"]) delete params[k];      // 上一个项目的针位表 / 花样文件不带过来
   Object.assign(params, defaults, full.params || {});
   compute();
 }

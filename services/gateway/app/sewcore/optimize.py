@@ -23,6 +23,9 @@ GOALS = {
     "cover": [
         ("timing", "弯针定时：放在窗口正中", "Looper timing: centre of the window"),
     ],
+    "embroid": [
+        ("order", "达到订单交期：头数最少（推力不够才加，不出红灯）", "Meet the order delivery: fewest heads (more force only if needed, no red)"),
+    ],
     "flatknit": [
         ("time", "一片用时最短（选针、摇床、制动、电机都不出红灯）", "Shortest time per piece (no red on selection, racking, braking, motor)"),
     ],
@@ -176,6 +179,16 @@ def run(machine, params, goal):
         for r in res:
             r["value"] = -r["value"]
         unit = ("一片用时 min", "time per piece min")
+    elif machine == "embroid" and goal == "order":
+        res = _embroid_order(M, p)
+        unit = ("头数", "heads")
+        if not res:
+            why = (("先在“断线与产能”里填订单件数和要求交期。", "Enter the order quantity and required delivery under Thread breaks and output first.")
+                   if not (p["Q"] > 0 and p["days"] > 0) else
+                   ("30 头、推力 5000 N 以内、现在的设计转速下都达不到这个交期：提高设计转速、多开几台，或者改花样（减针数、减长针）。",
+                    "Nothing up to 30 heads and 5000 N at the present design speed meets this delivery: raise the design speed, run more machines, "
+                    "or change the design (fewer or shorter stitches)."))
+            return dict(machine=machine, goal=goal, unit=dict(zh=unit[0], en=unit[1]), current={}, candidates=[], why=dict(zh=why[0], en=why[1]))
     else:
         raise ValueError("no such goal")
     # 每组候选再整体校核一次（红灯数），网页上一起显示
@@ -186,3 +199,59 @@ def run(machine, params, goal):
         r["value"] = round(r["value"], 3) if isinstance(r["value"], float) else r["value"]
     return dict(machine=machine, goal=goal, unit=dict(zh=unit[0], en=unit[1]), current={k: p[k] for c in res[:1] for k in c["params"]},
                 candidates=res)
+
+
+def _embroid_order(M, p):
+    """第 69 轮：头数从少到多试；每个头数下推力从小到大（二分，10 N 一档）找刚好赶上交期、又不出红灯的最小推力；
+    现有的推力比它大就不动（推力小了加速度小，花样一改就跟不上），比它小才加到刚好够。
+    转速不超过现在的设计转速（转速高低常常是质量的要求，留给人定）：手填时再受最长针的上限限制（往下取到 10 r/min），
+    有花样文件时就用设计转速（长针由前瞻调速降下来）。
+    给出最先赶上交期的三个头数，各自至少要的推力和交期。"""
+    if not (p["Q"] > 0 and p["days"] > 0):
+        return []
+    E = M
+
+    def speed(H, F):
+        n0 = int(min(p["n"], p["n_head"]))
+        if p.get("src") == "file":
+            return n0
+        nm = E.n_max(p["s"], E.a_max(H, F, p["Ff"], p["m0"], p["mh"]), p["W"], p["n_head"])
+        return int(min(n0, math.floor(nm / 10) * 10))
+
+    def run(H, F):
+        n = speed(H, F)
+        if n < 200:
+            return None
+        return n, E.run_production(p, H, F, n)[0]
+
+    def in_time(H, F):
+        r = run(H, F)
+        return r is not None and r[1]["days"] is not None and r[1]["days"] <= p["days"] + 1e-9
+
+    out = []
+    lo_F, hi_F = 100, 5000
+    for H in range(1, 31):
+        if not in_time(H, hi_F):                       # 推力到上限也赶不上：头再多一点试试
+            continue
+        a, b = lo_F // 10, hi_F // 10                  # 交期随推力单调：二分找刚好赶上的最小推力
+        while a < b:
+            m = (a + b) // 2
+            if in_time(H, m * 10):
+                b = m
+            else:
+                a = m + 1
+        F_min = a * 10
+        F = max(F_min, int(round(p["F"])))              # 现有的推力够就不动；不够才加到刚好够
+        n, PR = run(H, F)
+        if PR["eff"] < 0.6 or not in_time(H, F):       # 推力大了转速高、效率反而低；头再多效率只会更低，不再往上试
+            if out:
+                break
+            if run(H, F_min)[1]["eff"] < 0.6:
+                break
+            F = F_min
+            n, PR = run(H, F)
+        out.append(dict(value=H, params={"H": H, "F": F, "n": n},
+                        note=dict(F_min=F_min, pph=round(PR["pph"], 1), days=round(PR["days"], 1), eff=round(PR["eff"] * 100))))
+        if len(out) == 3:
+            break
+    return out

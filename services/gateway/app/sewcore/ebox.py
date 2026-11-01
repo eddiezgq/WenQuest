@@ -37,7 +37,7 @@ TOP_PLUME, FIN_PLUME = 0.5, 0.4      # 自然对流：顶面、顶面翅片相�
 GROUPS = [
     ("load", "工况（默认取本机的设计）", "Duty (taken from this machine's design by default)", [
         ("src", "电流从哪里来", "Where the currents come from", "", "design", None, None, None),
-        ("Irun", "主轴缝纫时相电流（有效值；绷缝、花样、刺绣机的主轴和手填时用）", "Spindle phase current while sewing (rms; cover, pattern, embroidery spindles and when entered by hand)", "A", 3.0, 0.2, 40, 0.1),
+        ("Irun", "主轴缝纫时相电流（有效值；绷缝、花样机的主轴和手填时用）", "Spindle phase current while sewing (rms; cover and pattern spindles and when entered by hand)", "A", 3.0, 0.2, 40, 0.1),
         ("Ipk", "起停时相电流（驱动器限流值）", "Phase current at start and stop (drive current limit)", "A", 9.0, 0.5, 80, 0.1),
         ("Kt", "电机转矩常数 K_t（示例值）", "Motor torque constant K_t (example value)", "N·m/A", 1.0, 0.1, 5.0, 0.05),
         ("tacc", "每次加速 / 减速时间", "Each acceleration / deceleration", "s", 0.15, 0.02, 1.0, 0.01),
@@ -149,6 +149,10 @@ def drives_of(machine, design_params, p):
         T = spindle_torque(machine, design_params)
         Trms = math.sqrt(sum(x * x for x in T) / len(T))
         spindle.update(Irun=min(Trms / Kt, p["Ipk"]), src="design", Trms=Trms)
+    if machine == "embroid" and not manual:          # 第 69 轮：刺绣机主轴按设计算（示例模型：阻力矩 + 每头阻力矩 × 头数）
+        from . import embroid as E0
+        Tr = E0.spindle(E0.clean(design_params or {}))["Trun"]
+        spindle.update(Irun=min(Tr / Kt, p["Ipk"]), src="design", Trms=Tr)
     if machine != "flatknit" or manual:            # 横机没有主轴；手填时就是一台手填电流的驱动
         out.append(spindle if machine != "flatknit" else dict(spindle, key="main", zh="主驱动（手填）", en="Main drive (by hand)"))
     if machine == "flatknit" and manual:
