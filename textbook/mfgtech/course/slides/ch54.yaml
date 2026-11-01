@@ -1,0 +1,407 @@
+# 第 54 章 机械加工精度 · 网页互动课件（第 13 轮十，样张）
+# 每页一个意思、最多 3 条；中文在上、英文在下。版式见 textbook/tools/webcourse/wc_slides.py 的 L_*；
+# {{exNN_k.键:格式}} 由本章 code/ 的算例程序算出（与正文同一个数）；{fig: …} 是本章的插图；{tex: …} 与正文同一个公式。
+lesson: 54
+code: [fig54_0, ex54_1, ex54_2, ex54_3, ex54_4, ex54_5, ex54_6, ex54_7, ex54_8, ex54_9]
+
+clips:
+  hero: {page: v54_3_1}            # 封面：尾座偏移，工件磨成锥形（三维动画，循环）
+  tail: {page: v54_3_1}
+  sens: {page: a54_1_1}            # 误差敏感方向（Manim）
+  defl: {page: a54_4_1}            # 刀具走过全长，让刀曲线逐点画出（Manim）
+  warm: {page: a54_5_1}            # 开机后的热伸长（Manim）
+  print: {page: v54_8_1}           # 误差的指纹（三维动画）
+  gauge: {page: v54_9_1}           # 主动测量（三维动画）
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 54 章", "Chapter 54"]
+    title: ["误差从哪里来，怎么找到它", "Where errors come from, and how to find them"]
+    sub: ["从一批零件的数据读出误差的“指纹”", "Read the fingerprint of an error from a batch of parts"]
+    notes:
+      - "这一章讲机械加工精度。同一台磨床、同一个操作工、同一份工艺规程，磨出来的轴还是一根一根不一样，有时还会突然出问题。背景上是一台外圆磨床：尾座偏了一点，工件就被磨成锥形，误差放大了五百倍才看得见。这一章要学会的，就是从数据里认出这种“指纹”，找到它的来源，再把它减小。"
+      - "This chapter is about machining accuracy. The same grinder, the same operator and the same process plan still turn out shafts that differ one from the next, and sometimes something suddenly goes wrong. In the background is a cylindrical grinder: the tailstock is slightly off, and the work comes out tapered, magnified five hundred times so we can see it. What we learn here is to recognise such fingerprints in the data, trace them to their source, and reduce them."
+
+  - layout: question
+    tag: ["车间里的事", "What happened in the shop"]
+    title: ["右轴承位一批超差，砂轮该修了吗？", "The right bearing seat goes out of tolerance: dress the wheel?"]
+    facts:
+      - ["工序 60 磨 SH-301，Ø35 k6，公差只有 16 µm", "Op 60 grinds SH-301: Ø35 k6, a tolerance of just 16 µm"]
+      - ["第 {{fig54_0.start}} 件起两处都变大：右 +{{fig54_0.dr_um:.1f}} µm，左 +{{fig54_0.dl_um:.1f}} µm", "From part {{fig54_0.start}} both grow: right +{{fig54_0.dr_um:.1f}} µm, left +{{fig54_0.dl_um:.1f}} µm"]
+      - ["后 30 件里右轴承位超差 {{fig54_0.n_fail}} 件", "{{fig54_0.n_fail}} of the last 30 right seats are out"]
+    notes:
+      - "先看仿真车间一个班次的记录。工序 60 外圆磨削 SH-301 的两个轴承位，Ø35 k6，公差只有 16 微米。前 30 件左右两处一起起伏，都在公差中间偏下；从第 {{fig54_0.start}} 件起两处都变大了，可右边大了 {{fig54_0.dr_um:.1f}} 微米，左边只大了 {{fig54_0.dl_um:.1f}} 微米，后 30 件里右轴承位超差 {{fig54_0.n_fail}} 件。质检员说：砂轮磨钝了，修一修。对吗？这一章学完，我们回来回答。"
+      - "Here is one shift's record from the simulated shop. Operation 60 grinds SH-301's two bearing seats, Ø35 k6, a tolerance of only 16 microns. For the first 30 parts the two seats rise and fall together, below the middle of the tolerance. From part {{fig54_0.start}} both grow, but the right one by {{fig54_0.dr_um:.1f}} microns and the left one by only {{fig54_0.dl_um:.1f}}; {{fig54_0.n_fail}} of the last 30 right seats are out. The inspector says the wheel is dull, dress it. Is that right? We'll come back to this at the end."
+
+  - layout: figure
+    title: ["一个班次 60 件的测量值", "Sixty parts from one shift"]
+    visual: {fig: fig54_0_1}
+    caption: ["点线是修整砂轮；第 {{fig54_0.start}} 件起两处都变大，右边变得多（方框为超差）", "Dotted lines: wheel dressing. From part {{fig54_0.start}} both seats grow, the right one more (squares: out of tolerance)"]
+    notes:
+      - "这是那 60 件的测量值。蓝线是左轴承位，橙线是右轴承位，点线是每 10 件修整一次砂轮。注意两件事：前面两条线一起起伏，说明有些误差两处一样；第 {{fig54_0.start}} 件起两处一起跳上去，但跳的高度不一样。如果是砂轮磨损，两处应该一样地变。两处变得不一样，离头架越远变得越多——这就是线索。"
+      - "These are the sixty measurements. Blue is the left bearing seat, orange the right one, and the dotted lines mark the wheel being dressed every ten parts. Notice two things: at first the two lines rise and fall together, so some errors act on both seats alike; from part {{fig54_0.start}} both jump up, but by different amounts. Wheel wear would change both seats alike. A change that grows with the distance from the headstock is our clue."
+
+  - layout: roadmap
+    title: ["本章路线", "The road through this chapter"]
+    parts:
+      - ["精度与误差", "Accuracy & error"]
+      - ["原理·调整", "Method & setting"]
+      - ["机床误差", "Machine tool"]
+      - ["受力变形", "Deflection"]
+      - ["热变形", "Heat"]
+      - ["磨损·测量", "Wear & gauging"]
+      - ["统计分析", "Statistics"]
+      - ["诊断·对策", "Diagnosis & cure"]
+    notes:
+      - "本章八站，分七段讲（磨损与测量并在热变形一段）。先讲什么是加工精度、误差往哪个方向最要紧；然后逐个看误差的来源：加工原理和调整、机床、受力变形、热变形、刀具磨损和测量；再学用统计的方法看一批零件；最后把这些合起来，从误差的形态推断来源，选对措施。"
+      - "Eight stops in seven sections (wear and gauging share the section on heat). First, what machining accuracy is and which direction of error matters most. Then the sources one by one: the method and the setting, the machine tool, deflection under load, heat, tool wear and measurement. Then statistics for a whole batch. Finally we put it together: infer the source from the pattern of the error and pick the right cure."
+
+  - layout: section
+    num: "01"
+    title: ["精度与误差：往哪个方向最要紧", "Accuracy and error: which direction matters"]
+
+  - layout: split
+    title: ["获得尺寸精度的四种方法", "Four ways to get a size right"]
+    points:
+      - ["试切法：切一点、量一下、再调", "Trial cut: cut, measure, adjust"]
+      - ["调整法：调好一次，整批照做", "Setting: set once, run the batch"]
+      - ["定尺寸刀具法、自动控制法", "Sized tool; automatic control"]
+    visual: {fig: fig54_1_2}
+    notes:
+      - "尺寸精度怎么得到？四种方法。试切法：切一小段、量一下、调刀再切，单件小批用。调整法：首件调好刀具和挡块的位置，整批照做，SH-301 的磨削就是这样。定尺寸刀具法：孔径由钻头、铰刀的尺寸决定。自动控制法：边加工边测量，到尺寸就停，54.9 节的主动测量就是。调整法的问题是：调得不准，整批都偏。"
+      - "How is a size achieved? Four ways. Trial cutting: cut a little, measure, adjust, cut again; for one-offs and small batches. Setting: position the tool and stops on the first part and run the whole batch, as for grinding SH-301. Sized tools: the drill or reamer decides the hole. Automatic control: measure while cutting and stop at size, like the in-process gauging of section 54.9. The catch with setting is that a bad setting makes the whole batch wrong."
+
+  - layout: split
+    title: ["误差敏感方向：法向差 {{ex54_1.ratio:.0f}} 倍", "The normal matters {{ex54_1.ratio:.0f}} times more"]
+    points:
+      - ["沿法向移 {{ex54_1.delta_um:.0f}} µm：直径变 {{ex54_1.dn_um:.0f}} µm", "Tool moves {{ex54_1.delta_um:.0f}} µm along the normal: Ø changes {{ex54_1.dn_um:.0f}} µm"]
+      - ["沿切向移同样多：只变 {{ex54_1.dt_um:.4f}} µm", "Same along the tangent: only {{ex54_1.dt_um:.4f}} µm"]
+      - ["看误差先看它在敏感方向上有多少", "Judge an error by its component on that direction"]
+    visual: {video: sens}
+    notes:
+      - "这是动画 54.1.1。刀尖沿加工表面的法向移动 {{ex54_1.delta_um:.0f}} 微米，车出的直径跟着变两倍，{{ex54_1.dn_um:.0f}} 微米；沿切向移动同样多，直径只变 {{ex54_1.dt_um:.4f}} 微米，差 {{ex54_1.ratio:.0f}} 倍。所以法向叫误差敏感方向。以后看任何一项原始误差，先问它在敏感方向上有多少：车床导轨在水平面内弯一点就要命，在垂直面内弯同样多几乎没关系。"
+      - "This is Animation 54.1.1. Move the tool tip {{ex54_1.delta_um:.0f}} microns along the normal of the surface and the diameter changes twice as much, {{ex54_1.dn_um:.0f}} microns. Move it the same amount along the tangent and the diameter changes only {{ex54_1.dt_um:.4f}} microns, {{ex54_1.ratio:.0f}} times smaller. So the normal is called the error-sensitive direction. For any raw error, first ask how much of it lies along that direction: a lathe bed bent a little in the horizontal plane matters a lot, the same bend in the vertical plane hardly at all."
+
+  - layout: split
+    title: ["调整误差：试磨几件、按均值调", "Setting error: grind a few, set by the mean"]
+    points:
+      - ["试磨 n 件取均值，误差降到 6σ/√n", "Average n trial parts: error falls to 6σ/√n"]
+      - ["工序 60 试磨 5 件，再计入最小补偿量 0.002 mm", "Op 60: 5 trial parts plus the 0.002 mm minimum step"]
+      - ["合成 {{ex54_2.a5:.4f}} mm，约占公差 1/4", "Combined {{ex54_2.a5:.4f}} mm, about a quarter of the tolerance"]
+    visual: {tex: "\\Delta_{\\text{调}} = \\sqrt{\\left(\\frac{6\\sigma}{\\sqrt{n}}\\right)^2 + \\Delta_{\\text{补}}^2}"}
+    notes:
+      - "调整法的误差从哪来？调整时按试切件的测量值决定刀补，可每件都有随机误差，σ 是 {{ex54_2.sig:.4f}} 毫米。只看 1 件，调整误差就是整个 6σ；试磨 n 件取均值，降到 6σ 除以根号 n。再加上机床补偿的最小增量，按平方和开方合成。工序 60 试磨 5 件、横进给最小补偿 0.002，合成 {{ex54_2.a5:.4f}} 毫米。件数再多，降得就慢了。"
+      - "Where does the setting error come from? The offset is chosen from the trial parts, but every part carries a random error, σ = {{ex54_2.sig:.4f}} mm. Judge by one part and the setting error is the whole 6σ; average n parts and it falls to 6σ over root n. Add the smallest step the machine can compensate, combined as a root sum of squares. Operation 60 grinds 5 trial parts with a 0.002 mm minimum infeed step: {{ex54_2.a5:.4f}} mm in all. More parts help less and less."
+
+  - layout: section
+    num: "02"
+    title: ["机床误差：主轴、导轨、两顶尖", "The machine: spindle, guideways, centres"]
+
+  - layout: split
+    title: ["外圆磨床：误差藏在哪几处", "The cylindrical grinder: where errors hide"]
+    points:
+      - ["中心孔与顶尖：圆度、圆跳动", "Centre holes and centres: roundness, runout"]
+      - ["导轨直线度：工作台走得不直", "Guideway straightness: the table runs crooked"]
+      - ["两顶尖连线与导轨不平行：锥度", "Centres not parallel to the table: taper"]
+    visual: {fig: fig54_3_1}
+    notes:
+      - "工序 60 用的外圆磨床：头架带着工件转，工件支在前后两个顶尖上，砂轮架横向进给，工作台带工件纵向往复。误差主要有三处：工件支在两个固定的顶尖上，头架主轴只拨动工件，主轴的回转误差不传到工件上，圆度由中心孔和顶尖决定；导轨不直，工作台走的不是直线；两顶尖的连线和工作台的运动方向不平行，磨出锥度。我们重点看最后一项，因为它就是开头那一批的问题。"
+      - "This is the grinder of operation 60: the headstock turns the work, which sits between two centres; the wheelhead feeds across and the table carries the work back and forth. Errors lie mainly in three places: the work sits on two dead centres and the spindle only drives it, so spindle run-out does not reach the work, and roundness is decided by the centre holes and centres; the guideways are not straight, so the table does not run in a line; and the line of centres is not parallel to the table's motion, which grinds a taper. We'll look hardest at the last one, because it is the problem in our batch."
+
+  - layout: split
+    title: ["尾座偏移 e：离头架越远，变得越多", "Tailstock offset e: the farther from the head, the bigger"]
+    points:
+      - ["工件绕头架顶尖偏斜，直径变化与距离成正比", "The work tilts about the head centre: change ∝ distance"]
+      - ["e = 8 µm：左 +{{ex54_3.dl_um:.1f}}、右 +{{ex54_3.dr_um:.1f}} µm", "e = 8 µm: left +{{ex54_3.dl_um:.1f}}, right +{{ex54_3.dr_um:.1f}} µm"]
+      - ["开班点检：e ≤ {{ex54_3.e_allow_um:.1f}} µm", "Start-of-shift check: e ≤ {{ex54_3.e_allow_um:.1f}} µm"]
+    visual: {video: tail}
+    notes:
+      - "这是动画 54.3.1。尾座顶尖离开砂轮 e，两顶尖连线就斜了，工件绕头架顶尖转过一个小角度。砂轮在敏感方向上离工件远了，离头架越远远得越多，直径的变化是 2e 乘以 z 除以 L，与到头架的距离成正比。e 等于 8 微米时，左轴承位大 {{ex54_3.dl_um:.1f}}、右轴承位大 {{ex54_3.dr_um:.1f}} 微米。所以工艺规程要求开班点检，偏移不超过 {{ex54_3.e_allow_um:.1f}} 微米。"
+      - "This is Animation 54.3.1. Move the tailstock centre away from the wheel by e and the line of centres tilts: the work turns a little about the head centre. Along the sensitive direction the work moves away from the wheel, more the farther it is from the headstock; the diameter changes by 2e times z over L, proportional to the distance from the head. With e = 8 microns the left seat grows {{ex54_3.dl_um:.1f}} and the right one {{ex54_3.dr_um:.1f}} microns. That is why the process plan has a start-of-shift check: the offset may not exceed {{ex54_3.e_allow_um:.1f}} microns."
+
+  - layout: lab
+    title: ["实验 54.3：机床几何误差与工件形状", "Lab 54.3: machine geometry and the shape of the work"]
+    shot:
+      page: lab54_3
+      steps: [{at: 2, set: {p-54-3-e: 8}}]       # 实验页禁止 eval：用控件 id 设参数（同学生拖滑块）
+    tasks:
+      - ["只加尾座偏移 8 µm：什么形状？右比左大多少？", "Tailstock offset 8 µm only: what shape, right minus left?"]
+      - ["导轨水平面、垂直面各中凸 10 µm：差多少？", "Guideway bow of 10 µm, horizontal vs vertical"]
+      - ["主轴颈椭圆 3 µm：截面与圆度", "Oval journal 3 µm: section and roundness"]
+    notes:
+      - "这是实验 54.3，三维的外圆磨削模型，可以转动。先只加尾座偏移 8 微米，看工件变成什么形状，读出左右轴承位的直径差，和刚才的公式对一下。再分别给导轨在水平面、垂直面各弯 10 微米，看哪一个要紧——这就是误差敏感方向。最后加主轴颈椭圆，看截面。课后把五个任务做完，填实验报告。"
+      - "This is Lab 54.3, a 3D model of the grinding set-up that you can turn. First add only an 8-micron tailstock offset: what shape is the work, and how much larger is the right seat? Check it against the formula. Then bend the guideways 10 microns, first in the horizontal and then in the vertical plane, and see which one matters: that is the sensitive direction again. Finally add an oval journal and look at the section. After class, finish all five tasks and fill in the report."
+
+  - layout: section
+    num: "03"
+    title: ["受力变形：刚度与误差复映", "Deflection: stiffness and error reflection"]
+
+  - layout: split
+    title: ["让刀量由四部分串联而成", "The deflection is four parts in series"]
+    points:
+      - ["头架、尾座、刀架、工件，柔度相加", "Head, tail, tool post, work: compliances add"]
+      - ["刀在哪里，哪一项就大", "Where the tool is decides which term grows"]
+      - ["最软的环节决定形状", "The softest link decides the shape"]
+    visual: {tex: "y(x) = F_p\\left[\\frac{1}{k_{\\text{头}}}\\left(\\frac{L-x}{L}\\right)^2 + \\frac{1}{k_{\\text{尾}}}\\left(\\frac{x}{L}\\right)^2 + \\frac{1}{k_{\\text{刀}}} + \\frac{x^2(L-x)^2}{3EIL}\\right]"}
+    notes:
+      - "两顶尖车外圆，背向力 Fp 把刀具和工件推开 y。y 是四部分之和：刀在头架端时头架那一项大，在尾座端时尾座那一项大，刀架一项处处一样，工件弯曲在中间最大。哪一项最软，形状就由它决定：头架尾座软，两头让得多，车成鞍形；工件软，中间让得多，车成鼓形；尾座比头架软，车成锥形。"
+      - "Turning between centres, the radial force Fp pushes tool and work apart by y. y is the sum of four parts: near the headstock the head term is large, near the tailstock the tail term; the tool-post term is the same everywhere, and the bending of the work peaks in the middle. Whichever is softest decides the shape: soft centres let the ends give more, a saddle; a soft work lets the middle give more, a barrel; a tailstock softer than the head, a taper."
+
+  - layout: split
+    title: ["SH-301 是鞍形，细长轴是鼓形", "SH-301 comes out saddle-shaped, a slender shaft barrel-shaped"]
+    points:
+      - ["SH-301 精车：两端大、中间小，相差 {{ex54_4.sh_range_um:.1f}} µm", "SH-301 finishing: ends larger than the middle by {{ex54_4.sh_range_um:.1f}} µm"]
+      - ["细长轴：中间大 {{ex54_4.sl_crown_um:.0f}} µm", "Ø20 × 500 slender shaft: middle +{{ex54_4.sl_crown_um:.0f}} µm"]
+      - ["加跟刀架：降到 {{ex54_4.rest_range_um:.1f}} µm", "With a follow rest: down to {{ex54_4.rest_range_um:.1f}} µm"]
+    visual: {video: defl}
+    notes:
+      - "这是动画 54.4.1，刀具从尾座走到头架，让刀曲线一点一点画出来。SH-301 又粗又短，工件几乎不弯，头架尾座的变形起主要作用，两头让得多，车成鞍形，不过两端和中间只差 {{ex54_4.sh_range_um:.1f}} 微米。换成直径 20、长 500 的细长轴，工件自己弯，中间让开 {{ex54_4.sl_crown_um:.0f}} 微米，车成腰鼓；加一个跟刀架托住，降到 {{ex54_4.rest_range_um:.1f}} 微米。"
+      - "This is Animation 54.4.1: the tool travels from the tailstock to the headstock and the deflection curve is drawn point by point. SH-301 is short and stiff, so the work hardly bends; the centres dominate, the ends give more, and it comes out saddle-shaped, though the ends and the middle differ by only {{ex54_4.sh_range_um:.1f}} microns. A slender shaft, 20 mm across and 500 long, bends itself: the middle gives {{ex54_4.sl_crown_um:.0f}} microns, a barrel. A follow rest that supports it brings this down to {{ex54_4.rest_range_um:.1f}} microns."
+
+  - layout: bignum
+    title: ["误差复映：毛坯的误差一刀一刀缩小", "Error reflection: the blank's error shrinks pass by pass"]
+    nums:
+      - {n: "1 mm", n_en: "blank", label: ["毛坯直径上的跳动", "Runout of the blank"]}
+      - {n: "{{ex54_4.e_r_um:.1f}} µm", n_en: "ε = {{ex54_4.eps_r:.3f}}", label: ["粗车后", "After roughing"]}
+      - {n: "{{ex54_4.e_s_um:.2f}} µm", n_en: "ε = {{ex54_4.eps_s:.3f}}", label: ["半精车后：已经足够", "After semi-finishing: enough"]}
+    foot: ["ε = C/k：切深大处背向力大、让刀多，误差变小但不消失；降到 10 µm 以下至少 {{ex54_4.n_need}} 刀", "ε = C/k: deeper cut, larger force, more give; the error shrinks but never vanishes; at least {{ex54_4.n_need}} passes to get below 10 µm"]
+    notes:
+      - "毛坯偏心，切深就一边大一边小。切深大处背向力大、让刀多，车出来偏心变小了，但没有消失——这叫误差复映。复映系数 ε 等于背向力随切深的变化率 C 除以系统刚度 k。SH-301 粗车 ε 约 {{ex54_4.eps_r:.3f}}，1 毫米的跳动粗车后剩 {{ex54_4.e_r_um:.1f}} 微米，半精车后剩 {{ex54_4.e_s_um:.2f}} 微米。所以重要的表面要分粗、精几刀加工。"
+      - "An eccentric blank means a cut that is deep on one side and shallow on the other. Where the cut is deep the force is larger and the system gives more, so the eccentricity shrinks but does not vanish: error reflection. The coefficient ε is C, the rate at which the radial force grows with the depth of cut, over the system stiffness k. For SH-301 roughing ε is about {{ex54_4.eps_r:.3f}}: 1 mm of runout leaves {{ex54_4.e_r_um:.1f}} microns after roughing and {{ex54_4.e_s_um:.2f}} after semi-finishing. That is why important surfaces are cut in rough and finish passes."
+
+  - layout: lab
+    title: ["实验 54.4：受力变形与误差复映", "Lab 54.4: deflection and error reflection"]
+    shot:
+      page: lab54_4
+      steps: [{at: 2, set: {p-54-4-kt: 5}}]
+    tasks:
+      - ["SH-301 默认参数：什么形状？两端、中间各多少？", "SH-301 defaults: what shape, ends and middle?"]
+      - ["尾座刚度降到 5 kN/mm：哪端大？", "Tailstock down to 5 kN/mm: which end is larger?"]
+      - ["细长轴加跟刀架；毛坯 1 mm 要几刀", "Slender shaft with a rest; passes for 1 mm of runout"]
+    notes:
+      - "实验 54.4。上面是刀具走过全长时的直径误差，下面是毛坯误差经过几次走刀以后的大小，对数坐标。现在是把尾座刚度降到头架的四分之一，曲线变成一头高一头低，锥形，尾座端大。课后完成五个任务：SH-301 的鞍形、软尾座的锥形、细长轴的鼓形和跟刀架、走刀次数。"
+      - "Lab 54.4. The top chart is the diameter error as the tool travels the length; the bottom one is the blank's error after each pass, on a log scale. Here the tailstock has been made a quarter as stiff as the headstock: the curve now rises toward one end, a taper, larger at the tailstock. After class, do all five tasks: SH-301's saddle, the soft-tailstock taper, the slender shaft's barrel and the follow rest, and the number of passes."
+
+  - layout: section
+    num: "04"
+    title: ["热变形、磨损与测量误差", "Heat, wear and measurement"]
+
+  - layout: split
+    title: ["开机就干：直径逐件变小", "Start grinding cold: the size drops part by part"]
+    points:
+      - ["热伸长 δ∞ = {{ex54_5.dinf_um:.0f}} µm（直径），τ = {{ex54_5.tau:.0f}} 件", "Wheelhead growth δ∞ = {{ex54_5.dinf_um:.0f}} µm on Ø, τ = {{ex54_5.tau:.0f}} parts"]
+      - ["约 {{ex54_5.n_res:.0f}} 件后剩余不到 1 µm", "Less than 1 µm left after about {{ex54_5.n_res:.0f}} parts"]
+      - ["先预热到热平衡，再调尺寸", "Warm up to equilibrium, then set the size"]
+    visual: {video: warm}
+    notes:
+      - "这是动画 54.5.1。磨床开机后砂轮架发热、向工件伸长，按冷态调好的尺寸，磨出的直径一件比一件小。热伸长按指数规律趋于稳定：直径上一共 {{ex54_5.dinf_um:.0f}} 微米，时间常数约 {{ex54_5.tau:.0f}} 件，也就是 {{ex54_5.tau_min:.0f}} 分钟；约 {{ex54_5.n_res:.0f}} 件以后剩余不到 1 微米。办法是先空运转预热到热平衡再调尺寸，或者用在机测量随时补偿。"
+      - "This is Animation 54.5.1. After start-up the wheelhead warms and grows toward the work, so with the size set cold every part comes out a little smaller than the last. The growth levels off exponentially: {{ex54_5.dinf_um:.0f}} microns on the diameter in all, with a time constant of about {{ex54_5.tau:.0f}} parts, {{ex54_5.tau_min:.0f}} minutes; after about {{ex54_5.n_res:.0f}} parts less than a micron remains. The cure: run the machine idle until it reaches equilibrium before setting the size, or compensate with in-process gauging."
+
+  - layout: split
+    title: ["砂轮磨损：多久修整一次", "Wheel wear: how often to dress"]
+    points:
+      - ["修整后尺寸逐件上升（锯齿）", "After dressing the size climbs part by part (a saw tooth)"]
+      - ["中心在下限 + 3σ 起步，第 {{ex54_6.n_max}} 件 +3σ 碰到上限", "Start 3σ above the lower limit: +3σ reaches the upper limit at {{ex54_6.n_max}} parts"]
+      - ["工艺规程每 10 件修整：留有余量", "The plan dresses every 10 parts: with room to spare"]
+    visual: {fig: fig54_6_3}
+    notes:
+      - "磨削时砂轮也在磨损，直径逐件变大；修整砂轮、补偿以后又回到起点，数据上就是锯齿。修整间隔怎么定？修整后把尺寸中心放在离下限 3σ 的地方，按每件上升的量往上走，走到离上限 3σ 就得修了。按本章的数据，最多 {{ex54_6.n_max}} 件。工艺规程定每 10 件修整一次，留了余量。"
+      - "The wheel wears as it grinds, and the size grows part by part; after dressing and compensation it starts again, which shows up as a saw tooth. How often to dress? After dressing, put the size centre 3σ above the lower limit and let it climb by the wear per part; when it reaches 3σ below the upper limit, it is time. With this chapter's data that is at most {{ex54_6.n_max}} parts. The process plan dresses every 10 parts, leaving some room."
+
+  - layout: points
+    title: ["测量也有误差", "Measurement has errors too"]
+    points:
+      - ["工件比量具热 10 °C：Ø35 读数偏大 {{ex54_5.e10_um:.1f}} µm，占公差四分之一", "Work 10 °C warmer than the gauge: Ø35 reads {{ex54_5.e10_um:.1f}} µm large, a quarter of the tolerance"]
+      - ["阿贝原则：被测线应与刻线在一条线上，否则倾斜被放大", "Abbe principle: keep the measured line on the scale line, or any tilt is magnified"]
+      - ["量具的误差要比公差小得多", "The gauge's error must be far smaller than the tolerance"]
+    foot: ["磨后不要马上测：等工件凉到与量具同温", "Don't measure straight after grinding: let the part cool to the gauge's temperature"]
+    notes:
+      - "零件合不合格是量出来的，测量本身也有误差。磨完马上测，工件比量具热 10 度，Ø35 的读数就偏大 {{ex54_5.e10_um:.1f}} 微米，占 k6 公差的四分之一。游标卡尺的被测线和刻线不在一条线上，尺框稍一倾斜误差就放大，这就是阿贝原则；外径千分尺符合这个原则，所以更准。"
+      - "Whether a part is good is decided by measuring, and measuring has errors too. Measure straight after grinding, with the work 10 degrees warmer than the gauge, and Ø35 reads {{ex54_5.e10_um:.1f}} microns large, a quarter of the k6 tolerance. On a vernier calliper the measuring line is offset from the scale, so any tilt of the jaw is magnified: the Abbe principle. A micrometer obeys the principle, and is more accurate for it."
+
+  - layout: section
+    num: "05"
+    title: ["统计分析：一批零件怎么看", "Statistics: looking at a whole batch"]
+
+  - layout: split
+    title: ["分布图：中心和分散", "The distribution: centre and spread"]
+    points:
+      - ["正常磨 {{ex54_7.n}} 件：均值 {{ex54_7.mean:.4f}}，s = {{ex54_7.s_um:.2f}} µm", "{{ex54_7.n}} parts: mean {{ex54_7.mean:.4f}}, s = {{ex54_7.s_um:.2f}} µm"]
+      - ["Cp = {{ex54_7.Cp:.2f}}（组内 σ̂ = {{ex54_7.sw_um:.2f}} µm）：分散够小", "Cp = {{ex54_7.Cp:.2f}} (within σ̂ = {{ex54_7.sw_um:.2f}} µm): spread small enough"]
+      - ["Cpk = {{ex54_7.Cpk:.2f}} < 1.33：中心偏了", "Cpk = {{ex54_7.Cpk:.2f}} < 1.33: off centre"]
+    visual: {fig: fig54_7_1}
+    notes:
+      - "正常状态磨 {{ex54_7.n}} 件，左轴承位的直方图接近正态，均值 {{ex54_7.mean:.4f}}，标准差 {{ex54_7.s_um:.2f}} 微米。工序能力指数 Cp 只看分散，等于公差除以 6σ，这里 σ 用组内估计的 {{ex54_7.sw_um:.2f}} 微米，Cp 是 {{ex54_7.Cp:.2f}}，够了；Cpk 还看中心，用中心到较近一侧公差限的距离除以 3σ，只有 {{ex54_7.Cpk:.2f}}，不到 1.33。不用换机床，把尺寸中心往公差中值调一调就行。"
+      - "A hundred parts in normal running: the left seat's histogram is close to normal, mean {{ex54_7.mean:.4f}}, standard deviation {{ex54_7.s_um:.2f}} microns. The capability index Cp looks only at spread, the tolerance over 6σ, here with the within-subgroup estimate σ = {{ex54_7.sw_um:.2f}} microns: {{ex54_7.Cp:.2f}}, enough. Cpk also looks at the centre: the distance to the nearer limit over 3σ, only {{ex54_7.Cpk:.2f}}, below 1.33. No new machine is needed; move the size centre toward the middle of the tolerance."
+
+  - layout: split
+    title: ["工序能力：Cp 看分散，Cpk 还看中心", "Capability: Cp is spread, Cpk adds the centre"]
+    points:
+      - ["T = 6σ 时 Cp = 1；一般要求 Cpk ≥ 1.33", "Cp = 1 when T = 6σ; Cpk ≥ 1.33 is usually required"]
+      - ["中心偏离公差中值，Cpk 小于 Cp", "Off-centre, Cpk falls below Cp"]
+      - ["这一批按正态估计约 {{ex54_7.p_out_ppm:.0f}} ppm 超差", "This batch: about {{ex54_7.p_out_ppm:.0f}} ppm out, assuming a normal distribution"]
+    visual: {tex: ["C_p = \\frac{T}{6\\sigma}", "C_{pk} = \\frac{\\min(\\text{USL} - \\mu,\\ \\mu - \\text{LSL})}{3\\sigma}"]}
+    notes:
+      - "两个指数写出来是这样。公差正好等于 6σ 时 Cp 等于 1，千件里约有 3 件超差；一般要求不低于 1.33。中心偏离公差中值时，Cpk 比 Cp 小，偏得越多小得越多。SH-301 这一批 Cpk {{ex54_7.Cpk:.2f}}，按正态分布估计约百万分之 {{ex54_7.p_out_ppm:.0f}} 超差。"
+      - "Written out, the two indices look like this. When the tolerance equals 6σ, Cp is 1 and about 3 parts in a thousand are out; at least 1.33 is usually required. When the centre is off the middle of the tolerance, Cpk is smaller than Cp, and the more it is off, the smaller. This SH-301 batch has a Cpk of {{ex54_7.Cpk:.2f}}, about {{ex54_7.p_out_ppm:.0f}} parts per million out, assuming a normal distribution."
+
+  - layout: split
+    title: ["均值–极差图：哪一组开始变了", "X̄–R chart: which subgroup changed"]
+    points:
+      - ["前 10 组定控制限；每组 10 件 = 一个修整周期", "Limits from 10 subgroups; 10 parts = one dressing cycle"]
+      - ["第 {{ex54_7.first}} 组起出界：规则 {{ex54_7.first_rule}}", "Out from subgroup {{ex54_7.first}}: rule {{ex54_7.first_rule}}"]
+      - ["极差图没反应：中心变了，分散没变", "R chart quiet: the centre moved, not the spread"]
+    visual: {fig: fig54_7_4}
+    notes:
+      - "单看分布图看不出先后。均值–极差图按加工顺序，每 10 件一组，正好一个修整周期，前 10 组的数据定出控制限。从第 {{ex54_7.first}} 组起均值图出界，是判异规则 {{ex54_7.first_rule}}：一点落在 3σ 之外。极差图却没有反应：说明是中心整体移动了，分散没有变——这是系统误差的信号，要去找原因。"
+      - "A histogram has no order. The X-bar and R chart follows the machining sequence, ten parts a subgroup, exactly one dressing cycle, with control limits from the first ten subgroups. From subgroup {{ex54_7.first}} the mean chart is out, by run rule {{ex54_7.first_rule}}: a point beyond 3σ. The range chart does not react: the centre has moved as a whole, the spread has not. That is the signal of a systematic error, and a cause to look for."
+
+  - layout: lab
+    title: ["实验 54.7：均值–极差图与判异", "Lab 54.7: X̄–R chart and run rules"]
+    shot:
+      page: lab54_7
+      steps: [{at: 2, set: {p-54-7-drift: 0.3}}]
+    tasks:
+      - ["均值偏移 1.5σ：第几组报警？哪条规则？", "1.5σ shift: which subgroup, which rule?"]
+      - ["分散变 2 倍；每组漂移 0.3σ", "Spread × 2; drift 0.3σ per subgroup"]
+      - ["子组容量 8 和 2：几组以内报警？", "Subgroup size 8 vs 2: how soon the alarm?"]
+    notes:
+      - "实验 54.7。可以给数据加均值偏移、分散变大、逐组漂移，看均值图、极差图哪个先报警，用的是哪条规则。现在是每组漂移 0.3σ：变化刚开始的几组都在界内，要过几组才报警，看读数里是哪一组、哪条规则。再改子组容量，体会为什么容量大了报警快。"
+      - "Lab 54.7. Add a mean shift, a larger spread or a drift per subgroup, and see which chart alarms first and by which rule. Here the drift is 0.3σ per subgroup: the first subgroups after the change stay inside the limits, and the alarm comes only a few subgroups later; read off which subgroup and which rule. Then change the subgroup size and see why larger subgroups alarm sooner."
+
+  - layout: section
+    num: "06"
+    title: ["从误差的形态推断来源", "From the pattern to the source"]
+
+  - layout: tiles
+    title: ["误差的“指纹”", "The fingerprints of errors"]
+    tiles:
+      - {k: "锥", name: ["锥度", "Taper"], use: ["尾座偏移、导轨与主轴不平行", "Tailstock offset, guideways not parallel"]}
+      - {k: "鼓", name: ["鼓形", "Barrel"], use: ["工件软（细长轴）、热伸长被顶尖顶住", "Soft (slender) work, thermal growth held by the centres"]}
+      - {k: "鞍", name: ["鞍形", "Saddle"], use: ["头架尾座软、导轨水平面中凸", "Soft centres, guideway bow"]}
+      - {k: "齿", name: ["锯齿", "Saw tooth"], use: ["砂轮、刀具磨损，修整后回落", "Wheel or tool wear, reset by dressing"]}
+      - {k: "热", name: ["开机段", "Start-up run"], use: ["热变形：指数趋稳", "Heat: levels off exponentially"]}
+      - {k: "跳", name: ["一次跳变", "One step"], use: ["调整、碰撞、换砂轮或换批", "Setting, a knock, new wheel or batch"]}
+    notes:
+      - "每种误差来源在零件上留下自己的形态，像指纹。沿轴向看：锥度、鼓形、鞍形，分别指向两顶尖、工件刚度、头尾架刚度和导轨。按加工顺序看：锯齿是磨损和修整，开机后指数趋稳是热变形，从某一件起一次跳变是调整、碰撞或者换了砂轮、换了毛坯批次。截面上还有椭圆、棱圆，指向主轴和中心孔。"
+      - "Every source of error leaves its own pattern on the part, like a fingerprint. Along the axis: taper, barrel and saddle point to the centres, the stiffness of the work, the stiffness of the head and tail, and the guideways. In machining order: a saw tooth is wear and dressing, an exponential settling after start-up is heat, and a single step from some part on is a setting, a knock, a new wheel or a new batch of blanks. In the cross-section there are ovals and lobes too, pointing to the spindle and the centre holes."
+
+  - layout: split
+    title: ["三维看形态：误差放大以后", "The shapes in 3D, magnified"]
+    points:
+      - ["锥形、鼓形、鞍形、弯曲", "Taper, barrel, saddle, bend"]
+      - ["椭圆、三棱：看截面", "Oval, three lobes: look at the section"]
+      - ["一个形态往往对应几个原因，要排除", "One pattern can have several causes: rule them out"]
+    visual: {video: print}
+    notes:
+      - "这是动画 54.8.1，误差放大几百倍以后的几种工件形状，逐个出现。要注意：一种形态往往对应不止一个原因。锥度可能是尾座偏移，也可能是导轨与主轴不平行、刀具磨损或者头尾架刚度不等。所以诊断不是查表，而是看了形态再用其他特性和时间先后把不对的原因排除掉。"
+      - "This is Animation 54.8.1: work shapes with the errors magnified hundreds of times, one after another. Mind that one pattern usually has more than one possible cause. A taper may be a tailstock offset, or guideways not parallel to the spindle, tool wear, or unequal stiffness of head and tail. So diagnosis is not a table lookup: see the pattern, then use the other characteristics and the timing to rule out the wrong causes."
+
+  - layout: split
+    title: ["回到那一批：三处的变化落在一条直线上", "Back to the batch: three changes on one line"]
+    points:
+      - ["右减左：砂轮磨损消掉，剩下第 {{ex54_8.jump_at}} 件的台阶", "Right minus left: wear cancels, a step at part {{ex54_8.jump_at}} is left"]
+      - ["左 {{ex54_8.dL:.1f}}、齿轮位 {{ex54_8.dG:.1f}}、右 {{ex54_8.dR:.1f}} µm：过头架顶尖", "Left {{ex54_8.dL:.1f}}, gear {{ex54_8.dG:.1f}}, right {{ex54_8.dR:.1f}} µm: through the head centre"]
+      - ["尾座偏移约 {{ex54_8.e_est_um:.1f}} µm（离开砂轮）", "Tailstock offset about {{ex54_8.e_est_um:.1f}} µm, away from the wheel"]
+    visual: {fig: fig54_8_4}
+    notes:
+      - "回到开头那一批。第一步，把右轴承位减左轴承位逐件画出来：砂轮磨损、热变形两处一样，相减就消掉了，剩下第 {{ex54_8.jump_at}} 件一个干净的台阶。第二步，把左轴承位、齿轮位、右轴承位的变化 {{ex54_8.dL:.1f}}、{{ex54_8.dG:.1f}}、{{ex54_8.dR:.1f}} 微米画在轴向位置上，三点落在一条过头架顶尖的直线上——锥度，工件绕头架顶尖偏斜。砂轮磨损两处一样变，排除；导轨和刚度是机床固有的，不会突然出现，排除。按斜率估出尾座偏移约 {{ex54_8.e_est_um:.1f}} 微米。"
+      - "Back to our batch. Step one: plot right minus left, part by part. Wheel wear and heat act alike on both seats and cancel, leaving a clean step at part {{ex54_8.jump_at}}. Step two: plot the changes at the left seat, the gear seat and the right seat, {{ex54_8.dL:.1f}}, {{ex54_8.dG:.1f}} and {{ex54_8.dR:.1f}} microns, against their axial positions. The three points lie on a line through the head centre: a taper, the work tilted about the head centre. Wheel wear would change both seats alike, so it is out; the guideways and the stiffness belong to the machine and don't appear suddenly, so they are out too. The slope gives a tailstock offset of about {{ex54_8.e_est_um:.1f}} microns."
+
+  - layout: lab
+    title: ["实验 54.8：误差诊断", "Lab 54.8: diagnosis"]
+    shot: {page: lab54_8}
+    tasks:
+      - ["四个批次各藏一个问题", "Four batches, each with a hidden problem"]
+      - ["看逐件数据和放大的工件形状", "Read the part-by-part data and the magnified shape"]
+      - ["选一项措施：系统判对不对症", "Pick an action: the lab says whether it fits"]
+    notes:
+      - "实验 54.8 是诊断练习。四个批次各藏着一个加工问题，批次名不透露是什么。左边看逐件数据，可以切换左右轴承位、右减左、圆跳动和键槽对称度；右边是放大的工件形状。找出形态、推出原因，选一项纠正措施，系统告诉你对不对症。"
+      - "Lab 54.8 is diagnosis practice. Four batches each hide one machining problem, and the batch names give nothing away. On the left, the part-by-part data: switch between the two bearing seats, right minus left, runout and keyway symmetry. On the right, the magnified shape of the work. Find the pattern, infer the cause, pick a corrective action, and the lab tells you whether it fits."
+
+  - layout: chain
+    title: ["在数字工厂里走一遍：质量异常单（8D）", "In the digital factory: the 8D report"]
+    steps:
+      - ["D1 成立小组", "D1 Team"]
+      - ["D2 用数据描述", "D2 Describe"]
+      - ["D3 临时措施", "D3 Contain"]
+      - ["D4 根本原因", "D4 Root cause"]
+      - ["D5 纠正措施", "D5 Action"]
+      - ["D6 用数据验证", "D6 Verify"]
+      - ["D7 防止再发生", "D7 Prevent"]
+      - ["D8 总结", "D8 Close out"]
+    hot: [3, 5]
+    mark: ["形态→原因→数据", "pattern → cause → data"]
+    foot: ["工程任务单 TS-54-1：老师注入一个隐藏问题，学生从质量页的数据诊断，措施经老师批准在仿真车间实施", "Task sheet TS-54-1: the teacher injects a hidden problem; students diagnose it from the quality data, and the approved action is carried out in the simulated shop"]
+    notes:
+      - "这套推理在数字工厂里就是一张质量异常单，按 8D 走。D2 用数据描述现象：哪个特性、偏多少、从第几件起、哪台设备；D4 写出从形态到原因的推理，为什么是它、为什么不是别的；D5 选纠正措施，提交老师批准；D6 等车间再磨至少 10 件，用措施以后的数据证明问题消除；D7 改工艺文件防止再发生。工程任务单 TS-54-1 就是这样做的。"
+      - "In the digital factory this reasoning becomes a quality problem report, the 8D. D2 describes the problem in data: which characteristic, by how much, from which part, on which machine. D4 gives the reasoning from pattern to cause: why this one and not the others. D5 chooses the corrective action and sends it for approval. D6 waits for at least ten more parts and proves with the new data that the problem is gone. D7 changes the process documents so it does not recur. Task sheet TS-54-1 works exactly this way."
+
+  - layout: figure
+    title: ["数字工厂质量页：注入“尾座偏移”以后", "The quality page after a tailstock offset is injected"]
+    visual: {fig: fig54_8_5}
+    caption: ["右轴承位单值图整体上移、越过上限；自动开出的不合格品单都是右轴承位和齿轮位", "The right seat's chart moves up past the limit; the automatic reject reports are all right seats and gear seats"]
+    notes:
+      - "这是数字工厂质量页的截图，测试数据。老师注入“磨床尾座偏移”以后，右轴承位的单值图从某一件起整体上移、越过上限；右栏自动开出的不合格品单都是右轴承位和齿轮位，没有左轴承位——离尾座近的两处。学生就从这里开质量异常单。"
+      - "This is a screenshot of the digital factory's quality page, with test data. After the teacher injects a tailstock offset, the right seat's chart moves up as a whole from some part on and crosses the limit; the reject reports opened automatically on the right are all right seats and gear seats, none on the left seat: the two places nearest the tailstock. This is where students open the 8D."
+
+  - layout: section
+    num: "07"
+    title: ["提高加工精度：预算、补偿、在机测量", "Better accuracy: budget, compensate, gauge in process"]
+
+  - layout: split
+    title: ["精度预算：先算再干", "Accuracy budget: work it out first"]
+    points:
+      - ["系统误差直接相加，随机误差平方和开方", "Systematic errors add; random ones as root sum of squares"]
+      - ["工序 60 轴承位：合计 {{ex54_9.b1_total:.1f}} µm，占公差 {{ex54_9.b1_share:.0f}}%", "Op 60 bearing seat: {{ex54_9.b1_total:.1f}} µm, {{ex54_9.b1_share:.0f}}% of the tolerance"]
+      - ["裕量只剩 {{ex54_9.b1_margin:.1f}} µm：点检、修整不能松", "Only {{ex54_9.b1_margin:.1f}} µm to spare: keep the checks and dressing"]
+    visual: {fig: fig54_9_1}
+    notes:
+      - "能不能做到公差，开工前就可以算：把各项误差列出来，系统误差直接相加，随机误差按平方和开方，合计不超过公差。SH-301 工序 60 的轴承位，系统误差 {{ex54_9.b1_sys:.1f}} 微米，随机误差合成 {{ex54_9.b1_rand:.1f}} 微米，合计 {{ex54_9.b1_total:.1f}} 微米，占公差的 {{ex54_9.b1_share:.0f}}%，只剩 {{ex54_9.b1_margin:.1f}} 微米裕量。数字工厂的 AI 评审员看工艺规程时就按这个算，给出“建议”。"
+      - "Whether the tolerance can be held can be worked out before production: list the errors, add the systematic ones, combine the random ones as a root sum of squares, and keep the total inside the tolerance. For SH-301's bearing seats in operation 60: systematic {{ex54_9.b1_sys:.1f}} microns, random {{ex54_9.b1_rand:.1f}}, total {{ex54_9.b1_total:.1f}}, {{ex54_9.b1_share:.0f}}% of the tolerance, with only {{ex54_9.b1_margin:.1f}} microns to spare. The digital factory's AI reviewer does exactly this sum when it reads a process plan, and raises a suggestion."
+
+  - layout: split
+    title: ["主动测量：边磨边量，到尺寸就停", "In-process gauging: measure while grinding, stop at size"]
+    points:
+      - ["开环、每 10 件修整：Cpk = {{ex54_9.cpk_open:.2f}}", "Open loop, dressing every 10: Cpk = {{ex54_9.cpk_open:.2f}}"]
+      - ["磨后测量、逐件反馈：Cpk = {{ex54_9.cpk_fb:.2f}}", "Post-process feedback: Cpk = {{ex54_9.cpk_fb:.2f}}"]
+      - ["主动测量：Cpk = {{ex54_9.cpk_act:.2f}}（只计测量仪误差）", "In-process gauging: Cpk = {{ex54_9.cpk_act:.2f}} (gauge error only)"]
+    visual: {video: gauge}
+    notes:
+      - "提高精度有几条路：减少误差源，补偿，转移，均化，还有在机测量。这是动画 54.9.1，外圆磨床的主动测量：两个测爪在磨削时一直量着直径，数控系统按测得的值控制横进给，到尺寸就停。砂轮磨损、热变形都被量进去了。同样磨 60 件，开环每 10 件修整，Cpk {{ex54_9.cpk_open:.2f}}；磨后测量逐件反馈，{{ex54_9.cpk_fb:.2f}}；主动测量，{{ex54_9.cpk_act:.2f}}。逐件反馈只略有提高：每件的随机误差也被当成偏差去补偿，这叫过度调整；主动测量的 Cpk 只计测量仪的误差。"
+      - "There are several roads to better accuracy: remove the source, compensate, transfer, average out, and gauge in process. This is Animation 54.9.1, in-process gauging on a cylindrical grinder: two fingers measure the diameter throughout the cut, and the CNC controls the infeed from the reading, stopping at size. Wheel wear and heat are measured away with it. Over 60 parts: open loop with dressing every ten, Cpk {{ex54_9.cpk_open:.2f}}; measuring after grinding with feedback, {{ex54_9.cpk_fb:.2f}}; in-process gauging, {{ex54_9.cpk_act:.2f}}. Part-by-part feedback helps only a little: each part's random error is treated as a deviation and compensated too, which is over-adjustment. The in-process figure counts only the gauge's own error."
+
+  - layout: points
+    title: ["机器人联系与生活例子", "A robot link and an everyday example"]
+    points:
+      - ["关节输出轴两个轴承位一大一小：预紧不均，摩擦力矩忽大忽小，力控就不稳", "Joint output shaft with unequal bearing seats: uneven preload, fluctuating friction, unsteady force control"]
+      - ["机器人连续工作一两个小时末端漂移几十微米：先“热机”", "A robot drifts tens of microns over an hour or two: warm it up first"]
+      - ["擀饺子皮：中间压得重就中间薄——让刀与复映", "Rolling dumpling skins: press hard in the middle and it thins there — deflection and reflection"]
+    notes:
+      - "机器人关节的输出轴两个轴承位要一次装夹磨出；如果尾座偏了，两个轴承位一大一小，两套轴承的预紧不均，关节转起来摩擦力矩忽大忽小，力控就不稳。机器人自己也有热变形：关节电动机和减速器发热，连续工作一两个小时末端漂移几十微米，高精度作业前要先热机。生活里，擀饺子皮中间压得重，皮子就中间薄，面团软的地方一擀就薄——这就是让刀和误差复映。"
+      - "A robot joint's output shaft has two bearing seats ground in one set-up. If the tailstock is off, one seat is larger than the other, the two bearings get unequal preload, the friction torque swings as the joint turns, and force control becomes unsteady. Robots warm up too: the joint motors and gearboxes heat, and after an hour or two of work the tool tip drifts tens of microns, so precise work starts with a warm-up. In the kitchen, press harder in the middle when rolling a dumpling skin and it comes out thin there, and soft dough thins at once: deflection and error reflection."
+
+  - layout: answer
+    tag: ["回到车间里的事", "Back to the problem"]
+    title: ["不是砂轮，是尾座偏了：校正尾座", "Not the wheel but the tailstock: realign it"]
+    rows:
+      - [["左、齿轮位、右：过头架顶尖的直线", "Left, gear, right: a line through the head"], ["锥度", "taper"]]
+      - [["估算的尾座偏移（离开砂轮）", "Estimated tailstock offset (away from the wheel)"], "{{ex54_8.e_est_um:.1f}} µm"]
+      - [["检验棒 + 千分表校正尾座", "Realign with a test bar and dial"], ["D6 有效", "D6 OK"]]
+    side: {big: "D7", text: ["开班点检：尾座偏移 ≤ {{ex54_3.e_allow_um:.1f}} µm，写进工艺规程", "Start-of-shift check, offset ≤ {{ex54_3.e_allow_um:.1f}} µm, in the plan"]}
+    foot: ["修整砂轮不对症：砂轮磨损两处一样变，修完右轴承位照样超差", "Dressing the wheel would not help: wear changes both seats alike, and the right seat would stay out"]
+    notes:
+      - "回答开头的问题。三处的变化 {{ex54_8.dL:.1f}}、{{ex54_8.dG:.1f}}、{{ex54_8.dR:.1f}} 微米落在过头架顶尖的直线上，是锥度，原因是两顶尖连线在第 {{ex54_8.jump_at}} 件前后被改变了，尾座偏移约 {{ex54_8.e_est_um:.1f}} 微米。措施是用标准检验棒和千分表校正尾座；防止再发生，是把开班点检写进工艺规程，偏移不超过 {{ex54_3.e_allow_um:.1f}} 微米。质检员说的修整砂轮不对症：砂轮磨损让两处一样变，修完右轴承位照样超差。"
+      - "Now the answer. The changes of {{ex54_8.dL:.1f}}, {{ex54_8.dG:.1f}} and {{ex54_8.dR:.1f}} microns lie on a line through the head centre: a taper, caused by the line of centres being disturbed around part {{ex54_8.jump_at}}, a tailstock offset of about {{ex54_8.e_est_um:.1f}} microns. The action is to realign the tailstock with a standard test bar and a dial gauge; to prevent recurrence, put a start-of-shift check in the process plan, offset no more than {{ex54_3.e_allow_um:.1f}} microns. The inspector's dressing would not help: wheel wear changes both seats alike, and the right seat would still be out."
+
+  - layout: summary
+    title: ["本章小结", "Summary"]
+    points:
+      - ["误差看敏感方向；来源：原理、调整、机床、受力、热、磨损、测量", "Judge errors along the sensitive direction; sources: method, setting, machine, load, heat, wear, gauging"]
+      - ["统计看一批：Cp、Cpk、控制图；形态是来源的指纹", "Statistics for a batch: Cp, Cpk, control charts; the pattern is the source's fingerprint"]
+      - ["先预算，再减少、补偿、在机测量；措施要用数据验证", "Budget first, then reduce, compensate, gauge in process; prove every action with data"]
+    after: ["实验 54.3、54.4、54.7、54.8 报告 · 工程任务单 TS-54-1 —— 在问渠学习平台完成", "Reports for Labs 54.3, 54.4, 54.7, 54.8 · Task sheet TS-54-1 — on WenQuest"]
+    notes:
+      - "小结三句话。看误差先看敏感方向，误差来自加工原理、调整、机床、受力变形、热变形、磨损和测量。看一批零件用统计：工序能力 Cp、Cpk，控制图看先后；误差的形态是来源的指纹。提高精度先做预算，再减少、补偿、在机测量，任何措施都要用措施以后的数据证明有效。课后完成四个实验报告和工程任务单 TS-54-1。"
+      - "Three sentences to sum up. Judge an error along the sensitive direction; errors come from the method, the setting, the machine, deflection, heat, wear and measurement. Look at a batch with statistics: Cp and Cpk, and control charts for the sequence; the pattern of an error is the fingerprint of its source. For better accuracy, budget first, then reduce, compensate and gauge in process, and prove every action with the data that follow. After class: four lab reports and task sheet TS-54-1."

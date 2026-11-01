@@ -168,7 +168,7 @@ export interface TextbookChapter { no: number | string; title: string; level: st
 /** 互动资源（第 9 轮 2.5）: an animation or a virtual lab of a chapter, and the section it is in. */
 export interface TextbookResource { kind: "anim" | "lab"; num: string; title: string; title_en?: string; sec: string }
 export interface TextbookIndex { book: string; title: string; title_en?: string; parts: { title: string }[]; parts_en?: Record<string, string>;
-  chapters: TextbookChapter[]; teacher: boolean; pdf: (number | string)[]; pdf_en?: (number | string)[]; resources?: Record<string, TextbookResource[]> }
+  chapters: TextbookChapter[]; teacher: boolean; pdf: (number | string)[]; pdf_en?: (number | string)[]; slides?: (number | string)[]; resources?: Record<string, TextbookResource[]> }
 export interface TextbookSection { id: string; title: string; lang?: "zh" | "en"; chapter: { no: number | string; title: string; status?: string }; html: string;
   prev: TextbookSectionRef | null; next: TextbookSectionRef | null }
 export interface CommitteeItem { pid: string; lid: string; course: Text; chapter: Text; no: string; title: Text; teacher: string; state: string; submitted?: number; verdict: string }
@@ -580,6 +580,9 @@ export const api = {
     request<TextbookSection>("GET", `/api/v1/textbooks/${book}/sections/${sid}?mp=${mp}&lang=${lang}`, undefined, 180000),   // 手机网络慢：图多的节要多等一会儿
   textbookPdf: (book: string, chapter: number | string, lang: "zh" | "en" = "zh") =>
     request<{ url: string }>("GET", `/api/v1/textbooks/${book}/pdf/${chapter}?lang=${lang}`),
+  // 网页互动课件（第 13 轮十）：人人能放映，老师另有下载链接
+  textbookSlides: (book: string, chapter: number | string) =>
+    request<{ url: string; download?: string }>("GET", `/api/v1/textbooks/${book}/slides/${chapter}`),
   studioConfirmChapter: (id: string, no: number) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/chapters/${no}/confirm`, {}),
   studioPace: (id: string, mode: "manual" | "daily", hour: number, tz: string) =>
     request<StudioProject>("PUT", `/api/v1/studio/projects/${id}/pace`, { mode, hour, tz }),

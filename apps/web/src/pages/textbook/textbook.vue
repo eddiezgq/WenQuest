@@ -75,7 +75,13 @@
           <view v-if="cur" class="crumb">
             <text>{{ chapterLabel(cur.chapter.no) }} {{ cur.chapter.title }}
               <text v-if="cur.chapter.status" class="badge">{{ t("book.status." + cur.chapter.status) }}</text></text>
-            <view v-if="pdfFor(cur.chapter.no)" class="pdf" @click="pdf(cur.chapter.no)">⤓ {{ t("book.pdf") }}{{ en ? " (English)" : "" }}</view>
+            <view class="crumb-btns">
+              <!-- #ifdef H5 -->
+              <view v-if="slidesFor(cur.chapter.no)" class="pdf" @click="slides(cur.chapter.no, false)">▶ {{ t("book.slides") }}</view>
+              <view v-if="slidesFor(cur.chapter.no) && idx?.teacher" class="pdf" @click="slides(cur.chapter.no, true)">⤓ {{ t("book.slides_dl") }}</view>
+              <!-- #endif -->
+              <view v-if="pdfFor(cur.chapter.no)" class="pdf" @click="pdf(cur.chapter.no)">⤓ {{ t("book.pdf") }}{{ en ? " (English)" : "" }}</view>
+            </view>
           </view>
           <text v-if="en && cur && cur.lang !== 'en'" class="no-en">{{ t("book.no_en") }}</text>
           <!-- 本章互动资源（第 9 轮 2.5）：章的第一页上列出本章的动画和实验 -->
@@ -167,6 +173,7 @@ async function go(r: TextbookResource) {
   if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   // #endif
 }
+const slidesFor = (ch: number | string) => !!idx.value?.slides?.includes(ch);
 const pdfFor = (ch: number | string) => (en.value && idx.value?.pdf_en?.includes(ch)) || (!en.value && idx.value?.pdf.includes(ch));
 
 function setLang(l: "zh" | "en") {
@@ -249,6 +256,21 @@ async function read(sid: string) {
   finally { reading.value = false; }
 }
 
+async function slides(ch: number | string, download: boolean) {
+  // 网页互动课件：新窗口放映（方向键翻页、S 讲者窗口、F 全屏）；老师可下载，下载后双击也能放映
+  const w = download ? null : window.open("", "_blank");      // 先开窗口（等接口返回再开会被浏览器拦下）
+  try {
+    const r = await api.textbookSlides(book.value, ch);
+    if (download) {                                              // 下载：附件，当前页不动
+      const a = document.createElement("a");
+      a.href = absolute(r.download || r.url); a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+      return;
+    }
+    const u = absolute(r.url);
+    if (w) w.location.href = u; else window.open(u, "_blank");
+  } catch (e) { w?.close(); fail(e); }
+}
+
 async function pdf(ch: number | string) {
   try {
     const r = await api.textbookPdf(book.value, ch, en.value && idx.value?.pdf_en?.includes(ch) ? "en" : "zh");
@@ -309,6 +331,7 @@ onLoad(async (q: any) => {
 .todo { font-size: 11px; flex-shrink: 0; }
 .page { flex: 1; min-width: 0; max-width: 820px; background: #fff; border: 1px solid var(--wq-line); border-radius: 10px; padding: 20px 28px 28px; }
 .crumb { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--wq-muted); margin-bottom: 4px; gap: 10px; }
+.crumb-btns { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 .pdf { border: 1px solid var(--wq-line); border-radius: 6px; padding: 4px 10px; cursor: pointer; color: var(--wq-ink); flex-shrink: 0; }
 .pager { display: flex; gap: 10px; margin-top: 28px; border-top: 1px solid var(--wq-line); padding-top: 14px; }
 .pg { font-size: 14px; color: var(--wq-link); cursor: pointer; }

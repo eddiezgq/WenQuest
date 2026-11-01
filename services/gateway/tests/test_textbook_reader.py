@@ -313,3 +313,40 @@ def test_a_maths_part_chapter(client, tmp_path):
     r = client.get(u[u.index("/api/"):])
     assert r.content == b"%PDF-1.4 M1" and "第M1章" in r.headers["content-disposition"].encode().decode("unicode_escape", "ignore") or True
     assert client.get("/api/v1/textbooks/robotics/pdf/..%2Fx", headers=h).status_code == 404   # 章号要校验格式
+
+
+def test_chapter_slides_open_for_everyone_and_get_the_animations(client, tmp_path):
+    """网页互动课件（第 13 轮十）：每个登录用户都能打开，老师另有下载；Manim 动画的占位由服务器上渲染好的视频填进去。"""
+    import base64
+    built_book(tmp_path)
+    page = lambda s: base64.b64encode(s.encode()).decode()
+    anim_page = ("<html><body><video autoplay loop muted playsinline poster='WQANIM:a4_1_1:abc123.png' "
+                 "src='WQANIM:a4_1_1:abc123.mp4'></video></body></html>")
+    deck = ("<!doctype html><html><body><div id='stage'></div>"
+            f'<script type="text/plain" data-page="a4_1_1">{page(anim_page)}</script>'
+            f'<script type="text/plain" data-page="lab4_1">{page("<html>lab</html>")}</script></body></html>')
+    (tmp_path / "robotics" / "slides").mkdir()
+    (tmp_path / "robotics" / "slides" / "ch04.html").write_text(deck)
+    main.state.settings.data_dir = str(tmp_path / "data")
+    h, hs = login(client), student(client)
+    assert client.get("/api/v1/textbooks/robotics", headers=hs).json()["slides"] == [4]
+    r = client.get("/api/v1/textbooks/robotics/slides/4", headers=hs).json()
+    assert "download" not in r                                           # students open, teachers download
+    pages = lambda html: {m: base64.b64decode(x).decode() for m, x in
+                          __import__("re").findall(r'data-page="([^"]+)">([^<]+)<', html)}
+    shown = client.get(r["url"][r["url"].index("/api/"):])
+    assert shown.status_code == 200 and "attachment" not in shown.headers.get("content-disposition", "")
+    p = pages(shown.text)
+    assert "动画制作中" in p["a4_1_1"] and "WQANIM" not in p["a4_1_1"] and p["lab4_1"] == "<html>lab</html>"
+    md = tmp_path / "data" / "textbook-media" / "robotics"                # the video is made: the deck gets it
+    md.mkdir(parents=True, exist_ok=True)
+    (md / "a4_1_1-abc123.mp4").write_bytes(b"MP4DATA")
+    (md / "a4_1_1-abc123.png").write_bytes(b"PNGDATA")
+    t = client.get("/api/v1/textbooks/robotics/slides/4", headers=h).json()
+    p = pages(client.get(t["url"][t["url"].index("/api/"):]).text)
+    assert "data:video/mp4;base64," + base64.b64encode(b"MP4DATA").decode() in p["a4_1_1"]
+    assert "data:image/png;base64," in p["a4_1_1"] and "WQANIM" not in p["a4_1_1"]
+    d = client.get(t["download"][t["download"].index("/api/"):])
+    assert "attachment" in d.headers["content-disposition"] and "MP4DATA" not in d.text   # base64, not raw
+    assert client.get("/api/v1/textbooks/robotics/slides/5", headers=hs).status_code == 404
+    assert client.get("/api/v1/textbook-slides/garbage").status_code == 410

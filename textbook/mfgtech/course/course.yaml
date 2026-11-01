@@ -1,0 +1,14 @@
+# 《机械制造技术》的网页互动课件（第 13 轮十）：一章一个课件，内容在 slides/chNN.yaml。
+# 公用工具 textbook/tools/webcourse/wc_book.py 先从本书的构建产物（textbook/build/mfgtech/）搭临时书目录，再调用课件引擎 wc_slides.py。
+book: mfgtech
+deck_id: mfgtech
+name:
+- 机械制造技术
+- Manufacturing Technology
+lessons: [50, 51, 52, 53, 54]
+summary:
+- 《机械制造技术》各章的网页互动课件：像 PPT 一样翻页，动画、虚拟实验、三维模型嵌在页里当场操作，中英对照，讲者窗口里有讲稿。
+- "Interactive web slides for the chapters of Manufacturing Technology: page through them like PowerPoint, with animations, virtual labs and 3D models live on the page; bilingual, with the script in the presenter view."
+info:
+- 每章一个课件，按节分段；数字由本章的算例程序算出，插图与教材相同。
+- "One deck per chapter, in sections; numbers come from the chapter's programs and figures are the book's own."

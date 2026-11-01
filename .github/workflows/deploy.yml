@@ -245,6 +245,17 @@ jobs:
           b="${{ matrix.book }}"
           python build.py "$b" --pdf --labs 2>&1 | tee /tmp/build.log || { grep "✗" /tmp/build.log | head -20 | sed "s/^/::error::$b /"; exit 1; }
           grep "^用时" /tmp/build.log | sed "s/^/::notice::$b /" || true      # 第 60 轮 D-5：各阶段用时、缓存命中数
+      # 网页互动课件（第 13 轮十）：普通教材的 <书>/course/slides/chNN.yaml → build/<书>/slides/chNN.html（阅读页的“课件”按钮打开；
+      # Manim 动画由网关在打开时填进去）。用本书刚构建出的插图、实验页、三维动画和算例程序
+      - name: Interactive web slides — ${{ matrix.book }}
+        if: hashFiles(format('textbook/{0}/course/tools/build_slides.py', matrix.book)) != ''
+        working-directory: textbook
+        run: |
+          b="${{ matrix.book }}"
+          sudo apt-get install -y -qq --no-install-recommends libcairo2 > /dev/null
+          pip install -q cairosvg Pillow
+          python "$b/course/tools/build_slides.py" --all --plain --out "build/$b/slides"
+          ls -la "build/$b/slides"
       - name: Save the build cache
         if: always()
         uses: actions/cache/save@v4

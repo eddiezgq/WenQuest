@@ -6,6 +6,8 @@ the gateway serves the built pages from WQ_TEXTBOOK_DIR (<dir>/<book>/web/index.
 """
 
 import asyncio
+import base64
+import hashlib
 import html
 import json
 import logging
@@ -40,6 +42,12 @@ def chname(no, en: bool = False) -> str:
     return f"Chapter{no}" if en else f"第{no}章"
 SECTION = re.compile(r"^(?:\d{1,3}|M\d{1,2})\.(\d{1,3}|end)$")      # 数学篇的节号是 M1.1（第 26 轮）
 PDF_TTL = 3600
+SLIDES_TTL = 12 * 3600
+# 网页互动课件（第 13 轮十）：<dir>/<book>/slides/chNN.html，由 textbook/tools/webcourse/wc_book.py 构建；Manim 动画只在服务器上渲染，
+# 课件里留占位 WQANIM:<名>:<散列>.<mp4|png>（在实验和动画页里，页面以 base64 存放），打开时由这里填进视频
+SLIDE_PAGE = re.compile(r'(<script type="text/plain" data-page="[^"]+">)([A-Za-z0-9+/=]+)(</script>)')
+ANIM_MARK = re.compile(r"WQANIM:(\w+):([0-9a-f]+)\.(mp4|png)")
+ANIM_VIDEO = re.compile(r"<video[^>]*WQANIM:(\w+):([0-9a-f]+)\.mp4[^>]*></video>")
 MEDIA_TTL = 86400
 LABBOX = re.compile(r"<div class='wq-media-box wq-labbox' data-lab='(M?\d+)-(\d+)'>(.*?)</div>", re.S)
 BOX = re.compile(r"<div class='wq-media-box' data-anim='(\w+)' data-hash='(\w+)'>(.*?)</div>", re.S)
@@ -54,6 +62,34 @@ WEB_TYPES = {".html": "text/html; charset=utf-8", ".webp": "image/webp", ".png":
 
 def media_dir(m, book: str) -> Path:
     return Path(m.state.settings.data_dir) / "textbook-media" / book
+
+
+def fill_slides(deck: str, md: Path) -> tuple[str, int]:
+    """Put the server-rendered animations into a deck; a scene not rendered yet shows a note. Returns (html, missing)."""
+    missing = 0
+
+    def page(mt):
+        nonlocal missing
+        src = base64.b64decode(mt.group(2)).decode("utf-8")
+        if "WQANIM:" not in src:
+            return mt.group(0)
+
+        def video(v):
+            nonlocal missing
+            if (md / f"{v.group(1)}-{v.group(2)}.mp4").exists():
+                return v.group(0)
+            missing += 1
+            return "<div class='wait'>动画制作中 · animation being made</div>"
+
+        def one(a):
+            f = md / f"{a.group(1)}-{a.group(2)}.{a.group(3)}"
+            if not f.exists():
+                return ""
+            mime = "video/mp4" if a.group(3) == "mp4" else "image/png"
+            return f"data:{mime};base64," + base64.b64encode(f.read_bytes()).decode("ascii")
+        src = ANIM_MARK.sub(one, ANIM_VIDEO.sub(video, src))
+        return mt.group(1) + base64.b64encode(src.encode("utf-8")).decode("ascii") + mt.group(3)
+    return SLIDE_PAGE.sub(page, deck), missing
 
 
 def pending(m) -> list[tuple[str, str, str]]:
@@ -179,6 +215,7 @@ def register(app, m) -> None:
         idx["teacher"] = teacher
         idx["pdf"] = [c for c in idx.get("pdf", []) if (root() / book / f"{chdir(c)}.pdf").exists()] if teacher else []
         idx["pdf_en"] = [c for c in idx.get("pdf_en", []) if (root() / book / f"{chdir(c)}.en.pdf").exists()] if teacher else []
+        idx["slides"] = [c["no"] for c in idx.get("chapters", []) if (root() / book / "slides" / f"{chdir(c['no'])}.html").exists()]
         anims = idx.pop("anims", {}) or {}
         idx["anims_ready"] = sum((media_dir(m, book) / f"{n}-{h}.mp4").exists() for n, h in anims.items())
         idx["anims_total"] = len(anims)
@@ -414,3 +451,47 @@ def register(app, m) -> None:
         else:
             name = f"{idx.get('title', '')}-{chname(d['c'])}-{ch.get('title', '')}.pdf"
         return FileResponse(p, media_type="application/pdf", filename=name)
+
+    @app.get("/api/v1/textbooks/{book}/slides/{chapter}")
+    async def slides_link(book: str, chapter: str, sess: Annotated[Session, Depends(m.current)]):
+        """A chapter's interactive web slides (第 13 轮十): everyone signed in may open them; teachers also get a download link."""
+        index(book)
+        if not (CHNO.match(chapter) and (root() / book / "slides" / f"{chdir(chapter)}.html").exists()):
+            raise EngineError("not_found", "no slides for this chapter", 404)
+        base = f"{m.state.settings.public_url.rstrip('/')}/api/v1/textbook-slides/"
+        tok = lambda dl: m.state.codec.fernet.encrypt(json.dumps({"b": book, "c": chapter, "u": sess.user_id, **({"d": 1} if dl else {})}).encode()).decode()
+        out = {"url": base + tok(False)}
+        if await m.can_create(sess.moodle_token):
+            out["download"] = base + tok(True)
+        return out
+
+    @app.get("/api/v1/textbook-slides/{signed}")
+    async def slides_file(signed: str):
+        try:
+            d = json.loads(m.state.codec.fernet.decrypt(signed.encode(), ttl=SLIDES_TTL))
+        except (InvalidToken, ValueError):
+            raise EngineError("link_expired", "link expired", 410)
+        if not (BOOK.match(d.get("b", "")) and CHNO.match(str(d.get("c", "")))):
+            raise EngineError("not_found", "no such file", 404)
+        p = root() / d["b"] / "slides" / f"{chdir(d['c'])}.html"
+        if not p.exists():
+            raise EngineError("not_found", "no slides for this chapter", 404)
+        md = media_dir(m, d["b"])
+        # 填好视频的课件按“课件文件 + 已渲染的视频”缓存：视频陆续做好后自动换新
+        raw = p.read_text(encoding="utf-8")
+        pages = "".join(base64.b64decode(x).decode("utf-8", "replace") for _, x, _ in SLIDE_PAGE.findall(raw))
+        have = sorted({f"{n}-{h}" for n, h, _ in ANIM_MARK.findall(pages) if (md / f"{n}-{h}.mp4").exists()})
+        key = f"{chdir(d['c'])}-{int(p.stat().st_mtime)}-{hashlib.sha1(' '.join(have).encode()).hexdigest()[:10]}.html"
+        cache = md / "slides"
+        hit = cache / key
+        if not hit.exists():
+            filled, _ = fill_slides(raw, md)
+            cache.mkdir(parents=True, exist_ok=True)
+            for old in cache.glob(f"{chdir(d['c'])}-*.html"):
+                old.unlink(missing_ok=True)
+            hit.write_text(filled, encoding="utf-8")
+        if d.get("d"):
+            idx = index(d["b"])
+            ch = next((c for c in idx["chapters"] if str(c["no"]) == str(d["c"])), {})
+            return FileResponse(hit, media_type="text/html; charset=utf-8", filename=f"{chname(d['c'])}-{ch.get('title', '')}-课件.html")
+        return FileResponse(hit, media_type="text/html; charset=utf-8", headers={"Cache-Control": "private, max-age=600"})
