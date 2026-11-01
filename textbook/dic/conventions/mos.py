@@ -339,6 +339,59 @@ def tau_m_est():
     return cin(Wmin, r * Wmin) * (1 + gamma_self()) / gm
 
 
+# ======================================================================= 第 5 章：功耗
+# 短路能量、漏电、电压—速度关系来自 SKY130 仿真（calib/calib_power.py），存在 params.json 的 power_sim；
+# 表中间按线性（短路比）或对数（漏电、延时倍数）插值，表外取端点值。
+
+def _interp(xs, ys, x, log=False):
+    import math as _m
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    for i in range(len(xs) - 1):
+        if xs[i] <= x <= xs[i + 1]:
+            t = (x - xs[i]) / (xs[i + 1] - xs[i])
+            if log:
+                return _m.exp(_m.log(ys[i]) + t * (_m.log(ys[i + 1]) - _m.log(ys[i])))
+            return ys[i] + t * (ys[i + 1] - ys[i])
+
+
+def sc_ratio(tin_fo4):
+    """短路能量与充电能量之比（仿真表）：输入转换时间以 FO4 为单位。"""
+    t = P["power_sim"]["sc"]
+    return max(0.0, _interp([a for a, _ in t], [b for _, b in t], tin_fo4))
+
+
+def leak_inv(temp=27.0, vdd=VDD):
+    """参考反相器两种输入的平均漏电（A）：温度之间按对数插值，电压按仿真的漏电倍数表。"""
+    q = P["power_sim"]
+    ts = sorted(float(k) for k in q["leak_inv"])
+    i = _interp(ts, [q["leak_inv"][str(int(k))] for k in ts], temp, log=True)
+    v = q["vdd"]
+    return i * _interp([a for a, _, _ in v], [c for _, _, c in v], vdd, log=True)
+
+
+def fo4_scale(vdd):
+    """FO4 延时相对 1.8 V 的倍数（仿真表，对数插值）。"""
+    v = P["power_sim"]["vdd"]
+    return _interp([a for a, _, _ in v], [b for _, b, _ in v], vdd, log=True)
+
+
+def energy_per_op(vdd, n_gates, alpha, c_gate, depth_fo4, temp=27.0):
+    """一个运算周期的能量（J）：动态 α·N·C·V² 加漏电 N·I_leak(T, V)·V·T_cycle，T_cycle = depth_fo4 个 FO4（按仿真倍数随电压变化）。
+    返回 (动态, 漏电, 周期)。"""
+    t_cyc = depth_fo4 * fo4_tp(r_ratio()) * fo4_scale(vdd)
+    e_dyn = alpha * n_gates * c_gate * vdd ** 2
+    e_leak = n_gates * leak_inv(temp, vdd) * vdd * t_cyc
+    return e_dyn, e_leak, t_cyc
+
+
+def sleep_ron(w_um, vdd=VDD):
+    """PMOS 休眠管（header）导通时的线性区电阻（Ω）：1 / (k′p·W/L·(VDD − |VTp|))。"""
+    return 1.0 / (kp * w_um / L * (vdd - VTp))
+
+
 def reference():
     r = kn / kp
     pr = P["problems"]
@@ -405,5 +458,7 @@ def reference():
     out["ch3"] = {"ff": ff_timing(), "tcq_le": sum(ff_tcq_le()), "tau_m_est": tau_m_est(),
                   "setup": setup_slack(1 / f33, 1e-9, 50e-12), "hold": hold_slack(0.0, 150e-12),
                   "inc16": inc_delay(16), "xtalk": list(xtalk("met2", 0.14, 0.14, 500, 1, 100e-12)),
+                  "sc": sc_ratio(2.0), "leak85": leak_inv(85), "leak_v": leak_inv(27, 1.2), "fo4s": fo4_scale(0.9),
+                  "eop": list(energy_per_op(0.8, 1e4, 0.1, 5e-15, 30, 85)), "ron": sleep_ron(100),
                   "mtbf": {str(n): mtbf(sync_tr(n, f33, q33["slack_ps"] * 1e-12), f33, fd) for n in (1, 2)}}
     return out

@@ -43,11 +43,13 @@ PY
 cat "$OUT/calib_compare.json"
 endstep
 
-step "6c、6e 第 2、3、4 章参数复核：门的逻辑努力与寄生延时、触发器时序、导线参数"
+step "6c、6e、6f 第 2–5 章参数复核：门的逻辑努力与寄生延时、触发器时序、导线参数、功耗参数"
 CALIB_OUT="$OUT/calib" SKY130_LIB="$LIB" python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/calib_gates.py" --check > "$OUT/calib_gates.log" 2>&1 || { fail=1; echo "::error title=门参数复核未通过::$(tail -4 "$OUT/calib_gates.log" | tr '\n' ' ' | cut -c1-900)"; }
 tail -14 "$OUT/calib_gates.log"
 CALIB_OUT="$OUT/calib" SKY130_LIB="$LIB" python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/calib_ff.py" --check > "$OUT/calib_ff.log" 2>&1 || { fail=1; echo "::error title=触发器参数复核未通过::$(tail -4 "$OUT/calib_ff.log" | tr '\n' ' ' | cut -c1-900)"; }
 tail -3 "$OUT/calib_ff.log"
+CALIB_OUT="$OUT/calib" SKY130_LIB="$LIB" python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/calib_power.py" --check > "$OUT/calib_power.log" 2>&1 || { fail=1; echo "::error title=功耗参数复核未通过::$(tail -4 "$OUT/calib_power.log" | tr '\n' ' ' | cut -c1-900)"; }
+tail -6 "$OUT/calib_power.log"
 TECH=$(ls "$PDKPATH"/libs.tech/magic/sky130A.tech 2>/dev/null | head -1)
 echo "tech file: $TECH"
 python3 "$REPO/samples/数字集成电路设计/生成脚本/calib/wires.py" "$TECH" --check > "$OUT/wires.log" 2>&1 || { fail=1; echo "::error title=导线参数复核未通过::$(tail -4 "$OUT/wires.log" | tr '\n' ' ' | cut -c1-900)"; }
@@ -122,7 +124,7 @@ cc = s["calib_compare"] or {}
 def last(p):
     try: return open(os.path.join(o, p), encoding="utf-8").read().strip().splitlines()[-1][:300]
     except Exception: return "无输出"
-print("::notice title=校准对照::" + "；".join(f"{k} {v['diff_pct']}%" for k, v in cc.items()) + f"。第 2、3、4 章：{last('calib_gates.log')}；{last('calib_ff.log')}；{last('wires.log')}")
+print("::notice title=校准对照::" + "；".join(f"{k} {v['diff_pct']}%" for k, v in cc.items()) + f"。第 2–5 章：{last('calib_gates.log')}；{last('calib_ff.log')}；{last('wires.log')}；{last('calib_power.log')}")
 cs = {k: j(f"capstone/{k}/result.json") or {} for k in ("step1", "step2", "step3", "step4")}
 s["capstone"] = cs
 json.dump(s, open(os.path.join(o, "summary.json"), "w"), indent=1, ensure_ascii=False)

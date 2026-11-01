@@ -1,0 +1,23 @@
+# 实验 5.4 的指导书与报告模板。目的、场景、参数、任务取自 lab5_4.js（由 labs/micro/textbook/lab5_4.body.js 生成）。
+原理:
+  - ["PMOS 休眠管串在模块与电源之间。工作时模块的全部电流流过它，导通电阻上的压降使模块变慢；断电时模块的漏电只剩休眠管的关断电流。", "A PMOS sleep transistor sits between the block and the supply. When on, the whole block current flows through it and its resistance causes a drop that slows the block; when off, only the transistor's own off current leaks."]
+  - 式: "Ron ≈ 1 / [k′p·(W/L)·(VDD − |VTp|)]，压降 = Ipk·Ron；tbe = Ewake / [(Ileak,模块 − Ileak,休眠管)·VDD]"
+  - ["唤醒要给虚拟电源轨和模块内部的电容重新充电，Ewake ≈ C·VDD²。空闲时间长于盈亏平衡时间 tbe 时断电才省电。", "Waking up recharges the virtual rail and the block's internal capacitance, Ewake ≈ C·VDD². Gating saves energy only when the idle time exceeds the break-even time tbe."]
+步骤:
+  - ["温度 85 °C，从 100 μm 起加大休眠管宽度，记录压降、断电后的漏电，找到压降不超过 5 % 的最小宽度（任务 1），填入表 1。", "At 85 °C widen the sleep transistor from 100 μm, record the drop and the gated leakage, and find the smallest width with a drop within 5 % (task 1); fill in Table 1."]
+  - ["宽度不变，调空闲时间，找到开始省电的最短空闲时间（任务 2）；把温度改为 27 °C 再找（任务 3），填入表 2。", "Keep the width and vary the idle time to find the shortest one that saves energy (task 2); repeat at 27 °C (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  休眠管宽度（85 °C）", "Table 1  Sleep transistor width (85 °C)"]
+    表头: ["宽度 / μm", "压降 / mV", "压降 / %", "模块漏电 / μA", "断电后漏电 / μA"]
+    表头英文: ["Width / μm", "Drop / mV", "Drop / %", "Block leakage / μA", "Gated leakage / μA"]
+    行: [["100", "", "", "", ""], ["200", "", "", "", ""], ["", "", "", "", "（最小宽度）"], ["1000", "", "", "", ""]]
+  - 标题: ["表 2  盈亏平衡时间", "Table 2  Break-even time"]
+    表头: ["温度 / °C", "唤醒能量 / nJ", "盈亏平衡时间 / μs", "实验找到的最短空闲 / μs"]
+    表头英文: ["Temperature / °C", "Wake-up energy / nJ", "Break-even / μs", "Shortest idle found / μs"]
+    行: [["85", "", "", ""], ["27", "", "", ""]]
+注意:
+  - ["峰值电流取平均电流的 3 倍、唤醒电容取模块全部门电容之和，都是示意值。", "The peak current (3× the average) and the wake-up capacitance (all gate capacitance of the block) are illustrative."]
+  - ["休眠管的导通电阻用线性区手算公式，关断漏电按参考 PMOS 的仿真漏电按宽度折算，没有计入叠层带来的下降。", "The on-resistance uses the hand linear-region formula and the off leakage scales the reference PMOS simulation by width, ignoring the stack effect."]
+思考题:
+  - ["为什么温度越高，盈亏平衡时间越短？", "Why does the break-even time shrink as the chip gets hotter?"]
+  - ["唤醒时如果一下子打开全部休眠管，会出现什么问题？", "What goes wrong if all sleep transistors are switched on at once during wake-up?"]

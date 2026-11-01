@@ -154,6 +154,28 @@
       const v = m.vm(Wmin, rr * Wmin), gm = kn * Wmin / L * (v - VTn) + kp * rr * Wmin / L * (VDD - v - VTp);
       return m.cin(Wmin, rr * Wmin) * (1 + gam) / gm;
     };
+    /* ---------- 第 5 章：功耗（仿真表 power_sim 插值，与 conventions/mos.py 一一对应） ---------- */
+    const PS = P.power_sim || { sc: [[0, 0]], leak_inv: { 27: 0 }, vdd: [[1.8, 1, 1]] };
+    const interp = (xs, ys, x, log) => {
+      if (x <= xs[0]) return ys[0];
+      if (x >= xs[xs.length - 1]) return ys[ys.length - 1];
+      for (let i = 0; i < xs.length - 1; i++) if (xs[i] <= x && x <= xs[i + 1]) {
+        const t = (x - xs[i]) / (xs[i + 1] - xs[i]);
+        return log ? Math.exp(Math.log(ys[i]) + t * (Math.log(ys[i + 1]) - Math.log(ys[i]))) : ys[i] + t * (ys[i + 1] - ys[i]);
+      }
+    };
+    m.scRatio = (t) => Math.max(0, interp(PS.sc.map((a) => a[0]), PS.sc.map((a) => a[1]), t));
+    m.leakInv = (temp = 27, vdd = VDD) => {
+      const ts = Object.keys(PS.leak_inv).map(Number).sort((a, b) => a - b);
+      const i = interp(ts, ts.map((k) => PS.leak_inv[String(k)]), temp, true);
+      return i * interp(PS.vdd.map((a) => a[0]), PS.vdd.map((a) => a[2]), vdd, true);
+    };
+    m.fo4Scale = (vdd) => interp(PS.vdd.map((a) => a[0]), PS.vdd.map((a) => a[1]), vdd, true);
+    m.energyPerOp = (vdd, n, alpha, c, depth, temp = 27) => {
+      const t = depth * m.fo4Tp(rr) * m.fo4Scale(vdd);
+      return [alpha * n * c * vdd * vdd, n * m.leakInv(temp, vdd) * vdd * t, t];
+    };
+    m.sleepRon = (w, vdd = VDD) => 1 / (kp * w / L * (vdd - VTp));
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -192,7 +214,8 @@
       out.ch4.opt = m.repeaterOpt(q43.L_um, q43.layer, q43.w_um);
       const q33 = pr.p33, f33 = q33.f_MHz * 1e6, fd = q33.rpm / 60 * q33.lines * 2;
       out.ch3 = { ff: m.ffTiming(), tcq_le: m.ffTcqLe().reduce((a, b) => a + b, 0), tau_m_est: m.tauMEst(),
-                  inc16: m.incDelay(16), xtalk: m.xtalk('met2', 0.14, 0.14, 500, 1, 100e-12),
+                  inc16: m.incDelay(16), sc: m.scRatio(2), leak85: m.leakInv(85), leak_v: m.leakInv(27, 1.2), fo4s: m.fo4Scale(0.9),
+                  eop: m.energyPerOp(0.8, 1e4, 0.1, 5e-15, 30, 85), ron: m.sleepRon(100), xtalk: m.xtalk('met2', 0.14, 0.14, 500, 1, 100e-12),
                   setup: m.setupSlack(1 / f33, 1e-9, 50e-12), hold: m.holdSlack(0, 150e-12), mtbf: {} };
       for (const n of [1, 2]) out.ch3.mtbf[n] = m.mtbf(m.syncTr(n, f33, q33.slack_ps * 1e-12), f33, fd);
       return out;

@@ -1,0 +1,24 @@
+# 实验 5.3 的指导书与报告模板。目的、场景、参数、任务取自 lab5_3.js（由 labs/micro/textbook/lab5_3.body.js 生成）。
+原理:
+  - ["每个控制周期（100 μs）要完成 N 个时钟周期的运算。选定电压后以该电压下的最高频率跑完，余下时间关时钟空闲，只有漏电。", "Each 100 μs control period needs N clock cycles of work. At the chosen supply the chip runs at its top clock, then idles with the clock gated, leaking only."]
+  - 式: "E = N·(α·Ngate·C·V² + Ngate·Ileak(V,T)·V·Tcyc(V)) + Ngate·Ileak(V,T)·V·(100 μs − N·Tcyc(V))"
+  - ["Tcyc(V) = 30 个 FO4，FO4 随电压的变化和漏电随电压、温度的变化取自 SKY130 仿真。电压越低，动态能量按 V² 减小，运算时间按仿真曲线变长，赶不上截止时间的电压不能用。", "Tcyc(V) is 30 FO4; the FO4 and leakage versus supply and temperature come from SKY130 simulation. Lower supply cuts the dynamic energy as V² and stretches the busy time; supplies that miss the deadline are not allowed."]
+步骤:
+  - ["选“巡逻”，27 °C，从 1.8 V 往下调，记录每个控制周期的能量和运算时间，填入表 1；找到能量最少的电压（任务 1）。", "Choose “Patrol”, 27 °C; lower the supply from 1.8 V, record the energy and busy time in Table 1, and find the supply with the least energy (task 1)."]
+  - ["把温度改为 85 °C、125 °C，重复（任务 2），比较 1.8 V 与最优电压的能量。", "Repeat at 85 °C and 125 °C (task 2) and compare 1.8 V with the optimum."]
+  - ["选“停靠”，27 °C，找到能量最少的电压（任务 3），填入表 2。", "Choose “Docked”, 27 °C, and find the supply with the least energy (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  巡逻（每周期 2000 个时钟），27 °C", "Table 1  Patrol (2000 clocks per period), 27 °C"]
+    表头: ["VDD / V", "最高频率 / MHz", "运算时间 / μs", "每周期能量 / nJ", "平均功耗 / μW"]
+    表头英文: ["VDD / V", "Max clock / MHz", "Busy time / μs", "Energy per period / nJ", "Average power / μW"]
+    行: [["1.8", "", "", "", ""], ["1.2", "", "", "", ""], ["1.0", "", "", "", ""], ["", "", "", "", "（最优）"]]
+  - 标题: ["表 2  最优电压与温度、负载", "Table 2  Optimum versus temperature and load"]
+    表头: ["场景", "温度 / °C", "最优 VDD / V", "最优能量 / nJ", "1.8 V 时的能量 / nJ"]
+    表头英文: ["Scene", "Temperature / °C", "Best VDD / V", "Best energy / nJ", "Energy at 1.8 V / nJ"]
+    行: [["巡逻", "27", "", "", ""], ["巡逻", "85", "", "", ""], ["巡逻", "125", "", "", ""], ["停靠", "27", "", "", ""]]
+注意:
+  - ["假设所有路径随电压按同样的倍数变慢；漏电的电压倍数在 27 °C 下测得，高温时借用。", "All paths are assumed to slow by the same factor; the leakage-versus-voltage factor was measured at 27 °C and reused at high temperature."]
+  - ["没有计入电压切换的开销和电压调节器的效率。", "Voltage-switching overhead and regulator efficiency are not included."]
+思考题:
+  - ["为什么在这块芯片上，降压慢跑比全速跑完再空闲省电？什么样的芯片上结论会反过来？", "Why does slowing down beat racing to idle on this chip? On what kind of chip would it flip?"]
+  - ["停靠时最优电压更低，为什么还不到 5.3.4 节的最低能量点？", "Why is the docked optimum lower, yet not at the minimum-energy point of Section 5.3.4?"]
