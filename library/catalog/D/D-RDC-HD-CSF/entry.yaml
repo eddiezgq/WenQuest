@@ -83,6 +83,18 @@ params:
   en: Mass
   role: info
   unit: kg
+- key: K1_1e4_Nm_rad
+  zh: 扭转刚度 K1（低负载区，×10⁴ N·m/rad）
+  en: Torsional stiffness K1 (low-load region, ×10⁴ N·m/rad)
+  role: perf
+- key: K2_1e4_Nm_rad
+  zh: 扭转刚度 K2（中负载区，×10⁴ N·m/rad）
+  en: Torsional stiffness K2 (mid-load region, ×10⁴ N·m/rad)
+  role: perf
+- key: K3_1e4_Nm_rad
+  zh: 扭转刚度 K3（高负载区，×10⁴ N·m/rad）
+  en: Torsional stiffness K3 (high-load region, ×10⁴ N·m/rad)
+  role: perf
 specs: specs.csv
 default: 20-100
 model:
@@ -99,7 +111,8 @@ model:
 source:
   origin: vendor
   vendor: Harmonic Drive
-  catalog: Harmonic Drive：CSF & CSG Series Cup Type Component Sets & Housed Units（样本）
+  catalog: Harmonic Drive：CSF & CSG Series Cup Type Component Sets & Housed Units（样本）；Harmonic
+    Drive 官网 CSF-2A 产品页（各型号的扭转刚度 K1、K2、K3）
   license: Apache-2.0
   attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Harmonic Drive 公开资料，商标归厂商所有
   checked:
@@ -110,6 +123,11 @@ source:
   - title: Harmonic Drive：CSF & CSG Series Cup Type Component Sets & Housed Units（样本）
     url: https://www.harmonicdrive.net/_hd/content/catalogs/pdf/csf-csg-catalog.pdf
     retrieved: '2026-09-30'
+  - title: Harmonic Drive 官网 CSF-2A 产品页（各型号的扭转刚度 K1、K2、K3）
+    url: https://www.harmonicdrive.net/products/component-sets/cup-type/csf-2a
+    retrieved: '2026-09-30'
+  notes: 扭转刚度 K1、K2、K3 取官网产品页（2026-11-01 读取），只补了机器人厂关节模组用到的 17、25、32 号减速比 100；分段转矩点
+    T1、T2 官网只给出 32 号（T1 = 29 N·m、T2 = 108 N·m），其余型号以样本为准。
 vendor:
   id: HD
   name:

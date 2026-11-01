@@ -25,6 +25,9 @@ def test_hd_csf_table_is_consistent_and_sourced():
         tr, ta, tp, tm = (float(x[k]) for k in ("T_rated_Nm", "T_avg_Nm", "T_repeat_Nm", "T_momentary_Nm"))
         assert tr <= ta <= tp <= tm, x["size"]
         assert float(x["n_avg_grease_rpm"]) <= float(x["n_max_grease_rpm"]) <= float(x["n_max_oil_rpm"])
+    # 扭转刚度（第 66 轮，官网产品页）：机器人关节模组用的三种，分段刚度 K1 < K2 < K3，型号越大越硬
+    k = [tuple(float(r[f"{s}-100"][f"K{i}_1e4_Nm_rad"]) for i in (1, 2, 3)) for s in (17, 25, 32)]
+    assert k[2] == (6.7, 11.0, 12.0) and all(a < b < c for a, b, c in k) and k[0][0] < k[1][0] < k[2][0]
 
 
 @pytest.mark.parametrize("eid,reach", [("B-ARM-UR3E", 500), ("B-ARM-UR16E", 900), ("B-ARM-UR20", 1750), ("B-ARM-UR30", 1300)])

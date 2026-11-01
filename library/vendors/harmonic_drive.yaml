@@ -11,6 +11,9 @@ sources:
   csf:
     title: Harmonic Drive：CSF & CSG Series Cup Type Component Sets & Housed Units（样本）
     url: https://www.harmonicdrive.net/_hd/content/catalogs/pdf/csf-csg-catalog.pdf
+  csf_web:
+    title: Harmonic Drive 官网 CSF-2A 产品页（各型号的扭转刚度 K1、K2、K3）
+    url: https://www.harmonicdrive.net/products/component-sets/cup-type/csf-2a
 products:
 - id: D-RDC-HD-CSF
   name:
@@ -108,6 +111,22 @@ products:
     - Mass
     - info
     - kg
+  - - K1_1e4_Nm_rad
+    - 扭转刚度 K1（低负载区，×10⁴ N·m/rad）
+    - Torsional stiffness K1 (low-load region, ×10⁴ N·m/rad)
+    - perf
+    - ''
+  - - K2_1e4_Nm_rad
+    - 扭转刚度 K2（中负载区，×10⁴ N·m/rad）
+    - Torsional stiffness K2 (mid-load region, ×10⁴ N·m/rad)
+    - perf
+    - ''
+  - - K3_1e4_Nm_rad
+    - 扭转刚度 K3（高负载区，×10⁴ N·m/rad）
+    - Torsional stiffness K3 (high-load region, ×10⁴ N·m/rad)
+    - perf
+    - ''
+  notes: 扭转刚度 K1、K2、K3 取官网产品页（2026-11-01 读取），只补了机器人厂关节模组用到的 17、25、32 号减速比 100；分段转矩点 T1、T2 官网只给出 32 号（T1 = 29 N·m、T2 = 108 N·m），其余型号以样本为准。
   rows:
   - size: 14-30
     src: csf
@@ -229,7 +248,9 @@ products:
     L_mm: 32.5
     mass_kg: 0.15
   - size: 17-100
-    src: csf
+    src:
+    - csf
+    - csf_web
     page: 10、19
     size_code: 17
     ratio: 100
@@ -245,6 +266,9 @@ products:
     OD_mm: 60
     L_mm: 32.5
     mass_kg: 0.15
+    K1_1e4_Nm_rad: 1.0
+    K2_1e4_Nm_rad: 1.4
+    K3_1e4_Nm_rad: 1.6
   - size: 17-120
     src: csf
     page: 10、19
@@ -416,7 +440,9 @@ products:
     L_mm: 37
     mass_kg: 0.42
   - size: 25-100
-    src: csf
+    src:
+    - csf
+    - csf_web
     page: 10、19
     size_code: 25
     ratio: 100
@@ -432,6 +458,9 @@ products:
     OD_mm: 85
     L_mm: 37
     mass_kg: 0.42
+    K1_1e4_Nm_rad: 3.1
+    K2_1e4_Nm_rad: 5
+    K3_1e4_Nm_rad: 5.7
   - size: 25-120
     src: csf
     page: 10、19
@@ -518,7 +547,9 @@ products:
     L_mm: 44
     mass_kg: 0.89
   - size: 32-100
-    src: csf
+    src:
+    - csf
+    - csf_web
     page: 10、19
     size_code: 32
     ratio: 100
@@ -534,6 +565,9 @@ products:
     OD_mm: 110
     L_mm: 44
     mass_kg: 0.89
+    K1_1e4_Nm_rad: 6.7
+    K2_1e4_Nm_rad: 11
+    K3_1e4_Nm_rad: 12
   - size: 32-120
     src: csf
     page: 10、19
