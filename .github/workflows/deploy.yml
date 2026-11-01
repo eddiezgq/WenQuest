@@ -16,17 +16,27 @@ on:
       # 线上诊断（只读日志）
       - ".github/workflows/diagnose.yml"
   workflow_dispatch:
-  # Weekly fresh build picks up Moodle security fixes from the stable branch.
   schedule:
+    # 每半小时上线一次：推送只跑检查，部署攒一批一起上（第 14 轮细则 2.19.2）。
+    # 这一档按增量来——取回缓存、只查“上次成功部署以来变动过的书”，与原来推送时一样。
+    - cron: "*/30 * * * *"
+    # Weekly fresh build picks up Moodle security fixes from the stable branch.
     - cron: "17 7 * * 1"
 
 permissions:
   contents: read
   packages: write
 
+env:
+  # 从头全量重建（不取回缓存、九本书全查）：每周一那次和手动触发。每半小时那次和推送都按增量。
+  FRESH: ${{ github.event_name != 'push' && github.event.schedule != '*/30 * * * *' }}
+
 concurrency:
-  group: deploy
-  cancel-in-progress: false
+  # 推送只跑检查：按分支排队、后一次顶掉前一次（main 是线性的，被顶掉的那次已经没意义）。
+  # 部署（定时与手动）单独一个组，互不取消——原来两者共用一个组，推送一密集，排队中的部署就被
+  # 后一次推送顶掉，连续几小时一次都上不了线（2026-11-01 连续六次）。
+  group: ${{ github.event_name == 'push' && format('ci-{0}', github.ref) || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 jobs:
   test:
@@ -109,16 +119,23 @@ jobs:
         name: The books to check — only those changed since the last successful deploy (第 32 轮附：省时间、省用量)
         env:
           GH_TOKEN: ${{ github.token }}
-          EVENT: ${{ github.event_name }}
+          FRESH: ${{ env.FRESH }}
         run: |
           all=$(ls textbook/*/book.yaml | xargs -n1 dirname | xargs -n1 basename | tr "\n" " ")
           base=""
-          if [ "$EVENT" = "push" ]; then
-            base=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=main&status=success&per_page=1" --jq '.workflow_runs[0].head_sha // ""' 2>/dev/null || true)
-            git cat-file -e "$base^{commit}" 2>/dev/null || base=""
+          if [ "$FRESH" != "true" ]; then
+            # 基准必须是“上次真的上了线”的那一次：推送只跑检查、不部署，拿它当基准会漏掉
+            # 一本改过却从没上过服务器的书（第 14 轮细则 2.19.2）。所以只看定时与手动触发的成功运行。
+            for ev in schedule workflow_dispatch; do
+              sha=$(gh api "repos/${{ github.repository }}/actions/workflows/deploy.yml/runs?branch=main&status=success&event=$ev&per_page=1" --jq '.workflow_runs[0].head_sha // ""' 2>/dev/null || true)
+              if [ -n "$sha" ] && git cat-file -e "$sha^{commit}" 2>/dev/null; then
+                # 取两者中较晚的那一个（它是另一个的后代，或者另一个还不存在）
+                if [ -z "$base" ] || git merge-base --is-ancestor "$base" "$sha"; then base="$sha"; fi
+              fi
+            done
           fi
           if [ -z "$base" ]; then
-            echo "Checking every book ($EVENT run, or no earlier successful deploy found)."
+            echo "Checking every book (full run, or no earlier successful deploy found)."
             changed="ALL"
           else
             changed=$(git diff --name-only "$base" HEAD)
@@ -183,8 +200,8 @@ jobs:
           key: wq-cuda-headers-v1
       # 第 60 轮 D-2：算例程序的结果、图、三维动画、编译检查、实验试做的缓存（都按内容散列命中）。只在推送时取回；
       # 每周定时运行和手动运行不取回，九本书从头全量检查（D-6）。改了这个工作流（包的版本在这里）也从头算
-      - name: Restore the build cache (push only)
-        if: github.event_name == 'push'
+      - name: Restore the build cache (incremental runs only)
+        if: env.FRESH != 'true'
         uses: actions/cache/restore@v4
         with:
           path: |
@@ -355,7 +372,7 @@ jobs:
             ${{ steps.meta.outputs.latest }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          no-cache: ${{ github.event_name == 'schedule' }}
+          no-cache: ${{ github.event.schedule == '17 7 * * 1' }}
 
       - name: Build and push gateway image
         uses: docker/build-push-action@v6
@@ -451,8 +468,9 @@ jobs:
 
   deploy:
     needs: [build, textbook, webeditions]
+    # 推送只跑检查，不上线（上线由每半小时的定时任务与手动触发做，见文件开头的 concurrency）。
     # the textbook checks are skipped when no book changed: deploy anyway (the books on the server stay as they are)
-    if: always() && !cancelled() && needs.build.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
+    if: always() && !cancelled() && github.event_name != 'push' && needs.build.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
     runs-on: ubuntu-latest
     environment: production
     env:
@@ -623,7 +641,7 @@ jobs:
   #   registry.cn-xxx.aliyuncs.com/命名空间 = 阿里云 ACR（第 34 轮）：另要 Secrets CN_REGISTRY_USER、CN_REGISTRY_PASSWORD
   mirror-cn:
     needs: build
-    if: vars.CN_REGISTRY != ''
+    if: github.event_name != 'push' && vars.CN_REGISTRY != ''
     runs-on: ubuntu-latest
     timeout-minutes: 240   # 自带仓库第一次要跨境传十几 GB；以后只传变化的层
     outputs:
@@ -755,7 +773,7 @@ jobs:
 
   deploy-cn:
     needs: [mirror-cn, textbook, webeditions]
-    if: always() && !cancelled() && needs.mirror-cn.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
+    if: always() && !cancelled() && github.event_name != 'push' && needs.mirror-cn.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
