@@ -117,3 +117,25 @@ def test_fault_frequencies():
     assert f["BPFO"] + f["BPFI"] == pytest.approx(b.Z * 30.0, rel=1e-12)
     assert f["FTF"] == pytest.approx(30 * (1 - g) / 2, rel=1e-12)
     assert f["BSF"] == pytest.approx(b.dm / (2 * b.D) * 30 * (1 - g * g), rel=1e-12)
+
+
+def test_radial_load_with_clearance_sits_at_groove_bottom():
+    b = B.bearing(B209 | {"Pd": 0.05})
+    r = B.distribute(b, Fr=8900)
+    assert np.max(np.abs(r["alpha_deg"])) < 1e-12                               # balls at the groove bottoms
+    c = np.cos(np.radians(r["psi_deg"]))
+    dl = np.maximum(r["dr"] * c - 0.05 / 2, 0)                                 # δ(ψ) = δ_r cos ψ − P_d/2
+    assert r["Q"] == pytest.approx(b.Kn(0.0) * dl**1.5, rel=1e-9, abs=1e-9)
+    assert np.sum(r["Q"] * c) == pytest.approx(8900, rel=1e-9)
+
+
+def test_fixed_tilt_keeps_ring_square():
+    b = B.bearing(B209 | {"alpha0_deg": 25.0})
+    r = B.distribute(b, Fr=3000, Fa=4000, tilt="fixed")
+    al, psi = np.radians(r["alpha_deg"]), np.radians(r["psi_deg"])
+    assert r["theta"] == 0.0
+    assert np.sum(r["Q"] * np.sin(al)) == pytest.approx(4000, rel=1e-8)
+    assert np.sum(r["Q"] * np.cos(al) * np.cos(psi)) == pytest.approx(3000, rel=1e-8)
+    assert r["M"] > 0                                                           # it pushes a moment on the shaft
+    free = B.distribute(b, Fr=3000, Fa=4000, M=r["M"])                          # given that moment, it stays square
+    assert abs(free["theta"]) < 1e-9 and free["Qmax"] == pytest.approx(r["Qmax"], rel=1e-6)

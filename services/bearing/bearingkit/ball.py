@@ -113,11 +113,16 @@ def _balls(b: BallBearing, x, psi):
     return Q, alpha, dl, Ri
 
 
-def distribute(b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0, psi0_deg: float = 0.0) -> dict:
+def distribute(b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0, psi0_deg: float = 0.0,
+               tilt: str = "free") -> dict:
     """Ball loads under radial force Fr (N, along ψ = 0), axial force Fa (N, pushing the contact angle side) and
-    moment M (N·mm). The first ball at ψ0. Returns per-ball loads, angles, deflections and the displacements."""
+    moment M (N·mm). The first ball at ψ0. tilt "free": the inner ring tilts until the moment balances M; "fixed":
+    the shaft holds it square (θ = 0), M is not used and the moment the bearing puts on the shaft is returned.
+    Returns per-ball loads, angles, deflections and the displacements."""
     if Fa < 0:
         raise BallError("give the axial force on the side the contact angle takes it (Fa ≥ 0)")
+    if tilt not in ("free", "fixed"):
+        raise BallError("the ring tilt is free or fixed")
     psi = np.radians(psi0_deg) + 2 * np.pi * np.arange(b.Z) / b.Z
     scale = max(Fr, Fa, abs(M) / max(b.dm, 1e-9), 1.0)
 
@@ -126,27 +131,31 @@ def distribute(b: BallBearing, Fr: float = 0.0, Fa: float = 0.0, M: float = 0.0,
         return [(np.sum(Q * np.sin(al)) - Fa) / scale, (np.sum(Q * np.cos(al) * np.cos(psi)) - Fr) / scale,
                 (np.sum(Q * np.sin(al) * Ri * np.cos(psi)) - M) / (scale * b.dm)]
 
-    # a starting point: with clearance and no axial load the ring first takes up half the clearance
     g = 1e-3 * b.D
-    x0 = [g if Fa > 0 else 0.0, max(b.Pd / 2, 0) + g if Fr > 0 else 0.0, 0.0]
-    if Fa == 0 and M == 0:  # only radial: solve δ_r alone (δ_a = θ = 0 by symmetry when α₀ = 0)
-        sol = fsolve(lambda v: [eqs([0.0, v[0], 0.0])[1]], [x0[1]], full_output=True, xtol=1e-13)
-        x = np.array([0.0, sol[0][0], 0.0])
-        ok = sol[2] == 1
-        if b.alpha0 > 1e-9:  # an angular contact bearing under radial load alone pushes itself axially: solve all
-            sol = fsolve(eqs, [g, x[1], 0.0], full_output=True, xtol=1e-13)
-            x, ok = sol[0], sol[2] == 1
+    if Fa == 0 and (M == 0 or tilt == "fixed") and b.alpha0_deg is None:
+        # deep groove, radial only: the balls sit at the groove bottoms (α = 0), δ_a = −A sin α₀ takes up the
+        # clearance's axial share; solve δ_r alone (Stribeck with clearance)
+        da = -b.A * math.sin(b.alpha0)
+        sol = fsolve(lambda v: [eqs([da, v[0], 0.0])[1]], [max(b.Pd / 2, 0) + g], full_output=True, xtol=1e-13)
+        x, ok = np.array([da, sol[0][0], 0.0]), sol[2] == 1
+        res = abs(eqs(x)[1])
+    elif tilt == "fixed":
+        sol = fsolve(lambda v: eqs([v[0], v[1], 0.0])[:2], [g if Fa > 0 else 0.0, g if Fr > 0 else 0.0],
+                     full_output=True, xtol=1e-13)
+        x, ok = np.array([sol[0][0], sol[0][1], 0.0]), sol[2] == 1
+        res = np.max(np.abs(eqs(x)[:2]))
     else:
+        x0 = [g if Fa > 0 else 0.0, max(b.Pd / 2, 0) + g if Fr > 0 else 0.0, 0.0]
         sol = fsolve(eqs, x0, full_output=True, xtol=1e-13)
         x, ok = sol[0], sol[2] == 1
-    res = np.max(np.abs(eqs(x)))
-    if not ok or res > 1e-8:
+        res = np.max(np.abs(eqs(x)))
+    Q, al, dl, Ri = _balls(b, x, psi)
+    if not ok or res > 1e-8 or not np.any(Q > 0):
         raise BallError("the load distribution did not converge (the load may be more than the bearing can carry "
                         "with this clearance, or there is no axial support for the moment)")
-    Q, al, dl, _ = _balls(b, x, psi)
     return {"psi_deg": np.degrees(psi), "Q": Q, "alpha_deg": np.degrees(al), "delta": dl,
             "da": float(x[0]), "dr": float(x[1]), "theta": float(x[2]), "Qmax": float(Q.max()),
-            "loaded": int(np.count_nonzero(Q > 0))}
+            "loaded": int(np.count_nonzero(Q > 0)), "M": float(np.sum(Q * np.sin(al) * Ri * np.cos(psi)))}
 
 
 def contacts(b: BallBearing, Q: float, alpha: float) -> dict:

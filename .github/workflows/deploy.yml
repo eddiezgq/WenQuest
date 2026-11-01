@@ -61,6 +61,11 @@ jobs:
         run: |
           pip install -q -r requirements-dev.txt
           python -m pytest -q -rf 2>&1 | tee "$RUNNER_TEMP/cam.txt" || { grep -E "^(FAILED|ERROR)" "$RUNNER_TEMP/cam.txt" | sed 's/^/::error::/'; exit 1; }
+      - name: Bearing design kernel and API tests (问渠轴承, 第 64 轮)
+        working-directory: services/bearing
+        run: |
+          pip install -q -r requirements-dev.txt
+          python -m pytest -q -rf 2>&1 | tee "$RUNNER_TEMP/bearing.txt" || { grep -E "^(FAILED|ERROR)" "$RUNNER_TEMP/bearing.txt" | sed 's/^/::error::/'; exit 1; }
       - name: Animator code check tests
         working-directory: services/animator
         run: pip install -q fastapi==0.141.1 pydantic==2.13.3 pytest && python -m pytest -q
@@ -318,6 +323,7 @@ jobs:
           echo "microsynth=ghcr.io/${repo}/micro-synth:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "blender=ghcr.io/${repo}/blender:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
           echo "cam=ghcr.io/${repo}/cam:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+          echo "bearing=ghcr.io/${repo}/bearing:${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -404,6 +410,16 @@ jobs:
           tags: ${{ steps.meta.outputs.cam }}
           cache-from: type=gha,scope=cam
           cache-to: type=gha,mode=max,scope=cam
+
+      - name: Build and push bearing design image (问渠轴承, 第 64 轮)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: services/bearing/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.bearing }}
+          cache-from: type=gha,scope=bearing
+          cache-to: type=gha,mode=max,scope=bearing
 
       - name: Build and push Verilog synthesis image
         uses: docker/build-push-action@v6
@@ -562,6 +578,14 @@ jobs:
           cat /tmp/cam.log
           if ! grep -q '^cam 200$' /tmp/cam.log; then python3 factory/deploy/ci_annotate.py "Cam site /cam/" /tmp/cam.log 120; exit 1; fi
 
+      - name: Bearing design site answers (问渠轴承 /bearing/；不通时把容器状态和日志作为注释发出来)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          ssh "deploy@$HOST" 'cd /opt/wenquest; D=$(grep -E "^SITE_DOMAIN=" .env | tail -n1 | cut -d= -f2-); for i in $(seq 1 12); do c=$(curl -s -o /dev/null -w "%{http_code}" --resolve "$D:443:127.0.0.1" "https://$D/bearing/api/health"); [ "$c" = 200 ] && break; sleep 5; done; echo "bearing $c"; if [ "$c" != 200 ]; then . deploy/lib.sh; dc ps -a bearing; dc logs --tail 80 bearing; fi' > /tmp/bearing.log 2>&1 || true
+          cat /tmp/bearing.log
+          if ! grep -q '^bearing 200$' /tmp/bearing.log; then python3 factory/deploy/ci_annotate.py "Bearing site /bearing/" /tmp/bearing.log 120; exit 1; fi
+
       - name: Disk space on the server (round 19)
         if: env.SKIP != '1'
         continue-on-error: true
@@ -597,9 +621,9 @@ jobs:
       CN: ${{ vars.CN_REGISTRY }}
       HOST: ${{ secrets.CN_DEPLOY_HOST }}
       IMAGE: ${{ needs.build.outputs.image }}
-      PLATFORM: engine gateway web animator labcheck micro-synth voice blender cam
+      PLATFORM: engine gateway web animator labcheck micro-synth voice blender cam bearing
       BASE: postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1
-      FIRST: gateway web cam engine labcheck micro-synth voice animator blender   # 自带仓库先传小的、必需的，大的放后面
+      FIRST: gateway web cam bearing engine labcheck micro-synth voice animator blender   # 自带仓库先传小的、必需的，大的放后面
     steps:
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3

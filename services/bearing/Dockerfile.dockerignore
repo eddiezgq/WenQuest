@@ -1,0 +1,12 @@
+# Only what the bearing image needs (the build context is the repository root).
+*
+!apps/bearing/package.json
+!apps/bearing/package-lock.json
+!apps/bearing/index.html
+!apps/bearing/vite.config.js
+!apps/bearing/src
+!services/bearing/requirements.txt
+!services/bearing/bearingkit
+!services/bearing/examples
+!services/bearing/app.py
+**/__pycache__

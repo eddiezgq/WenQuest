@@ -53,6 +53,7 @@ ENTERPRISE = [
     ("/solutions/platform/", "问渠数字工厂集成平台", "旗舰 · CAD/CAM/CAE/MES/MRP/ERP 一体"),
     ("/solutions/sewing/", "缝纫机设计与制造软件", "成熟产品"),
     ("/solutions/cam/", "凸轮设计与制造软件", "成熟产品"),
+    ("/solutions/bearing/", "轴承设计与制造软件", "初版"),
     ("/solutions/custom/", "制造业专用软件定制", "按企业需求定制"),
 ]
 EDUCATION = [
@@ -205,7 +206,7 @@ def home():
   <p>CAD、CAM、CAE、MES、MRP、ERP 信息集成化平台：改一次设计，下游自动跟着变，车间只拿到批准过的版本。</p>
   {ul(["设计 → 审批 → 物料版本与 BOM → MRP → 排产与车间执行 → 数控程序 → 质量 → 厂情中枢", "接你已有的 CAD（SolidWorks、FreeCAD，或任何能导出 STEP 的软件）", "选哪几个模块就集成哪几个，也可以整套上"])}
   <a class="more" href="/solutions/platform/">了解集成平台 →</a></div></article>"""
-    products = f"""<div class="cards" style="--n:2">
+    products = f"""<div class="cards" style="--n:3">
   <article class="card"><div class="shot"><img src="/assets/sewing-video.jpg" alt="缝纫机设计与制造软件" loading="lazy"></div>
     <span class="tag">成熟产品</span><h3 style="margin-top:12px">缝纫机设计与制造软件</h3>
     <p>平缝机、包缝机、绷缝机、电子花样机、多头刺绣机的设计、校核与出图。改参数，当场看三维样机、运动时序和红绿灯校核；一键出设计计算书、三维模型（STEP）、零件轮廓（DXF）、调机卡。网页直接用，也能装进 FreeCAD。</p>
@@ -214,6 +215,10 @@ def home():
     <span class="tag">成熟产品</span><h3 style="margin-top:12px">凸轮设计与制造软件</h3>
     <p>从运动要求到凸轮廓线，再到加工误差与补偿：挑线、送布等凸轮机构的运动与受力，廓线误差在高速下引起的加速度误差，磨削补偿能修掉哪些误差。</p>
     <a class="more" href="/solutions/cam/">了解 →</a></article>
+  <article class="card"><div class="shot"><img src="/assets/bearing-ui.jpg" alt="轴承设计与制造软件界面" loading="lazy"></div>
+    <span class="tag">初版</span><h3 style="margin-top:12px">轴承设计与制造软件</h3>
+    <p>给轴承厂的设计校核：深沟球、角接触球轴承每个钢球的载荷、接触应力与接触椭圆，装配和温差后的工作游隙，油膜厚度和故障特征频率，导出计算书。</p>
+    <a class="more" href="/solutions/bearing/">了解 →</a></article>
 </div>"""
     custom = f"""<div class="split"><div><h3>你的行业，你的软件</h3>
 <p>你的行业有没有现成软件解决不了的设计、计算或工艺问题？我们按你的需求定制专用软件，缝纫机和凸轮两款软件就是这样做出来的。</p>
@@ -358,6 +363,24 @@ def cam():
 {shot("cam-ui.jpg", "凸轮设计软件：运动程序、三维廓线、校核与曲线")}</div>''')}
 {cta("带一个你的凸轮来。", "我们按你的运动要求现场出廓线和校核。")}"""
     page("/solutions/cam/", "凸轮设计与制造软件", "凸轮设计与制造软件：运动规律、廓线、校核、加工误差与磨削补偿，浏览器里直接用。", body, "/solutions/cam/")
+
+
+def bearing():
+    body = f"""{hero("初版", "轴承设计与制造软件", "给轴承厂的设计校核软件：每个钢球受多大力，一眼看清。浏览器里直接用，不用安装。", "企业服务 / 轴承设计与制造软件", [("在线试用", "/bearing/"), ("预约演示", "/contact/")])}
+{part("一", "现在能用的", None, f'''<div class="split"><div>
+{ul(["深沟球轴承、角接触球轴承：钢球与沟道几何、相邻钢球间隙、沟底壁厚",
+     "径向力、轴向力、力矩联合作用下每个钢球的载荷和工作接触角",
+     "赫兹接触应力与接触椭圆，检查接触椭圆是否越过挡肩",
+     "初始 → 装配 → 温差的游隙链；油膜厚度与 λ；故障特征频率",
+     "限值由企业按自己的标准填写；缺数据的项标“未知”，不算合格",
+     "剖面图、钢球载荷图和计算书；项目存在你自己的浏览器里或存成文件"])}</div>
+{shot("bearing-ui.jpg", "轴承设计软件：参数、剖面、钢球载荷与校核")}</div>''')}
+{part("二", "接下来", None, ul(["额定载荷与寿命：按国家标准计算，标准正文录入前显示“未知”",
+     "圆柱滚子、圆锥滚子轴承；高速时的离心力与陀螺力矩；角接触轴承配对与预紧",
+     "制造：零件图、工艺路线、合套选配、检测与 SPC",
+     "FreeCAD 工作台；AI 起草设计说明（数字由代码核对）"]), "alt")}
+{cta("带一款你的轴承来。", "我们按你的尺寸和工况现场算载荷分布和校核。")}"""
+    page("/solutions/bearing/", "轴承设计与制造软件", "轴承设计与制造软件：深沟球、角接触球轴承的载荷分布、接触应力、游隙、油膜和故障频率，浏览器里直接用。", body, "/solutions/bearing/")
 
 
 def custom():
@@ -638,7 +661,7 @@ def main():
     page("/404/", "页面不存在", "页面不存在。", hero("404", "这一页不存在", "可能是网址打错了，或者页面已经移走。", None, [("回首页", "/"), ("预约演示", "/contact/")]))
     (OUT / "404" / "index.html").rename(OUT / "404.html")
     (OUT / "404").rmdir()
-    for f in (home, qms, platform, sewing, cam, custom, services, education, edu_platform, consulting, cases, about, contact,
+    for f in (home, qms, platform, sewing, cam, bearing, custom, services, education, edu_platform, consulting, cases, about, contact,
               privacy, terms, ai_notice, report):
         f()
     n = len(list(OUT.rglob("index.html")))
