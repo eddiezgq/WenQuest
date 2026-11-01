@@ -174,7 +174,89 @@ def seed(book):
                    sample_docx(x["名称"][0], [x["验收"][0]]))
     call("POST", f"/api/tasks/{tasks[52]}/submit", {}, token=student)
     rev = call("GET", f"/api/tasks/{tasks[52]}/submissions", token=teacher)["submissions"][0]["id"]
-    return {"teacher": teacher, "student": student, "subs": subs, "notes": notes, "tasks": tasks, "review52": rev}
+    d = {"teacher": teacher, "student": student, "subs": subs, "notes": notes, "tasks": tasks, "review52": rev}
+    d.update(seed54(teacher, student))
+    return d
+
+
+# ---------------------------------------------------------------- 第 54 章：车间数据（第 13 轮 9.4（3））
+# 用仿真车间的误差模型（sim/errors.py simulate，与第 54 章的算例同一套）“磨”一个班次的 SH-301：前 30 件正常（每 10 件修整砂轮），
+# 老师注入“磨床尾座偏移”后再磨 22 件，学生在质量页发现右轴承位偏大、开 8D；老师批准“校正尾座”后再磨 20 件，学生用 D6 验证。
+# 测量消息按真实的历史库入库（hub/historian.py：超差件自动开不合格品单），时间从 7 小时前起排。
+SHIFT = {"normal": 30, "problem": 22, "after": 20}     # 控制图显示最近 30 件：正常 8 件 + 注入后 22 件，台阶看得见
+_DB = {}
+
+
+def _db():
+    if "db" not in _DB:
+        sys.path.insert(0, str(DIGITAL))
+        from hub.db import DB
+        from hub.historian import Historian
+        _DB["db"] = DB(_DB["dsn"])
+        _DB["hist"] = Historian(_DB["db"])
+        _DB["hist"].load()
+    return _DB["db"], _DB["hist"]
+
+
+def _grind(problem, n, t0, step_min, start_no, seed):
+    """磨 n 件并入库；返回各特性的测得值"""
+    sys.path.insert(0, str(DIGITAL))
+    import wqbus
+    from sim import errors as ERR
+    _, hist = _db()
+    r = ERR.simulate(n, problem, seed=seed, dress_every=10)
+    for i in range(n):
+        ts = (t0 + dt.timedelta(minutes=step_min * i)).isoformat().replace("+00:00", "Z")
+        serial = "SH301-B54-{:03d}".format(start_no + i)
+        for code, name, nom, lo, hi in ERR.CHARS:
+            v = round(r["values"][code][i], 4)
+            m = wqbus.make("quality.measurement", "sim/qc-01", {
+                "part_serial": serial, "item": "SH-301", "characteristic": code, "name": name, "nominal_mm": nom,
+                "lower_tol_mm": lo, "upper_tol_mm": hi, "value_mm": v, "result": "pass" if lo <= v <= hi else "fail",
+                "work_order": "WO-54-01"}, mode="teach", ts=ts)
+            hist.handle("wq/gearbox/quality/qc-01/measurement", m)
+    return r["values"]
+
+
+def seed54(teacher, student):
+    now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    t0 = now - dt.timedelta(hours=7)
+    a = _grind(None, SHIFT["normal"], t0, 6, 1, 541)
+    n2 = SHIFT["problem"]
+    call("POST", "/api/quality/problems", {"problem": "tailstock_offset"}, token=teacher)
+    b = _grind("tailstock_offset", n2, t0 + dt.timedelta(hours=3, minutes=10), 6, 31, 540)
+    mean = lambda v: sum(v) / len(v)          # noqa: E731
+    dl, dr = mean(b["bearing_seat_d35"]) - mean(a["bearing_seat_d35"]), mean(b["bearing_seat_d35_r"]) - mean(a["bearing_seat_d35_r"])
+    fails = sum(1 for v in b["bearing_seat_d35_r"] if v > 35.018)
+    assert fails, "注入问题后应有超差件（换一个种子）"
+    title = "右轴承位 Ø35 k6 偏大、超差"
+    q = call("POST", "/api/quality/8d", {"item": "SH-301", "characteristic": "bearing_seat_d35_r", "title": title}, token=student)
+    sec = {
+        "d1": "工艺员学生甲（组长）、质检员、磨工、设备员；老师审批",
+        "d2": ("第 31 件起，右轴承位均值比前 30 件大 {:.4f} mm，左轴承位只变 {:+.4f} mm，圆跳动不变；之后 {} 件里右轴承位超差 {} 件，"
+               "全在上限一侧。都在磨床 GRD-01 工序 60 上。").format(dr, dl, n2, fails),
+        "d3": "工序 60 之后对右轴承位 100% 检验；已磨的 " + str(n2) + " 件隔离，超差件开不合格品单返修评审。",
+        "d4": ("左轴承位不变、右轴承位变大，两处直径差是锥度（右端大），不是逐件漂移，也不是分散变大：砂轮磨损、未预热会让两处一起变；"
+               "中心孔不好会让跳动变大。锥度来自两顶尖连线与工作台运动方向不平行——尾座偏移。估算偏移 Δ ≈ 直径差 × L ÷ (2 × 两轴承位距离)。"),
+        "d5": "选“校正磨床尾座”：用标准检验棒和千分表把两顶尖连线调到与工作台运动方向平行，能消除锥度的根本原因。",
+        "d7": "工序 60 的首件检验加测左右两个轴承位的直径差（≤ 0.004 mm）；设备点检表加“检验棒校尾座”，每班开机检一次。",
+        "d8": "数据的形态（哪处变、怎么变）指向原因：只看超差件会以为是砂轮磨损。",
+    }
+    call("POST", f"/api/quality/8d/{q['id']}", {"action": "save", "d": sec, "fix": "align_tailstock"}, token=student)
+    call("POST", f"/api/quality/8d/{q['id']}", {"action": "submit"}, token=student)
+    return {"q8d": q["id"], "now": now.isoformat()}
+
+
+def approve54(d):
+    """老师批准措施；措施的实施时刻定在 1 小时 15 分钟前，之后按校正后的磨床再磨 20 件，学生点 D6 验证"""
+    sid, now = d["q8d"], dt.datetime.fromisoformat(d["now"])
+    call("POST", f"/api/quality/8d/{sid}", {"action": "approve", "note": "同意，按检验棒法校正"}, token=d["teacher"])
+    call("POST", "/api/quality/problems", {"clear": True}, token=d["teacher"])
+    db, _ = _db()
+    fix_at = now - dt.timedelta(hours=1, minutes=15)
+    db.x("update quality_8d set fix_at=%s where id=%s", (fix_at, sid))
+    _grind(None, SHIFT["after"], fix_at + dt.timedelta(minutes=2), 3, 31 + SHIFT["problem"], 543)
+    call("POST", f"/api/quality/8d/{sid}", {"action": "verify"}, token=d["student"])
 
 
 # ---------------------------------------------------------------- 截图
@@ -190,6 +272,10 @@ def shots_list(d):
         ("shot52_2", 52, "teacher", f"/tasks/review/{d['review52']}", None, "任务单 TS-52-1 的老师审阅页：交付物、AI 评审员的意见、评分"),
         ("shot53_1", 53, "student", f"/process/{s['chart']}", None, d["notes"]["chart"]),
         ("shot53_2", 53, "student", f"/tasks/{t[53]}", "precheck_task", "任务单 TS-53-1 的学生页：选定工艺规程提交，AI 预检"),
+        ("shot54_1", 54, "student", "/work/quality", "select_r",
+         "质量页：右轴承位的单值控制图（老师注入“尾座偏移”以后偏大），右栏自动开的不合格品单和学生开的 8D"),
+        ("shot54_2", 54, "teacher", f"/quality/8d/{d['q8d']}", None, "学生填好 D1–D5、提交纠正措施，老师审批前的 8D 页"),
+        ("shot54_3", 54, "student", f"/quality/8d/{d['q8d']}", "approve54", "老师批准“校正尾座”、车间再磨 20 件以后，学生做 D6 验证：措施前后对比"),
     ]
 
 
@@ -208,6 +294,8 @@ def take(book, d, only=None):
                 continue
             ctx = b.new_context(viewport={"width": 1440, "height": 900}, device_scale_factor=2, locale="zh-CN")
             ctx.add_init_script(f"localStorage.setItem('wq-df-session', {json.dumps(json.dumps(users[who], ensure_ascii=False))})")
+            if act == "approve54":
+                approve54(d)
             pg = ctx.new_page()
             pg.goto(BASE + path, wait_until="networkidle")
             pg.wait_for_timeout(800)
@@ -216,6 +304,9 @@ def take(book, d, only=None):
                 pg.wait_for_timeout(300)
                 pg.get_by_role("button", name="AI 预检（不提交）").click()
                 pg.wait_for_timeout(1500)
+            elif act == "select_r":       # 选右轴承位
+                pg.locator(".card-head select").first.select_option("SH-301|bearing_seat_d35_r")
+                pg.wait_for_timeout(1200)
             elif act == "precheck_task":
                 pg.get_by_role("button", name="AI 预检").click()
                 pg.wait_for_timeout(1500)
@@ -226,6 +317,8 @@ def take(book, d, only=None):
             x0 = min(b["x"] for b in boxes) - 8
             clip = {"x": x0, "y": top["y"] - 8, "width": max(b["x"] + b["width"] for b in boxes) + 8 - x0,
                     "height": max(b["y"] + b["height"] for b in boxes) + 8 - top["y"] + 8}
+            if act == "select_r":           # 质量页只截控制图、前几行测量值和右栏的不合格品、8D
+                clip["height"] = min(clip["height"], 760)
             pg.screenshot(path=str(out / f"{name}.png"), clip=clip, full_page=True)
             done.append({"名称": name, "章": ch, "账号": "教师" if who == "teacher" else "学生甲", "页面": path,
                          "说明": note, "数据": "测试数据（factory_shots.py 灌入，见程序说明）"})
@@ -249,7 +342,8 @@ def main(argv=None):
     ap.add_argument("--dsn", default=os.environ.get("WQ_SHOTS_DSN", "postgresql://postgres:wq@localhost:5432/postgres"))
     a = ap.parse_args(argv)
     (REPO / "textbook" / "build").mkdir(exist_ok=True)
-    hub = start_hub(fresh_db(a.dsn))
+    _DB["dsn"] = fresh_db(a.dsn)
+    hub = start_hub(_DB["dsn"])
     try:
         d = seed(a.book)
         for x in take(a.book, d, a.only):
