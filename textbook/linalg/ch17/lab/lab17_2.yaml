@@ -1,0 +1,18 @@
+# 实验 17.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_2.js。
+原理:
+  - ["采样位置轴的闭环 x_{k+1} = A_cl x_k，A_cl 是 2×2 矩阵。由凯莱–哈密顿定理，A_cl² + c₁A_cl + c₀I = O。若把增益选得使 c₁ = c₀ = 0，就有 A_cl² = O：任何初始误差两步归零，这叫无差拍控制。", "The sampled axis obeys x_{k+1} = A_cl x_k with a 2×2 A_cl. By Cayley–Hamilton A_cl² + c₁A_cl + c₀I = O. Choosing gains with c₁ = c₀ = 0 gives A_cl² = O: any initial error vanishes in two steps (deadbeat control)."]
+  - 式: "c₁ = g₁/2 + g₂ − 2，c₀ = g₁/2 − g₂ + 1（g 为实际有效增益）；  无差拍 g₁ = 1，g₂ = 1.5；  二重特征值 λ：g₁ = (1 − λ)²，g₂ = (3 − 2λ − λ²)/2"
+  - ["二重特征值时，若 A_cl 不是数量矩阵 λI，它只有一个特征向量，相似于若尔当块，最小多项式是 (λ − λ₀)²。无差拍就是 λ₀ = 0 的情形：A_cl 幂零。", "With a double eigenvalue, unless A_cl is the scalar matrix λI it has a single eigenvector, is similar to a Jordan block and has minimal polynomial (λ − λ₀)². Deadbeat is the case λ₀ = 0: A_cl is nilpotent."]
+步骤:
+  - ["δ = 0，g₁ = 1，g₂ 依次取 1.3、1.4、1.5、1.6、1.7，记录特征值、最大模和 x₂（第 2 步的误差），填入表 1。", "With δ = 0 and g₁ = 1 set g₂ to 1.3, 1.4, 1.5, 1.6, 1.7 and record the eigenvalues, largest modulus and x₂ (the error after two steps) in Table 1."]
+  - ["取 g₁ = 1、g₂ = 1.5，把 δ 依次取 −5%、−1%、1%、5%、10%，记录特征值的最大模，与 √|δ| 比较。", "With g₁ = 1, g₂ = 1.5 set δ to −5%, −1%, 1%, 5%, 10% and compare the largest eigenvalue modulus with √|δ|."]
+  - ["完成任务 1～4。", "Complete tasks 1–4."]
+数据表:
+  - 标题: ["表 1  增益与无差拍（g₁ = 1，δ = 0）", "Table 1  Gains and deadbeat (g₁ = 1, δ = 0)"]
+    表头: ["g₂", "特征值", "最大模", "x₂ / mm", "可否对角化"]
+    表头英文: ["g₂", "Eigenvalues", "Largest modulus", "x₂ / mm", "Diagonalizable?"]
+    行: [["1.3", "", "", "", ""], ["1.4", "", "", "", ""], ["1.5", "", "", "", ""], ["1.6", "", "", "", ""], ["1.7", "", "", "", ""]]
+注意:
+  - ["滑块的步长是 0.01，“二重特征值”按判别式绝对值小于 2×10⁻⁴ 判断；无差拍时读数中的极小数值来自浮点舍入。", "Slider steps are 0.01; a 'double eigenvalue' means the discriminant is below 2×10⁻⁴ in magnitude; tiny numbers at deadbeat come from floating-point rounding."]
+思考题:
+  - ["为什么质量误差 δ 使特征值移动约 √δ 而不是 δ？用 17.7 节若尔当块的扰动说明。", "Why does a mass error δ move the eigenvalues by about √δ rather than δ? Explain with the perturbation of a Jordan block (Section 17.7)."]

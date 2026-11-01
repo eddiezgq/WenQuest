@@ -1,0 +1,18 @@
+# 实验 17.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_7.js。
+原理:
+  - ["n 阶若尔当块 J_n(0) 的特征值是 n 重的 0。左下角加 ε 后，特征多项式变为 λⁿ − ε，n 个特征值均匀分布在半径 ε^{1/n} 的圆上。", "The n×n Jordan block J_n(0) has the n-fold eigenvalue 0. Adding ε in the lower-left corner turns the characteristic polynomial into λⁿ − ε, whose n roots lie evenly on a circle of radius ε^{1/n}."]
+  - 式: "|λ| = ε^{1/n}；  放大倍数 |λ|/ε = ε^{1/n − 1}；  ε = 10⁻¹⁶ 时，n = 2 移动 10⁻⁸，n = 8 移动 10⁻²"
+  - ["n = 1 的情形或正规矩阵受扰动时，特征值只移动 ε 的量级（一般可对角化的矩阵移动量不超过特征向量矩阵的条件数乘 ε）。若尔当形对扰动不连续，所以数值计算用舒尔分解而不用若尔当形。", "The n = 1 case, or a normal matrix, moves its eigenvalues only by order ε (a general diagonalizable matrix by at most the condition number of its eigenvector matrix times ε). The Jordan form is discontinuous under perturbation, so numerical work uses the Schur form instead."]
+步骤:
+  - ["对 n = 1、2、4、8，ε 依次取 10⁻¹⁶、10⁻⁸、10⁻⁴，记录特征值的模，填入表 1。", "For n = 1, 2, 4, 8 and ε = 10⁻¹⁶, 10⁻⁸, 10⁻⁴ record the eigenvalue modulus in Table 1."]
+  - ["点“让 ε 从 10⁻¹⁶ 增大到 1”，观察特征值在对数半径图上怎样向外移动。", "Press the sweep button and watch the eigenvalues move outwards on the log-radius plot."]
+  - ["完成任务 1～4。", "Complete tasks 1–4."]
+数据表:
+  - 标题: ["表 1  若尔当块的扰动：特征值的模", "Table 1  Perturbed Jordan block: eigenvalue modulus"]
+    表头: ["n", "ε = 10⁻¹⁶", "ε = 10⁻⁸", "ε = 10⁻⁴"]
+    表头英文: ["n", "ε = 10⁻¹⁶", "ε = 10⁻⁸", "ε = 10⁻⁴"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["4", "", "", ""], ["8", "", "", ""]]
+注意:
+  - ["左图的半径按对数画：从圆心向外依次是 10⁻¹⁶、10⁻¹²、10⁻⁸、10⁻⁴、1，否则小的特征值都挤在圆心。", "The left plot uses a logarithmic radius (rings at 10⁻¹⁶, 10⁻¹², 10⁻⁸, 10⁻⁴, 1); otherwise small eigenvalues would all sit at the centre."]
+思考题:
+  - ["取一个随机的 8 阶正交矩阵 Q，用 numpy.linalg.eigvals 计算 QJ₈(1)Qᵀ 的特征值（精确值都是 1），结果离 1 有多远？与 10⁻¹⁶ 的 1/8 次方比较。为什么直接算 J₈(1) 本身看不出这个问题？", "Take a random 8×8 orthogonal Q and compute the eigenvalues of QJ₈(1)Qᵀ with numpy.linalg.eigvals (all exactly 1). How far are they from 1? Compare with (10⁻¹⁶)^{1/8}. Why does computing J₈(1) itself not show the problem?"]
