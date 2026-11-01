@@ -1,0 +1,38 @@
+# 实验 9.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab9_5.js。
+原理:
+  - ["关节带着连杆和负载转动。把它们看成几个质点 m_i，离轴 r_i：每个质点做圆周运动，切向需要 m_i r_i α 的力；重力沿切向的分量是 m_i g cos θ。两者乘以 r_i 相加，就是关节要提供的转矩。",
+     "The joint swings the link and the load. Treat them as point masses m_i at radii r_i: each needs a tangential force m_i r_i α for its circular motion, and gravity has a tangential component m_i g cos θ. Multiply by r_i and add: that is the torque the joint supplies."]
+  - 式: "τ = Jα + G cos θ，J = Σ m_i r_i²，G = (m_L r_L + m_p L) g        (9.5.6)"
+  - ["关节的功率 P = τω（9.4 节）。从静止到静止，动能不变，所以 ∫P dt 等于连杆和负载升高所需的功 G(sin θ_2 − sin θ_1)。",
+     "Joint power is P = τω (Section 9.4). From rest to rest the kinetic energy does not change, so ∫P dt equals the work to raise link and load, G(sin θ_2 − sin θ_1)."]
+  - 式: "W = ∫ τω dt = G(sin θ_2 − sin θ_1)        (9.5.7)"
+  - ["经传动比 i、效率 η 的减速器，电机侧的转矩为 τ/(iη)，转速为 iω。选电机看三项：运动中的最大转矩折算值不超过电机峰值转矩；水平静止保持的转矩 G 折算值不超过额定转矩；最大角速度折算后不超过最高转速。",
+     "Through a gearbox of ratio i and efficiency η, the motor sees torque τ/(iη) and speed iω. Check three things: the largest torque during the move, referred to the motor, within the motor's peak torque; the holding torque G with the arm horizontal within its rated torque; and the top joint speed, referred to the motor, within its maximum speed."]
+  - 式: "τ_max/(iη) ≤ τ_peak，G/(iη) ≤ τ_rated，iω_max ≤ n_max        (9.5.8)"
+步骤:
+  - ["选“功与功率”，末端负载调到 8 kg。由式 (9.5.7) 算出总功，调到“你算的功”，先点“提交”（任务 1，要在运行之前提交）。再点“开始”，运动结束时读“累计的功”，与计算值比较，填入表 1。",
+     "Choose “Work and power”, end load 8 kg. Compute the total work from Eq. (9.5.7), set “Your work” and press “Submit” (task 1). Then press “Start”; at the end read “Work so far” and compare, in Table 1."]
+  - ["用时取 3.0、2.0、1.5、1.0 s，各运行一次，读峰值功率和最大转矩，填入表 1。峰值功率出现在什么时候？",
+     "Run with move times 3.0, 2.0, 1.5 and 1.0 s; read the peak power and the largest torque into Table 1. When does the peak power occur?"]
+  - ["在 1.0 s 与 1.5 s 之间找出峰值功率不超过 100 W 的最短用时，运行一次后提交（任务 2）。",
+     "Between 1.0 s and 1.5 s find the shortest time with peak power at most 100 W; run it once and submit (task 2)."]
+  - ["选“选电机”，8 kg、1.0 s，点“开始”测出最大转矩和最大角速度。对三台电机、五种传动比逐一核算式 (9.5.8) 的三项，填入表 2；选出能满足要求的最小电机和一个传动比，运行后提交（任务 3）。",
+     "Choose “Choose a motor”, 8 kg, 1.0 s; press “Start” to measure the largest torque and angular speed. Check the three conditions of Eq. (9.5.8) for each motor and ratio in Table 2, pick the smallest motor that works with some ratio, run it and submit (task 3)."]
+  - ["选“自行车变速”，坡度 6%，换几个后飞轮，读车速，由车轮半径 0.34 m 和齿数比算出踏频，选一个使踏频在 70–90 r/min，提交核对（任务 4）。",
+     "Choose “Bicycle gears”, 6% grade; read the speed, work out the cadence from the 0.34 m wheel and the tooth ratio, pick a sprocket giving 70–90 r/min and submit to check (task 4)."]
+数据表:
+  - 标题: ["表 1  用时与峰值（末端负载 8 kg）", "Table 1  Move time and peaks (8 kg end load)"]
+    表头: ["用时 T / s", "累计的功 / J", "计算的功 / J", "峰值功率 / W", "峰值出现的时刻 / s", "最大转矩 / (N·m)"]
+    表头英文: ["Move time T / s", "Work so far / J", "Computed work / J", "Peak power / W", "Time of the peak / s", "Largest torque / (N·m)"]
+    行: [["3.0", "", "", "", "", ""], ["2.0", "", "", "", "", ""], ["1.5", "", "", "", "", ""], ["1.0", "", "", "", "", ""]]
+  - 标题: ["表 2  电机与传动比的核算（8 kg、1.0 s）", "Table 2  Checking motors and ratios (8 kg, 1.0 s)"]
+    表头: ["电机", "传动比 i", "τ_max/(iη) / (N·m)", "G/(iη) / (N·m)", "iω_max / (r/min)", "三项都满足？"]
+    表头英文: ["Motor", "Ratio i", "τ_max/(iη) / (N·m)", "G/(iη) / (N·m)", "iω_max / (r/min)", "All three met?"]
+    行: [["A", "160", "", "", "", ""], ["B", "100", "", "", "", ""], ["B", "120", "", "", "", ""], ["B", "160", "", "", "", ""], ["C", "50", "", "", "", ""], ["C", "80", "", "", "", ""]]
+注意:
+  - ["转矩和功率由式 (9.5.6) 算出，没有计入关节的摩擦和电机本身的惯量，实际选型还要留余量。", "Torque and power come from Eq. (9.5.6) without joint friction or the motor's own inertia; real selection keeps a margin."]
+  - ["减速器效率统一按 0.75 计；电机三项参数（额定、峰值转矩，最高转速 5000 r/min）显示在画面下方。", "Gearbox efficiency is taken as 0.75 throughout; the motors' ratings (rated and peak torque, 5000 r/min top speed) are shown under the picture."]
+  - ["任务 2、3 要在当前参数下运行一次，再点“提交”。", "For tasks 2 and 3, run once with the current settings before pressing “Submit”."]
+思考题:
+  - ["用时减半，角加速度变成几倍？峰值转矩和峰值功率大约变成几倍？为什么达不到 4 倍和 8 倍？（重力矩不随用时变。）", "Halving the move time multiplies the angular acceleration by what? Roughly how do the peak torque and peak power change, and why do they fall short of 4 and 8 times? (The gravity torque does not change with the time.)"]
+  - ["电机 A 为什么无论配哪个传动比都不行？哪一项卡住了它？", "Why does motor A fail with every ratio? Which condition stops it?"]

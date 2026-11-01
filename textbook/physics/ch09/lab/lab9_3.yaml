@@ -1,0 +1,39 @@
+# 实验 9.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab9_3.js。
+原理:
+  - ["弹簧在弹性限度内服从胡克定律，外力 F = kx。把 x 从 0 压缩到 x 的过程中，外力做的功等于 F–x 图下三角形的面积；弹簧恢复原长时，弹簧对物体做的功也是这么多。",
+     "Within its elastic limit a spring obeys Hooke's law, F = kx. Compressing it from 0 to x, the applied force does the work given by the triangle under the F–x graph; as it springs back, the spring does the same amount of work on the body."]
+  - 式: "W = ½kx²        (9.3.3)"
+  - ["测量 k：在若干个压缩量下读测力计，用最小二乘直线 F = kx + b 拟合（第 1.6 节），斜率就是 k。截距 b 不为零，是读数误差和测力计零点的缘故。",
+     "Measuring k: read the gauge at several compressions and fit a least-squares line F = kx + b (Section 1.6); the slope is k. A nonzero intercept b comes from reading errors and the gauge's zero."]
+  - ["动能定理：滑块从静止被弹出，到达光电门时 ½mv² = ½kx² + W_f，W_f 是导轨摩擦力做的（负）功。光电门测速：v = d/Δt，d 是挡光片宽度。",
+     "Work–energy theorem: from rest to the light gate, ½mv² = ½kx² + W_f, where W_f is the (negative) work of rail friction. The gate gives v = d/Δt, d being the flag width."]
+  - 式: "½mv² = ½kx² − μmg(x + s)        (9.2.3)、(9.3.2)"
+步骤:
+  - ["选“测弹簧”。压缩量从 0 起每次加 5 mm，到 40 mm，读测力计示数，填入表 1。作 F–x 图，用最小二乘直线求 k 和截距，把“你测得的 k”调到结果，点“提交”（任务 1）。",
+     "Choose “Measure the spring”. Increase the compression from 0 to 40 mm in 5 mm steps, reading the gauge each time, into Table 1. Plot F against x, fit k and the intercept by least squares, set “Your k” and press “Submit” (task 1)."]
+  - ["由表 1 的数据，用梯形法求压缩到 30 mm 时外力做的功，与 ½kx² 比较。",
+     "From Table 1, use the trapezoid rule for the work done compressing to 30 mm, and compare with ½kx²."]
+  - ["选“弹射滑块”，压缩量 30 mm，点“开始”。滑块通过光电门后读挡光时间 Δt，填入表 2。算出 v、½mv² 和 ½kx²，求比值，调到“到达光电门的动能 / ½kx²”，提交（任务 2）。",
+     "Choose “Launch the slider”, compression 30 mm, press “Start”. After the slider passes the gate read Δt into Table 2. Work out v, ½mv² and ½kx², form the ratio, set it and submit (task 2)."]
+  - ["再取 15、20、25、35 mm 各弹射一次，填入表 2。由“弹簧的功 − 动能”对滑过的距离 (x + 0.30 m) 作图，斜率就是摩擦力，求出 μ。",
+     "Launch at 15, 20, 25 and 35 mm too, filling Table 2. Plot “spring work − kinetic energy” against the distance slid (x + 0.30 m); the slope is the friction force, which gives μ."]
+  - ["用求出的 k 和 μ，由动能定理算出使滑块以 1.00 m/s 通过光电门的压缩量，调好后弹射一次，核对 v，提交（任务 3）。",
+     "With your k and μ, use the work–energy theorem to find the compression that sends the slider through the gate at 1.00 m/s; set it, launch once, check v and submit (task 3)."]
+  - ["选“弹珠台”，由 ½kx² = mg(L + x) sin θ 算出柱塞压缩量（x 比 L 小得多，可先略去再修正），调好后点“开始”，看球是否刚好到达顶端，提交（任务 4）。",
+     "Choose “Pinball plunger”, compute the pull from ½kx² = mg(L + x) sin θ (x ≪ L: drop it first, then correct), set it, press “Start”, see whether the ball just reaches the top, and submit (task 4)."]
+数据表:
+  - 标题: ["表 1  测力计读数", "Table 1  Force gauge readings"]
+    表头: ["x / mm", "0", "5", "10", "15", "20", "25", "30", "35", "40"]
+    表头英文: ["x / mm", "0", "5", "10", "15", "20", "25", "30", "35", "40"]
+    行: [["F / N", "", "", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  弹射与光电门", "Table 2  Launches and the light gate"]
+    表头: ["x / mm", "Δt / ms", "v / (m/s)", "½mv² / J", "½kx² / J", "½mv² / ½kx²", "½kx² − ½mv² / J", "x + 0.30 m / m"]
+    表头英文: ["x / mm", "Δt / ms", "v / (m/s)", "½mv² / J", "½kx² / J", "½mv² / ½kx²", "½kx² − ½mv² / J", "x + 0.30 m / m"]
+    行: [["15", "", "", "", "", "", "", ""], ["20", "", "", "", "", "", "", ""], ["25", "", "", "", "", "", "", ""], ["30", "", "", "", "", "", "", ""], ["35", "", "", "", "", "", "", ""]]
+注意:
+  - ["弹簧的劲度系数和导轨的摩擦因数都不显示，要靠测量求出。", "Neither the spring constant nor the rail's friction coefficient is shown; you measure them."]
+  - ["测力计读数的误差由压缩量确定，同一个压缩量重复读数不变；换一个压缩量，误差就不同。", "The gauge error is fixed by the compression: the same compression always reads the same; another compression has another error."]
+  - ["任务 2、3 要先在当前压缩量下弹射一次，再点“提交”。", "For tasks 2 and 3, launch once at the current compression before pressing “Submit”."]
+思考题:
+  - ["拟合直线的截距为什么不是零？如果强行用过原点的直线拟合，k 会偏大还是偏小？", "Why is the fitted intercept not zero? Forcing the line through the origin, would k come out larger or smaller?"]
+  - ["压缩量加倍，弹簧的功变成几倍？摩擦消耗的能量变成几倍？压缩量越大，到达光电门的动能所占的比例越大还是越小？为什么？", "Doubling the compression multiplies the spring's work by what? And the friction loss? Does the fraction reaching the gate grow or shrink with the compression, and why?"]
