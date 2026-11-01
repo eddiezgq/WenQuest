@@ -1,0 +1,30 @@
+# 实验 19.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab19_7.js。
+原理:
+  - ["不计绕组电感和摩擦时，直流电机的转速满足一阶方程 ω′ = (ω∞ − ω)/τ，ω∞ = V/k，τ = RJ/k²（19.1 节）。阶跃电压下 ω = ω∞(1 − e^(−t/τ))，t = τ 时达到稳态值的 63.2%。负载惯量 J_L 直接装在轴上时，J 换成 J + J_L。", "Neglecting winding inductance and friction, a DC motor's speed obeys ω′ = (ω∞ − ω)/τ with ω∞ = V/k and τ = RJ/k² (Section 19.1). After a voltage step ω = ω∞(1 − e^(−t/τ)), reaching 63.2% of the steady value at t = τ. A load inertia J_L on the shaft replaces J by J + J_L."]
+  - ["读时间常数的方法（19.7 节）：63.2% 法；切线法；半对数法（ln(ω∞ − ω) 对 t 是直线，斜率 −1/τ）；最小二乘法（选 τ 使模型与全部数据之差的平方和最小）。", "Ways to read the time constant (Section 19.7): the 63.2% point; the tangent at t = 0; the semi-log plot (ln(ω∞ − ω) against t is a line of slope −1/τ); least squares (choose τ to minimize the sum of squared differences from all the data)."]
+  - 式: "RC 低通：τ y′ + y = u，正弦输入的稳态幅值比 1/√(1 + (ωτ)²)，相位滞后 arctan(ωτ)，截止频率 f_c = 1/(2πτ)"
+步骤:
+  - ["在“电机阶跃响应”场景中取 J_L = 0、48 V、噪声 5 rad/s，调节模型的 τ 使曲线穿过数据点；读出 63.2% 法和最小二乘法的结果，与理论值和样本的 4.28 ms 比较（任务 1），填入表 1。", "In 'Motor step response' with J_L = 0, 48 V and noise 5 rad/s, adjust τ until the model runs through the data; read the 63.2% and least-squares results and compare with theory and the catalogue's 4.28 ms (task 1). Fill in Table 1."]
+  - ["负载惯量取 137、411、1000 g·cm²，重复上一步（任务 2）。", "Repeat with load inertias of 137, 411 and 1000 g·cm² (task 2)."]
+  - ["空载，电压取 12、24、36 V，重复（任务 3）。时间常数和稳态转速各怎样变化？", "No load, voltages of 12, 24 and 36 V (task 3). How do the time constant and the steady speed change?"]
+  - ["噪声取 0、10、20 rad/s，比较 63.2% 法与最小二乘法的结果，填入表 2。", "With noise 0, 10 and 20 rad/s compare the 63.2% and least-squares estimates in Table 2."]
+  - ["在“RC 低通滤波器”场景中取 R = 10 kΩ，频率取 1、5、15.9、50、200 Hz，记录幅值比和相位滞后，找出幅值比为 0.707 的频率（任务 4），填入表 3。", "In 'RC low-pass filter' with R = 10 kΩ, try 1, 5, 15.9, 50 and 200 Hz, record the amplitude ratio and phase lag and find where the ratio is 0.707 (task 4). Fill in Table 3."]
+数据表:
+  - 标题: ["表 1  负载惯量与时间常数（48 V，噪声 5 rad/s）", "Table 1  Load inertia and time constant (48 V, noise 5 rad/s)"]
+    表头: ["J_L / (g·cm²)", "理论 τ / ms", "63.2% 法 / ms", "最小二乘 / ms", "你的 τ / ms"]
+    表头英文: ["J_L / (g·cm²)", "theory τ / ms", "63.2% / ms", "least squares / ms", "your τ / ms"]
+    行: [["0", "", "", "", ""], ["137", "", "", "", ""], ["411", "", "", "", ""], ["1000", "", "", "", ""]]
+  - 标题: ["表 2  噪声对读法的影响（空载，48 V）", "Table 2  Effect of noise (no load, 48 V)"]
+    表头: ["噪声 / (rad/s)", "63.2% 法 / ms", "最小二乘 / ms", "与理论值之差 / %"]
+    表头英文: ["noise / (rad/s)", "63.2% / ms", "least squares / ms", "difference from theory / %"]
+    行: [["0", "", "", ""], ["5", "", "", ""], ["10", "", "", ""], ["20", "", "", ""]]
+  - 标题: ["表 3  RC 低通滤波器（R = 10 kΩ，C = 1 μF）", "Table 3  RC low-pass filter (R = 10 kΩ, C = 1 μF)"]
+    表头: ["f / Hz", "幅值比", "相位滞后 / °", "时间上落后 / ms"]
+    表头英文: ["f / Hz", "amplitude ratio", "phase lag / °", "time lag / ms"]
+    行: [["1", "", "", ""], ["5", "", "", ""], ["15.9", "", "", ""], ["50", "", "", ""], ["200", "", "", ""]]
+注意:
+  - ["数据由含绕组电感（0.33 mH）和摩擦（由空载电流 68.6 mA 折算）的模型生成，所以与一阶模型不完全一致：启动后零点几毫秒内电流还没有建立，转速上升比一阶模型稍慢，最小二乘得到的 τ 略大于理论值。电机参数取自 maxon RE 40（型号 148877）样本。", "The data come from a model with winding inductance (0.33 mH) and friction (from the 68.6 mA no-load current), so they do not exactly follow the first-order model: in the first fraction of a millisecond the current is still building up and the speed rises a little more slowly, so the least-squares τ is slightly above the theory. Motor data are from the maxon RE 40 (part 148877) catalogue."]
+  - ["负载惯量假设直接装在电机轴上；经减速比 N 的减速器连接时，折算到电机轴要除以 N²（17.4、19.4 节）。", "The load inertia is assumed to sit directly on the motor shaft; through a gearbox of ratio N it must be divided by N² (Sections 17.4 and 19.4)."]
+思考题:
+  - ["把噪声加大到 20 rad/s。63.2% 法、最小二乘法给出的时间常数还可靠吗？如果只用切线法（t = 0 处的斜率）会怎样？", "Raise the noise to 20 rad/s. Are the 63.2% and least-squares estimates still reliable? What would the tangent method (the slope at t = 0) give?"]
+  - ["电压降低时稳态转速按比例下降，时间常数却不变。从方程 (19.1.1) 解释为什么。", "Lowering the voltage scales the steady speed down but leaves the time constant unchanged. Explain why from equation (19.1.1)."]

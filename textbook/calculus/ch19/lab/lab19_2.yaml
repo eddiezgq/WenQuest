@@ -1,0 +1,31 @@
+# 实验 19.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab19_2.js。
+原理:
+  - ["方程 y′ = f(x, y) 在平面上每一点规定了积分曲线的斜率，画成短线段就是方向场（19.2 节）。积分曲线处处与方向场相切；f 与 ∂f/∂y 连续的区域内，积分曲线互不相交（定理 19.2.1）。", "The equation y′ = f(x, y) prescribes the slope of the solution curve at every point; drawn as short segments this is the direction field (Section 19.2). Solution curves are tangent to the field and, where f and ∂f/∂y are continuous, never cross (Theorem 19.2.1)."]
+  - ["自治方程 y′ = f(y) 的平衡点满足 f(y*) = 0；f′(y*) < 0 时稳定，f′(y*) > 0 时不稳定。平衡点附近的有效时间常数是 −1/f′(y*)。", "For an autonomous equation y′ = f(y), equilibria satisfy f(y*) = 0; they are stable if f′(y*) < 0 and unstable if f′(y*) > 0. The effective time constant near y* is −1/f′(y*)."]
+  - 式: "电机带风扇：ω′ = (ω∞ − ω)/τ − (c/J)ω²，ω∞ = V/k，τ = RJ/k²"
+  - ["欧拉法 y_{n+1} = y_n + h f(x_n, y_n) 沿当前点的斜率走一步（19.6 节）。平衡点附近每步的误差乘以 1 + h f′(y*)，其绝对值大于 1 时发散。", "Euler's method y_{n+1} = y_n + h f(x_n, y_n) takes a step along the current slope (Section 19.6). Near an equilibrium each step multiplies the error by 1 + h f′(y*); if its absolute value exceeds 1 the method diverges."]
+步骤:
+  - ["在“电机带风扇”场景中（48 V，c = 3.3×10⁻⁷），把初始转速从 0 逐渐加大，找出使转速曲线成为水平线的值，与读数中的稳态转速比较；再取 0、300、900、1200 rad/s，观察曲线怎样趋近稳态（任务 1）。把风扇系数取 0、3.3、6.6，记录稳态转速、稳态电流和有效时间常数，填入表 1。", "In 'Motor with a fan' (48 V, c = 3.3×10⁻⁷), raise the initial speed from 0 until the speed curve becomes horizontal and compare with the steady-speed readout; then start from 0, 300, 900, 1200 rad/s and watch the curves approach (task 1). For fan coefficients 0, 3.3, 6.6 record the steady speed, current and effective time constant in Table 1."]
+  - ["欧拉步长取 1、4、7、8 ms，观察折线；记录“误差放大倍数”，填入表 2。", "Take Euler steps of 1, 4, 7 and 8 ms; observe the polygon and record the error factor in Table 2."]
+  - ["在“方程的方向场”场景中选方程 1，找出唯一的直线积分曲线（任务 2）；在它上方和下方各点击几个初值，观察积分曲线。", "In 'Direction fields', choose equation 1 and find the only straight-line solution (task 2); click several initial points above and below it."]
+  - ["选方程 2，把 H 从 0 逐渐加大，记录两个平衡解，直到它们合二为一（任务 3），填入表 3。", "Choose equation 2 and raise H from 0, recording the two equilibria until they merge (task 3), in Table 3."]
+  - ["选方程 3，取 x₀ = 0、y₀ = 2，读出解跑到无穷的位置（任务 4）；叠加 h = 0.1 的欧拉折线，比较。选方程 4，观察解在有限处到达 0 后与 y = 0 重合。", "Choose equation 3 with x₀ = 0, y₀ = 2 and read where the solution blows up (task 4); overlay an Euler polygon with h = 0.1. Choose equation 4 and watch solutions reach 0 in finite x and then coincide with y = 0."]
+数据表:
+  - 标题: ["表 1  电机带风扇（48 V）", "Table 1  Motor with a fan (48 V)"]
+    表头: ["c / (10⁻⁷ N·m·s²)", "稳态转速 / (rad/s)", "稳态电流 / A", "有效时间常数 / ms"]
+    表头英文: ["c / (10⁻⁷ N·m·s²)", "steady speed / (rad/s)", "steady current / A", "effective time constant / ms"]
+    行: [["0", "", "", ""], ["3.3", "", "", ""], ["6.6", "", "", ""]]
+  - 标题: ["表 2  欧拉法的步长（c = 3.3×10⁻⁷）", "Table 2  Euler step size (c = 3.3×10⁻⁷)"]
+    表头: ["h / ms", "误差放大倍数", "折线的样子"]
+    表头英文: ["h / ms", "error factor", "appearance of the polygon"]
+    行: [["1", "", ""], ["4", "", ""], ["7", "", ""], ["8", "", ""]]
+  - 标题: ["表 3  带收获的逻辑斯谛方程 y′ = y(1 − y) − H", "Table 3  Logistic equation with harvesting y′ = y(1 − y) − H"]
+    表头: ["H", "不稳定平衡解", "稳定平衡解"]
+    表头英文: ["H", "unstable equilibrium", "stable equilibrium"]
+    行: [["0", "", ""], ["0.1", "", ""], ["0.2", "", ""], ["0.25", "", ""], ["0.3", "", ""]]
+注意:
+  - ["积分曲线用细步长的四阶龙格–库塔法（第 22 章）画出，可以当作“准确解”；欧拉折线是为了比较而叠加的。", "Solution curves are drawn with a fine-step fourth-order Runge–Kutta method (Chapter 22) and can be treated as exact; the Euler polygons are overlaid for comparison."]
+  - ["电机模型不计绕组电感和摩擦，风扇系数是为教学选的假设值，使稳态电流接近样本的额定电流 3.17 A。", "The motor model neglects winding inductance and friction; the fan coefficient is an assumed value chosen so that the steady current is close to the catalogue's rated 3.17 A."]
+思考题:
+  - ["电机场景中把欧拉步长取到 7.4 ms 以上（平衡点附近有效时间常数的两倍），折线会怎样？把风扇系数调为 0，界限变成多少？这对电机控制器里的“模型仿真”有什么启示？", "In the motor scene, take an Euler step above 7.4 ms (twice the effective time constant near equilibrium). What happens? With the fan coefficient at 0, where is the limit? What does that mean for model-based simulation inside a motor controller?"]
+  - ["方程 4 的积分曲线到达 y = 0 后与之重合。向左看（时间倒流），从 y = 0 出发有多少条积分曲线？这与定理 19.2.1 矛盾吗？", "Solutions of equation 4 merge with y = 0. Looking left (backwards in time), how many solution curves leave y = 0? Does this contradict Theorem 19.2.1?"]
