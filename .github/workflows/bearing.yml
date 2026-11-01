@@ -1,0 +1,29 @@
+name: Bearing kernel tests
+
+# 第 64 轮：问渠轴承计算内核的标准题。只在 services/bearing 改动时运行。
+on:
+  push:
+    paths: ["services/bearing/**", ".github/workflows/bearing.yml"]
+  pull_request:
+    paths: ["services/bearing/**", ".github/workflows/bearing.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        working-directory: services/bearing
+        run: pip install -q -r requirements-dev.txt
+      - name: Standard problems
+        working-directory: services/bearing
+        # failing test names go to the run's annotations, readable without the log
+        run: |
+          python -m pytest -q -rf 2>&1 | tee "$RUNNER_TEMP/bearing.txt" || { grep -E "^(FAILED|ERROR)" "$RUNNER_TEMP/bearing.txt" | sed 's/^/::error::/'; exit 1; }
