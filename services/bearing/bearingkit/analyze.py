@@ -25,6 +25,7 @@ from bearingkit import ball as BB
 from bearingkit import clearance as CL
 from bearingkit import ehl as EH
 from bearingkit import hertz as H
+from bearingkit import highspeed as HS
 from bearingkit import scenarios as SC
 
 PASS, FAIL, UNKNOWN, NA, INFO = "pass", "fail", "unknown", "na", "info"
@@ -143,22 +144,100 @@ def _label(c: dict) -> dict:
     return lab if isinstance(lab, dict) else {"zh": str(lab), "en": str(lab)}
 
 
-def _run(b, Fr, Fa, M, tilt) -> dict:
+def _contacts(b, Qi, ai, Qo, ao):
+    """Peak stress, ellipse ends and the heaviest contacts over a set of balls (inner and outer loads and angles
+    may differ at speed)."""
+    pmax, edge, heavy = {"inner": 0.0, "outer": 0.0}, {"inner": 0.0, "outer": 0.0}, {}
+    for ring, Qs, als, f in (("inner", Qi, ai, b.fi), ("outer", Qo, ao, b.fo)):
+        for Q, al in zip(Qs, als, strict=True):
+            if Q <= 0:
+                continue
+            c = H.solve(float(Q), H.curvatures(b.D, b.dm, float(al), f, ring), b.Es)
+            if c.p_max > pmax[ring]:
+                heavy[ring] = {"a": c.a, "b": c.b, "p_max": c.p_max, "alpha_deg": math.degrees(al), "Q": float(Q)}
+                pmax[ring] = c.p_max
+            edge[ring] = max(edge[ring], abs(al) + c.a / (f * b.D))  # groove bottom to the far end of the ellipse
+    return pmax, edge, heavy
+
+
+def _run(b, Fr, Fa, M, tilt, ctx=None, n=0.0) -> dict:
+    """One load case. ctx (angular contact bearings): the row model at speed and the pair, if any."""
+    if ctx is not None and (n > 0 or ctx.get("pair")):
+        return _run_hs(b, Fr, Fa, M, tilt, ctx, n)
     try:
         dist = BB.distribute(b, Fr=Fr, Fa=Fa, M=M, tilt=tilt)
     except BB.BallError as e:
         raise ProjectError(str(e)) from e
-    pmax, edge, heavy = {"inner": 0.0, "outer": 0.0}, {"inner": 0.0, "outer": 0.0}, {}
-    for Q, al in zip(dist["Q"], np.radians(dist["alpha_deg"]), strict=True):
-        if Q <= 0:
-            continue
-        for ring, c in BB.contacts(b, float(Q), float(al)).items():
-            if c.p_max > pmax[ring]:
-                heavy[ring] = {"a": c.a, "b": c.b, "p_max": c.p_max, "alpha_deg": math.degrees(al), "Q": float(Q)}
-                pmax[ring] = c.p_max
-            f = b.fi if ring == "inner" else b.fo
-            edge[ring] = max(edge[ring], abs(al) + c.a / (f * b.D))  # groove bottom to the far end of the ellipse
+    al = np.radians(dist["alpha_deg"])
+    pmax, edge, heavy = _contacts(b, dist["Q"], al, dist["Q"], al)
     return {"dist": dist, "pmax": pmax, "edge": edge, "heavy": heavy, "tilt": tilt}
+
+
+def _run_hs(b, Fr, Fa, M, tilt, ctx, n) -> dict:
+    row, pr, ot = ctx["row"], ctx.get("pair"), ctx.get("outer_turns", False)
+    try:
+        if pr:
+            r = HS.pair(row, pr["arrangement"], pr["preload"], pr["spacing"], Fr, Fa, M, n, ot)
+            rows = r["rows"]
+        else:
+            one = HS.single(row, Fr, Fa, M, n, tilt, ot)
+            rows = [{**one, "Fa": Fa, "Fr": Fr}]
+    except (HS.SpeedError, BB.BallError) as e:
+        raise ProjectError(str(e)) from e
+    Qi = np.concatenate([x["Qi"] for x in rows])
+    Qo = np.concatenate([x["Qo"] for x in rows])
+    ai = np.concatenate([x["ai"] for x in rows])
+    ao = np.concatenate([x["ao"] for x in rows])
+    pmax, edge, heavy = _contacts(b, Qi, ai, Qo, ao)
+    k = int(np.argmax([np.max(x["Qi"]) for x in rows]))  # the more loaded row for the pictures
+    main = rows[k]
+    dist = {
+        "psi_deg": np.degrees(np.radians(0.0) + 2 * np.pi * np.arange(b.Z) / b.Z),
+        "Q": main["Qi"],
+        "alpha_deg": np.degrees(main["ai"]),
+        "alpha_o_deg": np.degrees(main["ao"]),
+        "da": r["da"] if pr else one["da"],
+        "dr": r["dr"] if pr else one["dr"],
+        "theta": r["theta"] if pr else one["theta"],
+        "M": 0.0 if pr else one["M"],
+        "Qmax": float(np.max(Qi)),
+        "loaded": int(np.count_nonzero(main["Qi"] > 0)),
+    }
+    extra = {
+        "Fc": float(np.max(np.concatenate([x["Fc"] for x in rows]))),
+        "rows": [
+            {
+                "z": x.get("z", 0.0),
+                "facing": x.get("facing", 1),
+                "Fa": x["Fa"],
+                "Fr": x["Fr"],
+                "Qmax": float(np.max(x["Qi"])),
+                "loaded": int(np.count_nonzero(x["Qi"] > 0)),
+            }
+            for x in rows
+        ],
+    }
+    return {"dist": dist, "pmax": pmax, "edge": edge, "heavy": heavy, "tilt": "pair" if pr else tilt, **extra}
+
+
+def _speed_ctx(p: dict, b, g: dict, sc: dict):
+    """Angular contact bearings: the row model at speed (centrifugal force) and the pair arrangement, if any."""
+    if g["type"] != "angular":
+        return None
+    rho = _num((p.get("material") or {}).get("density"))  # g/cm³
+    pr = p.get("pair") or {}
+    arr = pr.get("arrangement") or "single"
+    if arr not in ("single", "DB", "DF", "DT"):
+        raise ProjectError("the arrangement is single, DB, DF or DT")
+    pair = None
+    if arr != "single":
+        s_, fp_ = _num(pr.get("spacing")), _num(pr.get("preload"))
+        if s_ is None or (arr != "DT" and fp_ is None):
+            raise ProjectError("a pair needs the distance between the rows and (DB, DF) the preload")
+        pair = {"arrangement": arr, "spacing": s_, "preload": fp_ or 0.0}
+        g["pair"] = pair
+    g["density"] = rho
+    return {"row": HS.Row(b, (rho or 7.85) * 1e-6), "pair": pair, "outer_turns": sc["outer_turns"]}
 
 
 def _freq(b, sc: dict):
@@ -267,6 +346,7 @@ def analyse(p: dict) -> dict:
         g["alpha_op_deg"] = math.degrees(b.alpha0)
     # every load case: ball loads, contact stresses, ellipse ends
     tilt_given = (p.get("loads") or {}).get("tilt")
+    ctx = _speed_ctx(p, b, g, sc)
     fp = _num((p.get("scenario") or {}).get("fp"))
     runs = []
     for c in sc["cases"]:
@@ -274,7 +354,7 @@ def analyse(p: dict) -> dict:
             runs.append(None)
             continue
         # the shaft holds the inner ring square unless a moment is given (then the ring tilts until it balances)
-        runs.append(_run(b, c["Fr"], c["Fa"], c["M"], tilt_given or ("free" if c["M"] else "fixed")))
+        runs.append(_run(b, c["Fr"], c["Fa"], c["M"], tilt_given or ("free" if c["M"] else "fixed"), ctx, c["n"]))
     live = [k for k, r in enumerate(runs) if r is not None]
     trunc, heavy, dist, film = {}, {}, None, None
     rotating = sc["motion"] == "rotating"
@@ -323,6 +403,129 @@ def analyse(p: dict) -> dict:
             )
         else:
             checks.append(_ck("tilt", "内圈倾角", "Inner ring tilt", math.degrees(dist["theta"]) * 60, None, INFO, "′"))
+        if "Fc" in rp:  # angular contact at speed or in a pair
+            if rp["Fc"] > 0:
+                j = int(np.argmax(dist["Q"]))
+                checks.append(
+                    _ck(
+                        "fc",
+                        "高速：每个钢球的离心力" + suffix_zh,
+                        "At speed: centrifugal force on each ball" + suffix_en,
+                        rp["Fc"],
+                        None,
+                        INFO,
+                        "N",
+                        "gyroscopic moment taken as held by friction; cage speed from pure rolling",
+                        "陀螺力矩按由摩擦平衡、不计入力平衡；保持架转速按纯滚动",
+                    )
+                )
+                checks.append(
+                    _ck(
+                        "angles",
+                        "高速：最重载钢球的外圈 / 内圈接触角",
+                        "At speed: outer / inner contact angle of the heaviest ball",
+                        f"{float(dist['alpha_o_deg'][j]):.2f} / {float(dist['alpha_deg'][j]):.2f}",
+                        None,
+                        INFO,
+                        "°",
+                        "",
+                        "",
+                        group="speed",
+                    )
+                )
+                if g.get("density") is None:
+                    checks.append(
+                        _ck(
+                            "density",
+                            "钢球密度",
+                            "Ball density",
+                            7.85,
+                            None,
+                            INFO,
+                            "g/cm³",
+                            "not given: a common value for bearing steel",
+                            "未填：按轴承钢的常用值",
+                        )
+                    )
+            if "pair" in g:
+                # a preloaded pair should keep every ball of both rows in contact: an unloaded ball skids
+                # judged at rest: at speed the centrifugal force keeps a let-go ball only lightly touching
+                worst_k, worst_free = None, 0
+                pr0 = g["pair"]
+                for k in live:
+                    c0 = sc["cases"][k]
+                    try:
+                        r0 = HS.pair(
+                            ctx["row"],
+                            pr0["arrangement"],
+                            pr0["preload"],
+                            pr0["spacing"],
+                            c0["Fr"],
+                            c0["Fa"],
+                            c0["M"],
+                            0.0,
+                            sc["outer_turns"],
+                        )
+                    except HS.SpeedError as e:
+                        raise ProjectError(str(e)) from e
+                    free = sum(int(np.count_nonzero(x["Qi"] <= 0)) for x in r0["rows"])
+                    if free > worst_free:
+                        worst_k, worst_free = k, free
+                ok = worst_free == 0
+                nm = _label(sc["cases"][worst_k]) if not ok else None
+                checks.append(
+                    _ck(
+                        "preload",
+                        "成对：各工况下两列的钢球都保持接触（预紧够）",
+                        "Pair: every ball of both rows stays in contact in every case (enough preload)",
+                        worst_free,
+                        0,
+                        PASS if ok else FAIL,
+                        "",
+                        ""
+                        if ok
+                        else f"{worst_free} balls lose contact (at rest) in case {nm['en']} and may skid: more preload",
+                        ""
+                        if ok
+                        else f"工况 {nm['zh']} 有 {worst_free} 个钢球失去接触（按静止判断），可能打滑：加大预紧",
+                    )
+                )
+                pr = g["pair"]
+                try:
+                    st = HS.stiffness(
+                        ctx["row"],
+                        pr["arrangement"],
+                        pr["preload"],
+                        pr["spacing"],
+                        cp["Fr"],
+                        cp["Fa"],
+                        cp["n"],
+                        sc["outer_turns"],
+                    )
+                    checks.append(
+                        _ck(
+                            "k_axial",
+                            "成对：轴向刚度" + suffix_zh,
+                            "Pair: axial stiffness" + suffix_en,
+                            st["axial"],
+                            None,
+                            INFO,
+                            "N/µm",
+                        )
+                    )
+                    checks.append(
+                        _ck(
+                            "k_radial",
+                            "成对：径向刚度" + suffix_zh,
+                            "Pair: radial stiffness" + suffix_en,
+                            st["radial"],
+                            None,
+                            INFO,
+                            "N/µm",
+                        )
+                    )
+                except HS.SpeedError:
+                    pass
         # static strength: the peak nominal load
         ls = _num(lim.get("p_static"))
         if ls is None:
@@ -384,7 +587,7 @@ def analyse(p: dict) -> dict:
             vals = []
             for k in live:
                 c = sc["cases"][k]
-                r = _run(b, fp * c["Fr"], fp * c["Fa"], fp * c["M"], runs[k]["tilt"])
+                r = _run(b, fp * c["Fr"], fp * c["Fa"], fp * c["M"], runs[k]["tilt"], ctx, c["n"])
                 vals.append((r["pmax"][ring], k))
             v, kw = max(vals)
             nm = _label(sc["cases"][kw])
@@ -530,6 +733,11 @@ def analyse(p: dict) -> dict:
         "truncation": trunc,
         "film": film,
         "contact": heavy,
+        "pair_rows": (
+            runs[max(live, key=lambda k: max(runs[k]["pmax"].values()))].get("rows")
+            if live and ctx and ctx.get("pair")
+            else None
+        ),
         "scenario": {
             "kind": sc["kind"],
             "motion": sc["motion"],

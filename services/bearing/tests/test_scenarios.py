@@ -200,3 +200,25 @@ def test_tapered_needs_axial_force():
     p["scenario"]["fixed"] = "B"
     with pytest.raises(ProjectError, match="needs an axial force"):
         analyse(p)
+
+
+def test_spindle_pair_at_speed():
+    p = json.loads((EX / "scene-spindle-pair.json").read_text(encoding="utf-8"))
+    r = analyse(p)
+    c = by_id(r)
+    assert c["preload"]["status"] == "pass" and c["k_axial"]["value"] > 0 and c["fc"]["value"] > 0
+    assert len(r["pair_rows"]) == 2
+    out_a, in_a = (float(x) for x in c["angles"]["value"].split(" / "))
+    assert out_a < in_a                                                      # centrifugal force splits the angles
+    # a heavy thrust with a light preload: the back row lets go
+    p["pair"]["preload"] = 50
+    p["scenario"]["cases"] = [{"label": "thrust", "Fr": 50, "Fa": 2000, "n": 500, "share": 1}]
+    c = by_id(analyse(p))["preload"]
+    assert c["status"] == "fail" and c["value"] > 0
+
+
+@pytest.mark.parametrize("name", sorted(f.stem for f in EX.glob("*.json")))
+def test_every_example_runs(name):
+    r = analyse(json.loads((EX / f"{name}.json").read_text(encoding="utf-8")))
+    assert r["status"] in ("pass", "fail", "unknown")
+    assert (r["status"] == "fail") == (name == "scene-hub")                 # the hub is the one failing example

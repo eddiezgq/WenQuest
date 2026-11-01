@@ -35,6 +35,14 @@ const sgn = (k, x) => (k === 'initial' || k === 'operating' ? '' : x >= 0 ? '+' 
         <template v-for="[k, x] in freq" :key="k"><dt>{{ t(k) }}</dt><dd class="mono">{{ x.toFixed(2) }}</dd></template>
       </dl>
     </section>
+    <section v-if="r?.pair_rows">
+      <h3>{{ t('pairRows') }}</h3>
+      <dl class="rows">
+        <template v-for="(x, j) in r.pair_rows" :key="j">
+          <dt>z = {{ x.z.toFixed(1) }} mm</dt><dd class="mono">Fa {{ x.Fa.toFixed(0) }}, Fr {{ x.Fr.toFixed(0) }}, Q<sub>max</sub> {{ x.Qmax.toFixed(0) }} N</dd>
+        </template>
+      </dl>
+    </section>
     <section v-if="r?.contact?.inner">
       <h3>{{ t('heaviest') }}</h3>
       <dl class="rows">
