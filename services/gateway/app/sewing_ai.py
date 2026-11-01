@@ -26,7 +26,7 @@ from .moodle import EngineError
 from .sewcore import aicheck
 
 MACHINE_RE = "^(lockstitch|overlock|cover|pattern|embroid|flatknit)$"
-SKIP = {"pts", "dst", "fname"}      # 上传的针位表 / 花样文件：不让 AI 改，也不发给模型
+SKIP = {"pts", "dst", "fname", "knit", "kpng"}      # 上传的针位表 / 花样文件：不让 AI 改，也不发给模型
 
 DRAFT_SYSTEM = """You help an engineer change a sewing-machine design in the WenQuest design software.
 You get the current parameters (key, name, unit, allowed range, current value), the current check results, and one

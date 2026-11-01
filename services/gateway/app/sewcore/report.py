@@ -61,7 +61,15 @@ def figures(R, lang="zh"):
     no = 0
     for c in R.get("charts", []):
         no += 1
-        if c["kind"] == "stitch":                     # 第 69 轮：刺绣花样（按颜色，降速的针红色）
+        if c["kind"] == "knitgrid":                   # 第 70 轮：横机意匠图（第一行在最下面）
+            from matplotlib.colors import ListedColormap
+            fig, ax = plt.subplots(figsize=(6, 4))
+            g = c["grid"]
+            img = [[(0 if row[2 * j] == "." else int(row[2 * j + 1])) for j in range(len(row) // 2)] for row in g]
+            ax.imshow(img, origin="lower", cmap=ListedColormap(c["colors"]), vmin=0, vmax=len(c["colors"]) - 1, interpolation="nearest", aspect="auto")
+            ax.set_xlabel(_t("针（每 {} 针取一）".format(c["step"]) if c["step"] > 1 else "针", "needle", lang))
+            ax.set_ylabel(_t("意匠行", "design row", lang))
+        elif c["kind"] == "stitch":                     # 第 69 轮：刺绣花样（按颜色，降速的针红色）
             fig, ax = plt.subplots(figsize=(6, 3.8))
             for g in c["segs"]:
                 ax.plot([q[0] for q in g["pts"]], [q[1] for q in g["pts"]], color=g["color"], lw=0.5)

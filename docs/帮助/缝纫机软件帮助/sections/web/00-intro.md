@@ -23,7 +23,7 @@ lead: 一个计算核心，两个入口：浏览器里的网页版和 FreeCAD �
 | {{name_cover}} | {{checks_cover}} 项 | 耗线量与线团计划 |
 | {{name_pattern}} | {{checks_pattern}} 项 | 每针转速与用时、X / Y 轴电机表、上传针位表 |
 | {{name_embroid}} | {{checks_embroid}} 项 | 上传花样文件（DST / CSV）、每针调速、头数与全机效率、订单交期（第 69 轮） |
-| {{name_flatknit}} | {{checks_flatknit}} 项 | 选针时间与提前量、一片用时、改进方案对照、全成型对比（第 54 轮） |
+| {{name_flatknit}} | {{checks_flatknit}} 项 | 选针时间与提前量、一片用时、改进方案对照、全成型对比（第 54 轮）；上传意匠图、逐趟算一片用时（第 70 轮） |
 
 ### 一张图看懂整套系统
 

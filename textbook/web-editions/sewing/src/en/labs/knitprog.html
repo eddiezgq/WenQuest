@@ -96,6 +96,7 @@ progress{width:100%;accent-color:var(--accent)}
           <span class="note" style="margin:0">Preset</span>
           <select id="preset"><option value="">(choose)</option><option value="rib">1×1 rib + jersey</option><option value="jac">Two-colour jacquard</option><option value="cable">2×2 cable</option><option value="shape">Narrowing on both edges</option></select>
           <button type="button" id="clr">Clear</button>
+          <button type="button" id="exp">Export design (CSV)</button>
         </div>
         <canvas id="cv" width="1000" height="640" aria-label="Pattern chart editor"></canvas>
         <p class="note">Grid of 24 needles × 20 rows, knitted from bottom to top. The two columns on the right are control lines: stitch-cam step and speed step; click to cycle 1–4. Drag to paint continuously.</p>
@@ -216,6 +217,13 @@ function buildPalette(){
 document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
 $('preset').addEventListener('change', e => { if (e.target.value) preset(e.target.value); e.target.value = ''; compiled = null; });
 $('clr').addEventListener('click', () => { blank(); draw(); compiled = null; grade(); });
+// Export the design: one design row per line (first line knitted first), cells K P T > < . plus colour (1 omitted) — the format the WenQuest sewing design software reads
+$('exp').addEventListener('click', () => {
+  let last = cells.length; while (last > 0 && cells[last - 1].every(c => c.s === '.')) last--;   // leave out empty rows on top
+  const txt = cells.slice(0, last).map(r => r.map(c => c.s + (c.c !== 1 ? c.c : '')).join(',')).join('\n') + '\n';
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv' })); a.download = 'knit-design.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
 
 // ---------- compiler ----------
 let compiled = null;

@@ -38,30 +38,41 @@ def add_design(doc=None, params=None, label=None, machine="lockstitch"):
     return obj
 
 
-def _add_stitch_props(obj):
+FILE_MACHINES = ("embroid", "flatknit")
+
+
+def _add_stitch_props(obj, machine="embroid"):
+    tip = ("刺绣花样文件（DST 或 CSV 针位表）；“花样从哪里来”选“上传花样文件”时用" if machine == "embroid" else
+           "横机意匠图（文字表 CSV / TXT，或提花色码图 PNG）；“花型从哪里来”选“上传意匠图”时用")
     if not hasattr(obj, "StitchFile"):
-        obj.addProperty("App::PropertyFile", "StitchFile", "花样", "刺绣花样文件（DST 或 CSV 针位表）；“花样从哪里来”选“上传花样文件”时用")
+        obj.addProperty("App::PropertyFile", "StitchFile", "花样", tip)
         obj.StitchFile = ""
     if not hasattr(obj, "StitchData"):
-        obj.addProperty("App::PropertyString", "StitchData", "花样", "从网页版导入的花样（JSON）；选了花样文件时以文件为准")
+        obj.addProperty("App::PropertyString", "StitchData", "花样", "从网页版导入的花样（JSON）；选了文件时以文件为准")
         obj.setEditorMode("StitchData", 2)
 
 
 def _set_stitch_data(obj, p):
-    keep = {k: p[k] for k in ("dst", "pts", "fname") if k in p}
+    keep = {k: p[k] for k in ("dst", "pts", "knit", "kpng", "fname") if k in p}
     obj.StitchData = json.dumps(keep) if keep else ""
 
 
-def _stitch_params(obj):
+def _stitch_params(obj, machine="embroid"):
     """花样文件路径优先；没有就用导入时存下的花样"""
     import base64
     path = getattr(obj, "StitchFile", "") or ""
     if path and os.path.isfile(path):
         with open(path, "rb") as f:
             raw = f.read()
-        if path.lower().endswith(".dst"):
-            return {"dst": base64.b64encode(raw).decode(), "fname": os.path.basename(path)}
-        return {"pts": raw.decode("utf-8", "replace"), "fname": os.path.basename(path)}
+        name = os.path.basename(path)
+        low = path.lower()
+        if machine == "flatknit":
+            if low.endswith(".png"):
+                return {"kpng": base64.b64encode(raw).decode(), "fname": name}
+            return {"knit": raw.decode("utf-8", "replace"), "fname": name}
+        if low.endswith(".dst"):
+            return {"dst": base64.b64encode(raw).decode(), "fname": name}
+        return {"pts": raw.decode("utf-8", "replace"), "fname": name}
     try:
         return json.loads(getattr(obj, "StitchData", "") or "{}")
     except ValueError:
@@ -88,8 +99,8 @@ class SewDesign:
         if "pts" in p:                          # 花样机上传的针位表（第 42 轮）：不在参数表里，存成一个 JSON 文字
             obj.addProperty("App::PropertyString", "PatternPoints", "花样", "上传的针位表（JSON：[[x, y], …]，mm）")
             obj.PatternPoints = json.dumps(p["pts"])
-        if M.MACHINE == "embroid":              # 第 69 轮：刺绣花样文件（“花样从哪里来”选“上传花样文件”时用）
-            _add_stitch_props(obj)
+        if M.MACHINE in FILE_MACHINES:          # 第 69 轮刺绣花样文件、第 70 轮横机意匠图（“从哪里来”选上传时用）
+            _add_stitch_props(obj, M.MACHINE)
             _set_stitch_data(obj, p)
         obj.addProperty("App::PropertyAngle", "Phi", "显示", "零件摆放时的主轴转角（0° = 针杆上止点）")
         obj.addProperty("App::PropertyLinkList", "Parts", "零件", "机构零件")
@@ -116,8 +127,8 @@ class SewDesign:
                 p["pts"] = json.loads(obj.PatternPoints)
             except ValueError:
                 pass
-        if M.MACHINE == "embroid":
-            p.update(_stitch_params(obj))
+        if M.MACHINE in FILE_MACHINES:
+            p.update(_stitch_params(obj, M.MACHINE))
         return M.clean(p)
 
     def execute(self, obj):
@@ -217,8 +228,8 @@ def import_params(obj, path):
         if k not in M.PARAMS:
             continue
         setattr(obj, _pname(k), v if k in M.CHOICES else float(v))
-    if M.MACHINE == "embroid":
-        _add_stitch_props(obj)
+    if M.MACHINE in FILE_MACHINES:
+        _add_stitch_props(obj, M.MACHINE)
         _set_stitch_data(obj, p)
     elif "pts" in p:
         if not hasattr(obj, "PatternPoints"):

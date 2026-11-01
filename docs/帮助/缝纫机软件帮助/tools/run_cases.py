@@ -7,6 +7,7 @@
   python3 run_cases.py [网关地址] [账号] [密码]
   python3 run_cases.py --only ebox     只（重）算案例六电控箱（第 62 轮），其余案例沿用 data/cases.json 里的结果
   python3 run_cases.py --only embroid  只（重）算案例七多头刺绣机（第 65 轮）
+  python3 run_cases.py --only flatknit 只（重）算案例五电脑横机（第 70 轮改用示例意匠图）
 """
 import json
 import sys
@@ -213,11 +214,70 @@ def case_embroid():
     return EM
 
 
+# ---------- 案例五 电脑横机：一片前片要织多久（第 54 轮，教材 17.8 节；第 70 轮改用示例意匠图） ----------
+def case_flatknit():
+    import build123d as bd
+    import tempfile
+    K = {}
+    _smp = req("GET", "/api/v1/sewing/flatknit/sample")
+    (ROOT / "apps/web/src/static/help/media/case-fk-front.csv").write_text(_smp["knit"], encoding="utf-8")     # 读者下载，照着做
+    FILE = {"src": "file", "knit": _smp["knit"], "fname": _smp["name"]}
+
+
+    def fk_brief(params):
+        R = analyze("flatknit", params)
+        out = dict(params={k: v for k, v in params.items() if k != "knit"}, counts=counts(R), vals=vals(R), bad=checks_brief(R, ("bad",)),
+                   warn=checks_brief(R, ("warn",)), t_piece=round(R["production"]["t_piece_min"], 2), t_pass=round(R["production"]["t_pass"], 3),
+                   D=round(R["production"]["D"], 1), passes=R["production"]["passes"], per_day=round(R["production"]["per_day"]),
+                   timing={t["key"]: [t["a"], t["b"]] for t in R["timing"]}, results={r["zh"]: f'{r["value"]} {r["unit"]}'.strip() for r in R["results"]})
+        if R.get("design"):
+            out["design"] = R["design"]
+            out["program"] = next(t for t in R["tables"] if t["key"] == "program")["rows"][:12]
+        return out
+
+
+    K["base"] = fk_brief(FILE)
+    K["base"]["variants"] = next(t for t in analyze("flatknit", FILE)["tables"] if t["key"] == "variants")["rows"]
+    K["base"]["garment"] = analyze("flatknit", {})["garment"]
+    K["hand"] = fk_brief({"N": 240, "rib": 40, "jac": 420, "col": 2, "xfer": 45})          # 对照：同一件前片按手填横列构成折算
+    K["tb"] = fk_brief({})                                                                  # 教材 17.8 节算例（默认参数）
+    K["vx12"] = fk_brief(dict(FILE, vx=1.2))
+    K["E18"] = fk_brief(dict(FILE, E=18))
+    K["E18_seg2"] = fk_brief(dict(FILE, E=18, seg=2))
+    K["none"] = fk_brief(dict(FILE, comp="none"))
+    K["v16"] = fk_brief(dict(FILE, v=1.6))
+    K["sys2"] = fk_brief(dict(FILE, sys=2, comp="realtime"))
+    K["sys3"] = fk_brief(dict(FILE, sys=3, comp="realtime"))
+    opt = req("POST", "/api/v1/sewing/optimize", {"machine": "flatknit", "params": FILE, "goal": "time"})
+    K["opt"] = [dict(params=c["params"], value=c["value"], bad=c["bad"], warn=c["warn"]) for c in opt["candidates"]]
+    best = dict(FILE, **opt["candidates"][0]["params"])
+    K["best"] = fk_brief(best)
+    mo = req("POST", "/api/v1/sewing/cae/motor", {"machine": "flatknit", "params": best})
+    ax = mo["axes"][0]
+    K["best_motor"] = dict(mass=ax["mass"], force=round(ax["force"]), pick=(ax.get("pick") or {}).get("name"), current=ax["current"])
+    K["cuff1"] = fk_brief({"N": 100})
+    K["cuff3"] = fk_brief({"N": 100, "pcs": 3, "gap": 0})
+    # 针床模态：简化的针床梁架在两根立柱上（梁 1500 × 200 × 80，立柱 100 × 200 × 700，铸铁；立柱底面固定）
+    leg = lambda x: bd.Pos(x, 0, 0) * bd.Box(100, 200, 700, align=(bd.Align.MIN, bd.Align.CENTER, bd.Align.MIN))   # noqa: E731
+    bed = leg(0) + leg(1400) + bd.Pos(0, 0, 700) * bd.Box(1500, 200, 80, align=(bd.Align.MIN, bd.Align.CENTER, bd.Align.MIN))
+    with tempfile.TemporaryDirectory() as t:
+        bd.export_step(bed, t + "/b.step")
+        stepb = Path(t + "/b.step").read_bytes()
+    (ROOT / "apps/web/src/static/help/media/case-fk-bed.step").write_bytes(stepb)
+    fj = req("POST", "/api/v1/sewing/cae/frame", files={"file": ("针床-简化.step", stepb), "machine": "flatknit",
+                                                        "params": json.dumps({k: v for k, v in best.items() if k != "knit"}), "material": "HT200"})
+    fr = wait(fj["id"])
+    K["bed"] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or [])[:4]], t_move=fr.get("t_move"),
+                    checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
+
+    return K
+
+
 out = {"date": time.strftime("%Y-%m-%d")}
-if ONLY in ("ebox", "embroid"):
+if ONLY in ("ebox", "embroid", "flatknit"):
     dest = HERE.parent / "data" / "cases.json"
     out = json.loads(dest.read_text())
-    out[ONLY] = case_ebox() if ONLY == "ebox" else case_embroid()
+    out[ONLY] = {"ebox": case_ebox, "embroid": case_embroid, "flatknit": case_flatknit}[ONLY]()
     out[ONLY + "_date"] = time.strftime("%Y-%m-%d")
     dest.write_text(json.dumps(out, ensure_ascii=False, indent=1))
     print(json.dumps({k: v for k, v in out[ONLY].items() if k in ("cae", "motor", "beam2", "beam3", "ebox38")}, ensure_ascii=False)[:3000])
@@ -328,49 +388,7 @@ PT["motor_ry8"] = [dict(axis=a["zh"], pick=(a.get("pick") or {}).get("name"), r_
 PT["template_cam"] = cam("pattern", {"n": 2000, "ay": 50, "ry": 8}, "template", slot_w=5.0, plate_t=3.0)
 out["pattern"] = PT
 
-# ---------- 案例五 电脑横机：一片前片要织多久（第 54 轮，教材 17.8 节） ----------
-from app.sewcore import flatknit as FK  # noqa: E402
-K = {}
-
-
-def fk_brief(params):
-    R = analyze("flatknit", params)
-    return dict(params=params, counts=counts(R), vals=vals(R), bad=checks_brief(R, ("bad",)), warn=checks_brief(R, ("warn",)),
-                t_piece=round(R["production"]["t_piece_min"], 2), t_pass=round(R["production"]["t_pass"], 3), D=round(R["production"]["D"], 1),
-                passes=R["production"]["passes"], per_day=round(R["production"]["per_day"]), timing={t["key"]: [t["a"], t["b"]] for t in R["timing"]},
-                results={r["zh"]: f'{r["value"]} {r["unit"]}'.strip() for r in R["results"]})
-
-
-K["base"] = fk_brief({})
-K["base"]["variants"] = next(t for t in analyze("flatknit", {})["tables"] if t["key"] == "variants")["rows"]
-K["base"]["garment"] = analyze("flatknit", {})["garment"]
-K["E18"] = fk_brief({"E": 18})
-K["E18_seg2"] = fk_brief({"E": 18, "seg": 2})
-K["none"] = fk_brief({"comp": "none"})
-K["v16"] = fk_brief({"v": 1.6})
-K["sys2"] = fk_brief({"sys": 2, "comp": "realtime"})
-K["sys3"] = fk_brief({"sys": 3, "comp": "realtime"})
-opt = req("POST", "/api/v1/sewing/optimize", {"machine": "flatknit", "params": {}, "goal": "time"})
-K["opt"] = [dict(params=c["params"], value=c["value"], bad=c["bad"], warn=c["warn"]) for c in opt["candidates"]]
-best = opt["candidates"][0]["params"]
-K["best"] = fk_brief(best)
-mo = req("POST", "/api/v1/sewing/cae/motor", {"machine": "flatknit", "params": best})
-ax = mo["axes"][0]
-K["best_motor"] = dict(mass=ax["mass"], force=round(ax["force"]), pick=(ax.get("pick") or {}).get("name"), current=ax["current"])
-K["cuff1"] = fk_brief({"N": 100})
-K["cuff3"] = fk_brief({"N": 100, "pcs": 3, "gap": 0})
-# 针床模态：简化的针床梁架在两根立柱上（梁 1500 × 200 × 80，立柱 100 × 200 × 700，铸铁；立柱底面固定）
-leg = lambda x: bd.Pos(x, 0, 0) * bd.Box(100, 200, 700, align=(bd.Align.MIN, bd.Align.CENTER, bd.Align.MIN))   # noqa: E731
-bed = leg(0) + leg(1400) + bd.Pos(0, 0, 700) * bd.Box(1500, 200, 80, align=(bd.Align.MIN, bd.Align.CENTER, bd.Align.MIN))
-with tempfile.TemporaryDirectory() as t:
-    bd.export_step(bed, t + "/b.step")
-    stepb = Path(t + "/b.step").read_bytes()
-(ROOT / "apps/web/src/static/help/media/case-fk-bed.step").write_bytes(stepb)
-fj = req("POST", "/api/v1/sewing/cae/frame", files={"file": ("针床-简化.step", stepb), "machine": "flatknit", "params": json.dumps(best), "material": "HT200"})
-fr = wait(fj["id"])
-K["bed"] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or [])[:4]], t_move=fr.get("t_move"),
-                checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
-out["flatknit"] = K
+out["flatknit"] = case_flatknit()
 out["ebox"] = case_ebox()
 out["embroid"] = case_embroid()
 

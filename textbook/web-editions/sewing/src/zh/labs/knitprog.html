@@ -96,6 +96,7 @@ progress{width:100%;accent-color:var(--accent)}
           <span class="note" style="margin:0">预设</span>
           <select id="preset"><option value="">（选择）</option><option value="rib">1×1 罗纹 + 平针</option><option value="jac">两色提花</option><option value="cable">2×2 绞花</option><option value="shape">两侧收针</option></select>
           <button type="button" id="clr">清空</button>
+          <button type="button" id="exp">导出意匠图（CSV）</button>
         </div>
         <canvas id="cv" width="1000" height="640" aria-label="意匠图编辑区"></canvas>
         <p class="note">网格 24 针 × 20 行，从下往上织。右侧两列是功能线：度目段、速度段，点击切换 1–4。拖动可连续涂画。</p>
@@ -216,6 +217,13 @@ function buildPalette(){
 document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => { mode = b.dataset.mode; document.querySelectorAll('[data-mode]').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
 $('preset').addEventListener('change', e => { if (e.target.value) preset(e.target.value); e.target.value = ''; compiled = null; });
 $('clr').addEventListener('click', () => { blank(); draw(); compiled = null; grade(); });
+// 导出意匠图：一行一个意匠行（第一行先织），每格 K P T > < . 加颜色号（1 号不写）——问渠缝纫机设计软件“上传意匠图”读的就是这个格式
+$('exp').addEventListener('click', () => {
+  let last = cells.length; while (last > 0 && cells[last - 1].every(c => c.s === '.')) last--;   // 上面没画的空行不导出
+  const txt = cells.slice(0, last).map(r => r.map(c => c.s + (c.c !== 1 ? c.c : '')).join(',')).join('\n') + '\n';
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv' })); a.download = 'knit-design.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
 
 // ---------- compiler ----------
 let compiled = null;

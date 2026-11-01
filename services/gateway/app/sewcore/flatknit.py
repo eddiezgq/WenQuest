@@ -6,14 +6,22 @@
 一趟用时 t = D/v + v/a + 停顿，一片 = 趟数 × t）。默认参数就是 17.8 节的算例：E12、前片 275 针、单系统、1.2 m/s、10 m/s²、760 横列。
 
 教材没给的（机头运动质量、传动、电机、摇床伺服、全成型的趟数倍数和套口工时）补成“示例值”，界面上标明，同第 42 轮刺绣机的做法。
-"""
-import math
 
+第 70 轮：可以上传意匠图（文字表或提花色码图，knitprog.py），按虚拟实验 17-2 的编译器编成逐趟的机头动作；
+每一趟的行程按这一趟实际用到的针（最左到最右）+ 三角座跨度 + 两端换向余量，翻针横列按“翻针横列机头速度”，
+加起来就是一片用时，取代手填横列构成的折算。多系统时一个意匠行的编织横列按系统数合进一趟（同 17.8 节的折算）。
+"""
+import hashlib
+import math
+import threading
+from collections import OrderedDict
+
+from . import knitprog as KP
 from .common import Checks, line_chart, make_params, result
 
 MACHINE = "flatknit"
 NAME = ("电脑横机", "Computerized Flat Knitting")
-VERSION = "1.0"
+VERSION = "1.1"
 LECTURES = ("第 17 章", "chapter 17")
 ERR_MAX = 0.25                # 选针位置误差 ≤ 0.25 个针距（17.3 节、虚拟实验 17-1 标红的线）
 
@@ -53,6 +61,8 @@ GROUPS = [
         ("e_end", "换向点外的制动余量", "Braking room beyond the reversal point", "mm", 50, 10, 200, 5),
     ]),
     ("piece", "衣片（17.6、17.8 节）", "Garment piece (17.6, 17.8)", [
+        ("src", "花型从哪里来", "Where the pattern comes from", "", "manual", None, None, None),
+        ("vx", "翻针横列机头速度（有意匠图时用；示例值）", "Carriage speed on transfer courses (with a design; example)", "m/s", 0.4, 0.1, 2.0, 0.05),
         ("N", "衣片针数", "Needles in the piece", "", 275, 20, 1200, 1),
         ("pcs", "并排织几片", "Pieces side by side", "", 1, 1, 6, 1),
         ("gap", "并排时片间空针", "Empty needles between pieces", "", 10, 0, 50, 1),
@@ -88,8 +98,130 @@ CHOICES = {
     "comp": [("none", "不补偿", "None"), ("fixed", "固定提前量（按最高速度整定）", "Fixed lead (tuned at top speed)"),
              ("realtime", "按实时速度", "Real-time speed")],
     "fashion": [("pieces", "织衣片 + 套口", "Pieces + linking"), ("whole", "全成型（隔针编织）", "Whole garment (alternate needles)")],
+    "src": [("manual", "手填横列构成（罗纹、提花、收针翻针）", "By hand (rib, jacquard, transfer courses)"),
+            ("file", "上传意匠图（文字表 / 色码图）", "Upload a design (text table / colour chart)")],
 }
-PARAMS, DEFAULTS, clean = make_params(GROUPS, CHOICES)
+PARAMS, DEFAULTS, _clean = make_params(GROUPS, CHOICES)
+
+
+def clean(p):
+    """参数整理；“花型从哪里来”选上传时，意匠图原样留着（knit：文字表原文；kpng：色码图 base64），项目里一起存。
+    选手填时不存意匠图；太大照留一个标记，算的时候亮红灯"""
+    out = _clean(p)
+    raw = p or {}
+    if out["src"] == "file":
+        for k in ("knit", "kpng"):
+            v = raw.get(k)
+            if isinstance(v, str) and v:
+                if len(v) <= KP.MAX_TEXT:
+                    out[k] = v
+                else:
+                    out["file_big"] = True
+                if isinstance(raw.get("fname"), str):
+                    out["fname"] = raw["fname"][:120]
+                break
+        if not (out.get("knit") or out.get("kpng") or out.get("file_big")):
+            out["src"] = "manual"
+    return out
+
+
+_CACHE = OrderedDict()       # 读过的意匠图：sha1 → (意匠图, 编译结果, 统计)；只留最近几个，计算在线程里跑，要加锁
+_CACHE_N = 4
+_LOCK = threading.Lock()
+_PASSES = OrderedDict()      # (sha1, 系统数) → 合并以后的趟
+
+
+def _key(p):
+    return hashlib.sha1((p.get("knit") or p.get("kpng") or "").encode()).hexdigest()
+
+
+def design_file(p):
+    """有意匠图时返回 (意匠图, 编译结果, 统计)；没有返回 None；读不出来抛 KnitFileError"""
+    if p.get("src") != "file":
+        return None
+    if p.get("file_big"):
+        raise KP.KnitFileError("意匠图文件太大，请拆开或缩小。", "The design file is too large; split or reduce it.")
+    key = _key(p)
+    with _LOCK:
+        hit = _CACHE.get(key)
+    if hit is None:
+        rows = KP.load(p.get("knit"), p.get("kpng"))
+        C = KP.compile(rows)
+        hit = (rows, C, KP.stats(rows, C))
+        with _LOCK:
+            _CACHE[key] = hit
+            while len(_CACHE) > _CACHE_N:
+                _CACHE.popitem(last=False)
+    return hit
+
+
+def merged_passes(p, C):
+    """program_passes 的结果按 (意匠图, 系统数) 缓存（一次计算要算几十个方案，趟本身不变）"""
+    k = (_key(p), int(round(p["sys"])))
+    with _LOCK:
+        hit = _PASSES.get(k)
+    if hit is None:
+        hit = program_passes(p, C)
+        with _LOCK:
+            _PASSES[k] = hit
+            while len(_PASSES) > 3 * _CACHE_N:
+                _PASSES.popitem(last=False)
+    return hit
+
+
+def program_passes(p, C):
+    """编译结果 → 实际的趟。单系统就是编译出来的横列（和虚拟实验 17-2 一样）。
+    多系统时一个意匠行的编织横列按系统数合进一趟（宽度取并集，同 17.8 节的折算），这一行的空行不要了
+    （几个系统各带一个纱嘴，编译器能把纱嘴排到同一边）；翻针各一趟"""
+    cs = C["courses"]
+    ns = int(round(p["sys"]))
+    if ns <= 1:
+        return [dict(c, carriers=[c["carrier"]] if c["type"] == "knit" else []) for c in cs]
+    out, i = [], 0
+    while i < len(cs):
+        row = cs[i]["row"]
+        j = i
+        while j < len(cs) and cs[j]["row"] == row:
+            j += 1
+        grp = cs[i:j]
+        out += [dict(c, carriers=[]) for c in grp if c["type"] == "xfer"]
+        knit = [c for c in grp if c["type"] == "knit"]
+        for k in range(0, len(knit), ns):
+            g = knit[k:k + ns]
+            out.append(dict(type="knit", row=row, lo=min(x["lo"] for x in g), hi=max(x["hi"] for x in g), carriers=[x["carrier"] for x in g],
+                            dir=g[0]["dir"], rack=0))
+        if not knit:
+            out += [dict(c, carriers=[]) for c in grp if c["type"] == "empty"]
+        i = j
+    return out
+
+
+def pass_width(p, n_needles):
+    """这一趟织物上的宽度（mm）：几片并排时连同片间空针；全成型隔针编织占两倍的针"""
+    n = n_needles * p["pcs"] + p["gap"] * (p["pcs"] - 1)
+    return n * pitch(p["E"]) * (2 if p["fashion"] == "whole" else 1)
+
+
+def program_time(p):
+    """有意匠图：逐趟算行程和用时。返回 None（没有文件）或 dict(passes=[(类型, 行程 mm, 速度, 用时 s)], t=总时间 s, ...)"""
+    df = design_file(p)
+    if df is None:
+        return None
+    rows, C, st = df
+    c = margin(p)
+    out, memo = [], {}
+    for q in merged_passes(p, C):
+        key = (q["type"] == "xfer", q["hi"] - q["lo"] + 1)
+        if key not in memo:                         # 同样宽、同类的趟只算一次速度规律
+            w = pass_width(p, key[1])
+            D = w + p["Lk"] * p["sys"] + 2 * c
+            v = min(p["vx"], p["v"]) if key[0] else p["v"]
+            memo[key] = (D, v, profile(D, v, p["a"])[3] + p["dwell"])
+        D, v, t = memo[key]
+        out.append((q["type"], D, v, t, q["row"]))
+    k = p["kwhole"] if p["fashion"] == "whole" else 1
+    t = sum(x[3] for x in out) * k
+    return dict(passes=out, t=t, n=len(out) * k, stats=st, C=C, rows=rows)
 
 
 def pitch(E):
@@ -103,9 +235,15 @@ def margin(p):
 
 
 def width(p):
-    """织物宽度（mm）：几片并排时连同片间空针；全成型隔针编织，同样针数的织物要占两倍的针"""
-    n = p["N"] * p["pcs"] + p["gap"] * (p["pcs"] - 1)
-    return n * pitch(p["E"]) * (2 if p["fashion"] == "whole" else 1)
+    """织物宽度（mm）：几片并排时连同片间空针；全成型隔针编织，同样针数的织物要占两倍的针。有意匠图时针数取意匠图的宽"""
+    N = p["N"]
+    if p.get("src") == "file":
+        try:
+            df = design_file(p)
+            N = df[2]["W"] if df else N
+        except KP.KnitFileError:
+            pass
+    return pass_width(p, N)
 
 
 def passes(p):
@@ -176,6 +314,19 @@ def drive(p, Jm=None, TmR=None, TmP=None):
     D, t = pass_time(p)
     vp, ta, tc, _ = profile(D, v, a)
     Trms = math.sqrt((Ta ** 2 * ta + Tdc ** 2 * ta + Tc ** 2 * tc) / t)
+    PT = None
+    if p.get("src") == "file":
+        try:
+            PT = program_time(p)
+        except KP.KnitFileError:
+            PT = None
+    if PT is not None and PT["passes"]:                # 有意匠图：按每一趟（宽窄、翻针降速）加权求均方根——窄趟换向多，发热大
+        acc = tot = 0.0
+        for _, Dq, vq, tq, _ in PT["passes"]:
+            _, ta_q, tc_q, _ = profile(Dq, vq, a)
+            acc += Ta ** 2 * ta_q + Tdc ** 2 * ta_q + Tc ** 2 * tc_q
+            tot += tq
+        Trms = math.sqrt(acc / tot)
     rpm = vp / r * i * 60 / (2 * math.pi)
     return dict(m=m, F=m * a + p["Ff"], Tpk=max(Ta, Tdc), Trms=Trms, rpm=rpm, i_opt=r * math.sqrt(m / Jm) if Jm > 0 else None)
 
@@ -196,8 +347,17 @@ def t_at(x_mm, D_mm, v, a):
 def production(p, **over):
     q = dict(p, **over)
     D, t = pass_time(q)
-    n = passes(q)
-    t_piece = n * t / q["pcs"]
+    try:
+        PT = program_time(q) if q.get("src") == "file" else None
+    except KP.KnitFileError:                           # 坏图：退回手填折算（analyze 里亮红灯）
+        PT = None
+    if PT is not None and PT["n"]:
+        n = PT["n"]
+        t = PT["t"] / n                                 # 平均一趟
+        t_piece = PT["t"] / q["pcs"]
+    else:
+        n = passes(q)
+        t_piece = n * t / q["pcs"]
     return dict(D=D, t_pass=t, passes=n, t_piece=t_piece, per_day=q["hours"] * 3600 * q["eff"] / t_piece)
 
 
@@ -229,6 +389,16 @@ def analyze(params=None, trial=True):
     p = clean(params)
     for k in ("E", "sys", "seg", "N", "pcs", "gap", "rib", "jac", "col", "xfer"):
         p[k] = int(round(p[k]))
+    ferr, df = None, None
+    try:
+        df = design_file(p)
+    except KP.KnitFileError as e:                    # 文件坏了：照手填算，红灯说明
+        ferr = e
+        p["src"] = "manual"
+        for k in ("knit", "kpng", "file_big"):
+            p.pop(k, None)
+    if df is not None:
+        p["N"] = df[2]["W"]                          # 衣片针数取意匠图的宽
     pm = pitch(p["E"])
     v, a = p["v"], p["a"]
     tn = pm / v                                   # ms：mm / (m/s)
@@ -247,6 +417,25 @@ def analyze(params=None, trial=True):
     DR = drive(p)
     G = garment(p)
     ch = Checks()
+    if ferr is not None:
+        ch.add("file", "piece", "意匠图读得出来", "The design can be read", (ferr.zh, ferr.en), ("文字表或提花色码图（PNG）", "text table or colour chart (PNG)"),
+               "bad", 17, "文字表每格 K P T > < . 加颜色号 1–6，一行一个意匠行（第一行先织）；色码图一个像素一枚针一行、最多 6 种颜色。"
+               "制版软件自己的格式请导出成这两种。",
+               "A text table has K P T > < . with colour 1–6, one design row per line (first line knitted first); a colour chart has one pixel per needle "
+               "and row, at most 6 colours. Export your digitising software's own format to one of these.")
+    if df is not None:
+        C = df[1]
+        errs = [m for m in C["msgs"] if m["t"] == "err"]
+        warns = [m for m in C["msgs"] if m["t"] == "warn"]
+        ch.add("program", "piece", "意匠图编译（空针翻针、摇床行程、移出针床）", "Design compiles (transfer from empty needle, racking, off the bed)",
+               (f"{len(errs)} 处错误" + (f"：{errs[0]['zh']}" if errs else ""), f"{len(errs)} errors" + (f": {errs[0]['en']}" if errs else "")),
+               ("没有错误", "no errors"), "bad" if errs else "ok", 17,
+               "这些错误上了机就是撞针和废片（17.6 节）：改意匠图——翻针前那枚针要先织上线圈，摇床不超过 ±4 针，收放针不要移出针床。",
+               "On the machine these are needle crashes and scrap (17.6): fix the design — knit a loop before transferring it, rack at most ±4, "
+               "keep moves on the bed.")
+        if warns:
+            ch.add("tuck", "piece", "连续集圈不超过 4 行", "At most 4 tucks in a row", (f"{len(warns)} 处：{warns[0]['zh']}", f"{len(warns)}: {warns[0]['en']}"),
+                   "≤ 4", "warn", 17, "连续集圈太多，线圈挂不住、容易破洞：中间插一行编织。", "Too many tucks in a row hold badly and tear: knit a course in between.")
     ch.add("sel_time", "select", "每枚针的选针时间够选针器动作", "Time per needle covers the selector cycle",
            (f"t_n = {tn:.2f} ms；周期 {p['Tc']:.2f} ms / {p['seg']} 段", f"t_n = {tn:.2f} ms; cycle {p['Tc']:.2f} ms / {p['seg']} segments"),
            ("t_n ≥ T_c / 段数", "t_n ≥ T_c / segments"), "ok" if tn >= p["Tc"] / p["seg"] - 1e-9 else "bad", 17,
@@ -285,13 +474,23 @@ def analyze(params=None, trial=True):
     ch.add("m_rpm", "drive", "机头电机转速", "Carriage motor speed", f"{DR['rpm']:.0f} r/min", f"≤ {p['Nm']:.0f} r/min",
            "ok" if DR["rpm"] <= p["Nm"] else "bad", 17, "减速比或带轮太小：加大带轮半径或减小减速比。", "Reduction too high or pulley too small: larger pulley or less reduction.")
     tpiece = PR["t_piece"]
-    results = [
+    PT = program_time(p) if df is not None else None
+    results = []
+    if PT is not None:
+        st = PT["stats"]
+        results += [
+            result("意匠图：针 × 行、颜色", "Design: needles × rows, colours", f"{st['W']} × {st['H']}、{st['colors']} 色", ""),
+            result("编译后的趟数：编织 / 翻针 / 空行（多系统合并后）", "Passes: knitting / transfer / empty (after merging systems)",
+                   "{} / {} / {}".format(*[sum(x[0] == t for x in PT["passes"]) for t in ("knit", "xfer", "empty")]), ""),
+            result("最宽 / 最窄一趟行程", "Longest / shortest pass travel", f"{max(x[1] for x in PT['passes']):.0f} / {min(x[1] for x in PT['passes']):.0f}", "mm"),
+        ]
+    results += [
         result("针距 / 每枚针的选针时间", "Pitch / time per needle", f"{pm:.2f} mm / {tn:.2f} ms"),
         result("选针器允许的机头最高速度", "Top carriage speed the selector allows", f"{vmax_sel:.2f}", "m/s"),
         result("不补偿时全速的选针滞后", "Lag at full speed without compensation", f"{v * p['Td'] / pm:.2f}", "p"),
         result("换向余量 c（v²/2a = {:.0f} mm）".format(v * v / (2 * a) * 1000), "Reversal margin c (v²/2a = {:.0f} mm)".format(v * v / (2 * a) * 1000), f"{c:.0f}", "mm"),
         result("织物宽度 / 一趟行程", "Fabric width / travel per pass", f"{w:.0f} / {D:.0f}", "mm"),
-        result("一趟用时", "Time per pass", f"{t1:.2f}", "s"),
+        result("一趟用时" + ("（平均）" if PT is not None else ""), "Time per pass" + (" (average)" if PT is not None else ""), f"{t1:.2f}", "s"),
         result("趟数 / 一片用时", "Passes / time per piece", f"{PR['passes']:.0f} / {tpiece / 60:.1f}", "min"),
         result("每天片数（开机 {:g} h、效率 {:.0%}）".format(p["hours"], p["eff"]), "Pieces per day ({:g} h, {:.0%})".format(p["hours"], p["eff"]), f"{PR['per_day']:.0f}"),
         result("摇床用时 / 急停距离", "Racking time / emergency stop distance", f"{tr * 1000:.0f} ms / {s_brake:.0f} mm"),
@@ -322,9 +521,18 @@ def analyze(params=None, trial=True):
                    [("一片用时", "per piece", "#2d6fb3", [production(dict(p, v=x))["t_piece"] / 60 for x in vs])], xr=[0.4, 2.0],
                    xl=("机头最高速度 m/s", "Carriage top speed, m/s")),
     ]
+    if PT is not None:
+        ts = [x[3] for x in PT["passes"]]
+        K = 600
+        step = max(1, -(-len(ts) // K))
+        idx = list(range(1, len(ts) + 1, step))
+        charts.insert(0, line_chart("passes", "每一趟的用时（s）", "Time of each pass (s)", idx,
+                                    [("这一趟", "this pass", "#2d6fb3", [round(max(ts[i - 1:i - 1 + step]), 3) for i in idx])],
+                                    xr=[1, max(2, len(ts))], xl=("第几趟", "Pass no.")))
+        charts.insert(0, knit_view(PT["rows"], PT["C"]))
     # 一趟的时间分配（时序条用 0–360 表示一趟的 0–100%）
     vp, ta, tcst, _ = profile(D, v, a)
-    k = 360 / t1
+    k = 360 / pass_time(p)[1]                      # 时序条画最宽的一趟（有意匠图时 t1 是平均一趟）
     a1, a2, a3 = ta * k, (ta + tcst) * k, (2 * ta + tcst) * k
     x_in, x_out = t_at(c, D, v, a) * k, t_at(c + w, D, v, a) * k
     timing = [dict(key="acc", zh="加速", en="Accelerate", a=0, b=round(a1, 1)),
@@ -333,7 +541,19 @@ def analyze(params=None, trial=True):
               dict(key="knit", zh="经过织物（选针、编织）", en="Over the fabric (selecting, knitting)", a=round(min(x_in, 359), 1), b=round(min(x_out, 360), 1)),
               dict(key="dwell", zh="换向停顿（摇床、纱嘴）", en="Reversal dwell (racking, carriers)", a=round(a3, 1), b=360)]
     timing = [t for t in timing if t["b"] - t["a"] > 0.05]       # 行程太短到不了最高速度时没有“全速”段；没有停顿就不画停顿
-    tables = [
+    tables = []
+    if PT is not None:
+        TY = {"knit": ("编织", "knit"), "xfer": ("翻针", "transfer"), "empty": ("空行", "empty")}
+        prog = merged_passes(p, PT["C"])
+        rows_t, acc = [], 0.0
+        for q, (ty, Dq, vq, tq, rw) in list(zip(prog, PT["passes"]))[:40]:
+            acc += tq
+            rows_t.append([str(rw), q["dir"], (TY[ty][0], TY[ty][1]), "、".join(str(c) for c in q["carriers"]) or "—",
+                           f"{q['rack']:+d}" if q["rack"] else "0", f"{q['lo'] + 1}–{q['hi'] + 1}", f"{Dq:.0f}", f"{vq:g}", f"{tq:.2f}", f"{acc:.1f}"])
+        tables.append(dict(key="program", zh="编译后的机头动作（前 40 趟）", en="Compiled carriage passes (first 40)",
+                           head=[("意匠行", "Row"), ("方向", "Dir."), ("类型", "Type"), ("纱嘴", "Carriers"), ("摇床", "Rack"), ("针", "Needles"),
+                                 ("行程 mm", "Travel mm"), ("速度 m/s", "Speed m/s"), ("用时 s", "Time s"), ("累计 s", "Total s")], rows=rows_t))
+    tables += [
         dict(key="variants", zh="改进方案对照（教材 17.8 节，按当前参数重算）", en="Improvement options (textbook 17.8, recomputed)",
              head=[("方案", "Option"), ("一趟 s", "Pass s"), ("趟数", "Passes"), ("一片 min", "Piece min"), ("比当前", "vs now"), ("红灯", "Red")],
              rows=[[(zh, en), f"{r['t_pass']:.2f}", f"{r['passes']:.0f}", f"{r['t_piece'] / 60:.1f}", f"{(r['t_piece'] / tpiece - 1) * 100:+.0f}%",
@@ -344,9 +564,27 @@ def analyze(params=None, trial=True):
              rows=[[("织衣片 + 套口", "Pieces + linking"), f"{G['knit_pieces']:.0f}", f"{G['link']:.0f}", f"{G['total_pieces']:.0f}", f"E{p['E']}"],
                    [("全成型（隔针编织）", "Whole garment (alternate needles)"), f"{G['knit_whole']:.0f}", "0", f"{G['total_whole']:.0f}", f"E{G['E_eff']:g}"]]),
     ]
-    return dict(version=VERSION, machine=MACHINE, params=p, checks=list(ch), ok=not any(x["state"] == "bad" for x in ch),
-                results=results, charts=charts, timing=timing, timing_x="pass", parts=parts(p, DR), card=adjust_card(p), tables=tables,
-                production=dict(PR, t_piece_min=tpiece / 60), drive=DR, garment=G, view=dict(page="model-flatknit", sync="", cfg={}))
+    out = dict(version=VERSION, machine=MACHINE, params={k: v for k, v in p.items() if k not in ("knit", "kpng")}, checks=list(ch),
+               ok=not any(x["state"] == "bad" for x in ch),
+               results=results, charts=charts, timing=timing, timing_x="pass", parts=parts(p, DR), card=adjust_card(p), tables=tables,
+               production=dict(PR, t_piece_min=tpiece / 60), drive=DR, garment=G, view=dict(page="model-flatknit", sync="", cfg={}))
+    if PT is not None:
+        out["design"] = dict(PT["stats"], fname=p.get("fname", ""), t_piece=round(tpiece / 60, 2))
+    return out
+
+
+KCOL = ["#ffffff", "#2d6fb3", "#e0a030", "#2e9e6a", "#c0392b", "#7b4fb3", "#1a9aa8"]
+
+
+def knit_view(rows, C, limit=30000):
+    """意匠图预览：每格一种颜色（纱嘴），后编、集圈、翻针的格子淡一些；红框是编译出错（和连续集圈）的格子。太大时隔行隔针抽样"""
+    H, W = len(rows), len(rows[0])
+    k = 1
+    while (H // k + 1) * (W // k + 1) > limit:
+        k += 1
+    grid = ["".join((s if s != "." else ".") + str(c) for s, c in row[::k]) for row in rows[::k]]
+    return dict(key="design", kind="knitgrid", zh="意匠图（第一行在最下面；红框是编译错误、连续集圈）", en="Design (first row at the bottom; red = compile errors, tuck runs)",
+                grid=grid, step=k, W=W, H=H, colors=KCOL, err=[[r, i] for r, i in C["err_cells"][:500]])
 
 
 def _bad(q):

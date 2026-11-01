@@ -215,6 +215,12 @@ def register(app, m) -> None:
         from .sewcore import emb_samples
         return {"name": "wq-logo.dst", "dst": base64.b64encode(emb_samples.logo_dst()).decode()}
 
+    @app.get("/api/v1/sewing/flatknit/sample")
+    async def flatknit_sample():
+        """第 70 轮：示例意匠图（程序生成的提花前片，240 针 × 460 行，罗纹、两色提花、袖窿收针），网页“用示例意匠图”"""
+        from .sewcore import knit_samples
+        return {"name": "wq-front.csv", "knit": knit_samples.front_text()}
+
     PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-pattern", "embroid", "model-flatknit"}
 
     @app.get("/api/v1/sewing/proto")
@@ -400,6 +406,7 @@ def workbench_zip() -> bytes:
         for f in ("__init__.py", "common.py", "kit.py", "design.py", "overlock.py", "cover.py", "pattern.py", "embroid.py", "flatknit.py", "machines.py", "cad.py",
                   "ebox.py",                                      # 第 62 轮：电控箱
                   "stitchfile.py",                                # 第 69 轮：刺绣花样文件
+                  "knitprog.py",                                  # 第 70 轮：横机意匠图
                   "cae_setup.py"):                                  # 第 49 轮：本机有限元算例（wqsew_fem）和网页版同一份工况
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")

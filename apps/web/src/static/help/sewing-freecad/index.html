@@ -138,13 +138,14 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="sub" href="#case-pt-output" data-s="case-pt">第三步　能多出几件？</a>
 <a class="sub" href="#case-pt-template" data-s="case-pt">第四步　模板槽板：花样变成一块铣出来的板</a>
 <a href="#case-fk" data-s="case-fk"><span class="n">08</span>案例五　电脑横机：一片前片要织多久</a>
-<a class="sub" href="#case-fk-select" data-s="case-fk">第一步　选针跟得上吗</a>
-<a class="sub" href="#case-fk-pass" data-s="case-fk">第二步　一趟的时间花在哪</a>
-<a class="sub" href="#case-fk-options" data-s="case-fk">第三步　三个改进方向</a>
-<a class="sub" href="#case-fk-opt" data-s="case-fk">第四步　设计优化：几样一起改</a>
-<a class="sub" href="#case-fk-cae" data-s="case-fk">第五步　电机和针床</a>
-<a class="sub" href="#case-fk-more" data-s="case-fk">第六步　几片并排、全成型</a>
-<a class="sub" href="#case-fk-7" data-s="case-fk">出件</a>
+<a class="sub" href="#case-fk-file" data-s="case-fk">第一步　上传意匠图</a>
+<a class="sub" href="#case-fk-select" data-s="case-fk">第二步　选针跟得上吗</a>
+<a class="sub" href="#case-fk-pass" data-s="case-fk">第三步　一趟的时间花在哪</a>
+<a class="sub" href="#case-fk-options" data-s="case-fk">第四步　三个改进方向</a>
+<a class="sub" href="#case-fk-opt" data-s="case-fk">第五步　设计优化：几样一起改</a>
+<a class="sub" href="#case-fk-cae" data-s="case-fk">第六步　电机和针床</a>
+<a class="sub" href="#case-fk-more" data-s="case-fk">第七步　几片并排、全成型</a>
+<a class="sub" href="#case-fk-8" data-s="case-fk">出件</a>
 <a href="#case-eb" data-s="case-eb"><span class="n">09</span>案例六　电控箱：夏天频繁报过热</a>
 <a class="sub" href="#case-eb-current" data-s="case-eb">第一步　电流从设计来</a>
 <a class="sub" href="#case-eb-summer" data-s="case-eb">第二步　夏天的车间</a>
@@ -366,6 +367,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>网页版“导出 → 参数文件”得到 <code>.wqsew.json</code>，FreeCAD 里选中同机型的设计点“导入参数”，68 项校核的结论和数值完全相同。</li>
 <li>FreeCAD 里“导出参数”得到同样格式的文件，存档或交给同事在 FreeCAD 里导入；网页版目前没有导入参数文件的入口。</li>
 <li>花样机上传的针位表存在设计对象的 <code>PatternPoints</code> 属性里，随参数文件一起带。</li>
+<li>横机的意匠图（第 70 轮）：属性“花型从哪里来”（<code>P_src</code>）选 file，“花样”一栏的 <code>StitchFile</code> 选意匠图文字表（CSV / TXT）或提花色码图（PNG），Ctrl+R 重算。</li>
 <li>刺绣机的花样文件（第 69 轮）：属性“花样从哪里来”（<code>P_src</code>）选 file，“花样”一栏的 <code>StitchFile</code> 选 DST 或 CSV 针位表，Ctrl+R 重算——针数、最长针、换色从文件来，每一针按自己的长度调速。从网页版导出的参数文件带着花样，导入后接着算。</li>
 </ul>
 <a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=lockstitch&amp;tab=checks" target="_blank" rel="noopener">▶ 试一试：在网页版打开同样的教材算例（对照结果）</a>
@@ -414,10 +416,10 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tr>
 <tr>
 <td><a href="#case-fk">五　电脑横机：一片前片要织多久</a></td>
-<td>选针跟不跟得上；提速、加系统、实时补偿哪个划算</td>
+<td>按制版师的意匠图算一片用时；提速、加系统、实时补偿哪个划算</td>
 <td>选针（提前量补偿）、机头往复</td>
-<td>（无三维零件）改进方案表</td>
-<td>校核、设计优化、伺服选型、针床模态、全成型对比</td>
+<td>（无三维零件）意匠图编译、改进方案表</td>
+<td>上传意匠图、校核、设计优化、伺服选型、针床模态、全成型对比</td>
 </tr>
 <tr>
 <td><a href="#case-eb">六　电控箱：夏天频繁报过热</a></td>
@@ -901,20 +903,30 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 
 <p>自家的花样在“基本参数”的花样里选“上传的针位表”，传一个 CSV（每行一针：x, y，mm；最多 3000 针），转速上限、前瞻调速、产能、模板全部按你的花样重算。</p>
 <p>FreeCAD 里“新建花样机设计”能算离布窗口、转速上限、前瞻调速、X / Y 伺服与同步带（没有三维零件）；伺服电机选型、模板数控在网页版。</p></section>
-<section id="case-fk"><h2><span class="n">08</span>案例五　电脑横机：一片前片要织多久</h2><p class="lead">选针跟不跟得上 → 一趟的时间花在哪 → 三个改进方向 → 设计优化 → 电机和针床 → 几片并排、全成型。</p><p><strong>实际问题</strong>：毛衫厂用 E12 电脑横机织一件提花毛衣的前片（275 针，罗纹 120 横列、两色提花 300 个意匠行、收针翻针 40 横列），一片要 11.4 分钟。老板想快一点：机头提速？换机器？加系统？——这就是教材第 17 讲 17.8 节的设计实例，软件的默认参数就是它。</p>
-<h3 id="case-fk-select">第一步　选针跟得上吗</h3>
+<section id="case-fk"><h2><span class="n">08</span>案例五　电脑横机：一片前片要织多久</h2><p class="lead">上传意匠图 → 选针跟不跟得上 → 一趟的时间花在哪 → 三个改进方向 → 设计优化 → 电机和针床 → 几片并排、全成型。</p><p><strong>实际问题</strong>：毛衫厂接了一款提花毛衣，制版师已经画好前片的意匠图：240 针，1+1 罗纹起口 40 行，两色菱形提花，袖窿两边各收 15 针，共 460 个意匠行（示例，程序生成；<a href="../media/case-fk-front.csv" download>下载这张意匠图</a>，软件里点“用示例意匠图”也是它）。E12 电脑横机织一片要多久？老板想快一点：机头提速？换机器？加系统？——这是教材第 17 讲 17.6 节（花型编程）和 17.8 节（设计实例）连起来的一个例子。</p>
+<h3 id="case-fk-file">第一步　上传意匠图</h3>
+<ol class="steps">
+<li>打开电脑横机。“衣片”一组里“花型从哪里来”选“上传意匠图（文字表 / 色码图）”，点“上传意匠图”选你的文件，或者点“用示例意匠图”。文字表和教材虚拟实验 17-2 同一套符号（K 前编、P 后编、T 集圈、> 右移、< 左移、. 不织，后跟颜色号）；实验 17-2 里画的图点“导出意匠图（CSV）”就能拿来。</li>
+<li>软件按虚拟实验 17-2 的编译器把每个意匠行编成机头的趟：898 趟，其中编织 705、翻针 45（每次收针三趟：两边的边针先从前床翻到后床；摇床 +1 针，左边那枚翻回前床；摇床 −1 针，右边那枚翻回前床）、空行 148（纱嘴停在另一头，机头空走一趟去接它）；没有编译错误。“衣片针数”“罗纹横列”等手填的几项不再用。</li>
+<li>每一趟按这一趟实际用到的针算行程（收针以后行变窄），翻针横列按“翻针横列机头速度”（示例值 0.4 m/s，17.6 节：翻针横列要降速）：一片 <b>12.63 分钟</b>。“时序与曲线”页签有意匠图预览和每一趟的用时，“零件与制造”页签有编译后的机头动作表（前 40 趟）。</li>
+</ol>
+
+<p><strong>和手填比</strong>：同一件前片按手填横列构成折算（罗纹 40、提花 420 行 × 2 色、收针翻针 45，每趟都按整幅宽、全速）是 925 趟、12.92 分钟，按意匠图反而快一点。有快有慢：菱形花之间有不少行只用一种颜色，一趟就织完，编织趟只有 705，不是手填的 40 + 420 × 2；收针以后的行窄了；可手填不知道有 148 趟空行，翻针还要降速（全按 1.2 m/s 算是 12.12 分钟）。哪样多哪样少，只有按真花型逐趟算才知道。</p>
+<a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=flatknit&amp;tab=checks&amp;p=%7B%22src%22%3A%22file%22%7D" target="_blank" rel="noopener">▶ 试一试：E12 横机、示例意匠图：一片多久</a>
+<p>（“试一试”打开后点“用示例意匠图”。）</p>
+<h3 id="case-fk-select">第二步　选针跟得上吗</h3>
 <p>机头经过针床时，每枚针只有很短的时间让选针器决定“织还是不织”。</p>
 <ol class="steps">
-<li>打开电脑横机（默认参数 = 教材 17.8 节）。“校核”页签 10 项全部合格；第一项“每枚针的选针时间”：t_n = 1.76 ms；周期 1.20 ms / 1 段，选针器吸合—释放一次 1.2 ms，来得及。</li>
+<li>“校核”页签 11 项全部合格；第一项“每枚针的选针时间”：t_n = 1.76 ms；周期 1.20 ms / 1 段，选针器吸合—释放一次 1.2 ms，来得及。</li>
 <li>“基本参数”里机号改成 <b>18</b>（针距 1.41 mm）：t_n = 1.18 ms；周期 1.20 ms / 1 段——红灯。机号越高、机头越快，每枚针的时间越短。</li>
 <li>两个办法：机头降到 1.17 m/s 以下；或“选针”一组里“选针器段数”改成 <b>2</b>（相邻的针分给两段去选，每段的时间放大一倍）——全部合格。</li>
 <li>改回 E12。“提前量补偿”改成<b>不补偿</b>：选针位置误差 0.34 个针距（要求 ≤ 0.25 个针距），红灯——选针器从接到指令到动作有 0.6 ms 延迟，全速时机头已经走过了三分之一个针距。“时序与曲线”页签的“选针位置误差”图把三种补偿方式放在同一个换向余量（下限 20 mm）上比：不补偿一直滞后；固定提前量在全速区准，换向后还在加速的那一段超前（教材图 17-4）；按实时速度一直准。</li>
 </ol>
 
 <a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=flatknit&amp;tab=checks&amp;p=%7B%22E%22%3A18%7D" target="_blank" rel="noopener">▶ 试一试：E18 横机：选针器跟不上</a>
-<h3 id="case-fk-pass">第二步　一趟的时间花在哪</h3>
-<p>“时序与曲线”页签的“机头一趟的时间分配”：一趟 0.90 秒、行程 876 mm，真正在织物上选针、编织的只占 <b>54%</b>，其余是加速、减速、走换向余量和换向停顿（摇床、换纱嘴）。“固定提前量”要求机头在经过第一枚针之前就到全速，所以两端各要留 v²/(2a) = 72 mm 的换向余量。一片 760 趟，11.4 分钟。</p>
-<h3 id="case-fk-options">第三步　三个改进方向</h3>
+<h3 id="case-fk-pass">第三步　一趟的时间花在哪</h3>
+<p>“时序与曲线”页签的“机头一趟的时间分配”画的是最宽的一趟（行程 802 mm；所有趟平均 0.84 秒），真正在织物上选针、编织的只占 <b>50%</b>，其余是加速、减速、走换向余量和换向停顿（摇床、换纱嘴）。“固定提前量”要求机头在经过第一枚针之前就到全速，所以两端各要留 v²/(2a) = 72 mm 的换向余量。</p>
+<h3 id="case-fk-options">第四步　三个改进方向</h3>
 <p>“零件与制造”页签的“改进方案对照”把教材 17.8 节的几个方向按当前参数重算：</p>
 <table>
 <thead>
@@ -930,65 +942,65 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <tbody>
 <tr>
 <td>当前设计</td>
-<td>0.90</td>
-<td>760</td>
-<td>11.4</td>
+<td>0.84</td>
+<td>898</td>
+<td>12.6</td>
 <td>+0%</td>
 <td>0</td>
 </tr>
 <tr>
 <td>按实时速度补偿（换向余量减到下限）</td>
-<td>0.81</td>
-<td>760</td>
-<td>10.3</td>
-<td>-10%</td>
+<td>0.75</td>
+<td>898</td>
+<td>11.2</td>
+<td>-11%</td>
 <td>0</td>
 </tr>
 <tr>
 <td>加一个系统（2 系统，几色同一趟织）</td>
-<td>1.03</td>
-<td>460</td>
-<td>7.9</td>
-<td>-31%</td>
+<td>1.01</td>
+<td>505</td>
+<td>8.5</td>
+<td>-33%</td>
 <td>0</td>
 </tr>
 <tr>
 <td>机头提速到 1.6 m/s</td>
-<td>0.83</td>
-<td>760</td>
-<td>10.5</td>
-<td>-8%</td>
+<td>0.81</td>
+<td>898</td>
+<td>12.1</td>
+<td>-4%</td>
 <td>0</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><strong>按实时速度补偿</strong>：加速中的针也能选准，换向余量从 72 mm 减到 20 mm，每趟少走 104 mm。</li>
-<li><strong>加一个系统</strong>：两色提花一趟织完，趟数从 760 减到 460——减的是趟数，收益最大。</li>
-<li><strong>提速 1/3</strong>：一片只快 8%——加减速时间和换向余量（固定提前量时 v²/2a 从 72 mm 涨到 128 mm）都随速度涨。</li>
+<li><strong>按实时速度补偿</strong>：加速中的针也能选准，换向余量从 72 mm 减到 20 mm，每趟少走 104 mm——趟数越多（898 趟），省得越多。</li>
+<li><strong>加一个系统</strong>：两色提花一趟织完，空行也不用了，趟数从 898 减到 505——减的是趟数，收益最大。</li>
+<li><strong>提速 1/3</strong>：一片只快 4%——加减速时间和换向余量（固定提前量时 v²/2a 从 72 mm 涨到 128 mm）都随速度涨。</li>
 </ul>
 <p>和案例四花样机一样：慢，往往不在最显眼的那个速度上。</p>
-<h3 id="case-fk-opt">第四步　设计优化：几样一起改</h3>
+<h3 id="case-fk-opt">第五步　设计优化：几样一起改</h3>
 <ol class="steps">
-<li>只把“系统数”改成 2、补偿改成“按实时速度”，会出一盏红灯：机头电机发热（均方根转矩） 3.25 N·m（额定 3.18 N·m）——两系统的机头重 55 kg，频繁加减速让电机发热超过额定（峰值转矩还够）。</li>
-<li>“CAE 分析 → 设计优化”，目标“一片用时最短”。软件把三种补偿方式 × 1–3 个系统逐个试，机头速度、加速度在范围里找，选针、摇床、制动、电机都不许出红灯。</li>
-<li>最好的一组：<b>2 个系统、按实时速度补偿、机头 1.55 m/s、加速度 6.5 m/s²</b>，一片 <b>6.77 分钟</b>（快 41%），全部合格，每天约 151 片。加速度反而比原来低、速度比原来高：电机发热（均方根转矩）是这里的瓶颈，少加减速、多跑全速更划算。三个系统不更好：两色提花两个系统已经一趟织完，第三个系统只会让机头更重、三角座更长。</li>
+<li>只把“系统数”改成 2、补偿改成“按实时速度”，会出一盏红灯：机头电机发热（均方根转矩） 3.20 N·m（额定 3.18 N·m）——两系统的机头重 55 kg，频繁加减速让电机发热超过额定（峰值转矩还够）。</li>
+<li>“CAE 分析 → 设计优化”，目标“一片用时最短”。软件把三种补偿方式 × 1–3 个系统逐个试，机头速度、加速度在范围里找，选针、摇床、制动、电机都不许出红灯；有意匠图时每一组都按这张意匠图逐趟算。</li>
+<li>最好的一组：<b>2 个系统、按实时速度补偿、机头 1.5 m/s、加速度 7 m/s²</b>，一片 <b>7.32 分钟</b>（快 42%），全部合格，每天约 139 片。加速度反而比原来低、速度比原来高：电机发热（均方根转矩）是这里的瓶颈，少加减速、多跑全速更划算。三个系统不更好：两色提花两个系统已经一趟织完，第三个系统只会让机头更重、三角座更长。</li>
 </ol>
 
-<a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=flatknit&amp;tab=checks&amp;p=%7B%22sys%22%3A2%2C%22comp%22%3A%22realtime%22%2C%22v%22%3A1.55%2C%22a%22%3A6.5%7D" target="_blank" rel="noopener">▶ 试一试：优化后的横机（2 系统、实时补偿）</a>
-<h3 id="case-fk-cae">第五步　电机和针床</h3>
+<a class="try" href="https://learn.wenquestrobotics.com/pages/sewing/sewing?machine=flatknit&amp;tab=checks&amp;p=%7B%22src%22%3A%22file%22%2C%22sys%22%3A2%2C%22comp%22%3A%22realtime%22%2C%22v%22%3A1.5%2C%22a%22%3A7.0%7D" target="_blank" rel="noopener">▶ 试一试：优化后的横机（2 系统、实时补偿；打开后点“用示例意匠图”）</a>
+<h3 id="case-fk-cae">第六步　电机和针床</h3>
 <ul>
-<li><strong>伺服电机选型</strong>（CAE 分析）：优化后的设计，机头 55 kg、所需推力 398 N。原来的 1 kW 电机均方根离额定只剩 3%，按 1.2 倍余量选型推荐<b>伺服 1.5 kW</b>——和花样机一样，校核按额定（不加余量），选型加了余量，两个都显示。</li>
-<li><strong>针床 / 机架模态</strong>：上传针床 STEP（本例是一根简化的针床梁架在两根立柱上，<a href="../media/case-fk-bed.step" download>下载这个 STEP</a>；实际用你们自己的），材料 HT200。一阶 <b>77 Hz</b>，乘机头加速时间 v/a = 0.24 s 得 18.34，要求 ≥ 1.5：机头一次加速的时间里针床来得及跟上、停稳。教材第 17 讲没有给针床的振动判据，这一条是借用花样机、刺绣机的，只能说明不会跟不上；针踵一枚枚经过三角的频率 v/p（这里约 732 Hz）也要离一阶固有频率远一些。</li>
+<li><strong>伺服电机选型</strong>（CAE 分析）：优化后的设计，机头 55 kg、所需推力 425 N。原来的 1 kW 电机均方根离额定只剩 4%，按 1.2 倍余量选型推荐<b>伺服 1.5 kW</b>——和花样机一样，校核按额定（不加余量），选型加了余量，两个都显示。</li>
+<li><strong>针床 / 机架模态</strong>：上传针床 STEP（本例是一根简化的针床梁架在两根立柱上，<a href="../media/case-fk-bed.step" download>下载这个 STEP</a>；实际用你们自己的），材料 HT200。一阶 <b>77 Hz</b>，乘机头加速时间 v/a = 0.21 s 得 16.48，要求 ≥ 1.5：机头一次加速的时间里针床来得及跟上、停稳。教材第 17 讲没有给针床的振动判据，这一条是借用花样机、刺绣机的，只能说明不会跟不上；针踵一枚枚经过三角的频率 v/p（这里约 709 Hz）也要离一阶固有频率远一些。</li>
 </ul>
-<h3 id="case-fk-more">第六步　几片并排、全成型</h3>
+<h3 id="case-fk-more">第七步　几片并排、全成型</h3>
 <ul>
 <li><strong>并排织</strong>：袖口只有 100 针，单织一只，一趟里织物只占 30%，一只 7.49 分钟；“衣片”一组里“并排织几片”改成 3、“并排时片间空针”改成 0，三只一起织，每只 3.99 分钟（只要单织的 53%）。工厂常在一个针床上同时织几片，就是这个道理（教材第 17 讲习题 7）。</li>
 <li><strong>全成型</strong>（一件下机，不用套口）：“全成型对比”一组，编织方式选“全成型（隔针编织）”。隔针编织只用一半的针：E12 的机器织出来相当于 <b>E6</b> 的密度，要织 E12 密度的全成型衣服得用 E24 的机器；同样针数的织物占两倍针床宽，翻针也多，趟数更多。按示例值，织衣片 + 套口一件 36 + 25 = 61 分钟，全成型上机 90 分钟——全成型省掉的是套口的<b>人工</b>，多花的是<b>机器时间</b>，两种时间的价钱不一样。合不合算要用你们自己的套口工价、机器折旧来算（教材第 29 讲毛衫厂一节）。</li>
 </ul>
-<h3 id="case-fk-7">出件</h3>
+<h3 id="case-fk-8">出件</h3>
 <p>计算书（含改进方案对照、全成型对比）、调机卡（选针提前量标定、摇床对针、线圈长度闭环、纱嘴停放、新花型低速试织，取自教材 17.9“现场要点”）、参数表与曲线（Excel）、参数文件。横机没有三维零件，不出 STEP、DXF。</p>
-<p>FreeCAD 里“新建横机设计”能改参数、看校核和改进方案（没有三维零件）；设计优化、伺服选型、针床模态在网页版。</p></section>
+<p>FreeCAD 里“新建横机设计”能改参数、看校核和改进方案（没有三维零件）；属性“花型从哪里来”（<code>P_src</code>）选 file、“花样”一栏的 <code>StitchFile</code> 选意匠图（CSV / TXT 或 PNG），Ctrl+R 重算，按意匠图逐趟算。设计优化、伺服选型、针床模态在网页版。</p></section>
 <section id="case-eb"><h2><span class="n">09</span>案例六　电控箱：夏天频繁报过热</h2><p class="lead">电流从设计来 → 夏天车间、飞絮 → 改进方案对照 → 清理以后 CAE 复核（自然对流 + 温度场）→ 顶面翅片有没有用 → 写进保养规程。</p><p><strong>实际问题</strong>：案例一的平缝机改到 6000 r/min 卖了一个夏天，几家工厂反映午后频繁显示过热故障码，停一会儿又能用；返修回来的电控箱散热片上糊着一层飞絮。这类车间往往没有空调，午后 38 °C。——这是教材第 18 章 18.7 节的案例，软件“CAE 分析 → 电控箱”的默认参数就是那只 550 W 平缝机伺服电控箱（单相 220 V、铝外壳兼散热器、没有风扇）。</p>
 <h3 id="case-eb-current">第一步　电流从设计来</h3>
 <ol class="steps">
