@@ -1,0 +1,86 @@
+{
+  "title": {
+    "zh": "示例（虚构）：减速器输出轴圆柱滚子轴承（凸度与倾斜）",
+    "en": "Example (fictional): cylindrical roller bearing on a gearbox output shaft (crown and misalignment)"
+  },
+  "note": {
+    "zh": "尺寸、设备参数和限值均为演示虚构，不是任何厂家、标准或企业的数据。",
+    "en": "Sizes, machine data and limits are made up for the demo: not any maker's, standard's or company's data."
+  },
+  "type": "cylindrical",
+  "size": {
+    "d": 40,
+    "D": 80,
+    "B": 18
+  },
+  "inner": {
+    "Dw": 10,
+    "Lw": 10,
+    "Lwe": 9.2,
+    "Z": 14,
+    "dm": 60,
+    "Pd": 0.025
+  },
+  "profile": {
+    "kind": "partial",
+    "R": 300,
+    "flat": 4
+  },
+  "alignment": {
+    "theta_arcmin": 3
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "scenario": {
+    "kind": "gearbox",
+    "fp": 1.2,
+    "mn": 4,
+    "z": 45,
+    "alpha_n_deg": 20,
+    "beta_deg": 0,
+    "x": 60,
+    "L": 180,
+    "this": "A",
+    "fixed": "B",
+    "axial_to": "B",
+    "cases": [
+      {
+        "label": {
+          "zh": "额定",
+          "en": "rated"
+        },
+        "P": 11,
+        "n": 320,
+        "share": 0.8
+      },
+      {
+        "label": {
+          "zh": "过载",
+          "en": "overload"
+        },
+        "P": 16,
+        "n": 320,
+        "share": 0.2
+      }
+    ]
+  },
+  "fits": {
+    "shaft_I": 0.02,
+    "housing_I": 0,
+    "T_i": 55,
+    "T_o": 45
+  },
+  "lube": {
+    "eta0": 0.05,
+    "alpha_p": 2e-08,
+    "sigma": 0.2
+  },
+  "limits": {
+    "p_static": 2500,
+    "p_fatigue": 1800,
+    "gap_min": 1.0,
+    "wall_min": 2.0
+  }
+}
