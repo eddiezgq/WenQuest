@@ -39,8 +39,8 @@ const sgn = (k, x) => (k === 'initial' || k === 'operating' ? '' : x >= 0 ? '+' 
       <h3>{{ t('heaviest') }}</h3>
       <dl class="rows">
         <dt>Q</dt><dd class="mono">{{ r.contact.inner.Q.toFixed(0) }} N</dd>
-        <dt>{{ t('contactAngle') }}</dt><dd class="mono">{{ r.contact.inner.alpha_deg.toFixed(2) }}°</dd>
-        <template v-for="ring in ['inner', 'outer']" :key="ring">
+        <template v-if="r.type !== 'cylindrical'"><dt>{{ t('contactAngle') }}</dt><dd class="mono">{{ r.contact.inner.alpha_deg.toFixed(2) }}°</dd></template>
+        <template v-for="ring in (r.contact.inner.a != null ? ['inner', 'outer'] : [])" :key="ring">
           <dt>{{ t('ellipse') }}，{{ t(ring + 'Ring') }}</dt>
           <dd class="mono">{{ r.contact[ring].a.toFixed(3) }} × {{ r.contact[ring].b.toFixed(3) }} mm</dd>
         </template>

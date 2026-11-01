@@ -69,7 +69,7 @@ def _limit(val, lim, higher_bad=True):
 def build(p: dict) -> tuple[BB.BallBearing, dict]:
     kind = p.get("type") or "deep_groove"
     if kind not in ("deep_groove", "angular"):
-        raise ProjectError("the bearing type is deep_groove or angular (rollers come in step 3)")
+        raise ProjectError("the bearing type is deep_groove, angular or cylindrical")
     s, i, m = p.get("size") or {}, p.get("inner") or {}, p.get("material") or {}
     d, D, B = _num(s.get("d")), _num(s.get("D")), _num(s.get("B"))
     if not (d and D and B and D > d > 0 and B > 0):
@@ -167,6 +167,10 @@ def _freq(b, sc: dict):
 
 
 def analyse(p: dict) -> dict:
+    if p.get("type") == "cylindrical":
+        from bearingkit import cyl_check  # round 64 step 4 (imports the helpers above)
+
+        return cyl_check.analyse(p)
     b, g = build(p)
     lim = p.get("limits") or {}
     sc = scenario_cases(p)

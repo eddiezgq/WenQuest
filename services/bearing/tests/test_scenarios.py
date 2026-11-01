@@ -156,3 +156,28 @@ def test_scenario_errors_are_project_errors():
     p["scenario"] = {"kind": "gearbox"}
     with pytest.raises(ProjectError):
         analyse(p)
+
+
+def test_cylindrical_project():
+    p = json.loads((EX / "scene-cylindrical.json").read_text(encoding="utf-8"))
+    r = analyse(p)
+    c = by_id(r)
+    assert r["type"] == "cylindrical" and r["status"] == "unknown"  # ratings unknown, nothing fails
+    assert c["ends"]["status"] == "pass" and c["pf_inner"]["status"] == "pass"
+    sl = r["slices"]
+    assert len(sl["x"]) == 41 and sl["q"][0] == 0 and sl["q"][-1] == 0
+    assert sl["q"].index(max(sl["q"])) != 20  # the misalignment moves the peak off the middle
+    # less crown with the same misalignment: the ends take load and the check fails
+    p["profile"] = {"kind": "partial", "R": 500, "flat": 5}
+    assert by_id(analyse(p))["ends"]["status"] == "fail"
+    p["profile"] = {"kind": "straight"}
+    p["alignment"] = {"theta_arcmin": 0}
+    e = by_id(analyse(p))["ends"]
+    assert e["status"] == "fail" and "需要凸度" in e["note_zh"]
+
+
+def test_cylindrical_refuses_axial_load():
+    p = json.loads((EX / "scene-cylindrical.json").read_text(encoding="utf-8"))
+    p["scenario"]["fixed"] = "A"  # now this bearing takes the gear's axial force
+    p["scenario"]["beta_deg"] = 10
+    assert by_id(analyse(p))["axial"]["status"] == "fail"
