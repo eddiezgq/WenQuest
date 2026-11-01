@@ -8,6 +8,7 @@
     {"type": "force",    "faces": [2], "vector_n": [0, -100, 0]},          # 面上总力，均匀分布
     {"type": "pressure", "faces": [4], "value_mpa": 1.0},                   # 正值压向表面
     {"type": "torque",   "faces": [9], "value_nmm": 3.5e5, "axis": {"origin": [0,0,0], "dir": [0,0,1]}},  # 按 r 线性分布的切向力
+    {"type": "moment",   "faces": [9], "vector_nmm": [4.1e4, 0, -7e3]},   # 绕所选面形心的力矩（任意方向，第 66 轮）：弯矩 + 扭矩
   ]
   mesh: {"size_mm": 可选, "max_elements": 200000}
 """
@@ -242,8 +243,19 @@ def solve(step_bytes, setup, workdir=None):
             elif l["type"] == "pressure":
                 p = float(l["value_mpa"])
                 add(consistent_loads(tris, P, lambda c, n, p=p: -p * n))
-            elif l["type"] == "torque":
-                o, d = _axis(l)
+            elif l["type"] in ("torque", "moment"):
+                if l["type"] == "moment":
+                    # 第 66 轮：任意方向的力矩 = 绕“过面形心、沿力矩方向”的轴的“扭矩”。同一个分布式：面力 = (M/J)·d × r⊥，
+                    # 对端面加弯矩时 d 在面内，d × r⊥ 垂直于面、与到中性轴的距离成正比——正好是梁弯曲的线性正应力分布
+                    mv = np.array(l["vector_nmm"], float)
+                    if not np.linalg.norm(mv):
+                        raise ValueError("力矩的大小是 0")
+                    wts = [np.linalg.norm(np.cross(P[t[1]] - P[t[0]], P[t[2]] - P[t[0]])) / 2 for t in tris]
+                    o = sum(w * (P[t[0]] + P[t[1]] + P[t[2]]) / 3 for w, t in zip(wts, tris)) / sum(wts)
+                    d = mv / np.linalg.norm(mv)
+                    l = dict(l, value_nmm=float(np.linalg.norm(mv)))
+                else:
+                    o, d = _axis(l)
                 # 切向面力 τ = T·r / J，J = ∫ r² dA：合力矩正好是 T（右手定则绕轴）
                 J = 0.0
                 for t in tris:
