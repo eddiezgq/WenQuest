@@ -1,0 +1,36 @@
+# 实验 12.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_5.js。
+原理:
+  - ["定轴转动定律：刚体所受的外力矩之和等于转动惯量乘以角加速度。试验台上小臂在水平面内转动，重力不产生力矩，外力矩是电机力矩 M 和轴承的摩擦力矩 M_f（方向与转动相反）。",
+     "Rotational law: the net external torque equals the moment of inertia times the angular acceleration. On the rig the forearm turns in a horizontal plane, so gravity gives no torque; the external torques are the motor torque M and the bearing friction torque M_f (opposing the motion)."]
+  - 式: "M − M_f = Jα        （式 (12.5.2)）"
+  - ["小臂从静止开始匀角加速，t 时刻的角速度 ω = αt，所以 α = ω/t（t = 2.000 s）。用两个不同的电机力矩各测一次，消去摩擦力矩：",
+     "Starting from rest with constant α, the angular velocity at time t is ω = αt, so α = ω/t (t = 2.000 s). Two runs with different motor torques eliminate the friction torque:"]
+  - 式: "J = (M₂ − M₁)/(α₂ − α₁)，M_f = M₁ − Jα₁        （式 (12.5.3)）"
+  - ["平行轴定理：末端加一个看成质点的负载 m（离肘关节 L），转动惯量增加 mL²。", "Parallel-axis theorem: a point load m at distance L from the elbow adds mL² to the moment of inertia."]
+  - ["落体法：砝码 m 挂在绕线半径为 r 的轮毂上，从静止下落 h 用时 t。由 mg − T = ma、Tr = Jα、a = rα 和 h = ½at²：", "Falling-mass method: a mass m hangs from a hub of radius r and falls h from rest in time t. From mg − T = ma, Tr = Jα, a = rα and h = ½at²:"]
+  - 式: "J = mr²(gt²/(2h) − 1)"
+步骤:
+  - ["选“小臂试验台”，负载设为 0，电机力矩取 0.20 N·m，点“开始”，记下 2.000 s 时的角速度。依次改为 0.30、0.40、0.60、0.80 N·m 各做一次，填入表 1。右边的图会画出每次的 α。",
+     "Choose “Forearm test rig”, load 0, motor torque 0.20 N·m; press “Start” and record the angular velocity at 2.000 s. Repeat at 0.30, 0.40, 0.60 and 0.80 N·m and fill in Table 1. The graph on the right plots α for each run."]
+  - ["用任意两次的数据按式 (12.5.3) 求 J 和 M_f，再用全部数据作 M–α 直线拟合。把 J 调到“你测得的 J”，提交（任务 1）。与零件模型的值 0.1186 kg·m² 比较，差百分之几？可能是什么原因？",
+     "From any two runs find J and M_f with Eq. (12.5.3), then fit a straight line M–α to all the data. Set J as “Your J” and submit (task 1). Compare with the part-model value 0.1186 kg·m²: how many percent apart, and why might that be?"]
+  - ["用你测得的 J 和平行轴定理，预测加 1 kg 负载（离肘关节 0.392 m）后的 J。负载设为 1，重复上面的测量，提交（任务 2），与预测值比较。",
+     "Using your measured J and the parallel-axis theorem, predict J with the 1 kg load (0.392 m from the elbow) by the parallel-axis theorem. Set the load to 1, repeat the measurement, submit (task 2) and compare with your prediction."]
+  - ["选“自行车轮”，砝码分别取 0.30、0.50、0.80 kg，记下下落 1.000 m 的时间，用落体法公式求 J，取平均，提交（任务 3）。",
+     "Choose “Bicycle wheel”; with masses of 0.30, 0.50 and 0.80 kg record the time to fall 1.000 m, compute J with the falling-mass formula, average, and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  小臂试验台（t = 2.000 s）", "Table 1  Forearm rig (t = 2.000 s)"]
+    表头: ["负载", "M / (N·m)", "ω / (rad/s)", "α = ω/t / (rad/s²)", "J = M/α（不扣摩擦）/ (kg·m²)"]
+    表头英文: ["Load", "M / (N·m)", "ω / (rad/s)", "α = ω/t / (rad/s²)", "J = M/α (friction ignored) / (kg·m²)"]
+    行: [["0", "0.20", "", "", ""], ["0", "0.30", "", "", ""], ["0", "0.40", "", "", ""], ["0", "0.60", "", "", ""], ["0", "0.80", "", "", ""], ["1", "0.30", "", "", ""], ["1", "0.60", "", "", ""]]
+  - 标题: ["表 2  自行车轮（落体法，r = 0.050 m，h = 1.000 m）", "Table 2  Bicycle wheel (falling mass, r = 0.050 m, h = 1.000 m)"]
+    表头: ["m / kg", "t / s", "J / (kg·m²)"]
+    表头英文: ["m / kg", "t / s", "J / (kg·m²)"]
+    行: [["0.30", "", ""], ["0.50", "", ""], ["0.80", "", ""]]
+注意:
+  - ["摩擦力矩的大小不显示，要靠两次以上的测量求出。电机力矩小于摩擦力矩时小臂不转。", "The friction torque is not shown; find it from two or more runs. Below the friction torque the forearm does not turn."]
+  - ["读数带有 ±0.3%（角速度）和 ±0.01 s（时间）以内的误差，同一设置重复做读数相同；要减小误差，取差别大的两个力矩。", "Readings carry errors up to ±0.3% (angular velocity) and ±0.01 s (time); repeating a setting gives the same reading. To reduce the error, use two torques far apart."]
+思考题:
+  - ["表 1 最后一列“不扣摩擦”的 J 随 M 怎样变化？为什么 M 越大越接近真值？", "How does the “friction ignored” J in Table 1 change with M? Why does it approach the true value as M grows?"]
+  - ["平行轴定理的预测与测量值差多少？负载在转动惯量中占多大比例？", "How far is the parallel-axis prediction from the measurement? What fraction of the moment of inertia comes from the load?"]
+  - ["落体法中，如果轴承有不变的摩擦力矩，测得的 J 偏大还是偏小？怎样用两个不同的砝码消去它？", "In the falling-mass method, would a constant bearing friction make J too big or too small? How could two different masses eliminate it?"]

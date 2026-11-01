@@ -1,0 +1,32 @@
+# 实验 12.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab12_7.js。
+原理:
+  - ["质量 M、半径 R 的圆形物体，绕中心轴的转动惯量写成 J_c = kMR²。它沿倾角 θ 的斜面纯滚动时，质心加速度与质量、半径无关：", "Write the moment of inertia of a round body (mass M, radius R) about its axis as J_c = kMR². Rolling without slipping down an incline of angle θ, its centre accelerates independently of mass and radius:"]
+  - 式: "a = g sin θ/(1 + k)        （式 (12.7.2)）"
+  - ["从静止滚过距离 L 用时 t，a = 2L/t²，所以", "Rolling a distance L from rest in time t gives a = 2L/t², so"]
+  - 式: "k = g t² sin θ/(2L) − 1"
+  - ["纯滚动要靠静摩擦力，需要的摩擦力随倾角增大。不打滑的条件：", "Rolling relies on static friction, and the friction needed grows with the angle. The no-slip condition is"]
+  - 式: "tan θ ≤ μ_s(1 + k)/k        （式 (12.7.4)）"
+步骤:
+  - ["选“零件滑道”，倾角 20°，依次选实心球、实心圆柱、薄圆筒，各点“开始”一次，记下走 1.000 m 的时间，求 k，与 2/5、1/2、1 比较，填入表 1。",
+     "Choose “Parts chute”, angle 20°; run the solid sphere, solid cylinder and thin hoop once each, record the time over 1.000 m, compute k and compare with 2/5, 1/2 and 1 in Table 1."]
+  - ["选未知零件，在 15°、20°、25° 各做一次，确认“纯滚动”，求 k 并取平均，调到“你的结果”，提交（任务 1）。它可能是什么形状？",
+     "Choose the unknown part; run at 15°, 20° and 25°, check that it rolls without slipping, find k and average it; set it as “Your result” and submit (task 1). What shape might it be?"]
+  - ["选薄圆筒，从 25° 起每次加 1°，看从哪个角度开始“打滑”。把仍能纯滚动的最大倾角调到“你的结果”，提交（任务 2）。再由式 (12.7.4) 反求滑道的 μ_s，并预测实心球、实心圆柱的最大倾角，各试一次验证。",
+     "Choose the thin hoop; go up 1° at a time from 25° and see where “slipping” starts. Set the largest angle that still rolls as “Your result” and submit (task 2). Then work out the chute's μ_s from Eq. (12.7.4), predict the maximum angles for the solid sphere and cylinder, and check each with one run."]
+  - ["选“罐头赛跑”，三个罐子各滚一次，记下时间，求 k，把一罐汤的 k 提交（任务 3）。", "Choose “Can race”, roll each can once, record the times and find k; submit k for the can of soup (task 3)."]
+数据表:
+  - 标题: ["表 1  零件滑道（L = 1.000 m）", "Table 1  Parts chute (L = 1.000 m)"]
+    表头: ["物体", "θ / (°)", "t / s", "a = 2L/t² / (m/s²)", "k（测得）", "k（理论）", "是否打滑"]
+    表头英文: ["Body", "θ / (°)", "t / s", "a = 2L/t² / (m/s²)", "k (measured)", "k (theory)", "Slipping?"]
+    行: [["实心球", "20", "", "", "", "0.40", ""], ["实心圆柱", "20", "", "", "", "0.50", ""], ["薄圆筒", "20", "", "", "", "1.00", ""], ["未知零件", "15", "", "", "", "", ""], ["未知零件", "20", "", "", "", "", ""], ["未知零件", "25", "", "", "", "", ""]]
+  - 标题: ["表 2  罐头赛跑（θ = 10°，L = 1.000 m）", "Table 2  Can race (θ = 10°, L = 1.000 m)"]
+    表头: ["罐子", "t / s", "k"]
+    表头英文: ["Can", "t / s", "k"]
+    行: [["一罐汤", "", ""], ["冻实的汤", "", ""], ["空罐", "", ""]]
+注意:
+  - ["只有纯滚动时才能用 k = g t² sin θ/(2L) − 1；打滑时这个公式不成立。", "k = g t² sin θ/(2L) − 1 holds only for rolling without slipping, not when the body slips."]
+  - ["时间读数带有 ±0.005 s 以内的误差。滑道的摩擦因数不显示；打滑后的运动按动摩擦因数等于 μ_s 处理。", "Times carry errors up to ±0.005 s. The chute's friction coefficient is not shown; after slipping starts, the model takes the kinetic friction coefficient equal to μ_s."]
+思考题:
+  - ["为什么滚下的快慢与质量、半径都无关？做一个大一倍的实心球，到达时间怎样变？", "Why does the time not depend on mass or radius? How would a solid sphere twice as large do?"]
+  - ["一罐汤为什么比冻实的汤滚得快？如果把汤换成很黏的蜂蜜，结果会怎样？", "Why does the can of soup beat the frozen one? What if the soup were replaced by very thick honey?"]
+  - ["设计滑道时，倾角取不打滑最大倾角的多少比较合适？为什么要留余量？", "When designing a chute, what fraction of the maximum no-slip angle would you use, and why leave a margin?"]
