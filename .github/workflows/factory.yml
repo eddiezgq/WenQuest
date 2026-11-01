@@ -243,6 +243,9 @@ jobs:
                 "sim/(calib|errors|engine|runin)\.py|hub/lab2[68]\.py|cae/wqcr5\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
               extra="--lab26 --lab28"
             fi
+            if [ -z "$changed" ] || echo "$changed" | grep -qE "hub/(lab29|rfield|rfield_api)\.py|tests/plant_loop\.py|workflows/factory\.yml"; then
+              extra="$extra --lab29"                # 第 68 轮：实验 29 售后追溯
+            fi
             echo "本次演练：两厂互发订单 $([ -n "$park" ] && echo 跑 || echo 不跑)；整机标定与负载跑合 $([ -n "$extra" ] && echo 跑 || echo 不跑)"
             for i in $(seq 1 40); do curl -fsS localhost:$hubp/api/health && break; sleep 5; done
             cd factory/digital
