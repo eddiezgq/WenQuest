@@ -1,0 +1,23 @@
+# 实验 18.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab18_2.js。
+原理:
+  - ["把 [a, b] 分成小区间，在每段上取 f 的上确界 Mᵢ 与下确界 mᵢ，得达布上和 U = ΣMᵢΔxᵢ 与下和 L = ΣmᵢΔxᵢ（18.1 节）。任何黎曼和都在 L 与 U 之间；f 可积当且仅当 U − L = ΣωᵢΔxᵢ 能任意小（18.2 节，ωᵢ = Mᵢ − mᵢ 是振幅）。", "Divide [a, b] into pieces and take the supremum Mᵢ and infimum mᵢ of f on each to get the upper Darboux sum U = ΣMᵢΔxᵢ and lower sum L = ΣmᵢΔxᵢ (Section 18.1). Every Riemann sum lies between L and U; f is integrable exactly when U − L = ΣωᵢΔxᵢ can be made arbitrarily small (Section 18.2, ωᵢ = Mᵢ − mᵢ is the oscillation)."]
+  - 式: "单调函数 n 等分：U − L = |f(b) − f(a)|·(b − a)/n"
+  - ["速度单调减小时，每段的最大值、最小值就是段首、段尾的读数，左端点矩形和与右端点矩形和是制动距离有保证的上界和下界。速度不单调时，采样点之间的最大值看不见，这个保证就失效了。", "When the speed decreases, the maximum and minimum on each interval are the readings at its ends, so the left- and right-endpoint sums are guaranteed upper and lower bounds on the braking distance. If the speed is not monotone, the maximum between samples is invisible and the guarantee fails."]
+步骤:
+  - ["在“AGV 制动距离”场景中选平稳制动，采样间隔取 200、100、50、20、10、6 ms，把下界、上界、上界 − 下界填入表 1（任务 1）。", "In 'AGV braking distance' choose smooth braking and intervals of 200, 100, 50, 20, 10, 6 ms; record the lower bound, upper bound and their gap in Table 1 (task 1)."]
+  - ["改为有周期性波动（周期 50 ms）的曲线，重复上一步，记录真值是否在界内，填入表 1 的后两列（任务 2）。注意：采样间隔是 50 ms 的整数倍时，采样点恰好都落在波动的谷底，界会失效；其他间隔下真值可能碰巧在界内，但那不是保证。", "Switch to the rippled profile (period 50 ms), repeat, and record whether the true value lies inside (last two columns of Table 1, task 2). When the interval is a multiple of 50 ms every sample falls in a trough and the bounds fail; at other intervals the true value may happen to lie inside, but that is not a guarantee."]
+  - ["在“函数的达布和”场景中，对五个函数分别取 n = 10、50、100、400，记录 U − L，填入表 2（任务 3、4）。", "In 'Darboux sums of functions', for each of the five functions with n = 10, 50, 100, 400, record U − L in Table 2 (tasks 3 and 4)."]
+数据表:
+  - 标题: ["表 1  AGV 制动距离的上下界", "Table 1  Bounds on the AGV braking distance"]
+    表头: ["Δt / ms", "平稳：下界 / cm", "平稳：上界 / cm", "平稳：上界 − 下界 / cm", "波动：真值在界内？", "波动：上界 − 下界 / cm"]
+    表头英文: ["Δt / ms", "smooth: lower / cm", "smooth: upper / cm", "smooth: gap / cm", "ripple: true value inside?", "ripple: gap / cm"]
+    行: [["200", "", "", "", "", ""], ["100", "", "", "", "", ""], ["50", "", "", "", "", ""], ["20", "", "", "", "", ""], ["10", "", "", "", "", ""], ["6", "", "", "", "", ""]]
+  - 标题: ["表 2  [0, 1] 上 n 等分的 U − L", "Table 2  U − L on [0, 1] with n equal pieces"]
+    表头: ["函数", "n = 10", "n = 50", "n = 100", "n = 400"]
+    表头英文: ["function", "n = 10", "n = 50", "n = 100", "n = 400"]
+    行: [["x²", "", "", "", ""], ["阶梯函数", "", "", "", ""], ["托马伊函数", "", "", "", ""], ["狄利克雷函数", "", "", "", ""], ["sin(1/x)", "", "", "", ""]]
+注意:
+  - ["托马伊函数每段的上确界是该段中有理数最小分母的倒数，程序逐个检查分母求得；狄利克雷函数的图像只画出了有限个点，实际上有理点和无理点都处处稠密。", "For Thomae's function the supremum on each piece is 1 over the smallest denominator of a rational in it, found by checking denominators one by one; the Dirichlet function is drawn with finitely many points, though rationals and irrationals are both dense everywhere."]
+  - ["sin(1/x) 在 x = 0 附近振荡无穷多次，第一段的振幅总是 2，所以 U − L 至少是 2/n，下降得比 x² 慢，但仍趋于零：它只有一个间断点。", "sin(1/x) oscillates infinitely often near 0; the first piece always has oscillation 2, so U − L ≥ 2/n and falls more slowly than for x², yet still tends to zero: there is only one discontinuity."]
+思考题:
+  - ["“速度单调减小”这个前提在安全评估中能不能保证？如果只知道加速度的绝对值不超过 a_max，怎样由采样值给出有保证的上下界？", "Can 'the speed decreases' be guaranteed in a safety case? If you only know |acceleration| ≤ a_max, how can sampled values still give guaranteed bounds?"]
