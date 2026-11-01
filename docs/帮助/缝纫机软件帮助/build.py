@@ -39,11 +39,11 @@ ONLINE = "https://learn.wenquestrobotics.com"
 EDITIONS = {
     "web": dict(title="缝纫机设计软件 · 网页版帮助", short="网页版帮助", other=("FreeCAD 版帮助", "../sewing-freecad/index.html"),
                 files=["web/00-intro", "web/01-start", "common/cases", "common/case-lockstitch", "common/case-overlock", "common/case-cover",
-                       "common/case-pattern", "common/case-flatknit", "common/case-ebox", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
+                       "common/case-pattern", "common/case-flatknit", "common/case-ebox", "common/case-embroid", "web/02-tabs", "common/ai", "common/cae", "common/lib", "web/03-export",
                        "common/kernel", "common/arch", "web/04-account", "common/faq"]),
     "freecad": dict(title="缝纫机设计软件 · FreeCAD 工作台帮助", short="FreeCAD 版帮助", other=("网页版帮助", ONLINE + "/static/help/sewing/index.html"),
                     files=["freecad/00-intro", "freecad/01-install", "freecad/02-use", "common/cases", "common/case-lockstitch",
-                               "common/case-overlock", "common/case-cover", "common/case-pattern", "common/case-flatknit", "common/case-ebox", "freecad/03-console", "common/ai", "common/cae",
+                               "common/case-overlock", "common/case-cover", "common/case-pattern", "common/case-flatknit", "common/case-ebox", "common/case-embroid", "freecad/03-console", "common/ai", "common/cae",
                            "common/lib", "common/kernel", "common/arch", "common/faq"]),
 }
 
@@ -195,6 +195,40 @@ def case_numbers():
                  eb_fin_gain=f"{(1 - cf['R_cae'] / c['R_cae']) * 100:.0f}%",
                  eb_fin_gain_f=f"{(1 - EB['fins']['Rgeo'] / EB['fix']['Rgeo']) * 100:.0f}%",
                  eb_hot_cae=next((x["value"] for x in c["checks"] if x["name"].startswith("最热车间") and x["state"] != "ok"), ""))
+    if "embroid" in d:                               # 案例七 多头刺绣机（第 65 轮）
+        def _tidy(x):                                # 641.0 → 641
+            if isinstance(x, dict): return {k: _tidy(y) for k, y in x.items()}
+            if isinstance(x, list): return [_tidy(y) for y in x]
+            return int(x) if isinstance(x, float) and x.is_integer() else x
+        M = _tidy(d["embroid"])
+        v["em"] = M
+        v["em_motor_acc"] = f"{M['motor']['accel']:.1f}"
+        v["em_tmove"] = f"{M['beam2']['t_move'] * 1000:.1f}"
+        v["em_gain"] = round((M["h12_F1200"]["per_h"] / M["h8_640"]["per_h"] - 1) * 100)
+        v["em_gain12"] = round((M["h12"]["per_h"] / M["h8_640"]["per_h"] - 1) * 100)
+        rows = ["| 头数 | 最长针转速上限 r/min | 全机效率 | 每小时件数 |", "|---|---|---|---|"]
+        rows += [f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} |" for r in M["h12"]["tables"]["heads_table"]]
+        v["em_heads"] = "\n".join(rows)
+        rows = ["| 针长 mm | 转速上限 r/min | 设计转速下所需加速度 m/s² | 所需推力 N |", "|---|---|---|---|"]
+        rows += [f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} |" for r in M["h8"]["tables"]["speed_table"]]
+        v["em_speeds"] = "\n".join(rows)
+        v["em_accel"] = M["h12"]["res"]["可用加速度 / 最长针所需"]
+        v["em_accel8"] = M["h8"]["res"]["可用加速度 / 最长针所需"]
+        v["em_accelF"] = M["h12_F1200"]["res"]["可用加速度 / 最长针所需"]
+        v["em_F800"] = M["h12_800"]["res"]["设计转速下这一针需要的推力"]
+        v["em_beam2"] = M["beam2"]["checks"][0]["value"]
+        v["em_beam3"] = M["beam3"]["checks"][0]["value"]
+        from app.sewcore import ebox as EBX
+        best = {"N": 12000, "s": 8, "H": 12, "F": 1200}
+        Rb = EBX.analyze({"Ta": 38, "clog": 0.3}, "embroid", best)
+        rows = ["| 改法 | 散热器 °C | 结温峰值 °C | 电容寿命 年 | 红灯 | 黄灯 |", "|---|---|---|---|---|---|"]
+        rows += [f"| {r[0]} | {r[2]} | {r[3]} | {r[4]} | {r[6]} | {r[7]} |" for r in Rb["variants"]["rows"]]
+        v["em_ebox_variants"] = "\n".join(rows)
+        from app.sewcore import embroid as EMB         # 对照：8 头机只加推力（不加头）
+        r8 = EMB.analyze(EMB.clean({"N": 12000, "s": 8, "F": 1200}))
+        v["em_h8F"] = next(x["value"] for x in r8["results"] if x["zh"] == "全机效率 / 每小时件数").split(" / ")[1]
+        v["em_ebox_lint"] = next(x["value"] for x in M["ebox"]["warn"] if x["key"] == "lint")
+        v["em_ebox_bad"] = "；".join(f"{b['name']} {b['value']}" for b in M["ebox38"]["bad"])
     y = P["motor_ry8"][1]["current"]
     v["pt_y8_margin"] = round((y["rated"] / y["rms"] - 1) * 100)
     v["pt_tpl"] = "{:.0f} × {:.0f} × {:.0f}".format(*P["template_cam"]["template"]["plate"])

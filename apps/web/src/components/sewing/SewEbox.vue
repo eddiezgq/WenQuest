@@ -63,7 +63,7 @@
             <text v-for="c in p.choices" :key="c.key" class="opt" :class="{ on: ep[p.key] === c.key }" @click="setv(p.key, c.key)">{{ L(c) }}</text>
           </view>
           <view v-else class="row">
-            <input class="inp" type="digit" :value="String(ep[p.key])" @change="(e: any) => setv(p.key, Number(e.detail.value))" />
+            <input class="inp" type="digit" :value="String(ep[p.key])" @blur="(e: any) => typed(p.key, e.detail.value)" @confirm="(e: any) => typed(p.key, e.detail.value)" />
             <text class="muted small">{{ p.min }}–{{ p.max }}</text>
           </view>
         </view>
@@ -141,6 +141,12 @@ let timer: ReturnType<typeof setTimeout> | null = null;
 function later() {
   if (timer) clearTimeout(timer);
   timer = setTimeout(calc, 250);
+}
+// uni-app 的 input 在网页上不发 change，失焦 / 回车时取值（第 65 轮发现：此前手填的数不生效）
+function typed(k: string, raw: string) {
+  const v = Number(raw);
+  if (raw === "" || !Number.isFinite(v) || v === ep[k]) return;
+  setv(k, v);
 }
 function setv(k: string, v: number | string) {
   ep[k] = v;

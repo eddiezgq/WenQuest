@@ -6,6 +6,7 @@
 用法（本地完整环境 tools/local + 数字工厂 cae、hub 都起来）：
   python3 run_cases.py [网关地址] [账号] [密码]
   python3 run_cases.py --only ebox     只（重）算案例六电控箱（第 62 轮），其余案例沿用 data/cases.json 里的结果
+  python3 run_cases.py --only embroid  只（重）算案例七多头刺绣机（第 65 轮）
 """
 import json
 import sys
@@ -144,14 +145,73 @@ def case_ebox():
     return E
 
 
+
+# ---------- 案例七 多头刺绣机：一张 logo 订单，8 头还是 12 头（第 65 轮，教材第 16 章） ----------
+ORDER = {"pieces": 20000, "hours_day": 16}                 # 示例订单：2 万件，两班 16 小时
+
+
+def case_embroid():
+    import tempfile as _tf
+    import build123d as _bd
+    EM = {"order": ORDER}
+    LOGO = {"N": 12000, "s": 8}                              # 示例花样：1.2 万针，带一段 8 mm 宽的缎纹边
+
+    def em(p):
+        R = analyze("embroid", dict(LOGO, **p))
+        res = {r["zh"]: f'{r["value"]} {r["unit"]}'.strip() for r in R["results"]}
+        num = lambda k: float(res[k].split()[0].split("/")[0])          # noqa: E731
+        per_h = float(res["全机效率 / 每小时件数"].split("/")[1].split()[0])
+        return dict(params=dict(LOGO, **p), counts=counts(R), bad=checks_brief(R, ("bad",)), warn=checks_brief(R, ("warn",)),
+                    res=res, limit=num("最长针的转速上限"), per_h=per_h, eff=res["全机效率 / 每小时件数"].split("/")[0].strip(),
+                    days=round(ORDER["pieces"] / per_h / ORDER["hours_day"], 1), mass=num("绷架折算质量"),
+                    tables={t["key"] if "key" in t else t["zh"]: t["rows"] for t in R.get("tables", [])})
+    EM["h8"] = em({})
+    EM["h8_640"] = em({"n": 640})
+    EM["h12"] = em({"H": 12})
+    EM["h12_F1200"] = em({"H": 12, "F": 1200})
+    EM["h12_800"] = em({"H": 12, "F": 1200, "n": 800})
+    best = {"N": 12000, "s": 8, "H": 12, "F": 1200}
+    mo = req("POST", "/api/v1/sewing/cae/motor", {"machine": "embroid", "params": best})
+    ax = mo["axes"][0]
+    EM["motor"] = dict(mass=ax["mass"], accel=ax["accel"], force=round(ax["force"]), pick=(ax.get("pick") or {}).get("name"),
+                       rows=[dict(name=r["name"], peak=round(r["need_peak"], 2), rms=round(r["need_rms"], 2), ok=r["ok"]) for r in ax["rows"]])
+    mo8 = req("POST", "/api/v1/sewing/cae/motor", {"machine": "embroid", "params": {"N": 12000, "s": 8, "n": 640}})
+    EM["motor8"] = dict(pick=(mo8["axes"][0].get("pick") or {}).get("name"), mass=mo8["axes"][0]["mass"])
+    # 横梁：12 头机的绷架横梁简化成 4.2 m 长的方钢（160 × 100 mm 实心截面，示意），两端立柱；再试中间加一根立柱
+    def beam(legs):
+        leg = lambda x: _bd.Pos(x, 0, 0) * _bd.Box(100, 160, 900, align=(_bd.Align.MIN, _bd.Align.CENTER, _bd.Align.MIN))   # noqa: E731
+        shape = _bd.Pos(0, 0, 900) * _bd.Box(4200, 160, 100, align=(_bd.Align.MIN, _bd.Align.CENTER, _bd.Align.MIN))
+        for x in legs:
+            shape = shape + leg(x)
+        with _tf.TemporaryDirectory() as t:
+            _bd.export_step(shape, t + "/b.step")
+            return Path(t + "/b.step").read_bytes()
+    for key, legs, fname in (("beam2", (0, 4100), "case-em-beam.step"), ("beam3", (0, 2050, 4100), "case-em-beam3.step")):
+        stepb = beam(legs)
+        (ROOT / "apps/web/src/static/help/media" / fname).write_bytes(stepb)
+        fj = req("POST", "/api/v1/sewing/cae/frame", files={"file": (fname, stepb), "machine": "embroid", "params": json.dumps(best), "material": "Q235"})
+        fr = wait(fj["id"])
+        EM[key] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or [])[:4]], t_move=fr.get("t_move"),
+                       checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
+    # 电控箱：主轴 + 绷架 X / Y 三台驱动（第 62 轮，公式）
+    for key, q in (("ebox", {}), ("ebox38", {"Ta": 38, "clog": 0.3})):
+        r = req("POST", "/api/v1/sewing/ebox/analyze", {"machine": "embroid", "params": best, "ebox": q})
+        t = r["thermal"]
+        EM[key] = dict(drives=[dict(name=d["zh"], Irun=d["Irun"], Ipk=d["Ipk"], Pavg=d["Pavg"]) for d in r["drives"]], Pavg=round(t["Pavg"], 1),
+                       Ths=round(t["Ths"], 1), Tj=round(t["Tjpk"], 1), life=round(t["life_y"], 1),
+                       bad=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"]) for c in r["checks"] if c["state"] == "bad"],
+                       warn=[dict(key=c["key"], name=c["name"]["zh"], value=c["value"]["zh"]) for c in r["checks"] if c["state"] == "warn"])
+    return EM
+
+
 out = {"date": time.strftime("%Y-%m-%d")}
-if ONLY == "ebox":
+if ONLY in ("ebox", "embroid"):
     dest = HERE.parent / "data" / "cases.json"
     out = json.loads(dest.read_text())
-    out["ebox"] = case_ebox()
-    out["ebox_date"] = time.strftime("%Y-%m-%d")
+    out[ONLY] = case_ebox() if ONLY == "ebox" else case_embroid()
+    out[ONLY + "_date"] = time.strftime("%Y-%m-%d")
     dest.write_text(json.dumps(out, ensure_ascii=False, indent=1))
-    print(json.dumps(out["ebox"]["cae"], ensure_ascii=False))
+    print(json.dumps({k: v for k, v in out[ONLY].items() if k in ("cae", "motor", "beam2", "beam3", "ebox38")}, ensure_ascii=False)[:3000])
     sys.exit(0)
 
 # ---------- 案例一 平缝机：从零件到整机 ----------
@@ -303,6 +363,7 @@ K["bed"] = dict(f1=fr.get("f1"), freqs=[round(x) for x in (fr.get("freqs_hz") or
                 checks=[dict(name=c["zh"], value=c["value"], state=c["state"]) for c in fr.get("checks") or []])
 out["flatknit"] = K
 out["ebox"] = case_ebox()
+out["embroid"] = case_embroid()
 
 dest = HERE.parent / "data" / "cases.json"
 if "--check" in sys.argv:
