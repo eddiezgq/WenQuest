@@ -1,0 +1,47 @@
+标题: ["GPU 实验 16.4 引导强度：把分布推偏到什么程度", "GPU Lab 16.4 Guidance strength: how far it pushes the distribution"]
+目的: ["在真的小扩散模型上重做 16.4 节那条曲线：训一个条件扩散模型生成四类缺陷图，再把无分类器引导的强度从 0 扫到 8，量出“单张更像这一类”与“整批更单调”这两件事各走多少。书里的玩具分布算得出解析解，这里看它在真模型上长什么样。",
+       "Reproduce the curve of Section 16.4 on a real model: train a small conditional diffusion model on four classes of defect images, then sweep classifier-free guidance from 0 to 8 and measure both effects — each sample looking more like its class, and the whole batch becoming less varied. The chapter's toy has a closed form; here you see the same thing on a trained model."]
+显卡: basic
+结果:
+  - {名: w_best_fid, 说明: ["弗雷歇距离最小的那个引导强度", "guidance strength with the lowest Frechet distance"], 单位: "—"}
+  - {名: fid_w0, 说明: ["不引导时的弗雷歇距离", "Frechet distance without guidance"], 单位: "—"}
+  - {名: fid_best, 说明: ["最好的那一档的弗雷歇距离", "best Frechet distance"], 单位: "—"}
+  - {名: fid_w8, 说明: ["引导强度 8 的弗雷歇距离", "Frechet distance at guidance 8"], 单位: "—"}
+  - {名: acc_w0, 说明: ["不引导时的类别一致率", "class consistency without guidance"], 单位: "%"}
+  - {名: acc_w8, 说明: ["引导强度 8 的类别一致率", "class consistency at guidance 8"], 单位: "%"}
+  - {名: div_w0, 说明: ["不引导时同类样本两两的平均距离", "mean pairwise distance within a class, no guidance"], 单位: "—"}
+  - {名: div_w8, 说明: ["引导强度 8 的同类两两平均距离", "mean pairwise distance at guidance 8"], 单位: "—"}
+  - {名: nn_w8, 说明: ["引导强度 8 时离训练集最近的距离", "distance to the nearest training image at guidance 8"], 单位: "—"}
+  - {名: sec_per_batch, 说明: ["采一批 256 张要多久", "seconds to sample a batch of 256"], 单位: "秒"}
+文件: []
+实际问题:
+  标题: ["调到多强才合适", "How strong should the guidance be"]
+  内容: ["要用生成模型给车间补缺陷样本，第一件要决定的事就是引导调多强。调小了，生成的图不像指定的那一类，标签就是错的；调大了，每张都像“标准的划痕”，几百张长得一个样，补进训练集也没用。这一档到底该怎么定，本实验量给你看。",
+         "The first decision when generating defect samples is how strong to make the guidance. Too weak and the images do not match the class they are labelled with; too strong and every image is the same textbook scratch, so hundreds of them add nothing. This lab measures where that setting should sit."]
+原理:
+  - ["无分类器引导把有条件与无条件两个噪声预测混起来：ε̃ = (1+w)·ε(x,c) − w·ε(x)。w = 0 就是不引导。训练时按一定概率把类别换成“空”，一个网络同时学会两件事（16.4 节）。", "Classifier-free guidance mixes the conditional and unconditional noise predictions as (1+w) eps(x,c) - w eps(x), with w = 0 meaning no guidance. During training the class label is dropped with some probability so that one network learns both (Section 16.4)."]
+  - ["引导调强会把概率质量往“这一类最典型的样子”上挤：单张的类别一致率上去，整批的多样性下来。引导论文自己的表上也是这样——FID 变差、IS 变好（见 16.4 节）。", "Stronger guidance concentrates probability mass on the most typical appearance of the class: per-sample class consistency rises while batch diversity falls. The guidance paper's own table shows the same trade-off, with FID worsening as IS improves."]
+  - ["这里的“弗雷歇距离”与 FID 是同一个算法（两组样本各拟合一个高斯再比），只是特征取自本实验自己训的小分类器，不是 Inception。所以它的绝对值不能与任何论文里的 FID 相比，只能在本实验内部横向比。", "The Frechet distance here uses the same formula as FID but takes features from this lab's own small classifier rather than Inception, so its absolute value cannot be compared with any published FID — only across the settings in this lab."]
+  - ["还要查一件事：引导调得很大时，模型会不会干脆把训练图背出来。量一下生成图与训练集最近邻的距离就知道。", "One more thing to check: whether strong guidance makes the model reproduce training images outright. The distance to the nearest training image answers that."]
+步骤:
+  - ["运行第 1 节，装好环境、确认显卡，生成训练用的缺陷图（任务 1）。", "Run section 1 to set up the environment, check the GPU and generate the training images (task 1)."]
+  - ["运行第 2 节，训条件扩散模型与评价用的分类器，记下训练耗时（任务 2）。", "Run section 2 to train the conditional diffusion model and the evaluation classifier, recording the training time (task 2)."]
+  - ["运行第 3 节，把引导强度从 0 扫到 8，每一档记下弗雷歇距离、类别一致率、同类两两平均距离（任务 3），填表 1。", "Run section 3 to sweep the guidance from 0 to 8, recording the Frechet distance, class consistency and within-class pairwise distance at each (task 3) in Table 1."]
+  - ["运行第 4 节，看最近邻距离与采样耗时（任务 4），填表 2；把生成的图按引导强度排成一排看一眼。", "Run section 4 for the nearest-neighbour distance and the sampling time (task 4) in Table 2, and look at the images laid out by guidance strength."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  引导强度扫描", "Table 1  Guidance sweep"]
+    表头: ["引导强度 w", "弗雷歇距离", "类别一致率（%）", "同类两两平均距离", "比 w=0 少了多少多样性"]
+    表头英文: ["guidance w", "Frechet distance", "class consistency (%)", "within-class distance", "diversity lost vs w=0"]
+    行: [["0", "", "", "", "—"], ["0.5", "", "", "", ""], ["1", "", "", "", ""], ["2", "", "", "", ""], ["4", "", "", "", ""], ["8", "", "", "", ""]]
+  - 标题: ["表 2  会不会把训练图背出来", "Table 2  Is it memorising the training set"]
+    表头: ["引导强度 w", "离训练集最近的距离", "真图之间的典型距离", "采一批 256 张要多久（s）"]
+    表头英文: ["guidance w", "distance to nearest training image", "typical distance between real images", "seconds per batch of 256"]
+    行: [["0", "", "", ""], ["4", "", "", ""], ["8", "", "", ""]]
+注意:
+  - ["弗雷歇距离用的是本实验自己的特征，绝对值不能与论文里的 FID 比，只能在这张表内部比。换一个特征提取器，最好的那一档也可能挪动。", "The Frechet distance uses this lab's own features; its absolute value is not comparable with any published FID, only across the rows of this table. A different feature extractor can move the optimum."]
+  - ["类别一致率是用另一个分类器打的分，它本身也会错。一致率很高不等于图像真的对——对着图看一眼再下结论。", "Class consistency is scored by a separate classifier that makes its own mistakes. A high rate does not prove the images are right; look at them."]
+  - ["训练集只有几千张程序现画的图，不含任何真实照片，也不下载任何模型权重。", "The training set is a few thousand images drawn by the program; no real photographs and no downloaded model weights are involved."]
+思考题:
+  - ["弗雷歇距离最小的那一档，与类别一致率最高的那一档是不是同一个 w？如果不是，补训练集该按哪一个选？说出你的理由。", "Is the w with the lowest Frechet distance the same as the one with the highest class consistency? If not, which should be used for augmenting a training set, and why?"]
+  - ["把“多样性”换一种量法（比如数一数生成图里缺陷的位置分布），结论还一样吗？为什么一个指标不够用？", "Measure diversity another way — say, by the spread of defect positions — and see whether the conclusion holds. Why is a single metric never enough?"]

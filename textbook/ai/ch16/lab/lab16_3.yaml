@@ -1,0 +1,27 @@
+# 实验 16.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_3.js。
+原理:
+  - ["扩散模型的前向过程每一步掺一点高斯噪声，而且第 t 步有闭式解：x_t = √ᾱ_t·x_0 + √(1−ᾱ_t)·ε，其中 ᾱ_t 是前 t 步 (1−β) 的连乘。这一步没有任何参数，不用学；训练时也因此不必一步步加噪，随手抽一个 t 跳过去就行（16.3 节）。", "The forward process of a diffusion model mixes in Gaussian noise step by step and has a closed form at step t: x_t = sqrt(abar_t) x_0 + sqrt(1 - abar_t) eps, where abar_t is the running product of (1 - beta). It has no parameters, so training never needs to walk the chain: it jumps to a random t (Section 16.3)."]
+  - ["反向过程从纯噪声起步，每一步估一次“这里掺进去的噪声是多少”，减掉一点再往前走。要学的只有这一个噪声预测器，训练目标就是 ‖ε − ε̂‖²。", "The reverse process starts from pure noise and at each step estimates how much noise went in, then removes part of it. The only thing learned is that noise predictor, trained on the squared error between the true and predicted noise."]
+  - ["本实验的真分布是已知的混合高斯，所以最优的噪声预测器有解析式，浏览器里不用训模型；“生成得像不像”也能用柯尔莫哥洛夫—斯米尔诺夫距离精确地量，不用看图猜。", "Here the target is a known Gaussian mixture, so the optimal noise predictor has a closed form and nothing needs training in the browser; and how good a sample set is can be measured exactly by the Kolmogorov-Smirnov distance instead of eyeballed."]
+  - 式: "x_t = √ᾱ_t·x_0 + √(1−ᾱ_t)·ε；ᾱ_t = Π(1−β_s)；ε*(x_t,t) = −√(1−ᾱ_t)·∇log q_t(x_t)"
+步骤:
+  - ["“正向：加噪”场景：把 t 从 0 拖到最大，记下几个时刻的 ᾱ_t、与标准正态的 KS 距离（任务 1、2），填表 1。", "Forward scene: drag t from 0 to the maximum, recording abar_t and the KS distance to the standard normal at several times (tasks 1 and 2); fill Table 1."]
+  - ["找出“与标准正态的 KS 距离”第一次掉到 0.02 以下的那个 t——那就是三个峰在统计上已经看不出来的时刻。", "Find the first t at which the KS distance to the standard normal falls below 0.02: that is where the modes become statistically invisible."]
+  - ["切到“反向：去噪采样”，步数留在 200，记下 KS 距离与有限样本的下限（任务 3）。", "Switch to the reverse scene, keep 200 steps and record the KS distance together with the finite-sample floor (task 3)."]
+  - ["把步数依次调成 100、50、20、10、5，每一档记一次 KS 距离（任务 4），填表 2；再把 η 调到 0 重做一遍 10 步那一档（任务 5）。", "Set the steps to 100, 50, 20, 10 and 5, recording the KS distance at each (task 4) in Table 2; then redo the 10-step case with eta set to 0 (task 5)."]
+数据表:
+  - 标题: ["表 1  加噪到第几步，峰就看不见了", "Table 1  When the modes disappear"]
+    表头: ["t", "ᾱ_t", "√ᾱ_t", "与标准正态的 KS", "还分得出峰吗"]
+    表头英文: ["t", "abar_t", "sqrt(abar_t)", "KS to the normal", "modes distinguishable?"]
+    行: [["0", "", "", "", ""], ["100", "", "", "", ""], ["200", "", "", "", ""], ["300", "", "", "", ""], ["600", "", "", "", ""], ["999", "", "", "", ""]]
+  - 标题: ["表 2  采样步数与质量", "Table 2  Sampling steps versus quality"]
+    表头: ["采样步数", "KS（η = 1）", "KS（η = 0）", "比下限高几倍", "采一次要几次前向"]
+    表头英文: ["steps", "KS (eta = 1)", "KS (eta = 0)", "times the floor", "forward passes"]
+    行: [["200", "", "", "", ""], ["100", "", "", "", ""], ["50", "", "", "", ""], ["20", "", "", "", ""], ["10", "", "", "", ""], ["5", "", "", "", ""]]
+注意:
+  - ["KS 距离不会降到 0：同样本量的真样本之间也有差别，这就是读数里的“有限样本的下限”。判断好坏要看“比下限高几倍”，不是看绝对值。", "The KS distance never reaches zero: two real samples of the same size already differ, which is the finite-sample floor shown in the readouts. Judge a model by how many times the floor it sits at, not by the raw number."]
+  - ["本实验用的是解析的最优噪声预测器，所以剩下的误差只来自采样步数。真模型还有“预测器本身不够好”那一份，两者要分开看（16.3 节）。", "This lab uses the analytically optimal noise predictor, so the remaining error comes only from the step count. A real model also carries the error of the predictor itself; Section 16.3 separates the two."]
+  - ["η = 0（确定性采样）在这个一维玩具上并不总是更好。真模型上的对照数字见 DDIM 论文表 1，正文两边都列了。", "Deterministic sampling is not always better on this one-dimensional toy. The numbers for a real model are in Table 1 of the DDIM paper, quoted in the text alongside."]
+思考题:
+  - ["把步数从 300 一档一档减到 5，把 KS 距离记成一条曲线。它在哪一段几乎不变、从哪一档开始陡起来？如果每一步的代价相同，你会把步数定在哪里，为什么？", "Sweep the steps from 300 down to 5 and plot the KS distance. Where is it flat and where does it take off? If each step costs the same, where would you set it, and why?"]
+  - ["正向过程“没有参数”这件事为什么重要？如果加噪的方式也要学，训练会多出哪些麻烦？", "Why does it matter that the forward process has no parameters? What new difficulties would appear if the noising schedule had to be learned as well?"]

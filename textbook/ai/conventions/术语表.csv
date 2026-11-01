@@ -441,3 +441,19 @@ M4,梯度裁剪,gradient clipping,
 15,反事实遗憾最小化,counterfactual regret minimization (CFR),
 15,完全信息,perfect information,棋盘上的一切双方都看得见
 15,样本效率,sample efficiency,
+16,生成对抗网络,generative adversarial network (GAN),生成器与判别器对着训
+16,自回归模型,autoregressive model,把联合分布拆成一串条件概率
+16,流模型,normalizing flow,学一个可逆映射，似然精确可算
+16,扩散模型,diffusion model,前向加噪有闭式解，反向学去噪
+16,噪声调度,noise schedule,前向过程每一步加多少噪声
+16,分数函数,score function,对数密度的梯度；与噪声预测只差一个常数
+16,潜在扩散,latent diffusion,先压到潜空间再做扩散
+16,无分类器引导,classifier-free guidance,有条件与无条件预测的线性外推
+16,狄拉克生成对抗网络,Dirac GAN,对抗训练不收敛的解析反例
+16,模式坍塌,mode collapse,生成器只守住分布里的几个峰
+16,神经音频编解码器,neural audio codec,把波形压成离散词元
+16,残差量化,residual quantization,一串码本依次记录残差
+16,码本交错,codebook interleaving,把多个码本错开生成，省自回归步数
+16,文本到三维,text-to-3D,拿二维扩散模型当评分器优化三维表示
+16,硬绑定,hard binding,用内容哈希把来源清单绑在内容上
+16,软绑定,soft binding,用水印或指纹绑定，内容改了还能追回

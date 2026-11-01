@@ -1,0 +1,27 @@
+# 实验 16.8 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_8.js。
+原理:
+  - ["车间里缺陷件本来就少，罕见缺陷一个月也出不了几件，所以真实标注往往只有几十张。合成数据想补的是“样本量”这一项：生成一批看起来一样的缺陷图，让检测器多见几眼（16.8 节）。", "Defective parts are rare on a line, so a few dozen labelled images is often all there is. Synthetic data is meant to supply sheer quantity: generate more defect images so the detector sees more examples (Section 16.8)."]
+  - ["成绩要看两个数：曲线下面积（随便挑一个有缺陷的和一个合格的，前者打分更高的概率），以及“把误报压到 5% 时能查出多少缺陷”——后者才是车间定门限时真正关心的。", "Two numbers matter: the area under the ROC curve, which is the chance that a defective part outranks a sound one; and the recall at a 5% false-alarm rate, which is what a plant actually sets its threshold by."]
+  - ["合成数据的前提是“分布对得上”。生成器学偏的地方，训练集就偏到哪里：底纹的变化没学会、某一类根本没合成、只会画重缺陷——每一样都会让检测器学到用不上的东西，甚至学成“认背景”的捷径（第 11 章）。", "Synthetic data only helps when its distribution matches. Wherever the generator is off, the training set is off: a texture variation it never learned, a class it never produces, only severe defects. Each of these teaches the detector something useless, or even a background shortcut (Chapter 11)."]
+  - 式: "曲线下面积 = P(打分(缺陷) > 打分(合格))；查出率@5% = 把门限定在合格件打分的 95 分位时查出的缺陷比例"
+步骤:
+  - ["“掺多少合成图”场景：合成图调到 0，记下只用 60 张真实图时的两个数（任务 1），填表 1 第一行。", "Mix scene: set the synthetic count to 0 and record both numbers for 60 real images (task 1) in the first row of Table 1."]
+  - ["把合成图依次加到 200、400、800、1200，每一档记一次（任务 2、3），填满表 1；再把真实图加到 200 张、合成图归零，记一行做对照。", "Raise the synthetic count to 200, 400, 800 and 1200, recording each (tasks 2 and 3); then set the real count to 200 with no synthetic data for a reference row."]
+  - ["切到“合成器偏了会怎样”，合成图留在 800，先只打开“底纹朝向固定”，记一行（任务 4）。", "Switch to the bias scene, keep 800 synthetic images, turn on only the frozen texture and record a row (task 4)."]
+  - ["再依次打开“压痕这一类不合成”、把最轻的合成缺陷提到 0.25，每多一样记一行（任务 5），填表 2。标出成绩第一次掉破“只用真实图”那条线的那一档。", "Then add the missing dent class and raise the lightest synthetic defect to 0.25, recording a row each time (task 5) in Table 2. Mark the first row that falls below the real-only baseline."]
+数据表:
+  - 标题: ["表 1  掺多少合成图", "Table 1  How much synthetic data"]
+    表头: ["真实图", "合成图", "曲线下面积", "误报 5% 处查出率", "比上一行多了多少"]
+    表头英文: ["real", "synthetic", "AUC", "recall at 5%", "gain over the row above"]
+    行: [["60", "0", "", "", "—"], ["60", "200", "", "", ""], ["60", "400", "", "", ""], ["60", "800", "", "", ""], ["60", "1200", "", "", ""], ["200", "0", "", "", ""]]
+  - 标题: ["表 2  合成器偏了多少", "Table 2  How far the generator is off"]
+    表头: ["底纹固定", "漏一类", "最轻缺陷", "曲线下面积", "误报 5% 处查出率", "压痕这一类的查出率"]
+    表头英文: ["frozen texture", "class missing", "lightest defect", "AUC", "recall at 5%", "recall on dents"]
+    行: [["否", "否", "0.08", "", "", ""], ["是", "否", "0.08", "", "", ""], ["是", "是", "0.08", "", "", ""], ["是", "是", "0.25", "", "", ""]]
+注意:
+  - ["“只用真实图”那条红线只随真实图数量变，掺多少合成图都不动——它是基准线，用来判断合成图是帮了忙还是添了乱。", "The red real-only curve depends only on the number of real images and never moves as synthetic data is added. It is the baseline against which the synthetic data is judged."]
+  - ["这里的“合成器”就是画真实图的那个程序改了几个设置，并不是真的生成模型。这样做是为了把“分布偏了多少”这件事拆开来一样一样看；真生成模型上的对照见云端实验 16.8。", "The generator here is the same renderer with a few settings changed, not an actual generative model. That is deliberate: it isolates each kind of distribution mismatch. The comparison on a real model is in cloud lab 16.8."]
+  - ["换一批真实图（不同的随机种子）成绩会差好几个点，样本越少差得越多。只看一次结果下结论是不稳的。", "A different draw of real images shifts the score by several points, the more so the fewer there are. One run is not enough to conclude anything."]
+思考题:
+  - ["只打开“底纹朝向固定”，合成图里一个缺陷类别都没少、严重度也没变，成绩为什么还是掉？这与第 11 章讲的“捷径”是同一回事吗？", "With only the texture frozen, every defect class and severity is still present, yet the score falls. Why? Is this the same thing as the shortcut problem in Chapter 11?"]
+  - ["如果你是车间的工程师，手上有 60 张真实图和一个不知道偏没偏的生成器，你会怎样在上线前判断“这批合成图能不能用”？写出你的验收办法。", "Suppose you have 60 real images and a generator of unknown quality. How would you decide, before deployment, whether its output is safe to train on? Write down your acceptance procedure."]
