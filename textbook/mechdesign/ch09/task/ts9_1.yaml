@@ -1,0 +1,33 @@
+# 工程任务单 TS-9-1（配第 9 章）：为协作机器人做末端刚度预算。格式见 textbook/tools/tasksheet.py。
+编号: TS-9-1
+标题: ["为协作机器人做末端刚度预算", "Tip-stiffness budget for a collaborative robot"]
+角色: ["机器人本体的结构工程师", "robot arm structural engineer"]
+背景:
+  - "项目组要在 UR5e 同级的协作机器人上做一款视觉检测版：末端装 5 kg 的相机和光源，手臂水平伸直时，相机由负载引起的下垂（从空载到 5 kg 的增量）不得超过 1.1 mm，否则图像会偏出视场；整条手臂（不含底座）的质量不得比现设计多 1.5 kg。9.4 节算过，现设计（肩、肘关节 CSF-25-100，肩关节输出轴 RJ-201，上臂 Ø85×2.5、小臂 Ø75×2 铝管）的增量约 1.6 mm，超了。底座（J1 及其轴承）沿用现设计，不在本任务的改动范围内。你作为结构工程师，要做一份刚度预算：列出力流上每一环的贡献，提出改进方案并证明它满足要求。"
+  - "The team is building a vision-inspection version of a UR5e-class cobot: a 5 kg camera and light at the tip, and with the arm stretched horizontally the payload-induced sag (from no load to 5 kg) must not exceed 1.1 mm, or the image leaves the field of view; the arm (without base) may weigh at most 1.5 kg more than now. Section 9.4 found about 1.6 mm for the present design (CSF-25-100 at shoulder and elbow, shoulder output shaft RJ-201, Ø85×2.5 and Ø75×2 aluminum tubes) — too much. The base (J1 and its bearing) stays as it is and is outside this task. As structural engineer, prepare a stiffness budget: list each contributor along the force path, propose an improvement and show that it meets the requirement."
+输入:
+  - {名称: ["UR5e 的连杆长度和质量（零件库模型，第 7 章）；谐波减速器 CSF 的三段扭转刚度 K1–K3 和质量（零件库；T1、T2 见程序 9.4.1 的样本值）；RJ-201 的结构与尺寸（第 33 章，数字工厂案例件）", "UR5e link lengths and masses (library model, Chapter 7); CSF harmonic-drive stiffnesses K1–K3 and masses (parts library; T1, T2 as in Program 9.4.1); RJ-201 structure and dimensions (Chapter 33, factory case part)"], 来源: ["教材第 7、9、33 章；数字工厂零件库与案例件", "Chapters 7, 9, 33; factory parts library and case parts"]}
+  - {名称: ["要求：5 kg 负载引起的末端下垂增量 ≤ 1.1 mm；手臂增重 ≤ 1.5 kg；减速器在 5 kg 静止时的转矩不超过平均负载转矩的允许值；连杆管的工作应力不超过屈服强度的 1/4（本书设定）", "Requirements: payload-induced tip sag ≤ 1.1 mm at 5 kg; added arm mass ≤ 1.5 kg; static reducer torque at 5 kg within the allowable average-load torque; tube working stress ≤ 1/4 of yield (set by this book)"], 来源: ["项目任务书", "Project brief"]}
+  - {名称: ["程序 9.1.1、9.4.1、9.6.1，实验 9.4；数字工厂“仿真与分析”（有限元）", "Programs 9.1.1, 9.4.1, 9.6.1, Lab 9.4; factory “Simulation & analysis” (finite elements)"], 来源: ["教材第 9 章；数字工厂", "Chapter 9; digital factory"]}
+交付物:
+  - {名称: ["刚度预算（3 页以内）：力流图（从末端到底座的每一环）、每一环的刚度和对末端下垂增量的贡献（表和条形图）、改进方案、改进后的预算、质量和成本的变化、减速器转矩和管子应力的核对", "Stiffness budget (up to 3 pages): force-path diagram (every link from tip to base), stiffness of each and its contribution to the payload-induced sag (table and bar chart), the improvement, the budget after it, mass and cost change, checks of reducer torque and tube stress"], 验收: ["每一环都有出处（零件库、程序、有限元）；改进后满足 1.1 mm 和 1.5 kg 两项要求", "Every entry has a source (library, program, FE); the improved design meets both the 1.1 mm and 1.5 kg limits"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["有限元核对：在数字工厂“仿真与分析”里对 RJ-201 加 5 kg 时的肩关节转矩（第 33.10 节的约束和加载方式），读出扭转角，与程序 9.4.1 按 GJ 公式算的这一环（肩关节在减速器之后串联）比较，预算里用两者中较大的", "FE check: in Simulation & analysis, load RJ-201 with the shoulder torque at 5 kg (supports and loading as in Section 33.10), read the twist, compare with the GJ-formula value Program 9.4.1 uses for this link (in series after the shoulder reducer), and use the larger in the budget"], 验收: ["截图含模型、约束、载荷、读数；有限元与公式的差别有解释；说明这一环占预算的百分比", "Screenshots of model, supports, load, read-out; the difference from the formula explained; its share of the budget stated"], 类型: 分析, 零件: RJ-201}
+  - {名称: ["计算书（Python 或计算表）", "Calculation (Python or spreadsheet)"], 验收: ["能复现刚度预算里的数", "Reproduces the numbers in the budget"], 类型: 文件, 格式: [zip, txt, xlsx]}
+工位: [PY, FEA]
+步骤:
+  - ["用程序 9.4.1 复核现设计：分别算空载和 5 kg 时的下垂，求增量和每一环对增量的贡献（注意谐波减速器的刚度随转矩变化，增量要按两个转矩之间的那一段算）", "Recheck the present design with Program 9.4.1: sag at no load and at 5 kg, the increment and each contributor to it (the harmonic-drive stiffness depends on torque; take the increment between the two torques)"]
+  - ["在“仿真与分析”里算 RJ-201 的扭转角，与程序 9.4.1 里按公式算的这一环比较", "Compute the RJ-201 twist in Simulation & analysis and compare it with the formula value used for this link in Program 9.4.1"]
+  - ["用实验 9.4 和程序试几种改法（换减速器规格、改管子截面），比较每减少 0.1 mm 下垂要多花多少质量；换大一号的减速器时，关节壳体要能装下它的外径（零件库）", "Try several changes with Lab 9.4 and the program (reducer size, tube sections) and compare the mass spent per 0.1 mm of sag removed; a larger reducer needs a joint housing that fits its outer diameter (parts library)"]
+  - ["选定方案，核对减速器转矩、管子应力（8.4 节）和局部屈曲（9.6 节）", "Choose the design and check reducer torque, tube stress (Section 8.4) and local buckling (Section 9.6)"]
+  - ["写刚度预算；评审后在“我的任务”里提交三份交付物", "Write the budget; submit the three deliverables in My tasks after the review"]
+评审要点:
+  - ["力流上的每一环都考虑到了，没有漏掉轴、连接这类“看不见”的环节", "Every link of the force path is included, including the “invisible” ones such as shafts and joints"]
+  - ["转动环节折算到末端的方法正确（K/x²），谐波减速器的非线性按转矩区间处理", "Rotary links are referred to the tip correctly (K/x²) and the harmonic-drive nonlinearity is handled by torque range"]
+  - ["改进方案针对最弱的一环，质量、成本、强度都核对过", "The improvement targets the weakest link; mass, cost and strength are checked"]
+  - ["有限元与公式对照，差别有解释", "FE compared with the formula, differences explained"]
+评分:
+  - {项: ["刚度预算", "Stiffness budget"], 分: 30, 标准: ["环节齐全、折算正确、出处清楚", "Complete, correctly referred, sourced"]}
+  - {项: ["改进方案", "Improvement"], 分: 30, 标准: ["抓住最弱的一环，满足两项要求", "Targets the weakest link, meets both limits"]}
+  - {项: ["强度与稳定核对", "Strength and stability checks"], 分: 20, 标准: ["减速器转矩、管子应力、局部屈曲都核对", "Reducer torque, tube stress and local buckling checked"]}
+  - {项: ["有限元核对与答辩", "FE check and defense"], 分: 20, 标准: ["对照合理、答辩清楚", "Sound comparison, clear defense"]}
+学时: 4

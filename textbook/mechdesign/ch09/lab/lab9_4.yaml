@@ -1,0 +1,28 @@
+# 实验 9.4 的指导书与报告模板。目的、场景、参数、任务取自 lab9_4.js。
+原理:
+  - ["机械臂末端的下垂是力流上每一环变形的叠加：连杆管的弯曲、关节减速器和肩关节输出轴 RJ-201 的扭转、底座轴承的倾斜。它们是串联的，柔度相加，最弱的一环决定整体。", "The tip sag of an arm is the sum of the deformations along the force path: tube bending, windup of the reducers and the shoulder shaft RJ-201, base-bearing tilt. They act in series, compliances add, and the weakest link governs."]
+  - 式: ["1/k = 1/k₁ + 1/k₂ + …；转动环节折算到末端：k = K/x²，下垂 = 转角 × 到末端的距离", "1/k = 1/k₁ + 1/k₂ + …; a rotary link referred to the tip: k = K/x², sag = rotation × distance to the tip"]
+  - 式: ["悬臂管端部：y = wL⁴/(8EI) + PL³/(3EI) + ML²/(2EI)，θ = wL³/(6EI) + PL²/(2EI) + ML/(EI)", "Cantilever tube end: y = wL⁴/(8EI) + PL³/(3EI) + ML²/(2EI), θ = wL³/(6EI) + PL²/(2EI) + ML/(EI)"]
+  - ["谐波减速器的扭转刚度分三段（K1、K2、K3），转矩小时软、大时硬；本实验按零件库的样本值计算。", "A harmonic drive's torsional stiffness has three segments (K1, K2, K3): soft at low torque, stiffer at high torque; the lab uses the catalog values in the parts library."]
+步骤:
+  - ["打开实验 9.4，场景“UR5e 水平伸直”，参数取默认（与程序 9.4.1 相同：5 kg、CSF-25、底座 20 × 10⁴ N·m/rad、Ø85 × 2.5、Ø75 × 2），点“计算”（任务 1），把六环的贡献和合计填入表 1 第一行；再把负载改为 0 算一次，记下增量。", "Open Lab 9.4, scene “UR5e stretched horizontally”, defaults (as in Program 9.4.1: 5 kg, CSF-25, base 20 × 10⁴ N·m/rad, Ø85 × 2.5, Ø75 × 2); press Compute (task 1) and fill in the first row of Table 1 (six links); then set the payload to 0, compute again and note the increment."]
+  - ["负载回到 5 kg，减速器规格改为 2（CSF-32）（任务 2），填表 1 第二行。", "Back to 5 kg, set the reducer size to 2 (CSF-32) (task 2) and fill in the second row."]
+  - ["规格改回 1，两根管的壁厚改为 5 mm 和 4 mm（任务 3），填表 1 第三行。", "Back to size 1, set the walls to 5 mm and 4 mm (task 3) and fill in the third row."]
+  - ["切换到“伸缩自拍杆”，m = 0.2 kg、D1 = 20、t1 = 1、D2 = 16、t2 = 1（任务 4），填表 2。", "Switch to “Telescoping selfie stick”: m = 0.2 kg, D1 = 20, t1 = 1, D2 = 16, t2 = 1 (task 4), and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  UR5e 末端下垂的组成（5 kg）", "Table 1  Make-up of the UR5e tip sag (5 kg)"]
+    表头: ["方案", "肩关节 / mm", "上臂管 / mm", "肘关节 / mm", "底座轴承 / mm", "RJ-201 / mm", "小臂管 / mm", "合计 / mm"]
+    表头英文: ["Design", "Shoulder / mm", "Upper arm / mm", "Elbow / mm", "Base bearing / mm", "RJ-201 / mm", "Forearm / mm", "Total / mm"]
+    行: [["原设计", "", "", "", "", "", "", ""], ["CSF-32", "", "", "", "", "", "", ""], ["壁厚加倍", "", "", "", "", "", "", ""]]
+    行英文: [["baseline", "", "", "", "", "", "", ""], ["CSF-32", "", "", "", "", "", "", ""], ["walls doubled", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  伸缩自拍杆（手机 0.2 kg）", "Table 2  Telescoping selfie stick (0.2 kg phone)"]
+    表头: ["下节管 / mm", "伸缩接头 / mm", "手腕 / mm", "上节管 / mm", "合计 / mm", "最软的一环"]
+    表头英文: ["Lower tube / mm", "Telescoping joint / mm", "Wrist / mm", "Upper tube / mm", "Total / mm", "Softest link"]
+    行: [["", "", "", "", "", ""]]
+注意:
+  - ["关节壳体当作刚体，没有计入螺栓结合面、轴承游隙、键和花键的间隙；实际的手臂还会更软一些。改管子或减速器时，自重的变化已一并计入。", "Joint housings are treated as rigid; bolted interfaces, bearing clearance and key or spline backlash are not included, so a real arm is somewhat softer. Changes in self-weight from new tubes or reducers are included."]
+  - ["管子截面、底座轴承刚度是本书设定；UR5e 的连杆长度和质量取自零件库模型。谐波减速器的分段点 T1、T2 零件库里没有，取样本值。", "Tube sections and base-bearing stiffness are assumed in this book; UR5e link lengths and masses come from the library model. The harmonic-drive break torques T1, T2 are catalog values not yet in the library."]
+  - ["自拍杆的伸缩接头和手腕刚度是示意值，只为说明“最弱的一环”。", "The selfie stick's joint and wrist stiffnesses are illustrative, only to show the weakest-link idea."]
+思考题:
+  - ["程序 9.4.1 和本实验用同一个模型。串联时柔度相加，最弱的一环决定整体；离末端越远的转动环节，折算到末端的刚度 K/x² 越小。为什么机械臂的肩关节常用比肘关节大一号的减速器？", "Program 9.4.1 and this lab share one model. In series the compliances add and the weakest link governs; the farther a rotary link is from the tip, the smaller its stiffness K/x² referred to the tip. Why do robot shoulders often use a reducer one size larger than the elbow?"]
+  - ["把两根管子的壁厚加倍，下垂减少得不多。除了“管子本来就不是最弱的一环”，还有什么原因？（提示：自重。）", "Doubling both tube walls removes little sag. Besides the tubes not being the weakest link, what else is going on? (Hint: self-weight.)"]
