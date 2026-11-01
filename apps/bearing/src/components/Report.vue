@@ -28,6 +28,10 @@ const inputs = computed(() => {
   } else {
     add('fi', p.inner.fi, ''); add('fo', p.inner.fo, '')
     if (p.type === 'deep_groove') add('Pd', p.inner.Pd, 'mm'); else add('alpha0', p.inner.alpha0_deg, '°')
+    if (p.type === 'angular' && p.pair?.arrangement && p.pair.arrangement !== 'single') {
+      rows.push(['arrangement', t('arr_' + p.pair.arrangement), '']); add('preloadF', p.pair.preload, 'N'); add('rowSpacing', p.pair.spacing, 'mm')
+    }
+    if (p.type === 'angular') add('density', p.material?.density, 'g/cm³')
     add('h_i', p.inner.h_i, 'mm'); add('h_o', p.inner.h_o, 'mm')
   }
   add('E', p.material.E, 'MPa'); add('nu', p.material.nu, '')

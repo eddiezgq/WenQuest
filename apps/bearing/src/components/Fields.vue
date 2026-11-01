@@ -40,6 +40,14 @@ const pts = computed({
       <Num v-model="project.inner.fo" :label="t('fo')" step="0.001" />
       <Num v-if="project.type === 'deep_groove'" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
       <Num v-else v-model="project.inner.alpha0_deg" :label="t('alpha0')" unit="°" />
+      <template v-if="project.type === 'angular'">
+        <label class="num"><span class="lab">{{ t('arrangement') }}</span>
+          <select v-model="project.pair.arrangement"><option v-for="k in ['single', 'DB', 'DF', 'DT']" :key="k" :value="k">{{ t('arr_' + k) }}</option></select></label>
+        <template v-if="project.pair.arrangement !== 'single'">
+          <Num v-if="project.pair.arrangement !== 'DT'" v-model="project.pair.preload" :label="t('preloadF')" unit="N" />
+          <Num v-model="project.pair.spacing" :label="t('rowSpacing')" unit="mm" :hint="t('rowSpacingHint')" />
+        </template>
+      </template>
       <Num v-model="project.inner.h_i" :label="t('h_i')" unit="mm" :hint="t('hHint')" />
       <Num v-model="project.inner.h_o" :label="t('h_o')" unit="mm" />
     </fieldset>
@@ -68,6 +76,7 @@ const pts = computed({
     <fieldset><legend>{{ t('gMat') }}</legend>
       <Num v-model="project.material.E" :label="t('E')" unit="MPa" />
       <Num v-model="project.material.nu" :label="t('nu')" step="0.01" />
+      <Num v-if="project.type === 'angular'" v-model="project.material.density" :label="t('density')" unit="g/cm³" step="0.01" :hint="t('densityHint')" />
     </fieldset>
 
     <fieldset v-if="project.scenario.kind === 'generic'"><legend>{{ t('gLoads') }}</legend>
