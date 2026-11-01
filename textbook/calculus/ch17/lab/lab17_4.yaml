@@ -1,0 +1,28 @@
+# 实验 17.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_4.js。
+原理:
+  - ["质量 M = ∫dm，质心 x̄ = (1/M)∫x dm，绕某轴的转动惯量 I = ∫r² dm（17.3、17.4 节）。均匀实心圆柱（质量 M、半径 r、长 L）绕过质心且垂直于轴线的轴：I = M(3r² + L²)/12；细杆极限 r → 0 时为 ML²/12。", "Mass M = ∫dm, centre of mass x̄ = (1/M)∫x dm, inertia about an axis I = ∫r² dm (Sections 17.3, 17.4). A uniform solid cylinder (mass M, radius r, length L) about a transverse axis through its centre: I = M(3r² + L²)/12, tending to ML²/12 for a thin rod."]
+  - 式: "平行轴定理 I_轴 = I_质心 + M d²"
+  - ["铝管（外半径 r_o、内半径 r_i、长 L、线密度 λ = ρπ(r_o² − r_i²)）绕一端的横轴：I = λL³/3 + λL(r_o² + r_i²)/4。两端关节模块近似为半径 0.06 m 的实心圆柱，轴线与关节轴平行，自身转动惯量 ½ m r²，肘端模块还要加 m L²。", "An aluminium tube (outer radius r_o, inner r_i, length L, linear density λ = ρπ(r_o² − r_i²)) about a transverse axis at one end: I = λL³/3 + λL(r_o² + r_i²)/4. The joint modules are modelled as solid cylinders of radius 0.06 m with axes parallel to the joint axis, each contributing ½ m r², plus m L² for the elbow module."]
+步骤:
+  - ["在“UR5e 上臂”场景中选模型 1，半径取 30、40、50、60、70 mm，记录绕质心的转动惯量，找出与零件库 0.133886 kg·m² 一致的半径，填入表 1（任务 1）。", "In 'UR5e upper arm', choose model 1 and radii 30, 40, 50, 60, 70 mm; record the inertia about the centre of mass and find the radius matching the library's 0.133886 kg·m² (Table 1, task 1)."]
+  - ["选模型 2，调整铝管尺寸和两个关节模块的质量，使总质量与 8.393 kg 相差不到 1%、质心在 0.2125 m ± 2 mm；再试着把总质量调到手册的 8.058 kg。把三组结果填入表 2（任务 2、3）。", "Choose model 2 and adjust the tube and module masses so the mass is within 1% of 8.393 kg and the centre of mass at 0.2125 m ± 2 mm; then try the manual's 8.058 kg. Record three settings in Table 2 (tasks 2 and 3)."]
+  - ["在“变密度杆”场景中，k 取 −0.75、−0.5、0、1、2，记录质心和绕根部的转动惯量，填入表 3（任务 4）。", "In 'Rod of varying density', for k = −0.75, −0.5, 0, 1, 2 record the centre of mass and inertia about the root in Table 3 (task 4)."]
+数据表:
+  - 标题: ["表 1  均匀实心圆柱模型（M = 8.393 kg，L = 0.425 m）", "Table 1  Uniform solid-cylinder model (M = 8.393 kg, L = 0.425 m)"]
+    表头: ["半径 / mm", "I_质心 / (kg·m²)", "I_肩 / (kg·m²)", "与零件库之比"]
+    表头英文: ["radius / mm", "I_CM / (kg·m²)", "I_shoulder / (kg·m²)", "ratio to library"]
+    行: [["30", "", "", ""], ["40", "", "", ""], ["50", "", "", ""], ["60", "", "", ""], ["70", "", "", ""]]
+  - 标题: ["表 2  铝管 + 关节模块模型", "Table 2  Tube + joint-module model"]
+    表头: ["r_o / mm", "壁厚 / mm", "m₁ / kg", "m₂ / kg", "M / kg", "x̄ / m", "I_质心 / (kg·m²)", "与零件库之比"]
+    表头英文: ["r_o / mm", "wall / mm", "m₁ / kg", "m₂ / kg", "M / kg", "x̄ / m", "I_CM / (kg·m²)", "ratio to library"]
+    行: [["", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", ""], ["", "", "", "", "", "", "", ""]]
+  - 标题: ["表 3  变密度杆（L = 1，M = 1）", "Table 3  Varying-density rod (L = 1, M = 1)"]
+    表头: ["k", "x̄ / L", "I_根 / (mL²)", "I_质心 / (mL²)"]
+    表头英文: ["k", "x̄ / L", "I_root / (mL²)", "I_CM / (mL²)"]
+    行: [["−0.75", "", "", ""], ["−0.5", "", "", ""], ["0", "", "", ""], ["1", "", "", ""], ["2", "", "", ""]]
+注意:
+  - ["零件库的 UR5e 模型来自 MuJoCo Menagerie（源自 ROS 的 ur_description），质心和转动惯量取自它的仿真模型文件，它把每节连杆当作均匀实心圆柱来估算转动惯量；厂家（Universal Robots）公布的上臂质量是 8.058 kg、质心 (0.2125, 0, 0.11336) m，转动惯量给为 0。两套数据都是近似，精确的动力学参数要靠实验辨识。", "The library's UR5e model comes from MuJoCo Menagerie (derived from ROS ur_description), which estimates each link's inertia as a uniform solid cylinder; Universal Robots publishes the upper-arm mass as 8.058 kg, the centre of mass at (0.2125, 0, 0.11336) m, and the inertia as zero. Both are approximations; accurate dynamic parameters require experimental identification."]
+  - ["模型 2 把关节模块的质量全部放在两端，偏向另一个极端；真实上臂的转动惯量多半介于两个模型之间，要靠辨识确定。", "Model 2 puts all the module mass at the ends, leaning to the other extreme; the real upper arm probably lies between the two and must be identified experimentally."]
+思考题:
+  - ["电机转子的转动惯量很小（约 10⁻⁴ kg·m²），但经过减速比 N = 101 的减速器折算到关节，要乘以 N²。与上臂绕肩关节轴的转动惯量相比，哪个大？这对控制器的设计意味着什么？", "A motor rotor's inertia is tiny (about 10⁻⁴ kg·m²), but through a gearbox of ratio N = 101 it appears at the joint multiplied by N². Which is larger, this or the upper arm's inertia about the shoulder? What does that mean for the controller?"]
+  - ["厂家把转动惯量写成 0，零件库用均匀圆柱估算，两者对“肩关节加速时需要多大力矩”的预测差多少？哪些场合这个差别要紧，哪些场合不要紧？", "The vendor lists the inertia as zero and the library estimates it with a uniform cylinder. How differently do they predict the torque needed to accelerate the shoulder? When does the difference matter?"]
