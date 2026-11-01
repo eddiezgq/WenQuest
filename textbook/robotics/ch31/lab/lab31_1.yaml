@@ -1,0 +1,27 @@
+# 实验 31.1 的指导书与报告模板。目的、场景、参数、任务取自 lab31_1.js。
+原理:
+  - ["手臂水平伸直、工具朝下，抓起负载 P 后 TCP 又下沉多少：每个会变形的地方转一个小角度，TCP 就移动“小角度 × 力臂”（31.2 节式 (31.2.1)）。伸直时化成闭式：", "Outstretched with the tool down, how much farther does the TCP drop after picking up a payload P? Every compliant spot turns a little and the TCP moves by “small angle × lever arm” (Eq. (31.2.1)). Outstretched, this becomes:"]
+  - 式: "δ = P·r2²/K_J2 + P·r3²/K_J3 + P·(0.10² + 0.05²)/K_wrist + P·(r2³ − r3³)/(3EI_u) + P·(r3³ − 0.10³)/(3EI_f) + 扭转"
+  - ["r2 = 0.86 m、r3 = 0.46 m 是负载点到 J2、J3 的水平距离；K 是谐波减速器的扭转刚度（零件库 D-RDC-HD-CSF：K1 最软、K3 最硬）。薄壁管的惯性矩近似为 π r³ t：与外半径的三次方、壁厚的一次方成正比，重量与两者都是一次方。", "r2 = 0.86 m and r3 = 0.46 m are the payload's horizontal distances from J2 and J3; K is each strain wave gear's torsional stiffness (library D-RDC-HD-CSF: K1 softest, K3 stiffest). A thin tube's second moment of area is about π r³ t: cubic in the radius, linear in the wall, while its weight is linear in both."]
+  - 式: "I = π/4·(r_o⁴ − r_i⁴) ≈ π r³ t，m = ρ·π(r_o² − r_i²)·L"
+  - ["大臂根部的弯矩等于 J2 的重力矩，扭矩来自腕部的横向偏置；按第四强度理论合成当量应力，与屈服强度比得安全系数。", "The bending moment at the upper arm's root equals J2's gravity torque; the torsion comes from the wrist's sideways offset. The fourth strength theory gives the equivalent stress, compared with the yield strength for the safety factor."]
+  - 式: "σ_eq = √(σ² + 3τ²)，σ = M r_o/I，τ = T r_o/(2I)"
+步骤:
+  - ["场景“WQ-CR5 手臂”，标准截面（6061 铝，Ø90×3、Ø75×3，关节按 K1，5 kg）：记录两管质量、J2 的重力矩、下沉的总量和组成、根部当量应力，填入表 1（任务 1）。再把关节改为 K3，记录一行。", "Scene “WQ-CR5 arm”, standard tubes (6061 Al, Ø90×3 and Ø75×3, joints at K1, 5 kg): record the tube mass, J2's torque, the sag and its parts and the root stress in Table 1 (task 1). Switch the joints to K3 and record another row."]
+  - ["材料改为 Q345 钢，外径不变，逐步减薄壁厚，直到两管弯曲的下沉回到标准的 ±5% 以内（任务 2）；记录壁厚和质量。再改成碳纤维管做同样的事（任务 4）。", "Switch to Q345 steel with the same ODs and thin the walls until the tubes' bending sag is within ±5 % of the standard (task 2); record the walls and mass. Do the same with carbon tubes (task 4)."]
+  - ["回到 6061 铝，只改大臂的外径和壁厚：大臂弯曲的下沉减半，大臂管重不超过标准的 1.3 倍（任务 3）；把试过的截面填入表 2。", "Back to 6061 Al and change only the upper arm's OD and wall: halve its bending sag with its tube at most 1.3 times the standard weight (task 3); list the sections you tried in Table 2."]
+  - ["场景“钓鱼竿”：两节竿总重不超过 0.16 kg，竿尖下沉不超过 0.14 m（任务 5）。先试两节一样粗，再试根粗梢细。", "Scene “A fishing rod”: total weight at most 0.16 kg, tip sag at most 0.14 m (task 5). Try equal diameters first, then a thick butt and a thin tip."]
+数据表:
+  - 标题: ["表 1  材料与下沉", "Table 1  Materials and sag"]
+    表头: ["材料", "大臂 D×t / mm", "小臂 D×t / mm", "关节刚度", "两管质量 / kg", "J2 力矩 / (N·m)", "下沉 / mm", "关节占 / %", "当量应力 / MPa"]
+    表头英文: ["Material", "Upper D×t / mm", "Forearm D×t / mm", "Joint stiffness", "Tube mass / kg", "J2 torque / (N·m)", "Sag / mm", "Joints / %", "Equiv. stress / MPa"]
+    行: [["6061 铝", "90×3", "75×3", "K1", "", "", "", "", ""], ["6061 铝", "90×3", "75×3", "K3", "", "", "", "", ""], ["Q345 钢", "90×", "75×", "K1", "", "", "", "", ""], ["碳纤维管", "90×", "75×", "K1", "", "", "", "", ""]]
+  - 标题: ["表 2  只改大臂截面（6061 铝）", "Table 2  Upper-arm section only (6061 Al)"]
+    表头: ["外径 / mm", "壁厚 / mm", "大臂管重 / kg", "大臂弯曲的下沉 / mm", "J2 力矩 / (N·m)"]
+    表头英文: ["OD / mm", "Wall / mm", "Upper tube mass / kg", "Upper bending sag / mm", "J2 torque / (N·m)"]
+    行: [["90", "3", "", "", ""], ["90", "5", "", "", ""], ["110", "2", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["本页按伸直工况的闭式计算，与程序 31.2.1、31.4.1 的三维模型一致（标准截面下沉 1.160 mm）；只算负载引起的变化，不含整机自重。", "This page uses the outstretched closed form and agrees with the 3D model of Programs 31.2.1 and 31.4.1 (1.160 mm for the standard tubes); only the payload's effect is shown, not the arm's own weight."]
+  - ["碳纤维管的数据取一种 0°/90° 铺层的卷制管，剪切模量只有 4.6 GPa，所以扭转的下沉会变大；强度按轴向抗拉强度算。", "The carbon tube is a roll-wrapped 0°/90° tube whose shear modulus is only 4.6 GPa, so the torsional part grows; its strength is the axial tensile strength."]
+思考题:
+  - ["钢管只要 1 mm 的壁就和铝管一样硬，而且不更重。工厂为什么还是用铝管？至少说出三条。", "A 1 mm steel wall is as stiff as the aluminium tube and no heavier. Why does the factory still use aluminium? Give at least three reasons."]

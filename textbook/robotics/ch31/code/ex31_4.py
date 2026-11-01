@@ -12,7 +12,7 @@ import math
 
 import numpy as np
 
-from _ch31 import G0, Q_OUT, W, deflection, load_points, materials, tube_props
+from _ch31 import G0, Q_OUT, W, deflection, load_points, materials, robot_plant_prices, tube_props
 from bookout import COLORS as C, T, figure, out, style
 
 MT = materials()
@@ -80,6 +80,10 @@ m_mod = sum(W.MODULES[s]["mass"] for s in W.JOINT_MODULE)
 out(m_tubes=m_tubes, cf_kg=save, dtau2=dtau2, dtau2_pct=dtau2 / tau2 * 100, m_total=W.total_mass(), m_mod=m_mod,
     save_pct=save / W.total_mass() * 100)
 assert save / W.total_mass() < 0.1                         # 整机轻不到一成：大头是关节模组
+# 价格的量级：碳纤维管取同一产品页的零售价（Ø50.3×1.4，每米 63.08 英镑），铝管取机器人厂清单的示例价（每千克）
+cf_kg_per_m = CF["rho"] * math.pi * ((50.3e-3 / 2) ** 2 - (47.5e-3 / 2) ** 2)
+P = robot_plant_prices()
+out(cf_gbp_kg=63.08 / cf_kg_per_m, al_usd_kg=P["RM-AL-TUBE-D90"])
 
 # ---------------------------------------------------------------- (4) 拓扑优化
 from _ch31 import CAE  # noqa: E402

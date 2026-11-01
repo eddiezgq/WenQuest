@@ -1,0 +1,29 @@
+# 实验 31.2 的指导书与报告模板。目的、场景、参数、任务取自 lab31_2.js。
+原理:
+  - ["把手臂看成两个扭簧（J2、J3 的谐波减速器）加刚性的连杆，平衡位置附近的小振动满足 M θ̈ + K θ = 0（31.5 节式 (31.5.3)）。设 θ = v sin ωt，得广义特征值问题：", "Treat the arm as two torsion springs (J2's and J3's strain wave gears) plus rigid links; small vibrations about the equilibrium obey M θ̈ + K θ = 0 (Eq. (31.5.3)). With θ = v sin ωt this becomes the generalised eigenvalue problem:"]
+  - 式: "K v = ω² M v，f = ω / 2π"
+  - ["M 是两个关节的质量矩阵：每个质点绕 J2、J3 转动时的速度相乘求和；K = diag(K_J2, K_J3)。两个特征值给出两个固有频率，特征向量是振型（两个关节转角的比例）。", "M is the two joints' mass matrix, from the speeds of every mass point when J2 or J3 turns; K = diag(K_J2, K_J3). The two eigenvalues give the two natural frequencies and the eigenvectors the mode shapes (ratios of the two joint angles)."]
+  - ["敲一下（冲量）以后，每一阶按 e^(−ζωt) 衰减。振幅降到 5% 的时间和减半所需的周期数：", "After a knock (an impulse) each mode decays as e^(−ζωt). The time to fall to 5 % and the cycles to halve:"]
+  - 式: "t₅ = ln 20 / (ζ ω)，n½ ≈ ln 2 / (2π ζ)"
+  - ["跳水板：板是悬臂弹簧 k = 3EI/L³，人是板端的质量（板的自重折算 0.2357 倍），f = √(k/m) / 2π。", "Springboard: the board is a cantilever spring k = 3EI/L³ and the diver a mass at its end (plus 0.2357 of the board's own mass), f = √(k/m) / 2π."]
+步骤:
+  - ["场景“WQ-CR5 手臂”，标准参数（5 kg、K1、J2 刚度 × 1、ζ = 0.02、伸直），点“敲一下”，看 TCP 的位移曲线；记录两个固有频率、第一阶振型、t₅，填入表 1（任务 1）。", "Scene “WQ-CR5 arm”, standard settings (5 kg, K1, J2 stiffness × 1, ζ = 0.02, outstretched): press “Knock”, watch the TCP curve and record both frequencies, the first mode shape and t₅ in Table 1 (task 1)."]
+  - ["负载依次取 0、2.5、5、8 kg，记录第一阶频率（任务 2）；算一算频率比与质量比的关系。", "Set the payload to 0, 2.5, 5 and 8 kg and record the first frequency (task 2); compare the frequency ratio with the mass ratio."]
+  - ["只把 J2 的刚度倍数调到 2（任务 3），再把关节改为 K3，各记录一行。", "Set only J2's stiffness multiplier to 2 (task 3), then switch the joints to K3, recording a row each."]
+  - ["回到标准参数，只改阻尼比，让 t₅ ≤ 1 s（任务 4）；敲一下，看曲线是否在 1 s 内平下来。", "Back to the standard settings, change only the damping so that t₅ ≤ 1 s (task 4); knock and check that the curve settles within 1 s."]
+  - ["把手臂收回（α = 30°、60°），记录第一阶频率，与图 31.5.1(b) 比较。", "Fold the arm (α = 30°, 60°) and record the first frequency; compare with Fig. 31.5.1(b)."]
+  - ["场景“跳水板”：调板长和体重，让弹跳频率在 0.95～1.05 Hz（任务 5）。", "Scene “A springboard”: set the length and the mass for 0.95–1.05 Hz (task 5)."]
+数据表:
+  - 标题: ["表 1  WQ-CR5 手臂的固有频率", "Table 1  The WQ-CR5 arm's natural frequencies"]
+    表头: ["负载 / kg", "关节刚度", "J2 刚度倍数", "收回角 α / °", "f₁ / Hz", "f₂ / Hz", "θ3 : θ2", "ζ", "t₅ / s"]
+    表头英文: ["Payload / kg", "Joint stiffness", "J2 multiplier", "Fold α / °", "f₁ / Hz", "f₂ / Hz", "θ3 : θ2", "ζ", "t₅ / s"]
+    行: [["5", "K1", "1", "0", "", "", "", "0.02", ""], ["0", "K1", "1", "0", "", "", "", "0.02", ""], ["8", "K1", "1", "0", "", "", "", "0.02", ""], ["5", "K1", "2", "0", "", "", "", "0.02", ""], ["5", "K3", "1", "0", "", "", "", "0.02", ""], ["5", "K1", "1", "60", "", "", "", "0.02", ""]]
+  - 标题: ["表 2  跳水板", "Table 2  The springboard"]
+    表头: ["板长 / m", "体重 / kg", "k / (N/m)", "f / Hz"]
+    表头英文: ["Length / m", "Mass / kg", "k / (N/m)", "f / Hz"]
+    行: [["4.8", "60", "", ""], ["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["本页只让 J2、J3 两个关节弹，手腕和铝管都当作刚性，所以第一阶频率比 31.5 节的六关节模型（表 31.5.1）高一点；阻尼比是示例值，实际要靠测试辨识。", "Only J2 and J3 are springs here; the wrist and tubes are rigid, so the first frequency is a little higher than the six-joint model of Table 31.5.1; the damping ratio is an example value that real robots get from tests."]
+  - ["跳水板的抗弯刚度 EI 是示例值；真实的跳水板还有一个可以前后移动的支点，用来调节节奏。", "The springboard's bending stiffness EI is an example value; real boards also have a movable fulcrum to tune the rhythm."]
+思考题:
+  - ["J2 的刚度加倍，第一阶频率为什么只提高约两成？如果 J2、J3 都加倍呢？", "Why does doubling J2's stiffness raise the first frequency by only about a fifth? And doubling both J2 and J3?"]

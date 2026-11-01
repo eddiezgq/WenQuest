@@ -154,3 +154,10 @@ def modes(q, K, payload_kg=W.PAYLOAD_KG):
     from scipy.linalg import eigh
     w2, V = eigh(np.diag(K), mass_matrix(q, payload_kg))
     return np.sqrt(np.maximum(w2, 0)) / (2 * math.pi), V
+
+
+def robot_plant_prices():
+    """机器人厂清单（factory/plants/wenquest-robot.yaml）里各物料的示例价"""
+    import yaml
+    P = yaml.safe_load((ROOT / "factory" / "plants" / "wenquest-robot.yaml").read_text(encoding="utf-8"))
+    return {it["code"]: it.get("price") for it in P["items"]}
