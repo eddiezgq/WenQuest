@@ -20,7 +20,7 @@ WQ.lab({
       problem: { title: ["机器人问题：管子怎么选", "Robot problem: choosing the tubes"],
                  text: ["手臂水平伸直，抓起 5 kg 的零件，TCP 又往下掉一点。换粗管、厚管、钢管还是碳纤维管？手臂重了，J2 的力矩也跟着变。",
                         "Outstretched, the arm picks up 5 kg and the TCP drops a little more. Thicker, wider, steel or carbon tubes? A heavier arm also changes J2's torque."] } },
-    { id: "rod", name: ["钓鱼竿", "A fishing rod"], hide: ["d1", "t1", "d2", "t2", "mat", "kj", "mp"],
+    { id: "rod", name: ["钓鱼竿", "A fishing rod"], hide: ["d1", "t1", "d2", "t2", "mat", "kj"],
       problem: { title: ["生活中的例子：鱼竿为什么根粗梢细", "Everyday example: why a rod is thick at the butt"],
                  text: ["两节碳纤维竿，竿尖挂一条 0.3 kg 的鱼。同样的重量，粗细怎样搭配，竿尖弯得最少？",
                         "A two-piece carbon rod with a 0.3 kg fish on the tip. For the same weight, which pair of diameters bends the tip least?"] } },
@@ -32,23 +32,22 @@ WQ.lab({
     { id: "t2", name: ["小臂壁厚", "Forearm wall"], min: 0.5, max: 8, step: 0.1, value: 3, unit: "mm", digits: 1 },
     { id: "mat", name: ["材料：0 6061 铝 / 1 7075 铝 / 2 Q345 钢 / 3 碳纤维管", "Material: 0 6061 Al / 1 7075 Al / 2 Q345 steel / 3 CFRP tube"], min: 0, max: 3, step: 1, value: 0, unit: "", digits: 0 },
     { id: "kj", name: ["关节刚度：0 按 K1（最软）/ 1 按 K3（最硬）", "Joint stiffness: 0 K1 (softest) / 1 K3 (stiffest)"], min: 0, max: 1, step: 1, value: 0, unit: "", digits: 0 },
-    { id: "mp", name: ["负载", "Payload"], min: 0, max: 8, step: 0.5, value: 5, unit: "kg", digits: 1 },
     { id: "db", name: ["竿根外径", "Butt OD"], min: 8, max: 20, step: 0.5, value: 14, unit: "mm", digits: 1 },
     { id: "dt", name: ["竿梢外径", "Tip OD"], min: 8, max: 20, step: 0.5, value: 14, unit: "mm", digits: 1 },
   ],
   tasks: [
     { id: "std", robot: true, text: ["标准截面（6061 铝，Ø90×3、Ø75×3，关节按 K1，5 kg）：读出下沉的组成，关节占多少？",
                                      "Standard tubes (6061 Al, Ø90×3 and Ø75×3, joints at K1, 5 kg): read the parts of the sag. What share is the joints'?"],
-      demo: { scene: "arm", set: { d1: 90, t1: 3, d2: 75, t2: 3, mat: 0, kj: 0, mp: 5 }, press: [] } },
+      demo: { scene: "arm", set: { d1: 90, t1: 3, d2: 75, t2: 3, mat: 0, kj: 0 }, press: [] } },
     { id: "steel", robot: true, text: ["两根都换成 Q345 钢管（外径不变），调壁厚，让两管弯曲的下沉与标准相差不到 5%：比一比两根管的重量。",
                                        "Switch both tubes to Q345 steel (same ODs) and set the walls so that the tubes' bending sag is within 5 % of the standard: compare the tube weights."],
-      demo: { scene: "arm", set: { d1: 90, t1: 0.9, d2: 75, t2: 1.0, mat: 2, kj: 0, mp: 5 }, press: [] } },
+      demo: { scene: "arm", set: { d1: 90, t1: 0.9, d2: 75, t2: 1.0, mat: 2, kj: 0 }, press: [] } },
     { id: "section", robot: true, text: ["只改截面（6061 铝）：大臂弯曲的下沉减到标准的一半以下，大臂的管子重不超过标准的 1.3 倍。",
                                          "Section only (6061 Al): halve the upper arm's bending sag while its tube weighs at most 1.3 times the standard."],
-      demo: { scene: "arm", set: { d1: 130, t1: 2.5, d2: 75, t2: 3, mat: 0, kj: 0, mp: 5 }, press: [] } },
+      demo: { scene: "arm", set: { d1: 130, t1: 2.5, d2: 75, t2: 3, mat: 0, kj: 0 }, press: [] } },
     { id: "cfrp", robot: true, text: ["两根都换成碳纤维管（外径不变），两管弯曲的下沉与标准相差不到 5%：两根管轻了多少？J2 的力矩少了多少？",
                                       "Switch both tubes to carbon (same ODs) with the tubes' bending sag within 5 % of the standard: how much lighter, and how much less J2 torque?"],
-      demo: { scene: "arm", set: { d1: 90, t1: 2.2, d2: 75, t2: 2.3, mat: 3, kj: 0, mp: 5 }, press: [] } },
+      demo: { scene: "arm", set: { d1: 90, t1: 2.2, d2: 75, t2: 2.3, mat: 3, kj: 0 }, press: [] } },
     { id: "rod", text: ["钓鱼竿：两节竿总重不超过 0.16 kg，竿尖下沉不超过 0.14 m。", "Fishing rod: total weight at most 0.16 kg and tip sag at most 0.14 m."],
       demo: { scene: "rod", set: { db: 18, dt: 10 }, press: [] } },
   ],
@@ -64,6 +63,7 @@ WQ.lab({
     return { ro, A: Math.PI * (ro * ro - ri * ri), I, Ip: 2 * I, G: m.G || m.E / (2 * (1 + m.nu)) };
   },
   calc(p) {
+    p = Object.assign({ mp: 5 }, p);                // 负载固定 5 kg（额定负载）
     const m = this.MATS[Math.round(p.mat)], al = this.MATS[0], P = p.mp * this.G0, kk = this.K[Math.round(p.kj)];
     const u = this.tube(p.d1, p.t1, m), f = this.tube(p.d2, p.t2, m);
     const u0 = this.tube(90, 3, al), f0 = this.tube(75, 3, al);
@@ -76,7 +76,7 @@ WQ.lab({
     const sig = tau2 * u.ro / u.I / 1e6, tau = T * u.ro / u.Ip / 1e6, vm = Math.sqrt(sig * sig + 3 * tau * tau);
     return { m, j, ub, fb, tr, tot: j + ub + fb + tr, mu, mf, mu0, mf0, tau2, vm, n: m.R / vm, ok: p.t1 < p.d1 / 2 && p.t2 < p.d2 / 2 };
   },
-  std() { return this.calc({ d1: 90, t1: 3, d2: 75, t2: 3, mat: 0, kj: 0, mp: 5 }); },
+  std() { return this.calc({ d1: 90, t1: 3, d2: 75, t2: 3, mat: 0, kj: 0 }); },
   rod(db, dt) {
     const E = 90e9, P = 0.3 * this.G0, I = (D) => Math.PI / 64 * ((D / 1000) ** 4 - ((D - 2) / 1000) ** 4);
     const sag = P * (4.032 / (E * I(db)) + 0.576 / (E * I(dt)));
@@ -94,7 +94,7 @@ WQ.lab({
     }
     const p = api.p, c = this.calc(p), s = this.std();
     const mm = (x) => f(x * 1000, 3);
-    const stdset = Math.round(p.mat) === 0 && Math.round(p.kj) === 0 && Math.abs(p.mp - 5) < 1e-9;
+    const stdset = Math.round(p.mat) === 0 && Math.round(p.kj) === 0;
     if (stdset && p.d1 === 90 && Math.abs(p.t1 - 3) < 1e-9 && p.d2 === 75 && Math.abs(p.t2 - 3) < 1e-9) api.done("std");
     const tb = c.ub + c.fb, tb0 = s.ub + s.fb;
     if (c.ok && Math.round(p.mat) === 2 && p.d1 === 90 && p.d2 === 75 && Math.abs(tb / tb0 - 1) <= 0.05) api.done("steel");
@@ -143,7 +143,7 @@ WQ.lab({
     const amp = 120;                                       // 下沉放大倍数
     api.label(api.lang() === "en" ? `side view; sag × ${amp}` : `侧视；下沉放大 ${amp} 倍`, x0, h * 0.06, api.css("--muted"), 12, "left");
     // 未变形的手臂（虚线）与变形后（实线）：关节转角 + 管子弯曲，按负载引起的下沉放大
-    const P = p.mp * 9.81, kk = this.K[Math.round(p.kj)], m = cc.m;
+    const P = 5 * 9.81, kk = this.K[Math.round(p.kj)], m = cc.m;
     const u = this.tube(p.d1, p.t1, m), fo = this.tube(p.d2, p.t2, m);
     const n = 80, pts = [];
     let th = P * this.LT / kk[0], y = 0;
@@ -171,7 +171,7 @@ WQ.lab({
     api.line(X(0.86), y0 + amp * k * tip[1], X(0.86), y0 + amp * k * tip[1] + k * 0.19, api.css("--ink"), 3);
     const ty = y0 + amp * k * tip[1] + k * 0.19;
     api.rect(X(0.86) - k * 0.04, ty, k * 0.08, k * 0.06, api.css("--amber"), api.css("--ink"));
-    api.label(`${p.mp} kg`, X(0.86) + k * 0.05, ty + k * 0.03, api.css("--ink"), 12, "left");
+    api.label("5 kg", X(0.86) + k * 0.05, ty + k * 0.03, api.css("--ink"), 12, "left");
     api.label("J2", X(0), y0 - k * 0.075, api.css("--ink"), 12, "center");
     api.label("J3", X(this.A2), yj3 - k * 0.065, api.css("--ink"), 12, "center");
     // 下沉的组成：横条

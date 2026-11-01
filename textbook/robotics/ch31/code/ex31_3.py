@@ -70,7 +70,7 @@ out(b_uy=fm["delta_mm"], b_mid=b_mid, b_root=fm["vm_mpa"], b_I_cm4=I / 1e4, uy_e
 ms, _ = MO.solve(step, {"material": mat, "loads": loads, "mesh": {"size_mm": 10.0}})
 f = [x["hz"] for x in ms["freqs"]]
 assert abs(f[0] / f[1] - 1) < 0.01 and abs(f[0] / fm["f1_tip_hz"] - 1) < 0.06 and f[0] < fm["f1_hz"]
-out(f1=f[0], f2=f[1], f3=f[2], b_f1=fm["f1_hz"], b_f1t=fm["f1_tip_hz"], f_err=(f[0] / fm["f1_tip_hz"] - 1) * 100)
+out(ray=33 / 140, f1=f[0], f2=f[1], f3=f[2], b_f1=fm["f1_hz"], b_f1t=fm["f1_tip_hz"], f_err=(f[0] / fm["f1_tip_hz"] - 1) * 100)
 
 # ---------------------------------------------------------------- 图 31.3.1
 plt = style()
@@ -82,7 +82,7 @@ ax = axs[0]
 from matplotlib.collections import PolyCollection  # noqa: E402
 polys = pos[tri[front]][:, :, [2, 1]]
 vals = VM[tri[front]].mean(axis=1)
-pc = PolyCollection(polys, array=vals, cmap="turbo", edgecolors="none")
+pc = PolyCollection(polys, array=vals, cmap="turbo", edgecolors="none", rasterized=True)
 pc.set_clim(0, float(np.percentile(vals, 99.5)))
 ax.add_collection(pc)
 ax.set_xlim(-5, L + 5)
