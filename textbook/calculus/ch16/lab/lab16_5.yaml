@@ -1,0 +1,30 @@
+# 实验 16.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_5.js。
+原理:
+  - ["外壳由轮廓线 r(z)（0 ≤ z ≤ H + c）绕竖直轴旋转而成。体积用圆盘法 V = ∫πr(z)²dz（16.3 节），表面积用旋转曲面的面积公式 S = ∫2πr ds（16.5 节），平底再加 πR²。", "The housing is the profile r(z) (0 ≤ z ≤ H + c) revolved about the vertical axis. Its volume is V = ∫πr(z)²dz by disks (Section 16.3) and its area S = ∫2πr ds (Section 16.5), plus πR² for the flat bottom."]
+  - 式: "V = πR²H + (2/3)πR²c；S_侧 = 2πRH；c = R 时 S_顶 = 2πR²"
+  - ["零件库的三维模型是三角网格：圆周用内接正 N 边形代替。截面积缩小为圆的 N sin(2π/N)/(2π) 倍，周长缩小为 N sin(π/N)/π 倍，所以外凸的网格模型的体积和面积偏小，偏差约为 (2π/N)²/6 和 (π/N)²/6（实验读数的面积偏差只算侧面和顶）。", "Part-library models are triangle meshes: the circle is replaced by an inscribed regular N-gon. Cross-sectional area shrinks by N sin(2π/N)/(2π) and perimeter by N sin(π/N)/π, so for a convex body the mesh volume and area are too small, by about (2π/N)²/6 and (π/N)²/6 (the lab's area deviation covers the side and top only)."]
+  - ["切片求和 Σπr(z_k)²Δz 是体积积分的中点和，误差与 1/n² 成正比（15.2 节）。", "The slice sum Σπr(z_k)²Δz is the midpoint sum of the volume integral; its error is proportional to 1/n² (Section 15.2)."]
+步骤:
+  - ["在“服务机器人外壳”场景中取默认外壳（R = 150 mm，H = 400 mm，c = 100 mm），记录体积、表面积、壳体质量和用漆量；N 取 12、24、48、82、96、360，把网格模型的体积偏差和面积偏差填入表 1（任务 1）。", "In 'Service-robot housing', with the default housing (R = 150 mm, H = 400 mm, c = 100 mm), record the volume, area, shell mass and paint; for N = 12, 24, 48, 82, 96, 360 record the mesh volume and area deviations in Table 1 (task 1)."]
+  - ["令 c = R，记录顶的面积，与 2πR² 比较（任务 2）。", "Set c = R and compare the top's area with 2πR² (task 2)."]
+  - ["保持 c = R，调整 R 和 H，使体积在 30～30.6 L 之间，找出表面积最小的组合，填入表 2（任务 3）。", "Keeping c = R, adjust R and H so that the volume is 30–30.6 L and find the smallest area; record in Table 2 (task 3)."]
+  - ["在“切片求体积”场景中，n 取 4、8、16、32、64，把相对误差和“误差 × n²”填入表 3（任务 4）。", "In 'Volume by slices', for n = 4, 8, 16, 32, 64 record the relative error and error × n² in Table 3 (task 4)."]
+数据表:
+  - 标题: ["表 1  网格模型的偏差（默认外壳）", "Table 1  Mesh model deviations (default housing)"]
+    表头: ["N", "体积偏差 / %", "面积偏差 / %", "近似值 −(2π/N)²/6 × 100"]
+    表头英文: ["N", "volume deviation / %", "area deviation / %", "approximation −(2π/N)²/6 × 100"]
+    行: [["12", "", "", ""], ["24", "", "", ""], ["48", "", "", ""], ["82", "", "", ""], ["96", "", "", ""], ["360", "", "", ""]]
+  - 标题: ["表 2  装下 30 L 的半球顶外壳", "Table 2  Hemisphere-topped housings holding 30 L"]
+    表头: ["R / mm", "H / mm", "体积 / L", "表面积 / m²", "H/R"]
+    表头英文: ["R / mm", "H / mm", "volume / L", "area / m²", "H/R"]
+    行: [["150", "", "", "", ""], ["165", "", "", "", ""], ["179", "", "", "", ""], ["195", "", "", "", ""], ["210", "", "", "", ""]]
+  - 标题: ["表 3  切片求体积的误差（默认外壳）", "Table 3  Error of the slice sum (default housing)"]
+    表头: ["n", "n 片之和 / L", "相对误差 / %", "误差 × n²"]
+    表头英文: ["n", "sum of n disks / L", "relative error / %", "error × n²"]
+    行: [["4", "", "", ""], ["8", "", "", ""], ["16", "", "", ""], ["32", "", "", ""], ["64", "", "", ""]]
+注意:
+  - ["壳体质量只算侧面和顶（底板另装），并把薄壳近似为“表面积 × 壁厚”；壁厚与半径相比很小时这个近似很好。用漆量按干膜 30 μm、固体含量 50% 估算。", "The shell mass counts only the side and top (the base plate is separate) and treats the thin shell as area × thickness, which is accurate when the wall is thin compared with the radius. Paint assumes a 30 μm dry film and 50% solids."]
+  - ["网格偏差只考虑了圆周方向的分段；真实的网格在顶部还沿经线方向分段，偏差会稍大一些。", "The mesh deviation considers only the segments around the circle; real meshes also split the top along meridians, which adds a little more."]
+思考题:
+  - ["这个外壳的网格模型体积为什么偏小？如果网格的顶点不在曲面上、而是让每个小平面与曲面相切（外切），结果会怎样？3D 打印时，这种偏差会造成什么后果？", "Why is the housing's mesh volume too small? What if each facet were tangent to the surface (circumscribed) instead of having its vertices on it? What would the deviation mean for 3D printing?"]
+  - ["表 2 中表面积最小时 H 与 R 有什么关系？用 V = πR²H + (2/3)πR³ 消去 H，对 R 求导，证明你的观察。", "In Table 2, how are H and R related at the minimum area? Eliminate H using V = πR²H + (2/3)πR³, differentiate with respect to R and prove your observation."]
