@@ -181,3 +181,22 @@ def test_cylindrical_refuses_axial_load():
     p["scenario"]["fixed"] = "A"  # now this bearing takes the gear's axial force
     p["scenario"]["beta_deg"] = 10
     assert by_id(analyse(p))["axial"]["status"] == "fail"
+
+
+def test_tapered_project():
+    p = json.loads((EX / "scene-tapered.json").read_text(encoding="utf-8"))
+    r = analyse(p)
+    c = by_id(r)
+    assert r["type"] == "tapered" and r["status"] == "unknown"
+    assert c["ends"]["status"] == "pass" and c["rib_p"]["status"] == "info" and c["rib_force"]["value"] > 0
+    # the cone is the bearing's fixed end: every case carries the gear's axial force
+    assert all(x["Fa"] > 0 for x in r["scenario"]["cases"])
+    p["inner"]["R_end"] = None
+    assert by_id(analyse(p))["rib_p"]["status"] == "unknown"
+
+
+def test_tapered_needs_axial_force():
+    p = json.loads((EX / "scene-tapered.json").read_text(encoding="utf-8"))
+    p["scenario"]["fixed"] = "B"
+    with pytest.raises(ProjectError, match="needs an axial force"):
+        analyse(p)

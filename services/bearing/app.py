@@ -33,7 +33,22 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^groove radius ratios f_i, f_o are between 0.5 and 0.6$", "沟曲率半径系数 f_i、f_o 要在 0.5 到 0.6 之间"),
     (r"^numbers must be finite$", "数值必须是有限数"),
     (r"^the balls do not fit round the pitch circle", "节圆上放不下这么多钢球（Z·Dw ≥ π·dm）"),
-    (r"^the bearing type is deep_groove, angular or cylindrical$", "轴承类型是深沟球、角接触球或圆柱滚子轴承"),
+    (
+        r"^the bearing type is deep_groove, angular, cylindrical or tapered$",
+        "轴承类型是深沟球、角接触球、圆柱滚子或圆锥滚子轴承",
+    ),
+    # tapered roller bearings (step 4 part 2)
+    (r"^give the cup angle and the cone angle", "请填圆锥滚子轴承的外圈（杯）角和内圈（锥）角"),
+    (r"^the cone angle is above 0 and below the cup angle", "内圈（锥）角要大于 0、小于外圈（杯）角，杯角小于 45°"),
+    (r"^the rib cannot hold the roller", "按这些角度，挡边托不住滚子：请检查杯角、锥角和挡边方向"),
+    (
+        r"^a single tapered roller bearing needs an axial force",
+        "单列圆锥滚子轴承受径向力时要有轴向力（只有径向力会把内圈推出）：请填轴向力，或配对使用（第 4 步之三）",
+    ),
+    (
+        r"^the load distribution did not converge \(the radial load may be too large",
+        "载荷分布算不出来：对这个轴向力，单列轴承的径向力可能太大",
+    ),
     # cylindrical roller bearings (step 4)
     (r"^give the roller diameter Dw, its length", "请填滚子直径 Dw、滚子长度 Lw、有效接触长度 Lwe 和滚子数 Z"),
     (r"^the effective contact length is not longer", "有效接触长度不能大于滚子长度"),

@@ -173,4 +173,4 @@ li.unknown .chip { background: var(--hold-bg); color: var(--hold); }
 .slices { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
 .slices figcaption .key { font: 400 12px var(--body); margin-left: 10px; } .slices .key::before { content: ""; display: inline-block; width: 14px; height: 2px; vertical-align: middle; margin-right: 4px; background: var(--accent-ink); }
 .slices .key.out::before { background: var(--blue); } .curve .line.out { stroke: var(--blue); stroke-dasharray: 5 3; }
-.seg { grid-template-columns: repeat(3, 1fr); } .seg button { padding: 8px 4px; font-size: 12.5px; }
+.seg { grid-template-columns: repeat(2, 1fr); } .seg button { padding: 8px 4px; font-size: 12.5px; }

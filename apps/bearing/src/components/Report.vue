@@ -6,6 +6,7 @@ import { t, lang } from '../i18n'
 import Section from './Section.vue'
 import SectionCyl from './SectionCyl.vue'
 import SliceChart from './SliceChart.vue'
+import SectionTaper from './SectionTaper.vue'
 import LoadRing from './LoadRing.vue'
 import Extras from './Extras.vue'
 import ScenarioPanel from './ScenarioPanel.vue'
@@ -18,8 +19,10 @@ const inputs = computed(() => {
   const add = (k, v, u) => { if (v != null && v !== '') rows.push([k, v, u]) }
   add('d', p.size.d, 'mm'); add('D', p.size.D, 'mm'); add('B', p.size.B, 'mm')
   add('Dw', p.inner.Dw, 'mm'); add('Z', p.inner.Z, ''); add('dm', p.inner.dm ?? props.r?.geometry?.dm, 'mm')
-  if (p.type === 'cylindrical') {
-    add('Lw', p.inner.Lw, 'mm'); add('Lwe', p.inner.Lwe, 'mm'); add('Pd', p.inner.Pd, 'mm')
+  if (['cylindrical', 'tapered'].includes(p.type)) {
+    add('Lw', p.inner.Lw, 'mm'); add('Lwe', p.inner.Lwe, 'mm')
+    if (p.type === 'cylindrical') add('Pd', p.inner.Pd, 'mm')
+    else { add('cupAngle', p.inner.alpha_o_deg, '°'); add('coneAngle', p.inner.alpha_i_deg, '°'); add('ribAngle', p.inner.alpha_f_deg, '°'); add('rEnd', p.inner.R_end, 'mm') }
     rows.push(['crown', t('crown_' + (p.profile?.kind || 'straight')), ''])
     add('crownR', p.profile?.R, 'mm'); add('crownFlat', p.profile?.flat, 'mm'); add('misalign', p.alignment?.theta_arcmin, '′')
   } else {
@@ -41,7 +44,7 @@ const inputs = computed(() => {
     for (const [k, w, u] of KEYS) add(w, S[k], u)
     if (S.this || S.kind === 'hub') rows.push(['thisBearing', S.kind === 'hub' ? t(S.row) : S.this, ''])
   }
-  if (p.type !== 'angular') {
+  if (!['angular', 'tapered'].includes(p.type)) {
     add('shaft_I', p.fits.shaft_I, 'mm'); add('housing_I', p.fits.housing_I, 'mm'); add('T_i', p.fits.T_i, '°C'); add('T_o', p.fits.T_o, '°C')
   }
   add('eta0', p.lube.eta0, 'Pa·s'); add('alpha_p', p.lube.alpha_p, '1/Pa'); add('sigma', p.lube.sigma, 'µm')
@@ -69,7 +72,7 @@ const print = () => window.print()
       <h2>{{ t('inputs') }}</h2>
       <table><tbody><tr v-for="[k, x, u] in inputs" :key="k"><th>{{ t(k) }}</th><td class="mono">{{ x }} {{ u }}</td></tr></tbody></table>
       <h2>{{ t('results') }}</h2>
-      <div class="figs"><SectionCyl v-if="r.type === 'cylindrical'" :r="r" /><Section v-else :r="r" /><LoadRing :r="r" /></div>
+      <div class="figs"><SectionCyl v-if="r.type === 'cylindrical'" :r="r" /><SectionTaper v-else-if="r.type === 'tapered'" :r="r" /><Section v-else :r="r" /><LoadRing :r="r" /></div>
       <table class="ck">
         <thead><tr><th></th><th>{{ t('value') }}</th><th>{{ t('limit') }}</th><th></th></tr></thead>
         <tbody>

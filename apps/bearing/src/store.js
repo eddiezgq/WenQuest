@@ -7,7 +7,7 @@ export function blank() {
   return {
     title: { zh: '', en: '' }, type: 'deep_groove',
     size: { d: null, D: null, B: null },
-    inner: { Dw: null, Z: null, dm: null, fi: null, fo: null, Pd: null, alpha0_deg: null, h_i: null, h_o: null, Lw: null, Lwe: null },
+    inner: { Dw: null, Z: null, dm: null, fi: null, fo: null, Pd: null, alpha0_deg: null, h_i: null, h_o: null, Lw: null, Lwe: null, alpha_o_deg: null, alpha_i_deg: null, alpha_f_deg: null, R_end: null },
     profile: { kind: 'straight', R: null, flat: null, points: [] },
     alignment: { theta_arcmin: null },
     material: { E: 206000, nu: 0.3 },
