@@ -25,6 +25,7 @@ from bearingkit import ball as BB
 from bearingkit import clearance as CL
 from bearingkit import ehl as EH
 from bearingkit import hertz as H
+from bearingkit import scenarios as SC
 
 PASS, FAIL, UNKNOWN, NA, INFO = "pass", "fail", "unknown", "na", "info"
 
@@ -42,7 +43,7 @@ def _num(v):
     return x
 
 
-def _ck(cid, zh, en, value, limit, status, unit="", note="", note_zh=""):
+def _ck(cid, zh, en, value, limit, status, unit="", note="", note_zh="", group=""):
     return {
         "id": cid,
         "zh": zh,
@@ -53,6 +54,7 @@ def _ck(cid, zh, en, value, limit, status, unit="", note="", note_zh=""):
         "unit": unit,
         "note": note,
         "note_zh": note_zh or note,
+        "group": group,
     }
 
 
@@ -124,11 +126,50 @@ def build(p: dict) -> tuple[BB.BallBearing, dict]:
     return b, geo
 
 
+def scenario_cases(p: dict) -> dict:
+    """The load cases of a project: from its application scenario, or the single set of loads it gives."""
+    s = p.get("scenario") or {}
+    if (s.get("kind") or "generic") == "generic" and not s.get("cases"):
+        ld = p.get("loads") or {}
+        s = {**s, "kind": "generic", "cases": [{"label": "", **{k: ld.get(k) for k in ("Fr", "Fa", "M", "n")}}]}
+    try:
+        return SC.loads(s)
+    except SC.ScenarioError as e:
+        raise ProjectError(str(e)) from e
+
+
+def _label(c: dict) -> dict:
+    lab = c.get("label") or ""
+    return lab if isinstance(lab, dict) else {"zh": str(lab), "en": str(lab)}
+
+
+def _run(b, Fr, Fa, M, tilt) -> dict:
+    try:
+        dist = BB.distribute(b, Fr=Fr, Fa=Fa, M=M, tilt=tilt)
+    except BB.BallError as e:
+        raise ProjectError(str(e)) from e
+    pmax, edge, heavy = {"inner": 0.0, "outer": 0.0}, {"inner": 0.0, "outer": 0.0}, {}
+    for Q, al in zip(dist["Q"], np.radians(dist["alpha_deg"]), strict=True):
+        if Q <= 0:
+            continue
+        for ring, c in BB.contacts(b, float(Q), float(al)).items():
+            if c.p_max > pmax[ring]:
+                heavy[ring] = {"a": c.a, "b": c.b, "p_max": c.p_max, "alpha_deg": math.degrees(al), "Q": float(Q)}
+                pmax[ring] = c.p_max
+            f = b.fi if ring == "inner" else b.fo
+            edge[ring] = max(edge[ring], abs(al) + c.a / (f * b.D))  # groove bottom to the far end of the ellipse
+    return {"dist": dist, "pmax": pmax, "edge": edge, "heavy": heavy, "tilt": tilt}
+
+
+def _freq(b, sc: dict):
+    n = max((c["n"] for c in sc["cases"]), default=0.0)
+    return BB.frequencies(b, n, outer_turns=sc["outer_turns"]) if n else None
+
+
 def analyse(p: dict) -> dict:
     b, g = build(p)
     lim = p.get("limits") or {}
-    ld = p.get("loads") or {}
-    Fr, Fa, M, n = (_num(ld.get(k)) or 0.0 for k in ("Fr", "Fa", "M", "n"))
+    sc = scenario_cases(p)
     checks = []
     # geometry
     gap = g["dm"] * math.sin(math.pi / b.Z) - b.D
@@ -216,19 +257,51 @@ def analyse(p: dict) -> dict:
             {"D": b.D, "Z": b.Z, "dm": b.dm, "fi": b.fi, "fo": b.fo, "Pd": max(op, 0.0), "E": b.E, "nu": b.nu}
         )
         g["alpha_op_deg"] = math.degrees(b.alpha0)
-    # load distribution
-    loaded = Fr > 0 or Fa > 0 or M != 0
-    # the shaft holds the inner ring square unless a moment is given (then the ring tilts until it balances)
-    tilt = ld.get("tilt") or ("free" if M else "fixed")
-    dist = None
-    if loaded:
-        try:
-            dist = BB.distribute(b, Fr=Fr, Fa=Fa, M=M, tilt=tilt)
-        except BB.BallError as e:
-            raise ProjectError(str(e)) from e
-        checks.append(_ck("qmax", "最大钢球载荷", "Largest ball load", dist["Qmax"], None, INFO, "N"))
-        checks.append(_ck("loaded", "受载钢球数", "Balls carrying load", dist["loaded"], b.Z, INFO, ""))
-        if tilt == "fixed":
+    # every load case: ball loads, contact stresses, ellipse ends
+    tilt_given = (p.get("loads") or {}).get("tilt")
+    fp = _num((p.get("scenario") or {}).get("fp"))
+    runs = []
+    for c in sc["cases"]:
+        if not (c["Fr"] > 0 or c["Fa"] > 0 or c["M"] != 0):
+            runs.append(None)
+            continue
+        # the shaft holds the inner ring square unless a moment is given (then the ring tilts until it balances)
+        runs.append(_run(b, c["Fr"], c["Fa"], c["M"], tilt_given or ("free" if c["M"] else "fixed")))
+    live = [k for k, r in enumerate(runs) if r is not None]
+    trunc, heavy, dist, film = {}, {}, None, None
+    rotating = sc["motion"] == "rotating"
+    if not live:
+        checks.append(
+            _ck("qmax", "最大钢球载荷", "Largest ball load", None, None, UNKNOWN, "N", "give the loads", "请填载荷")
+        )
+        checks.append(
+            _ck(
+                "film",
+                "最小油膜厚度",
+                "Minimum film thickness",
+                None,
+                None,
+                UNKNOWN,
+                "µm",
+                "give the loads",
+                "请填载荷",
+            )
+        )
+    else:
+        # the peak case: the largest contact stress at the nominal loads
+        kp = max(live, key=lambda k: max(runs[k]["pmax"].values()))
+        rp, cp = runs[kp], sc["cases"][kp]
+        dist, heavy = rp["dist"], rp["heavy"]
+        name = _label(cp)
+        many = len(sc["cases"]) > 1
+        suffix_zh, suffix_en = (f"（峰值工况 {name['zh']}）", f" (peak case {name['en']})") if many else ("", "")
+        checks.append(
+            _ck("qmax", "最大钢球载荷" + suffix_zh, "Largest ball load" + suffix_en, dist["Qmax"], None, INFO, "N")
+        )
+        checks.append(
+            _ck("loaded", "受载钢球数" + suffix_zh, "Balls carrying load" + suffix_en, dist["loaded"], b.Z, INFO, "")
+        )
+        if rp["tilt"] == "fixed":
             checks.append(
                 _ck(
                     "moment",
@@ -242,41 +315,89 @@ def analyse(p: dict) -> dict:
             )
         else:
             checks.append(_ck("tilt", "内圈倾角", "Inner ring tilt", math.degrees(dist["theta"]) * 60, None, INFO, "′"))
-    else:
-        checks.append(
-            _ck("qmax", "最大钢球载荷", "Largest ball load", None, None, UNKNOWN, "N", "give the loads", "请填载荷")
-        )
-    # contact stress and ellipse truncation, inner and outer
-    lp = _num(lim.get("p_max"))
-    trunc = {}
-    heavy = {}  # the most stressed contact on each ring, for the drawing
-    if dist is not None:
-        pmax = {"inner": 0.0, "outer": 0.0}
-        worst = {"inner": None, "outer": None}
-        for Q, al in zip(dist["Q"], np.radians(dist["alpha_deg"]), strict=True):
-            if Q <= 0:
-                continue
-            for ring, c in BB.contacts(b, float(Q), float(al)).items():
-                if c.p_max > pmax[ring]:
-                    heavy[ring] = {"a": c.a, "b": c.b, "p_max": c.p_max, "alpha_deg": math.degrees(al), "Q": float(Q)}
-                pmax[ring] = max(pmax[ring], c.p_max)
-                f = b.fi if ring == "inner" else b.fo
-                edge = abs(al) + c.a / (f * b.D)  # angle from the groove bottom to the far end of the ellipse
-                worst[ring] = edge if worst[ring] is None else max(worst[ring], edge)
+        # static strength: the peak nominal load
+        ls = _num(lim.get("p_static"))
+        if ls is None:
+            ls = _num(lim.get("p_max"))  # projects saved before step 3
         for ring, zh in (("inner", "内圈"), ("outer", "外圈")):
+            v = rp["pmax"][ring]
             checks.append(
                 _ck(
                     "p_" + ring,
-                    f"{zh}最大接触应力",
-                    f"Max contact stress, {ring} ring",
-                    pmax[ring],
-                    lp,
-                    _limit(pmax[ring], lp),
+                    f"静强度：{zh}最大接触应力" + suffix_zh,
+                    f"Static strength: max contact stress, {ring} ring" + suffix_en,
+                    v,
+                    ls,
+                    _limit(v, ls),
                     "MPa",
-                    "" if lp is not None else "give the allowed contact stress",
-                    "" if lp is not None else "请填许用接触应力",
+                    "" if ls is not None else "give the allowed static contact stress",
+                    "" if ls is not None else "请填静强度许用接触应力",
+                    group="static",
                 )
             )
+        # fatigue: every rotating case times the load factor
+        lf = _num(lim.get("p_fatigue"))
+        for ring, zh in (("inner", "内圈"), ("outer", "外圈")):
+            cid, czh = "pf_" + ring, f"疲劳：{zh}最大接触应力（各工况 × 载荷系数 fp）"
+            cen = f"Fatigue: max contact stress, {ring} ring (every case × load factor f_p)"
+            if not rotating:
+                checks.append(
+                    _ck(
+                        cid,
+                        czh,
+                        cen,
+                        None,
+                        None,
+                        NA,
+                        "MPa",
+                        "the bearing swings, it does not turn: static strength governs",
+                        "轴承摆动、不整圈转：以静强度为主",
+                        group="fatigue",
+                    )
+                )
+                continue
+            if fp is None:
+                v = max(runs[k]["pmax"][ring] for k in live)
+                checks.append(
+                    _ck(
+                        cid,
+                        czh,
+                        cen,
+                        v,
+                        lf,
+                        UNKNOWN,
+                        "MPa",
+                        "give the load factor f_p (from a handbook or your own standard); shown at the nominal loads",
+                        "请填载荷系数 fp（按手册或企业规范）；现显示名义载荷下的值",
+                        group="fatigue",
+                    )
+                )
+                continue
+            vals = []
+            for k in live:
+                c = sc["cases"][k]
+                r = _run(b, fp * c["Fr"], fp * c["Fa"], fp * c["M"], runs[k]["tilt"])
+                vals.append((r["pmax"][ring], k))
+            v, kw = max(vals)
+            nm = _label(sc["cases"][kw])
+            checks.append(
+                _ck(
+                    cid,
+                    czh,
+                    cen,
+                    v,
+                    lf,
+                    _limit(v, lf),
+                    "MPa",
+                    (f"worst case {nm['en']}" if many else "")
+                    + ("" if lf is not None else ("; " if many else "") + "give the allowed fatigue contact stress"),
+                    (f"最不利工况 {nm['zh']}" if many else "")
+                    + ("" if lf is not None else ("；" if many else "") + "请填疲劳许用接触应力"),
+                    group="fatigue",
+                )
+            )
+        # contact ellipse and shoulder, at the peak case
+        for ring, zh in (("inner", "内圈"), ("outer", "外圈")):
             h = g["h_" + ring[0]]
             f = b.fi if ring == "inner" else b.fo
             if h is None:
@@ -293,70 +414,81 @@ def analyse(p: dict) -> dict:
                         "请填挡肩高度",
                     )
                 )
-            else:
-                shoulder = math.acos(max(-1.0, 1 - h / (f * b.D)))
-                trunc[ring] = {"edge_deg": math.degrees(worst[ring]), "shoulder_deg": math.degrees(shoulder)}
-                checks.append(
-                    _ck(
-                        "trunc_" + ring,
-                        f"{zh}接触椭圆不越过挡肩（椭圆端点角 / 挡肩角）",
-                        f"Contact ellipse inside the {ring} shoulder (ellipse end / shoulder angle)",
-                        math.degrees(worst[ring]),
-                        math.degrees(shoulder),
-                        PASS if worst[ring] < shoulder else FAIL,
-                        "°",
-                        "" if worst[ring] < shoulder else "the ellipse runs over the shoulder: edge loading",
-                        "" if worst[ring] < shoulder else "接触椭圆越过挡肩：边缘受载",
-                    )
+                continue
+            shoulder = math.acos(max(-1.0, 1 - h / (f * b.D)))
+            edge = max(runs[k]["edge"][ring] for k in live)
+            trunc[ring] = {"edge_deg": math.degrees(edge), "shoulder_deg": math.degrees(shoulder)}
+            ok = edge < shoulder
+            checks.append(
+                _ck(
+                    "trunc_" + ring,
+                    f"{zh}接触椭圆不越过挡肩（椭圆端点角 / 挡肩角，各工况最大）",
+                    f"Contact ellipse inside the {ring} shoulder (ellipse end / shoulder angle, worst case)",
+                    math.degrees(edge),
+                    math.degrees(shoulder),
+                    PASS if ok else FAIL,
+                    "°",
+                    "" if ok else "the ellipse runs over the shoulder: edge loading",
+                    "" if ok else "接触椭圆越过挡肩：边缘受载",
                 )
-    # lubrication film
-    lu = p.get("lube") or {}
-    eta, ap, sig = _num(lu.get("eta0")), _num(lu.get("alpha_p")), _num(lu.get("sigma"))
-    film = None
-    if dist is not None and eta and ap and n:
-        j = int(np.argmax(dist["Q"]))
-        al = math.radians(dist["alpha_deg"][j])
-        rho = H.curvatures(b.D, b.dm, al, b.fi, "inner")
-        film = EH.film(float(dist["Q"][j]), rho, b.Es, eta, ap, EH.entraining_speed(b.dm, b.gamma(al), n))
-        lam = film["h_min"] * 1000 / sig if sig else None
-        checks.append(
-            _ck(
-                "film",
-                "最小油膜厚度（最重载钢球、内圈）",
-                "Minimum film thickness (heaviest ball, inner ring)",
-                film["h_min"] * 1000,
-                None,
-                INFO,
-                "µm",
             )
-        )
-        checks.append(
-            _ck(
-                "lambda",
-                "油膜厚度比 λ = h_min / σ",
-                "Film thickness ratio λ = h_min / σ",
-                lam,
-                None,
-                INFO if lam is not None else UNKNOWN,
-                "",
-                "" if lam is not None else "give the composite surface roughness",
-                "" if lam is not None else "请填综合表面粗糙度",
+        # lubrication film: the thinnest over the turning cases
+        lu = p.get("lube") or {}
+        eta, ap, sig = _num(lu.get("eta0")), _num(lu.get("alpha_p")), _num(lu.get("sigma"))
+        spun = [k for k in live if sc["cases"][k]["n"] > 0]
+        if eta and ap and spun:
+            best = None
+            for k in spun:
+                d_ = runs[k]["dist"]
+                j = int(np.argmax(d_["Q"]))
+                al = math.radians(d_["alpha_deg"][j])
+                rho = H.curvatures(b.D, b.dm, al, b.fi, "inner")
+                f_ = EH.film(
+                    float(d_["Q"][j]), rho, b.Es, eta, ap, EH.entraining_speed(b.dm, b.gamma(al), sc["cases"][k]["n"])
+                )
+                if best is None or f_["h_min"] < best[0]["h_min"]:
+                    best = (f_, k)
+            film, kf = best
+            nm = _label(sc["cases"][kf])
+            lam = film["h_min"] * 1000 / sig if sig else None
+            checks.append(
+                _ck(
+                    "film",
+                    "最小油膜厚度（最重载钢球、内圈）" + (f"（工况 {nm['zh']}）" if many else ""),
+                    "Minimum film thickness (heaviest ball, inner ring)" + (f" (case {nm['en']})" if many else ""),
+                    film["h_min"] * 1000,
+                    None,
+                    INFO,
+                    "µm",
+                )
             )
-        )
-    else:
-        checks.append(
-            _ck(
-                "film",
-                "最小油膜厚度",
-                "Minimum film thickness",
-                None,
-                None,
-                UNKNOWN,
-                "µm",
-                "give the speed, the oil viscosity and its pressure-viscosity coefficient",
-                "请填转速、润滑油黏度和黏压系数",
+            checks.append(
+                _ck(
+                    "lambda",
+                    "油膜厚度比 λ = h_min / σ",
+                    "Film thickness ratio λ = h_min / σ",
+                    lam,
+                    None,
+                    INFO if lam is not None else UNKNOWN,
+                    "",
+                    "" if lam is not None else "give the composite surface roughness",
+                    "" if lam is not None else "请填综合表面粗糙度",
+                )
             )
-        )
+        else:
+            checks.append(
+                _ck(
+                    "film",
+                    "最小油膜厚度",
+                    "Minimum film thickness",
+                    None,
+                    None,
+                    NA if not rotating else UNKNOWN,
+                    "µm",
+                    "give the speed, the oil viscosity and its pressure-viscosity coefficient",
+                    "请填转速、润滑油黏度和黏压系数",
+                )
+            )
     # ratings and life: from the national standards once their texts are entered
     for cid, zh, en in (
         ("C", "基本额定动载荷 C 与寿命 L10", "Dynamic load rating C and life L10"),
@@ -385,11 +517,30 @@ def analyse(p: dict) -> dict:
         "checks": checks,
         "geometry": g,
         "type": g["type"],
-        "freq": BB.frequencies(b, n) if n else None,
+        "freq": _freq(b, sc),
         "chain": chain,
         "truncation": trunc,
         "film": film,
         "contact": heavy,
+        "scenario": {
+            "kind": sc["kind"],
+            "motion": sc["motion"],
+            "outer_turns": sc["outer_turns"],
+            "steps": sc["steps"],
+            "notes": sc["notes"],
+            "curve": sc.get("curve"),
+            "fp": fp,
+            "cases": [
+                {
+                    **c,
+                    "Qmax": r["dist"]["Qmax"] if r else 0.0,
+                    "p_inner": r["pmax"]["inner"] if r else 0.0,
+                    "p_outer": r["pmax"]["outer"] if r else 0.0,
+                    "alpha_deg": r["heavy"].get("inner", {}).get("alpha_deg") if r else None,
+                }
+                for c, r in zip(sc["cases"], runs, strict=True)
+            ],
+        },
     }
     if dist is not None:
         out["balls"] = {

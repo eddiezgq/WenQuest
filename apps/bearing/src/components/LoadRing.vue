@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import { t } from '../i18n'
 
 const props = defineProps({ r: Object })
-const S = 360, C = S / 2
+const S = 384, C = S / 2
 
 const v = computed(() => {
   const g = props.r?.geometry, b = props.r?.balls

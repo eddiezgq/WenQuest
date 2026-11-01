@@ -18,8 +18,9 @@ import math
 from bearingkit import hertz as H
 
 
-def film(Q: float, rho: tuple[float, float, float, float], Es: float, eta0: float, alpha_p: float,
-         u_mm_s: float) -> dict:
+def film(
+    Q: float, rho: tuple[float, float, float, float], Es: float, eta0: float, alpha_p: float, u_mm_s: float
+) -> dict:
     """Minimum and central film thickness (mm). E* (MPa) as in hertz.py; η₀ in Pa·s, α_p in 1/Pa, u in mm/s."""
     Rx = 1 / (rho[0] + rho[2])
     Ry = 1 / (rho[1] + rho[3])

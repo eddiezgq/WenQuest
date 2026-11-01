@@ -9,6 +9,7 @@ import Section from './components/Section.vue'
 import LoadRing from './components/LoadRing.vue'
 import Checks from './components/Checks.vue'
 import Extras from './components/Extras.vue'
+import ScenarioPanel from './components/ScenarioPanel.vue'
 import Report from './components/Report.vue'
 
 const examples = ref([])
@@ -83,6 +84,7 @@ onMounted(async () => {
           <Section :r="result" />
           <LoadRing :r="result" />
         </div>
+        <ScenarioPanel :r="result" />
         <Extras :r="result" />
         <p v-if="busy" class="busy">{{ t('busy') }}</p>
         <p v-if="error" class="err" role="alert">{{ t('error') }}：{{ lang === 'zh' ? error.zh || error.message : error.message }}</p>

@@ -6,6 +6,7 @@ import { t, lang } from '../i18n'
 import Section from './Section.vue'
 import LoadRing from './LoadRing.vue'
 import Extras from './Extras.vue'
+import ScenarioPanel from './ScenarioPanel.vue'
 
 const props = defineProps({ r: Object })
 defineEmits(['close'])
@@ -19,12 +20,24 @@ const inputs = computed(() => {
   if (p.type === 'deep_groove') add('Pd', p.inner.Pd, 'mm'); else add('alpha0', p.inner.alpha0_deg, '°')
   add('h_i', p.inner.h_i, 'mm'); add('h_o', p.inner.h_o, 'mm')
   add('E', p.material.E, 'MPa'); add('nu', p.material.nu, '')
-  add('Fr', p.loads.Fr, 'N'); add('Fa', p.loads.Fa, 'N'); add('M', p.loads.M, 'N·mm'); add('n', p.loads.n, 'r/min')
+  rows.push(['sceneKind', t('sk_' + (p.scenario?.kind || 'generic')), ''])
+  if ((p.scenario?.kind || 'generic') === 'generic') { add('Fr', p.loads.Fr, 'N'); add('Fa', p.loads.Fa, 'N'); add('M', p.loads.M, 'N·mm'); add('n', p.loads.n, 'r/min') }
+  if (p.scenario?.fp != null) add('fp', p.scenario.fp, '')
+  // the machine data of the scenario (the cases are in the results)
+  const S = p.scenario || {}
+  const KEYS = [['mn', 'mn', 'mm'], ['z', 'zGear', ''], ['alpha_n_deg', 'alphaN', '°'], ['beta_deg', 'beta', '°'], ['m', 'rotorM', 'kg'],
+    ['U', 'unbalance', 'g·mm'], ['F_belt', 'beltF', 'N'], ['x_belt', 'beltX', 'mm'], ['belt_deg', 'beltDeg', '°'], ['a', 'overhang', 'mm'],
+    ['W', S.kind === 'hub' ? 'wheelW' : 'jointW', 'N'], ['ay', 'ay', 'g'], ['R', 'wheelR', 'mm'], ['e', 'hubE', 'mm'], ['r', 'lever', 'mm'],
+    ['swing_deg', 'swing', '°'], ['x', 'loadX', 'mm'], ['L', S.kind === 'hub' ? 'rowL' : 'spanL', 'mm']]
+  if (S.kind && S.kind !== 'generic') {
+    for (const [k, w, u] of KEYS) add(w, S[k], u)
+    if (S.this || S.kind === 'hub') rows.push(['thisBearing', S.kind === 'hub' ? t(S.row) : S.this, ''])
+  }
   if (p.type === 'deep_groove') {
     add('shaft_I', p.fits.shaft_I, 'mm'); add('housing_I', p.fits.housing_I, 'mm'); add('T_i', p.fits.T_i, '°C'); add('T_o', p.fits.T_o, '°C')
   }
   add('eta0', p.lube.eta0, 'Pa·s'); add('alpha_p', p.lube.alpha_p, '1/Pa'); add('sigma', p.lube.sigma, 'µm')
-  add('p_max', p.limits.p_max, 'MPa'); add('gap_min', p.limits.gap_min, 'mm'); add('wall_min', p.limits.wall_min, 'mm')
+  add('p_static', p.limits.p_static, 'MPa'); add('p_fatigue', p.limits.p_fatigue, 'MPa'); add('gap_min', p.limits.gap_min, 'mm'); add('wall_min', p.limits.wall_min, 'mm')
   return rows
 })
 const fmt = (x) => (x == null ? '—' : typeof x === 'number' ? (Math.abs(x) >= 100 ? x.toFixed(0) : Math.abs(x) >= 1 ? x.toFixed(2) : x.toFixed(4)) : x)
@@ -59,6 +72,7 @@ const print = () => window.print()
           </tr>
         </tbody>
       </table>
+      <ScenarioPanel :r="r" />
       <Extras :r="r" />
       <h2>{{ t('method') }}</h2>
       <p>{{ t('methodText') }}</p>

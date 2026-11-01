@@ -1,12 +1,50 @@
 {
-  "title": {"zh": "示例（虚构）：主轴角接触球轴承", "en": "Example (fictional): angular contact ball bearing on a spindle"},
-  "note": {"zh": "尺寸和参数为演示虚构，不是任何厂家或标准中的型号。", "en": "Made-up sizes and data for the demo: not a catalogue or standard bearing."},
+  "title": {
+    "zh": "示例（虚构）：主轴角接触球轴承",
+    "en": "Example (fictional): angular contact ball bearing on a spindle"
+  },
+  "note": {
+    "zh": "尺寸和参数为演示虚构，不是任何厂家或标准中的型号。",
+    "en": "Made-up sizes and data for the demo: not a catalogue or standard bearing."
+  },
   "type": "angular",
-  "size": {"d": 40, "D": 68, "B": 15},
-  "inner": {"Dw": 9, "Z": 13, "dm": 54, "fi": 0.52, "fo": 0.53, "alpha0_deg": 25, "h_i": 2.6, "h_o": 2.6},
-  "material": {"E": 206000, "nu": 0.3},
-  "loads": {"Fr": 1500, "Fa": 2000, "M": 0, "n": 8000},
-  "fits": {"T_i": 45, "T_o": 40},
-  "lube": {"eta0": 0.012, "alpha_p": 1.8e-8, "sigma": 0.08},
-  "limits": {"p_max": 2500, "gap_min": 1.0, "wall_min": 2.0}
+  "size": {
+    "d": 40,
+    "D": 68,
+    "B": 15
+  },
+  "inner": {
+    "Dw": 9,
+    "Z": 13,
+    "dm": 54,
+    "fi": 0.52,
+    "fo": 0.53,
+    "alpha0_deg": 25,
+    "h_i": 2.6,
+    "h_o": 2.6
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "loads": {
+    "Fr": 1500,
+    "Fa": 2000,
+    "M": 0,
+    "n": 8000
+  },
+  "fits": {
+    "T_i": 45,
+    "T_o": 40
+  },
+  "lube": {
+    "eta0": 0.012,
+    "alpha_p": 1.8e-08,
+    "sigma": 0.08
+  },
+  "limits": {
+    "p_static": 2500,
+    "gap_min": 1.0,
+    "wall_min": 2.0
+  }
 }

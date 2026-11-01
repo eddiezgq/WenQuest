@@ -9,23 +9,28 @@ export function blank() {
     size: { d: null, D: null, B: null },
     inner: { Dw: null, Z: null, dm: null, fi: null, fo: null, Pd: null, alpha0_deg: null, h_i: null, h_o: null },
     material: { E: 206000, nu: 0.3 },
+    scenario: { kind: 'generic', fp: null },
     loads: { Fr: null, Fa: null, M: null, n: null },
     fits: { shaft_I: null, housing_I: null, T_i: 20, T_o: 20 },
     lube: { eta0: null, alpha_p: null, sigma: null },
-    limits: { p_max: null, gap_min: null, wall_min: null },
+    limits: { p_static: null, p_fatigue: null, gap_min: null, wall_min: null },
   }
 }
 function loadSaved() {
   try { const s = localStorage.getItem(KEY); return s ? JSON.parse(s) : null } catch { return null }
 }
-export const project = reactive(Object.assign(blank(), loadSaved() || {}))
+export const project = reactive(blank())
 export const result = ref(null)
+{ const saved = loadSaved(); if (saved) replace(saved) }
 export const error = ref(null)
 export const busy = ref(false)
 
 export function replace(p) {
   const b = blank()
   for (const k of Object.keys(b)) project[k] = typeof b[k] === 'object' && b[k] ? { ...b[k], ...(p[k] || {}) } : p[k] ?? b[k]
+  project.scenario = p.scenario ? JSON.parse(JSON.stringify(p.scenario)) : b.scenario
+  if (p.limits && p.limits.p_max != null && p.limits.p_static == null) project.limits.p_static = p.limits.p_max  // saved before step 3
+  delete project.limits.p_max
   project.note = p.note || null
 }
 
