@@ -1,0 +1,31 @@
+# 实验 19.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab19_6.js。
+原理:
+  - ["第一阶段用 200 台受控产品估计各项目的均值、标准差和相关矩阵 R。新产品标准化后为 z，霍特林统计量 T² = zᵀR⁻¹z = Σ tᵢ²/λᵢ，tᵢ 是第 i 个主成分的得分，λᵢ 是它的方差（式 (19.6.1)、(19.6.2)）。",
+     "Phase I estimates the means, standard deviations and the correlation matrix R from 200 in-control units. For a new standardized unit z, Hotelling's statistic is T² = zᵀR⁻¹z = Σ tᵢ²/λᵢ, where tᵢ is the score on PC i and λᵢ its variance (Eqs. (19.6.1), (19.6.2))."]
+  - 式: "UCL = p(N + 1)(N − 1)/(N(N − p)) · F_{p, N−p}(α)；  T²ₖ = Σ_{i≤k} tᵢ²/λᵢ；  SPE = Σ_{i>k} tᵢ²；  cⱼ = zⱼ (R⁻¹z)ⱼ          (19.6.3)–(19.6.5)"
+  - ["T² 在方差小的主成分方向上特别灵敏，在方差大的方向上反而迟钝；T²ₖ 监视前 k 个主成分，SPE 监视其余方向（相关结构是否被破坏）。",
+     "T² is especially sensitive along low-variance components and comparatively dull along high-variance ones; T²ₖ watches the first k components and SPE the rest (whether the correlation structure is broken)."]
+步骤:
+  - ["故障 = 0，按“生产 60 台”，记录各种图的误报台数（任务 1），填入表 1 第一行。",
+     "Fault 0: press “Produce 60 units” and record the false alarms of each chart (task 1) in the first row of Table 1."]
+  - ["故障依次取 1～4，大小取 1，k = 3，分别生产 60 台，把第 31–60 台的报警台数和贡献最大的项目填入表 1（任务 2～4）。",
+     "Set the fault to 1–4 in turn with size 1 and k = 3, produce 60 units each time, and record the alarms among units 31–60 and the largest contributions in Table 1 (tasks 2–4)."]
+  - ["故障 = 4，把大小从 0.4 起每次加 0.2 到 1.6，记录 T² 与单变量图的报警台数，填入表 2，画出两条“检出台数—故障大小”曲线。",
+     "Fault 4: increase the size from 0.4 to 1.6 in steps of 0.2, record the alarms of T² and of the univariate charts in Table 2, and plot both against the fault size."]
+  - ["故障 = 4，大小 1，把 k 从 1 改到 5，观察 T²ₖ 与 SPE 的分工怎样变化。",
+     "Fault 4, size 1: change k from 1 to 5 and watch how the work is split between T²ₖ and SPE."]
+数据表:
+  - 标题: ["表 1  四种故障（大小 1，k = 3）", "Table 1  Four faults (size 1, k = 3)"]
+    表头: ["故障", "T²（31–60）", "单变量（31–60）", "T²ₖ", "SPE", "贡献最大的三项"]
+    表头英文: ["Fault", "T² (31–60)", "univariate (31–60)", "T²ₖ", "SPE", "three largest contributions"]
+    行: [["无故障", "", "", "", "", ""], ["轴承磨损", "", "", "", "", ""], ["齿轮偏心", "", "", "", "", ""], ["装配过紧", "", "", "", "", ""], ["用错润滑油", "", "", "", "", ""]]
+    行英文: [["none", "", "", "", "", ""], ["bearing wear", "", "", "", "", ""], ["gear eccentricity", "", "", "", "", ""], ["tight assembly", "", "", "", "", ""], ["wrong oil", "", "", "", "", ""]]
+  - 标题: ["表 2  用错润滑油：检出台数与故障大小", "Table 2  Wrong oil: units detected versus fault size"]
+    表头: ["故障大小", "T² 报警台数", "单变量图报警台数"]
+    表头英文: ["Fault size", "T² alarms", "univariate alarms"]
+    行: [["0.4", "", ""], ["0.6", "", ""], ["0.8", "", ""], ["1.0", "", ""], ["1.2", "", ""], ["1.4", "", ""], ["1.6", "", ""]]
+注意:
+  - ["每次运行用的随机数相同，所以同样的设置总得到同样的数据，便于比较；换一种故障只改变第 31 台以后的偏移。",
+     "Every run uses the same random numbers, so the same settings always give the same data; changing the fault only changes the shift from unit 31 on."]
+  - ["“单变量图报警”指六项中至少有一项超出 ±3σ。六张图合起来的误报概率约为 1.6%，比一张图（0.27%）大得多。",
+     "A univariate alarm means at least one of the six items is outside ±3σ. Together the six charts give about 1.6% false alarms, much more than one chart (0.27%)."]

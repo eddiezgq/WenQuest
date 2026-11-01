@@ -1,0 +1,33 @@
+# 实验 19.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab19_2.js。
+原理:
+  - ["N 个点中心化后，沿单位向量 u 的投影方差为 uᵀSu（式 (19.1.5)），S 为样本协方差矩阵。投影方差最大的方向是 S 最大特征值的特征向量，即第一主成分（定理 19.2.1）。",
+     "After centring, the variance of the projections onto a unit vector u is uᵀSu (Eq. (19.1.5)). The direction of largest variance is the eigenvector of the largest eigenvalue of S: the first principal component (Theorem 19.2.1)."]
+  - 式: "uᵀSu + 残差平方和/(N − 1) = tr S = λ₁ + λ₂          (19.2.2)"
+  - ["机械臂两个关节的定位误差 δθ 各自独立、标准差都是 σ_q（30 μrad），末端误差为 δx = J δθ，其协方差为 σ_q² J Jᵀ（式 (19.1.6)）；测量仪器另有各向同性的误差 σ_m（0.2 μm），总协方差为 σ_q² J Jᵀ + σ_m² I。J 的奇异值分解给出误差椭圆的主轴：长轴沿第一左奇异向量，半轴之比为 √((σ_q²σ₁(J)² + σ_m²)/(σ_q²σ₂(J)² + σ_m²))。肘关节伸直时 σ₂(J) → 0，椭圆压扁，短轴最后被仪器误差“托住”。",
+     "The joint errors δθ are independent with standard deviation σ_q (30 μrad); the tool error is δx = J δθ with covariance σ_q² J Jᵀ (Eq. (19.1.6)). The instrument adds isotropic noise σ_m (0.2 μm), so the total covariance is σ_q² J Jᵀ + σ_m² I. The SVD of J gives the axes: the long axis lies along the first left singular vector and the axis ratio is √((σ_q²σ₁(J)² + σ_m²)/(σ_q²σ₂(J)² + σ_m²)). As the elbow straightens σ₂(J) → 0 and the ellipse flattens until the instrument noise props up the short axis."]
+步骤:
+  - ["机械臂场景，θ₂ = 40°，无异常测点。从 φ = 0° 起每隔 30° 记录投影方差和残差平方和，填入表 1，验证两者之和不变。",
+     "Arm scene, θ₂ = 40°, no outlier. Starting from φ = 0° record the projected variance and the residual sum of squares every 30° in Table 1 and check that their sum is constant."]
+  - ["细调 φ，找出投影方差最大的方向（任务 1）和最小的方向（任务 2），与读数中的特征值、第一主成分方向比较。",
+     "Fine-tune φ to find the directions of largest (task 1) and smallest (task 2) variance; compare with the displayed eigenvalues and PC 1."]
+  - ["θ₂ 依次取 120°、90°、60°、30°、10°、3°，在表 2 中记录 λ₁、λ₂、长短轴之比、样本与理论的主方向，完成任务 3。",
+     "Set θ₂ to 120°, 90°, 60°, 30°, 10°, 3°; record λ₁, λ₂, the axis ratio and the sample and theoretical principal directions in Table 2; complete task 3."]
+  - ["θ₂ = 90°，把“异常测点”设为 1（第 7 次测量读错），记录第一主成分转过的角度和特征值的变化（任务 4）。",
+     "Set θ₂ = 90° and the outlier to 1 (the 7th reading is wrong); record how far PC 1 turns and how the eigenvalues change (task 4)."]
+  - ["切换到飞镖场景，找出落点散布最大的方向（任务 5）。",
+     "Switch to the darts scene and find the direction of largest spread (task 5)."]
+数据表:
+  - 标题: ["表 1  投影方差与残差（θ₂ = 40°）", "Table 1  Projected variance and residual (θ₂ = 40°)"]
+    表头: ["φ / (°)", "uᵀSu / μm²", "残差平方和/(N − 1) / μm²", "两者之和 / μm²"]
+    表头英文: ["φ / (°)", "uᵀSu / μm²", "residual SS/(N − 1) / μm²", "sum / μm²"]
+    行: [["0", "", "", ""], ["30", "", "", ""], ["60", "", "", ""], ["90", "", "", ""], ["120", "", "", ""], ["150", "", "", ""], ["（最大）", "", "", ""], ["（最小）", "", "", ""]]
+    行英文: [["0", "", "", ""], ["30", "", "", ""], ["60", "", "", ""], ["90", "", "", ""], ["120", "", "", ""], ["150", "", "", ""], ["(largest)", "", "", ""], ["(smallest)", "", "", ""]]
+  - 标题: ["表 2  误差椭圆随肘关节角的变化", "Table 2  The error ellipse versus the elbow angle"]
+    表头: ["θ₂ / (°)", "λ₁ / μm²", "λ₂ / μm²", "√(λ₁/λ₂)", "样本主方向 / (°)", "理论主方向 / (°)"]
+    表头英文: ["θ₂ / (°)", "λ₁ / μm²", "λ₂ / μm²", "√(λ₁/λ₂)", "sample PC 1 / (°)", "theoretical / (°)"]
+    行: [["120", "", "", "", "", ""], ["90", "", "", "", "", ""], ["60", "", "", "", "", ""], ["30", "", "", "", "", ""], ["10", "", "", "", "", ""], ["3", "", "", "", "", ""]]
+注意:
+  - ["30 个点是一个样本，样本的主方向与理论的主方向（总体协方差的特征向量）会有差别；椭圆越接近圆（λ₁ 与 λ₂ 越接近），主方向越难估准。",
+     "Thirty points are a sample; the sample principal direction differs from the theoretical one (the eigenvector of the population covariance). The closer the ellipse is to a circle (λ₁ near λ₂), the harder the direction is to estimate."]
+  - ["主成分方向只确定到 180°：φ 与 φ + 180° 是同一条直线。",
+     "Principal directions are defined only up to 180°: φ and φ + 180° are the same line."]
