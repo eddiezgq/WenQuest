@@ -1,0 +1,29 @@
+# 实验 15.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_4.js。
+原理:
+  - ["复合梯形公式的误差（近似值减准确值）约为 (b − a)h²f″/12，复合辛普森公式约为 (b − a)h⁴f⁽⁴⁾/180（15.2 节）：步长减半，误差分别降到 1/4 和 1/16。在双对数坐标中，误差—求值次数是斜率为 −2 和 −4 的直线；n 点高斯公式对 2n − 1 次多项式精确，光滑函数上误差下降得更快（15.3 节）。", "The composite trapezoid error (approximation minus exact value) is about (b − a)h²f″/12 and the composite Simpson error about (b − a)h⁴f⁽⁴⁾/180 (Section 15.2): halving the step divides the errors by 4 and 16. On log–log axes, error versus evaluations is a line of slope −2 or −4; the n-point Gauss rule is exact for polynomials of degree 2n − 1 and converges faster on smooth functions (Section 15.3)."]
+  - 式: "观测到的阶 p ≈ log₂(E(n)/E(2n))"
+  - ["这些误差估计要求被积函数足够光滑。被积函数在区间内有很窄的尖峰时，均匀步长必须小于尖峰宽度才能“看见”它；自适应方法比较一段上粗、细两次估计之差，只在差大的地方加密（15.4 节）。但如果第一轮采样根本没有落在尖峰上，两次估计都“看不见”它，差很小，方法就会以为已经算准了。", "These estimates assume a smooth integrand. With a narrow spike, a uniform step must be shorter than the spike to see it; an adaptive method compares a coarse and a fine estimate on each piece and refines only where they differ (Section 15.4). If the first samples miss the spike entirely, both estimates miss it, their difference is small, and the method believes it is done."]
+步骤:
+  - ["在“夹爪碰撞冲量”场景中，脉冲持续时间取 1 ms，方法取 1（均匀梯形），步长取 10、5、2、1、0.5、0.25、0.1、0.05 ms，把求值次数和相对误差填入表 1（任务 1）。", "In 'Gripper impact impulse', with a 1 ms pulse and method 1 (uniform trapezoid), use steps of 10, 5, 2, 1, 0.5, 0.25, 0.1, 0.05 ms and record evaluations and relative error in Table 1 (task 1)."]
+  - ["方法取 2（自适应辛普森），容差取 10⁻²到 10⁻⁸，把求值次数、相对误差、落在脉冲附近的点数填入表 2（任务 2、3）。", "With method 2 (adaptive Simpson), use tolerances 10⁻² to 10⁻⁸ and record evaluations, relative error and the number of points near the pulse in Table 2 (tasks 2 and 3)."]
+  - ["在“收敛阶”场景中，对四个被积函数，n 取 8 和 32，读出梯形和辛普森的“观测到的阶”，填入表 3（任务 4）。", "In 'Order of convergence', for each of the four integrands with n = 8 and 32, read the observed orders of the trapezoid and Simpson rules and record them in Table 3 (task 4)."]
+数据表:
+  - 标题: ["表 1  均匀梯形公式求冲量（脉冲 1 ms）", "Table 1  Impulse by the uniform trapezoid rule (1 ms pulse)"]
+    表头: ["步长 / ms", "求值次数", "算得的冲量 / (N·s)", "相对误差 / %"]
+    表头英文: ["step / ms", "evaluations", "computed impulse / (N·s)", "relative error / %"]
+    行: [["10", "", "", ""], ["5", "", "", ""], ["2", "", "", ""], ["1", "", "", ""], ["0.5", "", "", ""], ["0.25", "", "", ""], ["0.1", "", "", ""], ["0.05", "", "", ""]]
+  - 标题: ["表 2  自适应辛普森求冲量（脉冲 1 ms）", "Table 2  Impulse by adaptive Simpson (1 ms pulse)"]
+    表头: ["容差", "求值次数", "相对误差 / %", "是否捕捉到脉冲"]
+    表头英文: ["tolerance", "evaluations", "relative error / %", "pulse captured?"]
+    行: [["10⁻²", "", "", ""], ["10⁻³", "", "", ""], ["10⁻⁴", "", "", ""], ["10⁻⁵", "", "", ""], ["10⁻⁶", "", "", ""], ["10⁻⁸", "", "", ""]]
+  - 标题: ["表 3  观测到的收敛阶", "Table 3  Observed orders of convergence"]
+    表头: ["被积函数", "梯形（n = 8）", "梯形（n = 32）", "辛普森（n = 8）", "辛普森（n = 32）"]
+    表头英文: ["integrand", "trapezoid (n = 8)", "trapezoid (n = 32)", "Simpson (n = 8)", "Simpson (n = 32)"]
+    行: [["e^(−x²)", "", "", "", ""], ["√x", "", "", "", ""], ["1/(1 + 0.5 cos x)", "", "", "", ""], ["x³", "", "", "", ""]]
+注意:
+  - ["冲击力是理想化的半正弦脉冲加上指数建立的夹持力，准确冲量由公式给出；真实的力传感器信号还有噪声和采样延迟。", "The force is an idealized half-sine pulse plus an exponentially rising holding force, with the exact impulse known in closed form; real force signals also carry noise and sampling delay."]
+  - ["误差小于 10⁻¹⁴ 时已接近双精度的舍入极限，“观测到的阶”不再有意义，显示为“—”。x³ 用辛普森是精确的，周期函数用梯形在整周期上收敛极快，都会出现这种情况。", "Errors below 10⁻¹⁴ approach double-precision round-off, and the observed order is meaningless (shown as '—'). This happens for Simpson on x³ (exact) and for the trapezoid rule on a periodic function over a full period."]
+  - ["均匀梯形的误差并不随步长单调下降：脉冲两端的“拐角”落在网格的什么位置，会使误差忽大忽小（表 1 中 0.1 ms 比 0.25 ms 还差）。这是被积函数不光滑的典型表现。", "The uniform trapezoid error does not fall monotonically with the step: where the corners of the pulse fall relative to the grid makes the error jump around (0.1 ms does worse than 0.25 ms in Table 1). This is typical of a non-smooth integrand."]
+思考题:
+  - ["力传感器的采样频率一般是 1 kHz。若碰撞脉冲只有 0.5 ms，传感器的数据还能用来算冲量吗？硬件上和算法上各有什么办法？", "Force sensors typically sample at 1 kHz. If the impact lasts only 0.5 ms, can the data still give the impulse? What hardware and algorithmic remedies are there?"]
+  - ["自适应方法会漏掉第一轮采样之间的窄尖峰。如果事先知道尖峰大约在哪里，怎样告诉积分程序？如果不知道，又怎样降低漏掉的风险？", "Adaptive methods can miss a narrow spike between the first samples. If you know roughly where it is, how do you tell the integrator? If not, how can you reduce the risk?"]
