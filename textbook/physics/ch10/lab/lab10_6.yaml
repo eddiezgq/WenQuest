@@ -1,0 +1,39 @@
+# 实验 10.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_6.js。
+原理:
+  - ["升起时，电机对载货台和货物做功，增加它们的重力势能；母线要多提供传动中的损耗：P_母线 = P_机械/η。下降时，重力对载货台做功，载货台拖着电机转，电机变成发电机，送回母线的功率为 ηP_机械。",
+     "Lifting, the motor does work on the carriage and load, raising their gravitational potential energy; the bus must also cover the drive losses: P_bus = P_mech/η. Lowering, gravity does work on the carriage, which drives the motor as a generator; the power returned to the bus is ηP_mech."]
+  - 式: "P_回馈 = η|P_机械|        (10.6.1)"
+  - ["一个来回中，升起和降下时机械功的大小都等于 mgH（加速和减速的动能，一进一出抵消）。所以取用 mgH/η，最多送回 ηmgH，回收比例为 η²。",
+     "Over a cycle, the mechanical work up and down both equal mgH in size (kinetic energy going in and out cancels). So the bus supplies mgH/η and at most ηmgH comes back: a recovered fraction of η²."]
+  - 式: "回收比例 = η²        (10.6.2)"
+  - ["下降末尾减速时，载货台受的向上的力最大（m(g + a)），速度也还大，回馈功率在这里达到最大：P_max = ηm(g + v/t_a)v。回馈单元、制动电阻都要按这个功率选。",
+     "During the final braking of the descent the upward force on the carriage is largest (m(g + a)) while the speed is still high, so feedback peaks there: P_max = ηm(g + v/t_a)v. Regeneration units and braking resistors are sized for it."]
+  - ["电梯用对重平衡轿厢。匀速运行时，电机的机械功率为 (m_轿厢 + m_载重 − m_对重)gv（上行为正）。为正时电机驱动，为负时电机被拖动、发电。",
+     "An elevator balances the car with a counterweight. At constant speed the motor's mechanical power is (m_car + m_load − m_cw)gv (going up). Positive means driving; negative means the motor is being driven and generates."]
+步骤:
+  - ["选“堆垛机”，货物 1000 kg、速度 1.0 m/s、方式 0，点“开始”，看母线功率的正负，一个来回结束后读三块电能表，填入表 1。",
+     "Choose “Stacker crane”, 1000 kg, 1.0 m/s, mode 0; press “Start”, watch the sign of the bus power, and after one cycle read the three energy meters into Table 1."]
+  - ["改为方式 1 再运行一次，求“送回电网 ÷ 电网取用”，调到“你测得的回收比例”（跑完的读数会保留），提交（任务 1）。与 η² 比较（η = 0.95 × 0.92 × 0.97）。",
+     "Switch to mode 1 and run again; compute “fed back ÷ drawn”, set “Your recovered fraction” (a finished run's readings are kept) and submit (task 1). Compare with η² (η = 0.95 × 0.92 × 0.97)."]
+  - ["货物取 500 kg、1500 kg，速度取 0.6、1.4 m/s，各运行一次，回收比例变不变？",
+     "Try 500 kg and 1500 kg, and speeds of 0.6 and 1.4 m/s. Does the recovered fraction change?"]
+  - ["货物 1000 kg、方式 1，先由 P_max = ηm(g + v/t_a)v 估出回馈功率不超过 10 kW 的最大速度，再运行核对“回馈功率的最大值”，提交（任务 2）。",
+     "With 1000 kg in mode 1, first estimate from P_max = ηm(g + v/t_a)v the highest speed keeping feedback at or below 10 kW, then run to check “Largest feedback power”, and submit (task 2)."]
+  - ["选“电梯的对重”，先算出上行时电机功率为零的载重，调好后运行，提交（任务 3）。再看空轿厢上行、满载下行时电机在做什么。",
+     "Choose “Elevator counterweight”, compute the load for zero motor power going up, set it, run and submit (task 3). Then see what the motor does with an empty car going up and a full car going down."]
+数据表:
+  - 标题: ["表 1  一个来回的能量（货物 1000 kg、1.0 m/s）", "Table 1  Energy over one cycle (1000 kg, 1.0 m/s)"]
+    表头: ["方式", "电网取用 / kJ", "送回电网 / kJ", "电阻烧掉 / kJ", "回收比例", "mgH / kJ"]
+    表头英文: ["Mode", "Drawn / kJ", "Fed back / kJ", "Burnt / kJ", "Recovered fraction", "mgH / kJ"]
+    行: [["0", "", "", "", "", ""], ["1", "", "", "", "", ""]]
+  - 标题: ["表 2  回馈功率与速度（货物 1000 kg）", "Table 2  Feedback power and speed (1000 kg)"]
+    表头: ["v / (m/s)", "估算的 P_max / kW", "读出的最大回馈功率 / kW"]
+    表头英文: ["v / (m/s)", "Estimated P_max / kW", "Largest feedback read / kW"]
+    行: [["0.5", "", ""], ["0.6", "", ""], ["0.7", "", ""], ["0.8", "", ""]]
+注意:
+  - ["载货台本身 500 kg，算 mgH 时要加上。", "The carriage itself is 500 kg; include it in mgH."]
+  - ["动画按 3 倍速播放，电能表按实际时间累计。", "The animation runs at 3× speed; the energy meters count real time."]
+  - ["每个任务都要在当前参数下运行一次，再点“提交”。", "For each task, run once with the current settings before pressing “Submit”."]
+思考题:
+  - ["回收比例为什么约等于 η²，而与货物质量、速度几乎无关？如果 η 提高到 0.95，回收比例是多少？", "Why is the recovered fraction about η², nearly independent of mass and speed? What would it be with η = 0.95?"]
+  - ["对重为什么取轿厢加额定载重的 45% 左右？如果取加 100%，空轿厢运行时会怎样？", "Why is the counterweight the car plus about 45% of the rated load? With 100%, what happens when the car runs empty?"]

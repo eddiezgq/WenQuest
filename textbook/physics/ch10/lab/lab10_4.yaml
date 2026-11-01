@@ -1,0 +1,40 @@
+# 实验 10.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab10_4.js。
+原理:
+  - ["只有保守力做功时，机械能守恒：E_k1 + U_1 = E_k2 + U_2。有摩擦、滚动阻力等非保守力做功时，机械能的变化等于非保守力做的功，减少的机械能变成内能。",
+     "With only conservative forces doing work, mechanical energy is conserved: E_k1 + U_1 = E_k2 + U_2. When friction, rolling resistance and the like do work, the change of mechanical energy equals their work; the mechanical energy lost becomes internal energy."]
+  - 式: "E_k2 + U_2 − (E_k1 + U_1) = W_非保守        (10.5.1)"
+  - ["在水平段上，只有滚动阻力 μ_r mg 做功。两个光电门之间距离 d，速度分别为 v_1、v_2：½mv_2² − ½mv_1² = −μ_r mg d，所以 μ_r = (v_1² − v_2²)/(2gd)，与质量无关。速度由挡光片宽度除以挡光时间求出。",
+     "On the level section only rolling resistance μ_r mg does work. Between two gates a distance d apart, with speeds v_1 and v_2: ½mv_2² − ½mv_1² = −μ_r mg d, so μ_r = (v_1² − v_2²)/(2gd), whatever the mass. Each speed is the flag width divided by the blocking time."]
+  - 式: "μ_r = (v_1² − v_2²)/(2gd)"
+  - ["从高 h 处由静止滑下，经倾角 θ 的斜段和长 s 的水平段：½mv² = mgh − μ_r mg(h cot θ + s)。斜段上滚动阻力为 μ_r mg cos θ，斜段长 h/sin θ，两者之积是 μ_r mg h cot θ。",
+     "Sliding from rest at height h, over an incline of angle θ and a level run s: ½mv² = mgh − μ_r mg(h cot θ + s). On the incline the resistance is μ_r mg cos θ over a length h/sin θ, giving μ_r mg h cot θ."]
+  - ["过山车（不计摩擦）：环中离环底角 α 处，v² = 2g(h − R(1 − cos α))，支持力 N = m(v²/R + g cos α)。通过环顶要求 N ≥ 0，即 v_顶² ≥ gR，h ≥ 2.5R。",
+     "Roller coaster (no friction): at angle α from the bottom of the loop, v² = 2g(h − R(1 − cos α)) and the normal force is N = m(v²/R + g cos α). Getting over the top needs N ≥ 0, i.e. v_top² ≥ gR, h ≥ 2.5R."]
+  - 式: "h ≥ 2.5R        (10.4.3)"
+步骤:
+  - ["选“无动力输送线”，起点高度取 0.300 m，点“开始”。箱子经过两个光电门后，读两个挡光时间，填入表 1；挡光片宽 0.10 m，求 v_1、v_2，再求 μ_r。调到“你测得的 μ_r”（运行过的读数会保留），点“提交”（任务 1）。",
+     "Choose “Gravity conveyor”, start height 0.300 m, press “Start”. After the tote passes both gates, read the two blocking times into Table 1; with a 0.10 m flag find v_1 and v_2, then μ_r. Set “Your μ_r” (the readings of a finished run are kept) and press “Submit” (task 1)."]
+  - ["换两个起点高度（0.350 m、0.250 m）再测，看 μ_r 是否不变。高度 0.250 m 时箱子能到达取货位吗？",
+     "Repeat at two other heights (0.350 m and 0.250 m) and check that μ_r stays the same. At 0.250 m does the tote reach the pick station?"]
+  - ["用测得的 μ_r，由能量方程算出使箱子以 0.50 m/s 到达取货位的起点高度，调好后运行一次，提交（任务 2）。提交后读出到达速度，与计算比较。",
+     "With your μ_r, use the energy equation to find the start height for 0.50 m/s at the pick station; set it, run once and submit (task 2). After submitting, read the arrival speed and compare."]
+  - ["选“过山车”，R = 6 m。先由式 (10.4.3) 算出最小出发高度，再从 20 m 往下每次减 0.5 m 运行，找出刚好能通过圆环的高度，提交（任务 3），记下环底支持力。",
+     "Choose “Roller coaster”, R = 6 m. Compute the lowest start height from Eq. (10.4.3), then run from 20 m down in 0.5 m steps to find the height that just gets round; submit (task 3) and note the push at the bottom."]
+  - ["h = 20 m，增大 R，找出能通过的最大圆环半径，提交（任务 4）。",
+     "With h = 20 m, enlarge R to find the largest loop that still works, and submit (task 4)."]
+数据表:
+  - 标题: ["表 1  光电门测滚动阻力", "Table 1  Rolling resistance from the light gates"]
+    表头: ["起点高度 h / m", "Δt_1 / ms", "Δt_2 / ms", "v_1 / (m/s)", "v_2 / (m/s)", "μ_r"]
+    表头英文: ["Start height h / m", "Δt_1 / ms", "Δt_2 / ms", "v_1 / (m/s)", "v_2 / (m/s)", "μ_r"]
+    行: [["0.300", "", "", "", "", ""], ["0.350", "", "", "", "", ""], ["0.250", "", "", "", "", ""]]
+  - 标题: ["表 2  过山车", "Table 2  Roller coaster"]
+    表头: ["R / m", "h / m", "能否通过", "环底支持力 / mg", "h/R"]
+    表头英文: ["R / m", "h / m", "Gets round?", "Push at the bottom / mg", "h/R"]
+    行: [["6", "", "", "", ""], ["6", "", "", "", ""], ["", "20", "", "", ""], ["", "20", "", "", ""]]
+注意:
+  - ["滚动阻力系数不显示，要靠测量求出；到达取货位的速度在提交后才显示。", "The rolling-resistance coefficient is not shown; you measure it. The arrival speed is shown only after you submit."]
+  - ["画面竖直方向放大了 3 倍，斜段看起来比实际陡。", "The picture's vertical scale is ×3, so the incline looks steeper than it is."]
+  - ["每个任务都要在当前参数下运行一次，再点“提交”。", "For each task, run once with the current settings before pressing “Submit”."]
+思考题:
+  - ["用两个光电门求 μ_r 时，挡光时间的读数误差对 μ_r 的影响有多大？两个光电门离得近一些好，还是远一些好？", "How much do errors in the blocking times affect μ_r? Should the two gates be closer together or further apart?"]
+  - ["刚好通过圆环时，环底的支持力是重力的几倍？乘客受得了吗？真实的过山车为什么把圆环做成上小下大的“水滴形”？", "When the car just makes it round, how many times its weight is the push at the bottom? Could riders stand that? Why are real loops teardrop-shaped, tight at the top and wide at the bottom?"]
