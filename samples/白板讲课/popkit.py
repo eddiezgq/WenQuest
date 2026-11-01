@@ -367,3 +367,30 @@ def balloon_cow(cx, cy, k, at, idp="cow", moves=True):
         E += [{"t": "move", "at": at, "kind": "bob", "targets": [idp + "*"], "amp": 12 * k, "hz": 0.9},
               {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_s"], "pivot": [cx, cy + r], "amp": 6, "hz": 1.5}]
     return E
+
+
+def cute_tree(cx, cy, k, at, idp="tr", mood="happy", moves=True, muscle=None):
+    """小杨 Poplar: a cute young tree standing with its root at (cx, cy): a trunk, a round leafy crown with a face, two root feet.
+    Ids: <idp>_b (trunk + crown + face), <idp>_l (leaf tufts; wiggle), <idp>_m (the red 'muscle' strip of tension wood on the
+    muscle = "left" | "right" side of the trunk; pulse it). Rotate "<idp>*" about (cx, cy) to bend the whole tree."""
+    def P(d, c="ink", w=3.6, part="_b", **kw):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d, **kw}
+    X = lambda v: cx + v * k   # noqa: E731
+    Y = lambda v: cy - v * k   # noqa: E731
+    E = [P(f"M{X(-22)},{Y(0)} Q{X(-18)},{Y(150)} {X(-14)},{Y(260)} L{X(14)},{Y(260)} Q{X(18)},{Y(150)} {X(22)},{Y(0)} Z", fill="gold"),
+         P(f"M{X(-22)},{Y(0)} Q{X(-50)},{Y(-6)} {X(-70)},{Y(-14)} M{X(22)},{Y(0)} Q{X(50)},{Y(-6)} {X(70)},{Y(-14)}", w=4),
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-120), "y": Y(470), "w": 240 * k, "h": 230 * k, "c": "ink", "fill": "green"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 38 - 16), "y": Y(390), "w": 32 * k, "h": 36 * k, "c": "ink", "fill": "paper"})
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 38 - 7), "y": Y(378), "w": 14 * k, "h": 16 * k, "c": "ink", "fill": "ink"})
+    E.append(P(f"M{X(-26)},{Y(325)} Q{X(0)},{Y(305)} {X(26)},{Y(325)}" if mood == "happy" else
+               f"M{X(-26)},{Y(310)} Q{X(0)},{Y(330)} {X(26)},{Y(310)}", w=4))
+    for x, y in ((-100, 420), (95, 430), (-70, 470), (60, 475)):
+        E.append(P(f"M{X(x)},{Y(y)} Q{X(x + 20)},{Y(y + 40)} {X(x + 40)},{Y(y)} Q{X(x + 20)},{Y(y - 10)} {X(x)},{Y(y)} Z", fill="green", part="_l"))
+    if muscle:
+        s = -1 if muscle == "left" else 1
+        E.append(P(f"M{X(s * 20)},{Y(20)} Q{X(s * 17)},{Y(130)} {X(s * 14)},{Y(240)}", c="red", w=9, part="_m"))
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_l"], "pivot": [X(0), Y(420)], "amp": 6, "hz": 2.2},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b"], "amp": 3 * k, "hz": 0.9}]
+    return E

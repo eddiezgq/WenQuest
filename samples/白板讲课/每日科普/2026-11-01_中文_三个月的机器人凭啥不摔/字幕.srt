@@ -1,0 +1,420 @@
+1
+00:00:00,300 --> 00:00:00,900
+三个月，
+Three months
+
+2
+00:00:00,900 --> 00:00:03,130
+造出一台一米五的人形机器人。
+to build a humanoid robot one and a half meters tall.
+
+3
+00:00:03,130 --> 00:00:05,320
+造它的是扎克伯格的Meta，
+The builders: Zuckerberg's Meta
+
+4
+00:00:05,320 --> 00:00:06,850
+还有上海的傅利叶。
+and Shanghai's Fourier.
+
+5
+00:00:06,850 --> 00:00:08,580
+据报道，它叫Max，
+Reportedly it is called Max
+
+6
+00:00:08,580 --> 00:00:10,080
+大约四十八公斤。
+and weighs about forty eight kilograms.
+
+7
+00:00:10,080 --> 00:00:12,080
+脸是一块屏幕，会做表情，
+Its face is a screen that makes expressions,
+
+8
+00:00:12,080 --> 00:00:13,690
+还有五根手指的手。
+and it has five fingered hands.
+
+9
+00:00:13,690 --> 00:00:15,920
+Meta的团队专门飞到中国，
+Meta's team flew to China,
+
+10
+00:00:15,920 --> 00:00:19,060
+一位副总裁在傅利叶的工厂待了快两个月。
+and a vice president spent almost two months at Fourier's factory.
+
+11
+00:00:19,060 --> 00:00:20,550
+今天的烧脑问题：
+Today's brain teaser:
+
+12
+00:00:20,550 --> 00:00:24,000
+一个两条腿的铁家伙，凭什么站着不摔？
+how does a two legged machine stand without falling?
+
+13
+00:00:24,000 --> 00:00:25,580
+答案可能吓你一跳：
+The answer may surprise you:
+
+14
+00:00:25,580 --> 00:00:27,100
+它其实一直在摔。
+it is falling all the time.
+
+15
+00:00:27,100 --> 00:00:28,170
+先玩个游戏：
+Try a game:
+
+16
+00:00:28,170 --> 00:00:30,260
+把一把扫把立在手心上。
+balance a broom on your palm.
+
+17
+00:00:30,260 --> 00:00:30,950
+手不动，
+Keep your hand still,
+
+18
+00:00:30,950 --> 00:00:32,300
+扫把马上就倒。
+and the broom topples right away.
+
+19
+00:00:32,300 --> 00:00:33,540
+你得一直挪手，
+You have to keep moving your hand,
+
+20
+00:00:33,540 --> 00:00:35,090
+追着它倒的方向。
+chasing the way it falls.
+
+21
+00:00:35,090 --> 00:00:37,010
+物理学家管这叫倒立摆：
+Physicists call it an inverted pendulum:
+
+22
+00:00:37,010 --> 00:00:38,880
+重心在上，支点在下。
+weight on top, pivot at the bottom.
+
+23
+00:00:38,880 --> 00:00:40,650
+两条腿站着的机器人，
+A robot standing on two legs
+
+24
+00:00:40,650 --> 00:00:43,060
+就是一把会自己挪手的扫把。
+is a broom that moves its own hand.
+
+25
+00:00:43,060 --> 00:00:44,280
+规矩只有一条：
+There is one rule:
+
+26
+00:00:44,280 --> 00:00:47,360
+重心要落在脚底板围成的那块地方里。
+the center of mass must stay over the area under its feet.
+
+27
+00:00:47,360 --> 00:00:48,630
+重心一出界，
+Once the center of mass leaves that area,
+
+28
+00:00:48,630 --> 00:00:49,820
+就开始倒。
+it starts to fall.
+
+29
+00:00:49,820 --> 00:00:52,340
+反转一：高一点，反而好平衡。
+Twist one: taller is easier.
+
+30
+00:00:52,340 --> 00:00:54,440
+长扫把比铅笔好立多了。
+A long broom is easier to balance than a pencil.
+
+31
+00:00:54,440 --> 00:00:56,170
+因为越高，倒得越慢，
+Because taller things fall slower,
+
+32
+00:00:56,170 --> 00:00:57,840
+你有更多时间去接。
+you get more time to catch them.
+
+33
+00:00:57,840 --> 00:01:00,970
+估算一下：一米五的个子，重心大约在腰，
+A rough estimate: for a one and a half meter body, the center of mass is near the waist.
+
+34
+00:01:00,970 --> 00:01:03,730
+不管它的话，一秒左右就躺地上了。
+Left alone, it hits the floor in about a second.
+
+35
+00:01:03,730 --> 00:01:05,240
+所以机器人得飞快地
+So a robot must check very fast
+
+36
+00:01:05,240 --> 00:01:06,700
+检查自己歪没歪。
+whether it is tilting.
+
+37
+00:01:06,700 --> 00:01:08,340
+它肚子里有个陀螺仪，
+It has a gyroscope inside,
+
+38
+00:01:08,340 --> 00:01:11,080
+就像你耳朵里管平衡的那个小器官。
+like the balance organ in your inner ear.
+
+39
+00:01:11,080 --> 00:01:12,640
+脚底还有传感器，
+Sensors in the feet
+
+40
+00:01:12,640 --> 00:01:14,320
+感觉力压在哪儿。
+feel where the weight presses.
+
+41
+00:01:14,320 --> 00:01:15,900
+一般的人形机器人，
+A typical humanoid robot
+
+42
+00:01:15,900 --> 00:01:18,650
+每秒要这样调几百次甚至上千次。
+adjusts like this hundreds or even thousands of times a second.
+
+43
+00:01:18,650 --> 00:01:20,260
+反转二：所以大脑必须
+Twist two: so the brain must ride
+
+44
+00:01:20,260 --> 00:01:21,990
+装在机器人自己身上。
+inside the robot itself.
+
+45
+00:01:21,990 --> 00:01:23,610
+要是靠网络问云端，
+If it had to ask the cloud,
+
+46
+00:01:23,610 --> 00:01:26,610
+来回一趟可能就要几十到上百毫秒。
+one round trip could take tens to hundreds of milliseconds.
+
+47
+00:01:26,610 --> 00:01:27,660
+等答案回来，
+By the time the answer came back,
+
+48
+00:01:27,660 --> 00:01:29,020
+人已经躺下了。
+the robot would be lying down.
+
+49
+00:01:29,020 --> 00:01:31,650
+Max用的是英伟达的Thor芯片，
+Max uses Nvidia's Thor chip,
+
+50
+00:01:31,650 --> 00:01:32,860
+直接装在身上。
+built right into its body.
+
+51
+00:01:32,860 --> 00:01:34,280
+走路就更刺激了：
+Walking is even wilder:
+
+52
+00:01:34,280 --> 00:01:36,190
+每一步都是先往前倒。
+every step starts with falling forward.
+
+53
+00:01:36,190 --> 00:01:37,700
+然后伸出一只脚，
+Then a foot swings out
+
+54
+00:01:37,700 --> 00:01:38,960
+把自己接住。
+and catches it.
+
+55
+00:01:38,960 --> 00:01:40,440
+走路，就是一路摔、
+Walking is falling
+
+56
+00:01:40,440 --> 00:01:41,700
+一路接住自己。
+and catching yourself, again and again.
+
+57
+00:01:41,700 --> 00:01:43,370
+你每天也是这么走的，
+You walk this way every day too.
+
+58
+00:01:43,370 --> 00:01:44,820
+只是你早就忘了。
+You just forgot.
+
+59
+00:01:44,820 --> 00:01:46,740
+反转三：最难的不是站，
+Twist three: the hardest part is not standing.
+
+60
+00:01:46,740 --> 00:01:47,550
+是楼梯。
+It is stairs.
+
+61
+00:01:47,550 --> 00:01:49,780
+脚下的地面突然变了高度，
+The ground suddenly changes height,
+
+62
+00:01:49,780 --> 00:01:51,190
+它得提前看见。
+and it has to see that coming.
+
+63
+00:01:51,190 --> 00:01:53,720
+据报道，Max 2九月就开工了，
+Reportedly, Max 2 started in September,
+
+64
+00:01:53,720 --> 00:01:55,740
+加了帮它上楼梯的传感器。
+with extra sensors to help it on stairs.
+
+65
+00:01:55,740 --> 00:01:57,870
+还换了新躯干、更好的手，
+Plus a new torso, better hands,
+
+66
+00:01:57,870 --> 00:01:59,410
+甚至加了投影仪。
+and even a projector.
+
+67
+00:01:59,410 --> 00:02:02,380
+Meta想让它当自家AI Muse的身体，
+Meta wants it to be a body for its AI, Muse,
+
+68
+00:02:02,380 --> 00:02:03,630
+将来帮忙做家务。
+and someday help with chores.
+
+69
+00:02:03,630 --> 00:02:04,800
+想想那个画面：
+Picture it:
+
+70
+00:02:04,800 --> 00:02:06,260
+AI终于有了腿。
+AI finally gets legs.
+
+71
+00:02:06,260 --> 00:02:07,800
+然后它第一件事，
+And the first thing it has to learn
+
+72
+00:02:07,800 --> 00:02:09,260
+是学会别摔跤。
+is not to fall.
+
+73
+00:02:09,260 --> 00:02:10,820
+三个月能造这么快，
+Building it in three months
+
+74
+00:02:10,820 --> 00:02:13,710
+也说明中国的机器人供应链多成熟。
+also shows how mature China's robot supply chain is.
+
+75
+00:02:13,710 --> 00:02:15,720
+傅利叶自己也做人形机器人，
+Fourier makes its own humanoids too,
+
+76
+00:02:15,720 --> 00:02:18,630
+比如一米六五高的陪护机器人GR-3。
+like GR-3, a one hundred sixty five centimeter care robot.
+
+77
+00:02:18,630 --> 00:02:21,070
+友情提示：这些都来自媒体报道，
+Fine print: all of this comes from media reports.
+
+78
+00:02:21,070 --> 00:02:23,950
+Meta说原型只做内部研究，不卖。
+Meta says the prototypes are for research, not for sale.
+
+79
+00:02:23,950 --> 00:02:25,890
+一秒倒地、每秒几百次，
+One second to fall, hundreds of checks a second:
+
+80
+00:02:25,890 --> 00:02:29,540
+是一般情况的估算，不是Max的官方参数。
+these are general estimates, not Max's official specs.
+
+81
+00:02:29,540 --> 00:02:32,510
+所以，三个月造的机器人，凭啥不摔？
+So how does a robot built in three months not fall?
+
+82
+00:02:32,510 --> 00:02:36,130
+它一刻不停地在摔，又一刻不停地接住自己。
+It never stops falling, and never stops catching itself.
+
+83
+00:02:36,130 --> 00:02:37,030
+跟你一样。
+Just like you.
+
+84
+00:02:37,030 --> 00:02:39,900
+只不过它还在学，你已经会了。
+It is still learning. You already know how.
+
