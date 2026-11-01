@@ -86,7 +86,7 @@ def _rows(eid):
     return list(csv.DictReader(open(wqlib.CATALOG / "D" / eid / "specs.csv", encoding="utf-8")))
 
 
-@pytest.mark.parametrize("eid", ["D-ACT-ROBOTIS-X", "D-FTS-ATI-FT", "D-GRP-ROBOTIQ", "D-CAM-REALSENSE-D400", "D-LDR-OUSTER", "D-RDC-HD-CSF"])
+@pytest.mark.parametrize("eid", ["D-ACT-ROBOTIS-X", "D-FTS-ATI-FT", "D-GRP-ROBOTIQ", "D-CAM-REALSENSE-D400", "D-LDR-OUSTER", "D-RDC-HD-CSF", "D-RDC-NEUGART-PLE"])
 def test_every_vendor_row_has_source_and_proxy_dims(eid):
     e = entry(eid)
     rows = _rows(eid)
@@ -111,3 +111,14 @@ def test_vendor_tables_sanity():
         assert float(r["grip_force_min_N"]) < float(r["grip_force_max_N"])
     xm = {r["size"]: r for r in _rows("D-ACT-ROBOTIS-X")}["XM540-W270"]          # 抽查值（官方 e-Manual）
     assert (xm["stall_torque_Nm"], xm["no_load_speed_rpm"], xm["weight_g"]) == ("10.6", "30", "165")
+
+
+def test_neugart_ple_table_is_consistent():
+    """第 72 轮：行星减速机 PLE（样本两次读取一致）：连续 ≤ 最大 ≤ 急停扭矩；回程间隙比谐波、RV（1 角分）大"""
+    rows = _rows("D-RDC-NEUGART-PLE")
+    assert len(rows) == 18
+    r = {x["size"]: x for x in rows}
+    assert (r["PLE080-5"]["T2D_Nm"], r["PLE080-5"]["T2max_Nm"], r["PLE080-5"]["T2stop_Nm"]) == ("84", "175", "220")
+    for x in rows:
+        assert float(x["T2D_Nm"]) <= float(x["T2max_Nm"]) <= float(x["T2stop_Nm"]), x["size"]
+        assert float(x["backlash_arcmin"]) > 1 and float(x["Ct_min_Nm_arcmin"]) <= float(x["Ct_max_Nm_arcmin"])

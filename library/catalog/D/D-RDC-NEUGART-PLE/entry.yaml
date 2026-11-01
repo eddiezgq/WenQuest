@@ -1,0 +1,144 @@
+# D-RDC-NEUGART-PLE · 纽卡特 PLE 行星减速机（经济型，一级）（厂商目录，第 5 轮）
+schema: 1
+id: D-RDC-NEUGART-PLE
+kind: product
+name:
+  zh: 纽卡特 PLE 行星减速机（经济型，一级）
+  en: Neugart PLE planetary gearbox (economy line, one stage)
+category: RDC
+tags:
+- 行星减速器
+- 行星齿轮
+- 精密减速器
+- planetary gearbox
+- AGV 驱动
+- 纽卡特
+- Neugart
+standards: []
+params:
+- key: size_code
+  zh: 型号
+  en: Size
+  role: key
+- key: ratio
+  zh: 减速比
+  en: Ratio
+  role: key
+- key: T2D_Nm
+  zh: 连续扭矩 T2D
+  en: Continuous torque T2D
+  role: perf
+  unit: Nm
+- key: T2max_Nm
+  zh: 最大扭矩 T2max
+  en: Max. torque T2max
+  role: perf
+  unit: Nm
+- key: T2stop_Nm
+  zh: 急停扭矩（允许 1000 次）
+  en: Emergency stop torque
+  role: perf
+  unit: Nm
+- key: n1max_rpm
+  zh: 最高机械输入转速
+  en: Max. mechanical input speed
+  role: perf
+  unit: r/min
+- key: backlash_arcmin
+  zh: 标准回程间隙（上限）
+  en: Standard backlash (max)
+  role: perf
+  unit: arcmin
+- key: Ct_min_Nm_arcmin
+  zh: 抗扭刚度（下限）
+  en: Torsional stiffness (min)
+  role: perf
+  unit: Nm/arcmin
+- key: Ct_max_Nm_arcmin
+  zh: 抗扭刚度（上限）
+  en: Torsional stiffness (max)
+  role: perf
+  unit: Nm/arcmin
+- key: eta_pct
+  zh: 效率
+  en: Efficiency
+  role: perf
+  unit: '%'
+- key: mass_min_kg
+  zh: 重量（下限）
+  en: Weight (min)
+  role: info
+  unit: kg
+- key: mass_max_kg
+  zh: 重量（上限）
+  en: Weight (max)
+  role: info
+  unit: kg
+- key: life_h
+  zh: 使用寿命
+  en: Service life
+  role: perf
+  unit: h
+- key: D_mm
+  zh: 壳体外径 D6
+  en: Housing diameter D6
+  role: dim
+  unit: mm
+- key: L_mm
+  zh: 最小总长 L1
+  en: Min. total length L1
+  role: dim
+  unit: mm
+specs: specs.csv
+default: PLE080-5
+model:
+  engine: proxy:cylinder
+  formats:
+  - step
+  - stl
+  - glb
+  dims:
+    d: D_mm
+    h: L_mm
+  origin: 输出端面中心，轴线沿 Z
+  note: 外形示意：按样本外形尺寸生成，非厂商模型；厂商 CAD 请到厂商网站下载；行星减速机画成圆柱示意：直径取壳体外径 D6，高度取最小总长 L1（随电机法兰变化）
+source:
+  origin: vendor
+  vendor: Neugart
+  catalog: Neugart PLE 经济型行星减速机样本（中文，2026-05）第 20–24 页
+  license: Apache-2.0
+  attribution: 问渠零件库（规格表整理与外形示意模型）；参数摘自 Neugart 公开资料，商标归厂商所有
+  checked:
+    by: Claude
+    'on': '2026-11-02'
+    note: 样本的转矩表（连续、最大、急停）与一般数据两次独立读取一致；外形尺寸读取一次，只用于外形示意
+  data_sources:
+  - title: Neugart PLE 经济型行星减速机样本（中文，2026-05）第 20–24 页
+    url: https://www.neugart.com/fileadmin/user_upload/Downloads/Catalog_Chapters/05_2026/PLE/PLE_2026_05_ZH.pdf
+    retrieved: '2026-11-02'
+  notes: 只收一级、减速比 3–10 的 060、080、120 三种。T2D 是样本的“连续扭矩”，T2max 是“最大扭矩”，T2stop 是“急停扭矩”（允许
+    1000 次）。回程间隙是标准型的上限；抗扭刚度、重量随减速比变化，样本只给范围，按范围收（具体值见厂商的 Tec Data Finder）。效率 98%
+    是一级的标称值，寿命 20000 h 是样本的使用寿命。
+vendor:
+  id: NEUGART
+  name:
+    zh: 纽卡特
+    en: Neugart
+  site: https://www.neugart.com
+  series: PLE
+teaching:
+  principle: 太阳轮在中间，几个行星轮绕着它转，同时与外面固定的内齿圈啮合，行星轮的轴装在行星架上输出。内齿圈固定时传动比 i = 1 + z_圈/z_太阳；功率由几个行星轮分担，所以体积小、能传大力矩，效率高（一级约
+    98%）。背隙比谐波、RV 大（几个角分），多用在 AGV 车轮、直线模组、SCARA 和机床进给。
+  uses:
+  - AGV 车轮驱动
+  - 伺服电机减速
+  - SCARA 与直线模组
+  - 输送与包装机械
+  courses:
+  - course: 机器人技术
+    chapter: 关节驱动与减速器
+  labs: []
+factory:
+  erp_items: []
+  suppliers:
+  - Neugart

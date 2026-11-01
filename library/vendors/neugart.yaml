@@ -1,0 +1,446 @@
+# 纽卡特 Neugart PLE 经济型行星减速机（第 72 轮 D-5，《机器人学》32.4 节）。
+# 出处：Neugart 官网的 PLE 中文样本 PDF（2026-05）。转矩与一般数据两次独立读取一致；外形尺寸读取一次，只用于外形示意。
+vendor:
+  id: NEUGART
+  name:
+    zh: 纽卡特
+    en: Neugart
+  site: https://www.neugart.com
+retrieved: '2026-11-02'
+sources:
+  ple:
+    title: Neugart PLE 经济型行星减速机样本（中文，2026-05）第 20–24 页
+    url: https://www.neugart.com/fileadmin/user_upload/Downloads/Catalog_Chapters/05_2026/PLE/PLE_2026_05_ZH.pdf
+products:
+- id: D-RDC-NEUGART-PLE
+  name:
+    zh: 纽卡特 PLE 行星减速机（经济型，一级）
+    en: Neugart PLE planetary gearbox (economy line, one stage)
+  category: RDC
+  series: PLE
+  tags:
+  - 行星减速器
+  - 行星齿轮
+  - 精密减速器
+  - planetary gearbox
+  - AGV 驱动
+  default: PLE080-5
+  proxy: cylinder
+  dims:
+    d: D_mm
+    h: L_mm
+  proxy_note: 行星减速机画成圆柱示意：直径取壳体外径 D6，高度取最小总长 L1（随电机法兰变化）
+  origin: 输出端面中心，轴线沿 Z
+  principle: 太阳轮在中间，几个行星轮绕着它转，同时与外面固定的内齿圈啮合，行星轮的轴装在行星架上输出。内齿圈固定时传动比 i = 1 + z_圈/z_太阳；功率由几个行星轮分担，所以体积小、能传大力矩，效率高（一级约
+    98%）。背隙比谐波、RV 大（几个角分），多用在 AGV 车轮、直线模组、SCARA 和机床进给。
+  uses:
+  - AGV 车轮驱动
+  - 伺服电机减速
+  - SCARA 与直线模组
+  - 输送与包装机械
+  chapter: 关节驱动与减速器
+  checked_note: 样本的转矩表（连续、最大、急停）与一般数据两次独立读取一致；外形尺寸读取一次，只用于外形示意
+  notes: 只收一级、减速比 3–10 的 060、080、120 三种。T2D 是样本的“连续扭矩”，T2max 是“最大扭矩”，T2stop 是“急停扭矩”（允许
+    1000 次）。回程间隙是标准型的上限；抗扭刚度、重量随减速比变化，样本只给范围，按范围收（具体值见厂商的 Tec Data Finder）。效率 98%
+    是一级的标称值，寿命 20000 h 是样本的使用寿命。
+  params:
+  - - size_code
+    - 型号
+    - Size
+    - key
+    - ''
+  - - ratio
+    - 减速比
+    - Ratio
+    - key
+    - ''
+  - - T2D_Nm
+    - 连续扭矩 T2D
+    - Continuous torque T2D
+    - perf
+    - Nm
+  - - T2max_Nm
+    - 最大扭矩 T2max
+    - Max. torque T2max
+    - perf
+    - Nm
+  - - T2stop_Nm
+    - 急停扭矩（允许 1000 次）
+    - Emergency stop torque
+    - perf
+    - Nm
+  - - n1max_rpm
+    - 最高机械输入转速
+    - Max. mechanical input speed
+    - perf
+    - r/min
+  - - backlash_arcmin
+    - 标准回程间隙（上限）
+    - Standard backlash (max)
+    - perf
+    - arcmin
+  - - Ct_min_Nm_arcmin
+    - 抗扭刚度（下限）
+    - Torsional stiffness (min)
+    - perf
+    - Nm/arcmin
+  - - Ct_max_Nm_arcmin
+    - 抗扭刚度（上限）
+    - Torsional stiffness (max)
+    - perf
+    - Nm/arcmin
+  - - eta_pct
+    - 效率
+    - Efficiency
+    - perf
+    - '%'
+  - - mass_min_kg
+    - 重量（下限）
+    - Weight (min)
+    - info
+    - kg
+  - - mass_max_kg
+    - 重量（上限）
+    - Weight (max)
+    - info
+    - kg
+  - - life_h
+    - 使用寿命
+    - Service life
+    - perf
+    - h
+  - - D_mm
+    - 壳体外径 D6
+    - Housing diameter D6
+    - dim
+    - mm
+  - - L_mm
+    - 最小总长 L1
+    - Min. total length L1
+    - dim
+    - mm
+  rows:
+  - size: PLE060-3
+    src: ple
+    page: 20–24
+    size_code: PLE060
+    ratio: 3
+    T2D_Nm: 22
+    T2max_Nm: 44
+    T2stop_Nm: 60
+    n1max_rpm: 13000
+    backlash_arcmin: 10
+    Ct_min_Nm_arcmin: 2.0
+    Ct_max_Nm_arcmin: 2.7
+    eta_pct: 98
+    mass_min_kg: 0.9
+    mass_max_kg: 0.9
+    life_h: 20000
+    D_mm: 60
+    L_mm: 106
+  - size: PLE060-4
+    src: ple
+    page: 20–24
+    size_code: PLE060
+    ratio: 4
+    T2D_Nm: 23
+    T2max_Nm: 60
+    T2stop_Nm: 80
+    n1max_rpm: 13000
+    backlash_arcmin: 10
+    Ct_min_Nm_arcmin: 2.0
+    Ct_max_Nm_arcmin: 2.7
+    eta_pct: 98
+    mass_min_kg: 0.9
+    mass_max_kg: 0.9
+    life_h: 20000
+    D_mm: 60
+    L_mm: 106
+  - size: PLE060-5
+    src: ple
+    page: 20–24
+    size_code: PLE060
+    ratio: 5
+    T2D_Nm: 24
+    T2max_Nm: 61
+    T2stop_Nm: 80
+    n1max_rpm: 13000
+    backlash_arcmin: 10
+    Ct_min_Nm_arcmin: 2.0
+    Ct_max_Nm_arcmin: 2.7
+    eta_pct: 98
+    mass_min_kg: 0.9
+    mass_max_kg: 0.9
+    life_h: 20000
+    D_mm: 60
+    L_mm: 106
+  - size: PLE060-7
+    src: ple
+    page: 20–24
+    size_code: PLE060
+    ratio: 7
+    T2D_Nm: 19.5
+    T2max_Nm: 40
+    T2stop_Nm: 80
+    n1max_rpm: 13000
+    backlash_arcmin: 10
+    Ct_min_Nm_arcmin: 2.0
+    Ct_max_Nm_arcmin: 2.7
+    eta_pct: 98
+    mass_min_kg: 0.9
+    mass_max_kg: 0.9
+    life_h: 20000
+    D_mm: 60
+    L_mm: 106
+  - size: PLE060-8
+    src: ple
+    page: 20–24
+    size_code: PLE060
+    ratio: 8
+    T2D_Nm: 15
+    T2max_Nm: 28
+    T2stop_Nm: 80
+    n1max_rpm: 13000
+    backlash_arcmin: 10
+    Ct_min_Nm_arcmin: 2.0
+    Ct_max_Nm_arcmin: 2.7
+    eta_pct: 98
+    mass_min_kg: 0.9
+    mass_max_kg: 0.9
+    life_h: 20000
+    D_mm: 60
+    L_mm: 106
+  - size: PLE060-10
+    src: ple
+    page: 20–24
+    size_code: PLE060
+    ratio: 10
+    T2D_Nm: 12.5
+    T2max_Nm: 24
+    T2stop_Nm: 75
+    n1max_rpm: 13000
+    backlash_arcmin: 10
+    Ct_min_Nm_arcmin: 2.0
+    Ct_max_Nm_arcmin: 2.7
+    eta_pct: 98
+    mass_min_kg: 0.9
+    mass_max_kg: 0.9
+    life_h: 20000
+    D_mm: 60
+    L_mm: 106
+  - size: PLE080-3
+    src: ple
+    page: 20–24
+    size_code: PLE080
+    ratio: 3
+    T2D_Nm: 37
+    T2max_Nm: 105
+    T2stop_Nm: 150
+    n1max_rpm: 7000
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 7.2
+    Ct_max_Nm_arcmin: 10.0
+    eta_pct: 98
+    mass_min_kg: 2.1
+    mass_max_kg: 2.2
+    life_h: 20000
+    D_mm: 80
+    L_mm: 133.5
+  - size: PLE080-4
+    src: ple
+    page: 20–24
+    size_code: PLE080
+    ratio: 4
+    T2D_Nm: 82
+    T2max_Nm: 140
+    T2stop_Nm: 200
+    n1max_rpm: 7000
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 7.2
+    Ct_max_Nm_arcmin: 10.0
+    eta_pct: 98
+    mass_min_kg: 2.1
+    mass_max_kg: 2.2
+    life_h: 20000
+    D_mm: 80
+    L_mm: 133.5
+  - size: PLE080-5
+    src: ple
+    page: 20–24
+    size_code: PLE080
+    ratio: 5
+    T2D_Nm: 84
+    T2max_Nm: 175
+    T2stop_Nm: 220
+    n1max_rpm: 7000
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 7.2
+    Ct_max_Nm_arcmin: 10.0
+    eta_pct: 98
+    mass_min_kg: 2.1
+    mass_max_kg: 2.2
+    life_h: 20000
+    D_mm: 80
+    L_mm: 133.5
+  - size: PLE080-7
+    src: ple
+    page: 20–24
+    size_code: PLE080
+    ratio: 7
+    T2D_Nm: 55
+    T2max_Nm: 104
+    T2stop_Nm: 178
+    n1max_rpm: 7000
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 7.2
+    Ct_max_Nm_arcmin: 10.0
+    eta_pct: 98
+    mass_min_kg: 2.1
+    mass_max_kg: 2.2
+    life_h: 20000
+    D_mm: 80
+    L_mm: 133.5
+  - size: PLE080-8
+    src: ple
+    page: 20–24
+    size_code: PLE080
+    ratio: 8
+    T2D_Nm: 42
+    T2max_Nm: 80
+    T2stop_Nm: 190
+    n1max_rpm: 7000
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 7.2
+    Ct_max_Nm_arcmin: 10.0
+    eta_pct: 98
+    mass_min_kg: 2.1
+    mass_max_kg: 2.2
+    life_h: 20000
+    D_mm: 80
+    L_mm: 133.5
+  - size: PLE080-10
+    src: ple
+    page: 20–24
+    size_code: PLE080
+    ratio: 10
+    T2D_Nm: 32
+    T2max_Nm: 60
+    T2stop_Nm: 200
+    n1max_rpm: 7000
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 7.2
+    Ct_max_Nm_arcmin: 10.0
+    eta_pct: 98
+    mass_min_kg: 2.1
+    mass_max_kg: 2.2
+    life_h: 20000
+    D_mm: 80
+    L_mm: 133.5
+  - size: PLE120-3
+    src: ple
+    page: 20–24
+    size_code: PLE120
+    ratio: 3
+    T2D_Nm: 97
+    T2max_Nm: 184
+    T2stop_Nm: 375
+    n1max_rpm: 6500
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 15.5
+    Ct_max_Nm_arcmin: 21.0
+    eta_pct: 98
+    mass_min_kg: 5.6
+    mass_max_kg: 5.9
+    life_h: 20000
+    D_mm: 115
+    L_mm: 176.5
+  - size: PLE120-4
+    src: ple
+    page: 20–24
+    size_code: PLE120
+    ratio: 4
+    T2D_Nm: 131
+    T2max_Nm: 245
+    T2stop_Nm: 500
+    n1max_rpm: 6500
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 15.5
+    Ct_max_Nm_arcmin: 21.0
+    eta_pct: 98
+    mass_min_kg: 5.6
+    mass_max_kg: 5.9
+    life_h: 20000
+    D_mm: 115
+    L_mm: 176.5
+  - size: PLE120-5
+    src: ple
+    page: 20–24
+    size_code: PLE120
+    ratio: 5
+    T2D_Nm: 165
+    T2max_Nm: 310
+    T2stop_Nm: 500
+    n1max_rpm: 6500
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 15.5
+    Ct_max_Nm_arcmin: 21.0
+    eta_pct: 98
+    mass_min_kg: 5.6
+    mass_max_kg: 5.9
+    life_h: 20000
+    D_mm: 115
+    L_mm: 176.5
+  - size: PLE120-7
+    src: ple
+    page: 20–24
+    size_code: PLE120
+    ratio: 7
+    T2D_Nm: 114
+    T2max_Nm: 215
+    T2stop_Nm: 340
+    n1max_rpm: 6500
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 15.5
+    Ct_max_Nm_arcmin: 21.0
+    eta_pct: 98
+    mass_min_kg: 5.6
+    mass_max_kg: 5.9
+    life_h: 20000
+    D_mm: 115
+    L_mm: 176.5
+  - size: PLE120-8
+    src: ple
+    page: 20–24
+    size_code: PLE120
+    ratio: 8
+    T2D_Nm: 102
+    T2max_Nm: 192
+    T2stop_Nm: 380
+    n1max_rpm: 6500
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 15.5
+    Ct_max_Nm_arcmin: 21.0
+    eta_pct: 98
+    mass_min_kg: 5.6
+    mass_max_kg: 5.9
+    life_h: 20000
+    D_mm: 115
+    L_mm: 176.5
+  - size: PLE120-10
+    src: ple
+    page: 20–24
+    size_code: PLE120
+    ratio: 10
+    T2D_Nm: 80
+    T2max_Nm: 152
+    T2stop_Nm: 480
+    n1max_rpm: 6500
+    backlash_arcmin: 7
+    Ct_min_Nm_arcmin: 15.5
+    Ct_max_Nm_arcmin: 21.0
+    eta_pct: 98
+    mass_min_kg: 5.6
+    mass_max_kg: 5.9
+    life_h: 20000
+    D_mm: 115
+    L_mm: 176.5
