@@ -1,0 +1,911 @@
+1
+00:00:00,600 --> 00:00:01,710
+Hi everyone,
+
+2
+00:00:01,730 --> 00:00:08,488
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,888 --> 00:00:13,436
+This is Lecture 24, making needles and rotary hooks.
+
+4
+00:00:13,836 --> 00:00:18,178
+A needle pierces the fabric more than eighty times a second,
+
+5
+00:00:18,198 --> 00:00:21,449
+and the hook's fits are only tens of microns.
+
+6
+00:00:21,469 --> 00:00:25,883
+Today we see how these two tiny parts are made and inspected,
+
+7
+00:00:25,903 --> 00:00:30,826
+and how to fix the old problem of noisy hooks, cheaply and reliably.
+
+8
+00:00:32,346 --> 00:00:35,366
+Noisy hooks are a common repair call.
+
+9
+00:00:35,766 --> 00:00:41,954
+If the clearance between the hook race and the basket rib is too large,
+
+10
+00:00:41,974 --> 00:00:47,026
+the basket rattles; too small, and it heats up and sticks.
+
+11
+00:00:47,426 --> 00:00:51,886
+A hook maker requires a diametral clearance of 10 to 30 microns.
+
+12
+00:00:52,286 --> 00:01:01,038
+The race bore and the rib are ground after hardening to an economical plus or
+
+13
+00:01:01,058 --> 00:01:03,545
+minus 15 microns each,
+
+14
+00:01:03,565 --> 00:01:05,026
+a sigma of 5.
+
+15
+00:01:05,426 --> 00:01:08,893
+Halving sigma doubles the machining cost.
+
+16
+00:01:09,293 --> 00:01:15,290
+How do we reach a 99 percent yield, cheaply and reliably?
+
+17
+00:01:15,690 --> 00:01:17,270
+We'll answer at the end.
+
+18
+00:01:18,790 --> 00:01:22,490
+Needles: anatomy, stiffness and process.
+
+19
+00:01:24,010 --> 00:01:31,962
+The size is the blade diameter: Nm 90 means 0.90 millimetre.
+
+20
+00:01:32,362 --> 00:01:33,882
+The blade is a slender rod.
+
+21
+00:01:34,282 --> 00:01:39,781
+Bending stiffness goes with the section's second moment of area,
+
+22
+00:01:39,801 --> 00:01:45,645
+and so does the buckling load, which also falls with length squared.
+
+23
+00:01:46,045 --> 00:01:50,394
+The second moment goes with diameter to the fourth power,
+
+24
+00:01:50,414 --> 00:01:52,463
+so size matters enormously.
+
+25
+00:01:52,863 --> 00:02:01,565
+At the same length, Nm 110 is 2.23 times as stiff as Nm 90,
+
+26
+00:02:01,585 --> 00:02:05,409
+and Nm 70 only 0.37 times.
+
+27
+00:02:05,809 --> 00:02:09,830
+That's one reason thick fabric needs a thick needle:
+
+28
+00:02:09,850 --> 00:02:14,337
+a thin one gets pushed aside and runs into the hook point.
+
+29
+00:02:14,737 --> 00:02:17,934
+It's also why straightness is critical:
+
+30
+00:02:17,954 --> 00:02:22,553
+a needle that starts bent deflects even more under load.
+
+31
+00:02:24,073 --> 00:02:29,013
+Needle making has five stages: stock, forming, heat treatment,
+
+32
+00:02:29,033 --> 00:02:32,693
+surface treatment, and inspection and packing.
+
+33
+00:02:33,093 --> 00:02:39,009
+The raw material is high-carbon wire, checked on arrival for diameter,
+
+34
+00:02:39,029 --> 00:02:44,607
+cracks and decarburisation, then straightened and cut into blanks.
+
+35
+00:02:45,007 --> 00:02:49,433
+The blade is reduced from shank diameter to needle size,
+
+36
+00:02:49,453 --> 00:02:54,514
+about a 69 percent reduction in area, usually by rotary swaging:
+
+37
+00:02:54,534 --> 00:02:58,484
+dies spin around the blank and hammer it radially,
+
+38
+00:02:58,504 --> 00:03:00,787
+keeping the grain continuous.
+
+39
+00:03:01,187 --> 00:03:04,687
+Uneven reduction bends the blade.
+
+40
+00:03:05,087 --> 00:03:09,099
+Then the grooves and scarf are cold-pressed;
+
+41
+00:03:09,119 --> 00:03:16,064
+the dies are managed by stroke count, because as they wear the scarf drifts.
+
+42
+00:03:17,584 --> 00:03:23,572
+Flattening and punching the eye is the most critical operation in needle making,
+
+43
+00:03:23,592 --> 00:03:26,276
+and the one most likely to go wrong.
+
+44
+00:03:26,676 --> 00:03:32,375
+Grooves are pressed in from both sides to thin the eye region,
+
+45
+00:03:32,395 --> 00:03:35,696
+then a very fine punch goes through.
+
+46
+00:03:36,096 --> 00:03:41,531
+The punch is finer than the eye, so it wears and breaks quickly.
+
+47
+00:03:41,931 --> 00:03:46,730
+As it wears, the burrs grow and the eye width drifts;
+
+48
+00:03:46,750 --> 00:03:49,366
+if it is slightly off centre,
+
+49
+00:03:49,386 --> 00:03:54,911
+one wall is too thin and the needle breaks at the eye in use.
+
+50
+00:03:55,311 --> 00:03:59,501
+Burrs are the main cause of cut and broken thread,
+
+51
+00:03:59,521 --> 00:04:02,531
+and polishing can't remove big ones.
+
+52
+00:04:02,931 --> 00:04:08,302
+So this operation needs an in-line control chart of eye width,
+
+53
+00:04:08,322 --> 00:04:11,431
+and punches changed by stroke count.
+
+54
+00:04:12,951 --> 00:04:19,131
+After forming, the needle is still soft and must be hardened.
+
+55
+00:04:19,531 --> 00:04:20,533
+Being thin,
+
+56
+00:04:20,553 --> 00:04:27,684
+needles are usually heated continuously in a protective atmosphere to prevent
+
+57
+00:04:27,704 --> 00:04:30,285
+oxidation and decarburising,
+
+58
+00:04:30,305 --> 00:04:31,956
+then oil-quenched.
+
+59
+00:04:32,356 --> 00:04:38,558
+Quenched, they are hard and brittle, so they must be tempered.
+
+60
+00:04:38,958 --> 00:04:44,321
+Lower temperature: harder and more wear-resistant, but more brittle.
+
+61
+00:04:44,721 --> 00:04:47,986
+Higher: tougher, bending rather than breaking,
+
+62
+00:04:48,006 --> 00:04:50,414
+but the point and eye wear faster.
+
+63
+00:04:50,814 --> 00:04:55,594
+The exact value is a needle maker's core process data.
+
+64
+00:04:55,994 --> 00:05:02,866
+Slender needles always distort when hardened, so each one is straightened,
+
+65
+00:05:02,886 --> 00:05:08,361
+then polished to remove burrs and nickel- or chrome-plated.
+
+66
+00:05:08,761 --> 00:05:13,179
+Finally machine vision checks the shape of every needle;
+
+67
+00:05:13,199 --> 00:05:17,141
+hardness and plating can only be sampled by batch.
+
+68
+00:05:18,661 --> 00:05:21,961
+Inspection and statistical process control.
+
+69
+00:05:23,481 --> 00:05:28,913
+What the factory really wants to know is whether this operation can reliably
+
+70
+00:05:28,933 --> 00:05:30,061
+make good parts.
+
+71
+00:05:30,461 --> 00:05:35,788
+Cp only compares the tolerance band with the process spread;
+
+72
+00:05:35,808 --> 00:05:39,798
+Cpk also asks how far the mean is off centre.
+
+73
+00:05:40,198 --> 00:05:47,967
+A common target is 1.33, the nearer limit four sigma from the mean.
+
+74
+00:05:48,367 --> 00:05:53,692
+The example: eye width 0.360 plus or minus 0.020,
+
+75
+00:05:53,712 --> 00:06:00,236
+five needles per subgroup from in-line vision, 25 subgroups,
+
+76
+00:06:00,256 --> 00:06:04,490
+sigma estimated from the average range.
+
+77
+00:06:04,890 --> 00:06:13,870
+Cp comes out about 1.70 and Cpk about 1.52: capable.
+
+78
+00:06:14,270 --> 00:06:20,953
+But once the punch wears and the mean moves up one sigma,
+
+79
+00:06:20,973 --> 00:06:27,891
+Cpk falls to 1.17 and the reject rate rises about 68 times.
+
+80
+00:06:29,411 --> 00:06:32,819
+How do we catch a drift early?
+
+81
+00:06:33,219 --> 00:06:36,176
+With a control chart.
+
+82
+00:06:36,576 --> 00:06:42,713
+Plot each subgroup's mean in time order; the centre line is the grand mean,
+
+83
+00:06:42,733 --> 00:06:49,116
+and the limits are the grand mean plus or minus A-two times the average range.
+
+84
+00:06:49,516 --> 00:06:55,150
+Note that the limits come from the process's own spread and have nothing to
+
+85
+00:06:55,170 --> 00:06:57,110
+do with the specification.
+
+86
+00:06:57,510 --> 00:07:03,486
+A point outside means the process has changed, so stop and look for the cause,
+
+87
+00:07:03,506 --> 00:07:06,253
+even if the needle is still in spec.
+
+88
+00:07:06,653 --> 00:07:10,901
+Here a one-sigma drift starts at subgroup 26,
+
+89
+00:07:10,921 --> 00:07:17,731
+and with three per subgroup it takes around ten subgroups before a point
+
+90
+00:07:17,751 --> 00:07:19,913
+breaks the upper limit.
+
+91
+00:07:21,433 --> 00:07:25,715
+How fast it alarms can be worked out in advance:
+
+92
+00:07:25,735 --> 00:07:31,092
+the probability that a subgroup falls outside after a drift,
+
+93
+00:07:31,112 --> 00:07:35,573
+and its reciprocal is the average run length, ARL.
+
+94
+00:07:35,973 --> 00:07:44,246
+With no drift there's one false alarm every 370 subgroups on average.
+
+95
+00:07:44,646 --> 00:07:46,908
+After a one-sigma drift,
+
+96
+00:07:46,928 --> 00:07:52,329
+subgroups of three take nearly ten subgroups to catch it;
+
+97
+00:07:52,349 --> 00:07:58,226
+a half-sigma drift takes about 33 even with five per subgroup.
+
+98
+00:07:58,626 --> 00:08:04,167
+The bigger the subgroup, the less the mean scatters and the sooner the alarm,
+
+99
+00:08:04,187 --> 00:08:06,406
+at the price of measuring more.
+
+100
+00:08:06,806 --> 00:08:10,405
+With full inspection you can take big subgroups;
+
+101
+00:08:10,425 --> 00:08:14,703
+destructive checks like hardness must rely on prevention.
+
+102
+00:08:16,223 --> 00:08:19,440
+Hooks: grinding and selective assembly.
+
+103
+00:08:20,960 --> 00:08:25,813
+The basket's rib slides in the race inside the hook body.
+
+104
+00:08:26,213 --> 00:08:30,770
+Last lecture's hook gap had an adjustable link;
+
+105
+00:08:30,790 --> 00:08:34,470
+the race-to-basket clearance has none.
+
+106
+00:08:34,870 --> 00:08:37,589
+It depends only on two diameters:
+
+107
+00:08:37,609 --> 00:08:42,901
+the nominal clearance plus the difference of the two deviations,
+
+108
+00:08:42,921 --> 00:08:46,552
+with only plus or minus 10 microns to spare.
+
+109
+00:08:46,952 --> 00:08:53,558
+If any body fits any basket, the clearance's sigma is the root sum of squares.
+
+110
+00:08:53,958 --> 00:09:00,752
+Both parts at a sigma of 5, already decent economical accuracy,
+
+111
+00:09:00,772 --> 00:09:08,538
+give a clearance sigma of 7.07 microns and only about 84.5 percent good.
+
+112
+00:09:08,938 --> 00:09:15,707
+For 99 percent each part must be under 2.7 microns, nearly half,
+
+113
+00:09:15,727 --> 00:09:18,358
+at about double the cost.
+
+114
+00:09:18,758 --> 00:09:22,978
+The chart alternates between the two accuracies.
+
+115
+00:09:24,498 --> 00:09:27,078
+Grouped matching takes another approach.
+
+116
+00:09:27,478 --> 00:09:33,392
+The parts are still made to economical accuracy, but every one is measured;
+
+117
+00:09:33,412 --> 00:09:38,694
+the range of plus or minus 15 microns is split into k equal groups,
+
+118
+00:09:38,714 --> 00:09:41,938
+and parts are paired only within a group.
+
+119
+00:09:42,338 --> 00:09:49,638
+Two deviations in the same group of width w differ by less than w.
+
+120
+00:09:50,038 --> 00:09:56,730
+With three groups w is 10 microns, so the clearance is always within 10 to 30,
+
+121
+00:09:56,750 --> 00:09:59,570
+whatever the parts' own accuracy.
+
+122
+00:09:59,970 --> 00:10:02,747
+That's measurement instead of accuracy.
+
+123
+00:10:03,147 --> 00:10:08,496
+It has three costs: measuring everything and storing by group;
+
+124
+00:10:08,516 --> 00:10:14,557
+gauge error misgrading parts near the boundaries; and, most important,
+
+125
+00:10:14,577 --> 00:10:18,800
+both parts must have equal counts in every group.
+
+126
+00:10:20,320 --> 00:10:26,921
+What the shop floor most often overlooks is that the two parts' distributions
+
+127
+00:10:26,941 --> 00:10:27,867
+must match.
+
+128
+00:10:28,267 --> 00:10:32,102
+This shows the count in each of the three groups,
+
+129
+00:10:32,122 --> 00:10:35,564
+blue for hook bodies and orange for baskets.
+
+130
+00:10:35,964 --> 00:10:42,781
+After the race grinder's wheel is dressed, its mean shifts by 4 microns.
+
+131
+00:10:43,181 --> 00:10:49,694
+Pairs within a group still have good clearance, so the yield barely moves,
+
+132
+00:10:49,714 --> 00:10:53,843
+but the blue and orange bars no longer line up,
+
+133
+00:10:53,863 --> 00:11:00,641
+and leftovers rise from 1.7 percent to about 27, pushing up the cost per set.
+
+134
+00:11:01,041 --> 00:11:06,501
+So the matching station must watch not just the yield but the count in each group.
+
+135
+00:11:08,021 --> 00:11:12,161
+These ideas show up all over robotics.
+
+136
+00:11:12,561 --> 00:11:17,828
+A joint's precision gearbox must hold backlash to arc-minutes;
+
+137
+00:11:17,848 --> 00:11:21,409
+making every part that accurate is costly,
+
+138
+00:11:21,429 --> 00:11:28,231
+so pins and bearings are often graded by measured size and fitted within groups,
+
+139
+00:11:28,251 --> 00:11:34,541
+just like races and baskets, and again both distributions must be watched.
+
+140
+00:11:34,941 --> 00:11:42,127
+The needle factory's in-line vision inspection is itself a classic
+
+141
+00:11:42,147 --> 00:11:44,093
+robot-vision task.
+
+142
+00:11:44,493 --> 00:11:49,350
+Control-chart thinking carries over to robot maintenance too:
+
+143
+00:11:49,370 --> 00:11:53,588
+chart joint-motor current and vibration in subgroups,
+
+144
+00:11:53,608 --> 00:11:56,627
+alarm when the mean leaves its limits,
+
+145
+00:11:56,647 --> 00:12:00,145
+and service the gearbox before it wears out.
+
+146
+00:12:01,665 --> 00:12:04,635
+There's selective assembly in daily life too.
+
+147
+00:12:05,035 --> 00:12:09,844
+A shoe shop matches shoes to feet by size group.
+
+148
+00:12:10,244 --> 00:12:16,412
+The finer the sizes, the better the fit, but every size has to be stocked,
+
+149
+00:12:16,432 --> 00:12:18,670
+and the slow sizes pile up.
+
+150
+00:12:19,070 --> 00:12:23,416
+That's the trade-off between the number of groups and the leftovers:
+
+151
+00:12:23,436 --> 00:12:25,600
+finer groups match more precisely,
+
+152
+00:12:25,620 --> 00:12:28,810
+but bring more leftovers and more management cost.
+
+153
+00:12:30,330 --> 00:12:32,188
+Back to the opening problem.
+
+154
+00:12:32,588 --> 00:12:43,479
+Fully interchangeable: about 84.5 percent good at about 24.9 yuan a set.
+
+155
+00:12:43,879 --> 00:12:48,370
+No grouping, just tighter accuracy,
+
+156
+00:12:48,390 --> 00:12:58,294
+each sigma at 2.6 microns to leave a margin: 99.2 percent at about 39.8 yuan.
+
+157
+00:12:58,694 --> 00:13:04,870
+Three groups over plus or minus 15 microns, 10 microns wide,
+
+158
+00:13:04,890 --> 00:13:11,892
+with 1 micron gauge error: 99.6 percent good, 1.7 percent leftovers,
+
+159
+00:13:11,912 --> 00:13:19,018
+about 22.3 yuan a set, some 44 percent cheaper than tighter accuracy.
+
+160
+00:13:19,418 --> 00:13:22,279
+This holds only if the two distributions match,
+
+161
+00:13:22,299 --> 00:13:25,958
+so the matching station must keep watching the group counts.
+
+162
+00:13:27,478 --> 00:13:31,663
+Now Virtual lab 24-1, hook matching and process capability,
+
+163
+00:13:31,683 --> 00:13:36,580
+which you can do yourself on WenQuest. Results and tasks are blurred.
+
+164
+00:13:36,600 --> 00:13:41,997
+On page one, the left shows the clearance distribution and the group counts;
+
+165
+00:13:42,017 --> 00:13:44,990
+on the right you set the number of groups,
+
+166
+00:13:45,010 --> 00:13:47,698
+the part accuracy and the gauge error.
+
+167
+00:13:48,098 --> 00:13:52,518
+Task one: no groups. Turn down both parts' sigma,
+
+168
+00:13:52,538 --> 00:13:59,495
+watch the distribution narrow, check for yourself the accuracy we worked out,
+
+169
+00:13:59,515 --> 00:14:02,485
+and watch the cost per set climb.
+
+170
+00:14:02,885 --> 00:14:10,300
+Task two: put the accuracy back at 5 microns. Try two groups first, then three,
+
+171
+00:14:10,320 --> 00:14:15,570
+four and five in turn, record yield, leftovers and cost,
+
+172
+00:14:15,590 --> 00:14:20,182
+and explain why you choose your number of groups.
+
+173
+00:14:20,582 --> 00:14:25,335
+Then press Inject: race grinding mean plus 4 microns,
+
+174
+00:14:25,355 --> 00:14:32,269
+and watch the blue and orange bars in the group chart move apart. The remedy,
+
+175
+00:14:32,289 --> 00:14:36,682
+which side to move and by how much, is up to you.
+
+176
+00:14:37,082 --> 00:14:41,016
+Task three is on page two, the eye-width control chart.
+
+177
+00:14:41,036 --> 00:14:45,545
+With three needles per subgroup and a one-sigma drift injected,
+
+178
+00:14:45,565 --> 00:14:47,414
+see which subgroup alarms;
+
+179
+00:14:47,434 --> 00:14:52,734
+then choose the subgroup size so the average run length is no more than 5.
+
+180
+00:14:52,754 --> 00:14:56,329
+The guide and report template are on the platform.
+
+181
+00:14:57,849 --> 00:15:02,650
+One wheel dressing at the hook maker can reach all the way to the machine
+
+182
+00:15:02,670 --> 00:15:03,641
+assembly plant.
+
+183
+00:15:03,661 --> 00:15:06,085
+This is the WenQuest digital factory.
+
+184
+00:15:06,105 --> 00:15:09,849
+The assembly line measures the hook gap on every machine,
+
+185
+00:15:09,869 --> 00:15:13,152
+the readings go over the bus into a control chart,
+
+186
+00:15:13,172 --> 00:15:18,171
+and after one batch of hooks goes in the data starts to drift and the system
+
+187
+00:15:18,191 --> 00:15:19,228
+raises an alarm.
+
+188
+00:15:19,628 --> 00:15:24,838
+Switch to the trace page and follow the chain backwards: the alarmed machine,
+
+189
+00:15:24,858 --> 00:15:29,525
+the hook batch it carries, the race grinder that batch was ground on,
+
+190
+00:15:29,545 --> 00:15:34,756
+and the clue: the wheel-dressing interval was stretched from 50 parts to 150.
+
+191
+00:15:34,776 --> 00:15:38,288
+That's exactly the mean drift we talked about today.
+
+192
+00:15:38,688 --> 00:15:43,370
+Drag the serial number and look at the machine records one by one.
+
+193
+00:15:43,390 --> 00:15:48,855
+Because measurements reach the history database with lot and machine numbers,
+
+194
+00:15:48,875 --> 00:15:54,697
+a problem can be traced from the finished machine all the way back to the grinder.
+
+195
+00:15:54,717 --> 00:15:58,900
+We'll walk through the whole digital factory in Lecture 27.
+
+196
+00:16:00,420 --> 00:16:04,578
+Your assignment has four questions. One:
+
+197
+00:16:04,598 --> 00:16:10,741
+compare the blade stiffness of Nm 120 and Nm 65 with Nm 90,
+
+198
+00:16:10,761 --> 00:16:18,470
+then find the one-sided Cpk for straightness, before and after punch wear.
+
+199
+00:16:18,870 --> 00:16:25,469
+Two: for a 0.8-sigma drift to alarm within 6 subgroups on average,
+
+200
+00:16:25,489 --> 00:16:32,891
+what is the smallest subgroup size? Check one case on page two of the lab.
+
+201
+00:16:33,291 --> 00:16:37,619
+Three: use Lab 24-1 to propose a hook-matching plan,
+
+202
+00:16:37,639 --> 00:16:40,964
+then handle a 4 micron race shift. Four:
+
+203
+00:16:40,984 --> 00:16:45,228
+write an inspection item and a measurement message,
+
+204
+00:16:45,248 --> 00:16:51,751
+and work out the capacity with one more race grinder, and the next bottleneck.
+
+205
+00:16:52,151 --> 00:16:57,651
+Submit the assignment and the lab report on the WenQuest platform.
+
+206
+00:16:59,170 --> 00:17:04,320
+There's also a ten-question quiz. For example,
+
+207
+00:17:04,340 --> 00:17:10,950
+the eye-width spec is 0.360 plus or minus 0.020 millimetre,
+
+208
+00:17:10,970 --> 00:17:18,030
+with a process mean of 0.358 and a sigma of 0.005. What is Cpk?
+
+209
+00:17:18,430 --> 00:17:19,899
+Or true or false:
+
+210
+00:17:19,919 --> 00:17:27,081
+the control limits of an X-bar chart are worked out from the specification limits,
+
+211
+00:17:27,101 --> 00:17:31,810
+so a point inside them means the eye width is in spec.
+
+212
+00:17:32,210 --> 00:17:37,670
+You get three attempts, and the explanations appear as soon as you submit.
+
+213
+00:17:39,190 --> 00:17:40,650
+Three takeaways.
+
+214
+00:17:41,050 --> 00:17:46,782
+One: needles and hooks stand for two ways of manufacturing.
+
+215
+00:17:47,182 --> 00:17:53,046
+Needles rely on consistent forming and full vision inspection,
+
+216
+00:17:53,066 --> 00:17:59,689
+with eye punching and tempering most critical; hooks rely on grinding,
+
+217
+00:17:59,709 --> 00:18:01,682
+lapping and matching.
+
+218
+00:18:02,082 --> 00:18:06,593
+Two: Cpk tells you whether a process is capable,
+
+219
+00:18:06,613 --> 00:18:10,274
+a control chart whether it has changed,
+
+220
+00:18:10,294 --> 00:18:14,144
+and bigger subgroups catch drifts sooner.
+
+221
+00:18:14,544 --> 00:18:15,061
+Three:
+
+222
+00:18:15,081 --> 00:18:21,950
+grouped matching swaps accuracy for measurement and reaches a high yield with
+
+223
+00:18:21,970 --> 00:18:23,471
+economical parts,
+
+224
+00:18:23,491 --> 00:18:28,750
+but the two distributions must match, or leftovers pile up.
+
+225
+00:18:29,150 --> 00:18:31,617
+The slides, the virtual lab,
+
+226
+00:18:31,637 --> 00:18:37,836
+the assignment and the quiz are all on the WenQuest learning platform,
+
+227
+00:18:37,856 --> 00:18:43,788
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+228
+00:18:44,188 --> 00:18:45,088
+See you next time.
