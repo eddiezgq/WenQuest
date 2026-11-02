@@ -306,10 +306,11 @@ def _run(src, lib, script):
         log = r.stdout + r.stderr
     dl = re.findall(r"Delay =\s*([\d.]+) ps", log)
     ar = re.findall(r"Chip area for module '\\top': ([\d.]+)", log)
-    nc = re.findall(r"Number of cells:\s+(\d+)", log)
+    # 单元个数：旧版 Yosys 写“Number of cells: N”，新版（镜像里的）写“N cells”
+    nc = re.findall(r"Number of cells:\s+(\d+)", log) or re.findall(r"^\s*(\d+)\s+cells\s*$", log, re.M)
     if not dl or not ar:
         raise SystemExit("综合失败：\n" + log[-2000:])
-    return float(dl[-1]), float(ar[-1]), int(nc[-1])
+    return float(dl[-1]), float(ar[-1]), int(nc[-1]) if nc else 0
 
 
 def synth(src, lib):
