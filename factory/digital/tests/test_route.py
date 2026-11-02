@@ -149,3 +149,26 @@ def test_sh101_full_process_plan():
     q = copy.deepcopy(p)
     q["chains"][0]["links"][0]["ei"] = -0.2
     assert any(x["level"] == "error" and x["rule"] == "尺寸链" for x in PR.review(q))
+
+
+def test_opdesign_rules():
+    """“工序设计”规则（第 57 章）：入体标注、工步时间超过工时、瓶颈跟不上需求节拍。"""
+    import yaml
+    from hub import process as PR
+    p = yaml.safe_load((Path(__file__).resolve().parents[1] / "std" / "SH-101_process.yaml").read_text(encoding="utf-8"))
+    q = copy.deepcopy(p)
+    q["operations"][1]["features"][0]["es_mm"] = 0.1
+    assert any(x["rule"] == "工序设计" for x in PR.review(q))
+    q = copy.deepcopy(p)
+    next(o for o in q["operations"] if o["seq"] == 50)["minutes"] = 4      # 机动 2.5 + 辅助 2.2
+    assert any(x["rule"] == "工时" and "辅助时间" in x["text"] for x in PR.review(q))
+    q = copy.deepcopy(p)
+    q["annual_volume"] = 30000            # 零件图 6000 件；工艺规程里写的年产量只在零件图没有时才用
+    r = yaml.safe_load((Path(__file__).resolve().parents[1] / "std" / "SH-101_route.yaml").read_text(encoding="utf-8"))
+    PR_part = PR.part_spec
+    try:
+        PR.part_spec = lambda item: dict(PR_part(item), annual_volume=12000)
+        assert any(x["rule"] == "工时" and "需求节拍" in x["text"] for x in PR.review(r))       # 第 56 章路线的滚齿 22 min 跟不上 1.2 万件（需求节拍 17 min）
+        assert not any("需求节拍" in x["text"] for x in PR.review(p))                          # 本章定额后滚齿 9 min，瓶颈变成磨削 16 min，跟得上
+    finally:
+        PR.part_spec = PR_part
