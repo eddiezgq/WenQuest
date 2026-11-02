@@ -1,0 +1,23 @@
+# 实验 6.3 的指导书与报告模板。目的、场景、参数、任务取自 lab6_3.js（由 labs/micro/textbook/lab6_3.body.js 生成）。
+原理:
+  - ["基 4 Booth 编码把乘数每两位看成一个数字，取值 −2、−1、0、1、2，相邻两组重叠一位：", "Radix-4 Booth recoding takes the multiplier two bits at a time as digits −2, −1, 0, 1, 2, with adjacent groups overlapping by one bit:"]
+  - 式: "d(i) = −2·b(2i+1) + b(2i) + b(2i−1)，b = Σ d(i)·4^i        (6.3.1)"
+  - ["8 位无符号乘数补 b(−1) = 0 和高位的 0，得到 5 个数字，所以只有 5 行部分积，每行是被乘数的 0、±1、±2 倍（取反加 1、左移一位）。", "An 8-bit unsigned multiplier padded with b(−1) = 0 and high zeros gives five digits, so only five partial-product rows, each 0, ±1 or ±2 times the multiplicand (invert-and-add-1, shift)."]
+步骤:
+  - ["乘数取 123，记下 5 个 Booth 数字和每行部分积，验证合计等于 a·b（任务 1），填入表 1。", "Set the multiplier to 123, record the digits and rows, and check the sum equals a·b (task 1); fill in Table 1."]
+  - ["乘数取 255，比较普通部分积与 Booth 部分积中不为 0 的行数（任务 2）。", "Set 255 and compare the non-zero rows (task 2)."]
+  - ["找出让 5 个 Booth 数字都不为 0 的最小乘数（任务 3），填入表 2。", "Find the smallest multiplier with all five digits non-zero (task 3); fill in Table 2."]
+数据表:
+  - 标题: ["表 1  乘数 123 的 Booth 编码", "Table 1  Booth recoding of 123"]
+    表头: ["i", "b(2i+1) b(2i) b(2i−1)", "d(i)", "d(i)·a·4^i"]
+    表头英文: ["i", "b(2i+1) b(2i) b(2i−1)", "d(i)", "d(i)·a·4^i"]
+    行: [["0", "", "", ""], ["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""], ["4", "", "", ""]]
+  - 标题: ["表 2  不为 0 的行数", "Table 2  Non-zero rows"]
+    表头: ["乘数", "普通部分积", "Booth 部分积"]
+    表头英文: ["Multiplier", "Ordinary rows", "Booth rows"]
+    行: [["123", "", ""], ["255", "", ""], ["", "", ""]]
+注意:
+  - ["硬件里行数是固定的：不管数字是不是 0，5 行的电路都在；“不为 0 的行数”只说明哪些行实际在翻转，与功耗有关。", "In hardware the number of rows is fixed: all five exist whether or not a digit is 0; the non-zero count only tells which rows actually toggle, which matters for power."]
+思考题:
+  - ["为什么相邻两组要重叠一位？", "Why must adjacent groups overlap by one bit?"]
+  - ["有的乘数（如任务 3 的答案）Booth 编码后不为 0 的行反而比普通部分积多。这会不会让 Booth 乘法器变慢？", "For some multipliers (such as the answer to task 3) Booth has more non-zero rows than the ordinary form. Does this make the Booth multiplier slower?"]

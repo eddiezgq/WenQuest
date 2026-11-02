@@ -132,6 +132,18 @@
       "f_MHz": 100,
       "rpm": 6000,
       "lines": 1024
+    },
+    "p61": {
+      "bits": 32,
+      "f_MHz": 400
+    },
+    "p63": {
+      "bits": 16,
+      "f_MHz": 250
+    },
+    "p64": {
+      "bits": 16,
+      "f_MHz": 500
     }
   },
   "wires": {
@@ -390,5 +402,240 @@
         1.0
       ]
     ]
+  },
+  "arith_syn": {
+    "_note": "第 6 章算术电路按 SKY130 sky130_fd_sc_hd（tt_025C_1v80）综合的面积（μm²）、最长延时（ps，ABC 估算，含插缓冲与尺寸调整）与单元数（samples/数字集成电路设计/生成脚本/calib/arith.py）",
+    "add_rca_8": {
+      "area": 370.4,
+      "delay": 1103.4,
+      "cells": 53,
+      "area_min": 234.0,
+      "delay_amin": 1733.1
+    },
+    "add_cla_8": {
+      "area": 645.6,
+      "delay": 707.4,
+      "cells": 91,
+      "area_min": 355.3,
+      "delay_amin": 1273.1
+    },
+    "add_csel_8": {
+      "area": 474.2,
+      "delay": 804.6,
+      "cells": 78,
+      "area_min": 347.8,
+      "delay_amin": 1463.2
+    },
+    "add_bk_8": {
+      "area": 326.6,
+      "delay": 897.1,
+      "cells": 49,
+      "area_min": 270.3,
+      "delay_amin": 1462.3
+    },
+    "add_ks_8": {
+      "area": 491.7,
+      "delay": 730.1,
+      "cells": 84,
+      "area_min": 354.1,
+      "delay_amin": 1037.0
+    },
+    "add_rca_16": {
+      "area": 822.0,
+      "delay": 1847.2,
+      "cells": 124,
+      "area_min": 437.9,
+      "delay_amin": 3478.6
+    },
+    "add_cla_16": {
+      "area": 991.0,
+      "delay": 983.1,
+      "cells": 143,
+      "area_min": 699.4,
+      "delay_amin": 2009.2
+    },
+    "add_csel_16": {
+      "area": 989.7,
+      "delay": 1106.8,
+      "cells": 174,
+      "area_min": 759.5,
+      "delay_amin": 2646.1
+    },
+    "add_bk_16": {
+      "area": 679.4,
+      "delay": 1188.6,
+      "cells": 103,
+      "area_min": 579.3,
+      "delay_amin": 1836.0
+    },
+    "add_ks_16": {
+      "area": 1255.0,
+      "delay": 833.7,
+      "cells": 237,
+      "area_min": 884.6,
+      "delay_amin": 1302.6
+    },
+    "add_rca_32": {
+      "area": 1428.9,
+      "delay": 3728.2,
+      "cells": 273,
+      "area_min": 858.3,
+      "delay_amin": 7054.7
+    },
+    "add_cla_32": {
+      "area": 1727.9,
+      "delay": 1446.4,
+      "cells": 289,
+      "area_min": 1387.6,
+      "delay_amin": 3146.3
+    },
+    "add_csel_32": {
+      "area": 1910.6,
+      "delay": 1782.6,
+      "cells": 333,
+      "area_min": 1615.3,
+      "delay_amin": 3988.3
+    },
+    "add_bk_32": {
+      "area": 1341.3,
+      "delay": 1474.8,
+      "cells": 216,
+      "area_min": 1209.9,
+      "delay_amin": 2485.8
+    },
+    "add_ks_32": {
+      "area": 2807.7,
+      "delay": 1038.6,
+      "cells": 507,
+      "area_min": 2093.3,
+      "delay_amin": 1705.2
+    },
+    "mul_array_8": {
+      "area": 2832.7,
+      "delay": 2932.9,
+      "cells": 441,
+      "area_min": 1755.4,
+      "delay_amin": 4827.1
+    },
+    "mul_dadda_8": {
+      "area": 3310.7,
+      "delay": 1889.8,
+      "cells": 534,
+      "area_min": 2119.5,
+      "delay_amin": 2866.7
+    },
+    "mul_booth_8": {
+      "area": 3946.3,
+      "delay": 2113.8,
+      "cells": 623,
+      "area_min": 2195.9,
+      "delay_amin": 3379.2
+    },
+    "mul_array_16": {
+      "area": 13122.6,
+      "delay": 6581.2,
+      "cells": 2089,
+      "area_min": 7493.4,
+      "delay_amin": 11005.4
+    },
+    "mul_dadda_16": {
+      "area": 13795.7,
+      "delay": 2576.9,
+      "cells": 2277,
+      "area_min": 9080.0,
+      "delay_amin": 3902.8
+    },
+    "mul_booth_16": {
+      "area": 13033.8,
+      "delay": 2763.7,
+      "cells": 2175,
+      "area_min": 7608.5,
+      "delay_amin": 4504.0
+    },
+    "shift_16": {
+      "area": 694.4,
+      "delay": 471.3,
+      "cells": 129,
+      "area_min": 571.8,
+      "delay_amin": 978.0
+    },
+    "cmp_rca_16": {
+      "area": 387.9,
+      "delay": 1459.2,
+      "cells": 77,
+      "area_min": 321.6,
+      "delay_amin": 2225.8
+    },
+    "cmp_ks_16": {
+      "area": 431.7,
+      "delay": 606.9,
+      "cells": 85,
+      "area_min": 339.1,
+      "delay_amin": 901.9
+    },
+    "tgt_add_rca_32": {
+      "area": 1428.9,
+      "delay": 3728.2,
+      "cells": 273,
+      "area_min": 1428.9,
+      "delay_amin": 3728.2,
+      "target": 2285
+    },
+    "tgt_add_cla_32": {
+      "area": 1456.4,
+      "delay": 2276.6,
+      "cells": 246,
+      "area_min": 1456.4,
+      "delay_amin": 2276.6,
+      "target": 2285
+    },
+    "tgt_add_csel_32": {
+      "area": 1694.1,
+      "delay": 2668.4,
+      "cells": 283,
+      "area_min": 1694.1,
+      "delay_amin": 2668.4,
+      "target": 2285
+    },
+    "tgt_add_bk_32": {
+      "area": 1226.2,
+      "delay": 2259.0,
+      "cells": 204,
+      "area_min": 1226.2,
+      "delay_amin": 2259.0,
+      "target": 2285
+    },
+    "tgt_add_ks_32": {
+      "area": 2082.0,
+      "delay": 1562.9,
+      "cells": 398,
+      "area_min": 2082.0,
+      "delay_amin": 1562.9,
+      "target": 2285
+    },
+    "tgt_mul_array_16": {
+      "area": 13122.6,
+      "delay": 6581.2,
+      "cells": 2089,
+      "area_min": 13122.6,
+      "delay_amin": 6581.2,
+      "target": 3785
+    },
+    "tgt_mul_dadda_16": {
+      "area": 9217.6,
+      "delay": 3764.8,
+      "cells": 1576,
+      "area_min": 9217.6,
+      "delay_amin": 3764.8,
+      "target": 3785
+    },
+    "tgt_mul_booth_16": {
+      "area": 7848.8,
+      "delay": 3738.6,
+      "cells": 1259,
+      "area_min": 7848.8,
+      "delay_amin": 3738.6,
+      "target": 3785
+    }
   }
 }

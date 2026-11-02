@@ -111,3 +111,18 @@
 5,保持寄存器,retention register,
 5,隔离单元,isolation cell,
 5,活动率文件,switching-activity file,
+6,生成,generate,全加器两个输入都为 1 时一定产生进位
+6,传播,propagate,全加器把低位的进位传到高位
+6,行波进位加法器,ripple-carry adder,
+6,超前进位,carry lookahead,
+6,进位选择加法器,carry-select adder,
+6,前缀运算,prefix operator,
+6,并行前缀加法器,parallel-prefix adder,
+6,Kogge–Stone 树,Kogge–Stone tree,
+6,Brent–Kung 树,Brent–Kung tree,
+6,Sklansky 树,Sklansky tree,
+6,部分积,partial product,
+6,阵列乘法器,array multiplier,
+6,Wallace 树,Wallace tree,
+6,基 4 Booth 编码,radix-4 Booth recoding,
+6,对数移位器,logarithmic shifter,

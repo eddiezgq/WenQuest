@@ -1,0 +1,24 @@
+# 实验 6.1 的指导书与报告模板。目的、场景、参数、任务取自 lab6_1.js（由 labs/micro/textbook/lab6_1.body.js 生成）。
+原理:
+  - ["加法器要在一个时钟周期内算完：可用时间 = 时钟周期 − 触发器的 tcq − tsu（第 3 章）。满足预算的结构里选面积最小的。", "The adder must finish within one clock: available time = period − tcq − tsu of the flip-flops (Chapter 3). Among the structures that fit, choose the smallest."]
+  - 式: "c(i+1) = g(i) + p(i)·c(i)，g = a·b，p = a ⊕ b        (6.1.1)"
+  - ["行波进位的延时与位数成正比；超前进位（组间行波）、进位选择改善常数；并行前缀（Brent–Kung、Kogge–Stone）只按位数的对数增长。实验里的延时和面积是 SKY130 标准单元的综合结果（追求延时）。", "Ripple-carry delay grows linearly with width; group lookahead and carry select improve the constant; parallel-prefix adders grow only logarithmically. The delays and areas are SKY130 standard-cell synthesis results (optimised for speed)."]
+步骤:
+  - ["32 位、400 MHz：先算出时间预算，再逐个查看五种结构，找出满足预算、面积最小的（任务 1），填入表 1。", "32 bits, 400 MHz: compute the budget, look at each of the five structures, and find the smallest that fits (task 1); fill in Table 1."]
+  - ["把频率改为 600 MHz 再选（任务 2）；8 位、800 MHz 再选（任务 3），填入表 2。", "Repeat at 600 MHz (task 2) and for 8 bits at 800 MHz (task 3); fill in Table 2."]
+  - ["保持 32 位，从 100 MHz 往上调频率，记下每种结构不再满足预算的频率。", "Keep 32 bits and raise the clock from 100 MHz; record the frequency at which each structure stops fitting."]
+数据表:
+  - 标题: ["表 1  32 位加法器（SKY130 综合）", "Table 1  32-bit adders (SKY130 synthesis)"]
+    表头: ["结构", "延时 / ps", "面积 / μm²", "400 MHz 时满足？", "最高频率 / MHz"]
+    表头英文: ["Structure", "Delay / ps", "Area / μm²", "Fits at 400 MHz?", "Max clock / MHz"]
+    行: [["行波进位", "", "", "", ""], ["超前进位", "", "", "", ""], ["进位选择", "", "", "", ""], ["Brent–Kung", "", "", "", ""], ["Kogge–Stone", "", "", "", ""]]
+  - 标题: ["表 2  不同条件下的选择", "Table 2  Choices under different conditions"]
+    表头: ["位宽", "频率 / MHz", "时间预算 / ps", "选择的结构", "面积 / μm²"]
+    表头英文: ["Width", "Clock / MHz", "Budget / ps", "Chosen structure", "Area / μm²"]
+    行: [["32", "400", "", "", ""], ["32", "600", "", "", ""], ["8", "800", "", "", ""]]
+注意:
+  - ["延时是综合工具按单元库估算的，没有布局布线，没有计入连线和时钟偏斜；布局后 Kogge–Stone 这类连线多的结构会慢一些。", "Delays are synthesis estimates from the cell library, without placement, routing or clock skew; wire-heavy structures such as Kogge–Stone get slower after layout."]
+  - ["实验用的是“尽量快”地综合的延时和面积；按预算综合时面积会小一些，选择偶尔也会不同（见正文算例 6.1.2）。面积取决于综合目标：追求延时时会插缓冲、加大门；只求面积时行波进位最小。", "The lab uses as-fast-as-possible synthesis; synthesis to the budget gives smaller areas and occasionally a different choice (Example 6.1.2). Area depends on the goal: speed-driven synthesis adds buffers and upsizes gates; for minimum area the ripple-carry adder is smallest."]
+思考题:
+  - ["为什么行波进位在“追求延时”的综合里面积反而不是最小？", "Why is the ripple-carry adder not the smallest under speed-driven synthesis?"]
+  - ["位宽从 16 加倍到 32，哪种结构的延时增加最少？为什么？", "Doubling the width from 16 to 32, which structure slows least? Why?"]
