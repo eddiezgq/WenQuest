@@ -176,6 +176,84 @@
       return [alpha * n * c * vdd * vdd, n * m.leakInv(temp, vdd) * vdd * t, t];
     };
     m.sleepRon = (w, vdd = VDD) => 1 / (kp * w / L * (vdd - VTp));
+    /* ---------- 第 7 章：存储器（与 conventions/mos.py 一一对应） ---------- */
+    m.sramHalf = (vin, cr, pr, mode = 'read', vdd = VDD) => {
+      let lo = 0, hi = vdd;
+      for (let i = 0; i < 60; i++) {
+        const mid = (lo + hi) / 2;
+        let f = m.idn(vin, mid, cr * Wmin) - m.idp(vdd - vin, vdd - mid, pr * Wmin);
+        if (mode === 'read') f -= m.idn(vdd - mid, vdd - mid, Wmin);
+        if (f > 0) hi = mid; else lo = mid;
+      }
+      return (lo + hi) / 2;
+    };
+    m.sramCurve = (cr, pr, mode = 'read', step = 0.002, vdd = VDD) => {
+      const n = Math.round(vdd / step), xs = [], ys = [];
+      for (let i = 0; i <= n; i++) { xs.push(i * step); ys.push(m.sramHalf(i * step, cr, pr, mode, vdd)); }
+      return { xs, ys };
+    };
+    m.snmSeevinck = (xs, ys, vdd = VDD) => {
+      const s2 = Math.SQRT2, cmp = (p, q) => p[0] - q[0] || p[1] - q[1];
+      const a = xs.map((x, i) => [(x - ys[i]) / s2, (x + ys[i]) / s2]).sort(cmp);
+      const b = xs.map((x, i) => [(ys[i] - x) / s2, (ys[i] + x) / s2]).sort(cmp);
+      const at = (c, u) => {
+        if (u <= c[0][0] || u >= c[c.length - 1][0]) return null;
+        let lo = 0, hi = c.length - 1;
+        while (hi - lo > 1) { const mm = (lo + hi) >> 1; if (c[mm][0] <= u) lo = mm; else hi = mm; }
+        const t = c[hi][0] > c[lo][0] ? (u - c[lo][0]) / (c[hi][0] - c[lo][0]) : 0;
+        return c[lo][1] + t * (c[hi][1] - c[lo][1]);
+      };
+      let pos = 0, neg = 0;
+      const n = 2000, umax = vdd / s2;
+      for (let i = 1; i < n; i++) {
+        const u = -umax + 2 * umax * i / n, va = at(a, u), vb = at(b, u);
+        if (va === null || vb === null) continue;
+        pos = Math.max(pos, va - vb); neg = Math.max(neg, vb - va);
+      }
+      return Math.min(pos, neg) / s2;
+    };
+    m.sramSnm = (cr, pr = 1, mode = 'read', vdd = VDD) => { const c = m.sramCurve(cr, pr, mode, 0.002, vdd); return m.snmSeevinck(c.xs, c.ys, vdd); };
+    m.sramWriteQ = (qb, vbl, cr, pr, vdd = VDD) => {
+      let lo = 0, hi = vdd;
+      for (let i = 0; i < 60; i++) {
+        const mid = (lo + hi) / 2;
+        let f = m.idn(qb, mid, cr * Wmin) - m.idp(vdd - qb, vdd - mid, pr * Wmin);
+        if (mid > vbl) f += m.idn(vdd - vbl, mid - vbl, Wmin); else f -= m.idn(vdd - mid, vbl - mid, Wmin);
+        if (f > 0) hi = mid; else lo = mid;
+      }
+      return (lo + hi) / 2;
+    };
+    m.sramWriteTrip = (cr, pr, vdd = VDD, iters = 120) => {
+      const holds = (vbl) => { let q = vdd; for (let i = 0; i < iters; i++) q = m.sramWriteQ(m.sramHalf(q, cr, pr, 'read', vdd), vbl, cr, pr, vdd); return q > vdd / 2; };
+      let lo = 0, hi = vdd;
+      for (let i = 0; i < 40; i++) { const mid = (lo + hi) / 2; if (holds(mid)) hi = mid; else lo = mid; }
+      return (lo + hi) / 2;
+    };
+    const SS = P.sram_sim || { snm_read: [[1, 0]], snm_hold: [[1, 0]], write: [[1, 0]], sa: [[0.1, 1e-11]], i_read: 1e-4, c_cell: 0, t_bl0: 0 };
+    m.sramSimSnm = (cr, mode = 'read') => { const t = SS['snm_' + mode]; return interp(t.map((a) => a[0]), t.map((a) => a[1]), cr); };
+    m.sramSimWrite = (pr) => interp(SS.write.map((a) => a[0]), SS.write.map((a) => a[1]), pr);
+    m.saTime = (dv) => interp(SS.sa.map((a) => a[0]), SS.sa.map((a) => a[1]), dv, true);
+    m.sramAccess = (rows, cols, word, dv = 0.1, q = null) => {
+      q = q || P.problems.p71;
+      const n = Math.max(2, Math.round(Math.log2(rows))), n1 = Math.floor((n + 1) / 2), cw = cols * q.cell_w;
+      const w1 = WL.met1.wmin, w2 = WL.met2.wmin;
+      const cWl = cols * 2 * Wmin * Cg + m.wireC('met1', w1) * cw, cIn = q.cin_units * m.cin(Wmin, rr * Wmin);
+      const B = rows / 2, H = cWl / cIn;
+      let best = null;
+      for (let N = 4; N <= 12; N += 2) {
+        const gs = [m.leG('nand', n1), 1, m.leG('nand', 2)].concat(Array(N - 3).fill(1));
+        const ps = [m.leP('nand', n1), m.leP('inv', 1), m.leP('nand', 2)].concat(Array(N - 3).fill(m.leP('inv', 1)));
+        const d = m.pathDelay(gs, ps, B, H).D;
+        if (best === null || d < best[0]) best = [d, N];
+      }
+      const tDec = best[0] * m.tau(), rw = m.wireR('met1', w1) * cw, tWl = 0.38 * rw * cWl;
+      const cDev = rows * SS.c_cell, cWire = rows * m.wireC('met2', w2) * q.cell_h, cBl = cDev + cWire;
+      const tBl = SS.t_bl0 + cBl * dv / SS.i_read, tSa = m.saTime(dv);
+      const M = Math.max(1, Math.floor(cols / word)), tOut = m.fo4Tp(rr) * (2 + 0.5 * Math.log2(M));
+      const area = rows * cols * q.cell_w * q.cell_h + rows * q.cell_h * q.dec_w + cols * q.cell_w * q.col_h;
+      return { dec: tDec, dec_N: best[1], wl: tWl, bl: tBl, sa: tSa, out: tOut, total: tDec + tWl + tBl + tSa + tOut, area,
+               c_bl: cBl, c_wl: cWl, mux: M, w_um: cw + q.dec_w, h_um: rows * q.cell_h + q.col_h, c_bl_dev: cDev, c_bl_wire: cWire };
+    };
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -218,6 +296,11 @@
                   eop: m.energyPerOp(0.8, 1e4, 0.1, 5e-15, 30, 85), ron: m.sleepRon(100), xtalk: m.xtalk('met2', 0.14, 0.14, 500, 1, 100e-12),
                   setup: m.setupSlack(1 / f33, 1e-9, 50e-12), hold: m.holdSlack(0, 150e-12), mtbf: {} };
       for (const n of [1, 2]) out.ch3.mtbf[n] = m.mtbf(m.syncTr(n, f33, q33.slack_ps * 1e-12), f33, fd);
+      out.ch7 = { snm_read: {}, snm_hold: {}, write: {}, access: {} };
+      for (const cr of [1, 2, 3]) { out.ch7.snm_read[cr] = m.sramSnm(cr, 1, 'read'); out.ch7.snm_hold[cr] = m.sramSnm(cr, 1, 'hold'); }
+      for (const pr of [1, 2, 3]) out.ch7.write[pr] = m.sramWriteTrip(2, pr);
+      for (const R of [64, 256, 1024]) { const a = m.sramAccess(R, 32768 / R, 32); out.ch7.access[R] = { total: a.total, dec: a.dec, bl: a.bl, area: a.area }; }
+      out.ch7.sa = m.saTime(0.07); out.ch7.sim = m.sramSimSnm(1.75);
       return out;
     };
     return m;

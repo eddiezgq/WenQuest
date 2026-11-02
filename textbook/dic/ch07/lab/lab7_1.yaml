@@ -1,0 +1,23 @@
+# 实验 7.1 的指导书与报告模板。目的、场景、参数、任务取自 lab7_1.js（由 labs/micro/textbook/lab7_1.body.js 生成）。
+原理:
+  - ["存储阵列每次读一行：行译码器选中一条字线，这一行的单元接到各自的位线上，位线预充到 VDD，存 0 的单元把位线拉下 ΔV，灵敏放大器把它放大成满幅，列选挑出要的字。存取时间是几段之和：", "An array reads one row at a time: the decoder raises one word line, the cells drive their bit lines (precharged to VDD) down by ΔV, the sense amplifiers restore full swing and the column mux picks the word. The access time is a sum:"]
+  - 式: "t = t译码 + t字线 + t位线 + t灵敏放大 + t列选与输出，t位线 = C_BL·ΔV / I_read        (7.1.1)"
+  - ["行数多，位线长、C_BL 大，位线慢；列数多，字线又长又挂满存取管，字线的 RC 变大，列选的级数也多。读电流、存取管给位线添的电容和灵敏放大器的速度取自 SKY130 仿真，导线电容按第 4 章。", "More rows make the bit lines long and slow; more columns make the word line long and heavily loaded, and the column mux deeper. The read current, the access transistors' bit-line capacitance and the sense-amplifier speed come from SKY130 simulation; wire capacitance from Chapter 4."]
+步骤:
+  - ["ΔV = 100 mV，行数从 64 调到 1024，把各段延时、存取时间和面积填入表 1，找出最快的划分（任务 1）。", "With ΔV = 100 mV, step the rows from 64 to 1024, fill Table 1 and find the fastest organisation (task 1)."]
+  - ["ΔV 加到 200 mV、50 mV，各找出最快的划分，并看 1024 行时位线一段怎样变（任务 2），填入表 2。", "Set ΔV to 200 mV and 50 mV, find the fastest each time and watch the bit-line part at 1024 rows (task 2); fill Table 2."]
+  - ["找出面积最小的划分（任务 3），记下它的长和宽。", "Find the smallest organisation (task 3) and record its width and height."]
+数据表:
+  - 标题: ["表 1  ΔV = 100 mV 时各种划分（时间单位 ps）", "Table 1  Organisations at ΔV = 100 mV (times in ps)"]
+    表头: ["行 × 列", "译码", "字线", "位线", "灵敏放大", "列选与输出", "存取时间", "面积 / mm²"]
+    表头英文: ["Rows × columns", "Decode", "Word line", "Bit line", "Sense amp", "Mux & output", "Access", "Area / mm²"]
+    行: [["64 × 512", "", "", "", "", "", "", ""], ["128 × 256", "", "", "", "", "", "", ""], ["256 × 128", "", "", "", "", "", "", ""], ["512 × 64", "", "", "", "", "", "", ""], ["1024 × 32", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  位线摆幅的影响", "Table 2  Effect of the bit-line swing"]
+    表头: ["ΔV / mV", "最快的划分", "存取时间 / ps", "1024 行时的位线 / ps"]
+    表头英文: ["ΔV / mV", "Fastest", "Access / ps", "Bit line at 1024 rows / ps"]
+    行: [["100", "", "", ""], ["200", "", "", ""], ["50", "", "", ""]]
+注意:
+  - ["列选与输出一段按经验取 FO4 的倍数，译码器按逻辑努力的最优尺寸估算，读电流按常数，这些都是粗估；比较各种划分的趋势比看绝对值更有意义。", "The mux-and-output term is an empirical multiple of FO4, the decoder is sized by logical effort and the read current is taken as constant; compare trends rather than absolute values."]
+思考题:
+  - ["ΔV 加大时，为什么行数多的阵列吃亏最多？", "Why do arrays with many rows suffer most when ΔV grows?"]
+  - ["ΔV 能不能一直减小？限制它的是什么？", "Can ΔV keep shrinking? What limits it?"]

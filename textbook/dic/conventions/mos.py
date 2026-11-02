@@ -392,6 +392,162 @@ def sleep_ron(w_um, vdd=VDD):
     return 1.0 / (kp * w_um / L * (vdd - VTp))
 
 
+# ======================================================================= 第 7 章：存储器
+# 6 管 SRAM 单元的手算模型（平方律，与第 1 章反相器同一套参数）：存取管 Wpg = Wmin，下拉管 Wpd = cr·Wpg，上拉管 Wpu = pr·Wpg。
+# 仿真值（calib/calib_sram.py）存在 params.json 的 sram_sim。
+
+def sram_half(vin, cr, pr, mode="read", vdd=VDD):
+    """半边单元的输出电压：反相器（下拉 cr·Wmin、上拉 pr·Wmin）输入 vin；读出时存取管（栅、位线都接 VDD）从位线往输出端灌电流。
+    二分法解 I下拉 = I上拉 + I存取，固定 60 次，与 JS 一致。"""
+    lo, hi = 0.0, vdd
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        f = idn(vin, mid, cr * Wmin) - idp(vdd - vin, vdd - mid, pr * Wmin)
+        if mode == "read":
+            f -= idn(vdd - mid, vdd - mid, Wmin)
+        if f > 0:
+            hi = mid
+        else:
+            lo = mid
+    return (lo + hi) / 2
+
+
+def sram_curve(cr, pr, mode="read", step=0.002, vdd=VDD):
+    n = int(round(vdd / step))
+    xs = [i * step for i in range(n + 1)]
+    return xs, [sram_half(x, cr, pr, mode, vdd) for x in xs]
+
+
+def snm_seevinck(xs, ys, vdd=VDD):
+    """Seevinck 法求静态噪声容限（V）：曲线 A 为 (x, f(x))、B 为镜像 (f(y), y)，转 45°（u = (x − y)/√2，v = (x + y)/√2），
+    在同一 u 上两曲线 v 之差的正、负最大值各除以 √2，取较小的一瓣。u 取 2000 等分。与 calib_sram.py、JS 同一算法。"""
+    s2 = math.sqrt(2)
+    a = sorted(((x - y) / s2, (x + y) / s2) for x, y in zip(xs, ys))
+    b = sorted(((y - x) / s2, (y + x) / s2) for x, y in zip(xs, ys))
+
+    def at(c, u):
+        if u <= c[0][0] or u >= c[-1][0]:
+            return None
+        lo, hi = 0, len(c) - 1
+        while hi - lo > 1:
+            m = (lo + hi) // 2
+            if c[m][0] <= u:
+                lo = m
+            else:
+                hi = m
+        t = (u - c[lo][0]) / (c[hi][0] - c[lo][0]) if c[hi][0] > c[lo][0] else 0.0
+        return c[lo][1] + t * (c[hi][1] - c[lo][1])
+    pos = neg = 0.0
+    n, umax = 2000, vdd / s2
+    for i in range(1, n):
+        u = -umax + 2 * umax * i / n
+        va, vb = at(a, u), at(b, u)
+        if va is None or vb is None:
+            continue
+        pos, neg = max(pos, va - vb), max(neg, vb - va)
+    return min(pos, neg) / s2
+
+
+def sram_snm(cr, pr=1.0, mode="read", vdd=VDD):
+    xs, ys = sram_curve(cr, pr, mode, 0.002, vdd)
+    return snm_seevinck(xs, ys, vdd)
+
+
+def sram_write_q(qb, vbl, cr, pr, vdd=VDD):
+    """写入时存 1 一侧的节点电压 Q：反相器（输入 QB）加存取管把 Q 往位线电压 vbl 拉（栅接 VDD）。二分法 60 次。"""
+    lo, hi = 0.0, vdd
+    for _ in range(60):
+        mid = (lo + hi) / 2
+        f = idn(qb, mid, cr * Wmin) - idp(vdd - qb, vdd - mid, pr * Wmin)
+        if mid > vbl:
+            f += idn(vdd - vbl, mid - vbl, Wmin)
+        else:
+            f -= idn(vdd - mid, vbl - mid, Wmin)
+        if f > 0:
+            hi = mid
+        else:
+            lo = mid
+    return (lo + hi) / 2
+
+
+def sram_write_trip(cr, pr, vdd=VDD, iters=120):
+    """写入裕量（V）：BL 降到多低时存 1 的单元翻转。另一侧是读出状态的半边单元（BLB = VDD），QB = sram_half(Q)；
+    从 Q = VDD 出发反复迭代 Q ← sram_write_q(sram_half(Q))（iters 次），仍高于 VDD/2 说明还保持原状态。
+    对 BL 二分 40 次，返回翻转时的 BL 电压。与 JS 一致。"""
+    def holds(vbl):
+        q = vdd
+        for _ in range(iters):
+            q = sram_write_q(sram_half(q, cr, pr, "read", vdd), vbl, cr, pr, vdd)
+        return q > vdd / 2
+    lo, hi = 0.0, vdd
+    for _ in range(40):
+        mid = (lo + hi) / 2
+        if holds(mid):
+            hi = mid
+        else:
+            lo = mid
+    return (lo + hi) / 2
+
+
+def sram_sim_snm(cr, mode="read"):
+    """仿真的 SNM（V），按单元比线性插值。"""
+    t = P["sram_sim"]["snm_" + mode]
+    return _interp([a for a, _ in t], [b for _, b in t], cr)
+
+
+def sram_sim_write(pr):
+    t = P["sram_sim"]["write"]
+    return _interp([a for a, _ in t], [b for _, b in t], pr)
+
+
+def sa_time(dv):
+    """锁存型灵敏放大器的分辨时间（s），按输入差（V）对数插值仿真表。"""
+    t = P["sram_sim"]["sa"]
+    return _interp([a for a, _ in t], [b for _, b in t], dv, log=True)
+
+
+def sram_access(rows, cols, word, dv=0.1, q=None):
+    """存储阵列的存取时间估计（s）与面积（μm²）。rows 行 × cols 列，每次读 word 位（列选比 M = cols/word）。
+    各段：
+      译码：n 位行地址分成两组预译码（⌈n/2⌉ 输入与非门，取反得到预译码线），每条字线一个二输入与非门，再接反相器驱动字线；
+            逻辑努力 gs = [g与非(⌈n/2⌉), 1, g与非(2), 1, …]，总级数取偶数（字线高电平有效），在 4～12 级里取延时最小者；
+            总分支努力 B = rows/2，H = 字线总电容 / 地址输入电容（cin_units 个参考反相器）；
+      字线：met1 导线与沿线的存取管栅电容都是分布的，取 0.38·Rw·C字线（驱动器部分已算进译码）；
+      位线：t_bl0 + rows·(c_cell + 位线导线电容)·dv / i_read（c_cell、t_bl0、i_read 为仿真值；导线为 met2，每单元一个单元高，按第 4 章）；
+      灵敏放大：sa_time(dv)；
+      列选与输出：FO4 ×（2 + 0.5·log2 M），经验估计。
+    面积：单元 + 行译码（每行 dec_w μm 宽）+ 列外围（每列 col_h μm 高）。参数在 problems.p71。返回 dict。"""
+    q = q or P["problems"]["p71"]
+    S = P["sram_sim"]
+    rr = r_ratio()
+    n = max(2, int(round(math.log2(rows))))
+    n1 = (n + 1) // 2
+    cw = cols * q["cell_w"]
+    c_wl = cols * 2 * Wmin * Cg + wire_c("met1", WIRES["met1"]["wmin"]) * cw
+    c_in = q["cin_units"] * cin(Wmin, rr * Wmin)
+    B, H = rows / 2, c_wl / c_in
+    best = None
+    for N in range(4, 13, 2):
+        gs = [le_g("nand", n1), 1.0, le_g("nand", 2)] + [1.0] * (N - 3)
+        ps = [le_p("nand", n1), le_p("inv", 1), le_p("nand", 2)] + [le_p("inv", 1)] * (N - 3)
+        d, _ = path_delay(gs, ps, B, H)
+        if best is None or d < best[0]:
+            best = (d, N)
+    t_dec = best[0] * tau()
+    rw = wire_r("met1", WIRES["met1"]["wmin"]) * cw
+    t_wl = 0.38 * rw * c_wl
+    c_bl = rows * (S["c_cell"] + wire_c("met2", WIRES["met2"]["wmin"]) * q["cell_h"])
+    t_bl = S["t_bl0"] + c_bl * dv / S["i_read"]
+    t_sa = sa_time(dv)
+    M = max(1, cols // word)
+    t_out = fo4_tp(rr) * (2 + 0.5 * math.log2(M))
+    area = rows * cols * q["cell_w"] * q["cell_h"] + rows * q["cell_h"] * q["dec_w"] + cols * q["cell_w"] * q["col_h"]
+    return {"dec": t_dec, "dec_N": best[1], "wl": t_wl, "bl": t_bl, "sa": t_sa, "out": t_out,
+            "total": t_dec + t_wl + t_bl + t_sa + t_out, "area": area, "c_bl": c_bl, "c_wl": c_wl, "mux": M,
+            "w_um": cw + q["dec_w"], "h_um": rows * q["cell_h"] + q["col_h"],
+            "c_bl_dev": rows * S["c_cell"], "c_bl_wire": rows * wire_c("met2", WIRES["met2"]["wmin"]) * q["cell_h"]}
+
+
 def reference():
     r = kn / kp
     pr = P["problems"]
@@ -461,4 +617,12 @@ def reference():
                   "sc": sc_ratio(2.0), "leak85": leak_inv(85), "leak_v": leak_inv(27, 1.2), "fo4s": fo4_scale(0.9),
                   "eop": list(energy_per_op(0.8, 1e4, 0.1, 5e-15, 30, 85)), "ron": sleep_ron(100),
                   "mtbf": {str(n): mtbf(sync_tr(n, f33, q33["slack_ps"] * 1e-12), f33, fd) for n in (1, 2)}}
+    # 第 7 章
+    out["ch7"] = {"snm_read": {str(c): sram_snm(c, 1, "read") for c in (1, 2, 3)},
+                  "snm_hold": {str(c): sram_snm(c, 1, "hold") for c in (1, 2, 3)},
+                  "write": {str(p_): sram_write_trip(2, p_) for p_ in (1, 2, 3)}, "access": {},
+                  "sa": sa_time(0.07), "sim": sram_sim_snm(1.75)}
+    for R in (64, 256, 1024):
+        a = sram_access(R, 32768 // R, 32)
+        out["ch7"]["access"][str(R)] = {k: a[k] for k in ("total", "dec", "bl", "area")}
     return out

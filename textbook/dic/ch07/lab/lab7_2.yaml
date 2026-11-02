@@ -1,0 +1,25 @@
+# 实验 7.2 的指导书与报告模板。目的、场景、参数、任务取自 lab7_2.js（由 labs/micro/textbook/lab7_2.body.js 生成）。
+原理:
+  - ["6 管 SRAM 单元的两个反相器的传输特性画在一起（一条横纵轴对调）成为蝴蝶曲线；两个眼睛里最大正方形的边长，较小者是静态噪声容限 SNM。", "Plotting the transfer curves of the two inverters of a 6T cell together (one with axes swapped) gives the butterfly; the side of the largest square in the smaller eye is the static noise margin."]
+  - ["读出时存取管把存 0 的节点抬高，眼睛变小。单元比越大越稳：", "In a read the access transistor lifts the stored 0 and the eyes shrink. A larger cell ratio is more stable:"]
+  - 式: "CR = W下拉 / W存取，PR = W上拉 / W存取；要求读出 SNM ≥ 0.2·VDD，写入裕量 ≥ 0.2·VDD"
+  - ["写入裕量是写入时单元翻转的位线电压，上拉比越小越容易写。曲线用手算模型实时计算，旁边给出 SKY130 仿真值；按仿真值判断是否满足要求。", "The write margin is the bit-line voltage at which the cell flips; a smaller pull-up ratio writes more easily. Curves use the hand model; judge against the SKY130 simulated values shown alongside."]
+步骤:
+  - ["读出状态、PR = 1，CR 从 1 调到 3，把模型与仿真的读出 SNM 填入表 1，找出满足要求的最小 CR（任务 1）。", "In the read state with PR = 1, step CR from 1 to 3, fill Table 1 and find the smallest CR that meets the requirement (task 1)."]
+  - ["CR = 2，切换保持与读出，比较两种状态的 SNM（任务 2）。", "With CR = 2, switch between hold and read and compare the SNM (task 2)."]
+  - ["CR = 2，PR 从 1 调到 3，把写入裕量填入表 2，看 PR = 3 时是否满足要求（任务 3）。", "With CR = 2, step PR from 1 to 3, fill Table 2 and check PR = 3 (task 3)."]
+数据表:
+  - 标题: ["表 1  读出 SNM 随单元比（PR = 1）", "Table 1  Read SNM versus cell ratio (PR = 1)"]
+    表头: ["CR", "模型 / mV", "仿真 / mV", "是否满足"]
+    表头英文: ["CR", "Model / mV", "Sim. / mV", "Meets?"]
+    行: [["1", "", "", ""], ["1.5", "", "", ""], ["2", "", "", ""], ["2.5", "", "", ""], ["3", "", "", ""]]
+  - 标题: ["表 2  写入裕量随上拉比（CR = 2）", "Table 2  Write margin versus pull-up ratio (CR = 2)"]
+    表头: ["PR", "模型 / mV", "仿真 / mV", "是否满足"]
+    表头英文: ["PR", "Model / mV", "Sim. / mV", "Meets?"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["3", "", "", ""]]
+注意:
+  - ["仿真值只在算过的尺寸上准确（读出 SNM 在 CR = 1、1.25、1.5、2、2.5、3，写入裕量在 PR = 1、1.5、2、3），中间按直线插值。手算模型在 1.8 V 时读出 SNM 偏小、写入裕量偏大一成多；写入裕量的模型值按当前 CR 算，仿真值只在 CR = 2 时测过。", "Simulated values are exact only at the computed sizes and linearly interpolated between; the hand model reads about 10–15 % low for read SNM and high for the write margin."]
+  - ["这里的单元两边完全对称；实际单元有随机的阈值电压偏差，要另外留余量（第 10 章）。", "The cell here is perfectly symmetric; real cells have random threshold mismatch and need extra margin (Chapter 10)."]
+思考题:
+  - ["为什么增大单元比几乎不改变保持 SNM，却能明显增大读出 SNM？", "Why does a larger cell ratio barely change the hold SNM but clearly raise the read SNM?"]
+  - ["如果只能把存取管加宽，读和写会各怎样变？", "If you could only widen the access transistor, how would reading and writing change?"]
