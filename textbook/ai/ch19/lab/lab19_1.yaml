@@ -1,0 +1,29 @@
+# 实验 19.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab19_1.js。
+原理:
+  - ["把大气切成格子，一个时间步把信息往前送 uΔt。显式格式算新值时只看自己和左邻居，所以信息一步**不能跨过一个格距**：库朗数 C = uΔt/Δx 超过 1，解就指数放大（19.1 节）。", "Cut the atmosphere into cells: one timestep carries information a distance uΔt. An explicit scheme looks only at a cell and its upstream neighbour, so information may not cross more than one cell per step — once C = uΔt/Δx exceeds 1 the solution amplifies exponentially (Section 19.1)."]
+  - ["稳定不等于准。库朗数 0.9 时解不炸，峰值却一路掉下去——迎风格式自带**数值耗散**，把场一步步抹平。这是本章反复出现的那对矛盾的第一次露面。", "Stable is not the same as accurate. At Courant 0.9 nothing blows up, yet the peak keeps falling: the upwind scheme carries numerical dissipation that flattens the field step by step. This is the first appearance of a tension that returns throughout the chapter."]
+  - ["半拉格朗日格式沿轨迹回溯到上游点再插值，回溯多远都行，**不受 CFL 约束**。欧洲中期天气预报中心的技术文档正是据此说它“unconditional stability allows long timesteps”，业务运行中库朗数确实大于 1。它的代价同样是插值带来的抹平。", "A semi-Lagrangian scheme traces back along the trajectory and interpolates, however far back that is, so the CFL limit does not apply. ECMWF's own documentation says its unconditional stability allows long timesteps, and operational Courant numbers do exceed 1. Its price is again smoothing, from the interpolation."]
+  - ["第二道墙与格式无关：大气是混沌的，两个几乎一样的初值按**指数**分开。于是“还能信多久”只与初值精度的**对数**成正比——精度提高十倍，多买回一个翻倍时间。", "The second wall has nothing to do with the scheme: the atmosphere is chaotic and two nearly identical initial states separate exponentially. Useful lead time therefore grows with the logarithm of initial accuracy: ten times better data buys one more doubling time."]
+  - 式: "C = uΔt/Δx ≤ 1（显式格式）；误差 ≈ 初值误差 × 2^(t/翻倍时间)；还能信多久 ≈ 翻倍时间 × log₂(容许误差 / 初值误差)"
+步骤:
+  - ["“格子跟不跟得上”场景：显式格式、库朗数 0.9，把步数拖到 60，记下峰值与形状（任务 1），填表 1 第一行。", "In the first scene use the explicit scheme at Courant 0.9, drag the steps to 60 and record the peak and the shape (task 1); fill the first row of Table 1."]
+  - ["把库朗数依次调到 1.2、1.5、2.0，每一档记下“第几步峰值过 10”与第 40 步的峰值（任务 2），填满表 1 的显式那几行。", "Raise the Courant number to 1.2, 1.5 and 2.0, recording at each the step where the peak passes 10 and the peak at step 40 (task 2)."]
+  - ["格式换成半拉格朗日，把同样的几个库朗数再走一遍（任务 3）：它炸不炸？峰值掉到多少？填表 1 的后半。", "Switch to semi-Lagrangian and repeat the same Courant numbers (task 3): does it blow up, and how far does the peak fall? Complete Table 1."]
+  - ["切到“初值差一点点”，初值误差取 10⁻²，按“开始”看完整程，记下“12 对的平均”（任务 4），填表 2 第一行。", "Switch to the chaos scene with an initial error of 10⁻², press start, let it run to the end and record the twelve-pair average (task 4); fill the first row of Table 2."]
+  - ["把初值误差逐档缩到 10⁻³、10⁻⁴、10⁻⁵，每一档记下平均可信时长与“比上一档多了多少”（任务 5），填满表 2，并算出每缩小一个数量级多买回几个时间单位。", "Shrink the error to 10⁻³, 10⁻⁴ and 10⁻⁵, recording the average lead time and the gain over the previous row (task 5). Complete Table 2 and work out how much one order of magnitude buys."]
+数据表:
+  - 标题: ["表 1  两种格式在不同库朗数下的表现", "Table 1  The two schemes at different Courant numbers"]
+    表头: ["格式", "库朗数", "第几步峰值过 10", "第 40 步的峰值", "炸没炸"]
+    表头英文: ["scheme", "Courant number", "step where the peak passes 10", "peak at step 40", "blown up?"]
+    行: [["显式迎风", "0.9", "", "", ""], ["显式迎风", "1.2", "", "", ""], ["显式迎风", "1.5", "", "", ""], ["显式迎风", "2.0", "", "", ""], ["半拉格朗日", "1.2", "", "", ""], ["半拉格朗日", "2.0", "", "", ""]]
+  - 标题: ["表 2  初值精度买回多少时间", "Table 2  What initial accuracy buys"]
+    表头: ["初值误差", "这一对还能信多久", "12 对的平均", "比上一档多出多少"]
+    表头英文: ["initial error", "lead time of this pair", "average over 12 pairs", "gain over the previous row"]
+    行: [["10⁻²", "", "", "—"], ["10⁻³", "", "", ""], ["10⁻⁴", "", "", ""], ["10⁻⁵", "", "", ""]]
+注意:
+  - ["本实验的平流是一维的、风速恒定的玩具，洛伦兹系统也只有三个变量。它们说明的是**机理与数量级**：CFL 是谁的约束、误差怎么长。不要把这里的具体步数、具体时长换算成“真实大气能预报几天”。", "The advection here is one-dimensional with a constant wind, and the Lorenz system has only three variables. They are meant to show the mechanism and the order of magnitude, not to convert into a number of days for the real atmosphere."]
+  - ["“还能信多久”取的是**12 对轨迹的平均**。只看一对会抖得很厉害——同样的初值误差，换一个出发点，这个数能差一倍。表 2 要填平均那一栏才看得出规律。", "The lead time is averaged over twelve trajectory pairs. A single pair fluctuates badly: the same initial error from another starting point can give twice the value. Use the averaged column in Table 2."]
+  - ["显式格式在库朗数 0.9 时**不炸但也不准**：峰值一路掉。做任务 1 时别只看“炸没炸”这一栏，峰值那一栏同样要记。", "At Courant 0.9 the explicit scheme neither blows up nor stays accurate: the peak keeps falling. In task 1 record the peak, not just whether it blew up."]
+思考题:
+  - ["把观测加密一倍，初值误差大致能小一半。按本实验量到的增长速度，这能让“还能信多久”多出多少？如果有人说“再加一倍观测就能把预报做到两周”，你用哪个数反驳他？", "Doubling the observing network roughly halves the initial error. Using the growth rate you measured, how much lead time does that add? If someone claims twice the observations would push forecasts to two weeks, which number refutes them?"]
+  - ["半拉格朗日格式不受 CFL 约束，可它靠插值。插值会抹平场——这与第 19.2 节“越推越平”是同一件事吗？说出它们的相同点与不同点。", "The semi-Lagrangian scheme escapes CFL by interpolating, and interpolation smooths the field. Is that the same thing as the smoothing in Section 19.2? Give one way they are alike and one way they are not."]

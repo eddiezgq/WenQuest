@@ -1,0 +1,30 @@
+# 实验 19.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab19_3.js。
+原理:
+  - ["集合预报跑的是同一套方程、略有差别的初值，几十个成员铺开一片可能。**离散度/技巧比**把“散得合不合适”量成一个数：集合的离散度除以集合均值的均方根误差，校准良好时它接近 1（19.3 节）。", "An ensemble runs the same equations from slightly different initial states, spreading dozens of members across the possibilities. The spread/skill ratio measures whether that spread is right: ensemble spread divided by the RMSE of the ensemble mean, close to 1 when well calibrated (Section 19.3)."]
+  - ["CRPS 是另一把尺子，它**两头都罚**：成员铺得太窄（太自信）与太宽（太含糊）都让它变大，最小值落在校准最好的那一档。成员只剩一个时，CRPS 恰好退化成平均绝对误差——这就是它与确定性评分的接口。", "CRPS is the other ruler and it penalises both ends: too narrow (over-confident) and too wide (too vague) both raise it, with the minimum at the best-calibrated setting. With a single member CRPS collapses exactly to the mean absolute error, which is how it connects to deterministic scores."]
+  - ["CRPS 有两种标准估计量，只差第二项的分母：**无偏用 2M(M−1)，有偏用 2M²**。两种都在公开文献里用，所以印公式必须说明用的是哪一个。本实验用的是无偏那一个。", "CRPS has two standard estimators differing only in the denominator of the second term: 2M(M−1) for the unbiased one, 2M² for the biased one. Both appear in the published literature, so any formula must say which it uses. This lab uses the unbiased estimator."]
+  - ["可靠性图查的不是准不准，而是**老实不老实**：把所有“说了 70%”的预报挑出来，数实际发生了几成，完全可靠的点落在 45° 对角线上。但一个永远报气候概率的预报也完全可靠却毫无用处，所以可靠性必须和 Brier 分数一起看。", "The reliability diagram checks honesty rather than accuracy: gather every forecast that said 70% and count how often the event happened; perfectly reliable points lie on the 45° line. A forecast that always states the climatological probability is also perfectly reliable and useless, so reliability must be read with the Brier score."]
+  - 式: "离散度/技巧比 = 离散度 / 集合均值的 RMSE（该接近 1）；CRPS = E|x − y| − E|x − x′|/2（无偏估计量分母 2M(M−1)）；Brier = 平均 (预报概率 − 是否发生)²"
+步骤:
+  - ["“离散度调到多少才对”场景：倍数 1.0、偏差 0、成员 50，记下离散度、集合均值 RMSE、比值与 CRPS（任务 1），填表 1 第三行。", "In the first scene use spread factor 1.0, zero bias and 50 members, recording the spread, the RMSE of the ensemble mean, the ratio and the CRPS (task 1); fill the third row of Table 1."]
+  - ["把倍数依次调到 0.5、0.8、1.3、1.6、2.0，每一档记下比值与 CRPS（任务 2、3），填满表 1。标出 CRPS 最小的那一档。", "Set the factor to 0.5, 0.8, 1.3, 1.6 and 2.0, recording the ratio and CRPS at each (tasks 2 and 3). Complete Table 1 and mark the lowest CRPS."]
+  - ["倍数调回 1.0，把成员数从 50 拖到 20、10、5、1，记下 CRPS（任务 5）。成员只剩一个那一档，另算一个平均绝对误差对一对。", "Back at 1.0, drag the member count to 20, 10, 5 and 1, recording CRPS (task 5). At one member, work out the mean absolute error separately and check that they agree."]
+  - ["切到“概率说得老实不老实”，倍数 0.5 与 1.0 各看一次可靠性图（任务 4）：点在对角线哪一边、离开最远多少、Brier 分数各是多少，填表 2。", "Switch to the reliability scene and view it at spread factors 0.5 and 1.0 (task 4): which side of the line, the largest departure and the Brier score at each; fill Table 2."]
+  - ["最后切到“压成一个数会丢掉什么”（任务 6）：记下确定性预报与集合均值的 RMSE，以及三种做法的 Brier 分数。用一句话说明哪一把尺子看得出集合的价值。", "Finally switch to the third scene (task 6): record the RMSE of the deterministic forecast and of the ensemble mean, plus the Brier scores of all three approaches. Say in one sentence which ruler sees the ensemble's value."]
+数据表:
+  - 标题: ["表 1  离散度调到多少才对（成员 50、偏差 0）", "Table 1  How much spread is right (50 members, no bias)"]
+    表头: ["离散度倍数", "集合的离散度", "集合均值 RMSE", "离散度/技巧比", "CRPS"]
+    表头英文: ["spread factor", "ensemble spread", "RMSE of the ensemble mean", "spread/skill ratio", "CRPS"]
+    行: [["0.5", "", "", "", ""], ["0.8", "", "", "", ""], ["1.0", "", "", "", ""], ["1.3", "", "", "", ""], ["1.6", "", "", "", ""], ["2.0", "", "", "", ""]]
+  - 标题: ["表 2  可靠性与压成一个数的代价", "Table 2  Reliability, and the price of squashing"]
+    表头: ["这一档是什么", "离开 45° 线最远多少", "Brier 分数", "RMSE"]
+    表头英文: ["setting", "largest departure from the 45° line", "Brier score", "RMSE"]
+    行: [["倍数 0.5（太自信）", "", "", ""], ["倍数 1.0（校准良好）", "", "", ""], ["只答是或否", "—", "", ""], ["每次都报气候概率", "—", "", ""]]
+注意:
+  - ["本实验的“天气”是造出来的：真值 = 可预报的那部分 + 不可预报的那部分，成员 = 可预报的那部分 + 各自的扰动。它能说明两把尺子各量什么、为什么要两把，但**里面的具体数值与任何真实模式无关**。", "The weather here is synthetic: truth is a predictable part plus an unpredictable part, and members are the predictable part plus their own perturbations. It shows what the two rulers measure and why both are needed; the numbers correspond to no real model."]
+  - ["把成员数拖到 1 时，“离散度/技巧比”那一栏会显示破折号——一个成员算不出离散度。这不是出错。", "With one member the spread/skill row shows a dash: a single member has no spread. That is not an error."]
+  - ["换一批天气会改变所有数字的末几位。表 1、表 2 要在**同一批**（同一个“换一批天气”档位）里填完，否则比不出规律。", "Changing the batch of cases shifts the last digits of everything. Fill Tables 1 and 2 within a single batch, or the comparisons will not line up."]
+  - ["“只答是或否”在本实验里甚至比“每次都报气候概率”还差。这不是巧合：把概率四舍五入成 0 或 1，错的时候要付全额罚分。", "The yes/no answer here scores worse than climatology. That is no accident: rounding a probability to 0 or 1 pays the full penalty whenever it is wrong."]
+思考题:
+  - ["一个永远报气候概率的预报，可靠性图完全落在对角线上，却一点用也没有。请说出一个指标，它能同时惩罚“不可靠”和“没信息量”，并说明本实验里哪个数起了这个作用。", "A forecast that always states the climatological probability lands exactly on the 45° line and is useless. Name a measure that penalises both unreliability and lack of information, and say which number in this lab plays that role."]
+  - ["本实验里加一个系统偏差，离散度/技巧比和 CRPS 各有什么反应？把偏差调到 0.5 实测一遍，并解释为什么“比值接近 1”不能单独当成校准良好的证据。", "Add a systematic bias and see how the spread/skill ratio and CRPS each respond. Measure it at a bias of 0.5 and explain why a ratio near 1 is not on its own evidence of good calibration."]
