@@ -2,6 +2,7 @@
 """工艺路线的检查与计算（第 13 轮十二；《机械制造技术》第 56 章）：SH-101 的参照路线没有“路线”意见，
 各种排错的路线被找出来；加工方案链与临界批量。"""
 import copy
+from pathlib import Path
 import os
 
 import yaml
@@ -128,3 +129,23 @@ def test_sh101_models():
     assert all(a > b for a, b in zip(v, v[1:-1]))
     assert v[-1] < v[3]
     assert len(X.involute_gear()) == 24 * (2 * 9 + 2)
+
+
+def test_sh101_full_process_plan():
+    """第 57 章的 SH-101 全套工艺规程（std/SH-101_process.yaml）：AI 预检没有意见，能生成全套卡片；跟踪图、尺寸链改坏了能查出。"""
+    import copy
+    import yaml
+    from hub import cards as CD
+    from hub import process as PR
+    p = yaml.safe_load((Path(__file__).resolve().parents[1] / "std" / "SH-101_process.yaml").read_text(encoding="utf-8"))
+    f = PR.review(p)
+    assert [x for x in f if x["level"] in ("error", "warning")] == []
+    assert PR.suggested_score(f) == 100
+    assert CD.check(p) == []
+    q = copy.deepcopy(p)
+    c = next(c for c in q["tolerance_chart"]["cuts"] if c["seq"] == 30.24)
+    c["es"], c["ei"] = 0.2, -0.2
+    assert any(x["level"] == "error" and "8 ± 0.1" in x["text"] for x in PR.review(q))
+    q = copy.deepcopy(p)
+    q["chains"][0]["links"][0]["ei"] = -0.2
+    assert any(x["level"] == "error" and x["rule"] == "尺寸链" for x in PR.review(q))
