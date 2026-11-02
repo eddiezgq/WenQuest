@@ -1,0 +1,30 @@
+# 实验 21.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab21_7.js。
+原理:
+  - ["目标函数 F(θ) = ‖Aθ − b‖² 的微分为 dF = 2(Aθ − b)ᵀA dθ，所以梯度 ∇F = 2Aᵀ(Aθ − b)，黑塞矩阵为 2AᵀA。令梯度为零即正规方程。",
+     "The differential of F(θ) = ‖Aθ − b‖² is dF = 2(Aθ − b)ᵀA dθ, so ∇F = 2Aᵀ(Aθ − b) and the Hessian is 2AᵀA. Setting the gradient to zero gives the normal equations."]
+  - 式: "∇F = 2Aᵀ(Aθ − b)          (21.7.5)；  eₖ₊₁ = (I − 2ηAᵀA)eₖ          (21.7.6)；  0 < η < 1/λ_max(AᵀA)          (21.7.7)"
+  - ["梯度下降的误差每步乘以 I − 2ηAᵀA，谱半径小于 1 才收敛。最优固定步长 η = 1/(λ_min + λ_max) 时收敛因子为 (κ − 1)/(κ + 1)，κ 为 AᵀA 的条件数。把自变量去均值、除以标准差，可使 κ 接近 1。",
+     "Each gradient-descent step multiplies the error by I − 2ηAᵀA, which converges only if its spectral radius is below 1. The optimal fixed step η = 1/(λ_min + λ_max) gives the factor (κ − 1)/(κ + 1), κ the condition number of AᵀA. Centering and scaling the variable can bring κ close to 1."]
+步骤:
+  - ["标定场景，f = 0：移动检验点，记录解析梯度、有限差分和相对差（任务 1）。",
+     "Calibration scene, f = 0: move the probe and record the analytic gradient, the finite difference and their relative difference (task 1)."]
+  - ["f = 0，迭代 30 步：步长取 0.5、0.9、0.99、1.01、1.05（以 1/λ_max 为单位），记录收敛因子与 F(θ) − F*（表 1，任务 2）。",
+     "f = 0, 30 iterations: step 0.5, 0.9, 0.99, 1.01, 1.05 (units of 1/λ_max); record the factor and F(θ) − F* (Table 1, task 2)."]
+  - ["按“最优步长”，f 取 0、0.5、0.9、1，记录条件数、收敛因子、迭代 60 步（f = 1 时 1 步）后的 F(θ) − F*（表 2，任务 3、4）。",
+     "Press “Optimal step”; for f = 0, 0.5, 0.9, 1 record κ, the factor and F(θ) − F* after 60 iterations (1 when f = 1) (Table 2, tasks 3, 4)."]
+  - ["出租车场景：完成任务 5，写出拟合的单价和起步价。",
+     "Taxi scene: complete task 5 and state the fitted price per km and flag fall."]
+数据表:
+  - 标题: ["表 1  步长与收敛（f = 0，迭代 30 步）", "Table 1  Step size and convergence (f = 0, 30 iterations)"]
+    表头: ["η·λ_max", "收敛因子 ρ(I − 2ηAᵀA)", "F(θ) − F*", "收敛 / 发散"]
+    表头英文: ["η·λ_max", "Factor ρ(I − 2ηAᵀA)", "F(θ) − F*", "Converges / diverges"]
+    行: [["0.5", "", "", ""], ["0.9", "", "", ""], ["0.99", "", "", ""], ["1.01", "", "", ""], ["1.05", "", "", ""]]
+  - 标题: ["表 2  去均值的比例与条件数（最优步长）", "Table 2  Centering and condition number (optimal step)"]
+    表头: ["f", "κ(AᵀA)", "收敛因子", "迭代步数", "F(θ) − F*"]
+    表头英文: ["f", "κ(AᵀA)", "Factor", "Iterations", "F(θ) − F*"]
+    行: [["0", "", "", "60", ""], ["0.5", "", "", "60", ""], ["0.9", "", "", "60", ""], ["1", "", "", "1", ""]]
+注意:
+  - ["图中两轴同比例，等值线的长短轴之比为 √κ。κ 大时路径在狭长的山谷两壁之间来回折返，前进很慢。",
+     "Both axes use the same scale; the level sets have axis ratio √κ. When κ is large the path zigzags across a narrow valley and advances slowly."]
+  - ["有限差分的步长取 10⁻⁶ 左右；步长太小，舍入误差反而变大。",
+     "Use a finite-difference step of about 10⁻⁶; a smaller step makes rounding errors larger."]
