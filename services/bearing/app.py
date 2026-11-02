@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from bearingkit import assembly as AS
+from bearingkit import quality as QL
 from bearingkit.analyze import analyse
 
 HERE = Path(__file__).parent
@@ -98,6 +99,18 @@ ERR_ZH += [  # selective assembly (step 5)
     (r"^the class width is more than 0$", "分组间隔要大于 0"),
     (r"^the selective assembly found no answer in time", "这一批算不出来：请分成小批"),
     (r"^between 2 and (\d+) rings$", r"合成数据的套圈数在 2 到 \1 之间"),
+]
+
+ERR_ZH += [  # inspection and SPC (step 5)
+    (r"^a profile needs at least 16 points", "圆度轮廓一圈至少要 16 个点"),
+    (r"^the profile must go round the whole turn$", "轮廓要覆盖整圈"),
+    (r"^a band runs from order 2", "频段从 2 阶起、上限不小于下限"),
+    (r"^give at least 2 subgroups$", "至少要 2 个子组"),
+    (r"^every subgroup has the same number of values$", "每个子组的数据个数要相同"),
+    (r"^the individuals chart takes one value per row$", "单值图每行一个数"),
+    (r"^a mean chart needs subgroups of 2 or more$", "均值图的子组至少 2 个数"),
+    (r"^the range chart is for subgroups up to 25", "极差图用于 25 个数以内的子组，请改用均值–标准差图"),
+    (r"^the chart is xbar_r, xbar_s or i_mr$", "控制图是均值–极差、均值–标准差或单值–移动极差"),
 ]
 
 SCN_ZH = {  # scenario field names in the Chinese messages
@@ -214,6 +227,30 @@ async def assembly_synth(request: Request):
         return AS.synthetic(n, float(p["di"]), float(p["do"]), float(p["Dw"]), int(p["Z"]), int(p.get("seed") or 1))
 
     return run(make)
+
+
+@app.post("/api/quality/profile")
+async def profile_ep(request: Request):
+    """Roundness and waviness of one measured raceway turn (round 64, step 5)."""
+    p = await project_of(request)
+    return run(lambda: QL.profile(p))
+
+
+@app.post("/api/quality/spc")
+async def spc_ep(request: Request):
+    """Control charts and capability."""
+    p = await project_of(request)
+    return run(lambda: QL.spc(p))
+
+
+@app.get("/api/quality/synthetic/{what}")
+def quality_synth(what: str):
+    """Synthetic measurements for trying the tools; marked synthetic."""
+    if what == "profile":
+        return QL.synthetic_profile()
+    if what == "spc":
+        return QL.synthetic_spc(k=25, n=5, mean=52.52, sd=0.0015, shift_at=18, shift=1.5)
+    raise HTTPException(404, {"en": "no such synthetic data", "zh": "没有这种合成数据"})
 
 
 if WEB.is_dir():
