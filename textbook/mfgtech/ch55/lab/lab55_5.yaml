@@ -1,0 +1,27 @@
+# 实验 55.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab55_5.js。
+原理:
+  - ["磨削的比磨削能比车削约大一个数量级，热量集中在很短的接触弧上，每一点受热约 1 ms，表面温度却可达几百摄氏度。按移动带状热源（Jaeger）计算最高温度；受热时间极短，开始回火软化的温度要按 Hollomon–Jaffe 回火参数换算。温度超过回火软化温度为回火烧伤，超过 Ac1 为二次淬火烧伤（干磨为退火烧伤）。", "Grinding's specific energy is tens of times that of turning and the heat enters through a very short arc: each point is heated for about 1 ms, yet to several hundred degrees. The peak follows Jaeger's moving band source; with so short a heating time the softening onset follows the Hollomon–Jaffe parameter. Above the onset the work suffers tempering burn, above Ac1 re-hardening burn (annealing burn if dry)."]
+  - 式: "lc = √(ap·de)，q = εu·vw·ap/lc，θmax − θ₀ ≈ 1.13 (q/k)√(α·lc/vw)        (55.5.1)–(55.5.3)"
+  - 式: "P = T(C + lg t)，C ≈ 20        (55.5.4)"
+步骤:
+  - ["场景 SH-301，默认参数（粗磨 10 µm），读出接触弧长、比磨削能、最高温度和判别；再把切深改为 5 µm（精磨），记入表 1（任务 1）。", "Scene SH-301, defaults (roughing, 10 µm): read lc, u, the peak and the verdict; then 5 µm (finishing); Table 1 (task 1)."]
+  - ["场景 SH-101，从 1 µm 起逐步加大切深，找出不烧伤的最大切深（任务 2）；把磨平面积调到 4%、切深 2 µm（任务 3），记入表 1。", "Scene SH-101: raise the infeed from 1 µm and find the largest without burn (task 2); then a 4% wear flat at 2 µm (task 3); Table 1."]
+  - ["SH-101、刚修整的砂轮：把工件速度降到 10 m/min，用 5.5 µm 磨（任务 4）；对照下图的烧伤边界说明原因。", "SH-101, freshly dressed: drop vw to 10 m/min and grind at 5.5 µm (task 4); explain with the burn boundary."]
+  - ["调 vs、vw、ap，找不烧伤而比磨除率最大的一组（任务 5），记入表 2。", "Vary vs, vw, ap for the largest removal rate without burn (task 5); Table 2."]
+数据表:
+  - 标题: ["表 1  磨削温度与烧伤", "Table 1  Grinding temperature and burn"]
+    表头: ["情况", "ap / µm", "A / %", "lc / mm", "u / J·mm⁻³", "θmax / ℃", "软化温度 / ℃", "判别"]
+    表头英文: ["Case", "ap / µm", "A / %", "lc / mm", "u / J·mm⁻³", "θmax / °C", "Onset / °C", "Verdict"]
+    行: [["SH-301 粗磨", "10", "0.5", "", "", "", "", ""], ["SH-301 精磨", "5", "0.5", "", "", "", "", ""], ["SH-101 最大切深", "", "0.5", "", "", "", "", ""], ["SH-101 钝砂轮", "2", "4", "", "", "", "", ""]]
+    行英文: [["SH-301 rough", "10", "0.5", "", "", "", "", ""], ["SH-301 finish", "5", "0.5", "", "", "", "", ""], ["SH-101 limit", "", "0.5", "", "", "", "", ""], ["SH-101 dull", "2", "4", "", "", "", "", ""]]
+  - 标题: ["表 2  不烧伤又快", "Table 2  Fast without burn"]
+    表头: ["vs / m·s⁻¹", "vw / m·min⁻¹", "ap / µm", "θmax / ℃", "Q′ / mm³·s⁻¹·mm⁻¹"]
+    表头英文: ["vs / m·s⁻¹", "vw / m·min⁻¹", "ap / µm", "θmax / °C", "Q′ / mm³·s⁻¹·mm⁻¹"]
+    行: [["35", "20", "", "", ""], ["", "", "", "", ""]]
+    行英文: [["35", "20", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["比磨削能、热量分配比 ε、回火软化温度都是示意的经验值（量级与 Malkin《Grinding Technology》相符），实际的烧伤边界要用试磨和酸洗、巴克豪森检查确定。", "Specific energy, the heat partition ε and the softening onset are illustrative values (of the order given by Malkin); real burn limits are set by trial grinding with etching or Barkhausen checks."]
+  - ["本实验的冷却只改变温度超过 Ac1 后的烧伤种类；实际上干磨的热量分配比更大，温度更高。", "Here the coolant only changes the kind of burn above Ac1; in reality dry grinding also sends more heat into the work."]
+思考题:
+  - ["烧伤从尺寸和粗糙度上看不出来，为什么？生产中怎样保证不烧伤？", "Why can burn not be seen in size or roughness? How does production make sure there is none?"]
+  - ["在本实验里，提高砂轮速度为什么使磨削温度升高？它对粗糙度又有什么好处（55.2.3 节）？选砂轮速度时怎样兼顾？", "In this lab, why does a higher wheel speed raise the temperature? What does it do for roughness (Section 55.2.3)? How would you balance the two?"]

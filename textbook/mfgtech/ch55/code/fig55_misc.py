@@ -47,16 +47,17 @@ xc = (xs % f) - f / 2
 zz = r - np.sqrt(r * r - xc ** 2)
 ys = np.linspace(0, 1.0, 30)
 Xg, Yg = np.meshgrid(xs, ys)
-ax.plot_surface(Xg, Yg, np.tile(zz, (30, 1)) * 10, cmap="copper", linewidth=0, alpha=0.95)
+ax.plot_surface(Xg, Yg, np.tile(zz, (30, 1)) * 10, cmap="copper", linewidth=0, alpha=0.95, rasterized=True)
 for k in range(5):
     c = k * f
     t = np.linspace(-math.pi / 2 - 0.2, -math.pi / 2 + 0.2, 40)
     ax.plot(c + r * np.cos(t), np.full_like(t, 1.0), (r + r * np.sin(t)) * 10, color=M.RED if k == 4 else M.MUTED, lw=1.2 if k == 4 else 0.6)
 ax.text(4 * f, 1.05, 0.9, T("刀尖圆弧（每转前进 f）", "tool nose (advances f per rev)"), fontsize=7.5, color=M.RED)
 ax.set_xlabel(T("进给方向 / mm", "feed / mm"), fontsize=7.5); ax.set_ylabel(T("切削速度方向", "cutting dir."), fontsize=7.5)
-ax.set_zlabel(T("残留高度（×10）", "height (×10)"), fontsize=7.5); ax.view_init(26, -70); ax.tick_params(labelsize=6.5)
+ax.set_zlabel(T("残留高度 / mm（×10 画出）", "height / mm (×10)"), fontsize=7.5); ax.view_init(26, -70); ax.tick_params(labelsize=6.5)
 ax.set_box_aspect((1.2, 1.0, 0.4))
 ax.set_title(T("相邻两转刀尖圆弧之间留下的“残留面积”（f、h 放大画出）", "the scallops between successive passes of the nose (exaggerated)"), fontsize=8)
+fig.set_dpi(200)
 figure(fig, "fig55_2_1")
 
 # ---- 图 55.2.3：残留面积的几何
@@ -105,9 +106,10 @@ for i, (wave, title) in enumerate(((0.0, T("(a) 工艺系统刚度好：只有�
     ax = fig.add_subplot(1, 2, i + 1, projection="3d")
     hm = S.surface_map(0.15, 0.4, vc_m_min=150, wave_um=wave, wave_mm=0.4, width=1.2, length=0.9, n=120)
     Xg, Yg = np.meshgrid(np.linspace(0, 1.2, 120), np.linspace(0, 0.9, 120))
-    ax.plot_surface(Xg, Yg, hm, cmap="copper", linewidth=0, rstride=1, cstride=1)
+    ax.plot_surface(Xg, Yg, hm, cmap="copper", linewidth=0, rstride=1, cstride=1, rasterized=True)
     ax.set_zlim(-9, 9); ax.view_init(36, -58); ax.set_axis_off(); ax.set_box_aspect((1.2, 0.9, 0.35))
     ax.set_title(title, fontsize=8)
+fig.set_dpi(200)
 figure(fig, "fig55_2_6")
 
 # ---- 图 55.4.1：残余应力的三种成因（示意）
@@ -127,7 +129,7 @@ for a, ttl, sign, c in zip(axs, titles, (-1, 1, -1), (M.ACCENT, M.RED, M.ACCENT)
     prof = sign * 1.2 * np.exp(-zz / 0.5) - sign * 0.25 * np.exp(-((zz - 1.2) / 0.6) ** 2)
     a.plot(4.6 + prof * 0.6, -zz, color=c, lw=1.3)
     a.axvline(4.6, color=M.MUTED, lw=0.5)
-    a.text(4.6, 0.25, "σ", ha="center", fontsize=8)
+    a.text(4.6, 0.25, T("σ（拉 +）", "σ (tension +)"), ha="center", fontsize=8)
     a.set_xlim(-0.1, 5.6); a.set_ylim(-3.1, 0.6); a.axis("off"); a.set_title(ttl, fontsize=7.5)
 figure(fig, "fig55_4_1")
 
@@ -139,7 +141,8 @@ ax.fill(np.r_[R * np.cos(t), 0], np.r_[R + 0.05 + R * np.sin(t) + 0.0, 4.2], col
 ax.text(0, 1.6, T("砂轮 vs", "wheel vs"), ha="center", fontsize=8)
 ax.fill_between([-5, 5], [-2.5, -2.5], [0.05, 0.05], color="#f0d9bf")
 ax.fill_between([-1.1, 1.1], [-0.5, -0.5], [0.05, 0.05], color=M.RED, alpha=0.35)
-ax.text(-4.9, -2.2, T("工件 vw →", "work vw →"), fontsize=8)
+ax.text(-4.9, -2.2, T("← 工件 vw（与图 55.5.2 同向）", "← work vw (as in Fig. 55.5.2)"), fontsize=8)
+ax.annotate("", (1.6, 1.05), (-1.6, 1.05), arrowprops={"arrowstyle": "->", "lw": 0.9, "color": M.INK, "connectionstyle": "arc3,rad=0.25"})   # 砂轮逆时针转：接触处砂轮表面向右，与工件相对运动
 shares = [(T(f"进入工件 ε ≈ {S.EPS_WET:.0%}", f"into the work ε ≈ {S.EPS_WET:.0%}"), (0.0, -0.4), (2.2, -1.6), M.RED),
           (T("砂轮", "wheel"), (0.3, 0.4), (2.4, 1.6), M.ACCENT),
           (T("切屑（磨屑）", "chips"), (-0.8, 0.15), (-5.1, 1.6), M.WARM),

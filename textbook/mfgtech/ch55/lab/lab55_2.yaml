@@ -1,0 +1,27 @@
+# 实验 55.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab55_2.js。
+原理:
+  - ["车削时刀尖圆弧每转沿进给方向前进 f，相邻两转之间留下残留面积。残留高度只由 f 和刀尖圆弧半径 r 决定；把它当作轮廓算出的 Ra 叫理论 Ra。实际表面还有刃口的微观不平、积屑瘤和鳞刺、振动留下的振纹，所以实际 Ra 总比理论值大。", "Each revolution the nose advances f and leaves a scallop between passes. Its height depends only on f and the nose radius r; the Ra of the scallops alone is the theoretical Ra. Real surfaces add edge roughness, built-up edge and chatter, so the real Ra is always larger."]
+  - 式: "h = r − √(r² − f²/4) ≈ f²/(8r)        (55.2.1)"
+  - 式: "Ra ≈ 0.0321 f²/r        (55.2.3)"
+步骤:
+  - ["场景“SH-301 工序 40 精车”，默认参数，读出残留高度、理论 Ra、合成轮廓的 Ra 和 Rz，记入表 1（任务 1）。", "Scene operation 40, defaults: read h, the theoretical Ra and the profile's Ra and Rz into Table 1 (task 1)."]
+  - ["保持 r = 0.4，逐步减小进给量，找出理论 Ra 不超过 0.8 µm 的最大进给量（任务 2），与式 (55.2.3) 反求的结果比较。", "Keep r = 0.4 and reduce the feed until the theoretical Ra is within 0.8 µm (task 2); compare with Eq. (55.2.3) solved for f."]
+  - ["回到默认参数，把切削速度降到 25 m/min（任务 3），再恢复到 150 m/min、加 3 µm 振纹（任务 4），记入表 1。", "Back to the defaults, drop the speed to 25 m/min (task 3), then restore 150 m/min and add 3 µm of chatter (task 4); Table 1."]
+  - ["f = 0.15 不变，换刀尖圆弧，使理论 Ra 低于 1.6 µm（任务 5），记入表 2。", "Keep f = 0.15 and change the nose radius until the theoretical Ra is below 1.6 µm (task 5); Table 2."]
+数据表:
+  - 标题: ["表 1  切削条件与粗糙度", "Table 1  Cutting conditions and roughness"]
+    表头: ["情况", "f / mm·r⁻¹", "r / mm", "vc / m·min⁻¹", "振纹 / µm", "理论 Ra / µm", "Ra / µm", "Rz / µm"]
+    表头英文: ["Case", "f / mm", "r / mm", "vc / m·min⁻¹", "Chatter / µm", "Theoretical Ra / µm", "Ra / µm", "Rz / µm"]
+    行: [["工序 40", "0.15", "0.4", "150", "0", "", "", ""], ["Ra 0.8", "", "0.4", "150", "0", "", "", ""], ["积屑瘤区", "0.15", "0.4", "25", "0", "", "", ""], ["有振纹", "0.15", "0.4", "150", "3", "", "", ""]]
+    行英文: [["Operation 40", "0.15", "0.4", "150", "0", "", "", ""], ["Ra 0.8", "", "0.4", "150", "0", "", "", ""], ["Built-up edge", "0.15", "0.4", "25", "0", "", "", ""], ["Chatter", "0.15", "0.4", "150", "3", "", "", ""]]
+  - 标题: ["表 2  选刀尖圆弧", "Table 2  Choosing the nose radius"]
+    表头: ["r / mm", "f / mm·r⁻¹", "理论 Ra / µm", "Ra / µm", "能否达到 Ra 1.6"]
+    表头英文: ["r / mm", "f / mm", "Theoretical Ra / µm", "Ra / µm", "Ra 1.6 reached?"]
+    行: [["0.4", "0.15", "", "", ""], ["0.8", "0.15", "", "", ""], ["1.2", "0.15", "", "", ""]]
+    行英文: [["0.4", "0.15", "", "", ""], ["0.8", "0.15", "", "", ""], ["1.2", "0.15", "", "", ""]]
+注意:
+  - ["合成轮廓是按 hub/surface.py 的模型算出的示意轮廓（微观不平、积屑瘤的幅值是经验值），随机数不同，Ra、Rz 与教材算例相差百分之几。实际粗糙度要用粗糙度仪测量。", "The synthetic profile follows the model in hub/surface.py (edge roughness and built-up edge are empirical); with different random numbers Ra and Rz differ from the book's example by a few percent. Measure real surfaces with a profilometer."]
+  - ["三维表面的高度放大了很多倍；刀尖圆弧越大，背向力越大，细长件、薄壁件容易振动，选刀片时要一并考虑。", "Heights in the 3D view are greatly exaggerated. A larger nose radius raises the radial force, so slender and thin-walled parts chatter more easily."]
+思考题:
+  - ["为什么加大刀尖圆弧比减小进给量更有利于效率？它的代价是什么？", "Why is a larger nose radius better for productivity than a smaller feed? What does it cost?"]
+  - ["积屑瘤区的速度对刀具寿命和表面质量都不利，那为什么有的工厂在低速车削时还会遇到它？怎样避开？", "Built-up-edge speeds hurt both tool life and surface; why do some shops still meet it at low speed, and how can it be avoided?"]

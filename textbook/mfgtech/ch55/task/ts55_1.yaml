@@ -1,0 +1,35 @@
+# 工程任务单 TS-55-1（配 55.1–55.7 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-55-1
+标题: [轴承位的表面完整性要求与磨削参数, "Surface-integrity requirements and grinding parameters for the bearing seats"]
+角色: [工艺工程师（精加工工艺）, process engineer (finishing)]
+背景:
+  - "SH-301 的两个轴承位 Ø35 k6 要求 Ra 0.8，在工序 60 外圆磨削；同一条线上的 SH-101 齿轮轴（20CrMnTi 渗碳淬火）的轴承位也在同类磨床上磨。本章提要里那一批 SH-101 把精磨切深加大后在台架上早期开裂，原因是磨削烧伤——尺寸和粗糙度都合格。你作为工艺工程师，要为这两种轴承位定出表面完整性要求和磨削参数：核算粗糙度能否达到、参数在烧伤边界以内并留有余量，选定检验方法，把它们写进 SH-301 的工艺规程，并通过 AI 预检。"
+  - "SH-301's two Ø35 k6 bearing seats need Ra 0.8 and are ground in operation 60; the case-hardened SH-101 gear shaft (20CrMnTi) on the same line is ground on a similar machine. In the chapter opener a batch of SH-101 cracked early on the rig after its finishing infeed was raised — grinding burn, with size and Ra in tolerance. As the process engineer, set surface-integrity requirements and grinding parameters for both: check that Ra can be met, that the parameters lie inside the burn boundary with margin, choose the inspection methods, write them into SH-301's process plan and pass the AI pre-check."
+输入:
+  - {名称: [SH-301 工艺规程（工序 60 的磨削参数）, "SH-301 process plan (operation 60 grinding parameters)"], 来源: [factory/digital/std/SH-301_process.yaml；数字工厂 → 工艺规程与 AI 评审, "factory/digital/std/SH-301_process.yaml; digital factory → process plan and AI review"]}
+  - {名称: [表面质量的计算库, "Surface-quality library"], 来源: [factory/digital/hub/surface.py；程序 55.2.1、55.5.1、55.6.1, "factory/digital/hub/surface.py; Programs 55.2.1, 55.5.1, 55.6.1"]}
+  - {名称: [实验 55.2、55.5、55.6, "Labs 55.2, 55.5, 55.6"], 来源: [本章, this chapter]}
+  - {名称: [材料数据：45 钢调质、20CrMnTi 渗碳淬火, "Materials: 45 Q&T, 20CrMnTi case-hardened"], 来源: [factory/digital/cae/materials.py；hub/surface.py 的 STEELS, "factory/digital/cae/materials.py; STEELS in hub/surface.py"]}
+交付物:
+  - {名称: [表面完整性要求表, "Surface-integrity requirements"], 验收: [两种轴承位各一栏：Ra（必要时 Rz、Rmr）、纹理方向、硬度与硬化层、残余应力（或强化方法）、不允许的缺陷（烧伤、裂纹、划伤），每一项写明依据（配合、疲劳、材料），与图纸标注方法一致（55.1 节）, "One column per bearing seat: Ra (Rz, Rmr where needed), lay, hardness and case, residual stress (or a strengthening process), forbidden defects (burn, cracks, scratches), each with its reason (fit, fatigue, material), in the drawing notation of 55.1"]}
+  - {名称: [粗糙度与烧伤核算书（2–4 页）, "Roughness and burn calculation (2–4 pages)"], 验收: [用 hub/surface.py 或本章公式算出：两种轴承位粗磨、精磨（光磨后）的 Ra；各行程的最高温度、回火软化温度、Ac1 与余量；刚修整和修整周期末（磨平面积取 2%–4%）两种砂轮状态下的最大允许切深；烧伤边界图上标出选定的参数点；结论写明余量是否不小于 50 ℃, "With hub/surface.py or the chapter's formulas: Ra after roughing and finishing (with spark-out) for both seats; peak temperature, softening onset, Ac1 and margin for every pass; the largest infeed for a fresh wheel and for one at the end of its dressing cycle (2–4% wear flat); the chosen points on the burn-boundary chart; state whether the margin is at least 50 °C"]}
+  - {名称: [工艺规程修改与 AI 预检记录, Plan changes and pre-check record], 验收: [在数字工厂修改 SH-301 工序 60 的磨削参数（粗磨、精磨的工件速度、切深、光磨次数，修整前砂轮的磨平面积）和检验项目（粗糙度、烧伤检验的方法与频次），提交 AI 预检，没有“必须改”的意见，也没有“离烧伤只差 50 ℃ 以内”的提醒；说明每一处改动的理由, "In the digital factory change operation 60's grinding parameters (work speed, infeed, spark-out for roughing and finishing; wear flat before dressing) and inspection items (roughness, burn-check method and frequency); run the AI pre-check with no must-fix comments and no 'within 50 °C of burn' reminders; give the reason for each change"], 类型: 工艺规程, 零件: SH-301}
+  - {名称: [SH-101 的整改建议（1 页）, "Corrective proposal for SH-101 (1 page)"], 验收: [针对本章提要的开裂事件：精磨切深、工件速度、修整间隔怎样定，烧伤检验（酸洗或巴克豪森）放在哪一道、抽检还是全检，已磨出的那一批怎样处置；用实验 55.6 或式 (55.6.2) 估计整改前后的疲劳极限, "For the chapter-opener failure: finishing infeed, work speed and dressing interval; where the burn check (etching or Barkhausen) goes, sampling or 100%; what to do with the batch already ground; estimate the fatigue limit before and after with Lab 55.6 or Eq. (55.6.2)"]}
+工位: [PY, MES, QMS]
+步骤:
+  - ["读图纸和工序 60 的现有参数，按 55.1、55.6 节定出两种轴承位的表面完整性要求。", "Read the drawing and operation 60's current parameters; set the surface-integrity requirements of both seats from 55.1 and 55.6."]
+  - ["用实验 55.5 或程序 55.5.1 算各行程的温度和烧伤边界，考虑砂轮在修整周期里变钝，选定切深和工件速度。", "With Lab 55.5 or Program 55.5.1 compute the temperatures and burn boundary for each pass, allowing for the wheel dulling within its dressing cycle; choose infeed and work speed."]
+  - ["用程序 55.2.1 核算精磨、光磨后的 Ra，定光磨次数。", "Check Ra after finishing and spark-out with Program 55.2.1; set the number of spark-out passes."]
+  - ["在数字工厂修改工艺规程，提交 AI 预检；有意见就回到上一步。", "Change the plan in the digital factory and run the AI pre-check; if there are comments, go back a step."]
+  - ["写 SH-101 的整改建议，估计疲劳极限的变化。", "Write the SH-101 proposal and estimate the change in fatigue limit."]
+评审要点:
+  - ["〔AI 检查〕修改后的工艺规程没有“必须改”的意见，也没有“离烧伤只差 50 ℃ 以内”的提醒。", "[AI] The changed plan has no must-fix comments and no 'within 50 °C of burn' reminders."]
+  - ["〔老师检查〕核算书的数字与 hub/surface.py 一致；考虑了修整周期末的钝砂轮，而不只是刚修整的砂轮。", "[Teacher] The figures match hub/surface.py; the dull wheel at the end of the dressing cycle is considered, not only a fresh one."]
+  - ["〔老师检查〕检验方法能发现烧伤（不是只量尺寸和粗糙度），频次与风险相适应。", "[Teacher] The inspection can find burn (not just size and Ra) at a frequency that fits the risk."]
+  - ["〔老师检查〕SH-101 的建议同时有参数、检验和已磨零件的处置。", "[Teacher] The SH-101 proposal covers parameters, inspection and the parts already ground."]
+评分:
+  - {项: [表面完整性要求, Requirements], 分: 20, 标准: [项目齐全、依据清楚、标注规范, "Complete items, clear reasons, correct notation"]}
+  - {项: [粗糙度与烧伤核算, Roughness and burn calculation], 分: 35, 标准: [计算正确，考虑砂轮钝化，参数有余量, "Correct; wheel dulling considered; parameters with margin"]}
+  - {项: [工艺规程修改与预检, Plan change and pre-check], 分: 25, 标准: [预检通过，改动有理由，检验项目到位, "Pre-check passes; changes justified; inspection in place"]}
+  - {项: [SH-101 整改建议, SH-101 proposal], 分: 20, 标准: [措施对症，疲劳极限估计合理, "Actions fit; sound fatigue estimate"]}
+学时: 4

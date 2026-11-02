@@ -1131,8 +1131,10 @@ def characteristics(u=Depends(user_of)):
                      "operation": op} for c in chars]
         return out
     from sim import errors as ERR
-    return [{"item": "SH-301", "key": code, "name": name, "unit": "mm", "operation": "零件检验 Part inspection"}
-            for code, name, *_ in ERR.CHARS]
+    # 单位按特性名称里写的（如“Ra（µm）”）；公差上下限相同（0–0）的是计数型特性（第 13 轮 11.4：磨削烧伤“有/无”）
+    return [{"item": "SH-301", "key": code, "name": name, "unit": "" if hi - lo <= 0 else ("µm" if "（µm）" in name else "mm"),
+             "attribute": hi - lo <= 0, "operation": "零件检验 Part inspection"}
+            for code, name, nom, lo, hi in ERR.CHARS]
 
 
 @app.get("/api/quality/measurements")

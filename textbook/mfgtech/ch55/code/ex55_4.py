@@ -39,10 +39,11 @@ el = [-min(k * (t - 20), sy_t(t)) for t in up]
 down = np.linspace(thmax, 20, 60)
 s_peak = el[-1]
 dn = [s_peak + k * (thmax - t) for t in down]
-dn = [min(v, sy) for v in dn]
+dn = [min(v, sy_t(t)) for v, t in zip(dn, down)]     # 冷却中碰到该温度下的屈服强度，就沿 σs(T) 上升（拉伸屈服）
 ax.plot(up, el, color=M.RED, lw=1.5, label=T("加热：受里层约束，压应力；超过屈服强度后压缩屈服", "heating: constrained, compressive; yields"))
-ax.plot(down, dn, color=M.ACCENT, lw=1.5, label=T("冷却：按弹性收缩，变成拉应力", "cooling: elastic shrinkage turns it tensile"))
-ax.plot(up, [-sy_t(t) for t in up], color=M.MUTED, ls=":", lw=0.9, label=T("屈服强度随温度下降（示意）", "yield strength falling with temperature (illustr.)"))
+ax.plot(down, dn, color=M.ACCENT, lw=1.5, label=T("冷却：按弹性收缩变成拉应力，碰到该温度的屈服强度后沿它上升", "cooling: elastic, turns tensile, then follows the hot yield strength"))
+ax.plot(up, [-sy_t(t) for t in up], color=M.MUTED, ls=":", lw=0.9, label=T("± 屈服强度，随温度下降（示意）", "± yield strength, falling with temperature (illustr.)"))
+ax.plot(up, [sy_t(t) for t in up], color=M.MUTED, ls=":", lw=0.9)
 ax.axhline(0, color=M.INK, lw=0.6)
 ax.plot([20], [dn[-1]], "o", color=M.ACCENT, ms=5)
 ax.text(30, dn[-1] - 120, T(f"残余拉应力 ≈ {dn[-1]:.0f} MPa", f"residual tension ≈ {dn[-1]:.0f} MPa"), fontsize=7.5, color=M.ACCENT)

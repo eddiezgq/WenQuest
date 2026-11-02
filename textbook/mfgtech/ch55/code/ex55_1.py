@@ -46,13 +46,14 @@ hm = S.surface_map(f, r, vc_m_min=vc, wave_um=0.0, width=1.0, length=0.9, n=140)
 fig = plt.figure(figsize=(6.4, 3.6))
 ax = fig.add_subplot(projection="3d")
 X_, Y_ = np.meshgrid(np.linspace(0, 1.0, hm.shape[1]), np.linspace(0, 0.9, hm.shape[0]))
-ax.plot_surface(X_, Y_, hm, cmap="copper", linewidth=0, antialiased=True, rstride=1, cstride=1)
+ax.plot_surface(X_, Y_, hm, cmap="copper", linewidth=0, antialiased=True, rstride=1, cstride=1, rasterized=True)
 ax.set_xlabel(T("切削速度方向 / mm", "cutting direction / mm"), fontsize=8, labelpad=4)
 ax.set_ylabel(T("进给方向 / mm", "feed direction / mm"), fontsize=8, labelpad=4)
 ax.set_zlabel("µm", fontsize=8); ax.set_zlim(-8, 8); ax.view_init(32, -58); ax.set_box_aspect((1.0, 0.9, 0.35))
 ax.tick_params(labelsize=7)
 ax.set_title(T(f"精车表面（f = {f}，r = {r}）：沿进给方向一道道残留，纹理方向与切削速度方向一致（高度放大约 50 倍）",
                f"finish-turned surface (f = {f}, r = {r}): ridges across the feed, lay along the cut"), fontsize=8)
+fig.set_dpi(200)
 figure(fig, "fig55_1_1")
 
 # ---- 图 55.1.4：原始轮廓 → 波纹度 + 粗糙度
@@ -138,9 +139,10 @@ maps = [(T("车削：平行的残留", "turned: parallel ridges"), S.surface_map
         (T("端铣：圆弧形刀纹", "face milled: arc-shaped tool marks"), milled - milled.mean())]
 for i, (title, hm2) in enumerate(maps):
     ax = fig.add_subplot(1, 3, i + 1, projection="3d")
-    ax.plot_surface(Xg, Yg, hm2, cmap="copper", linewidth=0, rstride=1, cstride=1)
+    ax.plot_surface(Xg, Yg, hm2, cmap="copper", linewidth=0, rstride=1, cstride=1, rasterized=True)
     ax.set_zlim(-10, 10); ax.view_init(40, -60); ax.set_axis_off(); ax.set_box_aspect((1, 1, 0.35))
     ax.set_title(title, fontsize=8)
+fig.set_dpi(200)
 figure(fig, "fig55_1_2")
 
 out(f=f, r=r, vc=vc, Ra=rr["Ra"], Rq=rr["Rq"], Rz=rr["Rz"], Rt=rr["Rt"], Rmr=rmr * 100, Rsk=rsk, rq_ra=rr["Rq"] / rr["Ra"], rz_ra=rr["Rz"] / rr["Ra"],

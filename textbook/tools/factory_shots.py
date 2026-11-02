@@ -63,7 +63,14 @@ def v_chart(plan):
     return "tolerance_chart 第 40.3 刀（工序 40 总长）的公差由 ±0.2 改为 ±0.3（TS-53-1 的“故意改坏”）"
 
 
-VARIANTS = {"locate": v_locate, "fixture": v_fixture, "chart": v_chart}
+def v_grind(plan):
+    """第 55 章：工序 60 的粗磨切深 0.01 → 0.04 mm、精磨 0.005 → 0.02 mm，取消精磨后的光磨（图 55.7.7）"""
+    ps = _op(plan, 60)["grinding"]["passes"]
+    ps[0]["ap"], ps[1]["ap"], ps[1]["sparkout"] = 0.04, 0.02, 0
+    return "工序 60 粗磨切深 0.01 → 0.04 mm、精磨 0.005 → 0.02 mm，取消光磨（第 55 章的“故意改坏”）"
+
+
+VARIANTS = {"locate": v_locate, "fixture": v_fixture, "chart": v_chart, "grind": v_grind}
 
 
 # ---------------------------------------------------------------- 数字工厂
@@ -140,7 +147,7 @@ def start_hub(db):
     raise RuntimeError("数字工厂 90 秒内没有响应")
 
 
-def seed(book):
+def seed(book, only=None):
     """灌测试数据：学生提交参照工艺规程和三个变体，下达任务单 TS-50-1～53-1，学生在任务单里选自己的工艺规程。"""
     teacher = call("POST", "/api/login", {"name": "教师", "role": "engineer", "mode": "teach"})["token"]
     student = _sign(STUDENT)
@@ -175,7 +182,10 @@ def seed(book):
     call("POST", f"/api/tasks/{tasks[52]}/submit", {}, token=student)
     rev = call("GET", f"/api/tasks/{tasks[52]}/submissions", token=teacher)["submissions"][0]["id"]
     d = {"teacher": teacher, "student": student, "subs": subs, "notes": notes, "tasks": tasks, "review52": rev}
-    d.update(seed54(teacher, student))
+    if not only or "54" in only:
+        d.update(seed54(teacher, student))
+    if not only or "55" in only:      # 第 55 章另起一批（只截第 55 章时不灌第 54 章的数据，两章的控制图互不干扰）
+        d.update(seed55(teacher, student))
     return d
 
 
@@ -198,7 +208,7 @@ def _db():
     return _DB["db"], _DB["hist"]
 
 
-def _grind(problem, n, t0, step_min, start_no, seed):
+def _grind(problem, n, t0, step_min, start_no, seed, batch="B54", wo="WO-54-01"):
     """磨 n 件并入库；返回各特性的测得值"""
     sys.path.insert(0, str(DIGITAL))
     import wqbus
@@ -207,13 +217,13 @@ def _grind(problem, n, t0, step_min, start_no, seed):
     r = ERR.simulate(n, problem, seed=seed, dress_every=10)
     for i in range(n):
         ts = (t0 + dt.timedelta(minutes=step_min * i)).isoformat().replace("+00:00", "Z")
-        serial = "SH301-B54-{:03d}".format(start_no + i)
+        serial = "SH301-{}-{:03d}".format(batch, start_no + i)
         for code, name, nom, lo, hi in ERR.CHARS:
             v = round(r["values"][code][i], 4)
             m = wqbus.make("quality.measurement", "sim/qc-01", {
                 "part_serial": serial, "item": "SH-301", "characteristic": code, "name": name, "nominal_mm": nom,
                 "lower_tol_mm": lo, "upper_tol_mm": hi, "value_mm": v, "result": "pass" if lo <= v <= hi else "fail",
-                "work_order": "WO-54-01"}, mode="teach", ts=ts)
+                "work_order": wo}, mode="teach", ts=ts)
             hist.handle("wq/gearbox/quality/qc-01/measurement", m)
     return r["values"]
 
@@ -259,6 +269,23 @@ def approve54(d):
     call("POST", f"/api/quality/8d/{sid}", {"action": "verify"}, token=d["student"])
 
 
+# ---------------------------------------------------------------- 第 55 章：表面质量（第 13 轮 11.4（5））
+# 正常磨 30 件（每 10 件修整）：质量页的轴承位 Ra 单值图（图 55.2.9）；截图时老师注入“砂轮修整不锋利”再磨 30 件，
+# 修整周期后几件的酸洗烧伤检验不合格，historian 自动开不合格品单（图 55.5.10）。工艺规程的“故意改坏”见 v_grind（图 55.7.7）。
+def seed55(teacher, student):
+    now = dt.datetime.now(dt.timezone.utc).replace(microsecond=0)
+    _grind(None, 30, now - dt.timedelta(hours=7), 6, 1, 551, batch="B55", wo="WO-55-01")
+    return {"now55": now.isoformat()}
+
+
+def inject55(d):
+    call("POST", "/api/quality/problems", {"problem": "wheel_dull"}, token=d["teacher"])
+    now = dt.datetime.fromisoformat(d["now55"])
+    v = _grind("wheel_dull", 30, now - dt.timedelta(hours=3, minutes=50), 6, 31, 552, batch="B55", wo="WO-55-01")
+    assert sum(v["burn_bearing"]) > 0, "注入“修整不锋利”以后应有烧伤件（换一个种子）"
+    assert max(v["ra_bearing"]) <= 0.8, "烧伤件的 Ra 应合格（第 55.5 节的要点）"
+
+
 # ---------------------------------------------------------------- 截图
 def shots_list(d):
     s, t = d["subs"], d["tasks"]
@@ -276,8 +303,11 @@ def shots_list(d):
          "质量页：左轴承位的单值控制图（砂轮每 10 件修整一次的锯齿），右栏是不合格品单和质量异常单"),
         ("shot54_1", 54, "student", "/work/quality", "select_r",
          "质量页：右轴承位的单值控制图（老师注入“尾座偏移”以后偏大），右栏自动开的不合格品单和学生开的 8D"),
-        ("shot54_2", 54, "teacher", f"/quality/8d/{d['q8d']}", None, "学生填好 D1–D5、提交纠正措施，老师审批前的 8D 页"),
-        ("shot54_3", 54, "student", f"/quality/8d/{d['q8d']}", "approve54", "老师批准“校正尾座”、车间再磨 20 件以后，学生做 D6 验证：措施前后对比"),
+        ("shot54_2", 54, "teacher", f"/quality/8d/{d.get('q8d')}", None, "学生填好 D1–D5、提交纠正措施，老师审批前的 8D 页"),
+        ("shot54_3", 54, "student", f"/quality/8d/{d.get('q8d')}", "approve54", "老师批准“校正尾座”、车间再磨 20 件以后，学生做 D6 验证：措施前后对比"),
+        ("shot55_1", 55, "student", "/work/quality", "select_ra", "质量页：工序 60 后轴承位 Ra 的单值图（每 10 件修整砂轮）"),
+        ("shot55_2", 55, "student", "/work/quality", "inject55", "质量页：老师注入“砂轮修整不锋利”以后，酸洗烧伤检验不合格的件自动开出不合格品单"),
+        ("shot55_3", 55, "student", f"/process/{s['grind']}", None, d["notes"]["grind"]),
     ]
 
 
@@ -298,6 +328,8 @@ def take(book, d, only=None):
             ctx.add_init_script(f"localStorage.setItem('wq-df-session', {json.dumps(json.dumps(users[who], ensure_ascii=False))})")
             if act == "approve54":
                 approve54(d)
+            if act == "inject55":
+                inject55(d)
             pg = ctx.new_page()
             pg.goto(BASE + path, wait_until="networkidle")
             pg.wait_for_timeout(800)
@@ -309,6 +341,12 @@ def take(book, d, only=None):
             elif act == "select_r":       # 选右轴承位
                 pg.locator(".card-head select").first.select_option("SH-301|bearing_seat_d35_r")
                 pg.wait_for_timeout(1200)
+            elif act == "select_ra":
+                pg.locator(".card-head select").first.select_option("SH-301|ra_bearing")
+                pg.wait_for_timeout(1200)
+            elif act == "inject55":
+                pg.locator(".card-head select").first.select_option("SH-301|burn_bearing")
+                pg.wait_for_timeout(1200)
             elif act == "precheck_task":
                 pg.get_by_role("button", name="AI 预检").click()
                 pg.wait_for_timeout(1500)
@@ -319,7 +357,7 @@ def take(book, d, only=None):
             x0 = min(b["x"] for b in boxes) - 8
             clip = {"x": x0, "y": top["y"] - 8, "width": max(b["x"] + b["width"] for b in boxes) + 8 - x0,
                     "height": max(b["y"] + b["height"] for b in boxes) + 8 - top["y"] + 8}
-            if act in ("select_r", "clip"):   # 质量页只截控制图、前几行测量值和右栏的不合格品、8D
+            if act in ("select_r", "clip", "select_ra", "inject55"):   # 质量页只截控制图、前几行测量值和右栏的不合格品、8D
                 clip["height"] = min(clip["height"], 760)
             pg.screenshot(path=str(out / f"{name}.png"), clip=clip, full_page=True)
             done.append({"名称": name, "章": ch, "账号": "教师" if who == "teacher" else "学生甲", "页面": path,
@@ -347,7 +385,7 @@ def main(argv=None):
     _DB["dsn"] = fresh_db(a.dsn)
     hub = start_hub(_DB["dsn"])
     try:
-        d = seed(a.book)
+        d = seed(a.book, a.only)
         for x in take(a.book, d, a.only):
             print("截图", x["名称"], x["页面"])
     finally:

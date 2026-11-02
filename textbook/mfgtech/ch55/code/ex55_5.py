@@ -76,7 +76,7 @@ ax.annotate("", (0.35, 120), (0.95, 120), arrowprops={"arrowstyle": "->", "lw": 
 ax.text(0.65, 135, T("工件相对砂轮的运动方向", "work motion relative to the wheel"), fontsize=7.5, ha="center")
 ax.text(0.65, 60, T("前方：未受热", "ahead: still cold"), fontsize=7, ha="center", color=M.MUTED)
 ax.text(-0.75, 470, T("离开接触区后\n热量向内传开", "after contact the heat\nspreads inwards"), fontsize=7, ha="center", color=M.MUTED)
-ax.set_xlabel(T("沿工件运动方向的位置 / mm（0 为接触区中点，阴影为接触区）", "position along the work motion / mm (0 = middle of contact)"))
+ax.set_xlabel(T("沿砂轮相对工件运动方向的位置 / mm（0 为接触区中点，阴影为接触区）", "position along the wheel's motion relative to the work / mm (0 = middle of contact)"))
 ax.set_ylabel(T("工件表面温度 / ℃", "surface temperature / °C")); ax.set_xlim(-1.2, 1.2); ax.set_ylim(0, 800)
 ax.legend(fontsize=7, loc="center right"); ax.grid(lw=0.3, alpha=0.5)
 figure(fig, "fig55_5_2")

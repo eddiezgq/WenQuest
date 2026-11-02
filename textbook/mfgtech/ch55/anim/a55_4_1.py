@@ -24,7 +24,7 @@ class Lesson(Base):
             if not cooling:
                 return -min(K * (t - 20), sy_t(t))
             s_peak = -min(K * (state["peak"] - 20), sy_t(state["peak"]))
-            return min(s_peak + K * (state["peak"] - t), SY)
+            return min(s_peak + K * (state["peak"] - t), sy_t(t))     # 碰到该温度下的屈服强度后沿 σs(T) 上升
 
         cooling = {"on": False}
 

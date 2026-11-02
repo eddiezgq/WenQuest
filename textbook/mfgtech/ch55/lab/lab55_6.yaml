@@ -1,0 +1,28 @@
+# 实验 55.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab55_6.js。
+原理:
+  - ["疲劳裂纹绝大多数从表面萌生。表面粗糙度的谷底相当于微小的缺口，用粗糙度系数 K_R 修正；表层残余应力叠加在工作应力上，相当于平均应力，拉应力降低、压应力提高疲劳极限。", "Fatigue cracks almost always start at the surface. Roughness valleys act as tiny notches (roughness factor K_R); the surface residual stress acts as a mean stress — tension lowers, compression raises the fatigue limit."]
+  - 式: "K_R = 1 − 0.22·lg Rz·lg(2Rm/400)        (55.6.1)"
+  - 式: "σD = σ₋₁K_R − M·σres，M = 0.35 × 10⁻³Rm − 0.1        (55.6.2)"
+  - 式: "σa > σD 时 N = 10⁷·(σa/σD)^−9（Basquin）"
+步骤:
+  - ["场景 SH-101，加工方法 2（正常磨削）和 3（磨削烧伤），读出疲劳极限和 σa = 480 MPa 下的寿命，记入表 1（任务 1）。", "Scene SH-101, process 2 (ground) and 3 (burnt): read σD and the life at 480 MPa; Table 1 (task 1)."]
+  - ["换成 4（喷丸）、5（滚压），或用自定义的表层应力，找出恢复无限寿命的办法（任务 2）。", "Try 4 (peened), 5 (rolled) or a custom stress to restore infinite life (task 2)."]
+  - ["两个场景都选加工方法 1（精车 Ra 3.2），比较 K_R（任务 3）。", "In both scenes choose process 1 (turned Ra 3.2) and compare K_R (task 3)."]
+  - ["SH-101 自定义：Rz 5.4 µm、σa = 480 MPa，逐步加大表层拉应力，找出寿命刚好不少于 10⁶ 次的最大值（任务 4），记入表 2。", "SH-101 custom, Rz 5.4 µm, σa = 480 MPa: raise the surface tension until the life just stays at 10⁶ cycles (task 4); Table 2."]
+数据表:
+  - 标题: ["表 1  表面状态与疲劳", "Table 1  Surface condition and fatigue"]
+    表头: ["材料", "表面", "Rz / µm", "σres / MPa", "K_R", "σD / MPa", "σa = 480 MPa 的寿命"]
+    表头英文: ["Material", "Surface", "Rz / µm", "σres / MPa", "K_R", "σD / MPa", "Life at 480 MPa"]
+    行: [["20CrMnTi", "正常磨削", "", "", "", "", ""], ["20CrMnTi", "磨削烧伤", "", "", "", "", ""], ["20CrMnTi", "烧伤后喷丸", "", "", "", "", ""], ["20CrMnTi", "精车", "", "", "", "", ""], ["45 钢", "精车", "", "", "", "", ""]]
+    行英文: [["20CrMnTi", "Ground", "", "", "", "", ""], ["20CrMnTi", "Burnt", "", "", "", "", ""], ["20CrMnTi", "Burnt + peened", "", "", "", "", ""], ["20CrMnTi", "Turned", "", "", "", "", ""], ["45 steel", "Turned", "", "", "", "", ""]]
+  - 标题: ["表 2  寿命 10⁶ 次允许的表层拉应力", "Table 2  Surface tension allowed for 10⁶ cycles"]
+    表头: ["σres / MPa", "σD / MPa", "寿命 / 次"]
+    表头英文: ["σres / MPa", "σD / MPa", "Life / cycles"]
+    行: [["0", "", ""], ["", "", ""]]
+    行英文: [["0", "", ""], ["", "", ""]]
+注意:
+  - ["残余应力的分布是典型值（示意），式 (55.6.2) 只按表面值计算，而且只在残余应力不太大时适用；残余应力在交变载荷下会部分松弛，重要零件要做疲劳试验。", "The residual stress profiles are typical (illustrative); Eq. (55.6.2) uses only the surface value and holds for moderate stresses; residual stress partly relaxes under cyclic load, so important parts are fatigue-tested."]
+  - ["480 MPa 的应力幅是示意的台架加载，不是 SH-101 的设计载荷。", "The 480 MPa amplitude is an illustrative rig load, not SH-101's design load."]
+思考题:
+  - ["为什么强度越高的钢对表面粗糙度越敏感？", "Why is a stronger steel more sensitive to roughness?"]
+  - ["喷丸使表面变粗，为什么疲劳极限反而提高？", "Peening roughens the surface; why does the fatigue limit still rise?"]
