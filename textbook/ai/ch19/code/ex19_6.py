@@ -28,6 +28,7 @@ for vv in (4.0, 6.0, 8.0, 10.0, 12.0, 14.0):
     dp = float(power_error(np.array([vv]), ERR)[0]) * 100
     v["rows"].append((vv, round(float(power_curve(np.array([vv]))[0]) * 100, 1), round(dp, 1)))
     v[f"dp_v{int(vv)}"] = round(dp, 1)
+    v[f"p_v{int(vv)}"] = round(float(power_curve(np.array([vv]))[0]) * 100, 1)
 assert v["dp_v8"] > 3 * v["dp_v12"], \
     "额定以上再刮大风也不多发电，所以同样的风速误差在那里几乎不造成功率误差"
 assert v["dp_v10"] > v["dp_v4"], "三次方关系：风速越高，同样的误差放大得越厉害"

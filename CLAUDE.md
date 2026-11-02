@@ -37,7 +37,7 @@
 
 改了平台要读的数据格式（例如教材 `web/index.json` 的字段或类型），必须连 `services/gateway` 的测试一起跑，并且用真实构建产物把页面打开一遍再推——只跑 `textbook/tools` 的测试不够：2026-10-08 加数学篇的 M 章号时就是这样把《人工智能》整本的目录页跑成了 500。
 
-教材构建：`python3 textbook/tools/build.py <书名> [--pdf --labs]`。`--only` 认的是**节号**（`--only 1.4,1.5`），写成 `--only 1` 匹配不到任何一节，会“0 错误”通过却什么都没检查——交付前一定跑不带 `--only` 的全书构建。
+教材构建：`python3 textbook/tools/build.py <书名> [--pdf --labs]`。`--only` 认的是**节号**（`--only 1.4,1.5`），写成 `--only 1` 匹配不到任何一节，会“0 错误”通过却什么都没检查——交付前一定跑不带 `--only` 的全书构建。跑过 `--only` 之后 `web/index.json` 只记这几节“写过”，网关会报整章不在目录里（2026-11-02 第 19 章踩过）——所以**凡用过 `--only`，交付前必须再跑一次不带 `--only` 的全书构建**。
 
 线上：学习平台 https://learn.wenquestrobotics.com ，经典界面 classic. 子域名，官网主域名。
 

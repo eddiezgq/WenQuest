@@ -472,3 +472,16 @@ M4,梯度裁剪,gradient clipping,
 18,虚拟筛选,virtual screening,在计算机里给化合物排序，再挑前面一小撮去做实验
 18,富集因子,enrichment factor (EF),前 x% 里的活性比例除以全库的活性比例
 18,批次效应,batch effect,不同批次实验在数据上留下的整体偏移
+19,库朗数,Courant number,C = uΔt/Δx；显式格式要求不超过 1
+19,数据同化,data assimilation,把观测与上一次预报拼成初始场
+19,再分析资料,reanalysis,用一套固定的同化系统把历史重算一遍
+19,自回归推进,autoregressive rollout,把上一步的输出当下一步的输入
+19,集合预报,ensemble forecast,一组略有差别的预报，用来给概率
+19,离散度,spread,集合成员之间的散开程度
+19,可靠性图,reliability diagram,预报概率对实际发生频率
+19,降尺度,downscaling,从粗网格的场推细网格的场
+19,区块划分,block split,整块要么全训练、要么全测试
+19,锐度,sharpness,相邻格点差的均方根；场越平越小
+19,切入风速,cut-in wind speed,以下不发电
+19,额定风速,rated wind speed,以上恒定输出额定功率
+19,切出风速,cut-out wind speed,以上停机保护

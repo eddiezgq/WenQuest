@@ -73,6 +73,22 @@ v["ecmwf_mos"] = SMOOTHING["ecmwf_mos"]
 v["ecmwf_caveat"] = SMOOTHING["ecmwf_caveat"]
 v["graphcast_quote"] = GRAPHCAST["blur_quote"]
 v["aifs_limit"] = AIFS["limits"][0]
+# ---------- 两个模型的公开口径（数从事实模块来，不手抄）
+v["gc_res"] = GRAPHCAST["res_deg"]
+v["gc_levels"] = GRAPHCAST["levels"]
+v["gc_step"] = GRAPHCAST["step_h"]
+v["gc_params"] = GRAPHCAST["params_m"]
+v["aifs_levels"] = AIFS["levels"]
+v["aifs_step"] = AIFS["step_h"]
+v["aifs_res_announce"] = AIFS["res_km_announcement"]
+v["aifs_res_card"] = AIFS["res_km_modelcard"]
+assert v["aifs_res_announce"] != v["aifs_res_card"], \
+    "官方公告与官方模型卡给的分辨率不一样——本书两个都印，不替任何一方圆场"
+v["aifs_params_known"] = AIFS["params"] is not None
+assert not v["aifs_params_known"], "AIFS 的参数量官方未公布"
+v["aifs_day1_split"] = AIFS["day1_worse_vs_analysis"] and AIFS["day1_not_worse_vs_radiosonde"]
+assert v["aifs_day1_split"], "同一个模型，对分析场评分与对探空观测评分给出相反的结论"
+
 v["graphcast_rmse_known"] = GRAPHCAST["rmse_values"] is not None
 assert not v["graphcast_rmse_known"], "GraphCast 正文不给绝对 RMSE，只给技巧改进百分比"
 

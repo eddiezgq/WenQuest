@@ -52,6 +52,10 @@ prob = (mem > THRESH).mean(0)
 occurred = obs > THRESH
 v["rel_rows"] = [(round(c, 2), None if np.isnan(f) else round(f, 3), n)
                  for c, f, n in reliability(prob, occurred)]
+for c, f, n in reliability(prob, occurred):          # 正文要印的那几档，逐个取出来
+    tag = f"{int(round(c * 100)):02d}"
+    v[f"rel_f{tag}"] = None if np.isnan(f) else round(f, 3)
+    v[f"rel_n{tag}"] = n
 v["brier"] = round(brier(prob, occurred), 4)
 v["brier_clim"] = round(brier(np.full(N, occurred.mean()), occurred), 4)
 v["brier_skill"] = round(1 - v["brier"] / v["brier_clim"], 3)

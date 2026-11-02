@@ -49,8 +49,8 @@ for patch in (2, 4, 8, 16):
     a_bk = float((knn_classify(f2[tr], c2[tr], f2[te]) == c2[te]).mean())
     v["rows"].append((patch, round(a_px, 3), round(a_bk, 3), round((a_px - a_bk) * 100, 1)))
     v[f"px_p{patch}"], v[f"bk_p{patch}"] = round(a_px, 3), round(a_bk, 3)
-v["gap_p2"] = (v["px_p2"] - v["bk_p2"]) * 100
-v["gap_p16"] = (v["px_p16"] - v["bk_p16"]) * 100
+for pp in (2, 4, 8, 16):
+    v[f"gap_p{pp}"] = (v[f"px_p{pp}"] - v[f"bk_p{pp}"]) * 100
 assert v["gap_p16"] > v["gap_p2"], \
     "地物越成片，随机像素划分高估得越厉害——这正是真实地表的情形"
 

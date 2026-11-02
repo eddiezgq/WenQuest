@@ -1,0 +1,55 @@
+标题: ["GPU 实验 19.5 同一份卫星影像，两种划分，两个分数", "GPU Lab 19.5 One satellite scene, two splits, two scores"]
+目的: ["在真实卫星影像上训练一个地物分类模型，把同一份数据按像素随机划分一次、按区块划分一次，看同一个模型在两种口径下差出几十分；再把空间自相关量出来，弄清楚这几十分是从哪里漏过来的。做完能回答：一个遥感模型的分数该怎么读、验收时该要求哪种划分。",
+       "Train a land-cover classifier on real satellite imagery, score it once under a random pixel split and once under a block split, and watch the same model differ by tens of points. Then measure the spatial autocorrelation to see exactly where those points leaked in. You should be able to say how to read a remote-sensing score, and which split to demand at acceptance."]
+显卡: basic
+结果:
+  - {名: n_pixels, 说明: ["一共用了多少个像素", "pixels used"], 单位: "个"}
+  - {名: n_classes, 说明: ["分几类", "classes"], 单位: "类"}
+  - {名: acc_pixel, 说明: ["按像素随机划分的准确率", "accuracy under the random pixel split"], 单位: "—"}
+  - {名: acc_block, 说明: ["按区块划分的准确率", "accuracy under the block split"], 单位: "—"}
+  - {名: gap_pts, 说明: ["两种划分差多少分", "gap between the two splits"], 单位: "分"}
+  - {名: overestimate_pct, 说明: ["按像素划分高估了多少", "how much the pixel split overestimates"], 单位: "%"}
+  - {名: sd_block, 说明: ["按区块划分换几折的分数抖动", "spread of the block-split score across folds"], 单位: "—"}
+  - {名: range_km, 说明: ["空间自相关的距离尺度", "range of the spatial autocorrelation"], 单位: "km"}
+  - {名: block_km, 说明: ["区块划分用了多大的块", "block size used for the block split"], 单位: "km"}
+  - {名: chance, 说明: ["瞎猜的水平", "chance level"], 单位: "—"}
+文件: []
+实际问题:
+  标题: ["一个遥感模型报 95 分，你敢不敢验收", "A remote-sensing model reports 95%: do you sign it off"]
+  内容: ["市里要你验收一个“耕地识别”模型。供应商给的报告写着：在留出测试集上准确率 95.3%。你要签字的是“这个模型下一个县也能用”。问题在于：留出测试集是**怎么留的**？如果是按像素随机留的，那测试集里的每个像素在训练集里都有一个紧挨着的孪生兄弟，95.3 分量的是“会不会认邻居”，不是“会不会认耕地”。验收要求写哪一句，决定了你签的是哪一件事。",
+         "You are asked to sign off a cropland-detection model for a municipality. The vendor's report says 95.3% accuracy on a held-out test set, and your signature means it will work in the next county. The question is how that test set was held out. If pixels were held out at random, every test pixel has a twin next door in the training set, and 95.3% measures whether the model can recognise a neighbour, not cropland. The wording of the acceptance clause decides what you are signing."]
+原理:
+  - ["地表是**成片**的：相邻像素几乎总是同一类，而且同一片还共享“局地条件”（光照、土壤、传感器状态）。按像素随机划分时，测试集里的每个像素在训练集里都有一个紧挨着的、连局地条件都一样的孪生兄弟——一个只会“找最像的像素”的模型就能考高分（19.5 节）。", "The ground comes in patches: neighbouring pixels are almost always the same class, and a patch shares local conditions — illumination, soil, sensor state. Under a random pixel split every test pixel has a twin right next door in the training set with the same local conditions, so a model that merely finds the most similar pixel scores well (Section 19.5)."]
+  - ["把整片扣出来，这条路就断了。按区块划分（整块要么全在训练集、要么全在测试集）量到的分数才回答“换一个地方还准不准”这个问题。这与第 18.5 节的骨架划分是同一件事：**泄漏不在代码里，在划分口径里**。", "Holding out whole patches cuts that path. A block split — each block entirely in training or entirely in test — answers the question of whether the model transfers to another place. This is the same issue as the scaffold split of Section 18.5: the leakage is not in the code, it is in how the data was divided."]
+  - ["公开文献量过这件事的量级：一项研究报告按空间划分比随机划分**低约 28%**；另一项综述统计 99% 的相关论文在模型选择时没有做空间校验，并给出随机划分高估 **5% 到 54%** 的范围。本实验要在自己的数据上得出自己的那一个数。", "The published literature has measured the effect: one study reports spatial splits scoring about 28% lower than random ones, and a review finds that 99% of the papers it surveyed performed no spatial validation during model selection, with random splits overestimating by 5% to 54%. This lab produces your own number on your own data."]
+  - ["块要多大才够？看**空间自相关的距离尺度**：自相关降到接近零的那个距离，就是块的下限。块比这个尺度小，训练集里仍然有“隔壁”；块足够大，测试集才真的是“另一个地方”。本实验先把这个尺度量出来，再据此定块的大小。", "How large must a block be? Look at the range of the spatial autocorrelation: the distance at which it falls to near zero is the lower bound. Smaller blocks still leave neighbours in the training set; large enough blocks make the test set genuinely another place. This lab measures that range first and sizes the blocks from it."]
+  - ["**不要把“随机划分会泄漏”安在某个具体公开数据集头上**。常被点名的那个大型遥感数据集，其论文从未用过 leakage 一词，也没有声称自己的划分有问题——泄漏是**使用者怎么划分**的问题，不是数据集的问题。", "Do not pin the leakage claim on any particular public dataset. The large remote-sensing benchmark most often named for it never uses the word leakage in its paper and makes no such claim about its own splits: leakage is a property of how a user divides the data, not of the dataset."]
+步骤:
+  - ["运行第 1 节：装环境、确认显卡（任务 1）。", "Run section 1: set up and check the GPU (task 1)."]
+  - ["运行第 2 节：取一景公开卫星影像与它的地物标注（都从公开来源现取，仓库里不放任何影像文件），记下像素数与类别数（任务 2）。", "Run section 2 to fetch a public satellite scene and its land-cover labels from public sources (no imagery is kept in the repository), recording the pixel and class counts (task 2)."]
+  - ["运行第 3 节：量空间自相关，读出距离尺度，据此定区块大小（任务 3），填表 1。", "Run section 3 to measure the spatial autocorrelation, read off the range and size the blocks accordingly (task 3); fill Table 1."]
+  - ["运行第 4 节：同一个模型、同一套超参数，按像素随机划分跑 5 折，记下平均准确率与抖动（任务 4），填表 2 第一行。", "Run section 4 with one model and one set of hyper-parameters under a five-fold random pixel split, recording the mean accuracy and its spread (task 4) in the first row of Table 2."]
+  - ["运行第 5 节：换成按区块划分，同样跑 5 折（任务 5），填表 2 第二行，算出差了多少分、高估了百分之多少。", "Run section 5 with a block split over five folds (task 5), fill the second row of Table 2, and work out the gap and the overestimate."]
+  - ["运行第 6 节：把块的大小从小到大扫一遍（任务 6），看分数从“像素划分”一路掉到“区块划分”的那条曲线，填表 3。", "Run section 6 to sweep the block size (task 6) and watch the score fall from the pixel-split value to the block-split value; fill Table 3."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  这景影像的空间自相关", "Table 1  Spatial autocorrelation of this scene"]
+    表头: ["距离（km）", "特征的自相关", "同类的比例", "这个距离够不够当块的边长"]
+    表头英文: ["distance (km)", "feature autocorrelation", "share of same-class pairs", "large enough for a block?"]
+    行: [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+  - 标题: ["表 2  同一个模型，两种划分", "Table 2  One model, two splits"]
+    表头: ["划分口径", "5 折平均准确率", "折间抖动（标准差）", "最差的一折", "与瞎猜的差距"]
+    表头英文: ["split", "mean accuracy over 5 folds", "spread across folds", "worst fold", "margin over chance"]
+    行: [["按像素随机划分", "", "", "", ""], ["按区块划分", "", "", "", ""]]
+  - 标题: ["表 3  块越大，分数掉到哪", "Table 3  Where the score lands as blocks grow"]
+    表头: ["块的边长（km）", "准确率", "比像素划分低多少分", "块里还剩几个训练像素"]
+    表头英文: ["block side (km)", "accuracy", "points below the pixel split", "training pixels left nearby"]
+    行: [["", "", "", ""], ["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["**两种划分必须用同一个模型、同一套超参数、同一批特征。** 只要有一处不同，差出来的分就说不清是口径造成的还是调参造成的。本实验把这三样写死在一处，改要一起改。", "The two splits must use the same model, the same hyper-parameters and the same features. Change any one of them and the gap no longer isolates the split. This lab fixes all three in one place; change them together or not at all."]
+  - ["按区块划分的分数**本来就抖**：换哪几块进测试集，分数就变。所以要跑 5 折看平均与标准差，只跑一折下结论是不作数的。表 2 的抖动那一栏必须填。", "Block-split scores fluctuate by nature: which blocks go into the test set changes the answer. Run five folds and report the mean and the standard deviation; a single fold proves nothing. The spread column of Table 2 is not optional."]
+  - ["像素数不要开太大。本实验的瓶颈不是显卡而是**两两距离**——像素数翻倍，自相关那一节的开销翻四倍。先用十万量级跑通，再往上加。", "Do not take too many pixels. The bottleneck is not the GPU but the pairwise distances: doubling the pixel count quadruples the cost of the autocorrelation section. Get it working at a hundred thousand or so before scaling up."]
+  - ["这一景影像的结论不能直接外推到别的地物、别的季节、别的传感器。本实验量的是**方法上的差距**（两种划分差多少），不是某个数据集的绝对分数。", "The conclusion from one scene does not transfer to other land covers, seasons or sensors. What this lab measures is the methodological gap between two splits, not an absolute score for any dataset."]
+思考题:
+  - ["你量到的差距是多少分？把它写成一句验收条款：供应商该用多大的块、跑几折、报哪两个数？写出来，让一个不懂机器学习的人也能照着检查。", "How large is your gap? Turn it into an acceptance clause: what block size must the vendor use, over how many folds, and which two numbers must they report? Write it so that someone with no machine-learning background can check it."]
+  - ["假如这个模型要用在**另一个省**，按区块划分量到的分数是不是就够了？还缺哪一种划分？（提示：想一想同一个省内的块与跨省的块有什么不同。）", "If the model is to be used in another province, is the block-split score enough? What further split is missing? Hint: consider how blocks within one province differ from blocks across provinces."]

@@ -1,0 +1,50 @@
+标题: ["GPU 实验 19.2 跑一次全球预报，亲手量它越推越平", "GPU Lab 19.2 Run a global forecast and measure how it flattens"]
+目的: ["用公开权重的 AIFS（欧洲中期天气预报中心的机器学习预报模式，权重 CC BY 4.0）从真实初值起报一次十天全球预报，逐个时效量它的锐度与功率谱，亲眼看“越推越平”不是实现上的毛病而是均方误差最优解本身；再与同一时刻的分析场比 RMSE，看“RMSE 更小”和“场更像真的”能不能兼得。",
+       "Run a ten-day global forecast from real initial conditions with the open-weights AIFS model (ECMWF's machine-learning forecast system, weights under CC BY 4.0), measuring sharpness and the power spectrum at every lead time, so you can see that the smoothing is the MSE-optimal answer rather than an implementation flaw. Then score it against the analysis and ask whether lower RMSE and a realistic-looking field can be had at once."]
+显卡: basic
+结果:
+  - {名: lead_days, 说明: ["推了多少天", "lead time reached"], 单位: "天"}
+  - {名: sec_per_step, 说明: ["平均每 6 小时步要多久", "seconds per 6-hour step"], 单位: "秒"}
+  - {名: sharp_day0, 说明: ["初值场的锐度", "sharpness of the initial field"], 单位: "—"}
+  - {名: sharp_day2, 说明: ["第 2 天预报场的锐度", "sharpness at day 2"], 单位: "—"}
+  - {名: sharp_day10, 说明: ["第 10 天预报场的锐度", "sharpness at day 10"], 单位: "—"}
+  - {名: sharp_ratio, 说明: ["第 10 天锐度只剩初值的几成", "day-10 sharpness as a share of day 0"], 单位: "—"}
+  - {名: hi_energy_drop_pct, 说明: ["高波数能量掉了多少", "drop in high-wavenumber energy"], 单位: "%"}
+  - {名: rmse_day2, 说明: ["第 2 天对分析场的 RMSE", "RMSE against the analysis at day 2"], 单位: "K"}
+  - {名: rmse_day5, 说明: ["第 5 天对分析场的 RMSE", "RMSE against the analysis at day 5"], 单位: "K"}
+  - {名: extreme_share_pct, 说明: ["分析场里的极端格点，预报也判为极端的比例", "share of the analysis's extreme grid points the forecast also calls extreme"], 单位: "%"}
+文件: []
+实际问题:
+  标题: ["机器学习预报模式的场，敢直接拿去做什么", "What dare you do with a machine-learning model's field"]
+  内容: ["你在一家电力公司做新能源调度。有人推荐你用一个机器学习预报模式替掉现在买的数值预报：它的 RMSE 分数更好看，跑一次十天预报只要两分半。问题是具体的：这个场能不能直接拿去算风功率？能不能拿去判断“明天会不会有一场大风”？要回答这两个问题，光看 RMSE 的排行榜不够——你得自己把场打开，看它的小尺度还在不在。",
+         "You schedule renewables at a utility. Someone suggests replacing the numerical forecast you buy with a machine-learning model: its RMSE looks better and a ten-day forecast takes two and a half minutes. The questions are concrete: can that field be fed straight into a power curve? Can it tell you whether tomorrow brings a gale? An RMSE leaderboard cannot answer either — you have to open the field and see whether its small scales are still there."]
+原理:
+  - ["均方误差最优的一步预测，是把每个波数的分量乘上它自己的相关系数 ρ_k < 1；自回归推 n 步之后振幅是 ρ_k^n，高波数掉得最快。所以**“越推越平”是最优解本身**，不是实现上的毛病（19.2 节）。", "The MSE-optimal one-step forecast multiplies each wavenumber by its own correlation ρ_k < 1, so after n autoregressive steps the amplitude is ρ_k^n and the high wavenumbers fall fastest. The flattening is the optimum itself, not an implementation flaw (Section 19.2)."]
+  - ["这件事官方自己说在明处。AIFS 的已知局限里就写着“长时效预报场会模糊，这是用加权 MSE 损失训练的模型的共性”；另一个著名模型的论文把同一件事说成损失函数“encourages it to express its uncertainty by predicting spatially smoothed outputs”。", "The model developers say so themselves. The AIFS known-limitations list states that long-range forecast fields become blurred, a common property of models trained with a weighted MSE loss, and another well-known paper says its loss encourages the model to express uncertainty by predicting spatially smoothed outputs."]
+  - ["而且这不是机器学习带来的新毛病。欧洲中期天气预报中心面向预报员的材料早就说过，统计后处理是在“essentially dampening the forecast anomalies and thereby minimizing the RMSE”，并且提醒这在确定性语境下说得通、**在集合语境下说不通**。", "Nor is it new with machine learning: ECMWF's own forecaster material long ago described statistical post-processing as essentially dampening the forecast anomalies and thereby minimizing the RMSE, while warning that this might be justified in a purely deterministic context but not in an ensemble context."]
+  - ["AIFS 的口径要照记：2025 年 2 月 25 日起业务运行，每天 4 次，官方公告说约 28 km、模型卡说 31 km（两个数都在，本书两个都印），13 层，6 小时一步，十天预报单块 A100 约 2 分 30 秒。它对业务数值预报的改进官方只说“of the order of 10%”，**没有给成对的绝对 RMSE 数值**。", "Record the AIFS figures as published: operational since 25 February 2025, four runs a day, about 28 km in the announcement and 31 km on the model card (both appear, and this book prints both), 13 levels, 6-hour steps, and about two and a half minutes for a ten-day forecast on one A100. Its improvement over the operational numerical forecast is given only as of the order of 10%, with no paired absolute RMSE values."]
+  - ["比较的基准也要说清楚：官方自己指出 AIFS 第 1 天**对分析场**比业务模式差，**对探空观测**却不差——两边用的真值不是同一个。所以本实验只比“同一个真值下、不同时效之间”的变化，不下“谁更强”的结论。", "Be explicit about the baseline: ECMWF notes that at day 1 AIFS scores worse against analyses but not against radiosondes — the two sides use different ground truths. This lab therefore compares lead times under one fixed truth and draws no conclusion about which model is stronger."]
+步骤:
+  - ["运行第 1 节：装环境、确认显卡、下载模型权重（任务 1）。权重几个 GB，第一次要等几分钟。", "Run section 1: set up, check the GPU and download the weights (task 1). They run to several gigabytes, so the first download takes a few minutes."]
+  - ["运行第 2 节：取一个真实时刻的初值（公开数据，仓库里不放任何数据文件），记下时刻与格点数（任务 2）。", "Run section 2 to fetch real initial conditions from public data (no data files are kept in the repository) and record the date and the number of grid points (task 2)."]
+  - ["运行第 3 节：推十天，逐步计时，记下每一步的耗时（任务 3），填表 1 的耗时一栏。", "Run section 3 to march ten days forward, timing each step and recording it (task 3) in the timing column of Table 1."]
+  - ["运行第 4 节：逐个时效算锐度与功率谱，把第 0、2、5、10 天的谱画在一张图上（任务 4），填表 1 其余各栏。", "Run section 4 to compute sharpness and the power spectrum at each lead time, plotting days 0, 2, 5 and 10 together (task 4), and complete Table 1."]
+  - ["运行第 5 节：与同一时刻的分析场比 RMSE，并数一数“分析场判为极端的格点，预报也判为极端”的比例（任务 5），填表 2。", "Run section 5 to score the forecast against the analysis and count the share of the analysis's extreme grid points the forecast also calls extreme (task 5); fill Table 2."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  锐度与谱随时效怎么掉", "Table 1  How sharpness and the spectrum fall with lead time"]
+    表头: ["时效（天）", "这一步耗时（秒）", "锐度", "占初值锐度的几成", "高波数能量占比"]
+    表头英文: ["lead time (days)", "seconds for this step", "sharpness", "share of day-0 sharpness", "share of energy at high wavenumbers"]
+    行: [["0（初值）", "—", "", "1.00", ""], ["1", "", "", "", ""], ["2", "", "", "", ""], ["5", "", "", "", ""], ["10", "", "", "", ""]]
+  - 标题: ["表 2  RMSE 与极端事件，一起看", "Table 2  RMSE and extremes, side by side"]
+    表头: ["时效（天）", "对分析场的 RMSE（K）", "锐度", "分析场的极端格点抓住了几成（%）"]
+    表头英文: ["lead time (days)", "RMSE against the analysis (K)", "sharpness", "share of the analysis's extreme points captured (%)"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["5", "", "", ""], ["10", "", "", ""]]
+注意:
+  - ["**本实验不与任何业务模式比分数。** 官方自己说第 1 天对分析场与对探空观测的结论相反，而且没有公开成对的绝对 RMSE 值。能比的是“同一个真值下、不同时效之间”的变化，以及锐度与 RMSE 这两件事的方向。", "This lab scores no comparison against any operational model: the developers themselves report opposite conclusions at day 1 against analyses and against radiosondes, and no paired absolute RMSE values are published. What is comparable here is the change across lead times under one truth, and the direction in which sharpness and RMSE move."]
+  - ["官方明说 **GPU 的非确定性使用户无法精确复现官方 AIFS 预报**。你这一次的数与别人的、与官方的都会有末位差别，这是正常的，不要当成装错了。", "The documentation states plainly that GPU non-determinism prevents users from reproducing official AIFS forecasts exactly. Your numbers will differ in the last digits from anyone else's and from the official run; that is expected, not a broken install."]
+  - ["锐度（相邻格点差的均方根）随分辨率变。表 1 的各行必须在**同一套格点**上算，换了插值或换了分辨率就不能跨行比。", "Sharpness (the RMS of neighbouring differences) depends on resolution. Every row of Table 1 must be computed on the same grid; regridding or changing resolution breaks the comparison."]
+  - ["如果显存不够，把第 2 节的区域裁小（本实验的结论在区域上同样成立），不要降精度跑——降精度会把“场平不平”这件事本身搅乱。", "If memory is short, crop the region in section 2 — the conclusion holds regionally as well — rather than dropping numerical precision, which would itself confound the question of how smooth the field is."]
+思考题:
+  - ["你量到第 10 天的锐度只剩初值的几成？如果把这个场直接送进风功率曲线（19.6 节那条三次方关系），算出来的发电量会偏高还是偏低？用你表 1 的数说明。", "What share of the day-0 sharpness survives to day 10 in your run? If that field went straight into the cubic power curve of Section 19.6, would the computed generation come out too high or too low? Argue from your Table 1."]
+  - ["有人提议：把预报场的功率谱强行拉回真实场的样子（谱订正），这样锐度就对了。按你表 2 的数，这么做之后 RMSE 会怎么变？什么时候这笔交易划算、什么时候不划算？", "Someone proposes forcing the forecast's power spectrum back to the observed one so the sharpness is right. From your Table 2, what would that do to the RMSE? When is that trade worth making, and when is it not?"]
