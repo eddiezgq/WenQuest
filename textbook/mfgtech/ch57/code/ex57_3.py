@@ -78,6 +78,21 @@ ax.set_xlim(-115, 75); ax.set_yticks([]); ax.set_xlabel(T("偏差 / µm", "devia
 ax.spines["left"].set_visible(False)
 figure(fig, "fig57_3_2")
 
+fig, ax = plt.subplots(figsize=(5.4, 2.1))
+labs = [T("8 ± 0.1（轴肩到齿轮左端面）", "8 ± 0.1"), T("30 ± 0.2（齿宽）", "30 ± 0.2")]
+cv = [d8(cur)["result"].es, d30(cur)["result"].es]
+av = [d8(alt)["result"].es, d30(alt)["result"].es]
+lim = [0.1, 0.2]
+w = 0.36
+ax.bar([i - w / 2 for i in range(2)], cv, w, color=M.ACCENT, label=T("从轴肩编程（现行）", "from the shoulder (plan)"))
+ax.bar([i + w / 2 for i in range(2)], av, w, color=M.WARM, label=T("从左端面编程", "from the left end"))
+for i, l in enumerate(lim):
+    ax.plot([i - 0.45, i + 0.45], [l, l], color=M.RED, ls="--", lw=0.9)
+    ax.text(i + 0.46, l, T("图纸", "drawing"), fontsize=6.5, color=M.RED, va="center")
+ax.set_xticks(range(2)); ax.set_xticklabels(labs, fontsize=7); ax.set_ylabel(T("工艺上得到的 ± / mm", "achieved ± / mm"))
+ax.legend(fontsize=6.8, loc="upper left"); ax.grid(lw=0.3, alpha=0.4, axis="y"); ax.set_ylim(0, 0.26)
+figure(fig, "fig57_3_4")
+
 out(d8_cur=d8(cur)["result"].es, d8_alt=d8(alt)["result"].es, d8_alt_ok=d8(alt)["ok"], d30_cur=d30(cur)["result"].es,
     d30_alt=d30(alt)["result"].es, amin=min(a["min"] for a in cur["allowances"]), amax=max(a["max"] for a in cur["allowances"]),
     n_cuts=len(tc["cuts"]), n_draw=len(tc["drawing"]), H=H["nominal"], H_es=H_es, H_ei=H_ei, r30=r30["nominal"], r70=r70["nominal"],

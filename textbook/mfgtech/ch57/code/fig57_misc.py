@@ -221,4 +221,24 @@ rows = [[T("能做", "can"), T("按写成规则的标准逐条核算：经济精
         [T("怎样用", "how to use"), T("没意见 ≠ 没问题；有意见 ≠ 一定照改（写明理由可保留）；规则依据的数据要注明出处、定期核对", "use with care")]]
 M.table_fig(plt, [T("", ""), T("AI 工艺评审员", "AI reviewer")], rows, [0.14, 0.86], "fig57_10_3", fontsize=7, width_in=6.4)
 
-out(t_pass=t_pass, cap=cap, neck=cost["bottleneck"].split(" ")[0])
+# ---- 图 57.2.5：SH-301（调质，铣键槽后磨）与 SH-101（渗碳淬火后磨）磨削的最小余量
+import _calc57 as C57
+z301 = C57.zmin(0.0125, 0.03, 0.03)                      # 第 50 章底稿的企业标准：精车后铣键槽（Rz、Hₐ、ρ）
+z101 = C57.zmin(*C57.WQ_PS_01["半精车后渗碳淬火"][:3])
+fig, ax = plt.subplots(figsize=(5.2, 1.8))
+ax.barh([1, 0], [z301, z101], color=[MU, M.ACCENT], height=0.5)
+ax.set_yticks([1, 0]); ax.set_yticklabels([T("SH-301 调质，精车后铣键槽", "SH-301 Q&T"), T("SH-101 半精车后渗碳淬火", "SH-101 carburized")], fontsize=7)
+for y, z in ((1, z301), (0, z101)):
+    ax.text(z + 0.005, y, f"{z:.3f} mm", va="center", fontsize=7)
+ax.set_xlim(0, 0.42); ax.set_xlabel(T("磨削的最小余量（直径上）/ mm", "min grinding stock / mm")); ax.grid(lw=0.3, alpha=0.4, axis="x")
+figure(fig, "fig57_2_5")
+
+# ---- 图 57.8.7：工序简图的画法
+rows = [[T("画什么", "what"), T("本工序结束时的形状；加工面用粗实线，其余细实线", "state after the op; machined surfaces bold")],
+        [T("标什么", "dimensions"), T("本工序的工序尺寸、公差和粗糙度；不标图纸尺寸里与本工序无关的", "this op's sizes, tolerances, Ra")],
+        [T("定位夹紧", "locating"), T("GB/T 24740 的定位、夹紧符号，旁注限制的自由度数", "GB/T 24740 symbols with DOF")],
+        [T("方位", "orientation"), T("按工件在机床上的装夹位置画", "as held on the machine")],
+        [T("数字工厂", "digital factory"), T("hub/sketch.py 按工艺规程的 sketch 字段自动画，与工序卡同一份数据", "drawn from the plan data")]]
+M.table_fig(plt, [T("要点", "item"), T("做法", "how")], rows, [0.18, 0.82], "fig57_8_7", fontsize=7, width_in=6.4)
+
+out(z301=z301, z101=z101, t_pass=t_pass, cap=cap, neck=cost["bottleneck"].split(" ")[0])

@@ -81,6 +81,18 @@ ax.set_xlabel(T("背吃刀量 ap / mm（vc 120 m/min）", "depth of cut ap / mm 
 ax.grid(lw=0.3, alpha=0.4); ax.legend(fontsize=7, loc="upper left"); ax.set_ylim(0, 12)
 figure(fig, "fig57_5_3")
 
+prof = A.profile_between_centers(A.kienzle_turning(0.55, 0.15)["Fp"], L, 25.4, kh, kt, kk)
+prof2 = A.profile_between_centers(A.kienzle_turning(1.1, 0.3)["Fp"], L, 25.4, kh, kt, kk)
+fig, ax = plt.subplots(figsize=(5.6, 2.3))
+ax.plot(prof["x"], [v * 1000 for v in prof["dd"]], color=M.ACCENT, lw=1.4, label=T("工艺规程：ap 0.55、f 0.15", "plan: ap 0.55, f 0.15"))
+ax.plot(prof2["x"], [v * 1000 for v in prof2["dd"]], color=M.WARM, lw=1.2, label=T("一刀半精车 ap 1.1、f 0.3", "ap 1.1, f 0.3"))
+ax.axhline(TOL30 / 3 * 1000, color=M.RED, ls="--", lw=0.8); ax.text(2, TOL30 / 3 * 1000 + 0.6, T("工序公差的 1/3", "1/3 of tolerance"), fontsize=7, color=M.RED)
+for xx, nm in ((64.5, T("左轴承位", "left seat")), (127.5, T("右轴承位", "right seat"))):
+    ax.axvline(xx, color=M.MUTED, lw=0.5, ls=":"); ax.text(xx, 30, nm, fontsize=6.5, ha="center", color=M.MUTED, rotation=90)
+ax.set_xlabel(T("离左端面的距离 / mm（两顶尖，工件按 Ø25.4 计）", "distance from the left end / mm")); ax.set_ylim(0, 55); ax.set_ylabel(T("直径误差 / µm", "diameter error / µm"))
+ax.legend(fontsize=7, loc="upper right"); ax.grid(lw=0.3, alpha=0.4)
+figure(fig, "fig57_5_4")
+
 ap_max = max(a for a in np.linspace(0.5, 10, 951) if PR.cutting_power_kw(mat, {"vc_m_min": 120, "f_mm_r": 0.3, "ap_mm": a})[0] <= pw * eta)
 out(P20=P20, Fc20=Fc20, pw=pw, eta=eta, P_avail=pw * eta, ap_max=ap_max, P30=P30, Fc30=Fc30, cite=cite,
     f_ra=f_ra, ra_plan=S.ra_theory(0.15, r_nose), r_nose=r_nose, f_dd=f_dd, dd_plan=dd(0.15), comp=comp * 1000, comp_mid=comp_mid * 1000,

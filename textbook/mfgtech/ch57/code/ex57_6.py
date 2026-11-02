@@ -78,6 +78,10 @@ ax.set_ylabel(T("每件占用 / min（按台数分摊）", "min per part (per ma
 ax.grid(lw=0.3, alpha=0.4, axis="y"); ax.set_ylim(0, 38)
 figure(fig, "fig57_6_2")
 
+HEAD = [T("工序", "op"), T("机动 t_b", "t_b"), T("辅助 t_a", "t_a"), T("单件 t_d", "t_d"), T("定额（取整）", "standard"), T("准终 T_z", "T_z"), T("单件计算 t_c", "t_c")]
+trows = [[f"{r['seq']} {r['op']}", f"{r['tb']:.2f}", f"{r['ta']:.2f}", f"{r['td']:.2f}", f"{r['tq']:g}", f"{r['tz']:g}", f"{r['tc']:.2f}"] for r in rows]
+M.table_fig(plt, HEAD, trows, [0.2, 0.12, 0.12, 0.12, 0.16, 0.12, 0.16], "fig57_6_4", fontsize=7, width_in=6.4)
+
 r20 = next(r for r in rows if r["seq"] == 20)
 out(alpha=ALPHA, beta=BETA, batch=P["batch"], **{f"tb_{r['seq']}": r["tb"] for r in rows}, **{f"ta_{r['seq']}": r["ta"] for r in rows},
     **{f"td_{r['seq']}": r["td"] for r in rows}, **{f"tq_{r['seq']}": r["tq"] for r in rows}, **{f"tc_{r['seq']}": r["tc"] for r in rows},

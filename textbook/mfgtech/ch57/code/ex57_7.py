@@ -56,6 +56,14 @@ bx.set_xticks(range(3)); bx.set_xticklabels([k.split(" ")[0] for k in ks], fonts
 bx.set_ylabel(T("每件占用 / min", "min per part")); bx.legend(fontsize=7); bx.grid(lw=0.3, alpha=0.4, axis="y"); bx.set_ylim(0, 14)
 figure(fig, "fig57_7_1")
 
+HEAD = ["", T("A 加一台外圆磨床", "A second grinder"), T("B 硬车密封轴颈、轴伸", "B hard turning")]
+rows = [[T("投资 K / 元（示意）", "investment"), f"{K_A:,.0f}", f"{K_B:,.0f}"], [T("不变费用 S / 元每年", "fixed S"), f"{S_A:,.0f}", f"{S_B:,.0f}"],
+        [T("可变费用 V / 元每件", "variable V"), f"{VA:.2f}", f"{VB:.2f}"], [T(f"年工艺成本 E（{N} 件）/ 元", "annual cost E"), f"{EA:,.0f}", f"{EB:,.0f}"],
+        [T("单件工艺成本 C / 元", "unit cost C"), f"{VA + S_A / N:.2f}", f"{VB + S_B / N:.2f}"],
+        [T("磨床每件占用 / min（需求节拍 10.2）", "grinder min/part"), f"{loadA_grd:.2f}", f"{loadB_grd:.2f}"],
+        [T("风险与余地", "risk"), T("能力富余大，以后还能涨产", "capacity headroom"), T("磨床几乎满负荷；硬车 Ra、圆度要先试切验证", "no headroom; trial needed")]]
+M.table_fig(plt, HEAD, rows, [0.32, 0.32, 0.36], "fig57_7_3", fontsize=7, width_in=6.6)
+
 out(N=N, batch=batch, mat=mat, VA=VA, VB=VB, S_A=S_A, S_B=S_B, K_A=K_A, K_B=K_B, EA=EA, EB=EB, dE=EA - EB, cbn=cbn,
     CA=VA + S_A / N, CB=VB + S_B / N, Nc=Nc, tau=tau, need=need, loadA_grd=loadA_grd, loadB_grd=loadB_grd, loadB_cnc=loadB_cnc,
     okA=loadA_grd <= need, okB=loadB_grd <= need and loadB_cnc <= need)
