@@ -1,0 +1,420 @@
+1
+00:00:00,300 --> 00:00:04,210
+In 1960, three scientists calculated the end of the world:
+1960年，三位科学家算出了世界末日：
+
+2
+00:00:04,210 --> 00:00:06,620
+Friday, November thirteenth, 2026.
+2026年11月13日，星期五。
+
+3
+00:00:06,620 --> 00:00:08,320
+That is eleven days from today.
+那是十一天以后。
+
+4
+00:00:08,320 --> 00:00:10,140
+Yes, I checked my calendar too.
+对，我也去翻了日历。
+
+5
+00:00:10,140 --> 00:00:11,810
+They published it in Science,
+论文登在《科学》上，
+
+6
+00:00:11,810 --> 00:00:13,830
+one of the top journals on Earth.
+世界顶级的期刊。
+
+7
+00:00:13,830 --> 00:00:15,080
+Their claim: on that day,
+他们说，到那一天，
+
+8
+00:00:15,080 --> 00:00:17,190
+the number of humans shoots to infinity.
+人口会冲向无穷大。
+
+9
+00:00:17,190 --> 00:00:19,680
+They wrote: our great great grand kids will not starve.
+他们写道：我们的玄孙不会饿死，
+
+10
+00:00:19,680 --> 00:00:21,200
+They will be squeezed to death.
+会被挤死。
+
+11
+00:00:21,200 --> 00:00:23,140
+Time magazine and The New York Times
+《时代》周刊和《纽约时报》
+
+12
+00:00:23,140 --> 00:00:23,850
+covered it.
+都报道了它。
+
+13
+00:00:23,850 --> 00:00:25,000
+Today's brain teaser:
+今天的烧脑问题：
+
+14
+00:00:25,000 --> 00:00:27,700
+how can math put infinity on a specific Friday?
+数学怎么能算出一个“无穷大”的星期五？
+
+15
+00:00:27,700 --> 00:00:29,890
+Start with normal growth, exponential,
+先说普通的增长：指数增长，
+
+16
+00:00:29,890 --> 00:00:31,220
+like money in a bank.
+就像存在银行里的钱。
+
+17
+00:00:31,220 --> 00:00:33,790
+Exponential growth has a fixed doubling time,
+指数增长的翻倍时间是固定的，
+
+18
+00:00:33,790 --> 00:00:35,620
+say, double every forty years.
+比如每四十年翻一倍。
+
+19
+00:00:35,620 --> 00:00:36,330
+It gets huge,
+它会变得很大，
+
+20
+00:00:36,330 --> 00:00:38,100
+but it never reaches infinity.
+但永远到不了无穷。
+
+21
+00:00:38,100 --> 00:00:40,040
+Twist one: they found that humans grew
+反转一：他们发现，人类长得
+
+22
+00:00:40,040 --> 00:00:41,400
+faster than exponential.
+比指数还快。
+
+23
+00:00:41,400 --> 00:00:43,180
+They checked twenty four estimates
+他们查了两千年里
+
+24
+00:00:43,180 --> 00:00:45,730
+of world population across two thousand years.
+二十四个世界人口估计。
+
+25
+00:00:45,730 --> 00:00:46,740
+And the doubling time
+翻倍的时间，
+
+26
+00:00:46,740 --> 00:00:47,870
+kept getting shorter.
+越来越短。
+
+27
+00:00:47,870 --> 00:00:50,140
+Their idea: more people means more ideas,
+他们的想法：人越多，点子越多，
+
+28
+00:00:50,140 --> 00:00:51,640
+more teamwork, more food.
+合作越多，粮食越多。
+
+29
+00:00:51,640 --> 00:00:53,220
+So growth feeds on itself,
+于是增长喂养增长，
+
+30
+00:00:53,220 --> 00:00:54,440
+faster and faster.
+越来越快。
+
+31
+00:00:54,440 --> 00:00:56,450
+Bacteria in a dish do not do that.
+培养皿里的细菌可不会这样，
+
+32
+00:00:56,450 --> 00:00:57,930
+They do not swap ideas.
+它们不交换点子。
+
+33
+00:00:57,930 --> 00:00:59,830
+Math calls this hyperbolic growth.
+数学上这叫双曲增长。
+
+34
+00:00:59,830 --> 00:01:00,960
+Here is the trick.
+诀窍在这儿。
+
+35
+00:01:00,960 --> 00:01:03,880
+Picture each doubling taking half as long as the last:
+想象每次翻倍，只用上次一半的时间：
+
+36
+00:01:03,880 --> 00:01:06,490
+forty years, then twenty, then ten, then five.
+四十年，二十年，十年，五年。
+
+37
+00:01:06,490 --> 00:01:07,050
+Add them up,
+把它们加起来，
+
+38
+00:01:07,050 --> 00:01:08,820
+and you hit a wall at eighty years.
+八十年就撞墙。
+
+39
+00:01:08,820 --> 00:01:09,820
+Infinite doublings,
+无穷多次翻倍，
+
+40
+00:01:09,820 --> 00:01:11,410
+squeezed into a finite time.
+塞进有限的时间里。
+
+41
+00:01:11,410 --> 00:01:13,450
+It is a bit like Zeno's paradox,
+这有点像芝诺悖论，
+
+42
+00:01:13,450 --> 00:01:14,530
+run in reverse.
+只不过倒过来用。
+
+43
+00:01:14,530 --> 00:01:16,390
+That wall is a date on the calendar.
+那堵墙是日历上的一天。
+
+44
+00:01:16,390 --> 00:01:17,750
+They called it doomsday.
+他们管它叫末日。
+
+45
+00:01:17,750 --> 00:01:19,320
+Their formula pointed
+他们的公式指向
+
+46
+00:01:19,320 --> 00:01:20,720
+to November 2026.
+2026年11月。
+
+47
+00:01:20,720 --> 00:01:21,930
+Twist two: for decades,
+反转二：好几十年里，
+
+48
+00:01:21,930 --> 00:01:23,740
+the formula worked scarily well.
+这个公式准得吓人。
+
+49
+00:01:23,740 --> 00:01:25,010
+Until about 1993,
+直到大约1993年，
+
+50
+00:01:25,010 --> 00:01:27,300
+real numbers kept up with it.
+真实人口一直跟着它走。
+
+51
+00:01:27,300 --> 00:01:29,050
+Then reality fell behind.
+然后，现实掉队了。
+
+52
+00:01:29,050 --> 00:01:29,940
+Way behind.
+掉得很远。
+
+53
+00:01:29,940 --> 00:01:32,180
+Today there are about eight billion of us.
+今天地球上大约八十多亿人。
+
+54
+00:01:32,180 --> 00:01:33,850
+Not infinity. Not even close.
+不是无穷，差得远。
+
+55
+00:01:33,850 --> 00:01:35,260
+Run their formula for today,
+按他们的公式算，
+
+56
+00:01:35,260 --> 00:01:37,630
+and you get about two hundred billion people.
+今天地球上该有大约两千亿人。
+
+57
+00:01:37,630 --> 00:01:38,920
+Twist three, the weirdest:
+反转三，最奇妙：
+
+58
+00:01:38,920 --> 00:01:41,320
+maybe the warning helped break the prediction.
+也许是警告本身，打破了预言。
+
+59
+00:01:41,320 --> 00:01:42,390
+Their cure was to cut
+他们开的药方是：
+
+60
+00:01:42,390 --> 00:01:44,000
+the world birth rate in half.
+把全世界的出生率减半。
+
+61
+00:01:44,000 --> 00:01:45,740
+Today the global birth rate is
+今天全球出生率
+
+62
+00:01:45,740 --> 00:01:48,120
+slightly less than half its 1960 level.
+比1960年的一半还略低一点。
+
+63
+00:01:48,120 --> 00:01:49,790
+Of course, many things drove that:
+当然原因很多：
+
+64
+00:01:49,790 --> 00:01:51,970
+medicine, school, cities, family planning.
+医疗、上学、进城、计划生育。
+
+65
+00:01:51,970 --> 00:01:53,310
+Physicists know the sign:
+物理学家都懂这个信号：
+
+66
+00:01:53,310 --> 00:01:56,200
+when a formula hits infinity, the model is breaking.
+公式一算出无穷，模型就要坏了。
+
+67
+00:01:56,200 --> 00:01:57,300
+Something it ignored,
+它忽略的东西，
+
+68
+00:01:57,300 --> 00:02:00,020
+like food, space, or people's choices, takes over.
+比如粮食、空间、人的选择，会接管一切。
+
+69
+00:02:00,020 --> 00:02:01,000
+Real growth curves
+真实的增长曲线，
+
+70
+00:02:01,000 --> 00:02:02,260
+bend into an S shape.
+会弯成一个S形。
+
+71
+00:02:02,260 --> 00:02:03,700
+Like rabbits on an island:
+就像岛上的兔子：
+
+72
+00:02:03,700 --> 00:02:05,870
+a boom first, then the food runs out.
+先猛涨，然后吃的不够了。
+
+73
+00:02:05,870 --> 00:02:07,950
+Critics in 1960 called the paper
+1960年就有批评者说这篇论文
+
+74
+00:02:07,950 --> 00:02:10,220
+ridiculous and manifestly absurd.
+荒唐、明显荒谬。
+
+75
+00:02:10,220 --> 00:02:11,620
+But it left a great lesson:
+但它留下一堂好课：
+
+76
+00:02:11,620 --> 00:02:14,490
+a curve that fits the past can still fail the future.
+贴合过去的曲线，照样可能算错未来。
+
+77
+00:02:14,490 --> 00:02:16,740
+Fine print: the date was a math warning,
+友情提示：那个日期是数学上的警告，
+
+78
+00:02:16,740 --> 00:02:17,980
+not a real prophecy.
+不是真的预言。
+
+79
+00:02:17,980 --> 00:02:20,930
+The forty, twenty, ten example is our simple picture,
+四十、二十、十年的例子是我们的简化示意，
+
+80
+00:02:20,930 --> 00:02:22,380
+not their exact formula.
+不是他们的原公式。
+
+81
+00:02:22,380 --> 00:02:25,100
+So, will the world end on November thirteenth?
+所以，11月13日世界会完蛋吗？
+
+82
+00:02:25,100 --> 00:02:26,940
+No. The formula ends, not us.
+不会。完蛋的是公式，不是我们。
+
+83
+00:02:26,940 --> 00:02:29,300
+But if your subway is extra crowded that day,
+不过那天要是地铁特别挤，
+
+84
+00:02:29,300 --> 00:02:30,810
+you know who to blame.
+你知道该怪谁了。
+

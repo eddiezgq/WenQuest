@@ -1,0 +1,430 @@
+1
+00:00:00,300 --> 00:00:01,110
+马斯克说：
+Elon Musk says:
+
+2
+00:00:01,110 --> 00:00:04,450
+到2029年，天上的AI算力要碾压地面。
+by 2029, AI computing in orbit will crush computing on the ground.
+
+3
+00:00:04,450 --> 00:00:07,040
+据报道，他预计2028年底左右，
+Reportedly, he expects that around the end of 2028,
+
+4
+00:00:07,040 --> 00:00:09,740
+太空每月新增的算力就会超过地面。
+new computing added in space each month will pass the ground.
+
+5
+00:00:09,740 --> 00:00:12,710
+听起来很美：太空零下两百七十度，
+Sounds great: space is minus two hundred seventy degrees,
+
+6
+00:00:12,710 --> 00:00:14,500
+一台天然的大冰箱！
+a giant free fridge!
+
+7
+00:00:14,500 --> 00:00:16,070
+今天的烧脑问题：
+Today's brain teaser:
+
+8
+00:00:16,070 --> 00:00:18,930
+太空那么冷，显卡凭啥会热死？
+space is so cold, so how can a GPU overheat?
+
+9
+00:00:18,930 --> 00:00:20,510
+先认识主角：小芯，
+Meet our hero, Chip,
+
+10
+00:00:20,510 --> 00:00:21,870
+一块AI显卡。
+an AI graphics card.
+
+11
+00:00:21,870 --> 00:00:22,650
+它一干活，
+When it works,
+
+12
+00:00:22,650 --> 00:00:24,660
+一块就要吃掉大约七百瓦。
+one card eats about seven hundred watts.
+
+13
+00:00:24,660 --> 00:00:25,780
+吃进去的电，
+Almost all that electricity
+
+14
+00:00:25,780 --> 00:00:27,570
+几乎全都变成了热。
+turns into heat.
+
+15
+00:00:27,570 --> 00:00:29,520
+在地上，热是怎么走的？
+On the ground, how does heat leave?
+
+16
+00:00:29,520 --> 00:00:30,350
+靠空气。
+Through the air.
+
+17
+00:00:30,350 --> 00:00:32,510
+风扇一吹，热空气被赶走，
+A fan blows the hot air away,
+
+18
+00:00:32,510 --> 00:00:33,890
+冷空气补进来。
+and cool air rushes in.
+
+19
+00:00:33,890 --> 00:00:35,350
+机房再加上水冷，
+Add water cooling,
+
+20
+00:00:35,350 --> 00:00:37,280
+热就被一路搬到室外。
+and the heat is carried all the way outside.
+
+21
+00:00:37,280 --> 00:00:38,790
+反转一：太空里，
+Twist one: in space,
+
+22
+00:00:38,790 --> 00:00:39,860
+没有空气。
+there is no air.
+
+23
+00:00:39,860 --> 00:00:42,000
+没有空气，风扇转得再快，
+With no air, however fast the fan spins,
+
+24
+00:00:42,000 --> 00:00:43,020
+也是白转。
+it moves nothing.
+
+25
+00:00:43,020 --> 00:00:44,370
+太空不是冰箱，
+Space is not a fridge.
+
+26
+00:00:44,370 --> 00:00:45,840
+是一个保温瓶。
+It is a thermos.
+
+27
+00:00:45,840 --> 00:00:47,290
+保温瓶为啥保温？
+Why does a thermos keep things hot?
+
+28
+00:00:47,290 --> 00:00:49,040
+夹层里抽成了真空。
+The gap in its wall is a vacuum.
+
+29
+00:00:49,040 --> 00:00:50,770
+热没法靠碰传出去，
+Heat cannot leave by touching,
+
+30
+00:00:50,770 --> 00:00:52,040
+也没法靠吹。
+or by blowing.
+
+31
+00:00:52,040 --> 00:00:52,870
+冷是真冷，
+The cold is real,
+
+32
+00:00:52,870 --> 00:00:54,820
+可那份冷根本碰不到你。
+but it never touches you.
+
+33
+00:00:54,820 --> 00:00:56,420
+那热还剩哪条路？
+So what way out is left for heat?
+
+34
+00:00:56,420 --> 00:00:57,140
+发光。
+Glowing.
+
+35
+00:00:57,140 --> 00:00:59,640
+所有东西都在发看不见的红外光，
+Everything gives off invisible infrared light,
+
+36
+00:00:59,640 --> 00:01:00,750
+你我也在发。
+including you and me.
+
+37
+00:01:00,750 --> 00:01:02,830
+其实你在黑夜里也在发光，
+You glow in the dark too.
+
+38
+00:01:02,830 --> 00:01:05,030
+热成像相机拍到的就是它。
+A thermal camera sees exactly that.
+
+39
+00:01:05,030 --> 00:01:06,100
+这叫热辐射，
+This is thermal radiation,
+
+40
+00:01:06,100 --> 00:01:07,990
+是太空里唯一的出路。
+the only exit in space.
+
+41
+00:01:07,990 --> 00:01:09,480
+反转二：这条路，
+Twist two: this exit
+
+42
+00:01:09,480 --> 00:01:10,530
+窄得吓人。
+is shockingly narrow.
+
+43
+00:01:10,530 --> 00:01:12,860
+国际空间站有好几大片散热板，
+The space station has several big radiator panels.
+
+44
+00:01:12,860 --> 00:01:16,310
+据NASA资料，最多也就散掉约七十千瓦。
+According to NASA, they shed at most about seventy kilowatts.
+
+45
+00:01:16,310 --> 00:01:17,660
+七十千瓦是多少？
+How much is seventy kilowatts?
+
+46
+00:01:17,660 --> 00:01:19,990
+估算一下：大约一百块显卡。
+A rough estimate: about one hundred GPUs.
+
+47
+00:01:19,990 --> 00:01:21,620
+而一个大型AI机房，
+And a big AI data center
+
+48
+00:01:21,620 --> 00:01:23,380
+动不动就是几十万块。
+can hold hundreds of thousands.
+
+49
+00:01:23,380 --> 00:01:24,020
+怎么办？
+What to do?
+
+50
+00:01:24,020 --> 00:01:25,590
+让散热板更烫一点。
+Make the radiators hotter.
+
+51
+00:01:25,590 --> 00:01:27,250
+发光散热有个规律：
+Glowing follows a rule:
+
+52
+00:01:27,250 --> 00:01:30,130
+绝对温度翻一倍，散热变十六倍。
+double the absolute temperature, and the heat shed goes up sixteen times.
+
+53
+00:01:30,130 --> 00:01:31,640
+这叫四次方定律：
+It is the fourth power law:
+
+54
+00:01:31,640 --> 00:01:33,260
+温度自己乘四遍。
+temperature multiplied by itself four times.
+
+55
+00:01:33,260 --> 00:01:34,450
+可显卡怕烫，
+But GPUs hate heat.
+
+56
+00:01:34,450 --> 00:01:35,750
+它热不起来。
+They cannot run that hot.
+
+57
+00:01:35,750 --> 00:01:36,570
+小芯表示：
+Chip says:
+
+58
+00:01:36,570 --> 00:01:38,160
+我只想要一台风扇。
+all I want is a fan.
+
+59
+00:01:38,160 --> 00:01:40,240
+所以散热板只能做得巨大，
+So the radiators must be huge,
+
+60
+00:01:40,240 --> 00:01:41,920
+大得像一对对翅膀。
+like giant pairs of wings.
+
+61
+00:01:41,920 --> 00:01:44,920
+空间站上那些白色的大板子就是散热板，
+On the space station, the big white panels are radiators,
+
+62
+00:01:44,920 --> 00:01:46,210
+不是太阳能板。
+not solar panels.
+
+63
+00:01:46,210 --> 00:01:47,890
+反转三，最反直觉：
+Twist three, the strangest:
+
+64
+00:01:47,890 --> 00:01:49,500
+太阳还在帮倒忙。
+the Sun makes it worse.
+
+65
+00:01:49,500 --> 00:01:51,020
+太空里没有云挡着，
+In space no clouds block the Sun.
+
+66
+00:01:51,020 --> 00:01:53,320
+向阳的一面能晒到一百多度。
+The sunny side can bake above one hundred degrees.
+
+67
+00:01:53,320 --> 00:01:55,220
+所以散热板得侧着身子，
+So the radiators turn edge on,
+
+68
+00:01:55,220 --> 00:01:56,210
+躲着太阳。
+dodging the Sun.
+
+69
+00:01:56,210 --> 00:01:57,670
+那马斯克图什么？
+Then why does Musk want it?
+
+70
+00:01:57,670 --> 00:01:59,430
+图的恰恰就是太阳。
+Exactly for the Sun.
+
+71
+00:01:59,430 --> 00:02:01,700
+合适的轨道上几乎一直有太阳，
+In the right orbit, sunlight is almost nonstop:
+
+72
+00:02:01,700 --> 00:02:03,440
+没有黑夜，没有阴天。
+no night, no cloudy days.
+
+73
+00:02:03,440 --> 00:02:04,670
+电几乎白来，
+Nearly free power,
+
+74
+00:02:04,670 --> 00:02:06,640
+也不用抢地、抢水。
+and no fight over land or water.
+
+75
+00:02:06,640 --> 00:02:07,830
+地上的大机房，
+Some big data centers on the ground
+
+76
+00:02:07,830 --> 00:02:10,010
+有的要用大量的水来降温。
+use lots of water for cooling.
+
+77
+00:02:10,010 --> 00:02:11,360
+说白了是一笔账：
+It comes down to a trade:
+
+78
+00:02:11,360 --> 00:02:14,180
+省下的电，能不能抵掉散热的麻烦。
+can the power saved pay for the cooling trouble?
+
+79
+00:02:14,180 --> 00:02:17,420
+友情提示：2029的时间表是马斯克的预测，
+Fine print: the 2029 timeline is Musk's prediction.
+
+80
+00:02:17,420 --> 00:02:20,020
+还没有人在太空建成大型AI机房。
+Nobody has built a large AI data center in space yet.
+
+81
+00:02:20,020 --> 00:02:21,570
+一百块显卡是估算，
+One hundred GPUs is an estimate,
+
+82
+00:02:21,570 --> 00:02:25,140
+十六倍是物理规律，都不是哪家公司的方案。
+sixteen times is physics. Neither is any company's design.
+
+83
+00:02:25,140 --> 00:02:28,220
+所以，太空那么冷，显卡凭啥会热死？
+So why can a GPU overheat in freezing space?
+
+84
+00:02:28,220 --> 00:02:31,060
+因为冷碰不到它，热也甩不出去。
+Because the cold can't touch it, and the heat can't get out.
+
+85
+00:02:31,060 --> 00:02:33,320
+太空是全宇宙最大的保温瓶。
+Space is the biggest thermos in the universe.
+
+86
+00:02:33,320 --> 00:02:36,280
+显卡上去，可别被泡成一杯热茶。
+Send a GPU up there, and don't let it steep like hot tea.
+
