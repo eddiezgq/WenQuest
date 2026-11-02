@@ -1,0 +1,31 @@
+# 实验 20.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab20_7.js。
+原理:
+  - ["PD 控制律 τ = K_p(q_ref − q) − K_d q̇ 使关节满足 J q̈ + (b + K_d) q̇ + K_p q = K_p q_ref，即质量–弹簧–阻尼系统（20.7 节）。", "The PD law τ = K_p(q_ref − q) − K_d q̇ makes the joint obey J q̈ + (b + K_d) q̇ + K_p q = K_p q_ref, a mass–spring–damper (Section 20.7)."]
+  - 式: "ω_n = √(K_p/J)，ζ = (b + K_d)/(2√(K_p J))；超调 M_p = e^(−πζ/√(1−ζ²))，2% 调节时间约 4/(ζω_n)"
+  - ["受迫振动 ẍ + 2ζω_n ẋ + ω_n² x = (F₀/m) cos ωt 的稳态振幅是静态位移的 M(r) = 1/√((1 − r²)² + (2ζr)²) 倍，r = ω/ω_n；ζ < 1/√2 时在 r = √(1 − 2ζ²) 处最大，约为 1/(2ζ)（20.6 节）。", "The steady amplitude of ẍ + 2ζω_n ẋ + ω_n² x = (F₀/m) cos ωt is M(r) = 1/√((1 − r²)² + (2ζr)²) times the static deflection, r = ω/ω_n; for ζ < 1/√2 it peaks at r = √(1 − 2ζ²) at about 1/(2ζ) (Section 20.6)."]
+步骤:
+  - ["在“关节 PD 控制”场景中（空载、水平面、目标 0.5 rad），先任取几组 K_p、K_d，记录 ω_n、ζ、超调、调节时间、最大转矩，填入表 1；再按 ζ = 0.7、ω_n = 10 rad/s 算出增益并验证满足指标（任务 1）。", "In 'Joint PD control' (no payload, horizontal plane, 0.5 rad step), try several K_p, K_d and record ω_n, ζ, overshoot, settling time and peak torque in Table 1; then compute gains for ζ = 0.7, ω_n = 10 rad/s and check the specification (task 1)."]
+  - ["保持 K_p = 65.3，算出临界阻尼的 K_d 并验证（任务 2）；比较 ζ = 0.5、0.7、1、1.5 的调节时间。", "Keep K_p = 65.3, compute and check the K_d for critical damping (task 2); compare settling times for ζ = 0.5, 0.7, 1 and 1.5."]
+  - ["肘端负载取 2 kg，先用原来的增益，记录超调；再重新整定（任务 3），填入表 2。", "With 2 kg at the elbow, first keep the old gains and record the overshoot; then retune (task 3) and fill in Table 2."]
+  - ["打开重力，记录不同 K_p 下的稳态误差；找出使误差小于 0.05 rad、阻尼比不低于 0.5 的增益（任务 4），注意最大转矩是否超过额定值和限幅。", "Turn gravity on and record the steady error for several K_p; find gains giving error < 0.05 rad with ζ ≥ 0.5 (task 4), watching whether the peak torque exceeds the rating and the limit."]
+  - ["在“受迫振动”场景中取 ζ = 0.1，频率比从 0.5 到 1.5 逐步改变，记录放大系数，找出峰值（任务 5），填入表 3；再取 ζ = 0.02、0.5 重复。", "In 'Forced vibration' with ζ = 0.1, vary r from 0.5 to 1.5, record the magnification and find the peak (task 5) in Table 3; repeat for ζ = 0.02 and 0.5."]
+数据表:
+  - 标题: ["表 1  增益与阶跃响应（空载、水平面、0.5 rad）", "Table 1  Gains and step response (no payload, horizontal, 0.5 rad)"]
+    表头: ["K_p", "K_d", "ω_n / (rad/s)", "ζ", "超调 / %", "调节时间 / s", "最大转矩 / (N·m)"]
+    表头英文: ["K_p", "K_d", "ω_n / (rad/s)", "ζ", "overshoot / %", "settling / s", "peak torque / (N·m)"]
+    行: [["", "", "", "", "", "", ""], ["", "", "", "", "", "", ""], ["", "", "", "", "", "", ""], ["65.3", "8.64", "", "", "", "", ""]]
+  - 标题: ["表 2  负载与重力的影响", "Table 2  Effect of payload and gravity"]
+    表头: ["负载 / kg", "重力", "K_p", "K_d", "ζ", "超调 / %", "稳态误差 / rad"]
+    表头英文: ["payload / kg", "gravity", "K_p", "K_d", "ζ", "overshoot / %", "steady error / rad"]
+    行: [["2", "0", "65.3", "8.64", "", "", ""], ["2", "0", "", "", "", "", ""], ["0", "1", "65.3", "8.64", "", "", ""], ["0", "1", "", "", "", "", ""]]
+  - 标题: ["表 3  受迫振动的放大系数", "Table 3  Magnification in forced vibration"]
+    表头: ["ζ", "r", "M（公式）", "仿真末段最大位移", "相位滞后 / °"]
+    表头英文: ["ζ", "r", "M (formula)", "max displacement near the end", "phase lag / °"]
+    行: [["0.1", "0.5", "", "", ""], ["0.1", "0.9", "", "", ""], ["0.1", "", "", "", ""], ["0.1", "1.1", "", "", ""], ["0.1", "1.5", "", "", ""]]
+注意:
+  - ["关节模型：上臂绕肩轴 0.5129 kg·m²（零件库 UR5e 模型）加 maxon RE 40 转子经减速比 101 折算的 0.1398 kg·m²（假设的组合），粘性摩擦 0.5 N·m·s/rad 为假设值；转矩按驱动器限流 10 A 折算为 60.9 N·m 限幅，额定转矩约 18.9 N·m（不计减速器效率）。模型不含减速器的扭转柔度。", "Joint model: upper arm 0.5129 kg·m² about the shoulder (library UR5e model) plus a maxon RE 40 rotor through a 101:1 gearbox, 0.1398 kg·m² (an assumed pairing); viscous friction 0.5 N·m·s/rad is assumed; torque is limited to 60.9 N·m (10 A drive limit) and rated about 18.9 N·m (gearbox efficiency ignored). Gearbox compliance is not modelled."]
+  - ["转矩被限幅时系统不再是线性的，ω_n、ζ 的公式只在不限幅时准确。", "When the torque saturates the system is no longer linear, and the ω_n, ζ formulas hold only without saturation."]
+  - ["按 2% 标准，临界阻尼（约 0.58 s）的调节时间反而比 ζ = 0.7（约 0.60 s）略短：ζ = 0.7 的响应超调后要回落进 ±2% 带。“ζ = 0.7 最快”只在按 5% 标准或只看上升时才大致成立。", "By the 2% criterion, critical damping (about 0.58 s) actually settles slightly faster than ζ = 0.7 (about 0.60 s), because the ζ = 0.7 response overshoots and must come back into the ±2% band. 'ζ = 0.7 is fastest' holds roughly only for a 5% band or for rise time."]
+思考题:
+  - ["算例 20.3.2 中上臂在减速器上的固有频率约 197 rad/s。把 K_p 加大到使 ω_n 接近它的五分之一，实际的机械臂会出现什么这个模型看不到的问题？", "The upper arm's natural frequency on the gearbox is about 197 rad/s (Example 20.3.2). If K_p is raised until ω_n is about a fifth of that, what problem would a real arm show that this model cannot?"]
+  - ["重力下只靠加大增益来减小稳态误差，转矩和带宽各付出什么代价？重力补偿和积分项各有什么优缺点？", "Reducing the steady error under gravity by raising the gains alone: what does it cost in torque and bandwidth? What are the pros and cons of gravity compensation versus an integral term?"]
