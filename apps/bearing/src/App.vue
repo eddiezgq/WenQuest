@@ -17,12 +17,13 @@ import Report from './components/Report.vue'
 import Assembly from './components/Assembly.vue'
 import Quality from './components/Quality.vue'
 import Parts from './components/Parts.vue'
+import Process from './components/Process.vue'
 
 const examples = ref([])
 const pick = ref('')
 const showReport = ref(false)
 const showParts = ref(false)
-const MODES = ['design', 'assembly', 'quality']
+const MODES = ['design', 'assembly', 'quality', 'process']
 const mode = ref(MODES.includes(new URLSearchParams(location.search).get('mode')) ? new URLSearchParams(location.search).get('mode') : 'design')
 const fileInput = ref(null)
 const q = new URLSearchParams(location.search)
@@ -68,7 +69,7 @@ onMounted(async () => {
       <a class="brand" href="/"><b>{{ t('app') }}</b><small>{{ t('tagline') }}</small></a>
       <input v-model="title" class="title" :placeholder="t('untitled')" :aria-label="t('title')">
       <nav class="modes" :aria-label="t('modeDesign')">
-        <button v-for="m in MODES" :key="m" type="button" class="dark" :class="{ on: mode === m }" :aria-pressed="mode === m" @click="mode = m">{{ t({ design: 'modeDesign', assembly: 'modeAsm', quality: 'modeQuality' }[m]) }}</button>
+        <button v-for="m in MODES" :key="m" type="button" class="dark" :class="{ on: mode === m }" :aria-pressed="mode === m" @click="mode = m">{{ t({ design: 'modeDesign', assembly: 'modeAsm', quality: 'modeQuality', process: 'modeProcess' }[m]) }}</button>
       </nav>
       <div class="tools">
         <select v-model="pick" class="dark" :aria-label="t('examples')" @change="openExample(pick)">
@@ -87,6 +88,7 @@ onMounted(async () => {
 
     <Assembly v-if="mode === 'assembly'" />
     <Quality v-if="mode === 'quality'" />
+    <Process v-if="mode === 'process'" />
     <main v-show="mode === 'design'" class="work">
       <aside class="edit">
         <div class="pane"><Fields /></div>

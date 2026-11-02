@@ -1,0 +1,482 @@
+{
+ "rings": {
+  "inner": {
+   "ops": [
+    {
+     "no": 10,
+     "kind": "turn",
+     "mode": "size",
+     "name": {
+      "zh": "车削",
+      "en": "Turning"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "bore": {
+       "Z": 1.2,
+       "T": 0.1,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      },
+      "land": {
+       "Z": 1.2,
+       "T": 0.1,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      },
+      "width": {
+       "Z": 1.0,
+       "T": 0.1,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      },
+      "race": {
+       "Z": 1.0,
+       "T": 0.08,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      }
+     }
+    },
+    {
+     "no": 20,
+     "kind": "heat",
+     "mode": null,
+     "name": {
+      "zh": "热处理（淬火、回火）",
+      "en": "Heat treatment"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "bore": {
+       "change": 0.05,
+       "scatter": 0.04,
+       "distortion": 0.06
+      },
+      "land": {
+       "change": 0.06,
+       "scatter": 0.04,
+       "distortion": 0.05
+      },
+      "width": {
+       "change": 0.02,
+       "scatter": 0.02,
+       "distortion": 0.03
+      },
+      "race": {
+       "change": 0.055,
+       "scatter": 0.04,
+       "distortion": 0.05
+      }
+     }
+    },
+    {
+     "no": 30,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨端面",
+      "en": "Face grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "width": {
+       "Z": 0.3,
+       "T": 0.02,
+       "Zreq": 0.1,
+       "Zmax": 0.45,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 40,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨外径（挡边）",
+      "en": "Land grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "land": {
+       "Z": 0.3,
+       "T": 0.03,
+       "Zreq": 0.08,
+       "Zmax": null,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 50,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨沟道 / 滚道",
+      "en": "Raceway grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "race": {
+       "Z": 0.3,
+       "T": 0.012,
+       "Zreq": 0.08,
+       "Zmax": 0.45,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 60,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨内孔",
+      "en": "Bore grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "bore": {
+       "Z": 0.32,
+       "T": 0.008,
+       "Zreq": 0.08,
+       "Zmax": 0.5,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 70,
+     "kind": "superfinish",
+     "mode": "stock",
+     "name": {
+      "zh": "超精沟道 / 滚道",
+      "en": "Raceway superfinishing"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "race": {
+       "Z": 0.006,
+       "dz": 0.003,
+       "Zreq": 0.003
+      }
+     }
+    },
+    {
+     "no": 80,
+     "kind": "wash",
+     "mode": null,
+     "name": {
+      "zh": "清洗",
+      "en": "Washing"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {}
+    },
+    {
+     "no": 90,
+     "kind": "assemble",
+     "mode": null,
+     "name": {
+      "zh": "合套",
+      "en": "Assembly"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {}
+    },
+    {
+     "no": 100,
+     "kind": "inspect",
+     "mode": null,
+     "name": {
+      "zh": "检测",
+      "en": "Inspection"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {}
+    }
+   ],
+   "finish": {
+    "bore": {
+     "es": 0,
+     "ei": -0.01
+    },
+    "land": {
+     "es": 0,
+     "ei": -0.1
+    },
+    "width": {
+     "es": 0,
+     "ei": -0.12
+    },
+    "race": {
+     "es": 0.005,
+     "ei": -0.02
+    }
+   },
+   "blank": {
+    "bore": {
+     "T": 0.4
+    },
+    "land": {
+     "T": 0.4
+    },
+    "width": {
+     "T": 0.4
+    },
+    "race": {
+     "T": 0.4
+    }
+   }
+  },
+  "outer": {
+   "ops": [
+    {
+     "no": 10,
+     "kind": "turn",
+     "mode": "size",
+     "name": {
+      "zh": "车削",
+      "en": "Turning"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "od": {
+       "Z": 1.2,
+       "T": 0.1,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      },
+      "land_bore": {
+       "Z": 1.2,
+       "T": 0.1,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      },
+      "width": {
+       "Z": 1.0,
+       "T": 0.1,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      },
+      "race": {
+       "Z": 1.0,
+       "T": 0.08,
+       "Zreq": 0.4,
+       "Zmax": null,
+       "setup": null
+      }
+     }
+    },
+    {
+     "no": 20,
+     "kind": "heat",
+     "mode": null,
+     "name": {
+      "zh": "热处理（淬火、回火）",
+      "en": "Heat treatment"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "od": {
+       "change": 0.07,
+       "scatter": 0.05,
+       "distortion": 0.06
+      },
+      "land_bore": {
+       "change": 0.06,
+       "scatter": 0.05,
+       "distortion": 0.06
+      },
+      "width": {
+       "change": 0.02,
+       "scatter": 0.02,
+       "distortion": 0.03
+      },
+      "race": {
+       "change": 0.065,
+       "scatter": 0.05,
+       "distortion": 0.06
+      }
+     }
+    },
+    {
+     "no": 30,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨端面",
+      "en": "Face grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "width": {
+       "Z": 0.3,
+       "T": 0.02,
+       "Zreq": 0.1,
+       "Zmax": 0.45,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 40,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨外径",
+      "en": "Outside diameter grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "od": {
+       "Z": 0.34,
+       "T": 0.01,
+       "Zreq": 0.08,
+       "Zmax": 0.5,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 50,
+     "kind": "grind",
+     "mode": "size",
+     "name": {
+      "zh": "磨沟道 / 滚道",
+      "en": "Raceway grinding"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "race": {
+       "Z": 0.3,
+       "T": 0.012,
+       "Zreq": 0.08,
+       "Zmax": 0.45,
+       "setup": 0.01
+      }
+     }
+    },
+    {
+     "no": 60,
+     "kind": "superfinish",
+     "mode": "stock",
+     "name": {
+      "zh": "超精沟道 / 滚道",
+      "en": "Raceway superfinishing"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {
+      "race": {
+       "Z": 0.006,
+       "dz": 0.003,
+       "Zreq": 0.003
+      }
+     }
+    },
+    {
+     "no": 70,
+     "kind": "wash",
+     "mode": null,
+     "name": {
+      "zh": "清洗",
+      "en": "Washing"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {}
+    },
+    {
+     "no": 80,
+     "kind": "assemble",
+     "mode": null,
+     "name": {
+      "zh": "合套",
+      "en": "Assembly"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {}
+    },
+    {
+     "no": 90,
+     "kind": "inspect",
+     "mode": null,
+     "name": {
+      "zh": "检测",
+      "en": "Inspection"
+     },
+     "equipment": "",
+     "params": [],
+     "features": {}
+    }
+   ],
+   "finish": {
+    "od": {
+     "es": 0,
+     "ei": -0.013
+    },
+    "land_bore": {
+     "es": 0.1,
+     "ei": 0
+    },
+    "width": {
+     "es": 0,
+     "ei": -0.12
+    },
+    "race": {
+     "es": 0.02,
+     "ei": -0.005
+    }
+   },
+   "blank": {
+    "od": {
+     "T": 0.4
+    },
+    "land_bore": {
+     "T": 0.4
+    },
+    "width": {
+     "T": 0.4
+    },
+    "race": {
+     "T": 0.4
+    }
+   }
+  }
+ },
+ "title": {
+  "zh": "深沟球轴承套圈工艺（示例，虚构数）",
+  "en": "Deep groove ball bearing rings (example, fictional values)"
+ },
+ "fictional": true,
+ "note": {
+  "zh": "所有留量、公差、热处理变化都是虚构的演示数，不是推荐值；请按企业自己的设备和经验填写。",
+  "en": "Every allowance, tolerance and heat-treatment value is a fictional demonstration value, not a recommendation; fill in your own from your machines and experience."
+ },
+ "design": "demo-deep-groove"
+}

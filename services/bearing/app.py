@@ -17,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 
 from bearingkit import assembly as AS
 from bearingkit import parts as PT
+from bearingkit import process as PR
 from bearingkit import quality as QL
 from bearingkit.analyze import analyse, geometry_of
 
@@ -123,6 +124,15 @@ ERR_ZH += [  # part drawings and STEP (step 5)
     (r"^a groove arc reaches past the axis$", "沟道圆弧越过了轴线：请检查尺寸"),
 ]
 
+ERR_ZH += [  # process routes (step 5)
+    (r"^a ring has at most (\d+) operations$", r"一个套圈最多 \1 道工序"),
+    (r"^an operation kind is turn", "工序类型是车削、磨削、超精、切削、热处理、清洗、合套、检测或其他"),
+    (r"^a cutting operation works to size or removes a set stock$", "切削工序要么按尺寸加工，要么定量去除"),
+    (r"^the upper deviation of a finished size must be above", "成品尺寸的上偏差要大于下偏差"),
+    (r"^give the process as an object$", "工艺数据格式不对"),
+    (r"^give the operations of the inner or the outer ring$", "请给出内圈或外圈的工序"),
+]
+
 SCN_ZH = {  # scenario field names in the Chinese messages
     "mn": "法向模数 mn",
     "z": "齿数 z",
@@ -147,7 +157,7 @@ def zh(msg: str) -> str:
         return "应用场景：请填" + SCN_ZH.get(m.group(1), m.group(1))
     for pat, rep in ERR_ZH:
         if re.search(pat, msg):
-            return re.sub(pat, rep, msg)
+            return re.sub(pat + r".*", rep, msg, count=1, flags=re.S)  # the whole message, not just its start
     return msg
 
 
@@ -296,6 +306,51 @@ def quality_synth(what: str):
     if what == "spc":
         return QL.synthetic_spc(k=25, n=5, mean=52.52, sd=0.0015, shift_at=18, shift=1.5)
     raise HTTPException(404, {"en": "no such synthetic data", "zh": "没有这种合成数据"})
+
+
+PROCESS_EXAMPLES = EXAMPLES / "process"
+
+
+@app.post("/api/process/template")
+async def process_template(request: Request):
+    """The usual chain of this bearing's rings, structure only: every number is the company's to fill."""
+    p = await project_of(request)
+
+    def make():
+        g = geometry_of(p)
+        return {"features": PR.features(g), "template": PR.blank_template(g)}
+
+    return run(make)
+
+
+@app.get("/api/process/examples")
+def process_examples():
+    out = []
+    for f in sorted(PROCESS_EXAMPLES.glob("*.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        out.append({"id": f.stem, "title": d.get("title"), "design": d.get("design")})
+    return out
+
+
+@app.get("/api/process/examples/{eid}")
+def process_example(eid: str):
+    if not re.fullmatch(r"[a-z0-9-]{1,60}", eid) or not (PROCESS_EXAMPLES / f"{eid}.json").is_file():
+        raise HTTPException(404, {"en": "no such example", "zh": "没有这个示例"})
+    return json.loads((PROCESS_EXAMPLES / f"{eid}.json").read_text(encoding="utf-8"))
+
+
+@app.post("/api/process")
+async def process_ep(request: Request):
+    """Operation sizes worked back from the finished sizes, and the stock checks (round 64, step 5)."""
+    p = await project_of(request)
+
+    def make():
+        design, proc = p.get("design"), p.get("process")
+        if not isinstance(design, dict):
+            raise ValueError("give the process as an object")
+        return PR.run(geometry_of(design), proc)
+
+    return run(make)
 
 
 if WEB.is_dir():

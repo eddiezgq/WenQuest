@@ -205,3 +205,33 @@ li.unknown .chip { background: var(--hold-bg); color: var(--hold); }
 .parts .dl { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 6px 0; font-size: 13px; }
 .partgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 12px; }
 .partgrid h2 { margin-top: 6px; } .partgrid svg { width: 100%; height: auto; display: block; }
+/* process route and operation sheets (step 5) */
+.proc .btns .ghost { font-size: 12.5px; }
+.proc .pane { grid-auto-rows: max-content; }
+.proc .cases.fin td:last-child, .proc .cases.fin th:last-child { width: auto; } .proc .cases.fin td:first-child { width: 46%; }
+.route th:nth-child(2), .route td:nth-child(2) { text-align: left; }
+.proc .sub { margin: 10px 0 2px; font: 700 13px/1.3 var(--serif-zh); } .proc .sub small { display: block; font: 400 11.5px var(--body); color: var(--muted); }
+.ops { list-style: none; margin: 4px 0; padding: 0; display: grid; gap: 4px; }
+.ops > li { border: 1px solid var(--line); border-radius: 6px; background: var(--paper, transparent); }
+.ops > li.open { border-color: var(--accent); }
+.ophead { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 6px; align-items: center; padding: 4px 6px; }
+.opno { width: 100%; padding: 4px; font-size: 12px; }
+.opname { background: none; border: 0; text-align: left; padding: 2px 0; font-size: 13px; color: inherit; cursor: pointer; min-width: 0; }
+.opname small { display: block; color: var(--muted); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.opbtn { display: flex; } .opbtn button { background: none; border: 0; color: var(--muted); padding: 2px 5px; font-size: 14px; cursor: pointer; }
+.opbtn button:hover, .opbtn button:focus-visible { color: var(--ink); }
+.opbody { display: grid; gap: 6px; padding: 4px 8px 10px; border-top: 1px solid var(--line); }
+.opbody select { width: 100%; }
+.fchecks { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; }
+.fbox { display: grid; gap: 4px; padding: 6px 8px; border-left: 3px solid var(--line); } .fbox b { font-size: 12.5px; }
+.phead { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 6px; }
+.phead .verdict { margin: 0; } .phead .verdict small { margin-left: 10px; font-weight: 400; color: var(--muted); font-size: 12px; }
+.proc h3 { font: 700 13px/1.3 var(--serif-zh); margin: 14px 0 6px; } .proc h3 small { font: 400 12px var(--body); color: var(--muted); margin-left: 6px; }
+.route th small { display: block; font-weight: 400; }
+.route td { white-space: nowrap; } .route tr.heat td { color: var(--muted); font-style: italic; } .route tr.bad td:nth-child(2) { color: var(--bad); font-weight: 600; }
+.proc .checks ul { max-height: 520px; overflow: auto; }
+.pnotes { margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: 12px; display: grid; gap: 3px; }
+.sheets .sheet { padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px dashed var(--line); }
+.sheets .sheet h1 { margin-bottom: 2px; } .sheets .blankrow th, .sheets .blankrow td { height: 22px; }
+.sheets .warn { color: var(--bad); font-size: 12.5px; } .sheets .sign { margin-top: 18px; font-size: 13px; white-space: pre-wrap; }
+@media print { .shell > .asm.proc { display: block; padding: 0; } .shell > .asm .edit, .shell > .asm .stage { display: none !important; } .sheets .sheet { break-after: page; border: 0; } .sheets .sheet:last-child { break-after: auto; } }
