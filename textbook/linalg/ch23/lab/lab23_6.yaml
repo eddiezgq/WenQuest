@@ -1,0 +1,26 @@
+# 实验 23.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab23_6.js。
+原理:
+  - ["测量模型 y = f(p, q) + 噪声：f 为 DH 正运动学，p 为 24 个 DH 参数，q 为关节角。在当前参数处线性化，J δp ≈ y − f(p)，用截断 SVD 求修正量，迭代（高斯–牛顿法）。",
+     "Measurement model y = f(p, q) + noise, f the DH forward kinematics, p the 24 DH parameters, q the joint angles. Linearize at the current p, J δp ≈ y − f(p), solve by truncated SVD and iterate (Gauss–Newton)."]
+  - 式: "δp = Σᵢ≤k (uᵢᵀ r / σᵢ) vᵢ          (23.2.2)；  只测位置时 rank J = 18          (23.6.1)"
+  - ["J 有 6 个奇异值几乎为零：只测末端位置时，有 6 个参数组合对测量没有影响（例如末关节的零点和扭角）。把它们对应的奇异值也求逆，修正量会大得荒谬。",
+     "Six singular values of J are nearly zero: with position-only data, six parameter combinations do not affect the measurements (e.g. the last joint's zero offset and twist). Inverting them gives absurd corrections."]
+步骤:
+  - ["N = 50、噪声 0.05 mm：k 取 12、16、18、20、22，分别标定，记录验证误差与最大修正量（表 1，任务 1～3）。",
+     "N = 50, noise 0.05 mm: calibrate with k = 12, 16, 18, 20, 22; record the validation error and the largest correction (Table 1, tasks 1–3)."]
+  - ["k = 18：N 取 10、20、50、100，记录 σ₁₈ 与验证误差（任务 4）。",
+     "k = 18: N = 10, 20, 50, 100; record σ₁₈ and the validation error (task 4)."]
+  - ["k = 18、N = 50：噪声取 0.01、0.05、0.1、0.25 mm，记录验证误差（任务 5）。",
+     "k = 18, N = 50: noise 0.01, 0.05, 0.1, 0.25 mm; record the validation error (task 5)."]
+数据表:
+  - 标题: ["表 1  保留的奇异值个数 k（N = 50、噪声 0.05 mm）", "Table 1  Singular values kept k (N = 50, noise 0.05 mm)"]
+    表头: ["k", "验证误差 / mm", "标定残差 / mm", "最大修正量"]
+    表头英文: ["k", "Validation error / mm", "Calibration residual / mm", "Largest correction"]
+    行: [["12", "", "", ""], ["16", "", "", ""], ["18", "", "", ""], ["20", "", "", ""], ["22", "", "", ""]]
+注意:
+  - ["验证误差是与真实位置比较的，相当于用一台精度高得多的仪器检查；它可以小于测量噪声。",
+     "The validation error compares with true positions, as if checked by a much more accurate instrument; it can be smaller than the measurement noise."]
+  - ["“看不见”的参数组合不影响末端位置，标定后它们保持名义值（最小范数解），不影响使用。",
+     "Unobservable combinations do not affect the tool position; they stay at their nominal values (minimum-norm solution) and do no harm."]
+  - ["读数“接受 / 拒绝”：使残差变大的一步不被接受。k 超过 18 时修正量大得荒谬，每一步都被拒绝，参数停在名义值，“标定后”的误差就等于标定前——这不是“标定没有效果”，而是求出的修正量不能用。收敛以后的几步也可能因为残差不再减小而被拒绝，这是正常的。",
+     "Readout “accepted / rejected”: a step that increases the residual is not accepted. With k above 18 the corrections are absurd, every step is rejected and the parameters stay nominal, so the error “after” equals the error before. This does not mean calibration has no effect; the computed correction is unusable. After convergence, a few steps may also be rejected because the residual no longer decreases; that is normal."]

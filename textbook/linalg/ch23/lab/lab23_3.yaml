@@ -1,0 +1,26 @@
+# 实验 23.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab23_3.js。
+原理:
+  - ["位置是速度的积分：b = Av + 噪声，A = h × 下三角全 1 矩阵。直接求解 v = A⁻¹b 就是逐点差分，噪声被放大约 √2·σ/h 倍：采样越密，放大越厉害。",
+     "Position is the integral of velocity: b = Av + noise, A = h × lower-triangular ones. Solving v = A⁻¹b is point-by-point differencing, which amplifies noise by about √2·σ/h: the finer the sampling, the worse."]
+  - 式: "min ‖Av − b‖² + λ²‖Lv‖²  ⇔  (AᵀA + λ²LᵀL) v = Aᵀb          (23.3.1)、(23.3.2)；  偏差原理：‖Av − b‖ ≈ σ√n          (23.3.4)"
+  - ["λ 太小，解跟着噪声跳；λ 太大，解被惩罚项压扁（L = I 时压向零，L = 一阶差分时压成常数）。L 曲线的拐角和偏差原理是两种不必知道真解的选 λ 方法。",
+     "Too small a λ follows the noise; too large flattens the solution (toward zero for L = I, toward a constant for L = first difference). The L-curve corner and the discrepancy principle choose λ without knowing the truth."]
+步骤:
+  - ["编码器场景、惩罚加速度：log₁₀ λ 取 −7、−5、−4、−3.5、−3、−2、0，记录残差、‖Lv‖、速度误差（表 1，任务 1、2）。",
+     "Encoder, acceleration penalty: log₁₀ λ = −7, −5, −4, −3.5, −3, −2, 0; record residual, ‖Lv‖ and velocity error (Table 1, tasks 1, 2)."]
+  - ["改为惩罚 ‖v‖，重复上一步；比较两种惩罚项能达到的最小误差（任务 3）。",
+     "Switch to penalizing ‖v‖ and repeat; compare the smallest errors the two penalties can reach (task 3)."]
+  - ["噪声倍数取 2、4，用偏差原理重新选 λ，λ 怎样变化？",
+     "Set the noise factor to 2 and 4 and re-choose λ by the discrepancy principle. How does λ change?"]
+  - ["跑步手表场景：完成任务 4。",
+     "Running-watch scene: complete task 4."]
+数据表:
+  - 标题: ["表 1  编码器场景：λ 与误差（惩罚加速度）", "Table 1  Encoder: λ and error (acceleration penalty)"]
+    表头: ["log₁₀ λ", "残差 / rad", "‖Lv‖", "速度误差 / (rad/s)"]
+    表头英文: ["log₁₀ λ", "Residual / rad", "‖Lv‖", "Velocity error / (rad/s)"]
+    行: [["−7", "", "", ""], ["−5", "", "", ""], ["−4", "", "", ""], ["−3.5", "", "", ""], ["−3", "", "", ""], ["−2", "", "", ""], ["0", "", "", ""]]
+注意:
+  - ["速度误差要与真实速度比较，只有在模拟中才能算；实际中只能看残差和 L 曲线。",
+     "The velocity error needs the true velocity and is available only in simulation; in practice only the residual and the L-curve are available."]
+  - ["偏差原理要求知道噪声水平 σ；σ 估错了，λ 也会跟着错。",
+     "The discrepancy principle needs the noise level σ; a wrong σ gives a wrong λ."]
