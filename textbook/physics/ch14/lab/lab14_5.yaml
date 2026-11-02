@@ -1,0 +1,27 @@
+# 实验 14.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_5.js。
+原理:
+  - ["应力 σ = F/A，应变 ε = ΔL/L₀。弹性范围内应力与应变成正比（胡克定律），比例系数就是弹性模量 E：", "Stress σ = F/A, strain ε = ΔL/L₀. In the elastic range they are proportional (Hooke's law), and the constant is Young's modulus E:"]
+  - 式: "σ = Eε，E = F L₀/(A ΔL)        （式 (14.4.3)）"
+  - ["引伸计直接测标距 L₀ = 50.00 mm 内的伸长量，不受夹头打滑和试样两端变形的影响。试样直径 10.00 mm。", "The extensometer measures the extension over the 50.00 mm gauge length directly, unaffected by grip slip or the specimen ends. Specimen diameter 10.00 mm."]
+  - ["没有明显屈服平台的材料用 0.2% 偏移法定屈服强度：从 ε = 0.2% 处作一条斜率为 E 的直线，它与曲线的交点的应力就是 R_p0.2。", "For a material without a clear yield plateau, use the 0.2% offset: draw a line of slope E starting at ε = 0.2%; the stress where it meets the curve is R_p0.2."]
+步骤:
+  - ["方式 0，材料 0（Q235 钢），F 取 2、4、6、8、10 kN，各读一次伸长量，填入表 1。算出 σ 和 ε，作 σ–ε 图，由斜率求 E，提交（任务 1）。", "Mode 0, material 0 (Q235 steel), F = 2, 4, 6, 8, 10 kN; read the extension each time in Table 1. Compute σ and ε, plot σ against ε, find E from the slope and submit (task 1)."]
+  - ["换材料 1（6061-T6 铝），重复，提交（任务 2）。比较两者的斜率。", "Repeat with material 1 (6061-T6 aluminium) and submit (task 2). Compare the slopes."]
+  - ["材料 2（未知），先用方式 0 测 E；再改方式 1 拉断，拖动“查看应变”，在小图中找出曲线与 0.2% 偏移线的交点，求屈服强度，提交（任务 3）。", "Material 2 (unknown): first measure E in mode 0; then pull it to fracture in mode 1, drag “Read strain” and find where the curve meets the 0.2% offset line in the small plot; submit the yield strength (task 3)."]
+  - ["三种材料都拉断一次，记下最大力、抗拉强度和断后伸长率，填入表 2。", "Pull all three to fracture once and record the maximum force, tensile strength and elongation at break in Table 2."]
+数据表:
+  - 标题: ["表 1  弹性段（d = 10.00 mm，L₀ = 50.00 mm）", "Table 1  Elastic range (d = 10.00 mm, L₀ = 50.00 mm)"]
+    表头: ["材料", "F / kN", "ΔL / mm", "σ / MPa", "ε / 10⁻⁴", "E / GPa"]
+    表头英文: ["Material", "F / kN", "ΔL / mm", "σ / MPa", "ε / 10⁻⁴", "E / GPa"]
+    行: [["Q235", "2", "", "", "", ""], ["Q235", "6", "", "", "", ""], ["Q235", "10", "", "", "", ""], ["6061-T6", "2", "", "", "", ""], ["6061-T6", "6", "", "", "", ""], ["6061-T6", "10", "", "", "", ""]]
+  - 标题: ["表 2  拉到断", "Table 2  Pulled to fracture"]
+    表头: ["材料", "最大力 / kN", "抗拉强度 / MPa", "屈服强度 / MPa", "断后伸长率 / %"]
+    表头英文: ["Material", "Max force / kN", "Tensile strength / MPa", "Yield strength / MPa", "Elongation / %"]
+    行: [["Q235", "", "", "", ""], ["6061-T6", "", "", "", ""], ["未知", "", "", "", ""]]
+注意:
+  - ["材料的典型值取自数字工厂的材料库，这批试样的实测值会略有不同，以测量为准；曲线形状是教学模型。力读数带 ±5 N、伸长量带 ±0.0005 mm 以内的误差。", "Typical values come from the digital factory's materials library; this batch differs slightly, so trust your measurements. The curve shapes are a teaching model. Force readings carry errors up to ±5 N, extensions up to ±0.0005 mm."]
+  - ["方式 0 只在弹性范围内有意义：超过屈服后读数不再与力成正比。", "Mode 0 only makes sense in the elastic range: past yield the extension is no longer proportional to the force."]
+思考题:
+  - ["同样重的拉杆，钢和铝哪个伸长得少（比较 E/ρ）？", "For tie rods of equal weight, which stretches less, steel or aluminium (compare E/ρ)?"]
+  - ["与 Q235 比，未知材料的弹性模量和强度各怎样？它可能是什么钢？", "Compared with Q235, how do the unknown's modulus and strengths compare? What steel might it be?"]
+  - ["为什么设计时用屈服强度而不是抗拉强度作为强度的上限？", "Why do designers use the yield strength, not the tensile strength, as the limit?"]

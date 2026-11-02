@@ -2,3 +2,7 @@
 outline: docs/教材/大学物理/00_提纲.md
 title: 大学物理
 title_en: University Physics
+# 程序读到的书外文件（缓存键要包含它们，改了就重算）：第 14 章读数字工厂的材料库
+program_deps:
+  - factory/digital/cae/materials.py
+  - factory/digital/cae/__init__.py

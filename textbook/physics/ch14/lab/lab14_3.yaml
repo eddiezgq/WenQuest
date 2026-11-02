@@ -1,0 +1,30 @@
+# 实验 14.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab14_3.js。
+原理:
+  - ["刚体静止的条件：合力为零，对任何一点的合力矩为零。平面问题有三个独立的方程。", "A rigid body at rest: the net force is zero and the net torque about any point is zero. A planar problem gives three independent equations."]
+  - 式: "ΣF_x = 0，ΣF_y = 0，ΣM = 0        （式 (14.1.1)、(14.1.2)）"
+  - ["移动机械臂：前、后轮支持力之和等于总重；对后轮接地点取矩可求前轮支持力。后轮支持力降到零时，整车开始绕前轮倾覆。", "Mobile manipulator: the front and rear wheel loads add up to the total weight; taking torques about the rear contact gives the front load. When the rear load falls to zero the robot starts to tip about the front wheels."]
+  - ["由称重读数求重心：x_c = (N_前 x_前 + N_后 x_后)/(N_前 + N_后)。从整车的重心中扣除机械臂和负载的贡献，就得到底盘的重心。", "Centre of gravity from scale readings: x_c = (N_f x_f + N_r x_r)/(N_f + N_r). Remove the arm's and payload's share from the whole robot to get the base's centre of gravity."]
+  - ["关节静力矩：把关节以外的部分“切”下来，对关节取矩。", "Static joint torque: cut off everything beyond the joint and take torques about the joint."]
+  - ["梯子靠在光滑的墙上：墙只给水平支持力 P，地面给支持力 N 和摩擦力 f = P。对梯脚取矩求 P；不滑的条件 P ≤ μ_s N。", "Ladder against a smooth wall: the wall gives only a horizontal push P; the floor gives N and friction f = P. Take torques about the foot for P; no slip requires P ≤ μ_s N."]
+步骤:
+  - ["选“移动机械臂”，r = 0.50 m，负载 m = 0、5、10 kg 各做一次，记下前、后轮支持力和两个关节的静力矩，填入表 1。核对：前后之和是否等于总重？关节力矩与你的计算是否一致？",
+     "Choose “Mobile manipulator”, r = 0.50 m, and run m = 0, 5 and 10 kg; record both wheel loads and both joint torques in Table 1. Check: do the wheel loads add up to the total weight? Do the joint torques match your calculation?"]
+  - ["由称重读数求底盘的质量和重心的 x 坐标（cm），调到“你的结果”，提交（任务 1）。", "From the readings find the base's mass and the x coordinate of its centre of gravity (cm); set it as “Your result” and submit (task 1)."]
+  - ["r = 0.90 m 时，分别算出不倾覆的最大负载和肩关节不超过 200 N·m 的最大负载，取小者；用实验验证（负载调到这个值附近看后轮读数），提交（任务 2）。", "At r = 0.90 m work out the largest payload before tipping and the largest before the shoulder exceeds 200 N·m; take the smaller, check it in the lab (set the payload near this value and watch the rear reading), and submit (task 2)."]
+  - ["选“梯子”，θ = 60°，人从 1.5 m 起每次往上 0.05 m，找出梯子开始滑动的位置 s；由力矩平衡求地面的 μ_s，再换 θ = 65° 验证，提交（任务 3）。θ = 70° 时人爬到顶也不滑，说明什么？", "Choose “Ladder”, θ = 60°, and move the climber up 0.05 m at a time from 1.5 m until the ladder slips; from torque balance find μ_s, check with θ = 65°, and submit (task 3). At θ = 70° it never slips even at the top: what does that tell you?"]
+数据表:
+  - 标题: ["表 1  移动机械臂（r = 0.50 m）", "Table 1  Mobile manipulator (r = 0.50 m)"]
+    表头: ["m / kg", "前轮 / N", "后轮 / N", "合计 / N", "肩 / (N·m)", "肘 / (N·m)"]
+    表头英文: ["m / kg", "Front / N", "Rear / N", "Total / N", "Shoulder / (N·m)", "Elbow / (N·m)"]
+    行: [["0", "", "", "", "", ""], ["5", "", "", "", "", ""], ["10", "", "", "", "", ""]]
+  - 标题: ["表 2  梯子", "Table 2  Ladder"]
+    表头: ["θ / (°)", "开始滑动的 s / m", "墙的支持力 P / N", "μ_s"]
+    表头英文: ["θ / (°)", "s where it slips / m", "Wall force P / N", "μ_s"]
+    行: [["60", "", "", ""], ["65", "", "", ""]]
+注意:
+  - ["称重读数带有 ±0.5 N 以内的误差。g 取 9.81 m/s²。", "Scale readings carry errors up to ±0.5 N. Use g = 9.81 m/s²."]
+  - ["机械臂看成 12 kg 的均匀杆，肘关节在杆的中点。", "The arm is treated as a uniform 12 kg rod with the elbow at its midpoint."]
+思考题:
+  - ["伸出距离不同时，先限制负载的是倾覆还是关节力矩？", "At different reaches, which limit bites first: tipping or the joint torque?"]
+  - ["机器人加速或制动时，倾覆条件会怎样变（第 7 章）？", "How does the tipping condition change when the robot accelerates or brakes (Chapter 11)?"]
+  - ["梯子越陡越不容易滑，为什么实际使用时也不能太陡？", "A steeper ladder slips less: why shouldn't it be too steep either?"]
