@@ -15,6 +15,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from bearingkit import assembly as AS
 from bearingkit.analyze import analyse
 
 HERE = Path(__file__).parent
@@ -82,6 +83,22 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^scenario: the joint axis is horizontal or vertical$", "应用场景：关节轴线是水平或竖直"),
 ]
 
+
+ERR_ZH += [  # selective assembly (step 5)
+    (r"^give the number of balls per bearing", "请填每套轴承的钢球数（至少 3）"),
+    (r"^give the required clearance range$", "请填要求的游隙范围"),
+    (r"^the clearance range: the largest is above the smallest$", "游隙范围：上限要大于下限"),
+    (r"^give the measured inner rings$", "请填内圈实测数据"),
+    (r"^give the measured outer rings$", "请填外圈实测数据"),
+    (r"^give the ball groups$", "请填钢球分组"),
+    (r"^(inner|outer) rings: line (\d+) has no diameter$", r"第 \2 行没有沟道直径（\1）"),
+    (r"^(inner|outer) rings: the numbers repeat$", r"编号重复（\1）"),
+    (r"^at most (\d+) (inner|outer) rings in one run$", r"一次最多 \1 个（\2）"),
+    (r"^ball groups: line (\d+) needs", r"钢球分组第 \1 行要有直径和数量"),
+    (r"^the class width is more than 0$", "分组间隔要大于 0"),
+    (r"^the selective assembly found no answer in time", "这一批算不出来：请分成小批"),
+    (r"^between 2 and (\d+) rings$", r"合成数据的套圈数在 2 到 \1 之间"),
+]
 
 SCN_ZH = {  # scenario field names in the Chinese messages
     "mn": "法向模数 mn",
@@ -176,6 +193,27 @@ def example(eid: str):
 async def analyse_ep(request: Request):
     p = await project_of(request)
     return run(lambda: analyse(p))
+
+
+@app.post("/api/assembly")
+async def assembly_ep(request: Request):
+    """Selective assembly of measured rings and ball groups (round 64, step 5)."""
+    p = await project_of(request)
+    return run(lambda: AS.run(p))
+
+
+@app.post("/api/assembly/synthetic")
+async def assembly_synth(request: Request):
+    """Synthetic measured data around a design, for trying the tool; marked synthetic."""
+    p = await project_of(request)
+
+    def make():
+        n = int(p.get("n") or 100)
+        if not 2 <= n <= AS.MAX_PARTS:
+            raise ValueError(f"between 2 and {AS.MAX_PARTS} rings")
+        return AS.synthetic(n, float(p["di"]), float(p["do"]), float(p["Dw"]), int(p["Z"]), int(p.get("seed") or 1))
+
+    return run(make)
 
 
 if WEB.is_dir():

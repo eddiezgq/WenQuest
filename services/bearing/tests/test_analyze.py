@@ -128,3 +128,12 @@ def test_angular_groove_bottoms():
     A = (0.52 + 0.53 - 1) * 9
     assert g["do"] - g["di"] - 2 * 9 == pytest.approx(2 * A * (1 - math.cos(math.radians(25))))
     assert g["di"] < 54 - 9 and g["do"] > 54 + 9
+
+
+def test_assembly_api():
+    s = client.post("/api/assembly/synthetic", json={"project": {"n": 30, "di": 35.5, "do": 52.52, "Dw": 8.5, "Z": 10}})
+    assert s.status_code == 200 and s.json()["synthetic"]
+    r = client.post("/api/assembly", json={"project": {**s.json(), "P_min": 0.012, "P_max": 0.024}})
+    assert r.status_code == 200 and r.json()["piecewise"]["count"] > 0
+    e = client.post("/api/assembly", json={"project": {**s.json(), "P_min": 0.02, "P_max": 0.01}})
+    assert e.status_code == 422 and e.json()["detail"]["zh"] == "游隙范围：上限要大于下限"

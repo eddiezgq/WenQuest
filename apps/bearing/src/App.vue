@@ -14,10 +14,12 @@ import Checks from './components/Checks.vue'
 import Extras from './components/Extras.vue'
 import ScenarioPanel from './components/ScenarioPanel.vue'
 import Report from './components/Report.vue'
+import Assembly from './components/Assembly.vue'
 
 const examples = ref([])
 const pick = ref('')
 const showReport = ref(false)
+const mode = ref(new URLSearchParams(location.search).get('mode') === 'assembly' ? 'assembly' : 'design')
 const fileInput = ref(null)
 const q = new URLSearchParams(location.search)
 const embed = q.has('embed')  // shown inside the product page: no file buttons
@@ -61,6 +63,9 @@ onMounted(async () => {
     <header class="top">
       <a class="brand" href="/"><b>{{ t('app') }}</b><small>{{ t('tagline') }}</small></a>
       <input v-model="title" class="title" :placeholder="t('untitled')" :aria-label="t('title')">
+      <nav class="modes" :aria-label="t('modeDesign')">
+        <button v-for="m in ['design', 'assembly']" :key="m" type="button" class="dark" :class="{ on: mode === m }" :aria-pressed="mode === m" @click="mode = m">{{ t(m === 'design' ? 'modeDesign' : 'modeAsm') }}</button>
+      </nav>
       <div class="tools">
         <select v-model="pick" class="dark" :aria-label="t('examples')" @change="openExample(pick)">
           <option value="">{{ t('examples') }}</option>
@@ -75,7 +80,8 @@ onMounted(async () => {
       </div>
     </header>
 
-    <main class="work">
+    <Assembly v-if="mode === 'assembly'" />
+    <main v-show="mode === 'design'" class="work">
       <aside class="edit">
         <div class="pane"><Fields /></div>
         <p class="saved">{{ t('savedLocal') }}</p>
