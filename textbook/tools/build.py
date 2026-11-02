@@ -457,18 +457,20 @@ def _sha(p: Path) -> str:
         return ""
 
 
-def run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") -> dict[str, dict]:
+def run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh", only: set[str] | None = None,
+                 fresh: bool = False) -> dict[str, dict]:
     t0 = time.perf_counter()
     try:
-        return _run_programs(book, chapters, rep, lang)
+        return _run_programs(book, chapters, rep, lang, only, fresh)
     finally:
         k = "跑算例程序" + ("（英文版）" if lang == "en" else "")
         TIMES[k] = TIMES.get(k, 0) + time.perf_counter() - t0
 
 
-def _run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh") -> dict[str, dict]:
+def _run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh", only: set[str] | None = None,
+                  fresh: bool = False) -> dict[str, dict]:
     """Runs every program of these chapters; lang "en" runs them for the English edition (English figure labels and
-    text values, figures in figs/en/)."""
+    text values, figures in figs/en/). ``only`` limits it to these programs; ``fresh`` ignores the cache."""
     values: dict[str, dict] = {}
     cache = book["root"].parent / "build" / book["book"] / ("values" if lang == "zh" else "values-en")
     cache.mkdir(parents=True, exist_ok=True)
@@ -490,11 +492,13 @@ def _run_programs(book: dict, chapters: set[str], rep: Report, lang: str = "zh")
                 p = ROOT / "factory" / "digital" / rel
                 shared += p.read_bytes() if p.exists() else b""
         for prog in sorted(p for p in code.glob("*.py") if not p.name.startswith("_")):
+            if only is not None and prog.stem not in only:
+                continue
             where = str(prog.relative_to(book["root"].parent))
             digest = hashlib.sha256(prog.read_bytes() + shared + (TOOLS / "bookout.py").read_bytes() + lang.encode()).hexdigest()[:16]
             hit = cache / f"{prog.stem}.{digest}.json"
             deps_f = cache / f"{prog.stem}.{digest}.deps"          # 第 60 轮：这个程序上次读过的书外文件和它们的散列
-            if hit.exists() and deps_f.exists() and not os.environ.get("WQ_NO_CACHE"):
+            if hit.exists() and deps_f.exists() and not fresh and not os.environ.get("WQ_NO_CACHE"):
                 recorded = json.loads(deps_f.read_text(encoding="utf-8"))
                 if all(_sha(ROOT / rel) == h for rel, h in recorded.items()):
                     values[prog.stem] = json.loads(hit.read_text(encoding="utf-8"))
@@ -1143,6 +1147,13 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         rep.add(level, "实测", where, text)
     en_chapters = {s.chapter for s in sections_en}
     values_en = run_programs(book, en_chapters, rep, "en") if en_chapters else {}
+    # 两种语言的结果一边取自缓存、一边现算时，可能来自两台机器（CI 的缓存是别的运行存的，被取消的运行只存了一半），
+    # 浮点末位不同、迭代步数跟着变（第 72 轮：ex7_2 等在 CI 反复报“英文版数值不同”）。对不上的程序在本机两种语言都重算一次再比。
+    bad = {prog for prog, v in values_en.items() if english.same_values(values.get(prog, {}), v, prog)}
+    if bad:
+        chs = {ch for ch in en_chapters if any((book["root"] / chdir(ch) / "code" / f"{p}.py").exists() for p in bad)}
+        values.update(run_programs(book, chs, rep, "zh", only=bad, fresh=True))
+        values_en.update(run_programs(book, chs, rep, "en", only=bad, fresh=True))
     for prog, v in values_en.items():
         for why in english.same_values(values.get(prog, {}), v, prog):
             rep.add("error", "程序", "英文版", why)
