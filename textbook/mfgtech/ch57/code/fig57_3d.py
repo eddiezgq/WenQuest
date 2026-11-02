@@ -19,13 +19,13 @@ R.figure3d("fig57_0_2", a, 1300, 600, camera=CAM, fontSize=18,
                    {"at": an["齿轮"], "text": "齿顶圆 Ø52 h11（到尺寸）", "style": "text", "pos": [0.62, 0.1]},
                    {"at": an["右轴承位"], "text": "总长 136 ± 0.05，8 ± 0.05", "style": "text", "pos": [0.8, 0.9]}])
 
-# ---- 图 57.1.4：余量一层层（右半轴，剖开；各层径向放大 3 倍画出，不按比例）
+# ---- 图 57.1.3：余量一层层（右半轴，剖开；各层径向放大 3 倍画出，不按比例）
 A = C.Assembly("余量")
 layers = [("棒料", 30.0, "#b9b2a6"), ("粗车后", 20.0, "#8aa4bd"), ("半精车后", 16.0, "#3a7dc9"), ("磨后", 12.5, "#d98c3a")]
 for i, (n, r, col) in enumerate(layers):
     A.add(C.Part(n, S.cyl("x", (0, 0), r, 0 + i * 12, 70), col))
 panels = [R.render_png(A, 1100, 560, camera={"dir": [0.55, -1.0, 0.6]}, section=((0, 0, 0), (0, 0, 1)))]
-R.compose("fig57_1_4", panels, cols=1, titles=["从棒料到磨后：一层层切掉的余量（剖开；各层厚度放大画出）"])
+R.compose("fig57_1_3", panels, cols=1, titles=["从棒料到磨后：一层层切掉的余量（剖开；各层厚度放大画出）"])
 
 # ---- 图 57.4.2：各工序的装夹与刀具（示意）
 panels, titles = [], []

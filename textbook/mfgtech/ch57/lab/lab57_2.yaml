@@ -1,0 +1,22 @@
+# 实验 57.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab57_2.js。
+原理:
+  - ["工序尺寸从最后一道往前推：前一道尺寸不小于后一道的最大尺寸、后一道所需的最小余量与前一道公差之和，往大取整，按入体原则标注；再按两道的公差核算余量的最小值和最大值。", "Work back from the last operation: previous size ≥ next maximum + next minimum stock + previous tolerance; round up, tolerance into the material, then check minimum and maximum stock."]
+  - 式: "2Z_min = (A_前 − T_前) − A_本，2Z_max = A_前 − (A_本 − T_本)        (57.1.2)"
+  - 式: "2Z_min,所需 = 2(Rz + Hₐ) + 2√(ρ² + ε²)        (57.1.3)"
+  - 式: "A_前 ≥ A_本,max + 2Z_本,min + T_前        (57.2.1)"
+步骤:
+  - ["场景 SH-101 轴承位：把半精车尺寸调小，看磨削余量的最小值低于所需值（任务 1）。", "Bearing seat: shrink the semi size until the grinding stock is too small (task 1)."]
+  - ["把半精车公差改为 IT7，读提示（任务 2）。", "Set the semi grade to IT7 and read the note (task 2)."]
+  - ["渗碳淬火变形 ρ 取 0.15 mm，重新调尺寸使全部核算通过，记入表 1（任务 3）。", "With ρ = 0.15 mm re-fix the sizes until all checks pass; Table 1 (task 3)."]
+  - ["ρ 取 0.10 mm，调出磨削余量最大值不超过 0.40 mm 的一组尺寸，与工艺规程比较（任务 4）。", "With ρ = 0.10 find sizes with grinding stock ≤ 0.40 mm; compare with the plan (task 4)."]
+数据表:
+  - 标题: ["表 1  工序尺寸与余量", "Table 1  Operation sizes and stock"]
+    表头: ["情况", "ρ / mm", "半精车 A₂", "粗车 A₁", "磨削余量 min–max", "半精车余量 min–max", "结论"]
+    表头英文: ["Case", "ρ / mm", "Semi A₂", "Rough A₁", "Grinding stock", "Semi stock", "Result"]
+    行: [["余量不够", "0.10", "", "", "", "", ""], ["IT7 半精车", "0.10", "", "", "", "", ""], ["变形 0.15", "0.15", "", "", "", "", ""], ["最小磨量", "0.10", "", "", "", "", ""]]
+    行英文: [["Too small", "0.10", "", "", "", "", ""], ["IT7 semi", "0.10", "", "", "", "", ""], ["ρ 0.15", "0.15", "", "", "", "", ""], ["Least grinding", "0.10", "", "", "", "", ""]]
+注意:
+  - ["余量分量是企业工艺标准 WQ-PS-01 的教学示意值，不是国家标准；渗碳淬火的变形以实测为准。", "Stock components are teaching values of the enterprise standard WQ-PS-01; measure the real distortion."]
+思考题:
+  - ["为什么渗碳件的磨削余量既不能太小，也不能太大？", "Why must the grinding stock on a carburized part be neither too small nor too large?"]
+  - ["把半精车做得更准（公差更小），磨削余量能少留多少？代价是什么？", "How much less grinding stock if semi-finishing is more accurate, and at what cost?"]

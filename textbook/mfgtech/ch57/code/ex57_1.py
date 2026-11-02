@@ -1,6 +1,6 @@
 """算例 57.1.1、57.1.2：SH-101 的最小余量（分析计算法，式 57.1.3）与棒料直径。
 57.1.1 三次切削的最小余量各由什么组成：热轧圆钢 → 粗车、粗车 → 半精车、半精车 + 渗碳淬火 → 磨削（企业工艺标准 WQ-PS-01，示意值）；
-57.1.2 由齿顶圆 Ø52 推出需要的棒料直径，与工厂现用的 Ø60 比较（多用的材料与粗车工时）。画图 57.1.2、57.1.3。"""
+57.1.2 由齿顶圆 Ø52 推出需要的棒料直径，与工厂现用的 Ø60 比较（多用的材料与粗车工时）。画图 57.1.2、57.1.5。"""
 import math
 
 import _calc57 as C
@@ -52,7 +52,7 @@ for d, col, lab in ((bar["pick"], M.GREEN, T(f"够用的圆钢 Ø{bar['pick']}",
     ax.text(d + 0.3, 0 if d == 60 else 0.45, lab, va="center", fontsize=7, color=col)
 ax.set_xlim(48, 64); ax.set_ylim(-0.3, 1.8); ax.set_yticks([]); ax.set_xlabel(T("直径 / mm", "diameter / mm"))
 ax.axvline(bar["need"], color=M.INK, ls="--", lw=0.7); ax.text(bar["need"] + 0.15, 0.72, f"≥ {bar['need']:.2f}", ha="left", fontsize=7)
-figure(fig, "fig57_1_3")
+figure(fig, "fig57_1_5")
 
 out(**{f"z_{i}": c["z"] for i, c in enumerate(comp)}, **{f"geo_{i}": c["geo"] for i, c in enumerate(comp)},
     rz_rough=C.WQ_PS_01["粗车"][0], ha_rough=C.WQ_PS_01["粗车"][1], rho_rough=C.WQ_PS_01["粗车"][2],

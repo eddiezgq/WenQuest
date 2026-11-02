@@ -1,0 +1,19 @@
+# 实验 57.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab57_5.js。
+原理:
+  - ["切削用量按 ap → f → vc 的次序确定：ap 按余量，f 粗加工受力与功率限制、精加工受粗糙度限制，vc 按刀具寿命；再校核功率、让刀、粗糙度和寿命。几个条件在 f–vc 平面上围出可行域，在里面选机动时间短的点。", "Choose ap, then f (force/power or Ra), then vc (tool life); check power, deflection, Ra and life. The constraints bound a feasible region in the f–vc plane."]
+  - 式: "Ra ≈ 0.0321 f²/r；F_c = k_c1.1·b·h^(1−m_c)，P_c = F_c v_c / 60 000；v_c T^0.25 f^0.35 = C"
+  - 式: "让刀：2·F_p·[((L−x)/L)²/k_头 + (x/L)²/k_尾 + 1/k_刀 + x²(L−x)²/(3EIL)]；t_b = Lπd/(1000 v_c f)"
+步骤:
+  - ["场景半精车：从工艺规程的点（f 0.15、vc 150）出发，在可行域里找机动时间不超过 0.065 min 的点（任务 1），记入表 1。", "Semi: from the plan point, find a feasible point with t_b ≤ 0.065 min (task 1); Table 1."]
+  - ["Ra 要求改为 1.6，找 f 的最大值（任务 2）；再换刀尖圆弧 0.8（任务 4）。", "Set Ra 1.6 and find the largest f (task 2); then r = 0.8 (task 4)."]
+  - ["场景粗车：ap 加到 6 mm，读功率（任务 3）。", "Rough: ap 6 mm, read the power (task 3)."]
+数据表:
+  - 标题: ["表 1  切削用量与校核", "Table 1  Cutting data and checks"]
+    表头: ["情况", "ap", "f", "vc", "r", "Ra / µm", "让刀 / µm", "寿命 / min", "功率 / kW", "t_b / min"]
+    表头英文: ["Case", "ap", "f", "vc", "r", "Ra", "deflection", "life", "power", "t_b"]
+    行: [["工艺规程", "0.55", "0.15", "150", "0.4", "", "", "", "", ""], ["最快的点", "0.55", "", "", "0.4", "", "", "", "", ""], ["Ra 1.6", "0.55", "", "", "0.4", "", "", "", "", ""], ["r 0.8", "0.55", "", "", "0.8", "", "", "", "", ""], ["粗车 ap 6", "6", "0.3", "120", "0.8", "", "", "", "", ""]]
+    行英文: [["Plan", "0.55", "0.15", "150", "0.4", "", "", "", "", ""], ["Fastest", "0.55", "", "", "0.4", "", "", "", "", ""], ["Ra 1.6", "0.55", "", "", "0.4", "", "", "", "", ""], ["r 0.8", "0.55", "", "", "0.8", "", "", "", "", ""], ["Rough ap 6", "6", "0.3", "120", "0.8", "", "", "", "", ""]]
+注意:
+  - ["单位切削力按 C45E 近似（表中没有 20CrMnTi），刀具寿命常数按刀具卡的寿命标定，都是示意值；理论 Ra 只计残留面积，实际偏大。", "Specific force approximated by C45E; tool-life constant calibrated to the tool card; theoretical Ra ignores BUE and vibration."]
+思考题:
+  - ["为什么精加工的进给量受粗糙度限制、粗加工受功率和刚度限制？", "Why is finishing feed limited by Ra and roughing feed by power and stiffness?"]

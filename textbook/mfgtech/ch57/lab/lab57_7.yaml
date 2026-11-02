@@ -1,0 +1,19 @@
+# 实验 57.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab57_7.js。
+原理:
+  - ["工艺成本分可变费用 V（与产量成正比）和不变费用 S（每年固定）。单件成本 C = V + S/N，年成本 E = VN + S；两方案年成本相等的产量是临界年产量；多投资的方案每年省下的成本收回多出的投资所需的年数是投资回收期。比较时还要看瓶颈的负荷和技术风险。", "Variable cost V and fixed cost S; C = V + S/N, E = VN + S; break-even volume and payback; also bottleneck load and risk."]
+  - 式: "N_c = (S_A − S_B)/(V_B − V_A)        (57.7.2)"
+  - 式: "τ = (K_A − K_B)/(E_B − E_A)        (57.7.3)"
+步骤:
+  - ["其余不变，调年产量，找出临界年产量（任务 1），记入表 1。", "Vary N to find the break-even volume (task 1); Table 1."]
+  - ["年产 3.5 万件，降低 A 的投资，找出 5 年回收的投资（任务 2）。", "At 35 000/yr lower A's investment until payback ≤ 5 yr (task 2)."]
+  - ["增大年产量，找出 B 的磨床跟不上需求节拍的年产量（任务 3）。", "Raise N until B's grinder falls behind (task 3)."]
+数据表:
+  - 标题: ["表 1  两方案比较", "Table 1  Comparison"]
+    表头: ["N / 件", "K_A", "C_A / 元", "C_B / 元", "E_A − E_B / 元", "τ / 年", "B 磨床负荷 / min", "需求节拍 / min"]
+    表头英文: ["N", "K_A", "C_A", "C_B", "E_A − E_B", "τ", "B grinder", "takt"]
+    行: [["20000", "350000", "", "", "", "", "", ""], ["", "350000", "", "", "", "", "", ""], ["35000", "", "", "", "", "", "", ""]]
+    行英文: [["20000", "350000", "", "", "", "", "", ""], ["", "350000", "", "", "", "", "", ""], ["35000", "", "", "", "", "", "", ""]]
+注意:
+  - ["数控车床、磨床的费率取工厂数据；投资、维护、CBN 刀片费和硬车工时是示意值。", "Rates are factory data; investments, maintenance, CBN cost and hard-turning time are illustrative."]
+思考题:
+  - ["成本最低的方案一定是最好的吗？举出算例里没有计入、却会改变选择的两个因素。", "Is the cheapest route always best? Name two factors left out that would change the choice."]
