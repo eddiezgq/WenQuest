@@ -211,7 +211,7 @@ def same_values(zh: dict, en: dict, prog: str) -> list[str]:
         out.append(f"{prog}.py 两种语言交出的结果项不同：{sorted(set(zh) ^ set(en))}")
     for k in set(zh) & set(en):
         if not _num_equal(zh[k], en[k]):
-            out.append(f"{prog}.py 的 {k} 在英文版运行时数值不同（数字不能随语言变化）")
+            out.append(f"{prog}.py 的 {k} 在英文版运行时数值不同（数字不能随语言变化）：中文版 {str(zh[k])[:60]}，英文版 {str(en[k])[:60]}")
     return out
 
 
@@ -219,7 +219,9 @@ def _num_equal(a, b) -> bool:
     if isinstance(a, bool) or isinstance(b, bool):
         return a == b
     if isinstance(a, (int, float)) and isinstance(b, (int, float)):
-        return a == b or (math.isfinite(a) and math.isfinite(b) and abs(a - b) <= 1e-12 * max(1.0, abs(a)))
+        # 两次运行（中文版、英文版）在同一台机器上也可能差最后几位：多线程的线性代数库求和顺序不同，经 acos、长时间积分等放大。
+        # 书里的数字最多印六七位有效数字，所以按相对 1e-9 比（2026-11-02 Eddie 定：放宽比对，不改程序；第 13 轮 12.9）。
+        return a == b or (math.isfinite(a) and math.isfinite(b) and abs(a - b) <= 1e-9 * max(abs(a), abs(b)) + 1e-15)
     if isinstance(a, list) and isinstance(b, list):
         return len(a) == len(b) and all(_num_equal(x, y) for x, y in zip(a, b))
     if isinstance(a, dict) and isinstance(b, dict):
