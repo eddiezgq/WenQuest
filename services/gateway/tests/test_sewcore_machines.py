@@ -56,7 +56,10 @@ def test_cover_textbook_example():
     assert sum(x["cones"] for x in pl) == 13
     pl = cover.analyze({"stitch": "401", "spc": 4, "t": 2.4, "nr": 2, "Lcm": 60})["plan"]
     assert [round(x["meters"]) for x in pl] == [2231, 2285, 2231, 2285]
-    assert r["ok"] and r["view"]["sync"] == "ST"
+    # 第 73 轮：样机是三维模型 10-1（线迹、针距、弯针参数一起同步），弯针动画（实验 10-1）是第二个视图
+    assert r["ok"] and r["view"]["page"] == "model-cover" and r["view"]["sync"] == "setCfg"
+    assert r["view"]["cfg"]["stitch"] == "406" and r["view"]["cfg"]["g"] == 4.0 and r["view"]["cfg"]["dphi"] == 0
+    assert r["view"]["alt"] == {"page": "looper", "sync": "ST", "cfg": {"dphi": 0, "dz": 0, "e": 1.0, "gap": 0.03, "rr": 3.2}}
 
 
 def test_every_machine_gives_the_common_fields():

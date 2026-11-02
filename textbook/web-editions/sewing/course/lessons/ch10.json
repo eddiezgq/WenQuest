@@ -684,6 +684,115 @@
    ]
   },
   {
+   "id": "model-cover",
+   "no": "M10-1",
+   "title": [
+    "绷缝机三维样机",
+    "3D coverstitch machine prototype"
+   ],
+   "goal": [
+    [
+     "在三维模型中认出一排针、弯针、撑线器和差动送布牙，以及弯针的左右摆动和避针两套机构。",
+     "Identify the row of needles, the looper, the spreader and the differential feed dogs in 3D, and the two mechanisms that swing the looper and make it avoid the needle."
+    ],
+    [
+     "看清弯针从右往左依次钩住各根针的线环，理解多针时为什么以最右一根针为基准。",
+     "See the looper catch the loops of the needles one after another from right to left, and why the rightmost needle is the reference when there are several."
+    ],
+    [
+     "把弯针定时、高低调出窗口，在模型里找到标红的部件和出问题的转角，与实验 10-1 的判据对照。",
+     "Move the looper timing or height out of the window, find the part that turns red and the shaft angle where it fails, and compare with the criteria of Lab 10-1."
+    ]
+   ],
+   "theory": [
+    [
+     "针杆、弯针运动和五条判据与实验 10-1、10.4 节一致：针杆行程 31 mm，弯针左右行程 30 mm、前后避针按简谐运动近似，刀尖走扁椭圆。",
+     "Needle-bar motion, looper motion and the five criteria are those of Lab 10-1 and Section 10.4: 31 mm needle-bar stroke, 30 mm looper stroke and harmonic needle avoidance, so the point traces a flat ellipse."
+    ],
+    [
+     "基准针是最右一根，回退量、间隙都从它量起；其余各针在它左边，弯针去程依次经过，钩线时刻越往左越晚（标准设置、针距 5.6 mm 时约 214°、229°、242°）。",
+     "The reference is the rightmost needle; retraction and clearance are measured from it. The other needles lie to its left and are reached later on the looper’s stroke (about 214°, 229° and 242° at standard settings with a 5.6 mm gauge)."
+    ],
+    [
+     "602、605 有撑线器，在布面上方 8 mm 左右摆动（行程 17.5 mm），把覆盖线铺到各针之间；机构尺寸和外壳为示意。",
+     "602 and 605 have a spreader that swings 8 mm above the fabric (17.5 mm stroke) to lay the cover thread across the needles; mechanism dimensions and the housing are illustrative."
+    ]
+   ],
+   "steps": [
+    [
+     "打开模型 10-1，选“外观”“斜视”，拖动旋转、滚轮缩放，找到针夹上的针、针板下的弯针和右侧的手轮。",
+     "Open Model 10-1, choose “Exterior” and the oblique view; rotate and zoom to find the needles in the clamp, the looper under the plate and the handwheel."
+    ],
+    [
+     "选“爆炸”，拖动“拆开程度”，按“部件分组”的颜色找出引线、弯针、撑线器、送布、轴五组，记下弯针的摆杆、球头连杆和避针偏心。",
+     "Choose “Exploded” and drag the separation slider; find the five colour groups and note the looper rocker, ball-jointed rod and avoidance eccentric."
+    ],
+    [
+     "线迹依次选 401、406、407、602、605，数针数，看撑线器什么时候出现。",
+     "Select 401, 406, 407, 602 and 605 in turn; count the needles and note when the spreader appears."
+    ],
+    [
+     "选 605、“成缝区特写”，按“钩线时刻”和“针到弯针高度”，把读数面板上的转角、针尖高度、弯针尖位置填入记录表。",
+     "Choose 605 and the close-up view; press “catching” and “needle at looper height” and record the angle, needle height and looper position."
+    ],
+    [
+     "按“播放”、速度“很慢”，看弯针从右往左依次钩住三根针的线环、撑线器把覆盖线铺过去。",
+     "Press Play at “very slow” and watch the looper catch the three loops from right to left while the spreader lays the cover thread."
+    ],
+    [
+     "把“弯针定时”推迟到 +14°，再把“弯针高低”降到 −1.5 mm，每次按“出问题的转角”，记录判定、标红的部件和转角。",
+     "Retard the looper timing to +14°, then lower the looper by 1.5 mm; each time press “failing angle” and record the verdict, the red part and the angle."
+    ],
+    [
+     "按“恢复标准”，确认判定回到“能正常成缝”。",
+     "Press Reset to standard and confirm the verdict returns to “sews normally”."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "关键时刻与故障记录",
+     "Key instants and faults"
+    ],
+    "headers": [
+     [
+      "线迹 / 设置",
+      "Stitch / setting"
+     ],
+     [
+      "主轴转角（°）",
+      "Shaft angle (°)"
+     ],
+     [
+      "基准针尖高出弯针平面（mm）",
+      "Reference needle point above looper plane (mm)"
+     ],
+     [
+      "弯针尖左右位置（mm）",
+      "Looper point lateral position (mm)"
+     ],
+     [
+      "判定与标红部件",
+      "Verdict and red part"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "多针时为什么弯针先钩最右一根针？如果以最左一根针为基准量回退量，会出什么问题？",
+     "Why does the looper catch the rightmost needle first? What goes wrong if retraction is measured from the leftmost needle?"
+    ],
+    [
+     "定时推迟 14° 时先变红的是哪条判据？和实验 10-1 二维动画里看到的一致吗？",
+     "Which criterion fails first when the timing is retarded by 14°? Does it match what you see in the 2D animation of Lab 10-1?"
+    ],
+    [
+     "实际机器各针有高度阶差，模型里没有画。阶差是为了解决什么问题？",
+     "Real machines stagger the needle heights, which the model does not show. What problem does the stagger solve?"
+    ]
+   ]
+  },
+  {
    "id": "coverstitch",
    "no": "10-2",
    "title": [

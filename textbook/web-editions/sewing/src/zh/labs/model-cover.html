@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>绷缝机三维样机</title>
+<link rel="stylesheet" href="/vendor/fonts/noto-sans-sc.css"><link rel="stylesheet" href="/vendor/fonts/jetbrains-mono.css">
+<style>
+/* Layout: 3D stage with label overlay on the left, control rail on the right; stacks on phones */
+:root{
+  --bg:#eceff2; --panel:#f9fafb; --ink:#1d2a36; --muted:#5d6b7a; --rule:#d3d9df; --accent:#0f6e74;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161c;--panel:#18202a;--ink:#dde5ee;--muted:#93a2b3;--rule:#2b3643;--accent:#4cc3c9;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:16px;padding-block:18px 36px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:12px}
+h1{font-size:1.5rem;margin:0}
+.sub{color:var(--muted);font-size:.9rem}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.stage{position:relative;background:radial-gradient(120% 90% at 40% 30%,#ffffff 0%,#e4e8ec 70%,#d5dbe0 100%);border:1px solid var(--rule);border-radius:8px;overflow:hidden;aspect-ratio:16/10;min-width:0;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.stage svg.lab{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.lab text{font-family:var(--f-body);paint-order:stroke;stroke:#ffffffd0;stroke-width:4px;stroke-linejoin:round}
+.hint{position:absolute;left:12px;bottom:10px;font-size:.78rem;color:#5d6b7a;background:#ffffffb0;padding:2px 8px;border-radius:4px}
+.rail{display:flex;flex-direction:column;gap:12px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.card h3{margin:0 0 8px;font-size:.8rem;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--rule);border-radius:0;background:transparent;padding:6px 0}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--accent);color:var(--panel);font-weight:600}
+button{font:inherit;font-size:.86rem;border:1px solid var(--rule);background:var(--bg);color:var(--ink);border-radius:5px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.row+.row{margin-top:8px}
+input[type=range]{flex:1;min-width:120px;accent-color:var(--accent)}
+label{font-size:.85rem;color:var(--muted)}
+select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);border:1px solid var(--rule);border-radius:5px;padding:3px 6px}
+.read{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.read div{border-top:1px solid var(--rule);padding-top:4px}
+.read b{display:block;font-family:var(--f-mono);font-size:1rem;font-variant-numeric:tabular-nums}
+.read small{color:var(--muted);font-size:.74rem}
+.phase{font-weight:700;color:var(--accent);font-size:1rem;line-height:1.4}
+.note{font-size:.78rem;color:var(--muted)}
+.parts{display:grid;grid-template-columns:14px 1fr;gap:2px 8px;font-size:.84rem}
+.parts i{width:12px;height:12px;border-radius:3px;margin-top:5px}
+.cap{margin:0}.cap .wrap{max-width:none;padding:0}.cap header,.cap .rail,.cap .hint{display:none}.cap .grid{display:block}
+.cap .stage{width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#fbfaf7}
+.prm{display:grid;grid-template-columns:minmax(0,1fr) 5.4em;gap:2px 10px;align-items:center;font-size:.84rem}
+.prm label{grid-column:1/-1;color:var(--muted);margin-top:6px}
+.prm output{font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+input[type=range]{accent-color:var(--accent);width:100%}
+.checks{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.checks div{display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:6px;align-items:baseline;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.checks b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.checks .ok{color:var(--ok)} .checks .bad{color:var(--bad)}
+.checks small{display:block;color:var(--muted);font-size:.74rem}
+.verdict{font-weight:700;margin-top:8px;font-size:.92rem}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+:root{--ok:#1e8a4c;--bad:#c0392b}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#4cc38a;--bad:#ff7a6b}}
+:root[data-theme="dark"]{--ok:#4cc38a;--bad:#ff7a6b}
+.verdict-tag{position:absolute;right:12px;top:10px;font-size:.86rem;font-weight:700;padding:3px 10px;border-radius:5px;background:#ffffffd8}
+.verdict-tag.ok{color:#1e8a4c}.verdict-tag.bad{color:#c0392b}
+.cap .verdict-tag{font-size:1.2rem}
+.emb header{display:none}.emb a[href$="index.html"]{display:none}.emb .wrap{padding-block:8px 24px}
+
+</style>
+
+<div class="wrap">
+<header><h1>绷缝机三维样机</h1><span class="sub">《缝纫机设计与制造》第 10 章 · 模型 10-1 · 针杆、弯针运动与五条判据和第 10 章的计算一致，机构尺寸和外壳为示意</span></header>
+<div class="grid">
+  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="hint">拖动旋转 · 滚轮或双指缩放</div><div class="verdict-tag" id="vtag"></div></div>
+  <div class="rail">
+    <section class="card">
+      <h3>显示</h3>
+      <div class="seg" id="mode"><button type="button" data-m="solid" class="on">外观</button><button type="button" data-m="xray">透视</button><button type="button" data-m="explode">爆炸</button></div>
+      <div class="row"><label for="ex">拆开程度</label><input id="ex" type="range" min="0" max="1" step="0.01" value="0"></div>
+      <div class="row"><label><input type="checkbox" id="labels" checked> 标注</label><label><input type="checkbox" id="paths" checked> 轨迹</label><label><input type="checkbox" id="foot" checked> 压脚</label></div>
+      <div class="row"><span class="note">视角：</span><button type="button" data-v="iso">斜视</button><button type="button" data-v="front">正面</button><button type="button" data-v="side">左侧</button><button type="button" data-v="close">成缝区特写</button></div>
+    </section>
+    <section class="card">
+      <h3>转动主轴</h3>
+      <div class="row"><button id="play" type="button">播放</button><label for="spd">速度</label><select id="spd"><option value="20">很慢</option><option value="60" selected>慢</option><option value="200">中</option><option value="700">快</option></select></div>
+      <div class="row"><label for="phi">主轴转角</label><input id="phi" type="range" min="0" max="359" step="1" value="0"></div>
+      <div class="row"><button type="button" data-go="fc">钩线时刻</button><button type="button" data-go="fd">针到弯针高度</button><button type="button" data-go="bad">出问题的转角</button></div>
+      <div class="read" style="margin-top:8px">
+        <div><b id="r-a">0°</b><small>主轴转角（针在最高为 0°）</small></div>
+        <div><b id="r-n">0</b><small>基准针尖高出弯针平面 mm</small></div>
+        <div><b id="r-l">0</b><small>弯针尖左右位置 mm（0 = 最右一根针）</small></div>
+        <div><b id="r-s">—</b><small>撑线器钩尖左右位置 mm</small></div>
+        <div style="grid-column:1 / -1"><span class="phase" id="r-p">—</span></div>
+      </div>
+    </section>
+    <section class="card">
+      <h3>线迹与弯针（设计软件里跟着设计参数变）</h3>
+      <div class="row"><label for="stitch">线迹</label><select id="stitch"><option value="401">401 双线链缝</option><option value="406" selected>406 两针绷缝</option><option value="407">407 三针绷缝</option><option value="602">602 两针带覆盖线</option><option value="605">605 三针带覆盖线</option></select></div>
+      <div class="prm">
+        <label for="g">针距宽度（最外两针）</label><input id="g" type="range" min="2" max="7" step="0.1" value="4"><output id="gv"></output>
+        <label for="dphi">弯针定时（+ 为推迟）</label><input id="dphi" type="range" min="-15" max="15" step="0.5" value="0"><output id="dphiv"></output>
+        <label for="dz">弯针高低（+ 为抬高）</label><input id="dz" type="range" min="-1.5" max="1.5" step="0.05" value="0"><output id="dzv"></output>
+        <label for="e">让针幅度</label><input id="e" type="range" min="0" max="2" step="0.02" value="1"><output id="ev"></output>
+        <label for="gap">弯针尖与针的间隙</label><input id="gap" type="range" min="-0.05" max="0.2" step="0.01" value="0.03"><output id="gapv"></output>
+        <label for="rr">回退量（越过针右边）</label><input id="rr" type="range" min="1" max="7" step="0.05" value="3.2"><output id="rrv"></output>
+      </div>
+      <div class="row"><button id="reset" type="button">恢复标准</button></div>
+    </section>
+    <section class="card">
+      <h3>判据（第 10.4.2 节，按基准针）</h3>
+      <div class="checks" id="checks"></div>
+      <div class="verdict" id="verdict"></div>
+      <p class="note">基准针：最右一根——弯针从右往左最先钩它，回退量、间隙都从它量起（10.5 节说明书给的是“弯针到右针的距离”），其余各针在它左边。实际机器上各针有高度阶差，让每根针钩线时针眼和弯针尖的相对高度都合适（10.5 节）；教材没给阶差的数，模型里不画，判据按基准针算。标红的是出问题的那一样东西。</p>
+    </section>
+    <section class="card">
+      <h3>部件分组（透视与爆炸时着色）</h3>
+      <div class="parts">
+        <i style="background:#2f6fd6"></i><span>引线：针杆、针夹、机针、针杆曲柄与连杆</span>
+        <i style="background:#e0662f"></i><span>弯针：弯针、弯针架、摆杆、球头连杆、避针偏心</span>
+        <i style="background:#2e9e5b"></i><span>撑线器（602、605）</span>
+        <i style="background:#8e5bc4"></i><span>送布：主送布牙、差动送布牙</span>
+        <i style="background:#59636e"></i><span>主轴、下轴与手轮</span>
+      </div>
+      <p class="note">针杆是第 3 章的曲柄滑块（行程 31 mm）；弯针左右摆动和前后避针都按简谐运动近似，刀尖走一个扁椭圆（10.4.1 节），行程 30 mm。左右摆动由下轴上的偏心经球头连杆带动摆杆（空间连杆，10.4.3 节），避针由另一个偏心带动。撑线器离针板 8 mm、行程 17.5 mm（10.5 节的工程师手册数据）。这是教学模型，不是某一型号的设计数据。</p>
+    </section>
+  </div>
+</div>
+</div>
+
+<script src="/vendor/three/r128/three.min.js"></script><script>window.THREE||document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></scr'+'ipt>')</script>
+<script>
+(()=>{
+const T=THREE, D2R=Math.PI/180, $=id=>document.getElementById(id);
+if(location.hash==='#capture')document.body.classList.add('cap');
+if(window.self!==window.top)document.body.classList.add('emb');          // 嵌在设计软件里：不要页头，舞台顶上
+const TX={"sep": "，", "back": "后", "front": "前", "nohitLim": "后 ≥ 0，前 ≥ 0.05 mm", "play": "播放", "pause": "暂停", "ph": {"feed": "送布：针在布面以上，送布牙把布向后送", "above": "机针下行，快到布面", "catch": "弯针尖从针后钻进针线环（钩线）", "down": "针尖下到弯针平面：要刺进弯针线三角", "desc": "机针下行，刺布", "bdc": "针过下止点开始回升", "loop": "针线在针后形成线环", "hold": "弯针带着线环向左，针继续上升", "up": "针抽出布面上升；撑线器（602、605）把覆盖线横拉过各针"}, "lb": {"needle": n=>'机针（'+n+' 根）', "looper": "弯针", "looperS": "扁椭圆：左右摆 + 前后避针", "spreader": "撑线器", "spreaderS": "把覆盖线横拉过各针", "rocker": "弯针摆杆", "rockerS": "偏心 + 球头连杆（空间连杆）", "ecc": "避针偏心", "crank": "针杆曲柄", "crankS": "曲柄滑块，行程 31 mm", "feed": "送布牙（主 / 差动）", "plate": "针板", "foot": "压脚", "wheel": "手轮"}, "c": {"catch": "钩线时机针回升量（线环够大）", "height": "弯针尖在线环高度内", "gap": "弯针尖与针的间隙", "triangle": "针下行时刺进线三角（让开弯针）", "nohit": "针在弯针平面下方时不相碰"}, "v": {"ok": "能正常成缝", "hit": "撞针：弯针和针相碰", "skip": "跳针：弯针钩不住针线环", "tri": "针没刺进线三角：弯针线没被钩住，链环会脱开"}};
+// ================= 计算模型（与第 10 章程序 model10.py、虚拟实验 10-1、设计软件 cover.py 同一套） =================
+const R=15.5,L=55,lam=R/L,TF=1.5,RN=0.45,S=30,H0=2.2,PHR0=176;
+const X=f=>{const a=f*D2R;return R*(1-Math.cos(a))-L*(1-Math.sqrt(1-(lam*Math.sin(a))**2));};
+const HT=TF+X(101.7), DEYE=X(114.18)-X(101.7)-TF;
+const ztip=f=>HT-X(f), rise=f=>X(180)-X(f);
+const floop=h=>{h=Math.max(h,0);return (h/H0)**2*Math.exp(2*(1-h/H0));};
+const bis=(g,a,b)=>{let ga=g(a);for(let i=0;i<70;i++){const m=(a+b)/2,gm=g(m);if((gm>0)===(ga>0)){a=m;ga=gm;}else b=m;}return (a+b)/2;};
+const RW=[bis(h=>floop(h)-0.6,0.3,H0),bis(h=>floop(h)-0.6,H0,8)];
+const dcOf=rr=>Math.acos(Math.max(-1,Math.min(1,1-2*rr/S)))/D2R;
+const ZB0=ztip(PHR0+dcOf(3.2))+DEYE+1.5;
+const m360=f=>((f%360)+360)%360;
+const TY={'401':[1,false],'406':[2,false],'407':[3,false],'602':[2,true],'605':[3,true]};
+const STD={stitch:'406',g:4.0,dphi:0,dz:0,e:1.0,gap:0.03,rr:3.2};
+const ST={...STD};
+function P(){const phR=PHR0+ST.dphi, dc=dcOf(ST.rr);return {phR,dc,y0:-(RN+ST.gap)+ST.e*Math.sin(dc*D2R),zb:ZB0+ST.dz};}
+// 弯针尖：x 左右（+ 右，0 = 基准针），y 前后（+ 针前，− 针后）
+function looper(f,p){const d=(f-p.phR)*D2R;return [ST.rr-S/2*(1-Math.cos(d)), p.y0-ST.e*Math.sin(d)];}
+function evaluate(){
+  const p=P(), fc=m360(p.phR+p.dc), fr=m360(p.phR-p.dc);
+  const h=rise(fc), eye=ztip(fc)+DEYE, ds=p.zb-eye, ytop=0.5+0.9*Math.max(h,0);
+  const gap=-looper(fc,p)[1]-RN;
+  const fd=bis(f=>ztip(f)-p.zb,60,179.9), fu=bis(f=>ztip(f)-p.zb,180.1,300);
+  const [xd,yd]=looper(fd,p);
+  let wb=9,wf=9;
+  for(let f=0;f<360;f+=0.25){if(ztip(f)>p.zb)continue;const [x,y]=looper(f,p);if(x>0)continue;
+    if(f>=180&&f<=fu)wb=Math.min(wb,-y-RN);else wf=Math.min(wf,y-RN);}
+  const C=[
+    {k:'catch',ok:h>=RW[0]&&h<=RW[1],v:`${h.toFixed(2)} mm`,lim:`${RW[0].toFixed(2)}–${RW[1].toFixed(2)} mm`},
+    {k:'height',ok:ds>=0.2&&ds<=ytop-0.3,v:`${ds.toFixed(2)} mm`,lim:`0.20–${(ytop-0.3).toFixed(2)} mm`},
+    {k:'gap',ok:gap>=0&&gap<=0.10,v:`${gap.toFixed(3)} mm`,lim:'0–0.10 mm'},
+    {k:'triangle',ok:(-xd-RN)>=0.3&&(yd-RN)>=0.2,v:`x ${(-xd-RN).toFixed(2)}${TX.sep}y ${(yd-RN).toFixed(2)} mm`,lim:`x ≥ 0.30${TX.sep}y ≥ 0.20 mm`},
+    {k:'nohit',ok:wb>=-0.001&&wf>=0.05,v:`${TX.back} ${wb.toFixed(2)}${TX.sep}${TX.front} ${wf.toFixed(2)} mm`,lim:TX.nohitLim}];
+  return {p,fc,fr,fd,fu,h,ds,gap,xd,yd,wb,wf,C,ok:C.every(c=>c.ok)};
+}
+let E=evaluate();
+// 针的排法：一排，最右一根是基准针、放在 x = 0——弯针从右往左最先钩它，回退量、间隙都从它量起（10.5 节说明书给的就是“弯针到右针的距离”）；
+// 其余各针在它左边，弯针接着从它们后面经过。判据按基准针算；各针的高度阶差教材没给数，模型里不画
+let NEEDLES=[];
+function layout(){
+  const [n]=TY[ST.stitch]; const g=ST.g; const xs=n===1?[0]:n===2?[-g,0]:[-g,-g/2,0];
+  const p=E.p;
+  NEEDLES=xs.map(dx=>{
+    // 弯针尖从右往左走到这根针的转角（钩线去程：phR 到 phR+180 之间；左边的针在 −S 以内，一定找得到）
+    const fk=dx===0?E.fc:bis(f=>looper(f,p)[0]-dx,p.phR,p.phR+180);
+    return {x:dx, fc:m360(fk), dz:0};});
+}
+layout();
+
+// ================= 场景 =================
+const stage=$('stage'), cv=$('cv'), lab=$('lab');
+const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.outputEncoding=T.sRGBEncoding; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+const scene=new T.Scene(); const cam=new T.PerspectiveCamera(28,16/10,0.3,6000);
+{ const env=new T.Scene(); const g=new T.SphereGeometry(500,32,16), col=[]; const pp=g.attributes.position;
+  for(let i=0;i<pp.count;i++){const y=pp.getY(i)/500;const c=y>0?0.75+0.25*y:0.45+0.3*(1+y);col.push(c,c,c*1.02);}
+  g.setAttribute('color',new T.Float32BufferAttribute(col,3)); env.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide})));
+  const pm=(w,h,x,y,z,i)=>{const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(i,i,i),side:T.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);};
+  pm(300,120,0,420,180,3.0); pm(160,300,-420,120,120,1.6); pm(160,300,420,160,-120,1.2);
+  scene.environment=new T.PMREMGenerator(renderer).fromScene(env,0.04).texture; }
+scene.add(new T.HemisphereLight(0xffffff,0x9aa3ad,0.45));
+const sun=new T.DirectionalLight(0xffffff,1.1); sun.position.set(-260,520,420); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-260,right:260,top:260,bottom:-260,near:50,far:1600}); sun.shadow.bias=-0.0005; scene.add(sun);
+// 书上的坐标：X 向右、Y 向后、Z 向上（mm，原点在基准针的针板面上）→ three（x, y=Z, z=−Y）
+const W=p=>new T.Vector3(p[0],p[2],-p[1]);
+const YAX=new T.Vector3(0,1,0);
+const mats=[];
+const std=(c,o={})=>{const {grp,...rest}=o;const m=new T.MeshStandardMaterial(Object.assign({color:c,metalness:0.8,roughness:0.3},rest));m.userData={base:m.color.clone(),grp};mats.push(m);return m;};
+const housingMat=new T.MeshPhysicalMaterial({color:0xe6e3da,metalness:0.05,roughness:0.42,clearcoat:0.6,clearcoatRoughness:0.25});
+const tableMat=new T.MeshStandardMaterial({color:0xcfc9ba,roughness:0.8});
+const plateMat=std(0xd7dde2,{metalness:0.85,roughness:0.22});
+const fabMat=new T.MeshStandardMaterial({color:0xb9cde0,roughness:0.92,transparent:true,opacity:1});
+const GC={needle:0x2f6fd6,lp:0xe0662f,sp:0x2e9e5b,feed:0x8e5bc4,shaft:0x59636e};
+const BAD=0xd23b2b;
+const mNeedle=std(0xd7dde2,{grp:'needle'}), mNeedles=[0,1,2].map(()=>std(0xd7dde2,{grp:'needle'})), mBar=std(0xb9c3cc,{grp:'needle'}), mNcrank=std(0x7d8791,{grp:'needle',metalness:0.7,roughness:0.4});
+const mLP=std(0xcfd6dc,{grp:'lp'}), mLPd=std(0x8f99a3,{grp:'lp',metalness:0.7,roughness:0.4});
+const mSP=std(0xcfd6dc,{grp:'sp'}), mFeed=std(0x9aa4ad,{grp:'feed'});
+const mShaft=std(0xaeb7c0,{grp:'shaft'}), dark=std(0x2a3038,{metalness:0.6,roughness:0.45});
+const G=()=>new T.Group();
+function mesh(geo,mat,parent,pos){const m=new T.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;if(pos)m.position.copy(pos);parent.add(m);return m;}
+const box=(x,y,z)=>new T.BoxGeometry(x,y,z);
+function rbox(w,h,d,r){const s=new T.Shape();const x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  const b=Math.min(r,4);const g=new T.ExtrudeGeometry(s,{depth:d-2*b,bevelEnabled:true,bevelSize:b,bevelThickness:b,bevelSegments:3,curveSegments:8});g.translate(0,0,-(d-2*b)/2);return g;}
+function link(r,mat,parent,seg=16){const m=mesh(new T.CylinderGeometry(r,r,1,seg),mat,parent);return m;}
+function setLink(m,a,b){const A=W(a),B=W(b);const d=B.clone().sub(A);const Ln=d.length();m.position.copy(A).add(B).multiplyScalar(0.5);m.scale.set(1,Math.max(Ln,1e-3),1);m.quaternion.setFromUnitVectors(YAX,d.normalize());}
+function ball(r,mat,parent){return mesh(new T.SphereGeometry(r,16,12),mat,parent);}
+function disc(r,th,mat,parent,ax){const m=mesh(new T.CylinderGeometry(r,r,th,40),mat,parent);m.quaternion.setFromUnitVectors(YAX,W(ax).normalize());return m;}
+const root=G(); scene.add(root); const asm={};
+function A(name,ex){const g=G();g.userData.ex=W(ex);root.add(g);asm[name]=g;return g;}
+
+// ---------- 机壳（示意）：平板式底座、立柱、机臂、机头 ----------
+const house=A('house',[0,0,0]);
+const table=mesh(box(760,24,520),tableMat,house,W([40,60,-104]));
+const bed=mesh(rbox(240,80,150,10),housingMat,house,W([10,40,-46]));
+const pillar=mesh(rbox(70,180,90,14),housingMat,house,W([190,60,40]));
+const armH=mesh(rbox(230,70,84,16),housingMat,house,W([80,30,96]));
+const head=mesh(rbox(64,120,78,14),housingMat,house,W([-10,24,74]));
+[bed,pillar,armH,head].forEach(m=>m.userData.house=true);
+// ---------- 针板（针孔一排、送布牙槽）、布、压脚 ----------
+const plateG=A('plate',[0,0,0]);
+let plateMesh=null;
+function buildPlate(){
+  if(plateMesh){plateG.remove(plateMesh);plateMesh.geometry.dispose();}
+  const s=new T.Shape(); const P2=(x,Y)=>[x,-Y];
+  const poly=(path,pts)=>{path.moveTo(...P2(...pts[0]));pts.slice(1).forEach(p=>path.lineTo(...P2(...p)));};
+  poly(s,[[-34,-24],[30,-24],[30,30],[-34,30],[-34,-24]]);
+  const xs=NEEDLES.map(n=>n.x); const lo=Math.min(...xs)-1.6, hi=Math.max(...xs)+1.6;
+  const nh=new T.Path(); poly(nh,[[lo,-1.3],[hi,-1.3],[hi,1.3],[lo,1.3],[lo,-1.3]]); s.holes.push(nh);
+  for(const yy of [[4,15],[-16,-5]]){const h=new T.Path(); poly(h,[[lo-4,yy[0]],[hi+4,yy[0]],[hi+4,yy[1]],[lo-4,yy[1]],[lo-4,yy[0]]]); s.holes.push(h);}
+  const g=new T.ExtrudeGeometry(s,{depth:3,bevelEnabled:false}); g.rotateX(Math.PI/2);
+  plateMesh=mesh(g,plateMat,plateG);
+}
+const fabG=A('fabric',[0,0,40]); const fabBase=G(); fabG.add(fabBase);
+const fab=mesh(box(110,TF,190),fabMat,fabBase,W([0,0,TF/2])); fab.castShadow=false;
+const seamMat=new T.LineBasicMaterial({color:0x1d4c9e}), coverMat=new T.LineBasicMaterial({color:0x2e9e5b});
+const seam=new T.LineSegments(new T.BufferGeometry(),seamMat); fabG.add(seam);
+const cseam=new T.LineSegments(new T.BufferGeometry(),coverMat); fabG.add(cseam);
+const footG=A('foot',[0,0,30]); const footM=std(0xc7ced5,{metalness:0.85,roughness:0.25});
+const footParts=[]; function buildFoot(){footParts.forEach(m=>{footG.remove(m);m.geometry.dispose();});footParts.length=0;
+  const xs=NEEDLES.map(n=>n.x); const lo=Math.min(...xs)-2, hi=Math.max(...xs)+2;
+  footParts.push(mesh(box(8,1.2,24),footM,footG,W([lo-5,-3,TF+0.6])), mesh(box(8,1.2,24),footM,footG,W([hi+5,-3,TF+0.6])),
+    mesh(box(hi-lo+18,1.2,6),footM,footG,W([(lo+hi)/2,-14,TF+0.6])), mesh(box(3,30,3),footM,footG,W([hi+7,6,TF+16])));}
+// ---------- 主轴、针杆曲柄、针杆、针夹、机针 ----------
+const NL=30, BAR=70;                                      // 针尖到针夹 30 mm，针夹到针杆顶 70 mm
+const CZ=ztip(0)+NL+BAR-R+L;                              // 针在最高（0°）时曲柄销朝上
+const XC=-14;                                             // 曲柄盘在针杆左边
+const shaftG=A('shaft',[0,0,60]);
+const upShaft=mesh(new T.CylinderGeometry(5,5,230,24),mShaft,shaftG); upShaft.rotation.z=Math.PI/2; upShaft.position.copy(W([XC+110,0,CZ]));
+const wheel=mesh(new T.CylinderGeometry(44,44,12,64),dark,shaftG); wheel.rotation.z=Math.PI/2; wheel.position.copy(W([236,0,CZ]));
+const wheelMark=mesh(box(4,4,30),std(0xd4553a,{metalness:0.2,roughness:0.6}),shaftG);
+const loShaft=mesh(new T.CylinderGeometry(5,5,230,24),mShaft,shaftG); loShaft.rotation.z=Math.PI/2; loShaft.position.copy(W([60,0,-70]));
+const belt=link(3,dark,shaftG); setLink(belt,[200,0,CZ],[200,0,-70]);
+const nG=A('needle',[0,0,50]);
+const nCrank=disc(18,6,mNcrank,nG,[1,0,0]); nCrank.position.copy(W([XC,0,CZ]));
+const nPin=ball(2.4,mNcrank,nG), nRod=link(2.4,mNcrank,nG);
+const nBar=link(3.4,mBar,nG); const nClamp=mesh(box(1,8,8),mBar,nG);
+let needleMeshes=[];
+const drop=(par,o)=>{par.remove(o);o.traverse(c=>{if(c.geometry)c.geometry.dispose();});};      // 重建时释放几何体（材质共用、不释放）
+function buildNeedles(){needleMeshes.forEach(o=>{drop(nG,o.n);drop(nG,o.s);});
+  needleMeshes=NEEDLES.map((_,i)=>({n:link(RN,mNeedles[i],nG,12),s:link(0.9,mNeedle,nG,12)}));
+  const xs=NEEDLES.map(n=>n.x); nClamp.scale.set(Math.max(...xs)-Math.min(...xs)+6,1,1);}
+// ---------- 弯针、弯针架、摆杆与球头连杆、避针偏心 ----------
+const lpG=A('looper',[0,0,-30]);
+const blade=mesh(new T.BufferGeometry(),mLP,lpG);
+const holder=mesh(box(8,10,10),mLPd,lpG);
+const post=link(2,mLPd,lpG); const slider=mesh(box(9,7,8),mLPd,lpG);
+const guide=link(2.5,mShaft,lpG); setLink(guide,[-40,-14,-30],[45,-14,-30]);
+const XP=14, ZP=-58, LR=28;                                // 摆杆支点（轴线前后方向）
+const rockHub=disc(4,10,mLPd,lpG,[0,1,0]); rockHub.position.copy(W([XP,-14,ZP]));
+const rocker=link(2.6,mLPd,lpG), rockArm=link(2.6,mLPd,lpG), rod=link(1.8,mLPd,lpG), rodB1=ball(2.2,mLPd,lpG), rodB2=ball(2.2,mLPd,lpG);
+const ecc=disc(9,6,mLPd,lpG,[1,0,0]); ecc.position.copy(W([XP+30,0,-70]));
+const avoidEcc=disc(6,5,mLPd,lpG,[1,0,0]); avoidEcc.position.copy(W([XP+46,0,-70]));
+const avoidRod=link(1.4,mLPd,lpG);
+// ---------- 撑线器（602、605） ----------
+const spG=A('spreader',[-40,0,30]);
+const SPV=[-48,-12,30], SPZ=8.0, SPS=17.5;                 // 支点；钩尖离针板 8 mm、行程 17.5 mm（10.5 节）
+const spHub=disc(4,8,mSP,spG,[0,1,0]); spHub.position.copy(W(SPV));
+const spArm=link(1.6,mSP,spG); const spHook=mesh(new T.TorusGeometry(1.2,0.35,8,16,Math.PI*1.4),mSP,spG);
+// ---------- 送布牙（主、差动） ----------
+const fG=A('feed',[0,0,-20]);
+function dogGeo(len,w){const g=new T.Group();mesh(box(w,3,len),mFeed,g,new T.Vector3(0,-1.5,0));
+  for(let i=0;i<Math.floor(len/1.6);i++){const t=mesh(new T.ConeGeometry(0.9,1.2,4),mFeed,g,new T.Vector3(0,0.5,-len/2+0.8+i*1.6));t.rotation.y=Math.PI/4;}return g;}
+let mainDog=null, diffDog=null;
+function buildDogs(){[mainDog,diffDog].forEach(d=>d&&drop(fG,d));const xs=NEEDLES.map(n=>n.x);const w=Math.max(...xs)-Math.min(...xs)+8;
+  mainDog=dogGeo(10,w);diffDog=dogGeo(10,w);fG.add(mainDog);fG.add(diffDog);}
+// ---------- 线：针线（含线环）、弯针线、覆盖线 ----------
+const thrG=G(); root.add(thrG);
+const lineOf=(color,width)=>{const l=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color,linewidth:width}));thrG.add(l);return l;};
+let nThreads=[]; const lpThread=lineOf(0xc76b18), cvThread=lineOf(0x2e9e5b);
+function buildThreads(){nThreads.forEach(l=>{drop(thrG,l);l.material.dispose();});nThreads=NEEDLES.map(()=>lineOf(0x1d4c9e));}
+// ---------- 轨迹 ----------
+const pathG=G(); root.add(pathG);
+function rebuildPaths(){while(pathG.children.length){const c=pathG.children.pop();c.geometry.dispose();c.material.dispose();}
+  const p=E.p, nn=[], lp=[]; for(let d=0;d<=360;d+=2){nn.push(W([0,0,ztip(d)]));const [x,y]=looper(d,p);lp.push(W([x,-y,p.zb]));}
+  for(const [pts,c] of [[nn,0x2f6fd6],[lp,0xe0662f]]){const l=new T.Line(new T.BufferGeometry().setFromPoints(pts),new T.LineDashedMaterial({color:c,dashSize:0.6,gapSize:0.4}));l.computeLineDistances();pathG.add(l);}}
+
+function tubeFrom(pts,r){const c=new T.CatmullRomCurve3(pts.map(W));return new T.TubeGeometry(c,24,r,8,false);}
+let stitchLen=10/7, phi=0, diffRatio=1.3;
+const spX=f=>2-SPS/2*Math.cos((f-25)*D2R);               // 针杆从上止点下降 1.1 mm（约 25°）时撑线器在最左（10.5 节），把覆盖线横拉过各针
+function badSet(){const s=new Set(E.C.filter(c=>!c.ok).map(c=>c.k));return s;}
+function pose(phiDeg){
+  const f=m360(phiDeg), pr=f*D2R, p=E.p, bad=badSet();
+  // 针杆曲柄滑块
+  const tip0=ztip(f); const barTop=tip0+NL+BAR; const pin=[XC,R*Math.sin(pr),CZ+R*Math.cos(pr)];
+  nPin.position.copy(W(pin)); setLink(nRod,[0,0,barTop],pin); setLink(nBar,[0,0,tip0+NL],[0,0,barTop]);
+  nClamp.position.copy(W([(Math.min(...NEEDLES.map(n=>n.x))+Math.max(...NEEDLES.map(n=>n.x)))/2,0,tip0+NL]));
+  const hitNeedle=bad.has('nohit')||bad.has('triangle')||(bad.has('gap')&&E.gap<0);
+  NEEDLES.forEach((n,i)=>{const t=tip0-n.dz;const o=needleMeshes[i];setLink(o.n,[n.x,0,t],[n.x,0,t+16]);setLink(o.s,[n.x,0,t+16],[n.x,0,tip0+NL]);
+    o.n.material.color.set(hitNeedle?BAD:(mode==='solid'?0xd7dde2:GC.needle));});
+  // 弯针：刀尖（x, −y, zb），弯针身向右伸、末端向下进弯针架
+  const [lx,ly]=looper(f,p); const tipP=[lx,-ly,p.zb];
+  const body=[tipP,[lx+5,-ly,p.zb-0.2],[lx+11,-ly,p.zb-0.6],[lx+17,-ly,p.zb-1.4],[lx+22,-ly,p.zb-3.2],[lx+25,-ly,p.zb-6.5]];
+  blade.geometry.dispose(); blade.geometry=tubeFrom(body,0.55);
+  const lpBad=(bad.has('gap')&&E.gap<0)||bad.has('nohit')||bad.has('catch')||bad.has('height')||(bad.has('gap')&&E.gap>0.1);    // 撞针或钩不住：弯针标红
+  blade.material.color.set(lpBad?BAD:(mode==='solid'?0xcfd6dc:GC.lp));
+  holder.position.copy(W([lx+26,-ly,p.zb-10]));
+  const xs=lx+26, th=Math.asin(Math.max(-0.95,Math.min(0.95,(xs-XP)/LR)));
+  const top=[XP+LR*Math.sin(th),-14,ZP+LR*Math.cos(th)];
+  slider.position.copy(W(top)); setLink(post,[xs,-ly,p.zb-14],top); setLink(rocker,[XP,-14,ZP],top);
+  const armEnd=[XP-14*Math.cos(th),-14,ZP+14*Math.sin(th)]; setLink(rockArm,[XP,-14,ZP],armEnd); rodB2.position.copy(W(armEnd));
+  const ep=[XP+30,9*Math.sin(pr+0.6),-70+9*Math.cos(pr+0.6)]; rodB1.position.copy(W(ep)); setLink(rod,ep,armEnd);
+  const ap=[XP+46,6*Math.sin(pr-1.2),-70+6*Math.cos(pr-1.2)]; setLink(avoidRod,ap,[xs+4,-ly,p.zb-12]);
+  // 撑线器
+  const cov=TY[ST.stitch][1]; spG.visible=cov; cvThread.visible=cov; cseam.visible=cov;
+  const sx=spX(f), hook=[sx,-3,SPZ];
+  setLink(spArm,SPV,hook); spHook.position.copy(W(hook)); spHook.rotation.set(0,0,Math.PI/2);
+  // 送布：针在布外时牙在针板上面向后送
+  const ym=0.5*stitchLen*Math.sin(pr), zt=1.2*Math.cos(pr)-0.6, yd=0.5*stitchLen*diffRatio*Math.sin(pr);
+  const cx=(Math.min(...NEEDLES.map(n=>n.x))+Math.max(...NEEDLES.map(n=>n.x)))/2;
+  mainDog.position.copy(W([cx,9.5+ym,zt-0.3])); diffDog.position.copy(W([cx,-10.5+yd,zt-0.3]));
+  const w=68, q=phiDeg+180, kc=Math.floor(q/360), gg=q-360*kc-180; let fr=gg<=-w?0:gg>=w?1:(gg+w)/(2*w); fr=fr-Math.sin(2*Math.PI*fr)/(2*Math.PI);
+  const fy=(kc+fr)*stitchLen; fabBase.position.copy(W([0,((fy%10)+10)%10,0]));
+  { const off=fr*stitchLen, pts=[], cp=[]; const lo=Math.min(...NEEDLES.map(n=>n.x)), hi=Math.max(...NEEDLES.map(n=>n.x));
+    for(let k=0;k<40;k++){const y=off+k*stitchLen; for(const n of NEEDLES){pts.push(W([n.x,y+0.2,TF+0.05]),W([n.x,y+stitchLen-0.2,TF+0.05]));}
+      if(cov){cp.push(W([lo,y,TF+0.08]),W([hi,y+stitchLen/2,TF+0.08]),W([hi,y+stitchLen/2,TF+0.08]),W([lo,y+stitchLen,TF+0.08]));}}
+    seam.geometry.dispose(); seam.geometry=new T.BufferGeometry().setFromPoints(pts);
+    cseam.geometry.dispose(); cseam.geometry=new T.BufferGeometry().setFromPoints(cp); }
+  // 针线：从针眼往上；针在弯针平面以下回升时在针后形成线环（大小按第 5 章线环模型）
+  const loopBad=bad.has('catch')||bad.has('height')||(bad.has('gap')&&E.gap>0.1);
+  NEEDLES.forEach((n,i)=>{const t=tip0-n.dz, eye=t+DEYE; const pts=[[n.x,0,t+60],[n.x,0.3,eye+0.4]];
+    const rs=X(f)-X(180); const hh=f>=180&&f<=E.fu+20?Math.max(0,-rs):0;
+    if(hh>0.05&&eye<TF){const s=1.8*floop(hh);pts.push([n.x+0.2,0.6,eye],[n.x+0.6*s,0.6+0.8*s,eye-0.6*s],[n.x,0.6+1.4*s,eye-1.6*s],[n.x-0.6*s,0.6+0.8*s,eye-0.6*s],[n.x-0.2,0.6,eye]);}
+    pts.push([n.x,0.3,Math.max(eye,0)],[n.x,0,TF]);
+    nThreads[i].geometry.dispose(); nThreads[i].geometry=new T.BufferGeometry().setFromPoints(pts.map(W));
+    nThreads[i].material.color.set(loopBad?BAD:0x1d4c9e);});
+  lpThread.geometry.dispose(); lpThread.geometry=new T.BufferGeometry().setFromPoints([[lx+1.2,-ly,p.zb+0.3],[lx+12,-ly,p.zb-0.5],[lx+24,-ly,p.zb-4],[lx+40,-ly+6,p.zb-20]].map(W));
+  if(cov){const lo=Math.min(...NEEDLES.map(n=>n.x)), hi=Math.max(...NEEDLES.map(n=>n.x));
+    cvThread.geometry.dispose(); cvThread.geometry=new T.BufferGeometry().setFromPoints([[-48,-12,48],hook,[hi+3,-1,TF+0.1],[lo-2,-1,TF+0.1]].map(W));}
+  wheelMark.position.copy(W([243,30*Math.sin(pr),CZ+30*Math.cos(pr)]));
+  // 读数
+  $('r-a').textContent=Math.round(f)+'°';
+  $('r-n').textContent=(tip0-p.zb).toFixed(1);
+  $('r-l').textContent=lx.toFixed(1);
+  $('r-s').textContent=cov?sx.toFixed(1):'—';
+  $('r-p').textContent=phaseText(f);
+}
+function phaseText(f){
+  const E_=E; const near=(a,b)=>Math.abs(((f-a+540)%360)-180)<=b;
+  const fin=101.7, fout=258.3;                          // 针尖过布面（布厚 1.5 mm）的两个转角
+  if(near(E_.fc,6)) return TX.ph.catch;
+  if(near(E_.fd,6)) return TX.ph.down;
+  if(f<68||f>=292) return TX.ph.feed;
+  if(f<fin) return TX.ph.above;
+  if(f<E_.fd) return TX.ph.desc;
+  if(f<180) return TX.ph.bdc;
+  if(f<E_.fc) return TX.ph.loop;
+  if(f<fout) return TX.ph.hold;
+  return TX.ph.up;
+}
+// ---------- 标注 ----------
+const LABELS=[
+ [()=>TX.lb.needle(TY[ST.stitch][0]),'',()=>W([NEEDLES[0].x,0,ztip(phi)+12]),['solid','xray','explode'],[-170,-30]],
+ [()=>TX.lb.looper,TX.lb.looperS,()=>{const [x,y]=looper(phi,E.p);return W([x+10,-y,E.p.zb]);},['xray','explode'],[-160,90]],
+ [()=>TX.lb.spreader,TX.lb.spreaderS,()=>W([spX(phi),-3,SPZ]),['solid','xray','explode'],[-200,-90],null,()=>TY[ST.stitch][1]],
+ [()=>TX.lb.rocker,TX.lb.rockerS,()=>W([XP,-14,ZP]),['xray','explode'],[150,70]],
+ [()=>TX.lb.ecc,'',()=>W([XP+46,0,-70]),['xray','explode'],[150,20]],
+ [()=>TX.lb.crank,TX.lb.crankS,()=>W([XC,0,CZ]),['xray','explode'],[-170,-20]],
+ [()=>TX.lb.feed,'',()=>W([0,-10,-1]),['xray','explode'],[-170,40],null,()=>!closeView],
+ [()=>TX.lb.plate,'',()=>W([22,20,0]),['xray','explode'],[140,-30]],
+ [()=>TX.lb.foot,'',()=>W([10,-14,3]),['solid'],[160,-40],null,()=>$('foot').checked&&!closeView],
+ [()=>TX.lb.wheel,'',()=>W([236,-30,CZ+20]),['solid','xray'],[60,-60]],
+];
+let mode='solid', exT=0, playing=false, speed=60, showPaths=true, closeView=false;
+function drawLabels(){
+  lab.innerHTML=''; if(!$('labels').checked) return;
+  const Wd=stage.clientWidth,H=stage.clientHeight; const k=document.body.classList.contains('cap')?Wd/1100:Math.min(1,Wd/900); let out='';
+  for(const [tf,s,get,modes,off0,offE,cond] of LABELS){ if(!modes.includes(mode)) continue; if(cond&&!cond()) continue; const off=mode==='explode'&&offE?offE:off0; const p=get().clone();
+    p.project(cam); if(p.z>1) continue;
+    const x=(p.x+1)/2*Wd, y=(1-p.y)/2*H, lx=x+off[0]*k, ly=y+off[1]*k; const anchor=off[0]<-20?'end':off[0]>20?'start':'middle'; const fs=Math.max(11,15*k);
+    out+=`<circle cx="${x}" cy="${y}" r="3" fill="#1d2a36"/><path d="M${x} ${y}L${lx} ${ly}" stroke="#1d2a36" stroke-width="1" fill="none"/>`;
+    const tx=lx+(anchor==='start'?4:anchor==='end'?-4:0), ty=ly+(off[1]<0?-6:fs+2);
+    out+=`<text x="${tx}" y="${ty}" font-size="${fs}" font-weight="700" fill="#1d2a36" text-anchor="${anchor}">${tf()}</text>`;
+    if(s) out+=`<text x="${tx}" y="${ty+(off[1]<0?-fs-2:fs+2)}" font-size="${fs*0.8}" fill="#4d5b6a" text-anchor="${anchor}">${s}</text>`; }
+  lab.innerHTML=out;
+}
+function applyMode(){
+  const xr=mode==='xray', ex=mode==='explode';
+  housingMat.transparent=xr; housingMat.opacity=xr?0.12:1; housingMat.depthWrite=!xr; housingMat.needsUpdate=true;
+  house.children.forEach(c=>{ if(c.userData.house) c.visible=!ex&&!closeView; });
+  fG.visible=!closeView; footG.visible=$('foot').checked&&!closeView;            // 特写时送布牙、压脚不挡住成缝区
+  table.visible=!ex; tableMat.transparent=xr; tableMat.opacity=xr?0.3:1;
+  mats.forEach(m=>{const g=m.userData.grp; if((xr||ex)&&g&&GC[g]!==undefined){m.color.set(GC[g]);} else m.color.copy(m.userData.base); m.needsUpdate=true;});
+  fabMat.opacity=xr||ex?(closeView?0.25:0.45):1; fabMat.depthWrite=!(xr||ex);
+  plateMat.transparent=xr||ex; plateMat.opacity=xr||ex?(closeView?0.3:0.6):1; plateMat.depthWrite=!(xr||ex);
+  footM.transparent=xr; footM.opacity=xr?0.35:1;
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+}
+function applyExplode(){ Object.values(asm).forEach(g=>g.position.copy(g.userData.ex).multiplyScalar(exT)); pathG.visible=showPaths&&exT<0.05; thrG.visible=exT<0.05; }
+// ---------- 相机 ----------
+const target=new T.Vector3(0,-10,0); let th=-0.6, ph=0.38, dist=780;
+const VIEWS={iso:[-0.6,0.38,640,[40,-10,0]],front:[0,0.08,560,[40,-20,0]],side:[-1.5708,0.12,560,[0,-20,-10]],close:[-0.95,0.06,52,[-1,-2,-4]]};
+function placeCam(){cam.position.set(target.x+dist*Math.cos(ph)*Math.sin(th),target.y+dist*Math.sin(ph),target.z+dist*Math.cos(ph)*Math.cos(th));cam.lookAt(target);cam.near=Math.max(0.3,dist/200);cam.updateProjectionMatrix();}
+let drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,th,ph};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!drag)return;th=drag.th-(e.clientX-drag.x)*0.006;ph=Math.max(-0.6,Math.min(1.45,drag.ph+(e.clientY-drag.y)*0.005));dirty=true;});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(25,Math.min(2500,dist*(1+e.deltaY*0.001)));dirty=true;},{passive:false});
+let pinch=null;
+stage.addEventListener('touchstart',e=>{if(e.touches.length===2)pinch={d:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),dist};},{passive:true});
+stage.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.max(25,Math.min(2500,pinch.dist*pinch.d/d));dirty=true;}},{passive:true});
+stage.addEventListener('touchend',()=>pinch=null);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true;}
+new ResizeObserver(resize).observe(stage);
+// ---------- 参数、判据 ----------
+const fmt={g:v=>(+v).toFixed(1)+' mm',dphi:v=>(v>0?'+':'')+v+'°',dz:v=>(v>0?'+':'')+(+v).toFixed(2)+' mm',e:v=>(+v).toFixed(2)+' mm',gap:v=>(+v).toFixed(2)+' mm',rr:v=>(+v).toFixed(2)+' mm'};
+function syncInputs(){$('stitch').value=ST.stitch;for(const k of Object.keys(fmt)){$(k).value=ST[k];$(k+'v').textContent=fmt[k](ST[k]);}}
+function verdictText(){const b=badSet();
+  if((b.has('gap')&&E.gap<0)||b.has('nohit')) return TX.v.hit;
+  if(b.has('catch')||b.has('height')||b.has('gap')) return TX.v.skip;
+  if(b.has('triangle')) return TX.v.tri;
+  return TX.v.ok;}
+function rebuild(){
+  E=evaluate(); layout(); buildPlate(); buildFoot(); buildNeedles(); buildDogs(); buildThreads(); rebuildPaths(); applyMode(); syncInputs();
+  $('checks').innerHTML=E.C.map(c=>`<div><span class="${c.ok?'ok':'bad'}">${c.ok?'✓':'✗'}</span><span>${TX.c[c.k]}<small>${c.lim}</small></span><b class="${c.ok?'ok':'bad'}">${c.v}</b></div>`).join('');
+  const vt=verdictText(); $('verdict').textContent=vt; $('verdict').className='verdict '+(E.ok?'ok':'bad');
+  $('vtag').textContent=vt; $('vtag').className='verdict-tag '+(E.ok?'ok':'bad');
+  dirty=true;
+}
+function badAngle(){const b=badSet();if(b.has('catch')||b.has('height')||b.has('gap'))return E.fc;if(b.has('triangle')||b.has('nohit'))return E.fd;return E.fc;}   // 和右上角的结论同一个先后：先钩线，再线三角
+function go(which){playing=false;$('play').textContent=TX.play;phi=which==='fd'?E.fd:which==='bad'?badAngle():E.fc;$('phi').value=Math.round(m360(phi));dirty=true;}
+for(const k of Object.keys(fmt)) $(k).oninput=()=>{ST[k]=+$(k).value;rebuild();};
+$('stitch').onchange=()=>{ST.stitch=$('stitch').value;rebuild();};
+$('reset').onclick=()=>{Object.assign(ST,STD);rebuild();};
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+// ---------- 循环 ----------
+let last=performance.now(), dirty=true, manual=false;
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;try{if(!manual)tick(dt);}finally{requestAnimationFrame(frame);}}
+function tick(dt){if(playing){phi+=speed*dt;$('phi').value=Math.round(m360(phi));dirty=true;}
+  if(dirty||!window.__still){pose(phi);placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
+// 设计软件同步：setCfg({stitch, g, dphi, dz, e, gap, rr, spc})；录视频：manual / step；goto('fc' | 'fd' | 'bad')
+const LIM={g:[2,7],dphi:[-15,15],dz:[-1.5,1.5],e:[0,2],gap:[-0.05,0.2],rr:[1,7]};
+window.__api={setCfg:c=>{if(!c)return; const was=E.ok;
+    if(c.stitch!==undefined&&TY[String(c.stitch)])ST.stitch=String(c.stitch);
+    for(const k of Object.keys(LIM)){const v=+c[k];if(c[k]!==undefined&&isFinite(v))ST[k]=Math.min(LIM[k][1],Math.max(LIM[k][0],v));}
+    if(isFinite(+c.spc)&&+c.spc>0)stitchLen=10/+c.spc;
+    rebuild(); if(was&&!E.ok) go('bad');},                // 只在由好变坏时转到出问题的转角，改别的参数不打断播放
+  manual:on=>{manual=!!on;},step:dt=>tick(dt),goto:go,evaluate:()=>E,needles:()=>NEEDLES,ST};
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;$('ex').value=1;}if(mode!=='explode'){exT=0;$('ex').value=0;}applyMode();applyExplode();dirty=true;});
+$('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();dirty=true;};
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);closeView=b.dataset.v==='close';if(closeView&&mode==='solid')mode='xray';applyMode();dirty=true;});
+$('play').onclick=e=>{playing=!playing;e.target.textContent=playing?TX.pause:TX.play;};
+$('spd').onchange=e=>speed=+e.target.value;
+$('phi').oninput=e=>{phi=+e.target.value;dirty=true;};
+$('paths').onchange=e=>{showPaths=e.target.checked;applyExplode();dirty=true;};
+$('foot').onchange=e=>{footG.visible=e.target.checked;dirty=true;};
+$('labels').onchange=()=>dirty=true;
+window.__set=o=>{if('mode' in o)mode=o.mode;if('ex' in o)exT=o.ex;if('view' in o){const v=VIEWS[o.view];[th,ph,dist]=v;target.set(...v[3]);closeView=o.view==='close';if(closeView&&mode==='solid'&&!('mode' in o))mode='xray';}if('phi' in o)phi=o.phi;applyMode();applyExplode();dirty=true;};
+rebuild(); resize(); applyExplode(); requestAnimationFrame(frame);
+})();
+
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">返回教材</a>
+</body>
+</html>

@@ -223,7 +223,9 @@ def analyze(params=None, trial=True):
                    [[("合计", "Total"), f"{total:.2f}", f"{sum(r['meters'] for r in PL):,.0f}", str(sum(r["cones"] for r in PL))]])]
     return dict(version=VERSION, machine=MACHINE, params=p, checks=list(ch), ok=not any(c["state"] == "bad" for c in ch),
                 results=results, charts=charts, timing=timing, parts=parts(p), card=adjust_card(p), tables=tables, plan=PL,
-                view=dict(page="looper", sync="ST", cfg=st))
+                # 第 73 轮：三维样机（模型 10-1）跟着线迹、针距和弯针参数变；弯针动画（实验 10-1）留作第二个视图
+                view=dict(page="model-cover", sync="setCfg", cfg=dict(st, stitch=p["stitch"], g=p["g"], spc=p["spc"]),
+                          alt=dict(page="looper", sync="ST", cfg=st)))
 
 
 def parts(p):

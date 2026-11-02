@@ -103,6 +103,8 @@ def test_proto_page_served_from_web_edition(client, tmp_path):  # noqa: F811
     assert main.state.settings.textbook_dir == str(tmp_path / "textbook")
     r = client.get("/api/v1/sewing/proto")
     assert r.status_code == 200 and "proto" in r.text and "frame-ancestors 'self'" in r.headers["content-security-policy"]
+    (d / "model-cover.html").write_text("<html>cover</html>", encoding="utf-8")         # 第 73 轮：绷缝机三维样机
+    assert "cover" in client.get("/api/v1/sewing/proto?page=model-cover").text
 
 
 def test_bad_input_is_cleaned(client):  # noqa: F811

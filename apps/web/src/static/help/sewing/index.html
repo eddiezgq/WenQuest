@@ -240,7 +240,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tr>
 </tbody>
 </table>
-<p class="start"><strong>第一次用？从案例开始</strong>：<a href="#cases">典型案例</a>里有平缝、包缝、绷缝、花样、横机五个案例，从实际问题一步一步做到出图、出程序，每步都有“试一试”和录屏。</p>
+<p class="start"><strong>第一次用？从案例开始</strong>：<a href="#cases">典型案例</a>里有平缝、包缝、绷缝、花样、横机、电控箱、刺绣机七个案例，从实际问题一步一步做到出图、出程序，每步都有“试一试”和录屏。</p>
 <p>现在有六种机型：</p>
 <table>
 <thead>
@@ -678,12 +678,13 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>包缝机的另一个典型机构。弹力布、针织布缝时容易被拉长（荷叶边）或缩皱，靠<strong>差动送布</strong>：前面的差动牙（布先经过它）比后面的主送布牙走得多一点或少一点。软件算出这块布要平整的差动比 D* = 1.212，差动臂长 l_d = D·l_m = 24.2 mm；“送布与差动”一组里改“差动比 D”，校核“布边平整（差动送布）”马上告诉你布边会被拉长还是缩皱。设计优化里对应的目标是“差动比：布边平整”。</p>
 <p>切边也在校核里：上刀切布时针必须在布里（布不动），上下刀要有重叠量（“切边”一组）。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-10-case-ol.jpg"><source src="../media/web-10-case-ol.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-10-case-ol.vtt"></video><figcaption>▶ 案例二：包缝机上弯针设计优化；下弯针摆杆留 50% 和 40% 减重复核</figcaption></figure></section>
-<section id="case-cv"><h2><span class="n">05</span>案例三　绷缝机：五种线迹与用线计划</h2><p class="lead">换线迹时弯针定时怎么调；一张订单要买多少线团。</p><p><strong>实际问题</strong>：针织 T 恤的下摆、袖口用绷缝机缝。车间一天要换好几种线迹；采购要知道一张订单（1,000 件，每件缝长 172 cm，损耗按 12% 算，线团每个 5,000 m）得备多少线。绷缝机没有三维零件，这个案例用到“样机”“校核”“零件与制造”三个页签和“CAE 分析”里的设计优化。</p>
+<section id="case-cv"><h2><span class="n">05</span>案例三　绷缝机：五种线迹与用线计划</h2><p class="lead">换线迹时弯针定时怎么调；一张订单要买多少线团。</p><p><strong>实际问题</strong>：针织 T 恤的下摆、袖口用绷缝机缝。车间一天要换好几种线迹；采购要知道一张订单（1,000 件，每件缝长 172 cm，损耗按 12% 算，线团每个 5,000 m）得备多少线。绷缝机没有三维零件（出不了 STEP），但“样机”页签有三维样机；这个案例用到“样机”“校核”“零件与制造”三个页签和“CAE 分析”里的设计优化。</p>
 <h3 id="case-cv-window">第一步　弯针定时窗口有多窄</h3>
 <p>绷缝机的弯针要在机针回升、线环张开的那一刻从针后穿过去：偏早了，弯针尖高出线环、针下来时让不开弯针；偏晚了，机针已经回升太多，线环收缩，钩不住。软件把这几条约束一起算，得出<strong>弯针定时窗口</strong>。</p>
 <ol class="steps">
 <li>打开绷缝机（教材算例，406 两针绷缝，6500 r/min）。“样机”页签下面：弯针定时窗口 <b>-3.5 … +4.0°</b>——只有 7.5° 宽，在最高转速 6500 r/min 下只有 0.192 毫秒。</li>
 <li>“弯针（第 10 讲）”一组里，“弯针定时（相对标准）”拖到 <b>−6°</b>（来早了）：弯针尖在线环高度内 2.54 mm（要求 0.20–2.29 mm）；针下行时让开弯针 x -0.13，y 0.33 mm（要求 x ≥ 0.30，y ≥ 0.20 mm）；弯针定时离窗口边缘 -6.0°，窗口 -3.5° 到 +4.0°（要求 ≥ 1.5°）。</li>
+<li>回到“样机”页签：三维样机（教材模型 10-1）右上角写着“跳针”，机针标红；点“出问题的转角”，主轴转到针尖下到弯针平面的那一刻，换“成缝区特写”能看到针扎向弯针、刺不进线三角。</li>
 <li>拖到 <b>+6°</b>（来晚了）：钩线时机针回升量（线环够大） 4.56 mm（220.1°）（要求 0.98–4.17 mm）；弯针定时离窗口边缘 +6.0°，窗口 -3.5° 到 +4.0°（要求 ≥ 1.5°）。</li>
 <li>（“弯针定时离窗口边缘”这一项的数值栏显示的是定时本身和窗口两端，离边缘差多少要自己减：−6° 已经出了窗口 2.5°。）</li>
 <li>不想自己试：“CAE 分析 → 设计优化”，目标“弯针定时：放在窗口正中”，给出 <b>0.5°</b>，全部合格，点“采用”。</li>
@@ -756,7 +757,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>（每厘米线迹的耗线 = 线长 / 缝长；订单总用线已含损耗；每根线各自从一个线团放线，所以线团数按每根线分别向上取整。）</p>
 <p><strong>结论</strong>：同一张订单，401 双线链缝用线 11,751 m（3 个线团），605 三针带覆盖线 55,403 m（12 个线团），用线差 4.7 倍。报价和备料按“零件与制造”页签这张表来。</p>
 <a class="try" href="/pages/sewing/sewing?machine=cover&amp;tab=parts&amp;p=%7B%22stitch%22%3A%22605%22%7D" target="_blank" rel="noopener">▶ 试一试：605 三针带覆盖线的用线计划</a>
-<figure class="vid"><video controls preload="none" playsinline poster="../media/web-11-case-cv.jpg"><source src="../media/web-11-case-cv.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-11-case-cv.vtt"></video><figcaption>▶ 案例三：绷缝机弯针定时 ±6°、设计优化放回窗口正中；五种线迹的用线计划</figcaption></figure></section>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-11-case-cv.jpg"><source src="../media/web-11-case-cv.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-11-case-cv.vtt"></video><figcaption>▶ 案例三：绷缝机三维样机；弯针定时 ±6°、设计优化放回窗口正中；五种线迹的用线计划</figcaption></figure></section>
 <section id="case-pt"><h2><span class="n">06</span>案例四　电子花样机：一个口袋盖花样</h2><p class="lead">转速上限 → 前瞻调速 → 伺服选型（换带轮就合格）→ 产能 → 模板槽板数控。</p><p><strong>实际问题</strong>：电子花样机缝牛仔裤口袋盖（花样 60 × 40 mm，49 针）。客户嫌慢，想把设计转速从 1800 r/min 提到 <b>2000</b>。转速提得上去吗？要换电机吗？能多出多少件？最后还要给这个花样做一块模板。</p>
 <h3 id="case-pt-base">第一步　算例：每针都要在“针离布”的那一小段里走完</h3>
 <p>花样机的布夹（X、Y 两轴）只能在机针离开布的那段转角里移动，走不完下一针就扎偏。软件按 X、Y 伺服、同步带、运动质量算出两轴的转速上限。</p>
@@ -1313,7 +1314,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>“导出”页签：计算书（花样图、针长分段表、每针转速曲线、头数与效率、交期、伺服、电控箱一节；做过 CAE 的带上横梁模态的结果）、参数表、调机卡。“参数”文件（.wqsew.json）带着花样，FreeCAD 导入后接着算。比较的结论：这张订单 8 头机 50.2 天赶不上，12 头机 36.4 天。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-16-case-em.jpg"><source src="../media/web-16-case-em.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-16-case-em.vtt"></video><figcaption>▶ 案例七：上传花样文件、8 头还是 12 头、设计优化达到订单交期、伺服、横梁加立柱、电控箱</figcaption></figure></section>
 <section id="tabs"><h2><span class="n">10</span>七个页签</h2><p class="lead">样机、校核、时序与曲线、零件与制造、CAE 分析、零件库、导出。</p><h3 id="proto">样机</h3>
-<p>平缝机是教材的三维虚拟样机：定时、间隙、张力、送布、转速、平衡这些调机参数跟着你的设计同步，可以试缝、看故障标红。包缝机、花样机是教材的三维结构模型（只看结构转动，不随参数变）；绷缝机是弯针动画，刺绣机是虚拟实验 16-1，横机是教材的三维模型 17-1（V 形针床、机头三角、织针、摇床）。下面是主要结果（连杆比、惯性力、钩线角、供线量……）。</p>
+<p>平缝机是教材的三维虚拟样机：定时、间隙、张力、送布、转速、平衡这些调机参数跟着你的设计同步，可以试缝、看故障标红。包缝机、花样机是教材的三维结构模型（只看结构转动，不随参数变）；绷缝机是教材的三维样机（模型 10-1，第 73 轮）：线迹、针数、针距和弯针的定时、高低、让针、间隙、回退跟着设计同步，钩线判据当场算，出问题的机针或弯针标红，点“出问题的转角”转到那一刻慢慢看；上面能切换到弯针动画（虚拟实验 10-1）。刺绣机是虚拟实验 16-1，横机是教材的三维模型 17-1（V 形针床、机头三角、织针、摇床）。下面是主要结果（连杆比、惯性力、钩线角、供线量……）。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-02-proto.jpg"><source src="../media/web-02-proto.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-02-proto.vtt"></video><figcaption>▶ 三维样机：旋梭定时调错，试缝 30 针全跳</figcaption></figure>
 <a class="try" href="/pages/sewing/sewing?machine=lockstitch&amp;tab=proto&amp;p=%7B%22psi%22%3A-20%7D" target="_blank" rel="noopener">▶ 试一试：旋梭定时 −20°，在样机里看跳针</a>
 <h3 id="checks">校核</h3>

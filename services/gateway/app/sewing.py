@@ -221,7 +221,7 @@ def register(app, m) -> None:
         from .sewcore import knit_samples
         return {"name": "wq-front.csv", "knit": knit_samples.front_text()}
 
-    PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-pattern", "embroid", "model-flatknit"}
+    PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-cover", "model-pattern", "embroid", "model-flatknit"}
 
     @app.get("/api/v1/sewing/proto")
     async def proto(lang: str = "zh", page: str = "proto-lockstitch"):

@@ -92,6 +92,13 @@
 },
 {
 "ch": 10,
+"href": "labs/model-cover.html",
+"kind": "3D model",
+"title": "Coverstitch machine",
+"desc": "3D prototype with the row of needles, the looper, the spreader and the differential feed dogs; change the stitch type, needle gauge, looper timing, height, avoidance, gap and retreat, and the five criteria are recomputed, the needle or looper at fault turns red, and you can step to the shaft angle where it fails."
+},
+{
+"ch": 10,
 "href": "labs/looper.html",
 "kind": "Virtual lab",
 "title": "Chainstitch looper and 401 stitch formation",

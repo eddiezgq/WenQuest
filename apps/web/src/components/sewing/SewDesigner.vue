@@ -96,7 +96,11 @@
         <!-- 三维样机 -->
         <view v-show="tab === 'proto'" class="pane">
           <!-- #ifdef H5 -->
-          <view class="frame" :class="{ flat: R && ['looper', 'embroid'].includes(R.view.page) }">
+          <view v-if="R && R.view.alt" class="chips pv">
+            <text class="opt" :class="{ on: !altView }" @click="altView = false">{{ t("sew.protoView.3d") }}</text>
+            <text class="opt" :class="{ on: altView }" @click="altView = true">{{ t("sew.protoView.looper") }}</text>
+          </view>
+          <view class="frame" :class="{ flat: R && ['looper', 'embroid'].includes(curView.page) }">
             <iframe v-if="protoOk" :key="protoSrc" ref="frame" class="proto" :src="protoSrc" title="3D" @load="syncProto" />
             <view v-else class="empty">{{ t("sew.protoMissing") }}</view>
           </view>
@@ -272,9 +276,13 @@ const mname = (k?: string) => { const m = machines.value.find((x) => x.key === (
 const projectNames = computed(() => projects.value.map((p) => `${p.name}（${mname(p.machine)}）`));
 const plabels = computed(() => { const o: Record<string, string> = {}; for (const grp of schema.value) for (const x of grp.params) { o[x.key] = L(x); for (const c of x.choices || []) o[`${x.key}:${c.key}`] = L(c); } return o; });
 const pIndex = computed(() => Math.max(0, projects.value.findIndex((p) => p.id === current.value?.id)));
-const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "looper", pattern: "model-pattern", embroid: "embroid", flatknit: "model-flatknit" };
+const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "model-cover", pattern: "model-pattern", embroid: "embroid", flatknit: "model-flatknit" };
 const MACHINE_KEYS = Object.keys(PAGES);
-const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${PAGES[machine.value] || PAGES.lockstitch}`);
+// 第 73 轮：绷缝机有两个视图——三维样机（模型 10-1）和弯针动画（实验 10-1，view.alt）
+const altView = ref(false);
+watch(machine, () => { altView.value = false; });
+const curView = computed(() => (altView.value && R.value?.view?.alt) || R.value?.view || { page: PAGES[machine.value] });
+const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${altView.value && machine.value === "cover" ? "looper" : PAGES[machine.value] || PAGES.lockstitch}`);
 
 // ---------- 计算 ----------
 let timer: any = null;
@@ -423,7 +431,7 @@ function syncProto() {
   // #ifdef H5
   try {
     const w = frame.value?.contentWindow || (frame.value?.$el as HTMLIFrameElement | undefined)?.contentWindow;
-    const v = R.value?.view;
+    const v = R.value ? curView.value : null;
     if (!w || !w.__api || !v) return;
     if (v.sync === "setCfg") w.__api.setCfg(v.cfg);
     else if (v.sync === "ST") { Object.assign(w.__api.ST, v.cfg); w.__api.changed(); }
@@ -790,6 +798,7 @@ init();
 .td { flex: 1; padding: 6px 8px; min-width: 0; }
 .tr:last-child { font-weight: 600; }
 .frame.flat { aspect-ratio: 4 / 3; }
+.pv { margin-bottom: 8px; }
 .csv { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
 .frame { position: relative; width: 100%; aspect-ratio: 16 / 10; background: #0b1220; border-radius: 6px; overflow: hidden; }
 .proto { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
