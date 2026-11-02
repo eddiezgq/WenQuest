@@ -1,0 +1,25 @@
+# 实验 23.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab23_6.js。
+原理:
+  - ["级数 Σaₖ 的和是部分和 Sₙ 的极限；余项 Rₙ = S − Sₙ。几何级数 Σrᵏ（|r| < 1）的和为 1/(1 − r)，余项 Rₙ = rⁿ/(1 − r)（Sₙ 为前 n 项之和）可以准确算出（23.1 节）。", "The sum of Σaₖ is the limit of the partial sums Sₙ; the remainder is Rₙ = S − Sₙ. A geometric series Σrᵏ (|r| < 1) sums to 1/(1 − r) and its remainder Rₙ = rⁿ/(1 − r) (Sₙ the sum of the first n terms) is known exactly (Section 23.1)."]
+  - 式: "零件弹跳：总时间 T = t₀(1 + e)/(1 − e)，t₀ = √(2h/g)；前 n 次弹跳后余下 2t₀eⁿ⁺¹/(1 − e)"
+  - ["交错级数的误差不超过第一个略去的项（23.4 节）；莱布尼茨级数的误差约为 1/n，收敛极慢。艾特肯 Δ² 加速 S − Sₙ₊₂ ≈ −(ΔSₙ₊₁)²/(Δ²Sₙ) 对误差按比例变化的数列特别有效；Σ1/k² 的余项约为 1/n − 1/(2n²) + 1/(6n³)（23.6 节）。", "An alternating series' error is at most the first omitted term (Section 23.4); the Leibniz series' error is about 1/n, painfully slow. Aitken's Δ² works best when errors shrink by a ratio; the remainder of Σ1/k² is about 1/n − 1/(2n²) + 1/(6n³) (Section 23.6)."]
+步骤:
+  - ["在“零件弹跳”场景中取 h = 200 mm、e = 0.6，逐次增加 n，记录部分和与余项，找出余项小于 10 ms 所需的弹跳次数（任务 1），填入表 1。", "In 'Bouncing part' take h = 200 mm, e = 0.6; increase n and record the partial sum and remainder; find how many bounces bring the remainder below 10 ms (task 1). Table 1."]
+  - ["取 h = 200 mm，调 e，使总时间不超过 0.5 s（任务 2）；由公式反算 e 的上限并比较。", "With h = 200 mm adjust e until the total time is at most 0.5 s (task 2); compare with the bound from the formula."]
+  - ["在“求 π”场景中选级数 1、方法 1，找出误差小于 0.01 所需的项数（任务 3）；再换方法 2、3，记录 n = 5、10、15、20 时的误差，填入表 2（任务 4）。", "In 'Computing π' choose series 1, method 1; find how many terms give an error below 0.01 (task 3); then methods 2 and 3, recording errors at n = 5, 10, 15, 20 in Table 2 (task 4)."]
+  - ["选级数 2，比较方法 1 与方法 4（任务 5）；选级数 3（任务 6）。比较三种级数达到 10⁻⁸ 所需的项数。", "Choose series 2 and compare methods 1 and 4 (task 5); then series 3 (task 6). Compare the terms each needs for 10⁻⁸."]
+数据表:
+  - 标题: ["表 1  零件弹跳（h = 200 mm，e = 0.6）", "Table 1  Bouncing part (h = 200 mm, e = 0.6)"]
+    表头: ["弹跳次数 n", "部分和 / ms", "余项（读数）/ ms", "余项（公式）/ ms"]
+    表头英文: ["bounces n", "partial sum / ms", "remainder (readout) / ms", "remainder (formula) / ms"]
+    行: [["1", "", "", ""], ["3", "", "", ""], ["6", "", "", ""], ["9", "", "", ""]]
+  - 标题: ["表 2  求 π 的误差", "Table 2  Errors in π"]
+    表头: ["n", "级数 1 直接", "级数 1 反复平均", "级数 1 艾特肯", "级数 2 积分修正", "级数 3 直接"]
+    表头英文: ["n", "series 1 plain", "series 1 averaging", "series 1 Aitken", "series 2 corrected", "series 3 plain"]
+    行: [["5", "", "", "", "", ""], ["10", "", "", "", "", ""], ["15", "", "", "", "", ""], ["20", "", "", "", "", ""]]
+注意:
+  - ["弹跳模型假定恢复系数不变、零件不翻滚，空气阻力不计；真实零件弹跳几次后就会滚动、晃动。", "The bounce model assumes a constant coefficient of restitution, no tumbling and no air drag; real parts start rolling and rocking after a few bounces."]
+  - ["双精度的相对精度约为 2.2×10⁻¹⁶，误差到了这个量级就不会再减小，加速方法甚至会因为相消而变差。", "Double precision has a relative accuracy of about 2.2×10⁻¹⁶; errors stop improving at that level, and acceleration can even get worse through cancellation."]
+思考题:
+  - ["几何级数的余项可以准确算出，所以弹跳的总时间可以“预先知道”。物理引擎遇到很小的弹跳速度时直接让它停下，为什么？", "A geometric remainder is known exactly, so the total bounce time is known in advance. Why do physics engines simply stop a bounce when the rebound speed is very small?"]
+  - ["艾特肯加速对莱布尼茨级数这样有效，对调和级数的部分和也能“加速出”一个有限的和吗？这说明加速方法有什么风险？", "Aitken works wonders on the Leibniz series; could it also 'accelerate' the harmonic partial sums to a finite value? What risk of acceleration does this reveal?"]
