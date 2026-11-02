@@ -1,0 +1,28 @@
+# 实验 13.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_3.js。
+原理:
+  - ["物体在空中下落时，重力作用在质心上，对质心的力矩为零，绕质心的总角动量守恒。原来没有转动，总角动量就一直是零。", "In free fall gravity acts at the centre of mass and has no torque about it, so the angular momentum about the centre of mass is conserved. Starting without rotation, it stays zero."]
+  - ["由两部分组成、可以绕同一轴相对转动的物体：J₁ω₁ + J₂ω₂ = 0。两部分相对转过 Δφ 时，各自转过的角度与转动惯量成反比。", "For a body made of two parts that can turn relative to each other about one axis: J₁ω₁ + J₂ω₂ = 0. When they turn Δφ relative to each other, each turns by an amount inversely proportional to its moment of inertia."]
+  - 式: "身体转角 Δθ = Δφ · J_t/(J_b + J_t)"
+  - ["猫的两步法：一半收腿（转动惯量小）、一半伸腿（大）时扭过去，再交换收腿和伸腿扭回来。形状恢复原样，两半却都净转了一个角度。", "The cat's two-step trick: twist with one half tucked (small moment of inertia) and the other stretched (large), then swap and twist back. The shape is restored, yet both halves have turned."]
+步骤:
+  - ["选“甩尾巴的机器人”，方式 0（试摆），尾巴甩过 60°、90°、120° 各做一次，记下身体反向转过的角度，填入表 1。由 Δθ/Δφ = J_t/(J_b + J_t) 求 J_t/J_b，取平均，调到“你测得的 J_t/J_b”，提交（任务 1）。",
+     "Choose “Robot with a tail”, mode 0 (test swing); swing the tail 60°, 90° and 120°, record how far the body turns the opposite way in Table 1. From Δθ/Δφ = J_t/(J_b + J_t) find J_t/J_b, average, set it and submit (task 1)."]
+  - ["机器人离开台面时机头向下倾 35°。算出要甩多大角度身体才能转回水平，改用方式 1 运行，读落地时的倾角，提交（任务 2）。", "The robot leaves the ledge 35° nose-down. Work out the swing that brings the body back to level; run in mode 1, read the pitch at touchdown and submit (task 2)."]
+  - ["选“猫”，先算出一个循环两半各净转多少（用 Δ 和转动惯量 1 与 3 表示），再选 Δ 和循环次数，让猫从背朝下转到四脚朝下。注意下落时间只有 0.45 s，一个循环要 0.20 s。运行后提交（任务 3）。",
+     "Choose “Cat”. Work out how much each half turns per cycle (in terms of Δ and the moments of inertia 1 and 3), then choose Δ and the number of cycles to turn the cat from upside down to feet-down. The fall lasts only 0.45 s and a cycle takes 0.20 s. Run and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  机器人试摆", "Table 1  Robot test swing"]
+    表头: ["尾巴甩过的角度 Δφ / (°)", "身体转过的角度 Δθ / (°)", "Δθ/Δφ", "J_t/J_b"]
+    表头英文: ["Tail swing Δφ / (°)", "Body rotation Δθ / (°)", "Δθ/Δφ", "J_t/J_b"]
+    行: [["60", "", "", ""], ["90", "", "", ""], ["120", "", "", ""]]
+  - 标题: ["表 2  猫", "Table 2  Cat"]
+    表头: ["Δ / (°)", "循环次数", "前半身离四脚朝下 / (°)", "后半身离四脚朝下 / (°)"]
+    表头英文: ["Δ / (°)", "Cycles", "Front half from feet-down / (°)", "Back half from feet-down / (°)"]
+    行: [["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]
+注意:
+  - ["试摆读数带有 ±0.3% 以内的误差。尾巴和身体的转动惯量之比不显示，要靠试摆测出。", "Test-swing readings carry errors up to ±0.3%. The tail-to-body ratio is not shown; measure it with the test swing."]
+  - ["模型把尾巴看成绕身体质心的轴摆动，把猫的两半看成绕同一根脊柱转动，都是简化。", "The model treats the tail as swinging about an axis through the body's centre of mass and the cat's halves as turning about a single spine axis; both are simplifications."]
+思考题:
+  - ["甩尾巴前后，机器人的总角动量各是多少？身体为什么能转？", "What is the robot's total angular momentum before and after the swing? Why can the body still turn?"]
+  - ["尾巴越长越重，身体能转得越多，代价是什么？", "A longer, heavier tail turns the body more: what is the cost?"]
+  - ["如果猫两半同时收腿、同时伸腿，扭过去再扭回来，结果如何？", "If the cat tucked and stretched both halves together, twisting and untwisting, what would happen?"]

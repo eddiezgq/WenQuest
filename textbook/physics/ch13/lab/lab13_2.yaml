@@ -1,0 +1,30 @@
+# 实验 13.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab13_2.js。
+原理:
+  - ["每个螺旋桨受空气的阻力矩，电机要用同样大的力矩维持转速，电机定子装在机身上，机身就受到与螺旋桨转向相反的反扭矩 Q = k_Q ω²。两个顺时针、两个逆时针的螺旋桨转速相同时，反扭矩抵消。",
+     "Each propeller feels an aerodynamic drag torque; the motor supplies an equal torque to keep it spinning, and since the stator is fixed to the frame, the frame feels a reaction torque Q = k_Q ω² opposite to the propeller's spin. With two clockwise and two anticlockwise propellers at equal speed, the reaction torques cancel."]
+  - ["顺时针的一对加 δ、逆时针的一对减 δ，偏航力矩为", "Speeding the clockwise pair up by δ and slowing the anticlockwise pair by δ gives the yaw torque"]
+  - 式: "M_z = 8 k_Q ω₀ δ        （式 (13.2.6)）"
+  - ["机身在试验台上只能绕竖直轴转，M_z = J_z α。方式 0 中 δ 保持 2.000 s，从静止转过的角度 θ = ½αt²；方式 1 先加速 1.0 s、再减速 1.0 s，转过 θ = α(1.0 s)²。",
+     "On the stand the frame can only yaw, M_z = J_z α. In mode 0, δ is held for 2.000 s and the angle from rest is θ = ½αt²; in mode 1 it accelerates for 1.0 s and brakes for 1.0 s, turning θ = α(1.0 s)²."]
+  - ["转椅场景：人、转椅、轮子组成的系统在竖直方向不受外力矩，竖直方向的角动量守恒。轮轴从竖直向上翻过 β，轮子的角动量的竖直分量从 J_wω_w 变为 J_wω_w cos β，人和转椅得到", "Chair scene: the person, chair and wheel feel no external torque about the vertical, so the vertical angular momentum is conserved. Tilting the axle by β from straight up changes the wheel's vertical component from J_wω_w to J_wω_w cos β, so person and chair gain"]
+  - 式: "J_c ω_c = J_w ω_w (1 − cos β)"
+步骤:
+  - ["选“偏航试验台”，方式 0，δ 分别取 20、40、60、80 rad/s，各点“开始”一次，记下 2.000 s 时机头转过的角度，填入表 1，算出 α 和 M_z。", "Choose “Yaw test stand”, mode 0, and run δ = 20, 40, 60, 80 rad/s, recording the heading change at 2.000 s in Table 1; compute α and M_z."]
+  - ["作 M_z–δ 图，由斜率 8k_Qω₀ 求 k_Q，以 10⁻⁸ N·m/(rad/s)² 为单位调到“你的结果”，提交（任务 1）。", "Plot M_z against δ; from the slope 8k_Qω₀ find k_Q, set it in units of 10⁻⁸ N·m/(rad/s)² as “Your result” and submit (task 1)."]
+  - ["用你测得的 k_Q 算出方式 1 下转过 90° 需要的 δ，改用方式 1 运行，检查读数，提交（任务 2）。", "Use your k_Q to compute the δ needed to turn 90° in mode 1; run in mode 1, check the reading and submit (task 2)."]
+  - ["选“转椅与自行车轮”，β = 180°，轮子转速取 3、5、7 r/s 各做一次，再取 β = 90° 做一次，读转椅的角速度，求轮子的转动惯量，提交（任务 3）。", "Choose “Swivel chair and bicycle wheel”; with β = 180° run wheel spins of 3, 5 and 7 r/s, then once with β = 90°; read the chair's angular velocity, find the wheel's moment of inertia and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  偏航试验台（方式 0，ω₀ = 1000 rad/s，J_z = 0.012 kg·m²）", "Table 1  Yaw stand (mode 0, ω₀ = 1000 rad/s, J_z = 0.012 kg·m²)"]
+    表头: ["δ / (rad/s)", "2.000 s 时转角 / (°)", "α = 2θ/t² / (rad/s²)", "M_z = J_zα / (N·m)"]
+    表头英文: ["δ / (rad/s)", "Angle at 2.000 s / (°)", "α = 2θ/t² / (rad/s²)", "M_z = J_zα / (N·m)"]
+    行: [["20", "", "", ""], ["40", "", "", ""], ["60", "", "", ""], ["80", "", "", ""]]
+  - 标题: ["表 2  转椅与自行车轮（J_c = 2.5 kg·m²）", "Table 2  Chair and wheel (J_c = 2.5 kg·m²)"]
+    表头: ["轮子转速 / (r/s)", "β / (°)", "转椅角速度 / (rad/s)", "J_w / (kg·m²)"]
+    表头英文: ["Wheel spin / (r/s)", "β / (°)", "Chair angular velocity / (rad/s)", "J_w / (kg·m²)"]
+    行: [["3", "180", "", ""], ["5", "180", "", ""], ["7", "180", "", ""], ["5", "90", "", ""]]
+注意:
+  - ["这架飞机的螺旋桨与正文算例 13.2.3 的不同，k_Q 要自己测。角度读数带有 ±0.3% 以内的误差。", "This drone's propellers differ from Example 13.2.3; measure k_Q yourself. Angle readings carry errors up to ±0.3%."]
+  - ["计算时角度要换成弧度。", "Convert angles to radians in the calculations."]
+思考题:
+  - ["反扭矩是谁施加给谁的？如果机身装在完全没有摩擦的轴上，螺旋桨从静止加速到悬停转速的过程中，机身会怎样？", "Who exerts the reaction torque on whom? If the frame were on a frictionless pivot, what would it do while the propellers spin up from rest?"]
+  - ["转椅场景中，β = 90° 时转椅的角速度是 β = 180° 时的几分之几？为什么？", "In the chair scene, what fraction of the β = 180° chair speed do you get with β = 90°, and why?"]
