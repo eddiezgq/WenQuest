@@ -95,7 +95,7 @@ operations:
     content: 锯 Ø60×142
     datum: 外圆
     clamping: 锯床虎钳
-    minutes: 3
+    minutes: 3.5
     setup_min: 10
     locate: [{surface: 外圆, symbol: v, dof: 4}]
     clamp: [{surface: 外圆, kind: hydraulic}]
@@ -121,7 +121,7 @@ operations:
       - {name: 密封轴颈, size_mm: 25.5, es_mm: 0, ei_mm: -0.2, Ra_um: 12.5}
       - {name: 轴承位, size_mm: 26.5, es_mm: 0, ei_mm: -0.2, Ra_um: 12.5}
       - {name: 齿顶圆, size_mm: 53.5, es_mm: 0, ei_mm: -0.3, Ra_um: 12.5}
-    minutes: 9
+    minutes: 8.5
     setup_min: 30
     coolant: 乳化液
     fixture: 三爪自定心卡盘，回转顶尖
@@ -165,7 +165,7 @@ operations:
       - {name: 密封轴颈, size_mm: 24.4, es_mm: 0, ei_mm: -0.05, Ra_um: 3.2}
       - {name: 轴承位, size_mm: 25.4, es_mm: 0, ei_mm: -0.05, Ra_um: 3.2}
       - {name: 齿顶圆, size_mm: 52, es_mm: 0, ei_mm: -0.19, Ra_um: 3.2}
-    minutes: 8
+    minutes: 5
     setup_min: 20
     coolant: 乳化液
     fixture: 前顶尖（固定）、后顶尖（回转），鸡心夹头
@@ -203,7 +203,7 @@ operations:
     datum: 两端中心孔（精基准）
     clamping: 上下顶尖，拨盘
     tools: m2 单头滚刀 Ø63
-    minutes: 9
+    minutes: 8
     setup_min: 40
     coolant: 切削油
     aux: [去毛刺（齿端倒棱）]
@@ -231,7 +231,7 @@ operations:
     datum: 轴伸外圆（V 形块）
     clamping: V 形块，压板
     tools: 键槽铣刀 Ø6
-    minutes: 5
+    minutes: 5.5
     setup_min: 20
     coolant: 乳化液
     fixture: 键槽铣夹具（两个短 V 形块、轴向挡板、压板）
