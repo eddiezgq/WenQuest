@@ -201,3 +201,7 @@ li.unknown .chip { background: var(--hold-bg); color: var(--hold); }
 .curve .line { fill: none; }
 .cc svg { max-width: 900px; }
 .asm .figs figure svg { max-width: 340px; margin: 0 auto; }
+/* part drawings */
+.parts .dl { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 6px 0; font-size: 13px; }
+.partgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 12px; }
+.partgrid h2 { margin-top: 6px; } .partgrid svg { width: 100%; height: auto; display: block; }

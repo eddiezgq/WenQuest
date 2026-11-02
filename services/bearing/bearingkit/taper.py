@@ -98,6 +98,19 @@ class TaperBearing:
         return 1 / ((2 / self.D) / (1 - g)) if ring == "inner" else 1 / ((2 / self.D) / (1 + g))
 
 
+def on_apex_cone_angle(D: float, dm: float, alpha_o_deg: float) -> float:
+    """The cone angle for which the rollers roll without sliding: the apexes of the cup, the cone and every roller
+    meet on the bearing axis. A roller of mean diameter D_w whose own apex is on the axis has tan φ = D_w sin α_m / d_m
+    (φ its half angle, α_m its axis angle, the roller centre on the pitch circle), with φ = (α_o − α_i)/2 and
+    α_m = (α_o + α_i)/2."""
+    ao = math.radians(alpha_o_deg)
+
+    def f(ai):
+        return math.tan((ao - ai) / 2) - D * math.sin((ao + ai) / 2) / dm
+
+    return math.degrees(brentq(f, 1e-9, ao - 1e-12, xtol=1e-14))
+
+
 def bearing(d: dict) -> TaperBearing:
     return TaperBearing(
         D=float(d["D"]),

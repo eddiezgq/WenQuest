@@ -245,6 +245,20 @@ def _freq(b, sc: dict):
     return BB.frequencies(b, n, outer_turns=sc["outer_turns"]) if n else None
 
 
+def geometry_of(p: dict) -> dict:
+    """The design geometry of a project, as the checks see it (for drawings and 3D models)."""
+    t = p.get("type") or "deep_groove"
+    if t == "cylindrical":
+        from bearingkit import cyl_check
+
+        return cyl_check.build(p)[1]
+    if t == "tapered":
+        from bearingkit import taper_check
+
+        return taper_check.build(p)[1]
+    return build(p)[1]
+
+
 def analyse(p: dict) -> dict:
     if p.get("type") == "cylindrical":
         from bearingkit import cyl_check  # round 64 step 4 (imports the helpers above)

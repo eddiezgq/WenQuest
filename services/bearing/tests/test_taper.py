@@ -60,3 +60,16 @@ def test_single_row_needs_axial_force():
         T.distribute(T.bearing(TRB), 5000.0, 0.0)
     with pytest.raises(ValueError, match="cone angle"):
         T.bearing(TRB | {"alpha_i_deg": 16})
+
+
+def test_on_apex_cone_angle():
+    ai = T.on_apex_cone_angle(9.0, 52.0, 15.0)
+    am, ph = math.radians((15.0 + ai) / 2), math.radians((15.0 - ai) / 2)
+    assert math.tan(ph) == pytest.approx(9.0 * math.sin(am) / 52.0, rel=1e-12)  # the roller's own apex on the axis
+    # then the roller axis, the cup line and the cone line all meet the bearing axis at one point
+    rc = 52.0 / 2                                                               # roller centre on the pitch circle
+    z_axis = -rc / math.tan(am)
+    for side, a in ((1, 15.0), (-1, ai)):
+        r0 = rc + side * 4.5 * math.cos(am)
+        z0 = -side * 4.5 * math.sin(am)
+        assert z0 - r0 / math.tan(math.radians(a)) == pytest.approx(z_axis, rel=1e-9)

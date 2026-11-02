@@ -144,6 +144,25 @@ def analyse(p: dict) -> dict:
             "mm",
         )
     )
+    ai_apex = TP.on_apex_cone_angle(b.D, b.dm, g["alpha_o_deg"])
+    g["alpha_i_apex_deg"] = ai_apex
+    ok_apex = abs(ai_apex - g["alpha_i_deg"]) < 0.005  # angles are entered to 0.01°
+    checks.append(
+        _ck(
+            "apex",
+            "锥顶重合（滚子纯滚动）：内圈锥角应为",
+            "Apexes meet (rollers roll without sliding): the cone angle should be",
+            f"{g['alpha_i_deg']:.3f}",
+            f"{ai_apex:.3f}",
+            PASS if ok_apex else FAIL,
+            "°",
+            ""
+            if ok_apex
+            else "the cup, cone and roller apexes do not meet on the axis: the rollers slide and skew; "
+            "set the cone angle to the value given",
+            "" if ok_apex else "外圈、内圈和滚子的锥顶不在轴线上同一点：滚子会滑动和歪斜；请把内圈锥角改成给出的值",
+        )
+    )
     checks.append(
         _ck(
             "rib_ratio",
