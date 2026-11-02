@@ -548,6 +548,70 @@ def sram_access(rows, cols, word, dv=0.1, q=None):
             "c_bl_dev": rows * S["c_cell"], "c_bl_wire": rows * wire_c("met2", WIRES["met2"]["wmin"]) * q["cell_h"]}
 
 
+# ======================================================================= 第 8 章：时钟与时序分析
+# 数据通路的各块延时取第 6 章的综合结果（arith_syn），触发器取第 3 章（ff_timing）；这里补两样手算模型。
+
+def sat_delay(n_hi=16, n_out=16):
+    """无符号饱和电路的延时（s）：32 位和的高 n_hi 位有 1 即溢出（或非、与非交替的二输入树，log2 n_hi 级），
+    溢出信号经反相器驱动 n_out 个二选一（与非–与非），逻辑努力求最小延时，输出驱动一个参考反相器（H = 1）。"""
+    k = max(1, int(round(math.log2(n_hi))))
+    gs, ps = [], []
+    for i in range(k):
+        kind = "nor" if i % 2 == 0 else "nand"
+        gs.append(le_g(kind, 2)); ps.append(le_p(kind, 2))
+    gs += [1.0, le_g("nand", 2), le_g("nand", 2)]
+    ps += [le_p("inv", 1), le_p("nand", 2), le_p("nand", 2)]
+    d, _ = path_delay(gs, ps, n_out, 1.0)
+    return d * tau()
+
+
+def ff_clk_cap():
+    """一个传输门主从触发器挂在时钟上的电容（F），与第 3 章算例 3.4.1 相同：时钟输入 + 反相时钟节点 + 同相时钟节点。"""
+    g = gamma_self()
+    return (1 + (3 + g) + (2 + g)) * cin(Wmin, r_ratio() * Wmin)
+
+
+def htree(levels, die_um, n_ff, size, layer="met3", imb=0.0, vdd=VDD, f=100e6):
+    """H 形时钟树（每个 H 分两级二分，共 2·levels 级，4^levels 个叶子）。
+    第 i 级（i = 1…2·levels）每段导线长 die/2^(⌈i/2⌉+1)；每个分叉处一个 size 倍参考反相器的缓冲器，驱动两段导线和下一级的两个缓冲器：
+      t_i = 0.69·Rd·(Cself + 2(Cw + Cb)) + 0.38·Rw·Cw + 0.69·Rw·Cb；
+    叶子缓冲器驱动本区的 n_ff/4^levels 个触发器：本区边长 a = die/2^levels，区内导线总长按 a·√n 估计，
+      t_leaf = 0.69·Rd·(Cself + C本地线 + n·C触发器) + 0.38·(r·a)·(C本地线 + n·C触发器)。
+    imb：某一个叶子区的触发器多出的比例，它的叶子延时与正常区之差即偏斜。导线取该层最小线宽。返回 dict（s、F、W）。"""
+    rr = r_ratio()
+    R0 = (req_n(Wmin) + req_p(rr * Wmin)) / 2
+    C0 = cin(Wmin, rr * Wmin)
+    Rd, Cself, Cb = R0 / size, gamma_self() * C0 * size, C0 * size
+    w = WIRES[layer]["wmin"]
+    rw, cw = wire_r(layer, w), wire_c(layer, w)
+    m = 2 * levels
+    t_tree, c_wire, n_buf = 0.0, 0.0, 1
+    for i in range(1, m + 1):
+        seg = die_um / 2 ** (math.ceil(i / 2) + 1)
+        Rw, Cw = rw * seg, cw * seg
+        t_tree += 0.69 * Rd * (Cself + 2 * (Cw + Cb)) + 0.38 * Rw * Cw + 0.69 * Rw * Cb
+        c_wire += 2 ** i * Cw
+        n_buf += 2 ** i
+    leaves = 4 ** levels
+    a = die_um / 2 ** levels
+    cff = ff_clk_cap()
+
+    def leaf(n):
+        cl = cw * a * math.sqrt(n)
+        return 0.69 * Rd * (Cself + cl + n * cff) + 0.38 * rw * a * (cl + n * cff), cl
+    n_per = n_ff / leaves
+    t_leaf, c_loc = leaf(n_per)
+    t_imb, _ = leaf(n_per * (1 + imb))
+    c_local = leaves * c_loc
+    c_buf = n_buf * (Cb + Cself)
+    c_ffs = n_ff * cff
+    c_tot = c_wire + c_local + c_buf + c_ffs
+    return {"t_tree": t_tree, "t_leaf": t_leaf, "insertion": t_tree + t_leaf, "skew": t_imb - t_leaf, "n_buf": n_buf,
+            "leaves": leaves, "n_per": n_per, "c_wire": c_wire, "c_local": c_local, "c_buf": c_buf, "c_ff": c_ffs, "c_total": c_tot,
+            "ratio": (c_tot - c_ffs) / c_ffs, "power": c_tot * vdd ** 2 * f, "p_ff": c_ffs * vdd ** 2 * f,
+            "wire_um": c_wire / cw + c_local / cw}
+
+
 def reference():
     r = kn / kp
     pr = P["problems"]
@@ -625,4 +689,9 @@ def reference():
     for R in (64, 256, 1024):
         a = sram_access(R, 32768 // R, 32)
         out["ch7"]["access"][str(R)] = {k: a[k] for k in ("total", "dec", "bl", "area")}
+    # 第 8 章
+    out["ch8"] = {"sat": sat_delay(), "cff": ff_clk_cap(), "tree": {}}
+    for lv, sz in ((2, 8), (3, 16), (4, 32)):
+        h = htree(lv, 1000, 2000, sz, "met3", 0.2)
+        out["ch8"]["tree"][f"{lv}_{sz}"] = {"ins": h["insertion"], "skew": h["skew"], "ratio": h["ratio"], "power": h["power"]}
     return out

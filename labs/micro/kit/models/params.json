@@ -192,6 +192,51 @@
       "entries_per_sector": 256,
       "sectors": 16,
       "years": 10
+    },
+    "p81": {
+      "f_MHz": 50,
+      "jitter_ps": 100,
+      "bits_out": 16,
+      "blocks": [
+        [
+          "sub",
+          "add_rca_16",
+          "add_ks_16"
+        ],
+        [
+          "mul",
+          "mul_array_16",
+          "mul_dadda_16"
+        ],
+        [
+          "add1",
+          "add_rca_32",
+          "add_bk_32"
+        ],
+        [
+          "add2",
+          "add_rca_32",
+          "add_bk_32"
+        ],
+        [
+          "sat",
+          "",
+          ""
+        ]
+      ]
+    },
+    "p84": {
+      "die_um": 1000,
+      "layer": "met3",
+      "levels": 3,
+      "size": 16,
+      "imb": 0.2
+    },
+    "p85": {
+      "f_src_MHz": 25,
+      "f_dst_MHz": 50,
+      "word": 16,
+      "loop_kHz": 20
     }
   },
   "wires": {

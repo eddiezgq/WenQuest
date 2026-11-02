@@ -254,6 +254,32 @@
       return { dec: tDec, dec_N: best[1], wl: tWl, bl: tBl, sa: tSa, out: tOut, total: tDec + tWl + tBl + tSa + tOut, area,
                c_bl: cBl, c_wl: cWl, mux: M, w_um: cw + q.dec_w, h_um: rows * q.cell_h + q.col_h, c_bl_dev: cDev, c_bl_wire: cWire };
     };
+    /* ---------- 第 8 章：时钟与时序分析（与 conventions/mos.py 一一对应） ---------- */
+    m.satDelay = (nHi = 16, nOut = 16) => {
+      const k = Math.max(1, Math.round(Math.log2(nHi))), gs = [], ps = [];
+      for (let i = 0; i < k; i++) { const kind = i % 2 === 0 ? 'nor' : 'nand'; gs.push(m.leG(kind, 2)); ps.push(m.leP(kind, 2)); }
+      gs.push(1, m.leG('nand', 2), m.leG('nand', 2)); ps.push(m.leP('inv', 1), m.leP('nand', 2), m.leP('nand', 2));
+      return m.pathDelay(gs, ps, nOut, 1).D * m.tau();
+    };
+    m.ffClkCap = () => (1 + (3 + gam) + (2 + gam)) * m.cin(Wmin, rr * Wmin);
+    m.htree = (levels, die, nFf, size, layer = 'met3', imb = 0, vdd = VDD, f = 100e6) => {
+      const R0 = (m.reqN(Wmin) + m.reqP(rr * Wmin)) / 2, C0 = m.cin(Wmin, rr * Wmin);
+      const Rd = R0 / size, Cself = gam * C0 * size, Cb = C0 * size, w = WL[layer].wmin, rw = m.wireR(layer, w), cw = m.wireC(layer, w);
+      const mm = 2 * levels;
+      let tTree = 0, cWire = 0, nBuf = 1;
+      for (let i = 1; i <= mm; i++) {
+        const seg = die / 2 ** (Math.ceil(i / 2) + 1), Rw = rw * seg, Cw = cw * seg;
+        tTree += 0.69 * Rd * (Cself + 2 * (Cw + Cb)) + 0.38 * Rw * Cw + 0.69 * Rw * Cb;
+        cWire += 2 ** i * Cw; nBuf += 2 ** i;
+      }
+      const leaves = 4 ** levels, a = die / 2 ** levels, cff = m.ffClkCap();
+      const leaf = (n) => { const cl = cw * a * Math.sqrt(n); return [0.69 * Rd * (Cself + cl + n * cff) + 0.38 * rw * a * (cl + n * cff), cl]; };
+      const nPer = nFf / leaves, [tLeaf, cLoc] = leaf(nPer), [tImb] = leaf(nPer * (1 + imb));
+      const cLocal = leaves * cLoc, cBuf = nBuf * (Cb + Cself), cFfs = nFf * cff, cTot = cWire + cLocal + cBuf + cFfs;
+      return { t_tree: tTree, t_leaf: tLeaf, insertion: tTree + tLeaf, skew: tImb - tLeaf, n_buf: nBuf, leaves, n_per: nPer,
+               c_wire: cWire, c_local: cLocal, c_buf: cBuf, c_ff: cFfs, c_total: cTot, ratio: (cTot - cFfs) / cFfs,
+               power: cTot * vdd * vdd * f, p_ff: cFfs * vdd * vdd * f, wire_um: cWire / cw + cLocal / cw };
+    };
     m.reference = () => {
       const r = kn / kp, pr = P.problems, out = { r, idsat_n_per_um: m.idsatN(1), idsat_p_per_um: m.idsatP(1) };
       const w = m.wnForVol(pr.p11.Iload, pr.p11.VOLmax);
@@ -301,6 +327,8 @@
       for (const pr of [1, 2, 3]) out.ch7.write[pr] = m.sramWriteTrip(2, pr);
       for (const R of [64, 256, 1024]) { const a = m.sramAccess(R, 32768 / R, 32); out.ch7.access[R] = { total: a.total, dec: a.dec, bl: a.bl, area: a.area }; }
       out.ch7.sa = m.saTime(0.07); out.ch7.sim = m.sramSimSnm(1.75);
+      out.ch8 = { sat: m.satDelay(), cff: m.ffClkCap(), tree: {} };
+      for (const [L, S] of [[2, 8], [3, 16], [4, 32]]) { const h = m.htree(L, 1000, 2000, S, 'met3', 0.2); out.ch8.tree[L + '_' + S] = { ins: h.insertion, skew: h.skew, ratio: h.ratio, power: h.power }; }
       return out;
     };
     return m;

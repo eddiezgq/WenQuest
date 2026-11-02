@@ -1,0 +1,24 @@
+# 实验 8.3 的指导书与报告模板。目的、场景、参数、任务取自 lab8_3.js（由 labs/micro/textbook/lab8_3.body.js 生成）。
+原理:
+  - ["静态时序分析把数据通路看成从寄存器到寄存器的路径，一条路径要在一个时钟周期内走完：", "Static timing analysis views the datapath as register-to-register paths; each must finish within one clock period:"]
+  - 式: "T ≥ tcq + t逻辑,max + tsu        (8.1.1，不计偏斜、抖动)"
+  - ["在组合逻辑中间插一排寄存器（流水线），一条长路径变成几级短路径，周期由最长的一级决定；每插一级多一拍延迟，多一排触发器。积分回路（积分加法 → 积分寄存器）里不能插。", "A row of registers (pipelining) splits a long path into shorter stages; the period is set by the longest. Each register adds a cycle of latency and a row of flip-flops. None may go inside the integrator loop."]
+  - ["各块的延时与面积取自第 6 章按 SKY130 单元库的综合：低成本用行波进位与阵列乘法器（只求面积），快速用 Kogge–Stone、Dadda 树、Brent–Kung（尽量快）。", "Block delays and areas come from the SKY130 synthesis of Chapter 6: ripple adders and array multipliers for low cost (area-only), Kogge–Stone, Dadda and Brent–Kung for speed."]
+步骤:
+  - ["低成本、不插寄存器、50 MHz，记下各块组成的一级、最小周期和最高频率（任务 1），填入表 1 第一行。", "Low-cost, no registers, 50 MHz: record the stage, minimum period and maximum frequency (task 1); first row of Table 1."]
+  - ["只打开一个插寄存器的位置，四个位置逐个试，填入表 1，找出满足 50 MHz 的那一个（任务 2）。", "Turn on one register position at a time, try all four, fill Table 1 and find the one that meets 50 MHz (task 2)."]
+  - ["换成快速结构、不插寄存器（任务 3），把面积与任务 2 的方案比较，填入表 2。", "Switch to fast structures with no registers (task 3) and compare the area with task 2; fill Table 2."]
+数据表:
+  - 标题: ["表 1  插寄存器的位置（低成本，50 MHz）", "Table 1  Register position (low-cost, 50 MHz)"]
+    表头: ["位置", "各级逻辑 / ns", "最小周期 / ns", "最高频率 / MHz", "是否满足", "触发器数"]
+    表头英文: ["Position", "Stage logic / ns", "Min period / ns", "Max freq. / MHz", "Meets?", "Flip-flops"]
+    行: [["不插", "", "", "", "", "0"], ["减法后", "", "", "", "", ""], ["乘法后", "", "", "", "", ""], ["积分加法后", "", "", "", "", ""], ["输出加法后", "", "", "", "", ""]]
+  - 标题: ["表 2  两种满足 50 MHz 的办法", "Table 2  Two ways to meet 50 MHz"]
+    表头: ["方案", "最高频率 / MHz", "面积 / μm²", "多出的延迟"]
+    表头英文: ["Option", "Max freq. / MHz", "Area / μm²", "Extra latency"]
+    行: [["低成本 + 一级寄存器", "", "", ""], ["快速结构", "", "", ""]]
+注意:
+  - ["块级估算把各块延时直接相加，没有计块与块之间的重叠，也没有计导线，是设计初期比较方案用的；签核要用单元级的静态时序分析（OpenSTA，第 11 章）。", "Adding block delays ignores overlap between blocks and wiring; it is for early comparison. Sign-off uses cell-level STA (OpenSTA, Chapter 11)."]
+思考题:
+  - ["为什么插在乘法器后面最好？如果要 100 MHz，再插一级行不行？", "Why is after the multipliers the best place? Would one more register reach 100 MHz?"]
+  - ["积分加法和积分寄存器之间为什么不能插寄存器？", "Why can no register go between the integrator adder and its register?"]

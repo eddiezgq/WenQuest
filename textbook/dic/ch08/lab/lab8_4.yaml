@@ -1,0 +1,20 @@
+# 实验 8.4 的指导书与报告模板。目的、场景、参数、任务取自 lab8_4.js（由 labs/micro/textbook/lab8_4.body.js 生成）。
+原理:
+  - ["H 形树从中心出发，每一层把区域分成四份，到 4^L 个叶子的导线长度和缓冲器数都相同，理想情况下没有偏斜；叶子缓冲器驱动本区的触发器。", "An H-tree splits the area into four at each level, so all 4^L leaves see equal wire and buffer counts and ideally zero skew; each leaf buffer drives its region's flip-flops."]
+  - ["每一级的延时按第 4 章的分布式 RC 估算，时钟功耗是整个网络的电容充放电：", "Each level's delay follows Chapter 4's distributed RC; the clock power is the whole network being charged every cycle:"]
+  - 式: "P = (C触发器 + C导线 + C缓冲器) · VDD² · f"
+  - ["偏斜在这里来自负载不均：某区的触发器多，它的叶子就慢。", "Skew here comes from load imbalance: a region with more flip-flops has a slower leaf."]
+步骤:
+  - ["缓冲器 16 倍、负载不均 20 %，层数从 1 调到 4，把插入延时、偏斜、功耗填入表 1，找出偏斜小于 50 ps 的最少层数（任务 1）。", "Buffers 16×, imbalance 20 %: step L from 1 to 4, fill Table 1 and find the fewest levels with skew under 50 ps (task 1)."]
+  - ["L = 1，缓冲器调到 32 倍（任务 2），看只加大缓冲器够不够。", "L = 1 with 32× buffers (task 2): are bigger buffers alone enough?"]
+  - ["找一个导线和缓冲器电容超过触发器电容的方案（任务 3），记下它的功耗。", "Find a tree whose wires and buffers exceed the flip-flop capacitance (task 3) and record its power."]
+数据表:
+  - 标题: ["表 1  层数的影响（缓冲器 16 倍，负载不均 20 %）", "Table 1  Effect of levels (16× buffers, 20 % imbalance)"]
+    表头: ["L", "插入延时 / ps", "偏斜 / ps", "时钟功耗 / mW", "导线与缓冲器 ÷ 触发器"]
+    表头英文: ["L", "Insertion / ps", "Skew / ps", "Clock power / mW", "Wires+buffers ÷ FFs"]
+    行: [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""]]
+注意:
+  - ["核心区 1 mm × 1 mm、每层同样大小的缓冲器、区内导线按 a·√n 估计，都是教学设定和粗估；实际由时钟树综合工具按触发器的位置搭树（第 11 章）。", "The 1 mm die, equal buffers at every level and the a·√n local wiring are teaching assumptions; real trees are built by clock-tree synthesis from actual flip-flop positions (Chapter 11)."]
+思考题:
+  - ["为什么层数越多偏斜越小？", "Why does skew fall as levels increase?"]
+  - ["第 3 章取时钟树的电容是触发器的 1.5 倍。按本实验，这个比值在什么情况下成立？", "Chapter 3 assumed the tree has 1.5 times the flip-flop capacitance. When does this lab give such a ratio?"]
