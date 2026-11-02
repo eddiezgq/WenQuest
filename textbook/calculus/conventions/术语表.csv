@@ -402,6 +402,12 @@
 21,倒立摆,inverted pendulum,
 21,捕食者–猎物模型,predator–prey model,
 21,李雅普诺夫函数,Lyapunov function,
+21,状态,state,
+21,轨线,trajectory; orbit,
+21,分界线,separatrix,
+21,模态,mode,
+21,稳定,stable,第 21 章指李雅普诺夫意义下的稳定
+21,吸引域,basin of attraction; region of attraction,
 22,局部截断误差,local truncation error,
 22,整体误差,global error,
 22,龙格–库塔法,Runge–Kutta method,

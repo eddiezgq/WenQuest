@@ -1,0 +1,30 @@
+# 实验 21.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab21_4.js。
+原理:
+  - ["自治系统 ẋ = f(x) 在相平面上的轨线互不相交（定理 21.2.1）。平衡点处的线性化 ξ̇ = Df(x*) ξ：特征值实部全负则渐近稳定，有正的则不稳定，实部为零时线性化不能判断（定理 21.4.1）。", "Trajectories of an autonomous system never cross in the phase plane (Theorem 21.2.1). At an equilibrium the linearization ξ̇ = Df(x*) ξ decides: all eigenvalues with negative real parts means asymptotic stability, one positive means instability, zero real parts leave it undecided (Theorem 21.4.1)."]
+  - 式: "倒立摆 + PD：I θ̈ = m g h sin θ − K_p θ − K_d θ̇，线性化稳定 ⇔ K_p > m g h，K_d > 0"
+  - ["转矩有上限 τ_max 时，从静止释放、倾角达到 arcsin(τ_max/(m g h)) 就必倒；带着角速度时，吸引域的边界还与角速度有关。吸引域是有限的，线性化看不出来（21.4.5 节）。单摆的分界线 E = g/l 分开摆动与转动；范德波尔振子有稳定的极限环（21.5 节）。", "With a torque limit τ_max the robot must fall beyond arcsin(τ_max/(m g h)): the basin of attraction is finite, which linearization cannot show (Section 21.4.5). The pendulum's separatrix E = g/l separates swinging from rotating; the van der Pol oscillator has a stable limit cycle (Section 21.5)."]
+步骤:
+  - ["在“自平衡机器人”场景中取 K_d = 3、初始倾角 10°，把 K_p 从 15 逐渐加大，记录线性化特征值和仿真结果，找出不倒的最小 K_p（任务 1），填入表 1。", "In 'Balancing robot' with K_d = 3 and 10° tilt, raise K_p from 15, recording the linearized eigenvalues and the outcome; find the least K_p that holds it up (task 1). Fill in Table 1."]
+  - ["取 K_p = 70.82，算出并验证临界阻尼的 K_d（任务 2）。", "With K_p = 70.82, compute and check the K_d for critical damping (task 2)."]
+  - ["取 K_p = 70.82、K_d = 8.96、初始倾角速度 0，逐步加大初始倾角，找出能救回的最大倾角（任务 3）；再取初始倾角速度 ±1 rad/s 重复，填入表 2。", "With K_p = 70.82, K_d = 8.96 and zero initial rate, increase the initial tilt and find the largest that can be saved (task 3); repeat with ±1 rad/s, Table 2."]
+  - ["在“系统的相图”场景中选单摆（c = 0），从 θ = 0 出发，逐步加大初角速度，找出越过最高点的最小值（任务 4）；再取 c = 0.5，观察轨线螺旋地落入哪个平衡点。", "In 'Phase portraits' choose the pendulum (c = 0); from θ = 0 raise the initial speed until it goes over the top (task 4); then with c = 0.5 see which equilibrium the orbit spirals into."]
+  - ["选捕食者–猎物方程，点击不同初值，观察闭轨和守恒量；选范德波尔振子（μ = 1），从远处和原点附近出发，读出极限环振幅（任务 5），再取 μ = 0.2、3 比较，填入表 3。", "Choose predator–prey and click several initial points to see the closed orbits and the conserved quantity; choose van der Pol (μ = 1), start far out and near the origin and read the limit-cycle amplitude (task 5); compare μ = 0.2 and 3 in Table 3."]
+数据表:
+  - 标题: ["表 1  自平衡机器人：K_p 与稳定性（K_d = 3，θ₀ = 10°）", "Table 1  Balancing robot: K_p and stability (K_d = 3, θ₀ = 10°)"]
+    表头: ["K_p", "线性化特征值", "线性化判断", "仿真结果"]
+    表头英文: ["K_p", "linearized eigenvalues", "linearization says", "simulation"]
+    行: [["15", "", "", ""], ["19", "", "", ""], ["20", "", "", ""], ["21", "", "", ""], ["40", "", "", ""]]
+  - 标题: ["表 2  吸引域（K_p = 70.82，K_d = 8.96）", "Table 2  Basin of attraction (K_p = 70.82, K_d = 8.96)"]
+    表头: ["初始倾角速度 / (rad/s)", "能救回的最大倾角 / °", "静力极限 / °"]
+    表头英文: ["initial rate / (rad/s)", "largest saved tilt / °", "static limit / °"]
+    行: [["0", "", ""], ["1", "", ""], ["−1", "", ""]]
+  - 标题: ["表 3  范德波尔振子的极限环", "Table 3  Van der Pol limit cycle"]
+    表头: ["μ", "初值", "末段振幅", "波形特点"]
+    表头英文: ["μ", "initial point", "final amplitude", "waveform"]
+    行: [["1", "(3.5, 0)", "", ""], ["1", "(0.1, 0)", "", ""], ["0.2", "", "", ""], ["3", "", "", ""]]
+注意:
+  - ["机器人被简化为绕车轮轴转动的倒立摆，转矩直接加在支点上；真实的自平衡车靠车轮加减速产生这个转矩，车本身还会移动。质量、质心高度和 15 N·m 的转矩上限都是为说明问题选的数。", "The robot is simplified to an inverted pendulum about the wheel axle with torque applied directly at the pivot; a real balancing vehicle produces this torque by accelerating its wheels and moves itself. The mass, centre-of-mass height and 15 N·m limit are illustrative."]
+  - ["“扶住了”指 5 s 内没倒、并且倾角至少减到初值的一半；K_p 只比 m g h 大一点时，机器人没倒但恢复得很慢。", "'Held up' means it did not fall within 5 s and the tilt at least halved; when K_p is barely above m g h it stays up but recovers very slowly."]
+思考题:
+  - ["线性化说只要 K_p > m g h、K_d > 0 就稳定。为什么实际的自平衡机器人还要限制倾角、限制速度？吸引域和哪些参数有关？", "Linearization says K_p > m g h and K_d > 0 are enough. Why do real balancing robots still limit tilt and speed? Which parameters set the basin of attraction?"]
+  - ["捕食者–猎物方程的闭轨与范德波尔振子的极限环有什么本质的不同？受到一次扰动后，两者分别会怎样？", "What is the essential difference between the predator–prey closed orbits and the van der Pol limit cycle? How does each respond to a single disturbance?"]
