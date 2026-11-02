@@ -1,0 +1,23 @@
+# 实验 16.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_2.js。
+原理:
+  - ["吸盘内的压强比大气压低 Δp（真空度），大气对吸盘的压力比吸盘内对工件的压力大，差值就是把吸盘压在工件上的力：", "Inside the cup the pressure is Δp below atmospheric (the vacuum level). The atmosphere pushes harder on the outside than the cup's interior pushes back, and the difference holds the cup on:"]
+  - 式: "F = Δp · A_有效        （式 (16.2.3)）"
+  - ["吸盘的唇边受压变形，有效直径比名义直径小，要靠拉脱试验测出。", "The lip deforms under load, so the effective diameter is smaller than nominal; measure it with a pull-off test."]
+  - ["搬运时要按最大加速度和安全系数计算：S·m(g + a) ≤ Δp·A_有效。", "For handling, use the largest acceleration and a safety factor: S·m(g + a) ≤ Δp·A_eff."]
+  - ["竖直墙上的吸盘挂钩靠摩擦力承重，最大静摩擦力 μ·Δp·A。", "A suction hook on a vertical wall holds its load by friction; the maximum static friction is μ·Δp·A."]
+步骤:
+  - ["选“真空吸盘”，方式 0，Ø60 吸盘，真空度取 20、40、60、80 kPa，读拉脱力，填入表 1。作 F–Δp 图，由斜率求有效面积和有效直径，提交（任务 1）。", "Choose “Vacuum cup”, mode 0, Ø60 cup; read the pull-off force at 20, 40, 60 and 80 kPa in Table 1. Plot F against Δp, get the effective area and diameter from the slope, and submit (task 1)."]
+  - ["对 Ø40、Ø80 吸盘各测两次，求它们的有效直径。", "Measure the Ø40 and Ø80 cups twice each and find their effective diameters."]
+  - ["算出搬运 8.0 kg 钢板（向上加速 5.0 m/s²，安全系数 2）需要的 Δp·A，选一个真空度不超过 70 kPa 就够用的吸盘，把真空度调到刚好够用（多出不超过 3 kPa），用方式 1 验证，提交（任务 2）。", "Work out the Δp·A needed to lift the 8.0 kg sheet (5.0 m/s² up, safety factor 2), choose a cup that manages it at no more than 70 kPa, set the vacuum just high enough (no more than 3 kPa over), check in mode 1 and submit (task 2)."]
+  - ["选“吸盘挂钩”，从 3.0 kg 起每次加 0.05 kg，找出开始滑动的挂重，求 μ，提交（任务 3）。", "Choose “Suction hook”; from 3.0 kg add 0.05 kg at a time until it slides, find μ and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  拉脱试验", "Table 1  Pull-off tests"]
+    表头: ["吸盘", "Δp / kPa", "拉脱力 / N", "A_有效 / mm²", "有效直径 / mm"]
+    表头英文: ["Cup", "Δp / kPa", "Pull-off force / N", "A_eff / mm²", "Effective diameter / mm"]
+    行: [["Ø60", "20", "", "", ""], ["Ø60", "40", "", "", ""], ["Ø60", "60", "", "", ""], ["Ø60", "80", "", "", ""], ["Ø40", "", "", "", ""], ["Ø80", "", "", "", ""]]
+注意:
+  - ["拉脱力读数带有 ±1 N 以内的误差。真空度指吸盘内比大气压低多少。", "Pull-off readings carry errors up to ±1 N. The vacuum level is how far below atmospheric the cup interior is."]
+  - ["方式 1 只显示吸住或掉了（不含安全系数），安全系数要自己算进去。", "Mode 1 only shows held or dropped (without a safety factor); apply the safety factor yourself."]
+思考题:
+  - ["吸住工件的力是谁施加的？在大气压只有 60 kPa 的高原上会怎样？", "Who actually exerts the holding force? What changes on a plateau where the air pressure is only 60 kPa?"]
+  - ["为什么用名义直径算出的吸力偏大？", "Why does using the nominal diameter overestimate the holding force?"]

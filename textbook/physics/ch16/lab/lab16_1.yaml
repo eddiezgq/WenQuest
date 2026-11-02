@@ -1,0 +1,22 @@
+# 实验 16.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab16_1.js。
+原理:
+  - ["气缸的输出力：压缩空气的表压 p 作用在活塞面积 A 上，减去密封的摩擦 f：", "Cylinder output force: the gauge pressure p acts on the piston area A, minus the seal friction f:"]
+  - 式: "F = pA − f，A = πD²/4        （式 (16.1.1)、(16.1.3)）"
+  - ["用两个压强测两次，F–p 直线的斜率是 A，截距是 −f。", "Measure at two pressures: the slope of the F–p line is A and the intercept is −f."]
+  - ["帕斯卡原理：密闭液体中压强的变化传遍各处。液压千斤顶两个活塞上的压强相同，力与面积成正比：F₁/A₁ = F₂/A₂。", "Pascal's principle: a pressure change in a confined liquid is transmitted everywhere. In a hydraulic jack the pressure is the same on both pistons, so force is proportional to area: F₁/A₁ = F₂/A₂."]
+  - 式: "F₁ = F₂ A₁/A₂        （式 (16.1.2)）"
+步骤:
+  - ["选“气动夹爪”，气缸 0，表压取 0.20、0.40、0.60 MPa，各读一次夹紧力，填入表 1。作 F–p 图，求 A（与 16.0 mm 缸径比较）和摩擦 f。", "Choose “Pneumatic gripper”, cylinder 0, and read the force at 0.20, 0.40 and 0.60 MPa in Table 1. Plot F against p to get A (compare with a 16.0 mm bore) and the friction f."]
+  - ["换气缸 1，同样测三次，求它的缸径，提交（任务 1）。", "Switch to cylinder 1, measure three times, find its bore and submit (task 1)."]
+  - ["用气缸 0 夹 2.0 kg 的盒子：先算每个手指要压的力 S·m(g + a)/(2μ)（第 14 章算例 14.3.2），再加上摩擦，求需要的表压；把气压调到这个值，运行，提交（任务 2）。", "Gripping a 2.0 kg box with cylinder 0: first compute each finger's force S·m(g + a)/(2μ) (Example 14.3.2), add the friction, find the pressure needed; set it, run and submit (task 2)."]
+  - ["选“液压千斤顶”，算出刚好顶起车的力，验证，提交（任务 3）。", "Choose “Hydraulic jack”, compute the force that just lifts the car, check it and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  气缸的夹紧力", "Table 1  Cylinder clamping force"]
+    表头: ["气缸", "表压 / MPa", "夹紧力 / N"]
+    表头英文: ["Cylinder", "Gauge pressure / MPa", "Force / N"]
+    行: [["0", "0.20", ""], ["0", "0.40", ""], ["0", "0.60", ""], ["1", "0.20", ""], ["1", "0.40", ""], ["1", "0.60", ""]]
+注意:
+  - ["力传感器读数带有 ±0.3 N 以内的误差。气源压强指表压（比大气压高出的部分）。", "Force readings carry errors up to ±0.3 N. Supply pressure means gauge pressure (above atmospheric)."]
+思考题:
+  - ["只用一个压强、不管摩擦，求出的缸径偏大还是偏小？", "With a single pressure and friction ignored, is the bore too big or too small?"]
+  - ["千斤顶省了力，省了功吗？小活塞要压下多少，车才升高 1 cm？", "The jack saves force; does it save work? How far must the small piston move to raise the car 1 cm?"]
