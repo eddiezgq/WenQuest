@@ -252,10 +252,5 @@ def plan101():
     return yaml.safe_load((REPO / "factory" / "digital" / "std" / "SH-101_process.yaml").read_text(encoding="utf-8"))
 
 
-def cards():
-    from hub import cards as _c
-    return _c
-
-
 # 一年的有效工作时间（min）：250 天、两班、每班 480 min、设备综合效率 0.85（第 56.8 节，hub/process.py FE_MIN）
 FE_MIN = 250 * 2 * 480 * 0.85

@@ -11,7 +11,7 @@ import _mfg as M
 from bookout import T, figure, out, style
 
 P = M.plan101()
-CD = M.cards()
+CD = M.cards
 RT = M.route()
 ALPHA, BETA = 3.0, 5.0
 TA = {   # 工步里没有写的辅助时间（min）：装卸工件、测量、换刀与对刀、顶尖或鸡心夹头（教学设计值，量级同常用工时定额手册）
