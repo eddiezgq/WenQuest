@@ -1453,6 +1453,17 @@ def process_reference(item: str, u=Depends(user_of)):
         return {"item": item, "yaml": f.read()}
 
 
+@app.get("/api/process/part/{item}")
+def process_part(item: str, u=Depends(user_of)):
+    """零件图要求（std/<零件>_part.yaml，第 13 轮十二）：给零件拟定工艺路线时以它为准，AI 预检也按它核对。"""
+    spec = process.part_spec(item) if item in F.ITEMS else None
+    if not spec:
+        raise HTTPException(404, "这个零件没有登记零件图要求")
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "std", f"{item}_part.yaml")
+    with open(path, encoding="utf-8") as f:
+        return {"item": item, "yaml": f.read(), "part": spec}
+
+
 @app.post("/api/process/submit")
 def process_submit(body: dict = Body(...), u=Depends(user_of)):
     _can_submit(u)
