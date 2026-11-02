@@ -1,0 +1,24 @@
+# 实验 22.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab22_3.js。
+原理:
+  - ["对称正定矩阵做乔列斯基分解 A = LLᵀ 时，L 中会出现 A 中没有的非零元（填充）。在图上看：消去一个顶点，就把它尚未消去的邻居两两连起来，新连的边就是填充。",
+     "Cholesky factorization A = LLᵀ creates nonzeros in L that A lacks (fill-in). On the graph: eliminating a vertex joins its remaining neighbours pairwise; the new edges are the fill."]
+  - 式: "nnz(L) = n + Σₖ cₖ；  运算量（乘法与加法）约 Σₖ cₖ²（cₖ 为消去第 k 个顶点时的邻居数）          (22.3.1)"
+  - ["同一个矩阵换一种消元顺序（对称地重新编号 PAPᵀ），填充可以差好几倍。常用的排序有缩小带宽的 RCM、每步消去度最小顶点的最小度、先切分再排分隔线的嵌套剖分。",
+     "Renumbering the same matrix symmetrically (PAPᵀ) can change the fill several-fold. Common orders: RCM (reduce bandwidth), minimum degree (eliminate the lowest-degree vertex each step), nested dissection (cut, separators last)."]
+步骤:
+  - ["网格场景：m 取 6、10、16、20，四种排序，记录 nnz(L)、填充、运算量（表 1，任务 1～3）。",
+     "Grid scene: m = 6, 10, 16, 20, four orders; record nnz(L), fill and work (Table 1, tasks 1–3)."]
+  - ["把“已消元的比例”从 0 慢慢拖到 100%，观察填充（红色）出现的位置。",
+     "Drag “fraction eliminated” slowly from 0 to 100% and watch where the fill (red) appears."]
+  - ["位姿图、星形图场景：完成任务 4、5。",
+     "Pose-graph and star scenes: complete tasks 4 and 5."]
+数据表:
+  - 标题: ["表 1  网格 m × m 的拉普拉斯矩阵：nnz(L)", "Table 1  Grid m × m Laplacian: nnz(L)"]
+    表头: ["m", "自然", "RCM", "最小度", "嵌套剖分"]
+    表头英文: ["m", "natural", "RCM", "min degree", "nested dissection"]
+    行: [["6", "", "", "", ""], ["10", "", "", "", ""], ["16", "", "", "", ""], ["20", "", "", "", ""]]
+注意:
+  - ["这里只数非零元的位置（符号分解），不考虑数值上恰好相消成零的情形。",
+     "Only the positions of nonzeros are counted (symbolic factorization); exact numerical cancellation is ignored."]
+  - ["RCM 让带宽变窄，但填充不一定最少；位姿图中的回环约束连接相隔很远的位姿，RCM 反而比自然排序差。",
+     "RCM narrows the band but does not always minimize fill; loop closures connect distant poses, and RCM is worse than the natural order for the pose graph."]

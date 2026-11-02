@@ -1,0 +1,30 @@
+# 实验 22.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab22_1.js。
+原理:
+  - ["高斯消元算出的解是某个邻近问题的精确解：(A + δA)x̂ = b，‖δA‖ ≤ c(n)·ρ·u·‖A‖，ρ 为增长因子，u 为单位舍入。解的相对误差约为 κ(A) × 后向误差。",
+     "Gaussian elimination returns the exact solution of a nearby problem: (A + δA)x̂ = b with ‖δA‖ ≤ c(n)·ρ·u·‖A‖, ρ the growth factor and u the unit roundoff. The relative error is about κ(A) times the backward error."]
+  - 式: "ρ = maxᵢⱼₖ|aᵢⱼ⁽ᵏ⁾| / maxᵢⱼ|aᵢⱼ|          (20.5.3)；  部分选主元 ρ ≤ 2ⁿ⁻¹；  完全选主元 ρ 增长很慢          (22.1.1)"
+  - ["主元太小时乘数很大，舍入误差被放大：问题本身良态（κ 小），结果却全错。部分选主元保证乘数不超过 1；车式、完全选主元进一步限制增长。",
+     "A tiny pivot gives huge multipliers that magnify rounding errors: a well-conditioned problem (small κ) still gets a wrong answer. Partial pivoting keeps multipliers at most 1; rook and complete pivoting further limit growth."]
+步骤:
+  - ["计算器场景：有效位数取 3、4、6、16，分别不选主元和部分选主元，记录算出的 x、增长因子、相对误差（表 1，任务 1、2）。",
+     "Calculator scene: with 3, 4, 6, 16 digits, no pivoting and partial pivoting, record x, the growth factor and the error (Table 1, tasks 1, 2)."]
+  - ["威尔金森矩阵：n 取 20、40、55，双精度，四种策略，记录增长因子与误差（表 2，任务 3、4）。",
+     "Wilkinson's matrix: n = 20, 40, 55, double precision, four strategies; record growth and error (Table 2, tasks 3, 4)."]
+  - ["两点边值问题：N 取 10、30、55，部分与完全选主元，记录条件数、增长因子、误差（任务 5）。",
+     "Boundary-value problem: N = 10, 30, 55, partial and complete pivoting; record κ, growth and error (task 5)."]
+数据表:
+  - 标题: ["表 1  4 位计算器的例子", "Table 1  The 4-digit calculator example"]
+    表头: ["有效位数", "选主元", "算出的 x", "增长因子", "相对误差"]
+    表头英文: ["Digits", "Pivoting", "Computed x", "Growth", "Relative error"]
+    行: [["3", "不选", "", "", ""], ["3", "部分", "", "", ""], ["4", "不选", "", "", ""], ["4", "部分", "", "", ""], ["6", "不选", "", "", ""], ["16", "不选", "", "", ""]]
+    行英文: [["3", "none", "", "", ""], ["3", "partial", "", "", ""], ["4", "none", "", "", ""], ["4", "partial", "", "", ""], ["6", "none", "", "", ""], ["16", "none", "", "", ""]]
+  - 标题: ["表 2  威尔金森矩阵（双精度）", "Table 2  Wilkinson's matrix (double precision)"]
+    表头: ["n", "选主元", "增长因子", "相对误差", "后向误差"]
+    表头英文: ["n", "Pivoting", "Growth", "Relative error", "Backward error"]
+    行: [["20", "部分", "", "", ""], ["40", "部分", "", "", ""], ["55", "部分", "", "", ""], ["55", "车式", "", "", ""], ["55", "完全", "", "", ""]]
+    行英文: [["20", "partial", "", "", ""], ["40", "partial", "", "", ""], ["55", "partial", "", "", ""], ["55", "rook", "", "", ""], ["55", "complete", "", "", ""]]
+注意:
+  - ["计算器场景中 2.0001 存不进 4 位有效数字，输入时就已舍入成 2.000；不选主元的错误主要来自很大的乘数 3333。",
+     "In the calculator scene 2.0001 does not fit in 4 digits and is stored as 2.000; the error without pivoting comes mainly from the huge multiplier 3333."]
+  - ["条件数小说明问题良态；误差仍然大，就是算法不稳定。",
+     "A small condition number means a well-conditioned problem; a large error then means an unstable algorithm."]
