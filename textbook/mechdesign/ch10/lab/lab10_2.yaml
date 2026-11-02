@@ -1,0 +1,28 @@
+# 实验 10.2 的指导书与报告模板。目的、场景、参数、任务取自 lab10_2.js。
+原理:
+  - ["平面应力的一点（σ2 = 0）：主应力 σ1,3 = σ/2 ± √(σ²/4 + τ²)。强度理论把这个应力状态和单向拉伸试验比较。", "A point in plane stress (σ2 = 0): principal stresses σ1,3 = σ/2 ± √(σ²/4 + τ²). A strength theory compares this state with the uniaxial tensile test."]
+  - 式: ["塑性材料：特雷斯卡 σ1 − σ3 ≤ σs；冯·米塞斯 √(σ² + 3τ²) ≤ σs", "Ductile: Tresca σ1 − σ3 ≤ σs; von Mises √(σ² + 3τ²) ≤ σs"]
+  - 式: ["脆性材料：最大正应力 σ1 ≤ σt、−σ3 ≤ σc；库仑–莫尔 σ1/σt − σ3/σc ≤ 1", "Brittle: maximum normal stress σ1 ≤ σt, −σ3 ≤ σc; Coulomb–Mohr σ1/σt − σ3/σc ≤ 1"]
+  - ["两种塑性理论最多差 15.5%（纯剪切时，2/√3）；单向拉压时完全一样。脆性材料受压比受拉强得多，冯·米塞斯不分拉压，用在铸铁上会把受压的地方当成危险。", "The two ductile theories differ by at most 15.5% (pure shear, 2/√3) and agree in uniaxial tension or compression. Brittle materials are much stronger in compression; von Mises ignores the sign, so on cast iron it flags compressed regions as dangerous."]
+步骤:
+  - ["打开实验 10.2，场景“SH-301 齿轮位”，σ = 16.2、τ = 27.9 MPa、材料 0（与程序 10.2.1 相同），点“计算”（任务 1），把四种安全系数填入表 1 第一行。", "Open Lab 10.2, scene “SH-301 gear seat”, σ = 16.2, τ = 27.9 MPa, material 0 (as in Program 10.2.1); press Compute (task 1) and fill in the first row of Table 1."]
+  - ["σ 改为 0、τ = 100 MPa（任务 2），填表 1 第二行，算特雷斯卡与冯·米塞斯安全系数之比。", "Set σ = 0, τ = 100 MPa (task 2), fill in the second row and compute the ratio of the Tresca and von Mises factors."]
+  - ["切换到“铸铁轴承座”，σ = −3.2、τ = 0.3 MPa、材料 2（任务 3），填表 1 第三行。", "Switch to “Cast-iron bearing seat”: σ = −3.2, τ = 0.3 MPa, material 2 (task 3), and fill in the third row."]
+  - ["切换到“粉笔扭断”，σ = 0、τ = 1 MPa、材料 3（任务 4），填表 2。", "Switch to “Twisting chalk”: σ = 0, τ = 1 MPa, material 3 (task 4), and fill in Table 2."]
+数据表:
+  - 标题: ["表 1  四种判据的安全系数", "Table 1  Safety factors by the four criteria"]
+    表头: ["场景", "σ1 / MPa", "σ3 / MPa", "特雷斯卡", "冯·米塞斯", "最大正应力", "库仑–莫尔", "该用哪个"]
+    表头英文: ["Scene", "σ1 / MPa", "σ3 / MPa", "Tresca", "von Mises", "Max normal", "Coulomb–Mohr", "Which applies"]
+    行: [["SH-301 齿轮位", "", "", "", "", "", "", ""], ["纯剪切", "", "", "", "", "", "", ""], ["铸铁轴承座", "", "", "", "", "", "", ""]]
+    行英文: [["SH-301 gear seat", "", "", "", "", "", "", ""], ["pure shear", "", "", "", "", "", "", ""], ["cast-iron seat", "", "", "", "", "", "", ""]]
+  - 标题: ["表 2  粉笔纯扭转", "Table 2  Chalk in pure torsion"]
+    表头: ["σ1 / MPa", "σ1 的方向", "先判坏的理论", "断面的样子"]
+    表头英文: ["σ1 / MPa", "Direction of σ1", "First theory to predict failure", "Fracture surface"]
+    行: [["", "", "", ""]]
+注意:
+  - ["这里只处理平面应力（σ2 = 0）。有限元给出的是三维应力，书里的程序从六个应力分量求三个主应力再判断。", "Only plane stress (σ2 = 0) is handled here. FE gives three-dimensional stress; the book's programs find the three principal stresses from the six components."]
+  - ["铸铁的抗压强度取抗拉的 3.5 倍（手册典型值，本书取值）；粉笔的强度是示意值。", "Cast-iron compressive strength is taken as 3.5 times the tensile (a handbook typical value); the chalk strengths are illustrative."]
+  - ["静载下塑性材料的应力集中可以靠局部屈服重新分布，所以名义应力校核常不乘 Kt；脆性材料不行（10.4 节）。", "Under static load a ductile part redistributes a stress concentration by local yielding, so nominal checks often omit Kt; a brittle part cannot (Section 10.4)."]
+思考题:
+  - ["塑性材料用特雷斯卡或冯·米塞斯（屈服由切应力决定，与正应力的正负无关）；脆性材料用最大正应力或库仑–莫尔（断裂由拉应力决定，受压强得多）。有限元软件默认给的冯·米塞斯云图，对铸铁件会把受压的地方标成“危险”。数字工厂的“仿真与分析”目前只给冯·米塞斯，你会怎样从它的结果判断铸铁件？", "Ductile materials take Tresca or von Mises (yield is governed by shear, regardless of the sign of the normal stress); brittle materials take maximum normal stress or Coulomb–Mohr (fracture is governed by tension; they are far stronger in compression). The default von Mises plot marks compressed regions of a cast-iron part as 'dangerous'. The factory's Simulation & analysis currently gives only von Mises — how would you judge a cast-iron part from it?"]
+  - ["为什么钢轴扭断的断面是横截面，而粉笔、铸铁轴扭断的断面是 45° 螺旋面？", "Why does a twisted steel shaft break across its section while chalk or a cast-iron shaft breaks along a 45° spiral?"]

@@ -1,0 +1,33 @@
+# 工程任务单 TS-10-1（配第 10 章）：WQ-CR5 大臂的静强度评审。格式见 textbook/tools/tasksheet.py。
+编号: TS-10-1
+标题: ["WQ-CR5 大臂的静强度评审", "Static-strength review of the WQ-CR5 upper arm"]
+角色: ["机器人厂的结构评审工程师", "structural review engineer at the robot plant"]
+背景:
+  - "问渠机器人厂要给 WQ-CR5 推出一个“快速版”：节拍更短，手臂摆动更快，负载仍为 5 kg。设计组提交了大臂（6061-T6 铝管 + 两端法兰）的有限元报告，结论是“最大应力很小，安全系数几十，没有问题”。你作为评审工程师，要独立复核：载荷是不是按最不利的动作取的（快速摆动后制动停止；急停、碰撞另由控制系统保证），云图上的最大应力能不能信，该用哪个强度理论，要求的安全系数该是多少，允许多深的裂纹，写出评审意见（通过、有条件通过或退回）。"
+  - "The WQ-CR5 plant is launching a 'fast' version: shorter cycles, faster arm swings, still a 5 kg payload. The design team's FE report for the upper arm (6061-T6 tube plus two end flanges) says 'the maximum stress is small, the safety factor is in the tens, no problem'. As review engineer you check independently: was the load taken from the worst motion (fast swing and braked stop; emergency stops and collisions are covered by the controls), can the peak on the stress plot be trusted, which strength theory applies, what safety factor should be required, how deep a crack can be tolerated — and write a review verdict (pass, conditional pass, or return)."
+输入:
+  - {名称: ["WQ-CR5 大臂示例零件（数字工厂“仿真与分析”：Ø90×3 铝管、法兰厚 10、线缆孔 Ø50，参数可改）；WQ-CR5 动力学模型（数字工厂“多体动力学”）；材料库 6061-T6", "WQ-CR5 upper-arm sample part (factory Simulation & analysis: Ø90×3 tube, 10 mm flanges, Ø50 cable bore, editable); WQ-CR5 dynamic model (factory Multibody dynamics); material library 6061-T6"], 来源: ["数字工厂；机器人厂原件 wqcr5.py", "Digital factory; robot plant source wqcr5.py"]}
+  - {名称: ["快速版的动作：J2 在 0.4 s 内摆动 0.5 rad 后停住（本书设定）；6061-T6 的断裂韧度 K_IC ≈ 29 MPa·√m（手册典型值）；后果系数 1.5（协作机器人与人共处）", "Fast-version motion: J2 swings 0.5 rad in 0.4 s and stops (set by this book); 6061-T6 fracture toughness K_IC ≈ 29 MPa·√m (handbook typical); consequence factor 1.5 (cobot sharing space with people)"], 来源: ["项目任务书", "Project brief"]}
+  - {名称: ["程序 10.2.1、10.4.1、10.5.1、10.6.1；实验 10.2", "Programs 10.2.1, 10.4.1, 10.5.1, 10.6.1; Lab 10.2"], 来源: ["教材第 10 章", "Chapter 10"]}
+交付物:
+  - {名称: ["评审意见（3 页以内）：载荷从哪里来（多体动力学的峰值与动载系数）、有限元的约束和载荷、网格收敛（至少三级网格，哪些峰值收敛、哪些是尖角奇异）、选用的强度理论及理由、要求的安全系数（分项列出）、裂纹容限、结论与修改建议", "Review verdict (up to 3 pages): where the load comes from (multibody peak and dynamic factor), FE supports and loads, mesh convergence (at least three meshes; which peaks converge, which are sharp-corner singularities), the strength theory chosen and why, the required safety factor (itemized), crack tolerance, verdict and suggested changes"], 验收: ["每个数都有出处（截图、程序或公式）；能区分“收敛的应力集中”和“网格奇异”；结论与数据一致", "Every number has a source (screenshot, program or formula); converged concentrations are told apart from mesh singularities; the verdict follows from the data"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["有限元截图：在“仿真与分析”里打开 WQ-CR5 大臂，按快速版的动载加载，三级网格的冯·米塞斯云图和最大值的位置；如果修改了壁厚或法兰厚，附修改后的结果", "FE screenshots: open the WQ-CR5 upper arm in Simulation & analysis, load it with the fast-version dynamic load; von Mises plots and peak locations on three meshes; if wall or flange thickness was changed, the results after the change"], 验收: ["截图含模型、约束、载荷、网格尺寸、最大值位置", "Screenshots show model, supports, loads, mesh size and peak location"], 类型: 分析, 零件: WQ-CR5 大臂}
+  - {名称: ["计算书（Python 或计算表）", "Calculation (Python or spreadsheet)"], 验收: ["能复现评审意见里的数", "Reproduces the numbers in the verdict"], 类型: 文件, 格式: [zip, txt, xlsx]}
+工位: [MBD, FEA, PY]
+步骤:
+  - ["在“多体动力学”里跑 WQ-CR5 的快速版动作（带 5 kg），读出 J3 处的反力矩随时间的变化，求动载系数（或用程序 10.6.1 改动作时间）", "Run the fast-version motion of WQ-CR5 (5 kg) in Multibody dynamics, read the reaction moment at J3 over time and find the dynamic factor (or rerun Program 10.6.1 with the new motion time)"]
+  - ["在“仿真与分析”里打开 WQ-CR5 大臂，填入示范载荷再乘动载系数，用三级网格计算；对照程序 10.4.1，判断内角处的峰值是不是网格奇异（注意：网页只能整体加密，受单元数上限限制，做不到亚毫米；网格调到 6.7 mm 以下时，根部内角会进入评估范围，最大值可能跳到 J2 端）；用梁理论手算管中段的应力核对", "Open the WQ-CR5 upper arm in Simulation & analysis, enter the sample load times the dynamic factor and solve on three meshes; with Program 10.4.1 judge whether the inner-corner peak is a mesh singularity (note: the page refines only globally, within an element limit, so sub-millimeter meshes are out of reach; below 6.7 mm the root corner enters the evaluated region and the peak may jump to the J2 end); check the mid-tube stress against beam theory by hand"]
+  - ["选定强度理论（6061 是塑性材料），用程序 10.2.1 的办法比较特雷斯卡与冯·米塞斯；按 10.6 节列出要求的安全系数；按 10.5 节估算允许的表面裂纹深度，与壁厚比较", "Choose the strength theory (6061 is ductile) and compare Tresca with von Mises as in Program 10.2.1; itemize the required safety factor per Section 10.6; estimate the tolerable surface-crack depth per Section 10.5 and compare it with the wall thickness"]
+  - ["如果要改（壁厚、法兰厚；示例零件没有圆角参数，要加圆角就自己建模上传 STEP），在“仿真与分析”里改参数重算，比较质量和应力", "If changes are needed (wall, flange thickness; the sample part has no fillet parameter — to add a fillet, model it yourself and upload a STEP), change the parameters in Simulation & analysis, re-solve and compare mass and stress"]
+  - ["写评审意见；评审后在“我的任务”里提交三份交付物", "Write the verdict; submit the three deliverables in My tasks after the review"]
+评审要点:
+  - ["载荷取自动力学的最不利时刻，不是静载", "The load comes from the worst instant of the dynamics, not the static case"]
+  - ["网格收敛做了，能说清哪些峰值可信、哪些是尖角奇异；没有拿奇异点的应力直接判强度", "Mesh convergence done; credible peaks and sharp-corner singularities told apart; no strength verdict taken straight from a singular point"]
+  - ["强度理论、安全系数的各个分项有理由", "The strength theory and each safety-factor item are justified"]
+  - ["裂纹容限的结论合理（与壁厚、检测能力比较）", "The crack-tolerance conclusion is reasonable (compared with wall thickness and inspection capability)"]
+评分:
+  - {项: ["载荷与有限元", "Load and FE"], 分: 30, 标准: ["动载取得对、约束载荷正确、网格收敛完整", "Correct dynamic load, supports and loads, complete convergence study"]}
+  - {项: ["强度判断", "Strength judgment"], 分: 30, 标准: ["理论、安全系数、裂纹容限都有依据", "Theory, safety factor and crack tolerance all justified"]}
+  - {项: ["评审意见", "Verdict"], 分: 25, 标准: ["结论清楚、建议可行", "Clear verdict, workable suggestions"]}
+  - {项: ["答辩", "Defense"], 分: 15, 标准: ["能解释云图和手算的差别", "Can explain the differences between plot and hand calculation"]}
+学时: 4
