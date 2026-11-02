@@ -1,0 +1,31 @@
+# 实验 22.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab22_2.js。
+原理:
+  - ["数值方法的整体误差与步长的 p 次方成正比，p 叫作方法的阶：欧拉法和半隐式欧拉法 p = 1，休恩法 p = 2，经典 RK4 p = 4（22.1、22.2 节）。步长减半，误差约缩小到 1/2ᵖ。", "A method's global error is proportional to the p-th power of the step; p is its order: Euler and semi-implicit Euler p = 1, Heun p = 2, classical RK4 p = 4 (Sections 22.1, 22.2). Halving the step divides the error by about 2ᵖ."]
+  - 式: "RK4：k₁ = f(tₙ, yₙ)，k₂ = f(tₙ + h/2, yₙ + h k₁/2)，k₃ = f(tₙ + h/2, yₙ + h k₂/2)，k₄ = f(tₙ + h, yₙ + h k₃)，yₙ₊₁ = yₙ + h(k₁ + 2k₂ + 2k₃ + k₄)/6"
+  - ["显式欧拉法每一步把相平面上的面积放大 1 + h²ω² 倍，摆的能量越来越大；半隐式（辛）欧拉法保持面积，能量误差有界但不消失（22.5 节）。", "Explicit Euler enlarges phase-plane area by 1 + h²ω² per step, so the pendulum's energy keeps growing; semi-implicit (symplectic) Euler preserves area, so the energy error stays bounded though nonzero (Section 22.5)."]
+  - ["对 y′ = −λy（λ > 0），显式欧拉法稳定要求 hλ < 2，RK4 要求 hλ < 2.785，隐式欧拉法 yₙ₊₁ = yₙ/(1 + hλ) 对任何步长都稳定（22.4 节）。", "For y′ = −λy (λ > 0), explicit Euler is stable only for hλ < 2, RK4 for hλ < 2.785; implicit Euler yₙ₊₁ = yₙ/(1 + hλ) is stable for any step (Section 22.4)."]
+步骤:
+  - ["在“机械臂自由摆动”场景中取初始角度 0°、仿真 2 s。对四种方法分别取 h = 20、10、5 ms，记下全程最大角度误差和求值次数，填入表 1。", "In 'Arm swinging freely' take initial angle 0° and 2 s. For each of the four methods take h = 20, 10, 5 ms and record the maximum angle error and number of evaluations in Table 1."]
+  - ["由表 1 计算每种方法步长减半时误差缩小的倍数，估计各方法的阶（任务 2）。", "From Table 1 compute how much each method's error shrinks when the step is halved, and estimate each method's order (task 2)."]
+  - ["RK4：逐步加大步长，找出最大角度误差仍小于 10⁻⁴ rad 的最大步长（任务 1，可以取到 35 ms 以上）。用同样的求值次数，欧拉法能达到多大的误差？", "RK4: increase the step until the maximum angle error reaches 10⁻⁴ rad (task 1). With the same number of evaluations, what error does Euler reach?"]
+  - ["取 h = 10 ms、仿真 60 s，比较欧拉法与半隐式欧拉法的能量误差曲线（任务 3），再看 RK4，填入表 2。", "With h = 10 ms and 60 s, compare the energy-error curves of Euler and semi-implicit Euler (task 3), then RK4; fill in Table 2."]
+  - ["在“刚性方程”场景中取 λ = 1000，用显式欧拉法从 h = 1 ms 逐步加大步长，找出发散的界限；换成 RK4 重复（任务 5）；再用隐式欧拉法取 h = 20 ms（任务 4）。把 λ 改为 100、5000 重复，填入表 3。", "In 'Stiff equation' with λ = 1000, increase the explicit Euler step from 1 ms and find where it diverges; repeat with RK4 (task 5); then implicit Euler with h = 20 ms (task 4). Repeat for λ = 100 and 5000; Table 3."]
+数据表:
+  - 标题: ["表 1  机械臂自由摆动 2 s：最大角度误差 / rad", "Table 1  Arm swinging for 2 s: maximum angle error / rad"]
+    表头: ["方法", "h = 20 ms", "h = 10 ms", "h = 5 ms", "减半时的缩小倍数", "估计的阶"]
+    表头英文: ["method", "h = 20 ms", "h = 10 ms", "h = 5 ms", "reduction per halving", "estimated order"]
+    行: [["欧拉", "", "", "", "", ""], ["半隐式欧拉", "", "", "", "", ""], ["休恩", "", "", "", "", ""], ["RK4", "", "", "", "", ""]]
+  - 标题: ["表 2  h = 10 ms、60 s 的能量误差（单位 m g d）", "Table 2  Energy error with h = 10 ms over 60 s (unit m g d)"]
+    表头: ["方法", "最大 |ΔE|", "末了的 ΔE", "随时间的趋势"]
+    表头英文: ["method", "max |ΔE|", "final ΔE", "trend in time"]
+    行: [["欧拉", "", "", ""], ["半隐式欧拉", "", "", ""], ["RK4", "", "", ""]]
+  - 标题: ["表 3  刚性方程：稳定的最大步长", "Table 3  Stiff equation: largest stable step"]
+    表头: ["λ / (1/s)", "显式欧拉 h_max / ms", "RK4 h_max / ms", "理论值 2/λ、2.785/λ", "隐式欧拉 h = 20 ms 的误差"]
+    表头英文: ["λ / (1/s)", "explicit Euler h_max / ms", "RK4 h_max / ms", "theory 2/λ, 2.785/λ", "implicit Euler error, h = 20 ms"]
+    行: [["100", "", "", "", ""], ["1000", "", "", "", ""], ["5000", "", "", "", ""]]
+注意:
+  - ["参考解是细步长（不超过 0.1 ms）的 RK4，与所选方法在同样的时刻比较。程序 22.2.1 用同样的参数与 MuJoCo 物理引擎（RK4 积分器）比对过，两者相差约 10⁻¹¹ rad；程序 22.5.1 核对了 MuJoCo 的默认积分器与半隐式欧拉法逐步一致。", "The reference is RK4 with a fine step (at most 0.1 ms), compared at the same instants. Program 22.2.1 checked the same model against the MuJoCo physics engine (RK4 integrator), agreeing to about 10⁻¹¹ rad; Program 22.5.1 checked that MuJoCo's default integrator is step-for-step the semi-implicit Euler method."]
+  - ["不计关节摩擦和减速器，所以机械能守恒，能量误差全部来自数值方法。", "Joint friction and the gearbox are ignored, so mechanical energy is conserved and all energy error comes from the numerical method."]
+思考题:
+  - ["RK4 的误差比半隐式欧拉小几个数量级，为什么 MuJoCo 等物理引擎默认还是用半隐式欧拉？（提示：接触和碰撞使方程不光滑；能量的长期行为；每步的计算量。）", "RK4's error is orders of magnitude smaller than semi-implicit Euler's, so why do physics engines such as MuJoCo default to semi-implicit Euler? (Hints: contacts and impacts make the equations non-smooth; long-term energy behaviour; work per step.)"]
+  - ["机器人的电机电流环时间常数不到 1 ms，机械运动以秒计。如果把电流方程也放进仿真，用显式方法的步长受什么限制？有哪些办法？", "A robot motor's current loop has a time constant under 1 ms, while the motion takes seconds. If the current equation is included in the simulation, what limits the step of an explicit method, and what can be done?"]
