@@ -317,6 +317,42 @@ def _review_v2(plan, say):
             elif r["tight"]:
                 say("精度", "warning", "“{}”的精度预算合计 {:.4f} mm，占公差 {:g} 的 {:.0%}，裕量不足（工序能力偏低）；最大的一项是“{}”。"
                     .format(c["name"] if c else ab.get("char"), r["total"], T, r["total"] / T, big["name"]), o["seq"])
+    # 2d 磨削的表面完整性（第 55 章，hub/surface.py）：工序登记了磨削参数（grinding）时，按修整前砂轮最钝的状态
+    #    （wear_flat_pct）核算每一行程的磨削温度：超过回火软化温度或 Ac1 会烧伤（必须改），离得很近要提醒；
+    #    最后一次（ra_char）的粗糙度要达到图纸；淬硬件（低温回火）精磨没有烧伤检验要提醒
+    from hub import surface as SF
+    import re as _re
+    for o in plan.get("operations") or []:
+        g = o.get("grinding")
+        if not isinstance(g, dict):
+            continue
+        mat = SF.STEELS.get(g.get("mat"))
+        if not mat:
+            say("表面", "warning", "磨削参数的材料“{}”不在表面完整性库里，没有核算烧伤。".format(g.get("mat")), o["seq"])
+            continue
+        de = SF.equivalent_diameter(g["dw"], g["ds"], g.get("internal", False))
+        A = g.get("wear_flat_pct", 0.5)
+        for ps in g.get("passes") or []:
+            vw = ps["vw_m_min"] / 60
+            t = SF.grinding_temperature(mat, g["vs"], vw, ps["ap"], de, A)
+            b = SF.burn_state(mat, t["theta"], t["t_ms"], g.get("coolant", True))
+            lim = min(b["onset"], b["Ac1"])
+            if b["kind"] != "none":
+                say("表面", "error", "{}（工件 {:g} m/min、切深 {:g} mm）：砂轮修整前磨削区最高温度约 {:.0f} ℃，超过{} {:.0f} ℃，会{}；"
+                    "允许的最大切深约 {:.4f} mm。".format(ps.get("name", "磨削"), ps["vw_m_min"], ps["ap"], t["theta"],
+                                                    "回火软化温度" if b["onset"] <= b["Ac1"] else " Ac1", lim, b["name"],
+                                                    SF.max_infeed(mat, g["vs"], vw, de, A)), o["seq"])
+            elif b["margin"] < 50:
+                say("表面", "warning", "{}：磨削区最高温度约 {:.0f} ℃，离烧伤只差 {:.0f} ℃，砂轮稍钝就会烧伤；减小切深或缩短修整间隔。"
+                    .format(ps.get("name", "磨削"), t["theta"], b["margin"]), o["seq"])
+            c = chars.get(ps.get("ra_char")) if ps.get("ra_char") else None
+            if c:
+                m = _re.search(r"Ra\s*([\d.]+)", str(c.get("spec", "")))
+                ra = SF.grinding_ra(t["heq"], ps.get("sparkout", 0), g.get("mesh", 60), A)
+                if m and ra > float(m.group(1)):
+                    say("表面", "error", "{}后粗糙度约 Ra {:.2f} μm，达不到 {}；增加光磨次数或减小切深。".format(ps.get("name", "精磨"), ra, c.get("spec")), o["seq"])
+        if mat["temper_c"] < 300 and not any("烧伤" in str(i.get("char", "")) or "酸洗" in str(i.get("gauge", "")) for i in o.get("inspect") or []):
+            say("表面", "warning", "淬硬件（低温回火）磨削后没有烧伤检验（酸洗、显微硬度或巴克豪森噪声）：烧伤从尺寸和粗糙度上看不出来。", o["seq"])
     # 3 尺寸链：工艺规程里登记的尺寸链，按极值法算出的封闭环要落在图纸特性之内
     for ch in plan.get("chains") or []:
         links = [TL.Link(l["name"], l["nominal"], l.get("es", 0), l.get("ei", 0), l.get("sense", 1)) for l in ch["links"]]

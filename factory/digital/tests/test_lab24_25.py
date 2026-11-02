@@ -131,7 +131,7 @@ def test_bench_zero_drifts_for_all_joints_and_fix_works():
 def test_catalog_is_per_plant():
     from sim import errors as ERR
     assert set(ERR.problems_for("wenquest-robot")) == {"ja_torque", "hd_lot", "bench_zero"}
-    assert set(ERR.problems_for(None)) == {"tailstock_offset", "dressing_interval", "thermal_warmup", "locator_worn", "center_hole"}
+    assert set(ERR.problems_for(None)) == {"tailstock_offset", "dressing_interval", "thermal_warmup", "locator_worn", "center_hole", "wheel_dull"}
     assert "recalibrate_torque" not in ERR.fixes_for(None) and "align_tailstock" not in ERR.fixes_for("wenquest-robot")
     for p, v in ERR.problems_for("wenquest-robot").items():
         assert v["fix"] in ERR.fixes_for("wenquest-robot"), p
