@@ -1,0 +1,26 @@
+# 实验 20.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab20_3.js。
+原理:
+  - ["AGV 在 P 处测出到路标 Lᵢ 的方位 dᵢ（单位向量），P 在过 Lᵢ、方向为 dᵢ 的直线上：nᵢᵀP = nᵢᵀLᵢ，nᵢ ⊥ dᵢ。两条直线联立得 2 阶方程组 N P = c，N 的两行是 n₁ᵀ、n₂ᵀ。",
+     "At P the AGV measures the bearing dᵢ (a unit vector) to landmark Lᵢ, so P lies on the line through Lᵢ with direction dᵢ: nᵢᵀP = nᵢᵀLᵢ with nᵢ ⊥ dᵢ. The two lines give a 2×2 system N P = c whose rows are n₁ᵀ, n₂ᵀ."]
+  - 式: "κ₂(N) = cot(φ/2)（φ 为两条直线的锐夹角）；  δcᵢ = rᵢ δθᵢ；  δP = N⁻¹ δc；  ‖δP‖ ≤ ‖δc‖/σ₂(N)，σ₂(N) = √2·sin(φ/2)          (20.3.2)"
+  - ["方位误差 δθᵢ 使第 i 条直线平移 rᵢδθᵢ（rᵢ 为到路标的距离）。两条直线夹角 φ 越小，N 越接近奇异，平移引起的交点移动越大：最坏方向上放大 1/(√2·sin(φ/2)) 倍。",
+     "A bearing error δθᵢ shifts line i by rᵢδθᵢ (rᵢ is the distance to the landmark). The smaller the angle φ, the closer N is to singular and the farther the intersection moves: by 1/(√2·sin(φ/2)) in the worst direction."]
+步骤:
+  - ["AGV 场景，方位误差 5 mrad。把 AGV 放到表 1 所列的位置，记录夹角、条件数、到两个路标的距离、误差椭圆的半轴和长短轴之比。",
+     "AGV scene, bearing error 5 mrad. Put the AGV at the positions of Table 1 and record the angle, condition number, distances, semi-axes and axis ratio."]
+  - ["完成任务 1～4。在对称位置（x = 0）比较长短轴之比与条件数，说明为什么两者相等；在不对称位置它们为什么不相等？",
+     "Complete tasks 1–4. On the symmetry line (x = 0) compare the axis ratio with κ₂ and explain why they agree; why do they differ elsewhere?"]
+  - ["把方位误差从 5 mrad 改为 10 mrad，误差椭圆怎样变化？条件数呢？",
+     "Change the bearing error from 5 to 10 mrad. How does the ellipse change? And the condition number?"]
+  - ["切换到山头场景，完成任务 5，给出“选哪两座山头”的经验规则。",
+     "Switch to the summits scene, complete task 5 and state a rule of thumb for choosing the two summits."]
+数据表:
+  - 标题: ["表 1  位置与定位误差（方位误差 5 mrad）", "Table 1  Position and positioning error (bearing error 5 mrad)"]
+    表头: ["位置 (x, y) / m", "夹角", "κ₂(N)", "r₁, r₂ / m", "半轴 / mm", "长短轴之比"]
+    表头英文: ["Position (x, y) / m", "Angle", "κ₂(N)", "r₁, r₂ / m", "Semi-axes / mm", "Axis ratio"]
+    行: [["(0, 2)", "", "", "", "", ""], ["(0, −0.5)", "", "", "", "", ""], ["(0, 3.8)", "", "", "", "", ""], ["(1.5, 1)", "", "", "", "", ""], ["(3.5, 3.8)", "", "", "", "", ""], ["(−4, −1)", "", "", "", "", ""]]
+注意:
+  - ["条件数只由夹角决定，定位误差还与到路标的距离成正比；两者都小才好。",
+     "The condition number depends only on the angle; the error is also proportional to the distances. Both must be small."]
+  - ["站在两个路标的连线附近（无论在两者之间还是外侧），两条方位线都接近这条连线，几乎平行，定位误差沿连线的方向很大。",
+     "Near the line through the two landmarks (between them or outside), both bearing lines nearly coincide with it and are almost parallel; the error along that line is large."]

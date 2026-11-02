@@ -1,0 +1,30 @@
+# 实验 20.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab20_4.js。
+原理:
+  - ["浮点数在 [2ᵉ, 2ᵉ⁺¹) 内的间距为 ulp = 2ᵉ·ε。每步执行 t ← fl(t + dt)，实际加上的是 dt 舍入到 ulp 的整数倍：dt 比 ulp 的一半还小时，t 不再改变（停走）；dt 在半个与一个 ulp 之间时，每步多加（走快）。",
+     "In [2ᵉ, 2ᵉ⁺¹) floating-point numbers are ulp = 2ᵉ·ε apart. Each step t ← fl(t + dt) actually adds dt rounded to a multiple of ulp: when dt is less than half an ulp t stops changing (stall); when dt lies between half and one ulp each step adds too much (runs fast)."]
+  - 式: "fl(x ∘ y) = (x ∘ y)(1 + δ)，|δ| ≤ u = ε/2；  停走条件 dt < ulp(t)/2 = 2ᵉ ε/2          (20.4.2)、(20.4.3)"
+  - ["整数计数器 n 每步加 1，没有舍入；需要时间时计算 fl(n·dt)，只有一次舍入，误差不会逐步累积。",
+     "An integer counter n adds 1 each step with no rounding; when the time is needed compute fl(n·dt), whose error is a single rounding that does not build up step by step."]
+步骤:
+  - ["单精度、dt = 1 ms、浮点累加，运行时间取 1、2、4、6、8 h，记录读数误差、开始走快的时刻和停走的时刻（表 1，任务 1）。",
+     "Single, dt = 1 ms, float accumulation: run 1, 2, 4, 6, 8 h and record the error, when it starts running fast and when it stalls (Table 1, task 1)."]
+  - ["改为半精度（任务 2）、单精度 dt = 10 ms（任务 3），把停走的时刻填入表 2，并用“dt < ulp/2”的条件验算。",
+     "Switch to half precision (task 2) and single with dt = 10 ms (task 3); enter the stall times in Table 2 and check them with the condition dt < ulp/2."]
+  - ["单精度、dt = 1 ms，改用整数计数器，运行 8 h（任务 4），比较误差。",
+     "Single, dt = 1 ms, integer counter, 8 h (task 4): compare the error."]
+数据表:
+  - 标题: ["表 1  单精度、dt = 1 ms、浮点累加", "Table 1  Single precision, dt = 1 ms, float accumulation"]
+    表头: ["运行时间 / h", "读数 − 真实时间 / s", "是否已走快", "是否已停走"]
+    表头英文: ["Running time / h", "reading − real / s", "running fast?", "stalled?"]
+    行: [["1", "", "", ""], ["2", "", "", ""], ["4", "", "", ""], ["6", "", "", ""], ["8", "", "", ""]]
+    行英文: [["1", "", "", ""], ["2", "", "", ""], ["4", "", "", ""], ["6", "", "", ""], ["8", "", "", ""]]
+  - 标题: ["表 2  停走的时刻", "Table 2  Stall times"]
+    表头: ["格式", "dt", "停走时的读数", "停走时的真实时间", "按 dt < ulp/2 算出的读数"]
+    表头英文: ["Format", "dt", "reading at stall", "real time at stall", "reading from dt < ulp/2"]
+    行: [["单精度", "1 ms", "", "", ""], ["半精度", "1 ms", "", "", ""], ["单精度", "10 ms", "", "", ""]]
+    行英文: [["single", "1 ms", "", "", ""], ["half", "1 ms", "", "", ""], ["single", "10 ms", "", "", ""]]
+注意:
+  - ["“实际存的 dt”不是 0.001：0.001 在二进制中是无限小数，存入时已有舍入误差。",
+     "“dt as stored” is not 0.001: 0.001 is an infinite binary fraction and is rounded when stored."]
+  - ["读数误差在停走之前就已经累积：每个数量级内每步加上的量都与 dt 略有不同。",
+     "The error accumulates even before the stall: in every binade each step adds slightly more or less than dt."]
