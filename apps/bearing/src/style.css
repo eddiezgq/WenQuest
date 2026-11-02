@@ -194,3 +194,10 @@ li.unknown .chip { background: var(--hold-bg); color: var(--hold); }
 .left { margin: 0; padding-left: 18px; font-size: 12.5px; max-height: 220px; overflow: auto; }
 .tblwrap.sets { max-height: 420px; overflow: auto; }
 @media (max-width: 760px) { .asm { grid-template-columns: 1fr; padding: 8px 16px; } .cmp { grid-template-columns: 1fr 1fr; } .cmp .facts { grid-column: 1 / -1; justify-items: start; } .modes { width: 100%; } }
+/* inspection and SPC */
+.seg.two { grid-template-columns: 1fr 1fr; }
+.cc .cl { stroke: var(--ink); stroke-width: 1; } .cc .lim { stroke: var(--bad); stroke-width: 1; stroke-dasharray: 5 3; }
+.cc .pt { fill: var(--accent-ink); } .cc .pt.bad { fill: var(--bad); }
+.curve .line { fill: none; }
+.cc svg { max-width: 900px; }
+.asm .figs figure svg { max-width: 340px; margin: 0 auto; }

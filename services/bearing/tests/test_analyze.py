@@ -137,3 +137,14 @@ def test_assembly_api():
     assert r.status_code == 200 and r.json()["piecewise"]["count"] > 0
     e = client.post("/api/assembly", json={"project": {**s.json(), "P_min": 0.02, "P_max": 0.01}})
     assert e.status_code == 422 and e.json()["detail"]["zh"] == "游隙范围：上限要大于下限"
+
+
+def test_quality_api():
+    pr = client.get("/api/quality/synthetic/profile").json()
+    r = client.post("/api/quality/profile", json={"project": {**pr, "bands": [[2, 15, "r"], [16, 100, "w"]]}})
+    assert r.status_code == 200 and r.json()["roundness"] > 0
+    d = client.get("/api/quality/synthetic/spc").json()
+    s = client.post("/api/quality/spc", json={"project": {**d, "lsl": 52.51, "usl": 52.53}})
+    assert s.status_code == 200 and "Cpk" in s.json()["capability"]
+    e = client.post("/api/quality/spc", json={"project": {"data": [[1, 2], [1]]}})
+    assert e.status_code == 422 and e.json()["detail"]["zh"] == "每个子组的数据个数要相同"
