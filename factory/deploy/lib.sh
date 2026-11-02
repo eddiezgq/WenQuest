@@ -88,6 +88,11 @@ site_setup() {
             if dc run --rm ${SEED_PLANT:+-e WQ_PLANT_FILE=$SEED_PLANT} seed "${seedargs[@]}" $seedopt; then envset "${pre}_SEEDED" 1; break; fi
             log "导入没成功，20 秒后重试（第 $i 次）..."; sleep 20
         done
+    elif [ -n "${SEED_PLANT:-}" ]; then
+        # 第 71 轮：清单加了物料（如轮式人形 WQ-H1）——已建好的、按清单起的班级工厂每次部署补齐缺的物料、物料清单、工艺、检验模板
+        # （seed.py 按名称查，已有的跳过；不带 --opening-stock，不动库存）
+        dc run --rm -e WQ_PLANT_FILE="$SEED_PLANT" seed "${seedargs[@]}" > "/tmp/wq-seedup-$site.log" 2>&1 \
+            && log "$label：清单里新加的物料已补进 ERPNext。" || { log "警告：$label 清单物料没补齐（下次部署再试）："; tail -5 "/tmp/wq-seedup-$site.log"; }
     fi
     dc run --rm ${SEED_PLANT:+-e WQ_PLANT_FILE=$SEED_PLANT} seed "${seedargs[@]}" --erp-sso-only --sso-secret "$(envval "${pre}_ERP_OAUTH_SECRET")" \
         --hub-internal "$hubint" > "/tmp/wq-sso-$site.log" 2>&1 \
