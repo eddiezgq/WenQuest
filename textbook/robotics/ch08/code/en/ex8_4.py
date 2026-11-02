@@ -156,3 +156,5 @@ out(
     cp1=vec(cp[1], 3), cp10=vec(cp[10], 3), cp100=vec(cp[100], 3), cp1000=vec(cp[1000], 3),
     sc_err=float(np.abs(sc.x - xc).max()), gap_c=mc / cent_c[-1][0],
 )
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

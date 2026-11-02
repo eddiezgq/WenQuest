@@ -148,3 +148,5 @@ out(pd=vec(pd, 4), pw=vec(pw, 4), rho=rho, base=base, gam=gam, t1a=t1s[0], t1b=t
     wp=wp, wR=wR, a0=100 * hist_any[0] / 2000, a8=100 * hist_any[8] / 2000,
     cur=vec(np.degrees(cur), 0), near=near, dmin=math.degrees(dist_sorted[0]), d2=math.degrees(dist_sorted[1]),
     n_w=n_w, n_e=n_e, n_s=n_s, d4=D4, below=tr('、'.join(str(i) for i in below), (', '.join(str(i) for i in below[:-1]) + ' and ' if len(below) > 1 else '') + str(below[-1])), n_below=len(below))
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

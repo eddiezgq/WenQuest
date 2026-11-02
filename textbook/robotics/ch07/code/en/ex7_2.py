@@ -155,3 +155,5 @@ out(
     amp_eu_10=amp_eu ** steps_10, y=y, eu_small=eu_small, eu_small_pred=eu_small_pred, r4_small=r4_small,
     r4_small_pred=r4_small_pred, y6=y ** 6 / 72, rk4_lim=rk4_lim,
 )
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

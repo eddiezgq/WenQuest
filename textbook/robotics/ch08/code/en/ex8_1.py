@@ -127,3 +127,5 @@ out(
     lam_b=vec(lam_b, 4), xs_deg=vec(np.degrees(xs), 2), lam_s=vec(lam_s, 4), dist_s=dist_s, kg=len(pathg) - 1,
     ks=len(paths) - 1,
 )
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

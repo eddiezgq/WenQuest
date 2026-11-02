@@ -171,3 +171,5 @@ out(
     scipy_err=float(np.linalg.norm(res.x - x)), scipy_lam=vec(res.v[0], 3),
     disp=vec(pd - p_c, 4), comp_down=vec(comp_down * 1000, 1), disp_norm=float(np.linalg.norm(pd - p_c)), work=float(F @ (pd - p_c)),
 )
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

@@ -61,3 +61,5 @@ for m in meths:
         vals[f"p_{m}{i}"] = order[m][i]
 out(a=CONE["a"], b=CONE["b"], wnorm=math.sqrt(w2), det_eu=det_eu, ort_rk4_long=ort_rk4_long, ort_mag_long=ort_mag_long,
     s3_12=S3 / 12, **vals)
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

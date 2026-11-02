@@ -124,3 +124,5 @@ out(
     lam_b=vec(lam_b, 4), xs_deg=vec(np.degrees(xs), 2), lam_s=vec(lam_s, 4), dist_s=dist_s, kg=len(pathg) - 1,
     ks=len(paths) - 1,
 )
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

@@ -92,3 +92,5 @@ out(solA_deg=f"({math.degrees(down[0]):.2f}°, {math.degrees(down[1]):.2f}°)",
     beta_deg=math.degrees(beta), trig_worst=worst,
     n_start=len(found), n_conv=n_conv, n_6r=len(D), hits=hits, hmin=min(hits), hmax=max(hits), dh_rows=dh_rows,
     sol6r=vec(np.degrees(D[0]), 1))
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

@@ -92,3 +92,5 @@ out(R1=tex(R1), theta_total=deg(theta_total), w=vec(w), det_mid=det_mid, col_nor
     sp_e_max=max(speed["euler"]) / theta_total, sp_e_min=min(speed["euler"]) / theta_total,
     sp_n_max=max(speed["nlerp"]) / theta_total, sp_n_min=min(speed["nlerp"]) / theta_total,
     mid_gap=deg(mid_gap), dot01=float(q0 @ q1), q1=vec(q1).replace("^{\\mathsf T}", ""))
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

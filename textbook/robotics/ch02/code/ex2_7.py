@@ -114,3 +114,5 @@ out(
     M=tex(M, 4), G=tex(G, 4), turn2=turn[1], turn3=turn[2], orth_err_M=orth_err_M, dist_G=dist_G,
     loss_c=loss_c, loss_m=loss_m, loss_h=loss_h,
 )
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

@@ -175,3 +175,5 @@ out(
     scipy_err=float(np.linalg.norm(res.x - x)), scipy_lam=vec(res.v[0], 3),
     disp=vec(pd - p_c, 4), comp_down=vec(comp_down * 1000, 1), disp_norm=float(np.linalg.norm(pd - p_c)), work=float(F @ (pd - p_c)),
 )
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

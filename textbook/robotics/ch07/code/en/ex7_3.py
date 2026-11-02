@@ -190,3 +190,5 @@ out(
     frac_up=frac_up, frac_down=frac_down, frac_fail=frac_fail, med_iter=med_iter, grid_n=N, frac_fail_ls=frac_fail_ls, med_iter_ls=med_iter_ls,
     cyc_res=cyc_res[-1], cyc0=deg_pair(th0[i_fail], 1), n_sing=int(sing.sum()),
 )
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

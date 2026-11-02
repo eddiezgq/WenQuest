@@ -61,3 +61,5 @@ for m in meths:
         vals[f"p_{m}{i}"] = order[m][i]
 out(a=CONE["a"], b=CONE["b"], wnorm=math.sqrt(w2), det_eu=det_eu, ort_rk4_long=ort_rk4_long, ort_mag_long=ort_mag_long,
     s3_12=S3 / 12, **vals)
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

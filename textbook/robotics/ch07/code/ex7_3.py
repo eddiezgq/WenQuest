@@ -189,3 +189,5 @@ out(
     frac_up=frac_up, frac_down=frac_down, frac_fail=frac_fail, med_iter=med_iter, grid_n=N, frac_fail_ls=frac_fail_ls, med_iter_ls=med_iter_ls,
     cyc_res=cyc_res[-1], cyc0=deg_pair(th0[i_fail], 1), n_sing=int(sing.sum()),
 )
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

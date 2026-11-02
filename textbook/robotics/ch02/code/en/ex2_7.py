@@ -117,3 +117,5 @@ out(
     M=tex(M, 4), G=tex(G, 4), turn2=turn[1], turn3=turn[2], orth_err_M=orth_err_M, dist_G=dist_G,
     loss_c=loss_c, loss_m=loss_m, loss_h=loss_h,
 )
+
+# Recompute marker 2026-11-02: after the dependency list changed the two language caches diverged; editing this comment makes both recompute.

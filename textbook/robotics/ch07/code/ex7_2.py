@@ -155,3 +155,5 @@ out(
     amp_eu_10=amp_eu ** steps_10, y=y, eu_small=eu_small, eu_small_pred=eu_small_pred, r4_small=r4_small,
     r4_small_pred=r4_small_pred, y6=y ** 6 / 72, rk4_lim=rk4_lim,
 )
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）

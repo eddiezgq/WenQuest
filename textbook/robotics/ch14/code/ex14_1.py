@@ -90,3 +90,5 @@ out(solA_deg=f"({math.degrees(down[0]):.2f}°, {math.degrees(down[1]):.2f}°)",
     beta_deg=math.degrees(beta), trig_worst=worst,
     n_start=len(found), n_conv=n_conv, n_6r=len(D), hits=hits, hmin=min(hits), hmax=max(hits), dh_rows=dh_rows,
     sol6r=vec(np.degrees(D[0]), 1))
+
+# 重算标记 2026-11-02：程序依赖登记变动后两种语言的缓存不同步，改注释令两种语言重算（同第 13 轮 11.8 的处理）
