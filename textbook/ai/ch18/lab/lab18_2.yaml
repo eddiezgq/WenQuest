@@ -1,0 +1,29 @@
+# 实验 18.2 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab18_2.js。
+原理:
+  - ["把一条链放在二维方格上，每一步往上下左右走一格、不能走回已经占过的格子——这样的走法叫自回避走，每一条就是一种折法。链长每多一个残基，折法的数目就乘两三倍（18.2 节）。", "Put the chain on a square lattice: each step moves one cell and may not revisit an occupied one. Each such self-avoiding walk is one way to fold, and every extra residue multiplies the count by two or three (Section 18.2)."]
+  - ["能量只数一件事：空间上挨着、序列上不挨着的那些**疏水—疏水**对。能量最低的折法叫基态，它就是这条序列“该折成的样子”。", "The energy counts just one thing: pairs of hydrophobic residues that are adjacent in space but not along the chain. The lowest-energy fold is the ground state — the shape this sequence should take."]
+  - ["共进化分析能告诉我们“这两个残基大概挨着”。把它当成约束加进来，只保留满足全部约束的折法：**每加一条正确的接触，还剩的折法就少一个量级**。这就是接触信息的价值——它不直接给出结构，它把搜索空间砍掉。", "Co-evolution says two residues are probably in contact. As a restraint it keeps only the folds that satisfy it, and each correct contact removes about an order of magnitude. That is what contact information buys: not the structure itself, but a far smaller search."]
+  - ["反过来，**一条错的接触会把正确答案直接排除在外**。再给多少条正确的也救不回来——这就是为什么比对深度要紧：浅比对给出的接触，错得比对得多。", "One wrong contact, however, removes the right answer altogether, and no number of further correct ones brings it back. That is why alignment depth matters: a shallow alignment gets more contacts wrong than right."]
+  - 式: "能量 = −（空间相邻且序列上不相邻的 H—H 对数）；满足全部约束的折法占比 ≈ (1/10)^(接触条数)"
+步骤:
+  - ["“折法有多少种”场景：把链长从 8 一路拖到 13，每一档记下折法的数目与“比短一个残基时多几倍”（任务 1），填表 1。", "In the first scene drag the chain length from 8 to 13, recording the number of folds and the growth factor at each step (task 1); fill Table 1."]
+  - ["切到“给几条接触”，链长固定 12，把正确接触从 0 加到 1、再加到 4，每一档记下还剩多少种折法、占全部的百分之几（任务 2、3），填表 2 前三行。", "Switch to the restraints scene at length 12 and raise the correct contacts from 0 to 1 and then to 4, recording how many folds remain and what share that is (tasks 2 and 3)."]
+  - ["保持 4 条正确接触，把“混进几条错的”调到 1：记下还剩多少种、基态还在不在（任务 4）。再按“换一组接触”试三次，看结论稳不稳。", "Keep four correct contacts and set the wrong count to 1: record how many remain and whether the ground state is among them (task 4). Change the contact set three times to see whether it holds."]
+  - ["错一条不动，把正确接触加到 6（任务 5）：基态救得回来吗？填满表 2。", "With the wrong contact still in, raise the correct ones to 6 (task 5): does the ground state come back? Complete Table 2."]
+  - ["最后把链长改成 10 与 13 各重做一次任务 3，看“一条接触值多少”这件事随链长怎么变。", "Finally redo task 3 at lengths 10 and 13 to see how the value of one contact changes with chain length."]
+数据表:
+  - 标题: ["表 1  折法的数目随链长怎么涨", "Table 1  How the number of folds grows with chain length"]
+    表头: ["链长（残基）", "折法的数目", "比短一个残基时多几倍", "基态能量"]
+    表头英文: ["chain length", "number of folds", "growth factor", "ground-state energy"]
+    行: [["8", "", "—", ""], ["9", "", "", ""], ["10", "", "", ""], ["11", "", "", ""], ["12", "", "", ""], ["13", "", "", ""]]
+  - 标题: ["表 2  接触信息值多少（链长 12）", "Table 2  What the contacts are worth (length 12)"]
+    表头: ["正确接触条数", "混进错的条数", "还剩多少种折法", "占全部的百分比", "基态还在不在"]
+    表头英文: ["correct contacts", "wrong contacts", "folds left", "share of all folds", "ground state still there?"]
+    行: [["0", "0", "", "", ""], ["1", "0", "", "", ""], ["4", "0", "", "", ""], ["4", "1", "", "", ""], ["6", "1", "", "", ""]]
+注意:
+  - ["本实验是二维格点上的玩具，残基只分疏水与亲水两种。它能说明“接触信息值多少”“错一条有多贵”这两件事的**数量级与方向**，但不要把这里的具体数字搬到真蛋白上——真蛋白是三维的，接触的判据也不是“格点相邻”。", "This is a two-dimensional lattice toy with only two residue types. It is meant to show the order of magnitude and the direction of two effects, not to transfer numbers to real proteins, which are three-dimensional and define contacts quite differently."]
+  - ["“换一组接触”换的是**挑哪几条真接触**，不换蛋白。同一条序列、同样给 4 条，剩下的折法数会有波动——所以任务 4 要至少试三次再下结论。", "Changing the contact set picks different true contacts, not a different protein. The number of survivors fluctuates, so run task 4 at least three times before concluding."]
+  - ["链长 13 时要枚举五万多条走法，第一次拖到那一档会顿一下（之后有缓存）。这正是“穷举行不通”的直观体会。", "Length 13 enumerates tens of thousands of walks, so the first time you drag there it pauses (results are cached afterwards). That pause is the point."]
+思考题:
+  - ["真实方法拿到的接触不是“对”或“错”两种，而是带着一个分数。如果让你用这个分数，你会怎样把“可能是错的那一条”造成的损失降下来？写出一条具体的规则，并说明它的代价。", "Real methods get contacts with a score attached rather than a clean right/wrong label. How would you use that score to limit the damage from a possibly wrong contact? Write down a concrete rule and say what it costs."]
+  - ["本实验把接触当成硬约束（不满足就扔掉）。改成软约束——满足得越多分越高、但不满足也不直接淘汰——会带来什么好处和什么新问题？结合任务 4、5 的结果说明。", "Here contacts are hard constraints: fail one and the fold is discarded. What would soft restraints buy, and what new problem would they bring? Answer with the results of tasks 4 and 5 in hand."]

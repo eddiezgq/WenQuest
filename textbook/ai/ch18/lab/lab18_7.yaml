@@ -1,0 +1,33 @@
+# 实验 18.7 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab18_7.js。
+原理:
+  - ["结构预测工具会给每个残基一个自评分数（0—100）。要紧的是它的身份：**这是模型对自己的估计，不是“对的概率”**。公开论文给的，是它与真实误差之间的一条拟合线，相关系数 0.76（18.2、18.7 节）。", "A structure predictor gives every residue a self-score from 0 to 100. What matters is what that number is: the model's estimate of itself, not a probability of being right. What the papers publish is a fitted line against the true error, with a correlation of 0.76 (Sections 18.2 and 18.7)."]
+  - ["相关系数 0.76 听着很高，但它允许**分数很高、误差却很大**的那一撮存在。本实验就是把这一撮量出来：门限拉到最高，收下的残基里仍然有百分之几是不能用的。", "A correlation of 0.76 sounds high, yet it leaves room for residues that score high and are badly wrong anyway. This lab measures that group: even at the highest threshold a few percent of what you keep is unusable."]
+  - ["这条蛋白分三段：紧实的核心域、柔性的连接段、末端尾巴。三段的分数分布完全不同。官方文档对低分段的说法是：低置信区**不应当作结构，而应当作“无序”的预测**；但它也提醒，低分也可能是真失败，或者那一段只在复合物里才有结构。", "The protein has three parts: a compact core, a flexible linker and a tail, and the score distribution differs sharply between them. The official guidance says low-confidence regions should be read as a prediction of disorder rather than as structure, while also warning that a low score can be a genuine failure, or a region that is only structured in complex."]
+  - ["定门限这件事与第 17.6 节那道人工确认闸是同一笔账：**门限往上调，收下的更干净，但白扔的好残基更多**；没有哪条门限能把两种代价同时清零。", "Choosing a threshold is the same arithmetic as the human-approval gate of Section 17.6: raise it and what you keep is cleaner but more good material is thrown away, and no threshold drives both costs to zero."]
+  - 式: "收下的脏成数 = 收下且误差超限的残基数 / 收下的残基数；白扔率 = 扔掉却其实合格的残基数 / 扔掉的残基数"
+步骤:
+  - ["“沿着序列看”场景：记下核心域、连接段、尾巴三段各自的分数中位数与误差中位数（任务 1），填表 1。", "In the first scene record the median score and median error for the core, the linker and the tail (task 1); fill Table 1."]
+  - ["切到“定一条门限”，把门限设到 90（相关系数保持 0.76、超限判据 2 Å）：记下收下多少、脏成数、白扔了几个好残基（任务 2），填表 2 的 90 那一行。", "Switch to the threshold scene and set it to 90, keeping the correlation at 0.76 and the cut-off at 2 Å: record how many residues you keep, the dirty share and the number of good ones wasted (task 2)."]
+  - ["把门限依次设成 40、50、70、80、95，每一档记一行（任务 3、4），填满表 2。", "Set the threshold to 40, 50, 70, 80 and 95 in turn, recording a row at each (tasks 3 and 4)."]
+  - ["门限回到 90，把相关系数从 0.76 降到 0.4：同一条门限的脏成数变成多少（任务 5）？填表 3。", "Put the threshold back at 90 and lower the correlation from 0.76 to 0.4: what does the dirty share become (task 5)? Fill Table 3."]
+  - ["最后把“错多少算不能用”从 2 Å 改成 1 Å 与 4 Å 各做一次，看“判据定在哪”对结论的影响有多大。", "Finally change the unusable-error cut-off from 2 Å to 1 Å and to 4 Å, and see how much the conclusion depends on where that line is drawn."]
+数据表:
+  - 标题: ["表 1  三段各是什么样", "Table 1  What the three parts look like"]
+    表头: ["这一段", "有几个残基", "分数中位数", "误差中位数（Å）", "该怎么读"]
+    表头英文: ["part", "residues", "median score", "median error (Å)", "how to read it"]
+    行: [["核心域", "", "", "", ""], ["连接段", "", "", "", ""], ["末端尾巴", "", "", "", ""]]
+  - 标题: ["表 2  门限定在哪（相关系数 0.76，超限判据 2 Å）", "Table 2  Where to put the threshold (correlation 0.76, 2 Å cut-off)"]
+    表头: ["门限", "收下几个残基", "收下的脏成数（%）", "白扔了几个好残基", "这一档能用来做什么"]
+    表头英文: ["threshold", "residues kept", "dirty share (%)", "good ones wasted", "what it can be used for"]
+    行: [["40", "", "", "", ""], ["50", "", "", "", ""], ["70", "", "", "", ""], ["80", "", "", "", ""], ["90", "", "", "", ""], ["95", "", "", "", ""]]
+  - 标题: ["表 3  相关性变差时，同一条门限还靠不靠得住", "Table 3  Does the same threshold still hold when the correlation is worse"]
+    表头: ["相关系数", "门限", "收下几个", "收下的脏成数（%）"]
+    表头英文: ["correlation", "threshold", "residues kept", "dirty share (%)"]
+    行: [["0.76", "90", "", ""], ["0.60", "90", "", ""], ["0.40", "90", "", ""]]
+注意:
+  - ["本实验里“真实误差”是知道的，现实里不知道——这正是难处所在。能做的是拿一批**有实验结构**的同类蛋白去核对这条相关性，再决定门限定在哪。这件事要花钱，但它是唯一能把门限定得有依据的办法。", "Here the true error is known; in practice it is not, and that is the whole difficulty. What you can do is check the correlation on a set of similar proteins that do have experimental structures, and set the threshold from that. It costs money, and it is the only way to set the threshold on evidence."]
+  - ["分数低不等于预测错。官方的说法是：低置信区应当读成“这里大概没有固定结构”。但它**也可能**是真失败，或者那一段只在与别的分子结合时才成形——这三种情况在图上长得一样。", "A low score does not mean the prediction failed. The official reading is that a low-confidence region probably has no fixed structure — but it may also be a genuine failure, or a region that only folds when bound to something else. All three look the same on the plot."]
+  - ["“换一条蛋白”换的是随机种子，三段的比例与性质不变。结论要在至少三条蛋白上看一遍再写。", "Changing the protein changes the random seed; the three parts keep their proportions. Look at at least three before writing down a conclusion."]
+思考题:
+  - ["本实验里“真实误差”是知道的，现实里不知道。如果只有自评分数，你怎样判断这一次的相关性是好是坏？写出一条能在真实项目里执行的检查，并说明它要花什么代价。", "Here the true error is known; in a real project it is not. With only the self-score in hand, how would you tell whether the correlation holds this time? Write down a check you could actually run, and say what it costs."]
+  - ["把门限这件事换个问法：不是“收不收下这个残基”，而是“这个结论敢不敢下”。给三个具体结论——“这两个域大致怎么排”“这个口袋在哪”“这个氢键存不存在”——各配一条门限，并说明为什么三条不一样。", "Reframe the threshold: not which residues to keep, but which conclusions you dare draw. Give three specific conclusions — the rough arrangement of two domains, where a pocket sits, whether a particular hydrogen bond exists — and attach a threshold to each, explaining why the three differ."]

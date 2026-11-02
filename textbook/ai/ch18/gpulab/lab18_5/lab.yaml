@@ -1,0 +1,52 @@
+标题: ["GPU 实验 18.5 随机划分与骨架划分：同一个模型，两个成绩", "GPU Lab 18.5 Random versus scaffold split: one model, two scores"]
+目的: ["训一个预测分子性质的图神经网络，用**同一批分子、同一个模型**，只把数据划分方式从随机换成骨架，看分数差多少；再和一个只会“找类似物”的最近邻基线比一比，看两种划分把两个模型的名次排成什么样。",
+       "Train a graph neural network for molecular property prediction, then change only the data split — random to scaffold — on the same molecules with the same model and see how much the score moves. Compare it with a nearest-neighbour baseline that can only look up analogues, and see how the two splits rank the two models."]
+显卡: basic
+结果:
+  - {名: n_molecules, 说明: ["数据集有多少个分子", "molecules in the dataset"], 单位: "个"}
+  - {名: n_scaffolds, 说明: ["一共有多少个骨架", "distinct scaffolds"], 单位: "个"}
+  - {名: auc_gnn_random, 说明: ["图神经网络，随机划分", "GNN, random split"], 单位: "AUC"}
+  - {名: auc_gnn_scaffold, 说明: ["图神经网络，骨架划分", "GNN, scaffold split"], 单位: "AUC"}
+  - {名: auc_knn_random, 说明: ["最近邻基线，随机划分", "nearest-neighbour baseline, random split"], 单位: "AUC"}
+  - {名: auc_knn_scaffold, 说明: ["最近邻基线，骨架划分", "nearest-neighbour baseline, scaffold split"], 单位: "AUC"}
+  - {名: gnn_drop_pts, 说明: ["图神经网络换划分掉了几个点", "points the GNN loses when the split changes"], 单位: "点"}
+  - {名: knn_drop_pts, 说明: ["最近邻基线掉了几个点", "points the baseline loses"], 单位: "点"}
+  - {名: scaffold_sd, 说明: ["换几组骨架划分，分数抖多少", "spread across several scaffold splits"], 单位: "AUC"}
+  - {名: rank_flipped, 说明: ["两种划分有没有把名次排反", "did the two splits swap the ranking"], 单位: "—"}
+文件: []
+实际问题:
+  标题: ["这个模型到底会不会外推", "Does this model actually extrapolate"]
+  内容: ["筛一批新化合物，真正想知道的是：模型能不能对**它没见过的那一类**分子给出靠谱的预测。随机划分回答不了这个问题——测试集里的分子，训练集里几乎总有同骨架的近亲，模型只要会“找类似物”就能考高分。换成按骨架划分，这条路被切断，分数才说明问题。",
+         "When screening new compounds, what you actually want to know is whether the model can predict for a class of molecules it has never seen. A random split cannot answer that: for almost every test molecule there is a close analogue of the same scaffold in training, so a model that merely looks up analogues scores well. A scaffold split cuts that path, and only then does the score mean something."]
+原理:
+  - ["两种划分的原文定义：随机划分把样本随机分进训练／验证／测试；骨架划分按分子的**二维结构骨架**（Murcko 骨架，RDKit 实现）分，**结构不同的分子进不同子集**，所以比随机划分更难（18.5 节）。", "The original definitions: a random split assigns samples at random, while a scaffold split groups molecules by their two-dimensional framework (the Murcko scaffold, via RDKit) and puts structurally different molecules in different subsets, which makes it harder (Section 18.5)."]
+  - ["**骨架划分不是唯一确定的划分**：大于目标测试集一半的骨架箱全部进训练集，其余的箱是**随机**分配的。所以同一个数据集可以有多个骨架划分，分数会抖——本实验要换几组看抖多少。", "A scaffold split is not unique: bins larger than half the target test set all go to training, and the rest are assigned at random. The same dataset therefore admits several scaffold splits with different scores, and this lab measures that spread."]
+  - ["本书不印“换成骨架划分平均掉多少分”这种数——没有可核到的成对原始数字。能印的是 MoleculeNet 图卷积在骨架划分数据集上的三档落差：BBBP 训练 0.956、验证 0.943、测试只剩 0.690。**验证分几乎没掉而测试分掉了，说明连“用验证集选模型”都挡不住骨架外推的失败。**", "This book prints no average drop for switching to a scaffold split: no paired original numbers could be verified. What can be printed is MoleculeNet's three-way gap on a scaffold-split dataset: BBBP train 0.956, validation 0.943, test 0.690. The validation score barely moves while the test score collapses, which shows that even model selection on a validation set does not catch the failure."]
+  - ["最近邻基线是故意放进来的“只会记类似物”的对照。它在随机划分上往往比正经模型还高，在骨架划分上塌得最狠——**两种划分可能把两个模型的名次排反**，这与第 17.1 节“换一套测试排名会翻”是同一件事。", "The nearest-neighbour baseline is deliberately included as a model that can only memorize analogues. It often beats the real model under a random split and collapses hardest under a scaffold split, so the two protocols can rank the two models in opposite orders — the same phenomenon as the ranking flip of Section 17.1."]
+步骤:
+  - ["运行第 1 节：装环境、确认显卡、取数据集（任务 1）。数据集从公开来源现取，仓库里不放分子数据。", "Run section 1 to set up, check the GPU and fetch the dataset (task 1). Data is fetched from a public source; none is kept in the repository."]
+  - ["运行第 2 节：算 Murcko 骨架，看骨架的分布——最大的几个骨架各占多少分子（任务 2），填表 1。", "Run section 2 to compute the Murcko scaffolds and look at their distribution: how many molecules the largest scaffolds hold (task 2), in Table 1."]
+  - ["运行第 3 节：在随机划分上训图神经网络与最近邻基线，各记一次 AUC（任务 3）。", "Run section 3 to train the GNN and the nearest-neighbour baseline on a random split, recording the AUC of each (task 3)."]
+  - ["运行第 4 节：换成骨架划分再各训一次，填表 2（任务 4）。注意两个模型各掉了几个点。", "Run section 4 to repeat both on a scaffold split and fill Table 2 (task 4). Note how many points each one loses."]
+  - ["运行第 5 节：换五组不同的骨架划分，看分数抖多少（任务 5），填表 3。", "Run section 5 across five different scaffold splits to measure the spread (task 5) in Table 3."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  骨架的分布", "Table 1  How the scaffolds are distributed"]
+    表头: ["项目", "数值"]
+    表头英文: ["item", "value"]
+    行: [["分子总数", ""], ["不同骨架数", ""], ["最大的骨架有几个分子", ""], ["只有一个分子的骨架占比", ""]]
+  - 标题: ["表 2  同一个模型，两种划分", "Table 2  One model, two splits"]
+    表头: ["模型", "随机划分 AUC", "骨架划分 AUC", "掉了几个点"]
+    表头英文: ["model", "random split AUC", "scaffold split AUC", "points lost"]
+    行: [["图神经网络", "", "", ""], ["最近邻基线（只会找类似物）", "", "", ""]]
+  - 标题: ["表 3  换几组骨架划分，分数抖多少", "Table 3  Spread across scaffold splits"]
+    表头: ["第几组", "图神经网络 AUC", "最近邻基线 AUC"]
+    表头英文: ["split", "GNN AUC", "baseline AUC"]
+    行: [["1", "", ""], ["2", "", ""], ["3", "", ""], ["4", "", ""], ["5", "", ""], ["标准差", "", ""]]
+注意:
+  - ["本实验测出来的绝对分数不能与任何论文比：数据集版本、特征、模型大小、训练轮数都不一样。能比的是**同一次实验里两种划分之间的差**，以及两个模型的名次。", "The absolute numbers here are not comparable with any paper: different dataset version, features, model size and training schedule. What transfers is the gap between the two splits within one run, and the ranking of the two models."]
+  - ["MoleculeNet 论文自身的数据集大小有两套数（Table 1 与正文对不上，例如 BACE 1513 对 1522）。引用时只用 Table 1 的值并注明原文另有一组。", "The MoleculeNet paper gives two sets of dataset sizes (Table 1 disagrees with the text, e.g. BACE 1513 versus 1522). Quote Table 1 and note that the text differs."]
+  - ["骨架划分要跑五组才看得出抖多少。只跑一组就下结论，和只跑一个随机种子一样不可靠。", "Run five scaffold splits before concluding: a single split is as unreliable as a single random seed."]
+思考题:
+  - ["你这一次两个模型的名次有没有被两种划分排反？如果没有，把图神经网络的层数减到 1 层再试一次——模型越弱，越不会“记类似物”，这件事对名次有什么影响？", "Did the two splits rank your two models differently? If not, cut the GNN to a single layer and try again: a weaker model memorizes fewer analogues, and that should move the ranking."]
+  - ["给一个真实的筛选项目设计划分方案：你会用随机划分、骨架划分，还是别的（例如按时间、按来源）？写出你的方案，并说明它回答的是哪一个问题、回答不了哪一个。", "Design the split for a real screening project: random, scaffold, or something else such as by time or by source? Write it down and say which question it answers and which it cannot."]

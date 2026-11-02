@@ -1,0 +1,49 @@
+标题: ["GPU 实验 18.2 预测一个蛋白质，并读懂它的可信度", "GPU Lab 18.2 Predict a protein structure and read its confidence"]
+目的: ["用一个公开权重的结构预测模型（ESMFold，单序列、不用搜数据库）预测几条小蛋白，与实验结构逐条比 GDT_TS、lDDT 与 TM-score，再把模型的自评分数与真实误差画在一起，亲眼看“分数高到底意味着什么”。",
+       "Use an open-weights predictor (ESMFold: single sequence, no database search) on a few small proteins, compare each prediction with its experimental structure using GDT_TS, lDDT and TM-score, and then plot the model's self-score against the true error to see for yourself what a high score means."]
+显卡: basic
+结果:
+  - {名: n_proteins, 说明: ["预测了几条蛋白", "proteins predicted"], 单位: "条"}
+  - {名: median_len, 说明: ["序列长度的中位数", "median sequence length"], 单位: "残基"}
+  - {名: sec_per_protein, 说明: ["平均每条要多久", "seconds per protein"], 单位: "秒"}
+  - {名: tm_median, 说明: ["TM-score 的中位数", "median TM-score"], 单位: "—"}
+  - {名: lddt_median, 说明: ["lDDT 的中位数", "median lDDT"], 单位: "—"}
+  - {名: gdt_median, 说明: ["GDT_TS 的中位数", "median GDT_TS"], 单位: "—"}
+  - {名: plddt_median, 说明: ["自评分数的中位数", "median self-score"], 单位: "—"}
+  - {名: corr_plddt_err, 说明: ["自评分数与真实误差的相关系数", "correlation between self-score and true error"], 单位: "—"}
+  - {名: top_band_bad_pct, 说明: ["自评 90 分以上却错超过 2 Å 的残基占比", "share of residues scoring above 90 yet off by more than 2 Å"], 单位: "%"}
+  - {名: worst_name, 说明: ["哪一条预测得最差", "which protein came out worst"], 单位: "—"}
+文件: []
+实际问题:
+  标题: ["拿到一个预测结构，敢用它做什么", "What dare you do with a predicted structure"]
+  内容: ["车间里那个酶不够耐热，要改造它。没有实验结构，只有一个预测的。问题很具体：这个结构哪几段能信？能不能拿它看活性口袋在哪？能不能拿它判断某个位点该不该改？这些问题的答案不取决于“模型强不强”，取决于**你会不会读那张自评分数图**。",
+         "The enzyme in the plant is not heat-stable enough and has to be redesigned. There is no experimental structure, only a predicted one. The questions are concrete: which parts of it can be trusted? Can it tell you where the active-site pocket is? Can it tell you which position to mutate? The answers do not depend on how strong the model is; they depend on whether you can read the confidence plot."]
+原理:
+  - ["ESMFold 不做多序列比对，直接从单条序列预测。官方模型卡的原话是“It does not require any lookup or MSA step”，这正是它快的根本原因——省掉的是 MSA 检索那十来分钟，不是网络前向本身（18.2 节）。", "ESMFold predicts from a single sequence with no alignment: the official model card says it requires no lookup or MSA step. That is why it is fast — what it saves is the ten-plus minutes of MSA search, not the forward pass itself (Section 18.2)."]
+  - ["代价要一起记：论文给的是 CAMEO 194 个结构上 TM-score 0.83（AlphaFold2 0.88）、CASP14 51 个结构上 0.68（AlphaFold2 0.85）。**AlphaFold2 那两列是带 MSA 与模板的设置，与单序列不是同一个输入条件。**", "The cost comes with it: the paper reports TM-score 0.83 on 194 CAMEO structures (AlphaFold2: 0.88) and 0.68 on 51 CASP14 structures (0.85). Note that the AlphaFold2 columns use MSAs and templates — not the same input condition."]
+  - ["三个指标测的不是一件事：GDT_TS 与 TM-score 要先叠合、测整体折叠；lDDT **不叠合**、测局部环境。所以“域摆动”在 lDDT 上几乎不扣分，在另外两个上扣得很重（18.1 节）。三个一起看才判得准。", "The three metrics measure different things: GDT_TS and TM-score superimpose first and report the overall fold, while lDDT needs no superposition and reports the local environment. A domain swinging barely costs lDDT and costs the other two dearly (Section 18.1). Read all three."]
+  - ["自评分数（pLDDT）是模型对自己的估计，训练时回归的是真实的 lDDT-Cα。论文给的拟合是 lDDT-Cα = 0.997·pLDDT − 1.17，**相关系数只有 0.76**——这意味着单个残基上偏差可以很大。本实验要亲手把这件事量出来。", "The self-score is the model's estimate of itself, trained to regress the true lDDT-Cα. The published fit is lDDT-Cα = 0.997·pLDDT − 1.17 with a correlation of only 0.76, which leaves plenty of room for individual residues to be far off. This lab measures that."]
+  - ["官方对低分段的说法要照引：低置信区“should not be interpreted as structures but rather as a prediction of disorder”；但同一篇也提醒，低分也可能是真失败，或那一段只在复合物里才成形。", "The official reading of low-confidence regions is that they should not be interpreted as structures but as a prediction of disorder — while the same paper warns that a low score can also be a genuine failure, or a region that is only structured in complex."]
+步骤:
+  - ["运行第 1 节：装环境、确认显卡、下载模型（任务 1）。第一次下载权重要几分钟。", "Run section 1: set up, check the GPU and download the model (task 1). The first download takes a few minutes."]
+  - ["运行第 2 节：取几条小蛋白的序列与实验结构（都从公开数据库现取，仓库里不放任何结构文件），记下长度（任务 2）。", "Run section 2 to fetch a few small proteins and their experimental structures from public databases (no structure files are kept in the repository) and record the lengths (task 2)."]
+  - ["运行第 3 节：逐条预测并计时，记下每条的三个指标与自评分数（任务 3），填表 1。", "Run section 3 to predict and time each protein, recording the three metrics and the self-score (task 3) in Table 1."]
+  - ["运行第 4 节：把自评分数与真实误差按残基画在一起，算相关系数，并按四档统计（任务 4），填表 2。", "Run section 4 to plot the self-score against the true per-residue error, compute the correlation and tabulate the four bands (task 4) in Table 2."]
+  - ["挑出最差的那一条，看它差在哪：是整体折叠错了（TM 低、lDDT 也低），还是只是域摆了（lDDT 高、TM 低）？把判断写下来（任务 5）。", "Take the worst prediction and diagnose it: did the fold come out wrong (both TM and lDDT low), or did a domain merely swing (lDDT high, TM low)? Write down your call (task 5)."]
+  - ["运行最后一格，回传结果。", "Run the last cell to send your results."]
+数据表:
+  - 标题: ["表 1  每条蛋白的三个指标", "Table 1  The three metrics, protein by protein"]
+    表头: ["蛋白", "长度（残基）", "耗时（秒）", "TM-score", "lDDT", "GDT_TS", "自评分数中位"]
+    表头英文: ["protein", "length", "seconds", "TM-score", "lDDT", "GDT_TS", "median self-score"]
+    行: [["第 1 条", "", "", "", "", "", ""], ["第 2 条", "", "", "", "", "", ""], ["第 3 条", "", "", "", "", "", ""], ["第 4 条", "", "", "", "", "", ""], ["中位数", "", "", "", "", "", ""]]
+  - 标题: ["表 2  自评分数分档之后，真实误差是什么样", "Table 2  True error within each self-score band"]
+    表头: ["自评分数档", "有几个残基", "误差中位数（Å）", "错超过 2 Å 的占（%）", "这一档敢用来做什么"]
+    表头英文: ["band", "residues", "median error (Å)", "share off by > 2 Å (%)", "what it can be used for"]
+    行: [["90 以上", "", "", "", ""], ["70—90", "", "", "", ""], ["50—70", "", "", "", ""], ["50 以下", "", "", "", ""]]
+注意:
+  - ["本实验测出来的绝对值不能与论文里的 CAMEO/CASP 分数比：蛋白不同、数量少得多、叠合与指标的实现也不完全一样。能比的是**三个指标之间的关系**与**自评分数与真实误差的关系**。", "The absolute numbers here are not comparable with the published CAMEO or CASP scores: different proteins, far fewer of them, and a different implementation of the superposition and the metrics. What does transfer is the relationship between the three metrics, and between the self-score and the true error."]
+  - ["论文给的时间口径是 384 残基、单张 V100、14.2 秒，比**单个** AlphaFold2 模型快 6 倍；“最高约 60 倍”只在更短的序列上成立，论文没说“短”是多少残基。按这一组估自己的用时。", "The published timing is 14.2 seconds for 384 residues on one V100, six times faster than a single AlphaFold2 model. The headline figure of up to 60× holds only on shorter sequences, and the paper does not say how short. Estimate your own run from the 14.2-second figure."]
+  - ["选蛋白时避开太长的（显存）与明显是多聚体的（单链预测对不上实验结构）。挑 80—250 残基的单链球状蛋白最省事。", "Avoid very long chains (memory) and obvious oligomers (a single-chain prediction will not match the experimental structure). Globular single chains of 80 to 250 residues are the easy case."]
+思考题:
+  - ["你量出来的“自评 90 分以上却错超过 2 Å”的比例是多少？假设你要拿这个结构去判断一个氢键存不存在，这个比例能接受吗？如果不能，你会改做什么？", "What share of residues scoring above 90 is still off by more than 2 Å in your run? If you wanted to use the structure to decide whether a particular hydrogen bond exists, would that share be acceptable? If not, what would you do instead?"]
+  - ["把同一条序列的实验结构换成另一个构象态（如果这条蛋白有的话）再比一次。预测结构与两个态各自的分数差多少？这件事对“预测的是哪一个构象”说明了什么？", "If the protein has more than one known conformational state, score the same prediction against each. How different are the two scores, and what does that say about which conformation the model predicted?"]
