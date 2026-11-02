@@ -1,0 +1,27 @@
+# 实验 32.1 的指导书与报告模板。目的、场景、参数、任务取自 lab32_1.js。
+原理:
+  - ["关节有背隙 b，齿贴在间隙的哪一侧，输出轴就多转或少转 b/2；TCP 跟着移动“角度 × 力臂”（32.6 节式 (32.6.1)）。两侧来回跳，TCP 的晃量就是：", "A joint with backlash b turns b/2 more or less depending on which flank is in contact; the TCP moves by “angle × lever” (Eq. (32.6.1)). Jumping between the flanks, the TCP wanders by:"]
+  - 式: "δ = b2·r2 + b3·r3，r2 ≈ 0.88 m、r3 ≈ 0.50 m（手臂伸直）"
+  - ["齿贴哪一侧，看关节受的力矩：重力矩大于关节的空载摩擦力矩，重力就一直把齿压在同一侧（重力预紧），背隙看不见；重力矩不够大，齿贴哪侧由运动方向决定。", "Which flank touches depends on the joint torque: if gravity exceeds the joint's no-load friction it always holds the same flank (gravity preload) and the backlash disappears; otherwise the direction of motion decides."]
+  - 式: "重力预紧的条件：τ_g = (τ_手臂 + m_p·g·r)·sin θ > τ_摩擦"
+  - ["重复定位精度测的是“同一点反复到”：每次都从同一侧接近（单向接近），齿也总贴同一侧。剩下的只是伺服的定位噪声。", "Repeatability means “return to the same point”: always approaching from one side (one-way approach) also keeps the same flank in contact. Only the servo's noise remains."]
+步骤:
+  - ["场景“WQ-CR5 手臂”，背隙 0.6′、空载、手臂竖直、双向接近：记录散布和两个关节的重力矩，填入表 1 第一行（任务 1）。", "Scene “WQ-CR5 arm”, 0.6′ backlash, no payload, upright, both ways: record the spread and both gravity torques in Table 1, row 1 (task 1)."]
+  - ["把倾角改为 2°，负载从 0 起每次加 0.5 kg，记录散布和 J2、J3 是否“压住”，直到散布合格（任务 2）。再把倾角改为 90°（水平），空载，记录一行。", "Set the tilt to 2° and add 0.5 kg at a time, noting the spread and whether J2 and J3 are held, until it passes (task 2). Then set 90° (level), unloaded, and record a row."]
+  - ["回到竖直、空载，改成单向接近（任务 3），记录散布。", "Back to upright and unloaded, switch to one-way approach (task 3) and record the spread."]
+  - ["竖直、空载、双向：两个关节的背隙一起从 0.6′ 往下调，填入表 2，找出散布刚好合格的背隙（任务 4）；与关节测试台的上限 1.0′ 比一比。", "Upright, unloaded, both ways: lower both backlashes from 0.6′ and fill Table 2 to find where the spread just passes (task 4); compare with the test bench limit of 1.0′."]
+  - ["场景“旧自行车的车把”：调前叉的松旷，使前轮左右相差约 1 cm（任务 5）。", "Scene “An old bike's handlebar”: set the play so the wheel shifts about 1 cm (task 5)."]
+数据表:
+  - 标题: ["表 1  重力预紧与单向接近（背隙 0.6′）", "Table 1  Gravity preload and one-way approach (0.6′ backlash)"]
+    表头: ["倾角 / °", "负载 / kg", "接近方式", "J2 重力矩 / (N·m)", "J3 重力矩 / (N·m)", "J2 压住？", "J3 压住？", "散布 / mm"]
+    表头英文: ["Tilt / °", "Payload / kg", "Approach", "J2 gravity / (N·m)", "J3 gravity / (N·m)", "J2 held?", "J3 held?", "Spread / mm"]
+    行: [["0", "0", "双向", "", "", "", "", ""], ["2", "0", "双向", "", "", "", "", ""], ["2", "", "双向", "", "", "", "", ""], ["90", "0", "双向", "", "", "", "", ""], ["0", "0", "单向", "", "", "", "", ""]]
+  - 标题: ["表 2  只靠减小背隙（竖直、空载、双向）", "Table 2  Smaller backlash only (upright, unloaded, both ways)"]
+    表头: ["背隙 / ′", "J2 背隙乘力臂 / mm", "J3 背隙乘力臂 / mm", "散布 / mm", "合格？"]
+    表头英文: ["Backlash / ′", "J2 × lever / mm", "J3 × lever / mm", "Spread / mm", "Pass?"]
+    行: [["0.6", "", "", "", ""], ["0.3", "", "", "", ""], ["0.15", "", "", "", ""], ["", "", "", "", ""]]
+注意:
+  - ["本页只看 J2、J3，手臂伸直；倾斜时的重力矩按水平伸直时的值乘 sin θ 近似。摩擦力矩取机器人厂关节测试台的名义值，伺服噪声 ±0.0025 mm 是示例值。", "Only J2 and J3, arm straight; the tilted gravity torque is the level value times sin θ (approximate). Friction is the robot plant's test-bench nominal; the ±0.0025 mm servo noise is an example value."]
+  - ["真实的谐波减速器还有小力矩下的弹性段（空程），本页没有画进去。", "A real strain wave gear also has a soft zone at small torque (lost motion); it is not modelled here."]
+思考题:
+  - ["J1 的轴是竖直的，重力对它没有力矩。码垛时 J1 来回转，你会怎样安排动作，让它的背隙不影响放料位置？", "J1's axis is vertical, so gravity gives it no torque. When palletising, J1 swings back and forth: how would you plan the motion so its backlash does not affect where parts are placed?"]

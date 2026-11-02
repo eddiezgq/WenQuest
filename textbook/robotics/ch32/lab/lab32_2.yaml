@@ -1,0 +1,27 @@
+# 实验 32.2 的指导书与报告模板。目的、场景、参数、任务取自 lab32_2.js。
+原理:
+  - ["谐波减速器样本给出额定力矩 T_r 下、平均输入转速 2000 r/min 时的寿命 7000 h。实际工况的寿命按平均负载力矩 T_av 和平均输入转速 n_av 换算（32.2 节式 (32.2.2)）：", "Strain wave gear catalogues rate a life of 7000 h at the rated torque T_r and an average input speed of 2000 r/min. The actual life follows from the average load torque T_av and the average input speed n_av (Eq. (32.2.2)):"]
+  - 式: "L10 = 7000 h × (T_r / T_av)³ × (2000 / n_av)"
+  - ["平均负载力矩按转速和时间加权、取三次方平均；平均输入转速把停顿的时间也算进分母。本页的动作是梯形速度的往返（每段 1 s，加减速各占四分之一），运动时力矩恒为 T：", "The average torque is a cubic mean weighted by speed and time; the average speed includes the dwell time. Here the motion is a trapezoidal back-and-forth (1 s per move, a quarter each for acceleration and deceleration) with constant torque T while moving:"]
+  - 式: "T_av = T，n_av = 0.75·n_max × 1 s / (1 s + t_d)"
+  - ["另外两条限制：T_av 不超过样本的平均负载力矩允许值，n_av 不超过平均输入转速允许值（脂润滑 3500 r/min）。", "Two more limits: T_av must not exceed the catalogue's average torque limit, and n_av the average input speed limit (3500 r/min with grease)."]
+步骤:
+  - ["场景“关节”，标准工况（25 号、40 N·m、1500 r/min、停顿 1 s）：记录 n_av 和 L10，填入表 1 第一行（任务 1）。", "Scene “A joint”, standard case (size 25, 40 N·m, 1500 r/min, 1 s dwell): record n_av and L10 in Table 1, row 1 (task 1)."]
+  - ["只改力矩为 48 N·m，记录寿命与标准之比（任务 2）；再只改最高转速为 1800 r/min，比较两种“加 20%”的影响。", "Change only the torque to 48 N·m and note the ratio to the standard (task 2); then change only the top speed to 1800 r/min and compare the two “+20 %” cases."]
+  - ["回到标准工况，只改停顿时间，直到寿命翻倍（任务 3）。", "Back to the standard case, change only the dwell until the life doubles (task 3)."]
+  - ["力矩改为 60 N·m：依次选 17、25、32 号，填入表 2，找出寿命超过 3 万小时又最轻的型号（任务 4）。", "Set 60 N·m and try sizes 17, 25 and 32 in Table 2; find the lightest one lasting over 30 000 h (task 4)."]
+  - ["场景“骑车上坡”：从 11 齿起逐个换后飞轮，记录踏频和链条相对寿命；在踏频不超过 100 r/min 的前提下，选链条最耐用的一个（任务 5）。", "Scene “Cycling uphill”: step through the rear cogs from 11 T, noting cadence and relative chain life; with cadence at most 100 r/min pick the most durable (task 5)."]
+数据表:
+  - 标题: ["表 1  负载、转速与停顿（25 号）", "Table 1  Torque, speed and dwell (size 25)"]
+    表头: ["T / (N·m)", "n_max / (r/min)", "t_d / s", "n_av / (r/min)", "L10 / h", "与标准之比"]
+    表头英文: ["T / (N·m)", "n_max / (r/min)", "t_d / s", "n_av / (r/min)", "L10 / h", "Ratio to standard"]
+    行: [["40", "1500", "1", "", "", "1"], ["48", "1500", "1", "", "", ""], ["40", "1800", "1", "", "", ""], ["40", "1500", "", "", "", "2"]]
+  - 标题: ["表 2  选型（60 N·m、1500 r/min、停顿 1 s）", "Table 2  Sizing (60 N·m, 1500 r/min, 1 s dwell)"]
+    表头: ["型号", "质量 / kg", "额定力矩 / (N·m)", "平均允许 / (N·m)", "L10 / h", "可用？"]
+    表头英文: ["Size", "Mass / kg", "Rated / (N·m)", "Average limit / (N·m)", "L10 / h", "OK?"]
+    行: [["17", "", "", "", "", ""], ["25", "", "", "", "", ""], ["32", "", "", "", "", ""]]
+注意:
+  - ["型号参数取零件库 D-RDC-HD-CSF（Harmonic Drive 官网样本，减速比 100）；寿命公式与问渠“运动与动力分析”的减速器寿命计算相同。本页把运动时的力矩取为常数，真实动作的力矩随姿态和加速度变化，要用 32.2 节的程序按整段动作算。", "Gear data from library D-RDC-HD-CSF (Harmonic Drive catalogue, ratio 100); the life formula is the same as in 问渠 Motion and Dynamics. Here the moving torque is constant; a real motion's torque varies with pose and acceleration and is computed over the whole motion as in Section 32.2."]
+  - ["自行车的“链条相对寿命”只是仿照减速器寿命公式的比较量（拉力的三次方、链速的一次方），不是链条厂的寿命公式；骑手功率 150 W、车轮半径 0.34 m 是示例值。", "The bike's “relative chain life” only mimics the gear life formula (tension cubed, chain speed to the first power) for comparison; it is not a chain maker's formula. 150 W and a 0.34 m wheel are example values."]
+思考题:
+  - ["一台码垛机器人想把节拍从 6 s 提到 5 s。只看减速器寿命，是缩短停顿好，还是提高最高转速好？加速度提高后力矩也会变大，这又怎样影响寿命？", "A palletiser wants to cut its cycle from 6 s to 5 s. For gear life alone, is it better to shorten the dwell or raise the top speed? Faster acceleration also raises the torque — how does that change the answer?"]

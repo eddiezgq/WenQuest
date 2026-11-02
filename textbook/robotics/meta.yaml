@@ -19,3 +19,9 @@ program_deps:
   - library/catalog/B/B-ARM-*/vendor.yaml    # 零件库各机械臂的厂商参数（第 30 章选型）
   - library/catalog/B/B-SCA-WQ4/entry.yaml   # SCARA 的默认参数（第 30 章构型选择）
   - library/catalog/D/D-RDC-HD-CSF/specs.csv   # 谐波减速器的扭转刚度（第 31 章）
+  - factory/digital/twin/__init__.py       # 第 32 章：谐波减速器寿命（问渠“运动与动力分析”的同一段程序）
+  - factory/digital/twin/robot.py
+  - factory/digital/cae/thermal_parts.py    # 第 32 章：WQR-105 的效率参数
+  - library/catalog/D/D-RDC-NABTESCO-RVN/specs.csv   # 第 32 章：RV 减速器
+  - library/catalog/D/D-RDC-NEUGART-PLE/specs.csv    # 第 32 章：行星减速器
+  - library/catalog/C/C-SCN-LEAD/entry.yaml          # 第 32 章：丝杠
