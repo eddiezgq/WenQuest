@@ -16,10 +16,12 @@ import ScenarioPanel from './components/ScenarioPanel.vue'
 import Report from './components/Report.vue'
 import Assembly from './components/Assembly.vue'
 import Quality from './components/Quality.vue'
+import Parts from './components/Parts.vue'
 
 const examples = ref([])
 const pick = ref('')
 const showReport = ref(false)
+const showParts = ref(false)
 const MODES = ['design', 'assembly', 'quality']
 const mode = ref(MODES.includes(new URLSearchParams(location.search).get('mode')) ? new URLSearchParams(location.search).get('mode') : 'design')
 const fileInput = ref(null)
@@ -77,6 +79,7 @@ onMounted(async () => {
         <button v-if="!embed" type="button" class="dark" @click="fileInput.click()">{{ t('open') }}</button>
         <input ref="fileInput" type="file" accept=".json" hidden @change="openFile">
         <button v-if="!embed" type="button" class="dark" @click="save">{{ t('save') }}</button>
+        <button v-if="mode === 'design'" type="button" class="dark" :disabled="!result" @click="showParts = true">{{ t('partsBtn') }}</button>
         <button type="button" class="accent" :disabled="!result" @click="showReport = true">{{ t('report') }}</button>
         <button type="button" class="dark lang" @click="setLang(lang === 'zh' ? 'en' : 'zh')">{{ lang === 'zh' ? 'EN' : '中' }}</button>
       </div>
@@ -109,5 +112,6 @@ onMounted(async () => {
     </main>
 
     <Report v-if="showReport && result" :r="result" @close="showReport = false" />
+    <Parts v-if="showParts" @close="showParts = false" />
   </div>
 </template>

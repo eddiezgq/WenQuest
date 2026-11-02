@@ -16,8 +16,9 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from bearingkit import assembly as AS
+from bearingkit import parts as PT
 from bearingkit import quality as QL
-from bearingkit.analyze import analyse
+from bearingkit.analyze import analyse, geometry_of
 
 HERE = Path(__file__).parent
 EXAMPLES = HERE / "examples"
@@ -113,6 +114,15 @@ ERR_ZH += [  # inspection and SPC (step 5)
     (r"^the chart is xbar_r, xbar_s or i_mr$", "控制图是均值–极差、均值–标准差或单值–移动极差"),
 ]
 
+ERR_ZH += [  # part drawings and STEP (step 5)
+    (r"^give the shoulder heights: the rings cannot be drawn", "请填内外圈挡肩高度：没有它画不出套圈"),
+    (r"^the groove is wider than the ring at the shoulder$", "挡肩处沟道比套圈还宽：请检查挡肩高度和宽度"),
+    (r"^the rings do not fit", "套圈画不出来：请检查挡肩高度和尺寸"),
+    (r"^the rollers do not fit in these rings", "滚子放不进这对套圈：请检查宽度、角度和尺寸"),
+    (r"^the part is inner, outer", "零件是内圈、外圈、滚动体或整套"),
+    (r"^a groove arc reaches past the axis$", "沟道圆弧越过了轴线：请检查尺寸"),
+]
+
 SCN_ZH = {  # scenario field names in the Chinese messages
     "mn": "法向模数 mn",
     "z": "齿数 z",
@@ -206,6 +216,41 @@ def example(eid: str):
 async def analyse_ep(request: Request):
     p = await project_of(request)
     return run(lambda: analyse(p))
+
+
+@app.post("/api/parts/drawings")
+async def drawings_ep(request: Request):
+    """Section outlines of the rings and rolling elements for the page's part drawings (round 64, step 5)."""
+    p = await project_of(request)
+    return run(lambda: PT.drawings(geometry_of(p)))
+
+
+@app.post("/api/parts/{which}.step")
+async def step_ep(which: str, request: Request):
+    """STEP of one part (inner, outer, element) or of the bearing as assembled."""
+    p = await project_of(request)
+
+    def make():
+        if which not in ("inner", "outer", "element", "bearing"):
+            raise ValueError("the part is inner, outer, element or bearing")
+        text, vol = PT.step(geometry_of(p), which, f"bearing-{which}")
+        return {"name": f"bearing-{which}.step", "text": text, "volume": vol}
+
+    return run(make)
+
+
+@app.post("/api/parts/{which}.dxf")
+async def dxf_ep(which: str, request: Request):
+    """DXF of one part's half section (x axial, y radius)."""
+    p = await project_of(request)
+
+    def make():
+        pr = PT.parts(geometry_of(p))
+        if which not in ("inner", "outer", "element"):
+            raise ValueError("the part is inner, outer or element")
+        return {"name": f"bearing-{which}.dxf", "text": PT.dxf(pr[which])}
+
+    return run(make)
 
 
 @app.post("/api/assembly")
