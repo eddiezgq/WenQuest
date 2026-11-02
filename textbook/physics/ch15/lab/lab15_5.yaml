@@ -1,0 +1,22 @@
+# 实验 15.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_5.js。
+原理:
+  - ["只受地球引力的卫星，机械能守恒：E = ½mv² − GMm/r。E < 0 时轨道是椭圆（圆是特例），E ≥ 0 时逃逸。", "A satellite under Earth's gravity alone conserves E = ½mv² − GMm/r. With E < 0 the orbit is an ellipse (a circle being a special case); with E ≥ 0 it escapes."]
+  - 式: "圆轨道 v₁ = √(GM/r)，逃逸 v_esc = √(2GM/r)        （式 (15.5.1)、(15.3.3)）"
+  - ["水平入轨时，入轨点是近地点（v > v₁）或远地点（v < v₁）。椭圆的半长轴 a 由能量决定：E = −GMm/(2a)，近地点 r_p 和远地点 r_a 之和为 2a。", "Injected horizontally, the injection point is the perigee (v > v₁) or the apogee (v < v₁). The semi-major axis follows from the energy: E = −GMm/(2a), and r_p + r_a = 2a."]
+  - 式: "v_p = √(GM(2/r_p − 1/a))        （式 (15.5.3)）"
+步骤:
+  - ["选“卫星入轨”，入轨速度从 7.00 km/s 起每次加 0.20 km/s，记下近地点、远地点高度和周期，填入表 1。", "Choose “Orbit injection”; starting at 7.00 km/s, raise the speed 0.20 km/s at a time, recording perigee, apogee and period in Table 1."]
+  - ["用式 (15.5.1) 算出 400 km 高处的圆轨道速度，验证，提交（任务 1）。", "Compute the circular speed at 400 km with Eq. (15.5.1), check it, and submit (task 1)."]
+  - ["用 v_p 的公式算出远地点到达 35 786 km 所需的入轨速度，验证，提交（任务 2）。再找出卫星逃逸的最小速度，与 √2 v₁ 比较。", "With the v_p formula compute the speed for an apogee of 35 786 km, check it and submit (task 2). Then find the smallest speed that escapes and compare with √2 v₁."]
+  - ["选“小行星上扔石头”，先算出小行星的质量和地面的圆轨道速度，再验证，提交（任务 3）。", "Choose “Throwing a stone on an asteroid”; first compute the asteroid's mass and the circular speed at its surface, then check it and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  入轨速度与轨道（入轨高度 400 km）", "Table 1  Injection speed and orbit (injection height 400 km)"]
+    表头: ["v₀ / (km/s)", "近地点高度 / km", "远地点高度 / km", "周期 / min"]
+    表头英文: ["v₀ / (km/s)", "Perigee / km", "Apogee / km", "Period / min"]
+    行: [["7.00", "", "", ""], ["7.20", "", "", ""], ["7.40", "", "", ""], ["7.60", "", "", ""], ["7.80", "", "", ""], ["8.00", "", "", ""], ["9.00", "", "", ""], ["10.00", "", "", ""]]
+注意:
+  - ["不计空气阻力和地球自转；实际发射时向东发射可借助地球自转的速度。", "Air drag and the Earth's rotation are ignored; real launches go east to borrow the Earth's spin."]
+  - ["近地点低于地面时，卫星会落回地面。", "If the perigee is below the surface, the satellite falls back."]
+思考题:
+  - ["入轨速度只比圆轨道速度大 10%，远地点为什么高出约 3600 km？", "Why does a speed only 10% above circular raise the apogee by about 3600 km?"]
+  - ["在这颗小行星上，人原地起跳的速度约 2 m/s，会不会飞走？", "On this asteroid, a standing jump is about 2 m/s: would you fly off?"]

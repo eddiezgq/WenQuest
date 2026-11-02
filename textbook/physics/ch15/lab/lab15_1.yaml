@@ -1,0 +1,23 @@
+# 实验 15.1 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab15_1.js。
+原理:
+  - ["扭秤：小球 m 挂在轻杆两端，离悬丝 l。大球 M 放在小球旁边（球心距 r），每对球之间的引力 F = GMm/r²，两个力对悬丝的力矩 2Fl 被悬丝的扭转力矩 κθ 平衡：", "Torsion balance: small balls m at the ends of a light rod, distance l from the fibre. With a large ball M beside each (centre distance r), each pair attracts with F = GMm/r²; the two forces' torque 2Fl is balanced by the fibre's twist κθ:"]
+  - 式: "κθ = 2Fl = 2GMml/r²        （式 (15.1.3)）"
+  - ["扭转系数由摆动周期求：T = 2π√(I/κ)，I = 2ml²（杆的转动惯量不计）。", "The torsion constant comes from the swing period: T = 2π√(I/κ), I = 2ml² (rod neglected)."]
+  - ["镜子把光点反射到 D 外的标尺上，杆转过 θ，反射光转过 2θ，光点移动 x = 2Dθ。大球从一侧移到另一侧，平衡位置改变 2θ，光点的平衡位置改变 4Dθ。", "A mirror sends a light spot to a scale at distance D. When the rod turns θ, the reflected beam turns 2θ and the spot moves x = 2Dθ. Moving the large balls to the other side shifts the equilibrium by 2θ, so the spot's rest position shifts by 4Dθ."]
+  - ["由 g = GM_地/R² 得地球质量和平均密度：ρ = 3g/(4πGR)。", "From g = GM_E/R² the Earth's mass and mean density follow: ρ = 3g/(4πGR)."]
+步骤:
+  - ["大球移到右侧（1），点“开始”。拖动“读数时刻”，找出光点的几个最大值、最小值和对应的时刻，填入表 1。", "Move the large balls to the right (1) and press “Start”. Drag “Read time” to find several maxima and minima of the spot and their times; fill in Table 1."]
+  - ["量出 n 个周期（n ≥ 8）的总时间，求周期 T，再求 κ，提交（任务 1）。只量一个周期，读数时刻的分辨率会带来几个百分点的误差。", "Time n periods (n ≥ 8) together to get T, then κ, and submit (task 1). Timing a single period, the read-time resolution alone gives errors of a few per cent."]
+  - ["由相邻的最大值、最小值求平衡位置（例如 (x₁ + 2x₂ + x₃)/4）。大球移到左侧（−1），再做一次，求另一个平衡位置。", "From neighbouring maxima and minima find the rest position (e.g. (x₁ + 2x₂ + x₃)/4). Move the large balls to the left (−1), repeat, and find the other rest position."]
+  - ["两个平衡位置之差为 4Dθ（每个平衡位置离标尺零点 2Dθ），求 θ，提交（任务 2）。再由式 (15.1.3) 求 F 和 G，提交（任务 3），并求地球的平均密度。", "The two rest positions differ by 4Dθ (each lies 2Dθ from the scale zero); find θ and submit (task 2). Then from Eq. (15.1.3) find F and G, submit (task 3), and find the Earth's mean density."]
+数据表:
+  - 标题: ["表 1  光点的极值（m = 0.73 kg，l = 0.93 m，M = 158 kg，r = 0.225 m，D = 5.000 m）", "Table 1  Spot extremes (m = 0.73 kg, l = 0.93 m, M = 158 kg, r = 0.225 m, D = 5.000 m)"]
+    表头: ["大球的位置", "时刻 / min", "光点位置 / mm", "极大或极小"]
+    表头英文: ["Large balls", "Time / min", "Spot / mm", "Max or min"]
+    行: [["右", "", "", ""], ["右", "", "", ""], ["右", "", "", ""], ["左", "", "", ""], ["左", "", "", ""], ["左", "", "", ""]]
+注意:
+  - ["光点读数带有 ±0.05 mm 以内的误差。摆动有阻尼，要用相邻的几个极值求平衡位置，不能只看一个。", "Spot readings carry errors up to ±0.05 mm. The swing is damped: use several neighbouring extremes for the rest position, not just one."]
+  - ["只计每个小球与靠近它的大球之间的引力。", "Only the pull between each small ball and its nearby large ball is counted."]
+思考题:
+  - ["引力只相当于小球重量的约一亿分之二，扭秤靠什么测出来？", "The pull is only about 2 × 10⁻⁸ of the small ball's weight: what lets the balance detect it?"]
+  - ["悬丝越细越好吗？实际测量中最难控制的干扰是什么？", "Is a thinner fibre always better? What disturbance is hardest to control in practice?"]
