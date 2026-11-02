@@ -467,6 +467,8 @@
 24,误差函数,error function,
 24,复数,complex number,
 24,虚数单位,imaginary unit,
+24,解析,analytic,第 24 章指在一点的某邻域内能展开成幂级数
+24,光滑,smooth (C^∞),各阶导数都存在
 25,逐点收敛,pointwise convergence,
 25,一致收敛,uniform convergence,
 25,魏尔斯特拉斯判别法,Weierstrass M-test,
