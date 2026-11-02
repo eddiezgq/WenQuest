@@ -1,0 +1,129 @@
+# 《缝纫机设计与制造》公开课 第 24 讲：机针与旋梭的制造
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch24.yaml，2026-11-02 新做），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 24-1（旋梭选配与工序能力）录屏、数字工厂（第 23 轮 3.4：第 23–25 讲演示；示例是缝纫机总装线的梭尖间隙质量闭环与追溯，
+# 本讲顺着追溯链看到旋梭批次、梭道磨床和砂轮修整，同第 23 讲的页面）、作业页、测验页。
+# 数字一律由 course/calc/ch24.py 算出（{{ch24.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "24"
+deck: ch24
+skip: [3, 5, 7, 16, 17, 20, 22, 24]   # 两种制造思路（封面已说）、机针结构图、针尖与关键质量特性、旋梭工作条件、旋梭体工艺路线、分组越多越集中、组数与测量误差（分 2 组也是实验任务二的一步）、数字化瓶颈（作业第 4 题）：课程部分约 10 分钟；这几页留给课件
+code: [ch24]
+title: ["机针与旋梭的制造——两件最小的零件，两种制造思路", "Making Needles and Rotary Hooks — Two Tiny Parts, Two Ways of Making Them"]
+chapter: ["第七篇 制造与数字工厂 · 第 24 章", "Part VII Manufacturing and the Digital Factory · Chapter 24"]
+next: ["第 25 讲", "Lecture 25"]
+cover_formula: 'C_{pk}=\min\!\left(\frac{\mathrm{USL}-\mu}{3\sigma},\ \frac{\mu-\mathrm{LSL}}{3\sigma}\right)'
+tags:
+  zh: [机针, 旋梭, 冲针孔, 回火, 工序能力, Cpk, 控制图, 平均运行长度, 分组选配, 蒙特卡罗, 剩余件, 机器视觉, 缝纫机制造]
+  en: [sewing needle, rotary hook, eye punching, tempering, process capability, Cpk, control chart, average run length, selective assembly, Monte Carlo, leftover parts, machine vision, sewing machine manufacturing]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十四讲，机针与旋梭的制造。
+    - 机针每秒刺布八十多次，旋梭的配合只有几十微米。今天看这两件最小的零件怎样造出来、怎样检测，以及“旋梭响”这个老问题怎样又便宜又稳地解决。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 24, making needles and rotary hooks.
+    - A needle pierces the fabric more than eighty times a second, and the hook's fits are only tens of microns. Today we see how these two tiny parts are made and inspected, and how to fix the old problem of noisy hooks, cheaply and reliably.
+
+after:
+  - id: lab241
+    kind: lab
+    lab: hookfit
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checksA,#checksB,#tasks,#simtxt,#simtxtB,#groups text{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.getElementById('resetA').click(); })()"
+        dur: 4
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; let v = 5; const t = setInterval(function(){ v = Math.round((v - 0.2) * 10) / 10; f('sD', v); f('sd', v); if (v <= 4) clearInterval(t); }, 500); })()"
+        dur: 6
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('sD', 5); f('sd', 5); setTimeout(function(){ f('k', 2); }, 1200); })()"
+        dur: 6
+      - press: "#shift"
+        dur: 6
+      - js: "(() => { document.getElementById('tabB').click(); document.getElementById('resetB').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; setTimeout(function(){ f('n', 3); }, 1000); setTimeout(function(){ f('drift', 1); }, 2500); })()"
+        dur: 7
+    say:
+      zh:
+        - ">下面是虚拟实验 24-1，旋梭选配与工序能力，在问渠平台上可以亲手做。结果和任务先遮住。第一页左边是间隙分布和各组件数，右边调分组数、零件精度和测量误差。"
+        - ">任务一：不分组，只把两种零件的标准差往下调，看分布怎样收窄，亲手验证课上算出的精度，并看每套成本怎样涨上去。"
+        - ">任务二：精度恢复到 5 微米，先分 2 组，再把 3、4、5 组逐一试过，记录合格率、剩余件和成本，说明为什么选这个组数。"
+        - ">再按“注入：梭道磨削均值加 4 微米”，看各组件数图里蓝、橙两柱怎样错开。补救办法留给你：调哪一边、调多少。"
+        - ">任务三在第二页的针孔宽度控制图：每组抽 3 支、注入 1 个标准差的漂移，看第几组报警；再选每组抽几支，让平均报警组数不超过 5。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 24-1, hook matching and process capability, which you can do yourself on WenQuest. Results and tasks are blurred. On page one, the left shows the clearance distribution and the group counts; on the right you set the number of groups, the part accuracy and the gauge error."
+        - ">Task one: no groups. Turn down both parts' sigma, watch the distribution narrow, check for yourself the accuracy we worked out, and watch the cost per set climb."
+        - ">Task two: put the accuracy back at 5 microns. Try two groups first, then three, four and five in turn, record yield, leftovers and cost, and explain why you choose your number of groups."
+        - ">Then press Inject: race grinding mean plus 4 microns, and watch the blue and orange bars in the group chart move apart. The remedy, which side to move and by how much, is up to you."
+        - ">Task three is on page two, the eye-width control chart. With three needles per subgroup and a one-sigma drift injected, see which subgroup alarms; then choose the subgroup size so the average run length is no more than 5. The guide and report template are on the platform."
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    steps:
+      - js: "document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); document.getElementById('checksA').style.filter = 'blur(7px) grayscale(1)'"
+        press: "#play"
+      - press: "#tabB"
+        js: "setTimeout(() => { document.querySelectorAll('svg text').forEach(t => { if (!/已装整机|Built #|仓库剩余|Left in stores|已发货|Shipped/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }); document.querySelectorAll('svg text').forEach(t => { if (/装用起点|first used at/.test(t.textContent)) t.style.filter = 'blur(6px)'; }); ['cv3', 'checksL', 'late', 'latev', 'affIn'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; }); const s = document.createElement('style'); s.textContent = '#arch tr:nth-child(4) td.m, #arch tr:nth-child(11) td.m { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); }, 800)"
+      - sweep: {sn: [60, 100]}
+        dur: 8
+    say:
+      zh:
+        - ">旋梭厂的一次砂轮修整，会一路影响到整机厂。这是问渠数字工厂：总装线逐台测量梭尖间隙，读数经过总线进入控制图，有一批旋梭装上以后数据开始漂移，系统报警。"
+        - ">切到追溯页，顺着链往回找：报警的整机，装的是哪一批旋梭，这批旋梭在哪台梭道磨床上磨的，原因线索是砂轮修整间隔从 50 件放宽到了 150 件。这正是今天讲的均值漂移。"
+        - ">拖动序列号，一台一台地看整机档案。测量数据带着批号和设备号进历史库，出了问题才能从整机一直追到磨床。第二十七讲会完整地走一遍数字工厂。"
+      en:
+        - ">One wheel dressing at the hook maker can reach all the way to the machine assembly plant. This is the WenQuest digital factory. The assembly line measures the hook gap on every machine, the readings go over the bus into a control chart, and after one batch of hooks goes in the data starts to drift and the system raises an alarm."
+        - ">Switch to the trace page and follow the chain backwards: the alarmed machine, the hook batch it carries, the race grinder that batch was ground on, and the clue: the wheel-dressing interval was stretched from 50 parts to 150. That's exactly the mean drift we talked about today."
+        - ">Drag the serial number and look at the machine records one by one. Because measurements reach the history database with lot and machine numbers, a problem can be traced from the finished machine all the way back to the grinder. We'll walk through the whole digital factory in Lecture 27."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 24：机针工序能力与旋梭选配方案", "Assignment 24: needle capability and a hook-matching plan"]
+      points:
+        - ["针号刚度、直度单侧 Cpk · 控制图选抽样数", "Size stiffness, one-sided Cpk · subgroup size for a chart"]
+        - ["实验 24-1：选组数，再处理梭道均值 +4 μm", "Lab 24-1: choose groups, then handle a +4 μm race shift"]
+        - ["写一条检验项目和测量消息 · 加一台磨床后的产能", "An inspection item and message · capacity with one more grinder"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，Nm 120 和 Nm 65 的针身刚度各是 Nm 90 的几倍，再求直度的单侧 Cpk，冲头磨损以后再算一次。"
+        - ">第二题，要让 0.8 个标准差的漂移平均 6 组以内报警，每组至少抽几支？在实验第二页核对一次。"
+        - ">第三题用实验 24-1 给出旋梭选配方案，再处理梭道均值偏 4 微米；第四题写一条检验项目和测量消息，并算梭道磨床加一台以后的产能和下一个瓶颈。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: compare the blade stiffness of Nm 120 and Nm 65 with Nm 90, then find the one-sided Cpk for straightness, before and after punch wear."
+        - ">Two: for a 0.8-sigma drift to alarm within 6 subgroups on average, what is the smallest subgroup size? Check one case on page two of the lab."
+        - ">Three: use Lab 24-1 to propose a hook-matching plan, then handle a 4 micron race shift. Four: write an inspection item and a measurement message, and work out the capacity with one more race grinder, and the next bottleneck."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["均值 0.358、σ 0.005，规格 0.360±0.020：Cpk？", "Spec 0.360 ± 0.020, mean 0.358, σ 0.005: what is Cpk?"]
+        - ["判断：点在控制限以内，就说明针孔宽度合格？", "True or false: inside the control limits means in spec?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：针孔宽度规格 0.360 正负 0.020 毫米，过程均值 0.358、标准差 0.005，Cpk 是多少？"
+        - ">再比如判断题：均值控制图的控制限是由规格限算出来的，点落在控制限以内，就说明针孔宽度合格。对不对？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example, the eye-width spec is 0.360 plus or minus 0.020 millimetre, with a process mean of 0.358 and a sigma of 0.005. What is Cpk?"
+        - ">Or true or false: the control limits of an X-bar chart are worked out from the specification limits, so a point inside them means the eye width is in spec."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - See you next time.

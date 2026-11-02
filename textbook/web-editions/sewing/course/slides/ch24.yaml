@@ -1,0 +1,430 @@
+# 第 24 讲 机针与旋梭的制造 · 课件（第 24 轮新版式）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 course/tools/build_slides.py 的 LAYOUTS。
+# {{ch24.键:格式}} 由课程包程序 course/calc/ch24.py 算出，不手写数字。
+lesson: 24
+code: [ch24]
+
+clips:
+  hero:          # 封面：三维平缝机透视，主轴一直转（看得见旋梭和机针），画面右移让开标题
+    page: model-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, js: "var b=document.getElementById('play');if(/^(播放|Play)$/.test(b.textContent.trim()))b.click();var l=document.getElementById('labels');if(l.checked)l.click();document.querySelector('[data-m=xray]').click()"}
+      - {at: 1, js: "window.__view(-0.18)"}
+  form:          # 三维样机：放大钩线区，慢放，梭尖从机针旁掠过、钩住线环（一直转）
+    page: proto-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, press: "#zoomBtn"}
+  xbar:          # 实验 24-1 ②：针孔宽度均值控制图，不漂移 ↔ 第 26 组起漂移 1σ，轮流
+    page: hookfit
+    selector: "#xbar"
+    loop: 10
+    steps:
+      - {at: 0, js: "document.getElementById('tabB').click()", set: {n: 3, drift: 0}}
+      - {at: 5, set: {drift: 1}}
+  histsig:       # 实验 24-1 ①：完全互换，两零件 σ 5 μm ↔ 2.6 μm，轮流
+    page: hookfit
+    selector: "#hist"
+    loop: 8
+    steps:
+      - {at: 0, set: {k: 1, sD: 5, sd: 5}}
+      - {at: 4, set: {sD: 2.6, sd: 2.6}}
+  histk:         # 实验 24-1 ①：两零件 σ 5 μm，分组数 k = 1 → 2 → 3，轮流
+    page: hookfit
+    selector: "#hist"
+    loop: 9
+    steps:
+      - {at: 0, set: {k: 1}}
+      - {at: 3, set: {k: 2}}
+      - {at: 6, set: {k: 3}}
+  groups:        # 实验 24-1 ①：分 3 组，各组件数；梭道均值 0 ↔ +4 μm，轮流
+    page: hookfit
+    selector: "#groups"
+    loop: 8
+    steps:
+      - {at: 0, set: {k: 3, muD: 0}}
+      - {at: 4, set: {muD: 4}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 24 讲", "Lecture 24"]
+    title: ["机针与旋梭的制造", "Needles and Hooks"]
+    sub: ["两件最小的零件，两种制造思路", "Two tiny parts, two ways of making them"]
+    notes:
+      - "同学们好。上一讲看了整台平缝机怎样从图纸走到量产，今天把镜头推近，看两件最小、也最难做的零件：机针和旋梭。它们决定线迹能不能形成，却代表两种完全不同的制造思路。"
+      - "Hello everyone. Last time we followed a whole lockstitch machine from drawing to production. Today we zoom in on the two smallest and hardest parts to make: the needle and the rotary hook. They decide whether a stitch forms, yet they stand for two quite different ways of manufacturing."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["“旋梭响”：梭道与梭床的间隙怎样做稳", "Noisy hooks: holding the race-to-basket clearance"]
+    facts:
+      - ["直径间隙要求 10–30 μm，名义 20 μm", "Diametral clearance 10–30 μm, nominal 20 μm"]
+      - ["梭道、导轨淬硬后精磨：各 ±15 μm，σ = 5 μm", "Race and rib ground after hardening: ±15 μm, σ = 5 μm each"]
+      - ["σ 减半，加工成本加倍：怎样做到 99% 合格？", "Halving σ doubles the cost: how do we reach 99%?"]
+    notes:
+      - "车间里常有“旋梭响”的修机请求：梭道和梭床导轨的间隙太大，梭床晃动，“嗒嗒”地响；太小又发热卡滞。一家旋梭厂要求直径间隙 10 到 30 微米。梭道内孔和导轨外圆淬硬后精磨，经济精度是各正负 15 微米，标准差 5 微米；标准差减半，加工成本就加倍。怎样又便宜又稳地做到 99% 合格？这节课最后回答。"
+      - "Noisy hooks are a common repair call. If the clearance between the hook race and the basket rib is too large, the basket rattles; too small, and it heats up and sticks. A hook maker requires a diametral clearance of 10 to 30 microns. The race bore and the rib are ground after hardening to an economical plus or minus 15 microns each, a sigma of 5. Halving sigma doubles the machining cost. How do we reach a 99 percent yield, cheaply and reliably? We'll answer at the end."
+
+  - layout: points
+    title: ["两件最小也最难做的零件", "The two smallest and hardest parts"]
+    points:
+      - ["机针：每秒刺布八十多次，会弯、会断、会钝", "Needle: pierces 80+ times a second; bends, breaks, blunts"]
+      - ["旋梭：梭尖离机针不到 0.1 mm，配合几十微米", "Hook: point within 0.1 mm of the needle, fits of tens of microns"]
+      - ["机针靠成形一致 + 全检；旋梭靠精磨 + 选配", "Needles: consistent forming + 100% checks; hooks: grinding + matching"]
+    foot: ["300 台的工厂一年约用 {{ch24.needles:,.0f}} 根针（示意）：机针是消耗品", "A 300-machine plant uses about {{ch24.needles:,.0f}} needles a year (illustrative)"]
+    notes:
+      - "车间里最常听到两类修机请求：一类是断针、针钝、跳针，换根针就好；另一类是旋梭响、老断线，要拆开看梭尖和梭床。机针是消耗品，300 台的工厂一年约用 {{ch24.needles:,.0f}} 根，单件便宜、每支都要合格，所以靠成形的一致性和全数自动检测。旋梭是整机最精密的零件，单件贵、配合要准，靠精磨、研磨和选配。"
+      - "Two repair calls dominate a sewing floor: broken, blunt or skipping needles, fixed by fitting a new one; and noisy hooks or frequent thread breaks, which mean taking the hook out. Needles are consumables. A 300-machine plant uses about {{ch24.needles:,.0f}} a year; each is cheap but every one must be good, so they rely on consistent forming and full automatic inspection. The hook is the most precise part of the machine, expensive and tightly fitted, so it relies on fine grinding, lapping and selective assembly."
+
+  - layout: section
+    num: "01"
+    title: ["机针：结构、刚度与工艺", "Needles: anatomy, stiffness and process"]
+
+  - layout: figure
+    title: ["机针的结构：每一段都有自己的关键尺寸", "Needle anatomy: every part has a key dimension"]
+    visual: {fig: fig_needle}
+    h: 600
+    caption: ["针系统规定针柄直径和长度；工业平缝机常用 DB×1，针柄约 1.62 mm", "The system fixes the shank; DB×1, shank about 1.62 mm"]
+    notes:
+      - "先认识机针。针柄插进针杆、被螺钉夹紧，它的直径和长度由针系统规定，同一系统的针可以互换，工业平缝机常用 DB×1，针柄约 1.62 毫米。锥部过渡到针身，针身直径就是针号，Nm 90 就是 0.90 毫米。长槽护住下行的面线；另一侧的短槽和凹口让线环鼓出来，让梭尖贴近；最后是针孔和针尖。"
+      - "First, the needle. The shank goes into the needle bar and is clamped by a screw; its diameter and length are fixed by the needle system, so needles of one system interchange. Industrial lockstitch machines commonly use DB×1, with a shank of about 1.62 millimetres. A taper leads to the blade, whose diameter is the size: Nm 90 means 0.90 millimetre. The long groove shields the descending thread; on the other side the short groove and the scarf let the loop bulge and the hook point come close. Then the eye and the point."
+
+  - layout: split
+    title: ["针号与刚度：直径的四次方", "Size and stiffness: the fourth power of diameter"]
+    points:
+      - ["抗弯刚度 EI ∝ d⁴，压弯临界力 ∝ d⁴/L²", "Bending stiffness EI ∝ d⁴; buckling load ∝ d⁴/L²"]
+      - ["同样长度：Nm 110 是 Nm 90 的 {{ch24.r110:.2f}} 倍", "Same length: Nm 110 is {{ch24.r110:.2f}} × Nm 90"]
+      - ["厚料用粗针：细针易被推偏、撞上梭尖", "Thick fabric, thick needle: thin ones deflect into the hook"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <g fill="#22324d" stroke="#4c8dff" stroke-width="5"><circle cx="150" cy="130" r="52"/><circle cx="450" cy="130" r="67"/><circle cx="750" cy="130" r="82"/></g>
+          <g font-size="30" font-weight="800" fill="#f3f6fa" text-anchor="middle"><text x="150" y="258">Nm 70</text><text x="450" y="258">Nm 90</text><text x="750" y="258">Nm 110</text></g>
+          <g font-size="24" fill="#8fa3ba" text-anchor="middle"><text x="150" y="290">0.70 mm</text><text x="450" y="290">0.90 mm</text><text x="750" y="290">1.10 mm</text></g>
+          <path d="M60 600 L840 600" stroke="#4b5f7d" stroke-width="3"/>
+          <rect x="80" y="557" width="140" height="43" rx="10" fill="#4b5f7d"/>
+          <rect x="380" y="484" width="140" height="116" rx="10" fill="#f2b705"/>
+          <rect x="680" y="340" width="140" height="260" rx="10" fill="#ff7a45"/>
+          <g font-size="32" font-weight="800" fill="#f3f6fa" text-anchor="middle"><text x="150" y="542">×{{ch24.r70:.2f}}</text><text x="450" y="470">×1.00</text><text x="750" y="326">×{{ch24.r110:.2f}}</text></g>
+          <text x="60" y="636" font-size="24" fill="#8fa3ba" class="zh">相对刚度（同样长度，按 Nm 90 = 1）</text><text x="60" y="636" font-size="24" fill="#8fa3ba" class="eo">Relative stiffness (same length, Nm 90 = 1)</text>
+        </svg>
+    notes:
+      - "针号就是针身直径，Nm 90 即 0.90 毫米。针身是一根细长杆。抗弯刚度跟截面惯性矩成正比，失稳的临界力也一样，还和长度平方成反比，而惯性矩跟直径的四次方走。所以针号对刚度影响非常大：同样长度，Nm 110 是 Nm 90 的 {{ch24.r110:.2f}} 倍，Nm 70 只有 {{ch24.r70:.2f}} 倍。缝厚料要用粗针，原因之一就在这里：细针刺厚料容易被推偏，偏了就撞上梭尖。这也说明直度为什么是关键：本来就弯的针，受力后偏得更多。"
+      - "The size is the blade diameter: Nm 90 means 0.90 millimetre. The blade is a slender rod. Bending stiffness goes with the section's second moment of area, and so does the buckling load, which also falls with length squared. The second moment goes with diameter to the fourth power, so size matters enormously. At the same length, Nm 110 is {{ch24.r110:.2f}} times as stiff as Nm 90, and Nm 70 only {{ch24.r70:.2f}} times. That's one reason thick fabric needs a thick needle: a thin one gets pushed aside and runs into the hook point. It's also why straightness is critical: a needle that starts bent deflects even more under load."
+
+  - layout: points
+    title: ["针尖与关键质量特性", "Points and key characteristics"]
+    points:
+      - ["梭织用尖头；针织用圆头推开纱线；皮革用切割尖", "Woven: sharp point; knits: ball point; leather: cutting point"]
+      - ["针孔：孔宽、对中、无毛刺，否则割线、断线", "Eye: width, centring, no burrs, or the thread is cut"]
+      - ["凹口位置是尺寸链里“换针会变”的一环", "Scarf position is the chain link that changes with each needle"]
+    foot: ["最难兼顾的是硬度与韧性：越硬越耐磨，但撞上硬物时会断而不是弯", "Hardest of all is hardness versus toughness: harder wears less but breaks instead of bending"]
+    notes:
+      - "针尖按面料选：梭织物用尖头刺穿纤维；针织物用圆头，在纱线之间推开一条路，刺断纱线的针织物会脱散出洞；皮革用带刃口的切割尖。针孔要宽度合适、居中、孔边圆滑，有毛刺就割线。凹口位置是上一讲尺寸链里换针时会变的那一环，整机厂调不了用户买的每根针，只能对机针厂提公差。还有硬度与韧性：断针的碎片可能留在衣服里，这是严重的质量和安全事故。"
+      - "The point is chosen for the fabric. Woven fabric takes a sharp point that pierces the fibres. Knits take a ball point that pushes the yarns apart, because a knit with a cut yarn runs into a hole. Leather takes a cutting point with an edge. The eye must be the right width, centred and smooth; a burr cuts the thread. The scarf position is the link in last lecture's tolerance chain that changes with every needle; the machine maker can't adjust every needle a customer buys, so it sets tolerances for the needle maker. And hardness against toughness: a broken needle can leave fragments in a garment, a serious quality and safety incident."
+
+  - layout: chain
+    title: ["机针工艺路线：从钢丝到成品", "The needle route: from wire to finished needle"]
+    steps: [["钢丝进厂", "Wire in"], ["校直切坯", "Cut blanks"], ["旋锻减径", "Swage blade"], ["冷压槽", "Press grooves"], ["冲针孔", "Punch eye"], ["淬火回火", "Heat treat"], ["逐支校直", "Straighten"], ["抛光镀层", "Polish, plate"], ["视觉全检", "Vision check"]]
+    hot: [4, 5]
+    mark: ["最关键", "most critical"]
+    foot: ["针身从 1.62 减到 0.90 mm，减面率约 {{ch24.red:.0f}}%，常分几次；减径不均，针身就弯", "The blade goes from 1.62 to 0.90 mm, about {{ch24.red:.0f}}% reduction in several passes; uneven reduction bends it"]
+    notes:
+      - "机针的制造分五段：备料、成形、热处理、表面处理、检测与包装。原料是高碳钢丝，进厂查直径、裂纹和脱碳层，校直、切成针坯。针身要从针柄直径减到针号直径，减面率约 {{ch24.red:.0f}}%，常用旋锻，一组锻模绕针坯高速旋转、径向锤击，材料纤维连续；减径不均匀，针身就会弯。然后冷压出长槽、短槽和凹口，模具按冲次管理，磨损后凹口会漂移。"
+      - "Needle making has five stages: stock, forming, heat treatment, surface treatment, and inspection and packing. The raw material is high-carbon wire, checked on arrival for diameter, cracks and decarburisation, then straightened and cut into blanks. The blade is reduced from shank diameter to needle size, about a {{ch24.red:.0f}} percent reduction in area, usually by rotary swaging: dies spin around the blank and hammer it radially, keeping the grain continuous. Uneven reduction bends the blade. Then the grooves and scarf are cold-pressed; the dies are managed by stroke count, because as they wear the scarf drifts."
+
+  - layout: split
+    title: ["冲针孔：最关键、最容易出问题", "Eye punching: the most critical operation"]
+    points:
+      - ["先压槽、局部压薄，再用比孔还细的冲头冲穿", "Press grooves, thin locally, then punch finer than the eye"]
+      - ["毛刺和锐边割线；抛光去不掉大毛刺", "Burrs and sharp edges cut thread; polishing can't fix big ones"]
+      - ["对策：在线测孔宽画控制图，冲头按冲次换", "Remedy: chart eye width in line; change punches by count"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <g fill="#2a3b57" stroke="#f3f6fa" stroke-width="4" stroke-linejoin="round">
+            <circle cx="110" cy="220" r="78"/>
+            <path transform="translate(330,220)" d="M -40 -69 A 80 80 0 0 0 -40 69 L -40 45 Q 0 30 40 45 L 40 69 A 80 80 0 0 0 40 -69 L 40 -45 Q 0 -30 -40 -45 Z"/>
+            <path transform="translate(550,220)" d="M -40 -69 A 80 80 0 0 0 -40 69 L -14 52 L -14 -52 Z M 40 -69 A 80 80 0 0 1 40 69 L 14 52 L 14 -52 Z"/>
+            <path transform="translate(770,220)" d="M -40 -69 A 80 80 0 0 0 -40 69 Q -20 50 -18 30 L -18 -30 Q -20 -50 -40 -69 Z M 40 -69 A 80 80 0 0 1 40 69 Q 20 50 18 30 L 18 -30 Q 20 -50 40 -69 Z"/></g>
+          <g fill="#ff7a45"><path d="M 536 268 L 520 296 L 536 286 Z"/><path d="M 564 268 L 580 296 L 564 286 Z"/></g>
+          <circle cx="770" cy="220" r="13" fill="#4c8dff"/>
+          <g font-size="40" fill="#8fa3ba" text-anchor="middle"><text x="220" y="234">›</text><text x="440" y="234">›</text><text x="660" y="234">›</text></g>
+          <g font-size="26" font-weight="700" fill="#f3f6fa" text-anchor="middle">
+            <text x="110" y="350" class="zh">① 减径</text><text x="110" y="350" class="eo">1 Reduce</text>
+            <text x="330" y="350" class="zh">② 压槽</text><text x="330" y="350" class="eo">2 Groove</text>
+            <text x="550" y="350" class="zh">③ 冲孔</text><text x="550" y="350" class="eo">3 Punch</text>
+            <text x="770" y="350" class="zh">④ 抛光</text><text x="770" y="350" class="eo">4 Polish</text></g>
+          <text x="550" y="318" font-size="22" fill="#ff9c75" text-anchor="middle" class="zh">毛刺</text><text x="550" y="318" font-size="22" fill="#ff9c75" text-anchor="middle" class="eo">burrs</text>
+          <rect x="30" y="420" width="840" height="190" rx="18" fill="rgba(255,122,69,.12)" stroke="#ff7a45" stroke-width="3"/>
+          <g font-size="26" fill="#f3f6fa">
+            <text x="60" y="478" class="zh">冲头磨损 → 毛刺变大、孔宽漂移</text><text x="60" y="478" class="eo">Punch wear → bigger burrs, eye width drifts</text>
+            <text x="60" y="530" class="zh">冲头偏心 → 孔不居中、一侧壁薄易断</text><text x="60" y="530" class="eo">Off-centre punch → thin wall, breaks at the eye</text>
+            <text x="60" y="582" class="zh">孔壁粗糙 → 线发热、线迹不匀</text><text x="60" y="582" class="eo">Rough eye wall → hot thread, uneven stitches</text></g>
+          <text x="30" y="60" font-size="24" fill="#8fa3ba" class="zh">沿针孔中心的横截面（示意，放大）</text><text x="30" y="60" font-size="24" fill="#8fa3ba" class="eo">Section through the eye (schematic, enlarged)</text>
+        </svg>
+    notes:
+      - "压扁与冲针孔是机针制造里最关键、也最容易出问题的一道工序。针孔区先从两侧压出槽、局部压薄，再用很细的冲头冲穿。冲头比针孔还细，磨损和折断都很快：一磨损，孔边毛刺变大、孔宽漂移；稍有偏心，针孔不在正中，一侧壁太薄，用的时候就从针孔处断。毛刺是割线、断线的主要原因，抛光去不掉大的，所以这道工序既要在线测孔宽画控制图，又要按冲次换冲头。"
+      - "Flattening and punching the eye is the most critical operation in needle making, and the one most likely to go wrong. Grooves are pressed in from both sides to thin the eye region, then a very fine punch goes through. The punch is finer than the eye, so it wears and breaks quickly. As it wears, the burrs grow and the eye width drifts; if it is slightly off centre, one wall is too thin and the needle breaks at the eye in use. Burrs are the main cause of cut and broken thread, and polishing can't remove big ones. So this operation needs an in-line control chart of eye width, and punches changed by stroke count."
+
+  - layout: split
+    title: ["热处理：在硬度与韧性之间找平衡", "Heat treatment: balancing hardness and toughness"]
+    points:
+      - ["保护气氛连续加热后油淬，防氧化脱碳", "Heated in protective gas, oil-quenched: no decarburising"]
+      - ["回火温度低：硬、耐磨，但脆，撞硬物会断", "Low temper: hard and wear-resistant, but brittle"]
+      - ["回火温度高：韧、宁弯不断，但磨得快", "High temper: tough, bends not breaks, but wears faster"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M90 540 L860 540 M90 540 L90 80" stroke="#4b5f7d" stroke-width="3"/>
+          <rect x="400" y="90" width="170" height="450" fill="rgba(242,183,5,.13)"/>
+          <path d="M100 130 C 300 150, 600 330, 850 470" stroke="#f2b705" stroke-width="7" fill="none"/>
+          <path d="M100 480 C 300 460, 600 260, 850 140" stroke="#2ec4b6" stroke-width="7" fill="none"/>
+          <text x="120" y="115" font-size="28" font-weight="800" fill="#f2b705" class="zh">硬度、耐磨</text><text x="120" y="115" font-size="28" font-weight="800" fill="#f2b705" class="eo">Hardness, wear</text>
+          <text x="850" y="120" font-size="28" font-weight="800" fill="#5ee0d2" text-anchor="end" class="zh">韧性</text><text x="850" y="120" font-size="28" font-weight="800" fill="#5ee0d2" text-anchor="end" class="eo">Toughness</text>
+          <text x="485" y="80" font-size="26" fill="#f3f6fa" text-anchor="middle" class="zh">机针取平衡点</text><text x="485" y="80" font-size="26" fill="#f3f6fa" text-anchor="middle" class="eo">Needles sit here</text>
+          <text x="100" y="590" font-size="26" fill="#ff9c75" class="zh">易断</text><text x="100" y="590" font-size="26" fill="#ff9c75" class="eo">Breaks</text>
+          <text x="860" y="590" font-size="26" fill="#8fbaff" text-anchor="end" class="zh">易磨</text><text x="860" y="590" font-size="26" fill="#8fbaff" text-anchor="end" class="eo">Wears</text>
+          <text x="475" y="630" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">回火温度 →（示意）</text><text x="475" y="630" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">Tempering temperature → (schematic)</text>
+        </svg>
+    notes:
+      - "成形后的针还是软的，要淬火。针很细，常在保护气氛里连续加热，防止氧化脱碳，再油淬。淬火后又硬又脆，必须回火：温度低一些，硬度高、耐磨，但更脆；高一些，韧性好、宁弯不断，但针尖和针孔磨得快，具体取多少是机针厂的核心工艺数据。细长的针淬火必然变形，要逐支校直；再抛光去毛刺、镀镍或镀铬。最后用机器视觉全数检查外形，硬度、镀层只能按批抽检。"
+      - "After forming, the needle is still soft and must be hardened. Being thin, needles are usually heated continuously in a protective atmosphere to prevent oxidation and decarburising, then oil-quenched. Quenched, they are hard and brittle, so they must be tempered. Lower temperature: harder and more wear-resistant, but more brittle. Higher: tougher, bending rather than breaking, but the point and eye wear faster. The exact value is a needle maker's core process data. Slender needles always distort when hardened, so each one is straightened, then polished to remove burrs and nickel- or chrome-plated. Finally machine vision checks the shape of every needle; hardness and plating can only be sampled by batch."
+
+  - layout: section
+    num: "02"
+    title: ["检测与统计过程控制", "Inspection and statistical process control"]
+
+  - layout: split
+    title: ["工序能力：Cp 与 Cpk", "Process capability: Cp and Cpk"]
+    points:
+      - ["Cp 只比宽度；Cpk 还看偏移，常用要求 ≥ 1.33", "Cp compares widths; Cpk adds offset; target ≥ 1.33"]
+      - ["针孔宽度：Cp ≈ {{ch24.cp:.2f}}，Cpk ≈ {{ch24.cpk:.2f}}，超差约 {{ch24.ppm0:.1f}} ppm", "Eye width: Cp ≈ {{ch24.cp:.2f}}, Cpk ≈ {{ch24.cpk:.2f}}, true rejects about {{ch24.ppm0:.1f}} ppm"]
+      - ["冲头磨损、均值上移 1σ：Cpk ≈ {{ch24.cpk1:.2f}}，超差 ×{{ch24.ppmx:.0f}}", "Punch wear, mean +1σ: Cpk ≈ {{ch24.cpk1:.2f}}, rejects ×{{ch24.ppmx:.0f}}"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M60 470 L860 470" stroke="#4b5f7d" stroke-width="3"/>
+          <path d="M150 120 L150 470 M750 120 L750 470" stroke="#ff7a45" stroke-width="4" stroke-dasharray="12 8"/>
+          <polyline fill="rgba(76,141,255,.22)" stroke="#4c8dff" stroke-width="5" points="280,469 290,469 300,468 310,466 320,464 330,460 340,455 350,447 360,437 370,424 380,406 390,385 400,360 410,332 420,302 430,271 440,241 450,214 460,192 470,177 480,170 490,172 500,182 510,200 520,224 530,253 540,283 550,314 560,344 570,371 580,394 590,414 600,429 610,442 620,451 630,457 640,462 650,465 660,467 670,468 680,469 690,469 700,470"/>
+          <polyline fill="none" stroke="#f2b705" stroke-width="5" stroke-dasharray="14 8" points="330,469 340,469 350,468 360,467 370,465 380,462 390,457 400,451 410,442 420,430 430,416 440,397 450,375 460,350 470,322 480,293 490,264 500,236 510,212 520,194 530,182 540,178 550,182 560,194 570,212 580,236 590,264 600,293 610,322 620,350 630,375 640,397 650,416 660,430 670,442 680,451 690,457 700,462 710,465 720,467 730,468 740,469 750,469 760,470"/>
+          <g font-size="28" font-weight="800" fill="#ff9c75" text-anchor="middle"><text x="150" y="105">LSL</text><text x="750" y="105">USL</text></g>
+          <g font-size="24" fill="#8fa3ba" text-anchor="middle"><text x="150" y="510">0.340</text><text x="450" y="510">0.360</text><text x="750" y="510">0.380 mm</text></g>
+          <path d="M483 140 L750 140" stroke="#f3f6fa" stroke-width="3"/><path d="M483 128 L483 152 M750 128 L750 152" stroke="#f3f6fa" stroke-width="3"/>
+          <text x="616" y="125" font-size="24" fill="#f3f6fa" text-anchor="middle" class="zh">离最近的规格限</text><text x="616" y="125" font-size="24" fill="#f3f6fa" text-anchor="middle" class="eo">to the nearer limit</text>
+          <text x="60" y="580" font-size="26" fill="#8fbaff" class="zh">蓝：现在（均值 0.3622）</text><text x="60" y="580" font-size="26" fill="#8fbaff" class="eo">Blue: now (mean 0.3622)</text>
+          <text x="60" y="620" font-size="26" fill="#f2b705" class="zh">黄：冲头磨损、均值上移 1σ</text><text x="60" y="620" font-size="26" fill="#f2b705" class="eo">Yellow: punch wear, mean up 1σ</text>
+        </svg>
+    notes:
+      - "工厂更想知道：这道工序有没有能力稳定地做出合格品？Cp 只比较公差带和工序波动谁宽，Cpk 还看均值偏离中心多少，常用要求 1.33，也就是最近的规格限离均值 4 个标准差。算例：针孔宽度规格 0.360 正负 0.020，在线视觉每组抽 5 支、收 25 组，用平均极差估标准差，算得 Cp 约 {{ch24.cp:.2f}}、Cpk 约 {{ch24.cpk:.2f}}，能力够。可冲头一磨损，均值上移 1 个标准差，Cpk 降到 {{ch24.cpk1:.2f}}，超差率涨了约 {{ch24.ppmx:.0f}} 倍。"
+      - "What the factory really wants to know is whether this operation can reliably make good parts. Cp only compares the tolerance band with the process spread; Cpk also asks how far the mean is off centre. A common target is 1.33, the nearer limit four sigma from the mean. The example: eye width 0.360 plus or minus 0.020, five needles per subgroup from in-line vision, 25 subgroups, sigma estimated from the average range. Cp comes out about {{ch24.cp:.2f}} and Cpk about {{ch24.cpk:.2f}}: capable. But once the punch wears and the mean moves up one sigma, Cpk falls to {{ch24.cpk1:.2f}} and the reject rate rises about {{ch24.ppmx:.0f}} times."
+
+  - layout: figure
+    title: ["控制图：点出界，就停下来查原因", "Control chart: a point outside means stop and look"]
+    visual: {video: xbar}
+    h: 560
+    caption: ["前 25 组定控制限；每组 3 支；第 26 组起注入 1σ 漂移（橙色区），与不漂移轮流", "Limits from the first 25 groups; 3 per subgroup; a 1σ drift from group 26 (orange), alternating with none"]
+    notes:
+      - "怎样尽早发现漂移？靠控制图。把每组均值按时间画出来，中心线是总均值，控制限是总均值加减 A₂ 乘平均极差。注意控制限是从工序自己的波动算出来的，和规格限无关：点出界说明工序变了，即使这支针还在规格内，也该停下来查原因。画面里第 26 组起注入 1 个标准差的漂移，每组抽 3 支时，要十来组才有点跑出上控制限。"
+      - "How do we catch a drift early? With a control chart. Plot each subgroup's mean in time order; the centre line is the grand mean, and the limits are the grand mean plus or minus A-two times the average range. Note that the limits come from the process's own spread and have nothing to do with the specification. A point outside means the process has changed, so stop and look for the cause, even if the needle is still in spec. Here a one-sigma drift starts at subgroup 26, and with three per subgroup it takes around ten subgroups before a point breaks the upper limit."
+
+  - layout: bignum
+    title: ["平均几组才报警：平均运行长度 ARL", "How soon it alarms: average run length"]
+    nums:
+      - {n: "{{ch24.arl0:.0f}}", n_en: "subgroups", label: ["不漂移：平均这么多组误报一次", "No drift: one false alarm every this many subgroups"]}
+      - {n: "{{ch24.arl13:.1f}}", n_en: "subgroups", label: ["1σ 漂移，每组 3 支", "1σ drift, 3 per subgroup"]}
+      - {n: "{{ch24.arl055:.0f}}", n_en: "subgroups", label: ["0.5σ 小漂移，每组 5 支", "0.5σ drift, 5 per subgroup"]}
+    foot: ["每组抽得越多，发现越快；硬度这类破坏性项目抽不多，要靠工艺预防", "Bigger subgroups catch drifts sooner; destructive checks like hardness rely on prevention"]
+    notes:
+      - "多快报警可以事先算：漂移以后每组出界的概率，倒数就是平均运行长度 ARL。没漂移时平均 {{ch24.arl0:.0f}} 组误报一次。漂移 1 个标准差，每组 3 支平均要近 10 组才发现；0.5 个标准差的小漂移，每组 5 支也要约 {{ch24.arl055:.0f}} 组。每组抽得越多，均值的波动越小、发现越快，代价是多测几支。全检的工序可以把每组取大；硬度这类要破坏零件的项目，只能靠工艺预防。"
+      - "How fast it alarms can be worked out in advance: the probability that a subgroup falls outside after a drift, and its reciprocal is the average run length, ARL. With no drift there's one false alarm every {{ch24.arl0:.0f}} subgroups on average. After a one-sigma drift, subgroups of three take nearly ten subgroups to catch it; a half-sigma drift takes about {{ch24.arl055:.0f}} even with five per subgroup. The bigger the subgroup, the less the mean scatters and the sooner the alarm, at the price of measuring more. With full inspection you can take big subgroups; destructive checks like hardness must rely on prevention."
+
+  - layout: section
+    num: "03"
+    title: ["旋梭：精磨与选配", "Hooks: grinding and selective assembly"]
+
+  - layout: split
+    title: ["旋梭的工作条件", "What the hook has to survive"]
+    points:
+      - ["转速是主轴两倍：5000 r/min 时梭尖 {{ch24.vh:.1f}} m/s", "Twice shaft speed: at 5000 r/min the point runs {{ch24.vh:.1f}} m/s"]
+      - ["梭道滑动 {{ch24.vr:.1f}} m/s，每班滑过约 {{ch24.km:.0f}} km", "Race sliding {{ch24.vr:.1f}} m/s, about {{ch24.km:.0f}} km a shift"]
+      - ["梭尖掠过 Nm 90 机针只用约 {{ch24.us:.0f}} μs", "The point passes an Nm 90 needle in about {{ch24.us:.0f}} μs"]
+    visual: {video: form}
+    notes:
+      - "旋梭由旋梭体、梭床、梭壳梭芯和压圈组成，旋梭体和梭床是两个主要的精密零件，梭床外缘的导轨在旋梭体内侧的梭道里滑动。全回转旋梭的转速是主轴的两倍，主轴 5000 转时梭尖线速度约 {{ch24.vh:.1f}} 米每秒，梭道滑动约 {{ch24.vr:.1f}} 米每秒，一个班滑过约 {{ch24.km:.0f}} 公里；梭尖掠过一根 0.9 毫米的机针只用约 {{ch24.us:.0f}} 微秒。所以梭尖要形状准、刃口圆滑，梭道要硬而光，间隙不大不小。"
+      - "The hook consists of the hook body, the basket, the bobbin case and bobbin, and a retainer. The body and the basket are the two main precision parts: a rib on the basket's rim slides in the race inside the body. A full rotary hook turns at twice shaft speed, so at 5000 r/min the point moves at about {{ch24.vh:.1f}} metres a second and the race slides at about {{ch24.vr:.1f}}, some {{ch24.km:.0f}} kilometres in one shift. The point passes a 0.9 millimetre needle in about {{ch24.us:.0f}} microseconds. So the point must be accurately shaped with a smooth edge, the race hard and smooth, and the clearance neither too big nor too small."
+
+  - layout: chain
+    title: ["旋梭体工艺路线", "The hook-body route"]
+    steps: [["锻坯", "Forging"], ["数控车", "CNC turning"], ["五轴铣", "5-axis milling"], ["渗碳淬火", "Carburise"], ["精磨梭道", "Grind race"], ["测量分组", "Measure, grade"], ["研磨梭尖", "Lap point"], ["涂层", "Coating"], ["选配跑合", "Match, run in"]]
+    hot: [4, 5]
+    mark: ["精度最高", "most precise"]
+    foot: ["安装孔与梭道一次装夹：梭尖位置由机床保证，不靠几次装夹叠加", "Mounting bore and race in one set-up: the machine, not stacked set-ups, fixes the point"]
+    notes:
+      - "旋梭体和梭床分两条线加工，在选配站汇合。旋梭体常用锻造毛坯，让金属流线沿梭尖分布。数控车出内外圆和安装孔，安装孔是后面所有工序的基准；梭尖和梭道在五轴加工中心上一次装夹铣出，位置由机床保证，而不是几次装夹的误差叠加。然后渗碳淬火，表层硬、心部韧；热处理后精磨梭道和导轨，这是精度最高的工序，磨完逐件测量分组。梭尖要尖而不利，研磨最依赖手艺。最后涂层、选配、跑合测噪声。"
+      - "The hook body and the basket go down two lines that meet at the matching station. The body usually starts as a forging, so the grain follows the point. CNC turning makes the bores and the mounting hole, the datum for everything after. The point and the race are milled in one set-up on a five-axis machine, so their position comes from the machine, not from stacked set-up errors. Then carburising and hardening, hard outside and tough inside. After heat treatment the race and the rib are ground, the most accurate operation, and every part is measured and graded. The point must be sharp but not cutting, and lapping it relies most on skill. Finally coating, matching, and a run-in with a noise test."
+
+  - layout: split
+    title: ["完全互换：要多高的精度", "Full interchangeability: how accurate?"]
+    points:
+      - ["间隙只由两个直径决定：c = 20 + x − y（μm）", "Only two diameters set it: c = 20 + x − y (μm)"]
+      - ["两件各 σ 5 μm：σc = {{ch24.sc:.2f}} μm，合格约 {{ch24.y_int:.1f}}%", "Both σ 5 μm: σc = {{ch24.sc:.2f}} μm, about {{ch24.y_int:.1f}}% good"]
+      - ["要 99%：每件 σ ≤ {{ch24.s99:.1f}} μm，几乎减半", "For 99%: each σ ≤ {{ch24.s99:.1f}} μm, nearly halved"]
+    visual: {video: histsig}
+    notes:
+      - "梭床外缘的导轨在旋梭体内的梭道里滑动。上一讲的梭尖间隙有可调的环；梭道和梭床的间隙没有，它只由两个直径决定：名义间隙加上两个零件偏差之差，只能变化正负 10 微米。如果任取一个旋梭体和一个梭床都能装，间隙的标准差是两者的平方和开方。两件都按 5 微米加工，这已是不错的经济精度，可间隙标准差有 {{ch24.sc:.2f}} 微米，合格率只有约 {{ch24.y_int:.1f}}%。要 99%，每件要压到 {{ch24.s99:.1f}} 微米以下，几乎减半，成本约加倍。画面里两种精度轮流。"
+      - "The basket's rib slides in the race inside the hook body. Last lecture's hook gap had an adjustable link; the race-to-basket clearance has none. It depends only on two diameters: the nominal clearance plus the difference of the two deviations, with only plus or minus 10 microns to spare. If any body fits any basket, the clearance's sigma is the root sum of squares. Both parts at a sigma of 5, already decent economical accuracy, give a clearance sigma of {{ch24.sc:.2f}} microns and only about {{ch24.y_int:.1f}} percent good. For 99 percent each part must be under {{ch24.s99:.1f}} microns, nearly half, at about double the cost. The chart alternates between the two accuracies."
+
+  - layout: split
+    title: ["分组选配：用测量代替精度", "Grouped matching: measurement instead of accuracy"]
+    points:
+      - ["全部测量，±15 μm 等分 k 组，只在同组配对", "Measure all, split ±15 μm into k groups, pair within"]
+      - ["分 3 组：组宽 10 μm，间隙必在 10–30 μm", "Three groups: 10 μm wide, clearance always 10–30 μm"]
+      - ["代价：全测、测量误差、两件各组件数要相等", "Costs: measure all, gauge error, equal counts per group"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <polygon fill="#4c8dff" points="150,250 150,248 172,247 194,245 216,242 238,237 260,230 282,220 304,208 326,194 348,177 370,159 370,250"/>
+          <polygon fill="#f2b705" points="370,250 370,159 392,141 414,125 436,112 458,103 480,100 502,103 524,112 546,125 568,141 590,159 590,250"/>
+          <polygon fill="#2ec4b6" points="590,250 590,159 612,177 634,194 656,208 678,220 700,230 722,237 744,242 766,245 788,247 810,248 810,250"/>
+          <polygon fill="#4c8dff" points="150,470 150,468 172,467 194,465 216,462 238,457 260,450 282,440 304,428 326,414 348,397 370,379 370,470"/>
+          <polygon fill="#f2b705" points="370,470 370,379 392,361 414,345 436,332 458,323 480,320 502,323 524,332 546,345 568,361 590,379 590,470"/>
+          <polygon fill="#2ec4b6" points="590,470 590,379 612,397 634,414 656,428 678,440 700,450 722,457 744,462 766,465 788,467 810,468 810,470"/>
+          <g stroke="#08101d" stroke-width="4"><path d="M370 90 L370 252 M590 90 L590 252 M370 310 L370 472 M590 310 L590 472"/></g>
+          <g stroke="#f3f6fa" stroke-width="4" stroke-dasharray="8 7"><path d="M260 262 L260 400 M480 262 L480 312 M700 262 L700 420"/></g>
+          <g font-size="26" font-weight="800" fill="#f3f6fa" text-anchor="middle"><text x="260" y="290" class="zh">组 1</text><text x="260" y="290" class="eo">G1</text><text x="480" y="300" class="zh">组 2</text><text x="480" y="300" class="eo">G2</text><text x="700" y="290" class="zh">组 3</text><text x="700" y="290" class="eo">G3</text></g>
+          <text x="20" y="90" font-size="26" fill="#8fbaff" class="zh">梭道直径偏差 x</text><text x="20" y="90" font-size="26" fill="#8fbaff" class="eo">Race deviation x</text>
+          <text x="20" y="330" font-size="26" fill="#8fbaff" class="zh">导轨外径偏差 y</text><text x="20" y="330" font-size="26" fill="#8fbaff" class="eo">Rib deviation y</text>
+          <g font-size="24" fill="#8fa3ba" text-anchor="middle"><text x="150" y="505">−15</text><text x="370" y="505">−5</text><text x="590" y="505">+5</text><text x="810" y="505">+15 μm</text></g>
+          <text x="450" y="580" font-size="28" font-weight="800" fill="#f2b705" text-anchor="middle" class="zh">同组：|x − y| &lt; 10 μm → 间隙 10–30 μm</text><text x="450" y="580" font-size="26" font-weight="800" fill="#f2b705" text-anchor="middle" class="eo">Same group: |x − y| &lt; 10 μm → clearance 10–30 μm</text>
+        </svg>
+    notes:
+      - "分组选配换一个思路：零件仍按经济精度加工，但全部测量，把正负 15 微米等分成 k 组，只在同组之间配对。同组两个偏差落在同一个宽 w 的区间里，差一定小于 w。分 3 组时 w 是 10 微米，间隙一定在 10 到 30 之内，和零件本身的精度无关。这就是用测量代替提高精度。代价有三个：全部测量、按组存放管理；测量误差会把组界附近的零件分错；最重要的，两种零件在各组的件数必须相等。"
+      - "Grouped matching takes another approach. The parts are still made to economical accuracy, but every one is measured; the range of plus or minus 15 microns is split into k equal groups, and parts are paired only within a group. Two deviations in the same group of width w differ by less than w. With three groups w is 10 microns, so the clearance is always within 10 to 30, whatever the parts' own accuracy. That's measurement instead of accuracy. It has three costs: measuring everything and storing by group; gauge error misgrading parts near the boundaries; and, most important, both parts must have equal counts in every group."
+
+  - layout: figure
+    title: ["分组越多，间隙越集中", "More groups, tighter clearance"]
+    visual: {video: histk}
+    h: 560
+    caption: ["两件 σ 5 μm 不变，k = 1 → 2 → 3 轮流：绿色区为允许的 10–30 μm", "Both σ 5 μm; k = 1 → 2 → 3 in turn; green is the allowed 10–30 μm"]
+    notes:
+      - "看实验 24-1 的模拟：一批 2000 套，两种零件精度都不变，只改分组数。完全互换时两边都有红色的不合格；分 2 组，红色少了很多，但还有，合格率约 {{ch24.y_g2:.1f}}%；分 3 组，几乎全部落进绿色区。组宽不大于允许的变化量，再留一点给测量误差，组数就够了；再多分，剩余件和管理费反而增加。"
+      - "Here's Virtual lab 24-1's simulation: a batch of 2000 sets, the same part accuracy throughout, only the number of groups changing. Fully interchangeable, there's red, rejected clearance on both sides. Two groups cut the red a lot but not all of it, about {{ch24.y_g2:.1f}} percent good. Three groups put almost everything in the green. Once the group width is no larger than the allowed variation, with a little left for gauge error, you have enough groups; more only adds leftovers and overhead."
+
+  - layout: figure
+    title: ["两件分布不一致：合格率不变，剩余件大增", "Mismatched distributions: same yield, far more leftovers"]
+    visual: {video: groups}
+    h: 560
+    caption: ["分 3 组；梭道磨削均值 0 ↔ +4 μm 轮流：蓝、橙两柱之差就是剩余不配套件", "Three groups; race mean 0 ↔ +4 μm; the gap between blue and orange is leftovers"]
+    notes:
+      - "现场最容易忽视的是两种零件的分布必须一致。画面是分 3 组时各组的件数，蓝色是旋梭体，橙色是梭床。梭道磨床修整砂轮以后，均值偏了 4 微米：同组配上的间隙照样合格，合格率几乎不变，可蓝、橙两柱高低错开了，剩余不配套件从 {{ch24.l_g3:.1f}}% 升到约 {{ch24.l_sh:.0f}}%，每套成本也涨上去。所以选配站要盯的不只是合格率，还有各组件数。"
+      - "What the shop floor most often overlooks is that the two parts' distributions must match. This shows the count in each of the three groups, blue for hook bodies and orange for baskets. After the race grinder's wheel is dressed, its mean shifts by 4 microns. Pairs within a group still have good clearance, so the yield barely moves, but the blue and orange bars no longer line up, and leftovers rise from {{ch24.l_g3:.1f}} percent to about {{ch24.l_sh:.0f}}, pushing up the cost per set. So the matching station must watch not just the yield but the count in each group."
+
+  - layout: points
+    title: ["组数、测量误差与补救", "Groups, gauge error and remedies"]
+    points:
+      - ["分 2 组只有 {{ch24.y_g2:.1f}}%；分 4 组剩余件与管理费增加", "Two groups give {{ch24.y_g2:.1f}}%; four add leftovers and overhead"]
+      - ["测量误差 1 → 2 μm：分 3 组合格率降到 {{ch24.y_sm2:.1f}}%", "Gauge error 1 → 2 μm: three groups fall to {{ch24.y_sm2:.1f}}%"]
+      - ["分布偏了：让梭床跟上，或把梭道拉回中心", "Distributions apart: move the basket too, or re-centre the race"]
+    foot: ["量仪误差约不超过公差的十分之一（示意）；剩余件可留到下一批再配", "Gauge error about a tenth of the tolerance (illustrative); leftovers can wait for the next batch"]
+    notes:
+      - "把模拟结果归纳一下。组不是越多越好：分 2 组只有 {{ch24.y_g2:.1f}}%，分 4 组合格率到顶，但剩余件和管理费增加。测量误差吃掉余量：从 1 微米增到 2 微米，分 3 组的合格率降到 {{ch24.y_sm2:.1f}}%，所以量仪要比零件公差准得多。分布偏了，补救是让梭床的目标跟上，或者把梭道拉回中心；剩余件也可以留到下一批再配。"
+      - "To sum up the simulation: more groups are not always better. Two groups give only {{ch24.y_g2:.1f}} percent; four top out the yield but add leftovers and overhead. Gauge error eats the margin: from 1 micron to 2, three groups fall to {{ch24.y_sm2:.1f}} percent, so the gauge must be far more accurate than the part tolerance. If the distributions drift apart, move the basket's target to follow, or bring the race back to centre; leftovers can also wait for the next batch."
+
+  - layout: lab
+    title: ["动手试一试：旋梭选配与工序能力", "Try it: hook matching and process capability"]
+    shot: {page: hookfit}
+    tasks:
+      - ["不分组：只靠提高精度做到 99%，看成本", "No groups: reach 99% by accuracy alone; note the cost"]
+      - ["经济精度下选组数：≥ 99%、剩余 ≤ 3%、≤ 25 元", "Economical accuracy: groups for ≥ 99%, ≤ 3% left, ≤ 25 yuan"]
+      - ["第②页：Cpk ≥ 1.33 下选抽样数，使 ARL₁ ≤ 5", "Page 2: choose n with Cpk ≥ 1.33 so that ARL₁ ≤ 5"]
+    notes:
+      - "虚拟实验 24-1 有两页。第一页是梭道与梭床的分组选配：左边是间隙分布和各组件数，右边调分组数、两种零件的精度和均值、测量误差，还可以一键注入“梭道均值加 4 微米”。第二页是针孔工序的控制图，调过程均值、标准差、每组抽样数和漂移量。"
+      - "Virtual lab 24-1 has two pages. Page one is race-to-basket matching: on the left the clearance distribution and the group counts; on the right you set the number of groups, both parts' accuracy and mean, and the gauge error, and you can inject a race mean of plus 4 microns with one click. Page two is the eye-width control chart, with the process mean, sigma, subgroup size and drift to set."
+
+  - layout: bignum
+    title: ["数字化：精度最高的工序，产能也最紧", "Digital: the most accurate step is also the tightest"]
+    nums:
+      - {n: "{{ch24.cap_needle:.0f}}", n_en: "k/shift", label: ["机针线：热处理、抛光（千支/班）", "Needle line: heat treat, polish (k per shift)"]}
+      - {n: "{{ch24.cap_hook:.0f}}", n_en: "sets/shift", label: ["旋梭线：梭道与导轨磨床（套/班）", "Hook line: race and rib grinders (sets per shift)"]}
+      - {n: "14", n_en: "min × 2", label: ["每套磨削 14 分钟，只有 2 台", "14 min a set, only 2 grinders"]}
+    foot: ["测量消息带组号、量仪号、批号：控制图和各组件数自动画出", "The matching station posts quality.measurement with group, gauge and lot; history draws the charts"]
+    notes:
+      - "工艺路线、检验计划和选配规则，最终要写成数字工厂的数据：物料、工作中心、工艺路线和检验模板。用它做瓶颈分析：机针线卡在热处理和抛光，单班约 {{ch24.cap_needle:.0f}} 千支；旋梭线卡在梭道与导轨磨床，每套 14 分钟、只有 2 台，单班约 {{ch24.cap_hook:.0f}} 套。精度最高的工序恰好产能最紧，剩余件和返修吃掉的正是瓶颈产能。测量数据带上组号、量仪号和批号上总线，控制图和各组件数就能自动画出来。"
+      - "Process routes, inspection plans and matching rules must end up as digital-factory data: items, work centres, routes and inspection templates. Use them for bottleneck analysis. The needle line is limited by heat treatment and polishing, about {{ch24.cap_needle:.0f}} thousand a shift. The hook line is limited by the race and rib grinders, 14 minutes a set on only two machines, about {{ch24.cap_hook:.0f}} sets a shift. The most accurate operation is also the tightest, and leftovers and rework eat exactly that bottleneck capacity. Measurements posted to the bus with group, gauge and lot numbers let the control charts and group counts draw themselves."
+
+  - layout: split
+    title: ["机器人联系：选配、视觉全检、趋势报警", "Robot link: matching, vision checks, trend alarms"]
+    points:
+      - ["精密减速器把针齿、轴承按尺寸分组选配", "Precision gearboxes grade pins and bearings by size"]
+      - ["机针视觉全检就是典型的机器人视觉应用", "Needle vision inspection is classic robot vision"]
+      - ["关节电流、振动画控制图，减速器磨坏前报警", "Chart joint current and vibration; alarm before wear-out"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <circle cx="170" cy="190" r="110" fill="#22324d" stroke="#4c8dff" stroke-width="6"/>
+          <circle cx="170" cy="190" r="128" fill="none" stroke="#4c8dff" stroke-width="14" stroke-dasharray="12 12"/>
+          <circle cx="170" cy="190" r="34" fill="#f2b705"/>
+          <text x="170" y="370" font-size="26" font-weight="700" fill="#8fbaff" text-anchor="middle" class="zh">关节减速器：分组选配</text><text x="170" y="370" font-size="24" font-weight="700" fill="#8fbaff" text-anchor="middle" class="eo">Joint gearbox: matching</text>
+          <rect x="560" y="60" width="120" height="80" rx="12" fill="#2ec4b6"/><circle cx="620" cy="100" r="24" fill="#08101d"/>
+          <path d="M600 140 L540 250 M640 140 L760 250" stroke="#2ec4b6" stroke-width="3" stroke-dasharray="8 6"/>
+          <path d="M520 262 L760 262 L790 268 L760 274 L520 274 Z" fill="#c8d2de"/>
+          <rect x="480" y="290" width="380" height="16" rx="8" fill="#4b5f7d"/>
+          <text x="670" y="350" font-size="26" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="zh">相机测直径、直度、孔宽</text><text x="670" y="350" font-size="24" font-weight="700" fill="#5ee0d2" text-anchor="middle" class="eo">Camera: diameter, straightness, eye</text>
+          <path d="M60 600 L860 600 M60 600 L60 420" stroke="#4b5f7d" stroke-width="3"/>
+          <path d="M60 450 L860 450" stroke="#ff7a45" stroke-width="3" stroke-dasharray="12 8"/>
+          <polyline fill="none" stroke="#f3f6fa" stroke-width="4" points="80,540 140,520 200,550 260,530 320,545 380,525 440,540 500,515 560,520 620,500 680,490 740,470 800,440"/>
+          <circle cx="800" cy="440" r="12" fill="#ff7a45"/>
+          <text x="770" y="430" font-size="24" fill="#ff9c75" text-anchor="end" class="zh">电流均值出界：提前维护</text><text x="770" y="430" font-size="24" fill="#ff9c75" text-anchor="end" class="eo">Current mean out: service early</text>
+        </svg>
+    notes:
+      - "这些办法在机器人上处处可见。关节里的精密减速器要把回差控制在角分级，单靠零件做到这么准很贵，装配时常把针齿、轴承按测得尺寸分组选配，道理和梭道—梭床一样，也要盯住两种零件的分布。机针厂的在线视觉全检，本身就是机器人视觉的典型应用。控制图的思路也用在机器人运维上：把关节电机电流、振动按组画趋势，均值出界就提前报警，在减速器磨坏之前安排维护。"
+      - "These ideas show up all over robotics. A joint's precision gearbox must hold backlash to arc-minutes; making every part that accurate is costly, so pins and bearings are often graded by measured size and fitted within groups, just like races and baskets, and again both distributions must be watched. The needle factory's in-line vision inspection is itself a classic robot-vision task. Control-chart thinking carries over to robot maintenance too: chart joint-motor current and vibration in subgroups, alarm when the mean leaves its limits, and service the gearbox before it wears out."
+
+  - layout: split
+    title: ["生活中的例子：鞋码分得越细，越难备货", "Everyday example: finer shoe sizes, harder stocking"]
+    points:
+      - ["鞋店按尺码把鞋和脚“分组配对”", "A shoe shop matches shoes to feet by size group"]
+      - ["码分得越细，越合脚", "The finer the sizes, the better the fit"]
+      - ["可每个码都要备货，卖不动的码就积压", "But every size needs stock, and slow sizes pile up"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M60 520 L860 520" stroke="#4b5f7d" stroke-width="3"/>
+          <g fill="#4c8dff"><rect x="90" y="400" width="90" height="120" rx="10"/><rect x="220" y="300" width="90" height="220" rx="10"/><rect x="350" y="230" width="90" height="290" rx="10"/><rect x="480" y="250" width="90" height="270" rx="10"/><rect x="610" y="330" width="90" height="190" rx="10"/></g>
+          <rect x="740" y="170" width="90" height="350" rx="10" fill="#ff7a45"/>
+          <rect x="740" y="380" width="90" height="140" rx="10" fill="#4c8dff"/>
+          <g font-size="28" font-weight="800" fill="#f3f6fa" text-anchor="middle"><text x="135" y="560">38</text><text x="265" y="560">39</text><text x="395" y="560">40</text><text x="525" y="560">41</text><text x="655" y="560">42</text><text x="785" y="560">43</text></g>
+          <text x="785" y="150" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="middle" class="zh">积压</text><text x="785" y="150" font-size="26" font-weight="700" fill="#ff9c75" text-anchor="middle" class="eo">Left over</text>
+          <text x="60" y="90" font-size="26" fill="#8fbaff" class="zh">蓝：卖掉的　橙：进了货却没人买</text><text x="60" y="90" font-size="26" fill="#8fbaff" class="eo">Blue: sold　Orange: stocked, unsold</text>
+          <text x="60" y="610" font-size="24" fill="#8fa3ba" class="zh">尺码（示意）</text><text x="60" y="610" font-size="24" fill="#8fa3ba" class="eo">Size (illustrative)</text>
+        </svg>
+    notes:
+      - "生活里也有选配。鞋店按尺码把鞋和脚分组配对：码分得越细，越合脚，可每个码都要备货，某些码卖不动就积压。这就是选配的组数和剩余件之间的权衡：组分得越细，配得越准，剩余件和管理成本也越多。"
+      - "There's selective assembly in daily life too. A shoe shop matches shoes to feet by size group. The finer the sizes, the better the fit, but every size has to be stocked, and the slow sizes pile up. That's the trade-off between the number of groups and the leftovers: finer groups match more precisely, but bring more leftovers and more management cost."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the shop floor"]
+    title: ["三种方案，2000 套蒙特卡罗", "Three plans, a 2000-set Monte Carlo"]
+    rows:
+      - [["完全互换", "Interchangeable"], ["{{ch24.y_int:.1f}}% · {{ch24.c_int:.1f}} 元", "{{ch24.y_int:.1f}}% · {{ch24.c_int:.1f}} yuan"]]
+      - [["提高精度 σ 2.6", "Tighter σ 2.6"], ["{{ch24.y_26:.1f}}% · {{ch24.c_26:.1f}} 元", "{{ch24.y_26:.1f}}% · {{ch24.c_26:.1f}} yuan"]]
+      - [["分 3 组选配", "Three groups"], ["{{ch24.y_g3:.1f}}% · {{ch24.c_g3:.1f}} 元", "{{ch24.y_g3:.1f}}% · {{ch24.c_g3:.1f}} yuan"]]
+    side: {big: "−{{ch24.save:.0f}}%", text: ["分组选配比提高精度每套便宜", "cheaper per set than tighter accuracy"]}
+    foot: ["合格率 · 每套成本；分 3 组剩余件 {{ch24.l_g3:.1f}}%，前提是两种零件分布一致", "Yield · cost per set; three groups leave {{ch24.l_g3:.1f}}% over, if both distributions match"]
+    notes:
+      - "回到开头的问题。完全互换，合格率约 {{ch24.y_int:.1f}}%，每套约 {{ch24.c_int:.1f}} 元。不分组、只靠提高精度，每件标准差取 2.6 微米、留一点余量，合格率 {{ch24.y_26:.1f}}%，每套约 {{ch24.c_26:.1f}} 元。按正负 15 微米分 3 组选配，组宽 10 微米，测量误差 1 微米时合格率 {{ch24.y_g3:.1f}}%、剩余件 {{ch24.l_g3:.1f}}%，每套约 {{ch24.c_g3:.1f}} 元，比提高精度便宜约 {{ch24.save:.0f}}%。前提是两种零件的分布一致，选配站要一直盯着各组件数。"
+      - "Back to the opening problem. Fully interchangeable: about {{ch24.y_int:.1f}} percent good at about {{ch24.c_int:.1f}} yuan a set. No grouping, just tighter accuracy, each sigma at 2.6 microns to leave a margin: {{ch24.y_26:.1f}} percent at about {{ch24.c_26:.1f}} yuan. Three groups over plus or minus 15 microns, 10 microns wide, with 1 micron gauge error: {{ch24.y_g3:.1f}} percent good, {{ch24.l_g3:.1f}} percent leftovers, about {{ch24.c_g3:.1f}} yuan a set, some {{ch24.save:.0f}} percent cheaper than tighter accuracy. This holds only if the two distributions match, so the matching station must keep watching the group counts."
+
+  - layout: summary
+    title: ["小结", "Summary"]
+    points:
+      - ["机针靠成形一致与视觉全检；旋梭靠精磨与选配", "Needles: consistent forming, vision checks; hooks: grinding, matching"]
+      - ["Cpk 看能力，控制图看漂移；抽样越多发现越快", "Cpk for capability, charts for drift; bigger subgroups catch it sooner"]
+      - ["分组选配用测量代替精度，两件分布必须一致", "Matching swaps accuracy for measurement; distributions must match"]
+    after: ["课后：实验 24-1、作业、测验；下一讲：机壳与凸轮", "After class: Lab 24-1, assignment and quiz on the platform; next: housings and cams"]
+    notes:
+      - "小结三句话。第一，机针和旋梭代表两种制造思路：机针靠成形一致性和全数视觉检测，冲针孔和回火最关键；旋梭靠精磨、研磨和选配。第二，Cpk 说明工序有没有能力，控制图说明工序变没变，每组抽得越多，漂移发现得越快。第三，分组选配用测量代替提高精度，能用经济精度做到高合格率，但两种零件的分布必须一致，否则剩余件大量堆积。"
+      - "Three takeaways. One: needles and hooks stand for two ways of manufacturing. Needles rely on consistent forming and full vision inspection, with eye punching and tempering most critical; hooks rely on grinding, lapping and matching. Two: Cpk tells you whether a process is capable, a control chart whether it has changed, and bigger subgroups catch drifts sooner. Three: grouped matching swaps accuracy for measurement and reaches a high yield with economical parts, but the two distributions must match, or leftovers pile up."
