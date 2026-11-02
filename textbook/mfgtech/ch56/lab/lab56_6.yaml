@@ -1,0 +1,21 @@
+# 实验 56.6 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab56_6.js。
+原理:
+  - ["每种加工方法在正常生产条件下有一个经济精度和可达的粗糙度。拟定方案链从最后一道往前推：最后一道的经济精度要满足图纸，每一道要求上一道达到一定的精度（余量小而均匀，上道的误差才切得掉）；热处理以后只能用能加工淬硬钢的方法；热处理后不再加工的表面，热处理变形使精度降低约一级。", "Each method has an economic accuracy and Ra. Work the chain back from the last step: the last step must meet the drawing; each step needs the previous one to reach a given grade; after hardening only methods for hard steel; a surface not finished after heat treatment loses about one grade."]
+  - ["数据与数字工厂工艺标准 std/route_methods.yaml 相同，检查规则与 hub/route.py 的 check_chain 相同（AI 工艺评审员也用它）。", "The data are those of std/route_methods.yaml and the checks those of hub/route.py's check_chain (used by the AI reviewer too)."]
+步骤:
+  - ["场景外圆：IT6、Ra 0.8、淬硬后加工，选第 1–4 环的方法和热处理的位置，直到“可行”（任务 1），记入表 1。", "OD scene: IT6, Ra 0.8, hardened; choose steps 1–4 and the heat-treatment position until valid (task 1); Table 1."]
+  - ["改为 IT8、Ra 0.8（密封轴颈），找最短的可行方案链；试一试把热处理放在最后，看意见（任务 2）。", "Change to IT8, Ra 0.8 (seal journal); find the shortest valid chain; try the heat treatment last and read the comments (task 2)."]
+  - ["场景齿面：先做 8 级，再做 6 级（任务 3）。", "Gear scene: grade 8, then grade 6 (task 3)."]
+  - ["场景孔：IT7、Ra 1.6（任务 4）。", "Bore scene: IT7, Ra 1.6 (task 4)."]
+  - ["回到外圆，拼一条跳级的方案链，记下系统的意见（任务 5）。", "Back to OD: build a chain that skips a stage and note the comments (task 5)."]
+数据表:
+  - 标题: ["表 1  各表面的方案链", "Table 1  Chains for each surface"]
+    表头: ["表面", "要求", "方案链", "检查结果", "工时 / min"]
+    表头英文: ["Surface", "Requirement", "Chain", "Check", "Time / min"]
+    行: [["轴承位", "IT6 Ra 0.8 淬硬", "", "", ""], ["密封轴颈", "IT8 Ra 0.8 淬硬", "", "", ""], ["齿面", "8 级 淬硬", "", "", ""], ["齿面", "6 级 淬硬", "", "", ""], ["铸出孔", "IT7 Ra 1.6", "", "", ""], ["跳级的链", "IT6 Ra 0.8", "", "", ""]]
+    行英文: [["Bearing seat", "IT6 Ra 0.8 hard", "", "", ""], ["Seal journal", "IT8 Ra 0.8 hard", "", "", ""], ["Flanks", "grade 8 hard", "", "", ""], ["Flanks", "grade 6 hard", "", "", ""], ["Cored bore", "IT7 Ra 1.6", "", "", ""], ["Skipping chain", "IT6 Ra 0.8", "", "", ""]]
+注意:
+  - ["磨削、齿面、平面各行的数据是单一出处或教学设计值（见方法表的出处列）；工时是示意值，只用于比较不同方案链的长短。齿面用公差等级代表齿轮精度等级。", "Grinding, gear and plane rows come from a single source or are teaching values (see the source column); times are illustrative, for comparing chains only. For gears the IT grade stands for the gear accuracy grade."]
+思考题:
+  - ["同一个表面可能有几条可行的方案链，怎样从中选一条？", "When several chains are valid for a surface, how do you choose?"]
+  - ["为什么铸出的孔不能直接铰？", "Why can a cored hole not be reamed directly?"]

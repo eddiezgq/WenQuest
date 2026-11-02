@@ -186,6 +186,8 @@ def seed(book, only=None):
         d.update(seed54(teacher, student))
     if not only or "55" in only:      # 第 55 章另起一批（只截第 55 章时不灌第 54 章的数据，两章的控制图互不干扰）
         d.update(seed55(teacher, student))
+    if not only or "56" in only:
+        d.update(seed56(book, teacher, student))
     return d
 
 
@@ -286,6 +288,31 @@ def inject55(d):
     assert max(v["ra_bearing"]) <= 0.8, "烧伤件的 Ra 应合格（第 55.5 节的要点）"
 
 
+# ---------------------------------------------------------------- 第 56 章：SH-101 的工艺路线（第 13 轮十二）
+# 学生提交两份 SH-101 的路线：本章的参照路线（std/SH-101_route.yaml）和把铣键槽挪到渗碳淬火之后的一份（图 56.9.6）；
+# 下达任务单 TS-56-1，学生把参照路线那份选为“工艺规程”交付物（图 56.10.5）；工艺规程页选零件 SH-101（图 56.10.4）。
+def seed56(book, teacher, student):
+    ref = (DIGITAL / "std" / "SH-101_route.yaml").read_text(encoding="utf-8")
+    ok = call("POST", "/api/process/check", {"yaml": ref, "submit": True, "note": "SH-101 工艺路线（按教材第 56 章拟定）"}, token=student)
+    plan = yaml.safe_load(ref)
+    ops = plan["operations"]
+    key = next(o for o in ops if o["seq"] == 50)
+    ops.remove(key)
+    ops.insert(next(i for i, o in enumerate(ops) if o["seq"] == 80), key)
+    key["seq"] = 75                                   # 重新编号，只看“顺序”和“路线”的意见
+    note = "SH-101：铣键槽（原工序 50）挪到渗碳淬火、磨削之后，改为工序 75（第 56 章的“故意排错”）"
+    bad = call("POST", "/api/process/check", {"yaml": yaml.safe_dump(plan, allow_unicode=True, sort_keys=False), "submit": True, "note": note},
+               token=student)
+    spec = yaml.safe_load((REPO / "textbook" / book / "ch56" / "task" / "ts56_1.yaml").read_text(encoding="utf-8"))
+    spec.update(book=book, no="56.1")
+    due = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=14)).isoformat()
+    tid = call("POST", "/api/tasks/course/issue", {"spec": spec, "course_id": 101, "course_name": "机械制造技术（示例班）",
+                                                   "due": due, "issued_by": "教师"}, key=TASK_KEY)["id"]
+    i = next(n for n, x in enumerate(spec["交付物"]) if x.get("类型") == "工艺规程")
+    call("POST", f"/api/tasks/{tid}/deliverables/{i}/link", {"process": ok["id"]}, token=student)
+    return {"s56_ok": ok["id"], "s56_bad": bad["id"], "t56": tid, "n56": note}
+
+
 # ---------------------------------------------------------------- 截图
 def shots_list(d):
     s, t = d["subs"], d["tasks"]
@@ -308,6 +335,9 @@ def shots_list(d):
         ("shot55_1", 55, "student", "/work/quality", "select_ra", "质量页：工序 60 后轴承位 Ra 的单值图（每 10 件修整砂轮）"),
         ("shot55_2", 55, "student", "/work/quality", "inject55", "质量页：老师注入“砂轮修整不锋利”以后，酸洗烧伤检验不合格的件自动开出不合格品单"),
         ("shot55_3", 55, "student", f"/process/{s['grind']}", None, d["notes"]["grind"]),
+        ("shot56_1", 56, "student", f"/process/{d.get('s56_bad')}", None, d.get("n56", "")),
+        ("shot56_2", 56, "student", "/process", "select101", "“工艺规程与 AI 评审”页选零件 SH-101：零件图要求、下载模板、上传 AI 预检"),
+        ("shot56_3", 56, "student", f"/tasks/{d.get('t56')}", "precheck_task", "任务单 TS-56-1 的学生页：交付物“工艺规程”指定零件 SH-101，选定提交的工艺规程后 AI 预检"),
     ]
 
 
@@ -346,6 +376,9 @@ def take(book, d, only=None):
                 pg.wait_for_timeout(1200)
             elif act == "inject55":
                 pg.locator(".card-head select").first.select_option("SH-301|burn_bearing")
+                pg.wait_for_timeout(1200)
+            elif act == "select101":
+                pg.locator("label:has-text(\"零件\") select").first.select_option("SH-101")
                 pg.wait_for_timeout(1200)
             elif act == "precheck_task":
                 pg.get_by_role("button", name="AI 预检").click()

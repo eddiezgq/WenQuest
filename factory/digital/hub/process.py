@@ -371,7 +371,7 @@ def _review_route(plan, part, say):
                                                  if any(x.get("name") == d["name"] for x in o.get("features") or [])):
             hf = len(keys)
         for prob in RT.check_chain(keys, it, d.get("Ra_um"), hf, kind or "热轧圆钢", grades):
-            say("路线", "warning" if "跳级" in prob or "经济精度 IT" in prob and "规定到" in prob else "error", "“{}”（IT{}{}）的加工方案链 {}：{}。".format(
+            say("路线", "warning" if ("跳级" in prob or "不接在" in prob or ("经济精度 IT" in prob and "规定到" in prob)) else "error", "“{}”（IT{}{}）的加工方案链 {}：{}。".format(
                 d["name"], it, "、Ra {}".format(d["Ra_um"]) if d.get("Ra_um") else "",
                 " → ".join(RT.METHODS[k]["method_zh"] for k in keys), prob))
     gear = (part.get("part") or {}).get("gear")

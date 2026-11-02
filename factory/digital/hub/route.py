@@ -17,6 +17,7 @@ import yaml
 HERE = os.path.dirname(os.path.abspath(__file__))
 STD = os.path.join(HERE, "..", "std")
 HEAT_DISTORT = 1        # 渗碳淬火的变形使精度降低约一级（热处理后不再精加工的表面，热处理前要高一级；示意）
+HEAT_RA = 1.6           # 热处理后不再加工的表面，粗糙度要求不能高于 Ra 1.6（氧化皮、变形；齿面另按精度等级）
 BLANK_IT = {"热轧圆钢": 14, "模锻件": 15, "自由锻件": 16, "铸件": 15}     # 毛坯表面相当的公差等级（示意：棒料直径公差约 IT14）
 
 
@@ -55,6 +56,11 @@ def check_chain(keys, it, ra=None, hardened_from=None, blank="热轧圆钢", gra
     prev_it = BLANK_IT.get(blank, 14)
     for i, k in enumerate(keys):
         m = METHODS[k]
+        fol = m.get("follows") or []
+        if i == 0 and fol:
+            out.append("{}不能做第一道（它要接在{}之后）".format(m["method_zh"], "、".join(METHODS[x]["method_zh"] for x in fol)))
+        elif i > 0 and keys[i - 1] not in fol:
+            out.append("{}一般不接在{}之后".format(m["method_zh"], METHODS[keys[i - 1]]["method_zh"]))
         g = grades[i] if grades and i < len(grades) and grades[i] is not None else None
         if g is not None and g < m["IT_min"]:
             out.append("{}规定到 IT{}，超出它的经济精度 IT{}–IT{}".format(m["method_zh"], g, m["IT_min"], m["IT_max"]))
@@ -70,6 +76,8 @@ def check_chain(keys, it, ra=None, hardened_from=None, blank="热轧圆钢", gra
         if last["IT_min"] + HEAT_DISTORT > it:
             out.append("热处理后不再精加工，{}的 IT{} 再降约 {} 级（热处理变形）就达不到要求的 IT{}".format(
                 last["method_zh"], last["IT_min"], HEAT_DISTORT, it))
+        if ra is not None and ra < HEAT_RA:
+            out.append("热处理后表面有氧化皮、脱碳和变形，要求 Ra {} μm 的表面热处理后还要精加工（磨）".format(ra))
         return out
     if last["IT_min"] > it:
         out.append("最后一环{}的经济精度 IT{}–IT{} 达不到要求的 IT{}".format(last["method_zh"], last["IT_min"], last["IT_max"], it))

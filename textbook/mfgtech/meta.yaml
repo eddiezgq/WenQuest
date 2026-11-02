@@ -15,6 +15,7 @@ program_deps:
   - factory/digital/cae/cam_power.py
   - factory/digital/hub/process.py
   - factory/digital/hub/surface.py               # 表面完整性库（第 13 轮十一）
+  - factory/digital/hub/route.py                 # 加工方案链与路线比较（第 13 轮十二）
   - factory/digital/sim/errors.py
   - factory/factory/data.py
   - factory/digital/models3d/*.py      # 三维模型（第 13 轮 8.3 R1）

@@ -1,0 +1,35 @@
+# 工程任务单 TS-56-1（配 56.1–56.10 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-56-1
+标题: [SH-101 输入齿轮轴的工艺路线：扩产到大批生产, "Process route for the SH-101 input pinion shaft: ramping up to large-batch production"]
+角色: [工艺工程师（工艺规划）, process engineer (process planning)]
+背景:
+  - "WQR-105 减速器销量上升，SH-101 输入齿轮轴的年产量要从 6000 件增加到 20 000 件，每批 200 件。工厂 ERP 里那条只有工序名和工时的“工艺路线”预检只得 44 分，本章拟定的路线是按年产 6000 件定的。你作为工艺工程师，要审查零件图、选毛坯和定位基准、拟定两个工艺路线方案并比较论证，把选定的路线写成工艺规程，在数字工厂提交并通过 AI 预检。"
+  - "WQR-105 sales are rising: SH-101's annual volume grows from 6000 to 20 000, in batches of 200. The routing in the ERP (names and times only) scored 44 in the pre-check, and the chapter's route was set for 6000 a year. As the process engineer, review the drawing, choose the blank and the datums, draw up two alternative routes and justify one, write it as a process plan, and submit it in the digital factory through the AI pre-check."
+输入:
+  - {名称: [SH-101 零件图要求, "SH-101 drawing requirements"], 来源: [factory/digital/std/SH-101_part.yaml；数字工厂 → 工艺规程与 AI 评审 → 选 SH-101, "factory/digital/std/SH-101_part.yaml; digital factory → process plan and AI review → SH-101"]}
+  - {名称: [加工方法表（经济精度）, "Method table (economic accuracy)"], 来源: [factory/digital/std/route_methods.yaml；实验 56.6, "factory/digital/std/route_methods.yaml; Lab 56.6"]}
+  - {名称: [工作中心的台数与费率, "Work-centre counts and rates"], 来源: [工厂数据（factory/data.py）；hub/route.py 的 route_cost；实验 56.10, "factory data (factory/data.py); route_cost in hub/route.py; Lab 56.10"]}
+  - {名称: [本章的参照路线与 SH-301 工艺规程, "The chapter's route and SH-301's plan"], 来源: [std/SH-101_route.yaml（只作参考，年产量不同）；std/SH-301_process.yaml, "std/SH-101_route.yaml (reference only, different volume); std/SH-301_process.yaml"]}
+交付物:
+  - {名称: [工艺审查意见单, "Drawing review sheet"], 验收: [至少 4 条：部位、问题、建议、理由；包括结构工艺性（越程槽、中心孔、键槽与渗碳）和技术要求（缺的、过严的）；格式同图 56.2.5, "At least 4 items: feature, problem, proposal, reason; covering manufacturability (relief grooves, centre holes, keyway vs carburizing) and requirements (missing or too tight); in the format of Fig. 56.2.5"]}
+  - {名称: [毛坯选择与毛坯图, "Blank choice and blank drawing"], 验收: [按年产 20 000 件比较棒料与模锻件（材料利用率、单件成本、临界年产量），选定一种；画出毛坯图（余量、公差、粗基准，模锻件还要标分模面和正火）, "Compare bar and forging at 20 000 a year (yield, unit cost, break-even volume) and choose; draw the blank (allowances, tolerances, rough datum; parting line and normalizing for a forging)"]}
+  - {名称: [两个路线方案的比较与论证（2–3 页）, "Two routes compared and justified (2–3 pages)"], 验收: [两个方案各列出工序、设备、定位基准；比较表含质量（每项图纸要求怎样保证）、效率（瓶颈与需求节拍）、成本（单件成本粗估）；结论写明选择的理由和适用的产量范围；数字用 hub/route.py 或实验 56.10 算出, "Each route lists operations, equipment and datums; the comparison covers quality (how each requirement is held), efficiency (bottleneck vs demand takt) and cost (rough unit cost); the conclusion states why and for what volume range; figures from hub/route.py or Lab 56.10"]}
+  - {名称: [SH-101 工艺规程与 AI 预检记录, "SH-101 process plan and pre-check record"], 验收: [在数字工厂提交选定路线的工艺规程（毛坯、各工序的内容、设备、定位基准、主要工序尺寸、辅助工序），AI 预检没有“必须改”的意见，“路线”规则没有“建议”；附计算书（余量和工序尺寸可按第 50 章的方法估计，第 57 章细化）, "Submit the chosen route as a process plan (blank, content, equipment, datums, main operation sizes, auxiliary steps); the AI pre-check has no must-fix comments and no route advice; attach a calculation note (allowances by the method of Ch. 50, refined in Ch. 57)"], 类型: 工艺规程, 零件: SH-101}
+工位: [ERP, PY, MES]
+步骤:
+  - ["在数字工厂打开 SH-101 的零件图要求，按 56.2 节写工艺审查意见单。", "Open SH-101's drawing requirements in the digital factory and write the review sheet per 56.2."]
+  - ["按年产 20 000 件，用程序 56.3.1 或实验 56.10 比较两种毛坯，选定一种并画毛坯图。", "At 20 000 a year compare the blanks with Program 56.3.1 or Lab 56.10; choose and draw the blank."]
+  - ["用实验 56.6 定出各表面的方案链，按 56.4、56.5、56.7–56.9 节排出工序、选定基准。", "Fix each surface's chain with Lab 56.6; order the operations and choose datums per 56.4, 56.5, 56.7–56.9."]
+  - ["拟出两个方案（例如分散加工与车铣复合，或现有设备与增加一台滚齿机），用实验 56.10 比较节拍和成本，写论证。", "Draw up two routes (e.g. dispersed vs turn-mill, or present machines vs a second hobber); compare takt and cost with Lab 56.10; write the justification."]
+  - ["在数字工厂下载 SH-101 的零件图要求和工厂现行工序（起点），把选定的路线写成工艺规程后提交，按 AI 预检的意见修改，直到没有“必须改”。", "Download SH-101's drawing requirements and the current factory routing as a start, write the chosen route as a plan, submit and revise until there are no must-fix comments."]
+评审要点:
+  - ["〔AI 检查〕工艺规程没有“必须改”的意见，“路线”规则（毛坯、热处理顺序、方案链、修研中心孔、磨削余量、去毛刺与清洗）没有“建议”。", "[AI] No must-fix comments; no advice from the route rules (blank, heat-treatment order, chains, centre-hole lapping, grinding stock, deburring and washing)."]
+  - ["〔老师检查〕年产 20 000 件时瓶颈能满足需求节拍，或者写明了怎样满足（加设备、加班、工序集中）。", "[Teacher] At 20 000 a year the bottleneck meets the demand takt, or the plan says how it will."]
+  - ["〔老师检查〕毛坯选择、精基准与粗基准的理由与本章的原则一致，数字可以复算。", "[Teacher] The blank and datum choices follow the chapter's principles and the figures can be re-checked."]
+  - ["〔老师检查〕审查意见单的问题真实、建议可行，没有照抄图 56.2.5。", "[Teacher] The review items are real and workable, not copied from Fig. 56.2.5."]
+评分:
+  - {项: [工艺审查意见单, Review sheet], 分: 15, 标准: [问题真实、建议可行、理由清楚, "Real problems, workable proposals, clear reasons"]}
+  - {项: [毛坯选择与毛坯图, Blank], 分: 15, 标准: [比较有数据，毛坯图规范, "Compared with data; correct drawing"]}
+  - {项: [方案比较与论证, Route comparison], 分: 35, 标准: [两个方案都可行，比较全面、数字正确，结论有适用范围, "Both routes feasible; complete, correct comparison; conclusion with its range"]}
+  - {项: [工艺规程与预检, Plan and pre-check], 分: 35, 标准: [预检通过，基准、顺序、辅助工序完整, "Pre-check passes; datums, order and auxiliary steps complete"]}
+学时: 6

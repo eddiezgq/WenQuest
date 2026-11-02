@@ -1,0 +1,18 @@
+# 实验 56.10 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab56_10.js。
+原理:
+  - ["工艺路线方案先比质量（保证不了图纸要求的直接淘汰），再比效率（瓶颈每件占用的时间不大于需求节拍）和成本。单件成本 C = a + S/n（a：与批量无关的部分，S：每批的准备费用），两种方案相等时的批量是临界批量 n_c = (S₂ − S₁)/(a₁ − a₂)；毛坯的模具费按年产量分摊，两种毛坯相等时的年产量是临界年产量。", "Compare quality first (routes that cannot hold the drawing are dropped), then efficiency (bottleneck time ≤ demand takt) and cost. Unit cost C = a + S/n; the break-even batch n_c = (S₂ − S₁)/(a₁ − a₂); die cost spread over the annual volume gives the break-even volume."]
+  - 式: "需求节拍 t = Fe/N，Fe = 250 天 × 2 班 × 480 min × 0.85"
+步骤:
+  - ["数控车床、批量 100：改年产量，找出棒料与模锻件单件成本相等的年产量（任务 1），记入表 1。", "CNC, batch 100: vary the volume and find where bar and forging cost the same (task 1); Table 1."]
+  - ["改批量，找出粗车、精车用数控车床与普通车床单件成本相等的批量（任务 2）。", "Vary the batch to find the CNC / engine-lathe break-even (task 2)."]
+  - ["棒料、数控车床、批量 100：逐步加大年产量，找出瓶颈第一次跟不上需求节拍的年产量（任务 3）；再换成车铣复合中心，看瓶颈怎样变化。", "Bar, CNC, batch 100: raise the volume until the bottleneck first falls behind (task 3); then switch to the turn-mill centre."]
+数据表:
+  - 标题: ["表 1  方案比较", "Table 1  Route comparison"]
+    表头: ["毛坯", "设备", "年产量", "批量", "单件成本 / 元", "瓶颈", "瓶颈每件 / min", "需求节拍 / min"]
+    表头英文: ["Blank", "Equipment", "Volume", "Batch", "Cost / CNY", "Bottleneck", "Bottleneck min", "Demand takt / min"]
+    行: [["棒料", "数控车床", "6000", "100", "", "", "", ""], ["模锻件", "数控车床", "6000", "100", "", "", "", ""], ["棒料", "车铣复合", "6000", "100", "", "", "", ""], ["棒料", "数控车床", "", "100", "", "", "", ""]]
+    行英文: [["Bar", "CNC", "6000", "100", "", "", "", ""], ["Forging", "CNC", "6000", "100", "", "", "", ""], ["Bar", "Turn-mill", "6000", "100", "", "", "", ""], ["Bar", "CNC", "", "100", "", "", "", ""]]
+注意:
+  - ["数控车床等工作中心的台数与费率取工厂数据；普通车床、车铣复合中心、锻造加工费与锻模是示意值。成本只计毛坯、机床与人工，没有计入在制品、搬运、废品和投资风险。", "Work-centre counts and rates are factory data; the engine lathe, turn-mill centre, forging fee and die are illustrative. Costs cover blank, machines and labour only — no WIP, handling, scrap or investment risk."]
+思考题:
+  - ["瓶颈跟不上需求节拍时，有哪些办法？（加班、加设备、改工艺、工序集中……）各有什么代价？", "When the bottleneck falls behind, what are the options and their costs?"]

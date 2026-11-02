@@ -2,7 +2,7 @@
   <!-- 工艺规程与 AI 评审（第 13 轮 8.8（3a））：下载参照工艺规程，上传自己改过的，AI 预检或提交审批，看意见、处理意见 -->
   <div class="page">
     <div class="page-title"><h1>工艺规程与 AI 评审</h1>
-      <span class="muted">工艺员工作区 · {{ item }} 的工艺规程：AI 工艺评审员逐道工序检查基准、余量、切削用量、定位误差、夹具、精度、尺寸链</span></div>
+      <span class="muted">工艺员工作区 · {{ (sid && sub && sub.item) || item }} 的工艺规程：AI 工艺评审员逐道工序检查基准、余量、切削用量、定位误差、夹具、精度、尺寸链</span></div>
     <div v-if="err" class="err">{{ err }}</div>
 
     <template v-if="!sid">

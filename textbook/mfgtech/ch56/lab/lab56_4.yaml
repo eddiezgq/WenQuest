@@ -1,0 +1,26 @@
+# 实验 56.4 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab56_4.js。
+原理:
+  - ["精基准选择的五条原则：基准重合、基准统一、互为基准、自为基准、便于装夹。定位基准与设计基准不重合时，产生基准不重合误差，等于联系两个基准的尺寸的公差；换一次基准，就加进一项基准转换的误差。", "Five principles: datum coincidence, unity, mutual datums, self-datum, easy holding. When the locating datum is not the design datum there is a datum-mismatch error equal to the tolerance of the dimension linking them; every change of datum adds another error."]
+  - 式: "V 形块（夹角 α）定位外圆（公差 Td）：工序基准在下母线 Δ = Td/2·(1/sin(α/2) − 1)，在轴线 Δ = Td/(2 sin(α/2))，在上母线 Δ = Td/2·(1/sin(α/2) + 1)"
+  - ["一夹一顶时，卡盘的定心误差按到尾顶尖的距离折算到被加工表面处：e = TIR·(x_尾 − x)/(x_尾 − x_夹)。", "Chuck plus tail centre: the chuck error scales to the machined surface by its distance to the tail centre."]
+步骤:
+  - ["场景 SH-101 精车与滚齿：轴向编程原点分别取左端面和轴肩，读出 8 ± 0.1 的实际公差和基准不重合误差（任务 1），记入表 1。", "Scene SH-101 turning: origin at the left end and at the shoulder; read the tolerance on 8 ± 0.1 and the mismatch (task 1); Table 1."]
+  - ["依次选基准方案 A、B、C，读出齿顶圆跳动中由基准引起的部分；改卡盘跳动，看 B、C 怎样变化（任务 2），记入表 2。", "Choose schemes A, B, C; read the datum part of the tip runout; vary the chuck runout (task 2); Table 2."]
+  - ["场景铣键槽：α = 90°、Td = 0.05，槽深分别从下母线、轴线、上母线量，比较定位误差；再改 α（任务 3）。", "Keyway scene: α = 90°, Td = 0.05; compare the three depth references; then vary α (task 3)."]
+  - ["场景输出法兰：比较一次装夹和分两次装夹的同轴度（任务 4）。", "Flange scene: compare one and two set-ups (task 4)."]
+数据表:
+  - 标题: ["表 1  基准重合与不重合", "Table 1  Coincident and non-coincident datums"]
+    表头: ["编程原点", "±t / mm", "8 的实际公差 / mm", "基准不重合误差 / mm", "能否保证 8 ± 0.1"]
+    表头英文: ["Origin", "±t / mm", "Tolerance on 8 / mm", "Mismatch / mm", "Holds 8 ± 0.1?"]
+    行: [["左端面", "0.1", "", "", ""], ["轴肩", "0.1", "", "", ""], ["左端面", "0.05", "", "", ""]]
+    行英文: [["Left end", "0.1", "", "", ""], ["Shoulder", "0.1", "", "", ""], ["Left end", "0.05", "", "", ""]]
+  - 标题: ["表 2  基准方案与齿顶圆跳动；V 形块与法兰", "Table 2  Datum schemes and runout; V-block and flange"]
+    表头: ["情况", "参数", "误差 / µm", "与要求比较"]
+    表头英文: ["Case", "Settings", "Error / µm", "Against requirement"]
+    行: [["方案 A", "", "", ""], ["方案 B", "", "", ""], ["方案 C", "", "", ""], ["V 形块 下母线", "α 90°", "", ""], ["V 形块 轴线", "α 90°", "", ""], ["法兰一次装夹", "", "", ""], ["法兰两次装夹", "", "", ""]]
+    行英文: [["Scheme A", "", "", ""], ["Scheme B", "", "", ""], ["Scheme C", "", "", ""], ["V-block bottom", "α 90°", "", ""], ["V-block axis", "α 90°", "", ""], ["Flange one set-up", "", "", ""], ["Flange two set-ups", "", "", ""]]
+注意:
+  - ["卡盘跳动、中心孔偏移、主轴回转误差和法兰的同轴度要求是示意值；实际要按机床、夹具的检定数据。三维模型中的两顶尖取自零件库 E-ACC-CENTERS，SH-101、V 形块和法兰按尺寸实时生成。", "Chuck runout, centre-hole shift, spindle error and the flange requirement are illustrative; use the calibration data of the actual machine and fixture. The centres are library model E-ACC-CENTERS; SH-101, the V-block and the flange are generated from their dimensions."]
+思考题:
+  - ["为什么说基准统一时误差不累积？用齿顶圆跳动的三个方案说明。", "Why do errors not accumulate under a unified datum? Use the three runout schemes."]
+  - ["键槽对称度为什么没有定位误差，而槽深有？", "Why is there no locating error in keyway symmetry, but there is in its depth?"]
