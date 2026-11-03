@@ -1,0 +1,1007 @@
+1
+00:00:00,600 --> 00:00:01,567
+Hi everyone,
+
+2
+00:00:01,587 --> 00:00:07,492
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:07,892 --> 00:00:14,152
+This is Lecture 25, making housings and cams.
+
+4
+00:00:14,552 --> 00:00:19,413
+The housing is the largest part, carrying every shaft bore;
+
+5
+00:00:19,433 --> 00:00:22,309
+the cam is the most shape-critical,
+
+6
+00:00:22,329 --> 00:00:28,267
+where a few microns of error become a large acceleration error at speed.
+
+7
+00:00:28,287 --> 00:00:34,142
+Today we see how these parts are made accurate, how they stay accurate,
+
+8
+00:00:34,162 --> 00:00:39,520
+and why a cam that passes inspection can still be noisy at speed.
+
+9
+00:00:41,040 --> 00:00:44,155
+Here's a shop-floor problem.
+
+10
+00:00:44,555 --> 00:00:50,290
+A batch of chainstitch looper cams has been compensation-ground,
+
+11
+00:00:50,310 --> 00:00:56,855
+and the lift error is about 5 microns peak to valley, within the drawing.
+
+12
+00:00:57,255 --> 00:01:05,914
+Stroke 6 millimetres, a 150 degree rise, modified trapezoid,
+
+13
+00:01:05,934 --> 00:01:08,952
+top speed 6000 r/min.
+
+14
+00:01:09,352 --> 00:01:14,309
+Yet once fitted, the machines are clearly noisier at speed,
+
+15
+00:01:14,329 --> 00:01:18,612
+and the looper-carrier ball joints soon wear slack.
+
+16
+00:01:19,012 --> 00:01:24,863
+Harmonic analysis finds an order-24 component of about 2 microns:
+
+17
+00:01:24,883 --> 00:01:27,392
+chatter left by the grinder.
+
+18
+00:01:27,792 --> 00:01:30,689
+The plant's rule: at top speed,
+
+19
+00:01:30,709 --> 00:01:37,369
+the acceleration error must stay within 10 percent of the nominal peak.
+
+20
+00:01:37,769 --> 00:01:41,587
+How fast can this cam run?
+
+21
+00:01:41,987 --> 00:01:44,887
+Would another round of compensation fix it?
+
+22
+00:01:45,287 --> 00:01:46,427
+We'll answer at the end.
+
+23
+00:01:47,947 --> 00:01:51,487
+Housings: material, casting and ageing.
+
+24
+00:01:53,007 --> 00:01:56,796
+Housings are complex, with many cavities,
+
+25
+00:01:56,816 --> 00:02:00,605
+so the blanks are nearly always castings.
+
+26
+00:02:01,005 --> 00:02:07,172
+Industrial lockstitch housings have traditionally been sand-cast grey iron:
+
+27
+00:02:07,192 --> 00:02:11,380
+flake graphite gives it high damping, a dull sound,
+
+28
+00:02:11,400 --> 00:02:14,514
+and it expands about as much as steel.
+
+29
+00:02:14,914 --> 00:02:21,754
+Die-cast aluminium is light and near net shape, but the dies are expensive,
+
+30
+00:02:21,774 --> 00:02:27,150
+so it suits domestic machines made by the hundred thousand.
+
+31
+00:02:27,550 --> 00:02:30,965
+Aluminium expands twice as much as steel.
+
+32
+00:02:31,365 --> 00:02:39,421
+Warm the housing by 30 kelvin and a 20 millimetre bore grows 13.8 microns
+
+33
+00:02:39,441 --> 00:02:43,736
+while the steel bushing grows only 6.9:
+
+34
+00:02:43,756 --> 00:02:47,940
+the interference drops by 6.9 microns.
+
+35
+00:02:48,340 --> 00:02:53,035
+So bushing fits in aluminium housings must be checked hot.
+
+36
+00:02:54,555 --> 00:02:57,609
+We can estimate the size of it.
+
+37
+00:02:58,009 --> 00:03:06,330
+Treat the arm as a box cantilever from the pillar: 250 millimetres long,
+
+38
+00:03:06,350 --> 00:03:10,847
+a 60 by 70 section, 7 millimetre walls.
+
+39
+00:03:11,247 --> 00:03:17,527
+Suppose the front wall's 2 millimetre skin carries an unbalanced residual
+
+40
+00:03:17,547 --> 00:03:20,979
+stress sigma that the back wall doesn't.
+
+41
+00:03:21,379 --> 00:03:25,649
+Its resultant times the lever arm is a moment;
+
+42
+00:03:25,669 --> 00:03:28,820
+the moment over EI is a curvature;
+
+43
+00:03:28,840 --> 00:03:36,562
+curvature times L squared over two is how far the needle-bar bore at the tip moves.
+
+44
+00:03:36,962 --> 00:03:42,752
+Release all of 40 megapascals and that's about 52 microns.
+
+45
+00:03:43,152 --> 00:03:51,192
+At room temperature, assume half is released with a three-month time constant:
+
+46
+00:03:51,212 --> 00:03:54,292
+about 26 microns after a year.
+
+47
+00:03:54,692 --> 00:03:58,955
+Aged down to 10 megapascals, only about 6.
+
+48
+00:03:59,355 --> 00:04:03,815
+The hook gap allows just plus or minus 30.
+
+49
+00:04:05,335 --> 00:04:10,035
+Bores: datums, one set-up and dimension chains.
+
+50
+00:04:11,555 --> 00:04:14,855
+A housing's bores lie on several faces.
+
+51
+00:04:15,255 --> 00:04:22,612
+Re-clamp for every face and each set-up adds a few to a few tens of microns
+
+52
+00:04:22,632 --> 00:04:24,382
+of location error.
+
+53
+00:04:24,782 --> 00:04:31,881
+A horizontal machining centre indexes its table about the B axis: clamp once,
+
+54
+00:04:31,901 --> 00:04:38,075
+turn to 0, 90, 180 and 270 degrees, and machine four faces in turn,
+
+55
+00:04:38,095 --> 00:04:43,530
+so the bore pattern depends only on the machine's accuracy.
+
+56
+00:04:43,930 --> 00:04:50,946
+Bores on one axis are best line-bored with one long bar in a single pass,
+
+57
+00:04:50,966 --> 00:04:54,030
+coaxial to about 3 to 5 microns.
+
+58
+00:04:54,430 --> 00:05:00,715
+If the bar can't reach, you have to turn round, which adds two errors:
+
+59
+00:05:00,735 --> 00:05:04,138
+twice the centring error of the table,
+
+60
+00:05:04,158 --> 00:05:09,452
+plus the indexing error times the distance from the centre.
+
+61
+00:05:09,852 --> 00:05:14,352
+In our example that's about 14 microns.
+
+62
+00:05:14,752 --> 00:05:19,277
+So the designer makes coaxial bores step down from one end,
+
+63
+00:05:19,297 --> 00:05:23,052
+or keeps them equal, so one bar can pass through.
+
+64
+00:05:24,572 --> 00:05:27,912
+Here's a datum mismatch.
+
+65
+00:05:28,312 --> 00:05:35,032
+The drawing gives 32 plus or minus 0.03 millimetres from the hook-shaft bore
+
+66
+00:05:35,052 --> 00:05:37,427
+axis to the top of the bed,
+
+67
+00:05:37,447 --> 00:05:43,901
+because the hook height and the needle plate are measured from that face.
+
+68
+00:05:44,301 --> 00:05:49,651
+But the housing is machined from face A underneath:
+
+69
+00:05:49,671 --> 00:05:56,601
+milling the bed top gives A1, boring the hook-shaft bore gives A2.
+
+70
+00:05:57,001 --> 00:06:04,333
+H0 isn't machined directly; it's A1 minus A2, the closing link.
+
+71
+00:06:04,733 --> 00:06:10,783
+With A1 at 115 plus or minus 0.02, A2 is nominally 83,
+
+72
+00:06:10,803 --> 00:06:18,201
+and the worst-case method leaves it only plus or minus 10 microns;
+
+73
+00:06:18,221 --> 00:06:23,484
+the statistical method allows plus or minus 22.
+
+74
+00:06:23,884 --> 00:06:28,859
+Give the boring the full 0.03 without converting,
+
+75
+00:06:28,879 --> 00:06:32,224
+and only about 98.7 percent pass.
+
+76
+00:06:32,624 --> 00:06:36,646
+Better still, make the datums coincide:
+
+77
+00:06:36,666 --> 00:06:44,626
+locate or gauge the boring from the bed top, and all 0.03 goes to the boring.
+
+78
+00:06:46,146 --> 00:06:49,213
+Cams: motion laws and how they're made.
+
+79
+00:06:50,733 --> 00:06:57,815
+A cam turns the steady rotation of the shaft into a reciprocating motion that
+
+80
+00:06:57,835 --> 00:06:59,752
+follows a chosen law:
+
+81
+00:06:59,772 --> 00:07:03,902
+take-up, feed-lift eccentrics, looper drives,
+
+82
+00:07:03,922 --> 00:07:07,223
+zigzag and pattern cams all use one.
+
+83
+00:07:07,623 --> 00:07:12,855
+If the stroke h is completed over a shaft angle beta,
+
+84
+00:07:12,875 --> 00:07:19,495
+the peak acceleration is C times h omega squared over beta squared,
+
+85
+00:07:19,515 --> 00:07:24,153
+and C is about 4.89 for the modified trapezoid.
+
+86
+00:07:24,553 --> 00:07:29,854
+Our looper cam has a 20 millimetre base radius,
+
+87
+00:07:29,874 --> 00:07:37,891
+a 6 millimetre roller and a 6 millimetre stroke over a 150 degree rise.
+
+88
+00:07:38,291 --> 00:07:48,990
+At 6000 r/min the nominal peak is about 1690 metres per second squared,
+
+89
+00:07:49,010 --> 00:07:53,671
+so the 10 percent limit is 169.
+
+90
+00:07:54,071 --> 00:08:00,529
+On the right is the cam from the virtual lab, with the actual profile in red,
+
+91
+00:08:00,549 --> 00:08:07,091
+error magnified: the standard case, then with order-24 chatter added, in turn.
+
+92
+00:08:08,611 --> 00:08:12,336
+How much distortion can grinding take out?
+
+93
+00:08:12,736 --> 00:08:15,436
+The idea here is error replication.
+
+94
+00:08:15,836 --> 00:08:22,963
+Where there's more stock the cutting force is higher and the wheel and work
+
+95
+00:08:22,983 --> 00:08:24,202
+deflect more;
+
+96
+00:08:24,222 --> 00:08:27,728
+where there's less they deflect less.
+
+97
+00:08:28,128 --> 00:08:33,028
+So each operation's error is copied, scaled down, into the next.
+
+98
+00:08:33,428 --> 00:08:37,537
+The replication factor epsilon is below one,
+
+99
+00:08:37,557 --> 00:08:44,202
+and every extra pass shrinks the shape error to epsilon times the last.
+
+100
+00:08:44,602 --> 00:08:47,844
+Take 0.25: after carburising,
+
+101
+00:08:47,864 --> 00:08:56,054
+a second order error of 20 microns becomes 5 after one finishing pass and
+
+102
+00:08:56,074 --> 00:08:57,742
+1.25 after two.
+
+103
+00:08:58,142 --> 00:09:03,452
+More passes, more accuracy, but more time and more wheel dressing:
+
+104
+00:09:03,472 --> 00:09:06,522
+a trade-off between cost and accuracy.
+
+105
+00:09:08,042 --> 00:09:11,552
+A CNC cam grinder moves two axes together:
+
+106
+00:09:11,572 --> 00:09:17,183
+the C axis turns the cam and the X axis moves the wheel in and out,
+
+107
+00:09:17,203 --> 00:09:24,075
+so the wheel centre traces the actual profile offset outwards by the wheel radius.
+
+108
+00:09:24,475 --> 00:09:29,589
+Every dressing makes the wheel a little smaller.
+
+109
+00:09:29,989 --> 00:09:34,076
+The control computes the path from the stored radius,
+
+110
+00:09:34,096 --> 00:09:38,649
+so after dressing you must measure the wheel and update it.
+
+111
+00:09:39,049 --> 00:09:42,744
+If it's really d smaller and nobody updates it,
+
+112
+00:09:42,764 --> 00:09:48,989
+the wheel stays d away everywhere, and the lift is too big by d over cos alpha.
+
+113
+00:09:49,389 --> 00:09:52,778
+With d at 0.2 millimetres,
+
+114
+00:09:52,798 --> 00:10:02,089
+the size error is about 201 microns but the shape error only about 2.5.
+
+115
+00:10:02,489 --> 00:10:05,908
+It's mainly a size problem, invisible in the shape;
+
+116
+00:10:05,928 --> 00:10:10,764
+only measuring after every dressing, and checking the first part's size,
+
+117
+00:10:10,784 --> 00:10:11,709
+will catch it.
+
+118
+00:10:13,229 --> 00:10:16,209
+Error orders and compensation grinding.
+
+119
+00:10:17,729 --> 00:10:20,768
+Why do a few microns matter so much?
+
+120
+00:10:21,168 --> 00:10:24,148
+Break the lift error into harmonics.
+
+121
+00:10:24,548 --> 00:10:26,204
+The mean is the size error.
+
+122
+00:10:26,604 --> 00:10:32,625
+Orders one to three come from eccentricity, heat treatment and clamping,
+
+123
+00:10:32,645 --> 00:10:39,084
+and they shift the lift: positions such as loop-taking timing and clearances.
+
+124
+00:10:39,484 --> 00:10:42,682
+High orders come from grinder vibration,
+
+125
+00:10:42,702 --> 00:10:47,186
+wheel imbalance and axis following error; they're small.
+
+126
+00:10:47,586 --> 00:10:50,222
+With the cam turning steadily,
+
+127
+00:10:50,242 --> 00:10:56,510
+the acceleration error is the second time derivative of the lift error,
+
+128
+00:10:56,530 --> 00:11:01,646
+and order k has an amplitude of e k times k omega squared.
+
+129
+00:11:02,046 --> 00:11:12,630
+At 6000 r/min, each micron gives under 0.4 at order one, about 14 at order six,
+
+130
+00:11:12,650 --> 00:11:17,462
+227 at order 24 and 512 at order 36.
+
+131
+00:11:17,862 --> 00:11:27,602
+Two microns at order 24 alone give 455, 27 percent of the nominal peak.
+
+132
+00:11:29,122 --> 00:11:34,694
+This is the lab's curve of peak acceleration error against speed.
+
+133
+00:11:35,094 --> 00:11:43,572
+The yellow dashed line is the 169 limit and the vertical line is the 6000
+
+134
+00:11:43,592 --> 00:11:45,434
+r/min top speed.
+
+135
+00:11:45,834 --> 00:11:49,661
+In the standard case the curve stays under the limit.
+
+136
+00:11:50,061 --> 00:11:54,105
+Add the order-24 chatter and the whole curve jumps up;
+
+137
+00:11:54,125 --> 00:11:58,321
+where it crosses the limit is the highest allowed speed.
+
+138
+00:11:58,721 --> 00:12:02,498
+Because the error grows with the square of speed,
+
+139
+00:12:02,518 --> 00:12:08,233
+the allowed speed is the original speed times the square root of the limit
+
+140
+00:12:08,253 --> 00:12:09,938
+over the actual error.
+
+141
+00:12:11,458 --> 00:12:16,723
+Once you've measured the lift error, you can add it, reversed,
+
+142
+00:12:16,743 --> 00:12:21,838
+to the grinding path and grind again: compensation grinding.
+
+143
+00:12:22,238 --> 00:12:24,595
+It never cleans up completely.
+
+144
+00:12:24,995 --> 00:12:28,483
+The gauge has error, the machine has error,
+
+145
+00:12:28,503 --> 00:12:33,541
+and the wheel touches the profile over an arc with some width,
+
+146
+00:12:33,561 --> 00:12:38,109
+which acts like a low-pass filter: the higher the order,
+
+147
+00:12:38,129 --> 00:12:40,394
+the harder it is to correct.
+
+148
+00:12:40,794 --> 00:12:46,156
+In our model one round removes 84 percent of order two,
+
+149
+00:12:46,176 --> 00:12:51,734
+78 percent of order six, and only 20 percent of order 24.
+
+150
+00:12:52,134 --> 00:12:59,258
+On the right, dashed is as ground and solid is after one round:
+
+151
+00:12:59,278 --> 00:13:06,969
+the default looper cam goes from 16.6 to 3.0 microns peak to valley.
+
+152
+00:13:08,489 --> 00:13:16,295
+On a CNC cam grinder the C axis turns and the X axis follows:
+
+153
+00:13:16,315 --> 00:13:18,989
+X is a function of C.
+
+154
+00:13:19,389 --> 00:13:25,948
+That's exactly a robot arm using an electronic cam to make a joint follow a
+
+155
+00:13:25,968 --> 00:13:27,088
+master angle.
+
+156
+00:13:27,488 --> 00:13:30,638
+In a robot's path, interpolation ripple,
+
+157
+00:13:30,658 --> 00:13:35,869
+encoder sub-division error and the twice-per-revolution error of a
+
+158
+00:13:35,889 --> 00:13:39,832
+strain-wave reducer are all high-order components,
+
+159
+00:13:39,852 --> 00:13:46,172
+and the second derivative magnifies them into ripple in acceleration and torque,
+
+160
+00:13:46,192 --> 00:13:48,788
+seen as tool-tip shake and noise.
+
+161
+00:13:49,188 --> 00:13:55,945
+That's why robot paths use modified-trapezoid or S-curve profiles,
+
+162
+00:13:55,965 --> 00:14:02,723
+and why servo tuning must look specifically for high-order ripple.
+
+163
+00:14:03,123 --> 00:14:09,046
+And a robot joint housing's bearing and reducer bores must be bored in one set-up,
+
+164
+00:14:09,066 --> 00:14:11,583
+just like a sewing machine housing.
+
+165
+00:14:13,103 --> 00:14:15,215
+You've felt this on the road.
+
+166
+00:14:15,615 --> 00:14:21,810
+A pothole a few centimetres deep is barely noticed at low speed but jolts
+
+167
+00:14:21,830 --> 00:14:23,428
+hard at high speed:
+
+168
+00:14:23,448 --> 00:14:30,155
+the same amplitude, but the body's acceleration grows with the square of speed.
+
+169
+00:14:30,555 --> 00:14:35,591
+A washboard road shakes you more than one long gentle slope,
+
+170
+00:14:35,611 --> 00:14:38,793
+because its ripples are of high order,
+
+171
+00:14:38,813 --> 00:14:43,175
+and acceleration grows with the square of the order.
+
+172
+00:14:43,575 --> 00:14:47,875
+Chatter on a cam profile is a tiny washboard road.
+
+173
+00:14:49,395 --> 00:14:51,295
+Back to the opening problem.
+
+174
+00:14:51,695 --> 00:15:03,691
+Omega is 628, so the nominal peak is about 1690 and the limit 169.
+
+175
+00:15:04,091 --> 00:15:12,888
+Two microns at order 24 alone give 455, 2.7 times the limit.
+
+176
+00:15:13,288 --> 00:15:19,361
+With the other errors included it's about 469 as ground;
+
+177
+00:15:19,381 --> 00:15:26,869
+on a 60 gram looper carrier that's an extra 28 newtons at 2400 hertz,
+
+178
+00:15:26,889 --> 00:15:32,091
+the source of the noise and the ball-joint wear,
+
+179
+00:15:32,111 --> 00:15:37,205
+and the criterion allows only about 3600 r/min.
+
+180
+00:15:37,605 --> 00:15:47,545
+One round of compensation brings it to 366, still only about 4080 r/min.
+
+181
+00:15:47,945 --> 00:15:50,584
+More compensation won't do,
+
+182
+00:15:50,604 --> 00:15:55,804
+since each round removes only 20 percent of order 24.
+
+183
+00:15:56,204 --> 00:16:00,537
+Remove it in the process: balance and dress the wheel,
+
+184
+00:16:00,557 --> 00:16:06,744
+make the grinder stiffer and better damped, and finish with spark-out passes.
+
+185
+00:16:08,264 --> 00:16:13,393
+Now Virtual lab 25-1, cam profile error and compensation grinding,
+
+186
+00:16:13,413 --> 00:16:19,167
+which you can do yourself on WenQuest. The criteria and tasks are blurred.
+
+187
+00:16:19,187 --> 00:16:25,253
+On the left: the magnified profile error, the lift-error curve, the harmonics,
+
+188
+00:16:25,273 --> 00:16:31,339
+and acceleration error against speed. On the right you set the heat treatment,
+
+189
+00:16:31,359 --> 00:16:36,644
+the finishing passes, a machine-error harmonic and the wheel radius.
+
+190
+00:16:37,044 --> 00:16:42,849
+Task one: in the standard case, click 'Compensation grind one round'.
+
+191
+00:16:42,869 --> 00:16:49,264
+Use the harmonic chart to see which orders drop a lot and which barely move.
+
+192
+00:16:49,664 --> 00:16:56,318
+Task two: drag the dressed wheel radius to 199.80 and untick the radius update,
+
+193
+00:16:56,338 --> 00:17:02,569
+then compensate once and see whether the size error can pass. If it can't,
+
+194
+00:17:02,589 --> 00:17:07,469
+why not, and what should come first, is for you to answer.
+
+195
+00:17:07,869 --> 00:17:12,310
+Task three: reset and press Chatter, order 24, 2 microns,
+
+196
+00:17:12,330 --> 00:17:17,868
+and watch the acceleration curve rise. After one round of compensation,
+
+197
+00:17:17,888 --> 00:17:21,077
+read the acceleration error at top speed,
+
+198
+00:17:21,097 --> 00:17:26,009
+work out the allowed top speed yourself, and enter it to check.
+
+199
+00:17:26,409 --> 00:17:30,593
+Finally switch to the take-up cam with the same chatter,
+
+200
+00:17:30,613 --> 00:17:35,022
+and work out why its acceleration error is so much smaller.
+
+201
+00:17:35,042 --> 00:17:38,776
+The guide and report template are on the platform.
+
+202
+00:17:40,296 --> 00:17:45,999
+This is the WenQuest digital factory. The assembly line measures every machine,
+
+203
+00:17:46,019 --> 00:17:50,997
+and each reading travels over the bus with its serial number into the
+
+204
+00:17:51,017 --> 00:17:53,171
+historian and a control chart,
+
+205
+00:17:53,191 --> 00:17:56,358
+which alarms as soon as the process changes.
+
+206
+00:17:56,378 --> 00:18:01,791
+The CMM and the cam gauge from today's lecture send one measurement message
+
+207
+00:18:01,811 --> 00:18:05,196
+per characteristic along exactly the same path.
+
+208
+00:18:05,596 --> 00:18:09,104
+Switch to the trace page. Besides the hook batch,
+
+209
+00:18:09,124 --> 00:18:13,569
+each machine's record holds the housing's casting heat number:
+
+210
+00:18:13,589 --> 00:18:16,377
+which melt its housing was poured from.
+
+211
+00:18:16,397 --> 00:18:19,617
+If a heat of housings ever missed its ageing,
+
+212
+00:18:19,637 --> 00:18:23,865
+that number would lead you to every machine they went into.
+
+213
+00:18:24,265 --> 00:18:29,993
+Drag the serial number and look through the machine records one by one.
+
+214
+00:18:30,013 --> 00:18:36,226
+The next two lectures walk through connected machines and the digital factory
+
+215
+00:18:36,246 --> 00:18:36,873
+in full.
+
+216
+00:18:38,393 --> 00:18:41,508
+Your assignment has four questions. One:
+
+217
+00:18:41,528 --> 00:18:46,994
+a steel bushing in a 30 millimetre bore of an aluminium housing has 10
+
+218
+00:18:47,014 --> 00:18:49,267
+microns of cold interference.
+
+219
+00:18:49,287 --> 00:18:53,734
+After a 35 kelvin rise, how much is left, will it loosen,
+
+220
+00:18:53,754 --> 00:18:55,693
+and how would you fix it?
+
+221
+00:18:56,093 --> 00:19:02,241
+Two: a design dimension of 28 plus or minus 0.03 is held by two operations.
+
+222
+00:19:02,261 --> 00:19:08,490
+Convert the operational tolerance by the worst-case and statistical methods,
+
+223
+00:19:08,510 --> 00:19:12,273
+and say what changes once the datums coincide.
+
+224
+00:19:12,673 --> 00:19:17,863
+Three: a looper cam has harmonics at orders 2, 3, 8 and 24.
+
+225
+00:19:17,883 --> 00:19:24,839
+Work out each acceleration error, judge whether it passes, how fast it may run,
+
+226
+00:19:24,859 --> 00:19:28,195
+and which order to tackle first. Four:
+
+227
+00:19:28,215 --> 00:19:31,816
+the shop wants to drop the second ageing;
+
+228
+00:19:31,836 --> 00:19:35,613
+write an opinion of no more than 300 words.
+
+229
+00:19:36,013 --> 00:19:40,833
+Submit the assignment and the lab report on the WenQuest platform.
+
+230
+00:19:42,353 --> 00:19:46,013
+There's also a ten-question quiz. For example:
+
+231
+00:19:46,033 --> 00:19:51,853
+a steel bushing sits in a 25 millimetre bore of an aluminium housing that
+
+232
+00:19:51,873 --> 00:19:53,373
+warms by 40 kelvin.
+
+233
+00:19:53,393 --> 00:19:56,732
+How many microns of interference are lost?
+
+234
+00:19:57,132 --> 00:20:04,625
+Or true or false: if every housing passes on the CMM after machining,
+
+235
+00:20:04,645 --> 00:20:09,415
+that proves skipping ageing carries no risk.
+
+236
+00:20:09,815 --> 00:20:15,160
+You get three attempts, and the explanations appear as soon as you submit.
+
+237
+00:20:16,680 --> 00:20:18,300
+Three takeaways.
+
+238
+00:20:18,700 --> 00:20:22,077
+One: the housing fixes positions.
+
+239
+00:20:22,477 --> 00:20:28,435
+Grey iron is well damped and expands like steel; aluminium is light,
+
+240
+00:20:28,455 --> 00:20:32,039
+but its bushing fits must be checked hot.
+
+241
+00:20:32,439 --> 00:20:37,829
+Residual stress can move the needle-bar bore by tens of microns,
+
+242
+00:20:37,849 --> 00:20:41,379
+and ageing decides whether accuracy lasts.
+
+243
+00:20:41,779 --> 00:20:47,027
+Two: bore accuracy comes from common datums, one face and two pins,
+
+244
+00:20:47,047 --> 00:20:51,587
+and boring in one set-up on a horizontal machining centre;
+
+245
+00:20:51,607 --> 00:20:57,799
+when datums don't coincide, convert the tolerances through the dimension chain.
+
+246
+00:20:58,199 --> 00:21:05,706
+Three: cams are shaped before hardening and made accurate by grinding after,
+
+247
+00:21:05,726 --> 00:21:12,539
+and order k gives an acceleration error of e k times k omega squared.
+
+248
+00:21:12,939 --> 00:21:19,279
+Low orders are easy to fix; high orders must be removed in the process.
+
+249
+00:21:19,679 --> 00:21:22,619
+The slides, the virtual lab,
+
+250
+00:21:22,639 --> 00:21:30,017
+the assignment and the quiz are all on the WenQuest learning platform,
+
+251
+00:21:30,037 --> 00:21:37,099
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+252
+00:21:37,499 --> 00:21:38,559
+See you next time.
