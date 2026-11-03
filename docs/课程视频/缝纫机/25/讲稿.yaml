@@ -1,0 +1,129 @@
+# 《缝纫机设计与制造》公开课 第 25 讲：机壳与凸轮的制造
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch25.yaml，2026-11-03 新做），配音是课件每页的讲稿（notes），
+# 中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 25-1（凸轮廓线误差与磨削补偿）录屏、数字工厂（第 23 轮 3.4：第 23–25 讲演示；平台示例是缝纫机总装线的质量闭环与追溯，
+# 本讲讲测量数据怎样上总线进控制图，以及整机档案里的机壳炉号，同第 23、24 讲的页面）、作业页、测验页。
+# 数字一律由 course/calc/ch25.py 算出（{{ch25.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "25"
+deck: ch25
+skip: [3, 6, 7, 10, 12, 16, 24]   # 两类零件（封面已说）、铸件结构与缺陷、时效原理（算例页已讲漂移）、3-2-1 与一面两销、机壳工艺路线、凸轮工艺路线（复映页已讲热处理后磨准）、数字化（数字工厂段讲）：课程部分约 10 分钟；这几页留给课件
+code: [ch25]
+title: ["机壳与凸轮的制造——一个定位置，一个定运动", "Making Housings and Cams — One Fixes Positions, the Other Fixes Motion"]
+chapter: ["第七篇 制造与数字工厂 · 第 25 章", "Part VII Manufacturing and the Digital Factory · Chapter 25"]
+next: ["第 26 讲", "Lecture 26"]
+cover_formula: '\Delta a_k=e_k\,(k\omega)^{2}'
+tags:
+  zh: [机壳, 灰铸铁, 铝合金压铸, 时效, 残余应力, 一面两销, 卧式加工中心, 工序尺寸链, 凸轮, 凸轮磨削, 误差复映, 砂轮半径补偿, 补偿磨削, 谐波, 缝纫机制造]
+  en: [machine housing, grey iron, aluminium die casting, stress-relief ageing, residual stress, one face two pins, horizontal machining centre, operational dimension chain, cam, cam grinding, error replication, wheel radius compensation, compensation grinding, harmonics, sewing machine manufacturing]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十五讲，机壳与凸轮的制造。
+    - 机壳最大，所有轴孔都在它上面；凸轮最讲形状，几微米的误差在高速下会变成很大的加速度误差。今天看这两类零件怎样做准、怎样保持住，以及一只“合格”的凸轮为什么高速时会响。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 25, making housings and cams.
+    - The housing is the largest part, carrying every shaft bore; the cam is the most shape-critical, where a few microns of error become a large acceleration error at speed. Today we see how these parts are made accurate, how they stay accurate, and why a cam that passes inspection can still be noisy at speed.
+
+after:
+  - id: lab251
+    kind: lab
+    lab: cam
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checks,#info,#tasks,#msg{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.getElementById('reset').click(); })()"
+        dur: 4
+      - press: "#comp"
+        dur: 6
+      - js: "(() => { document.getElementById('reset').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; const c = document.getElementById('rcomp'); setTimeout(function(){ f('R', 199.8); }, 800); setTimeout(function(){ c.checked = false; c.dispatchEvent(new Event('change', {bubbles: true})); }, 2000); })()"
+        dur: 7
+      - js: "(() => { document.getElementById('reset').click(); setTimeout(function(){ document.getElementById('chat').click(); }, 1000); })()"
+        dur: 7
+      - js: "(() => { const s = document.getElementById('cam'); s.value = 'takeup'; s.dispatchEvent(new Event('change', {bubbles: true})); setTimeout(function(){ document.getElementById('chat').click(); }, 800); })()"
+        dur: 6
+    say:
+      zh:
+        - ">下面是虚拟实验 25-1，凸轮廓线误差与磨削补偿，在问渠平台上可以亲手做，判据和任务先遮住。左边是廓线误差、升程误差、谐波和加速度误差曲线，右边调热处理、精磨次数、机床误差和砂轮半径。"
+        - ">任务一：标准工况下点一次“补偿磨削一轮”，对照谐波图，看哪些阶次修得多、哪些几乎没动。"
+        - ">任务二：把修整后的砂轮半径拖到 199.80，取消“更新半径”，先补偿一轮，看尺寸偏差能不能合格。如果不行，原因是什么、该先做什么，留给你来回答。"
+        - ">任务三：恢复标准，按“振纹：24 阶 2 微米”，看加速度曲线怎样抬高。补偿一轮后读出加速度误差，自己算允许的最高转速，填进去核对。"
+        - ">最后换成挑线凸轮，同样的振纹，比较加速度误差为什么小得多。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 25-1, cam profile error and compensation grinding, which you can do yourself on WenQuest. The criteria and tasks are blurred. On the left: the magnified profile error, the lift-error curve, the harmonics, and acceleration error against speed. On the right you set the heat treatment, the finishing passes, a machine-error harmonic and the wheel radius."
+        - ">Task one: in the standard case, click 'Compensation grind one round'. Use the harmonic chart to see which orders drop a lot and which barely move."
+        - ">Task two: drag the dressed wheel radius to 199.80 and untick the radius update, then compensate once and see whether the size error can pass. If it can't, why not, and what should come first, is for you to answer."
+        - ">Task three: reset and press Chatter, order 24, 2 microns, and watch the acceleration curve rise. After one round of compensation, read the acceleration error at top speed, work out the allowed top speed yourself, and enter it to check."
+        - ">Finally switch to the take-up cam with the same chatter, and work out why its acceleration error is so much smaller. The guide and report template are on the platform."
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    steps:
+      - js: "document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); document.getElementById('checksA').style.filter = 'blur(7px) grayscale(1)'"
+        press: "#play"
+      - press: "#tabB"
+        js: "setTimeout(() => { document.querySelectorAll('svg text').forEach(t => { if (!/已装整机|Built #|仓库剩余|Left in stores|已发货|Shipped/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }); document.querySelectorAll('svg text').forEach(t => { if (/装用起点|first used at/.test(t.textContent)) t.style.filter = 'blur(6px)'; }); ['cv3', 'checksL', 'late', 'latev', 'affIn'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; }); const s = document.createElement('style'); s.textContent = '#arch tr:nth-child(4) td.m, #arch tr:nth-child(11) td.m { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); }, 800)"
+      - sweep: {sn: [60, 100]}
+        dur: 8
+    say:
+      zh:
+        - ">这是问渠数字工厂。总装线逐台测量，每个读数带着序列号经过总线进入历史库和控制图，过程一变就报警。今天讲的三坐标和凸轮测量仪，每测一个特性发一条测量消息，走的是同一条路。"
+        - ">切到追溯页。每台整机的档案里除了旋梭批次，还记着机壳炉号，也就是这台机器的机壳是哪一炉铸出来的。万一哪一炉机壳漏了时效，就能顺着炉号找到装了它们的整机。"
+        - ">拖动序列号，一台一台地看整机档案。下两讲会完整地走一遍设备联网和数字工厂。"
+      en:
+        - ">This is the WenQuest digital factory. The assembly line measures every machine, and each reading travels over the bus with its serial number into the historian and a control chart, which alarms as soon as the process changes. The CMM and the cam gauge from today's lecture send one measurement message per characteristic along exactly the same path."
+        - ">Switch to the trace page. Besides the hook batch, each machine's record holds the housing's casting heat number: which melt its housing was poured from. If a heat of housings ever missed its ageing, that number would lead you to every machine they went into."
+        - ">Drag the serial number and look through the machine records one by one. The next two lectures walk through connected machines and the digital factory in full."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 25：机壳与凸轮的工艺校核", "Assignment 25: process checks for a housing and a cam"]
+      points:
+        - ["铝机壳轴套的热态过盈 · 工序尺寸链换算", "Hot bushing interference · converting a dimension chain"]
+        - ["弯针凸轮各阶谐波的加速度误差与允许转速", "Harmonic acceleration errors and allowed speed of a looper cam"]
+        - ["能不能取消第二次时效：写一段工程意见", "Can the second ageing go? Write an engineering opinion"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，铝机壳 Ø30 的孔装钢轴套，冷态过盈 10 微米，温升 35 K 以后还剩多少过盈、会不会松，怎么改。"
+        - ">第二题，设计尺寸 28 正负 0.03 由两道工序保证，用极值法和统计法换算工序公差，再说说基准重合以后怎么变。"
+        - ">第三题，一只弯针凸轮有 2、3、8、24 阶四个谐波，算各阶的加速度误差，判断合不合格、能跑多快、先处理哪一阶；第四题，车间想取消第二次时效，写一段不超过 300 字的意见。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: a steel bushing in a 30 millimetre bore of an aluminium housing has 10 microns of cold interference. After a 35 kelvin rise, how much is left, will it loosen, and how would you fix it?"
+        - ">Two: a design dimension of 28 plus or minus 0.03 is held by two operations. Convert the operational tolerance by the worst-case and statistical methods, and say what changes once the datums coincide."
+        - ">Three: a looper cam has harmonics at orders 2, 3, 8 and 24. Work out each acceleration error, judge whether it passes, how fast it may run, and which order to tackle first. Four: the shop wants to drop the second ageing; write an opinion of no more than 300 words."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["Ø25 铝机壳孔温升 40 K：过盈少多少微米？", "Ø25 aluminium bore, 40 K warmer: how much interference is lost?"]
+        - ["判断：三坐标全部合格，就证明省掉时效没风险？", "True or false: all-pass CMM results prove skipping ageing is safe?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：铝机壳上 Ø25 的孔装钢轴套，温升 40 K，热态过盈比冷态少多少微米？"
+        - ">再比如判断题：机壳加工完在三坐标上全部合格，就可以证明省掉时效没有风险。对不对？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: a steel bushing sits in a 25 millimetre bore of an aluminium housing that warms by 40 kelvin. How many microns of interference are lost?"
+        - ">Or true or false: if every housing passes on the CMM after machining, that proves skipping ageing carries no risk."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - See you next time.

@@ -63,3 +63,49 @@ H = {2: 4.0, 3: 2.0, 8: 2.5, 24: 0.8}
 parts = {k: v * 1e-6 * (k * w(6000)) ** 2 for k, v in H.items()}
 print("hw 各阶 m/s2", {k: round(v, 1) for k, v in parts.items()}, "上界和", round(sum(parts.values()), 1))
 print("hw 按上界和的允许转速", round(6000 * math.sqrt(169 / sum(parts.values()))))
+
+# numbers quoted by the slides (第 25 讲课件，2026-11-03): only when WQ_BOOK_OUT is set
+import os as _os
+if _os.environ.get("WQ_BOOK_OUT"):
+    import numpy as _np
+    from bookout import out
+    _c, _law = M.CAMS['looper'], 'mtrap'
+    def _ev(e, n=6000):
+        r = M.evaluate(_c, _law, e, n); return r['size'], r['pv'], r['aemax']
+    _e0 = M.error_curve(_c, _law); _ec = M.error_curve(_c, _law, k=24, ek=2.0)
+    _R = {"g": _ev(_e0), "gc": _ev(M.compensate(_e0)), "p2": _ev(M.error_curve(_c, _law, passes=2)),
+          "ind": _ev(M.error_curve(_c, _law, ht='ind')), "w": _ev(M.error_curve(_c, _law, R_act=199.8, rcomp=False)),
+          "wc": _ev(M.compensate(M.error_curve(_c, _law, R_act=199.8, rcomp=False))),
+          "ch": _ev(_ec), "chc": _ev(M.compensate(_ec))}
+    _nm = M.nominal(_c, _law)
+    _amax = float(_np.degrees(_np.abs(_nm['alpha']).max()))
+    _wshape = 200 * (1 / math.cos(math.radians(_amax)) - 1)
+    _d40, _I = drift(40); _d10 = drift(10)[0]
+    _yr = 1 - math.exp(-12 / 3)                         # 释放一半、时间常数 3 个月，一年后
+    _sH = math.sqrt((0.02 / 3) ** 2 + (0.03 / 3) ** 2)  # 不换算：A1 ±0.02、A2 ±0.03（±3σ），H0 的 σ
+    _ncdf = lambda z: 0.5 * (1 + math.erf(z / math.sqrt(2)))
+    # SPC 示意数据（与图 25-8 相同：figsrc/ch25_figs.py 的 spc_data / spc_limits）
+    _rng = _np.random.default_rng(7); _means = []; _ranges = []; _bad = []
+    for _g in range(25):
+        _x = _rng.normal(0.0 if _g < 16 else 0.0028 * (_g - 15), 0.004, 5); _means.append(_x.mean()); _ranges.append(_x.max() - _x.min()); _bad.append(bool((abs(_x) > 0.02).any()))
+    _means = _np.array(_means); _ranges = _np.array(_ranges)
+    _xb = _means[:15].mean(); _rb = _ranges[:15].mean(); _sg = _rb / 2.326
+    _alarm = int(_np.where(_means > _xb + 0.577 * _rb)[0][0]) + 1
+    a24 = 2e-6 * (24 * w(6000)) ** 2
+    out(a_nom=a_nom, lim=lim, w6=w(6000), a24=a24, p24=a24 / a_nom * 100, n24=6000 * math.sqrt(lim / a24),
+        pu1=1e-6 * w(6000) ** 2, pu6=1e-6 * (6 * w(6000)) ** 2, pu24=1e-6 * (24 * w(6000)) ** 2, pu36=1e-6 * (36 * w(6000)) ** 2,
+        g_s=_R["g"][0], g_pv=_R["g"][1], g_a=_R["g"][2], gc_s=_R["gc"][0], gc_pv=_R["gc"][1], gc_a=_R["gc"][2],
+        p2_pv=_R["p2"][1], p2_a=_R["p2"][2], ind_pv=_R["ind"][1], w_s=_R["w"][0], wc_s=_R["wc"][0], wc_pv=_R["wc"][1],
+        ch_pv=_R["ch"][1], ch_a=_R["ch"][2], chc_pv=_R["chc"][1], chc_a=_R["chc"][2], ch_p=_R["ch"][2] / a_nom * 100,
+        n_ch=M.n_allow(_c, _law, _ec), n_chc=M.n_allow(_c, _law, M.compensate(_ec)),
+        n_chr=round(M.n_allow(_c, _law, _ec), -1), n_chcr=round(M.n_allow(_c, _law, M.compensate(_ec)), -1), r24=a24 / lim,
+        eta2=M.eta(2) * 100, eta6=M.eta(6) * 100, eta24=M.eta(24) * 100,
+        f24=24 * 6000 / 60, F24=0.06 * _R["ch"][2],
+        amax=_amax, wshape=_wshape, rho=float(_nm['rho_c'].min()),
+        dAl=20 * 23e-6 * 30 * 1000, dSt=20 * 11.5e-6 * 30 * 1000,
+        d40=_d40, d10=_d10, d40y=_d40 / 2 * _yr, d10y=_d10 / 2 * _yr, I=_I,
+        turn=2 * 5 + 150e3 * math.radians(5 / 3600),
+        A2=115 - 32, T2e=(0.03 - 0.02) * 1000, T2s=math.sqrt(0.03 ** 2 - 0.02 ** 2) * 1000, y_noconv=(2 * _ncdf(0.03 / _sH) - 1) * 100,
+        e2a=20 * 0.25, e2b=20 * 0.25 ** 2,
+        spc_c=_xb * 1000, spc_u=(_xb + 0.577 * _rb) * 1000, spc_l=(_xb - 0.577 * _rb) * 1000,
+        spc_cpk=min(0.02 - _xb, _xb + 0.02) / (3 * _sg), spc_alarm=_alarm, spc_out=_bad.index(True) + 1)

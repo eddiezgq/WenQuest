@@ -1,0 +1,449 @@
+# 第 25 讲 机壳与凸轮的制造 · 课件（第 24 轮新版式，2026-11-03 新做）
+# 每页一个意思、最多 3 条；中文在上、英文一行在下。版式见 textbook/tools/webcourse/wc_slides.py 的 LAYOUTS。
+# {{ch25.键:格式}} 由课程包程序 course/calc/ch25.py 算出（末尾 WQ_BOOK_OUT 块），不手写数字。
+lesson: 25
+code: [ch25]
+
+clips:
+  hero:          # 封面：三维平缝机透视（机壳半透明，看得见孔里的轴），主轴一直转，画面右移让开标题
+    page: model-lockstitch
+    selector: "#stage"
+    steps:
+      - {at: 0, js: "var b=document.getElementById('play');if(/^(播放|Play)$/.test(b.textContent.trim()))b.click();var l=document.getElementById('labels');if(l.checked)l.click();document.querySelector('[data-m=xray]').click()"}
+      - {at: 1, js: "window.__view(-0.16)"}
+  camv:          # 实验 25-1：凸轮与放大的误差，标准工况 ↔ 24 阶 2 μm 振纹，轮流
+    page: cam
+    selector: "#cv_cam"
+    loop: 8
+    steps:
+      - {at: 0, press: "#reset"}
+      - {at: 4, press: "#chat"}
+  spd:           # 实验 25-1：加速度误差随转速，标准工况 ↔ 24 阶振纹，轮流
+    page: cam
+    selector: "#cv_spd"
+    loop: 8
+    steps:
+      - {at: 0, press: "#reset"}
+      - {at: 4, press: "#chat"}
+  comp:          # 实验 25-1：升程误差，磨后 ↔ 补偿磨削一轮，轮流
+    page: cam
+    selector: "#cv_err"
+    loop: 8
+    steps:
+      - {at: 0, press: "#reset"}
+      - {at: 4, press: "#comp"}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 25 讲", "Lecture 25"]
+    title: ["机壳与凸轮的制造", "Housings and Cams"]
+    sub: ["一个定位置，一个定运动", "One fixes positions, the other fixes motion"]
+    notes:
+      - "同学们好。上一讲看了机针和旋梭这两件最小的零件，今天看另外两类：机壳最大，整台机器所有的轴孔都在它上面；凸轮最讲究形状，它的廓线就是从动件的运动规律。一个定位置，一个定运动。"
+      - "Hello everyone. Last time we looked at the two smallest parts, the needle and the hook. Today it's two other kinds: the housing, the largest part, which carries every shaft bore in the machine; and the cam, the most shape-critical part, whose profile is the follower's motion law. One fixes positions, the other fixes motion."
+
+  - layout: question
+    tag: ["车间问题", "Shop-floor problem"]
+    title: ["升程误差合格，高速时却响", "Lift error in tolerance, yet noisy at speed"]
+    facts:
+      - ["弯针凸轮补偿磨削后 P-V 约 5 μm，图纸合格", "Looper cams after compensation: about 5 μm P-V, in spec"]
+      - ["6000 r/min 噪声大，球铰很快磨出间隙", "Noisy at 6000 r/min; the ball joints soon wear slack"]
+      - ["谐波分析：24 阶、约 2 μm 的振纹", "Harmonic analysis: order 24, about 2 μm of chatter"]
+    notes:
+      - "先看一个车间问题。一批链缝机的弯针凸轮做过补偿磨削，升程误差 P-V 约 5 微米，按图纸合格。凸轮行程 6 毫米、推程 150 度，最高 6000 转。可装机以后高速噪声明显偏大，弯针架的球铰很快磨出间隙。谐波分析发现，误差里有一个 24 阶、约 2 微米的振纹。工厂的判据是：最高转速下，加速度误差不超过名义峰值的 10%。这只凸轮能跑多快？再补偿一轮行不行？最后回答。"
+      - "Here's a shop-floor problem. A batch of chainstitch looper cams has been compensation-ground, and the lift error is about 5 microns peak to valley, within the drawing. Stroke 6 millimetres, a 150 degree rise, modified trapezoid, top speed 6000 r/min. Yet once fitted, the machines are clearly noisier at speed, and the looper-carrier ball joints soon wear slack. Harmonic analysis finds an order-24 component of about 2 microns: chatter left by the grinder. The plant's rule: at top speed, the acceleration error must stay within 10 percent of the nominal peak. How fast can this cam run? Would another round of compensation fix it? We'll answer at the end."
+
+  - layout: points
+    title: ["两类零件：一个最大，一个最讲形状", "Two kinds of part: the largest and the most shape-critical"]
+    points:
+      - ["机壳：所有轴孔都在它上面，决定相对位置", "Housing: every shaft bore is in it; it fixes all positions"]
+      - ["凸轮：廓线就是从动件的运动规律", "Cam: its profile is the follower's motion law"]
+      - ["问题一：省掉时效，三个月后跳针", "Problem 1: no ageing, skipped stitches three months later"]
+    foot: ["机壳的孔位要在加工时做准，还要在以后几年里保持不变", "A housing's bores must be right when machined, and stay right for years"]
+    notes:
+      - "机壳是整台机器的骨架，上轴、下轴、针杆、压脚杆、送布轴的孔都开在它上面，孔一加工出来，第 23 讲那条尺寸链的大部分环节就定了。车间里还有另一个问题：某厂为赶交货省掉了时效，机壳加工、装配、试缝都合格，三个月后却陆续跳针，梭尖间隙变了二三十微米。原因就在机壳本身。"
+      - "The housing is the machine's skeleton. The bores for the main shaft, the hook shaft, the needle bar, the presser bar and the feed shafts are all machined into it, and once they're machined, most links of the tolerance chain from Lecture 23 are settled. There's a second shop-floor story: to meet a delivery date, a plant skipped ageing. The housings passed machining, assembly and test sewing, yet three months later machines began skipping stitches, with the hook gap shifted by twenty or thirty microns. The cause was the housing itself."
+
+  - layout: section
+    num: "01"
+    title: ["机壳：材料、铸造与时效", "Housings: material, casting and ageing"]
+
+  - layout: split
+    title: ["灰铸铁还是铝压铸", "Grey iron or die-cast aluminium"]
+    points:
+      - ["灰铸铁：阻尼高，膨胀与钢接近", "Grey iron: well damped, expands like steel"]
+      - ["铝压铸：轻、近净形；模具贵，适合大批量", "Aluminium die casting: light, near-net; costly dies, big volumes"]
+      - ["铝机壳 Ø20 孔温升 30 K：过盈少 {{ch25.dSt:.1f}} μm", "Aluminium, Ø20 bore, 30 K warmer: {{ch25.dSt:.1f}} μm less interference"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <g font-size="28" font-weight="800"><text x="300" y="44" fill="#4c8dff" class="zh">灰铸铁</text><text x="300" y="44" fill="#4c8dff" class="eo">Grey iron</text><text x="620" y="44" fill="#ff7a45" class="zh">铝合金</text><text x="620" y="44" fill="#ff7a45" class="eo">Aluminium</text></g>
+          <g font-size="26" fill="#d3deea"><text x="20" y="130" class="zh">密度</text><text x="20" y="130" class="eo">Density</text><text x="20" y="300" class="zh">弹性模量</text><text x="20" y="300" class="eo">Modulus</text><text x="20" y="470" class="zh">线膨胀系数</text><text x="20" y="470" class="eo">Expansion</text></g>
+          <g fill="#4c8dff"><rect x="220" y="150" width="560" height="34" rx="8"/><rect x="220" y="320" width="560" height="34" rx="8"/><rect x="220" y="490" width="300" height="34" rx="8"/></g>
+          <g fill="#ff7a45"><rect x="220" y="194" width="210" height="34" rx="8"/><rect x="220" y="364" width="327" height="34" rx="8"/><rect x="220" y="534" width="610" height="34" rx="8"/></g>
+          <g font-size="24" fill="#f3f6fa"><text x="232" y="176">7.2 g/cm³</text><text x="440" y="220">2.7 g/cm³</text><text x="232" y="346">100–140 GPa</text><text x="557" y="390">≈ 70 GPa</text><text x="232" y="516">10–11 ×10⁻⁶/K</text><text x="232" y="560">21–23 ×10⁻⁶/K</text></g>
+          <text x="20" y="620" font-size="24" fill="#f2b705" class="zh">钢约 11.5 ×10⁻⁶/K：铸铁和钢一起胀，铝胀得多一倍</text><text x="20" y="620" font-size="24" fill="#f2b705" class="eo">Steel ≈ 11.5 ×10⁻⁶/K: iron grows with it, aluminium twice as much</text>
+        </svg>
+    notes:
+      - "机壳形状复杂、内腔多，毛坯几乎都是铸件。工业平缝机传统上用灰铸铁砂型铸造：片状石墨让它阻尼高，膨胀系数和钢接近。铝合金压铸轻、接近净形，但模具贵，适合大批量。铝的膨胀系数是钢的两倍：温升 30 K，Ø20 的孔胀大 {{ch25.dAl:.1f}} 微米，钢轴套只胀 {{ch25.dSt:.1f}}，过盈少了 {{ch25.dSt:.1f}} 微米。所以铝机壳的轴套配合要按热态校核。"
+      - "Housings are complex, with many cavities, so the blanks are nearly always castings. Industrial lockstitch housings have traditionally been sand-cast grey iron: flake graphite gives it high damping, a dull sound, and it expands about as much as steel. Die-cast aluminium is light and near net shape, but the dies are expensive, so it suits domestic machines made by the hundred thousand. Aluminium expands twice as much as steel. Warm the housing by 30 kelvin and a 20 millimetre bore grows {{ch25.dAl:.1f}} microns while the steel bushing grows only {{ch25.dSt:.1f}}: the interference drops by {{ch25.dSt:.1f}} microns. So bushing fits in aluminium housings must be checked hot."
+
+  - layout: points
+    title: ["铸件结构与铸造缺陷", "Casting design and casting defects"]
+    points:
+      - ["好铸、好加工、不变形：壁厚均匀、圆角、拔模斜度", "Easy to cast and machine, and stable: even walls, fillets, draft"]
+      - ["灰铸铁：石墨膨胀抵消部分收缩，适合薄壁", "Sand-cast iron: graphite growth offsets shrinkage; good for thin walls"]
+      - ["压铸：皮下卷气，加工后露出会渗油", "Die casting: trapped gas under the skin can leak oil once machined"]
+    foot: ["内部缺陷靠 X 射线抽检；油池、油路在加工后做渗漏试验", "X-ray samples for internal defects; leak-test the oil sump after machining"]
+    notes:
+      - "好的铸件结构“好铸、好加工、不变形”：壁厚尽量均匀，厚处冷得慢、得不到补缩就出缩孔；转角做圆角，防止开裂；竖壁有拔模斜度；机臂靠加强筋；还要留清砂的工艺孔和第一道工序用的粗基准。压铸的问题是几十毫秒高速充型时卷入气体，气孔藏在表皮下，加工后露出来，靠近油池就渗油。所以渗漏试验放在加工以后做。"
+      - "A good casting design is easy to cast, easy to machine and stays put. Keep walls even: a thick spot cools last and, without feeding, leaves a shrinkage cavity. Round every corner against cracking, give vertical walls draft, stiffen the arm with ribs, and leave core-clearing holes and a sound rough datum for the first operation. The weak point of die casting is gas trapped during a fill of a few tens of milliseconds. The pores hide under the skin, machining opens them, and near the oil sump they leak. That's why the leak test comes after machining."
+
+  - layout: split
+    title: ["时效为什么不能省", "Why ageing can't be skipped"]
+    points:
+      - ["冷却先后不同，留下相互平衡的残余应力", "Uneven cooling leaves balanced residual stresses"]
+      - ["加工或慢慢松弛打破平衡，机臂弯曲", "Machining or slow relaxation upsets them; the arm bends"]
+      - ["人工时效：缓慢加热、保温、随炉缓冷", "Stress-relief ageing: heat slowly, soak, cool in the furnace"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <rect x="110" y="40" width="760" height="495" fill="#2ec4b6" opacity=".08"/>
+          <path d="M110 40 L870 40" stroke="#f2b705" stroke-width="3" stroke-dasharray="12 8"/>
+          <text x="124" y="80" font-size="24" fill="#f2b705" class="zh">梭尖间隙允许偏离 ±30 μm</text><text x="124" y="80" font-size="24" fill="#f2b705" class="eo">Hook-gap window ±30 μm</text>
+          <path d="M110 535 L870 535 M110 535 L110 30" stroke="#8fa3ba" stroke-width="3"/>
+          <path d="M110 535 C160 330 230 160 350 128 C480 108 650 104 870 104" fill="none" stroke="#ff7a45" stroke-width="7"/>
+          <path d="M110 535 C160 480 230 450 350 433 C480 426 650 425 870 425" fill="none" stroke="#2ec4b6" stroke-width="7"/>
+          <g font-size="30" font-weight="800"><text x="620" y="160" fill="#ff7a45">≈ {{ch25.d40y:.0f}} μm</text><text x="620" y="478" fill="#2ec4b6">≈ {{ch25.d10y:.0f}} μm</text></g>
+          <g font-size="24"><text x="620" y="196" fill="#ff7a45" class="zh">不时效（40 MPa）</text><text x="620" y="196" fill="#ff7a45" class="eo">Not aged (40 MPa)</text><text x="620" y="514" fill="#2ec4b6" class="zh">时效后（10 MPa）</text><text x="620" y="514" fill="#2ec4b6" class="eo">Aged (10 MPa)</text></g>
+          <g font-size="24" fill="#8fa3ba"><text x="100" y="572">0</text><text x="455" y="572" class="zh">加工后 12 个月</text><text x="455" y="572" class="eo">12 months</text><text x="810" y="572" class="zh">24</text><text x="830" y="572" class="eo">24</text></g>
+          <text x="110" y="620" font-size="24" fill="#8fa3ba" class="zh">针杆孔前后漂移（算例，示意值）</text><text x="110" y="620" font-size="24" fill="#8fa3ba" class="eo">Needle-bar bore drift (worked example, illustrative)</text>
+        </svg>
+    notes:
+      - "铸件冷却时，薄壁和表层先冷、先收缩，厚处和内部后收缩，被先凝固的部分拉住，冷到室温就留下相互平衡的残余应力。加工去掉材料，或应力自己慢慢松弛，平衡被打破，铸件就变形。后一种要几周到几个月才显现：出厂时合格，在用户手里变形，装配调整吸收不了。时效就是在加工以前把应力降下来，常见做法是缓慢加热、保温几小时、随炉缓冷；重要机壳铸造后、粗加工后各做一次。"
+      - "As a casting cools, thin walls and the skin cool and shrink first; thick sections and the core shrink later and are held back by what has already set, so at room temperature balanced residual stresses remain. Remove material by machining, or let the stresses slowly relax, and the balance breaks: the casting distorts. The slow kind takes weeks to months. The housing passes at the factory and distorts in the customer's hands, where no assembly adjustment can absorb it. Ageing lowers the stresses before machining: heat slowly, soak for a few hours, cool in the furnace. Important housings get it twice, after casting and again after rough machining."
+
+  - layout: split
+    title: ["算例：针杆孔会漂多少", "Worked example: how far the bore moves"]
+    points:
+      - ["机臂看成箱形悬臂梁：L = 250 mm，E = 120 GPa", "The arm as a box cantilever: L = 250 mm, E = 120 GPa"]
+      - ["40 MPa 全部释放：漂移约 {{ch25.d40:.0f}} μm", "40 MPa in the front skin, fully released: about {{ch25.d40:.0f}} μm"]
+      - ["漂移与不平衡应力成正比：时效把它降下来", "Drift is proportional to the unbalanced stress: ageing lowers it"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <rect x="40" y="80" width="70" height="360" rx="6" fill="#4b5f7d"/>
+          <rect x="110" y="140" width="640" height="110" rx="8" fill="#22324d" stroke="#8fa3ba" stroke-width="4"/>
+          <rect x="110" y="236" width="640" height="14" fill="#ff7a45"/>
+          <path d="M110 140 Q450 120 750 96" fill="none" stroke="#f2b705" stroke-width="4" stroke-dasharray="12 8"/>
+          <path d="M790 150 L790 98" stroke="#f2b705" stroke-width="4"/><path d="M780 112 L790 96 L800 112" fill="none" stroke="#f2b705" stroke-width="4"/>
+          <text x="806" y="140" font-size="34" font-weight="800" fill="#f2b705">δ</text>
+          <text x="300" y="295" font-size="24" fill="#ff7a45" class="zh">前壁 2 mm 表层：不平衡应力 σ</text><text x="300" y="295" font-size="24" fill="#ff7a45" class="eo">2 mm front skin: unbalanced stress σ</text>
+          <text x="430" y="205" font-size="26" fill="#d3deea">L = 250 mm</text>
+          <g font-size="30" fill="#f3f6fa" font-weight="700"><text x="60" y="390">F = σ t h</text><text x="300" y="390">M = F (B − t)/2</text><text x="60" y="460">κ = M / EI</text><text x="300" y="460">δ = κ L² / 2</text></g>
+          <g font-size="28" font-weight="800"><text x="60" y="540" fill="#ff7a45">40 MPa → {{ch25.d40:.0f}} μm</text><text x="60" y="590" fill="#2ec4b6">10 MPa → {{ch25.d10:.0f}} μm</text></g>
+          <text x="500" y="560" font-size="24" fill="#8fa3ba" class="zh">截面 60 × 70 mm，壁厚 7 mm</text><text x="500" y="560" font-size="24" fill="#8fa3ba" class="eo">Section 60 × 70 mm, 7 mm walls</text>
+        </svg>
+    notes:
+      - "铸件里有残余应力，加工后慢慢松弛，机臂就会弯，针杆孔跟着漂。能漂多少，可以估个量级。把机臂看成从立柱伸出的箱形悬臂梁，长 250 毫米。设前壁 2 毫米的表层里有不平衡残余应力，后壁没有：合力乘力臂是弯矩，除以 EI 是曲率，再乘 L 方除以 2，就是针杆孔的移动。40 兆帕全部释放约 {{ch25.d40:.0f}} 微米；假设常温下最终释放一半、时间常数三个月，一年后约 {{ch25.d40y:.0f}} 微米；时效到 10 兆帕，只有约 {{ch25.d10y:.0f}} 微米。而梭尖间隙只允许偏 ±30 微米。"
+      - "We can estimate the size of it. Treat the arm as a box cantilever from the pillar: 250 millimetres long, a 60 by 70 section, 7 millimetre walls. Suppose the front wall's 2 millimetre skin carries an unbalanced residual stress sigma that the back wall doesn't. Its resultant times the lever arm is a moment; the moment over EI is a curvature; curvature times L squared over two is how far the needle-bar bore at the tip moves. Release all of 40 megapascals and that's about {{ch25.d40:.0f}} microns. At room temperature, assume half is released with a three-month time constant: about {{ch25.d40y:.0f}} microns after a year. Aged down to 10 megapascals, only about {{ch25.d10y:.0f}}. The hook gap allows just plus or minus 30."
+
+  - layout: section
+    num: "02"
+    title: ["孔系：基准、一次装夹与尺寸链", "Bores: datums, one set-up and dimension chains"]
+
+  - layout: split
+    title: ["3-2-1 定位与一面两销", "3-2-1 location, and one face with two pins"]
+    points:
+      - ["粗基准只用一次；精基准求重合、求统一", "Use the rough datum once; finish datums coincide and stay common"]
+      - ["3 + 2 + 1 个点，限制 6 个自由度", "3 + 2 + 1 points fix all six degrees of freedom"]
+      - ["一面两销：底面 A + 圆柱销 + 削边销", "One face, two pins: face A, a round pin and a diamond pin"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M140 300 L560 300 L700 200 L280 200 Z" fill="#22324d" stroke="#4c8dff" stroke-width="4"/>
+          <path d="M140 300 L560 300 L560 470 L140 470 Z" fill="#1b2840" stroke="#8fa3ba" stroke-width="4"/>
+          <path d="M560 300 L700 200 L700 370 L560 470 Z" fill="#1d3a3a" stroke="#2ec4b6" stroke-width="4"/>
+          <g fill="#ff7a45"><circle cx="210" cy="500" r="13"/><circle cx="470" cy="500" r="13"/><circle cx="380" cy="545" r="13"/></g>
+          <g fill="#f2b705"><circle cx="330" cy="225" r="13"/><circle cx="560" cy="225" r="13"/></g>
+          <circle cx="742" cy="300" r="13" fill="#2ec4b6"/>
+          <path d="M370 40 L370 190" stroke="#f3f6fa" stroke-width="6"/><path d="M352 160 L370 196 L388 160" fill="#f3f6fa"/>
+          <g font-size="26" font-weight="700"><text x="120" y="600" fill="#ff7a45" class="zh">底面 A：3 点</text><text x="120" y="600" fill="#ff7a45" class="eo">Face A: 3 points</text><text x="420" y="140" fill="#f2b705" class="zh">侧面 B：2 点</text><text x="420" y="140" fill="#f2b705" class="eo">Side B: 2 points</text><text x="700" y="440" fill="#2ec4b6" class="zh">端面 C：1 点</text><text x="700" y="440" fill="#2ec4b6" class="eo">End C: 1 point</text></g>
+          <text x="400" y="70" font-size="24" fill="#d3deea" class="zh">夹紧力压向定位点</text><text x="400" y="70" font-size="24" fill="#d3deea" class="eo">Clamp towards the locators</text>
+        </svg>
+    notes:
+      - "加工从选基准开始。第一道工序只能用毛坯面定位，叫粗基准，要选平整、余量最小、和重要加工面关系最紧的面，而且只用一次。以后用加工过的精基准，尽量和设计基准重合，尽量各工序共用。最基本的是 3-2-1 定位：底面 3 点、侧面 2 点、端面 1 点，限制 6 个自由度。机壳批量加工常用一面两销：底面 A 铣平，钻铰两个相距较远的销孔，一个圆柱销、一个削边销。夹紧力要压向定位点，不能把薄壁压变形。"
+      - "Machining starts with choosing datums. The first operation can only locate on cast surfaces, the rough datum: pick a flat one, with the least stock and the closest tie to the key machined faces, and use it only once. After that, use machined finish datums, as close to the design datums as possible and shared by as many operations as possible. The basic scheme is 3-2-1: three points on the base, two on the side, one on the end, fixing all six degrees of freedom. Housings in volume usually use one face and two pins: mill face A flat, drill and ream two pin holes far apart, then locate on a round pin and a diamond pin. Clamp towards the locators, never hard enough to spring a thin wall."
+
+  - layout: split
+    title: ["一次装夹镗孔：同轴度怎样保证", "Boring in one set-up: holding coaxiality"]
+    points:
+      - ["卧式加工中心转台分度：一次装夹做四个面", "An HMC's rotary table indexes: four faces in one set-up"]
+      - ["一次镗通：一根镗杆穿过各孔，约 3–5 μm", "Line boring: one bar through every bore, about 3–5 μm"]
+      - ["调头镗：2δc + LΔθ，算例约 {{ch25.turn:.0f}} μm", "Turn-round boring: 2δc + LΔθ, about {{ch25.turn:.0f}} μm here"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <text x="30" y="50" font-size="28" font-weight="800" fill="#2ec4b6" class="zh">一次镗通</text><text x="30" y="50" font-size="28" font-weight="800" fill="#2ec4b6" class="eo">Line boring</text>
+          <g fill="#22324d" stroke="#8fa3ba" stroke-width="4"><rect x="140" y="80" width="60" height="170" rx="6"/><rect x="420" y="80" width="60" height="170" rx="6"/><rect x="700" y="80" width="60" height="170" rx="6"/></g>
+          <path d="M40 165 L860 165" stroke="#2ec4b6" stroke-width="16" stroke-linecap="round"/>
+          <path d="M40 165 L860 165" stroke="#f3f6fa" stroke-width="2" stroke-dasharray="10 8"/>
+          <text x="30" y="300" font-size="24" fill="#d3deea">≈ 3–5 μm</text>
+          <text x="30" y="370" font-size="28" font-weight="800" fill="#ff7a45" class="zh">调头镗：转台转 180° 再镗另一端</text><text x="30" y="370" font-size="28" font-weight="800" fill="#ff7a45" class="eo">Turn-round: index 180°, bore the far end</text>
+          <g fill="#22324d" stroke="#8fa3ba" stroke-width="4"><rect x="140" y="400" width="60" height="170" rx="6"/><rect x="700" y="400" width="60" height="170" rx="6"/></g>
+          <path d="M40 485 L260 485" stroke="#ff7a45" stroke-width="16" stroke-linecap="round"/>
+          <path d="M640 499 L860 499" stroke="#4c8dff" stroke-width="16" stroke-linecap="round"/>
+          <path d="M260 485 L640 485" stroke="#f3f6fa" stroke-width="2" stroke-dasharray="10 8"/>
+          <path d="M600 470 L600 514" stroke="#f2b705" stroke-width="3"/><text x="520" y="460" font-size="24" fill="#f2b705">e ≈ 2δc + LΔθ</text>
+          <text x="30" y="620" font-size="24" fill="#d3deea" class="zh">δc 5 μm、Δθ 5″、L 150 mm：≈ {{ch25.turn:.0f}} μm</text><text x="30" y="620" font-size="24" fill="#d3deea" class="eo">δc 5 μm, Δθ 5″, L 150 mm: ≈ {{ch25.turn:.0f}} μm</text>
+        </svg>
+    notes:
+      - "机壳的孔分布在好几个面上，每重新装夹一次，就带来几微米到几十微米的定位误差。卧式加工中心的转台分度，装一次就能依次加工四个侧面，孔系位置只取决于机床精度。同一轴线上的孔，最好用一根长镗杆一次镗通，同轴度约 3 到 5 微米。镗杆够不到只好调头镗，会多出两项：两倍的回转中心找正误差，加上分度误差乘孔到中心的距离，算例约 {{ch25.turn:.0f}} 微米。所以设计时就要让镗杆能从一端穿过去。"
+      - "A housing's bores lie on several faces. Re-clamp for every face and each set-up adds a few to a few tens of microns of location error. A horizontal machining centre indexes its table about the B axis: clamp once, turn to 0, 90, 180 and 270 degrees, and machine four faces in turn, so the bore pattern depends only on the machine's accuracy. Bores on one axis are best line-bored with one long bar in a single pass, coaxial to about 3 to 5 microns. If the bar can't reach, you have to turn round, which adds two errors: twice the centring error of the table, plus the indexing error times the distance from the centre. In our example that's about {{ch25.turn:.0f}} microns. So the designer makes coaxial bores step down from one end, or keeps them equal, so one bar can pass through."
+
+  - layout: chain
+    title: ["机壳工艺路线：从铸件到三坐标", "The housing route: from casting to CMM"]
+    steps: [["铸件检验", "Inspect"], ["粗铣底面", "Mill base"], ["粗加工", "Rough"], ["二次时效", "Age"], ["底面与销孔", "Pin holes"], ["精铣钻攻", "Finish"], ["精镗孔系", "Bore"], ["去毛刺清洗", "Wash"], ["三坐标", "CMM"]]
+    hot: [6]
+    mark: ["关键", "key"]
+    foot: ["先基准后其他、先面后孔、粗精分开；三坐标的实测值全部保存", "Datums first, faces before bores, rough apart from finish; keep every CMM value"]
+    notes:
+      - "这是一条典型的灰铸铁机壳工艺路线。几条规律：先基准后其他，先面后孔，粗精分开；粗加工去掉大量材料，应力重新分布，所以粗加工后再时效一次；精镗孔系放在最后、一次装夹完成。之后去毛刺、清洗：油路交叉处的毛刺手工够不到，掉进轴套就会卡死。最后上三坐标，建坐标系、每孔测几个截面拟合圆柱，算同轴度、中心距。实测值要全部保存：每件都合格时，均值也可能在慢慢漂。"
+      - "Here's a typical route for a grey-iron housing. A few rules: datums first, faces before bores, roughing apart from finishing. Roughing removes a lot of metal and the stresses redistribute, so the housing is aged again after roughing. Finish boring of the bore pattern comes last, in one set-up. Then deburring and washing: a burr where oil holes cross is out of reach by hand, and if it drops into a bushing the shaft seizes. Finally the CMM builds the datum frame, probes several sections of each bore, fits cylinders and works out coaxiality and centre distances. Keep every measured value: even when every part passes, the mean may be drifting."
+
+  - layout: split
+    title: ["算例：工序尺寸链", "Worked example: an operational dimension chain"]
+    points:
+      - ["设计 H0 = 32 ± 0.03，却以底面 A 定位", "Design H0 = 32 ± 0.03, but located on face A"]
+      - ["A2 = {{ch25.A2:.0f}}：极值 ±{{ch25.T2e:.0f}} μm，统计 ±{{ch25.T2s:.0f}} μm", "A1 = 115 ± 0.02, A2 = {{ch25.A2:.0f}}: worst case ±{{ch25.T2e:.0f}}, statistical ±{{ch25.T2s:.0f}} μm"]
+      - ["不换算、直接给 ±0.03：合格率只有约 {{ch25.y_noconv:.1f}}%", "Unconverted ±0.03: only about {{ch25.y_noconv:.1f}}% good"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <rect x="120" y="200" width="560" height="360" rx="6" fill="#22324d" stroke="#8fa3ba" stroke-width="4"/>
+          <path d="M100 200 L800 200" stroke="#f2b705" stroke-width="8"/>
+          <path d="M100 560 L800 560" stroke="#ff7a45" stroke-width="8"/>
+          <circle cx="330" cy="330" r="46" fill="#0b1220" stroke="#4c8dff" stroke-width="5"/><path d="M200 330 L560 330" stroke="#4c8dff" stroke-width="2" stroke-dasharray="8 6"/><path d="M330 270 L330 390" stroke="#4c8dff" stroke-width="2" stroke-dasharray="8 6"/>
+          <g stroke="#f3f6fa" stroke-width="4"><path d="M740 210 L740 550"/><path d="M540 340 L540 550"/><path d="M220 210 L220 320"/></g>
+          <g fill="#f3f6fa"><path d="M730 226 L740 206 L750 226 Z M730 534 L740 554 L750 534 Z M530 356 L540 336 L550 356 Z M530 534 L540 554 L550 534 Z M210 226 L220 206 L230 226 Z M210 304 L220 324 L230 304 Z"/></g>
+          <g font-size="32" font-weight="800"><text x="756" y="395" fill="#f3f6fa">A1</text><text x="556" y="455" fill="#f3f6fa">A2</text><text x="150" y="278" fill="#2ec4b6">H0</text></g>
+          <g font-size="26"><text x="110" y="180" fill="#f2b705" class="zh">底板上平面（设计基准）</text><text x="110" y="180" fill="#f2b705" class="eo">Bed top (design datum)</text><text x="110" y="604" fill="#ff7a45" class="zh">底面 A（定位基准）</text><text x="110" y="604" fill="#ff7a45" class="eo">Face A (locating datum)</text><text x="300" y="420" fill="#4c8dff" class="zh">下轴孔</text><text x="250" y="420" fill="#4c8dff" class="eo">Hook-shaft bore</text></g>
+          <g font-size="28" fill="#f3f6fa"><text x="110" y="30">H0 = A1 − A2,  A1 = 115 ± 0.02</text><text x="110" y="70">T0 = T1 + T2</text><text x="470" y="70">T0² = T1² + T2²</text></g>
+          <g font-size="24" fill="#8fa3ba"><text x="110" y="108" class="zh">极值法</text><text x="110" y="108" class="eo">worst case</text><text x="470" y="108" class="zh">统计法</text><text x="470" y="108" class="eo">statistical</text></g>
+        </svg>
+    notes:
+      - "看一个基准不重合的算例。设计图上，下轴孔轴线到底板上平面是 32 正负 0.03 毫米；可加工时用底面 A 定位，铣上平面得到 A1，镗孔得到 A2。H0 是 A1 减 A2，是封闭环。A1 定为 115 正负 0.02，A2 名义 {{ch25.A2:.0f}}，极值法只剩正负 {{ch25.T2e:.0f}} 微米，统计法可放宽到正负 {{ch25.T2s:.0f}}。不换算、直接给镗孔 ±0.03，合格率只有约 {{ch25.y_noconv:.1f}}%。最好的办法是基准重合：镗孔直接以上平面定位或测量。"
+      - "Here's a datum mismatch. The drawing gives 32 plus or minus 0.03 millimetres from the hook-shaft bore axis to the top of the bed, because the hook height and the needle plate are measured from that face. But the housing is machined from face A underneath: milling the bed top gives A1, boring the hook-shaft bore gives A2. H0 isn't machined directly; it's A1 minus A2, the closing link. With A1 at 115 plus or minus 0.02, A2 is nominally {{ch25.A2:.0f}}, and the worst-case method leaves it only plus or minus {{ch25.T2e:.0f}} microns; the statistical method allows plus or minus {{ch25.T2s:.0f}}. Give the boring the full 0.03 without converting, and only about {{ch25.y_noconv:.1f}} percent pass. Better still, make the datums coincide: locate or gauge the boring from the bed top, and all 0.03 goes to the boring."
+
+  - layout: section
+    num: "03"
+    title: ["凸轮：运动规律与制造工艺", "Cams: motion laws and how they're made"]
+
+  - layout: split
+    title: ["凸轮的峰值加速度", "Peak acceleration of a cam"]
+    points:
+      - ["a_max = C·h·ω²/β²：修正梯形 C ≈ 4.89", "a_max = C h ω²/β²: modified trapezoid C ≈ 4.89"]
+      - ["弯针凸轮：h = 6 mm、推程 150°、6000 r/min", "Looper cam: h = 6 mm, 150° rise, 6000 r/min"]
+      - ["名义峰值约 {{ch25.a_nom:.0f}} m/s²；判据 10% 即 {{ch25.lim:.0f}}", "Nominal peak about {{ch25.a_nom:.0f}} m/s²; the 10% limit is {{ch25.lim:.0f}}"]
+    visual: {video: camv}
+    notes:
+      - "凸轮把主轴的匀速转动变成从动件按规律的往复运动，挑线、抬牙、弯针、之字、花样都用它。推程 h 在转角 β 里完成，峰值加速度是 C 乘 h ω 方除以 β 方，修正梯形的 C 约 4.89。算例弯针凸轮行程 6 毫米、推程 150 度，6000 转时名义峰值约 {{ch25.a_nom:.0f}}，判据 10% 就是 {{ch25.lim:.0f}}。右边是虚拟实验里的凸轮，红线是放大的实际廓线：标准工况和加上 24 阶振纹，轮流出现。"
+      - "A cam turns the steady rotation of the shaft into a reciprocating motion that follows a chosen law: take-up, feed-lift eccentrics, looper drives, zigzag and pattern cams all use one. If the stroke h is completed over a shaft angle beta, the peak acceleration is C times h omega squared over beta squared, and C is about 4.89 for the modified trapezoid. Our looper cam has a 20 millimetre base radius, a 6 millimetre roller and a 6 millimetre stroke over a 150 degree rise. At 6000 r/min the nominal peak is about {{ch25.a_nom:.0f}} metres per second squared, so the 10 percent limit is {{ch25.lim:.0f}}. On the right is the cam from the virtual lab, with the actual profile in red, error magnified: the standard case, then with order-24 chatter added, in turn."
+
+  - layout: chain
+    title: ["凸轮工艺路线：热处理后靠磨削做准", "The cam route: accuracy comes from grinding after hardening"]
+    steps: [["下料", "Saw"], ["车内孔端面", "Turn bore, face"], ["铣廓线", "Mill profile"], ["热处理", "Heat treat"], ["磨内孔端面", "Grind bore, face"], ["凸轮磨削", "Cam grinding"], ["廓线测量", "Measure profile"], ["清洗防锈", "Wash, protect"]]
+    hot: [3, 4, 5]
+    mark: ["关键", "key"]
+    foot: ["铣廓线留 0.2–0.3 mm 磨量；相位基准（键槽、销孔）与廓线同一次装夹", "Leave 0.2–0.3 mm to grind; cut the keyway or pin hole with the profile in one set-up"]
+    notes:
+      - "凸轮的工艺一句话：热处理以前把形状做出来，热处理以后靠磨削把形状做准。先车出内孔和端面，它们是以后的基准；廓线在加工中心上铣出，留 0.2 到 0.3 毫米磨量。键槽或销孔这个相位基准要和廓线一次装夹加工，否则装上轴相位就错了。廓线接触应力高，要淬硬：渗碳淬火变形大，孔变椭圆，廓线出二阶、三阶误差；感应淬火变形小些。热处理后先磨内孔端面，再以它们为基准磨廓线，最后在凸轮测量仪上测升程误差。"
+      - "The cam route in one sentence: make the shape before heat treatment, and make it accurate by grinding afterwards. Turning gives the bore and the faces, the datums for everything after. The profile is milled on a machining centre, leaving 0.2 to 0.3 millimetres to grind. The phase datum, the keyway or pin hole, must be cut in the same set-up as the profile, or the timing will be off once the cam is on its shaft. Contact stresses are high, so the profile is hardened. Carburising distorts more: the bore goes oval and the profile picks up second and third order errors; induction hardening distorts less. After heat treatment, grind the bore and faces, grind the profile from them, and finally measure the lift error on a cam gauge."
+
+  - layout: split
+    title: ["误差复映：每次精磨缩小到 ε 倍", "Error replication: each pass leaves ε of the error"]
+    points:
+      - ["余量大处切削力大、退让多：误差按比例复映", "More stock, more force, more deflection: the error replicates"]
+      - ["ε = 0.25：二阶 20 → {{ch25.e2a:.0f}} → {{ch25.e2b:.2f}} μm", "ε = 0.25: order 2 goes 20 → {{ch25.e2a:.0f}} → {{ch25.e2b:.2f}} μm"]
+      - ["磨量必须大于变形量 + 找正误差", "Grinding stock must exceed distortion plus set-up error"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M80 520 L860 520" stroke="#4b5f7d" stroke-width="3"/>
+          <rect x="120" y="120" width="160" height="400" rx="12" fill="#ff7a45"/>
+          <rect x="380" y="420" width="160" height="100" rx="12" fill="#f2b705"/>
+          <rect x="640" y="495" width="160" height="25" rx="8" fill="#2ec4b6"/>
+          <g font-size="40" font-weight="800" fill="#f3f6fa" text-anchor="middle"><text x="200" y="100">20 μm</text><text x="460" y="400">{{ch25.e2a:.0f}} μm</text><text x="720" y="475">{{ch25.e2b:.2f}} μm</text></g>
+          <g font-size="26" fill="#d3deea" text-anchor="middle"><text x="200" y="566" class="zh">热处理后</text><text x="200" y="566" class="eo">Hardened</text><text x="460" y="566" class="zh">精磨 1 次</text><text x="460" y="566" class="eo">1 pass</text><text x="720" y="566" class="zh">精磨 2 次</text><text x="720" y="566" class="eo">2 passes</text></g>
+          <text x="80" y="620" font-size="24" fill="#8fa3ba" class="zh">二阶形状误差（渗碳淬火，ε = 0.25，示意）</text><text x="80" y="620" font-size="24" fill="#8fa3ba" class="eo">Second-order error (carburised, ε = 0.25, illustrative)</text>
+        </svg>
+    notes:
+      - "磨削能去掉多少变形？这里有个概念叫误差复映。余量大的地方切削力大，砂轮和工件退让得多，余量小的地方退让得少，上一道的误差就按一定比例复映到下一道。复映系数 ε 小于 1，每多一次走刀，形状误差缩小到上一次的 ε 倍。算例取 0.25：渗碳淬火后二阶误差 20 微米，精磨一次剩 {{ch25.e2a:.0f}}，两次剩 {{ch25.e2b:.2f}}。次数多精度高，但工时长、砂轮修整也多，是成本和精度的权衡。"
+      - "How much distortion can grinding take out? The idea here is error replication. Where there's more stock the cutting force is higher and the wheel and work deflect more; where there's less they deflect less. So each operation's error is copied, scaled down, into the next. The replication factor epsilon is below one, and every extra pass shrinks the shape error to epsilon times the last. Take 0.25: after carburising, a second order error of 20 microns becomes {{ch25.e2a:.0f}} after one finishing pass and {{ch25.e2b:.2f}} after two. More passes, more accuracy, but more time and more wheel dressing: a trade-off between cost and accuracy."
+
+  - layout: split
+    title: ["数控凸轮磨削与砂轮半径", "CNC cam grinding and the wheel radius"]
+    points:
+      - ["C 轴转、X 轴进退：砂轮中心 = 廓线外偏 Rg", "C turns, X follows: wheel centre = profile offset by Rg"]
+      - ["修整后小了 d 没更新：升程处处多 d/cos α", "Dressed d smaller, not updated: lift is d/cos α too big"]
+      - ["小 0.2 mm：尺寸 +{{ch25.w_s:.0f}}，形状只 {{ch25.wshape:.1f}} μm", "d = 0.2 mm: size +{{ch25.w_s:.0f}} μm, shape only {{ch25.wshape:.1f}} μm"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M260 120 C380 120 420 240 410 330 C400 430 330 500 250 500 C160 500 110 420 110 320 C110 200 160 120 260 120 Z" fill="#22324d" stroke="#4c8dff" stroke-width="5"/>
+          <circle cx="250" cy="320" r="10" fill="#f3f6fa"/>
+          <path d="M250 200 A120 120 0 1 1 140 370" fill="none" stroke="#2ec4b6" stroke-width="4"/><path d="M128 352 L140 376 L156 356" fill="none" stroke="#2ec4b6" stroke-width="4"/>
+          <text x="80" y="200" font-size="32" font-weight="800" fill="#2ec4b6">C</text>
+          <circle cx="650" cy="320" r="235" fill="none" stroke="#ff7a45" stroke-width="6"/>
+          <circle cx="650" cy="320" r="10" fill="#ff7a45"/>
+          <path d="M650 320 L415 320" stroke="#ff7a45" stroke-width="3" stroke-dasharray="10 8"/>
+          <text x="520" y="306" font-size="28" fill="#ff7a45">Rg</text>
+          <path d="M600 600 L760 600" stroke="#f2b705" stroke-width="5"/><path d="M590 600 L612 588 L612 612 Z M770 600 L748 588 L748 612 Z" fill="#f2b705"/>
+          <text x="790" y="610" font-size="32" font-weight="800" fill="#f2b705">X</text>
+          <g font-size="24"><path d="M413 330 L420 395" stroke="#f2b705" stroke-width="2"/><text x="360" y="425" fill="#f2b705" class="zh">磨削点</text><text x="360" y="425" fill="#f2b705" class="eo">Contact point</text><circle cx="413" cy="320" r="8" fill="#f2b705"/></g>
+          <text x="40" y="600" font-size="28" fill="#f3f6fa">Δs = d / cos α</text>
+        </svg>
+    notes:
+      - "数控凸轮磨床 C 轴带凸轮转，X 轴带砂轮进退，砂轮中心的轨迹就是廓线向外偏移一个砂轮半径。砂轮每修整一次就小一点，控制器按存的半径算轨迹，修整后必须测量并更新。实际小了 d 却没更新，升程处处多 d 除以 cos α。d 取 0.2 毫米，尺寸误差约 {{ch25.w_s:.0f}} 微米，形状误差只有约 {{ch25.wshape:.1f}}：看形状根本看不出来，只能靠每次修整后测量、首件测尺寸。"
+      - "A CNC cam grinder moves two axes together: the C axis turns the cam and the X axis moves the wheel in and out, so the wheel centre traces the actual profile offset outwards by the wheel radius. Every dressing makes the wheel a little smaller. The control computes the path from the stored radius, so after dressing you must measure the wheel and update it. If it's really d smaller and nobody updates it, the wheel stays d away everywhere, and the lift is too big by d over cos alpha. With d at 0.2 millimetres, the size error is about {{ch25.w_s:.0f}} microns but the shape error only about {{ch25.wshape:.1f}}. It's mainly a size problem, invisible in the shape; only measuring after every dressing, and checking the first part's size, will catch it."
+
+  - layout: section
+    num: "04"
+    title: ["误差的阶次与补偿磨削", "Error orders and compensation grinding"]
+
+  - layout: split
+    title: ["第 k 阶误差：加速度放大 (kω)² 倍", "Order k: acceleration grows by (kω)²"]
+    points:
+      - ["Δa = e_k (kω)²：幅值 × 转速² × 阶次²", "Δa = e_k (kω)²: amplitude × speed² × order²"]
+      - ["低阶管位置，高阶管平稳", "Low orders set position; high orders set smoothness"]
+      - ["24 阶 2 μm 单独就 {{ch25.a24:.0f}} m/s²，名义的 {{ch25.p24:.0f}}%", "Order 24 at 2 μm alone: {{ch25.a24:.0f}} m/s², {{ch25.p24:.0f}}% of nominal"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M60 520 L860 520" stroke="#4b5f7d" stroke-width="3"/>
+          <rect x="90" y="516" width="140" height="4" rx="2" fill="#4b5f7d"/>
+          <rect x="290" y="509" width="140" height="11" rx="4" fill="#4c8dff"/>
+          <rect x="490" y="343" width="140" height="177" rx="10" fill="#f2b705"/>
+          <rect x="690" y="120" width="140" height="400" rx="10" fill="#ff7a45"/>
+          <g font-size="34" font-weight="800" fill="#f3f6fa" text-anchor="middle"><text x="160" y="490">{{ch25.pu1:.2f}}</text><text x="360" y="490">{{ch25.pu6:.1f}}</text><text x="560" y="325">{{ch25.pu24:.0f}}</text><text x="760" y="102">{{ch25.pu36:.0f}}</text></g>
+          <g font-size="28" fill="#d3deea" text-anchor="middle"><text x="160" y="562">k = 1</text><text x="360" y="562">k = 6</text><text x="560" y="562">k = 24</text><text x="760" y="562">k = 36</text></g>
+          <text x="60" y="618" font-size="24" fill="#8fa3ba" class="zh">6000 r/min 时每 1 μm 升程误差的加速度误差（m/s²）</text><text x="60" y="618" font-size="24" fill="#8fa3ba" class="eo">Acceleration error per 1 μm of lift error at 6000 r/min (m/s²)</text>
+        </svg>
+    notes:
+      - "为什么几微米会出大事？把升程误差分解成谐波：一到三阶来自偏心、热处理和装夹，影响钩线时刻、间隙这些位置；高阶来自磨床振动、砂轮不平衡，幅值小。加速度误差是升程误差对时间的二阶导数，第 k 阶的幅值是该阶误差乘 kω 的平方。6000 转时每 1 微米：一阶不到 0.4，24 阶 {{ch25.pu24:.0f}}，36 阶 {{ch25.pu36:.0f}}。24 阶 2 微米单独就有 {{ch25.a24:.0f}}，是名义峰值的 {{ch25.p24:.0f}}%。"
+      - "Why do a few microns matter so much? Break the lift error into harmonics. The mean is the size error. Orders one to three come from eccentricity, heat treatment and clamping, and they shift the lift: positions such as loop-taking timing and clearances. High orders come from grinder vibration, wheel imbalance and axis following error; they're small. With the cam turning steadily, the acceleration error is the second time derivative of the lift error, and order k has an amplitude of e k times k omega squared. At 6000 r/min, each micron gives under 0.4 at order one, about 14 at order six, {{ch25.pu24:.0f}} at order 24 and {{ch25.pu36:.0f}} at order 36. Two microns at order 24 alone give {{ch25.a24:.0f}}, {{ch25.p24:.0f}} percent of the nominal peak."
+
+  - layout: split
+    title: ["转速越高，误差越大：按平方增长", "The faster it runs, the bigger the error: by the square"]
+    points:
+      - ["加速度误差 ∝ 转速²：曲线是抛物线", "Error ∝ speed²: the curve is a parabola"]
+      - ["和判据线的交点，就是允许的最高转速", "Where it crosses the limit is the top allowed speed"]
+      - ["n = n₀ √(限值 / a₀)", "n = n₀ √(limit / a₀)"]
+    visual: {video: spd}
+    notes:
+      - "这是虚拟实验里加速度误差峰值随转速的曲线，黄色虚线是判据 {{ch25.lim:.0f}}，竖线是最高转速 6000。标准工况下曲线在判据下面；加上 24 阶振纹，整条曲线一下子抬高，和判据线的交点就是允许的最高转速。加速度误差跟转速平方成正比，所以允许转速等于原转速乘根号下限值比实际值。"
+      - "This is the lab's curve of peak acceleration error against speed. The yellow dashed line is the {{ch25.lim:.0f}} limit and the vertical line is the 6000 r/min top speed. In the standard case the curve stays under the limit. Add the order-24 chatter and the whole curve jumps up; where it crosses the limit is the highest allowed speed. Because the error grows with the square of speed, the allowed speed is the original speed times the square root of the limit over the actual error."
+
+  - layout: split
+    title: ["补偿磨削：能修掉什么，修不掉什么", "Compensation grinding: what it can and can't fix"]
+    points:
+      - ["测得的误差反向叠加到轨迹上，再磨一遍", "Add the measured error, reversed, to the path and grind again"]
+      - ["像低通滤波：2 阶修掉 {{ch25.eta2:.0f}}%，24 阶只 {{ch25.eta24:.0f}}%", "The contact arc is a low-pass filter: {{ch25.eta2:.0f}}% off order 2, only {{ch25.eta24:.0f}}% off 24"]
+      - ["默认凸轮：P-V {{ch25.g_pv:.1f}} → {{ch25.gc_pv:.1f}} μm，合格", "Default cam: P-V {{ch25.g_pv:.1f}} → {{ch25.gc_pv:.1f}} μm, a pass"]
+    visual: {video: comp}
+    notes:
+      - "测出升程误差以后，可以把它反向叠加到磨削轨迹上再磨一遍，这就是补偿磨削。它修不干净：测量有误差，机床执行有误差，砂轮和廓线的接触弧有宽度，像一个低通滤波器，阶次越高越难修。算例一轮修掉二阶 {{ch25.eta2:.0f}}%，六阶 {{ch25.eta6:.0f}}%，二十四阶只有 {{ch25.eta24:.0f}}%。右边虚线是磨后、实线是补偿一轮：默认的弯针凸轮 P-V 从 {{ch25.g_pv:.1f}} 降到 {{ch25.gc_pv:.1f}} 微米。"
+      - "Once you've measured the lift error, you can add it, reversed, to the grinding path and grind again: compensation grinding. It never cleans up completely. The gauge has error, the machine has error, and the wheel touches the profile over an arc with some width, which acts like a low-pass filter: the higher the order, the harder it is to correct. In our model one round removes {{ch25.eta2:.0f}} percent of order two, {{ch25.eta6:.0f}} percent of order six, and only {{ch25.eta24:.0f}} percent of order 24. On the right, dashed is as ground and solid is after one round: the default looper cam goes from {{ch25.g_pv:.1f}} to {{ch25.gc_pv:.1f}} microns peak to valley."
+
+  - layout: lab
+    title: ["动手试一试：凸轮廓线误差与磨削补偿", "Try it: cam profile error and compensation grinding"]
+    shot: {page: cam}
+    tasks:
+      - ["只用一轮补偿磨削，使默认的弯针凸轮合格", "One round of compensation: pass the default looper cam"]
+      - ["砂轮半径先不更新做补偿，再更新使其合格", "Compensate with the radius not updated, then update and pass"]
+      - ["24 阶振纹：补偿一轮后求允许的最高转速", "Order-24 chatter: the top speed allowed after one round"]
+    notes:
+      - "虚拟实验 25-1：左边是凸轮与放大的误差、升程误差曲线、谐波幅值、加速度误差随转速的变化和接触应力；右边选凸轮和运动规律，调热处理、精磨次数、一个机床误差谐波、砂轮修整后的实际半径和是否更新，可以补偿磨削一轮。三条判据：尺寸偏差、P-V 和最高转速下的加速度误差。"
+      - "Virtual lab 25-1. On the left: the cam with its error magnified, the lift-error curve, the harmonic amplitudes, acceleration error against speed, and contact stress. On the right you choose the cam and motion law, and set the heat treatment, the finishing passes, one machine-error harmonic, the wheel radius after dressing and whether it's updated, and you can run a round of compensation grinding. Three criteria: size error, peak-to-valley, and acceleration error at top speed."
+
+  - layout: bignum
+    title: ["数字化：在超差之前发现漂移", "Digital: catch the drift before parts go out"]
+    nums:
+      - {n: "{{ch25.spc_cpk:.2f}}", n_en: "Cpk", label: ["机壳中心距偏差的过程能力", "Capability of the housing centre distance"]}
+      - {n: "{{ch25.spc_alarm}}", n_en: "subgroup", label: ["定位销磨损：第几组报警", "Pin wear: the subgroup that alarms"]}
+      - {n: "{{ch25.spc_out}}", n_en: "subgroup", label: ["不管它：第几组出现超差件", "Left alone: the first out-of-spec part"]}
+    foot: ["三坐标每测一个特性发一条测量消息，进历史库，按机床、夹具、班次查", "The CMM sends a message per characteristic to the historian, searchable by machine, fixture and shift"]
+    notes:
+      - "检验数据不只给“合格、不合格”。三坐标每测一个特性，就在总线上发一条测量消息，进历史库。看机壳上下轴孔的中心距：用前 15 组定控制限，Cpk 约 {{ch25.spc_cpk:.2f}}；后来夹具定位销开始磨损，第 {{ch25.spc_alarm}} 组均值出了控制上限，系统报警，这时每一件都还在公差内；不管它，第 {{ch25.spc_out}} 组就出超差件了。凸轮的谐波也可以按磨床和修整次数统计，看出哪台磨床、哪次修整后振纹变大。"
+      - "Inspection data are more than pass or fail. Every characteristic the CMM measures goes onto the bus as a measurement message and into the historian. Take the housing's upper-to-lower bore centre distance. Control limits from the first fifteen subgroups give a Cpk of about {{ch25.spc_cpk:.2f}}. Then a fixture pin starts to wear, and subgroup {{ch25.spc_alarm}}'s mean crosses the upper control limit: an alarm, while every part is still in tolerance. Leave it, and by subgroup {{ch25.spc_out}} there's an out-of-spec part. Cam harmonics can be tracked the same way, by grinder and by dressing, to see which grinder or which dressing made the chatter grow."
+
+  - layout: split
+    title: ["机器人联系：凸轮磨床就是两轴机器人", "Robots: a cam grinder is a two-axis robot"]
+    points:
+      - ["C 轴转、X 轴跟：X = f(C)，就是电子凸轮", "C turns, X follows: X = f(C), an electronic cam"]
+      - ["插补纹波、谐波减速器误差也按 (kω)² 放大", "Interpolation ripple and strain-wave error grow by (kω)² too"]
+      - ["关节座的轴承孔也要一次装夹镗出", "A joint housing's bearing bores: bored in one set-up too"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <rect x="60" y="500" width="200" height="50" rx="10" fill="#4b5f7d"/>
+          <path d="M160 500 L160 420" stroke="#8fa3ba" stroke-width="34" stroke-linecap="round"/>
+          <path d="M160 420 L330 270" stroke="#4c8dff" stroke-width="30" stroke-linecap="round"/>
+          <path d="M330 270 L540 300" stroke="#2ec4b6" stroke-width="24" stroke-linecap="round"/>
+          <g fill="#0b1220" stroke="#f2b705" stroke-width="6"><circle cx="160" cy="420" r="26"/><circle cx="330" cy="270" r="24"/></g>
+          <path d="M540 300 L575 284 M540 300 L575 318" stroke="#f3f6fa" stroke-width="6" stroke-linecap="round"/>
+          <text x="600" y="130" font-size="26" fill="#d3deea" class="zh">关节角误差</text><text x="600" y="130" font-size="26" fill="#d3deea" class="eo">Joint-angle error</text>
+          <path d="M600 190 q12 -26 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" fill="none" stroke="#4c8dff" stroke-width="4"/>
+          <text x="600" y="290" font-size="26" fill="#d3deea" class="zh">关节加速度、力矩</text><text x="600" y="290" font-size="26" fill="#d3deea" class="eo">Acceleration, torque</text>
+          <path d="M600 380 q12 -80 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" fill="none" stroke="#ff7a45" stroke-width="4"/>
+          <text x="600" y="470" font-size="26" fill="#ff7a45" class="zh">× (kω)²</text><text x="600" y="470" font-size="26" fill="#ff7a45" class="eo">× (kω)²</text>
+          <text x="60" y="610" font-size="24" fill="#8fa3ba" class="zh">末端抖动、噪声：伺服整定要专门查高阶纹波</text><text x="60" y="610" font-size="24" fill="#8fa3ba" class="eo">Tip shake and noise: tune servos for high-order ripple</text>
+        </svg>
+    notes:
+      - "凸轮磨床 C 轴转、X 轴跟着走，X 是 C 的函数，这就是机械臂里的电子凸轮。机器人轨迹里的插补纹波、编码器细分误差、谐波减速器每转两次的传动误差，都是高阶分量，同样被放大成加速度和力矩的波动，表现为末端抖动和噪声。所以伺服整定要专门查高阶纹波；关节座的轴承孔、减速器安装孔，也要像机壳那样一次装夹镗出。"
+      - "On a CNC cam grinder the C axis turns and the X axis follows: X is a function of C. That's exactly a robot arm using an electronic cam to make a joint follow a master angle. In a robot's path, interpolation ripple, encoder sub-division error and the twice-per-revolution error of a strain-wave reducer are all high-order components, and the second derivative magnifies them into ripple in acceleration and torque, seen as tool-tip shake and noise. That's why robot paths use modified-trapezoid or S-curve profiles, and why servo tuning must look specifically for high-order ripple. And a robot joint housing's bearing and reducer bores must be bored in one set-up, just like a sewing machine housing."
+
+  - layout: split
+    title: ["生活中的例子：路上的小坑和搓板路", "Everyday example: a pothole and a washboard road"]
+    points:
+      - ["同一个小坑：开得越快，颠得越厉害", "The same pothole jolts harder the faster you drive"]
+      - ["细密的搓板路，比一个大缓坡更颠", "A washboard road shakes more than a long gentle slope"]
+      - ["加速度 ∝ 速度² × 阶次²", "Acceleration ∝ speed² × order²"]
+    visual:
+      svg: |-
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none}</style>
+          <path d="M40 230 C200 230 300 150 450 150 C600 150 700 230 860 230" fill="none" stroke="#2ec4b6" stroke-width="6"/>
+          <text x="40" y="300" font-size="26" fill="#2ec4b6" class="zh">大缓坡：阶次低，几乎不颠</text><text x="40" y="300" font-size="26" fill="#2ec4b6" class="eo">Long gentle slope: low order, barely felt</text>
+          <path d="M40 480 q20 -36 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" fill="none" stroke="#ff7a45" stroke-width="6"/>
+          <text x="40" y="560" font-size="26" fill="#ff7a45" class="zh">搓板路：幅值小，阶次高，颠得厉害</text><text x="40" y="560" font-size="26" fill="#ff7a45" class="eo">Washboard: small ripples, high order, hard shaking</text>
+          <g transform="translate(560 395)"><rect x="0" y="0" width="190" height="56" rx="18" fill="#4c8dff"/><rect x="40" y="-38" width="110" height="44" rx="12" fill="#4c8dff"/><circle cx="40" cy="62" r="22" fill="#0b1220" stroke="#f3f6fa" stroke-width="6"/><circle cx="150" cy="62" r="22" fill="#0b1220" stroke="#f3f6fa" stroke-width="6"/></g>
+          <path d="M540 380 L505 380 M540 410 L495 410 M540 440 L510 440" stroke="#f2b705" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+    notes:
+      - "生活里也有同样的事。路上一个几厘米的小坑，慢慢开几乎没感觉，开快了却颠得厉害：同样的幅值，车身加速度随车速的平方增大。细密的搓板路比一个大缓坡更颠，因为起伏的阶次高，加速度按阶次的平方放大。凸轮廓线上的振纹就是一条微型搓板路。"
+      - "You've felt this on the road. A pothole a few centimetres deep is barely noticed at low speed but jolts hard at high speed: the same amplitude, but the body's acceleration grows with the square of speed. A washboard road shakes you more than one long gentle slope, because its ripples are of high order, and acceleration grows with the square of the order. Chatter on a cam profile is a tiny washboard road."
+
+  - layout: answer
+    tag: ["回到车间问题", "Back to the shop floor"]
+    title: ["24 阶振纹：限制的是转速", "Order-24 chatter: it's the speed that suffers"]
+    rows:
+      - [["名义峰值 · 判据 10%", "Nominal peak · 10% limit"], ["{{ch25.a_nom:.0f}} · {{ch25.lim:.0f}} m/s²", "{{ch25.a_nom:.0f}} · {{ch25.lim:.0f}} m/s²"]]
+      - [["24 阶 2 μm 单项", "Order 24, 2 μm alone"], ["{{ch25.a24:.0f}} m/s²（{{ch25.p24:.0f}}%）", "{{ch25.a24:.0f}} m/s² ({{ch25.p24:.0f}}%)"]]
+      - [["全部误差：磨后 → 补偿（m/s²）", "All errors, ground → comp. (m/s²)"], ["{{ch25.ch_a:.0f}} → {{ch25.chc_a:.0f}}", "{{ch25.ch_a:.0f}} → {{ch25.chc_a:.0f}}"]]
+    side: {big: "{{ch25.n_chcr:.0f}}", text: ["补偿后允许的最高 r/min（原定 6000）", "r/min allowed after compensation (rated 6000)"]}
+    foot: ["再补偿也不够：要平衡、修整砂轮，提高磨床刚度和阻尼，加光磨走刀", "More compensation won't do: balance and dress the wheel, stiffen the grinder, add spark-out passes"]
+    notes:
+      - "回到开头的问题。名义峰值约 {{ch25.a_nom:.0f}}，判据 {{ch25.lim:.0f}}。24 阶 2 微米单独就有 {{ch25.a24:.0f}}，是判据的 {{ch25.r24:.1f}} 倍。把其他误差也算上，磨后约 {{ch25.ch_a:.0f}}，落在 60 克的弯针架上就是 {{ch25.F24:.0f}} 牛、{{ch25.f24:.0f}} 赫兹的附加力，正是噪声和球铰磨损的来源；按判据只能跑约 {{ch25.n_chr:.0f}} 转。补偿一轮降到 {{ch25.chc_a:.0f}}，也只能跑约 {{ch25.n_chcr:.0f}} 转。再补偿也不够，一轮只修掉 24 阶的 {{ch25.eta24:.0f}}%：要平衡和修整砂轮、提高磨床刚度和阻尼、加光磨走刀。"
+      - "Back to the opening problem. Omega is 628, so the nominal peak is about {{ch25.a_nom:.0f}} and the limit {{ch25.lim:.0f}}. Two microns at order 24 alone give {{ch25.a24:.0f}}, {{ch25.r24:.1f}} times the limit. With the other errors included it's about {{ch25.ch_a:.0f}} as ground; on a 60 gram looper carrier that's an extra {{ch25.F24:.0f}} newtons at {{ch25.f24:.0f}} hertz, the source of the noise and the ball-joint wear, and the criterion allows only about {{ch25.n_chr:.0f}} r/min. One round of compensation brings it to {{ch25.chc_a:.0f}}, still only about {{ch25.n_chcr:.0f}} r/min. More compensation won't do, since each round removes only {{ch25.eta24:.0f}} percent of order 24. Remove it in the process: balance and dress the wheel, make the grinder stiffer and better damped, and finish with spark-out passes."
+
+  - layout: summary
+    title: ["小结", "Summary"]
+    points:
+      - ["机壳定位置：铝机壳按热态校核，时效保住精度", "Housings fix positions: check aluminium hot; ageing keeps accuracy"]
+      - ["孔系靠基准统一、一次装夹；基准不重合要换算", "Bores: common datums, one set-up; convert when datums differ"]
+      - ["凸轮误差按 (kω)² 放大：高阶要靠工艺消除", "Cam error grows by (kω)²: high orders must go in the process"]
+    after: ["课后：实验 25-1、作业、测验；下一讲：设备联网与数字孪生", "After class: Lab 25-1, assignment and quiz on the platform; next: connected machines and digital twins"]
+    notes:
+      - "小结三句话。第一，机壳定位置：灰铸铁阻尼高、膨胀和钢接近，铝机壳轻但轴套配合要按热态校核；残余应力会让针杆孔漂几十微米，时效决定精度能不能保持。第二，孔系精度靠一面两销的基准统一和卧加一次装夹镗出；基准不重合，就要按尺寸链换算工序公差。第三，凸轮热处理前成形、热处理后磨准，第 k 阶误差的加速度是该阶幅值乘 kω 的平方：低阶好修，高阶只能靠工艺消除。"
+      - "Three takeaways. One: the housing fixes positions. Grey iron is well damped and expands like steel; aluminium is light, but its bushing fits must be checked hot. Residual stress can move the needle-bar bore by tens of microns, and ageing decides whether accuracy lasts. Two: bore accuracy comes from common datums, one face and two pins, and boring in one set-up on a horizontal machining centre; when datums don't coincide, convert the tolerances through the dimension chain. Three: cams are shaped before hardening and made accurate by grinding after, and order k gives an acceleration error of e k times k omega squared. Low orders are easy to fix; high orders must be removed in the process."
