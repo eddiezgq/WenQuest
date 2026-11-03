@@ -394,3 +394,62 @@ def cute_tree(cx, cy, k, at, idp="tr", mood="happy", moves=True, muscle=None):
         E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_l"], "pivot": [X(0), Y(420)], "amp": 6, "hz": 2.2},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b"], "amp": 3 * k, "hz": 0.9}]
     return E
+
+
+def cute_dogbot(cx, cy, k, at, idp="dg", mood="happy", moves=True, load=None):
+    """机器狗 (2026-11-03): a cute four-legged robot dog standing with feet at (cx, cy), facing right.
+    Ids: <idp>_b (body), <idp>_f / <idp>_r (front / rear leg pairs, wiggle out of phase), <idp>_t (tail), <idp>_k (basket).
+    load = text drawn on a basket on its back (e.g. "70kg"). "<idp>*" moves the whole dog."""
+    def P(d, c="ink", w=4, part="_b"):
+        return {"t": "path", "at": at, "id": idp + part, "c": c, "w": w, "d": d}
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "rect", "at": at, "id": idp + "_b", "x": X(-130), "y": Y(230), "w": 260 * k, "h": 100 * k, "c": "ink", "fill": "gold"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": X(115), "y": Y(300), "w": 110 * k, "h": 90 * k, "c": "ink", "fill": "gold"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(165), "y": Y(280), "w": 26 * k, "h": 30 * k, "c": "ink", "fill": "blue"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(195), "y": Y(280), "w": 22 * k, "h": 26 * k, "c": "ink", "fill": "blue"}]
+    E.append(P(f"M{X(170)},{Y(232)} Q{X(190)},{Y(222 if mood == 'happy' else 242)} {X(212)},{Y(232)}"))
+    E.append(P(f"M{X(130)},{Y(300)} L{X(120)},{Y(345)} M{X(165)},{Y(300)} L{X(170)},{Y(340)}", w=5))
+    for part, x0 in (("_f", 90), ("_r", -90)):
+        E.append(P(f"M{X(x0 - 25)},{Y(130)} L{X(x0 - 45)},{Y(65)} L{X(x0 - 25)},{Y(0)} M{X(x0 + 25)},{Y(130)} L{X(x0 + 5)},{Y(65)} L{X(x0 + 25)},{Y(0)}",
+                   w=7, part=part))
+        E.append({"t": "ellipse", "at": at, "id": idp + part, "x": X(x0 - 60), "y": Y(78), "w": 28 * k, "h": 28 * k, "c": "ink", "fill": "ink"})
+    E.append(P(f"M{X(-130)},{Y(210)} Q{X(-190)},{Y(260)} {X(-175)},{Y(310)}", w=6, part="_t"))
+    if load:
+        E += [{"t": "rect", "at": at, "id": idp + "_k", "x": X(-110), "y": Y(360), "w": 200 * k, "h": 130 * k, "c": "ink", "fill": "red"},
+              P(f"M{X(-110)},{Y(300)} L{X(90)},{Y(300)} M{X(-60)},{Y(360)} L{X(-60)},{Y(230)} M{X(-10)},{Y(360)} L{X(-10)},{Y(230)} M{X(40)},{Y(360)} L{X(40)},{Y(230)}",
+                c="paper", w=3, part="_k"),
+              txt(X(-10), Y(295), 44 * k, load, at, c="paper", id=idp + "_k", font="en")]
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_f"], "pivot": [X(90), Y(130)], "amp": 9, "hz": 2.0},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_r"], "pivot": [X(-90), Y(130)], "amp": -9, "hz": 2.0},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_t"], "pivot": [X(-130), Y(210)], "amp": 18, "hz": 3.0},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_k"], "amp": 5 * k, "hz": 2.0}]
+    return E
+
+
+def cute_fridge(cx, cy, k, at, idp="fz", mood="happy", moves=True, hot=False):
+    """冰箱 Frosty (2026-11-03): a cute fridge standing with its base at (cx, cy). Ids: <idp>_b (body), <idp>_d (door handle line),
+    <idp>_s (snowflake or flame over the head; spins/wiggles). "<idp>*" moves it all. hot = sweaty red version."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    body = "red" if hot else "blue"
+    E = [{"t": "rect", "at": at, "id": idp + "_b", "x": X(-110), "y": Y(440), "w": 220 * k, "h": 440 * k, "c": "ink", "fill": "paper"},
+         {"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": f"M{X(-110)},{Y(300)} L{X(110)},{Y(300)}"},
+         {"t": "path", "at": at, "id": idp + "_d", "c": body, "w": 8, "d": f"M{X(80)},{Y(400)} L{X(80)},{Y(340)} M{X(80)},{Y(260)} L{X(80)},{Y(170)}"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 40 - 14), "y": Y(390), "w": 28 * k, "h": 32 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-30)},{Y(345)} Q{X(0)},{Y(320)} {X(30)},{Y(345)}", "sad": f"M{X(-30)},{Y(325)} Q{X(0)},{Y(350)} {X(30)},{Y(325)}",
+         "o": f"M{X(-12)},{Y(335)} a{12 * k},{12 * k} 0 1,0 {24 * k},0 a{12 * k},{12 * k} 0 1,0 {-24 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    if hot:
+        E.append({"t": "path", "at": at, "id": idp + "_s", "c": "red", "w": 6,
+                  "d": f"M{X(0)},{Y(470)} Q{X(-40)},{Y(530)} {X(0)},{Y(600)} Q{X(40)},{Y(530)} {X(0)},{Y(470)} M{X(-60)},{Y(150)} Q{X(-70)},{Y(120)} {X(-55)},{Y(100)}"})
+    else:
+        E.append({"t": "path", "at": at, "id": idp + "_s", "c": "blue", "w": 6,
+                  "d": f"M{X(0)},{Y(470)} L{X(0)},{Y(590)} M{X(-52)},{Y(500)} L{X(52)},{Y(560)} M{X(-52)},{Y(560)} L{X(52)},{Y(500)}"})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle" if hot else "spin", "targets": [idp + "_s"], "pivot": [X(0), Y(530)],
+               **({"amp": 12, "hz": 3} if hot else {"rpm": 40})},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_b", idp + "_d"], "pivot": [X(0), Y(0)], "amp": 4 if hot else 2, "hz": 4 if hot else 1.2}]
+    return E
