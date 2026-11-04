@@ -115,12 +115,24 @@ def _scp(src: str, dst: str) -> None:
 
 
 def pick_region(kind: str, prefer: str = "us-east-1") -> str:
-    """有空闲机器的区域（多卡机器常常某个区域没有）；优先 prefer。都没有时报错，说明哪种机器没货。"""
-    info = _api("GET", "/instance-types").get(kind) or {}
-    regions = [r.get("name") for r in info.get("regions_with_capacity_available") or [] if r.get("name")]
-    if not regions:
-        raise RuntimeError(f"Lambda 上 {kind} 现在没有空闲的机器，稍后再试")
-    return prefer if prefer in regions else regions[0]
+    """有空闲机器的区域（多卡机器常常某个区域没有）；优先 prefer。
+
+    没货不立刻放弃：Lambda 的空位是别人用完才放出来的，等几分钟常常就有了（2026-11-04 实测时
+    连跑几章把 A10 租空，后面全部直接失败）。等满 `WQ_GPU_WAIT_MIN` 分钟还没有才报错。
+    """
+    budget = float(os.environ.get("WQ_GPU_WAIT_MIN", "20")) * 60
+    waited, step = 0.0, min(60.0, max(5.0, budget / 10))
+    while True:
+        info = _api("GET", "/instance-types").get(kind) or {}
+        regions = [r.get("name") for r in info.get("regions_with_capacity_available") or [] if r.get("name")]
+        if regions:
+            return prefer if prefer in regions else regions[0]
+        if waited >= budget:
+            raise RuntimeError(f"Lambda 上 {kind} 等了 {budget / 60:.0f} 分钟还是没有空闲的机器，稍后再试")
+        if waited == 0:
+            print(f"  {kind} 现在没货，等空位（最多 {budget / 60:.0f} 分钟）", flush=True)
+        time.sleep(step)
+        waited += step
 
 
 def ssh_key() -> tuple[str, str]:
