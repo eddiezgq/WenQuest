@@ -9,23 +9,21 @@ import json
 import statistics
 import time
 
-import numpy as np
-import torch
-import torchvision
-from torch import nn
-
 import prep
 
-# torch.onnx.export 要 onnx；而 onnx 的新版要 numpy.exceptions（numpy ≥ 1.25），
-# 租来的机器上 numpy 常常更老，表现成 "module 'numpy' has no attribute 'exceptions'"（2026-11-04 实测）
+# **装依赖要在 import numpy 之前**：numpy 一旦被导入，再升级也换不掉进程里那一份
+# （2026-11-04 实测就栽在这里，升了 numpy 仍然报 "module 'numpy' has no attribute 'exceptions'"）。
+# torch.onnx.export 要 onnx，而 onnx 的新版要 numpy.exceptions（numpy ≥ 1.25）。
 prep.pip_install("onnx", "numpy>=1.25")
 try:
-    import onnxruntime  # noqa: F401
-except ImportError:                 # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
-    try:
-        prep.pip_install("onnxruntime-gpu")
-    except RuntimeError:
-        pass
+    prep.pip_install("onnxruntime-gpu")      # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
+except RuntimeError:
+    pass
+
+import numpy as np                                          # noqa: E402
+import torch                                                # noqa: E402
+import torchvision                                          # noqa: E402
+from torch import nn                                        # noqa: E402
 
 dev = "cuda"
 torch.manual_seed(0)
