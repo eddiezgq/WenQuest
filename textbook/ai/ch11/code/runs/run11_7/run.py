@@ -14,6 +14,17 @@ import torch
 import torchvision
 from torch import nn
 
+import prep
+
+prep.pip_install("onnx")            # torch.onnx.export 要它；租来的机器上常常只装了 torch
+try:
+    import onnxruntime  # noqa: F401
+except ImportError:                 # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
+    try:
+        prep.pip_install("onnxruntime-gpu")
+    except RuntimeError:
+        pass
+
 dev = "cuda"
 torch.manual_seed(0)
 model = torchvision.models.resnet18(weights=None)
@@ -48,23 +59,28 @@ with torch.no_grad():
     out["compile_fps"] = 32 / out["compile_b32_ms"] * 1e3
 
 # ---- 导出 ONNX，再用 TensorRT（或 ONNX Runtime）跑
-torch.onnx.export(model.float(), torch.randn(1, 3, 224, 224, device=dev), "model.onnx",
-                  input_names=["x"], output_names=["y"], dynamic_axes={"x": {0: "b"}, "y": {0: "b"}}, opset_version=17)
 engine = "none"
 try:
-    import tensorrt  # noqa: F401
-    import subprocess
-    r = subprocess.run(["trtexec", "--onnx=model.onnx", "--fp16", "--shapes=x:1x3x224x224",
-                        "--iterations=200", "--avgRuns=50"], capture_output=True, text=True, timeout=1800)
-    for line in r.stdout.splitlines():                      # 只认 "Latency:" 这一行：H2D/D2H Latency 是传输时间，不是推理
-        if line.strip().startswith("[I] Latency:") and "median =" in line:
-            ms = float(line.split("median =")[1].split("ms")[0])
-            if 0.01 < ms < 1000:                            # 解析出奇怪的数就当作没测到，退到 ONNX Runtime
-                out["trt_ms"], engine = ms, "tensorrt"
-            break
-    out["trt_version"] = tensorrt.__version__
-except Exception as e:                                      # noqa: BLE001  没有 TensorRT：退到 ONNX Runtime
-    out["trt_note"] = f"没有 TensorRT（{type(e).__name__}），改用 ONNX Runtime"
+    torch.onnx.export(model.float(), torch.randn(1, 3, 224, 224, device=dev), "model.onnx",
+                      input_names=["x"], output_names=["y"], dynamic_axes={"x": {0: "b"}, "y": {0: "b"}}, opset_version=17)
+except Exception as e:                                      # noqa: BLE001  导不出来就只报前两种方式，别把整次实测带倒
+    out["onnx_note"] = f"导出 ONNX 失败（{type(e).__name__}），这一路跳过"
+    engine = "skipped"
+if engine == "none":                                        # 导出失败就别再碰 model.onnx 了
+    try:
+        import tensorrt  # noqa: F401
+        import subprocess
+        r = subprocess.run(["trtexec", "--onnx=model.onnx", "--fp16", "--shapes=x:1x3x224x224",
+                            "--iterations=200", "--avgRuns=50"], capture_output=True, text=True, timeout=1800)
+        for line in r.stdout.splitlines():                      # 只认 "Latency:" 这一行：H2D/D2H Latency 是传输时间，不是推理
+            if line.strip().startswith("[I] Latency:") and "median =" in line:
+                ms = float(line.split("median =")[1].split("ms")[0])
+                if 0.01 < ms < 1000:                            # 解析出奇怪的数就当作没测到，退到 ONNX Runtime
+                    out["trt_ms"], engine = ms, "tensorrt"
+                break
+        out["trt_version"] = tensorrt.__version__
+    except Exception as e:                                      # noqa: BLE001  没有 TensorRT：退到 ONNX Runtime
+        out["trt_note"] = f"没有 TensorRT（{type(e).__name__}），改用 ONNX Runtime"
 if engine == "none":
     try:
         import onnxruntime as ort
