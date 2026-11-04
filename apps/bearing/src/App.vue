@@ -18,6 +18,8 @@ import Assembly from './components/Assembly.vue'
 import Quality from './components/Quality.vue'
 import Parts from './components/Parts.vue'
 import Process from './components/Process.vue'
+import AiDraft from './components/AiDraft.vue'
+import AiExplain from './components/AiExplain.vue'
 import CloudPanel from './components/CloudPanel.vue'
 import { me, links, detach, loadMe, loginUrl } from './cloud'
 
@@ -102,7 +104,7 @@ onMounted(async () => {
     <Process v-if="mode === 'process'" />
     <main v-show="mode === 'design'" class="work">
       <aside class="edit">
-        <div class="pane"><Fields /></div>
+        <div class="pane"><AiDraft v-if="!embed" /><Fields /></div>
         <p class="saved">{{ linked || t('savedLocal') }}</p>
       </aside>
 
@@ -121,7 +123,7 @@ onMounted(async () => {
         <p v-if="error" class="err" role="alert">{{ t('error') }}：{{ lang === 'zh' ? error.zh || error.message : error.message }}</p>
       </section>
 
-      <aside class="side"><Checks :r="result" /></aside>
+      <aside class="side"><Checks :r="result" /><AiExplain v-if="result && !embed" /></aside>
     </main>
 
     <Report v-if="showReport && result" :r="result" @close="showReport = false" />

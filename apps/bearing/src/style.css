@@ -240,3 +240,9 @@ li.unknown .chip { background: var(--hold-bg); color: var(--hold); }
 .who small { font-size: 11px; color: var(--night-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .who.in { color: var(--accent); }
 @media (max-width: 760px) { .modes { flex-wrap: wrap; } }
+/* the top bar wraps instead of running off the screen (round 64 step 7: cloud and sign-in were added) */
+@media (max-width: 1560px) {
+  .shell:not(.embed) > .top { flex-wrap: wrap; height: auto; min-height: 56px; padding: 6px 16px; row-gap: 6px; }
+  .shell:not(.embed) .tools { flex-wrap: wrap; justify-content: flex-end; flex-shrink: 1; min-width: 0; }
+  .shell:not(.embed) .brand small { display: none; }
+}

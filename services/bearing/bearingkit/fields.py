@@ -334,6 +334,7 @@ BLANK = {
     "fits": {"shaft_I": None, "housing_I": None, "T_i": 20, "T_o": 20},
     "lube": {"eta0": None, "alpha_p": None, "sigma": None},
     "limits": {"p_static": None, "p_fatigue": None, "gap_min": None, "wall_min": None},
+    "design_note": "",  # the design description of the report (round 64 step 7)
 }
 
 

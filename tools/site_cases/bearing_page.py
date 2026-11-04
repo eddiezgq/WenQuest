@@ -84,10 +84,10 @@ STEPS = [
      ("在 FreeCAD 1.1 里填参数（与网页版同样的字段、通用的项目文件）、校核（同一个内核，结果逐项相同）、建精确实体与整套装配、查干涉、出零件工作图和每道磨削工序的工序简图",
       "In FreeCAD 1.1: the same fields and project files as the web app, the same checks (one kernel, identical results), exact solids and the assembled bearing, an interference check, working drawings and a sketch for every grinding operation"),
      "now"),
-    (("AI 起草与云端项目", "AI drafts and cloud projects"),
-     ("AI 起草设计说明，数字由代码核对；开通的企业把项目和工艺模板存到云端",
-      "AI drafts the design description with every number checked by code; activated companies keep projects and process templates in the cloud"),
-     "next"),
+    (("云端项目与 AI 起草", "Cloud projects and AI drafts"),
+     ("开通的企业把设计项目和工艺模板存到云端，同单位共用、留 20 版、不互相覆盖；AI 用一句话起草应用场景、解释校核结果、起草设计说明，数字逐个由代码核对，人点“采用”才进项目",
+      "Activated companies keep design projects and process templates in the cloud, shared, 20 versions kept, no overwriting; AI drafts the application from one sentence, explains the checks and drafts the design description, every number checked by code, adopted only by a person"),
+     "now"),
 ]
 
 
