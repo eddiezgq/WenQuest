@@ -15,7 +15,9 @@ import prep
 # （1.25 才有），可这台机器上别的东西还在用 np.int（1.24 就删了），而装 numpy 2 会让
 # torch 直接 "Failed to initialize NumPy: _ARRAY_API not found"——没有一个 numpy 版本同时满足。
 # 所以退 onnx 的版本：1.16 之前的不碰 numpy.exceptions，用机器原装的 numpy 就能导出。
-prep.pip_install("onnx<1.16")
+# 还要把 numpy 一起钉住：不钉的话 pip 会顺手把 numpy 升到 2.x（当成 onnx 的依赖），
+# 装进 ~/.local 盖掉系统那一份，torch 立刻 _ARRAY_API not found。
+prep.pip_install("onnx<1.16", "numpy<1.24", "protobuf")
 try:
     prep.pip_install("onnxruntime-gpu")      # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
 except RuntimeError:
