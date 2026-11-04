@@ -17,6 +17,7 @@ export function blank() {
     fits: { shaft_I: null, housing_I: null, T_i: 20, T_o: 20 },
     lube: { eta0: null, alpha_p: null, sigma: null },
     limits: { p_static: null, p_fatigue: null, gap_min: null, wall_min: null },
+    design_note: '',
   }
 }
 function loadSaved() {

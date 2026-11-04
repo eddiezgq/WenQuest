@@ -10,6 +10,7 @@
 !services/bearing/examples
 !services/bearing/app.py
 !services/bearing/projects_api.py
+!services/bearing/ai_api.py
 !services/bearing/freecad
 !factory/digital/freecad/Mod/WenQuest/InitGui.py
 !factory/digital/freecad/Mod/WenQuest/wq_workbench.py
