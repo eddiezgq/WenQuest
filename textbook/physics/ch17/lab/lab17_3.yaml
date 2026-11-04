@@ -1,0 +1,28 @@
+# 实验 17.3 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_3.js。
+原理:
+  - ["小车按给定的速度曲线运动，货物的摆角 θ 满足（式 (17.3.5)）：", "The trolley follows a prescribed motion; the load's swing angle θ obeys (Eq. (17.3.5)):"]
+  - 式: "l θ̈ + Ẍ cos θ + g sin θ = 0"
+  - ["小车不动时就是单摆，小摆角的周期 T_p = 2π√(l/g)，由周期可以求出绳长 l = g(T_p/2π)²。", "With the trolley still it is a simple pendulum; for small swings T_p = 2π√(l/g), so the rope length is l = g(T_p/2π)²."]
+  - ["小车以加速度 a 加速时，货物绕偏后的位置 θ = −a/g 摆动。加速时间 t_a 正好等于 T_p 时，加速结束的瞬间货物回到竖直位置且速度为零，不再摆动；残留振幅约为 2(a/g)|sin(πt_a/T_p)|。", "While the trolley accelerates at a, the load swings about the tilted position θ = −a/g. If the acceleration lasts exactly T_p, the load is back at vertical and at rest when it ends, and stays still; otherwise the remaining amplitude is about 2(a/g)|sin(πt_a/T_p)|."]
+  - ["转动圆环上的珠子（式 (17.3.4)）：θ̈ = sin θ(ω² cos θ − g/R)。ω > √(g/R) 时，珠子停在 cos θ = g/(Rω²) 处。", "Bead on the spinning hoop (Eq. (17.3.4)): θ̈ = sin θ(ω² cos θ − g/R). For ω > √(g/R) the bead settles where cos θ = g/(Rω²)."]
+步骤:
+  - ["选“自动化仓库的行车”，方式 0，点“开始”。货物每次向右越过竖直位置，“次数”加 1，并显示时刻。记下第 1 次和第 11 次的时刻，填入表 1，求周期，再求绳长，提交（任务 1）。", "Choose “Warehouse crane”, mode 0, press “Start”. Each time the load crosses vertical moving right the count goes up by 1 and the time is shown. Record the 1st and 11th crossing times in Table 1, find the period and the rope length, and submit (task 1)."]
+  - ["方式 1，t_a 先取 2.00 s 运行一次，记下到站后的最大摆角；再按测得的周期设 t_a，运行，记下最大摆角，提交（任务 2）。", "Mode 1: run once with t_a = 2.00 s and record the largest swing after arrival; then set t_a from your measured period, run, record the swing, and submit (task 2)."]
+  - ["再取 t_a 比周期大、小各 5%，各运行一次，看匀速阶段的摆幅和到站后的最大摆角怎样变化。匀速阶段的摆幅可与原理中的残留振幅公式比较；到站后的摆动是加速、减速两段留下的摆动叠加的结果，可能部分抵消，也可能加强。", "Run again with t_a 5% above and 5% below the period and see how the swing during the cruise and after arrival change. Compare the cruise swing with the formula in the principle; the swing after arrival is the sum of what acceleration and braking each leave behind, which may partly cancel or add up."]
+  - ["选“转动圆环上的珠子”，ω 取 5、8、10、12 rad/s，记下珠子最后停的角度，填入表 2，与 cos θ = g/(Rω²) 比较。算出使珠子停在 60° 的 ω，运行，提交（任务 3）。", "Choose “Bead on a spinning hoop”; for ω = 5, 8, 10 and 12 rad/s record where the bead settles in Table 2 and compare with cos θ = g/(Rω²). Work out the ω that puts the bead at 60°, run and submit (task 3)."]
+数据表:
+  - 标题: ["表 1  行车", "Table 1  The crane"]
+    表头: ["方式", "t_a / s", "第 1 次越过 / s", "第 11 次越过 / s", "周期 / s", "绳长 / m", "到站后的最大摆角 / (°)"]
+    表头英文: ["Mode", "t_a / s", "1st crossing / s", "11th crossing / s", "Period / s", "Rope length / m", "Largest swing after arrival / (°)"]
+    行: [["0", "—", "", "", "", "", "—"], ["1", "2.00", "—", "—", "—", "—", ""], ["1", "", "—", "—", "—", "—", ""], ["1", "", "—", "—", "—", "—", ""], ["1", "", "—", "—", "—", "—", ""]]
+  - 标题: ["表 2  转动圆环上的珠子（R = 0.20 m）", "Table 2  Bead on the spinning hoop (R = 0.20 m)"]
+    表头: ["ω / (rad/s)", "停下的角度 θ / (°)", "由 cos θ = g/(Rω²) 算出的 θ / (°)"]
+    表头英文: ["ω / (rad/s)", "Settled angle θ / (°)", "θ from cos θ = g/(Rω²) / (°)"]
+    行: [["5", "", ""], ["8", "", ""], ["10", "", ""], ["12", "", ""], ["", "", "60"]]
+注意:
+  - ["摆动测试的初始摆角只有 5°，小角度的周期公式足够准确。多测几个周期再平均，误差小得多。", "The swing test starts at only 5°, so the small-angle period formula is accurate enough. Timing several swings and averaging cuts the error a lot."]
+  - ["珠子有一点摩擦，所以会停下来；摩擦不改变平衡位置。", "The bead has a little friction, so it comes to rest; friction does not change where it settles."]
+思考题:
+  - ["为什么用一个周期加速就能消除摆动？减速时为什么也要这样？", "Why does accelerating over one period remove the swing? Why must braking be done the same way?"]
+  - ["绳长测错 5%，残留的摆动大约多大？实际行车的绳长随提升高度变化，该怎么办？", "If the rope length is off by 5%, about how much swing remains? A real crane's rope length changes as it hoists; what then?"]
+  - ["圆环转得比临界角速度慢时，珠子为什么回到最低点？", "Below the critical spin rate, why does the bead return to the bottom?"]

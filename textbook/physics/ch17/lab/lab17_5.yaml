@@ -1,0 +1,27 @@
+# 实验 17.5 的指导书与报告模板（构建时生成 Word 文件）。目的、场景、参数、任务取自 lab17_5.js。
+原理:
+  - ["关节不出力时，两连杆机械臂的方程 M(q)q̈ + C(q, q̇)q̇ + g(q) = 0（式 (17.5.3)）就是一个双摆。它是确定的，却对初始状态极其敏感：两次运动的微小差别随时间大致按指数增长，这就是混沌。", "With no joint torque, the two-link arm's equation M(q)q̈ + C(q, q̇)q̇ + g(q) = 0 (Eq. (17.5.3)) is a double pendulum. It is deterministic yet extremely sensitive to its starting state: a tiny difference between two runs grows roughly exponentially. This is chaos."]
+  - ["若差别按 δ(t) ≈ δ₀e^{λt} 增长，差别达到 Δ 所需的时间为 t ≈ (1/λ) ln(Δ/δ₀)。初始误差每缩小 10 倍，可预测的时间只增加 (ln 10)/λ。", "If the difference grows like δ(t) ≈ δ₀e^{λt}, it reaches Δ after t ≈ (1/λ) ln(Δ/δ₀). Each tenfold cut in the starting error adds only (ln 10)/λ to the time you can predict."]
+  - ["摆角很小时，双摆的方程可以线性化，有两个简正模式：两根杆以同一频率振动、形状保持不变。同相模式中两根杆同方向摆，θ₂/θ₁ 是一个确定的正数。", "For small swings the double pendulum's equations can be linearised and have two normal modes, in which both rods oscillate at one frequency and keep their shape. In the in-phase mode both rods swing the same way and θ₂/θ₁ is a fixed positive number."]
+步骤:
+  - ["选“断电的机械臂”，k 依次取 −1、−2、…、−9，各运行一次，记下“末端相差超过 10 cm 的时刻”，填入表 1。", "Choose “Unpowered robot arm”; run with k = −1, −2, …, −9 in turn and record the time the ends are 10 cm apart in Table 1."]
+  - ["找出能在 5 s 内预测末端位置的最大误差，设定后运行，提交（任务 1）。以 k 为横坐标、分开的时刻为纵坐标作图，估计 (ln 10)/λ。", "Find the largest error that still lets you predict the end for 5 s, run with it and submit (task 1). Plot the parting time against k and estimate (ln 10)/λ."]
+  - ["选“双摆”，θ₁ 取 5°，θ₂ 从 5° 起逐步增大，每次运行观察两根杆是否始终同方向摆、形状不变。定量的判断办法：上杆每次过竖直（θ₁ = 0）时读 θ₂，简正模式下 θ₂ 也应同时接近 0；θ₂ 偏离越大，说明混进了另一个模式。找到后提交（任务 2），把 θ₂/θ₁ 填入表 2。", "Choose “Double pendulum”, set θ₁ = 5° and raise θ₂ from 5° in steps; after each run, watch whether the rods always swing together without changing shape. To judge it quantitatively, read θ₂ each time the upper rod passes vertical (θ₁ = 0): in a normal mode θ₂ should be close to 0 at the same moment; the further it is off, the more of the other mode is mixed in. Once found, submit (task 2) and enter θ₂/θ₁ in Table 2."]
+  - ["保持简正模式的设定，记下上杆第 1 次和第 11 次由左向右越过竖直的时刻，求周期，提交（任务 3）。", "Keeping the normal-mode setting, record the 1st and 11th times the upper rod crosses vertical moving right, find the period and submit (task 3)."]
+  - ["再试 θ₁ = θ₂ = 90°，观察下摆球的轨迹，与小角度时比较。", "Then try θ₁ = θ₂ = 90° and compare the lower bob's path with the small-angle case."]
+数据表:
+  - 标题: ["表 1  断电的机械臂：初始误差与可预测的时间", "Table 1  Unpowered arm: starting error and predictable time"]
+    表头: ["k", "编码器误差 / (°)", "末端相差 10 cm 的时刻 / s"]
+    表头英文: ["k", "Encoder error / (°)", "Time the ends are 10 cm apart / s"]
+    行: [["−1", "0.1", ""], ["−2", "0.01", ""], ["−3", "", ""], ["−4", "", ""], ["−5", "", ""], ["−6", "", ""], ["−7", "", ""], ["−8", "", ""], ["−9", "", ""]]
+  - 标题: ["表 2  双摆的同相简正模式", "Table 2  The double pendulum's in-phase normal mode"]
+    表头: ["θ₁ / (°)", "θ₂ / (°)", "θ₂/θ₁", "第 1 次越过 / s", "第 11 次越过 / s", "周期 / s"]
+    表头英文: ["θ₁ / (°)", "θ₂ / (°)", "θ₂/θ₁", "1st crossing / s", "11th crossing / s", "Period / s"]
+    行: [["5", "", "", "", "", ""], ["", "", "", "", "", ""]]
+注意:
+  - ["两个场景都不计摩擦。机械臂的仿真只算 10 s，10 s 内没有分开的，记为“> 10 s”。", "Neither scene has friction. The arm is simulated for 10 s only; if the ends never part, record “> 10 s”."]
+  - ["双摆的角度从竖直向下量起，是两根杆各自的角（不是相对角），与机械臂的关节角不同。", "The double pendulum's angles are measured from straight down for each rod (not relative angles), unlike the arm's joint angles."]
+思考题:
+  - ["初始误差每缩小 10 倍，可预测的时间大约增加多少？要多预测 10 s，编码器要精确多少倍？", "Each tenfold cut in the starting error buys roughly how much more predictable time? To predict 10 s longer, how much more precise must the encoder be?"]
+  - ["把同相模式的 θ₂ 改成相反的符号（θ₂/θ₁ 大小不变、取负值），双摆怎样运动？这是另一个简正模式吗？", "Flip the sign of θ₂ from the in-phase mode (same size of θ₂/θ₁, but negative). How does the double pendulum move? Is that the other normal mode?"]
+  - ["真实的机械臂关节有摩擦，断电下落还是混沌的吗？既然无法预测，为什么还能用仿真来设计机械臂？", "Real arm joints have friction; is the unpowered fall still chaotic? If it cannot be predicted, why can we still design arms by simulation?"]
