@@ -1,0 +1,53 @@
+# B-HUM-WQH1 · 问渠 WQ-H1 轮式人形（自建，第 75 轮：机器人厂的产品，带动力学模型）
+schema: 1
+id: B-HUM-WQH1
+kind: robot
+name:
+  zh: 问渠 WQ-H1 轮式人形
+  en: WenQuest WQ-H1 wheeled humanoid
+category: HUM
+tags:
+- 人形机器人
+- 轮式人形
+- 双臂
+- humanoid
+- 动力学
+- 自建
+- 问渠机器人厂
+standards: []
+params: []
+defaults: {}
+model:
+  engine: wqrobot:humanoid_wh
+  formats:
+  - glb
+  - urdf
+  - mjcf
+  origin: 基座坐标系在底盘底面中心（X 向前、Z 向上）；每个构件一个节点，零位时各构件坐标系与基座平行（站直、双臂自然下垂、头朝前）
+  note: 底盘是一台 WQ-AGV300，按一个刚体固定在地上（不做行走）；腰 2 个关节（WQJ-L）、头 2 个（WQJ-S）、双臂各 6 个（肩 2 个 WQJ-M、其余 WQJ-S），共 16 个，与机器人厂物料清单一一对应。关节模组的质量、电机、谐波减速器、名义摩擦与 WQ-CR5 同一份数据；构件质量惯量逐项相加。全部是示例值，不照抄任何厂商的数
+robot:
+  type: humanoid
+source:
+  origin: wenquest
+  license: Apache-2.0
+  attribution: 问渠零件库（生成程序 generators/wqh1.py，原件 factory/digital/cae/wqh1.py）
+  checked:
+    by: Claude
+    'on': '2026-11-04'
+    note: 自建；16 个关节与物料清单一致、总质量 = 各零件之和、MuJoCo 加载与位置伺服下静止不发散、重力下关节力矩在模组上限以内，由测试核对
+teaching:
+  principle: 上半身 16 个自由度：腰的转和俯仰让双臂够到更大的范围，每只手臂 6 个关节决定手的位置和姿态，头的两个关节让相机对准要抓的东西（手眼协调）。下半身是一台搬运车，先把它固定在地上，只研究双臂操作；手臂伸平抱箱时，肩关节承受的重力矩最大。
+  uses:
+  - 双臂搬运
+  - 上下料
+  - 具身智能教学与研究
+  courses:
+  - course: 人形机器人与具身智能
+    chapter: 整机建模与双臂操作
+  - course: 机器人技术
+    chapter: 动力学仿真
+  labs:
+  - 数字工厂实验 30
+factory:
+  erp_items: []          # 机器人厂清单 factory/plants/wenquest-robot.yaml 的 WQ-H1 写了 library: B-HUM-WQH1/default
+  suppliers: []

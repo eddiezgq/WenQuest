@@ -672,7 +672,61 @@ def cobot6(p):
             "robot": robot, "urdf": _urdf("wq_cr5", bodies, joints, vis), "mjcf": W.mjcf()}
 
 
-BUILDERS = {"cobot6": cobot6, "scara": scara, "delta": delta, "diff_cart": diff_cart, "cartesian": cartesian, "planar_2r": planar_2r,
+# ---------------------------------------------------------------- WQ-H1 轮式人形（第 75 轮）：构件、质量与 MJCF 来自 wqh1.py
+def humanoid_wh(p):
+    """问渠机器人厂 WQ-H1：底盘固定，腰 2 + 头 2 + 双臂各 6 共 16 个关节；每个构件一个节点（零位时各坐标系与基座平行）"""
+    from generators import wqh1 as H
+    import trimesh
+    col = lambda rgba: [int(255 * float(x)) for x in rgba.split()]  # noqa: E731
+
+    def mesh_of(g):
+        if g[0] == "cylinder":
+            _, r, h, c, axis, rgba = g
+            m = trimesh.creation.cylinder(radius=r, height=h, sections=40)
+            M = np.eye(4)
+            M[:3, :3] = H.W._axis_frame(axis)
+            M[:3, 3] = c
+        elif g[0] == "capsule":
+            _, r, _, p0, p1, rgba = g
+            p0, p1 = np.asarray(p0, float), np.asarray(p1, float)
+            m = trimesh.creation.capsule(radius=r, height=float(np.linalg.norm(p1 - p0)), count=[24, 12])
+            M = np.eye(4)
+            M[:3, :3] = H.W._axis_frame(p1 - p0)
+            M[:3, 3] = (p0 + p1) / 2
+        else:
+            _, half, c, rgba = g
+            m = trimesh.creation.box(extents=[2 * v for v in half])
+            M = np.eye(4)
+            M[:3, 3] = c
+        m.apply_transform(M)
+        m.visual.face_colors = col(rgba)
+        return m
+
+    S = H.summary()
+    js = {j["name"]: j for j in S["joints"]}
+    bodies, joints, vis = [], [], {}
+    for b in H.bodies():
+        geoms = [g for _, _, g in b["parts"] if g]
+        bodies.append(_body(b["name"], b["parent"], b["pos"], _cat(*[mesh_of(g) for g in geoms])))
+        vis[b["name"]] = []
+        if b["joint"]:
+            jn, ax, _, (lo, hi) = b["joint"]
+            j = _joint(jn, "revolute", b["parent"], b["name"], b["pos"], H.AX[ax], lower=math.radians(lo), upper=math.radians(hi),
+                       velocity=math.pi)
+            d = js[jn]
+            j["dynamics"] = {"armature": d["armature_kg_m2"], "damping": d["damping_Nms_rad"], "frictionloss": d["frictionloss_Nm"],
+                             "effort": d["torque_limit_Nm"], "module": d["module"]}
+            joints.append(j)
+    robot = {"type": "humanoid", "dof": S["dof"],
+             "links": [{"name": lk["name"], "node": lk["name"], "mass_kg": lk["mass_kg"], "com_m": lk["com_m"],
+                        "inertia_kg_m2": lk["inertia_kg_m2"]} for lk in S["links"]],
+             "joints": joints, "rest": {n: 0.0 for n in H.JOINTS}, "rest_source": "零位：站直、双臂自然下垂、头朝前",
+             "dynamics": {"payload_kg_per_hand": S["payload_kg_per_hand"], "mass_kg": S["mass_kg"],
+                          "upper_body_mass_kg": S["upper_body_mass_kg"], "modules": S["modules"], "note": S["note"]}}
+    return {"bodies": bodies, "world": _world(bodies), "robot": robot, "urdf": _urdf("wq_h1", bodies, joints, vis), "mjcf": H.mjcf()}
+
+
+BUILDERS = {"cobot6": cobot6, "humanoid_wh": humanoid_wh, "scara": scara, "delta": delta, "diff_cart": diff_cart, "cartesian": cartesian, "planar_2r": planar_2r,
             "cart_pole": cart_pole, "stewart": stewart}
 
 
