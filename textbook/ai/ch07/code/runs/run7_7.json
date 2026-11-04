@@ -1,0 +1,41 @@
+{
+ "name": "run7_7",
+ "fingerprint": "aee1a7628061dc61",
+ "at": "2026-11-04T13:30:26Z",
+ "platform": "lambda",
+ "region": "",
+ "instance_type": "gpu_1x_a10",
+ "env": {
+  "python": "3.10.12",
+  "os": "Linux-6.8.0-60-generic-x86_64-with-glibc2.35",
+  "gpu": "NVIDIA A10",
+  "driver": "570.148.08",
+  "gpu_memory": "23028 MiB",
+  "sm_clock_max": "1695 MHz",
+  "gpus": "1",
+  "nvcc": "12.8",
+  "torch": "2.7.0",
+  "torch_cuda": "12.8",
+  "capability": "8.6",
+  "triton": "3.3.0"
+ },
+ "values": {
+  "build_s": 41.99107074737549,
+  "fwd_err": 2.384185791015625e-07,
+  "dx_err": 1.0893563739955425e-06,
+  "db_rel": 1.417132722281167e-07,
+  "gradcheck": true,
+  "torch": "2.7.0",
+  "native_f_us": 432.12801218032837,
+  "native_fb_us": 862.2400164604187,
+  "fused_f_us": 212.73599565029144,
+  "fused_fb_us": 648.1919884681702,
+  "compiled_f_us": 245.7599937915802,
+  "compiled_fb_us": 700.2879977226257,
+  "fused_f_GBs": 473.18412519842923,
+  "native_f_GBs": 465.89572146502223,
+  "speed_f": 2.031287704083173,
+  "speed_fb": 1.3302231928199149,
+  "correct": true
+ }
+}
