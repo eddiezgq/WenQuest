@@ -4,6 +4,7 @@ y = GELU(x + b)，GELU 用 tanh 近似（与 2.9 节、PyTorch 的 F.gelu(approx
   （double 用来做梯度检查）；核函数发在 PyTorch 当前的流上。
 - torch.utils.cpp_extension.load_inline 在第一次导入时调用 nvcc 编译（约一分钟），以后用缓存。
 - BiasGelu 是一个 torch.autograd.Function：前向保存 x 与 b，反向用第二个核函数算 dx，偏置的梯度是 dx 按最后一维以外的各维求和。"""
+import prep
 import torch
 from torch.utils.cpp_extension import load_inline
 
@@ -68,8 +69,9 @@ torch::Tensor backward(torch::Tensor dy, torch::Tensor x, torch::Tensor b) {
 """
 CPP_SRC = "torch::Tensor forward(torch::Tensor x, torch::Tensor b);\ntorch::Tensor backward(torch::Tensor dy, torch::Tensor x, torch::Tensor b);"
 
+_inc = prep.pybind11_headers()
 ext = load_inline(name="wq_bias_gelu", cpp_sources=CPP_SRC, cuda_sources=CUDA_SRC, functions=["forward", "backward"],
-                  extra_cuda_cflags=["-O3"], verbose=False)
+                  extra_cflags=_inc, extra_cuda_cflags=["-O3", *_inc], verbose=False)
 
 
 class BiasGelu(torch.autograd.Function):
