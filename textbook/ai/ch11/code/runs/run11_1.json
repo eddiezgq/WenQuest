@@ -1,0 +1,41 @@
+{
+ "name": "run11_1",
+ "fingerprint": "e394136e3f47c9e1",
+ "at": "2026-11-04T14:18:32Z",
+ "platform": "lambda",
+ "region": "",
+ "instance_type": "gpu_1x_a10",
+ "env": {
+  "python": "3.10.12",
+  "os": "Linux-6.8.0-60-generic-x86_64-with-glibc2.35",
+  "gpu": "NVIDIA A10",
+  "driver": "570.148.08",
+  "gpu_memory": "23028 MiB",
+  "sm_clock_max": "1695 MHz",
+  "gpus": "1",
+  "nvcc": "12.8",
+  "torch": "2.7.0",
+  "torch_cuda": "12.8",
+  "capability": "8.6",
+  "triton": "3.3.0"
+ },
+ "values": {
+  "torch": "2.7.0",
+  "n_train": 2000,
+  "n_val": 500,
+  "n_class": 4,
+  "scratch_acc": 94.8,
+  "scratch_s": 14.961553974999987,
+  "scratch_loss": 0.004074648022651672,
+  "linear_acc": 98.2,
+  "linear_s": 4.912983421999996,
+  "linear_loss": 0.09372019022703171,
+  "finetune_acc": 100.0,
+  "finetune_s": 14.395733244000013,
+  "finetune_loss": 0.00028206966817379,
+  "gain_linear": 3.4000000000000057,
+  "gain_finetune": 5.200000000000003,
+  "speed_linear": 3.0453092733843135,
+  "_gpu_name": "NVIDIA A10"
+ }
+}
