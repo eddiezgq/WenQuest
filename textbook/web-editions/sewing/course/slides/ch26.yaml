@@ -12,7 +12,7 @@ clips:
     vh: 1300
     loop: 3
     steps:
-      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('msgjson').parentElement.style.display='none';document.getElementById('rerun').click()"}
+      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('msgjson').parentElement.style.display='none';document.querySelector('#pageA .col > p.note').style.display='none';var c=document.querySelector('#pageA .col');c.style.paddingLeft='46%';c.style.boxSizing='content-box';document.getElementById('rerun').click()"}
   events:        # 一刻钟的事件流：每 4 秒换一段
     page: iot
     selector: "#tl"
@@ -38,7 +38,7 @@ clips:
     page: hang
     selector: "#rail"
     steps:
-      - {at: 0, js: "var p=document.getElementById('playA');if(p.textContent.indexOf('暂停')<0)p.click()"}
+      - {at: 0, js: "var p=document.getElementById('playA');if(!/暂停|Pause/.test(p.textContent))p.click()"}
   predict:       # 第二层：产线仿真快进一个班，下班后重新开工
     page: line
     selector: "#cv"
@@ -80,30 +80,30 @@ slides:
       - ["缝哪一件：工票条码或衣架编号", "Which piece: a ticket barcode or the hanger ID"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="10" y="20" width="420" height="440" rx="26" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="220" y="74" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle">控制器已经知道</text>
-          <text x="220" y="106" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">already in the controller</text>
+          <text x="220" y="74" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="zh">控制器已经知道</text><text x="220" y="74" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="eo">In the controller</text>
+          <text x="220" y="106" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en zh">already in the controller</text>
           <g font-size="30" fill="#f3f6fa">
-            <text x="50" y="170">● 主轴启停、转速</text>
-            <text x="50" y="225">● 针数（每转一针）</text>
-            <text x="50" y="280">● 剪线、倒缝、抬压脚</text>
-            <text x="50" y="335">● 断线（有检测的机型）</text>
-            <text x="50" y="390">● 故障码、参数</text>
+            <text x="50" y="170" class="zh">● 主轴启停、转速</text><text x="50" y="170" font-size="28" class="eo">● Spindle on/off, speed</text>
+            <text x="50" y="225" class="zh">● 针数（每转一针）</text><text x="50" y="225" font-size="28" class="eo">● Stitches (1 per turn)</text>
+            <text x="50" y="280" class="zh">● 剪线、倒缝、抬压脚</text><text x="50" y="280" font-size="28" class="eo">● Trims, backtacks, foot lifts</text>
+            <text x="50" y="335" class="zh">● 断线（有检测的机型）</text><text x="50" y="335" font-size="28" class="eo">● Breaks (if detected)</text>
+            <text x="50" y="390" class="zh">● 故障码、参数</text><text x="50" y="390" font-size="28" class="eo">● Fault codes, settings</text>
           </g>
-          <text x="220" y="440" font-size="24" fill="#5ee0d2" text-anchor="middle">不用加传感器</text>
+          <text x="220" y="440" font-size="24" fill="#5ee0d2" text-anchor="middle" class="zh">不用加传感器</text><text x="220" y="440" font-size="24" fill="#5ee0d2" text-anchor="middle" class="eo">No extra sensors</text>
           <rect x="470" y="20" width="420" height="440" rx="26" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-          <text x="680" y="74" font-size="34" font-weight="800" fill="#ff9c75" text-anchor="middle">需要外加</text>
-          <text x="680" y="106" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">must be added</text>
-          <text x="510" y="180" font-size="32" font-weight="700" fill="#f3f6fa">谁在缝？</text>
-          <text x="530" y="226" font-size="28" fill="#ffb38f">→ 读卡器刷工卡</text>
-          <text x="510" y="300" font-size="32" font-weight="700" fill="#f3f6fa">缝的是哪一件？</text>
-          <text x="530" y="346" font-size="28" fill="#ffb38f">→ 工票条码</text>
-          <text x="530" y="390" font-size="28" fill="#ffb38f">→ 衣架编号 RFID</text>
+          <text x="680" y="74" font-size="34" font-weight="800" fill="#ff9c75" text-anchor="middle" class="zh">需要外加</text><text x="680" y="74" font-size="34" font-weight="800" fill="#ff9c75" text-anchor="middle" class="eo">Must be added</text>
+          <text x="680" y="106" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en zh">must be added</text>
+          <text x="510" y="180" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">谁在缝？</text><text x="510" y="180" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">Who is sewing?</text>
+          <text x="530" y="226" font-size="28" fill="#ffb38f" class="zh">→ 读卡器刷工卡</text><text x="530" y="226" font-size="28" fill="#ffb38f" class="eo">→ badge reader</text>
+          <text x="510" y="300" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">缝的是哪一件？</text><text x="510" y="300" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">Which piece?</text>
+          <text x="530" y="346" font-size="28" fill="#ffb38f" class="zh">→ 工票条码</text><text x="530" y="346" font-size="28" fill="#ffb38f" class="eo">→ ticket barcode</text>
+          <text x="530" y="390" font-size="28" fill="#ffb38f" class="zh">→ 衣架编号 RFID</text><text x="530" y="390" font-size="28" fill="#ffb38f" class="eo">→ hanger RFID tag</text>
           <path d="M220 470 L220 520 L680 520 L680 470" stroke="#f2b705" stroke-width="4" fill="none"/>
           <path d="M450 520 L450 548" stroke="#f2b705" stroke-width="4"/>
           <rect x="90" y="550" width="720" height="78" rx="18" fill="rgba(242,183,5,.12)"/>
-          <text x="450" y="600" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">谁、何时、做了哪一件的哪道工序</text>
+          <text x="450" y="600" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">谁、何时、做了哪一件的哪道工序</text><text x="450" y="600" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">Who, when, which piece, which operation</text>
         </svg>
     notes:
       - "先看数据从哪来。电控缝纫机的控制器本来就记着主轴启停和转速、针数、剪线倒缝抬压脚次数，有检测的机型还知道断线，再加上故障码和参数，不用加传感器。可它不知道谁在缝、缝的是哪一件：操作工上班刷工卡，件号靠工票条码或衣架编号。两类信息对上，才知道谁何时做了哪一件的哪道工序。"
@@ -117,27 +117,27 @@ slides:
       - ["向上是数据，向下是指令和参数", "Data go up; commands and parameters come down"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g font-size="26" fill="#f3f6fa">
             <rect x="120" y="10" width="770" height="130" rx="20" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
-            <text x="150" y="62" font-size="32" font-weight="800" fill="#c4b5fd">应用层</text>
-            <text x="150" y="112">看板 · MES · 远程运维 · 数字孪生</text>
+            <text x="150" y="62" font-size="32" font-weight="800" fill="#c4b5fd" class="zh">应用层</text><text x="150" y="62" font-size="32" font-weight="800" fill="#c4b5fd" class="eo">Application</text>
+            <text x="150" y="112" class="zh">看板 · MES · 远程运维 · 数字孪生</text><text x="150" y="112" class="eo">Dashboards · MES · remote service · twins</text>
             <rect x="120" y="170" width="770" height="130" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="150" y="222" font-size="32" font-weight="800" fill="#8fb6ff">平台层</text>
-            <text x="150" y="272">MQTT 代理 · 历史库 · 指标计算</text>
+            <text x="150" y="222" font-size="32" font-weight="800" fill="#8fb6ff" class="zh">平台层</text><text x="150" y="222" font-size="32" font-weight="800" fill="#8fb6ff" class="eo">Platform</text>
+            <text x="150" y="272" class="zh">MQTT 代理 · 历史库 · 指标计算</text><text x="150" y="272" class="eo">MQTT broker · historian · metrics</text>
             <rect x="120" y="330" width="770" height="130" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="150" y="382" font-size="32" font-weight="800" fill="#5ee0d2">边缘层</text>
-            <text x="150" y="432">联网模块 · 网关 · 工位终端</text>
+            <text x="150" y="382" font-size="32" font-weight="800" fill="#5ee0d2" class="zh">边缘层</text><text x="150" y="382" font-size="32" font-weight="800" fill="#5ee0d2" class="eo">Edge</text>
+            <text x="150" y="432" class="zh">联网模块 · 网关 · 工位终端</text><text x="150" y="432" class="eo">Modules · gateways · station terminals</text>
             <rect x="120" y="490" width="770" height="130" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="150" y="542" font-size="32" font-weight="800" fill="#ff9c75">设备层</text>
-            <text x="150" y="592">缝纫机电控 · 读卡器 · 工票扫码</text>
+            <text x="150" y="542" font-size="32" font-weight="800" fill="#ff9c75" class="zh">设备层</text><text x="150" y="542" font-size="32" font-weight="800" fill="#ff9c75" class="eo">Device</text>
+            <text x="150" y="592" class="zh">缝纫机电控 · 读卡器 · 工票扫码</text><text x="150" y="592" class="eo">Machine controls · badge readers · scanners</text>
           </g>
           <defs><marker id="u26" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker>
             <marker id="d26" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
           <path d="M36 590 L36 60" stroke="#f2b705" stroke-width="7" marker-end="url(#u26)"/>
           <path d="M84 60 L84 590" stroke="#8fa3ba" stroke-width="5" stroke-dasharray="12 8" marker-end="url(#d26)"/>
-          <text x="36" y="34" font-size="26" font-weight="700" fill="#f2b705" text-anchor="middle">数据</text>
-          <text x="84" y="632" font-size="24" fill="#8fa3ba" text-anchor="middle">指令</text>
+          <text x="36" y="34" font-size="26" font-weight="700" fill="#f2b705" text-anchor="middle" class="zh">数据</text><text x="36" y="34" font-size="26" font-weight="700" fill="#f2b705" text-anchor="middle" class="eo">data</text>
+          <text x="84" y="632" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">指令</text><text x="84" y="632" font-size="22" fill="#8fa3ba" text-anchor="middle" class="eo">commands</text>
         </svg>
     notes:
       - "数据怎么送出来？电控带通信口接联网模块，或电控集成联网，或者一组机器接网关，由网关转换协议、汇总上传。老机器没有通信口，可以在电源线上装电流互感器，但只能知道开停。整个系统分四层：设备层、边缘层、平台层、应用层；向上走状态、计数和事件，向下走派工、参数和固件。"
@@ -151,40 +151,40 @@ slides:
       - ["计数只增不减；事件发生在某一时刻", "Counters only go up; events happen at an instant"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g>
             <rect x="10" y="10" width="430" height="300" rx="24" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="40" y="66" font-size="38" font-weight="800" fill="#8fb6ff">识别</text><text x="140" y="66" font-size="22" fill="#8fa3ba" class="en">identity</text>
-            <text x="40" y="126" font-size="27" fill="#f3f6fa">编号 · 型号 · 序列号</text>
-            <text x="40" y="170" font-size="27" fill="#f3f6fa">固件版本 · 产线工位</text>
-            <text x="40" y="270" font-size="26" fill="#8fb6ff">很少变化</text>
+            <text x="40" y="66" font-size="38" font-weight="800" fill="#8fb6ff" class="zh">识别</text><text x="40" y="66" font-size="38" font-weight="800" fill="#8fb6ff" class="eo">Identity</text><text x="140" y="66" font-size="22" fill="#8fa3ba" class="en zh">identity</text>
+            <text x="40" y="126" font-size="27" fill="#f3f6fa" class="zh">编号 · 型号 · 序列号</text><text x="40" y="126" font-size="27" fill="#f3f6fa" class="eo">ID · model · serial no.</text>
+            <text x="40" y="170" font-size="27" fill="#f3f6fa" class="zh">固件版本 · 产线工位</text><text x="40" y="170" font-size="27" fill="#f3f6fa" class="eo">Firmware · line station</text>
+            <text x="40" y="270" font-size="26" fill="#8fb6ff" class="zh">很少变化</text><text x="40" y="270" font-size="26" fill="#8fb6ff" class="eo">Rarely changes</text>
           </g>
           <g>
             <rect x="460" y="10" width="430" height="300" rx="24" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="490" y="66" font-size="38" font-weight="800" fill="#5ee0d2">状态</text><text x="590" y="66" font-size="22" fill="#8fa3ba" class="en">state</text>
-            <text x="490" y="126" font-size="26" fill="#f3f6fa">运行 → 正在执行</text>
-            <text x="490" y="168" font-size="26" fill="#f3f6fa">待机 → 可用但未执行</text>
-            <text x="490" y="210" font-size="26" fill="#f3f6fa">故障 → 停用</text>
-            <text x="490" y="252" font-size="26" fill="#f3f6fa">关机 → 不可用</text>
+            <text x="490" y="66" font-size="38" font-weight="800" fill="#5ee0d2" class="zh">状态</text><text x="490" y="66" font-size="38" font-weight="800" fill="#5ee0d2" class="eo">State</text><text x="590" y="66" font-size="22" fill="#8fa3ba" class="en zh">state</text>
+            <text x="490" y="126" font-size="26" fill="#f3f6fa" class="zh">运行 → 正在执行</text><text x="490" y="126" font-size="26" fill="#f3f6fa" class="eo">Running → Executing</text>
+            <text x="490" y="168" font-size="26" fill="#f3f6fa" class="zh">待机 → 可用但未执行</text><text x="490" y="168" font-size="26" fill="#f3f6fa" class="eo">Idle → NotExecuting</text>
+            <text x="490" y="210" font-size="26" fill="#f3f6fa" class="zh">故障 → 停用</text><text x="490" y="210" font-size="26" fill="#f3f6fa" class="eo">Fault → OutOfService</text>
+            <text x="490" y="252" font-size="26" fill="#f3f6fa" class="zh">关机 → 不可用</text><text x="490" y="252" font-size="26" fill="#f3f6fa" class="eo">Off → NotAvailable</text>
           </g>
           <g>
             <rect x="10" y="330" width="430" height="300" rx="24" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-            <text x="40" y="386" font-size="38" font-weight="800" fill="#ffd75a">计数</text><text x="140" y="386" font-size="22" fill="#8fa3ba" class="en">counters</text>
-            <text x="40" y="446" font-size="27" fill="#f3f6fa">针数 · 剪线 · 件数</text>
-            <text x="40" y="490" font-size="27" fill="#f3f6fa">运行时间</text>
-            <text x="40" y="590" font-size="26" fill="#ffd75a">只增不减，报累计值</text>
+            <text x="40" y="386" font-size="38" font-weight="800" fill="#ffd75a" class="zh">计数</text><text x="40" y="386" font-size="38" font-weight="800" fill="#ffd75a" class="eo">Counters</text><text x="140" y="386" font-size="22" fill="#8fa3ba" class="en zh">counters</text>
+            <text x="40" y="446" font-size="27" fill="#f3f6fa" class="zh">针数 · 剪线 · 件数</text><text x="40" y="446" font-size="27" fill="#f3f6fa" class="eo">Stitches · trims · pieces</text>
+            <text x="40" y="490" font-size="27" fill="#f3f6fa" class="zh">运行时间</text><text x="40" y="490" font-size="27" fill="#f3f6fa" class="eo">Run time</text>
+            <text x="40" y="590" font-size="26" fill="#ffd75a" class="zh">只增不减，报累计值</text><text x="40" y="590" font-size="26" fill="#ffd75a" class="eo">Only go up: send totals</text>
           </g>
           <g>
             <rect x="460" y="330" width="430" height="300" rx="24" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="490" y="386" font-size="38" font-weight="800" fill="#ff9c75">事件</text><text x="590" y="386" font-size="22" fill="#8fa3ba" class="en">events</text>
-            <text x="490" y="446" font-size="27" fill="#f3f6fa">开始缝 · 停下 · 剪线</text>
-            <text x="490" y="490" font-size="27" fill="#f3f6fa">断线 · 报警 · 换人</text>
-            <text x="490" y="590" font-size="26" fill="#ff9c75">在某一时刻发生</text>
+            <text x="490" y="386" font-size="38" font-weight="800" fill="#ff9c75" class="zh">事件</text><text x="490" y="386" font-size="38" font-weight="800" fill="#ff9c75" class="eo">Events</text><text x="590" y="386" font-size="22" fill="#8fa3ba" class="en zh">events</text>
+            <text x="490" y="446" font-size="27" fill="#f3f6fa" class="zh">开始缝 · 停下 · 剪线</text><text x="490" y="446" font-size="27" fill="#f3f6fa" class="eo">Start · stop · trim</text>
+            <text x="490" y="490" font-size="27" fill="#f3f6fa" class="zh">断线 · 报警 · 换人</text><text x="490" y="490" font-size="27" fill="#f3f6fa" class="eo">Break · alarm · badge-in</text>
+            <text x="490" y="590" font-size="26" fill="#ff9c75" class="zh">在某一时刻发生</text><text x="490" y="590" font-size="26" fill="#ff9c75" class="eo">Happen at an instant</text>
           </g>
         </svg>
     notes:
-      - "车间里常有几家企业、几代型号的缝纫机，数据要先统一成一种结构。一台设备的数据分四类：识别信息，编号、型号、固件、工位，很少变；状态，参照 OPC UA 机械通用规范，运行、待机、故障、关机对应四种状态；计数，只增不减的累计量；事件，在某一时刻发生的事。"
-      - "A floor often has machines from several makers and generations, so their data must first share one structure. Four kinds: identity, such as ID, model, firmware and station, which rarely changes; state, mapped with OPC UA for Machinery, running, idle, fault and off matching its four states; counters, quantities that only go up; and events, things that happen at an instant."
+      - "车间里常有几家企业、几代型号的缝纫机，数据要先统一成一种结构。一台设备的数据分四类：识别信息，编号、型号、固件、工位，很少变；状态，参照另一种工业通信标准 OPC UA 的机械通用规范，运行、待机、故障、关机对应四种状态；计数，只增不减的累计量；事件，在某一时刻发生的事。"
+      - "A floor often has machines from several makers and generations, so their data must first share one structure. Four kinds: identity, such as ID, model, firmware and station, which rarely changes; state, mapped with OPC UA for Machinery, the other main industrial standard, running, idle, fault and off matching its four states; counters, quantities that only go up; and events, things that happen at an instant."
 
   - layout: split
     title: ["计数报累计值：丢一条也不怕", "Report counters cumulatively: a lost message doesn't matter"]
@@ -194,27 +194,27 @@ slides:
       - ["接收方要识别归零，归零后接续", "The receiver must spot resets and carry on"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
-          <text x="20" y="44" font-size="26" fill="#8fa3ba">本班累计件数（示意）</text>
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
+          <text x="20" y="44" font-size="26" fill="#8fa3ba" class="zh">本班累计件数（示意）</text><text x="20" y="44" font-size="26" fill="#8fa3ba" class="eo">Running total of pieces this shift (illustrative)</text>
           <path d="M40 250 L870 250" stroke="#2c3e5c" stroke-width="6" stroke-linecap="round"/>
           <g font-size="44" font-weight="800" text-anchor="middle" class="en">
             <circle cx="110" cy="250" r="16" fill="#2ec4b6"/><text x="110" y="200" fill="#5ee0d2">120</text>
-            <circle cx="310" cy="250" r="16" fill="#2ec4b6"/><text x="310" y="200" fill="#5ee0d2">128</text>
+            <circle cx="310" cy="250" r="16" fill="#2ec4b6"/><text x="310" y="200" fill="#5ee0d2">121</text>
             <circle cx="510" cy="250" r="16" fill="#ff7a45"/><text x="510" y="200" fill="#ff7a45">✗</text>
-            <circle cx="710" cy="250" r="16" fill="#2ec4b6"/><text x="710" y="200" fill="#5ee0d2">145</text>
+            <circle cx="710" cy="250" r="16" fill="#2ec4b6"/><text x="710" y="200" fill="#5ee0d2">124</text>
           </g>
           <g font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">
             <text x="110" y="300">10:00</text><text x="310" y="300">10:01</text><text x="510" y="300">10:02</text><text x="710" y="300">10:03</text>
           </g>
-          <text x="510" y="340" font-size="26" fill="#ff9c75" text-anchor="middle">这一条丢了</text>
+          <text x="510" y="340" font-size="26" fill="#ff9c75" text-anchor="middle" class="zh">这一条丢了</text><text x="510" y="340" font-size="26" fill="#ff9c75" text-anchor="middle" class="eo">This one is lost</text>
           <path d="M310 380 C 360 450, 660 450, 710 380" stroke="#f2b705" stroke-width="4" fill="none"/>
           <rect x="190" y="460" width="640" height="80" rx="18" fill="rgba(242,183,5,.12)"/>
-          <text x="510" y="512" font-size="32" font-weight="700" fill="#ffd75a" text-anchor="middle">145 − 128 = 17 件，一件不少</text>
-          <text x="450" y="600" font-size="26" fill="#f3f6fa" text-anchor="middle">若报“这一分钟做了几件”，丢一条就永远少了</text>
+          <text x="510" y="512" font-size="32" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">124 − 121 = 3 件，一件不少</text><text x="510" y="512" font-size="32" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">124 − 121 = 3 pieces, none missing</text>
+          <text x="450" y="600" font-size="26" fill="#f3f6fa" text-anchor="middle" class="zh">若报“这一分钟做了几件”，丢一条就永远少了</text><text x="450" y="600" font-size="24" fill="#f3f6fa" text-anchor="middle" class="eo">Send "pieces this minute", and a lost one is gone for good</text>
         </svg>
     notes:
-      - "计数的要点是报累计值，不报增量。看图，每分钟报一次本班累计件数：10 点 02 分那条丢了，10 点 03 分的 145 减 10 点 01 分的 128，中间 17 件一件不少；重复收到也不多算。若报“这一分钟做了几件”，丢一条就永远少了。接收方还要识别断电重启、换控制器造成的归零，再接着累计。"
-      - "The key with counters: report cumulative values, not increments. Here the machine reports the shift's running total every minute. The 10:02 message is lost, yet 145 at 10:03 minus 128 at 10:01 still gives all 17 pieces, and a duplicate does no harm. Report 'pieces this minute' and a lost message is lost for good. The receiver must also spot resets after a power cycle or controller swap and carry on."
+      - "计数的要点是报累计值，不报增量。看图，每分钟报一次本班累计件数：10 点 02 分那条丢了，10 点 03 分的 124 减 10 点 01 分的 121，中间 3 件一件不少；重复收到也不多算。若报“这一分钟做了几件”，丢一条就永远少了。接收方还要识别断电重启、换控制器造成的归零，再接着累计。"
+      - "The key with counters: report cumulative values, not increments. Here the machine reports the shift's running total every minute. The 10:02 message is lost, yet 124 at 10:03 minus 121 at 10:01 still gives all 3 pieces, and a duplicate does no harm. Report 'pieces this minute' and a lost message is lost for good. The receiver must also spot resets after a power cycle or controller swap and carry on."
 
   - layout: figure
     title: ["一台缝纫机的一刻钟：事件交错出现", "A quarter-hour on one machine: events interleave"]
@@ -236,26 +236,26 @@ slides:
       - ["加看板、换数据库，设备不用改", "Add a dashboard or a database: no change on machines"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <defs><marker id="m26" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
           <g font-size="26" font-weight="700" fill="#f3f6fa" text-anchor="middle">
-            <rect x="10" y="80" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="135">缝纫机 l03-06</text>
-            <rect x="10" y="275" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="330">缝纫机 l03-07</text>
-            <rect x="10" y="470" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="525">缝纫机 l03-08</text>
-            <rect x="670" y="80" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="135">车间看板</text>
-            <rect x="670" y="275" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="330">历史库</text>
-            <rect x="670" y="470" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="525">MES 桥接</text>
+            <rect x="10" y="80" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="135" class="zh">缝纫机 l03-06</text><text font-size="22" x="120" y="135" class="eo">Machine l03-06</text>
+            <rect x="10" y="275" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="330" class="zh">缝纫机 l03-07</text><text font-size="22" x="120" y="330" class="eo">Machine l03-07</text>
+            <rect x="10" y="470" width="220" height="90" rx="18" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="120" y="525" class="zh">缝纫机 l03-08</text><text font-size="22" x="120" y="525" class="eo">Machine l03-08</text>
+            <rect x="670" y="80" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="135" class="zh">车间看板</text><text x="780" y="135" class="eo">Dashboard</text>
+            <rect x="670" y="275" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="330" class="zh">历史库</text><text x="780" y="330" class="eo">Historian</text>
+            <rect x="670" y="470" width="220" height="90" rx="18" fill="#111d31" stroke="#a78bfa" stroke-width="3"/><text x="780" y="525" class="zh">MES 桥接</text><text x="780" y="525" class="eo">MES bridge</text>
           </g>
           <circle cx="450" cy="320" r="110" fill="rgba(76,141,255,.15)" stroke="#4c8dff" stroke-width="4"/>
           <text x="450" y="310" font-size="34" font-weight="800" fill="#8fb6ff" text-anchor="middle">MQTT</text>
-          <text x="450" y="350" font-size="30" font-weight="700" fill="#8fb6ff" text-anchor="middle">代理</text>
+          <text x="450" y="350" font-size="30" font-weight="700" fill="#8fb6ff" text-anchor="middle" class="zh">代理</text><text x="450" y="350" font-size="30" font-weight="700" fill="#8fb6ff" text-anchor="middle" class="eo">broker</text>
           <g stroke="#ff7a45" stroke-width="4" fill="none" marker-end="url(#m26)">
             <path d="M232 125 L345 260"/><path d="M232 320 L336 320"/><path d="M232 515 L345 380"/></g>
           <g stroke="#a78bfa" stroke-width="4" fill="none" marker-end="url(#m26)">
             <path d="M555 260 L666 125"/><path d="M562 320 L666 320"/><path d="M555 380 L666 515"/></g>
-          <text x="230" y="620" font-size="28" fill="#ff9c75" text-anchor="middle">发布 publish</text>
-          <text x="680" y="620" font-size="28" fill="#c4b5fd" text-anchor="middle">订阅 subscribe</text>
-          <text x="450" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle">双方互不认识</text>
+          <text x="230" y="620" font-size="28" fill="#ff9c75" text-anchor="middle" class="zh">发布 publish</text><text x="230" y="620" font-size="28" fill="#ff9c75" text-anchor="middle" class="eo">publish</text>
+          <text x="680" y="620" font-size="28" fill="#c4b5fd" text-anchor="middle" class="zh">订阅 subscribe</text><text x="680" y="620" font-size="28" fill="#c4b5fd" text-anchor="middle" class="eo">subscribe</text>
+          <text x="450" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">双方互不认识</text><text x="450" y="40" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">Neither side knows the other</text>
         </svg>
     notes:
       - "车间联网用得最多的协议之一是 MQTT，它像一个邮局：设备把消息发布到一个主题上，比如“3 号线 7 号工位 / 状态”，不关心谁来收；看板、MES、数据库各自订阅，由代理转发。双方互不认识，加看板、换数据库，设备一侧都不用改。消息头很小，无线和小模块也跑得动。"
@@ -269,26 +269,26 @@ slides:
       - ["报文标识符会重复使用，不能拿来去重", "Packet identifiers get reused, so they can't de-duplicate"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g>
             <rect x="10" y="20" width="880" height="170" rx="24" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
             <text x="50" y="100" font-size="56" font-weight="800" fill="#8fa3ba" class="en">0</text>
-            <text x="130" y="88" font-size="34" font-weight="700" fill="#f3f6fa">最多送一次</text>
-            <text x="130" y="140" font-size="27" fill="#8fa3ba">可能丢</text>
+            <text x="130" y="88" font-size="34" font-weight="700" fill="#f3f6fa" class="zh">最多送一次</text><text x="130" y="88" font-size="34" font-weight="700" fill="#f3f6fa" class="eo">At most once</text>
+            <text x="130" y="140" font-size="27" fill="#8fa3ba" class="zh">可能丢</text><text x="130" y="140" font-size="27" fill="#8fa3ba" class="eo">may be lost</text>
           </g>
           <g>
             <rect x="10" y="230" width="880" height="170" rx="24" fill="rgba(242,183,5,.10)" stroke="#f2b705" stroke-width="4"/>
             <text x="50" y="310" font-size="56" font-weight="800" fill="#f2b705" class="en">1</text>
-            <text x="130" y="298" font-size="34" font-weight="700" fill="#f3f6fa">至少送一次</text>
-            <text x="130" y="350" font-size="27" fill="#ffd75a">可能重复 → 接收方去重</text>
+            <text x="130" y="298" font-size="34" font-weight="700" fill="#f3f6fa" class="zh">至少送一次</text><text x="130" y="298" font-size="34" font-weight="700" fill="#f3f6fa" class="eo">At least once</text>
+            <text x="130" y="350" font-size="27" fill="#ffd75a" class="zh">可能重复 → 接收方去重</text><text x="130" y="350" font-size="27" fill="#ffd75a" class="eo">may repeat → de-duplicate</text>
             <rect x="620" y="282" width="240" height="66" rx="33" fill="#f2b705"/>
-            <text x="740" y="326" font-size="27" font-weight="800" fill="#0b1220" text-anchor="middle">计数 · 事件</text>
+            <text x="740" y="326" font-size="27" font-weight="800" fill="#0b1220" text-anchor="middle" class="zh">计数 · 事件</text><text x="740" y="326" font-size="23" font-weight="800" fill="#0b1220" text-anchor="middle" class="eo">Counters · events</text>
           </g>
           <g>
             <rect x="10" y="440" width="880" height="170" rx="24" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
             <text x="50" y="520" font-size="56" font-weight="800" fill="#8fa3ba" class="en">2</text>
-            <text x="130" y="508" font-size="34" font-weight="700" fill="#f3f6fa">恰好一次</text>
-            <text x="130" y="560" font-size="27" fill="#8fa3ba">开销最大</text>
+            <text x="130" y="508" font-size="34" font-weight="700" fill="#f3f6fa" class="zh">恰好一次</text><text x="130" y="508" font-size="34" font-weight="700" fill="#f3f6fa" class="eo">Exactly once</text>
+            <text x="130" y="560" font-size="27" fill="#8fa3ba" class="zh">开销最大</text><text x="130" y="560" font-size="27" fill="#8fa3ba" class="eo">highest cost</text>
           </g>
         </svg>
     notes:
@@ -303,7 +303,7 @@ slides:
       - ["+ 匹配一层；# 匹配其后所有层", "+ matches one level; # matches all levels below"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g font-size="30" fill="#f3f6fa" class="en">
             <text x="20" y="50" font-weight="800">wq</text>
             <path d="M40 62 L40 112 L80 112" stroke="#4b5f7d" stroke-width="3" fill="none"/>
@@ -320,12 +320,12 @@ slides:
             <text x="230" y="566" fill="#8fa3ba">l03-08 …</text>
           </g>
           <rect x="440" y="300" width="440" height="50" rx="12" fill="rgba(242,183,5,.14)"/>
-          <text x="455" y="334" font-size="24" fill="#ffd75a">保留 · 遗嘱 → offline</text>
+          <text x="455" y="334" font-size="24" fill="#ffd75a" class="zh">保留 · 遗嘱 → offline</text><text x="455" y="334" font-size="24" fill="#ffd75a" class="eo">Retained · will → offline</text>
           <rect x="400" y="40" width="490" height="190" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="420" y="88" font-size="26" fill="#5ee0d2">看板订阅全车间状态</text>
+          <text x="420" y="88" font-size="26" fill="#5ee0d2" class="zh">看板订阅全车间状态</text><text x="420" y="88" font-size="25" fill="#5ee0d2" class="eo">Dashboard: every machine's state</text>
           <text x="420" y="140" font-size="27" font-weight="700" fill="#f3f6fa" class="en">wq/shirt/sewing/<tspan fill="#f2b705">+</tspan>/status</text>
           <text x="420" y="196" font-size="27" font-weight="700" fill="#f3f6fa" class="en">wq/shirt/<tspan fill="#f2b705">#</tspan></text>
-          <text x="660" y="196" font-size="22" fill="#8fa3ba">历史库全收</text>
+          <text x="660" y="196" font-size="22" fill="#8fa3ba" class="zh">历史库全收</text><text x="660" y="196" font-size="22" fill="#8fa3ba" class="eo">historian: all</text>
         </svg>
     notes:
       - "MQTT 有几个功能车间特别有用。保留消息：代理为每个主题存最新一条，新开的看板马上拿到每台机器的当前状态。遗嘱消息：设备连接时预留“我掉线了”，心跳超时后代理替它发出，看板显示离线；正常下线不会触发，要自己先发。通配符：加号匹配一层，井号匹配其后所有层。"
@@ -339,7 +339,7 @@ slides:
       - ["仿真和真实设备只差 source 一个字段", "Simulated and real machines differ only in source"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <text x="10" y="36" font-size="24" fill="#8fa3ba" class="en">wq/shirt/sewing/l03-07/counter</text>
           <rect x="10" y="56" width="880" height="576" rx="22" fill="#0d1626" stroke="#22324d" stroke-width="2"/>
           <g font-size="26" fill="#d3deea" font-family="DejaVu Sans Mono, monospace">
@@ -358,11 +358,11 @@ slides:
             <text x="40" y="580">}</text>
           </g>
           <path d="M600 120 L620 120 L620 350 L600 350" stroke="#8fb6ff" stroke-width="4" fill="none"/>
-          <text x="640" y="232" font-size="30" font-weight="800" fill="#8fb6ff">信封</text>
-          <text x="640" y="268" font-size="22" fill="#8fa3ba" class="en">envelope</text>
+          <text x="640" y="232" font-size="30" font-weight="800" fill="#8fb6ff" class="zh">信封</text><text x="640" y="232" font-size="28" font-weight="800" fill="#8fb6ff" class="eo">Envelope</text>
+          <text x="640" y="268" font-size="22" fill="#8fa3ba" class="en zh">envelope</text>
           <path d="M600 395 L620 395 L620 520 L600 520" stroke="#5ee0d2" stroke-width="4" fill="none"/>
-          <text x="640" y="452" font-size="28" font-weight="800" fill="#5ee0d2">累计值</text>
-          <text x="640" y="488" font-size="22" fill="#8fa3ba">单位写进字段名</text>
+          <text x="640" y="452" font-size="28" font-weight="800" fill="#5ee0d2" class="zh">累计值</text><text x="640" y="452" font-size="28" font-weight="800" fill="#5ee0d2" class="eo">Totals</text>
+          <text x="640" y="488" font-size="22" fill="#8fa3ba" class="zh">单位写进字段名</text><text x="640" y="488" font-size="22" fill="#8fa3ba" class="eo">unit in the name</text>
         </svg>
     notes:
       - "主题怎样命名，决定数据好不好找。按 ISA-95 层级，工厂、车间、工位、类别一层层往下，所有系统都在这棵主题树上收发，叫统一命名空间，代理就成了全厂唯一的实时数据源。问渠的每条消息是统一的 JSON：外层信封有版本、编号、时间、类型、来源，业务放 data。仿真和真实设备只差 source。"
@@ -386,9 +386,9 @@ slides:
   - layout: bignum
     title: ["一台平缝机，一个班次", "One lockstitch machine, one shift"]
     nums:
-      - {n: "{{ch26.pieces:.0f}} 件", n_en: "pieces", label: ["实际做的件数", "Pieces actually made"]}
+      - {n: "{{ch26.pieces:.0f}}", n_en: "pieces", label: ["实际做的件数", "Pieces actually made"]}
       - {n: "{{ch26.run:.0f}} min", n_en: "spindle time", label: ["主轴真正转动的时间", "Time the spindle really turns"]}
-      - {n: "{{ch26.kst:.0f}} 万针", n_en: "{{ch26.kst:.0f}}0 000 stitches", label: ["剪线约 {{ch26.trims:.0f}} 次", "About {{ch26.trims:.0f}} trims"]}
+      - {n: "{{ch26.kst:.0f}}0 000", n_en: "stitches", label: ["约 {{ch26.kst:.0f}} 万针，剪线约 {{ch26.trims:.0f}} 次", "About {{ch26.trims:.0f}} trims"]}
     foot: ["每针一条：{{ch26.stitch_per:.0f}} 条/班；每分钟汇总一条：{{ch26.minute_per:.0f}} 条/班 —— 相差约 {{ch26.shrink:.0f}} 倍", "One per stitch: {{ch26.stitch_per:.0f}} a shift; one per minute: {{ch26.minute_per:.0f}} — about {{ch26.shrink:.0f}} times fewer"]
     notes:
       - "先算一台机器。这台平缝机一个班次缝约 {{ch26.pieces:.0f}} 件，主轴转约 {{ch26.run:.0f}} 分钟，平均每分钟 3000 针，约 {{ch26.kst:.0f}} 万针，剪线约 {{ch26.trims:.0f}} 次。每针报一条，一班三十几万条；每次踏板和剪线报一条，约 {{ch26.segment_per:.0f}} 条；每分钟汇总一条，约 {{ch26.minute_per:.0f}} 条。差了好几百倍。"
@@ -399,8 +399,8 @@ slides:
     visual: {video: rate}
     caption: ["每针上报一年 {{ch26.stitch_tb:.0f}} TB；计数每件或每分钟汇总、状态变化即报：约 {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB", "Per stitch {{ch26.stitch_tb:.0f}} TB/yr; aggregated + events: {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB/yr"]
     notes:
-      - "乘到 500 台、两班、每年 300 天、每条 250 字节，图里五种方式轮流选一遍，纵坐标是对数。每针上报一年约 {{ch26.stitch_tb:.0f}} TB，大部分没人看；每 10 分钟汇总又太慢，停机 10 分钟后才显示。合理的是计数在边缘汇总、状态变化立即报，一年约 {{ch26.minute_gb:.0f}} 到 {{ch26.piece_gb:.0f}} GB，停机 5 秒内显示。"
-      - "Now 500 machines, two shifts, 300 days, 250 bytes a message; the chart cycles through the five strategies on a log scale. Every stitch: about {{ch26.stitch_tb:.0f}} terabytes a year, mostly unread. Every ten minutes: stoppages show ten minutes late. The sensible way aggregates counters at the edge and reports state changes at once: about {{ch26.minute_gb:.0f}} to {{ch26.piece_gb:.0f}} gigabytes a year, with stoppages shown within 5 seconds."
+      - "一台平缝机一个班次主轴转约 {{ch26.run:.0f}} 分钟、约 {{ch26.kst:.0f}} 万针。上报可以每针一条，也可以汇总以后再报。乘到 500 台、两班、每年 300 天、每条 250 字节，图里五种方式轮流选一遍，纵坐标是对数。每针上报一年约 {{ch26.stitch_tb:.0f}} TB，大部分没人看；每 10 分钟汇总又太慢，停机 10 分钟后才显示。合理的是计数在边缘汇总、状态变化立即报，一年约 {{ch26.minute_gb:.0f}} 到 {{ch26.piece_gb:.0f}} GB，停机 5 秒内显示。"
+      - "One lockstitch machine turns its spindle about {{ch26.run:.0f}} minutes a shift, roughly {{ch26.kst:.0f}}0 thousand stitches. You can report every stitch, or aggregate first. Now 500 machines, two shifts, 300 days, 250 bytes a message; the chart cycles through the five strategies on a log scale. Every stitch: about {{ch26.stitch_tb:.0f}} terabytes a year, mostly unread. Every ten minutes: stoppages show ten minutes late. The sensible way aggregates counters at the edge and reports state changes at once: about {{ch26.minute_gb:.0f}} to {{ch26.piece_gb:.0f}} gigabytes a year, with stoppages shown within 5 seconds."
 
   - layout: bignum
     title: ["设备综合效率 OEE = A × P × Q", "Overall equipment effectiveness: OEE = A × P × Q"]
@@ -429,19 +429,19 @@ slides:
       - ["不能当“机器利用率”考核工人", "Never use it to judge operators as machine utilisation"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
-          <text x="20" y="60" font-size="28" fill="#8fa3ba">计划时间 450 min</text>
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
+          <text x="20" y="60" font-size="28" fill="#8fa3ba" class="zh">计划时间 450 min</text><text x="20" y="60" font-size="28" fill="#8fa3ba" class="eo">Planned time 450 min</text>
           <rect x="20" y="90" width="860" height="120" rx="16" fill="#22324d"/>
           <rect x="20" y="90" width="228" height="120" rx="16" fill="#2ec4b6"/>
           <text x="134" y="166" font-size="44" font-weight="800" fill="#08101d" text-anchor="middle" class="en">{{ch26.ratio:.0f}}%</text>
-          <text x="560" y="166" font-size="32" font-weight="700" fill="#d3deea" text-anchor="middle">拿布 · 对齐 · 翻面 · 放下 · 停机</text>
-          <text x="20" y="260" font-size="28" fill="#5ee0d2">主轴真正转动 ≈ {{ch26.run:.0f}} min</text>
+          <text x="560" y="166" font-size="32" font-weight="700" fill="#d3deea" text-anchor="middle" class="zh">拿布 · 对齐 · 翻面 · 放下 · 停机</text><text x="560" y="166" font-size="25" font-weight="700" fill="#d3deea" text-anchor="middle" class="eo">Pick up · align · turn · put down · stops</text>
+          <text x="20" y="260" font-size="28" fill="#5ee0d2" class="zh">主轴真正转动 ≈ {{ch26.run:.0f}} min</text><text x="20" y="260" font-size="28" fill="#5ee0d2" class="eo">Spindle actually turning ≈ {{ch26.run:.0f}} min</text>
           <rect x="20" y="320" width="860" height="290" rx="24" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-          <text x="60" y="390" font-size="32" font-weight="800" fill="#ffd75a">要提高它，靠的是</text>
-          <text x="60" y="450" font-size="30" fill="#f3f6fa">● 工位布置</text>
-          <text x="60" y="505" font-size="30" fill="#f3f6fa">● 辅助工具</text>
-          <text x="60" y="560" font-size="30" fill="#f3f6fa">● 自动单元（第 12 讲）</text>
-          <text x="840" y="560" font-size="30" fill="#ff9c75" text-anchor="end">不是让工人踩快一点</text>
+          <text x="60" y="390" font-size="32" font-weight="800" fill="#ffd75a" class="zh">要提高它，靠的是</text><text x="60" y="390" font-size="32" font-weight="800" fill="#ffd75a" class="eo">To raise it, use</text>
+          <text x="60" y="450" font-size="30" fill="#f3f6fa" class="zh">● 工位布置</text><text x="60" y="450" font-size="30" fill="#f3f6fa" class="eo">● Workplace layout</text>
+          <text x="60" y="505" font-size="30" fill="#f3f6fa" class="zh">● 辅助工具</text><text x="60" y="505" font-size="30" fill="#f3f6fa" class="eo">● Sewing aids</text>
+          <text x="60" y="560" font-size="30" fill="#f3f6fa" class="zh">● 自动单元（第 12 讲）</text><text x="60" y="560" font-size="30" fill="#f3f6fa" class="eo">● Automatic units (Lecture 12)</text>
+          <text x="840" y="560" font-size="30" fill="#ff9c75" text-anchor="end" class="zh">不是让工人踩快一点</text><text x="840" y="390" font-size="28" fill="#ff9c75" text-anchor="end" class="eo">not faster pedalling</text>
         </svg>
     notes:
       - "最容易被误读的数是缝纫时间比例：主轴真正转动的时间占计划时间多少。算例里主轴只转了约 {{ch26.run:.0f}} 分钟，约 {{ch26.ratio:.0f}}%。其余时间在拿布、对齐、翻面、放下，标准工时里本来就包括。所以不能拿它当机器利用率考核工人；要提高它，靠工位布置、辅助工具和自动单元。"
@@ -455,21 +455,21 @@ slides:
       - ["以衣架或工票为准，剪线用来核对", "Count by hanger or ticket; cross-check with trims"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
-          <text x="20" y="44" font-size="26" fill="#8fa3ba">三种数件方法的误差（算例，示意）</text>
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
+          <text x="20" y="44" font-size="26" fill="#8fa3ba" class="zh">三种数件方法的误差（算例，示意）</text><text x="20" y="44" font-size="24" fill="#8fa3ba" class="eo">Count error by method (worked example, illustrative)</text>
           <path d="M450 80 L450 540" stroke="#4b5f7d" stroke-width="3" stroke-dasharray="8 8"/>
-          <text x="450" y="580" font-size="24" fill="#8fa3ba" text-anchor="middle">实际件数</text>
-          <text x="20" y="160" font-size="32" font-weight="700" fill="#f3f6fa">剪线</text>
+          <text x="450" y="580" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">实际件数</text><text x="450" y="580" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">Actual pieces</text>
+          <text x="20" y="160" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">剪线</text><text x="20" y="160" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">Trims</text>
           <rect x="450" y="115" width="300" height="70" rx="12" fill="#ff7a45"/>
           <text x="770" y="162" font-size="34" font-weight="800" fill="#ff9c75" class="en">+{{ch26.err:.1f}}%</text>
-          <text x="470" y="230" font-size="24" fill="#ffb38f">返工 + 断线，多剪线</text>
-          <text x="20" y="330" font-size="32" font-weight="700" fill="#f3f6fa">工票</text>
+          <text x="470" y="230" font-size="24" fill="#ffb38f" class="zh">返工 + 断线，多剪线</text><text x="470" y="230" font-size="24" fill="#ffb38f" class="eo">Rework + breaks: extra trims</text>
+          <text x="20" y="330" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">工票</text><text x="20" y="300" font-size="28" font-weight="700" fill="#f3f6fa" class="eo">Tickets</text>
           <rect x="190" y="285" width="260" height="70" rx="12" fill="#4c8dff"/>
           <text x="170" y="332" font-size="34" font-weight="800" fill="#8fb6ff" text-anchor="end" class="en">−2%</text>
-          <text x="440" y="400" font-size="24" fill="#8fb6ff" text-anchor="end">2% 的扎漏扫，整扎地少</text>
-          <text x="20" y="490" font-size="32" font-weight="700" fill="#f3f6fa">衣架</text>
+          <text x="440" y="400" font-size="24" fill="#8fb6ff" text-anchor="end" class="zh">2% 的扎漏扫，整扎地少</text><text x="440" y="400" font-size="24" fill="#8fb6ff" text-anchor="end" class="eo">2% of bundles never scanned</text>
+          <text x="20" y="490" font-size="32" font-weight="700" fill="#f3f6fa" class="zh">衣架</text><text x="20" y="490" font-size="32" font-weight="700" fill="#f3f6fa" class="eo">Hangers</text>
           <rect x="440" y="445" width="20" height="70" rx="6" fill="#2ec4b6"/>
-          <text x="490" y="492" font-size="30" font-weight="700" fill="#5ee0d2">最准：逐件读编号</text>
+          <text x="490" y="492" font-size="30" font-weight="700" fill="#5ee0d2" class="zh">最准：逐件读编号</text><text x="490" y="492" font-size="28" font-weight="700" fill="#5ee0d2" class="eo">Best: each piece read by ID</text>
         </svg>
     notes:
       - "这是按原理编写的案例。车间按剪线次数除以段数数件、发计件工资，工人反映统计数比工票多。原因是返工重缝、断线后重新起缝都多剪一次线：剪线约 {{ch26.trims:.0f}} 次，除以 3 得约 {{ch26.est:.0f}} 件，多了 {{ch26.err:.1f}}%。工票漏扫则整扎地少；衣架计数最准。以衣架或工票为准，剪线用来核对。"
@@ -527,9 +527,9 @@ slides:
       - ["按夹爪闭合数件，重抓一次就多一件", "Count by gripper closures and every re-grip adds one"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="10" y="20" width="360" height="560" rx="26" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
-          <text x="190" y="70" font-size="30" font-weight="800" fill="#f3f6fa" text-anchor="middle">机器人工作站</text>
+          <text x="190" y="70" font-size="30" font-weight="800" fill="#f3f6fa" text-anchor="middle" class="zh">机器人工作站</text><text x="190" y="70" font-size="30" font-weight="800" fill="#f3f6fa" text-anchor="middle" class="eo">Robot cell</text>
           <rect x="120" y="470" width="140" height="60" rx="10" fill="#4b5f7d"/>
           <path d="M190 470 L190 380 L280 260 L200 170" stroke="#ff7a45" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           <circle cx="190" cy="380" r="22" fill="#f2b705"/><circle cx="280" cy="260" r="20" fill="#f2b705"/>
@@ -538,13 +538,13 @@ slides:
           <path d="M372 150 L440 150 M372 330 L440 330 M372 500 L440 500" stroke="#8fa3ba" stroke-width="4" marker-end="url(#r26)"/>
           <rect x="450" y="90" width="440" height="130" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
           <text x="470" y="140" font-size="25" fill="#5ee0d2" class="en">wq/…/robot-01/status</text>
-          <text x="470" y="190" font-size="26" fill="#f3f6fa">保留 · 遗嘱 → offline</text>
+          <text x="470" y="190" font-size="26" fill="#f3f6fa" class="zh">保留 · 遗嘱 → offline</text><text x="470" y="190" font-size="26" fill="#f3f6fa" class="eo">Retained · will → offline</text>
           <rect x="450" y="265" width="440" height="130" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
           <text x="470" y="315" font-size="25" fill="#ffd75a" class="en">wq/…/robot-01/counter</text>
-          <text x="470" y="365" font-size="26" fill="#f3f6fa">循环数 · 抓取次数（累计）</text>
+          <text x="470" y="365" font-size="26" fill="#f3f6fa" class="zh">循环数 · 抓取次数（累计）</text><text x="470" y="365" font-size="26" fill="#f3f6fa" class="eo">Cycles · picks (cumulative)</text>
           <rect x="450" y="440" width="440" height="130" rx="20" fill="rgba(255,122,69,.12)" stroke="#ff7a45" stroke-width="3"/>
           <text x="470" y="490" font-size="26" font-weight="700" fill="#ff9c75">OEE = A × P × Q</text>
-          <text x="470" y="540" font-size="25" fill="#f3f6fa">P 用程序的理想节拍</text>
+          <text x="470" y="540" font-size="25" fill="#f3f6fa" class="zh">P 用程序的理想节拍</text><text x="470" y="540" font-size="25" fill="#f3f6fa" class="eo">P uses the ideal program cycle</text>
         </svg>
     notes:
       - "这一套在机器人上完全一样。焊接或搬运机器人的状态用保留消息发到它的 status 主题，掉线由遗嘱消息变成离线；循环数、抓取次数报累计值。它的 OEE 也是 A 乘 P 乘 Q，只是 P 用程序的理想节拍。计件也有同样的坑：按夹爪闭合数件，重抓一次就多一件，要用视觉或到位信号核对。"
@@ -558,11 +558,11 @@ slides:
       - ["重复收到也不会多算电费", "A duplicate doesn't add to the bill"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="230" y="20" width="440" height="300" rx="36" fill="#111d31" stroke="#8fa3ba" stroke-width="4"/>
           <rect x="280" y="80" width="340" height="110" rx="14" fill="#0b1a12" stroke="#2ec4b6" stroke-width="3"/>
           <text x="450" y="160" font-size="64" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">01206</text>
-          <text x="450" y="240" font-size="28" fill="#8fa3ba" text-anchor="middle">累计 kWh（示意）</text>
+          <text x="450" y="240" font-size="28" fill="#8fa3ba" text-anchor="middle" class="zh">累计 kWh（示意）</text><text x="450" y="240" font-size="28" fill="#8fa3ba" text-anchor="middle" class="eo">Total kWh (illustrative)</text>
           <path d="M60 470 L840 470" stroke="#2c3e5c" stroke-width="6" stroke-linecap="round"/>
           <g font-size="38" font-weight="800" text-anchor="middle" class="en">
             <circle cx="150" cy="470" r="14" fill="#2ec4b6"/><text x="150" y="430" fill="#5ee0d2">1200</text>
@@ -571,7 +571,7 @@ slides:
           </g>
           <g font-size="22" fill="#8fa3ba" text-anchor="middle" class="en"><text x="150" y="510">08:00</text><text x="450" y="510">09:00</text><text x="750" y="510">10:00</text></g>
           <rect x="150" y="550" width="600" height="72" rx="18" fill="rgba(242,183,5,.12)"/>
-          <text x="450" y="597" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">两小时用电 = 1206 − 1200 = 6 度</text>
+          <text x="450" y="597" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">两小时用电 = 1206 − 1200 = 6 度</text><text x="450" y="597" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">Two hours: 1206 − 1200 = 6 kWh</text>
         </svg>
     notes:
       - "生活里有一个一模一样的例子：智能电表。它上报的是表上的累计读数，而不是这一刻用了多少度。中间丢了一次上报，没关系，下一次的读数减去上一次收到的读数，这段时间的用电照样算得出来；重复收到一次，也不会多收电费。缝纫机上报累计针数和件数，用的是同一个道理。"
@@ -581,9 +581,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["{{ch26.pieces:.0f}} 件，OEE {{ch26.OEE:.1f}}%，剪线数多了 {{ch26.err:.1f}}%", "{{ch26.pieces:.0f}} pieces, OEE {{ch26.OEE:.1f}}%, trim count {{ch26.err:.1f}}% high"]
     rows:
-      - ["A × P × Q", "{{ch26.A:.1f}} × {{ch26.P:.0f}} × {{ch26.Q:.0f}}%"]
-      - ["最大损失：速度", "≈ {{ch26.speed:.0f}} min"]
-      - ["按剪线次数数件", "{{ch26.est:.0f}} 件"]
+      - [["A × P × Q", "A × P × Q"], ["{{ch26.A:.1f}} × {{ch26.P:.0f}} × {{ch26.Q:.0f}}%", "{{ch26.A:.1f}} × {{ch26.P:.0f}} × {{ch26.Q:.0f}}%"]]
+      - [["最大损失：速度", "Biggest loss: speed"], ["≈ {{ch26.speed:.0f}} min", "≈ {{ch26.speed:.0f}} min"]]
+      - [["按剪线次数数件", "Counted by trims"], ["{{ch26.est:.0f}} 件", "{{ch26.est:.0f}} pieces"]]
     side: {big: "{{ch26.stitch_tb:.0f}} TB", text: ["500 台每针上报一年的数据；改为汇总 + 事件即报约 {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB", "A year of per-stitch data from 500 machines; aggregate + events: about {{ch26.minute_gb:.0f}}–{{ch26.piece_gb:.0f}} GB"]}
     foot: ["记件以衣架或工票为准，剪线计数用来核对返工和断线", "Count by hanger or ticket; use trims to watch rework and thread breaks"]
     notes:

@@ -1,0 +1,130 @@
+# 《缝纫机设计与制造》公开课 第 26 讲：设备联网与数字孪生
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch26.yaml；2026-11-04 补英文版 SVG、回答页中英两栏、封面事件流右移），
+# 配音是课件每页的讲稿（notes），中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 26-1（缝纫机联网：事件、指标与数据量）录屏、数字工厂（第 23 轮 3.4：第 26、27 讲演示数字工厂的完整流程——
+# 本讲讲总线消息怎样从测量工位进控制图、追溯和实施分期，下一讲细讲）、作业页、测验页。
+# 数字一律由 course/calc/ch26.py 算出（{{ch26.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "26"
+deck: ch26
+skip: [5, 8, 14, 16, 20, 24, 26]   # 四层架构、事件流（封面已在放）、OPC UA、单台数据量（下一页已给全年）、缝纫时间比例、ERP 对接（数字工厂段讲）、远程运维与安全：课程部分约 10 分钟；这几页留给课件
+code: [ch26]
+title: ["设备联网与数字孪生——把锁在机器里的数字送出来", "Connected Machines and Digital Twins — Getting the Numbers Out of the Machine"]
+chapter: ["第七篇 制造与数字工厂 · 第 26 章", "Part VII Manufacturing and the Digital Factory · Chapter 26"]
+next: ["第 27 讲", "Lecture 27"]
+cover_formula: 'OEE = A \times P \times Q'
+tags:
+  zh: [设备联网, 工业物联网, MQTT, OPC UA, 统一命名空间, 消息信封, 累计计数, 服务质量, 边缘汇总, OEE, 设备综合效率, 计件, 数字孪生, 缝纫机制造, 数字工厂]
+  en: [connected machines, industrial IoT, MQTT, OPC UA, unified namespace, message envelope, cumulative counters, quality of service, edge aggregation, OEE, overall equipment effectiveness, piece counting, digital twin, sewing machine manufacturing, digital factory]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十六讲，设备联网与数字孪生。
+    - 背景里跑的是一台平缝机一刻钟的事件流：主轴转了多久、剪了几次线、什么时候断线。今天看这些数字怎样送出来、送多少、算成什么指标。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 26, connected machines and digital twins.
+    - In the background is a quarter-hour of events from one lockstitch machine: when the spindle turned, every trim, every thread break. Today we'll see how those numbers get out, how much of it to send, and what to turn them into.
+
+after:
+  - id: lab261
+    kind: lab
+    lab: iot
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checksA,#checksB,#tbl,#tasks,#msg{filter:blur(7px) grayscale(1)} #rate{filter:grayscale(1)}'; document.head.appendChild(st); const nt = document.querySelector('#pageA .col > p.note'); if (nt) nt.style.visibility = 'hidden'; document.getElementById('resetA').click(); })()"
+        dur: 4
+      - js: "(() => { const r = document.getElementById('rerun'); r.click(); setTimeout(function(){ r.click(); }, 2500); setTimeout(function(){ r.click(); }, 5000); })()"
+        dur: 7
+      - js: "(() => { const s = document.getElementById('method'); const f = v => { s.value = v; s.dispatchEvent(new Event('input', {bubbles: true})); s.dispatchEvent(new Event('change', {bubbles: true})); }; f('ticket'); setTimeout(function(){ f('trim'); }, 3000); })()"
+        dur: 6
+      - js: "(() => { document.getElementById('tabB').click(); const m = document.getElementById('mode'); const f = v => { m.value = v; m.dispatchEvent(new Event('input', {bubbles: true})); m.dispatchEvent(new Event('change', {bubbles: true})); }; f('stitch'); setTimeout(function(){ f('tenmin'); }, 2500); })()"
+        dur: 6
+    say:
+      zh:
+        - ">下面是虚拟实验 26-1，缝纫机联网，在问渠平台上可以亲手做，结果、判据和任务先遮住。第①页左边是事件流和 OEE 瀑布图，下面是按问渠信封生成的总线消息，右边调工况。"
+        - ">先恢复标准，读出件数、A、P、Q 和 OEE，再点几次“换一段”，数一数一段里的件数和剪线次数，说说剪线数为什么偏多。"
+        - ">任务二：不改工时、效率和断线这些工况，只改“件数怎样数”，再配合漏扫概率，想办法让统计误差小于 1%。怎样设置、误差为什么能降下来，写进报告。"
+        - ">任务一：切到第②页，保持 500 台、每条 250 字节、两班，五种上报方式挨个试，对照消息率、年存储、状态延迟和件数延迟四项判据，找出全部满足的方式。任务三是按页面底部给的班次数据手算 OEE。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 26-1, a connected sewing machine, which you can do yourself on WenQuest. The results, criteria and tasks are blurred. Page one shows the event stream and the OEE waterfall on the left, with a bus message in the WenQuest envelope below; you set the conditions on the right."
+        - ">First reset to standard and read the pieces, A, P, Q and OEE. Then click 'New stretch' a few times, count the pieces and trims in one stretch, and explain why the trim count runs high."
+        - ">Task two: leave the standard minute, efficiency and thread breaks alone, change only how pieces are counted, together with the missed-scan probability, and get the count error under 1 percent. How you set it, and why the error drops, goes in your report."
+        - ">Task one: on page two, keep 500 machines, 250 bytes a message and two shifts, try the five reporting strategies one by one, and check message rate, yearly storage, state delay and count delay to find the ones that pass all four. Task three asks you to work out OEE by hand from the shift data at the bottom of the page. The guide and report template are on the platform."
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    viewport: [1600, 900]
+    steps:
+      - js: "document.body.style.zoom = '0.75'; document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); document.getElementById('checksA').style.filter = 'blur(7px) grayscale(1)'"
+        press: "#play"
+      - js: "document.getElementById('log').style.outline = '4px solid #f2b705'"
+        dur: 2
+      - press: "#tabB"
+        js: "setTimeout(() => { document.querySelectorAll('svg text').forEach(t => { if (!/已装整机|Built #|仓库剩余|Left in stores|已发货|Shipped/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }); document.querySelectorAll('svg text').forEach(t => { if (/装用起点|first used at/.test(t.textContent)) t.style.filter = 'blur(6px)'; }); ['cv3', 'checksL', 'late', 'latev', 'affIn'].forEach(i => { const e = document.getElementById(i); if (e) e.style.filter = 'blur(7px) grayscale(1)'; }); const s = document.createElement('style'); s.textContent = '#arch tr:nth-child(4) td.m, #arch tr:nth-child(11) td.m { filter: blur(7px) grayscale(1); }'; document.head.appendChild(s); }, 800)"
+      - press: "#tabC"
+        js: "document.getElementById('checksC').style.filter = 'blur(7px) grayscale(1)'"
+    say:
+      zh:
+        - ">这是问渠数字工厂，今天讲的规则在这里全部用上。总装调试工位逐台测梭尖间隙，每个读数就是一条总线消息。"
+        - ">看下面的消息框：主题按工厂、车间、工位、类别一层层排，外层是统一信封，有编号、时间、类型和来源，data 里是序列号、特性、测量值和旋梭批次。历史库订阅这些消息画控制图，过程一漂移就报警，自动起草不合格品报告。"
+        - ">第二页是追溯：报警的整机查到旋梭批次，再反查同批旋梭装进了哪些整机、有没有发货。靠的就是每条消息都带着序列号。"
+        - ">第三页是实施分期：联网和数字工厂分几期做、每期投多少、多久回本。下一讲完整地走一遍。"
+      en:
+        - ">This is the WenQuest digital factory, where every rule from today is put to work. The adjustment station on the assembly line measures the hook clearance of every machine, and each reading is one bus message."
+        - ">Look at the message box below. The topic runs plant, area, station, category, level by level. Outside is the common envelope, with ID, time, type and source; inside 'data' are the serial number, the characteristic, the reading and the hook batch. The historian subscribes, draws the control chart, raises an alarm as soon as the process drifts, and drafts a nonconformance report."
+        - ">Page two is traceability: from the machine that raised the alarm back to its hook batch, then forward to every machine built with that batch and whether any have shipped. It works because every message carries the serial number."
+        - ">Page three is the roll-out plan: how many phases, what each costs, and how long until it pays back. The next lecture walks through all of it."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 26：一条缝制线的联网方案与班次分析", "Assignment 26: connecting a sewing line and analysing a shift"]
+      points:
+        - ["一个工位的班次：件数、A、P、Q、OEE 与剪线计数误差", "One station's shift: pieces, A, P, Q, OEE and trim-count error"]
+        - ["300 台车间：选上报方式，核对四项判据", "A 300-machine floor: choose a strategy, check four criteria"]
+        - ["主题、counter 消息 JSON、保留与遗嘱；个人数据意见", "Topics, a counter JSON, retained and will; a personal-data opinion"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，一个工位班次 480 分钟、休息 30，等活 40、故障 20 分钟，断线每小时 2 次、每次 1 分钟，标准工时 0.75，效率 80%，返修 4%，每件 4 段，完整条件见平台；求件数、A、P、Q、OEE 和按剪线计数的误差，指出最该先改哪一项。"
+        - ">第二题，300 台缝纫机的车间，选一种上报方式，估算消息率和年存储量，逐条核对四项判据。"
+        - ">第三题，给 2 号线 5 号工位设计主题，写一条 counter 消息的 JSON，说明保留、遗嘱和通配符；第四题，车间想公开每个操作工的每件用时排名，写一段不超过 300 字的意见。记住，操作工的个人数据要事先告知目的、方式和范围，只采必要的。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">Your assignment has four questions. One: a station works a 480-minute shift with a 30-minute break, 40 minutes waiting, 20 of faults, 2 one-minute thread breaks an hour, a standard minute of 0.75, 80 percent efficiency, 4 percent rework and 4 seams a piece; the full data are on the platform. Find the pieces, A, P, Q, OEE and the trim-count error, and say which loss to tackle first."
+        - ">Two: for a floor of 300 machines, choose a reporting strategy, estimate the message rate and yearly storage, and check each of the four criteria."
+        - ">Three: design the topics for line 2, station 5, write one counter message in JSON, and explain the retained message, the will and the wildcard. Four: the floor wants to publish a ranking of every operator's time per piece; write an opinion of no more than 300 words. Remember that operators' personal data need notice of purpose, means and scope up front, and only what is necessary may be collected."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["QoS 1 可能重复：按什么去重？", "QoS 1 may duplicate: what do you de-duplicate by?"]
+        - ["800 台每分钟汇总一条：平均每秒多少条？", "800 machines, one summary a minute: messages per second?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：计数消息用 QoS 1 发，接收方可能收到重复的，应该按什么去重？"
+        - ">再比如：800 台缝纫机都按每分钟汇总一条上报计数，全车间平均每秒多少条消息？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: counter messages go out with QoS 1, so the receiver may get duplicates. What should it de-duplicate by?"
+        - ">Or: 800 sewing machines each send one counter summary a minute. How many messages per second does the floor average?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - See you next time.
