@@ -453,3 +453,43 @@ def cute_fridge(cx, cy, k, at, idp="fz", mood="happy", moves=True, hot=False):
                **({"amp": 12, "hz": 3} if hot else {"rpm": 40})},
               {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_b", idp + "_d"], "pivot": [X(0), Y(0)], "amp": 4 if hot else 2, "hz": 4 if hot else 1.2}]
     return E
+
+
+def cute_plasma(cx, cy, k, at, idp="pl", mood="happy", moves=True):
+    """一亿度的小火球“亿亿” (2026-11-04): a round plasma blob centred at (cx, cy) with flickering flame tips.
+    Ids: <idp>_b (body + face), <idp>_f (flame tips; wiggle). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-90), "y": Y(90), "w": 180 * k, "h": 180 * k, "c": "red", "fill": "gold"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 32 - 11), "y": Y(35), "w": 22 * k, "h": 26 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-28)},{Y(-20)} Q{X(0)},{Y(-48)} {X(28)},{Y(-20)}", "sad": f"M{X(-28)},{Y(-40)} Q{X(0)},{Y(-15)} {X(28)},{Y(-40)}",
+         "o": f"M{X(-12)},{Y(-30)} a{12 * k},{12 * k} 0 1,0 {24 * k},0 a{12 * k},{12 * k} 0 1,0 {-24 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    tips = " ".join(f"M{X(-60 + 40 * q)},{Y(70 - abs(q - 1.5) * 12)} Q{X(-50 + 40 * q)},{Y(150)} {X(-40 + 40 * q)},{Y(80 - abs(q - 1.5) * 12)}" for q in range(4))
+    E.append({"t": "path", "at": at, "id": idp + "_f", "c": "red", "w": 6, "d": tips})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_f"], "pivot": [X(0), Y(80)], "amp": 10, "hz": 3},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_f"], "amp": 8, "hz": 1.4}]
+    return E
+
+
+def cute_probe(cx, cy, k, at, idp="vg", mood="happy", moves=True):
+    """旅行者号 Voy (2026-11-04): a dish-faced space probe centred at (cx, cy): big dish with a face, a boom and an antenna stick.
+    Ids: <idp>_b (dish + face + body), <idp>_a (boom/antenna; wiggles). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-110), "y": Y(110), "w": 220 * k, "h": 220 * k, "c": "ink", "fill": "paper"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": X(-50), "y": Y(-100), "w": 100 * k, "h": 60 * k, "c": "ink", "fill": "gold"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 38 - 12), "y": Y(40), "w": 24 * k, "h": 28 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-32)},{Y(-25)} Q{X(0)},{Y(-55)} {X(32)},{Y(-25)}", "sad": f"M{X(-32)},{Y(-45)} Q{X(0)},{Y(-20)} {X(32)},{Y(-45)}",
+         "o": f"M{X(-12)},{Y(-35)} a{12 * k},{12 * k} 0 1,0 {24 * k},0 a{12 * k},{12 * k} 0 1,0 {-24 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    E.append({"t": "path", "at": at, "id": idp + "_a", "c": "ink", "w": 6,
+              "d": f"M{X(50)},{Y(-70)} L{X(230)},{Y(-160)} M{X(-50)},{Y(-70)} L{X(-200)},{Y(-120)} M{X(0)},{Y(110)} L{X(0)},{Y(190)}"})
+    E.append({"t": "ellipse", "at": at, "id": idp + "_a", "x": X(-14), "y": Y(204), "w": 28 * k, "h": 28 * k, "c": "red", "fill": "red"})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_a"], "pivot": [X(0), Y(0)], "amp": 6, "hz": 1.5},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_a"], "amp": 8, "hz": 1.0}]
+    return E
