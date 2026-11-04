@@ -1,0 +1,36 @@
+{
+ "name": "run11_7",
+ "fingerprint": "dc0886039bf87e59",
+ "at": "2026-11-04T18:37:21Z",
+ "platform": "lambda",
+ "region": "",
+ "instance_type": "gpu_1x_a10",
+ "env": {
+  "python": "3.10.12",
+  "os": "Linux-6.8.0-60-generic-x86_64-with-glibc2.35",
+  "gpu": "NVIDIA A10",
+  "driver": "570.148.08",
+  "gpu_memory": "23028 MiB",
+  "sm_clock_max": "1695 MHz",
+  "gpus": "1",
+  "nvcc": "12.8",
+  "torch": "2.7.0",
+  "torch_cuda": "12.8",
+  "capability": "8.6",
+  "triton": "3.3.0"
+ },
+ "values": {
+  "torch": "2.7.0",
+  "eager_precision": "fp16",
+  "engine_precision": "fp32",
+  "eager_ms": 1.8676509999977498,
+  "eager_b32_ms": 5.529343999981506,
+  "eager_fps": 5787.30496784194,
+  "compile_ms": 1.075855000010506,
+  "compile_b32_ms": 4.531808000010074,
+  "compile_fps": 7061.199415316993,
+  "onnx_note": "导出 ONNX 失败（AttributeError），这一路跳过",
+  "engine": "skipped",
+  "_gpu_name": "NVIDIA A10"
+ }
+}
