@@ -1,0 +1,847 @@
+1
+00:00:00,600 --> 00:00:01,517
+Hi everyone,
+
+2
+00:00:01,537 --> 00:00:07,140
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:07,540 --> 00:00:13,760
+This is Lecture 26, connected machines and digital twins.
+
+4
+00:00:14,160 --> 00:00:20,548
+{'In the background is a quarter-hour of events from one lockstitch machine':
+
+5
+00:00:20,568 --> 00:00:25,292
+"when the spindle turned, every trim, every thread break.
+
+6
+00:00:25,312 --> 00:00:30,784
+Today we'll see how those numbers get out, how much of it to send,
+
+7
+00:00:30,804 --> 00:00:33,198
+and what to turn them into."}
+
+8
+00:00:34,718 --> 00:00:36,698
+Here's the problem.
+
+9
+00:00:37,098 --> 00:00:44,558
+A shirt line fits a connectivity module to the lockstitch machine at station 7.
+
+10
+00:00:44,958 --> 00:00:52,333
+A 480-minute shift with a 30-minute break, 0.6 standard minutes a piece,
+
+11
+00:00:52,353 --> 00:00:58,084
+85 percent efficiency; 25 minutes waiting, 12 of faults,
+
+12
+00:00:58,104 --> 00:01:02,603
+1.5 thread breaks an hour, 3 percent rework.
+
+13
+00:01:03,003 --> 00:01:06,503
+The shop plans to count pieces by trims.
+
+14
+00:01:06,903 --> 00:01:08,763
+How many pieces really?
+
+15
+00:01:09,163 --> 00:01:11,303
+What OEE?
+
+16
+00:01:11,703 --> 00:01:14,327
+How far off is the trim count?
+
+17
+00:01:14,727 --> 00:01:19,987
+And if 500 machines reported every stitch, how much data a year?
+
+18
+00:01:20,387 --> 00:01:21,807
+We'll answer at the end.
+
+19
+00:01:23,327 --> 00:01:27,939
+Where the data come from and how to organise them.
+
+20
+00:01:29,459 --> 00:01:31,679
+Where do the data come from?
+
+21
+00:01:32,079 --> 00:01:39,105
+To do its own job the controller already records spindle start, stop and speed,
+
+22
+00:01:39,125 --> 00:01:43,208
+stitch count, trims, backtacks and foot lifts,
+
+23
+00:01:43,228 --> 00:01:49,897
+thread breaks on machines with a detector, plus fault codes and parameters,
+
+24
+00:01:49,917 --> 00:01:51,859
+with no extra sensors.
+
+25
+00:01:52,259 --> 00:01:58,151
+But it doesn't know who is sewing or which piece: the operator swipes a badge,
+
+26
+00:01:58,171 --> 00:02:02,319
+and the piece comes from a ticket barcode or hanger ID.
+
+27
+00:02:02,719 --> 00:02:08,866
+Put both together and you know who did which operation on which piece,
+
+28
+00:02:08,886 --> 00:02:09,659
+and when.
+
+29
+00:02:11,179 --> 00:02:15,634
+A floor often has machines from several makers and generations,
+
+30
+00:02:15,654 --> 00:02:18,830
+so their data must first share one structure.
+
+31
+00:02:19,230 --> 00:02:24,436
+Four kinds: identity, such as ID, model, firmware and station,
+
+32
+00:02:24,456 --> 00:02:29,662
+which rarely changes; state, mapped with OPC UA for Machinery,
+
+33
+00:02:29,682 --> 00:02:33,876
+the other main industrial standard, running, idle,
+
+34
+00:02:33,896 --> 00:02:40,366
+fault and off matching its four states; counters, quantities that only go up;
+
+35
+00:02:40,386 --> 00:02:44,159
+and events, things that happen at an instant.
+
+36
+00:02:45,679 --> 00:02:51,139
+The key with counters: report cumulative values, not increments.
+
+37
+00:02:51,539 --> 00:02:56,999
+Here the machine reports the shift's running total every minute.
+
+38
+00:02:57,399 --> 00:03:00,661
+The 10:02 message is lost,
+
+39
+00:03:00,681 --> 00:03:08,359
+yet 124 at 10:03 minus 121 at 10:01 still gives all 3 pieces,
+
+40
+00:03:08,379 --> 00:03:12,019
+and a duplicate does no harm.
+
+41
+00:03:12,419 --> 00:03:17,227
+Report 'pieces this minute' and a lost message is lost for good.
+
+42
+00:03:17,627 --> 00:03:25,593
+The receiver must also spot resets after a power cycle or controller swap and
+
+43
+00:03:25,613 --> 00:03:26,527
+carry on.
+
+44
+00:03:28,047 --> 00:03:32,502
+Communication: MQTT and OPC UA.
+
+45
+00:03:34,022 --> 00:03:38,900
+One of the most used protocols on the floor is MQTT,
+
+46
+00:03:38,920 --> 00:03:41,819
+which works like a post office.
+
+47
+00:03:42,219 --> 00:03:48,743
+A machine publishes to a topic, say 'line 3 station 7 / status',
+
+48
+00:03:48,763 --> 00:03:56,310
+without caring who reads it; dashboards, MES and databases each subscribe,
+
+49
+00:03:56,330 --> 00:03:58,559
+and a broker forwards.
+
+50
+00:03:58,959 --> 00:04:01,534
+Neither side knows the other,
+
+51
+00:04:01,554 --> 00:04:07,619
+so adding a dashboard or a database changes nothing on the machines.
+
+52
+00:04:08,019 --> 00:04:13,055
+The headers are tiny, so Wi-Fi and small modules cope.
+
+53
+00:04:14,575 --> 00:04:17,915
+MQTT has three levels of service.
+
+54
+00:04:18,315 --> 00:04:22,391
+QoS 0 delivers at most once and may lose;
+
+55
+00:04:22,411 --> 00:04:30,284
+QoS 1 at least once and may duplicate; QoS 2 exactly once, at the highest cost.
+
+56
+00:04:30,684 --> 00:04:34,327
+Counters and events normally use QoS 1,
+
+57
+00:04:34,347 --> 00:04:40,525
+so the receiver de-duplicates by the unique ID inside the message;
+
+58
+00:04:40,545 --> 00:04:45,784
+the packet identifier gets reused and can't do that job.
+
+59
+00:04:46,184 --> 00:04:51,564
+Cumulative counters help again: a duplicate never double-counts.
+
+60
+00:04:53,084 --> 00:04:57,664
+A few MQTT features matter on the floor.
+
+61
+00:04:58,064 --> 00:05:03,022
+Retained messages: the broker keeps the latest per topic,
+
+62
+00:05:03,042 --> 00:05:08,524
+so a newly opened dashboard gets every machine's state at once.
+
+63
+00:05:08,924 --> 00:05:11,776
+Will messages: left at connect time,
+
+64
+00:05:11,796 --> 00:05:15,685
+sent by the broker when the keep-alive times out,
+
+65
+00:05:15,705 --> 00:05:21,190
+so the dashboard shows 'offline'; a clean disconnect doesn't fire it,
+
+66
+00:05:21,210 --> 00:05:23,424
+so publish offline yourself.
+
+67
+00:05:23,824 --> 00:05:29,124
+Wildcards: plus matches one level, hash everything below.
+
+68
+00:05:30,644 --> 00:05:35,786
+How topics are named decides how easy data are to find.
+
+69
+00:05:36,186 --> 00:05:40,162
+Follow ISA-95, plant, area, station, category,
+
+70
+00:05:40,182 --> 00:05:45,721
+and have every system use one topic tree: the unified namespace,
+
+71
+00:05:45,741 --> 00:05:50,846
+which makes the broker the plant's single real-time source.
+
+72
+00:05:51,246 --> 00:06:00,553
+Every WenQuest message is the same JSON: an envelope with version, ID, time,
+
+73
+00:06:00,573 --> 00:06:06,689
+type and source, and the business content in data.
+
+74
+00:06:07,089 --> 00:06:10,309
+Simulated and real machines differ only in source.
+
+75
+00:06:11,829 --> 00:06:14,423
+Data volume and metrics.
+
+76
+00:06:15,943 --> 00:06:23,730
+One lockstitch machine turns its spindle about 120 minutes a shift,
+
+77
+00:06:23,750 --> 00:06:27,226
+roughly 360 thousand stitches.
+
+78
+00:06:27,626 --> 00:06:32,339
+You can report every stitch, or aggregate first.
+
+79
+00:06:32,739 --> 00:06:39,012
+Now 500 machines, two shifts, 300 days, 250 bytes a message;
+
+80
+00:06:39,032 --> 00:06:45,305
+the chart cycles through the five strategies on a log scale.
+
+81
+00:06:45,705 --> 00:06:51,467
+Every stitch: about 27 terabytes a year, mostly unread.
+
+82
+00:06:51,867 --> 00:06:56,605
+Every ten minutes: stoppages show ten minutes late.
+
+83
+00:06:57,005 --> 00:07:04,046
+The sensible way aggregates counters at the edge and reports state changes at once:
+
+84
+00:07:04,066 --> 00:07:10,086
+about 36 to 45 gigabytes a year, with stoppages shown within 5 seconds.
+
+85
+00:07:11,606 --> 00:07:18,506
+OEE measures a station overall by splitting its losses three ways.
+
+86
+00:07:18,906 --> 00:07:22,480
+A deducts stoppages: waiting,
+
+87
+00:07:22,500 --> 00:07:30,534
+faults and about 11 thread breaks leave about 402 of 450 minutes,
+
+88
+00:07:30,554 --> 00:07:33,136
+A about 89.3 percent.
+
+89
+00:07:33,536 --> 00:07:43,316
+P deducts speed loss: 670 pieces due, 569 made, P 85 percent.
+
+90
+00:07:43,716 --> 00:07:48,216
+Q deducts rework: 97 percent.
+
+91
+00:07:48,616 --> 00:07:53,436
+Multiplied: about 73.6 percent.
+
+92
+00:07:54,956 --> 00:08:02,389
+This is the OEE waterfall: from 450 planned minutes, step down through waiting,
+
+93
+00:08:02,409 --> 00:08:06,257
+faults and thread breaks to running time,
+
+94
+00:08:06,277 --> 00:08:12,389
+then through speed loss and rework to the green good-output time,
+
+95
+00:08:12,409 --> 00:08:14,087
+about 331 minutes.
+
+96
+00:08:14,487 --> 00:08:18,227
+The biggest loss is speed, about 60 minutes.
+
+97
+00:08:18,627 --> 00:08:23,893
+One caution: P uses a standard minute that includes handling,
+
+98
+00:08:23,913 --> 00:08:26,926
+so it measures operator efficiency,
+
+99
+00:08:26,946 --> 00:08:33,078
+and a manual station's OEE can't be compared directly with a machine's.
+
+100
+00:08:34,598 --> 00:08:39,012
+A case written from first principles.
+
+101
+00:08:39,412 --> 00:08:45,234
+A shop counted pieces as trims divided by seams and paid piece rates on it,
+
+102
+00:08:45,254 --> 00:08:49,128
+and operators found the count above their tickets.
+
+103
+00:08:49,528 --> 00:08:56,451
+Re-sewing and restarting after a break each add a trim:
+
+104
+00:08:56,471 --> 00:09:03,899
+about 1747 trims over 3 gives 582 pieces, 2.3 percent high.
+
+105
+00:09:04,299 --> 00:09:09,519
+Missed ticket scans lose whole bundles; hangers are most accurate.
+
+106
+00:09:09,919 --> 00:09:14,099
+Count by hanger or ticket and check with trims.
+
+107
+00:09:15,619 --> 00:09:18,679
+Integration, twins and security.
+
+108
+00:09:20,199 --> 00:09:26,657
+A digital twin is a virtual floor that changes in step with the real one,
+
+109
+00:09:26,677 --> 00:09:27,899
+in two layers.
+
+110
+00:09:28,299 --> 00:09:31,318
+On the left, the real-time mirror:
+
+111
+00:09:31,338 --> 00:09:37,039
+every station and hanger has a counterpart updated from the bus.
+
+112
+00:09:37,439 --> 00:09:41,907
+On the right, prediction: start from the actual state,
+
+113
+00:09:41,927 --> 00:09:47,225
+fast-forward the next few hours to see which operation will jam,
+
+114
+00:09:47,245 --> 00:09:49,220
+and compare a few fixes.
+
+115
+00:09:49,620 --> 00:09:53,754
+Once connected, these models run on measured data.
+
+116
+00:09:55,274 --> 00:09:58,054
+All of this carries over to robots.
+
+117
+00:09:58,454 --> 00:10:05,271
+A welding or handling robot publishes its state as a retained message on its
+
+118
+00:10:05,291 --> 00:10:06,441
+status topic,
+
+119
+00:10:06,461 --> 00:10:09,590
+turned 'offline' by a will message,
+
+120
+00:10:09,610 --> 00:10:13,818
+and reports cycle and pick counts cumulatively.
+
+121
+00:10:14,218 --> 00:10:19,366
+Its OEE is the same A times P times Q,
+
+122
+00:10:19,386 --> 00:10:25,078
+with P based on the program's ideal cycle.
+
+123
+00:10:25,478 --> 00:10:28,082
+Counting has the same trap:
+
+124
+00:10:28,102 --> 00:10:33,524
+count by gripper closures and every re-grip adds a part,
+
+125
+00:10:33,544 --> 00:10:38,577
+so cross-check with vision or a part-present signal.
+
+126
+00:10:40,097 --> 00:10:45,170
+There's an exact everyday parallel: the smart electricity meter.
+
+127
+00:10:45,570 --> 00:10:50,710
+It reports the running total on its register, not how much was used just now.
+
+128
+00:10:51,110 --> 00:10:53,943
+If one report is lost, no matter:
+
+129
+00:10:53,963 --> 00:11:01,033
+the next reading minus the last one received still gives the usage for the period,
+
+130
+00:11:01,053 --> 00:11:04,492
+and a duplicate doesn't add to the bill.
+
+131
+00:11:04,892 --> 00:11:11,235
+A sewing machine reporting cumulative stitches and pieces relies on the very
+
+132
+00:11:11,255 --> 00:11:12,072
+same idea.
+
+133
+00:11:13,592 --> 00:11:15,519
+Back to our problem.
+
+134
+00:11:15,919 --> 00:11:23,385
+Running time is about 402 minutes, A about 89.3 percent;
+
+135
+00:11:23,405 --> 00:11:31,807
+about 569 pieces were made, P 85, Q 97, OEE about 73.6 percent.
+
+136
+00:11:32,207 --> 00:11:35,947
+The biggest loss is speed, about 60 minutes.
+
+137
+00:11:36,347 --> 00:11:44,369
+Counting trims gives 582, 2.3 percent high.
+
+138
+00:11:44,769 --> 00:11:51,585
+Per-stitch reporting from 500 machines is about 27 terabytes a year;
+
+139
+00:11:51,605 --> 00:11:56,410
+aggregated with events, only 36 to 45 gigabytes.
+
+140
+00:11:57,930 --> 00:12:01,484
+Now Virtual lab 26-1, a connected sewing machine,
+
+141
+00:12:01,504 --> 00:12:05,203
+which you can do yourself on WenQuest. The results,
+
+142
+00:12:05,223 --> 00:12:07,464
+criteria and tasks are blurred.
+
+143
+00:12:07,484 --> 00:12:12,278
+Page one shows the event stream and the OEE waterfall on the left,
+
+144
+00:12:12,298 --> 00:12:15,924
+with a bus message in the WenQuest envelope below;
+
+145
+00:12:15,944 --> 00:12:18,550
+you set the conditions on the right.
+
+146
+00:12:18,950 --> 00:12:23,933
+First reset to standard and read the pieces, A, P, Q and OEE.
+
+147
+00:12:23,953 --> 00:12:26,967
+Then click 'New stretch' a few times,
+
+148
+00:12:26,987 --> 00:12:30,412
+count the pieces and trims in one stretch,
+
+149
+00:12:30,432 --> 00:12:33,774
+and explain why the trim count runs high.
+
+150
+00:12:34,174 --> 00:12:39,362
+Task two: leave the standard minute, efficiency and thread breaks alone,
+
+151
+00:12:39,382 --> 00:12:45,004
+change only how pieces are counted, together with the missed-scan probability,
+
+152
+00:12:45,024 --> 00:12:49,055
+and get the count error under 1 percent. How you set it,
+
+153
+00:12:49,075 --> 00:12:52,310
+and why the error drops, goes in your report.
+
+154
+00:12:52,710 --> 00:12:58,589
+Task one: on page two, keep 500 machines, 250 bytes a message and two shifts,
+
+155
+00:12:58,609 --> 00:13:03,876
+try the five reporting strategies one by one, and check message rate,
+
+156
+00:13:03,896 --> 00:13:05,025
+yearly storage,
+
+157
+00:13:05,045 --> 00:13:09,928
+state delay and count delay to find the ones that pass all four.
+
+158
+00:13:09,948 --> 00:13:15,827
+Task three asks you to work out OEE by hand from the shift data at the bottom
+
+159
+00:13:15,847 --> 00:13:16,747
+of the page.
+
+160
+00:13:16,767 --> 00:13:20,577
+The guide and report template are on the platform.
+
+161
+00:13:22,097 --> 00:13:24,672
+This is the WenQuest digital factory,
+
+162
+00:13:24,692 --> 00:13:27,687
+where every rule from today is put to work.
+
+163
+00:13:27,707 --> 00:13:32,876
+The adjustment station on the assembly line measures the hook clearance of
+
+164
+00:13:32,896 --> 00:13:33,858
+every machine,
+
+165
+00:13:33,878 --> 00:13:36,382
+and each reading is one bus message.
+
+166
+00:13:36,782 --> 00:13:43,330
+Look at the message box below. The topic runs plant, area, station, category,
+
+167
+00:13:43,350 --> 00:13:50,068
+level by level. Outside is the common envelope, with ID, time, type and source;
+
+168
+00:13:50,088 --> 00:13:54,844
+inside 'data' are the serial number, the characteristic,
+
+169
+00:13:54,864 --> 00:13:59,706
+the reading and the hook batch. The historian subscribes,
+
+170
+00:13:59,726 --> 00:14:05,762
+draws the control chart, raises an alarm as soon as the process drifts,
+
+171
+00:14:05,782 --> 00:14:08,747
+and drafts a nonconformance report.
+
+172
+00:14:09,147 --> 00:14:10,847
+Page two is traceability:
+
+173
+00:14:10,867 --> 00:14:15,111
+from the machine that raised the alarm back to its hook batch,
+
+174
+00:14:15,131 --> 00:14:20,683
+then forward to every machine built with that batch and whether any have shipped.
+
+175
+00:14:20,703 --> 00:14:24,604
+It works because every message carries the serial number.
+
+176
+00:14:25,004 --> 00:14:30,350
+Page three is the roll-out plan: how many phases, what each costs,
+
+177
+00:14:30,370 --> 00:14:36,366
+and how long until it pays back. The next lecture walks through all of it.
+
+178
+00:14:37,886 --> 00:14:41,758
+Your assignment has four questions. One:
+
+179
+00:14:41,778 --> 00:14:49,348
+a station works a 480-minute shift with a 30-minute break, 40 minutes waiting,
+
+180
+00:14:49,368 --> 00:14:56,744
+20 of faults, 2 one-minute thread breaks an hour, a standard minute of 0.75,
+
+181
+00:14:56,764 --> 00:15:02,582
+80 percent efficiency, 4 percent rework and 4 seams a piece;
+
+182
+00:15:02,602 --> 00:15:08,421
+the full data are on the platform. Find the pieces, A, P, Q,
+
+183
+00:15:08,441 --> 00:15:14,746
+OEE and the trim-count error, and say which loss to tackle first.
+
+184
+00:15:15,146 --> 00:15:20,294
+Two: for a floor of 300 machines, choose a reporting strategy,
+
+185
+00:15:20,314 --> 00:15:24,045
+estimate the message rate and yearly storage,
+
+186
+00:15:24,065 --> 00:15:27,046
+and check each of the four criteria.
+
+187
+00:15:27,446 --> 00:15:31,382
+Three: design the topics for line 2, station 5,
+
+188
+00:15:31,402 --> 00:15:37,105
+write one counter message in JSON, and explain the retained message,
+
+189
+00:15:37,125 --> 00:15:39,798
+the will and the wildcard. Four:
+
+190
+00:15:39,818 --> 00:15:45,858
+the floor wants to publish a ranking of every operator's time per piece;
+
+191
+00:15:45,878 --> 00:15:49,477
+write an opinion of no more than 300 words.
+
+192
+00:15:49,497 --> 00:15:54,695
+Remember that operators' personal data need notice of purpose,
+
+193
+00:15:54,715 --> 00:16:00,586
+means and scope up front, and only what is necessary may be collected.
+
+194
+00:16:00,986 --> 00:16:06,296
+Submit the assignment and the lab report on the WenQuest platform.
+
+195
+00:16:07,816 --> 00:16:12,269
+There's also a ten-question quiz. For example:
+
+196
+00:16:12,289 --> 00:16:19,174
+counter messages go out with QoS 1, so the receiver may get duplicates.
+
+197
+00:16:19,194 --> 00:16:22,189
+What should it de-duplicate by?
+
+198
+00:16:22,589 --> 00:16:28,113
+Or: 800 sewing machines each send one counter summary a minute.
+
+199
+00:16:28,133 --> 00:16:32,689
+How many messages per second does the floor average?
+
+200
+00:16:33,089 --> 00:16:38,476
+You get three attempts, and the explanations appear as soon as you submit.
+
+201
+00:16:39,996 --> 00:16:42,216
+Three things to remember.
+
+202
+00:16:42,616 --> 00:16:49,231
+One: machine data come as identity, state, counters and events;
+
+203
+00:16:49,251 --> 00:16:55,128
+counters are cumulative and de-duplicated by message ID.
+
+204
+00:16:55,528 --> 00:16:55,903
+Two:
+
+205
+00:16:55,923 --> 00:17:04,111
+MQTT with a unified namespace makes the broker the plant's single real-time source;
+
+206
+00:17:04,131 --> 00:17:11,428
+retained messages give current state, will messages mark machines offline.
+
+207
+00:17:11,828 --> 00:17:19,946
+Three: aggregate counters at the edge and report state changes at once;
+
+208
+00:17:19,966 --> 00:17:27,627
+OEE is A times P times Q, and trim counts run high, so cross-check.
+
+209
+00:17:28,027 --> 00:17:30,599
+The slides, the virtual lab,
+
+210
+00:17:30,619 --> 00:17:37,082
+the assignment and the quiz are all on the WenQuest learning platform,
+
+211
+00:17:37,102 --> 00:17:43,287
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+212
+00:17:43,686 --> 00:17:44,675
+See you next time.
