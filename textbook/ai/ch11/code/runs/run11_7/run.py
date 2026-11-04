@@ -16,7 +16,9 @@ from torch import nn
 
 import prep
 
-prep.pip_install("onnx")            # torch.onnx.export 要它；租来的机器上常常只装了 torch
+# torch.onnx.export 要 onnx；而 onnx 的新版要 numpy.exceptions（numpy ≥ 1.25），
+# 租来的机器上 numpy 常常更老，表现成 "module 'numpy' has no attribute 'exceptions'"（2026-11-04 实测）
+prep.pip_install("onnx", "numpy>=1.25")
 try:
     import onnxruntime  # noqa: F401
 except ImportError:                 # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
