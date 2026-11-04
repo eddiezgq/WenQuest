@@ -188,6 +188,8 @@ def seed(book, only=None):
         d.update(seed55(teacher, student))
     if not only or "56" in only:
         d.update(seed56(book, teacher, student))
+    if not only or "57" in only:
+        d.update(seed57(book, teacher, student))
     return d
 
 
@@ -313,6 +315,27 @@ def seed56(book, teacher, student):
     return {"s56_ok": ok["id"], "s56_bad": bad["id"], "t56": tid, "n56": note}
 
 
+# ---------------------------------------------------------------- 第 57 章：SH-101 的全套工艺规程（第 13 轮十三）
+# 学生提交 std/SH-101_process.yaml（全套工艺规程），截提交页（图 57.9.3）；另提交一份同样的，老师批准成为生效版本后截工艺规程页
+# （图 57.9.4）；下达任务单 TS-57-1，学生选定提交的工艺规程（图 57.9.5）。
+def seed57(book, teacher, student):
+    plan = (DIGITAL / "std" / "SH-101_process.yaml").read_text(encoding="utf-8")
+    a = call("POST", "/api/process/check", {"yaml": plan, "submit": True, "note": "SH-101 全套工艺规程（教材第 57 章）"}, token=student)
+    b = call("POST", "/api/process/check", {"yaml": plan, "submit": True, "note": "SH-101 全套工艺规程（批准发布）"}, token=student)
+    full = call("GET", f"/api/process/submissions/{b['id']}", token=teacher)
+    for c in full.get("comments") or []:
+        call("POST", f"/api/process/submissions/{b['id']}/comments/{c['id']}", {"resolved": True}, token=student)
+    call("POST", f"/api/process/submissions/{b['id']}/decision", {"decision": "approve", "note": "工序设计核算通过，批准发布"}, token=teacher)
+    spec = yaml.safe_load((REPO / "textbook" / book / "ch57" / "task" / "ts57_1.yaml").read_text(encoding="utf-8"))
+    spec.update(book=book, no="57.1")
+    due = (dt.datetime.now(dt.timezone.utc) + dt.timedelta(days=21)).isoformat()
+    tid = call("POST", "/api/tasks/course/issue", {"spec": spec, "course_id": 101, "course_name": "机械制造技术（示例班）",
+                                                   "due": due, "issued_by": "教师"}, key=TASK_KEY)["id"]
+    i = next(n for n, x in enumerate(spec["交付物"]) if x.get("类型") == "工艺规程")
+    call("POST", f"/api/tasks/{tid}/deliverables/{i}/link", {"process": a["id"]}, token=student)
+    return {"s57": a["id"], "s57_ok": b["id"], "t57": tid}
+
+
 # ---------------------------------------------------------------- 截图
 def shots_list(d):
     s, t = d["subs"], d["tasks"]
@@ -338,6 +361,9 @@ def shots_list(d):
         ("shot56_1", 56, "student", f"/process/{d.get('s56_bad')}", None, d.get("n56", "")),
         ("shot56_2", 56, "student", "/process", "select101", "“工艺规程与 AI 评审”页选零件 SH-101：零件图要求、下载模板、上传 AI 预检"),
         ("shot56_3", 56, "student", f"/tasks/{d.get('t56')}", "precheck_task", "任务单 TS-56-1 的学生页：交付物“工艺规程”指定零件 SH-101，选定提交的工艺规程后 AI 预检"),
+        ("shot57_1", 57, "student", f"/process/{d.get('s57')}", None, "SH-101 全套工艺规程提交后的 AI 评审意见与建议分"),
+        ("shot57_2", 57, "student", "/process", "select101", "老师批准后：SH-101 的工艺规程成为生效版本（提交记录里的“已批准”）"),
+        ("shot57_3", 57, "student", f"/tasks/{d.get('t57')}", "precheck_task", "任务单 TS-57-1 的学生页：交付物“工艺规程”指定零件 SH-101，选定提交的工艺规程后 AI 预检"),
     ]
 
 
