@@ -59,17 +59,21 @@ res = TL.extreme(links)
 c5 = next(c for c in P["characteristics"] if c["id"] == "C5")
 assert res.max <= c5["nominal"] + c5["es"] + 1e-9 and res.min >= c5["nominal"] + c5["ei"] - 1e-9
 H = ch["links"][0]
-r30, r70 = ch["links"][1], ch["links"][2]
-H_es = c5["es"] + r30["ei"] - r70["es"]                     # 封闭环上偏差 = H 上偏差 − r30 下偏差 + r70 上偏差 → 反求 H 上偏差
-H_ei = c5["ei"] + r30["es"] - r70["ei"]
+r30, r70, ec = ch["links"][1], ch["links"][2], ch["links"][3]
+H0_es = c5["es"] + r30["ei"] - r70["es"]                    # 不计同轴度：封闭环上偏差 = H 上偏差 − r30 下偏差 + r70 上偏差 → 反求 H 上偏差
+H0_ei = c5["ei"] + r30["es"] - r70["ei"]
+H_es = H0_es - ec["es"]                                     # 计入磨后轴伸轴线的偏移（0 ± e，第 53.5 节）：H 的公差被压缩
+H_ei = H0_ei - ec["ei"]
+assert H["es"] <= H_es + 1e-9 and H["ei"] >= H_ei - 1e-9
 
-fig, ax = plt.subplots(figsize=(4.2, 2.2))
+fig, ax = plt.subplots(figsize=(4.2, 2.6))
 items = [(T("H 槽底到精车外圆下母线（工序 50）", "H (op 50)"), H["nominal"], H["es"], H["ei"], M.ACCENT, "+"),
          (T("精车轴伸半径 Ø20.4/2（工序 30）", "semi radius (op 30)"), r30["nominal"], r30["es"], r30["ei"], M.MUTED, "−"),
          (T("磨削轴伸半径 Ø20 j6/2（工序 70）", "ground radius (op 70)"), r70["nominal"], r70["es"], r70["ei"], M.WARM, "+"),
+         (T("磨后与精车轴线的偏移（同轴度 0.02）", "axis offset (coaxiality 0.02)"), ec["nominal"], ec["es"], ec["ei"], M.GREEN, "+"),
          (T("d − t₁ 封闭环（图纸 16.5 0/−0.1）", "d − t₁ closing link"), c5["nominal"], res.max - c5["nominal"], res.min - c5["nominal"], M.RED, "=")]
 for i, (lab, nom, es, ei, col, sg) in enumerate(items):
-    yy = 3 - i
+    yy = 4 - i
     ax.barh(yy, (es - ei) * 1000, left=ei * 1000, color=col, height=0.5)
     ax.text(-118, yy, f"{sg} {lab}", va="center", ha="right", fontsize=6.8)
     ax.text(max(es, 0) * 1000 + 4, yy, f"{nom:g}（{es:+.4g}/{ei:+.4g}）".replace("-", "−"), va="center", fontsize=6.5)
@@ -95,5 +99,5 @@ figure(fig, "fig57_3_4")
 
 out(d8_cur=d8(cur)["result"].es, d8_alt=d8(alt)["result"].es, d8_alt_ok=d8(alt)["ok"], d30_cur=d30(cur)["result"].es,
     d30_alt=d30(alt)["result"].es, amin=min(a["min"] for a in cur["allowances"]), amax=max(a["max"] for a in cur["allowances"]),
-    n_cuts=len(tc["cuts"]), n_draw=len(tc["drawing"]), H=H["nominal"], H_es=H_es, H_ei=H_ei, r30=r30["nominal"], r70=r70["nominal"],
+    n_cuts=len(tc["cuts"]), n_draw=len(tc["drawing"]), H=H["nominal"], H_es=H_es, H_ei=H_ei, H0_es=H0_es, H0_ei=H0_ei, Hs=H["es"], Hi=H["ei"], e_coax=ec["es"], r30=r30["nominal"], r70=r70["nominal"],
     res_es=res.max - c5["nominal"], res_ei=res.min - c5["nominal"], chain_T=res.max - res.min)

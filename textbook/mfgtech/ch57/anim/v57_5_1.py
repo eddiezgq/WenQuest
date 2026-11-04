@@ -42,7 +42,7 @@ def frame(x, ap, f, cap):
 
 
 for ap, f, cap in ((0.55, 0.15, ("工艺规程：ap 0.55、f 0.15（让开量放大 800 倍画出）", "Plan: ap 0.55, f 0.15 (deflection ×800)")),
-                   (1.1, 0.3, ("改成 ap 1.1、f 0.3：背向力加倍，让刀接近工序公差", "ap 1.1, f 0.3: twice the force")),):
+                   (1.1, 0.3, ("改成 ap 1.1、f 0.3：背向力增大到约 3.6 倍，让刀接近工序公差", "ap 1.1, f 0.3: about 3.6× the force")),):
     for k in range(51):
         v.add(frame(136 - 136 * k / 50, ap, f, cap), hold=0.08)
     v.add(frame(0, ap, f, cap), hold=1.0)

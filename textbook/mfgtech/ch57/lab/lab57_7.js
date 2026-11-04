@@ -23,7 +23,7 @@ WQ.lab({
   scenes: [
     { id: "sh101", robot: true, name: ["SH-101 扩产", "SH-101 ramp-up"],
       params: { N: { value: 20000 }, KA: { value: 350000 }, KB: { value: 40000 }, cbn: { value: 3 }, tht: { value: 4 } },
-      problem: { title: ["机器人问题：减速器订单翻了三倍，磨床排不过来", "Robot problem: reducer orders tripled, the grinder cannot keep up"],
+      problem: { title: ["机器人问题：减速器订单增加到原来的 3 倍多，磨床排不过来", "Robot problem: reducer orders more than tripled, the grinder cannot keep up"],
                  text: ["WQR-105 减速器年产量要到 2 万台，SH-101 的外圆磨床每件 16 min，跟不上 10.2 min 的需求节拍。买一台磨床还是改成硬车？投资、成本、能力和风险都要比。",
                         "WQR-105 goes to 20 000 a year; SH-101's grinder needs 16 min per part against a 10.2 min takt. Buy a grinder or hard-turn? Compare investment, cost, capacity and risk."] } },
   ],

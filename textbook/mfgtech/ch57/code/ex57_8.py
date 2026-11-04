@@ -18,5 +18,5 @@ M.card_figure(C.inspection_card(P, pages - 1, pages), "fig57_8_5")
 M.card_figure(C.tool_card(P, pages, pages), "fig57_8_6")
 v30 = [C.step_values(s) for s in M.op(P, 30)["steps"]]
 out(n_ops=len(P["operations"]), n_mach=len(ops), n_pages=pages, n_chars=len(P["characteristics"]), n_tools=len(P["tool_list"]),
-    n_gauges=len(P["gauges"]), n30_lo=v30[0]["n"][0], n30_hi=v30[0]["n"][1], tb30=sum(x["tb"] for x in v30),
+    n_gauges=len(P["gauges"]), n30_lo=min(x["n"][0] for x in v30 if x.get("n")), n30_hi=max(x["n"][1] for x in v30 if x.get("n")), tb30=sum(x["tb"] for x in v30),
     n_steps=sum(len(o.get("steps") or []) for o in P["operations"]))

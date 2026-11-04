@@ -1,0 +1,33 @@
+# 工程任务单 TS-57-1（配 57.1–57.10 节）。生成《工程任务单》《评分量规》（Word）。
+编号: TS-57-1
+标题: [SH-101 输入齿轮轴的全套工艺规程：扩产到年产 2 万件, "Full process plan for the SH-101 input pinion shaft at 20 000 a year"]
+角色: [工艺工程师（工序设计）, process engineer (operation design)]
+背景:
+  - "TS-56-1 已经为扩产后的 SH-101 定下了工艺路线。现在要把它做成能下发车间的全套工艺规程：每道工序的余量与工序尺寸、轴向尺寸的跟踪图和键槽深的尺寸链、设备与工装、切削用量、时间定额；年产 2 万件时外圆磨床是瓶颈，要比较扩产方案；最后在数字工厂提交工艺规程，生成全套卡片，经 AI 预检、老师批准后发布。"
+  - "TS-56-1 fixed the route for SH-101 after the ramp-up. Now turn it into a full process plan for the shop: stock and operation sizes, the axial tolerance chart and keyway chain, machines and tooling, cutting data and time standards; at 20 000 a year the grinder is the bottleneck, so compare ramp-up options; then submit the plan in the digital factory, generate the full card set, pass the AI pre-check and the teacher's approval, and release it."
+输入:
+  - {名称: [SH-101 零件图要求与参照工艺规程, "SH-101 drawing and reference plan"], 来源: [factory/digital/std/SH-101_part.yaml、SH-101_process.yaml（年产 6000 件的版本，只作参考）, "std/SH-101_part.yaml, SH-101_process.yaml (6000/yr, reference only)"]}
+  - {名称: [你在 TS-56-1 定下的路线, "Your TS-56-1 route"], 来源: [数字工厂里你提交的工艺规程, "your submission in the digital factory"]}
+  - {名称: [计算库与实验, "Libraries and labs"], 来源: [code/_calc57.py；hub/tolerance.py、hub/route.py、hub/cards.py；实验 57.2、57.5、57.7, "code/_calc57.py; hub/tolerance.py, route.py, cards.py; Labs 57.2, 57.5, 57.7"]}
+交付物:
+  - {名称: [工艺计算书（4–6 页）, "Calculation sheet (4–6 pages)"], 验收: [三个磨削外圆的余量与工序尺寸（分析计算法，写明每个分量的出处）；轴向跟踪图与键槽深的尺寸链；主要工序的切削用量及功率、让刀、粗糙度、刀具寿命的校核；各工序的时间定额；格式按“已知 → 求 → 计算 → 校核 → 结论”, "Stock and sizes of the three ground diameters (with sources); axial chart and keyway chain; cutting data with power, deflection, Ra and tool-life checks; time standards; given → find → calculation → check → conclusion"]}
+  - {名称: [扩产方案的技术经济分析（1–2 页）, "Ramp-up economics (1–2 pages)"], 验收: [年产 2 万件时至少两个解决瓶颈的方案，算出单件和年工艺成本、临界年产量或回收期、瓶颈负荷，写明选择和适用的条件, "At least two options for the bottleneck at 20 000/yr: unit and annual cost, break-even or payback, bottleneck load; state the choice and its conditions"]}
+  - {名称: [SH-101 全套工艺规程（数字工厂提交并发布）, "SH-101 full process plan (submitted and released)"], 验收: [数据格式 v2：工序、工步、工序尺寸（入体）、切削用量、工时、工序简图、定位夹紧、检验项目、刀具卡、量具表、跟踪图与尺寸链；能生成全套卡片；AI 预检没有“必须改”，“建议”逐条处理或写明理由；老师批准后成为生效版本, "Format v2 with steps, sizes, cutting data, times, sketches, locating, inspection, tools, gauges, chart and chains; full card set generated; no must-fix comments, advice resolved or justified; released after approval"], 类型: 工艺规程, 零件: SH-101}
+工位: [PY, MES, QMS]
+步骤:
+  - ["从 TS-56-1 的路线出发，用 _calc57.py 或实验 57.2 推出三个磨削外圆的工序尺寸，核算余量。", "From your TS-56-1 route, derive the three ground diameters' sizes with _calc57.py or Lab 57.2 and check the stock."]
+  - ["建立轴向跟踪图（第 53 章），求键槽槽底尺寸 H；确认 8 ± 0.1 的编程原点。", "Build the axial chart, find the keyway H, fix the origin for 8 ± 0.1."]
+  - ["选设备、工装，用实验 57.5 定切削用量并校核；按式 (57.6.1)–(57.6.3) 定时间定额，核算瓶颈。", "Choose machines and tooling; set and check cutting data with Lab 57.5; set time standards and check the bottleneck."]
+  - ["用实验 57.7 比较扩产方案，写技术经济分析。", "Compare ramp-up options with Lab 57.7."]
+  - ["在数字工厂提交工艺规程，打开全套卡片检查，按 AI 预检的意见修改；提交审批，老师批准后发布。", "Submit, review the cards, revise to the pre-check, then submit for approval and release."]
+评审要点:
+  - ["〔AI 检查〕工艺规程没有“必须改”的意见；“工序设计”“尺寸链”“切削用量”“工时”规则的“建议”已处理或写明理由。", "[AI] No must-fix comments; advice from the operation-design, chain, cutting and time rules resolved or justified."]
+  - ["〔老师检查〕计算书的余量分量、用量常数注明出处；工序尺寸、工时与提交的工艺规程一致。", "[Teacher] Sources stated; sizes and times match the submitted plan."]
+  - ["〔老师检查〕年产 2 万件时瓶颈能跟上需求节拍，扩产方案的比较有成本、能力和风险。", "[Teacher] At 20 000/yr the bottleneck keeps up; the comparison covers cost, capacity and risk."]
+  - ["〔老师检查〕工序简图与工序尺寸一致，检验卡覆盖全部图纸特性。", "[Teacher] Sketches match the sizes; the inspection card covers every characteristic."]
+评分:
+  - {项: [工艺计算书, Calculation sheet], 分: 35, 标准: [计算正确、出处清楚、核算完整, "Correct, sourced, complete checks"]}
+  - {项: [技术经济分析, Economics], 分: 20, 标准: [方案可行、数字可复算、结论有条件, "Feasible options, reproducible figures, conditional conclusion"]}
+  - {项: [工艺规程与卡片, Plan and cards], 分: 35, 标准: [数据完整、卡片规范、预检通过, "Complete data, proper cards, pre-check passed"]}
+  - {项: [评审与发布, Review and release], 分: 10, 标准: [意见逐条处理，按流程发布, "Comments resolved, released by the procedure"]}
+学时: 8

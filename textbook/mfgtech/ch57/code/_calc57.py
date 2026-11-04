@@ -59,11 +59,12 @@ def sheet(d, es, ei, name, T2=0.05, T1=0.2, item="SH-101"):
     return cs
 
 
-def bar_diameter(da=52.0, finish=1.5, T1=0.3, sizes=(50, 52, 55, 56, 58, 60, 63, 65)):
-    """最大外圆（齿顶圆）需要的棒料直径：da + 精车余量 = 粗车尺寸；粗车尺寸 + 毛坯的最小余量（热轧表面、弯曲、卡盘定心）+ 粗车公差
-    = 最小棒料直径，取 GB/T 702 的优先尺寸（这里列出工厂常备的几种）。"""
+def bar_diameter(da=52.0, finish=1.5, bar_ei=-0.6, sizes=(50, 52, 55, 56, 58, 60, 63, 65)):
+    """最大外圆（齿顶圆）需要的棒料直径：da + 精车余量 = 粗车尺寸 A₁（上偏差 0）；按式 (57.2.1)，棒料的最小直径
+    ≥ A₁ + 毛坯的最小余量（热轧表面、弯曲、卡盘定心）。棒料按名义直径订货，要再扣去它的下偏差 bar_ei
+    （热轧圆钢 Ø50–Ø80 取 −0.6 示意，以现行 GB/T 702 为准），取工厂常备的规格。"""
     rz, ha, rho, _ = WQ_PS_01["热轧圆钢"]
     z1 = zmin(rz, ha, rho, EPS_CHUCK)
-    need = da + finish + z1 + T1
-    pick = next(s for s in sizes if s >= need)
-    return dict(z1=z1, need=need, pick=pick, a_rough=da + finish)
+    need = da + finish + z1                    # 棒料直径的最小值
+    pick = next(s for s in sizes if s + bar_ei >= need - 1e-9)
+    return dict(z1=z1, need=need, pick=pick, a_rough=da + finish, bar_ei=bar_ei, pick_min=pick + bar_ei)

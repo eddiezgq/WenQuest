@@ -37,9 +37,9 @@ figure(fig, "fig57_1_2")
 
 fig, ax = plt.subplots(figsize=(6.2, 2.3))
 parts = [(52.0, T("齿顶圆 Ø52", "tip Ø52"), M.INK), (1.5, T("精车余量 1.5", "finish 1.5"), M.ACCENT),
-         (bar["z1"], T(f"毛坯最小余量 {bar['z1']:.2f}", f"bar min stock {bar['z1']:.2f}"), M.WARM), (0.3, T("粗车公差 0.3", "rough tol 0.3"), M.MUTED)]
+         (bar["z1"], T(f"毛坯最小余量 {bar['z1']:.2f}", f"bar min stock {bar['z1']:.2f}"), M.WARM)]
 l = 0
-POS = {1: (52.75, 1.36, "center"), 2: (54.4, 1.58, "center"), 3: (55.7, 1.36, "left")}
+POS = {1: (52.75, 1.36, "center"), 2: (53.6, 1.58, "center")}
 for k, (w, lab, col) in enumerate(parts):
     ax.barh(1, w, left=l, color=col, height=0.5, clip_on=True)
     if k:
@@ -50,6 +50,9 @@ ax.text(50, 1, T("齿顶圆 Ø52", "tip Ø52"), ha="center", va="center", fontsi
 for d, col, lab in ((bar["pick"], M.GREEN, T(f"够用的圆钢 Ø{bar['pick']}", f"enough: Ø{bar['pick']}")), (60, M.RED, T("工厂现用 Ø60", "in stock: Ø60"))):
     ax.barh(0 if d == 60 else 0.45, d, color=col, height=0.3, alpha=0.35)
     ax.text(d + 0.3, 0 if d == 60 else 0.45, lab, va="center", fontsize=7, color=col)
+ax.barh(0.45, -bar["bar_ei"], left=bar["pick_min"], color=M.GREEN, height=0.3, alpha=0.7)
+ax.text(bar["pick_min"] - 0.35, 0.45, T(f"下偏差 −{-bar['bar_ei']:g} → 最小 {bar['pick_min']:g}", f"lower dev. {bar['bar_ei']:g} → min {bar['pick_min']:g}"),
+        ha="right", va="center", fontsize=6.5, color=M.INK)
 ax.set_xlim(48, 64); ax.set_ylim(-0.3, 1.8); ax.set_yticks([]); ax.set_xlabel(T("直径 / mm", "diameter / mm"))
 ax.axvline(bar["need"], color=M.INK, ls="--", lw=0.7); ax.text(bar["need"] + 0.15, 0.72, f"≥ {bar['need']:.2f}", ha="left", fontsize=7)
 figure(fig, "fig57_1_5")
@@ -58,5 +61,5 @@ out(**{f"z_{i}": c["z"] for i, c in enumerate(comp)}, **{f"geo_{i}": c["geo"] fo
     rz_rough=C.WQ_PS_01["粗车"][0], ha_rough=C.WQ_PS_01["粗车"][1], rho_rough=C.WQ_PS_01["粗车"][2],
     rz_semi=C.WQ_PS_01["半精车后渗碳淬火"][0], ha_semi=C.WQ_PS_01["半精车后渗碳淬火"][1], rho_semi=C.WQ_PS_01["半精车后渗碳淬火"][2],
     rz_bar=C.WQ_PS_01["热轧圆钢"][0], ha_bar=C.WQ_PS_01["热轧圆钢"][1], rho_bar=C.WQ_PS_01["热轧圆钢"][2], eps_chuck=C.EPS_CHUCK,
-    bar_need=bar["need"], bar_pick=bar["pick"], bar_z1=bar["z1"], m60=m60, m_pick=m_pick, save_kg=m60 - m_pick,
+    bar_need=bar["need"], bar_pick=bar["pick"], bar_ei=bar["bar_ei"], bar_pick_min=bar["pick_min"], bar_z1=bar["z1"], m60=m60, m_pick=m_pick, save_kg=m60 - m_pick,
     save_cny=(m60 - m_pick) * price, save_year=(m60 - m_pick) * price * 6000, price=price)
