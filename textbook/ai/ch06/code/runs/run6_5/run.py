@@ -9,6 +9,7 @@ import glob
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 
@@ -35,11 +36,35 @@ METRICS = {
 }
 
 
-def find_ncu():
+def look_for_ncu():
     for c in [shutil.which("ncu"), *sorted(glob.glob("/usr/local/cuda*/bin/ncu")), *sorted(glob.glob("/opt/nvidia/nsight-compute/*/ncu"))]:
         if c and os.path.exists(c):
             return c
-    raise SystemExit("找不到 ncu")
+    return ""
+
+
+def find_ncu():
+    """找 ncu；租来的机器上常常只有驱动和 CUDA 运行时、没有 Nsight Compute，那就现装一个。
+
+    包名跟着 CUDA 的版本走（cuda-nsight-compute-12-4 这种写法），版本号从 nvcc 问出来；
+    问不到或者那个包不在源里，再退回不带版本的 nsight-compute。装不上就照旧报错，别的实测不受影响。
+    """
+    if (c := look_for_ncu()):
+        return c
+    ver = ""
+    try:                                                    # “release 12.4, V12.4.131” → “12-4”
+        out = subprocess.run(["nvcc", "--version"], capture_output=True, text=True).stdout
+        if (m := re.search(r"release (\d+)\.(\d+)", out)):
+            ver = f"{m.group(1)}-{m.group(2)}"
+    except FileNotFoundError:
+        pass
+    subprocess.run(["sudo", "apt-get", "update", "-qq"], check=False)
+    for pkg in ([f"cuda-nsight-compute-{ver}"] if ver else []) + ["nsight-compute"]:
+        print(f"机器上没有 ncu，试装 {pkg}")
+        if subprocess.run(["sudo", "apt-get", "install", "-y", "-qq", pkg], check=False).returncode == 0:
+            if (c := look_for_ncu()):
+                return c
+    raise SystemExit("找不到 ncu，而且装不上")
 
 
 ncu = find_ncu()
