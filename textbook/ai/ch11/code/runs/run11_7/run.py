@@ -11,11 +11,11 @@ import time
 
 import prep
 
-# **装依赖要在 import numpy 之前**：numpy 一旦被导入，再升级也换不掉进程里那一份。
-# 版本要卡两头（2026-11-04 实测两头都撞过）：onnx 要 numpy.exceptions，那是 1.25 才有的；
-# 而机器上的 torch、scipy 是按 numpy 1.x 的二进制接口编的，装上 numpy 2 会直接
-# "Failed to initialize NumPy: _ARRAY_API not found"。所以只能取 [1.25, 2) 这一段。
-prep.pip_install("onnx", "numpy>=1.25,<2")
+# **不要动机器上的 numpy**（2026-11-04 实测，两头都撞过）：新版 onnx 要 numpy.exceptions
+# （1.25 才有），可这台机器上别的东西还在用 np.int（1.24 就删了），而装 numpy 2 会让
+# torch 直接 "Failed to initialize NumPy: _ARRAY_API not found"——没有一个 numpy 版本同时满足。
+# 所以退 onnx 的版本：1.16 之前的不碰 numpy.exceptions，用机器原装的 numpy 就能导出。
+prep.pip_install("onnx<1.16")
 try:
     prep.pip_install("onnxruntime-gpu")      # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
 except RuntimeError:
