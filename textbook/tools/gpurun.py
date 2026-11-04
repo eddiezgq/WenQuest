@@ -207,6 +207,8 @@ def execute(folder: Path, region: str = "") -> dict:
         _ssh(ip, "mkdir -p wqrun")
         _scp(f"{folder}/.", f"ubuntu@{ip}:wqrun/")
         _scp(str(HELPER), f"ubuntu@{ip}:wqrun/wqgpu.py")
+        for shared in sorted(folder.parent.parent.glob("_ch*.py")):   # 章内共用模块（run13_6 要 import _ch13）
+            _scp(str(shared), f"ubuntu@{ip}:wqrun/{shared.name}")
         _ssh(ip, f"cd wqrun && python3 -c 'import json, wqgpu; json.dump(wqgpu.env(), open(\"env.json\", \"w\"))' && {command}")
         tmp = folder / ".fetched"
         tmp.mkdir(exist_ok=True)
