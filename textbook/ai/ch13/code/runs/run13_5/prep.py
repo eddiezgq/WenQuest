@@ -18,12 +18,15 @@ def pip_install(pkgs):
 def modern_pillow():
     """transformers 的惰性导入要 PIL.Image.Resampling（Pillow ≥ 9.1）。租来的机器上常常是更老的
     Pillow，于是任何一个模型类都报成"Could not import module 'XxxModel'"，真正的原因被藏在下面
-    （2026-11-04 实测 run12_4、run13_5、run13_6 都倒在这里）。太老就升一下。"""
+    （2026-11-04 实测 run12_4、run13_5、run13_6 都倒在这里）。
+
+    **查版本不能用 import**：一旦把老的 PIL 导进来，后面再升级也换不掉进程里那一份
+    （这个坑踩过两次了）。所以用包的元数据查。"""
     try:
-        from PIL import Image
-        if hasattr(Image, "Resampling"):
+        from importlib.metadata import version
+        if tuple(int(x) for x in version("Pillow").split(".")[:2]) >= (9, 1):
             return True
-    except ImportError:
+    except Exception:
         pass
     return pip_install(["--upgrade", "Pillow"])
 
