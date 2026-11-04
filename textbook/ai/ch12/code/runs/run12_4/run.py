@@ -7,14 +7,19 @@
 结果写进 out.json（第 14 轮附 4.4 节）。"""
 import json
 import re
+import os
 import time
 
 import numpy as np
 import torch
 
+# 出事时把真正的导入错误印出来，否则只看到 "Could not import module 'XxxModel'"（2026-11-04 实测 run12_4）
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "debug")
+
 import prep
 
 prep.ensure()                                               # 装好依赖（transformers、datasets、soundfile）
+print("torch", torch.__version__, "| transformers", __import__("transformers").__version__, flush=True)
 
 from datasets import load_dataset                           # noqa: E402
 from transformers import WhisperForConditionalGeneration, WhisperProcessor   # noqa: E402
