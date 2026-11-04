@@ -19,7 +19,8 @@ import prep
 # 装进 ~/.local 盖掉系统那一份，torch 立刻 _ARRAY_API not found。
 prep.pip_install("onnx<1.16", "numpy<1.24", "protobuf")
 try:
-    prep.pip_install("onnxruntime-gpu")      # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
+    # 这一步也要钉 numpy：onnxruntime-gpu 的依赖里 numpy 不设上限，不钉就在这儿被升到 2.x
+    prep.pip_install("onnxruntime-gpu", "numpy<1.24")   # 没有 TensorRT 时这一路要用它；装不上就让下面那段自己退
 except RuntimeError:
     pass
 
