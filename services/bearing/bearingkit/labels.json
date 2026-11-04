@@ -1,0 +1,1570 @@
+{
+"B": [
+"宽度 B",
+"Width B"
+],
+"D": [
+"外径 D",
+"Outside diameter D"
+],
+"Dw": [
+"钢球直径 Dw",
+"Ball diameter Dw"
+],
+"DwR": [
+"滚子直径 Dw",
+"Roller diameter Dw"
+],
+"DwT": [
+"滚子平均直径 Dw",
+"Mean roller diameter Dw"
+],
+"E": [
+"弹性模量 E",
+"Elastic modulus E"
+],
+"Fa": [
+"轴向力 Fa",
+"Axial force Fa"
+],
+"Fr": [
+"径向力 Fr",
+"Radial force Fr"
+],
+"Lw": [
+"滚子长度 Lw",
+"Roller length Lw"
+],
+"Lwe": [
+"有效接触长度 Lwe",
+"Effective contact length Lwe"
+],
+"LweHint": [
+"滚子长度减去两端倒角",
+"Roller length less the end chamfers"
+],
+"M": [
+"力矩 M",
+"Moment M"
+],
+"MHint": [
+"填了力矩，内圈按自由倾斜计算；不填，按轴约束不倾斜",
+"With a moment the inner ring tilts freely; without, the shaft holds it square"
+],
+"Pd": [
+"初始径向游隙 Pd",
+"Initial diametral clearance Pd"
+],
+"T_i": [
+"内圈温度",
+"Inner ring temperature"
+],
+"T_o": [
+"外圈温度",
+"Outer ring temperature"
+],
+"Z": [
+"球数 Z",
+"Number of balls Z"
+],
+"ZR": [
+"滚子数 Z",
+"Number of rollers Z"
+],
+"addCase": [
+"加一个工况",
+"Add a case"
+],
+"alpha0": [
+"接触角 α₀",
+"Contact angle α₀"
+],
+"alphaN": [
+"法向压力角 αn",
+"Normal pressure angle α_n"
+],
+"alpha_p": [
+"黏压系数 α",
+"Pressure–viscosity coefficient α"
+],
+"angleCurve": [
+"一圈内的变化",
+"Round one turn"
+],
+"angular": [
+"角接触球轴承",
+"Angular contact ball bearing"
+],
+"app": [
+"问渠轴承",
+"WenQuest Bearing"
+],
+"arr_DB": [
+"成对：背对背 DB",
+"Pair: back to back DB"
+],
+"arr_DF": [
+"成对：面对面 DF",
+"Pair: face to face DF"
+],
+"arr_DT": [
+"成对：串联 DT",
+"Pair: tandem DT"
+],
+"arr_single": [
+"单个",
+"Single"
+],
+"arrangement": [
+"安装方式",
+"Arrangement"
+],
+"asmClear": [
+"游隙",
+"Clearance"
+],
+"asmCsv": [
+"下载 CSV",
+"Download CSV"
+],
+"asmEmpty": [
+"在左边贴入实测数据（或用合成数据试一试），点“配套”。",
+"Paste the measurements on the left (or try synthetic data) and press Match."
+],
+"asmGroup": [
+"钢球组",
+"Group"
+],
+"asmGroupHint": [
+"一套只用同一组钢球",
+"Each bearing takes balls of one group"
+],
+"asmGroupUse": [
+"钢球分组用量",
+"Ball groups used"
+],
+"asmGrouped": [
+"分组配套",
+"Size classes"
+],
+"asmGroups": [
+"钢球分组：组号, 直径（mm）, 数量（粒）",
+"Ball groups: group, diameter (mm), quantity (balls)"
+],
+"asmH": [
+"分组配套的分组间隔",
+"Class width for the grouping method"
+],
+"asmHHint": [
+"只用于对照；不填取游隙范围的一半",
+"For the comparison only; blank: half the clearance range"
+],
+"asmHist": [
+"游隙分布（µm，竖线为目标）",
+"Clearance (µm; the line is the target)"
+],
+"asmInner": [
+"内圈：编号, 沟道直径（mm）",
+"Inner rings: number, raceway diameter (mm)"
+],
+"asmInnerOne": [
+"内圈",
+"Inner"
+],
+"asmIntro": [
+"按实测的内圈沟径、外圈沟径和钢球分组配套，让每套的径向游隙 P = 外圈沟径 − 内圈沟径 − 2 × 钢球直径落在要求范围内。",
+"Measured inner and outer raceway diameters and ball groups into bearings whose radial clearance P = outer − inner − 2 × ball diameter is in range."
+],
+"asmLeft": [
+"配不上的件",
+"Left over"
+],
+"asmMaxReached": [
+"已达上限：套圈或钢球不能再多配",
+"At the limit: no more sets are possible"
+],
+"asmNeedBall": [
+"先在“设计校核”里打开一个球轴承（深沟球或角接触球），才能按它生成合成数据",
+"Open a ball bearing in Design first; the synthetic data follow its sizes"
+],
+"asmNotProven": [
+"大批量近似解，未证明最优",
+"Large batch, near-optimal, not proven"
+],
+"asmOf": [
+"内圈 {i} 件、外圈 {o} 件",
+"{i} inner, {o} outer rings"
+],
+"asmOptimal": [
+"已证明最优",
+"Proven optimal"
+],
+"asmOut": [
+"另有 {n} 套游隙超出范围",
+"{n} more sets out of range"
+],
+"asmOuter": [
+"外圈：编号, 沟道直径（mm）",
+"Outer rings: number, raceway diameter (mm)"
+],
+"asmOuterOne": [
+"外圈",
+"Outer"
+],
+"asmPiece": [
+"逐件配对",
+"Piece by piece"
+],
+"asmPmax": [
+"游隙上限",
+"Largest clearance"
+],
+"asmPmin": [
+"游隙下限",
+"Smallest clearance"
+],
+"asmPt": [
+"目标游隙",
+"Target clearance"
+],
+"asmPtHint": [
+"不填取上下限中间",
+"Blank: the middle of the range"
+],
+"asmQty": [
+"数量",
+"Balls"
+],
+"asmRingHint": [
+"每行一个，可从表格直接粘贴",
+"One per line; paste from a spreadsheet"
+],
+"asmRun": [
+"配套",
+"Match"
+],
+"asmSets": [
+"配套清单（逐件配对）",
+"Sets (piece by piece)"
+],
+"asmStats": [
+"游隙",
+"Clearance"
+],
+"asmSynth": [
+"用合成数据试一试",
+"Try with synthetic data"
+],
+"asmSynthNote": [
+"合成数据：按当前设计的沟径和球径随机生成，只用于演示，不是实测数据；自动填的游隙范围也是演示值。",
+"Synthetic data: drawn at random about the current design, for demonstration only, not measurements; the clearance range filled in is a demonstration value too."
+],
+"asmTitle": [
+"合套选配",
+"Selective assembly"
+],
+"asmUsed": [
+"配套数 / 最多",
+"Sets / most"
+],
+"asmWhyNone": [
+"没有任何外圈和钢球组能让游隙落在范围内",
+"no partner and ball group give a clearance in range"
+],
+"asmWhyTaken": [
+"能配的件已被别的套用掉",
+"its possible partners went to other sets"
+],
+"asmZ": [
+"每套钢球数 Z",
+"Balls per bearing Z"
+],
+"axialTo": [
+"齿轮轴向力指向",
+"Gear axial force points to"
+],
+"axis": [
+"关节轴线",
+"Joint axis"
+],
+"ay": [
+"转弯侧向加速度",
+"Cornering acceleration"
+],
+"beltDeg": [
+"带拉力方向（与竖直向下的夹角）",
+"Belt pull direction (from straight down)"
+],
+"beltF": [
+"带拉力（合力）",
+"Belt pull (resultant)"
+],
+"beltX": [
+"带轮位置",
+"Pulley position"
+],
+"beta": [
+"螺旋角 β（直齿填 0）",
+"Helix angle β (spur: 0)"
+],
+"bpfi": [
+"内圈 BPFI",
+"Inner race BPFI"
+],
+"bpfo": [
+"外圈 BPFO",
+"Outer race BPFO"
+],
+"bsf": [
+"滚动体自转 BSF",
+"Rolling element spin BSF"
+],
+"busy": [
+"计算中…",
+"Computing…"
+],
+"camTable": [
+"一圈内的力",
+"Force round the turn"
+],
+"camTableHint": [
+"每行：转角(°), Fx, Fy（可加 Fz），单位 N",
+"Each line: angle (°), Fx, Fy (optionally Fz), in N"
+],
+"caseName": [
+"工况",
+"Case"
+],
+"cases": [
+"工况（载荷谱）",
+"Cases (load spectrum)"
+],
+"chain": [
+"游隙链",
+"Clearance chain"
+],
+"checks": [
+"校核",
+"Checks"
+],
+"close": [
+"关闭",
+"Close"
+],
+"coneAngle": [
+"内圈（锥）滚道角",
+"Cone angle"
+],
+"contactAngle": [
+"工作接触角",
+"Operating contact angle"
+],
+"crown": [
+"滚子素线（凸度）",
+"Roller profile (crown)"
+],
+"crownFlat": [
+"中间直线段长度",
+"Length of the flat middle"
+],
+"crownR": [
+"凸度圆弧半径",
+"Crown radius"
+],
+"crownTable": [
+"凸度点表",
+"Crown points"
+],
+"crownTableHint": [
+"每行：到滚子中点的距离 x, 降量（mm）",
+"Each line: distance x from the roller centre, drop (mm)"
+],
+"crown_arc": [
+"全长圆弧",
+"Arc over the whole length"
+],
+"crown_partial": [
+"中间直线、两端圆弧",
+"Flat middle, arcs at the ends"
+],
+"crown_straight": [
+"直线（无凸度）",
+"Straight (no crown)"
+],
+"crown_table": [
+"点表（实测或设计值）",
+"Point table (measured or designed)"
+],
+"cupAngle": [
+"外圈（杯）滚道角 α",
+"Cup angle α"
+],
+"cupHint": [
+"即接触角，滚道与轴线的夹角",
+"The contact angle: raceway to axis"
+],
+"cylindrical": [
+"圆柱滚子轴承",
+"Cylindrical roller bearing"
+],
+"d": [
+"内径 d",
+"Bore d"
+],
+"deep_groove": [
+"深沟球轴承",
+"Deep groove ball bearing"
+],
+"density": [
+"钢球密度",
+"Ball density"
+],
+"densityHint": [
+"算高速离心力用；不填按轴承钢常用值 7.85",
+"For the centrifugal force at speed; blank: 7.85, common for bearing steel"
+],
+"dm": [
+"节圆直径 dm",
+"Pitch diameter dm"
+],
+"dmHint": [
+"不填按 (d + D)/2",
+"Blank: (d + D)/2"
+],
+"dropLabel": [
+"凸度降量（放大）",
+"Crown drop (exaggerated)"
+],
+"ellipse": [
+"接触椭圆半轴 a × b",
+"Contact ellipse semi-axes a × b"
+],
+"error": [
+"算不出来",
+"Cannot compute"
+],
+"eta0": [
+"工作温度下黏度 η₀",
+"Viscosity at operating temperature η₀"
+],
+"examples": [
+"示例",
+"Examples"
+],
+"fHint": [
+"沟道半径 ÷ 钢球直径，0.5–0.6",
+"Groove radius ÷ ball diameter, 0.5–0.6"
+],
+"fail": [
+"不合格",
+"Fail"
+],
+"fcDownload": [
+"下载 FreeCAD 工作台",
+"Download the FreeCAD workbench"
+],
+"fcHint": [
+"在 FreeCAD 1.1 里填参数、校核、建精确实体、出工作图和工序简图；项目文件与网页版通用",
+"Design and check in FreeCAD 1.1, build exact solids, working drawings and operation sketches; project files are shared with the web app"
+],
+"fi": [
+"内沟曲率系数 fi",
+"Inner groove ratio fi"
+],
+"fictional": [
+"虚构示例",
+"Fictional example"
+],
+"fitInner": [
+"内圈配合",
+"Inner fit"
+],
+"fitOuter": [
+"外圈配合",
+"Outer fit"
+],
+"fitsAngular": [
+"角接触球轴承的游隙由接触角和配对预紧决定，配对预紧在第 4 步加入。",
+"An angular contact bearing’s clearance is set by its contact angle and the paired preload, which comes in step 4."
+],
+"fitsTapered": [
+"圆锥滚子轴承的轴向游隙在安装时调整，这里按零游隙计算；配对与预紧在第 4 步之三加入。",
+"A tapered roller bearing’s end play is set at mounting; it is worked here with zero end play. Pairs and preload come in step 4, part 3."
+],
+"fixedBearing": [
+"承受轴向力的轴承（固定端）",
+"Bearing taking the axial force (fixed end)"
+],
+"fo": [
+"外沟曲率系数 fo",
+"Outer groove ratio fo"
+],
+"fp": [
+"载荷系数 fp",
+"Load factor f_p"
+],
+"fpHint": [
+"按冲击程度，从手册或企业规范取值；不填则疲劳校核为“未知”",
+"By how much shock there is, from a handbook or your own standard; blank leaves the fatigue check unknown"
+],
+"freq": [
+"故障特征频率",
+"Fault frequencies"
+],
+"ftf": [
+"保持架 FTF",
+"Cage FTF"
+],
+"gBalls": [
+"钢球与沟道",
+"Balls and grooves"
+],
+"gFits": [
+"配合与温度",
+"Fits and temperatures"
+],
+"gLimits": [
+"校核限值",
+"Limits"
+],
+"gLoads": [
+"载荷与转速",
+"Loads and speed"
+],
+"gLube": [
+"润滑",
+"Lubrication"
+],
+"gMat": [
+"材料",
+"Material"
+],
+"gRollers": [
+"滚子与凸度",
+"Rollers and crown"
+],
+"gScene": [
+"应用场景",
+"Application"
+],
+"gSize": [
+"外形尺寸",
+"Boundary dimensions"
+],
+"gap_min": [
+"钢球最小间隙",
+"Smallest gap between balls"
+],
+"generated": [
+"生成时间",
+"Generated"
+],
+"hHint": [
+"从沟底量起",
+"Measured from the groove bottom"
+],
+"h_i": [
+"内圈挡肩高度",
+"Inner shoulder height"
+],
+"h_o": [
+"外圈挡肩高度",
+"Outer shoulder height"
+],
+"heaviest": [
+"最重载钢球",
+"Heaviest ball"
+],
+"horizontal": [
+"水平",
+"Horizontal"
+],
+"housing_I": [
+"座孔配合过盈量（直径）",
+"Housing interference (diametral)"
+],
+"hubE": [
+"轮心面偏离两排中点",
+"Wheel plane offset from the row midpoint"
+],
+"inboard": [
+"内排（靠车内）",
+"Inboard row"
+],
+"info": [
+"计算值",
+"Value"
+],
+"initial": [
+"初始",
+"Initial"
+],
+"innerRing": [
+"内圈",
+"inner ring"
+],
+"inputs": [
+"输入",
+"Inputs"
+],
+"jointL": [
+"两轴承间距；单个轴承不填",
+"Bearing spacing; leave blank for one bearing"
+],
+"jointW": [
+"臂与负载总重 W",
+"Arm and payload weight W"
+],
+"k_assemble": [
+"合套",
+"Assembly"
+],
+"k_cut": [
+"其他切削",
+"Other cutting"
+],
+"k_grind": [
+"磨削",
+"Grinding"
+],
+"k_heat": [
+"热处理",
+"Heat treatment"
+],
+"k_inspect": [
+"检测",
+"Inspection"
+],
+"k_other": [
+"其他",
+"Other"
+],
+"k_superfinish": [
+"超精",
+"Superfinishing"
+],
+"k_turn": [
+"车削",
+"Turning"
+],
+"k_wash": [
+"清洗",
+"Washing"
+],
+"lever": [
+"重心到轴线的力臂 r",
+"Lever r from the axis to the centre of gravity"
+],
+"limit": [
+"限值",
+"Limit"
+],
+"limitsHint": [
+"限值由您按企业标准或客户要求填写；没填的项目结果显示“未知”，不会判为合格。",
+"Fill in the limits from your company standard or the customer’s requirement; a check without its limit shows “unknown”, never a pass."
+],
+"loadRing": [
+"钢球载荷",
+"Ball loads"
+],
+"loadX": [
+"载荷到轴承 A 的距离 x",
+"Load position x from bearing A"
+],
+"method": [
+"方法与依据",
+"Method and sources"
+],
+"misalign": [
+"内外圈相对倾斜",
+"Misalignment of the rings"
+],
+"misalignHint": [
+"轴的挠曲、座孔不同心等引起，按实测或计算填",
+"From shaft bending or housing bores: measured or worked out"
+],
+"mn": [
+"法向模数 mn",
+"Normal module m_n"
+],
+"modeAsm": [
+"合套选配",
+"Selective assembly"
+],
+"modeDesign": [
+"设计校核",
+"Design"
+],
+"modeProcess": [
+"工艺",
+"Process"
+],
+"modeQuality": [
+"检测与 SPC",
+"Inspection & SPC"
+],
+"motionOsc": [
+"摆动",
+"Swinging"
+],
+"motionRot": [
+"旋转",
+"Turning"
+],
+"mounted": [
+"装配后",
+"Mounted"
+],
+"n": [
+"内圈转速 n",
+"Inner ring speed n"
+],
+"na": [
+"不适用",
+"n/a"
+],
+"nelson1": [
+"1 个点超出 3σ",
+"one point beyond 3σ"
+],
+"nelson2": [
+"连续 9 点在中心线同一侧",
+"nine in a row on one side"
+],
+"nelson3": [
+"连续 6 点递增或递减",
+"six in a row rising or falling"
+],
+"nelson4": [
+"连续 14 点上下交替",
+"fourteen in a row alternating"
+],
+"nelson5": [
+"3 点中有 2 点在同侧 2σ 外",
+"two of three beyond 2σ on one side"
+],
+"nelson6": [
+"5 点中有 4 点在同侧 1σ 外",
+"four of five beyond 1σ on one side"
+],
+"nelson7": [
+"连续 15 点在 1σ 以内",
+"fifteen in a row within 1σ"
+],
+"nelson8": [
+"连续 8 点都在 1σ 外且两侧都有",
+"eight in a row beyond 1σ on both sides"
+],
+"newProject": [
+"新建",
+"New"
+],
+"nu": [
+"泊松比 ν",
+"Poisson's ratio ν"
+],
+"open": [
+"打开文件",
+"Open"
+],
+"operating": [
+"工作",
+"Operating"
+],
+"outboard": [
+"外排（靠车轮）",
+"Outboard row"
+],
+"outerRing": [
+"外圈",
+"outer ring"
+],
+"outerTurns": [
+"外圈转",
+"Outer ring turns"
+],
+"overall": [
+"总结论",
+"Overall"
+],
+"overallFail": [
+"有不合格项",
+"Some checks fail"
+],
+"overallPass": [
+"全部校核合格",
+"All checks pass"
+],
+"overallUnknown": [
+"有项目缺数据，暂不能判定合格",
+"Some checks lack data, so the bearing cannot be passed yet"
+],
+"overhang": [
+"主轴悬伸 a（前端到前轴承）",
+"Overhang a (nose to front bearing)"
+],
+"pIn": [
+"内圈接触应力",
+"Inner contact stress"
+],
+"pOut": [
+"外圈接触应力",
+"Outer contact stress"
+],
+"p_fatigue": [
+"疲劳许用接触应力",
+"Allowed fatigue contact stress"
+],
+"p_static": [
+"静强度许用接触应力",
+"Allowed static contact stress"
+],
+"pairRows": [
+"成对：两列（峰值工况）",
+"Pair: the two rows (peak case)"
+],
+"part_bearing": [
+"整套",
+"Bearing"
+],
+"part_element": [
+"滚动体",
+"Rolling element"
+],
+"part_inner": [
+"内圈",
+"Inner ring"
+],
+"part_outer": [
+"外圈",
+"Outer ring"
+],
+"partsBtn": [
+"零件图与三维",
+"Parts & 3D"
+],
+"partsDxf": [
+"下载截面 DXF：",
+"Download section DXF:"
+],
+"partsIn": [
+"内径",
+"inside"
+],
+"partsOut": [
+"外径",
+"outside"
+],
+"partsStep": [
+"下载 STEP：",
+"Download STEP:"
+],
+"partsTitle": [
+"零件图与三维模型",
+"Part drawings and 3D models"
+],
+"partsTol": [
+"尺寸公差",
+"Tolerances"
+],
+"partsVol": [
+"体积",
+"Volume"
+],
+"pass": [
+"合格",
+"Pass"
+],
+"pcAddOp": [
+"加一道工序",
+"Add an operation"
+],
+"pcAddParam": [
+"加一项参数",
+"Add a setting"
+],
+"pcAllPass": [
+"留量全部够",
+"every stock is enough"
+],
+"pcAtLeast": [
+"不小于",
+"at least"
+],
+"pcAtMost": [
+"不大于",
+"at most"
+],
+"pcBlank": [
+"毛坯",
+"Blank"
+],
+"pcBlankChain": [
+"按当前设计生成工序链（空白）",
+"Usual chain for this design (blank)"
+],
+"pcBlankT": [
+"毛坯公差",
+"Blank tolerance"
+],
+"pcBlankTHint": [
+"锻件或管料的尺寸公差，mm；用于检查车削留量",
+"Of the forging or tube, mm; for the turning stock check"
+],
+"pcChecks": [
+"留量校核",
+"Stock checks"
+],
+"pcChecksHint": [
+"按直径或宽度计",
+"on the diameter or the width"
+],
+"pcDel": [
+"删除",
+"Delete"
+],
+"pcDown": [
+"下移",
+"Move down"
+],
+"pcEi": [
+"下偏差",
+"Lower"
+],
+"pcEmpty": [
+"先在“设计校核”里打开一个轴承，再点“按当前设计生成工序链”或打开示例模板。",
+"Open a bearing in Design first, then make the usual chain or open the example."
+],
+"pcEquip": [
+"设备",
+"Machine"
+],
+"pcEs": [
+"上偏差",
+"Upper"
+],
+"pcExample": [
+"示例模板（虚构数）",
+"Example (fictional values)"
+],
+"pcFeatures": [
+"这道工序加工的面（尺寸按直径或宽度计）",
+"Surfaces this operation works on (sizes on the diameter or the width)"
+],
+"pcFinish": [
+"成品公差",
+"Finished tolerances"
+],
+"pcFinishHint": [
+"上下偏差，mm；没填时以公称尺寸为基准",
+"Upper and lower deviation, mm; blank: based on the nominal size"
+],
+"pcIntro": [
+"按成品尺寸和您填的各工序留量，倒推每道工序的工序尺寸，检查留量够不够。留量、公差、热处理变化、设备参数都由企业按自己的设备和经验填，软件不给默认值；没填的结果是“未知”。",
+"Operation sizes worked back from the finished sizes and the allowances you enter, with a check that each stock is enough. Allowances, tolerances, heat-treatment change and machine settings are your own: the software gives no defaults, and anything not filled in is “unknown”."
+],
+"pcKind": [
+"工序类型",
+"Kind"
+],
+"pcMode": [
+"加工方式",
+"Works"
+],
+"pcModeHint": [
+"超精、研磨一般按定量去除",
+"Superfinishing and lapping usually remove a set stock"
+],
+"pcModeSize": [
+"按尺寸加工",
+"to size"
+],
+"pcModeStock": [
+"定量去除",
+"removing a set stock"
+],
+"pcName": [
+"工序名称",
+"Operation"
+],
+"pcNo": [
+"工序号",
+"Op."
+],
+"pcNotFile": [
+"不是工艺模板文件",
+"Not a process template file"
+],
+"pcOpSize": [
+"工序尺寸",
+"Operation size"
+],
+"pcOpen": [
+"打开模板文件",
+"Open template"
+],
+"pcParams": [
+"设备与工艺参数",
+"Machine settings"
+],
+"pcParamsHint": [
+"名称、数值、单位由企业自定",
+"Names, values and units are your own"
+],
+"pcPk": [
+"名称",
+"Name"
+],
+"pcPu": [
+"单位",
+"Unit"
+],
+"pcPv": [
+"数值",
+"Value"
+],
+"pcRoute": [
+"工艺路线",
+"Route"
+],
+"pcRouteHint": [
+"每道工序后的工序尺寸，mm，入体标注",
+"Size after each operation, mm, into the material"
+],
+"pcSave": [
+"保存模板文件",
+"Save template"
+],
+"pcSheet": [
+"工序卡",
+"Operation sheet"
+],
+"pcSheetFoot": [
+"尺寸 mm，按直径或宽度计。沟曲率半径、沟位置本卡不算，请按企业图纸填写。",
+"Sizes in mm, on the diameter or the width. Groove radius and position are not computed here: take them from your drawings."
+],
+"pcSheetWarn": [
+"注意",
+"Note"
+],
+"pcSheets": [
+"工序卡（打印）",
+"Operation sheets (print)"
+],
+"pcSign": [
+"编制 ________　审核 ________　批准 ________　日期 ________",
+"Prepared ________   Checked ________   Approved ________   Date ________"
+],
+"pcSomeFail": [
+"有留量不够或公差超出",
+"some stock is short or a tolerance is exceeded"
+],
+"pcSomeUnknown": [
+"有数没填，部分结果未知",
+"some numbers are missing: part of the result is unknown"
+],
+"pcTitle": [
+"工艺路线与工序卡",
+"Process route and operation sheets"
+],
+"pcTolUnknown": [
+"公差未知",
+"tolerance unknown"
+],
+"pcUp": [
+"上移",
+"Move up"
+],
+"pcZrange": [
+"实际留量范围",
+"Stock range"
+],
+"pc_inner": [
+"内圈",
+"Inner ring"
+],
+"pc_outer": [
+"外圈",
+"Outer ring"
+],
+"perCase": [
+"各工况",
+"Every case"
+],
+"pf_T": [
+"本道公差",
+"Tolerance"
+],
+"pf_Z": [
+"公称留量",
+"Nominal allowance"
+],
+"pf_Zmax": [
+"允许的最大留量（可不填）",
+"Largest stock allowed (optional)"
+],
+"pf_Zreq": [
+"需要的最小留量",
+"Smallest stock needed"
+],
+"pf_change": [
+"尺寸变化 Δ（长大为正）",
+"Size change Δ (growth +)"
+],
+"pf_distortion": [
+"变形（圆度）",
+"Distortion (out of round)"
+],
+"pf_dz": [
+"去除量波动",
+"Stock scatter"
+],
+"pf_scatter": [
+"变化的波动范围",
+"Scatter of the change"
+],
+"pf_setup": [
+"装夹误差（可不填）",
+"Setup error (optional)"
+],
+"preloadF": [
+"预紧力",
+"Preload"
+],
+"print": [
+"打印 / 存为 PDF",
+"Print / save as PDF"
+],
+"qAnalyse": [
+"分析",
+"Analyse"
+],
+"qAtPoints": [
+"子组",
+"subgroups"
+],
+"qAuto": [
+"自动（按子组大小）",
+"Automatic (by subgroup size)"
+],
+"qBand": [
+"频段",
+"Band"
+],
+"qBandRes": [
+"频段",
+"Bands"
+],
+"qBands": [
+"频段（可选）",
+"Bands (optional)"
+],
+"qBandsHint": [
+"每行：起始阶, 终止阶, 名称；按企业标准填",
+"Each line: from order, to order, name; from your own standard"
+],
+"qChart": [
+"控制图",
+"Chart"
+],
+"qData": [
+"检测数据",
+"Measurements"
+],
+"qDataHint": [
+"每行一个子组，数之间用逗号或空格隔开；单值图每行一个数",
+"One subgroup per line, values separated by commas or spaces; one value per line for individuals"
+],
+"qEcc": [
+"偏心（1 阶幅值）",
+"Eccentricity (order 1)"
+],
+"qEccNote": [
+"安装偏心，已去掉",
+"Set-up eccentricity, taken out"
+],
+"qIMR": [
+"单值–移动极差",
+"Individuals–moving range"
+],
+"qLsc": [
+"按最小二乘圆，与输入同单位",
+"About the least-squares circle, input units"
+],
+"qLsl": [
+"规格下限",
+"Lower spec limit"
+],
+"qName": [
+"检测特性",
+"Characteristic"
+],
+"qNoRule": [
+"没有发现异常",
+"Nothing found"
+],
+"qNoSpec": [
+"未填规格限：过程能力未知",
+"No spec limits: capability unknown"
+],
+"qOrders": [
+"阶次",
+"Orders"
+],
+"qOutSpec": [
+"超规格的数",
+"Values out of spec"
+],
+"qPeak": [
+"最大的阶",
+"Largest order"
+],
+"qPlot": [
+"画控制图",
+"Plot"
+],
+"qPoints": [
+"个点",
+"points"
+],
+"qPolar": [
+"偏差极坐标图（放大）",
+"Deviation, polar (exaggerated)"
+],
+"qProfile": [
+"一圈轮廓",
+"One turn"
+],
+"qProfileEmpty": [
+"贴入一圈轮廓（或用合成数据试一试），点“分析”。",
+"Paste one turn (or try synthetic data) and press Analyse."
+],
+"qProfileHint": [
+"每行一个偏差值（等角度间隔），或“角度°, 偏差”；单位自定（常用 µm）",
+"One deviation per line (equal angle steps), or \"angle°, deviation\"; any unit (µm usual)"
+],
+"qProfileIntro": [
+"贴入圆度仪测得的一圈沟道轮廓（半径偏差）。软件做谐波分析：去掉 1 阶（安装偏心）后按最小二乘圆算圆度，各阶幅值看波纹度。",
+"Paste one measured turn of the raceway (radius deviations). The harmonics are worked out; order 1 (set-up eccentricity) is taken out and the roundness is about the least-squares circle; the orders show the waviness."
+],
+"qProfileTab": [
+"圆度与波纹度",
+"Roundness & waviness"
+],
+"qRoundness": [
+"圆度（峰谷值）",
+"Roundness (peak to valley)"
+],
+"qRule": [
+"规则",
+"Rule"
+],
+"qRules": [
+"判异",
+"Tests for special causes"
+],
+"qRulesSrc": [
+"判异规则：L. S. Nelson, The Shewhart Control Chart—Tests for Special Causes, Journal of Quality Technology 16(4), 1984。控制图常数按正态分布数值计算。",
+"Tests: L. S. Nelson, The Shewhart Control Chart—Tests for Special Causes, Journal of Quality Technology 16(4), 1984. Chart constants worked out from the normal distribution."
+],
+"qSpcEmpty": [
+"贴入检测数据（或用合成数据试一试），点“画控制图”。",
+"Paste measurements (or try synthetic data) and press Plot."
+],
+"qSpcIntro": [
+"贴入按时间顺序的检测数据，每行一个子组。软件画控制图、按 Nelson 八条判异、算过程能力。",
+"Paste measurements in time order, one subgroup per line. Control charts, Nelson’s eight tests and process capability."
+],
+"qSpcTab": [
+"控制图与过程能力",
+"Control charts"
+],
+"qSpectrum": [
+"各阶幅值（2–100 阶）",
+"Amplitude by order (2–100)"
+],
+"qSpreadOut": [
+"超出控制限的子组",
+"subgroups beyond the limits"
+],
+"qSynthName": [
+"外圈沟径（合成）",
+"Outer raceway diameter (synthetic)"
+],
+"qSynthNote": [
+"合成数据：随机生成，只用于演示，不是实测数据。",
+"Synthetic data: generated at random, for demonstration only; not measurements."
+],
+"qUnit": [
+"单位",
+"Unit"
+],
+"qUsl": [
+"规格上限",
+"Upper spec limit"
+],
+"qXR": [
+"均值–极差",
+"Mean–range"
+],
+"qXS": [
+"均值–标准差",
+"Mean–standard deviation"
+],
+"q_i_mr": [
+"单值–移动极差图",
+"Individuals–MR chart"
+],
+"q_xbar_r": [
+"均值–极差图",
+"Mean–range chart"
+],
+"q_xbar_s": [
+"均值–标准差图",
+"Mean–s chart"
+],
+"rEnd": [
+"滚子大端球基面半径",
+"Radius of the roller large end"
+],
+"radialLoad": [
+"径向力方向",
+"Radial force"
+],
+"ratingsNote": [
+"额定载荷和寿命按国家标准计算，标准正文录入前显示“未知”。",
+"Load ratings and life follow the national standards and show “unknown” until the standard texts are entered."
+],
+"removeCase": [
+"删除这个工况",
+"Remove this case"
+],
+"report": [
+"计算书",
+"Report"
+],
+"reportTitle": [
+"轴承计算书",
+"Bearing calculation report"
+],
+"results": [
+"结果",
+"Results"
+],
+"ribAngle": [
+"挡边推力方向",
+"Direction of the rib push"
+],
+"ribHint": [
+"不填：垂直于挡边面，沿滚子轴线",
+"Blank: square to the rib face, along the roller axis"
+],
+"rollerLoads": [
+"滚子载荷",
+"Roller loads"
+],
+"rotorM": [
+"转子质量",
+"Rotor mass"
+],
+"row": [
+"本轴承是",
+"This bearing is"
+],
+"rowFacing": [
+"朝向",
+"Facing"
+],
+"rowL": [
+"两排间距",
+"Row spacing"
+],
+"rowSpacing": [
+"两列中心距",
+"Distance between the rows"
+],
+"rowSpacingHint": [
+"两个轴承宽度中心之间的距离",
+"Between the width centres of the two bearings"
+],
+"save": [
+"保存为文件",
+"Save"
+],
+"savedLocal": [
+"已自动保存在这台电脑的浏览器里",
+"Saved automatically in this browser"
+],
+"sceneKind": [
+"用在哪",
+"Used in"
+],
+"sceneResult": [
+"载荷从哪来",
+"Where the loads come from"
+],
+"section": [
+"剖面",
+"Section"
+],
+"shaft": [
+"转频",
+"Shaft"
+],
+"shaft_I": [
+"轴配合过盈量（直径）",
+"Shaft interference (diametral)"
+],
+"share": [
+"时间占比",
+"Share"
+],
+"shareIn": [
+"转弯（侧向力朝内）占比",
+"Share turning, force inward"
+],
+"shareOut": [
+"转弯（侧向力朝外）占比",
+"Share turning, force outward"
+],
+"shareStraight": [
+"直行时间占比",
+"Share of time straight"
+],
+"sigma": [
+"综合表面粗糙度 σ",
+"Composite surface roughness σ"
+],
+"skHint_camshaft": [
+"贴入一圈内的力（转角, Fx, Fy，可加 Fz），可来自问渠凸轮或缝纫机软件。",
+"Paste the force round one turn (angle, Fx, Fy, optionally Fz), e.g. from WenQuest Cam or the sewing-machine software."
+],
+"skHint_gearbox": [
+"由齿轮参数和功率算啮合力，再按两轴承跨距分到本轴承；可填几个工况（功率、转速、时间占比）。",
+"Gear data and power give the mesh forces, shared between the two bearings; give one or more cases (power, speed, share of time)."
+],
+"skHint_generic": [
+"直接填轴承上的径向力、轴向力、力矩和转速。",
+"Enter the radial force, axial force, moment and speed on the bearing."
+],
+"skHint_hub": [
+"车轮载荷、转弯侧向加速度和滚动半径，分到内外两排；外圈转。自动算直行和左右转弯三个工况。",
+"Wheel load, cornering acceleration and rolling radius shared between the two rows; the outer ring turns. Straight running and both turns are worked."
+],
+"skHint_joint": [
+"关节来回摆动：以静强度为主。竖直轴时，重量在力臂上产生倾覆力矩。",
+"The joint swings back and forth: static strength governs. With a vertical axis the weight on its lever tilts the bearings."
+],
+"skHint_motor": [
+"转子重量、不平衡量和带拉力分到两轴承；不平衡随轴转，每 10° 算一次。",
+"Rotor weight, unbalance and belt pull shared between the bearings; the unbalance turns with the shaft and is worked every 10°."
+],
+"skHint_spindle": [
+"主轴前端的切削力，悬伸在前轴承 A 之前；轴向切削力由前轴承承受。",
+"Cutting force at the spindle nose, overhanging in front of the front bearing A; the front bearing takes the axial force."
+],
+"sk_camshaft": [
+"凸轮轴、缝纫机主轴",
+"Camshaft, sewing machine shaft"
+],
+"sk_gearbox": [
+"减速器齿轮轴",
+"Gearbox gear shaft"
+],
+"sk_generic": [
+"通用：直接填力",
+"General: enter the forces"
+],
+"sk_hub": [
+"汽车轮毂",
+"Wheel hub"
+],
+"sk_joint": [
+"机器人关节 / 摆臂",
+"Robot joint / swing arm"
+],
+"sk_motor": [
+"电机转子",
+"Motor rotor"
+],
+"sk_spindle": [
+"机床主轴",
+"Machine tool spindle"
+],
+"sliceTitle": [
+"最重载滚子：沿长度的接触应力",
+"Heaviest roller: contact stress along its length"
+],
+"spanL": [
+"两轴承跨距 L（A 到 B）",
+"Bearing span L (A to B)"
+],
+"swing": [
+"摆角",
+"Swing angle"
+],
+"tagline": [
+"滚动轴承设计与校核",
+"Rolling bearing design & checks"
+],
+"tapered": [
+"圆锥滚子轴承",
+"Tapered roller bearing"
+],
+"thermal": [
+"温差",
+"Temperature"
+],
+"thisBearing": [
+"本轴承是",
+"This bearing is"
+],
+"title": [
+"项目名称",
+"Project name"
+],
+"type": [
+"类型",
+"Type"
+],
+"unbalance": [
+"剩余不平衡量 U",
+"Residual unbalance U"
+],
+"unknown": [
+"未知",
+"Unknown"
+],
+"untitled": [
+"未命名轴承",
+"Untitled bearing"
+],
+"value": [
+"计算值",
+"Value"
+],
+"vertical": [
+"竖直",
+"Vertical"
+],
+"wall_min": [
+"套圈最小壁厚",
+"Smallest ring wall"
+],
+"wheelR": [
+"车轮滚动半径",
+"Rolling radius"
+],
+"wheelW": [
+"车轮载荷 W",
+"Wheel load W"
+],
+"xHint": [
+"在 B 外侧时大于跨距",
+"Beyond B: more than the span"
+],
+"zGear": [
+"齿数 z",
+"Number of teeth z"
+]
+}

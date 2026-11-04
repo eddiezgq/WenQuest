@@ -353,5 +353,80 @@ async def process_ep(request: Request):
     return run(make)
 
 
+# --------------------------------------------------------------------------------------- step 6: FreeCAD
+
+FREECAD = HERE / "freecad"
+
+
+def workbench_dirs(here: Path) -> list[Path]:
+    """Where the shared workbench files are: in the image /srv/freecad/workbench (the Dockerfile copies them there); in
+    the repository factory/digital/freecad/Mod/WenQuest. The image's /srv has no grandparent: look it up safely (the
+    cam service fell over on this, 2026-10-22)."""
+    out = [here / "freecad" / "workbench"]
+    if len(here.parents) >= 2:
+        out.append(here.parents[1] / "factory" / "digital" / "freecad" / "Mod" / "WenQuest")
+    return out
+
+
+WORKBENCH = workbench_dirs(HERE)
+FREECAD_README = """问渠轴承 · FreeCAD 工作台（第 64 轮第 6 步）
+
+1. 安装 FreeCAD 1.1（https://www.freecad.org/downloads.php）。
+2. 把本压缩包里的 Mod\\WenQuest 文件夹复制到 FreeCAD 的用户 Mod 目录，重启 FreeCAD：
+   Windows：%APPDATA%\\FreeCAD\\Mod；macOS：~/Library/Application Support/FreeCAD/Mod；Linux：~/.local/share/FreeCAD/Mod
+   （已装过问渠凸轮或数字工厂的包也没关系：解压到同一个 WenQuest 文件夹，各自的按钮都在。）
+3. 工作台列表里选“问渠”，点“轴承”：右边出现参数表单（与网页版同样的字段），可以从头填，也可以“打开项目”
+   选网页版存的文件（.wqbearing.json；文件夹 examples 里有示例）。
+4. “计算”：校核结果与网页版同一个计算内核，逐项相同。“建模”：内圈、外圈、全部滚动体的精确实体，按节圆排好，
+   并检查滚动体与套圈是否干涉。“出图与 STEP”：零件 STEP、整套 STEP、每个零件一张 A3 工作图（SVG，公差和技术要求
+   留给工程师填）。“工序简图”：选网页版“工艺”页存的模板（.wqprocess.json），每道磨削 / 超精出一张简图。
+5. 存的项目文件网页版也能打开。
+   不开界面也行：在 FreeCAD 的 Python 控制台里
+   import wq_bearing; wq_bearing.run_headless("项目.wqbearing.json", "输出文件夹", "工艺模板.wqprocess.json")
+
+需要 Python 包 numpy、scipy（1.9 以上）：FreeCAD 自带；缺的时候点“轴承”会提示安装命令。计算全在本机，不连网，不调 AI。
+示例的数是虚构的，只用于演示。
+"""
+
+
+def freecad_pack() -> bytes:
+    import io
+    import zipfile
+
+    wb = next((d for d in WORKBENCH if (d / "wq_workbench.py").is_file()), None)
+    if wb is None:
+        raise HTTPException(
+            404, {"en": "the FreeCAD workbench is not in this build", "zh": "这个版本里没有 FreeCAD 工作台"}
+        )
+    buf = io.BytesIO()
+    top = "wenquest-bearing-freecad/"
+    root = top + "Mod/WenQuest/"
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        for f in ("InitGui.py", "wq_workbench.py"):
+            z.write(wb / f, root + f)
+        for f in sorted(FREECAD.glob("*.py")):
+            z.write(f, root + f.name)
+        for f in sorted((HERE / "bearingkit").iterdir()):
+            if f.suffix in (".py", ".json"):
+                z.write(f, root + "bearingkit/" + f.name)
+        for f in sorted(EXAMPLES.glob("*.json")):
+            z.write(f, root + "examples/" + f.stem + ".wqbearing.json")
+        for f in sorted(PROCESS_EXAMPLES.glob("*.json")):
+            z.write(f, root + "examples/" + f.stem + ".wqprocess.json")
+        z.writestr(top + "使用说明.txt", FREECAD_README)
+    return buf.getvalue()
+
+
+@app.get("/api/freecad.zip")
+def freecad_zip():
+    from fastapi.responses import Response
+
+    return Response(
+        freecad_pack(),
+        media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=wenquest-bearing-freecad.zip"},
+    )
+
+
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")

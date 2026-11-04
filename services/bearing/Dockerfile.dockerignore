@@ -9,4 +9,7 @@
 !services/bearing/bearingkit
 !services/bearing/examples
 !services/bearing/app.py
+!services/bearing/freecad
+!factory/digital/freecad/Mod/WenQuest/InitGui.py
+!factory/digital/freecad/Mod/WenQuest/wq_workbench.py
 **/__pycache__

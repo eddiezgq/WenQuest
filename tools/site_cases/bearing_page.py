@@ -80,9 +80,13 @@ STEPS = [
      ("内外圈工序链（车削、热处理、磨削、超精……可增删）；按成品尺寸和企业自己的留量倒推每道工序尺寸，算最小与最大留量（含上道公差、热处理波动与变形），可打印的工序卡；软件不给默认值",
       "Ring operation chains (turning, heat treatment, grinding, superfinishing… edit freely); each operation size worked back from the finished part with your own allowances, smallest and largest stock (with the preceding tolerance, heat-treatment scatter and distortion), printable operation sheets; no default values"),
      "now"),
-    (("FreeCAD、AI 起草与云端项目", "FreeCAD, AI drafts and cloud projects"),
-     ("同一个计算内核进 FreeCAD；AI 起草设计说明，数字由代码核对；开通的企业把项目存到云端",
-      "The same kernel inside FreeCAD; AI drafts the design description with every number checked by code; activated companies keep projects in the cloud"),
+    (("FreeCAD 工作台", "FreeCAD workbench"),
+     ("在 FreeCAD 1.1 里填参数（与网页版同样的字段、通用的项目文件）、校核（同一个内核，结果逐项相同）、建精确实体与整套装配、查干涉、出零件工作图和每道磨削工序的工序简图",
+      "In FreeCAD 1.1: the same fields and project files as the web app, the same checks (one kernel, identical results), exact solids and the assembled bearing, an interference check, working drawings and a sketch for every grinding operation"),
+     "now"),
+    (("AI 起草与云端项目", "AI drafts and cloud projects"),
+     ("AI 起草设计说明，数字由代码核对；开通的企业把项目和工艺模板存到云端",
+      "AI drafts the design description with every number checked by code; activated companies keep projects and process templates in the cloud"),
      "next"),
 ]
 

@@ -185,6 +185,7 @@ const W = {
   nelson4: ['连续 14 点上下交替', 'fourteen in a row alternating'], nelson5: ['3 点中有 2 点在同侧 2σ 外', 'two of three beyond 2σ on one side'],
   nelson6: ['5 点中有 4 点在同侧 1σ 外', 'four of five beyond 1σ on one side'], nelson7: ['连续 15 点在 1σ 以内', 'fifteen in a row within 1σ'],
   nelson8: ['连续 8 点都在 1σ 外且两侧都有', 'eight in a row beyond 1σ on both sides'],
+  fcDownload: ['下载 FreeCAD 工作台', 'Download the FreeCAD workbench'], fcHint: ['在 FreeCAD 1.1 里填参数、校核、建精确实体、出工作图和工序简图；项目文件与网页版通用', 'Design and check in FreeCAD 1.1, build exact solids, working drawings and operation sketches; project files are shared with the web app'],
   partsBtn: ['零件图与三维', 'Parts & 3D'], partsTitle: ['零件图与三维模型', 'Part drawings and 3D models'],
   partsStep: ['下载 STEP：', 'Download STEP:'], partsDxf: ['下载截面 DXF：', 'Download section DXF:'],
   part_bearing: ['整套', 'Bearing'], part_inner: ['内圈', 'Inner ring'], part_outer: ['外圈', 'Outer ring'], part_element: ['滚动体', 'Rolling element'],
