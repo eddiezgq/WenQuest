@@ -3,7 +3,9 @@
 import subprocess
 import sys
 
-PKGS = ["transformers", "datasets", "soundfile", "librosa", "numpy>=1.23,<2", "torchcodec"]   # datasets 解码音频要 torchcodec   # transformers 要 np._CopyMode（1.23 才有），但别越到 numpy 2
+PKGS = ["transformers", "datasets", "soundfile", "librosa", "numpy>=1.23,<2", "torchcodec<0.5"]
+# datasets 解码音频要 torchcodec；新版是按 CUDA 13 编的（libnvrtc.so.13），这台机器是 12.8，
+# 所以钉在 0.5 以下（配 torch 2.7）。numpy 要 ≥1.23（transformers 的 np._CopyMode）又不能到 2。
 
 
 def pip_install(pkgs):
