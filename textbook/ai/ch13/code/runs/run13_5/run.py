@@ -12,7 +12,11 @@ import json
 import time
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+import prep
+
+prep.ensure()          # 装好 transformers 等，并把太老的 Pillow 升上来
+
+from transformers import AutoModelForCausalLM, AutoTokenizer  # noqa: E402
 
 from manual_data import pairs
 

@@ -17,7 +17,11 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from transformers import AutoModel, AutoModelForCausalLM, AutoTokenizer
+import prep
+
+prep.ensure()          # 装好 transformers 等，并把太老的 Pillow 升上来
+
+from transformers import AutoModel, AutoModelForCausalLM, AutoTokenizer  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))     # 用书中同一套手册与问题
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
