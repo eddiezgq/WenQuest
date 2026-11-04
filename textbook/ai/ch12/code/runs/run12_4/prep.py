@@ -14,18 +14,6 @@ def pip_install(pkgs):
     return False
 
 
-def ensure():
-    modern_pillow()
-    try:
-        import datasets, soundfile, transformers  # noqa: F401
-        return True
-    except ImportError:
-        pass
-    if not pip_install(PKGS):
-        raise SystemExit("装不上 transformers / datasets，实测无法进行")
-    return True
-
-
 def modern_pillow():
     """transformers 的惰性导入要 PIL.Image.Resampling（Pillow ≥ 9.1）。租来的机器上常常是更老的
     Pillow，于是任何一个模型类都报成"Could not import module 'XxxModel'"，真正的原因被藏在下面
@@ -37,3 +25,15 @@ def modern_pillow():
     except ImportError:
         pass
     return pip_install(["--upgrade", "Pillow"])
+
+
+def ensure():
+    modern_pillow()
+    try:
+        import datasets, soundfile, transformers  # noqa: F401
+        return True
+    except ImportError:
+        pass
+    if not pip_install(PKGS):
+        raise SystemExit("装不上 transformers / datasets，实测无法进行")
+    return True
