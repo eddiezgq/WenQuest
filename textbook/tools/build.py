@@ -1166,6 +1166,8 @@ def build(book_name: str, pdf: bool = False, only: set | None = None, out_dir: P
         check_figure_order(sec, rep, fig_level)
         check_numbers(sec, rep)
         check_terms(sec, terms, rep)
+        if "$" in sec.title:     # 标题不排公式：网页标题、目录、平台导航都按纯文本显示，$…$ 会原样露出来
+            rep.add("warning", "标题", sec.id, f"标题含公式记号 $：{sec.title}（标题按纯文本显示，请改用文字或 Unicode 符号）")
         sec.html = render_section(sec, fill(sec, values, rep), values, rep, formulas)
     check_refs(sections, book, rep)
     zh_of = {s.id: s for s in sections}

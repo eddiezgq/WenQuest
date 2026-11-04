@@ -446,7 +446,7 @@ chapters:
   - id: '24.4'
     title: 二项式级数
   - id: '24.5'
-    title: 欧拉公式 $e^{i\theta}=\cos\theta+i\sin\theta$
+    title: 欧拉公式
   - id: '24.6'
     title: 幂级数的应用：近似计算、求积分、解微分方程
 - 'no': 25
@@ -544,7 +544,7 @@ chapters:
   - id: '30.1'
     title: 多元函数：图像、等值线与等值面
   - id: '30.2'
-    title: $\mathbb R^n$ 中的点集：邻域、开集、闭集、有界集与紧集
+    title: n 维空间中的点集：邻域、开集、闭集、有界集与紧集
   - id: '30.3'
     title: 多元函数的极限；累次极限
   - id: '30.4'
@@ -608,7 +608,7 @@ chapters:
   part: 第七篇 多元微分学
   sections:
   - id: '34.1'
-    title: $\mathbb R^n$ 上的可微性与线性映射
+    title: n 维空间上的可微性与线性映射
   - id: '34.2'
     title: 多元中值定理与多元泰勒公式
   - id: '34.3'
