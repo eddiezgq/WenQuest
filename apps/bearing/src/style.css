@@ -235,3 +235,8 @@ li.unknown .chip { background: var(--hold-bg); color: var(--hold); }
 .sheets .sheet h1 { margin-bottom: 2px; } .sheets .blankrow th, .sheets .blankrow td { height: 22px; }
 .sheets .warn { color: var(--bad); font-size: 12.5px; } .sheets .sign { margin-top: 18px; font-size: 13px; white-space: pre-wrap; }
 @media print { .shell > .asm.proc { display: block; padding: 0; } .shell > .asm .edit, .shell > .asm .stage { display: none !important; } .sheets .sheet { break-after: page; border: 0; } .sheets .sheet:last-child { break-after: auto; } }
+.cloud-btn.linked { border-color: var(--accent); }
+.who { display: inline-flex; flex-direction: column; line-height: 1.15; font-size: 13px; color: var(--night-ink); max-width: 14ch; text-decoration: none; }
+.who small { font-size: 11px; color: var(--night-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who.in { color: var(--accent); }
+@media (max-width: 760px) { .modes { flex-wrap: wrap; } }

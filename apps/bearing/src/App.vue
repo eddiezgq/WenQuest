@@ -18,11 +18,14 @@ import Assembly from './components/Assembly.vue'
 import Quality from './components/Quality.vue'
 import Parts from './components/Parts.vue'
 import Process from './components/Process.vue'
+import CloudPanel from './components/CloudPanel.vue'
+import { me, links, detach, loadMe, loginUrl } from './cloud'
 
 const examples = ref([])
 const pick = ref('')
 const showReport = ref(false)
 const showParts = ref(false)
+const showCloud = ref(false)
 const MODES = ['design', 'assembly', 'quality', 'process']
 const mode = ref(MODES.includes(new URLSearchParams(location.search).get('mode')) ? new URLSearchParams(location.search).get('mode') : 'design')
 const fileInput = ref(null)
@@ -31,10 +34,10 @@ const embed = q.has('embed')  // shown inside the product page: no file buttons
 
 async function openExample(id) {
   if (!id) return
-  try { replace(await api('/examples/' + id)) } catch (e) { error.value = e }
+  try { replace(await api('/examples/' + id)); detach('design') } catch (e) { error.value = e }
   pick.value = ''
 }
-function fresh() { replace(blank()); result.value = null }
+function fresh() { replace(blank()); result.value = null; detach('design') }
 function save() {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([JSON.stringify(project, null, 2)], { type: 'application/json' }))
@@ -45,16 +48,21 @@ function save() {
 async function openFile(e) {
   const f = e.target.files?.[0]
   if (!f) return
-  try { replace(JSON.parse(await f.text())) } catch (err) { error.value = { message: 'not a bearing project file', zh: '不是轴承项目文件' } }
+  try { replace(JSON.parse(await f.text())); detach('design') } catch (err) { error.value = { message: 'not a bearing project file', zh: '不是轴承项目文件' } }
   e.target.value = ''
 }
 const title = computed({
   get: () => (lang.value === 'zh' ? project.title.zh : project.title.en),
   set: (v) => { project.title = { ...project.title, [lang.value]: v } },
 })
+// cloud projects (step 7): the design project as it is edited here
+const work = () => ({ body: JSON.parse(JSON.stringify(project)) })
+const loadWork = (body) => { replace(body) }
+const linked = computed(() => (links.design.id ? t('cloudLinked').replace('{name}', links.design.name).replace('{v}', links.design.version) : ''))
 const note = computed(() => project.note && (lang.value === 'zh' ? project.note.zh : project.note.en))
 
 onMounted(async () => {
+  if (!embed) loadMe()
   try { examples.value = await api('/examples') } catch { /* the page works without the list */ }
   const ex = q.get('example')
   if (ex && /^[a-z0-9-]{1,60}$/.test(ex)) await openExample(ex)
@@ -80,9 +88,12 @@ onMounted(async () => {
         <button v-if="!embed" type="button" class="dark" @click="fileInput.click()">{{ t('open') }}</button>
         <input ref="fileInput" type="file" accept=".json" hidden @change="openFile">
         <button v-if="!embed" type="button" class="dark" @click="save">{{ t('save') }}</button>
+        <button v-if="!embed && mode === 'design'" type="button" class="dark cloud-btn" :class="{ linked: links.design.id }" :title="linked || t('cloud')" @click="showCloud = true">{{ t('cloud') }}</button>
         <button v-if="mode === 'design'" type="button" class="dark" :disabled="!result" @click="showParts = true">{{ t('partsBtn') }}</button>
         <button type="button" class="accent" :disabled="!result" @click="showReport = true">{{ t('report') }}</button>
         <button type="button" class="dark lang" @click="setLang(lang === 'zh' ? 'en' : 'zh')">{{ lang === 'zh' ? 'EN' : '中' }}</button>
+        <span v-if="!embed && me?.login" class="who" :title="me.org">{{ me.name || '…' }}<small v-if="me.org">{{ me.org }}</small></span>
+        <a v-else-if="!embed && me && me.reachable" class="who in" :href="loginUrl()">{{ t('signIn') }}</a>
       </div>
     </header>
 
@@ -92,7 +103,7 @@ onMounted(async () => {
     <main v-show="mode === 'design'" class="work">
       <aside class="edit">
         <div class="pane"><Fields /></div>
-        <p class="saved">{{ t('savedLocal') }}</p>
+        <p class="saved">{{ linked || t('savedLocal') }}</p>
       </aside>
 
       <section class="stage">
@@ -115,5 +126,6 @@ onMounted(async () => {
 
     <Report v-if="showReport && result" :r="result" @close="showReport = false" />
     <Parts v-if="showParts" @close="showParts = false" />
+    <CloudPanel v-if="showCloud" kind="design" :work="work" :load="loadWork" :name="title" @close="showCloud = false" />
   </div>
 </template>

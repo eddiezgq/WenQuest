@@ -39,6 +39,7 @@ from . import sewing_video
 from . import sewing_ebox
 from . import cam_ai
 from . import cam_projects
+from . import bearing_projects
 from . import content
 from . import course_api
 from . import edit_api
@@ -151,6 +152,7 @@ def create_app() -> FastAPI:
     sewing_ebox.register(app, sys.modules[__name__])
     cam_ai.register(app, sys.modules[__name__])
     cam_projects.register(app, sys.modules[__name__])
+    bearing_projects.register(app, sys.modules[__name__])
     tasks_api.register(app, sys.modules[__name__])
     gpulab.register(app, sys.modules[__name__])
     micro.register(app, sys.modules[__name__])

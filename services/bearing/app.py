@@ -353,6 +353,11 @@ async def process_ep(request: Request):
     return run(make)
 
 
+import projects_api  # noqa: E402  (cloud projects, round 64 step 7)
+
+projects_api.register(app, 4 * MAX_BODY)
+
+
 # --------------------------------------------------------------------------------------- step 6: FreeCAD
 
 FREECAD = HERE / "freecad"
