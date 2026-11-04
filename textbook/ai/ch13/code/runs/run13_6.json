@@ -1,7 +1,7 @@
 {
  "name": "run13_6",
- "fingerprint": "bbcacba0c232bf36",
- "at": "2026-11-04T18:14:28Z",
+ "fingerprint": "e2e294a218f93a5e",
+ "at": "2026-11-04T19:50:07Z",
  "platform": "lambda",
  "region": "",
  "instance_type": "gpu_1x_a10",
@@ -29,8 +29,8 @@
   "n_ans": 25,
   "n_noans": 4,
   "k": 5,
-  "encode_s": 0.6091594696044922,
-  "encode_per_chunk_ms": 0.9105522714566401,
+  "encode_s": 0.965141773223877,
+  "encode_per_chunk_ms": 1.4426633381522824,
   "book_bm25": 96.0,
   "book_emb": 82.0,
   "book_hybrid": 96.0,
@@ -45,7 +45,8 @@
   "refuse_pct": 25.0,
   "tok_in_avg": 1262.7586206896551,
   "tok_out_avg": 51.0,
-  "ms_per_q": 831.5210671260439,
-  "ms_per_tok": 16.304334649530272
+  "ms_per_q": 1396.8691497013485,
+  "ms_per_tok": 27.38959117061468,
+  "refuse_pct_loose": 0.0
  }
 }
