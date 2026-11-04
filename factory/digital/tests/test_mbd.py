@@ -384,3 +384,20 @@ def test_wqcr5_from_the_library_gravity_torque_and_listing(tmp_path, monkeypatch
         assert rs[0]["id"] == "B-ARM-WQCR5" and rs[0]["own"] and rs[0]["end_body"] == "link6"
         info = c.post("/mbd/models/load", json={"source": "library", "id": "B-ARM-WQCR5"}).json()
         assert [j["name"] for j in info["joints"]] == list(W.JOINTS)
+
+
+def test_payload_com_at_its_position_reactions_match_statics():
+    """负载的质心就在给定的位置（以前 MjSpec 把 pos 记成了 ipos，质心偏到 2 × pos，偏置负载的反力矩算大）：
+    WQ-CR5 伸直、带偏置 5 kg 负载静止时，J3 处的关节反力、反力矩与机器人厂原件 wqcr5.joint_loads 的静力学手算一致"""
+    from cae import wqcr5 as W
+    q = np.radians(W.OUTSTRETCHED_DEG)
+    pay = [{"body": "link6", "mass": 5.0, "pos": [float(x) for x in W.tcp_local()]}]
+    _, ch, _ = mbd.simulate(mbd.load_spec(path=MM.robot_path("B-ARM-WQCR5")),
+                            {"duration_s": 0.3, "initial": dict(zip(W.JOINTS, q)), "payloads": pay,
+                             "drives": [{"joint": j, "kind": "hold"} for j in W.JOINTS], "sample_hz": 100})
+    for k in (3, 6):
+        ref = W.joint_loads(q, k - 1)
+        rf = np.array([ch["rf.link{}.{}".format(k, c)][-1] for c in "xyz"])
+        rm = np.array([ch["rm.link{}.{}".format(k, c)][-1] for c in "xyz"])
+        assert np.allclose(-rf, ref["F"], atol=1e-3 * np.linalg.norm(ref["F"]))
+        assert np.allclose(-rm, ref["M"], atol=1e-3 * np.linalg.norm(ref["M"]))

@@ -1,0 +1,33 @@
+# 实验 11.6 的指导书与报告模板。目的、场景、参数、任务取自 lab11_6.js。
+原理:
+  - ["一个载荷块里的循环按幅值分档（实验里两档）：第 i 档应力幅 σa,i、平均应力 σm,i、每块 n_i 次。先做平均应力修正，换成对称循环的等效应力幅 σa,eq，再查 S–N 曲线得到 N_i，迈因纳法则把损伤相加。", "The cycles in a load block are grouped by amplitude (two levels in the lab): level i has amplitude σa,i, mean σm,i and n_i cycles per block. A mean-stress correction turns each into an equivalent fully reversed amplitude σa,eq; the S–N curve gives N_i, and Miner's rule adds the damage."]
+  - 式: ["古德曼 σa,eq = σa/(1 − |σm|/R_m)；格伯 σa/(1 − (σm/R_m)²)；SWT √(σmax·σa)", "Goodman σa,eq = σa/(1 − |σm|/R_m); Gerber σa/(1 − (σm/R_m)²); SWT √(σmax·σa)"]
+  - 式: ["S–N：S_D = σ₋₁·β·ε；N = N_D (S_D/σa,eq)^k（σa,eq ≥ S_D），海巴赫 N = N_D (S_D/σa,eq)^(2k−1)（σa,eq < S_D）", "S–N: S_D = σ₋₁·β·ε; N = N_D (S_D/σa,eq)^k (σa,eq ≥ S_D); Haibach N = N_D (S_D/σa,eq)^(2k−1) (σa,eq < S_D)"]
+  - 式: ["迈因纳：每块损伤 D = Σ n_i/N_i，寿命 = 1/D 块", "Miner: damage per block D = Σ n_i/N_i, life = 1/D blocks"]
+  - ["数字工厂“仿真与分析”的“疲劳寿命”用的是同一组公式（古德曼、海巴赫修正，cae/fatigue.py，程序 11.10.1）。", "The factory's Simulation & analysis fatigue-life page uses the same formulas (Goodman, Haibach; cae/fatigue.py, Program 11.10.1)."]
+步骤:
+  - ["打开实验 11.6，场景“WQ-CR5 大臂根部内角”，保持初值（与程序 11.6.1 相同），点“计算”（任务 1），把各档的 σa,eq、N、损伤和整块的寿命填入表 1。", "Open Lab 11.6, scene “WQ-CR5 arm root corner”, keep the initial values (as in Program 11.6.1), press Compute (task 1) and fill in Table 1."]
+  - ["把载荷系数 λ 逐步加大，找出寿命等于 1.5 × 10⁷ 块（5 年两班）的 λ（任务 2），填表 2。", "Raise the load factor λ until the life is 1.5 × 10⁷ blocks (5 years of two shifts) (task 2) and fill in Table 2."]
+  - ["切换到“WQR-105 矿山现场”（任务 3），按古德曼、格伯、SWT 各算一次，填表 3，算卡料日占的损伤比例。", "Switch to “WQR-105 at the mine” (task 3), compute with Goodman, Gerber and SWT, fill in Table 3, and find the share of damage from the jam days."]
+  - ["切换到“反复弯折回形针”（任务 4），记下程序给出的结论，与程序 11.7.1 的应变–寿命结果比较。", "Switch to “Bending a paper clip” (task 4), note what the lab says, and compare with the strain–life result of Program 11.7.1."]
+数据表:
+  - 标题: ["表 1  WQ-CR5 大臂一个节拍的损伤（λ = 1）", "Table 1  Damage of one WQ-CR5 cycle (λ = 1)"]
+    表头: ["档", "σa / MPa", "σm / MPa", "σa,eq / MPa", "N", "每块损伤", "占总损伤 / %"]
+    表头英文: ["Level", "σa / MPa", "σm / MPa", "σa,eq / MPa", "N", "Damage per block", "Share / %"]
+    行: [["1", "", "", "", "", "", ""], ["2", "", "", "", "", "", ""]]
+  - 标题: ["表 2  5 年刚好用完的载荷系数", "Table 2  Load factor that uses up exactly 5 years"]
+    表头: ["λ", "第 1 档 σa,eq / MPa", "与 S_D 之比", "寿命 / 年", "与程序 11.6.1 的 λ 之差 / %"]
+    表头英文: ["λ", "Level 1 σa,eq / MPa", "Ratio to S_D", "Life / years", "Difference from Program 11.6.1 / %"]
+    行: [["", "", "", "", ""]]
+  - 标题: ["表 3  WQR-105 输出轴：三种平均应力修正", "Table 3  WQR-105 output shaft: three mean-stress corrections"]
+    表头: ["修正", "卡料日 σa,eq / MPa", "正常日 σa,eq / MPa", "每年损伤", "寿命 / 年", "卡料日占的损伤 / %"]
+    表头英文: ["Correction", "Jam day σa,eq / MPa", "Normal day σa,eq / MPa", "Damage per year", "Life / years", "Share of jam days / %"]
+    行: [["古德曼", "", "", "", "", ""], ["格伯", "", "", "", "", ""], ["SWT", "", "", "", "", ""]]
+    行英文: [["Goodman", "", "", "", "", ""], ["Gerber", "", "", "", "", ""], ["SWT", "", "", "", "", ""]]
+注意:
+  - ["WQ-CR5 场景的两档取自程序 11.6.1（临界平面上的正应力、最大的两个循环）；WQR-105 场景是名义应力，不计键槽的应力集中（11.7 节按局部应变另算）；回形针钢丝的 σ₋₁ 是示意值。", "The WQ-CR5 levels come from Program 11.6.1 (normal stress on the critical plane, the two largest cycles); the WQR-105 scene uses nominal stress without the keyseat concentration (Section 11.7 treats it by local strain); the wire's σ₋₁ is illustrative."]
+  - ["表面系数 β 固定为“精车” 0.85（数字工厂疲劳程序里钢的典型值；网页默认是“磨削” 0.92），尺寸系数固定为 0.85；S–N 曲线在 N_D 以后按海巴赫修正。", "The surface factor is fixed at fine-turned 0.85 (the factory program's typical steel value; the page defaults to ground, 0.92) and the size factor at 0.85; the S–N curve continues past N_D with the Haibach slope."]
+  - ["σa,eq ≥ R_m 时 S–N 曲线没有意义，实验直接提示改用应变–寿命法。", "When σa,eq ≥ R_m the S–N curve has no meaning; the lab says to use strain–life instead."]
+思考题:
+  - ["迈因纳法则把每个循环的损伤简单相加，不管先后顺序；而 S–N 曲线的斜率 k = 8–9，应力幅大 10%，损伤就大一倍多——所以载荷谱的“头”（少数大循环）几乎决定了寿命，测载荷时最要紧的是别漏掉大的。海巴赫修正让低于 S_D 的小循环也有一点损伤；什么时候它要紧，什么时候不要紧？", "Miner's rule just adds the damage of each cycle, ignoring order; with an S–N slope k = 8–9, a 10% larger amplitude more than doubles the damage — so the 'head' of the spectrum (the few big cycles) nearly decides the life, and a load measurement must not miss the big ones. Haibach gives a little damage to cycles below S_D: when does that matter and when not?"]
+  - ["数字工厂的疲劳程序用 |σm| 做古德曼修正，受压的平均应力也被当作有害。WQ-CR5 大臂的平均应力是重力造成的，它在哪些点受拉、哪些点受压？这样做偏保守还是偏危险？", "The factory program applies Goodman with |σm|, treating compressive means as harmful too. Where on the WQ-CR5 arm is the gravity-induced mean tensile and where compressive? Is this conservative or not?"]

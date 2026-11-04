@@ -1,0 +1,34 @@
+# 工程任务单 TS-11-1（配第 11 章）：WQ-CR5 快速版大臂的疲劳寿命评审。格式见 textbook/tools/tasksheet.py。
+编号: TS-11-1
+标题: ["WQ-CR5 快速版大臂的疲劳寿命评审", "Fatigue-life review of the fast WQ-CR5 upper arm"]
+角色: ["机器人厂的结构评审工程师", "structural review engineer at the robot plant"]
+背景:
+  - "TS-10-1 的静强度评审之后，快速版 WQ-CR5 进入寿命评审：客户要求两班、每年 250 天、5 年不坏（约 2 万小时），节拍缩短后手臂摆得更快，负载仍为 5 kg。设计组用“仿真与分析”的“疲劳寿命”算了一次（静止伸直的预设工况 × J3 反力矩大小的载荷谱），结论是“无限寿命”。你要独立复核：载荷谱是不是快速版的动作，网页上按 |冯·米塞斯| 比例缩放的做法在这里会不会偏危险（J1 转动时弯矩方向在变），平均应力怎样修正，寿命还有多少余量；还要说明：如果为了降成本把整体机加工的大臂改成铝管与法兰焊接，结论会变成什么。评审意见里给出通过、有条件通过或退回；需要改设计时，在 PLM 里提交工程更改单。"
+  - "After the static review of TS-10-1, the fast WQ-CR5 enters its life review: the customer wants two shifts, 250 days a year, 5 years without failure (about 20 000 h); the shorter cycle swings the arm faster, payload still 5 kg. The design team ran Simulation & analysis' fatigue life once (outstretched preset × a load spectrum of the J3 reaction-moment magnitude) and concluded 'infinite life'. You check independently: is the spectrum the fast motion; does the page's proportional |von Mises| scaling become unsafe here (the bending direction turns while J1 rotates); how is the mean stress corrected; how much life margin is left — and what changes if, to save cost, the machined arm becomes an aluminum tube welded to its flanges. Give a verdict (pass, conditional pass, return); if the design must change, submit an engineering change request in PLM."
+输入:
+  - {名称: ["WQ-CR5 动力学模型与标准动作（数字工厂“多体动力学”，机器人厂原件 wqcr5.py 的 RUNIN_POSES）；WQ-CR5 大臂示例零件（“仿真与分析”）；材料库 6061-T6 的 S–N 参数", "WQ-CR5 dynamic model and standard motion (factory Multibody dynamics; RUNIN_POSES in the plant source wqcr5.py); WQ-CR5 upper-arm sample part (Simulation & analysis); 6061-T6 S–N data in the material library"], 来源: ["数字工厂", "Digital factory"]}
+  - {名称: ["快速版：每段运动 0.9 s（原 1.2 s），段间停 0.2 s（本书设定）；寿命要求 5 年两班；法兰内角圆角 2 mm（TS-10-1 的修改）；焊接方案按 IIW 铝合金管–板角焊缝 FAT 25", "Fast version: 0.9 s per move (was 1.2 s), 0.2 s dwells (set by this book); 5 years of two shifts; 2 mm flange fillet (the change from TS-10-1); welded option per IIW aluminum tube-to-plate fillet weld FAT 25"], 来源: ["项目任务书", "Project brief"]}
+  - {名称: ["程序 11.3.1、11.5.1、11.6.1、11.8.1、11.9.1、11.10.1；实验 11.6", "Programs 11.3.1, 11.5.1, 11.6.1, 11.8.1, 11.9.1, 11.10.1; Lab 11.6"], 来源: ["教材第 11 章", "Chapter 11"]}
+交付物:
+  - {名称: ["评审意见（3 页以内）：载荷谱从哪里来（快速版动作的多体动力学结果）、有限元与单位载荷工况、当量应力的取法（网页的 |冯·米塞斯| 与临界平面的比较）、平均应力修正、表面和缺口系数、迈因纳累积、寿命与余量（载荷还能放大几倍）、裂纹扩展与检修的看法、焊接方案的结论、评审结论", "Review verdict (up to 3 pages): where the spectrum comes from (multibody result of the fast motion), FE and unit load cases, choice of equivalent stress (the page's |von Mises| vs critical plane), mean-stress correction, surface and notch factors, Miner summation, life and margin (how far loads may grow), view on crack growth and inspection, the welded option, verdict"], 验收: ["每个数有出处；说清网页做法在哪里偏危险、差多少；结论与数据一致", "Every number has a source; says where and by how much the page's method is unsafe; the verdict follows from the data"], 类型: 文件, 格式: [docx, pdf]}
+  - {名称: ["“仿真与分析”的疲劳寿命报告：WQ-CR5 大臂，载荷谱用快速版动作的 J3 反力矩，表面、尺寸系数按评审意见；附与书中程序（临界平面）的对照", "Simulation & analysis fatigue report: WQ-CR5 arm, spectrum = J3 reaction moment of the fast motion, surface and size factors as in the verdict; with the comparison against the book's program (critical plane)"], 验收: ["载荷谱、材料、表面、Kf、海巴赫开关写清；最危险点的位置与书中程序一致或说明差别", "Spectrum, material, surface, Kf and Haibach setting stated; worst-point location agrees with the book's program or the difference is explained"], 类型: 分析, 零件: WQ-CR5 大臂}
+  - {名称: ["工程更改单（需要改设计时；不需要时提交一份“不更改”的说明）", "Engineering change request (if the design must change; otherwise a short 'no change' note)"], 验收: ["写明改什么（圆角、壁厚、工艺、材料）、为什么、对质量和成本的影响", "States what changes (fillet, wall, process, material), why, and the effect on mass and cost"], 类型: 更改单, 零件: WQ-CR5 大臂}
+  - {名称: ["计算书（Python 或计算表）", "Calculation (Python or spreadsheet)"], 验收: ["能复现评审意见里的数", "Reproduces the numbers in the verdict"], 类型: 文件, 格式: [zip, txt, xlsx]}
+工位: [MBD, FEA, FAT, PLM]
+步骤:
+  - ["在“多体动力学”里跑 WQ-CR5 的快速版动作（带 5 kg，三段，每段 0.9 s、停 0.2 s），导出 J3 处的关节反力（rf、rm 三个分量）；或改程序 11.6.1 里的 seg_s、dwell_s 重算", "Run the fast WQ-CR5 motion in Multibody dynamics (5 kg, three moves of 0.9 s with 0.2 s dwells) and export the J3 joint reactions (all components of rf, rm); or rerun Program 11.6.1 with new seg_s, dwell_s"]
+  - ["在“仿真与分析”里打开 WQ-CR5 大臂，按网页的做法算一次疲劳寿命（载荷谱 = J3 反力矩的大小）；再用程序 11.5.1 的临界平面法算同一个动作，比较最危险点的位置和安全系数", "Open the WQ-CR5 arm in Simulation & analysis and compute fatigue life the page's way (spectrum = J3 reaction-moment magnitude); then compute the same motion with the critical-plane method of Program 11.5.1 and compare worst point and safety factor"]
+  - ["按 11.3 节定表面、阳极氧化、尺寸、缺口系数；按 11.9 节用 FKM 局部应力法算利用度；求 5 年刚好用完时载荷能放大的倍数 λ", "Set the surface, anodizing, size and notch factors per Section 11.3; compute the FKM utilization per Section 11.9; find the load factor λ that uses up exactly 5 years"]
+  - ["按 11.8 节判断：0.5 mm 的表面裂纹会不会长；如果会，到穿透壁厚要多久，定期检查有没有意义", "Per Section 11.8: will a 0.5 mm surface crack grow; if so, how long until it goes through the wall, and is periodic inspection meaningful"]
+  - ["按程序 11.9.1 评价焊接方案；写评审意见，需要时在 PLM 里提交工程更改单；在“我的任务”里提交交付物", "Assess the welded option with Program 11.9.1; write the verdict, submit an engineering change request in PLM if needed, and hand in the deliverables in My tasks"]
+评审要点:
+  - ["载荷谱取自快速版动作的多体动力学，不是静载乘系数", "The spectrum comes from the multibody run of the fast motion, not a static load times a factor"]
+  - ["看出网页按 |冯·米塞斯| 比例缩放在非比例加载时偏危险，并给出差多少", "Sees that proportional |von Mises| scaling is unsafe under non-proportional loading, and by how much"]
+  - ["平均应力修正、表面和缺口系数有理由；寿命余量用载荷倍数表达", "Mean-stress correction, surface and notch factors are justified; the life margin is expressed as a load factor"]
+  - ["焊接方案的结论有依据（FAT 等级、名义应力的取法）", "The welded-option conclusion is supported (FAT class, how the nominal stress is taken)"]
+评分:
+  - {项: ["载荷与应力", "Loads and stress"], 分: 30, 标准: ["动作、单位工况、当量应力取法正确", "Correct motion, unit cases and equivalent stress"]}
+  - {项: ["寿命判断", "Life judgment"], 分: 30, 标准: ["修正系数、累积损伤、余量与裂纹扩展都有依据", "Factors, damage summation, margin and crack growth all justified"]}
+  - {项: ["评审意见与更改", "Verdict and change"], 分: 25, 标准: ["结论清楚，焊接方案和更改建议可行", "Clear verdict; workable welded-option and change advice"]}
+  - {项: ["答辩", "Defense"], 分: 15, 标准: ["能解释网页结果与临界平面结果的差别", "Can explain the difference between the page and the critical-plane result"]}
+学时: 4

@@ -162,6 +162,7 @@ def build(spec, setup):
         pb = b.add_body(name="wq_payload_{}".format(i), pos=list(p.get("pos") or [0, 0, 0]))
         pb.mass = m
         pb.inertia = [1e-6, 1e-6, 1e-6]
+        pb.ipos = [0, 0, 0]                  # 质心就在负载体的原点（不写的话 MjSpec 会把 pos 再算一遍，质心偏到 2 × pos）
         pb.explicitinertial = True
         pb.add_geom(type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[max(0.01, 0.02 * m ** (1 / 3)), 0, 0], rgba=[0.9, 0.5, 0.1, 1],
                     contype=0, conaffinity=0, group=2, mass=0)
