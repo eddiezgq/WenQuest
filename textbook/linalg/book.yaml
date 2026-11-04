@@ -72,7 +72,7 @@ chapters:
   - id: '3.7'
     title: 应用：电路的节点方程、桁架的静力平衡、化学方程式配平、交通流量、投入产出模型（列昂惕夫）
   - id: '3.8'
-    title: 消元需要多少次运算：$n^3/3$ 从哪里来
+    title: 消元需要多少次运算：n³/3 从哪里来
 - 'no': 4
   title: 矩阵与矩阵乘法
   level: 基础
@@ -102,11 +102,11 @@ chapters:
   - id: '5.2'
     title: 初等矩阵；高斯–若尔当法求逆
   - id: '5.3'
-    title: 消元就是分解：$A = LU$
+    title: 消元就是分解：A = LU
   - id: '5.4'
-    title: 行交换与 $PA = LU$；部分主元
+    title: 行交换与 PA = LU；部分主元
   - id: '5.5'
-    title: 对称矩阵的 $LDL^{\mathsf T}$
+    title: 对称矩阵的 LDLᵀ 分解
   - id: '5.6'
     title: 三对角与带状矩阵：追赶法
   - id: '5.7'
@@ -127,7 +127,7 @@ chapters:
   - id: '6.5'
     title: 克拉默法则与伴随矩阵
   - id: '6.6'
-    title: 行列式与可逆性；$\det(AB) = \det A \det B$
+    title: 行列式与可逆性；det(AB) = det A · det B
   - id: '6.7'
     title: 范德蒙德行列式与几类特殊行列式【进阶】
   - id: '6.8'
@@ -138,7 +138,7 @@ chapters:
   part: 第二篇 向量空间与线性映射
   sections:
   - id: '7.1'
-    title: 数域；从 $\mathbb R^n$ 到一般向量空间的公理
+    title: 数域；从 n 维实空间到一般向量空间的公理
   - id: '7.2'
     title: 例子：多项式、函数、矩阵、离散信号
   - id: '7.3'
@@ -163,7 +163,7 @@ chapters:
   - id: '8.2'
     title: 矩阵的秩
   - id: '8.3'
-    title: $Ax = b$ 的完整解：特解加零空间
+    title: Ax = b 的完整解：特解加零空间
   - id: '8.4'
     title: 行空间与左零空间
   - id: '8.5'
@@ -222,7 +222,7 @@ chapters:
   - id: '11.2'
     title: 格拉姆–施密特正交化
   - id: '11.3'
-    title: $A = QR$
+    title: A = QR
   - id: '11.4'
     title: 豪斯霍尔德反射与吉文斯旋转
   - id: '11.5'
@@ -258,7 +258,7 @@ chapters:
   - id: '13.3'
     title: 迹、行列式与特征值的关系
   - id: '13.4'
-    title: 对角化：$A = X \Lambda X^{-1}$
+    title: 对角化：A = XΛX⁻¹
   - id: '13.5'
     title: 矩阵的幂与差分方程：斐波那契数列、人口模型
   - id: '13.6'
@@ -273,7 +273,7 @@ chapters:
   - id: '14.1'
     title: 实对称矩阵：特征值为实数，特征向量正交
   - id: '14.2'
-    title: 谱定理：$A = Q \Lambda Q^{\mathsf T}$
+    title: 谱定理：A = QΛQᵀ
   - id: '14.3'
     title: 埃尔米特矩阵、酉矩阵与正规矩阵
   - id: '14.4'
@@ -309,15 +309,15 @@ chapters:
   part: 第四篇 特征值
   sections:
   - id: '16.1'
-    title: $\dfrac{\mathrm d\boldsymbol u}{\mathrm dt} = A\boldsymbol u$：用特征向量解耦
+    title: du/dt = Au：用特征向量解耦
   - id: '16.2'
-    title: 矩阵指数 $e^{At}$
+    title: 矩阵指数
   - id: '16.3'
     title: 稳定性：特征值的实部
   - id: '16.4'
     title: 二阶系统与振动模态：质量–弹簧链
   - id: '16.5'
-    title: 反对称矩阵的指数是旋转：$e^{[\boldsymbol\omega]\theta}$
+    title: 反对称矩阵的指数是旋转
   - id: '16.6'
     title: 状态空间预告
 - 'no': 17
@@ -347,7 +347,7 @@ chapters:
   - id: '18.1'
     title: 任何矩阵都把单位圆变成椭圆
   - id: '18.2'
-    title: $A = U \Sigma V^{\mathsf T}$：存在性的证明
+    title: A = UΣVᵀ：存在性的证明
   - id: '18.3'
     title: SVD 给出四个基本子空间的标准正交基
   - id: '18.4'
@@ -374,7 +374,7 @@ chapters:
   - id: '19.5'
     title: 应用：点云法向估计、人脸的特征脸
   - id: '19.6'
-    title: 应用：多元统计过程控制——霍特林 $T^2$ 图（数字工厂检测数据）
+    title: 应用：多元统计过程控制——霍特林 T² 图（数字工厂检测数据）
   - id: '19.7'
     title: 鲁棒主成分分析【专题】
 - 'no': 20
@@ -402,7 +402,7 @@ chapters:
   - id: '21.1'
     title: 谱半径、矩阵序列与矩阵级数；诺伊曼级数
   - id: '21.2'
-    title: 矩阵函数 $f(A)$
+    title: 矩阵函数 f(A)
   - id: '21.3'
     title: 格什戈林圆盘定理
   - id: '21.4'
@@ -515,7 +515,7 @@ chapters:
   part: 第七篇 推广与抽象
   sections:
   - id: '28.1'
-    title: 有限域 $\mathbb F_2$ 与 $\mathbb F_p$
+    title: 有限域 GF(2) 与 GF(p)
   - id: '28.2'
     title: 线性码：生成矩阵与校验矩阵
   - id: '28.3'
@@ -570,7 +570,7 @@ chapters:
   - id: '31.6'
     title: 点云配准：ICP
   - id: '31.7'
-    title: 手眼标定 $AX = XB$
+    title: 手眼标定 AX = XB
 - 'no': 32
   title: 机器人运动学中的线性代数
   level: 专题
@@ -579,7 +579,7 @@ chapters:
   - id: '32.1'
     title: 雅可比：关节速度到末端速度的线性映射
   - id: '32.2'
-    title: 力雅可比与对偶：$\boldsymbol\tau = J^{\mathsf T}\boldsymbol F$
+    title: 力雅可比与对偶：τ = JᵀF
   - id: '32.3'
     title: 奇异性、可操作度与条件数
   - id: '32.4'
@@ -594,7 +594,7 @@ chapters:
   part: 第八篇 应用
   sections:
   - id: '33.1'
-    title: 相机模型：$P = K[R \mid \boldsymbol t]$
+    title: 相机模型：P = K[R | t]
   - id: '33.2'
     title: 相机标定：直接线性变换
   - id: '33.3'
@@ -677,7 +677,7 @@ chapters:
   - id: '38.5'
     title: 嵌入与余弦相似度
   - id: '38.6'
-    title: 注意力机制：$\operatorname{softmax}(QK^{\mathsf T}/\sqrt d)\,V$
+    title: 注意力机制：softmax(QKᵀ/√d)V
   - id: '38.7'
     title: 低秩适配（LoRA）与模型压缩
 - 'no': 39
@@ -707,7 +707,7 @@ chapters:
   - id: '40.3'
     title: 边界条件与求解
   - id: '40.4'
-    title: 模态分析：广义特征值问题 $K\boldsymbol x = \lambda M\boldsymbol x$
+    title: 模态分析：广义特征值问题 Kx = λMx
   - id: '40.5'
     title: 与数字工厂有限元服务对照
 - 'no': 41
@@ -729,7 +729,7 @@ chapters:
   part: 第八篇 应用
   sections:
   - id: '42.1'
-    title: 量子比特：$\mathbb C^2$ 中的单位向量
+    title: 量子比特：二维复向量空间中的单位向量
   - id: '42.2'
     title: 量子门是酉矩阵
   - id: '42.3'
