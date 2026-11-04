@@ -24,6 +24,7 @@ function fig(part) {
 }
 const f3 = (x) => Number(x).toFixed(3)
 const print = () => window.print()
+const fcZip = import.meta.env.BASE_URL + 'api/freecad.zip'
 </script>
 
 <template>
@@ -68,6 +69,7 @@ const print = () => window.print()
           </section>
         </div>
         <p v-for="(n, j) in dr.notes" :key="j" class="hint">{{ lang === 'zh' ? n.zh : n.en }}</p>
+        <p class="hint fcpack"><a :href="fcZip" download>{{ t('fcDownload') }}</a>　{{ t('fcHint') }}</p>
       </template>
     </article>
   </div>
