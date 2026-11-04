@@ -5,6 +5,8 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { api, saveText } from '../api'
 import { t, lang } from '../i18n'
 import { project, replace } from '../store'
+import { links, detach } from '../cloud'
+import CloudPanel from './CloudPanel.vue'
 
 const KEY = 'wqbearing-process'
 const KINDS = ['turn', 'heat', 'grind', 'superfinish', 'cut', 'wash', 'assemble', 'inspect', 'other']
@@ -13,7 +15,10 @@ const SIZE_F = ['Z', 'T', 'Zreq', 'Zmax', 'setup'], STOCK_F = ['Z', 'dz', 'Zreq'
 
 const tpl = ref((() => { try { return JSON.parse(localStorage.getItem(KEY) || 'null') } catch { return null } })())
 const feats = ref(null), out = ref(null), err = ref(null), busy = ref(false), ring = ref('inner'), open = ref(-1)
-const sheets = ref(false), fileInput = ref(null), examples = ref([])
+const sheets = ref(false), fileInput = ref(null), examples = ref([]), showCloud = ref(false)
+const cloudWork = () => ({ body: JSON.parse(JSON.stringify(tpl.value)) })
+const cloudLoad = (body) => { tpl.value = body; open.value = -1 }
+const cloudName = computed(() => (lang.value === 'zh' ? tpl.value?.title?.zh : tpl.value?.title?.en) || '')
 
 const design = () => JSON.parse(JSON.stringify(project))
 const L = (o) => (o ? (lang.value === 'zh' ? o.zh : o.en) : '')
@@ -24,13 +29,13 @@ async function loadFeatures() {
   try { feats.value = (await api('/process/template', design())).features; if (!tpl.value) await blankChain(); else err.value = null } catch (e) { feats.value = null; err.value = e }
 }
 async function blankChain() {
-  try { const d = await api('/process/template', design()); feats.value = d.features; tpl.value = d.template; open.value = -1; err.value = null } catch (e) { err.value = e }
+  try { const d = await api('/process/template', design()); feats.value = d.features; tpl.value = d.template; open.value = -1; err.value = null; detach('process') } catch (e) { err.value = e }
 }
 async function example(id) {
   try {
     const ex = await api('/process/examples/' + id)
     if (ex.design) replace(await api('/examples/' + ex.design))
-    tpl.value = ex; open.value = -1
+    tpl.value = ex; open.value = -1; detach('process')
     await loadFeatures()
   } catch (e) { err.value = e }
 }
@@ -81,7 +86,7 @@ function saveFile() {
 async function openFile(e) {
   const f = e.target.files?.[0]
   if (!f) return
-  try { const d = JSON.parse(await f.text()); if (!d.rings) throw new Error(); tpl.value = d; open.value = -1 } catch { err.value = { message: t('pcNotFile'), zh: t('pcNotFile') } }
+  try { const d = JSON.parse(await f.text()); if (!d.rings) throw new Error(); tpl.value = d; open.value = -1; detach('process') } catch { err.value = { message: t('pcNotFile'), zh: t('pcNotFile') } }
   e.target.value = ''
 }
 
@@ -130,7 +135,9 @@ const fmtZ = (x) => (x == null ? '—' : x.toFixed(4))
         <button type="button" class="ghost" @click="fileInput.click()">{{ t('pcOpen') }}</button>
         <input ref="fileInput" type="file" accept=".json" hidden @change="openFile">
         <button type="button" class="ghost" :disabled="!tpl" @click="saveFile">{{ t('pcSave') }}</button>
+        <button type="button" class="ghost cloud-btn" :class="{ linked: links.process.id }" :disabled="!tpl" @click="showCloud = true">{{ t('cloud') }}</button>
       </div>
+      <p v-if="links.process.id" class="hint">{{ t('cloudLinked').replace('{name}', links.process.name).replace('{v}', links.process.version) }}</p>
       <div class="seg two" role="tablist">
         <button v-for="k in ['inner', 'outer']" :key="k" type="button" :class="{ on: ring === k }" :aria-pressed="ring === k" @click="ring = k; open = -1">{{ t('pc_' + k) }}</button>
       </div>
@@ -210,6 +217,7 @@ const fmtZ = (x) => (x == null ? '—' : x.toFixed(4))
       <p v-else-if="!err" class="hint">{{ busy ? t('busy') : t('pcEmpty') }}</p>
     </section>
 
+    <CloudPanel v-if="showCloud" kind="process" :work="cloudWork" :load="cloudLoad" :name="cloudName" @close="showCloud = false" />
     <div v-if="sheets && out" class="report-wrap" role="dialog" aria-modal="true" :aria-label="t('pcSheets')">
       <div class="report-bar no-print">
         <button type="button" class="accent" @click="print">{{ t('print') }}</button>

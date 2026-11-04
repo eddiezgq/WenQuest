@@ -246,6 +246,8 @@ services:
       dockerfile: services/bearing/Dockerfile
     image: ${BEARING_IMAGE:-wenquest/bearing:0.1}
     restart: unless-stopped
+    environment:
+      WQ_GATEWAY_URL: http://gateway:8000   # cloud projects and AI drafts go through the gateway (round 64 step 7)
     cpus: 1
     mem_limit: 512m
     pids_limit: 64

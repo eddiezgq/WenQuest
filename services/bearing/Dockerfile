@@ -15,7 +15,7 @@ COPY services/bearing/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY services/bearing/bearingkit ./bearingkit
 COPY services/bearing/examples ./examples
-COPY services/bearing/app.py ./
+COPY services/bearing/app.py services/bearing/projects_api.py ./
 COPY services/bearing/freecad/*.py ./freecad/
 COPY factory/digital/freecad/Mod/WenQuest/InitGui.py factory/digital/freecad/Mod/WenQuest/wq_workbench.py ./freecad/workbench/
 COPY --from=web /app/dist ./web
