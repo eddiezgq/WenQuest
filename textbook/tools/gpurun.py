@@ -161,15 +161,34 @@ def ssh_key() -> tuple[str, str]:
     return tmp_name, kid
 
 
+def launch(kind: str, key_name: str, name: str, region: str = "") -> str:
+    """开一台机器，返回它的 id。
+
+    查到有空位、真去开的时候被别人抢走，是常事（Lambda 回 insufficient-capacity）。所以开机这一步
+    也要重试：重新挑一个有货的区域再来，总时长仍由 `WQ_GPU_WAIT_MIN` 管着。
+    """
+    deadline = time.time() + float(os.environ.get("WQ_GPU_WAIT_MIN", "20")) * 60
+    fixed = bool(region)
+    while True:
+        here = region if fixed else pick_region(kind)
+        try:
+            return _api("POST", "/instance-operations/launch",
+                        {"region_name": here, "instance_type_name": kind,
+                         "ssh_key_names": [key_name], "name": name})["instance_ids"][0]
+        except RuntimeError as e:
+            if "insufficient-capacity" not in str(e) or time.time() >= deadline:
+                raise
+            print(f"  {here} 的空位被抢走了，换一个再试", flush=True)
+            time.sleep(20)
+
+
 def execute(folder: Path, region: str = "") -> dict:
     cfg = yaml.safe_load((folder / "run.yaml").read_text(encoding="utf-8")) or {}
     kind = TYPES[cfg.get("显卡", "basic")]
-    region = region or pick_region(kind)
     command = cfg.get("命令") or "python3 run.py"
     key_name, kid = ssh_key()
     try:
-        iid = _api("POST", "/instance-operations/launch", {"region_name": region, "instance_type_name": kind,
-                                                           "ssh_key_names": [key_name], "name": f"wq-run-{folder.name}"})["instance_ids"][0]
+        iid = launch(kind, key_name, f"wq-run-{folder.name}", region)
     except Exception:
         if kid:
             _api("DELETE", f"/ssh-keys/{kid}")
