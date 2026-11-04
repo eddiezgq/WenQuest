@@ -3,7 +3,7 @@
 import subprocess
 import sys
 
-PKGS = ["transformers", "datasets", "soundfile", "librosa", "numpy>=1.23,<2"]   # transformers 要 np._CopyMode（1.23 才有），但别越到 numpy 2
+PKGS = ["transformers", "datasets", "soundfile", "librosa", "numpy>=1.23,<2", "torchcodec"]   # datasets 解码音频要 torchcodec   # transformers 要 np._CopyMode（1.23 才有），但别越到 numpy 2
 
 
 def pip_install(pkgs):
@@ -43,7 +43,7 @@ def numpy_ok():
 def ensure():
     modern_pillow()
     try:
-        import datasets, soundfile, transformers  # noqa: F401
+        import datasets, soundfile, torchcodec, transformers  # noqa: F401
         if numpy_ok():
             return True
     except ImportError:
