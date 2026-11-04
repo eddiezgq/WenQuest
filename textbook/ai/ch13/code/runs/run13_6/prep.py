@@ -2,7 +2,7 @@
 import subprocess
 import sys
 
-PKGS = ["transformers", "accelerate"]
+PKGS = ["transformers", "accelerate", "jinja2>=3.1.0"]   # apply_chat_template 要 jinja2 ≥ 3.1
 
 
 def pip_install(pkgs):
@@ -30,10 +30,13 @@ def modern_pillow():
 def ensure():
     modern_pillow()
     try:
+        import jinja2
         import transformers  # noqa: F401
-        return True
+        if tuple(int(x) for x in jinja2.__version__.split(".")[:2]) >= (3, 1):
+            return True
     except Exception:
-        return pip_install(PKGS)
+        pass
+    return pip_install(PKGS)
 
 
 if __name__ == "__main__":

@@ -85,6 +85,12 @@ for field, tag in (("q", "book"), ("q2", "shop")):
     out[f"{tag}_bm25_syn_part"] = 100 * float(np.mean(
         [recall_of(retrieve(q[field], CH, K, "bm25+syn+part"), q["gold"]) for q in ANS]))
 out["emb_beats_bm25_shop"] = out["shop_emb"] - out["shop_bm25"]
+
+# 下面要把显存让给生成模型，所以**先把答题阶段要用的检索结果算完**再放掉向量模型
+# （原来在这里就 del emb，后面 emb_rank / hybrid_rank 还要用，直接 NameError）。
+RANK = {"热一下": emb_rank("热一下")}
+for _q in ANS + NOANS:
+    RANK[_q["q2"]] = hybrid_rank(_q["q2"])
 del emb
 torch.cuda.empty_cache()
 
@@ -109,11 +115,11 @@ def answer(query, idx):
     return gtok.decode(new, skip_special_tokens=True), ids["input_ids"].shape[1], len(new), dt
 
 
-_ = answer("热一下", emb_rank("热一下"))                            # 先热跑一次，再开始计时
+_ = answer("热一下", RANK["热一下"])                            # 先热跑一次，再开始计时
 fact_ok = cite_ok = 0
 tok_in = tok_out = secs = 0.0
 for q in ANS:
-    idx = hybrid_rank(q["q2"])
+    idx = RANK[q["q2"]]
     text, nin, nout, dt = answer(q["q2"], idx)
     tok_in += nin
     tok_out += nout
@@ -122,7 +128,7 @@ for q in ANS:
     cite_ok += any(g in text for g in q["gold"])
 refuse = 0
 for q in NOANS:
-    idx = hybrid_rank(q["q2"])
+    idx = RANK[q["q2"]]
     text, nin, nout, dt = answer(q["q2"], idx)
     tok_in += nin
     tok_out += nout
