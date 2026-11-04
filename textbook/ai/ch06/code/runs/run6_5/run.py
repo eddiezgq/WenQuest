@@ -70,7 +70,9 @@ def find_ncu():
 ncu = find_ncu()
 subprocess.run(["nvcc", "-O3", "-arch=native", "-o", "gemm", "gemm.cu", "-lcublas"], check=True)
 known = subprocess.run(["sudo", ncu, "--query-metrics"], capture_output=True, text=True).stdout
-metrics = {k: m for k, m in METRICS.items() if m.split(".")[0] in known}
+# launch__* 是启动属性不是性能计数器，--query-metrics 不列它们，但每个版本都能取——
+# 拿它去对清单会得到假的"缺计数器"（2026-11-04 实测时 regs 就是这样被判没有的）
+metrics = {k: m for k, m in METRICS.items() if m.startswith("launch__") or m.split(".")[0] in known}
 missing = [k for k in METRICS if k not in metrics]
 print("这台机器的 ncu 没有这些计数器：", missing)
 REQUIRED = {"ms", "dram_rd", "dram_wr", "l2", "sm_pct", "mem_pct", "occ_pct", "wf", "conf", "regs",
