@@ -122,12 +122,30 @@ GROUPS = {
     "LL_Shaft": "looper", "LL_Looper": "looper", "UL_Eccentric": "looper", "UL_BallA": "looper", "UL_BallB": "looper",
     "UL_Link": "looper", "UL_Rocker": "looper", "UL_Shaft": "looper", "FeedArmMain": "feed", "FeedArmDiff": "feed",
     "FeedShaft": "feed", "LowerKnife": "knife", "UpperKnife": "knife",
+    # 绷缝机（第 76 轮；机针 CV_Needle1…、针板 CV_Plate*、线 CV_Thread* 按前缀分组，见 group_of）
+    "CV_UpperShaft": "drive", "CV_LowerShaft": "drive", "CV_Wheel": "drive", "CV_Belt": "drive",
+    "CV_NeedleCrank": "needle", "CV_CrankPin": "needle", "CV_NeedleRod": "needle", "CV_NeedleBar": "needle", "CV_Clamp": "needle",
+    "CV_Looper": "looper", "CV_Holder": "looper", "CV_Post": "looper", "CV_Slider": "looper", "CV_Guide": "looper",
+    "CV_RockHub": "looper", "CV_Rocker": "looper", "CV_RockArm": "looper", "CV_BallA": "looper", "CV_BallB": "looper",
+    "CV_Rod": "looper", "CV_Eccentric": "looper", "CV_AvoidEcc": "looper", "CV_AvoidRod": "looper",
+    "CV_SpHub": "spreader", "CV_SpArm": "spreader", "CV_SpHook": "spreader",
+    "CV_MainDog": "feed", "CV_DiffDog": "feed",
 }
+_PREFIX = (("CV_Needle", "needle"), ("CV_Shank", "needle"), ("CV_Plate", "frame"), ("CV_Thread", "thread"))
+
+
+def group_of(name):
+    """零件名 → 机构（三维讲解片透视、慢放用）"""
+    if name in GROUPS:
+        return GROUPS[name]
+    return next((g for pre, g in _PREFIX if name.startswith(pre)), "frame")
 
 
 def parts3d(params=None, phi=0.0, machine="lockstitch"):
     if machine == "overlock":
         return _parts_overlock(params, phi)
+    if machine == "cover":
+        return _parts_cover(params, phi)
     return _parts_lockstitch(params, phi)
 
 
@@ -437,3 +455,143 @@ def _parts_overlock(params=None, phi=0.0):
     out.append(dict(type="box", name="LowerKnife", zh="下刀", size=[8, 3, 10], base=[-4, Cy + p["w"] + 6, zk - 10], color=(0.6, 0.6, 0.65)))
     out.append(dict(type="box", name="UpperKnife", zh="上刀", size=[8, 3, 14], base=[-4, Cy + p["w"] + 9, zk + up], color=(0.5, 0.5, 0.55)))
     return dict(parts=out, phi=phi, params=p)
+
+
+def _parts_cover(params=None, phi=0.0):
+    """绷缝机（第 76 轮，只给三维讲解片用，不出 STEP）：零件、尺寸、运动照教材三维模型 10-1（model-cover.html）。
+    针杆、弯针运动和线环大小全由 cover.py 给（和五条判据同一套）；机构尺寸是示意。
+    模型 10-1 的坐标是 X 右、Y 向后、Z 向上，原点在基准针（最右一根）中心、针板上面；这里照本文件的习惯把 Y 反过来（向后为负）。
+    线（针线和线环、弯针线、覆盖线）是“管子”：一串点加半径，点数固定（渲染器每帧只挪点）。"""
+    from . import cover as C
+    p = C.clean(params)
+    st = {k: p[k] for k in ("dphi", "dz", "e", "gap", "rr")}
+    E = C.evaluate(st)
+    f = phi % 360
+    a = f * DEG
+    n_needle, cov = C.TY[p["stitch"]]
+    g = p["g"]
+    xs = [0.0] if n_needle == 1 else [-g, 0.0] if n_needle == 2 else [-g, -g / 2, 0.0]
+    lo, hi = min(xs), max(xs)
+    cx = (lo + hi) / 2
+    out = []
+
+    def Y(q):                                # 模型 10-1 的坐标 → 本文件（Y 反向）
+        return [q[0], -q[1], q[2]]
+
+    def cyl(name, zh, rad, A, B, color):
+        d = [B[i] - A[i] for i in range(3)]
+        Ln = math.sqrt(sum(x * x for x in d)) or 1e-6
+        out.append(dict(type="cyl", name=name, zh=zh, r=rad, h=Ln, base=Y(A), dir=Y([x / Ln for x in d]), color=color))
+
+    def disc(name, zh, rad, th, c, ax, color):
+        cyl(name, zh, rad, [c[i] - ax[i] * th / 2 for i in range(3)], [c[i] + ax[i] * th / 2 for i in range(3)], color)
+
+    def box(name, zh, c, size, color):        # 中心、尺寸（模型 10-1 坐标）
+        out.append(dict(type="box", name=name, zh=zh, size=list(size), base=[c[0] - size[0] / 2, -c[1] - size[1] / 2, c[2] - size[2] / 2],
+                        color=color))
+
+    def ball(name, zh, c, rad, color):
+        out.append(dict(type="sphere", name=name, zh=zh, c=Y(c), r=rad, color=color))
+
+    def tube(name, zh, pts, rad, color):
+        out.append(dict(type="tube", name=name, zh=zh, pts=[Y(q) for q in pts], r=rad, color=color))
+
+    STEEL, DARK, LP, LPD, SP, FEED, SHAFT, CRANK = ((0.84, 0.86, 0.89), (0.17, 0.19, 0.22), (0.81, 0.84, 0.86), (0.56, 0.60, 0.64),
+                                                    (0.81, 0.84, 0.86), (0.60, 0.64, 0.68), (0.68, 0.72, 0.75), (0.80, 0.55, 0.20))
+    # 主轴、手轮、下轴、同步带
+    NL, BAR = 30.0, 70.0                       # 针尖到针夹、针夹到针杆顶（同模型 10-1）
+    CZ = C.ztip(0) + NL + BAR - C.R + C.L      # 针在最高（0°）时曲柄销朝上
+    XC = -14.0
+    cyl("CV_UpperShaft", "上轴", 5, [XC - 5, 0, CZ], [XC + 225, 0, CZ], SHAFT)
+    disc("CV_Wheel", "手轮", 44, 12, [236, 0, CZ], [1, 0, 0], DARK)
+    cyl("CV_LowerShaft", "下轴", 5, [-55, 0, -70], [175, 0, -70], SHAFT)
+    cyl("CV_Belt", "同步带", 3, [200, 0, CZ], [200, 0, -70], DARK)
+    # 针杆曲柄滑块（行程 2R = 31 mm）、针夹、机针
+    tip0 = C.ztip(f)
+    bar_top = tip0 + NL + BAR
+    pin = [XC, C.R * math.sin(a), CZ + C.R * math.cos(a)]
+    disc("CV_NeedleCrank", "针杆曲柄", 18, 6, [XC, 0, CZ], [1, 0, 0], CRANK)
+    ball("CV_CrankPin", "曲柄销", pin, 2.4, CRANK)
+    cyl("CV_NeedleRod", "针杆连杆", 2.4, [0, 0, bar_top], pin, (0.85, 0.70, 0.30))
+    cyl("CV_NeedleBar", "针杆", 3.4, [0, 0, tip0 + NL], [0, 0, bar_top], (0.73, 0.76, 0.80))
+    box("CV_Clamp", "针夹", [cx, 0, tip0 + NL], [hi - lo + 6, 8, 8], (0.73, 0.76, 0.80))
+    for i, x in enumerate(xs, 1):
+        cyl(f"CV_Needle{i}", f"机针 {i}", C.RN, [x, 0, tip0], [x, 0, tip0 + 16], STEEL)
+        cyl(f"CV_Shank{i}", f"针柄 {i}", 0.9, [x, 0, tip0 + 16], [x, 0, tip0 + NL], STEEL)
+    # 弯针：刀尖 (x, −y, zb)，弯针身向右伸、末端向下进弯针架（同模型 10-1）
+    lx, ly = E["looper"](f)
+    zb = E["zb"]
+    body = [[lx, -ly, zb], [lx + 5, -ly, zb - 0.2], [lx + 11, -ly, zb - 0.6], [lx + 17, -ly, zb - 1.4], [lx + 22, -ly, zb - 3.2],
+            [lx + 25, -ly, zb - 6.5]]
+    tube("CV_Looper", "弯针", body, 0.55, LP)
+    box("CV_Holder", "弯针架", [lx + 26, -ly, zb - 10], [8, 10, 10], LPD)
+    XP, ZP, LR = 14.0, -58.0, 28.0             # 摆杆支点
+    xsl = lx + 26
+    th = math.asin(max(-0.95, min(0.95, (xsl - XP) / LR)))
+    top = [XP + LR * math.sin(th), -14, ZP + LR * math.cos(th)]
+    box("CV_Slider", "滑块", top, [9, 8, 7], LPD)
+    cyl("CV_Post", "弯针架立柱", 2, [xsl, -ly, zb - 14], top, LPD)
+    cyl("CV_Guide", "导杆", 2.5, [-40, -14, -30], [45, -14, -30], SHAFT)
+    disc("CV_RockHub", "摆轴", 4, 10, [XP, -14, ZP], [0, 1, 0], LPD)
+    cyl("CV_Rocker", "摆杆", 2.6, [XP, -14, ZP], top, LPD)
+    arm = [XP - 14 * math.cos(th), -14, ZP + 14 * math.sin(th)]
+    cyl("CV_RockArm", "摆杆短臂", 2.6, [XP, -14, ZP], arm, LPD)
+    ep = [XP + 30, 9 * math.sin(a + 0.6), -70 + 9 * math.cos(a + 0.6)]
+    ball("CV_BallA", "球头（偏心端）", ep, 2.2, LPD)
+    ball("CV_BallB", "球头（摆杆端）", arm, 2.2, LPD)
+    cyl("CV_Rod", "球头连杆", 1.8, ep, arm, LPD)
+    disc("CV_Eccentric", "摆动偏心", 9, 6, [XP + 30, 0, -70], [1, 0, 0], LPD)
+    disc("CV_AvoidEcc", "避针偏心", 6, 5, [XP + 46, 0, -70], [1, 0, 0], LPD)
+    ap = [XP + 46, 6 * math.sin(a - 1.2), -70 + 6 * math.cos(a - 1.2)]
+    cyl("CV_AvoidRod", "避针连杆", 1.4, ap, [xsl + 4, -ly, zb - 12], LPD)
+    # 撑线器（602、605）：针杆从上止点下降约 1.1 mm（约 25°）时最左（10.5 节）
+    SPV, SPZ, SPS = [-48, -12, 30], 8.0, 17.5
+    sx = 2 - SPS / 2 * math.cos((f - 25) * DEG)
+    hook = [sx, -3, SPZ]
+    if cov:
+        disc("CV_SpHub", "撑线器摆轴", 4, 8, SPV, [0, 1, 0], SP)
+        cyl("CV_SpArm", "撑线器", 1.6, SPV, hook, SP)
+        ball("CV_SpHook", "撑线器钩尖", hook, 1.3, SP)
+    # 送布牙（主、差动）：针在布外时在针板上面向后送
+    sl, diff = 10 / p["spc"], 1.3
+    ym, zt, yd = 0.5 * sl * math.sin(a), 1.2 * math.cos(a) - 0.6, 0.5 * sl * diff * math.sin(a)
+    w = hi - lo + 8
+    box("CV_MainDog", "主送布牙", [cx, 9.5 + ym, zt - 1.8], [w, 10, 3], FEED)
+    box("CV_DiffDog", "差动送布牙", [cx, -10.5 + yd, zt - 1.8], [w, 10, 3], FEED)
+    # 针板：上面在 z = 0，厚 3；针孔（各针一条长孔）、两只送布牙的孔用方块拼出
+    PL, x0, x1 = (0.84, 0.87, 0.89), -34.0, 30.0
+    nl, nh = lo - 1.6, hi + 1.6
+    fl, fh = nl - 4, nh + 4
+    rows = [(-24, -16, [(x0, x1)]), (-16, -5, [(x0, fl), (fh, x1)]), (-5, -1.3, [(x0, x1)]), (-1.3, 1.3, [(x0, nl), (nh, x1)]),
+            (1.3, 4, [(x0, x1)]), (4, 15, [(x0, fl), (fh, x1)]), (15, 30, [(x0, x1)])]
+    k = 0
+    for y_a, y_b, segs in rows:
+        for xa, xb in segs:
+            k += 1
+            box(f"CV_Plate{k}", "针板", [(xa + xb) / 2, (y_a + y_b) / 2, -1.5], [xb - xa, y_b - y_a, 3], PL)
+    # 线：针线（针眼往上；针在弯针平面以下回升时在针后张开线环，大小按 cover.floop）、弯针线、覆盖线
+    rs = C.X(f) - C.X(180)
+    hh = max(0.0, -rs) if 180 <= f <= E["fu"] + 20 else 0.0
+    for i, x in enumerate(xs, 1):
+        eye = tip0 + C.DEYE
+        # 线环从针眼往上鼓在针后（弯针尖要在针眼上沿 0.2 mm 以上、线环顶以下穿过，10.4.2 节）：顶高 0.5 + 0.9×回升量，
+        # 离针多远按第 5 章线环大小 floop；线环还不够大（floop < 0.6）时按比例画小
+        fo = C.floop(hh) if (hh > 0.05 and eye < C.T) else 0.0
+        w, top = 1.4 * fo, (0.5 + 0.9 * hh) * min(1.0, fo / 0.6)
+        loop = [[x + 0.2, 0.5, eye], [x + 0.55, 0.6 + 0.6 * w, eye + 0.45 * top], [x + 0.3, 0.6 + w, eye + 0.95 * top],
+                [x - 0.3, 0.6 + w, eye + 0.95 * top], [x - 0.55, 0.6 + 0.6 * w, eye + 0.45 * top], [x - 0.2, 0.5, eye]]
+        # 钩住以后（弯针尖已经越过这根针、线环够大、刀尖从环里穿过）：线环挂在弯针身上，跟着针眼和弯针走
+        phR = C.PHR0 + p["dphi"]
+        fk = E["fc"] if x == 0 else C.bis(lambda q, dx=x: E["looper"](q)[0] - dx, phR, phR + 180) % 360
+        caught = fk <= f <= E["fu"] + 20 and all(E["ok"][:3]) and eye < C.T and lx < x
+        if caught:
+            yb = -ly                          # 弯针身的 Y（模型 10-1 坐标）
+            loop = [[x + 0.2, 0.5, eye], [x + 0.45, yb + 0.1, zb + 0.15], [x + 0.2, yb + 0.5, zb + 0.6],
+                    [x - 0.2, yb + 0.5, zb + 0.6], [x - 0.45, yb + 0.1, zb + 0.15], [x - 0.2, 0.5, eye]]
+        pts = [[x, 0, tip0 + 60], [x, 0.3, eye + 0.4]] + loop + [[x, 0.3, max(eye, 0)], [x, 0, C.T]]
+        tube(f"CV_Thread{i}", f"针线 {i}", pts, 0.18, (0.11, 0.30, 0.62))
+    tube("CV_ThreadLooper", "弯针线", [[lx + 1.2, -ly, zb + 0.3], [lx + 12, -ly, zb - 0.5], [lx + 24, -ly, zb - 4], [lx + 40, -ly + 6, zb - 20]],
+         0.18, (0.78, 0.42, 0.09))
+    if cov:
+        tube("CV_ThreadCover", "覆盖线", [[-48, -12, 48], hook, [hi + 3, -1, C.T + 0.1], [lo - 2, -1, C.T + 0.1]], 0.18, (0.18, 0.62, 0.36))
+    return dict(parts=out, phi=phi, params=p, z_tip=tip0, zb=zb, lx=lx, sx=sx if cov else None, fc=E["fc"], fd=E["fd"])

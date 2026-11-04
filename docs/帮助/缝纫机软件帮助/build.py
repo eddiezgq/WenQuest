@@ -147,6 +147,8 @@ def case_numbers():
     for k in ("dphi_m6", "dphi_p6"):
         v["cv_" + k] = "；".join(f"{c['name']} {c['value']}（要求 {c['limit']}）" for c in C[k]["bad"])
     v["cv_opt"] = C["opt_timing"][0]["params"]["dphi"]
+    from app import sewing_video as SVID                       # 第 76 轮：绷缝机讲解片的片长（教材算例 406）
+    v["cv_vdur"] = f'{SVID.scene("cover", {})[1]["duration"]:g}'
     lo, hi = (float(x) for x in C["window"].split("…"))
     v["cv_wwidth"] = round(hi - lo, 1)
     v["cv_W"] = round(C["order"]["W"] * 100)

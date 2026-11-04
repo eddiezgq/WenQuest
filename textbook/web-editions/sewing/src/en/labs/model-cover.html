@@ -362,7 +362,11 @@ function pose(phiDeg){
   const loopBad=bad.has('catch')||bad.has('height')||(bad.has('gap')&&E.gap>0.1);
   NEEDLES.forEach((n,i)=>{const t=tip0-n.dz, eye=t+DEYE; const pts=[[n.x,0,t+60],[n.x,0.3,eye+0.4]];
     const rs=X(f)-X(180); const hh=f>=180&&f<=E.fu+20?Math.max(0,-rs):0;
-    if(hh>0.05&&eye<TF){const s=1.8*floop(hh);pts.push([n.x+0.2,0.6,eye],[n.x+0.6*s,0.6+0.8*s,eye-0.6*s],[n.x,0.6+1.4*s,eye-1.6*s],[n.x-0.6*s,0.6+0.8*s,eye-0.6*s],[n.x-0.2,0.6,eye]);}
+    // 线环从针眼往上鼓在针后（弯针尖在针眼上沿以上、线环顶以下穿过，10.4.2 节）；钩住以后挂在弯针身上（第 76 轮改，和讲解片一致）
+    const fo=hh>0.05&&eye<TF?floop(hh):0, w=1.4*fo, top=(0.5+0.9*hh)*Math.min(1,fo/0.6);
+    const caught=f>=n.fc&&f<=E.fu+20&&E.C[0].ok&&E.C[1].ok&&E.C[2].ok&&eye<TF&&lx<n.x;
+    if(caught){const yb=-ly;pts.push([n.x+0.2,0.5,eye],[n.x+0.45,yb+0.1,p.zb+0.15],[n.x+0.2,yb+0.5,p.zb+0.6],[n.x-0.2,yb+0.5,p.zb+0.6],[n.x-0.45,yb+0.1,p.zb+0.15],[n.x-0.2,0.5,eye]);}
+    else if(fo>0)pts.push([n.x+0.2,0.5,eye],[n.x+0.55,0.6+0.6*w,eye+0.45*top],[n.x+0.3,0.6+w,eye+0.95*top],[n.x-0.3,0.6+w,eye+0.95*top],[n.x-0.55,0.6+0.6*w,eye+0.45*top],[n.x-0.2,0.5,eye]);
     pts.push([n.x,0.3,Math.max(eye,0)],[n.x,0,TF]);
     nThreads[i].geometry.dispose(); nThreads[i].geometry=new T.BufferGeometry().setFromPoints(pts.map(W));
     nThreads[i].material.color.set(loopBad?BAD:0x1d4c9e);});

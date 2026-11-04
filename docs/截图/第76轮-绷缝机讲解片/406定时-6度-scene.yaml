@@ -1,0 +1,422 @@
+# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮）。数由计算核心给，模型参数锁定。
+name: 绷缝机讲解
+title:
+  zh: 绷缝机的机构怎么动
+  en: How this coverstitch machine works
+duration: 66.0
+floor: false
+clip: 0.002
+models:
+- id: d
+  use: gen:sewdesign
+  machine: cover
+  params:
+    n: 6500
+    stitch: '406'
+    spc: 7
+    g: 4.0
+    t: 0.5
+    nr: 1
+    dphi: -6.0
+    dz: 0
+    e: 1.0
+    gap: 0.03
+    rr: 3.2
+    Lcm: 172
+    Q: 1000
+    W: 0.12
+    cone: 5000
+motion:
+- drive: weblab
+  model: d
+  angle:
+  - - 0
+    - 0
+  - - 6.0
+    - 720.0
+  - - 14.0
+    - 1080.0
+  - - 22.0
+    - 1440.0
+  - - 23.0
+    - 1978.1
+  - - 30.0
+    - 2038.7
+  - - 31.0
+    - 2038.7
+  - - 39.0
+    - 2398.7
+  - - 40.0
+    - 2688.1
+  - - 45.0
+    - 2768.1
+  - - 46.0
+    - 2768.1
+  - - 47.0
+    - 2969.9
+  - - 52.0
+    - 3049.9
+  - - 53.0
+    - 3049.9
+  - - 54.0
+    - 3408.1
+  - - 59.0
+    - 3488.1
+  - - 60.0
+    - 3488.1
+  - - 66.0
+    - 4208.1
+camera:
+- t: 0
+  look:
+  - 0.113
+  - 0.0
+  - 0.0328
+  az: -40
+  el: 18
+  dist: 1.275
+  lens: 40
+- t: 5.5
+  look:
+  - 0.113
+  - 0.0
+  - 0.0328
+  az: -20
+  el: 14
+  dist: 1.173
+  lens: 40
+- t: 7.0
+  look:
+  - -0.014
+  - 0.0
+  - 0.0692
+  az: -35
+  el: 12
+  dist: 0.669
+  lens: 40
+- t: 13.0
+  look:
+  - -0.014
+  - 0.0
+  - 0.0692
+  az: -20
+  el: 10
+  dist: 0.669
+  lens: 40
+- t: 15.0
+  look:
+  - 0.013
+  - 0.0059
+  - -0.052
+  az: -35
+  el: 12
+  dist: 0.47
+  lens: 40
+- t: 21.0
+  look:
+  - 0.013
+  - 0.0059
+  - -0.052
+  az: -20
+  el: 10
+  dist: 0.47
+  lens: 40
+- t: 22.8
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -55
+  el: 8
+  dist: 0.032
+  lens: 40
+- t: 30.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -35
+  el: 6
+  dist: 0.032
+  lens: 40
+- t: 32.0
+  look:
+  - -0.002
+  - -0.003
+  - -0.0074
+  az: -35
+  el: 12
+  dist: 0.285
+  lens: 40
+- t: 38.0
+  look:
+  - -0.002
+  - -0.003
+  - -0.0074
+  az: -20
+  el: 10
+  dist: 0.285
+  lens: 40
+- t: 40.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -50
+  el: 15
+  dist: 0.032
+  lens: 40
+- t: 45.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -30
+  el: 12
+  dist: 0.032
+  lens: 40
+- t: 47.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -50
+  el: 15
+  dist: 0.032
+  lens: 40
+- t: 52.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -30
+  el: 12
+  dist: 0.032
+  lens: 40
+- t: 54.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -50
+  el: 15
+  dist: 0.032
+  lens: 40
+- t: 59.0
+  look:
+  - -0.002
+  - 0.0
+  - -0.0066
+  az: -30
+  el: 12
+  dist: 0.032
+  lens: 40
+- t: 61.5
+  look:
+  - 0.113
+  - 0.0
+  - 0.0328
+  az: -30
+  el: 18
+  dist: 1.275
+  lens: 40
+- t: 66.0
+  look:
+  - 0.113
+  - 0.0
+  - 0.0328
+  az: -45
+  el: 20
+  dist: 1.275
+  lens: 40
+effects:
+- kind: xray
+  t:
+  - 6.5
+  - 13.5
+  top:
+  - d.needle
+- kind: xray
+  t:
+  - 14.5
+  - 21.5
+  top:
+  - d.looper
+- kind: xray
+  t:
+  - 22.5
+  - 30.5
+  top:
+  - d.needle
+  - d.looper
+  - d.thread
+- kind: xray
+  t:
+  - 31.5
+  - 38.5
+  top:
+  - d.feed
+  - d.frame
+- kind: xray
+  t:
+  - 39.5
+  - 45.5
+  top:
+  - d.needle
+  - d.looper
+  - d.thread
+- kind: xray
+  t:
+  - 46.5
+  - 52.5
+  top:
+  - d.needle
+  - d.looper
+- kind: xray
+  t:
+  - 53.5
+  - 59.5
+  top:
+  - d.needle
+  - d.looper
+  - d.thread
+labels:
+- t:
+  - 0
+  - 6
+  zh: 这台绷缝机：406 线迹，6500 r/min
+  en: 'This coverstitch machine: stitch 406, 6500 r/min'
+- t:
+  - 0
+  - 6
+  where: bottom
+  zh: 针、弯针的运动和线环按你的设计算；机构尺寸为示意
+  en: Needle and looper motion and the loops follow your design; mechanism sizes are illustrative
+- t:
+  - 6.0
+  - 14.0
+  zh: ① 引线：针杆曲柄滑块带一排机针
+  en: '① Needle drive: slider-crank with the row of needles'
+- t:
+  - 6.0
+  - 14.0
+  where: bottom
+  zh: 线迹 406 · 2 根针，针距 4 mm · 6500 r/min
+  en: Stitch 406 · 2 needle(s), gauge 4 mm · 6500 r/min
+- t:
+  - 14.0
+  - 22.0
+  zh: ② 弯针：左右摆 + 前后避针，刀尖走扁椭圆
+  en: '② Looper: swing across + needle avoidance, a flat ellipse'
+- t:
+  - 14.0
+  - 22.0
+  where: bottom
+  zh: 弯针定时 -6° · 可行窗口 -3.5° 到 +4.0° · 回退量 3.2 mm
+  en: Looper timing -6° · workable window -3.5° to +4.0° · retraction 3.2 mm · avoid amplitude 1 mm
+- t:
+  - 22.0
+  - 31.0
+  zh: ③ 钩线：弯针从右往左依次钩住各针的线环
+  en: '③ Catching: the looper takes each needle loop, right to left'
+- t:
+  - 22.0
+  - 31.0
+  where: bottom
+  zh: 钩线时机针回升 2.32 mm（208.1°） · 弯针尖高出针眼 2.54 mm
+  en: Needle rise at the catch 2.32 mm (208.1°) · point above the eye 2.54 mm · clearance 0.030 mm
+- t:
+  - 31.0
+  - 39.0
+  zh: ④ 送布：主送布牙、差动送布牙
+  en: '④ Feed: main and differential feed dogs'
+- t:
+  - 31.0
+  - 39.0
+  where: bottom
+  zh: 针密 7 /cm · 主、差动两只送布牙
+  en: 7 stitches/cm · main and differential dogs
+- t:
+  - 39.0
+  - 46.0
+  tone: bad
+  zh: ⚠ 不合格：弯针尖在线环高度内
+  en: ⚠ Looper point within the loop height fails
+- t:
+  - 39.0
+  - 46.0
+  where: bottom
+  zh: 2.54 mm · 判据 0.20–2.29 mm
+  en: 2.54 mm · criterion 0.20–2.29 mm
+- t:
+  - 46.0
+  - 53.0
+  tone: bad
+  zh: ⚠ 不合格：针下行时让开弯针
+  en: ⚠ Needle clears the looper on its way down fails
+- t:
+  - 46.0
+  - 53.0
+  where: bottom
+  zh: x -0.13，y 0.33 mm · 判据 x ≥ 0.30，y ≥ 0.20 mm
+  en: x -0.13, y 0.33 mm · criterion x ≥ 0.30, y ≥ 0.20 mm
+- t:
+  - 53.0
+  - 60.0
+  tone: bad
+  zh: ⚠ 不合格：弯针定时离窗口边缘
+  en: ⚠ Looper timing margin to the window edges fails
+- t:
+  - 53.0
+  - 60.0
+  where: bottom
+  zh: -6.0°，窗口 -3.5° 到 +4.0° · 判据 ≥ 1.5°
+  en: -6.0°, window -3.5° to +4.0° · criterion ≥ 1.5°
+- t:
+  - 60.0
+  - 66.0
+  zh: 7 项校核：不合格 3 项，注意 0 项
+  en: '7 checks: 3 fail, 0 need attention'
+- t:
+  - 60.0
+  - 66.0
+  where: bottom
+  zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
+  en: WenQuest sewing design software · same parameters as report, setup card
+stills:
+- 3.0
+- 10.0
+- 42.5
+- 49.5
+- 56.5
+- 63.0
+panel:
+  kind: readouts
+  head: 读数
+  items:
+  - zh: 主轴转角
+    en: ''
+    key: phi
+    fmt: '{:5.0f}'
+    unit: °
+  - zh: 针尖高出弯针平面
+    en: ''
+    key: needle
+    fmt: '{:+6.1f}'
+    unit: ' mm'
+    scale: 25
+  - zh: 弯针尖左右位置
+    en: ''
+    key: looper
+    fmt: '{:+6.1f}'
+    unit: ' mm'
+  plot:
+    key: needle
+    zh: 针尖高度
+    en: ''
+    marks:
+    - phi: 208
+      zh: 钩线
+    - phi: 130
+      zh: 针到弯针平面
+lang: zh

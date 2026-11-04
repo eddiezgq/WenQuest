@@ -113,8 +113,8 @@ def check(text: str) -> tuple[dict | None, list[str]]:
         if "color" in mo and mo["color"] not in COLORS:
             errs.append(f"model {mid} 的 color={mo['color']!r} 不在颜色名表里")
         if use == "gen:sewdesign":
-            if mo.get("machine") not in ("lockstitch", "overlock"):
-                errs.append(f"model {mid}（gen:sewdesign）的 machine 只能是 lockstitch 或 overlock")
+            if mo.get("machine") not in ("lockstitch", "overlock", "cover"):
+                errs.append(f"model {mid}（gen:sewdesign）的 machine 只能是 lockstitch、overlock 或 cover")
             if not isinstance(mo.get("params", {}), dict) or len(mo.get("params") or {}) > 80:
                 errs.append(f"model {mid}（gen:sewdesign）的 params 要是设计参数字典")
         if use == "item":
