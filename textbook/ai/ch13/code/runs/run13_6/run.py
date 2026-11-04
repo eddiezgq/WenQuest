@@ -99,12 +99,14 @@ gtok = AutoTokenizer.from_pretrained(GEN)
 gen = AutoModelForCausalLM.from_pretrained(GEN, torch_dtype=torch.bfloat16).to(dev).eval()
 SYS = ("你是车间质量手册的问答助手。只能根据给出的手册片段回答，并在答案末尾用方括号给出条文号；"
        "片段里没有这件事时，回答“手册里没有规定”，不要猜。")
+# 把最后那句“没有就说没有规定”去掉——13.6 节要对比：拒答到底是提示给的，还是模型自己会的
+SYS_LOOSE = ("你是车间质量手册的问答助手。只能根据给出的手册片段回答，并在答案末尾用方括号给出条文号。")
 
 
 @torch.no_grad()
-def answer(query, idx):
+def answer(query, idx, sys_prompt=SYS):
     ctx = "\n".join(f"[{CH[i]['srcs'][0]}] {CH[i]['text']}" for i in idx)
-    msg = [{"role": "system", "content": SYS},
+    msg = [{"role": "system", "content": sys_prompt},
            {"role": "user", "content": f"手册片段：\n{ctx}\n\n问题：{query}"}]
     text = gtok.apply_chat_template(msg, tokenize=False, add_generation_prompt=True)
     ids = gtok(text, return_tensors="pt").to(dev)
@@ -142,5 +144,13 @@ out["tok_in_avg"] = tok_in / n_all
 out["tok_out_avg"] = tok_out / n_all
 out["ms_per_q"] = secs / n_all * 1000
 out["ms_per_tok"] = secs / max(tok_out, 1) * 1000
+
+# 同一批不可答的问题再问一遍，这次提示里不写“没有就说没有规定”（13.6 节要这个对比）。
+# 这一轮只为了数拒答率，**不计进上面的词元与耗时平均**。
+refuse_loose = 0
+for q in NOANS:
+    text, _, _, _ = answer(q["q2"], RANK[q["q2"]], SYS_LOOSE)
+    refuse_loose += ("没有规定" in text or "未规定" in text or "没有提到" in text)
+out["refuse_pct_loose"] = 100 * refuse_loose / len(NOANS)
 json.dump(out, open("out.json", "w"), ensure_ascii=False)
 print(out)

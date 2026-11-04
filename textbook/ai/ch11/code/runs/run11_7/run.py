@@ -64,7 +64,7 @@ try:
     torch.onnx.export(model.float(), torch.randn(1, 3, 224, 224, device=dev), "model.onnx",
                       input_names=["x"], output_names=["y"], dynamic_axes={"x": {0: "b"}, "y": {0: "b"}}, opset_version=17)
 except Exception as e:                                      # noqa: BLE001  导不出来就只报前两种方式，别把整次实测带倒
-    out["onnx_note"] = f"导出 ONNX 失败（{type(e).__name__}），这一路跳过"
+    out["onnx_note"] = f"导出 ONNX 失败（{type(e).__name__}: {e}），这一路跳过"[:300]
     engine = "skipped"
 if engine == "none":                                        # 导出失败就别再碰 model.onnx 了
     try:
