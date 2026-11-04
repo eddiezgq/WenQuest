@@ -1,0 +1,29 @@
+{
+ "name": "run4_3",
+ "fingerprint": "c91c471fa63c60e3",
+ "at": "2026-11-04T08:39:49Z",
+ "platform": "lambda",
+ "region": "us-east-1",
+ "instance_type": "gpu_1x_a10",
+ "env": {
+  "python": "3.10.12",
+  "os": "Linux-6.8.0-60-generic-x86_64-with-glibc2.35",
+  "gpu": "NVIDIA A10",
+  "driver": "570.148.08",
+  "gpu_memory": "23028 MiB",
+  "sm_clock_max": "1695 MHz",
+  "gpus": "1",
+  "nvcc": "12.8",
+  "torch": "2.7.0",
+  "torch_cuda": "12.8",
+  "capability": "8.6",
+  "triton": "3.3.0"
+ },
+ "values": {
+  "h2d_pageable": 11.3,
+  "h2d_pinned": 25.3,
+  "d2h_pageable": 10.4,
+  "d2h_pinned": 26.3,
+  "device": "NVIDIA A10"
+ }
+}
