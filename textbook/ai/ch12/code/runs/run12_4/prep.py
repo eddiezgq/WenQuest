@@ -3,7 +3,7 @@
 import subprocess
 import sys
 
-PKGS = ["transformers", "datasets", "soundfile", "librosa"]
+PKGS = ["transformers", "datasets", "soundfile", "librosa", "numpy>=1.23,<2"]   # transformers 要 np._CopyMode（1.23 才有），但别越到 numpy 2
 
 
 def pip_install(pkgs):
@@ -27,11 +27,22 @@ def modern_pillow():
     return pip_install(["--upgrade", "Pillow"])
 
 
+def numpy_ok():
+    """transformers 的模型类要 np._CopyMode（numpy ≥ 1.23）。装得动 transformers 不等于能用它——
+    真正的报错要等到 import 某个模型类时才冒出来，而且被包装成 "Could not import module 'XxxModel'"。"""
+    try:
+        import numpy
+        return tuple(int(x) for x in numpy.__version__.split(".")[:2]) >= (1, 23)
+    except Exception:
+        return False
+
+
 def ensure():
     modern_pillow()
     try:
         import datasets, soundfile, transformers  # noqa: F401
-        return True
+        if numpy_ok():
+            return True
     except ImportError:
         pass
     if not pip_install(PKGS):
