@@ -123,13 +123,45 @@ def pick_region(kind: str, prefer: str = "us-east-1") -> str:
     return prefer if prefer in regions else regions[0]
 
 
+def ssh_key() -> tuple[str, str]:
+    """用哪把 SSH 公钥开机。
+
+    机密里登记了名字和私钥就用那一把；**没有、或者名字在 Lambda 账号里查不到，就现生成一把**、
+    登记上去，用完删掉（与 tools/video/clone.py 的做法一致）。这样不必先在控制台里手工配一把钥匙。
+    返回 (公钥名, 临时钥匙的 id)；id 为空表示用的是机密里那一把，不要删。
+    """
+    name, keyfile = os.environ.get("LAMBDA_SSH_KEY_NAME", ""), os.environ.get("LAMBDA_SSH_KEY_FILE", "")
+    if name and keyfile and Path(keyfile).exists():
+        listed = _api("GET", "/ssh-keys")
+        have = {k.get("name") for k in listed} if isinstance(listed, list) else set()
+        if not have or name in have:                        # 查不动清单时也照用，让开机那一步去报错
+            return name, ""
+        print(f"  （机密里的公钥名 {name!r} 在 Lambda 账号里没有，改用现生成的一把）")
+    work = Path(os.environ.get("RUNNER_TEMP") or ".")
+    key = work / "wq_run_key"
+    for p in (key, key.with_suffix(".pub")):
+        p.unlink(missing_ok=True)
+    subprocess.run(["ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-f", str(key)], check=True)
+    tmp_name = f"wq-run-{int(time.time())}"
+    kid = _api("POST", "/ssh-keys", {"name": tmp_name,
+                                     "public_key": key.with_suffix(".pub").read_text().strip()}).get("id", "")
+    os.environ["LAMBDA_SSH_KEY_FILE"] = str(key)
+    return tmp_name, kid
+
+
 def execute(folder: Path, region: str = "") -> dict:
     cfg = yaml.safe_load((folder / "run.yaml").read_text(encoding="utf-8")) or {}
     kind = TYPES[cfg.get("显卡", "basic")]
     region = region or pick_region(kind)
     command = cfg.get("命令") or "python3 run.py"
-    iid = _api("POST", "/instance-operations/launch", {"region_name": region, "instance_type_name": kind,
-                                                       "ssh_key_names": [os.environ["LAMBDA_SSH_KEY_NAME"]], "name": f"wq-run-{folder.name}"})["instance_ids"][0]
+    key_name, kid = ssh_key()
+    try:
+        iid = _api("POST", "/instance-operations/launch", {"region_name": region, "instance_type_name": kind,
+                                                           "ssh_key_names": [key_name], "name": f"wq-run-{folder.name}"})["instance_ids"][0]
+    except Exception:
+        if kid:
+            _api("DELETE", f"/ssh-keys/{kid}")
+        raise
     try:
         ip = ""
         for _ in range(120):                                # up to 20 minutes to boot
@@ -159,6 +191,8 @@ def execute(folder: Path, region: str = "") -> dict:
         return rec
     finally:
         _api("POST", "/instance-operations/terminate", {"instance_ids": [iid]})       # always stop the machine
+        if kid:
+            _api("DELETE", f"/ssh-keys/{kid}")                                        # 临时钥匙用完就删
 
 
 def main() -> int:
