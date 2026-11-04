@@ -1,0 +1,41 @@
+{
+ "name": "run7_2",
+ "fingerprint": "a10d4ab342436854",
+ "at": "2026-11-04T11:04:31Z",
+ "platform": "lambda",
+ "region": "us-east-1",
+ "instance_type": "gpu_1x_a10",
+ "env": {
+  "python": "3.10.12",
+  "os": "Linux-6.8.0-60-generic-x86_64-with-glibc2.35",
+  "gpu": "NVIDIA A10",
+  "driver": "570.148.08",
+  "gpu_memory": "23028 MiB",
+  "sm_clock_max": "1695 MHz",
+  "gpus": "1",
+  "nvcc": "12.8",
+  "torch": "2.7.0",
+  "torch_cuda": "12.8",
+  "capability": "8.6",
+  "triton": "3.3.0"
+ },
+ "values": {
+  "correct": true,
+  "ok_swap": true,
+  "naive_wrong": true,
+  "ok_batched": true,
+  "ok_epi": true,
+  "loop_us": 1122.3,
+  "batched_us": 190.46,
+  "batch_speedup": 5.89,
+  "fused_us": 167.94,
+  "plain_us": 163.71,
+  "epi_us": 116.54,
+  "unfused_us": 279.55,
+  "epi_saving_pct": 39.9,
+  "plain_TFs": 59.0,
+  "epi_GBs": 432,
+  "max_diff": 0.00195,
+  "max_y": 3.934
+ }
+}
