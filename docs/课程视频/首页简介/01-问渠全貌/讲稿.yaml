@@ -1,0 +1,154 @@
+# 首页视频简介 01 · 问渠全貌（第 86 轮，首页顶部）。画面：官网首页、全貌总图、虚拟实验、三维仿真视频、数字工厂（取 07 段的截图）、
+# 凸轮 / 轴承 / 缝纫机软件（现成真界面截图）、校情中枢（取 17 段的截图）。讲稿见 ../讲稿_第一批.md 第 01 段。
+standalone: true
+langs: [zh, en]
+title: [问渠 WenQuest：从课堂到工厂的 AI 原生平台, 'WenQuest: an AI-native platform from the classroom to the factory']
+brand: [全貌, Overview]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的课程、工厂和学校数据是演示数据。, 'Course, factory and school data shown are demo data.']
+tags:
+  zh: [问渠, AI 教育, 智能制造, 数字工厂, 虚拟实验, 机器人, 工程教育, 教材, 评价系统]
+  en: [WenQuest, AI in education, smart manufacturing, digital factory, virtual labs, robotics, engineering education, textbooks, assessment]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: home, url: /, wait: 2500}
+  - {name: atlas, url: /, scroll: "#atlas", offset: 8, wait: 1500}
+  - {name: lab, url: /lab/kinematics.html, wait: 2500}
+  - {name: v3d, url: /cases/video3d.html, wait: 2500}
+  - {name: fac-3d, file: docs/课程视频/首页简介/07-数字工厂/课件/media/fac-3d-zh.jpg}
+  - {name: fac-ont, file: docs/课程视频/首页简介/07-数字工厂/课件/media/fac-ont-zh.jpg}
+  - {name: cam, file: tools/site_cn/assets/cam-ui.jpg}
+  - {name: sol, url: /solutions/sewing/, wait: 2500}
+  - {name: xq, file_zh: docs/课程视频/首页简介/17-评价与校情/课件/media/xq-heat-zh.jpg, file: docs/课程视频/首页简介/17-评价与校情/课件/media/xq-heat-en.jpg}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: home, title: [从课堂一直连到工厂, From the classroom all the way to the factory],
+          sub: [问渠 WenQuest：AI 原生的教学与工程平台, 'WenQuest: an AI-native platform for teaching and engineering']}
+  steps: [{show: 1}, {show: 1}]
+  say:
+    zh: ['>问渠，取自朱熹的“问渠那得清如许，为有源头活水来”。', '>我们做的，是一套从课堂一直连到工厂的 AI 原生平台。']
+    en: ['>WenQuest takes its name from a line by Zhu Xi: the pond stays clear because fresh water keeps flowing in.', '>We build an AI-native platform that runs from the classroom all the way to the factory.']
+- id: s02
+  kind: page
+  page: 2
+  part: [学习平台, Learning platform]
+  slide:
+    img: atlas
+    url: wenquestrobotics.com
+    kick: [第一块, Part one]
+    title: [学习平台：AI 建课, 'The learning platform: courses built by AI']
+    points:
+      - {text: [一堆资料，或者一句要求, 'A pile of materials, or one sentence'], zoom: [1.6, 25, 40]}
+      - {text: [讲义、课件、作业、测验、考试, 'Notes, slides, homework, quizzes, exams']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>第一块是学习平台。老师交来一堆资料，或者只说一句要求，', '>AI 就整理出一门完整的课：讲义、课件、作业、测验、考试。']
+    en: ['>First, the learning platform. Hand it a pile of materials, or just one sentence,', '>and the AI builds a complete course: notes, slides, homework, quizzes and exams.']
+- id: s03
+  kind: page
+  page: 3
+  part: [教材, Textbooks]
+  slide:
+    img: lab
+    url: wenquestrobotics.com/lab/kinematics
+    kick: [教材与虚拟实验, Textbooks and virtual labs]
+    title: [九本自编教材，中英对照, 'Nine textbooks of our own, in Chinese and English']
+    points:
+      - {text: [每章有程序、动画, Code and animations in every chapter]}
+      - {text: [浏览器里就能做的虚拟实验, Virtual labs that run in the browser]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>课程背后是我们自己写的九本教材，每章都有程序、动画，', '>和浏览器里就能做的虚拟实验，中英对照。']
+    en: ['>Behind the courses are nine textbooks of our own, each chapter with code and animations,', '>and virtual labs that run in the browser, in Chinese and English.']
+- id: s04
+  kind: page
+  page: 4
+  part: [内容制作, Content creation]
+  slide:
+    img: v3d
+    url: wenquestrobotics.com/cases/video3d
+    kick: [内容制作, Content creation]
+    title: [白板课、三维仿真视频, 'Whiteboard lessons, 3D simulation films']
+    points:
+      - {text: [一句话，出一节会动的白板课, 'One sentence: an animated whiteboard lesson']}
+      - {text: [一段话，出一部工程级三维动画, 'One paragraph: an engineering-grade 3D film'], zoom: [1.4, 70, 40]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>内容制作也交给 AI：一句话出一节会动的白板课，', '>一段话出一部工程级三维动画。']
+    en: ['>Content creation is AI-driven too: one sentence becomes an animated whiteboard lesson,', '>one paragraph an engineering-grade 3D film.']
+- id: s05
+  kind: page
+  page: 5
+  part: [数字工厂, Digital factory]
+  slide:
+    img: fac-3d
+    url: factory.wenquestrobotics.com/3d
+    kick: [第二块, Part two]
+    title: [数字工厂：按真实企业数据运转, 'The digital factory: run on real business data']
+    points:
+      - {text: [减速器厂、机器人厂, A gearbox plant and a robot plant]}
+      - {text: [订单、工艺、质量、设备、能源都在系统里, 'Orders, process plans, quality, equipment, energy: all in the system']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>第二块是数字工厂：一座按真实企业数据运转的教学工业园。', '>减速器厂、机器人厂里，订单、工艺、质量、设备、能源都在系统里。']
+    en: ['>Second, the digital factory: a teaching industrial park that runs on real business data.', '>In the gearbox and robot plants, orders, process plans, quality, equipment and energy all live in the system.']
+- id: s06
+  kind: page
+  page: 6
+  part: [企业, For companies]
+  slide:
+    img: cam
+    url: wenquestrobotics.com/cam
+    kick: [企业也能用, For companies]
+    title: [设计、编程、仿真、ERP、厂情中枢, 'Design, CNC, simulation, ERP, command center']
+    points:
+      - {text: [设计发布、数控编程、仿真分析, 'Design release, CNC programming, simulation']}
+      - {text: [缝纫机、凸轮、轴承行业软件, 'Industry software: sewing machines, cams, bearings']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>同一套平台，企业也能用：设计发布、数控编程、仿真分析、ERP、厂情中枢，', '>还有缝纫机、凸轮、轴承三个行业软件。']
+    en: ['>The same platform serves companies: design release, CNC programming, simulation, ERP and a factory command center,', '>plus industry software for sewing machines, cams and bearings.']
+- id: s07
+  kind: page
+  page: 7
+  part: [企业, For companies]
+  slide:
+    img: sol
+    url: wenquestrobotics.com/solutions/sewing
+    kick: [行业方案, Industry solutions]
+    title: [缝纫机企业解决方案, The sewing-machine solution]
+    points:
+      - {text: [设计软件、信息化、AI，一条线、一套数据, 'Design software, systems and AI on one data thread']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>比如缝纫机企业，从设计到售后，一条线、一套数据。']
+    en: ['>For a sewing-machine maker, for example, it is one line and one set of data from design to after-sales.']
+- id: s08
+  kind: page
+  page: 8
+  part: [评价, Assessment]
+  slide:
+    img: xq
+    url: wenquestrobotics.com/xq
+    kick: [第三块, Part three]
+    title: [评价：每一步都留下证据, 'Assessment: every step leaves evidence']
+    points:
+      - {text: [自动生成课程目标达成报告, Course-objective reports generated automatically]}
+      - {text: [校情中枢服务审核评估和专业认证, The Campus Hub serves audits and accreditation], zoom: [1.5, 28, 22]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>第三块是评价：每一步学习都留下证据，自动生成课程目标达成报告；', '>校情中枢把全校汇总起来，服务审核评估和专业认证。']
+    en: ['>Third, assessment: every learning step leaves evidence, and course-objective reports are generated automatically.', '>The Campus Hub rolls it all up for audits and accreditation.']
+- id: s09
+  kind: page
+  page: 9
+  part: [结尾, Outro]
+  slide: {layout: end, img: atlas, title: [每一样都能直接点开, Open every one of them],
+          sub: [首页“问渠全貌”, The overview on our homepage], link: [欢迎来试, wenquestrobotics.com]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>这些都能在首页“问渠全貌”里直接点开。欢迎来试。']
+    en: ['>You can open every one of them from the overview on our homepage. Come and try it.']

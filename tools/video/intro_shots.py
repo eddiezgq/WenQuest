@@ -90,7 +90,7 @@ def main(d: str):
                         shutil.copy(out / f"{c['name']}-zh.jpg", dst)
                     else:
                         hub_shot(b, c, dst)
-                        print(dst.relative_to(ROOT))
+                        print(dst)
                     continue
                 if "file" in c:
                     src = ROOT / (c.get(f"file_{lang}") or c["file"])
@@ -111,7 +111,7 @@ def main(d: str):
                                [c["scroll"], int(c.get("offset", 16))])
                 p.wait_for_timeout(int(c.get("wait", 700)))
                 p.screenshot(path=str(dst), type="jpeg", quality=88)
-                print(dst.relative_to(ROOT))
+                print(dst)
             ctx.close()
         b.close()
 
