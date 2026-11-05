@@ -109,8 +109,12 @@ def atlas(cat, vals):
                 dz, de = dz.replace(a, b), de.replace(a, b)
             ext = it["url"].startswith("http")
             lock = (f'<span class="lock">{T("需登录", "Sign-in")}</span>' if it.get("login") else "")
-            cards.append(f'<a class="ac" href="{it["url"]}"{" rel=noopener" if ext else ""}><b>{T(it["zh"], it["en"])}{lock}</b>'
-                         f'<span>{T(dz, de)}</span></a>')
+            card = (f'<a class="ac" href="{it["url"]}"{" rel=noopener" if ext else ""}><b>{T(it["zh"], it["en"])}{lock}</b>'
+                    f'<span>{T(dz, de)}</span></a>')
+            yt = ((cat.get("intro") or {}).get(it.get("intro") or "") or {}).get("yt")
+            if yt:                                   # 第 86 轮：有视频简介的卡加“▶ 视频”（英文版，YouTube）
+                card = f'<div class="acw">{card}<button type="button" class="vb" data-yt="{yt}">▶ {T("视频", "Video")}</button></div>'
+            cards.append(card)
         cols.append(f'<div class="ag{" wide" if g.get("wide") else ""}" id="atlas-{g["key"]}"><h3><span class="n">{k:02d}</span>{T(g["zh"], g["en"])}</h3>'
                     f'<div class="acs">{"".join(cards)}</div></div>')
     if problems:
@@ -139,6 +143,9 @@ def main():
     }
     cat = yaml.safe_load((HERE / "catalog.yaml").read_text(encoding="utf-8"))
     vals["__ATLAS__"] = atlas(cat, {k: vals[k] for k in ("__LAB__", "__FLAB__")})
+    top = ((cat.get("intro") or {}).get("overview") or {}).get("yt")   # 第 86 轮：总图上方“▶ 两分钟看懂问渠”
+    vals["__INTRO__"] = (f'<p class="aintro"><button type="button" class="vb big" data-yt="{top}">▶ {T("两分钟看懂问渠", "WenQuest in two minutes")}</button></p>'
+                         if top else "")
     vals["__VCFG__"] = video_cfg(cat)
     for k, v in vals.items():
         tpl = tpl.replace(k, v)
