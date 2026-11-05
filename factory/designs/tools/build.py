@@ -191,10 +191,10 @@ def exports():
                                              (r"(?m)^;.*[Dd]ate.*\n", ""), (r"(?m)^G04 .*[Dd]ate.*\n", ""), (r"%TF.CreationDate[^%]*%\*?%?\n?", ""),
                                              (r'"CreationDate": "[^"]*"', '"CreationDate": "{}T00:00:00"'.format(DATE))])
     buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as z:   # 不压缩：各版本 zlib 压出来的字节不同
         for fn in sorted(os.listdir(gdir)):
             zi = zipfile.ZipInfo(fn, date_time=(2026, 11, 5, 0, 0, 0))
-            zi.compress_type = zipfile.ZIP_DEFLATED
+            zi.compress_type = zipfile.ZIP_STORED
             with open(os.path.join(gdir, fn), "rb") as f:
                 z.writestr(zi, f.read())
     with open(os.path.join(OUT, "gerber.zip"), "wb") as f:
@@ -211,11 +211,11 @@ def exports():
     bom(os.path.join(OUT, "bom.csv"))
     # KiCad 工程打包下载
     buf = io.BytesIO()
-    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as z:   # 不压缩：各版本 zlib 压出来的字节不同
         for fn in sorted(os.listdir(KDIR)):
             if fn.endswith((".kicad_sch", ".kicad_pcb", ".kicad_pro")):
                 zi = zipfile.ZipInfo("drv-joint/" + fn, date_time=(2026, 11, 5, 0, 0, 0))
-                zi.compress_type = zipfile.ZIP_DEFLATED
+                zi.compress_type = zipfile.ZIP_STORED
                 with open(os.path.join(KDIR, fn), "rb") as f:
                     z.writestr(zi, f.read())
     with open(os.path.join(OUT, "kicad-project.zip"), "wb") as f:
