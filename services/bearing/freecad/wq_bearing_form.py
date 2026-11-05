@@ -53,6 +53,17 @@ def _case_label(c):
     return (lab.get("zh") or lab.get("en") or "") if isinstance(lab, dict) else (lab or "")
 
 
+ONLINE_HELP = "https://wenquestrobotics.com/bearing/help/freecad/"
+
+
+def help_url() -> str:
+    """The offline help that comes with the workbench (bearing-help/), or the online copy."""
+    from pathlib import Path
+
+    local = Path(__file__).resolve().parent / "bearing-help" / "index.html"
+    return local.as_uri() if local.is_file() else ONLINE_HELP
+
+
 class Form(QtWidgets.QWidget):
     """参数表单 + 校核结果。self.project 始终是网页版同样格式的项目。"""
 
@@ -76,6 +87,7 @@ class Form(QtWidgets.QWidget):
             ("model", "建模"),
             ("draw", "出图与 STEP"),
             ("sketch", "工序简图"),
+            ("help", "帮助"),
         ):
             b = QtWidgets.QPushButton(text)
             bar.addWidget(b)
@@ -111,9 +123,16 @@ class Form(QtWidgets.QWidget):
         self.buttons["model"].clicked.connect(self.model)
         self.buttons["draw"].clicked.connect(self.draw)
         self.buttons["sketch"].clicked.connect(self.sketch)
+        self.buttons["help"].clicked.connect(self.help)
         self.rebuild()
 
     # ------------------------------------------------------------------ the form
+    def help(self):
+        """The FreeCAD help (round 90): the offline copy beside this module, else the online one."""
+        import webbrowser
+
+        webbrowser.open(help_url())
+
     def rebuild(self):
         self.title.setText(FL.normalise(self.project)["title"].get("zh") or "")
         box = QtWidgets.QWidget()

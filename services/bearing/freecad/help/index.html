@@ -1,0 +1,1045 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>问渠轴承 · FreeCAD 工作台帮助</title>
+<style>
+:root{
+  --bg:#f6f4ef;--paper:#fffdf8;--ink:#1d2329;--muted:#5f6b76;--line:#e3ddd2;--soft:#f0ece4;
+  --accent:#1d4e75;--accent2:#c2410c;--gold:#b7791f;--ok:#1e8449;--bad:#b42318;--warn:#b7791f;
+  --side:#10181f;--side-ink:#d9e2e8;--side-muted:#8c9aa6;--side-hi:#f2b705;--code:#0f1720;--code-ink:#e6edf3;
+  --font:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Source Han Sans SC",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0d1216;--paper:#141b21;--ink:#e3e9ee;--muted:#9aa7b2;--line:#25313b;--soft:#1a232b;
+  --accent:#6fb3e6;--accent2:#f08c58;--gold:#e8b04b;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--code:#0a0f13}}
+:root[data-theme="dark"]{--bg:#0d1216;--paper:#141b21;--ink:#e3e9ee;--muted:#9aa7b2;--line:#25313b;--soft:#1a232b;
+  --accent:#6fb3e6;--accent2:#f08c58;--gold:#e8b04b;--ok:#5fd08a;--bad:#ff7b6b;--warn:#e8b04b;--code:#0a0f13}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:12px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 var(--font)}
+a{color:var(--accent)}
+aside{position:fixed;inset:0 auto 0 0;width:286px;background:var(--side);color:var(--side-ink);overflow:auto;padding:20px 0 40px;z-index:20}
+aside .brand{padding:0 22px 14px;border-bottom:1px solid #22303a;margin-bottom:8px}
+aside .brand b{display:block;font-size:18px;letter-spacing:.03em}
+aside .brand small{color:var(--side-muted);font-size:12.5px}
+aside .find{margin:6px 18px 8px;width:calc(100% - 36px);background:#1b2a34;border:1px solid #2c3d49;color:var(--side-ink);border-radius:8px;padding:7px 10px;font:14px var(--font)}
+aside nav a{display:flex;gap:10px;align-items:baseline;padding:5px 22px;color:var(--side-ink);text-decoration:none;font-size:14.5px;border-left:3px solid transparent}
+aside nav a .n{font:12px var(--mono);color:var(--side-muted);min-width:22px}
+aside nav a:hover{background:#18242d}
+aside nav a.on{border-left-color:var(--side-hi);background:#1b2a34;color:#fff}
+aside nav a.sub{padding-left:54px;font-size:13px;color:var(--side-muted);display:none}
+aside nav a.sub.show{display:flex}
+aside nav a.sub.on{color:#fff;background:transparent}
+aside nav a.hide{display:none}
+aside .tools{padding:14px 22px 0;display:flex;gap:8px;flex-wrap:wrap}
+aside .tools a,aside .tools button{background:#1b2a34;color:var(--side-ink);border:1px solid #2c3d49;border-radius:6px;padding:4px 10px;font:13px var(--font);cursor:pointer;text-decoration:none}
+main{margin-left:286px;padding:0 0 120px;overflow-x:hidden}
+.hamb{display:none;position:fixed;top:10px;left:10px;z-index:30;background:var(--side);color:#fff;border:0;border-radius:8px;padding:8px 12px;font:14px var(--font)}
+@media (max-width:980px){aside{transform:translateX(-100%);transition:transform .25s;box-shadow:0 0 40px rgba(0,0,0,.4)}aside.open{transform:none}main{margin-left:0}.hamb{display:block}}
+section{max-width:940px;margin:0 auto;padding:54px 32px 8px}
+@media (max-width:600px){section{padding:50px 16px 8px}}
+h1{font-size:38px;line-height:1.2;margin:0 0 10px}
+h2{font-size:28px;line-height:1.3;margin:0 0 6px;display:flex;gap:14px;align-items:baseline}
+h2 .n{font:600 15px var(--mono);color:var(--accent2)}
+h3{font-size:20px;margin:30px 0 8px}
+h4{font-size:16.5px;margin:20px 0 6px}
+.lead{color:var(--muted);font-size:17px;margin:0 0 18px}
+p{margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:14.5px;margin:10px 0;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:600;white-space:nowrap}
+code{font:13.5px var(--mono);background:var(--soft);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+pre{position:relative;background:var(--code);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow:auto;font:13.5px/1.6 var(--mono);margin:12px 0}
+pre code{background:none;padding:0;color:inherit}
+pre button.cp{position:absolute;top:8px;right:8px;background:#22303a;color:#d9e2e8;border:1px solid #33444f;border-radius:6px;padding:3px 9px;font:12px var(--font);cursor:pointer}
+pre button.cp.done{background:var(--ok);color:#fff}
+blockquote{border-left:4px solid var(--accent);background:var(--soft);padding:10px 16px;border-radius:0 8px 8px 0;margin:14px 0}
+blockquote p{margin:4px 0}
+.hero{background:linear-gradient(135deg,#10181f,#173048);color:#eef3f6;border-radius:0 0 22px 22px;padding:52px 32px 40px;max-width:none}
+.hero .wrap{max-width:880px;margin:0 auto}
+.hero .kick{font:600 13px var(--mono);letter-spacing:.12em;color:#f2b705}
+.hero p{color:#b8c6d0}
+.hero h1{color:#fff}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.facts div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px}
+.facts b{display:block;font-size:24px;color:#fff}
+.facts span{font-size:13px;color:#a9b8c3}
+@media (max-width:760px){.facts{grid-template-columns:1fr 1fr}}
+.try{display:inline-block;margin:6px 8px 6px 0;padding:6px 14px;border-radius:999px;background:var(--accent);color:#fff;text-decoration:none;font-size:14px}
+p.start{background:var(--soft);border-left:4px solid var(--accent);padding:10px 14px;border-radius:8px}
+.try:hover{filter:brightness(1.1)}
+figure{margin:16px 0}
+figure.vid video{width:100%;border-radius:10px;background:#000;display:block}
+figure figcaption{font-size:13.5px;color:var(--muted);margin-top:6px}
+figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);display:block}
+.anim,.calc{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;margin:16px 0}
+.anim canvas,.calc canvas{width:100%;display:block}
+.anim .bar,.calc .bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;margin-top:8px}
+.anim .bar button,.calc .bar button,.calc button{background:var(--soft);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:4px 11px;font:13.5px var(--font);cursor:pointer}
+.anim .bar button.on,.calc .bar button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.anim .cap,.calc .cap{font-size:13.5px;color:var(--muted);margin-top:6px}
+.anim input[type=range],.calc input[type=range]{flex:1;min-width:140px;accent-color:var(--accent)}
+.calc .row{display:grid;grid-template-columns:150px 1fr 90px;gap:10px;align-items:center;font-size:14px;margin:4px 0}
+@media (max-width:600px){.calc .row{grid-template-columns:110px 1fr 70px}}
+.lamp{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:7px;vertical-align:middle;background:var(--ok)}
+.lamp.warn{background:var(--warn)}.lamp.bad{background:var(--bad)}
+.checks{columns:2;column-gap:20px;font-size:13.5px;margin-top:8px}
+@media (max-width:700px){.checks{columns:1}}
+.checks div{break-inside:avoid;padding:2px 0}
+.sum{font-weight:600;padding:6px 10px;border-radius:8px;margin-top:8px}
+.sum.ok{background:rgba(30,132,73,.12);color:var(--ok)}.sum.bad{background:rgba(180,35,24,.12);color:var(--bad)}.sum.warn{background:rgba(183,121,31,.14);color:var(--warn)}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps>li{counter-increment:s;position:relative;padding:4px 0 4px 44px;margin:8px 0}
+.steps>li::before{content:counter(s);position:absolute;left:0;top:4px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font:700 14px var(--mono)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.tag{display:inline-block;font:600 12px/1 var(--mono);padding:4px 7px;border-radius:4px;background:var(--soft);color:var(--muted);vertical-align:middle}
+.top-other{font-size:13px}
+@media print{aside,.hamb,.try,.anim .bar,.calc{display:none}main{margin:0}section{padding:20px 0;break-inside:avoid-page}figure.vid{display:none}}
+</style>
+</head>
+<body>
+<button class="hamb" onclick="document.querySelector('aside').classList.toggle('open')">☰ 目录</button>
+<aside>
+  <div class="brand"><b>问渠轴承</b><small>FreeCAD 版帮助</small></div>
+  <input class="find" placeholder="搜索帮助…" oninput="findIn(this.value)">
+  <nav><a href="#intro" data-s="intro"><span class="n">00</span>这是什么</a>
+<a href="#install" data-s="install"><span class="n">01</span>安装</a>
+<a href="#use" data-s="use"><span class="n">02</span>使用</a>
+<a href="#cases" data-s="cases"><span class="n">03</span>典型案例</a>
+<a href="#case-dg" data-s="case-dg"><span class="n">04</span>案例一：减速器深沟球轴承，从设计到工艺</a>
+<a class="sub" href="#case-dg-1" data-s="case-dg">问题</a>
+<a class="sub" href="#case-dg-2" data-s="case-dg">第一步：校核</a>
+<a class="sub" href="#case-dg-3" data-s="case-dg">第二步：游隙链</a>
+<a class="sub" href="#case-dg-4" data-s="case-dg">第三步：载荷再大三成会怎样</a>
+<a class="sub" href="#case-dg-5" data-s="case-dg">第四步：游隙公差定多宽（游隙尺寸链）</a>
+<a class="sub" href="#case-dg-6" data-s="case-dg">第五步：合套选配</a>
+<a class="sub" href="#case-dg-7" data-s="case-dg">第六步：工艺留量</a>
+<a href="#case-taper" data-s="case-taper"><span class="n">05</span>案例二：减速器圆锥成对，冷态调的游隙热了还剩多少</a>
+<a class="sub" href="#case-taper-1" data-s="case-taper">问题</a>
+<a class="sub" href="#case-taper-2" data-s="case-taper">软件怎么算</a>
+<a class="sub" href="#case-taper-3" data-s="case-taper">改成背对背会怎样</a>
+<a class="sub" href="#case-taper-4" data-s="case-taper">结论</a>
+<a href="#case-thin" data-s="case-thin"><span class="n">06</span>案例三：机器人腕关节四点接触薄壁轴承，预紧给多少</a>
+<a class="sub" href="#case-thin-1" data-s="case-thin">问题</a>
+<a class="sub" href="#case-thin-2" data-s="case-thin">四点接触怎么承载</a>
+<a class="sub" href="#case-thin-3" data-s="case-thin">三种预紧对比</a>
+<a class="sub" href="#case-thin-4" data-s="case-thin">要注意的</a>
+<a href="#console" data-s="console"><span class="n">07</span>不开界面：控制台命令</a>
+<a href="#types" data-s="types"><span class="n">08</span>各类轴承怎么算</a>
+<a class="sub" href="#types-1" data-s="types">深沟球与角接触球轴承</a>
+<a class="sub" href="#types-2" data-s="types">圆柱滚子轴承</a>
+<a class="sub" href="#types-3" data-s="types">圆锥滚子轴承：单列、成对与温度</a>
+<a class="sub" href="#types-4" data-s="types">谐波减速器柔性轴承</a>
+<a class="sub" href="#types-5" data-s="types">交叉滚子轴承</a>
+<a class="sub" href="#types-6" data-s="types">薄壁轴承：四点接触、角接触、深沟</a>
+<a href="#mfg" data-s="mfg"><span class="n">09</span>制造：合套、尺寸链、检测、零件图与工艺</a>
+<a class="sub" href="#mfg-1" data-s="mfg">合套选配</a>
+<a class="sub" href="#mfg-2" data-s="mfg">游隙尺寸链</a>
+<a class="sub" href="#mfg-3" data-s="mfg">检测与 SPC</a>
+<a class="sub" href="#mfg-4" data-s="mfg">零件图与三维</a>
+<a class="sub" href="#mfg-5" data-s="mfg">工艺路线与工序卡</a>
+<a href="#kernel" data-s="kernel"><span class="n">10</span>内核：开源软件与参考专著</a>
+<a class="sub" href="#kernel-1" data-s="kernel">用到的开源软件</a>
+<a class="sub" href="#kernel-2" data-s="kernel">参考专著</a>
+<a class="sub" href="#kernel-3" data-s="kernel">我们自己做的</a>
+<a href="#arch" data-s="arch"><span class="n">11</span>系统设计</a>
+<a href="#limits" data-s="limits"><span class="n">12</span>标准、简化与限制</a>
+<a class="sub" href="#limits-1" data-s="limits">等标准正文的</a>
+<a class="sub" href="#limits-2" data-s="limits">计算里的简化</a>
+<a class="sub" href="#limits-3" data-s="limits">还没做的</a>
+<a href="#faq" data-s="faq"><span class="n">13</span>常见问题</a></nav>
+  <div class="tools">
+    <a href="https://wenquestrobotics.com/bearing/help/index.html" class="top-other">看网页版帮助</a>
+    <button onclick="toggleTheme()">◐ 深浅色</button>
+    <button onclick="window.print()">打印</button>
+  </div>
+</aside>
+<main>
+<section id="intro"><h2><span class="n">00</span>这是什么</h2><p class="lead">“问渠 → 轴承”工作台：在 FreeCAD 里校核轴承、建精确实体、出工作图和工序简图，和网页版同一个计算核心。</p><p>FreeCAD 是开源的参数化三维 CAD。问渠轴承工作台把网页版的计算核心装进 FreeCAD：右边一张参数表单，字段和网页版一样；点“计算”出校核，点“建模”把内圈、外圈、全部滚动体回转成精确实体并检查干涉，再出 STEP、A3 工作图和工序简图。计算全在本机，不联网、不调 AI。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>FreeCAD 工作台（本帮助）</th>
+<th>网页版</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>在哪用</td>
+<td>本机 FreeCAD 1.1</td>
+<td>浏览器</td>
+</tr>
+<tr>
+<td>适合</td>
+<td>精确实体、工作图、工序简图、在 CAD 里接着设计</td>
+<td>方案比较、合套选配、检测 SPC、工艺编制、云端项目、AI</td>
+</tr>
+<tr>
+<td>结果</td>
+<td>同一个项目文件，两边结果逐项相同</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="start"><strong>第一次用？</strong> 先装好工作台（下一节），再打开<a href="#cases">典型案例</a>里任意一个示例项目。</p></section>
+<section id="install"><h2><span class="n">01</span>安装</h2><p class="lead">下载一个压缩包，复制一个文件夹，重启 FreeCAD。</p><ol class="steps">
+<li>安装 FreeCAD 1.1（官网 freecad.org）。它自带 numpy 和 scipy（1.9 以上），工作台不用另装别的。</li>
+<li>网页版“零件图与三维”里点 <b>下载 FreeCAD 工作台</b>，或直接打开 <code>https://learn.wenquestrobotics.com/bearing/api/freecad.zip</code>。</li>
+<li>把压缩包里的 <code>Mod/WenQuest</code> 文件夹复制到 FreeCAD 的用户 Mod 目录（压缩包里的“使用说明.txt”写了 Windows、macOS、Linux 各在哪）。已经装过问渠凸轮或数字工厂的，解压到同一个 WenQuest 文件夹，各自的按钮都在。</li>
+<li>重启 FreeCAD，工作台列表里选 <b>问渠</b>，工具栏上点 <b>轴承</b>。</li>
+</ol>
+
+<p>压缩包里还有示例项目（<code>examples/*.wqbearing.json</code>）和本帮助的离线一份。缺依赖时点“轴承”会提示安装命令。</p></section>
+<section id="use"><h2><span class="n">02</span>使用</h2><p class="lead">打开项目 → 计算 → 建模 → 出图与 STEP → 工序简图。</p><ol class="steps">
+<li><b>打开项目</b>：选网页版存的 <code>.wqbearing.json</code> 或压缩包里的示例；也可以在表单里从头填。表单的字段、什么时候显示哪些字段，和网页版一样。</li>
+<li><b>计算</b>：右边列出校核结果，和网页版逐项相同。</li>
+<li><b>建模</b>：内圈、外圈、全部滚动体按同一剖面回转成精确实体，按节圆排好，并检查滚动体和套圈有没有干涉，结果写在表单下方。谐波柔性轴承旁边还会画出装配变形。</li>
+<li><b>出图与 STEP</b>：内圈、外圈、单个滚动体、整套的 STEP；每个零件一张 A3 工作图（SVG，浏览器打开可打印成 PDF）。公差、倒角、粗糙度在企业填写前写“未知”或留空，图上不编数。</li>
+<li><b>工序简图</b>：选网页版“工艺”页存的模板（<code>.wqprocess.json</code>），每道磨削、超精出一张简图，加工面加粗标红，标出工序尺寸和留量。</li>
+<li><b>保存项目</b>：存的文件网页版也能打开。<b>产品库</b>：打开网页版下载的 <code>.wqcatalog.json</code>，选型号填外形尺寸。</li>
+</ol>
+
+<p>合套选配、检测 SPC 是车间数据处理，留在网页版。</p></section>
+<section id="cases"><h2><span class="n">03</span>典型案例</h2><p class="lead">三个从实际问题出发的案例，每个数都是软件当场算的；示例轴承都是虚构的，不是任何厂家或标准中的型号。</p><table>
+<thead>
+<tr>
+<th>案例</th>
+<th>问题</th>
+<th>用到</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#case-dg">一、减速器深沟球轴承：从设计到工艺</a></td>
+<td>一个深沟球轴承够不够？游隙公差定多宽？工艺留量够不够？</td>
+<td>设计校核、游隙链、游隙尺寸链、合套选配、工艺</td>
+</tr>
+<tr>
+<td><a href="#case-taper">二、减速器圆锥成对：冷态调的游隙，热了还剩多少</a></td>
+<td>装配时调 +20 µm，开机后轴热了，会不会变成预紧？</td>
+<td>圆锥成对、配合与温度、调整量曲线</td>
+</tr>
+<tr>
+<td><a href="#case-thin">三、机器人腕关节四点接触薄壁轴承：预紧给多少</a></td>
+<td>一个轴承同时扛径向力、轴向力和倾覆力矩，预紧多少才不脱开？</td>
+<td>薄壁轴承、预紧量曲线、刚度</td>
+</tr>
+</tbody>
+</table>
+<p>每个案例的数都由 <code>docs/帮助/轴承软件帮助/build.py</code> 生成帮助时调计算核心重算；改了计算核心，重新生成，帮助里的数跟着变。</p></section>
+<section id="case-dg"><h2><span class="n">04</span>案例一：减速器深沟球轴承，从设计到工艺</h2><p class="lead">一个轴承从“够不够”一直做到“游隙公差定多宽、工艺留量够不够”。</p><h3 id="case-dg-1">问题</h3>
+<p>减速器输入轴上的深沟球轴承（示例，虚构）：内径 30.0 mm、外径 58.0 mm、宽 16.0 mm，10 个 8.5 mm 钢球，内外沟曲率系数 0.515、0.525；径向力 2500 N、轴向力 400 N、3000 r/min；轴过盈配合，内圈比外圈热。</p>
+<h3 id="case-dg-2">第一步：校核</h3>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-deep-groove" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
+<p>软件给出 19 项校核。几项关键的：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>最重的钢球</td>
+<td>1106 N，5 个钢球受载</td>
+</tr>
+<tr>
+<td>内圈 / 外圈最大接触应力</td>
+<td>2372 / 2207 MPa（示例许用 2500 MPa）</td>
+</tr>
+<tr>
+<td>接触椭圆端点角 / 挡肩角</td>
+<td>27.8° / 53.9°，不越过挡肩</td>
+</tr>
+<tr>
+<td>油膜厚度比 λ</td>
+<td>1.94</td>
+</tr>
+</tbody>
+</table>
+<p>为什么是“未知”而不是“合格”：疲劳：内圈最大接触应力（各工况 × 载荷系数 fp）、疲劳：外圈最大接触应力（各工况 × 载荷系数 fp）、基本额定动载荷 C 与寿命 L10、基本额定静载荷 C0 与静安全系数——疲劳一项要载荷系数 fp 和疲劳许用值，示例没填；额定载荷和寿命等标准正文录入。</p>
+<h3 id="case-dg-3">第二步：游隙链</h3>
+<p>初始径向游隙 15.0 µm，轴的过盈让内圈胀大、吃掉 10.1 µm，内外圈温差又让游隙变化 1.8 µm，<strong>工作游隙 6.6 µm</strong>。载荷分布按工作游隙算——这就是为什么配合和温度要填：同一个轴承，工作游隙小了，受载钢球更多，最重钢球的载荷更小。</p>
+<h3 id="case-dg-4">第三步：载荷再大三成会怎样</h3>
+<p>把径向力从 2500 N 改成 3250 N：最先变红的是 <strong>静强度：内圈最大接触应力</strong>（2599 MPa，超过示例许用值）。改法方向：加大钢球、减小沟曲率系数（沟道更贴合）、或者选大一号的轴承。</p>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-deep-groove&amp;set=%7B%22loads.Fr%22%3A3250%7D" target="_blank" rel="noopener">▶ 试一试：径向力改成 3250 N，看哪一项变红</a>
+<div class="calc" data-calc="loads"></div>
+<h3 id="case-dg-5">第四步：游隙公差定多宽（游隙尺寸链）</h3>
+<p>顶部 <strong>合套选配 → 游隙尺寸链</strong>，点“从设计取名义尺寸”“用示例偏差试一试”（示例偏差：沟底直径 ±4 µm、钢球 ±0.5 µm、沟曲率半径 ±10 µm，都是虚构的）。名义游隙 15.0 µm，三种算法：</p>
+<table>
+<thead>
+<tr>
+<th>算法</th>
+<th>径向游隙范围 µm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>极值法（最坏组合）</td>
+<td>6.0 – 24.0</td>
+</tr>
+<tr>
+<td>统计法（±3σ）</td>
+<td>9.3 – 20.7</td>
+</tr>
+<tr>
+<td>蒙特卡洛（10 万次，0.135%–99.865%）</td>
+<td>9.3 – 20.7</td>
+</tr>
+</tbody>
+</table>
+<p>要求游隙 10–24 µm 时，蒙特卡洛给出 0.45% 落在范围外。外圈沟径占游隙方差的 48%，钢球只占 3%——先卡紧沟径，比挑钢球有用。沟曲率半径不影响径向游隙，但让自由接触角在 7.4° – 15.7° 之间变。</p>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-deep-groove&amp;mode=assembly" target="_blank" rel="noopener">▶ 试一试：打开游隙尺寸链</a>
+<div class="calc" data-calc="tolmc"></div>
+<h3 id="case-dg-6">第五步：合套选配</h3>
+<p>“合套选配”页点“用合成数据试一试”（按这个设计随机生成 100 套内外圈和三组钢球，标明是合成数据），要求游隙 10–24 µm：</p>
+<ul>
+<li><strong>逐件配对</strong>：配成 100 套；</li>
+<li><strong>分组配套</strong>（多数厂现在的做法）：配成 94 套。</li>
+</ul>
+<p>差别来自分组看不到件在组内的位置；逐件配对按实测值一件一件配，先保证套数最多，再让游隙靠近目标。</p>
+<h3 id="case-dg-7">第六步：工艺留量</h3>
+<p>顶部 <strong>工艺</strong>，打开示例模板（数都是虚构的）。软件倒推每道工序的工序尺寸和最小留量，示例里有 1 项不合格：外圈挡边内径：末道工序公差在成品公差内——只车不磨的面，车削公差加热处理波动超出了成品公差。改法：这个面加一道磨削，或收紧车削公差。</p>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-deep-groove&amp;mode=process" target="_blank" rel="noopener">▶ 试一试：打开工艺页</a></section>
+<section id="case-taper"><h2><span class="n">05</span>案例二：减速器圆锥成对，冷态调的游隙热了还剩多少</h2><p class="lead">装配时调好 +20 µm，开机后轴比座热——面对面安装会把游隙吃成预紧。</p><h3 id="case-taper-1">问题</h3>
+<p>减速器中间轴两端各一个圆锥滚子轴承（示例，虚构），<strong>面对面</strong>安装，跨距 160 mm，装配时在 20 °C 调轴向游隙 +20.0 µm。工作时内圈 50 °C、外圈 45 °C、轴 50 °C、铸铁座 40 °C（示例值）。</p>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=scene-tapered-pair" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
+<h3 id="case-taper-2">软件怎么算</h3>
+<p>工作时的轴向游隙 = 调整值 + 三项：</p>
+<ol>
+<li>配合（只在“装前调好”时计）：内圈滚道胀大、外圈滚道缩小，按接触角换成轴向；本例是装好后调，这项为 0。</li>
+<li>内外圈温差：内圈比外圈热，滚道直径差变小，本例 <strong>-13.3 µm</strong>。</li>
+<li>轴与轴承座的轴向伸长之差 × 两列距离：面对面时轴伸长使游隙变小，本例 <strong>-21.6 µm</strong>。</li>
+</ol>
+<p>合计：<strong>工作时 -14.9 µm</strong>——冷态的 +20.0 µm 游隙，热了变成预紧，每列约 810 N。各工况、两列载荷和刚度都按这个工作游隙算。</p>
+<div class="calc" data-calc="taperheat"></div>
+<h3 id="case-taper-3">改成背对背会怎样</h3>
+<p>同样的轴和温度，改成<strong>背对背</strong>：轴向伸长反过来使游隙变大，和内外圈温差的影响部分抵消，工作时 <strong>+28.3 µm</strong>。两列距离等于外圈滚道锥顶重合的距离（本例 232 mm）时，同一种钢、轴与内圈同温、座与外圈同温，两项正好抵消——这是轴承厂样本里“锥顶重合”说法的来由，软件把这个距离写在校核说明里。</p>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=scene-tapered-pair&amp;set=%7B%22pair.arrangement%22%3A%22DB%22%7D" target="_blank" rel="noopener">▶ 试一试：改成背对背</a>
+<h3 id="case-taper-4">结论</h3>
+<p>面对面装、轴比座热时，想让热态还留 +20 µm，冷态大约要调 +54.9 µm。软件不替你选：调整量曲线把接触应力、刚度、受载滚子数随调整值的变化都画出来，按企业自己的判据定。线膨胀系数按实际材料填，软件不假定；只填了一部分时，工作游隙为“未知”。</p></section>
+<section id="case-thin"><h2><span class="n">06</span>案例三：机器人腕关节四点接触薄壁轴承，预紧给多少</h2><p class="lead">一个轴承同时扛径向力、轴向力和倾覆力矩；预紧小了钢球脱开、刚度掉，大了接触应力和摩擦上去。</p><h3 id="case-thin-1">问题</h3>
+<p>机器人腕关节只用一个四点接触薄壁轴承（示例，虚构）：内径 100 mm、外径 116 mm、宽 8 mm，56 个 5 mm 钢球，接触角 30°。载荷：径向 600 N、轴向 300 N、倾覆力矩 72 N·m。</p>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-thin-x" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
+<h3 id="case-thin-2">四点接触怎么承载</h3>
+<p>每个沟道由两段圆弧组成（桃形沟），钢球最多四个接触点，分成两条对角线：一条扛这个方向的轴向力，另一条扛反方向的。倾覆力矩让一边的钢球压紧一条对角线、对边压紧另一条。软件把钢球当作自由体，和内圈的五个位移一起解，所以一个钢球可以两条对角线同时受载。</p>
+<div class="calc" data-calc="gothic"></div>
+<h3 id="case-thin-3">三种预紧对比</h3>
+<table>
+<thead>
+<tr>
+<th>径向游隙</th>
+<th>预紧不脱开（钢球 × 对角线）</th>
+<th>倾覆刚度 N·m/mrad</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>+10 µm（有游隙；空载轴向游隙约 17 µm）</td>
+<td>73/112</td>
+<td>610</td>
+</tr>
+<tr>
+<td>−4 µm（小预紧）</td>
+<td>85/112</td>
+<td>553</td>
+</tr>
+<tr>
+<td><strong>-12 µm（示例）</strong></td>
+<td><strong>112/112</strong>（预紧力 2093 N）</td>
+<td><strong>882</strong></td>
+</tr>
+</tbody>
+</table>
+<p>−4 µm 时有对角线在载荷下脱开，软件判“预紧不脱开”不合格；-12 µm 时全部保持接触，倾覆刚度也高得多。代价是接触应力：最大 1794 MPa。</p>
+<div class="anim" data-anim="preload"></div>
+<p>另外两项四点接触特有的：接触椭圆不能越过挡肩，也不能越过桃形沟中线（离中线还有 17.8°）——接触角太小、游隙太大时，接触会跑到两段圆弧相接的地方。</p>
+<h3 id="case-thin-4">要注意的</h3>
+<ul>
+<li>套圈按刚性算。薄壁套圈实际会变形，刚度比算出来的低、载荷分得更开；轴和座孔要足够刚，校核栏会提示。</li>
+<li>预紧在图上按零游隙画，实际靠装配时选大一档的钢球实现。</li>
+</ul></section>
+<section id="console"><h2><span class="n">07</span>不开界面：控制台命令</h2><p class="lead">在 FreeCAD 的 Python 控制台里一行跑完：计算、建模、出图、工序简图。</p><pre><code class="language-python">import wq_bearing
+wq_bearing.run_headless(&quot;项目.wqbearing.json&quot;, &quot;输出文件夹&quot;, &quot;工艺模板.wqprocess.json&quot;)
+</code></pre>
+<p>不要工序简图时去掉第三个参数。输出文件夹里有校核结果、各零件的 STEP 和 A3 工作图（SVG），有工艺模板时还有工序简图。批量处理一个系列：</p>
+<pre><code class="language-python">import glob, os, wq_bearing
+for f in glob.glob(&quot;系列/*.wqbearing.json&quot;):
+    wq_bearing.run_headless(f, os.path.join(&quot;输出&quot;, os.path.basename(f)[:-15]))
+</code></pre></section>
+<section id="types"><h2><span class="n">08</span>各类轴承怎么算</h2><p class="lead">每类轴承填什么、软件怎么算、多出哪些结果；方法都出自公开的专著，每个模块带标准题。</p><h3 id="types-1">深沟球与角接触球轴承</h3>
+<ul>
+<li>填：钢球直径、个数、节圆直径、沟曲率系数 f_i、f_o（0.5–0.6）、深沟球填初始径向游隙 P_d、角接触填接触角 α₀、挡肩高度（从沟底量起）。</li>
+<li>算：套圈刚性、静力学载荷分布（Harris &amp; Kotzalas 第 7 章，也是 ISO 16281 的基础）；赫兹点接触用椭圆积分精确解；接触椭圆端点角和挡肩角比较；Hamrock–Dowson 油膜厚度；保持架、外圈、内圈、钢球的故障特征频率。</li>
+<li>不填力矩时，按轴把内圈扶正计算，结果里给轴承作用在轴上的力矩；填了力矩，内圈自由倾斜到力矩平衡。</li>
+<li><strong>游隙链</strong>（深沟球）：初始 → 轴和座孔的过盈（厚壁圆筒）→ 内外圈温差 → 工作游隙，载荷分布按工作游隙算。</li>
+<li><strong>角接触高速</strong>：钢球离心力把它甩向外圈，外圈接触角变小、内圈变大，两个接触不再在一条线上；陀螺力矩按由摩擦平衡、不计入力平衡（计算书写明）。</li>
+<li><strong>角接触成对</strong>：背对背 DB、面对面 DF、串联 DT，填预紧力和两列中心距；两列一起解，给轴向、径向刚度，有钢球失去接触就判不合格（会打滑）。</li>
+</ul>
+<div class="calc" data-calc="loads"></div>
+<h3 id="types-2">圆柱滚子轴承</h3>
+<ul>
+<li>填：滚子直径、长度、有效接触长度、个数、径向游隙、滚子素线（直线、全长圆弧、中间直线两端圆弧、点表）、内外圈相对倾斜（角分）。</li>
+<li>算：切片法，有效长度分 41 片，每片按 Palmgren 线接触公式承载、按赫兹线接触算应力；中间画“最重滚子沿长度的接触应力”。</li>
+<li>端部切片有载荷就判不合格（切片法算不出端部应力集中，软件不给那个数，直接提示加大凸度或减小倾斜）；NU / N 型出现轴向力、力矩也判不合格。</li>
+</ul>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=scene-cylindrical" target="_blank" rel="noopener">▶ 试一试：减速器输出轴圆柱滚子轴承示例</a>
+<h3 id="types-3">圆锥滚子轴承：单列、成对与温度</h3>
+<ul>
+<li>单列：每个滚子受外圈、内圈、挡边三个力，按平衡求内圈接触力和挡边力；受径向力时必须有轴向力。填了滚子大端球基面半径，给挡边接触应力。外圈、内圈和滚子的锥顶要交在轴线上同一点，不一致判不合格并给出该填的内圈锥角。</li>
+<li>成对：背对背 DB 或面对面 DF，紧挨着成对或轴两端各一个；给轴向游隙（负数为预紧）或预紧力，两者互算。两列一起解，某一列可以部分或全部卸载；两列的轴向力按刚度和调整量算，不用手册的“派生轴向力 0.5F_r/Y”（那要厂家目录的 Y 值）。</li>
+<li>三个宽度：总宽 T、内圈宽 B、外圈宽 C；B、C 只影响零件图、三维、工艺和产品库，不影响计算。</li>
+<li><strong>配合与温度</strong>：游隙是装好后调还是装前调好、调整时温度、内外圈和轴、座的温度、三个线膨胀系数；软件算出工作时的轴向游隙，各工况按它算。见<a href="#case-taper">案例二</a>。</li>
+</ul>
+<div class="calc" data-calc="taperheat"></div>
+<h3 id="types-4">谐波减速器柔性轴承</h3>
+<ul>
+<li>内圈压在波发生器凸轮上跟着变形（余弦形、椭圆或给点，点按三角级数拟合到 24 阶），外圈按薄圆环受钢球力和啮合区载荷弯曲（闭式解）；钢球载荷在外圈力平衡下由余能最小求出。</li>
+<li>结果：装配变形（放大画）、内圈弯曲应力、外圈每转两次的交变应力幅和平均应力、接触应力。啮合区径向力由企业按减速器设计给，不填时只算装配变形。</li>
+</ul>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-flex" target="_blank" rel="noopener">▶ 试一试：谐波柔性轴承示例</a>
+<h3 id="types-5">交叉滚子轴承</h3>
+<ul>
+<li>V 形沟道里正反交替的圆柱滚子，一套轴承扛径向力、两个方向的轴向力和倾覆力矩。接触角按图纸填（软件不给默认值）。</li>
+<li>内圈五个位移一起解，滚子切片、Palmgren 线接触；刚度取柔度矩阵的逆。机器人关节水平轴、只用一个交叉滚子支承时，悬臂重力按力矩 W·x 计入。</li>
+<li>校核：接触应力、预紧不脱开、三向刚度、滚子端角不碰另一面（L_w ≤ D_w·tan α）、挡边之间有间隙、V 形沟顶点壁厚。</li>
+</ul>
+<a class="try" href="https://wenquestrobotics.com/bearing/?example=scene-crossed" target="_blank" rel="noopener">▶ 试一试：交叉滚子示例</a>
+<h3 id="types-6">薄壁轴承：四点接触、角接触、深沟</h3>
+<ul>
+<li>截面型式三选一。四点接触：两段圆弧组成的桃形沟，钢球最多四个接触点，填径向游隙或预紧力；角接触：单列或成对（DB、DF），填轴向游隙或预紧力；深沟：填径向游隙。</li>
+<li>一个通用模型管三种：钢球作为自由体（每个钢球在自己剖面里两个未知数），和内圈五个位移一起解；刚度取钢球落位后的缩减刚度矩阵。深沟型、角接触型和老的球轴承内核对照过，同样条件下每个钢球的载荷一致。</li>
+<li>多出的校核：四点接触的接触椭圆不越过桃形沟中线；单列角接触被反向推时判不合格（钢球压向低挡肩）。见<a href="#case-thin">案例三</a>。</li>
+</ul>
+<div class="calc" data-calc="gothic"></div></section>
+<section id="mfg"><h2><span class="n">09</span>制造：合套、尺寸链、检测、零件图与工艺</h2><p class="lead">轴承厂车间里的几件事：配套、定公差、看质量、出图、排工艺。数据都由企业自己填，软件不编默认值。</p><h3 id="mfg-1">合套选配</h3>
+<p>填每套钢球数 Z 和要求的径向游隙范围（µm），贴入实测数据（直接从表格复制）：内圈“编号, 沟道直径”，外圈“编号, 沟道直径”，钢球“组号, 直径, 数量”。游隙 P = 外圈沟径 − 内圈沟径 − 2 × 钢球直径。</p>
+<ul>
+<li><strong>逐件配对</strong>：一件一件配，先保证配成的套数最多，再让游隙靠近目标。钢球够用时用匈牙利算法求精确解；钢球不够时小批量用整数规划求精确解、大批量用近似解，结果注明“已证明最优”“已达上限”或“近似解”。</li>
+<li><strong>分组配套</strong>：现在多数厂的做法，内外圈按尺寸分组，每对组配一组钢球；看不到件在组内的位置，会配出超差的套，单独列出。</li>
+<li>结果：套数对比、游隙分布、钢球各组用量、配不上的件和原因、配套清单（CSV）。没有实测数据时点“用合成数据试一试”（标明合成）。</li>
+</ul>
+<h3 id="mfg-2">游隙尺寸链</h3>
+<p><strong>合套选配</strong> 页上方点 <strong>游隙尺寸链</strong>（球轴承）：由沟底直径、钢球直径、沟曲率半径（可选两沟位置）的名义尺寸和上下偏差，算径向游隙、自由接触角、轴向游隙、端面凸出量的范围。极值法、统计法（±3σ）、蒙特卡洛（默认 10 万次，固定随机种子，同一输入结果相同）三种并排；给各尺寸占游隙方差的比例，告诉你先卡紧哪个尺寸。偏差空着不当 0，会提示要填。</p>
+<div class="calc" data-calc="tolmc"></div>
+<h3 id="mfg-3">检测与 SPC</h3>
+<ul>
+<li><strong>圆度与波纹度</strong>：贴入圆度仪测的一圈沟道轮廓，去掉 1 阶偏心后按最小二乘圆给圆度，画 2–100 阶幅值；频段按企业标准填（软件不内置频段划分）。</li>
+<li><strong>控制图与过程能力</strong>：均值–极差、均值–标准差、单值–移动极差；控制图常数按正态分布数值计算，不抄表；Nelson 八条判异规则；填了规格限才算 Cp、Cpk、Pp、Ppk。</li>
+</ul>
+<h3 id="mfg-4">零件图与三维</h3>
+<ul>
+<li>内圈、外圈、滚动体各一张截面图，列出内外径、宽度、沟道圆弧、体积；尺寸公差在企业填写或标准录入前写“未知”。</li>
+<li>STEP：整套（滚动体按节圆排好）、内圈、外圈、单个滚动体；程序直接写出，用 OpenCASCADE 读回检查过：实体有效、体积与解析值一致、滚动体不与套圈重叠。DXF 截面可在 CAD 里接着画。</li>
+<li>只画设计里有数据的部分：倒角、退刀槽、保持架、挡边细节、凸度不画，图下有说明。</li>
+</ul>
+<h3 id="mfg-5">工艺路线与工序卡</h3>
+<ul>
+<li>按当前设计生成内圈、外圈的常用工序链：车削 → 热处理 → 磨端面 → 磨外径 → 磨沟道 →（内圈）磨内孔 → 超精 → 清洗 → 合套 → 检测；可增删、改名、移动，每道勾选加工的面。</li>
+<li>每道切削工序填公称留量、本道公差、需要的最小留量；热处理填尺寸变化、波动、变形；超精填去除量。软件倒推工序尺寸（入体标注）和毛坯尺寸，逐道校核最小留量。</li>
+<li>最小留量 = 公称留量 − 上道公差（含热处理波动）− 热处理变形（只算热处理后第一刀）− 装夹误差。</li>
+<li>钢球和滚子也有工序链（光球、软磨、热处理、硬磨、精研、分选；车削、热处理、磨端面、无心磨外径、超精、分选）。</li>
+<li>工序卡每道一页，可打印；模板可存文件、存云端，在同类轴承之间套用。示例模板的数都是虚构的。</li>
+</ul></section>
+<section id="kernel"><h2><span class="n">10</span>内核：开源软件与参考专著</h2><p class="lead">数值计算、三维和网页交给成熟的开源软件；算法和判据出自公开的专著，每个模块带标准题对照。</p><h3 id="kernel-1">用到的开源软件</h3>
+<table>
+<thead>
+<tr>
+<th>开源软件</th>
+<th>做什么</th>
+<th>在问渠轴承里用在哪</th>
+<th>许可证</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>NumPy</strong></td>
+<td>数组与线性代数</td>
+<td>全部计算核心</td>
+<td>BSD-3</td>
+</tr>
+<tr>
+<td><strong>SciPy</strong></td>
+<td>优化、求根、指派与整数规划</td>
+<td>载荷分布求解、合套选配（匈牙利算法、整数规划）</td>
+<td>BSD-3</td>
+</tr>
+<tr>
+<td><strong>FreeCAD</strong> 1.1</td>
+<td>开源参数化 CAD</td>
+<td>“问渠 → 轴承”工作台的宿主，建精确实体、出图</td>
+<td>LGPL-2.0+</td>
+</tr>
+<tr>
+<td><strong>OpenCASCADE</strong>（OCCT）</td>
+<td>三维几何内核</td>
+<td>FreeCAD 建模；验收时读回我们写出的 STEP 检查实体</td>
+<td>LGPL-2.1（带例外）</td>
+</tr>
+<tr>
+<td><strong>openpyxl</strong></td>
+<td>Excel 文件</td>
+<td>产品库表格导入、空表格</td>
+<td>MIT</td>
+</tr>
+<tr>
+<td><strong>FastAPI</strong>、<strong>Uvicorn</strong></td>
+<td>网页接口</td>
+<td>轴承计算服务</td>
+<td>MIT、BSD-3</td>
+</tr>
+<tr>
+<td><strong>Vue</strong>、<strong>Vite</strong></td>
+<td>网页界面</td>
+<td>网页版</td>
+<td>MIT</td>
+</tr>
+</tbody>
+</table>
+<p>STEP 文件由我们自己的程序直接写出（解析几何：回转面、球面），不依赖 CAD 内核，所以网页版不装 CAD 也能下载三维。</p>
+<h3 id="kernel-2">参考专著</h3>
+<table>
+<thead>
+<tr>
+<th>书</th>
+<th>用在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>T. A. Harris, M. N. Kotzalas, <em>Rolling Bearing Analysis</em>, 5th ed., CRC Press, 2006</td>
+<td>几何、载荷分布、运动学、高速拟静力学、游隙</td>
+</tr>
+<tr>
+<td>K. L. Johnson, <em>Contact Mechanics</em>, Cambridge University Press, 1985</td>
+<td>赫兹接触</td>
+</tr>
+<tr>
+<td>B. J. Hamrock, D. Dowson, <em>Ball Bearing Lubrication</em>, Wiley, 1981</td>
+<td>点接触油膜</td>
+</tr>
+<tr>
+<td>D. Dowson, G. R. Higginson, <em>Elasto-hydrodynamic Lubrication</em></td>
+<td>线接触油膜</td>
+</tr>
+<tr>
+<td>A. Palmgren, <em>Ball and Roller Bearing Engineering</em></td>
+<td>线接触变形（经 Harris &amp; Kotzalas 引用）</td>
+</tr>
+<tr>
+<td>L. S. Nelson, <em>Journal of Quality Technology</em>, 1984</td>
+<td>控制图判异规则</td>
+</tr>
+</tbody>
+</table>
+<h3 id="kernel-3">我们自己做的</h3>
+<ul>
+<li>每类轴承的计算核心（<code>services/bearing/bearingkit/</code>，纯 Python）：载荷分布、成对与预紧、温度对游隙、柔性轴承、交叉滚子、薄壁轴承的钢球自由体模型、合套选配、尺寸链、SPC、工艺倒推、零件剖面与 STEP 写出。</li>
+<li><strong>标准题</strong>：每个模块和闭式解、专著公式或另一个独立模型对照，几百项测试每次改动都跑（<code>services/bearing/tests/</code>）。</li>
+<li>判定全由确定性程序做，不经 AI；没填的数据结果为“未知”，不算合格。</li>
+</ul></section>
+<section id="arch"><h2><span class="n">11</span>系统设计</h2><p class="lead">一条数据线：参数 → 计算核心 → 校核 → 图与三维 → 工艺 → 合套 → 检测；AI 只在起草和解释两头。</p><div class="anim" data-anim="arch"></div>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>是什么</th>
+<th>在哪</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>计算核心</td>
+<td>纯 Python，不联网、不调 AI；网页版服务和 FreeCAD 工作台共用同一份</td>
+<td><code>services/bearing/bearingkit/</code></td>
+</tr>
+<tr>
+<td>计算服务</td>
+<td>网页版的接口：校核、零件、合套、SPC、工艺、尺寸链、产品库核对</td>
+<td><code>services/bearing/app.py</code>，网址 <code>/bearing/api/</code></td>
+</tr>
+<tr>
+<td>网页版</td>
+<td>四个页面，项目存浏览器或云端</td>
+<td><code>apps/bearing/</code></td>
+</tr>
+<tr>
+<td>FreeCAD 工作台</td>
+<td>同一个表单、同一个核心，本机建模出图</td>
+<td><code>services/bearing/freecad/</code></td>
+</tr>
+<tr>
+<td>云端与 AI</td>
+<td>账号、企业授权、云端项目、产品库、AI 起草（经问渠网关）</td>
+<td><code>services/gateway/</code></td>
+</tr>
+</tbody>
+</table>
+<p>规矩：</p>
+<ol>
+<li><strong>判定只由程序做</strong>。AI 起草的数先过程序检查，人确认后才进项目。</li>
+<li><strong>不编数据</strong>。许用值、材料、温度、线膨胀系数、工艺留量都由企业填；标准里的系数从买来的正版标准录入，录入前结果为“未知”。</li>
+<li><strong>示例一律标“虚构”</strong>。</li>
+</ol></section>
+<section id="limits"><h2><span class="n">12</span>标准、简化与限制</h2><p class="lead">照实写：哪些还没有、哪些是简化。</p><h3 id="limits-1">等标准正文的</h3>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>标准</th>
+<th>现在</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>额定动载荷、额定寿命</td>
+<td>GB/T 6391（对应 ISO 281）</td>
+<td>“未知”</td>
+</tr>
+<tr>
+<td>额定静载荷、静安全系数</td>
+<td>GB/T 4662-2025（等同 ISO 76）</td>
+<td>“未知”</td>
+</tr>
+<tr>
+<td>按内部载荷分布的修正参考寿命</td>
+<td>ISO 16281:2025</td>
+<td>“未知”</td>
+</tr>
+<tr>
+<td>外形尺寸与目录对照</td>
+<td>GB/T 297 等</td>
+<td>产品库核对里为“未知”</td>
+</tr>
+<tr>
+<td>公差等级</td>
+<td>GB/T 307.1、钢球标准</td>
+<td>尺寸链、工艺的偏差由企业填</td>
+</tr>
+</tbody>
+</table>
+<h3 id="limits-2">计算里的简化</h3>
+<ul>
+<li>套圈按刚性（柔性轴承除外）。薄壁轴承、交叉滚子的套圈实际会变形，刚度比算出来的低。</li>
+<li>低速静力学：除角接触高速外不计离心力和陀螺力矩；圆锥滚子不计挡边摩擦。</li>
+<li>圆锥成对的温度：滚子按内圈温度，外圈径向按自身温度，配合按调整时温度。</li>
+<li>接触刚度在薄壁轴承里按自由接触角取常数（曲率随角度变化很小），接触应力按实际角度算。</li>
+<li>零件图不画倒角、退刀槽、保持架、凸度；预紧的薄壁轴承图上按零游隙画。</li>
+</ul>
+<h3 id="limits-3">还没做的</h3>
+<p>推力球与推力滚子、调心滚子轴承；四点接触薄壁轴承和交叉滚子的工艺模板（等企业给工艺）；双列圆锥能在产品库里查、暂不能计算。</p></section>
+<section id="faq"><h2><span class="n">13</span>常见问题</h2><p class="lead"></p><p><strong>为什么总结论老是“有项目缺数据”？</strong> 额定载荷和寿命等国家标准正文录入，一定是“未知”；许用值、载荷系数没填也是“未知”。“未知”不算合格，这是故意的。</p>
+<p><strong>示例里的许用接触应力能直接用吗？</strong> 不能。示例的限值、载荷系数、温度、工艺留量都是虚构的演示数，按企业标准或客户要求填。</p>
+<p><strong>网页版和 FreeCAD 版结果会不一样吗？</strong> 不会。两边是同一个计算核心，同一个项目文件结果逐项相同（测试里核对过）。</p>
+<p><strong>数据会被拿去训练 AI 吗？</strong> 计算核心不联网、不调 AI。只有你点“AI 起草”“AI 解释”时，句子或校核结果才发给模型，且每次留记录；产品库只有本单位能看。</p>
+<p><strong>为什么不给“最佳预紧”“推荐游隙”？</strong> 选哪个取决于企业对刚度、温升、寿命、噪声的判据。软件把曲线画全，让企业按自己的判据定。</p>
+<p><strong>算不出来（载荷分布不收敛）怎么办？</strong> 多半是载荷超过了轴承能承受的，或某个方向没有支承（例如单列角接触被反向推、单列圆锥只有径向力）。按提示加轴向力、配对或减小载荷。</p></section>
+</main>
+<script>
+const EDITION = "freecad", API = "https://learn.wenquestrobotics.com";
+const DATA = {"thin_curve":{"e_um":[10.0,8.0,6.0,4.0,2.0,0.0,-2.0,-4.0,-6.0,-8.0,-10.0,-12.0,-14.0,-16.0,-18.0,-20.0],"p_max":[1902.79,1888.13,1871.19,1852.55,1831.06,1806.66,1778.42,1745.96,1711.12,1688.79,1724.64,1793.61,1869.18,1946.76,2024.52,2101.58],"k_tilt":[609.63,603.7,597.1,589.41,581.69,572.85,563.0,553.02,549.97,599.29,784.81,881.86,960.36,1030.58,1095.45,1156.36],"preload":[0.0,0.0,0.0,0.0,0.0,0.0,143.95,406.27,744.75,1144.12,1595.48,2092.76,2631.46,3208.05,3819.69,4463.99],"loaded":[56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0,56.0]},"thin_rings":{"10":{"plus":[12.2,12.3,12.3,12.4,12.5,12.7,13.1,13.6,14.4,15.4,16.7,18.4,20.6,23.1,26.2,29.7,33.7,38.0,42.8,47.7,52.8,57.9,62.7,67.2,71.2,74.4,76.8,78.3,78.8,78.3,76.8,74.4,71.2,67.2,62.7,57.9,52.8,47.7,42.8,38.0,33.7,29.7,26.2,23.1,20.6,18.4,16.7,15.4,14.4,13.6,13.1,12.7,12.5,12.4,12.3,12.3],"minus":[163.7,160.3,150.0,133.5,111.9,86.4,59.0,32.2,9.5,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,9.5,32.2,59.0,86.4,111.9,133.5,150.0,160.3]},"-4":{"plus":[14.4,14.5,14.9,15.5,16.4,17.6,19.1,20.8,22.8,25.2,27.8,30.8,34.0,37.4,41.1,45.0,49.0,53.1,57.2,61.2,65.1,68.7,72.1,75.1,77.6,79.7,81.2,82.1,82.4,82.1,81.2,79.7,77.6,75.1,72.1,68.7,65.1,61.2,57.2,53.1,49.0,45.0,41.1,37.4,34.0,30.8,27.8,25.2,22.8,20.8,19.1,17.6,16.4,15.5,14.9,14.5],"minus":[126.5,125.3,121.7,116.0,108.1,98.5,87.4,75.2,62.2,49.1,36.2,24.2,13.5,5.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,5.0,13.5,24.2,36.2,49.1,62.2,75.2,87.4,98.5,108.1,116.0,121.7,125.3]},"-12":{"plus":[51.5,51.7,52.2,53.1,54.3,55.9,57.8,60.1,62.6,65.4,68.5,71.9,75.4,79.1,82.9,86.8,90.8,94.7,98.5,102.2,105.6,108.9,111.8,114.3,116.5,118.2,119.5,120.2,120.5,120.2,119.5,118.2,116.5,114.3,111.8,108.9,105.6,102.2,98.5,94.7,90.8,86.8,82.9,79.1,75.4,71.9,68.5,65.4,62.6,60.1,57.8,55.9,54.3,53.1,52.2,51.7],"minus":[137.1,136.6,135.2,132.9,129.7,125.7,121.0,115.6,109.7,103.4,96.8,89.9,83.0,76.1,69.4,62.8,56.6,50.8,45.3,40.4,36.0,32.1,28.8,26.0,23.7,22.0,20.8,20.0,19.8,20.0,20.8,22.0,23.7,26.0,28.8,32.1,36.0,40.4,45.3,50.8,56.6,62.8,69.4,76.1,83.0,89.9,96.8,103.4,109.7,115.6,121.0,125.7,129.7,132.9,135.2,136.6]}},"thin_Z":56,"dg":{"Dw":8.5,"Z":10,"dm":44.0,"fi":0.515,"fo":0.525,"di":35.5,"do":52.515},"tp":{"arr":"DF","set":"20.0","work":"-14.9","pre_work":"810","rad":"-13.3","ax":"-21.6","L":160,"Ti":50,"To":45,"Ts":50,"Th":40,"status":"unknown","pmax":"1061","db_work":"28.3","apex":"232","cold_for_20":"54.9"},"api":""};
+// 目录：当前节高亮，只展开当前节的小节；手机上点了就收起
+const links = [...document.querySelectorAll("aside nav a")];
+const targets = links.map(a => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+function spy() {
+  let cur = targets[0];
+  for (const t of targets) if (t.getBoundingClientRect().top < 120) cur = t;
+  const id = cur && cur.id;
+  const sec = id && (document.getElementById(id).closest("section") || {}).id;
+  for (const a of links) {
+    const h = a.getAttribute("href").slice(1), sub = a.classList.contains("sub");
+    a.classList.toggle("on", sub ? h === id : h === sec);
+    if (sub && !finding) a.classList.toggle("show", a.dataset.s === sec);
+  }
+}
+let finding = false;
+addEventListener("scroll", spy, { passive: true });
+links.forEach(a => a.addEventListener("click", () => document.querySelector("aside").classList.remove("open")));
+function findIn(q) {
+  q = q.trim();
+  finding = !!q;
+  for (const a of links) {
+    if (!q) { a.classList.remove("hide"); continue; }
+    const el = document.getElementById(a.getAttribute("href").slice(1));
+    let text = a.textContent;
+    if (a.classList.contains("sub")) { let n = el.nextElementSibling; while (n && n.tagName !== "H3") { text += n.textContent; n = n.nextElementSibling; } }
+    else text += el.textContent.slice(0, 400);
+    const hit = text.toLowerCase().includes(q.toLowerCase());
+    a.classList.toggle("hide", !hit);
+    if (a.classList.contains("sub")) a.classList.toggle("show", hit);
+  }
+  spy();
+}
+function toggleTheme() {
+  const r = document.documentElement, dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const now = r.dataset.theme || (dark ? "dark" : "light");
+  r.dataset.theme = now === "dark" ? "light" : "dark";
+  try { localStorage.setItem("wq-help-theme", r.dataset.theme); } catch (e) {}
+  document.dispatchEvent(new Event("themechange"));
+}
+try { const t = localStorage.getItem("wq-help-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+// 代码块加“复制”
+document.querySelectorAll("pre").forEach(p => {
+  const b = document.createElement("button"); b.className = "cp"; b.textContent = "复制";
+  b.onclick = () => { navigator.clipboard.writeText(p.innerText.replace(/复制$|已复制$/, "").trim()).then(() => { b.textContent = "已复制"; b.classList.add("done"); setTimeout(() => { b.textContent = "复制"; b.classList.remove("done"); }, 1500); }); };
+  p.appendChild(b);
+});
+spy();
+</script>
+<script>
+// 问渠轴承帮助的动画与小计算器（第 90 轮）。数据在 DATA 里（build.py 由计算核心真算）；小计算器调软件自己的接口（DATA.api）。
+(function () {
+  const css = (k) => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+  const C = () => ({ ink: css("--ink"), muted: css("--muted"), line: css("--line"), soft: css("--soft"), paper: css("--paper"),
+    accent: css("--accent"), accent2: css("--accent2"), ok: css("--ok"), bad: css("--bad"), warn: css("--warn"), gold: css("--gold") });
+  const FONT = '"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif';
+  function canvas(el, h) {
+    const cv = document.createElement("canvas");
+    el.appendChild(cv);
+    const fit = () => { const w = el.clientWidth - 28; cv.width = w * devicePixelRatio; cv.height = h * devicePixelRatio; cv.style.height = h + "px"; };
+    fit();
+    addEventListener("resize", fit);
+    const g = cv.getContext("2d");
+    return { cv, g, W: () => cv.width / devicePixelRatio, H: h, begin() { g.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0); g.clearRect(0, 0, cv.width, cv.height); } };
+  }
+  function bar(el, html) { const b = document.createElement("div"); b.className = "bar"; b.innerHTML = html; el.appendChild(b); return b; }
+  function cap(el, text) { const c = document.createElement("div"); c.className = "cap"; c.innerHTML = text; el.appendChild(c); return c; }
+  function visible(el, fn) { // 滚到眼前才开始动，省电
+    let on = false;
+    new IntersectionObserver((es) => { on = es[0].isIntersecting; }).observe(el);
+    let last = 0;
+    (function loop(t) { if (on && !document.hidden) { fn(t, t - (last || t)); } last = t; requestAnimationFrame(loop); })(0);
+  }
+  function txt(g, s, x, y, col, size, align, bold) { g.fillStyle = col; g.font = `${bold ? "600 " : ""}${size || 13}px ${FONT}`; g.textAlign = align || "left"; g.fillText(s, x, y); }
+  function arrow(g, x0, y0, x1, y1, col, w) {
+    g.strokeStyle = col; g.fillStyle = col; g.lineWidth = w || 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+    const a = Math.atan2(y1 - y0, x1 - x0), s = 8 + (w || 2);
+    g.beginPath(); g.moveTo(x1, y1); g.lineTo(x1 - s * Math.cos(a - 0.4), y1 - s * Math.sin(a - 0.4)); g.lineTo(x1 - s * Math.cos(a + 0.4), y1 - s * Math.sin(a + 0.4)); g.closePath(); g.fill();
+  }
+  function rbox(g, x, y, w, h, r, fill, stroke, lw) { g.beginPath(); g.roundRect(x, y, w, h, r); if (fill) { g.fillStyle = fill; g.fill(); } if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1.5; g.stroke(); } }
+  function jet(t) { // 0→1 蓝→青→绿→黄→红（应力云图常用色带）
+    t = Math.max(0, Math.min(1, t));
+    const r = Math.max(0, Math.min(1, 1.5 - Math.abs(4 * t - 3))), g = Math.max(0, Math.min(1, 1.5 - Math.abs(4 * t - 2))), b = Math.max(0, Math.min(1, 1.5 - Math.abs(4 * t - 1)));
+    return `rgb(${(r * 255) | 0},${(g * 255) | 0},${(b * 255) | 0})`;
+  }
+  function plot(g, x, y, w, h, series, opt) { // 简单曲线图：series = [{y:[], col, label}]
+    const c = C();
+    const all = series.flatMap((s) => s.y).filter((v) => isFinite(v));
+    let lo = Math.min(...all, opt.zero ? 0 : Infinity), hi = Math.max(...all);
+    if (hi - lo < 1e-9) hi = lo + 1;
+    rbox(g, x, y, w, h, 6, c.paper, c.line, 1);
+    const X = (i, n) => x + 8 + ((w - 16) * i) / (n - 1), Y = (v) => y + h - 18 - ((h - 34) * (v - lo)) / (hi - lo);
+    if (lo < 0 && hi > 0) { g.strokeStyle = c.line; g.lineWidth = 1; g.beginPath(); g.moveTo(x + 6, Y(0)); g.lineTo(x + w - 6, Y(0)); g.stroke(); }
+    series.forEach((s) => {
+      if (!s.y.length) return;
+      g.strokeStyle = s.col; g.lineWidth = s.w || 2; g.setLineDash(s.dash || []); g.beginPath();
+      s.y.forEach((v, i) => (i ? g.lineTo(X(i, s.y.length), Y(v)) : g.moveTo(X(i, s.y.length), Y(v)))); g.stroke(); g.setLineDash([]);
+    });
+    txt(g, opt.title || "", x + 10, y + 16, c.muted, 12);
+    txt(g, hi.toFixed(opt.dec ?? 1), x + w - 8, y + 16, c.muted, 11, "right");
+    txt(g, lo.toFixed(opt.dec ?? 1), x + w - 8, y + h - 6, c.muted, 11, "right");
+    let lx = x + 10;
+    series.forEach((s) => { if (!s.label) return; g.fillStyle = s.col; g.fillRect(lx, y + h - 13, 14, 3); txt(g, s.label, lx + 18, y + h - 6, c.muted, 11); lx += 30 + g.measureText(s.label).width; });
+    return { X, Y };
+  }
+
+  const A = {}, CALC = {};
+  const API = () => DATA.api;            // "../api/" beside the software; "" in the offline FreeCAD copy
+  const ONLINE_HELP = "https://wenquestrobotics.com/bearing/help/";
+  function offline(el) { // the offline copy has no API: say so and point online
+    if (API()) return false;
+    const d = document.createElement("div"); d.className = "sum warn";
+    d.innerHTML = `这是离线帮助：这个计算器要调软件的计算接口，打开<a href="${ONLINE_HELP}">在线帮助</a>就能用。`;
+    el.appendChild(d); return true;
+  }
+  function slider(el, rows, vals, on) { // rows: [key, 名称, lo, hi, step, unit]
+    rows.forEach(([k, zh, lo, hi, st, u]) => {
+      const r = document.createElement("div"); r.className = "row";
+      r.innerHTML = `<span>${zh}</span><input type="range" min="${lo}" max="${hi}" step="${st}" value="${vals[k]}"><b>${vals[k]} ${u}</b>`;
+      r.querySelector("input").oninput = (e) => { vals[k] = +e.target.value; r.querySelector("b").textContent = `${vals[k]} ${u}`; on(); };
+      el.appendChild(r);
+    });
+  }
+  function seg(el, label, opts, val, on) { // a row of buttons
+    const b = bar(el, `<span>${label}</span>` + opts.map(([k, t]) => `<button data-k="${k}"${k === val ? ' class="on"' : ""}>${t}</button>`).join(""));
+    b.querySelectorAll("button").forEach((x) => (x.onclick = () => { b.querySelectorAll("button").forEach((y) => y.classList.toggle("on", y === x)); on(x.dataset.k); }));
+    return b;
+  }
+  const fx = (x, k = 1) => (x == null || !isFinite(x) ? "—" : Number(x).toFixed(k));
+
+  // ---------- 系统结构 ----------
+  A.arch = (el) => {
+    const N = [
+      { k: "web", x: 0.04, y: 0.04, w: 0.28, t: "网页版", s: "设计校核 · 合套 · SPC · 工艺", d: "浏览器打开就用，不登录也能算。四个页面：设计校核、合套选配、检测与 SPC、工艺。项目存在浏览器里、文件里或云端。" },
+      { k: "fc", x: 0.68, y: 0.04, w: 0.28, t: "FreeCAD 工作台", s: "精确实体 · 工作图 · 工序简图", d: "“问渠 → 轴承”：同一张表单、同一个计算核心，在本机建精确实体、查干涉、出 A3 工作图和工序简图。" },
+      { k: "core", x: 0.33, y: 0.25, w: 0.34, t: "计算核心 bearingkit", s: "纯 Python · 不联网 · 不调 AI", d: "几何、赫兹接触、载荷分布、成对与预紧、温度对游隙、柔性轴承、交叉滚子、薄壁轴承、合套、尺寸链、SPC、工艺倒推、剖面与 STEP。每个模块带标准题。" },
+      { k: "svc", x: 0.04, y: 0.48, w: 0.3, t: "计算服务", s: "…/bearing/api/", d: "网页版的接口：校核、零件、合套、SPC、工艺、尺寸链、产品库核对。和网页版同一个网址，国内版、美国版都一样。" },
+      { k: "gw", x: 0.66, y: 0.48, w: 0.3, t: "问渠网关", s: "账号 · 企业授权 · 云端 · 产品库 · AI", d: "认人、按单位隔离云端项目和产品库、调大模型（国内已备案模型，美国 Claude）。AI 的数先过程序检查。" },
+      { k: "out", x: 0.04, y: 0.8, w: 0.3, t: "出件", s: "计算书 · STEP · DXF · 工序卡", d: "计算书（打印 / PDF）、STEP 整套与单件、DXF 截面、工序卡、配套清单 CSV。" },
+      { k: "shop", x: 0.66, y: 0.8, w: 0.3, t: "车间数据", s: "实测沟径 · 圆度 · 检测值", d: "合套选配用实测沟径和钢球分组；检测与 SPC 用圆度仪轮廓和检测数据。数据由企业贴入，不进代码。" },
+    ];
+    const E = [["web", "core"], ["fc", "core"], ["core", "svc"], ["svc", "web"], ["web", "gw"], ["svc", "out"], ["fc", "out"], ["shop", "svc"]];
+    const S = canvas(el, 400), info = cap(el, "点任意一块看它做什么。小圆点是一次“改参数 → 重算 → 出件”的数据。");
+    let sel = null;
+    const box = (n) => { const W = S.W(); return { x: n.x * W, y: n.y * 380 + 6, w: n.w * W, h: 54 }; };
+    const mid = (n) => { const b = box(n); return [b.x + b.w / 2, b.y + b.h / 2]; };
+    S.cv.addEventListener("click", (e) => {
+      const r = S.cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      sel = N.find((n) => { const b = box(n); return x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h; }) || null;
+      info.innerHTML = sel ? `<b>${sel.t}</b>：${sel.d}` : "点任意一块看它做什么。";
+    });
+    visible(el, (t) => {
+      const c = C(), g = S.g; S.begin();
+      E.forEach(([a, b], i) => {
+        const [x0, y0] = mid(N.find((n) => n.k === a)), [x1, y1] = mid(N.find((n) => n.k === b));
+        g.strokeStyle = c.line; g.lineWidth = 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+        const p = (t / 2400 + i * 0.37) % 1;
+        g.fillStyle = i % 2 ? c.accent2 : c.accent; g.beginPath(); g.arc(x0 + (x1 - x0) * p, y0 + (y1 - y0) * p, 4, 0, 7); g.fill();
+      });
+      const small = S.W() < 560;
+      N.forEach((n) => {
+        const b = box(n), on = sel === n;
+        rbox(g, b.x, b.y, b.w, b.h, 10, on ? c.paper : c.soft, on ? c.accent : c.line, on ? 2.5 : 1.5);
+        txt(g, n.t, b.x + b.w / 2, b.y + (small ? 32 : 23), c.ink, small ? 12.5 : 14.5, "center", true);
+        if (!small) txt(g, n.s, b.x + b.w / 2, b.y + 42, c.muted, 11.5, "center");
+      });
+    });
+  };
+
+  // ---------- AI 起草 → 程序核对 → 人采用 ----------
+  A.aiguard = (el) => {
+    const steps = [
+      ["一句话", "“减速器输出轴，斜齿轮模数 3、齿数 34，18 kW、960 r/min，跨距 160 mm”"],
+      ["AI 起草", "选“减速器齿轮轴”，把句子里的数填进去"],
+      ["程序核对", "句子里没有的数一律清空并列出来；不换算、不估计"],
+      ["黄格子", "没给的格子（压力角、螺旋角……）标黄，等人补"],
+      ["人点“采用”", "这时才放进表单，可以撤销"],
+      ["计算核心校核", "合格、不合格、未知——全由程序判"],
+    ];
+    const S = canvas(el, 230), b = bar(el, '<button>重播</button><span class="cap">AI 只起草；数先过程序检查，人点“采用”才进项目，判定全由计算核心做。</span>');
+    let t0 = performance.now();
+    b.querySelector("button").onclick = () => (t0 = performance.now());
+    function wrap(g, s, x, y, w, lh, col) { g.fillStyle = col; let line = ""; for (const ch of s) { if (g.measureText(line + ch).width > w) { g.fillText(line, x, y); y += lh; line = ch; } else line += ch; } g.fillText(line, x, y); }
+    visible(el, (t) => {
+      const c = C(), g = S.g; S.begin();
+      const W = S.W(), k = Math.min(steps.length, Math.floor((t - t0) / 1300) + 1), cols = W < 640 ? 2 : 3, bw = (W - 16 * (cols + 1)) / cols;
+      const bh = W < 640 ? 60 : 96;
+      steps.forEach((s, i) => {
+        const cx = 16 + (i % cols) * (bw + 16), cy = 10 + Math.floor(i / cols) * (bh + 12);
+        const on = i < k, warn = i === 2 || i === 3;
+        rbox(g, cx, cy, bw, bh, 10, on ? c.paper : c.soft, on ? (warn ? c.warn : i === 5 ? c.ok : c.accent) : c.line, on ? 2.2 : 1);
+        txt(g, `${i + 1} ${s[0]}`, cx + 10, cy + 20, on ? c.ink : c.muted, 14, "left", true);
+        if (W >= 640) { g.save(); g.font = `12px ${FONT}`; wrap(g, s[1], cx + 10, cy + 42, bw - 20, 17, on ? c.muted : c.line); g.restore(); }
+      });
+    });
+  };
+
+  // ---------- 小计算器：游隙 → 接触角与轴向游隙（与 tolerance.py 同一组公式） ----------
+  CALC.clearance = (el) => {
+    const d = DATA.dg;
+    el.innerHTML = "<b>小计算器：径向游隙与接触角</b><div class='cap'>页内计算，公式与软件相同。</div>";
+    const v = { Pd: 15, fi: d.fi, fo: d.fo, Dw: d.Dw };
+    slider(el, [["Pd", "径向游隙 Pd", 0, 60, 1, "µm"], ["fi", "内沟曲率系数 fi", 0.505, 0.58, 0.005, ""], ["fo", "外沟曲率系数 fo", 0.505, 0.58, 0.005, ""]], v, draw);
+    const S = canvas(el, 230), out = document.createElement("div"); out.className = "sum ok"; el.appendChild(out);
+    function draw() {
+      const c = C(), g = S.g; S.begin();
+      const A_ = (v.fi + v.fo - 1) * v.Dw, Pd = v.Pd / 1000;
+      const ca = 1 - Pd / (2 * A_), a0 = Math.acos(Math.max(-1, Math.min(1, ca)));
+      const Ga = 2 * Math.sqrt(Math.max(A_ * A_ - (A_ - Pd / 2) ** 2, 0));
+      out.innerHTML = `A = (fi + fo − 1)·Dw = ${fx(A_, 4)} mm　自由接触角 α₀ = <b>${fx(a0 * 180 / Math.PI, 2)}°</b>　轴向游隙 Ga = <b>${fx(Ga * 1000, 0)} µm</b>（约为径向游隙的 ${Pd > 0 ? fx(Ga / Pd, 1) : "—"} 倍）`;
+      // groove section: ball pushed to the contact angle, both groove arcs
+      const W = S.W(), s = 150 / v.Dw, cx = W / 2, cy = 115, K = 8;   // the gaps between ball and groove drawn 8 times larger
+      const ri = v.Dw / 2 + K * (v.fi * v.Dw - v.Dw / 2), ro = v.Dw / 2 + K * (v.fo * v.Dw - v.Dw / 2), n = [Math.sin(a0), Math.cos(a0)];
+      txt(g, "间隙放大 8 倍画", W - 12, S.H - 12, c.muted, 11.5, "right");
+      const ci = [cx + (ri - v.Dw / 2) * n[0] * s, cy - (ri - v.Dw / 2) * n[1] * s];
+      const co = [cx - (ro - v.Dw / 2) * n[0] * s, cy + (ro - v.Dw / 2) * n[1] * s];
+      g.lineWidth = 3; g.strokeStyle = c.accent; g.beginPath(); g.arc(ci[0], ci[1], ri * s, Math.PI * 0.2, Math.PI * 0.8); g.stroke();
+      g.strokeStyle = c.accent2; g.beginPath(); g.arc(co[0], co[1], ro * s, -Math.PI * 0.8, -Math.PI * 0.2); g.stroke();
+      g.fillStyle = c.soft; g.strokeStyle = c.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, v.Dw / 2 * s, 0, 7); g.fill(); g.stroke();
+      g.setLineDash([5, 4]); g.strokeStyle = c.muted; g.beginPath(); g.moveTo(cx - n[0] * 90, cy + n[1] * 90); g.lineTo(cx + n[0] * 90, cy - n[1] * 90); g.stroke(); g.setLineDash([]);
+      txt(g, "外圈沟道（内侧）", 12, 22, c.accent, 12); txt(g, "内圈沟道", 12, S.H - 12, c.accent2, 12);
+      txt(g, `α₀ ${fx(a0 * 180 / Math.PI, 1)}°`, cx + n[0] * 95 + 6, cy - n[1] * 95, c.muted, 12);
+    }
+    draw();
+  };
+
+  // ---------- 小计算器：深沟球示例的载荷分布（调软件的计算接口） ----------
+  CALC.loads = (el) => {
+    el.innerHTML = "<b>小计算器：径向力、轴向力、游隙 → 每个钢球的载荷</b><div class='cap'>用深沟球示例（虚构），调的就是软件的计算接口，结果和软件里一模一样。</div>";
+    if (offline(el)) return;
+    const v = { Fr: 2500, Fa: 400, Pd: 15 };
+    slider(el, [["Fr", "径向力 Fr", 0, 6000, 100, "N"], ["Fa", "轴向力 Fa", 0, 2000, 50, "N"], ["Pd", "初始径向游隙", 0, 60, 1, "µm"]], v, go);
+    const S = canvas(el, 250), sum = document.createElement("div"); sum.className = "sum"; el.appendChild(sum);
+    let base = null, tm = null, R = null;
+    function go() { clearTimeout(tm); tm = setTimeout(run, 200); }
+    async function run() {
+      try {
+        if (!base) base = await (await fetch(API() + "examples/demo-deep-groove")).json();
+        const p = JSON.parse(JSON.stringify(base));
+        p.loads.Fr = v.Fr; p.loads.Fa = v.Fa; p.inner.Pd = v.Pd / 1000;
+        const r = await fetch(API() + "analyse", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) });
+        R = await r.json();
+        if (!r.ok) { sum.className = "sum warn"; sum.textContent = (R.detail && (R.detail.zh || R.detail.en)) || "算不出来"; R = null; draw(); return; }
+        const ck = Object.fromEntries(R.checks.map((c) => [c.id, c]));
+        const bad = R.checks.filter((c) => c.status === "fail");
+        sum.className = "sum " + (bad.length ? "bad" : "ok");
+        sum.innerHTML = `最重钢球 <b>${fx(ck.qmax.value, 0)} N</b>，${ck.loaded.value} 个受载；内圈最大接触应力 <b>${fx(ck.p_inner.value, 0)} MPa</b>（示例许用 ${fx(ck.p_inner.limit, 0)}）` +
+          (bad.length ? `；不合格：${bad.map((c) => c.zh).join("、")}` : "；静强度合格");
+        draw();
+      } catch (e) { sum.className = "sum warn"; sum.textContent = "连不上计算接口（" + e.message + "）"; }
+    }
+    function draw() {
+      const c = C(), g = S.g; S.begin();
+      if (!R || !R.balls) return;
+      const W = S.W(), cx = W / 2, cy = 125, Rr = 70, Q = R.balls.Q, qm = Math.max(...Q, 1);
+      g.strokeStyle = c.line; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, Rr, 0, 7); g.stroke();
+      R.balls.psi_deg.forEach((d, j) => {
+        const a = (d * Math.PI) / 180, x = cx + Rr * Math.sin(a), y = cy + Rr * Math.cos(a), w = Q[j] / qm;
+        g.fillStyle = Q[j] > 0 ? c.accent : c.soft; g.globalAlpha = Q[j] > 0 ? 0.35 + 0.65 * w : 1;
+        g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); g.globalAlpha = 1; g.strokeStyle = c.muted; g.stroke();
+        if (Q[j] > 0) { g.strokeStyle = c.accent2; g.lineWidth = 3; g.beginPath(); g.moveTo(cx + (Rr + 14) * Math.sin(a), cy + (Rr + 14) * Math.cos(a)); g.lineTo(cx + (Rr + 14 + 36 * w) * Math.sin(a), cy + (Rr + 14 + 36 * w) * Math.cos(a)); g.stroke(); }
+      });
+      arrow(g, cx, cy - 20, cx, cy + 24, c.bad, 2); txt(g, "Fr", cx + 8, cy - 8, c.bad, 12);
+    }
+    run();
+  };
+
+  // ---------- 小计算器：圆锥成对的温度（与 taper_thermal.py 同一组公式） ----------
+  CALC.taperheat = (el) => {
+    const tp = DATA.tp;
+    el.innerHTML = "<b>小计算器：冷态调的游隙，热了还剩多少</b><div class='cap'>页内计算，公式与软件相同；以案例二的轴承为例（外圈滚道直径 62.2 mm、接触角 15°），轴承钢线膨胀系数取示例值 11.5×10⁻⁶/°C，调整时 20 °C。</div>";
+    const v = { s: 160, set: 20, Ti: 50, To: 45, Ts: 50, Th: 40 };
+    let arr = "DF", ah = 10.5;
+    seg(el, "安装", [["DF", "面对面 DF"], ["DB", "背对背 DB"]], arr, (k) => { arr = k; draw(); });
+    seg(el, "轴承座材料（示例值）", [["11.5", "钢 11.5"], ["10.5", "铸铁 10.5"], ["23", "铝 23"]], "10.5", (k) => { ah = +k; draw(); });
+    slider(el, [["set", "调整值（冷态）", -30, 80, 1, "µm"], ["s", "两列距离", 30, 400, 5, "mm"], ["Ti", "内圈温度", 20, 90, 1, "°C"], ["To", "外圈温度", 20, 90, 1, "°C"],
+      ["Ts", "轴温度", 20, 90, 1, "°C"], ["Th", "轴承座温度", 20, 90, 1, "°C"]], v, draw);
+    const S = canvas(el, 120), out = document.createElement("div"); out.className = "sum"; el.appendChild(out);
+    function draw() {
+      const ar = 11.5e-6, a = (15 * Math.PI) / 180, d_o = 54 + 8.5 * Math.cos(a);
+      const rad = -(d_o / Math.tan(a)) * ar * ((v.Ti - 20) - (v.To - 20)) * 1000;
+      const ax = (arr === "DB" ? 1 : -1) * v.s * (ar * (v.Ts - 20) - ah * 1e-6 * (v.Th - 20)) * 1000;
+      const work = v.set + rad + ax;
+      out.className = "sum " + (work < 0 ? "warn" : "ok");
+      out.innerHTML = `调整值 ${fx(v.set)} µm + 内外圈温差 ${fx(rad)} µm + 轴与座轴向伸长 ${fx(ax)} µm = 工作时 <b>${fx(work)} µm</b>` + (work < 0 ? "（变成预紧）" : "") +
+        (arr === "DB" ? `　背对背锥顶重合距离 ${fx(d_o / Math.tan(a), 0)} mm` : "");
+      const c = C(), g = S.g; S.begin();
+      const W = S.W(), lo = Math.min(0, v.set, work, v.set + rad) - 10, hi = Math.max(0, v.set, work, v.set + rad) + 10, X = (x) => 20 + ((x - lo) / (hi - lo)) * (W - 40);
+      g.strokeStyle = c.line; g.beginPath(); g.moveTo(X(0), 10); g.lineTo(X(0), 110); g.stroke(); txt(g, "0", X(0), 118, c.muted, 11, "center");
+      const bars = [["调整值", 0, v.set, c.accent], ["温差", v.set, v.set + rad, c.warn], ["轴向伸长", v.set + rad, work, c.accent2]];
+      bars.forEach(([t, x0, x1, col], i) => { const y = 14 + i * 28; rbox(g, Math.min(X(x0), X(x1)), y, Math.max(2, Math.abs(X(x1) - X(x0))), 18, 4, col); txt(g, t, Math.max(X(x0), X(x1)) + 6, y + 13, c.muted, 11.5); });
+      g.strokeStyle = work < 0 ? c.bad : c.ok; g.lineWidth = 2.5; g.beginPath(); g.moveTo(X(work), 8); g.lineTo(X(work), 100); g.stroke();
+    }
+    draw();
+  };
+
+  // ---------- 小计算器：四点接触的桃形沟（与 thin.py 同一套几何） ----------
+  CALC.gothic = (el) => {
+    el.innerHTML = "<b>小计算器：四点接触的桃形沟</b><div class='cap'>页内计算，几何与软件相同（钢球 5 mm）。两段圆弧的中心偏在中线两侧，钢球沿两条对角线接触。</div>";
+    const v = { a: 30, f: 0.53, Gr: 10 };
+    slider(el, [["a", "接触角 α₀", 15, 45, 1, "°"], ["f", "沟曲率系数 f", 0.505, 0.58, 0.005, ""], ["Gr", "径向游隙", -20, 40, 1, "µm"]], v, draw);
+    const S = canvas(el, 250), out = document.createElement("div"); out.className = "sum ok"; el.appendChild(out);
+    function draw() {
+      const Dw = 5, r = v.f * Dw, a0 = r - Dw / 2, al = (v.a * Math.PI) / 180, A_ = 2 * a0, Gr = v.Gr / 1000;
+      const zoff = a0 * Math.sin(al), mid = Math.asin(Math.min(zoff / r, 1)) * 180 / Math.PI;
+      const ga = Gr >= 0 ? 2 * (Math.sqrt(Math.max(A_ * A_ - (A_ * Math.cos(al) - Gr / 2) ** 2, 0)) - A_ * Math.sin(al)) : null;
+      out.innerHTML = `圆弧中心偏离中线 ±${fx(zoff * 1000, 0)} µm，两段圆弧在中线处相接的角度 ${fx(mid, 1)}°；` +
+        (ga != null ? `空载轴向游隙 <b>${fx(ga * 1000, 0)} µm</b>（径向游隙 ${v.Gr} µm）` : `径向游隙为负：<b>预紧</b>，两条对角线都压紧`);
+      const c = C(), g = S.g; S.begin();
+      const W = S.W(), s = 32, cx = W / 2, cy = 125;
+      // inner groove (below the ball): arcs centred above the ball at ±zoff; outer groove (above): arcs centred below
+      const arc = (zc, rc, rad, from, to, col) => { g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.arc(cx + zc * s, cy - rc * s, rad * s, from, to); g.stroke(); };
+      const K = 8, a0k = K * a0, rk = Dw / 2 + a0k, zk = a0k * Math.sin(al);   // the gaps drawn 8 times larger
+      const ci = a0k * Math.cos(al), co = a0k * Math.cos(al) + (K * Gr) / 2;
+      arc(zk, ci, rk, Math.PI * 0.5, Math.PI * 0.88, c.accent2); arc(-zk, ci, rk, Math.PI * 0.12, Math.PI * 0.5, c.accent2);
+      arc(-zk, -co, rk, -Math.PI * 0.5, -Math.PI * 0.12, c.accent); arc(zk, -co, rk, -Math.PI * 0.88, -Math.PI * 0.5, c.accent);
+      txt(g, "沟道与钢球之间的间隙放大 8 倍画", W - 12, S.H - 12, c.muted, 11.5, "right");
+      g.fillStyle = c.soft; g.strokeStyle = c.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(cx, cy, (Dw / 2) * s, 0, 7); g.fill(); g.stroke();
+      g.setLineDash([5, 4]); g.strokeStyle = c.muted; g.lineWidth = 1;
+      [1, -1].forEach((sg) => { g.beginPath(); g.moveTo(cx - sg * 110 * Math.sin(al), cy + 110 * Math.cos(al)); g.lineTo(cx + sg * 110 * Math.sin(al), cy - 110 * Math.cos(al)); g.stroke(); });
+      g.setLineDash([]);
+      txt(g, "外圈桃形沟", 12, 22, c.accent, 12); txt(g, "内圈桃形沟", 12, S.H - 12, c.accent2, 12);
+      txt(g, `对角线 ±${v.a}°`, cx + 115 * Math.sin(al) + 6, cy - 110 * Math.cos(al) + 4, c.muted, 12);
+    }
+    draw();
+  };
+
+  // ---------- 小计算器：游隙尺寸链（调软件的计算接口） ----------
+  CALC.tolmc = (el) => {
+    el.innerHTML = "<b>小计算器：游隙尺寸链（蒙特卡洛）</b><div class='cap'>名义尺寸取深沟球示例（虚构）；偏差是演示数，按企业的填。调软件的计算接口。</div>";
+    if (offline(el)) return;
+    const d = DATA.dg, v = { ring: 4, ball: 0.5, rad: 10 };
+    let dist = "normal";
+    slider(el, [["ring", "沟底直径偏差 ±", 0, 12, 0.5, "µm"], ["ball", "钢球直径偏差 ±", 0, 3, 0.25, "µm"], ["rad", "沟曲率半径偏差 ±", 0, 30, 1, "µm"]], v, go);
+    seg(el, "分布", [["normal", "正态（±3σ）"], ["uniform", "均匀"]], dist, (k) => { dist = k; go(); });
+    const S = canvas(el, 170), sum = document.createElement("div"); sum.className = "sum ok"; el.appendChild(sum);
+    let tm = null;
+    function go() { clearTimeout(tm); tm = setTimeout(run, 250); }
+    async function run() {
+      const e = (x) => ({ es: x / 1000, ei: -x / 1000 });
+      const spec = { di: { nom: d.di, ...e(v.ring) }, do: { nom: d.do, ...e(v.ring) }, Dw: { nom: d.Dw, ...e(v.ball) }, ri: { nom: d.fi * d.Dw, ...e(v.rad) }, ro: { nom: d.fo * d.Dw, ...e(v.rad) } };
+      try {
+        const r = await fetch(API() + "tolerance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spec, n: 100000, dist, target: { Pd: { min: 0.010, max: 0.024 } } }) });
+        const R = await r.json();
+        if (!r.ok) { sum.className = "sum warn"; sum.textContent = (R.detail && (R.detail.zh || R.detail.en)) || "算不出来"; return; }
+        const mc = R.montecarlo.Pd, ex = R.extremes.Pd, st = R.statistical.Pd;
+        sum.className = "sum " + (mc.outside > 0.0027 ? "warn" : "ok");
+        sum.innerHTML = `径向游隙 µm：极值法 ${fx(ex.min * 1000)}–${fx(ex.max * 1000)}；统计法 ${fx(st.lo * 1000)}–${fx(st.hi * 1000)}；蒙特卡洛 ${fx(mc.p_lo * 1000)}–${fx(mc.p_hi * 1000)}；要求 10–24 µm 时超出 <b>${fx(mc.outside * 100, 2)}%</b>`;
+        const c = C(), g = S.g; S.begin();
+        const W = S.W(), h = mc.hist, ed = mc.edges, hm = Math.max(...h), x0 = ed[0], x1 = ed[ed.length - 1];
+        const lo = Math.min(x0, ex.min, 0.010), hi = Math.max(x1, ex.max, 0.024), X = (x) => 16 + ((x - lo) / (hi - lo)) * (W - 32);
+        h.forEach((n, i) => { const xa = X(ed[i]), xb = X(ed[i + 1]), y = 140 - (n / hm) * 120; g.fillStyle = (ed[i] < 0.010 || ed[i + 1] > 0.024) ? c.warn : c.accent; g.fillRect(xa, y, Math.max(1, xb - xa - 1), 140 - y); });
+        [[0.010, "10"], [0.024, "24"]].forEach(([x, t]) => { g.strokeStyle = c.bad; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(X(x), 10); g.lineTo(X(x), 140); g.stroke(); g.setLineDash([]); txt(g, t + " µm", X(x), 158, c.bad, 11, "center"); });
+        g.strokeStyle = c.muted; g.lineWidth = 2; g.beginPath(); g.moveTo(X(ex.min), 146); g.lineTo(X(ex.max), 146); g.stroke(); txt(g, "极值法范围", X(ex.max) + 4, 150, c.muted, 11);
+      } catch (e2) { sum.className = "sum warn"; sum.textContent = "连不上计算接口（" + e2.message + "）"; }
+    }
+    run();
+  };
+
+  // ---------- 预紧量：四点接触薄壁轴承（案例三，计算核心真算的数据） ----------
+  A.preload = (el) => {
+    const cv = DATA.thin_curve, rings = DATA.thin_rings, Z = DATA.thin_Z;
+    let pick = "-12";
+    seg(el, "径向游隙", [["10", "+10 µm"], ["-4", "−4 µm"], ["-12", "−12 µm（示例）"]], pick, (k) => { pick = k; });
+    const S = canvas(el, 300);
+    cap(el, "左：每个钢球两条对角线的接触载荷（橙向外 = 对角线 +，蓝向内 = 对角线 −；淡的是脱开）。右：预紧量曲线——倾覆刚度和最大接触应力随径向游隙怎么变，竖线是左边选的游隙。数据由计算核心算出。");
+    visible(el, () => {
+      const c = C(), g = S.g; S.begin();
+      const W = S.W(), half = W < 620 ? W : W * 0.42, cx = half / 2, cy = 140, R0 = 78, RM = 46;
+      const rr = rings[pick], qm = Math.max(...rings["-12"].plus, ...rings["-12"].minus, ...rr.plus, ...rr.minus, 1);
+      g.strokeStyle = c.line; g.lineWidth = 1; g.beginPath(); g.arc(cx, cy, R0, 0, 7); g.stroke();
+      for (let j = 0; j < Z; j++) {
+        const a = (2 * Math.PI * j) / Z;
+        [[rr.plus[j], 1, c.accent2], [rr.minus[j], -1, c.accent]].forEach(([q, sg, col]) => {
+          const L = (q / qm) * RM; g.strokeStyle = col; g.globalAlpha = q > 0 ? 1 : 0.2; g.lineWidth = 2.5;
+          g.beginPath(); g.moveTo(cx + R0 * Math.cos(a), cy - R0 * Math.sin(a)); g.lineTo(cx + (R0 + sg * Math.max(L, 3)) * Math.cos(a), cy - (R0 + sg * Math.max(L, 3)) * Math.sin(a)); g.stroke(); g.globalAlpha = 1;
+        });
+      }
+      const off = rr.plus.filter((q) => q <= 0).length + rr.minus.filter((q) => q <= 0).length;
+      txt(g, off ? `${off} 处脱开` : "全部保持接触", cx, cy + 4, off ? c.bad : c.ok, 13, "center", true);
+      if (W >= 620) {
+        const x = half + 10, w = W - half - 20;
+        const ys = cv.e_um, k = ys.indexOf(+pick);
+        const P1 = plot(g, x, 8, w, 128, [{ y: cv.k_tilt, col: c.accent }], { title: "倾覆刚度 N·m/mrad", dec: 0 });
+        const P2 = plot(g, x, 146, w, 128, [{ y: cv.p_max, col: c.accent2 }], { title: "最大接触应力 MPa", dec: 0 });
+        [P1, P2].forEach((P, i) => { if (k >= 0) { g.strokeStyle = c.muted; g.setLineDash([4, 3]); g.beginPath(); g.moveTo(P.X(k, ys.length), 10 + i * 138); g.lineTo(P.X(k, ys.length), 134 + i * 138); g.stroke(); g.setLineDash([]); } });
+        txt(g, `${ys[0]} µm`, x + 8, 290 - 6, c.muted, 11); txt(g, `${ys[ys.length - 1]} µm`, x + w - 8, 290 - 6, c.muted, 11, "right");
+      }
+    });
+  };
+
+  document.querySelectorAll(".anim").forEach((el) => { const f = A[el.dataset.anim]; if (f) f(el); });
+  document.querySelectorAll(".calc").forEach((el) => { const f = CALC[el.dataset.calc]; if (f) f(el); });
+  if (location.hash) { const t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t) setTimeout(() => t.scrollIntoView(), 60); }
+})();
+
+</script>
+</body>
+</html>

@@ -79,7 +79,23 @@ onMounted(async () => {
   if (ex && /^[a-z0-9-]{1,60}$/.test(ex)) await openExample(ex)
   else if (!project.size.d && !project.inner.Dw && examples.value.length) await openExample('demo-deep-groove')
   else analyseSoon()
+  applySet(q.get('set'))
 })
+// ?set={"loads.Fr":3250} — the help's "try it" buttons open an example with a few values changed (round 90)
+function applySet(s) {
+  if (!s) return
+  try {
+    for (const [path, v] of Object.entries(JSON.parse(s))) {
+      const keys = path.split('.')
+      if (keys.length !== 2 || !(keys[0] in project) || typeof project[keys[0]] !== 'object' || !project[keys[0]]) continue
+      project[keys[0]][keys[1]] = v
+    }
+    analyseSoon()
+  } catch { /* a bad link changes nothing */ }
+}
+// the help: the section for this page (design: the current bearing type), round 90
+const HELP_TYPE = { deep_groove: 'types-1', angular: 'types-1', cylindrical: 'types-2', tapered: 'types-3', flex: 'types-4', crossed: 'types-5', thin: 'types-6' }
+const helpHref = computed(() => 'help/#' + ({ assembly: 'mfg-1', quality: 'mfg-3', process: 'mfg-5' }[mode.value] || HELP_TYPE[project.type] || 'start'))
 </script>
 
 <template>
@@ -103,6 +119,7 @@ onMounted(async () => {
         <button v-if="!embed && mode === 'design'" type="button" class="dark cloud-btn" :class="{ linked: links.design.id }" :title="linked || t('cloud')" @click="showCloud = true">{{ t('cloud') }}</button>
         <button v-if="mode === 'design'" type="button" class="dark" :disabled="!result" @click="showParts = true">{{ t('partsBtn') }}</button>
         <button type="button" class="accent" :disabled="!result" @click="showReport = true">{{ t('report') }}</button>
+        <a v-if="!embed" class="dark help" :href="helpHref" target="_blank" rel="noopener">{{ t('help') }}</a>
         <button type="button" class="dark lang" @click="setLang(lang === 'zh' ? 'en' : 'zh')">{{ lang === 'zh' ? 'EN' : '中' }}</button>
         <span v-if="!embed && me?.login" class="who" :title="me.org">{{ me.name || '…' }}<small v-if="me.org">{{ me.org }}</small></span>
         <a v-else-if="!embed && me && me.reachable" class="who in" :href="loginUrl()">{{ t('signIn') }}</a>
