@@ -3,7 +3,7 @@ name: 电脑横机讲解
 title:
   zh: 电脑横机怎么走完一个衣片
   en: How this computerized flat knitting machine runs a piece
-duration: 52.96
+duration: 52.6
 floor: false
 clip: 0.002
 models:
@@ -73,45 +73,45 @@ motion:
     - 720.0
   - - 22.0
     - 1080.0
-  - - 22.04
+  - - 22.0
     - 196560
-  - - 30.04
+  - - 30.0
     - 196920
-  - - 30.08
+  - - 30.0
     - 196560
-  - - 37.08
+  - - 37.0
     - 196920
-  - - 38.28
+  - - 38.2
     - 197280
-  - - 38.32
+  - - 38.2
     - 209880
-  - - 39.52
+  - - 39.4
     - 210240
-  - - 39.56
+  - - 39.4
     - 222480
-  - - 40.76
+  - - 40.6
     - 222840
-  - - 40.8
+  - - 40.6
     - 235440
-  - - 42.0
+  - - 41.8
     - 235800
-  - - 42.04
+  - - 41.8
     - 248040
-  - - 43.24
+  - - 43.0
     - 248400
-  - - 43.28
+  - - 43.0
     - 261000
-  - - 44.48
+  - - 44.2
     - 261360
-  - - 44.52
+  - - 44.2
     - 273600
-  - - 45.72
+  - - 45.4
     - 273960
-  - - 45.76
+  - - 45.4
     - 286560
-  - - 46.96
+  - - 46.6
     - 286920
-  - - 52.96
+  - - 52.6
     - 286920
 camera:
 - t: 0
@@ -186,7 +186,7 @@ camera:
   el: 36
   dist: 0.8
   lens: 40
-- t: 30.88
+- t: 30.8
   look:
   - 0.0
   - 0.0
@@ -195,7 +195,7 @@ camera:
   el: 40
   dist: 0.8
   lens: 40
-- t: 36.58
+- t: 36.5
   look:
   - 0.0
   - 0.0
@@ -204,7 +204,7 @@ camera:
   el: 36
   dist: 0.8
   lens: 40
-- t: 37.68
+- t: 37.6
   look:
   - 0.0
   - 0.0005
@@ -213,7 +213,7 @@ camera:
   el: 18
   dist: 2.022
   lens: 40
-- t: 48.46
+- t: 48.1
   look:
   - 0.0
   - 0.0005
@@ -222,7 +222,7 @@ camera:
   el: 20
   dist: 2.247
   lens: 40
-- t: 52.96
+- t: 52.6
   look:
   - 0.0
   - 0.0005
@@ -256,14 +256,14 @@ effects:
   - d.needles
 - kind: xray
   t:
-  - 30.58
-  - 37.08
+  - 30.5
+  - 37.0
   top:
   - d.bed
 - kind: xray
   t:
-  - 37.38
-  - 46.96
+  - 37.3
+  - 46.6
   top:
   - d.fabric
   - d.carriage
@@ -313,36 +313,36 @@ labels:
   en: Racking time / emergency stop distance 91 ms / 36 mm
   where: bottom
 - t:
-  - 30.08
-  - 37.08
+  - 30.0
+  - 37.0
   zh: ⚠ 不合格：摇床在换向停顿里走完、停稳
   en: ⚠ Racking done and settled within the reversal dwell fails
   tone: bad
 - t:
-  - 30.08
-  - 37.08
+  - 30.0
+  - 37.0
   zh: 91 / 10 ms · 判据 ≤ 停顿 / dwell
   en: 91 / 10 ms · criterion ≤ 停顿 / dwell
   where: bottom
 - t:
-  - 37.08
-  - 46.96
+  - 37.0
+  - 46.6
   zh: ④ 织一片（快放：每隔若干趟看一趟）
   en: '④ A whole piece (fast: one pass in every few)'
 - t:
-  - 37.08
-  - 46.96
+  - 37.0
+  - 46.6
   zh: 趟数 / 一片用时 898 / 12.0 min
   en: Passes / time per piece 898 / 12.0 min · Pieces per day (20 h, 85%) 85
   where: bottom
 - t:
-  - 46.96
-  - 52.96
+  - 46.6
+  - 52.6
   zh: 11 项校核：不合格 1 项，注意 0 项
   en: '11 checks: 1 fail, 0 need attention'
 - t:
-  - 46.96
-  - 52.96
+  - 46.6
+  - 52.6
   zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
   en: WenQuest sewing design software · same parameters as report, setup card
   where: bottom
@@ -351,8 +351,8 @@ stills:
 - 10.5
 - 18.5
 - 26.0
-- 33.58
-- 49.96
+- 33.5
+- 49.6
 panel:
   kind: readouts
   head: 读数

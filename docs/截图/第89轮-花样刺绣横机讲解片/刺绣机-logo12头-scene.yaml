@@ -3,7 +3,7 @@ name: 多头刺绣机讲解
 title:
   zh: 多头刺绣机怎么走完一个花样
   en: How this multi-head embroidery machine runs a design
-duration: 53.7
+duration: 53.66
 floor: false
 clip: 0.002
 models:
@@ -53,19 +53,19 @@ motion:
     - 0
   - - 6.0
     - 720.0
-  - - 6.04
+  - - 6.0
     - 1080
-  - - 15.04
+  - - 15.0
     - 1440
-  - - 23.04
+  - - 23.0
     - 2160
-  - - 32.04
+  - - 32.0
     - 242508.0
-  - - 39.04
+  - - 39.0
     - 242862.0
-  - - 47.7
+  - - 47.66
     - 287639.0
-  - - 53.7
+  - - 53.66
     - 287639.0
 camera:
 - t: 0
@@ -104,7 +104,7 @@ camera:
   el: 12
   dist: 0.5
   lens: 40
-- t: 15.84
+- t: 15.8
   look:
   - 0.02
   - 0.0
@@ -113,7 +113,7 @@ camera:
   el: 34
   dist: 2.751
   lens: 40
-- t: 22.04
+- t: 22.0
   look:
   - 0.02
   - 0.0
@@ -122,7 +122,7 @@ camera:
   el: 30
   dist: 2.646
   lens: 40
-- t: 23.64
+- t: 23.6
   look:
   - -0.62
   - -0.132
@@ -131,7 +131,7 @@ camera:
   el: 55
   dist: 0.546
   lens: 40
-- t: 32.84
+- t: 32.8
   look:
   - -0.62
   - -0.132
@@ -140,7 +140,7 @@ camera:
   el: 22
   dist: 0.5
   lens: 40
-- t: 38.54
+- t: 38.5
   look:
   - -0.62
   - -0.132
@@ -149,7 +149,7 @@ camera:
   el: 18
   dist: 0.5
   lens: 40
-- t: 39.64
+- t: 39.6
   look:
   - -0.62
   - -0.132
@@ -158,7 +158,7 @@ camera:
   el: 55
   dist: 0.546
   lens: 40
-- t: 49.2
+- t: 49.16
   look:
   - 0.0
   - -0.081
@@ -167,7 +167,7 @@ camera:
   el: 20
   dist: 5.143
   lens: 40
-- t: 53.7
+- t: 53.66
   look:
   - 0.0
   - -0.081
@@ -187,31 +187,31 @@ effects:
   - d.stitch
 - kind: xray
   t:
-  - 15.54
-  - 22.54
+  - 15.5
+  - 22.5
   top:
   - d.hoop
   - d.x
   - d.y
 - kind: xray
   t:
-  - 23.34
-  - 32.04
+  - 23.3
+  - 32.0
   top:
   - d.hoop
   - d.stitch
 - kind: xray
   t:
-  - 32.54
-  - 39.04
+  - 32.5
+  - 39.0
   top:
   - d.needle
   - d.hoop
   - d.stitch
 - kind: xray
   t:
-  - 39.34
-  - 47.7
+  - 39.3
+  - 47.66
   top:
   - d.hoop
   - d.stitch
@@ -239,67 +239,67 @@ labels:
   en: Available acceleration 12.9 m/s²
   where: bottom
 - t:
-  - 15.04
-  - 23.04
+  - 15.0
+  - 23.0
   zh: ② 绷架移动：X、Y 两轴带着所有绣框一起走
   en: '② Frame drive: X and Y move every hoop together'
 - t:
-  - 15.04
-  - 23.04
+  - 15.0
+  - 23.0
   zh: 绷架折算质量 58 kg
   en: Frame equivalent mass 58 kg · Frame servo peak / RMS torque (motor side, rotor excluded) 3.56 / 1.49 N·m
   where: bottom
 - t:
-  - 23.04
-  - 32.04
+  - 23.0
+  - 32.0
   zh: ③ 绣一遍（快放，按颜色分色）
   en: ③ The whole design (fast, by colour)
 - t:
-  - 23.04
-  - 32.04
+  - 23.0
+  - 32.0
   zh: 纯缝纫时间 / 一批总时间 16.2 / 21.0 min
   en: Pure sewing / batch time 16.2 / 21.0 min · Efficiency / pieces per hour 77% / 34.3
   where: bottom
 - t:
-  - 32.04
-  - 39.04
+  - 32.0
+  - 39.0
   zh: ④ 最难的一针：所需 / 可用加速度 1.00
   en: '④ The hardest stitch: required / available acceleration 1.00'
 - t:
-  - 32.04
-  - 39.04
+  - 32.0
+  - 39.0
   zh: 第 8727 针，针长 8 mm · 可用加速度 12.9 m/s²
   en: stitch 8727, 8 mm long · Available acceleration 12.9 m/s²
   where: bottom
 - t:
-  - 39.04
-  - 47.7
+  - 39.0
+  - 47.66
   zh: ③ 绣一遍（快放，按颜色分色）
   en: ③ The whole design (fast, by colour)
 - t:
-  - 39.04
-  - 47.7
+  - 39.0
+  - 47.66
   zh: 纯缝纫时间 / 一批总时间 16.2 / 21.0 min
   en: Pure sewing / batch time 16.2 / 21.0 min · Efficiency / pieces per hour 77% / 34.3
   where: bottom
 - t:
-  - 47.7
-  - 53.7
+  - 47.66
+  - 53.66
   zh: 全部 7 项校核合格
   en: All 7 checks pass
 - t:
-  - 47.7
-  - 53.7
+  - 47.66
+  - 53.66
   zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
   en: WenQuest sewing design software · same parameters as report, setup card
   where: bottom
 stills:
 - 3.0
 - 10.5
-- 19.04
-- 29.34
-- 35.54
-- 50.7
+- 19.0
+- 29.3
+- 35.5
+- 50.66
 panel:
   kind: readouts
   head: 读数

@@ -3,7 +3,7 @@ name: 电脑横机讲解
 title:
   zh: 电脑横机怎么走完一个衣片
   en: How this computerized flat knitting machine runs a piece
-duration: 45.92
+duration: 45.6
 floor: false
 clip: 0.002
 models:
@@ -73,41 +73,41 @@ motion:
     - 720.0
   - - 22.0
     - 1080.0
-  - - 22.04
+  - - 22.0
     - 196560
-  - - 30.04
+  - - 30.0
     - 196920
-  - - 31.24
+  - - 31.2
     - 197280
-  - - 31.28
+  - - 31.2
     - 209880
-  - - 32.48
+  - - 32.4
     - 210240
-  - - 32.52
+  - - 32.4
     - 222480
-  - - 33.72
+  - - 33.6
     - 222840
-  - - 33.76
+  - - 33.6
     - 235440
-  - - 34.96
+  - - 34.8
     - 235800
-  - - 35.0
+  - - 34.8
     - 248040
-  - - 36.2
+  - - 36.0
     - 248400
-  - - 36.24
+  - - 36.0
     - 261000
-  - - 37.44
+  - - 37.2
     - 261360
-  - - 37.48
+  - - 37.2
     - 273600
-  - - 38.68
+  - - 38.4
     - 273960
-  - - 38.72
+  - - 38.4
     - 286560
-  - - 39.92
+  - - 39.6
     - 286920
-  - - 45.92
+  - - 45.6
     - 286920
 camera:
 - t: 0
@@ -182,7 +182,7 @@ camera:
   el: 36
   dist: 0.8
   lens: 40
-- t: 30.64
+- t: 30.6
   look:
   - 0.0
   - 0.0005
@@ -191,7 +191,7 @@ camera:
   el: 18
   dist: 2.022
   lens: 40
-- t: 41.42
+- t: 41.1
   look:
   - 0.0
   - 0.0005
@@ -200,7 +200,7 @@ camera:
   el: 20
   dist: 2.247
   lens: 40
-- t: 45.92
+- t: 45.6
   look:
   - 0.0
   - 0.0005
@@ -234,8 +234,8 @@ effects:
   - d.needles
 - kind: xray
   t:
-  - 30.34
-  - 39.92
+  - 30.3
+  - 39.6
   top:
   - d.fabric
   - d.carriage
@@ -285,24 +285,24 @@ labels:
   en: Racking time / emergency stop distance 46 ms / 36 mm
   where: bottom
 - t:
-  - 30.04
-  - 39.92
+  - 30.0
+  - 39.6
   zh: ④ 织一片（快放：每隔若干趟看一趟）
   en: '④ A whole piece (fast: one pass in every few)'
 - t:
-  - 30.04
-  - 39.92
+  - 30.0
+  - 39.6
   zh: 趟数 / 一片用时 898 / 12.6 min
   en: Passes / time per piece 898 / 12.6 min · Pieces per day (20 h, 85%) 81
   where: bottom
 - t:
-  - 39.92
-  - 45.92
+  - 39.6
+  - 45.6
   zh: 全部 11 项校核合格
   en: All 11 checks pass
 - t:
-  - 39.92
-  - 45.92
+  - 39.6
+  - 45.6
   zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
   en: WenQuest sewing design software · same parameters as report, setup card
   where: bottom
@@ -311,8 +311,8 @@ stills:
 - 10.5
 - 18.5
 - 26.0
-- 30.64
-- 42.92
+- 30.6
+- 42.6
 panel:
   kind: readouts
   head: 读数

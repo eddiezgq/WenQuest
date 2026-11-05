@@ -283,3 +283,27 @@ def test_seq_endpoint(v3c):  # noqa: F811
         r = v3c.post("/api/v1/sewing/video", json={"machine": m, "params": {}, "lang": "zh"}, headers=t)
         assert r.status_code == 200, r.text
         assert r.json()["duration"] > 35 and r.json()["problems"] == []
+
+
+def test_seq_review_fixes():
+    """第 89 轮审读：只有一两针的花样不出错；跳针 / 跳趟是瞬间的；红灯关键画面正好停在那一针 / 那一趟；标题里的数就是那一针的"""
+    from app.sewcore import cad_seq as CS
+    for p in ({"src": "file", "pts": "0,0\n1,1"}, {"src": "file", "pts": "0,0\n1,1\n3,2"}):
+        _, errs = v3.check(SV.scene("embroid", p, "zh")[0])
+        assert errs == []
+    for m, p, key in (("pattern", {"pat": "star", "n": 3000, "ax": 5, "stx": 40}, "far"), ("pattern", {"n": 2000}, "worst"),
+                      ("embroid", {"s": 12, "n": 1200}, "worst"), ("flatknit", {"sys": 2, "xfer": 4, "rack": 4, "dwell": 0.01}, "first_x")):
+        text, meta = SV.scene(m, p, "zh")
+        spec, errs = v3.check(text)
+        assert errs == []
+        ang = spec["motion"][0]["angle"]
+        for (t0, a0), (t1, a1) in zip(ang, ang[1:]):
+            assert t1 > t0 or t1 == t0                                    # 跳是同一时刻两个关键点
+            if 0 < t1 - t0 < 0.07:
+                raise AssertionError(("跳的时候有中间帧", t0, t1))
+        D = CS.cfg_of(m, spec["models"][0]["params"])[0]
+        idx = [cad.parts3d(spec["models"][0]["params"], _prog_at(spec, x), m)["i"] for x in spec["stills"]]
+        assert D[key] in idx, (m, key, D[key], idx)
+        if m == "pattern" and key == "worst":
+            k = D["worst"]
+            assert any(f"转速上限 {D['cap'][k]} r/min，这一针 {D['sp'][k]} r/min" in lb["zh"] for lb in spec["labels"]) or meta["problems"]

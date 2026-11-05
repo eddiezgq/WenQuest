@@ -113,8 +113,7 @@ def scene_seq(machine: str, p: dict, R: dict, name_zh: str, name_en: str) -> tup
         nonlocal t, a
         if abs(to - a) < 0.05:
             return
-        t = round(t + 0.04, 2)
-        a = round(to, 1)
+        a = round(to, 1)                    # 同一时刻两个关键点：瞬间跳过去，不会有一帧画到中间的针 / 趟
         angle.append([t, a])
 
     def cam(t_, look, az, el, dist):
@@ -249,16 +248,20 @@ def scene_seq(machine: str, p: dict, R: dict, name_zh: str, name_en: str) -> tup
     # ---------- 3 走一遍：快放，途中在最紧的一针和红黄灯项停下慢放
     bad = [c for c in R["checks"] if c["state"] == "bad"] + [c for c in R["checks"] if c["state"] == "warn"]
     stops = []                                          # (第几针 / 趟, 0 = 最紧的一针、1 = 红黄灯, 校核项)
-    if tight:
-        stops.append((max(1, D["worst"]), 0, None))
+    lo = 1 if machine != "flatknit" else 0
     loose = []
     for c in bad[:3]:
         grp, how = PROBLEM[machine].get(c["key"], ([], None))
-        k = _target(machine, D, how)
+        if how in ("far", "over") and c["state"] != "bad":      # 同样机的 goBad：超行程、超 DST 上限亮红灯时才去那一针，否则看最紧的一针
+            how = "worst"
+        k = _target(machine, D, how) if n > lo else None
         if k is None:
             loose.append(c)
         else:
-            stops.append((max(1, k) if machine != "flatknit" else k, 1, c))
+            stops.append((max(lo, k), 1, c))
+    # 最紧的一针：红黄灯已经停在这一针的，不再单独慢放一遍；只有一针的花样不停
+    if tight and n > 1 and not any(s_[0] == max(1, D["worst"]) for s_ in stops):
+        stops.append((max(1, D["worst"]), 0, None))
     stops.sort(key=lambda s_: (s_[0], s_[1]))
     cur = math.floor(a / 360)
     if machine == "flatknit":
