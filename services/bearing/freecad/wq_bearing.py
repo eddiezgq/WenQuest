@@ -202,7 +202,7 @@ def build(doc, p, log=print):
         o.Label = label
         o.Shape = sh[key]
         objs[key] = o
-    kind = "钢球" if g["type"] in ("deep_groove", "angular") else "滚子"
+    kind = "钢球" if g["type"] in ("deep_groove", "angular", "four_point") else "滚子"
     elems = []
     for j, pl in enumerate(places):
         o = doc.addObject("Part::Feature", "Element{:03d}".format(j + 1))

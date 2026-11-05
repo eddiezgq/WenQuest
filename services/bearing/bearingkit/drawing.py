@@ -234,6 +234,8 @@ def _ring_dims(view, segs, which, g, fs):
         rc, zc = s["arc"]["c"]
         rho = s["arc"]["rho"]
         r_bottom = rc - rho if which == "inner" else rc + rho
+        if g["type"] == "four_point":  # the middle of the gothic arch (plan section 二十一)
+            r_bottom = g["di"] / 2 if which == "inner" else g["do"] / 2
         out.append(dim(view(zmax, -r_bottom), view(zmax, r_bottom), "φ" + _f(2 * r_bottom), (12, 0), fs))
         bx, by = view(zc, r_bottom + (1.25 if which == "inner" else -1.25) * rho)
         out.append(f'<text x="{bx:.2f}" y="{by + 1:.2f}" font-size="{fs}" text-anchor="middle">R{_f(rho)}</text>')
@@ -281,7 +283,16 @@ def part_rows(g: dict, which: str) -> list[tuple]:
     if arcs:
         s = arcs[0]
         rb = s["arc"]["c"][0] - s["arc"]["rho"] if which == "inner" else s["arc"]["c"][0] + s["arc"]["rho"]
-        rows += [("沟底直径", _f(2 * rb), "未知"), ("沟曲率半径", _f(s["arc"]["rho"]), "未知")]
+        if g["type"] == "four_point":  # a gothic arch: two arcs whose centres sit ± off the middle
+            x = g["x_arcs"]
+            rows += [
+                ("桃形沟中线直径", _f(g["di"] if which == "inner" else g["do"]), "未知"),
+                ("沟曲率半径（两段圆弧）", _f(s["arc"]["rho"]), "未知"),
+                ("圆弧中心轴向偏移 ±", _f(x["zi"] if which == "inner" else x["zo"], 4), "未知"),
+                ("接触角", _f(g["alpha0_deg"], 2) + "°", "—"),
+            ]
+        else:
+            rows += [("沟底直径", _f(2 * rb), "未知"), ("沟曲率半径", _f(s["arc"]["rho"]), "未知")]
         if g["type"] == "angular":
             rows.append(("接触角", _f(g["alpha0_deg"], 2) + "°", "—"))
     elif g["type"] == "cylindrical":

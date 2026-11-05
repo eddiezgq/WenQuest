@@ -10,6 +10,10 @@ const cyl = computed(() => ['cylindrical', 'tapered', 'crossed'].includes(projec
 const xr = computed(() => project.type === 'crossed')
 const tap = computed(() => project.type === 'tapered')
 const flex = computed(() => project.type === 'flex')
+// thin-section bearings (plan section 二十一): the section (X four-point, A angular, C radial) decides the fields
+const thin = computed(() => project.type === 'thin')
+const sec = computed(() => project.thin?.section || 'X')
+const thinSet = computed(() => thin.value && !(sec.value === 'A' && (project.pair.arrangement || 'single') === 'single'))
 // the cam given by points: "angle°, radial deviation mm" lines ↔ [[deg, mm], …] (plan section 十八)
 const camPts = computed({
   get: () => (project.flex?.points || []).map((r) => r.join(', ')).join('\n'),
@@ -29,7 +33,7 @@ const pts = computed({
 <template>
   <div class="fields">
     <div class="seg" role="radiogroup" :aria-label="t('type')">
-      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered', 'flex', 'crossed']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
+      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered', 'flex', 'crossed', 'thin']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
               :class="{ on: project.type === k }" @click="project.type = k">{{ t(k) }}</button>
     </div>
 
@@ -46,13 +50,15 @@ const pts = computed({
     </fieldset>
 
     <fieldset v-if="!cyl"><legend>{{ t('gBalls') }}</legend>
+      <label v-if="thin" class="num"><span class="lab">{{ t('thinSection') }}</span>
+        <select v-model="project.thin.section"><option v-for="k in ['X', 'A', 'C']" :key="k" :value="k">{{ t('thin_' + k) }}</option></select></label>
       <Num v-model="project.inner.Dw" :label="t('Dw')" unit="mm" />
       <Num v-model="project.inner.Z" :label="t('Z')" step="1" />
       <Num v-model="project.inner.dm" :label="t('dm')" unit="mm" :hint="t('dmHint')" />
       <Num v-model="project.inner.fi" :label="t('fi')" step="0.001" :hint="t('fHint')" />
       <Num v-model="project.inner.fo" :label="t('fo')" step="0.001" />
       <Num v-if="['deep_groove', 'flex'].includes(project.type)" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
-      <Num v-else v-model="project.inner.alpha0_deg" :label="t('alpha0')" unit="°" />
+      <Num v-else-if="!thin || sec !== 'C'" v-model="project.inner.alpha0_deg" :label="t('alpha0')" unit="°" />
       <template v-if="project.type === 'angular'">
         <label class="num"><span class="lab">{{ t('arrangement') }}</span>
           <select v-model="project.pair.arrangement"><option v-for="k in ['single', 'DB', 'DF', 'DT']" :key="k" :value="k">{{ t('arr_' + k) }}</option></select></label>
@@ -61,7 +67,22 @@ const pts = computed({
           <Num v-model="project.pair.spacing" :label="t('rowSpacing')" unit="mm" :hint="t('rowSpacingHint')" />
         </template>
       </template>
-      <Num v-model="project.inner.h_i" :label="t('h_i')" unit="mm" :hint="t('hHint')" />
+      <template v-if="thin">
+        <template v-if="sec === 'A'">
+          <label class="num"><span class="lab">{{ t('arrangement') }}</span>
+            <select v-model="project.pair.arrangement"><option v-for="k in ['single', 'DB', 'DF']" :key="k" :value="k">{{ t('arr_' + k) }}</option></select></label>
+          <Num v-if="project.pair.arrangement !== 'single'" v-model="project.pair.spacing" :label="t('rowSpacing')" unit="mm" :hint="t('rowSpacingHint')" />
+        </template>
+        <template v-if="thinSet">
+          <label v-if="sec !== 'C'" class="num"><span class="lab">{{ t('setting') }}</span>
+            <select v-model="project.pair.setting"><option value="endplay">{{ sec === 'A' ? t('setting_endplay') : t('xset_endplay') }}</option><option value="preload">{{ t('setting_preload') }}</option></select></label>
+          <Num v-if="sec === 'C' || project.pair.setting !== 'preload'" v-model="project.pair.endplay" :label="sec === 'A' ? t('endplay') : t('radialPlay')" unit="µm" :hint="sec === 'A' ? t('endplayHint') : t('radialPlayThinHint')" />
+          <Num v-else v-model="project.pair.preload" :label="sec === 'A' ? t('preloadF') : t('preloadThinX')" unit="N" />
+          <Num v-model="project.pair.sweep_from" :label="t('sweepFrom')" unit="µm" :hint="t('sweepHintThin')" />
+          <Num v-model="project.pair.sweep_to" :label="t('sweepTo')" unit="µm" />
+        </template>
+      </template>
+      <Num v-model="project.inner.h_i" :label="t('h_i')" unit="mm" :hint="thin && sec === 'X' ? t('hThinHint') : t('hHint')" />
       <Num v-model="project.inner.h_o" :label="t('h_o')" unit="mm" />
     </fieldset>
     <fieldset v-if="flex"><legend>{{ t('gFlex') }}</legend>
@@ -160,10 +181,10 @@ const pts = computed({
         <Num v-model="project.pair.a_shaft" :label="t('a_shaft')" unit="10⁻⁶/°C" step="0.1" />
         <Num v-model="project.pair.a_house" :label="t('a_house')" unit="10⁻⁶/°C" step="0.1" />
       </template>
-      <p v-else class="hint">{{ flex ? t('fitsFlex') : xr ? t('fitsCrossed') : tap ? t('fitsTapered') : t('fitsAngular') }}</p>
+      <p v-else class="hint">{{ flex ? t('fitsFlex') : xr ? t('fitsCrossed') : thin ? t('fitsThin') : tap ? t('fitsTapered') : t('fitsAngular') }}</p>
     </fieldset>
 
-    <fieldset v-if="!flex && !xr"><legend>{{ t('gLube') }}</legend>
+    <fieldset v-if="!flex && !xr && !thin"><legend>{{ t('gLube') }}</legend>
       <Num v-model="project.lube.eta0" :label="t('eta0')" unit="Pa·s" step="0.001" />
       <Num v-model="project.lube.alpha_p" :label="t('alpha_p')" unit="1/Pa" />
       <Num v-model="project.lube.sigma" :label="t('sigma')" unit="µm" step="0.01" />
@@ -172,7 +193,7 @@ const pts = computed({
     <fieldset><legend>{{ t('gLimits') }}</legend>
       <p class="hint">{{ t('limitsHint') }}</p>
       <Num v-model="project.limits.p_static" :label="t('p_static')" unit="MPa" />
-      <Num v-if="!flex && !xr" v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
+      <Num v-if="!flex && !xr && !thin" v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
       <template v-if="flex">
         <Num v-model="project.flex.sig_i_allow" :label="t('sigIAllow')" unit="MPa" />
         <Num v-model="project.flex.sig_a_allow" :label="t('sigAAllow')" unit="MPa" />

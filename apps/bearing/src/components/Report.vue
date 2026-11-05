@@ -16,6 +16,8 @@ import CatalogNote from './CatalogNote.vue'
 import FlexView from './FlexView.vue'
 import SectionCrossed from './SectionCrossed.vue'
 import XrLoads from './XrLoads.vue'
+import SectionThin from './SectionThin.vue'
+import ThinLoads from './ThinLoads.vue'
 
 const props = defineProps({ r: Object })
 defineEmits(['close'])
@@ -35,6 +37,23 @@ const inputs = computed(() => {
     else rows.push(['camPts', (f.points || []).length + ' ×', ''])
     add('meshF', f.F, 'N'); add('meshBeta', f.beta_deg, '°'); add('sigIAllow', f.sig_i_allow, 'MPa'); add('sigAAllow', f.sig_a_allow, 'MPa')
     add('E', p.material.E, 'MPa'); add('nu', p.material.nu, '')
+    add('p_static', p.limits.p_static, 'MPa'); add('gap_min', p.limits.gap_min, 'mm'); add('wall_min', p.limits.wall_min, 'mm')
+    return rows
+  }
+  if (p.type === 'thin') {
+    const sec = p.thin?.section || 'X'
+    rows.push(['thinSection', t('thin_' + sec), ''])
+    add('fi', p.inner.fi, ''); add('fo', p.inner.fo, '')
+    if (sec !== 'C') add('alpha0', p.inner.alpha0_deg, '°')
+    if (sec === 'A' && p.pair?.arrangement && p.pair.arrangement !== 'single') { rows.push(['arrangement', t('arr_' + p.pair.arrangement), '']); add('rowSpacing', p.pair.spacing, 'mm') }
+    if (!(sec === 'A' && (p.pair?.arrangement || 'single') === 'single')) {
+      add(sec === 'A' ? 'endplay' : 'radialPlay', props.r?.pair?.endplay_um != null ? props.r.pair.endplay_um.toFixed(1) : null, 'µm')
+      add(sec === 'A' ? 'preloadF' : sec === 'X' ? 'preloadThinX' : 'preloadF', props.r?.pair?.preload != null ? props.r.pair.preload.toFixed(0) : null, 'N')
+    }
+    add('h_i', p.inner.h_i, 'mm'); add('h_o', p.inner.h_o, 'mm')
+    add('E', p.material.E, 'MPa'); add('nu', p.material.nu, '')
+    rows.push(['sceneKind', t('sk_' + (p.scenario?.kind || 'generic')), ''])
+    if ((p.scenario?.kind || 'generic') === 'generic') { add('Fr', p.loads.Fr, 'N'); add('Fa', p.loads.Fa, 'N'); add('M', p.loads.M, 'N·mm'); add('n', p.loads.n, 'r/min') }
     add('p_static', p.limits.p_static, 'MPa'); add('gap_min', p.limits.gap_min, 'mm'); add('wall_min', p.limits.wall_min, 'mm')
     return rows
   }
@@ -116,9 +135,10 @@ const print = () => window.print()
       <h2>{{ t('inputs') }}</h2>
       <table><tbody><tr v-for="[k, x, u] in inputs" :key="k"><th>{{ t(k) }}</th><td class="mono">{{ x }} {{ u }}</td></tr></tbody></table>
       <h2>{{ t('results') }}</h2>
-      <div class="figs"><SectionCyl v-if="r.type === 'cylindrical'" :r="r" /><SectionTaper v-else-if="r.type === 'tapered'" :r="r" /><SectionCrossed v-else-if="r.type === 'crossed'" :r="r" /><Section v-else :r="r" /><LoadRing v-if="!['flex', 'crossed'].includes(r.type)" :r="r" /></div>
+      <div class="figs"><SectionCyl v-if="r.type === 'cylindrical'" :r="r" /><SectionTaper v-else-if="r.type === 'tapered'" :r="r" /><SectionCrossed v-else-if="r.type === 'crossed'" :r="r" /><SectionThin v-else-if="r.type === 'thin'" :r="r" /><Section v-else :r="r" /><LoadRing v-if="!['flex', 'crossed', 'thin'].includes(r.type)" :r="r" /></div>
       <FlexView v-if="r.type === 'flex'" :r="r" />
       <XrLoads v-if="r.type === 'crossed'" :r="r" />
+      <ThinLoads v-if="r.type === 'thin'" :r="r" />
       <table class="ck">
         <thead><tr><th></th><th>{{ t('value') }}</th><th>{{ t('limit') }}</th><th></th></tr></thead>
         <tbody>
@@ -137,6 +157,7 @@ const print = () => window.print()
       <p>{{ t('methodText') }}</p>
       <p v-if="r.type === 'flex'">{{ t('methodFlex') }}</p>
       <p v-if="r.type === 'crossed'">{{ t('methodCrossed') }}</p>
+      <p v-if="r.type === 'thin'">{{ t('methodThin') }}</p>
       <p>{{ t('ratingsNote') }}</p>
       <p class="gen">{{ t('generated') }}：{{ now }}</p>
     </article>

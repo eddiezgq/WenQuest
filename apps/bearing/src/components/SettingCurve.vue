@@ -13,8 +13,9 @@ const panels = computed(() => {
   const xs = c.e_um, x0 = Math.min(...xs), x1 = Math.max(...xs)
   const X = (x) => PL + ((x - x0) / (x1 - x0)) * (W - PL - PR)
   const now = props.r.pair?.endplay_um
-  const xr = props.r.type === 'crossed'  // a crossed roller bearing: the tilting stiffness is the one that matters
-  return [['p_max', 'scP', 'MPa', 0], xr ? ['k_tilt', 'scKt', 'N·m/mrad', 0] : ['k_axial', 'scK', 'N/µm', 0], ['loaded', xr ? 'scNx' : 'scN', '', 0]].map(([k, key, unit], i) => {
+  const xr = ['crossed', 'thin'].includes(props.r.type)  // robot joint bearings: the tilting stiffness is the one that matters
+  const nk = props.r.type === 'thin' ? 'scNb' : xr ? 'scNx' : 'scN'
+  return [['p_max', 'scP', 'MPa', 0], xr ? ['k_tilt', 'scKt', 'N·m/mrad', 0] : ['k_axial', 'scK', 'N/µm', 0], ['loaded', nk, '', 0]].map(([k, key, unit], i) => {
     const ys = c[k].map((y) => (y == null ? null : Number(y)))
     const ok = ys.filter((y) => y != null)
     const lo = Math.min(...ok), hi = Math.max(...ok), pad = (hi - lo) * 0.1 || Math.abs(hi) * 0.05 || 1
@@ -30,9 +31,9 @@ const H = 8 + 3 * (PH + GAP) + 10
 
 <template>
   <section v-if="panels" class="setting">
-    <h3>{{ t(r.type === 'crossed' ? 'scTitleX' : 'scTitle') }} <small>{{ t('scHint') }}</small></h3>
+    <h3>{{ t(['crossed', 'thin'].includes(r.type) ? 'scTitleX' : 'scTitle') }} <small>{{ t('scHint') }}</small></h3>
     <figure class="curve">
-      <svg :viewBox="`0 0 ${W} ${H}`" role="img" :aria-label="t(r.type === 'crossed' ? 'scTitleX' : 'scTitle')">
+      <svg :viewBox="`0 0 ${W} ${H}`" role="img" :aria-label="t(['crossed', 'thin'].includes(r.type) ? 'scTitleX' : 'scTitle')">
         <g v-for="p in panels.slice(0, 3)" :key="p.key">
           <rect :x="PL" :y="p.top" :width="W - PL - PR" :height="PH" class="frame" />
           <text :x="PL - 6" :y="p.top + 10" class="ann end">{{ p.hi }}</text>
@@ -44,7 +45,7 @@ const H = 8 + 3 * (PH + GAP) + 10
         </g>
         <text :x="PL" :y="H - 2" class="ann">{{ panels[3].x0 }} µm</text>
         <text :x="W - PR" :y="H - 2" class="ann end">{{ panels[3].x1 }} µm</text>
-        <text :x="(PL + W - PR) / 2" :y="H - 2" class="ann mid">{{ t(r.type === 'crossed' ? 'scXr' : 'scX') }}</text>
+        <text :x="(PL + W - PR) / 2" :y="H - 2" class="ann mid">{{ t(r.type === 'crossed' || (r.type === 'thin' && r.thin?.section !== 'A') ? 'scXr' : 'scX') }}</text>
       </svg>
     </figure>
   </section>

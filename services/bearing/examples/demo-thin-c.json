@@ -1,0 +1,57 @@
+{
+  "title": {
+    "zh": "示例（虚构）：机器人末端旋转轴深沟型薄壁轴承",
+    "en": "Example (fictional): radial (deep groove) thin-section bearing of a robot end rotary axis"
+  },
+  "note": {
+    "zh": "尺寸、游隙或预紧、载荷和许用值都是演示虚构，不是任何厂家或标准中的型号，也不是推荐值。",
+    "en": "Sizes, clearance or preload, loads and limits are made up for the demo: not a catalogue or standard bearing, nor recommended values."
+  },
+  "type": "thin",
+  "thin": {
+    "section": "C"
+  },
+  "size": {
+    "d": 80,
+    "D": 96,
+    "B": 8
+  },
+  "inner": {
+    "Dw": 5,
+    "Z": 40,
+    "dm": 88,
+    "fi": 0.52,
+    "fo": 0.53,
+    "h_i": 1.5,
+    "h_o": 1.5
+  },
+  "pair": {
+    "arrangement": "single",
+    "preload": null,
+    "spacing": null,
+    "mount": "pair",
+    "setting": "endplay",
+    "endplay": 10,
+    "sweep_from": null,
+    "sweep_to": null
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "scenario": {
+    "kind": "generic",
+    "fp": null
+  },
+  "limits": {
+    "p_static": 3500,
+    "gap_min": 0.5,
+    "wall_min": 1.0
+  },
+  "loads": {
+    "Fr": 500,
+    "Fa": 150,
+    "M": 0,
+    "n": 60
+  }
+}

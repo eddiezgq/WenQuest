@@ -27,6 +27,8 @@ import CatalogNote from './components/CatalogNote.vue'
 import FlexView from './components/FlexView.vue'
 import SectionCrossed from './components/SectionCrossed.vue'
 import XrLoads from './components/XrLoads.vue'
+import SectionThin from './components/SectionThin.vue'
+import ThinLoads from './components/ThinLoads.vue'
 import { me, links, detach, loadMe, loginUrl } from './cloud'
 
 const examples = ref([])
@@ -123,11 +125,13 @@ onMounted(async () => {
           <SectionCyl v-if="result?.type === 'cylindrical'" :r="result" />
           <SectionTaper v-else-if="result?.type === 'tapered'" :r="result" />
           <SectionCrossed v-else-if="result?.type === 'crossed'" :r="result" />
+          <SectionThin v-else-if="result?.type === 'thin'" :r="result" />
           <Section v-else :r="result" />
-          <LoadRing v-if="!['flex', 'crossed'].includes(result?.type)" :r="result" />
+          <LoadRing v-if="!['flex', 'crossed', 'thin'].includes(result?.type)" :r="result" />
         </div>
         <FlexView v-if="result?.type === 'flex'" :r="result" />
         <XrLoads v-if="result?.type === 'crossed'" :r="result" />
+        <ThinLoads v-if="result?.type === 'thin'" :r="result" />
         <SliceChart :r="result" />
         <ScenarioPanel :r="result" />
         <Extras :r="result" />
