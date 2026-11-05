@@ -159,6 +159,7 @@ def _norm_text(path, pats):
 def exports():
     sch_root = os.path.join(KDIR, NAME + ".kicad_sch")
     pcbf = os.path.join(KDIR, NAME + ".kicad_pcb")
+    os.makedirs(os.path.join(PROJ, ".route"), exist_ok=True)       # 中间文件（不入库；CI 里一开始没有）
     if os.path.isdir(OUT):
         shutil.rmtree(OUT)
     os.makedirs(os.path.join(OUT, "schematic"))
