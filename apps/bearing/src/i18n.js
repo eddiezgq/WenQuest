@@ -138,6 +138,19 @@ const W = {
   pcSign: ['编制 ________　审核 ________　批准 ________　日期 ________', 'Prepared ________   Checked ________   Approved ________   Date ________'],
   k_turn: ['车削', 'Turning'], k_heat: ['热处理', 'Heat treatment'], k_grind: ['磨削', 'Grinding'], k_superfinish: ['超精', 'Superfinishing'],
   k_cut: ['其他切削', 'Other cutting'], k_wash: ['清洗', 'Washing'], k_assemble: ['合套', 'Assembly'], k_inspect: ['检测', 'Inspection'], k_other: ['其他', 'Other'],
+  // crossed roller bearings (round 64, plan section 十九)
+  crossed: ['交叉滚子轴承', 'Crossed roller bearing'],
+  alphaX: ['接触角 α（V 形沟道）', 'Contact angle α (V groove)'], alphaXHint: ['沟道面与径向的夹角，通常 45°，按图纸填', 'The raceway face to the radial direction, usually 45°: from your drawing'],
+  xSplit: ['剖分的套圈', 'Split ring'], xsplit_outer: ['外圈剖分', 'Outer ring split'], xsplit_inner: ['内圈剖分', 'Inner ring split'],
+  xset_endplay: ['按径向游隙', 'By radial clearance'], radialPlay: ['径向游隙 Gr', 'Radial clearance Gr'],
+  radialPlayHint: ['内圈相对外圈的径向自由量；负数为预紧（过盈）', 'The inner ring’s free radial play; negative for preload'],
+  preloadX: ['预紧力（每组滚子的轴向力）', 'Preload (axial force of each set)'],
+  sweepHintX: ['预紧量曲线扫的径向游隙范围（如 10 到 −20 µm）；不填不画', 'The clearance range swept (e.g. 10 to −20 µm); blank: no curve'],
+  fitsCrossed: ['交叉滚子轴承的预紧在上面按径向游隙给（已含装配后的值）；配合不单独计算。', 'A crossed roller bearing’s preload is set above as the radial clearance (as mounted); fits are not worked separately.'],
+  scTitleX: ['预紧量曲线', 'Preload sweep'], scKt: ['倾覆刚度', 'Tilting stiffness'], scXr: ['径向游隙（负数为预紧）', 'Radial clearance (negative: preload)'], scNx: ['受载滚子数', 'Rollers carrying load'],
+  methodCrossed: ['交叉滚子轴承：内外圈刚性；内圈相对外圈的五个位移（两个径向、轴向、两个倾斜）一起解；滚子正反交替，每个滚子沿长度切片，线接触按 Palmgren 公式（两接触串联），存储能是位移的凸函数，求极小后用牛顿法精修；滚子可以部分或全部卸载。刚度取柔度矩阵的逆。接触应力按赫兹线接触，沟道是锥面。关节水平轴、只用一个交叉滚子支承时，悬臂重力按力矩 W·x 计入。', 'Crossed roller bearing: rigid rings; the inner ring’s five displacements (two radial, axial, two tilts) solved together; rollers alternating, each sliced along its length, line contact by Palmgren’s law (two contacts in series); the stored energy is convex in the displacements, minimised and polished by Newton steps; rollers may unload. Stiffness is the inverse of the compliance. Contact stress by Hertz line contact on the conical raceways. A joint with a horizontal axis held by one crossed roller bearing takes the overhung weight as the moment W·x.'],
+  xrLoads: ['滚子载荷（正、反两组）', 'Roller loads (the two sets)'], xrPlus: ['正向组', 'one set'], xrMinus: ['反向组', 'the other set'],
+  xrAlong: ['最重滚子沿长度的接触应力', 'Contact stress along the heaviest roller'], xrFa: ['两组轴向力', 'Axial force of the sets'],
   // harmonic reducer flexible bearings (round 64, plan section 十八)
   flex: ['谐波柔性轴承', 'Harmonic flexible bearing'], gFlex: ['凸轮与柔轮载荷', 'Cam and flexspline load'],
   camKind: ['凸轮形状', 'Cam shape'], cam_cosine: ['余弦形（给最大径向变形）', 'Cosine (give the largest deformation)'], cam_ellipse: ['椭圆（给长短半轴）', 'Ellipse (give the semi-axes)'], cam_points: ['给点', 'Points'],
@@ -170,7 +183,7 @@ const W = {
   catDraftNote: ['存到云端以后才能选用。', 'Save it to the cloud before picking from it.'],
   catMore: ['共 {n} 行，这里只列前 200 行；输入型号或内径查找。', '{n} rows; the first 200 are listed. Type a model or bore to find one.'],
   catNoHit: ['没有找到', 'Nothing found'], catZhOnly: ['', 'The reasons are written in Chinese for now.'], catNotYet: ['暂不能计算', 'not computed yet'],
-  catMetric: ['公制圆锥', 'Metric tapered'], catInch: ['英制圆锥', 'Inch tapered'], catDouble: ['双列圆锥', 'Double-row tapered'], catNU: ['NU 短圆柱', 'NU cylindrical'],
+  catMetric: ['公制圆锥', 'Metric tapered'], catInch: ['英制圆锥', 'Inch tapered'], catDouble: ['双列圆锥', 'Double-row tapered'], catNU: ['NU 短圆柱', 'NU cylindrical'], catCrossed: ['交叉滚子', 'Crossed roller'],
   catFrom: ['产品库', 'Catalogue'], catMakerRatings: ['厂家目录值（未经核实，不参与校核）', 'maker’s catalogue figures (not verified, not used in the checks)'],
   catChanged: ['外形尺寸已改动，与目录不同', 'outside sizes changed from the catalogue'],
   // cloud projects (round 64 step 7, the same words as the cam software)

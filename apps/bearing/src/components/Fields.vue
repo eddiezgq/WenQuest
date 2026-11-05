@@ -6,7 +6,8 @@ import Num from './Num.vue'
 import Scenario from './Scenario.vue'
 import { computed } from 'vue'
 
-const cyl = computed(() => ['cylindrical', 'tapered'].includes(project.type))
+const cyl = computed(() => ['cylindrical', 'tapered', 'crossed'].includes(project.type))
+const xr = computed(() => project.type === 'crossed')
 const tap = computed(() => project.type === 'tapered')
 const flex = computed(() => project.type === 'flex')
 // the cam given by points: "angle°, radial deviation mm" lines ↔ [[deg, mm], …] (plan section 十八)
@@ -28,7 +29,7 @@ const pts = computed({
 <template>
   <div class="fields">
     <div class="seg" role="radiogroup" :aria-label="t('type')">
-      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered', 'flex']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
+      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered', 'flex', 'crossed']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
               :class="{ on: project.type === k }" @click="project.type = k">{{ t(k) }}</button>
     </div>
 
@@ -78,8 +79,19 @@ const pts = computed({
       <Num v-model="project.inner.Lwe" :label="t('Lwe')" unit="mm" :hint="t('LweHint')" />
       <Num v-model="project.inner.Z" :label="t('ZR')" step="1" />
       <Num v-model="project.inner.dm" :label="t('dm')" unit="mm" :hint="t('dmHint')" />
-      <Num v-if="!tap" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
-      <template v-else>
+      <Num v-if="project.type === 'cylindrical'" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
+      <template v-if="xr">
+        <Num v-model="project.inner.alpha0_deg" :label="t('alphaX')" unit="°" :hint="t('alphaXHint')" />
+        <label class="num"><span class="lab">{{ t('xSplit') }}</span>
+          <select v-model="project.crossed.split"><option v-for="k in ['outer', 'inner']" :key="k" :value="k">{{ t('xsplit_' + k) }}</option></select></label>
+        <label class="num"><span class="lab">{{ t('setting') }}</span>
+          <select v-model="project.pair.setting"><option value="endplay">{{ t('xset_endplay') }}</option><option value="preload">{{ t('setting_preload') }}</option></select></label>
+        <Num v-if="project.pair.setting !== 'preload'" v-model="project.pair.endplay" :label="t('radialPlay')" unit="µm" :hint="t('radialPlayHint')" />
+        <Num v-else v-model="project.pair.preload" :label="t('preloadX')" unit="N" />
+        <Num v-model="project.pair.sweep_from" :label="t('sweepFrom')" unit="µm" :hint="t('sweepHintX')" />
+        <Num v-model="project.pair.sweep_to" :label="t('sweepTo')" unit="µm" />
+      </template>
+      <template v-if="tap">
         <Num v-model="project.inner.alpha_o_deg" :label="t('cupAngle')" unit="°" :hint="t('cupHint')" />
         <Num v-model="project.inner.alpha_i_deg" :label="t('coneAngle')" unit="°" />
         <Num v-model="project.inner.alpha_f_deg" :label="t('ribAngle')" unit="°" :hint="t('ribHint')" />
@@ -104,7 +116,7 @@ const pts = computed({
       <Num v-if="project.profile.kind === 'partial'" v-model="project.profile.flat" :label="t('crownFlat')" unit="mm" />
       <label v-if="project.profile.kind === 'table'" class="area"><span class="lab">{{ t('crownTable') }}<small>{{ t('crownTableHint') }}</small></span>
         <textarea v-model.lazy="pts" rows="5" spellcheck="false"></textarea></label>
-      <Num v-model="project.alignment.theta_arcmin" :label="t('misalign')" unit="′" :hint="t('misalignHint')" />
+      <Num v-if="!xr" v-model="project.alignment.theta_arcmin" :label="t('misalign')" unit="′" :hint="t('misalignHint')" />
     </fieldset>
 
     <fieldset><legend>{{ t('gMat') }}</legend>
@@ -127,10 +139,10 @@ const pts = computed({
         <Num v-model="project.fits.T_i" :label="t('T_i')" unit="°C" />
         <Num v-model="project.fits.T_o" :label="t('T_o')" unit="°C" />
       </template>
-      <p v-else class="hint">{{ flex ? t('fitsFlex') : tap ? t('fitsTapered') : t('fitsAngular') }}</p>
+      <p v-else class="hint">{{ flex ? t('fitsFlex') : xr ? t('fitsCrossed') : tap ? t('fitsTapered') : t('fitsAngular') }}</p>
     </fieldset>
 
-    <fieldset v-if="!flex"><legend>{{ t('gLube') }}</legend>
+    <fieldset v-if="!flex && !xr"><legend>{{ t('gLube') }}</legend>
       <Num v-model="project.lube.eta0" :label="t('eta0')" unit="Pa·s" step="0.001" />
       <Num v-model="project.lube.alpha_p" :label="t('alpha_p')" unit="1/Pa" />
       <Num v-model="project.lube.sigma" :label="t('sigma')" unit="µm" step="0.01" />
@@ -139,7 +151,7 @@ const pts = computed({
     <fieldset><legend>{{ t('gLimits') }}</legend>
       <p class="hint">{{ t('limitsHint') }}</p>
       <Num v-model="project.limits.p_static" :label="t('p_static')" unit="MPa" />
-      <Num v-if="!flex" v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
+      <Num v-if="!flex && !xr" v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
       <template v-if="flex">
         <Num v-model="project.flex.sig_i_allow" :label="t('sigIAllow')" unit="MPa" />
         <Num v-model="project.flex.sig_a_allow" :label="t('sigAAllow')" unit="MPa" />

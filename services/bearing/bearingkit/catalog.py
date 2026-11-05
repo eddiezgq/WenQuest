@@ -482,9 +482,13 @@ SHEETS = {
         },
     ),
     "NU短圆柱": ("nu", {"页码": "page", "型号": "model", "d": "d", "D": "D", "B": "B"}),
+    "交叉滚子": (
+        "crossed",
+        {"页码": "page", "型号": "model", "d": "d", "D": "D", "B": "B", "Cr (kN)": "Cr", "C0r (kN)": "Cor"},
+    ),
 }
 # which design type a table's rows open as (the others are listed for reference: not a type the software computes yet)
-OPENS_AS = {"metric": "tapered", "inch": "tapered", "nu": "cylindrical"}
+OPENS_AS = {"metric": "tapered", "inch": "tapered", "nu": "cylindrical", "crossed": "crossed"}
 MAX_ROWS = 5000
 
 

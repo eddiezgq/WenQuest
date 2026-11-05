@@ -130,6 +130,24 @@ def taper_parts(g: dict) -> dict:
     return {"inner": cone, "outer": cup, "element": roller, "element_kind": "taper", "axis_deg": math.degrees(am)}
 
 
+def crossed_parts(g: dict) -> dict:
+    """Crossed roller bearing (plan section 十九): rings with sharp V grooves (the relief under the apex is not drawn),
+    lands just covering the rollers; cylindrical rollers. One ring is split at z = 0 in the real part: drawn whole."""
+    d, D, B, Dw, Lw = g["d"], g["D"], g["B"], g["Dw"], g["Lw"]
+    a = math.radians(g["alpha_deg"])
+    ca, sa = math.cos(a), math.sin(a)
+    R0 = g["dm"] / 2
+    ri, ro, li, lo = g["r_ai"], g["r_ao"], g["r_li"], g["r_lo"]
+    zi = (Dw / 2 + ca * (li - R0)) / sa
+    zo = (Dw / 2 - ca * (lo - R0)) / sa
+    if not (d / 2 < ri < li < lo < ro < D / 2 and 0 < zi < B / 2 and 0 < zo < B / 2):
+        raise PartsError("the rollers do not fit in these rings: check the width, the contact angle and the sizes")
+    inner = _poly([(d / 2, -B / 2), (li, -B / 2), (li, -zi), (ri, 0.0), (li, zi), (li, B / 2), (d / 2, B / 2)])
+    outer = _poly([(lo, -B / 2), (D / 2, -B / 2), (D / 2, B / 2), (lo, B / 2), (lo, zo), (ro, 0.0), (lo, -zo)])
+    roller = _poly([(0, -Lw / 2), (Dw / 2, -Lw / 2), (Dw / 2, Lw / 2), (0, Lw / 2)])
+    return {"inner": inner, "outer": outer, "element": roller, "element_kind": "crossed", "alpha_deg": g["alpha_deg"]}
+
+
 def parts(g: dict) -> dict:
     t = g["type"]
     if t in ("deep_groove", "angular"):
@@ -138,6 +156,8 @@ def parts(g: dict) -> dict:
         return cyl_parts(g)
     if t == "tapered":
         return taper_parts(g)
+    if t == "crossed":
+        return crossed_parts(g)
     raise PartsError("no parts for this bearing type")
 
 
@@ -152,6 +172,12 @@ def _elements(g: dict, pr: dict):
             out.append(c)
         elif pr["element_kind"] == "roller":
             out.append(S.Frame(c, (0, 0, 1), er))
+        elif pr["element_kind"] == "crossed":
+            # every other roller turned through 90°: axis (−σ sin α) e_r + cos α e_z, across it the contact normal
+            sg = 1.0 if j % 2 == 0 else -1.0
+            a = math.radians(pr["alpha_deg"])
+            ez = np.array([0, 0, 1.0])
+            out.append(S.Frame(c, ez * math.cos(a) - sg * math.sin(a) * er, er * math.cos(a) + sg * math.sin(a) * ez))
         else:
             am = math.radians(pr["axis_deg"])
             z = np.array([0, 0, 1.0]) * math.cos(am) + er * math.sin(am)
