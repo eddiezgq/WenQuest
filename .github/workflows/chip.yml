@@ -1,6 +1,7 @@
 # 第 92 轮（电子 E5）：编码器接口芯片 WQ-ENCIF 的综合与版图。在微电子实验的基础镜像（IIC-OSIC-TOOLS，按摘要锁定，见 deploy/micro-lab/Dockerfile）里
 # 跑 LibreLane：RTL → 门级 → 布局布线 → DRC / LVS / 时序 → GDS，再出网页用的版图图片。产物作为构建产物保存；
-# 改了 RTL 或配置后，下载 chip-layout 产物，替换 factory/designs/wq-encif/out/layout/ 再提交（提交过的话，这里核对门数和检查结论与提交的一致）。
+# 在 main 上跑、并且全部检查通过时，由这个工作流把版图产物（out/layout/）和页面数据（design.json、下载包）提交回 main
+# （用工作流自带的令牌推送，不会再触发别的工作流；下一次推送时数字工厂部署带上它）。
 name: Chip layout 芯片版图
 
 on:
@@ -17,7 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   layout:
@@ -38,7 +39,7 @@ jobs:
       - name: 综合与版图（LibreLane，SKY130）
         run: |
           mkdir -p out && chmod 777 out
-          docker run --rm --user 1000:1000 -e IIC_OSIC_TOOLS_QUIET=1 -e PDK=sky130A -e WQ_IMAGE="$BASE" \
+          docker run --rm --user 1000:1000 -e IIC_OSIC_TOOLS_QUIET=1 -e PDK=sky130A -e WQ_IMAGE="$BASE" -e WQ_CHECK=0 \
             -v "$PWD:/repo:ro" -v "$PWD/out:/out" "$BASE" --skip bash -lc "bash /repo/factory/designs/wq-encif/flow/run.sh /repo /out"
       - name: 结论
         if: always()
@@ -51,6 +52,19 @@ jobs:
               r["logic_cells"], r["flipflops"], r["stdcell_area_um2"], r["setup_ws_ns"], r["hold_ws_ns"],
               "干净" if c["drc"] else "有错", "一致" if c["lvs"] else "不一致", "无违例" if c["antenna"] else "有违例"))
           PY
+      - name: 把版图产物提交回 main（全部检查通过时）
+        if: success() && github.ref == 'refs/heads/main'
+        run: |
+          D=factory/designs/wq-encif/out
+          rm -rf $D/layout && mkdir -p $D/layout
+          cp out/layout/* $D/layout/
+          python3 factory/designs/wq-encif/tools/pack.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A $D
+          if git diff --cached --quiet; then echo "产物没有变化"; exit 0; fi
+          git commit -q -m "第92轮：WQ-ENCIF 版图产物（CI 生成：$(python3 -c "import json;r=json.load(open('$D/layout/result.json'));print('逻辑单元',r['logic_cells'],'个，建立余量',round(r['setup_ws_ns'],3),'ns')")）"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 10; done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
