@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "50a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "87a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -135,6 +135,7 @@ def page(path, title, desc, body, cur=None):
 </main>
 {footer()}
 <script src="/assets/cn.js?v={VER}" defer></script>
+<script src="/assets/assist.js?v={VER}" defer></script>
 </body>
 </html>
 """
@@ -669,6 +670,7 @@ def main():
         shutil.copy2(p, OUT / "assets" / p.name)
     shutil.copy2(HERE / "cn.css", OUT / "assets" / "cn.css")
     shutil.copy2(HERE / "cn.js", OUT / "assets" / "cn.js")
+    shutil.copy2(ROOT / "site" / "assist.js", OUT / "assets" / "assist.js")   # 第 87 轮：客服小组件，两站同一个
     (OUT / "assets" / "logo.svg").write_text(LOGO.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"'), encoding="utf-8")
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
     page("/404/", "页面不存在", "页面不存在。", hero("404", "这一页不存在", "可能是网址打错了，或者页面已经移走。", None, [("回首页", "/"), ("预约演示", "/contact/")]))

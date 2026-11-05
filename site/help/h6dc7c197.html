@@ -1,0 +1,46 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>云端 GPU 实验使用说明 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>云端 GPU 实验使用说明</h1>
+<p>《人工智能》第 4 章起，有些实验要在真正的 GPU 上编译、运行 CUDA 程序。问渠替你租一台带 GPU 的机器，装好环境，做完自动关机。设计见《实施细则 · 第 14 轮附：云端 GPU 实验环境》。</p>
+<h2>学生</h2>
+<ol>
+<li><strong>打开</strong>：在“教材”中读到“GPU 实验 x.y”时，点“打开 GPU 实验”。新页面显示你还剩多少 GPU 小时。</li>
+<li><strong>开机</strong>：点“开机”。一两分钟后状态变为“已就绪”，点“进入 JupyterLab”。</li>
+<li><strong>做实验</strong>：在 JupyterLab 里打开本实验的笔记本，按顺序运行各格。</li>
+<li>第一格检查环境（GPU、驱动、CUDA）；</li>
+<li>最后一格把测得的数回传问渠。</li>
+<li><strong>看结果、下实验报告</strong>：回到实验页，下方显示你回传的结果，点“下载填好数据的实验报告”。报告表格中带 <code>{{…}}</code> 的格子已经填上你自己的数，其余照常填写，然后在“作业”中上传。</li>
+<li><strong>关机</strong>：做完点“关机”。机器按秒计费，额度用完就不能再开。</li>
+<li>空闲 30 分钟、或开机满 3 小时会自动关机；</li>
+<li>关机后机器上的文件全部删除，需要保留的代码请先在 JupyterLab 里下载。</li>
+<li><strong>同时只能开一台</strong>。没有额度时，“开机”按钮不出现，请联系任课老师。</li>
+</ol>
+<h2>老师</h2>
+<ul>
+<li><strong>给额度</strong>：在课程的“实验”页，最上方“云端 GPU 实验额度”卡片里填“本课程每名学生 N 小时”，点“保存”。学生的额度取他所在各门课中最大的一个。</li>
+<li><strong>看用量</strong>：同一张卡片列出每名学生用了多少小时、开了几次机器、花了多少钱。</li>
+<li><strong>估算</strong>：第 4—12 章每个 GPU 实验约 1.5 小时；一学期约 21 小时普通 GPU、3 小时虚拟机（第 6 章 GPU 实验 6.5 要读性能计数器；第 7、8 章的实验用 PyTorch 与 Triton，普通 GPU 即可；第 9 章的实验 9.2 有几块 GPU 用几块，只有 1 块时也能做；下篇的实验 11.1、11.7 与 12.4 都在普通 GPU 上做，12.4 会在机器上下载公开语音样例；第 13—16 章的实验也都用普通 GPU，其中第 16 章的实验 16.4 与 16.8 从头训一个小的条件扩散模型，不下载任何模型权重，数据由程序现画，各约 1 小时，实验 16.8 要训两代生成器，时间约为两倍；第 17 章的两个实验都用普通 GPU：实验 17.1 在一个公开权重的小代码模型上扫采样温度、实测 pass@1 与 pass@10，生成的代码在子进程里带超时执行，约 1 小时；实验 17.3 测预填充时延随上下文长度怎么长、20 步循环里前缀复用省多少，不训练任何模型，约半小时；第 18 章的两个实验也用普通 GPU：实验 18.2 用公开权重的 ESMFold 预测几条小蛋白、与实验结构比三个指标并读自评分数，序列与结构都从公开数据库现取，约 1 小时（第一次下载权重另加几分钟）；实验 18.5 训一个小的图神经网络，同一批分子按随机划分与骨架划分各训一次、再换五组骨架划分，约 1 小时；第 19 章的两个实验也用普通 GPU：实验 19.2 用公开权重的 AIFS 从真实初值跑一次十天全球预报，逐个时效量锐度与功率谱，再与同一时刻的分析场比均方根误差，约 1 小时（权重几个 GB，第一次下载另加几分钟；初值从公开数据现取，仓库里不放任何数据文件）；实验 19.5 在卫星影像上先量空间自相关、据此定区块大小，再用同一个模型跑“按像素随机划分”与“区块划分”各 5 折，约半小时（没有自己的影像时可切到合成路径，结论方向一样））。</li>
+</ul>
+<h2>常见问题</h2>
+<ul>
+<li><strong>GPU 实验 8.7 的 Triton 核函数第一次调用很慢</strong>：Triton 第一次遇到某种参数组合时要编译，几秒钟，以后用缓存；计时前先运行一次。报找不到 <code>Python.h</code> 时同下一条。</li>
+<li><strong>GPU 实验 7.7 编译自定义算子失败</strong>：第一次导入 <code>bias_gelu.py</code> 要用 nvcc 编译约一分钟。报找不到 <code>Python.h</code> 时，在终端运行 <code>apt-get install -y python3-dev</code>（普通用户前面加 <code>sudo</code>）；报找不到 ninja 时，第一格已自动安装，重新运行第一格即可。</li>
+<li>
+<p><strong>Nsight Compute 报 ERR_NVGPUCTRPERM</strong>（GPU 实验 6.5 等）：这台机器不允许普通用户读 GPU 性能计数器，容器平台上常见。笔记本会先试 <code>sudo</code>；仍不行时，按笔记本的提示改用书中的实测记录完成分析。平台没有专门配置“性能分析”机型时，问渠会开普通的机器。</p>
+</li>
+<li>
+<p><strong>“GPU 平台暂时没有响应或没有空闲的显卡”</strong>：平台上这类显卡一时租完了，过几分钟再试。</p>
+</li>
+<li><strong>“链接已过期”</strong>：实验页链接 12 小时有效，回到教材重新点“打开 GPU 实验”。</li>
+<li><strong>结果没有回传</strong>：确认运行了笔记本的最后一格；输出里会写“✓ 已回传”。只有本实验登记过的结果名会被保存。</li>
+<li><strong>GPU 实验 9.8 第一次运行要 10 分钟左右</strong>：先在单独的虚拟环境里装 vLLM（自带匹配的 PyTorch，不影响机器上原有的），再下载约 1 GB 的模型；报缺 <code>pythonX.Y-venv</code> 时实验会自动用 sudo 安装。</li>
+<li><strong>GPU 实验 9.2 只有 1 块 GPU</strong>：用 1 个进程跑 DDP 与 FSDP，能学会接口，看不到切分省下的显存；多卡的效果用书中表 9.2.1 在 8 块 A100 上的实测分析。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

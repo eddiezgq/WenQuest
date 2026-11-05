@@ -1,0 +1,86 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>三维仿真视频使用说明 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>三维仿真视频使用说明</h1>
+<p>一句话要一段工程级三维仿真视频：机构怎么动、零件里面发生了什么，可以剖开、透视、慢放，带中英标注和读数。动作由程序算出（机械臂按逆运动学，缝纫机按虚拟样机的机构），不是手调的动画，读数可以写进课件和报告。</p>
+<p><strong>负担在 AI：</strong> 你说要什么，AI 写场景；你提意见，AI 改。AI 只用平台已有的模型，不凭空造形状。</p>
+<h2>一、谁能用</h2>
+<table>
+<thead>
+<tr>
+<th>账号</th>
+<th>怎样用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>老师（能建课的账号）</td>
+<td>直接能用，左边菜单 <strong>三维视频</strong></td>
+</tr>
+<tr>
+<td>企业客户</td>
+<td>在官网“三维仿真视频”页点 <strong>申请开通</strong>；管理员开通后，左边菜单出现 <strong>三维视频</strong></td>
+</tr>
+<tr>
+<td>开通了缝纫机设计软件的企业</td>
+<td>在缝纫机设计软件“导出 → <strong>出三维讲解片</strong>”按自己的设计一键出片（平缝机、包缝机；第 76 轮起绷缝机），然后在这里看、改自己的讲解片、出小样和高清；不能在这里另起别的视频</td>
+</tr>
+<tr>
+<td>学生</td>
+<td>不能用（看不到菜单，接口也拒绝）</td>
+</tr>
+</tbody>
+</table>
+<p>收费：老师开课免费；其他用途按租用机器的时间收费，<strong>11 月上线</strong>。现在都不收费，平台只记下每次用了多少机器时间。</p>
+<h2>二、出一段视频</h2>
+<ol>
+<li>左边菜单 <strong>三维视频</strong>。两种开始方式：</li>
+<li>在上面的框里写一句要求，点 <strong>AI 写场景</strong>，例如“讲清楚平缝机旋梭怎样钩住线环、在布里扣成线结，先整机再特写”；</li>
+<li>在 <strong>从样片开始</strong> 里挑一段，点 <strong>照这个改</strong>（复制一份给你改，原样片不变）。</li>
+<li>进入工作页：</li>
+<li>左边是和 AI 编导的对话；</li>
+<li>中间是出片区，有三个标签：关键画面、小样、高清；</li>
+<li>下面是时间线（每条标注在第几秒出现）。</li>
+<li><strong>出关键画面</strong>：6 张静帧，约 1–2 分钟，先看构图和镜头对不对。点图片可以放大。</li>
+<li>不满意就在左边 <strong>提意见</strong>，例如“镜头再近一点”“第 3 步慢一点”“这里加剖面”“标注改成……”，点 <strong>按意见改</strong>。AI 改完场景，再出关键画面看。</li>
+<li><strong>出小样</strong>（960×540，整段）：平台临时租一台渲染机器，约 6–10 分钟，其中开机约 3–5 分钟。可以离开页面，回来看进度（等机器 → 开机 → 准备环境 → 已渲染多少帧 → 合成）。</li>
+<li><strong>出高清</strong>（1920×1080，MP4 和 WebM）：约 15–30 分钟。出完点 <strong>下载</strong>。</li>
+<li>场景改过以后，旧的关键画面和视频会标“场景改过了，这一版是旧的”，需要时重出。</li>
+</ol>
+<p>机器出完视频就自动关机。正在出的可以点 <strong>取消出片</strong>，机器马上关掉。</p>
+<h2>二之一、缝纫机设计软件的讲解片</h2>
+<p>在缝纫机设计软件里点 <strong>出三维讲解片</strong>，平台按当前这组设计参数自动写好场景，不用写一句话：整机 → 各机构（平缝机刺布、挑线、钩线、送布；包缝机刺布、下弯针、上弯针、送布与差动、切边）→ 红黄灯项（最多三项，在出问题的主轴转角慢放，标题标红 / 标黄）→ 结论，约 40–70 秒。零件、尺寸、每个转角的位置都由设计软件的计算核心给，和网页三维、STEP、计算书是同一套。</p>
+<p>之后照上面第 3–6 步出关键画面、小样、高清，也可以提意见改。<strong>锁定的东西</strong>：这台设计的机型和参数（每次都改回原样）；不能删掉或换掉这台设计、不能加别的模型（只能加方块、圆柱做标示）；字幕和标题里的数只能用计算核心给的那些（原字幕里有的）。镜头、节奏、透视剖开、字幕措辞都能改。</p>
+<h2>三、用到课里</h2>
+<ul>
+<li><strong>白板课</strong>：编辑白板课时点 <strong>插入</strong>，在“我的三维视频”里选（有高清用高清，没有就用小样）。</li>
+<li><strong>网页课件、其他地方</strong>：下载 MP4 后上传。</li>
+</ul>
+<h2>四、高级：直接改场景文件</h2>
+<p>工作页下方点 <strong>直接改场景文件（高级）</strong>，改完点 <strong>检查并保存</strong>。平台会先检查：
+- 只能用已有模型；
+- 时间不能超出视频长度；
+- 标注不能太长（中文 46 字以内，否则会出框）；
+- 镜头关键点要写全；
+- 缝纫机讲解片另有上面说的锁定。</p>
+<p>不合格会列出哪里不对，不保存。格式见仓库 <code>tools/blender/场景格式.md</code>。</p>
+<h2>五、管理员</h2>
+<p><strong>三维视频</strong> 页最下面是 <strong>管理：开通账号与用机记录</strong>：
+- 填企业客户的账号名或邮箱（备注写公司名），点 <strong>开通</strong>；<strong>取消开通</strong> 后对方就看不到菜单了。
+- 用机记录：每次出片用的机型、用时、花费，以及合计。</p>
+<p>服务器上的设置（<code>.env</code>）：
+- <code>VIDEO3D_LAMBDA_KEY</code>：Lambda 的 API 密钥。不填就用云端 GPU 实验的 <code>WQ_GPU_LAMBDA_KEY</code>。两个都没有时，只能出关键画面，页面上会提示。
+- 同时最多开 2 台机器，一台最长 3 小时，没有空闲机器最多等 60 分钟。这些在网关设置里可改（<code>WQ_VIDEO3D_MAX_MACHINES</code> 等）。</p>
+<h2>六、它是怎么做的（给维护的人）</h2>
+<ul>
+<li><strong>关键画面</strong>：服务器上的 <code>blender</code> 容器（Blender 4.2 + 渲染器 + 平缝机虚拟样机网页）。这个容器没有密钥、不能上网，一次只出一个。</li>
+<li><strong>小样和高清</strong>：网关在 Lambda 上租一台机器（按 <code>WQ_VIDEO3D_LAMBDA_TYPES</code> 的顺序挑有空的机型，默认先 A10）。经 JupyterLab 传上去渲染器包、场景文件和 <code>run.sh</code>，在后台运行。网关每 15 秒读一次进度，出完取回视频，然后关机。</li>
+<li>每次开机都记在 <code>video3d.db</code> 的 <code>run</code> 表里。网关重启后，会接着跟进没出完的。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

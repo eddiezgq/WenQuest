@@ -1,0 +1,41 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>从课程包建课 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>从课程包建课</h1>
+<p>适用：由一本网页版教材生成整门课程（目前是《缝纫机设计与制造》和《数字工厂实训》），不经过 AI 建课工作室，由管理员一键发布。</p>
+<h2>管理员怎么发布</h2>
+<ol>
+<li>用管理员账号登录 https://learn.wenquestrobotics.com → 左侧“管理” → 顶部“课程包”。</li>
+<li>卡片上按批列出：第 1 批（第 1–8 讲）、第 2 批（第 9–22 讲 + 期中考试）、第 3 批（第 23–31 讲 + 期末考试），每批显示已发布几讲。</li>
+<li>点某一批的“发布”，确认。第一次会先建好课程并在课程目录<strong>免费上架</strong>，然后逐讲发布；页面每 3 秒刷新进度，一批大约几分钟。</li>
+<li>发布完显示“✓ 已发布”。点“打开课程”可以直接进课程看。</li>
+<li>如果中途出错（比如服务器重启），卡片上会写原因；<strong>再点一次“发布”会从中断处继续</strong>，已发的不会重复。</li>
+</ol>
+<p>点后面的批次，会把前面没发的批次一起补上。</p>
+<h2>每讲有什么</h2>
+<p>讲义（本讲导入 + 教材本章 + 解答与小结）→ 动画（中文版、英文版）→ 中英对照课件（PPT，备注里是讲稿）→ 练习 → 实验指导书 → 实验报告模板 → 虚拟实验或三维模型（中文版、英文版）→ 作业 → 测验（可做 3 次）。老师另外能看到练习参考答案和教案。第 33 节“考试”放期中、期末（限时 120 分钟、一次）。</p>
+<h2>课程包在哪里、怎样修改</h2>
+<ul>
+<li>内容：<code>textbook/web-editions/&lt;书&gt;/course/lessons/chNN.json</code>（按书的配置在同目录上一级的 <code>course.yaml</code>）（格式见同目录 <code>FORMAT.md</code>），改完运行 <code>python3 textbook/web-editions/sewing/course/tools/check.py all</code> 检查。</li>
+<li>生成：<code>python3 textbook/web-editions/sewing/course/tools/build_course.py 输出目录</code>（本地看效果用）；推送 main 后由 CI 自动生成并部署。</li>
+<li>已经发布的讲次不会被重新发布。修改已发布讲次的内容，目前请在课程里直接编辑对应活动（或删掉该讲后告诉开发者重置该讲的发布记录）。</li>
+<li>发布记录：服务器上网关数据目录 <code>course-packs/sewing.json</code>。</li>
+</ul>
+<h2>《数字工厂实训》</h2>
+<ul>
+<li>卡片上只有一批（第 1–12 讲），没有考试（这门课不设期末笔试）。</li>
+<li>第 3、6、10 讲是完整的一讲；其余各讲先发布成“第 N 讲 ……（建设中）”，里面只有一页本讲大纲和对应的数字工厂实验。</li>
+<li><strong>以后某一讲写好了</strong>：推送上线后，卡片上这一批的“已发布”会少一讲，再点“发布”：平台先删掉这一讲的大纲页，再发布完整的一讲（节名里的“建设中”也去掉）。已经完整的讲不受影响。</li>
+<li>每讲的“数字工厂实验”是三个链接：打开数字工厂的实验页、指导书、报告模板。实验的自动评分在数字工厂“实验与任务”里，实验报告交到本讲作业。</li>
+</ul>
+<h2>还没有的</h2>
+<ul>
+<li>讲解视频：每页 PPT 都有中英讲稿，视频另行生成后补进各讲。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

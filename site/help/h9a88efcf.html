@@ -1,0 +1,116 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数字孪生（预测性维护） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>数字孪生（预测性维护）</h1>
+<p>数字工厂工作台左侧“专业软件 → <strong>数字孪生</strong>”。卖出去的每一台 WQR-105 减速器在这里都有一个“分身”：它的<strong>出厂数据</strong>（工单、输出轴序列号和检测值、设计版本、跑合记录）、持续收到的<strong>现场运行数据</strong>（转矩、转速、油温、振动），和前几轮已经有的<strong>寿命模型</strong>（轴承 L10、输出轴疲劳、热平衡油温、润滑油）。平台用它们算“用掉了多少、还剩多少、哪里快坏了、该做什么”，报警、开维修单进 ERPNext，并把整个机队的实际载荷反馈给设计。</p>
+<p>配套实验：<strong>实验 13 减速器数字孪生与预测性维护</strong>，页面右上角可下载指导书和报告模板（Word），课程接口里也有链接。</p>
+<h2>一、孪生从哪来</h2>
+<ul>
+<li><strong>出厂建档</strong>：跑合试验台做完一台 WQR-105（发出转矩记录）就建孪生；装配用的输出轴按先进先出分配一根检验合格的 SH-301，记下它的 6 项检测值；设计版本取当时输出轴的现行参数。3 个现场日后（运输、安装）开始在客户处运行，三类客户轮流分配。</li>
+<li><strong>情景设备</strong>：教学模式第一次启动（或重置实验 7 情景）时，已有 12 台在三类客户处运行 3–30 个月的设备，其中矿山一台轴承正在损坏、港口一台散热变差、港口一台换油过期。</li>
+<li><strong>真设备</strong>：没建档的序列号发来数据也收，自动建一个“现场接入”的档（见第六节）。</li>
+</ul>
+<h2>二、现场数据</h2>
+<p>现场的采集器每个现场日上报一条“运行摘要”（总线消息 <code>twin.telemetry</code>，主题 <code>wq/gearbox/field/&lt;序列号&gt;/telemetry</code>）：运行小时、起动次数、输入转速、平均 / 最大转矩、转矩雨流计数、转矩—小时分布、环境温度、平均 / 最高油温、振动烈度。</p>
+<p>教学模式下客户现场是<strong>模拟</strong>的：三类客户（矿山皮带机、港口输送、食品厂包装线）按各自的工况生成数据，同一台同一天每次一样。<strong>现场时钟</strong>默认 1 分钟 = 1 个现场日；30 分钟没人看“数字孪生”页会自动停，有人打开就从停的地方接着走。</p>
+<h2>三、看一台</h2>
+<p>左边是机队：红（严重）、黄（警告）、绿（正常），可按客户筛选、按健康度 / 剩余寿命排序。点一台，右边是它的分身：</p>
+<ul>
+<li><strong>报警</strong>：标题、数据说明、原因与依据、建议，以及“开维修单”按钮。</li>
+<li><strong>三维健康图</strong>：按真实尺寸画的三根轴、四个齿轮（分度圆）、六个轴承、箱体；轴承按已用寿命着色（振动报警的那个标红），输出轴按疲劳着色，箱体按油温残差和换油着色。鼠标停上去看数。</li>
+<li><strong>五张卡片</strong>：最先到期的轴承（已用 L10、约剩多久）、输出轴疲劳、换油、油温实测 − 模型、振动烈度（ISO 10816-1 分区）。</li>
+<li><strong>曲线</strong>（最近 30 / 90 / 365 天）：油温实测、热平衡模型、环境温度；振动（带 A–D 分区底色）；转矩平均 / 最大（额定线）。</li>
+<li><strong>六个轴承表</strong>：型号、C、额定工况下的径向力和 L10、已用、约剩。</li>
+<li><strong>假如</strong>：负载 50–130%、轴端加风扇（散热系数 17.45 → 31）、输出轴换 40Cr → 最先到期的轴承、输出轴、换油间隔、平均油温，现在 vs 假如（按最近 30 个现场日的实测工况重算）。</li>
+<li><strong>出厂数据</strong>、<strong>维修与报警记录</strong>。</li>
+<li><strong>请 AI 说说这台怎么了</strong>：用到模型时次数计入每人每小时的 AI 上限；没配模型时用规则写。</li>
+</ul>
+<h2>四、报警规则</h2>
+<table>
+<thead>
+<tr>
+<th>报警</th>
+<th>条件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>散热变差</td>
+<td>油温比热平衡模型高（平滑后）&gt; 6 ℃ 警告、&gt; 12 ℃ 严重</td>
+<td>振动正常 → 风扇、积灰、通风、油少；振动也在上升 → 先查轴承</td>
+</tr>
+<tr>
+<td>油温高（工况）</td>
+<td>最高油温 &gt; 90 ℃ 但和模型一致</td>
+<td>不是故障，建议加风扇或降载</td>
+</tr>
+<tr>
+<td>轴承早期损坏</td>
+<td>振动 ≥ 1.8 mm/s（C 区）且最近 7 天在上升；≥ 4.5（D 区）严重</td>
+<td>指向模型里消耗最高的轴承，估算几天进 D 区</td>
+</tr>
+<tr>
+<td>过载</td>
+<td>最近 7 天平均转矩 &gt; 额定</td>
+<td>冲击多（30 天里 ≥ 10 天超过 2 倍额定）只作提示</td>
+</tr>
+<tr>
+<td>轴承寿命</td>
+<td>已用 L10 ≥ 80% 警告、≥ 100% 严重</td>
+<td>建议计划停机时预防性更换</td>
+</tr>
+<tr>
+<td>输出轴疲劳</td>
+<td>Miner 损伤 ≥ 50%</td>
+<td>探伤、复核设计</td>
+</tr>
+<tr>
+<td>换油</td>
+<td>过期警告、14 天内到期提示</td>
+<td>当量小时：油温 70 ℃ 以上每高 10 ℃ 按 2 倍计</td>
+</tr>
+</tbody>
+</table>
+<p>新出现的报警会发 AI 提醒（看板、AI 工厂助手里能看到），升级的再提醒，消失的自动关闭。</p>
+<h2>五、维修闭环</h2>
+<ol>
+<li>报警上点“开维修单”（或“开维修单：换油”），看预览：标题、优先级（严重的为“紧急”）、设备、诊断、依据、要做什么。</li>
+<li>确认开单：经桥接写进 <strong>ERPNext 的服务工单（Issue）</strong>，设备序列号在自定义字段“设备序列号”里；报警标“已派单”。</li>
+<li>修完后在维修单上写维修记录，点“<strong>维修完成</strong>”：孪生里对应寿命复位（换轴承 → 该轴承归零；换油 → 当量小时归零；清洁散热 → 残差归零），模拟现场里对应的故障消失，报警变“已解决”，ERPNext 的服务工单改为 Resolved 并写上处理结果。</li>
+</ol>
+<h2>六、接入真设备</h2>
+<p>现场采集器（ESP32、PLC 网关等）每天用 HTTPS 发一条运行摘要：</p>
+<pre><code>POST https://factory.&lt;域名&gt;/api/twin/telemetry
+Authorization: Bearer &lt;WQ_TWIN_DEVICE_KEY&gt;
+Content-Type: application/json
+
+{&quot;serial&quot;: &quot;WQR105-2610-01&quot;, &quot;day&quot;: &quot;2026-10-04&quot;, &quot;period_h&quot;: 24, &quot;run_h&quot;: 15.2, &quot;starts&quot;: 6, &quot;n_in_rpm&quot;: 1450,
+ &quot;torque_mean_nm&quot;: 298, &quot;torque_max_nm&quot;: 610, &quot;t_amb_c&quot;: 22.5, &quot;oil_t_c&quot;: 71.3, &quot;oil_t_max_c&quot;: 76.0, &quot;vib_mm_s&quot;: 0.82,
+ &quot;rainflow&quot;: [[305, 305, 6], [30, 300, 27000]], &quot;load_hist&quot;: [[275, 3.8], [300, 7.6], [325, 3.8]]}
+</code></pre>
+<ul>
+<li>钥匙 <code>WQ_TWIN_DEVICE_KEY</code> 在服务器 <code>/opt/wenquest/factory/.env</code> 里（部署时自动生成）；没有钥匙的请求一律拒绝。</li>
+<li>格式和模拟器发的一样；不合格式的返回 422 并说明哪个字段不对；同一台旧日期、重复的数据不再累加。</li>
+<li>试发：<code>python tools/twin_device.py --hub https://factory.&lt;域名&gt; --key &lt;钥匙&gt; --serial REAL-0001 --days 3</code>（在仓库 <code>factory/digital/</code> 下运行）。</li>
+</ul>
+<h2>七、机队数据反馈设计</h2>
+<p>页面底部“机队数据反馈设计”按客户汇总最近一年：平均每天运行小时、平均转矩、<strong>轴承当量转矩</strong>（立方平均）占额定的比例、日最大转矩 P95、卡料天数、最先到期的轴承和每年用掉 L10 的比例，并给设计建议（例如矿山客户中间轴换 6306）。“把现场结论带到设计台”：设计台填好现行参数和这段说明（不发布）。</p>
+<h2>八、机械臂关节孪生</h2>
+<p>页面底部“机械臂关节孪生”：选一次已完成的“运动与动力分析”计算（一个搬运循环），填每天运行小时，建孪生。平台按电机选型助手自动选的谐波减速器（安全系数 1.2），用样本的寿命公式 L10 = 7000 h ×（额定力矩 / 平均负载力矩）³ ×（2000 / 平均输入转速）算每个关节，按每天运行小时累计（每天负载在 ±10% 内变，按 3 次方折算），看哪个关节先到期。</p>
+<h2>九、老师控制台</h2>
+<p>页面右上角（只有老师看得到）：现场时钟（停住、1 / 3 / 10 / 30 天每分钟）；每台现在的故障；给任何一台“制造”故障（散热变差、轴承损坏、过载）或清除。故障从当前现场日开始生效，学生只能从数据里发现。</p>
+<h2>十、限制</h2>
+<ul>
+<li>现场数据目前是模拟的；真设备接入口已有，等试点企业或实验室设备。</li>
+<li>轴承用基本额定寿命 L10（没有 ISO 281 的润滑、污染修正），不算齿轮本身的寿命；受力布置是简化的（两支点简支、三轴同平面）。</li>
+<li>振动只用一个振动烈度值，不做频谱分析。</li>
+<li>机械臂关节孪生按同一个搬运循环重复，不接真机器人的数据。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

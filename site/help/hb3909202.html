@@ -1,0 +1,231 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>能源与环境 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>能源与环境</h1>
+<p>数字工厂工作台左侧“保障 → <strong>能源与环境</strong>”。</p>
+<p>它把能源接进工厂主线：<strong>设备状态 → 功率 → 计量读数 → 单件能耗 → 电费（峰平谷）→ 碳排放</strong>，再加车间环境的两项监测（油雾、噪声）。机床开着没活（空转）、热处理炉在电价最贵的时候开炉、设备劣化每件多用电，都会在这里看到，也会在厂情中枢报出来。</p>
+<ul>
+<li>数据都在平台自己的表，不进 ERPNext；维修、整改仍走 ERPNext（设备维护的维修工单、安全环保的整改工单）。</li>
+<li><strong>教学模式</strong>由仿真车间按设备状态和功率每 15 分钟（工厂时间）发一个读数，和真实电表的抄表间隔一样；计量只记数，不改车间节拍。</li>
+<li><strong>生产模式</strong>默认不计量：以后接电表网关（MQTT / Modbus）或导入读数，写进同一张表。</li>
+</ul>
+<p><strong>谁能用：</strong>
+- 看：所有角色；
+- 改电价、排放因子、合同需量、环境限值：厂长；
+- 节能设定、错峰：计划员、维修工或厂长发起，厂长批准（改变车间的运行方式）；
+- 老师（教学模式）可以开关能源模拟器、注入问题。</p>
+<p>页面上方六个数：用电、电费（峰 / 平 / 谷电量）、峰时占比、空转电量、碳排放、本月需量 / 合同需量。默认看最近一天（刚过半夜不到 6 小时时看前一天），总览里可以翻前一天、后一天。</p>
+<h2>一、计量点</h2>
+<p>16 个计量点 + 2 个环境监测点：</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>是什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>E-SAW-01 … E-TEST-01</td>
+<td>12 台设备各一块电表（kWh）</td>
+</tr>
+<tr>
+<td>E-AIR</td>
+<td>空压机电表</td>
+</tr>
+<tr>
+<td>E-TOTAL</td>
+<td>车间总表（各设备 + 空压机 + 照明空调）</td>
+</tr>
+<tr>
+<td>F-AIR</td>
+<td>压缩空气流量计（m³）</td>
+</tr>
+<tr>
+<td>W-MAIN</td>
+<td>自来水总表（m³）</td>
+</tr>
+<tr>
+<td>ENV-MIST、ENV-NOISE</td>
+<td>机加区油雾（mg/m³）、车间噪声（dB(A)）</td>
+</tr>
+</tbody>
+</table>
+<p>每台设备四档功率（kW）：</p>
+<table>
+<thead>
+<tr>
+<th>设备</th>
+<th>运行</th>
+<th>空转</th>
+<th>待机</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>带锯床 SAW-01</td>
+<td>7.5</td>
+<td>2.0</td>
+<td>0.3</td>
+</tr>
+<tr>
+<td>数控车床 A / B</td>
+<td>15 / 11</td>
+<td>5.5 / 4.5</td>
+<td>0.6 / 0.5</td>
+</tr>
+<tr>
+<td>立式 / 卧式加工中心</td>
+<td>15 / 18</td>
+<td>5.0 / 6.0</td>
+<td>0.6 / 0.7</td>
+</tr>
+<tr>
+<td>键槽铣床 / 滚齿机</td>
+<td>5.5 / 7.5</td>
+<td>2.0 / 2.5</td>
+<td>0.3 / 0.4</td>
+</tr>
+<tr>
+<td>热处理炉 HT-01</td>
+<td>110（升温）</td>
+<td>35（保温）</td>
+<td>不待机</td>
+</tr>
+<tr>
+<td>外圆磨床 GRD-01</td>
+<td>11</td>
+<td>4.0</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>检验站 / 装配工位 / 跑合试验台</td>
+<td>1.5 / 3 / 15</td>
+<td>0.8 / 1 / 1.5</td>
+<td>0.2 / 0.2 / 0.3</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>空转</strong>：开着没活。</li>
+<li><strong>关机</strong>：这一班没人的设备（按班次下班，或排班里这台这一班没人），下班的人顺手关掉；<strong>忘了关</strong>就一直空转。检验站、试验台是自动设备，不按班次关。</li>
+<li><strong>待机</strong>：设了“空闲 N 分钟自动待机”，空闲到时自己转待机；再开要<strong>预热 3 分钟</strong>（算调整时间）。</li>
+<li><strong>空压机</strong> = 卸载 2 kW + 按开着的用气设备用气；漏气时多出一截。</li>
+</ul>
+<p>在“计量点”一栏选一个计量点看曲线（24 小时 / 3 天 / 7 天）。</p>
+<h2>二、总览</h2>
+<ul>
+<li><strong>总表曲线</strong>：每 15 分钟的平均功率，红色峰时（8–11、18–21 点，$0.15/度）、黄色平时（$0.10/度）、蓝色谷时（23–7 点，$0.05/度）；虚线是合同需量。</li>
+<li><strong>每台设备的电量条</strong>：运行、调整、空转、待机、停机、关机分色。灰色（空转）多的设备，可以考虑自动待机。</li>
+<li><strong>节能设定</strong>：车间正在用的自动待机、错峰、隔声罩。</li>
+</ul>
+<h2>三、单耗</h2>
+<ul>
+<li><strong>单件运行电量</strong>：每台设备每个物料最近 3 件的每件电量，对比基线（之前近 7 天；不到 5 件就用“运行功率 × 标准工时 × 1.08”）。高 25% 以上厂情中枢报“单耗突增”——多半是主轴轴承、刀具 / 砂轮在劣化。</li>
+<li><strong>近 12 小时空转</strong>：每台设备的空转电量、空转小时、占比。</li>
+<li><strong>公用</strong>：空压机比按开着的用气设备该用的多多少（多 3 kW 以上可能漏气）；近 24 小时峰时占比、其中热处理炉多少。</li>
+</ul>
+<h2>四、碳与环境</h2>
+<ul>
+<li><strong>碳核算</strong>（范围 2：外购电力）：本月电量 × 电网排放因子（默认 0.5306 kg CO2/度，生态环境部、国家统计局公布的 2023 年度全国电力平均二氧化碳排放因子，可按地区和新公布的值改）。</li>
+<li><strong>每件产品的碳足迹（全口径）</strong>：各工序设备本月的电量 ÷ 件数，加上空压机、照明按件分摊。开工率低时每件分摊的保温、空转很多，会比“运行功率 × 工时”大得多。</li>
+<li><strong>车间环境</strong>：油雾（按开着的湿式加工设备数推算，限值 5 mg/m³）、噪声（运行设备声级叠加，限值 85 dB(A)）。</li>
+<li><strong>参数</strong>：电价、排放因子、合同需量、环境限值，只有厂长能改。</li>
+</ul>
+<h2>五、厂情中枢的异常</h2>
+<table>
+<thead>
+<tr>
+<th>规则</th>
+<th>什么时候报</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N1 单耗突增</td>
+<td>某台设备某物料最近几件的单件电量比基线高 25% 以上</td>
+</tr>
+<tr>
+<td>N2 空转能耗高</td>
+<td>近 12 小时某台设备空转电量占 30% 以上（至少 1 小时、10 度）；只报最多的 3 台，热处理炉保温不算</td>
+</tr>
+<tr>
+<td>N3 峰时用电占比高</td>
+<td>近 24 小时峰时电量占 30% 以上</td>
+</tr>
+<tr>
+<td>N4 压缩空气基荷高（可能漏气）</td>
+<td>近 4 小时空压机比该用的多 3 kW 以上</td>
+</tr>
+<tr>
+<td>N5 需量接近合同需量</td>
+<td>本月最大 15 分钟平均功率超过合同需量的 90%（超过合同为严重）</td>
+</tr>
+<tr>
+<td>N6 车间环境指标超限</td>
+<td>近 1 小时油雾或噪声平均超过限值</td>
+</tr>
+</tbody>
+</table>
+<p>读数停了 3 小时以上（车间没在跑）不判。</p>
+<p><strong>处理方案</strong>（指挥台右栏）：</p>
+<table>
+<thead>
+<tr>
+<th>异常</th>
+<th>方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>N2 空转</td>
+<td>不处理（对照）/ 这台空闲 10 分钟自动待机 / 30 分钟 / 全部机加设备 10 分钟；车间推演算未来 24 小时的电量、电费、碳和交期</td>
+</tr>
+<tr>
+<td>N3 峰时、N5 需量</td>
+<td>热处理错峰（峰时不开新炉，工件攒着峰后一起进炉）/ 不处理</td>
+</tr>
+<tr>
+<td>N1 单耗突增</td>
+<td>开维修工单（设备维护）/ 暂不处理</td>
+</tr>
+<tr>
+<td>N4 漏气</td>
+<td>整改工单：管路查漏 / 暂不处理</td>
+</tr>
+<tr>
+<td>N6 环境超限</td>
+<td>整改工单：油雾收集器检修，或给锯床、磨床加隔声罩 / 暂不处理</td>
+</tr>
+</tbody>
+</table>
+<p>推荐顺序：交期不变的方案里电费最省的。错峰省的是<strong>钱</strong>（电换了时段），电量和碳排放不变；待机省的是<strong>电</strong>，钱和碳一起省。</p>
+<h2>六、AI 助手</h2>
+<p>可以直接问：
+- “昨天用了多少电、电费多少？峰时占多少？”
+- “磨床的单耗为什么升高了？”“空压机是不是漏气了？”
+- “这个月的碳排放是多少？每件输出轴多少？”</p>
+<p>AI 用三个新工具回答：能耗总览、单耗与空转、碳核算。</p>
+<h2>七、教学模式</h2>
+<ul>
+<li><strong>计量一直开</strong>（只记数，不改车间）。</li>
+<li><strong>能源模拟器（会出问题）</strong>：教学模式默认打开，大约每 30 分钟（真实时间）可能出一个问题——下班忘关（晚班没岗位的卧加、滚齿机、键槽铣床、立加）、压缩空气泄漏、设备劣化（单耗慢慢升高）、油雾收集器故障。<strong>重载实验 7 情景后关闭</strong>，生产模式不模拟。</li>
+<li><strong>问题怎么消失</strong>：劣化——这台设备的维修单修好；漏气、油雾——对应的整改工单批准执行；没人处理的，模拟器 2 小时后“修好”；忘关、峰时开炉到时自己结束。</li>
+<li><strong>老师注入</strong>：总览最下面“老师：能源模拟器”，选问题和设备注入，也可以清除。实验 21 页上“注入：卧加下班忘关 + 峰时开炉”。</li>
+</ul>
+<p><strong>两周情景</strong>：第 7 幕“空转与峰时”用到这一页，见<a href="两周情景.md">两周情景</a>。</p>
+<h2>八、实验 21</h2>
+<p>左侧“<strong>实验与任务 → 实验 21</strong>”：能源——空转、错峰与单件碳足迹。五个任务自动评 60 分，报告 40 分由老师批改；沿用比对模式（提交任务 3 之前，指挥台和 AI 不显示建议）。指导书和报告模板在页面右上角。</p>
+<h2>九、常见问题</h2>
+<ul>
+<li><strong>页面上一直“还没有计量读数”？</strong>教学模式要车间在跑（倍速 20 时 45 秒一个读数）；平台每 5 分钟把计量开关发给车间一次，车间重启后最多等 5 分钟。</li>
+<li><strong>为什么热处理炉空闲也有 35 kW？</strong>炉子保温，不待机、不关机。降低它的办法是集中开炉、错峰。</li>
+<li><strong>全口径的每件碳排放为什么这么大？</strong>开工率低时，空转和保温的电摊到很少的件上。多做件、少空转，每件就降下来。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

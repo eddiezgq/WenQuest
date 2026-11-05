@@ -1,0 +1,51 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>评价系统与校情中枢演示 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>评价系统与校情中枢演示</h1>
+<p>面向高校的本科教学审核评估、专业认证、校内教学评估。数据全部是模拟的（一门《大学物理（上）》、30 人模拟班）。</p>
+<h2>打开</h2>
+<ul>
+<li>评价系统：https://wenquestrobotics.com/eval/ ——三个标签：学生端（8 步、成绩单）、教师端（终审队列、照抄型样例 S006）、学校端（课程目标达成度、报告下载）。</li>
+<li>校情中枢：https://wenquestrobotics.com/xq/ ——三个学院、六个专业的毕业要求看板（红 = 低于 0.70）；点专业看指标点明细；改进任务可“下达”（演示，不保存）。</li>
+<li>首页“问渠全貌 → 学习平台与课程”里各有一张卡。</li>
+</ul>
+<h2>报告（网页 + Word）</h2>
+<table>
+<thead>
+<tr>
+<th>报告</th>
+<th>谁出</th>
+<th>位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>课程目标达成情况评价报告</td>
+<td>问渠（课程层）</td>
+<td><code>/eval/课程目标达成情况评价报告.html</code>、<code>.docx</code></td>
+</tr>
+<tr>
+<td>课程教学质量报告</td>
+<td>问渠（课程层）</td>
+<td><code>/eval/课程教学质量报告.html</code>、<code>.docx</code></td>
+</tr>
+<tr>
+<td>毕业要求达成情况评价报告</td>
+<td>校情中枢（专业层）</td>
+<td><code>/xq/毕业要求达成情况评价报告.html</code>、<code>.docx</code></td>
+</tr>
+</tbody>
+</table>
+<p>改进措施在演示稿里由规则生成；正式版由 AI 起草，都要教师确认。</p>
+<h2>重新生成</h2>
+<pre><code class="language-bash">python3 services/eval/r5/pipeline.py      # 评价流水线（11 条规则检查）
+python3 services/eval/reports/build.py    # 生成 site/eval/、site/xq/
+</code></pre>
+<p>改了 <code>services/eval/</code>，推送时工作流“Eval pipeline 评价系统检查”自动跑流水线和报告检查。方案见 <code>docs/方案/校情中枢架构与方案.md</code>、<code>docs/方案/评价系统/</code>。</p></main><script src="/assist.js" defer></script></body></html>

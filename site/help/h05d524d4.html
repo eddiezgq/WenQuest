@@ -1,0 +1,42 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>教材网页版 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>教材网页版</h1>
+<h2>学生、老师</h2>
+<ol>
+<li>登录问渠学习平台，左侧点“教材”。</li>
+<li>书架上标“网页版”的书（目前是《缝纫机设计与制造》《数字工厂实训》），点一下就在平台页面里打开。</li>
+<li>书内右上角有“目录”“互动资源”和“中文 · English”切换；虚拟实验点“在本页运行”就在正文里运行。</li>
+<li>想全屏阅读，点平台顶栏下方的“新窗口打开 ↗”。点“‹ 书架”回到书架。</li>
+<li>阅读链接 12 小时有效；过期后回到书架重新点开即可。</li>
+<li>小程序里只显示书名和说明：这本书带虚拟实验和三维模型，请在网页端阅读。</li>
+</ol>
+<h2>管理员</h2>
+<ul>
+<li>书的源文件在仓库 <code>textbook/web-editions/&lt;书&gt;/</code>，说明见那里的 <code>README.md</code>。改完推送 main，自动构建并部署。</li>
+<li>服务器上的位置：<code>/opt/wenquest/textbook/&lt;书&gt;/webed/</code>。</li>
+</ul>
+<h2>《缝纫机设计与制造》：虚拟样机与综合调机</h2>
+<p><strong>平缝机虚拟样机</strong>（第 2 章“模型 2-1”，第 3、4、6、8 章也有入口；课程第 2 讲、第 8 讲各有一份指导书）</p>
+<ul>
+<li>拖动旋转，滚轮或双指缩放，右键拖动平移；点零件显示编号、名称和所属机构。勾“显示编号”在零件旁标出编号，编号与真机套件透明盖板上印的、拆装手册里的一致。</li>
+<li>“外壳”四种显示：外观、透明盖板（与套件 A 相同）、开窗剖切（与展示机 A+ 相同）、全透视。“拆开程度”把整机拆开。“机构”里点一条传动链单独突出。</li>
+<li>“运转”：播放、暂停、慢放速度，拖“主轴转角”，或点“跳到：针杆最高、针最低、钩线、脱环、牙落下”。</li>
+<li>“看成线”：放大钩线区，慢放看面线线环被梭尖钩住、绕过梭壳、被挑线杆收紧。下方时序图和三维画面是同一个转角，点图上任一处跳到那个转角。</li>
+<li>“测量”：再点机针、挑线杆、送布牙或旋梭，下方画出它一转里的位移、速度、加速度。</li>
+<li>“调机与试缝”：调旋梭定时、针杆高度、梭尖间隙、机针、过线板、挑线簧、两根线的张力、送布定时、牙高、压脚压力、针距、转速、平衡率，换面料和缝线，点“试缝 30 针”。出毛病时样机上出事的部位标红，列出原因；点一条故障，跳到对应的机构，并给出该去细看的实验。“恢复标准”回到标准设定。</li>
+</ul>
+<p><strong>实验 8-2 综合调机</strong>（第 8 章；课程第 8 讲，作业改为“综合调机报告”）</p>
+<ul>
+<li>页面给一台有 1–3 个故障的平缝机，学生只看得到试缝的现象，要用“测量”找原因、用“调整”修好，直到 30 针都合格。调整只显示拧了多少，现在是多少要量了才知道；量具读数带有误差。</li>
+<li>完成后列出这台机器的故障、试缝/测量/调整次数，以及有没有把本来没问题的地方调离标准（“乱调”）。三个任务自动判定，第三个是 3 个故障、试缝不超过 8 次、不乱调。</li>
+<li><strong>老师出同一道题</strong>：让全班选同一个“故障数”，在“故障机编号”里输入同一个数字点“载入”；同一编号和故障数一定是同一台机器。也可以直接给链接，在实验页地址后加 <code>?level=3&amp;seed=1234</code>。</li>
+<li>故障库 15 种：旋梭定时早或晚、针杆高或低、换了粗针没重调梭尖间隙、挑线簧行程太小、过线板放线太少、夹线器太紧或太松、底线太松、送布定时太晚、送布牙太低、压脚压力不足、平衡率太大或太小。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

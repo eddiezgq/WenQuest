@@ -1,0 +1,95 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>流体分析（虚拟风洞：流场、阻力、散热系数） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>流体分析（虚拟风洞：流场、阻力、散热系数）</h1>
+<p>数字工厂工作台左侧“专业软件 → <strong>流体分析</strong>”。把零件放进一个虚拟风洞，服务器算出风怎么绕过零件、阻力多大、每个面的散热系数 h 是多少；算出的 h 可以一键送进“仿真与分析”的温度场，代替查表的散热系数。不用装软件，求解器是 OpenFOAM（开源，服务器上调用）。教学模式、生产模式都能用。</p>
+<p>配套实验：<strong>实验 14 减速器风扇冷却的流体与传热分析</strong>，页面右上角可下载指导书和报告模板（Word）。</p>
+<h2>一、四步算一次</h2>
+<ol>
+<li><strong>零件</strong>，三种来源：</li>
+<li>示例（参数可改，改了点“读入”重新生成）：<ul>
+<li><strong>WQR-105 简化箱体</strong>：读入后自动填好“风扇 5 m/s 顺着长边吹、放在机座上、表面 70 ℃”；</li>
+<li><strong>电脑 CPU 散热片</strong>（生活例子）：3 m/s 顺着片间通道吹；</li>
+<li><strong>缝纫机伺服电控箱</strong>：铝外壳兼散热器，顶面翅片可改，功率模块贴在顶板里面；没有风扇时用下面的“自然对流”；</li>
+<li><strong>AGV 小车电控箱通风</strong>（机器人例子）：小车 1.5 m/s 行驶，风从前面的风口灌进去、后面的风口出去；“风口布置”1/2/3 三种可比较；箱里有电机驱动器和工控机。</li>
+</ul>
+</li>
+<li>物料库里发布过三维模型的零件；</li>
+<li>上传任何 CAD 导出的 STEP。</li>
+<li><strong>风</strong>：风速（m/s）、来流方向（±X、±Y、±Z）、空气温度、是否“放在地面 / 机座上”（勾上后零件底面贴着地面，底面不吹风）。也可以在框里写一句话，例如“轴端风扇 5 m/s 沿长边吹，空气 25 ℃，箱体表面 70 ℃，放在机座上”，点“AI 填表”——AI 只填表，下面列出它理解了什么、哪些没看懂，确认后你自己点“开始计算”。</li>
+<li><strong>换热</strong>：勾“算散热系数”，填零件表面温度。强制对流时 h 几乎不随温差变，填接近实际的温度即可。不勾就只算流场和阻力（快一点）。</li>
+<li><strong>网格</strong>：粗（约 6 万单元）、中（12 万）、细（25 万）。一般 2–8 分钟；AGV 电控箱这种箱里有通风的，平台自动加密箱壁和风口附近，约 6–10 分钟。</li>
+</ol>
+<p>计算服务排队，一次算一个；页面上显示排在第几、正在划网格 / 算流场 / 算温度场。离开页面不影响计算，回来在下方记录里点“看 →”。</p>
+<h2>一之一、自然对流</h2>
+<p>没有风扇、靠热空气往上浮散热的零件（缝纫机电控箱、电控柜）要算自然对流。<strong>目前只有缝纫机设计软件“CAE 分析 → 电控箱”调用它</strong>，这一页的“风”还没有这个选项（以后加）。计算服务把零件放在一间大房间里（墙是空气温度），打开重力，按非定常（OpenFOAM buoyantPimpleFoam）算到流动稳定，取后段几帧平均每个面的散热系数 h。网格不贴体（台阶网格：贴体时边角挤出的歪斜单元在重力下会算出假流动），和坐标轴对齐的外形几乎没有误差，斜面、圆角会成台阶。辐射不在流体里算，送温度场时另加（εσ(T_s² + T_a²)(T_s + T_a)）。一般 5–10 分钟。</p>
+<h2>二、看结果</h2>
+<ul>
+<li><strong>三维图</strong>：零件表面按“压力”或“散热系数 h”着色（右边色标），流线按速度着色，半透明的水平截面是速度大小。鼠标停在零件上显示那一点的压力、h 和这个面的平均 h。拖动旋转、滚轮缩放、右键平移。</li>
+<li><strong>四张卡片</strong>：</li>
+<li>阻力 = 压差阻力 + 摩擦阻力，阻力系数 C_d（按迎风投影面积和动压 ½ρU²）；</li>
+<li>平均散热系数和总散热量；</li>
+<li>雷诺数和流动状态（Re &lt; 2000 层流，否则 k-ω SST 湍流模型）；</li>
+<li>网格和收敛：到步数上限还没完全收敛时标黄。钝体后面的尾流本身会摆动，常常这样；平均值仍可用，局部值看趋势。</li>
+<li><strong>每个面</strong>：面积、平均压力（相对来流，迎风面为正）、h、散热量。</li>
+<li><strong>下载 Word 报告</strong>：设置与方法、结果表、两张三维截图（表面压力和流线、表面 h）、每个面的表、页面上的 AI 解释和局限。</li>
+<li><strong>请 AI 解释结果</strong>：讲流动状态、阻力构成、h 大小面的原因，并用教材平板公式（层流 0.664·Re^½·Pr^⅓、湍流 0.037·Re^0.8·Pr^⅓）核对量级。没配大模型时用规则生成。</li>
+</ul>
+<h2>三、送到温度场</h2>
+<p>带换热的结果有“把散热系数送到温度场 →”按钮：转到“仿真与分析”，自动读入同一个零件、切到“温度”、每个面填上算出的 h（h 相近的面合成一行），环境温度取来流温度。示例零件同时带上它的发热（箱体内壁的齿轮损耗、CPU 发热、驱动器和工控机发热），装在机座上的底面、贴着 CPU 的面不填对流。</p>
+<p>WQR-105 箱体还会<strong>自动加上辐射</strong>：教材的 K_s 是“对流 + 辐射”的总系数，涂漆铸铁发射率约 0.9，70 ℃ 时辐射约 6.8 W/(m²·K)；教材公式里的 K_s 也换成“算出的对流平均 + 辐射”，方便和有限元比较。</p>
+<p>数字孪生页“假如加风扇”用的散热系数，会自动取本厂最近一次“箱体 + 换热”的流体分析结果（没有就用教材的 31）。</p>
+<h2>四、标准题核对</h2>
+<p>页面下方“标准题核对”：在服务器上跑四道有教材答案的题（约 3–5 分钟），表格列出平台结果、教材公式和差：</p>
+<table>
+<thead>
+<tr>
+<th>题</th>
+<th>教材 / 文献</th>
+<th>平台（差）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>平行平板间层流压降</td>
+<td>dp/dx = 12μU/h²</td>
+<td>0.5%</td>
+</tr>
+<tr>
+<td>平板层流平均 Nu（Re 9600）</td>
+<td>0.664·Re^½·Pr^⅓ = 58.6</td>
+<td>60.3（+2.9%）</td>
+</tr>
+<tr>
+<td>湍流平板通道摩擦系数</td>
+<td>Blasius 0.079·Re^(−¼)</td>
+<td>−0.8%</td>
+</tr>
+<tr>
+<td>湍流平板通道 Nu</td>
+<td>Dittus–Boelter 0.023·Re^0.8·Pr^0.4</td>
+<td>−1.7%</td>
+</tr>
+<tr>
+<td>绕圆柱阻力系数（Re 40）</td>
+<td>1.52–1.57</td>
+<td>1.57</td>
+</tr>
+</tbody>
+</table>
+<h2>五、它能算什么、不能算什么</h2>
+<ul>
+<li>能：定常、不可压（风速 60 m/s 以内）的空气外流和通风；强制对流换热；阻力。</li>
+<li>不能：浮力驱动的自然对流（车停着、风扇不转时靠的那种）、辐射（送温度场时箱体另加）、转动的风扇叶片、可压缩流、非定常涡脱落的频率。</li>
+<li>网格上限 30 万单元（教学版），阻力和 h 看前两三位有效数字；风洞侧面只留 1.5 倍零件尺寸，阻塞较大时阻力系数偏大几个百分点。</li>
+<li>薄壁（小于约 4 mm）的零件网格可能分不开，建议按 4 mm 以上建模或选细网格。</li>
+</ul>
+<h2>六、方法（给老师和想深入的同学）</h2>
+<p>STEP → 按 CAD 面分开的表面三角形 → 长方体风洞（来流前 2 倍、后 5 倍、侧面 1.5 倍特征尺寸）→ OpenFOAM blockMesh 背景网格 + snappyHexMesh 贴体加密 → simpleFoam（SIMPLE 算法，多核时自动分块并行）→ 在算好的流场上自写有限体积解温度（迎风格式，等效扩散 ν/Pr + ν_t/Pr_t，Pr_t = 0.85）→ 按面积分得每个 CAD 面的压力、摩擦力、散热量。强制对流时温度不影响流动，所以先算流动、再算温度，结果和耦合求解相同、快一两个数量级。</p></main><script src="/assist.js" defer></script></body></html>

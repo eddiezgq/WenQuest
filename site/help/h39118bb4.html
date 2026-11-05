@@ -1,0 +1,44 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>课程下架、删除、恢复与下载（老师） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>课程下架、删除、恢复与下载（老师）</h1>
+<blockquote>
+<p>适用版本 v0.11.0。一门课有四个状态：<strong>开课 → 下架 → 已删除（在回收站）→ 永久删除</strong>。永久删除之前，任何时候都能下载保存。
+已经发布的课时在 AI 建课里是锁定的（发布要严格）；要改内容，请在课程页里“编辑课程”手工改。</p>
+</blockquote>
+<h2>下架（这学期不开课）</h2>
+<ol>
+<li>打开课程首页，顶部“课程管理”点 <strong>下架</strong>，确认。</li>
+<li>下架后：学生在仪表盘、课程列表、课程目录里都看不到这门课；他们的成绩、提交都保留。你自己照常能看、能改，课程列表里这门课标“已下架”。</li>
+<li>想重新开：课程首页顶部灰条里点 <strong>重新开课</strong>。</li>
+</ol>
+<p>（编辑课程 → ⚙ 设置里的“对学生显示/隐藏”开关是同一件事。）</p>
+<h2>删除（进回收站，可以恢复）</h2>
+<ol>
+<li>只有<strong>已下架</strong>的课才能删：先下架，再在顶部灰条里点 <strong>删除</strong>，确认。</li>
+<li>删除时自动做一份完整备份（内容、学生、成绩、提交），课程放进 <strong>回收站</strong>。</li>
+<li>回收站在“课程”页右上角 <strong>回收站与下载</strong>。里面列出你删掉的课（删除时间、谁删的、大小，以及对应的 AI 建课项目）。回收站<strong>不会自动清空</strong>。</li>
+</ol>
+<h2>恢复</h2>
+<p>在回收站里点 <strong>恢复</strong>：课程按备份原样回来，学生、成绩都在，<strong>处于下架状态</strong>——你看过没问题，再点“重新开课”。对应的 AI 建课项目会自动重新连上（本章的虚拟实验页也会重新对上）。</p>
+<h2>永久删除</h2>
+<p>在回收站里点 <strong>永久删除</strong>：
+- 先点 <strong>先下载备份</strong>（强烈建议）；
+- 输入课程名确认；
+- 如果这门课有 AI 建课项目，可以勾选“同时删除 AI 建课项目”（默认不删：项目、资料和写好的课时都留着，以后可以重新发布成一门新课）。</p>
+<p>永久删除后无法找回。</p>
+<h2>下载保存</h2>
+<p>课程首页顶部点 <strong>下载</strong>，选一种：
+- <strong>课程备份包（.mbz）</strong>：含内容、学生、成绩，以后可以原样恢复到平台上（请管理员操作）；
+- <strong>资料压缩包（.zip）</strong>：每章一个文件夹，里面是课件、讲义、动画视频、实验指导书、报告模板等原始文件，另有一份“课程目录.html”，在自己电脑上直接打开看。测验、讨论这类只能在平台上用的内容，目录里会注明。</p>
+<p>回收站里的课也能点 <strong>课程备份包</strong> 下载。</p>
+<p>打包在后台进行，进度在“回收站与下载 → 我的下载”里看；好了出现 <strong>下载</strong> 按钮（配置了邮件的话也会发邮件通知）。下载链接 24 小时有效，文件保留 3 天。</p>
+<h2>谁能操作</h2>
+<p>课程的老师（能编辑这门课的人）和管理员。学生看不到这些按钮，也不能操作。</p></main><script src="/assist.js" defer></script></body></html>

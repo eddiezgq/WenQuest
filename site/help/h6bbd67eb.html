@@ -1,0 +1,166 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人员与排班 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>人员与排班</h1>
+<p>数字工厂工作台左侧“保障 → <strong>人员</strong>”。</p>
+<p>它把人接进工厂主线：设备要有人才能开。一位关键操作工请假，他那台设备这一班就停；如果那台是瓶颈，整条线和订单都受影响。</p>
+<ul>
+<li>员工、部门、岗位以 <strong>ERPNext</strong> 为准（平台第一次用到时自动建好）；</li>
+<li>技能矩阵（谁能开哪台设备）、排班、出勤、加班在平台；</li>
+<li>平台按排班、出勤、技能算出每一班每台设备“有没有能开它的人”，发给仿真车间：没人就停在“缺人”，只有学徒按 60% 速度开；</li>
+<li>缺人、单点依赖等在厂情中枢变成异常，右栏用车间推演算“调人 / 学徒带教 / 加班顶班 / 不处理”。</li>
+</ul>
+<p><strong>谁能用：</strong>
+- 看排班、技能矩阵：所有角色；
+- 记出勤、考核通过：班组长或厂长（新角色“班组长”在右上角“角色”里切换）；
+- 发起调班、加班顶班、技能培训：班组长、计划员或厂长；
+- 批准：调班班组长或厂长（不能批自己发起的）；加班顶班、技能培训花钱，厂长批；
+- 电话只有厂长和老师看得到；谁请假、迟到的明细只有厂长、班组长和老师看得到，其他人只看到“在岗 / 不在岗”。</p>
+<p>页面上方五个数：这一班出勤率、24 小时内的排班缺口、单点依赖的设备、本周加班小时、车间“要有人”开没开（老师可以在这里开关）。</p>
+<h2>一、组织与员工</h2>
+<p>30 位员工、7 个部门（机加一班、机加二班、热处理、装配检验、设备组、安环部、计划物流）。表里有工号、部门、岗位、班次、入职日期、ERPNext 员工号和会开的设备。</p>
+<ul>
+<li>第 18 轮 E2（安全环保）的 12 人工号不变（P01–P12），他们的安全培训、作业许可都还在；</li>
+<li>全部是虚构的人名。</li>
+</ul>
+<h2>二、技能矩阵</h2>
+<p>员工 × 设备的表，三级：</p>
+<table>
+<thead>
+<tr>
+<th>标记</th>
+<th>等级</th>
+<th>意思</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>学</td>
+<td>学徒</td>
+<td>要人带，速度 60%</td>
+</tr>
+<tr>
+<td>熟</td>
+<td>熟练</td>
+<td>独立操作</td>
+</tr>
+<tr>
+<td>师</td>
+<td>可带徒</td>
+<td>独立操作，还能带学徒</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>列头下面是熟练以上的人数；<strong>标红的列</strong>熟练以上只有一个人（单点依赖）；</li>
+<li>有的资质有有效期（例如热处理炉年审），过期按学徒算；</li>
+<li>一开始键槽铣床、滚齿机、卧式加工中心、压装机只有一个人会开，所以这四台只开早班。</li>
+</ul>
+<p><strong>技能培训（带教）</strong>：在厂情中枢打开“关键资质单点依赖”异常，采纳“技能培训”（谁来学、带教 40 小时，花费 = 40 × $30 × 1.25，含师傅分出去的时间）。批准后学员先按学徒排班，带教结束班组长点“考核通过”，矩阵里升为熟练，单点依赖少一台。</p>
+<h2>三、排班</h2>
+<p>两个班：<strong>早班</strong> 06:00–18:00、<strong>晚班</strong> 18:00–次日 06:00。</p>
+<ul>
+<li>每台设备有固定岗位（谁哪班开）；某一天的调整（调班、加班顶班、学徒带教）覆盖在上面；</li>
+<li>表里每一格：这一班这台设备是谁；<strong>红</strong>：没人能开（请假、调走、不会开）；<strong>黄</strong>：学徒带着开；“不开”：这一班没有岗位；</li>
+<li><strong>点一个格子可以换人</strong>：选谁来顶（按会开的程度排序），勾上“加班顶班”就是他原岗位不动、加班来顶。生成动作，批准后生效，车间马上按新排班。</li>
+</ul>
+<h2>四、出勤与加班</h2>
+<ul>
+<li>这一班谁在岗、开哪台设备；班组长可以记“请假 / 迟到 / 缺勤”（<strong>不记原因</strong>），记错了点“恢复在岗”；</li>
+<li>请假后排班表里他的格子变红，车间这一班这台设备没人能开；</li>
+<li>本周每人加班小时（上限 12 小时），近 7 天各班组缺勤率。</li>
+</ul>
+<h2>五、厂情中枢的异常</h2>
+<table>
+<thead>
+<tr>
+<th>规则</th>
+<th>什么时候报</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1 关键资质单点依赖</td>
+<td>某台设备熟练以上只有一个人</td>
+</tr>
+<tr>
+<td>H2 排班缺口</td>
+<td>未来 24 小时内，有岗位的设备在某一班没人能开（瓶颈设备为严重）；车间“要有人”关着时不报</td>
+</tr>
+<tr>
+<td>H3 技能资质到期</td>
+<td>30 天内到期为提示，已过期为警告</td>
+</tr>
+<tr>
+<td>H4 加班超限</td>
+<td>某人本周加班超过 12 小时</td>
+</tr>
+<tr>
+<td>H5 出勤异常</td>
+<td>近 7 天某班组缺勤率超过 10%（至少 10 人次）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>排班缺口（H2）的处理方案</strong>（指挥台右栏，用车间推演算，先按现在的排班）：</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>做什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A 不处理（对照）</td>
+<td>这一班这台设备停着</td>
+</tr>
+<tr>
+<td>B 调人顶岗</td>
+<td>同班空闲或另一班的熟练工来顶；他原来的岗位这一天空出来（推演里一起算）</td>
+</tr>
+<tr>
+<td>C 学徒带教</td>
+<td>学徒在班组长带着下开，速度 60%</td>
+</tr>
+<tr>
+<td>D 加班顶班</td>
+<td>另一班的熟练工加班 12 小时来顶，原岗位不动；$30 × 1.5 每小时</td>
+</tr>
+</tbody>
+</table>
+<p>推荐顺序：能处理的方案里，交期最好、花费最少的；同样好时不选学徒。</p>
+<p><strong>单点依赖（H1）</strong>：安排技能培训 / 暂不处理。</p>
+<p>因果链：H2 连到这台设备 → 排在它上面的工序 → 工单 → 订单。</p>
+<h2>六、AI 助手</h2>
+<p>可以直接问：
+- “这两天排班有没有缺人？”
+- “哪些设备只有一个人会开？”
+- “本周加班和出勤率怎么样？”</p>
+<p>AI 用三个新工具回答：员工与技能、排班与缺口、加班与负荷。</p>
+<h2>七、教学模式</h2>
+<ul>
+<li><strong>车间要有人</strong>：教学模式默认打开；<strong>重载实验 7 情景后关闭</strong>（和以前完全一样，设备不需要人）。老师在“人员”页上方或“实验与任务 → 实验 19”里开关。生产模式默认关闭（工厂接上自己的真实排班后再开）。</li>
+<li><strong>教学模拟器</strong>：每天每班开班时，班组长（模拟器）随机记少数人请假（约 3%）或迟到（约 5%）；带教按 40 小时 ÷ 30 的真实时间（约 80 分钟）后自动考核通过。</li>
+<li><strong>老师注入</strong>：让某人下一个要上的班请假（实验 19 页上方）。</li>
+</ul>
+<p><strong>两周情景</strong>：第 4 幕“缺人：磨床的熟练工请假”用到这一页，见<a href="两周情景.md">两周情景</a>。</p>
+<h2>八、和其他领域的关系</h2>
+<ul>
+<li><strong>安全环保</strong>：作业许可、挂牌上锁的持证人从员工档案里取，优先这一班在岗的；</li>
+<li><strong>设备维护</strong>：维修单、保养挂牌上锁时，优先派这一班在岗的持证维修工。</li>
+</ul>
+<h2>九、实验 19</h2>
+<p>左侧“<strong>实验与任务 → 实验 19</strong>”：排班与技能——缺人时的决策。五个任务自动评 60 分，报告 40 分由老师批改；沿用比对模式（提交任务 3 之前，指挥台和 AI 不显示建议）。指导书和报告模板在页面右上角。</p>
+<h2>十、常见问题</h2>
+<ul>
+<li><strong>ERPNext 员工号是空的？</strong>平台第一次打开人员页时在 ERPNext 里整批建员工、部门、岗位，稍等一两分钟刷新。</li>
+<li><strong>设备显示“👤 这一班没人能开”？</strong>到“人员 → 排班”找到红格子，点它换人，或在指挥台打开“排班缺口”异常看方案。</li>
+<li><strong>调班后另一个格子变红了？</strong>调来的人原来的岗位空出来了，这是调人的代价；可以再调一个，或改用加班顶班。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

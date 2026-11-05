@@ -1,0 +1,36 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>缝纫机真机套件意向登记 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>缝纫机真机套件意向登记</h1>
+<h2>给访客</h2>
+<p>官网“课程”表里，《缝纫机设计与制造》这一行有“真机套件意向登记”的链接，地址是 <code>https://wenquestrobotics.com/kits.html</code>。页面有中英两版，右上角切换，不需要注册账号。</p>
+<p>登记的内容：
+- 想要的套件：A 机头拆装套件、A+ 开窗剖切展示机、B 整机、C 控制套件，可以多选；
+- 机型；
+- 能接受的价位；
+- 用途；
+- 国家或地区；
+- 数量；
+- 邮箱。</p>
+<p>登记不是订单，不用付款。</p>
+<h2>给管理员</h2>
+<p>查看和导出登记：</p>
+<ol>
+<li>用管理员账号登录学习平台。</li>
+<li>打开“管理 → 课程包”。</li>
+<li>页面下方有“缝纫机真机套件意向登记”卡片，显示登记条数和各套件的累计套数。</li>
+<li>点“下载表格”，得到全部登记的表格（CSV，用 Excel 打开）。下载只能在网页端做，小程序里不行。</li>
+</ol>
+<p>登记数据保存在服务器的 <code>data_dir/kit-interest.db</code> 里。有人写信要求删除时，找技术人员按邮箱删除对应记录。</p>
+<h2>防垃圾提交</h2>
+<ul>
+<li>同一网络地址每小时最多提交 8 条。</li>
+<li>页面里有一个隐藏的输入框，机器人填了它，提交会被悄悄丢弃。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

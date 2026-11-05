@@ -1,0 +1,43 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>虚拟 PLC 使用说明（数字工厂 ·《PLC 原理及实践》第 18 轮） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>虚拟 PLC 使用说明（数字工厂 ·《PLC 原理及实践》第 18 轮）</h1>
+<p>学生写的 PLC 程序，在数字工厂里控制两台设备跑一个生产班次：<strong>轴承压装工位 PRESS-01</strong>（第 15 章任务单的设备）和<strong>成品分拣线 SORT-01</strong>。产量、合格率、节拍、报警、停机都记下来，供学生复盘。</p>
+<h2>程序怎样进车间</h2>
+<p><strong>学生（工程任务单）</strong>
+1. 在学习平台的 PLC 实验台写好程序，按“导出 PLCopen XML”存成文件（也可以交 .st 文本）。
+2. 打开数字工厂“我的任务”里的任务单（如 TS-15-1），在“PLC 程序”这一项点“上传”。上传时就编译检查，状态栏显示“编译通过”或错误。
+3. 点“AI 预检”：程序检查的错误（双线圈、没用到急停或光幕、变量与标准函数同名、状态变量设成保持型等）会列出来。
+4. 提交。老师批准后，程序<strong>自动下载到虚拟 PLC</strong>，跑一个 8 小时班次。任务单页下方出现“虚拟 PLC 试生产”，可以看进度和结果。</p>
+<p><strong>老师（试跑）</strong>
+1. 数字工厂左侧“专业软件”→“虚拟 PLC”。
+2. 在设备卡片上点“试跑一个班次”，选“参考程序”或上传程序，选班次长度，点“下载并运行”。
+3. 同一台设备上正在跑的班次会停下，换成新程序。</p>
+<h2>班次里发生什么</h2>
+<ul>
+<li>车间按仿真倍速运行（默认 20 倍，8 小时的班次约 24 分钟），设备状态、每个工件、报警实时发到总线；</li>
+<li>模拟操作工放件、双手启动、取件；过盈不合适的件约 3%；</li>
+<li>班次里会按时发生一两次设备故障（夹紧传感器断线、上位开关粘连；分拣线推杆卡住、颜色传感器脏），维修工一段时间后修好。好的程序会报警、停在安全状态、复位后接着生产；不处理故障的程序会一直等（记为“停线”）。</li>
+</ul>
+<h2>班次报告</h2>
+<p>点“班次记录”的一行：产量、合格 / 不合格、合格率、平均节拍、报警清单（班次内时刻、代码、内容）、停机时间、停线次数、危险动作、设备故障清单、程序检查意见、程序全文。</p>
+<h2>OpenPLC 兼容性检查</h2>
+<p>每个班次同时把程序交给开源软 PLC——<strong>OpenPLC 运行时</strong>（MatIEC 编译器）编译，并按真实时间控制同一台虚拟设备 90 秒（虚拟设备作为 Modbus TCP 从站，OpenPLC 轮询它）。结果显示在班次详情里：</p>
+<ul>
+<li><strong>通过</strong>：程序是标准 IEC 61131-3，换到真 PLC 上也能编译、也能生产；</li>
+<li><strong>编译不过</strong>：列出编译器的错误，行号对应“交给 OpenPLC 的程序”（加了 I/O 声明，可以展开看）。常见原因：变量与标准函数同名（如 LIMIT、MAX），用了问渠实验台独有的写法（如 SFC 前面直接写 ST 语句）。</li>
+</ul>
+<p>说明：开机最初几十毫秒，OpenPLC 还没从设备读到输入，急停输入为 0，程序会先进急停状态；兼容性检查里的操作工 3 秒后按复位，这是正常现象。</p>
+<h2>常见问题</h2>
+<ul>
+<li><strong>“程序编译不过”</strong>：先在学习平台实验台里点“编译并下载”和“程序检查”，改到没有错误再交。</li>
+<li><strong>班次一直“运行中”</strong>：看进度条；倍速 20 时一个班次约 24 分钟。</li>
+<li><strong>想重跑</strong>：老师在“虚拟 PLC”页再试跑一次；学生改了程序要重新提交、批准。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

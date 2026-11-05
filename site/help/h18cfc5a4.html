@@ -1,0 +1,172 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>微电子虚拟实验使用说明 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>微电子虚拟实验使用说明</h1>
+<p>适用于：数字集成电路设计第 1 章“CMOS 反相器”实验台，ngspice、Verilog 两个浏览器工具页，以及做版图和 RTL→GDS 用的实验镜像。对应《实施细则 · 第 17 轮》和《第 17 轮附：微电子容器镜像与综合服务》。</p>
+<h2>一、学生</h2>
+<p><strong>打开实验。</strong> 在课程页点“虚拟实验”，或在课件实验页点“打开虚拟实验”。实验台是一个网页，电脑和手机都能用，不需要安装软件。右上角“EN / 中文”切换语言。</p>
+<p><strong>做任务。</strong> 实验台有 5 个选项卡，对应第 1.1–1.5 节。每个实验右侧有 3 个任务：调参数达到要求的，系统自动打勾；需要填数的，在输入框里填好按“提交”。标“机器人”的任务对应本节的机器人问题。任务完成情况保存在本机，问渠接入后会同步到课程记录。</p>
+<p><strong>开放问题。</strong> 每个实验还有 1 个开放问题，没有标准答案，写在框里（保存在本机），课后整理进实验报告的思考题。</p>
+<p><strong>写实验报告。</strong> 按“实验指导书”操作并记录数据，报告用“实验报告模板”（Word），或在问渠在线填写。第六部分“实际问题的建模与求解”按五步写：问题、模型与假设、求解、实验检验、模型局限与改进。最后如实填写 AI 使用声明。</p>
+<p><strong>关于数值。</strong> 实验用的是长沟道模型，参数按 SKY130 开源工艺库（典型工艺角、27 °C）校准：饱和电流和 FO4 延时与 SPICE 仿真相差不到 10%，其余差别正是“模型局限”一步要讨论的内容。报告里比较“测量值”和“公式值”时，以实验台读数为准。</p>
+<h2>二、教师</h2>
+<p><strong>课堂用法。</strong> 课件每节的“虚拟实验”页可以直接点开实验台投屏，建议当堂演示机器人任务，其余任务和报告留作课后。课件备注栏有每页的讲解提示。</p>
+<p><strong>评分。</strong> 报告按量规评分：原理 20、数据 25、分析 25、实际问题 20、规范 10。AI 给出建议分，教师复核后发布。成绩登记表在“实验报告评分量规.xlsx”第二页，自动算总分、等级和班级平均。</p>
+<p><strong>参考答案。</strong> 各实验的参考数值写在实验指导书第八部分和课件“建模求解”页，也汇总在《实施细则 · 第 17 轮》第四节。</p>
+<p><strong>两个值得讲的地方。</strong> 一是 1.4 节：经验公式 ln F / ln 4 的前提是每级扇出约 4；最优扇出取决于自载比 γ（f(ln f − 1) = γ）。按 SKY130 校准后 γ ≈ 1.58，最优约 4，所以经验公式恰好给出最快的 6 级；校准前的示意参数 γ ≈ 0.67 时最优是 7 级。可以借这个对比讲经验公式的前提。二是 1.5 节：翻转率 α 指每个时钟一个门输出由 0 变 1 的概率；如果按“任一方向翻转”统计，公式前要乘 ½。</p>
+<h2>三、浏览器工具页</h2>
+<table>
+<thead>
+<tr>
+<th>页面</th>
+<th>用途</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>labs/micro/spice/</code></td>
+<td>在浏览器里运行 ngspice，仿真反相器并与实验台模型对照</td>
+<td>首次下载约 5.7 MB；电脑、手机都可用</td>
+</tr>
+<tr>
+<td><code>labs/micro/verilog/</code></td>
+<td>写 Verilog，用 Yosys 综合，用 DigitalJS 看门级电路和波形，自动测试</td>
+<td>电脑：首次下载约 16 MB，在本机综合；手机：自动改用问渠服务器综合（不下载引擎），电脑本机加载超过 15 秒也会自动改用服务器。读数栏“综合方式”显示用的是哪一种</td>
+</tr>
+</tbody>
+</table>
+<p>国内部署时，三个引擎文件应放在问渠服务器上，页面通过 <code>window.WQ_ENGINE_BASE</code> 指向服务器地址。</p>
+<p><strong>服务器综合的限制。</strong> 只接受 Verilog 源码（不超过 64 KB，不能用 <code>`include</code>、<code>$readmem</code> 和文件函数）；一次综合最长 20 秒；服务器同时综合 2 个，其余排队；每人每分钟最多 10 次。服务器综合用的 Verilog 页由问渠平台送出：平台给每位学生一个本人专用、12 小时有效的页面链接（接口 <code>/api/v1/micro/synth-link</code>），页面只把代码发回问渠本站。别人给的链接里如果写着其他网站的综合地址，页面不会采用。课程页、教材页上的“打开 Verilog 实验”按钮在课程正式上平台时接入（属于第 6 步“其余课程铺开”前的上线工作，不在第 5 步）。</p>
+<h2>四、实验镜像（版图与 RTL→GDS）</h2>
+<p>需要真正画版图、跑完整芯片流程的实验（第 1 章反相器版图、8 位计数器 RTL→GDS，以及后续 VLSI 课）用实验镜像 <code>wenquest/micro-lab</code>。它在开源的 IIC-OSIC-TOOLS 镜像上加了问渠的实验文件和 <code>wqlab</code> 小工具，工艺库默认 SKY130。学生用的在线容器服务在第 5、6 步开通；现在镜像由 GitHub 自动构建并验收（工作流“Micro lab image”）。</p>
+<p><strong>在镜像里能做什么。</strong> 打开网页远程桌面后可以用 Xschem 画原理图、Magic 和 KLayout 看版图、ngspice 仿真。命令行里：</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wqlab tools</code></td>
+<td>列出各工具版本</td>
+</tr>
+<tr>
+<td><code>wqlab netlist inv.sch</code></td>
+<td>把 Xschem 原理图导出为 LVS 网表</td>
+</tr>
+<tr>
+<td><code>wqlab inv --schematic inv.spice</code></td>
+<td>第 1 章反相器参考版图：生成、DRC、提取、LVS（同时核对器件尺寸）</td>
+</tr>
+<tr>
+<td><code>wqlab flow config.json</code></td>
+<td>LibreLane 从 RTL 到 GDS，汇总时序、DRC、LVS、面积、用时、内存峰值，判断是否“流片就绪”</td>
+</tr>
+<tr>
+<td><code>wqlab results 目录…</code></td>
+<td>把各步结果合成一张表，供实验报告回填</td>
+</tr>
+</tbody>
+</table>
+<p><strong>自己在电脑上试（教师）。</strong> 装好 Docker 后运行 <code>docker run -d -p 8080:80 hpretl/iic-osic-tools:2026.08 --wait</code>（问渠镜像推送后换成问渠的镜像名），浏览器打开 <code>http://localhost:8080</code>，密码 <code>abc123</code>。镜像约 20 GB，第一次下载较久。</p>
+<h2>五、贯通项目：从晶体管到芯片</h2>
+<p>四步做一块机器人关节电机控制芯片的数字部分（PWM 发生器 + 编码器计数器），最后交出 Tiny Tapeout 格式、通过本课程流片就绪检查的芯片版图。资料在 <code>samples/微电子贯通项目/</code>：四步指导书、报告模板（步骤四为设计报告）、评分量规。对应《第 17 轮附二》。</p>
+<p><strong>学生。</strong> 在实验镜像里运行 <code>wqlab start 我的目录</code> 拿到起始文件，按指导书完成标“在这里完成”的地方，每步用指导书给的命令检查：</p>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>做什么</th>
+<th>检查命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>一 器件</td>
+<td>在 SKY130 模型上测晶体管曲线，提取 VT、IDSAT、亚阈值摆幅</td>
+<td><code>wqlab device --script step1_device/device_curves.py</code></td>
+</tr>
+<tr>
+<td>二 单元</td>
+<td>写与非门网表，在 Magic 里给四个已放好的管子连线</td>
+<td><code>wqlab nand2 --check step2_nand2 --schematic step2_nand2/nand2_schematic.spice</code></td>
+</tr>
+<tr>
+<td>三 模块</td>
+<td>写 PWM 和编码器计数的 Verilog 及 cocotb 测试（含电机模型闭环）</td>
+<td><code>wqlab test step3_rtl</code></td>
+</tr>
+<tr>
+<td>四 芯片</td>
+<td>用 LibreLane 跑出 GDS，修正违例，写设计报告</td>
+<td><code>wqlab tt step3_rtl --config step4_chip/config.json</code></td>
+</tr>
+</tbody>
+</table>
+<p>画版图时只保存顶层单元（File → Save），不要用 writeall。</p>
+<p><strong>教师。</strong> 评分按量规：原理 15、数据 20、分析 20、实际问题 20、规范 10、流片就绪度 15（按检查结果自动给分，量规第二页列出各步条件）。步骤三用参考测试检查学生设计：<code>wqlab test 学生目录/step3_rtl --ref</code>（需要教师环境里的参考解，设置 <code>WQ_CAP_REF</code> 指向参考解目录；学生镜像里没有参考解）。</p>
+<p><strong>“流片就绪”的含义。</strong> 表示通过本课程的检查：时序、DRC、LVS、天线、接口、面积。真正报名 Tiny Tapeout 前，还要用其官方模板和预检工具再检查（引脚位置、电源网络、最高布线层等），报名的班次、价格和交付条件见待核对清单。</p>
+<h2>六、维护</h2>
+<table>
+<thead>
+<tr>
+<th>要改的东西</th>
+<th>改哪里</th>
+<th>之后运行</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>器件参数</td>
+<td>由校准得到：镜像验收工作流在完整 SKY130 模型上运行 <code>calib/calib.py</code>，结果用 <code>calib/adopt.py</code> 写进 <code>labs/micro/kit/models/params.json</code></td>
+<td><code>生成脚本/regen_ch1.sh</code>：一次重新生成实验台（含 JS 与 Python 模型比对）、实验自动测试、指导书、量规、课件和动画（<code>ANIM=0</code> 跳过动画）</td>
+</tr>
+<tr>
+<td>实验页面</td>
+<td><code>labs/micro/dic-ch1/index.src.html</code></td>
+<td><code>node labs/micro/tools/build.js</code>；<code>python labs/micro/tools/test_dic_ch1.py</code></td>
+</tr>
+<tr>
+<td>指导书、报告模板</td>
+<td><code>samples/数字集成电路设计/生成脚本/labs_ch1.py</code></td>
+<td><code>python build_guides.py</code></td>
+</tr>
+<tr>
+<td>动画</td>
+<td><code>生成脚本/anim/ch1.py</code></td>
+<td><code>anim/render.sh</code>（可用 <code>SCENES=Chain</code> 只渲染一段）</td>
+</tr>
+<tr>
+<td>课件</td>
+<td><code>生成脚本/build_ch1_deck_bi.js</code></td>
+<td><code>python deck_assets.py</code>，再 <code>node build_ch1_deck_bi.js</code></td>
+</tr>
+<tr>
+<td>贯通项目指导书、报告模板、量规</td>
+<td><code>samples/微电子贯通项目/生成脚本/capstone_labs.py</code>；参考数值在 <code>ref_results.json</code>（取自镜像验收的运行注释，工作流会比对）</td>
+<td><code>python build_capstone.py</code></td>
+</tr>
+<tr>
+<td>贯通项目参考解、起始文件</td>
+<td><code>deploy/micro-lab/wenquest/capstone/ref/</code>（教师用，不进学生镜像）、<code>capstone/start/</code></td>
+<td>推送后镜像验收工作流自动从头跑到 GDS</td>
+</tr>
+</tbody>
+</table>
+<h2>七、常见问题</h2>
+<ul>
+<li><strong>任务没有自动打勾？</strong> 检查是否满足全部条件，例如 1.4 要求负载正好 10 pF；1.5 只改电压、其他保持默认。</li>
+<li><strong>刷新后进度没了？</strong> 私密窗口或清除了浏览器数据时，本机保存会丢失；接入问渠后以平台记录为准。</li>
+<li><strong>ngspice 或 Verilog 页面一直在加载？</strong> 引擎来自公共 CDN，网络不通时会失败；换网络，或请管理员改用问渠服务器上的文件。Verilog 页在电脑上加载超过 15 秒会自动改用服务器综合。</li>
+<li><strong>服务器综合提示“忙”或“太频繁”？</strong> 同时综合的人多时会排队，最多等 30 秒；每人每分钟限 10 次，等一分钟再试。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

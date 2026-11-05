@@ -1,0 +1,46 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 客服（问问问渠） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>AI 客服（问问问渠）</h1>
+<p>官网、视频页、评价与校情演示页、帮助网页的右下角有一个 <strong>💬 问问问渠</strong>（英文页面是 <strong>Ask WenQuest</strong>）按钮。点开就能问：某个模块是什么、怎么用、在哪里打开、要不要登录。不用登录。</p>
+<h2>它怎么回答</h2>
+<ul>
+<li><strong>只按问渠的使用说明回答</strong>：知识来自 <code>docs/帮助/</code> 里的使用说明、首页清单和国内版官网文字稿。每个回答下面列出 <strong>出处</strong>，点开就是那篇使用说明。</li>
+<li><strong>两档</strong>：</li>
+<li><strong>检索档</strong>（两站都有，免费）：从使用说明里找出最相关的几段，显示摘要和出处，标“非 AI 生成”。</li>
+<li><strong>AI 档</strong>（美国站）：找出资料后，由模型只依据这几段组织成简短回答，标“AI 生成”。每天有调用次数上限，超了自动改用检索档。</li>
+<li>资料里没有的，客服会说“这个我不确定”，并给出“联系我们 / 预约演示”的链接。</li>
+<li>不报价格（请预约演示）、不承诺使用说明里没写的功能、不会要身份证号等个人信息。</li>
+<li>每个网络地址每小时最多问 20 个问题。</li>
+</ul>
+<h2>国内站（问渠科技）</h2>
+<ul>
+<li>现在只用 <strong>检索档</strong>：从使用说明里找出相关段落给你看，不调用大模型。</li>
+<li>网信办的生成式 AI 服务登记办好、<code>.env</code> 里填了 <code>WQ_AI_REG</code> 之后，国内站自动开 AI 档，只用已备案的 DeepSeek。</li>
+<li>国内站只用不含国内版官网禁用词的段落，出处只显示标题（帮助网页暂不上国内站）。</li>
+</ul>
+<h2>管理员：看大家问了什么、补资料</h2>
+<ul>
+<li>记录只存时间、问题、所在页面、档位、有没有答上，<strong>不存网络地址</strong>，只看最近 30 天。</li>
+<li>登录后打开 <code>/api/v1/admin/assist-log?missed=1</code>，列出没答上的问题。把这些问题的答案补进 <code>docs/帮助/</code> 里对应的使用说明，客服就会答了。</li>
+</ul>
+<h2>维护的人：资料改了怎么让客服跟着改</h2>
+<ol>
+<li>改 <code>docs/帮助/</code> 里的使用说明（部署、运维、开发类的不进客服，名单在 <code>tools/assistant/build_kb.py</code> 的 <code>EXCLUDE</code>）。</li>
+<li>跑 <code>python3 tools/assistant/build_kb.py</code>：重新生成知识库 <code>services/gateway/app/assist_kb.json</code> 和帮助网页 <code>site/help/</code>。</li>
+<li>跑考题：<code>cd services/gateway &amp;&amp; python -m pytest -q tests/test_assist.py</code>。考题在 <code>tests/data/assist_questions.yaml</code>（60 道，中英），要求正确的资料排在前 3 条的比例不低于 90%。</li>
+<li>
+<p>推送、部署。</p>
+</li>
+<li>
+<p>每天 AI 档调用次数上限：服务器 <code>.env</code> 里的 <code>WQ_ASSIST_AI_DAILY</code>（默认 300）。</p>
+</li>
+<li>别的页面要挂客服，在页面末尾加一行：<code>&lt;script src="/assist.js" defer&gt;&lt;/script&gt;</code>。</li>
+</ol></main><script src="/assist.js" defer></script></body></html>

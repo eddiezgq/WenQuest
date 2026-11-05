@@ -1,0 +1,224 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>经营与财务 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>经营与财务</h1>
+<p>数字工厂工作台左侧“从订单到回款 → <strong>经营与财务</strong>”。</p>
+<p>它把钱接进工厂主线：</p>
+<ul>
+<li><strong>订单 → 生产 → 开票（销售发票）→ 客户付款（收款单）</strong></li>
+<li><strong>采购 → 收货 → 供应商发票（采购发票）→ 付款（付款单）</strong></li>
+</ul>
+<p>再把各领域的成本汇成<strong>每张订单的毛利</strong>，把各领域的指标挂到<strong>经营目标的指标树</strong>上，按月对<strong>预算</strong>，看<strong>未来 8 周的现金</strong>。</p>
+<ul>
+<li>发票、收付款以 <strong>ERPNext</strong> 为准（Sales Invoice、Purchase Invoice、Payment Entry）；目标、预算、毛利分析、现金流预测在平台。</li>
+<li><strong>教学模式</strong>：订单的工单全部完工就自动开票；来料合格入库就自动开采购发票。<strong>生产模式</strong>只起草提议，由会计在“提议”里确认，平台不替会计做账。</li>
+</ul>
+<p><strong>谁能用：</strong>
+- 看：所有角色；
+- 改经营目标、预算：厂长；
+- 登记客户付款：销售或厂长；
+- 催款、信用冻结、付款、调整预算：销售、计划员或厂长发起。批准：催款由销售或厂长批；信用冻结、调预算、付款由厂长批（都不能批自己发起的）；
+- 老师（教学模式）可以开关财务模拟器、注入“某客户一笔发票不付”。</p>
+<p>页面上方五个数：毛利率（做完的订单）、应收与逾期、应收周转天数、现金、本月预算已用（对比月度进度）。</p>
+<h2>一、账期日</h2>
+<p>教学模式里，账期按“账期日”算：<strong>1 天 = 真实 2 分钟</strong>（和供应链一样），30 天账期约 1 小时；生产模式就是 1 天。ERPNext 发票上的到期日按真实日历（开票日 + 30 天）。</p>
+<h2>二、经营目标（指标树）</h2>
+<p>七个目标，每个挂一个指标；指标的数直接取各领域态势卡每天记下的数，和指挥台一个口径：</p>
+<table>
+<thead>
+<tr>
+<th>目标</th>
+<th>指标来自</th>
+<th>默认目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>准时交付</td>
+<td>订单与交付</td>
+<td>≥ 95%</td>
+</tr>
+<tr>
+<td>毛利率</td>
+<td>财务（做完的订单）</td>
+<td>≥ 25%</td>
+</tr>
+<tr>
+<td>一次合格率</td>
+<td>质量</td>
+<td>≥ 97%</td>
+</tr>
+<tr>
+<td>设备综合效率 OEE</td>
+<td>生产</td>
+<td>≥ 75%</td>
+</tr>
+<tr>
+<td>空转电量占比</td>
+<td>能源</td>
+<td>≤ 20%</td>
+</tr>
+<tr>
+<td>重大隐患</td>
+<td>安全环保</td>
+<td>≤ 0</td>
+</tr>
+<tr>
+<td>应收周转天数 DSO</td>
+<td>财务</td>
+<td>≤ 45 天</td>
+</tr>
+</tbody>
+</table>
+<p>绿 = 达标；黄 = 差 5% 以内（“≤”的指标差 10% 以内）；红 = 偏离。小折线是近 7 天。厂长可以直接改目标值。</p>
+<h2>三、订单毛利</h2>
+<p>每张做完的订单（工单全部完工）：</p>
+<p><strong>毛利 = 收入 − 料 − 工 − 电 − 废品 − 急单加班外协加急 − 保修</strong></p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>怎么算</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>收入</td>
+<td>订单单价 × 台数</td>
+</tr>
+<tr>
+<td>料</td>
+<td>BOM 标准用量 × 单价</td>
+</tr>
+<tr>
+<td>工</td>
+<td>工时 × 工位费率（折旧 + 人工）：输出轴用车间实测（含调整、换刀），其余零件、装配、跑合按标准</td>
+</tr>
+<tr>
+<td>电</td>
+<td>运行时间 × 运行功率 × 电价：输出轴实测，其余按标准</td>
+</tr>
+<tr>
+<td>废品返工</td>
+<td>不合格输出轴件数 × 标准成本</td>
+</tr>
+<tr>
+<td>急单、加班、外协、加急</td>
+<td>采纳并执行过的动作费用，按受影响的订单分摊</td>
+</tr>
+<tr>
+<td>保修</td>
+<td>这张订单的输出轴装进的现场设备，在保修期内的服务工单费用</td>
+</tr>
+</tbody>
+</table>
+<p>点“分解”看每一项和来源。“按标准”是全部按标准工时算的毛利率，差出来的就是这张订单多花的。标“（估）”的是情景里早先的订单：订单本身不在 ERPNext 快照里，按它的工单件数和标准售价估。</p>
+<h2>四、应收应付</h2>
+<ul>
+<li><strong>应收账龄</strong>：未到期 / 逾期 1–30 天 / 31–60 天 / 60 天以上；每张发票的未付、到期、逾期天数、催过几次。</li>
+<li><strong>客户信用</strong>：额度、应收、在做还没开票的订单、占用；超了厂情中枢报“信用超限”。冻结中的客户，订单做完先不开票，要厂长放行。</li>
+<li><strong>现金流预测</strong>（未来 8 周，账期周）：现在的现金 + 预计收款（按到期日 + 这个客户平时晚几天；催过的按 3 天内）− 应付到期 − 每周固定开支。</li>
+<li><strong>应付</strong>：供应商发票、付款日。到期由出纳（教学模拟器）付；要提前付或推迟，走“付款”动作。</li>
+<li><strong>应收周转天数 DSO</strong> = 应收余额 ÷ 近 30 天日均开票额。</li>
+</ul>
+<h2>五、预算</h2>
+<p>七个成本中心按月：生产人工与折旧、采购料、能源、维修保养、质量损失、售后服务、管理费用。实际来自：车间实测工时、采购发票、能源计量的电费、维修与服务动作的费用、不合格件；管理费用按进度计。竖线是月度进度（工厂时间），实际超过“预算 × 进度 × 1.1”厂情中枢报“预算超支”。厂长可以直接改，也可以走“调整预算”动作。</p>
+<h2>六、厂情中枢的异常</h2>
+<table>
+<thead>
+<tr>
+<th>规则</th>
+<th>什么时候报</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1 工单成本差异超标</td>
+<td>原有</td>
+</tr>
+<tr>
+<td>F2 应收逾期</td>
+<td>发票过了到期日还没付（逾期 30 天以上为严重）</td>
+</tr>
+<tr>
+<td>F3 客户信用超限</td>
+<td>应收 + 在做没开票的订单 &gt; 信用额度</td>
+</tr>
+<tr>
+<td>F4 现金不够付到期的账</td>
+<td>未来两周现金预测降到 0 以下</td>
+</tr>
+<tr>
+<td>F5 订单毛利低于目标</td>
+<td>做完的订单毛利率比目标低 5 个百分点以上</td>
+</tr>
+<tr>
+<td>F6 预算超支</td>
+<td>某成本中心本月实际 &gt; 预算 × 进度 × 1.1</td>
+</tr>
+<tr>
+<td>F7 经营指标偏离目标</td>
+<td>某指标现在是红的，并且近 7 天至少 5 天是红的</td>
+</tr>
+</tbody>
+</table>
+<p><strong>处理方案</strong>（指挥台右栏）：</p>
+<table>
+<thead>
+<tr>
+<th>异常</th>
+<th>方案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F2 应收逾期</td>
+<td>不处理（对照）/ 发催款函 / 信用冻结（同时催款）；每个方案写预计几天收到钱、现金流最低在哪一周</td>
+</tr>
+<tr>
+<td>F3 信用超限</td>
+<td>不处理 / 信用冻结 / 临时提额 20%</td>
+</tr>
+<tr>
+<td>F4 现金不够</td>
+<td>不处理 / 和供应商商量推迟 7 天付款 / 加快催收</td>
+</tr>
+<tr>
+<td>F6 预算超支</td>
+<td>不处理 / 调整预算（按现在的进度推到月底）</td>
+</tr>
+<tr>
+<td>F5、F7</td>
+<td>给分解和去处，不推演</td>
+</tr>
+</tbody>
+</table>
+<p>规则库 61 条全部在跑，没有“待数据”的了。</p>
+<h2>七、AI 助手</h2>
+<p>可以直接问：
+- “现在有多少应收逾期了？现金够不够？”
+- “SAL-ORD-2026-00021 的毛利是多少？”
+- “经营目标完成得怎么样？预算超了吗？”</p>
+<p>AI 用三个新工具回答：订单毛利分解、应收应付与现金流、经营目标与预算。</p>
+<h2>八、教学模式</h2>
+<ul>
+<li><strong>财务模拟器（客户会晚付）</strong>：教学模式默认打开。绿谷按时（晚 0–3 天），峰顶常晚 3–12 天，海港常晚 10–30 天；催款后通常 3 天内付。<strong>重载实验 7 情景后关闭</strong>（关闭时客户按时付）；生产模式不模拟。</li>
+<li><strong>期初应收</strong>：情景开始时三个客户各有一笔（平台里的，ERPNext 没有），峰顶搅拌机那笔已经逾期 5 天。</li>
+<li><strong>老师注入</strong>：“应收应付”最下面，或实验 22 页上：某客户一笔发票逾期 N 天、不催就不付。</li>
+</ul>
+<p><strong>两周情景</strong>：第 8 幕“交付开票、应收逾期；复盘看这张订单的毛利”用到这一页，见<a href="两周情景.md">两周情景</a>。</p>
+<h2>九、实验 22</h2>
+<p>左侧“<strong>实验与任务 → 实验 22</strong>”：经营——订单毛利、应收与现金。五个任务自动评 60 分，报告 40 分由老师批改；沿用比对模式（提交任务 3 之前，指挥台和 AI 不显示建议）。指导书和报告模板在页面右上角。</p>
+<h2>十、常见问题</h2>
+<ul>
+<li><strong>订单做完了怎么还没开票？</strong>开票要这张订单的工单全部完工；客户信用冻结中的要厂长放行；平台启动以前就做完的订单不补开。生产模式要会计在“提议”里确认。</li>
+<li><strong>为什么没有发货单？</strong>本厂车间只做输出轴，减速器的装配、跑合没有在 ERPNext 里入成品库，发货单会因为没有成品库存提交不了；发票直接按销售订单开（不动库存）。</li>
+<li><strong>毛利为什么和 ERPNext 的毛利报表不一样？</strong>这里是经营口径（工时、电、废品、动作费用、保修都算），ERPNext 是会计口径（按存货估价）。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

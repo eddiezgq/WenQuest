@@ -1,0 +1,65 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>白板课使用说明 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>白板课使用说明</h1>
+<p>白板课像老师边讲边在白板上画：一只手拿着笔，跟着讲解一样一样画出来；画的东西会动（机械臂抬起来、齿轮转起来、电流流过去）；讲到“动手试试”时，画板上的框里打开本课程的虚拟实验，学生可以当场操作。</p>
+<p><strong>负担在 AI：</strong> 给一个题目，或上传一段你的讲课录音，平台全自动做好；做好后你只需要改不满意的地方。</p>
+<h2>一、新建</h2>
+<p>左边菜单 <strong>白板课</strong> → 右上 <strong>＋ 新建白板课</strong>，两种开始方式：</p>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>你要做的</th>
+<th>平台做的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入题目</td>
+<td>写题目；可再写几句要求或贴讲义文字；选时长（约 3 / 6 / 10 分钟）和声音（点一下试听）</td>
+<td>AI 按课程标准写分段讲稿（机器人实际问题 → 概念 → 建模求解 → 小结，一个生活例子）→ 配音 → AI 排画板</td>
+</tr>
+<tr>
+<td>上传录音</td>
+<td>选录音文件（mp3、m4a、wav 或 mp4，300 MB 以内）；题目可不填</td>
+<td>识别录音、分段 → AI 只纠正识别错字、加标点（不改你的话）→ AI 按你讲的内容排画板，画面跟着你的停顿走</td>
+</tr>
+</tbody>
+</table>
+<p>“可插入的实验和动画来自”：默认是平台全部教材（AI 挑和题目相关的）；也可以选你的一门 AI 建课课程，或某一本教材。</p>
+<p>点 <strong>开始制作</strong> 后可以离开页面，列表里显示进度（AI 正在写讲稿 / 正在配音 / AI 正在排画板）。一般几分钟做好。</p>
+<p><strong>AI 建课里的一讲</strong>也能直接做：打开这一讲 → 交付物下面的 <strong>✎ 白板讲解</strong>，用这一讲的内容和这一讲的实验、动画生成；做好后同一个按钮变成“打开白板讲解”。</p>
+<h2>二、看和分享</h2>
+<p>列表里点 <strong>网页版</strong>：在浏览器里播放（暂停、拖进度、字幕、全屏，框里的实验可以操作）。链接一天内有效，需要时再从列表里打开。</p>
+<h2>三、编辑（请用电脑浏览器）</h2>
+<p>在列表里点一节课打开编辑器：</p>
+<ul>
+<li><strong>左边讲稿</strong>：一段一段，前面是时间，后面的数字是这段要画几样东西。点一段，画板跳到那里，并选中这段要画的东西。</li>
+<li>改字：直接在框里改。AI 配音的课改完字会出现 <strong>重新配音</strong>，只重配改过的段，时间自动重排。</li>
+<li>新画的东西（用上方的工具画、写字）自动放到当前选中的这段；已有的东西选中后点 <strong>把选中的放到第 N 段</strong>。</li>
+<li><strong>＋ 新画板</strong>：加一张新画板（镜头会按顺序移过去）。</li>
+<li><strong>中间画板</strong>：就是 Excalidraw，拖动、缩放、改字、改颜色、删除都和平常一样。AI 加的“动作”（转、移、持续转、流动、闪）跟着元素走：挪了位置，它还在原地动；删掉元素，动作就没了。</li>
+<li><strong>插入</strong>：列出你上传的视频、所选课程和教材里的虚拟实验与动画（和这节课相关的排在前面，可以搜索）。点一个，就在当前画板上放一个框，讲到当前这段时框里开始播放；拖框可以改位置和大小。也可以 <strong>上传一段视频（mp4）</strong> 再插入。</li>
+<li><strong>请 AI 重排</strong>：写一句意见（“太挤了，分成两张”“这里画受力图”“把实验放大”，不写也行），选 <strong>重排这张</strong>（当前这段所在的画板，其余不动）或 <strong>重排整节</strong>（会替换你手动改过的地方，会先问你）。</li>
+<li><strong>换录音</strong>：上传新录音，平台重新识别，画板按文字对上新时间；请校对左边的文字。</li>
+<li><strong>▶ 预览</strong>：从选中的这段开始播放，看画的节奏对不对。</li>
+<li><strong>保存</strong>：改完记得保存（离开页面时有未保存的改动会提醒）。</li>
+</ul>
+<h2>四、出视频（MP4）</h2>
+<p>编辑器上方 <strong>出视频</strong>：平台在服务器上逐帧录制（1280×720、每秒 30 帧，含配音和框里播放的视频），做好后出现 <strong>下载 MP4</strong>。录制要一些时间（大约是课长的几倍，画板里有虚拟实验的段落慢一些），平台一次只录一节，可以离开页面，做好后回来下载。</p>
+<p>MP4 里的虚拟实验是打开时的样子（不能操作）；如果某个实验在录制时打不开，那一段显示“虚拟实验（网页版里可以动手操作）”的卡片。</p>
+<h2>五、说明</h2>
+<ul>
+<li>只有你自己能看到、能改你的白板课。</li>
+<li>声音：现在用平台的 AI 声音（中英多种）。用老师本人的声音合成正在准备（需要本人授权，并在国内标注“AI 合成语音”）。</li>
+<li>手：网页版和 MP4 里拿笔的手，服务器上放了手的照片就用照片（<code>WQ_WB_HAND_DIR</code>），没有就画一支马克笔。</li>
+<li>国内部署：AI 用 DeepSeek；字体、编辑器、播放器都在自己的服务器上，不连外网。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

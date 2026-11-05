@@ -1,0 +1,75 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>注册、登录与审核（管理员和老师看） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>注册、登录与审核（管理员和老师看）</h1>
+<h2>一、大家怎么注册、登录</h2>
+<ul>
+<li><strong>入口</strong>：官网 wenquestrobotics.com 右上角“登录 / 注册”，或直接打开 https://learn.wenquestrobotics.com 。</li>
+<li><strong>注册</strong>：</li>
+<li>选“我是学生”或“我是教师”，填姓、名、邮箱。</li>
+<li>点“发送验证码”，把邮件里的 6 位数字填进来（10 分钟有效），再设密码（至少 8 位，含字母和数字）。</li>
+<li>勾选同意《用户协议》《隐私说明》。</li>
+<li><strong>开通规则</strong>：</li>
+<li>学生：注册完马上能用。</li>
+<li>教师 + 学校邮箱（.edu、.edu.cn、.ac.cn、.ac.uk 等）：注册完马上是教师，可以 AI 建课。</li>
+<li>教师 + 其他邮箱（qq、163、gmail…）：先按学生开通，同时提交教师申请（可以上传工作证、聘书照片）。AI 马上预审，结果等管理员一键批准。</li>
+<li><strong>登录</strong>：邮箱（或学校发的用户名）+ 密码。忘记密码点“忘记密码？”，用邮箱验证码重设。</li>
+<li><strong>一个账号到处通用</strong>：在任何一处登录后，官网右上角显示你的名字；学习平台、虚拟实验室不用再登录。在官网右上角点“退出”，或在学习平台“账户 → 退出登录”，都会在所有地方一起退出。</li>
+<li><strong>学生想当老师</strong>：学习平台“账户 → 申请成为教师”，填写单位、上传材料即可。</li>
+</ul>
+<h2>二、管理员：只需一键批准</h2>
+<p>学习平台左边栏多了“管理”（只有管理员看得到，红色数字 = 待办数）。</p>
+<ol>
+<li><strong>教师审核</strong>：</li>
+<li>每份申请上方有 AI 的建议（建议批准 / 建议补材料 / 建议拒绝）和一句理由，下面是申请人上传的材料，点一下可以放大看。</li>
+<li>点 <strong>✓ 批准</strong>：对方立即成为教师，系统自动发邮件通知。</li>
+<li>点 <strong>拒绝</strong>：AI 已写好礼貌的理由，可以直接发，也可以改一下再发。</li>
+<li>AI 觉得证据不足时，会<strong>自动</strong>发邮件请申请人补材料（只发一次）；申请人补完，AI 重新审。</li>
+<li>有新申请时，系统给你发一封汇总邮件，同一小时最多一封，邮件里有“去审核”链接。</li>
+<li><strong>课程报名</strong>：学生报名收费课后出现在这里，确认收到钱后点 <strong>✓ 开通</strong>，学生会收到开通邮件。</li>
+<li><strong>用户</strong>：查找任何人，可以设为/取消教师、停用/恢复账号、给他发重设密码的邮件。</li>
+</ol>
+<p>页面右上角显示“邮件：已开通 / 未配置”和当前 AI 模型，方便检查。</p>
+<h2>三、老师：把课程放进课程目录</h2>
+<p>课程 → 单元模块 → 编辑 → <strong>⚙ 课程设置</strong> → “课程目录”：</p>
+<ul>
+<li><strong>不公开</strong>（默认）：只有你拉进来的学生能看到。</li>
+<li><strong>公开 · 免费</strong>：出现在课程目录，任何注册用户点一下就能加入。</li>
+<li><strong>公开 · 收费</strong>：填价格（人民币或美元）。学生点“报名”并留言（如缴费方式），管理员确认后开通。在线支付以后接入。</li>
+</ul>
+<p>可以写一句话介绍，显示在目录卡片上。课程目录不登录也能看：https://learn.wenquestrobotics.com/pages/catalog/catalog</p>
+<h2>四、一次性设置：发信邮箱（Eddie 做一次）</h2>
+<p>服务器在 DigitalOcean，它封了常用的发信端口，所以用 Brevo（免费每天 300 封，支持 2525 端口）发信，发件人 noreply@wenquestrobotics.com。域名在 Cloudflare。</p>
+<ol>
+<li>打开 brevo.com 注册免费账号。</li>
+<li>右上角账号菜单 → <strong>Senders, Domains &amp; Dedicated IPs → Domains → Add a domain</strong>，填 <code>wenquestrobotics.com</code>，页面列出几条 DNS 记录。</li>
+<li>Cloudflare → wenquestrobotics.com → <strong>DNS → Records → Add record</strong>，逐条照抄。CNAME 记录要点成灰云（<strong>DNS only</strong>）。回 Brevo 点 <strong>Verify</strong>。</li>
+<li>一个域名只能有一条 <code>v=spf1</code> 开头的 TXT 记录；已经有的话，把 <code>include:spf.brevo.com</code> 加进原来那条。</li>
+<li>Brevo → <strong>Senders</strong> → 添加发件人 <code>noreply@wenquestrobotics.com</code>，名称“问渠机器人学院”。</li>
+<li>Brevo → <strong>SMTP &amp; API → SMTP → Generate a new SMTP key</strong>，记下 <strong>Login</strong> 和 key（不要发给任何人）。</li>
+<li>登录服务器执行 <code>nano /opt/wenquest/.env</code>，填：
+   <code>SMTP_HOST=smtp-relay.brevo.com
+   SMTP_PORT=2525
+   SMTP_SECURE=tls
+   SMTP_USER=&lt;第5步的 Login&gt;
+   SMTP_PASSWORD=&lt;第5步的 SMTP key&gt;
+   MOODLE_NOREPLY_EMAIL=noreply@wenquestrobotics.com
+   WQ_ADMIN_EMAIL=&lt;接收审核通知的邮箱&gt;</code>
+   保存后执行 <code>cd /opt/wenquest &amp;&amp; deploy/update.sh</code>。</li>
+<li>检查：学习平台 → 管理，右上角应显示“邮件：已开通”。用一个新邮箱注册一次，看能否收到验证码。</li>
+</ol>
+<p><strong>没配好之前</strong>：注册时验证码不会发出，只写进服务器日志（<code>docker compose logs gateway | grep 验证码</code>），可用来自己测试。</p>
+<p><strong>可选：收信</strong>。官网写的联系邮箱是 info@wenquestrobotics.com。想收到寄给它的信，在 Cloudflare → <strong>Email → Email Routing</strong> 开启，把 info@ 转发到你的常用邮箱。开启时 Cloudflare 会加 MX 记录和它自己的 SPF，要和 Brevo 的 SPF 合并成一条，例如 <code>v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all</code>。</p>
+<h2>五、技术备注</h2>
+<ul>
+<li>账号在 Moodle 里；注册、审核走插件的 <code>local_wenquest_account_*</code> 接口，只有网关的服务账号 <code>wqservice</code> 能调用。它的令牌由 <code>WQ_SECRET_KEY</code> 自动推导，容器启动时自动建好，不用填。</li>
+<li>验证码、教师申请、AI 意见、课程目录设置存在网关数据卷 <code>accounts.db</code>，每日备份（<code>gateway.tgz</code>），<code>deploy/restore.sh</code> 会一并恢复。</li>
+<li>密码规则：Moodle 的密码策略同步改成“至少 8 位、含数字”，字母由问渠注册页检查。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>
