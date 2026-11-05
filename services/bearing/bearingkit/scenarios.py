@@ -379,3 +379,157 @@ def loads(s: dict) -> dict:
     out["kind"] = kind
     out.setdefault("notes", [])
     return out
+
+
+# ------------------------------------------------------------------------------------------------ both supports
+# For a pair of tapered roller bearings at the two ends of a shaft (plan section 十六) the load on the shaft is needed,
+# not the share of one bearing: the statics above give the reactions at A and B in the two planes across the shaft
+# (x: the plane of the radial / weight forces, y: the plane of the tangential / cross forces) and the axial force
+# (positive towards B). The shaft load is then F = R_A + R_B with the moments of the reactions about the middle of
+# the span (A at z = −L/2, B at +L/2): the rows of the pair share it by their stiffness and the adjustment.
+
+
+def _support_case(label, RA, RB, Fz, n, share, **extra):
+    return {
+        "label": label,
+        "RA": [float(RA[0]), float(RA[1])],
+        "RB": [float(RB[0]), float(RB[1])],
+        "Fz": float(Fz),
+        "n": n,
+        "share": share,
+        **extra,
+    }
+
+
+def supports(s: dict, loads: dict | None = None, spacing: float | None = None) -> dict:
+    """Reactions at both supports for every case: {"cases": [{label, RA: [x, y], RB: [x, y], Fz, n, share}], "L",
+    "motion", "outer_turns"}. The generic kind takes the loads Fr, Fa, M at the middle of the span (spacing)."""
+    kind = s.get("kind") or "generic"
+    if kind == "gearbox":
+        mn, z, an, beta = _f(s, "mn"), _f(s, "z"), _f(s, "alpha_n_deg"), _f(s, "beta_deg", False, 0.0)
+        x, L = _f(s, "x"), _f(s, "L")
+        sign = 1.0 if (s.get("axial_to") or "B").upper() == "B" else -1.0
+        d = mn * z / math.cos(math.radians(beta))
+        rows = _spectrum(s)
+        cases = []
+        for k, r in enumerate(rows):
+            P, n = _f(r, "P"), _f(r, "n")
+            Ft = 2 * 9.549e6 * P / n / d
+            Fr = Ft * math.tan(math.radians(an)) / math.cos(math.radians(beta))
+            Fa = Ft * math.tan(math.radians(beta))
+            t, rp = reactions(Ft, x, L), reactions(Fr, x, L)
+            couple = sign * Fa * d / 2 / L
+            cases.append(
+                _support_case(
+                    r.get("label") or f"#{k + 1}",
+                    (rp[0] + couple, t[0]),
+                    (rp[1] - couple, t[1]),
+                    sign * Fa,
+                    n,
+                    _share(r, rows),
+                )
+            )
+        return {"cases": cases, "L": L, "motion": "rotating", "outer_turns": False}
+    if kind == "motor":
+        m, U, xr, L = _f(s, "m"), _f(s, "U", False, 0.0), _f(s, "x"), _f(s, "L")
+        Fb, xb, phi = _f(s, "F_belt", False, 0.0), _f(s, "x_belt", False, 0.0), _f(s, "belt_deg", False, 0.0)
+        Fa, n = _f(s, "Fa", False, 0.0), _f(s, "n")
+        W, w = m * G0, n * 2 * math.pi / 60
+        Fu = U * 1e-6 * w * w
+        cases = []
+        for k in range(36):
+            th = math.radians(10 * k)
+            fx = [(-W, xr), (-Fb * math.cos(math.radians(phi)), xb), (Fu * math.cos(th), xr)]
+            fy = [(Fb * math.sin(math.radians(phi)), xb), (Fu * math.sin(th), xr)]
+            RA = (sum(reactions(f, p, L)[0] for f, p in fx), sum(reactions(f, p, L)[0] for f, p in fy))
+            RB = (sum(reactions(f, p, L)[1] for f, p in fx), sum(reactions(f, p, L)[1] for f, p in fy))
+            cases.append(_support_case(f"{10 * k}°", RA, RB, Fa, n, 1 / 36, angle=10 * k))
+        return {"cases": cases, "L": L, "motion": "rotating", "outer_turns": False, "curve": "angle"}
+    if kind == "spindle":
+        a, L = _f(s, "a"), _f(s, "L")
+        rows = _spectrum(s)
+        cases = []
+        for k, r in enumerate(rows):
+            RA, RB = reactions(_f(r, "Fr"), -a, L)
+            cases.append(
+                _support_case(
+                    r.get("label") or f"#{k + 1}",
+                    (RA, 0.0),
+                    (RB, 0.0),
+                    _f(r, "Fa", False, 0.0),
+                    _f(r, "n"),
+                    _share(r, rows),
+                )
+            )
+        return {"cases": cases, "L": L, "motion": "rotating", "outer_turns": False}
+    if kind == "camshaft":
+        x, L, n = _f(s, "x"), _f(s, "L"), _f(s, "n")
+        camshaft({**s, "this": "A"})  # the same checks of the table as for one bearing
+        cases = []
+        pts = s.get("table")
+        rows = []
+        for ln in pts.replace("\t", " ").replace(",", " ").splitlines() if isinstance(pts, str) else []:
+            if ln.strip():
+                rows.append([float(v) for v in ln.split()])
+        rows = rows or pts
+        for r in rows:
+            fz = r[3] if len(r) == 4 else 0.0
+            rx, ry = reactions(r[1], x, L), reactions(r[2], x, L)
+            cases.append(_support_case(f"{r[0]:g}°", (rx[0], ry[0]), (rx[1], ry[1]), fz, n, 1 / len(rows), angle=r[0]))
+        return {"cases": cases, "L": L, "motion": "rotating", "outer_turns": False, "curve": "angle"}
+    if kind == "hub":
+        W, ay, Rw, L, e = _f(s, "W"), _f(s, "ay"), _f(s, "R"), _f(s, "L"), _f(s, "e", False, 0.0)
+        n = _f(s, "n")
+        shares = s.get("shares") or {}
+        cases = []
+        for label, sgn, key in (
+            ({"zh": "直行", "en": "straight"}, 0, "straight"),
+            ({"zh": "转弯，侧向力朝外", "en": "turning, lateral force outward"}, 1, "out"),
+            ({"zh": "转弯，侧向力朝内", "en": "turning, lateral force inward"}, -1, "in"),
+        ):
+            Fy = sgn * W * ay
+            RO = W * (L / 2 + e) / L + Fy * Rw / L  # A = the outboard row, B = the inboard row
+            RI = W * (L / 2 - e) / L - Fy * Rw / L
+            cases.append(_support_case(label, (RO, 0.0), (RI, 0.0), -Fy, n, _f(shares, key, False, 1.0) or 0.0))
+        tot = sum(c["share"] for c in cases)
+        if not tot > 0:
+            raise ScenarioError("scenario: the time shares add up to more than 0")
+        for c in cases:
+            c["share"] /= tot
+        return {"cases": cases, "L": L, "motion": "rotating", "outer_turns": True}
+    if kind == "joint":
+        W, n, L = _f(s, "W"), _f(s, "n", False, 0.0), _f(s, "L")
+        if (s.get("axis") or "horizontal") == "horizontal":
+            RA, RB = reactions(W, _f(s, "x"), L)
+            c = _support_case("W", (RA, 0.0), (RB, 0.0), 0.0, n, 1.0)
+        else:
+            Mt = W * _f(s, "r")
+            down = -1.0 if (s.get("fixed") or "A").upper() == "A" else 1.0
+            c = _support_case("W", (-Mt / L, 0.0), (Mt / L, 0.0), down * W, n, 1.0)
+        return {"cases": [c], "L": L, "motion": "oscillating", "outer_turns": False}
+    if kind == "generic":
+        if not (spacing and spacing > 0):
+            raise ScenarioError("scenario: give the distance between the two bearings")
+        L = float(spacing)
+        src = loads or {}
+        Fr, Fa, M = _f(src, "Fr", False, 0.0), _f(src, "Fa", False, 0.0), _f(src, "M", False, 0.0)
+        c = _support_case("#1", (Fr / 2 - M / L, 0.0), (Fr / 2 + M / L, 0.0), Fa, _f(src, "n", False, 0.0), 1.0)
+        return {
+            "cases": [c],
+            "L": L,
+            "motion": s.get("motion") or "rotating",
+            "outer_turns": bool(s.get("outer_turns")),
+        }
+    raise ScenarioError(f"scenario: unknown kind {kind}")
+
+
+def shaft_load(c: dict, L: float) -> list[float]:
+    """The generalised load on the shaft (Fx, Fy, Fz, Pβ, Pγ) from the reactions, about the middle of the span."""
+    za, zb = -L / 2, L / 2
+    return [
+        c["RA"][0] + c["RB"][0],
+        c["RA"][1] + c["RB"][1],
+        c["Fz"],
+        za * c["RA"][0] + zb * c["RB"][0],
+        za * c["RA"][1] + zb * c["RB"][1],
+    ]

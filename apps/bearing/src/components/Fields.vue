@@ -63,6 +63,19 @@ const pts = computed({
         <Num v-model="project.inner.alpha_i_deg" :label="t('coneAngle')" unit="°" />
         <Num v-model="project.inner.alpha_f_deg" :label="t('ribAngle')" unit="°" :hint="t('ribHint')" />
         <Num v-model="project.inner.R_end" :label="t('rEnd')" unit="mm" />
+        <label class="num"><span class="lab">{{ t('arrangement') }}</span>
+          <select v-model="project.pair.arrangement"><option v-for="k in ['single', 'DB', 'DF']" :key="k" :value="k">{{ t('tarr_' + k) }}</option></select></label>
+        <template v-if="project.pair.arrangement !== 'single'">
+          <label class="num"><span class="lab">{{ t('mount') }}</span>
+            <select v-model="project.pair.mount"><option v-for="k in ['pair', 'two_end']" :key="k" :value="k">{{ t('mount_' + k) }}</option></select></label>
+          <Num v-if="project.pair.mount !== 'two_end' || project.scenario.kind === 'generic'" v-model="project.pair.spacing" :label="project.pair.mount === 'two_end' ? t('spanTwo') : t('rowSpacing')" unit="mm" :hint="project.pair.mount === 'two_end' ? t('spanTwoHint') : t('rowSpacingHint')" />
+          <label class="num"><span class="lab">{{ t('setting') }}</span>
+            <select v-model="project.pair.setting"><option v-for="k in ['endplay', 'preload']" :key="k" :value="k">{{ t('setting_' + k) }}</option></select></label>
+          <Num v-if="project.pair.setting !== 'preload'" v-model="project.pair.endplay" :label="t('endplay')" unit="µm" :hint="t('endplayHint')" />
+          <Num v-else v-model="project.pair.preload" :label="t('preloadF')" unit="N" />
+          <Num v-model="project.pair.sweep_from" :label="t('sweepFrom')" unit="µm" :hint="t('sweepHint')" />
+          <Num v-model="project.pair.sweep_to" :label="t('sweepTo')" unit="µm" />
+        </template>
       </template>
       <label class="num"><span class="lab">{{ t('crown') }}</span>
         <select v-model="project.profile.kind"><option v-for="k in ['straight', 'arc', 'partial', 'table']" :key="k" :value="k">{{ t('crown_' + k) }}</option></select></label>
