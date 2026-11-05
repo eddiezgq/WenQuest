@@ -17,9 +17,10 @@ from pathlib import Path
 
 LABELS = json.loads((Path(__file__).with_name("labels.json")).read_text(encoding="utf-8"))
 
-TYPES = ["deep_groove", "angular", "cylindrical", "tapered", "flex"]
+TYPES = ["deep_groove", "angular", "cylindrical", "tapered", "flex", "crossed"]
 BALL, ROLLER = ["deep_groove", "angular"], ["cylindrical", "tapered"]
-RIGID = ["deep_groove", "angular", "cylindrical", "tapered"]  # every type but the flexible bearing (plan 十八)
+RIGID = ["deep_groove", "angular", "cylindrical", "tapered"]  # the types with lubrication and fatigue checks
+LOADED = RIGID + ["crossed"]  # the types loaded through an application (not the flexible bearing, plan 十八)
 SCENES = ["generic", "gearbox", "motor", "spindle", "hub", "joint", "camshaft"]
 AB = [("A", None), ("B", None)]
 
@@ -46,7 +47,7 @@ GROUPS = [
     ("type", {}, [F("type", "type", kind="select", options=opts(TYPES))]),
     (
         "gScene",
-        {"type": RIGID},
+        {"type": LOADED},
         [
             F("scenario.kind", "sceneKind", kind="select", options=opts(SCENES, "sk_")),
             # gearbox
@@ -156,9 +157,9 @@ GROUPS = [
     ),
     (
         "gRollers",
-        {"type": ROLLER},
+        {"type": ROLLER + ["crossed"]},
         [
-            F("inner.Dw", "DwR", "mm", when={"type": ["cylindrical"]}),
+            F("inner.Dw", "DwR", "mm", when={"type": ["cylindrical", "crossed"]}),
             F("inner.Dw", "DwT", "mm", when={"type": ["tapered"]}),
             F("inner.Lw", "Lw", "mm"),
             F("inner.Lwe", "Lwe", "mm", hint="LweHint"),
@@ -169,6 +170,32 @@ GROUPS = [
             F("inner.alpha_i_deg", "coneAngle", "°", when={"type": ["tapered"]}),
             F("inner.alpha_f_deg", "ribAngle", "°", hint="ribHint", when={"type": ["tapered"]}),
             F("inner.R_end", "rEnd", "mm", when={"type": ["tapered"]}),
+            # crossed roller bearings (plan section 十九)
+            F("inner.alpha0_deg", "alphaX", "°", hint="alphaXHint", when={"type": ["crossed"]}),
+            F(
+                "crossed.split",
+                "xSplit",
+                kind="select",
+                options=opts(["outer", "inner"], "xsplit_"),
+                when={"type": ["crossed"]},
+            ),
+            F(
+                "pair.setting",
+                "setting",
+                kind="select",
+                options=[("endplay", "xset_endplay"), ("preload", "setting_preload")],
+                when={"type": ["crossed"]},
+            ),
+            F(
+                "pair.endplay",
+                "radialPlay",
+                "µm",
+                hint="radialPlayHint",
+                when={"type": ["crossed"], "setting": ["endplay"]},
+            ),
+            F("pair.preload", "preloadX", "N", when={"type": ["crossed"], "setting": ["preload"]}),
+            F("pair.sweep_from", "sweepFrom", "µm", hint="sweepHintX", when={"type": ["crossed"]}),
+            F("pair.sweep_to", "sweepTo", "µm", when={"type": ["crossed"]}),
             # pairs (plan section 十六)
             F(
                 "pair.arrangement",
@@ -224,7 +251,7 @@ GROUPS = [
             F("profile.R", "crownR", "mm", when={"profile": ["arc", "partial"]}),
             F("profile.flat", "crownFlat", "mm", when={"profile": ["partial"]}),
             F("profile.points", "crownTable", kind="points", hint="crownTableHint", when={"profile": ["table"]}),
-            F("alignment.theta_arcmin", "misalign", "′", hint="misalignHint"),
+            F("alignment.theta_arcmin", "misalign", "′", hint="misalignHint", when={"type": ROLLER}),
         ],
     ),
     (
@@ -251,7 +278,7 @@ GROUPS = [
     ),
     (
         "gLoads",
-        {"scene": ["generic"], "type": RIGID},
+        {"scene": ["generic"], "type": LOADED},
         [
             F("loads.Fr", "Fr", "N"),
             F("loads.Fa", "Fa", "N"),
@@ -393,6 +420,7 @@ BLANK = {
         )
     },
     "profile": {"kind": "straight", "R": None, "flat": None, "points": []},
+    "crossed": {"split": "outer"},
     "flex": {
         "cam": "cosine",
         "w0": None,
@@ -541,7 +569,7 @@ def load(path: str) -> dict:
 
 
 # ---- a model from the company's catalogue (plan section 十七 K3; the same as CatalogPanel.vue's pick) ----
-CATALOG_OPENS = {"metric": "tapered", "inch": "tapered", "nu": "cylindrical"}
+CATALOG_OPENS = {"metric": "tapered", "inch": "tapered", "nu": "cylindrical", "crossed": "crossed"}
 CATALOG_KEEP = ("scenario", "loads", "fits", "lube", "limits", "material")
 
 

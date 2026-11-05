@@ -39,8 +39,22 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^numbers must be finite$", "数值必须是有限数"),
     (r"^the balls do not fit round the pitch circle", "节圆上放不下这么多钢球（Z·Dw ≥ π·dm）"),
     (
-        r"^the bearing type is deep_groove, angular, cylindrical(, tapered or flex| or tapered)$",
-        "轴承类型是深沟球、角接触球、圆柱滚子、圆锥滚子轴承或谐波柔性轴承",
+        r"^the bearing type is deep_groove, angular, cylindrical(, tapered, flex or crossed| or tapered)$",
+        "轴承类型是深沟球、角接触球、圆柱滚子、圆锥滚子、谐波柔性或交叉滚子轴承",
+    ),
+    # crossed roller bearings (plan section 十九)
+    (r"^give the contact angle of the crossed roller bearing", "请填交叉滚子轴承的接触角（20° 到 70° 之间）"),
+    (r"^give the radial clearance of the crossed roller bearing", "请填交叉滚子轴承的径向游隙（µm，负数为预紧）"),
+    (r"^give the preload of the crossed roller bearing", "请填交叉滚子轴承的预紧力（N）"),
+    (
+        r"^give the roller diameter and length, the number of rollers \(at least 4\)",
+        "请填滚子直径和长度、滚子数（至少 4 个），节圆直径要大于滚子直径",
+    ),
+    (r"^the rollers do not fit round the pitch circle \(Z·Dw", "节圆上放不下这么多滚子（Z·Dw ≥ π·dm）"),
+    (r"^the crossed roller bearing's load distribution did not converge", "载荷分布算不出来：对这些滚子，载荷可能太大"),
+    (
+        r"^the rollers do not fit in these rings: check the width, the contact angle",
+        "这些套圈放不下滚子：请检查宽度、接触角和尺寸",
     ),
     # harmonic reducer flexible bearings (plan section 十八)
     (r"^give the cam's largest radial deformation w0", "请填凸轮的最大径向变形量 w₀"),

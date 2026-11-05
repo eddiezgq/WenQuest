@@ -151,6 +151,14 @@
 "法向压力角 αn",
 "Normal pressure angle α_n"
 ],
+"alphaX": [
+"接触角 α（V 形沟道）",
+"Contact angle α (V groove)"
+],
+"alphaXHint": [
+"沟道面与径向的夹角，通常 45°，按图纸填",
+"The raceway face to the radial direction, usually 45°: from your drawing"
+],
 "alpha_p": [
 "黏压系数 α",
 "Pressure–viscosity coefficient α"
@@ -467,6 +475,10 @@
 "请确认",
 "please confirm"
 ],
+"catCrossed": [
+"交叉滚子",
+"Crossed roller"
+],
 "catDouble": [
 "双列圆锥",
 "Double-row tapered"
@@ -743,6 +755,10 @@
 "工作接触角",
 "Operating contact angle"
 ],
+"crossed": [
+"交叉滚子轴承",
+"Crossed roller bearing"
+],
 "crown": [
 "滚子素线（凸度）",
 "Roller profile (crown)"
@@ -890,6 +906,10 @@
 "fitsAngular": [
 "角接触球轴承的游隙由接触角和配对预紧决定，配对预紧在第 4 步加入。",
 "An angular contact bearing’s clearance is set by its contact angle and the paired preload, which comes in step 4."
+],
+"fitsCrossed": [
+"交叉滚子轴承的预紧在上面按径向游隙给（已含装配后的值）；配合不单独计算。",
+"A crossed roller bearing’s preload is set above as the radial clearance (as mounted); fits are not worked separately."
 ],
 "fitsFlex": [
 "柔性轴承的内圈形状由凸轮给定，外圈装在柔轮里；配合不单独计算。",
@@ -1138,6 +1158,10 @@
 "method": [
 "方法与依据",
 "Method and sources"
+],
+"methodCrossed": [
+"交叉滚子轴承：内外圈刚性；内圈相对外圈的五个位移（两个径向、轴向、两个倾斜）一起解；滚子正反交替，每个滚子沿长度切片，线接触按 Palmgren 公式（两接触串联），存储能是位移的凸函数，求极小后用牛顿法精修；滚子可以部分或全部卸载。刚度取柔度矩阵的逆。接触应力按赫兹线接触，沟道是锥面。关节水平轴、只用一个交叉滚子支承时，悬臂重力按力矩 W·x 计入。",
+"Crossed roller bearing: rigid rings; the inner ring’s five displacements (two radial, axial, two tilts) solved together; rollers alternating, each sliced along its length, line contact by Palmgren’s law (two contacts in series); the stored energy is convex in the displacements, minimised and polished by Newton steps; rollers may unload. Stiffness is the inverse of the compliance. Contact stress by Hertz line contact on the conical raceways. A joint with a horizontal axis held by one crossed roller bearing takes the overhung weight as the moment W·x."
 ],
 "methodFlex": [
 "柔性轴承：内圈按凸轮形状强制变形；外圈按薄圆环（曲梁，不伸长的弯曲模态加整体伸缩，闭式解）受钢球接触力和柔轮啮合区载荷弯曲；钢球按赫兹点接触（未变形沟道曲率），由余能最小求出各球载荷并满足外圈力平衡；保持架位置在一个球距内取 8 个。沟道表面弯曲应力：内圈随凸轮转、不交变；外圈每转两次交变，取各位置范围的一半为应力幅。截面按沟底壁厚、全宽矩形；不含柔轮与齿、离心力。",
@@ -1611,6 +1635,10 @@
 "预紧力",
 "Preload"
 ],
+"preloadX": [
+"预紧力（每组滚子的轴向力）",
+"Preload (axial force of each set)"
+],
 "print": [
 "打印 / 存为 PDF",
 "Print / save as PDF"
@@ -1811,6 +1839,14 @@
 "径向力方向",
 "Radial force"
 ],
+"radialPlay": [
+"径向游隙 Gr",
+"Radial clearance Gr"
+],
+"radialPlayHint": [
+"内圈相对外圈的径向自由量；负数为预紧（过盈）",
+"The inner ring’s free radial play; negative for preload"
+],
 "ratingsNote": [
 "额定载荷和寿命按国家标准计算，标准正文录入前显示“未知”。",
 "Load ratings and life follow the national standards and show “unknown” until the standard texts are entered."
@@ -1883,9 +1919,17 @@
 "轴向刚度",
 "Axial stiffness"
 ],
+"scKt": [
+"倾覆刚度",
+"Tilting stiffness"
+],
 "scN": [
 "受载滚子数（两列）",
 "Rollers carrying load (both rows)"
+],
+"scNx": [
+"受载滚子数",
+"Rollers carrying load"
 ],
 "scP": [
 "最大接触应力",
@@ -1895,9 +1939,17 @@
 "调整量曲线",
 "End play sweep"
 ],
+"scTitleX": [
+"预紧量曲线",
+"Preload sweep"
+],
 "scX": [
 "轴向游隙（负数为预紧）",
 "End play (negative: preload)"
+],
+"scXr": [
+"径向游隙（负数为预紧）",
+"Radial clearance (negative: preload)"
 ],
 "sceneKind": [
 "用在哪",
@@ -2043,6 +2095,10 @@
 "两个都填才画曲线",
 "Fill in both for the curve"
 ],
+"sweepHintX": [
+"预紧量曲线扫的径向游隙范围（如 10 到 −20 µm）；不填不画",
+"The clearance range swept (e.g. 10 to −20 µm); blank: no curve"
+],
 "sweepTo": [
 "调整量曲线：到",
 "End play sweep: to"
@@ -2130,6 +2186,42 @@
 "xHint": [
 "在 B 外侧时大于跨距",
 "Beyond B: more than the span"
+],
+"xSplit": [
+"剖分的套圈",
+"Split ring"
+],
+"xrAlong": [
+"最重滚子沿长度的接触应力",
+"Contact stress along the heaviest roller"
+],
+"xrFa": [
+"两组轴向力",
+"Axial force of the sets"
+],
+"xrLoads": [
+"滚子载荷（正、反两组）",
+"Roller loads (the two sets)"
+],
+"xrMinus": [
+"反向组",
+"the other set"
+],
+"xrPlus": [
+"正向组",
+"one set"
+],
+"xset_endplay": [
+"按径向游隙",
+"By radial clearance"
+],
+"xsplit_inner": [
+"内圈剖分",
+"Inner ring split"
+],
+"xsplit_outer": [
+"外圈剖分",
+"Outer ring split"
 ],
 "zGear": [
 "齿数 z",

@@ -277,6 +277,11 @@ def part_rows(g: dict, which: str) -> list[tuple]:
         rows.append(("滚道直径", _f(g["di"] if which == "inner" else g["do"]), "未知"))
     elif g["type"] == "tapered":
         rows.append(("滚道角", _f(g["alpha_i_deg"] if which == "inner" else g["alpha_o_deg"], 4) + "°", "未知"))
+    elif g["type"] == "crossed":
+        rows.append(("V 形沟顶点直径", _f(2 * (g["r_ai"] if which == "inner" else g["r_ao"])), "未知"))
+        rows.append(("接触角（沟道面与径向）", _f(g["alpha_deg"], 2) + "°", "未知"))
+        if g.get("split") == which:
+            rows.append(("剖分", "在宽度中间剖成两半（图按整体画）", "—"))
     return rows
 
 

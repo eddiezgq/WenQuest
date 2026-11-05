@@ -9,6 +9,7 @@ export function blank() {
     size: { d: null, D: null, B: null },
     inner: { Dw: null, Z: null, dm: null, fi: null, fo: null, Pd: null, alpha0_deg: null, h_i: null, h_o: null, Lw: null, Lwe: null, alpha_o_deg: null, alpha_i_deg: null, alpha_f_deg: null, R_end: null },
     profile: { kind: 'straight', R: null, flat: null, points: [] },
+    crossed: { split: 'outer' },
     flex: { cam: 'cosine', w0: null, a: null, b: null, points: [], F: null, beta_deg: null, sig_i_allow: null, sig_a_allow: null },
     alignment: { theta_arcmin: null },
     pair: { arrangement: 'single', preload: null, spacing: null, mount: 'pair', setting: 'endplay', endplay: null, sweep_from: null, sweep_to: null },

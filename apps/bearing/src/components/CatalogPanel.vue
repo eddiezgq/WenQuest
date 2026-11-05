@@ -22,9 +22,9 @@ const sure = ref(false)
 const fileIn = ref(null)
 const zh = computed(() => lang.value === 'zh')
 const words = (e) => (zh.value ? e.zh || e.message : e.message)
-const OPENS = { metric: 'tapered', inch: 'tapered', nu: 'cylindrical' }
+const OPENS = { metric: 'tapered', inch: 'tapered', nu: 'cylindrical', crossed: 'crossed' }
 const LEVEL = { '疑似': 'catSuspect', '请确认': 'catConfirm', '未知': 'catUnknown' }
-const TABLE = { metric: 'catMetric', inch: 'catInch', double: 'catDouble', nu: 'catNU' }
+const TABLE = { metric: 'catMetric', inch: 'catInch', double: 'catDouble', nu: 'catNU', crossed: 'catCrossed' }
 
 async function run(fn) {
   busy.value = true; err.value = ''; msg.value = ''

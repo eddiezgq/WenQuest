@@ -25,6 +25,8 @@ import CloudPanel from './components/CloudPanel.vue'
 import CatalogPanel from './components/CatalogPanel.vue'
 import CatalogNote from './components/CatalogNote.vue'
 import FlexView from './components/FlexView.vue'
+import SectionCrossed from './components/SectionCrossed.vue'
+import XrLoads from './components/XrLoads.vue'
 import { me, links, detach, loadMe, loginUrl } from './cloud'
 
 const examples = ref([])
@@ -120,10 +122,12 @@ onMounted(async () => {
         <div class="figs">
           <SectionCyl v-if="result?.type === 'cylindrical'" :r="result" />
           <SectionTaper v-else-if="result?.type === 'tapered'" :r="result" />
+          <SectionCrossed v-else-if="result?.type === 'crossed'" :r="result" />
           <Section v-else :r="result" />
-          <LoadRing v-if="result?.type !== 'flex'" :r="result" />
+          <LoadRing v-if="!['flex', 'crossed'].includes(result?.type)" :r="result" />
         </div>
         <FlexView v-if="result?.type === 'flex'" :r="result" />
+        <XrLoads v-if="result?.type === 'crossed'" :r="result" />
         <SliceChart :r="result" />
         <ScenarioPanel :r="result" />
         <Extras :r="result" />

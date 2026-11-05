@@ -180,10 +180,14 @@ def shapes(p, FreeCAD, Part):
 
 
 def interference(sh, places):
-    """第一个滚动体（按对称，每个都一样）与内、外圈求交的体积，mm³。"""
-    e = sh["element"].copy()
-    e.Placement = places[0]
-    return {"inner": e.common(sh["inner"]).Volume, "outer": e.common(sh["outer"]).Volume}
+    """前两个滚动体（按对称，其余与它们之一相同；交叉滚子正反交替，所以看两个）与内、外圈求交的最大体积，mm³。"""
+    out = {"inner": 0.0, "outer": 0.0}
+    for pl in places[:2]:
+        e = sh["element"].copy()
+        e.Placement = pl
+        out["inner"] = max(out["inner"], e.common(sh["inner"]).Volume)
+        out["outer"] = max(out["outer"], e.common(sh["outer"]).Volume)
+    return out
 
 
 def build(doc, p, log=print):
