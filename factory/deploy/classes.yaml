@@ -18,3 +18,10 @@ classes:
     teachers: []
     plant: wenquest-robot
     park: true             # 第 51 轮：接入工业园，WQR-105 向问渠减速器厂（factory.wenquestrobotics.com 的教学模式）下单
+  # 问渠数字工业园第三座厂（第 85 轮，电子 E3）：电路板厂，按清单起 → https://pcb.factory.wenquestrobotics.com
+  - id: pcb
+    name: 问渠数字工业园 · 电路板厂
+    course: ""
+    teachers: []
+    plant: wenquest-pcb
+    park: true             # 接入工业园：机器人厂的驱动板、AGV 控制板向这里下单

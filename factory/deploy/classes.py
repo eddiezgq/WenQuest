@@ -5,6 +5,7 @@
 网址：<编号>.factory.<域名>（工作台）、<编号>.erp.<域名>（ERPNext），由学习平台的 Caddy 按需申请证书。
 
 第 51 轮：写了 plant 的一行可以再写 park: true，接入工业园：这座厂向公共工厂（问渠减速器厂）下的采购单在那边成为销售订单。
+第 85 轮：接入工业园的班级工厂之间也互相认得（机器人厂向电路板厂买驱动板）。
 
 第 45 轮：一行可以写 plant（工厂清单，factory/plants/<plant>.yaml），这座厂就按那份清单起（如机器人厂）；
 不写 = 问渠减速器厂。清单只在第一次建站时决定 ERPNext 里的公司名和缩写，已建好的班级工厂不要再改 plant。
@@ -67,7 +68,20 @@ def env_key(cid, what):
     return "WQ_C_{}_{}".format(cid.upper(), what)
 
 
-def services(c, ci_ports=None):
+def park_peers(c, classes):
+    """接入工业园的班级工厂认得的兄弟厂：公共工厂（问渠减速器厂），和其他接入工业园的班级工厂——按清单 id（下单时用，
+    如 wenquest-pcb）和班级编号（发货回传时用，如 robot）都能找到（第 85 轮：机器人厂向电路板厂买驱动板）"""
+    out = {"wenquest-gearbox": "http://hub:8100"}
+    for d in classes or []:
+        if d["id"] == c["id"] or not d.get("park"):
+            continue
+        url = "http://hub-c-{}:8100".format(d["id"])
+        out.setdefault(d["plant"], url)
+        out[d["id"]] = url
+    return " ".join("{}={}".format(k, v) for k, v in out.items())
+
+
+def services(c, ci_ports=None, classes=None):
     cid, up = c["id"], c["id"].upper()
     log = {"driver": "json-file", "options": {"max-size": "10m", "max-file": "3"}}
     base_env = {"WQ_DB": "postgresql://wq:${WQ_DB_PASSWORD:?}@db:5432/wq_c_" + cid, "WQ_MQTT_HOST": "bus-c-" + cid,
@@ -130,14 +144,14 @@ def services(c, ci_ports=None):
         s["bridge-c-" + cid]["environment"].update({"WQ_ERP_ABBR": pi["abbr"], "WQ_ERP_COMPANY": pi["company"]})
     if c.get("park"):                        # 第 51 轮：接入工业园——向公共工厂（问渠减速器厂）下单、收它的发货回传
         s["hub-c-" + cid]["environment"].update({"WQ_PARK_KEY": "${WQ_PARK_KEY:-}", "WQ_PARK_ME": cid,
-                                                 "WQ_PARK_PEERS": "wenquest-gearbox=http://hub:8100"})
+                                                 "WQ_PARK_PEERS": park_peers(c, classes)})
     return s
 
 
 def compose(classes, ci_ports=False):
     svc = {}
     for i, c in enumerate(classes):
-        svc.update(services(c, (8102 + i, 8093 + i) if ci_ports else None))
+        svc.update(services(c, (8102 + i, 8093 + i) if ci_ports else None, classes))
     # 公共工厂的枢纽回答 Caddy“这个网址能不能发证书”（按需申请证书）
     svc["hub"] = {"environment": {"WQ_CLASS_IDS": " ".join(c["id"] for c in classes),
                                   # 第 51 轮：工业园里向本厂下单的班级工厂（classes.yaml 写了 park: true 的）

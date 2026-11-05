@@ -41,8 +41,20 @@ def test_plants_listing_for_setup_script():
     out = subprocess.run([sys.executable, os.path.join(DEPLOY, "classes.py"), os.path.join(DEPLOY, "classes.yaml"), "--plants"],
                          capture_output=True, text=True, check=True).stdout.strip().splitlines()
     rows = [r.split("\t") for r in out]
-    assert [r[0] for r in rows] == ["robot"]
+    assert [r[0] for r in rows] == ["robot", "pcb"]                     # 第 85 轮：加了电路板厂
     assert rows[0][1:4] == ["/app/plants/wenquest-robot.yaml", "问渠机器人厂 WenQuest Robotics (Demo)", "WQRB"]
+    assert rows[1][1:4] == ["/app/plants/wenquest-pcb.yaml", "问渠电路板厂 WenQuest Electronics (Demo)", "WQEL"]
+
+
+def test_park_peers_between_class_plants():
+    """第 85 轮：接入工业园的班级工厂互相认得——按清单 id 下单、按班级编号回传发货；公共工厂认得所有接入的班级工厂"""
+    cls = C.load(os.path.join(DEPLOY, "classes.yaml"))
+    svc = C.compose(cls)["services"]
+    peers = lambda s: dict(x.split("=", 1) for x in svc[s]["environment"]["WQ_PARK_PEERS"].split())    # noqa: E731
+    assert peers("hub-c-robot") == {"wenquest-gearbox": "http://hub:8100", "wenquest-pcb": "http://hub-c-pcb:8100", "pcb": "http://hub-c-pcb:8100"}
+    assert peers("hub-c-pcb")["robot"] == "http://hub-c-robot:8100" and peers("hub-c-pcb")["wenquest-gearbox"] == "http://hub:8100"
+    assert peers("hub") == {"robot": "http://hub-c-robot:8100", "pcb": "http://hub-c-pcb:8100"}
+    assert svc["hub-c-pcb"]["environment"]["WQ_PLANT_FILE"] == "/app/plants/wenquest-pcb.yaml"
 
 
 @pytest.mark.parametrize("plant, msg", [("no-such-plant", "找不到清单"), ("../etc", "不合规"), ("wenquest-gearbox", None),

@@ -107,7 +107,7 @@ jobs:
     name: 服务器演练（真 ERPNext）
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 110
+    timeout-minutes: 150
     env:
       FACTORY_DIR: /tmp/fac
       LEARN_DIR: /tmp/nolearn
@@ -207,7 +207,7 @@ jobs:
             python3 factory/deploy/ci_annotate.py 演示工厂诊断 /tmp/logs/demo_diag.log 200
           fi
           exit "$st"
-      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）
+      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）；电路板厂起得来、接单走通、机器人厂向它买驱动板（第 85 轮）
         run: |
           set +e
           val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
@@ -229,6 +229,27 @@ jobs:
           done
           bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$id'" 2>&1 | tee /tmp/logs/class_setup.log
           st=${PIPESTATUS[0]}
+          # 第 85 轮：工业园第三座厂（电路板厂）也起来：自己接单走通，再让机器人厂向它买驱动板
+          pcb=$(awk -F'\t' '$2 ~ /wenquest-pcb\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
+          pcbhubp=""; pcberpp=""
+          if [ "$st" = 0 ] && [ -n "$pcb" ]; then
+            m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$pcb" ] && break; m=$((m + 1)); done
+            pcbhubp=$((8102 + m)); pcberpp=$((8093 + m)); pup=$(echo "$pcb" | tr '[:lower:]' '[:upper:]')
+            bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$pcb'" 2>&1 | tee /tmp/logs/pcb_setup.log
+            st=${PIPESTATUS[0]}
+            if [ "$st" = 0 ]; then
+              for i in $(seq 1 40); do curl -fsS localhost:$pcbhubp/api/health && break; sleep 5; done
+              cd factory/digital
+              python tests/plant_loop.py --hub http://localhost:$pcbhubp --erp http://localhost:$pcberpp --erp-kind real \
+                --erp-key "$(val WQ_C_${pup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${pup}_ERP_API_SECRET)" --speed 300 --timeout 900 \
+                --item DRV-JOINT:3 --item ENC-RD:2 --reliability 0 --staffing 0 --domains --expect-products DRV-JOINT,CTRL-AGV,ENC-RD \
+                2>&1 | tee /tmp/logs/pcb_loop.log
+              st=${PIPESTATUS[0]}
+              cd - >/dev/null
+              [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/pcb_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/pcb_fail.log;
+                                 python3 factory/deploy/ci_annotate.py 电路板厂闭环失败项 /tmp/logs/pcb_fail.log 40; }
+            fi
+          fi
           if [ "$st" = 0 ]; then
             # 第 51 轮：公共工厂的枢纽带上班级工厂的配置重启（工业园：接入的班级工厂来下单、收发货回传）
             (cd "$FACTORY_DIR" && docker compose -p wq-factory -f docker-compose.yml -f ci.yml -f docker-compose.classes.yml up -d hub)
@@ -240,8 +261,9 @@ jobs:
             fi
             park=""; extra=""
             if grep -q "park: true" factory/deploy/classes.yaml && { [ -z "$changed" ] || echo "$changed" | grep -qE \
-                "hub/(park|supply|supply_api|finance|mrp|lab27)\.py|bridge/|plants/wenquest-|deploy/classes|tests/plant_loop\.py|workflows/factory\.yml"; }; then
+                "hub/(park|supply|supply_api|finance|mrp|lab27)\.py|bridge/|plants/wenquest-|deploy/classes|tests/plant_loop\.py|workflows/factory\.yml|sim/errors\.py"; }; then
               park="--park-hub http://localhost:8100 --lab27"
+              [ -z "$pcbhubp" ] || park="$park --park-buy DRV-JOINT=http://localhost:$pcbhubp"     # 第 85 轮
             fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE \
                 "sim/(calib|errors|engine|runin)\.py|hub/lab2[68]\.py|cae/wqcr5\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
