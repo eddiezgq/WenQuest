@@ -99,9 +99,9 @@ jobs:
       - name: 工作台网页能打包
         working-directory: factory/digital/web
         run: npm ci --no-audit --no-fund && npm run build
-      - name: 电路分析：浏览器 ngspice 与服务器 ngspice 读数一致（第 79 轮）
+      - name: 电路分析：浏览器 ngspice 与服务器 ngspice 读数一致（第 79 轮）；虚拟仪器：网页模型与服务器参数一致、学生做法能判对（第 82 轮）
         working-directory: factory/digital
-        run: python -m pytest -q tests/test_circuit.py -k browser
+        run: python -m pytest -q tests/test_circuit.py tests/test_instruments.py -k "browser or node"
 
   rehearsal:
     name: 服务器演练（真 ERPNext）
