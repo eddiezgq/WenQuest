@@ -133,8 +133,9 @@ jobs:
       - name: 芯片 RTL 仿真（WQ-ENCIF，与参考模型逐拍比对；波形与提交的一致）
         run: |
           python3 factory/designs/wq-encif/tb/run.py
-          git diff --stat --exit-code -- factory/designs/wq-encif/out/sim
-          test -z "$(git status --porcelain factory/designs/wq-encif/out/sim)"
+          python3 factory/designs/wq-encif/tools/pack.py
+          git diff --stat --exit-code -- factory/designs/wq-encif/out
+          test -z "$(git status --porcelain factory/designs/wq-encif/out)"
       - name: 可制造性检查（改坏能报出来）、芯片规格值
         run: python3 -m pytest -q factory/designs/tests
 

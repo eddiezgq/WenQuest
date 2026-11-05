@@ -19,12 +19,17 @@ SIGS = [("A", "w", 0), ("B", "w", 1), ("Z", "w", 2), ("SCLK", "w", 3), ("CS_N", 
 
 
 def vcd_to_wave(path):
-    """读 VCD，转成 {信号: [[拍, 值], …]}（只记变化）"""
-    ids, cur, t = {}, {}, 0
+    """读 VCD，转成 {信号: [[拍, 值], …]}（只记变化）；时间按 $timescale 换成拍（1 拍 = 20 ns）"""
+    ids, t = {}, 0
     out = {}
     with open(path) as f:
         lines = f.read().split("\n")
     scope = []
+    text = " ".join(lines)
+    ts = text[text.index("$timescale") + 10:text.index("$end", text.index("$timescale"))].strip()
+    num = int("".join(c for c in ts if c.isdigit()))
+    unit = {"s": 1, "ms": 1e-3, "us": 1e-6, "ns": 1e-9, "ps": 1e-12, "fs": 1e-15}[ts.lstrip("0123456789 ")]
+    per = round(20e-9 / (num * unit))                 # 一拍多少个 VCD 时间单位
     for ln in lines:
         p = ln.split()
         if not p:
@@ -36,7 +41,7 @@ def vcd_to_wave(path):
         elif p[0] == "$var":
             ids.setdefault(p[3], []).append(p[4])
         elif p[0].startswith("#"):
-            t = int(p[0][1:])
+            t = int(p[0][1:]) // per
         elif p[0][0] in "01xz" and len(p) == 1:
             for nm in ids.get(p[0][1:], []):
                 out.setdefault(nm, []).append([t, p[0][0]])
@@ -53,7 +58,7 @@ def wave_json(raw, n):
         ev = raw.get(src, [])
         pts, last = [], None
         for t, v in ev:
-            k = t // 20
+            k = t
             if bit is not None:
                 v = v.rjust(7, "0")[::-1][bit] if v[0] in "01" else "x"
             else:

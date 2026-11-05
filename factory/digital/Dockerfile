@@ -32,6 +32,7 @@ COPY seed.py seed.py
 COPY plants/ plants/
 # 第 88 轮：电路板设计的产物（KiCad 在 CI 里生成，随仓库发布；网页“电路板设计”读这里）
 COPY designs/drv-joint/out/ designs/drv-joint/out/
+COPY designs/wq-encif/out/ designs/wq-encif/out/
 COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 # 虚拟 PLC（第 18 轮第 8 步）：班次在仿真车间里算、回放；PLC 引擎是学习平台实验台的同一份 JS（Debian 自带的 nodejs 运行）
