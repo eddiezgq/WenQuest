@@ -67,6 +67,14 @@
 "初始径向游隙 Pd",
 "Initial diametral clearance Pd"
 ],
+"T_house": [
+"轴承座温度",
+"Housing temperature"
+],
+"T_houseHint": [
+"不填按外圈温度",
+"Blank: the outer ring’s"
+],
 "T_i": [
 "内圈温度",
 "Inner ring temperature"
@@ -74,6 +82,18 @@
 "T_o": [
 "外圈温度",
 "Outer ring temperature"
+],
+"T_ref": [
+"调整时温度",
+"Temperature at setting"
+],
+"T_shaft": [
+"轴温度",
+"Shaft temperature"
+],
+"T_shaftHint": [
+"不填按内圈温度",
+"Blank: the inner ring’s"
 ],
 "Ttot": [
 "总宽 T",
@@ -86,6 +106,18 @@
 "ZR": [
 "滚子数 Z",
 "Number of rollers Z"
+],
+"a_house": [
+"轴承座线膨胀系数",
+"Housing expansion coefficient"
+],
+"a_ring": [
+"轴承钢线膨胀系数",
+"Bearing steel expansion coefficient"
+],
+"a_shaft": [
+"轴线膨胀系数",
+"Shaft expansion coefficient"
 ],
 "addCase": [
 "加一个工况",
@@ -382,6 +414,18 @@
 "ay": [
 "转弯侧向加速度",
 "Cornering acceleration"
+],
+"basis": [
+"游隙在什么时候调的",
+"End play set"
+],
+"basis_bench": [
+"装前调好（如带隔圈的成对轴承），压装后会变",
+"Before mounting (e.g. a pair with spacers): the fits change it"
+],
+"basis_mounted": [
+"装好后调（螺母或垫片，在装好的套圈上调）",
+"On the mounted rings (nut or shims)"
 ],
 "beltDeg": [
 "带拉力方向（与竖直向下的夹角）",
@@ -875,6 +919,10 @@
 "安装时实际调的量，两列合计",
 "As set at mounting, for the two rows together"
 ],
+"endplayWork": [
+"工作时轴向游隙",
+"End play at work"
+],
 "error": [
 "算不出来",
 "Cannot compute"
@@ -932,8 +980,8 @@
 "The flexible bearing’s inner ring takes the cam’s shape and the outer ring sits in the flexspline; fits are not worked separately."
 ],
 "fitsTapered": [
-"圆锥滚子轴承的轴向游隙在安装时调整，这里按零游隙计算；配对与预紧在第 4 步之三加入。",
-"A tapered roller bearing’s end play is set at mounting; it is worked here with zero end play. Pairs and preload come in step 4, part 3."
+"单列圆锥滚子轴承按零游隙计算；选成对或两端支承后，这里可以填配合和温度，算工作时的轴向游隙。",
+"A single tapered row is worked with zero end play; choose a pair or two supports to give fits and temperatures for the end play at work."
 ],
 "fixedBearing": [
 "承受轴向力的轴承（固定端）",
@@ -1659,6 +1707,10 @@
 "预紧力",
 "Preload"
 ],
+"preloadWork": [
+"工作时预紧力",
+"Preload at work"
+],
 "preloadX": [
 "预紧力（每组滚子的轴向力）",
 "Preload (axial force of each set)"
@@ -2154,6 +2206,10 @@
 "thermal": [
 "温差",
 "Temperature"
+],
+"thermalHint": [
+"填调整时温度、工作温度和三个线膨胀系数，就按工作时的游隙算各工况；都不填则不计温度，只填一部分结果为“未知”。线膨胀系数按实际材料填。",
+"Give the setting temperature, the working temperatures and the three expansion coefficients and the cases run at the end play at work; none given: heat not taken; some given: unknown. Use the real materials’ coefficients."
 ],
 "thisBearing": [
 "本轴承是",

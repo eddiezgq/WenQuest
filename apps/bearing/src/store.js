@@ -12,7 +12,7 @@ export function blank() {
     crossed: { split: 'outer' },
     flex: { cam: 'cosine', w0: null, a: null, b: null, points: [], F: null, beta_deg: null, sig_i_allow: null, sig_a_allow: null },
     alignment: { theta_arcmin: null },
-    pair: { arrangement: 'single', preload: null, spacing: null, mount: 'pair', setting: 'endplay', endplay: null, sweep_from: null, sweep_to: null },
+    pair: { arrangement: 'single', preload: null, spacing: null, mount: 'pair', setting: 'endplay', endplay: null, sweep_from: null, sweep_to: null, basis: 'mounted' },
     material: { E: 206000, nu: 0.3, density: null },
     scenario: { kind: 'generic', fp: null },
     loads: { Fr: null, Fa: null, M: null, n: null },
