@@ -1,0 +1,120 @@
+# 首页视频简介 16 · 虚拟实验室（第 86 轮第二批）。画面：官网 /lab/（倒立摆、二连杆机械臂）、/lab/kinematics（质点运动学实验台），
+# 实验台页面只有中文，英文版用同样的画面。以及教材里的 PLC 实验台、微电子实验（本机用 textbook/tools/build.py plc|dic --labs 生成实验页，site/_tb 指向 textbook/build 截图，不提交）。
+standalone: true
+langs: [zh, en]
+title: [问渠虚拟实验室：在浏览器里做实验, 'WenQuest virtual labs: experiments in the browser']
+brand: [虚拟实验室, Virtual labs]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [实验在浏览器里实时计算；画面里的数据是演示时的一次运行。, 'Labs compute live in the browser; the data shown is one demo run.']
+tags:
+  zh: [虚拟实验, 虚拟仿真, 倒立摆, PID, 机械臂, PLC, 微电子, Verilog, 大学物理, 问渠]
+  en: [virtual lab, simulation, inverted pendulum, PID, robot arm, PLC, microelectronics, physics, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: lab, url: /lab/, wait: 2500}
+  - {name: lab-run, url: /lab/, click: 'button:text-is("开始标准测试")', wait: 9000, js: "window.scrollTo(0, 330)"}
+  - {name: arm, url: /lab/, click: 'button:text-is("实验二 · 二连杆机械臂")', wait: 3000}
+  - {name: kin, url: /lab/kinematics.html, click_en: 'button:text-is("EN")', wait: 3000}
+  - {name: plc, url: /_tb/plc/lab/ch01.html, click: ['button:text-is("运行 RUN")', 'button:text-is("启动 S1")'], wait: 5000}
+  - {name: dic, url: /_tb/dic/lab/ch01.html, wait: 3500}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: lab-run, title: [在浏览器里做实验, Experiments in the browser],
+          sub: [问渠虚拟实验室：先预测，再动手，AI 实验助教看过程, 'WenQuest virtual labs: predict first, then run; an AI lab assistant reads the process']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠虚拟实验室：打开浏览器就能做实验，不用装软件，也不怕把设备弄坏。']
+    en: ['>WenQuest virtual labs run in the browser: nothing to install, and nothing to break.']
+- id: s02
+  kind: page
+  page: 2
+  part: [机器人, Robotics]
+  slide:
+    img: lab-run
+    url: wenquestrobotics.com/lab
+    kick: [倒立摆 PID 控制, Inverted pendulum PID]
+    title: [调参数，看曲线，找原因, 'Tune it, watch the curves, find out why']
+    points:
+      - {text: [动力学与 MuJoCo 逐步对照, Dynamics checked step by step against MuJoCo]}
+      - {text: [过程曲线、指标一次看全, 'Process curves and metrics at a glance']}
+      - {text: [AI 实验助教只指方向，不给答案, 'The AI assistant points the way, never the answer']}
+  steps: [{show: 0.17}, {show: 0.5}, {show: 1}]
+  say:
+    zh: ['>倒立摆 PID 控制：动力学方程和 MuJoCo 逐步对照过。', '>调参数，看摆角、小车位置、控制力的曲线，', '>AI 实验助教读你的实验过程，只指方向，不给答案。']
+    en: ['>Inverted pendulum PID control, with the dynamics checked step by step against MuJoCo.', '>Tune the gains and watch the angle, cart position and force curves,', '>while the AI lab assistant reads your runs and points the way without giving the answer.']
+- id: s03
+  kind: page
+  page: 3
+  part: [机器人, Robotics]
+  slide:
+    img: arm
+    url: wenquestrobotics.com/lab
+    kick: [二连杆机械臂, Two-link arm]
+    title: [运动学、轨迹、控制, 'Kinematics, trajectories, control']
+    points:
+      - {text: [从公式到会动的机械臂, From equations to a moving arm]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>二连杆机械臂：运动学、轨迹规划和控制，从公式到会动的机械臂。']
+    en: ['>A two-link arm: kinematics, trajectory planning and control, from equations to an arm that moves.']
+- id: s04
+  kind: page
+  page: 4
+  part: [大学物理, Physics]
+  slide:
+    img: kin
+    url: wenquestrobotics.com/lab/kinematics
+    kick: [质点运动学实验台, Kinematics bench]
+    title: [每个概念一个场景, One scene for every concept]
+    points:
+      - {text: [参考系、抛体、圆周、相对运动, 'Frames, projectiles, circular and relative motion'], ring: [0, 8, 50, 8]}
+      - {text: [每个场景配一道机器人问题, Each scene comes with a robotics problem]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>大学物理的质点运动学：参考系、抛体、圆周、相对运动，每个概念一个场景，', '>每个场景都配一道机器人问题。']
+    en: ['>For university physics, the kinematics bench gives every concept a scene: frames, projectiles, circular and relative motion,', '>and every scene comes with a robotics problem.']
+- id: s05
+  kind: page
+  page: 5
+  part: [PLC, PLC]
+  slide:
+    img: plc
+    url: learn.wenquestrobotics.com
+    kick: [PLC 实验台, PLC bench]
+    title: [网页里的 PLC，接一台三维设备, 'A web PLC wired to a 3D machine']
+    points:
+      - {text: [写程序、运行、单步扫描, 'Write, run, single-step the scan']}
+      - {text: [故障按钮：卡料、断线、电机过载, 'Fault buttons: jams, broken wires, motor overload'], ring: [3, 93, 58, 7]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>PLC 实验台：网页里的 PLC 接着一台三维设备，写程序、运行、单步扫描，', '>还能故意制造卡料、断线、电机过载，练排故。']
+    en: ['>The PLC bench wires a web PLC to a 3D machine. Write the program, run it, step through the scan,', '>and inject jams, broken wires or motor overloads to practise troubleshooting.']
+- id: s06
+  kind: page
+  page: 6
+  part: [微电子, Microelectronics]
+  slide:
+    img: dic
+    url: learn.wenquestrobotics.com
+    kick: [微电子实验, Microelectronics]
+    title: [从晶体管到芯片, From transistor to chip]
+    points:
+      - {text: [调尺寸，延时和功耗当场算, 'Size the transistors; delay and power computed live']}
+      - {text: [Verilog 综合、版图，RTL → GDS, 'Verilog synthesis and layout, RTL to GDS']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>微电子实验：调晶体管尺寸，延时和功耗当场算出来；', '>后面还有 Verilog 综合和版图，从 RTL 一直做到 GDS。']
+    en: ['>Microelectronics: size the transistors and see delay and power at once,', '>then go on to Verilog synthesis and layout, from RTL all the way to GDS.']
+- id: s07
+  kind: page
+  page: 7
+  part: [结尾, Outro]
+  slide: {layout: end, img: lab, title: [每个实验都有指导书和报告模板, Every lab has a guide and a report template],
+          sub: [还有云端 GPU 实验：JupyterLab 里跑 CUDA, 'Plus cloud GPU labs: CUDA in JupyterLab'], link: [问渠官网首页 → 虚拟实验室, wenquestrobotics.com/lab]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>每个实验都有指导书和报告模板；还有云端 GPU 实验，在 JupyterLab 里跑 CUDA。']
+    en: ['>Every lab comes with a guide and a report template, and there are cloud GPU labs that run CUDA in JupyterLab.']

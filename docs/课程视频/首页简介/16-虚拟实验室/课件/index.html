@@ -1,0 +1,118 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WenQuest virtual labs: experiments in the browser</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#07131f}
+body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",Inter,Arial,sans-serif;color:#eaf1fb}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(1200px 700px at 85% -10%,#1d3f7a 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#0f4a4a 0%,transparent 60%),#07131f}
+section.pg{position:absolute;inset:0;display:none}
+section.pg.on{display:block}
+.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,sans-serif;letter-spacing:.18em;color:#7fb6ff;text-transform:uppercase}
+.brand b{color:#f5c344;font-weight:700;letter-spacing:.05em;margin-right:14px}
+.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600;letter-spacing:.04em}
+.title{position:absolute;left:56px;top:122px;width:1800px;font-size:52px;font-weight:800;line-height:1.15;color:#fff}
+.win{position:absolute;left:56px;top:212px;width:1280px;height:720px;border-radius:14px;overflow:hidden;background:#fff;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08)}
+.win .bar{position:absolute;left:0;top:0;right:0;height:34px;background:#e9edf2;display:flex;align-items:center;gap:8px;padding-left:14px;z-index:3}
+.win .bar i{width:12px;height:12px;border-radius:50%;background:#ff5f57}.win .bar i:nth-child(2){background:#febc2e}.win .bar i:nth-child(3){background:#28c840}
+.win .bar span{margin-left:18px;font:500 15px/1 Inter,sans-serif;color:#5b6775;background:#fff;border-radius:6px;padding:5px 14px}
+.win .vp{position:absolute;left:0;top:34px;right:0;bottom:0;overflow:hidden}
+.win .vp .cam{position:absolute;inset:0;transform-origin:0 0}
+.win .vp img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:top left}
+.ring{position:absolute;border:5px solid #f5c344;border-radius:12px;box-shadow:0 0 0 9999px rgba(7,19,31,.16),0 0 24px rgba(245,195,68,.8);opacity:0}
+.side{position:absolute;left:1384px;top:236px;width:480px}
+.side li{list-style:none;position:relative;padding:0 0 0 46px;margin:0 0 30px;font-size:31px;line-height:1.38;color:#dbe7f7;opacity:0}
+.side li::before{content:attr(data-n);position:absolute;left:0;top:4px;width:32px;height:32px;border-radius:50%;background:#f5c344;color:#07131f;
+  font:700 19px/32px Inter,sans-serif;text-align:center}
+.side li b{color:#fff}
+.cover .title{top:330px;font-size:78px;width:900px}
+.cover .sub{position:absolute;left:56px;top:600px;width:860px;font-size:36px;line-height:1.45;color:#bcd0ea}
+.cover .line{position:absolute;left:56px;top:300px;width:120px;height:6px;background:#f5c344;border-radius:3px}
+.cover .win{left:1010px;top:200px;width:1000px;height:597px;transform:perspective(1800px) rotateY(-16deg) rotateX(3deg);transform-origin:left center;opacity:.92}
+.end .title{top:300px;font-size:84px;width:1700px}
+.end .sub{position:absolute;left:56px;top:430px;font-size:40px;color:#bcd0ea}
+.end .url{position:absolute;left:56px;top:540px;font:600 44px/1.2 Inter,sans-serif;color:#f5c344}
+.end .win{left:1180px;top:260px;width:680px;height:416px;opacity:.85}
+.f{opacity:0}
+</style></head><body><div id="stage"><section class="pg cover" data-n="1">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="title">Experiments in the browser</div>
+<div class="line"></div>
+<div class="sub">WenQuest virtual labs: predict first, then run; an AI lab assistant reads the process</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/lab-run-en.jpg" alt=""></div></div></div>
+</section>
+<section class="pg shot" data-n="2">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="kick">Inverted pendulum PID</div>
+<div class="title">Tune it, watch the curves, find out why</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/lab</span></div><div class="vp"><div class="cam"><img src="media/lab-run-en.jpg" alt=""></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Dynamics checked step by step against MuJoCo</li><li data-k="2" data-n="2">Process curves and metrics at a glance</li><li data-k="3" data-n="3">The AI assistant points the way, never the answer</li></ul>
+</section>
+<section class="pg shot" data-n="3">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="kick">Two-link arm</div>
+<div class="title">Kinematics, trajectories, control</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/lab</span></div><div class="vp"><div class="cam"><img src="media/arm-en.jpg" alt=""></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">From equations to a moving arm</li></ul>
+</section>
+<section class="pg shot" data-n="4">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="kick">Kinematics bench</div>
+<div class="title">One scene for every concept</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/lab/kinematics</span></div><div class="vp"><div class="cam"><img src="media/kin-en.jpg" alt=""><div class="ring" data-k="1" style="left:0%;top:8%;width:50%;height:8%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Frames, projectiles, circular and relative motion</li><li data-k="2" data-n="2">Each scene comes with a robotics problem</li></ul>
+</section>
+<section class="pg shot" data-n="5">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="kick">PLC bench</div>
+<div class="title">A web PLC wired to a 3D machine</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>learn.wenquestrobotics.com</span></div><div class="vp"><div class="cam"><img src="media/plc-en.jpg" alt=""><div class="ring" data-k="2" style="left:3%;top:93%;width:58%;height:7%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Write, run, single-step the scan</li><li data-k="2" data-n="2">Fault buttons: jams, broken wires, motor overload</li></ul>
+</section>
+<section class="pg shot" data-n="6">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="kick">Microelectronics</div>
+<div class="title">From transistor to chip</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>learn.wenquestrobotics.com</span></div><div class="vp"><div class="cam"><img src="media/dic-en.jpg" alt=""></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Size the transistors; delay and power computed live</li><li data-k="2" data-n="2">Verilog synthesis and layout, RTL to GDS</li></ul>
+</section>
+<section class="pg end" data-n="7">
+<div class="brand"><b>问渠</b>Virtual labs</div>
+<div class="title">Every lab has a guide and a report template</div>
+<div class="sub">Plus cloud GPU labs: CUDA in JupyterLab</div>
+<div class="url">wenquestrobotics.com/lab</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/lab-en.jpg" alt=""></div></div></div>
+</section></div><script>
+(() => {
+  const pages = [...document.querySelectorAll('section.pg')]
+  let cur = 0, frag = 0, t0 = performance.now()
+  const frags = (i) => [...pages[i].querySelectorAll('[data-k]')].reduce((m, e) => Math.max(m, +e.dataset.k), 0)
+  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; t0 = performance.now()
+    pages[i].querySelectorAll('[data-k]').forEach((e) => { e.dataset.t = '' }); while (frag < s) next() }
+  function next() { if (frag >= frags(cur)) { if (cur < pages.length - 1) go(cur + 1, 0); return } frag++
+    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = performance.now() })
+    const z = pages[cur].querySelector(`.cam[data-z${frag}]`); if (z) { z.dataset.from = z.dataset.now || '1,0,0'; z.dataset.to = z.dataset['z' + frag]; z.dataset.zt = performance.now() } }
+  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
+  function tick() {
+    const now = performance.now(), p = pages[cur]; if (!p) return
+    p.querySelectorAll('[data-k]').forEach((e) => { const t = +e.dataset.t; const a = e.dataset.t ? ease((now - t) / 450) : 0
+      e.style.opacity = a; if (e.tagName === 'LI') e.style.transform = `translateX(${(1 - a) * 24}px)` })
+    p.querySelectorAll('.cam').forEach((c) => {
+      const drift = 1 + 0.035 * Math.min(1, (now - t0) / 14000)          // 缓慢推近，画面不死
+      let [s, x, y] = (c.dataset.now || '1,0,0').split(',').map(Number)
+      if (c.dataset.to) { const a = ease((now - +c.dataset.zt) / 1200), A = c.dataset.from.split(',').map(Number), B = c.dataset.to.split(',').map(Number)
+        ;[s, x, y] = A.map((v, k) => v + (B[k] - v) * a); if (a >= 1) { c.dataset.now = c.dataset.to; delete c.dataset.to } }
+      const W = c.clientWidth, H = c.clientHeight, S = s * drift
+      // 把 (x%, y%) 放到画面中心，且不露出边
+      const tx = Math.min(0, Math.max(W - W * S, W / 2 - W * S * x / 100)), ty = Math.min(0, Math.max(H - H * S, H / 2 - H * S * y / 100))
+      c.style.transform = `translate(${s === 1 && !x ? 0 : tx}px,${s === 1 && !y ? 0 : ty}px) scale(${S})`
+    })
+  }
+  setInterval(tick, 16)
+  function fit() { const k = Math.min(innerWidth / 1920, innerHeight / 1080); document.getElementById('stage').style.transform = `scale(${k})` }
+  addEventListener('resize', fit); fit()
+  addEventListener('keydown', (e) => { if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) next(); if (e.key === 'ArrowLeft') go(Math.max(0, cur - 1), 0) })
+  const h = +(location.hash.match(/#p(\d+)/) || [])[1]; go(h ? h - 1 : 0, 0)
+  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags,
+    notes: (i) => '', state: () => ({ page: cur, frag }) }
+})()
+</script></body></html>
