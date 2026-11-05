@@ -117,7 +117,7 @@ module wq_encif (
             if (boot != 2'd3) boot <= boot + 2'd1;
             else if (!armed && fa == sa[1] && fb == sb[1] && fz == sz[1]) armed <= 1'b1;
             if (en && step) begin
-                cnt <= fwd ? cnt + 32'd1 : cnt - 32'd1;
+                cnt <= cnt + (fwd ? 32'd1 : 32'hFFFFFFFF);   // 一个加法器加 ±1（比“加一、减一再选”路径短）
                 dir <= fwd;
             end
             if (en && da && db) err <= 1'b1;

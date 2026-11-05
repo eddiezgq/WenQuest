@@ -7,5 +7,6 @@
   "FP_CORE_UTIL": 40,
   "PL_TARGET_DENSITY_PCT": 55,
   "FP_PDN_MULTILAYER": false,
-  "RT_MAX_LAYER": "met4"
+  "RT_MAX_LAYER": "met4",
+  "SYNTH_STRATEGY": "DELAY 1"
 }

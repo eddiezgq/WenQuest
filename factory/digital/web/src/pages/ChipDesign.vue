@@ -86,10 +86,11 @@
 
     <section v-if="d && tab === 'chk'" class="card">
       <template v-if="L">
-        <p class="small">结论：<b :class="L.pass ? 'ok' : 'bad'">{{ L.pass ? '全部通过，可以出 GDS' : '有不通过的项' }}</b>（{{ d.pdk }}，{{ d.clock_mhz }} MHz，典型工艺角 25 °C 1.8 V）</p>
+        <p class="small">结论：<b :class="L.pass ? 'ok' : 'bad'">{{ L.pass ? '全部通过，可以出 GDS' : '有不通过的项' }}</b>（{{ d.pdk }}，{{ d.clock_mhz }} MHz；时序按全部工艺角查，最慢的是 100 °C、1.6 V）</p>
         <table class="tbl"><thead><tr><th>检查</th><th>结果</th><th>数</th><th>查的是什么</th></tr></thead>
           <tbody><tr v-for="c in CHECKS" :key="c.k"><td>{{ c.name }}</td><td :class="L.clean[c.k] ? 'ok' : 'bad'">{{ L.clean[c.k] ? '✓ 通过' : '✗ 不通过' }}</td>
             <td class="mono">{{ c.v(L) }}</td><td class="small">{{ c.why }}</td></tr></tbody></table>
+        <p v-if="L.max_slew_violations" class="small muted">提示：最慢工艺角（100 °C、1.6 V）下有 {{ L.max_slew_violations }} 处信号边沿偏慢（max slew），工具只报警告、不影响时序结论；量产前要再加缓冲器修掉。</p>
       </template>
       <p v-else class="muted">版图还没生成。</p>
     </section>

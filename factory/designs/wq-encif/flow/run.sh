@@ -8,7 +8,7 @@ W=$(mktemp -d)/wq-encif
 mkdir -p "$W" "$OUT/layout"
 cp -r "$D/rtl" "$D/flow" "$W/"
 cd "$W/flow"
-export WQ_LIBRELANE=$(librelane --version 2>/dev/null | tail -1)
+export WQ_LIBRELANE=$(librelane --version 2>&1 | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+[A-Za-z0-9.+-]*" | head -1)
 echo "LibreLane: $WQ_LIBRELANE  PDK_ROOT=${PDK_ROOT:-/foss/pdks}"
 t0=$(date +%s)
 librelane --manual-pdk --pdk-root "${PDK_ROOT:-/foss/pdks}" --pdk sky130A --run-tag wq --overwrite config.json > "$OUT/librelane.log" 2>&1
