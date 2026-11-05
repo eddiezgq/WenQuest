@@ -1,0 +1,186 @@
+# 首页视频简介 07 · 数字工厂（第 86 轮）。画面：本机起的教学版数字工厂（减速器厂、机器人厂，实验 7 情景在跑）的真界面截图，
+# 加官网“工厂演示”页。数字工厂界面只有中文，英文版用同一批截图、英文要点和配音。讲稿见 ../讲稿_第一批.md 第 07 段
+# （机器人厂一句按现有界面改为“量背隙、现场回传”，负载跑合页要先有标定过的机器人，截不到内容）。
+standalone: true
+langs: [zh, en]
+title: [问渠数字工厂：一座会运转的教学工业园, 'The WenQuest digital factory: a teaching industrial park that runs']
+brand: [数字工厂, Digital factory]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的订单、客户和数字都是教学情景的演示数据。, 'Orders, customers and figures shown are teaching-scenario demo data.']
+tags:
+  zh: [数字工厂, 智能制造, ERP, MES, 数字孪生, 工业工程, 质量管理, 机器人, 实训, 问渠]
+  en: [digital factory, smart manufacturing, ERP, MES, digital twin, industrial engineering, quality, robotics, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: fac-3d, hub: 8140, url: /3d, wheel: -1000, at: [700, 330], tap: [727, 280]}
+  - {name: fac-home, hub: 8140, url: /}
+  - {name: fac-planner, hub: 8140, url: /work/planner, role: planner}
+  - {name: fac-operator, hub: 8140, url: /work/operator, role: operator}
+  - {name: rob-3d, hub: 8141, url: /3d, wheel: -900, at: [760, 330]}
+  - {name: rob-service, hub: 8141, url: /rservice}
+  - {name: fac-quality, hub: 8140, url: /work/quality, role: quality}
+  - {name: fac-ont, hub: 8140, url: /ont}
+  - {name: fac-labs, hub: 8140, url: /labs}
+  - {name: site-factory, url: /factory/, wait: 2500}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: fac-3d, title: [一座会运转的教学工业园, A teaching industrial park that runs],
+          sub: [问渠数字工厂：减速器厂、机器人厂互为上下游, 'The WenQuest digital factory: a gearbox plant and a robot plant that supply each other']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>这是问渠数字工厂：一座教学用的工业园，几座工厂互为上下游。']
+    en: ['>This is the WenQuest digital factory, a teaching industrial park where the plants supply one another.']
+- id: s02
+  kind: page
+  page: 2
+  part: [减速器厂, Gearbox plant]
+  slide:
+    img: fac-3d
+    url: factory.wenquestrobotics.com/3d
+    kick: [减速器厂, The gearbox plant]
+    title: [3D 车间：每台设备在做什么, 'The 3D shop floor: what every machine is doing']
+    points:
+      - {text: [二级齿轮减速器 WQR-105, A two-stage reducer, WQR-105]}
+      - {text: [点设备看状态，AGV 在送料, 'Click a machine for its status; AGVs move material'], zoom: [1.5, 45, 35]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>减速器厂生产二级齿轮减速器。', '>点一台设备就能看它在做什么，AGV 在车间里送料。']
+    en: ['>The gearbox plant builds a two-stage reducer.', '>Click any machine to see what it is doing, while AGVs carry material around the shop.']
+- id: s03
+  kind: page
+  page: 3
+  part: [减速器厂, Gearbox plant]
+  slide:
+    img: fac-planner
+    url: factory.wenquestrobotics.com/work/planner
+    kick: [订单与计划, Orders and planning]
+    title: [一张订单进来, An order comes in]
+    points:
+      - {text: [接单、MRP 算料, 'Take the order; MRP plans materials'], zoom: [1.4, 40, 45]}
+      - {text: [ERP 排产，工单下到车间, 'ERP schedules; work orders go to the shop'], zoom: [1.0, 0, 0]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>一张订单进来，MRP 算料，', '>ERP 排产，工单下到车间，']
+    en: ['>An order comes in, MRP plans the materials,', '>ERP schedules it and the work orders go to the shop,']
+- id: s04
+  kind: page
+  page: 4
+  part: [减速器厂, Gearbox plant]
+  slide:
+    img: fac-operator
+    url: factory.wenquestrobotics.com/work/operator
+    kick: [车间终端, Shop-floor terminal]
+    title: [报工，数据一路连着, 'Progress reported, one data thread']
+    points:
+      - {text: [开工、完工、刀具寿命实时上报, 'Start, finish and tool life reported live'], zoom: [1.45, 40, 62]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>车间终端报工，从订单到工序，数据一路连着。']
+    en: ['>and the shop floor reports progress. From order to operation, it is all one data thread.']
+- id: s05
+  kind: page
+  page: 5
+  part: [机器人厂, Robot plant]
+  slide:
+    img: rob-3d
+    url: factory.wenquestrobotics.com/3d
+    kick: [机器人厂, The robot plant]
+    title: [协作机器人、AGV、轮式人形, 'Cobots, AGVs and a wheeled humanoid']
+    points:
+      - {text: [减速器厂的产品是这里的外购件, The gearbox plant's reducer is a bought-in part here]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>机器人厂造协作机器人、AGV 和轮式人形，减速器厂的产品就是它的外购件。']
+    en: ['>The robot plant builds cobots, AGVs and a wheeled humanoid, using the gearbox plant''s reducers as bought-in parts.']
+- id: s06
+  kind: page
+  page: 6
+  part: [机器人厂, Robot plant]
+  slide:
+    img: rob-service
+    url: factory.wenquestrobotics.com/rservice
+    kick: [出厂之后, After shipping]
+    title: [关节背隙，一直盯到客户现场, 'Joint backlash, tracked all the way to the customer']
+    points:
+      - {text: [关节测试台量背隙, A joint test bench measures backlash], ring: [19, 50, 79, 46]}
+      - {text: [现场的机器人每天回传运行数据, Robots in the field report back every day], zoom: [1.4, 40, 70]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>关节测试台量背隙；', '>机器人到了客户现场，每天还在回传运行数据，背隙超限就报警。']
+    en: ['>A joint test bench measures backlash,', '>and once a robot is at the customer, it keeps reporting back every day and raises an alarm when backlash drifts.']
+- id: s07
+  kind: page
+  page: 7
+  part: [质量, Quality]
+  slide:
+    img: fac-quality
+    url: factory.wenquestrobotics.com/work/quality
+    kick: [质量, Quality]
+    title: [控制图和 8D, Control charts and 8D]
+    points:
+      - {text: [尺寸在漂移，控制图先看见, 'A dimension drifts; the control chart sees it first'], zoom: [1.5, 38, 42]}
+      - {text: [开 8D，从一台机器追到一个批次, 'Open an 8D; trace from one machine to one batch']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>质量问题有控制图，', '>有 8D，从一台机器追到一个批次。']
+    en: ['>Quality issues come with control charts', '>and 8D, traced from one machine down to one batch.']
+- id: s08
+  kind: page
+  page: 8
+  part: [厂情中枢, Command center]
+  slide:
+    img: fac-ont
+    url: factory.wenquestrobotics.com/ont
+    kick: [厂情中枢, Command center]
+    title: [一张图看全厂, The whole plant on one screen]
+    points:
+      - {text: [发现异常、追原因、推演后果, 'Spot problems, trace causes, simulate outcomes']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>厂情中枢一张图看全厂：发现异常、追原因、推演后果。']
+    en: ['>The command center shows the whole plant: it spots problems, traces causes and simulates outcomes.']
+- id: s09
+  kind: page
+  page: 9
+  part: [厂情中枢, Command center]
+  slide:
+    img: fac-home
+    url: factory.wenquestrobotics.com
+    kick: [AI 工厂助手, AI factory assistant]
+    title: [AI 提醒，人来决定, The AI alerts; people decide]
+    points:
+      - {text: [停机、缺料、低于安全库存，自动提醒, 'Downtime, shortages, low stock: flagged automatically'], ring: [18, 32, 80, 24]}
+      - {text: [每条都附数据来源, Every point cites its data source], ring: [18, 63, 50, 34]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>停机、缺料、库存不够，AI 自动提醒，', '>每一条都附数据来源；决定由人来做。']
+    en: ['>Downtime, shortages and low stock are flagged by the AI,', '>each with its data source. People make the decisions.']
+- id: s10
+  kind: page
+  page: 10
+  part: [实验, Labs]
+  slide:
+    img: fac-labs
+    url: factory.wenquestrobotics.com/labs
+    kick: [学生, Students]
+    title: [二十多个实验，像在真厂里上班, 'More than twenty labs, much like a real job']
+    points:
+      - {text: [从订单到交付、追因、标定、售后, 'Order to delivery, root cause, calibration, after-sales']}
+      - {text: [平台自动评分，报告老师批改, 'Auto-scored on the platform; reports graded by the teacher']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>学生在这里做二十多个实验：从订单到交付、追因、标定、售后，', '>像在真厂里上班。']
+    en: ['>Students work through more than twenty labs here: order to delivery, root cause, calibration and after-sales,', '>much like a real job.']
+- id: s11
+  kind: page
+  page: 11
+  part: [结尾, Outro]
+  slide: {layout: end, img: site-factory, title: [进入数字工厂, Enter the digital factory],
+          sub: [或者先看不用登录的工厂演示, 'Or start with the factory demo, no sign-in needed'], link: [问渠官网首页 → 数字工业园, wenquestrobotics.com/factory]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>进入数字工厂，或者先看一眼不用登录的工厂演示。']
+    en: ['>Enter the digital factory, or start with the factory demo, no sign-in needed.']

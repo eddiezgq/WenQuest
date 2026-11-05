@@ -33,6 +33,41 @@ def serve(directory: Path) -> int:
     return srv.server_address[1]
 
 
+def hub_shot(b, c, dst):
+    """数字工厂的页面：先用本机工厂的 /api/login 拿令牌（教学模式、厂长），放进 localStorage 再打开。
+    本机工厂怎么起来见 docs/课程视频/首页简介/README.md。"""
+    import json
+    import urllib.request
+    base = f"http://127.0.0.1:{c['hub']}"
+    req = urllib.request.Request(base + "/api/login", method="POST", headers={"content-type": "application/json"},
+                                 data=json.dumps({"name": "教师", "role": c.get("role", "manager"), "mode": "teach"}).encode())
+    s = json.loads(urllib.request.urlopen(req, timeout=30).read())
+    ctx = b.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1.5, locale="zh-CN")
+    ctx.add_init_script("([k, v]) => localStorage.setItem(k, v)".join(["(", ")(" + json.dumps(["wq-df-session", json.dumps({"token": s["token"], "user": s.get("user") or s})]) + ")"]))
+    p = ctx.new_page()
+    p.goto(base + c["url"])
+    p.wait_for_timeout(int(c.get("wait", 5000)))
+    for sel in ([c["click"]] if isinstance(c.get("click"), str) else c.get("click") or []):
+        p.click(sel)
+        p.wait_for_timeout(800)
+    if c.get("wheel"):                                 # 三维页：滚轮推近
+        p.mouse.move(*c.get("at", [760, 380]))
+        for _ in range(int(abs(c["wheel"]) / 100)):
+            p.mouse.wheel(0, 100 if c["wheel"] > 0 else -100)
+            p.wait_for_timeout(60)
+    if c.get("drag"):
+        (x0, y0), (x1, y1) = c["drag"]
+        p.mouse.move(x0, y0); p.mouse.down(); p.mouse.move(x1, y1, steps=20); p.mouse.up()
+    if c.get("tap"):                                   # 在画面坐标处点一下（三维页点设备）
+        p.mouse.click(*c["tap"])
+        p.wait_for_timeout(1500)
+    if c.get("js"):
+        p.evaluate(c["js"])
+    p.wait_for_timeout(1500)
+    p.screenshot(path=str(dst), type="jpeg", quality=88)
+    ctx.close()
+
+
 def main(d: str):
     lec = Path(d).resolve()
     spec = yaml.safe_load((lec / "讲稿.yaml").read_text(encoding="utf-8"))
@@ -50,6 +85,13 @@ def main(d: str):
             p = ctx.new_page()
             for c in spec.get("capture") or []:
                 dst = out / f"{c['name']}-{lang}.jpg"
+                if c.get("hub"):                     # 数字工厂（本机测试环境，界面只有中文）：中文版截一次，英文版用同一张
+                    if lang == "en":
+                        shutil.copy(out / f"{c['name']}-zh.jpg", dst)
+                    else:
+                        hub_shot(b, c, dst)
+                        print(dst.relative_to(ROOT))
+                    continue
                 if "file" in c:
                     src = ROOT / (c.get(f"file_{lang}") or c["file"])
                     im = Image.open(src).convert("RGB")
