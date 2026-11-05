@@ -108,13 +108,15 @@ jobs:
     # 设计规则检查 0 错误、可制造性检查全部通过（改坏能报出来）。KiCad 用 Ubuntu 24.04 的软件包（7.0.11，与生成时同一版本）
     name: 电路板设计（KiCad）
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
       - name: 装 KiCad 7 与 Python 包
         run: |
+          sudo rm -f /var/lib/man-db/auto-update        # 装大软件包时 man-db 重建索引要很久（第一次就是卡在这里超时）
           sudo apt-get update -qq
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends kicad kicad-symbols kicad-footprints xvfb > /dev/null
+          time sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends -o Dpkg::Use-Pty=0 \
+            kicad kicad-symbols kicad-footprints xvfb | grep -E "^(Setting up|Get:)" | grep -E "kicad|xvfb" || true
           kicad-cli version
           python3 -m pip install --break-system-packages -q build123d==0.13.0 trimesh==5.1.0 shapely==2.1.2 pytest pyyaml
       - name: 重新导出并核对产物一致
