@@ -1,0 +1,2794 @@
+{
+ "knowledge_points": [
+  {
+   "id": "P1-1.1-a",
+   "section": "1.1",
+   "name_zh": "参考系与坐标系",
+   "name_en": "Reference frames and coordinates",
+   "prerequisites": []
+  },
+  {
+   "id": "P1-1.1-b",
+   "section": "1.1",
+   "name_zh": "伽利略速度合成",
+   "name_en": "Galilean velocity addition",
+   "prerequisites": [
+    "P1-1.1-a"
+   ]
+  },
+  {
+   "id": "P1-1.2-a",
+   "section": "1.2",
+   "name_zh": "位矢、位移与速度",
+   "name_en": "Position, displacement and velocity",
+   "prerequisites": [
+    "P1-1.1-a"
+   ]
+  },
+  {
+   "id": "P1-1.2-b",
+   "section": "1.2",
+   "name_zh": "数值微分与采样误差",
+   "name_en": "Numerical differentiation and sampling error",
+   "prerequisites": [
+    "P1-1.2-a"
+   ]
+  },
+  {
+   "id": "P1-1.3-a",
+   "section": "1.3",
+   "name_zh": "抛体运动方程",
+   "name_en": "Projectile equations of motion",
+   "prerequisites": [
+    "P1-1.2-a"
+   ]
+  },
+  {
+   "id": "P1-1.3-b",
+   "section": "1.3",
+   "name_zh": "按目标求初速度",
+   "name_en": "Launch speed to hit a target",
+   "prerequisites": [
+    "P1-1.3-a"
+   ]
+  },
+  {
+   "id": "P1-1.3-c",
+   "section": "1.3",
+   "name_zh": "出手误差的灵敏度",
+   "name_en": "Sensitivity to launch error",
+   "prerequisites": [
+    "P1-1.3-b"
+   ]
+  },
+  {
+   "id": "P1-1.4-a",
+   "section": "1.4",
+   "name_zh": "向心加速度",
+   "name_en": "Centripetal acceleration",
+   "prerequisites": [
+    "P1-1.2-a"
+   ]
+  },
+  {
+   "id": "P1-1.4-b",
+   "section": "1.4",
+   "name_zh": "侧翻与侧滑条件",
+   "name_en": "Tip-over and slip conditions",
+   "prerequisites": [
+    "P1-1.4-a"
+   ]
+  },
+  {
+   "id": "P1-1.5-a",
+   "section": "1.5",
+   "name_zh": "相对运动与航向修正",
+   "name_en": "Relative motion and heading correction",
+   "prerequisites": [
+    "P1-1.1-b"
+   ]
+  }
+ ],
+ "templates": [
+  {
+   "id": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "stem_zh": "列车以 {vt} m/s 向前行驶，乘客在车厢内以 {vw} m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at {vt} m/s; a passenger walks toward the rear at {vw} m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "params": {
+    "vt": [
+     10,
+     30,
+     2
+    ],
+    "vw": [
+     1,
+     3,
+     0.5
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "stem_zh": "取向东为正。A 车向东 {vA} m/s，B 车向西 {vB} m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at {vA} m/s and car B moves west at {vB} m/s. Find B's velocity relative to A (with sign).",
+   "params": {
+    "vA": [
+     5,
+     25,
+     5
+    ],
+    "vB": [
+     5,
+     25,
+     5
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "stem_zh": "传送带以 {u} m/s 向右运动，夹爪相对传送带竖直向下以 {w} m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at {u} m/s; the gripper moves straight down relative to the belt at {w} m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "params": {
+    "u": [
+     0.3,
+     0.8,
+     0.05
+    ],
+    "w": [
+     0.1,
+     0.4,
+     0.05
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "u": 0.5,
+    "w": 0.25
+   },
+   "ref_ans": {
+    "v_ground": 0.56,
+    "angle_below_horizontal_deg": 26.6
+   }
+  },
+  {
+   "id": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "stem_zh": "雨滴竖直下落，速度 {vr} m/s；汽车以 {vc} m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at {vr} m/s; a car drives at {vc} m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "params": {
+    "vr": [
+     4,
+     10,
+     1
+    ],
+    "vc": [
+     5,
+     30,
+     5
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "vr": 7,
+    "vc": 20
+   },
+   "ref_ans": {
+    "angle_from_vertical_deg": 70.7
+   }
+  },
+  {
+   "id": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "stem_zh": "质点位矢 r = ({A}t, {B}t²)（m，t 单位 s）。求 t = {t} s 时的速率。",
+   "stem_en": "A particle has position r = ({A}t, {B}t²) m. Find its speed at t = {t} s.",
+   "params": {
+    "A": [
+     1,
+     4,
+     0.5
+    ],
+    "B": [
+     0.5,
+     2,
+     0.5
+    ],
+    "t": [
+     1,
+     4,
+     1
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "stem_zh": "机器人 {dt} s 内从 ({x1}, {y1}) m 移动到 ({x2}, {y2}) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from ({x1}, {y1}) m to ({x2}, {y2}) m in {dt} s. Find the magnitude of its average velocity.",
+   "params": {
+    "x1": [
+     0,
+     2,
+     1
+    ],
+    "y1": [
+     0,
+     2,
+     1
+    ],
+    "x2": [
+     3,
+     8,
+     1
+    ],
+    "y2": [
+     2,
+     6,
+     1
+    ],
+    "dt": [
+     2,
+     10,
+     2
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = {sigma} m，速度约 {v} m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 {err_pct}%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = {sigma} m; the robot moves at about {v} m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below {err_pct}%?",
+   "params": {
+    "sigma": [
+     0.005,
+     0.02,
+     0.005
+    ],
+    "v": [
+     0.3,
+     1.0,
+     0.1
+    ],
+    "err": [
+     0.03,
+     0.1,
+     0.01
+    ]
+   },
+   "tol": 0.02,
+   "ref": {
+    "sigma": 0.01,
+    "v": 0.5,
+    "err": 0.05
+   },
+   "ref_ans": {
+    "T_min": 0.57
+   }
+  },
+  {
+   "id": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "stem_zh": "里程计位置噪声 σ = {sigma} m，机器人速度 {v} m/s，采样间隔 T = {T} s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = {sigma} m, speed {v} m/s, sampling interval T = {T} s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "params": {
+    "sigma": [
+     0.005,
+     0.02,
+     0.005
+    ],
+    "v": [
+     0.3,
+     1.0,
+     0.1
+    ],
+    "T": [
+     0.2,
+     1.0,
+     0.1
+    ]
+   },
+   "tol": 0.02,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "stem_zh": "小球从 {h} m 高处以 {v} m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at {v} m/s from {h} m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "params": {
+    "h": [
+     1,
+     20,
+     1
+    ],
+    "v": [
+     2,
+     15,
+     1
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "stem_zh": "以 {v0} m/s、仰角 {theta}° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at {v0} m/s, {theta}° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "params": {
+    "v0": [
+     5,
+     25,
+     1
+    ],
+    "theta": [
+     20,
+     70,
+     5
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "stem_zh": "投篮机器人在 {h0} m 高处出手，篮筐高 {hoop} m、水平距离 {x} m，出手角 {theta}°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at {h0} m height; the hoop is {hoop} m high and {x} m away; launch angle {theta}°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "params": {
+    "h0": [
+     0.6,
+     1.2,
+     0.1
+    ],
+    "hoop": [
+     2.43,
+     2.43,
+     0
+    ],
+    "x": [
+     3.0,
+     5.0,
+     0.5
+    ],
+    "theta": [
+     45,
+     65,
+     5
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 45
+   },
+   "ref_ans": {
+    "v0": 8.14
+   }
+  },
+  {
+   "id": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "stem_zh": "铅球在 {h0} m 高处以 {v0} m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at {h0} m height with speed {v0} m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "params": {
+    "h0": [
+     1.6,
+     2.2,
+     0.1
+    ],
+    "v0": [
+     10,
+     14,
+     0.5
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "h0": 2.0,
+    "v0": 13.5
+   },
+   "ref_ans": {
+    "best_angle_deg": 42
+   }
+  },
+  {
+   "id": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "stem_zh": "投篮机器人在 {h0} m 高处出手，篮筐高 {hoop} m、水平距离 {x} m，出手角 {theta}°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = {dv} m/s，偏差是多少米？",
+   "stem_en": "Release at {h0} m, hoop {hoop} m high and {x} m away, angle {theta}°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = {dv} m/s, what is the miss (m)?",
+   "params": {
+    "h0": [
+     0.8,
+     0.8,
+     0
+    ],
+    "hoop": [
+     2.43,
+     2.43,
+     0
+    ],
+    "x": [
+     3.5,
+     5.0,
+     0.5
+    ],
+    "theta": [
+     45,
+     65,
+     10
+    ],
+    "dv": [
+     0.1,
+     0.2,
+     0.05
+    ]
+   },
+   "tol": 0.03,
+   "ref": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 65,
+    "dv": 0.1
+   },
+   "ref_ans": {
+    "miss_m": 0.13
+   }
+  },
+  {
+   "id": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "stem_zh": "投篮机器人在 {h0} m 高处出手，篮筐高 {hoop} m、水平距离 {x} m，出手角 {theta}°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 {e} m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at {h0} m, hoop {hoop} m high and {x} m away, angle {theta}°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within {e} m, what is the largest allowed Δv (m/s)?",
+   "params": {
+    "h0": [
+     0.6,
+     1.0,
+     0.2
+    ],
+    "hoop": [
+     2.43,
+     2.43,
+     0
+    ],
+    "x": [
+     3.5,
+     5.0,
+     0.5
+    ],
+    "theta": [
+     45,
+     65,
+     10
+    ],
+    "e": [
+     0.05,
+     0.15,
+     0.05
+    ]
+   },
+   "tol": 0.02,
+   "ref": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 65,
+    "e": 0.13
+   },
+   "ref_ans": {
+    "dv_max": 0.1
+   }
+  },
+  {
+   "id": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "stem_zh": "机器人以 {v} m/s 沿半径 {R} m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at {v} m/s around an arc of radius {R} m. Find its centripetal acceleration.",
+   "params": {
+    "v": [
+     0.5,
+     3.0,
+     0.5
+    ],
+    "R": [
+     0.5,
+     3.0,
+     0.5
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "stem_zh": "机械臂末端绕基座转动，角速度 {w} rad/s，到转轴距离 {r} m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at {w} rad/s, {r} m from the axis. Find its linear speed and centripetal acceleration.",
+   "params": {
+    "w": [
+     0.5,
+     4,
+     0.5
+    ],
+    "r": [
+     0.3,
+     1.2,
+     0.1
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  },
+  {
+   "id": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "stem_zh": "AGV 以半径 {R} m 转弯，重心高 {h} m，轮距 {b} m，轮地摩擦系数 {mu}。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius {R} m; centre of mass {h} m high, track width {b} m, friction coefficient {mu}. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "params": {
+    "R": [
+     1.0,
+     3.0,
+     0.5
+    ],
+    "h": [
+     0.3,
+     0.8,
+     0.1
+    ],
+    "b": [
+     0.4,
+     0.8,
+     0.1
+    ],
+    "mu": [
+     0.4,
+     0.8,
+     0.1
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "R": 1.5,
+    "h": 0.6,
+    "b": 0.5,
+    "mu": 0.6
+   },
+   "ref_ans": {
+    "v_tip": 2.47,
+    "v_slip": 2.97,
+    "first": "tip"
+   }
+  },
+  {
+   "id": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "stem_zh": "为保证舒适，侧向加速度不超过 {k}g（g 取 9.81 m/s²）。转弯半径 {R} m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below {k}g (take g = 9.81 m/s²). On a {R} m radius, what is the maximum speed (m/s and km/h)?",
+   "params": {
+    "k": [
+     0.1,
+     0.4,
+     0.05
+    ],
+    "R": [
+     1,
+     600,
+     0
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "k": 0.3,
+    "R": 1.5
+   },
+   "ref_ans": {
+    "v_max": 2.1
+   }
+  },
+  {
+   "id": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "stem_zh": "无人机空速 {va} m/s，侧风 {vw} m/s（垂直于航线），要沿直线飞到 {d} m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed {va} m/s with a {vw} m/s crosswind and must fly straight to a target {d} m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "params": {
+    "va": [
+     8,
+     15,
+     1
+    ],
+    "vw": [
+     2,
+     6,
+     1
+    ],
+    "d": [
+     500,
+     2000,
+     250
+    ]
+   },
+   "tol": 0.01,
+   "ref": {
+    "va": 12,
+    "vw": 5,
+    "d": 1000
+   },
+   "ref_ans": {
+    "heading_deg": 24.6,
+    "v_ground": 10.9,
+    "t": 91.7,
+    "t_extra": 8.4
+   }
+  },
+  {
+   "id": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "stem_zh": "河宽 {W} m，水流速度 {w} m/s，小船相对水速度 {u} m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is {W} m wide with current {w} m/s; the boat moves at {u} m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "params": {
+    "W": [
+     40,
+     200,
+     20
+    ],
+    "w": [
+     0.5,
+     2.0,
+     0.5
+    ],
+    "u": [
+     2,
+     5,
+     0.5
+    ]
+   },
+   "tol": 0.01,
+   "ref": null,
+   "ref_ans": null
+  }
+ ],
+ "items": [
+  {
+   "id": "T-1.1-a1#1",
+   "template": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "params": {
+    "vt": 22,
+    "vw": 2.0
+   },
+   "stem_zh": "列车以 22 m/s 向前行驶，乘客在车厢内以 2.0 m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at 22 m/s; a passenger walks toward the rear at 2.0 m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "answer": {
+    "v_ground": 20.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a1#2",
+   "template": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "params": {
+    "vt": 26,
+    "vw": 1.0
+   },
+   "stem_zh": "列车以 26 m/s 向前行驶，乘客在车厢内以 1.0 m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at 26 m/s; a passenger walks toward the rear at 1.0 m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "answer": {
+    "v_ground": 25.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a1#3",
+   "template": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "params": {
+    "vt": 26,
+    "vw": 2.5
+   },
+   "stem_zh": "列车以 26 m/s 向前行驶，乘客在车厢内以 2.5 m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at 26 m/s; a passenger walks toward the rear at 2.5 m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "answer": {
+    "v_ground": 23.5
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a1#4",
+   "template": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "params": {
+    "vt": 14,
+    "vw": 1.0
+   },
+   "stem_zh": "列车以 14 m/s 向前行驶，乘客在车厢内以 1.0 m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at 14 m/s; a passenger walks toward the rear at 1.0 m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "answer": {
+    "v_ground": 13.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a1#5",
+   "template": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "params": {
+    "vt": 20,
+    "vw": 2.0
+   },
+   "stem_zh": "列车以 20 m/s 向前行驶，乘客在车厢内以 2.0 m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at 20 m/s; a passenger walks toward the rear at 2.0 m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "answer": {
+    "v_ground": 18.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a1#6",
+   "template": "T-1.1-a1",
+   "kp": "P1-1.1-a",
+   "b": -1.5,
+   "params": {
+    "vt": 16,
+    "vw": 2.0
+   },
+   "stem_zh": "列车以 16 m/s 向前行驶，乘客在车厢内以 2.0 m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+   "stem_en": "A train moves forward at 16 m/s; a passenger walks toward the rear at 2.0 m/s. Find the passenger's velocity relative to the ground (forward positive).",
+   "answer": {
+    "v_ground": 14.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a2#1",
+   "template": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "params": {
+    "vA": 5,
+    "vB": 20
+   },
+   "stem_zh": "取向东为正。A 车向东 5 m/s，B 车向西 20 m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at 5 m/s and car B moves west at 20 m/s. Find B's velocity relative to A (with sign).",
+   "answer": {
+    "v_B_rel_A": -25
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a2#2",
+   "template": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "params": {
+    "vA": 15,
+    "vB": 25
+   },
+   "stem_zh": "取向东为正。A 车向东 15 m/s，B 车向西 25 m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at 15 m/s and car B moves west at 25 m/s. Find B's velocity relative to A (with sign).",
+   "answer": {
+    "v_B_rel_A": -40
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a2#3",
+   "template": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "params": {
+    "vA": 25,
+    "vB": 20
+   },
+   "stem_zh": "取向东为正。A 车向东 25 m/s，B 车向西 20 m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at 25 m/s and car B moves west at 20 m/s. Find B's velocity relative to A (with sign).",
+   "answer": {
+    "v_B_rel_A": -45
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a2#4",
+   "template": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "params": {
+    "vA": 15,
+    "vB": 5
+   },
+   "stem_zh": "取向东为正。A 车向东 15 m/s，B 车向西 5 m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at 15 m/s and car B moves west at 5 m/s. Find B's velocity relative to A (with sign).",
+   "answer": {
+    "v_B_rel_A": -20
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a2#5",
+   "template": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "params": {
+    "vA": 5,
+    "vB": 5
+   },
+   "stem_zh": "取向东为正。A 车向东 5 m/s，B 车向西 5 m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at 5 m/s and car B moves west at 5 m/s. Find B's velocity relative to A (with sign).",
+   "answer": {
+    "v_B_rel_A": -10
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-a2#6",
+   "template": "T-1.1-a2",
+   "kp": "P1-1.1-a",
+   "b": -0.5,
+   "params": {
+    "vA": 10,
+    "vB": 25
+   },
+   "stem_zh": "取向东为正。A 车向东 10 m/s，B 车向西 25 m/s。求 B 相对 A 的速度（带正负号）。",
+   "stem_en": "East is positive. Car A moves east at 10 m/s and car B moves west at 25 m/s. Find B's velocity relative to A (with sign).",
+   "answer": {
+    "v_B_rel_A": -35
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b1#1",
+   "template": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "params": {
+    "u": 0.45,
+    "w": 0.4
+   },
+   "stem_zh": "传送带以 0.45 m/s 向右运动，夹爪相对传送带竖直向下以 0.4 m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at 0.45 m/s; the gripper moves straight down relative to the belt at 0.4 m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "answer": {
+    "v_ground": 0.6021,
+    "angle_below_horizontal_deg": 41.6335
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b1#2",
+   "template": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "params": {
+    "u": 0.65,
+    "w": 0.3
+   },
+   "stem_zh": "传送带以 0.65 m/s 向右运动，夹爪相对传送带竖直向下以 0.3 m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at 0.65 m/s; the gripper moves straight down relative to the belt at 0.3 m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "answer": {
+    "v_ground": 0.7159,
+    "angle_below_horizontal_deg": 24.7751
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b1#3",
+   "template": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "params": {
+    "u": 0.65,
+    "w": 0.2
+   },
+   "stem_zh": "传送带以 0.65 m/s 向右运动，夹爪相对传送带竖直向下以 0.2 m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at 0.65 m/s; the gripper moves straight down relative to the belt at 0.2 m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "answer": {
+    "v_ground": 0.6801,
+    "angle_below_horizontal_deg": 17.1027
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b1#4",
+   "template": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "params": {
+    "u": 0.5,
+    "w": 0.1
+   },
+   "stem_zh": "传送带以 0.5 m/s 向右运动，夹爪相对传送带竖直向下以 0.1 m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at 0.5 m/s; the gripper moves straight down relative to the belt at 0.1 m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "answer": {
+    "v_ground": 0.5099,
+    "angle_below_horizontal_deg": 11.3099
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b1#5",
+   "template": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "params": {
+    "u": 0.3,
+    "w": 0.25
+   },
+   "stem_zh": "传送带以 0.3 m/s 向右运动，夹爪相对传送带竖直向下以 0.25 m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at 0.3 m/s; the gripper moves straight down relative to the belt at 0.25 m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "answer": {
+    "v_ground": 0.3905,
+    "angle_below_horizontal_deg": 39.8056
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b1#6",
+   "template": "T-1.1-b1",
+   "kp": "P1-1.1-b",
+   "b": -0.5,
+   "params": {
+    "u": 0.8,
+    "w": 0.1
+   },
+   "stem_zh": "传送带以 0.8 m/s 向右运动，夹爪相对传送带竖直向下以 0.1 m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+   "stem_en": "A conveyor moves right at 0.8 m/s; the gripper moves straight down relative to the belt at 0.1 m/s. Find the gripper's ground speed and its angle below the horizontal.",
+   "answer": {
+    "v_ground": 0.8062,
+    "angle_below_horizontal_deg": 7.125
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b2#1",
+   "template": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "params": {
+    "vr": 5,
+    "vc": 15
+   },
+   "stem_zh": "雨滴竖直下落，速度 5 m/s；汽车以 15 m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at 5 m/s; a car drives at 15 m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "answer": {
+    "angle_from_vertical_deg": 71.5651
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b2#2",
+   "template": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "params": {
+    "vr": 10,
+    "vc": 30
+   },
+   "stem_zh": "雨滴竖直下落，速度 10 m/s；汽车以 30 m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at 10 m/s; a car drives at 30 m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "answer": {
+    "angle_from_vertical_deg": 71.5651
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b2#3",
+   "template": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "params": {
+    "vr": 5,
+    "vc": 30
+   },
+   "stem_zh": "雨滴竖直下落，速度 5 m/s；汽车以 30 m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at 5 m/s; a car drives at 30 m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "answer": {
+    "angle_from_vertical_deg": 80.5377
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b2#4",
+   "template": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "params": {
+    "vr": 5,
+    "vc": 25
+   },
+   "stem_zh": "雨滴竖直下落，速度 5 m/s；汽车以 25 m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at 5 m/s; a car drives at 25 m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "answer": {
+    "angle_from_vertical_deg": 78.6901
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b2#5",
+   "template": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "params": {
+    "vr": 9,
+    "vc": 20
+   },
+   "stem_zh": "雨滴竖直下落，速度 9 m/s；汽车以 20 m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at 9 m/s; a car drives at 20 m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "answer": {
+    "angle_from_vertical_deg": 65.7723
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.1-b2#6",
+   "template": "T-1.1-b2",
+   "kp": "P1-1.1-b",
+   "b": 0.3,
+   "params": {
+    "vr": 8,
+    "vc": 10
+   },
+   "stem_zh": "雨滴竖直下落，速度 8 m/s；汽车以 10 m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+   "stem_en": "Rain falls vertically at 8 m/s; a car drives at 10 m/s. What angle do the rain streaks on the side window make with the vertical?",
+   "answer": {
+    "angle_from_vertical_deg": 51.3402
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a1#1",
+   "template": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "params": {
+    "A": 4.0,
+    "B": 1.0,
+    "t": 2
+   },
+   "stem_zh": "质点位矢 r = (4.0t, 1.0t²)（m，t 单位 s）。求 t = 2 s 时的速率。",
+   "stem_en": "A particle has position r = (4.0t, 1.0t²) m. Find its speed at t = 2 s.",
+   "answer": {
+    "speed": 5.6569
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a1#2",
+   "template": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "params": {
+    "A": 3.0,
+    "B": 0.5,
+    "t": 1
+   },
+   "stem_zh": "质点位矢 r = (3.0t, 0.5t²)（m，t 单位 s）。求 t = 1 s 时的速率。",
+   "stem_en": "A particle has position r = (3.0t, 0.5t²) m. Find its speed at t = 1 s.",
+   "answer": {
+    "speed": 3.1623
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a1#3",
+   "template": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "params": {
+    "A": 3.0,
+    "B": 1.0,
+    "t": 2
+   },
+   "stem_zh": "质点位矢 r = (3.0t, 1.0t²)（m，t 单位 s）。求 t = 2 s 时的速率。",
+   "stem_en": "A particle has position r = (3.0t, 1.0t²) m. Find its speed at t = 2 s.",
+   "answer": {
+    "speed": 5.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a1#4",
+   "template": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "params": {
+    "A": 2.5,
+    "B": 2.0,
+    "t": 1
+   },
+   "stem_zh": "质点位矢 r = (2.5t, 2.0t²)（m，t 单位 s）。求 t = 1 s 时的速率。",
+   "stem_en": "A particle has position r = (2.5t, 2.0t²) m. Find its speed at t = 1 s.",
+   "answer": {
+    "speed": 4.717
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a1#5",
+   "template": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "params": {
+    "A": 3.5,
+    "B": 2.0,
+    "t": 4
+   },
+   "stem_zh": "质点位矢 r = (3.5t, 2.0t²)（m，t 单位 s）。求 t = 4 s 时的速率。",
+   "stem_en": "A particle has position r = (3.5t, 2.0t²) m. Find its speed at t = 4 s.",
+   "answer": {
+    "speed": 16.3783
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a1#6",
+   "template": "T-1.2-a1",
+   "kp": "P1-1.2-a",
+   "b": -0.8,
+   "params": {
+    "A": 2.5,
+    "B": 1.0,
+    "t": 1
+   },
+   "stem_zh": "质点位矢 r = (2.5t, 1.0t²)（m，t 单位 s）。求 t = 1 s 时的速率。",
+   "stem_en": "A particle has position r = (2.5t, 1.0t²) m. Find its speed at t = 1 s.",
+   "answer": {
+    "speed": 3.2016
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a2#1",
+   "template": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "params": {
+    "x1": 2,
+    "y1": 0,
+    "x2": 3,
+    "y2": 2,
+    "dt": 8
+   },
+   "stem_zh": "机器人 8 s 内从 (2, 0) m 移动到 (3, 2) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from (2, 0) m to (3, 2) m in 8 s. Find the magnitude of its average velocity.",
+   "answer": {
+    "v_avg": 0.2795
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a2#2",
+   "template": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "params": {
+    "x1": 1,
+    "y1": 1,
+    "x2": 4,
+    "y2": 3,
+    "dt": 4
+   },
+   "stem_zh": "机器人 4 s 内从 (1, 1) m 移动到 (4, 3) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from (1, 1) m to (4, 3) m in 4 s. Find the magnitude of its average velocity.",
+   "answer": {
+    "v_avg": 0.9014
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a2#3",
+   "template": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "params": {
+    "x1": 0,
+    "y1": 2,
+    "x2": 4,
+    "y2": 3,
+    "dt": 4
+   },
+   "stem_zh": "机器人 4 s 内从 (0, 2) m 移动到 (4, 3) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from (0, 2) m to (4, 3) m in 4 s. Find the magnitude of its average velocity.",
+   "answer": {
+    "v_avg": 1.0308
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a2#4",
+   "template": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "params": {
+    "x1": 1,
+    "y1": 1,
+    "x2": 5,
+    "y2": 3,
+    "dt": 4
+   },
+   "stem_zh": "机器人 4 s 内从 (1, 1) m 移动到 (5, 3) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from (1, 1) m to (5, 3) m in 4 s. Find the magnitude of its average velocity.",
+   "answer": {
+    "v_avg": 1.118
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a2#5",
+   "template": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "params": {
+    "x1": 1,
+    "y1": 1,
+    "x2": 3,
+    "y2": 3,
+    "dt": 10
+   },
+   "stem_zh": "机器人 10 s 内从 (1, 1) m 移动到 (3, 3) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from (1, 1) m to (3, 3) m in 10 s. Find the magnitude of its average velocity.",
+   "answer": {
+    "v_avg": 0.2828
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-a2#6",
+   "template": "T-1.2-a2",
+   "kp": "P1-1.2-a",
+   "b": -1.2,
+   "params": {
+    "x1": 2,
+    "y1": 1,
+    "x2": 5,
+    "y2": 4,
+    "dt": 10
+   },
+   "stem_zh": "机器人 10 s 内从 (2, 1) m 移动到 (5, 4) m。求这段时间内平均速度的大小。",
+   "stem_en": "A robot moves from (2, 1) m to (5, 4) m in 10 s. Find the magnitude of its average velocity.",
+   "answer": {
+    "v_avg": 0.4243
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.2-b1#1",
+   "template": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "params": {
+    "sigma": 0.005,
+    "v": 0.6,
+    "err": 0.03
+   },
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = 0.005 m，速度约 0.6 m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 3%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = 0.005 m; the robot moves at about 0.6 m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below 3%?",
+   "answer": {
+    "T_min": 0.3928
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b1#2",
+   "template": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "params": {
+    "sigma": 0.015,
+    "v": 0.4,
+    "err": 0.09
+   },
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = 0.015 m，速度约 0.4 m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 9%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = 0.015 m; the robot moves at about 0.4 m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below 9%?",
+   "answer": {
+    "T_min": 0.5893
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b1#3",
+   "template": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "params": {
+    "sigma": 0.01,
+    "v": 1.0,
+    "err": 0.09
+   },
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = 0.01 m，速度约 1.0 m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 9%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = 0.01 m; the robot moves at about 1.0 m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below 9%?",
+   "answer": {
+    "T_min": 0.1571
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b1#4",
+   "template": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "params": {
+    "sigma": 0.015,
+    "v": 1.0,
+    "err": 0.05
+   },
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = 0.015 m，速度约 1.0 m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 5%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = 0.015 m; the robot moves at about 1.0 m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below 5%?",
+   "answer": {
+    "T_min": 0.4243
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b1#5",
+   "template": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "params": {
+    "sigma": 0.01,
+    "v": 0.3,
+    "err": 0.05
+   },
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = 0.01 m，速度约 0.3 m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 5%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = 0.01 m; the robot moves at about 0.3 m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below 5%?",
+   "answer": {
+    "T_min": 0.9428
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b1#6",
+   "template": "T-1.2-b1",
+   "kp": "P1-1.2-b",
+   "b": 0.6,
+   "params": {
+    "sigma": 0.02,
+    "v": 0.3,
+    "err": 0.04
+   },
+   "stem_zh": "移动机器人里程计位置测量噪声 σ = 0.02 m，速度约 0.3 m/s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。要求相对误差小于 4%，采样间隔 T 至少多大？",
+   "stem_en": "An odometer has position noise σ = 0.02 m; the robot moves at about 0.3 m/s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What minimum sampling interval T keeps the relative error below 4%?",
+   "answer": {
+    "T_min": 2.357
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b2#1",
+   "template": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "params": {
+    "sigma": 0.005,
+    "v": 0.6,
+    "T": 0.9
+   },
+   "stem_zh": "里程计位置噪声 σ = 0.005 m，机器人速度 0.6 m/s，采样间隔 T = 0.9 s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = 0.005 m, speed 0.6 m/s, sampling interval T = 0.9 s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "answer": {
+    "rel_error_pct": 1.3095
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b2#2",
+   "template": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "params": {
+    "sigma": 0.01,
+    "v": 0.4,
+    "T": 0.5
+   },
+   "stem_zh": "里程计位置噪声 σ = 0.01 m，机器人速度 0.4 m/s，采样间隔 T = 0.5 s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = 0.01 m, speed 0.4 m/s, sampling interval T = 0.5 s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "answer": {
+    "rel_error_pct": 7.0711
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b2#3",
+   "template": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "params": {
+    "sigma": 0.01,
+    "v": 0.5,
+    "T": 0.7
+   },
+   "stem_zh": "里程计位置噪声 σ = 0.01 m，机器人速度 0.5 m/s，采样间隔 T = 0.7 s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = 0.01 m, speed 0.5 m/s, sampling interval T = 0.7 s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "answer": {
+    "rel_error_pct": 4.0406
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b2#4",
+   "template": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "params": {
+    "sigma": 0.02,
+    "v": 0.5,
+    "T": 0.8
+   },
+   "stem_zh": "里程计位置噪声 σ = 0.02 m，机器人速度 0.5 m/s，采样间隔 T = 0.8 s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = 0.02 m, speed 0.5 m/s, sampling interval T = 0.8 s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "answer": {
+    "rel_error_pct": 7.0711
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b2#5",
+   "template": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "params": {
+    "sigma": 0.02,
+    "v": 0.9,
+    "T": 0.5
+   },
+   "stem_zh": "里程计位置噪声 σ = 0.02 m，机器人速度 0.9 m/s，采样间隔 T = 0.5 s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = 0.02 m, speed 0.9 m/s, sampling interval T = 0.5 s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "answer": {
+    "rel_error_pct": 6.2854
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.2-b2#6",
+   "template": "T-1.2-b2",
+   "kp": "P1-1.2-b",
+   "b": 0.0,
+   "params": {
+    "sigma": 0.015,
+    "v": 0.9,
+    "T": 0.6
+   },
+   "stem_zh": "里程计位置噪声 σ = 0.015 m，机器人速度 0.9 m/s，采样间隔 T = 0.6 s。用相邻两次位置差估算速率。设各次位置测量相互独立、标准差均为 σ，速率误差取两次位置差的标准差除以 T（即 √2σ/T），相对误差 = 速率误差 ÷ 速度。相对误差是多少（%）？",
+   "stem_en": "Odometer noise σ = 0.015 m, speed 0.9 m/s, sampling interval T = 0.6 s. Speed is estimated from two successive positions. Assume independent position readings with standard deviation σ each; the speed error is the standard deviation of the difference divided by T (√2σ/T), and relative error = speed error ÷ speed. What is the relative error (%)?",
+   "answer": {
+    "rel_error_pct": 3.9284
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.3-a1#1",
+   "template": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "params": {
+    "h": 10,
+    "v": 10
+   },
+   "stem_zh": "小球从 10 m 高处以 10 m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at 10 m/s from 10 m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "answer": {
+    "range": 14.2784
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a1#2",
+   "template": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "params": {
+    "h": 12,
+    "v": 4
+   },
+   "stem_zh": "小球从 12 m 高处以 4 m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at 4 m/s from 12 m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "answer": {
+    "range": 6.2565
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a1#3",
+   "template": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "params": {
+    "h": 2,
+    "v": 7
+   },
+   "stem_zh": "小球从 2 m 高处以 7 m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at 7 m/s from 2 m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "answer": {
+    "range": 4.4699
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a1#4",
+   "template": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "params": {
+    "h": 7,
+    "v": 13
+   },
+   "stem_zh": "小球从 7 m 高处以 13 m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at 13 m/s from 7 m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "answer": {
+    "range": 15.5301
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a1#5",
+   "template": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "params": {
+    "h": 9,
+    "v": 7
+   },
+   "stem_zh": "小球从 9 m 高处以 7 m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at 7 m/s from 9 m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "answer": {
+    "range": 9.482
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a1#6",
+   "template": "T-1.3-a1",
+   "kp": "P1-1.3-a",
+   "b": -0.8,
+   "params": {
+    "h": 18,
+    "v": 3
+   },
+   "stem_zh": "小球从 18 m 高处以 3 m/s 水平抛出，不计空气阻力（g 取 9.81 m/s²）。求水平射程。",
+   "stem_en": "A ball is thrown horizontally at 3 m/s from 18 m high. Ignoring drag (take g = 9.81 m/s²), find its horizontal range.",
+   "answer": {
+    "range": 5.747
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a2#1",
+   "template": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "params": {
+    "v0": 20,
+    "theta": 20
+   },
+   "stem_zh": "以 20 m/s、仰角 20° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at 20 m/s, 20° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "answer": {
+    "h_max": 2.3849
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a2#2",
+   "template": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "params": {
+    "v0": 15,
+    "theta": 25
+   },
+   "stem_zh": "以 15 m/s、仰角 25° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at 15 m/s, 25° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "answer": {
+    "h_max": 2.0482
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a2#3",
+   "template": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "params": {
+    "v0": 16,
+    "theta": 35
+   },
+   "stem_zh": "以 16 m/s、仰角 35° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at 16 m/s, 35° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "answer": {
+    "h_max": 4.2926
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a2#4",
+   "template": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "params": {
+    "v0": 7,
+    "theta": 55
+   },
+   "stem_zh": "以 7 m/s、仰角 55° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at 7 m/s, 55° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "answer": {
+    "h_max": 1.6758
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a2#5",
+   "template": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "params": {
+    "v0": 14,
+    "theta": 65
+   },
+   "stem_zh": "以 14 m/s、仰角 65° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at 14 m/s, 65° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "answer": {
+    "h_max": 8.2056
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-a2#6",
+   "template": "T-1.3-a2",
+   "kp": "P1-1.3-a",
+   "b": -0.3,
+   "params": {
+    "v0": 10,
+    "theta": 25
+   },
+   "stem_zh": "以 10 m/s、仰角 25° 抛出小球，不计空气阻力（g 取 9.81 m/s²）。求上升的最大高度（相对出手点）。",
+   "stem_en": "A ball is launched at 10 m/s, 25° above horizontal. Ignoring drag (take g = 9.81 m/s²), find the maximum height above the launch point.",
+   "answer": {
+    "h_max": 0.9103
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b1#1",
+   "template": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "params": {
+    "h0": 0.6,
+    "hoop": 2.43,
+    "x": 3.5,
+    "theta": 45
+   },
+   "stem_zh": "投篮机器人在 0.6 m 高处出手，篮筐高 2.43 m、水平距离 3.5 m，出手角 45°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at 0.6 m height; the hoop is 2.43 m high and 3.5 m away; launch angle 45°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "answer": {
+    "v0": 8.4829
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b1#2",
+   "template": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "params": {
+    "h0": 1.2,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 65
+   },
+   "stem_zh": "投篮机器人在 1.2 m 高处出手，篮筐高 2.43 m、水平距离 4.0 m，出手角 65°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at 1.2 m height; the hoop is 2.43 m high and 4.0 m away; launch angle 65°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "answer": {
+    "v0": 7.733
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b1#3",
+   "template": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "params": {
+    "h0": 0.9,
+    "hoop": 2.43,
+    "x": 5.0,
+    "theta": 65
+   },
+   "stem_zh": "投篮机器人在 0.9 m 高处出手，篮筐高 2.43 m、水平距离 5.0 m，出手角 65°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at 0.9 m height; the hoop is 2.43 m high and 5.0 m away; launch angle 65°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "answer": {
+    "v0": 8.6422
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b1#4",
+   "template": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "params": {
+    "h0": 0.7,
+    "hoop": 2.43,
+    "x": 3.0,
+    "theta": 45
+   },
+   "stem_zh": "投篮机器人在 0.7 m 高处出手，篮筐高 2.43 m、水平距离 3.0 m，出手角 45°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at 0.7 m height; the hoop is 2.43 m high and 3.0 m away; launch angle 45°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "answer": {
+    "v0": 8.3378
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b1#5",
+   "template": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "params": {
+    "h0": 1.2,
+    "hoop": 2.43,
+    "x": 4.5,
+    "theta": 60
+   },
+   "stem_zh": "投篮机器人在 1.2 m 高处出手，篮筐高 2.43 m、水平距离 4.5 m，出手角 60°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at 1.2 m height; the hoop is 2.43 m high and 4.5 m away; launch angle 60°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "answer": {
+    "v0": 7.7798
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b1#6",
+   "template": "T-1.3-b1",
+   "kp": "P1-1.3-b",
+   "b": 0.8,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 45
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 4.0 m，出手角 45°。不计空气阻力（g 取 9.81 m/s²），求出手速度。",
+   "stem_en": "A shooting robot releases at 0.8 m height; the hoop is 2.43 m high and 4.0 m away; launch angle 45°. Ignoring drag (take g = 9.81 m/s²), find the launch speed.",
+   "answer": {
+    "v0": 8.138
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b2#1",
+   "template": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "params": {
+    "h0": 1.8,
+    "v0": 12.0
+   },
+   "stem_zh": "铅球在 1.8 m 高处以 12.0 m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at 1.8 m height with speed 12.0 m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "answer": {
+    "best_angle_deg": 41.9,
+    "range": 16.3803
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b2#2",
+   "template": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "params": {
+    "h0": 2.0,
+    "v0": 11.5
+   },
+   "stem_zh": "铅球在 2.0 m 高处以 11.5 m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at 2.0 m height with speed 11.5 m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "answer": {
+    "best_angle_deg": 41.3,
+    "range": 15.3514
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b2#3",
+   "template": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "params": {
+    "h0": 1.9,
+    "v0": 13.0
+   },
+   "stem_zh": "铅球在 1.9 m 高处以 13.0 m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at 1.9 m height with speed 13.0 m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "answer": {
+    "best_angle_deg": 42.1,
+    "range": 19.0327
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b2#4",
+   "template": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "params": {
+    "h0": 2.2,
+    "v0": 14.0
+   },
+   "stem_zh": "铅球在 2.2 m 高处以 14.0 m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at 2.2 m height with speed 14.0 m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "answer": {
+    "best_angle_deg": 42.2,
+    "range": 22.0702
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b2#6",
+   "template": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "params": {
+    "h0": 2.0,
+    "v0": 10.0
+   },
+   "stem_zh": "铅球在 2.0 m 高处以 10.0 m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at 2.0 m height with speed 10.0 m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "answer": {
+    "best_angle_deg": 40.3,
+    "range": 12.0285
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-b2#7",
+   "template": "T-1.3-b2",
+   "kp": "P1-1.3-b",
+   "b": 1.6,
+   "params": {
+    "h0": 1.8,
+    "v0": 10.5
+   },
+   "stem_zh": "铅球在 1.8 m 高处以 10.5 m/s 推出，不计空气阻力（g 取 9.81 m/s²）。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+   "stem_en": "A shot is released at 1.8 m height with speed 10.5 m/s. Ignoring drag (take g = 9.81 m/s²), what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+   "answer": {
+    "best_angle_deg": 41.0,
+    "range": 12.9137
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.3-c1#1",
+   "template": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 55,
+    "dv": 0.15
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 4.0 m，出手角 55°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = 0.15 m/s，偏差是多少米？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 4.0 m away, angle 55°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = 0.15 m/s, what is the miss (m)?",
+   "answer": {
+    "v0": 7.644,
+    "miss_m": 0.2638
+   },
+   "rel_tol": 0.03
+  },
+  {
+   "id": "T-1.3-c1#2",
+   "template": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.5,
+    "theta": 65,
+    "dv": 0.1
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 4.5 m，出手角 65°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = 0.1 m/s，偏差是多少米？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 4.5 m away, angle 65°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = 0.1 m/s, what is the miss (m)?",
+   "answer": {
+    "v0": 8.327,
+    "miss_m": 0.1363
+   },
+   "rel_tol": 0.03
+  },
+  {
+   "id": "T-1.3-c1#3",
+   "template": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 5.0,
+    "theta": 55,
+    "dv": 0.15
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 5.0 m，出手角 55°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = 0.15 m/s，偏差是多少米？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 5.0 m away, angle 55°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = 0.15 m/s, what is the miss (m)?",
+   "answer": {
+    "v0": 8.2242,
+    "miss_m": 0.2598
+   },
+   "rel_tol": 0.03
+  },
+  {
+   "id": "T-1.3-c1#4",
+   "template": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 5.0,
+    "theta": 65,
+    "dv": 0.1
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 5.0 m，出手角 65°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = 0.1 m/s，偏差是多少米？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 5.0 m away, angle 65°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = 0.1 m/s, what is the miss (m)?",
+   "answer": {
+    "v0": 8.6896,
+    "miss_m": 0.1409
+   },
+   "rel_tol": 0.03
+  },
+  {
+   "id": "T-1.3-c1#5",
+   "template": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 5.0,
+    "theta": 45,
+    "dv": 0.15
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 5.0 m，出手角 45°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = 0.15 m/s，偏差是多少米？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 5.0 m away, angle 45°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = 0.15 m/s, what is the miss (m)?",
+   "answer": {
+    "v0": 8.5308,
+    "miss_m": 0.3499
+   },
+   "rel_tol": 0.03
+  },
+  {
+   "id": "T-1.3-c1#6",
+   "template": "T-1.3-c1",
+   "kp": "P1-1.3-c",
+   "b": 1.4,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 65,
+    "dv": 0.15
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 4.0 m，出手角 65°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。若出手速度误差 Δv = 0.15 m/s，偏差是多少米？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 4.0 m away, angle 65°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. If the launch-speed error is Δv = 0.15 m/s, what is the miss (m)?",
+   "answer": {
+    "v0": 7.9524,
+    "miss_m": 0.1983
+   },
+   "rel_tol": 0.03
+  },
+  {
+   "id": "T-1.3-c2#1",
+   "template": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "params": {
+    "h0": 0.6,
+    "hoop": 2.43,
+    "x": 3.5,
+    "theta": 65,
+    "e": 0.1
+   },
+   "stem_zh": "投篮机器人在 0.6 m 高处出手，篮筐高 2.43 m、水平距离 3.5 m，出手角 65°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 0.1 m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at 0.6 m, hoop 2.43 m high and 3.5 m away, angle 65°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within 0.1 m, what is the largest allowed Δv (m/s)?",
+   "answer": {
+    "dv_max": 0.0745
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.3-c2#2",
+   "template": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "params": {
+    "h0": 0.6,
+    "hoop": 2.43,
+    "x": 3.5,
+    "theta": 45,
+    "e": 0.1
+   },
+   "stem_zh": "投篮机器人在 0.6 m 高处出手，篮筐高 2.43 m、水平距离 3.5 m，出手角 45°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 0.1 m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at 0.6 m, hoop 2.43 m high and 3.5 m away, angle 45°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within 0.1 m, what is the largest allowed Δv (m/s)?",
+   "answer": {
+    "dv_max": 0.0001
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.3-c2#3",
+   "template": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "params": {
+    "h0": 1.0,
+    "hoop": 2.43,
+    "x": 4.5,
+    "theta": 45,
+    "e": 0.15
+   },
+   "stem_zh": "投篮机器人在 1.0 m 高处出手，篮筐高 2.43 m、水平距离 4.5 m，出手角 45°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 0.15 m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at 1.0 m, hoop 2.43 m high and 4.5 m away, angle 45°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within 0.15 m, what is the largest allowed Δv (m/s)?",
+   "answer": {
+    "dv_max": 0.0709
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.3-c2#4",
+   "template": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "params": {
+    "h0": 1.0,
+    "hoop": 2.43,
+    "x": 4.0,
+    "theta": 45,
+    "e": 0.05
+   },
+   "stem_zh": "投篮机器人在 1.0 m 高处出手，篮筐高 2.43 m、水平距离 4.0 m，出手角 45°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 0.05 m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at 1.0 m, hoop 2.43 m high and 4.0 m away, angle 45°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within 0.05 m, what is the largest allowed Δv (m/s)?",
+   "answer": {
+    "dv_max": 0.0215
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.3-c2#5",
+   "template": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 5.0,
+    "theta": 55,
+    "e": 0.15
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 5.0 m，出手角 55°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 0.15 m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 5.0 m away, angle 55°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within 0.15 m, what is the largest allowed Δv (m/s)?",
+   "answer": {
+    "dv_max": 0.0867
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.3-c2#6",
+   "template": "T-1.3-c2",
+   "kp": "P1-1.3-c",
+   "b": 1.3,
+   "params": {
+    "h0": 0.8,
+    "hoop": 2.43,
+    "x": 3.5,
+    "theta": 45,
+    "e": 0.05
+   },
+   "stem_zh": "投篮机器人在 0.8 m 高处出手，篮筐高 2.43 m、水平距离 3.5 m，出手角 45°。名义出手速度取恰好使球穿过篮筐中心的速度；不计空气阻力（g 取 9.81 m/s²）。偏差指球下落经过篮筐高度时的水平位置偏差：分别按 v+Δv、v−Δv 精确计算，取两侧偏差绝对值的较大者。要求偏差不超过 0.05 m，出手速度误差 Δv 最大允许多少（m/s）？",
+   "stem_en": "Release at 0.8 m, hoop 2.43 m high and 3.5 m away, angle 45°. The nominal launch speed is the one that sends the ball through the hoop centre; ignore drag (take g = 9.81 m/s²). The miss is the horizontal offset when the ball descends through hoop height, computed exactly for v+Δv and v−Δv; take the larger absolute value. To keep the miss within 0.05 m, what is the largest allowed Δv (m/s)?",
+   "answer": {
+    "dv_max": 0.0067
+   },
+   "rel_tol": 0.02
+  },
+  {
+   "id": "T-1.4-a1#1",
+   "template": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "params": {
+    "v": 2.5,
+    "R": 0.5
+   },
+   "stem_zh": "机器人以 2.5 m/s 沿半径 0.5 m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at 2.5 m/s around an arc of radius 0.5 m. Find its centripetal acceleration.",
+   "answer": {
+    "a_n": 12.5
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a1#2",
+   "template": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "params": {
+    "v": 1.0,
+    "R": 1.5
+   },
+   "stem_zh": "机器人以 1.0 m/s 沿半径 1.5 m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at 1.0 m/s around an arc of radius 1.5 m. Find its centripetal acceleration.",
+   "answer": {
+    "a_n": 0.6667
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a1#3",
+   "template": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "params": {
+    "v": 1.5,
+    "R": 1.0
+   },
+   "stem_zh": "机器人以 1.5 m/s 沿半径 1.0 m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at 1.5 m/s around an arc of radius 1.0 m. Find its centripetal acceleration.",
+   "answer": {
+    "a_n": 2.25
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a1#5",
+   "template": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "params": {
+    "v": 0.5,
+    "R": 0.5
+   },
+   "stem_zh": "机器人以 0.5 m/s 沿半径 0.5 m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at 0.5 m/s around an arc of radius 0.5 m. Find its centripetal acceleration.",
+   "answer": {
+    "a_n": 0.5
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a1#6",
+   "template": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "params": {
+    "v": 2.0,
+    "R": 3.0
+   },
+   "stem_zh": "机器人以 2.0 m/s 沿半径 3.0 m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at 2.0 m/s around an arc of radius 3.0 m. Find its centripetal acceleration.",
+   "answer": {
+    "a_n": 1.3333
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a1#7",
+   "template": "T-1.4-a1",
+   "kp": "P1-1.4-a",
+   "b": -1.0,
+   "params": {
+    "v": 1.0,
+    "R": 2.0
+   },
+   "stem_zh": "机器人以 1.0 m/s 沿半径 2.0 m 的圆弧行驶。求向心加速度。",
+   "stem_en": "A robot drives at 1.0 m/s around an arc of radius 2.0 m. Find its centripetal acceleration.",
+   "answer": {
+    "a_n": 0.5
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a2#1",
+   "template": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "params": {
+    "w": 4.0,
+    "r": 1.2
+   },
+   "stem_zh": "机械臂末端绕基座转动，角速度 4.0 rad/s，到转轴距离 1.2 m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at 4.0 rad/s, 1.2 m from the axis. Find its linear speed and centripetal acceleration.",
+   "answer": {
+    "v": 4.8,
+    "a_n": 19.2
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a2#2",
+   "template": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "params": {
+    "w": 3.0,
+    "r": 1.1
+   },
+   "stem_zh": "机械臂末端绕基座转动，角速度 3.0 rad/s，到转轴距离 1.1 m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at 3.0 rad/s, 1.1 m from the axis. Find its linear speed and centripetal acceleration.",
+   "answer": {
+    "v": 3.3,
+    "a_n": 9.9
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a2#3",
+   "template": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "params": {
+    "w": 3.5,
+    "r": 0.4
+   },
+   "stem_zh": "机械臂末端绕基座转动，角速度 3.5 rad/s，到转轴距离 0.4 m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at 3.5 rad/s, 0.4 m from the axis. Find its linear speed and centripetal acceleration.",
+   "answer": {
+    "v": 1.4,
+    "a_n": 4.9
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a2#4",
+   "template": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "params": {
+    "w": 1.5,
+    "r": 1.0
+   },
+   "stem_zh": "机械臂末端绕基座转动，角速度 1.5 rad/s，到转轴距离 1.0 m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at 1.5 rad/s, 1.0 m from the axis. Find its linear speed and centripetal acceleration.",
+   "answer": {
+    "v": 1.5,
+    "a_n": 2.25
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a2#5",
+   "template": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "params": {
+    "w": 4.0,
+    "r": 1.0
+   },
+   "stem_zh": "机械臂末端绕基座转动，角速度 4.0 rad/s，到转轴距离 1.0 m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at 4.0 rad/s, 1.0 m from the axis. Find its linear speed and centripetal acceleration.",
+   "answer": {
+    "v": 4.0,
+    "a_n": 16.0
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-a2#6",
+   "template": "T-1.4-a2",
+   "kp": "P1-1.4-a",
+   "b": -0.4,
+   "params": {
+    "w": 1.0,
+    "r": 0.3
+   },
+   "stem_zh": "机械臂末端绕基座转动，角速度 1.0 rad/s，到转轴距离 0.3 m。求末端线速度和向心加速度。",
+   "stem_en": "An arm's end effector rotates about the base at 1.0 rad/s, 0.3 m from the axis. Find its linear speed and centripetal acceleration.",
+   "answer": {
+    "v": 0.3,
+    "a_n": 0.3
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b1#1",
+   "template": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "params": {
+    "R": 1.0,
+    "h": 0.8,
+    "b": 0.8,
+    "mu": 0.4
+   },
+   "stem_zh": "AGV 以半径 1.0 m 转弯，重心高 0.8 m，轮距 0.8 m，轮地摩擦系数 0.4。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius 1.0 m; centre of mass 0.8 m high, track width 0.8 m, friction coefficient 0.4. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "answer": {
+    "v_tip": 2.2147,
+    "v_slip": 1.9809,
+    "first": "slip"
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b1#2",
+   "template": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "params": {
+    "R": 2.5,
+    "h": 0.6,
+    "b": 0.8,
+    "mu": 0.8
+   },
+   "stem_zh": "AGV 以半径 2.5 m 转弯，重心高 0.6 m，轮距 0.8 m，轮地摩擦系数 0.8。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius 2.5 m; centre of mass 0.6 m high, track width 0.8 m, friction coefficient 0.8. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "answer": {
+    "v_tip": 4.0435,
+    "v_slip": 4.4294,
+    "first": "tip"
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b1#3",
+   "template": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "params": {
+    "R": 1.5,
+    "h": 0.4,
+    "b": 0.4,
+    "mu": 0.5
+   },
+   "stem_zh": "AGV 以半径 1.5 m 转弯，重心高 0.4 m，轮距 0.4 m，轮地摩擦系数 0.5。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius 1.5 m; centre of mass 0.4 m high, track width 0.4 m, friction coefficient 0.5. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "answer": {
+    "v_tip": 2.7125,
+    "v_slip": 2.7125,
+    "first": "slip"
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b1#4",
+   "template": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "params": {
+    "R": 2.0,
+    "h": 0.5,
+    "b": 0.6,
+    "mu": 0.6
+   },
+   "stem_zh": "AGV 以半径 2.0 m 转弯，重心高 0.5 m，轮距 0.6 m，轮地摩擦系数 0.6。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius 2.0 m; centre of mass 0.5 m high, track width 0.6 m, friction coefficient 0.6. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "answer": {
+    "v_tip": 3.431,
+    "v_slip": 3.431,
+    "first": "slip"
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b1#5",
+   "template": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "params": {
+    "R": 1.0,
+    "h": 0.3,
+    "b": 0.5,
+    "mu": 0.4
+   },
+   "stem_zh": "AGV 以半径 1.0 m 转弯，重心高 0.3 m，轮距 0.5 m，轮地摩擦系数 0.4。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius 1.0 m; centre of mass 0.3 m high, track width 0.5 m, friction coefficient 0.4. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "answer": {
+    "v_tip": 2.8592,
+    "v_slip": 1.9809,
+    "first": "slip"
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b1#6",
+   "template": "T-1.4-b1",
+   "kp": "P1-1.4-b",
+   "b": 1.0,
+   "params": {
+    "R": 3.0,
+    "h": 0.5,
+    "b": 0.8,
+    "mu": 0.7
+   },
+   "stem_zh": "AGV 以半径 3.0 m 转弯，重心高 0.5 m，轮距 0.8 m，轮地摩擦系数 0.7。设重心位于左右轮中间，各轮摩擦系数相同，侧翻以内侧车轮刚要离地为临界（g 取 9.81 m/s²）。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+   "stem_en": "An AGV turns on radius 3.0 m; centre of mass 0.5 m high, track width 0.8 m, friction coefficient 0.7. Assume the centre of mass is midway between the wheels, equal friction at all wheels, and tipping begins when the inner wheels just lift (take g = 9.81 m/s²). Find the speeds at which it starts to tip and to slip, and which comes first.",
+   "answer": {
+    "v_tip": 4.8522,
+    "v_slip": 4.5388,
+    "first": "slip"
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b2#1",
+   "template": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "params": {
+    "k": 0.3,
+    "R": 2.0
+   },
+   "stem_zh": "为保证舒适，侧向加速度不超过 0.3g（g 取 9.81 m/s²）。转弯半径 2.0 m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below 0.3g (take g = 9.81 m/s²). On a 2.0 m radius, what is the maximum speed (m/s and km/h)?",
+   "answer": {
+    "v_max": 2.4261,
+    "v_max_kmh": 8.734
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b2#2",
+   "template": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "params": {
+    "k": 0.35,
+    "R": 400
+   },
+   "stem_zh": "为保证舒适，侧向加速度不超过 0.35g（g 取 9.81 m/s²）。转弯半径 400 m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below 0.35g (take g = 9.81 m/s²). On a 400 m radius, what is the maximum speed (m/s and km/h)?",
+   "answer": {
+    "v_max": 37.0594,
+    "v_max_kmh": 133.4139
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b2#3",
+   "template": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "params": {
+    "k": 0.25,
+    "R": 600
+   },
+   "stem_zh": "为保证舒适，侧向加速度不超过 0.25g（g 取 9.81 m/s²）。转弯半径 600 m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below 0.25g (take g = 9.81 m/s²). On a 600 m radius, what is the maximum speed (m/s and km/h)?",
+   "answer": {
+    "v_max": 38.3601,
+    "v_max_kmh": 138.0965
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b2#4",
+   "template": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "params": {
+    "k": 0.1,
+    "R": 1.5
+   },
+   "stem_zh": "为保证舒适，侧向加速度不超过 0.1g（g 取 9.81 m/s²）。转弯半径 1.5 m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below 0.1g (take g = 9.81 m/s²). On a 1.5 m radius, what is the maximum speed (m/s and km/h)?",
+   "answer": {
+    "v_max": 1.2131,
+    "v_max_kmh": 4.367
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b2#5",
+   "template": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "params": {
+    "k": 0.15,
+    "R": 2.0
+   },
+   "stem_zh": "为保证舒适，侧向加速度不超过 0.15g（g 取 9.81 m/s²）。转弯半径 2.0 m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below 0.15g (take g = 9.81 m/s²). On a 2.0 m radius, what is the maximum speed (m/s and km/h)?",
+   "answer": {
+    "v_max": 1.7155,
+    "v_max_kmh": 6.1759
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.4-b2#6",
+   "template": "T-1.4-b2",
+   "kp": "P1-1.4-b",
+   "b": 0.2,
+   "params": {
+    "k": 0.25,
+    "R": 1.5
+   },
+   "stem_zh": "为保证舒适，侧向加速度不超过 0.25g（g 取 9.81 m/s²）。转弯半径 1.5 m 时最高车速是多少（m/s 和 km/h）？",
+   "stem_en": "For comfort, lateral acceleration must stay below 0.25g (take g = 9.81 m/s²). On a 1.5 m radius, what is the maximum speed (m/s and km/h)?",
+   "answer": {
+    "v_max": 1.918,
+    "v_max_kmh": 6.9048
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a1#1",
+   "template": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "params": {
+    "va": 10,
+    "vw": 3,
+    "d": 750
+   },
+   "stem_zh": "无人机空速 10 m/s，侧风 3 m/s（垂直于航线），要沿直线飞到 750 m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed 10 m/s with a 3 m/s crosswind and must fly straight to a target 750 m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "answer": {
+    "heading_deg": 17.4576,
+    "v_ground": 9.5394,
+    "t": 78.6214,
+    "t_extra": 3.6214
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a1#2",
+   "template": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "params": {
+    "va": 8,
+    "vw": 2,
+    "d": 1000
+   },
+   "stem_zh": "无人机空速 8 m/s，侧风 2 m/s（垂直于航线），要沿直线飞到 1000 m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed 8 m/s with a 2 m/s crosswind and must fly straight to a target 1000 m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "answer": {
+    "heading_deg": 14.4775,
+    "v_ground": 7.746,
+    "t": 129.0994,
+    "t_extra": 4.0994
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a1#3",
+   "template": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "params": {
+    "va": 9,
+    "vw": 5,
+    "d": 1000
+   },
+   "stem_zh": "无人机空速 9 m/s，侧风 5 m/s（垂直于航线），要沿直线飞到 1000 m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed 9 m/s with a 5 m/s crosswind and must fly straight to a target 1000 m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "answer": {
+    "heading_deg": 33.749,
+    "v_ground": 7.4833,
+    "t": 133.6306,
+    "t_extra": 22.5195
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a1#4",
+   "template": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "params": {
+    "va": 10,
+    "vw": 3,
+    "d": 1500
+   },
+   "stem_zh": "无人机空速 10 m/s，侧风 3 m/s（垂直于航线），要沿直线飞到 1500 m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed 10 m/s with a 3 m/s crosswind and must fly straight to a target 1500 m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "answer": {
+    "heading_deg": 17.4576,
+    "v_ground": 9.5394,
+    "t": 157.2427,
+    "t_extra": 7.2427
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a1#5",
+   "template": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "params": {
+    "va": 15,
+    "vw": 2,
+    "d": 1500
+   },
+   "stem_zh": "无人机空速 15 m/s，侧风 2 m/s（垂直于航线），要沿直线飞到 1500 m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed 15 m/s with a 2 m/s crosswind and must fly straight to a target 1500 m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "answer": {
+    "heading_deg": 7.6623,
+    "v_ground": 14.8661,
+    "t": 100.9009,
+    "t_extra": 0.9009
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a1#6",
+   "template": "T-1.5-a1",
+   "kp": "P1-1.5-a",
+   "b": 0.3,
+   "params": {
+    "va": 12,
+    "vw": 4,
+    "d": 2000
+   },
+   "stem_zh": "无人机空速 12 m/s，侧风 4 m/s（垂直于航线），要沿直线飞到 2000 m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+   "stem_en": "A drone has airspeed 12 m/s with a 4 m/s crosswind and must fly straight to a target 2000 m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+   "answer": {
+    "heading_deg": 19.4712,
+    "v_ground": 11.3137,
+    "t": 176.7767,
+    "t_extra": 10.11
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a2#1",
+   "template": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "params": {
+    "W": 120,
+    "w": 0.5,
+    "u": 2.5
+   },
+   "stem_zh": "河宽 120 m，水流速度 0.5 m/s，小船相对水速度 2.5 m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is 120 m wide with current 0.5 m/s; the boat moves at 2.5 m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "answer": {
+    "t_straight_heading": 48.0,
+    "drift": 24.0,
+    "t_straight_path": 48.9898
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a2#2",
+   "template": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "params": {
+    "W": 200,
+    "w": 1.5,
+    "u": 2.0
+   },
+   "stem_zh": "河宽 200 m，水流速度 1.5 m/s，小船相对水速度 2.0 m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is 200 m wide with current 1.5 m/s; the boat moves at 2.0 m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "answer": {
+    "t_straight_heading": 100.0,
+    "drift": 150.0,
+    "t_straight_path": 151.1858
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a2#3",
+   "template": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "params": {
+    "W": 160,
+    "w": 2.0,
+    "u": 5.0
+   },
+   "stem_zh": "河宽 160 m，水流速度 2.0 m/s，小船相对水速度 5.0 m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is 160 m wide with current 2.0 m/s; the boat moves at 5.0 m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "answer": {
+    "t_straight_heading": 32.0,
+    "drift": 64.0,
+    "t_straight_path": 34.9149
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a2#4",
+   "template": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "params": {
+    "W": 160,
+    "w": 2.0,
+    "u": 3.0
+   },
+   "stem_zh": "河宽 160 m，水流速度 2.0 m/s，小船相对水速度 3.0 m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is 160 m wide with current 2.0 m/s; the boat moves at 3.0 m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "answer": {
+    "t_straight_heading": 53.3333,
+    "drift": 106.6667,
+    "t_straight_path": 71.5542
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a2#5",
+   "template": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "params": {
+    "W": 180,
+    "w": 1.5,
+    "u": 3.5
+   },
+   "stem_zh": "河宽 180 m，水流速度 1.5 m/s，小船相对水速度 3.5 m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is 180 m wide with current 1.5 m/s; the boat moves at 3.5 m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "answer": {
+    "t_straight_heading": 51.4286,
+    "drift": 77.1429,
+    "t_straight_path": 56.921
+   },
+   "rel_tol": 0.01
+  },
+  {
+   "id": "T-1.5-a2#6",
+   "template": "T-1.5-a2",
+   "kp": "P1-1.5-a",
+   "b": -0.2,
+   "params": {
+    "W": 80,
+    "w": 0.5,
+    "u": 4.5
+   },
+   "stem_zh": "河宽 80 m，水流速度 0.5 m/s，小船相对水速度 4.5 m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+   "stem_en": "A river is 80 m wide with current 0.5 m/s; the boat moves at 4.5 m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+   "answer": {
+    "t_straight_heading": 17.7778,
+    "drift": 8.8889,
+    "t_straight_path": 17.8885
+   },
+   "rel_tol": 0.01
+  }
+ ]
+}

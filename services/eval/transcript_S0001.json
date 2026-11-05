@@ -1,0 +1,316 @@
+{
+ "student": {
+  "id": "S-0001",
+  "name": "样例学生 Sample Student"
+ },
+ "course": {
+  "zh": "大学物理（上）· 第 1 章 质点运动学",
+  "en": "University Physics I · Ch. 1 Kinematics"
+ },
+ "template": "基础理论课 Foundational theory",
+ "weights": {
+  "A": 0.55,
+  "B": 0.3,
+  "C": 0.15
+ },
+ "scores": {
+  "A": 81.1,
+  "B": 85.1,
+  "C": 82.0
+ },
+ "total": 82.4,
+ "letter": "B",
+ "kp_map": [
+  {
+   "id": "P1-1.1-a",
+   "name_zh": "参考系与坐标系",
+   "name_en": "Reference frames and coordinates",
+   "tier": "基本掌握",
+   "tier_idx": 1,
+   "confidence": 0.49,
+   "pending": true,
+   "n_items": 6,
+   "theta": -0.39,
+   "sd": 0.59
+  },
+  {
+   "id": "P1-1.1-b",
+   "name_zh": "伽利略速度合成",
+   "name_en": "Galilean velocity addition",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.48,
+   "pending": true,
+   "n_items": 5,
+   "theta": 0.6,
+   "sd": 0.62
+  },
+  {
+   "id": "P1-1.2-a",
+   "name_zh": "位矢、位移与速度",
+   "name_en": "Position, displacement and velocity",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.52,
+   "pending": false,
+   "n_items": 7,
+   "theta": 0.76,
+   "sd": 0.63
+  },
+  {
+   "id": "P1-1.2-b",
+   "name_zh": "数值微分与采样误差",
+   "name_en": "Numerical differentiation and sampling error",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.57,
+   "pending": false,
+   "n_items": 7,
+   "theta": 1.3,
+   "sd": 0.59
+  },
+  {
+   "id": "P1-1.3-a",
+   "name_zh": "抛体运动方程",
+   "name_en": "Projectile equations of motion",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.52,
+   "pending": false,
+   "n_items": 7,
+   "theta": 1.37,
+   "sd": 0.64
+  },
+  {
+   "id": "P1-1.3-b",
+   "name_zh": "按目标求初速度",
+   "name_en": "Launch speed to hit a target",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.47,
+   "pending": true,
+   "n_items": 5,
+   "theta": 0.57,
+   "sd": 0.61
+  },
+  {
+   "id": "P1-1.3-c",
+   "name_zh": "出手误差的灵敏度",
+   "name_en": "Sensitivity to launch error",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.49,
+   "pending": true,
+   "n_items": 6,
+   "theta": 0.59,
+   "sd": 0.6
+  },
+  {
+   "id": "P1-1.4-a",
+   "name_zh": "向心加速度",
+   "name_en": "Centripetal acceleration",
+   "tier": "熟练",
+   "tier_idx": 2,
+   "confidence": 0.57,
+   "pending": false,
+   "n_items": 7,
+   "theta": 0.9,
+   "sd": 0.62
+  },
+  {
+   "id": "P1-1.4-b",
+   "name_zh": "侧翻与侧滑条件",
+   "name_en": "Tip-over and slip conditions",
+   "tier": "基本掌握",
+   "tier_idx": 1,
+   "confidence": 0.48,
+   "pending": true,
+   "n_items": 5,
+   "theta": 0.45,
+   "sd": 0.61
+  },
+  {
+   "id": "P1-1.5-a",
+   "name_zh": "相对运动与航向修正",
+   "name_en": "Relative motion and heading correction",
+   "tier": "基本掌握",
+   "tier_idx": 1,
+   "confidence": 0.56,
+   "pending": false,
+   "n_items": 5,
+   "theta": 0.25,
+   "sd": 0.61
+  }
+ ],
+ "profile": {
+  "理解与知识 Understanding": 82.5,
+  "方法与建模 Methods & modeling": 82.8,
+  "实践与动手 Hands-on practice": 74.9,
+  "表达与沟通 Communication": 84.4
+ },
+ "labs": [
+  {
+   "id": "LAB-1.1",
+   "name": "传送带抓取：夹爪对准角度",
+   "process": 89,
+   "sub": {
+    "结果": 30,
+    "方法": 35,
+    "建模": 24,
+    "探索": 0
+   },
+   "report": 86,
+   "total": 87.2,
+   "evidence": [
+    "结果：第 1 次运行达到容差内（目标 18.4，容差 ±1.0）",
+    "方法：共 1 次运行（二分法约需 5 次）；根据上次结果调整方向正确率 —（事件 #2–#2）",
+    "建模：运行前预测误差 0.8%",
+    "探索：没有试越界一侧"
+   ],
+   "flags": []
+  },
+  {
+   "id": "LAB-1.2",
+   "name": "里程计：选采样间隔",
+   "process": 86,
+   "sub": {
+    "结果": 30,
+    "方法": 35,
+    "建模": 11,
+    "探索": 10
+   },
+   "report": 78,
+   "total": 81.2,
+   "evidence": [
+    "结果：第 5 次运行达到容差内（目标 1.06，容差 ±0.03）",
+    "方法：共 5 次运行（二分法约需 6 次）；根据上次结果调整方向正确率 100%（事件 #2–#6）",
+    "建模：运行前预测误差 17.1%",
+    "探索：试到了失败/越界一侧，确认了边界"
+   ],
+   "flags": []
+  },
+  {
+   "id": "LAB-1.3",
+   "name": "投篮：调出手速度",
+   "process": 89,
+   "sub": {
+    "结果": 30,
+    "方法": 35,
+    "建模": 24,
+    "探索": 0
+   },
+   "report": 90,
+   "total": 89.6,
+   "evidence": [
+    "结果：第 2 次运行达到容差内（目标 8.38，容差 ±0.05）",
+    "方法：共 2 次运行（二分法约需 7 次）；根据上次结果调整方向正确率 100%（事件 #2–#3）",
+    "建模：运行前预测误差 0.8%",
+    "探索：没有试越界一侧"
+   ],
+   "flags": []
+  },
+  {
+   "id": "LAB-1.4",
+   "name": "AGV：找侧翻临界速度",
+   "process": 99,
+   "sub": {
+    "结果": 30,
+    "方法": 35,
+    "建模": 24,
+    "探索": 10
+   },
+   "report": 88,
+   "total": 92.4,
+   "evidence": [
+    "结果：第 1 次运行达到容差内（目标 1.87，容差 ±0.05）",
+    "方法：共 3 次运行（二分法约需 6 次）；根据上次结果调整方向正确率 —（事件 #2–#4）",
+    "建模：运行前预测误差 1.5%",
+    "探索：试到了失败/越界一侧，确认了边界"
+   ],
+   "flags": []
+  },
+  {
+   "id": "LAB-1.5",
+   "name": "无人机：机头偏转角",
+   "process": 65,
+   "sub": {
+    "结果": 30,
+    "方法": 35,
+    "建模": 0,
+    "探索": 0
+   },
+   "report": 82,
+   "total": 75.2,
+   "evidence": [
+    "结果：第 1 次运行达到容差内（目标 30，容差 ±0.5）",
+    "方法：共 1 次运行（二分法约需 6 次）；根据上次结果调整方向正确率 —（事件 #2–#2）",
+    "建模：运行前预测误差 30.5%",
+    "探索：没有试越界一侧"
+   ],
+   "flags": []
+  }
+ ],
+ "defense": {
+  "panel": {
+   "领域专家甲": 84,
+   "领域专家乙": 80,
+   "质疑者": 78,
+   "应用评委": 82,
+   "表达与规范评委": 86
+  },
+  "dims": {
+   "问题理解": 8.4,
+   "方法": 8.2,
+   "结果": 8.6,
+   "判断": 7.6,
+   "表达": 8.4,
+   "独立理解": 8.0
+  }
+ },
+ "evidence": [
+  {
+   "id": "EV-A1",
+   "pillar": "A",
+   "title": "期末自适应考试",
+   "detail": "平时小测 30 题 + 期末 30 题；全章总体能力估计 θ = 0.61，按档位对齐的折算表得 81.1 分"
+  },
+  {
+   "id": "EV-LAB-1.1",
+   "pillar": "B",
+   "title": "传送带抓取：夹爪对准角度",
+   "detail": "结果：第 1 次运行达到容差内（目标 18.4，容差 ±1.0）；方法：共 1 次运行（二分法约需 5 次）；根据上次结果调整方向正确率 —（事件 #2–#2）；建模：运行前预测误差 0.8%；探索：没有试越界一侧；实验报告 86 分（样例值）"
+  },
+  {
+   "id": "EV-LAB-1.2",
+   "pillar": "B",
+   "title": "里程计：选采样间隔",
+   "detail": "结果：第 5 次运行达到容差内（目标 1.06，容差 ±0.03）；方法：共 5 次运行（二分法约需 6 次）；根据上次结果调整方向正确率 100%（事件 #2–#6）；建模：运行前预测误差 17.1%；探索：试到了失败/越界一侧，确认了边界；实验报告 78 分（样例值）"
+  },
+  {
+   "id": "EV-LAB-1.3",
+   "pillar": "B",
+   "title": "投篮：调出手速度",
+   "detail": "结果：第 2 次运行达到容差内（目标 8.38，容差 ±0.05）；方法：共 2 次运行（二分法约需 7 次）；根据上次结果调整方向正确率 100%（事件 #2–#3）；建模：运行前预测误差 0.8%；探索：没有试越界一侧；实验报告 90 分（样例值）"
+  },
+  {
+   "id": "EV-LAB-1.4",
+   "pillar": "B",
+   "title": "AGV：找侧翻临界速度",
+   "detail": "结果：第 1 次运行达到容差内（目标 1.87，容差 ±0.05）；方法：共 3 次运行（二分法约需 6 次）；根据上次结果调整方向正确率 —（事件 #2–#4）；建模：运行前预测误差 1.5%；探索：试到了失败/越界一侧，确认了边界；实验报告 88 分（样例值）"
+  },
+  {
+   "id": "EV-LAB-1.5",
+   "pillar": "B",
+   "title": "无人机：机头偏转角",
+   "detail": "结果：第 1 次运行达到容差内（目标 30，容差 ±0.5）；方法：共 1 次运行（二分法约需 6 次）；根据上次结果调整方向正确率 —（事件 #2–#2）；建模：运行前预测误差 30.5%；探索：没有试越界一侧；实验报告 82 分（样例值）"
+  },
+  {
+   "id": "EV-C1",
+   "pillar": "C",
+   "title": "综合项目答辩（文字版）",
+   "detail": "五位评委独立评分 78–86，分歧 8 分，未超过 15 分；第 7–9 问：质疑者把转弯半径减半，学生当场重算并解释"
+  }
+ ],
+ "issued": "2026-10-30",
+ "note": "本成绩单为样例：考生、作答和实验报告分为模拟数据。"
+}

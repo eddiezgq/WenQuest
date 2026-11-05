@@ -1,0 +1,245 @@
+<title>教师发展报告</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：一页概览在前（做得好 / 最值得改进），下面按五个方面展开，每条结论可以点开看证据 */
+:root{
+  --bg:#f5f7f8; --paper:#ffffff; --ink:#18232d; --muted:#5b6b78; --line:#d9e1e6;
+  --accent:#1f6f78; --accent-soft:#e1f0f1;
+  --good:#2e7d4f; --good-soft:#e3f2e8; --warn:#a86a00; --warn-soft:#fbf0d9; --bad:#b3372f; --bad-soft:#f8e3e1;
+  --f-display:"Noto Serif SC","Songti SC",serif; --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11181e; --paper:#18222a; --ink:#e3eaee; --muted:#9aabb7; --line:#2c3a44;
+  --accent:#5fb7c0; --accent-soft:#1d3a3e; --good:#6cc48f; --good-soft:#1b3326; --warn:#e3b04f; --warn-soft:#3a2f17; --bad:#ec7c72; --bad-soft:#3d2321; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11181e; --paper:#18222a; --ink:#e3eaee; --muted:#9aabb7; --line:#2c3a44;
+  --accent:#5fb7c0; --accent-soft:#1d3a3e; --good:#6cc48f; --good-soft:#1b3326; --warn:#e3b04f; --warn-soft:#3a2f17; --bad:#ec7c72; --bad-soft:#3d2321; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.65}
+.wrap{max-width:1040px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:28px}
+.wrap>*{min-width:0}
+header{display:grid;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:18px}
+.eyebrow{font-size:12px;letter-spacing:.12em;color:var(--muted)}
+h1{font-family:var(--f-display);font-size:clamp(26px,4vw,36px);line-height:1.25;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-size:22px;margin:0;text-wrap:balance}
+h3{font-size:15px;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--muted);font-size:13px}
+.private{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:3px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:500;width:max-content}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.overview{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.overview{grid-template-columns:1fr}}
+.col{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:18px;display:grid;gap:12px;align-content:start}
+.col h2{font-size:18px;display:flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.point{display:grid;gap:4px;padding-top:12px;border-top:1px solid var(--line)}
+.point:first-of-type{border-top:0;padding-top:0}
+.point p{margin:0;color:var(--muted);font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12px var(--f-mono);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:4px;padding:1px 7px;cursor:pointer}
+.chip:hover,.chip:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+nav.toc a{font-size:13px;color:var(--ink);text-decoration:none;padding:4px 10px;border-radius:999px;border:1px solid var(--line)}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--accent);color:var(--accent);outline:none}
+section{display:grid;gap:14px;scroll-margin-top:60px}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-head span{color:var(--muted);font-size:13px}
+.rows{background:var(--paper);border:1px solid var(--line);border-radius:6px}
+.row{display:grid;grid-template-columns:64px minmax(0,1.3fr) minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+@media (max-width:640px){.row{grid-template-columns:52px minmax(0,1fr) auto}.row .val{grid-column:2/4}}
+.code{font:500 12px var(--f-mono);color:var(--muted)}
+.name small{display:block;color:var(--muted);font-size:12.5px}
+.val{font-size:14px}
+.pill{font-size:12px;padding:2px 9px;border-radius:999px;white-space:nowrap;font-weight:500}
+.pill.good{background:var(--good-soft);color:var(--good)}.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}.pill.na{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 56px;gap:10px;align-items:center;font-size:13px}
+.track{height:10px;background:var(--bg);border:1px solid var(--line);border-radius:3px;position:relative;overflow:hidden}
+.fill{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.mark.pre{background:var(--warn);width:3px}
+.fill.low{background:var(--bad)}
+.mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:16px;display:grid;gap:12px}
+.panel p{margin:0}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:8px;margin-right:5px;vertical-align:middle}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12.5px}
+td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.theme{display:grid;gap:3px;padding:10px 0;border-top:1px solid var(--line)}
+.theme:first-child{border-top:0}
+.theme q{color:var(--muted);font-size:13.5px}
+.sugg{display:grid;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
+.sugg:first-child{border-top:0}
+.sugg p{margin:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:4px;padding:4px 12px;cursor:pointer}
+button:hover,button:focus-visible{border-color:var(--accent);outline:none}
+button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+textarea{font:inherit;font-size:14px;width:100%;box-sizing:border-box;min-height:64px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);padding:8px}
+textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+dialog{border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);max-width:min(560px,92vw);padding:20px}
+dialog::backdrop{background:rgba(10,20,28,.45)}
+dialog h3{font-family:var(--f-display);font-size:18px;margin-bottom:8px}
+dialog ul{margin:8px 0 14px;padding-left:20px}
+footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:4px}
+.saved{font-size:12px;color:var(--good)}
+@media (prefers-reduced-motion:no-preference){.fill{transition:width .4s ease}}
+</style>
+
+<div class="wrap" id="app"></div>
+<dialog id="ev"><h3 id="ev-t"></h3><div id="ev-b"></div><button id="ev-close">关闭</button></dialog>
+
+<script>
+const D = __DATA__;
+const $ = s => document.querySelector(s);
+const pct = x => Math.round(x * 100) + '%';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const A = D.O.attain, item = c => D.F.items.find(i => i.code === c);
+
+// 证据：每个编号对应一条可以点开查看的依据
+const EV = {
+  'O1': ['掌握度增值', `全班 ${D.meta.students} 人，期初诊断平均掌握概率 ${D.O.gain.pre}，期末 ${D.O.gain.post}，增值 +${D.O.gain.gain}。来源：自适应考试掌握度记录，快照 ${D.meta.snapshot}。`],
+  'O2': ['知识点卡点', D.O.stuck.map(s => `${s.kp} ${s.name}：期末掌握率 ${pct(s.post)}，低于 50%。关联：1.3 节第 2 讲、实验 1.3。`).join('<br>')],
+  'O3': ['课程目标达成度', Object.entries(A).map(([k,v]) => `${k} ${esc(v.name)}：直接评价 ${v.direct}（${v.achieved?'达成':'未达成'}），学生自评 ${v.indirect}`).join('<br>') + '<br>方法：第 4 轮第 1 步，阈值 0.70。'],
+  'O3-CO2': ['CO2 追溯', A.CO2.weak.map(w => `${esc(w['说明'])}（${w['考核项']}）：得分率 ${w['得分率']}`).join('<br>')],
+  'E3': ['评教 E3', `“${item('E3').text}”：平均 ${item('E3').mean}，${item('E3').n} 人回答。`],
+  'E10': ['评教 E10', `“${item('E10').text}”：平均 ${item('E10').mean}，${item('E10').n} 人回答。`],
+  'E6': ['评教 E6', `“${item('E6').text}”：平均 ${item('E6').mean}，12 道行为题中最低。`],
+  'E5': ['评教 E5', `“${item('E5').text}”：平均 ${item('E5').mean}。`],
+  'F3-1': ['留言主题', `“${D.F.themes[0].theme}”：${D.F.themes[0].count} 条。代表性原话：“${D.F.themes[0].quote}”`],
+  'F3-2': ['留言主题', `“${D.F.themes[1].theme}”：${D.F.themes[1].count} 条。代表性原话：“${D.F.themes[1].quote}”`],
+  'F3-3': ['留言主题', `“${D.F.themes[2].theme}”：${D.F.themes[2].count} 条。代表性原话：“${D.F.themes[2].quote}”`],
+  'P3': ['反馈具体度', `抽样 ${D.P.P3.n} 条批改反馈，同时指出具体错误和改进方法的占 ${pct(D.P.P3.rate)}。典型例子：“分析不足”（未说明哪里不足）。AI 初判，可提出异议。`],
+  'P1': ['答疑响应时长', `${D.P.P1.n} 次提问，首次有效回复中位数 ${D.P.P1.median_h} 个工作小时（周一到周五 8:00–20:00 计时）。AI 助教已答且学生未追问的不计入。`],
+  'E8': ['评教 E8', `“${item('E8').text}”：平均 ${item('E8').mean}，${item('E8').n} 人回答。`],
+  'Q-audit': ['课程质量审核', `AI 表述审核高严重度 ${D.Q.audit_high} 条：属实 ${D.Q.audit_true}，误报 ${D.Q.audit_false}。已修改 ${D.Q.fixed_templates} 个题目模板并重新生成题库，复核全部通过。`],
+  'LAB12': ['实验 1.2 建模', '实验 1.2（里程计）“建模”分项得分率 0.48，为全章实验最低；“数值微分与采样误差”闭卷得分率 0.53。'],
+};
+
+const STRONG = [
+  {t:'用实际问题讲概念，学生认可', p:`评教“用实际问题引出概念”${item('E3').mean} 分、“虚拟实验帮助理解”${item('E10').mean} 分，为全部行为题最高；${D.F.themes[0].count} 条留言提到机器人案例和实验。`, ev:['E3','E10','F3-1']},
+  {t:'学生进步明显', p:`期初到期末，平均掌握概率从 ${D.O.gain.pre} 升到 ${D.O.gain.post}；四个课程目标中三个达成。`, ev:['O1','O3']},
+  {t:'答疑及时，学生满意', p:`答疑首次有效回复的中位数 ${D.P.P1.median_h} 个工作小时；评教“课后提问能得到及时、有用的回答”${item('E8').mean} 分。平台记录和学生感受一致。`, ev:['P1','E8']},
+];
+const IMPROVE = [
+  {t:'CO2“工程问题建模”未达成', p:`直接评价 ${A.CO2.direct}，低于 0.70。主要卡在“出手误差的灵敏度”（得分率 0.43）；学生自评 ${A.CO2.indirect}，高于实测，说明学生以为自己会了。`, ev:['O3-CO2','O2','F3-2']},
+  {t:'反馈指出了错，但没说怎么改', p:`评教“反馈告诉我怎样改进”${item('E6').mean} 分，为行为题最低；抽样反馈中只有 ${pct(D.P.P3.rate)} 写了改进方法。两项数据互相印证。`, ev:['E6','P3','F3-3']},
+  {t:'采样误差与实验 1.2 建模偏弱', p:'实验 1.2 建模分项得分率 0.48，为全章实验最低；对应知识点闭卷得分率 0.53。', ev:['LAB12','O3-CO2']},
+];
+const SUGG = [
+  {id:'s1', t:'1.3 节增加一组“两种偏差定义对比”的练习', why:'针对 CO2 未达成和“灵敏度讲得太快”的留言。练习让学生分别按水平偏差和竖直偏差计算，比较结论为什么相反。', ev:['O3-CO2','F3-2']},
+  {id:'s2', t:'批改反馈用“错在哪 + 怎么改”两句式', why:'AI 批改建议已可按此格式起草，教师确认后发布。下学期对照 E6 和反馈具体度看效果。', ev:['E6','P3']},
+  {id:'s3', t:'实验 1.2 加一段“运行前预测”的示范', why:'先示范一次从噪声 σ 推出采样间隔 T 的预测，再让学生自己做。', ev:['LAB12']},
+];
+
+function chips(ev){return `<div class="chips">${ev.map(e=>`<button class="chip" data-ev="${e}" aria-label="查看证据 ${e}">${e}</button>`).join('')}</div>`}
+function pill(cls, txt){return `<span class="pill ${cls}">${txt}</span>`}
+function row(code, name, sub, val, st){return `<div class="row"><span class="code">${code}</span><div class="name">${name}${sub?`<small>${sub}</small>`:''}</div><div class="val">${val}</div>${st}</div>`}
+function bar(label, v, opts={}){const w=Math.max(0,Math.min(1,v))*100;return `<div class="bar"><span>${label}</span><div class="track"><div class="fill ${opts.low?'low':''}" style="width:${w}%;${opts.pre!=null?'opacity:.9;':''}"></div>${opts.mark!=null?`<span class="mark" style="left:${opts.mark*100}%"></span>`:''}${opts.pre!=null?`<span class="mark pre" style="left:${opts.pre*100}%" title="期初 ${opts.pre}"></span>`:''}</div><span class="num">${opts.text??v}</span></div>`}
+
+const html = `
+<header>
+  <div class="eyebrow">问渠 · 教师发展报告 · 样稿</div>
+  <h1>${D.meta.course}</h1>
+  <div class="meta"><span>${D.meta.term}</span><span>${D.meta.teacher}</span><span>学生 <b class="num">${D.meta.students}</b> 人</span><span>评教回答 <b class="num">${D.F.responses}</b> 份</span><span>数据快照 <span class="num">${D.meta.snapshot}</span></span></div>
+  <span class="private">仅教师本人可见 · 不用于考核排名</span>
+</header>
+
+<div class="overview" aria-label="一页概览">
+  <div class="col"><h2><span class="dot" style="background:var(--good)"></span>本学期做得好的 3 件事</h2>
+    ${STRONG.map(s=>`<div class="point"><h3>${s.t}</h3><p>${s.p}</p>${chips(s.ev)}</div>`).join('')}</div>
+  <div class="col"><h2><span class="dot" style="background:var(--warn)"></span>最值得改进的 3 件事</h2>
+    ${IMPROVE.map(s=>`<div class="point"><h3>${s.t}</h3><p>${s.p}</p>${chips(s.ev)}</div>`).join('')}</div>
+</div>
+
+<nav class="toc" aria-label="报告目录"><a href="#q">课程质量</a><a href="#p">教学过程</a><a href="#o">学习成效</a><a href="#f">学生反馈</a><a href="#ai">平台 AI</a><a href="#s">改进建议与回应</a></nav>
+
+<section id="q"><div class="sec-head"><h2>课程质量</h2><span>审核：AI 起草，教师核对</span></div>
+ <div class="rows">
+  ${row('Q1','目标覆盖率','有考核对应的课程目标所占比例',`<span class="num">${pct(D.Q.Q1)}</span>`,pill('good','完整'))}
+  ${row('Q2','考核对齐率','能对应到课程目标的考核项所占比例',`<span class="num">${pct(D.Q.Q2)}</span>`,pill('good','完整'))}
+  ${row('Q3','内容复算','程序复算课件和题目中的数值',`剩 1 项：${D.Q.q3_left}`,pill('good','已处理'))}
+  ${row('Q4','中英文一致','120 道题的数字逐一对照',`<span class="num">0</span> 处不一致`,pill('good','一致'))}
+  ${row('Q5','问题题目',`作答 ≥30 人的题目自动检查`,`${D.Q.q5.length} 道：${D.Q.q5.map(q=>q['题号']+'（'+q['问题'][q['问题'].length-1]+'）').join('；')}`,pill('warn','待核查'))}
+ </div></section>
+
+<section id="p"><div class="sec-head"><h2>教学过程</h2><span>只统计教师能改进的行为；不统计在线时长</span></div>
+ <div class="rows">
+  ${row('P1','答疑响应时长','首次有效回复，只计工作时间',`中位数 <span class="num">${D.P.P1.median_h}</span> 小时 · ${D.P.P1.n} 次提问`,pill('good','及时'))}
+  ${row('P2','批改周期','截止到发布反馈',`中位数 <span class="num">${D.P.P2.median_d}</span> 天 · ${D.P.P2.n} 次作业`,pill('good','正常'))}
+  ${row('P3','反馈具体度','同时写明错误和改进方法的比例',`<span class="num">${pct(D.P.P3.rate)}</span> · 抽样 ${D.P.P3.n} 条`,pill('warn','可改进'))}
+  ${row('P4','终审处理','处理时长与理由质量',`中位数 <span class="num">${D.P.P4.median_d}</span> 天 · 理由写清依据 ${pct(D.P.P4.reason_ok)} · ${D.P.P4.n} 个案例`,pill('good','规范'))}
+  ${row('P5','课堂互动','须教师主动开启课堂分析','本学期未开启',pill('na','未开启'))}
+ </div></section>
+
+<section id="o"><div class="sec-head"><h2>学习成效</h2><span>看进步，不看绝对分</span></div>
+ <div class="panel"><h3>课程目标达成度 <span class="code">O3</span></h3>
+  <div class="legend"><span><i style="background:var(--accent)"></i>直接评价</span><span><i style="background:var(--bad)"></i>未达成</span><span><i style="background:var(--ink);width:2px"></i>阈值 0.70</span></div>
+  <div class="bars">${Object.entries(A).map(([k,v])=>bar(`${k} ${v.name}`,v.direct,{mark:.7,low:!v.achieved,text:v.direct.toFixed(3)})).join('')}</div>
+  <div class="table-wrap"><table><thead><tr><th>目标</th><th>直接评价</th><th>学生自评</th><th>个人达成比例</th></tr></thead><tbody>
+   ${Object.entries(A).map(([k,v])=>`<tr><td>${k}</td><td class="n">${v.direct.toFixed(3)} ${v.achieved?'':pill('bad','未达成')}</td><td class="n">${v.indirect}</td><td class="n">${pct(v.pass)}</td></tr>`).join('')}
+  </tbody></table></div>${chips(['O3','O3-CO2'])}</div>
+ <div class="panel"><h3>掌握度增值（按知识点） <span class="code">O1 · O2</span></h3>
+  <div class="legend"><span><i style="background:var(--warn);width:3px"></i>期初</span><span><i style="background:var(--accent)"></i>期末</span><span><i style="background:var(--bad)"></i>期末低于 50%（卡点）</span></div>
+  <div class="bars">${D.O.gain.by_kp.map(k=>bar(`${k.name}`,k.post,{pre:k.pre,low:k.post<.5,text:'+'+k.gain.toFixed(2)})).join('')}</div>
+  <p class="code">全章平均：期初 ${D.O.gain.pre} → 期末 ${D.O.gain.post}（+${D.O.gain.gain}）</p>${chips(['O1','O2'])}</div>
+ <div class="rows">
+  ${row('O4','独立理解','答辩“独立理解”一项',`平均 <span class="num">${D.O.indep}</span> / 10`,pill('good','良好'))}
+  ${row('O5','预警干预效果','干预后 4 周内信号解除',`<span class="num">${D.O.warn.resolved}/${D.O.warn.n}</span> 人`,pill('good','有效'))}
+ </div></section>
+
+<section id="f"><div class="sec-head"><h2>学生反馈</h2><span>期末评教 · ${D.F.responses} 份 · 成绩发布后可见</span></div>
+ <div class="panel"><h3>行为题（1–5 分） <span class="code">F2</span></h3>
+  <div class="bars">${D.F.items.map(i=>bar(`${i.code} ${i.text}`,(i.mean-1)/4,{low:i.mean<3.5,text:i.mean.toFixed(2)})).join('')}</div>
+  <p class="code">条形长度按 1–5 分换算；低于 3.5 分标红。</p></div>
+ <div class="panel"><h3>留言主题 <span class="code">F3</span></h3>
+  <div>${D.F.themes.map(t=>`<div class="theme"><div>${pill(t.tone==='正面'?'good':t.tone==='负面'?'bad':'warn',t.tone)} <b>${t.theme}</b> <span class="num">${t.count}</span> 条</div><q>${t.quote}</q></div>`).join('')}</div>
+  <p class="code">已隐去可识别学生身份的内容；过滤辱骂或人身攻击 ${D.F.filtered} 条（只显示条数）。</p></div>
+ <div class="panel"><h3>评教与成效对照 <span class="code">F4</span></h3>
+  <p>“反馈告诉我怎样改进”得分低（${item('E6').mean}），抽样反馈具体度也只有 ${pct(D.P.P3.rate)}，两者一致，结论可信。</p>
+  <p>CO2 学生自评 ${A.CO2.indirect}，高于直接评价 ${A.CO2.direct}：学生对建模能力的自我感觉好于实际。</p></div>
+</section>
+
+<section id="ai"><div class="sec-head"><h2>平台 AI</h2><span>平台里的 AI 也接受评价</span></div>
+ <div class="rows">
+  ${row('A1','助教准确率','教师抽检',`<span class="num">${pct(D.AI.A1.rate)}</span> · 抽检 ${D.AI.A1.n} 条（目标 ≥90%）`,pill('good','达标'))}
+  ${row('A2','助教无帮助率','学生标记“没帮助”',`<span class="num">${pct(D.AI.A2.rate)}</span> · ${D.AI.A2.n} 次回答`,pill('good','正常'))}
+  ${row('A3','批改一致性','AI 建议分与终审分相差 ≤10%',`<span class="num">${pct(D.AI.A3.rate)}</span> · ${D.AI.A3.n} 份（目标 ≥80%）`,pill('good','达标'))}
+  ${row('A4','答辩组可靠性','申诉改判与共同误判',`改判 ${D.AI.A4.appeal_changed} 场 · 共同误判 ${D.AI.A4.common_error} 次（已按 G1 修复）· ${D.AI.A4.n} 场`,pill('warn','已修复'))}
+ </div></section>
+
+<section id="s"><div class="sec-head"><h2>改进建议与回应</h2><span>采纳与否由教师决定；本页的选择只保存在这个页面里</span></div>
+ <div class="rows">${SUGG.map(s=>`<div class="sugg" data-id="${s.id}"><h3>${s.t}</h3><p>${s.why}</p>${chips(s.ev)}
+   <div class="actions" role="group" aria-label="对这条建议的处理">${['采纳','暂缓','不同意'].map(a=>`<button type="button" data-act="${a}" aria-pressed="false">${a}</button>`).join('')}</div></div>`).join('')}</div>
+ <div class="panel"><label for="plan"><h3>下学期改进计划</h3></label>
+  <textarea id="plan" placeholder="例如：1.3 节增加偏差定义对比练习；批改反馈统一写“错在哪 + 怎么改”。下学期报告会对照这里写的计划看效果。"></textarea>
+  <label for="objection"><h3>对报告结论的异议</h3></label>
+  <textarea id="objection" placeholder="写明针对哪一条（如 P3 反馈具体度）以及理由。异议会与该结论并列显示，不会被删除。"></textarea>
+  <div class="actions"><button type="button" id="save">保存回应</button><span class="saved" id="saved" hidden>已保存（样稿只保存在本页）</span></div></div>
+</section>
+
+<footer><span>${D.meta.note}。</span><span>规则：样本不足时只显示“样本不足”；期中反馈和本报告只给教师本人；院系只看课程和院系层面的汇总（H1）。</span><span>生成日期 ${D.meta.generated} · 课程 ${D.meta.course_code}</span></footer>`;
+$('#app').innerHTML = html;
+
+// 证据弹窗
+const dlg = $('#ev');
+document.addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const [t, b] = EV[c.dataset.ev] || ['证据', '（样稿未提供）'];
+  $('#ev-t').textContent = c.dataset.ev + ' · ' + t; $('#ev-b').innerHTML = '<p>' + b + '</p>';
+  dlg.showModal();
+});
+$('#ev-close').onclick = () => dlg.close();
+dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+// 建议处理（三选一）
+document.querySelectorAll('.sugg .actions').forEach(g => g.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  g.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+}));
+$('#save').onclick = () => { $('#saved').hidden = false; setTimeout(() => $('#saved').hidden = true, 2500); };
+</script>

@@ -1,0 +1,19 @@
+# 评价系统（第 83 轮）：改了 services/eval/ 就跑流水线的 11 条规则检查和报告生成
+name: Eval pipeline 评价系统检查
+
+on:
+  push:
+    paths: ["services/eval/**", ".github/workflows/eval.yml"]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q numpy jsonschema openpyxl python-docx pytest
+      - run: python -m pytest -q services/eval/tests

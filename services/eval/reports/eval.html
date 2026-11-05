@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>评价系统演示 · Assessment demo — WenQuest</title>
+<meta name="description" content="问渠评价系统闭环演示：学生、教师、学校三端，自动生成课程目标达成报告与教学质量报告（模拟数据）">
+<!-- 由 services/eval/reports/build.py 复制到 site/eval/（第 83 轮），数据在同目录 data.json -->
+<style>
+  :root { --paper:#f4f2ec; --surface:#fbfaf6; --ink:#121c21; --muted:#56656b; --line:#d6d2c6; --accent:#7a5a00; --ok:#2f8a5b; --bad:#c2362b; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper:#0f181c; --surface:#152127; --ink:#e6ecee; --muted:#93a3a9; --line:#2a3a41; --accent:#f2c94c; --ok:#3fbf85; --bad:#ff6b5e; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:400 16px/1.7 "IBM Plex Sans","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+  html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display:none !important; }
+  main { max-width:1180px; margin:0 auto; padding:24px 16px 72px; }
+  .top { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .top a { color:var(--muted); text-decoration:none; font-size:14px; }
+  .top button, .tabs button { font:inherit; font-size:14px; background:none; color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:5px 14px; cursor:pointer; }
+  h1 { font:700 clamp(26px,4vw,38px)/1.25 "Noto Serif SC","Source Serif 4",serif; margin:24px 0 6px; }
+  h2 { font:600 20px/1.35 "Noto Serif SC","Source Serif 4",serif; margin:28px 0 10px; }
+  .lead { color:var(--muted); margin:0 0 6px; max-width:75ch; }
+  .note { font-size:13.5px; color:var(--muted); border-left:3px solid var(--accent); padding-left:10px; margin:10px 0 0; }
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin:22px 0 4px; }
+  .tabs button[aria-selected="true"] { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .pane { display:none; } .pane.on { display:block; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; }
+  .card { border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:14px 16px; min-width:0; }
+  .card b { display:block; font-size:15px; margin-bottom:4px; }
+  .card .big { font:600 28px/1.2 "IBM Plex Mono",ui-monospace,monospace; }
+  .card small { color:var(--muted); font-size:13px; display:block; }
+  .steps { counter-reset:s; list-style:none; padding:0; margin:0; display:grid; gap:8px; }
+  .steps li { counter-increment:s; border:1px solid var(--line); border-radius:8px; background:var(--surface); padding:10px 14px 10px 48px; position:relative; }
+  .steps li::before { content:counter(s); position:absolute; left:14px; top:10px; font:600 15px/1.6 "IBM Plex Mono",monospace; color:var(--accent); }
+  table { border-collapse:collapse; width:100%; font-size:14.5px; }
+  th, td { border-bottom:1px solid var(--line); padding:7px 8px; text-align:left; vertical-align:top; }
+  .ok { color:var(--ok); font-weight:600; } .bad { color:var(--bad); font-weight:600; }
+  .bar { height:8px; background:var(--line); border-radius:4px; overflow:hidden; margin-top:4px; } .bar i { display:block; height:100%; background:var(--accent); }
+  .rep { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .rep a { color:var(--accent); }
+  .btn { display:inline-block; border:1px solid var(--ink); padding:9px 14px; border-radius:3px; text-decoration:none; color:var(--ink); font-size:15px; }
+  .tbl { overflow-x:auto; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a href="/">← <span data-zh>问渠首页</span><span data-en>WenQuest home</span></a><button id="langBtn" type="button">EN</button></div>
+  <h1><span data-zh>评价系统：从一次作答到一份评估报告</span><span data-en>Assessment: from one answer to an accreditation report</span></h1>
+  <p class="lead"><span data-zh>面向高校的本科教学审核评估、专业认证和校内教学评估：学生每一步学习都留下证据，教师只处理需要人判断的案例，学校一键得到课程目标达成报告和教学质量报告；专业层的毕业要求达成报告由校情中枢汇总。</span><span data-en>Built for university audits, program accreditation and internal teaching reviews: every learning step leaves evidence, teachers handle only the cases that need human judgement, and the school gets course-objective and teaching-quality reports in one click; program-level reports come from the Campus Hub.</span></p>
+  <p class="note"><span data-zh>演示数据：一门《大学物理（上）》、30 人模拟班（其中 2 人模拟照抄）。所有数字由评价流水线计算，规则检查</span><span data-en>Demo data: one physics course, a simulated class of 30 (two simulated copiers). Every number is computed by the pipeline; rule checks passed:</span> <b id="checks"></b></p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" data-p="stu" aria-selected="true"><span data-zh>学生端</span><span data-en>Student</span></button>
+    <button role="tab" data-p="tea" aria-selected="false"><span data-zh>教师端</span><span data-en>Teacher</span></button>
+    <button role="tab" data-p="sch" aria-selected="false"><span data-zh>学校端 · 评估报告</span><span data-en>School · reports</span></button>
+  </div>
+
+  <section class="pane on" id="stu">
+    <h2><span data-zh>一个学生的一学期：8 步</span><span data-en>A student's term in 8 steps</span></h2>
+    <ol class="steps">
+      <li><span data-zh>期初诊断：自适应出题，每人不超过 10 题，画出知识点掌握图</span><span data-en>Diagnostic: adaptive, at most 10 items, a knowledge map</span></li>
+      <li><span data-zh>学习路径：每次推荐 3–5 项，以“熟练”为达标线，测验后立即更新</span><span data-en>Learning path: 3–5 recommendations, updated after every quiz</span></li>
+      <li><span data-zh>练习：按路径练，掌握概率随作答更新</span><span data-en>Practice: mastery updates with every answer</span></li>
+      <li><span data-zh>5 个虚拟实验：过程分 40% + 报告 60%，运行前要先预测</span><span data-en>Five virtual labs: process 40% + report 60%; predict before you run</span></li>
+      <li><span data-zh>章节自适应考试</span><span data-en>Adaptive chapter exam</span></li>
+      <li><span data-zh>AI 答辩组合议：分歧大、在及格线附近的转交教师</span><span data-en>AI defense panel; split or borderline cases go to the teacher</span></li>
+      <li><span data-zh>成绩单：知识 55 / 实践 30 / 综合 15，七档等级和四维画像，每项分数都有证据</span><span data-en>Transcript: 55/30/15, seven grades, a four-axis profile, evidence for every score</span></li>
+      <li><span data-zh>有未结的终审案例时，成绩单暂缓发布</span><span data-en>Transcripts with open review cases are held</span></li>
+    </ol>
+    <h2><span data-zh>三个学生的成绩单</span><span data-en>Three transcripts</span></h2>
+    <div class="grid" id="stuCards"></div>
+  </section>
+
+  <section class="pane" id="tea">
+    <h2><span data-zh>教师只看需要人判断的案例</span><span data-en>Teachers see only the cases that need them</span></h2>
+    <div class="grid" id="teaCards"></div>
+    <h2><span data-zh>样例：照抄型学生 S006</span><span data-en>Example: student S006 (simulated copier)</span></h2>
+    <div class="card" id="s006"></div>
+  </section>
+
+  <section class="pane" id="sch">
+    <h2><span data-zh>课程目标达成度（直接评价与间接评价分开）</span><span data-en>Course objectives (direct and indirect kept apart)</span></h2>
+    <div class="tbl"><table id="coTable"></table></div>
+    <h2><span data-zh>一键生成的报告</span><span data-en>Generated reports</span></h2>
+    <div class="grid">
+      <div class="card"><b>课程目标达成情况评价报告</b><small><span data-zh>专业认证中每门课都要的那份；改进措施待教师确认</span><span data-en>Required for every course in accreditation</span></small>
+        <p class="rep"><a href="课程目标达成情况评价报告.html"><span data-zh>网页版</span><span data-en>Web</span></a><a href="课程目标达成情况评价报告.docx">Word</a></p></div>
+      <div class="card"><b>课程教学质量报告</b><small><span data-zh>学业结果、增值、预警、评教、持续改进</span><span data-en>Results, gain, alerts, student feedback, improvement</span></small>
+        <p class="rep"><a href="课程教学质量报告.html"><span data-zh>网页版</span><span data-en>Web</span></a><a href="课程教学质量报告.docx">Word</a></p></div>
+      <div class="card"><b>毕业要求达成情况评价报告</b><small><span data-zh>专业层，由校情中枢汇总各课程生成</span><span data-en>Program level, built by the Campus Hub</span></small>
+        <p class="rep"><a href="/xq/毕业要求达成情况评价报告.html"><span data-zh>网页版</span><span data-en>Web</span></a><a href="/xq/毕业要求达成情况评价报告.docx">Word</a></p></div>
+    </div>
+    <p style="margin-top:22px"><a class="btn" href="/xq/"><span data-zh>进入校情中枢（学校 → 学院 → 专业）→</span><span data-en>Open the Campus Hub →</span></a></p>
+  </section>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("langBtn"), stored = null;
+  try { stored = localStorage.getItem("wq-site-lang"); } catch (e) {}
+  function set(l) { root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", l); } catch (e) {} }
+  set(stored || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en"));
+  btn.onclick = function () { set(root.lang === "en" ? "zh" : "en"); };
+  document.querySelectorAll(".tabs button").forEach(function (b) {
+    b.onclick = function () {
+      document.querySelectorAll(".tabs button").forEach(function (x) { x.setAttribute("aria-selected", x === b); });
+      document.querySelectorAll(".pane").forEach(function (p) { p.classList.toggle("on", p.id === b.dataset.p); });
+    };
+  });
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  fetch("data.json").then(function (r) { return r.json(); }).then(function (d) {
+    var c = d.course;
+    document.getElementById("checks").textContent = c.checks_ok;
+    document.getElementById("stuCards").innerHTML = d.sample_students.map(function (s) {
+      var p = s.profile;
+      return '<div class="card"><b>' + esc(s.id) + " · " + esc(s.grade) + "（" + s.total + "）</b><small>知识 " + s.A + " · 实践 " + s.B + " · 综合 " + s.C + "</small>" +
+        Object.keys(p).map(function (k) { return '<small style="margin-top:6px">' + esc(k) + " " + p[k] + '</small><div class="bar"><i style="width:' + p[k] + '%"></i></div>'; }).join("") + "</div>";
+    }).join("");
+    var r = c.review, rs = r["按原因"];
+    document.getElementById("teaCards").innerHTML =
+      '<div class="card"><b>终审队列</b><span class="big">' + r["总数"] + "</span><small>" + Object.keys(rs).filter(function (k) { return rs[k]; }).map(function (k) { return esc(k) + " " + rs[k]; }).join("、") + "</small></div>" +
+      '<div class="card"><b>暂缓发布成绩单</b><span class="big">' + r["暂缓发布成绩单"].length + "</span><small>" + r["暂缓发布成绩单"].join("、") + "（等口试）</small></div>" +
+      '<div class="card"><b>学业预警</b><span class="big">' + c.risks + "</span><small>推送任课教师、辅导员</small></div>" +
+      '<div class="card"><b>最弱知识点</b><small>' + c.weak.map(esc).join("<br>") + "</small></div>";
+    var s = c.s006;
+    document.getElementById("s006").innerHTML = "<b>闭卷 " + s.A + " · 实验 " + s.B + " · 答辩 " + s.C + " · 总评 " + s["总评"] + "（" + esc(s["等级"]) + "）</b>" +
+      "<small>疑点：" + s["疑点"].map(esc).join("；") + "</small><small>终审：" + esc(s["终审"]["决定"]) + "。理由：" + esc(s["终审"]["理由"]) + "</small>" +
+      '<small style="margin-top:6px">只看闭卷分数会被蒙混过去；过程考核和答辩把问题拦了下来。AI 不下作弊结论。</small>';
+    var o = c.objectives;
+    document.getElementById("coTable").innerHTML = "<thead><tr><th>课程目标</th><th>直接评价</th><th>间接评价（自评）</th><th>个人达成比例</th><th>结论</th></tr></thead><tbody>" +
+      Object.keys(o).map(function (k) { var v = o[k];
+        return "<tr><td><b>" + k + "</b> " + esc(v.name) + "</td><td>" + v.direct.toFixed(3) + "</td><td>" + v.indirect.toFixed(3) + "</td><td>" + Math.round(v.pass_rate * 100) + '%</td><td class="' + (v.achieved ? "ok" : "bad") + '">' + (v.achieved ? "达成" : "未达成") + "</td></tr>"; }).join("") + "</tbody>";
+  });
+})();
+</script>
+</body>
+</html>

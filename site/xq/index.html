@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>校情中枢演示 · Campus Hub demo — WenQuest</title>
+<meta name="description" content="校情中枢 V0 演示：学校、学院、专业三级看板，毕业要求达成，规则亮灯，改进任务闭环，自动生成评估报告（模拟数据）">
+<!-- 由 services/eval/reports/build.py 复制到 site/xq/（第 83 轮），数据在同目录 data.json -->
+<style>
+  :root { --paper:#eef1f0; --surface:#ffffff; --ink:#14212b; --muted:#55666e; --line:#cdd5d3; --accent:#7a5a00; --ok:#1f8a5b; --warn:#b07a00; --bad:#c2362b; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --paper:#0f171c; --surface:#16222a; --ink:#e5ecea; --muted:#93a4a9; --line:#2a3a42; --accent:#f5c22e; --ok:#3fbf85; --warn:#f5c22e; --bad:#ff6b5e; color-scheme: dark; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:400 15.5px/1.65 "IBM Plex Sans","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
+  html:not([lang="en"]) [data-en], html[lang="en"] [data-zh] { display:none !important; }
+  main { max-width:1240px; margin:0 auto; padding:20px 16px 72px; }
+  .top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+  .top a { color:var(--muted); text-decoration:none; font-size:14px; }
+  button { font:inherit; font-size:14px; background:none; color:var(--ink); border:1px solid var(--line); border-radius:999px; padding:5px 14px; cursor:pointer; }
+  h1 { font:700 clamp(24px,3.6vw,34px)/1.25 "Noto Serif SC",serif; margin:18px 0 4px; }
+  h2 { font:600 18px/1.4 "Noto Serif SC",serif; margin:26px 0 10px; display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
+  h2 small { font:400 13px/1 sans-serif; color:var(--muted); }
+  .lead { color:var(--muted); margin:0; max-width:80ch; }
+  .note { font-size:13px; color:var(--muted); border-left:3px solid var(--accent); padding-left:10px; margin-top:8px; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin-top:16px; }
+  .kpi { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+  .kpi b { display:block; font:600 26px/1.2 "IBM Plex Mono",ui-monospace,monospace; } .kpi span { color:var(--muted); font-size:13px; }
+  .cols { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:12px; }
+  .col { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:12px 14px; min-width:0; }
+  .col h3 { margin:0 0 8px; font:600 16px/1.4 "Noto Serif SC",serif; }
+  .prog { border-top:1px solid var(--line); padding:8px 0; cursor:pointer; }
+  .prog:hover { background:color-mix(in srgb, var(--accent) 6%, transparent); }
+  .prog .name { display:flex; justify-content:space-between; gap:8px; font-weight:600; }
+  .dots { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
+  .dot { font:500 11.5px/1 "IBM Plex Mono",monospace; padding:4px 6px; border-radius:4px; background:color-mix(in srgb, var(--ok) 16%, transparent); color:var(--ok); }
+  .dot.low { background:color-mix(in srgb, var(--bad) 16%, transparent); color:var(--bad); }
+  .dot.near { background:color-mix(in srgb, var(--warn) 18%, transparent); color:var(--warn); }
+  .tag { font:500 11px/1 monospace; border:1px solid var(--line); border-radius:999px; padding:3px 7px; color:var(--muted); }
+  table { border-collapse:collapse; width:100%; font-size:14px; background:var(--surface); }
+  th, td { border-bottom:1px solid var(--line); padding:7px 9px; text-align:left; vertical-align:top; }
+  .tbl { overflow-x:auto; border:1px solid var(--line); border-radius:8px; }
+  .ok { color:var(--ok); font-weight:600; } .bad { color:var(--bad); font-weight:600; }
+  .act { font-size:13px; padding:3px 10px; }
+  .rep a { color:var(--accent); margin-right:14px; }
+  #detail { display:none; } #detail.on { display:block; }
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><a href="/eval/">← <span data-zh>评价系统演示</span><span data-en>Assessment demo</span></a><button id="langBtn" type="button">EN</button></div>
+  <h1><span data-zh>校情中枢 · 示例大学</span><span data-en>Campus Hub · Demo University</span></h1>
+  <p class="lead"><span data-zh>一张图看全校的教学质量：问渠按数据约定推送各门课的达成度、增值、评教和预警，校情中枢汇总到专业的毕业要求，规则自动亮灯，一键给负责人派改进任务，自动生成审核评估、专业认证要的报告。</span><span data-en>The school's teaching quality at a glance: WenQuest pushes course attainment, learning gain, feedback and alerts under a data contract; the hub rolls them up to each program's graduate attributes, flags problems, assigns improvement tasks and drafts the reports audits and accreditation ask for.</span></p>
+  <p class="note"><span data-zh>V0 演示（第 83 轮）：机器人工程专业里《大学物理（上）》一门课由评价流水线真算（模拟学生），其余课程、其余专业为模拟数值。</span><span data-en>V0 demo: one course in Robotics Engineering is computed by the pipeline (simulated students); all other values are simulated.</span></p>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2><span data-zh>学院与专业</span><span data-en>Colleges and programs</span><small><span data-zh>每个小块是一个毕业要求指标点；红 = 低于 0.70，黄 = 0.70–0.72。点专业看明细</span><span data-en>Each chip is a graduate-attribute indicator; red &lt; 0.70, amber 0.70–0.72. Click a program</span></small></h2>
+  <div class="cols" id="cols"></div>
+
+  <section id="detail">
+    <h2 id="dTitle"></h2>
+    <div class="tbl"><table id="dTable"></table></div>
+    <p class="rep" id="dRep"></p>
+  </section>
+
+  <h2><span data-zh>改进任务（评价—反馈—改进闭环）</span><span data-en>Improvement tasks (evaluate, feed back, improve)</span><small><span data-zh>任务按问渠数据约定回发到课程，下学期复核</span><span data-en>Sent back to courses under the data contract; re-checked next term</span></small></h2>
+  <div class="tbl"><table id="tasks"></table></div>
+
+  <h2><span data-zh>报告</span><span data-en>Reports</span></h2>
+  <p class="rep"><b>毕业要求达成情况评价报告</b>　<a href="毕业要求达成情况评价报告.html"><span data-zh>网页版</span><span data-en>Web</span></a><a href="毕业要求达成情况评价报告.docx">Word</a></p>
+  <p class="rep"><b>课程目标达成情况评价报告、课程教学质量报告</b>（<span data-zh>问渠出</span><span data-en>from WenQuest</span>）　<a href="/eval/课程目标达成情况评价报告.html">达成报告</a><a href="/eval/课程教学质量报告.html">质量报告</a></p>
+  <p class="note"><span data-zh>后续（见《校情中枢架构与方案》）：教务数据导入、审核评估与专业认证的佐证材料管理、整本专业自评报告、AI 周报与风险提醒、真实学校试点。</span><span data-en>Next: registrar data import, evidence management for audits and accreditation, full self-study reports, AI weekly briefs, a pilot school.</span></p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById("langBtn"), stored = null;
+  try { stored = localStorage.getItem("wq-site-lang"); } catch (e) {}
+  function set(l) { root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", l); } catch (e) {} }
+  set(stored || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en"));
+  btn.onclick = function () { set(root.lang === "en" ? "zh" : "en"); };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  fetch("data.json").then(function (r) { return r.json(); }).then(function (d) {
+    var T = d.threshold, progs = [], low = 0, pts = 0, risk = 0;
+    d.colleges.forEach(function (c) { c.programs.forEach(function (p) { progs.push(p); risk += p.risk; p.points.forEach(function (x) { pts++; if (x.v < T) low++; }); }); });
+    document.getElementById("kpis").innerHTML =
+      '<div class="kpi"><b>' + d.colleges.length + '</b><span>学院</span></div><div class="kpi"><b>' + progs.length + '</b><span>专业</span></div>' +
+      '<div class="kpi"><b>' + low + " / " + pts + '</b><span>未达成的指标点</span></div><div class="kpi"><b>' + risk + '</b><span>学业预警（人）</span></div>' +
+      '<div class="kpi"><b>' + d.tasks.length + '</b><span>改进任务</span></div>';
+    document.getElementById("cols").innerHTML = d.colleges.map(function (c) {
+      return '<div class="col"><h3>' + esc(c.name) + "</h3>" + c.programs.map(function (p, i) {
+        return '<div class="prog" data-p="' + esc(p.name) + '"><div class="name"><span>' + esc(p.name) + "</span>" + (p.real ? '<span class="tag">含真算</span>' : '<span class="tag">模拟</span>') + '</div><div class="dots">' +
+          p.points.map(function (x) { return '<span class="dot' + (x.v < T ? " low" : x.v < T + 0.02 ? " near" : "") + '" title="' + esc(x.id) + '">' + esc(x.id.split(" ")[0]) + " " + x.v.toFixed(2) + "</span>"; }).join("") +
+          '</div><small style="color:var(--muted)">学业预警 ' + p.risk + " 人</small></div>";
+      }).join("") + "</div>";
+    }).join("");
+    document.querySelectorAll(".prog").forEach(function (el) {
+      el.onclick = function () {
+        var p = progs.filter(function (x) { return x.name === el.dataset.p; })[0], det = document.getElementById("detail");
+        det.classList.add("on");
+        document.getElementById("dTitle").textContent = p.name + " · 毕业要求指标点";
+        if (p.real) {
+          document.getElementById("dTable").innerHTML = "<thead><tr><th>指标点</th><th>加权和法</th><th>最小值法</th><th>支撑课程（权重 · 达成度）</th></tr></thead><tbody>" +
+            d.points.map(function (x) { return "<tr><td>" + esc(x.id) + '</td><td class="' + (x.achieved ? "ok" : "bad") + '">' + x.weighted.toFixed(3) + "</td><td>" + x.min.toFixed(3) + "</td><td>" +
+              x.support.map(function (s) { return esc(s.course) + (s.example ? "（示例）" : "") + " " + s.w + " · " + s.v.toFixed(3); }).join("<br>") + "</td></tr>"; }).join("") + "</tbody>";
+          document.getElementById("dRep").innerHTML = '<a href="毕业要求达成情况评价报告.html">毕业要求达成情况评价报告</a><a href="毕业要求达成情况评价报告.docx">Word</a>';
+        } else {
+          document.getElementById("dTable").innerHTML = "<thead><tr><th>指标点</th><th>达成（模拟）</th></tr></thead><tbody>" +
+            p.points.map(function (x) { return "<tr><td>" + esc(x.id) + '</td><td class="' + (x.v < T ? "bad" : "ok") + '">' + x.v.toFixed(3) + "</td></tr>"; }).join("") + "</tbody>";
+          document.getElementById("dRep").innerHTML = "<span style='color:var(--muted)'>模拟专业：接入该专业各课程的数据后自动生成报告</span>";
+        }
+        det.scrollIntoView({ behavior: "smooth", block: "start" });
+      };
+    });
+    document.getElementById("tasks").innerHTML = "<thead><tr><th>编号</th><th>发给</th><th>对象</th><th>原因</th><th>期限</th><th>状态</th></tr></thead><tbody>" +
+      d.tasks.map(function (t) { return "<tr><td>" + esc(t.id) + "</td><td>" + esc(t.to) + "</td><td>" + esc(t.target) + "</td><td>" + esc(t.reason) + "</td><td>" + esc(t.due) + "</td><td>" +
+        (t.status === "待下达" ? '<button class="act" type="button" onclick="this.outerHTML=\'已下达\'">下达</button>' : esc(t.status)) + "</td></tr>"; }).join("") + "</tbody>";
+  });
+})();
+</script>
+</body>
+</html>

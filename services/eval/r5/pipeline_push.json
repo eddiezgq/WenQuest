@@ -1,0 +1,454 @@
+{
+ "contract_version": "1.0",
+ "direction": "问渠→校情中枢",
+ "school_id": "SCH-DEMO",
+ "source": "wenquest",
+ "generated_at": "2027-01-20T10:00:00+08:00",
+ "batch_id": "WQ-RUN-0001",
+ "records": [
+  {
+   "kind": "course_objective_attainment",
+   "privacy": "汇总",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "课程目标达成度",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "n_students": 30,
+   "threshold": 0.7,
+   "student_pass_line": 0.6,
+   "objectives": [
+    {
+     "co_id": "CO1",
+     "name": "理解并运用运动学的基本概念和规律",
+     "direct": 0.782,
+     "achieved": true,
+     "student_pass_rate": 0.9,
+     "indirect": 0.82,
+     "components": [
+      {
+       "name": "闭卷：基础知识点",
+       "weight": 1.0,
+       "rate": 0.782
+      }
+     ],
+     "evidence": {
+      "url": "https://wenquest.example.cn/evidence/PHY1101-01/CO1",
+      "scope": "课程负责人"
+     }
+    },
+    {
+     "co_id": "CO2",
+     "name": "能为机器人等工程问题建立运动学模型并求解",
+     "direct": 0.624,
+     "achieved": false,
+     "student_pass_rate": 0.333,
+     "indirect": 0.753,
+     "components": [
+      {
+       "name": "闭卷：建模类知识点",
+       "weight": 0.5,
+       "rate": 0.733
+      },
+      {
+       "name": "实验过程：建模",
+       "weight": 0.3,
+       "rate": 0.363
+      },
+      {
+       "name": "答辩：方法",
+       "weight": 0.2,
+       "rate": 0.744
+      }
+     ],
+     "evidence": {
+      "url": "https://wenquest.example.cn/evidence/PHY1101-01/CO2",
+      "scope": "课程负责人"
+     }
+    },
+    {
+     "co_id": "CO3",
+     "name": "能用虚拟实验检验模型，处理数据并分析误差",
+     "direct": 0.843,
+     "achieved": true,
+     "student_pass_rate": 0.933,
+     "indirect": 0.84,
+     "components": [
+      {
+       "name": "实验过程：结果、方法、探索",
+       "weight": 0.5,
+       "rate": 0.89
+      },
+      {
+       "name": "实验报告：数据、分析",
+       "weight": 0.5,
+       "rate": 0.795
+      }
+     ],
+     "evidence": {
+      "url": "https://wenquest.example.cn/evidence/PHY1101-01/CO3",
+      "scope": "课程负责人"
+     }
+    },
+    {
+     "co_id": "CO4",
+     "name": "能清楚表达工程判断，说明模型的适用范围",
+     "direct": 0.755,
+     "achieved": true,
+     "student_pass_rate": 0.967,
+     "indirect": 0.8,
+     "components": [
+      {
+       "name": "实验报告：实际问题、规范",
+       "weight": 0.4,
+       "rate": 0.785
+      },
+      {
+       "name": "答辩：判断、表达、独立理解",
+       "weight": 0.6,
+       "rate": 0.735
+      }
+     ],
+     "evidence": {
+      "url": "https://wenquest.example.cn/evidence/PHY1101-01/CO4",
+      "scope": "课程负责人"
+     }
+    }
+   ]
+  },
+  {
+   "kind": "learning_gain",
+   "privacy": "汇总",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "掌握度增值",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "n_students": 30,
+   "pre_mean": 0.381,
+   "post_mean": 0.593,
+   "gain": 0.212
+  },
+  {
+   "kind": "feedback_themes",
+   "privacy": "汇总",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "期末评教主题",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "n_responses": 27,
+   "round": "期末",
+   "themes": [
+    {
+     "theme": "虚拟实验和机器人案例让概念变直观",
+     "count": 11,
+     "tone": "正面"
+    },
+    {
+     "theme": "灵敏度分析讲得太快",
+     "count": 7,
+     "tone": "负面"
+    }
+   ]
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S001",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "伽利略速度合成、按目标求初速度、出手误差的灵敏度"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S002",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "数值微分与采样误差、抛体运动方程、出手误差的灵敏度、侧翻与侧滑条件"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S004",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "按目标求初速度、出手误差的灵敏度、侧翻与侧滑条件"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S005",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "数值微分与采样误差、相对运动与航向修正"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S008",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "参考系与坐标系、数值微分与采样误差、按目标求初速度、出手误差的灵敏度、向心加速度、侧翻与侧滑条件、相对运动与航向修正"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S012",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "抛体运动方程、按目标求初速度、出手误差的灵敏度、侧翻与侧滑条件"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S017",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "参考系与坐标系、伽利略速度合成、数值微分与采样误差、出手误差的灵敏度"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S021",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "伽利略速度合成、位矢、位移与速度、数值微分与采样误差、抛体运动方程、出手误差的灵敏度、侧翻与侧滑条件"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S026",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "参考系与坐标系、伽利略速度合成、数值微分与采样误差、抛体运动方程、按目标求初速度、出手误差的灵敏度、向心加速度、侧翻与侧滑条件、相对运动与航向修正"
+    }
+   ],
+   "expires": "2027-03-31"
+  },
+  {
+   "kind": "student_risk",
+   "privacy": "个人",
+   "offering": {
+    "course_code": "PHY1101",
+    "term": "2026-2027-1",
+    "offering_id": "PHY1101-01",
+    "course_name": "大学物理（上）"
+   },
+   "provenance": {
+    "method": "学业预警规则 v0",
+    "method_version": "1.0",
+    "snapshot_id": "run-2026-11-05"
+   },
+   "student_ref": "S030",
+   "purpose": "学业预警与辅导",
+   "visible_to": [
+    "任课教师",
+    "辅导员"
+   ],
+   "signals": [
+    {
+     "type": "知识点未掌握",
+     "detail": "伽利略速度合成、数值微分与采样误差、抛体运动方程、按目标求初速度、出手误差的灵敏度、侧翻与侧滑条件、相对运动与航向修正"
+    }
+   ],
+   "expires": "2027-03-31"
+  }
+ ]
+}

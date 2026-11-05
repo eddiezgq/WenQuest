@@ -11,6 +11,8 @@ groups:
       - {zh: "AI 建课", en: "AI course building", dz: "对话中建课，资料再乱也由 AI 整理", de: "Build a course by conversation; the AI sorts out the materials", url: "https://learn.wenquestrobotics.com/pages/studio/studio", login: true}
       - {zh: "教材", en: "Textbooks", dz: "九本自编教材和网页版教材，每章配程序、动画、虚拟实验", de: "Nine textbooks of our own plus web editions, each chapter with code, animations and labs", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true}
       - {zh: "课程目录", en: "Course catalog", dz: "缝纫机设计与制造等已上线的课程", de: "Courses online now, such as sewing machine design", url: "https://learn.wenquestrobotics.com/pages/catalog/catalog", login: true}
+      - {zh: "评价系统（演示）", en: "Assessment (demo)", dz: "学生、教师、学校三端，自动生成课程目标达成报告、教学质量报告", de: "Student, teacher and school views; course-objective and teaching-quality reports in one click", url: "/eval/"}
+      - {zh: "校情中枢（演示）", en: "Campus Hub (demo)", dz: "学校、学院、专业看板，毕业要求达成、改进任务、评估报告", de: "School, college and program dashboards, graduate attributes, improvement tasks, reports", url: "/xq/"}
       - {zh: "网页互动课件", en: "Interactive web slides", dz: "像 PPT 一样翻页，动画、实验、三维模型当场操作", de: "Page through like slides, with live animations, labs and 3D models", url: "/solutions/sewing/"}
   - key: make
     zh: 内容制作软件

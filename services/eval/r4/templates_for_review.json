@@ -1,0 +1,472 @@
+[
+ {
+  "模板": "T-1.1-a1",
+  "知识点": "P1-1.1-a",
+  "中文题干": "列车以 {vt} m/s 向前行驶，乘客在车厢内以 {vw} m/s 向车尾走。求乘客相对地面的速度（向前为正）。",
+  "英文题干": "A train moves forward at {vt} m/s; a passenger walks toward the rear at {vw} m/s. Find the passenger's velocity relative to the ground (forward positive).",
+  "参数范围": {
+   "vt": [
+    10,
+    30,
+    2
+   ],
+   "vw": [
+    1,
+    3,
+    0.5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.1-a2",
+  "知识点": "P1-1.1-a",
+  "中文题干": "取向东为正。A 车向东 {vA} m/s，B 车向西 {vB} m/s。求 B 相对 A 的速度（带正负号）。",
+  "英文题干": "East is positive. Car A moves east at {vA} m/s and car B moves west at {vB} m/s. Find B's velocity relative to A (with sign).",
+  "参数范围": {
+   "vA": [
+    5,
+    25,
+    5
+   ],
+   "vB": [
+    5,
+    25,
+    5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.1-b1",
+  "知识点": "P1-1.1-b",
+  "中文题干": "传送带以 {u} m/s 向右运动，夹爪相对传送带竖直向下以 {w} m/s 运动。求夹爪对地速度的大小及其与水平方向的夹角。",
+  "英文题干": "A conveyor moves right at {u} m/s; the gripper moves straight down relative to the belt at {w} m/s. Find the gripper's ground speed and its angle below the horizontal.",
+  "参数范围": {
+   "u": [
+    0.3,
+    0.8,
+    0.05
+   ],
+   "w": [
+    0.1,
+    0.4,
+    0.05
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.1-b2",
+  "知识点": "P1-1.1-b",
+  "中文题干": "雨滴竖直下落，速度 {vr} m/s；汽车以 {vc} m/s 行驶。车窗上雨痕与竖直方向的夹角是多少？",
+  "英文题干": "Rain falls vertically at {vr} m/s; a car drives at {vc} m/s. What angle do the rain streaks on the side window make with the vertical?",
+  "参数范围": {
+   "vr": [
+    4,
+    10,
+    1
+   ],
+   "vc": [
+    5,
+    30,
+    5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.2-a1",
+  "知识点": "P1-1.2-a",
+  "中文题干": "质点位矢 r = ({A}t, {B}t²)（m，t 单位 s）。求 t = {t} s 时的速率。",
+  "英文题干": "A particle has position r = ({A}t, {B}t²) m. Find its speed at t = {t} s.",
+  "参数范围": {
+   "A": [
+    1,
+    4,
+    0.5
+   ],
+   "B": [
+    0.5,
+    2,
+    0.5
+   ],
+   "t": [
+    1,
+    4,
+    1
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.2-a2",
+  "知识点": "P1-1.2-a",
+  "中文题干": "机器人 {dt} s 内从 ({x1}, {y1}) m 移动到 ({x2}, {y2}) m。求这段时间内平均速度的大小。",
+  "英文题干": "A robot moves from ({x1}, {y1}) m to ({x2}, {y2}) m in {dt} s. Find the magnitude of its average velocity.",
+  "参数范围": {
+   "x1": [
+    0,
+    2,
+    1
+   ],
+   "y1": [
+    0,
+    2,
+    1
+   ],
+   "x2": [
+    3,
+    8,
+    1
+   ],
+   "y2": [
+    2,
+    6,
+    1
+   ],
+   "dt": [
+    2,
+    10,
+    2
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.2-b1",
+  "知识点": "P1-1.2-b",
+  "中文题干": "移动机器人里程计位置测量噪声 σ = {sigma} m，速度约 {v} m/s。用相邻两次位置差估算速率，要求误差小于 {err_pct}%，采样间隔 T 至少多大？",
+  "英文题干": "An odometer has position noise σ = {sigma} m; the robot moves at about {v} m/s. Estimating speed from two successive positions, what minimum sampling interval T keeps the error below {err_pct}%?",
+  "参数范围": {
+   "sigma": [
+    0.005,
+    0.02,
+    0.005
+   ],
+   "v": [
+    0.3,
+    1.0,
+    0.1
+   ],
+   "err": [
+    0.03,
+    0.1,
+    0.01
+   ]
+  },
+  "判分容差": 0.02
+ },
+ {
+  "模板": "T-1.2-b2",
+  "知识点": "P1-1.2-b",
+  "中文题干": "里程计位置噪声 σ = {sigma} m，机器人速度 {v} m/s，采样间隔 T = {T} s。用相邻两次位置差估算速率，相对误差约为多少（%）？",
+  "英文题干": "Odometer noise σ = {sigma} m, speed {v} m/s, sampling interval T = {T} s. Estimating speed from two successive positions, what is the relative error (%)?",
+  "参数范围": {
+   "sigma": [
+    0.005,
+    0.02,
+    0.005
+   ],
+   "v": [
+    0.3,
+    1.0,
+    0.1
+   ],
+   "T": [
+    0.2,
+    1.0,
+    0.1
+   ]
+  },
+  "判分容差": 0.02
+ },
+ {
+  "模板": "T-1.3-a1",
+  "知识点": "P1-1.3-a",
+  "中文题干": "小球从 {h} m 高处以 {v} m/s 水平抛出，不计空气阻力。求水平射程。",
+  "英文题干": "A ball is thrown horizontally at {v} m/s from {h} m high. Ignoring drag, find its horizontal range.",
+  "参数范围": {
+   "h": [
+    1,
+    20,
+    1
+   ],
+   "v": [
+    2,
+    15,
+    1
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.3-a2",
+  "知识点": "P1-1.3-a",
+  "中文题干": "以 {v0} m/s、仰角 {theta}° 抛出小球，不计空气阻力。求上升的最大高度（相对出手点）。",
+  "英文题干": "A ball is launched at {v0} m/s, {theta}° above horizontal. Ignoring drag, find the maximum height above the launch point.",
+  "参数范围": {
+   "v0": [
+    5,
+    25,
+    1
+   ],
+   "theta": [
+    20,
+    70,
+    5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.3-b1",
+  "知识点": "P1-1.3-b",
+  "中文题干": "投篮机器人在 {h0} m 高处出手，篮筐高 {hoop} m、水平距离 {x} m，出手角 {theta}°。不计空气阻力，求出手速度。",
+  "英文题干": "A shooting robot releases at {h0} m height; the hoop is {hoop} m high and {x} m away; launch angle {theta}°. Ignoring drag, find the launch speed.",
+  "参数范围": {
+   "h0": [
+    0.6,
+    1.2,
+    0.1
+   ],
+   "hoop": [
+    2.43,
+    2.43,
+    0
+   ],
+   "x": [
+    3.0,
+    5.0,
+    0.5
+   ],
+   "theta": [
+    45,
+    65,
+    5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.3-b2",
+  "知识点": "P1-1.3-b",
+  "中文题干": "铅球在 {h0} m 高处以 {v0} m/s 推出，不计空气阻力。出手角多大时最远？最远多少米？（角度精确到 0.1°）",
+  "英文题干": "A shot is released at {h0} m height with speed {v0} m/s. Ignoring drag, what launch angle gives the longest throw, and how far is it? (angle to 0.1°)",
+  "参数范围": {
+   "h0": [
+    1.6,
+    2.2,
+    0.1
+   ],
+   "v0": [
+    10,
+    14,
+    0.5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.3-c1",
+  "知识点": "P1-1.3-c",
+  "中文题干": "投篮机器人在 {h0} m 高处出手，篮筐高 {hoop} m、水平距离 {x} m，出手角 {theta}°。若出手速度误差 ±{dv} m/s，球到达篮筐高度时的水平偏差约为多少米？",
+  "英文题干": "Release at {h0} m, hoop {hoop} m high and {x} m away, angle {theta}°. If launch speed is off by ±{dv} m/s, about how far off horizontally is the ball at hoop height?",
+  "参数范围": {
+   "h0": [
+    0.8,
+    0.8,
+    0
+   ],
+   "hoop": [
+    2.43,
+    2.43,
+    0
+   ],
+   "x": [
+    3.5,
+    5.0,
+    0.5
+   ],
+   "theta": [
+    45,
+    65,
+    10
+   ],
+   "dv": [
+    0.1,
+    0.2,
+    0.05
+   ]
+  },
+  "判分容差": 0.03
+ },
+ {
+  "模板": "T-1.3-c2",
+  "知识点": "P1-1.3-c",
+  "中文题干": "投篮机器人在 {h0} m 高处出手，篮筐高 {hoop} m、水平距离 {x} m，出手角 {theta}°。要求球到达篮筐高度时水平偏差不超过 ±{e} m，出手速度最多允许误差多少（m/s）？",
+  "英文题干": "Release at {h0} m, hoop {hoop} m high and {x} m away, angle {theta}°. To keep the horizontal miss at hoop height within ±{e} m, what is the largest allowed launch-speed error (m/s)?",
+  "参数范围": {
+   "h0": [
+    0.6,
+    1.0,
+    0.2
+   ],
+   "hoop": [
+    2.43,
+    2.43,
+    0
+   ],
+   "x": [
+    3.5,
+    5.0,
+    0.5
+   ],
+   "theta": [
+    45,
+    65,
+    10
+   ],
+   "e": [
+    0.05,
+    0.15,
+    0.05
+   ]
+  },
+  "判分容差": 0.02
+ },
+ {
+  "模板": "T-1.4-a1",
+  "知识点": "P1-1.4-a",
+  "中文题干": "机器人以 {v} m/s 沿半径 {R} m 的圆弧行驶。求向心加速度。",
+  "英文题干": "A robot drives at {v} m/s around an arc of radius {R} m. Find its centripetal acceleration.",
+  "参数范围": {
+   "v": [
+    0.5,
+    3.0,
+    0.5
+   ],
+   "R": [
+    0.5,
+    3.0,
+    0.5
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.4-a2",
+  "知识点": "P1-1.4-a",
+  "中文题干": "机械臂末端绕基座转动，角速度 {w} rad/s，到转轴距离 {r} m。求末端线速度和向心加速度。",
+  "英文题干": "An arm's end effector rotates about the base at {w} rad/s, {r} m from the axis. Find its linear speed and centripetal acceleration.",
+  "参数范围": {
+   "w": [
+    0.5,
+    4,
+    0.5
+   ],
+   "r": [
+    0.3,
+    1.2,
+    0.1
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.4-b1",
+  "知识点": "P1-1.4-b",
+  "中文题干": "AGV 以半径 {R} m 转弯，重心高 {h} m，轮距 {b} m，轮地摩擦系数 {mu}。求开始侧翻和开始侧滑的速度，并判断哪个先发生。",
+  "英文题干": "An AGV turns on radius {R} m; centre of mass {h} m high, track width {b} m, friction coefficient {mu}. Find the speeds at which it starts to tip and to slip, and which comes first.",
+  "参数范围": {
+   "R": [
+    1.0,
+    3.0,
+    0.5
+   ],
+   "h": [
+    0.3,
+    0.8,
+    0.1
+   ],
+   "b": [
+    0.4,
+    0.8,
+    0.1
+   ],
+   "mu": [
+    0.4,
+    0.8,
+    0.1
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.4-b2",
+  "知识点": "P1-1.4-b",
+  "中文题干": "为保证舒适，侧向加速度不超过 {k}g。转弯半径 {R} m 时最高车速是多少（m/s 和 km/h）？",
+  "英文题干": "For comfort, lateral acceleration must stay below {k}g. On a {R} m radius, what is the maximum speed (m/s and km/h)?",
+  "参数范围": {
+   "k": [
+    0.1,
+    0.4,
+    0.05
+   ],
+   "R": [
+    1,
+    600,
+    0
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.5-a1",
+  "知识点": "P1-1.5-a",
+  "中文题干": "无人机空速 {va} m/s，侧风 {vw} m/s（垂直于航线），要沿直线飞到 {d} m 外的目标。求机头偏转角、地速、飞行时间，以及比无风时多用的时间。",
+  "英文题干": "A drone has airspeed {va} m/s with a {vw} m/s crosswind and must fly straight to a target {d} m away. Find the heading correction, ground speed, flight time and the extra time compared with no wind.",
+  "参数范围": {
+   "va": [
+    8,
+    15,
+    1
+   ],
+   "vw": [
+    2,
+    6,
+    1
+   ],
+   "d": [
+    500,
+    2000,
+    250
+   ]
+  },
+  "判分容差": 0.01
+ },
+ {
+  "模板": "T-1.5-a2",
+  "知识点": "P1-1.5-a",
+  "中文题干": "河宽 {W} m，水流速度 {w} m/s，小船相对水速度 {u} m/s。(1) 船头始终垂直河岸，过河用时多少、被冲下多远？(2) 要正对岸到达，过河用时多少？",
+  "英文题干": "A river is {W} m wide with current {w} m/s; the boat moves at {u} m/s relative to the water. (1) Heading straight across, how long does it take and how far downstream does it land? (2) To land directly opposite, how long does it take?",
+  "参数范围": {
+   "W": [
+    40,
+    200,
+    20
+   ],
+   "w": [
+    0.5,
+    2.0,
+    0.5
+   ],
+   "u": [
+    2,
+    5,
+    0.5
+   ]
+  },
+  "判分容差": 0.01
+ }
+]
