@@ -25,9 +25,46 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[2]
 
 
+class Handler(http.server.SimpleHTTPRequestHandler):
+    """静态文件 + 转发：环境变量 WQ_PROXY="cam=8301,bearing=8302" 把 /cam/… 转到本机 8301（去掉前缀），
+    和线上 Caddy 的 handle_path 一样——这样凸轮、轴承这类自带页面的服务也能按 /cam/ 截图。"""
+    def log_message(self, *a):
+        pass
+
+    def _proxy(self):
+        import os
+        import urllib.request
+        for item in filter(None, os.environ.get("WQ_PROXY", "").split(",")):
+            pre, port = item.split("=")
+            if self.path.startswith(f"/{pre}/") or self.path == f"/{pre}":
+                n = int(self.headers.get("content-length") or 0)
+                body = self.rfile.read(n) if n else None
+                req = urllib.request.Request(f"http://127.0.0.1:{port}" + (self.path[len(pre) + 1:] or "/"), data=body, method=self.command,
+                                             headers={k: v for k, v in self.headers.items() if k.lower() in ("content-type", "accept")})
+                try:
+                    r = urllib.request.urlopen(req, timeout=120)
+                    code, data, ct = r.status, r.read(), r.headers.get("content-type", "")
+                except urllib.error.HTTPError as e:
+                    code, data, ct = e.code, e.read(), e.headers.get("content-type", "")
+                self.send_response(code)
+                self.send_header("content-type", ct)
+                self.send_header("content-length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+                return True
+        return False
+
+    def do_GET(self):
+        if not self._proxy():
+            super().do_GET()
+
+    def do_POST(self):
+        if not self._proxy():
+            self.send_error(404)
+
+
 def serve(directory: Path) -> int:
-    h = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(directory))
-    h.log_message = lambda *a: None
+    h = functools.partial(Handler, directory=str(directory))
     srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), h)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv.server_address[1]
@@ -106,7 +143,7 @@ def main(d: str):
         for lang in ("zh", "en"):
             ctx = b.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1.5,
                                 locale="zh-CN" if lang == "zh" else "en-US")
-            ctx.add_init_script(f"try{{localStorage.setItem('wq-site-lang','{lang}')}}catch(e){{}}")
+            ctx.add_init_script(f"try{{for (const k of ['wq-site-lang','wqcam-lang','wqbearing-lang']) localStorage.setItem(k,'{lang}')}}catch(e){{}}")
             ctx.route("**/assist.js", lambda r: r.fulfill(body="", content_type="text/javascript"))   # 画面里不要客服按钮
             p = ctx.new_page()
             for c in spec.get("capture") or []:
@@ -128,9 +165,13 @@ def main(d: str):
                     im.save(dst, quality=88)
                     continue
                 p.goto(f"http://127.0.0.1:{port}{c['url']}", wait_until="networkidle")
-                for sel in ([c["click"]] if isinstance(c.get("click"), str) else c.get("click") or []):
+                if c.get("select"):                   # [下拉框, 第几项]：比如凸轮、轴承软件里选一个示例
+                    p.select_option(c["select"][0], index=int(c["select"][1]))
+                    p.wait_for_timeout(int(c.get("wait_select", 2500)))
+                ck = c.get(f"click_{lang}", c.get("click"))     # 按钮文字分中英时写 click_en
+                for sel in ([ck] if isinstance(ck, str) else ck or []):
                     p.click(sel)
-                    p.wait_for_timeout(300)
+                    p.wait_for_timeout(int(c.get("wait_click", 600)))
                 if c.get("js"):
                     p.evaluate(c["js"])
                 if c.get("find"):                     # 按文字找标题，滚到它

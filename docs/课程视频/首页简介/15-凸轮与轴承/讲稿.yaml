@@ -1,0 +1,169 @@
+# 首页视频简介 15 · 问渠凸轮与问渠轴承（第 86 轮第二批）。画面：本机起的凸轮、轴承服务（services/cam、services/bearing + apps/ 网页）
+# 的真界面，用 intro_shots.py 的 WQ_PROXY="cam=8301,bearing=8302" 按 /cam/、/bearing/ 截；软件自带中英界面。
+standalone: true
+langs: [zh, en]
+title: [问渠凸轮与问渠轴承：网页里的行业设计软件, 'WenQuest Cam and WenQuest Bearing: industry design software in the browser']
+brand: [行业软件, Industry software]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的示例尺寸和参数是演示用的虚构数据。, 'Example sizes and parameters shown are fictional demo data.']
+tags:
+  zh: [凸轮设计, 凸轮机构, 轴承设计, 轴承选型, 机械设计, 有限元, SPC, FreeCAD, 问渠]
+  en: [cam design, cam mechanism, bearing design, mechanical design, FEA, SPC, FreeCAD, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: cam-single, url: /cam/, wait: 3000}
+  - {name: cam-sys, url: /cam/, select: ["select >> nth=0", 1], wait: 2000}
+  - {name: cam-3d, url: /cam/, select: ["select >> nth=0", 1], click: 'button:text-is("三维与制造")', click_en: 'button:text-is("3D & manufacturing")', wait: 6000}
+  - {name: cam-cae, url: /cam/, select: ["select >> nth=0", 1], click: 'button:text-is("CAE 分析")', click_en: 'button:text-is("CAE analysis")', wait: 6000}
+  - {name: brg, url: /bearing/, wait: 3000}
+  - {name: brg-asm, url: /bearing/, click: ['button:text-is("合套选配")', 'button:text-is("用合成数据试一试")', 'button:text-is("配套")'],
+     click_en: ['button:text-is("Selective assembly")', 'button:text-is("Try with synthetic data")', 'button:text-is("Match")'], wait: 2500}
+  - {name: brg-spc, url: /bearing/, click: ['button:text-is("检测与 SPC")', 'button:text-is("控制图与过程能力")', 'button:text-is("用合成数据试一试")', 'button:text-is("画控制图")'],
+     click_en: ['button:text-is("Inspection & SPC")', 'button:text-is("Control charts")', 'button:text-is("Try with synthetic data")', 'button:text-is("Plot")'], wait: 2500}
+  - {name: brg-parts, url: /bearing/, click: 'button:text-is("零件图与三维")', click_en: 'button:text-is("Parts & 3D")', wait: 5000}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: cam-3d, title: [网页里的行业设计软件, Industry design software in the browser],
+          sub: [问渠凸轮 · 问渠轴承：网页直接用，计算核心和数字工厂相同, 'WenQuest Cam and WenQuest Bearing: right in the browser, on the same engine as the digital factory']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠凸轮和问渠轴承，是两款已经可以交付的行业设计软件，网页直接用，不用安装。']
+    en: ['>WenQuest Cam and WenQuest Bearing are two industry design tools ready to deliver. They run in the browser, nothing to install.']
+- id: s02
+  kind: page
+  page: 2
+  part: [问渠凸轮, WenQuest Cam]
+  slide:
+    img: cam-single
+    url: wenquestrobotics.com/cam
+    kick: [问渠凸轮, WenQuest Cam]
+    title: [定运动规律，当场校核, 'Set the motion, check it on the spot']
+    points:
+      - {text: [按段定义运动规律, Define the motion segment by segment], ring: [1, 22, 28, 30]}
+      - {text: [位移、速度、加速度曲线实时更新, 'Displacement, velocity and acceleration update live'], ring: [18, 75, 82, 25]}
+      - {text: [压力角、曲率、冲击逐项校核, 'Pressure angle, curvature and jerk checked item by item'], ring: [73, 15, 27, 60]}
+  steps: [{show: 0.17}, {show: 0.5}, {show: 1}]
+  say:
+    zh: ['>设计一个凸轮：按段定运动规律，', '>位移、速度、加速度曲线当场画出来，', '>压力角、曲率、冲击逐项校核；也可以一句话让 AI 起草。']
+    en: ['>Designing a cam starts with the motion, segment by segment.', '>Displacement, velocity and acceleration are drawn at once,', '>and pressure angle, curvature and jerk are checked item by item. Or let the AI draft it from one sentence.']
+- id: s03
+  kind: page
+  page: 3
+  part: [问渠凸轮, WenQuest Cam]
+  slide:
+    img: cam-sys
+    url: wenquestrobotics.com/cam
+    kick: [整套机构, The whole mechanism]
+    title: [时序、转矩、残余振动一起算, 'Timing, torque and residual vibration together']
+    points:
+      - {text: [时序图：几个凸轮怎么配合, 'Timing diagram: how the cams work together'], zoom: [1.5, 50, 20]}
+      - {text: [自动搜索最高转速, Search for the highest safe speed]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>整套凸轮机构一起算：时序图、凸轮轴和电机转矩、停歇段残余振动，', '>还能自动搜索满足限值的最高转速。']
+    en: ['>A whole cam mechanism is worked out together: timing, camshaft and motor torque, residual vibration in the dwells,', '>and an automatic search for the highest speed within the limits.']
+- id: s04
+  kind: page
+  page: 4
+  part: [问渠凸轮, WenQuest Cam]
+  slide:
+    img: cam-3d
+    url: wenquestrobotics.com/cam
+    kick: [三维与制造, 3D and manufacturing]
+    title: [三维模型、加工程序、FreeCAD, '3D models, CNC programs, FreeCAD']
+    points:
+      - {text: [弧面分度凸轮三维模型, The globoidal cam in 3D], zoom: [1.4, 30, 50]}
+      - {text: [四轴加工程序、STEP、FreeCAD 工作台一键下载, '4-axis program, STEP and a FreeCAD workbench to download']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>三维模型当场转动查看，', '>四轴加工程序、STEP 文件、FreeCAD 工作台，一键下载。']
+    en: ['>Turn the 3D model right on the page,', '>then download the 4-axis program, the STEP files and a FreeCAD workbench.']
+- id: s05
+  kind: page
+  page: 5
+  part: [问渠凸轮, WenQuest Cam]
+  slide:
+    img: cam-cae
+    url: wenquestrobotics.com/cam
+    kick: [CAE 分析, CAE analysis]
+    title: [有限元、疲劳、多体动力学, 'FEA, fatigue, multibody dynamics']
+    points:
+      - {text: [和数字工厂同一套计算核心, The same engine as the digital factory]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>有限元、疲劳寿命、整机多体动力学，用的是和数字工厂同一套计算核心。']
+    en: ['>FEA, fatigue life and whole-machine multibody dynamics run on the same engine as the digital factory.']
+- id: s06
+  kind: page
+  page: 6
+  part: [问渠轴承, WenQuest Bearing]
+  slide:
+    img: brg
+    url: wenquestrobotics.com/bearing
+    kick: [问渠轴承, WenQuest Bearing]
+    title: [八类轴承，一页校核, 'Eight bearing types, checked on one page']
+    points:
+      - {text: [深沟球、角接触、圆锥、圆柱、谐波柔性、薄壁……, 'Deep groove, angular contact, tapered, cylindrical, harmonic flexible, thin-section...'], ring: [1, 9, 22, 20]}
+      - {text: [游隙链、钢球载荷、接触应力、寿命, 'Clearance chain, ball loads, contact stress, life'], ring: [72, 10, 27, 85]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>问渠轴承：深沟球、角接触、圆锥、圆柱、谐波柔性、薄壁，', '>游隙链、钢球载荷、接触应力和寿命，一页校核。']
+    en: ['>WenQuest Bearing covers deep groove, angular contact, tapered, cylindrical, harmonic flexible and thin-section bearings,', '>with the clearance chain, ball loads, contact stress and life checked on one page.']
+- id: s07
+  kind: page
+  page: 7
+  part: [问渠轴承, WenQuest Bearing]
+  slide:
+    img: brg-asm
+    url: wenquestrobotics.com/bearing
+    kick: [合套选配, Selective assembly]
+    title: [贴入实测尺寸，自动配套, 'Paste the measurements, match automatically']
+    points:
+      - {text: [内外圈和钢球按游隙配成套, 'Rings and balls matched for clearance']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>生产也管得到：贴入内外圈的实测尺寸，自动配套。']
+    en: ['>It reaches into production too: paste the ring measurements and it matches the sets automatically.']
+- id: s08
+  kind: page
+  page: 8
+  part: [问渠轴承, WenQuest Bearing]
+  slide:
+    img: brg-spc
+    url: wenquestrobotics.com/bearing
+    kick: [检测与 SPC, Inspection and SPC]
+    title: [圆度波纹度、控制图与过程能力, 'Roundness, waviness, control charts, capability']
+    points:
+      - {text: [检测数据进来，过程能力当场算, Measurements in; process capability computed on the spot]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>检测数据进来，圆度波纹度、控制图和过程能力当场算。']
+    en: ['>Inspection data comes in, and roundness, waviness, control charts and process capability follow at once.']
+- id: s09
+  kind: page
+  page: 9
+  part: [问渠轴承, WenQuest Bearing]
+  slide:
+    img: brg-parts
+    url: wenquestrobotics.com/bearing
+    kick: [零件图与三维, Parts and 3D]
+    title: [零件图、STEP，带进 FreeCAD, 'Part drawings and STEP, into FreeCAD']
+    points:
+      - {text: [内圈、外圈、滚动体分别出图, 'Inner ring, outer ring and rolling elements, each drawn']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>内圈、外圈、滚动体分别出零件图和三维模型，可以带进 FreeCAD 继续设计。']
+    en: ['>Inner ring, outer ring and rolling elements each get a drawing and a 3D model, ready to continue in FreeCAD.']
+- id: s10
+  kind: page
+  page: 10
+  part: [结尾, Outro]
+  slide: {layout: end, img: cam-sys, title: [打开就能用, Open it and use it],
+          sub: [演示不用登录；计算书一键出, 'No sign-in for the demo; reports in one click'], link: [问渠官网首页 → 工程软件, 'wenquestrobotics.com/cam · /bearing']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>两款软件都能在问渠官网首页直接打开，演示不用登录，计算书一键生成。']
+    en: ['>Both open straight from the WenQuest homepage. No sign-in for the demo, and reports come in one click.']
