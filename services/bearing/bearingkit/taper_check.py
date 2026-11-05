@@ -22,6 +22,7 @@ from bearingkit import roller as RL
 from bearingkit import scenarios as SC
 from bearingkit import taper as TP
 from bearingkit import taper_pair as TPP
+from bearingkit import taper_thermal as TT
 from bearingkit.analyze import FAIL, INFO, NA, PASS, UNKNOWN, ProjectError, _ck, _label, _limit, _num, scenario_cases
 
 E_STEEL = 206000.0
@@ -133,14 +134,155 @@ def pair_config(p: dict, b) -> dict | None:
             else "give the distance between the two bearings (the span L of the application)"
         )
     sweep = (_num(pr.get("sweep_from")), _num(pr.get("sweep_to")))
+    chain = thermal_chain(p, b, arr, spacing, e)
     return {
         "arrangement": arr,
         "mount": mount,
-        "endplay": e,
+        "endplay": chain["operating"] if chain["operating"] is not None else chain["mounted"],  # the one worked
+        "endplay_set": e,
         "spacing": spacing,
         "setting": setting,
         "sweep": sweep if None not in sweep and sweep[0] != sweep[1] else None,
+        "chain": chain,
     }
+
+
+MISSING_ZH = {
+    "T_ref": "调整时温度",
+    "T_i": "内圈温度",
+    "T_o": "外圈温度",
+    "T_shaft": "轴温度",
+    "T_house": "轴承座温度",
+    "a_ring": "轴承钢线膨胀系数",
+    "a_shaft": "轴线膨胀系数",
+    "a_house": "轴承座线膨胀系数",
+}
+THERMAL_KEYS = ("T_ref", "T_shaft", "T_house", "a_ring", "a_shaft", "a_house")
+
+
+def thermal_chain(p: dict, b, arr: str, spacing: float, e: float) -> dict:
+    """From the end play as set to work (plan section 二十一): fits if set before mounting, ring temperatures, the
+    shaft against the housing. Nothing taken unless asked (the setting temperature or a coefficient given); asked
+    but incomplete: the operating end play is unknown and the cases run at the mounted end play."""
+    pr, ft, s_, m = p.get("pair") or {}, p.get("fits") or {}, p.get("size") or {}, p.get("material") or {}
+    basis = pr.get("basis") or "mounted"
+    do = b.dm + b.D * math.cos(b.ao)
+    di = b.dm - b.D * math.cos(b.ai)
+    try:
+        gi, so = TT.fits(
+            basis,
+            _num(s_.get("d")),
+            _num(s_.get("D")),
+            di,
+            do,
+            _num(ft.get("shaft_I")) or 0.0,
+            _num(ft.get("housing_I")) or 0.0,
+            _num(m.get("E")) or E_STEEL,
+            _num(m.get("nu")) or 0.3,
+        )
+    except TT.ThermalError as ex:
+        raise ProjectError(str(ex)) from ex
+    asked = any(_num(pr.get(k)) is not None for k in THERMAL_KEYS)
+    temps, missing = None, []
+    if asked:
+        v = {k: _num(pr.get(k)) for k in THERMAL_KEYS} | {"T_i": _num(ft.get("T_i")), "T_o": _num(ft.get("T_o"))}
+        v["T_shaft"] = v["T_shaft"] if v["T_shaft"] is not None else v["T_i"]  # blank: the shaft at the cone's
+        v["T_house"] = v["T_house"] if v["T_house"] is not None else v["T_o"]
+        missing = [k for k, x in v.items() if x is None]
+        if not missing:
+            temps = v | {k: v[k] * 1e-6 for k in ("a_ring", "a_shaft", "a_house")}
+    out = TT.operating(e, arr, spacing, b.ao, do, gi, so, temps)
+    return out | {
+        "basis": basis,
+        "asked": asked,
+        "missing": missing,
+        "apex": TT.apex_distance(b.ao, do) if arr == "DB" else None,
+    }
+
+
+def _um(x):
+    return f"{x * 1000:+.1f} µm"
+
+
+def work_checks(pc: dict, pair: TPP.Pair) -> list:
+    """The end play at work and how it got there (plan section 二十一)."""
+    c = pc["chain"]
+    steps_zh = [f"调整值 {_um(c['set'])}"]
+    steps_en = [f"as set {_um(c['set'])}"]
+    if c["basis"] == "bench":
+        steps_zh.append(f"配合（装前调好，压装后内圈滚道胀大、外圈滚道缩小）{_um(c['fit'])}")
+        steps_en.append(f"fits (set before mounting; the rings pressed in) {_um(c['fit'])}")
+    out = []
+    if c["operating"] is not None:
+        steps_zh += [f"内外圈温差 {_um(c['radial'])}", f"轴与轴承座轴向热伸长 {_um(c['axial'])}"]
+        steps_en += [f"ring temperatures {_um(c['radial'])}", f"shaft against housing, axially {_um(c['axial'])}"]
+        if c["apex"] is not None:
+            steps_zh.append(
+                f"背对背两列距离为 {c['apex']:.1f} mm 时（外圈滚道锥顶重合），"
+                "若轴与内圈同温、轴承座与外圈同温且同一种钢，两项温度影响相互抵消"
+            )
+            steps_en.append(
+                f"back to back: at a row distance of {c['apex']:.1f} mm (the cup raceway apexes meet) the two heat "
+                "terms cancel when the shaft is at the cones' temperature, the housing at the cups' and all one steel"
+            )
+        steps_zh.append("简化：滚子按内圈温度，外圈径向按自身温度，配合按调整时温度")
+        steps_en.append("simplified: the rollers at the cone's temperature, the cups by their own, the fits as set")
+        out.append(
+            _ck(
+                "endplay_work",
+                "工作时轴向游隙（负数为预紧；各工况按这个值计算）",
+                "End play at work (negative: preload; the cases run at it)",
+                c["operating"] * 1000,
+                None,
+                INFO,
+                "µm",
+                "; ".join(steps_en),
+                "；".join(steps_zh),
+            )
+        )
+        out.append(
+            _ck(
+                "preload_work",
+                "工作时预紧力（无外载时每列的轴向力）",
+                "Preload at work (axial force in each row with no outside load)",
+                pair.preload_force(),
+                None,
+                INFO,
+                "N",
+            )
+        )
+    elif c["asked"]:
+        names = "、".join(MISSING_ZH.get(k, k) for k in c["missing"])
+        out.append(
+            _ck(
+                "endplay_work",
+                "工作时轴向游隙（负数为预紧）",
+                "End play at work (negative: preload)",
+                None,
+                None,
+                UNKNOWN,
+                "µm",
+                f"missing: {', '.join(c['missing'])}; the cases run at the end play after mounting",
+                f"缺：{names}；各工况暂按装好后的游隙计算",
+            )
+        )
+    else:
+        note_zh = "；".join(steps_zh + [f"装好后 {_um(c['mounted'])}"]) if c["basis"] == "bench" else ""
+        out.append(
+            _ck(
+                "endplay_work",
+                "工作时轴向游隙",
+                "End play at work",
+                c["mounted"] * 1000 if c["basis"] == "bench" else None,
+                None,
+                INFO,
+                "µm" if c["basis"] == "bench" else "",
+                "temperature not taken: give the setting temperature, the working temperatures and the expansion "
+                "coefficients",
+                (note_zh + "；" if note_zh else "") + "未计温度：填调整时温度、工作温度和线膨胀系数后计算",
+            )
+        )
+    return out
 
 
 def _pair_run(pr: TPP.Pair, b, P) -> dict:
@@ -180,11 +322,12 @@ def _pair_run(pr: TPP.Pair, b, P) -> dict:
     return {**best, "rows": summ, "u": u}
 
 
-def setting_curve(pr: TPP.Pair, b, P, e_from_um: float, e_to_um: float, n: int = 21) -> dict:
-    """Sweep the end play: the largest contact stress, the rollers carrying load (both rows) and the axial stiffness."""
+def setting_curve(pr: TPP.Pair, b, P, e_from_um: float, e_to_um: float, n: int = 21, shift: float = 0.0) -> dict:
+    """Sweep the end play: the largest contact stress, the rollers carrying load (both rows) and the axial stiffness.
+    The sweep is of the end play as set; shift (mm) is what fits and heat add at work (plan section 二十一)."""
     out = {"e_um": [], "p_max": [], "loaded": [], "k_axial": [], "preload": []}
     for e_um in np.linspace(e_from_um, e_to_um, n):
-        q = TPP.Pair(b, pr.arr, pr.s, e_um / 1000)
+        q = TPP.Pair(b, pr.arr, pr.s, e_um / 1000 + shift)
         try:
             r = _pair_run(q, b, P)
             k = TPP.stiffness(q, P, r["u"])["axial"]
@@ -321,7 +464,7 @@ def analyse(p: dict) -> dict:
                 "endplay",
                 "轴向游隙（安装时调整；负数为预紧）",
                 "End play set at mounting (negative: preload)",
-                pc["endplay"] * 1000,
+                pc["endplay_set"] * 1000,
                 None,
                 INFO,
                 "µm",
@@ -332,12 +475,13 @@ def analyse(p: dict) -> dict:
                 "preload",
                 "预紧力（无外载时每列的轴向力）",
                 "Preload (axial force in each row with no outside load)",
-                pair.preload_force(),
+                TPP.Pair(b, pc["arrangement"], pc["spacing"], pc["endplay_set"]).preload_force(),
                 None,
                 INFO,
                 "N",
             )
         )
+        checks += work_checks(pc, pair)
     else:
         checks.append(
             _ck(
@@ -677,12 +821,16 @@ def analyse(p: dict) -> dict:
     }
     if pc:
         out["pair"] = {k: v for k, v in pc.items() if k != "sweep"} | {
-            "endplay_um": pc["endplay"] * 1000,
-            "preload": pair.preload_force(),
+            "endplay_um": pc["endplay_set"] * 1000,
+            "work_um": pc["endplay"] * 1000,
+            "preload": TPP.Pair(b, pc["arrangement"], pc["spacing"], pc["endplay_set"]).preload_force(),
+            "preload_work": pair.preload_force(),
         }
         out["pair_rows"] = rp["rows"] if rp else None
         if pc["sweep"] and rp:
-            out["setting_curve"] = setting_curve(pair, b, sc["cases"][kp]["P"], *pc["sweep"])
+            out["setting_curve"] = setting_curve(
+                pair, b, sc["cases"][kp]["P"], *pc["sweep"], shift=pc["endplay"] - pc["endplay_set"]
+            )
     if rp:
         d_ = rp["dist"]
         out["balls"] = {

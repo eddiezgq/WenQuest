@@ -111,6 +111,9 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
 ]
 
 
+ERR_ZH += [  # a tapered pair from the setting to work (plan section 二十一)
+    (r"^the end play is set on the mounted rings or before mounting", "游隙要么装好后调，要么装前调好（选其一）"),
+]
 ERR_ZH += [  # selective assembly (step 5)
     (r"^give the number of balls per bearing", "请填每套轴承的钢球数（至少 3）"),
     (r"^give the required clearance range$", "请填要求的游隙范围"),

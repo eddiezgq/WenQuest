@@ -21,6 +21,7 @@ TYPES = ["deep_groove", "angular", "cylindrical", "tapered", "flex", "crossed"]
 BALL, ROLLER = ["deep_groove", "angular"], ["cylindrical", "tapered"]
 RIGID = ["deep_groove", "angular", "cylindrical", "tapered"]  # the types with lubrication and fatigue checks
 LOADED = RIGID + ["crossed"]  # the types loaded through an application (not the flexible bearing, plan 十八)
+TP2 = {"type": ["tapered"], "pair": ["DB", "DF"]}  # a tapered pair (plan sections 十六, 二十一)
 SCENES = ["generic", "gearbox", "motor", "spindle", "hub", "joint", "camshaft"]
 AB = [("A", None), ("B", None)]
 
@@ -300,12 +301,30 @@ GROUPS = [
     ),
     (
         "gFits",
-        {"type": ["deep_groove", "cylindrical"]},
+        {"type": ["deep_groove", "cylindrical", "tapered"]},
         [
-            F("fits.shaft_I", "shaft_I", "mm", step=0.001),
-            F("fits.housing_I", "housing_I", "mm", step=0.001),
-            F("fits.T_i", "T_i", "°C"),
-            F("fits.T_o", "T_o", "°C"),
+            F("fits.shaft_I", "shaft_I", "mm", step=0.001, when={"type": ["deep_groove", "cylindrical"]}),
+            F("fits.housing_I", "housing_I", "mm", step=0.001, when={"type": ["deep_groove", "cylindrical"]}),
+            F("fits.T_i", "T_i", "°C", when={"type": ["deep_groove", "cylindrical"]}),
+            F("fits.T_o", "T_o", "°C", when={"type": ["deep_groove", "cylindrical"]}),
+            # a tapered pair from the setting to work (plan section 二十一)
+            F(
+                "pair.basis",
+                "basis",
+                kind="select",
+                options=opts(["mounted", "bench"], "basis_"),
+                when={"type": ["tapered"], "pair": ["DB", "DF"]},
+            ),
+            F("fits.shaft_I", "shaft_I", "mm", step=0.001, when={**TP2, "basis": ["bench"]}),
+            F("fits.housing_I", "housing_I", "mm", step=0.001, when={**TP2, "basis": ["bench"]}),
+            F("pair.T_ref", "T_ref", "°C", hint="thermalHint", when=TP2),
+            F("fits.T_i", "T_i", "°C", when=TP2),
+            F("fits.T_o", "T_o", "°C", when=TP2),
+            F("pair.T_shaft", "T_shaft", "°C", hint="T_shaftHint", when=TP2),
+            F("pair.T_house", "T_house", "°C", hint="T_houseHint", when=TP2),
+            F("pair.a_ring", "a_ring", "10⁻⁶/°C", step=0.1, when=TP2),
+            F("pair.a_shaft", "a_shaft", "10⁻⁶/°C", step=0.1, when=TP2),
+            F("pair.a_house", "a_house", "10⁻⁶/°C", step=0.1, when=TP2),
         ],
     ),
     (
@@ -454,6 +473,7 @@ BLANK = {
         "endplay": None,
         "sweep_from": None,
         "sweep_to": None,
+        "basis": "mounted",  # when the end play was set (plan section 二十一)
     },
     "material": {"E": 206000, "nu": 0.3, "density": None},
     "scenario": {"kind": "generic", "fp": None},
@@ -525,6 +545,7 @@ def shown(when: dict, p: dict) -> bool:
         "axis": (p.get("scenario") or {}).get("axis") or "horizontal",
         "mount": (p.get("pair") or {}).get("mount") or "pair",
         "setting": (p.get("pair") or {}).get("setting") or "endplay",
+        "basis": (p.get("pair") or {}).get("basis") or "mounted",
         "cam": (p.get("flex") or {}).get("cam") or "cosine",
     }
     for k, allowed in when.items():

@@ -143,6 +143,23 @@ const pts = computed({
         <Num v-model="project.fits.T_i" :label="t('T_i')" unit="°C" />
         <Num v-model="project.fits.T_o" :label="t('T_o')" unit="°C" />
       </template>
+      <template v-else-if="tap && project.pair.arrangement !== 'single'">
+        <label class="num"><span class="lab">{{ t('basis') }}</span>
+          <select v-model="project.pair.basis"><option v-for="k in ['mounted', 'bench']" :key="k" :value="k">{{ t('basis_' + k) }}</option></select></label>
+        <template v-if="project.pair.basis === 'bench'">
+          <Num v-model="project.fits.shaft_I" :label="t('shaft_I')" unit="mm" step="0.001" />
+          <Num v-model="project.fits.housing_I" :label="t('housing_I')" unit="mm" step="0.001" />
+        </template>
+        <p class="hint">{{ t('thermalHint') }}</p>
+        <Num v-model="project.pair.T_ref" :label="t('T_ref')" unit="°C" />
+        <Num v-model="project.fits.T_i" :label="t('T_i')" unit="°C" />
+        <Num v-model="project.fits.T_o" :label="t('T_o')" unit="°C" />
+        <Num v-model="project.pair.T_shaft" :label="t('T_shaft')" unit="°C" :hint="t('T_shaftHint')" />
+        <Num v-model="project.pair.T_house" :label="t('T_house')" unit="°C" :hint="t('T_houseHint')" />
+        <Num v-model="project.pair.a_ring" :label="t('a_ring')" unit="10⁻⁶/°C" step="0.1" />
+        <Num v-model="project.pair.a_shaft" :label="t('a_shaft')" unit="10⁻⁶/°C" step="0.1" />
+        <Num v-model="project.pair.a_house" :label="t('a_house')" unit="10⁻⁶/°C" step="0.1" />
+      </template>
       <p v-else class="hint">{{ flex ? t('fitsFlex') : xr ? t('fitsCrossed') : tap ? t('fitsTapered') : t('fitsAngular') }}</p>
     </fieldset>
 

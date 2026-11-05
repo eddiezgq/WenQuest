@@ -58,6 +58,7 @@ const inputs = computed(() => {
         rows.push(['arrangement', t('tarr_' + p.pair.arrangement), '']); rows.push(['mount', t('mount_' + (p.pair.mount || 'pair')), ''])
         add(p.pair.mount === 'two_end' ? 'spanTwo' : 'rowSpacing', props.r?.pair?.spacing, 'mm')
         add('endplay', props.r?.pair?.endplay_um != null ? props.r.pair.endplay_um.toFixed(1) : null, 'µm'); add('preloadF', props.r?.pair?.preload != null ? props.r.pair.preload.toFixed(0) : null, 'N')
+        if (props.r?.pair?.chain?.operating != null) { add('endplayWork', props.r.pair.work_um.toFixed(1), 'µm'); add('preloadWork', props.r.pair.preload_work.toFixed(0), 'N') }
       }
     }
     rows.push(['crown', t('crown_' + (p.profile?.kind || 'straight')), ''])
