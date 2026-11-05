@@ -94,14 +94,31 @@ function loadWork(k, body) {
   if (k === 'system' || body.kind === 'system') { openSystem(body, body.example_id || ''); return }
   kind.value = 'cam'; replace(body); theta.value = 0; mfgResult.value = null; measResult.value = null; compResult.value = null
 }
+// the help's "try it" buttons (round 90): ?mode= opens a page, ?set={"loads.rpm":4000} changes a few values
+function applyQuery(qs) {
+  const m = qs.get('mode')
+  if (m && (isSys.value ? ['sys', 'sys3d', 'cae'] : ['design', 'mfg', 'measure']).includes(m)) curMode.value = m
+  const s = qs.get('set')
+  if (!s || isSys.value) return
+  try {
+    for (const [path, v] of Object.entries(JSON.parse(s))) {
+      const keys = path.split('.')
+      if (keys.length === 2 && project[keys[0]] && typeof project[keys[0]] === 'object') project[keys[0]][keys[1]] = v
+    }
+  } catch { /* a bad link changes nothing */ }
+}
+// the help: the section for this page (round 90)
+const helpHref = computed(() => 'help/#' + ({ mfg: 'mfg-1', measure: 'mfg-2', sys: 'case-atc', sys3d: 'case-atc', cae: 'case-atc-5' }[curMode.value] || (isCylP.value ? 'methods-5' : 'start')))
 const linked = computed(() => (link.id ? t('cloudLinked').replace('{name}', link.name).replace('{v}', link.version) : ''))
 
 onMounted(async () => {
   if (!embed) loadMe()
   await loadLaws()
   try { examples.value = await api('/examples') } catch { examples.value = [] }
-  const ex = new URLSearchParams(location.search).get('example')
+  const qs = new URLSearchParams(location.search)
+  const ex = qs.get('example')
   if (ex) await openExample(ex)
+  applyQuery(qs)
   analyseSoon(0)
   if (isSys.value) { analyseSystemSoon(0); loadExampleCae() }
   if (embed) playing.value = true
@@ -138,6 +155,7 @@ onMounted(async () => {
         </template>
         <span v-if="!embed && me?.login" class="who" :title="me.org">{{ me.name || '…' }}<small v-if="me.org">{{ me.org }}</small></span>
         <a v-else-if="!embed && me && me.reachable" class="who in" :href="loginUrl()">{{ t('signIn') }}</a>
+        <a v-if="!embed" class="dark help" :href="helpHref" target="_blank" rel="noopener">{{ t('help') }}</a>
         <button type="button" class="dark lang" @click="setLang(lang === 'zh' ? 'en' : 'zh')">{{ lang === 'zh' ? 'EN' : '中' }}</button>
       </div>
     </header>

@@ -5,6 +5,7 @@
 !apps/cam/index.html
 !apps/cam/vite.config.js
 !apps/cam/src
+!apps/cam/public
 !services/cam/requirements.txt
 !services/cam/camkit
 !services/cam/examples

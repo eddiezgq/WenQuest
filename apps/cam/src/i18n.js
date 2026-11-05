@@ -6,6 +6,7 @@ export const lang = ref(saved || (navigator.language?.startsWith('zh') ? 'zh' : 
 export function setLang(l) { lang.value = l; try { localStorage.setItem('wqcam-lang', l) } catch { /* private mode */ } }
 
 const W = {
+  help: ['？帮助', '? Help'],
   app: ['问渠凸轮', 'WenQuest Cam'],
   tagline: ['凸轮设计与制造', 'Cam design & manufacturing'],
   examples: ['示例', 'Examples'],
