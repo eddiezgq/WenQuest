@@ -1,0 +1,827 @@
+1
+00:00:00,600 --> 00:00:01,603
+Hi everyone,
+
+2
+00:00:01,623 --> 00:00:07,740
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:08,140 --> 00:00:11,254
+This is Lecture 27, the digital factory.
+
+4
+00:00:11,274 --> 00:00:17,053
+Last time we stood in a garment factory and connected its sewing machines;
+
+5
+00:00:17,073 --> 00:00:20,501
+today we move to the plant that builds them.
+
+6
+00:00:20,901 --> 00:00:23,432
+In the background is today's lab,
+
+7
+00:00:23,452 --> 00:00:29,230
+where hook clearances measured machine by machine at the adjustment station
+
+8
+00:00:29,250 --> 00:00:33,868
+travel over the bus and become a control chart and an alarm.
+
+9
+00:00:33,888 --> 00:00:35,568
+From order to service,
+
+10
+00:00:35,588 --> 00:00:40,361
+how does information move through a plant with an ID attached?
+
+11
+00:00:41,881 --> 00:00:42,941
+Here's the problem.
+
+12
+00:00:43,341 --> 00:00:50,388
+The adjustment station measures every hook clearance:
+
+13
+00:00:50,408 --> 00:01:00,921
+mean 0.070 millimetres and sigma 6 microns when stable, tolerance 0.04 to 0.10.
+
+14
+00:01:01,321 --> 00:01:04,689
+From machine 46 a new hook lot goes in,
+
+15
+00:01:04,709 --> 00:01:08,685
+ground with a relaxed wheel-dressing interval,
+
+16
+00:01:08,705 --> 00:01:12,421
+and the clearance drifts 4 microns an hour.
+
+17
+00:01:12,821 --> 00:01:17,660
+Today an NCR opens only when one machine fails,
+
+18
+00:01:17,680 --> 00:01:20,968
+and a shipment leaves at hour 8.
+
+19
+00:01:21,368 --> 00:01:23,291
+What are the X-bar limits,
+
+20
+00:01:23,311 --> 00:01:28,148
+and how different is acting on failures from acting on run rules?
+
+21
+00:01:29,668 --> 00:01:33,342
+Seven breaks and the overall architecture.
+
+22
+00:01:34,862 --> 00:01:38,085
+This plant builds 180 machines a day.
+
+23
+00:01:38,485 --> 00:01:45,316
+An order arrives: 200 WQ-LS-TED, due in ten days.
+
+24
+00:01:45,716 --> 00:01:49,865
+With information scattered over spreadsheets, paper tickets and test PCs,
+
+25
+00:01:49,885 --> 00:01:53,976
+it breaks in at least seven places: the low-oil hook copied as standard,
+
+26
+00:01:53,996 --> 00:01:57,288
+DLC outsourcing missing from MRP, firmware left to memory,
+
+27
+00:01:57,308 --> 00:02:01,570
+test results filed without serials, a bottleneck stop noticed at shift end,
+
+28
+00:02:01,590 --> 00:02:03,454
+a growing clearance nobody plots,
+
+29
+00:02:03,474 --> 00:02:06,138
+and a complaint nobody can trace to a hook lot.
+
+30
+00:02:07,658 --> 00:02:14,232
+The plant's information system has five layers: equipment and lines;
+
+31
+00:02:14,252 --> 00:02:16,268
+the unified data bus,
+
+32
+00:02:16,288 --> 00:02:23,055
+which every machine and program only publishes to and subscribes from;
+
+33
+00:02:23,075 --> 00:02:30,522
+the historian, storing every message as the single source of truth; ERP, PLM,
+
+34
+00:02:30,542 --> 00:02:35,079
+MES, QMS and WMS; and dashboards and AI on top.
+
+35
+00:02:35,479 --> 00:02:39,592
+Two rules: components talk only through the bus,
+
+36
+00:02:39,612 --> 00:02:43,295
+so one layer can change without the others;
+
+37
+00:02:43,315 --> 00:02:48,375
+and writes need a person to confirm, with AI only drafting.
+
+38
+00:02:49,895 --> 00:02:55,360
+These are the bus messages scrolling past, newest on top.
+
+39
+00:02:55,760 --> 00:03:01,975
+The plant's root topic is wq/sewing, and following 'add,
+
+40
+00:03:01,995 --> 00:03:08,100
+never change' it adds assembly, test and service areas.
+
+41
+00:03:08,500 --> 00:03:15,450
+Each measurement at the adjustment station publishes a quality.measurement;
+
+42
+00:03:15,470 --> 00:03:18,145
+besides the value and limits,
+
+43
+00:03:18,165 --> 00:03:24,000
+data carries a hook_lot field recording which hook lot went in.
+
+44
+00:03:24,400 --> 00:03:26,860
+Every trace later depends on it.
+
+45
+00:03:28,380 --> 00:03:32,622
+Product data and the bottleneck.
+
+46
+00:03:34,142 --> 00:03:38,206
+WQ-LS has three options, auto-trim T,
+
+47
+00:03:38,226 --> 00:03:45,050
+electronic stitch length E and low-oil hook D, each on or off:
+
+48
+00:03:45,070 --> 00:03:48,362
+2 times 2 times 2, 8 variants.
+
+49
+00:03:48,762 --> 00:03:58,150
+In the ERP, WQ-LS becomes an item template with T, E and D as attributes,
+
+50
+00:03:58,170 --> 00:04:03,692
+generating eight variants, each with a BOM.
+
+51
+00:04:04,092 --> 00:04:09,304
+With more options, a configurator builds the BOM by rule.
+
+52
+00:04:09,704 --> 00:04:14,457
+Sales picks options, MRP sees the DLC outsourcing,
+
+53
+00:04:14,477 --> 00:04:17,702
+and breaks one and two are closed.
+
+54
+00:04:19,222 --> 00:04:24,369
+With routings in the MES you can compute load:
+
+55
+00:04:24,389 --> 00:04:33,242
+machines a day times minutes each, over units times shifts times 480 times OEE.
+
+56
+00:04:33,642 --> 00:04:41,213
+The horizontal machining centre takes 16 minutes per housing; five units,
+
+57
+00:04:41,233 --> 00:04:48,284
+two shifts, OEE 60 percent give exactly 180 a day, 100 percent load:
+
+58
+00:04:48,304 --> 00:04:49,844
+the bottleneck.
+
+59
+00:04:50,244 --> 00:04:55,260
+At 68 percent OEE the load falls to 88.
+
+60
+00:04:55,660 --> 00:05:02,672
+Raising OEE elsewhere adds no output, so phase one connects the bottleneck.
+
+61
+00:05:04,192 --> 00:05:08,973
+Closing the quality loop: control charts and rules.
+
+62
+00:05:10,493 --> 00:05:14,473
+Watch the measurements play machine by machine,
+
+63
+00:05:14,493 --> 00:05:17,793
+sixteen hours in about sixteen seconds.
+
+64
+00:05:18,193 --> 00:05:21,780
+For two hours the dots scatter around 0.070;
+
+65
+00:05:21,800 --> 00:05:27,682
+the yellow band marks the new hook lot, and from there the cloud climbs.
+
+66
+00:05:28,082 --> 00:05:32,714
+For a long time not one dot crosses the red tolerance line,
+
+67
+00:05:32,734 --> 00:05:36,182
+so a system acting on failures stays silent.
+
+68
+00:05:36,582 --> 00:05:42,602
+That's the trouble with drift: every unit passes while the process gets worse.
+
+69
+00:05:44,122 --> 00:05:50,166
+The right tool is an X-bar chart: subgroups of five machines,
+
+70
+00:05:50,186 --> 00:05:52,850
+plotting the subgroup mean.
+
+71
+00:05:53,250 --> 00:06:02,401
+The centre line is 0.070 millimetres and the limits are three sigma over root
+
+72
+00:06:02,421 --> 00:06:04,068
+n either side,
+
+73
+00:06:04,088 --> 00:06:10,976
+about 8.0 microns: upper about 0.0780, lower about 0.0620.
+
+74
+00:06:11,376 --> 00:06:15,243
+Two points: compute them from stable-process data,
+
+75
+00:06:15,263 --> 00:06:19,596
+and never substitute the tolerance, which is much wider.
+
+76
+00:06:21,116 --> 00:06:25,048
+Run rules catch a drift before anything fails.
+
+77
+00:06:25,448 --> 00:06:31,056
+R1, one point beyond 3 sigma, is the slowest; R2,
+
+78
+00:06:31,076 --> 00:06:39,902
+two of three beyond 2 sigma on one side; R3, four of five beyond 1 sigma; R4,
+
+79
+00:06:39,922 --> 00:06:43,003
+eight in a row on one side.
+
+80
+00:06:43,403 --> 00:06:46,983
+More rules, earlier detection, more false alarms.
+
+81
+00:06:47,383 --> 00:06:53,399
+Alarms go out as ai.alert with the triggering messages as evidence,
+
+82
+00:06:53,419 --> 00:06:56,102
+not repeated within two hours,
+
+83
+00:06:56,122 --> 00:07:01,507
+and the AI drafts a freeze proposal for a person to confirm.
+
+84
+00:07:03,027 --> 00:07:08,247
+Tick R1 through R4 and play it again.
+
+85
+00:07:08,647 --> 00:07:17,700
+The subgroup means climb step by step past the two-sigma line in the yellow band,
+
+86
+00:07:17,720 --> 00:07:22,741
+and at machine 70, about 3.1 hours, R2 fires.
+
+87
+00:07:23,141 --> 00:07:26,765
+That's barely an hour after the drift began,
+
+88
+00:07:26,785 --> 00:07:29,911
+with not one machine out of tolerance.
+
+89
+00:07:30,311 --> 00:07:38,895
+With R1 alone it takes until machine 100, 4.4 hours; acting only on failures,
+
+90
+00:07:38,915 --> 00:07:44,035
+the first NCR opens at machine 174, 7.7 hours.
+
+91
+00:07:45,555 --> 00:07:53,663
+Every hour later means about 22.5 more affected machines, an hour's output.
+
+92
+00:07:54,063 --> 00:07:58,033
+But more rules aren't free: with R1 to R4,
+
+93
+00:07:58,053 --> 00:08:05,254
+over 1000 random seeds the chance of at least one false alarm in 16 hours is
+
+94
+00:08:05,274 --> 00:08:06,870
+about 54 percent,
+
+95
+00:08:06,890 --> 00:08:10,480
+and frequent false alarms get ignored.
+
+96
+00:08:10,880 --> 00:08:16,712
+After an alarm, contain first: freeze the remaining hooks,
+
+97
+00:08:16,732 --> 00:08:24,380
+re-inspect suspect machines, open an NCR, then run an 8D for the root cause.
+
+98
+00:08:25,900 --> 00:08:30,880
+Traceability, versions, service and roll-out.
+
+99
+00:08:32,400 --> 00:08:38,561
+After an alarm, follow serials and lots both ways.
+
+100
+00:08:38,961 --> 00:08:47,254
+Backward to the cause: the alarmed machine carries hook lot H2610-07,
+
+101
+00:08:47,274 --> 00:08:53,157
+whose work order ran on raceway grinder GRD-H-02,
+
+102
+00:08:53,177 --> 00:08:58,338
+where the wheel-dressing event explains it.
+
+103
+00:08:58,738 --> 00:09:04,854
+Forward to the scope: which other machines got the lot, how many hooks remain,
+
+104
+00:09:04,874 --> 00:09:06,742
+and whether any shipped.
+
+105
+00:09:07,142 --> 00:09:12,376
+Without scanning every machine you can only bound the scope by time,
+
+106
+00:09:12,396 --> 00:09:13,922
+several times wider.
+
+107
+00:09:15,442 --> 00:09:21,662
+Swap the sewing machine for a six-axis robot and almost everything carries over.
+
+108
+00:09:22,062 --> 00:09:24,658
+Each joint's reducer lot,
+
+109
+00:09:24,678 --> 00:09:31,043
+motor and encoder serials are scanned and bound to the robot;
+
+110
+00:09:31,063 --> 00:09:37,322
+repeatability and backlash go out as test.result with units.
+
+111
+00:09:37,722 --> 00:09:40,951
+Measure backlash on every robot,
+
+112
+00:09:40,971 --> 00:09:48,973
+and an X-bar chart with run rules spots a drifting reducer lot before failures,
+
+113
+00:09:48,993 --> 00:09:52,222
+then bounds the affected robots.
+
+114
+00:09:52,622 --> 00:09:55,482
+The AI only drafts the freeze.
+
+115
+00:09:57,002 --> 00:10:00,042
+The traceability everyone knows is a milk recall.
+
+116
+00:10:00,442 --> 00:10:04,417
+When a supermarket finds a problem with one batch,
+
+117
+00:10:04,437 --> 00:10:10,490
+it recalls by the lot number printed on the carton instead of clearing every
+
+118
+00:10:10,510 --> 00:10:12,328
+carton off the shelves.
+
+119
+00:10:12,728 --> 00:10:18,283
+That works only because each carton got a lot number at production and the
+
+120
+00:10:18,303 --> 00:10:21,221
+plant recorded which stores it went to.
+
+121
+00:10:21,621 --> 00:10:27,131
+Scanning the hook lot into each machine at assembly is printing a lot number
+
+122
+00:10:27,151 --> 00:10:28,877
+on every sewing machine.
+
+123
+00:10:29,277 --> 00:10:36,259
+Without it, when something goes wrong you can only bound the problem by time,
+
+124
+00:10:36,279 --> 00:10:37,532
+in big blocks.
+
+125
+00:10:39,052 --> 00:10:40,152
+Back to our problem.
+
+126
+00:10:40,552 --> 00:10:47,339
+The limits are 0.070 plus or minus 8.0 microns.
+
+127
+00:10:47,739 --> 00:10:56,433
+After 4, 5 and 6 hours a machine fails with probability about 1.0,
+
+128
+00:10:56,453 --> 00:10:58,941
+4.8 and 16 percent.
+
+129
+00:10:59,341 --> 00:11:11,130
+Acting on failures, the first appears at machine 174, 7.7 hours: 140 affected,
+
+130
+00:11:11,150 --> 00:11:12,947
+135 shipped.
+
+131
+00:11:13,347 --> 00:11:22,464
+With R1 to R4 the alarm comes at machine 70: 36 affected, all in the plant,
+
+132
+00:11:22,484 --> 00:11:25,023
+and 264 hooks frozen.
+
+133
+00:11:26,543 --> 00:11:32,474
+Now Virtual lab 27-1, quality loop and traceability in the digital factory,
+
+134
+00:11:32,494 --> 00:11:38,505
+which you can do yourself on WenQuest. The results are blurred. On page one,
+
+135
+00:11:38,525 --> 00:11:42,790
+the left column shows the readings machine by machine,
+
+136
+00:11:42,810 --> 00:11:45,726
+the X-bar chart and the bus messages;
+
+137
+00:11:45,746 --> 00:11:51,599
+on the right you pick run rules and set the conditions. Reset to standard,
+
+138
+00:11:51,619 --> 00:11:57,391
+press play, and note the alarm's machine number, time and affected count.
+
+139
+00:11:57,791 --> 00:12:02,118
+Click 'New random numbers': for the same rules,
+
+140
+00:12:02,138 --> 00:12:06,465
+the alarm time and false-alarm count both move,
+
+141
+00:12:06,485 --> 00:12:12,568
+so the rules you choose must not just look good on one lucky seed.
+
+142
+00:12:12,968 --> 00:12:16,405
+Now tick R2, R3 and R4 as well and replay.
+
+143
+00:12:16,425 --> 00:12:19,450
+See how much earlier the alarm comes,
+
+144
+00:12:19,470 --> 00:12:25,622
+and note how many false alarms the no-drift control gives in sixteen hours.
+
+145
+00:12:26,022 --> 00:12:29,642
+Last, try R0 alone, the existing 'near the limit' rule,
+
+146
+00:12:29,662 --> 00:12:33,614
+and think about why it false-alarms so often here. Task one:
+
+147
+00:12:33,634 --> 00:12:37,851
+find a rule set that alarms at least four hours before the first
+
+148
+00:12:37,871 --> 00:12:39,505
+out-of-tolerance machine,
+
+149
+00:12:39,525 --> 00:12:42,352
+with no false alarms when there's no drift.
+
+150
+00:12:42,372 --> 00:12:45,661
+The guide and report template are on the platform.
+
+151
+00:12:47,181 --> 00:12:50,227
+This is the WenQuest digital factory,
+
+152
+00:12:50,247 --> 00:12:54,784
+where today's rules join up into one line. On page two,
+
+153
+00:12:54,804 --> 00:13:00,584
+the right side is the machine record. Drag the serial number: variant,
+
+154
+00:13:00,604 --> 00:13:06,550
+work order, hook lot, housing heat number, control-box serial, firmware,
+
+155
+00:13:06,570 --> 00:13:13,096
+parameter and event-table versions, hook clearance, hook timing and final test.
+
+156
+00:13:13,116 --> 00:13:16,659
+Every line is one message in the historian.
+
+157
+00:13:17,059 --> 00:13:21,826
+The graph on the left starts from the machine that alarmed and goes backward
+
+158
+00:13:21,846 --> 00:13:22,834
+to the hook lot,
+
+159
+00:13:22,854 --> 00:13:26,046
+the work order, the grinder and the wheel dressing,
+
+160
+00:13:26,066 --> 00:13:30,833
+then forward to every machine built with that lot, the hooks left in stores,
+
+161
+00:13:30,853 --> 00:13:35,746
+and anything shipped. Task two is to work out the number of affected machines,
+
+162
+00:13:35,766 --> 00:13:37,572
+so those figures are blurred.
+
+163
+00:13:37,972 --> 00:13:42,281
+Page three is the roll-out calculator: investment,
+
+164
+00:13:42,301 --> 00:13:46,956
+duration and KPI targets for each of the three phases,
+
+165
+00:13:46,976 --> 00:13:51,111
+with sixty months of cumulative cash flow above.
+
+166
+00:13:51,511 --> 00:13:57,034
+Set key-equipment OEE to 64 percent and the payback slips. Task three:
+
+167
+00:13:57,054 --> 00:14:02,497
+keep OEE at 64, make no other KPI or investment better than standard,
+
+168
+00:14:02,517 --> 00:14:07,564
+and shorten only the phase durations, at least four months each,
+
+169
+00:14:07,584 --> 00:14:13,028
+to bring payback back within 36 months. How you schedule it, and why,
+
+170
+00:14:13,048 --> 00:14:14,611
+goes in your report.
+
+171
+00:14:16,131 --> 00:14:19,405
+The assignment has four questions. One:
+
+172
+00:14:19,425 --> 00:14:25,570
+the horizontal machining centre takes 16 minutes per housing, five units,
+
+173
+00:14:25,590 --> 00:14:30,807
+two 480-minute shifts, and the plant wants 220 machines a day.
+
+174
+00:14:30,827 --> 00:14:34,101
+Find the load at 60 and 68 percent OEE,
+
+175
+00:14:34,121 --> 00:14:39,421
+the OEE that keeps the load at 90 percent without new machines,
+
+176
+00:14:39,441 --> 00:14:42,969
+the load with one more unit at 68 percent,
+
+177
+00:14:42,989 --> 00:14:48,712
+and make a recommendation with the 2.4-minute assembly takt in mind.
+
+178
+00:14:49,112 --> 00:14:55,779
+Two: an adjustment characteristic has mean 0.070 millimetres, sigma 5 microns,
+
+179
+00:14:55,799 --> 00:15:01,351
+tolerance 0.04 to 0.10, subgroups of five. Find the X-bar limits;
+
+180
+00:15:01,371 --> 00:15:04,523
+if the mean drifts 5 microns an hour,
+
+181
+00:15:04,543 --> 00:15:09,839
+find the chance a single machine fails after 2, 4 and 6 hours,
+
+182
+00:15:09,859 --> 00:15:16,612
+then choose your run rules, the containment steps, and the first four 8D steps.
+
+183
+00:15:17,012 --> 00:15:22,469
+Three: write two test.result messages for end-of-line test,
+
+184
+00:15:22,489 --> 00:15:28,596
+successful trims out of 50 and the low-oil temperature rise. Four:
+
+185
+00:15:28,616 --> 00:15:33,609
+hook life is Weibull with beta 2.2 and eta 5000 hours;
+
+186
+00:15:33,629 --> 00:15:37,786
+two machines each run 225 hours next quarter,
+
+187
+00:15:37,806 --> 00:15:44,192
+with hooks at 1000 and 4000 hours. Find each one's chance of failing.
+
+188
+00:15:44,592 --> 00:15:49,752
+Submit the assignment and the lab report on the WenQuest platform.
+
+189
+00:15:51,272 --> 00:15:55,093
+There's also a ten-question quiz. For example:
+
+190
+00:15:55,113 --> 00:15:59,937
+WQ-LS has four on-off options plus three top-speed grades,
+
+191
+00:15:59,957 --> 00:16:06,116
+and eight combinations aren't allowed. How many usable variants are there?
+
+192
+00:16:06,516 --> 00:16:10,153
+Or: with the machining centres as in the lecture,
+
+193
+00:16:10,173 --> 00:16:13,212
+what is their load at 200 machines a day?
+
+194
+00:16:13,612 --> 00:16:19,352
+You get three attempts, and the explanations appear as soon as you submit.
+
+195
+00:16:20,872 --> 00:16:22,292
+Three things to remember.
+
+196
+00:16:22,692 --> 00:16:29,818
+One: the seven breaks come from information without IDs in one linkable place;
+
+197
+00:16:29,838 --> 00:16:35,682
+the digital factory has five layers, talks only through the bus,
+
+198
+00:16:35,702 --> 00:16:39,072
+and needs a person to confirm writes.
+
+199
+00:16:39,472 --> 00:16:45,824
+Two: X-bar limits are mu-zero plus or minus three sigma over root n;
+
+200
+00:16:45,844 --> 00:16:49,385
+run rules catch drift before failures,
+
+201
+00:16:49,405 --> 00:16:54,164
+earlier with more rules but with more false alarms.
+
+202
+00:16:54,564 --> 00:16:55,017
+Three:
+
+203
+00:16:55,037 --> 00:17:00,861
+scan lots in at assembly to trace back to causes and forward to the scope.
+
+204
+00:17:01,261 --> 00:17:04,036
+The slides, the virtual lab,
+
+205
+00:17:04,056 --> 00:17:11,024
+the assignment and the quiz are all on the WenQuest learning platform,
+
+206
+00:17:11,044 --> 00:17:17,712
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+207
+00:17:18,112 --> 00:17:19,452
+See you next time.
