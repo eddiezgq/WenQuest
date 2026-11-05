@@ -23,3 +23,5 @@
 3. 演示稿：`python3 tools/video/intro_deck.py <目录>`（检查每页的“>”数和 steps 数对得上）。浏览器打开 `课件/index.zh.html` 可以翻页看。
 4. 本机试看：`python3 tools/video/make.py <目录> --lang zh --voice estimate --out /tmp/v`（无声，按字数估时长）。
 5. 出片：GitHub → Actions →“Lecture videos 公开课视频”：task `render`、lectures 填目录、voice `kokoro`、lang `both`。成片在运行的下载页。
+   学习平台页面（`learn:` 写路径）要先搭本机完整环境：`tools/local/setup.sh`，导入样例课 `python3 /home/claude/local/import_physics.py && php /home/claude/local/enrol.php 2`；
+   AI 建课的两个项目用 `teacher1` 通过网关接口建（上传 `samples/大学物理/课程资料`、开始、回答问题、确认资料清单），项目号写进讲稿。

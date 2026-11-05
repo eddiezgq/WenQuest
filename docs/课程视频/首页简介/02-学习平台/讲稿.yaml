@@ -1,0 +1,136 @@
+# 首页视频简介 02 · 学习平台与 AI 建课（第 86 轮）。画面：本机完整环境（tools/local/setup.sh：Moodle + 网关 + 网页端，AI 用假模型）
+# 的真界面——老师 teacher1 的仪表盘、导入的《大学物理A（上）》样例课、AI 建课两个项目（资料盘点、大纲与日历），英文版界面切英文。
+# 讲稿见 ../讲稿_第一批.md 第 02 段；第 6 行原稿“学生有 AI 助教”平台网页端还没有，改为“每一课老师审过、课程委员会批准后发布”（属实）。
+standalone: true
+langs: [zh, en]
+title: [问渠学习平台：一句话建一门完整的课, 'The WenQuest learning platform: a whole course from one sentence']
+brand: [学习平台, Learning platform]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的课程是本机测试用的样例课（大学物理），AI 回复为演示内容。, 'The course shown is a local sample (university physics); AI replies are demo content.']
+tags:
+  zh: [AI 建课, 学习平台, 在线课程, 网页互动课件, 教学设计, 高校, 问渠]
+  en: [AI course building, learning platform, LMS, online course, interactive slides, instructional design, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: dash, learn: /}
+  - {name: course, learn: "/pages/course/course?id=2"}
+  - {name: studio, learn: /pages/studio/studio}
+  - {name: materials, learn: "/pages/studio/project?id=ef2850b9e244"}
+  - {name: outline, learn: "/pages/studio/project?id=25f7cfb91012"}
+  - {name: slides, file: tools/site_cn/assets/edu-slides.jpg}
+  - {name: textbook, learn: /pages/textbook/textbook, wait: 6000}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: course, title: [一句话，建一门完整的课, A whole course from one sentence],
+          sub: [问渠学习平台：以 Canvas 为样板，网页和微信小程序一套代码, 'The WenQuest learning platform: modeled on Canvas, one codebase for the web and WeChat']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠学习平台，界面以 Canvas 为样板，网页和微信小程序一套代码。']
+    en: ['>The WenQuest learning platform is modeled on Canvas, with one codebase for the web and WeChat.']
+- id: s02
+  kind: page
+  page: 2
+  part: [AI 建课, AI course building]
+  slide:
+    img: studio
+    url: learn.wenquestrobotics.com/pages/studio/studio
+    kick: [AI 建课, AI course building]
+    title: [一位 AI 课程负责人，带一个教授团队, 'An AI course lead with a whole faculty team']
+    points:
+      - {text: [从一句话开始, Start with one sentence], ring: [72, 11, 10, 7]}
+      - {text: [资料馆员、课程设计师、主讲教授、审稿人, 'Librarian, designer, lecturer, reviewer'], ring: [8, 27, 77, 13]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>建一门课，从一句话开始，比如“给机械专业大一开一门大学物理，十六周”。', '>后面是一整个 AI 教授团队：资料馆员、课程设计师、主讲教授、出题的、审稿的。']
+    en: ['>Building a course starts with one sentence, for example: a sixteen-week physics course for first-year mechanical students.', '>Behind it sits a whole AI faculty team: a librarian, a course designer, a lecturer, a question writer and a reviewer.']
+- id: s03
+  kind: page
+  page: 3
+  part: [AI 建课, AI course building]
+  slide:
+    img: materials
+    url: learn.wenquestrobotics.com/pages/studio/project
+    kick: [资料盘点, Sorting the materials]
+    title: [资料再乱，也由 AI 分类, 'However messy the materials, the AI sorts them']
+    points:
+      - {text: [43 份资料，逐个认出身份和章节, '43 files, each given a role and a chapter'], ring: [47, 30, 52, 68]}
+      - {text: [不清楚的，一次问清, 'Anything unclear is asked once'], ring: [9, 26, 36, 40]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>有资料就交给它：再乱也由 AI 分类，找出主教材和参考书，', '>不清楚的事，课程负责人一次问清。']
+    en: ['>Give it your materials, however messy. The AI sorts them and finds the main textbook and references,', '>and the course lead asks about anything unclear, all at once.']
+- id: s04
+  kind: page
+  page: 4
+  part: [AI 建课, AI course building]
+  slide:
+    img: outline
+    url: learn.wenquestrobotics.com/pages/studio/project
+    kick: [大纲与日历, Outline and calendar]
+    title: [先定大纲，再一课一课写, 'Settle the outline, then write lesson by lesson']
+    points:
+      - {text: [课程设计书：每一课都按它写, 'A course design book every lesson follows'], ring: [48, 26, 50, 70]}
+      - {text: [每一步都能改，改了能撤回, 'Change any step, and undo it']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>AI 像一位课程负责人，先问清对象和目标，再定大纲和课程设计书，一讲一讲往下写；', '>每一步都可以改，改了能撤回。']
+    en: ['>The AI acts like a course lead: it settles the students and goals, drafts the outline and a course design book, then writes lesson by lesson.', '>You can change any step, and undo it.']
+- id: s05
+  kind: page
+  page: 5
+  part: [课件, Slides]
+  slide:
+    img: slides
+    url: learn.wenquestrobotics.com
+    kick: [网页互动课件, Interactive web slides]
+    title: [像 PPT 一样翻页，动画和实验当场操作, 'Page through like slides; animations and labs run live']
+    points:
+      - {text: [中英对照, Chinese and English side by side]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>课件是网页互动课件，像 PPT 一样翻页，动画、虚拟实验、三维模型嵌在页里当场操作。']
+    en: ['>Slides are interactive web pages: page through them like PowerPoint, with animations, labs and 3D models working right on the page.']
+- id: s06
+  kind: page
+  page: 6
+  part: [教材, Textbooks]
+  slide:
+    img: textbook
+    url: learn.wenquestrobotics.com/pages/textbook/textbook
+    kick: [教材, Textbooks]
+    title: [每章配程序、动画、虚拟实验, 'Code, animations and labs in every chapter']
+    points:
+      - {text: [本章互动资源一目了然, 'Every chapter lists its interactive resources'], ring: [37, 17, 61, 34]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>课程背后是自编教材，每章的动画和虚拟实验都列在章首，点开就能做。']
+    en: ['>Behind the courses are our own textbooks; each chapter lists its animations and labs up front, ready to open.']
+- id: s07
+  kind: page
+  page: 7
+  part: [课程, Courses]
+  slide:
+    img: course
+    url: learn.wenquestrobotics.com/pages/course/course
+    kick: [一门完整的课, A complete course]
+    title: [大纲、讲义、视频、课件、实验、作业、测验, 'Syllabus, notes, videos, slides, labs, homework, quizzes']
+    points:
+      - {text: [每一课老师审过才发布, Teachers approve every lesson before it goes out]}
+      - {text: [单位的课程委员会批准后上线, The school's course committee signs off]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>建好就是一门完整的课。每一课老师审过才发布，', '>单位的课程委员会批准后上线。']
+    en: ['>What you get is a complete course. Teachers approve every lesson,', '>and the school''s course committee signs off before it goes live.']
+- id: s08
+  kind: page
+  page: 8
+  part: [结尾, Outro]
+  slide: {layout: end, img: dash, title: [欢迎老师来开课, Teachers are welcome to run courses here],
+          sub: [学习平台免费注册, Sign up free], link: [问渠官网首页 → 学习平台, learn.wenquestrobotics.com]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>学习平台免费注册，欢迎老师来开课。']
+    en: ['>Sign up free, and teachers are welcome to run courses here.']

@@ -68,6 +68,32 @@ def hub_shot(b, c, dst):
     ctx.close()
 
 
+def learn_shot(b, c, lang, dst):
+    """学习平台的页面：用测试账号（teacher1 / student1，密码 Test#2026）登录本机网页端，界面语言跟视频语言。"""
+    import json
+    ctx = b.new_context(viewport={"width": 1280, "height": 720}, device_scale_factor=1.5, locale="zh-CN" if lang == "zh" else "en-US")
+    ctx.add_init_script("localStorage.setItem('wq.locale', " + json.dumps(json.dumps({"type": "string", "data": lang})) + ")")
+    p = ctx.new_page()
+    base = c.get("base", "http://localhost:8088")
+    p.goto(base + "/")
+    p.wait_for_timeout(2000)
+    p.fill("input[type=text]", c.get("user", "teacher1"))
+    p.fill("input[type=password]", "Test#2026")
+    p.keyboard.press("Enter")
+    p.wait_for_timeout(3500)
+    if c["learn"] != "/":
+        p.goto(base + c["learn"])
+        p.wait_for_timeout(int(c.get("wait", 4000)))
+    for sel in ([c["click"]] if isinstance(c.get("click"), str) else c.get("click") or []):
+        p.click(sel)
+        p.wait_for_timeout(1200)
+    if c.get("js"):
+        p.evaluate(c["js"])
+        p.wait_for_timeout(800)
+    p.screenshot(path=str(dst), type="jpeg", quality=88)
+    ctx.close()
+
+
 def main(d: str):
     lec = Path(d).resolve()
     spec = yaml.safe_load((lec / "讲稿.yaml").read_text(encoding="utf-8"))
@@ -91,6 +117,10 @@ def main(d: str):
                     else:
                         hub_shot(b, c, dst)
                         print(dst)
+                    continue
+                if c.get("learn"):                   # 学习平台（本机完整环境 tools/local/setup.sh，网页端 :8088），按语言切界面
+                    learn_shot(b, c, lang, dst)
+                    print(dst)
                     continue
                 if "file" in c:
                     src = ROOT / (c.get(f"file_{lang}") or c["file"])
