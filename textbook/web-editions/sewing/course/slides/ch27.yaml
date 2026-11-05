@@ -12,7 +12,7 @@ clips:
     vh: 1300
     loop: 21
     steps:
-      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('log').parentElement.style.display='none';document.getElementById('replay').click()"}
+      - {at: 0, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)';document.getElementById('log').parentElement.style.display='none';document.querySelectorAll('#pageA .col p.note').forEach(function(n){n.style.display='none'});var c=document.querySelector('#pageA .col');c.style.paddingLeft='46%';c.style.boxSizing='content-box';document.getElementById('replay').click()"}
   bus:           # 总线上的消息：播放时逐条滚动，放完重放
     page: factory
     selector: "#log"
@@ -79,8 +79,8 @@ slides:
       - ["停机下班才知道，间隙没人画趋势，追溯查不下去", "Stops found at shift end, no trend chart, traces dead-end"]
     foot: ["共同点：信息都产生过，只是没有带上编号、记在一个能关联的地方", "What they share: the information existed, but never with an ID in one place where it could be linked"]
     notes:
-      - "这家整机厂每天装 180 台。早上来了一张订单：WQ-LS-TED 200 台，10 天交货。信息散在表格、纸质工票和测试电脑里，它至少在七处断开：少油旋梭被抄成标准旋梭，DLC 外协没进 MRP，烧哪版固件全凭记忆，瓶颈停机下班才知道，间隙变大没人画图，客户投诉时查不出用的哪批旋梭。"
-      - "This plant builds 180 machines a day. An order arrives: 200 WQ-LS-TED, due in ten days. With information scattered over spreadsheets, paper tickets and test PCs, it breaks in at least seven places: the low-oil hook copied as standard, DLC outsourcing missing from MRP, firmware left to memory, a bottleneck stop noticed at shift end, a growing clearance nobody plots, and a complaint nobody can trace to a hook lot."
+      - "这家整机厂每天装 180 台。早上来了一张订单：WQ-LS-TED 200 台，10 天交货。信息散在表格、纸质工票和测试电脑里，它至少在七处断开：少油旋梭被抄成标准旋梭，DLC 外协没进 MRP，烧哪版固件全凭记忆，测试结果不带序列号，瓶颈停机下班才知道，间隙变大没人画图，客户投诉时查不出用的哪批旋梭。"
+      - "This plant builds 180 machines a day. An order arrives: 200 WQ-LS-TED, due in ten days. With information scattered over spreadsheets, paper tickets and test PCs, it breaks in at least seven places: the low-oil hook copied as standard, DLC outsourcing missing from MRP, firmware left to memory, test results filed without serials, a bottleneck stop noticed at shift end, a growing clearance nobody plots, and a complaint nobody can trace to a hook lot."
 
   - layout: split
     title: ["五层架构，两条规矩", "Five layers, two rules"]
@@ -90,20 +90,20 @@ slides:
       - ["规矩二：写操作要人确认，AI 只起草", "Rule two: writes need a human; AI only drafts"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g font-size="28" fill="#f3f6fa">
             <rect x="10" y="10" width="880" height="100" rx="20" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
-            <text x="40" y="70" font-size="32" font-weight="800" fill="#c4b5fd">看板与 AI</text><text x="330" y="70">简报 · 提醒 · 起草提议</text>
+            <text x="40" y="70" font-size="32" font-weight="800" fill="#c4b5fd" class="zh">看板与 AI</text><text x="40" y="70" font-size="28" font-weight="800" fill="#c4b5fd" class="eo">Dashboards &amp; AI</text><text x="330" y="70" class="zh">简报 · 提醒 · 起草提议</text><text x="330" y="70" class="eo">Briefs · alerts · drafts</text>
             <rect x="10" y="130" width="880" height="100" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="40" y="190" font-size="32" font-weight="800" fill="#8fb6ff">业务系统</text><text x="330" y="190" class="en">ERP · PLM · MES · QMS · WMS</text>
+            <text x="40" y="190" font-size="32" font-weight="800" fill="#8fb6ff" class="zh">业务系统</text><text x="40" y="190" font-size="28" font-weight="800" fill="#8fb6ff" class="eo">Business systems</text><text x="330" y="190" class="en">ERP · PLM · MES · QMS · WMS</text>
             <rect x="10" y="250" width="880" height="100" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="40" y="310" font-size="32" font-weight="800" fill="#5ee0d2">历史库</text><text x="330" y="310">每条消息原样存下</text>
+            <text x="40" y="310" font-size="32" font-weight="800" fill="#5ee0d2" class="zh">历史库</text><text x="40" y="310" font-size="28" font-weight="800" fill="#5ee0d2" class="eo">Historian</text><text x="330" y="310" class="zh">每条消息原样存下</text><text x="330" y="310" class="eo">Every message, as sent</text>
             <rect x="10" y="370" width="880" height="100" rx="20" fill="rgba(242,183,5,.12)" stroke="#f2b705" stroke-width="4"/>
-            <text x="40" y="430" font-size="32" font-weight="800" fill="#ffd75a">统一数据总线</text><text x="330" y="430">只往上发、从上收</text>
+            <text x="40" y="430" font-size="32" font-weight="800" fill="#ffd75a" class="zh">统一数据总线</text><text x="40" y="430" font-size="28" font-weight="800" fill="#ffd75a" class="eo">Unified data bus</text><text x="330" y="430" class="zh">只往上发、从上收</text><text x="330" y="430" class="eo">Publish to it, subscribe from it</text>
             <rect x="10" y="490" width="880" height="100" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="40" y="550" font-size="32" font-weight="800" fill="#ff9c75">设备与产线</text><text x="330" y="550">机加工 · 装配 · 调试 · 测试</text>
+            <text x="40" y="550" font-size="32" font-weight="800" fill="#ff9c75" class="zh">设备与产线</text><text x="40" y="550" font-size="28" font-weight="800" fill="#ff9c75" class="eo">Equipment &amp; lines</text><text x="330" y="550" class="zh">机加工 · 装配 · 调试 · 测试</text><text x="330" y="550" font-size="24" class="eo">Machining · assembly · adjustment · test</text>
           </g>
-          <text x="450" y="628" font-size="23" fill="#8fa3ba" text-anchor="middle">换掉一层，其他各层不用改</text>
+          <text x="450" y="628" font-size="23" fill="#8fa3ba" text-anchor="middle" class="zh">换掉一层，其他各层不用改</text><text x="450" y="628" font-size="23" fill="#8fa3ba" text-anchor="middle" class="eo">Swap one layer; the others stay unchanged</text>
         </svg>
     notes:
       - "整厂信息系统分五层：设备与产线；统一数据总线，所有设备和软件只往上发、从上收；历史库，每条消息原样存下，是唯一的事实来源；ERP、PLM、MES、QMS、WMS；最上面是看板和 AI。两条规矩：组件之间只经总线，换掉一层其他不用改；写操作要人确认，AI 只起草提议。"
@@ -129,11 +129,11 @@ slides:
       - ["选项再多：配置器按规则即时生成 BOM", "More options: a configurator builds the BOM by rule"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="300" y="10" width="300" height="90" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="4"/>
           <text x="450" y="68" font-size="40" font-weight="800" fill="#ffd75a" text-anchor="middle" class="en">WQ-LS</text>
           <g font-size="26" fill="#d3deea">
-            <text x="20" y="160">T 自动剪线</text><text x="320" y="160">E 电子针距</text><text x="620" y="160">D 少油旋梭</text>
+            <text x="20" y="160" class="zh">T 自动剪线</text><text x="20" y="160" class="eo">T auto-trim</text><text x="320" y="160" class="zh">E 电子针距</text><text x="320" y="160" class="eo">E electronic stitch</text><text x="620" y="160" class="zh">D 少油旋梭</text><text x="620" y="160" class="eo">D low-oil hook</text>
           </g>
           <g font-size="30" font-weight="700" class="en" text-anchor="middle">
             <rect x="20" y="200" width="200" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="2"/><text x="120" y="252" fill="#d3deea">WQ-LS</text>
@@ -146,13 +146,13 @@ slides:
             <rect x="680" y="300" width="200" height="80" rx="16" fill="#f2b705"/><text x="780" y="352" fill="#0b1220">-TED</text>
           </g>
           <rect x="20" y="430" width="860" height="180" rx="22" fill="rgba(46,196,182,.10)" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="50" y="490" font-size="30" font-weight="700" fill="#5ee0d2">销售点选项 → 变型编码 + BOM</text>
-          <text x="50" y="545" font-size="27" fill="#f3f6fa">D 带出 DLC 外协（约 5 天），MRP 自然看到</text>
-          <text x="50" y="590" font-size="24" fill="#8fa3ba">断点 1、2 在接单时就被堵上</text>
+          <text x="50" y="490" font-size="30" font-weight="700" fill="#5ee0d2" class="zh">销售点选项 → 变型编码 + BOM</text><text x="50" y="490" font-size="28" font-weight="700" fill="#5ee0d2" class="eo">Sales picks options → variant code + BOM</text>
+          <text x="50" y="545" font-size="27" fill="#f3f6fa" class="zh">D 带出 DLC 外协（约 5 天），MRP 自然看到</text><text x="50" y="545" font-size="25" fill="#f3f6fa" class="eo">D brings in DLC outsourcing (≈5 days); MRP sees it</text>
+          <text x="50" y="590" font-size="24" fill="#8fa3ba" class="zh">断点 1、2 在接单时就被堵上</text><text x="50" y="590" font-size="24" fill="#8fa3ba" class="eo">Breaks 1 and 2 closed at order entry</text>
         </svg>
     notes:
-      - "WQ-LS 有三个选项：自动剪线 T、电子针距 E、少油旋梭 D，各有各无，2 乘 2 乘 2 等于 {{ch27.variants}} 种变型。在 ERPNext 里把 WQ-LS 建成物料模板，T、E、D 作属性，生成 8 个变型，各挂一张 BOM。选项再多就由配置器按规则即时生成 BOM。销售点选项，MRP 自然看到 DLC 外协，断点 1、2 就堵上了。"
-      - "WQ-LS has three options, auto-trim T, electronic stitch length E and low-oil hook D, each on or off: 2 times 2 times 2, {{ch27.variants}} variants. In ERPNext, WQ-LS becomes an item template with T, E and D as attributes, generating eight variants, each with a BOM. With more options, a configurator builds the BOM by rule. Sales picks options, MRP sees the DLC outsourcing, and breaks one and two are closed."
+      - "WQ-LS 有三个选项：自动剪线 T、电子针距 E、少油旋梭 D，各有各无，2 乘 2 乘 2 等于 {{ch27.variants}} 种变型。在 ERP 里把 WQ-LS 建成物料模板，T、E、D 作属性，生成 8 个变型，各挂一张 BOM。选项再多就由配置器按规则即时生成 BOM。销售点选项，MRP 自然看到 DLC 外协，断点 1、2 就堵上了。"
+      - "WQ-LS has three options, auto-trim T, electronic stitch length E and low-oil hook D, each on or off: 2 times 2 times 2, {{ch27.variants}} variants. In the ERP, WQ-LS becomes an item template with T, E and D as attributes, generating eight variants, each with a BOM. With more options, a configurator builds the BOM by rule. Sales picks options, MRP sees the DLC outsourcing, and breaks one and two are closed."
 
   - layout: split
     title: ["EBOM、MBOM 与固件物料", "EBOM, MBOM and firmware as an item"]
@@ -162,24 +162,24 @@ slides:
       - ["固件作为 BOM 的一行，数量 1、带版本", "Firmware is a BOM line: quantity 1, with a version"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
-          <text x="210" y="40" font-size="32" font-weight="800" fill="#8fb6ff" text-anchor="middle">EBOM 设计</text>
-          <text x="680" y="40" font-size="32" font-weight="800" fill="#ff9c75" text-anchor="middle">MBOM 车间</text>
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
+          <text x="210" y="40" font-size="32" font-weight="800" fill="#8fb6ff" text-anchor="middle" class="zh">EBOM 设计</text><text x="210" y="40" font-size="32" font-weight="800" fill="#8fb6ff" text-anchor="middle" class="eo">EBOM · design</text>
+          <text x="680" y="40" font-size="32" font-weight="800" fill="#ff9c75" text-anchor="middle" class="zh">MBOM 车间</text><text x="680" y="40" font-size="32" font-weight="800" fill="#ff9c75" text-anchor="middle" class="eo">MBOM · shop</text>
           <g font-size="26" fill="#f3f6fa">
-            <rect x="20" y="70" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="115">刺布机构</text>
-            <rect x="20" y="155" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="200">钩线机构</text>
-            <rect x="20" y="240" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="285">送布机构</text>
-            <rect x="20" y="325" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="370">电控</text>
-            <rect x="490" y="70" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="115">机壳部件（镗孔后）</text>
-            <rect x="490" y="155" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="200">旋梭 + DLC 外协</text>
-            <rect x="490" y="240" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="285">总装 · 辅料</text>
+            <rect x="20" y="70" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="115" class="zh">刺布机构</text><text x="40" y="115" class="eo">Needle mechanism</text>
+            <rect x="20" y="155" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="200" class="zh">钩线机构</text><text x="40" y="200" class="eo">Hook mechanism</text>
+            <rect x="20" y="240" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="285" class="zh">送布机构</text><text x="40" y="285" class="eo">Feed mechanism</text>
+            <rect x="20" y="325" width="380" height="70" rx="14" fill="#111d31" stroke="#4c8dff" stroke-width="2"/><text x="40" y="370" class="zh">电控</text><text x="40" y="370" class="eo">Controls</text>
+            <rect x="490" y="70" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="115" class="zh">机壳部件（镗孔后）</text><text x="510" y="115" class="eo">Housing (after boring)</text>
+            <rect x="490" y="155" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="200" class="zh">旋梭 + DLC 外协</text><text x="510" y="200" class="eo">Hook + DLC (outsourced)</text>
+            <rect x="490" y="240" width="390" height="70" rx="14" fill="#111d31" stroke="#ff7a45" stroke-width="2"/><text x="510" y="285" class="zh">总装 · 辅料</text><text x="510" y="285" font-size="22" class="eo">Final assembly · consumables</text>
             <rect x="490" y="325" width="390" height="70" rx="14" fill="rgba(242,183,5,.14)" stroke="#f2b705" stroke-width="4"/><text x="510" y="370" fill="#ffd75a" font-weight="700" class="en">FW-WQSC-LS 1.5.0</text>
           </g>
           <path d="M410 230 L480 230" stroke="#8fa3ba" stroke-width="5"/><path d="M470 218 L484 230 L470 242" stroke="#8fa3ba" stroke-width="5" fill="none"/>
           <rect x="20" y="440" width="860" height="170" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-          <text x="50" y="495" font-size="29" font-weight="700" fill="#ffd75a">固件进了 BOM：</text>
-          <text x="50" y="545" font-size="27" fill="#f3f6fa">工单知道烧哪版 · 测试台能核对</text>
-          <text x="50" y="590" font-size="27" fill="#f3f6fa">序列号档案自动记下出厂固件</text>
+          <text x="50" y="495" font-size="29" font-weight="700" fill="#ffd75a" class="zh">固件进了 BOM：</text><text x="50" y="495" font-size="29" font-weight="700" fill="#ffd75a" class="eo">Firmware in the BOM:</text>
+          <text x="50" y="545" font-size="27" fill="#f3f6fa" class="zh">工单知道烧哪版 · 测试台能核对</text><text x="50" y="545" font-size="25" fill="#f3f6fa" class="eo">Work order knows what to flash · bench checks it</text>
+          <text x="50" y="590" font-size="27" fill="#f3f6fa" class="zh">序列号档案自动记下出厂固件</text><text x="50" y="590" font-size="25" fill="#f3f6fa" class="eo">The serial record logs the shipped firmware</text>
         </svg>
     notes:
       - "设计的 BOM 按功能组织，车间的 BOM 按装配部件和工序组织；从 EBOM 到 MBOM 要加进外协工序、辅料和装配时才绑定的固件。BOM 跟着设计发布走，发布新版本，物料版本加一。最值得记住的一条：固件在 BOM 里占一行，数量 1，带版本。工单知道烧哪版，测试台能核对，档案自动记下，断点 3 就没了。"
@@ -188,7 +188,7 @@ slides:
   - layout: bignum
     title: ["找瓶颈：负荷 = 需求 × 工时 ÷ 有效能力", "Finding the bottleneck: load = demand × time ÷ capacity"]
     nums:
-      - {n: "{{ch27.hmc_cap:.0f}} 台", n_en: "per day", label: ["卧加 5 台 × 2 班、OEE 60% 的能力", "HMC capacity: 5 units, 2 shifts, OEE 60%"]}
+      - {n: "{{ch27.hmc_cap:.0f}}", n_en: "per day", label: ["卧加每天能做的台数：5 台 × 2 班、OEE 60%", "HMC capacity: 5 units, 2 shifts, OEE 60%"]}
       - {n: "{{ch27.hmc_load:.0f}}%", n_en: "load", label: ["每天 180 台，每台 16 min", "180 a day at 16 min each"]}
       - {n: "{{ch27.hmc_load68:.0f}}%", n_en: "at OEE 68%", label: ["才有应付停机和插单的余量", "Only then is there headroom"]}
     foot: ["非瓶颈设备的 OEE 提高了，全厂产量并不增加：第一期先联网瓶颈设备", "Raising OEE off the bottleneck adds no output: phase one connects the bottleneck first"]
@@ -216,22 +216,22 @@ slides:
       - ["关二“趋近上限”：为 σ≈1.2 μm 的磨床写的", "Check two, 'near the limit': written for σ ≈ 1.2 μm grinders"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <path d="M40 120 L860 120" stroke="#2c3e5c" stroke-width="10" stroke-linecap="round"/>
           <g font-size="27" font-weight="700" text-anchor="middle">
-            <rect x="20" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="110" y="130" fill="#d3deea">来料</text>
-            <rect x="240" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="330" y="130" fill="#d3deea">零件</text>
-            <rect x="460" y="70" width="200" height="100" rx="18" fill="rgba(242,183,5,.14)" stroke="#f2b705" stroke-width="4"/><text x="560" y="130" fill="#ffd75a">装配调试</text>
-            <rect x="700" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="790" y="130" fill="#d3deea">出厂</text>
+            <rect x="20" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="110" y="130" fill="#d3deea" class="zh">来料</text><text x="110" y="130" fill="#d3deea" class="eo">Incoming</text>
+            <rect x="240" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="330" y="130" fill="#d3deea" class="zh">零件</text><text x="330" y="130" fill="#d3deea" class="eo">Parts</text>
+            <rect x="460" y="70" width="200" height="100" rx="18" fill="rgba(242,183,5,.14)" stroke="#f2b705" stroke-width="4"/><text x="560" y="130" fill="#ffd75a" class="zh">装配调试</text><text x="560" y="130" fill="#ffd75a" class="eo">Adjustment</text>
+            <rect x="700" y="70" width="180" height="100" rx="18" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="790" y="130" fill="#d3deea" class="zh">出厂</text><text x="790" y="130" fill="#d3deea" class="eo">Final test</text>
           </g>
-          <text x="560" y="210" font-size="24" fill="#8fa3ba" text-anchor="middle">间隙 0.04–0.10 mm · 钩线定时 ±1.5°</text>
+          <text x="560" y="210" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">间隙 0.04–0.10 mm · 钩线定时 ±1.5°</text><text x="560" y="210" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">Clearance 0.04–0.10 mm · hook timing ±1.5°</text>
           <rect x="20" y="260" width="860" height="150" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-          <text x="50" y="318" font-size="30" font-weight="800" fill="#5ee0d2">关一：超差 → 自动开 NCR</text>
-          <text x="50" y="370" font-size="26" fill="#d3deea">漂移时每台都合格，等到超差已经晚了</text>
+          <text x="50" y="318" font-size="30" font-weight="800" fill="#5ee0d2" class="zh">关一：超差 → 自动开 NCR</text><text x="50" y="318" font-size="28" font-weight="800" fill="#5ee0d2" class="eo">Check one: out of spec → automatic NCR</text>
+          <text x="50" y="370" font-size="26" fill="#d3deea" class="zh">漂移时每台都合格，等到超差已经晚了</text><text x="50" y="370" font-size="24" fill="#d3deea" class="eo">In a drift every unit passes; the first failure is late</text>
           <rect x="20" y="440" width="860" height="180" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-          <text x="50" y="498" font-size="30" font-weight="800" fill="#ff9c75">关二：“趋近上限”</text>
-          <text x="50" y="550" font-size="26" fill="#d3deea">为公差带 16 μm、σ≈1.2 μm 的磨床写的</text>
-          <text x="50" y="595" font-size="26" fill="#ffb38f">间隙公差带 60 μm、σ = 6 μm，还合适吗？</text>
+          <text x="50" y="498" font-size="30" font-weight="800" fill="#ff9c75" class="zh">关二：“趋近上限”</text><text x="50" y="498" font-size="28" font-weight="800" fill="#ff9c75" class="eo">Check two: 'near the limit'</text>
+          <text x="50" y="550" font-size="26" fill="#d3deea" class="zh">为公差带 16 μm、σ≈1.2 μm 的磨床写的</text><text x="50" y="550" font-size="26" fill="#d3deea" class="eo">Written for grinders: 16 μm band, σ ≈ 1.2 μm</text>
+          <text x="50" y="595" font-size="26" fill="#ffb38f" class="zh">间隙公差带 60 μm、σ = 6 μm，还合适吗？</text><text x="50" y="595" font-size="26" fill="#ffb38f" class="eo">Clearance: 60 μm band, σ = 6 μm. Still right?</text>
         </svg>
     notes:
       - "缝纫机厂有四个关口：来料、零件、装配调试、出厂。问渠现在有两道关。关一：测量结论是 fail，历史库自动开 NCR，可漂移时每台都合格，等到超差已经晚了。关二：AI 的“趋近上限”提醒，是为公差带 16 微米、σ 约 1.2 微米的磨床写的。梭尖间隙公差带 60 微米、σ 6 微米，它还合适吗？"
@@ -322,21 +322,21 @@ slides:
       - ["远程升级分三圈推送，出问题双区回滚", "Updates go out in three rings; dual-bank rollback"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <circle cx="300" cy="330" r="280" fill="rgba(46,196,182,.06)" stroke="#2ec4b6" stroke-width="3"/>
           <circle cx="300" cy="330" r="175" fill="rgba(242,183,5,.08)" stroke="#f2b705" stroke-width="3"/>
           <circle cx="300" cy="330" r="80" fill="rgba(255,122,69,.18)" stroke="#ff7a45" stroke-width="4"/>
           <text x="300" y="342" font-size="38" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">1%</text>
           <text x="300" y="215" font-size="36" font-weight="800" fill="#ffd75a" text-anchor="middle" class="en">10%</text>
-          <text x="300" y="110" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle">全部</text>
+          <text x="300" y="110" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="zh">全部</text><text x="300" y="110" font-size="34" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="eo">All</text>
           <g font-size="26" fill="#f3f6fa">
-            <text x="620" y="150" font-weight="700" fill="#ff9c75">先约 1%</text>
-            <text x="620" y="190">观察 72 h</text>
-            <text x="620" y="280" font-weight="700" fill="#ffd75a">比故障率</text>
-            <text x="620" y="320">每千运转小时</text>
-            <text x="620" y="360">新旧版本对比</text>
-            <text x="620" y="450" font-weight="700" fill="#5ee0d2">再 10%、再全部</text>
-            <text x="620" y="490">出问题双区回滚</text>
+            <text x="620" y="150" font-weight="700" fill="#ff9c75" class="zh">先约 1%</text><text x="620" y="150" font-weight="700" fill="#ff9c75" class="eo">About 1% first</text>
+            <text x="620" y="190" class="zh">观察 72 h</text><text x="620" y="190" class="eo">Watch for 72 h</text>
+            <text x="620" y="280" font-weight="700" fill="#ffd75a" class="zh">比故障率</text><text x="620" y="280" font-weight="700" fill="#ffd75a" class="eo">Compare faults</text>
+            <text x="620" y="320" class="zh">每千运转小时</text><text x="620" y="320" class="eo">per 1000 running h</text>
+            <text x="620" y="360" class="zh">新旧版本对比</text><text x="620" y="360" class="eo">new vs old version</text>
+            <text x="620" y="450" font-weight="700" fill="#5ee0d2" class="zh">再 10%、再全部</text><text x="620" y="450" font-weight="700" fill="#5ee0d2" class="eo">Then 10%, then all</text>
+            <text x="620" y="490" class="zh">出问题双区回滚</text><text x="620" y="490" class="eo">Dual-bank rollback</text>
           </g>
         </svg>
     notes:
@@ -351,21 +351,21 @@ slides:
       - ["按每台累计小时预测，比按平均寿命少", "Per-machine hours predict fewer than mean life"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
-          <text x="20" y="44" font-size="28" font-weight="700" fill="#f3f6fa">下一季度旋梭需求（只）</text>
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
+          <text x="20" y="44" font-size="28" font-weight="700" fill="#f3f6fa" class="zh">下一季度旋梭需求（只）</text><text x="20" y="44" font-size="28" font-weight="700" fill="#f3f6fa" class="eo">Hooks needed next quarter</text>
           <rect x="60" y="120" width="240" height="380" rx="14" fill="#4b5f7d"/>
           <text x="180" y="100" font-size="52" font-weight="800" fill="#d3deea" text-anchor="middle" class="en">{{ch27.hooks_cal:.0f}}</text>
-          <text x="180" y="550" font-size="27" fill="#d3deea" text-anchor="middle">按平均寿命</text>
+          <text x="180" y="550" font-size="27" fill="#d3deea" text-anchor="middle" class="zh">按平均寿命</text><text x="180" y="550" font-size="27" fill="#d3deea" text-anchor="middle" class="eo">By mean life</text>
           <text x="180" y="588" font-size="22" fill="#8fa3ba" text-anchor="middle" class="en">≈ {{ch27.life:.0f}} h</text>
           <rect x="380" y="247" width="240" height="253" rx="14" fill="#2ec4b6"/>
           <text x="500" y="227" font-size="52" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">{{ch27.hooks_use:.0f}}</text>
-          <text x="500" y="550" font-size="27" fill="#5ee0d2" text-anchor="middle">按每台累计小时</text>
-          <text x="500" y="588" font-size="22" fill="#8fa3ba" text-anchor="middle">条件失效概率求和</text>
+          <text x="500" y="550" font-size="27" fill="#5ee0d2" text-anchor="middle" class="zh">按每台累计小时</text><text x="500" y="550" font-size="24" fill="#5ee0d2" text-anchor="middle" class="eo">By each machine's hours</text>
+          <text x="500" y="588" font-size="22" fill="#8fa3ba" text-anchor="middle" class="zh">条件失效概率求和</text><text x="500" y="588" font-size="22" fill="#8fa3ba" text-anchor="middle" class="eo">Σ conditional P(fail)</text>
           <rect x="660" y="140" width="230" height="260" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
           <text x="775" y="200" font-size="26" fill="#ffd75a" text-anchor="middle">P = 1 −</text>
           <text x="775" y="250" font-size="26" fill="#ffd75a" text-anchor="middle" class="en">R(a+Δ)/R(a)</text>
-          <text x="775" y="320" font-size="24" fill="#d3deea" text-anchor="middle">机群还年轻</text>
-          <text x="775" y="358" font-size="24" fill="#d3deea" text-anchor="middle">平均法偏多</text>
+          <text x="775" y="320" font-size="24" fill="#d3deea" text-anchor="middle" class="zh">机群还年轻</text><text x="775" y="320" font-size="24" fill="#d3deea" text-anchor="middle" class="eo">Young fleet:</text>
+          <text x="775" y="358" font-size="24" fill="#d3deea" text-anchor="middle" class="zh">平均法偏多</text><text x="775" y="358" font-size="20" fill="#d3deea" text-anchor="middle" class="eo">mean life overcounts</text>
         </svg>
     notes:
       - "联网机器的数据首先属于服装厂，经同意只转发设备数据。故障码按每千运转小时、按固件版本统计，就能看出修改有没有用，比如 E-31 从 0.62 降到 0.18。备件预测：旋梭寿命按韦布尔分布，按每台自己的累计小时求下季度失效概率再加总，约 {{ch27.hooks_use:.0f}} 只，比按平均寿命的 {{ch27.hooks_cal:.0f}} 只少，因为机群还年轻。"
@@ -398,22 +398,22 @@ slides:
       - ["AI 只起草“冻结批次”，人确认才执行", "AI only drafts 'freeze the lot'; a person confirms"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="20" y="500" width="200" height="60" rx="10" fill="#4b5f7d"/>
           <path d="M120 500 L120 380 L250 260 L380 300" stroke="#ff7a45" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           <circle cx="120" cy="380" r="26" fill="#f2b705"/><circle cx="250" cy="260" r="24" fill="#f2b705"/><circle cx="380" cy="300" r="20" fill="#f2b705"/>
           <path d="M146 376 L460 120" stroke="#f2b705" stroke-width="2" stroke-dasharray="6 6"/>
           <rect x="460" y="40" width="430" height="170" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-          <text x="485" y="92" font-size="27" font-weight="700" fill="#ffd75a">关节 2</text>
-          <text x="485" y="140" font-size="25" fill="#f3f6fa">减速器批次 · 电机序列号</text>
-          <text x="485" y="182" font-size="25" fill="#f3f6fa">编码器序列号 → 整机</text>
+          <text x="485" y="92" font-size="27" font-weight="700" fill="#ffd75a" class="zh">关节 2</text><text x="485" y="92" font-size="27" font-weight="700" fill="#ffd75a" class="eo">Joint 2</text>
+          <text x="485" y="140" font-size="25" fill="#f3f6fa" class="zh">减速器批次 · 电机序列号</text><text x="485" y="140" font-size="25" fill="#f3f6fa" class="eo">Reducer lot · motor serial</text>
+          <text x="485" y="182" font-size="25" fill="#f3f6fa" class="zh">编码器序列号 → 整机</text><text x="485" y="182" font-size="25" fill="#f3f6fa" class="eo">Encoder serial → robot</text>
           <rect x="460" y="240" width="430" height="150" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
           <text x="485" y="292" font-size="26" fill="#5ee0d2" class="en">test.result</text>
-          <text x="485" y="340" font-size="25" fill="#f3f6fa">重复定位 mm · 回差 角分</text>
+          <text x="485" y="340" font-size="25" fill="#f3f6fa" class="zh">重复定位 mm · 回差 角分</text><text x="485" y="340" font-size="25" fill="#f3f6fa" class="eo">Repeatability · backlash</text>
           <rect x="460" y="420" width="430" height="170" rx="20" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
-          <text x="485" y="472" font-size="26" fill="#c4b5fd">固件 · 参数表 · 标定文件</text>
-          <text x="485" y="520" font-size="25" fill="#f3f6fa">带版本的物料</text>
-          <text x="485" y="562" font-size="25" fill="#f3f6fa">1% → 10% → 全部</text>
+          <text x="485" y="472" font-size="26" fill="#c4b5fd" class="zh">固件 · 参数表 · 标定文件</text><text x="485" y="472" font-size="22" fill="#c4b5fd" class="eo">Firmware · params · calibration</text>
+          <text x="485" y="520" font-size="25" fill="#f3f6fa" class="zh">带版本的物料</text><text x="485" y="520" font-size="25" fill="#f3f6fa" class="eo">Versioned items</text>
+          <text x="485" y="562" font-size="25" fill="#f3f6fa" class="zh">1% → 10% → 全部</text><text x="485" y="562" font-size="25" fill="#f3f6fa" class="eo">1% → 10% → all</text>
         </svg>
     notes:
       - "把整机换成六轴机器人，这一讲的做法几乎原样适用。每个关节的减速器批次、电机和编码器序列号扫码绑定到整机；重复定位精度和关节回差用带单位的 test.result 上报。关节回差逐台测，用 X̄ 图加判异规则在超差前发现某批减速器在漂移，再圈出受影响的机器人。AI 只起草冻结提议。"
@@ -427,22 +427,22 @@ slides:
       - ["装配时扫码绑定旋梭批次 = 给整机“印批号”", "Scanning hook lots at assembly = printing lot numbers"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g>
             <path d="M80 160 L140 100 L220 100 L280 160 L280 440 L80 440 Z" fill="#f3f6fa"/>
             <rect x="80" y="230" width="200" height="90" fill="#4c8dff"/>
-            <text x="180" y="290" font-size="34" font-weight="800" fill="#fff" text-anchor="middle">牛奶</text>
+            <text x="180" y="290" font-size="34" font-weight="800" fill="#fff" text-anchor="middle" class="zh">牛奶</text><text x="180" y="290" font-size="34" font-weight="800" fill="#fff" text-anchor="middle" class="eo">Milk</text>
             <rect x="100" y="360" width="160" height="50" rx="8" fill="#ff7a45"/>
             <text x="180" y="395" font-size="24" font-weight="700" fill="#fff" text-anchor="middle" class="en">LOT 0612</text>
           </g>
           <defs><marker id="m27" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#8fa3ba"/></marker></defs>
           <path d="M300 300 L400 170 M300 300 L400 300 M300 300 L400 430" stroke="#8fa3ba" stroke-width="4" marker-end="url(#m27)"/>
           <g font-size="28" font-weight="700">
-            <rect x="410" y="130" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="440" y="182" fill="#ffb38f">门店 A：召回</text>
-            <rect x="410" y="260" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="440" y="312" fill="#ffb38f">门店 C：召回</text>
-            <rect x="410" y="390" width="300" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="440" y="442" fill="#8fa3ba">其他批次：照卖</text>
+            <rect x="410" y="130" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="440" y="182" fill="#ffb38f" class="zh">门店 A：召回</text><text x="440" y="182" fill="#ffb38f" class="eo">Store A: recall</text>
+            <rect x="410" y="260" width="300" height="80" rx="16" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/><text x="440" y="312" fill="#ffb38f" class="zh">门店 C：召回</text><text x="440" y="312" fill="#ffb38f" class="eo">Store C: recall</text>
+            <rect x="410" y="390" width="300" height="80" rx="16" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/><text x="440" y="442" fill="#8fa3ba" class="zh">其他批次：照卖</text><text x="440" y="442" fill="#8fa3ba" font-size="24" class="eo">Other lots: on sale</text>
           </g>
-          <text x="450" y="560" font-size="28" fill="#5ee0d2" text-anchor="middle">批号 + 去向 = 只圈出该圈的</text>
+          <text x="450" y="560" font-size="28" fill="#5ee0d2" text-anchor="middle" class="zh">批号 + 去向 = 只圈出该圈的</text><text x="450" y="560" font-size="28" fill="#5ee0d2" text-anchor="middle" class="eo">Lot + destination = recall only what you must</text>
         </svg>
     notes:
       - "生活里最熟悉的追溯是牛奶召回。超市发现某一批牛奶有问题，会按盒子上印的批号召回，而不是把所有牛奶都下架；前提是每一盒在生产时就印上了批号，还记下了发往哪些门店。缝纫机厂在装配时扫码绑定旋梭批次，就是给每台整机印批号。没有这一步，出了问题只能按时段一大片一大片地圈。"
@@ -452,9 +452,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["用 R1–R4：第 {{ch27.n4}} 台报警，一台没发出去", "With R1–R4: alarm at machine {{ch27.n4}}, nothing shipped"]
     rows:
-      - ["X̄ 控制限（mm）", "{{ch27.lcl:.4f}}–{{ch27.ucl:.4f}}"]
-      - ["只按超差：第 {{ch27.nt}} 台、{{ch27.tt:.1f}} h", "{{ch27.at}} 台受影响"]
-      - ["R1–R4：第 {{ch27.n4}} 台、{{ch27.t4:.1f}} h", "{{ch27.a4}} 台受影响"]
+      - [["X̄ 控制限（mm）", "X̄ limits (mm)"], ["{{ch27.lcl:.4f}}–{{ch27.ucl:.4f}}", "{{ch27.lcl:.4f}}–{{ch27.ucl:.4f}}"]]
+      - [["只按超差：第 {{ch27.nt}} 台、{{ch27.tt:.1f}} h", "Failures only (#{{ch27.nt}}, {{ch27.tt:.1f}} h): affected"], ["{{ch27.at}} 台受影响", "{{ch27.at}}"]]
+      - [["R1–R4：第 {{ch27.n4}} 台、{{ch27.t4:.1f}} h", "R1–R4 (#{{ch27.n4}}, {{ch27.t4:.1f}} h): affected"], ["{{ch27.a4}} 台受影响", "{{ch27.a4}}"]]
     side: {big: "{{ch27.sht}}", text: ["台已发货：只按超差时", "shipped when acting on failures only"]}
     foot: ["R1–R4：受影响第 46–{{ch27.last4}} 台全在厂内、无一超差，冻结剩余 {{ch27.left4}} 只旋梭", "R1–R4: machines 46–{{ch27.last4}} all still in the plant, none failed; {{ch27.left4}} hooks frozen"]
     notes:

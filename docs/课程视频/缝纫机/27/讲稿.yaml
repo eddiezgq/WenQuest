@@ -1,0 +1,129 @@
+# 《缝纫机设计与制造》公开课 第 27 讲：数字工厂——缝纫机工厂的整体信息化解决方案
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch27.yaml；2026-11-05 补英文版 SVG、回答页中英两栏、封面右移），
+# 配音是课件每页的讲稿（notes），中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 27-1（数字工厂：质量闭环与追溯）第①页录屏、数字工厂（第 23 轮 3.4：第 26、27 讲演示数字工厂的完整流程——
+# 本讲从一台整机的档案走一遍：变型、工单、批次、固件、测量、出厂，再到追溯和实施分期）、作业页、测验页。
+# 数字一律由 course/calc/ch27.py 算出（{{ch27.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "27"
+deck: ch27
+skip: [9, 13, 17, 22, 23, 24, 25]   # EBOM/MBOM、四个关口、超差概率（解答页再给）、版本管理、服务数据、AI 的位置、分期回收（数字工厂段第③页演示）：课程部分约 10 分钟；这几页留给课件
+code: [ch27]
+title: ["数字工厂——缝纫机工厂的整体信息化解决方案", "The Digital Factory — An Integrated IT Solution for a Sewing-Machine Plant"]
+chapter: ["第七篇 制造与数字工厂 · 第 27 章", "Part VII Manufacturing and the Digital Factory · Chapter 27"]
+next: ["第 28 讲", "Lecture 28"]
+cover_formula: 'UCL = \mu_0 + 3\sigma/\sqrt{n}'
+tags:
+  zh: [数字工厂, 信息化, 统一数据总线, 历史库, BOM, 物料模板, 固件版本, 瓶颈, OEE, X̄ 控制图, 判异规则, 质量闭环, 序列号追溯, 批次追溯, 韦布尔, 备件预测, 缝纫机制造]
+  en: [digital factory, manufacturing IT, unified data bus, historian, BOM, item template, firmware versioning, bottleneck, OEE, X-bar chart, run rules, quality loop, serial traceability, lot traceability, Weibull, spare-parts forecast, sewing machine manufacturing]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十七讲，数字工厂。上一讲我们站在服装厂里给缝纫机联网，这一讲换个位置，站到造缝纫机的工厂里。
+    - 背景里是今天的虚拟实验：调试工位逐台测出的梭尖间隙，经总线变成控制图和报警。一家整机厂从接单到售后，信息怎样带着编号一路走下来？
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 27, the digital factory. Last time we stood in a garment factory and connected its sewing machines; today we move to the plant that builds them.
+    - In the background is today's lab, where hook clearances measured machine by machine at the adjustment station travel over the bus and become a control chart and an alarm. From order to service, how does information move through a plant with an ID attached?
+
+after:
+  - id: lab271
+    kind: lab
+    lab: factory
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.75'; window.scrollTo(0, 0); document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && (!e.children.length || e.tagName === 'P') && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); ['checksA','tasks','msg'].forEach(i => { document.getElementById(i).style.filter = 'blur(7px) grayscale(1)'; }); document.getElementById('resetA').click(); setTimeout(function(){ document.getElementById('play').click(); }, 300); })()"
+        dur: 4
+      - js: "(() => { const r = document.getElementById('reseed'); r.click(); setTimeout(function(){ r.click(); }, 3000); })()"
+        dur: 6
+      - js: "(() => { ['rR2','rR3','rR4'].forEach(function(i){ var c = document.getElementById(i); if (!c.checked) { c.checked = true; c.dispatchEvent(new Event('change', {bubbles: true})); } }); setTimeout(function(){ document.getElementById('replay').click(); }, 300); })()"
+        dur: 6
+      - js: "(() => { ['rR1','rR2','rR3','rR4'].forEach(function(i){ var c = document.getElementById(i); if (c.checked) { c.checked = false; c.dispatchEvent(new Event('change', {bubbles: true})); } }); var z = document.getElementById('rR0'); if (!z.checked) { z.checked = true; z.dispatchEvent(new Event('change', {bubbles: true})); } setTimeout(function(){ document.getElementById('replay').click(); }, 300); })()"
+        dur: 6
+    say:
+      zh:
+        - ">下面是虚拟实验 27-1，数字工厂的质量闭环与追溯，在问渠平台上可以亲手做，结果区先遮住。第①页左边从上到下是逐台测量值、X̄ 图和总线消息，右边选判异规则、调工况。先恢复标准，点播放，记下报警的台号、时刻和受影响台数。"
+        - ">点“换一组随机数”，同一组规则的报警时刻和误报次数都会变，所以选出来的规则不能只在一组随机数上碰巧好看。"
+        - ">再把 R2、R3、R4 都勾上重放，看报警提前了多少，再记下无漂移的对照组 16 小时里误报了几次。"
+        - ">最后单独试 R0，也就是现有的“趋近上限”规则，想想它为什么在这里误报多。任务一：找一组规则，报警比首台超差早至少 4 小时，无漂移时又不误报。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 27-1, quality loop and traceability in the digital factory, which you can do yourself on WenQuest. The results are blurred. On page one, the left column shows the readings machine by machine, the X-bar chart and the bus messages; on the right you pick run rules and set the conditions. Reset to standard, press play, and note the alarm's machine number, time and affected count."
+        - ">Click 'New random numbers': for the same rules, the alarm time and false-alarm count both move, so the rules you choose must not just look good on one lucky seed."
+        - ">Now tick R2, R3 and R4 as well and replay. See how much earlier the alarm comes, and note how many false alarms the no-drift control gives in sixteen hours."
+        - ">Last, try R0 alone, the existing 'near the limit' rule, and think about why it false-alarms so often here. Task one: find a rule set that alarms at least four hours before the first out-of-tolerance machine, with no false alarms when there's no drift. The guide and report template are on the platform."
+
+  - id: factory
+    kind: lab
+    lab: factory
+    part: ["数字工厂", "Digital factory"]
+    viewport: [1600, 900]
+    steps:
+      - press: "#tabB"
+        js: "(() => { document.body.style.zoom = '0.75'; window.scrollTo(0, 0); document.querySelectorAll('body *').forEach(e => { if (/ERPNext|figsrc|hub\\/ai\\.py/.test(e.textContent) && (!e.children.length || e.tagName === 'P') && !e.querySelector('section,svg,canvas,table,button,input')) e.style.visibility = 'hidden'; }); const st = document.createElement('style'); st.textContent = '#cv3,#checksL,#late,#latev,#affIn,#msgB,#checksC{filter:blur(7px) grayscale(1)} #arch tr:nth-child(11) td.m{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); const g = document.getElementById('graph'); g.style.filter = 'blur(6px)'; setTimeout(() => { document.querySelectorAll('#graph text').forEach(t => { if (!/已装整机|Built #|仓库剩余|Left in stores|已发货|Shipped/.test(t.textContent)) return; const b = t.getBBox(), cx = b.x + b.width / 2; t.parentNode.querySelectorAll('text').forEach(u => { const c = u.getBBox(); if (Math.abs(c.x + c.width / 2 - cx) < 30 && c.y >= b.y - 2 && c.y < b.y + 60) u.style.filter = 'blur(6px)'; }); }); document.querySelectorAll('#graph text').forEach(t => { if (/装用起点|first used at/.test(t.textContent)) t.style.filter = 'blur(6px)'; }); g.style.filter = ''; }, 800); const s = document.getElementById('sn'); const f = v => { s.value = v; s.dispatchEvent(new Event('input', {bubbles: true})); }; setTimeout(() => f(40), 1500); setTimeout(() => f(70), 5000); document.getElementById('arch').style.outline = '4px solid #f2b705'; })()"
+      - js: "(() => { document.getElementById('arch').style.outline = 'none'; document.getElementById('graph').style.outline = '4px solid #f2b705'; })()"
+        dur: 2
+      - press: "#tabC"
+      - js: "(() => { const s = document.getElementById('oee1'); s.value = 0.64; s.dispatchEvent(new Event('input', {bubbles: true})); s.dispatchEvent(new Event('change', {bubbles: true})); })()"
+        dur: 3
+    say:
+      zh:
+        - ">这是问渠数字工厂，这一讲的规则在这里连成一条线。第②页右边是整机档案，拖动序列号：变型、工单、旋梭批次、机壳炉号、电控箱序列号，固件、参数表和事件表的版本，梭尖间隙、钩线定时和出厂测试，每一项都是历史库里的一条消息。"
+        - ">左边的关系图从报警的整机出发，向后查到旋梭批次、工单、磨床和砂轮修整，向前查同批旋梭装了哪些整机、仓库剩多少、有没有发货。任务二就是算出受影响的整机台数，数字先遮住。"
+        - ">第③页是实施分期计算器：三期各自的投资、工期和 KPI 目标，上面是 60 个月的累计现金流。"
+        - ">把关键设备 OEE 调到 64%，回收期就往后拖。任务三：OEE 保持 64%，其他 KPI 和投资都不比标准更有利，只压缩各期工期，每期不少于 4 个月，把回收期拉回 36 个月以内，怎样排、为什么，写进报告。"
+      en:
+        - ">This is the WenQuest digital factory, where today's rules join up into one line. On page two, the right side is the machine record. Drag the serial number: variant, work order, hook lot, housing heat number, control-box serial, firmware, parameter and event-table versions, hook clearance, hook timing and final test. Every line is one message in the historian."
+        - ">The graph on the left starts from the machine that alarmed and goes backward to the hook lot, the work order, the grinder and the wheel dressing, then forward to every machine built with that lot, the hooks left in stores, and anything shipped. Task two is to work out the number of affected machines, so those figures are blurred."
+        - ">Page three is the roll-out calculator: investment, duration and KPI targets for each of the three phases, with sixty months of cumulative cash flow above."
+        - ">Set key-equipment OEE to 64 percent and the payback slips. Task three: keep OEE at 64, make no other KPI or investment better than standard, and shorten only the phase durations, at least four months each, to bring payback back within 36 months. How you schedule it, and why, goes in your report."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 27：缝纫机厂的瓶颈、质量闭环与备件分析", "Assignment 27: bottleneck, quality loop and spares"]
+      points:
+        - ["日产 220 台：卧加负荷与所需 OEE", "220 a day: HMC load and the OEE it needs"]
+        - ["X̄ 控制限、漂移后超差概率、判异与 8D", "X̄ limits, failure odds under drift, rules and 8D"]
+        - ["两条 test.result 消息；韦布尔备件概率", "Two test.result messages; Weibull spare odds"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共四道题。第一题，卧加每台机壳 16 分钟、5 台、两班、每班 480 分钟，工厂要把日产量提到 220 台：求 OEE 60% 和 68% 时的负荷，不加设备时 OEE 至少多少才能不超过 90%，加一台、OEE 68% 又怎样，结合总装节拍 2.4 分钟给出建议。"
+        - ">第二题，某调试特性均值 0.070 毫米、σ 5 微米、公差 0.04 到 0.10，子组 5 台，求 X̄ 控制限；均值每小时漂 5 微米，求 2、4、6 小时后单台超差的概率，再说说选哪些判异规则、怎样围堵、8D 前四步做什么。"
+        - ">第三题，为出厂测试的“剪线 50 次成功次数”和“少油运转温升”写两条 test.result 消息；第四题，旋梭寿命按韦布尔 β 2.2、η 5000 小时，两台下季度各运转 225 小时，它们的旋梭分别已运转 1000 和 4000 小时，各求下季度失效的概率。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">The assignment has four questions. One: the horizontal machining centre takes 16 minutes per housing, five units, two 480-minute shifts, and the plant wants 220 machines a day. Find the load at 60 and 68 percent OEE, the OEE that keeps the load at 90 percent without new machines, the load with one more unit at 68 percent, and make a recommendation with the 2.4-minute assembly takt in mind."
+        - ">Two: an adjustment characteristic has mean 0.070 millimetres, sigma 5 microns, tolerance 0.04 to 0.10, subgroups of five. Find the X-bar limits; if the mean drifts 5 microns an hour, find the chance a single machine fails after 2, 4 and 6 hours, then choose your run rules, the containment steps, and the first four 8D steps."
+        - ">Three: write two test.result messages for end-of-line test, successful trims out of 50 and the low-oil temperature rise. Four: hook life is Weibull with beta 2.2 and eta 5000 hours; two machines each run 225 hours next quarter, with hooks at 1000 and 4000 hours. Find each one's chance of failing."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["4 个有无选项、3 档转速，8 种不允许：几种变型？", "4 options, 3 speeds, 8 not allowed: how many variants?"]
+        - ["每天 200 台：卧加负荷百分之多少？", "200 a day: what is the HMC load?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：WQ-LS 有 4 个有无选项，再加最高转速 3 档，其中 8 种组合技术上不允许，一共有多少种可用变型？"
+        - ">再比如：卧加条件和课上一样，每天要装 200 台，负荷是百分之多少？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: WQ-LS has four on-off options plus three top-speed grades, and eight combinations aren't allowed. How many usable variants are there?"
+        - ">Or: with the machining centres as in the lecture, what is their load at 200 machines a day?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - See you next time.
