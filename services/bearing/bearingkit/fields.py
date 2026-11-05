@@ -17,10 +17,10 @@ from pathlib import Path
 
 LABELS = json.loads((Path(__file__).with_name("labels.json")).read_text(encoding="utf-8"))
 
-TYPES = ["deep_groove", "angular", "cylindrical", "tapered", "flex", "crossed"]
+TYPES = ["deep_groove", "angular", "cylindrical", "tapered", "flex", "crossed", "thin"]
 BALL, ROLLER = ["deep_groove", "angular"], ["cylindrical", "tapered"]
 RIGID = ["deep_groove", "angular", "cylindrical", "tapered"]  # the types with lubrication and fatigue checks
-LOADED = RIGID + ["crossed"]  # the types loaded through an application (not the flexible bearing, plan 十八)
+LOADED = RIGID + ["crossed", "thin"]  # loaded through an application (not the flexible bearing, plan 十八)
 TP2 = {"type": ["tapered"], "pair": ["DB", "DF"]}  # a tapered pair (plan sections 十六, 二十一)
 SCENES = ["generic", "gearbox", "motor", "spindle", "hub", "joint", "camshaft"]
 AB = [("A", None), ("B", None)]
@@ -140,8 +140,16 @@ GROUPS = [
     ),
     (
         "gBalls",
-        {"type": BALL + ["flex"]},
+        {"type": BALL + ["flex", "thin"]},
         [
+            # thin-section bearings (plan section 二十一): the section first, it decides the rest
+            F(
+                "thin.section",
+                "thinSection",
+                kind="select",
+                options=opts(["X", "A", "C"], "thin_"),
+                when={"type": ["thin"]},
+            ),
             F("inner.Dw", "Dw", "mm"),
             F("inner.Z", "Z", kind="int"),
             F("inner.dm", "dm", "mm", hint="dmHint"),
@@ -149,6 +157,64 @@ GROUPS = [
             F("inner.fo", "fo", step=0.001),
             F("inner.Pd", "Pd", "mm", step=0.001, when={"type": ["deep_groove", "flex"]}),
             F("inner.alpha0_deg", "alpha0", "°", when={"type": ["angular"]}),
+            F("inner.alpha0_deg", "alpha0", "°", when={"type": ["thin"], "section": ["X", "A"]}),
+            F(
+                "pair.arrangement",
+                "arrangement",
+                kind="select",
+                options=opts(["single", "DB", "DF"], "arr_"),
+                when={"type": ["thin"], "section": ["A"]},
+            ),
+            F(
+                "pair.spacing",
+                "rowSpacing",
+                "mm",
+                hint="rowSpacingHint",
+                when={"type": ["thin"], "section": ["A"], "pair": ["DB", "DF"]},
+            ),
+            F(
+                "pair.setting",
+                "setting",
+                kind="select",
+                options=[("endplay", "xset_endplay"), ("preload", "setting_preload")],
+                when={"type": ["thin"], "section": ["X"]},
+            ),
+            F(
+                "pair.setting",
+                "setting",
+                kind="select",
+                options=opts(["endplay", "preload"], "setting_"),
+                when={"type": ["thin"], "section": ["A"], "pair": ["DB", "DF"]},
+            ),
+            F(
+                "pair.endplay",
+                "radialPlay",
+                "µm",
+                hint="radialPlayThinHint",
+                when={"type": ["thin"], "section": ["X"], "setting": ["endplay"]},
+            ),
+            F("pair.endplay", "radialPlay", "µm", hint="radialPlayThinHint", when={"type": ["thin"], "section": ["C"]}),
+            F(
+                "pair.endplay",
+                "endplay",
+                "µm",
+                hint="endplayHint",
+                when={"type": ["thin"], "section": ["A"], "pair": ["DB", "DF"], "setting": ["endplay"]},
+            ),
+            F(
+                "pair.preload",
+                "preloadThinX",
+                "N",
+                when={"type": ["thin"], "section": ["X"], "setting": ["preload"]},
+            ),
+            F(
+                "pair.preload",
+                "preloadF",
+                "N",
+                when={"type": ["thin"], "section": ["A"], "pair": ["DB", "DF"], "setting": ["preload"]},
+            ),
+            F("pair.sweep_from", "sweepFrom", "µm", hint="sweepHintThin", when={"type": ["thin"], "thinset": [True]}),
+            F("pair.sweep_to", "sweepTo", "µm", when={"type": ["thin"], "thinset": [True]}),
             F(
                 "pair.arrangement",
                 "arrangement",
@@ -452,6 +518,7 @@ BLANK = {
     },
     "profile": {"kind": "straight", "R": None, "flat": None, "points": []},
     "crossed": {"split": "outer"},
+    "thin": {"section": "X"},
     "flex": {
         "cam": "cosine",
         "w0": None,
@@ -546,6 +613,12 @@ def shown(when: dict, p: dict) -> bool:
         "mount": (p.get("pair") or {}).get("mount") or "pair",
         "setting": (p.get("pair") or {}).get("setting") or "endplay",
         "basis": (p.get("pair") or {}).get("basis") or "mounted",
+        "section": (p.get("thin") or {}).get("section") or "X",
+        # a thin-section bearing with a setting of its own (all but a single angular contact row)
+        "thinset": not (
+            ((p.get("thin") or {}).get("section") or "X") == "A"
+            and ((p.get("pair") or {}).get("arrangement") or "single") == "single"
+        ),
         "cam": (p.get("flex") or {}).get("cam") or "cosine",
     }
     for k, allowed in when.items():

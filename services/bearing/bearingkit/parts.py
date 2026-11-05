@@ -76,6 +76,50 @@ def ball_parts(g: dict) -> dict:
     return {"inner": inner, "outer": outer, "element": ball, "element_kind": "ball"}
 
 
+def four_point_parts(g: dict) -> dict:
+    """Four-point contact thin-section bearing (plan section 二十一): each groove two arcs meeting in the middle (a
+    gothic arch, the relief at the middle not drawn), shoulders at the given heights above the middle; balls."""
+    d, D, B, Dw = g["d"], g["D"], g["B"], g["Dw"]
+    hi, ho = g.get("h_i"), g.get("h_o")
+    if hi is None or ho is None:
+        raise PartsError("give the shoulder heights: the rings cannot be drawn without them")
+    x = g["x_arcs"]
+    ri, ro, zi, zo, rci, rco = x["ri"], x["ro"], x["zi"], x["zo"], x["rci"], x["rco"]
+    ai_, ao_ = g["di"] / 2, g["do"] / 2  # the middles of the arches
+    rsI, rsO = ai_ + hi, ao_ - ho
+    if not (rsI < rci and rsO > rco):
+        raise PartsError("the shoulders are higher than the groove arcs: lower shoulders")
+    wI = math.sqrt(max(ri * ri - (rci - rsI) ** 2, 0.0)) - zi  # where the arcs meet the shoulders, |z|
+    wO = math.sqrt(max(ro * ro - (rsO - rco) ** 2, 0.0)) - zo
+    if wI >= B / 2 or wO >= B / 2:
+        raise PartsError("the groove is wider than the ring at the shoulder")
+    if not (d / 2 < ai_ and rsI < rsO and ao_ < D / 2):
+        raise PartsError("the rings do not fit: check the shoulder heights and the sizes")
+    inner = [
+        {"a": (d / 2, -B / 2), "b": (rsI, -B / 2), "arc": None},
+        {"a": (rsI, -B / 2), "b": (rsI, -wI), "arc": None},
+        {"a": (rsI, -wI), "b": (ai_, 0.0), "arc": {"c": (rci, zi), "rho": ri, "ccw": False}},
+        {"a": (ai_, 0.0), "b": (rsI, wI), "arc": {"c": (rci, -zi), "rho": ri, "ccw": False}},
+        {"a": (rsI, wI), "b": (rsI, B / 2), "arc": None},
+        {"a": (rsI, B / 2), "b": (d / 2, B / 2), "arc": None},
+        {"a": (d / 2, B / 2), "b": (d / 2, -B / 2), "arc": None},
+    ]
+    outer = [
+        {"a": (rsO, -B / 2), "b": (D / 2, -B / 2), "arc": None},
+        {"a": (D / 2, -B / 2), "b": (D / 2, B / 2), "arc": None},
+        {"a": (D / 2, B / 2), "b": (rsO, B / 2), "arc": None},
+        {"a": (rsO, B / 2), "b": (rsO, wO), "arc": None},
+        {"a": (rsO, wO), "b": (ao_, 0.0), "arc": {"c": (rco, -zo), "rho": ro, "ccw": False}},
+        {"a": (ao_, 0.0), "b": (rsO, -wO), "arc": {"c": (rco, zo), "rho": ro, "ccw": False}},
+        {"a": (rsO, -wO), "b": (rsO, -B / 2), "arc": None},
+    ]
+    ball = [
+        {"a": (0.0, -Dw / 2), "b": (0.0, Dw / 2), "arc": {"c": (0.0, 0.0), "rho": Dw / 2, "ccw": True}},
+        {"a": (0.0, Dw / 2), "b": (0.0, -Dw / 2), "arc": None},
+    ]
+    return {"inner": inner, "outer": outer, "element": ball, "element_kind": "ball"}
+
+
 def cyl_parts(g: dict) -> dict:
     d, D, B, Dw, Lw = g["d"], g["D"], g["B"], g["Dw"], g["Lw"]
     inner = _poly([(d / 2, -B / 2), (g["di"] / 2, -B / 2), (g["di"] / 2, B / 2), (d / 2, B / 2)])
@@ -164,6 +208,8 @@ def parts(g: dict) -> dict:
         return taper_parts(g)
     if t == "crossed":
         return crossed_parts(g)
+    if t == "four_point":
+        return four_point_parts(g)
     raise PartsError("no parts for this bearing type")
 
 

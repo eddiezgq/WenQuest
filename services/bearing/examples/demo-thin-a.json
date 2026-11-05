@@ -1,0 +1,58 @@
+{
+  "title": {
+    "zh": "示例（虚构）：机器人腰部转台角接触薄壁轴承成对（背对背，预紧）",
+    "en": "Example (fictional): a pair of angular contact thin-section bearings in a robot base turntable (back to back, preloaded)"
+  },
+  "note": {
+    "zh": "尺寸、游隙或预紧、载荷和许用值都是演示虚构，不是任何厂家或标准中的型号，也不是推荐值。",
+    "en": "Sizes, clearance or preload, loads and limits are made up for the demo: not a catalogue or standard bearing, nor recommended values."
+  },
+  "type": "thin",
+  "thin": {
+    "section": "A"
+  },
+  "size": {
+    "d": 150,
+    "D": 166,
+    "B": 8
+  },
+  "inner": {
+    "Dw": 5,
+    "Z": 80,
+    "dm": 158,
+    "fi": 0.52,
+    "fo": 0.53,
+    "alpha0_deg": 30,
+    "h_i": 1.6,
+    "h_o": 1.6
+  },
+  "pair": {
+    "arrangement": "DB",
+    "preload": 1500,
+    "spacing": 8,
+    "mount": "pair",
+    "setting": "preload",
+    "endplay": null,
+    "sweep_from": 5,
+    "sweep_to": -10
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "scenario": {
+    "kind": "generic",
+    "fp": null
+  },
+  "limits": {
+    "p_static": 3500,
+    "gap_min": 0.5,
+    "wall_min": 1.0
+  },
+  "loads": {
+    "Fr": 1500,
+    "Fa": 800,
+    "M": 60000,
+    "n": 10
+  }
+}

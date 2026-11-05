@@ -1,0 +1,58 @@
+{
+  "title": {
+    "zh": "示例（虚构）：机器人腕关节四点接触薄壁轴承（预紧）",
+    "en": "Example (fictional): four-point contact thin-section bearing of a robot wrist (preloaded)"
+  },
+  "note": {
+    "zh": "尺寸、游隙或预紧、载荷和许用值都是演示虚构，不是任何厂家或标准中的型号，也不是推荐值。",
+    "en": "Sizes, clearance or preload, loads and limits are made up for the demo: not a catalogue or standard bearing, nor recommended values."
+  },
+  "type": "thin",
+  "thin": {
+    "section": "X"
+  },
+  "size": {
+    "d": 100,
+    "D": 116,
+    "B": 8
+  },
+  "inner": {
+    "Dw": 5,
+    "Z": 56,
+    "dm": 108,
+    "fi": 0.53,
+    "fo": 0.53,
+    "alpha0_deg": 30,
+    "h_i": 1.4,
+    "h_o": 1.4
+  },
+  "pair": {
+    "arrangement": "single",
+    "preload": null,
+    "spacing": null,
+    "mount": "pair",
+    "setting": "endplay",
+    "endplay": -12,
+    "sweep_from": 10,
+    "sweep_to": -15
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "scenario": {
+    "kind": "generic",
+    "fp": null
+  },
+  "limits": {
+    "p_static": 3500,
+    "gap_min": 0.5,
+    "wall_min": 1.0
+  },
+  "loads": {
+    "Fr": 600,
+    "Fa": 300,
+    "M": 72000,
+    "n": 20
+  }
+}

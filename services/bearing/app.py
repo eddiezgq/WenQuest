@@ -40,9 +40,26 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^numbers must be finite$", "数值必须是有限数"),
     (r"^the balls do not fit round the pitch circle", "节圆上放不下这么多钢球（Z·Dw ≥ π·dm）"),
     (
-        r"^the bearing type is deep_groove, angular, cylindrical(, tapered, flex or crossed| or tapered)$",
-        "轴承类型是深沟球、角接触球、圆柱滚子、圆锥滚子、谐波柔性或交叉滚子轴承",
+        r"^the bearing type is deep_groove, angular, cylindrical(, tapered, flex, crossed or thin| or tapered)$",
+        "轴承类型是深沟球、角接触球、圆柱滚子、圆锥滚子、谐波柔性、交叉滚子或薄壁轴承",
     ),
+    # thin-section bearings (plan section 二十一)
+    (r"^the thin-section bearing is four-point contact X", "薄壁轴承的截面型式是四点接触 X、角接触 A 或深沟 C"),
+    (r"^give the contact angle of the thin-section bearing", "请填薄壁轴承的接触角（10° 到 60° 之间）"),
+    (r"^only the angular contact thin-section bearing is used in pairs", "只有角接触型薄壁轴承可以成对"),
+    (r"^the pair is back to back \(DB\) or face to face \(DF\)$", "成对安装是背对背 DB 或面对面 DF"),
+    (r"^give the preload of the thin-section bearing", "请填薄壁轴承的预紧力（N）"),
+    (r"^a radial thin-section bearing is set by its clearance", "深沟型薄壁轴承用径向游隙设定，不能直接给预紧力"),
+    (r"^a single angular contact row has no preload of its own", "单列角接触没有自己的预紧：请选成对"),
+    (r"^give the axial end play of the pair \(µm", "请填成对轴承的轴向游隙（µm，负数为预紧）"),
+    (r"^give the radial clearance of the thin-section bearing", "请填薄壁轴承的径向游隙（µm，负数为预紧）"),
+    (
+        r"^the thin-section bearing's load distribution did not converge",
+        "载荷分布算不出来：载荷可能超过轴承能承受的，或这个方向没有支承",
+    ),
+    (r"^the shoulder height is above zero and below the groove depth", "挡肩高度要大于零、小于沟深"),
+    (r"^the shoulders are higher than the groove arcs", "挡肩高过了沟道圆弧：请降低挡肩"),
+    (r"^give the loads \(or a scenario with loads\)", "请填载荷（或选带载荷的应用场景）"),
     (r"^the cone or cup is too narrow to carry the whole roller", "内圈或外圈太窄，盖不住整个滚子：请检查宽度 B、C"),
     # crossed roller bearings (plan section 十九)
     (r"^give the contact angle of the crossed roller bearing", "请填交叉滚子轴承的接触角（20° 到 70° 之间）"),

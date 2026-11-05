@@ -983,6 +983,10 @@
 "单列圆锥滚子轴承按零游隙计算；选成对或两端支承后，这里可以填配合和温度，算工作时的轴向游隙。",
 "A single tapered row is worked with zero end play; choose a pair or two supports to give fits and temperatures for the end play at work."
 ],
+"fitsThin": [
+"薄壁轴承的游隙或预紧在上面直接给（按装好后的值）；配合与温度不单独计算。套圈按刚性计算，实际薄壁套圈会变形。",
+"A thin-section bearing’s clearance or preload is given above (as mounted); fits and temperatures are not worked separately. The rings are taken as rigid; real thin rings bend."
+],
 "fixedBearing": [
 "承受轴向力的轴承（固定端）",
 "Bearing taking the axial force (fixed end)"
@@ -1098,6 +1102,10 @@
 "hHint": [
 "从沟底量起",
 "Measured from the groove bottom"
+],
+"hThinHint": [
+"四点接触从桃形沟中线量起，其余从沟底量起",
+"Four-point: from the middle of the gothic arch; the others from the groove bottom"
 ],
 "h_i": [
 "内圈挡肩高度",
@@ -1230,6 +1238,10 @@
 "methodFlex": [
 "柔性轴承：内圈按凸轮形状强制变形；外圈按薄圆环（曲梁，不伸长的弯曲模态加整体伸缩，闭式解）受钢球接触力和柔轮啮合区载荷弯曲；钢球按赫兹点接触（未变形沟道曲率），由余能最小求出各球载荷并满足外圈力平衡；保持架位置在一个球距内取 8 个。沟道表面弯曲应力：内圈随凸轮转、不交变；外圈每转两次交变，取各位置范围的一半为应力幅。截面按沟底壁厚、全宽矩形；不含柔轮与齿、离心力。",
 "Flexible bearing: the inner ring forced to the cam’s shape; the outer ring a thin ring (curved beam: inextensional bending modes plus uniform stretch, closed form) bent by the ball contacts and the flexspline’s meshing zones; Hertz point contacts (raceway curvatures as made), ball loads from minimum complementary energy with the outer ring in balance; 8 cage positions over one ball pitch. Raceway bending stress: steady in the inner ring (it turns with the cam), alternating twice per turn in the outer ring (amplitude half the range). Section: full width, wall at the groove bottom; the flexspline, its teeth and centrifugal force are not modelled."
+],
+"methodThin": [
+"薄壁轴承：钢球作为自由体，内圈五个方向的位移和每个钢球的位置一起解（能量最小）；四点接触每个钢球最多四个接触点。套圈按刚性计算。",
+"Thin-section bearings: the balls are free bodies, solved with the inner ring’s five displacements (energy minimum); a four-point ball has up to four contacts. Rings taken as rigid."
 ],
 "misalign": [
 "内外圈相对倾斜",
@@ -1707,6 +1719,10 @@
 "预紧力",
 "Preload"
 ],
+"preloadThinX": [
+"预紧力（每条对角线上全部钢球的轴向力）",
+"Preload (axial force of all balls on one diagonal)"
+],
 "preloadWork": [
 "工作时预紧力",
 "Preload at work"
@@ -1923,6 +1939,10 @@
 "内圈相对外圈的径向自由量；负数为预紧（过盈）",
 "The inner ring’s free radial play; negative for preload"
 ],
+"radialPlayThinHint": [
+"内圈相对外圈的径向自由量，两边合计；负数为预紧",
+"The inner ring’s free radial play, both ways together; negative for preload"
+],
 "ratingsNote": [
 "额定载荷和寿命按国家标准计算，标准正文录入前显示“未知”。",
 "Load ratings and life follow the national standards and show “unknown” until the standard texts are entered."
@@ -2002,6 +2022,10 @@
 "scN": [
 "受载滚子数（两列）",
 "Rollers carrying load (both rows)"
+],
+"scNb": [
+"受载钢球数",
+"Balls carrying load"
 ],
 "scNx": [
 "受载滚子数",
@@ -2171,6 +2195,10 @@
 "两个都填才画曲线",
 "Fill in both for the curve"
 ],
+"sweepHintThin": [
+"预紧量曲线扫的游隙范围（µm，如 10 到 −15）；两个都填才画",
+"The clearance or end play range swept (µm, e.g. 10 to −15); fill in both for the curve"
+],
 "sweepHintX": [
 "预紧量曲线扫的径向游隙范围（如 10 到 −20 µm）；不填不画",
 "The clearance range swept (e.g. 10 to −20 µm); blank: no curve"
@@ -2210,6 +2238,62 @@
 "thermalHint": [
 "填调整时温度、工作温度和三个线膨胀系数，就按工作时的游隙算各工况；都不填则不计温度，只填一部分结果为“未知”。线膨胀系数按实际材料填。",
 "Give the setting temperature, the working temperatures and the three expansion coefficients and the cases run at the end play at work; none given: heat not taken; some given: unknown. Use the real materials’ coefficients."
+],
+"thin": [
+"薄壁轴承",
+"Thin-section bearing"
+],
+"thinAngle": [
+"接触角",
+"Angle"
+],
+"thinBall": [
+"钢球",
+"Balls"
+],
+"thinDiagM": [
+"对角线 −",
+"Diagonal −"
+],
+"thinDiagP": [
+"对角线 +（内圈 −z 侧、外圈 +z 侧）",
+"Diagonal + (inner −z, outer +z)"
+],
+"thinLoads": [
+"每个钢球的接触载荷",
+"Contact load of every ball"
+],
+"thinRowA": [
+"第 1 列",
+"Row 1"
+],
+"thinRowB": [
+"第 2 列",
+"Row 2"
+],
+"thinSection": [
+"截面型式",
+"Section"
+],
+"thinTable": [
+"各接触点的最大值（峰值工况）",
+"Largest at each contact (peak case)"
+],
+"thinWhere": [
+"接触点",
+"Contact"
+],
+"thin_A": [
+"角接触（A 型）",
+"Angular contact (A)"
+],
+"thin_C": [
+"深沟（C 型）",
+"Radial, deep groove (C)"
+],
+"thin_X": [
+"四点接触（X 型）",
+"Four-point contact (X)"
 ],
 "thisBearing": [
 "本轴承是",
