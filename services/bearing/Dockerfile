@@ -17,6 +17,7 @@ COPY services/bearing/bearingkit ./bearingkit
 COPY services/bearing/examples ./examples
 COPY services/bearing/app.py services/bearing/projects_api.py services/bearing/ai_api.py ./
 COPY services/bearing/freecad/*.py ./freecad/
+COPY services/bearing/freecad/help ./freecad/help
 COPY factory/digital/freecad/Mod/WenQuest/InitGui.py factory/digital/freecad/Mod/WenQuest/wq_workbench.py ./freecad/workbench/
 COPY --from=web /app/dist ./web
 RUN useradd -r -u 10007 bearing

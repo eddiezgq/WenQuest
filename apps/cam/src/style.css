@@ -39,6 +39,7 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .tools { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
 .tools button, .modes button { white-space: nowrap; }
 .tools select.dark { max-width: 220px; }
+a.dark.help { text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; }
 .cloud-btn.linked { border-color: var(--accent); }
 .who { display: inline-flex; flex-direction: column; line-height: 1.15; font-size: 13px; color: var(--night-ink); max-width: 14ch; text-decoration: none; }
 .who small { font-size: 11px; color: var(--night-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

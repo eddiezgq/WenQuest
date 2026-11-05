@@ -422,6 +422,7 @@ FREECAD_README = """问渠凸轮 · FreeCAD 工作台（第 39 轮第 5 步）
 
 需要 Python 包 numpy、scipy、shapely：FreeCAD 自带 numpy；缺的时候点“凸轮”会提示安装命令。
 弧面凸轮建模约一分钟。计算全在本机，不连网。
+帮助（不联网也能看）：Mod/WenQuest/cam-help/index.html；在线：https://wenquestrobotics.com/cam/help/freecad/
 """
 
 
@@ -446,6 +447,10 @@ def freecad_pack() -> bytes:
             if f.name.endswith(".cae.json"):
                 continue
             z.write(f, root + "examples/" + f.stem + ".wqcam.json")
+        help_dir = FREECAD / "help"  # the offline help (round 90)
+        for f in sorted(help_dir.rglob("*")) if help_dir.is_dir() else []:
+            if f.is_file():
+                z.write(f, root + "cam-help/" + f.relative_to(help_dir).as_posix())
         z.writestr("wenquest-cam-freecad/使用说明.txt", FREECAD_README)
     return buf.getvalue()
 

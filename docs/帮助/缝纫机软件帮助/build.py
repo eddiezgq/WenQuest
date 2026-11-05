@@ -9,10 +9,9 @@
   apps/web/src/static/help/media/…                      两份共用的视频、封面、字幕（原件就放这里，tools/ 里的录屏程序生成）
   services/gateway/app/sewcore/freecad/help/…           FreeCAD 版帮助的离线一份（随工作台安装包，带 FreeCAD 的视频）
 
-源文件：sections/*.md（Markdown + 几种指令，见 README.md）、template.html（版式）、anim.js（动画与小计算器）。
+源文件：sections/*.md（Markdown + 几种指令，见 README.md）、anim.js（动画与小计算器）；版式和生成在 docs/帮助/_帮助生成/（第 90 轮起共用）。
 文中的数一律由计算核心算出（{{键}}），不手写；CAE 的真实结果在 data/（tools/ 里的程序重算）。
 """
-import html
 import json
 import math
 import re
@@ -20,10 +19,10 @@ import shutil
 import sys
 from pathlib import Path
 
-import markdown
-
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
+sys.path.insert(0, str(HERE.parent / "_帮助生成"))
+import helpgen as HG  # noqa: E402
 sys.path.insert(0, str(ROOT / "services" / "gateway"))
 from app.sewcore import cae_setup as CS  # noqa: E402
 from app.sewcore import machines as MS  # noqa: E402
@@ -244,13 +243,6 @@ def case_numbers():
     return v
 
 
-def lookup(vals, path):
-    x = vals
-    for k in path.split("."):
-        x = x[int(k)] if isinstance(x, list) else x[k]
-    return x
-
-
 # ---------- 动画用的数据 ----------
 def anim_data():
     from app.sewcore import design as D
@@ -292,106 +284,20 @@ def anim_data():
             "explode": json.loads((HERE / "data/explode.json").read_text())}
 
 
-# ---------- Markdown + 指令 ----------
-ATTR = re.compile(r'(\w+)=(?:"([^"]*)"|\'([^\']*)\'|(\S+))')
-
-
-def attrs(s):
-    return {m.group(1): m.group(2) if m.group(2) is not None else m.group(3) if m.group(3) is not None else m.group(4) for m in ATTR.finditer(s)}
-
-
-def directive(name, a, ed, media_prefix):
-    e = html.escape
-    if name == "anim":
-        return f'<div class="anim" data-anim="{e(a["id"])}"></div>'
-    if name == "calc":
-        return f'<div class="calc" data-calc="{e(a["id"])}"></div>'
-    if name == "video":
-        v = a["src"]
-        cap = a.get("title", "")
-        return (f'<figure class="vid"><video controls preload="none" playsinline poster="{media_prefix}{v}.jpg">'
-                f'<source src="{media_prefix}{v}.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="{media_prefix}{v}.vtt">'
-                f'</video><figcaption>▶ {e(cap)}</figcaption></figure>')
-    if name == "img":
-        return f'<figure class="shot"><img loading="lazy" src="{media_prefix}{e(a["src"])}" alt="{e(a.get("caption", ""))}"><figcaption>{e(a.get("caption", ""))}</figcaption></figure>'
-    if name == "try":
-        q = [f"machine={a.get('machine', 'lockstitch')}"]
-        if a.get("tab"):
-            q.append(f"tab={a['tab']}")
-        if a.get("p"):
-            from urllib.parse import quote
-            q.append("p=" + quote(a["p"]))
-        url = ("/" if ed == "web" else ONLINE + "/") + "pages/sewing/sewing?" + "&".join(q)     # 网页端用 history 路由
-        return f'<a class="try" href="{e(url)}" target="_blank" rel="noopener">▶ 试一试：{e(a["label"])}</a>'
-    raise ValueError("unknown directive " + name)
-
-
-DIR = re.compile(r"^::(\w+)\{(.*)\}\s*$", re.M)
-ONLY = re.compile(r"^::only\{(\w+)\}\s*\n(.*?)^::end\s*$", re.M | re.S)
-
-
-def render(md, ed, vals, media_prefix):
-    md = ONLY.sub(lambda m: m.group(2) if m.group(1) == ed else "", md)
-    md = re.sub(r"\{\{([\w.]+)\}\}", lambda m: str(lookup(vals, m.group(1))), md)
-    blocks = {}
-
-    def keep(m):
-        k = f"@@D{len(blocks)}@@"
-        blocks[k] = directive(m.group(1), attrs(m.group(2)), ed, media_prefix)
-        return "\n" + k + "\n"
-    md = DIR.sub(keep, md)
-    h = markdown.markdown(md, extensions=["tables", "fenced_code", "attr_list", "md_in_html"])
-    for k, v in blocks.items():
-        h = h.replace(f"<p>{k}</p>", v).replace(k, v)
-    return h
-
-
-def sections(ed, vals, media_prefix):
-    out, nav = [], []
-    for i, f in enumerate(EDITIONS[ed]["files"]):
-        md = (HERE / "sections" / (f + ".md")).read_text(encoding="utf-8")
-        m = re.match(r"---\n(.*?)\n---\n", md, re.S)
-        meta = dict(x.split(":", 1) for x in m.group(1).splitlines()) if m else {}
-        meta = {k.strip(): v.strip() for k, v in meta.items()}
-        body = md[m.end():] if m else md
-        sid = meta["id"]
-        h = render(body, ed, vals, media_prefix)
-        subs = []
-
-        def h3(mm):
-            hid = mm.group(1) or f"{sid}-{len(subs) + 1}"
-            t = re.sub("<[^>]+>", "", mm.group(2))
-            subs.append((hid, t))
-            return f'<h3 id="{hid}">{mm.group(2)}</h3>'
-        h = re.sub(r'<h3(?: id="([^"]*)")?>(.*?)</h3>', h3, h)
-        num = f"{i:02d}"
-        out.append(f'<section id="{sid}"><h2><span class="n">{num}</span>{html.escape(meta["title"])}</h2>'
-                   f'<p class="lead">{meta.get("lead", "")}</p>{h}</section>')
-        nav.append((sid, num, meta["title"], subs))
-    return "\n".join(out), nav
-
-
-def nav_html(nav):
-    s = []
-    for sid, num, title, subs in nav:
-        s.append(f'<a href="#{sid}" data-s="{sid}"><span class="n">{num}</span>{html.escape(title)}</a>')
-        for k, t in subs:
-            s.append(f'<a class="sub" href="#{k}" data-s="{sid}">{html.escape(t)}</a>')
-    return "\n".join(s)
+# ---------- Markdown + 指令、版式：共用生成程序（第 90 轮抽到 docs/帮助/_帮助生成/） ----------
+def try_url(a, ed):
+    q = [f"machine={a.get('machine', 'lockstitch')}"]
+    if a.get("tab"):
+        q.append(f"tab={a['tab']}")
+    if a.get("p"):
+        from urllib.parse import quote
+        q.append("p=" + quote(a["p"]))
+    return ("/" if ed == "web" else ONLINE + "/") + "pages/sewing/sewing?" + "&".join(q)     # 网页端用 history 路由
 
 
 def build(ed, vals, data, out_dir, media_prefix):
-    E = EDITIONS[ed]
-    body, nav = sections(ed, vals, media_prefix)
-    t = (HERE / "template.html").read_text(encoding="utf-8")
-    page = (t.replace("{{TITLE}}", E["title"]).replace("{{SHORT}}", E["short"]).replace("{{NAV}}", nav_html(nav))
-             .replace("{{BODY}}", body).replace("{{OTHER_NAME}}", E["other"][0]).replace("{{OTHER_URL}}", E["other"][1])
-             .replace("{{EDITION}}", ed).replace("{{API}}", "" if ed == "web" else ONLINE)
-             .replace("{{DATA}}", json.dumps(data, ensure_ascii=False, separators=(",", ":")))
-             .replace("{{ANIM_JS}}", (HERE / "anim.js").read_text(encoding="utf-8")))
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / "index.html").write_text(page, encoding="utf-8")
-    return page
+    return HG.build(HERE, "问渠缝纫机设计软件", EDITIONS[ed], ed, vals, data, out_dir, media_prefix, try_url,
+                    (HERE / "anim.js").read_text(encoding="utf-8"))
 
 
 def main():
@@ -404,25 +310,8 @@ def main():
     media.mkdir(parents=True, exist_ok=True)
     build("web", vals, data, WEB_OUT, "../media/")
     build("freecad", vals, data, FC_ONLINE, "../media/")
-    # 离线版：只带 FreeCAD 的视频（fc-*）和截图，网页版的视频点了就去在线
-    if FC_OFFLINE.exists():
-        shutil.rmtree(FC_OFFLINE)
-    (FC_OFFLINE / "media").mkdir(parents=True)
-    for f in media.glob("*"):
-        if f.is_file() and (f.name.startswith("fc-") or f.suffix in (".png", ".webp", ".jpg") and not f.name.startswith("web-")):
-            shutil.copy2(f, FC_OFFLINE / "media" / f.name)
-    page = build("freecad", vals, data, FC_OFFLINE, "media/")
-    # 离线版用 file:// 打开时浏览器多半不读旁边的字幕文件：把字幕直接写进页面（data URI）
-    import base64
-
-    def inline_vtt(m):
-        p = FC_OFFLINE / "media" / m.group(1)
-        return f'src="data:text/vtt;base64,{base64.b64encode(p.read_bytes()).decode()}"' if p.exists() else m.group(0)
-    page = re.sub(r'src="media/([^"]+\.vtt)"', inline_vtt, page)
-    # 离线版里网页版的视频改成在线地址
-    page = page.replace('href="../media/', f'href="{ONLINE}/static/help/media/')          # 下载件（如案例机壳 STEP）走在线地址
-    page = re.sub(r'(src|poster)="media/(web-[^"]+)"', lambda m: f'{m.group(1)}="{ONLINE}/static/help/media/{m.group(2)}"', page)
-    (FC_OFFLINE / "index.html").write_text(page, encoding="utf-8")
+    # 离线版：只带 FreeCAD 的视频（fc-*）和截图，网页版的视频点了就去在线；字幕写进页面
+    HG.offline(lambda out, pre: build("freecad", vals, data, out, pre), media, FC_OFFLINE, ONLINE + "/static/help/media/")
     print("web", (WEB_OUT / "index.html").stat().st_size // 1024, "KB · freecad", (FC_OFFLINE / "index.html").stat().st_size // 1024, "KB ·",
           len(list(MEDIA_OUT.glob("*"))), "media files")
 

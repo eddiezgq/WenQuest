@@ -475,6 +475,14 @@ def run_headless(path, outdir):
             "valid": {k: bool(o.Shape.isValid()) for k, o in objs.items() if k != "driver"}}
 
 
+def help_url() -> str:
+    """The offline help that comes with the workbench (cam-help/, round 90), or the online copy."""
+    local = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cam-help", "index.html")
+    from pathlib import Path
+
+    return Path(local).as_uri() if os.path.isfile(local) else "https://wenquestrobotics.com/cam/help/freecad/"
+
+
 def run_dialog():
     import FreeCAD
     import FreeCADGui
@@ -491,6 +499,7 @@ def run_dialog():
         return
     p = load(path)
     FreeCAD.Console.PrintMessage("问渠凸轮：正在计算和建模（弧面凸轮约一分钟）…\n")
+    FreeCAD.Console.PrintMessage("问渠凸轮帮助：" + help_url() + "\n")
     QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtGui.Qt.WaitCursor))
     try:
         res = analyse(p)

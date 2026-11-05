@@ -173,6 +173,7 @@ const W = {
   preloadX: ['预紧力（每组滚子的轴向力）', 'Preload (axial force of each set)'],
   sweepHintX: ['预紧量曲线扫的径向游隙范围（如 10 到 −20 µm）；不填不画', 'The clearance range swept (e.g. 10 to −20 µm); blank: no curve'],
   fitsCrossed: ['交叉滚子轴承的预紧在上面按径向游隙给（已含装配后的值）；配合不单独计算。', 'A crossed roller bearing’s preload is set above as the radial clearance (as mounted); fits are not worked separately.'],
+  help: ['？帮助', '? Help'],
   // thin-section bearings (plan section 二十一)
   thin: ['薄壁轴承', 'Thin-section bearing'], thinSection: ['截面型式', 'Section'],
   thin_X: ['四点接触（X 型）', 'Four-point contact (X)'], thin_A: ['角接触（A 型）', 'Angular contact (A)'], thin_C: ['深沟（C 型）', 'Radial, deep groove (C)'],

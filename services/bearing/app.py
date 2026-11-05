@@ -527,6 +527,7 @@ FREECAD_README = """问渠轴承 · FreeCAD 工作台（第 64 轮第 6 步）
    import wq_bearing; wq_bearing.run_headless("项目.wqbearing.json", "输出文件夹", "工艺模板.wqprocess.json")
 
 需要 Python 包 numpy、scipy（1.9 以上）：FreeCAD 自带；缺的时候点“轴承”会提示安装命令。计算全在本机，不连网，不调 AI。
+6. 表单上的“帮助”打开随包带的帮助（Mod/WenQuest/bearing-help/index.html，不联网也能看）。
 示例的数是虚构的，只用于演示。
 """
 
@@ -555,6 +556,10 @@ def freecad_pack() -> bytes:
             z.write(f, root + "examples/" + f.stem + ".wqbearing.json")
         for f in sorted(PROCESS_EXAMPLES.glob("*.json")):
             z.write(f, root + "examples/" + f.stem + ".wqprocess.json")
+        help_dir = FREECAD / "help"  # the offline help (round 90), opened by the form's 帮助 button
+        for f in sorted(help_dir.rglob("*")) if help_dir.is_dir() else []:
+            if f.is_file():
+                z.write(f, root + "bearing-help/" + f.relative_to(help_dir).as_posix())
         z.writestr(top + "使用说明.txt", FREECAD_README)
     return buf.getvalue()
 
