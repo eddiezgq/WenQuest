@@ -1,0 +1,61 @@
+# 白板科普上传 YouTube（第 80 轮 Q5）：每日科普做完后，把两期 MP4 放进一个 GitHub 发布页（tag：popsci-<日期>，
+# 文件名 <日期>_中文.mp4、<日期>_英文.mp4），再触发本工作流；它按文件名找到 samples/白板讲课/每日科普/ 里对应的目录，
+# 逐期上传（进播放列表“问渠白板科普”/“WenQuest Whiteboard Science”），最后刷新官网视频清单。
+name: Popsci upload 白板科普上传
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "发布页的 tag，如 popsci-2026-11-05"
+        required: true
+      privacy:
+        description: "public / unlisted / private（谷歌审核通过前，接口上传都会被锁成私密）"
+        default: public
+
+permissions:
+  contents: write
+
+concurrency:
+  group: popsci-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+      YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+      YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Upload each episode
+        run: |
+          sudo apt-get install -y -qq ffmpeg > /dev/null
+          pip install -q google-api-python-client google-auth pyyaml
+          mkdir -p "$RUNNER_TEMP/pop"
+          gh release download "${{ inputs.tag }}" --pattern "*.mp4" --dir "$RUNNER_TEMP/pop"
+          n=0
+          for f in "$RUNNER_TEMP"/pop/*.mp4; do
+            stem=$(basename "$f" .mp4)                       # 2026-11-05_中文
+            d=$(ls -d samples/白板讲课/每日科普/"${stem}"_* 2>/dev/null | head -1)
+            if [ -z "$d" ]; then echo "::error::找不到 ${stem} 对应的科普目录"; exit 1; fi
+            echo "上传 $d"
+            python tools/video/upload_popsci.py "$d" "$f" --privacy "${{ inputs.privacy }}"
+            n=$((n+1))
+          done
+          echo "::notice title=白板科普已上传::$n 期（未过谷歌审核时为私密，请在 YouTube Studio 里点公开）"
+      - name: Refresh the site video list
+        run: |
+          python tools/site_home/videos.py
+          git config user.name "WenQuest site bot"
+          git config user.email "noreply@wenquestrobotics.com"
+          git add site/data/videos.json
+          git diff --cached --quiet && { echo "视频清单没有变化"; exit 0; }
+          git commit -m "官网视频清单：白板科普上传后更新"
+          git pull --rebase origin main && git push origin HEAD:main
