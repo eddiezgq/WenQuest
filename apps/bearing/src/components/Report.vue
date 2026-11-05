@@ -12,6 +12,7 @@ import Extras from './Extras.vue'
 import SettingCurve from './SettingCurve.vue'
 import ScenarioPanel from './ScenarioPanel.vue'
 import DesignNote from './DesignNote.vue'
+import CatalogNote from './CatalogNote.vue'
 
 const props = defineProps({ r: Object })
 defineEmits(['close'])
@@ -82,6 +83,7 @@ const print = () => window.print()
         <p v-if="project.note" class="fict">{{ t('fictional') }}：{{ lang === 'zh' ? project.note.zh : project.note.en }}</p>
         <p class="verdict" :class="r?.status">{{ t('overall') }}：{{ t(r?.status === 'pass' ? 'overallPass' : r?.status === 'fail' ? 'overallFail' : 'overallUnknown') }}</p>
       </header>
+      <CatalogNote />
       <DesignNote />
       <h2>{{ t('inputs') }}</h2>
       <table><tbody><tr v-for="[k, x, u] in inputs" :key="k"><th>{{ t(k) }}</th><td class="mono">{{ x }} {{ u }}</td></tr></tbody></table>

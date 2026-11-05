@@ -22,6 +22,8 @@ import AiDraft from './components/AiDraft.vue'
 import SettingCurve from './components/SettingCurve.vue'
 import AiExplain from './components/AiExplain.vue'
 import CloudPanel from './components/CloudPanel.vue'
+import CatalogPanel from './components/CatalogPanel.vue'
+import CatalogNote from './components/CatalogNote.vue'
 import { me, links, detach, loadMe, loginUrl } from './cloud'
 
 const examples = ref([])
@@ -29,6 +31,7 @@ const pick = ref('')
 const showReport = ref(false)
 const showParts = ref(false)
 const showCloud = ref(false)
+const showCatalog = ref(false)
 const MODES = ['design', 'assembly', 'quality', 'process']
 const mode = ref(MODES.includes(new URLSearchParams(location.search).get('mode')) ? new URLSearchParams(location.search).get('mode') : 'design')
 const fileInput = ref(null)
@@ -91,6 +94,7 @@ onMounted(async () => {
         <button v-if="!embed" type="button" class="dark" @click="fileInput.click()">{{ t('open') }}</button>
         <input ref="fileInput" type="file" accept=".json" hidden @change="openFile">
         <button v-if="!embed" type="button" class="dark" @click="save">{{ t('save') }}</button>
+        <button v-if="!embed && mode === 'design'" type="button" class="dark" @click="showCatalog = true">{{ t('catalog') }}</button>
         <button v-if="!embed && mode === 'design'" type="button" class="dark cloud-btn" :class="{ linked: links.design.id }" :title="linked || t('cloud')" @click="showCloud = true">{{ t('cloud') }}</button>
         <button v-if="mode === 'design'" type="button" class="dark" :disabled="!result" @click="showParts = true">{{ t('partsBtn') }}</button>
         <button type="button" class="accent" :disabled="!result" @click="showReport = true">{{ t('report') }}</button>
@@ -111,6 +115,7 @@ onMounted(async () => {
 
       <section class="stage">
         <p v-if="note" class="fict">{{ t('fictional') }}：{{ note }}</p>
+        <CatalogNote />
         <div class="figs">
           <SectionCyl v-if="result?.type === 'cylindrical'" :r="result" />
           <SectionTaper v-else-if="result?.type === 'tapered'" :r="result" />
@@ -130,6 +135,7 @@ onMounted(async () => {
 
     <Report v-if="showReport && result" :r="result" @close="showReport = false" />
     <Parts v-if="showParts" @close="showParts = false" />
+    <CatalogPanel v-if="showCatalog" @close="showCatalog = false" />
     <CloudPanel v-if="showCloud" kind="design" :work="work" :load="loadWork" :name="title" @close="showCloud = false" />
   </div>
 </template>

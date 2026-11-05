@@ -1,7 +1,8 @@
 """问渠轴承的云端项目（第 64 轮第 7 步，细则第十五节）：做法与问渠凸轮的云端项目（cam_projects.py）相同，
-多一个“类型”：设计项目（design，.wqbearing.json）和工艺模板（process，.wqprocess.json），列表可按类型筛。
+多一个“类型”：设计项目（design，.wqbearing.json）、工艺模板（process，.wqprocess.json）和产品库（catalog，企业自己的
+产品目录表，细则第十七节 K3），列表可按类型筛。
 
-  GET    /api/v1/bearing/projects?kind=design|process   本单位的项目列表（不含内容）
+  GET    /api/v1/bearing/projects?kind=design|process|catalog   本单位的项目列表（不含内容）
   POST   /api/v1/bearing/projects                       新建（第 1 版）
   GET    /api/v1/bearing/projects/{id}                  打开：当前版本的内容和历史版本列表；?version=n 打开某一版（只读）
   PUT    /api/v1/bearing/projects/{id}                  保存：带上打开时的版本号 base；别人已存过新版 → 409
@@ -35,7 +36,7 @@ MAX_BYTES = 2_000_000
 
 class NewIn(BaseModel):
     name: str = Field(min_length=1, max_length=80)
-    kind: str = Field(default="design", pattern="^(design|process)$")
+    kind: str = Field(default="design", pattern="^(design|process|catalog)$")
     body: dict[str, Any]
 
 
@@ -128,8 +129,8 @@ def register(app, m) -> None:
     @app.get("/api/v1/bearing/projects")
     async def list_projects(lic: Annotated[dict, Depends(who)], kind: str | None = None):
         org, _uid, name = me(lic)
-        if kind not in (None, "", "design", "process"):
-            raise EngineError("bad_kind", "the kind is design or process", 400)
+        if kind not in (None, "", "design", "process", "catalog"):
+            raise EngineError("bad_kind", "the kind is design, process or catalog", 400)
         with db() as c:
             if kind:
                 rs = c.execute("select * from projects where org=? and kind=? and deleted=0 order by updated desc", (org, kind))
