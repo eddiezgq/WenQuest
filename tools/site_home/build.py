@@ -86,6 +86,44 @@ def tiers(S):
     return "\n".join(out)
 
 
+# ---------------------------------------------------------------- 第 80 轮：问渠全貌总图、看视频认识问渠
+NOT_FILES = ("/cam/", "/bearing/")          # 由各自的服务提供，不是 site/ 里的文件
+
+
+def check_link(url, problems):
+    if not url.startswith("/") or url.startswith(NOT_FILES):
+        return
+    path = ROOT / "site" / url.lstrip("/")
+    if not (path.is_file() or (path / "index.html").is_file() or path.with_suffix(".html").is_file()):
+        problems.append(url)
+
+
+def atlas(cat, vals):
+    problems, cols = [], []
+    for k, g in enumerate(cat["groups"], 1):
+        cards = []
+        for it in g["items"]:
+            check_link(it["url"], problems)
+            dz, de = it["dz"], it["de"]
+            for a, b in vals.items():
+                dz, de = dz.replace(a, b), de.replace(a, b)
+            ext = it["url"].startswith("http")
+            lock = (f'<span class="lock">{T("需登录", "Sign-in")}</span>' if it.get("login") else "")
+            cards.append(f'<a class="ac" href="{it["url"]}"{" rel=noopener" if ext else ""}><b>{T(it["zh"], it["en"])}{lock}</b>'
+                         f'<span>{T(dz, de)}</span></a>')
+        cols.append(f'<div class="ag{" wide" if g.get("wide") else ""}" id="atlas-{g["key"]}"><h3><span class="n">{k:02d}</span>{T(g["zh"], g["en"])}</h3>'
+                    f'<div class="acs">{"".join(cards)}</div></div>')
+    if problems:
+        raise SystemExit(f"总图里的站内链接找不到文件：{problems}")
+    return "\n".join(cols)
+
+
+def video_cfg(cat):
+    import json
+    v = cat["videos"]
+    return json.dumps({"pinned": v.get("sewing_pinned", [])}, ensure_ascii=False)
+
+
 def main():
     S = {b: book_stats(b) for b in BOOKS}
     flab = len(glob.glob(str(ROOT / "factory" / "digital" / "实验*.md")))
@@ -99,10 +137,15 @@ def main():
         "__ASOF__": dt.date.today().isoformat(),
         "__TIERS__": tiers(S),
     }
+    cat = yaml.safe_load((HERE / "catalog.yaml").read_text(encoding="utf-8"))
+    vals["__ATLAS__"] = atlas(cat, {k: vals[k] for k in ("__LAB__", "__FLAB__")})
+    vals["__VCFG__"] = video_cfg(cat)
     for k, v in vals.items():
         tpl = tpl.replace(k, v)
     (ROOT / "site" / "index.html").write_text(tpl, encoding="utf-8")
-    print({k: v for k, v in vals.items() if k != "__TIERS__"})
+    vp = (HERE / "videos.tpl.html").read_text(encoding="utf-8").replace("__VCFG__", vals["__VCFG__"])
+    (ROOT / "site" / "videos.html").write_text(vp, encoding="utf-8")
+    print({k: v for k, v in vals.items() if k not in ("__TIERS__", "__ATLAS__", "__VCFG__")})
 
 
 if __name__ == "__main__":

@@ -1,0 +1,41 @@
+# 官网首页“看视频认识问渠”（第 80 轮）：每天读一次 YouTube 频道里的播放列表（只取公开视频），
+# 写 site/data/videos.json 提交回 main；首页和 site/videos.html 按它显示“最新”的几期。没有变化就不提交。
+name: Site videos 官网视频清单
+
+on:
+  schedule:
+    - cron: "17 11 * * *"     # 每天 11:17 UTC（美东早上 6 点多，在每日科普之后）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: site-videos
+  cancel-in-progress: false
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Read the playlists
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+        run: |
+          pip install -q google-api-python-client google-auth pyyaml
+          python tools/site_home/videos.py
+      - name: Commit if changed
+        run: |
+          git config user.name "WenQuest site bot"
+          git config user.email "noreply@wenquestrobotics.com"
+          git add site/data/videos.json
+          git diff --cached --quiet && { echo "视频清单没有变化"; exit 0; }
+          git commit -m "官网视频清单：按 YouTube 播放列表更新（只含公开视频）"
+          git pull --rebase origin main && git push origin HEAD:main
