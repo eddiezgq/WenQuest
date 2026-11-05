@@ -1,0 +1,53 @@
+{
+ "channel": "https://www.youtube.com/channel/UC30qOp-nWdBX6Fj11e8ET6A",
+ "lists": {
+  "pop_zh": [],
+  "pop_en": [],
+  "sew_zh": [
+   {
+    "id": "jc5dO8ef_Io",
+    "title": "缝纫机设计与制造 第 22 讲｜自动化测试与持续迭代——工况、次数、模型都要够",
+    "date": "2026-11-05",
+    "dur": "PT15M37S"
+   },
+   {
+    "id": "_MmlWoP79aw",
+    "title": "缝纫机设计与制造 第 24 讲｜机针与旋梭的制造——两件最小的零件，两种制造思路",
+    "date": "2026-11-05",
+    "dur": "PT16M25S"
+   },
+   {
+    "id": "H_MWn1pcee0",
+    "title": "缝纫机设计与制造 第 25 讲｜机壳与凸轮的制造——一个定位置，一个定运动",
+    "date": "2026-11-05",
+    "dur": "PT16M42S"
+   }
+  ],
+  "sew_en": [
+   {
+    "id": "LWvbjD7R8A0",
+    "title": "Sewing Machine Design 23 | Designing, Building and Testing the Sewing Machine — Right on Paper Is No",
+    "date": "2026-11-05",
+    "dur": "PT18M23S"
+   },
+   {
+    "id": "XcIiEQlC0qQ",
+    "title": "Sewing Machine Design 24 | Making Needles and Rotary Hooks — Two Tiny Parts, Two Ways of Making Them",
+    "date": "2026-11-05",
+    "dur": "PT18M47S"
+   },
+   {
+    "id": "XTKjDdOb-JQ",
+    "title": "Sewing Machine Design 25 | Making Housings and Cams — One Fixes Positions, the Other Fixes Motion",
+    "date": "2026-11-05",
+    "dur": "PT21M40S"
+   },
+   {
+    "id": "WhSM1jGHtcs",
+    "title": "Sewing Machine Design 26 | Connected Machines and Digital Twins — Getting the Numbers Out of the Mac",
+    "date": "2026-11-04",
+    "dur": ""
+   }
+  ]
+ }
+}
