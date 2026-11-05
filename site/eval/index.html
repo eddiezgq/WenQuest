@@ -40,6 +40,12 @@
   .rep a { color:var(--accent); }
   .btn { display:inline-block; border:1px solid var(--ink); padding:9px 14px; border-radius:3px; text-decoration:none; color:var(--ink); font-size:15px; }
   .tbl { overflow-x:auto; }
+  .figs { display:grid; grid-template-columns:repeat(auto-fill,minmax(430px,1fr)); gap:14px; margin-top:14px; }
+  @media (max-width:520px) { .figs { grid-template-columns:1fr; } }
+  .figs figure { margin:0; background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; }
+  .figs img { width:100%; display:block; }
+  h1 { background:linear-gradient(90deg,#2563eb,#7c3aed,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .card { border-top:4px solid var(--c, #2563eb); }
 </style>
 </head>
 <body>
@@ -69,11 +75,13 @@
     </ol>
     <h2><span data-zh>三个学生的成绩单</span><span data-en>Three transcripts</span></h2>
     <div class="grid" id="stuCards"></div>
+    <div class="figs"><figure><img data-fig="radar" alt="能力画像"></figure><figure><img data-fig="kp" alt="知识点掌握结构"></figure></div>
   </section>
 
   <section class="pane" id="tea">
     <h2><span data-zh>教师只看需要人判断的案例</span><span data-en>Teachers see only the cases that need them</span></h2>
     <div class="grid" id="teaCards"></div>
+    <div class="figs"><figure><img data-fig="scatter" alt="知识 vs 实践"></figure><figure><img data-fig="review" alt="终审与评教"></figure></div>
     <h2><span data-zh>样例：照抄型学生 S006</span><span data-en>Example: student S006 (simulated copier)</span></h2>
     <div class="card" id="s006"></div>
   </section>
@@ -81,6 +89,8 @@
   <section class="pane" id="sch">
     <h2><span data-zh>课程目标达成度（直接评价与间接评价分开）</span><span data-en>Course objectives (direct and indirect kept apart)</span></h2>
     <div class="tbl"><table id="coTable"></table></div>
+    <div class="figs"><figure><img data-fig="co" alt="课程目标达成度"></figure><figure><img data-fig="components" alt="考核环节得分率"></figure>
+      <figure><img data-fig="grades" alt="成绩分布"></figure><figure><img data-fig="gain" alt="学习增值"></figure></div>
     <h2><span data-zh>一键生成的报告</span><span data-en>Generated reports</span></h2>
     <div class="grid">
       <div class="card"><b>课程目标达成情况评价报告</b><small><span data-zh>专业认证中每门课都要的那份；改进措施待教师确认</span><span data-en>Required for every course in accreditation</span></small>
@@ -109,6 +119,7 @@
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   fetch("data.json").then(function (r) { return r.json(); }).then(function (d) {
     var c = d.course;
+    document.querySelectorAll("img[data-fig]").forEach(function (im) { im.src = d.figs[im.dataset.fig]; });
     document.getElementById("checks").textContent = c.checks_ok;
     document.getElementById("stuCards").innerHTML = d.sample_students.map(function (s) {
       var p = s.profile;
@@ -117,7 +128,7 @@
     }).join("");
     var r = c.review, rs = r["按原因"];
     document.getElementById("teaCards").innerHTML =
-      '<div class="card"><b>终审队列</b><span class="big">' + r["总数"] + "</span><small>" + Object.keys(rs).filter(function (k) { return rs[k]; }).map(function (k) { return esc(k) + " " + rs[k]; }).join("、") + "</small></div>" +
+      '<div class="card" style="--c:#e11d48"><b>终审队列</b><span class="big">' + r["总数"] + "</span><small>" + Object.keys(rs).filter(function (k) { return rs[k]; }).map(function (k) { return esc(k) + " " + rs[k]; }).join("、") + "</small></div>" +
       '<div class="card"><b>暂缓发布成绩单</b><span class="big">' + r["暂缓发布成绩单"].length + "</span><small>" + r["暂缓发布成绩单"].join("、") + "（等口试）</small></div>" +
       '<div class="card"><b>学业预警</b><span class="big">' + c.risks + "</span><small>推送任课教师、辅导员</small></div>" +
       '<div class="card"><b>最弱知识点</b><small>' + c.weak.map(esc).join("<br>") + "</small></div>";

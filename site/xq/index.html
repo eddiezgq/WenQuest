@@ -43,6 +43,11 @@
   .act { font-size:13px; padding:3px 10px; }
   .rep a { color:var(--accent); margin-right:14px; }
   #detail { display:none; } #detail.on { display:block; }
+  .figs { display:grid; grid-template-columns:repeat(auto-fill,minmax(460px,1fr)); gap:14px; }
+  @media (max-width:520px) { .figs { grid-template-columns:1fr; } }
+  .figs figure { margin:0; background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px; } .figs img { width:100%; display:block; }
+  h1 { background:linear-gradient(90deg,#0d9488,#2563eb,#7c3aed); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .kpi { border-top:4px solid var(--c,#2563eb); } .kpi b { color:var(--c,#14212b); }
 </style>
 </head>
 <body>
@@ -54,12 +59,16 @@
 
   <div class="kpis" id="kpis"></div>
 
+  <h2><span data-zh>全校一张图</span><span data-en>The whole school at a glance</span></h2>
+  <div class="figs"><figure><img data-fig="heat" alt="毕业要求热力图"></figure><figure><img data-fig="risk" alt="学业预警与未达成指标点"></figure></div>
+
   <h2><span data-zh>学院与专业</span><span data-en>Colleges and programs</span><small><span data-zh>每个小块是一个毕业要求指标点；红 = 低于 0.70，黄 = 0.70–0.72。点专业看明细</span><span data-en>Each chip is a graduate-attribute indicator; red &lt; 0.70, amber 0.70–0.72. Click a program</span></small></h2>
   <div class="cols" id="cols"></div>
 
   <section id="detail">
     <h2 id="dTitle"></h2>
     <div class="tbl"><table id="dTable"></table></div>
+    <div class="figs" id="dFigs" style="margin-top:12px"><figure><img data-fig="radar" alt="指标点雷达"></figure><figure><img data-fig="support" alt="支撑课程"></figure></div>
     <p class="rep" id="dRep"></p>
   </section>
 
@@ -81,11 +90,12 @@
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   fetch("data.json").then(function (r) { return r.json(); }).then(function (d) {
     var T = d.threshold, progs = [], low = 0, pts = 0, risk = 0;
+    document.querySelectorAll("img[data-fig]").forEach(function (im) { im.src = d.figs[im.dataset.fig]; });
     d.colleges.forEach(function (c) { c.programs.forEach(function (p) { progs.push(p); risk += p.risk; p.points.forEach(function (x) { pts++; if (x.v < T) low++; }); }); });
     document.getElementById("kpis").innerHTML =
-      '<div class="kpi"><b>' + d.colleges.length + '</b><span>学院</span></div><div class="kpi"><b>' + progs.length + '</b><span>专业</span></div>' +
-      '<div class="kpi"><b>' + low + " / " + pts + '</b><span>未达成的指标点</span></div><div class="kpi"><b>' + risk + '</b><span>学业预警（人）</span></div>' +
-      '<div class="kpi"><b>' + d.tasks.length + '</b><span>改进任务</span></div>';
+      '<div class="kpi" style="--c:#2563eb"><b>' + d.colleges.length + '</b><span>学院</span></div><div class="kpi" style="--c:#0d9488"><b>' + progs.length + '</b><span>专业</span></div>' +
+      '<div class="kpi" style="--c:#e11d48"><b>' + low + " / " + pts + '</b><span>未达成的指标点</span></div><div class="kpi" style="--c:#f59e0b"><b>' + risk + '</b><span>学业预警（人）</span></div>' +
+      '<div class="kpi" style="--c:#7c3aed"><b>' + d.tasks.length + '</b><span>改进任务</span></div>';
     document.getElementById("cols").innerHTML = d.colleges.map(function (c) {
       return '<div class="col"><h3>' + esc(c.name) + "</h3>" + c.programs.map(function (p, i) {
         return '<div class="prog" data-p="' + esc(p.name) + '"><div class="name"><span>' + esc(p.name) + "</span>" + (p.real ? '<span class="tag">含真算</span>' : '<span class="tag">模拟</span>') + '</div><div class="dots">' +
@@ -98,6 +108,7 @@
         var p = progs.filter(function (x) { return x.name === el.dataset.p; })[0], det = document.getElementById("detail");
         det.classList.add("on");
         document.getElementById("dTitle").textContent = p.name + " · 毕业要求指标点";
+        document.getElementById("dFigs").style.display = p.real ? "" : "none";
         if (p.real) {
           document.getElementById("dTable").innerHTML = "<thead><tr><th>指标点</th><th>加权和法</th><th>最小值法</th><th>支撑课程（权重 · 达成度）</th></tr></thead><tbody>" +
             d.points.map(function (x) { return "<tr><td>" + esc(x.id) + '</td><td class="' + (x.achieved ? "ok" : "bad") + '">' + x.weighted.toFixed(3) + "</td><td>" + x.min.toFixed(3) + "</td><td>" +

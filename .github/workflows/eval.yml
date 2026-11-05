@@ -15,5 +15,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -q numpy jsonschema openpyxl python-docx pytest
+      - run: sudo apt-get install -y -qq fonts-noto-cjk > /dev/null
+      - run: pip install -q numpy jsonschema openpyxl python-docx pytest matplotlib
       - run: python -m pytest -q services/eval/tests

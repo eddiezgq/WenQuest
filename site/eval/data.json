@@ -1,4 +1,14 @@
 {
+ "figs": {
+  "grades": "fig_grades.png",
+  "co": "fig_co.png",
+  "components": "fig_components.png",
+  "kp": "fig_kp.png",
+  "gain": "fig_gain.png",
+  "scatter": "fig_scatter.png",
+  "radar": "fig_radar.png",
+  "review": "fig_review.png"
+ },
  "course": {
   "offering": {
    "course_code": "PHY1101",

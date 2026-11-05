@@ -84,7 +84,7 @@ def school(c, pts):
     rnd = random.Random(83)
     colleges = [("机械与机器人学院", ["机器人工程", "机械设计制造及其自动化"]), ("电子信息学院", ["电子信息工程", "微电子科学与工程"]),
                 ("计算机学院", ["计算机科学与技术", "人工智能"])]
-    gps = ["1 工程知识", "2 问题分析", "3 设计/开发解决方案", "4 研究", "5 使用现代工具", "10 沟通"]
+    gps = ["1.2 工程知识", "2.1 问题分析", "3.1 设计/开发解决方案", "4.2 研究", "5.1 使用现代工具", "10.1 沟通"]
     out = []
     for col, progs in colleges:
         ps = []
@@ -115,17 +115,21 @@ def school(c, pts):
 
 
 # ---------------------------------------------------------------- 报告：结构写一次，同时出网页和 Word
-def report_course(c):
+def report_course(c, F):
     o = c["offering"]
     S = [("h", f"《{o['course_name']}》课程目标达成情况评价报告"),
          ("p", f"课程代码 {o['course_code']}　学期 {o['term']}　开课班 {o['offering_id']}　学生 {c['n']} 人　数据快照 {c['snapshot']}"),
          ("note", "演示样稿：学生数据为模拟数据（30 人模拟班），数字全部由评价流水线计算得出。"),
+         ("kpis", [("课程目标", f"{sum(v['achieved'] for v in c['objectives'].values())} / {len(c['objectives'])} 达成", "#0d9488"),
+                   ("最低达成度", f"{min(v['direct'] for v in c['objectives'].values()):.3f}", "#e11d48"),
+                   ("学生", f"{c['n']} 人", "#2563eb"), ("规则检查", c["checks_ok"], "#7c3aed")]),
          ("h2", "一、课程目标与毕业要求指标点"),
          ("table", ["课程目标", "内容", "支撑的毕业要求指标点（权重）"],
           [[co, v["name"], "；".join(f"{g}（{w}）" for g, w in c["support"].get(co, []))] for co, v in c["objectives"].items()]),
          ("h2", "二、考核方式与评价依据"),
          ("table", ["课程目标", "考核环节", "权重", "得分率"],
           [[co, comp["name"], f"{comp['weight']:.1f}", f"{comp['rate']:.3f}"] for co, v in c["objectives"].items() for comp in v["components"]]),
+         ("img", F["components"], "图 1　各考核环节得分率：红色环节拖了课程目标的后腿"),
          ("h2", "三、计算方法"),
          ("ul", [f"直接评价：课程目标达成度 = Σ（考核环节权重 × 该环节得分率），达成阈值 {c['threshold']:.2f}。",
                  f"个人达成比例：个人达成度不低于 {c['pass_line']:.2f} 的学生所占比例。",
@@ -134,6 +138,8 @@ def report_course(c):
          ("table", ["课程目标", "直接评价", "间接评价（自评）", "个人达成比例", "结论"],
           [[co, f"{v['direct']:.3f}", f"{v['indirect']:.3f}", f"{v['pass_rate']:.0%}", "达成" if v["achieved"] else "未达成"]
            for co, v in c["objectives"].items()]),
+         ("img", F["co"], "图 2　课程目标达成度：直接评价（红 = 未达成）与学生自评对照"),
+         ("img", F["kp"], "图 3　期末各知识点掌握结构：卡点一眼可见"),
          ("h2", "五、分析与改进措施（待教师确认；演示稿由规则生成，正式版由 AI 起草）")]
     S += [("ul", suggestions(c))]
     S += [("h2", "六、数据来源"),
@@ -142,41 +148,53 @@ def report_course(c):
     return S
 
 
-def report_quality(c):
+def report_quality(c, F):
     o = c["offering"]
     g = c["gain"]
     S = [("h", f"《{o['course_name']}》课程教学质量报告"),
          ("p", f"学期 {o['term']}　开课班 {o['offering_id']}　学生 {c['n']} 人"),
          ("note", "演示样稿：数据为模拟数据，数字由评价流水线计算得出。"),
+         ("kpis", [("总评平均", f"{c['mean']}", "#2563eb"), ("掌握概率增值", f"+{g['gain']:.2f}", "#7c3aed"),
+                   ("学业预警", f"{c['risks']} 人", "#f59e0b"), ("终审案例", f"{c['review']['总数']} 例", "#e11d48")]),
          ("h2", "一、学业结果"),
          ("table", ["项目", "结果"],
           [["总评平均", f"{c['mean']}"], ["成绩分布", "，".join(f"{k} {v}" for k, v in c["grades"].items())],
            ["三根支柱平均", f"知识 {c['pillars']['A']}，实践 {c['pillars']['B']}，综合 {c['pillars']['C']}"]]),
+         ("img", F["grades"], "图 1　成绩分布"),
+         ("img", F["radar"], "图 2　三个学生的能力画像（照抄型 S006、最高分、最低分）"),
          ("h2", "二、学习增值"),
          ("p", f"平均掌握概率由期初 {g['pre_mean']:.3f} 提高到期末 {g['post_mean']:.3f}，增值 {g['gain']:.3f}（{g['n_students']} 人）。"
                f"期末最弱的知识点：{'、'.join(c['weak'])}。"),
+         ("img", F["gain"], "图 3　学习增值；AI 学习路径比随机练习在两个卡点上的提升高出近一倍"),
          ("h2", "三、学业预警与终审"),
          ("p", f"学业预警 {c['risks']} 人（已推送任课教师、辅导员）。终审队列 {c['review']['总数']} 个案例："
                + "，".join(f"{k} {v}" for k, v in c["review"]["按原因"].items() if v)
                + f"；暂缓发布成绩单 {len(c['review']['暂缓发布成绩单'])} 人，等口试结果。"),
+         ("img", F["scatter"], "图 4　知识 vs 实践：闭卷高、实践低的红圈学生被过程考核和答辩拦下"),
          ("h2", "四、学生评教"),
          ("p", f"回收 {c['eval']['回答份数']} 份；得分最低两题：" + "、".join(f"{q}（{s}）" for q, s in c["eval"]["最低两题"]) + "。"),
          ("table", ["学生反馈主题", "人次", "倾向"], [[t["theme"], str(t["count"]), t["tone"]] for t in c["themes"]]),
+         ("img", F["review"], "图 5　终审队列构成与学生反馈主题"),
          ("h2", "五、持续改进（待教师确认；演示稿由规则生成，正式版由 AI 起草）"), ("ul", suggestions(c))]
     return S
 
 
-def report_grad(c, pts):
+def report_grad(c, pts, F):
     S = [("h", "机器人工程专业毕业要求达成情况评价报告（样稿）"),
          ("p", "评价学年 2026–2027　评价方法：加权和法为主，最小值法对照　达成阈值 0.70"),
          ("note", "演示样稿：《大学物理（上）》一门课的数值由问渠评价流水线真算（模拟学生数据）；标“示例”的课程是示例数值。由校情中枢汇总各课程推送生成。"),
+         ("kpis", [("指标点", f"{sum(p['achieved'] for p in pts)} / {len(pts)} 达成", "#0d9488"),
+                   ("最低", f"{min(p['weighted'] for p in pts):.3f}", "#e11d48"), ("改进任务", f"{sum(not v['achieved'] for v in c['objectives'].values())} 项", "#f59e0b")]),
          ("h2", "一、各指标点达成情况"),
          ("table", ["毕业要求指标点", "加权和法", "最小值法", "结论"],
           [[p["id"], f"{p['weighted']:.3f}", f"{p['min']:.3f}", "达成" if p["achieved"] else "未达成"] for p in pts]),
+         ("img", F["radar"], "图 1　机器人工程毕业要求指标点（红虚线为阈值 0.70）"),
          ("h2", "二、支撑课程明细"),
          ("table", ["指标点", "支撑课程", "课程目标", "支撑权重", "课程目标达成度"],
           [[p["id"], s["course"] + ("（示例）" if s["example"] else ""), s["co"] or "—", f"{s['w']:.1f}", f"{s['v']:.3f}"]
            for p in pts for s in p["support"]]),
+         ("img", F["support"], "图 2　各指标点由哪些课程撑起来"),
+         ("img", F["heat"], "图 3　全校毕业要求达成热力图（其他专业为模拟值）"),
          ("h2", "三、分析"),
          ("ul", [f"{p['id']}：加权和 {p['weighted']:.3f}，最低的支撑课程是 "
                  f"{min(p['support'], key=lambda s: s['v'])['course']}（{min(s['v'] for s in p['support']):.3f}）。"
@@ -202,6 +220,10 @@ def to_html(S, title):
             body.append(f'<p class="note">{e(item[1])}</p>')
         elif k == "ul":
             body.append("<ul>" + "".join(f"<li>{e(x)}</li>" for x in item[1]) + "</ul>")
+        elif k == "img":
+            body.append(f'<figure><img src="{e(item[1])}" alt="{e(item[2])}"><figcaption>{e(item[2])}</figcaption></figure>')
+        elif k == "kpis":
+            body.append('<div class="kpis">' + "".join(f'<div class="kpi" style="--c:{col}"><b>{e(v)}</b><span>{e(l)}</span></div>' for l, v, col in item[1]) + "</div>")
         elif k == "table":
             body.append("<table><thead><tr>" + "".join(f"<th>{e(h)}</th>" for h in item[1]) + "</tr></thead><tbody>"
                         + "".join("<tr>" + "".join(f"<td>{e(str(x))}</td>" for x in r) + "</tr>" for r in item[2]) + "</tbody></table>")
@@ -214,6 +236,13 @@ main{{max-width:900px;margin:0 auto;padding:28px 16px 64px}} h1{{font:700 26px/1
 .note{{color:var(--muted);font-size:14px;border-left:3px solid var(--accent);padding-left:10px}}
 table{{border-collapse:collapse;width:100%;font-size:14.5px;margin:8px 0}} th,td{{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}}
 .top{{display:flex;gap:16px;font-size:14px}} .top a{{color:var(--accent)}}
+h1{{background:linear-gradient(90deg,#2563eb,#7c3aed,#db2777);-webkit-background-clip:text;background-clip:text;color:transparent}}
+h2{{border-left:5px solid #2563eb;padding-left:10px}} th{{background:color-mix(in srgb,#2563eb 10%,transparent)}}
+figure{{margin:18px 0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}} figure img{{width:100%;display:block}}
+figcaption{{font-size:13.5px;color:#475569;margin-top:6px}}
+.kpis{{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}}
+.kpi{{border-radius:10px;padding:12px 14px;background:color-mix(in srgb,var(--c) 12%,transparent);border:1px solid color-mix(in srgb,var(--c) 40%,transparent)}}
+.kpi b{{display:block;font:700 24px/1.2 ui-monospace,monospace;color:var(--c)}} .kpi span{{font-size:13px;color:var(--muted)}}
 @media print{{.top{{display:none}}}}
 </style></head><body><main><div class="top"><a href="./">← 返回演示</a><a href="{e(title)}.docx">下载 Word</a></div>
 {''.join(body)}</main></body></html>"""
@@ -222,7 +251,7 @@ table{{border-collapse:collapse;width:100%;font-size:14.5px;margin:8px 0}} th,td
 def to_docx(S, path):
     from docx import Document
     from docx.oxml.ns import qn
-    from docx.shared import Pt
+    from docx.shared import Cm, Pt, RGBColor
     d = Document()
     st = d.styles["Normal"]
     st.font.name = "Microsoft YaHei"
@@ -241,6 +270,20 @@ def to_docx(S, path):
         elif k == "ul":
             for x in item[1]:
                 d.add_paragraph(x, style="List Bullet")
+        elif k == "img":
+            d.add_picture(str(path.parent / item[1]), width=Cm(15.5))
+            cap = d.add_paragraph(item[2])
+            cap.runs[0].font.size = Pt(9)
+            cap.runs[0].font.color.rgb = RGBColor(0x47, 0x55, 0x69)
+        elif k == "kpis":
+            t = d.add_table(rows=2, cols=len(item[1]))
+            t.style = "Table Grid"
+            for i, (l, v, col) in enumerate(item[1]):
+                r = t.rows[0].cells[i].paragraphs[0].add_run(v)
+                r.bold = True
+                r.font.size = Pt(16)
+                r.font.color.rgb = RGBColor.from_string(col.lstrip("#").upper())
+                t.rows[1].cells[i].text = l
         elif k == "table":
             t = d.add_table(rows=1, cols=len(item[1]))
             t.style = "Table Grid"
@@ -265,16 +308,20 @@ def main():
     ev, xq = out / "eval", out / "xq"
     ev.mkdir(parents=True, exist_ok=True)
     xq.mkdir(parents=True, exist_ok=True)
-    reports = [(ev, "课程目标达成情况评价报告", report_course(c)), (ev, "课程教学质量报告", report_quality(c)),
-               (xq, "毕业要求达成情况评价报告", report_grad(c, pts))]
+    import charts
+    lp = json.loads((R5 / "learning_path_results.json").read_text(encoding="utf-8"))
+    Fc = charts.course_charts(c, lp, stu, charts.kp_names(), ev)
+    Fs = charts.school_charts(pts, sch, xq, THR)
+    reports = [(ev, "课程目标达成情况评价报告", report_course(c, Fc)), (ev, "课程教学质量报告", report_quality(c, Fc)),
+               (xq, "毕业要求达成情况评价报告", report_grad(c, pts, Fs))]
     for d, name, S in reports:
         (d / f"{name}.html").write_text(to_html(S, name), encoding="utf-8")
         to_docx(S, d / f"{name}.docx")
     s006 = next(s for s in stu if s["id"] == "S006")
-    data_ev = {"course": {**{k: v for k, v in c.items() if k not in ("students", "support")}, "suggestions": suggestions(c)},
+    data_ev = {"figs": Fc, "course": {**{k: v for k, v in c.items() if k not in ("students", "support")}, "suggestions": suggestions(c)},
                "sample_students": [s006, max(stu, key=lambda s: s["total"]), min(stu, key=lambda s: s["total"])]}
     (ev / "data.json").write_text(json.dumps(data_ev, ensure_ascii=False, indent=1), encoding="utf-8")
-    (xq / "data.json").write_text(json.dumps({"points": pts, **sch, "threshold": THR}, ensure_ascii=False, indent=1), encoding="utf-8")
+    (xq / "data.json").write_text(json.dumps({"figs": Fs, "points": pts, **sch, "threshold": THR}, ensure_ascii=False, indent=1), encoding="utf-8")
     tpl = Path(__file__).resolve().parent
     for d, f in ((ev, "eval.html"), (xq, "xq.html")):
         (d / "index.html").write_text((tpl / f).read_text(encoding="utf-8"), encoding="utf-8")
