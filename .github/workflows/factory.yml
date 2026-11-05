@@ -107,6 +107,7 @@ jobs:
   design:
     # 第 88 轮：关节驱动板 DRV-JOINT 的 KiCad 设计——用仓库里的 KiCad 工程重新导出全部产物，必须和提交的一字不差；
     # 设计规则检查 0 错误、可制造性检查全部通过（改坏能报出来）。KiCad 用 Ubuntu 24.04 的软件包（7.0.11，与生成时同一版本）
+    # 第 92 轮：编码器接口芯片 WQ-ENCIF 的 RTL 仿真（Icarus）也在这里跑：与参考模型逐拍一致，波形与提交的一字不差（版图在 chip.yml）
     name: 电路板设计（KiCad）
     runs-on: ubuntu-24.04
     timeout-minutes: 50
@@ -117,7 +118,7 @@ jobs:
           sudo rm -f /var/lib/man-db/auto-update        # 装大软件包时 man-db 重建索引要很久（第一次就是卡在这里超时）
           sudo apt-get update -qq
           time sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends -o Dpkg::Use-Pty=0 \
-            kicad kicad-symbols kicad-footprints xvfb | grep -E "^(Setting up|Get:)" | grep -E "kicad|xvfb" || true
+            kicad kicad-symbols kicad-footprints xvfb iverilog | grep -E "^(Setting up|Get:)" | grep -E "kicad|xvfb|iverilog" || true
           kicad-cli version
           python3 -m pip install --break-system-packages -q build123d==0.13.0 trimesh==5.1.0 shapely==2.1.2 pytest pyyaml
       - name: 重新导出并核对产物一致
@@ -129,7 +130,12 @@ jobs:
           git status --porcelain factory/designs
           git diff --stat --exit-code -- factory/designs/drv-joint ':!*.glb' ':!*.step'
           test -z "$(git status --porcelain factory/designs/drv-joint | grep -v -E '\.(glb|step)$')"
-      - name: 可制造性检查（改坏能报出来）
+      - name: 芯片 RTL 仿真（WQ-ENCIF，与参考模型逐拍比对；波形与提交的一致）
+        run: |
+          python3 factory/designs/wq-encif/tb/run.py
+          git diff --stat --exit-code -- factory/designs/wq-encif/out/sim
+          test -z "$(git status --porcelain factory/designs/wq-encif/out/sim)"
+      - name: 可制造性检查（改坏能报出来）、芯片规格值
         run: python3 -m pytest -q factory/designs/tests
 
   rehearsal:

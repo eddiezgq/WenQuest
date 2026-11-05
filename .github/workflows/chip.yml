@@ -1,0 +1,67 @@
+# 第 92 轮（电子 E5）：编码器接口芯片 WQ-ENCIF 的综合与版图。在微电子实验的基础镜像（IIC-OSIC-TOOLS，按摘要锁定，见 deploy/micro-lab/Dockerfile）里
+# 跑 LibreLane：RTL → 门级 → 布局布线 → DRC / LVS / 时序 → GDS，再出网页用的版图图片。产物作为构建产物保存；
+# 改了 RTL 或配置后，下载 chip-layout 产物，替换 factory/designs/wq-encif/out/layout/ 再提交（提交过的话，这里核对门数和检查结论与提交的一致）。
+name: Chip layout 芯片版图
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - factory/designs/wq-encif/rtl/**
+      - factory/designs/wq-encif/flow/**
+      - .github/workflows/chip.yml
+
+concurrency:
+  group: chip-layout
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: 腾出磁盘（基础镜像解开约 20 GB）
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost /usr/share/swift /usr/local/.ghcup
+          sudo docker image prune -af > /dev/null
+          df -h /
+      - name: 拉取基础镜像（按摘要）
+        run: |
+          base=$(sed -n 's/^ARG BASE=//p' deploy/micro-lab/Dockerfile)
+          docker pull -q "$base"
+          echo "BASE=$base" >> "$GITHUB_ENV"
+      - name: 综合与版图（LibreLane，SKY130）
+        run: |
+          mkdir -p out && chmod 777 out
+          docker run --rm --user 1000:1000 -e IIC_OSIC_TOOLS_QUIET=1 -e PDK=sky130A -e WQ_IMAGE="$BASE" \
+            -v "$PWD:/repo:ro" -v "$PWD/out:/out" "$BASE" --skip bash -lc "bash /repo/factory/designs/wq-encif/flow/run.sh /repo /out"
+      - name: 结论
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json
+          r = json.load(open("out/layout/result.json"))
+          c = r["clean"]
+          print("::notice title=WQ-ENCIF 版图::逻辑单元 {} 个（触发器 {}），面积 {} μm²；建立余量 {} ns、保持余量 {} ns；DRC {}、LVS {}、天线 {}".format(
+              r["logic_cells"], r["flipflops"], r["stdcell_area_um2"], r["setup_ws_ns"], r["hold_ws_ns"],
+              "干净" if c["drc"] else "有错", "一致" if c["lvs"] else "不一致", "无违例" if c["antenna"] else "有违例"))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chip-layout
+          path: out/layout/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: chip-run
+          path: |
+            out/librelane.log
+            out/run/
+          retention-days: 14
