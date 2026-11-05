@@ -493,3 +493,47 @@ def cute_probe(cx, cy, k, at, idp="vg", mood="happy", moves=True):
         E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_a"], "pivot": [X(0), Y(0)], "amp": 6, "hz": 1.5},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_a"], "amp": 8, "hz": 1.0}]
     return E
+
+
+def cute_drop(cx, cy, k, at, idp="nn", mood="happy", moves=True, warm=True):
+    """暖水滴“小尼” (2026-11-05): a teardrop of sea water centred at (cx, cy), with a face and a little steam curl on top.
+    warm=True fills it red (warm water), False fills it blue (cold water). Ids: <idp>_b (body + face), <idp>_s (steam; wiggles).
+    "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    fill = "red" if warm else "blue"
+    E = [{"t": "path", "at": at, "id": idp + "_b", "c": fill, "w": 7, "fill": fill,
+          "d": f"M{X(0)},{Y(150)} C{X(40)},{Y(90)} {X(95)},{Y(40)} {X(95)},{Y(-20)} C{X(95)},{Y(-80)} {X(50)},{Y(-100)} {X(0)},{Y(-100)} "
+               f"C{X(-50)},{Y(-100)} {X(-95)},{Y(-80)} {X(-95)},{Y(-20)} C{X(-95)},{Y(40)} {X(-40)},{Y(90)} {X(0)},{Y(150)} Z"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 32 - 12), "y": Y(10), "w": 24 * k, "h": 28 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-28)},{Y(-40)} Q{X(0)},{Y(-68)} {X(28)},{Y(-40)}", "sad": f"M{X(-28)},{Y(-62)} Q{X(0)},{Y(-38)} {X(28)},{Y(-62)}",
+         "o": f"M{X(-12)},{Y(-50)} a{12 * k},{12 * k} 0 1,0 {24 * k},0 a{12 * k},{12 * k} 0 1,0 {-24 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "d": m})
+    E.append({"t": "path", "at": at, "id": idp + "_s", "c": "muted" if warm else "blue", "w": 5,
+              "d": f"M{X(0)},{Y(175)} Q{X(25)},{Y(200)} {X(0)},{Y(225)} Q{X(-25)},{Y(250)} {X(0)},{Y(275)}"})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_s"], "pivot": [X(0), Y(175)], "amp": 12, "hz": 2.5},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_s"], "amp": 8, "hz": 1.3}]
+    return E
+
+
+def cute_claw(cx, cy, k, at, idp="cl", mood="happy", moves=True, open_=True):
+    """吊在绳子上的抓手“小抓” (2026-11-05): a round gripper body centred at (cx, cy) with a face and two claw fingers below.
+    Ropes are drawn by the caller (they must end at (cx, cy - 70k)). Ids: <idp>_b (body + face), <idp>_f (fingers; wiggle).
+    "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-75), "y": Y(70), "w": 150 * k, "h": 130 * k, "c": "ink", "fill": "gold"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 28 - 11), "y": Y(30), "w": 22 * k, "h": 26 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-24)},{Y(-15)} Q{X(0)},{Y(-40)} {X(24)},{Y(-15)}", "sad": f"M{X(-24)},{Y(-35)} Q{X(0)},{Y(-12)} {X(24)},{Y(-35)}",
+         "o": f"M{X(-10)},{Y(-25)} a{10 * k},{10 * k} 0 1,0 {20 * k},0 a{10 * k},{10 * k} 0 1,0 {-20 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    sp = 70 if open_ else 30
+    E.append({"t": "path", "at": at, "id": idp + "_f", "c": "ink", "w": 8,
+              "d": f"M{X(-30)},{Y(-55)} Q{X(-sp)},{Y(-110)} {X(-sp + 30)},{Y(-150)} M{X(30)},{Y(-55)} Q{X(sp)},{Y(-110)} {X(sp - 30)},{Y(-150)}"})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_f"], "pivot": [X(0), Y(-55)], "amp": 8, "hz": 2.0},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_f"], "amp": 6, "hz": 1.1}]
+    return E
