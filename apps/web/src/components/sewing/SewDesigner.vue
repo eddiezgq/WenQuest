@@ -428,7 +428,7 @@ async function sampleStitch() {
   } catch (e: any) { stitchInfo.value = e?.message || String(e); }
 }
 
-// 三维样机 / 动画：同源页面。平缝机调 __api.setCfg；绷缝机弯针动画改 __api.ST 再 changed()；包缝机三维结构模型不用同步
+// 三维样机 / 动画：同源页面。六种机型的三维样机都调 __api.setCfg（第 73、81、88 轮）；绷缝机弯针动画改 __api.ST 再 changed()；刺绣机实验 16-1 改 __api.A
 function syncProto() {
   // #ifdef H5
   try {

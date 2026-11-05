@@ -82,3 +82,39 @@ def test_review_fixes():
     assert m["sp"][1] == 1300 and (m["acc"][m["worst"]] > 1) == ("accel" in [x["key"] for x in m["bad"]])
     c = E.analyze({"src": "file", "dst": LOGO})["view"]["cfg"]
     assert len(c["up"]) == c["n"] and sum(c["up"]) > 0 and c["over"] is None
+
+
+# ---------- 第 88 轮：包缝机 ----------
+def test_overlock_table_matches_the_textbook_model():
+    """默认参数下，逐度运动表和教材模型 9-1 页面里原来的表一致；尺寸、装不上的转角、慢放转角随设计变"""
+    import json
+    import re
+    from pathlib import Path
+    from app.sewcore import overlock as O
+    page = Path(__file__).resolve().parents[3] / "textbook/web-editions/sewing/src/zh/labs/model-overlock.html"
+    K = json.loads(re.search(r"const K=(\{.*?\});\n", page.read_text(encoding="utf-8")).group(1))
+    v = O.analyze({})["view"]
+    c = v["cfg"]
+    assert v["sync"] == "setCfg" and len(c["a"]) == len(c["th"]) == len(c["psi"]) == 360
+    assert max(abs(c["a"][i] - K["rows"][i]["a_tip"]) for i in range(360)) < 1e-3
+    assert max(abs(c["th"][i] - K["rows"][i]["th"]) for i in range(360)) < 1e-4
+    assert max(abs(c["psi"][i] - K["rows"][i]["psi"]) for i in range(360)) < 1e-4
+    assert [b["key"] for b in c["bad"]] == ["ul_gamma"] and c["bad"][0]["phi"] == min(range(360), key=lambda i: O.rssr(7.3801, 29.47, 20, O.UL)["gm"][i])
+    s = O.analyze({"ll_r": 14, "w": 6, "D": 1.5})["view"]["cfg"]
+    assert s["ll_fail"] and s["bad"][0]["key"] == "ll_turn" and s["bad"][0]["phi"] == s["ll_range"][0] == s["ll_fail"][0]   # 慢放到装不上的第一度（读数写卡死）
+    assert all(x == s["th"][(s["ll_fail"][0] - 1) % 360] for x in [s["th"][i] for i in s["ll_fail"]])     # 装不上：停在最后一个装得上的位置
+    assert s["FAB_EDGE_X"] == 6 and s["D"] == 1.5 and s["R_LLC"] == O.clean({"ll_r": 14})["ll_r"]
+
+
+def test_overlock_lockup_range_wrapping_past_zero():
+    """审读发现：装不上的转角跨过 0° 时（上弯针偏心 12 mm：342°–25°），慢放转角、读数和沿用的位置都要按连起来的那一段算"""
+    from app.sewcore import overlock as O
+    R = O.analyze({"ul_r": 12})
+    c = R["view"]["cfg"]
+    a, b = c["ul_range"]
+    assert a > b and a > 300 and b < 60                                # 342°–25° 这样跨过 0°
+    chk = next(x for x in R["checks"] if x["key"] == "ul_turn")
+    assert f"{a}°–{b}°" in chk["value"]["zh"]
+    assert next(x["phi"] for x in c["bad"] if x["key"] == "ul_turn") == a
+    frozen = c["psi"][(a - 1) % 360]
+    assert all(c["psi"][i] == frozen for i in c["ul_fail"])            # 整段停在装不上前的最后一个位置

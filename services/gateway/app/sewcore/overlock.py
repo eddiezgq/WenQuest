@@ -7,7 +7,7 @@ RSSR 与教材程序 course/calc/ch09.py、虚拟实验 9-2（rssr.html）同一
 """
 import math
 
-from .common import Checks, line_chart, make_params, mod360, result
+from .common import flagged, Checks, line_chart, make_params, mod360, result
 
 MACHINE = "overlock"
 NAME = ("包缝机", "Overlock")
@@ -180,6 +180,15 @@ def rssr_pose(r, b, c, pre, phi):
     return dict(A=A, B=B, Q=Q, C=C, e=e, v0=v0, v1=v1, th=t)
 
 
+def fail_range(fail):
+    """装不上的转角（rssr 按 0–359 记）连成一段：跨过 0° 时从真正的起点算（第 88 轮审读：原来写成 0°–359°）"""
+    if not fail:
+        return None
+    fs = set(fail)
+    start = next((i for i in fail if (i - 1) % 360 not in fs), fail[0])
+    return start, (start + len(fail) - 1) % 360
+
+
 def r_critical(b, c, pre, lo, hi=20.0):
     """曲柄能整周转动的最大偏心半径（二分 40 次，同 ch09.py）"""
     for _ in range(40):
@@ -271,7 +280,8 @@ def analyze(params=None, trial=True):
     # 下弯针（9.6）
     if L["fail"]:
         ch.add("ll_turn", "lower", "下弯针机构整周转动", "Lower looper linkage turns fully",
-               (f"在 {L['fail'][0]}°–{L['fail'][-1]}° 卡死", f"locks at {L['fail'][0]}°–{L['fail'][-1]}°"), ("能整周转动", "full revolution"), "bad", 9,
+               (f"在 {fail_range(L['fail'])[0]}°–{fail_range(L['fail'])[1]}° 卡死", f"locks at {fail_range(L['fail'])[0]}°–{fail_range(L['fail'])[1]}°"),
+               ("能整周转动", "full revolution"), "bad", 9,
                f"偏心半径要小于临界值约 {rc:.2f} mm，或加长球头连杆、摆杆。", f"Keep the eccentric below about {rc:.2f} mm, or lengthen the link or rocker.")
     else:
         arc = L["swing"] * DEG * p["ll_R"]
@@ -295,7 +305,8 @@ def analyze(params=None, trial=True):
     # 上弯针（9.7）
     if U["fail"]:
         ch.add("ul_turn", "upper", "上弯针机构整周转动", "Upper looper linkage turns fully",
-               (f"在 {U['fail'][0]}°–{U['fail'][-1]}° 卡死", f"locks at {U['fail'][0]}°–{U['fail'][-1]}°"), ("能整周转动", "full revolution"), "bad", 9,
+               (f"在 {fail_range(U['fail'])[0]}°–{fail_range(U['fail'])[1]}° 卡死", f"locks at {fail_range(U['fail'])[0]}°–{fail_range(U['fail'])[1]}°"),
+               ("能整周转动", "full revolution"), "bad", 9,
                "减小偏心半径或加长连杆。", "Reduce the eccentric or lengthen the link.")
     else:
         ch.add("ul_gamma", "upper", "上弯针最小传动角", "Upper looper minimum transmission angle", f"{U['gmin']:.1f}°", "≥ 40°",
@@ -363,7 +374,49 @@ def analyze(params=None, trial=True):
     timing.append(dict(key="knife", zh="上刀最低点", en="Upper knife at bottom", a=p["kn_ph"], b=p["kn_ph"], mark=p["kn_ph"]))
     return dict(version=VERSION, machine=MACHINE, params=p, checks=list(ch), ok=not any(c["state"] == "bad" for c in ch),
                 results=results, charts=charts, timing=timing, parts=parts(p, rc), card=adjust_card(p),
-                view=dict(page="model-overlock", sync=None, cfg={}))
+                view=dict(page="model-overlock", sync="setCfg", cfg=proto(p, L, U, list(ch), cr)))
+
+
+DELTA_UL = 0.44109           # 模型 9-1 画上弯针用的摆角 = RSSR 摆杆角 − 这个安装角（教材算例逐度核对过）
+
+
+def proto(p, L, U, checks, cr):
+    """样机（模型 9-1）跟这台设计走（第 88 轮）：每 1° 一行——针尖沿针的位置 a、下弯针摆角 th、上弯针摆角 psi（同模型页面的 K.rows，
+    默认参数下与教材原表逐度一致），加上画图要的尺寸；装不上的转角沿用最后一个装得上的位置，并列出来（样机里那套弯针整体标红、停住）。
+    每个出问题的校核项给一个慢放转角：传动角最小、尖速度最大、送布牙露出 / 落下、180°、上刀最低点。"""
+    a_top = p["tip0"] / math.cos(INCLINE * DEG)
+
+    def filled(th, off=0.0):
+        """装不上的那段沿用它前面最后一个装得上的位置（段跨过 0° 时从 359° 那头接过来）"""
+        fr = fail_range([i for i, x in enumerate(th) if x is None])
+        last = th[(fr[0] - 1) % 360] if fr else 0.0
+        out = [None] * 360
+        for k in range(360):
+            i = ((fr[0] if fr else 0) + k) % 360
+            last = th[i] if th[i] is not None else last
+            out[i] = round(last - off, 5)
+        return out
+    rows_a = [round(a_top - needle_s(p, f), 4) for f in range(360)]
+    th, psi = filled(L["th"]), filled(U["th"], DELTA_UL)
+
+    def argmin(v):
+        ok = [(x, i) for i, x in enumerate(v) if x is not None]
+        return min(ok)[1] if ok else 0
+    mid = ((p["f_on"] + p["f_off"] + 360) / 2) % 360          # 送布中段
+    angle = {"lambda": 180, "needle_in": 180, "knife_time": p["kn_ph"], "knife_ov": p["kn_ph"], "diff": mid, "diff_range": mid}
+    if cr:
+        pin, pout = cr
+        angle["feed_window"] = p["f_on"] if p["f_on"] - pout <= pin - p["f_off"] else p["f_off"]
+    angle.update(ll_gamma=argmin(L["gm"]), ll_swing=L.get("i_max", 0), ll_crit=argmin(L["gm"]),
+                 ll_speed=max(range(360), key=lambda i: abs(L["thd"][i] or 0)), ul_gamma=argmin(U["gm"]),
+                 ll_turn=fail_range(L["fail"])[0] if L["fail"] else 0, ul_turn=fail_range(U["fail"])[0] if U["fail"] else 0)
+    bad = flagged(checks)
+    for b in bad:
+        b["phi"] = round(angle.get(b["key"], 0) % 360, 1)
+    return dict(a=rows_a, th=th, psi=psi, ll_fail=L["fail"], ul_fail=U["fail"], ll_range=fail_range(L["fail"]), ul_range=fail_range(U["fail"]),
+                R_N=p["r"], L_N=p["l"], A_TOP=round(a_top, 4), R_LLC=p["ll_r"], C_LL=p["ll_c"], R_LL=p["ll_R"], R_ULC=p["ul_r"], C_UL=p["ul_c"],
+                KNIFE_LOW_PHI=round(p["kn_ph"] * DEG, 5), KNIFE_OVERLAP=p["kn_ov"], FAB_EDGE_X=p["w"], STITCH=p["s"], D=p["D"],
+                f_on=p["f_on"], f_off=p["f_off"], bad=bad)
 
 
 def parts(p, rc=None):
