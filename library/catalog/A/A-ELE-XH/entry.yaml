@@ -1,0 +1,49 @@
+# A-ELE-XH · 线对板连接器（2.5 mm）（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-XH
+kind: family
+name:
+  zh: 线对板连接器（2.5 mm）
+  en: Wire-to-board connector 2.5 mm
+category: ELE
+tags:
+- 连接器
+params:
+- key: n_pin
+  zh: 针数
+  en: Pins
+  role: key
+- key: pitch_mm
+  zh: 间距（mm）
+  en: Pitch
+  role: dim
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: 4P
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Connector_JST:JST_XH_B4B-XH-A_1x04_P2.50mm_Vertical；SPICE 模型：无（芯片看器件手册）
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 2.5 mm 间距线对板连接器，通孔插件；接编码器和 CAN 总线。
+  uses:
+  - 编码器
+  - CAN
+  courses:
+  - course: 电子技术基础

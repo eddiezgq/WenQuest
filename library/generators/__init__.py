@@ -28,6 +28,9 @@ def get_builder(entry):
     if eng.startswith("wqfix:"):
         from generators import e_fixture
         return e_fixture.build
+    if eng.startswith("kicad:"):                      # 第 88 轮：电子元件，外形取 KiCad 官方三维模型库
+        from generators import f_kicad
+        return f_kicad.build
     if eng.startswith("menagerie:"):
         from generators import b_robot
         return b_robot.build

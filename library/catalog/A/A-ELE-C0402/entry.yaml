@@ -1,0 +1,52 @@
+# A-ELE-C0402 · 贴片陶瓷电容 0402（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-C0402
+kind: family
+name:
+  zh: 贴片陶瓷电容 0402
+  en: Ceramic capacitor 0402
+category: ELE
+tags:
+- 电容
+- MLCC
+- '0402'
+params:
+- key: c_f
+  zh: 容值（F）
+  en: Capacitance
+  role: key
+- key: v_rated
+  zh: 耐压（V）
+  en: Rated voltage
+  role: perf
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: 10P
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Capacitor_SMD:C_0402_1005Metric；SPICE 模型：C
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 多层陶瓷电容（MLCC）：几十到几百层陶瓷介质与电极交错叠压烧结。容值随直流偏压下降，选型时看器件手册的偏压曲线。
+  uses:
+  - 芯片电源去耦
+  - 滤波
+  - 晶振负载电容
+  courses:
+  - course: 电子技术基础

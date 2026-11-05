@@ -1,0 +1,51 @@
+# A-ELE-SOIC8 · SOIC-8 芯片（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-SOIC8
+kind: family
+name:
+  zh: SOIC-8 芯片
+  en: SOIC-8 ICs
+category: ELE
+tags:
+- 芯片
+- SOIC-8
+params:
+- key: part
+  zh: 示例选型
+  en: Example part
+  role: key
+- key: func
+  zh: 功能
+  en: Function
+  role: info
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: IR2101S
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Package_SO:SOIC-8_3.9x4.9mm_P1.27mm；SPICE 模型：无（芯片看器件手册）
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 小外形封装 8 脚、脚距 1.27 mm。驱动板上的栅极驱动、电流采样放大、通信收发都是这个封装（示例选型，引脚取自 KiCad 官方符号库）。
+  uses:
+  - 栅极驱动
+  - 电流采样
+  - CAN、RS-485
+  courses:
+  - course: 电子技术基础

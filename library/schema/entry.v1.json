@@ -177,7 +177,8 @@
             "robot_descriptions",
             "ros_industrial",
             "freecad-library",
-            "vendor"
+            "vendor",
+            "kicad"
           ]
         },
         "repo": {

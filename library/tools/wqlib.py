@@ -8,7 +8,8 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog"
 ALLOWED_LICENSES = {"Apache-2.0", "BSD-2-Clause", "BSD-3-Clause", "BSD-3-Clause-Clear", "MIT", "Zlib", "ISC",
-                    "CC0-1.0", "CC-BY-3.0", "CC-BY-4.0"}
+                    "CC0-1.0", "CC-BY-3.0", "CC-BY-4.0",
+                    "CC-BY-SA-4.0"}       # 第 88 轮：KiCad 官方封装与三维模型库（附例外，设计与生成文件不受相同方式共享约束）
 
 
 def entry_dirs():
@@ -76,7 +77,7 @@ CATEGORY_NAMES = {
           "PIN": ("销", "Pins"), "KEY": ("键", "Keys"), "RNG": ("挡圈", "Retaining rings"), "BRG": ("滚动轴承", "Rolling bearings"),
           "BSC": ("滚珠丝杠", "Ball screws"), "LGD": ("直线导轨", "Linear guides"), "PUL": ("同步带轮", "Timing pulleys"),
           "SPK": ("链轮", "Sprockets"), "CPL": ("联轴器", "Couplings"), "SPR": ("弹簧", "Springs"), "SEL": ("密封件", "Seals"),
-          "PLG": ("螺塞", "Plugs")},
+          "PLG": ("螺塞", "Plugs"), "ELE": ("电子元件", "Electronic components")},
     "B": {"ARM": ("机械臂", "Arms"), "MOB": ("移动机器人", "Mobile robots"), "LEG": ("足式机器人", "Legged robots"),
           "HUM": ("人形机器人", "Humanoids"), "EEF": ("末端执行器", "End effectors"), "UAV": ("无人机", "Drones"),
           "CRT": ("直角坐标", "Cartesian"), "SCA": ("SCARA", "SCARA"), "PAR": ("并联", "Parallel"),

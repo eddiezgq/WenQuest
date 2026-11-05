@@ -1,0 +1,50 @@
+# A-ELE-TB · 接线端子（5.0 mm）（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-TB
+kind: family
+name:
+  zh: 接线端子（5.0 mm）
+  en: Terminal block 5.0 mm
+category: ELE
+tags:
+- 连接器
+- 端子
+params:
+- key: n_pin
+  zh: 位数
+  en: Positions
+  role: key
+- key: pitch_mm
+  zh: 间距（mm）
+  en: Pitch
+  role: dim
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: 2P
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2_1x02_P5.00mm_Horizontal；SPICE 模型：无（芯片看器件手册）
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 螺钉压线端子，通孔插件，在后段选择焊上焊；接 48 V 电源和电机三相。
+  uses:
+  - 母线输入
+  - 电机输出
+  courses:
+  - course: 电子技术基础

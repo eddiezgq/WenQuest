@@ -1,0 +1,49 @@
+# A-ELE-SOT · SOT 封装稳压芯片（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-SOT
+kind: family
+name:
+  zh: SOT 封装稳压芯片
+  en: SOT regulators
+category: ELE
+tags:
+- 芯片
+- 电源
+params:
+- key: part
+  zh: 示例选型
+  en: Example part
+  role: key
+- key: pkg
+  zh: 封装
+  en: Package
+  role: info
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: LMR16006YQ
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Package_TO_SOT_SMD:SOT-23-6；SPICE 模型：无（芯片看器件手册）
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 降压芯片（开关电源，效率高）把 48 V 降到 12 V；线性稳压（简单、安静、效率低）再出 5 V 和 3.3 V（示例选型）。
+  uses:
+  - 驱动板辅助电源
+  courses:
+  - course: 电子技术基础

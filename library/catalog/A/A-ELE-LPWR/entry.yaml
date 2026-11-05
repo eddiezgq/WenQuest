@@ -1,0 +1,44 @@
+# A-ELE-LPWR · 贴片功率电感（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-LPWR
+kind: family
+name:
+  zh: 贴片功率电感
+  en: SMD power inductor
+category: ELE
+tags:
+- 电感
+params:
+- key: l_h
+  zh: 电感量（H）
+  en: Inductance
+  role: key
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: 22U
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Inductor_SMD:L_Bourns_SRN6045TA；SPICE 模型：L
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 降压电源的储能电感：开关导通时储能、关断时向负载放能；电感量由输入输出电压、开关频率和允许的纹波电流算。
+  uses:
+  - 48 V → 12 V 降压电源
+  courses:
+  - course: 电子技术基础

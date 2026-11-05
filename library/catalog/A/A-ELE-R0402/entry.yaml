@@ -1,0 +1,50 @@
+# A-ELE-R0402 · 贴片电阻 0402（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-R0402
+kind: family
+name:
+  zh: 贴片电阻 0402
+  en: Chip resistor 0402
+category: ELE
+tags:
+- 电阻
+- '0402'
+params:
+- key: r_ohm
+  zh: 阻值（Ω）
+  en: Resistance
+  role: key
+- key: tol_pct
+  zh: 精度（%）
+  en: Tolerance
+  role: perf
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: 10R
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Resistor_SMD:R_0402_1005Metric；SPICE 模型：R
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 厚膜电阻：陶瓷基片上印电阻浆料，两端电极焊在焊盘上。0402 即 1.0 × 0.5 mm（公制 1005），贴片机一次能贴几万只。
+  uses:
+  - 驱动板的分压、上下拉、滤波
+  - 栅极电阻
+  courses:
+  - course: 电子技术基础

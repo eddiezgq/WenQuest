@@ -1,0 +1,49 @@
+# A-ELE-LQFP48 · LQFP-48 微控制器（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-LQFP48
+kind: family
+name:
+  zh: LQFP-48 微控制器
+  en: LQFP-48 microcontroller
+category: ELE
+tags:
+- 芯片
+- MCU
+params:
+- key: part
+  zh: 示例选型
+  en: Example part
+  role: key
+- key: pkg
+  zh: 封装
+  en: Package
+  role: info
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: STM32G431CBT6
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Package_QFP:LQFP-48_7x7mm_P0.5mm；SPICE 模型：无（芯片看器件手册）
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 电机控制 MCU：定时器出三相互补 PWM、ADC 同步采电流、编码器接口、CAN；脚距 0.5 mm，贴片和 AOI 要求高（示例选型）。
+  uses:
+  - 关节驱动板主控
+  courses:
+  - course: 电子技术基础

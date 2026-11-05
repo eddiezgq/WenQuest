@@ -1,0 +1,57 @@
+# A-ELE-CPEL · 贴片铝电解电容（电子元件第一批，第 88 轮；由 tools/import_kicad_ele.py 生成）
+schema: 1
+id: A-ELE-CPEL
+kind: family
+name:
+  zh: 贴片铝电解电容
+  en: SMD aluminium electrolytic capacitor
+category: ELE
+tags:
+- 电容
+- 电解
+params:
+- key: c_f
+  zh: 容值（F）
+  en: Capacitance
+  role: key
+- key: v_rated
+  zh: 耐压（V）
+  en: Rated voltage
+  role: perf
+- key: d_mm
+  zh: 直径（mm）
+  en: Diameter
+  role: dim
+- key: h_mm
+  zh: 高度（mm）
+  en: Height
+  role: dim
+- key: step
+  zh: 外形文件
+  en: Shape file
+  role: info
+specs: specs.csv
+default: 470U-63V
+model:
+  engine: kicad:factory/designs/3dmodels
+  formats:
+  - step
+  - glb
+  origin: KiCad 封装原点（焊盘中心），Z 向上
+  note: 外形原样取自 KiCad 官方三维模型库；封装（焊盘）Capacitor_SMD:CP_Elec_16x17.5；SPICE 模型：C
+source:
+  origin: kicad
+  repo: https://gitlab.com/kicad/libraries/kicad-packages3D
+  commit: 7.0.11
+  license: CC-BY-SA-4.0
+  attribution: 外形：KiCad 官方三维模型库 7.0.11（© KiCad Libraries Team，CC-BY-SA 4.0 附例外）；条目与规格表：问渠零件库
+  checked:
+    by: Claude
+    'on': '2026-11-05'
+    note: Debian 软件包 kicad-footprints / kicad-packages3d 7.0.11 的 copyright 文件：CC-BY-SA 4.0 附例外（设计与由其生成的文件不受相同方式共享约束）
+teaching:
+  principle: 铝电解电容容量大、体积小，适合做母线储能；有极性，等效串联电阻（ESR）和纹波电流决定发热和寿命。
+  uses:
+  - 48 V 母线电容（电路分析例题 3）
+  courses:
+  - course: 电子技术基础
