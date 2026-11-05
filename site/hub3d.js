@@ -1,4 +1,4 @@
-/* 首页首屏：立体的厂情中枢（第 91 轮）。三层——设备、数据、事件——叠成一座立体网络，慢慢旋转（可拖动）；
+/* 首页首屏：立体的厂情中枢（第 91 轮）。三层——设备、数据、事件——叠成一座立体网络，角度固定不转；
    数据包从设备往上流，每隔几秒走一条真实的“事件链”：一个数据异常如何一路映射到工单、质量、采购、交期和决策。
    对象名取自问渠数字工厂（减速器厂 WQR-105、机器人厂 WQ-CR5、实验 7 情景）。纯 Canvas，不依赖外部库。
    用法：WQHub3D.start(canvas, {chain: 元素, count: 元素, rate: 元素}) */
@@ -102,7 +102,7 @@
     const deg = {}; E.forEach((e) => { deg[e.a.id] = (deg[e.a.id] || 0) + 1; deg[e.b.id] = (deg[e.b.id] || 0) + 1; });
     if (ui.count) ui.count.textContent = `${N.length} / ${E.length}`;
     // ---- 视角 ----
-    let W = 0, H = 0, dpr = 1, yaw = -0.6, pitch = 0.52, spin = reduce ? 0 : 0.0016, drag = null, hover = null;
+    let W = 0, H = 0, dpr = 1, yaw = -0.6, pitch = 0.52, spin = 0,   /* 不旋转（Eddie 11-05：转起来晃眼），只有数据在流、事件链在闪 */ drag = null, hover = null;
     function fit() {
       dpr = Math.min(devicePixelRatio || 1, 2); const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -137,7 +137,6 @@
     }
     new MutationObserver(showChain).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     // ---- 交互：拖动旋转、悬停看标签 ----
-    cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, yaw, pitch }; cv.setPointerCapture(e.pointerId); });
     cv.addEventListener("pointermove", (e) => {
       if (drag) { yaw = drag.yaw + (e.clientX - drag.x) * 0.006; pitch = Math.max(0.15, Math.min(1.1, drag.pitch + (e.clientY - drag.y) * 0.004)); return; }
       const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, V = view();
