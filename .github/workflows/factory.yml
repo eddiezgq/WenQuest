@@ -66,7 +66,8 @@ jobs:
           python-version: "3.12"
       - name: 有限元、流体求解器（第 11 轮 CalculiX、gmsh 用到的系统库；第 16 轮 OpenFOAM）
         run: |
-          sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 openfoam openmpi-bin ngspice
+          sudo rm -f /var/lib/man-db/auto-update        # 同“电路板设计”一节：man-db 重建索引会卡住（第 88 轮上线时卡过 30 分钟）
+          sudo apt-get update -q && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends -o Dpkg::Use-Pty=0 calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 openfoam openmpi-bin ngspice
           (ccx -v || true) | grep -q Version          # ccx -v 的退出码不是 0
           which simpleFoam snappyHexMesh mpirun        # 流体分析（第 16 轮）：OpenFOAM
           which ngspice                                # 电路分析（第 79 轮）
