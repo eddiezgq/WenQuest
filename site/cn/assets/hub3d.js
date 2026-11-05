@@ -1,4 +1,4 @@
-/* 首页首屏：立体的厂情中枢（第 91 轮）。三层——设备、数据、事件——叠成一座立体网络，角度固定不转；
+/* 首页首屏：立体的厂情中枢（第 91 轮）。三层——设备、数据、事件——叠成一座立体网络，不连续旋转，按镜头设计换方向和远近：每条事件链“远景→近景→中景”，平滑过去后静止；也可以拖动换方向；
    数据包从设备往上流，每隔几秒走一条真实的“事件链”：一个数据异常如何一路映射到工单、质量、采购、交期和决策。
    对象名取自问渠数字工厂（减速器厂 WQR-105、机器人厂 WQ-CR5、实验 7 情景）。纯 Canvas，不依赖外部库。
    用法：WQHub3D.start(canvas, {chain: 元素, count: 元素, rate: 元素}) */
@@ -102,7 +102,7 @@
     const deg = {}; E.forEach((e) => { deg[e.a.id] = (deg[e.a.id] || 0) + 1; deg[e.b.id] = (deg[e.b.id] || 0) + 1; });
     if (ui.count) ui.count.textContent = `${N.length} / ${E.length}`;
     // ---- 视角 ----
-    let W = 0, H = 0, dpr = 1, yaw = -0.6, pitch = 0.52, spin = 0,   /* 不旋转（Eddie 11-05：转起来晃眼），只有数据在流、事件链在闪 */ drag = null, hover = null;
+    let W = 0, H = 0, dpr = 1, yaw = -0.6, pitch = 0.52, spin = 0,   /* 不连续旋转（Eddie 11-05：转起来晃眼）；每换一条事件链换一个观察方向，平滑过去后静止 */ drag = null, hover = null;
     function fit() {
       dpr = Math.min(devicePixelRatio || 1, 2); const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -111,19 +111,34 @@
       const wide = W > 900, H = ui.area ? Math.min(cv.clientHeight, ui.area.offsetTop + ui.area.offsetHeight) : cv.clientHeight;  // 只在首屏文字那一块里摆
       return { cx: wide ? W * 0.72 : W * 0.5, cy: wide ? H * (ui.area ? 0.52 : 0.47) : Math.min(H * 0.3, innerHeight * 0.27), s: wide ? Math.min(W * 0.125, H * 0.165) : Math.min(W * 0.21, innerHeight * 0.1), wide };
     }
-    function P(x, y, z, V) {           // 绕竖轴转 yaw，再俯仰 pitch，透视投影
+    let zoom = 1, fx = 0, fy = 0, fz = 0;   // 镜头：远近（zoom）和对准的点（fx, fy, fz）
+    function P(x, y, z, V) {           // 先移到镜头对准的点，绕竖轴转 yaw，再俯仰 pitch，透视投影，按远近缩放
+      x -= fx; z -= fz; y -= fy / 1.2;
       const cy = Math.cos(yaw), sy = Math.sin(yaw), x1 = x * cy - z * sy, z1 = x * sy + z * cy;
       const yy = y * 1.2, cp = Math.cos(pitch), sp = Math.sin(pitch), y2 = yy * cp - z1 * sp, z2 = yy * sp + z1 * cp;
       const f = 4.2 / (4.2 + z2);
-      return { X: V.cx + x1 * V.s * f, Y: V.cy - y2 * V.s * f, f, d: z2 };
+      return { X: V.cx + x1 * V.s * zoom * f, Y: V.cy - y2 * V.s * zoom * f, f: f * Math.sqrt(zoom), d: z2 };
     }
     // ---- 数据包 ----
     const packets = [];
     function emit(e, col, speed, big) { packets.push({ e, t: 0, col, sp: speed || 0.012 + Math.random() * 0.01, big }); }
     // ---- 事件链 ----
     let chainIdx = -1, chain = null, stepT = 0, stepI = 0, since = 0, n = 0;
+    // 几个固定的观察方向：每条事件链换一个，用 1.8 秒缓过去，然后静止
+    // 镜头设计：每条事件链 = 远景（换一个观察方向看全厂）→ 近景（推到这条链上，看清数据和事件）→ 中景（拉开一点看它牵动了哪些事）
+    // 每次换镜头用 1.8 秒缓过去，然后静止；不连续旋转
+    const VIEWS = [[-0.6, 0.52], [0.35, 0.62], [-1.35, 0.45], [0.95, 0.5], [-0.15, 0.78], [-2.0, 0.55]];
+    let aim = null;
+    function shot(y1, p1, z1, f1) {
+      aim = { t: 0, from: [yaw, pitch, zoom, fx, fy, fz], to: [y1, p1, z1, f1[0], f1[1], f1[2]] };
+    }
+    function centroid() {
+      const ns = chain.steps.map((s) => byId[s[0]]).filter(Boolean);
+      return [0, 1, 2].map((k) => ns.reduce((a, x) => a + [x.x, x.y * 1.2, x.z][k], 0) / ns.length);
+    }
     function nextChain() {
-      chainIdx = (chainIdx + 1) % CHAINS.length; chain = CHAINS[chainIdx]; stepI = 0; stepT = 0; n++;
+      chainIdx = (chainIdx + 1) % CHAINS.length;
+      if (n > 0) { const v = VIEWS[n % VIEWS.length]; shot(v[0], v[1], 1, [0, 0, 0]); } chain = CHAINS[chainIdx]; stepI = 0; stepT = 0; n++;
       N.forEach((x) => { x.hl = 0; }); E.forEach((e) => { e.hot = 0; });
       showChain();
     }
@@ -137,6 +152,7 @@
     }
     new MutationObserver(showChain).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     // ---- 交互：拖动旋转、悬停看标签 ----
+    cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, yaw, pitch }; aim = null; cv.setPointerCapture(e.pointerId); });
     cv.addEventListener("pointermove", (e) => {
       if (drag) { yaw = drag.yaw + (e.clientX - drag.x) * 0.006; pitch = Math.max(0.15, Math.min(1.1, drag.pitch + (e.clientY - drag.y) * 0.004)); return; }
       const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, V = view();
@@ -164,10 +180,18 @@
       ctx.textAlign = right.X + 10 + ctx.measureText(title).width > W ? "right" : "left";
       ctx.fillText(title, ctx.textAlign === "right" ? Math.min(right.X, W - 8) : right.X + 10, right.Y + (ctx.textAlign === "right" ? -10 : 4));
     }
+    function veil(V) {                  // 宽屏：左边留给标题，镜头推近时网络在那里淡出
+      if (!V.wide) return;
+      const g = ctx.createLinearGradient(W * 0.36, 0, W * 0.52, 0);
+      g.addColorStop(0, "rgba(10,18,22,0.92)"); g.addColorStop(1, "rgba(10,18,22,0)");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W * 0.52, H);
+    }
     function frame(dt) {
       const V = view(), L = lang();
       ctx.clearRect(0, 0, W, H);
       if (!drag) yaw += spin * dt;
+      if (aim && !drag) { aim.t = Math.min(1, aim.t + dt / 1800); const k = aim.t < 0.5 ? 2 * aim.t * aim.t : 1 - Math.pow(-2 * aim.t + 2, 2) / 2;
+        [yaw, pitch, zoom, fx, fy, fz] = aim.from.map((a, i) => a + (aim.to[i] - a) * k); if (aim.t >= 1) aim = null; }
       [2, 1, 0].forEach((k) => plane(LAYERS[k].y, V, LAYERS[k][L]));
       const pts = N.map((x) => P(x.x, x.y, x.z, V));
       // 边
@@ -226,6 +250,7 @@
         x.hl = hl * 0.996;
       });
     }
+    const _frame = frame; frame = (dt) => { _frame(dt); veil(view()); };
     const fmt = (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : Math.abs(v) >= 10 ? v.toFixed(1) : Math.abs(v) >= 1 ? v.toFixed(2) : v.toFixed(3));
     // ---- 时间推进：数据跳动、数据包、事件链 ----
     let rate = 0, rateT = 0;
@@ -237,7 +262,11 @@
       // 事件链：每 1.6 秒走一步
       since += dt;
       if (!chain || (stepI >= chain.steps.length - 1 && since > 4200)) { nextChain(); since = 0; light(0); return; }
-      if (since > 1600 && stepI < chain.steps.length - 1) { stepI++; since = 0; light(stepI); }
+      if (since > 1600 && stepI < chain.steps.length - 1) {
+        stepI++; since = 0; light(stepI);
+        if (stepI === 2) { const c = centroid(); shot(yaw + 0.4, 0.62, 1.75, c); }                       // 近景
+        if (stepI === chain.steps.length - 1) { const c = centroid(); shot(yaw - 0.25, 0.5, 1.3, c.map((v) => v * 0.6)); } // 中景
+      }
     }
     function light(i) {
       const s = chain.steps[i], x = byId[s[0]]; if (!x) return;
