@@ -659,6 +659,14 @@
 "接触椭圆半轴 a × b",
 "Contact ellipse semi-axes a × b"
 ],
+"endplay": [
+"轴向游隙（负数为预紧）",
+"End play (negative: preload)"
+],
+"endplayHint": [
+"安装时实际调的量，两列合计",
+"As set at mounting, for the two rows together"
+],
 "error": [
 "算不出来",
 "Cannot compute"
@@ -930,6 +938,18 @@
 "motionRot": [
 "旋转",
 "Turning"
+],
+"mount": [
+"装法",
+"Mounting"
+],
+"mount_pair": [
+"紧挨着成对",
+"Side by side"
+],
+"mount_two_end": [
+"两端支承（轴两端各一个）",
+"One at each end of the shaft"
 ],
 "mounted": [
 "装配后",
@@ -1615,6 +1635,30 @@
 "已自动保存在这台电脑的浏览器里",
 "Saved automatically in this browser"
 ],
+"scHint": [
+"按峰值工况；竖线为当前调整量；软件不推荐“最佳值”",
+"At the peak case; the line is the current setting; no \"best\" value is suggested"
+],
+"scK": [
+"轴向刚度",
+"Axial stiffness"
+],
+"scN": [
+"受载滚子数（两列）",
+"Rollers carrying load (both rows)"
+],
+"scP": [
+"最大接触应力",
+"Largest contact stress"
+],
+"scTitle": [
+"调整量曲线",
+"End play sweep"
+],
+"scX": [
+"轴向游隙（负数为预紧）",
+"End play (negative: preload)"
+],
 "sceneKind": [
 "用在哪",
 "Used in"
@@ -1626,6 +1670,18 @@
 "section": [
 "剖面",
 "Section"
+],
+"setting": [
+"调整方式",
+"Adjusted by"
+],
+"setting_endplay": [
+"给轴向游隙",
+"End play"
+],
+"setting_preload": [
+"给预紧力",
+"Preload"
 ],
 "shaft": [
 "转频",
@@ -1723,6 +1779,26 @@
 "两轴承跨距 L（A 到 B）",
 "Bearing span L (A to B)"
 ],
+"spanTwo": [
+"两轴承间距",
+"Distance between the bearings"
+],
+"spanTwoHint": [
+"应用场景为“通用”时填；其他场景用场景里的跨距 L",
+"For the general application; the others use their span L"
+],
+"sweepFrom": [
+"调整量曲线：从",
+"End play sweep: from"
+],
+"sweepHint": [
+"两个都填才画曲线",
+"Fill in both for the curve"
+],
+"sweepTo": [
+"调整量曲线：到",
+"End play sweep: to"
+],
 "swing": [
 "摆角",
 "Swing angle"
@@ -1734,6 +1810,18 @@
 "tapered": [
 "圆锥滚子轴承",
 "Tapered roller bearing"
+],
+"tarr_DB": [
+"成对：背对背 DB（O 形）",
+"Pair: back to back DB (O)"
+],
+"tarr_DF": [
+"成对：面对面 DF（X 形）",
+"Pair: face to face DF (X)"
+],
+"tarr_single": [
+"单列",
+"Single row"
 ],
 "thermal": [
 "温差",

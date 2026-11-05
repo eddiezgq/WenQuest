@@ -124,6 +124,20 @@ ERR_ZH += [  # part drawings and STEP (step 5)
     (r"^a groove arc reaches past the axis$", "沟道圆弧越过了轴线：请检查尺寸"),
 ]
 
+ERR_ZH += [  # tapered roller bearing pairs (plan section 十六)
+    (r"^a tapered roller bearing pair is back to back", "圆锥滚子轴承成对只能背对背（DB）或面对面（DF）"),
+    (r"^the pair is side by side or one bearing at each end", "装法是紧挨着成对，或轴两端各一个"),
+    (r"^give the preload of the tapered pair", "请填成对圆锥滚子轴承的预紧力（N）"),
+    (r"^give the axial end play of the tapered pair", "请填成对圆锥滚子轴承的轴向游隙（µm，负数为预紧）"),
+    (r"^give the distance between the two bearings", "请填两轴承间距（应用场景的跨距 L）"),
+    (r"^give the distance between the two rows$", "请填两列中心距"),
+    (
+        r"^the pair's load distribution did not converge \(the load is too large",
+        "成对轴承的载荷分布算不出来：载荷对这两列太大，或轴向没有被约束住（请检查装法和轴向游隙）",
+    ),
+    (r"^scenario: give the distance between the two bearings$", "应用场景：请填两轴承间距"),
+]
+
 ERR_ZH += [  # process routes (step 5)
     (r"^a ring has at most (\d+) operations$", r"一个套圈最多 \1 道工序"),
     (r"^an operation kind is turn", "工序类型是车削、磨削、超精、切削、热处理、清洗、合套、检测或其他"),

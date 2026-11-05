@@ -19,6 +19,7 @@ import Quality from './components/Quality.vue'
 import Parts from './components/Parts.vue'
 import Process from './components/Process.vue'
 import AiDraft from './components/AiDraft.vue'
+import SettingCurve from './components/SettingCurve.vue'
 import AiExplain from './components/AiExplain.vue'
 import CloudPanel from './components/CloudPanel.vue'
 import { me, links, detach, loadMe, loginUrl } from './cloud'
@@ -119,6 +120,7 @@ onMounted(async () => {
         <SliceChart :r="result" />
         <ScenarioPanel :r="result" />
         <Extras :r="result" />
+        <SettingCurve :r="result" />
         <p v-if="busy" class="busy">{{ t('busy') }}</p>
         <p v-if="error" class="err" role="alert">{{ t('error') }}：{{ lang === 'zh' ? error.zh || error.message : error.message }}</p>
       </section>

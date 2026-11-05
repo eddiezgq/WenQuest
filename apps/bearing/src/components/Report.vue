@@ -9,6 +9,7 @@ import SliceChart from './SliceChart.vue'
 import SectionTaper from './SectionTaper.vue'
 import LoadRing from './LoadRing.vue'
 import Extras from './Extras.vue'
+import SettingCurve from './SettingCurve.vue'
 import ScenarioPanel from './ScenarioPanel.vue'
 import DesignNote from './DesignNote.vue'
 
@@ -23,7 +24,14 @@ const inputs = computed(() => {
   if (['cylindrical', 'tapered'].includes(p.type)) {
     add('Lw', p.inner.Lw, 'mm'); add('Lwe', p.inner.Lwe, 'mm')
     if (p.type === 'cylindrical') add('Pd', p.inner.Pd, 'mm')
-    else { add('cupAngle', p.inner.alpha_o_deg, '°'); add('coneAngle', p.inner.alpha_i_deg, '°'); add('ribAngle', p.inner.alpha_f_deg, '°'); add('rEnd', p.inner.R_end, 'mm') }
+    else {
+      add('cupAngle', p.inner.alpha_o_deg, '°'); add('coneAngle', p.inner.alpha_i_deg, '°'); add('ribAngle', p.inner.alpha_f_deg, '°'); add('rEnd', p.inner.R_end, 'mm')
+      if (p.pair?.arrangement && p.pair.arrangement !== 'single') {
+        rows.push(['arrangement', t('tarr_' + p.pair.arrangement), '']); rows.push(['mount', t('mount_' + (p.pair.mount || 'pair')), ''])
+        add(p.pair.mount === 'two_end' ? 'spanTwo' : 'rowSpacing', props.r?.pair?.spacing, 'mm')
+        add('endplay', props.r?.pair?.endplay_um != null ? props.r.pair.endplay_um.toFixed(1) : null, 'µm'); add('preloadF', props.r?.pair?.preload != null ? props.r.pair.preload.toFixed(0) : null, 'N')
+      }
+    }
     rows.push(['crown', t('crown_' + (p.profile?.kind || 'straight')), ''])
     add('crownR', p.profile?.R, 'mm'); add('crownFlat', p.profile?.flat, 'mm'); add('misalign', p.alignment?.theta_arcmin, '′')
   } else {
@@ -92,6 +100,7 @@ const print = () => window.print()
       <SliceChart :r="r" />
       <ScenarioPanel :r="r" />
       <Extras :r="r" />
+      <SettingCurve :r="r" />
       <h2>{{ t('method') }}</h2>
       <p>{{ t('methodText') }}</p>
       <p>{{ t('ratingsNote') }}</p>

@@ -6,7 +6,8 @@ Project fields beside the common ones:
            angle (contact angle), cone angle, direction of the rib's push (blank: square to the roller axis),
            radius of the roller's large end face
     profile, alignment: as for cylindrical roller bearings
-Mounted with zero end play (pairs, end play and preload come in part 3). Ring walls use the mean roller diameter
+A single row is worked with zero end play. A pair (side by side, or one bearing at each end of the shaft) is worked
+with the end play or preload set at mounting (taper_pair.py, plan section 十六). Ring walls use the mean roller diameter
 projected onto the radial direction, so they are approximate and say so.
 Plain code: no AI, no network.
 """
@@ -18,7 +19,9 @@ import math
 import numpy as np
 
 from bearingkit import roller as RL
+from bearingkit import scenarios as SC
 from bearingkit import taper as TP
+from bearingkit import taper_pair as TPP
 from bearingkit.analyze import FAIL, INFO, NA, PASS, UNKNOWN, ProjectError, _ck, _label, _limit, _num, scenario_cases
 
 E_STEEL = 206000.0
@@ -95,6 +98,105 @@ def _run(b, Fr, Fa, theta):
     }
 
 
+def pair_config(p: dict, b) -> dict | None:
+    """The pair settings of a project, or None for a single row. End play in mm (negative: preload)."""
+    pr = p.get("pair") or {}
+    arr = pr.get("arrangement") or "single"
+    if arr in ("single", ""):
+        return None
+    if arr not in TPP.ARRANGEMENTS:
+        raise ProjectError("a tapered roller bearing pair is back to back (DB) or face to face (DF)")
+    mount = pr.get("mount") or "pair"
+    if mount not in ("pair", "two_end"):
+        raise ProjectError("the pair is side by side or one bearing at each end of the shaft")
+    setting = pr.get("setting") or "endplay"
+    if setting == "preload":
+        Fp = _num(pr.get("preload"))
+        if Fp is None or Fp < 0:
+            raise ProjectError("give the preload of the tapered pair (N)")
+        e = TPP.endplay_for_preload(b, Fp)
+    else:
+        e_um = _num(pr.get("endplay"))
+        if e_um is None:
+            raise ProjectError("give the axial end play of the tapered pair (µm; negative for preload)")
+        e = e_um / 1000
+    s = (p.get("scenario") or {}).get("kind") or "generic"
+    spacing = _num(pr.get("spacing"))
+    if mount == "two_end" and s != "generic":
+        spacing = _num((p.get("scenario") or {}).get("L"))
+    if not spacing or spacing <= 0:
+        raise ProjectError(
+            "give the distance between the two rows"
+            if mount == "pair"
+            else "give the distance between the two bearings (the span L of the application)"
+        )
+    sweep = (_num(pr.get("sweep_from")), _num(pr.get("sweep_to")))
+    return {
+        "arrangement": arr,
+        "mount": mount,
+        "endplay": e,
+        "spacing": spacing,
+        "setting": setting,
+        "sweep": sweep if None not in sweep and sweep[0] != sweep[1] else None,
+    }
+
+
+def _pair_run(pr: TPP.Pair, b, P) -> dict:
+    """One load case on a pair: both rows, the heavier one shown as the single row is."""
+    try:
+        u = pr.solve(P)
+    except TPP.PairError as e:
+        raise ProjectError(str(e)) from e
+    rows = TPP.rows_of(pr, u)
+    best = None
+    summ = []
+    for r in rows:
+        st = TP.stresses(b, r["q"])
+        pm = {k: float(v["p"].max()) for k, v in st.items()}
+        summ.append(
+            {
+                "z": r["z"],
+                "facing": r["facing"],
+                "Fa": r["Fa"],
+                "Fr": r["Fr"],
+                "Qmax": r["Qmax"],
+                "loaded": r["loaded"],
+                "p_inner": pm["inner"],
+                "p_outer": pm["outer"],
+            }
+        )
+        if best is None or max(pm.values()) > max(best["pmax"].values()):
+            best = {
+                "dist": r,
+                "st": st,
+                "j": int(np.argmax(r["Q"])),
+                "pmax": pm,
+                "ends": float(max(r["q"][:, 0].max(), r["q"][:, -1].max())),
+                "qmax": float(r["q"].max()),
+                "Qf": float(r["Qf"].max()),
+            }
+    return {**best, "rows": summ, "u": u}
+
+
+def setting_curve(pr: TPP.Pair, b, P, e_from_um: float, e_to_um: float, n: int = 21) -> dict:
+    """Sweep the end play: the largest contact stress, the rollers carrying load (both rows) and the axial stiffness."""
+    out = {"e_um": [], "p_max": [], "loaded": [], "k_axial": [], "preload": []}
+    for e_um in np.linspace(e_from_um, e_to_um, n):
+        q = TPP.Pair(b, pr.arr, pr.s, e_um / 1000)
+        try:
+            r = _pair_run(q, b, P)
+            k = TPP.stiffness(q, P, r["u"])["axial"]
+            row = (max(r["pmax"].values()), sum(x["loaded"] for x in r["rows"]), k)
+        except (ProjectError, np.linalg.LinAlgError):
+            row = (None, None, None)
+        out["e_um"].append(float(e_um))
+        out["p_max"].append(row[0])
+        out["loaded"].append(row[1])
+        out["k_axial"].append(row[2])
+        out["preload"].append(q.preload_force())
+    return out
+
+
 def analyse(p: dict) -> dict:
     b, g = build(p)
     lim = p.get("limits") or {}
@@ -102,6 +204,41 @@ def analyse(p: dict) -> dict:
     fp = _num((p.get("scenario") or {}).get("fp"))
     theta = math.radians((_num((p.get("alignment") or {}).get("theta_arcmin")) or 0.0) / 60)
     lam, mu = b.ratios()
+    pc = pair_config(p, b)
+    pair = TPP.Pair(b, pc["arrangement"], pc["spacing"], pc["endplay"]) if pc else None
+    if pc and pc["mount"] == "two_end":
+        try:
+            sp = SC.supports(p.get("scenario") or {"kind": "generic"}, p.get("loads") or {}, pc["spacing"])
+        except SC.ScenarioError as e:
+            raise ProjectError(str(e)) from e
+        cases = []
+        for c in sp["cases"]:
+            Pv = SC.shaft_load(c, sp["L"])
+            cases.append({**c, "Fr": math.hypot(Pv[0], Pv[1]), "Fa": c["Fz"], "M": 0.0, "P": Pv})
+        sc = {
+            **sc,
+            "cases": cases,
+            "motion": sp["motion"],
+            "outer_turns": sp["outer_turns"],
+            "notes": list(sc["notes"])
+            + [
+                {
+                    "zh": "两端支承：表里是作用在轴上的合力；两端轴承各自分担多少，"
+                    "由两列的刚度和安装时调的轴向游隙算出，见“两列”。",
+                    "en": "Two supports: the table gives the load on the shaft; how the two bearings "
+                    "share it follows from their stiffness and the end play set at mounting (see the two rows).",
+                }
+            ],
+        }
+    elif pc:
+        for c in sc["cases"]:
+            c["P"] = [c["Fr"], 0.0, c["Fa"], c["M"], 0.0]
+
+    def run(c, f=1.0):
+        if pair is not None:
+            return _pair_run(pair, b, [f * v for v in c["P"]])
+        return _run(b, f * c["Fr"], f * c["Fa"], theta)
+
     checks = []
     gap = g["dm"] * math.sin(math.pi / b.Z) - b.D
     lg, lw = _num(lim.get("gap_min")), _num(lim.get("wall_min"))
@@ -176,19 +313,43 @@ def analyse(p: dict) -> dict:
             "",
         )
     )
-    checks.append(
-        _ck(
-            "endplay",
-            "轴向游隙",
-            "End play",
-            None,
-            None,
-            INFO,
-            "",
-            "set at mounting; worked here with zero end play (pairs and preload in part 3)",
-            "安装时调整；这里按零游隙计算（配对与预紧在第 4 步之三）",
+    if pc:
+        checks.append(
+            _ck(
+                "endplay",
+                "轴向游隙（安装时调整；负数为预紧）",
+                "End play set at mounting (negative: preload)",
+                pc["endplay"] * 1000,
+                None,
+                INFO,
+                "µm",
+            )
         )
-    )
+        checks.append(
+            _ck(
+                "preload",
+                "预紧力（无外载时每列的轴向力）",
+                "Preload (axial force in each row with no outside load)",
+                pair.preload_force(),
+                None,
+                INFO,
+                "N",
+            )
+        )
+    else:
+        checks.append(
+            _ck(
+                "endplay",
+                "轴向游隙",
+                "End play",
+                None,
+                None,
+                INFO,
+                "",
+                "set at mounting; a single row is worked with zero end play (choose a pair to set it)",
+                "安装时调整；单列按零游隙计算（选成对或两端支承可以给游隙或预紧）",
+            )
+        )
     if abs(b.E - E_STEEL) / E_STEEL > 0.05:
         checks.append(
             _ck(
@@ -203,7 +364,7 @@ def analyse(p: dict) -> dict:
                 "Palmgren 变形公式适用于钢，这种材料的结果只是近似",
             )
         )
-    if any(c["M"] for c in sc["cases"]):
+    if not pc and any(c["M"] for c in sc["cases"]):
         checks.append(
             _ck(
                 "moment_in",
@@ -213,12 +374,12 @@ def analyse(p: dict) -> dict:
                 0.0,
                 FAIL,
                 "N·m",
-                "a single row does not carry a moment; pair it (part 3) or give the misalignment",
-                "单列圆锥滚子轴承不承受力矩：请配对使用（第 4 步之三）或改填倾斜角",
+                "a single row does not carry a moment; pair it or give the misalignment",
+                "单列圆锥滚子轴承不承受力矩：请成对使用或改填倾斜角",
             )
         )
-    loaded = [c["Fr"] > 0 or c["Fa"] > 0 for c in sc["cases"]]
-    runs = [(_run(b, c["Fr"], c["Fa"], theta) if ok else None) for c, ok in zip(sc["cases"], loaded, strict=True)]
+    loaded = [(c["Fr"] > 0 or c["Fa"] != 0 or (pc is not None and (c["M"] or pc["endplay"] < 0))) for c in sc["cases"]]
+    runs = [(run(c) if ok else None) for c, ok in zip(sc["cases"], loaded, strict=True)]
     live = [k for k, r in enumerate(runs) if r is not None]
     rotating = sc["motion"] == "rotating"
     many = len(sc["cases"]) > 1
@@ -259,7 +420,7 @@ def analyse(p: dict) -> dict:
         if rotating and fp is not None:
             for k in live:
                 c = sc["cases"][k]
-                fat[k] = _run(b, fp * c["Fr"], fp * c["Fa"], theta)
+                fat[k] = run(c, fp)
         for ring, zh in (("inner", "内圈（锥）"), ("outer", "外圈（杯）")):
             cid, czh = "pf_" + ring, f"疲劳：{zh}最大接触应力（各工况 × 载荷系数 fp）"
             cen = f"Fatigue: max contact stress, {ring} ring (every case × load factor f_p)"
@@ -330,6 +491,41 @@ def analyse(p: dict) -> dict:
                 "" if ps is not None else "请填滚子大端球基面半径",
             )
         )
+        if pc:
+            unl = [k for k in live if any(x["loaded"] == 0 for x in runs[k]["rows"])]
+            names = "、".join(_label(sc["cases"][k])["zh"] for k in unl)
+            names_en = ", ".join(_label(sc["cases"][k])["en"] for k in unl)
+            if pc["endplay"] < 0:
+                st_ = FAIL if unl else PASS
+                nz = f"卸载的工况：{names}；预紧不够或外载太大" if unl else ""
+                ne = f"cases where a row unloads: {names_en}; too little preload or too much load" if unl else ""
+            else:
+                st_ = INFO
+                nz = f"有轴向游隙时一列卸载是正常的（{names}）" if unl else ""
+                ne = f"with end play one row unloading is normal ({names_en})" if unl else ""
+            checks.append(
+                _ck(
+                    "pair_loaded",
+                    "各工况下两列都有滚子受载（按静止判）",
+                    "Both rows carry rollers in every case (at rest)",
+                    len(live) - len(unl),
+                    len(live),
+                    st_,
+                    "",
+                    ne,
+                    nz,
+                )
+            )
+            try:
+                k = TPP.stiffness(pair, sc["cases"][kp]["P"], rp["u"])
+                for kid, zh, en, unit, val in (
+                    ("k_axial", "轴向刚度（峰值工况）", "Axial stiffness (peak case)", "N/µm", k["axial"]),
+                    ("k_radial", "径向刚度（峰值工况）", "Radial stiffness (peak case)", "N/µm", k["radial"]),
+                    ("k_tilt", "倾覆刚度（峰值工况）", "Tilting stiffness (peak case)", "N·m/mrad", k["tilt"]),
+                ):
+                    checks.append(_ck(kid, zh, en, val, None, INFO, unit))
+            except np.linalg.LinAlgError:
+                pass
         worst = [runs[k] for k in live] + list(fat.values())
         ends = max(r["ends"] / r["qmax"] for r in worst)
         ok = ends < 1e-9
@@ -468,7 +664,7 @@ def analyse(p: dict) -> dict:
             "fp": fp,
             "cases": [
                 {
-                    **c,
+                    **{k: v for k, v in c.items() if k != "P"},
                     "Qmax": r["dist"]["Qmax"] if r else 0.0,
                     "p_inner": r["pmax"]["inner"] if r else 0.0,
                     "p_outer": r["pmax"]["outer"] if r else 0.0,
@@ -477,6 +673,14 @@ def analyse(p: dict) -> dict:
             ],
         },
     }
+    if pc:
+        out["pair"] = {k: v for k, v in pc.items() if k != "sweep"} | {
+            "endplay_um": pc["endplay"] * 1000,
+            "preload": pair.preload_force(),
+        }
+        out["pair_rows"] = rp["rows"] if rp else None
+        if pc["sweep"] and rp:
+            out["setting_curve"] = setting_curve(pair, b, sc["cases"][kp]["P"], *pc["sweep"])
     if rp:
         d_ = rp["dist"]
         out["balls"] = {
