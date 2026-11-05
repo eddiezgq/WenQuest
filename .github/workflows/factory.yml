@@ -66,9 +66,10 @@ jobs:
           python-version: "3.12"
       - name: 有限元、流体求解器（第 11 轮 CalculiX、gmsh 用到的系统库；第 16 轮 OpenFOAM）
         run: |
-          sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 openfoam openmpi-bin
+          sudo apt-get update -q && sudo apt-get install -y -q --no-install-recommends calculix-ccx libglu1-mesa libxcursor1 libxft2 libxinerama1 openfoam openmpi-bin ngspice
           (ccx -v || true) | grep -q Version          # ccx -v 的退出码不是 0
           which simpleFoam snappyHexMesh mpirun        # 流体分析（第 16 轮）：OpenFOAM
+          which ngspice                                # 电路分析（第 79 轮）
       - name: 动力学用的机器人模型（第 12 轮：Menagerie 固定提交）
         run: sh factory/deploy/fetch_menagerie.sh "$RUNNER_TEMP/menagerie" && echo "WQ_MENAGERIE=$RUNNER_TEMP/menagerie" >> "$GITHUB_ENV"
       - name: 工厂数据与导入脚本
@@ -98,6 +99,9 @@ jobs:
       - name: 工作台网页能打包
         working-directory: factory/digital/web
         run: npm ci --no-audit --no-fund && npm run build
+      - name: 电路分析：浏览器 ngspice 与服务器 ngspice 读数一致（第 79 轮）
+        working-directory: factory/digital
+        run: python -m pytest -q tests/test_circuit.py -k browser
 
   rehearsal:
     name: 服务器演练（真 ERPNext）
