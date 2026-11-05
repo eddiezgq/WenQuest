@@ -682,8 +682,8 @@ def upload_text_standalone(lec, lang, chapters, total, voice_backend, out_dir):
     t = lec.t(lec.data["title"], lang)
     contact = lec.data.get("contact")
     desc = [t, "", "Chapters:" if lang == "en" else "章节："] + [f"{mmss(a)} {p}" for a, p in chapters] + [
-            "", lec.t(VOICE_NOTE[voice_backend], lang) + (". The company and figures shown are a fictional demo." if lang == "en"
-                                                             else "。画面里的企业和数字是虚构的演示数据。")]
+            "", lec.t(VOICE_NOTE[voice_backend], lang) + ("." if lang == "en" else "。") + (lec.t(lec.data["note"], lang) if lec.data.get("note") else
+                                                             (" The company and figures shown are a fictional demo." if lang == "en" else "画面里的企业和数字是虚构的演示数据。"))]
     if contact:
         desc += ["", ("Contact: " if lang == "en" else "联系：") + contact]
     tags = list((lec.data.get("tags") or {}).get(lang, []))

@@ -1,0 +1,188 @@
+# 首页视频简介 17 · 评价系统与校情中枢（第 86 轮）。独立视频：画面是 intro_deck.py 生成的演示稿（课件/），截图是官网 /eval/、/xq/ 的真界面
+# （intro_shots.py 截）；配音平台 AI 声音（kokoro），中英两版。讲稿内容见 ../讲稿_第一批.md 第 17 段。
+standalone: true
+langs: [zh, en]
+title: [问渠评价系统与校情中枢：从一次作答到一份评估报告, 'WenQuest assessment and Campus Hub: from one answer to an accreditation report']
+brand: [评价系统 · 校情中枢, Assessment · Campus Hub]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的学校、学生和数字都是模拟的演示数据。, 'The school, students and figures shown are simulated demo data.']
+tags:
+  zh: [评价系统, 审核评估, 专业认证, 工程教育认证, 课程目标达成, 毕业要求达成, 教学质量, 高校, AI, 问渠]
+  en: [assessment, accreditation, ABET, outcomes assessment, course objectives, graduate attributes, higher education, AI, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: xq-top, url: /xq/}
+  - {name: eval-stu, url: /eval/, find: [一个学生的一学期, "A student's term"], offset: 8}
+  - {name: eval-transcript, url: /eval/, find: [三个学生的成绩单, Three transcripts], offset: 8}
+  - {name: eval-tea, url: /eval/, click: "[data-p=tea]", find: [教师只看, Teachers see only], offset: 8}
+  - {name: eval-s006, url: /eval/, click: "[data-p=tea]", find: [样例：照抄型, "Example: student S006"], offset: 8}
+  - {name: eval-sch, url: /eval/, click: "[data-p=sch]", find: [课程目标达成度, Course objectives], offset: 8}
+  - {name: eval-report, url: /eval/课程目标达成情况评价报告.html}
+  - {name: xq-heat, url: /xq/, find: [全校一张图, The whole school], offset: 8}
+  - {name: xq-detail, url: /xq/, click: ".prog", scroll: "#detail", offset: 8, wait: 1200}
+  - {name: xq-tasks, url: /xq/, find: [改进任务, Improvement tasks], offset: 8, click: [], js: "document.querySelector('button.act')&&document.querySelector('button.act').click()"}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: xq-top, title: [从一次作答，到一份评估报告, 'From one answer to an accreditation report'],
+          sub: [问渠评价系统与校情中枢：审核评估、专业认证、校内教学评估, 'WenQuest assessment and Campus Hub, for audits, program accreditation and internal reviews']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠的评价系统，面向高校的审核评估、专业认证和校内教学评估。']
+    en: [">WenQuest's assessment system is built for university audits, program accreditation and internal teaching reviews."]
+- id: s02
+  kind: page
+  page: 2
+  part: [学生端, Students]
+  slide:
+    img: eval-stu
+    url: wenquestrobotics.com/eval/
+    kick: [学生端, Students]
+    title: [每一步学习，都留下证据, Every step leaves evidence]
+    points:
+      - {text: [诊断与练习：掌握度随作答更新, 'Diagnosis and practice: mastery updates with every answer'], ring: [1, 8, 94, 22]}
+      - {text: [虚拟实验：先预测、再动手, 'Virtual labs: predict first, then run'], ring: [1, 32, 94, 7]}
+      - {text: [考试与 AI 答辩, Exams and an AI defense panel], ring: [1, 40, 94, 15]}
+  steps: [{show: 0.17}, {show: 0.5}, {show: 1}]
+  say:
+    zh: ['>学生每一步学习都留下证据：诊断、练习，', '>虚拟实验，', '>考试，还有 AI 答辩。']
+    en: ['>Every step a student takes leaves evidence: diagnosis and practice,', '>virtual labs,', '>exams, and an AI defense panel.']
+- id: s03
+  kind: page
+  page: 3
+  part: [学生端, Students]
+  slide:
+    img: eval-transcript
+    url: wenquestrobotics.com/eval/
+    kick: [成绩单, Transcripts]
+    title: [不只一个分数, More than one grade]
+    points:
+      - {text: [能力画像：四个维度, 'An ability profile on four axes'], zoom: [1.5, 25, 75]}
+      - {text: [每一项分数都能追到证据, Every score traces back to evidence]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>成绩单不只一个分数，还有能力画像，', '>每一项分数都能追到证据。']
+    en: ['>A transcript is more than a grade: it carries an ability profile,', '>and every score traces back to evidence.']
+- id: s04
+  kind: page
+  page: 4
+  part: [教师端, Teachers]
+  slide:
+    img: eval-tea
+    url: wenquestrobotics.com/eval/
+    kick: [教师端, Teachers]
+    title: [老师只看需要人判断的案例, Teachers see only the cases that need them]
+    points:
+      - {text: [AI 先筛，疑难案例进终审队列, The AI sorts; hard cases go to a review queue]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>老师只处理需要人判断的案例。']
+    en: ['>Teachers handle only the cases that need human judgement.']
+- id: s05
+  kind: page
+  page: 5
+  part: [教师端, Teachers]
+  slide:
+    img: eval-s006
+    url: wenquestrobotics.com/eval/
+    kick: [样例, Example]
+    title: [闭卷 86 分，实验却一次命中, '86 on the exam, a first-try hit in the lab']
+    points:
+      - {text: [实验记录：没预测、一次命中, 'Lab log: no prediction, first-try hit'], zoom: [1.35, 0, 92]}
+      - {text: [系统安排口试, The system schedules an oral exam]}
+      - {text: [AI 不下作弊结论, The AI never calls it cheating]}
+  steps: [{show: 0.17}, {show: 0.5}, {show: 1}]
+  say:
+    zh: ['>比如这位学生，闭卷八十六分，可实验记录显示一次命中、事先没预测。', '>系统安排口试，', '>AI 不下作弊结论。']
+    en: ['>This student scored 86 on the closed-book exam, but the lab log shows a first-try hit with no prediction.', '>The system schedules an oral exam;', '>the AI does not call it cheating.']
+- id: s06
+  kind: page
+  page: 6
+  part: [学校端, The school]
+  slide:
+    img: eval-sch
+    url: wenquestrobotics.com/eval/
+    kick: [学校端, The school]
+    title: [一键出报告, Reports in one click]
+    points:
+      - {text: [课程目标达成情况评价报告, Course-objective attainment report], ring: [1, 17, 95, 6]}
+      - {text: [课程教学质量报告, Teaching-quality report]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>学校一键得到课程目标达成情况评价报告，', '>和教学质量报告。']
+    en: ['>The school gets a course-objective attainment report in one click,', '>and a teaching-quality report.']
+- id: s07
+  kind: page
+  page: 7
+  part: [学校端, The school]
+  slide:
+    img: eval-report
+    url: 课程目标达成情况评价报告
+    kick: [报告, Reports]
+    title: [网页版、Word 版都有, On the web and in Word]
+    points:
+      - {text: [彩色统计图，数字由程序算出, 'Colour charts; every number computed']}
+      - {text: [改进措施 AI 起草、老师确认, 'Improvement actions: drafted by AI, confirmed by teachers']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>网页版、Word 版都有，', '>改进措施由 AI 起草、老师确认。']
+    en: ['>They come on the web and in Word,', '>with improvement actions drafted by AI and confirmed by teachers.']
+- id: s08
+  kind: page
+  page: 8
+  part: [校情中枢, Campus Hub]
+  slide:
+    img: xq-heat
+    url: wenquestrobotics.com/xq/
+    kick: [校情中枢, Campus Hub]
+    title: [全校一张图, The whole school at a glance]
+    points:
+      - {text: [各门课汇总到专业的毕业要求, Courses roll up to each program's graduate attributes]}
+      - {text: [没达成的指标点亮红灯, Indicators that fall short turn red], zoom: [1.6, 28, 22]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>校情中枢把各门课汇总到专业的毕业要求：', '>哪个指标点没达成，亮红灯。']
+    en: ['>The Campus Hub rolls courses up to each program''s graduate attributes,', '>and flags any indicator that falls short.']
+- id: s09
+  kind: page
+  page: 9
+  part: [校情中枢, Campus Hub]
+  slide:
+    img: xq-detail
+    url: wenquestrobotics.com/xq/
+    kick: [追原因, Drill down]
+    title: [追到哪门课、哪个考核环节, Down to the course and the assessment item]
+    points:
+      - {text: [点开专业，看每个指标点的支撑课程, 'Open a program: the courses behind each indicator']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>点开就能追到，是哪门课、哪个考核环节拖了后腿。']
+    en: ['>Click through to the course and the assessment item that is holding it back.']
+- id: s10
+  kind: page
+  page: 10
+  part: [校情中枢, Campus Hub]
+  slide:
+    img: xq-tasks
+    url: wenquestrobotics.com/xq/
+    kick: [闭环, Closing the loop]
+    title: [评价、反馈、改进, 'Evaluate, feed back, improve']
+    points:
+      - {text: [一键给负责人下达改进任务, Assign an improvement task in one click], ring: [1, 14, 97, 50]}
+      - {text: [下学期自动复核, Re-checked next term]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>一键给负责人下达改进任务，', '>下学期复核。评价、反馈、改进，形成闭环。']
+    en: ['>Assign an improvement task in one click,', '>and re-check it next term: evaluate, feed back, improve.']
+- id: s11
+  kind: page
+  page: 11
+  part: [结尾, Outro]
+  slide: {layout: end, img: eval-sch, title: [欢迎学校来试点, Schools are welcome to pilot it],
+          sub: [演示用的是模拟数据, The demo uses simulated data], link: [问渠官网首页 → 评价系统, wenquestrobotics.com/eval]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>演示用的是模拟数据，欢迎学校来试点。']
+    en: ['>The demo uses simulated data. Schools are welcome to pilot it.']
