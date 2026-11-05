@@ -38,7 +38,11 @@ const pts = computed({
     <fieldset><legend>{{ t('gSize') }}</legend>
       <Num v-model="project.size.d" :label="t('d')" unit="mm" />
       <Num v-model="project.size.D" :label="t('D')" unit="mm" />
-      <Num v-model="project.size.B" :label="t('B')" unit="mm" />
+      <Num v-model="project.size.B" :label="tap ? t('Ttot') : t('B')" unit="mm" />
+      <template v-if="tap">
+        <Num v-model="project.size.Bi" :label="t('Bcone')" unit="mm" :hint="t('BconeHint')" />
+        <Num v-model="project.size.Co" :label="t('Ccup')" unit="mm" />
+      </template>
     </fieldset>
 
     <fieldset v-if="!cyl"><legend>{{ t('gBalls') }}</legend>

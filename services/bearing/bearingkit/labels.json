@@ -3,6 +3,18 @@
 "宽度 B",
 "Width B"
 ],
+"Bcone": [
+"内圈宽 B",
+"Cone width B"
+],
+"BconeHint": [
+"内圈背面（大挡边一侧）到外圈背面相距 T；B、C 不填时按 T。只影响零件图、三维和工艺，计算不变",
+"The cone’s back face (rib side) and the cup’s back face are T apart; blank B, C: as T. Drawings, 3D and process only: the checks do not change"
+],
+"Ccup": [
+"外圈宽 C",
+"Cup width C"
+],
 "D": [
 "外径 D",
 "Outside diameter D"
@@ -62,6 +74,10 @@
 "T_o": [
 "外圈温度",
 "Outer ring temperature"
+],
+"Ttot": [
+"总宽 T",
+"Overall width T"
 ],
 "Z": [
 "球数 Z",
@@ -552,8 +568,8 @@
 "Page"
 ],
 "catPickNote": [
-"点一行：设成这个型号（外形尺寸填好，内部尺寸清空待填；应用场景和载荷保留）。圆锥滚子轴承的宽度取总宽 T。",
-"Click a row to set that model (outside sizes filled, inner sizes cleared for you to fill; the application and loads stay). A tapered bearing’s width is taken as the overall width T."
+"点一行：设成这个型号（外形尺寸填好，内部尺寸清空待填；应用场景和载荷保留）。圆锥滚子轴承填总宽 T、内圈宽 B、外圈宽 C。",
+"Click a row to set that model (outside sizes filled, inner sizes cleared for you to fill; the application and loads stay). A tapered bearing gets its overall width T, cone width B and cup width C."
 ],
 "catRead": [
 "读到 {n} 行，已按固定规则核对（见下）。起个名字存到云端：",
@@ -1407,6 +1423,10 @@
 "按当前设计生成工序链（空白）",
 "Usual chain for this design (blank)"
 ],
+"pcBlankElement": [
+"生成滚动体工序链（空白）",
+"Blank chain of the balls or rollers"
+],
 "pcBlankT": [
 "毛坯公差",
 "Blank tolerance"
@@ -1582,6 +1602,10 @@
 "pcZrange": [
 "实际留量范围",
 "Stock range"
+],
+"pc_element": [
+"滚动体",
+"Rolling element"
 ],
 "pc_inner": [
 "内圈",
@@ -2138,6 +2162,166 @@
 "title": [
 "项目名称",
 "Project name"
+],
+"tolA": [
+"自由接触角 α₀",
+"Free contact angle α₀"
+],
+"tolDemo": [
+"用示例偏差试一试",
+"Try with example deviations"
+],
+"tolDemoNote": [
+"偏差是演示用的虚构数，不是标准或推荐值。",
+"The deviations are made up for the demo: not standard or recommended values."
+],
+"tolDist": [
+"蒙特卡洛分布",
+"Monte Carlo distribution"
+],
+"tolEi": [
+"下偏差",
+"Lower dev."
+],
+"tolEmpty": [
+"填名义尺寸和上下偏差（或“从设计取名义尺寸”），点“计算”。",
+"Fill in the sizes and deviations (or take them from the design) and press Compute."
+],
+"tolEs": [
+"上偏差",
+"Upper dev."
+],
+"tolExt": [
+"极值法",
+"Extremes"
+],
+"tolFromDesign": [
+"从设计取名义尺寸",
+"Nominal sizes from the design"
+],
+"tolGa": [
+"轴向游隙 Ga",
+"Axial play Ga"
+],
+"tolHist": [
+"径向游隙分布（蒙特卡洛，µm；竖线为目标范围）",
+"Radial clearance (Monte Carlo, µm; lines: the target range)"
+],
+"tolInterf": [
+"有过盈的可能：蒙特卡洛中游隙为负的比例 {p}（这些样本的接触角、轴向游隙不计）",
+"Interference is possible: {p} of the samples have a negative clearance (their contact angle and axial play are not counted)"
+],
+"tolIntro": [
+"由沟底直径、钢球直径、沟曲率半径的名义尺寸和上下偏差（企业填），算径向游隙、自由接触角、轴向游隙和端面凸出量的范围：极值法、统计法（正态，公差带为 ±3σ）、蒙特卡洛并排列出。",
+"From the groove bottom diameters, ball diameter and groove radii with their deviations (yours): the range of the radial clearance, free contact angle, axial play and standout by extremes, statistics (normal, tolerance = ±3σ) and Monte Carlo, side by side."
+],
+"tolMc": [
+"蒙特卡洛 0.135%–99.865%",
+"Monte Carlo 0.135–99.865 %"
+],
+"tolMean": [
+"蒙特卡洛均值",
+"MC mean"
+],
+"tolN": [
+"抽样次数",
+"Samples"
+],
+"tolNeedBall": [
+"先在“设计校核”里打开一个球轴承",
+"Open a ball bearing in Design first"
+],
+"tolNom": [
+"名义",
+"Nominal"
+],
+"tolNormal": [
+"正态（公差带 ±3σ）",
+"Normal (tolerance ±3σ)"
+],
+"tolNote": [
+"蒙特卡洛 {n} 次，固定随机种子 {seed}：同样的输入得到同样的结果。",
+"Monte Carlo {n} samples, fixed seed {seed}: the same input gives the same result."
+],
+"tolOutside": [
+"游隙落在目标范围外的比例：{p}",
+"Share outside the target clearance: {p}"
+],
+"tolPd": [
+"径向游隙 Pd",
+"Radial clearance Pd"
+],
+"tolPosHint": [
+"沟位置：沟道中心到各自基准端面的距离，算端面凸出量用（配对时）；不需要就两个都空着。偏差精确时填 0、0，空着不当 0。",
+"Groove position: from the groove centre to the ring’s reference face, for the standout (pairs); leave both blank if not needed. An exact size is 0, 0: blanks are not taken as 0."
+],
+"tolRun": [
+"计算",
+"Compute"
+],
+"tolS": [
+"端面凸出量 s",
+"Standout s"
+],
+"tolShare": [
+"各尺寸对径向游隙的影响（方差占比）",
+"Each size’s share of the clearance variance"
+],
+"tolShareCol": [
+"占比",
+"Share"
+],
+"tolStat": [
+"统计法 ±3σ",
+"Statistical ±3σ"
+],
+"tolTHint": [
+"填了就算落在范围外的比例",
+"Filled: the share outside is given"
+],
+"tolTitle": [
+"游隙尺寸链",
+"Clearance chain"
+],
+"tolTmax": [
+"目标游隙：上限",
+"Target clearance: max"
+],
+"tolTmin": [
+"目标游隙：下限",
+"Target clearance: min"
+],
+"tolUniform": [
+"均匀（公差带内）",
+"Uniform (over the tolerance)"
+],
+"tol_Dw": [
+"钢球直径 Dw",
+"Ball diameter Dw"
+],
+"tol_ai": [
+"内圈沟位置 aᵢ",
+"Inner groove position aᵢ"
+],
+"tol_ao": [
+"外圈沟位置 aₒ",
+"Outer groove position aₒ"
+],
+"tol_di": [
+"内圈沟底直径 dᵢ",
+"Inner groove bottom dᵢ"
+],
+"tol_do": [
+"外圈沟底直径 dₒ",
+"Outer groove bottom dₒ"
+],
+"tol_ri": [
+"内沟曲率半径 rᵢ",
+"Inner groove radius rᵢ"
+],
+"tol_ro": [
+"外沟曲率半径 rₒ",
+"Outer groove radius rₒ"
 ],
 "type": [
 "类型",

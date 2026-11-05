@@ -114,9 +114,29 @@ def test_the_project_and_its_checks():
     assert r["type"] == "crossed" and r["status"] == "unknown"  # the ratings wait for the standard
     assert {"p_inner", "p_outer", "x_both", "k_tilt", "k_axial", "k_radial", "x_fit", "x_lands"} <= set(ids)
     assert ids["x_both"]["status"] == "pass" and ids["x_gr"]["value"] == pytest.approx(-10.0)
-    # the joint with a horizontal axis and one bearing: the overhung weight is the moment W·x
-    assert r["crossed"]["P"] == pytest.approx([1200.0, 0, 0, 1200.0 * 60, 0])
-    assert r["scenario"]["cases"][0]["M"] == pytest.approx(72000.0)
+    # the loads given directly (the arm's weight 1200 N at 60 mm, as a force and a moment)
+    assert r["crossed"]["P"] == pytest.approx([1200.0, 0, 0, 72000.0, 0])
+    # the same through the robot joint scene: a horizontal axis held by this one bearing, the overhung weight is the
+    # moment W·x (plan section 十九); the results are the same as with the loads given directly
+    j = copy.deepcopy(ex)
+    j["scenario"] = {
+        "kind": "joint",
+        "axis": "horizontal",
+        "W": 1200,
+        "x": 60,
+        "r": None,
+        "L": None,
+        "this": "A",
+        "fixed": "A",
+        "swing_deg": 180,
+        "n": 15,
+        "fp": None,
+    }
+    rj = analyse(j)
+    assert rj["crossed"]["P"] == pytest.approx([1200.0, 0, 0, 72000.0, 0])
+    assert rj["scenario"]["cases"][0]["M"] == pytest.approx(72000.0)
+    assert any("W·x" in st["zh"] for st in rj["scenario"]["steps"])
+    assert {c["id"]: c["value"] for c in rj["checks"]}["k_tilt"] == pytest.approx(ids["k_tilt"]["value"], rel=1e-9)
     assert len(r["setting_curve"]["e_um"]) == 21 and r["profile"]["inner"]
     # preload given as a force: the same as the clearance that gives it
     q = copy.deepcopy(ex)
@@ -127,7 +147,7 @@ def test_the_project_and_its_checks():
     # too little preload for a large moment: a set unloads, the check fails
     q = copy.deepcopy(ex)
     q["pair"]["endplay"] = -0.5
-    q["scenario"]["W"] = 6000
+    q["loads"].update(Fr=6000, M=360000)
     assert {c["id"]: c for c in analyse(q)["checks"]}["x_both"]["status"] == "fail"
     # rollers longer than Dw·tan α would hit the other face
     q = copy.deepcopy(ex)

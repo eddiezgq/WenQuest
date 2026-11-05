@@ -92,7 +92,7 @@ function pick(r) {
     ...blank(), ...JSON.parse(JSON.stringify(keep)), type,
     title: { zh: name, en: name },
     // the model's width: a tapered bearing here has one width for cone and cup, taken as the overall width T
-    size: { d: Number(r.d), D: Number(r.D), B: Number(type === 'tapered' ? r.T : r.B) },
+    size: { d: Number(r.d), D: Number(r.D), B: Number(type === 'tapered' ? r.T : r.B), Bi: type === 'tapered' && r.B ? Number(r.B) : null, Co: type === 'tapered' && r.C ? Number(r.C) : null },
     catalog: {
       maker: cur.value.name, version: cur.value.version, table: r.table, model: r.model, cup: r.cup || null, page: r.page || null, d: r.d ?? null, D: r.D ?? null,
       T: r.T ?? null, B: r.B ?? null, C: r.C ?? null, Cr: r.Cr ?? null, Cor: r.Cor ?? null,

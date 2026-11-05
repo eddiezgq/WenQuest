@@ -8,13 +8,55 @@
     "en": "Sizes, preload, loads and limits are made up for the demo: not a catalogue or standard bearing, nor recommended values."
   },
   "type": "crossed",
-  "size": {"d": 80, "D": 120, "B": 15},
-  "inner": {"Dw": 8, "Z": 32, "dm": 100, "Lw": 7.5, "Lwe": 6.9, "alpha0_deg": 45},
-  "profile": {"kind": "partial", "R": 500, "flat": 4, "points": []},
-  "pair": {"arrangement": "single", "preload": null, "spacing": null, "mount": "pair", "setting": "endplay",
-           "endplay": -10, "sweep_from": 10, "sweep_to": -20},
-  "crossed": {"split": "outer"},
-  "material": {"E": 206000, "nu": 0.3},
-  "scenario": {"kind": "joint", "axis": "horizontal", "W": 1200, "x": 60, "r": null, "L": null, "this": "A", "fixed": "A", "swing_deg": 180, "n": 15, "fp": null},
-  "limits": {"p_static": 4000, "gap_min": 1.0, "wall_min": 2.0}
+  "size": {
+    "d": 80,
+    "D": 120,
+    "B": 15
+  },
+  "inner": {
+    "Dw": 8,
+    "Z": 32,
+    "dm": 100,
+    "Lw": 7.5,
+    "Lwe": 6.9,
+    "alpha0_deg": 45
+  },
+  "profile": {
+    "kind": "partial",
+    "R": 500,
+    "flat": 4,
+    "points": []
+  },
+  "pair": {
+    "arrangement": "single",
+    "preload": null,
+    "spacing": null,
+    "mount": "pair",
+    "setting": "endplay",
+    "endplay": -10,
+    "sweep_from": 10,
+    "sweep_to": -20
+  },
+  "crossed": {
+    "split": "outer"
+  },
+  "material": {
+    "E": 206000,
+    "nu": 0.3
+  },
+  "scenario": {
+    "kind": "generic",
+    "fp": null
+  },
+  "limits": {
+    "p_static": 4000,
+    "gap_min": 1.0,
+    "wall_min": 2.0
+  },
+  "loads": {
+    "Fr": 1200,
+    "Fa": 0,
+    "M": 72000,
+    "n": 15
+  }
 }

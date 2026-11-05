@@ -58,6 +58,8 @@ FEATURE_NAMES = {
     "rib": ("挡边外径", "Rib diameter"),
     "width": ("宽度（两端面）", "Width (both faces)"),
     "race": ("沟道直径", "Raceway diameter"),
+    "dia": ("直径", "Diameter"),
+    "length": ("长度（两端面）", "Length (both ends)"),
 }
 
 
@@ -119,13 +121,27 @@ def features(g: dict) -> dict:
         inner = [
             _f("bore", g["d"], "int"),
             _f("rib", 2 * max(rs_in), "ext"),
-            _f("width", B, "ext"),
+            _f("width", g.get("Bi") or B, "ext"),  # the cone width B (plan section 二十)
             _f("race", mid(cone_seg), "ext", *rname),
         ]
-        outer = [_f("od", g["D"], "ext"), _f("width", B, "ext"), _f("race", mid(cup_seg), "int", *rname)]
+        outer = [
+            _f("od", g["D"], "ext"),
+            _f("width", g.get("Co") or B, "ext"),  # the cup width C
+            _f("race", mid(cup_seg), "int", *rname),
+        ]
     else:
         raise ProcessError("the bearing type is deep_groove, angular, cylindrical or tapered")
     return {"inner": inner, "outer": outer}
+
+
+def element_features(g: dict) -> tuple[str, list[dict]]:
+    """The rolling element's machined features (plan section 二十, part 3): a ball's diameter; a roller's diameter
+    (the mean one of a tapered roller) and length. Returns ("ball" | "roller", features)."""
+    pr = PT.parts(g)
+    if pr["element_kind"] == "ball":
+        return "ball", [_f("dia", g["Dw"], "ext", "钢球直径", "Ball diameter")]
+    dz = ("平均直径", "Mean diameter") if g["type"] == "tapered" else ("滚子直径", "Roller diameter")
+    return "roller", [_f("dia", g["Dw"], "ext", *dz), _f("length", g["Lw"], "ext", "滚子长度", "Roller length")]
 
 
 # The usual chain of a bearing ring (plan section 十三 (二)); structure only, no numbers.
@@ -154,6 +170,28 @@ CHAIN = {
         ("inspect", "检测", "Inspection", []),
     ],
 }
+# The usual chain of a ball and of a roller (plan section 二十, part 3); structure only, no numbers. The cold-headed
+# (or cut) blank is the starting state: its tolerance is the "blank" one.
+ELEMENT_CHAIN = {
+    "ball": [
+        ("grind", "光球", "Flashing", ["dia"]),
+        ("grind", "软磨", "Soft grinding", ["dia"]),
+        ("heat", "热处理（淬火、回火）", "Heat treatment", ["dia"]),
+        ("grind", "硬磨", "Hard grinding", ["dia"]),
+        ("superfinish", "精研", "Lapping", ["dia"]),
+        ("wash", "清洗", "Washing", []),
+        ("inspect", "分选（按直径分组）", "Sorting (diameter groups)", []),
+    ],
+    "roller": [
+        ("turn", "车削（或冷镦后车）", "Turning (or heading, then turning)", ["dia", "length"]),
+        ("heat", "热处理（淬火、回火）", "Heat treatment", ["dia", "length"]),
+        ("grind", "磨端面", "End face grinding", ["length"]),
+        ("grind", "磨外径（无心磨）", "Outside diameter grinding (centreless)", ["dia"]),
+        ("superfinish", "超精外径（凸度）", "Superfinishing (crown)", ["dia"]),
+        ("wash", "清洗", "Washing", []),
+        ("inspect", "分选（按直径分组）", "Sorting (diameter groups)", []),
+    ],
+}
 CUT_FIELDS = ("Z", "T", "Zreq", "Zmax", "setup")
 STOCK_FIELDS = ("Z", "dz", "Zreq")
 HEAT_FIELDS = ("change", "scatter", "distortion")
@@ -162,39 +200,46 @@ HEAT_FIELDS = ("change", "scatter", "distortion")
 def blank_template(g: dict) -> dict:
     """The usual chain for this bearing's rings with every number left empty for the company to fill."""
     fs = features(g)
-    rings = {}
-    for ring in ("inner", "outer"):
-        ids = [f["id"] for f in fs[ring]]
-        ops = []
-        for kind, zh, en, feats in CHAIN[ring]:
-            use = [f for f in feats if f in ids]
-            if kind in ("grind", "superfinish") and not use:
-                continue  # e.g. the lands of a cylindrical roller ring are not drawn
-            mode = "stock" if kind == "superfinish" else "size"
-            names = (
-                HEAT_FIELDS
-                if kind == "heat"
-                else (STOCK_FIELDS if mode == "stock" else CUT_FIELDS)
-                if KINDS[kind] == CUT
-                else ()
-            )
-            ops.append(
-                {
-                    "no": 10 * (len(ops) + 1),
-                    "kind": kind,
-                    "mode": mode if KINDS[kind] == CUT else None,
-                    "name": {"zh": zh, "en": en},
-                    "equipment": "",
-                    "params": [],
-                    "features": {f: {n: None for n in names} for f in use},
-                }
-            )
-        rings[ring] = {
-            "ops": ops,
-            "finish": {f: {"es": None, "ei": None} for f in ids},
-            "blank": {f: {"T": None} for f in ids},
-        }
-    return {"rings": rings}
+    return {"rings": {ring: _blank_ring(fs[ring], CHAIN[ring]) for ring in ("inner", "outer")}}
+
+
+def element_template(g: dict) -> dict:
+    """The usual chain of this bearing's balls or rollers, every number left empty (plan section 二十, part 3)."""
+    kind, fs = element_features(g)
+    return {"rings": {"element": _blank_ring(fs, ELEMENT_CHAIN[kind])}}
+
+
+def _blank_ring(feats: list[dict], chain_of) -> dict:
+    ids = [f["id"] for f in feats]
+    ops = []
+    for kind, zh, en, use_ids in chain_of:
+        use = [f for f in use_ids if f in ids]
+        if kind in ("grind", "superfinish") and not use:
+            continue  # e.g. the lands of a cylindrical roller ring are not drawn
+        mode = "stock" if kind == "superfinish" else "size"
+        names = (
+            HEAT_FIELDS
+            if kind == "heat"
+            else (STOCK_FIELDS if mode == "stock" else CUT_FIELDS)
+            if KINDS[kind] == CUT
+            else ()
+        )
+        ops.append(
+            {
+                "no": 10 * (len(ops) + 1),
+                "kind": kind,
+                "mode": mode if KINDS[kind] == CUT else None,
+                "name": {"zh": zh, "en": en},
+                "equipment": "",
+                "params": [],
+                "features": {f: {n: None for n in names} for f in use},
+            }
+        )
+    return {
+        "ops": ops,
+        "finish": {f: {"es": None, "ei": None} for f in ids},
+        "blank": {f: {"T": None} for f in ids},
+    }
 
 
 def _state_str(side, mm, w):
@@ -561,8 +606,14 @@ def run(design_geometry: dict, process: dict) -> dict:
         raise ProcessError("give the process as an object")
     fs = features(design_geometry)
     rings_in = process.get("rings") or {}
+    if "element" in rings_in:
+        fs["element"] = element_features(design_geometry)[1]
     out = {}
-    for ring, zh, en in (("inner", "内圈", "Inner ring"), ("outer", "外圈", "Outer ring")):
+    for ring, zh, en in (
+        ("inner", "内圈", "Inner ring"),
+        ("outer", "外圈", "Outer ring"),
+        ("element", "滚动体", "Rolling element"),
+    ):
         if ring in rings_in:
             out[ring] = _ring(fs[ring], rings_in[ring] or {}, zh, en)
     if not out:
@@ -596,9 +647,14 @@ def run(design_geometry: dict, process: dict) -> dict:
                 "en": "A setup error left blank is not subtracted (taken as included in the required smallest stock).",
             },
             {
-                "zh": "沟曲率半径、沟位置（相对端面）和滚动体工艺本步不算，工序卡上留栏。",
-                "en": "Groove radius, groove position from the faces and the rolling elements' process are not "
-                "computed here; the sheets leave room for them.",
+                "zh": "沟曲率半径和沟位置的影响在“合套选配”页的“游隙尺寸链”里算；这里只算直径和宽度方向的工序尺寸。",
+                "en": "The groove radius and position are worked in the clearance chain (Selective assembly page); "
+                "here only diameters and widths.",
+            },
+            {
+                "zh": "滚动体：钢球按直径、滚子按直径和长度倒推；分选的组距与“合套选配”的钢球分组对应，由企业定。",
+                "en": "Rolling elements: a ball by its diameter, a roller by its diameter and length; the sorting "
+                "groups match the ball groups of selective assembly and are the company's.",
             },
         ],
     }

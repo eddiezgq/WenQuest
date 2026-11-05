@@ -65,7 +65,9 @@ def build(p: dict):
         "type": "tapered",
         "d": d,
         "D": D,
-        "B": B,
+        "B": B,  # the overall width T (plan section 二十: one width before; the cone and cup widths below)
+        "Bi": _num(s.get("Bi")) or B,
+        "Co": _num(s.get("Co")) or B,
         "dm": dm,
         "Dw": Dw,
         "Z": int(Z),

@@ -23,7 +23,8 @@ const name = computed(() => (lang.value === 'zh' ? project.title.zh : project.ti
 const inputs = computed(() => {
   const p = project, rows = [['type', t(p.type), '']]
   const add = (k, v, u) => { if (v != null && v !== '') rows.push([k, v, u]) }
-  add('d', p.size.d, 'mm'); add('D', p.size.D, 'mm'); add('B', p.size.B, 'mm')
+  add('d', p.size.d, 'mm'); add('D', p.size.D, 'mm'); add(p.type === 'tapered' ? 'Ttot' : 'B', p.size.B, 'mm')
+  if (p.type === 'tapered') { add('Bcone', p.size.Bi, 'mm'); add('Ccup', p.size.Co, 'mm') }
   add('Dw', p.inner.Dw, 'mm'); add('Z', p.inner.Z, ''); add('dm', p.inner.dm ?? props.r?.geometry?.dm, 'mm')
   if (p.type === 'flex') {
     add('fi', p.inner.fi, ''); add('fo', p.inner.fo, ''); add('Pd', p.inner.Pd, 'mm')

@@ -68,6 +68,17 @@ def feature_segments(segs: list[dict], ring: str, fid: str, kind: str) -> list[i
         return not s.get("arc") and abs(s["a"][0] - s["b"][0]) > tol and abs(s["a"][1] - s["b"][1]) > tol
 
     idx = list(range(len(segs)))
+    if fid == "length":  # a roller's ends
+        return [i for i in idx if const_z(segs[i]) and abs(abs(segs[i]["a"][1]) - zmax) < tol]
+    if fid == "dia":  # a ball's sphere, a tapered roller's cone, a cylinder
+        arcs = [i for i in idx if segs[i].get("arc")]
+        if arcs:
+            return arcs
+        inc = [i for i in idx if inclined(segs[i])]
+        if inc:
+            return [max(inc, key=lambda i: math.dist(segs[i]["a"], segs[i]["b"]))]
+        r = max(s["a"][0] for s in segs if const_r(s))
+        return [i for i in idx if const_r(segs[i]) and abs(segs[i]["a"][0] - r) < tol]
     if fid == "width":
         return [i for i in idx if const_z(segs[i]) and abs(abs(segs[i]["a"][1]) - zmax) < tol]
     if fid in ("bore", "land_bore"):

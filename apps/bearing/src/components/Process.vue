@@ -26,7 +26,16 @@ const fname = (fid) => L(feats.value?.[ring.value]?.find((f) => f.id === fid)) |
 const fieldsOf = (o) => (o.kind === 'heat' ? HEAT_F : CUTS.includes(o.kind) ? ((o.mode || (o.kind === 'superfinish' ? 'stock' : 'size')) === 'stock' ? STOCK_F : SIZE_F) : [])
 
 async function loadFeatures() {
-  try { feats.value = (await api('/process/template', design())).features; if (!tpl.value) await blankChain(); else err.value = null } catch (e) { feats.value = null; err.value = e }
+  try {
+    const f = (await api('/process/template', design())).features
+    if (tpl.value?.rings?.element) f.element = (await api('/process/element-template', design())).features.element
+    feats.value = f
+    if (!tpl.value) await blankChain(); else err.value = null
+  } catch (e) { feats.value = null; err.value = e }
+}
+// the balls' or rollers' usual chain, structure only (plan section 二十, part 3)
+async function blankElement() {
+  try { const d = await api('/process/element-template', design()); feats.value = { ...(feats.value || {}), ...d.features }; tpl.value = d.template; ring.value = 'element'; open.value = -1; err.value = null; detach('process') } catch (e) { err.value = e }
 }
 async function blankChain() {
   try { const d = await api('/process/template', design()); feats.value = d.features; tpl.value = d.template; open.value = -1; err.value = null; detach('process') } catch (e) { err.value = e }
@@ -58,6 +67,8 @@ onMounted(async () => {
   if (tpl.value) { await loadFeatures(); runSoon() } else await blankChain()
 })
 
+const ringKeys = computed(() => ['inner', 'outer', 'element'].filter((x) => tpl.value?.rings?.[x]))
+watch(ringKeys, (ks) => { if (ks.length && !ks.includes(ring.value)) ring.value = ks[0] }, { immediate: true })
 const R = computed(() => tpl.value?.rings?.[ring.value])
 const ops = computed(() => R.value?.ops || [])
 function addOp() {
@@ -92,7 +103,8 @@ async function openFile(e) {
 
 // numbers on the page
 const mm = (x, d = 4) => (x == null ? '—' : x.toFixed(d))
-const dev = (x) => (x === 0 ? '0' : (x > 0 ? '+' : '−') + Math.abs(x).toFixed(3))
+// deviations: micron-level ones (rolling elements) keep their fourth decimal
+const dev = (x) => (x === 0 ? '0' : (x > 0 ? '+' : '−') + (Math.abs(x) < 0.001 || Math.round(Math.abs(x) * 1e4) % 10 ? Math.abs(x).toFixed(4) : Math.abs(x).toFixed(3)))
 const sizeStr = (s) => (s ? `${s.size.toFixed(4)} ${dev(s.upper)}/${dev(s.lower)}` : t('unknown'))
 const resRing = computed(() => out.value?.rings?.[ring.value])
 const colFeats = computed(() => resRing.value?.features || [])
@@ -117,7 +129,7 @@ const counts = computed(() => {
   return c
 })
 const print = () => window.print()
-const allCards = computed(() => ['inner', 'outer'].filter((k) => out.value?.rings?.[k]).flatMap((k) => out.value.rings[k].cards.map((c) => ({ ...c, ring: k }))))
+const allCards = computed(() => ['inner', 'outer', 'element'].filter((k) => out.value?.rings?.[k]).flatMap((k) => out.value.rings[k].cards.map((c) => ({ ...c, ring: k }))))
 const ringFeat = (rk, fid) => L(out.value?.rings?.[rk]?.features.find((f) => f.id === fid)) || fid
 const fmtZ = (x) => (x == null ? '—' : x.toFixed(4))
 </script>
@@ -129,7 +141,11 @@ const fmtZ = (x) => (x == null ? '—' : x.toFixed(4))
       <p class="hint">{{ t('pcIntro') }}</p>
       <div class="btns">
         <button type="button" class="ghost" @click="blankChain">{{ t('pcBlankChain') }}</button>
-        <button v-for="e in examples" :key="e.id" type="button" class="ghost" @click="example(e.id)">{{ t('pcExample') }}</button>
+        <button type="button" class="ghost" @click="blankElement">{{ t('pcBlankElement') }}</button>
+        <select v-if="examples.length" class="exsel" :aria-label="t('pcExample')" @change="$event.target.value && example($event.target.value); $event.target.value = ''">
+          <option value="">{{ t('pcExample') }}…</option>
+          <option v-for="e in examples" :key="e.id" :value="e.id">{{ lang === 'zh' ? e.title?.zh : e.title?.en }}</option>
+        </select>
       </div>
       <div class="btns">
         <button type="button" class="ghost" @click="fileInput.click()">{{ t('pcOpen') }}</button>
@@ -139,7 +155,7 @@ const fmtZ = (x) => (x == null ? '—' : x.toFixed(4))
       </div>
       <p v-if="links.process.id" class="hint">{{ t('cloudLinked').replace('{name}', links.process.name).replace('{v}', links.process.version) }}</p>
       <div class="seg two" role="tablist">
-        <button v-for="k in ['inner', 'outer']" :key="k" type="button" :class="{ on: ring === k }" :aria-pressed="ring === k" @click="ring = k; open = -1">{{ t('pc_' + k) }}</button>
+        <button v-for="k in ringKeys" :key="k" type="button" :class="{ on: ring === k }" :aria-pressed="ring === k" @click="ring = k; open = -1">{{ t('pc_' + k) }}</button>
       </div>
 
       <template v-if="R">

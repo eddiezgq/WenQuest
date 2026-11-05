@@ -1,0 +1,149 @@
+{
+  "rings": {
+    "element": {
+      "ops": [
+        {
+          "no": 10,
+          "kind": "grind",
+          "mode": "size",
+          "name": {
+            "zh": "光球",
+            "en": "Flashing"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.25,
+              "T": 0.03,
+              "Zreq": 0.08,
+              "Zmax": null,
+              "setup": null
+            }
+          }
+        },
+        {
+          "no": 20,
+          "kind": "grind",
+          "mode": "size",
+          "name": {
+            "zh": "软磨",
+            "en": "Soft grinding"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.1,
+              "T": 0.01,
+              "Zreq": 0.04,
+              "Zmax": null,
+              "setup": null
+            }
+          }
+        },
+        {
+          "no": 30,
+          "kind": "heat",
+          "mode": null,
+          "name": {
+            "zh": "热处理（淬火、回火）",
+            "en": "Heat treatment"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "change": 0.008,
+              "scatter": 0.006,
+              "distortion": 0.01
+            }
+          }
+        },
+        {
+          "no": 40,
+          "kind": "grind",
+          "mode": "size",
+          "name": {
+            "zh": "硬磨",
+            "en": "Hard grinding"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.06,
+              "T": 0.0006,
+              "Zreq": 0.02,
+              "Zmax": 0.1,
+              "setup": null
+            }
+          }
+        },
+        {
+          "no": 50,
+          "kind": "superfinish",
+          "mode": "stock",
+          "name": {
+            "zh": "精研",
+            "en": "Lapping"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.004,
+              "dz": 0.0003,
+              "Zreq": 0.002
+            }
+          }
+        },
+        {
+          "no": 60,
+          "kind": "wash",
+          "mode": null,
+          "name": {
+            "zh": "清洗",
+            "en": "Washing"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {}
+        },
+        {
+          "no": 70,
+          "kind": "inspect",
+          "mode": null,
+          "name": {
+            "zh": "分选（按直径分组）",
+            "en": "Sorting (diameter groups)"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {}
+        }
+      ],
+      "finish": {
+        "dia": {
+          "es": 0.0005,
+          "ei": -0.0005
+        }
+      },
+      "blank": {
+        "dia": {
+          "T": 0.08
+        }
+      }
+    }
+  },
+  "title": {
+    "zh": "钢球工艺（示例，虚构数）",
+    "en": "Ball process (example, fictional values)"
+  },
+  "fictional": true,
+  "note": {
+    "zh": "所有留量、公差、热处理变化都是虚构的演示数，不是推荐值；请按企业自己的设备和经验填写。",
+    "en": "Every allowance, tolerance and heat-treatment value is a fictional demonstration value, not a recommendation; fill in your own from your machines and experience."
+  },
+  "design": "demo-deep-groove"
+}

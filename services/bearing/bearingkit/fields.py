@@ -124,7 +124,19 @@ GROUPS = [
             ),
         ],
     ),
-    ("gSize", {}, [F("size.d", "d", "mm"), F("size.D", "D", "mm"), F("size.B", "B", "mm")]),
+    (
+        "gSize",
+        {},
+        [
+            F("size.d", "d", "mm"),
+            F("size.D", "D", "mm"),
+            F("size.B", "B", "mm", when={"type": [t for t in TYPES if t != "tapered"]}),
+            # tapered (plan section 二十): the overall width T, the cone width B and the cup width C
+            F("size.B", "Ttot", "mm", when={"type": ["tapered"]}),
+            F("size.Bi", "Bcone", "mm", hint="BconeHint", when={"type": ["tapered"]}),
+            F("size.Co", "Ccup", "mm", when={"type": ["tapered"]}),
+        ],
+    ),
     (
         "gBalls",
         {"type": BALL + ["flex"]},
@@ -398,7 +410,7 @@ FRESH = {
 BLANK = {
     "title": {"zh": "", "en": ""},
     "type": "deep_groove",
-    "size": {"d": None, "D": None, "B": None},
+    "size": {"d": None, "D": None, "B": None},  # tapered may add Bi, Co (plan section 二十; only when given)
     "inner": {
         k: None
         for k in (
@@ -497,6 +509,8 @@ def put(p: dict, path: str, value) -> None:
     cur = p
     for part in parts[:-1]:
         cur = cur.setdefault(part, {})
+    if value is None and parts[-1] not in cur:
+        return  # an optional field left blank is not written into the file (e.g. a tapered bearing's B and C)
     cur[parts[-1]] = value
 
 
@@ -597,7 +611,13 @@ def from_catalog(p: dict, cat: dict, r: dict) -> dict:
     q.update(
         type=typ,
         title={"zh": name, "en": name},
-        size={"d": num(r.get("d")), "D": num(r.get("D")), "B": num(r.get("T") if typ == "tapered" else r.get("B"))},
+        size={
+            "d": num(r.get("d")),
+            "D": num(r.get("D")),
+            "B": num(r.get("T") if typ == "tapered" else r.get("B")),
+            "Bi": num(r.get("B")) if typ == "tapered" else None,
+            "Co": num(r.get("C")) if typ == "tapered" else None,
+        },
         catalog={
             "maker": cat.get("name"),
             "version": cat.get("version"),
