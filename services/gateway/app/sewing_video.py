@@ -6,6 +6,8 @@
 - 段落：整机 → 各机构（平缝机：刺布、挑线、钩线、送布；包缝机：引针、下弯针、上弯针、送布与差动、切刀；
   绷缝机（第 76 轮）：引线、弯针、钩线（在钩线角慢放，弯针依次钩各针的线环）、撑线器（602、605）、送布）→ 红黄灯项（最多 3 项，
   在出问题的机构上慢放、透视，写出数值和判据）→ 整机和结论。
+- 花样机、刺绣机、横机（第 89 轮）按针 / 按趟走，场景由 sewing_video_seq.py 写：一针（一趟）慢放 → 移动 → 快放走完，
+  途中在最紧的一针和出问题的那一针 / 那一趟停下慢放 → 结论。
 - 数全由计算核心给（analyze 的校核值和参数），AI 不写数；以后 AI 改场景时，设计参数锁定（video3d.Service 的 lock）。
 - 谁能用：缝纫机设计软件已开通的单位（同 CAE），以及能用三维视频的老师。收费：第 56 轮只记账（video3d 的 runs 表）。
 
@@ -24,8 +26,9 @@ from . import sewcore
 from .moodle import EngineError
 from . import video3d as v3
 from .sewcore import cad
+from . import sewing_video_seq as SEQ
 
-MACHINES = ("lockstitch", "overlock", "cover")
+MACHINES = ("lockstitch", "overlock", "cover", "pattern", "embroid", "flatknit")      # 后三种第 89 轮，场景见 sewing_video_seq.py
 S = 0.001                      # 毫米 → 米（渲染器的单位）
 
 # 平板、轴、球……按零件名分到机构（与 tools/blender/sewdesign.py 的 GROUP 一致）
@@ -247,6 +250,9 @@ def scene(machine: str, params: dict | None, lang: str = "both") -> tuple[str, d
     p = M.clean(params or {})
     R = M.analyze(p, trial=False) if machine == "lockstitch" else M.analyze(p)
     name_zh, name_en = M.NAME
+    if machine in SEQ.MACHINES:                 # 第 89 轮：花样机、刺绣机、横机按针 / 按趟走
+        spec, info = SEQ.scene_seq(machine, p, R, name_zh, name_en)
+        return _finish(spec, lang, info["bad"], info["warn"], info["problems"])
     cap = captions(machine, R)
     catch = fd = None
     if machine == "lockstitch":
@@ -372,7 +378,7 @@ def scene(machine: str, params: dict | None, lang: str = "both") -> tuple[str, d
         "name": f"{name_zh}讲解",
         "title": {"zh": _short(f"{name_zh}的机构怎么动", 40), "en": _short(f"How this {name_en.lower()} machine works", 100)},
         "duration": dur, "floor": False, "clip": 0.002,
-        "models": [{"id": "d", "use": "gen:sewdesign", "machine": machine, "params": {k: v for k, v in p.items() if not isinstance(v, (list, dict))}}],
+        "models": [{"id": "d", "use": "gen:sewdesign", "machine": machine, "params": SEQ.spec_params(p)}],
         "motion": [{"drive": "weblab", "model": "d", "angle": angle}],
         "camera": cams, "effects": effects, "labels": labels, "stills": sorted(stills)[:6],
     }
@@ -392,6 +398,15 @@ def scene(machine: str, params: dict | None, lang: str = "both") -> tuple[str, d
                      "marks": [{"phi": round(catch) % 360, "zh": "钩线"}, {"phi": round(fd) % 360, "zh": "针到弯针平面"}]}}
     else:
         spec["panel"] = {"kind": "readouts", "head": "读数  Readouts", "items": [{"zh": "主轴转角", "en": "shaft", "key": "phi", "fmt": "{:5.0f}", "unit": "°"}]}
+    return _finish(spec, lang, nb, nw, [c["key"] for c in bad[:3]])
+
+
+FOOT_EN = {"（横轴：针号）": " (x: stitch no.)", "（横轴：趟）": " (x: pass)"}
+MARK_EN = {"最低点": "BDC", "钩线": "catch", "针到弯针平面": "needle at looper", "最紧": "tightest", "最难": "hardest", "最宽": "widest"}
+
+
+def _finish(spec: dict, lang: str, nb: int, nw: int, problems: list[str]) -> tuple[str, dict]:
+    """按文件语言收面板的中英文，写成 YAML；摘要"""
     if lang in ("zh", "en"):
         spec["lang"] = lang
         pan = spec["panel"]
@@ -402,10 +417,16 @@ def scene(machine: str, params: dict | None, lang: str = "both") -> tuple[str, d
             else:
                 it["zh"], it["en"] = it["en"], ""
         for mk in pan.get("plot", {}).get("marks", []):
-            mk["zh"] = {"最低点": "BDC", "钩线": "catch", "针到弯针平面": "needle at looper"}.get(mk["zh"], mk["zh"]) if lang == "en" else mk["zh"]
+            mk["zh"] = MARK_EN.get(mk["zh"], mk["zh"]) if lang == "en" else mk["zh"]
+        if "foot" in pan.get("plot", {}) and lang == "en":
+            pan["plot"]["foot"] = FOOT_EN.get(pan["plot"]["foot"], pan["plot"]["foot"])
+    elif "foot" in spec["panel"].get("plot", {}):
+        pl = spec["panel"]["plot"]
+        pl["foot"] = pl["foot"] + FOOT_EN.get(pl["foot"], "")
     text = ("# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮）。数由计算核心给，模型参数锁定。\n"
             + yaml.dump(spec, Dumper=_Plain, allow_unicode=True, sort_keys=False, width=200))
-    return text, {"duration": dur, "bad": nb, "warn": nw, "problems": [c["key"] for c in bad[:3]], "title": spec["title"],
+    return text, {"duration": spec["duration"], "bad": nb, "warn": nw, "problems": problems, "title": spec["title"],
+                  "params": spec["models"][0]["params"],
                   "numbers": sorted(v3.label_numbers(spec))}
 
 
@@ -416,7 +437,7 @@ class _Plain(yaml.SafeDumper):
 
 
 class VideoIn(BaseModel):
-    machine: str = Field(default="lockstitch", pattern="^(lockstitch|overlock|cover)$")
+    machine: str = Field(default="lockstitch", pattern="^(lockstitch|overlock|cover|pattern|embroid|flatknit)$")
     params: dict[str, Any] = Field(default_factory=dict)
     project: str = Field(default="", max_length=80)
     lang: str = Field(default="zh", pattern="^(zh|en|both)$")
@@ -431,8 +452,7 @@ def register(app, m) -> None:
         svc = video3d_api.service(m)
         text, meta = scene(body.machine, body.params, body.lang)
         V = await svc.create(sess.user_id, lic.get("org") or "", "", "")
-        p = sewcore.get(body.machine).clean(body.params)
-        V["lock"] = {"model": "d", "machine": body.machine, "params": {k: v for k, v in p.items() if not isinstance(v, (list, dict))},
+        V["lock"] = {"model": "d", "machine": body.machine, "params": meta["params"],
                      "numbers": meta["numbers"]}
         V["sewing"] = {"machine": body.machine, "project": body.project, "org": lic.get("org") or ""}
         svc.store.save(V)

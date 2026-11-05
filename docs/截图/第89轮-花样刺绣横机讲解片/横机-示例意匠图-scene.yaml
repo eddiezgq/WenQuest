@@ -1,0 +1,591 @@
+# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮）。数由计算核心给，模型参数锁定。
+name: 电脑横机讲解
+title:
+  zh: 电脑横机怎么走完一个衣片
+  en: How this computerized flat knitting machine runs a piece
+duration: 45.92
+floor: false
+clip: 0.002
+models:
+- id: d
+  use: gen:sewdesign
+  machine: flatknit
+  params:
+    E: 12
+    B: 1270
+    sys: 1
+    Lk: 150
+    v: 1.2
+    a: 10
+    dwell: 0.05
+    c_min: 20
+    comp: fixed
+    Td: 0.6
+    dTd: 0.1
+    Tc: 1.2
+    seg: 1
+    lstar: 5.0
+    dldd: 2.0
+    step: 0.01
+    meas: 0.3
+    kcl: 0.5
+    rack: 1
+    ar: 5
+    vr: 0.15
+    tset: 5
+    ab: 20
+    e_end: 50
+    src: file
+    vx: 0.4
+    N: 275
+    pcs: 1
+    gap: 10
+    rib: 120
+    jac: 300
+    col: 2
+    xfer: 40
+    fashion: pieces
+    kpc: 3.2
+    kwhole: 1.6
+    tlink: 25
+    m0: 25
+    msys: 15
+    Ff: 40
+    r: 30
+    ig: 3
+    eta: 0.9
+    TmR: 3.18
+    TmP: 9.55
+    Jm: 2.6
+    Nm: 3000
+    hours: 20
+    eff: 0.85
+    _track: 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
+motion:
+- drive: weblab
+  model: d
+  angle:
+  - - 0
+    - 0
+  - - 6.0
+    - 360.0
+  - - 15.0
+    - 720.0
+  - - 22.0
+    - 1080.0
+  - - 22.04
+    - 196560
+  - - 30.04
+    - 196920
+  - - 31.24
+    - 197280
+  - - 31.28
+    - 209880
+  - - 32.48
+    - 210240
+  - - 32.52
+    - 222480
+  - - 33.72
+    - 222840
+  - - 33.76
+    - 235440
+  - - 34.96
+    - 235800
+  - - 35.0
+    - 248040
+  - - 36.2
+    - 248400
+  - - 36.24
+    - 261000
+  - - 37.44
+    - 261360
+  - - 37.48
+    - 273600
+  - - 38.68
+    - 273960
+  - - 38.72
+    - 286560
+  - - 39.92
+    - 286920
+  - - 45.92
+    - 286920
+camera:
+- t: 0
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: -40
+  el: 20
+  dist: 2.247
+  lens: 40
+- t: 5.5
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: -22
+  el: 16
+  dist: 2.067
+  lens: 40
+- t: 6.8
+  look:
+  - 0.0
+  - 0.0
+  - 0.0
+  az: -24
+  el: 58
+  dist: 0.95
+  lens: 40
+- t: 14.0
+  look:
+  - 0.0
+  - 0.0
+  - 0.0
+  az: -8
+  el: 54
+  dist: 0.95
+  lens: 40
+- t: 15.8
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: -8
+  el: 22
+  dist: 1.573
+  lens: 40
+- t: 21.0
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: 8
+  el: 22
+  dist: 1.573
+  lens: 40
+- t: 22.8
+  look:
+  - 0.0
+  - 0.0
+  - 0.02
+  az: 150
+  el: 40
+  dist: 0.8
+  lens: 40
+- t: 29.0
+  look:
+  - 0.0
+  - 0.0
+  - 0.02
+  az: 170
+  el: 36
+  dist: 0.8
+  lens: 40
+- t: 30.64
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: -30
+  el: 18
+  dist: 2.022
+  lens: 40
+- t: 41.42
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: -30
+  el: 20
+  dist: 2.247
+  lens: 40
+- t: 45.92
+  look:
+  - 0.0
+  - 0.0005
+  - -0.1199
+  az: -45
+  el: 22
+  dist: 2.247
+  lens: 40
+effects:
+- kind: xray
+  t:
+  - 6.5
+  - 14.5
+  top:
+  - d.needles
+  - d.carriage
+- kind: xray
+  t:
+  - 15.5
+  - 21.5
+  top:
+  - d.carriage
+  - d.drive
+  - d.yarn
+- kind: xray
+  t:
+  - 22.5
+  - 29.5
+  top:
+  - d.bed
+  - d.needles
+- kind: xray
+  t:
+  - 30.34
+  - 39.92
+  top:
+  - d.fabric
+  - d.carriage
+labels:
+- t:
+  - 0
+  - 6
+  zh: 这台电脑横机：一片 898 趟，1 个系统
+  en: 'This computerized flat knitting machine: 898 passes per piece, 1 system(s)'
+- t:
+  - 0
+  - 6
+  zh: 运动、针迹、趟次按你的设计算；机构尺寸为示意
+  en: Motion, stitches and passes follow your design; mechanism sizes are illustrative
+  where: bottom
+- t:
+  - 6.0
+  - 15.0
+  zh: ① 三角起针：机头经过时针一根根升起又落下
+  en: '① Cams: needles rise and fall as the carriage passes'
+- t:
+  - 6.0
+  - 15.0
+  zh: 针距 / 每枚针的选针时间 2.12 mm / 1.76 ms
+  en: Pitch / time per needle 2.12 mm / 1.76 ms · Top carriage speed the selector allows 1.76 m/s
+  where: bottom
+- t:
+  - 15.0
+  - 22.0
+  zh: ② 机头一趟：加速、匀速、减速，换向时停一下
+  en: '② One pass: accelerate, cruise, decelerate, dwell at reversal'
+- t:
+  - 15.0
+  - 22.0
+  zh: 织物宽度 / 一趟行程 508 / 802 mm · 一趟用时（平均） 0.84 s
+  en: Fabric width / travel per pass 508 / 802 mm · Time per pass (average) 0.84 s
+  where: bottom
+- t:
+  - 22.0
+  - 30.0
+  zh: ③ 翻针与摇床：后针床横移，把线圈翻到另一床
+  en: '③ Transfer and racking: the back bed shifts, loops move across'
+- t:
+  - 22.0
+  - 30.0
+  zh: 摇床用时 / 急停距离 46 ms / 36 mm
+  en: Racking time / emergency stop distance 46 ms / 36 mm
+  where: bottom
+- t:
+  - 30.04
+  - 39.92
+  zh: ④ 织一片（快放：每隔若干趟看一趟）
+  en: '④ A whole piece (fast: one pass in every few)'
+- t:
+  - 30.04
+  - 39.92
+  zh: 趟数 / 一片用时 898 / 12.6 min
+  en: Passes / time per piece 898 / 12.6 min · Pieces per day (20 h, 85%) 81
+  where: bottom
+- t:
+  - 39.92
+  - 45.92
+  zh: 全部 11 项校核合格
+  en: All 11 checks pass
+- t:
+  - 39.92
+  - 45.92
+  zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
+  en: WenQuest sewing design software · same parameters as report, setup card
+  where: bottom
+stills:
+- 3.0
+- 10.5
+- 18.5
+- 26.0
+- 30.64
+- 42.92
+panel:
+  kind: readouts
+  head: 读数
+  items:
+  - zh: 第几趟
+    en: ''
+    key: idx
+    fmt: '{:5.0f}'
+    unit: ' / 898'
+  - zh: 机头速度
+    en: ''
+    key: v
+    fmt: '{:5.2f}'
+    unit: ' m/s'
+    scale: 1.2
+  - zh: 机头走了
+    en: ''
+    key: x
+    fmt: '{:5.0f}'
+    unit: ' mm'
+  - zh: 累计用时
+    en: ''
+    key: tacc
+    fmt: '{:6.1f}'
+    unit: ' s'
+  plot:
+    key: top
+    zh: 每趟最高速度 m/s
+    en: ''
+    series:
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 0.4
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    - 1.2
+    cursor: frac
+    foot: （横轴：趟）
+    marks:
+    - at: 0.0
+      zh: 最宽
+lang: zh

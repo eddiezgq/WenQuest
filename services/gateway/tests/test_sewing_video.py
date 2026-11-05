@@ -65,7 +65,7 @@ def test_lock_resets_the_design_and_keeps_the_numbers():
     hacked = text.replace("machine: lockstitch", "machine: overlock").replace("n: 6000", "n: 3000")
     out = yaml.safe_load(v3.apply_lock(hacked, lock))
     assert out["models"][0]["machine"] == "lockstitch" and out["models"][0]["params"]["n"] == 6000
-    _, errs = v3.check(text.replace("machine: lockstitch", "machine: flatknit"))
+    _, errs = v3.check(text.replace("machine: lockstitch", "machine: quilting"))
     assert errs
     spec, _ = v3.check(text)
     assert v3.lock_errors(spec, lock) == []
@@ -92,7 +92,7 @@ def test_endpoint_needs_a_license_and_opens_only_sewing_videos(v3c):  # noqa: F8
     s, t = login(v3c, "s"), login(v3c, "t")
     body = {"machine": "lockstitch", "params": {"n": 6000}, "project": "LS-6000", "lang": "zh"}
     assert v3c.post("/api/v1/sewing/video", json=body, headers=s).status_code == 403
-    assert v3c.post("/api/v1/sewing/video", json=dict(body, machine="flatknit"), headers=t).status_code == 422
+    assert v3c.post("/api/v1/sewing/video", json=dict(body, machine="quilting"), headers=t).status_code == 422
     assert v3c.post("/api/v1/admin/sewing/licenses", json={"username": "s", "org": "甲缝纫机厂"}, headers=t).status_code == 200
     r = v3c.post("/api/v1/sewing/video", json=body, headers=s).json()
     assert r["problems"] and r["duration"] > 40
@@ -201,3 +201,85 @@ def test_cover_loops_are_caught_one_after_another_and_odd_cases():
     assert 180 <= ang <= E["fu"]
     _, meta = SV.scene("cover", {"gap": -0.05})
     assert "avoid" in meta["problems"]
+
+
+# ---------------------------------------------------------------- 第 89 轮：花样机、刺绣机、横机
+def _prog_at(spec, t):
+    """场景在 t 秒时的进度角"""
+    ks = spec["motion"][0]["angle"]
+    for (t0, a0), (t1, a1) in zip(ks, ks[1:]):
+        if t <= t1:
+            return a0 + (a1 - a0) * (t - t0) / max(1e-9, t1 - t0)
+    return ks[-1][1]
+
+
+def test_seq_scenes_green_and_red():
+    import base64
+
+    from app.sewcore import cad_seq as CS
+    from app.sewcore import emb_samples as SMP
+    from app.sewcore import embroid as E
+    from app.sewcore import pattern as P
+    logo = base64.b64encode(SMP.logo_dst()).decode()
+    for m, p in (("pattern", {}), ("embroid", {}), ("flatknit", {}), ("embroid", {"src": "file", "dst": logo, "H": 12})):
+        text, meta = SV.scene(m, p, "zh")
+        spec, errs = v3.check(text)
+        assert errs == [] and meta["bad"] == 0 and 35 <= meta["duration"] <= 80, (m, errs)
+        mp = spec["models"][0]["params"]
+        assert spec["models"][0]["machine"] == m and isinstance(mp["_track"], str) and "dst" not in mp     # 文件不进场景，带抽样后的轨迹
+        assert any("示意" in lb["zh"] for lb in spec["labels"]) and spec["panel"]["plot"]["series"]
+        assert v3.lock_errors(spec, {"model": "d", "machine": m, "params": meta["params"], "numbers": meta["numbers"]}) == []
+        bottom = {lb["t"][0]: lb["zh"] for lb in spec["labels"] if lb.get("where") == "bottom"}
+        first = next(lb for lb in spec["labels"] if lb["zh"].startswith("①"))
+        want = {"pattern": "入布角", "embroid": "可用加速度", "flatknit": "针距 / 每枚针"}[m]
+        assert bottom[first["t"][0]].startswith(want)          # 结果表按名字取（有文件时结果表多几行，不能按位置）
+    # 花样机有红灯：最紧的一针停下慢放，标题红；字幕里的数来自 analyze
+    p = {"pat": "star", "n": 3000, "ax": 5, "stx": 40}
+    text, meta = SV.scene("pattern", p, "both")
+    spec, errs = v3.check(text)
+    R = P.analyze(p)
+    assert errs == [] and meta["bad"] == 3 and set(meta["problems"]) == {"speed", "head", "travel"}
+    D = CS.video_track("pattern", R["view"]["cfg"])
+    k = D["worst"]
+    assert any(int(_prog_at(spec, x) // 360) in (k - 1, k) for x in spec["stills"])          # 有一张关键画面停在最紧的那一针
+    v = next(c for c in R["checks"] if c["key"] == "speed")["value"]["zh"]
+    assert any(v in lb["zh"] for lb in spec["labels"]) and any(lb.get("tone") == "bad" for lb in spec["labels"])
+    for e in spec["effects"]:                              # 透视时已缝的针迹留实的
+        if "d.needle" in e["top"] or "d.tpl" in e["top"]:
+            assert "d.stitch" in e["top"], e
+    far = D["far"]
+    assert any(int(_prog_at(spec, x) // 360) in (far - 1, far) for x in spec["stills"])       # 超行程：停在超出最远的那一针
+    # 刺绣机手填长针高速：所需加速度 > 可用，最难的一针慢放
+    text, meta = SV.scene("embroid", {"s": 12, "n": 1200}, "en")
+    spec, errs = v3.check(text)
+    assert errs == [] and "accel" in meta["problems"] and spec["lang"] == "en" and spec["panel"]["plot"]["foot"].startswith(" (x:")
+    assert E.analyze({"s": 12, "n": 1200})["view"]["cfg"]["acc"][1] > 1
+    # 横机摇床不合格：停在第一个翻针趟，这一趟摇床
+    p = {"sys": 2, "xfer": 4, "rack": 4, "dwell": 0.01}
+    text, meta = SV.scene("flatknit", p, "zh")
+    spec, errs = v3.check(text)
+    assert errs == [] and meta["problems"] == ["rack"]
+    D = CS.video_track("flatknit", CS.cfg_of("flatknit", p)[0])
+    assert D["kind"][D["first_x"]] == "x"
+    fx = [x for x in spec["stills"] if int(_prog_at(spec, x) // 360) == D["first_x"]]
+    assert fx and cad.parts3d(spec["models"][0]["params"], _prog_at(spec, fx[0]), "flatknit")["rack"] > 0
+
+
+def test_video_track_keeps_the_problem_stitch_and_its_neighbour():
+    from app.sewcore import cad_seq as CS
+    D = {"n": 5000, "N": 5000, "idx": list(range(5000)), "pts": [[i * 0.1, 0] for i in range(5000)], "sp": [1000] * 5000,
+         "cap": [2000] * 5000, "mv": [100] * 5000, "f1": 101.7, "f2": 258.3, "mg": 5, "worst": 2345, "far": 4999, "bad": []}
+    T = CS.video_track("pattern", D)
+    assert T["n"] <= CS.VIDEO_MAX and T["idx"][T["worst"]] == 2345 and T["idx"][T["worst"] - 1] == 2344 and T["idx"][T["far"]] == 4999
+    assert CS.unpack(CS.pack(T)) == T
+    m = cad.parts3d({"_track": CS.pack(T)}, T["worst"] * 360 + 180, "pattern")       # 渲染器按场景里的轨迹画，不重算
+    assert m["idx"] == 2346
+
+
+def test_seq_endpoint(v3c):  # noqa: F811
+    t = login(v3c, "t")
+    assert v3c.post("/api/v1/admin/sewing/licenses", json={"username": "t", "org": "乙缝纫机厂"}, headers=t).status_code == 200
+    for m in ("pattern", "embroid", "flatknit"):
+        r = v3c.post("/api/v1/sewing/video", json={"machine": m, "params": {}, "lang": "zh"}, headers=t)
+        assert r.status_code == 200, r.text
+        assert r.json()["duration"] > 35 and r.json()["problems"] == []

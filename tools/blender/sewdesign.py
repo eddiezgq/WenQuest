@@ -4,6 +4,8 @@
 和网页版三维、导出的 STEP、计算书是同一套：企业改了曲柄半径、连杆长、挑线四杆……视频里的机器跟着变。
 机型：平缝机（lockstitch）、包缝机（overlock）——有三维零件的两种，不画线（设计零件里没有线环）；
 绷缝机（cover，第 76 轮）——零件照教材模型 10-1（尺寸示意、运动同 cover.py），画示意线（针线环、弯针线、覆盖线，零件类型 tube）。
+花样机（pattern）、刺绣机（embroid）、横机（flatknit），第 89 轮——零件照教材模型 15-1 / 16-1 / 17-1（尺寸示意，sewcore/cad_seq.py），
+这三种的“转角”是进度角：每 360° 一针（花样机、刺绣机）/ 一趟（横机）；针迹是管子，一针一针长出来。
 
 场景里这样写（网关 sewing_video.py 自动写，人不用写）：
   - id: d
@@ -13,9 +15,13 @@
     at: [0, 0, 0]
 运动用 drive: weblab 同样的写法：{drive: weblab, model: d, angle: [[秒, 主轴累计转角°], …]}。
 组：<id>.<零件名>（UpperShaft、NeedleCrank……，同 STEP）和 <id>.<机构>（needle 刺布、takeup 挑线、hook 钩线、feed 送布、drive 轴、
-looper 弯针（包缝机、绷缝机）、knife 切刀（包缝机）、spreader 撑线器（绷缝机）、thread 线（绷缝机）、frame 针板）。
+looper 弯针（包缝机、绷缝机）、knife 切刀（包缝机）、spreader 撑线器（绷缝机）、thread 线（绷缝机）、frame 针板；
+花样机 head 机头、tpl 模板压框、x / y 两轴、stitch 针迹；刺绣机 head、needle、hoop 绷架绣框、hook、stitch、x、y；
+横机 bed 针床、needles 针、carriage 机头、yarn 纱嘴、fabric 织物、drive 机头驱动）。
 读数：phi（主轴转角）、needle（平缝机：针尖高出针板 mm；绷缝机：基准针尖高出弯针平面 mm）、hookdeg（平缝机：旋梭转角）、
-looper（绷缝机：弯针尖左右位置 mm，0 = 最右一根针）。
+looper（绷缝机：弯针尖左右位置 mm，0 = 最右一根针）；
+花样机：idx 针号、sp 转速、cap 这一针的转速上限、needle 针尖离针板、frac 进度（0–1）；刺绣机：idx、col 颜色号、sp、need 所需加速度、
+am 可用加速度、acc 两者之比、needle、frac；横机：idx 第几趟、v 机头速度 m/s、top 这一趟最高速度、x 机头走了多远 mm、tacc 累计用时 s、frac。
 """
 import math
 import sys
@@ -44,7 +50,15 @@ def reads(machine, model, params):
     elif machine == "cover":
         r["needle"] = model["z_tip"] - model["zb"]
         r["looper"] = model["lx"]
+    elif machine in SEQ:
+        r["frac"] = model["i"] / max(1, model["n"] - 1)
+        for k in SEQ[machine]:
+            r[k] = model[k]
     return r
+
+
+SEQ = {"pattern": ("idx", "sp", "cap", "needle"), "embroid": ("idx", "col", "sp", "need", "am", "acc", "needle"),
+       "flatknit": ("idx", "v", "top", "x", "tacc")}
 
 
 class SewDesign:
@@ -53,8 +67,8 @@ class SewDesign:
     def __init__(self, mid, m, bpy, mat, add_group, Matrix, Vector):
         self.bpy, self.mat, self.Matrix, self.Vector = bpy, mat, Matrix, Vector
         self.mid, self.machine, self.params = mid, m.get("machine", "lockstitch"), m.get("params", {}) or {}
-        if self.machine not in ("lockstitch", "overlock", "cover"):
-            raise SystemExit(f"gen:sewdesign 只做平缝机、包缝机、绷缝机（lockstitch、overlock、cover），不是 {self.machine}")
+        if self.machine not in ("lockstitch", "overlock", "cover", "pattern", "embroid", "flatknit"):
+            raise SystemExit(f"gen:sewdesign 只做 lockstitch、overlock、cover、pattern、embroid、flatknit，不是 {self.machine}")
         at = [float(x) for x in (m.get("at") or (0, 0, 0))][:3]
         self.offset = Matrix.Translation(Vector(at + [0.0] * (3 - len(at))))
         colors = m.get("colors", {})

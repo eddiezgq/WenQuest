@@ -186,11 +186,12 @@
           <view v-for="k in kinds" :key="k" class="exp" :class="{ locked: !me.licensed }" @click="download(k)">
             <text>{{ t("sew.exp." + k) }}</text><text class="muted">{{ making === k ? t("sew.making") : "↓" }}</text>
           </view>
-          <!-- 第 56 轮：按这台设计一键出三维讲解片（平缝机、包缝机）；第 76 轮加绷缝机（机构尺寸示意，画线环） -->
-          <view v-if="machine === 'lockstitch' || machine === 'overlock' || machine === 'cover'" class="fc">
+          <!-- 第 56 轮：按这台设计一键出三维讲解片（平缝机、包缝机）；第 76 轮加绷缝机（机构尺寸示意，画线环）；第 89 轮六种机型都有 -->
+          <view class="fc">
             <text class="pt">{{ t("sew.video") }}</text>
-            <text class="para">{{ t("sew.videoText") }}</text>
+            <text class="para">{{ t(["pattern", "embroid", "flatknit"].includes(machine) ? "sew.videoTextSeq" : "sew.videoText") }}</text>
             <text v-if="machine === 'cover'" class="para muted">{{ t("sew.videoCover") }}</text>
+            <text v-if="['pattern', 'embroid', 'flatknit'].includes(machine)" class="para muted">{{ t("sew.videoSeq") }}</text>
             <view class="btn" :class="{ disabled: !me.licensed }" @click="makeVideo">{{ making === "video" ? t("sew.videoMaking") : t("sew.videoBtn") }}</view>
           </view>
           <view class="fc">

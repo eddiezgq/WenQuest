@@ -809,6 +809,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 <p><strong>在样机里看</strong>：设计转速 2000 时打开“样机”页签，模型 15-1 按这个花样走，右上角写着“设计转速下标准针距走得完……”不合格；点“慢放到出问题的那一针”，停在最紧的那一针，读数里“这一针转速”比设计转速低（前瞻调速把它降下来了）。换成小带轮以后再看，判定变成“能正常缝制”。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-81-pt-proto.jpg" alt="花样机 2000 r/min：样机标红，慢放到最紧的那一针"><figcaption>花样机 2000 r/min：样机标红，慢放到最紧的那一针</figcaption></figure>
+<p><strong>给车间出一段讲解片</strong>：还是 2000 r/min 这一版，“导出”页签点“出三维讲解片”，软件写好约 48.02 秒的片子：整机 → 一针慢放（针在布中模板不动，出布后在窗口里移到下一针）→ X、Y 两轴 → 快放走完整个花样，途中停在最紧的那一针慢放，再停一次标红“设计转速下标准针距走得完”→ 结论。针迹、每针转速和上限都按这台设计，机构尺寸是示意。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-89-pt-tight.jpg" alt="讲解片：快放途中停在最紧的那一针，右边曲线的光标在“最紧”"><figcaption>讲解片：快放途中停在最紧的那一针，右边曲线的光标在“最紧”</figcaption></figure>
+<figure class="shot"><img loading="lazy" src="../media/web-89-pt-bad.jpg" alt="讲解片：同一针上的红灯段，字幕写数值和判据"><figcaption>讲解片：同一针上的红灯段，字幕写数值和判据</figcaption></figure>
 <a class="try" href="/pages/sewing/sewing?machine=pattern&amp;tab=checks&amp;p=%7B%22n%22%3A2000%2C%22ay%22%3A50%2C%22ry%22%3A8%7D" target="_blank" rel="noopener">▶ 试一试：花样机 2000 r/min、Y 加速度 50、带轮 8 mm（全部合格）</a>
 <h3 id="case-pt-output">第三步　能多出几件？</h3>
 <table>
@@ -948,6 +951,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 <h3 id="case-fk-8">出件</h3>
 <p>计算书（含改进方案对照、全成型对比）、调机卡（选针提前量标定、摇床对针、线圈长度闭环、纱嘴停放、新花型低速试织，取自教材 17.9“现场要点”）、参数表与曲线（Excel）、参数文件。横机没有三维零件，不出 STEP、DXF。</p>
+<p><strong>讲解片</strong>：按这张意匠图，“导出”页签点“出三维讲解片”，约 45.92 秒：整机 → 三角起针（一趟慢放）→ 机头一趟（加速、匀速、减速、换向停顿）→ 翻针与摇床 → 织一片（每隔若干趟看一趟，织物往下长）→ 结论。摇床量改成 4 针、换向停顿改成 0.01 s 再出一次，多一段红灯，停在第一个翻针趟。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-89-fk-cams.jpg" alt="讲解片：机头经过时针按三角一根根升起又落下"><figcaption>讲解片：机头经过时针按三角一根根升起又落下</figcaption></figure>
+<figure class="shot"><img loading="lazy" src="../media/web-89-fk-rack.jpg" alt="讲解片：摇床量 4 针、停顿 0.01 s，红灯段停在第一个翻针趟"><figcaption>讲解片：摇床量 4 针、停顿 0.01 s，红灯段停在第一个翻针趟</figcaption></figure>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-13-case-fk.jpg"><source src="../media/web-13-case-fk.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-13-case-fk.vtt"></video><figcaption>▶ 案例五：上传意匠图、编译成逐趟的机头动作；改进方案对照；设计优化：两系统、实时补偿，一片快四成</figcaption></figure></section>
 <section id="case-eb"><h2><span class="n">08</span>案例六　电控箱：夏天频繁报过热</h2><p class="lead">电流从设计来 → 夏天车间、飞絮 → 改进方案对照 → 清理以后 CAE 复核（自然对流 + 温度场）→ 顶面翅片有没有用 → 写进保养规程。</p><p><strong>实际问题</strong>：案例一的平缝机改到 6000 r/min 卖了一个夏天，几家工厂反映午后频繁显示过热故障码，停一会儿又能用；返修回来的电控箱散热片上糊着一层飞絮。这类车间往往没有空调，午后 38 °C。——这是教材第 18 章 18.7 节的案例，软件“CAE 分析 → 电控箱”的默认参数就是那只 550 W 平缝机伺服电控箱（单相 220 V、铝外壳兼散热器、没有风扇）。</p>
 <h3 id="case-eb-current">第一步　电流从设计来</h3>
@@ -1325,6 +1331,9 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>按教材 18.7 节的夏天（38 °C），把“散热（18.3、18.7 节）”里的“飞絮堵塞程度”手填 0.3（绣花车间飞絮多）：散热器 81.6 °C、结温 109.2 °C、电容寿命 9.1 年，全部合格。如果手填、每针都按最长针算，绷架电流是 2.67 A，同样条件下散热器 91.9 °C、结温 119.5 °C，黄灯：开关时间在可选窗口内（最热车间）（300 ns）；最热车间仍合格（45 °C 车间：散热器 98.9、结温 126.5 °C）——算偏了，就会多花钱加散热。清理周期照样写进保养规程（案例六）。</p>
 <h3 id="case-em-out">第六步　出件</h3>
 <p>“导出”页签：计算书（花样图、针长分段表、每针转速曲线、头数与效率、交期、伺服、电控箱一节；做过 CAE 的带上横梁模态的结果）、参数表、调机卡。“参数”文件（.wqsew.json）带着花样，FreeCAD 导入后接着算。比较的结论：这张订单 8 头机 50.2 天赶不上，12 头机 36.4 天。</p>
+<p><strong>讲解片</strong>：12 头、这份 logo 花样，“导出”页签点“出三维讲解片”，约 53.7 秒：整机（画 4 个头，字幕写共 12 头）→ 刺布 → 绷架移动 → 快放绣一遍（按颜色分色画出针迹）→ 停在所需加速度最大的那一针慢放 → 结论。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-89-em-fast.jpg" alt="讲解片：快放绣一遍，四个绣框上同时长出同一个花样"><figcaption>讲解片：快放绣一遍，四个绣框上同时长出同一个花样</figcaption></figure>
+<figure class="shot"><img loading="lazy" src="../media/web-89-em-hard.jpg" alt="讲解片：最难的一针（所需 / 可用加速度最大）慢放"><figcaption>讲解片：最难的一针（所需 / 可用加速度最大）慢放</figcaption></figure>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-16-case-em.jpg"><source src="../media/web-16-case-em.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-16-case-em.vtt"></video><figcaption>▶ 案例七：上传花样文件、8 头还是 12 头、设计优化达到订单交期、伺服、横梁加立柱、电控箱</figcaption></figure></section>
 <section id="tabs"><h2><span class="n">10</span>七个页签</h2><p class="lead">样机、校核、时序与曲线、零件与制造、CAE 分析、零件库、导出。</p><h3 id="proto">样机</h3>
 <p>平缝机是教材的三维虚拟样机：定时、间隙、张力、送布、转速、平衡这些调机参数跟着你的设计同步，可以试缝、看故障标红。包缝机（模型 9-1，第 88 轮）的引针曲柄连杆、两套弯针的偏心和摆杆、差动比、切刀定时跟着设计走，运动按第 9 章逐度算，出问题的部件标红；偏心大到装不上时，那套弯针标红、停住，读数写明哪几度装不上。花样机、刺绣机、横机（第 81 轮）的三维模型跟着设计走：花样机（模型 15-1）按你的花样、每针前瞻转速走，电机、同步带、压框、机头出问题时标红；刺绣机（模型 16-1，新做）按头数、花样文件（或手填的最长针）、每针转速走，走不完的那一针绷架标红，能看到机针扎下时绷架还在动，上面能切换到虚拟实验 16-1；横机（模型 17-1）按系统数、织物宽，照意匠图（或手填的横列）逐趟走编织、翻针、摇床，选针器、后针床、电机出问题时标红。三种都有“慢放到出问题的那一针（那一趟）”。绷缝机是教材的三维样机（模型 10-1，第 73 轮）：线迹、针数、针距和弯针的定时、高低、让针、间隙、回退跟着设计同步，钩线判据当场算，出问题的机针或弯针标红，点“出问题的转角”转到那一刻慢慢看；上面能切换到弯针动画（虚拟实验 10-1）。下面是主要结果（连杆比、惯性力、钩线角、供线量……）。</p>
@@ -1632,7 +1641,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>按单位隔离：查、改、下载都只认本单位；别的单位连有没有这个编号都看不到。</li>
 <li>文件存在问渠服务器上（国内部署存在国内服务器）；数据随问渠的日常备份。</li>
 </ul></section>
-<section id="export"><h2><span class="n">14</span>导出</h2><p class="lead">一组参数，出七种文件；平缝机、包缝机、绷缝机还能一键出三维讲解片（已开通的企业）。</p><table>
+<section id="export"><h2><span class="n">14</span>导出</h2><p class="lead">一组参数，出七种文件；六种机型都能一键出三维讲解片（已开通的企业）。</p><table>
 <thead>
 <tr>
 <th>文件</th>
@@ -1673,7 +1682,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>绷缝机、花样机、刺绣机、横机没有三维零件，不出 STEP、宏、DXF。“文件语言”可选中文或英文。</p>
 <p>FreeCAD 工作台安装包也在这一页下载，安装见 FreeCAD 版帮助。</p>
 <h3 id="export-video">三维讲解片</h3>
-<p>平缝机、包缝机、绷缝机在这一页还有“出三维讲解片”：给客户、车间看“我们这台的机构怎么动”。不用写一句话，软件按当前这组参数自动写好讲解片——</p>
+<p>六种机型在这一页都有“出三维讲解片”：给客户、车间看“我们这台的机构怎么动”（花样机、刺绣机、横机是“一个花样 / 一片衣片怎么走完”，见本节后面）。不用写一句话，软件按当前这组参数自动写好讲解片——</p>
 <ol>
 <li><strong>整机</strong>（约 6 秒）：平缝机、包缝机的零件就是导出 STEP 的那些，尺寸、每个主轴转角的位置都按你的设计；绷缝机的零件照教材三维模型 10-1，机构尺寸是示意，针、弯针的运动和线环按你的设计算。</li>
 <li><strong>各机构</strong>（每个约 8 秒）：平缝机刺布、挑线、钩线、送布，包缝机刺布、下弯针、上弯针、送布与差动、切边，绷缝机引线、弯针、钩线、撑线器（602、605）、送布；其余零件变半透明，底部字幕写这个机构的主要结果（数由计算核心给）。</li>
@@ -1683,7 +1692,17 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>右边的读数面板随主轴转：主轴转角；平缝机另有针尖高出针板、旋梭转角和针尖高度曲线（标着最低点和钩线时刻）；绷缝机另有针尖高出弯针平面、弯针尖左右位置和针尖高度曲线（标着钩线、针到弯针平面两个时刻）。字幕跟“文件语言”走，只出中文或只出英文。</p>
 <p>点按钮后跳到平台的“三维视频”页：先出关键画面（自己服务器，免费，一两分钟），看过再出小样、高清（租云端 GPU，几分钟到十几分钟），可下载 MP4。还可以在左边对 AI 说“第 3 段慢一点”“钩线那段镜头拉近”，AI 改镜头、节奏和字幕；<strong>设计参数和数值改不了</strong>——场景里那台机器每次都按你的设计重置。片子只有自己和平台管理员看得到。眼下出片先不收费，平台计费上线后按机器时间计。国内站暂时只出关键画面。</p>
 <p><strong>绷缝机的钩线段</strong>：转到钩线角前 30°，用 7 秒慢慢走过各针的钩线角，弯针从右往左依次钩住每根针的线环；针线、线环、弯针线、覆盖线是示意画法（线环大小按教材第 5 章的模型随针回升张开），不是线的物理仿真。绷缝机不出 STEP（尺寸是示意，不能当设计图）。</p>
-<p>平缝机、包缝机的讲解片只讲机构，不画线。花样机、刺绣机、横机不出讲解片。</p>
+<p>平缝机、包缝机的讲解片只讲机构，不画线。</p>
+<p><strong>花样机、刺绣机、横机</strong>（第 89 轮）讲的是一个花样、一片衣片怎么走完，片子按针（趟）走：</p>
+<ol>
+<li><strong>整机</strong>：花样机的机头、X / Y 两轴、压框模板；刺绣机按头数画（最多 4 个头，多的字幕写总头数）；横机的两块斜针床、机头、纱嘴。</li>
+<li><strong>① 一针（一趟）慢放</strong>：花样机看针在布中模板不动、出布后在离布窗口里移到下一针；刺绣机几个头一起扎、针在布中绷架停住；横机看机头经过时针按三角一根根升起又落下。</li>
+<li><strong>② 移动</strong>：花样机 X、Y 两轴；刺绣机绷架；横机机头一趟的加速、匀速、减速和换向停顿。横机有翻针的，再加一段“翻针与摇床”。</li>
+<li><strong>③ 快放走完</strong>：针迹一针一针画出来（刺绣机按颜色分色）；横机每隔若干趟看一趟，织物往下长。途中在<strong>最紧的一针</strong>（花样机：这一针的转速上限最低；刺绣机：所需加速度最大）停下慢放，红黄灯项在出问题的那一针 / 那一趟停下慢放（规则同“样机”页签的“慢放到出问题的那一针 / 那一趟”）。</li>
+<li><strong>结论</strong>。</li>
+</ol>
+<p>读数面板：第几针（趟）、这一针转速和上限（花样机）、颜色和所需 / 可用加速度（刺绣机）、机头速度和累计用时（横机）；曲线是每针转速（花样机，红线是上限）、所需 / 可用加速度（刺绣机，红线 = 1）、每趟最高速度（横机），光标跟着走。上传的花样文件、意匠图照样能出片：场景里带的是抽样后的针迹 / 逐趟动作（最多 800 针 / 趟），不是原文件。机构尺寸是示意（教材模型 15-1、16-1、17-1），不出 STEP。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-89-pt-tight.jpg" alt="花样机 2000 r/min：快放途中停在最紧的那一针慢放，读数面板的曲线上光标正在“最紧”"><figcaption>花样机 2000 r/min：快放途中停在最紧的那一针慢放，读数面板的曲线上光标正在“最紧”</figcaption></figure>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-14-video.jpg"><source src="../media/web-14-video.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-14-video.vtt"></video><figcaption>▶ 6000 r/min 未改那一版：导出 → 出三维讲解片 → 关键画面（红灯停在 180°）</figcaption></figure>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-08-export.jpg"><source src="../media/web-08-export.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-08-export.vtt"></video><figcaption>▶ 导出计算书（带 AI 设计说明）和 STEP</figcaption></figure></section>
 <section id="kernel"><h2><span class="n">15</span>内核：流行的开源软件</h2><p class="lead">求解和建模交给全世界工程师用了多年的开源软件；我们做的是把它们和教材、工厂、AI 接成一条线。</p><h3 id="kernel-1">缝纫机设计软件直接用到的</h3>

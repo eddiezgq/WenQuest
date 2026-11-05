@@ -1,0 +1,818 @@
+# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮）。数由计算核心给，模型参数锁定。
+name: 多头刺绣机讲解
+title:
+  zh: 多头刺绣机怎么走完一个花样
+  en: How this multi-head embroidery machine runs a design
+duration: 53.7
+floor: false
+clip: 0.002
+models:
+- id: d
+  use: gen:sewdesign
+  machine: embroid
+  params:
+    H: 12.0
+    n: 650
+    n_head: 1100
+    s: 7.0
+    W: 204
+    dn: 100
+    F: 800
+    Ff: 50
+    m0: 10
+    mh: 4
+    stx: 400
+    sty: 400
+    rf: 20
+    ig: 5
+    eta: 0.9
+    T0: 0.5
+    Th: 0.3
+    J0: 0.002
+    Jh: 0.0008
+    ta: 0.3
+    src: file
+    N: 20000
+    lam: 0.5
+    t_fix: 40
+    t_back: 1.6
+    d: 10
+    b: 12
+    colors: 6
+    t_color: 6
+    t_load: 0
+    Q: 0
+    days: 0
+    hday: 16
+    _track: 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
+motion:
+- drive: weblab
+  model: d
+  angle:
+  - - 0
+    - 0
+  - - 6.0
+    - 720.0
+  - - 6.04
+    - 1080
+  - - 15.04
+    - 1440
+  - - 23.04
+    - 2160
+  - - 32.04
+    - 242508.0
+  - - 39.04
+    - 242862.0
+  - - 47.7
+    - 287639.0
+  - - 53.7
+    - 287639.0
+camera:
+- t: 0
+  look:
+  - 0.0
+  - -0.081
+  - 0.0564
+  az: -40
+  el: 20
+  dist: 5.143
+  lens: 40
+- t: 5.5
+  look:
+  - 0.0
+  - -0.081
+  - 0.0564
+  az: -22
+  el: 16
+  dist: 4.731
+  lens: 40
+- t: 6.8
+  look:
+  - -0.62
+  - -0.132
+  - 0.01
+  az: -48
+  el: 16
+  dist: 0.5
+  lens: 40
+- t: 14.0
+  look:
+  - -0.62
+  - -0.132
+  - 0.01
+  az: -30
+  el: 12
+  dist: 0.5
+  lens: 40
+- t: 15.84
+  look:
+  - 0.02
+  - 0.0
+  - 0.006
+  az: -30
+  el: 34
+  dist: 2.751
+  lens: 40
+- t: 22.04
+  look:
+  - 0.02
+  - 0.0
+  - 0.006
+  az: -15
+  el: 30
+  dist: 2.646
+  lens: 40
+- t: 23.64
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -20
+  el: 55
+  dist: 0.546
+  lens: 40
+- t: 32.84
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -45
+  el: 22
+  dist: 0.5
+  lens: 40
+- t: 38.54
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -28
+  el: 18
+  dist: 0.5
+  lens: 40
+- t: 39.64
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -20
+  el: 55
+  dist: 0.546
+  lens: 40
+- t: 49.2
+  look:
+  - 0.0
+  - -0.081
+  - 0.0564
+  az: -30
+  el: 20
+  dist: 5.143
+  lens: 40
+- t: 53.7
+  look:
+  - 0.0
+  - -0.081
+  - 0.0564
+  az: -45
+  el: 22
+  dist: 5.143
+  lens: 40
+effects:
+- kind: xray
+  t:
+  - 6.5
+  - 14.5
+  top:
+  - d.needle
+  - d.hoop
+  - d.stitch
+- kind: xray
+  t:
+  - 15.54
+  - 22.54
+  top:
+  - d.hoop
+  - d.x
+  - d.y
+- kind: xray
+  t:
+  - 23.34
+  - 32.04
+  top:
+  - d.hoop
+  - d.stitch
+- kind: xray
+  t:
+  - 32.54
+  - 39.04
+  top:
+  - d.needle
+  - d.hoop
+  - d.stitch
+- kind: xray
+  t:
+  - 39.34
+  - 47.7
+  top:
+  - d.hoop
+  - d.stitch
+labels:
+- t:
+  - 0
+  - 6
+  zh: 这台多头刺绣机：12 头（画 4 个），10329 条记录，650 r/min
+  en: 'This multi-head embroidery machine: 12 heads, 10329 records, 650 r/min'
+- t:
+  - 0
+  - 6
+  zh: 运动、针迹、趟次按你的设计算；机构尺寸为示意
+  en: Motion, stitches and passes follow your design; mechanism sizes are illustrative
+  where: bottom
+- t:
+  - 6.0
+  - 15.0
+  zh: ① 刺布：几个头一起扎，针在布中时绷架停住
+  en: '① Needles: all heads stitch together; the frame stops while they are in'
+- t:
+  - 6.0
+  - 15.0
+  zh: 可用加速度 12.9 m/s²
+  en: Available acceleration 12.9 m/s²
+  where: bottom
+- t:
+  - 15.04
+  - 23.04
+  zh: ② 绷架移动：X、Y 两轴带着所有绣框一起走
+  en: '② Frame drive: X and Y move every hoop together'
+- t:
+  - 15.04
+  - 23.04
+  zh: 绷架折算质量 58 kg
+  en: Frame equivalent mass 58 kg · Frame servo peak / RMS torque (motor side, rotor excluded) 3.56 / 1.49 N·m
+  where: bottom
+- t:
+  - 23.04
+  - 32.04
+  zh: ③ 绣一遍（快放，按颜色分色）
+  en: ③ The whole design (fast, by colour)
+- t:
+  - 23.04
+  - 32.04
+  zh: 纯缝纫时间 / 一批总时间 16.2 / 21.0 min
+  en: Pure sewing / batch time 16.2 / 21.0 min · Efficiency / pieces per hour 77% / 34.3
+  where: bottom
+- t:
+  - 32.04
+  - 39.04
+  zh: ④ 最难的一针：所需 / 可用加速度 1.00
+  en: '④ The hardest stitch: required / available acceleration 1.00'
+- t:
+  - 32.04
+  - 39.04
+  zh: 第 8727 针，针长 8 mm · 可用加速度 12.9 m/s²
+  en: stitch 8727, 8 mm long · Available acceleration 12.9 m/s²
+  where: bottom
+- t:
+  - 39.04
+  - 47.7
+  zh: ③ 绣一遍（快放，按颜色分色）
+  en: ③ The whole design (fast, by colour)
+- t:
+  - 39.04
+  - 47.7
+  zh: 纯缝纫时间 / 一批总时间 16.2 / 21.0 min
+  en: Pure sewing / batch time 16.2 / 21.0 min · Efficiency / pieces per hour 77% / 34.3
+  where: bottom
+- t:
+  - 47.7
+  - 53.7
+  zh: 全部 7 项校核合格
+  en: All 7 checks pass
+- t:
+  - 47.7
+  - 53.7
+  zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
+  en: WenQuest sewing design software · same parameters as report, setup card
+  where: bottom
+stills:
+- 3.0
+- 10.5
+- 19.04
+- 29.34
+- 35.54
+- 50.7
+panel:
+  kind: readouts
+  head: 读数
+  items:
+  - zh: 针号
+    en: ''
+    key: idx
+    fmt: '{:5.0f}'
+    unit: ' / 10329'
+  - zh: 颜色
+    en: ''
+    key: col
+    fmt: '{:3.0f}'
+    unit: ''
+  - zh: 转速
+    en: ''
+    key: sp
+    fmt: '{:5.0f}'
+    unit: ' r/min'
+  - zh: 所需加速度
+    en: ''
+    key: need
+    fmt: '{:5.1f}'
+    unit: ' / 12.93 m/s²'
+  plot:
+    key: acc
+    zh: 所需 / 可用加速度（红线 = 1）
+    en: ''
+    series:
+    - 0.0
+    - 0.444
+    - 0.444
+    - 0.036
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.444
+    - 0.444
+    - 0.444
+    - 0.462
+    - 0.036
+    - 0.426
+    - 0.444
+    - 0.444
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.266
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.266
+    - 0.426
+    - 0.444
+    - 0.213
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.462
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.426
+    - 0.444
+    - 0.462
+    - 0.408
+    - 0.426
+    - 0.071
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.284
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.036
+    - 0.408
+    - 0.426
+    - 0.213
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.213
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.391
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.426
+    - 0.107
+    - 0.426
+    - 0.036
+    - 0.426
+    - 0.178
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 0.71
+    - 0.586
+    - 0.693
+    - 0.639
+    - 0.675
+    - 0.515
+    - 0.693
+    - 0.355
+    - 0.355
+    - 0.355
+    - 0.355
+    - 0.444
+    - 0.444
+    - 0.444
+    ref:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    cursor: frac
+    foot: （横轴：针号）
+    marks:
+    - at: 0.8446
+      zh: 最难
+lang: zh

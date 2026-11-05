@@ -643,7 +643,25 @@ def hud(img, t, read):
         d.text((x0, y), f"夹爪 gripper：{'夹紧 closed' if arm.grip > 0.5 else '张开 open'}", font=font(FONT_R, 24), fill=(60, 68, 76))
         y += 34 * s
     pl = pan.get("plot")
-    if pl and pl["key"] in CURVES:
+    if pl and "series" in pl:                     # 第 89 轮：按针 / 按趟的曲线（场景里直接给数），光标在进度 frac（0–1）
+        px, py, pw, ph = x0, y + 20 * s, w - 10 * s, 170 * s
+        d.rectangle([px, py, px + pw, py + ph], fill=(246, 247, 248), outline=(210, 214, 218))
+        vals, ref = pl["series"], pl.get("ref") or []
+        lo = min(vals + ref + [0]) if pl.get("zero", True) else min(vals + ref)
+        hi = max(vals + ref)
+        n_ = max(2, len(vals))
+        yv = lambda v: py + ph - 10 * s - (ph - 20 * s) * (v - lo) / max(1e-9, hi - lo)
+        if ref:
+            d.line([(px + pw * i / (len(ref) - 1 or 1), yv(v)) for i, v in enumerate(ref)], fill=(217, 56, 46), width=max(1, int(2 * s)))
+        d.line([(px + pw * i / (n_ - 1), yv(v)) for i, v in enumerate(vals)], fill=(33, 112, 158), width=max(1, int(3 * s)))
+        for k, m in enumerate(pl.get("marks", [])):
+            mx = px + pw * m["at"]
+            d.line([mx, py, mx, py + ph], fill=(217, 56, 46, 160), width=max(1, int(2 * s)))
+            d.text((mx + 4 * s, py + (4 + 24 * k) * s), m["zh"], font=font(FONT_R, 18), fill=(217, 56, 46))
+        cx = px + pw * max(0.0, min(1.0, read.get(pl.get("cursor", "frac"), 0) or 0))
+        d.line([cx, py, cx, py + ph], fill=(29, 35, 41), width=max(1, int(3 * s)))
+        d.text((px, py + ph + 8 * s), f"{pl['zh']} {pl['en']}".strip() + pl.get("foot", ""), font=font(FONT_R, 20), fill=(95, 107, 118))
+    elif pl and pl["key"] in CURVES:
         px, py, pw, ph = x0, y + 20 * s, w - 10 * s, 170 * s
         d.rectangle([px, py, px + pw, py + ph], fill=(246, 247, 248), outline=(210, 214, 218))
         vals = CURVES[pl["key"]]
@@ -693,7 +711,7 @@ for mid in WEBLAB_A:
     lab = OBJ[mid]
     if not isinstance(lab, WebLab):               # gen:sewdesign 每帧直接算，不用预取；曲线一圈也直接算
         pan = SPEC.get("panel") or {}
-        if pan.get("plot") and jobs:
+        if pan.get("plot") and jobs and "series" not in pan["plot"]:
             from sewdesign import poses, reads
             CURVES[pan["plot"]["key"]] = [reads(lab.machine, poses(lab.machine, lab.params, a), lab.params).get(pan["plot"]["key"], 0)
                                           for a in range(360)]

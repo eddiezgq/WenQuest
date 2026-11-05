@@ -138,7 +138,8 @@ def group_of(name):
     """零件名 → 机构（三维讲解片透视、慢放用）"""
     if name in GROUPS:
         return GROUPS[name]
-    return next((g for pre, g in _PREFIX if name.startswith(pre)), "frame")
+    from .cad_seq import PREFIX as _SEQ           # 花样机、刺绣机、横机（第 89 轮）
+    return next((g for pre, g in _PREFIX + _SEQ if name.startswith(pre)), "frame")
 
 
 def parts3d(params=None, phi=0.0, machine="lockstitch"):
@@ -146,6 +147,9 @@ def parts3d(params=None, phi=0.0, machine="lockstitch"):
         return _parts_overlock(params, phi)
     if machine == "cover":
         return _parts_cover(params, phi)
+    if machine in ("pattern", "embroid", "flatknit"):           # 第 89 轮：phi 是进度角（每 360° 一针 / 一趟），见 cad_seq.py
+        from .cad_seq import parts_seq
+        return parts_seq(params, phi, machine)
     return _parts_lockstitch(params, phi)
 
 

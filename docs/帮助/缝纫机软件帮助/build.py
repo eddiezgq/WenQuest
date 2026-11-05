@@ -149,6 +149,11 @@ def case_numbers():
     v["cv_opt"] = C["opt_timing"][0]["params"]["dphi"]
     from app import sewing_video as SVID                       # 第 76 轮：绷缝机讲解片的片长（教材算例 406）
     v["cv_vdur"] = f'{SVID.scene("cover", {})[1]["duration"]:g}'
+    import base64                                              # 第 89 轮：花样机、刺绣机、横机讲解片的片长（案例里的设置）
+    from app.sewcore import emb_samples, knit_samples
+    v["pt_vdur"] = f'{SVID.scene("pattern", {"n": 2000})[1]["duration"]:g}'
+    v["em_vdur"] = f'{SVID.scene("embroid", {"src": "file", "dst": base64.b64encode(emb_samples.logo_dst()).decode(), "H": 12})[1]["duration"]:g}'
+    v["fk_vdur"] = f'{SVID.scene("flatknit", {"src": "file", "knit": knit_samples.front_text()})[1]["duration"]:g}'
     lo, hi = (float(x) for x in C["window"].split("…"))
     v["cv_wwidth"] = round(hi - lo, 1)
     v["cv_W"] = round(C["order"]["W"] * 100)

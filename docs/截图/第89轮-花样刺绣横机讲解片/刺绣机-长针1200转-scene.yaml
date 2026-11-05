@@ -1,0 +1,636 @@
+# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮）。数由计算核心给，模型参数锁定。
+name: 多头刺绣机讲解
+title:
+  zh: 多头刺绣机怎么走完一个花样
+  en: How this multi-head embroidery machine runs a design
+duration: 58.46
+floor: false
+clip: 0.002
+models:
+- id: d
+  use: gen:sewdesign
+  machine: embroid
+  params:
+    H: 8
+    n: 1200
+    n_head: 1100
+    s: 12.0
+    W: 204
+    dn: 100
+    F: 800
+    Ff: 50
+    m0: 10
+    mh: 4
+    stx: 400
+    sty: 400
+    rf: 20
+    ig: 5
+    eta: 0.9
+    T0: 0.5
+    Th: 0.3
+    J0: 0.002
+    Jh: 0.0008
+    ta: 0.3
+    src: manual
+    N: 20000
+    lam: 0.5
+    t_fix: 40
+    t_back: 1.6
+    d: 10
+    b: 12
+    colors: 6
+    t_color: 6
+    t_load: 0
+    Q: 0
+    days: 0
+    hday: 16
+    _track: eNrtmE9v2zgQxb+KwdMu8GJw+J8+76GHYq97SIpCseVGqGunllx3t8h336FSe+aytwB7qBNgTGlIPvLNj7KSH2ZvVuQszJ8/P8/tc8mNJ7MKeZlg3plVgfnLrJwNLbH/OPbT3Hu+eOq7DV+RtS3ZfeF2XhYeN07feYrX2+P097W9GaePX7rvsw7BbIddb1bbbjf2MI9trvsf5nPP/U23Xvc700Z3E/eZszD/8MrMwyllax9ONeYtx1DKwylmxzF3NXPb957v03r9cCqbzD3jdr7/WPjOdmu5Z3KhzcDzLB5OzqWwmMfxfDm2maLrWt4S34l9l+ZxlVfQs2nm/WH/qR+nxTgN0/ppsR2mcTE99YvzsN8czovfjv3X03DsN5e5u2/dsOsed/1i3lZ/7KbhsP/dvOCy3dnJ/9hteXzsW+yI4zatL+sKvd20HZbY7q9z88V3vN7qw9WjblP0qMsO/ujH4dN+MT73vMrzMD0N+3kHbR2L6fD8mjEvH2CGDdfr3oLg4BEQkZBRUEF8k0AO5EEBFEEJlEEFVMFEOR7j4DxcgItwCS7DFbgKb+EJnqf08AE+wif4DF/gK4JFIASHwIoBISIkhIxQECqiRSREh+gReUERMSFmxIJYkSwSITkkjxSQeL0JKSMVpIpskQnZIXvkgByReTsZuSBXFItCKA7FowSUCKa58G4LSkW1qITqUD1qQI2oCTWjshnNDbbDsh+WDbHsiGVLLHti2RTLrli2xXK/2Tbu14xrzjXrmnfNvOZes48qO/88jez8/V3io3Pn/LJ8wP2lHbh9Tdhrwi2TJNzSXRM0j767XASVsJKw8/BL210TVEWc20EnruJUlDhfXMXbQ0ESWcS5LeKURJzbSjwq8ajFoxIPWjwoca/FvRL3WtwpcafFSYmTFiclbrW4FfGqtKtIV6VcRLgo3SyyWalmEU1KM4lkVJJRJKOSDCIZlKQCTPOl8dJ0KYu1w8pgJanAUlyJU8pA8VXZLVVQxZGaqVJKhVXhhQeFidCjoBLWFIJCpgJWOFZ4C/XqMMgZUUdHThQpR0iMIuUfia2k3CYpAqnakJSMVCVJCkyq7iQ4kKKEBB5STJGgRopAEjBJ8UqCMSm6SaAndRZIjgipk+MEE6c4cQKKU6Q4hYpmRWBxihYnuMwPWH7qfuYvcf6GHP+nn/YW8MyP/fkd6xZu4W0DA/6+vc69PjJu4RbeMDBc/AfOT7zikt/3b+EW3iwwXuvDbv5j9Jf65X2fD8ex/eMF5vCtP5rV/rTbwZyef0EzXv4Fk3wSVQ==
+motion:
+- drive: weblab
+  model: d
+  angle:
+  - - 0
+    - 0
+  - - 6.0
+    - 720.0
+  - - 6.04
+    - 1080
+  - - 15.04
+    - 1440
+  - - 23.04
+    - 2160
+  - - 23.08
+    - 228.0
+  - - 30.08
+    - 582.0
+  - - 30.12
+    - 228.0
+  - - 37.12
+    - 582.0
+  - - 37.16
+    - 228.0
+  - - 44.16
+    - 582.0
+  - - 52.46
+    - 43199.0
+  - - 58.46
+    - 43199.0
+camera:
+- t: 0
+  look:
+  - 0.0
+  - -0.0685
+  - 0.0638
+  az: -40
+  el: 20
+  dist: 5.121
+  lens: 40
+- t: 5.5
+  look:
+  - 0.0
+  - -0.0685
+  - 0.0638
+  az: -22
+  el: 16
+  dist: 4.711
+  lens: 40
+- t: 6.8
+  look:
+  - -0.62
+  - -0.132
+  - 0.01
+  az: -48
+  el: 16
+  dist: 0.5
+  lens: 40
+- t: 14.0
+  look:
+  - -0.62
+  - -0.132
+  - 0.01
+  az: -30
+  el: 12
+  dist: 0.5
+  lens: 40
+- t: 15.84
+  look:
+  - 0.02
+  - 0.0
+  - 0.0063
+  az: -30
+  el: 34
+  dist: 2.684
+  lens: 40
+- t: 22.04
+  look:
+  - 0.02
+  - 0.0
+  - 0.0063
+  az: -15
+  el: 30
+  dist: 2.581
+  lens: 40
+- t: 23.88
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -45
+  el: 22
+  dist: 0.5
+  lens: 40
+- t: 29.58
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -28
+  el: 18
+  dist: 0.5
+  lens: 40
+- t: 30.92
+  look:
+  - 0.02
+  - 0.0
+  - 0.0063
+  az: -32
+  el: 30
+  dist: 3.097
+  lens: 40
+- t: 36.62
+  look:
+  - 0.02
+  - 0.0
+  - 0.0063
+  az: -18
+  el: 26
+  dist: 2.994
+  lens: 40
+- t: 37.96
+  look:
+  - 0.105
+  - 0.0475
+  - 0.35
+  az: -45
+  el: 16
+  dist: 3.345
+  lens: 40
+- t: 43.66
+  look:
+  - 0.105
+  - 0.0475
+  - 0.35
+  az: -30
+  el: 14
+  dist: 3.345
+  lens: 40
+- t: 44.76
+  look:
+  - -0.62
+  - -0.132
+  - 0.0
+  az: -20
+  el: 55
+  dist: 0.39
+  lens: 40
+- t: 53.96
+  look:
+  - 0.0
+  - -0.0685
+  - 0.0638
+  az: -30
+  el: 20
+  dist: 5.121
+  lens: 40
+- t: 58.46
+  look:
+  - 0.0
+  - -0.0685
+  - 0.0638
+  az: -45
+  el: 22
+  dist: 5.121
+  lens: 40
+effects:
+- kind: xray
+  t:
+  - 6.5
+  - 14.5
+  top:
+  - d.needle
+  - d.hoop
+  - d.stitch
+- kind: xray
+  t:
+  - 15.54
+  - 22.54
+  top:
+  - d.hoop
+  - d.x
+  - d.y
+- kind: xray
+  t:
+  - 23.58
+  - 30.08
+  top:
+  - d.needle
+  - d.hoop
+  - d.stitch
+- kind: xray
+  t:
+  - 30.62
+  - 37.12
+  top:
+  - d.hoop
+  - d.x
+  - d.y
+  - d.stitch
+- kind: xray
+  t:
+  - 37.66
+  - 44.16
+  top:
+  - d.head
+  - d.needle
+  - d.stitch
+- kind: xray
+  t:
+  - 44.46
+  - 52.46
+  top:
+  - d.hoop
+  - d.stitch
+labels:
+- t:
+  - 0
+  - 6
+  zh: 这台多头刺绣机：8 头（画 4 个），120 条记录，1200 r/min
+  en: 'This multi-head embroidery machine: 8 heads, 120 records, 1200 r/min'
+- t:
+  - 0
+  - 6
+  zh: 运动、针迹、趟次按你的设计算；机构尺寸为示意
+  en: Motion, stitches and passes follow your design; mechanism sizes are illustrative
+  where: bottom
+- t:
+  - 6.0
+  - 15.0
+  zh: ① 刺布：几个头一起扎，针在布中时绷架停住
+  en: '① Needles: all heads stitch together; the frame stops while they are in'
+- t:
+  - 6.0
+  - 15.0
+  zh: 可用加速度 / 最长针所需 17.9 / 93.9 m/s²
+  en: Available / required acceleration 17.9 / 93.9 m/s² · Speed limit for the longest stitch 523 r/min
+  where: bottom
+- t:
+  - 15.04
+  - 23.04
+  zh: ② 绷架移动：X、Y 两轴带着所有绣框一起走
+  en: '② Frame drive: X and Y move every hoop together'
+- t:
+  - 15.04
+  - 23.04
+  zh: 绷架折算质量 42 kg
+  en: Frame equivalent mass 42 kg · Frame servo peak / RMS torque (motor side, rotor excluded) 17.75 / 13.36 N·m
+  where: bottom
+- t:
+  - 23.08
+  - 30.08
+  zh: ④ 最难的一针：所需 / 可用加速度 5.26
+  en: '④ The hardest stitch: required / available acceleration 5.26'
+- t:
+  - 23.08
+  - 30.08
+  zh: 第 2 针，针长 12 mm
+  en: stitch 2, 12 mm long · Available / required acceleration 17.9 / 93.9 m/s²
+  where: bottom
+- t:
+  - 30.12
+  - 37.12
+  zh: ⚠ 不合格：最长针在窗口里走得完（所需 ≤ 可用加速度）
+  en: ⚠ Longest stitch fits the window (required ≤ available acceleration) fails
+  tone: bad
+- t:
+  - 30.12
+  - 37.12
+  zh: 93.9 / 17.9 m/s² · 判据 ≤ 1
+  en: 93.9 / 17.9 m/s² · criterion ≤ 1
+  where: bottom
+- t:
+  - 37.16
+  - 44.16
+  zh: ⚠ 不合格：设计转速不超过机头最高转速
+  en: ⚠ Design speed within the head top speed fails
+  tone: bad
+- t:
+  - 37.16
+  - 44.16
+  zh: 1200 r/min · 判据 ≤ 1100 r/min
+  en: 1200 r/min · criterion ≤ 1100 r/min
+  where: bottom
+- t:
+  - 44.16
+  - 52.46
+  zh: ③ 绣一遍（快放，按颜色分色）
+  en: ③ The whole design (fast, by colour)
+- t:
+  - 44.16
+  - 52.46
+  zh: 纯缝纫时间 / 一批总时间 38.2 / 44.4 min
+  en: Pure sewing / batch time 38.2 / 44.4 min · Efficiency / pieces per hour 86% / 10.8
+  where: bottom
+- t:
+  - 52.46
+  - 58.46
+  zh: 5 项校核：不合格 2 项，注意 0 项
+  en: '5 checks: 2 fail, 0 need attention'
+- t:
+  - 52.46
+  - 58.46
+  zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
+  en: WenQuest sewing design software · same parameters as report, setup card
+  where: bottom
+stills:
+- 3.0
+- 10.5
+- 26.58
+- 33.62
+- 40.66
+- 55.46
+panel:
+  kind: readouts
+  head: 读数
+  items:
+  - zh: 针号
+    en: ''
+    key: idx
+    fmt: '{:5.0f}'
+    unit: ' / 120'
+  - zh: 颜色
+    en: ''
+    key: col
+    fmt: '{:3.0f}'
+    unit: ''
+  - zh: 转速
+    en: ''
+    key: sp
+    fmt: '{:5.0f}'
+    unit: ' r/min'
+  - zh: 所需加速度
+    en: ''
+    key: need
+    fmt: '{:5.1f}'
+    unit: ' / 17.86 m/s²'
+  plot:
+    key: acc
+    zh: 所需 / 可用加速度（红线 = 1）
+    en: ''
+    series:
+    - 0.0
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    - 5.26
+    ref:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+    cursor: frac
+    foot: （横轴：针号）
+    marks:
+    - at: 0.0084
+      zh: 最难
+lang: zh
