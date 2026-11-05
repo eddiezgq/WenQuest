@@ -1,0 +1,100 @@
+# 首页视频简介 04 · 白板课（第 86 轮第二批）。画面：学习平台的白板课页面（本机完整环境，中英界面）和白板课成片
+# samples/白板讲课/白板讲课样片.mp4 里的几帧（AI 生成的样片，画面中英对照）。
+standalone: true
+langs: [zh, en]
+title: [问渠白板课：一句话出一节会动的白板课, 'WenQuest whiteboard lessons: an animated lesson from one sentence']
+brand: [白板课, Whiteboard lessons]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的白板课是 AI 生成的样片。, 'The whiteboard lesson shown is an AI-generated sample.']
+tags:
+  zh: [白板课, 白板动画, AI 讲课, 微课, 科普, 教学视频, 问渠]
+  en: [whiteboard animation, AI lecture, micro-lesson, explainer, teaching video, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: page, learn: /pages/whiteboard/whiteboard}
+  - {name: f1, video: samples/白板讲课/白板讲课样片.mp4, t: 10}
+  - {name: f2, video: samples/白板讲课/白板讲课样片.mp4, t: 25}
+  - {name: f3, video: samples/白板讲课/白板讲课样片.mp4, t: 35}
+  - {name: f4, video: samples/白板讲课/白板讲课样片.mp4, t: 39.5}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: f4, title: [一句话，出一节会动的白板课, An animated whiteboard lesson from one sentence],
+          sub: [问渠白板课：AI 写讲稿、配音、排画板，像老师边讲边画, 'WenQuest whiteboard lessons: the AI writes, voices and lays out the board, like a teacher drawing as they talk']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠白板课：像老师边讲边在白板上画，AI 写讲稿、配音、排画板。']
+    en: ['>WenQuest whiteboard lessons work like a teacher drawing on a whiteboard while talking. The AI writes the script, voices it and lays out the board.']
+- id: s02
+  kind: page
+  page: 2
+  part: [怎么做, How]
+  slide:
+    img: page
+    url: learn.wenquestrobotics.com/pages/whiteboard
+    kick: [给一个题目, Give it a topic]
+    title: [或者上传一段讲课录音, Or upload a recording of your lecture]
+    points:
+      - {text: [几分钟就做好, Ready in a few minutes]}
+      - {text: [做好后可以自己改, You can edit it afterwards]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>给一个题目，或者上传一段你的讲课录音，几分钟就做好；', '>做好后每一块画板、每一句话都可以自己改。']
+    en: ['>Give it a topic, or upload a recording of your own lecture, and it is ready in a few minutes.', '>Afterwards you can change any board and any line yourself.']
+- id: s03
+  kind: page
+  page: 3
+  part: [成片, The result]
+  slide:
+    img: f1
+    url: 白板课样片
+    kick: [边讲边画, Drawn as it is told]
+    title: [笔跟着讲解走, The pen follows the explanation]
+    points:
+      - {text: [中英对照的板书, Board text in Chinese and English]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>笔跟着讲解一笔一笔画出来，板书中英对照。']
+    en: ['>The pen draws stroke by stroke as the explanation goes, with board text in Chinese and English.']
+- id: s04
+  kind: page
+  page: 4
+  part: [成片, The result]
+  slide:
+    img: f2
+    url: 白板课样片
+    kick: [结构一目了然, Structure at a glance]
+    title: [概念之间的关系画出来, The links between ideas drawn out]
+    points:
+      - {text: [重点用颜色标出来, Key ideas highlighted in colour]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>概念之间是什么关系，一张图画清楚，重点用颜色标出来。']
+    en: ['>How the ideas relate is drawn as one picture, with the key points in colour.']
+- id: s05
+  kind: page
+  page: 5
+  part: [成片, The result]
+  slide:
+    img: f4
+    url: 白板课样片
+    kick: [画的东西会动, The drawings move]
+    title: [还能插入本课程的虚拟实验和动画, 'It can drop in the course''s labs and animations']
+    points:
+      - {text: [机器人例子贯穿, Robotics examples throughout], zoom: [1.6, 85, 70]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>画的东西会动，还能插入本课程的虚拟实验和动画；例子以机器人为主。']
+    en: ['>The drawings move, and the lesson can drop in the course''s own labs and animations, with robots as the running example.']
+- id: s06
+  kind: page
+  page: 6
+  part: [结尾, Outro]
+  slide: {layout: end, img: f3, title: [每天一期白板科普, A whiteboard explainer every day],
+          sub: [首页“看视频认识问渠”里有最新几期, The latest are on our homepage], link: [问渠官网首页 → 白板课, learn.wenquestrobotics.com]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>我们每天用它出一期白板科普，首页就能看到最新几期。']
+    en: ['>We use it to publish a whiteboard explainer every day; the latest ones are on our homepage.']

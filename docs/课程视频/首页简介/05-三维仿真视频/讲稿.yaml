@@ -1,0 +1,101 @@
+# 首页视频简介 05 · 三维仿真视频（第 86 轮第二批）。画面：学习平台“三维仿真视频”页面（本机完整环境，中英界面）和官网三维样片
+# site/cases/video3d/*.mp4 里的帧（样片画面自带中英字幕）。
+standalone: true
+langs: [zh, en]
+title: [问渠三维仿真视频：一段话出一部工程动画, 'WenQuest 3D simulation films: an engineering animation from one paragraph']
+brand: [三维仿真视频, 3D simulation films]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里是平台生成的三维样片。, 'The footage shown is 3D samples made on the platform.']
+tags:
+  zh: [三维动画, 工程动画, 仿真视频, 缝纫机, 机械臂, 教学视频, 问渠]
+  en: [3D animation, engineering animation, simulation video, sewing machine, robot arm, teaching video, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: page, learn: /pages/video3d/video3d}
+  - {name: hook, video: site/cases/video3d/hook-loop-machine.mp4, t: 17}
+  - {name: stitch, video: site/cases/video3d/lockstitch-one-stitch.mp4, t: 19}
+  - {name: cine, video: site/cases/video3d/lockstitch-cinematic.mp4, t: 11}
+  - {name: arm, video: site/cases/video3d/arm-pick-place.mp4, t: 12}
+  - {name: arm2, video: site/cases/video3d/arm-pick-place.mp4, t: 30}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: cine, title: [一段话，出一部工程动画, An engineering animation from one paragraph],
+          sub: [问渠三维仿真视频：动作由程序算出，可以剖开、透视、慢放, 'WenQuest 3D simulation films: motion computed, with cutaways, X-ray views and slow motion']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠三维仿真视频：一句话，出一段工程级的三维动画。']
+    en: ['>WenQuest 3D simulation films turn one sentence into an engineering-grade 3D animation.']
+- id: s02
+  kind: page
+  page: 2
+  part: [怎么做, How]
+  slide:
+    img: page
+    url: learn.wenquestrobotics.com/pages/video3d
+    kick: [写一句要求, Write what you want]
+    title: [AI 写场景，先看关键画面, 'The AI writes the scene; check the key frames first']
+    points:
+      - {text: [只用平台已有的模型, Built only from the platform's own models], ring: [1, 30, 98, 30]}
+      - {text: [满意再出小样和高清, Then a draft and a full-HD render]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>写一句要求，AI 用平台已有的模型写场景，先给你看关键画面，', '>满意了再出小样和高清。']
+    en: ['>Write what you want, and the AI builds the scene from the platform''s own models and shows you the key frames first,', '>then renders a draft and a full-HD version.']
+- id: s03
+  kind: page
+  page: 3
+  part: [样片, Samples]
+  slide:
+    img: stitch
+    url: 三维样片 · 平缝机一针
+    kick: [动作由程序算出, Motion is computed]
+    title: [不是手摆的关键帧, Not hand-placed keyframes]
+    points:
+      - {text: [主轴转角、针杆、旋梭、挑线杆，读数实时, 'Shaft angle, needle, hook and take-up, read out live'], ring: [72, 12, 27, 40]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>动作由机构程序算出来，不是手摆的关键帧；主轴转角、针杆高度这些读数跟着走。']
+    en: ['>The motion comes from the mechanism model, not hand-placed keyframes, and readouts such as shaft angle and needle height follow along.']
+- id: s04
+  kind: page
+  page: 4
+  part: [样片, Samples]
+  slide:
+    img: hook
+    url: 三维样片 · 钩线机构
+    kick: [剖开、透视、慢放, 'Cutaway, X-ray, slow motion']
+    title: [看清肉眼看不到的地方, See what the eye cannot]
+    points:
+      - {text: [慢放约 2000 倍, About 2000× slower]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>可以剖开、透视、慢放，看清旋梭怎么钩住线环，带中英标注。']
+    en: ['>Cut it open, see through it, slow it down: watch how the hook catches the loop, labelled in Chinese and English.']
+- id: s05
+  kind: page
+  page: 5
+  part: [样片, Samples]
+  slide:
+    img: arm
+    url: 三维样片 · 机械臂抓放
+    kick: [机器人, Robots]
+    title: [机械臂抓放，关节角一路显示, 'A robot arm picks and places, joint angles shown throughout']
+    points:
+      - {text: [六个关节角实时读数, Six joint angles read out live], zoom: [1.4, 85, 30]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>机器人也一样：机械臂抓放，六个关节角一路显示。']
+    en: ['>Robots too: a robot arm picks and places, with all six joint angles shown throughout.']
+- id: s06
+  kind: page
+  page: 6
+  part: [结尾, Outro]
+  slide: {layout: end, img: cine, title: [课件、公开课、产品介绍都能用, 'For slides, open courses and product films'],
+          sub: [首页“三维样片”里有成片, Finished samples are on our homepage], link: [问渠官网首页 → 三维仿真视频, wenquestrobotics.com/cases/video3d]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>课件、公开课、产品介绍都能用；首页“三维样片”里有成片。']
+    en: ['>Use it for slides, open courses and product films; finished samples are on our homepage.']

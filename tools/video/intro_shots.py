@@ -159,6 +159,11 @@ def main(d: str):
                     learn_shot(b, c, lang, dst)
                     print(dst)
                     continue
+                if c.get("video"):                   # 成片里的一帧（三维样片、白板课成片）：两种语言用同一帧
+                    import subprocess
+                    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", str(c.get("t", 0)), "-i", str(ROOT / c["video"]),
+                                    "-frames:v", "1", "-vf", "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080", "-q:v", "3", str(dst)], check=True)
+                    continue
                 if "file" in c:
                     src = ROOT / (c.get(f"file_{lang}") or c["file"])
                     im = Image.open(src).convert("RGB")
