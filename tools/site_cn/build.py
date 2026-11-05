@@ -676,7 +676,7 @@ def main():
     shutil.copy2(HERE / "cn.css", OUT / "assets" / "cn.css")
     shutil.copy2(HERE / "cn.js", OUT / "assets" / "cn.js")
     shutil.copy2(ROOT / "site" / "assist.js", OUT / "assets" / "assist.js")
-    shutil.copy2(ROOT / "site" / "hub3d.js", OUT / "assets" / "hub3d.js")     # 第 90 轮：首屏立体厂情中枢，两站同一个   # 第 87 轮：客服小组件，两站同一个
+    shutil.copy2(ROOT / "site" / "hub3d.js", OUT / "assets" / "hub3d.js")     # 第 91 轮：首屏立体厂情中枢，两站同一个   # 第 87 轮：客服小组件，两站同一个
     (OUT / "assets" / "logo.svg").write_text(LOGO.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"'), encoding="utf-8")
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
     page("/404/", "页面不存在", "页面不存在。", hero("404", "这一页不存在", "可能是网址打错了，或者页面已经移走。", None, [("回首页", "/"), ("预约演示", "/contact/")]))
