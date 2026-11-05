@@ -98,7 +98,7 @@
           <!-- #ifdef H5 -->
           <view v-if="R && R.view.alt" class="chips pv">
             <text class="opt" :class="{ on: !altView }" @click="altView = false">{{ t("sew.protoView.3d") }}</text>
-            <text class="opt" :class="{ on: altView }" @click="altView = true">{{ t("sew.protoView.looper") }}</text>
+            <text class="opt" :class="{ on: altView }" @click="altView = true">{{ t("sew.protoView." + (machine === "cover" ? "looper" : "lab")) }}</text>
           </view>
           <view class="frame" :class="{ flat: R && ['looper', 'embroid'].includes(curView.page) }">
             <iframe v-if="protoOk" :key="protoSrc" ref="frame" class="proto" :src="protoSrc" title="3D" @load="syncProto" />
@@ -277,13 +277,14 @@ const mname = (k?: string) => { const m = machines.value.find((x) => x.key === (
 const projectNames = computed(() => projects.value.map((p) => `${p.name}（${mname(p.machine)}）`));
 const plabels = computed(() => { const o: Record<string, string> = {}; for (const grp of schema.value) for (const x of grp.params) { o[x.key] = L(x); for (const c of x.choices || []) o[`${x.key}:${c.key}`] = L(c); } return o; });
 const pIndex = computed(() => Math.max(0, projects.value.findIndex((p) => p.id === current.value?.id)));
-const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "model-cover", pattern: "model-pattern", embroid: "embroid", flatknit: "model-flatknit" };
+const PAGES: Record<string, string> = { lockstitch: "proto-lockstitch", overlock: "model-overlock", cover: "model-cover", pattern: "model-pattern", embroid: "model-embroid", flatknit: "model-flatknit" };
 const MACHINE_KEYS = Object.keys(PAGES);
 // 第 73 轮：绷缝机有两个视图——三维样机（模型 10-1）和弯针动画（实验 10-1，view.alt）
 const altView = ref(false);
 watch(machine, () => { altView.value = false; });
 const curView = computed(() => (altView.value && R.value?.view?.alt) || R.value?.view || { page: PAGES[machine.value] });
-const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${altView.value && machine.value === "cover" ? "looper" : PAGES[machine.value] || PAGES.lockstitch}`);
+// 第二视图（绷缝机的弯针动画、刺绣机的虚拟实验 16-1）的页面由计算结果的 view.alt 给
+const protoSrc = computed(() => `${BASE}/api/v1/sewing/proto?lang=${lang.value}&page=${(altView.value && R.value?.view?.alt?.page) || PAGES[machine.value] || PAGES.lockstitch}`);
 
 // ---------- 计算 ----------
 let timer: any = null;

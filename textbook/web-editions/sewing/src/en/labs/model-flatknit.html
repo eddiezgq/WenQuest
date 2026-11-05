@@ -50,13 +50,18 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
 .note{font-size:.78rem;color:var(--muted)}
 .parts{display:grid;grid-template-columns:14px 1fr;gap:2px 8px;font-size:.84rem}
 .parts i{width:12px;height:12px;border-radius:3px;margin-top:5px}
+.verdict-tag{position:absolute;right:12px;top:10px;font-size:.86rem;font-weight:700;padding:3px 10px;border-radius:5px;background:#ffffffd8}
+.verdict-tag:empty{display:none}.verdict-tag.ok{color:#1e8a4c}.verdict-tag.bad{color:#c0392b}.verdict-tag.warn{color:#a86a00}
+.checks{display:flex;flex-direction:column;gap:4px;font-size:.84rem}
+.checks div{border-bottom:1px solid var(--rule);padding-bottom:3px}.checks .bad{color:#c0392b}.checks .warn{color:#a86a00}
+.emb header{display:none}.emb a[href$="index.html"]{display:none}.emb .wrap{padding-block:8px 24px}
 .cap{margin:0}.cap .wrap{max-width:none;padding:0}.cap header,.cap .rail,.cap .hint{display:none}.cap .grid{display:block}
 .cap .stage{width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#fbfaf7}
 </style>
 <div class="wrap">
 <header><h1>Computerised flat knitting machine in 3D</h1><span class="sub"><i>Sewing Machine Design and Manufacturing</i>, Chapter 17 · Model 17-1 · Needle beds, needle sets and carriage of a two-bed computerised flat knitting machine (schematic; needle pitch enlarged about 6× for clarity)</span></header>
 <div class="grid">
-  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="hint">Drag to rotate · scroll or pinch to zoom</div></div>
+  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="verdict-tag" id="vtag"></div><div class="hint">Drag to rotate · scroll or pinch to zoom</div></div>
   <div class="rail">
     <section class="card">
       <h3>Display</h3>
@@ -75,8 +80,15 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
         <div><b id="r-d">→</b><small>Carriage direction</small></div>
         <div><b id="r-c">1</b><small>Course</small></div>
         <div><b id="r-r">0</b><small>Racking (needles)</small></div>
+        <div id="rd-v" hidden><b id="r-v">—</b><small>Carriage speed m/s</small></div>
+        <div id="rd-t" hidden><b id="r-t">—</b><small>This pass / total s</small></div>
       </div>
       <p class="note">As the carriage passes, the selected needles are pushed towards the trick gap by the raising cam (to knit or tuck) while unselected needles stay put; the stitch cam then draws the needles back down to the loop-forming depth.</p>
+    </section>
+    <section class="card" id="dcard" hidden>
+      <h3>This design (follows the parameters in the design software)</h3>
+      <div class="checks" id="checks"></div>
+      <div class="row" style="margin-top:8px"><button type="button" id="gobad">Slow down at the problem pass</button></div>
     </section>
     <section class="card">
       <h3>Part groups (separated in the exploded view)</h3>
@@ -96,6 +108,8 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
 <script>
 (()=>{
 const T=THREE, D2R=Math.PI/180;
+if(window.self!==window.top)document.body.classList.add('emb');          // 嵌在设计软件里：不要页头
+const TX={"rv": "Carriage speed m/s", "rt": "This pass / total s", "card": "This design (follows the parameters in the design software)", "gobad": "Slow down at the problem pass", "ok": "Knits normally", "nbad": " failing", "tot": "", "sep": ", ", "play": "Play", "pause": "Pause", "kind": {"k": "knit", "x": "transfer", "e": "empty"}, "pass_": "pass"};
 if(location.hash==='#capture')document.body.classList.add('cap');
 const stage=document.getElementById('stage'), cv=document.getElementById('cv'), lab=document.getElementById('lab');
 const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
@@ -160,7 +174,8 @@ buildBed(bedF,bedMatF,'F',1); buildBed(bedB,bedMatB,'B',-1);
 const car=A('car',[0,260,0]); const carMove=G(); car.add(carMove);
 const carF=bedFrame(carMove,1), carB=bedFrame(carMove,-1);
 const CW=170;
-[carF,carB].forEach((fr,k)=>{
+let NSYS=1, sysGroups=[];
+function camSet(fr){
   mesh(box(CW,14,190),camPlateMat,fr,[0,40,S0+95]);                                        // cam plate
   mesh(box(CW-20,22,30),camPlateMat,fr,[0,58,S0+200]);                                    // outer rib
   // raising cam (triangle) + stitch cams under the plate (visible in x-ray)
@@ -175,8 +190,13 @@ const CW=170;
   for(let j=0;j<5;j++) mesh(new T.CylinderGeometry(3,3,22,12),coilMat,fr,[-44+j*12,60,S0+150]);
   // stitch cam stepper motors
   mesh(new T.CylinderGeometry(14,14,26,24),selMat,fr,[45,66,S0+120]); mesh(new T.CylinderGeometry(14,14,26,24),selMat,fr,[-55,66,S0+120]);
-});
-const bridge=mesh(box(CW+10,24,40),camPlateMat,carMove,[0,150,0]);
+}
+function buildSys(n){
+  sysGroups.forEach(g=>{g.parent.remove(g);g.traverse(c=>{if(c.geometry)c.geometry.dispose();});}); sysGroups=[]; NSYS=n;
+  for(let k=0;k<n;k++)[carF,carB].forEach(fr=>{const g=G();fr.add(g);g.position.x=(k-(n-1)/2)*CW*(fr===carB?-1:1);sysGroups.push(g);camSet(g);});
+}
+buildSys(1);
+const bridge=mesh(box(CW+10,24,40),camPlateMat,carMove,[0,150,0]); bridge.scale.x=NSYS;
 mesh(box(CW+10,110,20),camPlateMat,carMove,[0,95,0]);
 // ---------- yarn carrier rail + carrier ----------
 const yarnA=A('yarn',[0,360,0]);
@@ -186,7 +206,7 @@ mesh(box(26,26,22),carrierMat,carrier,[0,175,0]); mesh(new T.CylinderGeometry(2.
 const yarnCurve=new T.Line(new T.BufferGeometry(),new T.LineBasicMaterial({color:0x2f6fd6})); yarnA.add(yarnCurve);
 // ---------- fabric + take-down ----------
 const fabA=A('fab',[0,-220,0]);
-mesh(new T.PlaneGeometry(N*PV,300),fabMat,fabA,[0,-170,0]);
+const fabM=mesh(new T.PlaneGeometry(N*PV,300),fabMat,fabA,[0,-170,0]);
 [-22,22].forEach(z=>mesh(cylX(18,L+40,40),rollMat,fabA,[0,-330,z]));
 mesh(cylX(30,8,32),rollMat,fabA,[L/2+30,-330,22]);
 // ---------- carriage drive ----------
@@ -214,7 +234,33 @@ function level(bed,i){
   if(pat==='tuck') return bed==='F'?(course%2===0&&i%2===0?1:2):0;
   return 0;
 }
+// 这台设计（第 81 轮）：逐趟的类型、行程 D（mm）、最高速度 v（m/s）、用时 t（s，含换向停顿）
+let D=null, pj=0, tp=0;
+const kx=()=>L/(D&&D.B?D.B:L);                               // 针床有效宽 B（mm）↔ 画面上的针床长 L
+function passPos(j,tt){                                     // 第 j 趟开始后 tt 秒：机头离起点多远（mm）、速度（m/s）
+  const Dm=D.D[j]/1000, v=D.v[j], a=D.a, vp=Math.min(v,Math.sqrt(a*Dm)), ta=vp/a, tc=Math.max(0,(Dm-vp*vp/a)/vp), tm=2*ta+tc;
+  if(tt<=0)return [0,0]; if(tt>=tm)return [D.D[j],0];
+  if(tt<ta)return [0.5*a*tt*tt*1000,a*tt];
+  if(tt<ta+tc)return [(0.5*a*ta*ta+vp*(tt-ta))*1000,vp];
+  const u=tm-tt; return [D.D[j]-0.5*a*u*u*1000,a*u];
+}
+function poseDesign(dt){
+  if(playing){tp+=dt*speed/400; while(tp>=D.t[pj]){tp-=D.t[pj];pj=(pj+1)%D.n;}}
+  const dirj=pj%2?-1:1, Dv=D.D[pj]*kx(), [s_,v_]=passPos(pj,tp);
+  xc=dirj*(-Dv/2+s_*kx()); dir=dirj;
+  const k=D.kind[pj]; rack=k==='x'?Math.max(0,Math.min(4,D.rack||0)):0;
+  rackT+=(rack-rackT)*Math.min(1,dt*4+(dt===0?1:0));
+  carMove.position.x=xc; backShift.position.x=rackT*PV;
+  ['F','B'].forEach(kk=>needles[kk].forEach((n,i)=>{ const wx=xi(i)+(kk==='B'?rackT*PV:0); const u=dir*(wx-xc); const lv=k==='e'?0:k==='x'?(kk==='F'?1:0):level(kk,i); n.g.position.z=-profile(u,lv); }));
+  carrier.position.x=xc-dir*40;
+  yarnCurve.geometry.setFromPoints([new T.Vector3(xc-dir*40,250,0),new T.Vector3(xc-dir*40,170,0),new T.Vector3(xc-dir*40,16,0),new T.Vector3(Math.max(-N*PV/2,Math.min(N*PV/2,xc-dir*90)),2,0)]);
+  beltClamp.position.x=xc;
+  document.getElementById('r-x').textContent=Math.round(dirj>0?s_:D.D[pj]-s_); document.getElementById('r-d').textContent=dir>0?'→':'←';
+  document.getElementById('r-c').textContent=`${(D.idx?D.idx[pj]:pj)+1} / ${D.N}${D.kw>1?' ×'+D.kw:''} ${TX.kind[k]||''}`;   /* 全成型：趟数按倍数折算 */ document.getElementById('r-r').textContent=rack;
+  document.getElementById('r-v').textContent=v_.toFixed(2); document.getElementById('r-t').textContent=`${D.t[pj].toFixed(2)} / ${(D.tacc[pj]-D.t[pj]+Math.min(tp,D.t[pj])).toFixed(1)}`;
+}
 function pose(dt){
+  if(D)return poseDesign(dt);
   if(playing){ xc+=dir*speed*dt; if(xc>XMAX){xc=XMAX;dir=-1;course++;} if(xc<XMIN){xc=XMIN;dir=1;course++;} }
   rackT+=(rack-rackT)*Math.min(1,dt*4);
   carMove.position.x=xc; backShift.position.x=rackT*PV;
@@ -263,6 +309,31 @@ function applyMode(){
   mats.forEach(m=>{const g=m.userData.grp; if((mode==='explode')&&g&&GC[g]!==undefined) m.color.set(GC[g]); else m.color.copy(m.userData.base); m.needsUpdate=true;});
   fabMat.transparent=xr; fabMat.opacity=xr?0.5:1; frameA.visible=mode==='solid';
   document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+  paintBad();
+}
+const fabBase=fabMat.color.clone(), RED=new T.Color(0xd23b2b), AMB=new T.Color(0xe0a019);
+function matsOf(k){
+  if(k==='sel_time'||k==='sel_err')return [selMat,coilMat];
+  if(k==='rack')return [bedMatB];
+  if(k==='brake')return [camPlateMat];
+  if(k==='cam_res'||k==='meas')return [camMat];
+  if(k.startsWith('m_'))return [driveMat];
+  if(k==='bed')return [fabMat];
+  return [];
+}
+function paintBad(){
+  fabMat.color.copy(fabBase);
+  if(!D||!D.bad)return;
+  for(const c of D.bad.slice().reverse())for(const m of matsOf(c.key))m.color.copy(c.state==='bad'?RED:AMB);
+}
+function verdict(){
+  const tag=document.getElementById('vtag'), box=document.getElementById('checks');
+  if(!D){tag.textContent='';return;}
+  const nb=D.bad.filter(c=>c.state==='bad').length, nw=D.bad.length-nb, nm=c=>(document.documentElement.lang==='en'?c.en:c.zh);
+  tag.className='verdict-tag '+(nb?'bad':nw?'warn':'ok');
+  tag.textContent=nb?nm(D.bad[0])+(nb>1?TX.sep+TX.tot+nb+TX.nbad:''):nw?nm(D.bad[0]):TX.ok;
+  box.innerHTML=D.bad.length?D.bad.map(c=>`<div class="${c.state}">● ${nm(c)}</div>`).join(''):`<div>${TX.ok}</div>`;
+  document.getElementById('dcard').hidden=false;
 }
 function applyExplode(){ Object.values(asm).forEach(g=>g.position.copy(g.userData.ex).multiplyScalar(exT)); }
 // ---------- camera ----------
@@ -282,9 +353,28 @@ function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSiz
 new ResizeObserver(resize).observe(stage); resize();
 let last=performance.now(), dirty=true, manual=false;
 // 录视频用（与 proto-lockstitch、model-pattern 相同）：__api.manual(true) 后页面不再自己走帧，由 __api.step(dt) 一帧一帧推进
-function tick(dt){if(!window.__still||dirty){pose(window.__still?0:dt);placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
+function tick(dt){if(playing)dirty=true;if(!window.__still||dirty){pose(window.__still?0:dt);placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
 function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(!manual)tick(dt);requestAnimationFrame(frame);}
-window.__api={manual:on=>{manual=!!on;},step:dt=>tick(dt)};
+// 设计软件（第 81 轮）：setCfg 送这台设计；“出问题的那一趟”：摇床 → 第一个翻针趟，其余 → 最宽（最快）的一趟
+function setCfg(c){
+  if(!c||!(c.n>0)||!Array.isArray(c.D)||c.D.length!==c.n)return;
+  const ok=a=>Array.isArray(a)&&a.length===c.n&&a.every(v=>isFinite(v));
+  if(!ok(c.D)||!ok(c.v)||!ok(c.t)||!ok(c.tacc)||typeof c.kind!=='string'||c.kind.length!==c.n||!(c.a>0))return;
+  D={...c,t:c.t.map(x=>Math.max(0.05,x)),bad:Array.isArray(c.bad)?c.bad:[]}; pj=0; tp=0;
+  buildSys(Math.max(1,Math.min(4,Math.round(c.sys)||1))); bridge.scale.x=NSYS;
+  const fw=Math.max(40,Math.min(N*PV,(c.W||0)*kx())); fabM.scale.x=fw/(N*PV);
+  document.getElementById('rack').closest('.row').style.display='none'; document.getElementById('pat').closest('.row').style.display='none';
+  ['rd-v','rd-t'].forEach(id=>document.getElementById(id).hidden=false);
+  applyMode(); verdict(); dirty=true;
+}
+function goBad(){
+  if(!D)return;
+  const rk=D.bad.some(c=>c.key==='rack'&&c.state==='bad')&&D.first_x!=null;
+  pj=rk?D.first_x:D.widest; tp=D.bad.some(c=>c.key==='brake')?Math.max(0,D.t[pj]-D.dwell-0.05):Math.min(D.t[pj]*0.4,D.t[pj]);
+  playing=false; document.getElementById('play').textContent=TX.play; dirty=true;
+}
+document.getElementById('gobad').onclick=goBad;
+window.__api={manual:on=>{manual=!!on;},step:dt=>tick(dt),setCfg,goBad,get D(){return D;},get pass(){return pj;}};
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;}if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;}applyMode();applyExplode();});
 document.getElementById('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();};
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);});

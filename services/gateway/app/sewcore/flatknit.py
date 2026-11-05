@@ -17,7 +17,7 @@ import threading
 from collections import OrderedDict
 
 from . import knitprog as KP
-from .common import Checks, line_chart, make_params, result
+from .common import Checks, flagged, thin, line_chart, make_params, result
 
 MACHINE = "flatknit"
 NAME = ("电脑横机", "Computerized Flat Knitting")
@@ -567,7 +567,8 @@ def analyze(params=None, trial=True):
     out = dict(version=VERSION, machine=MACHINE, params={k: v for k, v in p.items() if k not in ("knit", "kpng")}, checks=list(ch),
                ok=not any(x["state"] == "bad" for x in ch),
                results=results, charts=charts, timing=timing, timing_x="pass", parts=parts(p, DR), card=adjust_card(p), tables=tables,
-               production=dict(PR, t_piece_min=tpiece / 60), drive=DR, garment=G, view=dict(page="model-flatknit", sync="", cfg={}))
+               production=dict(PR, t_piece_min=tpiece / 60), drive=DR, garment=G,
+               view=dict(page="model-flatknit", sync="setCfg", cfg=proto(p, PT, list(ch))))
     if PT is not None:
         out["design"] = dict(PT["stats"], fname=p.get("fname", ""), t_piece=round(tpiece / 60, 2))
     return out
@@ -635,3 +636,37 @@ def adjust_card(params=None):
         dict(zh="新花型低速试织", en="New design at low speed", do_zh="新花型首片 0.3–0.5 m/s 试织，确认无误再提速；竖向漏针多半是某枚舌针针舌不灵或针钩变形，按位置换针。",
              do_en="Knit the first piece of a new design at 0.3–0.5 m/s; a vertical dropped-stitch line usually means one latch needle to replace."),
     ]
+
+
+def proto(p, PT, checks):
+    """样机（模型 17-1）跟这台设计走（第 81 轮）：一片的逐趟动作——类型（k 编织 / x 翻针 / e 空行）、行程 mm、最高速度 m/s、用时 s（含换向停顿）、
+    意匠行。有意匠图时就是编出来的那些趟；没有时按手填的罗纹、提花、收针横列排（同 passes()：罗纹在前，收针翻针平均插在提花里）。
+    出问题的那一趟：摇床 → 第一个翻针趟；急停、选针、电机 → 最宽（最快）的一趟。趟太多时等间隔抽样。"""
+    if PT is not None and PT["passes"]:
+        seq = [(q[0][0], q[1], q[2], q[3], q[4]) for q in PT["passes"]]
+    else:
+        D, t = pass_time(p)
+        jac = p["jac"] * math.ceil(p["col"] / p["sys"])
+        seq = [("k", D, p["v"], t, i + 1) for i in range(p["rib"])]
+        body = [("k", D, p["v"], t, 0)] * jac
+        nx, nj = p["xfer"], len(body)
+        for j in range(nx):                         # 收针翻针平均插进提花（按原来的提花趟数分段，前面已插的 j 个往后错开）
+            body.insert(round((j + 1) * nj / (nx + 1)) + j, ("x", D, p["v"], t, 0))
+        seq += [(k_, D_, v_, t_, p["rib"] + i + 1) for i, (k_, D_, v_, t_, _) in enumerate(body)]
+        if not seq:
+            seq = [("k", D, p["v"], t, 1)]
+    kw = p["kwhole"] if p["fashion"] == "whole" else 1      # 全成型：趟数按倍数折算（同 passes()、program_time()），每趟用时乘这个倍数
+    seq = [(("x" if k == "x" else "e" if k == "e" else "k"), D, v, t * kw, r) for k, D, v, t, r in seq]
+    N = len(seq)
+    first_x = next((i for i, q in enumerate(seq) if q[0] == "x"), None)
+    widest = max(range(N), key=lambda i: (seq[i][1], seq[i][2]))
+    keep = thin(N, keep=tuple(i for i in (first_x, widest) if i is not None))
+    acc, tt = [], 0.0
+    for q in seq:
+        tt += q[3]
+        acc.append(tt)
+    return dict(n=len(keep), N=N, idx=keep, kind="".join(seq[i][0] for i in keep), D=[round(seq[i][1], 1) for i in keep],
+                v=[round(seq[i][2], 3) for i in keep], t=[round(seq[i][3], 3) for i in keep], row=[seq[i][4] for i in keep],
+                tacc=[round(acc[i], 2) for i in keep], kw=kw, a=p["a"], dwell=p["dwell"], B=p["B"], W=round(width(p), 1), sys=p["sys"], E=p["E"],
+                rack=p["rack"], t_rack=round(rack_time(p), 3), first_x=keep.index(first_x) if first_x is not None else None,
+                widest=keep.index(widest), bad=flagged(checks))

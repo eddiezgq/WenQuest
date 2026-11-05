@@ -600,6 +600,115 @@
      "Why must the backup count be no less than the detection delay, yet not much more?"
     ]
    ]
+  },
+  {
+   "id": "model-embroid",
+   "no": "M16-1",
+   "title": [
+    "多头刺绣机三维样机",
+    "3D multi-head embroidery machine"
+   ],
+   "goal": [
+    [
+     "在三维模型中认出横梁、机头（针杆箱、上轴）、绷架、绣框、X / Y 驱动和台板下的旋梭、下轴。",
+     "Identify the beam, heads (needle-bar case, upper shaft), frame, hoops, X/Y drives and the hooks and lower shaft under the table in 3D."
+    ],
+    [
+     "看清每一针的绷架移动都在针离布的窗口里走完，读出转速、针长和所需 / 可用加速度。",
+     "See that each frame move is finished inside the needle-out window, and read the speed, stitch length and required / available acceleration."
+    ],
+    [
+     "理解头数越多、绷架越重时长针为什么要降速，并在样机里看到走不完时的现象。",
+     "Understand why long stitches must slow down as the number of heads (frame mass) grows, and see in the model what happens when a move cannot be finished."
+    ]
+   ],
+   "theory": [
+    [
+     "一针所需峰值加速度 a = 2πs/T²，T = 204° / (6n)；可用加速度 = (驱动力 − 摩擦) / 绷架折算质量，算例取 10 + 4 × 头数 kg（16.3 节）。",
+     "Required peak acceleration a = 2πs/T², T = 204° / (6n); available acceleration = (drive force − friction) / frame mass, taken as 10 + 4 × heads kg in the example (Section 16.3)."
+    ],
+    [
+     "所需比可用大时，一针要的时间约为窗口的 √(所需 / 可用) 倍：绷架在机针扎下后还在动，会断针、断线或针迹走样，所以控制器按每针的长度前瞻调速。",
+     "When the required exceeds the available, a stitch needs about √(required / available) times the window: the frame is still moving when the needle comes down, breaking needles or thread or distorting the stitches, which is why the controller sets the speed stitch by stitch with look-ahead."
+    ],
+    [
+     "模型的机构尺寸是示意；一根上轴贯穿所有机头，一个绷架带所有绣框走同一个花样（16.2 节）。",
+     "Mechanism sizes are schematic; one upper shaft runs through all heads and one frame carries all hoops through the same design (Section 16.2)."
+    ]
+   ],
+   "steps": [
+    [
+     "打开模型 16-1，选“外观”“斜视”，拖动旋转、滚轮缩放，找到横梁、各机头的针杆箱和线架、绷架和绣框。",
+     "Open Model 16-1, choose Solid and the oblique view; rotate and zoom to find the beam, each head's needle-bar case and thread stand, the frame and the hoops."
+    ],
+    [
+     "选“爆炸”，按“部件分组”的颜色找出机头、针杆、绷架、X 轴、Y 轴、台板六组；切到“透视”，找到上轴、下轴和旋梭。",
+     "Choose Exploded and find the six colour groups; switch to X-ray and find the upper shaft, the lower shaft and the hooks."
+    ],
+    [
+     "选“绣框特写”，按“播放”、速度“很慢”，看一圈里机针在布中时绷架不动、机针离布时绷架移动；把读数面板上的主轴转角、针长、转速、所需 / 可用加速度填入记录表（取 3 针）。",
+     "Choose the hoop close-up, press Play at very slow and watch the frame stand still while the needle is in the fabric and move while it is out; record the shaft angle, stitch length, speed and required / available acceleration for three stitches."
+    ],
+    [
+     "在缝纫机设计软件里打开刺绣机，“样机”页签：头数 8、转速 650 r/min，看判定为“能正常绣”。",
+     "In the sewing machine design software open the embroidery machine, Prototype tab: 8 heads, 650 r/min, and check that it embroiders normally."
+    ],
+    [
+     "把头数改成 12、Y 轴驱动力改成 300 N，点“慢放到出问题的那一针”，记录所需 / 可用加速度和读数面板的提示，看绷架在机针扎下时是否还在动。",
+     "Change to 12 heads and a 300 N drive force, press “Slow down at the problem stitch”, record the required / available acceleration and the phase message, and see whether the frame is still moving as the needle comes down."
+    ],
+    [
+     "改回 800 N，再上传花样文件（或用示例花样），看最长那几针转速降到多少。",
+     "Go back to 800 N, upload a design file (or use the sample) and see how far the speed drops on the longest stitches."
+    ]
+   ],
+   "record": {
+    "caption": [
+     "读数与判定",
+     "Readings and verdicts"
+    ],
+    "headers": [
+     [
+      "设置",
+      "Setting"
+     ],
+     [
+      "针号",
+      "Stitch"
+     ],
+     [
+      "针长（mm）",
+      "Length (mm)"
+     ],
+     [
+      "转速（r/min）",
+      "Speed (r/min)"
+     ],
+     [
+      "所需 / 可用加速度（m/s²）",
+      "Required / available accel. (m/s²)"
+     ],
+     [
+      "判定与现象",
+      "Verdict and what you see"
+     ]
+    ],
+    "rows": 6
+   },
+   "questions": [
+    [
+     "为什么头数增加时，同样的 7 mm 缎纹针转速要降？用 16.3 节的公式算 8 头和 15 头时的上限。",
+     "Why must the same 7 mm satin stitch slow down as heads are added? Use the formulas of Section 16.3 for 8 and 15 heads."
+    ],
+    [
+     "绷架在机针扎下后还在动，会出什么问题？控制器为什么不能只按最长针给一个转速？",
+     "What goes wrong if the frame is still moving when the needle comes down? Why should the controller not run the whole design at the speed of the longest stitch?"
+    ],
+    [
+     "要让 12 头机的 7 mm 缎纹针转到 650 r/min，驱动力至少要多大？",
+     "What drive force lets a 12-head machine run 7 mm satin stitches at 650 r/min?"
+    ]
+   ]
   }
  ],
  "assignment": {

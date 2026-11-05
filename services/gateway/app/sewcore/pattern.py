@@ -8,7 +8,7 @@
 """
 import math
 
-from .common import Checks, line_chart, make_params, result
+from .common import flagged, thin, Checks, line_chart, make_params, result
 
 MACHINE = "pattern"
 NAME = ("电子花样机", "Pattern Sewing")
@@ -373,7 +373,28 @@ def analyze(params=None, trial=True):
     return dict(version=VERSION, machine=MACHINE, params=p, checks=list(ch), ok=not any(c["state"] == "bad" for c in ch),
                 results=results, charts=charts, timing=timing, parts=parts(p, MX, MY, kx, ky), card=adjust_card(p), tables=tables,
                 plan=dict(n=N, t_sew=PL["t_sew"], avg=avg, slow=slow_n, t_cycle=t_cycle, pph=pph),
-                motors=dict(x=MX, y=MY), view=dict(page="model-pattern", sync="", cfg={}))
+                motors=dict(x=MX, y=MY), view=dict(page="model-pattern", sync="setCfg", cfg=proto(p, PL, list(ch))))
+
+
+def proto(p, PL, checks):
+    """样机（模型 15-1）跟这台设计走（第 81 轮）：每一针的位置、前瞻后的转速、工作台移动占的转角（= 两轴中较慢一轴的移动时间 × 转速），
+    出问题的校核项和“最紧的一针”（自身转速上限最低）、超出行程最远的一针。针太多时等间隔抽样（最紧的那针留着）。"""
+    pts, sp, caps, steps = PL["pts"], PL["speeds"], PL["caps"], PL["steps"]
+    N = len(pts)
+    worst = min(range(1, N), key=lambda i: caps[i]) if N > 1 else 0
+    xs, ys = [q[0] for q in pts], [q[1] for q in pts]
+    cx, cy = (max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2
+    far = max(range(N), key=lambda i: max(abs(pts[i][0] - cx) / max(p["stx"], 1), abs(pts[i][1] - cy) / max(p["sty"], 1))) if N else 0
+    mv = [0.0]
+    for i in range(1, N):
+        sx, sy = steps[i]
+        tm = max(t_axis(sx, p["ax"], p["v"], PL["C"]), t_axis(sy, p["ay"], p["v"], PL["C"]))
+        mv.append(round(tm * sp[i] * 6, 1))
+    keep = thin(N, keep=(worst, far))
+    return dict(n=len(keep), N=N, idx=keep, pts=[[round(pts[i][0], 2), round(pts[i][1], 2)] for i in keep],
+                sp=[round(sp[i]) for i in keep], cap=[round(min(caps[i], 99999)) for i in keep], mv=[mv[i] for i in keep],
+                f1=round(PL["f1"], 1), f2=round(PL["f2"], 1), mg=p["mg"], n_set=p["n"], n_head=p["n_head"], stx=p["stx"], sty=p["sty"],
+                worst=keep.index(worst), far=keep.index(far), bad=flagged(checks))
 
 
 def parts(p, MX=None, MY=None, kx=None, ky=None):

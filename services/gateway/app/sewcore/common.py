@@ -69,3 +69,21 @@ def xy_chart(key, zh, en, x, y, color="#2e9e6a", ref_zh="", ref_en=""):
 
 def mod360(a):
     return ((a % 360) + 360) % 360
+
+
+TRACK_MAX = 3000          # 样机轨迹最多这么多点（针 / 趟），多了等间隔抽样（第 81 轮）
+
+
+def flagged(checks):
+    """不合格、注意的校核项（样机标红用，第 81 轮）：键、状态、中英文名，先红后黄"""
+    out = [dict(key=c["key"], state=c["state"], zh=c["name"]["zh"], en=c["name"]["en"]) for c in checks if c["state"] in ("bad", "warn")]
+    return sorted(out, key=lambda c: c["state"] != "bad")
+
+
+def thin(n, limit=TRACK_MAX, keep=()):
+    """0..n-1 里取不超过 limit 个下标（等间隔，首尾和 keep 里的都留）"""
+    if n <= limit:
+        return list(range(n))
+    step = (n - 1) / (limit - 1 - len(keep))
+    idx = {round(i * step) for i in range(limit - len(keep))} | {0, n - 1} | {k for k in keep if 0 <= k < n}
+    return sorted(idx)

@@ -112,7 +112,8 @@ def test_embroid_defaults_and_red():
     R = E.analyze({"n": 800})                                                 # 8 头、7 mm、800 r/min：24.4 > 17.9
     assert [c["key"] for c in R["checks"] if c["state"] == "bad"] == ["accel"]
     assert E.analyze({"b": 6})["checks"][3]["state"] == "bad"                 # 回退少于检测延迟
-    assert R["view"] == {"page": "embroid", "sync": "A", "cfg": {"H": 8, "F": 800, "s": 7.0, "n": 800}}
+    assert R["view"]["alt"] == {"page": "embroid", "sync": "A", "cfg": {"H": 8, "F": 800, "s": 7.0, "n": 800}}   # 第 81 轮：实验 16-1 改成第二视图
+    assert R["view"]["page"] == "model-embroid" and R["view"]["sync"] == "setCfg"
 
 
 def test_registry_and_common_fields():

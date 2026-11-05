@@ -176,6 +176,13 @@
 },
 {
 "ch": 16,
+"href": "labs/model-embroid.html",
+"kind": "3D model",
+"title": "Multi-head embroidery machine",
+"desc": "A row of heads, a frame spanning them and a hoop under each, embroidering the same design stitch by stitch; in the design software it follows the heads, design file and per-stitch speed, and the frame turns red at a stitch it cannot finish."
+},
+{
+"ch": 16,
 "href": "labs/embroid.html",
 "kind": "Virtual lab",
 "title": "Multi-head embroidery machine: stitch length, speed and thread-break mending",

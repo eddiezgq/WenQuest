@@ -205,7 +205,8 @@ def register(app, m) -> None:
         limit(req)
         # 第 69 轮：刺绣机带花样文件时要逐针调速（大花样一两秒），放到线程里算，不堵别的请求
         r = await asyncio.to_thread(sewcore.get(body.machine).analyze, body.params)
-        r["proto"] = r["view"]["cfg"]                 # 第 39 轮的字段名，网页旧版本还在用
+        if body.machine == "lockstitch":
+            r["proto"] = r["view"]["cfg"]             # 第 39 轮的字段名，网页旧版本还在用（只有平缝机；第 81 轮起别的机型带轨迹，不重复发）
         return r
 
     @app.get("/api/v1/sewing/embroid/sample")
@@ -221,7 +222,7 @@ def register(app, m) -> None:
         from .sewcore import knit_samples
         return {"name": "wq-front.csv", "knit": knit_samples.front_text()}
 
-    PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-cover", "model-pattern", "embroid", "model-flatknit"}
+    PAGES = {"proto-lockstitch", "model-overlock", "looper", "model-cover", "model-pattern", "embroid", "model-embroid", "model-flatknit"}
 
     @app.get("/api/v1/sewing/proto")
     async def proto(lang: str = "zh", page: str = "proto-lockstitch"):

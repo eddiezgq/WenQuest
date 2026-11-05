@@ -51,13 +51,18 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
 .note{font-size:.78rem;color:var(--muted)}
 .parts{display:grid;grid-template-columns:14px 1fr;gap:2px 8px;font-size:.84rem}
 .parts i{width:12px;height:12px;border-radius:3px;margin-top:5px}
+.verdict-tag{position:absolute;right:12px;top:10px;font-size:.86rem;font-weight:700;padding:3px 10px;border-radius:5px;background:#ffffffd8}
+.verdict-tag:empty{display:none}.verdict-tag.ok{color:#1e8a4c}.verdict-tag.bad{color:#c0392b}.verdict-tag.warn{color:#a86a00}
+.checks{display:flex;flex-direction:column;gap:4px;font-size:.84rem}
+.checks div{border-bottom:1px solid var(--rule);padding-bottom:3px}.checks .bad{color:#c0392b}.checks .warn{color:#a86a00}
+.emb header{display:none}.emb a[href$="index.html"]{display:none}.emb .wrap{padding-block:8px 24px}
 .cap{margin:0}.cap .wrap{max-width:none;padding:0}.cap header,.cap .rail,.cap .hint{display:none}.cap .grid{display:block}
 .cap .stage{width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0;background:#fbfaf7}
 </style>
 <div class="wrap">
 <header><h1>电子花样机三维结构</h1><span class="sub">《缝纫机设计与制造》第 15 章 · 模型 15-1 · 模板式电子花样机（结构示意，尺寸取整）</span></header>
 <div class="grid">
-  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="hint">拖动旋转 · 滚轮或双指缩放</div></div>
+  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="verdict-tag" id="vtag"></div><div class="hint">拖动旋转 · 滚轮或双指缩放</div></div>
   <div class="rail">
     <section class="card">
       <h3>显示</h3>
@@ -73,9 +78,15 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
         <div><b id="r-a">0°</b><small>主轴转角 φ</small></div>
         <div><b id="r-n">1 / —</b><small>当前针</small></div>
         <div><b id="r-x">0.0</b><small>X 位置 mm</small></div>
+        <div><b id="r-s">—</b><small>这一针转速 r/min</small></div>
         <div><b id="r-y">0.0</b><small>Y 位置 mm</small></div>
         <div style="grid-column:1 / -1"><span class="phase" id="r-p">—</span><small style="display:block">机针离布时 X–Y 才移动（离布窗口按第 15.3 节）</small></div>
       </div>
+    </section>
+    <section class="card" id="dcard" hidden>
+      <h3>这台设计（在设计软件里跟着参数变）</h3>
+      <div class="checks" id="checks"></div>
+      <div class="row" style="margin-top:8px"><button type="button" id="gobad">慢放到出问题的那一针</button></div>
     </section>
     <section class="card">
       <h3>部件分组（爆炸图里分开）</h3>
@@ -96,6 +107,8 @@ select{font:inherit;font-size:.86rem;background:var(--bg);color:var(--ink);borde
 <script>
 (()=>{
 const T=THREE, D2R=Math.PI/180;
+if(window.self!==window.top)document.body.classList.add('emb');          // 嵌在设计软件里：不要页头
+const TX={"rs": "这一针转速 r/min", "card": "这台设计（在设计软件里跟着参数变）", "gobad": "慢放到出问题的那一针", "ok": "能正常缝制", "nbad": " 项不合格", "nwarn": "项注意", "hint": "打开教材时走的是示例花样；在设计软件里按这台设计的花样、每针转速走。", "inF": "机针在布中：模板静止", "outF": "机针离布：X–Y 移动", "hold": "机针离布：等待（这一针移动已完成）", "sep": "，", "of": "（设计 ", "ofe": "）", "play": "播放"};
 if(location.hash==='#capture')document.body.classList.add('cap');
 const stage=document.getElementById('stage'), cv=document.getElementById('cv'), lab=document.getElementById('lab');
 const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
@@ -137,12 +150,14 @@ const root=G(); scene.add(root); const asm={};
 function A(name,ex){const g=G();g.userData.ex=new T.Vector3(...ex);root.add(g);asm[name]=g;return g;}
 // ---------- pattern (pocket flap, template coordinates, mm) ----------
 const R0=15.5, LR=55, LAM=R0/LR; const xN=f=>{const p=f*D2R;return R0*(1-Math.cos(p))-LR*(1-Math.sqrt(1-LAM*LAM*Math.sin(p)**2));};
-const ENTER=101.7, LEAVE=258.3;
+let ENTER=101.7, LEAVE=258.3, MG=7.5;
 function flap(){ const segs=[[[-30,20],[-30,-10]],'a1',[[-20,-20],[20,-20]],'a2',[[30,-10],[30,20]]]; const pts=[];
   const line=(a,b)=>{const L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.ceil(L/3);for(let k=pts.length?1:0;k<=n;k++)pts.push([a[0]+(b[0]-a[0])*k/n,a[1]+(b[1]-a[1])*k/n]);};
   const arc=(cx,cy,a0,a1)=>{const n=6;for(let k=1;k<=n;k++){const a=(a0+(a1-a0)*k/n)*D2R;pts.push([cx+10*Math.cos(a),cy+10*Math.sin(a)]);}};
   line([-30,20],[-30,-10]); arc(-20,-10,180,270); line([-20,-20],[20,-20]); arc(20,-10,270,360); line([30,-10],[30,20]); return pts; }
-const PTS=flap();
+let PTS=flap();
+// 设计软件送来的这台设计（第 81 轮）：针位、每针转速 sp、工作台移动占的转角 mv、出问题的校核项 bad；没有时走示例花样
+let D=null;
 // ---------- table ----------
 const tableG=A('table',[0,0,0]);
 mesh(box(1000,30,760),tableMat,tableG,[120,-80,40]);
@@ -161,30 +176,37 @@ RAILX.forEach(x=>{mesh(box(24,16,560),std(0x8a949e,{grp:'y'}),yA,[x,-57,60]);});
 const beamG=G(); yA.add(beamG);
 const beam=mesh(box(720,26,46),std(0xb8c2cc,{grp:'y'}),beamG,[0,-36,0]);
 RAILX.forEach(x=>{mesh(box(46,20,60),std(0x5d6670,{grp:'y'}),beamG,[x,-53,0]);});
-const yMotor=mesh(rbox(70,70,90,6),dark,yA,[390,-20,380]);
+const yMotor=mesh(rbox(70,70,90,6),dark.clone(),yA,[390,-20,380]);
 mesh(cylX(14,40),std(0x9aa4ad,{grp:'y'}),yA,[340,-30,380]);
-const yBelt=mesh(box(8,4,560),beltMat,yA,[312,-44,60]);
+const yBelt=mesh(box(8,4,560),beltMat.clone(),yA,[312,-44,60]);
 // ---------- X axis: slide on the beam, belt, motor ----------
 const xA=A('x',[0,20,170]);
-const xMotor=mesh(rbox(70,70,80,6),dark,xA,[-400,-30,0]);
+const xMotor=mesh(rbox(70,70,80,6),dark.clone(),xA,[-400,-30,0]);
 mesh(cylX(14,40),std(0x9aa4ad,{grp:'x'}),xA,[-350,-30,0]);
-const xBelt=mesh(box(700,4,10),beltMat,xA,[0,-20,28]);
+const xBelt=mesh(box(700,4,10),beltMat.clone(),xA,[0,-20,28]);
 const xSlideG=G(); xA.add(xSlideG);
 mesh(box(110,30,70),std(0xe0662f,{grp:'x',metalness:0.4,roughness:0.4}),xSlideG,[0,-12,0]);
 // ---------- template + clamp frame (moves with X slide) ----------
 const tA=A('tpl',[0,70,0]);
 const frameG=G(); tA.add(frameG);
-const FW=300, FD=230;
+let FW=300, FD=230;
 const frameMat=std(0x5d6670,{grp:'tpl'});
-[[0,FD/2],[0,-FD/2]].forEach(([x,z])=>mesh(box(FW,10,16),frameMat,frameG,[x,6,z]));
-[[FW/2,0],[-FW/2,0]].forEach(([x,z])=>mesh(box(16,10,FD),frameMat,frameG,[x,6,z]));
-mesh(box(40,10,170),frameMat,frameG,[0,6,FD/2+85]);            // arm to the X slide (in front)
-const tplLow=mesh(box(FW-30,2,FD-30),tplMat,frameG,[0,-1,0]); tplLow.castShadow=false;
-const fab=mesh(box(FW-60,0.8,FD-60),fabMat,frameG,[0,0.6,0]);
-const tplUp=mesh(box(FW-30,2,FD-30),tplMat,frameG,[0,2.2,0]); tplUp.castShadow=false;
-// slot drawn as a dark tube on the top plate, seam drawn as it is sewn
-const slotPts=PTS.map(p=>new T.Vector3(p[0],3.5,-p[1]));
-mesh(new T.TubeGeometry(new T.CatmullRomCurve3(slotPts),200,3.2,8,false),std(0x1d4c9e,{grp:'tpl',metalness:0,roughness:0.6,transparent:true,opacity:0.35}),frameG);
+const slotMat=std(0x1d4c9e,{grp:'tpl',metalness:0,roughness:0.6,transparent:true,opacity:0.35});
+let frameParts=[];
+function buildFrame(){
+  frameParts.forEach(m=>{frameG.remove(m);m.geometry.dispose();}); frameParts=[];
+  const add=m=>{frameParts.push(m);return m;};
+  [[0,FD/2],[0,-FD/2]].forEach(([x,z])=>add(mesh(box(FW,10,16),frameMat,frameG,[x,6,z])));
+  [[FW/2,0],[-FW/2,0]].forEach(([x,z])=>add(mesh(box(16,10,FD),frameMat,frameG,[x,6,z])));
+  add(mesh(box(40,10,170),frameMat,frameG,[0,6,FD/2+85]));            // arm to the X slide (in front)
+  const tl=add(mesh(box(FW-30,2,FD-30),tplMat,frameG,[0,-1,0])); tl.castShadow=false;
+  add(mesh(box(FW-60,0.8,FD-60),fabMat,frameG,[0,0.6,0]));
+  const tu=add(mesh(box(FW-30,2,FD-30),tplMat,frameG,[0,2.2,0])); tu.castShadow=false;
+  // slot drawn as a dark tube on the top plate (along the pattern), seam drawn as it is sewn
+  const sp=PTS.map(p=>new T.Vector3(p[0],3.5,-p[1]));
+  if(sp.length>1)add(mesh(new T.TubeGeometry(new T.CatmullRomCurve3(sp),Math.min(2000,sp.length*4),3.2,8,false),slotMat,frameG));
+}
+buildFrame();
 const seamGeo=new T.BufferGeometry(); const seamLine=new T.Line(seamGeo,new T.LineBasicMaterial({color:0x1d4c9e})); frameG.add(seamLine);
 // pneumatic cylinders on the frame
 [[-110,-FD/2-14],[110,-FD/2-14]].forEach(([x,z])=>{ mesh(cylY(12,60),cyl,frameG,[x,40,z]); mesh(cylY(4,30),steel,frameG,[x,82,z]); });
@@ -240,13 +262,17 @@ function drawLabels(){
 const smooth=t=>t<=0?0:t>=1?1:t-Math.sin(2*Math.PI*t)/(2*Math.PI);
 function pose(){
   const f=((phi%360)+360)%360; const cycle=Math.floor(phi/360);
-  // stitch index advances once per revolution; move happens in the window LEAVE..360+ENTER
+  // 每圈一针：机针在布中（ENTER–LEAVE）模板不动；出布后从 LEAVE+MG 起，用这一针的移动转角 mv 走到下一针（第 15.3–15.4 节）
   const n=PTS.length; const base=((cycle%(n+6))+(n+6))%(n+6);
-  let i0=Math.min(base,n-1), i1=Math.min(base+1,n-1);
-  let tau=0; if(f>=LEAVE) tau=(f-LEAVE)/(360+ENTER-LEAVE); else if(f<=ENTER){ i0=Math.min(Math.max(base-1,0),n-1); i1=Math.min(base,n-1); tau=(f+360-LEAVE)/(360+ENTER-LEAVE); } else { i0=i1=Math.min(base,n-1); tau=1; }
-  if(base>=n){ i0=i1=n-1; }
+  const mvOf=k=>D&&D.mv?D.mv[Math.min(k,n-1)]:(360+ENTER-LEAVE-2*MG);
+  let i0,i1,u;
+  if(f>=LEAVE){i0=Math.min(base,n-1);i1=Math.min(base+1,n-1);u=f-LEAVE-MG;}
+  else if(f<ENTER&&base>0){i0=Math.min(base-1,n-1);i1=Math.min(base,n-1);u=f+360-LEAVE-MG;}
+  else {i0=i1=Math.min(base,n-1);u=1e9;}
+  if(base>=n){i0=i1=n-1;}
+  const mv=Math.max(1,mvOf(i1)), tau=Math.max(0,Math.min(1,u/mv));
   const s=smooth(tau); const px=PTS[i0][0]+(PTS[i1][0]-PTS[i0][0])*s, py=PTS[i0][1]+(PTS[i1][1]-PTS[i0][1])*s;
-  sIdx=Math.min(i1,n-1);
+  sIdx=i1;
   // the needle stays at x=0,z=0; the template point (px,py) must come under it
   const X=-px, Z=py;
   beamG.position.z=260+Z;
@@ -260,10 +286,40 @@ function pose(){
   hookDisc.rotation.z=-2*f*D2R;
   // seam so far
   const done=PTS.slice(0,Math.min(base+1,n)).map(p=>new T.Vector3(p[0],3.6,-p[1])); seamGeo.setFromPoints(done.length>1?done:[new T.Vector3(),new T.Vector3()]);
-  document.getElementById('r-a').textContent=Math.round(f)+'°';
-  document.getElementById('r-n').textContent=`${Math.min(base+1,n)} / ${n}`;
+  const shown=D&&D.idx?D.idx[sIdx]+1:sIdx+1, total=D&&D.N?D.N:n;
+  document.getElementById('r-a').textContent=(Math.round(f)%360)+'°';
+  document.getElementById('r-n').textContent=`${shown} / ${total}`;
   document.getElementById('r-x').textContent=px.toFixed(1); document.getElementById('r-y').textContent=py.toFixed(1);
-  document.getElementById('r-p').textContent=f>ENTER&&f<LEAVE?'机针在布中：模板静止':'机针离布：X–Y 移动';
+  document.getElementById('r-s').textContent=D&&D.sp?(D.sp[sIdx]+(D.sp[sIdx]<D.n_set-0.5?TX.of+D.n_set+TX.ofe:'')):'—';
+  document.getElementById('r-p').textContent=f>ENTER&&f<LEAVE?TX.inF:(tau>=1?TX.hold:TX.outF);
+}
+// ---------- 这台设计：出问题的部件标红（第 81 轮） ----------
+const BADM=new T.MeshStandardMaterial({color:0xd23b2b,metalness:0.3,roughness:0.45}), WARNM=new T.MeshStandardMaterial({color:0xe0a019,metalness:0.3,roughness:0.45});
+const keep=new Map();
+function partsOf(k){
+  if(k==='speed')return [nbar,needle,mpBar,mpFoot,...frameParts.filter(m=>m.material===frameMat)];   // 走不完：机针和压框（工作台带着走）
+  if(k==='margin')return [nbar,needle,mpBar,mpFoot];
+  if(k==='head')return head.children.filter(m=>m.isMesh);
+  if(k.startsWith('x_'))return [xMotor];
+  if(k.startsWith('y_'))return [yMotor];
+  if(k==='belt_x'||k==='belt_dx')return [xBelt];
+  if(k==='belt_y')return [yBelt];
+  if(k==='travel')return frameParts.filter(m=>m.material===frameMat);
+  return [];
+}
+function paintBad(){
+  keep.forEach((m,o)=>{o.material=m;}); keep.clear();
+  if(!D||!D.bad)return;
+  for(const c of D.bad.slice().reverse())for(const o of partsOf(c.key)){if(!keep.has(o))keep.set(o,o.material);o.material=c.state==='bad'?BADM:WARNM;}
+}
+function verdict(){
+  const tag=document.getElementById('vtag'), box=document.getElementById('checks');
+  if(!D){tag.textContent='';return;}
+  const nb=D.bad.filter(c=>c.state==='bad').length, nw=D.bad.length-nb, nm=c=>(document.documentElement.lang==='en'?c.en:c.zh);
+  tag.className='verdict-tag '+(nb?'bad':nw?'warn':'ok');
+  tag.textContent=nb?nm(D.bad[0])+(nb>1?TX.sep+'共 '+nb+TX.nbad:''):nw?nm(D.bad[0]):TX.ok;
+  box.innerHTML=D.bad.length?D.bad.map(c=>`<div class="${c.state}">● ${nm(c)}</div>`).join(''):`<div>${TX.ok}</div>`;
+  document.getElementById('dcard').hidden=false;
 }
 xA.children.forEach(c=>c.userData.z0=c.position.z);
 // ---------- modes ----------
@@ -273,6 +329,7 @@ function applyMode(){
   mats.forEach(m=>{const g=m.userData.grp; if((xr||mode==='explode')&&g&&GC[g]!==undefined){m.color.set(GC[g]);} else m.color.copy(m.userData.base); m.needsUpdate=true;});
   tableMat.transparent=xr; tableMat.opacity=xr?0.25:1; tableG.visible=mode!=='explode';
   document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+  paintBad();
 }
 function applyExplode(){ Object.values(asm).forEach(g=>g.position.copy(g.userData.ex).multiplyScalar(exT)); }
 // ---------- camera ----------
@@ -293,8 +350,29 @@ new ResizeObserver(resize).observe(stage); resize();
 let last=performance.now(), dirty=true, manual=false;
 // 录视频用（与 proto-lockstitch、model-overlock 相同）：__api.manual(true) 后页面不再自己走帧，由 __api.step(dt) 一帧一帧推进
 function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;if(!manual)tick(dt);requestAnimationFrame(frame);}
-function tick(dt){if(playing)phi+=speed*dt;if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
-window.__api={manual:on=>{manual=!!on;},step:dt=>tick(dt)};
+function tick(dt){if(playing){phi+=speed*dt;dirty=true;}if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
+// 设计软件（第 81 轮）：setCfg 送这台设计；出问题的那一针 = 超行程最远的一针（travel）或自身转速上限最低的一针
+function setCfg(c){
+  if(!c||!Array.isArray(c.pts)||c.pts.length<2)return;
+  const ok=a=>Array.isArray(a)&&a.length===c.pts.length&&a.every(v=>isFinite(v));
+  if(!c.pts.every(q=>Array.isArray(q)&&isFinite(q[0])&&isFinite(q[1])))return;
+  const xs=c.pts.map(q=>q[0]), ys=c.pts.map(q=>q[1]), cx=(Math.max(...xs)+Math.min(...xs))/2, cy=(Math.max(...ys)+Math.min(...ys))/2;
+  PTS=c.pts.map(q=>[q[0]-cx,q[1]-cy]);
+  D={...c,sp:ok(c.sp)?c.sp:null,mv:ok(c.mv)?c.mv:null,bad:Array.isArray(c.bad)?c.bad:[]};
+  if(isFinite(c.f1))ENTER=+c.f1; if(isFinite(c.f2))LEAVE=+c.f2; if(isFinite(c.mg))MG=+c.mg;
+  const bw=Math.max(...xs)-Math.min(...xs), bh=Math.max(...ys)-Math.min(...ys);
+  FW=Math.max(300,bw+90); FD=Math.max(230,bh+90); buildFrame(); applyMode(); verdict(); phi=0; dirty=true;
+}
+function goBad(){
+  if(!D)return;
+  const tr=D.bad.some(c=>c.key==='travel'&&c.state==='bad'); const j=Math.max(1,tr?D.far:D.worst);
+  playing=false; document.getElementById('play').textContent=TX.play;
+  phi=(j-1)*360+LEAVE+MG+(D.mv?D.mv[j]*0.5:60);
+  if(!tr&&D.bad.some(c=>['speed','margin','head'].includes(c.key))){const v=VIEWS.close;[th,ph,dist]=v;target.set(...v[3]);}   // 出在机针和窗口上：转到机针特写
+  dirty=true;
+}
+document.getElementById('gobad').onclick=goBad;
+window.__api={manual:on=>{manual=!!on;},step:dt=>tick(dt),setCfg,goBad,get D(){return D;},get phi(){return phi;}};
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;document.getElementById('ex').value=1;}if(mode!=='explode'){exT=0;document.getElementById('ex').value=0;}applyMode();applyExplode();});
 document.getElementById('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();};
 document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);});

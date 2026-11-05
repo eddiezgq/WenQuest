@@ -1,0 +1,376 @@
+"""三维模型 16-1　多头刺绣机（第 81 轮）：生成 src/{zh,en}/labs/model-embroid.html。
+
+一根横梁上排一列机头（每头一个针杆箱、几根针杆，上轴贯穿所有机头），台面下的下轴带旋梭；绷架跨过所有机头，每头一个绣框，
+X、Y 两向伺服带着走同一个花样（16.2 节）。每一针的绷架移动在针离布窗口（约 204°）里走完，摆线规律（16.3 节）。
+教材里单独打开时绣一圈示例缎纹；在缝纫机设计软件里，网关用 setCfg 送这台设计的花样记录、每针转速、所需 / 可用加速度和出问题的校核项。
+改页面时改这里，再运行：python3 textbook/web-editions/sewing/tools/make_model_embroid.py
+"""
+import json
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parents[1]
+CSS = (HERE / "src/zh/labs/model-pattern.html").read_text(encoding="utf-8")
+CSS = CSS[CSS.index("<style>"):CSS.index("</style>") + 8]
+
+T = {
+    "zh": dict(
+        lang="zh-CN", title="多头刺绣机三维样机",
+        sub="《缝纫机设计与制造》第 16 章 · 模型 16-1 · 一根上轴、一个绷架带动所有机头（结构示意，尺寸取整）",
+        hint="拖动旋转 · 滚轮或双指缩放", disp="显示", solid="外观", xray="透视", explode="爆炸", exAmt="拆开程度", labels="显示标注",
+        view="视角：", iso="斜视", front="正面", top="俯视", close="绣框特写", sew="刺绣", play="播放", pause="暂停", speed="速度",
+        vs="很慢", sl="慢", md="中", fs="快", ra="主轴转角 φ", rn="当前针", rl="针长 mm", rs="转速 r/min", rq="所需 / 可用加速度 m/s²",
+        rh="头数", inF="机针在布中：绷架静止", outF="机针离布：绷架移动", late="绷架还没停，机针已经扎下", jump="跳步：针杆停在上面，绷架走",
+        note="每一针的绷架移动都要在机针离布的窗口（约 204°）里走完（16.3 节）；针越长、转速越高、头越多（绷架越重），越难走完。",
+        card="这台设计（在设计软件里跟着参数变）", gobad="慢放到出问题的那一针", ok="能正常绣", nbad=" 项不合格", tot="共 ", sep="，",
+        parts="部件分组（爆炸图里分开）", g_head="机头：横梁、针杆箱、上轴、主电机", g_needle="针杆、机针、压脚", g_frame="绷架与绣框（布）",
+        g_x="X 轴：伺服电机、同步带", g_y="Y 轴：伺服电机、同步带、导轨", g_bed="台板、下轴与旋梭",
+        pnote="各厂结构有差别：针杆数、机头间距、绷架驱动方式各不相同，此处取一种常见方案的示意。",
+        more="共 {H} 头（画前 {h} 个）", lb=dict(beam="横梁", upper="上轴", upperS="贯穿所有机头", motor="主电机", motorS="伺服，带上轴",
+        case="针杆箱", caseS="几根针杆，换色时横移", needle="针杆与机针", foot="压脚", cone="线架", frame="绷架", frameS="跨过所有机头",
+        hoop="绣框", hoopS="每头一片布，绣同一个花样", xm="X 轴伺服电机", ym="Y 轴伺服电机", belt="同步带", hook="旋梭", hookS="在台板下",
+        lower="下轴", table="台板")),
+    "en": dict(
+        lang="en", title="Multi-Head Embroidery Machine in 3D",
+        sub="<i>Sewing Machine Design and Manufacturing</i>, Chapter 16 · Model 16-1 · One upper shaft and one frame drive all heads (schematic structure, rounded dimensions)",
+        hint="Drag to rotate · scroll or pinch to zoom", disp="Display", solid="Solid", xray="X-ray", explode="Exploded", exAmt="Explode amount",
+        labels="Show labels", view="View:", iso="Oblique", front="Front", top="Top", close="Hoop close-up", sew="Embroidery", play="Play",
+        pause="Pause", speed="Speed", vs="Very slow", sl="Slow", md="Medium", fs="Fast", ra="Main-shaft angle φ", rn="Current stitch",
+        rl="Stitch length mm", rs="Speed r/min", rq="Required / available accel. m/s²", rh="Heads", inF="Needle in fabric: frame stationary",
+        outF="Needle out of fabric: frame moving", late="Frame still moving while the needle comes down", jump="Jump: needle bar held up, frame moves",
+        note="Each stitch's frame move must finish inside the needle-out window (about 204°, Section 16.3); the longer the stitch, the higher the speed and the more heads (heavier frame), the harder it is.",
+        card="This design (follows the parameters in the design software)", gobad="Slow down at the problem stitch", ok="Embroiders normally",
+        nbad=" failing", tot="", sep=", ", parts="Part groups (separated in the exploded view)", g_head="Heads: beam, needle-bar case, upper shaft, main motor",
+        g_needle="Needle bars, needles, presser feet", g_frame="Frame and hoops (fabric)", g_x="X axis: servo motor, belt",
+        g_y="Y axis: servo motor, belt, rails", g_bed="Table, lower shaft and rotary hooks",
+        pnote="Makers differ in the number of needle bars, head spacing and frame drive; this is a schematic of one common layout.",
+        more="{H} (first {h} drawn)", lb=dict(beam="Beam", upper="Upper shaft", upperS="through all heads", motor="Main motor",
+        motorS="servo on the upper shaft", case="Needle-bar case", caseS="several bars, shifts to change colour", needle="Needle bar and needle",
+        foot="Presser foot", cone="Thread stand", frame="Frame", frameS="spans all heads", hoop="Hoops", hoopS="one piece per head, same design",
+        xm="X-axis servo motor", ym="Y-axis servo motor", belt="Timing belt", hook="Rotary hook", hookS="under the table", lower="Lower shaft",
+        table="Table")),
+}
+
+BODY = r"""
+<div class="wrap">
+<header><h1>{title}</h1><span class="sub">{sub}</span></header>
+<div class="grid">
+  <div class="stage" id="stage"><canvas id="cv"></canvas><svg class="lab" id="lab"></svg><div class="verdict-tag" id="vtag"></div><div class="hint">{hint}</div></div>
+  <div class="rail">
+    <section class="card">
+      <h3>{disp}</h3>
+      <div class="seg" id="mode"><button type="button" data-m="solid" class="on">{solid}</button><button type="button" data-m="xray">{xray}</button><button type="button" data-m="explode">{explode}</button></div>
+      <div class="row"><label for="ex">{exAmt}</label><input id="ex" type="range" min="0" max="1" step="0.01" value="0"></div>
+      <div class="row"><label><input type="checkbox" id="labels" checked> {labels}</label></div>
+      <div class="row"><span class="note">{view}</span><button type="button" data-v="iso">{iso}</button><button type="button" data-v="front">{front}</button><button type="button" data-v="top">{top}</button><button type="button" data-v="close">{close}</button></div>
+    </section>
+    <section class="card">
+      <h3>{sew}</h3>
+      <div class="row"><button id="play" type="button">{play}</button><label for="spd">{speed}</label><select id="spd"><option value="40">{vs}</option><option value="120" selected>{sl}</option><option value="400">{md}</option><option value="1200">{fs}</option></select></div>
+      <div class="read" style="margin-top:8px">
+        <div><b id="r-a">0°</b><small>{ra}</small></div>
+        <div><b id="r-n">1 / —</b><small>{rn}</small></div>
+        <div><b id="r-l">—</b><small>{rl}</small></div>
+        <div><b id="r-s">—</b><small>{rs}</small></div>
+        <div><b id="r-q">—</b><small>{rq}</small></div>
+        <div><b id="r-h">—</b><small>{rh}</small></div>
+        <div style="grid-column:1 / -1"><span class="phase" id="r-p">—</span><small style="display:block">{note}</small></div>
+      </div>
+    </section>
+    <section class="card" id="dcard" hidden>
+      <h3>{card}</h3>
+      <div class="checks" id="checks"></div>
+      <div class="row" style="margin-top:8px"><button type="button" id="gobad">{gobad}</button></div>
+    </section>
+    <section class="card">
+      <h3>{parts}</h3>
+      <div class="parts">
+        <i style="background:#e9e6dd"></i><span>{g_head}</span>
+        <i style="background:#2f6fd6"></i><span>{g_needle}</span>
+        <i style="background:#7fb3d5"></i><span>{g_frame}</span>
+        <i style="background:#e0662f"></i><span>{g_x}</span>
+        <i style="background:#2e9e5b"></i><span>{g_y}</span>
+        <i style="background:#8a949e"></i><span>{g_bed}</span>
+      </div>
+      <p class="note">{pnote}</p>
+    </section>
+  </div>
+</div>
+</div>
+"""
+
+SCRIPT = r"""
+<script src="/vendor/three/r128/three.min.js"></script><script>window.THREE||document.write('<scr'+'ipt src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></scr'+'ipt>')</script>
+<script>
+(()=>{
+const T=THREE, D2R=Math.PI/180, $=id=>document.getElementById(id);
+const TX=__TX__;
+if(location.hash==='#capture')document.body.classList.add('cap');
+if(window.self!==window.top)document.body.classList.add('emb');          // 嵌在设计软件里：不要页头
+const stage=$('stage'), cv=$('cv'), lab=$('lab');
+const renderer=new T.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.outputEncoding=T.sRGBEncoding; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+const scene=new T.Scene(); const cam=new T.PerspectiveCamera(28,16/10,10,20000);
+{ const env=new T.Scene(); const g=new T.SphereGeometry(500,32,16), col=[]; const p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const y=p.getY(i)/500;const c=y>0?0.75+0.25*y:0.45+0.3*(1+y);col.push(c,c,c*1.02);}
+  g.setAttribute('color',new T.Float32BufferAttribute(col,3)); env.add(new T.Mesh(g,new T.MeshBasicMaterial({vertexColors:true,side:T.BackSide})));
+  const pm=(w,h,x,y,z,i)=>{const m=new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({color:new T.Color(i,i,i),side:T.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);env.add(m);};
+  pm(300,120,0,420,180,3.0); pm(160,300,-420,120,120,1.6); pm(160,300,420,160,-120,1.2);
+  scene.environment=new T.PMREMGenerator(renderer).fromScene(env,0.04).texture; }
+scene.add(new T.HemisphereLight(0xffffff,0x9aa3ad,0.45));
+const sun=new T.DirectionalLight(0xffffff,1.2); sun.position.set(-600,1400,900); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-1600,right:1600,top:1000,bottom:-1000,near:100,far:4000}); sun.shadow.bias=-0.0004; scene.add(sun);
+// ---------- materials ----------
+const mats=[];
+const std=(c,o={})=>{const {grp,...rest}=o;const m=new T.MeshStandardMaterial(Object.assign({color:c,metalness:0.8,roughness:0.3},rest));m.userData={base:m.color.clone(),grp};mats.push(m);return m;};
+const housingMat=new T.MeshPhysicalMaterial({color:0xe9e6dd,metalness:0.05,roughness:0.42,clearcoat:0.6,clearcoatRoughness:0.25});
+const steel=std(0xc9d0d6), dark=std(0x2a3038,{metalness:0.6,roughness:0.45});
+const tableMat=new T.MeshStandardMaterial({color:0xcfc9ba,roughness:0.8});
+const frameMat=std(0x5d6670,{grp:'frame'}), hoopMat=std(0xd8c7a0,{grp:'frame',metalness:0.1,roughness:0.6});
+const fabMat=new T.MeshStandardMaterial({color:0xf3efe6,roughness:0.95});
+const beltMat=new T.MeshStandardMaterial({color:0x22262b,roughness:0.8});
+const xMotMat=std(0x2a3038,{grp:'x',metalness:0.6,roughness:0.45}), yMotMat=std(0x2a3038,{grp:'y',metalness:0.6,roughness:0.45});
+const needleMat=std(0x2f6fd6,{grp:'needle',metalness:0.7}), railMat=std(0x8a949e,{grp:'y'}), shaftMat=std(0xaeb7c0,{grp:'head'});
+const GC={head:0xe9e6dd,needle:0x2f6fd6,frame:0x7fb3d5,x:0xe0662f,y:0x2e9e5b,bed:0x8a949e};
+const PAL=[0x2d6fb3,0x2e9e6a,0xc77d1a,0x7b4fb3,0x1a9aa8,0xb34f7b,0x5a6b2e,0x8a5a2e];
+const hookMat=std(0xc9d0d6,{grp:'bed'}), coneMats=PAL.map(c=>new T.MeshStandardMaterial({color:c,roughness:0.8}));   // 共用，重建时不再新建
+const G=()=>new T.Group();
+function mesh(geo,mat,parent,pos,rot){const m=new T.Mesh(geo,mat);m.castShadow=true;m.receiveShadow=true;if(pos)m.position.set(...pos);if(rot)m.rotation.set(...rot);parent.add(m);return m;}
+const box=(x,y,z)=>new T.BoxGeometry(x,y,z);
+const cylX=(r,l,s=32)=>{const g=new T.CylinderGeometry(r,r,l,s);g.rotateZ(Math.PI/2);return g;};
+const cylY=(r,l,s=32)=>new T.CylinderGeometry(r,r,l,s);
+const cylZ=(r,l,s=32)=>{const g=new T.CylinderGeometry(r,r,l,s);g.rotateX(Math.PI/2);return g;};
+function rbox(w,h,d,r){const s=new T.Shape();const x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);
+  const b=Math.min(r,4);const g=new T.ExtrudeGeometry(s,{depth:d-2*b,bevelEnabled:true,bevelSize:b,bevelThickness:b,bevelSegments:3,curveSegments:8});g.translate(0,0,-(d-2*b)/2);return g;}
+const root=G(); scene.add(root); const asm={};
+function A(name,ex){const g=G();g.userData.ex=new T.Vector3(...ex);root.add(g);asm[name]=g;return g;}
+// ---------- the design track ----------
+// 示例（教材里单独打开）：一圈缎纹，针长 6 mm，650 r/min，6 头
+function demo(){const pts=[],L=[],kind=[];let k=0;for(let i=0;i<=220;i++){const a=i/220*2*Math.PI,r=25+(i%2?3:-3);pts.push([r*Math.cos(a),r*Math.sin(a)]);L.push(i?6:0);kind.push('s');}
+  return {n:pts.length,N:pts.length,pts,kind:kind.join(''),sp:pts.map(()=>650),L,acc:pts.map((_,i)=>i?0.62:0),col:pts.map((_,i)=>i<110?0:1),H:6,W:204,n_set:650,am:22.1,worst:1,bad:[],demo:true};}
+// 示例的数按 16.3 节算：6 头折算 34 kg，(800 − 50) / 34 = 22.1 m/s²；6 mm、650 r/min 要 13.8 m/s²，比值 0.62
+let D=demo(); let HV=6;                                      // 画几个机头（最多 8 个）
+const PITCH=420;                                             // 机头间距（示意）
+// ---------- table + bed (lower shaft, hooks) ----------
+const tableG=A('table',[0,-200,0]);
+const bedA=A('bed',[0,-120,0]);
+const tableTop=mesh(box(1,40,900),tableMat,tableG,[0,-40,60]);
+const lowerShaft=mesh(cylX(9,1),shaftMat,bedA,[0,-70,-20]);
+let hooks=[];
+// ---------- beam + heads ----------
+const headA=A('head',[0,360,-120]);
+const beam=mesh(rbox(1,120,160,16),housingMat,headA,[0,430,-150]);
+const upperShaft=mesh(cylX(10,1),shaftMat,headA,[0,430,-150]);
+const mainMotor=mesh(cylX(60,140),dark,headA,[0,430,-150]);
+let heads=[];
+// ---------- needles (per head; move with the shaft angle) ----------
+const needleA=A('needle',[0,200,0]);
+// ---------- frame (spans all heads) + hoops ----------
+const frameA=A('frame',[0,60,240]);
+const frameG=G(); frameA.add(frameG);
+let frameParts=[], hoopParts=[], seams=[];
+// ---------- X, Y drives ----------
+const xA=A('x',[-200,0,0]), yA=A('y',[0,0,320]); const xG=G(), yG=G(); xA.add(xG); yA.add(yG);   // 组的位置给爆炸用，摆位放在里层
+const xMotor=mesh(rbox(80,80,90,6),xMotMat,xG,[0,40,0]); const xBelt=mesh(box(1,4,10),beltMat.clone(),xG,[0,20,0]);
+const yMotor=mesh(rbox(80,80,90,6),yMotMat,yG,[0,40,0]); const yBelt=mesh(box(8,4,600),beltMat.clone(),yG,[0,20,0]);
+let rails=[];
+const segGeo=new T.BufferGeometry(); let segPrefix=[];      // 已绣的针迹（每头的绣框共用一份几何）
+const markerMat=new T.MeshBasicMaterial({color:0xd23b2b}); let markers=[];
+function build(){
+  // 重建跟头数、花样大小有关的部分
+  const dispose=a=>{a.forEach(m=>{m.parent&&m.parent.remove(m);m.traverse&&m.traverse(c=>{if(c.geometry&&c.geometry!==segGeo)c.geometry.dispose();});});a.length=0;};
+  dispose(heads); dispose(hooks); dispose(frameParts); dispose(hoopParts); dispose(rails); dispose(markers); seams.length=0;
+  HV=Math.max(1,Math.min(8,D.H|0||1));
+  const span=(HV-1)*PITCH, Lb=span+700;
+  const xs=[...Array(HV)].map((_,i)=>i*PITCH-span/2);
+  tableTop.scale.x=Lb+500; lowerShaft.scale.x=Lb; beam.geometry.dispose(); beam.geometry=rbox(Lb,120,160,16); upperShaft.scale.x=Lb+40;
+  mainMotor.position.x=Lb/2+80;
+  const hw=Math.max(150,Math.min(400,Math.max(D.w||0,D.h||0)+80));       // 绣框直径：花样 + 余量
+  xs.forEach(x=>{
+    const h=G(); headA.add(h); h.position.x=x; heads.push(h);
+    mesh(rbox(150,260,190,14),housingMat,h,[0,300,-10]);                 // head body
+    mesh(rbox(170,120,70,10),housingMat,h,[0,250,95]);                    // needle-bar case (front)
+    for(let k=0;k<6;k++)mesh(cylY(3,90,12),steel,h,[-50+k*20,250,132]);  // needle bars (idle)
+    const stand=G(); h.add(stand); stand.position.set(0,470,-20);
+    mesh(box(150,6,60),dark,stand,[0,0,0]);
+    for(let k=0;k<6;k++)mesh(new T.CylinderGeometry(8,14,46,16),coneMats[k%coneMats.length],stand,[-62+k*25,26,0]);
+    const nb=G(); needleA.add(nb); nb.position.x=x; heads.push(nb);
+    nb.userData.bar=mesh(cylY(4.5,150,16),needleMat,nb,[10,0,132]);
+    nb.userData.needle=mesh(new T.CylinderGeometry(0.9,0.6,36,12),steel,nb,[10,0,132]);
+    nb.userData.foot=mesh(new T.TorusGeometry(6,1.8,10,24),needleMat,nb,[10,0,132],[Math.PI/2,0,0]);
+    const hk=mesh(new T.CylinderGeometry(24,24,10,40),hookMat,bedA,[x+10,-20,132],[Math.PI/2,0,0]); hooks.push(hk);
+  });
+  // frame: two long bars + cross bars, a hoop per head
+  const FL=span+hw+200, FD=hw+140;
+  const add=(m,arr)=>{arr.push(m);return m;};
+  [[0,FD/2],[0,-FD/2]].forEach(([x,z])=>add(mesh(box(FL,24,30),frameMat,frameG,[x,0,132+z]),frameParts));       // 绣框中心在 z = 132（机针下）
+  [[FL/2,0],[-FL/2,0]].forEach(([x,z])=>add(mesh(box(30,24,FD),frameMat,frameG,[x,0,132+z]),frameParts));
+  xs.forEach((x,i)=>{
+    const hp=add(mesh(new T.TorusGeometry(hw/2,6,10,64),hoopMat,frameG,[x+10,8,132],[Math.PI/2,0,0]),hoopParts);
+    add(mesh(new T.CircleGeometry(hw/2-2,64),fabMat,frameG,[x+10,6,132],[-Math.PI/2,0,0]),hoopParts).castShadow=false;
+    const sm=new T.LineSegments(segGeo,new T.LineBasicMaterial({vertexColors:true})); sm.position.set(x+10,7,132); frameG.add(sm); hoopParts.push(sm); seams.push(sm);
+    if(i===0){const mk=new T.Mesh(new T.SphereGeometry(2.4,12,8),markerMat); mk.visible=false; frameG.add(mk); markers.push(mk); mk.userData.x0=x+10;}
+  });
+  // drives
+  xG.position.set(-FL/2-120,0,132); xBelt.scale.x=FL; xBelt.position.set(FL/2+60,20,-FD/2-60);          // 同步带在绷架后面，不挡绣框
+  yG.position.set(FL/2+160,0,0);
+  [-FL/2-60,FL/2+60].forEach(x=>add(mesh(box(26,16,FD+500),railMat,frameA,[x,-30,132]),rails));
+  // stitched seam geometry: segments for stitch records, colour per record
+  const pos=[],col=[]; segPrefix=[0]; const c=new T.Color();
+  for(let i=1;i<D.n;i++){
+    if(D.kind[i]==='s'&&D.kind[i-1]==='s'&&!(D.up&&D.up[i])){   /* 跳步、换色之后（或抽样跳过了它们）不画线 */const a=D.pts[i-1],b=D.pts[i];pos.push(a[0],0,-a[1],b[0],0,-b[1]);c.set(PAL[(D.col?D.col[i]:0)%PAL.length]);col.push(c.r,c.g,c.b,c.r,c.g,c.b);}
+    segPrefix.push(pos.length/6);
+  }
+  segGeo.setAttribute('position',new T.Float32BufferAttribute(pos,3)); segGeo.setAttribute('color',new T.Float32BufferAttribute(col,3)); segGeo.setDrawRange(0,0);
+  $('r-h').textContent=D.H>HV?TX.more.replace('{H}',D.H).replace('{h}',HV):String(D.H);
+  dirty=true;
+}
+// ---------- labels ----------
+const wp=(g,x,y,z)=>g.localToWorld(new T.Vector3(x,y,z));
+const LB=TX.lb;
+const LABELS=[
+ [LB.beam,'',()=>wp(headA,0,490,-150),['solid','explode'],[-60,-80]],
+ [LB.upper,LB.upperS,()=>wp(headA,heads[0]?heads[0].position.x-120:0,430,-150),['xray','explode'],[-160,-60]],
+ [LB.motor,LB.motorS,()=>mainMotor.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[60,-80]],
+ [LB.case,LB.caseS,()=>wp(heads[0]||headA,0,300,130),['solid','xray','explode'],[-170,-40]],
+ [LB.cone,'',()=>wp(heads[0]||headA,0,500,-20),['solid','explode'],[-140,-40]],
+ [LB.needle,'',()=>needleA.children[0]?wp(needleA.children[0],10,40,132):new T.Vector3(),['xray','explode'],[-170,10]],
+ [LB.frame,LB.frameS,()=>frameParts[0]?frameParts[0].getWorldPosition(new T.Vector3()):new T.Vector3(),['solid','xray','explode'],[160,110]],
+ [LB.hoop,LB.hoopS,()=>hoopParts[0]?hoopParts[0].getWorldPosition(new T.Vector3()).add(new T.Vector3(0,10,80)):new T.Vector3(),['solid','xray','explode'],[-180,120]],
+ [LB.xm,'',()=>xMotor.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[-120,-70]],
+ [LB.ym,'',()=>yMotor.getWorldPosition(new T.Vector3()),['solid','xray','explode'],[110,-70]],
+ [LB.belt,'',()=>wp(yG,0,20,200),['xray','explode'],[90,60]],
+ [LB.hook,LB.hookS,()=>hooks[0]?hooks[0].getWorldPosition(new T.Vector3()):new T.Vector3(),['xray','explode'],[-150,90]],
+ [LB.lower,'',()=>wp(bedA,0,-70,-20),['xray','explode'],[120,90]],
+];
+let mode='solid', exT=0, playing=false, speed=120, phi=0, dirty=true;
+function drawLabels(){
+  lab.innerHTML=''; if(!$('labels').checked) return;
+  const W=stage.clientWidth,H=stage.clientHeight; const k=document.body.classList.contains('cap')?W/1100:Math.min(1,W/900); let out='';
+  for(const [t,s,get,modes,off] of LABELS){ if(!modes.includes(mode)) continue; const p=get().project(cam); if(p.z>1) continue;
+    const x=(p.x+1)/2*W, y=(1-p.y)/2*H, lx=x+off[0]*k, ly=y+off[1]*k; const anchor=off[0]<-20?'end':off[0]>20?'start':'middle'; const fs=Math.max(11,15*k);
+    out+=`<circle cx="${x}" cy="${y}" r="3" fill="#1d2a36"/><path d="M${x} ${y}L${lx} ${ly}" stroke="#1d2a36" stroke-width="1" fill="none"/>`;
+    const tx=lx+(anchor==='start'?4:anchor==='end'?-4:0), ty=ly+(off[1]<0?-6:fs+2);
+    out+=`<text x="${tx}" y="${ty}" font-size="${fs}" font-weight="700" fill="#1d2a36" text-anchor="${anchor}">${t}</text>`;
+    if(s) out+=`<text x="${tx}" y="${ty+(off[1]<0?-fs-2:fs+2)}" font-size="${fs*0.8}" fill="#4d5b6a" text-anchor="${anchor}">${s}</text>`; }
+  lab.innerHTML=out;
+}
+// ---------- motion ----------
+// 针杆：曲柄滑块（同第 3 章，行程 31 mm）；针离布窗口按 W°（约 204°）以上止点为中心；绷架在窗口里按摆线规律走完一针。
+// 一针所需时间 ∝ √(所需加速度 / 可用加速度)：比值 > 1 时走不完，绷架在机针扎下后还在动（标红）。
+const R0=15.5, LR=55, LAM=R0/LR; const xN=f=>{const p=f*D2R;return R0*(1-Math.cos(p))-LR*(1-Math.sqrt(1-LAM*LAM*Math.sin(p)**2));};
+const cyc=t=>t<=0?0:t>=1?1:t-Math.sin(2*Math.PI*t)/(2*Math.PI);
+function pose(){
+  const f=((phi%360)+360)%360, cycle=Math.floor(phi/360), n=D.n;
+  const base=((cycle%(n+4))+(n+4))%(n+4), W=D.W||204, ws=360-W/2;   // 窗口从 360 − W/2 开始，跨过上止点
+  // 这一圈的移动：到第 base+1 条记录；走的转角 = W × √(所需 / 可用)
+  let i0,i1,u;
+  if(f>=ws){i0=Math.min(base,n-1);i1=Math.min(base+1,n-1);u=f-ws;}
+  else {i0=Math.min(Math.max(base-1,0),n-1);i1=Math.min(base,n-1);u=f+360-ws;}
+  if(base>=n){i0=i1=n-1;}
+  const need=W*Math.sqrt(Math.max(1,D.acc?D.acc[i1]||0:0)), tau=Math.max(0,Math.min(1,u/need));
+  const s=cyc(tau), px=D.pts[i0][0]+(D.pts[i1][0]-D.pts[i0][0])*s, py=D.pts[i0][1]+(D.pts[i1][1]-D.pts[i0][1])*s;
+  frameG.position.set(-px,0,py);
+  const jump=D.kind[i1]==='j'||D.kind[i1]==='c';
+  const tipY=(jump?18:18-xN(f));                               // 针尖离布面（mm）；跳步时针杆停在上面
+  needleA.children.forEach(nb=>{nb.userData.needle.position.y=tipY+18;nb.userData.bar.position.y=tipY+36+75;nb.userData.foot.position.y=Math.max(4,tipY+5);});
+  hooks.forEach(h=>h.rotation.y=-2*f*D2R);
+  segGeo.setDrawRange(0,2*(segPrefix[Math.min(base,n-1)]||0));
+  const inF=!jump&&f>W/2&&f<360-W/2, late=inF&&tau<1;                  // 针在布中 = 窗口以外（16.3 节，同计算核心的 timing）
+  const sp=D.sp[i1]; $('r-a').textContent=(Math.round(f)%360)+'°';
+  $('r-n').textContent=`${(D.idx?D.idx[i1]:i1)+1} / ${D.N||n}`; $('r-l').textContent=(D.L?D.L[i1]:0).toFixed(1);
+  $('r-s').textContent=sp+(sp<D.n_set-0.5?` / ${D.n_set}`:''); $('r-q').textContent=D.am?`${((D.acc[i1]||0)*D.am).toFixed(1)} / ${D.am.toFixed(1)}`:'—';
+  const ph=$('r-p'); ph.textContent=jump?TX.jump:late?TX.late:inF?TX.inF:TX.outF; ph.style.color=late?'#c0392b':'';
+  needleMat.color.copy(late?new T.Color(0xd23b2b):(mode==='solid'?needleMat.userData.base:new T.Color(GC.needle)));
+  if(markers[0]){const w=probIdx(), bad=D.bad&&D.bad.some(c=>(c.key==='accel'||c.key==='dst')&&c.state==='bad'); markers[0].visible=!!bad; if(bad){markers[0].position.set(markers[0].userData.x0+D.pts[w][0],9,132-D.pts[w][1]);}}
+}
+// ---------- 出问题的部件标红 ----------
+const RED=new T.Color(0xd23b2b), AMB=new T.Color(0xe0a019);
+function matsOf(k){ if(k==='accel')return [frameMat]; if(k==='head')return [housingMat]; if(k==='dst'||k==='travel')return [hoopMat]; return []; }
+function paintBad(){ housingMat.color.set(0xe9e6dd); if(!D.bad)return; for(const c of D.bad.slice().reverse())for(const m of matsOf(c.key))m.color.copy(c.state==='bad'?RED:AMB); }
+function verdict(){
+  const tag=$('vtag'), box_=$('checks');
+  if(D.demo){tag.textContent='';$('dcard').hidden=true;return;}
+  const nb=D.bad.filter(c=>c.state==='bad').length, nw=D.bad.length-nb, nm=c=>(document.documentElement.lang==='en'?c.en:c.zh);
+  tag.className='verdict-tag '+(nb?'bad':nw?'warn':'ok');
+  tag.textContent=nb?nm(D.bad[0])+(nb>1?TX.sep+TX.tot+nb+TX.nbad:''):nw?nm(D.bad[0]):TX.ok;
+  box_.innerHTML=D.bad.length?D.bad.map(c=>`<div class="${c.state}">● ${nm(c)}</div>`).join(''):`<div>${TX.ok}</div>`;
+  $('dcard').hidden=false;
+}
+// ---------- modes ----------
+function applyMode(){
+  const xr=mode==='xray';
+  housingMat.transparent=xr; housingMat.opacity=xr?0.15:1; housingMat.depthWrite=!xr; housingMat.needsUpdate=true;
+  mats.forEach(m=>{const g=m.userData.grp; if((xr||mode==='explode')&&g&&GC[g]!==undefined){m.color.set(GC[g]);} else m.color.copy(m.userData.base); m.needsUpdate=true;});
+  tableMat.transparent=xr; tableMat.opacity=xr?0.25:1; tableG.visible=mode!=='explode';
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+  paintBad();
+}
+function applyExplode(){ Object.values(asm).forEach(g=>g.position.copy(g.userData.ex).multiplyScalar(exT)); }
+// ---------- camera ----------
+const target=new T.Vector3(0,150,60); let th=-0.55, ph=0.42, dist=3600;
+const VIEWS={iso:[-0.55,0.42,3600,[0,150,60]],front:[0,0.15,3400,[0,180,60]],top:[0,1.35,3400,[0,0,132]],close:[-0.45,0.75,900,[0,20,132]]};
+function fit(){ const k=Math.max(1,(HV-1)*PITCH/1600); VIEWS.iso[2]=2600*k+800; VIEWS.front[2]=2400*k+800; VIEWS.top[2]=2400*k+800;
+  const c=heads[0]?heads[0].position.x+10:0; VIEWS.close[3]=[c,20,132]; }
+function placeCam(){cam.position.set(target.x+dist*Math.cos(ph)*Math.sin(th),target.y+dist*Math.sin(ph),target.z+dist*Math.cos(ph)*Math.cos(th));cam.lookAt(target);}
+let drag=null;
+stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,th,ph};stage.setPointerCapture(e.pointerId);});
+stage.addEventListener('pointermove',e=>{if(!drag)return;th=drag.th-(e.clientX-drag.x)*0.006;ph=Math.max(-0.2,Math.min(1.45,drag.ph+(e.clientY-drag.y)*0.005));dirty=true;});
+stage.addEventListener('pointerup',()=>drag=null);
+stage.addEventListener('wheel',e=>{e.preventDefault();dist=Math.max(250,Math.min(9000,dist*(1+e.deltaY*0.001)));dirty=true;},{passive:false});
+let pinch=null;
+stage.addEventListener('touchstart',e=>{if(e.touches.length===2)pinch={d:Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY),dist};},{passive:true});
+stage.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);dist=Math.max(250,Math.min(9000,pinch.dist*pinch.d/d));dirty=true;}},{passive:true});
+stage.addEventListener('touchend',()=>pinch=null);
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();dirty=true;}
+new ResizeObserver(resize).observe(stage); resize();
+let last=performance.now(), manual=false;
+function frame(t){const dt=Math.min(0.1,(t-last)/1000);last=t;try{if(!manual)tick(dt);}finally{requestAnimationFrame(frame);}}
+function tick(dt){if(playing){phi+=speed*dt;dirty=true;}if(!window.__still||dirty){pose();placeCam();renderer.render(scene,cam);drawLabels();dirty=false;}}
+// 设计软件（第 81 轮）：setCfg 送这台设计的花样记录、每针转速、所需 / 可用加速度、头数、出问题的校核项
+function setCfg(c){
+  if(!c||!(c.n>1)||!Array.isArray(c.pts)||c.pts.length!==c.n||typeof c.kind!=='string'||c.kind.length!==c.n)return;
+  const ok=a=>Array.isArray(a)&&a.length===c.n&&a.every(v=>isFinite(v));
+  if(!c.pts.every(q=>Array.isArray(q)&&isFinite(q[0])&&isFinite(q[1]))||!ok(c.sp)||!ok(c.acc))return;
+  D={...c,L:ok(c.L)?c.L:c.pts.map(()=>0),col:ok(c.col)?c.col:c.pts.map(()=>0),up:ok(c.up)?c.up:null,bad:Array.isArray(c.bad)?c.bad:[],demo:false};
+  build(); fit(); applyMode(); verdict(); phi=0; dirty=true;
+}
+function probIdx(){ return D.bad&&D.bad.some(c=>c.key==='dst'&&c.state==='bad')&&D.over!=null?D.over:(D.worst|0); }   // 超 DST 上限的那一针，否则所需加速度最大的那一针
+function goBad(){ if(D.demo)return; const j=Math.max(1,probIdx()); playing=false; $('play').textContent=TX.play;
+  phi=j*360+135;  /* 机针已扎进布（约 135°）：走不完时绷架还在动 */ const v=VIEWS.close; [th,ph,dist]=v; target.set(...v[3]); target.x+=0; dirty=true; }
+$('gobad').onclick=goBad;
+window.__api={manual:on=>{manual=!!on;},step:dt=>tick(dt),setCfg,goBad,get D(){return D;},get phi(){return phi;}};
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;if(mode==='explode'&&exT<0.5){exT=1;$('ex').value=1;}if(mode!=='explode'){exT=0;$('ex').value=0;}applyMode();applyExplode();dirty=true;});
+$('ex').oninput=e=>{exT=+e.target.value;if(exT>0&&mode==='solid')mode='explode';applyMode();applyExplode();dirty=true;};
+document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>{const v=VIEWS[b.dataset.v];[th,ph,dist]=v;target.set(...v[3]);dirty=true;});
+$('play').onclick=e=>{playing=!playing;e.target.textContent=playing?TX.pause:TX.play;};
+$('spd').onchange=e=>speed=+e.target.value;
+$('labels').onchange=()=>{dirty=true;};
+window.__set=(o)=>{if('mode' in o)mode=o.mode;if('ex' in o)exT=o.ex;if('view' in o){const v=VIEWS[o.view];[th,ph,dist]=v;target.set(...v[3]);}if('cam' in o){[th,ph,dist]=o.cam;}if('target' in o)target.set(...o.target);if('phi' in o)phi=o.phi;if('labels' in o)$('labels').checked=o.labels;applyMode();applyExplode();dirty=true;};
+build(); fit(); applyMode(); applyExplode(); verdict(); requestAnimationFrame(frame);
+})();
+</script>
+<a href="../index.html" style="position:fixed;right:12px;bottom:12px;z-index:99;font:13px system-ui,sans-serif;background:rgba(20,30,40,.78);color:#fff;padding:6px 10px;border-radius:6px;text-decoration:none">__BACK__</a>
+</body>
+</html>
+"""
+
+
+def main():
+    for lang, t in T.items():
+        head = (f'<!doctype html>\n<html lang="{t["lang"]}">\n<head>\n<meta charset="utf-8">\n'
+                '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n</head>\n<body>\n'
+                f'<title>{t["title"]}</title>\n'
+                '<link rel="stylesheet" href="/vendor/fonts/noto-sans-sc.css"><link rel="stylesheet" href="/vendor/fonts/jetbrains-mono.css">\n')
+        body = BODY.format(**{k: v for k, v in t.items() if isinstance(v, str)})
+        tx = {k: t[k] for k in ("play", "pause", "inF", "outF", "late", "jump", "ok", "nbad", "tot", "sep", "more")}
+        tx["lb"] = t["lb"]
+        script = SCRIPT.replace("__TX__", json.dumps(tx, ensure_ascii=False)).replace("__BACK__", "返回教材" if lang == "zh" else "Back to the book")
+        out = head + CSS + body + script
+        (HERE / f"src/{lang}/labs/model-embroid.html").write_text(out, encoding="utf-8")
+    print("ok")
+
+
+if __name__ == "__main__":
+    main()

@@ -14,7 +14,7 @@ import hashlib
 import math
 
 from . import stitchfile as SF
-from .common import Checks, line_chart, make_params, result
+from .common import Checks, flagged, thin, line_chart, make_params, result
 
 MACHINE = "embroid"
 NAME = ("多头刺绣机", "Multi-head Embroidery")
@@ -455,7 +455,8 @@ def analyze(params=None, trial=True):
                                     ("平均转速 r/min", "Average speed r/min"), ("用时 min", "Time min"), ("占用时", "Share of time")], rows=rows))
     out = dict(version=VERSION, machine=MACHINE, params={k: v for k, v in p.items() if k not in ("dst", "pts")}, checks=list(ch), ok=not any(c["state"] == "bad" for c in ch),
                results=results, charts=charts, timing=timing, parts=parts(p), card=adjust_card(dict(p, s=s)), tables=tables, production=PR,
-               view=dict(page="embroid", sync="A", cfg=dict(H=H, F=p["F"], s=s, n=n)))
+               view=dict(page="model-embroid", sync="setCfg", cfg=proto(p, PL, list(ch), am),
+                         alt=dict(page="embroid", sync="A", cfg=dict(H=H, F=p["F"], s=s, n=n))))
     if PL is not None:
         out["design"] = dict(stitches=N, jumps=st["jumps"], colors=colors, s_max=round(s, 2), w=round(st["w"], 1), h=round(st["h"], 1),
                              avg=round(PL["avg"]), t_sew=round(PL["t_sew"], 1), fname=p.get("fname", ""))
@@ -481,3 +482,51 @@ def adjust_card(params=None):
         dict(zh="线、针、张力", en="Thread, needle, tension", do_zh="某个头经常断线，先查这个头的线路、张力和针，再查断线检测器。",
              do_en="If one head breaks often, check its thread path, tension and needle first, then the break detector."),
     ]
+
+
+def proto(p, PL, checks, am):
+    """样机（三维模型 16-1）跟这台设计走（第 81 轮）：每条记录（针 s / 跳步 j / 换色 c）的绝对位置（mm）、转速、所需加速度 / 可用加速度、颜色号。
+    有花样文件：就是文件里的记录、前瞻后的每针转速。没有文件（手填）：按手填的最长针长画一段缎纹（宽 = 最长针），整段用一个转速
+    （设计转速；走不完的针所需加速度大于可用加速度，样机里标红）。“出问题的那一针”= 所需加速度最大的那一针。针太多时等间隔抽样（那一针留着）。"""
+    W = p["W"]
+    if PL is not None:
+        recs = design_file(p)[0]
+        rows, j = [], 0
+        x = y = 0.0
+        col = 0
+        for dx, dy, k in recs:
+            x, y = x + dx, y + dy
+            if k == "c" and dx == 0 and dy == 0:
+                col += 1
+                continue
+            sp = max(PL["sp"][j], 1.0)
+            L_ = PL["s"][j]
+            rows.append((x, y, k, sp, L_, a_req(L_, sp, W) if L_ > 0 and k == "s" else 0.0, col, max(abs(dx), abs(dy))))
+            if k == "c":
+                col += 1
+            j += 1
+    else:
+        s_ = p["s"]
+        n_ = p["n"]                                    # 手填：按设计转速走（同校核“最长针在窗口里走得完”：走不完时所需加速度 > 可用，那一针标红）
+        rows = []
+        for i in range(120):                          # 一段缎纹：横着来回 s，往前走 0.4 mm
+            x, y = (s_ / 2 if i % 2 else -s_ / 2), i * 0.4 - 24
+            rows.append((x, y, "s", n_, s_ if i else 0.0, a_req(s_, n_, W) if i else 0.0, 0, s_ if i else 0.0))
+    N = len(rows)
+    worst = max(range(N), key=lambda i: rows[i][5]) if N else 0
+    over = next((i for i in range(N) if rows[i][7] > DST_MAX + 1e-9), None)        # 第一条超过 DST 记录上限的移动
+    keep = thin(N, keep=tuple(i for i in (worst, over) if i is not None))
+    # 抽样后两条留下的记录之间如果跳过了跳步或换色，这一段不画线（“抬笔”），免得线横穿绣框
+    up, prev = [], -1
+    for i in keep:
+        up.append(1 if any(rows[q][2] != "s" for q in range(prev + 1, i)) else 0)
+        prev = i
+    xs, ys = [r[0] for r in rows], [r[1] for r in rows]
+    cx, cy = ((max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2) if N else (0, 0)
+    return dict(n=len(keep), N=N, idx=keep, pts=[[round(rows[i][0] - cx, 2), round(rows[i][1] - cy, 2)] for i in keep],
+                kind="".join(rows[i][2] for i in keep), sp=[round(rows[i][3]) for i in keep], L=[round(rows[i][4], 2) for i in keep],
+                acc=[round(rows[i][5] / am, 3) if am > 0 else 99 for i in keep], col=[rows[i][6] for i in keep], up=up,
+                over=keep.index(over) if over is not None else None,
+                w=round(max(xs) - min(xs), 1) if N else 0, h=round(max(ys) - min(ys), 1) if N else 0,
+                H=int(p["H"]), W=W, n_set=p["n"], n_head=p["n_head"], am=round(am, 2), stx=p["stx"], sty=p["sty"],
+                dst_max=DST_MAX, worst=keep.index(worst) if N else 0, file=PL is not None, bad=flagged(checks))

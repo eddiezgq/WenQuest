@@ -105,6 +105,8 @@ def test_proto_page_served_from_web_edition(client, tmp_path):  # noqa: F811
     assert r.status_code == 200 and "proto" in r.text and "frame-ancestors 'self'" in r.headers["content-security-policy"]
     (d / "model-cover.html").write_text("<html>cover</html>", encoding="utf-8")         # 第 73 轮：绷缝机三维样机
     assert "cover" in client.get("/api/v1/sewing/proto?page=model-cover").text
+    (d / "model-embroid.html").write_text("<html>embroid</html>", encoding="utf-8")     # 第 81 轮：刺绣机三维样机
+    assert "embroid" in client.get("/api/v1/sewing/proto?page=model-embroid").text
 
 
 def test_bad_input_is_cleaned(client):  # noqa: F811
@@ -154,7 +156,8 @@ def test_machines_pattern_and_embroid(sc, tmp_path):
     assert r["params"]["pts"][4] == [19.0, 0.0] and r["view"]["page"] == "model-pattern"
     assert next(c for c in r["charts"] if c["key"] == "speed")["xr"][1] == 6
     r = client.post("/api/v1/sewing/analyze", json={"machine": "embroid", "params": {"n": 800}}).json()
-    assert r["view"] == {"page": "embroid", "sync": "A", "cfg": {"H": 8, "F": 800, "s": 7.0, "n": 800}} and not r["ok"]
+    assert r["view"]["alt"] == {"page": "embroid", "sync": "A", "cfg": {"H": 8, "F": 800, "s": 7.0, "n": 800}} and not r["ok"]
+    assert r["view"]["page"] == "model-embroid" and r["view"]["cfg"]["bad"][0]["key"] == "accel"
     admin = login(client)
     p = client.post("/api/v1/sewing/projects", json={"name": "PT-1", "machine": "pattern", "params": {"pat": "csv", "pts": csv}}, headers=admin).json()
     assert p["machine"] == "pattern" and p["params"]["pts"][4] == [19.0, 0.0]

@@ -805,6 +805,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li><strong>换电机</strong>：Y 轴换成伺服 1.5 kW（伺服电机选型按 1.2 倍余量推荐的）。</li>
 <li><strong>不换电机，换带轮</strong>（本例）：原来的 750 W 伺服接着用。注意校核按额定转矩算（不加余量），均方根离额定只剩 7%；伺服电机选型按 1.2 倍余量仍会推荐伺服 1.5 kW。X 轴也一样：原来的电机均方根离额定只剩 4%，加 1.2 倍余量选型也会推荐大一号。夏天车间温度高、连续三班的，两轴都选换电机。</li>
 </ul>
+<p><strong>在样机里看</strong>：设计转速 2000 时打开“样机”页签，模型 15-1 按这个花样走，右上角写着“设计转速下标准针距走得完……”不合格；点“慢放到出问题的那一针”，停在最紧的那一针，读数里“这一针转速”比设计转速低（前瞻调速把它降下来了）。换成小带轮以后再看，判定变成“能正常缝制”。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-81-pt-proto.jpg" alt="花样机 2000 r/min：样机标红，慢放到最紧的那一针"><figcaption>花样机 2000 r/min：样机标红，慢放到最紧的那一针</figcaption></figure>
 <a class="try" href="/pages/sewing/sewing?machine=pattern&amp;tab=checks&amp;p=%7B%22n%22%3A2000%2C%22ay%22%3A50%2C%22ry%22%3A8%7D" target="_blank" rel="noopener">▶ 试一试：花样机 2000 r/min、Y 加速度 50、带轮 8 mm（全部合格）</a>
 <h3 id="case-pt-output">第三步　能多出几件？</h3>
 <table>
@@ -866,6 +868,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ol>
 
 <a class="try" href="/pages/sewing/sewing?machine=flatknit&amp;tab=checks&amp;p=%7B%22E%22%3A18%7D" target="_blank" rel="noopener">▶ 试一试：E18 横机：选针器跟不上</a>
+<p><strong>在样机里看</strong>：E18 时打开“样机”页签，模型 17-1 照这张意匠图一趟一趟走，电磁选针器标红；点“慢放到出问题的那一趟”，停在最宽、最快的那一趟，读数里有这一趟的机头速度、用时和累计用时。翻针趟里后针床会横移（摇床）；摇床量加大到走不完时，后针床标红。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-81-fk-proto.jpg" alt="E18：选针器标红，机头在最宽的那一趟"><figcaption>E18：选针器标红，机头在最宽的那一趟</figcaption></figure>
 <h3 id="case-fk-pass">第三步　一趟的时间花在哪</h3>
 <p>“时序与曲线”页签的“机头一趟的时间分配”画的是最宽的一趟（行程 802 mm；所有趟平均 0.84 秒），真正在织物上选针、编织的只占 <b>50%</b>，其余是加速、减速、走换向余量和换向停顿（摇床、换纱嘴）。“固定提前量”要求机头在经过第一枚针之前就到全速，所以两端各要留 v²/(2a) = 72 mm 的换向余量。</p>
 <h3 id="case-fk-options">第四步　三个改进方向</h3>
@@ -1261,6 +1265,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tbody>
 </table>
 <p><strong>为什么要上传花样文件</strong>：如果只手填“最长针 8 mm、10305 针”，软件只能把整个花样都按最长那一针的转速算：12 头机一律 545 r/min，650 r/min 亮红灯，订单 41.1 天；按文件、每针调速是 36.4 天。头少、长针少时差得不多（8 头机 50.7 天对 50.2 天），头一多、绷架一重，差别就出来了。</p>
+<p><strong>在样机里看</strong>：“样机”页签是新做的三维模型 16-1——一列机头、一个跨过所有机头的绷架，每个绣框里一针一针绣这个花样，最长的那几针转速降下来。改回手填、12 头，再把 Y 轴驱动力降到 300 N：绷架标红，点“慢放到出问题的那一针”，读数是“绷架还没停，机针已经扎下”，所需加速度比可用的大好几倍。上面能切换回虚拟实验 16-1。</p>
+<figure class="shot"><img loading="lazy" src="../media/web-81-em-proto.jpg" alt="手填 12 头、驱动力 300 N：绷架标红，机针扎下时绷架还在动"><figcaption>手填 12 头、驱动力 300 N：绷架标红，机针扎下时绷架还在动</figcaption></figure>
 <h3 id="case-em-opt">第三步　设计优化：达到订单交期</h3>
 <ol class="steps">
 <li>头数改回 8。“CAE 分析”→“设计优化”→“达到订单交期：头数最少（推力不够才加，不出红灯）”。软件从 1 头试起，每个头数下找刚好赶上交期的最小推力；现有的 800 N 够用就不动：</li>
@@ -1319,7 +1325,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>“导出”页签：计算书（花样图、针长分段表、每针转速曲线、头数与效率、交期、伺服、电控箱一节；做过 CAE 的带上横梁模态的结果）、参数表、调机卡。“参数”文件（.wqsew.json）带着花样，FreeCAD 导入后接着算。比较的结论：这张订单 8 头机 50.2 天赶不上，12 头机 36.4 天。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-16-case-em.jpg"><source src="../media/web-16-case-em.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-16-case-em.vtt"></video><figcaption>▶ 案例七：上传花样文件、8 头还是 12 头、设计优化达到订单交期、伺服、横梁加立柱、电控箱</figcaption></figure></section>
 <section id="tabs"><h2><span class="n">10</span>七个页签</h2><p class="lead">样机、校核、时序与曲线、零件与制造、CAE 分析、零件库、导出。</p><h3 id="proto">样机</h3>
-<p>平缝机是教材的三维虚拟样机：定时、间隙、张力、送布、转速、平衡这些调机参数跟着你的设计同步，可以试缝、看故障标红。包缝机、花样机是教材的三维结构模型（只看结构转动，不随参数变）；绷缝机是教材的三维样机（模型 10-1，第 73 轮）：线迹、针数、针距和弯针的定时、高低、让针、间隙、回退跟着设计同步，钩线判据当场算，出问题的机针或弯针标红，点“出问题的转角”转到那一刻慢慢看；上面能切换到弯针动画（虚拟实验 10-1）。刺绣机是虚拟实验 16-1，横机是教材的三维模型 17-1（V 形针床、机头三角、织针、摇床）。下面是主要结果（连杆比、惯性力、钩线角、供线量……）。</p>
+<p>平缝机是教材的三维虚拟样机：定时、间隙、张力、送布、转速、平衡这些调机参数跟着你的设计同步，可以试缝、看故障标红。包缝机是教材的三维结构模型（只看结构转动，不随参数变）。花样机、刺绣机、横机（第 81 轮）的三维模型跟着设计走：花样机（模型 15-1）按你的花样、每针前瞻转速走，电机、同步带、压框、机头出问题时标红；刺绣机（模型 16-1，新做）按头数、花样文件（或手填的最长针）、每针转速走，走不完的那一针绷架标红，能看到机针扎下时绷架还在动，上面能切换到虚拟实验 16-1；横机（模型 17-1）按系统数、织物宽，照意匠图（或手填的横列）逐趟走编织、翻针、摇床，选针器、后针床、电机出问题时标红。三种都有“慢放到出问题的那一针（那一趟）”。绷缝机是教材的三维样机（模型 10-1，第 73 轮）：线迹、针数、针距和弯针的定时、高低、让针、间隙、回退跟着设计同步，钩线判据当场算，出问题的机针或弯针标红，点“出问题的转角”转到那一刻慢慢看；上面能切换到弯针动画（虚拟实验 10-1）。下面是主要结果（连杆比、惯性力、钩线角、供线量……）。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-02-proto.jpg"><source src="../media/web-02-proto.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-02-proto.vtt"></video><figcaption>▶ 三维样机：旋梭定时调错，试缝 30 针全跳</figcaption></figure>
 <a class="try" href="/pages/sewing/sewing?machine=lockstitch&amp;tab=proto&amp;p=%7B%22psi%22%3A-20%7D" target="_blank" rel="noopener">▶ 试一试：旋梭定时 −20°，在样机里看跳针</a>
 <h3 id="checks">校核</h3>
