@@ -56,14 +56,6 @@
   .fig b { color: var(--night-ink); font-weight: 500; }
   .fig .k { color: var(--accent); }
   .fig .k2 { color: var(--blue); }
-  .hsteps { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; font: 400 12.5px/1.4 var(--body); color: var(--night-muted); min-height: 26px; }
-  .hsteps li { padding: 3px 9px; border: 1px solid var(--night-line); border-radius: 999px; background: rgba(10,18,22,.6); }
-  .hsteps li + li::before { content: "→ "; color: var(--accent); }
-  .hsteps li.now { color: #fff4d6; border-color: var(--accent); }
-  .hero canvas { cursor: grab; touch-action: pan-y; }
-  .hero .wrap { max-width: none; }
-  @media (max-width: 900px) { .hero .wrap { padding-top: 50vh; } }
-  @media (min-width: 901px) { .hero .wrap > * { max-width: 46%; } .hero .wrap > .fig, .hero .wrap > .hsteps { max-width: 100%; } }
   .fig button { font: inherit; color: var(--night-ink); background: none; border: 1px solid var(--night-line); border-radius: 999px; padding: 2px 12px; cursor: pointer; margin-left: auto; }
   .fig button:hover { border-color: var(--accent); }
 
@@ -428,7 +420,7 @@
 
 <main id="top">
   <section class="hero" aria-label="WenQuest Robotics Academy">
-    <canvas id="hub3d" aria-label="厂情中枢立体网络 · 3D command-center network" role="img"></canvas>
+    <canvas id="chaos" aria-hidden="true"></canvas>
     <div class="wrap">
       <p class="eyebrow">WenQuest Robotics Academy · <span data-zh>问渠机器人学院</span><span data-en>est. 2026</span></p>
       <h1><span class="zh">问渠机器人学院</span><span class="en">Model it. Simulate it. Build it.</span></h1>
@@ -439,11 +431,11 @@
         <a class="btn ghost" href="/cases/"><span data-zh>看数字工厂案例</span><span data-en>See factory cases</span></a>
       </div>
       <div class="fig" aria-live="off">
-        <span><b><span data-zh>图 1</span><span data-en>Fig. 1</span></b> · <span data-zh>厂情中枢：设备 → 数据 → 事件，一张立体网络</span><span data-en>Command center: assets → data → events, as one 3D network</span></span>
-        <span><span data-zh>对象 / 关系</span><span data-en>objects / links</span> <b id="hcount">—</b> · <span data-zh>数据</span><span data-en>signals</span> <b id="hrate">—</b>/min</span>
-        <span class="k"><span data-zh>事件链</span><span data-en>Event chain</span> <span id="hchain"></span></span>
+        <span><b><span data-zh>图 1</span><span data-en>Fig. 1</span></b> · <span data-zh>两个双摆，初始角只差</span><span data-en>Two double pendulums whose starting angles differ by</span> <b>0.001 rad</b></span>
+        <span>RK4 · dt = 1 ms · <span data-zh>浏览器实时计算</span><span data-en>computed live in your browser</span></span>
+        <span><span class="k">θ₂</span> / <span class="k2">θ₂′</span> <span data-zh>相差</span><span data-en>apart</span> <b id="gap">0.001</b> rad · t = <b id="tt">0.0</b> s</span>
+        <button id="again" type="button"><span data-zh>重新释放</span><span data-en>Release again</span></button>
       </div>
-      <ol class="hsteps" id="hsteps" aria-live="off"></ol>
     </div>
   </section>
 
@@ -846,7 +838,6 @@ __TIERS__
   </div>
 </footer>
 
-<script src="/hub3d.js"></script>
 <script>
 (() => {
   // ---- language ----
@@ -889,9 +880,85 @@ __TIERS__
   }
   document.querySelectorAll(".tiers button").forEach(b => b.addEventListener("click", () => showTier(b.dataset.t)));
 
-  // ---- 首屏：立体的厂情中枢（第 91 轮，site/hub3d.js） ----
-  WQHub3D.start(document.getElementById("hub3d"), { chain: document.getElementById("hchain"), steps: document.getElementById("hsteps"),
-    count: document.getElementById("hcount"), rate: document.getElementById("hrate") });
+  // ---- two double pendulums (chaos) ----
+  const cv = document.getElementById("chaos"), ctx = cv.getContext("2d");
+  const g = 9.81, m1 = 1, m2 = 1, l1 = 1, l2 = 1, dt = 0.001;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function deriv(s) {
+    const [a1, a2, w1, w2] = s, d = a1 - a2, den = 2 * m1 + m2 - m2 * Math.cos(2 * d);
+    const b1 = (-g * (2 * m1 + m2) * Math.sin(a1) - m2 * g * Math.sin(a1 - 2 * a2) - 2 * Math.sin(d) * m2 * (w2 * w2 * l2 + w1 * w1 * l1 * Math.cos(d))) / (l1 * den);
+    const b2 = (2 * Math.sin(d) * (w1 * w1 * l1 * (m1 + m2) + g * (m1 + m2) * Math.cos(a1) + w2 * w2 * l2 * m2 * Math.cos(d))) / (l2 * den);
+    return [w1, w2, b1, b2];
+  }
+  function rk4(s) {
+    const k1 = deriv(s), k2 = deriv(s.map((v, i) => v + dt / 2 * k1[i])), k3 = deriv(s.map((v, i) => v + dt / 2 * k2[i])), k4 = deriv(s.map((v, i) => v + dt * k3[i]));
+    return s.map((v, i) => v + dt / 6 * (k1[i] + 2 * k2[i] + 2 * k3[i] + k4[i]));
+  }
+  let A, B, t, trailA, trailB, W = 0, H = 0, dpr = 1;
+  function release() {
+    const a1 = 2.0 + Math.random() * 0.6, a2 = 2.3 + Math.random() * 0.6;
+    A = [a1, a2, 0, 0]; B = [a1, a2 + 0.001, 0, 0]; t = 0; trailA = []; trailB = [];
+  }
+  function fit() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  const css = (n) => getComputedStyle(root).getPropertyValue(n).trim();
+  function geom() {
+    const wide = W > 820, scale = Math.min(H * 0.19, wide ? W * 0.12 : W * 0.2);
+    return { ox: wide ? W * 0.74 : W * 0.5, oy: wide ? H * 0.45 : H * 0.3, s: scale };
+  }
+  function tip(s, G) {
+    const x1 = G.ox + G.s * Math.sin(s[0]), y1 = G.oy + G.s * Math.cos(s[0]);
+    return [x1, y1, x1 + G.s * Math.sin(s[1]), y1 + G.s * Math.cos(s[1])];
+  }
+  const gapEl = document.getElementById("gap"), ttEl = document.getElementById("tt");
+  function draw() {
+    const G = geom();
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    ctx.strokeStyle = "rgba(143,161,168,0.08)"; ctx.lineWidth = 1;
+    for (let x = G.ox % 40; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = G.oy % 40; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    const trail = (tr, col) => {
+      for (let i = 1; i < tr.length; i++) {
+        ctx.strokeStyle = col; ctx.globalAlpha = (i / tr.length) * 0.9; ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(tr[i - 1][0], tr[i - 1][1]); ctx.lineTo(tr[i][0], tr[i][1]); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+    trail(trailB, css("--blue")); trail(trailA, css("--accent"));
+    const arm = (s, col) => {
+      const [x1, y1, x2, y2] = tip(s, G);
+      ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(G.ox, G.oy); ctx.lineTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x1, y1, 5, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(x2, y2, 6, 0, 7); ctx.fill();
+    };
+    arm(B, "rgba(92,184,214,0.85)"); arm(A, "rgba(242,183,5,0.95)");
+    ctx.fillStyle = "#e9eef0"; ctx.beginPath(); ctx.arc(G.ox, G.oy, 4, 0, 7); ctx.fill();
+    gapEl.textContent = Math.abs(A[1] - B[1]).toFixed(3);
+    ttEl.textContent = t.toFixed(1);
+  }
+  function stepTo(frames) {
+    const G = geom();
+    for (let f = 0; f < frames; f++) {
+      for (let k = 0; k < 16; k++) { A = rk4(A); B = rk4(B); t += dt; }
+      const a = tip(A, G), b = tip(B, G);
+      trailA.push([a[2], a[3]]); trailB.push([b[2], b[3]]);
+      if (trailA.length > 260) { trailA.shift(); trailB.shift(); }
+    }
+  }
+  fit(); release();
+  addEventListener("resize", () => { fit(); trailA = []; trailB = []; });
+  document.getElementById("again").onclick = release;
+  if (reduce) { stepTo(600); draw(); return; }
+  let visible = true;
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(cv);
+  (function loop() {
+    if (visible && !document.hidden) { stepTo(1); draw(); if (t > 40) release(); }
+    requestAnimationFrame(loop);
+  })();
 })();
 </script>
 <script src="/videos.js"></script>
