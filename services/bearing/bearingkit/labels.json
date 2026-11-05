@@ -391,6 +391,30 @@
 "计算中…",
 "Computing…"
 ],
+"camA": [
+"凸轮长半轴 a",
+"Cam long semi-axis a"
+],
+"camAHint": [
+"装上后内圈内孔的长半轴；短半轴 b 填在下面",
+"The inner ring bore’s long semi-axis when mounted; the short one b below"
+],
+"camB": [
+"凸轮短半轴 b",
+"Cam short semi-axis b"
+],
+"camKind": [
+"凸轮形状",
+"Cam shape"
+],
+"camPts": [
+"凸轮点表",
+"Cam points"
+],
+"camPtsHint": [
+"每行“角度°, 径向偏差 mm”，0° 是长轴；至少 4 点，按三角级数拟合（到 24 阶）",
+"One “angle°, radial deviation mm” per line, 0° on the long axis; at least 4 points, fitted by a trigonometric series (to the 24th harmonic)"
+],
 "camTable": [
 "一圈内的力",
 "Force round the turn"
@@ -398,6 +422,18 @@
 "camTableHint": [
 "每行：转角(°), Fx, Fy（可加 Fz），单位 N",
 "Each line: angle (°), Fx, Fy (optionally Fz), in N"
+],
+"cam_cosine": [
+"余弦形（给最大径向变形）",
+"Cosine (give the largest deformation)"
+],
+"cam_ellipse": [
+"椭圆（给长短半轴）",
+"Ellipse (give the semi-axes)"
+],
+"cam_points": [
+"给点",
+"Points"
 ],
 "cancel": [
 "取消",
@@ -855,6 +891,10 @@
 "角接触球轴承的游隙由接触角和配对预紧决定，配对预紧在第 4 步加入。",
 "An angular contact bearing’s clearance is set by its contact angle and the paired preload, which comes in step 4."
 ],
+"fitsFlex": [
+"柔性轴承的内圈形状由凸轮给定，外圈装在柔轮里；配合不单独计算。",
+"The flexible bearing’s inner ring takes the cam’s shape and the outer ring sits in the flexspline; fits are not worked separately."
+],
 "fitsTapered": [
 "圆锥滚子轴承的轴向游隙在安装时调整，这里按零游隙计算；配对与预紧在第 4 步之三加入。",
 "A tapered roller bearing’s end play is set at mounting; it is worked here with zero end play. Pairs and preload come in step 4, part 3."
@@ -862,6 +902,46 @@
 "fixedBearing": [
 "承受轴向力的轴承（固定端）",
 "Bearing taking the axial force (fixed end)"
+],
+"flex": [
+"谐波柔性轴承",
+"Harmonic flexible bearing"
+],
+"flexAmp": [
+"外圈应力幅 {a} MPa，平均 {m} MPa",
+"Outer ring amplitude {a} MPa, mean {m} MPa"
+],
+"flexAngle": [
+"从长轴量起的角度",
+"Angle from the long axis"
+],
+"flexBalls": [
+"钢球载荷",
+"Ball loads"
+],
+"flexInner": [
+"内圈（随凸轮转，不交变）",
+"Inner ring (turns with the cam: steady)"
+],
+"flexOuter": [
+"外圈（最重的保持架位置）",
+"Outer ring (heaviest cage position)"
+],
+"flexScale": [
+"径向变形放大 {k} 倍",
+"Radial deformation × {k}"
+],
+"flexShape": [
+"装配变形（放大画）",
+"Shape when mounted (exaggerated)"
+],
+"flexStress": [
+"沟道表面弯曲应力",
+"Bending stress at the raceways"
+],
+"flexZone": [
+"啮合区",
+"Meshing zone"
 ],
 "fo": [
 "外沟曲率系数 fo",
@@ -890,6 +970,10 @@
 "gFits": [
 "配合与温度",
 "Fits and temperatures"
+],
+"gFlex": [
+"凸轮与柔轮载荷",
+"Cam and flexspline load"
 ],
 "gLimits": [
 "校核限值",
@@ -1039,9 +1123,25 @@
 "载荷到轴承 A 的距离 x",
 "Load position x from bearing A"
 ],
+"meshBeta": [
+"啮合区半角 β",
+"Meshing-zone half-angle β"
+],
+"meshF": [
+"啮合区径向力 F（每区）",
+"Meshing-zone radial force F (each zone)"
+],
+"meshFHint": [
+"柔轮啮合对外圈的向内合力，长轴两端各一区；由企业按减速器设计给，不填则只算装配变形",
+"The flexspline’s inward resultant on the outer ring, one zone at each end of the long axis; from your reducer design. Blank: assembly bending only"
+],
 "method": [
 "方法与依据",
 "Method and sources"
+],
+"methodFlex": [
+"柔性轴承：内圈按凸轮形状强制变形；外圈按薄圆环（曲梁，不伸长的弯曲模态加整体伸缩，闭式解）受钢球接触力和柔轮啮合区载荷弯曲；钢球按赫兹点接触（未变形沟道曲率），由余能最小求出各球载荷并满足外圈力平衡；保持架位置在一个球距内取 8 个。沟道表面弯曲应力：内圈随凸轮转、不交变；外圈每转两次交变，取各位置范围的一半为应力幅。截面按沟底壁厚、全宽矩形；不含柔轮与齿、离心力。",
+"Flexible bearing: the inner ring forced to the cam’s shape; the outer ring a thin ring (curved beam: inextensional bending modes plus uniform stretch, closed form) bent by the ball contacts and the flexspline’s meshing zones; Hertz point contacts (raceway curvatures as made), ball loads from minimum complementary energy with the outer ring in balance; 8 cage positions over one ball pitch. Raceway bending stress: steady in the inner ring (it turns with the cam), alternating twice per turn in the outer ring (amplitude half the range). Section: full width, wall at the groove bottom; the flexspline, its teeth and centrifugal force are not modelled."
 ],
 "misalign": [
 "内外圈相对倾斜",
@@ -1847,6 +1947,14 @@
 "直行时间占比",
 "Share of time straight"
 ],
+"sigAAllow": [
+"外圈许用交变应力幅",
+"Outer ring allowable alternating stress amplitude"
+],
+"sigIAllow": [
+"内圈许用弯曲应力",
+"Inner ring allowable bending stress"
+],
 "sigma": [
 "综合表面粗糙度 σ",
 "Composite surface roughness σ"
@@ -1998,6 +2106,14 @@
 "vertical": [
 "竖直",
 "Vertical"
+],
+"w0": [
+"最大径向变形量 w₀",
+"Largest radial deformation w₀"
+],
+"w0Hint": [
+"内圈长轴处比原来的半径大 w₀（短轴处小 w₀）；企业按凸轮图纸填",
+"The inner ring’s long axis is w₀ above its round radius (the short axis w₀ below); from your cam drawing"
 ],
 "wall_min": [
 "套圈最小壁厚",

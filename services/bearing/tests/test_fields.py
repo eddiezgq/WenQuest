@@ -27,7 +27,8 @@ def web_paths():
     paths |= {"scenario." + p for p in re.findall(r'v-model(?:\.\w+)?="s\.([\w.]+)"', s)}
     # fields the web editor sets without v-model: the type buttons, the crown table, the scenario picker and cases
     assert "project.type = k" in f and "project.profile.points" in f and "pick($event.target.value)" in s
-    return paths | {"type", "profile.points", "scenario.kind", "scenario.cases"}
+    assert "project.flex.points" in f  # the cam point table (plan section 十八)
+    return paths | {"type", "profile.points", "flex.points", "scenario.kind", "scenario.cases"}
 
 
 def test_the_form_has_exactly_the_web_fields():

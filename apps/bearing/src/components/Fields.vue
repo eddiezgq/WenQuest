@@ -8,6 +8,14 @@ import { computed } from 'vue'
 
 const cyl = computed(() => ['cylindrical', 'tapered'].includes(project.type))
 const tap = computed(() => project.type === 'tapered')
+const flex = computed(() => project.type === 'flex')
+// the cam given by points: "angle°, radial deviation mm" lines ↔ [[deg, mm], …] (plan section 十八)
+const camPts = computed({
+  get: () => (project.flex?.points || []).map((r) => r.join(', ')).join('\n'),
+  set: (v) => {
+    project.flex.points = v.split('\n').map((l) => l.split(/[\s,;]+/).filter(Boolean).map(Number)).filter((r) => r.length === 2 && r.every(Number.isFinite))
+  },
+})
 // the crown profile table: "x, drop" lines ↔ [[x, drop], …]
 const pts = computed({
   get: () => (project.profile?.points || []).map((r) => r.join(', ')).join('\n'),
@@ -20,11 +28,11 @@ const pts = computed({
 <template>
   <div class="fields">
     <div class="seg" role="radiogroup" :aria-label="t('type')">
-      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
+      <button v-for="k in ['deep_groove', 'angular', 'cylindrical', 'tapered', 'flex']" :key="k" type="button" role="radio" :aria-checked="project.type === k"
               :class="{ on: project.type === k }" @click="project.type = k">{{ t(k) }}</button>
     </div>
 
-    <Scenario />
+    <Scenario v-if="!flex" />
 
     <fieldset><legend>{{ t('gSize') }}</legend>
       <Num v-model="project.size.d" :label="t('d')" unit="mm" />
@@ -38,7 +46,7 @@ const pts = computed({
       <Num v-model="project.inner.dm" :label="t('dm')" unit="mm" :hint="t('dmHint')" />
       <Num v-model="project.inner.fi" :label="t('fi')" step="0.001" :hint="t('fHint')" />
       <Num v-model="project.inner.fo" :label="t('fo')" step="0.001" />
-      <Num v-if="project.type === 'deep_groove'" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
+      <Num v-if="['deep_groove', 'flex'].includes(project.type)" v-model="project.inner.Pd" :label="t('Pd')" unit="mm" step="0.001" />
       <Num v-else v-model="project.inner.alpha0_deg" :label="t('alpha0')" unit="°" />
       <template v-if="project.type === 'angular'">
         <label class="num"><span class="lab">{{ t('arrangement') }}</span>
@@ -50,6 +58,19 @@ const pts = computed({
       </template>
       <Num v-model="project.inner.h_i" :label="t('h_i')" unit="mm" :hint="t('hHint')" />
       <Num v-model="project.inner.h_o" :label="t('h_o')" unit="mm" />
+    </fieldset>
+    <fieldset v-if="flex"><legend>{{ t('gFlex') }}</legend>
+      <label class="num"><span class="lab">{{ t('camKind') }}</span>
+        <select v-model="project.flex.cam"><option v-for="k in ['cosine', 'ellipse', 'points']" :key="k" :value="k">{{ t('cam_' + k) }}</option></select></label>
+      <Num v-if="project.flex.cam === 'cosine'" v-model="project.flex.w0" :label="t('w0')" unit="mm" step="0.001" :hint="t('w0Hint')" />
+      <template v-if="project.flex.cam === 'ellipse'">
+        <Num v-model="project.flex.a" :label="t('camA')" unit="mm" step="0.001" :hint="t('camAHint')" />
+        <Num v-model="project.flex.b" :label="t('camB')" unit="mm" step="0.001" />
+      </template>
+      <label v-if="project.flex.cam === 'points'" class="area"><span class="lab">{{ t('camPts') }}<small>{{ t('camPtsHint') }}</small></span>
+        <textarea v-model.lazy="camPts" rows="6" spellcheck="false"></textarea></label>
+      <Num v-model="project.flex.F" :label="t('meshF')" unit="N" :hint="t('meshFHint')" />
+      <Num v-model="project.flex.beta_deg" :label="t('meshBeta')" unit="°" />
     </fieldset>
     <fieldset v-else><legend>{{ t('gRollers') }}</legend>
       <Num v-model="project.inner.Dw" :label="tap ? t('DwT') : t('DwR')" unit="mm" />
@@ -92,7 +113,7 @@ const pts = computed({
       <Num v-if="project.type === 'angular'" v-model="project.material.density" :label="t('density')" unit="g/cm³" step="0.01" :hint="t('densityHint')" />
     </fieldset>
 
-    <fieldset v-if="project.scenario.kind === 'generic'"><legend>{{ t('gLoads') }}</legend>
+    <fieldset v-if="project.scenario.kind === 'generic' && !flex"><legend>{{ t('gLoads') }}</legend>
       <Num v-model="project.loads.Fr" :label="t('Fr')" unit="N" />
       <Num v-model="project.loads.Fa" :label="t('Fa')" unit="N" />
       <Num v-model="project.loads.M" :label="t('M')" unit="N·mm" :hint="t('MHint')" />
@@ -100,16 +121,16 @@ const pts = computed({
     </fieldset>
 
     <fieldset><legend>{{ t('gFits') }}</legend>
-      <template v-if="!['angular', 'tapered'].includes(project.type)">
+      <template v-if="['deep_groove', 'cylindrical'].includes(project.type)">
         <Num v-model="project.fits.shaft_I" :label="t('shaft_I')" unit="mm" step="0.001" />
         <Num v-model="project.fits.housing_I" :label="t('housing_I')" unit="mm" step="0.001" />
         <Num v-model="project.fits.T_i" :label="t('T_i')" unit="°C" />
         <Num v-model="project.fits.T_o" :label="t('T_o')" unit="°C" />
       </template>
-      <p v-else class="hint">{{ tap ? t('fitsTapered') : t('fitsAngular') }}</p>
+      <p v-else class="hint">{{ flex ? t('fitsFlex') : tap ? t('fitsTapered') : t('fitsAngular') }}</p>
     </fieldset>
 
-    <fieldset><legend>{{ t('gLube') }}</legend>
+    <fieldset v-if="!flex"><legend>{{ t('gLube') }}</legend>
       <Num v-model="project.lube.eta0" :label="t('eta0')" unit="Pa·s" step="0.001" />
       <Num v-model="project.lube.alpha_p" :label="t('alpha_p')" unit="1/Pa" />
       <Num v-model="project.lube.sigma" :label="t('sigma')" unit="µm" step="0.01" />
@@ -118,7 +139,11 @@ const pts = computed({
     <fieldset><legend>{{ t('gLimits') }}</legend>
       <p class="hint">{{ t('limitsHint') }}</p>
       <Num v-model="project.limits.p_static" :label="t('p_static')" unit="MPa" />
-      <Num v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
+      <Num v-if="!flex" v-model="project.limits.p_fatigue" :label="t('p_fatigue')" unit="MPa" />
+      <template v-if="flex">
+        <Num v-model="project.flex.sig_i_allow" :label="t('sigIAllow')" unit="MPa" />
+        <Num v-model="project.flex.sig_a_allow" :label="t('sigAAllow')" unit="MPa" />
+      </template>
       <Num v-model="project.limits.gap_min" :label="t('gap_min')" unit="mm" />
       <Num v-model="project.limits.wall_min" :label="t('wall_min')" unit="mm" />
     </fieldset>
