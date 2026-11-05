@@ -228,7 +228,50 @@ def build(doc, p, log=print):
     notes.append("干涉检查：滚动体与内圈重叠 {:.4f} mm³，与外圈 {:.4f} mm³".format(ov["inner"], ov["outer"]))
     if g["type"] == "tapered" and max(ov.values()) > 0:
         notes.append("（圆锥滚子与滚道线接触相切，求交会留下极小的残差，不是干涉）")
+    if p.get("type") == "flex":
+        objs["mounted"] = build_mounted(doc, p, g)
+        notes.append(
+            "装配变形：真实尺寸，放在旁边（x 向偏移 1.5D）；套圈画成沟底壁厚的环（不含沟道和挡边），是形状示意"
+        )
     return objs, notes, {"shapes": sh, "volumes": vols, "overlap": ov, "geometry": g}
+
+
+def build_mounted(doc, p, g):
+    """谐波柔性轴承装在凸轮上的形状（细则第十八节）：内圈随凸轮、外圈按计算的变形、钢球在最重的保持架位置。"""
+    import FreeCAD
+    import Part
+
+    from bearingkit import flex_check as FC
+
+    m = FC.deformed(p)
+    V = FreeCAD.Vector
+    off = 1.5 * g["D"]
+    B = m["B"]
+
+    def closed(pts):
+        c = Part.BSplineCurve()
+        c.interpolate([V(x + off, y, -B / 2) for x, y in pts], PeriodicFlag=True)
+        return Part.Wire(c.toShape())
+
+    grp = doc.addObject("App::DocumentObjectGroup", "Mounted")
+    grp.Label = "装配变形（真实尺寸）"
+    out = []
+    for key, label in (("inner", "内圈（装在凸轮上）"), ("outer", "外圈（变形后）")):
+        a, b = closed(m[key][0]), closed(m[key][1])
+        face = Part.Face(b).cut(Part.Face(a))
+        o = doc.addObject("Part::Feature", "Mounted" + key.capitalize())
+        o.Label = label
+        o.Shape = face.extrude(V(0, 0, B))
+        grp.addObject(o)
+        out.append(o)
+    for j, (x, y) in enumerate(m["balls"]):
+        o = doc.addObject("Part::Feature", "MountedBall{:03d}".format(j + 1))
+        o.Label = "钢球 {}（装配变形）".format(j + 1)
+        o.Shape = Part.makeSphere(m["Dw"] / 2, V(x + off, y, 0))
+        grp.addObject(o)
+        out.append(o)
+    doc.recompute()
+    return out
 
 
 # ---------------------------------------------------------------------------------- 导出

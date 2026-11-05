@@ -39,9 +39,16 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
     (r"^numbers must be finite$", "数值必须是有限数"),
     (r"^the balls do not fit round the pitch circle", "节圆上放不下这么多钢球（Z·Dw ≥ π·dm）"),
     (
-        r"^the bearing type is deep_groove, angular, cylindrical or tapered$",
-        "轴承类型是深沟球、角接触球、圆柱滚子或圆锥滚子轴承",
+        r"^the bearing type is deep_groove, angular, cylindrical(, tapered or flex| or tapered)$",
+        "轴承类型是深沟球、角接触球、圆柱滚子、圆锥滚子轴承或谐波柔性轴承",
     ),
+    # harmonic reducer flexible bearings (plan section 十八)
+    (r"^give the cam's largest radial deformation w0", "请填凸轮的最大径向变形量 w₀"),
+    (r"^give the cam ellipse's semi-axes", "请填凸轮椭圆的长半轴 a、短半轴 b（a ≥ b > 0，指内圈内孔）"),
+    (r"^give at least 4 cam points", "凸轮点表至少 4 点（角度 0° 到 360° 以下，径向偏差单位 mm）"),
+    (r"^the cam is cosine, ellipse or points$", "凸轮形状是余弦形、椭圆或给点"),
+    (r"^give the half-angle of the meshing zone", "请填啮合区半角（0° 到 90° 之间）"),
+    (r"^the rings have no wall under the grooves", "沟底没有壁厚：请检查 d、D、钢球直径和节圆直径"),
     # tapered roller bearings (step 4 part 2)
     (r"^give the cup angle and the cone angle", "请填圆锥滚子轴承的外圈（杯）角和内圈（锥）角"),
     (r"^the cone angle is above 0 and below the cup angle", "内圈（锥）角要大于 0、小于外圈（杯）角，杯角小于 45°"),

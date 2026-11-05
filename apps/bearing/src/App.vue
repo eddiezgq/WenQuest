@@ -24,6 +24,7 @@ import AiExplain from './components/AiExplain.vue'
 import CloudPanel from './components/CloudPanel.vue'
 import CatalogPanel from './components/CatalogPanel.vue'
 import CatalogNote from './components/CatalogNote.vue'
+import FlexView from './components/FlexView.vue'
 import { me, links, detach, loadMe, loginUrl } from './cloud'
 
 const examples = ref([])
@@ -120,8 +121,9 @@ onMounted(async () => {
           <SectionCyl v-if="result?.type === 'cylindrical'" :r="result" />
           <SectionTaper v-else-if="result?.type === 'tapered'" :r="result" />
           <Section v-else :r="result" />
-          <LoadRing :r="result" />
+          <LoadRing v-if="result?.type !== 'flex'" :r="result" />
         </div>
+        <FlexView v-if="result?.type === 'flex'" :r="result" />
         <SliceChart :r="result" />
         <ScenarioPanel :r="result" />
         <Extras :r="result" />

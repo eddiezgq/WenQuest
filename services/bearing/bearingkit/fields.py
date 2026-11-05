@@ -17,8 +17,9 @@ from pathlib import Path
 
 LABELS = json.loads((Path(__file__).with_name("labels.json")).read_text(encoding="utf-8"))
 
-TYPES = ["deep_groove", "angular", "cylindrical", "tapered"]
+TYPES = ["deep_groove", "angular", "cylindrical", "tapered", "flex"]
 BALL, ROLLER = ["deep_groove", "angular"], ["cylindrical", "tapered"]
+RIGID = ["deep_groove", "angular", "cylindrical", "tapered"]  # every type but the flexible bearing (plan 十八)
 SCENES = ["generic", "gearbox", "motor", "spindle", "hub", "joint", "camshaft"]
 AB = [("A", None), ("B", None)]
 
@@ -45,7 +46,7 @@ GROUPS = [
     ("type", {}, [F("type", "type", kind="select", options=opts(TYPES))]),
     (
         "gScene",
-        {},
+        {"type": RIGID},
         [
             F("scenario.kind", "sceneKind", kind="select", options=opts(SCENES, "sk_")),
             # gearbox
@@ -125,14 +126,14 @@ GROUPS = [
     ("gSize", {}, [F("size.d", "d", "mm"), F("size.D", "D", "mm"), F("size.B", "B", "mm")]),
     (
         "gBalls",
-        {"type": BALL},
+        {"type": BALL + ["flex"]},
         [
             F("inner.Dw", "Dw", "mm"),
             F("inner.Z", "Z", kind="int"),
             F("inner.dm", "dm", "mm", hint="dmHint"),
             F("inner.fi", "fi", step=0.001, hint="fHint"),
             F("inner.fo", "fo", step=0.001),
-            F("inner.Pd", "Pd", "mm", step=0.001, when={"type": ["deep_groove"]}),
+            F("inner.Pd", "Pd", "mm", step=0.001, when={"type": ["deep_groove", "flex"]}),
             F("inner.alpha0_deg", "alpha0", "°", when={"type": ["angular"]}),
             F(
                 "pair.arrangement",
@@ -227,6 +228,19 @@ GROUPS = [
         ],
     ),
     (
+        "gFlex",
+        {"type": ["flex"]},
+        [
+            F("flex.cam", "camKind", kind="select", options=opts(["cosine", "ellipse", "points"], "cam_")),
+            F("flex.w0", "w0", "mm", step=0.001, hint="w0Hint", when={"cam": ["cosine"]}),
+            F("flex.a", "camA", "mm", step=0.001, hint="camAHint", when={"cam": ["ellipse"]}),
+            F("flex.b", "camB", "mm", step=0.001, when={"cam": ["ellipse"]}),
+            F("flex.points", "camPts", kind="points", hint="camPtsHint", when={"cam": ["points"]}),
+            F("flex.F", "meshF", "N", hint="meshFHint"),
+            F("flex.beta_deg", "meshBeta", "°"),
+        ],
+    ),
+    (
         "gMat",
         {},
         [
@@ -237,7 +251,7 @@ GROUPS = [
     ),
     (
         "gLoads",
-        {"scene": ["generic"]},
+        {"scene": ["generic"], "type": RIGID},
         [
             F("loads.Fr", "Fr", "N"),
             F("loads.Fa", "Fa", "N"),
@@ -257,7 +271,7 @@ GROUPS = [
     ),
     (
         "gLube",
-        {},
+        {"type": RIGID},
         [
             F("lube.eta0", "eta0", "Pa·s", step=0.001),
             F("lube.alpha_p", "alpha_p", "1/Pa"),
@@ -269,7 +283,9 @@ GROUPS = [
         {},
         [
             F("limits.p_static", "p_static", "MPa"),
-            F("limits.p_fatigue", "p_fatigue", "MPa"),
+            F("limits.p_fatigue", "p_fatigue", "MPa", when={"type": RIGID}),
+            F("flex.sig_i_allow", "sigIAllow", "MPa", when={"type": ["flex"]}),
+            F("flex.sig_a_allow", "sigAAllow", "MPa", when={"type": ["flex"]}),
             F("limits.gap_min", "gap_min", "mm"),
             F("limits.wall_min", "wall_min", "mm"),
         ],
@@ -377,6 +393,17 @@ BLANK = {
         )
     },
     "profile": {"kind": "straight", "R": None, "flat": None, "points": []},
+    "flex": {
+        "cam": "cosine",
+        "w0": None,
+        "a": None,
+        "b": None,
+        "points": [],
+        "F": None,
+        "beta_deg": None,
+        "sig_i_allow": None,
+        "sig_a_allow": None,
+    },
     "alignment": {"theta_arcmin": None},
     "pair": {
         "arrangement": "single",
@@ -456,6 +483,7 @@ def shown(when: dict, p: dict) -> bool:
         "axis": (p.get("scenario") or {}).get("axis") or "horizontal",
         "mount": (p.get("pair") or {}).get("mount") or "pair",
         "setting": (p.get("pair") or {}).get("setting") or "endplay",
+        "cam": (p.get("flex") or {}).get("cam") or "cosine",
     }
     for k, allowed in when.items():
         if k == "axis_not":

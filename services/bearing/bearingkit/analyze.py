@@ -70,7 +70,7 @@ def _limit(val, lim, higher_bad=True):
 def build(p: dict) -> tuple[BB.BallBearing, dict]:
     kind = p.get("type") or "deep_groove"
     if kind not in ("deep_groove", "angular"):
-        raise ProjectError("the bearing type is deep_groove, angular, cylindrical or tapered")
+        raise ProjectError("the bearing type is deep_groove, angular, cylindrical, tapered or flex")
     s, i, m = p.get("size") or {}, p.get("inner") or {}, p.get("material") or {}
     d, D, B = _num(s.get("d")), _num(s.get("D")), _num(s.get("B"))
     if not (d and D and B and D > d > 0 and B > 0):
@@ -256,6 +256,10 @@ def geometry_of(p: dict) -> dict:
         from bearingkit import taper_check
 
         return taper_check.build(p)[1]
+    if t == "flex":
+        from bearingkit import flex_check
+
+        return flex_check.build(p)[1]
     return build(p)[1]
 
 
@@ -268,6 +272,10 @@ def analyse(p: dict) -> dict:
         from bearingkit import taper_check  # round 64 step 4 part 2
 
         return taper_check.analyse(p)
+    if p.get("type") == "flex":
+        from bearingkit import flex_check  # plan section 十八: harmonic reducer flexible bearings
+
+        return flex_check.analyse(p)
     b, g = build(p)
     lim = p.get("limits") or {}
     sc = scenario_cases(p)

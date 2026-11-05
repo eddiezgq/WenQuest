@@ -13,6 +13,7 @@ import SettingCurve from './SettingCurve.vue'
 import ScenarioPanel from './ScenarioPanel.vue'
 import DesignNote from './DesignNote.vue'
 import CatalogNote from './CatalogNote.vue'
+import FlexView from './FlexView.vue'
 
 const props = defineProps({ r: Object })
 defineEmits(['close'])
@@ -22,6 +23,18 @@ const inputs = computed(() => {
   const add = (k, v, u) => { if (v != null && v !== '') rows.push([k, v, u]) }
   add('d', p.size.d, 'mm'); add('D', p.size.D, 'mm'); add('B', p.size.B, 'mm')
   add('Dw', p.inner.Dw, 'mm'); add('Z', p.inner.Z, ''); add('dm', p.inner.dm ?? props.r?.geometry?.dm, 'mm')
+  if (p.type === 'flex') {
+    add('fi', p.inner.fi, ''); add('fo', p.inner.fo, ''); add('Pd', p.inner.Pd, 'mm')
+    const f = p.flex || {}
+    rows.push(['camKind', t('cam_' + (f.cam || 'cosine')), ''])
+    if ((f.cam || 'cosine') === 'cosine') add('w0', f.w0, 'mm')
+    else if (f.cam === 'ellipse') { add('camA', f.a, 'mm'); add('camB', f.b, 'mm') }
+    else rows.push(['camPts', (f.points || []).length + ' ×', ''])
+    add('meshF', f.F, 'N'); add('meshBeta', f.beta_deg, '°'); add('sigIAllow', f.sig_i_allow, 'MPa'); add('sigAAllow', f.sig_a_allow, 'MPa')
+    add('E', p.material.E, 'MPa'); add('nu', p.material.nu, '')
+    add('p_static', p.limits.p_static, 'MPa'); add('gap_min', p.limits.gap_min, 'mm'); add('wall_min', p.limits.wall_min, 'mm')
+    return rows
+  }
   if (['cylindrical', 'tapered'].includes(p.type)) {
     add('Lw', p.inner.Lw, 'mm'); add('Lwe', p.inner.Lwe, 'mm')
     if (p.type === 'cylindrical') add('Pd', p.inner.Pd, 'mm')
@@ -88,7 +101,8 @@ const print = () => window.print()
       <h2>{{ t('inputs') }}</h2>
       <table><tbody><tr v-for="[k, x, u] in inputs" :key="k"><th>{{ t(k) }}</th><td class="mono">{{ x }} {{ u }}</td></tr></tbody></table>
       <h2>{{ t('results') }}</h2>
-      <div class="figs"><SectionCyl v-if="r.type === 'cylindrical'" :r="r" /><SectionTaper v-else-if="r.type === 'tapered'" :r="r" /><Section v-else :r="r" /><LoadRing :r="r" /></div>
+      <div class="figs"><SectionCyl v-if="r.type === 'cylindrical'" :r="r" /><SectionTaper v-else-if="r.type === 'tapered'" :r="r" /><Section v-else :r="r" /><LoadRing v-if="r.type !== 'flex'" :r="r" /></div>
+      <FlexView v-if="r.type === 'flex'" :r="r" />
       <table class="ck">
         <thead><tr><th></th><th>{{ t('value') }}</th><th>{{ t('limit') }}</th><th></th></tr></thead>
         <tbody>
@@ -105,6 +119,7 @@ const print = () => window.print()
       <SettingCurve :r="r" />
       <h2>{{ t('method') }}</h2>
       <p>{{ t('methodText') }}</p>
+      <p v-if="r.type === 'flex'">{{ t('methodFlex') }}</p>
       <p>{{ t('ratingsNote') }}</p>
       <p class="gen">{{ t('generated') }}：{{ now }}</p>
     </article>

@@ -1,0 +1,17 @@
+{
+  "title": {
+    "zh": "示例（虚构）：机器人关节谐波减速器柔性轴承",
+    "en": "Example (fictional): flexible bearing of a robot joint's harmonic reducer"
+  },
+  "note": {
+    "zh": "尺寸、凸轮变形量、啮合区载荷和许用值都是演示虚构，不是任何厂家或标准中的型号，也不是推荐值。",
+    "en": "Sizes, cam deformation, meshing load and limits are made up for the demo: not a catalogue or standard bearing, nor recommended values."
+  },
+  "type": "flex",
+  "size": {"d": 25, "D": 34, "B": 6.4},
+  "inner": {"Dw": 2.4, "Z": 26, "dm": 29.5, "fi": 0.52, "fo": 0.53, "Pd": 0.01, "h_i": 0.45, "h_o": 0.45},
+  "material": {"E": 206000, "nu": 0.3},
+  "flex": {"cam": "cosine", "w0": 0.2, "a": null, "b": null, "points": [], "F": 300, "beta_deg": 30,
+           "sig_i_allow": 600, "sig_a_allow": 400},
+  "limits": {"p_static": 4000, "gap_min": 0.5, "wall_min": 0.8}
+}
