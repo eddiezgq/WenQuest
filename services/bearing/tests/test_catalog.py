@@ -218,7 +218,13 @@ def test_a_design_from_a_catalogue_row():
     assert all(r["table"] in ("metric", "inch") for r in FL.catalog_rows(cat))
     row = series()[3]
     p = FL.from_catalog(ex, cat, row)
-    assert p["type"] == "tapered" and p["size"] == {"d": 35.0, "D": 82.0, "B": float(row["T"])}
+    assert p["type"] == "tapered" and p["size"] == {
+        "d": 35.0,
+        "D": 82.0,
+        "B": float(row["T"]),  # overall T; the cone and cup widths too (plan section 二十)
+        "Bi": float(row["B"]),
+        "Co": float(row["C"]),
+    }
     assert p["inner"]["Dw"] is None and p["inner"]["Z"] is None and p["scenario"] == ex["scenario"]
     assert (
         p["catalog"]["model"] == "88003"

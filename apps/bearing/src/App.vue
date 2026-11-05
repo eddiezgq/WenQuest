@@ -14,7 +14,7 @@ import Checks from './components/Checks.vue'
 import Extras from './components/Extras.vue'
 import ScenarioPanel from './components/ScenarioPanel.vue'
 import Report from './components/Report.vue'
-import Assembly from './components/Assembly.vue'
+import AssemblyMode from './components/AssemblyMode.vue'
 import Quality from './components/Quality.vue'
 import Parts from './components/Parts.vue'
 import Process from './components/Process.vue'
@@ -107,7 +107,7 @@ onMounted(async () => {
       </div>
     </header>
 
-    <Assembly v-if="mode === 'assembly'" />
+    <AssemblyMode v-if="mode === 'assembly'" />
     <Quality v-if="mode === 'quality'" />
     <Process v-if="mode === 'process'" />
     <main v-show="mode === 'design'" class="work">

@@ -1,0 +1,168 @@
+{
+  "rings": {
+    "element": {
+      "ops": [
+        {
+          "no": 10,
+          "kind": "turn",
+          "mode": "size",
+          "name": {
+            "zh": "车削（或冷镦后车）",
+            "en": "Turning (or heading, then turning)"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.6,
+              "T": 0.05,
+              "Zreq": 0.2,
+              "Zmax": null,
+              "setup": null
+            },
+            "length": {
+              "Z": 0.6,
+              "T": 0.05,
+              "Zreq": 0.2,
+              "Zmax": null,
+              "setup": null
+            }
+          }
+        },
+        {
+          "no": 20,
+          "kind": "heat",
+          "mode": null,
+          "name": {
+            "zh": "热处理（淬火、回火）",
+            "en": "Heat treatment"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "change": 0.01,
+              "scatter": 0.008,
+              "distortion": 0.015
+            },
+            "length": {
+              "change": 0.01,
+              "scatter": 0.008,
+              "distortion": 0.01
+            }
+          }
+        },
+        {
+          "no": 30,
+          "kind": "grind",
+          "mode": "size",
+          "name": {
+            "zh": "磨端面",
+            "en": "End face grinding"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "length": {
+              "Z": 0.2,
+              "T": 0.01,
+              "Zreq": 0.05,
+              "Zmax": 0.3,
+              "setup": 0.005
+            }
+          }
+        },
+        {
+          "no": 40,
+          "kind": "grind",
+          "mode": "size",
+          "name": {
+            "zh": "磨外径（无心磨）",
+            "en": "Outside diameter grinding (centreless)"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.2,
+              "T": 0.0012,
+              "Zreq": 0.05,
+              "Zmax": 0.3,
+              "setup": 0.005
+            }
+          }
+        },
+        {
+          "no": 50,
+          "kind": "superfinish",
+          "mode": "stock",
+          "name": {
+            "zh": "超精外径（凸度）",
+            "en": "Superfinishing (crown)"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {
+            "dia": {
+              "Z": 0.004,
+              "dz": 0.0006,
+              "Zreq": 0.002
+            }
+          }
+        },
+        {
+          "no": 60,
+          "kind": "wash",
+          "mode": null,
+          "name": {
+            "zh": "清洗",
+            "en": "Washing"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {}
+        },
+        {
+          "no": 70,
+          "kind": "inspect",
+          "mode": null,
+          "name": {
+            "zh": "分选（按直径分组）",
+            "en": "Sorting (diameter groups)"
+          },
+          "equipment": "",
+          "params": [],
+          "features": {}
+        }
+      ],
+      "finish": {
+        "dia": {
+          "es": 0.0,
+          "ei": -0.002
+        },
+        "length": {
+          "es": 0.0,
+          "ei": -0.01
+        }
+      },
+      "blank": {
+        "dia": {
+          "T": 0.2
+        },
+        "length": {
+          "T": 0.2
+        }
+      }
+    }
+  },
+  "title": {
+    "zh": "圆柱滚子工艺（示例，虚构数）",
+    "en": "Cylindrical roller process (example, fictional values)"
+  },
+  "fictional": true,
+  "note": {
+    "zh": "所有留量、公差、热处理变化都是虚构的演示数，不是推荐值；请按企业自己的设备和经验填写。",
+    "en": "Every allowance, tolerance and heat-treatment value is a fictional demonstration value, not a recommendation; fill in your own from your machines and experience."
+  },
+  "design": "scene-cylindrical"
+}

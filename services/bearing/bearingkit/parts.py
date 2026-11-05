@@ -86,6 +86,11 @@ def cyl_parts(g: dict) -> dict:
 
 def taper_parts(g: dict) -> dict:
     d, D, B, dm, Dw, Lw = g["d"], g["D"], g["B"], g["dm"], g["Dw"], g["Lw"]
+    # three widths (plan section 二十): overall T (= B here, the one width before), cone Bi, cup Co. The cone's back
+    # face (the rib side, +z) and the cup's back face (−z) are T apart; without Bi, Co both rings span T.
+    T, Bi, Co = B, g.get("Bi") or B, g.get("Co") or B
+    zc0, zc1 = T / 2 - Bi, T / 2  # the cone
+    zu0, zu1 = -T / 2, -T / 2 + Co  # the cup
     ao, ai = math.radians(g["alpha_o_deg"]), math.radians(g["alpha_i_deg"])
     am, ph = (ao + ai) / 2, (ao - ai) / 2
     u, n = (math.cos(am), math.sin(am)), (-math.sin(am), math.cos(am))  # (axial, radial)
@@ -106,12 +111,13 @@ def taper_parts(g: dict) -> dict:
 
     end = pt(Lw / 2, -1)
     top = (Lw / 2 * u[0], dm / 2 + Lw / 2 * u[1])
-    if not (top[0] < B / 2 and coneR(-B / 2) > d / 2 and cupR(B / 2) < D / 2):
+    small = pt(-Lw / 2, 1)  # the roller's small end on the cup side
+    if not (Bi <= T and Co <= T and top[0] < zc1 and coneR(zc0) > d / 2 and cupR(zu1) < D / 2):
         raise PartsError("the rollers do not fit in these rings: check the width, angles and sizes")
-    cone = _poly(
-        [(d / 2, -B / 2), (coneR(-B / 2), -B / 2), (end[1], end[0]), (top[1], top[0]), (top[1], B / 2), (d / 2, B / 2)]
-    )
-    cup = _poly([(cupR(-B / 2), -B / 2), (D / 2, -B / 2), (D / 2, B / 2), (cupR(B / 2), B / 2)])
+    if not (zc0 <= pt(-Lw / 2, -1)[0] and zu1 >= pt(Lw / 2, 1)[0] and zu0 <= small[0]):
+        raise PartsError("the cone or cup is too narrow to carry the whole roller: check the widths B and C")
+    cone = _poly([(d / 2, zc0), (coneR(zc0), zc0), (end[1], end[0]), (top[1], top[0]), (top[1], zc1), (d / 2, zc1)])
+    cup = _poly([(cupR(zu0), zu0), (D / 2, zu0), (D / 2, zu1), (cupR(zu1), zu1)])
     R_end = g.get("R_end")
     r_l = rad(Lw / 2)
     if R_end and R_end > r_l:

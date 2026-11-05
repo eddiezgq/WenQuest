@@ -6,7 +6,7 @@ const KEY = 'wqbearing-project'
 export function blank() {
   return {
     title: { zh: '', en: '' }, type: 'deep_groove',
-    size: { d: null, D: null, B: null },
+    size: { d: null, D: null, B: null },  // a tapered bearing may add Bi, Co (plan section 二十)
     inner: { Dw: null, Z: null, dm: null, fi: null, fo: null, Pd: null, alpha0_deg: null, h_i: null, h_o: null, Lw: null, Lwe: null, alpha_o_deg: null, alpha_i_deg: null, alpha_f_deg: null, R_end: null },
     profile: { kind: 'straight', R: null, flat: null, points: [] },
     crossed: { split: 'outer' },

@@ -20,6 +20,7 @@ from bearingkit import catalog as CK
 from bearingkit import parts as PT
 from bearingkit import process as PR
 from bearingkit import quality as QL
+from bearingkit import tolerance as TL
 from bearingkit.analyze import analyse, geometry_of
 
 HERE = Path(__file__).parent
@@ -42,6 +43,7 @@ ERR_ZH = [  # kernel messages in Chinese (patterns over the English text)
         r"^the bearing type is deep_groove, angular, cylindrical(, tapered, flex or crossed| or tapered)$",
         "轴承类型是深沟球、角接触球、圆柱滚子、圆锥滚子、谐波柔性或交叉滚子轴承",
     ),
+    (r"^the cone or cup is too narrow to carry the whole roller", "内圈或外圈太窄，盖不住整个滚子：请检查宽度 B、C"),
     # crossed roller bearings (plan section 十九)
     (r"^give the contact angle of the crossed roller bearing", "请填交叉滚子轴承的接触角（20° 到 70° 之间）"),
     (r"^give the radial clearance of the crossed roller bearing", "请填交叉滚子轴承的径向游隙（µm，负数为预紧）"),
@@ -359,6 +361,18 @@ async def process_template(request: Request):
     return run(make)
 
 
+@app.post("/api/process/element-template")
+async def process_element_template(request: Request):
+    """The usual chain of this bearing's balls or rollers, structure only (plan section 二十, part 3)."""
+    p = await project_of(request)
+
+    def make():
+        g = geometry_of(p)
+        return {"features": {"element": PR.element_features(g)[1]}, "template": PR.element_template(g)}
+
+    return run(make)
+
+
 @app.get("/api/process/examples")
 def process_examples():
     out = []
@@ -385,6 +399,32 @@ async def process_ep(request: Request):
         if not isinstance(design, dict):
             raise ValueError("give the process as an object")
         return PR.run(geometry_of(design), proc)
+
+    return run(make)
+
+
+# ------------------------------------------------------------------- plan section 二十: the clearance dimension chain
+ERR_ZH += [
+    (r"^give the nominal size and deviations of (\w+)", r"请填 \1 的名义尺寸和上下偏差"),
+    (r"^give the upper and lower deviations of (\w+)", r"请填 \1 的上下偏差（尺寸精确时填 0、0）"),
+    (r"^(\w+): the upper deviation is below the lower one", r"\1：上偏差小于下偏差"),
+    (r"^give both groove positions", "沟位置 a_i、a_o 要两个都填，或都不填"),
+    (r"^samples between 1000 and 200000", "抽样次数在 1000 到 200000 之间"),
+    (r"^the distribution is normal or uniform", "分布是正态或均匀"),
+    (r"^the clearance chain is for ball bearings", "游隙尺寸链用于球轴承（深沟球、角接触球、柔性轴承）"),
+]
+
+
+@app.post("/api/tolerance")
+async def tolerance(request: Request):
+    """The clearance and groove position chain: extremes, statistical, Monte Carlo (plan section 二十, part 2)."""
+    p = await project_of(request)
+
+    def make():
+        n = int(p.get("n") or 100_000)
+        if not 1_000 <= n <= 200_000:
+            raise ValueError("samples between 1000 and 200000")
+        return TL.analyse(p.get("spec") or {}, n=n, dist=p.get("dist") or "normal", target=p.get("target"))
 
     return run(make)
 
