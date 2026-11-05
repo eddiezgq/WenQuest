@@ -411,6 +411,146 @@
 "工况（载荷谱）",
 "Cases (load spectrum)"
 ],
+"catChanged": [
+"外形尺寸已改动，与目录不同",
+"outside sizes changed from the catalogue"
+],
+"catChecks": [
+"目录核对",
+"Catalogue checks"
+],
+"catChecksNote": [
+"只有本厂能确定正确值；核对不改任何数。规则见帮助“产品库”。",
+"Only the maker can say the right value; nothing is changed. The rules are in the help, “Catalogue”."
+],
+"catChoose": [
+"选一份产品库…",
+"Choose a catalogue…"
+],
+"catConfirm": [
+"请确认",
+"please confirm"
+],
+"catDouble": [
+"双列圆锥",
+"Double-row tapered"
+],
+"catDraftNote": [
+"存到云端以后才能选用。",
+"Save it to the cloud before picking from it."
+],
+"catFreecad": [
+"下载给 FreeCAD 用",
+"Download for FreeCAD"
+],
+"catFrom": [
+"产品库",
+"Catalogue"
+],
+"catImport": [
+"导入表格（.xlsx）…",
+"Import workbook (.xlsx)…"
+],
+"catInch": [
+"英制圆锥",
+"Inch tapered"
+],
+"catIntro": [
+"本厂的产品目录存在本单位的云端，只有本单位的账号能看到。选一个型号，外形尺寸自动填好；滚子、角度等内部尺寸由本厂自己填，填好前校核无法计算。目录里的额定载荷只作“厂家目录值”显示，不参与校核。",
+"Your catalogue is kept in your company’s cloud space, seen only by your company. Pick a model to fill the outside sizes; the inner sizes (rollers, angles) are yours to fill, and the checks wait for them. The catalogue’s load ratings are shown as the maker’s figures and are not used in the checks."
+],
+"catLicense": [
+"产品库给已开通的企业账号用，请联系问渠开通。",
+"The catalogue is for activated company accounts; contact WenQuest."
+],
+"catLogin": [
+"产品库是企业自己的产品目录，只有本单位登录的账号能看到。请先登录。",
+"The catalogue is your company’s own; only your company’s signed-in accounts see it. Please sign in."
+],
+"catMakerRatings": [
+"厂家目录值（未经核实，不参与校核）",
+"maker’s catalogue figures (not verified, not used in the checks)"
+],
+"catMetric": [
+"公制圆锥",
+"Metric tapered"
+],
+"catModel": [
+"型号",
+"Model"
+],
+"catMore": [
+"共 {n} 行，这里只列前 200 行；输入型号或内径查找。",
+"{n} rows; the first 200 are listed. Type a model or bore to find one."
+],
+"catNU": [
+"NU 短圆柱",
+"NU cylindrical"
+],
+"catNoHit": [
+"没有找到",
+"Nothing found"
+],
+"catNone": [
+"还没有产品库：导入本厂的目录表格",
+"No catalogue yet: import your catalogue workbook"
+],
+"catNotYet": [
+"暂不能计算",
+"not computed yet"
+],
+"catPage": [
+"页",
+"Page"
+],
+"catPickNote": [
+"点一行：设成这个型号（外形尺寸填好，内部尺寸清空待填；应用场景和载荷保留）。圆锥滚子轴承的宽度取总宽 T。",
+"Click a row to set that model (outside sizes filled, inner sizes cleared for you to fill; the application and loads stay). A tapered bearing’s width is taken as the overall width T."
+],
+"catRead": [
+"读到 {n} 行，已按固定规则核对（见下）。起个名字存到云端：",
+"Read {n} rows and checked them by fixed rules (below). Name it and save it to the cloud:"
+],
+"catReplace": [
+"替换“{name}”",
+"Replace “{name}”"
+],
+"catReplaced": [
+"已替换，成为新的一版",
+"Replaced as a new version"
+],
+"catSaveNew": [
+"存为新的产品库",
+"Save as a new catalogue"
+],
+"catSaved": [
+"已存到云端",
+"Saved to the cloud"
+],
+"catSearch": [
+"查型号或内径",
+"Find a model or bore"
+],
+"catSuspect": [
+"疑似",
+"suspected"
+],
+"catTemplate": [
+"下载空表格",
+"Blank workbook"
+],
+"catUnknown": [
+"未知",
+"unknown"
+],
+"catZhOnly": [
+"",
+"The reasons are written in Chinese for now."
+],
+"catalog": [
+"产品库",
+"Catalogue"
+],
 "chain": [
 "游隙链",
 "Clearance chain"

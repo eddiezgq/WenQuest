@@ -417,3 +417,142 @@ def _fit(rows, V, base, idx, field, size, name, sname, spread):
                 )
             )
     return out
+
+
+# ---- the catalogue as an Excel workbook (plan section 十七 K3): one sheet per table, the first row the headers ----
+# The company keeps its catalogue in this form (the template, or the checked table it was given) and loads it into its
+# own cloud space; nothing of it is in the code.
+SHEETS = {
+    "公制圆锥": (
+        "metric",
+        {
+            "页码": "page",
+            "系列": "series",
+            "新型号": "model",
+            "旧型号": "old",
+            "d": "d",
+            "D": "D",
+            "T": "T",
+            "B": "B",
+            "C": "C",
+            "R min": "R",
+            "r min": "r",
+            "Cr (kN)": "Cr",
+            "C0r (kN)": "Cor",
+            "极限转速 脂": "n_grease",
+            "极限转速 油": "n_oil",
+            "da max": "da_max",
+            "db min": "db_min",
+            "Da min": "Da_min",
+            "Da max": "Da_max",
+            "Db min": "Db_min",
+            "质量 (kg)": "mass",
+        },
+    ),
+    "英制圆锥": (
+        "inch",
+        {
+            "页码": "page",
+            "内圈": "model",
+            "外圈": "cup",
+            "d": "d",
+            "D": "D",
+            "T": "T",
+            "B": "B",
+            "C": "C",
+            "R min": "R",
+            "r min": "r",
+            "Cr (kN)": "Cr",
+            "C0r (kN)": "Cor",
+            "极限转速 脂": "n_grease",
+            "极限转速 油": "n_oil",
+        },
+    ),
+    "双列圆锥": (
+        "double",
+        {
+            "页码": "page",
+            "型号": "model",
+            "d": "d",
+            "D": "D",
+            "T": "T",
+            "Cr (kN)": "Cr",
+            "C0r (kN)": "Cor",
+            "轴向游隙 (mm)": "axial_clearance",
+        },
+    ),
+    "NU短圆柱": ("nu", {"页码": "page", "型号": "model", "d": "d", "D": "D", "B": "B"}),
+}
+# which design type a table's rows open as (the others are listed for reference: not a type the software computes yet)
+OPENS_AS = {"metric": "tapered", "inch": "tapered", "nu": "cylindrical"}
+MAX_ROWS = 5000
+
+
+class CatalogError(ValueError):
+    pass
+
+
+def _cell(v):
+    if v is None:
+        return None
+    if isinstance(v, float) and v.is_integer():
+        v = int(v)
+    s = str(v).strip()
+    return s or None
+
+
+def read_xlsx(data: bytes) -> list[dict]:
+    """The rows of a catalogue workbook, values kept as written (text). Sheets and columns not known are skipped; a
+    known sheet must have a model column."""
+    import io
+
+    from openpyxl import load_workbook
+
+    try:
+        wb = load_workbook(io.BytesIO(data), read_only=True, data_only=True)
+    except Exception as e:  # noqa: BLE001  (any unreadable file)
+        raise CatalogError("not an Excel workbook (.xlsx)") from e
+    rows: list[dict] = []
+    found = False
+    for ws in wb.worksheets:
+        if ws.title not in SHEETS:
+            continue
+        found = True
+        table, cols = SHEETS[ws.title]
+        it = ws.iter_rows(values_only=True)
+        head = [_cell(h) for h in next(it, ())]
+        keys = [cols.get(h) if h else None for h in head]
+        if "model" not in keys:
+            raise CatalogError(f"sheet {ws.title}: no model column")
+        for vals in it:
+            r = {k: _cell(v) for k, v in zip(keys, vals, strict=False) if k}
+            if not r.get("model"):
+                continue
+            r["table"] = table
+            if r.get("series") == "重卡非标":
+                r["nonstandard"] = True
+            rows.append(r)
+            if len(rows) > MAX_ROWS:
+                raise CatalogError(f"at most {MAX_ROWS} rows")
+    if not found:
+        raise CatalogError("no sheet named " + " / ".join(SHEETS))
+    return rows
+
+
+def template_xlsx() -> bytes:
+    """An empty workbook with the sheets and headers read_xlsx knows."""
+    import io
+
+    from openpyxl import Workbook
+    from openpyxl.styles import Font
+
+    wb = Workbook()
+    wb.remove(wb.active)
+    for name, (_t, cols) in SHEETS.items():
+        ws = wb.create_sheet(name)
+        ws.append(list(cols))
+        for c in ws[1]:
+            c.font = Font(bold=True)
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()

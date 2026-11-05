@@ -36,6 +36,11 @@ def test_two_kinds_share_versions_conflicts_and_isolation(sc):  # noqa: F811
     assert {x["name"] for x in c.get(URL, headers=s).json()["projects"]} == {"6206 减速器", "深沟球套圈工艺"}
     assert [x["name"] for x in c.get(URL + "?kind=process", headers=s).json()["projects"]] == ["深沟球套圈工艺"]
     assert [x["name"] for x in c.get(URL + "?kind=design", headers=s).json()["projects"]] == ["6206 减速器"]
+    # the third kind: the company's own product catalogue (plan section 十七 K3), listed apart from the others
+    k = c.post(URL, json={"name": "本厂产品目录", "kind": "catalog", "body": {"rows": [{"model": "X1"}]}}, headers=s).json()
+    assert k["kind"] == "catalog"
+    assert [x["name"] for x in c.get(URL + "?kind=catalog", headers=s).json()["projects"]] == ["本厂产品目录"]
+    assert c.delete(f"{URL}/{k['id']}", headers=s).status_code == 200
     assert c.get(URL + "?kind=cam", headers=s).status_code == 400
     # 别的单位（管理员 = 问渠）看不到、打不开、存不了；凸轮的项目库里也没有
     assert c.get(URL, headers=admin).json()["projects"] == []

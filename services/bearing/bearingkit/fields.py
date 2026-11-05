@@ -395,6 +395,7 @@ BLANK = {
     "lube": {"eta0": None, "alpha_p": None, "sigma": None},
     "limits": {"p_static": None, "p_fatigue": None, "gap_min": None, "wall_min": None},
     "design_note": "",  # the design description of the report (round 64 step 7)
+    "catalog": None,  # the catalogue row the outside sizes came from (plan section 十七 K3), or None
 }
 
 
@@ -509,3 +510,63 @@ def save(p: dict, path: str) -> None:
 
 def load(path: str) -> dict:
     return normalise(json.loads(Path(path).read_text(encoding="utf-8")))
+
+
+# ---- a model from the company's catalogue (plan section 十七 K3; the same as CatalogPanel.vue's pick) ----
+CATALOG_OPENS = {"metric": "tapered", "inch": "tapered", "nu": "cylindrical"}
+CATALOG_KEEP = ("scenario", "loads", "fits", "lube", "limits", "material")
+
+
+def catalog_rows(cat: dict) -> list[dict]:
+    """The rows of a downloaded catalogue file (.wqcatalog.json) a design can be set from."""
+    return [r for r in cat.get("rows") or [] if r.get("table") in CATALOG_OPENS and r.get("model")]
+
+
+def catalog_name(r: dict) -> str:
+    return f"{r['model']} / {r['cup']}" if r.get("cup") else str(r["model"])
+
+
+def from_catalog(p: dict, cat: dict, r: dict) -> dict:
+    """A new project for catalogue row r: outside sizes from the row (a tapered bearing's one width is the overall
+    width T), the inner sizes blank for the company to fill, the application and loads kept; the row is noted."""
+    typ = CATALOG_OPENS.get(r.get("table"))
+    if not typ:
+        raise ValueError("this catalogue table is not a bearing type the software computes yet")
+    q = copy.deepcopy(BLANK)
+    for k in CATALOG_KEEP:
+        if k in p:
+            q[k] = copy.deepcopy(p[k])
+    name = catalog_name(r)
+    num = lambda v: float(v) if v not in (None, "") else None  # noqa: E731
+    q.update(
+        type=typ,
+        title={"zh": name, "en": name},
+        size={"d": num(r.get("d")), "D": num(r.get("D")), "B": num(r.get("T") if typ == "tapered" else r.get("B"))},
+        catalog={
+            "maker": cat.get("name"),
+            "version": cat.get("version"),
+            "table": r.get("table"),
+            "model": r.get("model"),
+            "cup": r.get("cup"),
+            "page": r.get("page"),
+            "d": r.get("d"),
+            "D": r.get("D"),
+            "T": r.get("T"),
+            "B": r.get("B"),
+            "C": r.get("C"),
+            "Cr": r.get("Cr"),
+            "Cor": r.get("Cor"),
+        },
+    )
+    return normalise(q)
+
+
+def catalog_note(p: dict) -> str:
+    """Where the outside sizes came from, as the web page shows it (CatalogNote.vue)."""
+    c = p.get("catalog")
+    if not c:
+        return ""
+    s = f"产品库：{c.get('maker')} · {catalog_name(c)}" + (f"（p{c['page']}）" if c.get("page") else "")
+    if c.get("Cr") or c.get("Cor"):
+        s += f" · Cr {c.get('Cr') or '—'} kN、C0r {c.get('Cor') or '—'} kN，厂家目录值（未经核实，不参与校核）"
+    return s

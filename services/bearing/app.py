@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from bearingkit import assembly as AS
+from bearingkit import catalog as CK
 from bearingkit import parts as PT
 from bearingkit import process as PR
 from bearingkit import quality as QL
@@ -367,9 +368,46 @@ async def process_ep(request: Request):
     return run(make)
 
 
+# ------------------------------------------------------------------- plan section 十七 K3: the company's catalogue
+
+CATALOG_MAX = 5 * 1024 * 1024
+ERR_ZH += [
+    (r"^not an Excel workbook", "不是 Excel 表格（.xlsx）"),
+    (r"^sheet (.+): no model column$", r"工作表 \1 没有型号列"),
+    (r"^at most (\d+) rows$", r"最多 \1 行"),
+    (r"^no sheet named", "表里没有这些名字的工作表：" + " / ".join(CK.SHEETS)),
+]
+
+
+@app.post("/api/catalog/read")
+async def catalog_read(request: Request):
+    """The company's catalogue workbook (.xlsx, sent as the request body): its rows as written and the fixed checks.
+    Nothing is kept here; the page saves the rows to the company's cloud space."""
+    data = await request.body()
+    if len(data) > CATALOG_MAX:
+        raise HTTPException(413, {"en": "the workbook can be at most 5 MB", "zh": "表格不能超过 5 MB"})
+
+    def make():
+        rows = CK.read_xlsx(data)
+        return {"rows": rows, "findings": CK.check(rows), "opens_as": CK.OPENS_AS}
+
+    return run(make)
+
+
+@app.get("/api/catalog/template.xlsx")
+def catalog_template():
+    from fastapi.responses import Response
+
+    return Response(
+        CK.template_xlsx(),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"content-disposition": "attachment; filename=wenquest-bearing-catalogue.xlsx"},
+    )
+
+
 import projects_api  # noqa: E402  (cloud projects, round 64 step 7)
 
-projects_api.register(app, 4 * MAX_BODY)
+projects_api.register(app, 8 * MAX_BODY)  # 2 MB: a product catalogue is the largest kind
 
 import ai_api  # noqa: E402  (AI drafts, round 64 step 7)
 

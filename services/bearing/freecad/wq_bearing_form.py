@@ -70,6 +70,7 @@ class Form(QtWidgets.QWidget):
         for key, text in (
             ("new", "新建"),
             ("open", "打开项目"),
+            ("catalog", "产品库"),
             ("save", "保存项目"),
             ("calc", "计算"),
             ("model", "建模"),
@@ -104,6 +105,7 @@ class Form(QtWidgets.QWidget):
         outer.addWidget(split, 1)
         self.buttons["new"].clicked.connect(self.new)
         self.buttons["open"].clicked.connect(self.open_dialog)
+        self.buttons["catalog"].clicked.connect(self.catalog_dialog)
         self.buttons["save"].clicked.connect(self.save_dialog)
         self.buttons["calc"].clicked.connect(self.calculate)
         self.buttons["model"].clicked.connect(self.model)
@@ -278,6 +280,32 @@ class Form(QtWidgets.QWidget):
                 path += ".wqbearing.json"
             self.save_file(path)
 
+    def use_catalog(self, cat, row):
+        """设成产品库里的一个型号（与网页版“产品库”相同：外形尺寸填好，内部尺寸清空待填，应用场景和载荷保留）。"""
+        self.project, self.path = FL.from_catalog(self.project, cat, row), None
+        self.rebuild()
+        self.calculate()
+
+    def catalog_dialog(self):
+        """本厂产品库：网页版“产品库”里“下载给 FreeCAD 用”的文件（.wqcatalog.json）。"""
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self, "打开产品库文件", os.path.expanduser("~"), "问渠轴承产品库 (*.wqcatalog.json)"
+        )
+        if not path:
+            return
+        with open(path, encoding="utf-8") as f:
+            cat = json.load(f)
+        rows = FL.catalog_rows(cat)
+        if not rows:
+            QtWidgets.QMessageBox.information(self, "产品库", "这个文件里没有能计算的型号。")
+            return
+        names = [f"{FL.catalog_name(r)}   d {r.get('d')}  D {r.get('D')}  T {r.get('T') or r.get('B')}" for r in rows]
+        item, ok = QtWidgets.QInputDialog.getItem(
+            self, "产品库", "选型号（外形尺寸填好，内部尺寸请自己填）", names, 0, False
+        )
+        if ok and item:
+            self.use_catalog(cat, rows[names.index(item)])
+
     # ------------------------------------------------------------------ actions
     def calculate(self):
         import wq_bearing
@@ -287,6 +315,7 @@ class Form(QtWidgets.QWidget):
         except (ValueError, TypeError) as e:
             self.verdict.setText("算不出来：{}".format(e))
             self.table.setRowCount(0)
+            self.note.setText(FL.catalog_note(self.project))
             return None
         self.verdict.setText("总结论：" + STATUS.get(res.get("status"), res.get("status")))
         checks = res.get("checks") or []
@@ -308,7 +337,16 @@ class Form(QtWidgets.QWidget):
                 self.table.setItem(i, j, QtWidgets.QTableWidgetItem(str(x).strip()))
         self.table.resizeColumnsToContents()
         self.table.setColumnWidth(0, min(self.table.columnWidth(0), 220))
-        self.note.setText("计算由确定性程序完成，未经 AI；许用值由用户填写，缺数据判为“未知”。")
+        self.note.setText(
+            "\n".join(
+                x
+                for x in (
+                    FL.catalog_note(self.project),
+                    "计算由确定性程序完成，未经 AI；许用值由用户填写，缺数据判为“未知”。",
+                )
+                if x
+            )
+        )
         return res
 
     def model(self):

@@ -148,3 +148,87 @@ def test_nonstandard_series_and_input_untouched():
     got = K.check(rows)
     assert not any(x["rule"] == "outlier" and "外径" in x["why"] for x in got)
     assert rows == before  # check() only reads
+
+
+def test_the_workbook_round_trip_and_the_service():
+    """The company's workbook (made-up rows here) is read as written, checked, and nothing else is kept."""
+    import io
+
+    from fastapi.testclient import TestClient
+    from openpyxl import load_workbook
+
+    import app as service
+
+    c = TestClient(service.app)
+    r = c.get("/api/catalog/template.xlsx")
+    assert r.status_code == 200 and r.content[:2] == b"PK"
+    wb = load_workbook(io.BytesIO(r.content))
+    assert wb.sheetnames == list(K.SHEETS)
+    m, i = wb["公制圆锥"], wb["英制圆锥"]
+    head = [x.value for x in m[1]]
+    for row in series()[:6]:
+        m.append([row.get(K.SHEETS["公制圆锥"][1][h]) for h in head])
+    m.append([None] * len(head))  # an empty line is skipped
+    ih = [x.value for x in i[1]]
+    for row in inch()[:3]:
+        i.append([row.get(K.SHEETS["英制圆锥"][1][h]) for h in ih])
+    i.append(["2", "X999", "X998", 25.4, "50.800", 15, 15, 12, None, None, None, None, None, None])
+    buf = io.BytesIO()
+    wb.save(buf)
+    got = c.post("/api/catalog/read", content=buf.getvalue())
+    assert got.status_code == 200, got.text
+    j = got.json()
+    rows = j["rows"]
+    assert [x["model"] for x in rows if x["table"] == "metric"] == [f"880{k:02d}" for k in range(6)]
+    assert len([x for x in rows if x["table"] == "inch"]) == 4
+    last = rows[-1]
+    assert (
+        last["d"] == "25.4"
+        and last["D"] == "50.800"
+        and last["T"] == "15"
+        and "Cr" not in {k for k, v in last.items() if v}
+    )
+    assert j["opens_as"]["metric"] == "tapered" and any(
+        f["rule"] == "blank" and f["model"] == "X999 / X998" for f in j["findings"]
+    )
+    bad = c.post("/api/catalog/read", content=b"not a workbook")
+    assert bad.status_code == 422 and bad.json()["detail"]["zh"].startswith("不是 Excel")
+    empty = io.BytesIO()
+    from openpyxl import Workbook
+
+    Workbook().save(empty)
+    e = c.post("/api/catalog/read", content=empty.getvalue())
+    assert e.status_code == 422 and "公制圆锥" in e.json()["detail"]["zh"]
+
+
+def test_a_design_from_a_catalogue_row():
+    """Picking a model (the web panel and the FreeCAD form share fields.from_catalog): outside sizes from the row, a
+    tapered bearing's width is T, the inner sizes cleared, the application kept, the row noted; the checks then wait
+    for the inner sizes (an error asking for them, never a pass)."""
+    import json
+    from pathlib import Path
+
+    import pytest
+
+    from bearingkit import fields as FL
+    from bearingkit.analyze import ProjectError, analyse
+
+    ex = json.loads((Path(__file__).resolve().parents[1] / "examples" / "scene-tapered.json").read_text("utf-8"))
+    cat = {"name": "示范厂目录（虚构）", "version": 3, "rows": series() + inch()}
+    assert all(r["table"] in ("metric", "inch") for r in FL.catalog_rows(cat))
+    row = series()[3]
+    p = FL.from_catalog(ex, cat, row)
+    assert p["type"] == "tapered" and p["size"] == {"d": 35.0, "D": 82.0, "B": float(row["T"])}
+    assert p["inner"]["Dw"] is None and p["inner"]["Z"] is None and p["scenario"] == ex["scenario"]
+    assert (
+        p["catalog"]["model"] == "88003"
+        and p["catalog"]["maker"] == "示范厂目录（虚构）"
+        and p["catalog"]["version"] == 3
+    )
+    assert p["title"]["zh"] == "88003" and "厂家目录值" in FL.catalog_note(p) and FL.catalog_note(ex) == ""
+    with pytest.raises(ProjectError, match="roller diameter"):
+        analyse(p)
+    q = FL.from_catalog(ex, cat, inch()[0])
+    assert q["catalog"]["cup"] == "X020" and q["title"]["zh"] == "X010 / X020"
+    with pytest.raises(ValueError):
+        FL.from_catalog(ex, cat, {"table": "double", "model": "T1", "d": "40", "D": "80", "T": "40"})

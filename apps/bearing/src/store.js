@@ -18,6 +18,7 @@ export function blank() {
     lube: { eta0: null, alpha_p: null, sigma: null },
     limits: { p_static: null, p_fatigue: null, gap_min: null, wall_min: null },
     design_note: '',
+    catalog: null,  // the catalogue row the project was set from (plan section 十七 K3), or null
   }
 }
 function loadSaved() {

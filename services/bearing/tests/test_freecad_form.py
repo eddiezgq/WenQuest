@@ -94,3 +94,16 @@ def test_switching_type_and_scenario_rebuilds_the_form():
     bad.setText("abc")
     bad.editingFinished.emit()
     assert bad.text() == "" and form.project["scenario"]["a"] is None  # not a number: refused, nothing stored
+
+
+def test_a_model_from_the_company_catalogue(tmp_path):
+    """产品库：选一个型号，外形尺寸填好、内部尺寸清空，说明里写出出处（虚构目录）。"""
+    from test_catalog import series
+
+    form = WF.Form(json.loads((EX / "scene-tapered.json").read_text(encoding="utf-8")))
+    cat = {"name": "示范厂目录（虚构）", "version": 1, "rows": series()}
+    form.use_catalog(cat, series()[2])
+    settle()
+    assert form.project["size"]["d"] == 30.0 and form.project["inner"]["Dw"] is None
+    assert "88002" in form.note.text() and "算不出来" in form.verdict.text()
+    assert form.title.text() == "88002"
