@@ -58,7 +58,17 @@ nav.main a[aria-current="page"] { color: var(--water); }
 
 /* ---------- 首屏 ---------- */
 .hero { position: relative; background: var(--night); color: var(--night-ink); overflow: hidden; }
-.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+.hero .wrap { pointer-events: none; } .hero .wrap a, .hero .wrap button { pointer-events: auto; }
+@media (min-width: 901px) { .hero > .wrap:first-of-type > * { max-width: 50%; } .hero > .wrap:first-of-type > .hsteps { max-width: 100%; } }
+@media (max-width: 900px) { .hero > .wrap:first-of-type { padding-top: 46vh !important; } }
+@media (min-width: 901px) { .hero > .wrap:first-of-type h1 { font-size: clamp(34px, 3.4vw, 50px); } }
+.hero .hfig { margin: 22px 0 0; font: 400 12.5px/1.7 ui-monospace, Menlo, monospace; color: var(--night-muted); }
+.hero .hfig b { color: var(--night-ink); font-weight: 500; } .hero .hfig .hc { color: #f2b705; }
+.hsteps { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--night-muted); min-height: 26px; }
+.hsteps li { padding: 3px 9px; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; background: rgba(10,18,22,.6); }
+.hsteps li + li::before { content: "→ "; color: #f2b705; }
+.hsteps li.now { color: #fff4d6; border-color: #f2b705; }
 .hero .wrap { position: relative; z-index: 2; padding-block: 104px 72px; }
 .eyebrow { font: 500 13px/1.4 var(--mono); letter-spacing: .16em; color: var(--water); margin: 0 0 18px; }
 .hero h1 { margin: 0; font: 900 clamp(34px, 5.6vw, 70px)/1.16 var(--serif-zh); letter-spacing: .02em; max-width: 15em; text-wrap: balance; }

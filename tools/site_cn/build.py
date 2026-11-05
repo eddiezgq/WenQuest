@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "87a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "90a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -237,18 +237,22 @@ def home():
   <article class="card"><h3>教育服务</h3><p>学习系统（问渠 AI 学习平台）、电子教材开发、虚拟实验开发、数字工厂开发、CAD/CAM/CAE 集成化解决方案；学校和企业可按单位申请在线体验。</p><a class="more" href="/education/">了解 →</a></article>
   <article class="card"><h3>咨询</h3><p>数字化转型与智能制造诊断，ERP / MES 选型与实施规划，工业软件方案咨询。</p><a class="more" href="/consulting/">了解 →</a></article>
 </div>"""
-    body = f"""<section class="hero"><canvas id="thread" aria-hidden="true"></canvas><div class="wrap">
+    body = f"""<section class="hero"><canvas id="hub3d" role="img" aria-label="厂情中枢立体网络：设备、数据、事件三层"></canvas><div class="wrap">
   <p class="eyebrow">问渠科技 · AI 原生的制造业软件</p>
   <h1><span class="nw">按你的工厂来配，</span><span class="nw"><em>模块自由组合</em>，</span><span class="nw">快速上线、越用越合身。</span></h1>
   <p class="lead">我们用 AI 重新构造制造企业的软件，不是在老系统上加一个聊天框：整理文件、起草流程、每天自查、追查原因、生成程序，这些原来要人一点点做的事交给 AI，人只做判断和审批。</p>
   <div class="btns"><a class="btn solid" href="/contact/">预约演示 →</a><a class="btn" href="#flagships">看两个旗舰产品</a></div>
   <p class="motto">问渠那得清如许，为有源头活水来。</p>
+  <p class="hfig">厂情中枢 · 设备 → 数据 → 事件 · 对象 / 关系 <b id="hcount">—</b> · 数据 <b id="hrate">—</b>/分钟<br><span class="hc">事件链 <span id="hchain"></span></span></p>
+  <ol class="hsteps" id="hsteps"></ol>
 </div>
 <div class="wrap" style="position:relative;z-index:2"><div class="pillars">
   <div><span class="no">01</span><h3>AI 原生</h3><p>每项功能都写清“AI 做什么、人做什么”。AI 起草，人批准才生效，全程留痕。</p></div>
   <div><span class="no">02</span><h3>自由组合</h3><p>质量、ERP、MRP、MES、CAD、CAM、CAE、厂情中枢，每个模块都能单独用，也能任意组合，经同一条数据总线连在一起，并对接你已有的系统。</p></div>
   <div><span class="no">03</span><h3>个性化部署</h3><p>按你的产品、流程、表单和标准配置，不让企业去适应软件。上线后按你的反馈持续完善：AI 起草改动，你确认后生效。</p></div>
 </div></div></section>
+<script src="/assets/hub3d.js?v={VER}"></script>
+<script>WQHub3D.start(document.getElementById("hub3d"), {{chain: document.getElementById("hchain"), steps: document.getElementById("hsteps"), count: document.getElementById("hcount"), rate: document.getElementById("hrate"), area: document.querySelector(".hero > .wrap")}});</script>
 <div id="flagships"></div>
 {part("旗舰产品", "两个旗舰：质量为核心的 AI ERP，和一条数字主线", "两者可以单独上，也可以合在一起：质量 ERP 管体系和经营，集成平台把设计、工艺和车间接进来。", f'<div class="flagships">{flag_qms}{flag_plat}</div><p class="note">{DEMO_NOTE}</p>')}
 {part("成熟产品", "两款已经可以交付的行业软件", "网页直接用，也能装进 FreeCAD；计算核心相同，结果一致；设计结果可以提交到集成平台审批。", products, "alt")}
@@ -671,7 +675,8 @@ def main():
         shutil.copy2(p, OUT / "assets" / p.name)
     shutil.copy2(HERE / "cn.css", OUT / "assets" / "cn.css")
     shutil.copy2(HERE / "cn.js", OUT / "assets" / "cn.js")
-    shutil.copy2(ROOT / "site" / "assist.js", OUT / "assets" / "assist.js")   # 第 87 轮：客服小组件，两站同一个
+    shutil.copy2(ROOT / "site" / "assist.js", OUT / "assets" / "assist.js")
+    shutil.copy2(ROOT / "site" / "hub3d.js", OUT / "assets" / "hub3d.js")     # 第 90 轮：首屏立体厂情中枢，两站同一个   # 第 87 轮：客服小组件，两站同一个
     (OUT / "assets" / "logo.svg").write_text(LOGO.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"'), encoding="utf-8")
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
     page("/404/", "页面不存在", "页面不存在。", hero("404", "这一页不存在", "可能是网址打错了，或者页面已经移走。", None, [("回首页", "/"), ("预约演示", "/contact/")]))
