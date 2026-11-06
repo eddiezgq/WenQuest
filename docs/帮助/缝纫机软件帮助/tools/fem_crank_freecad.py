@@ -1,7 +1,7 @@
 # 用 FreeCAD 自带的 Gmsh + CalculiX 给针杆曲柄做一次有限元（第 49 轮帮助的算例，也是帮助里给用户的控制台命令的验证）
 import os, sys, json, math
-sys.path.insert(0, os.path.expanduser("~/.local/share/FreeCAD/Mod/WenQuestSewing"))
 import FreeCAD as App, Part, ObjectsFem
+sys.path.insert(0, os.path.join(App.getUserAppDataDir(), "Mod", "WenQuestSewing"))  # FreeCAD 1.1 是 …/FreeCAD/v1-1/Mod
 from sewcore import cad
 case = json.load(open("/home/claude/fc/case.json"))
 doc = App.newDocument("crank")
