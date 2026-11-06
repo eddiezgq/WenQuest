@@ -72,7 +72,8 @@ def register(app, m) -> None:
         return Path(os.environ.get("WQ_PILOT_QUEUE", "/pilot-queue"))
 
     def most() -> int:
-        return int(os.environ.get("WQ_PILOT_MAX", "3") or 3)
+        # 国内 3 家；美国服务器还跑着数字工厂，内存只够 2 家（11-06 换装后实测可用约 3 GB）
+        return int(os.environ.get("WQ_PILOT_MAX", "") or (3 if cn() else 2))
 
     def db() -> sqlite3.Connection:
         d = Path(state.settings.data_dir)
