@@ -81,6 +81,9 @@ def show_checks(obj=None):
             msg = goto(obj, checks[row]["key"])
             if msg:
                 dlg.accept()
+            else:                                           # 第 94 轮以前存的文件：还没算过出问题的部件
+                QtW.QMessageBox.information(dlg, "问渠缝纫机", "先点“重新计算”（Ctrl+R），再双击。")
+    t.setEditTriggers(QtW.QAbstractItemView.NoEditTriggers)    # 双击是“停到出问题的地方”，不是改格子
     t.cellDoubleClicked.connect(dbl)
     t.setMinimumHeight(min(len(checks), 8) * 30 + 40)     # 第 94 轮：下面的表很长时（花样机每针表）校核表不被挤成一行
     lay.addWidget(t, 3)
@@ -172,13 +175,14 @@ def toggle_spin():
     t = QtCore.QTimer()
     p = obj.Proxy.params(obj)
     whole = F.span(obj, p)               # 主轴机型 360°；花样、刺绣、横机走完全部针 / 趟再从头
-    step = 1.0 if _TIMER["slow"] else 6.0
+    fast = 18.0 if obj.Machine == "flatknit" else 6.0     # 横机一片几百趟：一格走得多一点（每趟 0.8 秒）
+    step = fast / 6.0 if _TIMER["slow"] else fast
 
     def tick():
         try:
-            phi = (obj.Phi.Value + step) % whole
+            phi = (F.get_phi(obj) + step) % whole
             obj.Proxy.update_parts(obj, p, phi)
-            obj.Phi = phi
+            F.set_phi(obj, phi)
             obj.purgeTouched()
             Gui.updateGui()
         except Exception:  # noqa: BLE001
@@ -201,7 +205,7 @@ def goto(obj, key):
     where = ""
     if h.get("phi") is not None:
         obj.Proxy.update_parts(obj, p, h["phi"])
-        obj.Phi = h["phi"]
+        F.set_phi(obj, h["phi"])
         obj.purgeTouched()
         where = F.progress_text(obj, p, h["phi"])
     Gui.Selection.clearSelection()
@@ -733,8 +737,9 @@ class VideoDialog(QtW.QDialog):
             r = c.video(M.MACHINE, p, lang, self.voice.isChecked(), self.obj.Label)
         except N.NetError as e:
             self.out.setText(_html.escape(str(e)))
-            self.go.setEnabled(True)
             return
+        finally:
+            self.go.setEnabled(True)
         self.vid, self.url = r["id"], c.video_url(r["id"])
         probs = []
         for k in (r.get("problems") or [])[:3]:            # 服务器给的是校核项代号，换成名字

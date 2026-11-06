@@ -63,7 +63,14 @@ class Client:
             raise NetError(ERR.get(code) or "服务器返回错误（{} {}）".format(e.code, code)) from e
         except urllib.error.URLError as e:
             raise NetError("连不上问渠服务器（{}）：检查网络，或在设置里改服务器地址。".format(e.reason)) from e
-        return out if raw else json.loads(out.decode("utf-8"))
+        except (TimeoutError, OSError) as e:           # 第 94 轮：读超时、连接中断
+            raise NetError("问渠服务器没有按时回话（{}）：稍后再试。".format(e)) from e
+        if raw:
+            return out
+        try:
+            return json.loads(out.decode("utf-8"))
+        except ValueError as e:                        # 代理返回的错误页之类
+            raise NetError("问渠服务器的回话看不懂（不是 JSON）：稍后再试，或检查服务器地址。") from e
 
     # AI 助手：kind = draft / explain / describe
     def ai(self, kind, machine, params, sentence=""):

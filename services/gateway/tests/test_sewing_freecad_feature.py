@@ -205,3 +205,18 @@ def test_red_parts_and_goto_spot(feature, m):
         if m in feature.SEQ:
             unit = "趟" if m == "flatknit" else "针"
             assert o.Progress.startswith("第 {} {}".format(h["index"] + 1, unit))
+
+
+@pytest.mark.parametrize("m", ["pattern", "flatknit", "lockstitch"])
+def test_progress_angle_beyond_360_survives_recompute(feature, m):
+    """审读：FreeCAD 的角度属性夹在 360° 以内——花样、刺绣、横机的进度角另存一个数，重算后还停在那一针"""
+    doc = Doc()
+    o = feature.add_design(doc, params=BAD[m], machine=m)
+    h = next(h for h in feature.hotspots(o) if h["phi"] is not None)
+    feature.set_phi(o, h["phi"])
+    assert o.Phi == pytest.approx(h["phi"] % 360)
+    assert feature.get_phi(o) == pytest.approx(h["phi"])
+    doc.recompute()
+    assert feature.get_phi(o) == pytest.approx(h["phi"])
+    if m in feature.SEQ:
+        assert o.Progress.startswith("第 {} ".format(h["index"] + 1))

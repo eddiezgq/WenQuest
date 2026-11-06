@@ -19,7 +19,7 @@ from sewcore import cad  # noqa: E402
 from sewcore import hotspot  # noqa: E402
 
 RED, ORANGE = (0.86, 0.20, 0.16), (0.95, 0.55, 0.15)
-SEQ = hotspot.SEQ                       # 花样机、刺绣机按针走，横机按趟走：Phi 是进度角，每 360° 一针 / 一趟（第 89 轮）
+SEQ = hotspot.SEQ                       # 花样机、刺绣机按针走，横机按趟走：进度角每 360° 一针 / 一趟（第 89 轮）；存在 Progress 角（Phi 是角度属性，FreeCAD 夹在 360° 以内）
 
 PROP = "App::PropertyFloat"
 
@@ -84,9 +84,23 @@ def _stitch_params(obj, machine="embroid"):
 
 
 PHI_TIP = {"lockstitch": "零件摆放时的主轴转角（0° = 针杆上止点）",
-           "pattern": "进度角：每 360° 走一针（第 k 针从 k×360° 开始）；读数见“进度”",
-           "embroid": "进度角：每 360° 绣一针（第 k 针从 k×360° 开始）；读数见“进度”",
-           "flatknit": "进度角：每 360° 机头走一趟（第 k 趟从 k×360° 开始）；读数见“进度”"}
+           "pattern": "这一针里的转角（第几针见“进度”；改“进度角”跳到别的针）",
+           "embroid": "这一针里的转角（第几针见“进度”；改“进度角”跳到别的针）",
+           "flatknit": "这一趟里的进度（第几趟见“进度”；改“进度角”跳到别的趟）"}
+
+
+def get_phi(obj):
+    """零件摆放的位置：主轴机型是主轴转角；花样、刺绣、横机是进度角（可以远大于 360°）"""
+    if getattr(obj, "Machine", "") in SEQ and hasattr(obj, "ProgressAngle"):
+        return float(obj.ProgressAngle)
+    return float(obj.Phi.Value if hasattr(obj.Phi, "Value") else obj.Phi)
+
+
+def set_phi(obj, phi):
+    if getattr(obj, "Machine", "") in SEQ:
+        _ensure_props(obj)
+        obj.ProgressAngle = float(phi)
+    obj.Phi = float(phi) % 360.0
 
 
 def _ensure_props(obj):
@@ -97,6 +111,9 @@ def _ensure_props(obj):
     if getattr(obj, "Machine", "") in SEQ and not hasattr(obj, "Progress"):
         obj.addProperty("App::PropertyString", "Progress", "显示", "现在走到第几针 / 第几趟")
         obj.setEditorMode("Progress", 1)
+    if getattr(obj, "Machine", "") in SEQ and not hasattr(obj, "ProgressAngle"):
+        obj.addProperty("App::PropertyFloat", "ProgressAngle", "显示", "进度角：每 360° 一针 / 一趟（第 k 针从 k×360° 开始，从 0 数）")
+        obj.ProgressAngle = float(obj.Phi.Value if hasattr(obj.Phi, "Value") else obj.Phi)
 
 
 def span(obj, p=None):
@@ -189,9 +206,16 @@ class SewDesign:
         except Exception as e:  # noqa: BLE001  标红是辅助，算不出不影响零件和校核
             App.Console.PrintWarning("问渠缝纫机：标红没算出来（{}）\n".format(e))
             hs = []
+        if getattr(self, "_painted", None) is None:      # 刚打开的文件：上次涂过的就是上次的红黄灯部件（灯灭了要还回本色）
+            self._hot = None
+            self._painted = {}
+            names = {getattr(o, "SewKey", ""): o.Name for o in (obj.Parts or []) if o is not None}
+            for n, c in self.hot_colors(obj).items():
+                if n in names:
+                    self._painted[names[n]] = tuple(c)
         obj.HotJson = json.dumps(hs, ensure_ascii=False)
         self._hot = None
-        self.update_parts(obj, p, float(obj.Phi.Value if hasattr(obj.Phi, "Value") else obj.Phi))
+        self.update_parts(obj, p, get_phi(obj))
 
     def hot_colors(self, obj):
         """零件名 → 颜色：红灯的部件红、黄灯的橙（同一个零件红黄都有算红）"""
@@ -223,7 +247,8 @@ class SewDesign:
         for d in model["parts"]:
             name = d["name"]
             o = have.get(name)
-            if o is None or o.Document is None:
+            fresh = o is None or o.Document is None
+            if fresh:
                 o = doc.addObject("Part::Feature", "Sew_" + name)
                 o.addProperty("App::PropertyString", "SewKey", "问渠", "零件代号")
                 o.SewKey = name
@@ -234,12 +259,27 @@ class SewDesign:
             if sig.get(o.Name) != key:              # 只重建动了的零件：转动时快得多（横机一百多根针，大多不动）
                 o.Shape = cad.freecad_shapes({"parts": [d]})[0][2]
                 sig[o.Name] = key
-            color = tuple(hot.get(name, d["color"]))
-            try:
-                if tuple(round(c, 3) for c in o.ViewObject.ShapeColor[:3]) != tuple(round(c, 3) for c in color[:3]):
+            # 只动我们涂过的颜色：新零件给本色；红黄灯涂红 / 橙；灯灭了还回本色。用户自己改过的颜色不碰
+            painted = getattr(self, "_painted", None)
+            if painted is None:
+                painted = self._painted = {}
+            want = hot.get(name)
+            color = None
+            if fresh:
+                color = tuple(want or d["color"])
+            elif want is not None and painted.get(o.Name) != tuple(want):
+                color = tuple(want)
+            elif want is None and o.Name in painted:
+                color = tuple(d["color"])
+            if color is not None:
+                try:
                     o.ViewObject.ShapeColor = color
-            except Exception:  # noqa: BLE001  命令行里没有 ViewObject
-                pass
+                except Exception:  # noqa: BLE001  命令行里没有 ViewObject
+                    pass
+                if want is not None:
+                    painted[o.Name] = tuple(want)
+                else:
+                    painted.pop(o.Name, None)
             o.purgeTouched()
             out.append(o)
         keep = {x.Name for x in out}
