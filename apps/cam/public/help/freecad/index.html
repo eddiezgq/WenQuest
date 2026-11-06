@@ -352,12 +352,12 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="try" href="https://wenquestrobotics.com/cam/?example=atc-globoidal&amp;mode=cae" target="_blank" rel="noopener">▶ 试一试：打开 CAE 页</a>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-05-3d-cae.jpg"><source src="../media/web-05-3d-cae.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-05-3d-cae.vtt"></video><figcaption>▶ 案例二录像：三维与 CAE</figcaption></figure></section>
 <section id="console"><h2><span class="n">06</span>不开界面：控制台命令</h2><p class="lead">在 FreeCAD 的 Python 控制台里一行跑完：校核、建模、导出。</p><pre><code class="language-python">import wq_cam
-wq_cam.run_headless(&quot;项目.json&quot;, &quot;输出文件夹&quot;)
+wq_cam.run_headless(&quot;项目.wqcam.json&quot;, &quot;输出文件夹&quot;)
 </code></pre>
 <p>批量处理一批凸轮：</p>
 <pre><code class="language-python">import glob, os, wq_cam
-for f in glob.glob(&quot;凸轮/*.json&quot;):
-    wq_cam.run_headless(f, os.path.join(&quot;输出&quot;, os.path.basename(f)[:-5]))
+for f in glob.glob(&quot;凸轮/*.wqcam.json&quot;):
+    wq_cam.run_headless(f, os.path.join(&quot;输出&quot;, os.path.basename(f)[:-11]))
 </code></pre></section>
 <section id="methods"><h2><span class="n">07</span>怎么算：运动规律、压力角、曲率、接触与跳离</h2><p class="lead">每一项校核出自哪个公式；方法出自公开的教材和专著，每个模块带标准题。</p><h3 id="methods-1">运动程序与运动规律</h3>
 <p>一圈由升、停、回拼成，每段选一种运动规律：等速、等加速等减速、简谐（余弦加速度）、摆线（正弦加速度）、修正梯形、修正正弦、3-4-5 次多项式、4-5-6-7 次多项式。段与段接头处速度不连续是<strong>刚性冲击</strong>，加速度不连续是<strong>柔性冲击</strong>，软件逐个接头查。也可以用点表（至少 8 个点，按周期三次样条连起来）。</p>
