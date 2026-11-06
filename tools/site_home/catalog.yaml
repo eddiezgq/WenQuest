@@ -9,6 +9,11 @@ intro:
   learn: {zh: 学习平台与 AI 建课, en: Learning platform and AI course building, yt: "", bv: ""}
   factory: {zh: 数字工厂, en: The digital factory, yt: "", bv: ""}
   eval: {zh: 评价系统与校情中枢, en: Assessment and Campus Hub, yt: "", bv: ""}
+  textbook: {zh: 自编教材与网页互动课件, en: Textbooks and interactive web slides, yt: "", bv: ""}
+  whiteboard: {zh: 白板课, en: Whiteboard lessons, yt: "", bv: ""}
+  video3d: {zh: 三维仿真视频, en: 3D simulation films, yt: "", bv: ""}
+  cambearing: {zh: 问渠凸轮与问渠轴承, en: WenQuest Cam and Bearing, yt: "", bv: ""}
+  labs: {zh: 虚拟实验室, en: Virtual labs, yt: "", bv: ""}
 
 groups:
   - key: learn
@@ -17,18 +22,18 @@ groups:
     items:
       - {zh: "学习平台", en: "Learning platform", dz: "课程、作业测验、讨论、直播课，网页与微信小程序", de: "Courses, homework, quizzes, discussion and live classes, on the web and WeChat", url: "https://learn.wenquestrobotics.com/", login: true, intro: learn}
       - {zh: "AI 建课", en: "AI course building", dz: "对话中建课，资料再乱也由 AI 整理", de: "Build a course by conversation; the AI sorts out the materials", url: "https://learn.wenquestrobotics.com/pages/studio/studio", login: true, intro: learn}
-      - {zh: "教材", en: "Textbooks", dz: "九本自编教材和网页版教材，每章配程序、动画、虚拟实验", de: "Nine textbooks of our own plus web editions, each chapter with code, animations and labs", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true}
+      - {zh: "教材", en: "Textbooks", dz: "九本自编教材和网页版教材，每章配程序、动画、虚拟实验", de: "Nine textbooks of our own plus web editions, each chapter with code, animations and labs", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true, intro: textbook}
       - {zh: "课程目录", en: "Course catalog", dz: "缝纫机设计与制造等已上线的课程", de: "Courses online now, such as sewing machine design", url: "https://learn.wenquestrobotics.com/pages/catalog/catalog", login: true, intro: learn}
       - {zh: "评价系统（演示）", en: "Assessment (demo)", dz: "学生、教师、学校三端，自动生成课程目标达成报告、教学质量报告", de: "Student, teacher and school views; course-objective and teaching-quality reports in one click", url: "/eval/", intro: eval}
       - {zh: "校情中枢（演示）", en: "Campus Hub (demo)", dz: "学校、学院、专业看板，毕业要求达成、改进任务、评估报告", de: "School, college and program dashboards, graduate attributes, improvement tasks, reports", url: "/xq/", intro: eval}
-      - {zh: "网页互动课件", en: "Interactive web slides", dz: "像 PPT 一样翻页，动画、实验、三维模型当场操作", de: "Page through like slides, with live animations, labs and 3D models", url: "/solutions/sewing/"}
+      - {zh: "网页互动课件", en: "Interactive web slides", dz: "像 PPT 一样翻页，动画、实验、三维模型当场操作", de: "Page through like slides, with live animations, labs and 3D models", url: "/solutions/sewing/", intro: textbook}
   - key: make
     zh: 内容制作软件
     en: Content tools
     items:
-      - {zh: "白板课", en: "Whiteboard lessons", dz: "输入题目或上传录音，AI 画出会动的白板讲解", de: "Type a topic or upload a recording; the AI draws an animated whiteboard talk", url: "https://learn.wenquestrobotics.com/pages/whiteboard/whiteboard", login: true}
-      - {zh: "三维仿真视频", en: "3D simulation videos", dz: "用一段话描述，出工程级三维动画片", de: "Describe it in a paragraph and get an engineering-grade 3D film", url: "https://learn.wenquestrobotics.com/pages/video3d/video3d", login: true}
-      - {zh: "三维样片", en: "3D sample films", dz: "平缝机、机械臂抓放等样片", de: "Lockstitch machine, robot pick-and-place and more", url: "/cases/video3d.html"}
+      - {zh: "白板课", en: "Whiteboard lessons", dz: "输入题目或上传录音，AI 画出会动的白板讲解", de: "Type a topic or upload a recording; the AI draws an animated whiteboard talk", url: "https://learn.wenquestrobotics.com/pages/whiteboard/whiteboard", login: true, intro: whiteboard}
+      - {zh: "三维仿真视频", en: "3D simulation videos", dz: "用一段话描述，出工程级三维动画片", de: "Describe it in a paragraph and get an engineering-grade 3D film", url: "https://learn.wenquestrobotics.com/pages/video3d/video3d", login: true, intro: video3d}
+      - {zh: "三维样片", en: "3D sample films", dz: "平缝机、机械臂抓放等样片", de: "Lockstitch machine, robot pick-and-place and more", url: "/cases/video3d.html", intro: video3d}
       - {zh: "讲解视频与公开课", en: "Lecture videos", dz: "每课一段讲解视频，中英配音与字幕", de: "A lecture video for every lesson, Chinese and English", url: "#videos"}
   - key: park
     wide: true
@@ -58,19 +63,19 @@ groups:
       - {zh: "数字孪生", en: "Digital twin", dz: "现场设备的寿命、残差与预测性维护", de: "Field units' remaining life and predictive maintenance", url: "https://factory.wenquestrobotics.com/twin", login: true}
       - {zh: "虚拟 PLC", en: "Virtual PLC", dz: "写梯形图、ST，接虚拟设备运行", de: "Write ladder or ST and run it on virtual equipment", url: "https://factory.wenquestrobotics.com/plc", login: true}
       - {zh: "缝纫机设计与制造", en: "Sewing machine design", dz: "六种机型的参数化设计、三维样机、出图出片", de: "Six machine types: parametric design, 3D prototypes, drawings and films", url: "https://learn.wenquestrobotics.com/pages/sewing/sewing", login: true}
-      - {zh: "问渠凸轮", en: "WenQuest Cam", dz: "凸轮设计与制造，演示不用登录", de: "Cam design and manufacturing; demo without sign-in", url: "/cam/"}
-      - {zh: "问渠轴承", en: "WenQuest Bearing", dz: "轴承设计、寿命与合套选配，演示不用登录", de: "Bearing design, life and matched sets; demo without sign-in", url: "/bearing/"}
+      - {zh: "问渠凸轮", en: "WenQuest Cam", dz: "凸轮设计与制造，演示不用登录", de: "Cam design and manufacturing; demo without sign-in", url: "/cam/", intro: cambearing}
+      - {zh: "问渠轴承", en: "WenQuest Bearing", dz: "轴承设计、寿命与合套选配，演示不用登录", de: "Bearing design, life and matched sets; demo without sign-in", url: "/bearing/", intro: cambearing}
   - key: labs
     wide: true
     zh: 虚拟实验室
     en: Virtual labs
     items:
-      - {zh: "倒立摆与二连杆机械臂", en: "Cart-pole and two-link arm", dz: "浏览器里的物理仿真，调 PID", de: "Physics in the browser; tune a PID", url: "/lab"}
-      - {zh: "质点运动学实验台", en: "Kinematics bench", dz: "中英双语实验台", de: "Bilingual lab bench", url: "/lab/kinematics"}
-      - {zh: "教材虚拟实验", en: "Textbook labs", dz: "__LAB__ 个实验，配指导书与报告模板", de: "__LAB__ labs, each with a guide and report template", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true}
-      - {zh: "PLC 实验台", en: "PLC lab bench", dz: "网页里的 PLC 接一台虚拟设备", de: "A web PLC wired to a virtual machine", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true}
+      - {zh: "倒立摆与二连杆机械臂", en: "Cart-pole and two-link arm", dz: "浏览器里的物理仿真，调 PID", de: "Physics in the browser; tune a PID", url: "/lab", intro: labs}
+      - {zh: "质点运动学实验台", en: "Kinematics bench", dz: "中英双语实验台", de: "Bilingual lab bench", url: "/lab/kinematics", intro: labs}
+      - {zh: "教材虚拟实验", en: "Textbook labs", dz: "__LAB__ 个实验，配指导书与报告模板", de: "__LAB__ labs, each with a guide and report template", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true, intro: labs}
+      - {zh: "PLC 实验台", en: "PLC lab bench", dz: "网页里的 PLC 接一台虚拟设备", de: "A web PLC wired to a virtual machine", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true, intro: labs}
       - {zh: "GPU 实验", en: "GPU labs", dz: "云端 GPU，JupyterLab 里跑 CUDA", de: "Cloud GPUs; CUDA in JupyterLab", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true}
-      - {zh: "微电子实验", en: "Microelectronics labs", dz: "Verilog 综合、版图，RTL → GDS", de: "Verilog synthesis and layout, RTL to GDS", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true}
+      - {zh: "微电子实验", en: "Microelectronics labs", dz: "Verilog 综合、版图，RTL → GDS", de: "Verilog synthesis and layout, RTL to GDS", url: "https://learn.wenquestrobotics.com/pages/textbook/textbook", login: true, intro: labs}
 
 # 看视频认识问渠：videos.py 按这里的播放列表名读 YouTube（只取公开视频），写 site/data/videos.json
 videos:
