@@ -48,6 +48,6 @@ FreeCAD 工作台安装包也在这一页下载，安装见 FreeCAD 版帮助。
 
 ::img{src=web-89-pt-tight.jpg caption="花样机教材算例：快放途中停在最紧的那一针慢放，读数面板的曲线上光标正在“最紧”"}
 
-::video{src=web-14-video title="6000 r/min 未改那一版：导出 → 出三维讲解片 → 关键画面（红灯停在 180°）"}
+::video{src=web-14-video title="花样机 2000 r/min（有旁白）：导出 → 出三维讲解片、配旁白 → 关键画面 → 小样开头一段"}
 
 ::video{src=web-08-export title="导出计算书（带 AI 设计说明）和 STEP"}

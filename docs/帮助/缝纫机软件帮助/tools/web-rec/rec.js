@@ -1,4 +1,6 @@
 // 帮助录屏：登录后带着登录状态开一个录像的页面；cue(文字) 记字幕时间，cut(true/false) 标要剪掉的等待段
+// 第 95 轮：带配音的段用 say(文字)——配音时长来自 _帮助生成/rec/lines.py 写的 durations.json（环境变量 WQ_VOICE 指向那个目录），
+// 记字幕时间并等配音读完；出片用 _帮助生成/rec/vfinish.py。
 const { chromium } = require('playwright'); const fs = require('fs'); const path = require('path');
 const OUT = __dirname + '/out';
 async function session(user, pass) {
@@ -19,10 +21,25 @@ async function clip(name, user, pass, body) {
   const p = await ctx.newPage(); const t0 = Date.now();
   p.on('pageerror', (e) => console.log('PAGEERROR', e.message));
   const cues = [], cuts = []; let cutStart = null;
+  const dur = process.env.WQ_VOICE ? JSON.parse(fs.readFileSync(path.join(process.env.WQ_VOICE, 'durations.json'), 'utf8')) : {};
   const now = () => (Date.now() - t0) / 1000;
   const api = {
     p, wait: (ms) => p.waitForTimeout(ms),
     cue(text, dur) { cues.push({ t: now(), text, dur }); },
+    async say(text, extra = 0) {
+      const d = dur[text]; if (!d) throw new Error('no voice for: ' + text + '（先运行 lines.py，设 WQ_VOICE）');
+      // 两句旁白之间的操作（点按钮、改参数、切机型）在无显卡的录屏机上很慢，整段剪掉：画面直接跳到操作后的样子，留 0.4 秒再开口
+      if (cutStart != null) { await p.waitForTimeout(1200); api.cut(false); await p.waitForTimeout(400); }
+      cues.push({ t: now(), text, dur: d.sec, wav: d.wav }); await p.waitForTimeout(d.sec * 1000 + 350 + extra);
+      cutStart = now();
+    },
+    async proto(fn) {                  // 在样机页面（iframe）里执行
+      const fr = p.frames().find((x) => x.url().includes('/sewing/proto')); return fr.evaluate(fn);
+    },
+    async settle(show = 700) {         // 留 show 毫秒（两句旁白之间本来就剪掉；第一句之前用它开剪辑段）
+      await p.waitForTimeout(show); if (cutStart == null) cutStart = now();
+    },
+    async frameTop() { await p.locator('.frame').evaluate((e) => e.scrollIntoView({ block: 'start' })); await p.evaluate(() => scrollBy(0, -8)); },
     cut(on) { if (on) cutStart = now(); else if (cutStart != null) { cuts.push([cutStart, now()]); cutStart = null; } },
     async sewing() { await p.goto('http://localhost:8088/'); await p.waitForTimeout(2500); await p.getByText('缝纫机设计').first().click(); await p.waitForTimeout(3000); },
     async type(loc, text) { await loc.click(); await loc.fill(''); await loc.pressSequentially(text, { delay: 60 }); },
