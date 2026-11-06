@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91h"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91i"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -218,8 +218,8 @@ DEMO_NOTE = "截图来自产品的演示环境，演示企业、人名和数据�
 DEPLOY_STEPS = [
     ("调研", "看你的产品、流程、表单和现有系统，列出要用的模块。"),
     ("配置", "按你的规则配好流程、表单、编码和权限，导入现有数据。"),
-    ("上线", "先选一条产品线或一个车间试运行，再推广。"),
-    ("持续完善", "你提意见，AI 起草改动，你确认后生效；每次改动有记录、可撤回。"),
+    ("上线", "在境内云服务器上为你开一套独立的系统（数据单独隔离、每天备份），先选一条产品线或一个车间试运行，再推广。"),
+    ("持续完善", "你提意见，AI 起草改动，你确认后生效；修好的问题、新加的功能自动更新到你的系统，每次改动有记录、可撤回。"),
 ]
 
 # ================================================================ 首页
@@ -279,7 +279,7 @@ def home():
 <div class="wrap" style="position:relative;z-index:2"><div class="pillars">
   <div><span class="no">01</span><h3>AI 原生</h3><p>每项功能都写清“AI 做什么、人做什么”。AI 起草，人批准才生效，全程留痕。</p></div>
   <div><span class="no">02</span><h3>自由组合</h3><p>质量、ERP、MRP、MES、CAD、CAM、CAE、厂情中枢，每个模块都能单独用，也能任意组合，经同一条数据总线连在一起，并对接你已有的系统。</p></div>
-  <div><span class="no">03</span><h3>个性化部署</h3><p>按你的产品、流程、表单和标准配置，不让企业去适应软件。上线后按你的反馈持续完善：AI 起草改动，你确认后生效。</p></div>
+  <div><span class="no">03</span><h3>个性化配置，云上自动更新</h3><p>按你的产品、流程、表单和标准配置，不让企业去适应软件。默认部署在境内云服务器上，每家一套、数据隔离；上线后按你的反馈持续完善，AI 起草改动，你确认后生效，更新自动送达。</p></div>
 </div></div></section>
 <script src="/assets/hub3d.js?v={VER}"></script>
 <script>WQHub3D.start(document.getElementById("hub3d"), {{chain: document.getElementById("hchain"), steps: document.getElementById("hsteps"), count: document.getElementById("hcount"), rate: document.getElementById("hrate"), area: document.querySelector(".hero > .wrap")}});</script>
@@ -287,7 +287,7 @@ def home():
 {part("旗舰产品", "两个旗舰：质量为核心的 AI ERP，和一条数字主线", "两者可以单独上，也可以合在一起：质量 ERP 管体系和经营，集成平台把设计、工艺和车间接进来。", f'<div class="flagships">{flag_qms}{flag_plat}</div><p class="note">{DEMO_NOTE}</p>')}
 {part("成熟产品", "两款已经可以交付的行业软件", "网页直接用，也能装进 FreeCAD；计算核心相同，结果一致；设计结果可以提交到集成平台审批。", products, "alt")}
 {part("定制", "制造业专用软件定制", None, custom)}
-{part("部署", "部署怎么走", "可以只上一个模块，先解决一个问题，再逐步扩展。", steps(DEPLOY_STEPS), "dark")}
+{part("部署", "部署怎么走", "默认云上部署、自动更新：每家单位一套独立实例，我们负责更新和备份；坚持数据放在自己云账号或机房的，也可以专属部署。可以只上一个模块，先解决一个问题，再逐步扩展。", steps(DEPLOY_STEPS), "dark")}
 {part("案例", "典型案例", "从需求到车间完工，每一步做了什么、得出什么数、产出了什么，都在平台里留着。", cases, "alt")}
 {part("服务", "技术服务、教育服务和咨询", None, three)}
 {cta()}"""
@@ -324,7 +324,7 @@ def qms():
 {part("二", "看几个画面", None, gallery, "alt")}
 {part("三", "功能", None, feats)}
 {part("四", "更多画面", None, more, "alt")}
-{part("五", "适合谁、怎么上", "要过质量体系审核、客户审核的中小制造企业；文件多、记录散、追溯靠翻纸的工厂。可以只上质量部分，再逐步接 ERP 和集成平台的其他模块。", steps(DEPLOY_STEPS))}
+{part("五", "适合谁、怎么上", "要过质量体系审核、客户审核的中小制造企业；文件多、记录散、追溯靠翻纸的工厂。可以只上质量部分，再逐步接 ERP 和集成平台的其他模块。默认部署在境内云服务器，每家一套独立系统、自动更新；现正接受试点企业，免费试用 3 个月，在“预约演示”里说明即可。", steps(DEPLOY_STEPS))}
 {cta()}"""
     page("/solutions/qms-erp/", "问渠质量 ERP", "问渠质量 ERP：以质量体系为核心的 AI ERP，AI 归类与起草文件、每日按记录自查体系、不合格与纠正预防、来料检验、控制图、追溯召回，与 ERP 同一套数据。", body, "/solutions/qms-erp/")
 
