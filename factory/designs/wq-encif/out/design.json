@@ -666,7 +666,27 @@
   "all": "layout-all.png",
   "top": "wq_encif"
  },
- "transistor": null,
+ "transistor": {
+  "pass": true,
+  "design": {
+   "wn": 0.42,
+   "wp": 0.97,
+   "k": 1.5,
+   "wfn": 0.63,
+   "wfp": 1.455,
+   "out_inv": [
+    0.42,
+    0.97
+   ],
+   "plain_inv": [
+    0.42,
+    0.97
+   ]
+  },
+  "hyst": 0.6476,
+  "generic": false,
+  "file": "transistor/schmitt.json"
+ },
  "files": {
   "rtl/wq_encif.v": "da974c8e9a8c2878",
   "tb/tb.v": "7eb361d027b3bc0a",
