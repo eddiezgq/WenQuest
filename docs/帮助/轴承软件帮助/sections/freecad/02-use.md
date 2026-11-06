@@ -13,3 +13,5 @@ lead: 打开项目 → 计算 → 建模 → 出图与 STEP → 工序简图。
 </ol>
 
 合套选配、检测 SPC 是车间数据处理，留在网页版。
+
+::video{src=fc-02-bearing-thin title="录像：在 FreeCAD 里建四点接触薄壁轴承"}

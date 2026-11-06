@@ -5,6 +5,7 @@
 import { computed, ref } from 'vue'
 import { system, sysResult, sysError, sysBusy, sysPayload } from '../sysstore'
 import { api } from '../api'
+import { laws } from '../store'
 import { t, lang } from '../i18n'
 import NumField from './NumField.vue'
 import ProgramEditor from './ProgramEditor.vue'
@@ -39,6 +40,14 @@ function adopt(row) {
   if (row.rpm_max) cs.value.rpm = Math.floor(row.rpm_max * 10) / 10
   search.value = null
 }
+// the design-search table speaks the page's language: law names from /laws, a failed check by its cam and check names
+const lawName = (k) => { const l = laws.value.find((x) => x.key === k); return l ? (lang.value === 'zh' ? l.zh : l.en) : k }
+const failName = (f) => {
+  const [cid, ck] = f.split(':'); const c = res.value?.cams?.find((x) => x.id === cid); const k = c?.checks?.find((x) => x.id === ck)
+  return c && k ? `${nm(c.name)}${lang.value === 'zh' ? '：' : ': '}${lang.value === 'zh' ? k.zh : k.en}` : f
+}
+const LIM = { vib: ['允许残余振动', 'allowed residual vibration'], peak: ['电机允许峰值转矩', 'allowed motor peak torque'], speed: ['电机允许最高转速', 'allowed motor top speed'] }
+const limName = (k) => (LIM[k] ? LIM[k][lang.value === 'zh' ? 0 : 1] : k)
 const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFixed(d))
 </script>
 
@@ -153,11 +162,11 @@ const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFix
         <table v-else-if="search" class="tb">
           <thead><tr><th>{{ t('law') }}</th><th>{{ t('atRpm') }}<br>{{ t('vibUm').slice(0, 4) }} µm</th><th>{{ t('peakNm') }}</th><th>{{ t('rpmMax') }}</th><th /></tr></thead>
           <tbody><tr v-for="r in search.rows" :key="r.law" :class="{ best: search.best && r.law === search.best.law, off: r.fails?.length }">
-            <td>{{ r.law }}</td><td class="mono">{{ fmt(r.vib_um, 1) }}</td><td class="mono">{{ fmt(r.motor_peak, 1) }}</td>
-            <td class="mono">{{ r.rpm_max ? fmt(r.rpm_max, 1) + ' r/min' : (r.fails?.length ? r.fails.join(', ') : '—') }}</td>
+            <td>{{ lawName(r.law) }}</td><td class="mono">{{ fmt(r.vib_um, 1) }}</td><td class="mono">{{ fmt(r.motor_peak, 1) }}</td>
+            <td class="mono">{{ r.rpm_max ? fmt(r.rpm_max, 1) + ' r/min' : (r.fails?.length ? r.fails.map(failName).join(lang === 'zh' ? '；' : '; ') : '—') }}</td>
             <td><button v-if="!r.fails?.length && !r.error" type="button" class="ghost" @click="adopt(r)">{{ t('adopt') }}</button></td></tr></tbody>
         </table>
-        <p v-if="search && search.limits_missing?.length" class="note">{{ lang === 'zh' ? '没填的限值不参与：' : 'Limits not given are not used: ' }}{{ search.limits_missing.join(', ') }}</p>
+        <p v-if="search && search.limits_missing?.length" class="note">{{ lang === 'zh' ? '没填的限值不参与：' : 'Limits not given are not used: ' }}{{ search.limits_missing.map(limName).join(lang === 'zh' ? '、' : ', ') }}</p>
       </div>
     </section>
   </main>

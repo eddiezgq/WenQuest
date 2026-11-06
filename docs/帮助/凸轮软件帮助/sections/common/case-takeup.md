@@ -33,6 +33,8 @@ lead: 一个槽凸轮从“够不够”一直做到“磨出来差多少、怎�
 
 ::try{label="打开制造页" example=sewing-takeup-groove mode=mfg}
 
+::video{src=web-02-mfg title="案例一录像：磨削程序与仿真"}
+
 ### 第三步：测量与补偿
 
 顶部 **测量与补偿**，点“载入合成测量数据（演示）”——软件按设计升程加上已知误差造出来的，只作演示。勾“自动对相位”，填示例许用加速度误差 {{tk.acc_lim}} rad/s²（虚构），点“分析”：
@@ -44,3 +46,5 @@ lead: 一个槽凸轮从“够不够”一直做到“磨出来差多少、怎�
 ::anim{id=comp}
 
 ::try{label="打开测量与补偿" example=sewing-takeup-groove mode=measure}
+
+::video{src=web-03-measure title="案例一录像：测量、谐波分析与补偿"}

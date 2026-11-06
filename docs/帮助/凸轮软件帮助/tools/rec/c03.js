@@ -1,0 +1,20 @@
+const { clip } = require('../../../_帮助生成/rec/vrec.js'); const D = __dirname;
+clip(D + '/out', D + '/voice', 'web-03-measure', async (r) => {
+  const p = r.p;
+  await r.open('/cam/?example=sewing-takeup-groove&mode=mfg');
+  await r.num('砂轮半径', 4); await r.wait(1500);
+  await p.locator('nav.modes button', { hasText: '测量与补偿' }).click(); await r.wait(1500);
+  await r.say('磨好的凸轮上测量仪，把升程表贴进来。这里用合成数据演示，数据开头写明是合成的。');
+  await p.getByRole('button', { name: '载入合成测量数据（演示）' }).click(); await r.wait(1000);
+  await r.say('填许用加速度误差五十，点分析。');
+  await r.num('许用加速度误差', 50);
+  await p.getByRole('button', { name: '分析', exact: true }).click(); r.cut(true); await r.wait(3500); r.cut(false);
+  await r.say('软件先自动对齐相位，再把误差分成各阶谐波：一阶是偏心和装夹，低阶多是热处理变形。');
+  await r.say('第十七阶幅值不大，但乘上阶数的平方，加速度误差到了一百五十八，超出五十，判不合格。');
+  await r.say('这样的误差，最高只能跑每分钟两千八百一十一转。');
+  await r.say('选补偿一到六阶，点生成补偿程序。');
+  await p.getByRole('button', { name: '生成补偿程序' }).click(); r.cut(true); await r.wait(4000); r.cut(false);
+  await r.say('误差反向加到运动程序上重新出程序：均方根从三点一九降到零点六，补偿后的程序同样过一遍校核。');
+  await r.smooth(400);
+  await r.say('高阶误差来自机床和颤振，补偿改不了，要从机床上找原因。');
+});

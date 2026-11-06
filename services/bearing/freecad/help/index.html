@@ -191,11 +191,12 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <section id="install"><h2><span class="n">01</span>安装</h2><p class="lead">下载一个压缩包，复制一个文件夹，重启 FreeCAD。</p><ol class="steps">
 <li>安装 FreeCAD 1.1（官网 freecad.org）。它自带 numpy 和 scipy（1.9 以上），工作台不用另装别的。</li>
 <li>网页版“零件图与三维”里点 <b>下载 FreeCAD 工作台</b>，或直接打开 <code>https://learn.wenquestrobotics.com/bearing/api/freecad.zip</code>。</li>
-<li>把压缩包里的 <code>Mod/WenQuest</code> 文件夹复制到 FreeCAD 的用户 Mod 目录（压缩包里的“使用说明.txt”写了 Windows、macOS、Linux 各在哪）。已经装过问渠凸轮或数字工厂的，解压到同一个 WenQuest 文件夹，各自的按钮都在。</li>
+<li>把压缩包里的 <code>Mod/WenQuest</code> 文件夹复制到 FreeCAD 的用户 Mod 目录。目录在哪：在 FreeCAD 的 Python 控制台输入 <code>App.getUserAppDataDir()</code> 回车，显示的文件夹里的 <code>Mod</code>（没有就新建）。FreeCAD 1.1 一般是 Windows <code>%APPDATA%\FreeCAD\v1-1\Mod</code>，macOS <code>~/Library/Application Support/FreeCAD/v1-1/Mod</code>，Linux <code>~/.local/share/FreeCAD/v1-1/Mod</code>，以控制台显示的为准。已经装过问渠凸轮或数字工厂的，解压到同一个 WenQuest 文件夹，各自的按钮都在。</li>
 <li>重启 FreeCAD，工作台列表里选 <b>问渠</b>，工具栏上点 <b>轴承</b>。</li>
 </ol>
 
-<p>压缩包里还有示例项目（<code>examples/*.wqbearing.json</code>）和本帮助的离线一份。缺依赖时点“轴承”会提示安装命令。</p></section>
+<p>压缩包里还有示例项目（<code>examples/*.wqbearing.json</code>）和本帮助的离线一份。缺依赖时点“轴承”会提示安装命令。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/fc-01-bearing.jpg"><source src="media/fc-01-bearing.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="data:text/vtt;base64,V0VCVlRUCgowMDowMDowMC42MDAgLS0+IDAwOjAwOjA2Ljk5OQrlronoo4Xlj6rlgZrkuIDmrKHjgILlnKggRnJlZUNBRCDnmoQgUHl0aG9uIOaOp+WItuWPsOi+k+WFpei/meS4gOihjO+8jOafpeWIsOeUqOaIt+aVsOaNruaWh+S7tuWkueOAggoKMDA6MDA6MDkuMjk5IC0tPiAwMDowMDoxNi45NDEK5oqK5Y6L57yp5YyF6YeM55qEIFdlblF1ZXN0IOaWh+S7tuWkueaUvui/m+i/meS4quaWh+S7tuWkuemHjOeahCBNb2TvvIzmsqHmnIkgTW9kIOWwseaWsOW7uuS4gOS4qu+8jOeEtuWQjumHjeWQryBGcmVlQ0FE44CCCgowMDowMDoxOC4yOTkgLS0+IDAwOjAwOjIxLjMzNQrph43lkK/lkI7vvIzlnKjlt6XkvZzlj7DliJfooajph4zpgInpl67muKDjgIIKCjAwOjAwOjIzLjMwMCAtLT4gMDA6MDA6MjguODAwCuW3peWFt+agj+S4iueCuei9tOaJv++8jOWPs+i+ueWHuueOsOWPguaVsOihqOWNle+8jOWtl+auteWSjOe9kemhteeJiOS4gOagt+OAggoKMDA6MDA6MjguODAwIC0tPiAwMDowMDozNC45MTQK54K55omT5byA6aG555uu77yM6YCJ572R6aG154mI5a2Y55qE5paH5Lu244CC6L+Z6YeM5omT5byA5Y6L57yp5YyF6YeM55qE5rex5rKf55CD6L205om/56S65L6L44CCCgowMDowMDozOC4zMDAgLS0+IDAwOjAwOjQ0LjM2OQrngrnorqHnrpfvvJrlj7PovrnpgJDpobnmoKHmoLjvvIzlkoznvZHpobXniYjnlKjlkIzkuIDkuKrorqHnrpflhoXmoLjvvIznu5PmnpzpgJDpobnnm7jlkIzjgIIKCjAwOjAwOjQ1LjcwMCAtLT4gMDA6MDA6NTQuMjUzCueCueW7uuaooe+8muWGheWciOOAgeWkluWciOWSjOWFqOmDqOmSoueQg+W7uuaIkOeyvuehruWunuS9k++8jOaMieiKguWchuaOkuWlve+8jOW5tuajgOafpeacieayoeacieW5sua2ie+8jOe7k+aenOWGmeWcqOihqOWNleS4i+mdouOAggoKMDA6MDA6NTQuMjUzIC0tPiAwMDowMTowMS43OTcK5Ye65Zu+5LiOIFNURVAg5a+85Ye65q+P5Liq6Zu25Lu255qEIFNURVAg5ZKMIEEzIOW3peS9nOWbvuOAguW4ruWKqeaMiemSruaJk+W8gOmaj+WMheW4pueahOi/meS7veW4ruWKqe+8jOS4jeiBlOe9keS5n+iDveeci+OAggo="></video><figcaption>▶ 录像：安装工作台，打开示例、计算、建模</figcaption></figure></section>
 <section id="use"><h2><span class="n">02</span>使用</h2><p class="lead">打开项目 → 计算 → 建模 → 出图与 STEP → 工序简图。</p><ol class="steps">
 <li><b>打开项目</b>：选网页版存的 <code>.wqbearing.json</code> 或压缩包里的示例；也可以在表单里从头填。表单的字段、什么时候显示哪些字段，和网页版一样。</li>
 <li><b>计算</b>：右边列出校核结果，和网页版逐项相同。</li>
@@ -205,7 +206,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li><b>保存项目</b>：存的文件网页版也能打开。<b>产品库</b>：打开网页版下载的 <code>.wqcatalog.json</code>，选型号填外形尺寸。</li>
 </ol>
 
-<p>合套选配、检测 SPC 是车间数据处理，留在网页版。</p></section>
+<p>合套选配、检测 SPC 是车间数据处理，留在网页版。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/fc-02-bearing-thin.jpg"><source src="media/fc-02-bearing-thin.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="data:text/vtt;base64,V0VCVlRUCgowMDowMDowMC42MDAgLS0+IDAwOjAwOjA1LjI5Mgrlho3nnIvmnLrlmajkurrohZXlhbPoioLnmoTlm5vngrnmjqXop6boloTlo4HovbTmib/jgILmiZPlvIDnpLrkvovjgIIKCjAwOjAwOjA5LjEwMCAtLT4gMDA6MDA6MTguNzIxCuiuoeeul+S5i+WQju+8jOWPs+i+ueeahOagoeaguOihqOWIl+WHuuaOpeinpuinkuiMg+WbtOOAgeacgOWkp+aOpeinpuW6lOWKm+WSjOaIqumdouWImuW6pu+8jOWSjOe9kemhteeJiOebuOWQjO+8m+avj+S4qumSoueQg+eahOi9veiNt+WbvuWcqOe9kemhteeJiOeci+OAggoKMDA6MDA6MjAuNzAxIC0tPiAwMDowMDozMC4xMDAK5bu65qih5pe277yM5YaF5aSW5ZyI55qE5rKf6YGT5oyJ5Lik5q615ZyG5byn5ou85oiQ55qE5bCW5oux5b2i5Zue6L2s5oiQ5a6e5L2T77yM5LqU5Y2B5YWt5Liq6ZKi55CD5oyJ6IqC5ZyG5o6S5aW977yM5YaN5p+l5pyJ5rKh5pyJ5bmy5raJ44CCCgowMDowMDozMy4yMjcgLS0+IDAwOjAwOjM4Ljc1Nwrlt6Xluo/nroDlm77opoHpgInnvZHpobXniYjlt6XoibrpobXlrZjnmoTmqKHmnb/vvIzmr4/pgZPno6jliYrlkozotoXnsr7lh7rkuIDlvKDnroDlm77jgIIK"></video><figcaption>▶ 录像：在 FreeCAD 里建四点接触薄壁轴承</figcaption></figure></section>
 <section id="cases"><h2><span class="n">03</span>典型案例</h2><p class="lead">三个从实际问题出发的案例，每个数都是软件当场算的；示例轴承都是虚构的，不是任何厂家或标准中的型号。</p><table>
 <thead>
 <tr>
@@ -271,6 +273,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>把径向力从 2500 N 改成 3250 N：最先变红的是 <strong>静强度：内圈最大接触应力</strong>（2599 MPa，超过示例许用值）。改法方向：加大钢球、减小沟曲率系数（沟道更贴合）、或者选大一号的轴承。</p>
 <a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-deep-groove&amp;set=%7B%22loads.Fr%22%3A3250%7D" target="_blank" rel="noopener">▶ 试一试：径向力改成 3250 N，看哪一项变红</a>
 <div class="calc" data-calc="loads"></div>
+<figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/bearing/help/media/web-02-case-dg.jpg"><source src="https://wenquestrobotics.com/bearing/help/media/web-02-case-dg.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/bearing/help/media/web-02-case-dg.vtt"></video><figcaption>▶ 案例一录像：游隙尺寸链、合套选配、工艺留量</figcaption></figure>
 <h3 id="case-dg-5">第四步：游隙公差定多宽（游隙尺寸链）</h3>
 <p>顶部 <strong>合套选配 → 游隙尺寸链</strong>，点“从设计取名义尺寸”“用示例偏差试一试”（示例偏差：沟底直径 ±4 µm、钢球 ±0.5 µm、沟曲率半径 ±10 µm，都是虚构的）。名义游隙 15.0 µm，三种算法：</p>
 <table>
@@ -311,6 +314,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <section id="case-taper"><h2><span class="n">05</span>案例二：减速器圆锥成对，冷态调的游隙热了还剩多少</h2><p class="lead">装配时调好 +20 µm，开机后轴比座热——面对面安装会把游隙吃成预紧。</p><h3 id="case-taper-1">问题</h3>
 <p>减速器中间轴两端各一个圆锥滚子轴承（示例，虚构），<strong>面对面</strong>安装，跨距 160 mm，装配时在 20 °C 调轴向游隙 +20.0 µm。工作时内圈 50 °C、外圈 45 °C、轴 50 °C、铸铁座 40 °C（示例值）。</p>
 <a class="try" href="https://wenquestrobotics.com/bearing/?example=scene-tapered-pair" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
+<figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/bearing/help/media/web-03-case-taper.jpg"><source src="https://wenquestrobotics.com/bearing/help/media/web-03-case-taper.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/bearing/help/media/web-03-case-taper.vtt"></video><figcaption>▶ 案例二录像：温度让冷态游隙变成预紧</figcaption></figure>
 <h3 id="case-taper-2">软件怎么算</h3>
 <p>工作时的轴向游隙 = 调整值 + 三项：</p>
 <ol>
@@ -328,6 +332,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <section id="case-thin"><h2><span class="n">06</span>案例三：机器人腕关节四点接触薄壁轴承，预紧给多少</h2><p class="lead">一个轴承同时扛径向力、轴向力和倾覆力矩；预紧小了钢球脱开、刚度掉，大了接触应力和摩擦上去。</p><h3 id="case-thin-1">问题</h3>
 <p>机器人腕关节只用一个四点接触薄壁轴承（示例，虚构）：内径 100 mm、外径 116 mm、宽 8 mm，56 个 5 mm 钢球，接触角 30°。载荷：径向 600 N、轴向 300 N、倾覆力矩 72 N·m。</p>
 <a class="try" href="https://wenquestrobotics.com/bearing/?example=demo-thin-x" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
+<figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/bearing/help/media/web-04-case-thin.jpg"><source src="https://wenquestrobotics.com/bearing/help/media/web-04-case-thin.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/bearing/help/media/web-04-case-thin.vtt"></video><figcaption>▶ 案例三录像：四点接触薄壁轴承的预紧与倾覆刚度</figcaption></figure>
 <h3 id="case-thin-2">四点接触怎么承载</h3>
 <p>每个沟道由两段圆弧组成（桃形沟），钢球最多四个接触点，分成两条对角线：一条扛这个方向的轴向力，另一条扛反方向的。倾覆力矩让一边的钢球压紧一条对角线、对边压紧另一条。软件把钢球当作自由体，和内圈的五个位移一起解，所以一个钢球可以两条对角线同时受载。</p>
 <div class="calc" data-calc="gothic"></div>
@@ -434,12 +439,14 @@ for f in glob.glob(&quot;系列/*.wqbearing.json&quot;):
 <li><strong>圆度与波纹度</strong>：贴入圆度仪测的一圈沟道轮廓，去掉 1 阶偏心后按最小二乘圆给圆度，画 2–100 阶幅值；频段按企业标准填（软件不内置频段划分）。</li>
 <li><strong>控制图与过程能力</strong>：均值–极差、均值–标准差、单值–移动极差；控制图常数按正态分布数值计算，不抄表；Nelson 八条判异规则；填了规格限才算 Cp、Cpk、Pp、Ppk。</li>
 </ul>
+<figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/bearing/help/media/web-06-spc.jpg"><source src="https://wenquestrobotics.com/bearing/help/media/web-06-spc.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/bearing/help/media/web-06-spc.vtt"></video><figcaption>▶ 录像：检测数据与 SPC</figcaption></figure>
 <h3 id="mfg-4">零件图与三维</h3>
 <ul>
 <li>内圈、外圈、滚动体各一张截面图，列出内外径、宽度、沟道圆弧、体积；尺寸公差在企业填写或标准录入前写“未知”。</li>
 <li>STEP：整套（滚动体按节圆排好）、内圈、外圈、单个滚动体；程序直接写出，用 OpenCASCADE 读回检查过：实体有效、体积与解析值一致、滚动体不与套圈重叠。DXF 截面可在 CAD 里接着画。</li>
 <li>只画设计里有数据的部分：倒角、退刀槽、保持架、挡边细节、凸度不画，图下有说明。</li>
 </ul>
+<figure class="vid"><video controls preload="none" playsinline poster="https://wenquestrobotics.com/bearing/help/media/web-05-parts.jpg"><source src="https://wenquestrobotics.com/bearing/help/media/web-05-parts.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="https://wenquestrobotics.com/bearing/help/media/web-05-parts.vtt"></video><figcaption>▶ 录像：零件图、STEP 与 FreeCAD 工作台下载</figcaption></figure>
 <h3 id="mfg-5">工艺路线与工序卡</h3>
 <ul>
 <li>按当前设计生成内圈、外圈的常用工序链：车削 → 热处理 → 磨端面 → 磨外径 → 磨沟道 →（内圈）磨内孔 → 超精 → 清洗 → 合套 → 检测；可增删、改名、移动，每道勾选加工的面。</li>

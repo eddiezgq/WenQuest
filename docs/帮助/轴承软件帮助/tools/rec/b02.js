@@ -1,0 +1,26 @@
+const { clip } = require('../../../_帮助生成/rec/vrec.js'); const D = __dirname;
+clip(D + '/out', D + '/voice', 'web-02-case-dg', async (r) => {
+  const p = r.p;
+  await r.open('/bearing/?example=demo-deep-groove'); await r.wait(1500);
+  await p.locator('nav.modes button', { hasText: '合套选配' }).click(); await r.wait(1200);
+  await r.say('案例一：深沟球轴承的游隙公差定多宽。打开合套选配页上方的游隙尺寸链。');
+  await p.locator('.subtabs button').nth(1).dispatchEvent('click'); await r.wait(1200);
+  await r.say('点从设计取名义尺寸，再点用示例偏差试一试。偏差是演示用的虚构数。');
+  await p.getByRole('button', { name: '用示例偏差试一试' }).click(); await r.wait(1200);
+  await p.getByRole('button', { name: '计算' }).first().click(); r.cut(true); await r.wait(4000); r.cut(false);
+  await r.smooth(400);
+  await r.say('极值法、统计法、蒙特卡洛三种算法并排。蒙特卡洛十万次，同一输入结果相同。');
+  await r.smooth(400);
+  await r.say('下面是各尺寸占游隙方差的比例：外圈沟径占得多，钢球很少，先卡紧沟径更有用。');
+  await r.smooth(-800);
+  await r.say('再看合套选配。点用合成数据试一试，按这个设计随机生成一百套。');
+  await p.evaluate(() => window.scrollTo(0, 0)); await p.locator('.subtabs button').first().dispatchEvent('click'); await r.wait(800);
+  await p.getByRole('button', { name: '用合成数据试一试' }).scrollIntoViewIfNeeded(); await p.getByRole('button', { name: '用合成数据试一试' }).dispatchEvent('click'); await r.wait(1500);
+  await p.getByRole('button', { name: '配套' }).dispatchEvent('click'); r.cut(true); await r.wait(5000); r.cut(false);
+  await r.smooth(400);
+  await r.say('逐件配对和分组配套对照：逐件按实测值一件一件配，配成的套数更多。');
+  await r.open('/bearing/?example=demo-deep-groove&mode=process');
+  await r.say('最后是工艺。打开示例模板，软件倒推每道工序的尺寸和最小留量。');
+  await r.smooth(500);
+  await r.say('示例里外圈挡边内径只车不磨，车削公差加热处理波动超出了成品公差，判不合格。');
+});

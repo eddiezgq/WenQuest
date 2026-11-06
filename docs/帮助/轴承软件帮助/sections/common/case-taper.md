@@ -9,6 +9,8 @@ lead: 装配时调好 +20 µm，开机后轴比座热——面对面安装会把
 
 ::try{label="打开这个示例" example=scene-tapered-pair}
 
+::video{src=web-03-case-taper title="案例二录像：温度让冷态游隙变成预紧"}
+
 ### 软件怎么算
 
 工作时的轴向游隙 = 调整值 + 三项：

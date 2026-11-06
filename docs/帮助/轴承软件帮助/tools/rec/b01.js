@@ -1,0 +1,21 @@
+const { clip } = require('../../../_帮助生成/rec/vrec.js'); const D = __dirname;
+clip(D + '/out', D + '/voice', 'web-01-first', async (r) => {
+  const p = r.p;
+  await r.open('/bearing/?example=demo-deep-groove');
+  await r.say('这是问渠轴承的网页版。左边填轴承和它用在哪，中间看图，右边逐项校核。');
+  await r.say('右边每一项：合格、不合格，或者未知。未知是缺数据，不算合格。');
+  await p.locator('aside.side').hover(); await r.smooth(500);
+  await r.say('额定载荷和寿命要等国家标准正文录入，现在一律显示未知。');
+  await r.smooth(-500);
+  await r.say('中间是剖面和每个钢球的载荷。径向力向下，越深的钢球受力越大。');
+  await r.say('把径向力从两千五百牛加到三千二百五十牛。');
+  await r.num('径向力 Fr', 3250); await r.wait(1500);
+  await r.say('内圈接触应力超过了示例许用值，这一项变红，总结论变成不合格。');
+  await r.num('径向力 Fr', 2500); await r.wait(1200);
+  await r.say('顶部示例里有每一类轴承：圆柱、圆锥、谐波柔性、交叉滚子和薄壁轴承。');
+  await p.locator('select[aria-label="示例"]').selectOption('demo-thin-x'); await r.wait(2500);
+  await r.say('比如机器人腕关节的四点接触薄壁轴承，钢球分两条对角线受载。');
+  await r.say('点计算书，可以打印或者存成 PDF。');
+  await p.getByRole('button', { name: '计算书' }).click(); await r.wait(1500); await r.smooth(600); await r.wait(800);
+  await r.say('右上角的帮助按钮，会打开这份帮助里对应的一节。');
+});

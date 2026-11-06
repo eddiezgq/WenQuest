@@ -146,7 +146,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
   </div>
 </aside>
 <main>
-<section id="intro"><h2><span class="n">00</span>这是什么</h2><p class="lead">“问渠 → 凸轮”工作台：打开网页版的项目，在 FreeCAD 里重算校核、建精确实体、装配、出工作图和程序。</p><p>问渠凸轮工作台用与网页版同一个计算核心：打开网页版“保存为文件”存下的项目，重算校核（结果逐项相同，摘要在“报告视图”里），建出零件——盘形与槽凸轮、圆柱凸轮（槽侧面按啮合方程拟合，偏差 ≤ 0.25 µm）、弧面分度凸轮的精确实体、换刀臂；凸轮系统按时序装配，改“转角”属性看动作；导出 STEP、加工程序、点表和 A3 工作图。</p>
+<section id="intro"><h2><span class="n">00</span>这是什么</h2><p class="lead">“问渠 → 凸轮”工作台：打开网页版的项目，在 FreeCAD 里重算校核、建精确实体、装配、出工作图和程序。</p><p>问渠凸轮工作台用与网页版同一个计算核心：打开网页版“保存为文件”存下的项目，重算校核（结果逐项相同，摘要在“报告视图”里），建出零件——盘形与槽凸轮、圆柱凸轮（槽侧面按啮合方程拟合，偏差 ≤ 0.25 µm）、弧面分度凸轮的精确实体、换刀臂；凸轮系统按时序装配，改属性 Angle（凸轮轴转角）看动作；导出 STEP、加工程序、点表和 A3 工作图。</p>
 <table>
 <thead>
 <tr>
@@ -172,18 +172,21 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <section id="install"><h2><span class="n">01</span>安装</h2><p class="lead">下载一个压缩包，复制一个文件夹，重启 FreeCAD。</p><ol class="steps">
 <li>安装 FreeCAD 1.1（官网 freecad.org）。</li>
 <li>网页版“制造”或“三维与制造”页点“下载 → FreeCAD 工作台 .zip”。</li>
-<li>把压缩包里的 <code>Mod/WenQuest</code> 文件夹复制到 FreeCAD 的用户 Mod 目录：Windows <code>%APPDATA%\FreeCAD\Mod</code>，macOS <code>~/Library/Application Support/FreeCAD/Mod</code>，Linux <code>~/.local/share/FreeCAD/Mod</code>。已经装过问渠轴承或数字工厂的，解压到同一个 WenQuest 文件夹，各自的按钮都在。</li>
+<li>把压缩包里的 <code>Mod/WenQuest</code> 文件夹复制到 FreeCAD 的用户 Mod 目录。目录在哪：在 FreeCAD 的 Python 控制台输入 <code>App.getUserAppDataDir()</code> 回车，显示的文件夹里的 <code>Mod</code>（没有就新建）。FreeCAD 1.1 一般是 Windows <code>%APPDATA%\FreeCAD\v1-1\Mod</code>，macOS <code>~/Library/Application Support/FreeCAD/v1-1/Mod</code>，Linux <code>~/.local/share/FreeCAD/v1-1/Mod</code>，以控制台显示的为准。已经装过问渠轴承或数字工厂的，解压到同一个 WenQuest 文件夹，各自的按钮都在。</li>
 <li>重启 FreeCAD，工作台列表里选 <b>问渠</b>，点 <b>凸轮</b>。</li>
 </ol>
 
-<p>缺 Python 包（scipy、shapely）时点“凸轮”会提示一条安装命令，照着在 FreeCAD 的 Python 控制台里运行即可。压缩包里有示例项目（<code>examples</code>）和本帮助的离线一份（<code>Mod/WenQuest/cam-help/index.html</code>，不联网也能看）。</p></section>
+<p>缺 Python 包（scipy、shapely）时点“凸轮”会提示一条安装命令，照着在 FreeCAD 的 Python 控制台里运行即可。压缩包里有示例项目（<code>examples</code>）和本帮助的离线一份（<code>Mod/WenQuest/cam-help/index.html</code>，不联网也能看）。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/fc-01-cam.jpg"><source src="../media/fc-01-cam.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/fc-01-cam.vtt"></video><figcaption>▶ 录像：安装工作台，打开槽凸轮示例</figcaption></figure></section>
 <section id="use"><h2><span class="n">02</span>使用</h2><p class="lead">点“凸轮”，选项目，看校核、实体、装配，导出。</p><ol class="steps">
 <li>点 <b>凸轮</b>，选网页版“保存为文件”存下的项目（或压缩包 <code>examples</code> 里的示例）。</li>
 <li>软件重算校核，摘要在“报告视图”里，与网页版逐项相同。</li>
 <li>建出零件：盘形 / 槽凸轮（与网页版 STEP 同一个实体；槽凸轮要在项目里填毛坯半径和板厚，没填时只建示意件）、圆柱凸轮和滚子、弧面分度凸轮精确实体（约一分钟）、换刀臂。</li>
-<li>凸轮系统：模型树里选“凸轮系统”，改属性“转角”，转塔和换刀臂按时序转、上下动。</li>
-<li>导出到你选的文件夹：每个零件的 STEP、加工程序、盘形凸轮点表 CSV、每个零件一张 A3 工作图（SVG，浏览器打开可打印成 PDF；技术要求留给工程师填）。</li>
-</ol></section>
+<li>凸轮系统：模型树里选“凸轮系统”，改属性 Angle（凸轮轴转角），转塔和换刀臂按时序转、上下动。</li>
+<li>导出：在 Python 控制台运行一行命令（见“不开界面：控制台命令”），输出到你指定的文件夹：凸轮和换刀臂的 STEP 与 A3 工作图，加工程序（弧面凸轮、圆柱凸轮的四轴程序；盘形凸轮在网页版“制造”里填了刀具时出程序），盘形 / 槽凸轮的点表 CSV，示意件不导出；每张工作图（SVG，浏览器打开可打印成 PDF；技术要求留给工程师填）。</li>
+</ol>
+
+<figure class="vid"><video controls preload="none" playsinline poster="../media/fc-02-cam-system.jpg"><source src="../media/fc-02-cam-system.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/fc-02-cam-system.vtt"></video><figcaption>▶ 录像：凸轮系统装配与转动</figcaption></figure></section>
 <section id="cases"><h2><span class="n">03</span>典型案例</h2><p class="lead">两个从实际问题出发的案例，每个数都是软件当场算的；示例参数都是虚构的。</p><table>
 <thead>
 <tr>
@@ -250,6 +253,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>程序 168 个点，凸轮转一圈约 6 s。</li>
 </ul>
 <a class="try" href="https://wenquestrobotics.com/cam/?example=sewing-takeup-groove&amp;mode=mfg" target="_blank" rel="noopener">▶ 试一试：打开制造页</a>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-02-mfg.jpg"><source src="../media/web-02-mfg.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-02-mfg.vtt"></video><figcaption>▶ 案例一录像：磨削程序与仿真</figcaption></figure>
 <h3 id="case-takeup-4">第三步：测量与补偿</h3>
 <p>顶部 <strong>测量与补偿</strong>，点“载入合成测量数据（演示）”——软件按设计升程加上已知误差造出来的，只作演示。勾“自动对相位”，填示例许用加速度误差 50 rad/s²（虚构），点“分析”：</p>
 <ul>
@@ -258,7 +262,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>选 1–6 阶补偿，点“生成补偿程序”：误差均方根从 <strong>3.19</strong> 降到 <strong>0.60</strong> µrad（剩下的是没选的高阶和噪声），下载补偿后的程序。</li>
 </ul>
 <div class="anim" data-anim="comp"></div>
-<a class="try" href="https://wenquestrobotics.com/cam/?example=sewing-takeup-groove&amp;mode=measure" target="_blank" rel="noopener">▶ 试一试：打开测量与补偿</a></section>
+<a class="try" href="https://wenquestrobotics.com/cam/?example=sewing-takeup-groove&amp;mode=measure" target="_blank" rel="noopener">▶ 试一试：打开测量与补偿</a>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-03-measure.jpg"><source src="../media/web-03-measure.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-03-measure.vtt"></video><figcaption>▶ 案例一录像：测量、谐波分析与补偿</figcaption></figure></section>
 <section id="case-atc"><h2><span class="n">05</span>案例二：加工中心凸轮式换刀机构</h2><p class="lead">一根凸轮轴上两个凸轮：弧面分度凸轮转换刀臂，槽凸轮让换刀臂拔刀、插刀；动作要错开，电机要够，停下来不能晃太大。</p><h3 id="case-atc-1">问题</h3>
 <p>加工中心凸轮式换刀机构（示例，虚构）：凸轮轴 60 r/min，经 30:1 减速由电机带动。弧面分度凸轮：停—转 65°—停—转 180°—停—回 65°；槽凸轮 + 摆杆：在换刀臂停着时下拔、上插。</p>
 <a class="try" href="https://wenquestrobotics.com/cam/?example=atc-globoidal" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
@@ -341,9 +346,11 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tbody>
 </table>
 <p>振动最小的几种规律都让弧面凸轮的压力角超了；在全部合格的里面，软件选 <strong>修正正弦</strong>（示例本来用的就是它）。给了允许振动、电机额定值时，还会求满足它们的最高转速。点“采用”换上那种规律。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-04-system.jpg"><source src="../media/web-04-system.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-04-system.vtt"></video><figcaption>▶ 案例二录像：时序、联锁、残余振动与设计搜索</figcaption></figure>
 <h3 id="case-atc-5">第四步：CAE</h3>
 <p>“CAE 分析”页：换刀臂有限元（55724 个单元）最大应力 31.9 MPa、安全系数 16.9；换刀臂本身（孔固定）一阶固有频率 791 Hz；还有疲劳寿命和整机多体动力学（MuJoCo）与解析结果的对照。示例结果是 2026-10-18 用数字工厂计算服务同一套程序算的；提交新计算要企业账号。</p>
-<a class="try" href="https://wenquestrobotics.com/cam/?example=atc-globoidal&amp;mode=cae" target="_blank" rel="noopener">▶ 试一试：打开 CAE 页</a></section>
+<a class="try" href="https://wenquestrobotics.com/cam/?example=atc-globoidal&amp;mode=cae" target="_blank" rel="noopener">▶ 试一试：打开 CAE 页</a>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-05-3d-cae.jpg"><source src="../media/web-05-3d-cae.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-05-3d-cae.vtt"></video><figcaption>▶ 案例二录像：三维与 CAE</figcaption></figure></section>
 <section id="console"><h2><span class="n">06</span>不开界面：控制台命令</h2><p class="lead">在 FreeCAD 的 Python 控制台里一行跑完：校核、建模、导出。</p><pre><code class="language-python">import wq_cam
 wq_cam.run_headless(&quot;项目.json&quot;, &quot;输出文件夹&quot;)
 </code></pre>
@@ -371,7 +378,8 @@ for f in glob.glob(&quot;凸轮/*.json&quot;):
 <h3 id="methods-4">凸轮系统</h3>
 <p>凸轮轴转矩 T(θ) = J_e θ̈ + ½ J_e′ θ̇² + Σ L_i ψ_i′ + T_摩擦（拉格朗日方程，Norton、Chen）；电机转矩按传动比和效率折算。停歇段残余振动按单自由度振动方程 y″ + 2ζω_n y′ + ω_n² y = −ψ̈(t)（Norton，凸轮动力学一章）。弧面分度凸轮的压力角按 Rothbart《Cam Design Handbook》里滚子齿轮凸轮的公式，啮合、筋厚、根切、接触应力另查。</p>
 <h3 id="methods-5">圆柱凸轮</h3>
-<p>槽侧面由啮合条件闭式求出；压力角沿槽深变化，槽底处最大，按槽底给结论；锥形滚子的锥顶在凸轮轴线上，停歇时纯滚动。</p></section>
+<p>槽侧面由啮合条件闭式求出；压力角沿槽深变化，槽底处最大，按槽底给结论；锥形滚子的锥顶在凸轮轴线上，停歇时纯滚动。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-06-cyl.jpg"><source src="../media/web-06-cyl.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-06-cyl.vtt"></video><figcaption>▶ 录像：圆柱凸轮</figcaption></figure></section>
 <section id="mfg"><h2><span class="n">08</span>制造、测量与补偿</h2><p class="lead">出程序、读回仿真；测出误差、分阶次、算加速度误差、反向补偿出新程序。机床参数都是示例值，按本厂设备改。</p><h3 id="mfg-1">制造</h3>
 <ul>
 <li>加工方式：<strong>磨削 X–C</strong>（凸轮随 C 轴转、砂轮沿 X 进退）、<strong>铣削 XY</strong>、<strong>慢走丝</strong>（只出 DXF 和点表）。填刀具半径和弦高公差；槽凸轮刀具不能大于滚子，等于时一刀磨出两侧。</li>
