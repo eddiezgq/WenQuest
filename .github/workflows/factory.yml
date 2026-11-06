@@ -118,7 +118,7 @@ jobs:
           sudo rm -f /var/lib/man-db/auto-update        # 装大软件包时 man-db 重建索引要很久（第一次就是卡在这里超时）
           sudo apt-get update -qq
           time sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends -o Dpkg::Use-Pty=0 \
-            kicad kicad-symbols kicad-footprints xvfb iverilog | grep -E "^(Setting up|Get:)" | grep -E "kicad|xvfb|iverilog" || true
+            kicad kicad-symbols kicad-footprints xvfb iverilog gcc-arm-none-eabi | grep -E "^(Setting up|Get:)" | grep -E "kicad|xvfb|iverilog|arm-none" || true
           kicad-cli version
           python3 -m pip install --break-system-packages -q build123d==0.13.0 trimesh==5.1.0 shapely==2.1.2 pytest pyyaml
       - name: 重新导出并核对产物一致
@@ -136,6 +136,24 @@ jobs:
           python3 factory/designs/wq-encif/tb/run.py
           python3 factory/designs/wq-encif/tools/pack.py
           git diff --stat --exit-code -- factory/designs/wq-encif/out
+      - name: Renode（第 100 轮：驱动板 B 版固件仿真）
+        uses: actions/cache@v4
+        with:
+          path: ~/renode
+          key: renode-1.15.3-linux-portable-dotnet
+      - name: 驱动板 B 版固件：重新编译、在 Renode 里跑六个场景，结果与提交的一字不差
+        run: |
+          if [ ! -x ~/renode/renode ]; then
+            mkdir -p ~/renode && curl -sSL https://github.com/renode/renode/releases/download/v1.15.3/renode-1.15.3.linux-portable-dotnet.tar.gz | tar xz --strip-components=1 -C ~/renode
+          fi
+          arm-none-eabi-gcc --version | head -1
+          cd factory/designs/drv-joint-b/fw
+          python3 run.py --renode ~/renode/renode
+          python3 pack.py
+          cd "$GITHUB_WORKSPACE"
+          git diff --stat --exit-code -- factory/designs/drv-joint-b/fw
+          test -z "$(git status --porcelain factory/designs/drv-joint-b/fw)"
+          python3 -m pytest -q factory/designs/tests/test_drv_b_fw.py
           test -z "$(git status --porcelain factory/designs/wq-encif/out)"
       - name: 可制造性检查（改坏能报出来）、芯片规格值
         run: python3 -m pytest -q factory/designs/tests

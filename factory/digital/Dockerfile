@@ -34,6 +34,7 @@ COPY plants/ plants/
 COPY designs/drv-joint/out/ designs/drv-joint/out/
 COPY designs/wq-encif/out/ designs/wq-encif/out/
 COPY designs/drv-joint-b/out/ designs/drv-joint-b/out/
+COPY designs/drv-joint-b/fw/out/ designs/drv-joint-b/fw/out/
 COPY digital/wqbus/ digital/wqbus/
 COPY digital/sim/ digital/sim/
 # 虚拟 PLC（第 18 轮第 8 步）：班次在仿真车间里算、回放；PLC 引擎是学习平台实验台的同一份 JS（Debian 自带的 nodejs 运行）
