@@ -28,6 +28,8 @@ EXCLUDE = {"GPU平台接入说明", "国内服务器加模块（质量ERP等）"
            "本地测试环境", "视频课制作与发布", "解决方案介绍片"}
 ROUND = re.compile(r"[（(]\s*(?:第\s*\d+\s*轮[^）)]*|\d{4}-\d{2}-\d{2}\s*起)[）)]")
 MAX = 900
+# 给管理员、运维、开发看的小节不进客服（来问的是访客和用户；2026-11-06 “管理员能打开 ERP 吗”被这些小节顶走）
+STAFF = re.compile(r"给维护|运维|技术备注|给开发|开发者|数据格式|接口说明|一次性设置|排查|日志|密钥|\.env|部署与|上线与维护|源文件")
 sys.path.insert(0, str(ROOT / "tools" / "site_cn"))
 from check_cn import BANNED  # noqa: E402
 
@@ -81,6 +83,17 @@ def chunks_of(md: str):
         yield sec, "\n".join(buf).strip()
 
 
+JUNK = [re.compile(p) for p in (r"(?:-{3,}\s*)+", r"第\s*\d+\s*轮起?[^：:。；]*[：:]?", r"[（(]\s*\d{4}-\d{2}-\d{2}[^）)]*[）)]",
+                                  r"\S*(?:docs|tools|services|apps|textbook|factory)/[\w./\-]+\S*", r"python3?\s+\S+\.py[^。；]*")]
+
+
+def tidy(t: str) -> str:
+    """给客服用的文字：去掉表格分隔线、轮次备注、文件路径和命令（访客看不懂也用不上）"""
+    for j in JUNK:
+        t = j.sub(" ", t)
+    return re.sub(r"\s{2,}", " ", t).strip()
+
+
 def plain(md: str) -> str:
     t = re.sub(r"```.*?```", " ", md, flags=re.S)
     t = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", t)
@@ -113,8 +126,8 @@ def main():
         sid = slug(f.stem)
         pages.append((sid, title, md))
         for i, (sec, text) in enumerate(chunks_of(md)):
-            t = plain(text)
-            if len(t) < 30:
+            t = tidy(plain(text))
+            if len(t) < 30 or STAFF.search(sec or ""):
                 continue
             kb.append(add_cn({"id": f"{sid}-{i}", "doc": f.stem, "title": title, "section": sec if sec != title else "",
                        "text": t[:1600], "url": f"/help/{sid}.html", "lang": "zh"}))
@@ -128,10 +141,16 @@ def main():
     cn = ROOT / "docs" / "方案" / "国内版官网文字稿.md"
     if cn.exists():
         for i, (sec, text) in enumerate(chunks_of(cn.read_text(encoding="utf-8"))):
-            t = plain(re.sub(r"〔[^〕]*〕", "", text))
+            t = tidy(plain(re.sub(r"〔[^〕]*〕", "", text)))
             if len(t) >= 30:
                 kb.append(add_cn({"id": f"cn-{i}", "doc": "问渠科技官网", "title": "问渠科技", "section": sec, "text": t[:1600],
                            "url": "/about/", "lang": "zh", "us": False}))
+    faq = yaml.safe_load((Path(__file__).with_name("faq.yaml")).read_text(encoding="utf-8"))
+    for f in faq:
+        sites = f.get("sites") or ["cn", "us"]
+        kb.append({"id": "faq-" + f["id"], "doc": "常见问题", "title": f["q"]["zh"][0], "section": "", "faq": True,
+                   "q": f["q"], "a": f["a"], "link": f.get("link") or {}, "text": f["a"]["zh"],
+                   "url": (f.get("link") or {}).get("us"), "lang": "zh+en", "cn": "cn" in sites, "us": "us" in sites})
     OUT.write_text(json.dumps({"chunks": kb}, ensure_ascii=False), encoding="utf-8")
     # 公开的帮助网页：美国站 site/help/，国内站 site/cn/help/
     for base, home, brand in ((ROOT / "site" / "help", "/", "问渠 WenQuest"),):

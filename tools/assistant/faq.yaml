@@ -1,0 +1,304 @@
+# 客服常见问答库（第 87 轮返修，2026-11-06）：官网访客最常问的问题，人工写好的标准答案。
+# 客服先拿问题和这里的“问法”比，足够像就直接给标准答案（标“常见问题”）；没对上再查资料、交大模型。
+# sites: cn 国内站（问渠科技）/ us 美国站（WenQuest）/ 不写 = 两站都用。link 是“详细看这里”的站内网址。
+# 改完运行 python3 tools/assistant/build_kb.py，再跑网关测试。答案里不写价格数字、不写联系电话（电话在页面底部）。
+
+- id: what
+  q:
+    zh: [你们是做什么的, 问渠是什么, 问渠科技是做什么的, 介绍一下你们公司, 你们有什么产品, 你们公司主要做什么]
+    en: [What do you do, What is WenQuest, Tell me about your company, What products do you have]
+  sites: [cn]
+  a:
+    zh: 问渠科技做 AI 原生的制造业软件：两个旗舰产品是以质量体系为核心的“问渠质量 ERP”和把 CAD、CAM、CAE、MES、MRP、ERP 连成一条数字主线的“数字工厂集成平台”；还有缝纫机、凸轮、轴承等行业设计软件和专用软件定制，以及技术服务、教育服务和咨询。
+    en: WenQuest builds AI-native software for manufacturers - a quality-centred AI ERP, a digital factory integration platform, design software for sewing machines, cams and bearings, custom software, plus engineering, education and consulting services.
+  link: {cn: /}
+- id: what-us
+  q:
+    zh: [你们是做什么的, 问渠是什么, 介绍一下问渠, 你们有什么产品]
+    en: [What do you do, What is WenQuest, Tell me about WenQuest, What products do you have, What is this site]
+  sites: [us]
+  a:
+    zh: 问渠 WenQuest 是一套 AI 原生的工程教育和制造软件：学习平台（AI 建课、AI 助教、网页互动课件）、自编教材、虚拟实验室、数字工厂（减速器厂、机器人厂）、评价系统，以及凸轮、轴承、缝纫机等工程软件。首页按模块列出了入口，每个模块都有一两分钟的视频介绍。
+    en: WenQuest is an AI-native platform for engineering education and manufacturing - a learning platform with AI course building and an AI tutor, our own textbooks, virtual labs, a running digital factory, assessment, and engineering software for cams, bearings and sewing machines. The home page lists every module, each with a short video.
+  link: {us: /}
+- id: qms
+  q:
+    zh: [问渠质量 ERP 是什么, 质量 ERP 能做什么, 质量 ERP 有哪些功能, 你们的 ERP 怎么样, 质量管理系统, QMS, 支持 ISO 13485 吗, 支持 ISO 9001 吗]
+    en: [What is the quality ERP, What can WenQuest Ops do, quality management system, QMS features]
+  a:
+    zh: 问渠质量 ERP 是以质量体系为核心的 AI ERP：标准写成流程和检查，体系每天按记录自查；文件控制、不合格与纠正预防、来料检验、控制图、追溯召回，和接单、物料、排产、采购、财务在同一套数据里。AI 起草（文件分类、程序文件、原因分析），人审批后才生效。可按 ISO 9001、ISO 13485 等标准配置。
+    en: The quality ERP (WenQuest Ops) is an AI ERP built around the quality system - document control, nonconformance and CAPA, incoming inspection, control charts, traceability and recall, in the same data as orders, stock, purchasing and finance. The AI drafts; people approve. It can be set up for ISO 9001 or ISO 13485.
+  link: {cn: /solutions/qms-erp/}
+- id: erp-access
+  q:
+    zh: [管理员能打开 ERP 吗, 怎么进 ERP, ERP 在哪里打开, 怎么登录 ERP, ERPNext 在哪, 怎么体验质量 ERP, 质量 ERP 能试用吗]
+    en: [How do I open the ERP, Where is ERPNext, Can I try the quality ERP, How to log in to the ERP]
+  sites: [cn]
+  a:
+    zh: 问渠质量 ERP 有自己的账号，和学习平台不通用。正式客户和试点企业用开通时发到邮箱的账号登录工作台，ERPNext 从工作台菜单“ERPNext ↗”直接进、不用再登录。想先看看，请在“预约演示”里选“问渠质量 ERP”，我们安排演示并开通体验。
+    en: The quality ERP has its own accounts. Customers sign in to the workspace with the account emailed to them and open ERPNext from its menu without signing in again. To try it, book a demo and choose the quality ERP.
+  link: {cn: /contact/}
+- id: platform
+  q:
+    zh: [数字工厂集成平台是什么, 集成平台能做什么, CAD CAM CAE MES 集成, 数字主线, 能接 SolidWorks 吗]
+    en: [What is the digital factory integration platform, digital thread, Does it work with SolidWorks]
+  sites: [cn]
+  a:
+    zh: 数字工厂集成平台把 CAD、CAM、CAE、MES、MRP、ERP 连成一条数字主线：设计 → 审批 → 物料版本与 BOM → MRP → 排产与车间执行 → 数控程序 → 质量 → 厂情中枢。改一次设计，下游自动跟着变，车间只拿到批准过的版本。能接你已有的 CAD（SolidWorks、FreeCAD，或任何能导出 STEP 的软件），选哪几个模块就集成哪几个。
+    en: The integration platform links CAD, CAM, CAE, MES, MRP and ERP into one digital thread - change a design once and everything downstream follows; the shop floor only gets approved versions. It works with SolidWorks, FreeCAD or anything that exports STEP.
+  link: {cn: /solutions/platform/}
+- id: factory
+  q:
+    zh: [数字工厂是什么, 什么是数字工厂, 数字工业园, 教学工厂, 减速器厂, 机器人厂]
+    en: [What is the digital factory, digital industrial park, teaching factory]
+  a:
+    zh: 数字工厂是一座按真实企业数据运转的工厂：减速器厂、机器人厂互为上下游，有 ERP、工艺、MES、质量、设备、能源和三维车间，厂情中枢一张图看全厂。学校用它做二十多个岗位实验，企业版可以按你的产品和流程搭起来。
+    en: The digital factory runs on realistic company data - a gearbox plant and a robot plant that supply each other, with ERP, process planning, MES, quality, maintenance, energy and a 3D shop floor. Students work through 20+ job-like labs; companies can have one built around their own products.
+  link: {cn: /solutions/platform/, us: /factory}
+- id: sewing
+  q:
+    zh: [缝纫机软件是什么, 缝纫机设计软件, 缝纫机软件怎么用, 平缝机设计, 包缝机]
+    en: [sewing machine design software, How do I use the sewing machine software]
+  a:
+    zh: 缝纫机设计与制造软件做平缝机、包缝机、绷缝机、电子花样机、多头刺绣机的设计、校核与出图：改参数，当场看三维样机、运动时序和红绿灯校核；一键出设计计算书、三维模型（STEP）、零件轮廓（DXF）、调机卡。网页直接用，也能装进 FreeCAD，两边计算结果一致。
+    en: The sewing machine software designs, checks and draws lockstitch, overlock, coverstitch, pattern and embroidery machines - change parameters and see the 3D prototype, timing and checks at once; export the calculation report, STEP models, DXF profiles and setup cards. It runs in the browser or inside FreeCAD.
+  link: {cn: /solutions/sewing/}
+- id: cam-bearing
+  q:
+    zh: [凸轮软件, 凸轮设计软件能做什么, 轴承软件, 轴承设计软件, 凸轮和轴承]
+    en: [cam design software, bearing design software, cam and bearing]
+  a:
+    zh: 凸轮设计与制造软件从运动要求算到凸轮廓线、加工误差与磨削补偿；轴承设计与制造软件（初版）给深沟球、角接触球轴承做每个钢球的载荷、接触应力、工作游隙、油膜厚度和故障特征频率，导出计算书。都在网页里直接用。
+    en: The cam software goes from motion requirements to the cam profile, machining error and grinding compensation; the bearing software (first release) computes ball loads, contact stress, operating clearance, film thickness and fault frequencies for deep-groove and angular-contact ball bearings. Both run in the browser.
+  link: {cn: /solutions/cam/}
+- id: custom
+  q:
+    zh: [能定制软件吗, 软件定制, 定制开发, 我们行业没有现成软件, 能不能按我们的需求做]
+    en: [Can you build custom software, custom development, software for our industry]
+  a:
+    zh: 可以。按你的需求定制专用的设计、计算或工艺软件：先调研现在怎么算、怎么画、怎么检，AI 起草计算核心和界面、工程师逐条核对，用你自己的老产品核对结果，最后交付网页版或 FreeCAD 工作台，也可以接入集成平台。缝纫机、凸轮两款软件就是这样做出来的。
+    en: Yes. We build design, calculation or process software for your own problem - research, AI-drafted core checked line by line by engineers, verified against your existing products, delivered as a web app or a FreeCAD workbench.
+  link: {cn: /solutions/custom/}
+- id: price
+  q:
+    zh: [多少钱, 价格, 怎么收费, 费用多少, 报价, 贵不贵, 收费标准]
+    en: [How much does it cost, price, pricing, quote, How much]
+  a:
+    zh: 价格按你选的模块、用户数和部署方式定，没有统一的价目表。请在“预约演示”里留下单位和需求，我们会联系你报价；试点期间可以先免费试用。
+    en: Pricing depends on the modules, number of users and how it is deployed, so there is no fixed price list. Leave your details on the contact form and we will send a quote.
+  link: {cn: /contact/, us: /#contact}
+- id: trial
+  q:
+    zh: [怎么申请体验账号, 单位怎么开通试用账号, 能试用吗, 怎么试用, 申请体验, 在线体验, 怎么注册, 可以免费用吗]
+    en: [Can I try it, free trial, How do I sign up, How do I register]
+  sites: [cn]
+  a:
+    zh: 学校和企业可以按单位申请在线体验：点右上角“注册”（或“预约演示”），勾选“申请在线体验账号”，填写单位和联系人。体验期 90 天，可以申请延长；不接受个人申请。正式使用时为单位单独开通。
+    en: Schools and companies can apply for a 90-day online trial through the contact form; we do not take individual applications.
+  link: {cn: "/contact/?trial=1"}
+- id: signup-us
+  q:
+    zh: [怎么注册, 怎么申请账号, 能试用吗, 怎么登录]
+    en: [How do I sign up, How do I register, Can I try it, How do I log in, create an account]
+  sites: [us]
+  a:
+    zh: 点页面右上角“注册”，用邮箱建一个学习平台账号就能用；老师账号会经过审核。已有账号点“登录”。
+    en: Click “Sign up” at the top right to create a learning platform account with your email; teacher accounts are reviewed. Already have one? Click “Log in”.
+  link: {us: https://learn.wenquestrobotics.com/}
+- id: login-cn
+  q:
+    zh: [怎么登录, 登录入口, 学习平台在哪, 忘记密码怎么办]
+    en: [How do I log in, forgot password]
+  sites: [cn]
+  a:
+    zh: 点右上角“登录”进学习平台（learn.wenquestech.online），用单位开通的账号登录；忘了密码在登录页点“忘记密码”，按邮件里的验证码重设。
+    en: Click “Log in” at the top right to open the learning platform; use “Forgot password” on the sign-in page to reset it by email.
+  link: {cn: https://learn.wenquestech.online/}
+- id: deploy
+  q:
+    zh: [能不能本地部署, 可以私有化部署吗, 部署在哪里, 云上还是本地, 能装在我们自己的服务器上吗, 怎么部署]
+    en: [Can it be installed on premises, self-hosted, where is it hosted, cloud or on-premise, Can I install it on my own server, on our own servers]
+  a:
+    zh: 默认云上部署：每家单位一套独立实例，我们负责更新和备份，修好的问题、新加的功能很快就能用上。坚持数据放在自己账号里的，可以用你自己的云服务器（专属云），我们远程安装、照样自动更新；确有需要也能装进你的机房，更新另外排期。
+    en: By default it runs in our cloud - a separate instance for each organization, updated and backed up by us. It can also run on your own cloud account, or on your premises if you really need it (updates are then scheduled).
+  link: {cn: /contact/, us: /#contact}
+- id: steps
+  q:
+    zh: [上线要多久, 部署怎么走, 实施周期, 怎么开始用]
+    en: [How long does it take to go live, implementation steps, How do we start]
+  sites: [cn]
+  a:
+    zh: 四步：调研（看你的产品、流程、表单和现有系统）→ 配置（按你的规则配好流程、表单、编码和权限，导入现有数据）→ 上线（先选一条产品线或一个车间试运行）→ 持续完善（你提意见，AI 起草改动，你确认后生效）。可以只上一个模块，先解决一个问题。
+    en: Four steps - survey, configure, go live on one product line or shop first, then keep improving. You can start with a single module.
+  link: {cn: /}
+- id: data
+  q:
+    zh: [数据安全吗, 数据存在哪里, 数据会不会泄露, 数据放在哪, 隐私]
+    en: [Is my data safe, Where is the data stored, privacy, data security]
+  a:
+    zh: 国内客户的数据存于境内服务器，每家单位单独隔离，不传出境；每天备份。AI 只调用已备案的境内大模型，生成的内容标注“AI 生成”。个人信息的处理见隐私政策。
+    en: Each organization's data is kept separate and backed up daily; data of customers in China stays on servers in China. Personal information is handled as described in our privacy policy.
+  link: {cn: /privacy/, us: /privacy.html}
+- id: ai-model
+  q:
+    zh: [用的什么 AI, 什么大模型, 用的什么大模型, AI 是哪家的, 用 ChatGPT 吗, AI 会不会乱说]
+    en: [Which AI model do you use, Is it ChatGPT, Can the AI make mistakes]
+  sites: [cn]
+  a:
+    zh: 只用已备案的境内大模型（如 DeepSeek）。AI 只起草，任何生效、发布、对外发送的动作都要人确认；AI 生成的内容都标注出来，回答注明依据的资料。
+    en: Only registered domestic models such as DeepSeek. The AI only drafts - anything that takes effect or goes out is approved by a person, and AI-generated content is labelled.
+- id: ai-model-us
+  q:
+    zh: [用的什么 AI, 什么大模型, 用的什么大模型, AI 是哪家的, 用 ChatGPT 吗, AI 会不会乱说]
+    en: [Which AI model do you use, Is it ChatGPT, Can the AI make mistakes]
+  sites: [us]
+  a:
+    zh: 美国站用 Anthropic 的 Claude。AI 只起草，任何生效、发布、对外发送的动作都要人确认；AI 生成的内容都标注出来，回答注明依据的资料。
+    en: The US site uses Anthropic's Claude. The AI only drafts - anything that takes effect or goes out is approved by a person, and AI-generated content is labelled.
+- id: ai-native
+  q:
+    zh: [AI 原生是什么意思, 和别的 ERP 有什么不同, 为什么选你们, 跟传统软件有什么区别]
+    en: [What does AI-native mean, How are you different, Why choose you]
+  a:
+    zh: 不是在老系统上加一个聊天框，而是把原来要人一点点做的事交给 AI：整理文件、起草流程、每天自查、追查原因、生成程序；每项功能都写清“AI 做什么、人做什么”，人只做判断和审批，全程留痕。模块可以单独用也能自由组合，按你的工厂来配，不让企业去适应软件。
+    en: Not a chat box on an old system - the AI does the legwork (sorting documents, drafting procedures, daily self-checks, root-cause tracing, generating programs) while people judge and approve, with a full record. Modules work alone or together and are configured to your plant.
+- id: modules
+  q:
+    zh: [能只买一个模块吗, 可以单独用吗, 模块怎么组合, 能和我们现有系统对接吗]
+    en: [Can I buy just one module, Does it integrate with our existing systems]
+  sites: [cn]
+  a:
+    zh: 可以。质量、ERP、MRP、MES、CAD、CAM、CAE、厂情中枢，每个模块都能单独用，也能任意组合，经同一条数据总线连在一起，并对接你已有的系统。可以先上一个模块解决一个问题，再逐步扩展。
+    en: Yes - every module works on its own or in any combination, linked by one data bus and to your existing systems.
+  link: {cn: /}
+- id: learn
+  q:
+    zh: [学习平台是什么, AI 建课怎么用, 怎么用 AI 建一门课, AI 学习平台能做什么, 怎么建课, AI 助教]
+    en: [What is the learning platform, How does AI course building work, AI tutor]
+  a:
+    zh: 问渠 AI 学习平台：老师交来杂乱的资料（讲义、PPT、视频、习题），或只说一句要求，AI 整理分类，建出完整的一门课——大纲、每节内容、网页互动课件、作业、测验、考试；老师审核修改，单位批准后才发布。AI 助教只依据课程资料回答学生、注明出处，作业只引导不代做。网页和微信小程序一套。
+    en: The AI learning platform builds a complete course from messy materials or a one-line request - syllabus, lessons, interactive web slides, homework, quizzes and exams - which the teacher reviews before it is published. The AI tutor answers only from the course materials and guides rather than doing the homework.
+  link: {cn: /education/platform/, us: https://learn.wenquestrobotics.com/}
+- id: courseware
+  q:
+    zh: [网页互动课件是什么, 课件是 PPT 吗, 课件怎么放映, 有没有 PPT]
+    en: [What are interactive web slides, Are the slides PowerPoint]
+  a:
+    zh: 课件一律做成网页互动课件，取代 PPT：像 PPT 一样翻页，动画、虚拟实验、三维模型嵌在页里当场操作，中英对照。浏览器打开就能放映。
+    en: Slides are interactive web pages instead of PowerPoint - you page through them like slides, with animations, virtual labs and 3D models you can operate live, in Chinese and English.
+- id: textbooks
+  q:
+    zh: [有哪些教材, 教材是什么, 电子教材, 教材能看吗]
+    en: [What textbooks do you have, e-textbooks]
+  a:
+    zh: 我们自己编写电子教材，每章配程序、动画和虚拟实验，书里的数字由程序算出、逐条核对；有网页版、PDF 和配套课程包（课件、作业、测验）。样书可以看简介、目录和样章，全文给合同单位在平台内使用。
+    en: We write our own e-textbooks - every chapter with code, animations and virtual labs, every number computed and checked - as web editions, PDF and a course package.
+  link: {cn: /education/, us: https://learn.wenquestrobotics.com/pages/textbook/textbook}
+- id: labs
+  q:
+    zh: [虚拟实验是什么, 有哪些虚拟实验, 虚拟实验室]
+    en: [What are the virtual labs, virtual lab]
+  a:
+    zh: 虚拟实验在浏览器里运行物理仿真：机器人、力学、电路、PLC、Verilog 芯片设计等。每个实验配指导书和报告模板，任务自动判定，AI 助教讲原因不代做，也能嵌进课件当场操作。
+    en: Virtual labs run physics simulations in the browser - robots, mechanics, circuits, PLCs, Verilog chip design and more - each with a lab guide and report template.
+  link: {cn: /education/}
+- id: education
+  q:
+    zh: [教育服务有哪些, 你们给学校做什么, 学校能用吗, 高校合作]
+    en: [education services, Do you work with schools]
+  sites: [cn]
+  a:
+    zh: 教育服务为学校和企业开发：学习系统（问渠 AI 学习平台）、电子教材、虚拟实验、数字工厂、CAD/CAM/CAE 集成化解决方案。只与单位签约、不面向个人；可以先按单位申请在线体验。
+    en: For schools and companies we develop a learning platform, e-textbooks, virtual labs, digital factories and CAD/CAM/CAE integration.
+  link: {cn: /education/}
+- id: individual
+  q:
+    zh: [个人能用吗, 我是学生能注册吗, 个人可以申请吗]
+    en: [Can individuals use it, I am a student can I join]
+  sites: [cn]
+  a:
+    zh: 国内版只与单位签约、按单位开通，不接受个人申请。如果你所在的学校或公司已经开通，请找单位联系人给你加账号。
+    en: In China accounts are opened for organizations only; ask your school or company's contact person to add you.
+- id: services
+  q:
+    zh: [技术服务有哪些, 你们能做仿真吗, 能帮我们做有限元分析吗, 能帮我们做数控编程吗]
+    en: [engineering services, Can you do simulation, FEA]
+  sites: [cn]
+  a:
+    zh: 技术服务包括工程仿真（有限元强度、疲劳、温度场、流体、多体动力学）、设计优化、数控编程和工业设计，按项目做。
+    en: Engineering services cover simulation (strength, fatigue, thermal, CFD, multibody), design optimisation, CNC programming and industrial design.
+  link: {cn: /services/}
+- id: consulting
+  q:
+    zh: [咨询服务, 数字化转型咨询, ERP 选型, 能帮我们规划吗]
+    en: [consulting, digital transformation, ERP selection]
+  sites: [cn]
+  a:
+    zh: 咨询分四步：诊断（交《数字化现状诊断报告》）→ 规划（分期、模块、投入估算）→ 选型（ERP、MES、质量系统、工业软件对比与建议，不限于我们自己的产品）→ 实施陪跑。
+    en: Consulting in four steps - diagnosis, planning, selection (not limited to our own products) and support during implementation.
+  link: {cn: /consulting/}
+- id: cases
+  q:
+    zh: [有什么案例, 典型案例, 有客户吗, 成功案例]
+    en: [case studies, examples, customers]
+  a:
+    zh: 官网“案例”页有四个从需求到车间完工的完整案例：协作机器人关节、SCARA 机器人、直驱平缝机、数字主线追溯（使用虚构的演示企业和数据），每一步做了什么、得出什么数都在平台里留着。
+    en: The cases page walks through four end-to-end examples - a cobot joint, a SCARA robot, a direct-drive lockstitch machine and digital-thread traceability (fictional demo data).
+  link: {cn: /cases/, us: /cases/}
+- id: contact
+  q:
+    zh: [联系方式, 怎么联系你们, 电话多少, 邮箱多少, 怎么找你们, 预约演示, 我想要演示]
+    en: [How do I contact you, phone number, email, book a demo, contact]
+  a:
+    zh: 请在“联系我们 / 预约演示”页留下单位、联系人和想了解的产品，我们约时间演示或回复你；页面底部也有电话和邮箱。
+    en: Use the contact / book-a-demo form with your organization and what you would like to see, and we will get back to you.
+  link: {cn: /contact/, us: /#contact}
+- id: language
+  q:
+    zh: [有英文版吗, 支持英文吗, 界面是中文吗]
+    en: [Is there an English version, Does it support Chinese]
+  a:
+    zh: 有。学习平台、课件、质量 ERP 都是中英两种界面，课件和教材可以中英对照。
+    en: Yes - the learning platform, slides and the quality ERP all have English and Chinese interfaces, and slides and textbooks can be bilingual.
+- id: mobile
+  q:
+    zh: [手机能用吗, 有小程序吗, 有 App 吗, 微信能用吗]
+    en: [Is there a mobile app, Can I use it on my phone]
+  a:
+    zh: 学习平台网页和微信小程序是一套，手机浏览器也能用；质量 ERP 和设计软件建议在电脑上用。
+    en: The learning platform works on the web and as a WeChat mini program, and in a phone browser; the ERP and design software are best on a computer.
+- id: videos
+  q:
+    zh: [有视频介绍吗, 看视频, 有演示视频吗]
+    en: [Is there a video, demo video]
+  a:
+    zh: 有。首页“两分钟看懂问渠”是总览，各个模块卡片上的“▶ 视频”是一两分钟的单项介绍（配音为 AI 合成）。
+    en: Yes - “WenQuest in two minutes” on the home page, and a short “▶ Video” on each module card.
+  link: {cn: /, us: /}
+- id: whiteboard
+  q:
+    zh: [白板课是什么, 三维仿真视频是什么, 能自动做视频吗]
+    en: [What are whiteboard lessons, 3D simulation videos]
+  sites: [us]
+  a:
+    zh: 白板课：输入题目或上传录音，AI 画出会动的白板讲解；三维仿真视频：用一段话描述，出工程级三维动画片。都在学习平台里，需要登录。
+    en: Whiteboard lessons - type a topic or upload a recording and the AI draws an animated whiteboard talk; 3D simulation films - describe it in a paragraph and get an engineering-grade 3D animation. Both are in the learning platform.
+  link: {us: https://learn.wenquestrobotics.com/}
+- id: eval
+  q:
+    zh: [评价系统是什么, 校情中枢, 课程目标达成, 专业认证]
+    en: [assessment system, campus hub, accreditation]
+  sites: [us]
+  a:
+    zh: 评价系统有学生、教师、学校三端，自动生成课程目标达成报告、教学质量报告；校情中枢给学校、学院、专业看板，毕业要求达成、改进任务、评估报告。首页有不用登录的演示。
+    en: Assessment has student, teacher and school views with course-objective and teaching-quality reports; the Campus Hub gives school, college and program dashboards for accreditation. Both have demos on the home page.
+  link: {us: /eval/}
+- id: founder
+  q:
+    zh: [创始人是谁, 创办人是谁, 谁创办的问渠, 你们老板是谁, 公司负责人]
+    en: [Who founded WenQuest, Who is the founder]
+  sites: [cn]
+  a:
+    zh: 问渠科技的创办人是张国庆，博士、教授：历任高校院长、校长和省级重点研究院院长，做过企业博士后、常务副总和上市公司教育总监，在美国加州大学河滨分校、佛罗里达大学访学进修计算机，现任美国一家医疗器械公司的质量工程师。既懂课堂，也懂工厂。
+    en: WenQuest was founded by Dr. Guoqing Zhang, a professor and former dean and university president who has also worked in industry and now works as a quality engineer at a US medical device company.
+  link: {cn: /about/}

@@ -8,13 +8,15 @@
   var T = {
     zh: { btn: "问问问渠", title: "问渠客服", ph: "问一个问题，例如：数控编程怎么出 G 代码？", send: "问",
           hello: "你好！我按问渠的使用说明回答问题。可以问某个模块是什么、怎么用、在哪里打开。",
-          ai: "AI 生成，依据下面的资料", search: "从使用说明里找到这些（非 AI 生成）", src: "出处", none: "资料里没找到相关内容。",
+          ai: "AI 生成，依据下面的资料", faq: "常见问题（人工整理）", search: "摘自使用说明原文（非 AI 生成）", src: "出处",
+          none: "这个问题资料里没有。请留下联系方式，我们回复你。",
           unsure: "这个我不确定。", contact: "联系我们 / 预约演示", busy: "正在找……", err: "出错了，请稍后再试。",
           price: "价格、合同请预约演示，我们当面谈。", close: "关闭" },
     en: { btn: "Ask WenQuest", title: "WenQuest assistant", ph: "Ask a question, e.g. how do I generate G-code?", send: "Ask",
           hello: "Hi! I answer from WenQuest's user guides. Ask what a module is, how to use it, or where to open it.",
-          ai: "AI-generated, based on the sources below", search: "Found in the user guides (not AI-generated)", src: "Sources",
-          none: "Nothing relevant found in the guides.", unsure: "I'm not sure about this.", contact: "Contact us / book a demo",
+          ai: "AI-generated, based on the sources below", faq: "Common question (written by our team)",
+          search: "Quoted from the user guides (not AI-generated)", src: "Sources",
+          none: "Our guides don't cover this. Leave your details and we'll get back to you.", unsure: "I'm not sure about this.", contact: "Contact us / book a demo",
           busy: "Looking…", err: "Something went wrong — please try again later.", price: "", close: "Close" }
   };
   function L() { return (document.documentElement.lang || "zh").toLowerCase().indexOf("en") === 0 ? "en" : "zh"; }
@@ -63,8 +65,13 @@
 
     function render(a, r, q) {
       var t = T[L()]; a.textContent = "";
-      a.appendChild(el("span", "tag", r.mode === "ai" ? t.ai : t.search));
-      if (r.mode === "ai" && r.answer) {
+      if (!r.sources.length && !r.answer) {             // 没找到就说没找到，不堆片段
+        a.appendChild(el("div", "", t.none));
+        var c0 = el("a", "", "→ " + t.contact); c0.href = r.contact || "/#contact"; a.appendChild(c0);
+        return;
+      }
+      a.appendChild(el("span", "tag", r.mode === "ai" ? t.ai : r.mode === "faq" ? t.faq : t.search));
+      if (r.answer) {
         r.answer.split(/\n+/).forEach(function (line) { if (line.trim()) a.appendChild(el("div", "", line)); });
       } else if (!r.sources.length) {
         a.appendChild(el("div", "", t.none));
@@ -77,13 +84,13 @@
           var li = el("li");
           if (x.url) { var k = el("a", "", x.title); k.href = x.url; if (/^https?:/.test(x.url)) { k.target = "_blank"; k.rel = "noopener"; } li.appendChild(k); }
           else li.appendChild(el("span", "", x.title));
-          if (r.mode !== "ai" && x.snippet) li.appendChild(el("div", "sn", x.snippet));
+          if (r.mode === "search" && x.snippet && !r.answer) li.appendChild(el("div", "sn", x.snippet));
           ul.appendChild(li);
         });
         s.appendChild(ul); a.appendChild(s);
       }
       if (r.unsure || !r.sources.length || /价|多少钱|费用|报价|price|cost|quote/i.test(q)) {
-        if (t.price && /价|多少钱|费用|报价/.test(q)) a.appendChild(el("div", "", t.price));
+        if (t.price && r.mode !== "faq" && /价|多少钱|费用|报价/.test(q)) a.appendChild(el("div", "", t.price));
         var c = el("a", "", "→ " + t.contact); c.href = r.contact || "/#contact"; a.appendChild(c);
       }
     }
