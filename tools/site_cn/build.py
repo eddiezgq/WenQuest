@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "90a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91b"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -144,12 +144,35 @@ def page(path, title, desc, body, cur=None):
     out.write_text(doc, encoding="utf-8")
 
 
-def hero(eyebrow, h1, lead, crumbs=None, btns=None):
+# 第 86 轮：模块视频简介（B 站）。编号在 tools/site_home/catalog.yaml 的 intro.<键>.bv，两站共用一份清单
+def _intro():
+    import yaml
+    cat = yaml.safe_load((ROOT / "tools" / "site_home" / "catalog.yaml").read_text(encoding="utf-8"))
+    return {k: v for k, v in (cat.get("intro") or {}).items() if v.get("bv")}
+
+
+INTRO = _intro()
+# 国内版首页“视频看问渠”放这几段（顺序即显示顺序）
+CN_VIDEOS = ["overview", "factory", "cambearing", "learn", "textbook", "labs", "whiteboard", "video3d", "eval"]
+
+
+def vbtn(key, text="▶ 看视频介绍"):
+    v = INTRO.get(key)
+    return f'<button type="button" class="btn vb" data-bv="{v["bv"]}" data-title="{html.escape(v["zh"])}">{text}</button>' if v else ""
+
+
+def videos_section():
+    cards = "".join(f'<button type="button" class="vcard" data-bv="{INTRO[k]["bv"]}" data-title="{html.escape(INTRO[k]["zh"])}">'
+                    f'<span class="play">▶</span><b>{html.escape(INTRO[k]["zh"])}</b></button>' for k in CN_VIDEOS if k in INTRO)
+    return part("视频", "一两分钟，看懂每一块", "配音为 AI 合成；视频在哔哩哔哩播放。", f'<div class="vgrid">{cards}</div>', "alt") if cards else ""
+
+
+def hero(eyebrow, h1, lead, crumbs=None, btns=None, video=None):
     cr = f'<p class="crumbs"><a href="/">首页</a> / {crumbs}</p>' if crumbs else ""
     bt = ""
-    if btns:
+    if btns or video:
         bt = '<div class="btns">' + "".join(
-            f'<a class="btn{" solid" if i == 0 else ""}" href="{h}">{t}</a>' for i, (t, h) in enumerate(btns)) + "</div>"
+            f'<a class="btn{" solid" if i == 0 else ""}" href="{h}">{t}</a>' for i, (t, h) in enumerate(btns or [])) + (vbtn(video) if video else "") + "</div>"
     return f'<section class="hero sub"><div class="wrap">{cr}<p class="eyebrow">{eyebrow}</p><h1>{h1}</h1><p class="lead">{lead}</p>{bt}</div></section>'
 
 
@@ -241,7 +264,7 @@ def home():
   <p class="eyebrow">问渠科技 · AI 原生的制造业软件</p>
   <h1><span class="nw">按你的工厂来配，</span><span class="nw"><em>模块自由组合</em>，</span><span class="nw">快速上线、越用越合身。</span></h1>
   <p class="lead">我们用 AI 重新构造制造企业的软件，不是在老系统上加一个聊天框：整理文件、起草流程、每天自查、追查原因、生成程序，这些原来要人一点点做的事交给 AI，人只做判断和审批。</p>
-  <div class="btns"><a class="btn solid" href="/contact/">预约演示 →</a><a class="btn" href="#flagships">看两个旗舰产品</a></div>
+  <div class="btns"><a class="btn solid" href="/contact/">预约演示 →</a><a class="btn" href="#flagships">看两个旗舰产品</a>{vbtn("overview", "▶ 两分钟看懂问渠")}</div>
   <p class="motto">问渠那得清如许，为有源头活水来。</p>
   <p class="hfig">厂情中枢 · 设备 → 数据 → 事件 · 对象 / 关系 <b id="hcount">—</b> · 数据 <b id="hrate">—</b>/分钟<br><span class="hc">事件链 <span id="hchain"></span></span></p>
   <ol class="hsteps" id="hsteps"></ol>
@@ -260,6 +283,7 @@ def home():
 {part("部署", "部署怎么走", "可以只上一个模块，先解决一个问题，再逐步扩展。", steps(DEPLOY_STEPS), "dark")}
 {part("案例", "典型案例", "从需求到车间完工，每一步做了什么、得出什么数、产出了什么，都在平台里留着。", cases, "alt")}
 {part("服务", "技术服务、教育服务和咨询", None, three)}
+{videos_section()}
 {cta()}"""
     page("/", "问渠科技", "问渠科技：AI 原生的制造业软件——以质量体系为核心的 AI ERP、CAD/CAM/CAE/MES/MRP/ERP 数字工厂集成平台、缝纫机与凸轮设计软件、制造业专用软件定制，以及技术服务、教育服务和咨询。", body)
 
@@ -327,7 +351,7 @@ def platform():
   <article class="card"><h3>CAD + 审批 + ERP</h3><p>设计改动走审批，批准后自动更新物料版本和 BOM，采购和生产用的永远是最新批准的版本。</p></article>
   <article class="card"><h3>整套</h3><p>从设计、仿真、编程到车间执行、质量和售后，一条线；卖出的产品还能在线监测、预测维护。</p></article>
 </div><p class="note">选哪几个就集成哪几个，并可对接你已有的系统（经统一的数据总线和接口）。</p>"""
-    body = f"""{hero("旗舰产品二", "问渠数字工厂集成平台：CAD、CAM、CAE、MES、MRP、ERP 信息集成化", "一条数字主线把设计、工艺、加工、经营和车间连起来：改一次设计，下游自动跟着变，车间只拿到批准过的版本。", "企业服务 / 数字工厂集成平台", [("预约演示", "/contact/"), ("看案例", "/cases/")])}
+    body = f"""{hero("旗舰产品二", "问渠数字工厂集成平台：CAD、CAM、CAE、MES、MRP、ERP 信息集成化", "一条数字主线把设计、工艺、加工、经营和车间连起来：改一次设计，下游自动跟着变，车间只拿到批准过的版本。", "企业服务 / 数字工厂集成平台", [("预约演示", "/contact/"), ("看案例", "/cases/")], video="factory")}
 {part("一", "设计、工艺、经营、车间，一条线", None, thread)}
 {part("二", "各模块：每个都能单独用", "下表最后一列是 AI 在这个模块里做的事；它起草的东西都要人批准。", table, "alt")}
 <div id="combine"></div>
@@ -357,7 +381,7 @@ def sewing():
 
 
 def cam():
-    body = f"""{hero("成熟产品", "凸轮设计与制造软件", "从运动要求到凸轮廓线，再到加工误差与补偿：一路校核到计算书。浏览器里直接用，不用安装。", "企业服务 / 凸轮设计与制造软件", [("在线试用", "/cam/"), ("预约演示", "/contact/")])}
+    body = f"""{hero("成熟产品", "凸轮设计与制造软件", "从运动要求到凸轮廓线，再到加工误差与补偿：一路校核到计算书。浏览器里直接用，不用安装。", "企业服务 / 凸轮设计与制造软件", [("在线试用", "/cam/"), ("预约演示", "/contact/")], video="cambearing")}
 {part("一", "从运动要求到能加工的廓线", None, f'''<div class="split"><div>
 {ul(["运动规律：等速、等加速等减速、简谐、摆线、修正梯形、修正正弦、3-4-5、4-5-6-7 等",
      "盘形凸轮与槽凸轮，直动 / 摆动从动件，滚子 / 平底 / 尖顶",
@@ -371,7 +395,7 @@ def cam():
 
 
 def bearing():
-    body = f"""{hero("初版", "轴承设计与制造软件", "给轴承厂的设计校核软件：每个钢球受多大力，一眼看清。浏览器里直接用，不用安装。", "企业服务 / 轴承设计与制造软件", [("在线试用", "/bearing/"), ("预约演示", "/contact/")])}
+    body = f"""{hero("初版", "轴承设计与制造软件", "给轴承厂的设计校核软件：每个钢球受多大力，一眼看清。浏览器里直接用，不用安装。", "企业服务 / 轴承设计与制造软件", [("在线试用", "/bearing/"), ("预约演示", "/contact/")], video="cambearing")}
 {part("一", "现在能用的", None, f'''<div class="split"><div>
 {ul(["深沟球轴承、角接触球轴承：钢球与沟道几何、相邻钢球间隙、沟底壁厚",
      "径向力、轴向力、力矩联合作用下每个钢球的载荷和工作接触角",
@@ -460,7 +484,7 @@ def education():
 {ul(["按单位申请：由单位联系人在“预约演示”里勾选“申请在线体验账号”", "审核后为单位开通若干体验账号，体验期 90 天，可以申请延长", "名额有限，按申请先后开通；不接受个人申请", "正式使用时按合同为单位单独部署"])}
 <p><a class="btn solid" href="/contact/">申请在线体验 →</a></p></div>
 {shot("edu-slides.jpg", "在线体验：网页互动课件，动画和实验在页里当场操作")}</div>"""
-    body = f"""{hero("教育服务", "教育服务：学习系统与教学资源开发", "为学校和企业开发学习系统、电子教材、虚拟实验、数字工厂和 CAD、CAM、CAE 集成化解决方案；国内服务器上提供按单位开通的在线体验。", "教育服务", [("申请在线体验", "/contact/"), ("学习系统", "/education/platform/")])}
+    body = f"""{hero("教育服务", "教育服务：学习系统与教学资源开发", "为学校和企业开发学习系统、电子教材、虚拟实验、数字工厂和 CAD、CAM、CAE 集成化解决方案；国内服务器上提供按单位开通的在线体验。", "教育服务", [("申请在线体验", "/contact/"), ("学习系统", "/education/platform/")], video="textbook")}
 <div id="dev"></div>
 {part("一", "我们为你开发什么", "每一项都按单位的需求做，交付后归单位使用；可以单独做，也可以合在一起。", dev)}
 <div id="trial"></div>
@@ -478,7 +502,7 @@ def edu_platform():
         "企业版：把作业指导书、质量文件、设备手册变成员工上手课程；与问渠质量 ERP 的“培训确认”连通，学完、考过才算培训到位",
         "数据存于境内，按单位隔离；AI 调用已备案的境内大模型，生成内容标注“AI 生成”",
     ])
-    body = f"""{hero("教育服务 · 学习平台", "问渠 AI 学习平台：AI 原生的在线学习平台", "AI 建课、AI 助教、AI 批改建议，老师和单位来把关。", "教育服务 / 问渠 AI 学习平台", [("预约演示", "/contact/")])}
+    body = f"""{hero("教育服务 · 学习平台", "问渠 AI 学习平台：AI 原生的在线学习平台", "AI 建课、AI 助教、AI 批改建议，老师和单位来把关。", "教育服务 / 问渠 AI 学习平台", [("预约演示", "/contact/")], video="learn")}
 {part("一", "AI 做什么、人做什么", None, ai_table([
         ("老师交来一堆杂乱的资料（讲义、PPT、视频、习题），或只说一句要求，AI 整理分类，建出完整的一门课：教学大纲、每节内容、网页互动课件、作业、测验、考试", "老师审核修改；课程委员会（单位指定的人）批准后才发布"),
         ("对话中随时改课：“第三章加一个实验”“这节讲浅一点”", "每次改动可撤回，留痕"),

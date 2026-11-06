@@ -236,3 +236,17 @@ ol.plain { padding-left: 1.3em; }
 ol.plain li { margin: 6px 0; }
 
 form.demo select { font: 400 16px/1.4 var(--body); padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); margin-left: 6px; }
+
+/* 第 86 轮：视频简介 */
+.btn.vb { cursor: pointer; font: inherit; }
+.vgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.vcard { display: flex; align-items: center; gap: 12px; text-align: left; padding: 16px; border: 1px solid var(--line, #d6d2c6); border-radius: 10px; background: var(--surface, #fff); color: inherit; font: inherit; cursor: pointer; }
+.vcard:hover { border-color: #f2b705; }
+.vcard .play { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: #f2b705; color: #0a1216; font-size: 14px; }
+.vcard b { font-weight: 600; line-height: 1.4; }
+.vmodal { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.8); display: none; place-items: center; padding: 16px; }
+.vmodal.on { display: grid; }
+.vmodal .box { width: min(960px, 100%); position: relative; }
+.vmodal iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 8px; background: #000; display: block; }
+.vmodal .x { position: absolute; right: 0; top: -40px; font-size: 28px; color: #fff; background: none; border: 0; cursor: pointer; }
+.vmodal .vt { color: #e6ecee; margin: 10px 0 0; font-size: 14px; }

@@ -128,3 +128,23 @@
     });
   }
 })();
+
+/* 第 86 轮：视频简介——点“▶”在页内弹出哔哩哔哩播放器（点了才加载） */
+(function () {
+  var m = document.createElement("div");
+  m.className = "vmodal"; m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true");
+  m.innerHTML = '<div class="box"><button type="button" class="x" aria-label="关闭">×</button><iframe title="视频" allow="autoplay; fullscreen" allowfullscreen scrolling="no"></iframe><p class="vt"></p></div>';
+  document.body.appendChild(m);
+  var f = m.querySelector("iframe"), t = m.querySelector(".vt");
+  function close() { m.classList.remove("on"); f.src = "about:blank"; }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("[data-bv]");
+    if (b) {
+      e.preventDefault();
+      f.src = "https://player.bilibili.com/player.html?bvid=" + encodeURIComponent(b.dataset.bv) + "&autoplay=1&high_quality=1&danmaku=0";
+      t.textContent = b.dataset.title || ""; m.classList.add("on"); return;
+    }
+    if (e.target === m || (e.target.closest && e.target.closest(".vmodal .x"))) close();
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && m.classList.contains("on")) close(); });
+})();

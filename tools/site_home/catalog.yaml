@@ -5,15 +5,15 @@
 # 第 86 轮：模块视频简介。yt = 英文版 YouTube 编号（美国官网用），bv = 中文版 B 站 BV 号（国内版官网用）；空着的不显示按钮。
 # 卡片写 intro: <下面的键>，同一段视频可以挂几张卡；overview 显示在总图上方。
 intro:
-  overview: {zh: 问渠全貌, en: WenQuest overview, yt: "", bv: ""}
-  learn: {zh: 学习平台与 AI 建课, en: Learning platform and AI course building, yt: "", bv: ""}
-  factory: {zh: 数字工厂, en: The digital factory, yt: "", bv: ""}
-  eval: {zh: 评价系统与校情中枢, en: Assessment and Campus Hub, yt: "", bv: ""}
-  textbook: {zh: 自编教材与网页互动课件, en: Textbooks and interactive web slides, yt: "", bv: ""}
-  whiteboard: {zh: 白板课, en: Whiteboard lessons, yt: "", bv: ""}
-  video3d: {zh: 三维仿真视频, en: 3D simulation films, yt: "", bv: ""}
-  cambearing: {zh: 问渠凸轮与问渠轴承, en: WenQuest Cam and Bearing, yt: "", bv: ""}
-  labs: {zh: 虚拟实验室, en: Virtual labs, yt: "", bv: ""}
+  overview: {zh: 问渠全貌, en: WenQuest overview, yt: "", bv: "BV1zR4v6iERT"}
+  learn: {zh: 学习平台与 AI 建课, en: Learning platform and AI course building, yt: "", bv: "BV1r94v6MErQ"}
+  factory: {zh: 数字工厂, en: The digital factory, yt: "", bv: "BV1zo4v6NEiR"}
+  eval: {zh: 评价系统与校情中枢, en: Assessment and Campus Hub, yt: "", bv: "BV1CU4v66En6"}
+  textbook: {zh: 自编教材与网页互动课件, en: Textbooks and interactive web slides, yt: "", bv: "BV1BZ4v6eEXm"}
+  whiteboard: {zh: 白板课, en: Whiteboard lessons, yt: "", bv: "BV1BZ4v6eEbt"}
+  video3d: {zh: 三维仿真视频, en: 3D simulation films, yt: "", bv: "BV1BZ4v6eERd"}
+  cambearing: {zh: 问渠凸轮与问渠轴承, en: WenQuest Cam and Bearing, yt: "", bv: "BV1fo4v6NE6g"}
+  labs: {zh: 虚拟实验室, en: Virtual labs, yt: "", bv: "BV1Fo4v6KEKe"}
 
 groups:
   - key: learn
