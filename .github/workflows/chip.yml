@@ -56,20 +56,23 @@ jobs:
         if: success() && github.ref == 'refs/heads/main'
         run: |
           D=factory/designs/wq-encif/out
-          rm -rf $D/layout && mkdir -p $D/layout
+          rm -rf $D/layout $D/transistor && mkdir -p $D/layout $D/transistor
           cp out/layout/* $D/layout/
+          cp out/transistor/* $D/transistor/
           python3 factory/designs/wq-encif/tools/pack.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A $D
           if git diff --cached --quiet; then echo "产物没有变化"; exit 0; fi
-          git commit -q -m "第92轮：WQ-ENCIF 版图产物（CI 生成：$(python3 -c "import json;r=json.load(open('$D/layout/result.json'));print('逻辑单元',r['logic_cells'],'个，建立余量',round(r['setup_ws_ns'],3),'ns')")）"
+          git commit -q -m "第92、93轮：WQ-ENCIF 版图与晶体管级产物（CI 生成：$(python3 -c "import json;r=json.load(open('$D/layout/result.json'));print('逻辑单元',r['logic_cells'],'个，建立余量',round(r['setup_ws_ns'],3),'ns')")）"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin HEAD:main && break; sleep 10; done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: chip-layout
-          path: out/layout/
+          path: |
+            out/layout/
+            out/transistor/
           retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
