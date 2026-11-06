@@ -681,7 +681,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p>包缝机的另一个典型机构。弹力布、针织布缝时容易被拉长（荷叶边）或缩皱，靠<strong>差动送布</strong>：前面的差动牙（布先经过它）比后面的主送布牙走得多一点或少一点。软件算出这块布要平整的差动比 D* = 1.212，差动臂长 l_d = D·l_m = 24.2 mm；“送布与差动”一组里改“差动比 D”，校核“布边平整（差动送布）”马上告诉你布边会被拉长还是缩皱。设计优化里对应的目标是“差动比：布边平整”。</p>
 <p>切边也在校核里：上刀切布时针必须在布里（布不动），上下刀要有重叠量（“切边”一组）。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-10-case-ol.jpg"><source src="../media/web-10-case-ol.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-10-case-ol.vtt"></video><figcaption>▶ 案例二：包缝机上弯针设计优化；下弯针摆杆留 50% 和 40% 减重复核</figcaption></figure></section>
-<section id="case-cv"><h2><span class="n">05</span>案例三　绷缝机：五种线迹与用线计划</h2><p class="lead">换线迹时弯针定时怎么调；一张订单要买多少线团。</p><p><strong>实际问题</strong>：针织 T 恤的下摆、袖口用绷缝机缝。车间一天要换好几种线迹；采购要知道一张订单（1,000 件，每件缝长 172 cm，损耗按 12% 算，线团每个 5,000 m）得备多少线。绷缝机没有三维零件（出不了 STEP），但“样机”页签有三维样机；这个案例用到“样机”“校核”“零件与制造”三个页签和“CAE 分析”里的设计优化。</p>
+<section id="case-cv"><h2><span class="n">05</span>案例三　绷缝机：五种线迹与用线计划</h2><p class="lead">换线迹时弯针定时怎么调；一张订单要买多少线团。</p><p><strong>实际问题</strong>：针织 T 恤的下摆、袖口用绷缝机缝。车间一天要换好几种线迹；采购要知道一张订单（1,000 件，每件缝长 172 cm，损耗按 12% 算，线团每个 5,000 m）得备多少线。网页版不出绷缝机的 STEP，但“样机”页签有三维样机；这个案例用到“样机”“校核”“零件与制造”三个页签和“CAE 分析”里的设计优化。</p>
 <h3 id="case-cv-window">第一步　弯针定时窗口有多窄</h3>
 <p>绷缝机的弯针要在机针回升、线环张开的那一刻从针后穿过去：偏早了，弯针尖高出线环、针下来时让不开弯针；偏晚了，机针已经回升太多，线环收缩，钩不住。软件把这几条约束一起算，得出<strong>弯针定时窗口</strong>。</p>
 <ol class="steps">
@@ -950,7 +950,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li><strong>全成型</strong>（一件下机，不用套口）：“全成型对比”一组，编织方式选“全成型（隔针编织）”。隔针编织只用一半的针：E12 的机器织出来相当于 <b>E6</b> 的密度，要织 E12 密度的全成型衣服得用 E24 的机器；同样针数的织物占两倍针床宽，翻针也多，趟数更多。按示例值，织衣片 + 套口一件 36 + 25 = 61 分钟，全成型上机 90 分钟——全成型省掉的是套口的<b>人工</b>，多花的是<b>机器时间</b>，两种时间的价钱不一样。合不合算要用你们自己的套口工价、机器折旧来算（教材第 29 讲毛衫厂一节）。</li>
 </ul>
 <h3 id="case-fk-8">出件</h3>
-<p>计算书（含改进方案对照、全成型对比）、调机卡（选针提前量标定、摇床对针、线圈长度闭环、纱嘴停放、新花型低速试织，取自教材 17.9“现场要点”）、参数表与曲线（Excel）、参数文件。横机没有三维零件，不出 STEP、DXF。</p>
+<p>计算书（含改进方案对照、全成型对比）、调机卡（选针提前量标定、摇床对针、线圈长度闭环、纱嘴停放、新花型低速试织，取自教材 17.9“现场要点”）、参数表与曲线（Excel）、参数文件。网页版不出横机的 STEP、DXF（FreeCAD 工作台里可以导出 STEP）。</p>
 <p><strong>讲解片</strong>：按这张意匠图，“导出”页签点“出三维讲解片”，约 45.6 秒：整机 → 三角起针（一趟慢放）→ 机头一趟（加速、匀速、减速、换向停顿）→ 翻针与摇床 → 织一片（每隔若干趟看一趟，织物往下长）→ 结论。摇床量改成 4 针、换向停顿改成 0.01 s 再出一次，多一段红灯，停在第一个翻针趟。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-89-fk-cams.jpg" alt="讲解片：机头经过时针按三角一根根升起又落下"><figcaption>讲解片：机头经过时针按三角一根根升起又落下</figcaption></figure>
 <figure class="shot"><img loading="lazy" src="../media/web-89-fk-rack.jpg" alt="讲解片：摇床量 4 针、停顿 0.01 s，红灯段停在第一个翻针趟"><figcaption>讲解片：摇床量 4 针、停顿 0.01 s，红灯段停在第一个翻针趟</figcaption></figure>
@@ -1679,7 +1679,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tr>
 </tbody>
 </table>
-<p>绷缝机、花样机、刺绣机、横机没有三维零件，不出 STEP、宏、DXF。“文件语言”可选中文或英文。</p>
+<p>绷缝机、花样机、刺绣机、横机网页版不出 STEP、宏、DXF（要这四种的 STEP：在 FreeCAD 工作台里新建同一台设计，“导出 STEP”）。“文件语言”可选中文或英文。</p>
 <p>FreeCAD 工作台安装包也在这一页下载，安装见 FreeCAD 版帮助。</p>
 <h3 id="export-video">三维讲解片</h3>
 <p>六种机型在这一页都有“出三维讲解片”：给客户、车间看“我们这台的机构怎么动”（花样机、刺绣机、横机是“一个花样 / 一片衣片怎么走完”，见本节后面）。不用写一句话，软件按当前这组参数自动写好讲解片——</p>

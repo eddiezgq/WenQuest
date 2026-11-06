@@ -69,15 +69,36 @@ def show_checks(obj=None):
             t.setItem(i, j, it)
     t.resizeColumnsToContents()
     t.horizontalHeader().setStretchLastSection(True)
-    lay.addWidget(t)
-    for tb in R.get("tables", []):
-        cell = lambda c: c[0] if isinstance(c, (list, tuple)) else str(c)  # noqa: E731
-        html = "<b>{}</b><table cellpadding='4' border='1' cellspacing='0'><tr>{}</tr>{}</table>".format(
-            tb["zh"], "".join("<th>{}</th>".format(h[0]) for h in tb["head"]),
-            "".join("<tr>{}</tr>".format("".join("<td>{}</td>".format(cell(c)) for c in r)) for r in tb["rows"]))
-        lab = QtW.QLabel(html)
-        lab.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
-        lay.addWidget(lab)
+    if any(c["state"] != "ok" for c in R.get("checks", [])):      # 第 94 轮：双击红黄灯那一行，三维停到出问题的地方
+        tip = QtW.QLabel("双击红 / 黄灯那一行：三维停到出问题的转角（花样机、刺绣机停到那一针，横机停到那一趟），"
+                         "出问题的部件选中；再点“转动机构”就从这里慢转。")
+        tip.setWordWrap(True)
+        lay.addWidget(tip)
+    checks = R.get("checks", [])
+
+    def dbl(row, _col=0):
+        if 0 <= row < len(checks) and checks[row]["state"] != "ok":
+            msg = goto(obj, checks[row]["key"])
+            if msg:
+                dlg.accept()
+    t.cellDoubleClicked.connect(dbl)
+    t.setMinimumHeight(min(len(checks), 8) * 30 + 40)     # 第 94 轮：下面的表很长时（花样机每针表）校核表不被挤成一行
+    lay.addWidget(t, 3)
+    if R.get("tables"):
+        box = QtW.QWidget()
+        bl = QtW.QVBoxLayout(box)
+        for tb in R.get("tables", []):
+            cell = lambda c: c[0] if isinstance(c, (list, tuple)) else str(c)  # noqa: E731
+            html = "<b>{}</b><table cellpadding='4' border='1' cellspacing='0'><tr>{}</tr>{}</table>".format(
+                tb["zh"], "".join("<th>{}</th>".format(h[0]) for h in tb["head"]),
+                "".join("<tr>{}</tr>".format("".join("<td>{}</td>".format(cell(c)) for c in r)) for r in tb["rows"]))
+            lab = QtW.QLabel(html)
+            lab.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+            bl.addWidget(lab)
+        sc = QtW.QScrollArea()
+        sc.setWidgetResizable(True)
+        sc.setWidget(box)
+        lay.addWidget(sc, 2)
     btn = QtW.QPushButton("关闭")
     btn.clicked.connect(dlg.accept)
     lay.addWidget(btn)
@@ -136,7 +157,7 @@ def show_timing():
 
 
 # ---------- 转动 ----------
-_TIMER = {"t": None}
+_TIMER = {"t": None, "slow": False}
 
 
 def toggle_spin():
@@ -146,13 +167,17 @@ def toggle_spin():
     if _TIMER["t"]:
         _TIMER["t"].stop()
         _TIMER["t"] = None
+        _TIMER["slow"] = False
         return
     t = QtCore.QTimer()
+    p = obj.Proxy.params(obj)
+    whole = F.span(obj, p)               # 主轴机型 360°；花样、刺绣、横机走完全部针 / 趟再从头
+    step = 1.0 if _TIMER["slow"] else 6.0
 
     def tick():
         try:
-            phi = (obj.Phi.Value + 6) % 360
-            obj.Proxy.update_parts(obj, obj.Proxy.params(obj), phi)
+            phi = (obj.Phi.Value + step) % whole
+            obj.Proxy.update_parts(obj, p, phi)
             obj.Phi = phi
             obj.purgeTouched()
             Gui.updateGui()
@@ -162,6 +187,37 @@ def toggle_spin():
     t.timeout.connect(tick)
     t.start(40)
     _TIMER["t"] = t
+
+
+def goto(obj, key):
+    """第 94 轮：停到这一项出问题的地方，选中出问题的部件；返回状态栏上那句话（没有对应的部件时返回空）"""
+    h = F.hotspot_of(obj, key)
+    if not h:
+        return ""
+    if _TIMER["t"]:
+        _TIMER["t"].stop()
+        _TIMER["t"] = None
+    p = obj.Proxy.params(obj)
+    where = ""
+    if h.get("phi") is not None:
+        obj.Proxy.update_parts(obj, p, h["phi"])
+        obj.Phi = h["phi"]
+        obj.purgeTouched()
+        where = F.progress_text(obj, p, h["phi"])
+    Gui.Selection.clearSelection()
+    for o in obj.Parts or []:
+        if getattr(o, "SewKey", "") in (h.get("names") or []):
+            Gui.Selection.addSelection(o)
+    _TIMER["slow"] = True
+    name = (h.get("name") or {}).get("zh", key)
+    msg = "{}：{}".format(WORD.get(h["state"], ""), name) + ("，停在 {}。再点“转动机构”从这里慢转。".format(where) if where else
+                                                          "：整圈都要看，没有停到某个转角；出问题的部件已选中，点“转动机构”慢转一圈看。")
+    try:
+        Gui.getMainWindow().statusBar().showMessage(msg, 15000)
+    except Exception:  # noqa: BLE001
+        pass
+    Gui.updateGui()
+    return msg
 
 
 # ---------- 命令 ----------
@@ -187,8 +243,9 @@ def new_design(machine="lockstitch"):
     Gui.Selection.clearSelection()
     Gui.Selection.addSelection(obj)
     try:
-        Gui.SendMsgToActiveView("ViewFit")
-        Gui.activeDocument().activeView().viewIsometric()
+        v = Gui.activeDocument().activeView()
+        v.viewIsometric()
+        v.fitAll()                          # FreeCAD 1.0 里 SendMsgToActiveView("ViewFit") 不认了
     except Exception:  # noqa: BLE001
         pass
 
@@ -212,7 +269,7 @@ def _file(save, title, filt):
 def export_step():
     obj = design()
     if obj and not obj.Parts:
-        QtW.QMessageBox.information(None, "问渠缝纫机", "这个机型第一期没有三维零件。")
+        QtW.QMessageBox.information(None, "问渠缝纫机", "还没有零件：先点“重新计算”。")
         return
     if obj:
         path = _file(True, "导出 STEP", "STEP (*.step *.stp)")
@@ -494,7 +551,7 @@ class PartsDialog(QtW.QDialog):
         doc.recompute()
         self.info.setText("已插入：{}（{}）".format(o.Label, len(set(x.Name for x in doc.Objects) - before)))
         try:
-            Gui.SendMsgToActiveView("ViewFit")
+            Gui.activeDocument().activeView().fitAll()
         except Exception:  # noqa: BLE001
             pass
 
@@ -601,7 +658,7 @@ class EboxDialog(QtW.QDialog):
         try:
             Gui.Selection.clearSelection()
             Gui.Selection.addSelection(f)
-            Gui.SendMsgToActiveView("ViewFit")
+            Gui.activeDocument().activeView().fitAll()
         except Exception:  # noqa: BLE001
             pass
         self.out.append("<p>已在文档里建好“{}”，可以用“文件 → 导出”存成 STEP。</p>".format(f.Label))
@@ -617,6 +674,93 @@ def ebox_dialog():
 HELP_ONLINE = "https://learn.wenquestrobotics.com/static/help/sewing-freecad/index.html"
 
 
+# ---------- 第 94 轮：出三维讲解片（交给问渠服务器出，浏览器里看、改、下载）----------
+class VideoDialog(QtW.QDialog):
+    LANGS = [("中文", "zh"), ("英文", "en"), ("中英两行", "both")]
+
+    def __init__(self, obj):
+        super().__init__(Gui.getMainWindow())
+        self.obj = obj
+        self.vid = None
+        self.setWindowTitle("出三维讲解片 · " + obj.Label)
+        self.resize(520, 300)
+        lay = QtW.QVBoxLayout(self)
+        intro = QtW.QLabel("把这台设计发给问渠服务器，自动写好讲解片：整机、各机构，再把红黄灯慢放到出问题的地方。"
+                           "出好后在浏览器里打开这段视频：看关键画面、提意见修改、出小样和高清、下载 MP4。"
+                           "<br>要联网和钥匙；浏览器里要用同一个账号登录。")
+        intro.setWordWrap(True)
+        lay.addWidget(intro)
+        row = QtW.QHBoxLayout()
+        row.addWidget(QtW.QLabel("字幕语言"))
+        self.lang = QtW.QComboBox()
+        for zh, _ in self.LANGS:
+            self.lang.addItem(zh)
+        row.addWidget(self.lang)
+        row.addStretch(1)
+        lay.addLayout(row)
+        self.voice = QtW.QCheckBox("配旁白（念画面上的标题和字幕；要几分钟，旁白长的段放慢拉长）")
+        self.voice.setChecked(True)
+        lay.addWidget(self.voice)
+        self.out = QtW.QLabel("")
+        self.out.setWordWrap(True)
+        self.out.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
+        lay.addWidget(self.out)
+        bt = QtW.QHBoxLayout()
+        self.go = QtW.QPushButton("出讲解片")
+        self.go.clicked.connect(self.run)
+        self.web = QtW.QPushButton("在浏览器里打开")
+        self.web.setEnabled(False)
+        self.web.clicked.connect(self.open_web)
+        kb = QtW.QPushButton("设置钥匙")
+        kb.clicked.connect(lambda: key_dialog(self))
+        close = QtW.QPushButton("关闭")
+        close.clicked.connect(self.accept)
+        for b in (self.go, self.web, kb, close):
+            bt.addWidget(b)
+        lay.addLayout(bt)
+
+    def run(self):
+        if not _need_key():
+            return
+        M = F.SewDesign.machine(self.obj)
+        p = self.obj.Proxy.params(self.obj)
+        lang = self.LANGS[self.lang.currentIndex()][1]
+        self.out.setText("正在发给问渠服务器写场景……")
+        self.go.setEnabled(False)
+        QtW.QApplication.processEvents()
+        try:
+            c = N.Client()
+            r = c.video(M.MACHINE, p, lang, self.voice.isChecked(), self.obj.Label)
+        except N.NetError as e:
+            self.out.setText(_html.escape(str(e)))
+            self.go.setEnabled(True)
+            return
+        self.vid, self.url = r["id"], c.video_url(r["id"])
+        probs = []
+        for k in (r.get("problems") or [])[:3]:            # 服务器给的是校核项代号，换成名字
+            h = F.hotspot_of(self.obj, k)
+            probs.append(((h or {}).get("name") or {}).get("zh", k))
+        txt = "写好了：约 {:g} 秒{}。".format(r.get("duration", 0), "，慢放 " + "、".join(probs) if probs else "")
+        if self.voice.isChecked():
+            txt += ("正在配旁白（要几分钟），配好接着出关键画面。" if r.get("voice") else "这台服务器没装语音服务，这次是无声的片子。")
+        txt += "<br>已在浏览器里打开；没打开就点“在浏览器里打开”。网页版“三维视频”里也能找到它。"
+        self.out.setText(txt)
+        self.web.setEnabled(True)
+        self.go.setEnabled(True)
+        self.open_web()
+
+    def open_web(self):
+        if self.vid:
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl(self.url))
+
+
+def video_dialog():
+    obj = design()
+    if obj:
+        d = VideoDialog(obj)
+        d.exec_() if hasattr(d, "exec_") else d.exec()
+
+
 def open_help():
     """本机的帮助（随安装包，断网也能看）；没有就开在线版"""
     p = os.path.join(HERE, "help", "index.html")
@@ -627,14 +771,15 @@ def open_help():
 def register():
     cmds = [("WQS_New", Cmd("新建平缝机设计", "按默认（教材算例）参数生成平缝机机构零件和校核", new_design, needs=False)),
             ("WQS_NewOverlock", Cmd("新建包缝机设计", "按教材第 9 讲算例机生成包缝机机构零件和校核", lambda: new_design("overlock"), needs=False)),
-            ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机弯针定时校核与耗线量、线团计划（第一期没有三维零件）", lambda: new_design("cover"), needs=False)),
-            ("WQS_NewPattern", Cmd("新建花样机设计", "电子花样机：离布窗口、转速上限、前瞻调速、X/Y 伺服与同步带校核（没有三维零件）", lambda: new_design("pattern"), needs=False)),
-            ("WQS_NewEmbroid", Cmd("新建刺绣机设计", "多头刺绣机：绷架加速度、转速上限、断线补绣与全机效率（没有三维零件）", lambda: new_design("embroid"), needs=False)),
-            ("WQS_NewFlatknit", Cmd("新建横机设计", "电脑横机：选针时间与提前量、换向余量、摇床、机头电机、一片用时与改进方案（没有三维零件）", lambda: new_design("flatknit"), needs=False)),
+            ("WQS_NewCover", Cmd("新建绷缝机设计", "绷缝机：弯针定时校核与耗线量、线团计划；引针、弯针、撑线器、送布的三维零件", lambda: new_design("cover"), needs=False)),
+            ("WQS_NewPattern", Cmd("新建花样机设计", "电子花样机：离布窗口、转速上限、前瞻调速、X/Y 伺服与同步带校核；三维零件按针走", lambda: new_design("pattern"), needs=False)),
+            ("WQS_NewEmbroid", Cmd("新建刺绣机设计", "多头刺绣机：绷架加速度、转速上限、断线补绣与全机效率；三维零件按针走", lambda: new_design("embroid"), needs=False)),
+            ("WQS_NewFlatknit", Cmd("新建横机设计", "电脑横机：选针时间与提前量、换向余量、摇床、机头电机、一片用时与改进方案；三维零件按趟走", lambda: new_design("flatknit"), needs=False)),
             ("WQS_Recompute", Cmd("重新计算", "改了参数后重算零件与校核（Ctrl+R 也可以）", recompute)),
-            ("WQS_Checks", Cmd("校核结果", "红绿灯列表：惯性力、钩线、挑线、送布、张力、共振、尺寸链", show_checks)),
+            ("WQS_Checks", Cmd("校核结果", "红绿灯列表；双击红黄灯那一行，三维停到出问题的地方（出问题的部件涂红 / 橙）", show_checks)),
             ("WQS_Timing", Cmd("时序图", "针杆、钩线窗口、送布、挑线的时序", show_timing)),
-            ("WQS_Spin", Cmd("转动机构", "让主轴转起来看运动（再点一次停止）", toggle_spin)),
+            ("WQS_Spin", Cmd("转动机构", "让主轴转起来看运动（花样机、刺绣机一针针走，横机一趟趟走；再点一次停止）", toggle_spin)),
+            ("WQS_Video", Cmd("出三维讲解片", "发给问渠服务器自动出讲解片（可配旁白），在浏览器里看、改、下载（要联网和钥匙）", video_dialog)),
             ("WQS_Step", Cmd("导出 STEP", "整套机构零件导出 STEP", export_step)),
             ("WQS_Ebox", Cmd("电控箱", "这台机配的电控箱：结温、电容寿命、开关时间窗口、改进方案；在文档里建参数化外壳（第 18 章）", ebox_dialog)),
             ("WQS_Import", Cmd("导入参数", "读入问渠网页版导出的参数文件（.wqsew.json）", import_params)),

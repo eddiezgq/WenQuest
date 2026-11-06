@@ -10,25 +10,13 @@ from typing import Any
 
 from .sewcore import cad
 from .sewcore import cad_seq as CS
+from .sewcore import hotspot as HS
 
 S = 0.001
 MACHINES = CS.MACHINES
 
-# 校核项 → (出问题的组, 停在哪一针 / 哪一趟："worst" 最紧的、"far" 超行程最远的、"over" 第一条超 DST 上限的、"first_x" 第一个翻针趟、
-#          "widest" 最宽的一趟、None = 不对到某一针，整机看一会儿)
-PROBLEM = {
-    "pattern": {"speed": (["needle", "tpl"], "worst"), "margin": (["needle"], "worst"), "head": (["head", "needle"], "worst"),
-                "x_peak": (["x"], "worst"), "x_rms": (["x"], "worst"), "x_rpm": (["x"], "worst"),
-                "y_peak": (["y"], "worst"), "y_rms": (["y"], "worst"), "y_rpm": (["y"], "worst"),
-                "belt_x": (["x"], "worst"), "belt_y": (["y"], "worst"), "belt_dx": (["x"], "worst"),
-                "travel": (["tpl", "x", "y"], "far"), "avg": (["tpl", "stitch"], None)},
-    "embroid": {"accel": (["hoop", "x", "y"], "worst"), "dst": (["hoop", "stitch"], "over"), "head": (["head", "needle"], "worst"),
-                "travel": (["hoop", "x", "y"], None)},
-    "flatknit": {"rack": (["bed"], "first_x"), "brake": (["carriage", "drive"], "widest"), "sel_time": (["carriage"], "widest"),
-                 "sel_err": (["carriage"], "widest"), "cam_res": (["carriage"], "widest"), "meas": (["carriage"], "widest"),
-                 "m_peak": (["drive"], "widest"), "m_rms": (["drive"], "widest"), "m_rpm": (["drive"], "widest"),
-                 "bed": (["fabric", "bed"], "widest")},
-}
+# 校核项 → (出问题的组, 停在哪一针 / 哪一趟)：第 94 轮挪到计算核心 sewcore/hotspot.py（FreeCAD 工作台共用）
+PROBLEM = HS.PROBLEM
 UNIT = {"pattern": ("针", "stitch"), "embroid": ("针", "stitch"), "flatknit": ("趟", "pass")}
 
 
@@ -83,13 +71,7 @@ def _box(machine: str, p: dict, phi: float, groups: list[str] | None) -> tuple[l
     return [round((lo[i] + hi[i]) / 2 * S, 4) for i in range(3)], diag
 
 
-def _target(machine: str, D: dict, how: str | None) -> int | None:
-    if how is None:
-        return None
-    k = D.get(how)
-    if k is None:
-        return None
-    return max(0, min(D["n"] - 1, int(k)))
+_target = HS.seq_target
 
 
 def scene_seq(machine: str, p: dict, R: dict, name_zh: str, name_en: str) -> tuple[dict[str, Any], dict]:
@@ -174,8 +156,7 @@ def scene_seq(machine: str, p: dict, R: dict, name_zh: str, name_en: str) -> tup
         fast_title = ("③ 走一遍花样（快放）", "③ The whole pattern (fast)")
         fast_cap = (_join([_res(R, "花样针数"), _res(R, "缝制用时")], 46), _join([_res(R, "花样针数", "en"), _res(R, "缝制用时", "en")], 110))
         tight = ("④ 最紧的一针：转速上限 {cap} r/min，这一针 {sp} r/min", "④ The tightest stitch: limit {cap} r/min, run at {sp} r/min")
-        slow_from = lambda k: (k - 1) * 360 + f2 - 25                               # noqa: E731  出布前一点，看完整个移动
-        slow_span = 360 - (f2 - f1) + 60
+        slow_from, slow_span = HS.seq_slow(machine, D)                              # 出布前一点，看完整个移动
         top_view = (-20, 58)
         fast_groups = ["tpl", "stitch"]
     elif machine == "embroid":
@@ -204,8 +185,7 @@ def scene_seq(machine: str, p: dict, R: dict, name_zh: str, name_en: str) -> tup
         fast_title = ("③ 绣一遍（快放，按颜色分色）", "③ The whole design (fast, by colour)")
         fast_cap = (_join([_res(R, "纯缝纫时间"), _res(R, "全机效率")], 46), _join([_res(R, "纯缝纫时间", "en"), _res(R, "全机效率", "en")], 110))
         tight = ("④ 最难的一针：所需 / 可用加速度 {acc}", "④ The hardest stitch: required / available acceleration {acc}")
-        slow_from = lambda k: (k - 1) * 360 + 360 - W / 2 - 30                      # noqa: E731  窗口开始前一点
-        slow_span = W + 150
+        slow_from, slow_span = HS.seq_slow(machine, D)                              # 窗口开始前一点
         top_view = (-20, 55)
         fast_groups = ["hoop", "stitch"]
     else:
@@ -251,9 +231,7 @@ def scene_seq(machine: str, p: dict, R: dict, name_zh: str, name_en: str) -> tup
     lo = 1 if machine != "flatknit" else 0
     loose = []
     for c in bad[:3]:
-        grp, how = PROBLEM[machine].get(c["key"], ([], None))
-        if how in ("far", "over") and c["state"] != "bad":      # 同样机的 goBad：超行程、超 DST 上限亮红灯时才去那一针，否则看最紧的一针
-            how = "worst"
+        grp, how = HS.seq_how(machine, c)
         k = _target(machine, D, how) if n > lo else None
         if k is None:
             loose.append(c)

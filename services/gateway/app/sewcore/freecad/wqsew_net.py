@@ -69,6 +69,16 @@ class Client:
     def ai(self, kind, machine, params, sentence=""):
         return self._req("POST", "/api/v1/sewing/ai/" + kind, {"machine": machine, "params": params, "sentence": sentence})
 
+    # 第 94 轮：出三维讲解片——服务器按这台设计写场景、配旁白、出关键画面；返回 {id, duration, problems, voice}
+    def video(self, machine, params, lang="zh", voice=True, project=""):
+        return self._req("POST", "/api/v1/sewing/video", {"machine": machine, "params": params, "lang": lang,
+                                                           "voice": bool(voice), "project": project[:80]})
+
+    def video_url(self, vid):
+        """这段视频在网页上的页面（要用钥匙主人的账号登录）"""
+        from urllib.parse import quote
+        return "{}/pages/video3d/edit?id={}".format(self.server, quote(str(vid)))
+
     def parts(self, q="", cat="", status="ok"):
         from urllib.parse import urlencode
         return self._req("GET", "/api/v1/sewing/parts?" + urlencode({"q": q, "cat": cat, "status": status}))

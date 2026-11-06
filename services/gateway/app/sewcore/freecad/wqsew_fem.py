@@ -116,7 +116,7 @@ def run(obj=None, part="", mesh_mm=1.2, solve=True, workdir=None):
             if o is not rm:
                 o.ViewObject.Visibility = False
         Gui.activeDocument().activeView().viewIsometric()
-        Gui.SendMsgToActiveView("ViewFit")
+        Gui.activeDocument().activeView().fitAll()
     except Exception as e:  # noqa: BLE001
         App.Console.PrintWarning("问渠缝纫机：结果上色没成功（%s），可在 FEM 工作台里双击结果对象查看。\n" % e)
     return out

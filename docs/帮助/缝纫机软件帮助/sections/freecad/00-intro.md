@@ -14,7 +14,7 @@ FreeCAD 是开源的参数化三维 CAD。“问渠缝纫机”工作台把问�
 **第一次用？从案例开始**：[典型案例](#cases)里有平缝、包缝、绷缝、花样、横机、电控箱、刺绣机七个案例；案例一另有 FreeCAD 里的做法和录屏。
 {: .start }
 
-六种机型：{{name_lockstitch}}（{{checks_lockstitch}} 项校核）、{{name_overlock}}（{{checks_overlock}} 项）、{{name_cover}}（{{checks_cover}} 项）、{{name_pattern}}（{{checks_pattern}} 项）、{{name_embroid}}（{{checks_embroid}} 项）、{{name_flatknit}}（{{checks_flatknit}} 项）。平缝机、包缝机有三维机构零件；另外四种是校核和计划（没有三维零件）。
+六种机型：{{name_lockstitch}}（{{checks_lockstitch}} 项校核）、{{name_overlock}}（{{checks_overlock}} 项）、{{name_cover}}（{{checks_cover}} 项）、{{name_pattern}}（{{checks_pattern}} 项）、{{name_embroid}}（{{checks_embroid}} 项）、{{name_flatknit}}（{{checks_flatknit}} 项）。六种都有三维机构零件（第 94 轮起；和网页版样机、讲解片同一套）：平缝机、包缝机、绷缝机转主轴，花样机、刺绣机一针针走，横机一趟趟走；出问题的部件涂红。
 
 ### 一张图看懂整套系统
 

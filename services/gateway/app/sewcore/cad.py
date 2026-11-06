@@ -291,6 +291,17 @@ def freecad_shapes(model):
             sh = Part.makeBox(*d["size"], V(*d["base"]))
         elif d["type"] == "sphere":
             sh = Part.makeSphere(d["r"], V(*d["c"]))
+        elif d["type"] == "tube":           # 第 94 轮：线、弯针身、缝迹——一节节圆柱 + 拐点小球（不做布尔，快、不会失败）
+            segs = []
+            pts = [V(*q) for q in d["pts"]]
+            for i in range(len(pts) - 1):
+                a_, b_ = pts[i], pts[i + 1]
+                L = (b_ - a_).Length
+                if L > 1e-6:
+                    segs.append(Part.makeCylinder(d["r"], L, a_, (b_ - a_) * (1.0 / L)))
+                    if i:
+                        segs.append(Part.makeSphere(d["r"], a_))
+            sh = Part.makeCompound(segs) if segs else Part.makeSphere(d["r"], pts[0])
         else:
             fr = _frame(d)
             n = V(*fr[3])

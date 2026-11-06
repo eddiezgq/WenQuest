@@ -26,6 +26,7 @@ from . import sewcore
 from .moodle import EngineError
 from . import video3d as v3
 from .sewcore import cad
+from .sewcore import hotspot as HS
 from . import sewing_video_seq as SEQ
 
 MACHINES = ("lockstitch", "overlock", "cover", "pattern", "embroid", "flatknit")      # 后三种第 89 轮，场景见 sewing_video_seq.py
@@ -40,9 +41,9 @@ LOCK_SECTIONS = [
 ]
 OL_SECTIONS = [
     ("needle", ["needle"], ("① 斜向引针（曲柄滑块）", "① Slanted needle drive (slider-crank)")),
-    ("lower", ["LL_Eccentric", "LL_BallA", "LL_BallB", "LL_Link", "LL_Rocker", "LL_Shaft", "LL_Looper"],
+    ("lower", HS.OL_LL,
      ("② 下弯针：空间四杆（RSSR）", "② Lower looper: spatial four-bar (RSSR)")),
-    ("upper", ["UL_Eccentric", "UL_BallA", "UL_BallB", "UL_Link", "UL_Rocker", "UL_Shaft"],
+    ("upper", HS.OL_UL,
      ("③ 上弯针：空间四杆（RSSR）", "③ Upper looper: spatial four-bar (RSSR)")),
     ("feed", ["feed"], ("④ 送布与差动：主送布臂、差动送布臂", "④ Feed and differential: main and differential arms")),
     ("knife", ["knife"], ("⑤ 切边：上刀、下刀", "⑤ Edge trimming: upper and lower knives")),
@@ -56,11 +57,8 @@ CV_SECTIONS = [
     ("spreader", ["spreader"], ("④ 撑线器：把覆盖线铺过各针", "④ Spreader: lays the cover thread across the needles"), None),
     ("feed", ["feed", "frame"], ("⑤ 送布：主送布牙、差动送布牙", "⑤ Feed: main and differential feed dogs"), None),
 ]
-CV_PROBLEM = {"loop_rise": "catch", "point_h": "catch", "gap": "catch", "timing_margin": "catch", "descend": "fd", "avoid": "fd"}
-# 校核项 → 出问题的机构（组）、慢放到哪个主轴转角附近（None = 整圈）
-LOCK_PROBLEM = {"needle_force": ("needle", 180), "lambda": ("needle", None), "catch_rise": ("hook", "catch"), "hook": ("hook", "catch"),
-                "chain": ("hook", "catch"), "frame_force": ("all", None), "frame_res": ("all", None)}
-OL_PROBLEM = {"feed_window": "feed", "lambda": "needle", "diff": "feed", "diff_range": "feed", "knife_time": "knife", "knife_ov": "knife"}
+# 校核项 → 出问题的机构、慢放转角：第 94 轮挪到计算核心 sewcore/hotspot.py（FreeCAD 工作台共用）
+CV_PROBLEM, LOCK_PROBLEM, OL_PROBLEM = HS.CV_PROBLEM, HS.LOCK_PROBLEM, HS.OL_PROBLEM
 
 
 def _section_groups(machine: str) -> list:
@@ -70,15 +68,7 @@ def _section_groups(machine: str) -> list:
     return [s + (None,) for s in (LOCK_SECTIONS if machine == "lockstitch" else OL_SECTIONS)]
 
 
-def _names_in(machine: str, params: dict, groups: list[str]) -> list[str]:
-    """组名可以是机构名（needle……）也可以是零件名；返回零件名清单"""
-    names = [p["name"] for p in cad.parts3d(params, 0.0, machine)["parts"]]
-    out = []
-    for n in names:
-        if n in groups or cad.group_of(n) in groups:
-            out.append(n)
-    return out
-
+_names_in = HS.names_in
 
 
 def _extent(machine: str, params: dict, names: list[str] | None) -> tuple[list[float], float]:
@@ -199,47 +189,8 @@ def _n_needles(p: dict) -> int:
     return sewcore.get("cover").TY[p["stitch"]][0]
 
 
-def _avoid_angle(M, p: dict) -> float | None:
-    """“针在弯针平面下方时不相碰”不合格时，间隙最小的转角（后侧在针回升时、前侧在针下行时；同 cover.evaluate 的扫法）"""
-    st = {k: p[k] for k in ("dphi", "dz", "e", "gap", "rr")}
-    E = M.evaluate(st)
-    worst = []
-    f = 0.0
-    while f < 360:
-        if M.ztip(f) <= E["zb"]:
-            x, y = E["looper"](f)
-            if x <= 0:
-                back = 180 <= f <= E["fu"]
-                c = (-y - M.RN) if back else (y - M.RN - 0.05)
-                worst.append((c, f))
-        f += 0.25
-    return min(worst)[1] if worst else None
-
-
-def problem_target(machine: str, key: str, catch: float, fd: float | None = None,
-                   avoid_at: float | None = None) -> tuple[list[str], float | None]:
-    """红黄灯项 → 要透视的组、慢放的转角（绷缝机：钩线角或针下到弯针平面的转角）"""
-    if machine == "cover":
-        k = CV_PROBLEM.get(key)
-        if key == "avoid" and fd is not None and avoid_at is not None:   # 不相碰：慢放到间隙最小（出问题）的那一侧
-            return ["needle", "looper"], avoid_at
-        if k == "catch":
-            return ["needle", "looper", "thread"], catch
-        if k == "fd":
-            return ["needle", "looper"], fd
-        return ["looper"], None
-    if machine == "lockstitch":
-        if key.startswith("takeup") or key.startswith("tension"):
-            return ["takeup"], None
-        if key.startswith("feed"):
-            return ["feed", "frame"], None
-        g, phi = LOCK_PROBLEM.get(key, ("all", None))
-        return (["needle", "takeup", "hook", "feed", "drive"] if g == "all" else [g]), (catch if phi == "catch" else phi)
-    if key.startswith("ll_"):
-        return OL_SECTIONS[1][1], None
-    if key.startswith("ul_"):
-        return OL_SECTIONS[2][1], None
-    return [OL_PROBLEM.get(key, "needle")], None
+_avoid_angle = HS.avoid_angle
+problem_target = HS.problem_target
 
 
 def scene(machine: str, params: dict | None, lang: str = "both") -> tuple[str, dict]:
@@ -448,11 +399,11 @@ def register(app, m) -> None:
     from . import video3d_api
 
     @app.post("/api/v1/sewing/video")
-    async def make_video(body: VideoIn, sess: Annotated[Any, Depends(m.current)]):
-        lic = await m.sewing_need_license(sess)
+    async def make_video(body: VideoIn, lic: Annotated[dict, Depends(m.sewing_who)]):
+        """已开通的人：网页登录凭证，或 FreeCAD 钥匙（第 94 轮：工作台“出三维讲解片”）；片子记在这个人名下"""
         svc = video3d_api.service(m)
         text, meta = scene(body.machine, body.params, body.lang)
-        V = await svc.create(sess.user_id, lic.get("org") or "", "", "")
+        V = await svc.create(lic["user_id"], lic.get("org") or "", "", "")
         V["lock"] = {"model": "d", "machine": body.machine, "params": meta["params"],
                      "numbers": meta["numbers"]}
         V["sewing"] = {"machine": body.machine, "project": body.project, "org": lic.get("org") or ""}

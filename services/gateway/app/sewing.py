@@ -136,7 +136,7 @@ def register(app, m) -> None:
     async def who(req: Request, authorization: Annotated[str | None, Header()] = None,
                   x_wq_key: Annotated[str | None, Header()] = None) -> dict:
         """第 49 轮：已开通的人——网页的登录凭证（Bearer 或全站 cookie），或 FreeCAD 钥匙（X-WQ-Key）。返回开通记录。
-        钥匙只认真开通了的账号（收回开通、改单位时钥匙一并删掉），只用在读零件库、下载 STEP、AI 助手这几处。"""
+        钥匙只认真开通了的账号（收回开通、改单位时钥匙一并删掉），只用在读零件库、下载 STEP、AI 助手、出三维讲解片（第 94 轮）这几处。"""
         if x_wq_key:
             with db() as c:
                 r = c.execute("select user_id, org from keys where hash=?", (key_hash(x_wq_key),)).fetchone()
@@ -408,7 +408,8 @@ def workbench_zip() -> bytes:
                   "ebox.py",                                      # 第 62 轮：电控箱
                   "stitchfile.py",                                # 第 69 轮：刺绣花样文件
                   "knitprog.py",                                  # 第 70 轮：横机意匠图
-                  "cae_setup.py"):                                  # 第 49 轮：本机有限元算例（wqsew_fem）和网页版同一份工况
+                  "cae_setup.py",                                 # 第 49 轮：本机有限元算例（wqsew_fem）和网页版同一份工况
+                  "cad_seq.py", "hotspot.py"):                    # 第 94 轮：花样、刺绣、横机的三维零件；红黄灯对应的部件、停的地方
             z.write(core / f, root + "sewcore/" + f)
         z.write(core / "freecad" / "使用说明.txt", "使用说明.txt")
         hd = core / "freecad" / "help"                # 第 49 轮：帮助随安装包（断网也能看）
