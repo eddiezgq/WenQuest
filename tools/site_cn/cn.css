@@ -44,6 +44,12 @@ nav.main a[aria-current="page"] { color: var(--water); }
 .dd .menu a:hover { background: var(--night); }
 .cta-top { font: 600 14px/1 var(--body); text-decoration: none; background: var(--water); color: #fff; padding: 11px 16px; border-radius: 6px; white-space: nowrap; }
 .cta-top:hover { background: #17877c; }
+/* 登录 / 注册（11-05 Eddie：首页加注册登录） */
+.auth-top { font: 500 14px/1 var(--body); color: var(--night-ink); text-decoration: none; padding: 10px 8px; white-space: nowrap; }
+.auth-top:hover { color: #fff; text-decoration: underline; }
+.auth-top.reg { border: 1px solid var(--night-line); border-radius: 6px; padding: 10px 14px; margin-right: 4px; }
+.auth-top.reg:hover { border-color: var(--water); text-decoration: none; }
+nav.main .auth-m { display: none; }
 .burger { display: none; background: none; border: 1px solid var(--night-line); color: var(--night-ink); border-radius: 6px; padding: 8px 10px; font: 500 14px/1 var(--body); }
 @media (max-width: 980px) {
   .burger { display: inline-block; }
@@ -52,6 +58,8 @@ nav.main a[aria-current="page"] { color: var(--water); }
   .dd .menu { position: static; display: block; box-shadow: none; border: 0; background: none; padding: 0 0 6px 12px; }
   .dd > button::after { display: none; }
   .cta-top { display: none; }
+  .auth-top { padding: 8px 6px; font-size: 13px; } .auth-top.reg { padding: 8px 10px; }
+  nav.main .auth-m { display: block; padding: 10px 4px; }
   nav.main .cta-m { display: block; text-align: center; margin-top: 8px; background: var(--water); color: #fff; }
 }
 @media (min-width: 981px) { nav.main .cta-m { display: none; } }

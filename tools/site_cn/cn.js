@@ -148,3 +148,10 @@
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && m.classList.contains("on")) close(); });
 })();
+
+/* 注册 = 按单位申请体验账号：从“注册”进来时自动勾上并滚到表单 */
+(function () {
+  if (!/[?&]trial=1/.test(location.search)) return;
+  var f = document.getElementById("demo-form"); if (!f) return;
+  var c = f.querySelector('input[name="trial"]'); if (c) c.checked = true;
+})();

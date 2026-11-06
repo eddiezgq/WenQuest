@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91b"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91c"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -74,6 +74,7 @@ def nav(cur):
 
     return ("<nav class=\"main\" aria-label=\"主菜单\">" + dd("企业服务", ENTERPRISE) + a("/services/", "技术服务")
             + dd("教育服务", EDUCATION) + a("/consulting/", "咨询") + a("/cases/", "案例") + a("/about/", "关于我们")
+            + f'<a class="auth-m" href="{LEARN}/pages/login/login">登录学习平台</a><a class="auth-m" href="/contact/?trial=1#demo-form">注册（按单位申请体验账号）</a>'
             + '<a class="cta-m" href="/contact/">预约演示</a></nav>')
 
 
@@ -127,6 +128,8 @@ def page(path, title, desc, body, cur=None):
 <header class="top"><div class="wrap">
   <a class="brand" href="/">{LOGO}<b>问渠科技</b></a>
   {nav(cur or path)}
+  <a class="auth-top" href="{LEARN}/pages/login/login">登录</a>
+  <a class="auth-top reg" href="/contact/?trial=1#demo-form" title="体验账号按单位开通：填写单位信息并勾选“申请在线体验账号”，审核后开通">注册</a>
   <a class="cta-top" href="/contact/">预约演示</a>
   <button class="burger" type="button" aria-expanded="false" aria-label="菜单">菜单</button>
 </div></header>
@@ -578,7 +581,7 @@ def contact():
   <label class="full">所在行业<input type="text" name="industry" maxlength="60" placeholder="如：缝制机械、减速器、电子装配、职业院校"></label>
   <fieldset><legend>想了解的产品或服务</legend>{boxes}</fieldset>
   <fieldset class="trial"><legend>在线体验</legend>
-    <label><input type="checkbox" name="trial" value="1"> 申请在线体验账号（按单位开通，体验期 90 天）</label>
+    <label><input type="checkbox" name="trial" value="1"> 申请在线体验账号（注册：按单位开通，审核后把账号发给你，体验期 90 天）</label>
     <label>需要几个账号 <select name="seats"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option></select></label>
   </fieldset>
   <label class="full">需求说明<textarea name="note" maxlength="2000" placeholder="说说你的工厂或学校现在最想解决的一件事"></textarea></label>
