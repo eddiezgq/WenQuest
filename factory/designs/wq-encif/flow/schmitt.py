@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """第 93 轮：WQ-ENCIF 输入端施密特触发器的晶体管级仿真（ngspice + SKY130 器件模型）。
 6 管 CMOS 施密特触发器 + 输出反相器；与《数字集成电路设计》第 1 章的普通反相器（Wn 0.42、Wp 0.97 μm）对比。
-① 反馈管宽度扫描，选回差 ≥ 0.6 V 的最小一档；② 直流上扫 / 下扫：上门限 VT+、下门限 VT−；③ 工艺角与温度；
+① 反馈管宽度扫描，选回差 ≥ 0.6 V 的最小一档；② 慢三角波输入（准静态）上升 / 下降：上门限 VT+、下门限 VT−；③ 工艺角与温度；
 ④ 带 ±0.3 V 干扰的慢边沿：数两种输入级的输出翻转次数；⑤ 干净边沿的传播延迟（负载 10 fF）。
 用法：python3 schmitt.py --lib $PDK_ROOT/sky130A/libs.tech/combined/sky130.lib.spice --out OUT
       python3 schmitt.py --generic --out OUT   （本机冒烟：通用一级模型，数不能当真）。示例设计，未流片。"""
@@ -91,31 +91,34 @@ def cross(xs, ys, level, rising):
 
 
 def dc(a, k, corner, temp, tmp, keep=False):
+    """准静态转移曲线：输入用慢三角波（2 μs 升到 VDD、2 μs 降回 0），比直流扫描可靠——双稳态电路的直流扫描不一定沿着上一点的状态走。
+    VT+ = 上升段输出越过 VDD/2 时的输入，VT− = 下降段的。"""
     wfn, wfp, sub = cells(k)
     net = header(a, corner, temp) + sub + f"""
 VDD vdd 0 {VDD}
-VIN in 0 0
+VIN in 0 PWL(0 0 2u {VDD} 4u 0)
 XS in out vdd 0 schmitt
 XI in oi vdd 0 inv
 .control
 set wr_singlescale
-dc VIN 0 {VDD} 0.002
-wrdata up.txt v(out) v(oi)
-dc VIN {VDD} 0 -0.002
-wrdata dn.txt v(out) v(oi)
+tran 2n 4u
+wrdata tri.txt v(in) v(out) v(oi)
 .endc
 .end
 """
     run(net, tmp)
-    up, dn = table(os.path.join(tmp, "up.txt")), table(os.path.join(tmp, "dn.txt"))
+    rows = table(os.path.join(tmp, "tri.txt"))
+    up = [(r[1], r[2], r[3]) for r in rows if r[0] <= 2e-6]
+    dn = [(r[1], r[2], r[3]) for r in rows if r[0] > 2e-6]
     vtp = cross([r[0] for r in up], [r[1] for r in up], VDD / 2, True)
     vtn = cross([r[0] for r in dn], [r[1] for r in dn], VDD / 2, False)
     vm = cross([r[0] for r in up], [r[2] for r in up], VDD / 2, False)          # 普通反相器的门限（输出下降过半）
     res = {"k": k, "wfn": wfn, "wfp": wfp, "vt_plus": r4(vtp), "vt_minus": r4(vtn), "hyst": r4(vtp - vtn) if vtp and vtn else None, "inv_vm": r4(vm)}
     if keep:
-        res["curve_up"] = [[r4(r[0]), r4(r[1])] for r in up[::5]]
-        res["curve_dn"] = [[r4(r[0]), r4(r[1])] for r in dn[::5]]
-        res["curve_inv"] = [[r4(r[0]), r4(r[2])] for r in up[::5]]
+        st = max(1, len(up) // 180)
+        res["curve_up"] = [[r4(r[0]), r4(r[1])] for r in up[::st]]
+        res["curve_dn"] = [[r4(r[0]), r4(r[1])] for r in dn[::st]]
+        res["curve_inv"] = [[r4(r[0]), r4(r[2])] for r in up[::st]]
     return res
 
 
