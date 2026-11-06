@@ -1,0 +1,102 @@
+# 首页视频简介 03 · 自编教材与网页互动课件（第 86 轮第二批）。画面：学习平台教材阅读页（本机完整环境，中英界面，《机器人学》）、
+# 教材虚拟实验页（本机 textbook/tools/build.py robotics --labs 生成，site/_tb 指向 textbook/build，不提交）、课件放映截图（现成）。
+standalone: true
+langs: [zh, en]
+title: [问渠自编教材与网页互动课件, 'WenQuest textbooks and interactive web slides']
+brand: [教材与课件, Textbooks and slides]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的教材是问渠自编的《机器人学》。, 'The book shown is WenQuest''s own Robotics textbook.']
+tags:
+  zh: [教材, 电子教材, 中英对照, 网页课件, 虚拟实验, 机器人学, 问渠]
+  en: [textbook, bilingual textbook, web slides, virtual lab, robotics, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: read, learn: /pages/textbook/textbook, click: ['text=机器人学', '.toc-ch-t >> nth=3', '.toc-sec:has-text("4.4 ")'], wait: 5000}
+  - {name: res, learn: /pages/textbook/textbook, click: ['text=机器人学'], wait: 5000}
+  - {name: lab, url: /_tb/robotics/lab/ch04.html, wait: 4000}
+  - {name: slides, file: tools/site_cn/assets/edu-slides.jpg}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: read, title: [自己写的教材，中英对照, 'Textbooks of our own, in Chinese and English'],
+          sub: [九本教材：机器人学、机械设计、机械制造技术、PLC、人工智能、线性代数、微积分、大学物理、数字集成电路设计, 'Nine books: robotics, mechanical design, manufacturing, PLC, AI, linear algebra, calculus, physics, digital IC design']}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠的课程背后，是我们自己写的九本教材：机器人学、机械设计、制造技术、PLC、人工智能，还有数学和物理。']
+    en: ['>Behind WenQuest courses are nine textbooks of our own: robotics, mechanical design, manufacturing, PLC, AI, and the maths and physics beneath them.']
+- id: s02
+  kind: page
+  page: 2
+  part: [教材, Textbooks]
+  slide:
+    img: res
+    url: learn.wenquestrobotics.com/pages/textbook
+    kick: [章首, Chapter opening]
+    title: [每章的动画和实验列在章首, Every chapter lists its animations and labs]
+    points:
+      - {text: [点开就是动画或实验, One click opens the animation or lab], ring: [36, 14, 62, 37]}
+      - {text: [中文、English 一键切换, Switch between Chinese and English], ring: [10, 22, 18, 7]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>每一章开头列出本章的动画和虚拟实验，点开就能看、就能做，', '>中文和英文一键切换。']
+    en: ['>Each chapter opens with its animations and virtual labs, one click away,', '>and switches between Chinese and English in one click.']
+- id: s03
+  kind: page
+  page: 3
+  part: [教材, Textbooks]
+  slide:
+    img: read
+    url: learn.wenquestrobotics.com/pages/textbook
+    kick: [每一节, Every section]
+    title: [实际问题 → 概念 → 动画 → 实验 → 建模求解, 'Problem → concept → animation → lab → model and solve']
+    points:
+      - {text: [例子以机器人为主, Robotics examples throughout]}
+      - {text: [算例程序真的跑过，数字由程序算出, 'Worked examples actually run; numbers come from the code']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>每一节都从一个实际问题出发，讲概念、看动画、做实验、建模求解，例子以机器人为主；', '>书里的算例程序都真的跑过，数字由程序算出来。']
+    en: ['>Each section starts from a real problem, then the concept, an animation, a lab, and a model to solve, mostly with robots as examples.', '>Every worked example has actually been run; the numbers come from the code.']
+- id: s04
+  kind: page
+  page: 4
+  part: [实验, Labs]
+  slide:
+    img: lab
+    url: learn.wenquestrobotics.com
+    kick: [教材虚拟实验, Textbook labs]
+    title: [拖一拖，看公式怎么变, 'Drag it and watch the formula change']
+    points:
+      - {text: [每个实验配一道机器人问题, Each lab comes with a robotics problem]}
+      - {text: [有指导书和报告模板, With a guide and a report template]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>虚拟实验里拖动参数，看矩阵和坐标怎么变，每个实验配一道机器人问题，', '>还有实验指导书和报告模板。']
+    en: ['>In the labs you drag a parameter and watch the matrices and coordinates change, each lab with a robotics problem,', '>plus a lab guide and a report template.']
+- id: s05
+  kind: page
+  page: 5
+  part: [课件, Slides]
+  slide:
+    img: slides
+    url: learn.wenquestrobotics.com
+    kick: [网页互动课件, Interactive web slides]
+    title: [取代 PPT, Instead of PowerPoint]
+    points:
+      - {text: [像 PPT 一样翻页, Page through like slides]}
+      - {text: [动画、虚拟实验、三维模型当场操作, 'Animations, labs and 3D models work on the page']}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>课件一律做成网页互动课件，像 PPT 一样翻页，', '>动画、虚拟实验、三维模型嵌在页里，上课当场操作。']
+    en: ['>All slides are interactive web pages. You page through them like PowerPoint,', '>with animations, labs and 3D models built in, to work with live in class.']
+- id: s06
+  kind: page
+  page: 6
+  part: [结尾, Outro]
+  slide: {layout: end, img: res, title: [网页版、PDF 都有, On the web and as PDF],
+          sub: [学习平台注册后就能读, Read it once you sign up], link: [问渠官网首页 → 教材, learn.wenquestrobotics.com]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>教材有网页版和 PDF，在学习平台注册后就能读。']
+    en: ['>The books are on the web and as PDF, ready to read once you sign up on the learning platform.']
