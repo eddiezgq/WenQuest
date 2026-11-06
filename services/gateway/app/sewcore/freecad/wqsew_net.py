@@ -77,9 +77,17 @@ class Client:
         return self._req("POST", "/api/v1/sewing/ai/" + kind, {"machine": machine, "params": params, "sentence": sentence})
 
     # 第 94 轮：出三维讲解片——服务器按这台设计写场景、配旁白、出关键画面；返回 {id, duration, problems, voice}
-    def video(self, machine, params, lang="zh", voice=True, project=""):
-        return self._req("POST", "/api/v1/sewing/video", {"machine": machine, "params": params, "lang": lang,
-                                                           "voice": bool(voice), "project": project[:80]})
+    def video(self, machine, params, lang="zh", voice=True, project="", voice_name="", speed=None):
+        body = {"machine": machine, "params": params, "lang": lang, "voice": bool(voice), "project": project[:80]}
+        if voice and voice_name:                       # 第 102 轮：选的声音、语速（不选 = 平台默认）
+            body["voice_name"] = voice_name
+        if voice and speed:
+            body["speed"] = float(speed)
+        return self._req("POST", "/api/v1/sewing/video", body)
+
+    # 第 102 轮：能选的声音、语速 {available, default, speeds:[{v, zh, en}], voices:[{id, lang, zh, en}]}
+    def video_voices(self):
+        return self._req("GET", "/api/v1/sewing/video/voices")
 
     def video_url(self, vid):
         """这段视频在网页上的页面（要用钥匙主人的账号登录）"""

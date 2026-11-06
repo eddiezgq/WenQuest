@@ -736,20 +736,32 @@ class Service:
             self.spawn(self.revoice(vid, stills=False))
         return V
 
-    def set_voice(self, V: dict, on: bool) -> dict:
-        """第 99 轮：工作页的“配旁白”开关。打开：配一次；关掉：不再配，场景退回配旁白前那一版（配好以后没再改过的话）"""
+    def set_voice(self, V: dict, on: bool, name: str | None = None, speed: float | None = None, label: str = "") -> dict:
+        """第 99 轮：工作页的“配旁白”开关。打开：配一次；关掉：不再配，场景退回配旁白前那一版（配好以后没再改过的话）。
+        第 102 轮：打开时可以带声音、语速（记在这段视频上，以后改片、重配照用）"""
         vo = V.get("voice") or {}
         if on:
             if not self.voice_url:
                 raise RuntimeError("这台服务器没有装语音服务")
-            V["voice"] = {"on": True, "state": "running"}
+            keep = {k: vo[k] for k in ("name", "speed", "label") if k in vo}
+            if name is not None:
+                keep.update(name=name, label=label or name)
+            if speed is not None:
+                keep["speed"] = speed
+            # 换声音、语速：配好以后没改过的，先退回没拉长的那一版再配（换快的声音片子会变短）；改过的只能在现在的节奏上重配
+            plain = self.store.vdir(V["id"]) / "scene.plain.yaml"
+            if (vo.get("on") and vo.get("state") == "done" and vo.get("version") == V.get("version") and vo.get("plain")
+                    and plain.exists()):
+                self.store.set_scene(V, plain.read_text(encoding="utf-8"))
+                V["stretched"] = False
+            V["voice"] = {"on": True, "state": "running", **keep}
             V["busy"] = "voice"
             self.store.save(V)
             self.spawn(self.revoice(V["id"], stills=False))
             return V
         plain = self.store.vdir(V["id"]) / "scene.plain.yaml"
         back = vo.get("state") == "done" and vo.get("version") == V.get("version") and vo.get("plain") and plain.exists()
-        V["voice"] = {"on": False}
+        V["voice"] = {"on": False, **{k: vo[k] for k in ("name", "speed", "label") if k in vo}}
         if back:
             self.store.set_scene(V, plain.read_text(encoding="utf-8"))
             V["stretched"] = False
@@ -846,17 +858,18 @@ class Service:
                 log.exception("video3d recover %s", p)
 
     # ---- 旁白（第 90 轮：缝纫机讲解片）
-    async def speak(self, text: str, voice: str) -> tuple[bytes, float]:
+    async def speak(self, text: str, voice: str, speed: float | None = None) -> tuple[bytes, float]:
         """一句话的 WAV 和长度；按“声音 + 语速 + 文字”缓存在 video3d/voice_cache"""
         from . import sewing_voice as SVO
         from .production import voice as VS
+        speed = SVO.SPEED if speed is None else speed
         d = self.store.root / "voice_cache"
         d.mkdir(parents=True, exist_ok=True)
-        k = hashlib.sha1(f"{voice}|{SVO.SPEED:.2f}|{text}".encode()).hexdigest()
+        k = hashlib.sha1(f"{voice}|{speed:.2f}|{text}".encode()).hexdigest()
         wav, meta = d / f"{k}.wav", d / f"{k}.json"
         if wav.exists() and meta.exists():
             return wav.read_bytes(), float(json.loads(meta.read_text())["seconds"])
-        audio, secs = await VS.tts(self.voice_url, text, voice, SVO.SPEED)
+        audio, secs = await VS.tts(self.voice_url, text, voice, speed)
         wav.write_bytes(audio)
         meta.write_text(json.dumps({"seconds": secs, "text": text[:200]}, ensure_ascii=False))
         return audio, secs
@@ -882,9 +895,10 @@ class Service:
             if not items:
                 raise RuntimeError("场景里没有解说词，也没有标题、字幕可念")
             plain = self.store.scene(vid)
+            voice, speed, vnote = VV.pick(vo, lang)                     # 第 102 轮：这段视频选的声音、语速
             clips = []
             for x in items:
-                wav, secs = await self.speak(x["text"], SVO.VOICES[lang])
+                wav, secs = await self.speak(x["text"], voice, speed)
                 x["dur"] = secs
                 clips.append(wav)
             fitted = SVO.fit(spec, items)
@@ -908,8 +922,8 @@ class Service:
             V.setdefault("voice", {"on": True}).update(state="done", version=V["version"], n=len(items), seconds=fitted["duration"], lang=lang,
                                                        src=src, plain=fresh)
             what = "AI 写的解说词" if src == "script" else "画面上的标题和字幕"
-            msg = (f"旁白配好了：{len(items)} 段，念的是{what}；旁白长的段已放慢，片长 {fitted['duration']:g} 秒。"
-                   "小样、高清里有声音（关键画面没有）。")
+            msg = (f"旁白配好了：{len(items)} 段，念的是{what}；{VV.describe(vo, voice, speed)}；旁白长的段已放慢，片长 {fitted['duration']:g} 秒。"
+                   "小样、高清里有声音（关键画面没有）。" + (f"（{vnote}）" if vnote else ""))
         except asyncio.CancelledError:                             # 任务被取消（网关关机）：清掉“正在忙”再退出
             V = self.store.load(vid)
             V["busy"] = ""

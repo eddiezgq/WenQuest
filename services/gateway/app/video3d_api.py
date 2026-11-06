@@ -5,7 +5,7 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import httpx
 from fastapi import Depends
@@ -29,6 +29,37 @@ class NewIn(BaseModel):
 
 class VoiceIn(BaseModel):
     on: bool
+    voice: str | None = Field(default=None, max_length=40)       # 第 102 轮：声音（语音服务里的 id）
+    speed: float | None = None                                   # 第 102 轮：语速三档 1.0 / 1.1 / 1.25
+
+
+VOICE_LIST: dict[str, Any] = {"at": 0.0, "voices": []}
+
+
+async def voice_list(svc) -> list[dict]:
+    """语音服务里的声音（一小时取一次）；连不上就是空的"""
+    import time
+    from .production import voice as VS
+    if svc.voice_url and (not VOICE_LIST["voices"] or time.time() - VOICE_LIST["at"] > 3600):
+        try:
+            VOICE_LIST["voices"], VOICE_LIST["at"] = await VS.voices(svc.voice_url), time.time()
+        except VS.VoiceError:
+            return []
+    return VOICE_LIST["voices"] if svc.voice_url else []
+
+
+async def check_voice(svc, voice: str | None, speed: float | None) -> tuple[str | None, float | None, str]:
+    """选的声音要是语音服务里有的；语速只认三档。返回 (声音, 语速, 声音的中文名)"""
+    from . import video3d_voice as VV
+    label = ""
+    if voice:
+        v = next((x for x in await voice_list(svc) if x["id"] == voice), None)
+        if not v:
+            raise EngineError("bad_voice", f"没有这个声音：{voice}", 400)
+        label = v.get("zh") or voice
+    if speed is not None and float(speed) not in VV.SPEEDS:
+        raise EngineError("bad_speed", "语速只有慢 1.0、标准 1.1、快 1.25 三档", 400)
+    return voice or None, (float(speed) if speed is not None else None), label
 
 
 class SayIn(BaseModel):
@@ -186,6 +217,44 @@ def register(app, m) -> None:
             raise EngineError("not_found", "no such sample", 404)
         return detail(V)
 
+    @app.get("/api/v1/video3d/voices")
+    async def voices(sess: Annotated[Session, Depends(current)]):
+        """第 102 轮：旁白能选的声音（中英各 8 个，带试听）和语速三档；默认是平台默认"""
+        await need(sess)
+        from . import sewing_voice as SVO
+        from . import video3d_voice as VV
+        vs = await voice_list(service(m))
+        base = m.state.settings.public_url.rstrip("/")
+        return {"available": bool(vs), "default": {**SVO.VOICES, "speed": SVO.SPEED},
+                "speeds": [{"v": k, "zh": a, "en": b} for k, (a, b) in VV.SPEEDS.items()],
+                "voices": [{"id": v["id"], "lang": v["lang"], "gender": v.get("gender"), "zh": v.get("zh"), "en": v.get("en"),
+                            "sample": f"{base}/api/v1/video3d/voice-sample/{v['id']}"} for v in vs]}
+
+    @app.get("/api/v1/video3d/voice-sample/{voice}")
+    async def voice_sample(voice: str):
+        """试听：一小段标准语速的话（缓存）。不要登录（<audio> 直接放），只念固定的一句"""
+        from pathlib import Path
+
+        from fastapi.responses import FileResponse
+
+        from . import sewing_voice as SVO
+        from .lectures import SAMPLE
+        from .production import voice as VS
+        svc = service(m)
+        v = next((x for x in await voice_list(svc) if x["id"] == voice), None)
+        if not v:
+            raise EngineError("not_found", "no such voice", 404)
+        d = Path(m.state.settings.data_dir) / "video3d_voice_samples"
+        d.mkdir(parents=True, exist_ok=True)
+        f = d / f"{v['id']}.wav"
+        if not f.exists():
+            try:
+                wav, _ = await VS.tts(svc.voice_url, SAMPLE["zh" if v["lang"] == "zh" else "en"], v["id"], SVO.SPEED)
+            except VS.VoiceError as e:
+                raise EngineError("voice_unavailable", str(e), 503)
+            f.write_bytes(wav)
+        return FileResponse(f, media_type="audio/wav", headers={"Cache-Control": "private, max-age=86400"})
+
     @app.get("/api/v1/video3d/{vid}")
     async def get(vid: str, sess: Annotated[Session, Depends(current)]):
         a = await need(sess)
@@ -235,8 +304,9 @@ def register(app, m) -> None:
         a = await need(sess)
         V = load(vid, sess, a)
         not_busy(V)
+        voice, speed, label = await check_voice(service(m), body.voice, body.speed) if body.on else (None, None, "")
         try:
-            V = service(m).set_voice(V, body.on)
+            V = service(m).set_voice(V, body.on, voice, speed, label)
         except RuntimeError as e:
             raise EngineError("voice_unavailable", str(e), 503)
         return detail(V)
