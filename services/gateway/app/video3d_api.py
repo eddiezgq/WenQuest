@@ -24,6 +24,11 @@ MEDIA = {".png": "image/png", ".mp4": "video/mp4", ".webm": "video/webm"}
 class NewIn(BaseModel):
     prompt: str = Field(default="", max_length=2000)
     sample: str = Field(default="", max_length=80)
+    voice: bool = True                  # 第 99 轮：新建默认配旁白
+
+
+class VoiceIn(BaseModel):
+    on: bool
 
 
 class SayIn(BaseModel):
@@ -144,13 +149,16 @@ def register(app, m) -> None:
             spec = v3.yaml.safe_load(scene) or {}
             labels = [{"t": lb.get("t"), "zh": lb.get("zh"), "en": lb.get("en"), "bottom": lb.get("where") == "bottom"}
                       for lb in spec.get("labels") or [] if isinstance(lb, dict)]
+            voice = [{"t": x.get("t"), "dur": x.get("dur"), "zh": x.get("zh") or "", "en": x.get("en") or "",
+                      "say": x.get("say") or x.get("text") or "", "labels": x.get("src") == "labels"}
+                     for x in spec.get("voice") or [] if isinstance(x, dict)]     # 第 99 轮：时间线上的旁白
             timeline = {"duration": spec.get("duration"), "labels": labels[:80], "shots": len(spec.get("camera") or []),
-                        "style": spec.get("style") or "engineering"}
+                        "style": spec.get("style") or "engineering", "voice": voice[:80]}
         except Exception:  # noqa: BLE001
-            timeline = {"duration": None, "labels": [], "shots": 0, "style": ""}
+            timeline = {"duration": None, "labels": [], "shots": 0, "style": "", "voice": []}
         return {**summary(V), "prompt": V.get("prompt"), "timeline": timeline, "chat": V.get("chat"), "ai_error": V.get("ai_error"),
                 "version": V.get("version"), "scene": scene, "stills": S, "renders": R, "voice": V.get("voice") or {},
-                "render_on": svc.render_on, "stills_on": svc.blender.on}
+                "render_on": svc.render_on, "stills_on": svc.blender.on, "voice_on": bool(svc.voice_url)}
 
     @app.get("/api/v1/video3d/access")
     async def get_access(sess: Annotated[Session, Depends(current)]):
@@ -162,7 +170,7 @@ def register(app, m) -> None:
         svc = service(m)
         samples = [{"id": s["id"], "title": s.get("title"), "duration": s.get("duration")} for s in await svc.blender.samples()] if a["general"] else []
         return {"samples": samples, "videos": [summary(V) for V in svc.store.list(sess.user_id)],
-                "render_on": svc.render_on, "stills_on": svc.blender.on, "admin": a["admin"], "general": a["general"]}
+                "render_on": svc.render_on, "stills_on": svc.blender.on, "voice_on": bool(svc.voice_url), "admin": a["admin"], "general": a["general"]}
 
     @app.post("/api/v1/video3d")
     async def create(body: NewIn, sess: Annotated[Session, Depends(current)]):
@@ -173,7 +181,7 @@ def register(app, m) -> None:
         if body.prompt.strip() and not m.state.ai.available:
             raise EngineError("ai_unavailable", "no AI model is configured", 503)
         try:
-            V = await service(m).create(sess.user_id, "", body.prompt.strip(), body.sample)
+            V = await service(m).create(sess.user_id, "", body.prompt.strip(), body.sample, voice=body.voice)
         except KeyError:
             raise EngineError("not_found", "no such sample", 404)
         return detail(V)
@@ -221,6 +229,17 @@ def register(app, m) -> None:
             svc.store.save(V)
             svc.spawn(svc.revoice(vid, stills=False))
         return detail(svc.store.load(vid))
+
+    @app.post("/api/v1/video3d/{vid}/voice")
+    async def voice(vid: str, body: VoiceIn, sess: Annotated[Session, Depends(current)]):
+        a = await need(sess)
+        V = load(vid, sess, a)
+        not_busy(V)
+        try:
+            V = service(m).set_voice(V, body.on)
+        except RuntimeError as e:
+            raise EngineError("voice_unavailable", str(e), 503)
+        return detail(V)
 
     @app.post("/api/v1/video3d/{vid}/stills")
     async def stills(vid: str, sess: Annotated[Session, Depends(current)]):

@@ -101,13 +101,15 @@ def hud(img, t, spec, W, H):
             k = 1 - (t - a) / (b - a)
             d.rectangle([0, 0, W, H], fill=(255, 255, 255, int(255 * k * k)))
     for v in spec.get("voice", []):
+        if not v.get("zh") or v.get("src") == "labels":      # 第 99 轮：平台念字幕配的旁白不再另画一遍
+            continue
         a, b = v["t"], v["t"] + v.get("dur", 3.0)
         if a <= t < b:
             al = int(255 * min(ease((t - a) / 0.25), ease((b - t) / 0.25)))
             y = H - 150 * s
             d.text((W / 2 + 2 * s, y + 2 * s), v["zh"], font=font(FONT_M, 46, H), fill=(0, 0, 0, al // 2), anchor="ma")
             d.text((W / 2, y), v["zh"], font=font(FONT_M, 46, H), fill=(255, 255, 255, al), anchor="ma")
-            d.text((W / 2, y + 66 * s), v["en"], font=font(FONT_R, 28, H), fill=(200, 210, 222, al), anchor="ma")
+            d.text((W / 2, y + 66 * s), v.get("en", ""), font=font(FONT_R, 28, H), fill=(200, 210, 222, al), anchor="ma")
     for p in spec.get("pops", []):
         a, b = p["t"]
         if a <= t < b:

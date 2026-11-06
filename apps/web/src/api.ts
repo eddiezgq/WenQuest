@@ -391,8 +391,10 @@ export interface V3Video extends V3Summary {
   prompt: string; chat: { who: "me" | "ai"; text: string; at: number }[]; ai_error: string; version: number; scene: string;
   stills: { state?: string; urls?: string[]; error?: string; stale: boolean; times?: number[]; seconds?: number };
   renders: Record<string, any>; render_on: boolean; stills_on: boolean;
-  voice?: { on?: boolean; state?: string; version?: number; error?: string; n?: number; seconds?: number };   // 第 90 轮：旁白
-  timeline?: { duration: number; labels: { t: number[]; zh: string; en: string; bottom: boolean }[]; shots: number; style: string };
+  voice?: { on?: boolean; state?: string; version?: number; error?: string; n?: number; seconds?: number; src?: string };   // 第 90、99 轮：旁白
+  voice_on?: boolean;
+  timeline?: { duration: number; labels: { t: number[]; zh: string; en: string; bottom: boolean }[]; shots: number; style: string;
+               voice?: { t: number; dur?: number; zh: string; en: string; say: string; labels: boolean }[] };
 }
 export interface V3AdminOverview { grants: { user_id: number; username: string; note: string; at: number }[];
   runs: { id: string; video: string; user_id: number; quality: string; kind: string; state: string; seconds: number; cost: number;
@@ -471,8 +473,9 @@ export const api = {
   studioRedoLab: (id: string, lid: string) => request<StudioProject>("POST", `/api/v1/studio/projects/${id}/lessons/${lid}/lab`, {}),
   // --- 三维仿真视频 (round 38) ---
   v3Access: () => request<V3Access>("GET", "/api/v1/video3d/access"),
-  v3Index: () => request<{ samples: V3Sample[]; videos: V3Summary[]; render_on: boolean; stills_on: boolean; admin: boolean; general?: boolean }>("GET", "/api/v1/video3d"),
-  v3Create: (b: { prompt?: string; sample?: string }) => request<V3Video>("POST", "/api/v1/video3d", b),
+  v3Index: () => request<{ samples: V3Sample[]; videos: V3Summary[]; render_on: boolean; stills_on: boolean; voice_on?: boolean; admin: boolean; general?: boolean }>("GET", "/api/v1/video3d"),
+  v3Voice: (id: string, on: boolean) => request<V3Video>("POST", `/api/v1/video3d/${id}/voice`, { on }),   // 第 99 轮：配旁白开关
+  v3Create: (b: { prompt?: string; sample?: string; voice?: boolean }) => request<V3Video>("POST", "/api/v1/video3d", b),
   v3Get: (id: string) => request<V3Video>("GET", `/api/v1/video3d/${id}`),
   v3Delete: (id: string) => request<{ ok: boolean }>("DELETE", `/api/v1/video3d/${id}`),
   v3Say: (id: string, text: string) => request<V3Video>("POST", `/api/v1/video3d/${id}/say`, { text }),

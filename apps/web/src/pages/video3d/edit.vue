@@ -27,6 +27,11 @@
           <view class="tabs">
             <text v-for="k in ['stills', 'draft', 'hd']" :key="k" class="tab" :class="{ on: tab === k }" @click="tab = k">{{ t("v3.tab." + k) }}</text>
           </view>
+          <!-- 第 99 轮：配旁白开关（老视频打开就配一次；关掉不再配） -->
+          <view v-if="v.voice_on || (v.voice && v.voice.on)" class="vsw" :class="{ disabled: !!v.busy }" @click="toggleVoice">
+            <text class="box">{{ v.voice && v.voice.on ? "☑" : "☐" }}</text><text>{{ t("v3.voiceSwitch") }}</text>
+            <text v-if="voiceNote" class="muted"> · {{ voiceNote }}</text>
+          </view>
 
           <view class="card stage">
             <template v-if="tab === 'stills'">
@@ -75,9 +80,10 @@
           <!-- 时间线（只读）与场景文件（高级） -->
           <view class="card">
             <text class="label">{{ t("v3.timeline") }} <text class="muted">· {{ t("v3.seconds", { n: v.timeline?.duration || 0 }) }} · {{ t("v3.shots", { n: v.timeline?.shots || 0 }) }}</text></text>
-            <view v-for="(lb, i) in v.timeline?.labels || []" :key="i" class="tl">
-              <text class="tl-t">{{ fmtSpan(lb.t) }}</text>
-              <text class="tl-x">{{ locale === "en" ? lb.en : lb.zh }}<text v-if="lb.bottom" class="muted"> · {{ t("v3.subtitle") }}</text></text>
+            <view v-for="(x, i) in tlRows" :key="i" class="tl" :class="{ say: x.kind === 'voice' }">
+              <text class="tl-t">{{ x.when }}</text>
+              <text v-if="x.kind === 'voice'" class="tl-x"><text class="vtag">{{ t("v3.narration") }}</text> {{ x.text }}</text>
+              <text v-else class="tl-x">{{ x.text }}<text v-if="x.bottom" class="muted"> · {{ t("v3.subtitle") }}</text></text>
             </view>
             <text class="link" @click="showScene = !showScene">{{ showScene ? t("v3.hideScene") : t("v3.editScene") }}</text>
             <template v-if="showScene">
@@ -117,6 +123,28 @@ const live = (s?: string) => !!s && LIVE.includes(s);
 const pick = (x: { zh: string; en: string } | undefined) => (x ? (locale.value === "en" ? x.en || x.zh : x.zh || x.en) : "");
 const stills = computed(() => v.value?.stills || ({ stale: false } as any));
 const r = computed(() => (v.value?.renders || {})[tab.value] as any);
+const voiceNote = computed(() => {
+  const vo = v.value?.voice;
+  if (!vo || !vo.on) return "";
+  if (v.value?.busy === "voice" || vo.state === "running") return t("v3.voiceRunning");
+  if (vo.state === "failed") return t("v3.voiceFailed");
+  if (vo.state === "done" && vo.version === v.value?.version) return t(vo.src === "script" ? "v3.voiceScript" : "v3.voiceLabels", { n: vo.n || 0 });
+  return "";
+});
+// 时间线：标注和旁白按时间排在一起；旁白配好以后写的是实际念的稿，没配之前是解说词原文
+const tlRows = computed(() => {
+  const tl = v.value?.timeline;
+  if (!tl) return [];
+  const rows: { at: number; when: string; text: string; kind: string; bottom?: boolean }[] = (tl.labels || []).map((lb) => ({
+    at: +lb.t[0], when: fmtSpan(lb.t), text: locale.value === "en" ? lb.en : lb.zh, kind: "label", bottom: lb.bottom }));
+  for (const x of tl.voice || []) {
+    const text = x.dur ? x.say || (locale.value === "en" ? x.en || x.zh : x.zh || x.en) : (locale.value === "en" ? x.en || x.zh : x.zh || x.en);
+    if (!text) continue;
+    rows.push({ at: +x.t + 0.001, when: x.dur ? fmtSpan([x.t, +x.t + +x.dur]) : `${(+x.t).toFixed(1)} s`, text, kind: "voice" });
+  }
+  return rows.sort((a, b) => a.at - b.at);
+});
+const toggleVoice = () => { if (!v.value || v.value.busy) return; act(() => api.v3Voice(id.value, !(v.value?.voice && v.value.voice.on))); };
 const fmtSpan = (s: any) => (Array.isArray(s) ? `${(+s[0]).toFixed(1)}–${(+s[1]).toFixed(1)} s` : "");
 
 function stageText(x: any) {
@@ -223,6 +251,11 @@ onUnmounted(() => { if (timer) clearTimeout(timer); });
 .muted { color: var(--wq-muted); font-weight: 400; }
 .link { color: var(--wq-link); font-size: 14px; cursor: pointer; display: inline-block; margin-top: 8px; }
 .link.danger { color: var(--wq-muted); margin-top: 0; }
+.vsw { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--wq-ink); cursor: pointer; padding: 2px 4px; flex-wrap: wrap; }
+.vsw .box { font-size: 16px; }
+.vsw.disabled { opacity: 0.6; cursor: default; }
+.vtag { font-size: 11.5px; color: #2b6cb0; background: #ebf4ff; border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
+.tl.say .tl-x { color: #2d3748; }
 .tl { display: flex; gap: 10px; padding: 5px 0; border-top: 1px solid #f0f1f0; font-size: 13.5px; }
 .tl-t { color: var(--wq-muted); font-family: ui-monospace, Menlo, monospace; width: 96px; flex: none; }
 .tl-x { color: var(--wq-ink); }

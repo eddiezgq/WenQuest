@@ -181,7 +181,17 @@ def fit(spec: dict, items: list[dict]) -> dict:
                 e["t"] = [f(float(e["t"][0])), f(float(e["t"][1]))]
     if isinstance(s.get("stills"), list):
         s["stills"] = [round(f(float(x)), 4) for x in s["stills"]]
-    s["voice"] = [{"t": round(f(x["t0"]) + LEAD, 2), "dur": round(x["dur"], 2), "text": x["text"]} for x in items]
+    # 第 99 轮统一的 voice 段：t 开口时刻、dur 长度、seg 这一段开头、say 实际念的稿；
+    # 解说词（AI 写的，kind=script）保留原来的 zh、en（下次再配照念）；念标题字幕的标 src: labels（下次重新从字幕取）
+    out = []
+    for x in items:
+        v = {"t": round(f(x["t0"]) + LEAD, 2), "dur": round(x["dur"], 2), "seg": round(f(x["t0"]), 4), "say": x["text"]}
+        if x.get("kind") == "script":
+            v.update({k: x[k] for k in ("zh", "en") if x.get(k)})
+        else:
+            v["src"] = "labels"
+        out.append(v)
+    s["voice"] = out
     return s
 
 
