@@ -681,13 +681,23 @@ HELP_ONLINE = "https://learn.wenquestrobotics.com/static/help/sewing-freecad/ind
 # ---------- 第 94 轮：出三维讲解片（交给问渠服务器出，浏览器里看、改、下载）----------
 class VideoDialog(QtW.QDialog):
     LANGS = [("中文", "zh"), ("英文", "en"), ("中英两行", "both")]
+    SPEEDS = [("慢", 1.0), ("标准", 1.1), ("快", 1.25)]
+
+    def fill_voices(self, *_):
+        """按字幕语言列声音：英文列英文声音，中文、中英两行列中文声音；第一项是平台默认"""
+        key = "en" if self.LANGS[self.lang.currentIndex()][1] == "en" else "zh"
+        self.vname.clear()
+        self.vname.addItem("平台默认（{}）".format("Heart 美式女声" if key == "en" else "晓贝 女声"), "")
+        for v in self.voices:
+            if v.get("lang") == key:
+                self.vname.addItem(v.get("zh") or v["id"], v["id"])
 
     def __init__(self, obj):
         super().__init__(Gui.getMainWindow())
         self.obj = obj
         self.vid = None
         self.setWindowTitle("出三维讲解片 · " + obj.Label)
-        self.resize(520, 300)
+        self.resize(520, 330)
         lay = QtW.QVBoxLayout(self)
         intro = QtW.QLabel("把这台设计发给问渠服务器，自动写好讲解片：整机、各机构，再把红黄灯慢放到出问题的地方。"
                            "出好后在浏览器里打开这段视频：看关键画面、提意见修改、出小样和高清、下载 MP4。"
@@ -705,6 +715,28 @@ class VideoDialog(QtW.QDialog):
         self.voice = QtW.QCheckBox("配旁白（念画面上的标题和字幕；要几分钟，旁白长的段放慢拉长）")
         self.voice.setChecked(True)
         lay.addWidget(self.voice)
+        # 第 102 轮：声音、语速（列表从问渠服务器取；连不上只有“平台默认”；FreeCAD 里没有试听，到网页里试听）
+        vrow = QtW.QHBoxLayout()
+        vrow.addWidget(QtW.QLabel("声音"))
+        self.vname = QtW.QComboBox()
+        vrow.addWidget(self.vname)
+        vrow.addWidget(QtW.QLabel("语速"))
+        self.vspeed = QtW.QComboBox()
+        for zh, v in self.SPEEDS:
+            self.vspeed.addItem(zh, v)
+        self.vspeed.setCurrentIndex(1)
+        vrow.addWidget(self.vspeed)
+        vrow.addStretch(1)
+        lay.addLayout(vrow)
+        self.voices = []
+        try:
+            if N.settings()["key"]:
+                self.voices = N.Client().video_voices().get("voices") or []
+        except N.NetError:
+            self.voices = []
+        self.fill_voices()
+        self.lang.currentIndexChanged.connect(self.fill_voices)
+        self.voice.toggled.connect(lambda on: (self.vname.setEnabled(on), self.vspeed.setEnabled(on)))
         self.out = QtW.QLabel("")
         self.out.setWordWrap(True)
         self.out.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
@@ -734,7 +766,8 @@ class VideoDialog(QtW.QDialog):
         QtW.QApplication.processEvents()
         try:
             c = N.Client()
-            r = c.video(M.MACHINE, p, lang, self.voice.isChecked(), self.obj.Label)
+            r = c.video(M.MACHINE, p, lang, self.voice.isChecked(), self.obj.Label,
+                        self.vname.currentData() or "", self.vspeed.currentData())
         except N.NetError as e:
             self.out.setText(_html.escape(str(e)))
             return

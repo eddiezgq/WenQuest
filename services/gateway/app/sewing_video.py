@@ -393,15 +393,33 @@ class VideoIn(BaseModel):
     project: str = Field(default="", max_length=80)
     lang: str = Field(default="zh", pattern="^(zh|en|both)$")
     voice: bool = True                  # 第 90 轮：配旁白（念画面上的字，旁白长的段放慢拉长）
+    voice_name: str = Field(default="", max_length=40)   # 第 102 轮：声音（空 = 平台默认）
+    speed: float | None = None                           # 第 102 轮：语速三档 1.0 / 1.1 / 1.25（空 = 标准）
 
 
 def register(app, m) -> None:
     from . import video3d_api
 
+    @app.get("/api/v1/sewing/video/voices")
+    async def video_voices(lic: Annotated[dict, Depends(m.sewing_who)]):
+        """第 102 轮：出讲解片能选的声音、语速（FreeCAD 用钥匙取；网页版用 /api/v1/video3d/voices，带试听）"""
+        from . import sewing_voice as SVO
+        from . import video3d_voice as VV
+        vs = await video3d_api.voice_list(video3d_api.service(m))
+        return {"available": bool(vs), "default": {**SVO.VOICES, "speed": SVO.SPEED},
+                "speeds": [{"v": k, "zh": a, "en": b} for k, (a, b) in VV.SPEEDS.items()],
+                "voices": [{"id": v["id"], "lang": v["lang"], "gender": v.get("gender"), "zh": v.get("zh"), "en": v.get("en"),
+                            "sample": f"{m.state.settings.public_url.rstrip('/')}/api/v1/video3d/voice-sample/{v['id']}"} for v in vs]}
+
     @app.post("/api/v1/sewing/video")
     async def make_video(body: VideoIn, lic: Annotated[dict, Depends(m.sewing_who)]):
         """已开通的人：网页登录凭证，或 FreeCAD 钥匙（第 94 轮：工作台“出三维讲解片”）；片子记在这个人名下"""
         svc = video3d_api.service(m)
+        vname, vspeed, vlabel = (await video3d_api.check_voice(svc, body.voice_name or None, body.speed)
+                                 if body.voice and svc.voice_url else (None, None, ""))
+        from . import video3d_voice as VV
+        if vname and VV.voice_lang(vname) != ("en" if body.lang == "en" else "zh"):
+            raise EngineError("bad_voice", "字幕是英文要选英文声音，中文、中英两行要选中文声音", 400)
         text, meta = scene(body.machine, body.params, body.lang)
         V = await svc.create(lic["user_id"], lic.get("org") or "", "", "")
         V["lock"] = {"model": "d", "machine": body.machine, "params": meta["params"],
@@ -424,6 +442,10 @@ def register(app, m) -> None:
         voice = body.voice and bool(svc.voice_url)
         if voice:
             V["voice"], V["busy"] = {"on": True, "state": "running"}, "voice"
+            if vname:
+                V["voice"].update(name=vname, label=vlabel)
+            if vspeed is not None:
+                V["voice"]["speed"] = vspeed
         elif body.voice:                                    # 要旁白，可这台服务器没装语音服务
             V["chat"].append({"who": "ai", "at": video3d_api.v3.now(), "text": "这台服务器没装语音服务，这次先出无声的片子。"})
         svc.store.save(V)

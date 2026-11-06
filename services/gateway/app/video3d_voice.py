@@ -168,3 +168,40 @@ def unpin(text: str) -> str:
         x.pop("say", None)
         changed = True
     return yaml.safe_dump(s, allow_unicode=True, sort_keys=False, width=200) if changed else text
+
+
+# ---- 第 102 轮：选声音、调语速（视频页、网页版缝纫机设计软件、FreeCAD 都能选；新视频一律从平台默认开始）
+SPEEDS = {1.0: ("慢", "slow"), 1.1: ("标准", "normal"), 1.25: ("快", "fast")}
+
+
+def voice_lang(voice: str) -> str:
+    """Kokoro 声音名的第一个字母是语言：z 普通话，a 美式英语，b 英式英语"""
+    return "zh" if voice[:1] == "z" else "en" if voice[:1] in ("a", "b") else ""
+
+
+def pick(vo: dict, lang: str) -> tuple[str, float, str]:
+    """这段视频记下的声音、语速（不对就退回平台默认），和一句说明（没退回就是空的）"""
+    key = "en" if lang == "en" else "zh"
+    voice, speed, note = SVO.VOICES[key], SVO.SPEED, []
+    want = str(vo.get("name") or "")
+    if want:
+        if voice_lang(want) == key:
+            voice = want
+        else:
+            note.append(f"选的声音不是{'英文' if key == 'en' else '中文'}声音，用平台默认的")
+    sp = vo.get("speed")
+    if sp is not None:
+        try:
+            sp = float(sp)
+        except (TypeError, ValueError):
+            sp = None
+        if sp in SPEEDS:
+            speed = sp
+        else:
+            note.append("语速只有慢、标准、快三档，用标准")
+    return voice, speed, "；".join(note)
+
+
+def describe(vo: dict, voice: str, speed: float) -> str:
+    name = vo.get("label") if vo.get("name") == voice and vo.get("label") else voice
+    return f"声音 {name}，{SPEEDS.get(speed, ('标准',))[0]}语速"

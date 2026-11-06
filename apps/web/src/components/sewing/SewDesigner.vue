@@ -193,6 +193,8 @@
             <text v-if="machine === 'cover'" class="para muted">{{ t("sew.videoCover") }}</text>
             <text v-if="['pattern', 'embroid', 'flatknit'].includes(machine)" class="para muted">{{ t("sew.videoSeq") }}</text>
             <view class="vchk" @click="videoVoice = !videoVoice"><text class="box">{{ videoVoice ? "☑" : "☐" }}</text><text>{{ t("sew.videoVoice") }}</text></view>
+            <!-- 第 102 轮：选声音（点一下试听）、语速；每次都从平台默认开始 -->
+            <VoicePick v-if="videoVoice && me.licensed" v-model="videoPick" :lang="flang" src="sewing" />
             <view class="btn" :class="{ disabled: !me.licensed }" @click="makeVideo">{{ making === "video" ? t("sew.videoMaking") : t("sew.videoBtn") }}</view>
           </view>
           <view class="fc">
@@ -230,6 +232,7 @@ import { computed, reactive, ref, watch } from "vue";
 import { ApiError, BASE, request, token } from "../../api";
 import { siteUrl } from "../../accountApi";
 import { errorText, locale, t } from "../../i18n";
+import VoicePick from "../video3d/VoicePick.vue";
 import SewAi from "./SewAi.vue";
 import SewCae from "./SewCae.vue";
 import SewParts from "./SewParts.vue";
@@ -266,6 +269,8 @@ const msg = ref("");
 const making = ref("");
 const flang = ref<"zh" | "en">(locale.value === "en" ? "en" : "zh");
 const videoVoice = ref(true);                     // 第 90 轮：讲解片配旁白，默认配
+const videoPick = ref<{ voice: string; speed: number }>({ voice: "", speed: 0 });   // 第 102 轮：空 = 平台默认
+watch(() => flang.value, () => { videoPick.value = { voice: "", speed: videoPick.value.speed }; });   // 换字幕语言：声音回到默认
 const protoOk = ref(true);
 const frame = ref<any>(null);
 const licenses = ref<any[]>([]);
@@ -680,7 +685,9 @@ async function makeVideo() {
   making.value = "video";
   msg.value = "";
   try {
-    const r = await request<{ id: string }>("POST", "/api/v1/sewing/video", { machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value, voice: videoVoice.value });
+    const r = await request<{ id: string }>("POST", "/api/v1/sewing/video", { machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value, voice: videoVoice.value,
+      ...(videoVoice.value && videoPick.value.voice ? { voice_name: videoPick.value.voice } : {}),
+      ...(videoVoice.value && videoPick.value.speed ? { speed: videoPick.value.speed } : {}) });
     uni.navigateTo({ url: `/pages/video3d/edit?id=${encodeURIComponent(r.id)}` });
   } catch (e) {
     msg.value = errorText(e instanceof ApiError ? e.code : "unknown");

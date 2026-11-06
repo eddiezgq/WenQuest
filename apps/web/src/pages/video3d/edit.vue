@@ -32,6 +32,11 @@
             <text class="box">{{ v.voice && v.voice.on ? "☑" : "☐" }}</text><text>{{ t("v3.voiceSwitch") }}</text>
             <text v-if="voiceNote" class="muted"> · {{ voiceNote }}</text>
           </view>
+          <!-- 第 102 轮：选声音（点一下试听）、调语速；选好按“用这个声音重配” -->
+          <view v-if="v.voice_on && v.voice && v.voice.on" class="vpick">
+            <VoicePick v-model="vpick" :lang="vlang" />
+            <text v-if="pickChanged" class="vapply" :class="{ disabled: !!v.busy }" @click="applyPick">{{ t("v3.voiceApply") }}</text>
+          </view>
 
           <view class="card stage">
             <template v-if="tab === 'stills'">
@@ -99,8 +104,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onUnmounted, ref } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import AiBadge from "../../components/AiBadge.vue";
+import VoicePick from "../../components/video3d/VoicePick.vue";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import { api, ApiError, token, type V3Video } from "../../api";
@@ -144,6 +150,22 @@ const tlRows = computed(() => {
   }
   return rows.sort((a, b) => a.at - b.at);
 });
+// 第 102 轮：这段视频的语言（念中文还是英文）、选的声音和语速
+const vlang = computed(() => v.value?.voice?.lang || (/^lang:\s*(\w+)/m.exec(v.value?.scene || "")?.[1] === "en" ? "en" : "zh"));
+const vpick = ref<{ voice: string; speed: number }>({ voice: "", speed: 0 });
+// 打开页面、重配好以后：显示这段视频现在用的声音、语速（没选过就是平台默认）
+watch(() => [v.value?.voice?.name, v.value?.voice?.speed, v.value?.voice?.state], () => {
+  vpick.value = { voice: v.value?.voice?.name || "", speed: v.value?.voice?.speed || 0 };
+}, { immediate: true });
+const pickChanged = computed(() => {
+  const vo = v.value?.voice || {};
+  return (vpick.value.voice || "") !== (vo.name || "") || (vpick.value.speed || 1.1) !== (vo.speed || 1.1);
+});
+const applyPick = () => {
+  if (!v.value || v.value.busy) return;
+  const p = { ...vpick.value };
+  act(() => api.v3Voice(id.value, true, { voice: p.voice || undefined, speed: p.speed || undefined }));
+};
 let toggling = false;
 const toggleVoice = async () => {
   if (!v.value || v.value.busy || toggling) return;
@@ -258,6 +280,9 @@ onUnmounted(() => { if (timer) clearTimeout(timer); });
 .link.danger { color: var(--wq-muted); margin-top: 0; }
 .vsw { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--wq-ink); cursor: pointer; padding: 2px 4px; flex-wrap: wrap; }
 .vsw .box { font-size: 16px; }
+.vpick { padding: 0 4px 6px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.vapply { font-size: 13px; padding: 5px 14px; border-radius: 6px; background: var(--wq-gold, #f2b705); color: #1a1a1a; font-weight: 600; cursor: pointer; }
+.vapply.disabled { opacity: 0.5; cursor: default; }
 .vsw.disabled { opacity: 0.6; cursor: default; }
 .vtag { font-size: 11.5px; color: #2b6cb0; background: #ebf4ff; border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
 .tl.say .tl-x { color: #2d3748; }

@@ -391,7 +391,8 @@ export interface V3Video extends V3Summary {
   prompt: string; chat: { who: "me" | "ai"; text: string; at: number }[]; ai_error: string; version: number; scene: string;
   stills: { state?: string; urls?: string[]; error?: string; stale: boolean; times?: number[]; seconds?: number };
   renders: Record<string, any>; render_on: boolean; stills_on: boolean;
-  voice?: { on?: boolean; state?: string; version?: number; error?: string; n?: number; seconds?: number; src?: string };   // 第 90、99 轮：旁白
+  voice?: { on?: boolean; state?: string; version?: number; error?: string; n?: number; seconds?: number; src?: string;
+            name?: string; speed?: number; label?: string; lang?: string };   // 第 90、99、102 轮：旁白
   voice_on?: boolean;
   timeline?: { duration: number; labels: { t: number[]; zh: string; en: string; bottom: boolean }[]; shots: number; style: string;
                voice?: { t: number; dur?: number; zh: string; en: string; say: string; labels: boolean }[] };
@@ -474,7 +475,10 @@ export const api = {
   // --- 三维仿真视频 (round 38) ---
   v3Access: () => request<V3Access>("GET", "/api/v1/video3d/access"),
   v3Index: () => request<{ samples: V3Sample[]; videos: V3Summary[]; render_on: boolean; stills_on: boolean; voice_on?: boolean; admin: boolean; general?: boolean }>("GET", "/api/v1/video3d"),
-  v3Voice: (id: string, on: boolean) => request<V3Video>("POST", `/api/v1/video3d/${id}/voice`, { on }),   // 第 99 轮：配旁白开关
+  v3Voice: (id: string, on: boolean, pick?: { voice?: string; speed?: number }) =>
+    request<V3Video>("POST", `/api/v1/video3d/${id}/voice`, { on, ...(pick || {}) }),   // 第 99 轮：配旁白开关；第 102 轮：带声音、语速
+  v3Voices: () => request<{ available: boolean; voices: Voice[]; speeds: { v: number; zh: string; en: string }[];
+                            default: { zh?: string; en?: string; speed?: number } }>("GET", "/api/v1/video3d/voices"),
   v3Create: (b: { prompt?: string; sample?: string; voice?: boolean }) => request<V3Video>("POST", "/api/v1/video3d", b),
   v3Get: (id: string) => request<V3Video>("GET", `/api/v1/video3d/${id}`),
   v3Delete: (id: string) => request<{ ok: boolean }>("DELETE", `/api/v1/video3d/${id}`),
