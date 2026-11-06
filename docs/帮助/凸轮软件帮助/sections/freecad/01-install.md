@@ -10,6 +10,6 @@ lead: 下载一个压缩包，复制一个文件夹，重启 FreeCAD。
 <li>重启 FreeCAD，工作台列表里选 <b>问渠</b>，点 <b>凸轮</b>。</li>
 </ol>
 
-缺 Python 包（scipy、shapely）时点“凸轮”会提示一条安装命令，照着在 FreeCAD 的 Python 控制台里运行即可。压缩包里有示例项目（`examples`）和本帮助的离线一份（`Mod/WenQuest/cam-help/index.html`，不联网也能看）。
+缺 Python 包（scipy、shapely）时点“凸轮”会提示一条安装命令，整行粘贴到 FreeCAD 的 Python 控制台里运行（命令会自动找到 FreeCAD 自带的 Python，没有 pip 先补上，再装缺的包），装完重启 FreeCAD。压缩包里有示例项目（`examples`）和本帮助的离线一份（`Mod/WenQuest/cam-help/index.html`，不联网也能看）。
 
 ::video{src=fc-01-cam title="录像：安装工作台，打开槽凸轮示例"}
