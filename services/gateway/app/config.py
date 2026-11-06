@@ -103,6 +103,7 @@ class Settings(BaseSettings):
     video3d_wait_minutes: int = 60                # 没有空机器时最多等多久
     sewing_ai_daily: int = 30  # 缝纫机设计软件 AI 助手：每人每天次数（第 49 轮）
     cam_ai_daily: int = 30  # 问渠凸轮 AI 起草：每人每天次数（第 39 轮第 6 步）
+    eda_ai_daily: int = 30  # 问渠电子 AI 起草：每人每天次数（第 105 轮）
     data_dir: str = "/tmp/wq-data"  # converted slides and small settings; a persistent volume in production
 
     # --- accounts: sign-up, email codes, teacher approval (app/accounts.py) ---

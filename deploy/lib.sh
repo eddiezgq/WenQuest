@@ -36,6 +36,7 @@ set_images() {
     envset BLENDER_IMAGE "${1/\/engine:/\/blender:}"
     envset CAM_IMAGE "${1/\/engine:/\/cam:}"
     envset BEARING_IMAGE "${1/\/engine:/\/bearing:}"
+    envset EDA_IMAGE "${1/\/engine:/\/eda:}"
 }
 
 dc() {
