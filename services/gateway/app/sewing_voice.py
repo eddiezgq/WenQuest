@@ -27,19 +27,26 @@ EN_NUM = ("one", "two", "three", "four", "five", "six", "seven", "eight", "nine"
 
 # 口语读法：先长后短（m/s² 要在 m/s 前面）
 ZH_RULES = [
-    (r"⚠\s*", ""), (r"r/min", "转每分"), (r"m/s²", "米每二次方秒"), (r"m/s", "米每秒"), (r"N·m", "牛米"),
+    (r"⚠\s*", ""), (r"(?<=\d),(?=\d{3})", ""), (r"所需\s*/\s*可用加速度", "所需加速度和可用加速度之比"),
+    (r"(?<=\d)-(?=\d)", "杠"),                                     # 模型 9-1、实验 15-1
+    (r"[−-](?=\d)", "负"), (r"\+(?=\d)", "正"), (r"±\s*", "正负"), (r"≈\s*", "约"), (r"\s*→\s*", "到"), (r"ε", "伊普西龙"),
+    (r"r/min", "转每分"), (r"mm/s", "毫米每秒"), (r"m/s²", "米每二次方秒"), (r"m/s", "米每秒"), (r"N·m", "牛米"),
     (r"(?<=\d)\s*mm\b", "毫米"), (r"(?<=\d)\s*ms\b", "毫秒"), (r"(?<=\d)\s*kg\b", "千克"), (r"(?<=\d)\s*Hz\b", "赫兹"),
     (r"(?<=\d)\s*min\b", "分钟"), (r"(?<=\d)\s*s\b", "秒"), (r"(?<=\d)\s*N\b", "牛"), (r"(?<=\d)\s*°", "度"), (r"°", "度"),
-    (r"(\d+(?:\.\d+)?)\s*%", r"百分之\1"), (r"\s*/\s*cm\b", "每厘米"), (r"(?<=\d)\s*cm\b", "厘米"), (r"(?<=[\d度])\s*[–~]\s*", "到"), (r"≤", "不超过"), (r"≥", "不小于"), (r"×", "乘"), (r"[−-](?=\d)", "负"), (r"\+(?=\d)", "正"),
+    (r"(负|正)?(\d+(?:\.\d+)?)\s*%", r"\1百分之\2"), (r"\s*/\s*cm\b", "每厘米"), (r"(?<=\d)\s*cm\b", "厘米"),
+    (r"(?<=[\d度])\s*[–~]\s*", "到"), (r"≤", "不超过"), (r"≥", "不小于"), (r"×", "乘"),
     (r"\s*·\s*", "，"), (r"\s*/\s*", "和"), (r"…", ""),
 ]
 EN_RULES = [
-    (r"⚠\s*", ""), (r"r/min", "R P M"), (r"m/s²", "metres per second squared"), (r"m/s", "metres per second"),
-    (r"N·m", "newton metres"), (r"(?<=\d)\s*mm\b", " millimetres"), (r"(?<=\d)\s*ms\b", " milliseconds"),
+    (r"⚠\s*", ""), (r"(?<=\d),(?=\d{3})", ""), (r"required\s*/\s*available acceleration", "the ratio of required to available acceleration"),
+    (r"(?<=\d)-(?=\d)", " dash "),
+    (r"[−-](?=\d)", "minus "), (r"\+(?=\d)", "plus "), (r"±\s*", "plus or minus "), (r"≈\s*", "about "), (r"\s*→\s*", " to "),
+    (r"ε", "epsilon"), (r"r/min", "R P M"), (r"mm/s", "millimetres per second"), (r"m/s²", "metres per second squared"),
+    (r"m/s", "metres per second"), (r"N·m", "newton metres"), (r"(?<=\d)\s*mm\b", " millimetres"), (r"(?<=\d)\s*ms\b", " milliseconds"),
     (r"(?<=\d)\s*kg\b", " kilograms"), (r"(?<=\d)\s*Hz\b", " hertz"), (r"(?<=\d)\s*min\b", " minutes"), (r"(?<=\d)\s*s\b", " seconds"),
     (r"(?<=\d)\s*N\b", " newtons"), (r"(?<=\d)\s*°", " degrees"), (r"°", " degrees"), (r"(\d)\s*%", r"\1 percent"),
-    (r"\s*/\s*cm\b", " per centimetre"), (r"(?<=\d)\s*cm\b", " centimetres"), (r"(?<=[\ds])\s*[–~]\s*(?=[\d+−-])", " to "),
-    (r"≤", "at most"), (r"≥", "at least"), (r"×", " by "), (r"[−-](?=\d)", "minus "), (r"\+(?=\d)", "plus "), (r"\s*·\s*", ", "), (r"\s*/\s*", " and "),
+    (r"\s*/\s*cm\b", " per centimetre"), (r"(?<=\d)\s*cm\b", " centimetres"), (r"(?<=[\ds])\s*[–~]\s*(?=[\d+−-]|minus|plus)", " to "),
+    (r"≤", "at most"), (r"≥", "at least"), (r"×", " by "), (r"\s*·\s*", ", "), (r"\s*/\s*", " and "),
     (r"…", ""),
 ]
 
@@ -52,9 +59,11 @@ def _int_zh(n: int) -> str:
     if n == 0:
         return "零"
     if n >= 10 ** 8:
-        return _int_zh(n // 10 ** 8) + "亿" + (("零" if n % 10 ** 8 < 10 ** 7 else "") + _int_zh(n % 10 ** 8) if n % 10 ** 8 else "")
+        r = n % 10 ** 8
+        return _int_zh(n // 10 ** 8) + "亿" + (("零" if r < 10 ** 7 else "") + ("一" if 10 <= r < 20 else "") + _int_zh(r) if r else "")
     if n >= 10 ** 4:
-        return ("两" if n // 10 ** 4 == 2 else _int_zh(n // 10 ** 4)) + "万" + (("零" if n % 10 ** 4 < 1000 else "") + _int_zh(n % 10 ** 4) if n % 10 ** 4 else "")
+        r = n % 10 ** 4
+        return ("两" if n // 10 ** 4 == 2 else _int_zh(n // 10 ** 4)) + "万" + (("零" if r < 1000 else "") + ("一" if 10 <= r < 20 else "") + _int_zh(r) if r else "")
     out, zero = "", False
     for unit, k in (("千", 1000), ("百", 100), ("十", 10), ("", 1)):
         d = n // k % 10

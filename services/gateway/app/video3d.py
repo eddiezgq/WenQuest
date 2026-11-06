@@ -38,6 +38,7 @@ EFFECTS = {"xray", "cutaway", "blur", "flash"}
 COLORS = {"body", "joint", "accent", "part", "table", "belt", "frame", "floor", "motor", "gear", "needle", "takeup", "hook",
           "feed", "steel", "shell", "wood", "thread", "bobbin", "dark", "chrome"}
 MAX_SECONDS = 120
+MAX_SECONDS_VOICE = 150         # 第 90 轮：配了旁白的讲解片（旁白长的段放慢拉长，三项红灯时约两分钟）
 MAX_SCENE = 40_000
 LIVE = ("queued", "starting", "rendering", "stopping")
 QUALITY = {"draft": "小样", "hd": "高清"}
@@ -70,9 +71,10 @@ def check(text: str) -> tuple[dict | None, list[str]]:
     if not isinstance(s, dict):
         return None, ["场景文件顶层要是一个字典（name、title、duration、models……）"]
     dur = s.get("duration")
-    if not _num(dur) or not 2 <= dur <= MAX_SECONDS:
-        errs.append(f"duration 要是 2–{MAX_SECONDS} 之间的秒数")
-        dur = MAX_SECONDS
+    top = MAX_SECONDS_VOICE if isinstance(s.get("voice"), list) and s["voice"] else MAX_SECONDS
+    if not _num(dur) or not 2 <= dur <= top:
+        errs.append(f"duration 要是 2–{top} 之间的秒数")
+        dur = top
     t = s.get("title")
     if not (isinstance(t, dict) and isinstance(t.get("zh"), str) and isinstance(t.get("en"), str)):
         errs.append("title 要写成 {zh: 中文标题, en: English title}")
@@ -683,6 +685,7 @@ class Service:
                  wait_minutes: int = 60, voice_url: str = ""):
         self.store = Store(root)
         self.voice_url = voice_url              # 第 90 轮：平台语音服务（讲解片旁白）；空 = 不配
+        self.recover()
         self.ai, self.blender, self.provider = ai, blender, provider
         self.max_machines, self.max_hours, self.wait = max_machines, max_hours, wait_minutes
         self.tick_lock = asyncio.Lock()
@@ -788,6 +791,24 @@ class Service:
         self.store.save(V)
         return []
 
+    def recover(self) -> None:
+        """网关重启：上次没做完的 AI 改写、配旁白不会再接着做了，把“正在忙”清掉，免得这段视频一直不能动"""
+        for p in (self.store.root / "videos").glob("*/meta.json"):
+            try:
+                V = json.loads(p.read_text(encoding="utf-8"))
+            except Exception:  # noqa: BLE001
+                continue
+            if not V.get("busy"):
+                continue
+            if V["busy"] == "voice":
+                V.setdefault("voice", {"on": True}).update(state="failed", error="服务器重启，旁白没配完")
+                V.setdefault("chat", []).append({"who": "ai", "at": now(), "text": "服务器重启了，旁白没配完；提一次意见（或直接改场景）会重新配。"})
+            V["busy"] = ""
+            try:
+                self.store.save(V)
+            except Exception:  # noqa: BLE001
+                log.exception("video3d recover %s", p)
+
     # ---- 旁白（第 90 轮：缝纫机讲解片）
     async def speak(self, text: str, voice: str) -> tuple[bytes, float]:
         """一句话的 WAV 和长度；按“声音 + 语速 + 文字”缓存在 video3d/voice_cache"""
@@ -842,6 +863,12 @@ class Service:
             V.setdefault("voice", {"on": True}).update(state="done", version=V["version"], n=len(items), seconds=fitted["duration"], lang=lang)
             msg = (f"旁白配好了：{len(items)} 段，念的是画面上的标题和字幕；旁白长的段已放慢，片长 {fitted['duration']:g} 秒。"
                    "小样、高清里有声音（关键画面没有）。")
+        except asyncio.CancelledError:                             # 任务被取消（网关关机）：清掉“正在忙”再退出
+            V = self.store.load(vid)
+            V["busy"] = ""
+            V.setdefault("voice", {"on": True}).update(state="failed", error="配旁白被中断")
+            self.store.save(V)
+            raise
         except Exception as e:  # noqa: BLE001
             log.warning("video3d voice %s: %s", vid, e)
             V = self.store.load(vid)

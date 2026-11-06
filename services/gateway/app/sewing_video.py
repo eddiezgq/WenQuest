@@ -468,15 +468,18 @@ def register(app, m) -> None:
         V["chat"].append({"who": "ai", "at": video3d_api.v3.now(),
                           "text": f"按这台设计自动写好了场景（{meta['duration']:g} 秒：整机、各机构"
                                   + (f"，再把 {len(meta['problems'])} 项红黄灯慢放标出" if probs else "") + "）。"
-                                  + ("正在配旁白，配好接着出关键画面；" if body.voice else "正在出关键画面；") +
+                                  + ("正在配旁白（要几分钟），配好接着出关键画面；" if body.voice and svc.voice_url else "正在出关键画面；") +
                                   "看过可以直接出小样、高清，或者告诉我要改什么（镜头、节奏、字幕都能改，设计参数和数值不改）。"})
-        if body.voice:
+        voice = body.voice and bool(svc.voice_url)
+        if voice:
             V["voice"], V["busy"] = {"on": True, "state": "running"}, "voice"
+        elif body.voice:                                    # 要旁白，可这台服务器没装语音服务
+            V["chat"].append({"who": "ai", "at": video3d_api.v3.now(), "text": "这台服务器没装语音服务，这次先出无声的片子。"})
         svc.store.save(V)
-        if body.voice:
+        if voice:
             svc.spawn(svc.revoice(V["id"]))                 # 配完接着出关键画面（拉长以后关键画面的时刻变了）
         elif svc.blender.on:
             V["stills"] = {"state": "running", "version": V.get("version")}
             svc.store.save(V)
             svc.spawn(svc.stills(V["id"]))
-        return {"id": V["id"], "duration": meta["duration"], "problems": meta["problems"], "voice": body.voice}
+        return {"id": V["id"], "duration": meta["duration"], "problems": meta["problems"], "voice": voice}

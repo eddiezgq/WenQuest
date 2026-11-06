@@ -76,7 +76,7 @@ def test_fit_stretches_segments_and_keeps_the_stills_on_the_same_frame():
         assert items and all(x["text"] for x in items)
         assert len({x["text"] for x in items}) == len(items)                  # 同一句不念两遍
         for x in items:
-            x["dur"] = max(1.0, len(x["text"]) / (5.0 if lang == "zh" else 14.0))
+            x["dur"] = max(1.0, len(x["text"]) / (4.4 if lang == "zh" else 12.2))          # 实测本地语音的语速
         out = SVO.fit(spec, items)
         _, errs = v3.check(yaml.safe_dump(out, allow_unicode=True, sort_keys=False, width=200))
         assert errs == [], (m, lang, errs)
@@ -178,3 +178,54 @@ def test_endpoint_voice_switch(v3c, monkeypatch):  # noqa: F811
     finally:
         st.voice_url = old
         main.state.video3d = None
+
+
+def test_review_readings_and_long_videos():
+    """审读：带正负号的百分数、数字中间的连字符、比值；三项红灯的包缝机配旁白后超过两分钟上限的问题"""
+    assert SVO.spoken("布边 ε = -19.8%") == "布边 伊普西龙 = 负百分之十九点八"
+    assert SVO.spoken("+15.4%") == "正百分之十五点四" and SVO.spoken("+15.4%", "en") == "plus 15.4 percent"
+    assert SVO.spoken("模型 9-1") == "模型 九杠一" and SVO.spoken("lab 9-1", "en") == "lab 9 dash 1"
+    assert SVO.spoken("所需 / 可用加速度 1.23") == "所需加速度和可用加速度之比 一点二三"
+    assert SVO._int_zh(10010) == "一万零一十" and SVO.spoken("1,200 r/min") == "一千二百 转每分"
+    p = {"n": 5600, "t": 1.95, "r": 15.925, "tip0": 19, "mr": 0.104, "ll_r": 8.7238, "ll_c": 66, "ll_R": 49.4, "ll_J": 600, "ul_r": 14.7602,
+         "ul_b": 58.94, "ul_c": 10, "f_on": 146, "f_off": 54.4, "D": 2.42, "pf": 0.8, "lm": 16, "kn_ph": 360, "kn_ov": 2.4, "T_sew": 0.195}
+    spec = yaml.safe_load(SVd.scene("overlock", p, "zh")[0])
+    items = SVO.lines(spec, "zh")
+    for x in items:
+        x["dur"] = len(x["text"]) / 4.0                                     # 比实测还慢一点
+    out = SVO.fit(spec, items)
+    assert out["duration"] > v3.MAX_SECONDS
+    _, errs = v3.check(yaml.safe_dump(out, allow_unicode=True, sort_keys=False, width=200))
+    assert errs == []                                                        # 配了旁白的片子上限放到 150 秒
+    del out["voice"]
+    _, errs = v3.check(yaml.safe_dump(out, allow_unicode=True, sort_keys=False, width=200))
+    assert errs and "duration" in errs[0]                                    # 没配旁白的仍是 120 秒
+
+
+def test_restart_clears_busy_and_ai_edit_revoices(tmp_path, monkeypatch):
+    monkeypatch.setattr(VS, "tts", fake_tts())
+    svc = v3.Service(tmp_path, None, v3.Blender(""), None, voice_url="http://voice.test")
+    text, meta = SVd.scene("lockstitch", {}, "zh")
+    V = asyncio.run(svc.create(1, "x", "", ""))
+    assert svc.set_scene(V, text) == []
+    V = svc.store.load(V["id"])
+    V["voice"], V["busy"] = {"on": True, "state": "running"}, "voice"
+    svc.store.save(V)
+    svc2 = v3.Service(tmp_path, None, v3.Blender(""), None, voice_url="http://voice.test")       # 网关重启
+    V = svc2.store.load(V["id"])
+    assert V["busy"] == "" and V["voice"]["state"] == "failed" and "重启" in V["chat"][-1]["text"]
+
+    class FakeAI:                                                            # AI 改片（这里原样返回）：旁白跟着重配
+        async def json(self, **kw):
+            return {"scene": svc2.store.scene(V["id"]), "reply": "改好了"}
+
+    class B(v3.Blender):
+        async def samples(self):
+            return []
+
+        async def format(self):
+            return ""
+    svc2.ai, svc2.blender = FakeAI(), B("")
+    asyncio.run(svc2.write(V["id"], "第 3 段慢一点"))
+    V = svc2.store.load(V["id"])
+    assert V["voice"]["state"] == "done" and svc2.audio_for(V) and not V["busy"]
