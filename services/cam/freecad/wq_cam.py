@@ -512,7 +512,7 @@ def run_dialog():
     msg = "已建好 {} 个零件。\n{}\n\n校核摘要在“报告视图”里。".format(len([k for k in objs if k != "driver"]),
                                                           "\n".join(notes))
     if "driver" in objs:
-        msg += "\n在模型树里选“凸轮系统”，改属性“转角”，各零件按时序动。"
+        msg += "\n在模型树里选“凸轮系统”，改属性 Angle（凸轮轴转角），各零件按时序动。"
     QtGui.QMessageBox.information(None, "问渠凸轮", msg)
 
 

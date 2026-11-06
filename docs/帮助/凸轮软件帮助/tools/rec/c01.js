@@ -1,0 +1,22 @@
+const { clip } = require('../../../_帮助生成/rec/vrec.js'); const D = __dirname;
+clip(D + '/out', D + '/voice', 'web-01-first', async (r) => {
+  const p = r.p;
+  await r.open('/cam/?example=sewing-takeup-groove');
+  await r.say('这是问渠凸轮的网页版。示例是平缝机的挑线槽凸轮，参数是虚构的。');
+  await r.say('左边写运动程序：每一段的转角、行程和运动规律。中间是凸轮和从动件，右边逐项校核。');
+  await p.getByRole('button', { name: '▶ 播放' }).click(); await r.wait(500);
+  await r.say('点播放，凸轮转起来。红线是法线，虚线是运动方向，两者夹角就是压力角。');
+  await p.getByRole('button', { name: '❚❚ 暂停' }).click();
+  await r.say('推程最大压力角二十一点二度，回程三十二点五度，都在四十五度以内。');
+  await r.say('接触应力四百一十四兆帕，许用值没填，所以是未知。未知不算合格。');
+  await p.locator('section.curves').hover(); await r.smooth(500);
+  await r.say('下面是位移、速度、加速度、跃度和转矩曲线，拖动转角，所有曲线一起走。');
+  await r.smooth(-500);
+  await p.locator('nav.tabs button', { hasText: '机构' }).click(); await r.wait(800);
+  await r.say('机构页里点求最小基圆，软件找出满足全部限值的最小基圆。');
+  await p.getByRole('button', { name: '求最小基圆' }).click(); r.cut(true); await r.wait(3500); r.cut(false);
+  await r.say('九点二四毫米，卡住它的是推程压力角，刚好到四十五度。');
+  await p.locator('select[aria-label="示例"]').selectOption('sewing-feed'); await r.wait(2500);
+  await r.say('再看一个反例：送布抬牙凸轮靠弹簧压住从动件。');
+  await r.say('算出来超过每分钟四千五百零五转就会跳离，而设计转速是五千转，这一项不合格。');
+});
