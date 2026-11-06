@@ -125,11 +125,12 @@ jobs:
         run: |
           cd factory/designs/tools
           python3 build.py --no-route
+          python3 build.py --no-route --rev B          # 第 98 轮：B 版（放上 WQ-ENCIF，设计对照）
           cd "$GITHUB_WORKSPACE"
           # 三维（STEP 的网格化、GLB）随 OpenCASCADE 版本有细微差别，不比逐字；其余产物必须一字不差
           git status --porcelain factory/designs
-          git diff --stat --exit-code -- factory/designs/drv-joint ':!*.glb' ':!*.step'
-          test -z "$(git status --porcelain factory/designs/drv-joint | grep -v -E '\.(glb|step)$')"
+          git diff --stat --exit-code -- factory/designs/drv-joint factory/designs/drv-joint-b ':!*.glb' ':!*.step'
+          test -z "$(git status --porcelain factory/designs/drv-joint factory/designs/drv-joint-b | grep -v -E '\.(glb|step)$')"
       - name: 芯片 RTL 仿真（WQ-ENCIF，与参考模型逐拍比对；波形与提交的一致）
         run: |
           python3 factory/designs/wq-encif/tb/run.py
