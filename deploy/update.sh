@@ -29,6 +29,10 @@ dc pull --quiet moodle gateway web animator labcheck voice micro-synth blender c
 docker network inspect factory-edge >/dev/null 2>&1 || docker network create factory-edge >/dev/null 2>&1 || true
 # The QMS demo network exists on the US server; elsewhere (a new or China server) an empty one lets the web server start.
 docker network inspect qms-edge >/dev/null 2>&1 || docker network create qms-edge >/dev/null 2>&1 || true
+# 问渠质量 ERP 试点企业的开通交接文件夹（第 97 轮）：网关（uid 10001）写申请、服务器上 deploy 用户的开通程序写结果，
+# 两边都要能写、能删，所以 777（只在本机，不对外）。要在 compose 起网关之前建好，否则 Docker 会建成 root 的。
+install -d -m 777 "$WQ_DIR/pilot-queue" 2>/dev/null || mkdir -p "$WQ_DIR/pilot-queue"
+chmod 777 "$WQ_DIR/pilot-queue" 2>/dev/null || true
 
 # Digital factory course API (factory round 4, C2): copy its read-only key so the gateway can call
 # https://factory.<domain>/api/course/*. The factory generates the key on its own deploys.

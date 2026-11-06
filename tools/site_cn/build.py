@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91e"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91f"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -577,6 +577,13 @@ PRODUCTS = ["问渠质量 ERP", "问渠数字工厂集成平台", "缝纫机设�
             "学习系统", "电子教材开发", "虚拟实验开发", "数字工厂开发", "CAD/CAM/CAE 集成化解决方案", "技术服务", "咨询"]
 
 
+def pilot():
+    """第 97 轮：问渠质量 ERP 试点企业凭邀请链接注册，自动开通（site/pilot.js）"""
+    body = """<section class="part"><div class="wrap"><div id="pilot" class="pilot"><p>正在打开邀请……</p></div></div></section>
+<script src="/assets/pilot.js?v=""" + VER + """" defer></script>"""
+    page("/pilot/", "开通问渠质量 ERP 试点", "凭邀请链接开通问渠质量 ERP 试点企业。", body)
+
+
 def contact():
     boxes = "".join(f'<label><input type="checkbox" name="products" value="{p}"> {p}</label>' for p in PRODUCTS)
     form = f"""<form class="demo" id="demo-form" novalidate>
@@ -709,6 +716,7 @@ def main():
     shutil.copy2(HERE / "cn.css", OUT / "assets" / "cn.css")
     shutil.copy2(HERE / "cn.js", OUT / "assets" / "cn.js")
     shutil.copy2(ROOT / "site" / "assist.js", OUT / "assets" / "assist.js")
+    shutil.copy2(ROOT / "site" / "pilot.js", OUT / "assets" / "pilot.js")
     shutil.copy2(ROOT / "site" / "hub3d.js", OUT / "assets" / "hub3d.js")     # 第 91 轮：首屏立体厂情中枢，两站同一个   # 第 87 轮：客服小组件，两站同一个
     (OUT / "assets" / "logo.svg").write_text(LOGO.replace('aria-hidden="true"', 'xmlns="http://www.w3.org/2000/svg"'), encoding="utf-8")
     (OUT / "robots.txt").write_text("User-agent: *\nAllow: /\n", encoding="utf-8")
@@ -716,7 +724,7 @@ def main():
     (OUT / "404" / "index.html").rename(OUT / "404.html")
     (OUT / "404").rmdir()
     for f in (home, qms, platform, sewing, cam, bearing, custom, services, education, edu_platform, consulting, cases, about, contact,
-              privacy, terms, ai_notice, report):
+              privacy, terms, ai_notice, report, pilot):
         f()
     n = len(list(OUT.rglob("index.html")))
     print(f"site/{OUT.name}: {n} 个页面")

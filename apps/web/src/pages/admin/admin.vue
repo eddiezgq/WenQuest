@@ -12,6 +12,7 @@
       <template v-else>
         <view class="wq-tabs">
           <text v-if="isCN" class="wq-tab" :class="{ on: tab === 'orgs' }" @click="setTab('orgs')">{{ t("admin.orgs") }}</text>
+          <text class="wq-tab" :class="{ on: tab === 'pilots' }" @click="setTab('pilots')">{{ t("admin.pilots") }}</text>
           <text class="wq-tab" :class="{ on: tab === 'apps' }" @click="setTab('apps')">{{ t("admin.apps") }}<text v-if="info?.applications" class="count">{{ info.applications }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'requests' }" @click="setTab('requests')">{{ t("admin.requests") }}<text v-if="info?.requests" class="count">{{ info.requests }}</text></text>
           <text class="wq-tab" :class="{ on: tab === 'users' }" @click="setTab('users')">{{ t("admin.users") }}</text>
@@ -21,6 +22,7 @@
 
         <!-- teacher applications -->
         <OrgAdmin v-if="tab === 'orgs'" />
+        <PilotAdmin v-if="tab === 'pilots'" />
         <template v-if="tab === 'apps'">
           <view class="wq-row filter">
             <text class="chip" :class="{ on: appFilter === 'open' }" @click="appFilter = 'open'; loadApps()">{{ t("admin.open") }}</text>
@@ -190,12 +192,13 @@ import { isCN, loadSite } from "../../site";
 import { onLoad, onShow } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import OrgAdmin from "../../components/admin/OrgAdmin.vue";
+import PilotAdmin from "../../components/admin/PilotAdmin.vue";
 import { type AdminUser, type Application, type EnrolRequest, accountApi, loadAdmin } from "../../accountApi";
 import { api, ApiError, BASE, type CoursePack, type KitInterest, token } from "../../api";
 import { confirmAction } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 
-const tab = ref<"orgs" | "apps" | "requests" | "users" | "committee" | "packs">(isCN.value ? "orgs" : "apps");
+const tab = ref<"orgs" | "pilots" | "apps" | "requests" | "users" | "committee" | "packs">(isCN.value ? "orgs" : "apps");
 const packs = ref<CoursePack[]>([]);
 const kits = ref<KitInterest | null>(null);
 async function loadKits() {
@@ -300,7 +303,7 @@ async function loadUsers(p: number) {
 function setTab(x: typeof tab.value) {
   tab.value = x;
   error.value = "";
-  if (x === "orgs") return;               // OrgAdmin loads itself
+  if (x === "orgs" || x === "pilots") return;   // OrgAdmin, PilotAdmin load themselves
   if (x === "apps") loadApps();
   else if (x === "requests") loadReqs();
   else if (x === "committee") loadCommittee();

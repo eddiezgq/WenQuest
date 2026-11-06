@@ -9,3 +9,16 @@ qms.{$SITE_DOMAIN}, qms-erp.{$SITE_DOMAIN} {
 	}
 	reverse_proxy qms-demo-edge:80
 }
+
+# 问渠质量 ERP 试点企业（第 97 轮，wenquest-ops ADR-0025）：每家一套，对外的容器 qms-<编号>-edge 接在 qms-edge 上；
+# 证书按需办，先问网关这家开通了没有。
+*.qms.{$SITE_DOMAIN}, *.qms-erp.{$SITE_DOMAIN} {
+	tls {
+		on_demand
+	}
+	encode gzip
+	request_body {
+		max_size 100MB
+	}
+	reverse_proxy qms-{labels.3}-edge:80
+}

@@ -1,9 +1,10 @@
 # Caddy obtains and renews HTTPS certificates automatically once DNS points at this server.
 {
 	email {$ACME_EMAIL}
-	# 数字工厂班级工厂（第 10 轮）：<编号>.factory / <编号>.erp 按需申请证书，先问数字工厂枢纽这个编号是否已建
+	# 按需申请证书前先问网关这个网址该不该办（第 97 轮起）：问渠质量 ERP 试点企业 <编号>.qms / <编号>.qms-erp
+	# 网关自己答；数字工厂班级工厂 <编号>.factory / <编号>.erp（第 10 轮）由网关转问数字工厂枢纽，和原来一样
 	on_demand_tls {
-		ask http://wqf-hub:8100/api/caddy/ask
+		ask http://gateway:8000/api/v1/caddy/ask
 	}
 }
 

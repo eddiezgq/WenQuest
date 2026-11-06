@@ -32,6 +32,7 @@ from . import kit_interest
 from . import demo_request
 from . import assist
 from . import orgs
+from . import pilots
 from . import sewing
 from . import sewing_cae
 from . import sewing_ai
@@ -105,8 +106,10 @@ async def lifespan(app: FastAPI):
     books = asyncio.create_task(textbook_api.media_loop(sys.modules[__name__]))
     gpus = asyncio.create_task(gpulab.reap_loop(sys.modules[__name__]))
     v3d = asyncio.create_task(video3d_api.loop(sys.modules[__name__]))
+    pilot = asyncio.create_task(sys.modules[__name__].pilots_loop())
     yield
     v3d.cancel()
+    pilot.cancel()
     pace.cancel()
     sweep.cancel()
     books.cancel()
@@ -147,6 +150,7 @@ def create_app() -> FastAPI:
     demo_request.register(app, sys.modules[__name__])
     assist.register(app, sys.modules[__name__])
     orgs.register(app, sys.modules[__name__])
+    pilots.register(app, sys.modules[__name__])
     sewing.register(app, sys.modules[__name__])
     sewing_cae.register(app, sys.modules[__name__])
     sewing_parts.register(app, sys.modules[__name__])
