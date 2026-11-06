@@ -25,3 +25,19 @@
 5. 出片：GitHub → Actions →“Lecture videos 公开课视频”：task `render`、lectures 填目录、voice `kokoro`、lang `both`。成片在运行的下载页。
    学习平台页面（`learn:` 写路径）要先搭本机完整环境：`tools/local/setup.sh`，导入样例课 `python3 /home/claude/local/import_physics.py && php /home/claude/local/enrol.php 2`；
    AI 建课的两个项目用 `teacher1` 通过网关接口建（上传 `samples/大学物理/课程资料`、开始、回答问题、确认资料清单），项目号写进讲稿。
+
+## YouTube（2026-11-05 私密上传，Eddie 在 Studio 看过后公开；播放列表“问渠产品介绍 / WenQuest product tours”）
+
+| 段 | 英文版 | 中文版 | catalog.yaml 键 |
+|---|---|---|---|
+| 01 问渠全貌 | spCHVOw97v8 | 2C8JdfSlyTU | overview |
+| 02 学习平台与 AI 建课 | XB0CTTIXoWM | 1eycQZx_36I | learn |
+| 03 教材与课件 | rusMo87KWK0 | fNcqT09_jFg | textbook |
+| 04 白板课 | F90JgWGEtNQ | lcQbS0G_qMw | whiteboard |
+| 05 三维仿真视频 | dlyDt47ccF4 | QH-LMrs3988 | video3d |
+| 07 数字工厂 | jXvQ3KIRwtQ | JWw5kZ60Nvc | factory |
+| 15 凸轮与轴承 | MTKbcIgE6to | nTKZ9k5MX-I | cambearing |
+| 16 虚拟实验室 | GzjaMcvmaCY | xOpQ6uuCPCc | labs |
+| 17 评价与校情 | v6R-rRzFWsw | hGESSq2LjCc | eval |
+
+美国官网用英文版编号（Eddie 公开后填进 `tools/site_home/catalog.yaml` 的 `intro.*.yt`）；国内版官网用 B 站 BV 号（`bv`，B 站投稿资料见 `B站投稿资料.md`）。
