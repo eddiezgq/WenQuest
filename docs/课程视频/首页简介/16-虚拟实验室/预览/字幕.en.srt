@@ -7,69 +7,69 @@ WenQuest virtual labs run in the browser: nothing to install,
 and nothing to break.
 
 3
-00:00:06,149 --> 00:00:07,660
+00:00:06,149 --> 00:00:07,661
 Inverted pendulum PID control,
 
 4
-00:00:07,680 --> 00:00:10,417
+00:00:07,681 --> 00:00:10,418
 with the dynamics checked step by step against MuJoCo.
 
 5
-00:00:10,887 --> 00:00:14,764
+00:00:10,888 --> 00:00:14,770
 Tune the gains and watch the angle, cart position and force curves,
 
 6
-00:00:15,234 --> 00:00:19,701
+00:00:15,240 --> 00:00:19,710
 while the AI lab assistant reads your runs and points the way without giving
 
 7
-00:00:19,721 --> 00:00:20,351
+00:00:19,730 --> 00:00:20,359
 the answer.
 
 8
-00:00:21,371 --> 00:00:24,812
+00:00:21,379 --> 00:00:24,813
 A two-link arm: kinematics, trajectory planning and control,
 
 9
-00:00:24,832 --> 00:00:26,888
+00:00:24,833 --> 00:00:26,885
 from equations to an arm that moves.
 
 10
-00:00:27,908 --> 00:00:32,212
+00:00:27,905 --> 00:00:32,218
 For university physics, the kinematics bench gives every concept a scene:
 
 11
-00:00:32,232 --> 00:00:35,174
+00:00:32,238 --> 00:00:35,186
 frames, projectiles, circular and relative motion,
 
 12
-00:00:35,644 --> 00:00:38,302
+00:00:35,656 --> 00:00:38,314
 and every scene comes with a robotics problem.
 
 13
-00:00:39,321 --> 00:00:43,830
+00:00:39,334 --> 00:00:43,843
 The PLC bench wires a web PLC to a 3D machine. Write the program, run it,
 
 14
-00:00:43,850 --> 00:00:45,195
+00:00:43,863 --> 00:00:45,208
 step through the scan,
 
 15
-00:00:45,665 --> 00:00:50,372
+00:00:45,678 --> 00:00:50,419
 and inject jams, broken wires or motor overloads to practise troubleshooting.
 
 16
-00:00:51,392 --> 00:00:55,873
+00:00:51,439 --> 00:00:55,920
 Microelectronics: size the transistors and see delay and power at once,
 
 17
-00:00:56,343 --> 00:00:59,950
+00:00:56,390 --> 00:00:59,954
 then go on to Verilog synthesis and layout, from RTL all the way to GDS.
 
 18
-00:01:00,970 --> 00:01:03,331
+00:01:00,974 --> 00:01:03,335
 Every lab comes with a guide and a report template,
 
 19
-00:01:03,351 --> 00:01:05,992
+00:01:03,355 --> 00:01:05,997
 and there are cloud GPU labs that run CUDA in JupyterLab.
