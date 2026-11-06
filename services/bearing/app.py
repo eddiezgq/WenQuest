@@ -515,8 +515,9 @@ FREECAD_README = """问渠轴承 · FreeCAD 工作台（第 64 轮第 6 步）
 
 1. 安装 FreeCAD 1.1（https://www.freecad.org/downloads.php）。
 2. 把本压缩包里的 Mod\\WenQuest 文件夹复制到 FreeCAD 的用户 Mod 目录，重启 FreeCAD。
-   用户 Mod 目录在哪：在 FreeCAD 的 Python 控制台（菜单“视图 → 面板 → Python 控制台”）输入 App.getUserAppDataDir() 回车，
-   显示的文件夹里的 Mod（没有就新建一个）。FreeCAD 1.1 一般是 Windows：%APPDATA%\\FreeCAD\\v1-1\\Mod；
+   用户 Mod 目录在哪：在 FreeCAD 的 Python 控制台（菜单“视图 → 面板 → Python 控制台”）
+   输入 App.getUserAppDataDir() 回车，显示的文件夹里的 Mod（没有就新建一个）。
+   FreeCAD 1.1 一般是 Windows：%APPDATA%\\FreeCAD\\v1-1\\Mod；
    macOS：~/Library/Application Support/FreeCAD/v1-1/Mod；Linux：~/.local/share/FreeCAD/v1-1/Mod（以控制台显示的为准）。
    （已装过问渠凸轮或数字工厂的包也没关系：解压到同一个 WenQuest 文件夹，各自的按钮都在。）
 3. 工作台列表里选“问渠”，点“轴承”：右边出现参数表单（与网页版同样的字段），可以从头填，也可以“打开项目”

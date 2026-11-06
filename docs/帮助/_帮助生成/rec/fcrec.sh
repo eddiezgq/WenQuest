@@ -8,7 +8,7 @@ XV=$!; sleep 2
 export DISPLAY=:98 HOME=${FC_HOME:-$HOME} LANG=C.UTF-8 LC_ALL=C.UTF-8 PYTHONIOENCODING=utf-8 QT_QPA_PLATFORM=xcb
 export WQ_SCRIPT=$SCRIPT WQ_CLIP=$CLIP WQ_VOICE=$VOICE WQ_OUT=$OUT/$CLIP.json
 export WQ_T0=$(date +%s.%N)
-ffmpeg -loglevel error -y -f x11grab -video_size 1280x720 -framerate 25 -i :98 -c:v libx264 -preset ultrafast -crf 18 "$OUT/$CLIP.raw.mp4" &
+ffmpeg -loglevel error -y -use_wallclock_as_timestamps 1 -f x11grab -video_size 1280x720 -framerate 25 -i :98 -fps_mode cfr -r 25 -c:v libx264 -preset ultrafast -crf 18 "$OUT/$CLIP.raw.mp4" &
 FF=$!
 timeout 600 ${FREECAD:-freecad} "$HERE/fcvrec.py" > "$OUT/$CLIP.log" 2>&1 || true
 kill -INT $FF; wait $FF 2>/dev/null || true

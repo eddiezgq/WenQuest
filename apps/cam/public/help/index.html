@@ -218,7 +218,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </table>
 <h3 id="intro-1">一张图看懂整套系统</h3>
 <div class="anim" data-anim="arch"></div></section>
-<section id="start"><h2><span class="n">01</span>快速上手</h2><p class="lead">打开、拼运动程序、填机构、看校核——五分钟走一遍。</p><h3 id="start-1">打开</h3>
+<section id="start"><h2><span class="n">01</span>快速上手</h2><p class="lead">打开、拼运动程序、填机构、看校核——五分钟走一遍。</p><figure class="vid"><video controls preload="none" playsinline poster="media/web-01-first.jpg"><source src="media/web-01-first.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/web-01-first.vtt"></video><figcaption>▶ 两分钟看懂网页版：校核、最小基圆、跳离反例</figcaption></figure>
+<h3 id="start-1">打开</h3>
 <ul>
 <li>官网“解决方案 → 行业专用软件 → 凸轮设计与制造”，点“在线使用”；或直接打开 <code>/cam/</code>。</li>
 <li>不登录也能用。项目自动存在你自己的浏览器里，也可以“保存为文件”带走。右上角“？帮助”打开本帮助对应的一节。</li>
@@ -306,6 +307,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>程序 168 个点，凸轮转一圈约 6 s。</li>
 </ul>
 <a class="try" href="../?example=sewing-takeup-groove&amp;mode=mfg" target="_blank" rel="noopener">▶ 试一试：打开制造页</a>
+<figure class="vid"><video controls preload="none" playsinline poster="media/web-02-mfg.jpg"><source src="media/web-02-mfg.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/web-02-mfg.vtt"></video><figcaption>▶ 案例一录像：磨削程序与仿真</figcaption></figure>
 <h3 id="case-takeup-4">第三步：测量与补偿</h3>
 <p>顶部 <strong>测量与补偿</strong>，点“载入合成测量数据（演示）”——软件按设计升程加上已知误差造出来的，只作演示。勾“自动对相位”，填示例许用加速度误差 50 rad/s²（虚构），点“分析”：</p>
 <ul>
@@ -314,7 +316,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>选 1–6 阶补偿，点“生成补偿程序”：误差均方根从 <strong>3.19</strong> 降到 <strong>0.60</strong> µrad（剩下的是没选的高阶和噪声），下载补偿后的程序。</li>
 </ul>
 <div class="anim" data-anim="comp"></div>
-<a class="try" href="../?example=sewing-takeup-groove&amp;mode=measure" target="_blank" rel="noopener">▶ 试一试：打开测量与补偿</a></section>
+<a class="try" href="../?example=sewing-takeup-groove&amp;mode=measure" target="_blank" rel="noopener">▶ 试一试：打开测量与补偿</a>
+<figure class="vid"><video controls preload="none" playsinline poster="media/web-03-measure.jpg"><source src="media/web-03-measure.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/web-03-measure.vtt"></video><figcaption>▶ 案例一录像：测量、谐波分析与补偿</figcaption></figure></section>
 <section id="case-atc"><h2><span class="n">04</span>案例二：加工中心凸轮式换刀机构</h2><p class="lead">一根凸轮轴上两个凸轮：弧面分度凸轮转换刀臂，槽凸轮让换刀臂拔刀、插刀；动作要错开，电机要够，停下来不能晃太大。</p><h3 id="case-atc-1">问题</h3>
 <p>加工中心凸轮式换刀机构（示例，虚构）：凸轮轴 60 r/min，经 30:1 减速由电机带动。弧面分度凸轮：停—转 65°—停—转 180°—停—回 65°；槽凸轮 + 摆杆：在换刀臂停着时下拔、上插。</p>
 <a class="try" href="../?example=atc-globoidal" target="_blank" rel="noopener">▶ 试一试：打开这个示例</a>
@@ -397,9 +400,11 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </tbody>
 </table>
 <p>振动最小的几种规律都让弧面凸轮的压力角超了；在全部合格的里面，软件选 <strong>修正正弦</strong>（示例本来用的就是它）。给了允许振动、电机额定值时，还会求满足它们的最高转速。点“采用”换上那种规律。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/web-04-system.jpg"><source src="media/web-04-system.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/web-04-system.vtt"></video><figcaption>▶ 案例二录像：时序、联锁、残余振动与设计搜索</figcaption></figure>
 <h3 id="case-atc-5">第四步：CAE</h3>
 <p>“CAE 分析”页：换刀臂有限元（55724 个单元）最大应力 31.9 MPa、安全系数 16.9；换刀臂本身（孔固定）一阶固有频率 791 Hz；还有疲劳寿命和整机多体动力学（MuJoCo）与解析结果的对照。示例结果是 2026-10-18 用数字工厂计算服务同一套程序算的；提交新计算要企业账号。</p>
-<a class="try" href="../?example=atc-globoidal&amp;mode=cae" target="_blank" rel="noopener">▶ 试一试：打开 CAE 页</a></section>
+<a class="try" href="../?example=atc-globoidal&amp;mode=cae" target="_blank" rel="noopener">▶ 试一试：打开 CAE 页</a>
+<figure class="vid"><video controls preload="none" playsinline poster="media/web-05-3d-cae.jpg"><source src="media/web-05-3d-cae.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/web-05-3d-cae.vtt"></video><figcaption>▶ 案例二录像：三维与 CAE</figcaption></figure></section>
 <section id="methods"><h2><span class="n">05</span>怎么算：运动规律、压力角、曲率、接触与跳离</h2><p class="lead">每一项校核出自哪个公式；方法出自公开的教材和专著，每个模块带标准题。</p><h3 id="methods-1">运动程序与运动规律</h3>
 <p>一圈由升、停、回拼成，每段选一种运动规律：等速、等加速等减速、简谐（余弦加速度）、摆线（正弦加速度）、修正梯形、修正正弦、3-4-5 次多项式、4-5-6-7 次多项式。段与段接头处速度不连续是<strong>刚性冲击</strong>，加速度不连续是<strong>柔性冲击</strong>，软件逐个接头查。也可以用点表（至少 8 个点，按周期三次样条连起来）。</p>
 <div class="calc" data-calc="laws"></div>
@@ -419,7 +424,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <h3 id="methods-4">凸轮系统</h3>
 <p>凸轮轴转矩 T(θ) = J_e θ̈ + ½ J_e′ θ̇² + Σ L_i ψ_i′ + T_摩擦（拉格朗日方程，Norton、Chen）；电机转矩按传动比和效率折算。停歇段残余振动按单自由度振动方程 y″ + 2ζω_n y′ + ω_n² y = −ψ̈(t)（Norton，凸轮动力学一章）。弧面分度凸轮的压力角按 Rothbart《Cam Design Handbook》里滚子齿轮凸轮的公式，啮合、筋厚、根切、接触应力另查。</p>
 <h3 id="methods-5">圆柱凸轮</h3>
-<p>槽侧面由啮合条件闭式求出；压力角沿槽深变化，槽底处最大，按槽底给结论；锥形滚子的锥顶在凸轮轴线上，停歇时纯滚动。</p></section>
+<p>槽侧面由啮合条件闭式求出；压力角沿槽深变化，槽底处最大，按槽底给结论；锥形滚子的锥顶在凸轮轴线上，停歇时纯滚动。</p>
+<figure class="vid"><video controls preload="none" playsinline poster="media/web-06-cyl.jpg"><source src="media/web-06-cyl.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="media/web-06-cyl.vtt"></video><figcaption>▶ 录像：圆柱凸轮</figcaption></figure></section>
 <section id="modes"><h2><span class="n">06</span>界面一览</h2><p class="lead">单个凸轮：设计、制造、测量与补偿三页；凸轮系统：系统设计、三维与制造、CAE 三页。</p><h3 id="modes-1">顶部</h3>
 <table>
 <thead>

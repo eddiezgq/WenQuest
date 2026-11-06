@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """带配音的录屏出片（第 90 轮）：webm（网页，vrec.js）或 raw.mp4（FreeCAD，fcrec.sh）+ 字幕时间 → 剪掉等待段 → 720p mp4（H.264 + AAC 配音）+ 封面 jpg + 中文字幕 vtt。
 配音把每句的 WAV 放在它的字幕时间上（剪辑后的时间），响度统一到 −16 LUFS。
 

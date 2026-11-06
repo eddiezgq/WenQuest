@@ -18,8 +18,18 @@ def open_bearing():
 def tidy():
     """录屏版面：收起 Python 控制台，表单放宽，模型树收窄，三维视图留在中间。"""
     hide_dock("Python console")
-    dock_width("问渠轴承", 600)
-    dock_width("Combo View", 190)
+    hide_dock("Tasks")
+    dock_width("问渠轴承", 640)
+    dock_width("Combo View", 200)
+
+
+def views():
+    """换两个视角（二等角、三等角），看清截面和钢球。"""
+    def go(cmd):
+        Gui.runCommand(cmd, 0)
+        Gui.SendMsgToActiveView("ViewFit")
+    QtCore.QTimer.singleShot(0, lambda: go("Std_ViewDimetric"))
+    QtCore.QTimer.singleShot(1700, lambda: go("Std_ViewTrimetric"))
 
 
 def ex(name):
@@ -58,8 +68,8 @@ def fc02():
         do(lambda: ex("demo-thin-x"), 1500), do(lambda: click("calc"), 2500),
         say("计算之后，右边是每个钢球的接触角、接触应力和截面的刚度，和网页版相同。"),
         cut(True), do(lambda: form().model(), 500), cut(False), do(fit, 2000),
-        say("建模后，外圈和内圈的沟道是两段圆弧拼成的尖拱形，钢球在两条对角线上受力。"),
-        do(lambda: Gui.activeDocument().activeView().viewFront(), 1200), do(lambda: Gui.SendMsgToActiveView("ViewFit"), 2500),
+        say("建模时，内外圈的沟道按两段圆弧拼成的尖拱形回转成实体，五十六个钢球按节圆排好，再查有没有干涉。"),
+        do(views, 3500),
         say("工序简图要选网页版工艺页存的模板，每道磨削和超精出一张简图。"),
         wait(1500),
     ]

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """录屏配音第一步（第 90 轮）：从录屏脚本里找出 say('…') 的每一句，用开源 Kokoro 中文声音合成（tools/video/voice.py，
 离线，不调外部服务），写 durations.json（句子 → 秒数、WAV 路径）。录屏脚本按这个时长等配音读完再做下一步。
 
@@ -13,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
 sys.path.insert(0, str(ROOT / "tools" / "video"))
-import voice as V  # noqa: E402
+import voice as V
 
 SAY = re.compile(r"""say\(\s*(['"`])(.+?)\1""")
 SPOKEN = {"FreeCAD": "free cad", "WenQuest": "问渠", "DXF": "D X F", "CAE": "C A E", "PDF": "P D F", "SPC": "统计过程控制", "µm": "微米", "N·m": "牛米", "r/min": "转每分", "MPa": "兆帕", "mm": "毫米", "rad/s²": "弧度每二次方秒", "µrad": "微弧度",

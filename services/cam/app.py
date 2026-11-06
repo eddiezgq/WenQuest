@@ -411,16 +411,17 @@ FREECAD_README = """问渠凸轮 · FreeCAD 工作台（第 39 轮第 5 步）
 
 1. 安装 FreeCAD 1.1（https://www.freecad.org/downloads.php）。
 2. 把本压缩包里的 Mod\\WenQuest 文件夹复制到 FreeCAD 的用户 Mod 目录，重启 FreeCAD。
-   用户 Mod 目录在哪：在 FreeCAD 的 Python 控制台（菜单“视图 → 面板 → Python 控制台”）输入 App.getUserAppDataDir() 回车，
-   显示的文件夹里的 Mod（没有就新建一个）。FreeCAD 1.1 一般是 Windows：%APPDATA%\\FreeCAD\\v1-1\\Mod；
+   用户 Mod 目录在哪：在 FreeCAD 的 Python 控制台（菜单“视图 → 面板 → Python 控制台”）
+   输入 App.getUserAppDataDir() 回车，显示的文件夹里的 Mod（没有就新建一个）。
+   FreeCAD 1.1 一般是 Windows：%APPDATA%\\FreeCAD\\v1-1\\Mod；
    macOS：~/Library/Application Support/FreeCAD/v1-1/Mod；Linux：~/.local/share/FreeCAD/v1-1/Mod（以控制台显示的为准）。
    （已装过问渠数字工厂的宏包也没关系：解压到同一个 WenQuest 文件夹，两边的按钮都在。）
 3. 工作台列表里选“问渠”，点“凸轮”，选网页版存的项目文件（.wqcam.json；文件夹 examples 里有示例）。
 4. 软件重算校核（与网页版同一个计算内核，结果逐项相同），建出零件：盘形 / 槽凸轮、弧面分度凸轮的精确实体、换刀臂；
    凸轮系统按时序装配：在模型树里选“凸轮系统”，改属性 Angle（凸轮轴转角），转塔、换刀臂按时序动。
-5. 导出：零件 STEP、加工程序、每个零件一张 A3 工作图（SVG，技术要求留给工程师填）。
-   不开界面也行：在 FreeCAD 的 Python 控制台里
+5. 导出：在 FreeCAD 的 Python 控制台里运行（同时重算校核、建模）
    import wq_cam; wq_cam.run_headless("项目.wqcam.json", "输出文件夹")
+   输出零件 STEP、加工程序、每个零件一张 A3 工作图（SVG，技术要求留给工程师填）。
 
 需要 Python 包 numpy、scipy、shapely：FreeCAD 自带 numpy；缺的时候点“凸轮”会提示安装命令。
 弧面凸轮建模约一分钟。计算全在本机，不连网。

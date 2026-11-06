@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """带配音的 FreeCAD 录屏驱动（第 90 轮，从第 49 轮缝纫机的 drive.py 改来）：在 FreeCAD 图形界面里按脚本一步步操作，
 每句 say 等配音读完（时长来自 lines.py 写的 durations.json），记下字幕时间和要剪掉的等待段，写 <名字>.json 给 vfinish.py。
 
@@ -85,9 +84,10 @@ def hide_dock(name):
 
 
 def dock_width(title, w):
-    """按标题找停靠面板，设宽度（右边的软件表单、左边的模型树）。"""
+    """按标题找停靠面板，限定宽度（右边的软件表单、左边的模型树），三维视图留在中间。"""
     for d in mw.findChildren(QtW.QDockWidget):
         if d.windowTitle() == title or d.objectName() == title:
+            d.setMaximumWidth(w)
             mw.resizeDocks([d], [w], QtCore.Qt.Horizontal)
             return
 
@@ -101,6 +101,30 @@ def typecmd(cmd):
         QtW.QApplication.processEvents()
         time.sleep(0.04)
     QtTest.QTest.keyClick(c, QtCore.Qt.Key_Return)
+
+
+def type_only(cmd):
+    """不阻塞地往控制台里写一行（不回车），写完 STATE["typed"] = True；回车用 enter()。
+    长命令用这个：回车后命令要跑一阵，录屏要在回车前标好剪辑起点。"""
+    c = console()
+    c.setFocus()
+    STATE["typed"] = False
+    chars = list(cmd)
+
+    def one():
+        if chars:
+            c.insertPlainText(chars.pop(0))
+            QtCore.QTimer.singleShot(40, one)
+        else:
+            STATE["typed"] = True
+    one()
+
+
+def enter():
+    c = console()
+    QtTest.QTest.keyClick(c, QtCore.Qt.Key_Return)
+    c.moveCursor(QtGui.QTextCursor.End)
+    c.ensureCursorVisible()
 
 
 def fit(iso=True):
