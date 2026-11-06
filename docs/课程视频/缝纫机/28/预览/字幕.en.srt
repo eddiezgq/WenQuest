@@ -1,0 +1,783 @@
+1
+00:00:00,600 --> 00:00:01,746
+Hi everyone,
+
+2
+00:00:01,766 --> 00:00:08,745
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,145 --> 00:00:14,005
+This is Lecture 28, garment processes and the sewing floor.
+
+4
+00:00:14,405 --> 00:00:18,569
+For more than twenty lectures we've studied one machine.
+
+5
+00:00:18,589 --> 00:00:24,097
+Today we step onto the floor and see how dozens of machines and people are
+
+6
+00:00:24,117 --> 00:00:25,665
+arranged into a line.
+
+7
+00:00:27,185 --> 00:00:28,645
+Here's the problem.
+
+8
+00:00:29,045 --> 00:00:35,918
+A chinos line has 26 people and a plan of 120 an hour;
+
+9
+00:00:35,938 --> 00:00:40,258
+23 operations total 13.20 minutes.
+
+10
+00:00:40,658 --> 00:00:42,792
+Work was split by feel,
+
+11
+00:00:42,812 --> 00:00:48,129
+roughly one operation per station with extras where busy;
+
+12
+00:00:48,149 --> 00:00:54,029
+zip setting and inseam take 0.70 minutes each, one person each.
+
+13
+00:00:54,429 --> 00:00:56,988
+The manager wants more people;
+
+14
+00:00:57,008 --> 00:01:03,437
+the alternative is an automatic pocket welter and a waistband machine for a
+
+15
+00:01:03,457 --> 00:01:05,329
+net 200 thousand yuan.
+
+16
+00:01:05,729 --> 00:01:12,844
+What does the line make now, what could regrouping do, and do the machines pay?
+
+17
+00:01:13,244 --> 00:01:14,538
+We'll answer at the end.
+
+18
+00:01:16,058 --> 00:01:18,198
+From sample to bulk production.
+
+19
+00:01:19,718 --> 00:01:22,996
+A garment takes two journeys through a factory.
+
+20
+00:01:23,396 --> 00:01:27,050
+First, technical preparation: patterns, sample,
+
+21
+00:01:27,070 --> 00:01:29,865
+tech pack and pre-production sample,
+
+22
+00:01:29,885 --> 00:01:34,244
+while the industrial engineer splits it into operations,
+
+23
+00:01:34,264 --> 00:01:39,091
+estimates times and lays out the line, which is most of today.
+
+24
+00:01:39,491 --> 00:01:46,765
+Second, bulk production: cutting, sewing, finishing, inspection and packing.
+
+25
+00:01:47,165 --> 00:01:50,592
+Sewing has the most operations and people,
+
+26
+00:01:50,612 --> 00:01:55,025
+about 80 percent of labour time in our chinos example.
+
+27
+00:01:56,545 --> 00:01:59,245
+Operations and standard minutes.
+
+28
+00:02:00,765 --> 00:02:03,426
+The industrial engineer, or IE,
+
+29
+00:02:03,446 --> 00:02:08,703
+first splits the garment into operations in processing order,
+
+30
+00:02:08,723 --> 00:02:15,190
+finely for a long line, coarsely for a cell, each with its machine, stitch,
+
+31
+00:02:15,210 --> 00:02:17,785
+requirements and predecessors.
+
+32
+00:02:18,185 --> 00:02:25,867
+The chinos take 23: back, front and fly made separately, then rise, side seams,
+
+33
+00:02:25,888 --> 00:02:30,645
+inseam, waistband and hems, 13.20 minutes in all.
+
+34
+00:02:31,045 --> 00:02:34,928
+Times for similar products differ several-fold,
+
+35
+00:02:34,948 --> 00:02:37,585
+so factories use their own data.
+
+36
+00:02:39,105 --> 00:02:44,954
+A standard minute is the time a trained worker needs by the set method at
+
+37
+00:02:44,974 --> 00:02:45,919
+normal pace,
+
+38
+00:02:45,939 --> 00:02:47,205
+plus allowances.
+
+39
+00:02:47,605 --> 00:02:54,456
+For the side-seam topstitch: ten stopwatch timings average 0.48 minutes;
+
+40
+00:02:54,476 --> 00:03:01,041
+the operator is brisk, rated 110 percent, so the basic time is 0.528;
+
+41
+00:03:01,061 --> 00:03:06,289
+add 14 percent for personal needs, fatigue and machine,
+
+42
+00:03:06,309 --> 00:03:11,347
+and the standard minute is about 0.60, or 36 seconds.
+
+43
+00:03:12,867 --> 00:03:18,462
+Operators spend about 80 percent of their time handling fabric.
+
+44
+00:03:18,862 --> 00:03:21,325
+So how much does top speed buy?
+
+45
+00:03:21,725 --> 00:03:26,664
+The lab computes one seam with the speed profile,
+
+46
+00:03:26,684 --> 00:03:31,320
+cycling top speed through 4000, 5000 and 6000.
+
+47
+00:03:31,720 --> 00:03:42,207
+A 333-stitch seam goes from 5.75 to 4.80 seconds at 5000 instead of 4000;
+
+48
+00:03:42,227 --> 00:03:48,540
+two seams save only 5 percent of 36 seconds.
+
+49
+00:03:48,940 --> 00:03:54,277
+A 40-stitch seam saves a tenth of a second at 6000.
+
+50
+00:03:54,677 --> 00:03:59,174
+Faster ramps, trimming and handling matter more.
+
+51
+00:04:00,694 --> 00:04:01,820
+Line balancing.
+
+52
+00:04:03,340 --> 00:04:08,409
+The basic quantities: takt is 60 over target output,
+
+53
+00:04:08,429 --> 00:04:11,150
+0.5 minutes for 120 an hour;
+
+54
+00:04:11,170 --> 00:04:18,001
+the theoretical minimum headcount is total time over takt, rounded up,
+
+55
+00:04:18,021 --> 00:04:19,176
+at least 27.
+
+56
+00:04:19,576 --> 00:04:25,635
+The busiest person's load is the cycle, output is 60 over the cycle,
+
+57
+00:04:25,655 --> 00:04:30,104
+and balance is total time over people times cycle.
+
+58
+00:04:30,504 --> 00:04:34,524
+The busiest person sets the pace of the whole line.
+
+59
+00:04:36,044 --> 00:04:40,984
+The chart switches between two splits; the red line is takt.
+
+60
+00:04:41,384 --> 00:04:48,088
+With one operation per station you add people wherever time exceeds takt,
+
+61
+00:04:48,108 --> 00:04:54,168
+but only in whole people: the 0.55-minute fly topstitch needs two,
+
+62
+00:04:54,188 --> 00:05:00,524
+each idle half the time, and a 0.2-minute buttonhole still takes one.
+
+63
+00:05:00,924 --> 00:05:06,424
+Result: 38 people, 69.5 percent balance.
+
+64
+00:05:06,824 --> 00:05:14,844
+Switch to automatic grouping and the bars even out: 29 people, 91.0 percent.
+
+65
+00:05:16,364 --> 00:05:22,064
+The answer is to merge neighbouring operations into groups shared by several people.
+
+66
+00:05:22,464 --> 00:05:30,225
+Front overlocking, back overlocking and back darts total 1.30 minutes;
+
+67
+00:05:30,245 --> 00:05:35,004
+three people at 0.433 each, all under takt.
+
+68
+00:05:35,404 --> 00:05:42,036
+Rules: at most four people, four operations and two machine types per group,
+
+69
+00:05:42,056 --> 00:05:44,224
+and no broken precedence.
+
+70
+00:05:44,624 --> 00:05:49,987
+Positional weight is an operation's time plus everything after it;
+
+71
+00:05:50,007 --> 00:05:55,696
+sort by weight and cut with dynamic programming for the fewest people.
+
+72
+00:05:57,216 --> 00:06:07,745
+Automatic grouping gives 29 people at 91.0 percent for 120 an hour,
+
+73
+00:06:07,765 --> 00:06:14,516
+36 at 91.7 for 150, and 25 at 91.8 for 100.
+
+74
+00:06:14,916 --> 00:06:19,069
+Change takt and the rounding changes, so regroup;
+
+75
+00:06:19,089 --> 00:06:22,816
+a new style or method means rebalancing too.
+
+76
+00:06:23,216 --> 00:06:28,815
+Theoretical balance ignores individual speed and variation;
+
+77
+00:06:28,835 --> 00:06:35,196
+next lecture's hanger systems and U cells let the line absorb them.
+
+78
+00:06:36,716 --> 00:06:37,872
+Lean production.
+
+79
+00:06:39,392 --> 00:06:43,913
+Lean production grew out of the Japanese car industry,
+
+80
+00:06:43,933 --> 00:06:49,126
+and its core is removing waste: everything that adds no value.
+
+81
+00:06:49,526 --> 00:06:56,300
+Garment floors name seven: overproduction, waiting, transport, over-processing,
+
+82
+00:06:56,320 --> 00:06:59,826
+inventory, unnecessary motion and rework.
+
+83
+00:07:00,226 --> 00:07:05,499
+A sewing machine adds value only in the seconds it sews;
+
+84
+00:07:05,519 --> 00:07:07,956
+the rest can all be waste.
+
+85
+00:07:09,476 --> 00:07:12,136
+Equipment and multi-machine tending.
+
+86
+00:07:13,656 --> 00:07:16,195
+With groups settled, equip them:
+
+87
+00:07:16,215 --> 00:07:21,952
+machines of each type equal that type's time over the cycle, rounded up.
+
+88
+00:07:22,352 --> 00:07:28,996
+Three people sharing 1.2 minutes of lockstitch work get three machines;
+
+89
+00:07:29,016 --> 00:07:33,032
+0.2 minutes of bartacking gets one, shared.
+
+90
+00:07:33,432 --> 00:07:38,535
+The 29-person plan has 20 lockstitch, 8 overlock,
+
+91
+00:07:38,555 --> 00:07:46,272
+3 bartack and one each of chainstitch, buttonhole and button machines: 34,
+
+92
+00:07:46,292 --> 00:07:48,572
+about 1.17 per person.
+
+93
+00:07:48,972 --> 00:07:56,921
+Keep 5 to 10 percent spares for breakdowns and style changes.
+
+94
+00:07:58,441 --> 00:08:04,787
+With pattern sewers and automatic pocket welters the operator only loads and
+
+95
+00:08:04,807 --> 00:08:07,383
+unloads while the machine sews,
+
+96
+00:08:07,403 --> 00:08:09,979
+so one person can tend several.
+
+97
+00:08:10,379 --> 00:08:15,679
+Let a be load time, w walking time and t sewing time.
+
+98
+00:08:16,079 --> 00:08:21,550
+Tending n, the operator's round is n times a plus w,
+
+99
+00:08:21,570 --> 00:08:27,779
+a machine's cycle is a plus t, and the cycle is the larger.
+
+100
+00:08:28,179 --> 00:08:35,799
+As the lab steps n from 1 to 6, first the operator waits, then the machines do.
+
+101
+00:08:36,199 --> 00:08:38,961
+Where they're equal is the balance point.
+
+102
+00:08:40,481 --> 00:08:53,061
+Compute it: a 0.3, w 0.05 and t 0.9 minutes give a balance point of about 3.43.
+
+103
+00:08:53,461 --> 00:09:02,648
+Tending 3, the cycle is 1.2 and the operator waits 13 percent; tending 4,
+
+104
+00:09:02,668 --> 00:09:09,081
+the cycle is 1.4 and each machine waits 14 percent.
+
+105
+00:09:09,481 --> 00:09:20,645
+By cost, at 0.5 yuan wages and 0.08 per machine-minute,
+
+106
+00:09:20,665 --> 00:09:28,373
+3 cost 0.296 and 4 cost 0.287 a piece.
+
+107
+00:09:28,773 --> 00:09:35,538
+Make the machine faster, t at 0.6, and the cheapest becomes 3.
+
+108
+00:09:37,058 --> 00:09:40,678
+Now the special machines.
+
+109
+00:09:41,078 --> 00:09:50,925
+An automatic pocket welter cuts the back pocket from 1.20 to 0.45 minutes,
+
+110
+00:09:50,945 --> 00:09:57,858
+a waistband machine the waistband from 1.30 to 0.80.
+
+111
+00:09:58,258 --> 00:10:07,303
+Work content falls to 11.95 minutes and 26 people make 120 an hour at 91.9
+
+112
+00:10:07,323 --> 00:10:09,263
+percent balance,
+
+113
+00:10:09,283 --> 00:10:14,162
+three fewer than adding people up to 29.
+
+114
+00:10:14,562 --> 00:10:22,528
+But with frequent style changes or no back pockets, the sums don't work.
+
+115
+00:10:24,048 --> 00:10:27,920
+Robot machine tending is the same model:
+
+116
+00:10:27,940 --> 00:10:34,732
+the robot loads in time a and moves in w, the machine tool cuts for t,
+
+117
+00:10:34,752 --> 00:10:40,668
+and the cycle is the larger of n times a plus w and a plus t.
+
+118
+00:10:41,068 --> 00:10:44,932
+Robots are fast, so one tends more machines;
+
+119
+00:10:44,952 --> 00:10:51,466
+speed up the machine tools and it tends fewer, so dual fixtures shorten a,
+
+120
+00:10:51,486 --> 00:10:55,968
+just like alternating templates on a pattern sewer.
+
+121
+00:10:56,368 --> 00:11:01,708
+Robot lines need balancing too: the slowest cell sets output.
+
+122
+00:11:03,228 --> 00:11:05,748
+You tend several machines at home too.
+
+123
+00:11:06,148 --> 00:11:08,844
+On a weekend you put rice in the cooker,
+
+124
+00:11:08,864 --> 00:11:12,848
+clothes in the washer and bread in the oven, go round once,
+
+125
+00:11:12,868 --> 00:11:17,328
+and the first one is just finishing: that's multi-machine tending.
+
+126
+00:11:17,728 --> 00:11:25,328
+Loading the rice or the clothes is a, walking between kitchen and balcony is w,
+
+127
+00:11:25,348 --> 00:11:30,053
+and the time the machines work on their own is t.
+
+128
+00:11:30,453 --> 00:11:35,327
+Make all the machines faster and you end up running between them more,
+
+129
+00:11:35,347 --> 00:11:37,913
+and you can look after fewer at once.
+
+130
+00:11:39,433 --> 00:11:41,274
+Back to our problem.
+
+131
+00:11:41,674 --> 00:11:52,599
+Today the cycle is 0.70 minutes: about 85.7 an hour at 72.5 percent balance.
+
+132
+00:11:52,999 --> 00:11:58,339
+In theory 120 needs at least 27.
+
+133
+00:11:58,739 --> 00:12:09,409
+Regroup the same 26 and the cycle is 0.55: about 109 an hour at 92.3 percent,
+
+134
+00:12:09,429 --> 00:12:17,599
+about 27 percent more; with today's equipment 120 needs 29.
+
+135
+00:12:17,999 --> 00:12:24,925
+With the special machines 26 are enough, saving 18000 yuan a month,
+
+136
+00:12:24,945 --> 00:12:28,139
+paying back in about 11 months.
+
+137
+00:12:29,659 --> 00:12:38,082
+Now Virtual lab 28-1, line balancing, which you can do yourself on WenQuest.
+
+138
+00:12:38,102 --> 00:12:42,859
+Results and tasks are blurred. On page one,
+
+139
+00:12:42,879 --> 00:12:49,303
+the balance chart and the operation table are on the left;
+
+140
+00:12:49,323 --> 00:12:54,747
+on the right you set target output and equipment.
+
+141
+00:12:54,767 --> 00:13:02,079
+First click 'one operation per group' and see which stations wait.
+
+142
+00:13:02,479 --> 00:13:09,445
+Then click 'automatic grouping' and the bars even out. Record the headcount,
+
+143
+00:13:09,465 --> 00:13:13,029
+cycle, output and balance, and compare.
+
+144
+00:13:13,429 --> 00:13:20,387
+Task one: reorder operations with the arrows in the table. 'Make belt loops',
+
+145
+00:13:20,407 --> 00:13:25,734
+outlined here, has no predecessors. Don't break precedence;
+
+146
+00:13:25,754 --> 00:13:30,809
+re-cut the groups and see whether you can save a person.
+
+147
+00:13:31,209 --> 00:13:34,656
+Task two sets the target to 100 an hour,
+
+148
+00:13:34,676 --> 00:13:41,071
+and task three adds the automatic pocket welter and the waistband machine.
+
+149
+00:13:41,091 --> 00:13:46,618
+In both, group automatically first, then reorder to save people.
+
+150
+00:13:47,018 --> 00:13:50,839
+On page two, step the machines tended from 1 to 6,
+
+151
+00:13:50,859 --> 00:13:55,064
+watch who waits for whom in the operator-machine chart,
+
+152
+00:13:55,084 --> 00:14:00,134
+record the cycle and cost per piece, and find the cheapest number.
+
+153
+00:14:00,154 --> 00:14:05,358
+Then cut the automatic sewing time to 0.6 minutes and find it again.
+
+154
+00:14:05,758 --> 00:14:13,156
+Last, the machine time for one seam: 333 stitches at a top speed of 4000,
+
+155
+00:14:13,176 --> 00:14:17,933
+5000 and 6000, then 40 stitches for comparison.
+
+156
+00:14:17,953 --> 00:14:23,014
+The guide and report template are on the platform.
+
+157
+00:14:24,534 --> 00:14:29,594
+Everything in this lecture is on the WenQuest learning platform.
+
+158
+00:14:29,994 --> 00:14:35,944
+You can open the interactive slides and the line-balancing lab and work them
+
+159
+00:14:35,964 --> 00:14:36,651
+yourself,
+
+160
+00:14:36,671 --> 00:14:40,814
+including the two pages on markers and lean practice.
+
+161
+00:14:41,214 --> 00:14:45,969
+You submit the assignment and the lab report on the platform,
+
+162
+00:14:45,989 --> 00:14:48,474
+and get marks and comments back.
+
+163
+00:14:48,874 --> 00:14:55,294
+Questions go to the discussion forum, and the grades page shows every mark.
+
+164
+00:14:56,814 --> 00:14:59,923
+The assignment has three questions. One:
+
+165
+00:14:59,943 --> 00:15:04,616
+a T-shirt line has 8 operations and a target of 150 an hour.
+
+166
+00:15:04,636 --> 00:15:08,761
+Find takt and the theoretical minimum, the headcount,
+
+167
+00:15:08,781 --> 00:15:12,437
+cycle and balance with one operation per group,
+
+168
+00:15:12,457 --> 00:15:16,661
+and then your own grouping under this lecture's rules.
+
+169
+00:15:17,061 --> 00:15:23,697
+Two: 'set sleeves' was timed ten times at an average of 0.52 minutes,
+
+170
+00:15:23,717 --> 00:15:30,448
+rated 90 percent, with 15 percent allowance. Find the standard minute,
+
+171
+00:15:30,468 --> 00:15:38,358
+and explain what a rating of 110 percent would do to line balance and piece rates.
+
+172
+00:15:38,758 --> 00:15:46,330
+Three: a pattern sewer takes 0.25 minutes to load, 0.05 to walk and 1.0 to sew;
+
+173
+00:15:46,350 --> 00:15:52,577
+wages are 0.5 yuan a minute and machines 0.10 per machine-minute.
+
+174
+00:15:52,597 --> 00:15:59,978
+Find the balance point, the cycle and cost per piece for 3, 4 and 5 machines,
+
+175
+00:15:59,998 --> 00:16:07,378
+choose the cheapest, and say how the answer changes if loading drops to 0.15.
+
+176
+00:16:07,778 --> 00:16:12,257
+Submit the assignment and the lab report on the WenQuest platform.
+
+177
+00:16:13,777 --> 00:16:17,853
+There's also a ten-question quiz. For example:
+
+178
+00:16:17,873 --> 00:16:24,086
+an operation's observed time averages 0.50 minutes, rated 105 percent,
+
+179
+00:16:24,106 --> 00:16:28,894
+with 12 percent allowance. What's the standard minute?
+
+180
+00:16:29,294 --> 00:16:37,596
+Or: a garment takes 15.6 minutes of work in all, and the target is 100 an hour.
+
+181
+00:16:37,616 --> 00:16:41,914
+What's the theoretical minimum headcount?
+
+182
+00:16:42,314 --> 00:16:47,459
+You get three attempts, and the explanations appear as soon as you submit.
+
+183
+00:16:48,979 --> 00:16:50,285
+Three things to remember.
+
+184
+00:16:50,685 --> 00:16:58,963
+One: a standard minute is observed time times rating times one plus allowance;
+
+185
+00:16:58,983 --> 00:17:04,814
+most of it is handling, so more top speed helps little.
+
+186
+00:17:05,214 --> 00:17:09,281
+Two: takt, minimum headcount, cycle and balance;
+
+187
+00:17:09,301 --> 00:17:13,283
+one operation per station wastes odd fractions,
+
+188
+00:17:13,303 --> 00:17:20,350
+while grouping by positional weight lifts balance from about 70 to over 90 percent.
+
+189
+00:17:20,750 --> 00:17:26,973
+Three: in multi-machine tending the cycle is the larger of the two;
+
+190
+00:17:26,993 --> 00:17:28,557
+choose n by cost.
+
+191
+00:17:28,957 --> 00:17:31,489
+The slides, the virtual lab,
+
+192
+00:17:31,509 --> 00:17:37,870
+the assignment and the quiz are all on the WenQuest learning platform,
+
+193
+00:17:37,890 --> 00:17:43,977
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+194
+00:17:44,377 --> 00:17:49,858
+Today was about balancing a line. Next time we visit typical garment factories,
+
+195
+00:17:49,878 --> 00:17:52,852
+made-to-measure suits, shirts and T-shirts,
+
+196
+00:17:52,872 --> 00:17:57,797
+and see why factories making clothes can be so different. See you then.
