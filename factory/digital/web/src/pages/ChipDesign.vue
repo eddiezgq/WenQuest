@@ -62,7 +62,8 @@
           <div class="kpi"><b>{{ L.power_total_w != null ? fmt(L.power_total_w * 1000, 3) : '—' }}</b><span>功耗估计 mW</span></div>
           <div class="kpi"><b>{{ L.wire_length_um != null ? fmt(L.wire_length_um / 1000, 2) : '—' }}</b><span>连线总长 mm</span></div></div>
         <h3>各类单元</h3>
-        <div v-for="(n, k) in L.cells_by_kind" :key="k" class="bar"><span class="bl">{{ k }}</span><span class="bb" :style="{ width: 100 * n / maxKind + '%' }"></span><span class="bn">{{ n }}</span></div>
+        <div v-for="(n, k) in L.cells_by_kind" :key="k" class="krow"><span>{{ k }}</span><span class="ktrack"><span class="kfill" :style="{ width: 100 * n / maxKind + '%' }"></span></span><span class="kn">{{ n }}</span></div>
+        <p class="small muted">去耦电容、填充、衬底接触是版图上必须放的“非逻辑”单元：稳电源、填满空位、把衬底接到电源和地。</p>
         <h3>用得最多的单元</h3>
         <p class="small mono">{{ L.cells_top.map((c) => c[0] + ' ×' + c[1]).join('、') }}</p>
       </template>
@@ -72,12 +73,13 @@
     <section v-if="d && tab === 'lay'" class="card">
       <template v-if="IM">
         <div class="line">
-          <label v-for="l in IM.layers" :key="l.key" class="small"><input v-model="lays" type="checkbox" :value="l.key"> {{ l.name }}</label>
+          <button class="chip" :class="{ on: lay === 'all' }" @click="lay = 'all'">全部层</button>
+          <button v-for="l in IM.layers.filter((x) => x.present)" :key="l.key" class="chip" :class="{ on: lay === l.key }" @click="lay = l.key">{{ l.name }}</button>
           <label class="small">放大 <input v-model.number="zoom" type="range" min="1" max="6" step="0.25"></label>
           <label class="small"><input v-model="detail" type="checkbox"> 看中心 30 × 30 μm 的单元</label></div>
         <div class="small muted">芯片 {{ IM.die_um[0] }} × {{ IM.die_um[1] }} μm（GDS 由 LibreLane 生成，KLayout 出图；颜色是 SKY130 的层颜色）</div>
         <div class="canvas"><div v-if="!detail" class="stack" :style="{ width: zoom * 100 + '%' }">
-          <img v-for="l in shownLays" :key="l.key" :src="url('layout/' + l.png)" class="ly" :alt="l.name"></div>
+          <img :src="url('layout/' + layPng)" class="ly" :alt="lay"></div>
           <img v-else :src="url('layout/' + IM.detail.png)" :style="{ width: zoom * 60 + '%' }" alt="局部">
         </div>
       </template>
@@ -161,7 +163,7 @@ const wcase = ref('');
 const w0 = ref(0);
 const span = ref(600);
 const zoom = ref(1);
-const lays = ref(['devices', 'met1', 'met2', 'met3', 'met4']);
+const lay = ref('all');
 const detail = ref(false);
 const B = reactive({ rpm: 3000, dir: 1, flen: 3, glitch: 0.04, gmax: 3, lines: 1000 });
 const bres = ref(null);
@@ -171,7 +173,7 @@ const bwin = ref('spi');
 const url = (p) => BASE + p;
 const L = computed(() => d.value?.layout || null);
 const IM = computed(() => d.value?.images || null);
-const shownLays = computed(() => (IM.value?.layers || []).filter((l) => lays.value.includes(l.key) && l.present));
+const layPng = computed(() => (lay.value === 'all' ? IM.value?.all : IM.value?.layers.find((l) => l.key === lay.value)?.png));
 const rtlLines = computed(() => (d.value?.rtl || '').split('\n'));
 const maxKind = computed(() => Math.max(1, ...Object.values(L.value?.cells_by_kind || { x: 1 })));
 const win = computed(() => [w0.value, Math.min(wave.value?.n || 0, w0.value + span.value)]);
@@ -277,12 +279,14 @@ onMounted(async () => {
 .kpis { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
 .kpi { border: 1px solid #e3e6ee; border-radius: 8px; padding: 6px 10px; min-width: 110px; }
 .kpi b { display: block; font-size: 18px; } .kpi span { font-size: 12px; color: #64748b; }
-.bar { display: flex; align-items: center; gap: 6px; font-size: 13px; margin: 2px 0; }
-.bl { width: 7em; } .bb { height: 10px; background: #60a5fa; border-radius: 3px; } .bn { color: #475569; }
+.krow { display: grid; grid-template-columns: 7em 1fr 3.5em; align-items: center; gap: 8px; font-size: 13px; margin: 3px 0; }
+.ktrack { height: 12px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+.kfill { display: block; height: 100%; background: #60a5fa; } .kn { color: #475569; }
 .canvas { overflow: auto; max-height: 75vh; border: 1px solid #e3e6ee; border-radius: 8px; background: #000; }
 .stack { position: relative; }
-.stack .ly { position: absolute; left: 0; top: 0; width: 100%; mix-blend-mode: screen; display: block; }
-.stack .ly:first-child { position: relative; }
+.stack .ly { width: 100%; display: block; }
+.chip { border: 1px solid #ccd; background: #fff; border-radius: 14px; padding: 3px 10px; cursor: pointer; font-size: 13px; }
+.chip.on { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
 .ok { color: #15803d; } .bad { color: #b91c1c; }
 .dl li { margin: 6px 0; }
 .btn.sm { padding: 1px 8px; font-size: 12px; } .btn.on { background: #1d4ed8; color: #fff; }
