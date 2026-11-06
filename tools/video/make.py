@@ -691,7 +691,8 @@ def upload_text_standalone(lec, lang, chapters, total, voice_backend, out_dir):
     md = [f"# {t}", "", "## Title", t, "", "## Description", *desc, "", "## Tags", ", ".join(tags), "", "## Settings",
           *[f"- {x}" for x in extra], "", f"<!-- length {mmss(total)} -->"]
     (out_dir / "upload.md").write_text("\n".join(md) + "\n", encoding="utf-8")
-    (out_dir / "upload.json").write_text(json.dumps({"title": t, "description": "\n".join(desc), "tags": tags, "lang": lang},
+    (out_dir / "upload.json").write_text(json.dumps({"title": t, "description": "\n".join(desc), "tags": tags, "lang": lang,
+                                                     "playlist": "问渠产品介绍" if lang == "zh" else "WenQuest product tours"},
                                                     ensure_ascii=False, indent=1), encoding="utf-8")
 
 

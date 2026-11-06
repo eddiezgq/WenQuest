@@ -45,7 +45,8 @@ def upload(d: Path, privacy: str, playlist: str | None) -> str:
     meta = json.loads((d / "upload.json").read_text(encoding="utf-8"))
     zh = meta.get("lang") == "zh"
     yl = "zh-Hans" if zh else "en"
-    playlist = playlist or meta.get("playlist") or "Linear Algebra (WenQuest)"
+    # 课程讲次的 upload.json 都写了 playlist；没写的是独立视频（产品介绍、首页视频简介，第 86 轮），归到“产品介绍”列表
+    playlist = playlist or meta.get("playlist") or ("问渠产品介绍" if zh else "WenQuest product tours")
     yt = client()
     body = {"snippet": {"title": meta["title"][:100], "description": meta["description"][:5000], "tags": meta["tags"],
                         "categoryId": "27", "defaultLanguage": yl, "defaultAudioLanguage": yl},
