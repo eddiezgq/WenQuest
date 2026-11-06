@@ -1,0 +1,75 @@
+1
+00:00:00,500 --> 00:00:03,938
+WenQuest virtual labs run in the browser: nothing to install,
+
+2
+00:00:03,958 --> 00:00:05,129
+and nothing to break.
+
+3
+00:00:06,149 --> 00:00:07,660
+Inverted pendulum PID control,
+
+4
+00:00:07,680 --> 00:00:10,417
+with the dynamics checked step by step against MuJoCo.
+
+5
+00:00:10,887 --> 00:00:14,764
+Tune the gains and watch the angle, cart position and force curves,
+
+6
+00:00:15,234 --> 00:00:19,701
+while the AI lab assistant reads your runs and points the way without giving
+
+7
+00:00:19,721 --> 00:00:20,351
+the answer.
+
+8
+00:00:21,371 --> 00:00:24,812
+A two-link arm: kinematics, trajectory planning and control,
+
+9
+00:00:24,832 --> 00:00:26,888
+from equations to an arm that moves.
+
+10
+00:00:27,908 --> 00:00:32,212
+For university physics, the kinematics bench gives every concept a scene:
+
+11
+00:00:32,232 --> 00:00:35,174
+frames, projectiles, circular and relative motion,
+
+12
+00:00:35,644 --> 00:00:38,302
+and every scene comes with a robotics problem.
+
+13
+00:00:39,321 --> 00:00:43,830
+The PLC bench wires a web PLC to a 3D machine. Write the program, run it,
+
+14
+00:00:43,850 --> 00:00:45,195
+step through the scan,
+
+15
+00:00:45,665 --> 00:00:50,372
+and inject jams, broken wires or motor overloads to practise troubleshooting.
+
+16
+00:00:51,392 --> 00:00:55,873
+Microelectronics: size the transistors and see delay and power at once,
+
+17
+00:00:56,343 --> 00:00:59,950
+then go on to Verilog synthesis and layout, from RTL all the way to GDS.
+
+18
+00:01:00,970 --> 00:01:03,331
+Every lab comes with a guide and a report template,
+
+19
+00:01:03,351 --> 00:01:05,992
+and there are cloud GPU labs that run CUDA in JupyterLab.
