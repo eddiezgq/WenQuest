@@ -1,0 +1,12 @@
+# Only what the eda image needs (the build context is the repository root).
+*
+!services/eda/requirements.txt
+!services/eda/app.py
+!services/eda/web
+!eda/wqeda
+!eda/parts
+!factory/designs/drv-joint/design.yaml
+!factory/digital/cae/__init__.py
+!factory/digital/cae/circuit.py
+!factory/digital/cae/motors.py
+**/__pycache__

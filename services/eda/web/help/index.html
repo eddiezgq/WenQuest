@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>起草台帮助</title>
+<link rel="stylesheet" href="../style.css">
+<style>main{max-width:760px}h2{margin-top:28px}li{margin:4px 0}.src{margin-right:4px}</style>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><b>问渠电子</b><span class="sep">·</span><span>起草台帮助</span></div>
+  <nav><a href="../">回到起草台</a></nav>
+</header>
+<main>
+<h1>起草台怎么用</h1>
+<p class="lede">起草台把一句话需求变成一份电路板设计描述。AI 只起草，判定都由代码做；草稿不存服务器，你确认后下载。</p>
+
+<h2>一、写需求</h2>
+<p>写清楚电压、电流、电机、接口。例如：“给 400 W、48 V 的机器人关节伺服电机做一块驱动板，额定相电流 8.5 A，峰值 30 A，带 2500 线增量编码器和 CAN。”需求框下面有三个示例可以点。</p>
+<p>本版只做<b>三相电机驱动板</b>：九种功能单元（母线输入、辅助电源、半桥、栅极驱动、电流采样、MCU、增量编码器、SSI 编码器、CAN），拓扑固定。别的板子、别的接口会列在“目录里做不了的”里。</p>
+
+<h2>二、看草稿：每个数都有来源</h2>
+<ul>
+  <li><span class="src requirement">需求原文</span>你写的需求里有这个数，下面是引用的原话。代码会核对：引用的话必须真在需求里，并且含有这个数。</li>
+  <li><span class="src rule">规则推出</span>由需求里的数按规则算出来，下面写着用了哪些数。</li>
+  <li><span class="src assumption">AI 假设</span>需求没说、AI 先提的，整行标成铜色，下面是要你回答的问题。<b>请逐个看过</b>。</li>
+  <li><span class="src person">人填</span>你在页面上改过的数。</li>
+  <li><span class="src template">模板默认</span>没人动过，沿用驱动板模板的值。</li>
+</ul>
+<p><b>必须有的规格</b>（母线电压、额定和峰值相电流）AI 不许假设：需求里没有，就留空、提问，页面上方会提示“缺必须有的规格”，你填上再重算。</p>
+<p>“被代码退回的数”是 AI 给了、但没通过校验的数：不在目录里、超出范围、来源不成立。这些数没有进设计。</p>
+
+<h2>三、看结论、改数、重算</h2>
+<p>上方四个数是所有判定的结论：<span class="pass">通过</span>、<span class="fail">不通过</span>、<span class="pending">待核对</span>（用到的器件数据还没人对照规格书核对，不算通过）、<span class="unknown">未知</span>（缺数据）。展开“计算书”能看到每个功能块怎么算的、仿真对照、出处。</p>
+<p>在规格表和功能块参数里改数，点“按改过的数重算”。只列 AI 可以改的参数，范围以外的数会被拒绝并说明原因。</p>
+
+<h2>四、确认并下载</h2>
+<p>勾选“我已看过标成‘AI 假设’的数”，再点“下载设计描述（YAML）”。文件里 <code>draft.provenance</code> 记着每个数的来源。板子层（摆放、铺铜）本版沿用驱动板模板，按新规格重新布局在下一期做。</p>
+
+<h2>五、次数与记录</h2>
+<p>AI 起草要登录问渠账号，每人每天有次数上限。每次调用模型都有记录：谁、需求摘要、用的模型、是否通过代码校验。美国站用 Claude，国内站用已备案的 DeepSeek。</p>
+
+<h2>English, in brief</h2>
+<p>Write a requirement; AI drafts the specification and block parameters with a source for every number (requirement quote, derived rule, AI assumption, entered by you, template default). Code checks the draft, expands the circuit and runs the calculations and simulations; required values the requirement does not give are left empty with a question, never guessed. Edit, recalculate, tick the confirmation and download the design description. This version covers one board family (three-phase motor drive). Example design, not for production.</p>
+</main>
+</body>
+</html>

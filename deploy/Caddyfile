@@ -52,6 +52,11 @@
 	handle_path /bearing/* {
 		reverse_proxy bearing:8000
 	}
+	# 问渠电子（第 105 轮）：起草台，容器 eda 自己出页面和接口；AI 起草经网关
+	redir /eda /eda/ 308
+	handle_path /eda/* {
+		reverse_proxy eda:8000
+	}
 	# 网页：美国版 site/，国内版 site/cn/（第 48 轮，按 WQ_REGION 选，见 site-handle/）
 	import site-handle/{$WQ_REGION:us}.caddy
 }

@@ -93,6 +93,14 @@ function input(meta, value, id) {
   return `<input id="${id}" type="number" step="any" min="${lo}" max="${hi}" value="${esc(v)}" placeholder="${lo}–${hi}">`;
 }
 
+// 退回项的位置写成人看得懂的名字（单元名 · 参数名 / 规格名）
+function where(r) {
+  const u = CAT.units.find(x => x.type === r.where);
+  if (u) { const p = u.params.find(x => x.key === r.key); return nm(u) + (p ? " · " + nm(p) : r.key ? " · " + r.key : ""); }
+  const s = CAT.spec.find(x => x.key === r.key);
+  return s ? nm(s) : [r.where, r.key].filter(Boolean).join(" ");
+}
+
 function render() {
   const {report, result} = state;
   $("#out").hidden = false;
@@ -107,7 +115,7 @@ function render() {
   const list = (title, items, cls) => items && items.length ? `<div class="box ${cls || ""}"><h3>${esc(title)}</h3><ul>${items.map(x => `<li>${x}</li>`).join("")}</ul></div>` : "";
   notes += list(t("questions"), (report.questions || []).map(esc));
   notes += list(t("unsupported"), (report.unsupported || []).map(esc));
-  notes += list(t("rejected"), (report.rejected || []).map(r => `${esc(r.where)} ${esc(r.key || "")} = ${esc(JSON.stringify(r.value))}：${esc(r.reason)}`), "rej");
+  notes += list(t("rejected"), (report.rejected || []).map(r => `${esc(where(r))} = ${esc(JSON.stringify(r.value))}：${esc(r.reason)}`), "rej");
   if (result && result.fails.length) {
     notes += list(t("fails"), result.fails.map(f => `${esc(f.block)} · ${esc(f.name)}：${esc(f.rule)}`), "rej");
   }
