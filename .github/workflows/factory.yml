@@ -142,7 +142,7 @@ jobs:
         with:
           path: ~/renode
           key: renode-1.15.3-linux-portable-dotnet
-      - name: 驱动板 B 版固件：重新编译、在 Renode 里跑六个场景，结果与提交的一字不差
+      - name: 驱动板 B 版固件：重新编译、在 Renode 里跑编码器与电机控制各六个场景，结果与提交的一字不差
         run: |
           if [ ! -x ~/renode/renode ]; then
             mkdir -p ~/renode && curl -sSL https://github.com/renode/renode/releases/download/v1.15.3/renode-1.15.3.linux-portable-dotnet.tar.gz | tar xz --strip-components=1 -C ~/renode
@@ -150,11 +150,12 @@ jobs:
           arm-none-eabi-gcc --version | head -1
           cd factory/designs/drv-joint-b/fw
           python3 run.py --renode ~/renode/renode
+          python3 run_motor.py --renode ~/renode/renode --no-build
           python3 pack.py
           cd "$GITHUB_WORKSPACE"
           git diff --stat --exit-code -- factory/designs/drv-joint-b/fw
           test -z "$(git status --porcelain factory/designs/drv-joint-b/fw)"
-          python3 -m pytest -q factory/designs/tests/test_drv_b_fw.py
+          python3 -m pytest -q factory/designs/tests/test_drv_b_fw.py factory/designs/tests/test_drv_b_motor.py
           test -z "$(git status --porcelain factory/designs/wq-encif/out)"
       - name: 可制造性检查（改坏能报出来）、芯片规格值
         run: python3 -m pytest -q factory/designs/tests
