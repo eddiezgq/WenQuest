@@ -17,7 +17,7 @@ L = 0.15
 WN, WP = 0.42, 0.97            # 主通路（与第 1 章反相器同尺寸）
 INV = (0.42, 0.97)             # 对比用的普通反相器
 OUTINV = (0.42, 0.97)          # 施密特后面的输出反相器
-KS = [0.25, 0.5, 1, 1.5, 2, 3, 4]   # 反馈管宽度 = k × 主通路宽度
+KS = [1, 1.5, 2, 2.5, 3, 4]        # 反馈管宽度 = k × 主通路宽度（SKY130 的 1.8 V 管有最小宽度，从 1 倍 = 0.42 μm 起）
 TARGET = 0.6                   # 回差目标（V），大于 ±0.3 V 干扰的峰峰值
 CORNERS = [("tt", 27), ("ss", 27), ("ff", 27), ("sf", 27), ("fs", 27), ("tt", -40), ("tt", 125)]
 GENERIC = """
@@ -217,7 +217,13 @@ def main():
         raise SystemExit("要 --lib（SKY130 的 sky130.lib.spice）或 --generic")
     os.makedirs(a.out, exist_ok=True)
     tmp = tempfile.mkdtemp(prefix="schmitt-")
-    sweep = [dc(a, k, "tt", 27, tmp) for k in KS]
+    sweep = []
+    for k in KS:
+        try:
+            sweep.append(dc(a, k, "tt", 27, tmp))
+        except RuntimeError as e:                  # 某一档算不出来就记为空（结果里看得到），不拖垮整次
+            print("反馈管 ×{} 没算出来：{}".format(k, str(e)[-300:]))
+            sweep.append({"k": k, "wfn": round(k * WN, 3), "wfp": round(k * WP, 3), "vt_plus": None, "vt_minus": None, "hyst": None, "inv_vm": None})
     ok = [s for s in sweep if s["hyst"] and s["hyst"] >= TARGET]
     pick = min(ok, key=lambda s: s["k"]) if ok else max(sweep, key=lambda s: s["hyst"] or 0)
     k = pick["k"]
