@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91c"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91d"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -155,8 +155,6 @@ def _intro():
 
 
 INTRO = _intro()
-# 国内版首页“视频看问渠”放这几段（顺序即显示顺序）
-CN_VIDEOS = ["overview", "factory", "cambearing", "learn", "textbook", "labs", "whiteboard", "video3d", "eval"]
 
 
 def vbtn(key, text="▶ 看视频介绍"):
@@ -164,10 +162,15 @@ def vbtn(key, text="▶ 看视频介绍"):
     return f'<button type="button" class="btn vb" data-bv="{v["bv"]}" data-title="{html.escape(v["zh"])}">{text}</button>' if v else ""
 
 
-def videos_section():
-    cards = "".join(f'<button type="button" class="vcard" data-bv="{INTRO[k]["bv"]}" data-title="{html.escape(INTRO[k]["zh"])}">'
-                    f'<span class="play">▶</span><b>{html.escape(INTRO[k]["zh"])}</b></button>' for k in CN_VIDEOS if k in INTRO)
-    return part("视频", "一两分钟，看懂每一块", "配音为 AI 合成；视频在哔哩哔哩播放。", f'<div class="vgrid">{cards}</div>', "alt") if cards else ""
+def vchips(*keys):
+    """模块卡片上的小按钮（和美国官网一样，视频放在各模块上）：一段写“▶ 视频”，几段写“▶ 视频：名称”。"""
+    ks = [k for k in keys if k in INTRO]
+    short = {"learn": "学习平台", "eval": "评价与校情", "textbook": "教材与课件", "whiteboard": "白板课", "video3d": "三维仿真视频",
+             "labs": "虚拟实验室", "factory": "数字工厂", "cambearing": "凸轮与轴承", "overview": "问渠全貌"}
+    b = "".join(f'<button type="button" class="vchip" data-bv="{INTRO[k]["bv"]}" data-title="{html.escape(INTRO[k]["zh"])}">'
+                f'▶ 视频{"：" + short.get(k, INTRO[k]["zh"]) if len(ks) > 1 else ""}</button>' for k in ks)
+    return f'<p class="vchips">{b}</p>' if b else ""
+
 
 
 def hero(eyebrow, h1, lead, crumbs=None, btns=None, video=None):
@@ -232,7 +235,7 @@ def home():
   <div class="txt"><span class="tag">旗舰二</span><h3>问渠数字工厂集成平台</h3>
   <p>CAD、CAM、CAE、MES、MRP、ERP 信息集成化平台：改一次设计，下游自动跟着变，车间只拿到批准过的版本。</p>
   {ul(["设计 → 审批 → 物料版本与 BOM → MRP → 排产与车间执行 → 数控程序 → 质量 → 厂情中枢", "接你已有的 CAD（SolidWorks、FreeCAD，或任何能导出 STEP 的软件）", "选哪几个模块就集成哪几个，也可以整套上"])}
-  <a class="more" href="/solutions/platform/">了解集成平台 →</a></div></article>"""
+  <a class="more" href="/solutions/platform/">了解集成平台 →</a>{vchips("factory")}</div></article>"""
     products = f"""<div class="cards" style="--n:3">
   <article class="card"><div class="shot"><img src="/assets/sewing-video.jpg" alt="缝纫机设计与制造软件" loading="lazy"></div>
     <span class="tag">成熟产品</span><h3 style="margin-top:12px">缝纫机设计与制造软件</h3>
@@ -241,11 +244,11 @@ def home():
   <article class="card"><div class="shot"><img src="/assets/cam-ui.jpg" alt="凸轮设计与制造软件界面" loading="lazy"></div>
     <span class="tag">成熟产品</span><h3 style="margin-top:12px">凸轮设计与制造软件</h3>
     <p>从运动要求到凸轮廓线，再到加工误差与补偿：挑线、送布等凸轮机构的运动与受力，廓线误差在高速下引起的加速度误差，磨削补偿能修掉哪些误差。</p>
-    <a class="more" href="/solutions/cam/">了解 →</a></article>
+    <a class="more" href="/solutions/cam/">了解 →</a>{vchips("cambearing")}</article>
   <article class="card"><div class="shot"><img src="/assets/bearing-ui.jpg" alt="轴承设计与制造软件界面" loading="lazy"></div>
     <span class="tag">初版</span><h3 style="margin-top:12px">轴承设计与制造软件</h3>
     <p>给轴承厂的设计校核：深沟球、角接触球轴承每个钢球的载荷、接触应力与接触椭圆，装配和温差后的工作游隙，油膜厚度和故障特征频率，导出计算书。</p>
-    <a class="more" href="/solutions/bearing/">了解 →</a></article>
+    <a class="more" href="/solutions/bearing/">了解 →</a>{vchips("cambearing")}</article>
 </div>"""
     custom = f"""<div class="split"><div><h3>你的行业，你的软件</h3>
 <p>你的行业有没有现成软件解决不了的设计、计算或工艺问题？我们按你的需求定制专用软件，缝纫机和凸轮两款软件就是这样做出来的。</p>
@@ -258,9 +261,9 @@ def home():
   <a class="card" href="/cases/#lockstitch" style="text-decoration:none"><div class="shot"><img src="/assets/case-lockstitch.jpg" alt="" loading="lazy"></div><h3>直驱平缝机</h3><p>每分钟 5000 针，主轴电机该选多大，上轴强度与共振怎么校核。</p></a>
   <a class="card" href="/cases/#thread" style="text-decoration:none"><div class="shot"><img src="/assets/case-digital-thread.jpg" alt="" loading="lazy"></div><h3>数字主线追溯</h3><p>客户一个电话，追到车间那片砂轮，再找出同样隐患的设备。</p></a>
 </div><p class="note">案例使用虚构的演示企业和数据。</p>"""
-    three = """<div class="cards">
+    three = f"""<div class="cards">
   <article class="card"><h3>技术服务</h3><p>工程仿真（有限元强度、疲劳、温度场、流体、多体动力学）、设计优化、数控编程、工业设计。</p><a class="more" href="/services/">了解 →</a></article>
-  <article class="card"><h3>教育服务</h3><p>学习系统（问渠 AI 学习平台）、电子教材开发、虚拟实验开发、数字工厂开发、CAD/CAM/CAE 集成化解决方案；学校和企业可按单位申请在线体验。</p><a class="more" href="/education/">了解 →</a></article>
+  <article class="card"><h3>教育服务</h3><p>学习系统（问渠 AI 学习平台）、电子教材开发、虚拟实验开发、数字工厂开发、CAD/CAM/CAE 集成化解决方案；学校和企业可按单位申请在线体验。</p><a class="more" href="/education/">了解 →</a>{vchips("learn")}</article>
   <article class="card"><h3>咨询</h3><p>数字化转型与智能制造诊断，ERP / MES 选型与实施规划，工业软件方案咨询。</p><a class="more" href="/consulting/">了解 →</a></article>
 </div>"""
     body = f"""<section class="hero"><canvas id="hub3d" role="img" aria-label="厂情中枢立体网络：设备、数据、事件三层"></canvas><div class="wrap">
@@ -286,7 +289,6 @@ def home():
 {part("部署", "部署怎么走", "可以只上一个模块，先解决一个问题，再逐步扩展。", steps(DEPLOY_STEPS), "dark")}
 {part("案例", "典型案例", "从需求到车间完工，每一步做了什么、得出什么数、产出了什么，都在平台里留着。", cases, "alt")}
 {part("服务", "技术服务、教育服务和咨询", None, three)}
-{videos_section()}
 {cta()}"""
     page("/", "问渠科技", "问渠科技：AI 原生的制造业软件——以质量体系为核心的 AI ERP、CAD/CAM/CAE/MES/MRP/ERP 数字工厂集成平台、缝纫机与凸轮设计软件、制造业专用软件定制，以及技术服务、教育服务和咨询。", body)
 
@@ -475,11 +477,15 @@ EDU_SERVICES = [
 ]
 
 
+EDU_VIDEOS = {"dev-lms": ["learn", "eval"], "dev-book": ["textbook", "whiteboard", "video3d"], "dev-lab": ["labs"],
+              "dev-factory": ["factory"], "dev-cax": ["cambearing"]}
+
+
 def education():
     cards = ""
     for aid, h, p, pts, link in EDU_SERVICES:
         more = f'<a class="more" href="{link}">了解 →</a>' if link else ""
-        cards += f'<article class="card" id="{aid}"><h3>{h}</h3><p>{p}</p>{ul(pts)}{more}</article>'
+        cards += f'<article class="card" id="{aid}"><h3>{h}</h3><p>{p}</p>{ul(pts)}{more}{vchips(*EDU_VIDEOS.get(aid, []))}</article>'
     dev = f'<div class="cards">{cards}</div>'
     trial = f"""<div class="split"><div>
 <h3>先在线体验，再谈合同</h3>
