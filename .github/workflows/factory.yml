@@ -168,7 +168,7 @@ jobs:
     name: 服务器演练（真 ERPNext）
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 175
     env:
       FACTORY_DIR: /tmp/fac
       LEARN_DIR: /tmp/nolearn
@@ -268,7 +268,7 @@ jobs:
             python3 factory/deploy/ci_annotate.py 演示工厂诊断 /tmp/logs/demo_diag.log 200
           fi
           exit "$st"
-      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）；电路板厂起得来、接单走通、机器人厂向它买驱动板（第 85 轮）
+      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）；电路板厂起得来、接单走通、机器人厂向它买驱动板（第 85 轮）；芯片厂起得来、接单走通（第 103 轮）
         run: |
           set +e
           val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
@@ -309,6 +309,26 @@ jobs:
               cd - >/dev/null
               [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/pcb_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/pcb_fail.log;
                                  python3 factory/deploy/ci_annotate.py 电路板厂闭环失败项 /tmp/logs/pcb_fail.log 40; }
+            fi
+          fi
+          # 第 103 轮：工业园第四座厂（芯片封测厂）起来，自己接单走通（一片晶圆一批，晶圆测试 → 封装 → 成品测试 → 编带）
+          chip=$(awk -F'\t' '$2 ~ /wenquest-chip\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
+          if [ "$st" = 0 ] && [ -n "$chip" ]; then
+            m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$chip" ] && break; m=$((m + 1)); done
+            chiphubp=$((8102 + m)); chiperpp=$((8093 + m)); cup=$(echo "$chip" | tr '[:lower:]' '[:upper:]')
+            bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$chip'" 2>&1 | tee /tmp/logs/chip_setup.log
+            st=${PIPESTATUS[0]}
+            if [ "$st" = 0 ]; then
+              for i in $(seq 1 40); do curl -fsS localhost:$chiphubp/api/health && break; sleep 5; done
+              cd factory/digital
+              python tests/plant_loop.py --hub http://localhost:$chiphubp --erp http://localhost:$chiperpp --erp-kind real \
+                --erp-key "$(val WQ_C_${cup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${cup}_ERP_API_SECRET)" --speed 600 --timeout 900 \
+                --item WQ-ENCIF:2 --reliability 0 --staffing 0 --domains --expect-products WQ-ENCIF,WQ-ENCIF-ES \
+                2>&1 | tee /tmp/logs/chip_loop.log
+              st=${PIPESTATUS[0]}
+              cd - >/dev/null
+              [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/chip_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/chip_fail.log;
+                                 python3 factory/deploy/ci_annotate.py 芯片厂闭环失败项 /tmp/logs/chip_fail.log 40; }
             fi
           fi
           if [ "$st" = 0 ]; then
