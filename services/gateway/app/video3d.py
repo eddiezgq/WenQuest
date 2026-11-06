@@ -61,7 +61,7 @@ def _span(v, dur: float) -> bool:
             and v[0] >= -3 and v[1] <= dur + 3)
 
 
-def check(text: str) -> tuple[dict | None, list[str]]:
+def check(text: str, voiced: bool = False) -> tuple[dict | None, list[str]]:
     """(场景, []) 合格；(None 或场景, [问题…]) 不合格。问题用中文写，直接交给 AI 改。"""
     errs: list[str] = []
     if len(text) > MAX_SCENE:
@@ -74,7 +74,7 @@ def check(text: str) -> tuple[dict | None, list[str]]:
         return None, ["场景文件顶层要是一个字典（name、title、duration、models……）"]
     dur = s.get("duration")
     vo = s.get("voice")                       # 配好旁白（每句有 dur）的片子才放到 150 秒；AI 只写了解说词的仍按 120 秒写
-    top = MAX_SECONDS_VOICE if isinstance(vo, list) and any(isinstance(x, dict) and "dur" in x for x in vo) else MAX_SECONDS
+    top = MAX_SECONDS_VOICE if voiced or (isinstance(vo, list) and any(isinstance(x, dict) and "dur" in x for x in vo)) else MAX_SECONDS
     if not _num(dur) or not 2 <= dur <= top:
         errs.append(f"duration 要是 2–{top} 之间的秒数")
         dur = top
@@ -652,7 +652,8 @@ SYSTEM = """你是问渠的三维仿真视频编导。用户用一句话说要�
 7. scene 字段里放完整的 YAML 文本（不要加 ``` 包裹）；reply 用中文一两句话告诉用户这段视频怎么安排的。
 8. 写解说词 voice（会用平台语音念出来）：[{t: 这一段镜头从第几秒开始, zh: 中文, en: English}]，每段镜头一句或两句口语，
    讲“现在看什么、为什么这样”，比标题、字幕多讲一层，不要照念标题原话；中文不超过 90 字。解说词里的数只能用标题、标注里已有的数
-   （1–10 的小整数除外）。旁白比镜头长时平台会自动把这一段放慢，不用为旁白留时间。改已有场景时，voice 里的 dur、seg、say 是平台写的，删掉即可。"""
+   （0–10 的整数除外）。旁白比镜头长时平台会自动把这一段放慢，不用为旁白留时间，但配好后整段不能超过 150 秒（中文每秒约 4 字）。
+   改已有场景时，voice 里平台写的 dur、seg、say 原样保留（seg 是这一段的开头，要改这句的时间就改 seg 和 t），只改 zh、en。"""
 
 
 def scene_schema() -> dict:
@@ -786,7 +787,7 @@ class Service:
                                          fake=lambda: fake_scene(samples, instruction) if not cur else {"scene": cur, "reply": "好的，已按你的意见改了。"})
                 text = re.sub(r"^```(?:yaml)?\s*|\s*```\s*$", "", str(res.get("scene") or "").strip())
                 text = VV.unpin(apply_lock(text, V.get("lock")))
-                spec, errs = check(text)
+                spec, errs = check(text, voiced=bool(V.get("stretched")))       # 配过旁白拉长的片子改片时仍按 150 秒
                 errs = errs or lock_errors(spec, V.get("lock"))
                 if not errs:
                     V = self.store.load(vid)
@@ -816,7 +817,7 @@ class Service:
 
     def set_scene(self, V: dict, text: str) -> list[str]:
         text = VV.unpin(apply_lock(text, V.get("lock")))
-        spec, errs = check(text)
+        spec, errs = check(text, voiced=bool(V.get("stretched")))
         errs = errs or lock_errors(spec, V.get("lock"))
         if errs:
             return errs
@@ -873,9 +874,9 @@ class Service:
         try:
             if not self.voice_url:
                 raise RuntimeError("这台服务器没有装语音服务")
-            spec, errs = check(self.store.scene(vid))
+            spec, errs = check(self.store.scene(vid), voiced=bool(V.get("stretched")))
             if errs or spec is None:
-                raise RuntimeError("场景没通过检查")
+                raise RuntimeError("场景没通过检查" + ("：" + errs[0] if errs else ""))
             lang = SVO.lang_of(spec)
             items, src = VV.lines(spec, lang, locked=bool(V.get("lock")))     # 第 99 轮：有解说词念解说词，没有念标题字幕
             if not items:
@@ -899,7 +900,8 @@ class Service:
             V = self.store.load(vid)
             self.store.set_scene(V, text)
             (self.store.vdir(vid) / "audio.m4a").write_bytes(audio)
-            fresh = not V.get("stretched")                          # 这个场景还没被配旁白拉长过（拉长以后再改的仍算拉长过）
+            fresh = not V.get("stretched") and not any(isinstance(x, dict) and "dur" in x for x in spec.get("voice") or [])
+            # ↑ 这个场景还没被配旁白拉长过（拉长以后再改的、第 90 轮配过的老讲解片都算拉长过）
             if fresh:                                               # 关掉旁白时退回这一版（没拉长）；从已经拉长过的场景重配的不算
                 (self.store.vdir(vid) / "scene.plain.yaml").write_text(plain, encoding="utf-8")
             V["stretched"] = True

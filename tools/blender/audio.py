@@ -54,14 +54,16 @@ tts = so.OfflineTts(so.OfflineTtsConfig(model=so.OfflineTtsModelConfig(kokoro=so
     lexicon=m + "lexicon-us-en.txt," + m + "lexicon-zh.txt"), num_threads=2),
     rule_fsts=m + "date-zh.fst," + m + "number-zh.fst," + m + "phone-zh.fst", max_num_sentences=1))
 for v in SPEC.get("voice", []):
-    a = tts.generate(speech.speakable(v.get("say", v["zh"])), sid=int(v.get("sid", 49)), speed=float(v.get("speed", 1.1)))
+    if not (v.get("say") or v.get("zh") or v.get("text")):
+        continue
+    a = tts.generate(speech.speakable(v.get("say") or v.get("zh") or v.get("text")), sid=int(v.get("sid", 49)), speed=float(v.get("speed", 1.1)))
     x = np.array(a.samples, np.float32)
     if a.sample_rate != SR:
         x = np.interp(np.arange(0, len(x), a.sample_rate / SR), np.arange(len(x)), x).astype(np.float32)
     i = int(v["t"] * SR)
     x = x[: max(0, n - i)]
     mix[i:i + len(x)] += 0.9 * x
-    print(f"{v['t']:5.1f}s  {len(x) / SR:4.1f}s  {v['zh']}")
+    print(f"{v['t']:5.1f}s  {len(x) / SR:4.1f}s  {v.get('say') or v.get('zh') or v.get('text')}")
 mix /= max(1e-6, np.abs(mix).max()) / 0.9
 wav = DIR / "_audio.wav"
 sf.write(wav, mix, SR)

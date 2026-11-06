@@ -191,3 +191,26 @@ def test_endpoints_create_default_voice_and_switch(v3c, monkeypatch):  # noqa: F
     finally:
         st.voice_url = old
         main.state.video3d = None
+
+
+def test_review_fixes_number_values_length_estimate_and_voiced_limit(tmp_path, monkeypatch):
+    s = _spec(SCRIPTED)
+    s["labels"].append({"t": [0, 12], "zh": "转速 3,000 r/min · 针距 1.5 mm", "en": "3,000 r/min · 1.5 mm"})
+    s["voice"][0]["zh"] = "主轴 3000 转每分，针距 1.50 毫米，快 2.0 倍。"      # 按数值比
+    assert VV.errors(s, 12) == []
+    s["voice"][1]["t"] = 0.2                                        # 两句挤在一起
+    assert any("隔 0.5 秒" in e for e in VV.errors(s, 12))
+    # 解说词太长：估计拉长后超过 150 秒，先让 AI 写短
+    long = _spec(SCENE)
+    long["duration"] = 40
+    long["voice"] = [{"t": i * 4, "zh": "这" * 88, "en": "x"} for i in range(10)]
+    assert any("解说词太长" in e for e in VV.errors(long, 40))
+    # 配过旁白、拉长到 120 秒以上的片子：AI 改片时把 dur 删了也照 150 秒查
+    big = _spec(SCENE)
+    big["duration"] = 130
+    big["camera"][-1]["t"] = 130
+    big["motion"][0]["angle"] = [[0, 0], [130, 360]]
+    big["effects"][0]["t"] = [2, 130]
+    big["labels"][0]["t"] = [0, 130]
+    txt = yaml.safe_dump(big, allow_unicode=True)
+    assert v3.check(txt)[1] and v3.check(txt, voiced=True)[1] == []

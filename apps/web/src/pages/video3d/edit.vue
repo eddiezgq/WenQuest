@@ -129,7 +129,7 @@ const voiceNote = computed(() => {
   if (v.value?.busy === "voice" || vo.state === "running") return t("v3.voiceRunning");
   if (vo.state === "failed") return t("v3.voiceFailed");
   if (vo.state === "done" && vo.version === v.value?.version) return t(vo.src === "script" ? "v3.voiceScript" : "v3.voiceLabels", { n: vo.n || 0 });
-  return "";
+  return t("v3.voicePending");                        // 开着但还没配（AI 没写成、或配好后场景又改了还没重配）
 });
 // 时间线：标注和旁白按时间排在一起；旁白配好以后写的是实际念的稿，没配之前是解说词原文
 const tlRows = computed(() => {
@@ -144,7 +144,12 @@ const tlRows = computed(() => {
   }
   return rows.sort((a, b) => a.at - b.at);
 });
-const toggleVoice = () => { if (!v.value || v.value.busy) return; act(() => api.v3Voice(id.value, !(v.value?.voice && v.value.voice.on))); };
+let toggling = false;
+const toggleVoice = async () => {
+  if (!v.value || v.value.busy || toggling) return;
+  toggling = true;
+  try { await act(() => api.v3Voice(id.value, !(v.value?.voice && v.value.voice.on))); } finally { toggling = false; }
+};
 const fmtSpan = (s: any) => (Array.isArray(s) ? `${(+s[0]).toFixed(1)}–${(+s[1]).toFixed(1)} s` : "");
 
 function stageText(x: any) {
