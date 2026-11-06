@@ -46,7 +46,7 @@ const failName = (f) => {
   const [cid, ck] = f.split(':'); const c = res.value?.cams?.find((x) => x.id === cid); const k = c?.checks?.find((x) => x.id === ck)
   return c && k ? `${nm(c.name)}${lang.value === 'zh' ? '：' : ': '}${lang.value === 'zh' ? k.zh : k.en}` : f
 }
-const LIM = { vib: ['允许残余振动', 'allowed residual vibration'], peak: ['电机峰值转矩', 'motor peak torque'], speed: ['电机最高转速', 'motor top speed'] }
+const LIM = { vib: ['允许残余振动', 'allowed residual vibration'], peak: ['电机允许峰值转矩', 'allowed motor peak torque'], speed: ['电机允许最高转速', 'allowed motor top speed'] }
 const limName = (k) => (LIM[k] ? LIM[k][lang.value === 'zh' ? 0 : 1] : k)
 const fmt = (v, d = 2) => (v == null || !Number.isFinite(v) ? '—' : (+v).toFixed(d))
 </script>

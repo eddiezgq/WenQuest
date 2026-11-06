@@ -9,6 +9,6 @@ clip(D + '/out', D + '/voice', 'web-04-system', async (r) => {
   await r.say('停歇段残余振动：停下来时换刀臂端部还在晃两百五十二微米。');
   await r.say('点搜索运动规律与最高转速，每种运动规律都试一遍。');
   await p.getByRole('button', { name: '搜索运动规律与最高转速' }).click(); r.cut(true); await r.wait(8000); r.cut(false);
-  await r.say('摆线和多项式规律振动更小，但弧面分度凸轮的压力角超了，只有修正正弦全部合格。');
-  await r.say('填上电机额定值和允许振动，还能算出满足它们的最高转速。');
+  await r.say('摆线和多项式规律振动更小，但弧面分度凸轮的压力角超了，只有修正正弦没有不合格。');
+  await r.say('填上电机峰值转矩、最高转速和允许振动，还能算出满足它们的最高转速。');
 });

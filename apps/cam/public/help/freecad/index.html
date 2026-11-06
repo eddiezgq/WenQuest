@@ -183,7 +183,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>软件重算校核，摘要在“报告视图”里，与网页版逐项相同。</li>
 <li>建出零件：盘形 / 槽凸轮（与网页版 STEP 同一个实体；槽凸轮要在项目里填毛坯半径和板厚，没填时只建示意件）、圆柱凸轮和滚子、弧面分度凸轮精确实体（约一分钟）、换刀臂。</li>
 <li>凸轮系统：模型树里选“凸轮系统”，改属性 Angle（凸轮轴转角），转塔和换刀臂按时序转、上下动。</li>
-<li>导出：在 Python 控制台运行一行命令（见“不开界面：控制台命令”），输出到你指定的文件夹：每个零件的 STEP、加工程序、盘形凸轮点表 CSV、每个零件一张 A3 工作图（SVG，浏览器打开可打印成 PDF；技术要求留给工程师填）。</li>
+<li>导出：在 Python 控制台运行一行命令（见“不开界面：控制台命令”），输出到你指定的文件夹：凸轮和换刀臂的 STEP 与 A3 工作图，加工程序（弧面凸轮、圆柱凸轮的四轴程序；盘形凸轮在网页版“制造”里填了刀具时出程序），盘形 / 槽凸轮的点表 CSV，示意件不导出；每张工作图（SVG，浏览器打开可打印成 PDF；技术要求留给工程师填）。</li>
 </ol>
 
 <figure class="vid"><video controls preload="none" playsinline poster="../media/fc-02-cam-system.jpg"><source src="../media/fc-02-cam-system.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/fc-02-cam-system.vtt"></video><figcaption>▶ 录像：凸轮系统装配与转动</figcaption></figure></section>
