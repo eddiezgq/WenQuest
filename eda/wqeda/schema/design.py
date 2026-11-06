@@ -15,6 +15,8 @@ import os
 
 import yaml
 
+from .. import blocks
+
 DESIGN_FORMAT = "wqeda.design/1"
 VARIANT_FORMAT = "wqeda.variant/1"
 SIDES = ("F", "B")
@@ -72,11 +74,17 @@ def validate_design(doc):
                 p.append("功能块 {} 的参数 {} 不是数".format(b.get("key"), name))
     c = doc["circuit"]
     parts = c.get("parts") or []
-    refs = [q.get("ref") for q in parts]
+    gen = []
+    if c.get("generate"):
+        try:
+            gen = all_parts(doc)[:-len(parts) or None]
+        except (ValueError, KeyError, TypeError) as e:
+            p.append("功能块展开失败：{}".format(e))
+    refs = [q.get("ref") for q in gen + parts]
     dup = sorted({r for r in refs if refs.count(r) > 1})
     if dup:
         p.append("位号重复：{}".format(", ".join(map(str, dup))))
-    for q in parts:
+    for q in gen + parts:
         p += _check_part(q, set(keys))
     nets = c.get("nets") or {}
     for name in ("nc", "power"):
@@ -145,7 +153,7 @@ def validate_variant(doc, base):
         return ["format 应为 {}".format(VARIANT_FORMAT)]
     if not isinstance(doc.get("rev"), str):
         p.append("变体缺 rev")
-    refs = {q["ref"] for q in base["circuit"]["parts"]}
+    refs = {q["ref"] for q in all_parts(base)}
     new = [q.get("ref") for q in doc.get("add_parts") or []]
     blocks = {b["key"] for b in base["blocks"]}
     for ref in doc.get("pin_changes") or {}:
@@ -191,10 +199,19 @@ def load_variant(path):
 # ------------------------------------------------------------------------------------------------- 展开
 
 
+def all_parts(doc):
+    """电路的全部手写器件：先按 circuit.generate 由功能块展开，再接手写的 circuit.parts（深拷贝，可以改）"""
+    c = doc["circuit"]
+    gen = blocks.generate(doc) if c.get("generate") else []
+    return copy.deepcopy(gen) + copy.deepcopy(c.get("parts") or [])
+
+
 def apply_variant(doc, var):
     """在底稿上打补丁，返回 (新设计描述, 改动清单 [(位号, 改了什么)])；底稿不动"""
     out = copy.deepcopy(doc)
-    parts = out["circuit"]["parts"]
+    parts = all_parts(doc)                       # 功能块先展开成器件，补丁打在展开后的器件上
+    out["circuit"]["parts"] = parts
+    out["circuit"]["generate"] = []
     by_ref = {q["ref"]: q for q in parts}
     changes = []
     if var.get("title"):
@@ -251,7 +268,7 @@ def expand(doc, var=None):
     if var is not None:
         doc, changes = apply_variant(doc, var)
     c, bd = doc["circuit"], doc["board"]
-    parts = copy.deepcopy(c["parts"])
+    parts = all_parts(doc)
     rule = c.get("ict_test_points")
     ict = ict_nets(parts, rule) if rule else []
     tps = test_point_parts(parts, rule) if rule else []
@@ -268,6 +285,8 @@ def expand(doc, var=None):
     params = {}
     for b in doc["blocks"]:
         params.update(b.get("params") or {})
+    if any(b.get("units") for b in doc["blocks"]):
+        params.update(blocks.exported_params(doc))
     nets = c.get("nets") or {}
     return {
         "name": doc["name"],

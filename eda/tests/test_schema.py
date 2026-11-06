@@ -12,6 +12,14 @@ A_PATH = os.path.join(DESIGNS, "drv-joint", "design.yaml")
 B_PATH = os.path.join(DESIGNS, "drv-joint-b", "variant.yaml")
 
 
+def flat():
+    """把功能块展开成手写器件清单（测试改坏某个器件用）"""
+    d = copy.deepcopy(design.load_design(A_PATH))
+    d["circuit"]["parts"] = design.all_parts(d)
+    d["circuit"]["generate"] = []
+    return d
+
+
 def test_drive_board_descriptions_are_valid():
     a = design.load_design(A_PATH)
     assert a["name"] == "DRV-JOINT" and len(a["blocks"]) == 7
@@ -50,13 +58,13 @@ def test_ict_test_points_cover_every_unprobed_net():
     (lambda d: d["board"].update(outline_mm=[100]), "outline_mm"),
 ])
 def test_errors_are_reported(break_it, expect):
-    d = copy.deepcopy(design.load_design(A_PATH))
+    d = flat()
     break_it(d)
     assert any(expect in p for p in design.validate_design(d))
 
 
 def test_variant_errors_are_reported():
-    base = design.load_design(A_PATH)
+    base = flat()
     var = {"format": design.VARIANT_FORMAT, "rev": "C", "pin_changes": {"U99": []},
            "add_parts": [dict(base["circuit"]["parts"][0])]}
     probs = design.validate_variant(var, base)
