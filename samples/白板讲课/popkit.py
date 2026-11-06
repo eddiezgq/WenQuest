@@ -537,3 +537,45 @@ def cute_claw(cx, cy, k, at, idp="cl", mood="happy", moves=True, open_=True):
         E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_f"], "pivot": [X(0), Y(-55)], "amp": 8, "hz": 2.0},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_f"], "amp": 6, "hz": 1.1}]
     return E
+
+
+def cute_atom(cx, cy, k, at, idp="at", mood="happy", moves=True, cold=True):
+    """铷原子“小铷” (2026-11-06): a round atom centred at (cx, cy) with a face and one tilted orbit ring carrying an electron dot.
+    cold=True fills it blue (super-cold), False red (hot). Ids: <idp>_b (body + face), <idp>_o (orbit + electron; spins).
+    "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    fill = "blue" if cold else "red"
+    E = [{"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-80), "y": Y(80), "w": 160 * k, "h": 160 * k, "c": "ink", "fill": fill}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 30 - 11), "y": Y(30), "w": 22 * k, "h": 26 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-26)},{Y(-15)} Q{X(0)},{Y(-42)} {X(26)},{Y(-15)}", "sad": f"M{X(-26)},{Y(-38)} Q{X(0)},{Y(-14)} {X(26)},{Y(-38)}",
+         "o": f"M{X(-10)},{Y(-28)} a{10 * k},{10 * k} 0 1,0 {20 * k},0 a{10 * k},{10 * k} 0 1,0 {-20 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    E.append({"t": "ellipse", "at": at, "id": idp + "_o", "x": X(-140), "y": Y(45), "w": 280 * k, "h": 90 * k, "c": "muted"})
+    E.append({"t": "ellipse", "at": at, "id": idp + "_o", "x": X(125), "y": Y(12), "w": 26 * k, "h": 26 * k, "c": "gold", "fill": "gold"})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "spin", "targets": [idp + "_o"], "pivot": [X(0), Y(0)], "rpm": 30},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b"], "amp": 6, "hz": 1.2}]
+    return E
+
+
+def cute_saucer(cx, cy, k, at, idp="sc", mood="happy", moves=True):
+    """飞碟舱“小碟” Saucy (2026-11-06): a flat disk capsule centred at (cx, cy) with a dome, a face on the rim and blinking lights.
+    Ids: <idp>_b (disk + dome + face), <idp>_l (lights; wiggle). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-70), "y": Y(95), "w": 140 * k, "h": 110 * k, "c": "ink", "fill": "paper"},
+         {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-170), "y": Y(40), "w": 340 * k, "h": 90 * k, "c": "ink", "fill": "gold"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 28 - 10), "y": Y(70), "w": 20 * k, "h": 24 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-22)},{Y(30)} Q{X(0)},{Y(8)} {X(22)},{Y(30)}", "sad": f"M{X(-22)},{Y(14)} Q{X(0)},{Y(34)} {X(22)},{Y(14)}",
+         "o": f"M{X(-9)},{Y(22)} a{9 * k},{9 * k} 0 1,0 {18 * k},0 a{9 * k},{9 * k} 0 1,0 {-18 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    for q, xx in enumerate((-120, -40, 40, 120)):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_l", "x": X(xx - 10), "y": Y(5), "w": 20 * k, "h": 20 * k, "c": "red" if q % 2 else "blue",
+                  "fill": "red" if q % 2 else "blue"})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_l"], "pivot": [X(0), Y(0)], "amp": 4, "hz": 3},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_l"], "amp": 8, "hz": 1.0}]
+    return E
