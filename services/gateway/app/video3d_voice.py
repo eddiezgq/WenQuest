@@ -202,6 +202,9 @@ def pick(vo: dict, lang: str) -> tuple[str, float, str]:
     return voice, speed, "；".join(note)
 
 
+DEFAULT_LABELS = {"zf_xiaobei": "晓贝（女）", "af_heart": "Heart（美式女声）"}
+
+
 def describe(vo: dict, voice: str, speed: float) -> str:
-    name = vo.get("label") if vo.get("name") == voice and vo.get("label") else voice
+    name = vo.get("label") if vo.get("name") == voice and vo.get("label") else DEFAULT_LABELS.get(voice, voice)
     return f"声音 {name}，{SPEEDS.get(speed, ('标准',))[0]}语速"

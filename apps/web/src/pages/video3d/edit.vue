@@ -154,8 +154,8 @@ const tlRows = computed(() => {
 const vlang = computed(() => v.value?.voice?.lang || (/^lang:\s*(\w+)/m.exec(v.value?.scene || "")?.[1] === "en" ? "en" : "zh"));
 const vpick = ref<{ voice: string; speed: number }>({ voice: "", speed: 0 });
 // 打开页面、重配好以后：显示这段视频现在用的声音、语速（没选过就是平台默认）
-watch(() => [v.value?.voice?.name, v.value?.voice?.speed, v.value?.voice?.state], () => {
-  vpick.value = { voice: v.value?.voice?.name || "", speed: v.value?.voice?.speed || 0 };
+watch([() => v.value?.voice?.name, () => v.value?.voice?.speed, () => v.value?.voice?.state], () => {   // 三个值分别比：轮询换了对象也不重置
+  vpick.value = { voice: v.value?.voice?.name || "", speed: v.value?.voice?.speed && v.value.voice.speed !== 1.1 ? v.value.voice.speed : 0 };
 }, { immediate: true });
 const pickChanged = computed(() => {
   const vo = v.value?.voice || {};
