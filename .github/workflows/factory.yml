@@ -269,7 +269,7 @@ jobs:
             python3 factory/deploy/ci_annotate.py 演示工厂诊断 /tmp/logs/demo_diag.log 200
           fi
           exit "$st"
-      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）；电路板厂起得来、接单走通、机器人厂向它买驱动板（第 85 轮）；芯片厂起得来、接单走通（第 103 轮）
+      - name: 班级工厂（第 10 轮）· 机器人厂起得来、闭环走通（第 45 轮）；电路板厂起得来、接单走通、机器人厂向它买驱动板（第 85 轮）；芯片厂起得来、接单走通（第 103 轮）；电路板厂试产 B 版、向芯片厂买 WQ-ENCIF（第 106 轮）
         run: |
           set +e
           val() { grep "^$1=" /tmp/fac/.env | cut -d= -f2; }
@@ -292,6 +292,7 @@ jobs:
           bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$id'" 2>&1 | tee /tmp/logs/class_setup.log
           st=${PIPESTATUS[0]}
           # 第 85 轮：工业园第三座厂（电路板厂）也起来：自己接单走通，再让机器人厂向它买驱动板
+          # 第 106 轮：顺序改为 电路板厂建站 → 芯片厂建站、自己接单走通 → 电路板厂接单走通（含驱动板 B 版，向芯片厂买 WQ-ENCIF）
           pcb=$(awk -F'\t' '$2 ~ /wenquest-pcb\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
           pcbhubp=""; pcberpp=""
           if [ "$st" = 0 ] && [ -n "$pcb" ]; then
@@ -299,21 +300,10 @@ jobs:
             pcbhubp=$((8102 + m)); pcberpp=$((8093 + m)); pup=$(echo "$pcb" | tr '[:lower:]' '[:upper:]')
             bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$pcb'" 2>&1 | tee /tmp/logs/pcb_setup.log
             st=${PIPESTATUS[0]}
-            if [ "$st" = 0 ]; then
-              for i in $(seq 1 40); do curl -fsS localhost:$pcbhubp/api/health && break; sleep 5; done
-              cd factory/digital
-              python tests/plant_loop.py --hub http://localhost:$pcbhubp --erp http://localhost:$pcberpp --erp-kind real \
-                --erp-key "$(val WQ_C_${pup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${pup}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-                --item DRV-JOINT:3 --item ENC-RD:2 --reliability 0 --staffing 0 --domains --expect-products DRV-JOINT,CTRL-AGV,ENC-RD \
-                2>&1 | tee /tmp/logs/pcb_loop.log
-              st=${PIPESTATUS[0]}
-              cd - >/dev/null
-              [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/pcb_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/pcb_fail.log;
-                                 python3 factory/deploy/ci_annotate.py 电路板厂闭环失败项 /tmp/logs/pcb_fail.log 40; }
-            fi
           fi
           # 第 103 轮：工业园第四座厂（芯片封测厂）起来，自己接单走通（一片晶圆一批，晶圆测试 → 封装 → 成品测试 → 编带）
           chip=$(awk -F'\t' '$2 ~ /wenquest-chip\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
+          chiphubp=""
           if [ "$st" = 0 ] && [ -n "$chip" ]; then
             m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$chip" ] && break; m=$((m + 1)); done
             chiphubp=$((8102 + m)); chiperpp=$((8093 + m)); cup=$(echo "$chip" | tr '[:lower:]' '[:upper:]')
@@ -331,6 +321,19 @@ jobs:
               [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/chip_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/chip_fail.log;
                                  python3 factory/deploy/ci_annotate.py 芯片厂闭环失败项 /tmp/logs/chip_fail.log 40; }
             fi
+          fi
+          if [ "$st" = 0 ] && [ -n "$pcbhubp" ]; then
+            for i in $(seq 1 40); do curl -fsS localhost:$pcbhubp/api/health && break; sleep 5; done
+            buyb=""; [ -z "$chiphubp" ] || buyb="--item DRV-JOINT-B:2 --park-buy IC-ENCIF=http://localhost:$chiphubp=芯片厂"     # 第 106 轮
+            cd factory/digital
+            python tests/plant_loop.py --hub http://localhost:$pcbhubp --erp http://localhost:$pcberpp --erp-kind real \
+              --erp-key "$(val WQ_C_${pup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${pup}_ERP_API_SECRET)" --speed 300 --timeout 900 \
+              --item DRV-JOINT:3 --item ENC-RD:2 $buyb --reliability 0 --staffing 0 --domains --expect-products DRV-JOINT,CTRL-AGV,ENC-RD,DRV-JOINT-B \
+              2>&1 | tee /tmp/logs/pcb_loop.log
+            st=${PIPESTATUS[0]}
+            cd - >/dev/null
+            [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/pcb_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/pcb_fail.log;
+                               python3 factory/deploy/ci_annotate.py 电路板厂闭环失败项 /tmp/logs/pcb_fail.log 40; }
           fi
           if [ "$st" = 0 ]; then
             # 第 51 轮：公共工厂的枢纽带上班级工厂的配置重启（工业园：接入的班级工厂来下单、收发货回传）
