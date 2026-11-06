@@ -25,3 +25,10 @@ classes:
     teachers: []
     plant: wenquest-pcb
     park: true             # 接入工业园：机器人厂的驱动板、AGV 控制板向这里下单
+  # 问渠数字工业园第四座厂（第 103 轮，电子 E9）：芯片封测厂，按清单起 → https://chip.factory.wenquestrobotics.com
+  - id: chip
+    name: 问渠数字工业园 · 芯片厂
+    course: ""
+    teachers: []
+    plant: wenquest-chip
+    park: true             # 接入工业园（本轮客户是示例外部客户；以后电路板厂 B 版投产时向这里买 WQ-ENCIF）

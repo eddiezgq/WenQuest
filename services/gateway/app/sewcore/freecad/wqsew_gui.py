@@ -731,7 +731,7 @@ class VideoDialog(QtW.QDialog):
         self.voices = []
         try:
             if N.settings()["key"]:
-                self.voices = N.Client().video_voices().get("voices") or []
+                self.voices = N.Client(timeout=5).video_voices().get("voices") or []    # 短超时：服务器慢也不卡住对话框
         except N.NetError:
             self.voices = []
         self.fill_voices()

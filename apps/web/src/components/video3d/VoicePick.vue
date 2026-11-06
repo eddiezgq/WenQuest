@@ -41,10 +41,13 @@ onMounted(async () => {
 
 let audio: any = null;
 function pickVoice(v: Voice) {
-  emit("update:modelValue", { voice: v.id, speed: cur.value.speed });
+  // 点的是平台默认的声音：记成“不选”（和没动过一样）
+  emit("update:modelValue", { voice: v.id === (defaults.value as any)[key.value] ? "" : v.id, speed: cur.value.speed });
   try { audio?.pause(); audio = new Audio(v.sample); audio.play(); } catch { /* 放不出声：不要紧 */ }
 }
-function pickSpeed(s: number) { emit("update:modelValue", { voice: cur.value.voice, speed: s }); }
+function pickSpeed(s: number) {
+  emit("update:modelValue", { voice: props.modelValue.voice || "", speed: s === (defaults.value.speed || 1.1) ? 0 : s });
+}
 </script>
 
 <style scoped>

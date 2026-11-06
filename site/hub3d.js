@@ -146,10 +146,23 @@
       if (!ui.chain || !chain) return;
       const L = lang();
       ui.chain.innerHTML = `<b>#${String(n).padStart(3, "0")}</b> ` + chain[L].replace(/&/g, "&amp;").replace(/</g, "&lt;");
-      if (ui.steps) {
-        ui.steps.innerHTML = chain.steps.slice(0, stepI + 1).map((s, i) => `<li class="${i === stepI ? "now" : ""}">${(L === "zh" ? s[1] : s[2]).replace(/</g, "&lt;")}</li>`).join("");
+      if (ui.steps) {   // 整条链一次排好（没走到的先淡着），高度不随步骤变，页面不跳
+        ui.steps.innerHTML = chain.steps.map((s, i) => `<li class="${i === stepI ? "now" : i > stepI ? "later" : ""}">${(L === "zh" ? s[1] : s[2]).replace(/</g, "&lt;")}</li>`).join("");
       }
     }
+    // 首屏文字区按最长的那条链留足高度：换链、换语言、手机上折行都不会把下面的内容顶上顶下（11-06 Eddie：“首页画面在抖动”）
+    function reserve() {
+      const L = lang(), box = [[ui.chain, (c) => `<b>#000</b> ` + c[L]], [ui.steps, (c) => c.steps.map((s) => `<li>${L === "zh" ? s[1] : s[2]}</li>`).join("")]];
+      for (const [el, fill] of box) {
+        if (!el) continue;
+        const keep = el.innerHTML; el.style.minHeight = "";
+        let most = 0;
+        for (const c of CHAINS) { el.innerHTML = fill(c); most = Math.max(most, el.offsetHeight); }
+        el.innerHTML = keep; el.style.minHeight = most + "px";
+      }
+    }
+    reserve(); addEventListener("resize", reserve);
+    new MutationObserver(reserve).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     new MutationObserver(showChain).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
     // ---- 交互：拖动旋转、悬停看标签 ----
     cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, yaw, pitch }; aim = null; cv.setPointerCapture(e.pointerId); });

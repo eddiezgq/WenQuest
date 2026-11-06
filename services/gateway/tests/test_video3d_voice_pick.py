@@ -46,6 +46,7 @@ def test_pick_defaults_and_fallbacks():
     v, s, note = VV.pick({"name": "am_michael", "speed": 1.3}, "zh")      # 语言不对、语速不在三档：退回默认并说明
     assert (v, s) == ("zf_xiaobei", 1.1) and "中文声音" in note and "三档" in note
     assert VV.describe({"name": "zm_yunjian", "label": "云健（男）"}, "zm_yunjian", 1.25) == "声音 云健（男），快语速"
+    assert VV.describe({}, "zf_xiaobei", 1.1) == "声音 晓贝（女），标准语速"
 
 
 def test_revoice_uses_the_videos_voice_and_speed_and_keeps_them(tmp_path, monkeypatch):
@@ -104,6 +105,8 @@ def test_endpoints_voices_and_switch_with_choice(v3c, monkeypatch):  # noqa: F81
         settle(v3c, t, r["id"], lambda d: not d["busy"], n=200)
         assert v3c.post(f"/api/v1/video3d/{r['id']}/voice", json={"on": True, "voice": "zz_no"}, headers=t).status_code == 400
         assert v3c.post(f"/api/v1/video3d/{r['id']}/voice", json={"on": True, "speed": 1.3}, headers=t).status_code == 400
+        bad = v3c.post(f"/api/v1/video3d/{r['id']}/voice", json={"on": True, "voice": "am_michael"}, headers=t)
+        assert bad.status_code == 400 and "中文声音" in bad.text                  # 中文视频选英文声音
         n0 = len(log)
         assert v3c.post(f"/api/v1/video3d/{r['id']}/voice", json={"on": True, "voice": "zm_yunjian", "speed": 1.0}, headers=t).status_code == 200
         d = settle(v3c, t, r["id"], lambda d: not d["busy"], n=200)
@@ -140,3 +143,19 @@ def test_sewing_video_carries_the_choice(v3c, monkeypatch):  # noqa: F811
     finally:
         st.voice_url = old
         main.state.video3d = None
+
+
+def test_voice_service_down_keeps_the_cached_list(monkeypatch):
+    class S:
+        voice_url = "http://voice.test"
+
+    async def down(url):
+        raise VS.VoiceError("down", "service")
+    asyncio.run(video3d_api.voice_list(S()))                     # 取到列表
+    video3d_api.VOICE_LIST["at"] = 0.0                           # 过期
+    monkeypatch.setattr(VS, "voices", down)
+    assert len(asyncio.run(video3d_api.voice_list(S()))) == 4    # 连不上：用旧的
+    video3d_api.VOICE_LIST.update(at=0.0, voices=[])             # 没有旧列表：认得出语言的先记下
+    assert asyncio.run(video3d_api.check_voice(S(), "zm_yunjian", None))[0] == "zm_yunjian"
+    with pytest.raises(Exception):
+        asyncio.run(video3d_api.check_voice(S(), "xx_none", None))

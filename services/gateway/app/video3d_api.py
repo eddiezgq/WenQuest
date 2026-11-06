@@ -44,7 +44,7 @@ async def voice_list(svc) -> list[dict]:
         try:
             VOICE_LIST["voices"], VOICE_LIST["at"] = await VS.voices(svc.voice_url), time.time()
         except VS.VoiceError:
-            return []
+            VOICE_LIST["at"] = time.time() - 3600 + 60          # 连不上：一分钟内不再试；有旧列表就用旧的
     return VOICE_LIST["voices"] if svc.voice_url else []
 
 
@@ -53,10 +53,13 @@ async def check_voice(svc, voice: str | None, speed: float | None) -> tuple[str 
     from . import video3d_voice as VV
     label = ""
     if voice:
-        v = next((x for x in await voice_list(svc) if x["id"] == voice), None)
-        if not v:
+        vs = await voice_list(svc)
+        v = next((x for x in vs if x["id"] == voice), None)
+        if not v and vs:
             raise EngineError("bad_voice", f"没有这个声音：{voice}", 400)
-        label = v.get("zh") or voice
+        if not v and not VV.voice_lang(voice):                 # 语音服务暂时连不上：认得出语言的先记下，配音时再说
+            raise EngineError("bad_voice", f"没有这个声音：{voice}", 400)
+        label = (v or {}).get("zh") or voice
     if speed is not None and float(speed) not in VV.SPEEDS:
         raise EngineError("bad_speed", "语速只有慢 1.0、标准 1.1、快 1.25 三档", 400)
     return voice or None, (float(speed) if speed is not None else None), label
@@ -305,6 +308,12 @@ def register(app, m) -> None:
         V = load(vid, sess, a)
         not_busy(V)
         voice, speed, label = await check_voice(service(m), body.voice, body.speed) if body.on else (None, None, "")
+        if voice:                                               # 声音的语言要和视频对上（英文视频选英文声音）
+            import re as _re
+            from . import video3d_voice as VV
+            want = (V.get("voice") or {}).get("lang") or ("en" if _re.search(r"^lang:\s*en\b", service(m).store.scene(vid), _re.M) else "zh")
+            if VV.voice_lang(voice) != ("en" if want == "en" else "zh"):
+                raise EngineError("bad_voice", "这段视频念" + ("英文，要选英文声音" if want == "en" else "中文，要选中文声音"), 400)
         try:
             V = service(m).set_voice(V, body.on, voice, speed, label)
         except RuntimeError as e:

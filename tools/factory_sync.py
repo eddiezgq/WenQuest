@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""比对两边数字工厂的共有代码（第 30 轮 H-9）：本仓库 factory/ 与 freecad-ai-parts 的 factory/。
+"""比对两边数字工厂的共有代码（第 30 轮 H-9）：本仓库 factory/ 与 freecad-ai-parts 的 factory/；
+第 102 轮起还比对仓库根下的 eda/（问渠电子：factory/designs 的设计脚本要用它），报告里这部分的路径以 “eda/” 开头（相对仓库根）。
 
 哪些路径只在一边、哪些两边各自实现，写在 factory/SYNC.md 的 sync-a-only、sync-b-only、sync-own 代码块里；
 其余都是共有，应当逐字一致。报告：共有文件内容不同、只在这边、只在那边。有差异退出码 1，没有 0。
@@ -49,15 +50,17 @@ def matches(path, pats):
     return False
 
 
-def list_files(repo):
-    """repo/factory 下的文件（相对 factory/）。是 git 仓库时：入了 git 的 + 没被 .gitignore 挡住的新文件，减去已删的。"""
-    base = os.path.join(repo, "factory")
+def list_files(repo, sub="factory"):
+    """repo/<sub> 下的文件（相对 <sub>/）。是 git 仓库时：入了 git 的 + 没被 .gitignore 挡住的新文件，减去已删的。"""
+    base = os.path.join(repo, sub)
     if not os.path.isdir(base):
+        if sub != "factory":
+            return set()
         sys.exit("找不到 {}".format(base))
     try:
-        out = subprocess.run(["git", "-C", repo, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", "factory"],
+        out = subprocess.run(["git", "-C", repo, "ls-files", "-z", "--cached", "--others", "--exclude-standard", "--", sub],
                              capture_output=True, check=True).stdout.decode("utf-8")
-        files = {f[len("factory/"):] for f in out.split("\0") if f}
+        files = {f[len(sub) + 1:] for f in out.split("\0") if f}
         files = {f for f in files if os.path.isfile(os.path.join(base, f))}        # 已删、还没提交的不算
     except (OSError, subprocess.CalledProcessError):
         files = set()
@@ -97,8 +100,15 @@ def main(argv=None):
     base_a, base_b = os.path.join(A_ROOT, "factory"), os.path.join(os.path.abspath(a.other), "factory")
     differ = sorted(f for f in fa & fb if not same(os.path.join(base_a, f), os.path.join(base_b, f)))
     only_a, only_b = sorted(fa - fb), sorted(fb - fa)
+    # 第 102 轮：仓库根下的 eda/（问渠电子）整个共有；路径写成 “eda/…”，base_a、base_b 的上一级拼起来就是文件
+    ea, eb = list_files(A_ROOT, "eda"), list_files(os.path.abspath(a.other), "eda")
+    root_a, root_b = A_ROOT, os.path.abspath(a.other)
+    differ += sorted("eda/" + f for f in ea & eb if not same(os.path.join(root_a, "eda", f), os.path.join(root_b, "eda", f)))
+    only_a += sorted("eda/" + f for f in ea - eb)
+    only_b += sorted("eda/" + f for f in eb - ea)
+    n_common = len(fa & fb) + len(ea & eb)
 
-    print("比对：{} ↔ {}（共有 {} 个文件；不比对的清单见 factory/SYNC.md）".format(base_a, base_b, len(fa & fb)))
+    print("比对：{} ↔ {}（另加仓库根下的 eda/；共有 {} 个文件；不比对的清单见 factory/SYNC.md）".format(base_a, base_b, n_common))
     for title, rows in (("共有文件内容不同", differ), ("只在这边（问渠）", only_a), ("只在那边（freecad-ai-parts）", only_b)):
         print("\n{}：{} 个".format(title, len(rows)))
         for r in rows:
@@ -108,7 +118,10 @@ def main(argv=None):
         for f in differ:
             if f in want:
                 print("\n==== " + f)
-                show_diff(os.path.join(base_a, f), os.path.join(base_b, f), f)
+                if f.startswith("eda/"):
+                    show_diff(os.path.join(root_a, f), os.path.join(root_b, f), f)
+                else:
+                    show_diff(os.path.join(base_a, f), os.path.join(base_b, f), f)
     n = len(differ) + len(only_a) + len(only_b)
     print("\n" + ("两边共有部分一致（0 差异）" if not n else "共 {} 处差异".format(n)))
     return 1 if n else 0
