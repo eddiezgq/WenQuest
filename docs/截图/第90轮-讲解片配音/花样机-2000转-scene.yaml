@@ -1,0 +1,455 @@
+# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮），配了旁白（第 90 轮：旁白长的段已放慢拉长）。
+name: 电子花样机讲解
+title:
+  zh: 电子花样机怎么走完一个花样
+  en: How this pattern sewing machine runs a design
+duration: 70.91
+floor: false
+clip: 0.002
+models:
+- id: d
+  use: gen:sewdesign
+  machine: pattern
+  params:
+    n: 2000
+    n_head: 2800
+    pat: flap
+    s: 3.0
+    t: 1.5
+    law: c4
+    mg: 5
+    dn: 300
+    nslow: 400
+    mx: 3.0
+    ax: 50
+    rx: 10
+    TxR: 1.27
+    TxP: 3.8
+    Jx: 0.3
+    my: 6.0
+    ay: 40
+    ry: 10
+    TyR: 2.39
+    TyP: 7.16
+    Jy: 1.0
+    v: 1.0
+    Nmot: 3000
+    mu: 0.05
+    EA: 250
+    L1: 0.3
+    L2: 0.5
+    nyb: 2
+    stx: 250
+    sty: 160
+    t_extra: 1.5
+    t_load: 9
+    _track: eNrFVdtu2zAM/RVDTxvACKLuzkfsZY9JMTix3QRbkyB2lm5F/32k7CRysa4bNmAPZnQk8ZCHUqgnsRNzW4L4MPy0KOaoUAYaajHXLkoD4uFezJ1UIHafuqanaaUS2DRVTSgqxYtd/8ge4/gbEfk0XvGmxZP43NCc6A5NUwveUfUNYV4F8X1Dw+UprlYN2wrJtn69PJUK2+XJNmq1PPmowvLkcO1p3sZIe+q6ZhsUzbclr64iebWtiuylLfMEm8a8s42GeNDr5Sn4mOaVuuwhr5Jyaagk4mNf7erqWBddv+3Xm6Ld9l3Rb5rivN3V+3NR9UXddNv7XZEEFe+6L/tzcyyqx233XjzfgdjWVI6FAgQNBiw48BAgQglIkwioAQ2gBXSAHjAARsAStAJNPhq0AW1BO9AedAAdQZdgFBgEQ5QGjAXjwHgwAUwEU4JVYBGsBksRLVgH1oMNYCMldOg7SmgxM3wqmswdjABDBl5fQZsDzEDMxi7nysaz3GGWU83CZNsYX5fSe4JaujLhOOCRX5NTIMg/CbvkzJsSZDfC5QUn7os28qLC36CVVNobREn1u8IoXbghJwPekJbRX1EeYrIw8ZnQTUNN85gmORHwQt1U+4vKTOv2oqqTkueHkZ9SfnzZsWannV2C/HLktya/Trd7RteyO9CttNRQLl+gD7nDoGHj2UT/C5Pa0X81P03NXyWoUdWokESvK1bNnfMNbW8qpyahAvUITX9/ar4EDXeQBJFaxd+bRJVIE32CKSQH/+OcSfzDV26MknuV9IMJmp4cVEZSdzROUnf0nl4eLM1vWWRqSa104HFWusQQLjMRefXf2oF5iDJEHGOlTIasXst5UDcoTaqT67UeVKTz/tjRU2v4Ua6OYq6efwDgiLGc
+motion:
+- drive: weblab
+  model: d
+  angle:
+  - - 0.0
+    - 0
+  - - 10.995
+    - 720.0
+  - - 10.995
+    - 1080
+  - - 22.282
+    - 1440
+  - - 34.524
+    - 2160
+  - - 42.907
+    - 13913.3
+  - - 59.534
+    - 14176.7
+  - - 61.314
+    - 17639.0
+  - - 70.911
+    - 17639.0
+camera:
+- t: 0.0
+  look:
+  - 0.124
+  - -0.0425
+  - -0.091
+  az: -40
+  el: 20
+  dist: 2.804
+  lens: 40
+- t: 10.079
+  look:
+  - 0.124
+  - -0.0425
+  - -0.091
+  az: -22
+  el: 16
+  dist: 2.579
+  lens: 40
+- t: 11.998
+  look:
+  - 0.0
+  - 0.0
+  - 0.01
+  az: -50
+  el: 16
+  dist: 0.42
+  lens: 40
+- t: 21.028
+  look:
+  - 0.0
+  - 0.0
+  - 0.01
+  az: -32
+  el: 12
+  dist: 0.42
+  lens: 40
+- t: 23.506
+  look:
+  - -0.005
+  - -0.1025
+  - 0.018
+  az: -30
+  el: 30
+  dist: 1.74
+  lens: 40
+- t: 32.994
+  look:
+  - -0.005
+  - -0.1025
+  - 0.018
+  az: -15
+  el: 26
+  dist: 1.632
+  lens: 40
+- t: 36.116
+  look:
+  - 0.0
+  - 0.0
+  - 0.0
+  az: -20
+  el: 58
+  dist: 0.39
+  lens: 40
+- t: 44.807
+  look:
+  - 0.0
+  - 0.0
+  - 0.0
+  az: -48
+  el: 22
+  dist: 0.45
+  lens: 40
+- t: 58.346
+  look:
+  - 0.0
+  - 0.0
+  - 0.0
+  az: -30
+  el: 18
+  dist: 0.45
+  lens: 40
+- t: 60.134
+  look:
+  - 0.0
+  - 0.0
+  - 0.0
+  az: -20
+  el: 58
+  dist: 0.39
+  lens: 40
+- t: 63.713
+  look:
+  - 0.124
+  - -0.0425
+  - -0.091
+  az: -30
+  el: 20
+  dist: 2.804
+  lens: 40
+- t: 70.911
+  look:
+  - 0.124
+  - -0.0425
+  - -0.091
+  az: -45
+  el: 22
+  dist: 2.804
+  lens: 40
+effects:
+- kind: xray
+  t:
+  - 11.622
+  - 21.655
+  top:
+  - d.needle
+  - d.tpl
+  - d.stitch
+- kind: xray
+  t:
+  - 23.047
+  - 33.759
+  top:
+  - d.x
+  - d.y
+- kind: xray
+  t:
+  - 35.32
+  - 42.907
+  top:
+  - d.tpl
+  - d.stitch
+- kind: xray
+  t:
+  - 44.095
+  - 59.534
+  top:
+  - d.needle
+  - d.tpl
+  - d.stitch
+- kind: xray
+  t:
+  - 59.834
+  - 61.314
+  top:
+  - d.tpl
+  - d.stitch
+labels:
+- t:
+  - 0.0
+  - 10.995
+  zh: 这台电子花样机：花样 49 针，设计 2000 r/min
+  en: 'This pattern sewing machine: 49 stitches, 2000 r/min'
+- t:
+  - 0.0
+  - 10.995
+  zh: 运动、针迹、趟次按你的设计算；机构尺寸为示意
+  en: Motion, stitches and passes follow your design; mechanism sizes are illustrative
+  where: bottom
+- t:
+  - 10.995
+  - 22.282
+  zh: ① 刺布：针在布中模板不动，离布窗口里移到下一针
+  en: '① Needle: the template stands still while the needle is in'
+- t:
+  - 10.995
+  - 22.282
+  zh: 入布角 / 出布角 101.7 / 258.3 °
+  en: Needle enters / leaves 101.7 / 258.3 ° · Out-of-fabric window (geometric / usable) 203.3 / 193.3 °
+  where: bottom
+- t:
+  - 22.282
+  - 34.524
+  zh: ② X、Y 两轴：横梁带 X 轴前后走，滑座带压框左右走
+  en: '② X and Y axes: the beam carries X, the slide carries the clamp'
+- t:
+  - 22.282
+  - 34.524
+  zh: X 轴峰值 / 均方根转矩 1.66 / 1.22 N·m
+  en: X-axis peak / RMS torque 1.66 / 1.22 N·m · Y-axis peak / RMS torque 2.83 / 2.07 N·m
+  where: bottom
+- t:
+  - 34.524
+  - 42.907
+  zh: ③ 走一遍花样（快放）
+  en: ③ The whole pattern (fast)
+- t:
+  - 34.524
+  - 42.907
+  zh: 花样针数 / 大小 49 / 60 × 40 mm
+  en: Stitches / size 49 / 60 × 40 mm · Sewing time / average speed 2.16 s / 1333 r/min
+  where: bottom
+- t:
+  - 42.907
+  - 59.534
+  zh: ⚠ 不合格：设计转速下标准针距走得完（两轴中较慢的一轴）
+  en: ⚠ Standard stitch fits the window at design speed (slower axis) fails
+  tone: bad
+- t:
+  - 42.907
+  - 59.534
+  zh: 2000 r/min；上限 X 2080、Y 1860 · 判据 ≤ 1860 r/min
+  en: 2000 r/min; limits X 2080, Y 1860 · criterion ≤ 1860 r/min
+  where: bottom
+- t:
+  - 59.534
+  - 61.314
+  zh: ③ 走一遍花样（快放）
+  en: ③ The whole pattern (fast)
+- t:
+  - 59.534
+  - 61.314
+  zh: 花样针数 / 大小 49 / 60 × 40 mm
+  en: Stitches / size 49 / 60 × 40 mm · Sewing time / average speed 2.16 s / 1333 r/min
+  where: bottom
+- t:
+  - 61.314
+  - 70.911
+  zh: 14 项校核：不合格 1 项，注意 0 项
+  en: '14 checks: 1 fail, 0 need attention'
+- t:
+  - 61.314
+  - 70.911
+  zh: 问渠缝纫机设计软件 · 计算书、调机卡同一组参数
+  en: WenQuest sewing design software · same parameters as report, setup card
+  where: bottom
+stills:
+- 5.5
+- 16.64
+- 28.4
+- 40.39
+- 51.22
+- 66.11
+panel:
+  kind: readouts
+  head: 读数
+  items:
+  - zh: 针号
+    en: ''
+    key: idx
+    fmt: '{:5.0f}'
+    unit: ' / 49'
+  - zh: 这一针转速
+    en: ''
+    key: sp
+    fmt: '{:5.0f}'
+    unit: ' r/min'
+  - zh: 这一针上限
+    en: ''
+    key: cap
+    fmt: '{:5.0f}'
+    unit: ' r/min'
+  - zh: 针尖离针板
+    en: ''
+    key: needle
+    fmt: '{:+6.1f}'
+    unit: ' mm'
+    scale: 20
+  plot:
+    key: sp
+    zh: 每针转速（红：上限）
+    en: ''
+    series:
+    - 400
+    - 400
+    - 400
+    - 700
+    - 1000
+    - 1300
+    - 1600
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 2000
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1600
+    - 1300
+    - 1000
+    - 700
+    - 400
+    - 400
+    ref:
+    - 2800
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 2003
+    - 2075
+    - 2239
+    - 2503
+    - 2320
+    - 2239
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2131
+    - 2239
+    - 2320
+    - 2503
+    - 2239
+    - 2075
+    - 2003
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    - 1860
+    cursor: frac
+    foot: （横轴：针号）
+    marks:
+    - at: 0.8125
+      zh: 最紧
+lang: zh
+voice:
+- t: 0.35
+  dur: 10.2
+  text: 这台电子花样机：花样 四十九 针，设计 两千 转每分。运动、针迹、趟次按你的设计算；机构尺寸为示意。
+- t: 11.34
+  dur: 10.49
+  text: 第一段，刺布：针在布中模板不动，离布窗口里移到下一针。入布角和出布角 一百零一点七和两百五十八点三度。
+- t: 22.63
+  dur: 11.44
+  text: 第二段，X、Y 两轴：横梁带 X 轴前后走，滑座带压框左右走。X 轴峰值和均方根转矩 一点六六和一点二二 牛米。
+- t: 34.87
+  dur: 7.58
+  text: 第三段，走一遍花样（快放）。花样针数和大小 四十九和六十 乘 四十毫米。
+- t: 43.26
+  dur: 15.83
+  text: 不合格：设计转速下标准针距走得完（两轴中较慢的一轴）。两千 转每分；上限 X 两千零八十、Y 一千八百六十，判据 不超过 一千八百六十 转每分。
+- t: 61.66
+  dur: 8.8
+  text: 十四 项校核：不合格 一 项，注意 零 项。问渠缝纫机设计软件，计算书、调机卡同一组参数。

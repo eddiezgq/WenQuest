@@ -1,0 +1,456 @@
+# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮），配了旁白（第 90 轮：旁白长的段已放慢拉长）。
+name: 平缝机讲解
+title:
+  zh: 平缝机的机构怎么动
+  en: How this lockstitch machine works
+duration: 96.9
+floor: false
+clip: 0.002
+models:
+- id: d
+  use: gen:sewdesign
+  machine: lockstitch
+  params:
+    n: 6000
+    s: 3.0
+    fab: cotton
+    th: t24
+    r: 15.5
+    l: 55.0
+    mr: 0.12
+    F_lim: 800
+    lk_r: 20.7
+    lk_a: 43.4
+    lk_b: 40.9
+    lk_c: 65.7
+    lk_al: 2.8
+    lk_d: -6.8
+    u: 0
+    stroke: 10
+    psi: 0
+    dz: 0
+    g: 0.08
+    d: 0.9
+    h: 0.8
+    dT: 0
+    dP: 0
+    P: 1.0
+    mode: drop
+    Td: 100
+    Tb: 40
+    k: 0.3
+    fn: 190
+    zeta: 0.03
+    T_sew: 0.2
+    mat: 45-QT
+motion:
+- drive: weblab
+  model: d
+  angle:
+  - - 0.0
+    - 0
+  - - 11.777
+    - 720.0
+  - - 23.607
+    - 1080.0
+  - - 34.995
+    - 1440.0
+  - - 46.152
+    - 1800.0
+  - - 58.316
+    - 2160.0
+  - - 59.446
+    - 2660.0
+  - - 65.093
+    - 2740.0
+  - - 66.223
+    - 2740.0
+  - - 78.568
+    - 3100.0
+  - - 87.059
+    - 3460.0
+  - - 96.897
+    - 4180.0
+camera:
+- t: 0.0
+  look:
+  - 0.019
+  - -0.068
+  - -0.1259
+  az: -40
+  el: 18
+  dist: 0.985
+  lens: 40
+- t: 10.796
+  look:
+  - 0.019
+  - -0.068
+  - -0.1259
+  az: -20
+  el: 14
+  dist: 0.906
+  lens: 40
+- t: 13.256
+  look:
+  - 0.0
+  - 0.012
+  - -0.1102
+  az: -35
+  el: 12
+  dist: 0.822
+  lens: 40
+- t: 22.128
+  look:
+  - 0.0
+  - 0.012
+  - -0.1102
+  az: -20
+  el: 10
+  dist: 0.822
+  lens: 40
+- t: 25.03
+  look:
+  - 0.0282
+  - -0.004
+  - -0.0207
+  az: -35
+  el: 12
+  dist: 0.466
+  lens: 40
+- t: 33.572
+  look:
+  - 0.0282
+  - -0.004
+  - -0.0207
+  az: -20
+  el: 10
+  dist: 0.466
+  lens: 40
+- t: 36.39
+  look:
+  - 0.0
+  - -0.01
+  - -0.2239
+  az: -35
+  el: 12
+  dist: 0.18
+  lens: 40
+- t: 44.757
+  look:
+  - 0.0
+  - -0.01
+  - -0.2239
+  az: -20
+  el: 10
+  dist: 0.18
+  lens: 40
+- t: 47.672
+  look:
+  - 0.0
+  - -0.024
+  - -0.2266
+  az: -35
+  el: 12
+  dist: 0.494
+  lens: 40
+- t: 56.795
+  look:
+  - 0.0
+  - -0.024
+  - -0.2266
+  az: -20
+  el: 10
+  dist: 0.494
+  lens: 40
+- t: 59.446
+  look:
+  - 0.0
+  - 0.012
+  - -0.1102
+  az: -50
+  el: 15
+  dist: 0.822
+  lens: 40
+- t: 65.093
+  look:
+  - 0.0
+  - 0.012
+  - -0.1102
+  az: -30
+  el: 12
+  dist: 0.822
+  lens: 40
+- t: 67.987
+  look:
+  - 0.0282
+  - -0.0713
+  - -0.1253
+  az: -50
+  el: 15
+  dist: 1.162
+  lens: 40
+- t: 76.804
+  look:
+  - 0.0282
+  - -0.0713
+  - -0.1253
+  az: -30
+  el: 12
+  dist: 1.162
+  lens: 40
+- t: 79.781
+  look:
+  - 0.0282
+  - -0.0713
+  - -0.1253
+  az: -50
+  el: 15
+  dist: 1.162
+  lens: 40
+- t: 85.846
+  look:
+  - 0.0282
+  - -0.0713
+  - -0.1253
+  az: -30
+  el: 12
+  dist: 1.162
+  lens: 40
+- t: 89.519
+  look:
+  - 0.019
+  - -0.068
+  - -0.1259
+  az: -30
+  el: 18
+  dist: 0.985
+  lens: 40
+- t: 96.897
+  look:
+  - 0.019
+  - -0.068
+  - -0.1259
+  az: -45
+  el: 20
+  dist: 0.985
+  lens: 40
+effects:
+- kind: xray
+  t:
+  - 12.516
+  - 22.868
+  top:
+  - d.needle
+- kind: xray
+  t:
+  - 24.319
+  - 34.283
+  top:
+  - d.takeup
+- kind: xray
+  t:
+  - 35.692
+  - 45.455
+  top:
+  - d.hook
+- kind: xray
+  t:
+  - 46.912
+  - 57.556
+  top:
+  - d.feed
+  - d.frame
+- kind: xray
+  t:
+  - 58.881
+  - 65.658
+  top:
+  - d.needle
+- kind: xray
+  t:
+  - 67.105
+  - 77.686
+  top:
+  - d.needle
+  - d.takeup
+  - d.hook
+  - d.feed
+  - d.drive
+- kind: xray
+  t:
+  - 79.174
+  - 86.453
+  top:
+  - d.needle
+  - d.takeup
+  - d.hook
+  - d.feed
+  - d.drive
+labels:
+- t:
+  - 0.0
+  - 11.777
+  zh: 这台平缝机：6000 r/min，零件尺寸按你的设计
+  en: 'This lockstitch machine: 6000 r/min, parts at your design dimensions'
+- t:
+  - 0.0
+  - 11.777
+  where: bottom
+  zh: 机构零件、尺寸和运动都由设计软件的计算核心给出
+  en: Parts, dimensions and motion come from the design software's computation core
+- t:
+  - 11.777
+  - 23.607
+  zh: ① 刺布机构（曲柄滑块）
+  en: ① Needle bar (slider-crank)
+- t:
+  - 11.777
+  - 23.607
+  where: bottom
+  zh: 下止点惯性力 941 N · 连杆比 0.282 · 曲柄 15.5 mm
+  en: Inertia force at BDC 941 N · rod ratio 0.282 · crank 15.5 mm · rod 55 mm
+- t:
+  - 23.607
+  - 34.995
+  zh: ② 挑线机构（四杆）
+  en: ② Take-up (four-bar)
+- t:
+  - 23.607
+  - 34.995
+  where: bottom
+  zh: 挑线余量（最小）1.9 mm（296°） · 传动角 41°–115°
+  en: Take-up margin (min.) 1.9 mm (296°) · transmission angle 41°–115°
+- t:
+  - 34.995
+  - 46.152
+  zh: ③ 钩线：旋梭（转速是主轴的 2 倍）
+  en: '③ Hook: rotary hook at twice shaft speed'
+- t:
+  - 34.995
+  - 46.152
+  where: bottom
+  zh: 钩线时机针回升 2.00 mm（206.1°） · 旋梭定时 0°
+  en: Needle rise at pickup 2.00 mm (206.1°) · hook timing 0°
+- t:
+  - 46.152
+  - 58.316
+  zh: ④ 送布：抬牙和送布偏心轮带送布牙
+  en: '④ Feed: lift and feed eccentrics drive the feed dog'
+- t:
+  - 46.152
+  - 58.316
+  where: bottom
+  zh: 实际针距 100% · 针距 3 mm · 送布牙高出针板 0.8 mm
+  en: Actual / set stitch 100% · stitch 3 mm · feed dog 0.8 mm above the plate
+- t:
+  - 58.316
+  - 66.223
+  tone: bad
+  zh: ⚠ 不合格：针杆下止点惯性力
+  en: ⚠ Needle-bar inertia force at BDC fails
+- t:
+  - 58.316
+  - 66.223
+  where: bottom
+  zh: 941 N · 判据 ≤ 800 N
+  en: 941 N · criterion ≤ 800 N
+- t:
+  - 66.223
+  - 78.568
+  tone: bad
+  zh: ⚠ 不合格：二阶激振频率 / 机壳固有频率
+  en: ⚠ 2nd-order excitation / frame natural frequency fails
+- t:
+  - 66.223
+  - 78.568
+  where: bottom
+  zh: 1.053（共振转速 5700 r/min） · 判据 ≤ 0.90
+  en: 1.053 (resonance at 5700 r/min) · criterion ≤ 0.90
+- t:
+  - 78.568
+  - 87.059
+  tone: warn
+  zh: ⚠ 注意：整机惯性力（最大合力）
+  en: ⚠ Machine inertia force (peak) check
+- t:
+  - 78.568
+  - 87.059
+  where: bottom
+  zh: 621 N · 判据 ≤ 550 N
+  en: 621 N · criterion ≤ 550 N
+- t:
+  - 87.059
+  - 96.897
+  zh: 21 项校核：不合格 2 项，注意 1 项
+  en: '21 checks: 2 fail, 1 need attention'
+- t:
+  - 87.059
+  - 96.897
+  where: bottom
+  zh: 问渠缝纫机设计软件 · 计算书、STEP、调机卡同一组参数
+  en: WenQuest sewing design software · same parameters as report, STEP, setup card
+stills:
+- 5.89
+- 17.69
+- 62.27
+- 72.39
+- 82.81
+- 91.98
+panel:
+  kind: readouts
+  head: 读数
+  items:
+  - zh: 主轴转角
+    en: ''
+    key: phi
+    fmt: '{:5.0f}'
+    unit: °
+  - zh: 针尖高出针板
+    en: ''
+    key: needle
+    fmt: '{:+6.1f}'
+    unit: ' mm'
+    scale: 25
+  - zh: 旋梭转角
+    en: ''
+    key: hookdeg
+    fmt: '{:5.0f}'
+    unit: °
+  plot:
+    key: needle
+    zh: 针尖高度
+    en: ''
+    marks:
+    - phi: 180
+      zh: 最低点
+    - phi: 206
+      zh: 钩线
+lang: zh
+voice:
+- t: 0.35
+  dur: 10.98
+  text: 这台平缝机：六千 转每分，零件尺寸按你的设计。机构零件、尺寸和运动都由设计软件的计算核心给出。
+- t: 12.13
+  dur: 11.03
+  text: 第一段，刺布机构（曲柄滑块）。下止点惯性力 九百四十一牛，连杆比 零点二八二，曲柄 十五点五毫米。
+- t: 23.96
+  dur: 10.59
+  text: 第二段，挑线机构（四杆）。挑线余量（最小）一点九毫米（两百九十六度），传动角 四十一度到一百一十五度。
+- t: 35.34
+  dur: 10.36
+  text: 第三段，钩线：旋梭（转速是主轴的 二 倍）。钩线时机针回升 二点零零毫米（两百零六点一度），旋梭定时 零度。
+- t: 46.5
+  dur: 11.36
+  text: 第四段，送布：抬牙和送布偏心轮带送布牙。实际针距 百分之一百，针距 三毫米，送布牙高出针板 零点八毫米。
+- t: 58.67
+  dur: 7.11
+  text: 不合格：针杆下止点惯性力。九百四十一牛，判据 不超过 八百牛。
+- t: 66.57
+  dur: 11.54
+  text: 不合格：二阶激振频率和机壳固有频率。一点零五三（共振转速 五千七百 转每分），判据 不超过 零点九零。
+- t: 78.92
+  dur: 7.69
+  text: 注意：整机惯性力（最大合力）。六百二十一牛，判据 不超过 五百五十牛。
+- t: 87.41
+  dur: 9.04
+  text: 二十一 项校核：不合格 二 项，注意 一 项。问渠缝纫机设计软件，计算书、STEP、调机卡同一组参数。
