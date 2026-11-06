@@ -1,5 +1,6 @@
 # QMS demo (a separate project on the same server, reached over the external qms-edge network).
-qms.wenquestrobotics.com {
+# qms-erp.<domain> is its ERPNext (the hub's "Open ERPNext" and single sign-on use it; wenquest-ops ADR-0025, 第 97 轮).
+qms.wenquestrobotics.com, qms-erp.wenquestrobotics.com {
 	encode gzip
 	request_body {
 		max_size 100MB
