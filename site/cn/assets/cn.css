@@ -270,3 +270,7 @@ form.demo select { font: 400 16px/1.4 var(--body); padding: 6px 10px; border: 1p
 .pl-status { font-size: 18px; }
 .pl-status a { word-break: break-all; }
 .pl-ok { color: var(--water-ink); min-height: 1.4em; }
+.hsteps li.later { opacity: .35; }
+/* 首屏数字和事件链不让页面跳（11-06）：计数留够宽度，事件链单独一块、按最长的一条留高（hub3d.js reserve） */
+.hero .hfig b { display: inline-block; min-width: 5ch; font-variant-numeric: tabular-nums; }
+.hero .hfig #hchain { display: block; }

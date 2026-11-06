@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91g"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91h"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
