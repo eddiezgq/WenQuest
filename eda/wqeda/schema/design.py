@@ -100,7 +100,7 @@ def validate_design(doc):
     for ref, v in place.items():
         if ref not in known:
             p.append("摆放里的 {} 不在器件清单里".format(ref))
-        if not (isinstance(v, list) and len(v) == 4 and _is_num(v[0]) and _is_num(v[1]) and _is_num(v[2]) and v[3] in SIDES):
+        if not (isinstance(v, list) and len(v) == 4 and all(_is_num(x) for x in v[:3]) and v[3] in SIDES):
             p.append("摆放 {} 应是 [x, y, 角度, F/B]".format(ref))
     for h in bd.get("holes") or []:
         if not _check_xy(h):
@@ -260,7 +260,10 @@ def expand(doc, var=None):
     grid = bd.get("test_point_grid")
     if grid:
         refs = list(grid.get("first") or []) + [q["ref"] for q in tps]
-        for ref, (x, y) in zip(refs, test_point_spots(grid)):
+        spots = test_point_spots(grid)
+        if len(refs) > len(spots):
+            raise DesignError(["测试点 {} 个，网格只有 {} 个位置".format(len(refs), len(spots))])
+        for ref, (x, y) in zip(refs, spots[:len(refs)], strict=True):
             placement[ref] = (x, y, 0, grid.get("side", "B"))
     params = {}
     for b in doc["blocks"]:
