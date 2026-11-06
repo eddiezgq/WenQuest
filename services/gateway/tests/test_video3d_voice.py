@@ -34,6 +34,9 @@ def test_script_numbers_must_be_on_screen():
     assert len(errs) == 1 and "4500" in errs[0] and "3" not in errs[0].split("4500")[1][:3]
     s["labels"].append({"t": [0, 12], "zh": "4500 r/min", "en": "4500 r/min"})
     assert VV.errors(s, 12) == []
+    s["style"] = "cinematic"                                       # 电影风格：解说词就是屏上大字幕，不查数
+    assert VV.errors(s, 12) == []
+    del s["style"]
     s["voice"][1]["zh"] = "长" * 91
     assert any("太长" in e for e in VV.errors(s, 12))
     s["voice"] = [{"t": 13, "zh": "超出"}]
@@ -51,6 +54,10 @@ def test_lines_prefer_script_then_labels_and_sewing_stays_on_labels():
     items, src = VV.lines(_spec(SCRIPTED), "zh")
     assert src == "script" and [x["t0"] for x in items] == [0, 6] and items[0]["t1"] == 6 and items[1]["t1"] == 12
     assert items[0]["text"].startswith("先看整台平缝机")
+    sp = _spec(SCRIPTED)
+    sp["voice"][0]["zh"] = "再来一次，快 2 倍，2.5 秒。"
+    sp["labels"].append({"t": [0, 1], "zh": "2.5 s", "en": "2.5 s"})
+    assert VV.lines(sp, "zh")[0][0]["text"] == "再来一次，快两倍，二点五 秒。"
     en, _ = VV.lines(_spec(SCRIPTED), "en")
     assert en[1]["text"].startswith("Now under the needle plate")
     items, src = VV.lines(_spec(SCENE), "zh")                       # 没有解说词：念标题
@@ -92,9 +99,12 @@ def test_revoice_script_switch_off_restores_and_revoice_does_not_drift(tmp_path,
     assert _spec(svc.store.scene(V["id"]))["duration"] == 12 and "退回" in V["chat"][-1]["text"]
 
     # 在配好的场景上改过（人直接改场景，原样保存）再配：时刻不往后挪，片长不变；这时关掉不退回
+    async def on_again():
+        svc.set_voice(svc.store.load(V["id"]), True)
+        await svc.revoice(V["id"], stills=False)
+    asyncio.run(on_again())
+    assert svc.store.scene(V["id"]) == first                       # 再打开：配出来和第一次一样
     V = svc.store.load(V["id"])
-    V["voice"] = {"on": True}
-    svc.store.save(V)
     assert svc.set_scene(V, first) == []
     asyncio.run(svc.revoice(V["id"], stills=False))
     again = _spec(svc.store.scene(V["id"]))

@@ -138,7 +138,7 @@ const tlRows = computed(() => {
   const rows: { at: number; when: string; text: string; kind: string; bottom?: boolean }[] = (tl.labels || []).map((lb) => ({
     at: +lb.t[0], when: fmtSpan(lb.t), text: locale.value === "en" ? lb.en : lb.zh, kind: "label", bottom: lb.bottom }));
   for (const x of tl.voice || []) {
-    const text = x.dur ? x.say || (locale.value === "en" ? x.en || x.zh : x.zh || x.en) : (locale.value === "en" ? x.en || x.zh : x.zh || x.en);
+    const text = (locale.value === "en" ? x.en || x.zh : x.zh || x.en) || x.say;   // 解说词原文；念字幕配的只有实际念的稿
     if (!text) continue;
     rows.push({ at: +x.t + 0.001, when: x.dur ? fmtSpan([x.t, +x.t + +x.dur]) : `${(+x.t).toFixed(1)} s`, text, kind: "voice" });
   }

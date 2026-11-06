@@ -751,6 +751,7 @@ class Service:
         V["voice"] = {"on": False}
         if back:
             self.store.set_scene(V, plain.read_text(encoding="utf-8"))
+            V["stretched"] = False
         V["chat"].append({"who": "ai", "at": now(), "text": "旁白关掉了：" + ("场景退回配旁白前那一版（没拉长）。" if back
                                                                   else "以后出的小样、高清没有声音；配旁白以后改过场景，节奏保持现在的样子。")})
         self.store.save(V)
@@ -898,9 +899,10 @@ class Service:
             V = self.store.load(vid)
             self.store.set_scene(V, text)
             (self.store.vdir(vid) / "audio.m4a").write_bytes(audio)
-            fresh = not any(isinstance(x, dict) and "dur" in x for x in spec.get("voice") or [])
+            fresh = not V.get("stretched")                          # 这个场景还没被配旁白拉长过（拉长以后再改的仍算拉长过）
             if fresh:                                               # 关掉旁白时退回这一版（没拉长）；从已经拉长过的场景重配的不算
                 (self.store.vdir(vid) / "scene.plain.yaml").write_text(plain, encoding="utf-8")
+            V["stretched"] = True
             V.setdefault("voice", {"on": True}).update(state="done", version=V["version"], n=len(items), seconds=fitted["duration"], lang=lang,
                                                        src=src, plain=fresh)
             what = "AI 写的解说词" if src == "script" else "画面上的标题和字幕"

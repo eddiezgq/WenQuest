@@ -2,7 +2,8 @@
 
 - 念什么：场景里有解说词（voice 段，AI 写场景时顺带写的，每段镜头一两句，中英成对）就念解说词；
   没有（从样片复制、老视频、缝纫机讲解片）就照第 90 轮念画面上的标题和底部字幕。缝纫机讲解片（有 lock）一律念字幕，数锁定。
-- 解说词里的数只能是画面上已有的数（标题、标注、面板里出现过的），1–10 的小整数除外（“3 个关节”“第 2 步”）。
+- 解说词里的数只能是画面上已有的数（标题、标注、面板里出现过的），1–10 的小整数除外（“3 个关节”“第 2 步”）；
+  电影风格（style: cinematic）的解说词本身就画在屏上当大字幕，不查。
 - 统一的 voice 段：[{t, zh, en}]（AI 写），配好后网关补上 dur（长度）、seg（这一段开头）、say（实际念的稿）；
   念字幕配出来的标 src: labels。旧格式 {t, dur, text}（第 90 轮）照样认。
 - 拉长、混音沿用 sewing_voice（旁白长的段放慢拉长，读完再进下一段）。
@@ -68,6 +69,8 @@ def errors(spec: dict, dur: float) -> list[str]:
             continue
         if len(str(zh or "")) > MAX_ZH or len(str(en or "")) > MAX_EN:
             errs.append(f"voice 第 {i + 1} 句太长（中文最多 {MAX_ZH} 字、英文 {MAX_EN} 字符，一两句话）")
+        if spec.get("style") == "cinematic":                 # 电影风格：解说词本身就画在屏上当大字幕，不另查
+            continue
         bad = sorted({n for n in NUM_RE.findall(f"{zh or ''} {en or ''}") if n not in nums and not _small(n)})
         if bad:
             errs.append(f"voice 第 {i + 1} 句里的数 {'、'.join(bad[:4])} 画面上没有：解说词里的数只能用标题、标注里已有的数")
@@ -92,7 +95,11 @@ def lines(spec: dict, lang: str, locked: bool = False) -> tuple[list[dict], str]
         if not raw:
             continue
         t1 = starts[i + 1] if i + 1 < len(sc) else dur
-        text = SVO.spoken(raw, lang)
+        if lang == "zh":                                          # “快 2 倍”“2 个关节”念“两”
+            raw_say = re.sub(r"(?<![\d.])\s*(?<![\d.])2\s*(?=[个倍台次段种根条把块])", "两", raw)
+        else:
+            raw_say = raw
+        text = SVO.spoken(raw_say, lang)
         if lang == "zh" and not text.endswith(("。", "！", "？")):
             text += "。"
         elif lang == "en" and not text.endswith((".", "!", "?")):
