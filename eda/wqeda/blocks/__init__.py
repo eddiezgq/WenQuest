@@ -3,6 +3,7 @@
 
 设计描述里，一个功能块（= 原理图一页）下面有若干“单元”（units），每个单元一种类型、一组参数；电路由
 circuit.generate 列出的生成器按顺序展开。计算器、生成器都是纯函数：不联网、不调 AI。"""
+
 from __future__ import annotations
 
 from . import common, control, drive, power
@@ -101,8 +102,16 @@ def calculate(doc, devices, parts):
     out = []
     for u in units(doc):
         items, checks = CALCULATORS[u["type"]](u, doc["spec"], d, parts)
-        out.append({"block": u["key"], "type": u["type"], "name": NAMES[u["type"]][0], "name_en": NAMES[u["type"]][1],
-                    "items": items, "checks": checks})
+        out.append(
+            {
+                "block": u["key"],
+                "type": u["type"],
+                "name": NAMES[u["type"]][0],
+                "name_en": NAMES[u["type"]][1],
+                "items": items,
+                "checks": checks,
+            }
+        )
     return out
 
 

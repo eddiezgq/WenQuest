@@ -6,6 +6,7 @@
   - 录了但没核对（checked: false）→ pending（待核对）：照样把数和要求列出来，但不算通过
   - 核对过 → 按数判 pass / fail
 读文件，只做计算：不联网、不调 AI。"""
+
 from __future__ import annotations
 
 import glob
@@ -21,7 +22,7 @@ PARTS_DIR = os.path.join(HERE, "parts")
 
 class Devices:
     def __init__(self, entries):
-        self.entries = entries          # 型号 → 文件内容
+        self.entries = entries  # 型号 → 文件内容
 
     @classmethod
     def load(cls, folder=PARTS_DIR):
@@ -68,8 +69,17 @@ class Devices:
         """额定值 ≥ 要求"""
         have = self.value(part, key)
         ok = None if have is None else have >= need - 1e-12
-        return c.judge(key, name, need, have, unit, rule, status=self._status(part, key, ok),
-                       source=self.source(part, key), note=self.note(part, key))
+        return c.judge(
+            key,
+            name,
+            need,
+            have,
+            unit,
+            rule,
+            status=self._status(part, key, ok),
+            source=self.source(part, key),
+            note=self.note(part, key),
+        )
 
     def in_range(self, part, key, name, x, unit=""):
         """工作范围 [下限, 上限] 包含 x"""
@@ -77,11 +87,29 @@ class Devices:
         lo, hi = (p.get("min"), p.get("max")) if p else (None, None)
         ok = None if lo is None or hi is None else lo <= x <= hi
         have = None if lo is None or hi is None else "{:g}–{:g}".format(lo, hi)
-        return c.judge(key, name, x, have, unit, "范围包含 {:g} {}".format(x, unit), status=self._status(part, key, ok),
-                       source=self.source(part, key), note=self.note(part, key))
+        return c.judge(
+            key,
+            name,
+            x,
+            have,
+            unit,
+            "范围包含 {:g} {}".format(x, unit),
+            status=self._status(part, key, ok),
+            source=self.source(part, key),
+            note=self.note(part, key),
+        )
 
     def equals(self, part, key, name, x, unit=""):
         have = self.value(part, key)
         ok = None if have is None else abs(have - x) < 1e-9
-        return c.judge(key, name, x, have, unit, "器件数据 = 设计值", status=self._status(part, key, ok),
-                       source=self.source(part, key), note=self.note(part, key))
+        return c.judge(
+            key,
+            name,
+            x,
+            have,
+            unit,
+            "器件数据 = 设计值",
+            status=self._status(part, key, ok),
+            source=self.source(part, key),
+            note=self.note(part, key),
+        )
