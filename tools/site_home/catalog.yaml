@@ -14,6 +14,9 @@ intro:
   video3d: {zh: 三维仿真视频, en: 3D simulation films, yt: "dlyDt47ccF4", bv: "BV1BZ4v6eERd"}
   cambearing: {zh: 问渠凸轮与问渠轴承, en: WenQuest Cam and Bearing, yt: "MTKbcIgE6to", bv: "BV1fo4v6NE6g"}
   labs: {zh: 虚拟实验室, en: Virtual labs, yt: "GzjaMcvmaCY", bv: "BV1Fo4v6KEKe"}
+  # 11-06 Eddie 上传的两部现成介绍片（第 38/46 轮、第 44 轮的成片）。yt_zh：中文版另有 YouTube 时，中文界面放它
+  qms: {zh: 问渠质量 ERP, en: WenQuest Ops (quality ERP), yt: "BTVhY2bG0cM", yt_zh: "CqGguSWMODQ", bv: "BV1664B6CE3y"}
+  sewing: {zh: 缝纫机企业解决方案, en: Sewing machine company solution (in Chinese), yt: "QHSns2OfpwE", bv: "BV1Ek4B6GE1G"}
 
 groups:
   - key: learn
@@ -58,11 +61,12 @@ groups:
       - {zh: "多体动力学", en: "Multibody dynamics", dz: "机械臂动作、关节力矩、减速器寿命", de: "Robot motions, joint torques, gear life", url: "https://factory.wenquestrobotics.com/mbd", login: true}
       - {zh: "流体分析", en: "CFD", dz: "风扇冷却、流动与传热", de: "Fan cooling, flow and heat transfer", url: "https://factory.wenquestrobotics.com/cfd", login: true}
       - {zh: "设计优化", en: "Design optimization", dz: "自动调尺寸，轻量化", de: "Automatic sizing and lightweighting", url: "https://factory.wenquestrobotics.com/opt", login: true}
+      - {zh: "问渠质量 ERP", en: "WenQuest Ops (quality ERP)", dz: "以质量体系为骨架的 AI ERP：文件控制、不合格与纠正、追溯，AI 起草、人来决定", de: "An AI ERP built on the quality system: documents, nonconformance and CAPA, traceability; AI drafts, people decide", url: "https://qms.wenquestrobotics.com/", login: true, intro: qms}
       - {zh: "ERP 经营与生产", en: "ERP / MES", dz: "基于开源 ERPNext：订单、物料、排产、成本", de: "On open-source ERPNext: orders, materials, scheduling, cost", url: "https://factory.wenquestrobotics.com/finance", login: true}
       - {zh: "厂情中枢", en: "Command center", dz: "一张图看全厂，异常追因、推演、AI 提醒", de: "The whole plant at a glance: root cause, what-if, AI alerts", url: "https://factory.wenquestrobotics.com/ont", login: true}
       - {zh: "数字孪生", en: "Digital twin", dz: "现场设备的寿命、残差与预测性维护", de: "Field units' remaining life and predictive maintenance", url: "https://factory.wenquestrobotics.com/twin", login: true}
       - {zh: "虚拟 PLC", en: "Virtual PLC", dz: "写梯形图、ST，接虚拟设备运行", de: "Write ladder or ST and run it on virtual equipment", url: "https://factory.wenquestrobotics.com/plc", login: true}
-      - {zh: "缝纫机设计与制造", en: "Sewing machine design", dz: "六种机型的参数化设计、三维样机、出图出片", de: "Six machine types: parametric design, 3D prototypes, drawings and films", url: "https://learn.wenquestrobotics.com/pages/sewing/sewing", login: true}
+      - {zh: "缝纫机设计与制造", en: "Sewing machine design", dz: "六种机型的参数化设计、三维样机、出图出片", de: "Six machine types: parametric design, 3D prototypes, drawings and films", url: "https://learn.wenquestrobotics.com/pages/sewing/sewing", login: true, intro: sewing}
       - {zh: "问渠凸轮", en: "WenQuest Cam", dz: "凸轮设计与制造，演示不用登录", de: "Cam design and manufacturing; demo without sign-in", url: "/cam/", intro: cambearing}
       - {zh: "问渠轴承", en: "WenQuest Bearing", dz: "轴承设计、寿命与合套选配，演示不用登录", de: "Bearing design, life and matched sets; demo without sign-in", url: "/bearing/", intro: cambearing}
   - key: labs

@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91f"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "91g"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -166,7 +166,8 @@ def vchips(*keys):
     """模块卡片上的小按钮（和美国官网一样，视频放在各模块上）：一段写“▶ 视频”，几段写“▶ 视频：名称”。"""
     ks = [k for k in keys if k in INTRO]
     short = {"learn": "学习平台", "eval": "评价与校情", "textbook": "教材与课件", "whiteboard": "白板课", "video3d": "三维仿真视频",
-             "labs": "虚拟实验室", "factory": "数字工厂", "cambearing": "凸轮与轴承", "overview": "问渠全貌"}
+             "labs": "虚拟实验室", "factory": "数字工厂", "cambearing": "凸轮与轴承", "overview": "问渠全貌",
+             "qms": "问渠质量 ERP", "sewing": "缝纫机企业解决方案"}
     b = "".join(f'<button type="button" class="vchip" data-bv="{INTRO[k]["bv"]}" data-title="{html.escape(INTRO[k]["zh"])}">'
                 f'▶ 视频{"：" + short.get(k, INTRO[k]["zh"]) if len(ks) > 1 else ""}</button>' for k in ks)
     return f'<p class="vchips">{b}</p>' if b else ""
@@ -229,7 +230,7 @@ def home():
   <div class="txt"><span class="tag">旗舰一</span><h3>问渠质量 ERP</h3>
   <p>以质量体系为核心的 AI ERP。标准变成流程和检查，体系每天按记录自查；文件、不合格、来料检验、追溯召回，和接单、物料、排产、采购、财务在同一套数据里。</p>
   {ul(["AI 把共享盘里的文件分类，检查整个文件库，起草新文件，人审批", "不合格与纠正、来料检验、控制图、帕累托、鱼骨图与 5 Why、过程 FMEA", "生产记录逐步签字，出了问题一键追溯到批次、设备和人"])}
-  <a class="more" href="/solutions/qms-erp/">了解问渠质量 ERP →</a></div></article>"""
+  <a class="more" href="/solutions/qms-erp/">了解问渠质量 ERP →</a>{vchips("qms")}</div></article>"""
     flag_plat = f"""<article class="flag">
   <div class="shot"><img src="/assets/platform-12steps.jpg" alt="问渠数字工厂集成平台：从需求到车间完工 12 步" loading="lazy"></div>
   <div class="txt"><span class="tag">旗舰二</span><h3>问渠数字工厂集成平台</h3>
@@ -240,7 +241,7 @@ def home():
   <article class="card"><div class="shot"><img src="/assets/sewing-video.jpg" alt="缝纫机设计与制造软件" loading="lazy"></div>
     <span class="tag">成熟产品</span><h3 style="margin-top:12px">缝纫机设计与制造软件</h3>
     <p>平缝机、包缝机、绷缝机、电子花样机、多头刺绣机的设计、校核与出图。改参数，当场看三维样机、运动时序和红绿灯校核；一键出设计计算书、三维模型（STEP）、零件轮廓（DXF）、调机卡。网页直接用，也能装进 FreeCAD。</p>
-    <a class="more" href="/solutions/sewing/">了解 →</a></article>
+    <a class="more" href="/solutions/sewing/">了解 →</a>{vchips("sewing")}</article>
   <article class="card"><div class="shot"><img src="/assets/cam-ui.jpg" alt="凸轮设计与制造软件界面" loading="lazy"></div>
     <span class="tag">成熟产品</span><h3 style="margin-top:12px">凸轮设计与制造软件</h3>
     <p>从运动要求到凸轮廓线，再到加工误差与补偿：挑线、送布等凸轮机构的运动与受力，廓线误差在高速下引起的加速度误差，磨削补偿能修掉哪些误差。</p>
@@ -311,7 +312,7 @@ def qms():
 <div class="split rev"><div><h3>从批次到客户，几秒钟</h3><p>供应商发来警告：某批来料有问题。从来料批次向下追到用了它的生产记录，再追到发给了哪几家客户，一张图看完，召回范围清清楚楚。</p></div>{shot("qms-trace.jpg", "向下追溯：来料批次 → 生产记录 → 客户（演示数据）")}</div>"""
     more = f"""<div class="gallery">{shot("qms-capa.jpg", "不合格品报告：隔离、处置、纠正预防，职责分离")}{shot("qms-spc.jpg", "控制图：来自已签字的检验记录，过程偏移自动提示")}
 {shot("qms-anomaly.jpg", "异常：迟交订单点一下，沿关联记录追到原因")}{shot("qms-wall.jpg", "车间大屏：整家公司的运营情况实时显示")}</div><p class="note">{DEMO_NOTE}</p>"""
-    body = f"""{hero("旗舰产品一", "问渠质量 ERP：以质量体系为核心的 AI ERP", "质量不是 ERP 里的一个角落，而是整套系统的骨架：标准写成流程和检查，每一张单据都按体系走，体系每天按记录自己检查自己。", "企业服务 / 问渠质量 ERP", [("预约演示", "/contact/"), ("和集成平台怎么组合", "/solutions/platform/#combine")])}
+    body = f"""{hero("旗舰产品一", "问渠质量 ERP：以质量体系为核心的 AI ERP", "质量不是 ERP 里的一个角落，而是整套系统的骨架：标准写成流程和检查，每一张单据都按体系走，体系每天按记录自己检查自己。", "企业服务 / 问渠质量 ERP", [("预约演示", "/contact/"), ("和集成平台怎么组合", "/solutions/platform/#combine")], video="qms")}
 {part("一", "AI 做什么、人做什么", "AI 只起草和建议；凡是会生效的东西，都要人批准，系统记下谁、在什么时候、批准了哪一版。", ai_table([
         ("把共享盘里的文件分类，找出缺的、过期的、互相矛盾的", "决定保留、修订还是作废"),
         ("按标准条款起草程序文件、作业指导书、表单", "审批，批准后才受控生效"),
@@ -369,7 +370,7 @@ def platform():
 # ================================================================ 成熟产品
 
 def sewing():
-    body = f"""{hero("成熟产品", "缝纫机设计与制造软件", "平缝机、包缝机、绷缝机、电子花样机、多头刺绣机的设计、校核与出图：改参数，当场看三维样机和红绿灯校核，一键出计算书、模型和图纸。", "企业服务 / 缝纫机设计与制造软件", [("预约演示", "/contact/")])}
+    body = f"""{hero("成熟产品", "缝纫机设计与制造软件", "平缝机、包缝机、绷缝机、电子花样机、多头刺绣机的设计、校核与出图：改参数，当场看三维样机和红绿灯校核，一键出计算书、模型和图纸。", "企业服务 / 缝纫机设计与制造软件", [("预约演示", "/contact/")], video="sewing")}
 {part("一", "改参数，当场看结果", None, f'''<div class="split"><div>
 {ul(["机型：平缝机、包缝机、绷缝机、电子花样机、多头刺绣机（横机随后上线）",
      "三维样机、运动时序和红绿灯校核：惯性力、钩线、挑线、送布、张力、共振、尺寸链",

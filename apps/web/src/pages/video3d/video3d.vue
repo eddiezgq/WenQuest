@@ -18,6 +18,8 @@
         <text class="label">{{ t("v3.ask") }}</text>
         <textarea v-model="prompt" class="area" :placeholder="t('v3.askPh')" maxlength="2000" />
         <view class="row-end">
+          <!-- 第 99 轮：新建默认配旁白（一句话写的念 AI 写的解说词，样片念标题字幕） -->
+          <view v-if="voiceOn" class="vchk" @click="voice = !voice"><text class="box">{{ voice ? "☑" : "☐" }}</text><text>{{ t("v3.voiceNew") }}</text></view>
           <text class="hint">{{ t("v3.askHint") }}</text>
           <view class="primary" :class="{ disabled: busy }" @click="create('')">{{ busy || t("v3.write") }}</view>
         </view>
@@ -99,6 +101,8 @@ const error = ref("");
 const busy = ref("");
 const prompt = ref("");
 const general = ref(true);
+const voice = ref(true);
+const voiceOn = ref(false);
 const renderOn = ref(true);
 const isAdmin = ref(false);
 const ov = ref<V3AdminOverview | null>(null);
@@ -118,6 +122,7 @@ async function load() {
     renderOn.value = r.render_on;
     isAdmin.value = r.admin;
     general.value = r.general !== false;
+    voiceOn.value = !!r.voice_on;
     if (r.admin) ov.value = await api.v3Admin();
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";
@@ -131,7 +136,8 @@ async function create(sample: string) {
   if (!sample && !prompt.value.trim()) return uni.showToast({ title: t("v3.needAsk"), icon: "none" });
   busy.value = t("v3.creating");
   try {
-    const v = await api.v3Create(sample ? { sample } : { prompt: prompt.value.trim() });
+    const vo = voiceOn.value ? voice.value : false;
+    const v = await api.v3Create(sample ? { sample, voice: vo } : { prompt: prompt.value.trim(), voice: vo });
     prompt.value = "";
     open(v.id);
   } catch (e) {
@@ -198,6 +204,8 @@ onShow(() => {
 .muted { color: var(--wq-muted); }
 .empty { background: #fff; border: 1px dashed var(--wq-line); border-radius: 8px; padding: 24px; text-align: center; color: var(--wq-muted); line-height: 1.7; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.vchk { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--wq-ink); cursor: pointer; margin-right: auto; }
+.vchk .box { font-size: 16px; }
 .sample { background: #fff; border: 1px solid var(--wq-line); border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
 .s-title { font-weight: 600; color: var(--wq-ink); }
 .s-meta { color: var(--wq-muted); font-size: 13px; }
