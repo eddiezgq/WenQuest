@@ -126,11 +126,11 @@
                 <line x1="130" y1="202" x2="130" y2="224" /><line x1="130" y1="246" x2="130" y2="280" /><line x1="80" y1="67" x2="130" y2="67" /><line x1="80" y1="213" x2="130" y2="213" />
                 <line x1="130" y1="140" x2="250" y2="140" /><line x1="294" y1="140" x2="340" y2="140" /></g>
               <text x="134" y="72" class="nd">Y</text><text x="134" y="216" class="nd">X</text><text x="200" y="134" class="nd">OB</text><text x="310" y="134" class="nd">OUT</text>
-              <text x="150" y="160" class="nd">IN 接 MP1、MP2、MN1、MN2 的栅</text>
+              <text x="136" y="168" class="nd">IN → 四只主管的栅</text>
             </svg>
             <p class="small muted">尺寸是沟道宽度 W（μm），长度都是 {{ T.l_um }} μm。反馈管 MN3 在输出为高时把 X 往上拉，要更高的输入才能拉下 OB——上门限被推高；MP3 对称地压低下门限。
               反馈管越宽回差越大（右表），取回差 ≥ {{ T.target_hyst }} V 的最小一档：{{ T.design.k }} × 主管宽度。</p></div>
-          <div><h3>直流转移曲线（上扫 / 下扫）</h3>
+          <div><h3>转移曲线（慢三角波输入：上升 / 下降）</h3>
             <svg viewBox="0 0 360 260" class="plot">
               <rect x="40" y="10" width="300" height="220" class="pbox" />
               <line v-for="v in [0.45, 0.9, 1.35]" :key="'g' + v" :x1="px(v)" y1="10" :x2="px(v)" y2="230" class="grid" />
