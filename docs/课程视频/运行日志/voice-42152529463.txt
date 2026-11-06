@@ -1,0 +1,400 @@
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:27:54,724 INFO synthesis text A forty-stitch seam saves a tenth of a second at six thousand.
+2026-11-06 03:27:57,969 INFO yield speech len 5.92, rtf 0.5481654727781141
+
+100%|██████████| 1/1 [00:03<00:00,  3.42s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.42s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:27:58,454 INFO synthesis text A forty-stitch seam saves a tenth of a second at six thousand.
+2026-11-06 03:28:01,628 INFO yield speech len 5.92, rtf 0.5361885235116288
+
+100%|██████████| 1/1 [00:03<00:00,  3.35s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:02,160 INFO synthesis text A forty-stitch seam saves a tenth of a second at six thousand.
+2026-11-06 03:28:04,989 INFO yield speech len 5.36, rtf 0.527800552880586
+
+100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.01s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:05,475 INFO synthesis text Faster ramps, trimming and handling matter more.
+2026-11-06 03:28:08,020 INFO yield speech len 4.56, rtf 0.5581556182158621
+
+100%|██████████| 1/1 [00:02<00:00,  2.72s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.72s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:08,373 WARNING synthesis text Line balancing. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:28:08,499 INFO synthesis text Line balancing.
+2026-11-06 03:28:09,420 INFO yield speech len 0.84, rtf 1.0971986112140475
+
+100%|██████████| 1/1 [00:01<00:00,  1.09s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:09,641 WARNING synthesis text Line balancing. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:28:09,766 INFO synthesis text Line balancing.
+2026-11-06 03:28:10,726 INFO yield speech len 0.96, rtf 0.999964028596878
+
+100%|██████████| 1/1 [00:01<00:00,  1.13s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.13s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:10,949 WARNING synthesis text Line balancing. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:28:11,076 INFO synthesis text Line balancing.
+2026-11-06 03:28:12,171 INFO yield speech len 1.2, rtf 0.9118262926737468
+
+100%|██████████| 1/1 [00:01<00:00,  1.27s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:12,568 INFO synthesis text The basic quantities: takt is sixty over target output, zero.five minutes for one hundred and twenty an hour; the theoretical minimum headcount is total time over takt, rounded up, at least twenty-seven.
+2026-11-06 03:28:21,171 INFO yield speech len 17.04, rtf 0.5048764283668268
+
+100%|██████████| 1/1 [00:08<00:00,  8.79s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:28:22,049 INFO synthesis text The basic quantities: takt is sixty over target output, zero.five minutes for one hundred and twenty an hour; the theoretical minimum headcount is total time over takt, rounded up, at least twenty-seven.
+
+100%|██████████| 1/1 [00:03<00:00,  3.46s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:29:32,226 INFO synthesis text The answer is to merge neighbouring operations into groups shared by several people.
+2026-11-06 03:29:35,435 INFO yield speech len 5.72, rtf 0.5610487261018553
+
+100%|██████████| 1/1 [00:03<00:00,  3.38s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:29:35,947 INFO synthesis text Front overlocking, back overlocking and back darts total one.thirty minutes; three people at zero.four hundred and thirty-three each, all under takt.
+2026-11-06 03:29:42,412 INFO yield speech len 12.56, rtf 0.5147854423826667
+
+100%|██████████| 1/1 [00:06<00:00,  6.64s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:29:43,114 INFO synthesis text Rules: at most four people, four operations and two machine types per group, and no broken precedence.
+2026-11-06 03:29:47,749 INFO yield speech len 8.84, rtf 0.5242447777571182
+
+100%|██████████| 1/1 [00:04<00:00,  4.81s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.81s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:29:48,291 INFO synthesis text Positional weight is an operation's time plus everything after it; sort by weight and cut with dynamic programming for the fewest people.
+2026-11-06 03:29:53,964 INFO yield speech len 11.12, rtf 0.5101987783857387
+
+100%|██████████| 1/1 [00:05<00:00,  5.85s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:29:54,606 INFO synthesis text Automatic grouping gives twenty-nine people at ninety-one.zero percent for one hundred and twenty an hour, thirty-six at ninety-one.seven for one hundred and fifty, and twenty-five at ninety-one.eight for one hundred.
+2026-11-06 03:30:04,028 INFO yield speech len 18.4, rtf 0.5120551197425179
+
+100%|██████████| 1/1 [00:09<00:00,  9.60s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.61s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:30:04,787 INFO synthesis text Automatic grouping gives twenty-nine people at ninety-one.zero percent for one hundred and twenty an hour, thirty-six at ninety-one.seven for one hundred and fifty, and twenty-five at ninety-one.eight for one hundred.
+2026-11-06 03:30:13,940 INFO yield speech len 17.32, rtf 0.5284844452459322
+
+100%|██████████| 1/1 [00:09<00:00,  9.33s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.33s/it]
+cv2: 140/199 句，用时 31.8 分钟，预计还要 13.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:30:14,684 INFO synthesis text Change takt and the rounding changes, so regroup; a new style or method means rebalancing too.
+2026-11-06 03:30:18,727 INFO yield speech len 7.92, rtf 0.5105068587293529
+
+100%|██████████| 1/1 [00:04<00:00,  4.22s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:30:19,349 INFO synthesis text Theoretical balance ignores individual speed and variation; next lecture's hanger systems and U cells let the line absorb them.
+2026-11-06 03:30:54,883 INFO yield speech len 10.44, rtf 0.5271700835319315
+
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:30:55,562 INFO synthesis text A sewing machine adds value only in the seconds it sews; the rest can all be waste.
+2026-11-06 03:30:59,210 INFO yield speech len 6.68, rtf 0.5461775971030047
+
+100%|██████████| 1/1 [00:03<00:00,  3.82s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:30:59,774 INFO synthesis text A sewing machine adds value only in the seconds it sews; the rest can all be waste.
+2026-11-06 03:31:03,757 INFO yield speech len 7.76, rtf 0.5132513255188146
+
+100%|██████████| 1/1 [00:04<00:00,  4.16s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:31:04,353 INFO synthesis text A sewing machine adds value only in the seconds it sews; the rest can all be waste.
+2026-11-06 03:31:07,621 INFO yield speech len 6.32, rtf 0.5170409060731719
+
+100%|██████████| 1/1 [00:03<00:00,  3.45s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.45s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:31:08,017 WARNING synthesis text Equipment and multi-machine tending. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:31:08,147 INFO synthesis text Equipment and multi-machine tending.
+2026-11-06 03:31:09,895 INFO yield speech len 2.68, rtf 0.6523073609195538
+
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:31:10,346 INFO synthesis text With groups settled, equip them: machines of each type equal that type's time over the cycle, rounded up.
+2026-11-06 03:31:14,838 INFO yield speech len 8.32, rtf 0.5399479888952695
+
+100%|██████████| 1/1 [00:04<00:00,  4.67s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.67s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:31:15,408 INFO synthesis text Three people sharing one.two minutes of lockstitch work get three machines; zero.two minutes of bartacking gets one, shared.
+2026-11-06 03:31:20,961 INFO yield speech len 10.76, rtf 0.5160203653640464
+
+100%|██████████| 1/1 [00:05<00:00,  5.73s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:31:21,614 INFO synthesis text Three people sharing one.two minutes of lockstitch work get three machines; zero.two minutes of bartacking gets one, shared.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:08,893 INFO synthesis text Keep five to ten percent spares for breakdowns and style changes.
+2026-11-06 03:32:13,178 INFO yield speech len 8.04, rtf 0.5330111256879361
+
+100%|██████████| 1/1 [00:04<00:00,  4.46s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.46s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:13,720 INFO synthesis text With pattern sewers and automatic pocket welters the operator only loads and unloads while the machine sews, so one person can tend several.
+2026-11-06 03:32:19,639 INFO yield speech len 11.6, rtf 0.5102904089565935
+
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:20,317 INFO synthesis text Let a be load time, w walking time and t sewing time.
+2026-11-06 03:32:23,803 INFO yield speech len 6.64, rtf 0.5249968135213278
+
+100%|██████████| 1/1 [00:03<00:00,  3.66s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:24,351 INFO synthesis text Let a be load time, w walking time and t sewing time.
+2026-11-06 03:32:41,014 INFO yield speech len 2.84, rtf 0.6094334830700512
+
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:41,437 INFO synthesis text Compute it: a zero.three, w zero.five and t zero.nine minutes give a balance point of about three.forty-three.
+2026-11-06 03:32:48,352 INFO yield speech len 13.16, rtf 0.5254568118817176
+
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:48,971 INFO synthesis text Compute it: a zero.three, w zero.five and t zero.nine minutes give a balance point of about three.forty-three.
+2026-11-06 03:32:56,296 INFO yield speech len 13.88, rtf 0.5277385629219693
+
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.50s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:32:56,881 INFO synthesis text Compute it: a zero.three, w zero.five and t zero.nine minutes give a balance point of about three.forty-three.
+2026-11-06 03:33:03,532 INFO yield speech len 12.6, rtf 0.5278555173722524
+
+100%|██████████| 1/1 [00:06<00:00,  6.82s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:33:04,158 INFO synthesis text Tending three, the cycle is one.two and the operator waits thirteen percent; tending four, the cycle is one.four and each machine waits fourteen percent.
+2026-11-06 03:33:12,242 INFO yield speech len 15.64, rtf 0.516843475649119
+
+100%|██████████| 1/1 [00:08<00:00,  8.26s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:33:13,015 INFO synthesis text Tending three, the cycle is one.two and the operator waits thirteen percent; tending four, the cycle is one.four and each machine waits fourteen percent.
+2026-11-06 03:33:21,482 INFO yield speech len 16.12, rtf 0.5252660208245364
+
+100%|██████████| 1/1 [00:08<00:00,  8.65s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.65s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:33:22,204 INFO synthesis text Tending three, the cycle is one.two and the operator waits thirteen percent; tending four, the cycle is one.four and each machine waits fourteen percent.
+
+100%|██████████| 1/1 [00:01<00:00,  1.80s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:34:07,467 WARNING synthesis text Now the special machines. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:34:07,593 INFO synthesis text Now the special machines.
+2026-11-06 03:34:09,660 INFO yield speech len 3.64, rtf 0.5678496517977871
+
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:34:09,936 WARNING synthesis text Now the special machines. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:34:10,072 INFO synthesis text Now the special machines.
+2026-11-06 03:34:12,045 INFO yield speech len 3.16, rtf 0.6243472612356837
+
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:34:12,434 INFO synthesis text An automatic pocket welter cuts the back pocket from one.twenty to zero.forty-five minutes, a waistband machine the waistband from one.thirty to zero.eighty.
+2026-11-06 03:34:19,987 INFO yield speech len 14.96, rtf 0.5048373644364709
+
+100%|██████████| 1/1 [00:07<00:00,  7.73s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:34:20,748 INFO synthesis text An automatic pocket welter cuts the back pocket from one.twenty to zero.forty-five minutes, a waistband machine the waistband from one.thirty to zero.eighty.
+2026-11-06 03:35:02,765 INFO yield speech len 16.64, rtf 0.5232188707360854
+
+100%|██████████| 1/1 [00:08<00:00,  8.89s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:03,646 INFO synthesis text Robots are fast, so one tends more machines; speed up the machine tools and it tends fewer, so dual fixtures shorten a, just like alternating templates on a pattern sewer.
+2026-11-06 03:35:11,456 INFO yield speech len 14.92, rtf 0.5234443470236443
+
+100%|██████████| 1/1 [00:07<00:00,  7.99s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:12,256 INFO synthesis text Robot lines need balancing too: the slowest cell sets output.
+2026-11-06 03:35:15,113 INFO yield speech len 5.36, rtf 0.5330159148173546
+
+100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:15,491 WARNING synthesis text You tend several machines at home too. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:35:15,616 INFO synthesis text You tend several machines at home too.
+2026-11-06 03:35:17,177 INFO yield speech len 2.28, rtf 0.6847272839462548
+
+100%|██████████| 1/1 [00:01<00:00,  1.73s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.73s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:17,437 WARNING synthesis text You tend several machines at home too. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:35:17,567 INFO synthesis text You tend several machines at home too.
+2026-11-06 03:35:19,222 INFO yield speech len 2.48, rtf 0.6674971311323105
+
+100%|██████████| 1/1 [00:01<00:00,  1.83s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.83s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:19,531 WARNING synthesis text You tend several machines at home too. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-06 03:35:19,659 INFO synthesis text You tend several machines at home too.
+2026-11-06 03:35:21,382 INFO yield speech len 2.64, rtf 0.6529043118158976
+
+100%|██████████| 1/1 [00:01<00:00,  1.89s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:21,809 INFO synthesis text On a weekend you put rice in the cooker, clothes in the washer and bread in the oven, go round once, and the first one is just finishing: that's multi-machine tending.
+
+100%|██████████| 1/1 [00:05<00:00,  5.22s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.22s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:53,415 INFO synthesis text Today the cycle is zero.seventy minutes: about eighty-five.seven an hour at seventy-two.five percent balance.
+2026-11-06 03:35:59,134 INFO yield speech len 11.04, rtf 0.5180023070694744
+
+100%|██████████| 1/1 [00:05<00:00,  5.89s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:35:59,729 INFO synthesis text In theory one hundred and twenty needs at least twenty-seven.
+2026-11-06 03:36:02,572 INFO yield speech len 5.36, rtf 0.5302858441623289
+
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:36:03,000 INFO synthesis text Regroup the same twenty-six and the cycle is zero.fifty-five: about one hundred and nine an hour at ninety-two.three percent, about twenty-seven percent more; with today's equipment one hundred and twenty needs twenty-nine.
+2026-11-06 03:36:12,878 INFO yield speech len 18.88, rtf 0.5232343734320948
+
+100%|██████████| 1/1 [00:10<00:00, 10.06s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.06s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:36:13,697 INFO synthesis text With the special machines twenty-six are enough, saving eighteen thousand yuan a month, paying back in about eleven months.
+2026-11-06 03:36:18,995 INFO yield speech len 10.16, rtf 0.521477094785435
+
+100%|██████████| 1/1 [00:05<00:00,  5.47s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.47s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:36:19,628 INFO synthesis text Now Virtual lab twenty-eight-one, line balancing, which you can do yourself on WenQuest. Results and tasks are blurred. On page one, the balance chart and the operation table are on the left; on the right you set target output and equipment. First click 'one operation per group' and see which stations wait.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:37:20,295 INFO synthesis text Task two sets the target to one hundred an hour, and task three adds the automatic pocket welter and the waistband machine. In both, group automatically first, then reorder to save people.
+
+100%|██████████| 1/1 [00:07<00:00,  7.97s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.97s/it]
+cv2: 180/199 句，用时 39.1 分钟，预计还要 4.1 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:37:28,866 INFO synthesis text On page two, step the machines tended from one to six, watch who waits for whom in the operator-machine chart, record the cycle and cost per piece, and find the cheapest number. Then cut the automatic sewing time to zero.six minutes and find it again.
+2026-11-06 03:37:38,361 INFO yield speech len 18.36, rtf 0.5171723225537469
+
+100%|██████████| 1/1 [00:09<00:00,  9.67s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:37:39,376 INFO synthesis text Last, the machine time for one seam: three hundred and thirty-three stitches at a top speed of four thousand, five thousand and six thousand, then forty stitches for comparison. The guide and report template are on the platform.
+2026-11-06 03:37:48,450 INFO yield speech len 17.28, rtf 0.5250724101508105
+
+100%|██████████| 1/1 [00:09<00:00,  9.26s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.26s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:37:49,395 INFO synthesis text Everything in this lecture is on the WenQuest learning platform.
+2026-11-06 03:37:52,246 INFO yield speech len 5.08, rtf 0.5612090347320076
+
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:37:52,709 INFO synthesis text You can open the interactive slides and the line-balancing lab and work them yourself, including the two pages on markers and lean practice.
+2026-11-06 03:37:58,480 INFO yield speech len 10.84, rtf 0.5323957253206261
+
+100%|██████████| 1/1 [00:05<00:00,  5.94s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:37:59,193 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-11-06 03:38:03,048 INFO yield speech len 7.28, rtf 0.5296236211126977
+
+100%|██████████| 1/1 [00:04<00:00,  4.03s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:38:03,559 INFO synthesis text Questions go to the discussion forum, and the grades page shows every mark.
+2026-11-06 03:38:07,006 INFO yield speech len 6.44, rtf 0.5352711825637343
+
+100%|██████████| 1/1 [00:03<00:00,  3.62s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.62s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:38:07,566 INFO synthesis text The assignment has three questions. One: a T-shirt line has eight operations and a target of one hundred and fifty an hour. Find takt and the theoretical minimum, the headcount, cycle and balance with one operation per group, and then your own grouping under this lecture's rules.
+2026-11-06 03:38:17,814 INFO yield speech len 19.88, rtf 0.5154743520786585
+
+100%|██████████| 1/1 [00:10<00:00, 10.43s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:38:18,840 INFO synthesis text The assignment has three questions. One: a T-shirt line has eight operations and a target of one hundred and fifty an hour. Find takt and the theoretical minimum, the headcount, cycle and balance with one operation per group, and then your own grouping under this lecture's rules.
+2026-11-06 03:39:59,805 INFO yield speech len 4.56, rtf 0.5374756821414881
+
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+100%|██████████| 1/1 [00:02<00:00,  2.63s/it]
+cv2: 190/199 句，用时 41.6 分钟，预计还要 2.0 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:40:00,296 INFO synthesis text There's also a ten-question quiz. For example: an operation's observed time averages zero.fifty minutes, rated one hundred and five percent, with twelve percent allowance. What's the standard minute?
+2026-11-06 03:40:08,147 INFO yield speech len 15.16, rtf 0.5178561783088543
+
+100%|██████████| 1/1 [00:08<00:00,  8.03s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:40:08,915 INFO synthesis text There's also a ten-question quiz. For example: an operation's observed time averages zero.fifty minutes, rated one hundred and five percent, with twelve percent allowance. What's the standard minute?
+2026-11-06 03:40:17,379 INFO yield speech len 16.88, rtf 0.5014288199456383
+
+100%|██████████| 1/1 [00:08<00:00,  8.64s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.64s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:40:18,119 INFO synthesis text There's also a ten-question quiz. For example: an operation's observed time averages zero.fifty minutes, rated one hundred and five percent, with twelve percent allowance. What's the standard minute?
+2026-11-06 03:40:26,379 INFO yield speech len 16.56, rtf 0.49880207448765856
+
+100%|██████████| 1/1 [00:08<00:00,  8.44s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:40:27,094 INFO synthesis text Or: a garment takes fifteen.six minutes of work in all, and the target is one hundred an hour. What's the theoretical minimum headcount?
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:40:47,409 INFO synthesis text Two: takt, minimum headcount, cycle and balance; one operation per station wastes odd fractions, while grouping by positional weight lifts balance from about seventy to over ninety percent.
+2026-11-06 03:40:56,713 INFO yield speech len 18.12, rtf 0.5134950673606485
+
+100%|██████████| 1/1 [00:09<00:00,  9.49s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:40:57,459 INFO synthesis text Two: takt, minimum headcount, cycle and balance; one operation per station wastes odd fractions, while grouping by positional weight lifts balance from about seventy to over ninety percent.
+2026-11-06 03:41:05,380 INFO yield speech len 15.16, rtf 0.5224638375254609
+
+100%|██████████| 1/1 [00:08<00:00,  8.10s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.10s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:41:06,157 INFO synthesis text Two: takt, minimum headcount, cycle and balance; one operation per station wastes odd fractions, while grouping by positional weight lifts balance from about seventy to over ninety percent.
+2026-11-06 03:41:14,717 INFO yield speech len 16.36, rtf 0.5232302950180538
+
+100%|██████████| 1/1 [00:08<00:00,  8.74s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.74s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:41:15,533 INFO synthesis text Three: in multi-machine tending the cycle is the larger of the two; choose n by cost.
+2026-11-06 03:41:19,713 INFO yield speech len 7.84, rtf 0.5332148500851223
+
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:41:20,274 INFO synthesis text The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at learn dot wen quest robotics dot com. Sign up for free and start learning.
+2026-11-06 03:41:28,245 INFO yield speech len 15.04, rtf 0.5300039623646027
+
+100%|██████████| 1/1 [00:08<00:00,  8.16s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-06 03:41:29,060 INFO synthesis text Today was about balancing a line. Next time we visit typical garment factories, made-to-measure suits, shirts and T-shirts, and see why factories making clothes can be so different. See you then.
+GPU 机器已关机，用时 54 分钟
