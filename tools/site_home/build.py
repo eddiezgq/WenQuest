@@ -111,9 +111,11 @@ def atlas(cat, vals):
             lock = (f'<span class="lock">{T("需登录", "Sign-in")}</span>' if it.get("login") else "")
             card = (f'<a class="ac" href="{it["url"]}"{" rel=noopener" if ext else ""}><b>{T(it["zh"], it["en"])}{lock}</b>'
                     f'<span>{T(dz, de)}</span></a>')
-            yt = ((cat.get("intro") or {}).get(it.get("intro") or "") or {}).get("yt")
-            if yt:                                   # 第 86 轮：有视频简介的卡加“▶ 视频”（英文版，YouTube）
-                card = f'<div class="acw">{card}<button type="button" class="vb" data-yt="{yt}">▶ {T("视频", "Video")}</button></div>'
+            iv = (cat.get("intro") or {}).get(it.get("intro") or "") or {}
+            yt = iv.get("yt")
+            if yt:                                   # 第 86 轮：有视频简介的卡加“▶ 视频”（英文版，YouTube；有中文版时中文界面放 yt_zh）
+                zh_attr = f' data-yt-zh="{iv["yt_zh"]}"' if iv.get("yt_zh") else ""
+                card = f'<div class="acw">{card}<button type="button" class="vb" data-yt="{yt}"{zh_attr}>▶ {T("视频", "Video")}</button></div>'
             cards.append(card)
         cols.append(f'<div class="ag{" wide" if g.get("wide") else ""}" id="atlas-{g["key"]}"><h3><span class="n">{k:02d}</span>{T(g["zh"], g["en"])}</h3>'
                     f'<div class="acs">{"".join(cards)}</div></div>')

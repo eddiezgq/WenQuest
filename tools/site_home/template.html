@@ -474,7 +474,7 @@ __ATLAS__
     function close() { m.classList.remove("on"); f.src = "about:blank"; }
     document.addEventListener("click", function (e) {
       var b = e.target.closest && e.target.closest(".vb");
-      if (b) { e.preventDefault(); f.src = "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(b.dataset.yt) + "?autoplay=1&rel=0"; m.classList.add("on"); return; }
+      if (b) { e.preventDefault(); f.src = "https://www.youtube-nocookie.com/embed/" + encodeURIComponent((document.documentElement.lang !== "en" && b.dataset.ytZh) || b.dataset.yt) + "?autoplay=1&rel=0"; m.classList.add("on"); return; }
       if (e.target === m || (e.target.closest && e.target.closest(".vmodal .x"))) close();
     });
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && m.classList.contains("on")) close(); });
