@@ -1,0 +1,133 @@
+# 《缝纫机设计与制造》公开课 第 28 讲：服装生产工艺与缝制车间
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch28.yaml；2026-11-06 补英文版 SVG、大数字改纯数字、回答页中英两栏、封面右移），
+# 配音是课件每页的讲稿（notes），中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 28-1（生产线平衡）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch28.py 算出（{{ch28.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "28"
+deck: ch28
+skip: [5, 18]   # 唛架与分床、精益做法（标准作业、快速换型、质量内建、5S）：课程部分约 10 分钟；这几页留给课件
+code: [ch28]
+title: ["服装生产工艺与缝制车间——标准工时、生产线平衡与一人多机", "Garment Processes and the Sewing Floor — Standard Minutes, Line Balancing and Multi-Machine Tending"]
+chapter: ["第八篇 工厂与未来 · 第 28 章", "Part VIII Factories and the Future · Chapter 28"]
+next: ["第 29 讲", "Lecture 29"]
+cover_formula: 'C = \max[\,n(a+w),\ a+t\,]'
+tags:
+  zh: [服装生产, 缝制车间, 工业工程, IE, 标准工时, 评比, 宽放, 生产线平衡, 节拍, 平衡率, 位置权重法, 精益生产, 七种浪费, 一人多机, 人机作业图, 机器人上下料, 缝纫机]
+  en: [garment production, sewing floor, industrial engineering, standard minute, SAM, rating, allowance, line balancing, takt, balance efficiency, positional weight, lean production, seven wastes, multi-machine tending, operator-machine chart, robot machine tending, sewing machine]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第二十八讲，服装生产工艺与缝制车间。
+    - 前面二十多讲都在讲一台缝纫机，今天走进车间，看几十台缝纫机和几十个人怎样排成一条线。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 28, garment processes and the sewing floor.
+    - For more than twenty lectures we've studied one machine. Today we step onto the floor and see how dozens of machines and people are arranged into a line.
+
+after:
+  - id: lab281
+    kind: lab
+    lab: line21
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.75'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checksA,#machA,#checksB,#costc,#seamtxt,#tasks,#msg{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.querySelectorAll('p.note').forEach(n => { n.style.visibility = 'hidden'; }); document.getElementById('one').click(); })()"
+        dur: 5
+      - js: "document.getElementById('auto').click()"
+        dur: 4
+      - js: "(() => { window.scrollTo(0, 420); const r = [...document.querySelectorAll('#oplist tr')].find(t => t.cells && t.cells[0] && t.cells[0].textContent.trim() === '16'); if (r) { r.scrollIntoView({block: 'center'}); r.style.outline = '4px solid #f2b705'; } })()"
+        dur: 6
+      - js: "(() => { window.scrollTo(0, 0); const f = (id, v, ev) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event(ev, {bubbles: true})); }; f('tgt', 100, 'input'); setTimeout(() => document.getElementById('auto').click(), 800); setTimeout(() => { f('tgt', 120, 'input'); f('imp', '1', 'input'); document.getElementById('auto').click(); }, 3500); })()"
+        dur: 6
+      - js: "(() => { document.getElementById('tabB').click(); window.scrollTo(0, 0); document.getElementById('resetB').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [1, 2, 3, 4, 5, 6].forEach((n, i) => setTimeout(() => f('n', n), 300 + i * 1500)); setTimeout(() => { f('n', 4); f('t', 0.6); }, 9800); })()"
+        dur: 11
+      - js: "(() => { document.getElementById('seam').scrollIntoView({block: 'center'}); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('stn', 333); f('nmx', 4000); setTimeout(() => f('nmx', 5000), 2000); setTimeout(() => f('nmx', 6000), 4000); setTimeout(() => f('stn', 40), 6000); })()"
+        dur: 8
+    say:
+      zh:
+        - ">下面是虚拟实验 28-1，生产线平衡，在问渠平台上可以亲手做，结果和任务先遮住。第①页左边是平衡图和工序表，右边调目标产量和设备。先点“一道工序一组”，看哪些工位在等。"
+        - ">再点“自动分组”，柱子齐了。记下人数、周期、产量和平衡率，和刚才比一比。"
+        - ">任务一：在工序表里用上下箭头调整顺序，比如框出的“做串带”没有前道约束；不能违反前道关系，再重新切分，看能不能少用一人。"
+        - ">任务二把目标改成每小时 100 件，任务三换上自动开袋机和绱腰机，都是先自动分组，再调整顺序省人。"
+        - ">切到第②页，把看机台数从 1 调到 6，看人机作业图里谁在等谁，记下周期和每件成本，找出最便宜的台数；再把自动缝制时间改成 0.6 分，重找一次。"
+        - ">最后看一道缝的机器时间：333 针，最高转速取 4000、5000、6000，再把针数改成 40 比一比。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 28-1, line balancing, which you can do yourself on WenQuest. Results and tasks are blurred. On page one, the balance chart and the operation table are on the left; on the right you set target output and equipment. First click 'one operation per group' and see which stations wait."
+        - ">Then click 'automatic grouping' and the bars even out. Record the headcount, cycle, output and balance, and compare."
+        - ">Task one: reorder operations with the arrows in the table. 'Make belt loops', outlined here, has no predecessors. Don't break precedence; re-cut the groups and see whether you can save a person."
+        - ">Task two sets the target to 100 an hour, and task three adds the automatic pocket welter and the waistband machine. In both, group automatically first, then reorder to save people."
+        - ">On page two, step the machines tended from 1 to 6, watch who waits for whom in the operator-machine chart, record the cycle and cost per piece, and find the cheapest number. Then cut the automatic sewing time to 0.6 minutes and find it again."
+        - ">Last, the machine time for one seam: 333 stitches at a top speed of 4000, 5000 and 6000, then 40 stitches for comparison. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 28-1，可以自己动手", "Interactive slides and Lab 28-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">互动课件和生产线平衡实验都可以自己打开动手做，唛架与分床、精益做法这两页也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到讨论区提问，每项得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open the interactive slides and the line-balancing lab and work them yourself, including the two pages on markers and lean practice."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the discussion forum, and the grades page shows every mark."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 28：一条 T 恤线的平衡与一人多机配置", "Assignment 28: balancing a T-shirt line and multi-machine tending"]
+      points:
+        - ["T 恤 8 道工序、150 件/时：分组与平衡率", "T-shirt, 8 operations, 150 an hour: grouping and balance"]
+        - ["“绱袖”的标准工时；评比给高了会怎样", "SAM for 'set sleeves'; what if the rating is too high"]
+        - ["花样机看 3、4、5 台：周期与每件成本", "Pattern sewers, 3, 4 or 5 per person: cycle and cost"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共三道题。第一题，一条 T 恤线 8 道工序，目标每小时 150 件：求节拍和理论最少人数，按一道工序一组算人数、周期和平衡率，再按本讲的规则给出你自己的分组。"
+        - ">第二题，“绱袖”测时 10 次平均 0.52 分，评比 90%，宽放 15%，求标准工时，再说说评比要是给成 110%，对线平衡和计件工价各有什么影响。"
+        - ">第三题，花样机每台装卸 0.25 分、走动 0.05 分、自动缝 1.0 分，工资 0.5 元每分，设备 0.10 元每分每台：求平衡台数，算看 3、4、5 台的周期和每件成本，选出最省的；装卸降到 0.15 分，结论怎样变。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">The assignment has three questions. One: a T-shirt line has 8 operations and a target of 150 an hour. Find takt and the theoretical minimum, the headcount, cycle and balance with one operation per group, and then your own grouping under this lecture's rules."
+        - ">Two: 'set sleeves' was timed ten times at an average of 0.52 minutes, rated 90 percent, with 15 percent allowance. Find the standard minute, and explain what a rating of 110 percent would do to line balance and piece rates."
+        - ">Three: a pattern sewer takes 0.25 minutes to load, 0.05 to walk and 1.0 to sew; wages are 0.5 yuan a minute and machines 0.10 per machine-minute. Find the balance point, the cycle and cost per piece for 3, 4 and 5 machines, choose the cheapest, and say how the answer changes if loading drops to 0.15."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["观测 0.50 分、评比 105%、宽放 12%：标准工时？", "Observed 0.50, rated 105%, 12% allowance: the SAM?"]
+        - ["总工时 15.6 分、100 件/时：至少几人？", "15.6 minutes of work, 100 an hour: how many people?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：某工序观测时间平均 0.50 分，评比 105%，宽放 12%，标准工时是多少分？"
+        - ">再比如：一件衣服总工时 15.6 分，目标每小时 100 件，理论最少要几个人？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: an operation's observed time averages 0.50 minutes, rated 105 percent, with 12 percent allowance. What's the standard minute?"
+        - ">Or: a garment takes 15.6 minutes of work in all, and the target is 100 an hour. What's the theoretical minimum headcount?"
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 今天讲的是怎样把一条线排平；下一讲走进几类典型的服装工厂，定制西服、衬衫、T 恤，看同样做衣服，工厂为什么不一样。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "Today was about balancing a line. Next time we visit typical garment factories, made-to-measure suits, shirts and T-shirts, and see why factories making clothes can be so different. See you then."
