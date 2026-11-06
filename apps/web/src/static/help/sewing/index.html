@@ -809,6 +809,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ul>
 <p><strong>在样机里看</strong>：设计转速 2000 时打开“样机”页签，模型 15-1 按这个花样走，右上角写着“设计转速下标准针距走得完……”不合格；点“慢放到出问题的那一针”，停在最紧的那一针，读数里“这一针转速”比设计转速低（前瞻调速把它降下来了）。换成小带轮以后再看，判定变成“能正常缝制”。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-81-pt-proto.jpg" alt="花样机 2000 r/min：样机标红，慢放到最紧的那一针"><figcaption>花样机 2000 r/min：样机标红，慢放到最紧的那一针</figcaption></figure>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-17-proto-seq.jpg"><source src="../media/web-17-proto-seq.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-17-proto-seq.vtt"></video><figcaption>▶ 三种机型的样机（有旁白）：花样机 2000 r/min、刺绣机 12 头 300 N、横机 E18，慢放到出问题的那一针 / 那一趟</figcaption></figure>
 <p><strong>给车间出一段讲解片</strong>：还是 2000 r/min 这一版，“导出”页签点“出三维讲解片”，软件写好约 40.94 秒的片子：整机 → 一针慢放（针在布中模板不动，出布后在窗口里移到下一针）→ X、Y 两轴 → 快放走完整个花样，途中停在最紧的那一针慢放，标题标红“设计转速下标准针距走得完”→ 结论（全部合格时这一段的标题是“最紧的一针：转速上限……”）。针迹、每针转速和上限都按这台设计，机构尺寸是示意。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-89-pt-axes.jpg" alt="讲解片：X、Y 两轴——横梁带 X 轴前后走，滑座带压框左右走"><figcaption>讲解片：X、Y 两轴——横梁带 X 轴前后走，滑座带压框左右走</figcaption></figure>
 <figure class="shot"><img loading="lazy" src="../media/web-89-pt-bad.jpg" alt="讲解片：快放途中停在最紧的那一针，红灯标题，字幕写数值和判据；右边曲线的光标在“最紧”"><figcaption>讲解片：快放途中停在最紧的那一针，红灯标题，字幕写数值和判据；右边曲线的光标在“最紧”</figcaption></figure>
@@ -875,6 +876,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <a class="try" href="/pages/sewing/sewing?machine=flatknit&amp;tab=checks&amp;p=%7B%22E%22%3A18%7D" target="_blank" rel="noopener">▶ 试一试：E18 横机：选针器跟不上</a>
 <p><strong>在样机里看</strong>：E18 时打开“样机”页签，模型 17-1 照这张意匠图一趟一趟走，电磁选针器标红；点“慢放到出问题的那一趟”，停在最宽、最快的那一趟，读数里有这一趟的机头速度、用时和累计用时。翻针趟里后针床会横移（摇床）；摇床量加大到走不完时，后针床标红。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-81-fk-proto.jpg" alt="E18：选针器标红，机头在最宽的那一趟"><figcaption>E18：选针器标红，机头在最宽的那一趟</figcaption></figure>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-17-proto-seq.jpg"><source src="../media/web-17-proto-seq.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-17-proto-seq.vtt"></video><figcaption>▶ 三种机型的样机（有旁白）：花样机 2000 r/min、刺绣机 12 头 300 N、横机 E18，慢放到出问题的那一针 / 那一趟</figcaption></figure>
 <h3 id="case-fk-pass">第三步　一趟的时间花在哪</h3>
 <p>“时序与曲线”页签的“机头一趟的时间分配”画的是最宽的一趟（行程 802 mm；所有趟平均 0.84 秒），真正在织物上选针、编织的只占 <b>50%</b>，其余是加速、减速、走换向余量和换向停顿（摇床、换纱嘴）。“固定提前量”要求机头在经过第一枚针之前就到全速，所以两端各要留 v²/(2a) = 72 mm 的换向余量。</p>
 <h3 id="case-fk-options">第四步　三个改进方向</h3>
@@ -1275,6 +1277,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <p><strong>为什么要上传花样文件</strong>：如果只手填“最长针 8 mm、10305 针”，软件只能把整个花样都按最长那一针的转速算：12 头机一律 545 r/min，650 r/min 亮红灯，订单 41.1 天；按文件、每针调速是 36.4 天。头少、长针少时差得不多（8 头机 50.7 天对 50.2 天），头一多、绷架一重，差别就出来了。</p>
 <p><strong>在样机里看</strong>：“样机”页签是新做的三维模型 16-1——一列机头、一个跨过所有机头的绷架，每个绣框里一针一针绣这个花样，最长的那几针转速降下来。改回手填、12 头，再把 Y 轴驱动力降到 300 N：绷架标红，点“慢放到出问题的那一针”，读数是“绷架还没停，机针已经扎下”，所需加速度比可用的大好几倍。上面能切换回虚拟实验 16-1。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-81-em-proto.jpg" alt="手填 12 头、驱动力 300 N：绷架标红，机针扎下时绷架还在动"><figcaption>手填 12 头、驱动力 300 N：绷架标红，机针扎下时绷架还在动</figcaption></figure>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-17-proto-seq.jpg"><source src="../media/web-17-proto-seq.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-17-proto-seq.vtt"></video><figcaption>▶ 三种机型的样机（有旁白）：花样机 2000 r/min、刺绣机 12 头 300 N、横机 E18，慢放到出问题的那一针 / 那一趟</figcaption></figure>
 <h3 id="case-em-opt">第三步　设计优化：达到订单交期</h3>
 <ol class="steps">
 <li>头数改回 8。“CAE 分析”→“设计优化”→“达到订单交期：头数最少（推力不够才加，不出红灯）”。软件从 1 头试起，每个头数下找刚好赶上交期的最小推力；现有的 800 N 够用就不动：</li>
@@ -1337,7 +1340,8 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-16-case-em.jpg"><source src="../media/web-16-case-em.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-16-case-em.vtt"></video><figcaption>▶ 案例七：上传花样文件、8 头还是 12 头、设计优化达到订单交期、伺服、横梁加立柱、电控箱</figcaption></figure></section>
 <section id="tabs"><h2><span class="n">10</span>七个页签</h2><p class="lead">样机、校核、时序与曲线、零件与制造、CAE 分析、零件库、导出。</p><h3 id="proto">样机</h3>
 <p>平缝机是教材的三维虚拟样机：定时、间隙、张力、送布、转速、平衡这些调机参数跟着你的设计同步，可以试缝、看故障标红。包缝机（模型 9-1，第 88 轮）的引针曲柄连杆、两套弯针的偏心和摆杆、差动比、切刀定时跟着设计走，运动按第 9 章逐度算，出问题的部件标红；偏心大到装不上时，那套弯针标红、停住，读数写明哪几度装不上。花样机、刺绣机、横机（第 81 轮）的三维模型跟着设计走：花样机（模型 15-1）按你的花样、每针前瞻转速走，电机、同步带、压框、机头出问题时标红；刺绣机（模型 16-1，新做）按头数、花样文件（或手填的最长针）、每针转速走，走不完的那一针绷架标红，能看到机针扎下时绷架还在动，上面能切换到虚拟实验 16-1；横机（模型 17-1）按系统数、织物宽，照意匠图（或手填的横列）逐趟走编织、翻针、摇床，选针器、后针床、电机出问题时标红。三种都有“慢放到出问题的那一针（那一趟）”。绷缝机是教材的三维样机（模型 10-1，第 73 轮）：线迹、针数、针距和弯针的定时、高低、让针、间隙、回退跟着设计同步，钩线判据当场算，出问题的机针或弯针标红，点“出问题的转角”转到那一刻慢慢看；上面能切换到弯针动画（虚拟实验 10-1）。下面是主要结果（连杆比、惯性力、钩线角、供线量……）。</p>
-<figure class="vid"><video controls preload="none" playsinline poster="../media/web-02-proto.jpg"><source src="../media/web-02-proto.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-02-proto.vtt"></video><figcaption>▶ 三维样机：旋梭定时调错，试缝 30 针全跳</figcaption></figure>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-02-proto.jpg"><source src="../media/web-02-proto.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-02-proto.vtt"></video><figcaption>▶ 样机跟设计走（有旁白）：平缝机旋梭定时调错、试缝 30 针全跳；包缝机下弯针偏心加大，慢放到出问题的转角</figcaption></figure>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-17-proto-seq.jpg"><source src="../media/web-17-proto-seq.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-17-proto-seq.vtt"></video><figcaption>▶ 花样机、刺绣机、横机（有旁白）：改坏一项，慢放到出问题的那一针、那一趟</figcaption></figure>
 <a class="try" href="/pages/sewing/sewing?machine=lockstitch&amp;tab=proto&amp;p=%7B%22psi%22%3A-20%7D" target="_blank" rel="noopener">▶ 试一试：旋梭定时 −20°，在样机里看跳针</a>
 <h3 id="checks">校核</h3>
 <p>每项一行：数值、判据、出自教材第几讲；不合格的给出怎么改。平缝机上面还有 30 针虚拟试缝的结果（成缝、跳针、碰针、划线、断线）。</p>
@@ -1704,7 +1708,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 </ol>
 <p>读数面板：第几针（趟）、这一针转速和上限（花样机）、颜色和所需 / 可用加速度（刺绣机）、机头速度和累计用时（横机）；曲线是每针转速（花样机，红线是上限）、所需 / 可用加速度（刺绣机，红线 = 1）、每趟最高速度（横机），光标跟着走。上传的花样文件、意匠图照样能出片：场景里带的是抽样后的针迹 / 逐趟动作（最多 800 针 / 趟），不是原文件。机构尺寸是示意（教材模型 15-1、16-1、17-1），不出 STEP。</p>
 <figure class="shot"><img loading="lazy" src="../media/web-89-pt-tight.jpg" alt="花样机教材算例：快放途中停在最紧的那一针慢放，读数面板的曲线上光标正在“最紧”"><figcaption>花样机教材算例：快放途中停在最紧的那一针慢放，读数面板的曲线上光标正在“最紧”</figcaption></figure>
-<figure class="vid"><video controls preload="none" playsinline poster="../media/web-14-video.jpg"><source src="../media/web-14-video.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-14-video.vtt"></video><figcaption>▶ 6000 r/min 未改那一版：导出 → 出三维讲解片 → 关键画面（红灯停在 180°）</figcaption></figure>
+<figure class="vid"><video controls preload="none" playsinline poster="../media/web-14-video.jpg"><source src="../media/web-14-video.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-14-video.vtt"></video><figcaption>▶ 花样机 2000 r/min（有旁白）：导出 → 出三维讲解片、配旁白 → 关键画面 → 小样开头一段</figcaption></figure>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/web-08-export.jpg"><source src="../media/web-08-export.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/web-08-export.vtt"></video><figcaption>▶ 导出计算书（带 AI 设计说明）和 STEP</figcaption></figure></section>
 <section id="kernel"><h2><span class="n">15</span>内核：流行的开源软件</h2><p class="lead">求解和建模交给全世界工程师用了多年的开源软件；我们做的是把它们和教材、工厂、AI 接成一条线。</p><h3 id="kernel-1">缝纫机设计软件直接用到的</h3>
 <table>
