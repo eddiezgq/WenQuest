@@ -195,7 +195,7 @@ figure.shot img{width:100%;border-radius:10px;border:1px solid var(--line);displ
 <li>重启 FreeCAD，工作台列表里选 <b>问渠</b>，工具栏上点 <b>轴承</b>。</li>
 </ol>
 
-<p>压缩包里还有示例项目（<code>examples/*.wqbearing.json</code>）和本帮助的离线一份。缺依赖时点“轴承”会提示安装命令。</p>
+<p>压缩包里还有示例项目（<code>examples/*.wqbearing.json</code>）和本帮助的离线一份。缺依赖时点“轴承”会提示一条安装命令，整行粘贴到 FreeCAD 的 Python 控制台里运行（命令会自动找到 FreeCAD 自带的 Python，没有 pip 先补上，再装缺的包），装完重启 FreeCAD。</p>
 <figure class="vid"><video controls preload="none" playsinline poster="../media/fc-01-bearing.jpg"><source src="../media/fc-01-bearing.mp4" type="video/mp4"><track kind="subtitles" srclang="zh" label="中文" default src="../media/fc-01-bearing.vtt"></video><figcaption>▶ 录像：安装工作台，打开示例、计算、建模</figcaption></figure></section>
 <section id="use"><h2><span class="n">02</span>使用</h2><p class="lead">打开项目 → 计算 → 建模 → 出图与 STEP → 工序简图。</p><ol class="steps">
 <li><b>打开项目</b>：选网页版存的 <code>.wqbearing.json</code> 或压缩包里的示例；也可以在表单里从头填。表单的字段、什么时候显示哪些字段，和网页版一样。</li>

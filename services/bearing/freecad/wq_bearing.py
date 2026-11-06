@@ -46,11 +46,12 @@ def missing():
 
 
 def install_hint(pkgs):
-    return (
-        "在 FreeCAD 的 Python 控制台里运行：\n"
-        "import subprocess, sys; subprocess.run([sys.executable, '-m', 'pip', 'install', '--user', {}])\n"
-        "（Windows 版 FreeCAD 若 sys.executable 不是 python.exe，改用 FreeCAD 安装目录 bin 下的 python.exe）"
-    ).format(", ".join(repr(p) for p in pkgs))
+    return ("在 FreeCAD 的 Python 控制台里粘贴下面一行，回车，装完重启 FreeCAD：\n"
+            "from freecad.utils import get_python_exe as py; import subprocess as sp; "
+            "sp.run([py(), '-m', 'ensurepip', '--user']); "
+            "sp.run([py(), '-m', 'pip', 'install', '--user', {}])\n"
+            "（先补上 pip，已经有 pip 时这一步什么也不做；再装缺的包）"
+            ).format(", ".join(repr(p) for p in pkgs))
 
 
 def load(path):

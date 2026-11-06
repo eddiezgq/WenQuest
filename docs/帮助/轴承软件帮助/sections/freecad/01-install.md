@@ -10,6 +10,6 @@ lead: 下载一个压缩包，复制一个文件夹，重启 FreeCAD。
 <li>重启 FreeCAD，工作台列表里选 <b>问渠</b>，工具栏上点 <b>轴承</b>。</li>
 </ol>
 
-压缩包里还有示例项目（`examples/*.wqbearing.json`）和本帮助的离线一份。缺依赖时点“轴承”会提示安装命令。
+压缩包里还有示例项目（`examples/*.wqbearing.json`）和本帮助的离线一份。缺依赖时点“轴承”会提示一条安装命令，整行粘贴到 FreeCAD 的 Python 控制台里运行（命令会自动找到 FreeCAD 自带的 Python，没有 pip 先补上，再装缺的包），装完重启 FreeCAD。
 
 ::video{src=fc-01-bearing title="录像：安装工作台，打开示例、计算、建模"}
