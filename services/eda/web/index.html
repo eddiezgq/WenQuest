@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>问渠电子 · 起草台</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><b data-t="brand">问渠电子</b><span class="sep">·</span><span data-t="desk">起草台</span></div>
+  <nav>
+    <a href="help/" data-t="help">帮助</a>
+    <button id="lang" type="button" aria-label="中文 / English">EN</button>
+  </nav>
+</header>
+<main>
+  <section class="ask">
+    <h1 data-t="title">把需求写成一块电路板</h1>
+    <p class="lede" data-t="lede">写一句话或一段需求。AI 起草规格和功能块参数，每个数都标来源；代码马上展开电路、跑计算和仿真。你改、你定，确认后下载设计描述。</p>
+    <label for="req" class="vh" data-t="reqLabel">需求</label>
+    <textarea id="req" rows="4" maxlength="3000"></textarea>
+    <div class="row">
+      <div class="examples" id="examples"></div>
+      <button id="go" class="primary" type="button" data-t="go">AI 起草</button>
+    </div>
+    <p class="scope" data-t="scope">本版只做三相电机驱动板（九种功能单元、拓扑固定）；板子层沿用驱动板模板。示例设计，不能直接投产。</p>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="out" hidden>
+    <div class="tally" id="tally"></div>
+    <div id="notes"></div>
+
+    <h2 data-t="spec">规格</h2>
+    <div class="wrap"><table id="specT"></table></div>
+
+    <h2 data-t="units">功能块参数</h2>
+    <p class="hint" data-t="unitsHint">只列 AI 可以改的参数；其余沿用模板。改完点“按改过的数重算”。</p>
+    <div id="unitsT"></div>
+
+    <div class="actions">
+      <button id="again" type="button" data-t="again">按改过的数重算</button>
+      <label class="confirm"><input type="checkbox" id="ok"> <span data-t="confirm">我已看过标成“AI 假设”的数，确认这份草稿</span></label>
+      <button id="dl" class="primary" type="button" disabled data-t="download">下载设计描述（YAML）</button>
+    </div>
+
+    <details id="bookBox">
+      <summary data-t="book">计算书</summary>
+      <iframe id="book" title="计算书"></iframe>
+      <p><a id="dlmd" href="#" data-t="downloadMd">下载计算书（Markdown）</a></p>
+    </details>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
