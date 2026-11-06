@@ -43,13 +43,25 @@ groups:
     zh: 数字工业园
     en: Digital industrial park
     items:
-      - {zh: "进入数字工厂", en: "Enter the digital factory", dz: "减速器厂、机器人厂：ERP、工艺、MES、质量、设备、能源", de: "Gearbox and robot plants: ERP, process, MES, quality, maintenance, energy", url: "https://factory.wenquestrobotics.com/", login: true, intro: factory}
+      - {zh: "进入数字工厂", en: "Enter the digital factory", dz: "减速器厂、机器人厂、电路板厂、芯片封测厂：ERP、工艺、MES、质量、设备、能源", de: "Gearbox, robot, PCB and chip plants: ERP, process, MES, quality, maintenance, energy", url: "https://factory.wenquestrobotics.com/", login: true, intro: factory}
       - {zh: "工厂演示", en: "Factory demo", dz: "不用登录，看车间怎样运转", de: "See the shop floor run, no sign-in", url: "/factory", intro: factory}
       - {zh: "三维工厂", en: "3D factory", dz: "车间、设备、在制品的三维视图", de: "The plant in 3D", url: "https://factory.wenquestrobotics.com/3d", login: true, intro: factory}
       - {zh: "数字工厂实验", en: "Factory labs", dz: "__FLAB__ 个实验：从订单到交付、追因、标定、售后", de: "__FLAB__ labs: order to delivery, root cause, calibration, after-sales", url: "https://factory.wenquestrobotics.com/labs", login: true, intro: factory}
       - {zh: "零件与机器人库", en: "Parts and robot library", dz: "标准件、厂商零部件、机器人整机，参数与三维", de: "Standard parts, vendor components and robots, with specs and 3D", url: "https://factory.wenquestrobotics.com/library"}
       - {zh: "典型应用与案例", en: "Cases", dz: "协作机器人关节、SCARA、平缝机、数字主线", de: "Cobot joint, SCARA, lockstitch machine, digital thread", url: "/cases/"}
       - {zh: "企业版演示工厂", en: "Enterprise demo plant", dz: "生产模式：设计发布、审批、配置器出图出价", de: "Production mode: design release, approval, configure-to-quote", url: "https://demo.wenquestrobotics.com/", login: true}
+  # 第 101 轮：电子这条线（第 82–103 轮另一个会话做的，已上线的才写）。设计都是示例设计，卡片上写明
+  - key: elec
+    wide: true
+    zh: 电子与芯片
+    en: Electronics and chips
+    items:
+      - {zh: "电路板厂", en: "PCB plant", dz: "关节驱动板、AGV 控制板：锡膏印刷、贴片、回流、AOI 到功能测试，给机器人厂供货", de: "Joint driver and AGV boards: paste print, placement, reflow, AOI to functional test; supplies the robot plant", url: "https://pcb.factory.wenquestrobotics.com/", login: true}
+      - {zh: "电路板设计", en: "PCB design", dz: "关节驱动板 A/B 两版：原理图、PCB、三维、BOM、可制造性检查（示例设计）", de: "Joint driver board, rev A and B: schematic, layout, 3D, BOM, DFM checks (example design)", url: "https://pcb.factory.wenquestrobotics.com/pcb-design", login: true}
+      - {zh: "芯片设计", en: "Chip design", dz: "编码器接口芯片 WQ-ENCIF：RTL 到 GDS，DRC、LVS、时序都过（示例设计，未流片）", de: "Encoder-interface chip WQ-ENCIF: RTL to GDS, DRC, LVS and timing clean (example, not taped out)", url: "https://pcb.factory.wenquestrobotics.com/chip-design", login: true}
+      - {zh: "芯片封测厂", en: "Chip packaging and test plant", dz: "WQ-ENCIF 的封装与测试：晶圆外协，封装、测试、分档", de: "Packaging and test of WQ-ENCIF: wafers bought in, then package, test and bin", url: "https://chip.factory.wenquestrobotics.com/", login: true}
+      - {zh: "固件与仿真", en: "Firmware and simulation", dz: "驱动板 B 版的固件，在 Renode 里整板仿真运行（示例固件）", de: "Firmware for driver board rev B, run on a simulated board in Renode (example)", url: "https://pcb.factory.wenquestrobotics.com/pcb-design", login: true}
+      - {zh: "传感器虚拟仪器", en: "Sensor virtual instruments", dz: "7 种仪器、6 种传感器、6 个测量任务，结果自动核对，导出实验记录", de: "7 instruments, 6 sensors, 6 measuring tasks, results checked, lab record exported", url: "https://factory.wenquestrobotics.com/instruments", login: true}
   - key: soft
     wide: true
     zh: 工程软件

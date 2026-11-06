@@ -49,11 +49,11 @@
   link: {cn: /solutions/platform/}
 - id: factory
   q:
-    zh: [数字工厂是什么, 什么是数字工厂, 数字工业园, 教学工厂, 减速器厂, 机器人厂]
+    zh: [数字工厂是什么, 什么是数字工厂, 数字工业园, 教学工厂, 减速器厂, 机器人厂, 有几座厂]
     en: [What is the digital factory, digital industrial park, teaching factory]
   a:
-    zh: 数字工厂是一座按真实企业数据运转的工厂：减速器厂、机器人厂互为上下游，有 ERP、工艺、MES、质量、设备、能源和三维车间，厂情中枢一张图看全厂。学校用它做二十多个岗位实验，企业版可以按你的产品和流程搭起来。
-    en: The digital factory runs on realistic company data - a gearbox plant and a robot plant that supply each other, with ERP, process planning, MES, quality, maintenance, energy and a 3D shop floor. Students work through 20+ job-like labs; companies can have one built around their own products.
+    zh: 数字工厂是一座按真实企业数据运转的工业园：减速器厂、机器人厂、电路板厂、芯片封测厂，机器人厂向减速器厂买减速器、向电路板厂买驱动板；每座厂有 ERP、工艺、MES、质量、设备、能源和三维车间，厂情中枢一张图看全厂。学校用它做二十多个岗位实验，企业版可以按你的产品和流程搭起来。
+    en: The digital factory is an industrial park running on realistic company data - gearbox, robot, PCB and chip plants; the robot plant buys reducers from the gearbox plant and driver boards from the PCB plant. Each has ERP, process planning, MES, quality, maintenance, energy and a 3D shop floor. Students work through 20+ job-like labs; companies can have one built around their own products.
   link: {cn: /solutions/platform/, us: /factory}
 - id: sewing
   q:
@@ -302,3 +302,40 @@
     zh: 问渠科技的创办人是张国庆，博士、教授：历任高校院长、校长和省级重点研究院院长，做过企业博士后、常务副总和上市公司教育总监，在美国加州大学河滨分校、佛罗里达大学访学进修计算机，现任美国一家医疗器械公司的质量工程师。既懂课堂，也懂工厂。
     en: WenQuest was founded by Dr. Guoqing Zhang, a professor and former dean and university president who has also worked in industry and now works as a quality engineer at a US medical device company.
   link: {cn: /about/}
+# 第 101 轮：电子这条线（另一个会话第 82–103 轮做的，已上线的才写；设计都是示例设计）
+- id: pcb-plant
+  q:
+    zh: [电路板厂是什么, 电路板厂做什么, PCB 厂, SMT 贴片线, 驱动板在哪里生产]
+    en: [What is the PCB plant, PCB factory, SMT line]
+  sites: [us]
+  a:
+    zh: 电路板厂是数字工业园里的第三座厂，生产关节驱动板、AGV 控制板和编码器读头板：锡膏印刷、锡膏检测、贴片、回流焊、AOI，再到在线测试、烧录、老化和功能测试；机器人厂向它下驱动板订单，它接单、生产、发货，机器人厂来料检验后入库。工位数据（锡膏体积、炉温、AOI 缺陷、功能测试读数）都进系统，AI 巡检会发现缺陷率突升、炉温越界这类问题。
+    en: The PCB plant builds joint driver boards, AGV controller boards and encoder boards - paste print, paste inspection, placement, reflow, AOI, then in-circuit test, programming, burn-in and functional test. The robot plant orders driver boards from it; station data (paste volume, oven profile, AOI defects, test readings) feed AI checks such as a sudden rise in defects.
+  link: {us: "https://pcb.factory.wenquestrobotics.com/"}
+- id: pcb-design
+  q:
+    zh: [电路板设计在哪看, 驱动板原理图, 有没有 PCB 设计, KiCad, 驱动板 B 版, 固件仿真, Renode]
+    en: [Where is the PCB design, driver board schematic, KiCad design, firmware simulation, Renode]
+  sites: [us]
+  a:
+    zh: 数字工厂“仿真与分析”下的“电路板设计”：关节驱动板 A、B 两版的原理图、PCB、三维、BOM 和可制造性检查，可以下载设计文件；B 版放上了自研的编码器接口芯片，并有“固件（Renode 仿真）”标签，固件在仿真的整板上运行。都是示例设计，未经硬件验证。
+    en: Under Simulation and analysis in the digital factory, "PCB design" shows the joint driver board, rev A and rev B - schematic, layout, 3D, BOM and manufacturability checks, with files to download. Rev B carries our encoder-interface chip and has a firmware tab running on a simulated board in Renode. Example designs, not hardware-verified.
+  link: {us: "https://pcb.factory.wenquestrobotics.com/pcb-design"}
+- id: chip-design
+  q:
+    zh: [芯片设计在哪, 能做芯片设计吗, RTL 到 GDS, WQ-ENCIF, 编码器接口芯片, 芯片封测厂]
+    en: [chip design, RTL to GDS, WQ-ENCIF, encoder interface chip, chip packaging plant]
+  sites: [us]
+  a:
+    zh: “芯片设计”页是编码器接口芯片 WQ-ENCIF 从 RTL 到 GDS 的完整流程：综合、布局布线、DRC、LVS、时序，还有输入施密特触发器的晶体管级仿真；芯片封测厂负责它的封装、测试和分档（晶圆外协）。示例设计，未流片、未经硅验证。
+    en: The Chip design page walks the encoder-interface chip WQ-ENCIF from RTL to GDS - synthesis, place and route, DRC, LVS and timing, plus a transistor-level Schmitt trigger. The chip plant packages, tests and bins it (wafers bought in). An example design, not taped out.
+  link: {us: "https://pcb.factory.wenquestrobotics.com/chip-design"}
+- id: instruments
+  q:
+    zh: [虚拟仪器是什么, 传感器实验, 示波器, 万用表, 虚拟仪器在哪]
+    en: [virtual instruments, sensor labs, oscilloscope, multimeter]
+  sites: [us]
+  a:
+    zh: 传感器虚拟仪器在数字工厂“仿真与分析”下：7 种仪器（万用表、示波器等）、6 种传感器、6 个测量任务，学生接线测量、提交结果，系统自动核对，可以导出实验记录（表格和 Word）。
+    en: The sensor virtual instruments, under Simulation and analysis in the digital factory, have 7 instruments, 6 sensors and 6 measuring tasks; results are checked automatically and the lab record can be exported.
+  link: {us: "https://factory.wenquestrobotics.com/instruments"}

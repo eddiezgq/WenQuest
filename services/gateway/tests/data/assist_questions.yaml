@@ -82,3 +82,10 @@
 - {q: "Can I install it on my own server?", want: ["faq:deploy"]}
 - {q: "数字工厂集成平台能接SolidWorks吗", want: ["faq:platform"], site: cn}
 - {q: "上线要多久", want: ["faq:steps"], site: cn}
+# 第 101 轮：电子这条线
+- {q: "电路板厂做什么", want: ["faq:pcb-plant"], site: us}
+- {q: "驱动板原理图在哪看", want: ["faq:pcb-design"], site: us}
+- {q: "能做芯片设计吗", want: ["faq:chip-design"], site: us}
+- {q: "虚拟仪器是什么", want: ["faq:instruments"], site: us}
+- {q: "数字工厂有几座厂", want: ["faq:factory"]}
+

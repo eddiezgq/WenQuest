@@ -1,6 +1,6 @@
 /* 首页首屏：立体的厂情中枢（第 91 轮）。三层——设备、数据、事件——叠成一座立体网络，不连续旋转，按镜头设计换方向和远近：每条事件链“远景→近景→中景”，平滑过去后静止；也可以拖动换方向；
    数据包从设备往上流，每隔几秒走一条真实的“事件链”：一个数据异常如何一路映射到工单、质量、采购、交期和决策。
-   对象名取自问渠数字工厂（减速器厂 WQR-105、机器人厂 WQ-CR5、实验 7 情景）。纯 Canvas，不依赖外部库。
+   对象名取自问渠数字工厂（减速器厂 WQR-105、机器人厂 WQ-CR5、电路板厂驱动板、实验 7 情景）。纯 Canvas，不依赖外部库。
    用法：WQHub3D.start(canvas, {chain: 元素, count: 元素, rate: 元素}) */
 (function () {
   const LAYERS = [
@@ -18,6 +18,9 @@
     ["JT-01", "关节测试台", "Joint test bench", -1.35, 0.75], ["RI-01", "负载跑合台", "Load run-in bench", -0.6, 1.0],
     ["CR5-L", "协作机器人总装", "Cobot final assembly", 0.2, 1.2], ["EM-01", "总电表", "Main meter", 1.0, 1.2],
     ["F-002", "客户现场机器人 F002", "Field robot F002", -1.6, 1.35], ["CMM", "三坐标测量机", "CMM", 0.1, 0.35],
+    // 电路板厂（第 101 轮；问渠数字工业园第三座厂，给机器人厂供驱动板）
+    ["SMT-1", "电路板厂 SMT 贴片线", "PCB plant SMT line", 0.5, -0.8], ["AOI-1", "AOI 光学检测", "AOI inspection", 1.1, -0.45],
+    ["FCT-1", "驱动板功能测试 FCT", "Driver board FCT", -0.35, 0.62],
   ];
   // 数据（第 1 层）：[编号, 所属设备, 中文, 英文, 单位, 基准值, 波动]
   const TAGS = [
@@ -33,6 +36,8 @@
     ["simr", "RI-01", "仿真/实测偏差", "sim vs measured", "%", 3.1, 0.4], ["cycle", "CR5-L", "总装节拍", "assembly cycle", "min", 42, 1],
     ["kwh", "EM-01", "峰时功率", "peak power", "kW", 312, 8], ["fbl", "F-002", "现场背隙", "field backlash", "′", 1.1, 0.04],
     ["fhr", "F-002", "运行小时", "run hours", "h", 3120, 1], ["dim", "CMM", "孔径 Ø50 H7", "bore Ø50 H7", "mm", 50.012, 0.002],
+    ["paste", "SMT-1", "锡膏体积", "paste volume", "%", 98, 3], ["reflow", "SMT-1", "回流峰温", "reflow peak", "°C", 245, 2],
+    ["aoi", "AOI-1", "AOI 缺陷率", "AOI defect rate", "ppm", 120, 15], ["isns", "FCT-1", "相电流采样误差", "current-sense error", "%", 0.6, 0.05],
   ];
   // 事件（第 2 层）：[编号, 中文, 英文, x, z]
   const EVENTS = [
@@ -43,6 +48,7 @@
     ["PR", "采购申请 PR-332", "Purchase req. PR-332", -0.95, 1.0], ["SUP", "供应商交期", "Supplier lead time", -0.1, 1.35],
     ["SVC", "售后工单 SV-087", "Service ticket SV-087", 0.65, 1.4], ["ENERGY", "能耗异常", "Energy anomaly", 1.55, -0.85],
     ["AI", "AI 简报", "AI briefing", 0.25, -0.3], ["GM", "厂长决策", "Plant manager decides", 0.0, -0.75],
+    ["PO-DRV", "驱动板订单 PO-7710", "Driver board order PO-7710", -0.75, -1.35], ["IQC", "机器人厂来料检验", "Robot plant incoming inspection", 1.3, 1.15],
   ];
   // 事件链：数据异常 → 一路映射到业务事件
   const CHAINS = [
@@ -50,6 +56,11 @@
       steps: [["CNC-L02", "数控车床 L02 运行中", "CNC lathe L02 running"], ["vib2", "主轴振动 7.8 mm/s ↑（阈值 4.5）", "spindle vibration 7.8 mm/s ↑ (limit 4.5)", 7.8],
         ["MAINT", "自动开预测性维护 MO-1182", "predictive maintenance MO-1182 opened"], ["SCHED", "APS 重排 3 张工单", "APS reschedules 3 work orders"],
         ["SO", "SO-2045 交期风险 −0.5 天", "SO-2045 due date at risk, −0.5 day"], ["AI", "AI 简报：附数据来源", "AI briefing, with data sources"], ["GM", "厂长决定：加一班", "Plant manager: add a shift"]] },
+    { zh: "机器人厂下驱动板订单 → 电路板厂贴片 → AOI 缺陷升高 → 追因 → 交回总装", en: "Driver board order → PCB plant SMT → AOI defects rise → root cause → back to assembly",
+      steps: [["PO-DRV", "机器人厂向电路板厂下单：驱动板 200 块", "robot plant orders 200 driver boards from the PCB plant"], ["SMT-1", "电路板厂 SMT 线开工", "PCB plant SMT line starts"],
+        ["paste", "锡膏体积 84% ↓（下限 90%）", "paste volume 84% ↓ (min 90%)", 84], ["aoi", "AOI 缺陷率 860 ppm ↑（少锡）", "AOI defects 860 ppm ↑ (insufficient solder)", 860],
+        ["QA", "质量预警：追到钢网堵孔，清洗", "quality alert: clogged stencil, cleaned"], ["isns", "功能测试：采样误差 0.6%，全部通过", "FCT: current-sense error 0.6%, all pass", 0.6],
+        ["IQC", "机器人厂来料检验，入库", "robot plant incoming inspection, stocked"], ["CR5-L", "协作机器人总装", "cobot final assembly"], ["AI", "AI 简报", "AI briefing"]] },
     { zh: "齿形误差连升 7 点 → 质量预警 → 8D → 批次隔离", en: "Profile error trend → quality alert → 8D → lot hold",
       steps: [["GR-01", "磨齿机 GR-01", "Gear grinder GR-01"], ["fpe", "齿形误差 6.1 µm，连升 7 点", "profile error 6.1 µm, 7 points rising", 6.1],
         ["spc", "SPC 判异：规则 3", "SPC rule 3 violated", 2.6], ["QA", "质量预警，停机确认", "quality alert, stop and verify"], ["8D", "开 8D-0117 追因：砂轮修整周期", "8D-0117: dressing interval"],
