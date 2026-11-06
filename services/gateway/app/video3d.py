@@ -197,6 +197,12 @@ def check(text: str) -> tuple[dict | None, list[str]]:
     return s, errs
 
 
+class _NoAlias(yaml.SafeDumper):
+    """不写 &id001 这类引用：人和 AI 改场景时一眼看得懂"""
+    def ignore_aliases(self, data):
+        return True
+
+
 def apply_lock(text: str, lock: dict | None) -> str:
     """缝纫机软件写的讲解片（第 56 轮）：AI 或人改场景时，设计模型的机型和参数改回原样——只许改镜头、节奏、字"""
     if not lock:
@@ -674,8 +680,9 @@ OUT_NAMES = {"draft": {"video_小样.mp4": "draft.mp4"}, "hd": {"video.mp4": "hd
 
 class Service:
     def __init__(self, root: Path, ai, blender: Blender, provider, *, max_machines: int = 2, max_hours: float = 3.0,
-                 wait_minutes: int = 60):
+                 wait_minutes: int = 60, voice_url: str = ""):
         self.store = Store(root)
+        self.voice_url = voice_url              # 第 90 轮：平台语音服务（讲解片旁白）；空 = 不配
         self.ai, self.blender, self.provider = ai, blender, provider
         self.max_machines, self.max_hours, self.wait = max_machines, max_hours, wait_minutes
         self.tick_lock = asyncio.Lock()
@@ -751,6 +758,8 @@ class Service:
                     V["chat"].append({"who": "ai", "text": str(res.get("reply") or "写好了。")[:1000], "at": now()})
                     V["busy"], V["ai_error"] = "", ""
                     self.store.save(V)
+                    if (V.get("voice") or {}).get("on"):          # 第 90 轮：改了字幕、节奏，旁白重配、段落重新拉长
+                        await self.revoice(vid, stills=False)
                     return
                 last_errs = errs
                 prompt = base + "\n\n## 上一稿没通过检查，请改正后重写完整场景\n" + "\n".join("- " + e for e in errs[:20]) + "\n\n上一稿：\n" + text[:MAX_SCENE]
@@ -778,6 +787,80 @@ class Service:
         V["title"] = {"zh": str(t.get("zh") or "")[:60], "en": str(t.get("en") or "")[:120]}
         self.store.save(V)
         return []
+
+    # ---- 旁白（第 90 轮：缝纫机讲解片）
+    async def speak(self, text: str, voice: str) -> tuple[bytes, float]:
+        """一句话的 WAV 和长度；按“声音 + 语速 + 文字”缓存在 video3d/voice_cache"""
+        from . import sewing_voice as SVO
+        from .production import voice as VS
+        d = self.store.root / "voice_cache"
+        d.mkdir(parents=True, exist_ok=True)
+        k = hashlib.sha1(f"{voice}|{SVO.SPEED:.2f}|{text}".encode()).hexdigest()
+        wav, meta = d / f"{k}.wav", d / f"{k}.json"
+        if wav.exists() and meta.exists():
+            return wav.read_bytes(), float(json.loads(meta.read_text())["seconds"])
+        audio, secs = await VS.tts(self.voice_url, text, voice, SVO.SPEED)
+        wav.write_bytes(audio)
+        meta.write_text(json.dumps({"seconds": secs, "text": text[:200]}, ensure_ascii=False))
+        return audio, secs
+
+    async def revoice(self, vid: str, stills: bool = True) -> None:
+        """配旁白：念画面上的字，旁白长的段放慢拉长（场景改写一版），混成 audio.m4a；配不成就照无声出（并说明）。
+        stills=True 时配完接着出关键画面（拉长以后关键画面的时刻变了）"""
+        from . import sewing_voice as SVO
+        V = self.store.load(vid)
+        vo = V.setdefault("voice", {"on": True})
+        V["busy"] = "voice"
+        vo.update(state="running", error="")
+        self.store.save(V)
+        msg = ""
+        try:
+            if not self.voice_url:
+                raise RuntimeError("这台服务器没有装语音服务")
+            spec, errs = check(self.store.scene(vid))
+            if errs or spec is None:
+                raise RuntimeError("场景没通过检查")
+            lang = SVO.lang_of(spec)
+            items = SVO.lines(spec, lang)
+            clips = []
+            for x in items:
+                wav, secs = await self.speak(x["text"], SVO.VOICES[lang])
+                x["dur"] = secs
+                clips.append(wav)
+            fitted = SVO.fit(spec, items)
+            text = ("# 缝纫机设计软件按这台设计自动写的讲解片场景（第 56 轮），配了旁白（第 90 轮：旁白长的段已放慢拉长）。\n"
+                    + yaml.dump(fitted, Dumper=_NoAlias, allow_unicode=True, sort_keys=False, width=200))
+            text = apply_lock(text, V.get("lock"))
+            spec2, errs = check(text)
+            errs = errs or lock_errors(spec2, V.get("lock"))
+            if errs:
+                raise RuntimeError("拉长后的场景没通过检查：" + "；".join(errs[:2]))
+            audio = await asyncio.to_thread(SVO.mix, [(v["t"], w) for v, w in zip(fitted["voice"], clips)], float(fitted["duration"]))
+            V = self.store.load(vid)
+            self.store.set_scene(V, text)
+            (self.store.vdir(vid) / "audio.m4a").write_bytes(audio)
+            V.setdefault("voice", {"on": True}).update(state="done", version=V["version"], n=len(items), seconds=fitted["duration"], lang=lang)
+            msg = (f"旁白配好了：{len(items)} 段，念的是画面上的标题和字幕；旁白长的段已放慢，片长 {fitted['duration']:g} 秒。"
+                   "小样、高清里有声音（关键画面没有）。")
+        except Exception as e:  # noqa: BLE001
+            log.warning("video3d voice %s: %s", vid, e)
+            V = self.store.load(vid)
+            V.setdefault("voice", {"on": True}).update(state="failed", error=str(e)[:300])
+            msg = f"旁白没配成（{str(e)[:120]}），先按无声的出；可以稍后在“三维视频”里提意见时再配。"
+        V["busy"] = ""
+        V["chat"].append({"who": "ai", "text": msg, "at": now()})
+        self.store.save(V)
+        if stills and self.blender.on:
+            V = self.store.load(vid)
+            V["stills"] = {"state": "running", "version": V.get("version")}
+            self.store.save(V)
+            await self.stills(vid)
+
+    def audio_for(self, V: dict) -> Path | None:
+        """这一版场景配好的旁白（版本对得上才用）"""
+        vo = V.get("voice") or {}
+        p = self.store.vdir(V["id"]) / "audio.m4a"
+        return p if vo.get("on") and vo.get("state") == "done" and vo.get("version") == V.get("version") and p.exists() else None
 
     # ---- 关键画面（blender 容器）
     async def stills(self, vid: str) -> None:
@@ -809,6 +892,9 @@ class Service:
         rid = secrets.token_hex(6)
         text = normalized(self.store.scene(V["id"]))
         (self.store.vdir(V["id"]) / f"run_{rid}.yaml").write_text(text, encoding="utf-8")
+        au = self.audio_for(V)
+        if au:                                                       # 第 90 轮：旁白跟着这一次出片走
+            shutil.copy(au, self.store.vdir(V["id"]) / f"run_{rid}.m4a")
         self.store.add_run(id=rid, video=V["id"], user_id=uid, quality=quality, provider=getattr(self.provider, "name", ""),
                            state="queued", queued_at=now(), price_hour=0.0)
         V.setdefault("renders", {})[quality] = {"state": "queued", "run": rid, "version": V.get("version"), "stage": "",
@@ -903,6 +989,9 @@ class Service:
             await jup.put("wq3d/bundle.tgz", await self.blender.bundle())
             await jup.put("wq3d/run.sh", (await self.blender.run_sh()).decode("utf-8"))
             await jup.put("wq3d/job/scene.yaml", (self.store.vdir(run["video"]) / f"run_{run['id']}.yaml").read_text(encoding="utf-8"))
+            au = self.store.vdir(run["video"]) / f"run_{run['id']}.m4a"
+            if au.exists():                                          # 渲染器合成时自动配上场景目录里的 audio.m4a
+                await jup.put("wq3d/job/audio.m4a", au.read_bytes())
             await jup.put("wq3d/job/job.json", json.dumps({"quality": q}))
             await jup.run(START_CODE)
             self.store.update_run(run["id"], state="rendering", url=s["url"], token=s["token"], errors=0)

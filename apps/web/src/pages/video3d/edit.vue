@@ -15,7 +15,7 @@
               <AiBadge v-if="c.who === 'ai'" />
               <text>{{ c.text }}</text>
             </view>
-            <view v-if="v.busy" class="msg ai muted">{{ t("v3.aiWriting") }}…</view>
+            <view v-if="v.busy" class="msg ai muted">{{ t(v.busy === "voice" ? "v3.voicing" : "v3.aiWriting") }}…</view>
           </scroll-view>
           <view v-if="v.ai_error" class="alert small">{{ v.ai_error }}</view>
           <textarea v-model="say" class="area" :placeholder="t('v3.sayPh')" maxlength="2000" :disabled="!!v.busy" />
@@ -66,6 +66,7 @@
                 <text v-if="r && live(r.state)" class="link danger" @click="cancel">{{ t("v3.cancel") }}</text>
                 <view v-else class="primary" :class="{ disabled: !!v.busy || !v.render_on }" @click="render">{{ t(tab === "hd" ? "v3.doHd" : "v3.doDraft") }}</view>
               </view>
+              <text v-if="v.voice && v.voice.on && v.voice.state === 'done' && v.voice.version === v.version" class="hint">{{ t("v3.withVoice") }}</text>
               <text v-if="!v.render_on" class="hint">{{ t("v3.noMachines") }}</text>
               <text v-else class="hint">{{ t(tab === "hd" ? "v3.hdHint" : "v3.draftHint") }}</text>
             </template>

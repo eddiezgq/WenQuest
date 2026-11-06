@@ -441,6 +441,7 @@ class VideoIn(BaseModel):
     params: dict[str, Any] = Field(default_factory=dict)
     project: str = Field(default="", max_length=80)
     lang: str = Field(default="zh", pattern="^(zh|en|both)$")
+    voice: bool = True                  # 第 90 轮：配旁白（念画面上的字，旁白长的段放慢拉长）
 
 
 def register(app, m) -> None:
@@ -466,11 +467,16 @@ def register(app, m) -> None:
         probs = "；".join(meta["problems"]) if meta["problems"] else ""
         V["chat"].append({"who": "ai", "at": video3d_api.v3.now(),
                           "text": f"按这台设计自动写好了场景（{meta['duration']:g} 秒：整机、各机构"
-                                  + (f"，再把 {len(meta['problems'])} 项红黄灯慢放标出" if probs else "") + "）。正在出关键画面；"
+                                  + (f"，再把 {len(meta['problems'])} 项红黄灯慢放标出" if probs else "") + "）。"
+                                  + ("正在配旁白，配好接着出关键画面；" if body.voice else "正在出关键画面；") +
                                   "看过可以直接出小样、高清，或者告诉我要改什么（镜头、节奏、字幕都能改，设计参数和数值不改）。"})
+        if body.voice:
+            V["voice"], V["busy"] = {"on": True, "state": "running"}, "voice"
         svc.store.save(V)
-        if svc.blender.on:
+        if body.voice:
+            svc.spawn(svc.revoice(V["id"]))                 # 配完接着出关键画面（拉长以后关键画面的时刻变了）
+        elif svc.blender.on:
             V["stills"] = {"state": "running", "version": V.get("version")}
             svc.store.save(V)
             svc.spawn(svc.stills(V["id"]))
-        return {"id": V["id"], "duration": meta["duration"], "problems": meta["problems"]}
+        return {"id": V["id"], "duration": meta["duration"], "problems": meta["problems"], "voice": body.voice}

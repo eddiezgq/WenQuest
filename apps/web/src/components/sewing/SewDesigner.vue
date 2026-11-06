@@ -192,6 +192,7 @@
             <text class="para">{{ t(["pattern", "embroid", "flatknit"].includes(machine) ? "sew.videoTextSeq" : "sew.videoText") }}</text>
             <text v-if="machine === 'cover'" class="para muted">{{ t("sew.videoCover") }}</text>
             <text v-if="['pattern', 'embroid', 'flatknit'].includes(machine)" class="para muted">{{ t("sew.videoSeq") }}</text>
+            <view class="vchk" @click="videoVoice = !videoVoice"><text class="box">{{ videoVoice ? "☑" : "☐" }}</text><text>{{ t("sew.videoVoice") }}</text></view>
             <view class="btn" :class="{ disabled: !me.licensed }" @click="makeVideo">{{ making === "video" ? t("sew.videoMaking") : t("sew.videoBtn") }}</view>
           </view>
           <view class="fc">
@@ -264,6 +265,7 @@ const pname = ref("");
 const msg = ref("");
 const making = ref("");
 const flang = ref<"zh" | "en">(locale.value === "en" ? "en" : "zh");
+const videoVoice = ref(true);                     // 第 90 轮：讲解片配旁白，默认配
 const protoOk = ref(true);
 const frame = ref<any>(null);
 const licenses = ref<any[]>([]);
@@ -678,7 +680,7 @@ async function makeVideo() {
   making.value = "video";
   msg.value = "";
   try {
-    const r = await request<{ id: string }>("POST", "/api/v1/sewing/video", { machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value });
+    const r = await request<{ id: string }>("POST", "/api/v1/sewing/video", { machine: machine.value, params: { ...params }, project: current.value?.name || pname.value || "", lang: flang.value, voice: videoVoice.value });
     uni.navigateTo({ url: `/pages/video3d/edit?id=${encodeURIComponent(r.id)}` });
   } catch (e) {
     msg.value = errorText(e instanceof ApiError ? e.code : "unknown");
@@ -816,6 +818,7 @@ init();
 .dot.skip { background: #e8913a; }
 .dot.hit, .dot.cut, .dot.break { background: #c0392b; }
 .chk { display: flex; gap: 10px; padding: 9px 0; border-top: 1px solid var(--wq-line); }
+.vchk { display: flex; gap: 6px; align-items: flex-start; margin: 6px 0 8px; font-size: 13px; cursor: pointer; }
 .lamp { width: 12px; height: 12px; border-radius: 50%; margin-top: 5px; flex: none; background: #2e9e6a; }
 .lamp.warn, .cst.warn { background: #e8913a; }
 .lamp.bad, .cst.bad { background: #c0392b; }

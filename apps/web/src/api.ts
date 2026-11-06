@@ -391,6 +391,7 @@ export interface V3Video extends V3Summary {
   prompt: string; chat: { who: "me" | "ai"; text: string; at: number }[]; ai_error: string; version: number; scene: string;
   stills: { state?: string; urls?: string[]; error?: string; stale: boolean; times?: number[]; seconds?: number };
   renders: Record<string, any>; render_on: boolean; stills_on: boolean;
+  voice?: { on?: boolean; state?: string; version?: number; error?: string; n?: number; seconds?: number };   // 第 90 轮：旁白
   timeline?: { duration: number; labels: { t: number[]; zh: string; en: string; bottom: boolean }[]; shots: number; style: string };
 }
 export interface V3AdminOverview { grants: { user_id: number; username: string; note: string; at: number }[];

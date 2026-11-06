@@ -64,7 +64,8 @@ def service(m) -> v3.Service:
     if s is None or str(s.store.root) != root or s.ai is not m.state.ai:
         blender = v3.Blender(st.video3d_blender_url, getattr(m.state, "video3d_transport", None))
         s = m.state.video3d = v3.Service(Path(root), m.state.ai, blender, provider_of(m), max_machines=st.video3d_max_machines,
-                                         max_hours=st.video3d_max_hours, wait_minutes=st.video3d_wait_minutes)
+                                         max_hours=st.video3d_max_hours, wait_minutes=st.video3d_wait_minutes,
+                                         voice_url=getattr(st, "voice_url", "") or "")
     return s
 
 
@@ -148,7 +149,7 @@ def register(app, m) -> None:
         except Exception:  # noqa: BLE001
             timeline = {"duration": None, "labels": [], "shots": 0, "style": ""}
         return {**summary(V), "prompt": V.get("prompt"), "timeline": timeline, "chat": V.get("chat"), "ai_error": V.get("ai_error"),
-                "version": V.get("version"), "scene": scene, "stills": S, "renders": R,
+                "version": V.get("version"), "scene": scene, "stills": S, "renders": R, "voice": V.get("voice") or {},
                 "render_on": svc.render_on, "stills_on": svc.blender.on}
 
     @app.get("/api/v1/video3d/access")
@@ -210,10 +211,16 @@ def register(app, m) -> None:
         a = await need(sess)
         V = load(vid, sess, a)
         not_busy(V)
-        errs = service(m).set_scene(V, body.scene)
+        svc = service(m)
+        errs = svc.set_scene(V, body.scene)
         if errs:
             raise EngineError("bad_scene", "；".join(errs[:6]), 422)
-        return detail(service(m).store.load(vid))
+        if (V.get("voice") or {}).get("on"):                       # 第 90 轮：直接改了场景，旁白重配
+            V = svc.store.load(vid)
+            V["busy"] = "voice"
+            svc.store.save(V)
+            svc.spawn(svc.revoice(vid, stills=False))
+        return detail(svc.store.load(vid))
 
     @app.post("/api/v1/video3d/{vid}/stills")
     async def stills(vid: str, sess: Annotated[Session, Depends(current)]):
