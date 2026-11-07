@@ -78,7 +78,7 @@ canvas{max-width:100%;image-rendering:pixelated;border:1px solid var(--line)}.le
 </table></div>
 <h2>三、热</h2>
 <p><span class='s unknown'>未知</span>；板上最高 114.2 ℃，总损耗 4.26 W。条件：环境 40 ℃，两面对流 10 W/(m²·K)。环境温度 40 ℃、两面自然对流换热系数 10 W/(m²·K) 都是示例假设（电控箱里不通风时的量级）；PWM 20 kHz 取自 drv-joint-b/fw/src/motor.h</p><p class='sub'>导热：Electronics Cooling 1998-05 Calculation Corner：铜 390、FR-4 0.25 W/(m·K)；100 × 70 格，每格 1 mm。简化模型：板子当一块平板，没算器件本体、外壳和过孔导热；只作布局阶段的估算，不替代样板实测</p>
-<canvas id='heat' role='img' aria-label='板子温度分布'></canvas><p class='legend'>板子温度分布（顶视，<span id='lo'></span> ℃ 蓝 → <span id='hi'></span> ℃ 红）</p>
+<canvas id='heat' role='img' aria-label='板子温度分布'></canvas><p class='legend'>板子温度分布（顶视，<span id='lo'></span> ℃ 浅 → <span id='hi'></span> ℃ 深）</p>
 <div class='wrap'><table><tr><th>位号</th><th>损耗 W</th><th>其中</th><th>焊盘下板温 ℃</th><th>结温 ℃ / 上限</th><th>结论</th><th>说明</th></tr>
 <tr><td>Q1</td><td class='n'>0.638</td><td>导通 I²·R_DS(on) 0.289；开关 ½·V·I·(t_on+t_off)·f 0.349</td><td class='n'>107.7</td><td class='n'>108.5 / 150</td><td><span class='s unknown'>未知</span></td><td>R_DS(on) 用 25 ℃ 的最大值；结温高时更大，导通损耗偏低；结温 108 ℃ 没超上限，但损耗偏低，判不了</td></tr>
 <tr><td>Q2</td><td class='n'>0.638</td><td>导通 I²·R_DS(on) 0.289；开关 ½·V·I·(t_on+t_off)·f 0.349</td><td class='n'>106.4</td><td class='n'>107.2 / 150</td><td><span class='s unknown'>未知</span></td><td>R_DS(on) 用 25 ℃ 的最大值；结温高时更大，导通损耗偏低；结温 107 ℃ 没超上限，但损耗偏低，判不了</td></tr>
@@ -94,8 +94,9 @@ canvas{max-width:100%;image-rendering:pixelated;border:1px solid var(--line)}.le
 (function(){var d=JSON.parse(document.getElementById('tdata').textContent),cv=document.getElementById('heat');
 if(!cv)return;var s=6,ctx=cv.getContext('2d');cv.width=d.nx*s;cv.height=d.ny*s;
 var lo=Math.min.apply(null,d.t),hi=Math.max.apply(null,d.t);
-function col(v){var u=(v-lo)/Math.max(1e-9,hi-lo);var r=Math.round(40+215*u),g=Math.round(70+120*(1-Math.abs(u-.5)*2)),
-b=Math.round(160*(1-u));return 'rgb('+r+','+g+','+b+')';}
+function col(v){var u=(v-lo)/Math.max(1e-9,hi-lo),S=[[255,245,235],[253,174,107],[230,85,13],[127,39,4]];
+var k=Math.min(2,Math.floor(u*3)),f=u*3-k,a=S[k],b=S[k+1];
+return 'rgb('+[0,1,2].map(function(i){return Math.round(a[i]+(b[i]-a[i])*f);}).join(',')+')';}
 for(var j=0;j<d.ny;j++)for(var i=0;i<d.nx;i++){ctx.fillStyle=col(d.t[j*d.nx+i]);ctx.fillRect(i*s,(d.ny-1-j)*s,s,s);}
 document.getElementById('lo').textContent=lo.toFixed(0);document.getElementById('hi').textContent=hi.toFixed(0);})();
 </script>
