@@ -4,6 +4,7 @@ import os
 import sys
 
 os.environ.setdefault("EDA_SIM", "0")
+os.environ.setdefault("EDA_THERMAL", "0")  # 第 111 轮：热分析要 CalculiX，在 eda/tests 里测
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest  # noqa: E402
@@ -85,3 +86,18 @@ def test_evaluate_rejects_out_of_range_and_reports_missing(client):
 
 def test_requirement_length(client):
     assert client.post("/api/draft", json={"requirement": "a"}, headers={"cookie": "x=1"}).status_code == 400
+
+
+def test_board_checks_follow_the_draft(client):
+    """第 111 轮：结果里带模板板子的检查；额定相电流改到 15 A，大电流线宽判不通过（不重新布线）"""
+    h = {"cookie": "wq_sso=x"}
+    r = client.post("/api/draft", json={"requirement": REQ}, headers=h).json()
+    b = r["result"]["board"]
+    assert "skipped" not in b and b["factory"].startswith("示例贴片厂")
+    c1 = next(x for x in b["rows"] if x["key"] == "C1")
+    assert c1["status"] == "pass"
+    vals = {"spec": {"bus_voltage_v": 48, "phase_current_a": 15, "phase_current_peak_a": 30}}
+    e = client.post("/api/evaluate", json={"requirement": REQ, "report": r["report"], "values": vals}).json()
+    c1 = next(x for x in e["result"]["board"]["rows"] if x["key"] == "C1")
+    assert c1["status"] == "fail" and "MOT_A 15 A" in c1["detail"]
+    assert e["result"]["board"]["count"]["fail"] > b["count"]["fail"]

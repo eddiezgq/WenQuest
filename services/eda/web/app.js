@@ -17,7 +17,11 @@ const T = {
     field: "项", value: "值", source: "来源", src: {requirement: "需求原文", rule: "规则推出", assumption: "AI 假设",
       person: "人填", template: "模板默认"},
     fails: "不通过的判定", none: "无", login: "请先登录问渠账号", loginLink: "去登录",
-    noDesign: "还缺必须有的规格，没法展开电路。", confirmFirst: "先勾选确认"},
+    noDesign: "还缺必须有的规格，没法展开电路。", confirmFirst: "先勾选确认",
+    board: "板子检查", boardHint: "用驱动板模板的板子（不重新布线），按这份草稿的规格查工艺、布局约束和热。",
+    boardItem: "项", boardRes: "结论", boardVal: "量到 / 限值", boardNote: "说明", boardAll: "通过的 {n} 项",
+    heat: (s, t, w) => `热：${s}。板上最高约 ${t} ℃，总损耗 ${w} W（简化平板模型，只作布局阶段估算）。`,
+    tj: "结温", limit: "限", detailLang: ""},
   en: {brand: "WenQuest Electronics", desk: "Drafting desk", help: "Help", title: "Turn a requirement into a circuit board",
     lede: "Write a sentence or a short requirement. AI drafts the specification and block parameters, each number with its source; code then expands the circuit and runs the calculations and simulations. You change and decide, then download the design description.",
     reqLabel: "Requirement", go: "Draft with AI", scope: "This version covers one board family: a three-phase motor drive (nine block types, fixed topology); the board layer follows the drive-board template. Example design, not for production.",
@@ -34,7 +38,11 @@ const T = {
     field: "Item", value: "Value", source: "Source", src: {requirement: "requirement", rule: "derived", assumption: "AI assumption",
       person: "entered", template: "template"},
     fails: "Failed checks", none: "none", login: "Please sign in with your WenQuest account", loginLink: "Sign in",
-    noDesign: "Required specification is missing, so no circuit can be expanded.", confirmFirst: "Tick the confirmation first"},
+    noDesign: "Required specification is missing, so no circuit can be expanded.", confirmFirst: "Tick the confirmation first",
+    board: "Board checks", boardHint: "The drive-board template's board (not re-routed), checked against this draft's specification: process, layout constraints and thermal.",
+    boardItem: "Item", boardRes: "Result", boardVal: "Measured / limit", boardNote: "Note", boardAll: "{n} passing items",
+    heat: (s, t, w) => `Thermal: ${s}. Board peak about ${t} °C, total loss ${w} W (simplified plate model, a layout-stage estimate only).`,
+    tj: "junction", limit: "limit", detailLang: "Item names and notes are in Chinese for now."},
 };
 let lang = (localGet("eda.lang") || (navigator.language || "zh").slice(0, 2)) === "en" ? "en" : "zh";
 let CAT = null, state = null;           // state = {requirement, report, result, runs}
@@ -136,11 +144,37 @@ function render() {
           `<td>${input(p, e ? e.value : p.default, `p-${u.type}-${p.key}`)}<span class="unit">${esc(p.unit)}</span></td><td>${srcChip(e)}</td></tr>`;
       }).join("") + `</table></div></details>`;
   }).join("");
+  renderBoard(result && result.board);
   $("#ok").checked = false;
   $("#dl").disabled = !result;
   const book = $("#book");
   book.srcdoc = result ? result.html : "";
   $("#dlmd").style.display = result ? "" : "none";
+}
+
+// 第 111 轮：板子检查（不通过、未知的排在前面；通过的收在“全部”里）
+function renderBoard(b) {
+  const box = $("#boardT");
+  if (!b) { box.innerHTML = `<p class="hint">${esc(t("noDesign"))}</p>`; return; }
+  if (b.skipped) { box.innerHTML = `<p class="hint">${esc(b.skipped[lang] || b.skipped.zh)}</p>`; return; }
+  const rank = {fail: 0, unknown: 1, pending: 2, pass: 3};
+  const fmt = v => v === null || v === undefined ? "—" : (typeof v === "number" ? +v.toFixed(3) : v);
+  const val = r => r.limit === null || r.limit === undefined ? `${fmt(r.value)} ${esc(r.unit || "")}` : `${fmt(r.value)} / ${esc(t("limit"))} ${fmt(r.limit)} ${esc(r.unit || "")}`;
+  const row = r => `<tr><td>${esc(r.name)}<small>${esc(r.key)}</small></td><td class="${r.status}"><b>${esc(t(r.status))}</b></td><td>${val(r)}</td><td>${esc(r.detail || r.why || "")}</td></tr>`;
+  const head = `<tr><th>${esc(t("boardItem"))}</th><th>${esc(t("boardRes"))}</th><th>${esc(t("boardVal"))}</th><th>${esc(t("boardNote"))}</th></tr>`;
+  const rows = b.rows.slice().sort((a, c) => rank[a.status] - rank[c.status]);
+  const top = rows.filter(r => r.status !== "pass"), rest = rows.filter(r => r.status === "pass");
+  const th = b.thermal || {};
+  const fets = (th.rows || []).filter(r => r.model === "mosfet");
+  let h = `<div class="tally">` + ["pass", "fail", "pending", "unknown"].map(k => `<span class="${k}"><b>${b.count[k]}</b>${esc(t(k))}</span>`).join("") + `</div>`;
+  if (t("detailLang")) h += `<p class="hint">${esc(t("detailLang"))}</p>`;
+  if (th.status && th.t_max_c !== undefined && th.t_max_c !== null) {
+    h += `<p class="${th.status}">${esc(t("heat")(t(th.status), th.t_max_c, th.total_w))}</p>`;
+    if (fets.length) h += `<p class="hint">${fets.map(r => `${esc(r.ref)} ${esc(t("tj"))} ${fmt(r.tj_c)} / ${fmt(r.tj_max_c)} ℃ <span class="${r.status}">${esc(t(r.status))}</span>`).join(" · ")}</p>`;
+  } else if (th.detail) h += `<p class="hint">${esc(th.detail)}</p>`;
+  if (top.length) h += `<div class="wrap"><table>${head}${top.map(row).join("")}</table></div>`;
+  h += `<details class="unit"><summary>${esc(t("boardAll").replace("{n}", rest.length))}</summary><div class="wrap"><table>${head}${rest.map(row).join("")}</table></div></details>`;
+  box.innerHTML = h;
 }
 
 function readValues() {

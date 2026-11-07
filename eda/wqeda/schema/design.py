@@ -17,6 +17,7 @@ import os
 import yaml
 
 from .. import blocks
+from . import board as _board
 
 DESIGN_FORMAT = "wqeda.design/1"
 VARIANT_FORMAT = "wqeda.variant/1"
@@ -104,7 +105,10 @@ def validate_design(doc):
         if not isinstance(nets.get(name, []), list):
             p.append("circuit.nets.{} 应是列表".format(name))
     for net, amps in (nets.get("high_current") or {}).items():
-        if not _is_num(amps) or amps <= 0:
+        if isinstance(amps, str):
+            if not (amps.startswith("spec.") and _is_num(doc["spec"].get(amps[5:]))):
+                p.append("大电流网络 {} 的电流 {} 应是正数或 spec.<规格字段>".format(net, amps))
+        elif not _is_num(amps) or amps <= 0:
             p.append("大电流网络 {} 的电流应是正数".format(net))
     ict = c.get("ict_test_points")
     if ict is not None:
@@ -139,6 +143,7 @@ def validate_design(doc):
         for pad in pads:
             if not (isinstance(pad, list) and len(pad) == 2 and pad[0] in known and isinstance(pad[1], str)):
                 p.append("大电流焊盘 {} 应是 [位号, 引脚]，位号要在器件清单里".format(net))
+    p += _board.validate(bd, known)
     return p
 
 
@@ -351,7 +356,7 @@ def expand(doc, var=None):
         "ict_nets": ict,
         "nc_nets": set(nets.get("nc") or []),
         "power_nets": set(nets.get("power") or []),
-        "high_current": dict(nets.get("high_current") or {}),
+        "high_current": {net: _amps(a, doc["spec"]) for net, a in (nets.get("high_current") or {}).items()},
         "back_end_items": set(c.get("back_end_items") or []),
         "board_mm": tuple(bd["outline_mm"]),
         "layers": bd["layers"],
@@ -359,4 +364,26 @@ def expand(doc, var=None):
         "holes": [tuple(h) for h in bd.get("holes") or []],
         "power_pads": {net: [tuple(x) for x in pads] for net, pads in (bd.get("power_pads") or {}).items()},
         "pours": [(q["net"], q["layer"], [tuple(xy) for xy in q["points"]]) for q in bd.get("pours") or []],
+        "net_classes": _net_classes(bd, parts),
+        "stackup": dict(bd.get("stackup") or {}),
+        "rules": dict(bd.get("rules") or {}),
+        "thermal": copy.deepcopy(bd.get("thermal") or {}),
+        "constraints": copy.deepcopy(bd.get("constraints") or []),
+        "high_current_src": dict(nets.get("high_current") or {}),
     }
+
+
+def _amps(a, spec):
+    """大电流网络的电流：数，或 spec.<字段>（跟着规格变）"""
+    return float(spec[a[5:]]) if isinstance(a, str) else a
+
+
+def _net_classes(bd, parts):
+    """网络分类只留板子上真有的网络（同一份分类给 A、B 两版用：B 版多的网络在 A 版里自动去掉），顺序不变"""
+    have = {n for q in parts for n in q["pins"].values()}
+    out = []
+    for c in bd.get("net_classes") or []:
+        d = dict(c)
+        d["nets"] = [n for n in c["nets"] if n in have]
+        out.append(d)
+    return out
