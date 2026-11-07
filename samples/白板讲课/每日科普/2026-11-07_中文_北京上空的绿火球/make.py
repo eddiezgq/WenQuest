@@ -170,13 +170,13 @@ def bars(a, x, y, cols, d=0.0):
 
 
 # ---------- boards ----------
-bd(0, sky(0), blaze(0, 1500, 250, 1.4, 0.0, mood="o", dx=-700, dy=450, dur=2.5), big(0, 600, 300, "18:30", c="red", d=0.3, s=140), man(0, 400, 960, 1.0, 0.2, arms="up", amp=8))
+bd(0, sky(0), blaze(0, 1450, 380, 1.1, 0.0, mood="o", dx=-700, dy=450, dur=2.5), big(0, 600, 300, "18:30", c="red", d=0.3, s=140), man(0, 400, 960, 1.0, 0.2, arms="up", amp=8))
 bd(0.5, sky(0.5), streak(0.5, 1600, 150, 900, 650, "green", 0.0, 14), blaze(0.5, 900, 650, 1.0, 0.1, mood="o"), big(0.5, 500, 300, "绿光！", c="green", d=0.3, s=150), [ic(0.5, "building", 1300 + 150 * q, 860, 140, 0.2 + 0.05 * q, mv="bob") for q in range(3)])
 bd(1, [ic(1, "phone", 450 + 500 * q, 600, 220, 0.1 * q, mv="wig") for q in range(3)], [t(1, 450 + 500 * q, 850, 56, n, c="blue", d=0.2 + 0.1 * q) for q, n in enumerate(["北京", "河北", "山西"])], streak(1, 1700, 150, 1300, 400, "green", 0.3))
 bd(1.5, ic(1.5, "telescope" if False else "eye", 500, 550, 260, 0.0, mv="wig"), big(1.5, 1250, 450, "同一颗", c="red", d=0.2, s=150), blaze(1.5, 1250, 800, 0.8, 0.3))
-bd(2, blaze(2, 960, 300, 1.2, 0.0, dx=0, dy=60, dur=2), [O(2, 500 + 460 * q, 800, 120, c=["blue", "green", "gold"][q], idp=f"pv{q}") for q in range(3)], [pop(2, f"pv{q}", 0.2 + 0.1 * q) for q in range(3)], [wig(2, f"pv{q}", (960, 800), 3, 1.5) for q in range(3)])
+bd(2, blaze(2, 960, 400, 0.9, 0.0, dx=0, dy=60, dur=2), [O(2, 500 + 460 * q, 800, 120, c=["blue", "green", "gold"][q], idp=f"pv{q}") for q in range(3)], [pop(2, f"pv{q}", 0.2 + 0.1 * q) for q in range(3)], [wig(2, f"pv{q}", (960, 800), 3, 1.5) for q in range(3)])
 bd(2.5, big(2.5, 960, 350, "3 个省", c="red", d=0.0, s=180), [ic(2.5, "sun", 500 + 460 * q, 750, 160, 0.2 + 0.1 * q, mv="spin", c="gold") for q in range(3)])
-bd(3, big(3, 960, 230, "烧脑问题", c="red", d=0.0, s=120), blaze(3, 650, 650, 1.3, 0.1, mood="o"), ic(3, "question", 1350, 600, 260, 0.2, mv="wig", c="red"))
+bd(3, big(3, 960, 230, "烧脑问题", c="red", d=0.0, s=120), blaze(3, 650, 720, 1.1, 0.1, mood="o"), ic(3, "question", 1350, 600, 260, 0.2, mv="wig", c="red"))
 bd(3.5, ic(3.5, "sun", 600, 550, 260, 0.0, mv="spin", c="gold"), ic(3.5, "question", 1000, 550, 180, 0.2, mv="wig", c="green"), blaze(3.5, 1400, 600, 1.0, 0.3), t(3.5, 960, 900, 64, "这么亮？还是绿的？", d=0.3))
 bd(4, blaze(4, 960, 560, 2.2, 0.0, tail=False), t(4, 960, 920, 70, "小火", c="red", d=0.3), star(4, 450, 380, 0.4, r=40), star(4, 1470, 380, 0.5, r=40))
 bd(4.5, [star(4.5, 300 + 220 * q, 250 + 140 * (q % 3), 0.05 * q, r=25) for q in range(7)], blaze(4.5, 960, 650, 1.2, 0.1, tail=False, dx=200, dy=-60, dur=3), ic(4.5, "clock", 1550, 750, 160, 0.3, mv="spin"))
@@ -196,7 +196,7 @@ bd(11, big(11, 960, 300, "几千度", c="red", d=0.0, s=170), dots(11, 450, 650,
 bd(11.5, blaze(11.5, 960, 600, 1.6, 0.0, mood="o", tail=False), [flame(11.5, 650 + 150 * q, 430, 100, 0.1 + 0.06 * q, c="gold") for q in range(5)], bubbles(11.5, 960, 500, 5, 0.3, 300, "red"))
 bd(12, blaze(12, 1100, 550, 1.4, 0.0), [O(12, 700 + 60 * q, 450 + 50 * (q % 3), 25, c="gold", fill="gold", idp=f"gl{q}") for q in range(6)], [pop(12, f"gl{q}", 0.2 + 0.05 * q) for q in range(6)], [wig(12, f"gl{q}", (850, 500), 8, 3) for q in range(6)])
 bd(12.5, sky(12.5), streak(12.5, 1600, 150, 800, 700, "gold", 0.0, 12), blaze(12.5, 800, 700, 0.8, 0.1), big(12.5, 600, 280, "流星", c="red", d=0.3, s=150))
-bd(13, big(13, 960, 250, "反转二", c="red", d=0.0, s=140), blaze(13, 700, 650, 1.2, 0.1), ic(13, "question", 1300, 650, 220, 0.2, mv="wig", c="green"))
+bd(13, big(13, 960, 250, "反转二", c="red", d=0.0, s=140), blaze(13, 700, 720, 1.0, 0.1), ic(13, "question", 1300, 650, 220, 0.2, mv="wig", c="green"))
 bd(13.5, ic(13.5, "atom", 600, 550, 260, 0.0, mv="spin", c="blue"), ic(13.5, "magnifier", 1300, 550, 240, 0.2, mv="wig"), t(13.5, 960, 880, 80, "原子的指纹", c="green", d=0.3))
 bd(14, ic(14, "atom", 500, 550, 220, 0.0, mv="spin", c="red"), flame(14, 500, 830, 120, 0.1), arr(14, 700, 550, 1000, 550, c="ink", d=0.3), bars(14, 1100, 420, ["green", "green", "blue"], 0.4))
 bd(14.5, [ic(14.5, "atom", 450 + 500 * q, 450, 170, 0.1 * q, mv="spin", c=c) for q, c in enumerate(["gold", "red", "green"])],
@@ -212,8 +212,8 @@ bd(18.5, R(18.5, 600, 300, 700, 500, c="ink", fill="paper", idp="tab18"), pop(18
    [t(18.5, 800 + 150 * q, 600, 56, n, c=c, d=0.2 + 0.1 * q) for q, (n, c) in enumerate([("镁", "green"), ("钠", "gold"), ("氧", "red")])], blaze(18.5, 1600, 700, 0.7, 0.4))
 bd(19, big(19, 960, 250, "反转三", c="red", d=0.0, s=140), [ic(19, "map_pin", 500 + 460 * q, 650, 180, 0.1 + 0.1 * q, mv="bob", c=["blue", "green", "gold"][q]) for q in range(3)])
 bd(19.5, [man(19.5, 450 + 500 * q, 960, 1.0, 0.1 * q, arms="up", amp=6) for q in range(3)], blaze(19.5, 960, 300, 1.0, 0.2), [arr(19.5, 450 + 500 * q, 650, 900 + 60 * q, 380, c="muted", d=0.3 + 0.08 * q) for q in range(3)])
-bd(20, P(20, "M200,950 L1700,950", c="ink", w=6, idp="gd20"), pop(20, "gd20", 0.0), ic(20, "rocket" if False else "satellite", 400, 820, 120, 0.1, mv="bob"), t(20, 600, 820, 50, "飞机 10 公里", d=0.2),
-   blaze(20, 1300, 250, 1.0, 0.2), big(20, 1300, 550, "70+ 公里", c="red", d=0.3, s=110), arr(20, 1000, 900, 1000, 300, c="red", d=0.4))
+bd(20, P(20, "M200,950 L1700,950", c="ink", w=6, idp="gd20"), pop(20, "gd20", 0.0), ic(20, "rocket" if False else "satellite", 230, 820, 120, 0.1, mv="bob"), t(20, 620, 820, 50, "飞机 10 公里", d=0.2),
+   blaze(20, 1250, 340, 0.8, 0.2), big(20, 1300, 550, "70+ 公里", c="red", d=0.3, s=110), arr(20, 1000, 900, 1000, 300, c="red", d=0.4))
 bd(20.5, bar(20.5, 600, 950, 160, 70, "blue", 0.0), t(20.5, 680, 1010, 40, "飞机", d=0.0), bar(20.5, 1000, 950, 160, 700, "red", 0.2, 1.2), t(20.5, 1080, 1010, 40, "流星", d=0.2), big(20.5, 1500, 400, "× 10", c="red", d=0.4, s=140))
 bd(21, ic(21, "building", 700, 650, 360, 0.0, mv="bob"), man(21, 700, 450, 0.7, 0.1, arms="up", amp=6), [arr(21, 800, 400, 1300 + 100 * q, 500 + 150 * q, c="blue", d=0.2 + 0.08 * q) for q in range(3)])
 bd(21.5, earth(21.5, 960, 900, 600, 0.0), blaze(21.5, 960, 280, 0.8, 0.1), [arr(21.5, 960, 340, 600 + 200 * q, 700, c="gold", d=0.2 + 0.06 * q) for q in range(5)])

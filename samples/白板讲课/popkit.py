@@ -590,7 +590,7 @@ def cute_meteor(cx, cy, k, at, idp="mt", mood="happy", moves=True, tail=True):
     if tail:
         for q, (c, w) in enumerate((("red", 120), ("gold", 90), ("green", 60))):
             E.append({"t": "path", "at": at, "id": idp + "_t", "c": c, "w": 8,
-                      "d": f"M{X(-w * .45)},{Y(w * .25)} Q{X(120 + 40 * q)},{Y(150 + 30 * q)} {X(260 + 30 * q)},{Y(300 + 20 * q)} Q{X(140)},{Y(90)} {X(w * .45)},{Y(-w * .25)}"})
+                      "d": f"M{X(5 + w * .1)},{Y(72)} Q{X(120 + 40 * q)},{Y(150 + 30 * q)} {X(260 + 30 * q)},{Y(300 + 20 * q)} Q{X(140)},{Y(90)} {X(72)},{Y(5 + w * .1)}"})
     E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "fill": "muted",
               "d": f"M{X(-70)},{Y(10)} Q{X(-75)},{Y(60)} {X(-20)},{Y(72)} Q{X(40)},{Y(80)} {X(68)},{Y(30)} Q{X(85)},{Y(-30)} {X(30)},{Y(-68)} "
                    f"Q{X(-30)},{Y(-80)} {X(-62)},{Y(-40)} Z"})
