@@ -11,6 +11,10 @@
 
 from __future__ import annotations
 
+import os
+
+SOLVER = os.environ.get("WQ_CCX_SOLVER", "ITERATIVE CHOLESKY")
+
 
 def node_id(i, j, k, nx, ny):
     return 1 + i + (nx + 1) * (j + (ny + 1) * k)
@@ -60,7 +64,8 @@ def deck(nx, ny, dx, t, k_cells, q_cells, h, ta):
         out.append("*CONDUCTIVITY, TYPE=ORTHO")
         out.append("{:.6g},{:.6g},{:.6g}".format(key[0], key[0], key[1]))
         out.append("*SOLID SECTION, ELSET=E{}, MATERIAL={}".format(name, name))
-    out += ["*STEP", "*HEAT TRANSFER, STEADY STATE", "1.,1."]
+    # 求解器照数字工厂（cae/solve.py、cae/thermal.py）：用迭代法；缺省的直接法在 CI 机器上会卡住
+    out += ["*STEP", "*HEAT TRANSFER, STEADY STATE, SOLVER={}".format(SOLVER), "1.,1."]
     hh = h * 1e-3
     out.append("*FILM")
     for j in range(ny):
