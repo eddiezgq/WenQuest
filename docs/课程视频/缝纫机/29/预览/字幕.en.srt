@@ -1,0 +1,799 @@
+1
+00:00:00,600 --> 00:00:01,746
+Hi everyone,
+
+2
+00:00:01,766 --> 00:00:08,740
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:09,140 --> 00:00:14,302
+This is Lecture 29, typical garment factories.
+
+4
+00:00:14,702 --> 00:00:16,981
+Last time we balanced one line.
+
+5
+00:00:17,001 --> 00:00:22,692
+Today we visit five kinds of factory and ask why plants that all make clothes
+
+6
+00:00:22,712 --> 00:00:24,027
+look so different.
+
+7
+00:00:25,547 --> 00:00:27,447
+Here's the problem.
+
+8
+00:00:27,847 --> 00:00:35,381
+A T-shirt factory wins a big order for a basic crew-neck tee at 200 an hour.
+
+9
+00:00:35,781 --> 00:00:46,716
+Its 16 operations total 5.841 minutes: overlock 1.863, coverstitch 1.506,
+
+10
+00:00:46,736 --> 00:00:56,921
+lockstitch 1.334, hand 1.138, the longest being side seams at 0.655.
+
+11
+00:00:57,321 --> 00:01:05,541
+The manager plans one operation each, staffed by SMV over takt rounded up.
+
+12
+00:01:05,941 --> 00:01:09,222
+What's the takt and the minimum headcount?
+
+13
+00:01:09,622 --> 00:01:14,202
+How many, at what balance, operation by operation?
+
+14
+00:01:14,602 --> 00:01:17,782
+And merging by machine type?
+
+15
+00:01:19,302 --> 00:01:22,562
+Same garments, different factories: why?.
+
+16
+00:01:24,082 --> 00:01:28,542
+Each kind of factory has its signature.
+
+17
+00:01:28,942 --> 00:01:34,445
+Suits have over 300 operations, and every piece differs.
+
+18
+00:01:34,845 --> 00:01:40,505
+Shirts spend their time on small parts: collars, cuffs, plackets.
+
+19
+00:01:40,905 --> 00:01:45,605
+T-shirts are knit, so overlock and coverstitch rule.
+
+20
+00:01:46,005 --> 00:01:47,958
+Knitwear panels are knitted.
+
+21
+00:01:48,358 --> 00:01:54,341
+Quick response takes orders of a hundred and lives on fast changeovers.
+
+22
+00:01:54,741 --> 00:01:55,982
+Why the differences?
+
+23
+00:01:56,382 --> 00:02:03,194
+Product structure sets the operations, fabric sets the stitches and machines,
+
+24
+00:02:03,214 --> 00:02:06,122
+batch size sets the organisation.
+
+25
+00:02:07,642 --> 00:02:12,858
+Made-to-measure suits: data first, then single-piece flow.
+
+26
+00:02:14,378 --> 00:02:17,799
+What makes suits hard is that every piece differs.
+
+27
+00:02:18,199 --> 00:02:23,498
+The bundle system ties 10 to 30 same-size pieces together;
+
+28
+00:02:23,518 --> 00:02:27,074
+once every piece differs, it collapses.
+
+29
+00:02:27,474 --> 00:02:30,708
+So made-to-measure plants run two rows.
+
+30
+00:02:31,108 --> 00:02:37,382
+Data on top: a 3D scan in about 7 seconds produces the marker file,
+
+31
+00:02:37,402 --> 00:02:41,328
+the hanger route and station instructions.
+
+32
+00:02:41,728 --> 00:02:47,591
+Material below: cut one at a time, hung with an electronic tag,
+
+33
+00:02:47,611 --> 00:02:52,447
+and the operator's swipe shows what this suit needs.
+
+34
+00:02:53,967 --> 00:02:55,467
+How do hangers route?
+
+35
+00:02:55,867 --> 00:03:01,893
+A reader at each spur entrance reads the hanger, looks up its next operation,
+
+36
+00:03:01,913 --> 00:03:06,683
+and switches it in only if this station does it and has room,
+
+37
+00:03:06,703 --> 00:03:08,567
+favouring idle stations.
+
+38
+00:03:08,967 --> 00:03:10,503
+Now sleeve setting:
+
+39
+00:03:10,523 --> 00:03:15,664
+the cap is 3 centimetres longer than the 47-centimetre armhole,
+
+40
+00:03:15,684 --> 00:03:17,548
+about 6.4 percent ease,
+
+41
+00:03:17,568 --> 00:03:22,627
+distributed with plenty at the crown and almost none underarm.
+
+42
+00:03:23,027 --> 00:03:30,573
+The machine sets upper and lower feeds separately, like differential feed.
+
+43
+00:03:32,093 --> 00:03:34,455
+Why is single-piece flow fast?
+
+44
+00:03:34,855 --> 00:03:40,635
+Little's law: throughput time equals WIP over output, for any stable system.
+
+45
+00:03:41,035 --> 00:03:52,197
+A suit line making 30 an hour with 1500 in progress keeps each suit 50 hours;
+
+46
+00:03:52,217 --> 00:03:56,118
+cut WIP to 300 and it's 10.
+
+47
+00:03:56,518 --> 00:04:06,820
+A shirt line growing bundles from 10 to 70 stretched throughput from 0.61 to
+
+48
+00:04:06,840 --> 00:04:08,178
+4.16 days.
+
+49
+00:04:08,578 --> 00:04:10,918
+Short lead times need low WIP.
+
+50
+00:04:12,438 --> 00:04:16,001
+Shirts: the time goes into small parts.
+
+51
+00:04:17,521 --> 00:04:18,856
+Shirts are different.
+
+52
+00:04:19,256 --> 00:04:25,996
+Their 41 sewing operations take about 22.3 minutes; where does it go?
+
+53
+00:04:26,396 --> 00:04:36,748
+Collar 3.62, cuffs 3.85, plackets 2.21: those three are 43 percent,
+
+54
+00:04:36,768 --> 00:04:42,786
+all parts 66 percent, assembly a third.
+
+55
+00:04:43,186 --> 00:04:48,526
+So shirt plants run five part lines into one assembly line.
+
+56
+00:04:48,926 --> 00:04:54,035
+The small parts are flat, fixed in shape and repetitive:
+
+57
+00:04:54,055 --> 00:04:58,066
+ideal for template-plus-X-Y automatic units.
+
+58
+00:04:59,586 --> 00:05:02,166
+T-shirts: staffing and balance.
+
+59
+00:05:03,686 --> 00:05:08,345
+T-shirts are knit: stretchy, curling, running at cut edges,
+
+60
+00:05:08,365 --> 00:05:12,469
+so seams use four-thread overlock, hems coverstitch,
+
+61
+00:05:12,489 --> 00:05:15,641
+and lockstitch only labels and bartacks;
+
+62
+00:05:15,661 --> 00:05:19,923
+overlock and coverstitch carry 58 percent of the work.
+
+63
+00:05:20,323 --> 00:05:27,063
+Takt is how often the line must deliver: 18 seconds for 200 an hour.
+
+64
+00:05:27,463 --> 00:05:37,013
+Theoretical headcount is total time over takt, 5.841 over 0.30, about 19.5,
+
+65
+00:05:37,033 --> 00:05:38,928
+so at least 20.
+
+66
+00:05:40,447 --> 00:05:45,798
+The chart switches between two plans; bars are load per person,
+
+67
+00:05:45,818 --> 00:05:47,248
+the line is takt.
+
+68
+00:05:47,648 --> 00:05:55,749
+In the published 22-person plan the tallest bar is thread trimming with one person,
+
+69
+00:05:55,769 --> 00:05:58,489
+capping output at about 153;
+
+70
+00:05:58,509 --> 00:06:03,577
+add one person there and the cap rises to about 174,
+
+71
+00:06:03,597 --> 00:06:07,588
+anywhere else and almost nothing changes.
+
+72
+00:06:07,988 --> 00:06:14,782
+Staffing each operation by takt takes 27 people, all bars under takt,
+
+73
+00:06:14,802 --> 00:06:17,448
+many far below it: waiting.
+
+74
+00:06:18,968 --> 00:06:25,828
+The lab actually runs the line, with operation times varying by 12 percent.
+
+75
+00:06:26,228 --> 00:06:33,607
+On the left, bundles: 600 pieces in progress queuing between stations,
+
+76
+00:06:33,627 --> 00:06:38,681
+so a garment takes about three and a half hours.
+
+77
+00:06:39,080 --> 00:06:44,989
+On the right, hangers with 21 people grouped by machine,
+
+78
+00:06:45,009 --> 00:06:52,294
+work sent to idle stations: about 190 an hour, fifty-odd on the line,
+
+79
+00:06:52,314 --> 00:06:54,941
+under 20 minutes through.
+
+80
+00:06:55,340 --> 00:07:00,321
+The organisation decides how much paper balance survives.
+
+81
+00:07:01,840 --> 00:07:05,100
+Knitwear, quick response and choosing equipment.
+
+82
+00:07:06,620 --> 00:07:13,068
+Knitwear panels are knitted to shape, then linked loop by loop,
+
+83
+00:07:13,088 --> 00:07:15,840
+about 32 minutes a garment.
+
+84
+00:07:16,240 --> 00:07:22,844
+Fully-fashioned work takes about 52 labour-minutes, 60 percent linking;
+
+85
+00:07:22,864 --> 00:07:29,467
+whole-garment knitting cuts that to about 17 but ties up the machine 30
+
+86
+00:07:29,487 --> 00:07:30,960
+minutes a piece.
+
+87
+00:07:31,360 --> 00:07:36,870
+For 1000 a day: about 13 machines and 67 linkers,
+
+88
+00:07:36,890 --> 00:07:40,821
+or about 23 whole-garment machines.
+
+89
+00:07:41,221 --> 00:07:44,761
+It saves people and costs machine time.
+
+90
+00:07:46,281 --> 00:07:50,730
+For quick response, changeover costs twice: the stoppage,
+
+91
+00:07:50,750 --> 00:07:56,531
+re-arranging machines, rethreading, setting and test sewing; and learning,
+
+92
+00:07:56,551 --> 00:08:02,960
+with one study finding first-day efficiency only about 63 percent of steady state,
+
+93
+00:08:02,980 --> 00:08:05,861
+recovering over three time constants.
+
+94
+00:08:06,261 --> 00:08:08,321
+Both are spread over the batch.
+
+95
+00:08:08,721 --> 00:08:15,454
+The chart cycles the batch from 150 to 3000:
+
+96
+00:08:15,474 --> 00:08:26,043
+at 150 the long line costs 74 labour-minutes a piece and the cell 28;
+
+97
+00:08:26,063 --> 00:08:29,266
+they cross near 3828.
+
+98
+00:08:30,786 --> 00:08:38,183
+A cell has 4 to 17 people, each doing two to four operations, machines in a U,
+
+99
+00:08:38,203 --> 00:08:41,606
+only the pieces in hand on the line.
+
+100
+00:08:42,006 --> 00:08:46,351
+The relay zone is clever: nobody owns fixed operations,
+
+101
+00:08:46,371 --> 00:08:51,193
+each carries a garment forward; the last operator, when done,
+
+102
+00:08:51,213 --> 00:08:56,669
+takes over from the one before, who walks back to the one before him,
+
+103
+00:08:56,689 --> 00:08:59,288
+and the first fetches new pieces.
+
+104
+00:08:59,688 --> 00:09:04,949
+Order them slowest to fastest and the cell balances itself.
+
+105
+00:09:06,468 --> 00:09:10,676
+On a car body-welding line robots work in series,
+
+106
+00:09:10,696 --> 00:09:14,472
+and every cell's cycle must stay under takt;
+
+107
+00:09:14,492 --> 00:09:18,096
+the one that exceeds it is the bottleneck,
+
+108
+00:09:18,116 --> 00:09:21,288
+the same chart as the T-shirt line's.
+
+109
+00:09:21,688 --> 00:09:26,306
+There's no half robot, so rounding losses appear too,
+
+110
+00:09:26,326 --> 00:09:29,544
+and the fix is merging similar tasks.
+
+111
+00:09:29,944 --> 00:09:36,522
+Warehouse robots dispatched to the shortest queue follow the hanger system's rule,
+
+112
+00:09:36,542 --> 00:09:39,981
+and tote buffers obey Little's law as well.
+
+113
+00:09:41,501 --> 00:09:43,121
+You meet Little's law every day.
+
+114
+00:09:43,521 --> 00:09:49,299
+Thirty people are queuing at the canteen window and it serves two a minute,
+
+115
+00:09:49,319 --> 00:09:53,473
+so you'll wait about thirty over two, fifteen minutes.
+
+116
+00:09:53,873 --> 00:09:59,249
+To wait less, either open another window, which raises output,
+
+117
+00:09:59,269 --> 00:10:04,733
+or keep fewer people in the queue, which cuts work in progress.
+
+118
+00:10:05,133 --> 00:10:12,399
+A sewing floor shortens lead times by shrinking bundles and WIP for exactly
+
+119
+00:10:12,419 --> 00:10:13,953
+the same reason.
+
+120
+00:10:15,473 --> 00:10:16,972
+Back to our problem.
+
+121
+00:10:17,372 --> 00:10:27,024
+Takt is 0.30 minutes, 18 seconds; theoretical headcount about 19.5,
+
+122
+00:10:27,044 --> 00:10:28,756
+at least 20.
+
+123
+00:10:29,156 --> 00:10:32,785
+Rounding each operation up gives 27 people,
+
+124
+00:10:32,805 --> 00:10:38,723
+bottlenecked at rib joining with one person, about 72 percent balance,
+
+125
+00:10:38,743 --> 00:10:41,523
+every fraction turned to waiting.
+
+126
+00:10:41,923 --> 00:10:49,865
+Grouped by machine, 7 overlock, 5 coverstitch, 5 lockstitch and 4 hand,
+
+127
+00:10:49,885 --> 00:10:55,023
+21 in all at about 92 percent: 6 fewer people.
+
+128
+00:10:56,543 --> 00:11:00,488
+Now Virtual lab 29-1, simulating a sewing floor,
+
+129
+00:11:00,508 --> 00:11:06,188
+which you can do yourself on WenQuest. Results and tasks are blurred.
+
+130
+00:11:06,208 --> 00:11:11,309
+The guide is on the left; on the right is the operation table:
+
+131
+00:11:11,329 --> 00:11:17,257
+each row has an operation, machine type, standard minutes and headcount;
+
+132
+00:11:17,277 --> 00:11:23,204
+the bar is load per person and the line is takt. Choose the bundle line,
+
+133
+00:11:23,224 --> 00:11:28,243
+one operator per operation, and click 'Source configuration'.
+
+134
+00:11:28,643 --> 00:11:32,690
+Below is the floor plan. Dots are operators, filled when working,
+
+135
+00:11:32,710 --> 00:11:36,068
+hollow when waiting; yellow blocks are queued bundles.
+
+136
+00:11:36,088 --> 00:11:41,198
+Fast-forward at 20 minutes a second and look for the red bar in the balance chart.
+
+137
+00:11:41,218 --> 00:11:44,577
+Task one: add just one person, try several operations,
+
+138
+00:11:44,597 --> 00:11:47,767
+restart and skip to the end of the shift each time,
+
+139
+00:11:47,787 --> 00:11:49,769
+and see where output rises most.
+
+140
+00:11:50,169 --> 00:11:56,845
+Click 'Staff each operation to takt' and record the headcount and balance.
+
+141
+00:11:56,865 --> 00:12:00,284
+Then switch to 'Pool by machine type',
+
+142
+00:12:00,304 --> 00:12:05,260
+where one team shares all operations on a machine type.
+
+143
+00:12:05,280 --> 00:12:10,056
+Task two asks for 182 an hour or more with 21 people.
+
+144
+00:12:10,456 --> 00:12:17,538
+Task three stays with bundles: tune the bundle size and the WIP cap, restart,
+
+145
+00:12:17,558 --> 00:12:23,903
+skip to shift end, and cut the throughput time without losing output.
+
+146
+00:12:23,923 --> 00:12:30,914
+Then check from your records that WIP is about output times throughput time.
+
+147
+00:12:31,314 --> 00:12:35,101
+Switch to hangers and watch them circle the main rail,
+
+148
+00:12:35,121 --> 00:12:38,344
+switched into a station only when it has room.
+
+149
+00:12:38,364 --> 00:12:42,856
+Task four wants high output with little WIP. Then in the U cell,
+
+150
+00:12:42,876 --> 00:12:48,002
+swap multi-skilled operators with the arrows and compare putting the fast
+
+151
+00:12:48,022 --> 00:12:50,540
+ones at the entrance or at the exit.
+
+152
+00:12:50,940 --> 00:12:55,491
+Last, batch size and style changes: move the order size,
+
+153
+00:12:55,511 --> 00:13:00,552
+the long line's changeover downtime and its learning constant,
+
+154
+00:13:00,572 --> 00:13:03,572
+and watch where the two curves cross.
+
+155
+00:13:03,592 --> 00:13:08,959
+Task six asks you to bring the break-even batch under 1000 pieces.
+
+156
+00:13:08,979 --> 00:13:13,040
+The guide and report template are on the platform.
+
+157
+00:13:14,560 --> 00:13:20,247
+Everything in this lecture is on the WenQuest learning platform.
+
+158
+00:13:20,647 --> 00:13:28,394
+You can open the interactive slides and the line simulation and work them yourself,
+
+159
+00:13:28,414 --> 00:13:32,044
+including the pages this video skipped.
+
+160
+00:13:32,444 --> 00:13:38,278
+You submit the assignment and the lab report on the platform,
+
+161
+00:13:38,298 --> 00:13:41,349
+and get marks and comments back.
+
+162
+00:13:41,749 --> 00:13:48,129
+Questions go to the discussion forum, and the grades page shows every mark.
+
+163
+00:13:49,649 --> 00:13:52,652
+The assignment has three questions. One:
+
+164
+00:13:52,672 --> 00:13:58,170
+using this lecture's 16 operation times, raise the target to 250 an hour.
+
+165
+00:13:58,190 --> 00:14:01,194
+Find takt and the theoretical headcount,
+
+166
+00:14:01,214 --> 00:14:05,427
+staff the line per operation and pooled by machine type,
+
+167
+00:14:05,447 --> 00:14:08,148
+give headcount and balance for each,
+
+168
+00:14:08,168 --> 00:14:11,549
+and explain where the extra people come from.
+
+169
+00:14:11,949 --> 00:14:19,210
+Two: the line used bundles, with 600 pieces in progress at 175 an hour;
+
+170
+00:14:19,230 --> 00:14:23,313
+with hangers it holds 55 at 191 an hour.
+
+171
+00:14:23,333 --> 00:14:28,133
+Use Little's law to find both throughput times,
+
+172
+00:14:28,153 --> 00:14:32,030
+and explain why hangers keep WIP down.
+
+173
+00:14:32,430 --> 00:14:36,157
+Three: the factory starts taking 300-piece orders.
+
+174
+00:14:36,177 --> 00:14:41,627
+Use this lecture's changeover model to find labour per piece for the long
+
+175
+00:14:41,647 --> 00:14:43,126
+line and the U cell,
+
+176
+00:14:43,146 --> 00:14:47,398
+recompute with zero changeover downtime on the long line,
+
+177
+00:14:47,418 --> 00:14:52,269
+and propose your organisation and at least two equipment changes.
+
+178
+00:14:52,669 --> 00:14:59,441
+Submit the assignment and the lab report on the WenQuest platform.
+
+179
+00:15:00,961 --> 00:15:04,563
+There's also a ten-question quiz. For example:
+
+180
+00:15:04,583 --> 00:15:09,917
+a suit line makes 25 suits an hour with 400 in progress. On average,
+
+181
+00:15:09,937 --> 00:15:13,460
+how many hours does a suit spend on the line?
+
+182
+00:15:13,860 --> 00:15:14,247
+Or:
+
+183
+00:15:14,267 --> 00:15:25,241
+a T-shirt line's 16 operations total 5.841 minutes and the target is 180 an hour.
+
+184
+00:15:25,261 --> 00:15:29,720
+What's the theoretical headcount?
+
+185
+00:15:30,120 --> 00:15:36,218
+You get three attempts, and the explanations appear as soon as you submit.
+
+186
+00:15:37,738 --> 00:15:39,718
+Three things to remember.
+
+187
+00:15:40,118 --> 00:15:45,965
+One: the product sets the operations, the operations the machines,
+
+188
+00:15:45,985 --> 00:15:52,098
+the batch size the organisation; the five factories follow from that.
+
+189
+00:15:52,498 --> 00:15:58,065
+Two: Little's law, throughput time equals WIP over output;
+
+190
+00:15:58,085 --> 00:16:04,518
+single-piece flow and hangers shorten lead time by keeping WIP low.
+
+191
+00:16:04,918 --> 00:16:11,243
+Three: grouping operations by machine type cuts rounding loss,
+
+192
+00:16:11,263 --> 00:16:15,131
+lifting balance from 72 to 92 percent;
+
+193
+00:16:15,151 --> 00:16:20,043
+below the crossover batch the U cell is cheaper.
+
+194
+00:16:20,443 --> 00:16:22,866
+The slides, the virtual lab,
+
+195
+00:16:22,886 --> 00:16:28,972
+the assignment and the quiz are all on the WenQuest learning platform,
+
+196
+00:16:28,992 --> 00:16:34,817
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+197
+00:16:35,217 --> 00:16:39,043
+Today we saw how factories use their machines.
+
+198
+00:16:39,063 --> 00:16:45,231
+Next time we turn back to the machines themselves and look at where sewing
+
+199
+00:16:45,251 --> 00:16:46,987
+equipment is heading.
+
+200
+00:16:47,007 --> 00:16:48,074
+See you then.
