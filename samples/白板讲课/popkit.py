@@ -579,3 +579,48 @@ def cute_saucer(cx, cy, k, at, idp="sc", mood="happy", moves=True):
         E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_l"], "pivot": [X(0), Y(0)], "amp": 4, "hz": 3},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_l"], "amp": 8, "hz": 1.0}]
     return E
+
+
+def cute_meteor(cx, cy, k, at, idp="mt", mood="happy", moves=True, tail=True):
+    """流星“小火” Blaze (2026-11-07): a lumpy space rock centred at (cx, cy) with a face and a flickering three-colour tail pointing up-right.
+    Ids: <idp>_b (rock + face), <idp>_t (tail; wiggles). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = []
+    if tail:
+        for q, (c, w) in enumerate((("red", 120), ("gold", 90), ("green", 60))):
+            E.append({"t": "path", "at": at, "id": idp + "_t", "c": c, "w": 8,
+                      "d": f"M{X(-w * .45)},{Y(w * .25)} Q{X(120 + 40 * q)},{Y(150 + 30 * q)} {X(260 + 30 * q)},{Y(300 + 20 * q)} Q{X(140)},{Y(90)} {X(w * .45)},{Y(-w * .25)}"})
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "fill": "muted",
+              "d": f"M{X(-70)},{Y(10)} Q{X(-75)},{Y(60)} {X(-20)},{Y(72)} Q{X(40)},{Y(80)} {X(68)},{Y(30)} Q{X(85)},{Y(-30)} {X(30)},{Y(-68)} "
+                   f"Q{X(-30)},{Y(-80)} {X(-62)},{Y(-40)} Z"})
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 25 - 9), "y": Y(30), "w": 18 * k, "h": 22 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-20)},{Y(-10)} Q{X(0)},{Y(-30)} {X(20)},{Y(-10)}", "sad": f"M{X(-20)},{Y(-26)} Q{X(0)},{Y(-6)} {X(20)},{Y(-26)}",
+         "o": f"M{X(-9)},{Y(-18)} a{9 * k},{9 * k} 0 1,0 {18 * k},0 a{9 * k},{9 * k} 0 1,0 {-18 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_t"], "pivot": [X(0), Y(0)], "amp": 6, "hz": 4},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_b"], "pivot": [X(0), Y(0)], "amp": 5, "hz": 1.5}]
+    return E
+
+
+def cute_floppy(cx, cy, k, at, idp="fp", mood="happy", moves=True):
+    """软盘“小软” Floppy (2026-11-07): a 3.5-inch disk centred at (cx, cy), side 200*k, with a metal shutter, a label face and a sliding shutter.
+    Ids: <idp>_b (body + label + face), <idp>_s (shutter; slides). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "fill": "blue",
+          "d": f"M{X(-100)},{Y(100)} L{X(80)},{Y(100)} L{X(100)},{Y(80)} L{X(100)},{Y(-100)} L{X(-100)},{Y(-100)} Z"},
+         {"t": "rect", "at": at, "id": idp + "_b", "x": X(-70), "y": Y(-5), "w": 140 * k, "h": 90 * k, "c": "ink", "fill": "paper"},
+         {"t": "rect", "at": at, "id": idp + "_s", "x": X(-45), "y": Y(100), "w": 90 * k, "h": 60 * k, "c": "ink", "fill": "muted"},
+         {"t": "rect", "at": at, "id": idp + "_s", "x": X(5), "y": Y(90), "w": 22 * k, "h": 40 * k, "c": "ink", "fill": "blue"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 28 - 9), "y": Y(-25), "w": 18 * k, "h": 22 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-20)},{Y(-58)} Q{X(0)},{Y(-78)} {X(20)},{Y(-58)}", "sad": f"M{X(-20)},{Y(-74)} Q{X(0)},{Y(-56)} {X(20)},{Y(-74)}",
+         "o": f"M{X(-9)},{Y(-66)} a{9 * k},{9 * k} 0 1,0 {18 * k},0 a{9 * k},{9 * k} 0 1,0 {-18 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_s"], "pivot": [X(0), Y(70)], "amp": 3, "hz": 2},
+              {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_s"], "amp": 8, "hz": 1.0}]
+    return E
