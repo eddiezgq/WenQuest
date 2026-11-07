@@ -67,7 +67,8 @@
           <input v-model="mf(o.id).phone" class="wq-input" placeholder="手机 *" maxlength="20" />
           <input v-model="mf(o.id).email" class="wq-input" placeholder="邮箱（登录用）*" maxlength="254" />
         </view>
-        <view class="wq-btn" :class="{ disabled: busy }" @click="addMember(o)">添加账号</view>
+        <view class="wq-btn" :class="{ disabled: busy }" @click="addMember(o)">{{ busy && adding === o.id ? "正在开通账号…" : "添加账号" }}</view>
+        <text v-if="err && adding === o.id" class="wq-error block">{{ err }}</text>
       </view>
 
       <view v-if="shown && shown.org === o.id" class="pw">
@@ -98,6 +99,7 @@ const reqs = ref<Req[]>([]);
 const err = ref("");
 const busy = ref(false);
 const shown = ref<{ org: number; login: string; password: string } | null>(null);
+const adding = ref(0);   // 出错时把提示放在这家单位的“添加账号”按钮下面，不只在页面顶上（11-06 Eddie：点了没反应）
 const f = reactive({ name: "", kind: "company", contact: "", phone: "", email: "", seats: undefined as number | undefined, request_id: 0 });
 const forms = reactive<Record<number, { name: string; phone: string; email: string }>>({});
 const mf = (id: number) => (forms[id] ||= { name: "", phone: "", email: "" });
@@ -140,7 +142,9 @@ function change(o: Org, body: Record<string, unknown>) {
 }
 function addMember(o: Org) {
   const m = mf(o.id);
+  adding.value = o.id;
   if (!m.name.trim() || !m.phone.trim() || !m.email.trim()) { err.value = "姓名、手机、邮箱都要填"; return; }
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m.email.trim())) { err.value = "邮箱格式不对，例如 123456789@qq.com"; return; }
   run(async () => {
     const r = await request<{ login: string; password: string }>("POST", `/api/v1/admin/orgs/${o.id}/members`, { ...m });
     shown.value = { org: o.id, ...r };
