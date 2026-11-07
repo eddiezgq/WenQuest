@@ -14,8 +14,11 @@ COPY factory/designs/drv-joint/design.yaml factory/designs/drv-joint/design.yaml
 # 第 111 轮：模板板子的板子模型（服务器上没有 KiCad）和示例工厂的工艺能力表
 COPY factory/designs/drv-joint/report/board-model.json.gz factory/designs/drv-joint/report/board-model.json.gz
 COPY eda/examples/factories eda/examples/factories
+# 第 112 轮：工厂端演示资料包（故意带错，标明）：驱动板 A 版的光绘 + 漏了 C47 物料编号的物料清单和坐标
+COPY factory/designs/drv-joint/out/gerber.zip factory/designs/drv-joint/out/gerber.zip
+COPY eda/examples/pcba-demo/bom.csv eda/examples/pcba-demo/pos.csv eda/examples/pcba-demo/
 COPY factory/digital/cae/__init__.py factory/digital/cae/circuit.py factory/digital/cae/motors.py factory/digital/cae/
-COPY services/eda/app.py services/eda/app.py
+COPY services/eda/app.py services/eda/factory_api.py services/eda/
 COPY services/eda/web services/eda/web
 RUN useradd -r -u 10008 eda
 USER eda

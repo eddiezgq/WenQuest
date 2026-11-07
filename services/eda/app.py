@@ -5,6 +5,8 @@
   POST /api/draft                {requirement, lang} → AI 起草（经网关）→ 代码校验 → 展开 → 计算器与仿真 → 结果
   POST /api/evaluate             {requirement, report, values} → 人改过的数 → 校验 → 展开 → 计算 → 结果（不调 AI）
 
+第 112 轮（P5）：问渠贴片（工厂端）的接口在 factory_api.py，页面在 web/factory/。
+
 第 111 轮（P4）：结果里加 board——按新规格查模板板子（工艺、布局约束、热；不重新布线）。服务器上没有 KiCad，
 板子用预先存好的板子模型文件（eda/wqeda/model_io.py 从 KiCad 文件写出，CI 核对一致）。
 
@@ -211,6 +213,14 @@ async def evaluate(request: Request):
     result["board"] = board_section(doc)
     return {"report": rep, "result": result}
 
+
+import factory_api  # noqa: E402
+
+factory_api.register(app, factory_dir=REPO / "eda" / "examples" / "factories", gateway=GATEWAY, headers_of=_headers,
+                     gw_errors=GW_ERRORS, client=lambda: _client(),
+                     demo={"gerber": REPO / "factory" / "designs" / "drv-joint" / "out" / "gerber.zip",
+                           "bom": REPO / "eda" / "examples" / "pcba-demo" / "bom.csv",
+                           "cpl": REPO / "eda" / "examples" / "pcba-demo" / "pos.csv"})
 
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")

@@ -16,6 +16,11 @@ AI 原生电子设计与制造平台的本体（方案：`docs/方案/AI原生�
 | `wqeda/readback.py` | KiCad 手工改动读回：`python3 -m wqeda.readback <板子.kicad_pcb> <design.yaml> [--write 新文件]` |
 | `wqeda/report.py` | 一份报告（电气、工艺、热）：`python3 -m wqeda.report <设计或变体> --factory <工艺能力表> --out <目录>` |
 | `wqeda/model_io.py` | 板子模型存成文件（起草台服务器上没有 KiCad 时用） |
+| `wqeda/factory.py` | 工厂端检查（第 112 轮）：资料包 → 编号的检查结果、数量统计；`checks/assembly.py` 板子尺寸、最小引脚间距、最小焊盘 |
+| `wqeda/quantity.py` | 数量统计（报价依据，只算量） |
+| `wqeda/issues.py` | 问题单格式；`python3 -m wqeda.issues <问题单.yaml> <design.yaml> [--gerber … --bom … --cpl … --factory …]` 对到设计描述、判已解决 |
+| `wqeda/package.py` | 由设计描述导出物料清单和贴片坐标：`python3 -m wqeda.package <设计或变体> --out <目录>` |
+| `examples/pcba-demo/` | 工厂端演示资料包（故意漏了 C47 的物料编号，标明） |
 | `examples/factories/` | 演示工厂的工艺能力表（虚构，数值为示例值） |
 | `tests/` | `python3 -m pytest -q eda/tests`（读 KiCad 文件的测试要 KiCad 7 的 pcbnew，没有就跳过） |
 

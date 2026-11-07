@@ -50,8 +50,18 @@
 <h2>六、次数与记录</h2>
 <p>AI 起草要登录问渠账号，每人每天有次数上限。每次调用模型都有记录：谁、需求摘要、用的模型、是否通过代码校验。美国站用 Claude，国内站用已备案的 DeepSeek。</p>
 
+<h2 id="factory">七、问渠贴片（工厂端）</h2>
+<p>起草台页头的“问渠贴片”是给贴片厂用的：上传客户的光绘、钻孔、物料清单和坐标（CSV），选按哪家工厂的工艺能力查，十几秒出检查结果、板图上的位置和数量统计（报价依据，只算量）。点“用演示资料包”可以直接试：驱动板 A 版，故意漏了一个物料编号。</p>
+<ul>
+  <li>光绘里没有网表和器件外框，有几项查不了，判“未知”；有极性的元件列出来请人确认方向。</li>
+  <li>列名、层认错了，在“列映射与层”里改，再查一次。</li>
+  <li>“AI 起草问题单”：AI 只拿到没通过的检查结果，拿不到文件；每条问题必须引用一条检查结果，编出来的会被退回。改完、勾选确认后下载：YAML 给设计端，Markdown 给客户。</li>
+  <li>上传的文件算完就删，不存服务器，也不用来训练。演示工厂都是虚构的，工艺能力是示例值。</li>
+</ul>
+
 <h2>English, in brief</h2>
 <p>Write a requirement; AI drafts the specification and block parameters with a source for every number (requirement quote, derived rule, AI assumption, entered by you, template default). Code checks the draft, expands the circuit and runs the calculations and simulations; required values the requirement does not give are left empty with a question, never guessed. Edit, recalculate, tick the confirmation and download the design description. Board checks re-check the template's routed board against your specification (process, layout constraints, thermal estimate) without re-routing, so a larger current shows up as a failing trace width. This version covers one board family (three-phase motor drive). Example design, not for production.</p>
+<p>WenQuest PCBA (factory side, <code>/eda/factory/</code>): upload a customer's Gerber, drill, BOM and placement files, pick a factory capability table and get the checks, locations on the board and quantities for quoting. AI drafts an engineering query from the open results only (never from your files); every item must cite a result. Files are deleted after the check. Demo factories are fictional.</p>
 </main>
 </body>
 </html>
