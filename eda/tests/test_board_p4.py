@@ -320,14 +320,22 @@ def test_readback(tmp_path):
 
 
 @kicad
-def test_board_model_file_is_current(tmp_path):
-    """仓库里的板子模型文件（起草台用）和 KiCad 板子文件一致"""
+def test_board_model_file_is_current():
+    """仓库里的板子模型文件（起草台用）和 KiCad 板子文件一致。按内容比（形状允许 0.002 mm 的差），不比字节：
+    不同机器上 KiCad 把圆弧变多边形、shapely 写 WKB 的结果字节可以不同。不一致时只报第一处，不打印整个文件"""
     from wqeda import model_io
     from wqeda.readers import kicad as kr
 
-    out = tmp_path / "m.json.gz"
-    model_io.dump(kr.read(A_PCB), str(out))
-    assert out.read_bytes() == open(MODEL, "rb").read(), "板子改了：重新运行 python3 -m wqeda.model_io 写出板子模型文件"
+    fresh = model_io.from_dict(model_io.to_dict(kr.read(A_PCB)))  # 和写文件时一样取整到 0.001 mm
+    saved = model_io.load(MODEL)
+    hint = "板子改了：重新运行 python3 -m wqeda.model_io 写出板子模型文件"
+    assert len(fresh.features) == len(saved.features), hint
+    for a, b in zip(fresh.features, saved.features, strict=True):
+        same = (a.layer, a.kind, a.net, a.ref, a.pad, a.width) == (b.layer, b.kind, b.net, b.ref, b.pad, b.width)
+        assert same and a.geom.hausdorff_distance(b.geom) < 0.002, "{}：{} {} {}".format(hint, a.layer, a.kind, a.ref)
+    assert sorted(fresh.courtyards) == sorted(saved.courtyards), hint
+    assert [(c.ref, c.x, c.y, c.rot, c.side) for c in fresh.components] == [
+        (c.ref, c.x, c.y, c.rot, c.side) for c in saved.components], hint
 
 
 def test_board_model_roundtrip(board, cap, xa):
