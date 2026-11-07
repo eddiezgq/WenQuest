@@ -54,3 +54,31 @@ def test_catalog_must_have_units(client, monkeypatch):  # noqa: F811
     h = login(client, "s")
     r = client.post("/api/v1/eda/ai/draft", json={"requirement": "随便一块板", "catalog": {}}, headers=h)
     assert r.status_code == 400
+
+
+def test_issues_cite_only_open_results_and_log_no_files(client, monkeypatch):  # noqa: F811
+    """第 112 轮：工厂端问题单——只把未通过的检查结果交给模型，引用编号限在这些结果里；记录里不记结果内容"""
+    calls = []
+
+    async def fake_json(**kw):
+        calls.append(kw)
+        return {"issues": [{"cites": ["R1"], "question": "C47 要不要贴？", "options": ["贴", "不贴"],
+                            "reply_required": True}]}
+
+    monkeypatch.setattr(main.state.ai, "json", fake_json)
+    monkeypatch.setattr(main.state.ai, "provider", "fake")
+    results = [{"id": "R1", "key": "D1", "name": "位号对上", "status": "fail", "refs": ["C47"], "detail": "C47 只在坐标里"},
+               {"id": "R2", "key": "F1", "name": "最小线宽", "status": "pass", "refs": []}]
+    body = {"results": results, "factory": "示例贴片厂"}
+    assert client.post("/api/v1/eda/ai/issues", json=body).status_code == 401
+    h = login(client, "s")
+    r = client.post("/api/v1/eda/ai/issues", json=body, headers=h).json()
+    assert r["draft"]["issues"][0]["cites"] == ["R1"]
+    cites = calls[0]["schema"]["properties"]["issues"]["items"]["properties"]["cites"]["items"]["enum"]
+    assert cites == ["R1"] and "R2" not in calls[0]["prompt"] and "C47 只在坐标里" in calls[0]["prompt"]
+    assert "Never mention a problem that is not in the results" in calls[0]["system"]
+    with sqlite3.connect(str(Path(main.state.settings.data_dir) / "eda_ai.db")) as c:
+        kind, inp = c.execute("select kind, input from runs order by id desc limit 1").fetchone()
+    assert kind == "issues" and "C47" not in inp and "1 条结果" in inp
+    only_pass = {"results": [results[1]]}
+    assert client.post("/api/v1/eda/ai/issues", json=only_pass, headers=h).status_code == 400

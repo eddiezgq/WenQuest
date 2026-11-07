@@ -2,6 +2,8 @@
 
   POST /api/v1/eda/ai/draft      需求 + 起草目录 → 规格与功能块参数的草稿（每个数带来源；没给的关键数留空并提问）
   POST /api/v1/eda/ai/runs/{id}  问渠电子服务回填这次草稿是否通过代码校验
+  POST /api/v1/eda/ai/issues     第 112 轮：工厂端检查结果 → 给客户的工程问题单草稿（每条引用检查结果编号）。
+                                 只收检查结果，不收客户的文件；记录里只记工厂名和结果条数
 
 调用方是问渠电子服务（官网 /eda/），它转来用户的全站登录 cookie 或 Bearer；目录由它按功能块库生成，这里只把目录当数据
 放进提示，网关不判定、不改设计。模型走统一的模型接口 ai.py：美国用 Claude，国内部署（region cn）自动用 DeepSeek。
@@ -41,6 +43,30 @@ Rules — they matter more than anything else:
 Answer only with the JSON object."""
 
 
+ISSUES_SYSTEM = """You draft an engineering query (problem list) that a PCB assembly factory sends to its customer, for the
+WenQuest PCBA platform. You get only the factory's check results; each has an id (R1, R2, ...), a check key, a status
+(fail / unknown / pending), the measured value, the factory's limit, the reference designators and a note.
+Rules:
+1. Every issue cites one or more result ids from the list. Never mention a problem that is not in the results, and never
+   invent numbers, part numbers or designators: write about what the results say.
+2. Ask a clear question the customer can answer, and give two to four concrete options (e.g. fix the design, accept a
+   deviation, provide a missing file). For "unknown" results caused by missing files, ask for those files.
+3. Group results that the customer would answer together; skip nothing that failed.
+4. Be short and polite, the way an experienced process engineer writes.
+Answer only with the JSON object."""
+
+
+def issues_schema(ids: list[str]) -> dict:
+    item = {"type": "object", "additionalProperties": False,
+            "properties": {"cites": {"type": "array", "items": {"type": "string", "enum": ids}},
+                           "question": {"type": "string"},
+                           "options": {"type": "array", "items": {"type": "string"}},
+                           "reply_required": {"type": "boolean"}},
+            "required": ["cites", "question", "options", "reply_required"]}
+    return {"type": "object", "additionalProperties": False,
+            "properties": {"issues": {"type": "array", "items": item}}, "required": ["issues"]}
+
+
 def _value_schema() -> dict:
     return {"type": ["number", "string", "null"]}
 
@@ -71,6 +97,15 @@ class DraftIn(BaseModel):
     catalog: dict[str, Any]
     feedback: dict[str, Any] | None = None
     lang: str = Field(default="zh", pattern="^(zh|en)$")
+
+
+class IssuesIn(BaseModel):
+    results: list[dict[str, Any]] = Field(min_length=1, max_length=80)
+    factory: str = Field(default="", max_length=120)
+    lang: str = Field(default="zh", pattern="^(zh|en)$")
+
+
+RESULT_KEYS = ("id", "key", "name", "status", "value", "limit", "unit", "detail", "refs")
 
 
 class VerdictIn(BaseModel):
@@ -141,6 +176,34 @@ def register(app, m) -> None:
                                 (t0, sess.user_id, "draft" if not body.feedback else "revise",
                                  body.requirement[:200], state.ai.provider, int((time.time() - t0) * 1000),
                                  ok)).lastrowid
+        return {"draft": out, "run": rid, "left_today": left - 1, "model": state.ai.provider}
+
+    @app.post("/api/v1/eda/ai/issues")
+    async def issues(body: IssuesIn, sess: Annotated[Session, Depends(who)]):
+        res = [{k: r.get(k) for k in RESULT_KEYS} for r in body.results if r.get("status") in ("fail", "unknown", "pending")]
+        ids = [str(r["id"]) for r in res if r.get("id")]
+        if not ids:
+            raise EngineError("bad_request", "no open check results to write about", 400)
+        data = json.dumps(res, ensure_ascii=False)
+        if len(data) > 30000:
+            raise EngineError("bad_request", "results too large", 400)
+        if not state.ai.available:
+            raise EngineError("ai_unavailable", "no AI model is configured", 503)
+        left = quota(sess)
+        prompt = (f"Write in {'Chinese' if body.lang == 'zh' else 'English'}.\nFactory: {body.factory}\n"
+                  f"Check results (JSON):\n{data}")
+        t0 = time.time()
+        ok, out = 0, {}
+        try:
+            out = await state.ai.json(system=ISSUES_SYSTEM, prompt=prompt, schema=issues_schema(ids), max_tokens=3000,
+                                      fake=lambda: {"issues": [{"cites": ids[:1], "question": "(fake model)",
+                                                                "options": [], "reply_required": True}]})
+            ok = 1
+        finally:
+            with db() as c:
+                rid = c.execute("insert into runs(ts,user_id,kind,input,provider,ms,ok) values(?,?,?,?,?,?,?)",
+                                (t0, sess.user_id, "issues", f"{body.factory[:80]}；{len(ids)} 条结果",
+                                 state.ai.provider, int((time.time() - t0) * 1000), ok)).lastrowid
         return {"draft": out, "run": rid, "left_today": left - 1, "model": state.ai.provider}
 
     @app.post("/api/v1/eda/ai/runs/{rid}")

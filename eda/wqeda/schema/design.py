@@ -6,7 +6,7 @@
     L3 circuit   电路：器件、引脚接哪个网络、物料编号；网络分类；按规则生成的 ICT 测试点
     L4 board     板子：外形、层数、摆放、安装孔、测试点网格、大电流焊盘路径、功率铺铜
 
-变体（variant）：在一份设计描述上打补丁（改引脚、改说明、加器件、加摆放、加铺铜），改了什么自动记成改动清单。
+变体（variant）：在一份设计描述上打补丁（改引脚、改说明、改物料编号、加器件、加摆放、加铺铜），改了什么自动记成改动清单。
 本模块只做读、校验和确定性展开：不联网、不调 AI。"""
 
 from __future__ import annotations
@@ -187,6 +187,11 @@ def validate_variant(doc, base):
     for ref in doc.get("note_changes") or {}:
         if ref not in refs:
             p.append("改说明的 {} 不在原设计里".format(ref))
+    for ref, item in (doc.get("item_changes") or {}).items():  # 第 112 轮：改物料编号（null = 去掉）
+        if ref not in refs:
+            p.append("改物料编号的 {} 不在原设计里".format(ref))
+        elif item is not None and not isinstance(item, str):
+            p.append("改物料编号的 {} 应是文字或 null".format(ref))
     for ref in new:
         if ref in refs:
             p.append("新增的 {} 与原设计位号重复".format(ref))
@@ -272,6 +277,9 @@ def apply_variant(doc, var):
             changes.append((ref, "引脚 {}：{} → {}".format(pin, old or "未用", new or "未用")))
     for ref, note in (var.get("note_changes") or {}).items():
         by_ref[ref]["note"] = note
+    for ref, item in (var.get("item_changes") or {}).items():
+        changes.append((ref, "物料编号：{} → {}".format(by_ref[ref].get("item") or "无", item or "无")))
+        by_ref[ref]["item"] = item
     for q in var.get("add_parts") or []:
         parts.append(copy.deepcopy(q))
         changes.append((q["ref"], "新增：" + q.get("note", "")))

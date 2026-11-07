@@ -1,0 +1,41 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>问渠电子使用说明（起草台与问渠贴片） · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>问渠电子使用说明（起草台与问渠贴片）</h1>
+<p>问渠电子是问渠的电路板设计与制造平台，网址 <code>wenquestrobotics.com/eda/</code>，用问渠账号登录。它有两个页面：设计的人用“起草台”，贴片厂用“问渠贴片”。两边用的是同一套检查程序，判定全由程序做，AI 只起草，由人确认。示例设计和演示工厂都是虚构的，不能直接投产。</p>
+<h2>起草台：把一句话需求变成一块电路板</h2>
+<ol>
+<li>在需求框里写清楚电压、电流、电机、接口，例如“给 400 W、48 V 的机器人关节伺服电机做一块驱动板，额定相电流 8.5 A，峰值 30 A，带 2500 线增量编码器和 CAN”。需求框下面有三个示例可以点。</li>
+<li>点“AI 起草”。半分钟左右出来规格和功能块参数，每个数都标了来源：需求原文、规则推出、AI 假设（铜色高亮，要你回答的问题写在下面）、人填、模板默认。</li>
+<li>母线电压、额定和峰值相电流这几项必须有。需求里没写，AI 不许猜，会留空并提问，你填上再点“按改过的数重算”。</li>
+<li>看结论：通过、不通过、待核对（器件数据还没人对照规格书核对，不算通过）、未知（缺数据）。展开“计算书”能看到每一步怎么算的。</li>
+<li>“板子检查”用驱动板模板已经布好线的板子，按你的规格再查一遍工艺、布局和发热。不重新布线，所以电流改大了，大电流线宽会显示不通过。</li>
+<li>勾选“我已看过标成‘AI 假设’的数”，下载设计描述（YAML 文件）。草稿不存服务器。</li>
+</ol>
+<p>本版只做三相电机驱动板（九种功能单元，拓扑固定）。</p>
+<h2>问渠贴片：客户的资料包进厂前先查一遍</h2>
+<p>网址 <code>wenquestrobotics.com/eda/factory/</code>，起草台页头也有链接。</p>
+<ol>
+<li>选按哪家工厂的工艺能力查。现在只有两家虚构的演示工厂：“示例贴片厂”和“示例贴片厂·经济线”，后者设备旧一些，只接常规件。</li>
+<li>上传资料包：光绘和钻孔（一个 zip 或多个文件），物料清单和贴片坐标（CSV）。Excel 的物料清单请先另存为 CSV。没有资料包，可以点“用演示资料包”：那是驱动板 A 版的资料包，故意漏了一个物料编号。</li>
+<li>点“检查”，十几秒出结果：</li>
+<li>资料对不对：位号、数量、正反面；</li>
+<li>板子做不做得出：线宽、线距、孔、孔环、阻焊桥、铜到板边；</li>
+<li>好不好贴：板子尺寸、最小引脚间距、最小焊盘、极性方向（光绘里没有第 1 脚的信息，有极性的元件列出来请人确认）。
+   资料包里没有网表和器件外框，有几项查不了，判“未知”，不判通过。点一行结果，板图上会标出位置。</li>
+<li>数量统计是报价和备料的依据：贴片元件数（正反面）、焊点数、通孔件数、物料种类、元件总数、细间距器件数。软件只算量，不算钱。</li>
+<li>列名或层认错了，在“列映射与层”里改，再点“检查”。</li>
+<li>点“AI 起草问题单”。AI 只拿到没通过的检查结果，拿不到你的文件。每条问题都必须引用一条检查结果，编出来的会被程序退回。你逐条改、删、加，勾选确认后下载：YAML 给设计端用，Markdown 发给客户。</li>
+</ol>
+<p>上传的文件只在这一次检查里用，算完就删，不存服务器，也不用来训练。</p>
+<h2>问题单回到设计端</h2>
+<p>设计的人收到问题单（YAML 文件），在问渠电子的工具里运行“问题单对到设计”，它会指出每条问题对应设计描述里的哪个器件、哪一层，例如“C47 没有物料编号，所以没进物料清单”。改完设计、重新导出资料包，再查一遍，问题单上的项会显示“已解决”。</p>
+<h2>次数与记录</h2>
+<p>AI 起草（起草台和问题单）要登录问渠账号，每人每天有次数上限。每次调用模型都有记录：谁、什么时候、用的哪个模型、是否通过程序校验。问题单的记录只记工厂名和结果条数，不记内容。美国站用 Claude，国内站用已备案的 DeepSeek。</p></main><script src="/assist.js" defer></script></body></html>

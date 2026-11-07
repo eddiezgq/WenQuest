@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>问渠贴片 · 新产品导入</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="factory.css">
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><b data-t="brand">问渠贴片</b><span class="sep">·</span><span data-t="desk">新产品导入</span></div>
+  <nav>
+    <a href="../" data-t="toDesk">起草台</a>
+    <a href="../help/#factory" data-t="help">帮助</a>
+    <button id="lang" type="button" aria-label="中文 / English">EN</button>
+  </nav>
+</header>
+<main>
+  <section>
+    <h1 data-t="title">客户的资料包，进厂前先查一遍</h1>
+    <p class="lede" data-t="lede">上传光绘、钻孔、物料清单和坐标，按本厂的工艺能力查：资料对不对得上、板子做不做得出、好不好贴。查出的问题由 AI 起草成给客户的问题单，你改完、确认后才导出。文件算完就删，不存服务器。</p>
+    <form id="up" class="upload">
+      <label><span data-t="factory">按哪家工厂的工艺能力查</span>
+        <select id="factory" name="factory"></select></label>
+      <label><span data-t="gerber">光绘和钻孔（一个 zip，或多个文件）</span>
+        <input id="gerber" name="gerber" type="file" multiple></label>
+      <label><span data-t="bom">物料清单（CSV）</span><input id="bom" name="bom" type="file" accept=".csv,.txt"></label>
+      <label><span data-t="cpl">贴片坐标（CSV）</span><input id="cpl" name="cpl" type="file" accept=".csv,.txt"></label>
+      <div class="row">
+        <button id="demo" type="button" data-t="demo">用演示资料包</button>
+        <button id="go" class="primary" type="submit" data-t="go">检查</button>
+      </div>
+      <p class="scope" data-t="scope">演示工厂都是虚构的，工艺能力是示例值。演示资料包是驱动板 A 版，故意漏了一个物料编号。</p>
+    </form>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </section>
+
+  <section id="out" hidden>
+    <div class="tally" id="tally"></div>
+    <div id="notes"></div>
+
+    <div class="split">
+      <div>
+        <h2 data-t="board">板图</h2>
+        <div class="sides"><button type="button" data-side="top" class="on" data-t="top">顶面</button><button type="button" data-side="bottom" data-t="bottom">底面</button></div>
+        <div id="svg" class="board" role="img" aria-label="板图"></div>
+        <p class="hint" data-t="boardHint">点检查结果的一行，问题位置在板图上标出来。</p>
+      </div>
+      <div>
+        <h2 data-t="qty">数量统计（报价依据，只算量）</h2>
+        <div class="wrap"><table id="qty"></table></div>
+      </div>
+    </div>
+
+    <h2 data-t="results">检查结果</h2>
+    <div class="wrap"><table id="res"></table></div>
+
+    <details id="mapBox" class="unit">
+      <summary data-t="maps">列映射与层（认错了在这里改，再点“检查”）</summary>
+      <div id="maps"></div>
+    </details>
+
+    <h2 data-t="issues">工程问题单</h2>
+    <p class="hint" data-t="issuesHint">AI 只拿到没通过的检查结果，不拿你的文件；每条问题必须引用一条检查结果。</p>
+    <div class="actions"><button id="draft" type="button" class="primary" data-t="draft">AI 起草问题单</button></div>
+    <div id="issues"></div>
+    <div class="actions" id="issueActions" hidden>
+      <label class="confirm"><span class="vh" data-t="pick">引用哪条检查结果</span><select id="pick"></select></label>
+      <button id="add" type="button" data-t="add">加一条</button>
+      <label class="confirm"><input type="checkbox" id="ok"> <span data-t="confirm">我已逐条看过，确认这份问题单</span></label>
+      <button id="dlY" type="button" class="primary" disabled data-t="dlY">下载问题单（YAML，给设计端）</button>
+      <button id="dlM" type="button" disabled data-t="dlM">下载问题单（Markdown，给客户）</button>
+    </div>
+  </section>
+</main>
+<script src="factory.js"></script>
+</body>
+</html>

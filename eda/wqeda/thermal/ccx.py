@@ -9,7 +9,7 @@ import subprocess
 import tempfile
 
 CCX = os.environ.get("WQ_CCX", "ccx")
-TIME_LIMIT_S = 600
+TIME_LIMIT_S = 300
 
 
 def read_nt(path):
@@ -38,7 +38,10 @@ def run(text, workdir=None):
     tmp = workdir or tempfile.mkdtemp(prefix="wqeda-th-")
     with open(os.path.join(tmp, "job.inp"), "w") as f:
         f.write(text)
-    r = subprocess.run([CCX, "-i", "job"], cwd=tmp, capture_output=True, text=True, timeout=TIME_LIMIT_S)
+    # 线程数照数字工厂（cae/solve.py）：不设时 CalculiX 的 OpenMP 在 CI 机器上会卡住
+    env = dict(os.environ, OMP_NUM_THREADS=os.environ.get("WQ_CAE_THREADS", "2"))
+    r = subprocess.run([CCX, "-i", "job"], cwd=tmp, capture_output=True, text=True, timeout=TIME_LIMIT_S,
+                       stdin=subprocess.DEVNULL, env=env)
     frd = os.path.join(tmp, "job.frd")
     if r.returncode != 0 or not os.path.exists(frd):
         raise RuntimeError("CalculiX 没算出来：" + (r.stdout[-1500:] + r.stderr[-500:]))

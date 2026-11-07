@@ -2,12 +2,16 @@
 *
 !services/eda/requirements.txt
 !services/eda/app.py
+!services/eda/factory_api.py
 !services/eda/web
 !eda/wqeda
 !eda/parts
 !factory/designs/drv-joint/design.yaml
 !factory/designs/drv-joint/report/board-model.json.gz
 !eda/examples/factories
+!factory/designs/drv-joint/out/gerber.zip
+!eda/examples/pcba-demo/bom.csv
+!eda/examples/pcba-demo/pos.csv
 !factory/digital/cae/__init__.py
 !factory/digital/cae/circuit.py
 !factory/digital/cae/motors.py

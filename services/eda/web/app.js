@@ -1,7 +1,7 @@
 // 问渠电子 · 起草台（第 105 轮 P3）。不用框架：一页、几个接口。判定都在服务器的确定性代码里，这里只显示和收集人改的数。
 "use strict";
 const T = {
-  zh: {brand: "问渠电子", desk: "起草台", help: "帮助", title: "把需求写成一块电路板",
+  zh: {brand: "问渠电子", desk: "起草台", help: "帮助", pcba: "问渠贴片", title: "把需求写成一块电路板",
     lede: "写一句话或一段需求。AI 起草规格和功能块参数，每个数都标来源；代码马上展开电路、跑计算和仿真。你改、你定，确认后下载设计描述。",
     reqLabel: "需求", go: "AI 起草", scope: "本版只做三相电机驱动板（九种功能单元、拓扑固定）；板子层沿用驱动板模板。示例设计，不能直接投产。",
     spec: "规格", units: "功能块参数", unitsHint: "只列 AI 可以改的参数；其余沿用模板。改完点“按改过的数重算”。",
@@ -22,7 +22,7 @@ const T = {
     boardItem: "项", boardRes: "结论", boardVal: "量到 / 限值", boardNote: "说明", boardAll: "通过的 {n} 项",
     heat: (s, t, w) => `热：${s}。板上最高约 ${t} ℃，总损耗 ${w} W（简化平板模型，只作布局阶段估算）。`,
     tj: "结温", limit: "限", detailLang: ""},
-  en: {brand: "WenQuest Electronics", desk: "Drafting desk", help: "Help", title: "Turn a requirement into a circuit board",
+  en: {brand: "WenQuest Electronics", desk: "Drafting desk", help: "Help", pcba: "PCBA (factory)", title: "Turn a requirement into a circuit board",
     lede: "Write a sentence or a short requirement. AI drafts the specification and block parameters, each number with its source; code then expands the circuit and runs the calculations and simulations. You change and decide, then download the design description.",
     reqLabel: "Requirement", go: "Draft with AI", scope: "This version covers one board family: a three-phase motor drive (nine block types, fixed topology); the board layer follows the drive-board template. Example design, not for production.",
     spec: "Specification", units: "Block parameters", unitsHint: "Only the parameters AI may change are listed; the rest follow the template. Press “Recalculate” after editing.",
