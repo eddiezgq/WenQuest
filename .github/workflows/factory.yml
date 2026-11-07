@@ -164,7 +164,7 @@ jobs:
           # 第 104 轮：ngspice 仿真核对；第 111 轮：CalculiX 算板子温升（标准题和驱动板）
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends ngspice calculix-ccx >/dev/null
           python3 -m pip install --break-system-packages -q gerbonara==1.6.3
-          python3 -m pytest -q eda/tests
+          timeout 900 python3 -m pytest -v -p no:cacheprovider -o faulthandler_timeout=120 --durations=15 eda/tests  # DEBUG 分支：找出卡住的用例
 
   rehearsal:
     name: 服务器演练（真 ERPNext）
