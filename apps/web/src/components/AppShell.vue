@@ -85,6 +85,7 @@
       <view class="acc-row narrow-only" @click="go('inbox')">{{ t("shell.inbox") }}</view>
       <view class="acc-row narrow-only" @click="go('help')">{{ t("shell.help") }}</view>
       <view v-if="user && !user.can_create_courses" class="acc-row" @click="go('apply')">{{ t("apply.menu") }}</view>
+      <view v-if="myOrg" class="acc-row" @click="go('myorg')">我的单位（给同事开账号）</view>
       <view v-if="isCN && site.wechat" class="acc-row" @click="wechatBind">{{ wxBound ? "解绑微信" : "绑定微信（以后扫码登录）" }}</view>
       <view class="acc-row" @click="toggleLocale">{{ t("shell.language") }} · {{ t("lang.switch") }}</view>
       <view class="acc-row" @click="logout">{{ t("nav.logout") }}</view>
@@ -154,7 +155,7 @@ const menu = computed(() => (props.course ? courseMenu(props.course) : []));
 function go(where: string) {
   accountOpen.value = false;
   if (where === "create") return uni.reLaunch({ url: "/pages/studio/studio" });
-  if (["catalog", "admin", "apply", "committee", "textbook", "whiteboard", "video3d", "sewing"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
+  if (["catalog", "admin", "apply", "committee", "myorg", "textbook", "whiteboard", "video3d", "sewing"].includes(where)) return uni.reLaunch({ url: `/pages/${where}/${where}` });
   if (["calendar", "inbox", "help"].includes(where)) return uni.reLaunch({ url: `/pages/hub/hub?view=${where}` });
   uni.reLaunch({ url: where === "courses" ? "/pages/courses/courses?view=all" : "/pages/courses/courses" });
 }
@@ -170,6 +171,7 @@ function openCourse(key: string) {
 
 // 第 108 轮：绑定 / 解绑微信扫码登录
 const wxBound = ref(false);
+const myOrg = ref(false);   // 第 96 轮：单位负责人看到“我的单位”
 async function wechatBind() {
   try {
     if (wxBound.value) {
@@ -200,6 +202,7 @@ onMounted(() => {
   else if (user.value && v3Allowed.value === null) api.v3Access().then((r) => (v3Allowed.value = r.allowed)).catch(() => {});
   // 缝纫机设计软件（第 39 轮）：已开通企业账号的人在左栏看到入口
   if (user.value && !sewOn.value) request<{ licensed: boolean }>("GET", "/api/v1/sewing/me").then((r) => (sewOn.value = r.licensed)).catch(() => {});
+  if (user.value && isCN.value) request("GET", "/api/v1/my/org").then(() => (myOrg.value = true)).catch(() => {});
   if (user.value && isCN.value && site.value.wechat) request<{ wechat: boolean }>("GET", "/api/v1/me/logins").then((r) => (wxBound.value = r.wechat)).catch(() => {});
   // #ifdef H5
   const wq = new URLSearchParams(window.location.search);

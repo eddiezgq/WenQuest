@@ -68,6 +68,8 @@ services:
       WQ_CN_MAX_ORGS: ${WQ_CN_MAX_ORGS:-100}
       WQ_CN_ORG_SEATS: ${WQ_CN_ORG_SEATS:-5}
       WQ_CN_ORG_SEATS_MAX: ${WQ_CN_ORG_SEATS_MAX:-20}
+      WQ_CN_AUTO: ${WQ_CN_AUTO:-1}
+      WQ_CN_AUTO_DAILY: ${WQ_CN_AUTO_DAILY:-20}
       WQ_CN_TRIAL_DAYS: ${WQ_CN_TRIAL_DAYS:-90}
       WQ_CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-sonnet-5}
       # The course lead (专家版) and the AI pre-review use the strongest model.

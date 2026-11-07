@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 PREVIEW = "--preview" in sys.argv
 OUT = ROOT / "site" / ("cn-preview" if PREVIEW else "cn")
-VER = "91j"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
+VER = "96a"                                   # 改了 cn.css、cn.js 就改这里，浏览器取新文件
 
 # ---------------------------------------------------------------- 由服务器 .env 填入的信息（Caddy templates）
 
@@ -59,7 +59,7 @@ ENTERPRISE = [
 EDUCATION = [
     ("/education/platform/", "学习系统：问渠 AI 学习平台", "AI 原生的在线学习平台"),
     ("/education/#dev", "电子教材、虚拟实验、数字工厂开发", "按单位需求开发"),
-    ("/education/#trial", "在线体验", "按单位申请，审核后开通"),
+    ("/education/#trial", "在线体验", "按单位申请，邮箱验证后自动开通"),
 ]
 
 
@@ -129,7 +129,7 @@ def page(path, title, desc, body, cur=None):
   <a class="brand" href="/">{LOGO}<b>问渠科技</b></a>
   {nav(cur or path)}
   <a class="auth-top" href="{LEARN}/pages/login/login">登录</a>
-  <a class="auth-top reg" href="/contact/?trial=1#demo-form" title="体验账号按单位开通：填写单位信息并勾选“申请在线体验账号”，审核后开通">注册</a>
+  <a class="auth-top reg" href="/contact/?trial=1#demo-form" title="体验账号按单位开通：填写单位信息并勾选“申请在线体验账号”，邮箱验证后自动开通">注册</a>
   <a class="cta-top" href="/contact/">预约演示</a>
   <button class="burger" type="button" aria-expanded="false" aria-label="菜单">菜单</button>
 </div></header>
@@ -491,7 +491,7 @@ def education():
     trial = f"""<div class="split"><div>
 <h3>先在线体验，再谈合同</h3>
 <p>学校和企业可以先在我们的服务器上在线体验：学习系统（AI 建课、AI 助教、互动课件、虚拟实验）、缝纫机与凸轮设计软件、演示数字工厂。</p>
-{ul(["按单位申请：由单位联系人在“预约演示”里勾选“申请在线体验账号”", "审核后为单位开通若干体验账号，体验期 90 天，可以申请延长", "名额有限，按申请先后开通；不接受个人申请", "正式使用时按合同为单位单独部署"])}
+{ul(["按单位申请：由单位联系人在“预约演示”里勾选“申请在线体验账号”，填邮箱收验证码", "提交后当场开通，账号和初始密码发到联系人邮箱，体验期 90 天，可以申请延长", "联系人登录学习平台后，在“我的单位”里自己给同事开账号", "正式使用时按合同为单位单独部署"])}
 <p><a class="btn solid" href="/contact/">申请在线体验 →</a></p></div>
 {shot("edu-slides.jpg", "在线体验：网页互动课件，动画和实验在页里当场操作")}</div>"""
     body = f"""{hero("教育服务", "教育服务：学习系统与教学资源开发", "为学校和企业开发学习系统、电子教材、虚拟实验、数字工厂和 CAD、CAM、CAE 集成化解决方案；国内服务器上提供按单位开通的在线体验。", "教育服务", [("申请在线体验", "/contact/"), ("学习系统", "/education/platform/")], video="textbook")}
@@ -595,8 +595,10 @@ def contact():
   <label class="full">所在行业<input type="text" name="industry" maxlength="60" placeholder="如：缝制机械、减速器、电子装配、职业院校"></label>
   <fieldset><legend>想了解的产品或服务</legend>{boxes}</fieldset>
   <fieldset class="trial"><legend>在线体验</legend>
-    <label><input type="checkbox" name="trial" value="1"> 申请在线体验账号（注册：按单位开通，审核后把账号发给你，体验期 90 天）</label>
+    <label><input type="checkbox" name="trial" value="1"> 申请在线体验账号（注册：填邮箱收验证码，提交后自动开通，账号发到你的邮箱，体验期 90 天）</label>
     <label>需要几个账号 <select name="seats"><option>1</option><option>2</option><option>3</option><option>4</option><option selected>5</option></select></label>
+    <div class="vcode" hidden><label>邮箱验证码 *<span class="vrow"><input type="text" name="code" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="6 位数字"><button type="button" class="btn vbtn">获取验证码</button></span></label>
+      <small>验证码发到上面填的邮箱；没收到请看垃圾邮件。同事的账号，开通后你登录学习平台在“我的单位”里自己加。</small></div>
   </fieldset>
   <label class="full">需求说明<textarea name="note" maxlength="2000" placeholder="说说你的工厂或学校现在最想解决的一件事"></textarea></label>
   <label class="hp" aria-hidden="true">网站<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
@@ -623,7 +625,7 @@ def privacy():
 <h3>1. 预约演示与联系</h3>
 <p>单位名称、姓名、手机号、邮箱（选填）、所在行业、想了解的产品、需求说明。目的：联系你、安排演示和提供报价。你主动填写并勾选同意后才提交。</p>
 <h3>2. 产品账号</h3>
-<p>在我们的产品中注册账号时，需要手机号（用于实名注册、登录和找回账号，依照《网络安全法》要求提供真实身份信息）和姓名；单位客户为其人员开通账号的，由单位提供，邮箱选填。你选择用微信扫码登录时，我们只从微信获得用于识别你的微信标识（OpenID / UnionID），不获取你的昵称、头像、好友等信息；你可以随时在账号菜单里解绑。目的：提供服务、身份验证和安全保障。</p>
+<p>在我们的产品中注册账号时，需要手机号（用于实名注册、登录和找回账号，依照《网络安全法》要求提供真实身份信息）和姓名；单位客户为其人员开通账号的，由单位提供，邮箱选填；你在“预约演示”里申请在线体验并验证邮箱后，我们自动为你建立账号，账号和初始密码发到这个邮箱。你选择用微信扫码登录时，我们只从微信获得用于识别你的微信标识（OpenID / UnionID），不获取你的昵称、头像、好友等信息；你可以随时在账号菜单里解绑。目的：提供服务、身份验证和安全保障。</p>
 <h3>3. 使用记录</h3>
 <p>登录记录、操作日志、审批与签字记录（含时间、操作人、版本）。目的：提供服务、记录追溯（这是质量体系和审批功能本身的要求）、安全审计。网络日志按法律要求留存不少于六个月。</p>
 <h3>4. 你提交给 AI 功能的内容</h3>

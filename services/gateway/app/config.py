@@ -41,6 +41,8 @@ class Settings(BaseSettings):
     cn_org_seats: int = 5
     cn_org_seats_max: int = 20
     cn_trial_days: int = 90
+    cn_auto: bool = True          # 第 96 轮：官网申请体验、邮箱验证后自动开通（管理页可随时关）
+    cn_auto_daily: int = 20       # 每天最多自动开通几家，超出转人工
 
     # --- AI models (see app/ai.py) ---
     # auto = Claude if a key is set, else DeepSeek; or claude / deepseek / fake (tests and demos)

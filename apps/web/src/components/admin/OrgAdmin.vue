@@ -5,6 +5,8 @@
       <text class="wq-tag info">体验单位 {{ info.live }} / {{ info.max }}</text>
       <text class="wq-muted">每家默认 {{ info.default_seats }} 个账号（最多 {{ info.max_seats }}），体验期 {{ info.trial_days }} 天</text>
       <text v-if="info.expiring.length" class="wq-tag live">{{ info.expiring.length }} 家 7 天内到期</text>
+      <!-- 第 96 轮：官网申请、邮箱验证后自动开通；出问题可以马上关 -->
+      <text class="wq-link" @click="switchAuto">{{ info.auto ? `官网申请自动开通：开（每天最多 ${info.auto_daily} 家）· 点此关闭` : "官网申请自动开通：关（转人工）· 点此打开" }}</text>
     </view>
     <text v-if="err" class="wq-error block">{{ err }}</text>
 
@@ -38,6 +40,7 @@
       <view class="wq-row o-head">
         <text class="o-name">{{ o.name }}</text>
         <text class="wq-tag">{{ KIND_NAMES[KINDS.indexOf(o.kind)] || o.kind }}</text>
+        <text v-if="o.auto" class="wq-tag info">自动开通</text>
         <text v-if="o.live" class="wq-tag ok">体验中 · 还剩 {{ o.days_left }} 天</text>
         <text v-else-if="o.status === 'stopped'" class="wq-tag live">已停用</text>
         <text v-else class="wq-tag live">已到期</text>
@@ -54,9 +57,11 @@
 
       <view v-for="mb in o.members" :key="mb.userid" class="wq-row mem">
         <text class="m-name">{{ mb.name }}</text>
+        <text v-if="mb.owner" class="wq-tag info">负责人</text>
         <text class="wq-muted">{{ [mb.phone, mb.email].filter(Boolean).join(" · ") }}</text>
         <text v-if="mb.stopped" class="wq-tag live">已停用</text>
         <view class="gap" />
+        <text class="wq-link" @click="setOwner(o, mb)">{{ mb.owner ? "取消负责人" : "设为负责人" }}</text>
         <text class="wq-link" @click="newPw(o, mb)">重设密码</text>
         <text class="wq-link" :class="{ danger: !mb.stopped }" @click="stopMember(o, mb)">{{ mb.stopped ? "恢复" : "停用" }}</text>
       </view>
@@ -85,10 +90,10 @@ import { onMounted, reactive, ref } from "vue";
 import { ApiError, request } from "../../api";
 import { errorText } from "../../i18n";
 
-interface Member { userid: number; name: string; phone: string; email: string; stopped: number }
+interface Member { userid: number; name: string; phone: string; email: string; stopped: number; owner?: number }
 interface Org { id: number; name: string; kind: string; contact: string; phone: string; email: string; seats: number; used: number;
-  status: string; live: boolean; days_left: number; members: Member[] }
-interface Info { live: number; max: number; default_seats: number; max_seats: number; trial_days: number; expiring: number[]; orgs: Org[] }
+  status: string; live: boolean; days_left: number; members: Member[]; auto?: number }
+interface Info { auto?: boolean; auto_daily?: number; live: number; max: number; default_seats: number; max_seats: number; trial_days: number; expiring: number[]; orgs: Org[] }
 interface Req { id: number; org: string; name: string; phone: string; email: string; industry: string; trial?: number; seats?: number }
 
 const KINDS = ["company", "school", "other"];
@@ -136,6 +141,13 @@ function openOrg() {
       seats: f.seats || undefined, request_id: f.request_id || undefined });
     Object.assign(f, { name: "", contact: "", phone: "", email: "", seats: undefined, request_id: 0 });
   });
+}
+function switchAuto() {
+  run(() => request("PUT", "/api/v1/admin/orgs-auto", { on: !info.value?.auto }));
+}
+// 负责人可以在“我的单位”里自己给同事开账号（第 96 轮）
+function setOwner(o: Org, mb: Member) {
+  run(() => request("PUT", `/api/v1/admin/orgs/${o.id}/members/${mb.userid}`, { owner: !mb.owner }));
 }
 function change(o: Org, body: Record<string, unknown>) {
   run(() => request("PUT", `/api/v1/admin/orgs/${o.id}`, body));

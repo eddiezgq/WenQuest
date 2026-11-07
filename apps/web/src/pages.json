@@ -193,6 +193,15 @@
       }
     },
     {
+      "path": "pages/myorg/myorg",
+      "style": {
+        "navigationBarTitleText": "我的单位",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/catalog/catalog",
       "style": {
         "navigationBarTitleText": "课程目录",

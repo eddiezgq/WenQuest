@@ -105,6 +105,36 @@
 
   // ---------- 预约演示表单 ----------
   var form = document.getElementById('demo-form');
+  // 第 96 轮：勾了“申请在线体验账号”就要邮箱验证码，验证后自动开通
+  function showCode() {
+    if (!form) return;
+    var box = form.querySelector('.vcode'), t = form.querySelector('input[name="trial"]');
+    if (box && t) box.hidden = !t.checked;
+  }
+  if (form) {
+    var tr = form.querySelector('input[name="trial"]');
+    if (tr) tr.addEventListener('change', showCode);
+    showCode();
+    var vb = form.querySelector('.vbtn'), wait = 0;
+    if (vb) vb.addEventListener('click', function () {
+      var msg = form.querySelector('.msg'), email = (form.querySelector('input[name="email"]').value || '').trim();
+      if (wait > 0) return;
+      if (!/^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(email)) { msg.className = 'msg err'; msg.textContent = '请先在上面填写邮箱。'; return; }
+      vb.disabled = true; vb.textContent = '发送中…';
+      fetch('/api/v1/public/demo-request/code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) })
+        .then(function (r) { return r.json().then(function (j) { return [r.ok, j]; }); })
+        .then(function (res) {
+          if (!res[0]) { vb.disabled = false; vb.textContent = '获取验证码'; msg.className = 'msg err'; msg.textContent = (res[1] && res[1].detail) || '验证码没有发出去，请稍后再试。'; return; }
+          msg.className = 'msg ok'; msg.textContent = '验证码已发到 ' + email + '，10 分钟内有效（没收到请看垃圾邮件）。';
+          wait = 60;
+          var timer = setInterval(function () {
+            wait -= 1; vb.textContent = wait > 0 ? wait + ' 秒后重发' : '重新获取';
+            if (wait <= 0) { clearInterval(timer); vb.disabled = false; }
+          }, 1000);
+        })
+        .catch(function () { vb.disabled = false; vb.textContent = '获取验证码'; msg.className = 'msg err'; msg.textContent = '网络不通，请稍后再试。'; });
+    });
+  }
   if (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -115,13 +145,20 @@
         email: (fd.get('email') || '').trim(), industry: (fd.get('industry') || '').trim(),
         products: fd.getAll('products'), note: (fd.get('note') || '').trim(),
         consent: !!fd.get('consent'), website: fd.get('website') || '',
-        trial: !!fd.get('trial'), seats: parseInt(fd.get('seats') || '0', 10) || 0
+        trial: !!fd.get('trial'), seats: parseInt(fd.get('seats') || '0', 10) || 0,
+        code: (fd.get('code') || '').trim()
       };
+      if (body.trial && !body.email) { msg.className = 'msg err'; msg.textContent = '申请在线体验请填写邮箱，账号会发到这个邮箱。'; return; }
       msg.className = 'msg'; msg.textContent = '正在提交…';
       fetch('/api/v1/public/demo-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
         .then(function (r) { return r.json().then(function (j) { return [r.ok, j]; }); })
         .then(function (res) {
-          if (res[0]) { msg.className = 'msg ok'; msg.textContent = '已收到，我们会在 2 个工作日内联系你。'; form.reset(); }
+          if (res[0]) {
+            msg.className = 'msg ok';
+            msg.textContent = res[1].opened ? '在线体验已开通：账号和初始密码已发到你的邮箱（没收到请看垃圾邮件）。'
+              : body.trial ? '已收到，我们会在 2 个工作日内审核开通，账号发到你的邮箱。' : '已收到，我们会在 2 个工作日内联系你。';
+            form.reset(); showCode();
+          }
           else { msg.className = 'msg err'; msg.textContent = (res[1] && typeof res[1].detail === 'string' && res[1].detail) || '提交没有成功，请检查后再试，或直接打电话、发邮件给我们。'; }
         })
         .catch(function () { msg.className = 'msg err'; msg.textContent = '网络不通，请稍后再试，或直接打电话、发邮件给我们。'; });
@@ -153,5 +190,5 @@
 (function () {
   if (!/[?&]trial=1/.test(location.search)) return;
   var f = document.getElementById("demo-form"); if (!f) return;
-  var c = f.querySelector('input[name="trial"]'); if (c) c.checked = true;
+  var c = f.querySelector('input[name="trial"]'); if (c) { c.checked = true; c.dispatchEvent(new Event('change')); }
 })();
