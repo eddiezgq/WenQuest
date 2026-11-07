@@ -10,7 +10,8 @@ import csv
 import re
 import warnings
 
-from ..model import Board, BomRow, Component, Copper, Hole, Pad, Track
+from .. import geom as G
+from ..model import Board, BomRow, Component, Copper, Feature, Hole, Pad, Track
 
 BOM_MAP = {"refs": "位号", "qty": "数量", "value": "数值", "package": "封装", "item": "物料编号"}
 CPL_MAP = {"ref": "Ref", "x": "PosX", "y": "PosY", "rot": "Rot", "side": "Side"}
@@ -81,7 +82,97 @@ def read_gerbers(path):
             out.holes.append(Hole(x, y, round(d, 4), plated, ring))
     if not out.holes and not (stack.drill_pth or stack.drill_npth):
         out.notes.append("没有钻孔文件")
+    _features(stack, names, out)
     return out
+
+
+def _prim(p):
+    """gerbonara 图元 → shapely；不认识的返回 None"""
+    from gerbonara import graphic_primitives as gp
+    from shapely.geometry import Polygon
+
+    if isinstance(p, gp.Circle):
+        return G.circle(p.x, p.y, 2 * p.r)
+    if isinstance(p, gp.Rectangle):
+        return G.rect(p.x, p.y, p.w, p.h, p.rotation)
+    if isinstance(p, gp.Line):
+        return G.segment(p.x1, p.y1, p.x2, p.y2, p.width)
+    if isinstance(p, gp.Arc):
+        return G.arc(p.x1, p.y1, p.x2, p.y2, p.cx, p.cy, p.clockwise, p.width)
+    if isinstance(p, gp.ArcPoly):
+        pts = list(p.outline)
+        return Polygon(pts).buffer(0) if len(pts) >= 3 else None
+    return None
+
+
+def _shape(o):
+    """一个光绘对象（走线、焊盘、铺铜区）的形状：亮图元并起来，减去暗图元"""
+    from shapely.ops import unary_union
+
+    dark, clear = [], []
+    for p in o.to_primitives(unit="mm"):
+        g = _prim(p)
+        if g is not None and not g.is_empty:
+            (dark if p.polarity_dark else clear).append(g)
+    if not dark:
+        return None
+    g = unary_union(dark)
+    return g.difference(unary_union(clear)) if clear else g
+
+
+def _features(stack, names, out):
+    """第 111 轮：铜和阻焊开窗的形状（光绘里没有网络，net 留空）；板框多边形"""
+    from gerbonara.graphic_objects import Arc, Flash, Line
+    from shapely.geometry import LineString
+    from shapely.ops import polygonize, unary_union
+
+    kinds = {Flash: "pad", Line: "track", Arc: "track"}
+    for key, lay in names.items():
+        for o in stack.graphic_layers[key].objects:
+            g = _shape(o)
+            if g is not None:
+                w = (
+                    round(o.aperture.diameter, 4)
+                    if kinds.get(type(o)) == "track" and hasattr(o.aperture, "diameter")
+                    else 0.0
+                )
+                out.features.append(Feature(lay, g, kinds.get(type(o), "zone"), width=w))
+    for side, name in (("top", "F.Mask"), ("bottom", "B.Mask")):
+        layer = stack.graphic_layers.get((side, "mask"))
+        for o in layer.objects if layer else []:
+            g = _shape(o)
+            if g is not None:
+                out.features.append(Feature(name, g, "opening"))
+    if stack.outline:
+        lines = []
+        for o in stack.outline.objects:
+            if isinstance(o, Line):
+                lines.append(LineString([(o.x1, o.y1), (o.x2, o.y2)]))
+            elif isinstance(o, Arc):
+                lines.append(_arc_line(o))
+        polys = list(polygonize(unary_union(lines)))
+        if polys:
+            out.outline_geom = max(polys, key=lambda g: g.area)
+
+
+def _arc_line(o):
+    import math
+
+    from shapely.geometry import LineString
+
+    cx, cy = o.center  # 光绘里圆心是相对起点的偏移，center 是绝对坐标
+    r = math.hypot(o.x1 - cx, o.y1 - cy)
+    a1, a2 = math.atan2(o.y1 - cy, o.x1 - cx), math.atan2(o.y2 - cy, o.x2 - cx)
+    if o.clockwise:
+        while a2 > a1:
+            a2 -= 2 * math.pi
+    else:
+        while a2 < a1:
+            a2 += 2 * math.pi
+    n = 16
+    return LineString(
+        [(cx + r * math.cos(a1 + (a2 - a1) * i / n), cy + r * math.sin(a1 + (a2 - a1) * i / n)) for i in range(n + 1)]
+    )
 
 
 def _rows(path):

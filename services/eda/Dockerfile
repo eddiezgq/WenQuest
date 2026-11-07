@@ -4,12 +4,16 @@
 FROM python:3.12-slim-bookworm
 WORKDIR /srv/repo
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 EDA_REPO=/srv/repo EDA_WEB_DIR=/srv/repo/services/eda/web
-RUN apt-get update -qq && apt-get install -y -q --no-install-recommends ngspice && rm -rf /var/lib/apt/lists/*
+# 第 111 轮：CalculiX 算板子温升（起草台的板子检查）
+RUN apt-get update -qq && apt-get install -y -q --no-install-recommends ngspice calculix-ccx && rm -rf /var/lib/apt/lists/*
 COPY services/eda/requirements.txt services/eda/requirements.txt
 RUN pip install --no-cache-dir -r services/eda/requirements.txt
 COPY eda/wqeda eda/wqeda
 COPY eda/parts eda/parts
 COPY factory/designs/drv-joint/design.yaml factory/designs/drv-joint/design.yaml
+# 第 111 轮：模板板子的板子模型（服务器上没有 KiCad）和示例工厂的工艺能力表
+COPY factory/designs/drv-joint/report/board-model.json.gz factory/designs/drv-joint/report/board-model.json.gz
+COPY eda/examples/factories eda/examples/factories
 COPY factory/digital/cae/__init__.py factory/digital/cae/circuit.py factory/digital/cae/motors.py factory/digital/cae/
 COPY services/eda/app.py services/eda/app.py
 COPY services/eda/web services/eda/web

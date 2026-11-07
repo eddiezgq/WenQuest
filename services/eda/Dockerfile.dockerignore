@@ -6,6 +6,8 @@
 !eda/wqeda
 !eda/parts
 !factory/designs/drv-joint/design.yaml
+!factory/designs/drv-joint/report/board-model.json.gz
+!eda/examples/factories
 !factory/digital/cae/__init__.py
 !factory/digital/cae/circuit.py
 !factory/digital/cae/motors.py

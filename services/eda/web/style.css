@@ -63,4 +63,6 @@ details.unit table{border:0}
 #bookBox{margin-top:20px}#bookBox summary{cursor:pointer;font-weight:600}
 iframe{width:100%;height:70vh;border:1px solid var(--line);border-radius:6px;background:#fff;margin-top:8px}
 .hint{color:var(--muted);font-size:13px;margin:0 0 6px}
+#boardT table{min-width:620px}#boardT td:first-child{min-width:12em}#boardT td:nth-child(2),#boardT td:nth-child(3){white-space:nowrap}
+#boardT small{display:block;color:var(--muted)}
 @media (max-width:600px){h1{font-size:22px}.tally{gap:12px}td input,td select{width:7em}}

@@ -159,9 +159,10 @@ jobs:
           test -z "$(git status --porcelain factory/designs/wq-encif/out)"
       - name: 可制造性检查（改坏能报出来）、芯片规格值
         run: python3 -m pytest -q factory/designs/tests
-      - name: 问渠电子（第 102、104 轮）：设计描述、功能块计算器与生成器、标准题、两条入口一致、仿真核对、判定代码不联网
+      - name: 问渠电子（第 102、104、111 轮）：设计描述、功能块计算器与生成器、标准题、两条入口一致、仿真核对、板子检查与热、读回、判定代码不联网
         run: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends ngspice >/dev/null   # 第 104 轮：仿真核对
+          # 第 104 轮：ngspice 仿真核对；第 111 轮：CalculiX 算板子温升（标准题和驱动板）
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends ngspice calculix-ccx >/dev/null
           python3 -m pip install --break-system-packages -q gerbonara==1.6.3
           python3 -m pytest -q eda/tests
 
