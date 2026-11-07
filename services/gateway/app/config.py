@@ -120,6 +120,17 @@ class Settings(BaseSettings):
     app_url: str = "http://localhost:8088"   # the learning platform, for links in emails
     site_domain: str = ""      # e.g. wenquestrobotics.com: the sign-in cookie is shared across it
     accounts_service: str = "local_wenquest_accounts"
+    # --- 第 108 轮：国内手机号（阿里云短信）与微信扫码登录（app/phone.py）。空 = 不发短信（验证码只写日志）、不显示对应入口 ---
+    sms_access_key_id: str = ""
+    sms_access_key_secret: str = ""
+    sms_sign: str = ""            # 短信签名，如“问渠科技”
+    sms_template: str = ""        # 验证码模板 CODE，如 SMS_123456789；模板里的变量名是 code
+    sms_endpoint: str = "https://dysmsapi.aliyuncs.com/"
+    sms_daily: int = 10           # 同一手机号每天最多几条
+    sms_log_only: bool = False    # 本机测试：没有短信设置也开放手机号登录，验证码只写日志
+    wechat_web_appid: str = ""    # 微信开放平台“网站应用”
+    wechat_web_secret: str = ""
+    public_signup_cn: bool = True  # D-8：国内公众用手机号注册（短信设置好以后才真正开放）
 
     @property
     def cors_list(self) -> list[str]:

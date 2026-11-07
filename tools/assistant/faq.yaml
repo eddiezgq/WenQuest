@@ -107,11 +107,11 @@
   link: {us: https://learn.wenquestrobotics.com/}
 - id: login-cn
   q:
-    zh: [怎么登录, 登录入口, 学习平台在哪, 忘记密码怎么办]
+    zh: [怎么登录, 登录入口, 学习平台在哪, 忘记密码怎么办, 能用手机号登录吗, 没有邮箱怎么登录, 微信能登录吗]
     en: [How do I log in, forgot password]
   sites: [cn]
   a:
-    zh: 点右上角“登录”进学习平台（learn.wenquestech.online），用单位开通的账号登录；忘了密码在登录页点“忘记密码”，按邮件里的验证码重设。
+    zh: 点右上角“登录”进学习平台（learn.wenquestech.online）。可以用手机号收验证码登录（没有邮箱也行），也可以用手机号或邮箱加密码登录；电脑上还可以微信扫码（初次扫码要验证手机号绑定）。忘了密码在登录页点“忘记密码”，选“发到手机”或“发到邮箱”重设。
     en: Click “Log in” at the top right to open the learning platform; use “Forgot password” on the sign-in page to reset it by email.
   link: {cn: https://learn.wenquestech.online/}
 - id: deploy

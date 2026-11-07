@@ -2,7 +2,14 @@
   <AuthCard wide>
     <!-- done: what happens next -->
     <!-- 第 50 轮：国内服务器上不接受个人注册，账号按单位开通 -->
-    <template v-if="isCN">
+    <!-- 第 108 轮 D-8：国内公众用手机号注册（短信开通后才显示），注册后是学生，建课要申请 -->
+    <template v-if="isCN && site.signup">
+      <text class="title">手机号注册</text>
+      <text class="lead">注册后可以选课、学习、做实验、用 AI 助教。想自己建课，登录后在“申请成为老师”里提交，审核通过即可。学校、企业整体开通请到官网预约演示。</text>
+      <PhoneAuth mode="register" @done="afterLogin(back)" />
+      <text class="wq-link center" @click="toLogin">已有账号？去登录</text>
+    </template>
+    <template v-else-if="isCN">
       <text class="title">{{ t("reg.cnClosedTitle") }}</text>
       <text class="lead">{{ t("reg.cnClosedText") }}</text>
       <view class="submit" @click="goContact">{{ t("reg.cnClosedGo") }}</view>
@@ -122,7 +129,8 @@ import AuthCard from "../../components/auth/AuthCard.vue";
 import { PASSWORD_OK, accountApi, afterLogin, siteUrl } from "../../accountApi";
 import { ApiError } from "../../api";
 import { errorText, t } from "../../i18n";
-import { isCN } from "../../site";
+import { isCN, site } from "../../site";
+import PhoneAuth from "../../components/auth/PhoneAuth.vue";
 function goContact() {
   // #ifdef H5
   window.location.href = siteUrl("/contact/");

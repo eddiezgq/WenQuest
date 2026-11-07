@@ -492,4 +492,71 @@ class accounts extends external_api {
             ])),
         ]);
     }
+
+    // --- signin_token (round 108) -------------------------------------------
+
+    /**
+     * Parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function signin_token_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'userid' => new external_value(PARAM_INT, 'User id'),
+        ]);
+    }
+
+    /**
+     * A sign-in token for someone the gateway has identified another way (a text-message code to the phone on
+     * the account, or a WeChat account bound to it). The same kind of token login/token.php gives for the
+     * official mobile service; an existing valid one is reused. Never for administrators: they sign in with
+     * their password.
+     *
+     * @param int $userid
+     * @return array
+     */
+    public static function signin_token(int $userid): array {
+        global $CFG, $DB;
+        $p = self::validate_parameters(self::signin_token_parameters(), ['userid' => $userid]);
+        self::guard();
+        $user = $DB->get_record('user', ['id' => $p['userid'], 'deleted' => 0], '*', MUST_EXIST);
+        if (isguestuser($user) || $user->username === self::SERVICE_USER || is_siteadmin($user->id)) {
+            throw new \invalid_parameter_exception('this account signs in with its password');
+        }
+        if ($user->suspended || !$user->confirmed || $user->auth === 'nologin') {
+            throw new \moodle_exception('usersuspended', 'local_wenquest');
+        }
+        $service = $DB->get_record('external_services', ['shortname' => MOODLE_OFFICIAL_MOBILE_SERVICE, 'enabled' => 1],
+            '*', MUST_EXIST);
+        $context = \context_system::instance();
+        if (!has_capability('moodle/webservice:createmobiletoken', $context, $user->id)) {
+            throw new \moodle_exception('nocapabilitytousethisservice', 'webservice');
+        }
+        $now = time();
+        $tokens = $DB->get_records_select('external_tokens',
+            'userid = :u AND externalserviceid = :s AND tokentype = :t AND sid IS NULL AND iprestriction IS NULL ' .
+            'AND (validuntil = 0 OR validuntil > :n)',
+            ['u' => $user->id, 's' => $service->id, 't' => EXTERNAL_TOKEN_PERMANENT, 'n' => $now + 86400],
+            'timecreated DESC', 'id, token', 0, 1);
+        if ($tokens) {
+            $token = reset($tokens)->token;
+        } else {
+            $token = \core_external\util::generate_token(EXTERNAL_TOKEN_PERMANENT, $service, $user->id, $context,
+                $now + (int) ($CFG->tokenduration ?? 12 * WEEKSECS));
+        }
+        $DB->set_field('user', 'lastlogin', $user->currentlogin, ['id' => $user->id]);
+        $DB->set_field('user', 'currentlogin', $now, ['id' => $user->id]);
+        return ['token' => $token];
+    }
+
+    /**
+     * Result.
+     *
+     * @return external_single_structure
+     */
+    public static function signin_token_returns(): external_single_structure {
+        return new external_single_structure([
+            'token' => new external_value(PARAM_ALPHANUM, 'Web service token'),
+        ]);
+    }
 }

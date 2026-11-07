@@ -9,6 +9,7 @@ import { setRegionOverrides } from "./i18n";
 export interface SiteInfo {
   region: "us" | "cn";
   brand?: string; company?: string; icp?: string; psb?: string; ai_reg?: string; ai_model?: string; ai_label?: boolean; signup?: boolean;
+  phone?: boolean; wechat?: boolean;   // 第 108 轮：手机号验证码登录、微信扫码登录
 }
 
 export const site = ref<SiteInfo>({ region: "us" });

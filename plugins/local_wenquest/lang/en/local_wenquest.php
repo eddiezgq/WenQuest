@@ -21,6 +21,7 @@ $string['privacy:metadata'] = 'The WenQuest services plugin does not store perso
 $string['emptycourse'] = 'A course needs at least one section.';
 $string['sectionnotempty'] = 'This section still has activities; delete them too or move them first.';
 $string['wenquest:manageaccounts'] = 'Manage WenQuest accounts (sign-up, teacher approval)';
+$string['usersuspended'] = 'This account is suspended.';
 $string['emailexists'] = 'An account with this email already exists.';
 
 $string['coursevisible'] = 'Take the course down (hide it from students) before deleting it.';

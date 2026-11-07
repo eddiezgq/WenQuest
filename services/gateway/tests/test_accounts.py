@@ -65,6 +65,14 @@ def moodle(request: httpx.Request) -> httpx.Response:
             if body.get("suspended") in ("0", "1"):
                 u["suspended"] = body["suspended"] == "1"
             return httpx.Response(200, json=pub(u))
+        if fn.endswith("_signin_token"):          # round 108: never for administrators
+            u = USERS[int(body["userid"])]
+            if u["admin"]:
+                return httpx.Response(200, json={"exception": "invalid_parameter_exception", "errorcode": "invalidparameter",
+                                                 "message": "this account signs in with its password"})
+            if u["suspended"]:
+                return httpx.Response(200, json={"exception": "moodle_exception", "errorcode": "usersuspended", "message": "x"})
+            return httpx.Response(200, json={"token": f"u{u['id']}"})
         if fn.endswith("_search"):
             return httpx.Response(200, json={"total": len(USERS), "users": [pub(u) for u in USERS.values()]})
         if fn.endswith("_enrol"):

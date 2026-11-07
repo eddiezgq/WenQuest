@@ -1,7 +1,14 @@
 <template>
   <AuthCard>
     <text class="title">{{ t("forgot.title") }}</text>
-    <text class="tagline">{{ t("forgot.tagline") }}</text>
+    <text class="tagline">{{ byPhone ? "用手机收验证码，设一个新密码" : t("forgot.tagline") }}</text>
+    <!-- 第 108 轮：国内可以发到手机 -->
+    <view v-if="usePhone" class="tabs">
+      <text class="tab" :class="{ on: byPhone }" @click="byPhone = true">发到手机</text>
+      <text class="tab" :class="{ on: !byPhone }" @click="byPhone = false">发到邮箱</text>
+    </view>
+    <PhoneAuth v-if="byPhone" mode="reset" @done="afterLogin(back)" />
+    <template v-else>
     <view class="field">
       <text class="label">{{ t("reg.email") }}</text>
       <view class="code-row">
@@ -23,6 +30,7 @@
     </view>
     <text v-if="error" class="error" role="alert">{{ error }}</text>
     <view class="submit" :class="{ disabled: busy || !ready }" @click="submit">{{ busy ? t("common.saving") : t("forgot.submit") }}</view>
+    </template>
     <text class="wq-link center" @click="toLogin">← {{ t("login.submit") }}</text>
   </AuthCard>
 </template>
@@ -31,6 +39,8 @@
 import { computed, onUnmounted, ref } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import AuthCard from "../../components/auth/AuthCard.vue";
+import PhoneAuth from "../../components/auth/PhoneAuth.vue";
+import { isCN, site } from "../../site";
 import { PASSWORD_OK, accountApi, afterLogin } from "../../accountApi";
 import { ApiError } from "../../api";
 import { errorText, t } from "../../i18n";
@@ -44,6 +54,8 @@ const sent = ref(false);
 const wait = ref(0);
 const error = ref("");
 const back = ref("");
+const usePhone = computed(() => isCN.value && !!site.value.phone);
+const byPhone = ref(usePhone.value);
 let timer: ReturnType<typeof setInterval> | null = null;
 const emailOk = computed(() => /^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$/.test(email.value.trim()));
 const pwOk = computed(() => PASSWORD_OK(password.value));
@@ -51,7 +63,7 @@ const ready = computed(() => emailOk.value && code.value.trim().length >= 4 && p
 
 onLoad((q: any) => {
   back.value = q?.back ? decodeURIComponent(String(q.back)) : "";
-  if (q?.email) email.value = decodeURIComponent(String(q.email));
+  if (q?.email) { email.value = decodeURIComponent(String(q.email)); byPhone.value = false; }
 });
 onUnmounted(() => timer && clearInterval(timer));
 
@@ -105,4 +117,7 @@ const toLogin = () => uni.redirectTo({ url: `/pages/login/login${back.value ? `?
   font-size: 16px; text-align: center; cursor: pointer; width: 100%; }
 .submit.disabled { opacity: 0.5; cursor: default; }
 .center { text-align: center; margin-top: 16px; font-size: 14px; }
+.tabs { display: flex; gap: 20px; margin-bottom: 18px; border-bottom: 1px solid var(--wq-line); }
+.tab { padding: 0 0 8px; font-size: 15px; color: var(--wq-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.tab.on { color: var(--wq-ink); font-weight: 600; border-bottom-color: var(--wq-accent); }
 </style>

@@ -33,6 +33,7 @@ from . import demo_request
 from . import assist
 from . import orgs
 from . import pilots
+from . import phone
 from . import sewing
 from . import sewing_cae
 from . import sewing_ai
@@ -102,6 +103,7 @@ async def lifespan(app: FastAPI):
     state.accounts = accounts.Store(str(Path(s.data_dir) / "accounts"))
     state.mailer = Mailer(s.smtp_host, s.smtp_port, s.smtp_secure, s.smtp_user, s.smtp_password,
                           s.mail_from, s.mail_from_name)
+    state.mailer.skip = "@" + phone.internal_domain(s)   # 第 108 轮：没有邮箱的账号不发信
     pace = asyncio.create_task(_pace_loop())
     sweep = asyncio.create_task(_accounts_loop())
     books = asyncio.create_task(textbook_api.media_loop(sys.modules[__name__]))
@@ -152,6 +154,7 @@ def create_app() -> FastAPI:
     assist.register(app, sys.modules[__name__])
     orgs.register(app, sys.modules[__name__])
     pilots.register(app, sys.modules[__name__])
+    phone.register(app, sys.modules[__name__])
     sewing.register(app, sys.modules[__name__])
     sewing_cae.register(app, sys.modules[__name__])
     sewing_parts.register(app, sys.modules[__name__])
@@ -176,6 +179,10 @@ def create_app() -> FastAPI:
 def lang_of(req_lang: str | None, sess: Session | None = None) -> str:
     lang = (req_lang or (sess.lang if sess else None) or state.settings.default_lang).lower()
     return "zh" if lang.startswith("zh") else "en"
+
+
+async def login_name(name: str) -> str:      # replaced by phone.register (round 108): a phone number signs in too
+    return name
 
 
 def org_gate(user_id: int) -> None:          # replaced by orgs.register (round 50); a no-op until then
@@ -324,7 +331,7 @@ def register(app: FastAPI) -> None:
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn, response: Response):
         # User name or email (Moodle's authloginviaemail is on).
-        mtoken = await state.moodle.login(body.username.strip(), body.password)
+        mtoken = await state.moodle.login(await login_name(body.username.strip()), body.password)
         info = await state.moodle.site_info(mtoken)
         org_gate(int(info["userid"]))
         lang = lang_of(body.lang or info.get("lang"))

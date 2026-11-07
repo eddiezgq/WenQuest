@@ -78,13 +78,14 @@
         <view class="avatar big">{{ initial }}</view>
         <view>
           <text class="acc-name">{{ user ? user.fullname : "" }}</text>
-          <text class="acc-user">{{ user ? user.username : "" }}</text>
+          <text class="acc-user">{{ user ? user.username.replace(/@m\.[^@]+$/, "") : "" }}</text>
         </view>
       </view>
       <view class="acc-row narrow-only" @click="go('calendar')">{{ t("shell.calendar") }}</view>
       <view class="acc-row narrow-only" @click="go('inbox')">{{ t("shell.inbox") }}</view>
       <view class="acc-row narrow-only" @click="go('help')">{{ t("shell.help") }}</view>
       <view v-if="user && !user.can_create_courses" class="acc-row" @click="go('apply')">{{ t("apply.menu") }}</view>
+      <view v-if="isCN && site.wechat" class="acc-row" @click="wechatBind">{{ wxBound ? "解绑微信" : "绑定微信（以后扫码登录）" }}</view>
       <view class="acc-row" @click="toggleLocale">{{ t("shell.language") }} · {{ t("lang.switch") }}</view>
       <view class="acc-row" @click="logout">{{ t("nav.logout") }}</view>
     </view>
@@ -132,7 +133,7 @@ import { computed, onMounted, ref } from "vue";
 import { admin, accountApi, loadAdmin } from "../accountApi";
 import { api, request, user, v3Allowed } from "../api";
 import { t, toggleLocale } from "../i18n";
-import { isCN } from "../site";
+import { isCN, site } from "../site";
 import SiteFooter from "./SiteFooter.vue";
 import { type CourseData, courseMenu, studentPreview } from "../store";
 
@@ -167,6 +168,25 @@ function openCourse(key: string) {
   else uni.navigateTo({ url });
 }
 
+// 第 108 轮：绑定 / 解绑微信扫码登录
+const wxBound = ref(false);
+async function wechatBind() {
+  try {
+    if (wxBound.value) {
+      await request("DELETE", "/api/v1/me/wechat");
+      wxBound.value = false;
+      uni.showToast({ title: "已解绑微信", icon: "none" });
+      return;
+    }
+    const r = await request<{ url: string }>("GET", "/api/v1/auth/wechat/url");
+    // #ifdef H5
+    window.location.href = r.url;
+    // #endif
+  } catch {
+    uni.showToast({ title: "微信登录暂时不可用", icon: "none" });
+  }
+}
+
 async function logout() {
   // Sign out everywhere: the site-wide cookie would otherwise sign this browser straight back in.
   await accountApi.logoutEverywhere();
@@ -180,6 +200,12 @@ onMounted(() => {
   else if (user.value && v3Allowed.value === null) api.v3Access().then((r) => (v3Allowed.value = r.allowed)).catch(() => {});
   // 缝纫机设计软件（第 39 轮）：已开通企业账号的人在左栏看到入口
   if (user.value && !sewOn.value) request<{ licensed: boolean }>("GET", "/api/v1/sewing/me").then((r) => (sewOn.value = r.licensed)).catch(() => {});
+  if (user.value && isCN.value && site.value.wechat) request<{ wechat: boolean }>("GET", "/api/v1/me/logins").then((r) => (wxBound.value = r.wechat)).catch(() => {});
+  // #ifdef H5
+  const wq = new URLSearchParams(window.location.search);
+  if (wq.get("wx") === "bound") uni.showToast({ title: "微信已绑定，以后可以扫码登录", icon: "none" });
+  if (wq.get("wx_error") === "taken") uni.showToast({ title: "这个微信已经绑定了别的账号", icon: "none" });
+  // #endif
   if (user.value?.can_create_courses || user.value) api.committeeMe().then((r) => (cm.value = r)).catch(() => {});
 });
 </script>

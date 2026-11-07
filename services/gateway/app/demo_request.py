@@ -107,7 +107,9 @@ def register(app, m) -> None:
         if st.region.strip().lower() != "cn":
             return {"region": "us"}
         return {"region": "cn", "brand": st.brand or "问渠科技", "company": st.company, "icp": st.icp, "psb": st.psb,
-                "ai_reg": st.ai_reg, "ai_model": "DeepSeek", "ai_label": True, "signup": False}
+                "ai_reg": st.ai_reg, "ai_model": "DeepSeek", "ai_label": True,
+                "signup": bool(getattr(m, "phone_signup_open", lambda: False)()),   # 第 108 轮 D-8：手机号注册
+                **getattr(m, "login_methods", dict)()}                              # 第 108 轮：手机号、微信登录
 
     @app.get("/api/v1/admin/demo-request")
     async def listing(sess: Annotated[Session, Depends(m.current)], format: str = "json"):

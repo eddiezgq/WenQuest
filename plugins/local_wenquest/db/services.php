@@ -142,6 +142,13 @@ $functions = [
         'type'         => 'read',
         'capabilities' => 'local/wenquest:manageaccounts',
     ],
+    'local_wenquest_account_signin_token' => [
+        'classname'    => \local_wenquest\external\accounts::class,
+        'methodname'   => 'signin_token',
+        'description'  => 'A sign-in token for someone identified by a text-message code or WeChat (round 108).',
+        'type'         => 'write',
+        'capabilities' => 'local/wenquest:manageaccounts',
+    ],
 ];
 
 // Accounts: a separate service, used only by the gateway's wqservice account (see moodle/setup_wenquest.php).
@@ -155,6 +162,7 @@ $services = [
             'local_wenquest_account_search',
             'local_wenquest_account_enrol',
             'local_wenquest_account_courses',
+            'local_wenquest_account_signin_token',
         ],
         'restrictedusers' => 1,
         'enabled' => 1,

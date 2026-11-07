@@ -60,7 +60,7 @@ class OrgChange(BaseModel):
 class MemberIn(BaseModel):
     name: str = Field(min_length=1, max_length=40)
     phone: str = Field(min_length=5, max_length=20)
-    email: str = Field(min_length=3, max_length=254)
+    email: str = Field(default="", max_length=254)   # 第 108 轮：选填；不填的用手机号登录
 
 
 class MemberChange(BaseModel):
@@ -220,7 +220,13 @@ def register(app, m) -> None:
     async def add_member(oid: int, body: MemberIn, sess: Annotated[Session, Depends(m.current)]):
         need_cn()
         await m.accounts_require_admin(sess)
-        email = body.email.strip().lower()
+        from .phone import norm_phone
+        phone = norm_phone(body.phone)
+        if not phone:
+            raise EngineError("invalid_phone", "请填 11 位手机号（登录要用）", 400)
+        if m.phone_user(phone):
+            raise EngineError("phone_taken", "这个手机号已经有账号了", 409)
+        email = body.email.strip().lower() or m.internal_email(phone)
         with db() as c:
             o = get_org(c, oid)
             if not live(o):
@@ -229,14 +235,16 @@ def register(app, m) -> None:
             if used >= o["seats"]:
                 raise EngineError("seats_full", f"这家单位的 {o['seats']} 个账号已用完", 409)
         name = body.name.strip()
-        last, first = (name[0], name[1:]) if len(name) > 1 else (name, "")
+        last, first = (name[0], name[1:]) if len(name) > 1 else (name, name)
         pw = gen_password()
-        u = await m.accounts_svc("local_wenquest_account_create", email=email, password=pw, firstname=first or name,
-                                 lastname=last if first else "", lang="zh_cn", teacher=True)
+        u = await m.accounts_svc("local_wenquest_account_create", email=email, password=pw, firstname=first,
+                                 lastname=last, lang="zh_cn", teacher=True)
+        m.phone_map(int(u["id"]), phone)
+        shown = "" if email == m.internal_email(phone) else email
         with db() as c:
             c.execute("insert into member(userid,org_id,name,phone,email,stopped,created) values(?,?,?,?,?,0,?)",
-                      (int(u["id"]), oid, name, body.phone.strip(), email, int(time.time())))
-        return {"userid": int(u["id"]), "login": email, "password": pw}
+                      (int(u["id"]), oid, name, phone, shown, int(time.time())))
+        return {"userid": int(u["id"]), "login": shown or phone, "phone": phone, "password": pw}
 
     @app.put("/api/v1/admin/orgs/{oid}/members/{uid}")
     async def change_member(oid: int, uid: int, body: MemberChange, sess: Annotated[Session, Depends(m.current)]):
@@ -255,9 +263,9 @@ def register(app, m) -> None:
         need_cn()
         await m.accounts_require_admin(sess)
         with db() as c:
-            r = c.execute("select email from member where userid=? and org_id=?", (uid, oid)).fetchone()
+            r = c.execute("select email, phone from member where userid=? and org_id=?", (uid, oid)).fetchone()
         if not r:
             raise EngineError("not_found", "no such account in this organisation", 404)
         pw = gen_password()
         await m.accounts_svc("local_wenquest_account_update", userid=uid, password=pw)
-        return {"login": r["email"], "password": pw}
+        return {"login": r["email"] or r["phone"], "password": pw}

@@ -23,6 +23,7 @@ class Mailer:
         self.user, self.password = user, password
         self.sender, self.sender_name = sender, sender_name
         self.outbox: list[dict] = []  # the last messages, for tests and the local log
+        self.skip = ""                # internal sign-in names (<phone>@m.<domain>, round 108) never get mail
 
     @property
     def configured(self) -> bool:
@@ -30,6 +31,9 @@ class Mailer:
 
     async def send(self, to: str, subject: str, text: str, html_body: str | None = None) -> bool:
         self.outbox = (self.outbox + [{"to": to, "subject": subject, "text": text}])[-50:]
+        if self.skip and to.lower().endswith(self.skip):
+            log.info("no mail to the internal sign-in name %s: %s", to, subject)
+            return True
         if not self.configured:
             log.warning("[mail not configured] to %s: %s\n%s", to, subject, text)
             return True

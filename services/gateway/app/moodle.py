@@ -43,6 +43,7 @@ _ERRORS = {
     "invalidparameter": ("invalid_input", 400),
     "emailexists": ("email_taken", 409),
     "suspended": ("account_suspended", 403),
+    "usersuspended": ("account_suspended", 403),
 }
 
 

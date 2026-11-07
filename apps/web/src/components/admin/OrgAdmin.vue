@@ -54,7 +54,7 @@
 
       <view v-for="mb in o.members" :key="mb.userid" class="wq-row mem">
         <text class="m-name">{{ mb.name }}</text>
-        <text class="wq-muted">{{ mb.email }} · {{ mb.phone }}</text>
+        <text class="wq-muted">{{ [mb.phone, mb.email].filter(Boolean).join(" · ") }}</text>
         <text v-if="mb.stopped" class="wq-tag live">已停用</text>
         <view class="gap" />
         <text class="wq-link" @click="newPw(o, mb)">重设密码</text>
@@ -64,15 +64,15 @@
       <view v-if="o.live && o.used < o.seats" class="add">
         <view class="grid3">
           <input v-model="mf(o.id).name" class="wq-input" placeholder="姓名 *" maxlength="40" />
-          <input v-model="mf(o.id).phone" class="wq-input" placeholder="手机 *" maxlength="20" />
-          <input v-model="mf(o.id).email" class="wq-input" placeholder="邮箱（登录用）*" maxlength="254" />
+          <input v-model="mf(o.id).phone" class="wq-input" placeholder="手机 *（登录用）" maxlength="20" />
+          <input v-model="mf(o.id).email" class="wq-input" placeholder="邮箱（选填）" maxlength="254" />
         </view>
         <view class="wq-btn" :class="{ disabled: busy }" @click="addMember(o)">{{ busy && adding === o.id ? "正在开通账号…" : "添加账号" }}</view>
         <text v-if="err && adding === o.id" class="wq-error block">{{ err }}</text>
       </view>
 
       <view v-if="shown && shown.org === o.id" class="pw">
-        <text class="block strong">账号已就绪，请把下面的登录信息交给本人（密码只显示这一次）：</text>
+        <text class="block strong">账号已就绪，请把下面的登录信息交给本人（密码只显示这一次；也可以用手机号收验证码登录）：</text>
         <text class="block mono">登录：{{ shown.login }}　密码：{{ shown.password }}</text>
         <text class="wq-link" @click="copy(`登录：${shown.login}  密码：${shown.password}`)">复制</text>
       </view>
@@ -105,7 +105,7 @@ const forms = reactive<Record<number, { name: string; phone: string; email: stri
 const mf = (id: number) => (forms[id] ||= { name: "", phone: "", email: "" });
 
 function fail(e: unknown) {
-  err.value = e instanceof ApiError ? (e.message && /[一-龥]/.test(e.message) ? e.message : errorText(e.code)) : String(e);
+  err.value = e instanceof ApiError ? (e.detail && /[一-龥]/.test(e.detail) ? e.detail : errorText(e.code)) : String(e);
 }
 async function load() {
   try {
@@ -143,8 +143,9 @@ function change(o: Org, body: Record<string, unknown>) {
 function addMember(o: Org) {
   const m = mf(o.id);
   adding.value = o.id;
-  if (!m.name.trim() || !m.phone.trim() || !m.email.trim()) { err.value = "姓名、手机、邮箱都要填"; return; }
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m.email.trim())) { err.value = "邮箱格式不对，例如 123456789@qq.com"; return; }
+  if (!m.name.trim() || !m.phone.trim()) { err.value = "姓名、手机要填（邮箱选填）"; return; }
+  if (!/^1[3-9]\d{9}$/.test(m.phone.replace(/\D/g, "").replace(/^86(?=1\d{10}$)/, ""))) { err.value = "请填 11 位手机号，本人用它登录"; return; }
+  if (m.email.trim() && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m.email.trim())) { err.value = "邮箱格式不对，例如 123456789@qq.com"; return; }
   run(async () => {
     const r = await request<{ login: string; password: string }>("POST", `/api/v1/admin/orgs/${o.id}/members`, { ...m });
     shown.value = { org: o.id, ...r };
