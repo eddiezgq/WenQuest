@@ -7,6 +7,10 @@ APP="$HOME/tender-crawler"
 cd "$APP"
 mkdir -p data pylib
 [ -f config.local.yaml ] || cp config.yaml config.local.yaml   # 服务器上的配置；以后升级不覆盖
+# 1.0.2 迁移：旧配置里的来源已失效（交易平台换域名、政府采购网检索被拦），备份后换成新配置
+if ! grep -q "type: ccgp_list" config.local.yaml; then
+  cp config.local.yaml "config.local.yaml.bak-$(date +%Y%m%d%H%M%S)"; cp config.yaml config.local.yaml; echo "配置已迁移到 1.0.2（旧配置已备份）"
+fi
 IMG=$(docker ps --format '{{.Image}}' | grep -m1 gateway || true)
 [ -n "$IMG" ] || IMG=$(docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -m1 gateway || true)
 [ -n "$IMG" ] || { echo "找不到网关镜像（平台是否已部署？）"; exit 1; }

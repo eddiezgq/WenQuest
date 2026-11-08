@@ -103,15 +103,32 @@ focus:
 
 # 抓取来源。enabled: false 即关闭。type 决定用哪个抓取器
 sources:
+  # 中国政府采购网公告列表（静态页，2026-11-08 起用这个；按日期往回翻，关键词在本地过滤）
   - name: 中国政府采购网
-    type: ccgp_search
+    type: ccgp_list
     enabled: true
-    base_url: http://search.ccgp.gov.cn/bxsearch
+    max_pages: 30           # 每个栏目最多翻几页（每页 20 条），翻到时间窗口之前自动停
+    lists:
+      - http://www.ccgp.gov.cn/cggg/dfgg/gkzb/     # 地方 公开招标
+      - http://www.ccgp.gov.cn/cggg/dfgg/jzxcs/    # 地方 竞争性磋商
+      - http://www.ccgp.gov.cn/cggg/dfgg/jzxtp/    # 地方 竞争性谈判
+      - http://www.ccgp.gov.cn/cggg/dfgg/xjgg/     # 地方 询价
+      - http://www.ccgp.gov.cn/cggg/dfgg/dylygg/   # 地方 单一来源
+      - http://www.ccgp.gov.cn/cggg/zygg/gkzb/     # 中央 公开招标
+      - http://www.ccgp.gov.cn/cggg/zygg/jzxcs/    # 中央 竞争性磋商
+      - http://www.ccgp.gov.cn/cggg/zygg/jzxtp/    # 中央 竞争性谈判
+      - http://www.ccgp.gov.cn/cggg/zygg/xjgg/     # 中央 询价
 
   - name: 全国公共资源交易平台
     type: ggzy_deal
     enabled: true
-    base_url: http://deal.ggzy.gov.cn/ds/deal/dealList_find.jsp
+    base_url: https://www.ggzy.gov.cn/information/pubTradingInfo/getTradList   # 2026 年新版接口（旧 deal.ggzy.gov.cn 已停用）
+
+  # 中国政府采购网全文检索：从国内云服务器访问会返回“频繁访问”页面（2026-11-08 实测），按规矩不绕过，关闭
+  - name: 中国政府采购网检索
+    type: ccgp_search
+    enabled: false
+    base_url: http://search.ccgp.gov.cn/bxsearch
 
   # 通用列表页抓取器：任何"公告列表页"都能配，不用改代码。
   # list_url 里的 {page} 会替换成页码；item/title/link/date 是 CSS 选择器。

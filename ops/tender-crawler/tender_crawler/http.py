@@ -9,7 +9,7 @@ import requests
 
 log = logging.getLogger(__name__)
 
-BLOCK_MARKERS = ("验证码", "滑动验证", "安全验证", "访问过于频繁", "captcha", "请输入验证", "人机验证")
+BLOCK_MARKERS = ("验证码", "滑动验证", "安全验证", "访问过于频繁", "captcha", "请输入验证", "人机验证", "频繁访问")
 
 
 class BlockedError(Exception):

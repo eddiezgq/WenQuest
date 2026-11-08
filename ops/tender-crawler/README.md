@@ -1,5 +1,7 @@
 # 招标信息抓取（tender-crawler）
 
+> 本仓库中的部署方式：国内服务器上以 deploy 用户运行（`server-install.sh` + `cron.sh`，不用 sudo），由 `.github/workflows/tender-crawler.yml` 安装和取回结果，说明见 `docs/帮助/招标抓取.md`。下面的 systemd 安装方式供有 root 的机器使用。
+
 每天自动从公开的政府采购 / 公共资源交易网站抓取招标公告，按关键词筛选，用规则提取预算、截止时间、采购人和地区，
 生成一份 JSON 和一份 Markdown 摘要，供每日判断"哪些能投"使用。
 
@@ -55,8 +57,9 @@ systemctl list-timers tender-crawler.timer
 - **排除词**：`exclude`，标题命中直接丢弃（物业、施工、保洁等）。
 - **重点地区和高校**：`focus`，命中的排在前面并打上标记。
 - **来源**：`sources`。
-  - `ccgp_search`：中国政府采购网全文检索。
-  - `ggzy_deal`：全国公共资源交易平台。
+  - `ccgp_list`：中国政府采购网公告列表页（地方 / 中央的公开招标、磋商、谈判、询价、单一来源栏目），按日期往回翻，本地按关键词过滤。
+  - `ggzy_deal`：全国公共资源交易平台（2026 年新版接口 www.ggzy.gov.cn；接口要求验证码时当天停止）。
+  - `ccgp_search`：中国政府采购网全文检索。从国内云服务器访问会被拦截（“频繁访问”），默认关闭。
   - `html_list`：**通用列表页抓取器**。任何高校采购网、地方采购网的"公告列表页"，填网址和 CSS 选择器就能加，不用改代码。填好后用 `tender-crawler test-source 名称` 验证，再把 `enabled` 改成 `true`。
   - 上海政府采购网已预置为 `html_list`，但默认关闭：它的页面结构需要在服务器上打开确认后再启用。
 - 改完不用重启，下次运行自动生效。
