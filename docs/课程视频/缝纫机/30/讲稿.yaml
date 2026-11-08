@@ -1,0 +1,135 @@
+# 《缝纫机设计与制造》公开课 第 30 讲：缝制设备发展趋势
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch30.yaml；2026-11-08 补英文版 SVG、大数字改纯数字、回答页中英两栏、封面右移），
+# 配音是课件每页的讲稿（notes），中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 30-1（软面料与机器人）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 数字一律由 course/calc/ch30.py 算出（{{ch30.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "30"
+deck: ch30
+skip: [6, 11, 14, 17, 19, 20, 21, 22]   # 软件定义、机器人怎么拿布、人形机器人进展、算账（解答页再给）、其他门槛、第四节（不缝的衣服、数码印花）：课程部分约 10 分钟；这几页留给课件
+code: [ch30]
+title: ["缝制设备发展趋势——更省、更聪明、更少人、不缝", "Trends in Sewing Equipment — Leaner, Smarter, Fewer Hands, No Stitches"]
+chapter: ["第八篇 工厂与未来 · 第 30 章", "Part VIII Factories and the Future · Chapter 30"]
+next: ["第 31 讲", "Lecture 31"]
+cover_formula: 'P = p^{n}'
+tags:
+  zh: [缝制设备, 发展趋势, 伺服直驱, 节能, 电子送布, 智能缝纫机, 数字孪生, 机器人上料, 人形机器人, 柔性物体操作, 弯曲刚度, 悬臂法, 推布失稳, 临界力, 流程可靠性, 投资回收期, 全成型编织, 超声波焊接, 数码印花, 缝纫机]
+  en: [sewing equipment, technology trends, servo direct drive, energy saving, electronic feed, smart sewing machine, digital twin, robot loading, humanoid robot, deformable object handling, bending rigidity, cantilever test, buckling, critical force, process reliability, payback period, whole-garment knitting, ultrasonic welding, digital printing, sewing machine]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第三十讲，缝制设备发展趋势。
+    - 上一讲看了五类工厂怎样用设备；今天往前看十年，哪些变化已经在发生，哪些还要过几道门槛。
+    - 这次视频重点讲省电和机器人上料；软件定义的缝纫机、不缝的衣服只点到为止，详细内容在课件里。
+  en:
+    - Hi everyone, and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 30, trends in sewing equipment.
+    - Last time we saw how five kinds of factory use their machines. Today we look ten years ahead, at which changes are already happening and which still have hurdles to clear.
+    - This video concentrates on saving power and robot loading; software-defined machines and garments without stitches get only a mention here, with the details in the slides.
+
+after:
+  - id: lab301
+    kind: lab
+    lab: soft
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.8'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checks0,#checks1,#checks2,#tasks,#msg,#pay{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.querySelectorAll('p.note').forEach(n => { n.style.visibility = 'hidden'; }); document.getElementById('tab0').click(); const s = document.getElementById('preset'); [0, 1, 2, 3, 4, 5].forEach((v, i) => setTimeout(() => { s.value = v; s.dispatchEvent(new Event('input', {bubbles: true})); }, 600 + i * 1300)); })()"
+        dur: 9
+      - js: "(() => { const s = document.getElementById('preset'); s.value = 1; s.dispatchEvent(new Event('input', {bubbles: true})); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [160, 220, 300, 400].forEach((v, i) => setTimeout(() => f('W', v), 800 + i * 700)); [25, 32, 40, 50].forEach((v, i) => setTimeout(() => f('c', v), 4200 + i * 700)); })()"
+        dur: 8
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('c', 20); [24, 18, 12].forEach((v, i) => setTimeout(() => f('b', v), 800 + i * 900)); })()"
+        dur: 6
+      - js: "(() => { document.getElementById('tab1').click(); window.scrollTo(0, 0); document.getElementById('reset1').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [0.975, 0.98, 0.975].forEach((v, i) => setTimeout(() => f('p', v), 2000 + i * 1300)); })()"
+        dur: 8
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('p', 0.97); [30, 22].forEach((v, i) => setTimeout(() => f('price', v), 800 + i * 1000)); setTimeout(() => f('price', 25), 3200); setTimeout(() => f('sh', 3), 4400); })()"
+        dur: 7
+      - js: "(() => { document.getElementById('tab2').click(); window.scrollTo(0, 0); document.getElementById('reset2').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [3200, 4000, 4800].forEach((v, i) => setTimeout(() => f('hr', v), 1500 + i * 1300)); })()"
+        dur: 8
+    say:
+      zh:
+        - ">下面是虚拟实验 30-1，软面料与机器人，在问渠平台上可以亲手做，判定结果、回收期曲线和任务先遮住。第①页“面料有多软”：在材料下拉框里依次选四种面料、卡纸和钢板，伸出 10 厘米，看橙线怎样从整条垂下到几乎不动，记下每种材料的弯曲刚度、弦角和推弯布条的力。"
+        - ">再回到衬衫府绸，先只拖克重，看下垂形状变不变；再只拖弯曲长度，比一比两者谁在起作用。"
+        - ">任务一和任务二也在这一页：一个是让弦角压到 10 度以内，算出要硬多少倍；一个是改推的布条宽度，看推力和自重的比值，再找推得动时的弯曲长度。"
+        - ">第②页是机器人流程：从 10 步、97% 开始，记下无人完成率、每小时干预、每小时产量和回收期。任务三要找出无人完成率到 90% 时单步成功率最小是多少。"
+        - ">任务四在两班、单步不超过 97%、步数不少于 10 的条件下，调价格、人工或每步时间，让回收期不超过 24 个月，再把班次改成三班比一比。"
+        - ">第③页是直驱的节电账：用默认值记下全厂年耗电、年节电和减排，再调每台开机时间，任务五要让每台年节电达到规定的值。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 30-1, soft fabric and robots, which you can do yourself on WenQuest. The checks, the payback chart and the tasks are blurred. Page one, how soft is fabric: pick the four fabrics, card and steel in turn from the material list, with a 10-centimetre overhang. Watch the orange line go from hanging straight down to barely moving, and record each material's rigidity, chord angle and the force that buckles a strip."
+        - ">Back on shirting poplin, drag only the weight and see whether the droop changes; then drag only the bending length, and compare which one matters."
+        - ">Tasks one and two are on this page too: one asks you to bring the chord angle under 10 degrees and work out how much stiffer that is; the other changes the strip width, checks the push-to-weight ratio, and finds the bending length at which you can push."
+        - ">Page two is the robot workflow. Start from ten steps at 97 percent and record unattended rate, interventions and output per hour, and payback. Task three asks for the lowest per-step success that reaches 90 percent unattended."
+        - ">Task four keeps two shifts, at most 97 percent and at least ten steps, and asks you to tune price, wage or step time until payback is 24 months or less; then try three shifts."
+        - ">Page three is the direct-drive energy account. Record the plant's annual use, saving and emissions at the defaults, then change the running hours; task five asks for a set saving per machine. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 30-1，可以自己动手", "Interactive slides and Lab 30-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">互动课件和软面料实验都可以自己打开动手做，视频里跳过的几页也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到讨论区提问，每项得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open the interactive slides and the soft-fabric lab and work them yourself, including the pages this video skipped."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the discussion forum, and the grades page shows every mark."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 30：一份自动化提案的工程评估", "Assignment 30: engineering appraisal of an automation proposal"]
+      points:
+        - ["300 台改伺服：节电、电费、回收期、减排", "300 machines to servo: energy, cost, payback, CO₂"]
+        - ["200 g/m²、c 25 mm：刚度、失稳力与自重", "200 g/m², c 25 mm: rigidity, buckling force, weight"]
+        - ["8 步 98% 的上料方案：算账、索取数据、给建议", "8 steps at 98%: the sums, the data to ask for, advice"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共三道题。第一题，一家工厂 300 台平缝机，每台每年开机 3000 小时，离合器电机平均 0.45 千瓦、伺服 0.25 千瓦，电价每度 0.7 元，每台改造 500 元：求年节电量、年省电费、回收期，以及按每度 0.57 千克算的年减排量。"
+        - ">第二题，一种面料每平方米 200 克，弯曲长度 25 毫米：求弯曲刚度；一条长 5 厘米、宽 20 厘米的布条一端夹住往前推、另一端可以侧移，推力多大会拱起？和它的自重比一比，再说明夹持点离缝合点近一半时，临界力怎样变。"
+        - ">第三题，供应商提出 8 步的机器人上料方案，单步 98%，其余条件和本讲相同：算出无人完成率、每小时干预和回收期，以及要 95% 无人完成单步至少要多少；再列出你还要向供应商要的数据，给出要不要试点的建议。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">The assignment has three questions. One: a factory has 300 lockstitch machines, each running 3000 hours a year; clutch motors average 0.45 kilowatts and servos 0.25, power costs 0.7 yuan a kilowatt-hour, and each retrofit costs 500 yuan. Find the annual energy and cost saving, the payback, and the annual CO2 reduction at 0.57 kilograms per kilowatt-hour."
+        - ">Two: a fabric weighs 200 grams per square metre with a bending length of 25 millimetres. Find its bending rigidity. A strip 5 centimetres long and 20 wide is clamped at one end and pushed, its other end free to move sideways: at what force does it arch? Compare that with its weight, and say how the critical force changes if the clamp is moved to half the distance."
+        - ">Three: a vendor proposes 8-step robot loading at 98 percent per step, everything else as in this lecture. Find the unattended rate, interventions per hour and payback, and the per-step rate needed for 95 percent unattended. Then list the data you'd still ask the vendor for, and recommend whether to pilot it."
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：10 题，即时反馈", "After-class quiz: 10 questions, instant feedback"]
+      points:
+        - ["克重相同，弯曲长度 2 倍：刚度几倍？", "Same weight, twice the bending length: how much stiffer?"]
+        - ["只把克重加倍：下垂形状变不变？", "Double only the weight: does the droop change?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份十道题的测验，比如：两种面料克重相同，A 的弯曲长度是 B 的 2 倍，A 的弯曲刚度是 B 的几倍？"
+        - ">再比如判断题：同一种面料只把克重加倍、弯曲长度不变，伸出 10 厘米时的下垂形状和弦角变不变？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a ten-question quiz. For example: two fabrics weigh the same per square metre, and A's bending length is twice B's. How many times stiffer is A?"
+        - ">Or true or false: for the same fabric, doubling only the weight while keeping the bending length leaves the droop and chord angle at a 10-centimetre overhang unchanged."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 今天算的是机器人上料靠不靠得住；下一讲是最后一讲，人工智能与制衣业，看 AI 在设计、打版、质检里做什么、怕什么。我们下一讲见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "Today we asked whether robot loading can be trusted. Next time, in the final lecture, we look at artificial intelligence in apparel making: what it does in design, patterns and inspection, and where it goes wrong. See you then."

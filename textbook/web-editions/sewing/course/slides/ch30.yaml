@@ -5,12 +5,12 @@ lesson: 30
 code: [ch30]
 
 clips:
-  hero:          # 封面：实验 30-1 第②页，单步成功率 0.90 → 0.999 轮换，曲线上的圆点跟着走（深色显示）
+  hero:          # 封面：实验 30-1 第②页，单步成功率 0.90 → 0.999 轮换，曲线上的圆点跟着走（深色显示；右移让开标题）
     page: soft
     selector: "#chain"
     loop: 12
     steps:
-      - {at: 0, press: "#tab1", set: {n: 10, p: 0.9}, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)'"}
+      - {at: 0, press: "#tab1", set: {n: 10, p: 0.9}, js: "var d=document.documentElement;d.style.filter='invert(.9) hue-rotate(180deg)';var s=document.getElementById('chain');if(!s.dataset.sh){s.dataset.sh=1;var w=s.getBoundingClientRect().width;s.style.boxSizing='content-box';s.style.width=w+'px';s.style.paddingLeft=Math.round(w*0.7)+'px';s.style.marginLeft=-Math.round(w*0.7)+'px';s.style.background='transparent';document.body.style.visibility='hidden';s.style.visibility='visible';d.style.background='transparent';document.body.style.background='transparent'}"}
       - {at: 2, set: {p: 0.95}}
       - {at: 4, set: {p: 0.97}}
       - {at: 6, set: {p: 0.98}}
@@ -73,25 +73,25 @@ slides:
     title: ["更省、更聪明、更少人、不缝", "Leaner, smarter, fewer hands, no stitches"]
     visual:
       svg: |
-        <svg viewBox="0 0 1700 620" width="1700" height="620">
+        <svg viewBox="0 0 1700 620" width="1700" height="620"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <defs><linearGradient id="g30" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2ec4b6"/><stop offset="1" stop-color="#ff7a45"/></linearGradient></defs>
           <g font-size="44" font-weight="800" text-anchor="middle">
-            <text x="230" y="60" fill="#5ee0d2">更省</text><text x="640" y="60" fill="#8fb6ff">更聪明</text><text x="1050" y="60" fill="#ffd75a">更少人</text><text x="1460" y="60" fill="#ff9c75">不缝</text>
+            <g class="zh"><text x="230" y="60" fill="#5ee0d2">更省</text><text x="640" y="60" fill="#8fb6ff">更聪明</text><text x="1050" y="60" fill="#ffd75a">更少人</text><text x="1460" y="60" fill="#ff9c75">不缝</text></g><g class="eo" font-size="40"><text x="230" y="60" fill="#5ee0d2">Leaner</text><text x="640" y="60" fill="#8fb6ff">Smarter</text><text x="1050" y="60" fill="#ffd75a">Fewer hands</text><text x="1460" y="60" fill="#ff9c75">No stitches</text></g>
           </g>
           <g font-size="30" fill="#f3f6fa" text-anchor="middle">
-            <rect x="60" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="230" y="168">伺服直驱</text>
-            <rect x="60" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="230" y="308">少油 · 降噪</text>
-            <rect x="470" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="640" y="168">电子送布·张力·压脚</text>
-            <rect x="470" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="640" y="308">联网 · 数字孪生</text>
-            <rect x="880" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="1050" y="168">花样机 · 自动单元</text>
-            <rect x="880" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="1050" y="308">机器人上料</text>
-            <rect x="880" y="380" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3" stroke-dasharray="10 8"/><text x="1050" y="448">人形机器人</text>
-            <rect x="1290" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="168">全成型编织</text>
-            <rect x="1290" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="308">焊接 · 粘合</text>
-            <rect x="1290" y="380" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="448">数码印花</text>
+            <rect x="60" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="230" y="168" class="zh">伺服直驱</text><text x="230" y="166" font-size="26" class="eo">Servo direct drive</text>
+            <rect x="60" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/><text x="230" y="308" class="zh">少油 · 降噪</text><text x="230" y="306" font-size="26" class="eo">Less oil · quieter</text>
+            <rect x="470" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="640" y="168" class="zh">电子送布·张力·压脚</text><text x="640" y="166" font-size="26" class="eo">E-feed · tension · foot</text>
+            <rect x="470" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#4c8dff" stroke-width="3"/><text x="640" y="308" class="zh">联网 · 数字孪生</text><text x="640" y="306" font-size="26" class="eo">Network · digital twin</text>
+            <rect x="880" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="1050" y="168" class="zh">花样机 · 自动单元</text><text x="1050" y="166" font-size="26" class="eo">Pattern sewers · units</text>
+            <rect x="880" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/><text x="1050" y="308" class="zh">机器人上料</text><text x="1050" y="306" font-size="26" class="eo">Robot loading</text>
+            <rect x="880" y="380" width="340" height="110" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3" stroke-dasharray="10 8"/><text x="1050" y="448" class="zh">人形机器人</text><text x="1050" y="446" font-size="26" class="eo">Humanoid robots</text>
+            <rect x="1290" y="100" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="168" class="zh">全成型编织</text><text x="1460" y="166" font-size="26" class="eo">Whole-garment knitting</text>
+            <rect x="1290" y="240" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="308" class="zh">焊接 · 粘合</text><text x="1460" y="306" font-size="26" class="eo">Welding · bonding</text>
+            <rect x="1290" y="380" width="340" height="110" rx="20" fill="#111d31" stroke="#ff7a45" stroke-width="3"/><text x="1460" y="448" class="zh">数码印花</text><text x="1460" y="446" font-size="26" class="eo">Digital printing</text>
           </g>
           <rect x="10" y="100" width="18" height="390" rx="9" fill="url(#g30)"/>
-          <text x="40" y="560" font-size="28" fill="#8fa3ba">越往下越新、越不成熟；“更少人”最受布的软和投资回收约束</text>
+          <text x="40" y="560" font-size="28" fill="#8fa3ba" class="zh">越往下越新、越不成熟；“更少人”最受布的软和投资回收约束</text><text x="40" y="560" font-size="28" fill="#8fa3ba" class="eo">Lower down = newer and less mature; “fewer hands” is held back most by soft cloth and payback</text>
         </svg>
     notes:
       - "图上分四列：更省、更聪明、更少人、不缝，每列越往下越新、越不成熟。更省最成熟，是伺服直驱；更聪明是电子送布、电子张力、电子压脚，加上联网和数字孪生；更少人从花样机、自动单元，到机器人上料，再到人形机器人；不缝是全成型编织、焊接粘合和数码印花。我们会在“更少人”这一列用力最多，因为它最受两件事约束：布太软，和投资能不能收回来。"
@@ -101,7 +101,7 @@ slides:
     title: ["最成熟的趋势：伺服直驱省电", "The most mature trend: servo direct drive saves power"]
     nums:
       - {n: "−{{ch30.e_pct:.0f}}%", n_en: "450 W → 250 W", label: ["离合器电机通电就空转", "A clutch motor idles whenever it's on"]}
-      - {n: "{{ch30.e_save:.1f}} 万", n_en: "kWh a year", label: ["500 台 × 3550 h：{{ch30.e_cl:.0f}} → {{ch30.e_sv:.0f}} 万 kWh", "500 machines × 3550 h"]}
+      - {n: "{{ch30.e_save:.1f}}", n_en: "× 10 000 kWh a year", label: ["万 kWh/年；500 台 × 3550 h：{{ch30.e_cl:.0f}} → {{ch30.e_sv:.0f}} 万 kWh", "500 machines × 3550 h"]}
       - {n: "{{ch30.co2:.0f}} t", n_en: "CO₂", label: ["排放因子 0.57 kg/kWh", "At 0.57 kg per kWh"]}
     foot: ["年节电 = 台数 × 开机小时 × 功率差：空等时间越多越划算，公开案例约 4 个月回本", "Saving = machines × hours × power difference: the more idle time, the bigger the saving; a published case paid back in 4 months"]
     notes:
@@ -150,17 +150,17 @@ slides:
       - ["要推得动，c 得超过 {{ch30.c_need:.0f}} mm：比牛仔布还硬", "To push it, c must exceed {{ch30.c_need:.0f}} mm: stiffer than denim"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="20" y="380" width="860" height="24" rx="6" fill="#2a3a55"/>
           <rect x="60" y="300" width="90" height="90" rx="10" fill="#4b5f7d"/>
-          <text x="105" y="290" font-size="24" fill="#8fa3ba" text-anchor="middle">夹住</text>
+          <text x="105" y="290" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">夹住</text><text x="105" y="290" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">Clamped</text>
           <path d="M150 372 C 300 372, 330 200, 450 200 C 570 200, 600 372, 750 372" stroke="#f2b705" stroke-width="10" fill="none" stroke-linecap="round"/>
           <path d="M150 372 L750 372" stroke="#f2b705" stroke-width="3" stroke-dasharray="10 10" opacity=".5"/>
           <defs><marker id="m30" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff7a45"/></marker></defs>
           <path d="M870 362 L780 362" stroke="#ff7a45" stroke-width="10" marker-end="url(#m30)"/>
-          <text x="830" y="335" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle">推</text>
-          <text x="450" y="170" font-size="28" fill="#ffd75a" text-anchor="middle">一推就拱起</text>
-          <text x="450" y="450" font-size="26" fill="#8fa3ba" text-anchor="middle">长 L，宽 b</text>
+          <text x="830" y="335" font-size="30" font-weight="800" fill="#ff9c75" text-anchor="middle" class="zh">推</text><text x="830" y="335" font-size="26" font-weight="800" fill="#ff9c75" text-anchor="middle" class="eo">Push</text>
+          <text x="450" y="170" font-size="28" fill="#ffd75a" text-anchor="middle" class="zh">一推就拱起</text><text x="450" y="170" font-size="28" fill="#ffd75a" text-anchor="middle" class="eo">One push and it arches</text>
+          <text x="450" y="450" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">长 L，宽 b</text><text x="450" y="450" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">Length L, width b</text>
           <rect x="150" y="490" width="600" height="110" rx="22" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
           <text x="450" y="562" font-size="44" font-weight="800" fill="#ffd75a" text-anchor="middle" class="en">F<tspan font-size="28" dy="10">cr</tspan><tspan dy="-10"> = π²Bb / 4L²</tspan></text>
         </svg>
@@ -176,20 +176,20 @@ slides:
       - ["不让布离开台面：视觉在机头前纠偏", "Keep it on the table: vision steers it at the needle"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g font-size="28" font-weight="700" text-anchor="middle">
             <rect x="20" y="20" width="410" height="260" rx="24" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
             <g stroke="#8fb6ff" stroke-width="5"><path d="M130 90 L130 180 M180 90 L180 180 M230 90 L230 180 M280 90 L280 180 M330 90 L330 180"/></g>
-            <rect x="100" y="185" width="260" height="14" fill="#e9dcc0"/><text x="225" y="250" fill="#8fb6ff">针刺</text>
+            <rect x="100" y="185" width="260" height="14" fill="#e9dcc0"/><text x="225" y="250" fill="#8fb6ff" class="zh">针刺</text><text x="225" y="250" fill="#8fb6ff" class="eo">Needles</text>
             <rect x="470" y="20" width="410" height="260" rx="24" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
             <rect x="560" y="90" width="230" height="70" rx="12" fill="#22324d"/><g fill="#5ee0d2"><circle cx="600" cy="170" r="10"/><circle cx="650" cy="170" r="10"/><circle cx="700" cy="170" r="10"/><circle cx="750" cy="170" r="10"/></g>
-            <rect x="550" y="185" width="250" height="14" fill="#e9dcc0"/><text x="675" y="250" fill="#5ee0d2">真空 · 静电</text>
+            <rect x="550" y="185" width="250" height="14" fill="#e9dcc0"/><text x="675" y="250" fill="#5ee0d2" class="zh">真空 · 静电</text><text x="675" y="250" fill="#5ee0d2" class="eo">Vacuum · static</text>
             <rect x="20" y="310" width="410" height="300" rx="24" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
-            <rect x="100" y="420" width="260" height="30" rx="6" fill="#c4b5fd"/><text x="225" y="520" fill="#c4b5fd">浸树脂变硬</text><text x="225" y="560" font-size="22" fill="#8fa3ba">未见规模化应用</text>
+            <rect x="100" y="420" width="260" height="30" rx="6" fill="#c4b5fd"/><text x="225" y="520" fill="#c4b5fd" class="zh">浸树脂变硬</text><text x="225" y="520" fill="#c4b5fd" class="eo">Resin-stiffened</text><text x="225" y="560" font-size="22" fill="#8fa3ba" class="zh">未见规模化应用</text><text x="225" y="560" font-size="22" fill="#8fa3ba" class="eo">not yet at scale</text>
             <rect x="470" y="310" width="410" height="300" rx="24" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
             <rect x="520" y="440" width="310" height="16" fill="#e9dcc0"/><rect x="520" y="456" width="310" height="10" fill="#2a3a55"/>
             <path d="M700 360 L700 440" stroke="#d3deea" stroke-width="6"/><circle cx="600" cy="380" r="22" fill="none" stroke="#ffd75a" stroke-width="4"/>
-            <text x="675" y="520" fill="#ffd75a">贴着台面 + 视觉</text>
+            <text x="675" y="520" fill="#ffd75a" class="zh">贴着台面 + 视觉</text><text x="675" y="520" fill="#ffd75a" class="eo">Flat on table + vision</text>
           </g>
         </svg>
     notes:
@@ -236,7 +236,7 @@ slides:
       - {n: "{{ch30.f97:.2f}}", n_en: "failures / piece", label: ["每件期望失败 n(1−p)/p", "Expected failures per piece"]}
       - {n: "{{ch30.cyc97:.0f}} s", n_en: "{{ch30.perh97:.0f}} / h", label: ["节拍：动作 + 处理失败", "Cycle incl. fixing failures"]}
       - {n: "{{ch30.int97:.1f}}", n_en: "per hour", label: ["每小时人工干预次数", "Human interventions an hour"]}
-    foot: ["单步 99%：每小时约 {{ch30.int99:.1f}} 次；99.9%：不到 {{ch30.int999:.1f}} 次 —— 单步要过 99%，机器人旁边才能不站人", "At 99%: about {{ch30.int99:.1f}} an hour; at 99.9%: under {{ch30.int999:.1f}}; only beyond 99% can the robot work alone"]
+    foot: ["单步 99%：每小时约 {{ch30.int99:.1f}} 次；99.9%：约 {{ch30.int999:.2f}} 次 —— 单步要过 99%，机器人旁边才能不站人", "At 99%: about {{ch30.int99:.1f}} an hour; at 99.9%: about {{ch30.int999:.2f}}; only beyond 99% can the robot work alone"]
     notes:
       - "再算插手次数。每件期望失败次数等于 n 乘 1 减 p 再除以 p：10 步、97%，约 {{ch30.f97:.2f}} 次。每步 8 秒，失败一次人处理 30 秒再重做，节拍约 {{ch30.cyc97:.0f}} 秒，每小时约 {{ch30.perh97:.0f}} 件，人工干预约 {{ch30.int97:.1f}} 次，也就是每 {{ch30.every_min:.0f}} 分钟就要人过去一趟，机器人旁边离不开人。单步 99%，每小时约 {{ch30.int99:.1f}} 次；99.9%，不到半次。所以单步要过 99%，机器人旁边才能不站人。"
       - "Now the interventions. Expected failures per piece are n times one minus p, over p: ten steps at 97 percent gives about {{ch30.f97:.2f}}. With 8-second steps and 30 seconds of human fixing per failure plus a redo, the cycle is about {{ch30.cyc97:.0f}} seconds, about {{ch30.perh97:.0f}} pieces an hour, and about {{ch30.int97:.1f}} interventions an hour: someone has to walk over every {{ch30.every_min:.0f}} minutes, so a person can't leave the robot. At 99 percent it's about {{ch30.int99:.1f}} an hour; at 99.9, under half. Only beyond 99 percent per step can the robot be left alone."
@@ -244,9 +244,9 @@ slides:
   - layout: bignum
     title: ["算账：两班约 {{ch30.pay2:.0f}} 个月回本", "The sums: about {{ch30.pay2:.0f}} months to pay back on two shifts"]
     nums:
-      - {n: "{{ch30.saved:.1f}} 万", n_en: "yuan saved a year", label: ["两班各省一人，0.5 元/分", "One person per shift, ¥0.5/min"]}
-      - {n: "−{{ch30.costs:.1f}} 万", n_en: "fixing + upkeep", label: ["处理失败 {{ch30.hc:.1f}} + 维护 {{ch30.maint:.1f}} 万", "Failures {{ch30.hc:.1f}} + upkeep {{ch30.maint:.1f}}"]}
-      - {n: "{{ch30.pay3:.0f}} 月", n_en: "on three shifts", label: ["改三班回收期", "Payback on three shifts"]}
+      - {n: "{{ch30.saved:.1f}}", n_en: "× ¥10 000 saved a year", label: ["万元/年：两班各省一人，0.5 元/分", "One person per shift, ¥0.5/min"]}
+      - {n: "−{{ch30.costs:.1f}}", n_en: "× ¥10 000 fixing + upkeep", label: ["万元/年：处理失败 {{ch30.hc:.1f}} + 维护 {{ch30.maint:.1f}}", "Failures {{ch30.hc:.1f}} + upkeep {{ch30.maint:.1f}}"]}
+      - {n: "{{ch30.pay3:.0f}}", n_en: "months on three shifts", label: ["个月：改三班的回收期", "Payback on three shifts"]}
     foot: ["回收期 = 12 × 价格 ÷（年省人工 − 处理失败 − 维护）；班次和价格比成功率影响更大", "Payback = 12 × price ÷ (labour saved − failure handling − upkeep); shifts and price matter more than success rate"]
     notes:
       - "最后算钱。机器人顶替每班一人，两班，年省人工 2 乘 0.5 乘 60 乘 8 乘 300，等于 {{ch30.saved:.1f}} 万元；扣掉处理失败的人工约 {{ch30.hc:.1f}} 万元、维护 {{ch30.maint:.1f}} 万元，回收期约 {{ch30.pay2:.0f}} 个月。改成三班，约 {{ch30.pay3:.0f}} 个月；单步提到 99%，两班约 {{ch30.pay99:.0f}} 个月。可见班次和价格比成功率影响更大。还要注意，顶替一个人本身是乐观假设：这个流程每小时只有约 {{ch30.perh97:.0f}} 件。"
@@ -286,25 +286,25 @@ slides:
       - ["热熔胶带粘合：温度、压力、时间要严控", "Hot-melt tape: tight control of heat, pressure, time"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g>
             <rect x="20" y="20" width="860" height="180" rx="24" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
             <path d="M80 70 q20 -30 40 0 t40 0 t40 0 t40 0 M80 110 q20 -30 40 0 t40 0 t40 0 t40 0 M80 150 q20 -30 40 0 t40 0 t40 0 t40 0" stroke="#c4b5fd" stroke-width="5" fill="none"/>
-            <text x="320" y="100" font-size="32" font-weight="800" fill="#c4b5fd">全成型编织</text>
-            <text x="320" y="150" font-size="26" fill="#d3deea">省裁剪、套口、缝合；上机时间长</text>
+            <text x="320" y="100" font-size="32" font-weight="800" fill="#c4b5fd" class="zh">全成型编织</text><text x="320" y="100" font-size="32" font-weight="800" fill="#c4b5fd" class="eo">Whole-garment knitting</text>
+            <text x="320" y="150" font-size="26" fill="#d3deea" class="zh">省裁剪、套口、缝合；上机时间长</text><text x="320" y="150" font-size="26" fill="#d3deea" class="eo">No cutting or seaming; slow to knit</text>
           </g>
           <g>
             <rect x="20" y="230" width="860" height="180" rx="24" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
             <rect x="80" y="300" width="180" height="16" fill="#e9dcc0"/><rect x="80" y="318" width="180" height="16" fill="#cdbb95"/>
             <g stroke="#5ee0d2" stroke-width="4"><path d="M120 270 v25 M150 270 v25 M180 270 v25 M210 270 v25"/></g>
-            <text x="320" y="310" font-size="32" font-weight="800" fill="#5ee0d2">超声波焊接</text>
-            <text x="320" y="360" font-size="26" fill="#d3deea">合成纤维局部熔融；纯棉焊不上</text>
+            <text x="320" y="310" font-size="32" font-weight="800" fill="#5ee0d2" class="zh">超声波焊接</text><text x="320" y="310" font-size="32" font-weight="800" fill="#5ee0d2" class="eo">Ultrasonic welding</text>
+            <text x="320" y="360" font-size="26" fill="#d3deea" class="zh">合成纤维局部熔融；纯棉焊不上</text><text x="320" y="360" font-size="26" fill="#d3deea" class="eo">Melts synthetics locally; not cotton</text>
           </g>
           <g>
             <rect x="20" y="440" width="860" height="180" rx="24" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
             <rect x="80" y="510" width="180" height="16" fill="#e9dcc0"/><rect x="80" y="528" width="180" height="8" fill="#ff7a45"/><rect x="80" y="538" width="180" height="16" fill="#cdbb95"/>
-            <text x="320" y="520" font-size="32" font-weight="800" fill="#ff9c75">热熔胶带粘合</text>
-            <text x="320" y="570" font-size="26" fill="#d3deea">对纤维要求低；和西服粘衬同一类</text>
+            <text x="320" y="520" font-size="32" font-weight="800" fill="#ff9c75" class="zh">热熔胶带粘合</text><text x="320" y="520" font-size="32" font-weight="800" fill="#ff9c75" class="eo">Hot-melt tape bonding</text>
+            <text x="320" y="570" font-size="26" fill="#d3deea" class="zh">对纤维要求低；和西服粘衬同一类</text><text x="320" y="570" font-size="26" fill="#d3deea" class="eo">Less fussy about fibre; like fusing interlining</text>
           </g>
         </svg>
     notes:
@@ -330,19 +330,19 @@ slides:
       - ["料框抓取：每步成功率相乘，同样是 pⁿ", "Bin picking: success rates multiply, pⁿ again"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="700" y="220" width="160" height="180" rx="16" fill="#111d31" stroke="#8fa3ba" stroke-width="3"/>
-          <text x="780" y="440" font-size="26" fill="#8fa3ba" text-anchor="middle">连接器</text>
+          <text x="780" y="440" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">连接器</text><text x="780" y="440" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">Connector</text>
           <rect x="690" y="285" width="40" height="50" fill="#22324d"/>
-          <text x="20" y="80" font-size="28" font-weight="700" fill="#ff9c75">夹得远：一推就弯</text>
+          <text x="20" y="80" font-size="28" font-weight="700" fill="#ff9c75" class="zh">夹得远：一推就弯</text><text x="20" y="80" font-size="28" font-weight="700" fill="#ff9c75" class="eo">Gripped far back: it bends</text>
           <rect x="60" y="120" width="70" height="60" rx="10" fill="#4b5f7d"/>
           <path d="M130 150 C 300 150, 360 80, 460 120 C 560 160, 600 260, 690 300" stroke="#ff7a45" stroke-width="10" fill="none" stroke-linecap="round"/>
-          <text x="20" y="480" font-size="28" font-weight="700" fill="#5ee0d2">夹在线头附近：推得进去</text>
+          <text x="20" y="480" font-size="28" font-weight="700" fill="#5ee0d2" class="zh">夹在线头附近：推得进去</text><text x="20" y="480" font-size="28" font-weight="700" fill="#5ee0d2" class="eo">Gripped near the tip: it goes in</text>
           <path d="M60 310 L560 310" stroke="#2ec4b6" stroke-width="10" stroke-linecap="round"/>
           <rect x="560" y="280" width="70" height="60" rx="10" fill="#2ec4b6"/>
           <path d="M630 310 L688 310" stroke="#2ec4b6" stroke-width="10"/>
           <rect x="120" y="530" width="660" height="80" rx="20" fill="rgba(242,183,5,.12)"/>
-          <text x="450" y="582" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">悬空长度减半 → 临界力 × 4</text>
+          <text x="450" y="582" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">悬空长度减半 → 临界力 × 4</text><text x="450" y="582" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">Half the free length → 4 × the force</text>
         </svg>
     notes:
       - "推布失稳公式和机器人装配线束、软管时遇到的问题完全一样：机械手把导线推进连接器，悬空的那段导线就是一根一端夹住的细压杆。临界力和悬空长度的平方成反比，夹持点离线头近一半，能推的力就大四倍。所以线束装配机器人总是夹在线头附近，分几次短行程推进，或者改成拉的方式。多步上料的 p 的 n 次方规律，也适用于料框抓取：识别、抓取、姿态校正、放置，每一步的成功率相乘。"
@@ -356,14 +356,14 @@ slides:
       - ["所以缝纫机用送布牙“拖”布，不“推”布", "That's why feed dogs drag the fabric, not push it"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="20" y="250" width="860" height="20" rx="6" fill="#2a3a55"/>
           <rect x="20" y="560" width="860" height="20" rx="6" fill="#2a3a55"/>
           <defs><marker id="t30" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
-          <text x="20" y="60" font-size="30" font-weight="700" fill="#5ee0d2">拉：平平地跟着走</text>
+          <text x="20" y="60" font-size="30" font-weight="700" fill="#5ee0d2" class="zh">拉：平平地跟着走</text><text x="20" y="60" font-size="30" font-weight="700" fill="#5ee0d2" class="eo">Pull: it follows flat</text>
           <rect x="120" y="215" width="480" height="30" rx="6" fill="#4c8dff"/>
           <path d="M600 230 L800 230" stroke="#f2b705" stroke-width="8" marker-end="url(#t30)"/>
-          <text x="20" y="370" font-size="30" font-weight="700" fill="#ff9c75">推：马上皱成一团</text>
+          <text x="20" y="370" font-size="30" font-weight="700" fill="#ff9c75" class="zh">推：马上皱成一团</text><text x="20" y="370" font-size="30" font-weight="700" fill="#ff9c75" class="eo">Push: it bunches up at once</text>
           <path d="M160 552 C 200 440, 240 440, 270 552 C 300 470, 340 470, 370 552 C 400 500, 430 500, 460 552 L 560 552" stroke="#4c8dff" stroke-width="28" fill="none" stroke-linejoin="round"/>
           <path d="M800 545 L590 545" stroke="#f2b705" stroke-width="8" marker-end="url(#t30)"/>
         </svg>
@@ -375,9 +375,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["{{ch30.P97:.0f}}% 无人完成，每 {{ch30.every_min:.0f}} 分钟要人插手一次", "{{ch30.P97:.0f}}% unattended: a person steps in every {{ch30.every_min:.0f}} minutes"]
     rows:
-      - ["无人完成率 0.97¹⁰", "{{ch30.P97:.1f}}%"]
-      - ["每小时人工干预", "{{ch30.int97:.0f}} 次"]
-      - ["回收期（两班 / 三班）", "{{ch30.pay2:.0f}} / {{ch30.pay3:.0f}} 月"]
+      - [["无人完成率 0.97¹⁰", "Unattended rate 0.97¹⁰"], ["{{ch30.P97:.1f}}%", "{{ch30.P97:.1f}}%"]]
+      - [["每小时人工干预", "Interventions an hour"], ["{{ch30.int97:.0f}} 次", "{{ch30.int97:.0f}}"]]
+      - [["回收期（两班 / 三班）", "Payback (2 / 3 shifts)"], ["{{ch30.pay2:.0f}} / {{ch30.pay3:.0f}} 月", "{{ch30.pay2:.0f}} / {{ch30.pay3:.0f}} months"]]
     side: {big: "{{ch30.p90:.0f}}%", text: ["要 90% 无人完成，单步成功率要约 {{ch30.p90:.0f}}%", "90% unattended needs about {{ch30.p90:.0f}}% per step"]}
     foot: ["单步 99% 时干预降到每小时约 {{ch30.int99:.0f}} 次，两班回收期约 {{ch30.pay99:.0f}} 个月；班次和价格影响更大", "At 99% per step: about {{ch30.int99:.0f}} interventions an hour, payback about {{ch30.pay99:.0f}} months on two shifts"]
     notes:
