@@ -6,19 +6,23 @@ import time, re, json, requests
 UA = "Mozilla/5.0 (compatible; TenderWatch/1.0; public announcements only)"
 s = requests.Session(); s.headers["User-Agent"] = UA
 sq = lambda x: re.sub(r"\s+", " ", x)
-r = s.get("https://www.ggzy.gov.cn/deal/dealList.html", timeout=20); r.encoding = "utf-8"; t = r.text
-i = t.find("formObject"); print("== 参数代码:", sq(t[i-200:i+1800]))
-time.sleep(5)
-form = {"SOURCE_TYPE": "1", "DEAL_TIME": "02", "DEAL_CLASSIFY": "00", "DEAL_STAGE": "0000", "DEAL_PROVINCE": "0", "DEAL_CITY": "0",
-        "DEAL_PLATFORM": "0", "BID_PLATFORM": "0", "DEAL_TRADE": "0", "isShowAll": "1", "PAGENUMBER": "1", "FINDTXT": "智慧"}
-r = s.post("https://www.ggzy.gov.cn/information/pubTradingInfo/getTradList", data=form, timeout=20,
-           headers={"Referer": "https://www.ggzy.gov.cn/deal/dealList.html", "X-Requested-With": "XMLHttpRequest"})
-print("== 查询: HTTP", r.status_code, sq(r.text[:2500]))
-time.sleep(5)
-for u in ["http://www.ccgp.gov.cn/cggg/zygg/", "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/"]:
+API = "https://www.ggzy.gov.cn/information/pubTradingInfo/getTradList"
+H = {"Referer": "https://www.ggzy.gov.cn/deal/dealList.html"}
+for form in [{"SOURCE_TYPE": "1", "DEAL_TIME": "02", "PAGENUMBER": "1"},
+             {"SOURCE_TYPE": "1", "DEAL_TIME": "02", "FINDTXT": "软件", "PAGENUMBER": "1"},
+             {"SOURCE_TYPE": "1", "DEAL_TIME": "06", "TIMEBEGIN": "2026-11-06", "TIMEEND": "2026-11-09", "FINDTXT": "平台", "PAGENUMBER": "2"}]:
+    r = s.post(API, data=form, headers=H, timeout=20)
+    try:
+        js = r.json(); d = js.get("data") or {}
+        print("== ", form, "→ code", js.get("code"), "total", d.get("total"), "pages", d.get("pages"), "size", d.get("size"))
+        for rec in (d.get("records") or [])[:2]: print("   记录:", json.dumps(rec, ensure_ascii=False)[:700])
+    except Exception as e:
+        print("== ", form, "非 JSON", r.status_code, sq(r.text[:300]))
+    time.sleep(5)
+for u in ["http://www.ccgp.gov.cn/cggg/dfgg/gkzb/index_1.htm", "http://www.ccgp.gov.cn/robots.txt", "https://www.ggzy.gov.cn/robots.txt"]:
     r = s.get(u, timeout=20); r.encoding = "utf-8"; t = r.text
-    for m in re.finditer(r'<ul[^>]*class="[^"]*(?:list|lst)[^"]*"[^>]*>', t):
-        print("== ", u, "列表:", sq(t[m.start():m.start()+1200]))
-    print("   翻页:", sq(" ".join(re.findall(r"index_\d+\.htm|createPageHTML\([^)]*\)", t)[:5])))
+    lis = re.findall(r"发布时间：<em>([^<]+)</em>", t)
+    print("== ", u, "HTTP", r.status_code, "条目", len(lis), "首末", lis[:1], lis[-1:], "| 翻页:", re.findall(r"createPageHTML\([^)]*\)|countPage\s*=\s*\d+", t)[:3])
+    if "robots" in u: print("   ", sq(t[:400]))
     time.sleep(5)
 PY
