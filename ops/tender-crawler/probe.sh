@@ -19,6 +19,11 @@ for u in urls:
             if re.search(r"deal|search|list|jyxx|information|query|\.do|\.jsp|api", h, re.I) and not h.endswith((".css", ".png", ".jpg", ".gif")):
                 links.add(urljoin(r.url, h))
         for h in sorted(links)[:60]: print("   ", h)
+        for m in re.finditer(r'<script[^>]+src=["\']([^"\']+)', t): print("   脚本", urljoin(r.url, m.group(1)))
+        for m in list(re.finditer(r"getTradList|\$\.(?:ajax|post)|data\s*:\s*\{", t))[:6]:
+            print("   上下文:", re.sub(r"\s+", " ", t[max(0, m.start()-300):m.start()+900]))
+        lis = re.findall(r"<li[^>]*>.*?</li>", t, re.S)
+        for li in [x for x in lis if "href" in x and len(x) > 80][:4]: print("   条目:", re.sub(r"\s+", " ", li)[:400])
         if len(t) < 6000: print("   正文:", re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", t))[:800])
     except Exception as e:
         print(u, "失败", e)
