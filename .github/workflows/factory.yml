@@ -350,7 +350,7 @@ jobs:
             if grep -q "park: true" factory/deploy/classes.yaml && { [ -z "$changed" ] || echo "$changed" | grep -qE \
                 "hub/(park|supply|supply_api|finance|mrp|lab27)\.py|bridge/|plants/wenquest-|deploy/classes|tests/plant_loop\.py|workflows/factory\.yml|sim/errors\.py"; }; then
               park="--park-hub http://localhost:8100 --lab27"
-              [ -z "$pcbhubp" ] || park="$park --park-buy DRV-JOINT=http://localhost:$pcbhubp"     # 第 85 轮
+              [ -z "$pcbhubp" ] || park="$park --park-buy DRV-JOINT-B=http://localhost:$pcbhubp"     # 第 85 轮；第 116 轮起关节模组用 B 版
             fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE \
                 "sim/(calib|errors|engine|runin)\.py|hub/lab2[68]\.py|cae/wqcr5\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then
