@@ -1,31 +1,24 @@
 #!/usr/bin/env bash
-# 只读诊断：少量访问公开页面，看域名、页面结构。不重试、不绕过。用法：probe.sh [网址 ...]
+# 只读诊断（少量访问公开页面，不重试、不绕过）：看公共资源交易平台接口参数和一次查询结果、政府采购网列表页结构。
 APP="$HOME/tender-crawler"; IMG=$(cat "$APP/image.txt")
 docker run -i --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e PYTHONPATH=/app/pylib -v "$APP":/app -w /app "$IMG" python - "$@" <<'PY'
-import sys, time, re, requests
-from urllib.parse import urljoin
+import time, re, json, requests
 UA = "Mozilla/5.0 (compatible; TenderWatch/1.0; public announcements only)"
 s = requests.Session(); s.headers["User-Agent"] = UA
-urls = sys.argv[1:] or ["https://www.ggzy.gov.cn/"]
-for u in urls:
-    try:
-        r = s.get(u, timeout=20); r.encoding = r.apparent_encoding
-        t = r.text
-        print(f"== {u}: HTTP {r.status_code} 长度 {len(t)} 最终 {r.url}")
-        print("   标题:", (re.search(r"<title>(.*?)</title>", t, re.S | re.I) or [None, ""])[1].strip()[:80])
-        links = set()
-        for m in re.finditer(r'(?:href|src|url)\s*[:=]\s*["\']([^"\']+)["\']', t):
-            h = m.group(1)
-            if re.search(r"deal|search|list|jyxx|information|query|\.do|\.jsp|api", h, re.I) and not h.endswith((".css", ".png", ".jpg", ".gif")):
-                links.add(urljoin(r.url, h))
-        for h in sorted(links)[:60]: print("   ", h)
-        for m in re.finditer(r'<script[^>]+src=["\']([^"\']+)', t): print("   脚本", urljoin(r.url, m.group(1)))
-        for m in list(re.finditer(r"getTradList|\$\.(?:ajax|post)|data\s*:\s*\{", t))[:6]:
-            print("   上下文:", re.sub(r"\s+", " ", t[max(0, m.start()-300):m.start()+900]))
-        lis = re.findall(r"<li[^>]*>.*?</li>", t, re.S)
-        for li in [x for x in lis if "href" in x and len(x) > 80][:4]: print("   条目:", re.sub(r"\s+", " ", li)[:400])
-        if len(t) < 6000: print("   正文:", re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", t))[:800])
-    except Exception as e:
-        print(u, "失败", e)
+sq = lambda x: re.sub(r"\s+", " ", x)
+r = s.get("https://www.ggzy.gov.cn/deal/dealList.html", timeout=20); r.encoding = "utf-8"; t = r.text
+i = t.find("formObject"); print("== 参数代码:", sq(t[i-200:i+1800]))
+time.sleep(5)
+form = {"SOURCE_TYPE": "1", "DEAL_TIME": "02", "DEAL_CLASSIFY": "00", "DEAL_STAGE": "0000", "DEAL_PROVINCE": "0", "DEAL_CITY": "0",
+        "DEAL_PLATFORM": "0", "BID_PLATFORM": "0", "DEAL_TRADE": "0", "isShowAll": "1", "PAGENUMBER": "1", "FINDTXT": "智慧"}
+r = s.post("https://www.ggzy.gov.cn/information/pubTradingInfo/getTradList", data=form, timeout=20,
+           headers={"Referer": "https://www.ggzy.gov.cn/deal/dealList.html", "X-Requested-With": "XMLHttpRequest"})
+print("== 查询: HTTP", r.status_code, sq(r.text[:2500]))
+time.sleep(5)
+for u in ["http://www.ccgp.gov.cn/cggg/zygg/", "http://www.ccgp.gov.cn/cggg/dfgg/gkzb/"]:
+    r = s.get(u, timeout=20); r.encoding = "utf-8"; t = r.text
+    for m in re.finditer(r'<ul[^>]*class="[^"]*(?:list|lst)[^"]*"[^>]*>', t):
+        print("== ", u, "列表:", sq(t[m.start():m.start()+1200]))
+    print("   翻页:", sq(" ".join(re.findall(r"index_\d+\.htm|createPageHTML\([^)]*\)", t)[:5])))
     time.sleep(5)
 PY
