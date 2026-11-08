@@ -18,6 +18,7 @@ from typing import Annotated, Any
 from fastapi import Depends
 from pydantic import BaseModel, Field
 
+from . import bookcourse
 from . import course_builder as cb
 from .moodle import EngineError
 from .session import Session
@@ -52,9 +53,23 @@ def register(app, m) -> None:
 
     def load_manifest(book: str) -> dict:
         p = manifest_path(book)
-        if "/" in book or ".." in book or not p.is_file():
+        if "/" in book or ".." in book or book.startswith("."):
             raise EngineError("not_found", "no such course pack", 404)
-        return json.loads(p.read_text(encoding="utf-8"))
+        if p.is_file():
+            return json.loads(p.read_text(encoding="utf-8"))
+        # 第 117 轮：没有课程包清单的教材，当场生成“体验课”
+        man = bookcourse.make(packs_dir(), book, state.settings.app_url or state.settings.public_url)
+        if man is None:
+            raise EngineError("not_found", "no such course pack", 404)
+        return man
+
+    def all_packs() -> list[str]:
+        root = packs_dir()
+        if not root.is_dir():
+            return []
+        have = {p.parent.parent.name for p in root.glob("*/course/manifest.json")}
+        books = {p.parent.parent.name for p in root.glob("*/web/index.json")}
+        return sorted(have) + sorted(books - have)       # 现成课程包在前，教材体验课在后
 
     def load_state(book: str) -> dict:
         p = state_path(book)
@@ -374,14 +389,37 @@ def register(app, m) -> None:
         await m.accounts_require_admin(sess)
         lg = m.lang_of(lang, sess)
         out = []
-        root = packs_dir()
-        for p in sorted(root.glob("*/course/manifest.json")) if root.is_dir() else []:
-            book = p.parent.parent.name
+        for book in all_packs():
             try:
                 out.append(view(book, load_manifest(book), load_state(book), lg))
             except (ValueError, KeyError):
                 continue
         return {"packs": out}
+
+    @app.post("/api/v1/admin/course-packs/publish-all")
+    async def publish_all(sess: Annotated[Session, Depends(m.current)], lang: str | None = None):
+        """第 117 轮：一次发完所有课程包（含教材体验课）的所有批次；已发布的跳过，一本接一本，不并行。"""
+        await m.accounts_require_admin(sess)
+        if any(not t.done() for t in running.values()):
+            raise EngineError("busy", "already publishing", 409)
+        books = all_packs()
+
+        async def go() -> None:
+            for book in books:
+                try:
+                    man = load_manifest(book)
+                except (EngineError, ValueError, KeyError):
+                    continue
+                st = load_state(book)
+                st.update(status="running", error="")
+                save_state(book, st)
+                running[book] = asyncio.current_task()          # 列表里这一本显示“发布中”
+                await work(sess, book, max(b["no"] for b in man["batches"]))
+                running.pop(book, None)
+
+        running["*"] = asyncio.create_task(go())
+        await asyncio.sleep(0)
+        return {"books": books}
 
     @app.post("/api/v1/admin/course-packs/{book}/refresh")
     async def refresh(book: str, sess: Annotated[Session, Depends(m.current)], lang: str | None = None):

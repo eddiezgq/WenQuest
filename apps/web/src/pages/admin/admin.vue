@@ -147,6 +147,11 @@
         <!-- course packs (round 16) -->
         <template v-if="tab === 'packs'">
           <text class="wq-muted block">{{ t("pack.hint") }}</text>
+          <!-- 第 117 轮：一次发完全部课程包和教材体验课 -->
+          <view v-if="packs.length" class="wq-row pk-all">
+            <text class="wq-muted">{{ t("pack.allHint") }}</text>
+            <view class="wq-btn primary" :class="{ disabled: allBusy || packs.some((p) => p.status === 'running') }" @click="publishAll">{{ t("pack.all") }}</view>
+          </view>
           <view v-if="!packs.length" class="wq-empty">{{ t("pack.none") }}</view>
           <view v-for="pk in packs" :key="pk.book" class="wq-card pack">
             <view class="wq-row pk-top">
@@ -220,13 +225,22 @@ async function loadPacks() {
   clearTimeout(packTimer);
   try {
     packs.value = (await api.coursePacks()).packs;
-    if (tab.value === "packs" && packs.value.some((p) => p.status === "running")) packTimer = setTimeout(loadPacks, 3000);
+    const left = packs.value.some((p) => p.status !== "failed" && p.batches.some((b) => !b.done));
+    if (allBusy.value && !left) allBusy.value = false;
+    if (tab.value === "packs" && (packs.value.some((p) => p.status === "running") || allBusy.value)) packTimer = setTimeout(loadPacks, 3000);
   } catch (e) { fail(e); }
 }
 async function publishPack(pk: CoursePack, b: CoursePack["batches"][number]) {
   if (pk.status === "running" || !(await confirmAction(t("pack.confirm", { b: b.name }), t("pack.publish"), t("common.cancel")))) return;
   error.value = "";
   try { await api.publishCoursePack(pk.book, b.no); } catch (e) { fail(e); }
+  loadPacks();
+}
+const allBusy = ref(false);
+async function publishAll() {
+  if (allBusy.value || !(await confirmAction(t("pack.allConfirm"), t("pack.all"), t("common.cancel")))) return;
+  error.value = "";
+  try { await api.publishAllCoursePacks(); allBusy.value = true; } catch (e) { fail(e); }
   loadPacks();
 }
 async function refreshPack(pk: CoursePack) {
@@ -434,4 +448,5 @@ onShow(async () => {
 .c-a { width: 230px; justify-content: flex-end; }
 .pager { margin-top: 10px; justify-content: flex-end; }
 @media (max-width: 760px) { .c-d { display: none; } .c-a { width: auto; } .tr { flex-wrap: wrap; } }
+.pk-all { gap: 12px; align-items: center; justify-content: space-between; margin: 8px 0 12px; flex-wrap: wrap; }
 </style>

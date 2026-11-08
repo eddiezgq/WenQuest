@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>招标抓取 · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>招标抓取</h1>
+<p>每天北京时间 06 点，国内服务器自动抓取中国政府采购网、全国公共资源交易平台的公开招标公告，按关键词筛选，
+07:10 结果自动取回到 GitHub，每日招标判断任务从这里读取。</p>
+<h2>看结果</h2>
+<p>GitHub 仓库 → Actions → 左侧 <strong>tender-crawler</strong> → 最新一次运行：页面上直接显示当天摘要；下方附件 <code>tender-feed</code> 可下载 <code>latest.json / latest.md</code>（保留 7 天）。</p>
+<h2>手动操作（都在 Actions → tender-crawler → Run workflow 里选）</h2>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fetch</td>
+<td>取回最新结果（默认）</td>
+</tr>
+<tr>
+<td>run</td>
+<td>立即抓一次并取回</td>
+</tr>
+<tr>
+<td>status</td>
+<td>看定时任务、最后运行日期、日志</td>
+</tr>
+<tr>
+<td>install</td>
+<td>程序有更新时重新安装（配置和历史数据保留）</td>
+</tr>
+</tbody>
+</table>
+<h2>改关键词、地区、来源</h2>
+<p>改仓库里的 <code>ops/tender-crawler/config.yaml</code> 只影响<strong>新装</strong>的服务器。服务器上真正使用的是 <code>~/tender-crawler/config.local.yaml</code>（第一次安装时复制，以后升级不覆盖）。要改，登录服务器以 deploy 用户编辑该文件，下次运行自动生效。</p>
+<h2>出问题</h2>
+<ul>
+<li>某来源 <code>blocked</code>：对方拦截或出验证码。按规矩当天停止访问该网站，不重试、不绕过；第二天会再试。</li>
+<li>某来源 <code>error</code> 或长期 0 条：网站改版，需要改 <code>ops/tender-crawler/tender_crawler/sources.py</code>，再运行 install。</li>
+<li>预算、截止时间是规则识别，可能不准，以公告原文为准。</li>
+</ul>
+<h2>规矩</h2>
+<p>只访问公开页面、控制频率、不登录、不绕过验证码、不报名、不发邮件、不联系任何人；只用规则提取，不调用大模型（以后若用，只能用国内已备案模型）。</p></main><script src="/assist.js" defer></script></body></html>

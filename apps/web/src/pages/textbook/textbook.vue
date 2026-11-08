@@ -284,8 +284,20 @@ async function pdf(ch: number | string) {
 }
 
 onLoad(async (q: any) => {
-  if (!token.value) return uni.reLaunch({ url: "/pages/login/login?back=" + encodeURIComponent("/pages/textbook/textbook") });
+  if (!token.value) {
+    // 带上原来的参数（体验课里的链接指到某本书某一节、某章课件），登录后回到同一处
+    const qs = Object.entries(q || {}).map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join("&");
+    return uni.reLaunch({ url: "/pages/login/login?back=" + encodeURIComponent("/pages/textbook/textbook" + (qs ? `?${qs}` : "")) });
+  }
   try {
+    // 第 117 轮：体验课里的“互动课件”链接直接打开这一章的课件（同一个窗口跳过去，不会被浏览器拦）
+    if (q?.book && q?.slides) {
+      const r = await api.textbookSlides(String(q.book), String(q.slides));
+      // #ifdef H5
+      window.location.replace(absolute(r.url));
+      // #endif
+      return;
+    }
     books.value = (await api.textbooks()).books;
     const b = q?.book || (books.value.length === 1 ? books.value[0].book : "");
     if (b) await open(b, q?.s || "");

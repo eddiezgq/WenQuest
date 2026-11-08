@@ -578,6 +578,7 @@ export const api = {
   coursePacks: () => request<{ packs: CoursePack[] }>("GET", "/api/v1/admin/course-packs"),
   kitInterest: () => request<KitInterest>("GET", "/api/v1/admin/kit-interest"),
   publishCoursePack: (book: string, batch: number) => request<CoursePack>("POST", `/api/v1/admin/course-packs/${book}/publish`, { batch }),
+  publishAllCoursePacks: () => request<{ books: string[] }>("POST", "/api/v1/admin/course-packs/publish-all"),
   refreshCoursePack: (book: string) => request<CoursePack>("POST", `/api/v1/admin/course-packs/${book}/refresh`),
   // 问渠教材（第 7 轮）
   textbooks: () => request<{ books: { book: string; title: string; title_en?: string; web?: boolean; labs?: number; chapters: number; sections?: number; written?: number }[] }>("GET", "/api/v1/textbooks"),
