@@ -29,7 +29,8 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "${{ inputs.server == 'cn' && secrets.CN_DEPLOY_SSH_KEY || secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          kh="${{ inputs.server == 'cn' && secrets.CN_DEPLOY_KNOWN_HOSTS || secrets.DEPLOY_KNOWN_HOSTS }}"
+          # 不能写成 a && b || c：国内没设 known_hosts 时会落到美国那一份（11-08 踩过）
+          if [ "${{ inputs.server }}" = cn ]; then kh="${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}"; else kh="${{ secrets.DEPLOY_KNOWN_HOSTS }}"; fi
           if [ -n "$kh" ]; then
             printf '%s\n' "$kh" > ~/.ssh/known_hosts
           else
