@@ -3,6 +3,7 @@
 !services/eda/requirements.txt
 !services/eda/app.py
 !services/eda/factory_api.py
+!services/eda/view_api.py
 !services/eda/web
 !eda/wqeda
 !eda/parts
@@ -12,6 +13,11 @@
 !factory/designs/drv-joint/out/gerber.zip
 !eda/examples/pcba-demo/bom.csv
 !eda/examples/pcba-demo/pos.csv
+!factory/designs/drv-joint/kicad
+!factory/designs/drv-joint-b/kicad
+!factory/designs/drv-joint/report/report.json
+!factory/designs/drv-joint-b/report/report.json
+!eda/examples/drv-joint-24v/report/report.json
 !factory/digital/cae/__init__.py
 !factory/digital/cae/circuit.py
 !factory/digital/cae/motors.py

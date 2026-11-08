@@ -222,5 +222,9 @@ factory_api.register(app, factory_dir=REPO / "eda" / "examples" / "factories", g
                            "bom": REPO / "eda" / "examples" / "pcba-demo" / "bom.csv",
                            "cpl": REPO / "eda" / "examples" / "pcba-demo" / "pos.csv"})
 
+import view_api  # noqa: E402  第 113 轮：网页审图
+
+view_api.register(app, REPO)
+
 if WEB.is_dir():
     app.mount("/", StaticFiles(directory=WEB, html=True), name="web")
