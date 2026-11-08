@@ -624,3 +624,50 @@ def cute_floppy(cx, cy, k, at, idp="fp", mood="happy", moves=True):
         E += [{"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_s"], "pivot": [X(0), Y(70)], "amp": 3, "hz": 2},
               {"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_s"], "amp": 8, "hz": 1.0}]
     return E
+
+
+def cute_rocket(cx, cy, k, at, idp="rk", mood="happy", moves=True, flame=True):
+    """火箭“小谷” Gu (2026-11-08): an upright rocket centred at (cx, cy), about 300*k tall, with a face in the window and a flickering flame.
+    Ids: <idp>_b (body + face), <idp>_f (flame; wiggles). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = []
+    if flame:
+        for q, (c, h) in enumerate((("red", 120), ("gold", 80))):
+            E.append({"t": "path", "at": at, "id": idp + "_f", "c": c, "w": 6, "fill": c,
+                      "d": f"M{X(-30 + 10 * q)},{Y(-110)} Q{X(0)},{Y(-110 - h * 1.4)} {X(30 - 10 * q)},{Y(-110)} Z"})
+    E += [{"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "fill": "paper",
+           "d": f"M{X(-45)},{Y(-110)} L{X(-45)},{Y(80)} Q{X(0)},{Y(190)} {X(45)},{Y(80)} L{X(45)},{Y(-110)} Z"},
+          {"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "fill": "red",
+           "d": f"M{X(-45)},{Y(-40)} L{X(-90)},{Y(-120)} L{X(-45)},{Y(-110)} Z M{X(45)},{Y(-40)} L{X(90)},{Y(-120)} L{X(45)},{Y(-110)} Z"},
+          {"t": "ellipse", "at": at, "id": idp + "_b", "x": X(-32), "y": Y(72), "w": 64 * k, "h": 64 * k, "c": "ink", "fill": "blue"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 13 - 6), "y": Y(56), "w": 12 * k, "h": 14 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-14)},{Y(30)} Q{X(0)},{Y(18)} {X(14)},{Y(30)}", "sad": f"M{X(-14)},{Y(20)} Q{X(0)},{Y(32)} {X(14)},{Y(20)}",
+         "o": f"M{X(-6)},{Y(26)} a{6 * k},{6 * k} 0 1,0 {12 * k},0 a{6 * k},{6 * k} 0 1,0 {-12 * k},0"}[mood]
+    E.append({"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m})
+    if moves:
+        if flame:
+            E.append({"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_f"], "pivot": [X(0), Y(-110)], "amp": 8, "hz": 5})
+        E.append({"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_b"], "pivot": [X(0), Y(-110)], "amp": 2, "hz": 1.5})
+    return E
+
+
+def cute_puff(cx, cy, k, at, idp="pf", mood="happy", moves=True):
+    """呼出的一口气“小呼” Puff (2026-11-08): a soft three-lobed cloud centred at (cx, cy), about 240*k wide, with a face and a little CO2 badge.
+    Ids: <idp>_b (cloud + face), <idp>_c (badge; wiggles). "<idp>*" moves it all."""
+    X = lambda v: cx + v * k
+    Y = lambda v: cy - v * k
+    E = [{"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 5, "fill": "paper",
+          "d": f"M{X(-110)},{Y(-40)} Q{X(-140)},{Y(30)} {X(-70)},{Y(45)} Q{X(-50)},{Y(110)} {X(10)},{Y(85)} Q{X(70)},{Y(120)} {X(90)},{Y(45)} "
+               f"Q{X(150)},{Y(10)} {X(110)},{Y(-40)} Z"}]
+    for side in (-1, 1):
+        E.append({"t": "ellipse", "at": at, "id": idp + "_b", "x": X(side * 30 - 8), "y": Y(35), "w": 16 * k, "h": 20 * k, "c": "ink", "fill": "ink"})
+    m = {"happy": f"M{X(-18)},{Y(0)} Q{X(0)},{Y(-18)} {X(18)},{Y(0)}", "sad": f"M{X(-18)},{Y(-14)} Q{X(0)},{Y(2)} {X(18)},{Y(-14)}",
+         "o": f"M{X(-8)},{Y(-6)} a{8 * k},{8 * k} 0 1,0 {16 * k},0 a{8 * k},{8 * k} 0 1,0 {-16 * k},0"}[mood]
+    E += [{"t": "path", "at": at, "id": idp + "_b", "c": "ink", "w": 4, "d": m},
+          {"t": "ellipse", "at": at, "id": idp + "_c", "x": X(70), "y": Y(-10), "w": 56 * k, "h": 56 * k, "c": "ink", "fill": "gold"}]
+    if moves:
+        E += [{"t": "move", "at": at, "kind": "bob", "targets": [idp + "_b", idp + "_c"], "amp": 10, "hz": 0.9},
+              {"t": "move", "at": at, "kind": "wiggle", "targets": [idp + "_c"], "pivot": [X(98), Y(-38)], "amp": 10, "hz": 2}]
+    return E
