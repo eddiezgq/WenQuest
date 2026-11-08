@@ -661,6 +661,15 @@ jobs:
           cat /tmp/eda.log
           if ! grep -q '^eda 200$' /tmp/eda.log; then python3 factory/deploy/ci_annotate.py "Electronics desk /eda/" /tmp/eda.log 120; exit 1; fi
 
+      - name: Online documents answer (第 121 轮 OnlyOffice /docs/；不通时把容器状态和日志作为注释发出来)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        timeout-minutes: 8
+        run: |
+          ssh "deploy@$HOST" '/opt/wenquest/deploy/check-docs.sh' > /tmp/docs.log 2>&1 || true
+          cat /tmp/docs.log
+          if ! grep -q '^docs ok$' /tmp/docs.log; then python3 factory/deploy/ci_annotate.py "Online documents /docs/" /tmp/docs.log 120; exit 1; fi
+
       - name: Disk space on the server (round 19)
         if: env.SKIP != '1'
         continue-on-error: true
@@ -893,6 +902,13 @@ jobs:
             python3 factory/deploy/ci_annotate.py "China server update" /tmp/update.log 180
             exit "$st"
           fi
+      - name: Online documents answer (第 121 轮)
+        if: env.SKIP != '1'
+        continue-on-error: true
+        timeout-minutes: 8
+        run: |
+          ssh "deploy@$HOST" '/opt/wenquest/deploy/check-docs.sh' 2>&1 | tee /tmp/docs.log || true
+          if ! grep -q '^docs ok$' /tmp/docs.log; then echo "::warning title=Online documents (China)::$(tail -n 1 /tmp/docs.log)"; exit 1; fi
       - name: Pages get their fonts and libraries from this server (第 34 轮)
         if: env.SKIP != '1'
         continue-on-error: true
