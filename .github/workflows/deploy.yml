@@ -170,8 +170,10 @@ jobs:
               yaml = None
           # 第 60 轮 D-3：真正共用的只有构建工具、实验检查器和实验工具包；书外的其他文件看各书 meta.yaml 登记的 program_deps
           # （构建时会核对程序读到的书外文件都登记了）。数字工厂、零件库别的文件改了，不再九本书全查
+          # 部署流程文件 deploy.yml 不算共用：它一改九本书全查，11-08 改部署规则后每次上线都要两个多小时，Eddie 定去掉。
+          # 改了教材检查本身那一段，请手动触发并勾 fresh
           shared = ("textbook/tools/", "services/labcheck/", "services/gateway/app/production/",
-                    "textbook/mechdesign/conventions/calcsheet.py", ".github/workflows/deploy.yml")
+                    "textbook/mechdesign/conventions/calcsheet.py")
           def deps(b):
               m = f"textbook/{b}/meta.yaml"
               pats = []
