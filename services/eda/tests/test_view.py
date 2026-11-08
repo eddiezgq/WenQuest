@@ -40,3 +40,17 @@ def test_page_has_no_external_fonts():
     assert "fonts.googleapis.com" not in js and "vendor/kicanvas-fonts.css" in js
     for f in ("KICANVAS-LICENSE.md", "MATERIAL-SYMBOLS-LICENSE.txt", "NUNITO-LICENSE.txt"):
         assert (A.WEB / "view" / "vendor" / f).exists()
+
+
+def test_plugin_zip():
+    import io
+    import zipfile
+
+    r = c.get("/api/kicad-plugin.zip")
+    assert r.status_code == 200 and r.headers["content-type"] == "application/zip"
+    names = zipfile.ZipFile(io.BytesIO(r.content)).namelist()
+    for n in ("plugin.json", "check.py", "requirements.txt", "wq_kicad/app.py", "wqeda/readers/kicad_ipc.py",
+              "parts/BSC040N08NS5.yaml", "factories/example-smt.yaml", "resources/icon-24.png"):
+        assert "wenquest-eda/" + n in names
+    assert not any("__pycache__" in n for n in names)
+    assert c.get("/api/kicad-plugin.zip").content == r.content  # 每次打出的字节一样

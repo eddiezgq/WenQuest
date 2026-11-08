@@ -4,6 +4,7 @@
 !services/eda/app.py
 !services/eda/factory_api.py
 !services/eda/view_api.py
+!eda/kicad-plugin
 !services/eda/web
 !eda/wqeda
 !eda/parts

@@ -3,6 +3,7 @@
   GET /api/view/designs                  能看的设计（驱动板 A、B，24 V 示例用 A 的板子）
   GET /api/view/file/{key}/{name}        设计的 KiCad 文件（原理图、板子、工程文件；只给登记过的文件夹）
   GET /api/view/report/{key}             这块板子报告里没通过的项：检查项、结论、位号、位置（KiCad 坐标，y 向下）
+  GET /api/kicad-plugin.zip              KiCad 9 插件（插件文件 + 检查引擎 + 器件数据 + 示例工厂），现场打包
 
 打开自己电脑上的 KiCad 文件不经过这里：页面在浏览器里读文件、交给 KiCanvas，不上传。"""
 
@@ -13,7 +14,7 @@ import os
 import re
 
 from fastapi import HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 
 from wqeda.factory import refs_of
 
@@ -58,6 +59,16 @@ def issues(report):
 
 def register(app, repo):
     reg = designs(repo)
+
+    @app.get("/api/kicad-plugin.zip")
+    def plugin_zip():
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location("wq_pack", repo / "eda" / "kicad-plugin" / "pack.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return Response(mod.build(), media_type="application/zip",
+                        headers={"Content-Disposition": 'attachment; filename="wenquest-eda-kicad-plugin.zip"'})
 
     @app.get("/api/view/designs")
     def list_designs():
