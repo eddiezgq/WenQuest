@@ -62,7 +62,7 @@ jobs:
       - name: Status
         if: env.ACTION == 'status'
         run: |
-          ssh "deploy@$HOST" 'df -h / /opt 2>/dev/null; docker system df 2>/dev/null; du -sh ~/tender-crawler ~/tender-crawler/* /opt/wenquest/* 2>/dev/null | sort -h | tail -15; cd ~/tender-crawler && echo "镜像: $(cat image.txt)"; crontab -l | grep tender-crawler; echo "最后运行: $(cat data/.last_run 2>/dev/null)"; ls -la data | tail -15; tail -40 data/cron.log 2>/dev/null'
+          ssh "deploy@$HOST" 'nproc; free -m; docker stats --no-stream --format "{{.Name}} {{.MemUsage}}" 2>/dev/null | sort -k2 -h | tail -25; df -h / /opt 2>/dev/null; docker system df 2>/dev/null; du -sh ~/tender-crawler ~/tender-crawler/* /opt/wenquest/* 2>/dev/null | sort -h | tail -15; cd ~/tender-crawler && echo "镜像: $(cat image.txt)"; crontab -l | grep tender-crawler; echo "最后运行: $(cat data/.last_run 2>/dev/null)"; ls -la data | tail -15; tail -40 data/cron.log 2>/dev/null'
 
       - name: Free disk space
         if: env.ACTION == 'cleanup'   # 只在手动选 cleanup 时运行
