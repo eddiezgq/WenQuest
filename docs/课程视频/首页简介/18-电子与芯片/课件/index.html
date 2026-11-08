@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WenQuest electronics and chips: from a circuit all the way into the factory</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#07131f}
+body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",Inter,Arial,sans-serif;color:#eaf1fb}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(1200px 700px at 85% -10%,#1d3f7a 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#0f4a4a 0%,transparent 60%),#07131f}
+section.pg{position:absolute;inset:0;display:none}
+section.pg.on{display:block}
+.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,sans-serif;letter-spacing:.18em;color:#7fb6ff;text-transform:uppercase}
+.brand b{color:#f5c344;font-weight:700;letter-spacing:.05em;margin-right:14px}
+.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600;letter-spacing:.04em}
+.title{position:absolute;left:56px;top:122px;width:1800px;font-size:52px;font-weight:800;line-height:1.15;color:#fff}
+.win{position:absolute;left:56px;top:212px;width:1280px;height:720px;border-radius:14px;overflow:hidden;background:#fff;
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08)}
+.win .bar{position:absolute;left:0;top:0;right:0;height:34px;background:#e9edf2;display:flex;align-items:center;gap:8px;padding-left:14px;z-index:3}
+.win .bar i{width:12px;height:12px;border-radius:50%;background:#ff5f57}.win .bar i:nth-child(2){background:#febc2e}.win .bar i:nth-child(3){background:#28c840}
+.win .bar span{margin-left:18px;font:500 15px/1 Inter,sans-serif;color:#5b6775;background:#fff;border-radius:6px;padding:5px 14px}
+.win .vp{position:absolute;left:0;top:34px;right:0;bottom:0;overflow:hidden}
+.win .vp .cam{position:absolute;inset:0;transform-origin:0 0}
+.win .vp img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:top left}
+.ring{position:absolute;border:5px solid #f5c344;border-radius:12px;box-shadow:0 0 0 9999px rgba(7,19,31,.16),0 0 24px rgba(245,195,68,.8);opacity:0}
+.side{position:absolute;left:1384px;top:236px;width:480px}
+.side li{list-style:none;position:relative;padding:0 0 0 46px;margin:0 0 30px;font-size:31px;line-height:1.38;color:#dbe7f7;opacity:0}
+.side li::before{content:attr(data-n);position:absolute;left:0;top:4px;width:32px;height:32px;border-radius:50%;background:#f5c344;color:#07131f;
+  font:700 19px/32px Inter,sans-serif;text-align:center}
+.side li b{color:#fff}
+.cover .title{top:330px;font-size:78px;width:900px}
+.cover .sub{position:absolute;left:56px;top:600px;width:860px;font-size:36px;line-height:1.45;color:#bcd0ea}
+.cover .line{position:absolute;left:56px;top:300px;width:120px;height:6px;background:#f5c344;border-radius:3px}
+.cover .win{left:1010px;top:200px;width:1000px;height:597px;transform:perspective(1800px) rotateY(-16deg) rotateX(3deg);transform-origin:left center;opacity:.92}
+.end .title{top:300px;font-size:84px;width:1700px}
+.end .sub{position:absolute;left:56px;top:430px;font-size:40px;color:#bcd0ea}
+.end .url{position:absolute;left:56px;top:540px;font:600 44px/1.2 Inter,sans-serif;color:#f5c344}
+.end .win{left:1180px;top:260px;width:680px;height:416px;opacity:.85}
+.f{opacity:0}
+</style></head><body><div id="stage"><section class="pg cover" data-n="1">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="title">From a circuit, all the way into the factory</div>
+<div class="line"></div>
+<div class="sub">WenQuest&#x27;s electronics track: a circuit, a board, a chip</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/home-elec-en.jpg" alt=""></div></div></div>
+</section>
+<section class="pg shot" data-n="2">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">Circuit analysis</div>
+<div class="title">Build a circuit, change a value, in the browser</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/circuit</span></div><div class="vp"><div class="cam" data-z2="1.35,55,72"><img src="media/circuit-en.jpg" alt=""><div class="ring" data-k="1" style="left:19.5%;top:27%;width:60%;height:14.5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Change a value</li><li data-k="2" data-n="2">The simulation runs on the spot</li></ul>
+</section>
+<section class="pg shot" data-n="3">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">Virtual instruments</div>
+<div class="title">Sensors, oscilloscopes and meters on the web</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/instruments</span></div><div class="vp"><div class="cam"><img src="media/instruments-en.jpg" alt=""><div class="ring" data-k="1" style="left:58.5%;top:56%;width:38.5%;height:44%"></div><div class="ring" data-k="2" style="left:19.5%;top:41%;width:76.5%;height:6.5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Sensors, oscilloscopes, meters</li><li data-k="2" data-n="2">Set up like real devices</li></ul>
+</section>
+<section class="pg shot" data-n="4">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">Board design</div>
+<div class="title">A real joint drive board</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/pcb-design</span></div><div class="vp"><div class="cam"><img src="media/pcb-design-en.jpg" alt=""><div class="ring" data-k="1" style="left:18%;top:43%;width:47.5%;height:5%"></div><div class="ring" data-k="2" style="left:18%;top:19%;width:30.5%;height:5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Schematic and layout generated from a design description</li><li data-k="2" data-n="2">Compare revisions A and B</li></ul>
+</section>
+<section class="pg shot" data-n="5">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">The board&#x27;s firmware</div>
+<div class="title">Spinning a motor in a simulator</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/pcb-design</span></div><div class="vp"><div class="cam" data-z2="1.3,55,58"><img src="media/firmware-en.jpg" alt=""><div class="ring" data-k="1" style="left:19.5%;top:13%;width:73.5%;height:18.5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Current loop, encoders, brake, protections</li><li data-k="2" data-n="2">Scenario by scenario</li></ul>
+</section>
+<section class="pg shot" data-n="6">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">Chip design</div>
+<div class="title">An encoder interface chip, our own design</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/chip-design</span></div><div class="vp"><div class="cam" data-z2="1.4,55,75"><img src="media/chip-layout-en.jpg" alt=""><div class="ring" data-k="1" style="left:18%;top:30.5%;width:39.5%;height:5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Verilog → synthesis → layout</li><li data-k="2" data-n="2">All open-source tools</li></ul>
+</section>
+<section class="pg shot" data-n="7">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">Digital factory</div>
+<div class="title">Built and tested in the board and chip plants</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>pcb.factory.wenquestrobotics.com/fct</span></div><div class="vp"><div class="cam"><img src="media/pcb-fct-en.jpg" alt=""><div class="ring" data-k="1" style="left:41%;top:25.5%;width:53.5%;height:5%"></div><div class="ring" data-k="2" style="left:27%;top:12.5%;width:59%;height:5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Every board tested before it ships</li><li data-k="2" data-n="2">Joint drive boards, on to the robot plant</li></ul>
+</section>
+<section class="pg shot" data-n="8">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">WenQuest Electronics · drafting desk</div>
+<div class="title">For companies: AI drafts the design</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/eda/</span></div><div class="vp"><div class="cam"><img src="media/eda-desk-en.jpg" alt=""><div class="ring" data-k="1" style="left:9%;top:27.5%;width:82.5%;height:35.5%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Write the requirement; AI drafts</li></ul>
+</section>
+<section class="pg shot" data-n="9">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="kick">WenQuest Electronics · factory side</div>
+<div class="title">Incoming production files, checked automatically</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/eda/factory/</span></div><div class="vp"><div class="cam"><img src="media/eda-factory-en.jpg" alt=""><div class="ring" data-k="1" style="left:8.5%;top:4.5%;width:25%;height:7.5%"></div><div class="ring" data-k="2" style="left:20%;top:77.5%;width:6%;height:10%"></div></div></div></div>
+<ul class="side"><li data-k="1" data-n="1">Checked automatically</li><li data-k="2" data-n="2">Issues raised on the spot</li></ul>
+</section>
+<section class="pg end" data-n="10">
+<div class="brand"><b>问渠</b>Electronics and chips</div>
+<div class="title">&quot;Electronics and chips&quot;</div>
+<div class="sub">You can open every one of them here</div>
+<div class="url">wenquestrobotics.com</div>
+<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/home-elec-en.jpg" alt=""></div></div></div>
+</section></div><script>
+(() => {
+  const pages = [...document.querySelectorAll('section.pg')]
+  let cur = 0, frag = 0, t0 = performance.now()
+  const frags = (i) => [...pages[i].querySelectorAll('[data-k]')].reduce((m, e) => Math.max(m, +e.dataset.k), 0)
+  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; t0 = performance.now()
+    pages[i].querySelectorAll('[data-k]').forEach((e) => { e.dataset.t = '' }); while (frag < s) next() }
+  function next() { if (frag >= frags(cur)) { if (cur < pages.length - 1) go(cur + 1, 0); return } frag++
+    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = performance.now() })
+    const z = pages[cur].querySelector(`.cam[data-z${frag}]`); if (z) { z.dataset.from = z.dataset.now || '1,0,0'; z.dataset.to = z.dataset['z' + frag]; z.dataset.zt = performance.now() } }
+  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
+  function tick() {
+    const now = performance.now(), p = pages[cur]; if (!p) return
+    p.querySelectorAll('[data-k]').forEach((e) => { const t = +e.dataset.t; const a = e.dataset.t ? ease((now - t) / 450) : 0
+      e.style.opacity = a; if (e.tagName === 'LI') e.style.transform = `translateX(${(1 - a) * 24}px)` })
+    p.querySelectorAll('.cam').forEach((c) => {
+      const drift = 1 + 0.035 * Math.min(1, (now - t0) / 14000)          // 缓慢推近，画面不死
+      let [s, x, y] = (c.dataset.now || '1,0,0').split(',').map(Number)
+      if (c.dataset.to) { const a = ease((now - +c.dataset.zt) / 1200), A = c.dataset.from.split(',').map(Number), B = c.dataset.to.split(',').map(Number)
+        ;[s, x, y] = A.map((v, k) => v + (B[k] - v) * a); if (a >= 1) { c.dataset.now = c.dataset.to; delete c.dataset.to } }
+      const W = c.clientWidth, H = c.clientHeight, S = s * drift
+      // 把 (x%, y%) 放到画面中心，且不露出边
+      const tx = Math.min(0, Math.max(W - W * S, W / 2 - W * S * x / 100)), ty = Math.min(0, Math.max(H - H * S, H / 2 - H * S * y / 100))
+      c.style.transform = `translate(${s === 1 && !x ? 0 : tx}px,${s === 1 && !y ? 0 : ty}px) scale(${S})`
+    })
+  }
+  setInterval(tick, 16)
+  function fit() { const k = Math.min(innerWidth / 1920, innerHeight / 1080); document.getElementById('stage').style.transform = `scale(${k})` }
+  addEventListener('resize', fit); fit()
+  addEventListener('keydown', (e) => { if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) next(); if (e.key === 'ArrowLeft') go(Math.max(0, cur - 1), 0) })
+  const h = +(location.hash.match(/#p(\d+)/) || [])[1]; go(h ? h - 1 : 0, 0)
+  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags,
+    notes: (i) => '', state: () => ({ page: cur, frag }) }
+})()
+</script></body></html>

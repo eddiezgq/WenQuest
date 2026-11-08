@@ -1,0 +1,179 @@
+# 首页视频简介 18 · 电子与芯片（第 101 轮讲稿，Eddie 已审）。讲稿见 ../讲稿_第二批.md 第 18 段，画面、中文、英文照表里的写。
+# 画面全是真界面截图（2026-11-08 本机截）：
+#   - 官网首页“电子与芯片”一组（site/，intro_shots.py 直接截）；
+#   - 电路分析 /circuit、虚拟仪器 /instruments、电路板设计 /pcb-design（含 B 版“固件”标签）、芯片设计 /chip-design、
+#     电路板厂功能测试台 /fct：本机教学版数字工厂（hub 端口见 capture；起法见 ../README.md）。电路分析、虚拟仪器要计算服务：
+#     本机另起 `uvicorn cae.service:app --port 8200`（factory/digital，WQ_CAE_DATA 指一个临时目录），枢纽加 WQ_CAE_URL=http://127.0.0.1:8200；
+#     功能测试台要先有做过功能测试的板（tests/plant_loop.py 接一张 DRV-JOINT 订单走完，桥接 Node-RED 要起）。
+#   - 问渠电子 /eda/（起草台）、/eda/factory/（问渠贴片）：本机 `uvicorn app:app --port 8150`（services/eda，先装 requirements.txt），
+#     截图时 WQ_PROXY=eda=8150。起草台本机没有接 AI 模型，画面是填好示例需求、还没点“AI 起草”的页面；问渠贴片用“演示资料包”真跑检查
+#     （演示资料包故意漏了 C47 的物料编号，演示工厂是虚构的）。问题单要 AI 起草，本机截不到，画面停在检查结果。
+# 数字工厂界面只有中文，英文版用同一张图；官网、问渠电子按语言各截一张（问渠贴片的检查结果文字只有中文）。
+standalone: true
+langs: [zh, en]
+title: [问渠电子与芯片：从一个电路，一直连到工厂, "WenQuest electronics and chips: from a circuit all the way into the factory"]
+brand: [电子与芯片, Electronics and chips]
+deck_html: {en: 课件/index.html, zh: 课件/index.zh.html}
+note: [画面里的驱动板、芯片和固件都是示例设计，未投产、未流片；工厂和数字都是教学演示数据。, 'The boards, chip and firmware shown are example designs, not in production or taped out; plants and figures are teaching demo data.']
+tags:
+  zh: [电子, 电路分析, 虚拟仪器, 电路板设计, KiCad, 固件, Renode, 芯片设计, Verilog, 开源 EDA, 数字工厂, 问渠]
+  en: [electronics, circuit analysis, virtual instruments, PCB design, KiCad, firmware, Renode, chip design, Verilog, open-source EDA, digital factory, WenQuest]
+pace: {speed: 1.0, head: 0.5, pause: 0.15, tail: 0.6, hold: 0.3, xfade: 0.4}
+capture:
+  - {name: home-elec, url: /, scroll: "#atlas-elec", offset: 80, wait: 1500}
+  - {name: circuit, hub: 8141, url: /circuit, wait: 6000, click: ["button:has-text(\"运行\")"], js: "new Promise((r) => setTimeout(() => { window.scrollTo(0, 330); r() }, 6000))"}
+  - {name: instruments, hub: 8141, url: /instruments, wait: 5000, click: ["button:has-text(\"4 霍尔\")"]}
+  - {name: pcb-design, hub: 8142, url: "/pcb-design?rev=B&tab=pcb", wait: 6000}
+  - {name: firmware, hub: 8142, url: "/pcb-design?rev=B&tab=fw", wait: 8000, js: "(() => { const e = [...document.querySelectorAll('h3')].find((x) => x.textContent.includes('场景')); e.scrollIntoView({block: 'start'}); window.scrollBy(0, -90) })()"}
+  - {name: chip-layout, hub: 8142, url: "/chip-design?tab=lay", wait: 8000}
+  - {name: pcb-fct, hub: 8142, url: /fct}
+  - {name: eda-desk, url: /eda/, click: "#examples button", wait: 1500}
+  - {name: eda-factory, url: /eda/factory/, click: ["#demo", "#res tr:has-text('C47')"], wait_click: 15000, scroll: "#tally", offset: 24, wait: 1500}
+shots:
+- id: s01
+  kind: page
+  page: 1
+  part: [开场, Intro]
+  slide: {layout: cover, img: home-elec, title: [一个电路，一直连到工厂, 'From a circuit, all the way into the factory'],
+          sub: [问渠的电子线：一个电路、一块板、一颗芯片, "WenQuest's electronics track: a circuit, a board, a chip"]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>问渠的电子线，从一个电路、一块板、一颗芯片，一直连到工厂。']
+    en: [">WenQuest's electronics track runs from a circuit, to a board, to a chip, and all the way into the factory."]
+- id: s02
+  kind: page
+  page: 2
+  part: [电路分析, Circuit analysis]
+  slide:
+    img: circuit
+    url: factory.wenquestrobotics.com/circuit
+    kick: [电路分析, Circuit analysis]
+    title: [在浏览器里搭电路、改元件值, 'Build a circuit, change a value, in the browser']
+    points:
+      - {text: [改元件值, Change a value], ring: [19.5, 27, 60, 14.5]}
+      - {text: [仿真当场跑，波形马上出来, 'The simulation runs on the spot'], zoom: [1.35, 55, 72]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>先是电路分析：在浏览器里搭电路、改元件值，', '>仿真当场跑，波形马上出来。']
+    en: ['>It starts with circuit analysis: build a circuit in the browser, change a value,', '>and the simulation runs on the spot.']
+- id: s03
+  kind: page
+  page: 3
+  part: [虚拟仪器, Virtual instruments]
+  slide:
+    img: instruments
+    url: factory.wenquestrobotics.com/instruments
+    kick: [虚拟仪器, Virtual instruments]
+    title: [传感器、示波器、万用表，搬到网页上, 'Sensors, oscilloscopes and meters on the web']
+    points:
+      - {text: [传感器、示波器、万用表, 'Sensors, oscilloscopes, meters'], ring: [58.5, 56, 38.5, 44]}
+      - {text: [参数按真实器件设定, Set up like real devices], ring: [19.5, 41, 76.5, 6.5]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>虚拟仪器把传感器、示波器、万用表搬到网页上，', '>参数按真实器件设定。']
+    en: ['>Virtual instruments bring sensors, oscilloscopes and meters to the web,', '>set up like real devices.']
+- id: s04
+  kind: page
+  page: 4
+  part: [驱动板, Drive board]
+  slide:
+    img: pcb-design
+    url: factory.wenquestrobotics.com/pcb-design
+    kick: [电路板设计, Board design]
+    title: [一块真实的关节驱动板, A real joint drive board]
+    points:
+      - {text: [原理图、PCB 由设计描述自动生成, 'Schematic and layout generated from a design description'], ring: [18, 43, 47.5, 5]}
+      - {text: [A 版、B 版对照着看, 'Compare revisions A and B'], ring: [18, 19, 30.5, 5]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>然后是一块真实的关节驱动板：原理图、PCB 都由设计描述自动生成，', '>A 版、B 版可以对照着看。']
+    en: ['>Then a real joint drive board: the schematic and layout are generated from a design description,', '>and you can compare revisions A and B side by side.']
+- id: s05
+  kind: page
+  page: 5
+  part: [固件, Firmware]
+  slide:
+    img: firmware
+    url: factory.wenquestrobotics.com/pcb-design
+    kick: [板上的固件, The board's firmware]
+    title: [在仿真器里带着电机转, Spinning a motor in a simulator]
+    points:
+      - {text: [电流环、编码器、抱闸、保护, 'Current loop, encoders, brake, protections'], ring: [19.5, 13, 73.5, 18.5]}
+      - {text: [一个个场景都能看, Scenario by scenario], zoom: [1.3, 55, 58]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>板上的固件也能跑：在仿真器里带着电机转，', '>电流环、编码器、抱闸、保护，一个个场景都能看。']
+    en: ['>Its firmware runs too, spinning a motor in a simulator:', '>current loop, encoders, brake and protections, scenario by scenario.']
+- id: s06
+  kind: page
+  page: 6
+  part: [芯片, Chip]
+  slide:
+    img: chip-layout
+    url: factory.wenquestrobotics.com/chip-design
+    kick: [芯片设计, Chip design]
+    title: [编码器接口芯片，自己设计, 'An encoder interface chip, our own design']
+    points:
+      - {text: [Verilog → 综合 → 版图, Verilog → synthesis → layout], ring: [18, 30.5, 39.5, 5]}
+      - {text: [全用开源工具, All open-source tools], zoom: [1.4, 55, 75]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>板上那颗编码器接口芯片也是我们自己设计的：从 Verilog 到综合、版图，', '>用的全是开源工具。']
+    en: ['>The encoder interface chip on that board is our own design too, from Verilog through synthesis to layout,', '>all with open-source tools.']
+- id: s07
+  kind: page
+  page: 7
+  part: [进工厂, Into the factory]
+  slide:
+    img: pcb-fct
+    url: pcb.factory.wenquestrobotics.com/fct
+    kick: [数字工厂, Digital factory]
+    title: [电路板厂、芯片封测厂生产、测试, 'Built and tested in the board and chip plants']
+    points:
+      - {text: [每块板出厂前逐项测, Every board tested before it ships], ring: [41, 25.5, 53.5, 5]}
+      - {text: [关节驱动板，再卖给机器人厂, 'Joint drive boards, on to the robot plant'], ring: [27, 12.5, 59, 5]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>设计好的板子和芯片，进数字工厂的电路板厂、芯片封测厂生产、测试，', '>再卖给机器人厂。']
+    en: [">The boards and chips then go into production and test in the digital factory's circuit board and chip plants,", '>and on to the robot plant.']
+- id: s08
+  kind: page
+  page: 8
+  part: [问渠电子, WenQuest Electronics]
+  slide:
+    img: eda-desk
+    url: wenquestrobotics.com/eda/
+    kick: [问渠电子 · 起草台, WenQuest Electronics · drafting desk]
+    title: [面向企业：AI 帮你起草设计, 'For companies: AI drafts the design']
+    points:
+      - {text: [写下需求，AI 起草, 'Write the requirement; AI drafts'], ring: [9, 27.5, 82.5, 35.5]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>面向企业，还有问渠电子：AI 帮你起草设计，']
+    en: ['>For companies there is WenQuest Electronics: AI drafts the design,']
+- id: s09
+  kind: page
+  page: 9
+  part: [问渠电子, WenQuest Electronics]
+  slide:
+    img: eda-factory
+    url: wenquestrobotics.com/eda/factory/
+    kick: [问渠电子 · 工厂端, WenQuest Electronics · factory side]
+    title: [生产资料进厂，先自动查一遍, 'Incoming production files, checked automatically']
+    points:
+      - {text: [自动查一遍, Checked automatically], ring: [8.5, 4.5, 25, 7.5]}
+      - {text: [有问题当场开问题单, Issues raised on the spot], ring: [20, 77.5, 6, 10]}
+  steps: [{show: 0.25}, {show: 1}]
+  say:
+    zh: ['>工厂收到生产资料先自动查一遍，', '>有问题当场开问题单。']
+    en: ['>and the factory checks incoming production files automatically', '>and raises issues on the spot.']
+- id: s10
+  kind: page
+  page: 10
+  part: [结尾, Outro]
+  slide: {layout: end, img: home-elec, title: [首页“电子与芯片”, '"Electronics and chips"'],
+          sub: [这些都能在这里直接打开, You can open every one of them here], link: [问渠官网首页 → 电子与芯片, wenquestrobotics.com]}
+  steps: [{show: 1}]
+  say:
+    zh: ['>这些都能在首页“电子与芯片”里直接打开。']
+    en: ['>You can open every one of them from "Electronics and chips" on our homepage.']
