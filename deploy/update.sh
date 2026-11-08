@@ -84,7 +84,10 @@ for _ in $(seq 1 90); do
     status=$(docker inspect -f '{{.State.Health.Status}}' "$(dc ps -q moodle)" 2>/dev/null || echo unknown)
     if [ "$status" = "healthy" ]; then
         log "Learning platform is healthy."
-        docker image prune -f >/dev/null
+        # 旧版本的镜像不留：每次部署都换一套新标签，原来只清无标签的，国内 11-08 攒到 143 个镜像 84 GB 把盘写满、
+        # Moodle 起不来。只删没有容器在用、而且建了一天以上的；回退（rollback.sh）要用时会从镜像仓库重新拉。
+        docker image prune -af --filter "until=24h" >/dev/null || true
+        docker builder prune -af --filter "until=24h" >/dev/null 2>&1 || true
         exit 0
     fi
     sleep 10
