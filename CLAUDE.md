@@ -32,7 +32,7 @@
 | 前端（uni-app，网页 + 微信小程序） | `apps/web/` | `npm ci && npm test && npm run build:h5` |
 | 接口网关（FastAPI） | `services/gateway/` | `pip install -r requirements-dev.txt && python -m pytest -q` |
 | Moodle 插件 | `plugins/` | — |
-| 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 跑检查，每半小时定时上线；手动 `gh workflow run deploy.yml --ref main` 默认增量（没改的教材跳过），全量重建要加 `-f fresh=true`（几个小时的用量，第 113 轮） |
+| 部署 | `.github/workflows/deploy.yml`、`deploy/` | 推送 main 跑检查，每半小时定时上线；手动 `gh workflow run deploy.yml --ref main` 默认增量（没改的教材跳过），全量重建要加 `-f fresh=true`（几个小时的用量，第 116 轮） |
 | 本地完整环境（Moodle + 网关 + 网页端） | `tools/local/setup.sh`，说明见 `docs/帮助/本地测试环境.md` | 推送前用老师和学生账号实际走一遍 |
 
 改了平台要读的数据格式（例如教材 `web/index.json` 的字段或类型），必须连 `services/gateway` 的测试一起跑，并且用真实构建产物把页面打开一遍再推——只跑 `textbook/tools` 的测试不够：2026-10-08 加数学篇的 M 章号时就是这样把《人工智能》整本的目录页跑成了 500。

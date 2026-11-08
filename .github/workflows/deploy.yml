@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
     inputs:
       fresh:
-        description: "全量重建（不取回缓存、九本教材全查，要几个小时）。不勾 = 增量，只查改过的书（第 113 轮）"
+        description: "全量重建（不取回缓存、九本教材全查，要几个小时）。不勾 = 增量，只查改过的书（第 116 轮）"
         type: boolean
         default: false
   schedule:
@@ -34,7 +34,7 @@ permissions:
 
 env:
   # 从头全量重建（不取回缓存、九本书全查）：只有每周一那次，和手动触发时勾了 fresh。
-  # 其余（推送、每半小时、默认的手动触发）都按增量——第 113 轮：手动触发原来也全量，一次五六个小时的用量，11-08 把预算用完
+  # 其余（推送、每半小时、默认的手动触发）都按增量——第 116 轮：手动触发原来也全量，一次五六个小时的用量，11-08 把预算用完
   FRESH: ${{ github.event.schedule == '17 7 * * 1' || (github.event_name == 'workflow_dispatch' && github.event.inputs.fresh == 'true') }}
 
 concurrency:
