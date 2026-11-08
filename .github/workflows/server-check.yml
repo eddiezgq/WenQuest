@@ -4,6 +4,11 @@ name: Server check 服务器体检
 on:
   workflow_dispatch:
     inputs:
+      server:
+        description: "哪台服务器（11-08 加 cn：国内磁盘满，Moodle 起不来）"
+        type: choice
+        options: ["us", "cn"]
+        default: "us"
       clean:
         description: "yes：清理不用的 Docker 镜像和构建缓存（只在磁盘满时用）"
         type: choice
@@ -17,15 +22,16 @@ jobs:
     environment: production
     timeout-minutes: 15
     env:
-      HOST: ${{ secrets.DEPLOY_HOST }}
+      HOST: ${{ inputs.server == 'cn' && secrets.CN_DEPLOY_HOST || secrets.DEPLOY_HOST }}
     steps:
       - name: Set up SSH
         run: |
           install -d -m 700 ~/.ssh
-          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          printf '%s\n' "${{ inputs.server == 'cn' && secrets.CN_DEPLOY_SSH_KEY || secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          if [ -n "${{ secrets.DEPLOY_KNOWN_HOSTS }}" ]; then
-            printf '%s\n' "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          kh="${{ inputs.server == 'cn' && secrets.CN_DEPLOY_KNOWN_HOSTS || secrets.DEPLOY_KNOWN_HOSTS }}"
+          if [ -n "$kh" ]; then
+            printf '%s\n' "$kh" > ~/.ssh/known_hosts
           else
             ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null
           fi
@@ -39,6 +45,10 @@ jobs:
           echo "SSH OK" | note
           ssh "deploy@$HOST" 'df -h / /opt 2>/dev/null; df -i / | tail -1' | sed 's/^/disk: /' | note
           ssh "deploy@$HOST" 'docker system df 2>&1 | head -6' | sed 's/^/docker: /' | note
+          # 哪里占得多：/opt/wenquest 下各目录、Docker 卷、日志
+          ssh "deploy@$HOST" 'du -xsh /opt/wenquest/* /opt/wenquest/.[!.]* 2>/dev/null | sort -rh | head -12' | sed 's/^/du: /' | note
+          ssh "deploy@$HOST" 'docker system df -v 2>/dev/null | awk "/VOLUME NAME/{f=1;next} /^$/{f=0} f" | sort -k3 -rh | head -8' | sed 's/^/vol: /' | note
+          ssh "deploy@$HOST" 'sudo -n du -xsh /var/lib/docker/containers /var/log 2>/dev/null; journalctl --disk-usage 2>/dev/null' | sed 's/^/sys: /' | note
           ssh "deploy@$HOST" 'ls -ld /opt/wenquest /opt/wenquest/site /opt/wenquest/deploy 2>&1; find /opt/wenquest/site /opt/wenquest/deploy -maxdepth 2 ! -user deploy 2>/dev/null | head -5' | sed 's/^/perm: /' | note
           ssh "deploy@$HOST" 'p=/opt/wenquest/site/.probe; (echo x > $p && rm -f $p && echo write OK) 2>&1' | sed 's/^/write: /' | note
       - uses: actions/checkout@v4
