@@ -1,0 +1,51 @@
+# 问渠电子 KiCad 插件（第 113 轮 P6）：装 KiCad 9，用无界面的 pcbnew 打开驱动板 A 并打开进程间接口，跑插件的真测试。
+# 只在改了插件、进程间接口读入或这个文件时跑（推到 main、开 PR），也可以手动跑。不部署任何东西。
+name: eda-plugin
+on:
+  push:
+    branches: [main]
+    paths: ["eda/kicad-plugin/**", "eda/wqeda/readers/kicad_ipc.py", "eda/wqeda/readback.py", ".github/workflows/eda-plugin.yml"]
+  pull_request:
+    paths: ["eda/kicad-plugin/**", "eda/wqeda/readers/kicad_ipc.py", "eda/wqeda/readback.py", ".github/workflows/eda-plugin.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: eda-plugin-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kicad9:
+    name: KiCad 9 插件
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: 装 KiCad 9（官方 PPA）
+        run: |
+          sudo add-apt-repository -y ppa:kicad/kicad-9.0-releases
+          sudo apt-get update -q
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends kicad xvfb xauth >/dev/null
+          python3 -m pip install --break-system-packages -q "kicad-python>=0.3.0,<0.9" shapely==2.1.2 pyyaml pytest gerbonara==1.6.3
+          kicad-cli version
+      - name: 打开进程间接口，用无界面的 pcbnew 打开驱动板 A
+        run: |
+          cfg=~/.config/kicad/9.0
+          mkdir -p $cfg
+          printf '(fp_lib_table\n  (version 7)\n)\n' > $cfg/fp-lib-table
+          printf '(sym_lib_table\n  (version 7)\n)\n' > $cfg/sym-lib-table
+          echo '{"api": {"enable_server": true}}' > $cfg/kicad_common.json
+          (xvfb-run -a pcbnew factory/designs/drv-joint/kicad/drv-joint.kicad_pcb > /tmp/pcbnew.log 2>&1 &)
+          for i in $(seq 1 90); do
+            [ -S /tmp/kicad/api.sock ] && break
+            sleep 2
+          done
+          ls -la /tmp/kicad || (cat /tmp/pcbnew.log; exit 1)
+          sleep 10
+      - name: 插件测试（真 KiCad 9）
+        env:
+          WQ_KICAD_IPC: "1"
+        run: |
+          timeout 900 python3 -m pytest -v -p no:cacheprovider -o faulthandler_timeout=120 eda/tests/test_plugin_ipc.py -s
+      - name: 失败时的 pcbnew 日志
+        if: failure()
+        run: tail -100 /tmp/pcbnew.log || true

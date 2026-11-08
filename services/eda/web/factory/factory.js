@@ -1,7 +1,7 @@
 // 问渠贴片 · 新产品导入（第 112 轮 P5）。不用框架。判定都在服务器的确定性代码里；这里上传、显示、编辑问题单。
 "use strict";
 const T = {
-  zh: {brand: "问渠贴片", desk: "新产品导入", toDesk: "起草台", help: "帮助", title: "客户的资料包，进厂前先查一遍",
+  zh: {brand: "问渠贴片", desk: "新产品导入", toDesk: "起草台", help: "帮助", view: "网页审图", title: "客户的资料包，进厂前先查一遍",
     lede: "上传光绘、钻孔、物料清单和坐标，按本厂的工艺能力查：资料对不对得上、板子做不做得出、好不好贴。查出的问题由 AI 起草成给客户的问题单，你改完、确认后才导出。文件算完就删，不存服务器。",
     factory: "按哪家工厂的工艺能力查", gerber: "光绘和钻孔（一个 zip，或多个文件）", bom: "物料清单（CSV）", cpl: "贴片坐标（CSV）",
     demo: "用演示资料包", go: "检查", scope: "演示工厂都是虚构的，工艺能力是示例值。演示资料包是驱动板 A 版，故意漏了一个物料编号。",
@@ -18,7 +18,7 @@ const T = {
     col: "列", file: "文件", layer: "认成", mapBom: "物料清单的列", mapCpl: "坐标的列", unset: "（没有）",
     keys: {refs: "位号", qty: "数量", value: "数值", package: "封装", item: "物料编号", ref: "位号", x: "X", y: "Y", rot: "角度", side: "面"},
     layersNeeded: "认不出哪个文件是哪一层：请在下面逐个指定，再点“检查”。", newIssue: "新问题"},
-  en: {brand: "WenQuest PCBA", desk: "New product introduction", toDesk: "Drafting desk", help: "Help", title: "Check the customer's data pack before it reaches the line",
+  en: {brand: "WenQuest PCBA", desk: "New product introduction", toDesk: "Drafting desk", help: "Help", view: "Web review", title: "Check the customer's data pack before it reaches the line",
     lede: "Upload the Gerber, drill, BOM and placement files and check them against this factory's capability: do the files agree, can the board be made, can it be assembled. AI drafts the findings into an engineering query; you edit and confirm before export. Files are deleted after the check and never stored.",
     factory: "Factory capability table", gerber: "Gerber and drill (one zip or several files)", bom: "BOM (CSV)", cpl: "Placement (CSV)",
     demo: "Use the demo pack", go: "Check", scope: "Demo factories are fictional with example values. The demo pack is drive board A with one part number left out on purpose.",

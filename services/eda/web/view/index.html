@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>问渠电子 · 网页审图</title>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="view.css">
+<script type="module" src="vendor/kicanvas.js"></script>
+</head>
+<body>
+<header class="bar">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><b data-t="brand">问渠电子</b><span class="sep">·</span><span data-t="desk">网页审图</span></div>
+  <nav>
+    <a href="../" data-t="toDesk">起草台</a>
+    <a href="../factory/" data-t="pcba">问渠贴片</a>
+    <a href="../help/#view" data-t="help">帮助</a>
+    <button id="lang" type="button" aria-label="中文 / English">EN</button>
+  </nav>
+</header>
+<main class="wide">
+  <h1 data-t="title">不装软件，看原理图和板子</h1>
+  <p class="lede" data-t="lede">选一块示例板子，旁边列出它报告里没通过的项，点一条，板子上就跳到那个位置。也可以打开自己电脑上的 KiCad 文件：文件只在浏览器里打开，不上传。</p>
+  <div class="pick">
+    <label><span data-t="design">示例设计</span> <select id="design"></select></label>
+    <label class="local"><span data-t="local">打开自己的 KiCad 文件（原理图、板子，可多选）</span>
+      <input id="files" type="file" multiple accept=".kicad_sch,.kicad_pcb,.kicad_pro"></label>
+  </div>
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+
+  <div class="layout">
+    <section class="viewer">
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="pcb" class="on" data-t="board">板子</button>
+        <button type="button" role="tab" data-tab="sch" data-t="sch">原理图</button>
+      </div>
+      <div id="pcb" class="pane"></div>
+      <div id="sch" class="pane" hidden></div>
+      <p class="hint" data-t="kicanvas">看图用的是 KiCanvas（开源，MIT 许可）。滚轮缩放，拖动平移。</p>
+    </section>
+    <aside class="list">
+      <h2 data-t="issues">报告里没通过的项</h2>
+      <div class="tally" id="tally"></div>
+      <ol id="issues"></ol>
+      <p class="hint" id="noReport" hidden data-t="noReport">自己的文件这里不做检查：要检查，请用问渠贴片上传资料包，或在 KiCad 插件里跑。</p>
+    </aside>
+  </div>
+</main>
+<script src="view.js"></script>
+</body>
+</html>

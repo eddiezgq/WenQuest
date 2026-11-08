@@ -11,7 +11,7 @@ code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4
 <h1>缝纫机企业 PLM 使用说明</h1>
 <p>PLM 是问渠质量 ERP 里的一个模块，管零件、零件的版本和 BOM（物料清单）。
 企业清单里打开 <code>plm</code> 模块后，左边栏“工程设计”下会出现“零件”。国内演示企业（海港五金供应，虚构）已经打开。</p>
-<p>已做好：<strong>零件库与编码</strong>、<strong>BOM 版本</strong>、<strong>设计变更（ECN）</strong>、<strong>型号衍生配置</strong>。FreeCAD 推送和导入、
+<p>已做好：<strong>零件库与编码</strong>、<strong>BOM 版本</strong>、<strong>设计变更（ECN）</strong>、<strong>型号衍生配置</strong>、<strong>接设计数据</strong>（FreeCAD 推送、STEP 和 Excel 导入）。
 缝纫机演示企业在后面（见《实施细则 · 第 109 轮》）。</p>
 <h2>谁能做什么</h2>
 <table>
@@ -102,5 +102,33 @@ code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4
    “和配置表一致”不是“是”的，会列出差在哪里（例如基础 BOM 出了新版本、某个选项换了零件）。
    已生成的型号不会自动改，请走设计变更修改。</li>
 </ol>
+<h2>接设计数据（FreeCAD、STEP、Excel）</h2>
+<p>左边栏“工程设计 → 设计数据”是收件箱。三种来路都进这里，每送来一批是一张“待核对”的单子：</p>
+<ol>
+<li><strong>FreeCAD 推送</strong>：</li>
+<li>装“问渠 PLM”插件：把质量 ERP 仓库 <code>freecad/WenQuestPLM</code> 文件夹复制到 FreeCAD 的 Mod 目录，重启。装了缝纫机工作台的，工作台里也会多出这两个按钮。</li>
+<li>老板在质量 ERP“集成”页新建一把钥匙，勾“从 FreeCAD 把设计数据送进 PLM 收件箱（plm:send）”。</li>
+<li>FreeCAD 里点“问渠 PLM 设置”，填质量 ERP 地址和钥匙；打开模型，点“推送到 PLM”。</li>
+<li>送出的内容：零件、部件（App::Part、装配），装配关系（链接装几次算几个），每个零件的 STEP；零件属性里有 PartNumber / Code / WQCode 就带上编码，设了材料就带材料和按密度算的质量。</li>
+<li><strong>上传 STEP</strong>：只读装配结构和零件名，不读几何；文件留在这批记录上。</li>
+<li><strong>上传 Excel 旧 BOM</strong>：表头写“父件编码、子件编码、数量”（平铺表），或“层级、编码、数量”（层级表，层级写 1、2、3 或 .2、..3 或 1.2.1）；有“名称、单位、自制/外购、类别”也写上。</li>
+</ol>
+<p><strong>核对</strong>：
+- 页面顶上一行统计：共几行、对上已有零件几个、新零件几个（其中外购几个）、有下层零件的几个。行按装配层级缩进排列。
+- 编码和已有零件一样的自动对上；名称相近的会提示“可能是”。
+- 其他行是“新零件”，类别和自制 / 外购<strong>已按文件或名称猜好</strong>（文件里写了就用；有下层的是部件；否则看名称末尾，“上轴前轴套”是轴套；螺钉、轴承、电机、电子件、机针、旋梭、同步带默认外购）。请看一遍，不对的改掉。
+- 行多时：上面可以按名称或编码搜、只看“新零件”或某一类；勾选多行，一次改类别或自制 / 外购，点“应用”。
+- 编码在 ERPNext 里已有物料的，会提示；确实是同一个，勾“关联 ERPNext 物料”。
+- 下面有零件的必须是自制部件。
+- 它的 BOM 已发布的，要选一张列了它、已批准的设计变更。
+- 改完点“保存”。下面列出所有还不能写入的原因（例如装配包含了自己、两行对上同一个零件），全部解决才能写入。</p>
+<p><strong>写入（签字）</strong>：
+- 要么全部写成，要么一个都不写：任何一个零件或 BOM 建不成，整批保持“待核对”，并说明原因。
+- 新零件建好，STEP 挂到设计中的版本上，有下层零件的建成 BOM 草稿。BOM 已是草稿的，替换明细。
+- 然后在 ERPNext 建物料（旧 BOM 的单位如“个、支、根”ERPNext 里没有就先建上）。某个物料建不成，记在这批的历史里，到那个零件页点“重试”。
+- 不发布任何东西，发布照前面的步骤签字。</p>
+<p><strong>演示文件</strong>：质量 ERP 仓库 <code>demo/plm/</code> 里有一台虚构的平缝机（WQ-8800D）：347 个零件、29 个部件、5 层。
+<code>python demo/plm/lockstitch_bom.py</code> 写出 Excel 旧 BOM；<code>lockstitch_freecad.py</code> 在 FreeCAD 里搭出同样结构的模型，可以试“推送到 PLM”。</p>
+<p><strong>不采用</strong>：写原因，点“不采用”。</p>
 <h2>截图</h2>
-<p><code>docs/截图/第109轮-缝纫机企业PLM/</code>：零件清单、设计中的零件页、BOM 发布前检查、已发布的 BOM 与 ERPNext 草稿、B 版与 A 版的比较、设计变更。</p></main><script src="/assist.js" defer></script></body></html>
+<p><code>docs/截图/第109轮-缝纫机企业PLM/</code>：零件清单、设计中的零件页、BOM 发布前检查、已发布的 BOM 与 ERPNext 草稿、B 版与 A 版的比较、设计变更、型号配置、设计数据收件箱；<code>平缝机-*.png</code> 是 347 个零件的平缝机从 FreeCAD 推送、核对、写入、再用 Excel 对上的全过程。</p></main><script src="/assist.js" defer></script></body></html>

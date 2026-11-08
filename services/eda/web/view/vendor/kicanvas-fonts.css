@@ -1,0 +1,12 @@
+/* 网页审图用的字体（第 113 轮）：KiCanvas 原本从 fonts.googleapis.com 取，国内打不开，改成本站自带。
+   Material Symbols Outlined（Apache-2.0，npm material-symbols 0.27.0）只留 KiCanvas 用到的图标；Nunito（OFL-1.1，npm @fontsource/nunito 5.1.0）只留拉丁字符。 */
+@font-face{font-family:"Material Symbols Outlined";font-style:normal;font-weight:100 700;font-display:block;
+  src:url(material-symbols-outlined-subset.woff2) format("woff2")}
+.material-symbols-outlined{font-family:"Material Symbols Outlined";font-weight:normal;font-style:normal;font-size:24px;
+  line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;
+  direction:ltr;-webkit-font-feature-settings:"liga";font-feature-settings:"liga";-webkit-font-smoothing:antialiased}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:300;font-display:swap;src:url(nunito-latin-300-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:400;font-display:swap;src:url(nunito-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:500;font-display:swap;src:url(nunito-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:600;font-display:swap;src:url(nunito-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Nunito";font-style:normal;font-weight:700;font-display:swap;src:url(nunito-latin-700-normal.woff2) format("woff2")}
