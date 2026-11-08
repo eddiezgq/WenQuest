@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 只读诊断：每个来源各访问一次，看域名能否解析、返回什么页面。不重试、不绕过。
 APP="$HOME/tender-crawler"; IMG=$(cat "$APP/image.txt")
-docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e PYTHONPATH=/app/pylib -v "$APP":/app -w /app "$IMG" python - <<'PY'
+docker run -i --rm --user "$(id -u):$(id -g)" -e HOME=/tmp -e PYTHONPATH=/app/pylib -v "$APP":/app -w /app "$IMG" python - <<'PY'
 import socket, time, re, requests
 UA = "Mozilla/5.0 (compatible; TenderWatch/1.0; public announcements only)"
 for h in ["search.ccgp.gov.cn", "www.ccgp.gov.cn", "deal.ggzy.gov.cn", "www.ggzy.gov.cn", "ggzy.gov.cn"]:
