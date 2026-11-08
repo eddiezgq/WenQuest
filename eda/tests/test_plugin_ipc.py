@@ -73,3 +73,30 @@ def test_readback_and_jump(kb):
     assert "C27" in s.jump(i)
     picked = [x.reference_field.text.value for x in board.get_selection() if hasattr(x, "reference_field")]
     assert "C27" in picked
+
+
+def test_move_then_readback(kb):
+    """细则第四节第 4 步：在 KiCad 里挪一个器件 → 读回 → 设计描述里的摆放跟着变（测完挪回去）"""
+    from kipy.geometry import Vector2
+
+    from wqeda import readback as R
+    from wqeda.schema import design as D
+
+    _, board = kb
+    fp = next(f for f in board.get_footprints() if f.reference_field.text.value == "C27")
+    x0, y0 = fp.position.x, fp.position.y
+    fp.position = Vector2.from_xy(x0 + 1_000_000, y0)  # 往右挪 1 mm（KiCad 内部单位 nm）
+    board.update_items(fp)
+    try:
+        raw = D.read_yaml(A)
+        ch = R.compare(R.read_ipc(board), raw)
+        moved = [m for m in ch["moved"] if m["ref"] == "C27"]
+        assert moved and not ch["none"], R.describe(ch)
+        with open(A, encoding="utf-8") as f:
+            text = R.patch(f.read(), ch)
+        D.validate_design(D.read_yaml_text(text))
+        assert R.compare(R.read_ipc(board), D.read_yaml_text(text))["none"]
+    finally:
+        fp.position = Vector2.from_xy(x0, y0)
+        board.update_items(fp)
+    assert R.compare(R.read_ipc(board), D.read_yaml(A))["none"]
