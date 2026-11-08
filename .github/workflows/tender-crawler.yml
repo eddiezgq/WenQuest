@@ -40,6 +40,7 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "${{ secrets.CN_DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          printf 'Host *\n  ServerAliveInterval 30\n  ServerAliveCountMax 10\n' > ~/.ssh/config   # 抓取要十来分钟没有输出，保持连接
           if [ -n "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" ]; then
             printf '%s\n' "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
           else
