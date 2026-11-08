@@ -163,7 +163,8 @@ def register(app, m) -> None:
                              body.note.strip()[:2000], 1 if body.trial else 0, (body.seats or 5) if body.trial else 0))
             rid = cur.lastrowid
         if auto:
-            why = await m.orgs_auto_open(org[:100], name[:40], phone, email, body.seats or 5, rid, ip(req))
+            why = await m.orgs_auto_open(org[:100], name[:40], phone, email, body.seats or 5, rid, ip(req),
+                                         erp="问渠质量 ERP" in products)
             return {"ok": True, "opened": not why, "manual": why}
         return {"ok": True}
 

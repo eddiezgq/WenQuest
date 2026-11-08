@@ -50,6 +50,8 @@
       <view class="wq-row acts">
         <text class="wq-link" @click="change(o, { extend_days: 30 })">延长 30 天</text>
         <text class="wq-link" @click="change(o, { extend_days: 90 })">延长 90 天</text>
+        <!-- ops ADR-0027：要录自己数据试质量 ERP 的，发试点邀请（独立一套、数据保留） -->
+        <text v-if="o.email" class="wq-link" @click="toPilot(o)">转成质量 ERP 试点</text>
         <text v-if="o.seats < (info?.max_seats || 20)" class="wq-link" @click="change(o, { seats: o.seats + 1 })">账号数 +1</text>
         <text v-if="o.status === 'active'" class="wq-link danger" @click="change(o, { status: 'stopped' })">停用</text>
         <text v-else class="wq-link" @click="change(o, { status: 'active' })">恢复</text>
@@ -140,6 +142,12 @@ function openOrg() {
     await request("POST", "/api/v1/admin/orgs", { name: f.name.trim(), kind: f.kind, contact: f.contact, phone: f.phone, email: f.email,
       seats: f.seats || undefined, request_id: f.request_id || undefined });
     Object.assign(f, { name: "", contact: "", phone: "", email: "", seats: undefined, request_id: 0 });
+  });
+}
+function toPilot(o: Org) {
+  run(async () => {
+    await request("POST", "/api/v1/admin/pilots/invite", { email: o.email, company: o.name, lang: "zh" });
+    uni.showToast({ title: `试点邀请已发到 ${o.email}`, icon: "none" });
   });
 }
 function switchAuto() {

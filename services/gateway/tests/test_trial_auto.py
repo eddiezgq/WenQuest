@@ -127,3 +127,27 @@ def test_administrator_makes_an_owner(cn):
     assert cn.get("/api/v1/my/org", headers=hz).status_code == 404
     assert cn.put(f"/api/v1/admin/orgs/{o['id']}/members/{a['userid']}", json={"owner": True}, headers=h).json() == {"ok": True}
     assert cn.get("/api/v1/my/org", headers=hz).json()["id"] == o["id"]
+
+
+def test_quality_erp_trial_account_in_the_demo_company(cn, tmp_path, monkeypatch):
+    """ops ADR-0027: asking for the quality ERP as well queues an account in the shared demo company; the runner's
+    answer is emailed once, with the warning that the company is shared and reset every night."""
+    import asyncio
+    import json
+
+    q = tmp_path / "queue"
+    monkeypatch.setenv("WQ_PILOT_QUEUE", str(q))
+    r = apply(cn, org="宁波某机械", phone="13512345670", email="erp@qq.com", ip="7.7.7.7", products=["问渠质量 ERP"])
+    assert r.json()["opened"] is True
+    assert "另发一封" in [x for x in main.state.mailer.outbox if x["to"] == "erp@qq.com"][-1]["text"]
+    reqs = list(q.glob("trial-*.json"))
+    assert len(reqs) == 1
+    req = json.loads(reqs[0].read_text())
+    assert req["email"] == "erp@qq.com" and req["name"] == "郑吉"
+    (q / f"res-trial-{req['id']}.json").write_text(json.dumps({"id": req["id"], "email": "erp@qq.com",
+                                                               "password": "Abc123def456", "expires": "2026-12-07",
+                                                               "url": "https://qms.wenquestech.online"}))
+    asyncio.run(main.pilots_collect())
+    sent = main.state.mailer.outbox[-1]
+    assert sent["subject"] == "问渠质量 ERP 体验账号" and "Abc123def456" in sent["text"] and "每晚还原" in sent["text"]
+    assert not list(q.glob("res-trial-*"))

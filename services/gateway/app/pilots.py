@@ -85,6 +85,9 @@ def register(app, m) -> None:
                      code_sent integer default 0, tries integer default 0)""")
         c.execute("""create table if not exists tenant(id text primary key, company text, contact text, email text, lang text,
                      status text, error text, token text, created integer, ready integer)""")
+        # ops ADR-0027：官网申请里勾了“问渠质量 ERP”的，在共用演示企业里开一个体验账号（每晚还原）
+        c.execute("""create table if not exists trial(id text primary key, name text, email text, org text, status text,
+                     error text, created integer)""")
         return c
 
     def domain(kind: str, tid: str) -> str:
@@ -297,7 +300,11 @@ def register(app, m) -> None:
                     if admin:
                         await mail(admin, f"试点企业 {tid} 开通失败", f"{t['company']}（{t['email']}）开通失败：\n{s.get('error', '')}\n"
                                    "服务器上看 /opt/wenquest/pilot-queue 和 /opt/wenquest/qms-tenants/" + tid)
+        for f in sorted(q.glob("res-trial-*.json")):
+            await trial_done(f)
         for f in sorted(q.glob("res-*.json")):
+            if f.name.startswith("res-trial-"):
+                continue
             try:
                 res = json.loads(f.read_text(encoding="utf-8"))
             except (OSError, ValueError):
@@ -323,6 +330,42 @@ def register(app, m) -> None:
             f.unlink(missing_ok=True)                  # 密码只在这封邮件里
             with db() as c:
                 c.execute("update tenant set status='active', ready=?, error=null where id=?", (int(time.time()), tid))
+
+    # ------------------------------------------------------------------ 质量 ERP 共用演示企业的体验账号（ops ADR-0027）
+
+    def open_trial(name: str, email: str, org: str) -> str:
+        tid = "t" + secrets.token_hex(6)
+        with db() as c:
+            c.execute("insert into trial(id,name,email,org,status,created) values(?,?,?,?, 'queued', ?)",
+                      (tid, name, email.lower(), org, int(time.time())))
+        write(f"trial-{tid}.json", {"id": tid, "name": name, "email": email.lower()})
+        return tid
+
+    async def trial_done(f: Path) -> None:
+        try:
+            res = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return
+        with db() as c:
+            t = c.execute("select * from trial where id=?", (res.get("id", ""),)).fetchone()
+        if t and res.get("error"):
+            admin = state.settings.admin_email or state.settings.admin_email_fallback
+            if admin:
+                await mail(admin, "质量 ERP 体验账号没开成", f"{t['org']} {t['name']}（{t['email']}）：{res['error']}")
+            with db() as c:
+                c.execute("update trial set status='failed', error=? where id=?", (str(res["error"])[:500], t["id"]))
+        elif t:
+            await mail(t["email"], "问渠质量 ERP 体验账号",
+                       f"{t['name']}，你好：\n\n问渠质量 ERP 的体验账号已开通，可以用到 {res.get('expires')}。\n\n"
+                       f"工作台：{res.get('url')}\n账号：{res.get('email')}\n初始密码：{res.get('password')}\n\n"
+                       "请注意：这是供大家体验的共用演示企业（海港五金供应，数据是虚构的），别人也在用，每晚还原成演示数据。"
+                       "请不要录入真实的企业数据。\n\n想用自己的数据试（独立的一套、数据保留、免费 3 个月），直接回复这封邮件，"
+                       "我们为你开通独立的试点企业。\n\n问渠科技")
+            with db() as c:
+                c.execute("update trial set status='active', error=null where id=?", (t["id"],))
+        f.unlink(missing_ok=True)                      # 密码只在这封邮件里
+
+    m.pilots_open_trial = open_trial
 
     async def loop() -> None:
         while True:

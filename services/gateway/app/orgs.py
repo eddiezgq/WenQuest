@@ -314,7 +314,8 @@ def register(app, m) -> None:
     m.orgs_auto_on = lambda: cn() and auto_on()
     auto_hits: dict[str, list[float]] = {}
 
-    async def auto_open(org: str, name: str, phone: str, email: str, seats: int, request_id: int, ip: str) -> str:
+    async def auto_open(org: str, name: str, phone: str, email: str, seats: int, request_id: int, ip: str,
+                        erp: bool = False) -> str:
         """Open a trial at once for a verified request (round 96). Returns '' when opened (the account is mailed),
         else why it goes to the administrator instead (the request is kept either way)."""
         from .phone import norm_phone
@@ -356,6 +357,9 @@ def register(app, m) -> None:
                 f"登录网址：{url}\n账号：{a['login']}（也可以用手机号 {mobile} 登录）\n初始密码：{a['password']}\n\n"
                 f"登录后在左上角头像菜单“我的单位”里可以给同事开账号（共 {max(1, min(seats or st.cn_org_seats, 5))} 个）。\n"
                 "请登录后尽快修改密码。有问题直接回复这封邮件或打电话给我们。\n\n问渠科技")
+        if erp:                                       # 勾了“问渠质量 ERP”：共用演示企业的体验账号另发一封（ops ADR-0027）
+            m.pilots_open_trial(name, email, org)
+            text = text.replace("\n\n问渠科技", "\n\n问渠质量 ERP 的体验账号稍后另发一封邮件。\n\n问渠科技")
         await state.mailer.send(email, "问渠在线体验已开通", text)
         return ""
 
