@@ -320,13 +320,21 @@ def register(app: FastAPI) -> None:
                 blender = r.json() if r.status_code == 200 else "down"
             except (httpx.HTTPError, ValueError):
                 blender = "down"
+        docs: Any = False             # 在线编辑 Word、Excel（第 121 轮）：OnlyOffice 的 /healthcheck 返回 true
+        if state.settings.docs_url:
+            try:
+                async with httpx.AsyncClient(timeout=3.0, trust_env=False) as c:
+                    r = await c.get(state.settings.docs_url.rstrip("/") + "/healthcheck")
+                docs = "ok" if r.status_code == 200 and r.text.strip() == "true" else "down"
+            except httpx.HTTPError:
+                docs = "down"
         try:
             v3render = video3d_api.service(sys.modules[__name__]).render_on
         except Exception:  # noqa: BLE001
             v3render = False
         return {"ok": True, "version": VERSION, "ai": state.ai.provider, "region": state.settings.region, "slides": state.slides.available,
                 "slide_queue": state.slides.overview(), "animator": animator, "labcheck": labcheck, "voice": voice,
-                "video3d": {"stills": blender, "render": v3render}}
+                "video3d": {"stills": blender, "render": v3render}, "docs": docs}
 
     @app.post("/api/v1/auth/login", response_model=LoginOut)
     async def login(body: LoginIn, response: Response):

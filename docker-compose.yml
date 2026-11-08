@@ -83,6 +83,8 @@ services:
       WQ_MICROSYNTH_URL: http://micro-synth:8000
       # Lecture videos: speech synthesis and recognition by the voice service (below).
       WQ_VOICE_URL: http://voice:8000
+      # 在线文档服务（第 121 轮），只用来查健康；编辑走 Moodle 插件
+      WQ_DOCS_URL: http://docs
       # 三维仿真视频（第 38 轮）：关键画面在 blender 容器出；小样、高清租 Lambda 机器出（密钥 WQ_VIDEO3D_LAMBDA_KEY，空则用 WQ_GPU_LAMBDA_KEY）。
       WQ_VIDEO3D_BLENDER_URL: http://blender:8000
       WQ_VIDEO3D_LAMBDA_KEY: ${VIDEO3D_LAMBDA_KEY:-}
@@ -292,6 +294,33 @@ services:
       - no-new-privileges:true
     cap_drop: [ALL]
 
+  # 在线编辑 Word、Excel、PPT（第 121 轮）：OnlyOffice Docs 社区版，官方镜像不改代码（AGPL v3，保留“关于”页）。
+  # 浏览器经 Caddy 的 learn.<主域名>/docs/ 访问；Moodle 走内网 http://docs/；回调 Moodle 走公网地址（Caddy 在内网有同名别名）。
+  # 版本只在这里写一处：deploy/update.sh（国内镜像名）和 deploy.yml（国内同步清单）照这一行核对。
+  docs:
+    image: ${DOCS_IMAGE:-onlyoffice/documentserver:10.0.0.1}
+    restart: unless-stopped
+    mem_limit: 2g
+    environment:
+      JWT_ENABLED: "true"
+      # deploy/update.sh 第一次部署时生成并写进 .env；空 = 镜像自己随机生成（本机试用时 Moodle 连不上，但不会不设防）
+      JWT_SECRET: ${DOCS_JWT_SECRET:-}
+      JWT_HEADER: Authorization
+      # 回调 Moodle 的地址在内网解析到 Caddy（私有地址），要放行；请求都要带 JWT，别人借它访问内网也过不了签名
+      ALLOW_PRIVATE_IP_ADDRESS: "true"
+      # 插件（含自带 AI）全部关闭：国内只能用已备案模型，AI 统一走问渠自己的入口（第 121 轮 D-5）
+      PLUGINS_ENABLED: "false"
+    volumes:
+      - docsdata:/var/www/onlyoffice/Data
+      - docslib:/var/lib/onlyoffice
+      - docslog:/var/log/onlyoffice
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/healthcheck | grep -q true"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 3m
+
   # WenQuest web app (static files) with /api forwarded to the gateway.
   web:
     build: apps/web
@@ -325,3 +354,6 @@ volumes:
   dbdata:
   moodledata:
   gatewaydata:
+  docsdata:
+  docslib:
+  docslog:

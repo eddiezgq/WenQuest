@@ -76,6 +76,19 @@ learn.{$SITE_DOMAIN} {
 	handle /vendor/* {
 		import vendor_files
 	}
+	# 在线编辑 Word、Excel（第 121 轮）：OnlyOffice 放在 /docs/ 下，不另开子域名（不用加解析）。
+	# 它按 X-Forwarded-Host 拼自己的网址，所以把路径前缀一起告诉它（官方“虚拟路径”做法）。
+	redir /docs /docs/ 308
+	handle_path /docs/* {
+		reverse_proxy docs:80 {
+			header_up X-Forwarded-Host {host}/docs
+			header_up X-Forwarded-Proto {scheme}
+			transport http {
+				read_timeout 300s
+				write_timeout 300s
+			}
+		}
+	}
 	handle {
 		reverse_proxy web:80
 	}

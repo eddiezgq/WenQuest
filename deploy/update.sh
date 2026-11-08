@@ -63,6 +63,16 @@ if [ -r "$FACTORY_ENV" ]; then
     fi
 fi
 
+# 在线文档（第 121 轮）：OnlyOffice 和 Moodle 共用的签名密钥，第一次部署时生成；国内服务器拉不到 Docker Hub，
+# 镜像改用基础镜像所在的国内仓库（和 CADDY_IMAGE 同一处，deploy.yml 的国内同步清单里有它）。
+[ -n "$(envval DOCS_JWT_SECRET)" ] || { envset DOCS_JWT_SECRET "$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n')"; log "Online documents key created."; }
+docs_ref=$(grep -oE 'onlyoffice/documentserver:[0-9.]+' "$WQ_DIR/docker-compose.yml" | head -n 1 || true)
+caddy_img=$(envval CADDY_IMAGE)
+if [ -n "$docs_ref" ] && [ "${caddy_img%/caddy:*}" != "$caddy_img" ]; then
+    want="${caddy_img%/caddy:*}/${docs_ref#onlyoffice/}"
+    [ "$want" = "$(envval DOCS_IMAGE)" ] || { envset DOCS_IMAGE "$want"; log "Online documents image: $want"; }
+fi
+
 log "Starting services..."
 dc up -d --no-build --remove-orphans
 

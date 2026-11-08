@@ -278,3 +278,22 @@ def test_health_reports_ai_provider_without_secrets(client):
     assert r["ok"] is True and r["ai"] in ("claude", "deepseek", "fake", "none")
     assert r["region"] == "us"   # 第 34 轮：不写 WQ_REGION = 美国，行为不变
     assert "key" not in str(r).lower()
+
+
+def test_health_reports_online_documents(client, monkeypatch):
+    """第 121 轮：在线文档服务（OnlyOffice）的 /healthcheck 返回 true 才算正常；没配置时为 False。"""
+    assert client.get("/api/health").json()["docs"] is False
+    real = httpx.AsyncClient
+    answer = {"text": "true"}
+
+    def fake(*a, **k):
+        def handler(req):
+            if req.url.host == "docs" and req.url.path == "/healthcheck":
+                return httpx.Response(200, text=answer["text"])
+            return httpx.Response(404)
+        return real(transport=httpx.MockTransport(handler), timeout=k.get("timeout"))
+    monkeypatch.setattr(httpx, "AsyncClient", fake)
+    monkeypatch.setattr(main.state.settings, "docs_url", "http://docs")
+    assert client.get("/api/health").json()["docs"] == "ok"
+    answer["text"] = "false"
+    assert client.get("/api/health").json()["docs"] == "down"

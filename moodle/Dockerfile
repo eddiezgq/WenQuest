@@ -34,6 +34,15 @@ ARG MULTILANG2_REF=0c6fc6f11b6cd8b729ce7ca261d593ba06a1cf35
 RUN git clone -q https://github.com/iarenaza/moodle-filter_multilang2.git public/filter/multilang2 \
     && git -C public/filter/multilang2 checkout -q "$MULTILANG2_REF" && rm -rf public/filter/multilang2/.git
 
+# 在线编辑 Word、Excel（第 121 轮）：OnlyOffice 的课程活动插件和作业在线提交插件（固定提交，支持 Moodle 4.5–5.3）。
+# 文档服务本身是容器 docs；地址和密钥由 setup_wenquest.php 按环境变量填写。
+ARG OO_MOD_REF=5cd78f0974d7f6350db386d5490042529c075706
+ARG OO_ASSIGN_REF=42ea54f44bb7c9c755e4f7a5b6923aefc4d28f75
+RUN git clone -q https://github.com/ONLYOFFICE/onlyoffice-moodle.git public/mod/onlyofficeeditor \
+    && git -C public/mod/onlyofficeeditor checkout -q "$OO_MOD_REF" && rm -rf public/mod/onlyofficeeditor/.git \
+    && git clone -q https://github.com/ONLYOFFICE/moodle-assignsubmission_onlyoffice.git public/mod/assign/submission/onlyoffice \
+    && git -C public/mod/assign/submission/onlyoffice checkout -q "$OO_ASSIGN_REF" && rm -rf public/mod/assign/submission/onlyoffice/.git
+
 # Language packs are downloaded at build time; a failed download is not fatal.
 RUN mkdir -p /opt/langpacks && for l in $LANGPACKS; do \
         curl -fsSL -o /tmp/$l.zip "https://download.moodle.org/download.php/direct/langpack/5.2/$l.zip" \

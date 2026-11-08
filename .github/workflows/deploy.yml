@@ -67,6 +67,13 @@ jobs:
           docker run --rm -v "$PWD/deploy:/d:ro" -e SITE_DOMAIN=example.com -e ACME_EMAIL=ci@example.com caddy:2 caddy validate --config /d/Caddyfile --adapter caddyfile
           # 第 34 轮：国内服务器（WQ_REGION=cn）的设置也要有效
           docker run --rm -v "$PWD/deploy:/d:ro" -e SITE_DOMAIN=example.cn -e ACME_EMAIL=ci@example.cn -e WQ_REGION=cn caddy:2 caddy validate --config /d/Caddyfile --adapter caddyfile
+      - name: Online documents image is consistent and exists (第 121 轮)
+        run: |
+          ref=$(grep -oE 'onlyoffice/documentserver:[0-9.]+' docker-compose.yml | head -n 1)
+          [ -n "$ref" ] || { echo "::error::docker-compose.yml 的 docs 服务没有固定版本"; exit 1; }
+          grep -qE "BASE:.* $ref( |\$)" .github/workflows/deploy.yml || { echo "::error::deploy.yml 国内同步清单 BASE 里的 OnlyOffice 版本与 docker-compose.yml（$ref）不一致"; exit 1; }
+          docker manifest inspect "$ref" > /dev/null || { echo "::error::Docker Hub 上没有 $ref"; exit 1; }
+          echo "OK: $ref"
       - name: Pages that go live load no Google Fonts or public CDN (第 34 轮：国内访问不了)
         run: python3 tools/vendor/check_external.py
       - name: China website 问渠科技 is up to date and compliant (第 48 轮)
@@ -690,7 +697,8 @@ jobs:
       HOST: ${{ secrets.CN_DEPLOY_HOST }}
       IMAGE: ${{ needs.build.outputs.image }}
       PLATFORM: engine gateway web animator labcheck micro-synth voice blender cam bearing eda
-      BASE: postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1
+      # 在线文档 OnlyOffice（第 121 轮）：版本与 docker-compose.yml 的 docs 服务一致（“部署文件一致”检查核对）
+      BASE: postgres:16-alpine redis:7-alpine caddy:2 rclone/rclone:1 onlyoffice/documentserver:10.0.0.1
       FIRST: gateway web cam bearing eda engine labcheck micro-synth voice animator blender   # 自带仓库先传小的、必需的，大的放后面
     steps:
       - uses: docker/setup-buildx-action@v3

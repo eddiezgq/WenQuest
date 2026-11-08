@@ -34,9 +34,12 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     networks:
-      - default
-      - qms-edge
-      - factory-edge   # 数字工厂（factory. 与 erp. 两个网址）
+      default:
+        # 在线文档（第 121 轮）：OnlyOffice 回调 Moodle 用公网地址 classic.<主域名>，在内网直接落到 Caddy，不绕公网
+        aliases:
+          - classic.${SITE_DOMAIN}
+      qms-edge: {}
+      factory-edge: {}   # 数字工厂（factory. 与 erp. 两个网址）
 
   web:
     ports: !reset []

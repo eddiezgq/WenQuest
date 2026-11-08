@@ -107,4 +107,24 @@ if ($secret !== '' && $service) {
     mtrace('WenQuest accounts service not set up (WQ_SECRET_KEY missing or plugin not installed yet).');
 }
 
+// 在线编辑 Word、Excel（第 121 轮）：OnlyOffice 文档服务的地址和签名密钥。
+// 浏览器走 learn.<主域名>/docs（Caddy 转给容器 docs）；Moodle 自己走内网 http://docs；
+// 文档服务回调 Moodle 用公网地址（wwwroot），在服务器内网由 Caddy 的同名别名接住。插件（含 AI）一律关闭。
+$docssecret = (string) getenv('DOCS_JWT_SECRET');
+$appurl = rtrim((string) getenv('APP_URL'), '/');
+if ($docssecret !== '' && $appurl !== '' && file_exists($CFG->dirroot . '/mod/onlyofficeeditor/version.php')) {
+    set_config('documentserverurl', $appurl . '/docs', 'onlyofficeeditor');
+    set_config('documentserverinternal', (string) (getenv('DOCS_INTERNAL_URL') ?: 'http://docs'), 'onlyofficeeditor');
+    set_config('storageurl', '', 'onlyofficeeditor');
+    set_config('documentserversecret', $docssecret, 'onlyofficeeditor');
+    set_config('jwtheader', 'Authorization', 'onlyofficeeditor');
+    set_config('disable_verify_ssl', 0, 'onlyofficeeditor');
+    set_config('editor_security_plugin', 0, 'onlyofficeeditor');
+    set_config('editor_security_macros', 0, 'onlyofficeeditor');
+    set_config('editor_view_feedback', 0, 'onlyofficeeditor');
+    mtrace('Online documents (OnlyOffice): ' . $appurl . '/docs');
+} else {
+    mtrace('Online documents not set up (DOCS_JWT_SECRET or APP_URL missing, or plugin not installed).');
+}
+
 mtrace('WenQuest gateway access: web services, mobile service and multi-language filters enabled.');
