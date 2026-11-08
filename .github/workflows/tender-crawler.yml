@@ -78,6 +78,8 @@ jobs:
           mkdir -p feed
           scp "deploy@$HOST:tender-crawler/data/latest.json" "deploy@$HOST:tender-crawler/data/latest.md" feed/
           cat feed/latest.md >> "$GITHUB_STEP_SUMMARY"
+          # 附件下载地址（blob.core.windows.net）在一些环境里不能访问，结果同时写进日志，用 gh run view --log 读取
+          echo "=====TENDER-FEED-JSON-BEGIN====="; python3 -c "import json;print(json.dumps(json.load(open('feed/latest.json')),ensure_ascii=False))"; echo "=====TENDER-FEED-JSON-END====="
 
       - uses: actions/upload-artifact@v4
         if: always() && hashFiles('feed/latest.json') != ''
