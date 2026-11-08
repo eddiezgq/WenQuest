@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "install=安装/升级并试跑；run=立即抓一次；status=看状态；fetch=取回最新结果；probe=只读诊断来源"
+        description: "install=安装/升级并试跑；run=立即抓一次；status=看状态；fetch=取回最新结果；probe=只读诊断来源；cleanup=服务器磁盘清理（deploy/free-disk.sh）"
         type: choice
-        options: [fetch, status, run, install, probe]
+        options: [fetch, status, run, install, probe, cleanup]
         default: fetch
       urls:
         description: "probe 时要看的网址（空格分隔，可留空）"
@@ -62,6 +62,10 @@ jobs:
         if: env.ACTION == 'status'
         run: |
           ssh "deploy@$HOST" 'df -h / /opt 2>/dev/null; docker system df 2>/dev/null; du -sh ~/tender-crawler ~/tender-crawler/* /opt/wenquest/* 2>/dev/null | sort -h | tail -15; cd ~/tender-crawler && echo "镜像: $(cat image.txt)"; crontab -l | grep tender-crawler; echo "最后运行: $(cat data/.last_run 2>/dev/null)"; ls -la data | tail -15; tail -40 data/cron.log 2>/dev/null'
+
+      - name: Free disk space
+        if: env.ACTION == 'cleanup'   # 只在手动选 cleanup 时运行
+        run: ssh "deploy@$HOST" 'bash -s' < deploy/free-disk.sh
 
       - name: Probe sources
         if: env.ACTION == 'probe'
