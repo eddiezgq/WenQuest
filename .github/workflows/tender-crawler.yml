@@ -10,6 +10,10 @@ on:
         type: choice
         options: [fetch, status, run, install, probe]
         default: fetch
+      urls:
+        description: "probe 时要看的网址（空格分隔，可留空）"
+        required: false
+        default: ""
   schedule:
     - cron: "10 23 * * *"   # 北京时间 07:10：06 点抓完后取回结果
 
@@ -62,7 +66,7 @@ jobs:
       - name: Probe sources
         if: env.ACTION == 'probe'
         run: |
-          tar czf - -C ops/tender-crawler probe.sh | ssh "deploy@$HOST" 'tar xzf - -C ~/tender-crawler && bash ~/tender-crawler/probe.sh'
+          tar czf - -C ops/tender-crawler probe.sh | ssh "deploy@$HOST" 'tar xzf - -C ~/tender-crawler && bash ~/tender-crawler/probe.sh ${{ github.event.inputs.urls }}'
 
       - name: Fetch results
         if: always() && (env.ACTION == 'fetch' || env.ACTION == 'run' || env.ACTION == 'install')
