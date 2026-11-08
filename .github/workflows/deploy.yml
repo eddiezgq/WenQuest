@@ -15,6 +15,9 @@ on:
       - ".github/workflows/video.yml"
       # 线上诊断（只读日志）
       - ".github/workflows/diagnose.yml"
+      # 招标抓取（第 119 轮）单独由 tender-crawler.yml 运行，不影响平台
+      - "ops/**"
+      - ".github/workflows/tender-crawler.yml"
   workflow_dispatch:
     inputs:
       fresh:

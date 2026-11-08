@@ -1,0 +1,168 @@
+# 招标信息抓取 配置文件
+# 改完不用重启：每天运行时都会重新读取。改错格式时，运行 `tender-crawler check` 会报出哪一行有问题。
+
+run:
+  days_back: 2              # 每次抓最近几天发布的公告（留 1 天重叠，防止漏抓）
+  max_pages_per_query: 3    # 每个关键词每个来源最多翻几页
+  fetch_details: true       # 是否打开详情页提取预算、截止时间（命中关键词的才打开）
+  max_details_per_run: 120  # 每天最多打开多少个详情页
+  timezone: Asia/Shanghai
+
+# 访问礼节：只访问公开页面，控制频率，遇到验证码或拦截就停止该来源当天的抓取，不重试、不绕过
+politeness:
+  min_interval_seconds: 4   # 同一网站两次请求之间至少间隔几秒
+  jitter_seconds: 2         # 再随机加 0~N 秒
+  timeout_seconds: 20
+  respect_robots_txt: true
+  user_agent: "Mozilla/5.0 (compatible; TenderWatch/1.0; public announcements only)"
+
+# 关键词：命中任意一个就收录。分组用于结果里的"方向"标签
+keywords:
+  engineering:
+    - CAD
+    - 三维设计软件
+    - 工业软件
+    - 产品数据管理
+    - PLM
+    - ERP
+    - 企业资源计划
+    - 质量管理系统
+    - 质量管理平台
+    - MES
+    - 制造执行系统
+    - 零件库
+    - 数字化工厂
+    - 智能制造
+  education:
+    - 智慧教学
+    - 智慧课堂
+    - 教学平台
+    - 学习平台
+    - 在线课程
+    - 课程建设
+    - 数字教材
+    - 新形态教材
+    - 虚拟仿真实验
+    - 虚拟仿真实训
+    - 实训平台
+    - 教学评价
+    - 教学质量评价
+    - 数字工厂实训
+    - 产教融合
+    - 人工智能教育
+    - AI教学
+  management:
+    - 校情
+    - 数据中台
+    - 校园大数据
+    - 决策分析平台
+    - 智慧校园
+    - 教育数字化
+
+# 标题或正文命中这些词的，直接丢弃（明显不是我们能做的）
+exclude:
+  - 物业
+  - 保洁
+  - 食堂
+  - 餐饮
+  - 绿化
+  - 维修改造工程
+  - 施工
+  - 装修
+  - 车辆
+  - 医疗器械
+  - 药品
+  - 安保
+  - 监理
+  - 印刷
+  - 办公家具
+
+# 公告类型：只要这些（中标、成交、废标等结果公告也会抓，但标记为 result，供参考）
+notice_types_wanted: [tender, intention, inquiry, negotiation, single_source, correction]
+
+# 重点关注的地区和高校：命中时在结果里加 "focus" 标记、排在前面（不命中的照样收录）
+focus:
+  provinces: [上海, 江苏, 浙江, 广东, 北京, 山东, 湖北, 四川]
+  universities:
+    - 上海交通大学
+    - 同济大学
+    - 复旦大学
+    - 华东理工大学
+    - 上海理工大学
+    - 上海工程技术大学
+    - 上海电机学院
+    - 东南大学
+    - 南京理工大学
+    - 浙江大学
+    - 浙江工业大学
+    - 华南理工大学
+    - 华中科技大学
+    - 四川大学
+    - 电子科技大学
+    - 山东大学
+
+# 抓取来源。enabled: false 即关闭。type 决定用哪个抓取器
+sources:
+  - name: 中国政府采购网
+    type: ccgp_search
+    enabled: true
+    base_url: http://search.ccgp.gov.cn/bxsearch
+
+  - name: 全国公共资源交易平台
+    type: ggzy_deal
+    enabled: true
+    base_url: http://deal.ggzy.gov.cn/ds/deal/dealList_find.jsp
+
+  # 通用列表页抓取器：任何"公告列表页"都能配，不用改代码。
+  # list_url 里的 {page} 会替换成页码；item/title/link/date 是 CSS 选择器。
+  # 高校采购网各自格式不同，网址和选择器要对着页面填写，填好后运行 `tender-crawler test-source 名称` 验证。
+  - name: 上海政府采购网
+    type: html_list
+    enabled: false          # 待在服务器上打开页面确认选择器后再启用
+    list_url: "https://www.zfcg.sh.gov.cn/site/category?parentId=137027&childrenCode=ZcyAnnouncement&page={page}"
+    item: "li"
+    title: "a"
+    link: "a"
+    date: "span"
+    region: 上海
+
+  - name: 示例-高校采购网
+    type: html_list
+    enabled: false
+    list_url: "https://example.edu.cn/cgxx/list{page}.htm"
+    item: "ul.news-list li"
+    title: "a"
+    link: "a"
+    date: "span.date"
+    region: 上海
+    buyer: 示例大学
+
+# 结果输出
+output:
+  dir: /app/data                      # 容器内路径（服务器上是 ~/tender-crawler/data）；每天一份 YYYY-MM-DD.json，另有 latest.json / latest.md
+  keep_days: 90
+
+# 推送开关（默认关闭，以后再填）
+publish:
+  oss:
+    enabled: false
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    bucket: ""
+    prefix: tenders/
+    access_key_id_env: OSS_ACCESS_KEY_ID          # 密钥只放环境变量文件 /etc/tender-crawler.env，不写在这里
+    access_key_secret_env: OSS_ACCESS_KEY_SECRET
+  email:
+    enabled: false
+    smtp_host: ""
+    smtp_port: 465
+    username_env: SMTP_USER
+    password_env: SMTP_PASSWORD
+    to: []
+
+# 大模型辅助提取（默认关闭，先只用规则）。只允许国内已备案的模型服务；数据不出境。
+llm:
+  enabled: false
+  provider: ""          # 例如 qwen（通义千问，阿里云百炼）
+  endpoint: ""
+  model: ""
+  api_key_env: LLM_API_KEY

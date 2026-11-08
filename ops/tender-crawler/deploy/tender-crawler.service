@@ -1,0 +1,21 @@
+[Unit]
+Description=招标信息抓取（每天一次）
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=tender
+Group=tender
+EnvironmentFile=-/etc/tender-crawler.env
+Environment=TENDER_CONFIG=/opt/tender-crawler/config.yaml
+WorkingDirectory=/opt/tender-crawler
+ExecStart=/opt/tender-crawler/venv/bin/python -m tender_crawler.main run
+TimeoutStartSec=3h
+Nice=10
+# 安全加固
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/tender-crawler/data
+PrivateTmp=true

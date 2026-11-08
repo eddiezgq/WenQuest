@@ -1,0 +1,10 @@
+[Unit]
+Description=每天 06:30（北京时间）抓取招标信息
+
+[Timer]
+OnCalendar=*-*-* 06:30:00 Asia/Shanghai
+RandomizedDelaySec=15min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
