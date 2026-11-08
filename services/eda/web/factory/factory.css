@@ -17,3 +17,4 @@
 .issue textarea{min-height:3.5em}.issue .meta{color:var(--muted);font-size:13px;margin:4px 0 6px}
 .issue .row{margin-top:6px}.issue label{font-size:13px;color:var(--muted)}
 #maps table select{font:inherit;max-width:16em}
+#qty td:nth-child(1),#qty td:nth-child(2),#qty th{white-space:nowrap}  /* 11-08：统计名、数量、表头不折行 */
