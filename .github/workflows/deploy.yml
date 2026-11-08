@@ -836,6 +836,11 @@ jobs:
           else
             ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
           fi
+      # 第 119 轮：国内服务器 2026-11-09 磁盘满到 100%（这个任务原来没有清理）。与美国服务器同一做法，见 deploy/free-disk.sh
+      - name: Free disk space when the server is nearly full
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: ssh "deploy@$HOST" 'bash -s' < deploy/free-disk.sh
       - name: Copy deployment files
         if: env.SKIP != '1'
         run: |
