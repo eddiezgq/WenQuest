@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: "install=安装/升级并试跑；run=立即抓一次；status=看状态；fetch=取回最新结果"
+        description: "install=安装/升级并试跑；run=立即抓一次；status=看状态；fetch=取回最新结果；probe=只读诊断来源"
         type: choice
-        options: [fetch, status, run, install]
+        options: [fetch, status, run, install, probe]
         default: fetch
   schedule:
     - cron: "10 23 * * *"   # 北京时间 07:10：06 点抓完后取回结果
@@ -58,6 +58,11 @@ jobs:
         if: env.ACTION == 'status'
         run: |
           ssh "deploy@$HOST" 'cd ~/tender-crawler && echo "镜像: $(cat image.txt)"; crontab -l | grep tender-crawler; echo "最后运行: $(cat data/.last_run 2>/dev/null)"; ls -la data | tail -15; tail -40 data/cron.log 2>/dev/null'
+
+      - name: Probe sources
+        if: env.ACTION == 'probe'
+        run: |
+          tar czf - -C ops/tender-crawler probe.sh | ssh "deploy@$HOST" 'tar xzf - -C ~/tender-crawler && bash ~/tender-crawler/probe.sh'
 
       - name: Fetch results
         if: always() && (env.ACTION == 'fetch' || env.ACTION == 'run' || env.ACTION == 'install')
