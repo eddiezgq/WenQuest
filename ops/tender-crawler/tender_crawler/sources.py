@@ -138,11 +138,11 @@ def parse_ccgp_list(html, src, page_url):
             continue
         text = li.get_text(" ", strip=True)
         bx = li.find("em", attrs={"rel": "bxlx"})
-        reg = re.search(r"地域：\s*(\S+)", text)
+        reg = re.search(r"地域：\s*([^\s：:]+)(?=\s|$)", text)
         buyer = re.search(r"采购人：\s*(.+)$", text)
         m = re.search(r"发布时间：\s*([0-9-]+)", text)
         yield {"title": (a.get("title") or a.get_text(" ", strip=True)).strip(), "url": urljoin(page_url, a["href"]),
-               "date": normalize_date(m.group(1) if m else ""), "region": reg.group(1) if reg else None,
+               "date": normalize_date(m.group(1) if m else ""), "region": reg.group(1) if reg and not reg.group(1).startswith("采购人") else None,
                "buyer": buyer.group(1).strip() if buyer else None,
                "type_text": (bx.get_text(strip=True) if bx else "") or sec, "source": src["name"]}
 

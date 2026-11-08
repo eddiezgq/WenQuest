@@ -21,8 +21,12 @@ BUDGET_RES = [
     re.compile(r"(?:预算金额|采购预算|项目预算|最高限价)[（(](万元|元)[)）][:：\s]*" + _NUM),
 ]
 DATE = r"(20\d{2})\s*[-年./]\s*(\d{1,2})\s*[-月./]\s*(\d{1,2})\s*日?(?:\s*(\d{1,2})\s*[:：时点]\s*(\d{1,2})?)?"
-DEADLINE_RES = [re.compile(r"(?:提交投标文件截止时间|投标截止时间|响应文件提交截止时间|递交截止时间|开标时间|"
-                           r"截止时间|获取.{0,6}文件.{0,6}时间)[^0-9]{0,30}?" + DATE)]
+DEADLINE_RES = [  # 按优先级：先找明确的“提交 / 投标截止”，再找开标时间，最后才是泛泛的“截止时间”
+    re.compile(r"(?:提交投标文件截止时间|投标截止时间|响应文件提交截止时间|提交响应文件截止时间|递交截止时间|"
+               r"投标文件递交截止时间|首次响应文件提交截止时间)[^0-9]{0,30}?" + DATE),
+    re.compile(r"(?:开标时间|开启时间)[^0-9]{0,30}?" + DATE),
+    re.compile(r"截止时间[^0-9]{0,30}?" + DATE),
+]
 BUYER_RES = [re.compile(r"(?:采购人(?:名称)?|招标人(?:名称)?|采购单位)\s*[:：]\s*([^\s，,。;；|<>]{2,40})")]
 
 
@@ -66,12 +70,14 @@ def budget_cny(text):
     return None
 
 
-def deadline(text):
+def deadline(text, not_before=None):
+    """投标 / 响应截止时间。not_before（YYYY-MM-DD，一般是发布日期）之前的日期不算——那多半是文件获取期的开始。"""
     for rx in DEADLINE_RES:
-        m = rx.search(text)
-        if m:
+        for m in rx.finditer(text):
             y, mo, d, h, mi = m.groups()
             s = f"{int(y):04d}-{int(mo):02d}-{int(d):02d}"
+            if not_before and s < not_before:
+                continue
             if h:
                 s += f" {int(h):02d}:{int(mi or 0):02d}"
             return s

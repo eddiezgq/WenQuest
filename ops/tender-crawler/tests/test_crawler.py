@@ -78,6 +78,10 @@ def test_extract_rules():
     assert extract.notice_type("竞争性磋商公告") == "negotiation"
     assert extract.notice_type("2026年采购意向公开") == "intention"
     assert extract.keyword_hits("采购mes系统", {"e": ["MES"]}) == (["e"], ["MES"])
+    # 获取文件时间在前、投标截止在后：取投标截止；早于发布日期的日期不算
+    t2 = "获取招标文件时间：2026年11月06日至2026年11月13日 提交投标文件截止时间：2026年11月27日 09:30"
+    assert extract.deadline(t2, "2026-11-07") == "2026-11-27 09:30"
+    assert extract.deadline("截止时间：2026-11-01 截止时间：2026-11-20 10:00", "2026-11-07") == "2026-11-20 10:00"
 
 
 def test_run_end_to_end(cfg, monkeypatch):
@@ -91,6 +95,9 @@ def test_run_end_to_end(cfg, monkeypatch):
     hd = next(r for r in feed["items"] if r["title"] == "华东理工大学智慧课堂建设项目公开招标公告")  # 政府采购网公告列表
     assert (hd["region"], hd["buyer"], hd["notice_type"], hd["publish_date"]) == ("上海", "华东理工大学", "tender", "2026-11-08")
     assert "华东理工大学" in hd["focus"]
+    assert hd["sources"] == ["中国政府采购网", "全国公共资源交易平台"]   # 两个平台各发一次，按标题合并
+    zy = next(r for r in feed["items"] if r["title"].startswith("某职业技术大学"))
+    assert zy["region"] is None or "采购人" not in zy["region"]   # 地域为空时不把“采购人：”当地区
     assert not any("某学院教学平台" in t for t in titles)         # 列表里超出时间窗口的
     mes = next(r for r in feed["items"] if "MES" in r["title"])
     assert mes["region"] == "浙江" and mes["url"].startswith("https://www.ggzy.gov.cn/information/deal/")
@@ -168,4 +175,4 @@ def test_ccgp_list_section_error_keeps_others(cfg):
     with pytest.raises(RuntimeError, match="jzxcs"):
         for it in sources.ccgp_list(H(routes()), src, cfg):
             got.append(it)
-    assert len(got) == 3 and got[0]["type_text"] == "公开招标"
+    assert len(got) == 4 and got[0]["type_text"] == "公开招标"

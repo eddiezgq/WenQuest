@@ -5,6 +5,7 @@
 import argparse
 import json
 import logging
+import re
 import os
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -107,6 +108,7 @@ def build_items(cfg, raw, http, store, today):
     wanted = set(cfg.get("notice_types_wanted") or [])
     focus = cfg.get("focus", {})
     start = (today_cst() - timedelta(days=int(cfg["run"].get("days_back", 2)))).isoformat()
+    by_title = {}  # 同一项目常在两个平台各发一次：标题相同就合并
     by_key, details_left = {}, int(cfg["run"].get("max_details_per_run", 0)) if cfg["run"].get("fetch_details") else 0
     for it in raw:
         title = it.get("title") or ""
@@ -119,6 +121,8 @@ def build_items(cfg, raw, http, store, today):
         if not words:
             continue  # 搜索引擎可能按全文命中；标题和采购人没命中就不收，减少噪音
         key, first = store.first_seen(it, today)
+        tkey = re.sub(r"[\s()（）【】\[\]]", "", title)
+        key = by_title.setdefault(tkey, key)
         rec = by_key.get(key)
         if rec:
             rec["keywords"] = sorted(set(rec["keywords"]) | set(words))
@@ -141,7 +145,7 @@ def build_items(cfg, raw, http, store, today):
             details_left -= 1
             try:
                 text = detail_text(http, rec["url"])
-                rec.update(detail_fetched=True, budget_cny=extract.budget_cny(text), deadline=extract.deadline(text))
+                rec.update(detail_fetched=True, budget_cny=extract.budget_cny(text), deadline=extract.deadline(text, rec["publish_date"]))
                 rec["buyer"] = rec["buyer"] or extract.buyer(text)
                 rec["region"] = rec["region"] or extract.region(text[:3000])
                 g2, w2 = extract.keyword_hits(text, cfg["keywords"])
