@@ -151,3 +151,12 @@ def test_quality_erp_trial_account_in_the_demo_company(cn, tmp_path, monkeypatch
     sent = main.state.mailer.outbox[-1]
     assert sent["subject"] == "问渠质量 ERP 体验账号" and "Abc123def456" in sent["text"] and "每晚还原" in sent["text"]
     assert not list(q.glob("res-trial-*"))
+    assert "蓝湾" not in sent["text"]
+    # 第 109 轮 26f：缝纫机演示企业也开了的，邮件里多一个网址
+    (q / f"res-trial-{req['id']}.json").write_text(json.dumps({"id": req["id"], "email": "erp@qq.com",
+                                                               "password": "Abc123def456", "expires": "2026-12-07",
+                                                               "url": "https://qms.wenquestech.online",
+                                                               "sewing_url": "https://sewing.qms.wenquestech.online"}))
+    asyncio.run(main.pilots_collect())
+    sent = main.state.mailer.outbox[-1]
+    assert "https://sewing.qms.wenquestech.online" in sent["text"] and "蓝湾缝纫机械" in sent["text"]

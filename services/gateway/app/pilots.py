@@ -355,10 +355,14 @@ def register(app, m) -> None:
             with db() as c:
                 c.execute("update trial set status='failed', error=? where id=?", (str(res["error"])[:500], t["id"]))
         elif t:
+            # 第 109 轮 26f：缝纫机演示企业也装好了的，同一个账号、同一个初始密码也开在那里
+            sew = (f"\n另一家演示企业：蓝湾缝纫机械（缝纫机厂，看产品数据管理 PLM：零件、BOM、型号配置、设计变更）\n"
+                   f"工作台：{res['sewing_url']}（同一个账号和初始密码，两边各自改密码）\n") if res.get("sewing_url") else ""
             await mail(t["email"], "问渠质量 ERP 体验账号",
                        f"{t['name']}，你好：\n\n问渠质量 ERP 的体验账号已开通，可以用到 {res.get('expires')}。\n\n"
-                       f"工作台：{res.get('url')}\n账号：{res.get('email')}\n初始密码：{res.get('password')}\n\n"
-                       "请注意：这是供大家体验的共用演示企业（海港五金供应，数据是虚构的），别人也在用，每晚还原成演示数据。"
+                       f"工作台：{res.get('url')}\n账号：{res.get('email')}\n初始密码：{res.get('password')}\n{sew}\n"
+                       "请注意：这是供大家体验的共用演示企业（海港五金供应" + ("、蓝湾缝纫机械" if sew else "") +
+                       "，数据是虚构的），别人也在用，每晚还原成演示数据。"
                        "请不要录入真实的企业数据。\n\n想用自己的数据试（独立的一套、数据保留、免费 3 个月），直接回复这封邮件，"
                        "我们为你开通独立的试点企业。\n\n问渠科技")
             with db() as c:
