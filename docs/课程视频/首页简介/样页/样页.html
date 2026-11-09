@@ -1,0 +1,152 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1920px;height:1080px;overflow:hidden;font-family:"Noto Sans CJK SC","Source Han Sans SC",Inter,Arial,sans-serif;color:#eaf1fb;
+background:radial-gradient(1200px 700px at 85% -10%,#1d3f7a 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#0f4a4a 0%,transparent 60%),#07131f}
+.pg{position:absolute;inset:0;display:none}.pg.on{display:block}
+.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,sans-serif;letter-spacing:.18em;color:#7fb6ff}
+.brand b{color:#f5c344;letter-spacing:.05em;margin-right:14px}
+.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600}
+.title{position:absolute;left:56px;top:122px;font-size:56px;font-weight:800;color:#fff}
+.en{font:500 0.62em/1.3 Inter,sans-serif;color:#8fb3dd;display:block;margin-top:4px}
+svg text{font-family:"Noto Sans CJK SC",Inter,sans-serif}
+.code{position:absolute;left:70px;top:300px;width:600px;height:560px;border-radius:16px;background:#0b1d30;border:1px solid #23415f;padding:26px 28px;
+font:500 20px/1.55 "JetBrains Mono","DejaVu Sans Mono",monospace;color:#cfe2ff;white-space:pre;overflow:hidden}
+.code .k{color:#f5c344}.code .c{color:#6f8db0}.code .n{color:#7fe0c0}
+.cap{position:absolute;font-size:30px;font-weight:700;color:#fff}.cap small{display:block;font:500 20px Inter,sans-serif;color:#8fb3dd;margin-top:4px}
+.tag{position:absolute;left:56px;bottom:48px;font-size:28px;color:#bcd0ea}.tag b{color:#f5c344}
+</style></head><body>
+
+<!-- 样页 1：07 开场，四座厂互为上下游 -->
+<section class="pg" id="p1">
+<div class="brand"><b>问渠</b>WENQUEST DIGITAL FACTORY</div>
+<div class="kick">数字工厂</div>
+<div class="title">四座厂，互为上下游<span class="en">Four plants, each supplying the next</span></div>
+<svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+<defs>
+ <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5c344"/></marker>
+ <linearGradient id="card" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14304f"/><stop offset="1" stop-color="#0c2038"/></linearGradient>
+</defs>
+<!-- cards -->
+<g transform="translate(110,330)">
+ <rect width="480" height="250" rx="22" fill="url(#card)" stroke="#2f5d8a" stroke-width="2"/>
+ <g transform="translate(40,58)" fill="none" stroke="#7fb6ff" stroke-width="5">
+  <circle cx="60" cy="60" r="44"/><circle cx="60" cy="60" r="16"/>
+  <g stroke-linecap="round">
+   <line x1="60" y1="4" x2="60" y2="-6"/><line x1="60" y1="116" x2="60" y2="126"/><line x1="4" y1="60" x2="-6" y2="60"/><line x1="116" y1="60" x2="126" y2="60"/>
+   <line x1="20" y1="20" x2="13" y2="13"/><line x1="100" y1="100" x2="107" y2="107"/><line x1="100" y1="20" x2="107" y2="13"/><line x1="20" y1="100" x2="13" y2="107"/></g></g>
+ <text x="200" y="110" font-size="40" font-weight="800" fill="#fff">减速器厂</text>
+ <text x="200" y="152" font-size="24" fill="#8fb3dd">Gearbox plant</text>
+ <text x="200" y="196" font-size="24" fill="#bcd0ea">二级齿轮减速器</text>
+</g>
+<g transform="translate(110,700)">
+ <rect width="480" height="250" rx="22" fill="url(#card)" stroke="#2f5d8a" stroke-width="2"/>
+ <g transform="translate(40,60)" fill="none" stroke="#7fe0c0" stroke-width="5" stroke-linejoin="round">
+  <rect x="8" y="10" width="112" height="110" rx="10"/><g fill="#7fe0c0" stroke="none"><rect x="30" y="34" width="22" height="22" rx="3"/><rect x="68" y="34" width="34" height="14" rx="3"/><rect x="68" y="56" width="34" height="14" rx="3"/><circle cx="40" cy="92" r="9"/><circle cx="84" cy="92" r="9"/></g>
+  <g stroke-linecap="round"><line x1="34" y1="10" x2="34" y2="-6"/><line x1="64" y1="10" x2="64" y2="-6"/><line x1="94" y1="10" x2="94" y2="-6"/></g></g>
+ <text x="200" y="110" font-size="40" font-weight="800" fill="#fff">电路板厂</text>
+ <text x="200" y="152" font-size="24" fill="#8fb3dd">Circuit board plant</text>
+ <text x="200" y="196" font-size="24" fill="#bcd0ea">驱动板 · AGV 控制板</text>
+</g>
+<g transform="translate(1330,700)">
+ <rect width="480" height="250" rx="22" fill="url(#card)" stroke="#2f5d8a" stroke-width="2"/>
+ <g transform="translate(40,58)" fill="none" stroke="#c9a2ff" stroke-width="5">
+  <rect x="20" y="20" width="84" height="84" rx="8"/><rect x="42" y="42" width="40" height="40" rx="4" fill="#c9a2ff" stroke="none" opacity=".8"/>
+  <g stroke-linecap="round"><line x1="40" y1="20" x2="40" y2="2"/><line x1="62" y1="20" x2="62" y2="2"/><line x1="84" y1="20" x2="84" y2="2"/>
+  <line x1="40" y1="104" x2="40" y2="122"/><line x1="62" y1="104" x2="62" y2="122"/><line x1="84" y1="104" x2="84" y2="122"/>
+  <line x1="20" y1="40" x2="2" y2="40"/><line x1="20" y1="62" x2="2" y2="62"/><line x1="20" y1="84" x2="2" y2="84"/>
+  <line x1="104" y1="40" x2="122" y2="40"/><line x1="104" y1="62" x2="122" y2="62"/><line x1="104" y1="84" x2="122" y2="84"/></g></g>
+ <text x="200" y="110" font-size="40" font-weight="800" fill="#fff">芯片封测厂</text>
+ <text x="200" y="152" font-size="24" fill="#8fb3dd">Chip test &amp; packaging</text>
+ <text x="200" y="196" font-size="24" fill="#bcd0ea">编码器接口芯片</text>
+</g>
+<g transform="translate(1330,330)">
+ <rect width="480" height="250" rx="22" fill="url(#card)" stroke="#f5c344" stroke-width="3"/>
+ <g transform="translate(46,48)" fill="none" stroke="#f5c344" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="10" y1="140" x2="110" y2="140"/><path d="M60 140 L60 108 L28 64 L82 26"/><circle cx="60" cy="108" r="9" fill="#07131f"/><circle cx="28" cy="64" r="9" fill="#07131f"/><path d="M82 26 l20 -6 M82 26 l14 16"/></g>
+ <text x="200" y="110" font-size="40" font-weight="800" fill="#fff">机器人厂</text>
+ <text x="200" y="152" font-size="24" fill="#8fb3dd">Robot plant</text>
+ <text x="200" y="196" font-size="24" fill="#bcd0ea">协作臂 · AGV · 人形</text>
+</g>
+<!-- flows -->
+<g stroke="#f5c344" stroke-width="5" fill="none" marker-end="url(#ar)">
+ <path d="M598 455 L1318 455"/>
+ <path d="M598 825 C 900 825, 1000 620, 1318 520"/>
+ <path d="M1322 825 L610 825" stroke-dasharray="0"/>
+</g>
+<g font-size="28" font-weight="700" fill="#fff" text-anchor="middle">
+ <rect x="830" y="398" width="260" height="44" rx="22" fill="#07131f" stroke="#f5c344" stroke-width="2"/><text x="960" y="430">减速器</text>
+ <rect x="1000" y="600" width="250" height="44" rx="22" fill="#07131f" stroke="#f5c344" stroke-width="2"/><text x="1125" y="632">驱动板</text>
+ <rect x="840" y="852" width="270" height="44" rx="22" fill="#07131f" stroke="#f5c344" stroke-width="2"/><text x="975" y="884">编码器接口芯片</text>
+</g>
+<g font-size="20" fill="#8fb3dd" text-anchor="middle"><text x="960" y="488">reducers</text><text x="1125" y="664">drive boards</text><text x="975" y="918">encoder interface chips</text></g>
+</svg>
+<div class="tag">数据一条线连着：订单 → 排产 → 车间 → 质量 → 售后　<b>教学用工业园</b></div>
+</section>
+
+<!-- 样页 2：18 芯片设计，Verilog → 综合 → 版图 -->
+<section class="pg" id="p2">
+<div class="brand"><b>问渠</b>WENQUEST ELECTRONICS</div>
+<div class="kick">芯片设计</div>
+<div class="title">编码器接口芯片，自己设计<span class="en">An encoder interface chip, our own design</span></div>
+<div class="code"><span class="c">// WQ-ENCIF 编码器接口芯片（示例设计，未流片）</span>
+<span class="k">always</span> @(<span class="k">posedge</span> clk <span class="k">or negedge</span> rst_n)
+  <span class="k">if</span> (!rst_n) <span class="k">begin</span>
+    sa &lt;= <span class="n">2'b00</span>; sb &lt;= <span class="n">2'b00</span>;
+  <span class="k">end else begin</span>
+    sa &lt;= {sa[0], enc_a};
+    sb &lt;= {sb[0], enc_b};
+  <span class="k">end</span>
+
+<span class="c">// A/B 滤波 → 四倍频解码</span>
+<span class="c">// → 32 位计数 → SPI 读出</span></div>
+<div class="cap" style="left:70px;top:880px">① Verilog<small>describe the circuit</small></div>
+<svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+ <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5c344"/></marker></defs>
+ <g stroke="#f5c344" stroke-width="6" marker-end="url(#ar2)"><line x1="690" y1="580" x2="760" y2="580"/><line x1="1240" y1="580" x2="1310" y2="580"/></g>
+ <!-- 综合：门级 -->
+ <g transform="translate(780,300)">
+  <rect width="440" height="560" rx="16" fill="#0b1d30" stroke="#23415f"/>
+  <g stroke="#7fb6ff" stroke-width="4" fill="none">
+   <!-- DFF boxes -->
+   <rect x="40" y="70" width="90" height="110" rx="6"/><rect x="40" y="250" width="90" height="110" rx="6"/>
+   <!-- XOR gate -->
+   <path d="M230 160 q40 50 0 100 q90 0 120 -50 q-30 -50 -120 -50 z"/><path d="M218 160 q40 50 0 100"/>
+   <!-- AND gate -->
+   <path d="M230 360 h50 a50 50 0 0 1 0 100 h-50 z"/>
+   <!-- wires -->
+   <path d="M130 125 H190 V180 H236"/><path d="M130 305 H190 V240 H236"/><path d="M130 330 H200 V385 H230"/><path d="M160 125 V435 H230" stroke-dasharray="6 6"/>
+   <path d="M350 210 H410"/><path d="M330 410 H410"/>
+  </g>
+  <g fill="#cfe2ff" font-size="22" font-family="JetBrains Mono,DejaVu Sans Mono,monospace"><text x="60" y="130">DFF</text><text x="60" y="310">DFF</text><text x="262" y="218">XOR</text><text x="244" y="418">AND</text></g>
+  <text x="40" y="520" fill="#8fb3dd" font-size="22">变成一个个标准单元（触发器、门）</text>
+ </g>
+ <!-- 版图：标准单元行 -->
+ <g transform="translate(1330,300)">
+  <rect width="520" height="560" rx="16" fill="#0b1d30" stroke="#23415f"/>
+  <g id="rows">
+   <rect x="30" y="40" width="460" height="480" fill="#101a24"/>
+  </g>
+ </g>
+ <g transform="translate(1360,340)" id="cells"></g>
+</svg>
+<div class="cap" style="left:780px;top:880px">② 综合 → 门级电路<small>synthesis</small></div>
+<div class="cap" style="left:1330px;top:880px">③ 版图（130 nm 开源工艺）<small>layout</small></div>
+<div class="tag">全用开源工具：<b>Yosys · OpenROAD · KLayout</b>（LibreLane 流程）</div>
+</section>
+
+<script>
+// 版图示意：几排标准单元，横向金属一、纵向金属二
+const g = document.getElementById('cells'), NS = 'http://www.w3.org/2000/svg'
+const add = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); g.appendChild(e); return e }
+let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280
+for (let r = 0; r < 8; r++) {
+  const y = r * 58
+  add('rect', { x: 0, y: y, width: 460, height: 6, fill: '#3b6ea8', opacity: .9 })
+  let x = 0
+  while (x < 420) { const w = Math.min(22 + Math.floor(rnd() * 46), 460 - x); add('rect', { x, y: y + 9, width: w - 4, height: 40, fill: ['#2c6b5a', '#5a3d78', '#6b4f22'][Math.floor(rnd() * 3)], rx: 2 }); x += w }
+}
+for (let i = 0; i < 14; i++) { const x = 12 + i * 32 + rnd() * 10; add('rect', { x, y: 0, width: 4, height: 460, fill: '#c9a2ff', opacity: .55 }) }
+for (let i = 0; i < 10; i++) { const y = 30 + i * 46 + rnd() * 8; add('rect', { x: 0, y, width: 460, height: 3, fill: '#7fe0c0', opacity: .5 }) }
+document.getElementById(location.hash.slice(1) || 'p1').classList.add('on')
+</script>
+</body></html>
