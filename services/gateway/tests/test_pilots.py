@@ -60,7 +60,7 @@ def test_invite_register_and_open(pc):
     assert pc.post(f"/api/v1/public/pilot/{token}/code").status_code == 429          # one code a minute
     body = {"company": "艾克米五金有限公司", "id": "acme", "contact": "王老板", "code": "000000" if code != "000000" else "111111"}
     assert pc.post(f"/api/v1/public/pilot/{token}/apply", json=body).json()["error"] == "bad_code"
-    for bad in ("Ab", "demo", "1acme", "acme-"):
+    for bad in ("Ab", "demo", "sewing", "1acme", "acme-"):
         r = pc.post(f"/api/v1/public/pilot/{token}/apply", json=body | {"code": code, "id": bad})
         assert r.status_code in (400, 422), (bad, r.text)
     r = pc.post(f"/api/v1/public/pilot/{token}/apply", json=body | {"code": code})
@@ -84,7 +84,10 @@ def test_invite_register_and_open(pc):
     assert pc.get(f"/api/v1/public/pilot/{token}/status").json()["url"] == "https://acme.qms.wenquestech.online"
     for d in ("acme.qms.wenquestech.online", "acme.qms-erp.wenquestech.online"):
         assert pc.get("/api/v1/caddy/ask", params={"domain": d}).status_code == 200
-    for d in ("other.qms.wenquestech.online", "acme.qms.example.com", "x.acme.qms.wenquestech.online"):
+    for d in ("sewing.qms.wenquestech.online", "sewing.qms-erp.wenquestech.online"):      # the demo company (26f)
+        assert pc.get("/api/v1/caddy/ask", params={"domain": d}).status_code == 200
+    for d in ("other.qms.wenquestech.online", "acme.qms.example.com", "x.acme.qms.wenquestech.online",
+              "sewing.qms.example.com"):
         assert pc.get("/api/v1/caddy/ask", params={"domain": d}).status_code == 404
     lst = pc.get("/api/v1/admin/pilots", headers=admin(pc)).json()
     assert lst["used"] == 1 and lst["max"] == 2 and lst["host"]["fresh"] and lst["tenants"][0]["status"] == "active"

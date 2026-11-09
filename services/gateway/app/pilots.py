@@ -35,7 +35,9 @@ from .session import Session
 DAY = 86400
 INVITE_DAYS = 7
 ID_RE = re.compile(r"^[a-z][a-z0-9-]{2,19}$")
-RESERVED = {"demo", "www", "api", "admin", "erp", "mail", "qms", "test", "staging"}
+# 部署直接装的演示企业（不经开通流程）：证书照办，试点企业不能用这些编号
+QMS_DEMOS = {"sewing"}
+RESERVED = {"demo", "www", "api", "admin", "erp", "mail", "qms", "test", "staging"} | QMS_DEMOS
 EMAIL_RE = re.compile(r"^[^@\s]{1,64}@[A-Za-z0-9.-]{1,190}\.[A-Za-z]{2,24}$")
 MIN_FREE_MB = 1536
 RUNNER_STALE = 600                    # 10 分钟没有心跳：开通程序没在跑
@@ -266,6 +268,10 @@ def register(app, m) -> None:
         site = state.settings.site_domain.lower()
         parts = d.split(".")
         if site and d.endswith("." + site) and len(parts) == len(site.split(".")) + 2 and parts[1] in ("qms", "qms-erp"):
+            # 演示企业（第 109 轮 26f 的蓝湾缝纫机械，sewing.qms）由部署直接装、不经开通流程，不在 tenant 表里：
+            # 按名单放行（第 124 轮补：原来漏了，证书办不下来，网址打不开）
+            if parts[0] in QMS_DEMOS:
+                return Response(status_code=200)
             with db() as c:
                 ok = c.execute("select 1 from tenant where id=? and status in ('active','stopped')", (parts[0],)).fetchone()
             return Response(status_code=200 if ok else 404)

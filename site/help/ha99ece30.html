@@ -1,0 +1,48 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>在线编辑 Word 和 Excel · 问渠帮助</title><style>
+:root{--ink:#121c21;--muted:#56656b;--line:#d6d2c6;--paper:#fbfaf6;--accent:#2563eb;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--ink:#e6ecee;--muted:#93a3a9;--line:#2a3a41;--paper:#0f181c;--accent:#7aa7ff;color-scheme:dark}}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 "Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px} a{color:var(--accent)} h1{font:700 26px/1.3 serif} h2{margin-top:28px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;display:block;overflow-x:auto} th,td{border:1px solid var(--line);padding:6px 8px;text-align:left}
+code,pre{background:color-mix(in srgb,var(--ink) 7%,transparent);border-radius:4px;padding:1px 4px} pre{padding:10px;overflow-x:auto}
+.top{font-size:14px;color:var(--muted)}
+</style></head><body><main><p class="top"><a href="/">← 问渠 WenQuest</a> · <a href="index.html">帮助目录</a></p>
+<h1>在线编辑 Word 和 Excel</h1>
+<p>电脑上不用装 Office 或 WPS：在问渠的经典界面（<code>classic.</code> 子域名）里，Word、Excel、PPT 直接在浏览器里打开、编辑、多人同时改，文件存在我们自己的服务器上（国内、美国各一套，不出境）。</p>
+<blockquote>
+<p>自己写的教案、指导书、通知，更省事的是 <strong>网页文档</strong>（AI 可写初稿、可发布给学生、可导出 Word / PDF），见《老师用网页文档》。这里的在线 Word 适合外面拿来的文件、必须按对方模板排版的文件。</p>
+</blockquote>
+<p>背后是开源的 OnlyOffice 文档服务（官方社区版，不限同时在线人数），地址是 <code>learn.&lt;主域名&gt;/docs/</code>，只给学习平台自己用，单独打开没有内容。</p>
+<h2>老师：在课程里放一份可以在线编辑的文档</h2>
+<ol>
+<li>经典界面打开课程 → 右上角“编辑模式” → 在某一节点“添加活动或资源” → 选 <strong>ONLYOFFICE 文档</strong>。</li>
+<li>填名称；文件可以：</li>
+<li>点图标新建空白的 <strong>文档</strong>（Word）、<strong>电子表格</strong>（Excel）、演示文稿或表单；</li>
+<li>或者 <strong>上传文件</strong>（外来的 docx、xlsx、pptx 都行）。</li>
+<li>保存后点开就是编辑器。几个人同时打开会看到彼此的光标和修改，自动保存。</li>
+<li>需要下载时，编辑器里“文件 → 下载为”，可选 docx、pdf 等。</li>
+</ol>
+<h2>老师：让学生在作业里直接在线写 Word</h2>
+<ol>
+<li>添加“作业”，在“提交类型”里勾 <strong>ONLYOFFICE 文档</strong>。</li>
+<li>“格式（ONLYOFFICE）”选文档或表格；“文件模板（ONLYOFFICE）”可以：</li>
+<li><strong>从空白文档开始</strong>；</li>
+<li><strong>编辑默认模板</strong>：把模板内容放进去，每个学生拿到的都是这份模板的副本。学生提交后模板不能再改。（教材实验的报告不用这样做，直接用“在线实验报告”。）</li>
+<li>可选：允许学生在评分后在文档里留评论。</li>
+<li>批改：在作业的提交列表里点开学生的文档，直接看、批注、打分。</li>
+</ol>
+<p>学生那边：打开作业 → “添加提交” → 在页面里直接写 → 保存并提交，不用下载、不用上传。</p>
+<h2>说明</h2>
+<ul>
+<li><strong>主要方式是网页文档</strong>：实验报告已经可以在问渠页面上写、一键导出 Word / PDF，教学文件等以后陆续做。在线 Office 主要用来处理外来文件和必须按对方模板填写的文件。</li>
+<li><strong>AI</strong>：编辑器自带的 AI 插件已关闭（国内只能用已备案模型）；需要 AI 帮忙写，用问渠自己的 AI 入口。</li>
+<li><strong>服务器资源</strong>：文档服务最多占 2 GB 内存。大量老师同时使用前，先告诉运维（可能需要给服务器加配置）。</li>
+</ul>
+<h2>运维</h2>
+<ul>
+<li>健康：<code>https://learn.&lt;主域名&gt;/api/health</code> 里 <code>docs</code> 为 <code>ok</code>；或在服务器上 <code>docker compose ps docs</code>。</li>
+<li>密钥：<code>.env</code> 的 <code>DOCS_JWT_SECRET</code>，第一次部署时 <code>deploy/update.sh</code> 自动生成；Moodle 启动时 <code>setup_wenquest.php</code> 把地址和密钥填进插件设置（经典界面“网站管理 → 插件 → 活动模块 → ONLYOFFICE 文档”可以看到，“检查连接”按钮可测）。改密钥要重启 <code>docs</code> 和 <code>moodle</code> 两个容器。</li>
+<li>版本：只在 <code>docker-compose.yml</code> 的 <code>docs</code> 服务写一处（现为 <code>onlyoffice/documentserver:10.0.0.1</code>），升级时同时改 <code>deploy.yml</code> 的国内同步清单 <code>BASE</code>（CI 会核对两处一致、镜像存在）。国内服务器的镜像自动改用国内镜像仓库里的同名镜像。</li>
+<li>打不开编辑器时先看：<code>docs</code> 容器是否健康；浏览器能否打开 <code>https://learn.&lt;主域名&gt;/docs/healthcheck</code>（应显示 <code>true</code>）；Moodle 插件设置页“检查连接”。</li>
+</ul></main><script src="/assist.js" defer></script></body></html>

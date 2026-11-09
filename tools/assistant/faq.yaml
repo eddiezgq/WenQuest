@@ -38,6 +38,15 @@
     zh: 问渠质量 ERP 有自己的账号，和学习平台不通用。正式客户和试点企业用开通时发到邮箱的账号登录工作台，ERPNext 从工作台菜单“ERPNext ↗”直接进、不用再登录。想先看看，请在“预约演示”里选“问渠质量 ERP”，我们安排演示并开通体验。
     en: The quality ERP has its own accounts. Customers sign in to the workspace with the account emailed to them and open ERPNext from its menu without signing in again. To try it, book a demo and choose the quality ERP.
   link: {cn: /contact/}
+- id: sewing-demo
+  q:
+    zh: [蓝湾演示在哪里, 蓝湾缝纫机械在哪, 缝纫机演示企业, 怎么进蓝湾演示, 蓝湾演示网址, 缝纫机 PLM 演示, 配件手册演示在哪看, 缝纫机厂演示]
+    en: [Where is the sewing machine demo company, sewing demo company]
+  sites: [cn]
+  a:
+    zh: 蓝湾缝纫机械（演示）是问渠质量 ERP 里一家虚构的缝纫机厂，网址 https://sewing.qms.wenquestech.online ，每晚还原。用体验账号登录：在“预约演示”里申请体验、勾选“问渠质量 ERP”，开通邮件里会给两个工作台（海港五金和蓝湾缝纫机械），同一个账号和初始密码。里面有平缝机、包缝机的零件和 BOM、型号配置、设计变更，以及平缝机型号 WQ88-0000-5TA 的现成配件手册。
+    en: The sewing-machine demo company of the quality ERP (fictional) is at https://sewing.qms.wenquestech.online and is reset every night. Request a trial of the quality ERP; the email gives the sign-in for both demo workspaces.
+  link: {cn: /contact/}
 - id: platform
   q:
     zh: [数字工厂集成平台是什么, 集成平台能做什么, CAD CAM CAE MES 集成, 数字主线, 能接 SolidWorks 吗]
