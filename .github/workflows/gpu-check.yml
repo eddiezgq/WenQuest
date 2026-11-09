@@ -1,8 +1,13 @@
-# 查 Lambda 账户里现在开着的 GPU 机器（只读，不开机不关机）：机器名、型号、每小时价钱、开着多久。
+# 查 Lambda 账户里现在开着的 GPU 机器（默认只读；勾 terminate 才关机）：机器名、型号、每小时价钱、开着多久。
 # 起因：2026-11-09 Lambda 扣款 $368，远超实测用量，查有没有没关掉的机器。
 name: GPU check
 on:
   workflow_dispatch:
+    inputs:
+      terminate:
+        description: "把列出的机器全部关掉（遗留机器在一直计费）"
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -13,6 +18,7 @@ jobs:
       - name: List running Lambda instances
         env:
           LAMBDA_KEY: ${{ secrets.LAMBDA_KEY }}
+          TERMINATE: ${{ inputs.terminate }}
         run: |
           test -n "$LAMBDA_KEY" || { echo "::error::没有设置 LAMBDA_KEY"; exit 1; }
           python3 - <<'PY'
@@ -27,4 +33,10 @@ jobs:
               print(json.dumps({"id": i.get("id"), "name": i.get("name"), "status": i.get("status"),
                                 "type": t.get("name"), "cents_per_hour": t.get("price_cents_per_hour"),
                                 "region": (i.get("region") or {}).get("name")}, ensure_ascii=False))
+          if os.environ.get("TERMINATE") == "true" and data:
+              body = json.dumps({"instance_ids": [i["id"] for i in data]}).encode()
+              req = urllib.request.Request("https://cloud.lambda.ai/api/v1/instance-operations/terminate", data=body, method="POST",
+                  headers={"Authorization": "Bearer " + os.environ["LAMBDA_KEY"].strip(), "Content-Type": "application/json",
+                           "Accept": "application/json", "User-Agent": "wenquest-gpu/1.0"})
+              print("terminated:", json.loads(urllib.request.urlopen(req, timeout=60).read()).get("data"))
           PY
