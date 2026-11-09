@@ -1,87 +1,87 @@
 1
-00:00:00,500 --> 00:00:04,410
+00:00:00,500 --> 00:00:04,428
 WenQuest's electronics track runs from a circuit, to a board, to a chip,
 
 2
-00:00:04,430 --> 00:00:06,212
+00:00:04,448 --> 00:00:06,237
 and all the way into the factory.
 
 3
-00:00:07,232 --> 00:00:11,211
+00:00:07,257 --> 00:00:11,235
 It starts with circuit analysis: build a circuit in the browser,
 
 4
-00:00:11,231 --> 00:00:12,148
+00:00:11,255 --> 00:00:12,172
 change a value,
 
 5
-00:00:12,618 --> 00:00:14,781
+00:00:12,342 --> 00:00:14,525
 and the simulation runs on the spot.
 
 6
-00:00:15,801 --> 00:00:19,172
+00:00:15,245 --> 00:00:18,618
 Virtual instruments bring sensors, oscilloscopes and meters to the web,
 
 7
-00:00:19,642 --> 00:00:20,845
+00:00:18,788 --> 00:00:19,991
 set up like real devices.
 
 8
-00:00:21,865 --> 00:00:23,399
+00:00:20,711 --> 00:00:22,258
 Then a real joint drive board:
 
 9
-00:00:23,419 --> 00:00:26,767
+00:00:22,278 --> 00:00:25,653
 the schematic and layout are generated from a design description,
 
 10
-00:00:27,237 --> 00:00:29,716
+00:00:26,673 --> 00:00:29,151
 and you can compare revisions A and B side by side.
 
 11
-00:00:30,736 --> 00:00:33,832
+00:00:29,871 --> 00:00:32,965
 Its firmware runs too, spinning a motor in a simulator:
 
 12
-00:00:34,302 --> 00:00:37,749
+00:00:33,135 --> 00:00:36,741
 current loop, encoders, brake and protections, scenario by scenario.
 
 13
-00:00:38,769 --> 00:00:42,052
+00:00:37,461 --> 00:00:40,764
 The encoder interface chip on that board is our own design too,
 
 14
-00:00:42,072 --> 00:00:44,202
+00:00:40,784 --> 00:00:42,927
 from Verilog through synthesis to layout,
 
 15
-00:00:44,672 --> 00:00:46,322
+00:00:43,397 --> 00:00:45,042
 all with open-source tools.
 
 16
-00:00:47,342 --> 00:00:50,909
+00:00:46,062 --> 00:00:49,633
 The boards and chips then go into production and test in the digital
 
 17
-00:00:50,929 --> 00:00:53,019
+00:00:49,653 --> 00:00:51,745
 factory's circuit board and chip plants,
 
 18
-00:00:53,489 --> 00:00:55,149
+00:00:51,915 --> 00:00:53,580
 and on to the robot plant.
 
 19
-00:00:56,169 --> 00:00:59,378
+00:00:54,300 --> 00:00:57,507
 For companies there is WenQuest Electronics: AI drafts the design,
 
 20
-00:01:00,398 --> 00:01:03,997
-and the factory checks incoming production files automatically
+00:00:58,527 --> 00:01:02,925
+and the factory checks incoming production files automatically and raises
 
 21
-00:01:04,467 --> 00:01:06,288
-and raises issues on the spot.
+00:01:02,945 --> 00:01:04,074
+issues on the spot.
 
 22
-00:01:07,308 --> 00:01:10,506
+00:01:04,794 --> 00:01:07,992
 You can open every one of them from "Electronics and chips" on our homepage.
