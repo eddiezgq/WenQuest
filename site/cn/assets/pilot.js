@@ -18,7 +18,9 @@
       installing: "Being set up - about 10-15 minutes. You can close this page; we will email you.", active: "Ready! The sign-in has been emailed to you. Open: ",
       failed: "The setup did not succeed. We have been told and will contact you.", stopped: "This pilot has been stopped.", err: "Something went wrong - please try again later." }
   };
-  var t = T.zh, info = null, timer = 0;
+  // 第 129 轮：没有指定语言时按站点定：美国站英文，国内站中文
+  var HOME = location.hostname.endsWith("wenquestech.online") ? "zh" : "en";
+  var t = T[HOME], info = null, timer = 0;
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
   function call(path, body) {
     return fetch(API + path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {})
@@ -70,12 +72,12 @@
     };
     box.appendChild(f);
   }
-  if (!token) { box.appendChild(el("p", "pl-err", T[Q.get("lang") === "en" ? "en" : "zh"].bad)); return; }
+  if (!token) { box.appendChild(el("p", "pl-err", (T[Q.get("lang")] || T[HOME]).bad)); return; }
   fetch(API).then(function (r) { return r.json().then(function (j) { if (!r.ok) throw j; return j; }); })
     .then(function (j) {
-      info = j; t = T[(Q.get("lang") || j.lang) === "en" ? "en" : "zh"];
+      info = j; t = T[(Q.get("lang") || j.lang || HOME) === "zh" ? "zh" : "en"];
       document.documentElement.lang = t === T.en ? "en" : "zh-CN";
       if (j.status) poll(); else if (j.used) box.appendChild(el("p", "pl-err", t.used)); else form();
     })
-    .catch(function (e) { t = T[Q.get("lang") === "en" ? "en" : "zh"]; box.textContent = ""; box.appendChild(el("p", "pl-err", (e && typeof e.detail === "string" && e.detail) || t.bad)); });
+    .catch(function (e) { t = T[(Q.get("lang") || HOME) === "zh" ? "zh" : "en"]; box.textContent = ""; box.appendChild(el("p", "pl-err", (e && typeof e.detail === "string" && e.detail) || t.bad)); });
 })();
