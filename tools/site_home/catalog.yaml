@@ -43,7 +43,7 @@ groups:
     zh: 数字工业园
     en: Digital industrial park
     items:
-      - {zh: "进入数字工厂", en: "Enter the digital factory", dz: "减速器厂、机器人厂、电路板厂、芯片封测厂：ERP、工艺、MES、质量、设备、能源", de: "Gearbox, robot, PCB and chip plants: ERP, process, MES, quality, maintenance, energy", url: "https://factory.wenquestrobotics.com/", login: true, intro: factory}
+      - {zh: "进入数字工厂", en: "Enter the digital factory", dz: "减速器厂、机器人厂、电路板厂、芯片封测厂、传感器厂：ERP、工艺、MES、质量、设备、能源", de: "Gearbox, robot, PCB, chip and sensor plants: ERP, process, MES, quality, maintenance, energy", url: "https://factory.wenquestrobotics.com/", login: true, intro: factory}
       - {zh: "工厂演示", en: "Factory demo", dz: "不用登录，看车间怎样运转", de: "See the shop floor run, no sign-in", url: "/factory", intro: factory}
       - {zh: "三维工厂", en: "3D factory", dz: "车间、设备、在制品的三维视图", de: "The plant in 3D", url: "https://factory.wenquestrobotics.com/3d", login: true, intro: factory}
       - {zh: "数字工厂实验", en: "Factory labs", dz: "__FLAB__ 个实验：从订单到交付、追因、标定、售后", de: "__FLAB__ labs: order to delivery, root cause, calibration, after-sales", url: "https://factory.wenquestrobotics.com/labs", login: true, intro: factory}
@@ -60,6 +60,8 @@ groups:
       - {zh: "电路板设计", en: "PCB design", dz: "关节驱动板 A/B 两版：原理图、PCB、三维、BOM、可制造性检查（示例设计）", de: "Joint driver board, rev A and B: schematic, layout, 3D, BOM, DFM checks (example design)", url: "https://pcb.factory.wenquestrobotics.com/pcb-design", login: true}
       - {zh: "芯片设计", en: "Chip design", dz: "编码器接口芯片 WQ-ENCIF：RTL 到 GDS，DRC、LVS、时序都过（示例设计，未流片）", de: "Encoder-interface chip WQ-ENCIF: RTL to GDS, DRC, LVS and timing clean (example, not taped out)", url: "https://pcb.factory.wenquestrobotics.com/chip-design", login: true}
       - {zh: "芯片封测厂", en: "Chip packaging and test plant", dz: "WQ-ENCIF 的封装与测试：晶圆外协，封装、测试、分档", de: "Packaging and test of WQ-ENCIF: wafers bought in, then package, test and bin", url: "https://chip.factory.wenquestrobotics.com/", login: true}
+      - {zh: "传感器厂", en: "Sensor plant", dz: "关节编码器与扭矩传感器：码盘对心、读头装调、精度标定、应变片与砝码标定；读头板向电路板厂买，编码器卖给机器人厂", de: "Joint encoders and torque sensors: disk centering, read-head setup, accuracy calibration, strain gauges and dead-weight calibration; buys read heads from the PCB plant, sells encoders to the robot plant", url: "https://sensor.factory.wenquestrobotics.com/", login: true}
+      - {zh: "编码器误差曲线", en: "Encoder error curves", dz: "每台编码器的整圈误差、谐波分解、信号幅值：看曲线形状分出偏心、间隙、码盘脏", de: "Full-turn error, harmonics and signal amplitude for each encoder: tell eccentricity, gap and dirt apart by the curve's shape", url: "https://sensor.factory.wenquestrobotics.com/enc-curve", login: true}
       - {zh: "固件与仿真", en: "Firmware and simulation", dz: "驱动板 B 版的固件，在 Renode 里整板仿真运行（示例固件）", de: "Firmware for driver board rev B, run on a simulated board in Renode (example)", url: "https://pcb.factory.wenquestrobotics.com/pcb-design", login: true}
       - {zh: "传感器虚拟仪器", en: "Sensor virtual instruments", dz: "7 种仪器、6 种传感器、6 个测量任务，结果自动核对，导出实验记录", de: "7 instruments, 6 sensors, 6 measuring tasks, results checked, lab record exported", url: "https://factory.wenquestrobotics.com/instruments", login: true}
       # 第 101 轮附（11-08，Eddie“按建议”）：视频 18 讲到的两项补卡
