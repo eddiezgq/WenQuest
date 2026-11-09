@@ -289,16 +289,16 @@ html[lang="en"] .group-h { font-family: var(--serif); font-weight: 600; }
 <footer><div class="wrap"><span data-zh>依据：</span><span data-en>Source: </span><span data-zh>问渠数字工厂教学模式演练（2026-10-08），引擎与实验 16 相同；记录见仓库 tools/site_cases/runs/。</span><span data-en>WenQuest digital factory, teaching-mode run (2026-10-08), same engine as Lab 16; record in tools/site_cases/runs/ in the repository.</span></div></footer>
 <script>const STORY = {"chain":[{"k":["投诉","Complaint"],"v":"WQR105-H2404-01","sub":["北方矿业 · 2 号主运皮带","Northern Mining · belt line 2"],"tone":"alarm","d":["客户来电：减速器异响，振动比以前大。投诉登记后，规则 C1 在下一个检测周期开出异常。数字孪生：健康度绿，但最先到期的中间轴轴承 B（6206-2RS）寿命已用 73.7%。","Phone complaint: noise and more vibration. Rule C1 opens an anomaly on the next detection cycle. Digital twin: health green, but the first-due bearing (intermediate shaft B, 6206-2RS) has used 73.7% of its life."],"how":"规则 C1（客户投诉）/ rule C1"},{"k":["输出轴","Output shaft"],"v":"SH301-H2404-01","sub":["出厂档案","Build record"],"tone":"","d":["从现场设备找到它的出厂总成，再找到装在里面的输出轴。依据是数字孪生的出厂数据。","From the field unit to its shipped assembly, then to the output shaft installed in it, using the twin’s build record."],"how":"PartSerial.became → PartSerial.installed_in"},{"k":["砂轮","Grinding wheel"],"v":"grd-01/S1","sub":["GRD-01 外圆磨床","GRD-01 cylindrical grinder"],"tone":"cause","d":["这根轴的磨外圆工序记下了用的是哪片砂轮：grd-01/S1，加工时砂轮剩余寿命 62%。轴承位尺寸由这一刀决定。","The grinding operation recorded which wheel it used: grd-01/S1, with 62% wheel life left at the time. This pass sets the bearing seat size."],"how":"PartSerial.processed（加工记录 / machining record）"},{"k":["同一片砂轮磨出","Same wheel also ground"],"v":"SH301-H2406-09 · SH301-H2408-05","sub":["另外 2 根输出轴","2 more output shafts"],"tone":"","d":["反过来查：同一片砂轮还磨了两根输出轴。如果问题出在砂轮（修整不及时、磨损），这两根轴的轴承位也可能偏。","Searching the other way: the same wheel ground two more shafts. If the wheel is the cause (late dressing, wear), their bearing seats may be off too."],"how":"PartSerial.processed（props.tool = grd-01/S1）"},{"k":["装在","Installed in"],"v":"WQR105-H2408-05","sub":["东港码头 · 散货输送线","East Port · bulk conveyor"],"tone":"risk","d":["健康度黄：换油已过期；最先到期的轴承寿命已用 51.4%。按规则（健康度红 / 黄，或轴承寿命用过 50%）判为<b>高风险</b>。","Health yellow: oil change overdue; first-due bearing at 51.4% of life. By the rule (health red or yellow, or a bearing past 50%) it is <b>high risk</b>."],"how":"PartSerial.installed_in → FieldUnit.customer"},{"k":["装在","Installed in"],"v":"WQR105-H2406-09","sub":["鲜丰食品 · 包装线","Fresh Foods · packaging line"],"tone":"","d":["健康度绿，没有报警，最先到期的轴承寿命只用了 3.5%。在排查范围里，但不是高风险。","Health green, no alarms, first-due bearing at only 3.5% of life. In the check scope, but not high risk."],"how":"PartSerial.installed_in → FieldUnit.customer"}]};</script>
 <script>
-// ---- language (shared with the home page: localStorage "wq-site-lang") ----
+// ---- language (shared with the home page: localStorage "wq-site-lang2") ----
 const root = document.documentElement, langBtn = document.getElementById("langBtn");
 let lang;
-try { lang = localStorage.getItem("wq-site-lang"); } catch (e) {}
-lang = lang || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+try { lang = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+lang = lang || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
 const onLang = [];
 function setLang(l) {
   lang = l; root.lang = l === "en" ? "en" : "zh-CN";
   langBtn.textContent = l === "en" ? "中文" : "EN";
-  try { localStorage.setItem("wq-site-lang", l); } catch (e) {}
+  try { localStorage.setItem("wq-site-lang2", l); } catch (e) {}
   onLang.forEach(f => f());
 }
 langBtn.addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));

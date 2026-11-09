@@ -305,16 +305,16 @@ html[lang="en"] .group-h { font-family: var(--serif); font-weight: 600; }
 </div></section>
 <footer><div class="wrap"><span data-zh>教学版免费；加工程序、误差补偿和 FreeCAD 工作台属于企业版。企业自己的凸轮规范、机床和测量仪可以接进来，按项目报价。</span><span data-en>Free for teaching; machining programs, error compensation and the FreeCAD workbench are in the enterprise edition. Your own cam standards, machines and measuring instruments can be connected, quoted per project.</span></div></footer>
 <script>
-// ---- language (shared with the home page: localStorage "wq-site-lang") ----
+// ---- language (shared with the home page: localStorage "wq-site-lang2") ----
 const root = document.documentElement, langBtn = document.getElementById("langBtn");
 let lang;
-try { lang = localStorage.getItem("wq-site-lang"); } catch (e) {}
-lang = lang || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+try { lang = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+lang = lang || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
 const onLang = [];
 function setLang(l) {
   lang = l; root.lang = l === "en" ? "en" : "zh-CN";
   langBtn.textContent = l === "en" ? "中文" : "EN";
-  try { localStorage.setItem("wq-site-lang", l); } catch (e) {}
+  try { localStorage.setItem("wq-site-lang2", l); } catch (e) {}
   onLang.forEach(f => f());
 }
 langBtn.addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));

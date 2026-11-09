@@ -82,7 +82,7 @@ async function invite() {
   busy.value = true; err.value = "";
   try {
     sent.value = await request<{ email: string; link: string }>("POST", "/api/v1/admin/pilots/invite",
-      { email: f.email.trim(), company: f.company.trim(), lang: locale.value });
+      { email: f.email.trim(), company: f.company.trim() });   // 第 129 轮：语言按站点（美国英文、国内中文），不跟管理员界面走
     Object.assign(f, { email: "", company: "" });
     await load();
   } catch (e) { fail(e); } finally { busy.value = false; }

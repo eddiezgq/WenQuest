@@ -67,9 +67,9 @@
 <script>
 (() => {
   const root = document.documentElement, btn = document.getElementById("lang");
-  let l = null; try { l = localStorage.getItem("wq-site-lang"); } catch (e) {}
-  l = l || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
-  const set = (x) => { l = x; root.lang = x === "en" ? "en" : "zh-CN"; btn.textContent = x === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", x); } catch (e) {} };
+  let l = null; try { l = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+  l = l || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
+  const set = (x) => { l = x; root.lang = x === "en" ? "en" : "zh-CN"; btn.textContent = x === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang2", x); } catch (e) {} };
   set(l); btn.onclick = () => set(l === "en" ? "zh" : "en");
 })();
 </script>

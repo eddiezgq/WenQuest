@@ -359,7 +359,7 @@ const store = {
 };
 
 // ---------- language ----------
-let lang = store.get("wq-ch1-lang") || ((navigator.language || "").startsWith("zh") ? "zh" : "zh");
+let lang = store.get("wq-ch1-lang") || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
 const T = (zh, en) => (lang === "en" ? en : zh);
 const langHooks = [];
 function applyLang() {

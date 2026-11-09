@@ -90,15 +90,15 @@
 (() => {
   const root = document.documentElement, btn = document.getElementById("lang"), $ = (id) => document.getElementById(id);
   const BANDS = { CNY: ["2000 元以下", "2000–4000 元", "4000–8000 元", "8000 元以上"], USD: ["Under $300", "$300–600", "$600–1,000", "Over $1,000"] };
-  let l = null; try { l = localStorage.getItem("wq-site-lang"); } catch (e) {}
-  l = l || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+  let l = null; try { l = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+  l = l || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
   const cur = () => /中国|china|^cn$|prc/i.test($("country").value.trim()) || (!$("country").value.trim() && l !== "en") ? "CNY" : "USD";
   const bands = () => { const c = cur(), keep = (document.querySelector('input[name=band]:checked') || {}).value;
     $("bands").innerHTML = BANDS[c].map((t, i) => `<label><input type="radio" name="band" value="${i + 1}"${keep === String(i + 1) ? " checked" : ""}> ${t}</label>`).join("") +
       `<span class="note">${c === "CNY" ? (l === "en" ? "(RMB)" : "（人民币）") : (l === "en" ? "(US dollars)" : "（美元）")}</span>`; };
   const set = (x) => { l = x; root.lang = x === "en" ? "en" : "zh-CN"; btn.textContent = x === "en" ? "中文" : "EN";
     document.querySelectorAll("option[data-zh-t]").forEach((o) => { o.textContent = o.dataset[x === "en" ? "enT" : "zhT"]; });
-    try { localStorage.setItem("wq-site-lang", x); } catch (e) {} bands(); };
+    try { localStorage.setItem("wq-site-lang2", x); } catch (e) {} bands(); };
   set(l); btn.onclick = () => set(l === "en" ? "zh" : "en");
   $("country").addEventListener("input", bands);
   const MSG = { zh: { ok: "已收到，谢谢！有了备货和价格的消息，我们会写信告诉你。", kits: "请至少选一种套件。", email: "请填写正确的邮箱。", consent: "请勾选同意联系。", country: "请填写国家或地区。", fail: "没能提交，请稍后再试，或写信给 info@wenquestrobotics.com。", rate: "提交太频繁，请稍后再试。" },

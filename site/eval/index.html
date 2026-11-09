@@ -106,9 +106,9 @@
 <script>
 (function () {
   var root = document.documentElement, btn = document.getElementById("langBtn"), stored = null;
-  try { stored = localStorage.getItem("wq-site-lang"); } catch (e) {}
-  function set(l) { root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", l); } catch (e) {} }
-  set(stored || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en"));
+  try { stored = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+  function set(l) { root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang2", l); } catch (e) {} }
+  set(stored || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en"));
   btn.onclick = function () { set(root.lang === "en" ? "zh" : "en"); };
   document.querySelectorAll(".tabs button").forEach(function (b) {
     b.onclick = function () {

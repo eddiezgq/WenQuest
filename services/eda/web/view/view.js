@@ -16,7 +16,7 @@ const T = {
     pass: "pass", fail: "fail", pending: "pending", unknown: "unknown", loading: "Loading…", localOpen: "{n} files opened in your browser (nothing uploaded)",
     noBoard: "No board file", noSch: "No schematic file", limit: "limit", none: "Nothing open", notFound: "{r} is not on the board"},
 };
-let lang = (localGet("eda.lang") || (navigator.language || "zh").slice(0, 2)) === "en" ? "en" : "zh";
+let lang = (localGet("eda.lang") || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en")) === "en" ? "en" : "zh";   // 美国站默认英文（第 129 轮）
 let DESIGNS = [], REPORT = null, sel = null;
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));

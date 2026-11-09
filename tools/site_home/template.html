@@ -843,9 +843,9 @@ __TIERS__
   // ---- language ----
   const root = document.documentElement, btn = document.getElementById("langBtn");
   let stored = null;
-  try { stored = localStorage.getItem("wq-site-lang"); } catch (e) {}
-  let lang = stored || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
-  const setLang = (l) => { lang = l; root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang", l); } catch (e) {} };
+  try { stored = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+  let lang = stored || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
+  const setLang = (l) => { lang = l; root.lang = l === "en" ? "en" : "zh-CN"; btn.textContent = l === "en" ? "中文" : "EN"; try { localStorage.setItem("wq-site-lang2", l); } catch (e) {} };
   setLang(lang);
   btn.onclick = () => setLang(lang === "en" ? "zh" : "en");
 

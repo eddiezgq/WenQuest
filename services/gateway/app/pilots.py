@@ -68,7 +68,8 @@ def register(app, m) -> None:
         return state.settings.region.strip().lower() == "cn"
 
     def zh(lang: str = "") -> bool:
-        return (lang or ("zh" if cn() else "en")).startswith("zh")
+        # 第 129 轮：美国站的邀请、注册页、邮件、开出来的企业一律英文（原来跟着管理员界面语言，开出了中文的）
+        return cn() and (lang or "zh").startswith("zh")
 
     def queue() -> Path:
         return Path(os.environ.get("WQ_PILOT_QUEUE", "/pilot-queue"))
@@ -149,7 +150,7 @@ def register(app, m) -> None:
         email = body.email.strip().lower()
         if not EMAIL_RE.match(email):
             raise EngineError("bad_email", "邮箱格式不对" if cn() else "Not a valid email address", 400)
-        lang = body.lang if body.lang in ("zh", "en") else ("zh" if cn() else "en")
+        lang = (body.lang if body.lang in ("zh", "en") else "zh") if cn() else "en"
         with db() as c:
             if taken(c) >= most():
                 raise EngineError("pilot_full", f"试点企业已满 {most()} 家（WQ_PILOT_MAX）", 409)
@@ -198,7 +199,7 @@ def register(app, m) -> None:
         with db() as c:
             r = get_invite(c, token)
             t = c.execute("select * from tenant where token=?", (token,)).fetchone()
-        return {"email": mask(r["email"]), "company": r["company"], "lang": r["lang"], "used": bool(r["used"]),
+        return {"email": mask(r["email"]), "company": r["company"], "lang": "zh" if zh(r["lang"]) else "en", "used": bool(r["used"]),
                 "status": t["status"] if t else None, "domain": f"<编号>.qms.{state.settings.site_domain}"}
 
     @app.post("/api/v1/public/pilot/{token}/code")
@@ -245,10 +246,10 @@ def register(app, m) -> None:
                                   "服务器暂时不能开通，已通知管理员，我们会尽快联系您", 503)
             now = int(time.time())
             c.execute("insert into tenant(id,company,contact,email,lang,status,token,created) values(?,?,?,?,?,'queued',?,?)",
-                      (tid, body.company.strip(), body.contact.strip(), r["email"], r["lang"], token, now))
+                      (tid, body.company.strip(), body.contact.strip(), r["email"], "zh" if zh(r["lang"]) else "en", token, now))
             c.execute("update invite set used=1, code=null where token=?", (token,))
             write(f"req-{tid}.json", {"id": tid, "name": body.company.strip(), "contact": body.contact.strip(),
-                                      "email": r["email"], "lang": r["lang"], "ts": now})
+                                      "email": r["email"], "lang": "zh" if zh(r["lang"]) else "en", "ts": now})
         return {"ok": True, "id": tid, "status": "queued", "minutes": 15}
 
     @app.get("/api/v1/public/pilot/{token}/status")

@@ -276,16 +276,16 @@ html[lang="en"] .group-h { font-family: var(--serif); font-weight: 600; }
 </div></section>
 <footer><div class="wrap"><span data-zh>依据：问渠《M13 典型应用全流程演练报告》（2026-10-07，M14 修订）。</span><span data-en>Source: WenQuest “M13 end-to-end run of typical applications” (2026-10-07, revised in M14).</span></div></footer>
 <script>
-// ---- language (shared with the home page: localStorage "wq-site-lang") ----
+// ---- language (shared with the home page: localStorage "wq-site-lang2") ----
 const root = document.documentElement, langBtn = document.getElementById("langBtn");
 let lang;
-try { lang = localStorage.getItem("wq-site-lang"); } catch (e) {}
-lang = lang || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+try { lang = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+lang = lang || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
 const onLang = [];
 function setLang(l) {
   lang = l; root.lang = l === "en" ? "en" : "zh-CN";
   langBtn.textContent = l === "en" ? "中文" : "EN";
-  try { localStorage.setItem("wq-site-lang", l); } catch (e) {}
+  try { localStorage.setItem("wq-site-lang2", l); } catch (e) {}
   onLang.forEach(f => f());
 }
 langBtn.addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));

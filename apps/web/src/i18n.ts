@@ -3786,8 +3786,13 @@ function initial(): Locale {
   try {
     const saved = uni.getStorageSync(KEY);
     if (saved === "zh" || saved === "en") return saved;
-    const sys = (uni.getSystemInfoSync().language || "").toLowerCase();
-    return sys.startsWith("zh") ? "zh" : "en";
+    // 第 129 轮：按站点定，不按浏览器语言——美国站默认英文，国内站（和微信小程序）默认中文；自己切过的以切过的为准
+    // #ifdef H5
+    return window.location.hostname.endsWith("wenquestech.online") ? "zh" : "en";
+    // #endif
+    // #ifndef H5
+    return "zh";
+    // #endif
   } catch {
     return "zh";
   }

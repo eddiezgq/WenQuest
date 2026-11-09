@@ -44,7 +44,7 @@ const T = {
     heat: (s, t, w) => `Thermal: ${s}. Board peak about ${t} °C, total loss ${w} W (simplified plate model, a layout-stage estimate only).`,
     tj: "junction", limit: "limit", detailLang: "Item names and notes are in Chinese for now."},
 };
-let lang = (localGet("eda.lang") || (navigator.language || "zh").slice(0, 2)) === "en" ? "en" : "zh";
+let lang = (localGet("eda.lang") || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en")) === "en" ? "en" : "zh";   // 美国站默认英文（第 129 轮）
 let CAT = null, state = null;           // state = {requirement, report, result, runs}
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
