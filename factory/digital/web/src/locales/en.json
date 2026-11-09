@@ -1233,6 +1233,7 @@
 "编码器脉冲频率 Hz": "Encoder pulse frequency Hz",
 "编码器芯片不响应：停机、CAN 报警故障码 3": "Encoder chip not responding: stops, CAN alarm fault code 3",
 "编码器误差曲线": "Encoder error curve",
+"电机终检波形": "Motor final-test waveforms",
 "编码器（第 100 轮）": "Encoder (round 100)",
 "编码器（第 100 轮）与电机控制、CAN（第 102 轮）在同一份固件里。": "Encoder (round 100) and motor control/CAN (round 102) are in the same firmware.",
 "编译": "Build",

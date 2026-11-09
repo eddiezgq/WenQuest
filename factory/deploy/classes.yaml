@@ -39,3 +39,10 @@ classes:
     teachers: []
     plant: wenquest-sensor
     park: true             # 接入工业园：读头板向电路板厂买；机器人厂的关节编码器向这里买
+  # 问渠数字工业园第六座厂（第 131 轮）：电机厂（伺服电机、AGV 驱动电机），按清单起 → https://motor.factory.wenquestrobotics.com
+  - id: motor
+    name: 问渠数字工业园 · 电机厂
+    course: ""
+    teachers: []
+    plant: wenquest-motor
+    park: true             # 接入工业园：机器人厂的四种电机向这里买

@@ -171,7 +171,7 @@ jobs:
     name: 服务器演练（真 ERPNext）
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 200
+    timeout-minutes: 230
     env:
       FACTORY_DIR: /tmp/fac
       LEARN_DIR: /tmp/nolearn
@@ -359,6 +359,27 @@ jobs:
                                  python3 factory/deploy/ci_annotate.py 传感器厂闭环失败项 /tmp/logs/sensor_fail.log 40; }
             fi
           fi
+          # 第 131 轮：工业园第六座厂（电机厂）起来，自己接单走通
+          motor=$(awk -F'\t' '$2 ~ /wenquest-motor\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
+          motorhubp=""
+          if [ "$st" = 0 ] && [ -n "$motor" ]; then
+            m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$motor" ] && break; m=$((m + 1)); done
+            motorhubp=$((8102 + m)); motorerpp=$((8093 + m)); sup=$(echo "$motor" | tr '[:lower:]' '[:upper:]')
+            bash -c ". '$FACTORY_DIR/deploy/lib.sh'; class_setup '$motor'" 2>&1 | tee /tmp/logs/motor_setup.log
+            st=${PIPESTATUS[0]}
+            if [ "$st" = 0 ]; then
+              for i in $(seq 1 40); do curl -fsS localhost:$motorhubp/api/health && break; sleep 5; done
+              cd factory/digital
+              python tests/plant_loop.py --hub http://localhost:$motorhubp --erp http://localhost:$motorerpp --erp-kind real \
+                --erp-key "$(val WQ_C_${sup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${sup}_ERP_API_SECRET)" --speed 300 --timeout 900 \
+                --item WQ-SM200:2 --item WQ-AM750:1 --reliability 0 --staffing 0 --domains --expect-products WQ-SM200,WQ-AM750 \
+                2>&1 | tee /tmp/logs/motor_loop.log
+              st=${PIPESTATUS[0]}
+              cd - >/dev/null
+              [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/motor_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/motor_fail.log;
+                                 python3 factory/deploy/ci_annotate.py 电机厂闭环失败项 /tmp/logs/motor_fail.log 40; }
+            fi
+          fi
           if [ "$st" = 0 ]; then
             # 第 51 轮：公共工厂的枢纽带上班级工厂的配置重启（工业园：接入的班级工厂来下单、收发货回传）
             (cd "$FACTORY_DIR" && docker compose -p wq-factory -f docker-compose.yml -f ci.yml -f docker-compose.classes.yml up -d hub)
@@ -374,6 +395,7 @@ jobs:
               park="--park-hub http://localhost:8100 --lab27"
               [ -z "$pcbhubp" ] || park="$park --park-buy DRV-JOINT-B=http://localhost:$pcbhubp"     # 第 85 轮；第 118 轮起关节模组用 B 版
               [ -z "$sensorhubp" ] || park="$park --park-buy ENC-ABS=http://localhost:$sensorhubp=传感器厂"     # 第 125 轮：关节编码器
+              [ -z "$motorhubp" ] || park="$park --park-buy MTR-SV-400=http://localhost:$motorhubp=电机厂"     # 第 131 轮：伺服电机
             fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE \
                 "sim/(calib|errors|engine|runin)\.py|hub/lab2[68]\.py|cae/wqcr5\.py|plants/wenquest-robot|tests/plant_loop\.py|workflows/factory\.yml"; then

@@ -41,11 +41,12 @@ def test_plants_listing_for_setup_script():
     out = subprocess.run([sys.executable, os.path.join(DEPLOY, "classes.py"), os.path.join(DEPLOY, "classes.yaml"), "--plants"],
                          capture_output=True, text=True, check=True).stdout.strip().splitlines()
     rows = [r.split("\t") for r in out]
-    assert [r[0] for r in rows] == ["robot", "pcb", "chip", "sensor"]   # 第 85 轮：加了电路板厂；第 103 轮：芯片厂；第 125 轮：传感器厂
+    assert [r[0] for r in rows] == ["robot", "pcb", "chip", "sensor", "motor"]   # 第 85 轮：加了电路板厂；第 103 轮：芯片厂；第 125 轮：传感器厂；第 131 轮：电机厂
     assert rows[0][1:4] == ["/app/plants/wenquest-robot.yaml", "问渠机器人厂 WenQuest Robotics (Demo)", "WQRB"]
     assert rows[1][1:4] == ["/app/plants/wenquest-pcb.yaml", "问渠电路板厂 WenQuest Electronics (Demo)", "WQEL"]
     assert rows[2][1:4] == ["/app/plants/wenquest-chip.yaml", "问渠芯片封测厂 WenQuest Semiconductor (Demo)", "WQSC"]
     assert rows[3][1:4] == ["/app/plants/wenquest-sensor.yaml", "问渠传感器厂 WenQuest Sensors (Demo)", "WQSN"]
+    assert rows[4][1:4] == ["/app/plants/wenquest-motor.yaml", "问渠电机厂 WenQuest Motors (Demo)", "WQMT"]
 
 
 def test_park_peers_between_class_plants():
@@ -55,10 +56,11 @@ def test_park_peers_between_class_plants():
     peers = lambda s: dict(x.split("=", 1) for x in svc[s]["environment"]["WQ_PARK_PEERS"].split())    # noqa: E731
     assert peers("hub-c-robot") == {"wenquest-gearbox": "http://hub:8100", "wenquest-pcb": "http://hub-c-pcb:8100", "pcb": "http://hub-c-pcb:8100",
                                     "wenquest-chip": "http://hub-c-chip:8100", "chip": "http://hub-c-chip:8100",      # 第 103 轮：芯片厂
-                                    "wenquest-sensor": "http://hub-c-sensor:8100", "sensor": "http://hub-c-sensor:8100"}   # 第 125 轮：传感器厂
+                                    "wenquest-sensor": "http://hub-c-sensor:8100", "sensor": "http://hub-c-sensor:8100",   # 第 125 轮：传感器厂
+                                    "wenquest-motor": "http://hub-c-motor:8100", "motor": "http://hub-c-motor:8100"}       # 第 131 轮：电机厂
     assert peers("hub-c-pcb")["robot"] == "http://hub-c-robot:8100" and peers("hub-c-pcb")["wenquest-gearbox"] == "http://hub:8100"
     assert peers("hub") == {"robot": "http://hub-c-robot:8100", "pcb": "http://hub-c-pcb:8100", "chip": "http://hub-c-chip:8100",
-                            "sensor": "http://hub-c-sensor:8100"}
+                            "sensor": "http://hub-c-sensor:8100", "motor": "http://hub-c-motor:8100"}
     assert peers("hub-c-sensor")["wenquest-pcb"] == "http://hub-c-pcb:8100"                        # 第 125 轮：读头板向电路板厂买
     assert svc["hub-c-pcb"]["environment"]["WQ_PLANT_FILE"] == "/app/plants/wenquest-pcb.yaml"
 
