@@ -22,6 +22,11 @@ url=$(dc exec -T moodle su -s /bin/sh www-data -c 'c=admin/cli/cfg.php; [ -f $c 
 echo "Moodle documentserverurl -> ${url:-（未设置）}"
 [ "$url" = "https://learn.$D/docs" ] || fail="$fail moodle-config"
 
+# 在线实验报告导出 PDF（第 122 轮）：用真实报告模板生成 Word，经 OnlyOffice 转成 PDF 并检查。
+pdf=$(dc exec -T gateway python -m app.production.pdf_selftest 2>&1 | tail -5)
+echo "$pdf"
+echo "$pdf" | tail -1 | grep -q '^pdf ok' || fail="$fail report-pdf"
+
 docker stats --no-stream --format '{{.Name}} {{.MemUsage}} {{.CPUPerc}}' | grep -E 'docs|moodle|gateway' || true
 free -m | sed -n 1,2p
 
