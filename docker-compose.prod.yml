@@ -41,6 +41,14 @@ services:
       qms-edge: {}
       factory-edge: {}   # 数字工厂（factory. 与 erp. 两个网址）
 
+  # 第 125 轮：Caddy 给 <编号>.factory 办证书前问网关，网关再问数字工厂枢纽 wqf-hub（第 97 轮起这样转），
+  # 网关要和枢纽在同一个网络里才找得到它；以前只有 Caddy 接了 factory-edge，第 97 轮以后新建的厂（芯片厂、传感器厂）都办不下证书、打不开
+  gateway:
+    networks:
+      default: {}
+      render: {}
+      factory-edge: {}
+
   web:
     ports: !reset []
 
