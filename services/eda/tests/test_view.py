@@ -42,6 +42,24 @@ def test_page_has_no_external_fonts():
         assert (A.WEB / "view" / "vendor" / f).exists()
 
 
+def test_chinese_glyphs_loaded():
+    # KiCanvas 自带字形只到 U+4E1F，原理图里的中文显示成“?”（11-08 线上看到）；补上 KiCad 字库其余字形
+    import json
+
+    v = A.WEB / "view" / "vendor"
+    js = (v / "kicanvas.js").read_text(encoding="utf-8")
+    assert "].concat(globalThis.WQ_NEWSTROKE_EXTRA||[]);" in js
+    i = js.index("K3=[")
+    have = len(json.loads(js[i + 3 : js.index("].concat(globalThis.WQ_NEWSTROKE_EXTRA", i) + 1]))
+    extra = (v / "newstroke-extra.js").read_text(encoding="utf-8")
+    glyphs = json.loads(extra[extra.index("=[") + 1 : extra.rindex(";")])
+    for ch in "关节伺服驱动板相电流采样编码器接口":
+        assert glyphs[ord(ch) - 32 - have]
+    assert (v / "NEWSTROKE-LICENSE.txt").exists()
+    page = (A.WEB / "view" / "index.html").read_text(encoding="utf-8")
+    assert page.index("vendor/newstroke-extra.js") < page.index("vendor/kicanvas.js")
+
+
 def test_plugin_zip():
     import io
     import zipfile
