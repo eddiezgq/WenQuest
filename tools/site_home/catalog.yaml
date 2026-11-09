@@ -62,6 +62,9 @@ groups:
       - {zh: "芯片封测厂", en: "Chip packaging and test plant", dz: "WQ-ENCIF 的封装与测试：晶圆外协，封装、测试、分档", de: "Packaging and test of WQ-ENCIF: wafers bought in, then package, test and bin", url: "https://chip.factory.wenquestrobotics.com/", login: true}
       - {zh: "固件与仿真", en: "Firmware and simulation", dz: "驱动板 B 版的固件，在 Renode 里整板仿真运行（示例固件）", de: "Firmware for driver board rev B, run on a simulated board in Renode (example)", url: "https://pcb.factory.wenquestrobotics.com/pcb-design", login: true}
       - {zh: "传感器虚拟仪器", en: "Sensor virtual instruments", dz: "7 种仪器、6 种传感器、6 个测量任务，结果自动核对，导出实验记录", de: "7 instruments, 6 sensors, 6 measuring tasks, results checked, lab record exported", url: "https://factory.wenquestrobotics.com/instruments", login: true}
+      # 第 101 轮附（11-08，Eddie“按建议”）：视频 18 讲到的两项补卡
+      - {zh: "电路分析", en: "Circuit analysis", dz: "浏览器里搭电路、改元件值，当场仿真出波形", de: "Build a circuit in the browser, change a value, simulate and see the waveform", url: "https://factory.wenquestrobotics.com/circuit", login: true}
+      - {zh: "问渠电子", en: "WenQuest Electronics", dz: "AI 起草电路设计；工厂收到生产资料先自动检查，有问题开问题单", de: "AI drafts the circuit design; the factory checks incoming production files and raises issues", url: "https://wenquestrobotics.com/eda/"}
   - key: soft
     wide: true
     zh: 工程软件
