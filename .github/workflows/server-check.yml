@@ -74,17 +74,17 @@ jobs:
       - name: 工业园各厂网址（第 125 轮：新厂打不开时查证书与转发）
         if: always() && inputs.server == 'us'
         run: |
-          ssh "deploy@$HOST" 'for h in chip sensor motor; do
+          ssh "deploy@$HOST" 'for h in chip sensor motor sewing; do
               d=$h.factory.wenquestrobotics.com
               echo "$d local=$(curl -sk -o /dev/null -m 20 -w "%{http_code}" --resolve $d:443:127.0.0.1 https://$d/api/health 2>&1)"
               curl -sv -o /dev/null -m 20 --resolve $d:443:127.0.0.1 https://$d/api/health 2>&1 | grep -iE "subject:|issuer:|expire|SSL|alert|HTTP/" | head -6
             done
             c=$(docker ps --format "{{.Names}}" | grep -i caddy | head -1); echo "caddy=$c"
-            docker logs "$c" 2>&1 | grep -i "motor" | tail -15 | cut -c1-400
+            docker logs "$c" 2>&1 | grep -i "sewing" | tail -15 | cut -c1-400
             g=$(docker ps --format "{{.Names}}" | grep -i gateway | head -1); echo "gateway=$g"
-            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://localhost:8000/api/v1/caddy/ask?domain=motor.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
-            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub:8100/api/caddy/ask?domain=motor.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
-            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub-c-motor:8100/api/health\",timeout=5).read()[:200])" 2>&1 | tail -2' 2>&1 \
+            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://localhost:8000/api/v1/caddy/ask?domain=sewing.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
+            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub:8100/api/caddy/ask?domain=sewing.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
+            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub-c-sewing:8100/api/health\",timeout=5).read()[:200])" 2>&1 | tail -2' 2>&1 \
             | sed 's/^/site: /' | while IFS= read -r l; do echo "::notice::$l"; done
       - name: Clean (only when asked) — 先于试传文件执行
         if: always() && inputs.clean == 'yes'
