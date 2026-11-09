@@ -51,6 +51,7 @@ from . import edit_api
 from . import learn_api
 from . import webdocs_api
 from . import coursedocs_api
+from . import engdocs_api
 from . import life_api
 from . import course_builder as cb
 from . import generate as gen
@@ -165,6 +166,7 @@ def create_app() -> FastAPI:
     sewing_ai.register(app, sys.modules[__name__])
     sewing_video.register(app, sys.modules[__name__])
     sewing_ebox.register(app, sys.modules[__name__])
+    engdocs_api.register(app, sys.modules[__name__])      # 第 128 轮：计算书、调机卡存为网页文档；工艺卡转 PDF
     cam_ai.register(app, sys.modules[__name__])
     cam_projects.register(app, sys.modules[__name__])
     bearing_projects.register(app, sys.modules[__name__])

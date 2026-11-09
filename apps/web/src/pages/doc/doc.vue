@@ -5,18 +5,19 @@
       <view class="bar">
         <view class="b-title">
           <text class="b-name">{{ title }}</text>
-          <text class="wq-tag" :class="st?.published ? 'ok' : 'accent'">{{ st?.published ? t("doc.publishedN", { n: st.published }) : t("doc.draft") }}</text>
-          <text v-if="st?.published" class="wq-tag">{{ t("doc.aud." + st.audience) }}</text>
+          <text v-if="eng" class="wq-tag accent">{{ t("doc.engKind." + (est?.kind || "report")) }}</text>
+          <text v-else class="wq-tag" :class="st?.published ? 'ok' : 'accent'">{{ st?.published ? t("doc.publishedN", { n: st.published }) : t("doc.draft") }}</text>
+          <text v-if="st?.published && !eng" class="wq-tag">{{ t("doc.aud." + st.audience) }}</text>
           <text v-if="!viewing" class="wq-muted save">{{ saveText }}</text>
         </view>
         <view class="b-actions">
           <!-- #ifdef H5 -->
-          <view v-if="!viewing" class="wq-btn small" :class="{ disabled: busy }" @click="openDraft">✦ {{ t("doc.aiDraft") }}</view>
+          <view v-if="!viewing && !eng" class="wq-btn small" :class="{ disabled: busy }" @click="openDraft">✦ {{ t("doc.aiDraft") }}</view>
           <!-- #endif -->
           <view class="wq-btn small" :class="{ disabled: busy }" @click="exportAs('docx')">{{ t("report.exportWord") }}</view>
           <view v-if="st?.pdf" class="wq-btn small" :class="{ disabled: busy }" @click="exportAs('pdf')">{{ t("report.exportPdf") }}</view>
-          <view class="wq-btn small" :class="{ disabled: busy }" @click="exportMany">{{ t("doc.exportMany") }}</view>
-          <view v-if="!viewing" class="wq-btn primary small" :class="{ disabled: busy }" @click="publish">{{ t("doc.publish") }}</view>
+          <view v-if="!eng" class="wq-btn small" :class="{ disabled: busy }" @click="exportMany">{{ t("doc.exportMany") }}</view>
+          <view v-if="!viewing && !eng" class="wq-btn primary small" :class="{ disabled: busy }" @click="publish">{{ t("doc.publish") }}</view>
         </view>
       </view>
       <text v-if="error" class="wq-error block">{{ error }}</text>
@@ -25,14 +26,20 @@
         <text class="wq-link" @click="restore">{{ t("doc.restore") }}</text>
         <text class="wq-link" @click="backToDraft">{{ t("report.backToCurrent") }}</text>
       </view>
+      <view v-else-if="eng" class="banner muted">{{ t("doc.engNote") }}</view>
       <view v-else class="banner muted">{{ t("doc.draftNote") }}<!-- #ifndef H5 --> {{ t("doc.mobileNote") }}<!-- #endif --></view>
+      <view v-if="eng && est?.stale" class="banner">
+        <text>{{ t("doc.stale") }}</text>
+        <text class="wq-link" @click="regenerate">{{ t("doc.regenerate") }}</text>
+      </view>
+      <view v-if="eng && est?.project_gone" class="banner muted">{{ t("doc.projectGone") }}</view>
       <view v-if="fresh && !viewing" class="banner">
         <text>{{ t("doc.freshHint") }}</text>
         <!-- #ifdef H5 -->
         <text class="wq-link" @click="openDraft">✦ {{ t("doc.aiDraft") }}</text>
         <!-- #endif -->
       </view>
-      <view v-if="st?.versions.length" class="versions">
+      <view v-if="st?.versions.length && !eng" class="versions">
         <text class="wq-muted">{{ t("doc.versions") }}</text>
         <text v-for="v in st.versions" :key="v.ver" class="vchip" :class="{ on: viewing === v.ver }" @click="viewVersion(v.ver)">
           {{ t("report.versionN", { n: v.ver }) }} · {{ t("doc.aud." + v.audience) }} · {{ formatDate(v.at) }}
@@ -48,12 +55,20 @@
         <input v-model="doc.sub" class="d-sub" :placeholder="t('doc.subPh')" @input="changed" />
         <view v-for="(b, bi) in doc.blocks" :key="keys[bi]" class="blk" :class="'k-' + b.t">
           <!-- block tools -->
+          <view v-if="b.lock" class="tools">
+            <text class="lock-l">🔒 {{ t("doc.locked") }}</text>
+            <!-- #ifdef H5 -->
+            <text class="tl" @click="insertMenu(bi)">＋</text>
+            <!-- #endif -->
+          </view>
+          <view v-if="b.lock" class="locked"><MathContent :html="blocksHtml([b])" /></view>
+          <template v-else>
           <view class="tools">
             <!-- #ifdef H5 -->
             <text class="tl" :title="t('doc.up')" @click="move(bi, -1)">↑</text>
             <text class="tl" :title="t('doc.down')" @click="move(bi, 1)">↓</text>
             <text class="tl" @click="insertMenu(bi)">＋</text>
-            <text v-if="['h', 'para', 'list', 'table', 'callout'].includes(b.t)" class="tl ai" @click="aiMenu(bi)">✦ {{ t("doc.ai") }}</text>
+            <text v-if="!eng && ['h', 'para', 'list', 'table', 'callout'].includes(b.t)" class="tl ai" @click="aiMenu(bi)">✦ {{ t("doc.ai") }}</text>
             <text v-if="b.t === 'table'" class="tl" @click="openChart(bi)">📈</text>
             <!-- #endif -->
             <text v-if="b.t === 'h' || b.t === 'para'" class="tl" :class="{ on: showEn[bi] || !!(b as any).en }" @click="showEn[bi] = !showEn[bi]">{{ t("doc.bilingual") }}</text>
@@ -115,6 +130,7 @@
 
           <textarea v-else-if="b.t === 'callout'" v-model="b.text" class="area callout" auto-height :maxlength="20000" @input="changed" />
           <view v-else-if="b.t === 'hr'" class="hr" />
+          </template>
         </view>
 
         <!-- add at the end -->
@@ -205,12 +221,15 @@ import { onLoad } from "@dcloudio/uni-app";
 import AppShell from "../../components/AppShell.vue";
 import MathContent from "../../components/MathContent.vue";
 import { ApiError } from "../../api";
-import { type AiSource, type CBlock, type CDoc, type CDocState, confirmAction, docApi, docImageUrl, downloadAuthed } from "../../courseApi";
+import { type AiSource, type CBlock, type CDoc, type CDocState, confirmAction, docApi, docImageUrl, downloadAuthed, engDocApi,
+  type EngDocState } from "../../courseApi";
 import { drawChart } from "../../chart";
 import { errorText, formatDate, locale, t } from "../../i18n";
 
 type TableB = Extract<CBlock, { t: "table" }>;
 const id = ref(0);
+const eng = ref(false);                   // 第 128 轮：工程师的网页文档（缝纫机计算书、调机卡）
+const est = ref<EngDocState | null>(null);
 const st = ref<CDocState | null>(null);
 const doc = ref<CDoc | null>(null);
 const keys = ref<number[]>([]);          // stable keys for v-for while blocks move
@@ -234,7 +253,7 @@ const addKinds = h5 ? ["h", "para", "list", "table", "image", "callout", "hr"] :
 
 const title = computed(() => (doc.value?.title[0] || (locale.value === "en" ? doc.value?.title[1] : "") || t("doc.title")));
 const saveText = computed(() => (saving.value ? t("common.saving") : dirty.value ? t("report.unsaved") : savedAt.value ? t("report.savedAt", { time: formatDate(savedAt.value) }) : ""));
-const fresh = computed(() => !!st.value && !st.value.published && !st.value.versions.length);
+const fresh = computed(() => !eng.value && !!st.value && !st.value.published && !st.value.versions.length);
 const fail = (e: unknown) => { error.value = errorText(e instanceof ApiError ? e.code : "unknown"); };
 
 // ---------- rendering helpers (a read-only preview, the same shape as the course page) ----------
@@ -272,9 +291,14 @@ function take(s: CDocState) {
   savedAt.value = s.updated;
   dirty.value = false;
 }
+function fromEng(e: EngDocState): CDocState {
+  est.value = e;
+  return { id: e.id, course: 0, cmid: 0, template: "blank", doc: e.doc, audience: "teachers", published: 0, updated: e.updated, versions: [], pdf: e.pdf };
+}
 async function load() {
   error.value = "";
   try {
+    if (eng.value) { take(fromEng(await engDocApi.get(id.value))); return; }
     take(await docApi.get(id.value));
     viewing.value = 0;
     shown.value = null;
@@ -291,7 +315,7 @@ async function save() {
   if (!dirty.value || !doc.value || !st.value) return;
   saving.value = true;
   try {
-    const r = await docApi.save(id.value, doc.value, st.value.updated);
+    const r = await (eng.value ? engDocApi.save : docApi.save)(id.value, doc.value, st.value.updated);
     st.value.updated = r.updated;
     savedAt.value = r.updated;
     dirty.value = false;
@@ -336,6 +360,12 @@ function move(bi: number, d: number) {
   [keys.value[bi], keys.value[j]] = [keys.value[j], keys.value[bi]];
   changed();
 }
+async function regenerate() {
+  if (busy.value) return;
+  busy.value = true;
+  try { await flush(); take(fromEng(await engDocApi.regenerate(id.value))); uni.showToast({ title: t("doc.regenerated"), icon: "none" }); }
+  catch (e) { fail(e); } finally { busy.value = false; }
+}
 async function remove(bi: number) {
   if (!(await confirmAction(t("doc.removeAsk"), t("doc.remove"), t("common.cancel")))) return;
   doc.value!.blocks.splice(bi, 1);
@@ -374,7 +404,7 @@ function addImage(at: number) {
       try {
         const data = await readImage(r.tempFilePaths[0]);
         if (data.length > 4_000_000) { uni.showToast({ title: t("doc.imageTooBig"), icon: "none" }); return; }
-        const up = await docApi.image(id.value, data);
+        const up = await (eng.value ? engDocApi.image : docApi.image)(id.value, data);
         put(at, { t: "image", img: up.img, caption: "" });
       } catch (e) { fail(e); } finally { busy.value = false; }
     },
@@ -401,7 +431,7 @@ async function addChart() {
   if (!chart.ok || busy.value) return;
   busy.value = true;
   try {
-    const up = await docApi.image(id.value, "data:image/png;base64," + chart.png);
+    const up = await (eng.value ? engDocApi.image : docApi.image)(id.value, "data:image/png;base64," + chart.png);
     put(chart.at + 1, { t: "image", img: up.img, caption: chart.caption });
     chart.open = false;
   } catch (e) { fail(e); } finally { busy.value = false; }
@@ -487,7 +517,8 @@ async function exportAs(fmt: "docx" | "pdf") {
   error.value = "";
   try {
     await flush();
-    await downloadAuthed(`/api/v1/webdocs/${id.value}/export?fmt=${fmt}${viewing.value ? `&ver=${viewing.value}` : ""}`, `${fname()}.${fmt}`);
+    const base = eng.value ? `/api/v1/engdocs/${id.value}` : `/api/v1/webdocs/${id.value}`;
+    await downloadAuthed(`${base}/export?fmt=${fmt}${viewing.value ? `&ver=${viewing.value}` : ""}`, `${fname()}.${fmt}`);
   } catch (e) { fail(e); } finally { busy.value = false; }
 }
 function exportMany() {
@@ -507,7 +538,8 @@ function exportMany() {
 }
 
 onLoad(async (q: any) => {
-  id.value = +(q.id || 0);
+  eng.value = !!q.eng;
+  id.value = +(q.id || q.eng || 0);
   if (!id.value) { error.value = errorText("not_found"); return; }
   await load();
   if (q.ai && fresh.value && h5) openDraft();      // just made from the course editor
@@ -569,6 +601,8 @@ onLoad(async (q: any) => {
 .img { text-align: center; display: flex; flex-direction: column; align-items: center; }
 .pic { max-width: 640px; width: 100%; }
 .hr { border-top: 1px solid #c9d1d6; margin: 10px 0; }
+.locked { background: #f7f8f9; border-radius: 6px; padding: 4px 10px; color: #333; }
+.lock-l { font-size: 11px; color: #8a959c; margin-right: auto; }
 .add-row { margin-top: 18px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-top: 1px dashed #d9dde1; padding-top: 12px; }
 .add-k { font-size: 13px; padding: 3px 10px; border: 1px solid #d9dde1; border-radius: 12px; cursor: pointer; background: #fff; }
 .mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 50; }

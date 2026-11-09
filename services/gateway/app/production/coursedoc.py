@@ -9,6 +9,7 @@
   image    {img, caption}                    图片：img 是图片库里的编号（上传的照片或由表格作的图）
   callout  {text}                            提示框
   hr       {}                                分隔线
+任何块可带 lock: true（第 128 轮）：由计算生成，网页上只读，服务器保存时以生成的为准。
 
 和第 122 轮实验报告（webdoc.py）不同，这里所有内容老师都能改，所以没有“模板合并”，只做 `clean()`：
 只留认得的块和字段，限制长度。同一份数据出 Word（docgen 版式）和课程页面的正文（HTML）。
@@ -51,6 +52,7 @@ def clean(doc: Any) -> dict:
         raise DocError(f"内容块太多（最多 {MAX_BLOCKS} 块）")
     n = 0
     for b in blocks:
+        before = len(out["blocks"])
         t = b.get("t")
         if t == "h":
             lv = b.get("level") if b.get("level") in (1, 2, 3) else 1
@@ -81,6 +83,8 @@ def clean(doc: Any) -> dict:
             out["blocks"].append({"t": "callout", "text": _s(b.get("text"), MAX_TEXT)})
         elif t == "hr":
             out["blocks"].append({"t": "hr"})
+        if b.get("lock") and len(out["blocks"]) > before:
+            out["blocks"][-1]["lock"] = True      # 第 128 轮：由计算生成的块（计算书、调机卡），网页上不能改
     return out
 
 

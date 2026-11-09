@@ -21,6 +21,7 @@ const routes = [
   { path: '/library', component: () => import('./pages/Library.vue') },
   { path: '/design', component: () => import('./pages/DesignRelease.vue') },
   { path: '/process', component: () => import('./pages/ProcessPlan.vue') },
+  { path: '/process/edit/:item', component: () => import('./pages/ProcessEdit.vue') },   // 第 128 轮：在页面上改工艺卡
   { path: '/process/:sid', component: () => import('./pages/ProcessPlan.vue') },
   { path: '/design/:id', component: () => import('./pages/DesignReview.vue') },
   { path: '/members', component: () => import('./pages/Members.vue') },

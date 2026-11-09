@@ -12,7 +12,7 @@ export const PAGES = {
 export function pageTitle(path) {
   return PAGES[path] || (path === '/help' || path.startsWith('/help/') ? '帮助' : '')
     || (path.startsWith('/quality/8d/') ? '质量异常单（8D）' : path.startsWith('/ont/') ? '厂情中枢' : '')
-    || (path.startsWith('/design/') ? '设计审阅' : path.startsWith('/process/') ? '工艺规程与 AI 评审'
+    || (path.startsWith('/design/') ? '设计审阅' : path.startsWith('/process/edit/') ? '在页面上改工艺卡' : path.startsWith('/process/') ? '工艺规程与 AI 评审'
       : path.startsWith('/tasks/review/') ? '任务单审阅' : path.startsWith('/tasks/') ? '工程任务单' : '');
 }
 

@@ -386,14 +386,15 @@ export const reportApi = {
 
 // ---------- 老师用的网页文档（第 126 轮）----------
 export type CItem = { text: string; en: string };
-export type CBlock =
+// 第 128 轮：lock = 由计算生成（计算书、调机卡），网页上只读
+export type CBlock = (
   | { t: "h"; level: 1 | 2 | 3; text: string; en: string }
   | { t: "para"; text: string; en: string }
   | { t: "list"; ordered: boolean; items: CItem[] }
   | { t: "table"; id: string; caption: string; head: string[]; rows: string[][] }
   | { t: "image"; img: string; caption: string }
   | { t: "callout"; text: string }
-  | { t: "hr" };
+  | { t: "hr" }) & { lock?: boolean };
 export interface CDoc { v: number; kind: "coursedoc"; template: string; title: Pair; sub: string; blocks: CBlock[] }
 export interface CVersion { ver: number; at: number; by: number; audience: "teachers" | "students" }
 export interface CDocState {
@@ -419,6 +420,22 @@ export const docApi = {
     request<{ block: CBlock }>("POST", `/api/v1/webdocs/${id}/ai-block`, { index, action, block, note }, 180000),
 };
 export const docImageUrl = (h: string) => `${BASE}/api/v1/webdoc-img/${h}`;
+
+// ---------- 工程师的网页文档（第 128 轮）：缝纫机计算书、调机卡 ----------
+export interface EngDocState {
+  id: number; kind: "report" | "card"; machine: string; pid: number; project: string; doc: CDoc; updated: number; by_name: string;
+  stale: boolean; project_gone: boolean; pdf: boolean;
+}
+export interface EngDocItem { id: number; kind: string; machine: string; project: string; title: Pair; updated: number; by_name: string }
+export const engDocApi = {
+  create: (body: Record<string, unknown>) => request<EngDocState>("POST", "/api/v1/sewing/webdocs", body, 180000),
+  list: () => request<{ docs: EngDocItem[] }>("GET", "/api/v1/sewing/webdocs"),
+  get: (id: number) => request<EngDocState>("GET", `/api/v1/engdocs/${id}`),
+  save: (id: number, doc: CDoc, base: number) => request<{ updated: number }>("PUT", `/api/v1/engdocs/${id}`, { doc, base }),
+  regenerate: (id: number) => request<EngDocState>("POST", `/api/v1/engdocs/${id}/regenerate`, {}, 180000),
+  image: (id: number, data: string) => request<{ img: string; url: string }>("POST", `/api/v1/engdocs/${id}/images`, { data }, 120000),
+  remove: (id: number) => request<{ ok: boolean }>("DELETE", `/api/v1/engdocs/${id}`),
+};
 
 /** A file from the gateway that needs the login (Word / PDF export). H5 saves it; the mini program opens it. */
 export async function downloadAuthed(path: string, name: string): Promise<void> {

@@ -1479,22 +1479,108 @@ def process_get(sid: str, u=Depends(user_of)):
     return s
 
 
+def _cards_pdf(docx: bytes) -> bytes:
+    """第 128 轮（阶段 C1）：工艺卡的 PDF——把 Word 交给学习平台网关，网关用本服务器的在线文档服务（OnlyOffice）转换。
+    网关与枢纽同在 factory-edge 网络；认证用课程接口钥匙 WQ_FACTORY_READ_KEY（两边 .env 里是同一把）。"""
+    import httpx
+    url, key = os.environ.get("WQ_PDF_URL", ""), os.environ.get("WQ_FACTORY_READ_KEY", "")
+    if not url or not key:
+        raise HTTPException(503, "这台服务器没有配置 PDF 导出（WQ_PDF_URL），请先导出 Word")
+    try:
+        r = httpx.post(url, content=docx, headers={"Authorization": "Bearer " + key,
+                                                   "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"},
+                       timeout=180)
+    except httpx.HTTPError as e:
+        raise HTTPException(502, f"PDF 转换服务连不上：{type(e).__name__}")
+    if r.status_code != 200 or not r.content.startswith(b"%PDF"):
+        raise HTTPException(502, f"PDF 转换失败（{r.status_code}）")
+    return r.content
+
+
 def _cards_response(plan: dict, fmt: str):
-    """全套工艺文件（第 13 轮 N2）：HTML 直接看、用浏览器打印成 PDF；fmt=docx 下载可编辑的 Word。"""
+    """全套工艺文件（第 13 轮 N2）：HTML 直接看；fmt=docx 下载 Word；fmt=pdf（第 128 轮）由 Word 经在线文档服务转成 PDF。"""
     if not plan.get("operations") or not plan.get("doc"):
         raise HTTPException(400, "这份工艺规程还不是数据格式 v2（缺 doc 或 operations），生成不了卡片")
     try:
-        if fmt == "docx":
+        if fmt in ("docx", "pdf"):
             import tempfile
             with tempfile.TemporaryDirectory() as d:
                 path = proc_cards.docx(plan, os.path.join(d, "cards.docx"))
                 data = path.read_bytes()
+            if fmt == "pdf":
+                name = urllib.parse.quote(f"{plan.get('item', 'part')}_工艺文件.pdf")
+                return Response(_cards_pdf(data), media_type="application/pdf",
+                                headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
             name = urllib.parse.quote(f"{plan.get('item', 'part')}_工艺文件.docx")
             return Response(data, media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                             headers={"Content-Disposition": f"attachment; filename*=UTF-8''{name}"})
         return Response(proc_cards.html(plan), media_type="text/html; charset=utf-8")
     except (KeyError, TypeError, ValueError, StopIteration) as e:
         raise HTTPException(400, f"工艺规程数据不完整，生成卡片失败：{e!r}")
+
+
+# ---------------------------------------------------------------- 第 128 轮（阶段 C1）：在页面上改工艺卡
+# 改的是工艺规程的数据（卡片照 JB/T 9165.2 版式重排）；每人每个零件一份草稿，随时核算与 AI 预检，改好照常“提交审批”。
+
+def _std_plan(item: str):
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "std", f"{item}_process.yaml")
+    return proc_cards.load(path) if os.path.exists(path) else None
+
+
+@app.get("/api/process/drafts/{item}")
+def process_draft_get(item: str, start: str = "", u=Depends(user_of)):
+    """我的草稿；没有草稿时按 start 给起点：reference（参照工艺规程）或某次提交的编号（在那一份上改）。"""
+    if item not in F.ITEMS:
+        raise HTTPException(404, "没有这个零件")
+    r = H.db.one("select plan, ts from process_draft where mode=%s and uid=%s and item=%s", (u["mode"], _uid(u), item))
+    if r and not start:
+        return {"item": item, "plan": r["plan"], "saved": r["ts"].isoformat(), "draft": True}
+    plan = None
+    if start == "reference":
+        plan = _std_plan(item)
+    elif start:
+        s = process.get(H.db, start)
+        if s and s["mode"] == u["mode"] and s["item"] == item:
+            plan = s["plan"]
+    elif r is None:
+        plan = _std_plan(item)
+    if plan is None:
+        raise HTTPException(404, "没有可以作起点的工艺规程（先下载零件图要求，按 YAML 写一份上传）")
+    return {"item": item, "plan": json.loads(json.dumps(plan, ensure_ascii=False, default=str)), "saved": None, "draft": False}
+
+
+@app.put("/api/process/drafts/{item}")
+def process_draft_put(item: str, body: dict = Body(...), u=Depends(user_of)):
+    from psycopg.types.json import Jsonb
+    plan = _plan_of(body)
+    if plan.get("item") != item:
+        raise HTTPException(400, "草稿的零件和网址不一致")
+    if len(json.dumps(plan, ensure_ascii=False)) > 1_000_000:
+        raise HTTPException(413, "工艺规程太大（超过 1 MB）")
+    H.db.x("insert into process_draft (mode, uid, item, plan, ts) values (%s,%s,%s,%s,now()) "
+           "on conflict (mode, uid, item) do update set plan=excluded.plan, ts=now()", (u["mode"], _uid(u), item, Jsonb(plan)))
+    return {"ok": True, "saved": dt.datetime.now(dt.timezone.utc).isoformat()}
+
+
+@app.delete("/api/process/drafts/{item}")
+def process_draft_delete(item: str, u=Depends(user_of)):
+    H.db.x("delete from process_draft where mode=%s and uid=%s and item=%s", (u["mode"], _uid(u), item))
+    return {"ok": True}
+
+
+@app.post("/api/process/live")
+def process_live(body: dict = Body(...), u=Depends(user_of)):
+    """边改边查：卡片能不能生成（cards.check）和 AI 工艺评审员的意见（process.review），都不记录。"""
+    plan = _plan_of(body)
+    try:
+        problems = proc_cards.check(plan) if plan.get("doc") else ["这份工艺规程还不是数据格式 v2（缺 doc），生成不了卡片。"]
+    except (KeyError, TypeError, ValueError, StopIteration) as e:
+        problems = [f"数据不完整：{e!r}"[:300]]
+    try:
+        f = process.review(plan)
+    except (KeyError, TypeError, ValueError) as e:
+        f = [{"level": "error", "rule": "数据", "seq": None, "text": f"工艺规程数据不完整，评审不了：{e!r}"[:300]}]
+    return {"problems": problems, "findings": f, "suggested_score": process.suggested_score(f)}
 
 
 @app.get("/api/process/cards/reference/{item}")

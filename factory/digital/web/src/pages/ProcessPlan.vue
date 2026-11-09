@@ -11,6 +11,7 @@
         <div class="line">
           <label class="small">零件 <select v-model="item"><option v-for="i in ITEMS" :key="i" :value="i">{{ i }}</option></select></label>
           <button class="btn" @click="cards('/process/cards/reference/' + item)">看全套工艺文件</button>
+          <router-link class="btn primary" :to="'/process/edit/' + item">在页面上改工艺卡</router-link>
           <button class="btn ghost" @click="downloadRef">下载 YAML</button>
           <span class="small muted">当前生效：{{ info?.revision ? '第 ' + info.revision + ' 版' : '参照工艺规程（还没有批准过学生的版本）' }}</span>
         </div>
@@ -63,7 +64,8 @@
           <router-link to="/process" class="small">← 工艺规程</router-link></div>
         <p class="small">提交人 {{ sub.author }} · {{ timeOf(sub.ts) }}<template v-if="sub.note"> · 说明：{{ sub.note }}</template>
           <template v-if="sub.revision"> · 已生效为第 {{ sub.revision }} 版</template></p>
-        <div class="line"><button class="btn" @click="cards('/process/submissions/' + sub.id + '/cards')">看这份的全套工艺文件</button></div>
+        <div class="line"><button class="btn" @click="cards('/process/submissions/' + sub.id + '/cards')">看这份的全套工艺文件</button>
+          <router-link v-if="sub.plan?.doc" class="btn" :to="{ path: '/process/edit/' + sub.item, query: { start: sub.id } }">在这一份上改</router-link></div>
         <div class="result">
           <div class="score">{{ sub.review?.by || 'AI 工艺评审员' }} · 建议分 <b>{{ sub.review?.suggested_score ?? '—' }}</b>
             <span class="pill bad">{{ count(sub.review?.findings, 'error') }} 必须改</span>

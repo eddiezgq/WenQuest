@@ -186,6 +186,17 @@
           <view v-for="k in kinds" :key="k" class="exp" :class="{ locked: !me.licensed }" @click="download(k)">
             <text>{{ t("sew.exp." + k) }}</text><text class="muted">{{ making === k ? t("sew.making") : "↓" }}</text>
           </view>
+          <!-- 第 128 轮：计算书、调机卡存为网页文档（数字照计算，只能加说明、照片；设计改了可重新生成） -->
+          <view class="fc">
+            <text class="pt">{{ t("doc.myEngDocs") }}</text>
+            <view class="lrow">
+              <view class="btn" :class="{ disabled: !me.licensed }" @click="saveWeb('report')">{{ making === "web-report" ? t("sew.making") : t("doc.saveAsWeb") + "：" + t("sew.exp.report") }}</view>
+              <view class="btn" :class="{ disabled: !me.licensed }" @click="saveWeb('card')">{{ making === "web-card" ? t("sew.making") : t("doc.saveAsWeb") + "：" + t("sew.exp.card") }}</view>
+            </view>
+            <view v-for="d in webDocs" :key="d.id" class="exp" @click="openWeb(d.id)">
+              <text>{{ d.title[0] }}</text><text class="muted small">{{ d.by_name }} · {{ new Date(d.updated * 1000).toLocaleDateString() }}</text>
+            </view>
+          </view>
           <!-- 第 56 轮：按这台设计一键出三维讲解片（平缝机、包缝机）；第 76 轮加绷缝机（机构尺寸示意，画线环）；第 89 轮六种机型都有 -->
           <view class="fc">
             <text class="pt">{{ t("sew.video") }}</text>
@@ -232,6 +243,7 @@ import { computed, reactive, ref, watch } from "vue";
 import { ApiError, BASE, request, token } from "../../api";
 import { siteUrl } from "../../accountApi";
 import { errorText, locale, t } from "../../i18n";
+import { type EngDocItem, engDocApi } from "../../courseApi";
 import VoicePick from "../video3d/VoicePick.vue";
 import SewAi from "./SewAi.vue";
 import SewCae from "./SewCae.vue";
@@ -638,6 +650,30 @@ function removeProject() {
     await loadProjects();
   } });
 }
+
+// ---------- 第 128 轮：存为网页文档 ----------
+const webDocs = ref<EngDocItem[]>([]);
+async function loadWebDocs() {
+  if (!me.value.licensed) return;
+  try { webDocs.value = (await engDocApi.list()).docs; } catch { webDocs.value = []; }
+}
+async function saveWeb(kind: "report" | "card") {
+  if (!me.value.licensed) return (msg.value = t("sew.expLocked"));
+  if (making.value) return;
+  making.value = "web-" + kind;
+  msg.value = "";
+  try {
+    const d = await engDocApi.create({ kind, machine: machine.value, params: { ...params }, pid: current.value?.id || 0,
+      project: current.value?.name || pname.value || "", lang: flang.value, desc: kind === "report" && withDesc.value ? desc.value : [],
+      ebox: kind === "report" && eboxP.value ? eboxP.value : null });
+    openWeb(d.id);
+    loadWebDocs();
+  } catch (e) {
+    msg.value = errorText(e instanceof ApiError ? e.code : "unknown");
+  } finally { making.value = ""; }
+}
+function openWeb(id: number) { uni.navigateTo({ url: `/pages/doc/doc?eng=${id}` }); }
+watch(() => tab.value, (v) => { if (v === "export") loadWebDocs(); });
 
 // ---------- 导出（H5：带登录凭证取文件再存盘） ----------
 async function download(kind: string) {

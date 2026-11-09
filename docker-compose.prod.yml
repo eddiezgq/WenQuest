@@ -47,7 +47,7 @@ services:
     networks:
       default: {}
       render: {}
-      factory-edge: {}
+      factory-edge: { aliases: [wq-gateway] }   # 第 128 轮：数字工厂枢纽经它把工艺卡转成 PDF
 
   web:
     ports: !reset []
