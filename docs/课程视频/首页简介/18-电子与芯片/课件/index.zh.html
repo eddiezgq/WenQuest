@@ -1,139 +1,294 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>问渠电子与芯片：从一个电路，一直连到工厂</title><style>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>18-电子与芯片</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#07131f}
-body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",Inter,Arial,sans-serif;color:#eaf1fb}
+body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC",Inter,Arial,sans-serif;color:#eaf1fb}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
   background:radial-gradient(1200px 700px at 85% -10%,#1d3f7a 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#0f4a4a 0%,transparent 60%),#07131f}
 section.pg{position:absolute;inset:0;display:none}
 section.pg.on{display:block}
-.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,sans-serif;letter-spacing:.18em;color:#7fb6ff;text-transform:uppercase}
-.brand b{color:#f5c344;font-weight:700;letter-spacing:.05em;margin-right:14px}
-.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600;letter-spacing:.04em}
-.title{position:absolute;left:56px;top:122px;width:1800px;font-size:52px;font-weight:800;line-height:1.15;color:#fff}
-.win{position:absolute;left:56px;top:212px;width:1280px;height:720px;border-radius:14px;overflow:hidden;background:#fff;
-  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08)}
-.win .bar{position:absolute;left:0;top:0;right:0;height:34px;background:#e9edf2;display:flex;align-items:center;gap:8px;padding-left:14px;z-index:3}
-.win .bar i{width:12px;height:12px;border-radius:50%;background:#ff5f57}.win .bar i:nth-child(2){background:#febc2e}.win .bar i:nth-child(3){background:#28c840}
-.win .bar span{margin-left:18px;font:500 15px/1 Inter,sans-serif;color:#5b6775;background:#fff;border-radius:6px;padding:5px 14px}
-.win .vp{position:absolute;left:0;top:34px;right:0;bottom:0;overflow:hidden}
-.win .vp .cam{position:absolute;inset:0;transform-origin:0 0}
-.win .vp img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:top left}
-.ring{position:absolute;border:5px solid #f5c344;border-radius:12px;box-shadow:0 0 0 9999px rgba(7,19,31,.16),0 0 24px rgba(245,195,68,.8);opacity:0}
-.side{position:absolute;left:1384px;top:236px;width:480px}
-.side li{list-style:none;position:relative;padding:0 0 0 46px;margin:0 0 30px;font-size:31px;line-height:1.38;color:#dbe7f7;opacity:0}
-.side li::before{content:attr(data-n);position:absolute;left:0;top:4px;width:32px;height:32px;border-radius:50%;background:#f5c344;color:#07131f;
-  font:700 19px/32px Inter,sans-serif;text-align:center}
-.side li b{color:#fff}
-.cover .title{top:330px;font-size:78px;width:900px}
-.cover .sub{position:absolute;left:56px;top:600px;width:860px;font-size:36px;line-height:1.45;color:#bcd0ea}
-.cover .line{position:absolute;left:56px;top:300px;width:120px;height:6px;background:#f5c344;border-radius:3px}
-.cover .win{left:1010px;top:200px;width:1000px;height:597px;transform:perspective(1800px) rotateY(-16deg) rotateX(3deg);transform-origin:left center;opacity:.92}
-.end .title{top:300px;font-size:84px;width:1700px}
-.end .sub{position:absolute;left:56px;top:430px;font-size:40px;color:#bcd0ea}
-.end .url{position:absolute;left:56px;top:540px;font:600 44px/1.2 Inter,sans-serif;color:#f5c344}
-.end .win{left:1180px;top:260px;width:680px;height:416px;opacity:.85}
-.f{opacity:0}
-</style></head><body><div id="stage"><section class="pg cover" data-n="1">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="title">一个电路，一直连到工厂</div>
-<div class="line"></div>
-<div class="sub">问渠的电子线：一个电路、一块板、一颗芯片</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/home-elec-zh.jpg" alt=""></div></div></div>
+.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,"Noto Sans CJK SC",sans-serif;letter-spacing:.18em;color:#7fb6ff}
+.brand b{color:#f5c344;letter-spacing:.05em;margin-right:14px}
+.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600}
+.title{position:absolute;left:56px;top:122px;width:1800px;font-size:56px;font-weight:800;line-height:1.2;color:#fff}
+.sub{font:500 34px/1.3 Inter,"Noto Sans CJK SC",sans-serif;color:#8fb3dd;display:block;margin-top:6px}
+svg text{font-family:"Noto Sans CJK SC",Inter,sans-serif}
+.code{position:absolute;border-radius:16px;background:#0b1d30;border:1px solid #23415f;padding:26px 28px;
+  font:500 21px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;color:#cfe2ff;white-space:pre;overflow:hidden}
+.code .k{color:#f5c344}.code .c{color:#6f8db0}.code .n{color:#7fe0c0}
+.cap{position:absolute;font-size:30px;font-weight:700;color:#fff}.cap .sub{font-size:21px;margin-top:4px}
+.tag{position:absolute;left:56px;bottom:118px;font-size:30px;color:#bcd0ea}.tag b{color:#f5c344}
+.card{position:absolute;border-radius:22px;background:linear-gradient(#14304f,#0c2038);border:2px solid #2f5d8a}
+.card.hot{border:3px solid #f5c344}
+.big{position:absolute;font-size:84px;font-weight:800;color:#fff;line-height:1.15}
+.url{position:absolute;font:600 46px/1.2 Inter,"Noto Sans CJK SC",sans-serif;color:#f5c344}
+html[lang=en] .sub,html[lang=en] .zh-only{display:none!important}
+html[lang=zh-CN] .en-only{display:none!important}
+html[lang=en] .title{font-family:Inter,"Noto Sans CJK SC",sans-serif}
+</style></head><body><div id="stage"><!-- 18 电子与芯片 · 网页版 PPT（第 127 轮）。tools/video/intro_ppt.py 套上样式写出 index.zh.html / index.html。
+     页里的图都是示意（不是系统界面）；系统里真实的样子用录屏（录屏.yaml）。 -->
+<svg width="0" height="0" style="position:absolute"><defs>
+ <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5c344"/></marker>
+ <linearGradient id="cardg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14304f"/><stop offset="1" stop-color="#0c2038"/></linearGradient>
+</defs></svg>
+
+<!-- p1 开场：电路 → 板 → 芯片 → 工厂 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST ELECTRONICS</div>
+ <div class="kick" data-en="Electronics and chips">电子与芯片</div>
+ <div class="title"><span data-en="From a circuit, all the way into the factory">从一个电路，一直连到工厂</span><span class="sub">From a circuit, all the way into the factory</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <!-- 电路 -->
+  <g data-k="1" data-d="0">
+   <rect x="70" y="380" width="380" height="420" rx="24" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <g transform="translate(150,440)" fill="none" stroke="#7fb6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 80 H40 l12 -24 l20 48 l20 -48 l20 48 l12 -24 H170"/><path d="M170 80 V30 H220"/><path d="M220 0 L220 60 L272 30 Z"/><path d="M170 80 V130 H220"/>
+   </g>
+   <text x="260" y="680" text-anchor="middle" font-size="46" font-weight="800" fill="#fff" data-en="A circuit">一个电路</text>
+   <text x="260" y="726" text-anchor="middle" font-size="25" fill="#8fb3dd" class="sub">a circuit</text>
+   <text x="260" y="770" text-anchor="middle" font-size="25" fill="#bcd0ea" data-en="analysis · instruments">电路分析 · 虚拟仪器</text>
+  </g>
+  <!-- 板 -->
+  <g data-k="1" data-d="900">
+   <rect x="550" y="380" width="380" height="420" rx="24" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <g transform="translate(640,430)" fill="none" stroke="#7fe0c0" stroke-width="6" stroke-linejoin="round">
+    <rect x="0" y="10" width="200" height="150" rx="12"/>
+    <g fill="#7fe0c0" stroke="none"><rect x="30" y="40" width="44" height="44" rx="4"/><rect x="100" y="40" width="70" height="18" rx="3"/><rect x="100" y="70" width="70" height="18" rx="3"/><circle cx="50" cy="128" r="11"/><circle cx="96" cy="128" r="11"/><circle cx="142" cy="128" r="11"/></g>
+    <g stroke-linecap="round"><line x1="60" y1="10" x2="60" y2="-12"/><line x1="100" y1="10" x2="100" y2="-12"/><line x1="140" y1="10" x2="140" y2="-12"/></g>
+   </g>
+   <text x="740" y="680" text-anchor="middle" font-size="46" font-weight="800" fill="#fff" data-en="A board">一块板</text>
+   <text x="740" y="726" text-anchor="middle" font-size="25" fill="#8fb3dd" class="sub">a board</text>
+   <text x="740" y="770" text-anchor="middle" font-size="25" fill="#bcd0ea" data-en="joint drive board · firmware">关节驱动板 · 固件</text>
+  </g>
+  <!-- 芯片 -->
+  <g data-k="1" data-d="1800">
+   <rect x="1030" y="380" width="380" height="420" rx="24" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <g transform="translate(1150,440)" fill="none" stroke="#c9a2ff" stroke-width="6">
+    <rect x="20" y="20" width="100" height="100" rx="10"/><rect x="46" y="46" width="48" height="48" rx="5" fill="#c9a2ff" stroke="none" opacity=".85"/>
+    <g stroke-linecap="round"><line x1="44" y1="20" x2="44" y2="0"/><line x1="70" y1="20" x2="70" y2="0"/><line x1="96" y1="20" x2="96" y2="0"/>
+    <line x1="44" y1="120" x2="44" y2="140"/><line x1="70" y1="120" x2="70" y2="140"/><line x1="96" y1="120" x2="96" y2="140"/>
+    <line x1="20" y1="44" x2="0" y2="44"/><line x1="20" y1="70" x2="0" y2="70"/><line x1="20" y1="96" x2="0" y2="96"/>
+    <line x1="120" y1="44" x2="140" y2="44"/><line x1="120" y1="70" x2="140" y2="70"/><line x1="120" y1="96" x2="140" y2="96"/></g>
+   </g>
+   <text x="1220" y="680" text-anchor="middle" font-size="46" font-weight="800" fill="#fff" data-en="A chip">一颗芯片</text>
+   <text x="1220" y="726" text-anchor="middle" font-size="25" fill="#8fb3dd" class="sub">a chip</text>
+   <text x="1220" y="770" text-anchor="middle" font-size="25" fill="#bcd0ea" data-en="encoder interface chip">编码器接口芯片</text>
+  </g>
+  <!-- 工厂 -->
+  <g data-k="1" data-d="2700">
+   <rect x="1510" y="380" width="340" height="420" rx="24" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/>
+   <g transform="translate(1590,440)" fill="none" stroke="#f5c344" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M0 150 V60 L50 90 V60 L100 90 V60 L150 90 V150 Z"/><path d="M150 150 V10 H178 V150"/><rect x="24" y="112" width="26" height="22"/><rect x="74" y="112" width="26" height="22"/>
+   </g>
+   <text x="1680" y="680" text-anchor="middle" font-size="46" font-weight="800" fill="#fff" data-en="The factory">工厂</text>
+   <text x="1680" y="726" text-anchor="middle" font-size="25" fill="#8fb3dd" class="sub">the factory</text>
+   <text x="1680" y="770" text-anchor="middle" font-size="25" fill="#bcd0ea" data-en="board plant · chip plant">电路板厂 · 芯片封测厂</text>
+  </g>
+  <g stroke="#f5c344" stroke-width="6" fill="none" marker-end="url(#ar)">
+   <path d="M458 590 H540" data-k="1" data-d="700" data-a="draw"/>
+   <path d="M938 590 H1020" data-k="1" data-d="1600" data-a="draw"/>
+   <path d="M1418 590 H1500" data-k="1" data-d="2500" data-a="draw"/>
+  </g>
+ </svg>
 </section>
-<section class="pg shot" data-n="2">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">电路分析</div>
-<div class="title">在浏览器里搭电路、改元件值</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/circuit</span></div><div class="vp"><div class="cam" data-z2="1.35,55,72"><img src="media/circuit-zh.jpg" alt=""><div class="ring" data-k="1" style="left:19.5%;top:27%;width:60%;height:14.5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">改元件值</li><li data-k="2" data-n="2">仿真当场跑，波形马上出来</li></ul>
+
+<!-- p2 驱动板：设计描述 → 原理图、PCB -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST ELECTRONICS</div>
+ <div class="kick" data-en="Board design">电路板设计</div>
+ <div class="title"><span data-en="A real joint drive board">一块真实的关节驱动板</span><span class="sub">A real joint drive board</span></div>
+ <div class="code" style="left:70px;top:280px;width:700px;height:520px" data-k="1"><span class="c"># 设计描述 design.yaml（节选）</span>
+<span class="k">name:</span> DRV-JOINT
+<span class="k">spec:</span>
+  <span class="k">bus_voltage_v:</span> <span class="n">48.0</span>
+  <span class="k">phase_current_a:</span> <span class="n">8.5</span>
+  <span class="k">motor_power_w:</span> <span class="n">400.0</span>
+<span class="k">blocks:</span>
+- <span class="k">key:</span> power
+  <span class="k">name:</span> 48 V 输入与母线
+- <span class="k">key:</span> aux
+  <span class="k">name:</span> 辅助电源 12 / 5 / 3.3 V
+  …</div>
+ <div class="cap" style="left:70px;top:820px" data-k="1"><span data-en="① Design description">① 设计描述</span><span class="sub">design description</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0"><g transform="translate(0,-50)">
+  <g stroke="#f5c344" stroke-width="6" fill="none" marker-end="url(#ar)">
+   <path d="M790 480 C 900 480, 900 440, 1010 440" data-k="1" data-d="900" data-a="draw"/>
+   <path d="M790 700 C 900 700, 900 740, 1010 740" data-k="1" data-d="1300" data-a="draw"/>
+  </g>
+  <text x="900" y="600" text-anchor="middle" font-size="30" font-weight="700" fill="#fff" data-k="1" data-d="900" data-en="generated">自动生成</text>
+  <text x="900" y="638" text-anchor="middle" font-size="22" fill="#8fb3dd" class="sub" data-k="1" data-d="900">generated</text>
+  <!-- 原理图（示意） -->
+  <g data-k="1" data-d="1100">
+   <rect x="1030" y="320" width="820" height="250" rx="18" fill="#0b1d30" stroke="#23415f"/>
+   <g transform="translate(1080,360)" fill="none" stroke="#7fb6ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 80 H60 l10 -20 l16 40 l16 -40 l16 40 l10 -20 H200"/><path d="M200 80 V30 H260"/><path d="M260 0 V60 L320 30 Z"/><path d="M320 30 H400"/>
+    <path d="M200 80 V140 H260"/><path d="M260 120 V160 M248 120 H272 M248 132 H272"/>
+    <path d="M440 0 H560 V150 H440 Z"/><path d="M400 30 H440 M400 70 H440 M400 110 H440 M560 30 H620 M560 70 H620 M560 110 H620"/>
+    <path d="M620 30 l10 -16 l12 32 l12 -32 l10 16 H700"/>
+   </g>
+   <text x="1060" y="550" font-size="28" font-weight="700" fill="#fff" data-en="② Schematic">② 原理图</text>
+  </g>
+  <!-- PCB（示意） -->
+  <g data-k="1" data-d="1500">
+   <rect x="1030" y="620" width="820" height="250" rx="18" fill="#0b1d30" stroke="#23415f"/>
+   <rect x="1080" y="650" width="420" height="190" rx="10" fill="#1f4d3c" stroke="#7fe0c0" stroke-width="3"/>
+   <g fill="#c8a24a"><rect x="1110" y="680" width="60" height="60" rx="4"/><rect x="1200" y="680" width="34" height="18" rx="2"/><rect x="1200" y="712" width="34" height="18" rx="2"/>
+    <rect x="1280" y="676" width="90" height="70" rx="5" fill="#2b2b2b" stroke="#c8a24a" stroke-width="3"/><rect x="1400" y="690" width="70" height="40" rx="4"/>
+    <circle cx="1120" cy="810" r="10"/><circle cx="1470" cy="810" r="10"/></g>
+   <g stroke="#e0b44a" stroke-width="5" fill="none" stroke-linecap="round"><path d="M1170 710 H1200 M1234 721 H1280 M1370 711 H1400 M1140 740 V790 H1300 V746 M1435 730 V800"/></g>
+   <text x="1540" y="760" font-size="28" font-weight="700" fill="#fff" data-en="③ PCB layout">③ PCB</text>
+   <text x="1540" y="800" font-size="22" fill="#8fb3dd" class="sub">layout</text>
+  </g>
+ </g></svg>
+ <div class="tag" data-k="1" data-d="2200"><span data-en="KiCad · Freerouting auto-routing (example design)">KiCad · Freerouting 自动布线（示例设计）</span></div>
 </section>
-<section class="pg shot" data-n="3">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">虚拟仪器</div>
-<div class="title">传感器、示波器、万用表，搬到网页上</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/instruments</span></div><div class="vp"><div class="cam"><img src="media/instruments-zh.jpg" alt=""><div class="ring" data-k="1" style="left:58.5%;top:56%;width:38.5%;height:44%"></div><div class="ring" data-k="2" style="left:19.5%;top:41%;width:76.5%;height:6.5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">传感器、示波器、万用表</li><li data-k="2" data-n="2">参数按真实器件设定</li></ul>
+
+<!-- p3 芯片：Verilog → 综合 → 版图（Eddie 认可的样页） -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST ELECTRONICS</div>
+ <div class="kick" data-en="Chip design">芯片设计</div>
+ <div class="title"><span data-en="An encoder interface chip, our own design">编码器接口芯片，自己设计</span><span class="sub">An encoder interface chip, our own design</span></div>
+ <div class="code" style="left:70px;top:250px;width:600px;height:560px" data-k="1"><span class="c">// WQ-ENCIF 编码器接口芯片（示例设计，未流片）</span>
+<span class="k">always</span> @(<span class="k">posedge</span> clk <span class="k">or negedge</span> rst_n)
+  <span class="k">if</span> (!rst_n) <span class="k">begin</span>
+    sa &lt;= <span class="n">2'b00</span>; sb &lt;= <span class="n">2'b00</span>;
+  <span class="k">end else begin</span>
+    sa &lt;= {sa[0], enc_a};
+    sb &lt;= {sb[0], enc_b};
+  <span class="k">end</span>
+
+<span class="c">// A/B 滤波 → 四倍频解码</span>
+<span class="c">// → 32 位计数 → SPI 读出</span></div>
+ <div class="cap" style="left:70px;top:830px" data-k="1">① Verilog<span class="sub">describe the circuit</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0"><g transform="translate(0,-50)">
+  <g stroke="#f5c344" stroke-width="6" marker-end="url(#ar)"><line x1="690" y1="580" x2="760" y2="580" data-k="1" data-d="800" data-a="draw"/><line x1="1240" y1="580" x2="1310" y2="580" data-k="1" data-d="1800" data-a="draw"/></g>
+  <g transform="translate(780,300)" data-k="1" data-d="1000">
+   <rect width="440" height="560" rx="16" fill="#0b1d30" stroke="#23415f"/>
+   <g stroke="#7fb6ff" stroke-width="4" fill="none">
+    <rect x="40" y="70" width="90" height="110" rx="6"/><rect x="40" y="250" width="90" height="110" rx="6"/>
+    <path d="M230 160 q40 50 0 100 q90 0 120 -50 q-30 -50 -120 -50 z"/><path d="M218 160 q40 50 0 100"/>
+    <path d="M230 360 h50 a50 50 0 0 1 0 100 h-50 z"/>
+    <path d="M130 125 H190 V180 H236"/><path d="M130 305 H190 V240 H236"/><path d="M130 330 H200 V385 H230"/><path d="M160 125 V435 H230" stroke-dasharray="6 6"/>
+    <path d="M350 210 H410"/><path d="M330 410 H410"/>
+   </g>
+   <g fill="#cfe2ff" font-size="22" font-family="JetBrains Mono,DejaVu Sans Mono,monospace"><text x="60" y="130">DFF</text><text x="60" y="310">DFF</text><text x="262" y="218">XOR</text><text x="244" y="418">AND</text></g>
+   <text x="40" y="520" fill="#8fb3dd" font-size="22" data-en="becomes standard cells (flip-flops, gates)">变成一个个标准单元（触发器、门）</text>
+  </g>
+  <g transform="translate(1330,300)" data-k="1" data-d="2000">
+   <rect width="520" height="560" rx="16" fill="#0b1d30" stroke="#23415f"/>
+   <rect x="30" y="40" width="460" height="480" fill="#101a24"/>
+   <g transform="translate(30,40)" class="cells"></g>
+  </g>
+ </g></svg>
+ <div class="cap" style="left:780px;top:830px" data-k="1" data-d="1000"><span data-en="② Synthesis → gates">② 综合 → 门级电路</span><span class="sub">synthesis</span></div>
+ <div class="cap" style="left:1330px;top:830px" data-k="1" data-d="2000"><span data-en="③ Layout (130 nm, open process)">③ 版图（130 nm 开源工艺）</span><span class="sub">layout</span></div>
+ <div class="tag" data-k="2"><span class="zh-only">全用开源工具：<b>Yosys · OpenROAD · KLayout</b>（LibreLane 流程）</span><span class="en-only">All open-source tools: <b>Yosys · OpenROAD · KLayout</b> (LibreLane flow)</span></div>
+ <script>
+ (() => { // 版图示意：几排标准单元，横向金属一、纵向金属二（示意，不是这颗芯片的真实版图）
+  const g = document.currentScript.parentElement.querySelector('.cells'), NS = 'http://www.w3.org/2000/svg'
+  const add = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); g.appendChild(e) }
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280
+  for (let r = 0; r < 8; r++) { const y = r * 58 + 10; add('rect', {x: 0, y, width: 460, height: 6, fill: '#3b6ea8', opacity: .9}); let x = 0
+   while (x < 420) { const w = Math.min(22 + Math.floor(rnd() * 46), 460 - x); add('rect', {x, y: y + 9, width: w - 4, height: 40, fill: ['#2c6b5a', '#5a3d78', '#6b4f22'][Math.floor(rnd() * 3)], rx: 2}); x += w } }
+  for (let i = 0; i < 14; i++) add('rect', {x: 12 + i * 32 + rnd() * 10, y: 0, width: 4, height: 480, fill: '#c9a2ff', opacity: .55})
+  for (let i = 0; i < 10; i++) add('rect', {x: 0, y: 30 + i * 46 + rnd() * 8, width: 460, height: 3, fill: '#7fe0c0', opacity: .5})
+ })()
+ </script>
 </section>
-<section class="pg shot" data-n="4">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">电路板设计</div>
-<div class="title">一块真实的关节驱动板</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/pcb-design</span></div><div class="vp"><div class="cam"><img src="media/pcb-design-zh.jpg" alt=""><div class="ring" data-k="1" style="left:18%;top:43%;width:47.5%;height:5%"></div><div class="ring" data-k="2" style="left:18%;top:19%;width:30.5%;height:5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">原理图、PCB 由设计描述自动生成</li><li data-k="2" data-n="2">A 版、B 版对照着看</li></ul>
+
+<!-- p4 问渠电子：AI 起草（流程示意，取自起草台页面上的说明） -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST ELECTRONICS</div>
+ <div class="kick" data-en="For companies">面向企业</div>
+ <div class="title"><span data-en="WenQuest Electronics: AI drafts the design">问渠电子：AI 帮你起草设计</span><span class="sub">WenQuest Electronics: AI drafts the design</span></div>
+ <div class="card" style="left:70px;top:340px;width:400px;height:440px" data-k="1" data-d="0"></div>
+ <div class="card" style="left:540px;top:340px;width:400px;height:440px" data-k="1" data-d="900"></div>
+ <div class="card" style="left:1010px;top:340px;width:400px;height:440px" data-k="1" data-d="1800"></div>
+ <div class="card hot" style="left:1480px;top:340px;width:380px;height:440px" data-k="1" data-d="2700"></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <g data-k="1" data-d="0">
+   <g transform="translate(110,390)" fill="none" stroke="#7fb6ff" stroke-width="5" stroke-linecap="round"><rect x="0" y="0" width="120" height="90" rx="12"/><path d="M24 30 H96 M24 52 H80"/><path d="M30 90 L20 118 L60 90"/></g>
+   <text x="110" y="560" font-size="40" font-weight="800" fill="#fff" data-en="Requirement">写下需求</text>
+   <text x="110" y="600" font-size="24" fill="#8fb3dd" class="sub">your requirement</text>
+   <text x="110" y="660" font-size="23" fill="#bcd0ea" data-en="e.g. a drive board for a">例：给 400 W、48 V 的</text>
+   <text x="110" y="694" font-size="23" fill="#bcd0ea" data-en="400 W, 48 V joint motor">关节伺服电机做驱动板</text>
+  </g>
+  <g data-k="1" data-d="900">
+   <g transform="translate(580,390)" fill="none" stroke="#f5c344" stroke-width="5" stroke-linejoin="round"><path d="M60 0 L72 40 L112 52 L72 64 L60 104 L48 64 L8 52 L48 40 Z"/></g>
+   <text x="580" y="560" font-size="40" font-weight="800" fill="#fff" data-en="AI drafts">AI 起草</text>
+   <text x="580" y="600" font-size="24" fill="#8fb3dd" class="sub">AI drafts</text>
+   <text x="580" y="660" font-size="23" fill="#bcd0ea" data-en="spec and block parameters,">规格和功能块参数，</text>
+   <text x="580" y="694" font-size="23" fill="#bcd0ea" data-en="each number with its source">每个数都标来源</text>
+  </g>
+  <g data-k="1" data-d="1800">
+   <g transform="translate(1050,390)" fill="none" stroke="#7fe0c0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M30 20 L0 52 L30 84 M90 20 L120 52 L90 84 M70 8 L50 96"/></g>
+   <text x="1050" y="560" font-size="40" font-weight="800" fill="#fff" data-en="Code expands">代码展开</text>
+   <text x="1050" y="600" font-size="24" fill="#8fb3dd" class="sub">code expands it</text>
+   <text x="1050" y="660" font-size="23" fill="#bcd0ea" data-en="expands the circuit, runs">电路，跑计算</text>
+   <text x="1050" y="694" font-size="23" fill="#bcd0ea" data-en="calculations and simulation">和仿真</text>
+  </g>
+  <g data-k="1" data-d="2700">
+   <g transform="translate(1520,390)" fill="none" stroke="#f5c344" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><circle cx="40" cy="30" r="26"/><path d="M0 110 C 4 70, 76 70, 80 110"/><path d="M92 60 L108 78 L140 40"/></g>
+   <text x="1520" y="560" font-size="40" font-weight="800" fill="#fff" data-en="You decide">你改、你定</text>
+   <text x="1520" y="600" font-size="24" fill="#8fb3dd" class="sub">you decide</text>
+   <text x="1520" y="660" font-size="23" fill="#bcd0ea" data-en="then download the">确认后下载</text>
+   <text x="1520" y="694" font-size="23" fill="#bcd0ea" data-en="design description">设计描述</text>
+  </g>
+  <g stroke="#f5c344" stroke-width="6" fill="none" marker-end="url(#ar)">
+   <path d="M474 560 H534" data-k="1" data-d="700" data-a="draw"/><path d="M944 560 H1004" data-k="1" data-d="1600" data-a="draw"/><path d="M1414 560 H1474" data-k="1" data-d="2500" data-a="draw"/>
+  </g>
+ </svg>
+ <div class="tag"><span data-en="wenquestrobotics.com/eda/ · example design, not for production">wenquestrobotics.com/eda/ · 示例设计，不能直接投产</span></div>
 </section>
-<section class="pg shot" data-n="5">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">板上的固件</div>
-<div class="title">在仿真器里带着电机转</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/pcb-design</span></div><div class="vp"><div class="cam" data-z2="1.3,55,58"><img src="media/firmware-zh.jpg" alt=""><div class="ring" data-k="1" style="left:19.5%;top:13%;width:73.5%;height:18.5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">电流环、编码器、抱闸、保护</li><li data-k="2" data-n="2">一个个场景都能看</li></ul>
+
+<!-- p5 结尾：首页“电子与芯片” -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST ELECTRONICS</div>
+ <div class="big" style="left:56px;top:250px"><span data-en="&quot;Electronics and chips&quot;">首页“电子与芯片”</span><span class="sub" style="font-size:40px;margin-top:10px">"Electronics and chips" on our homepage</span></div>
+ <div class="url" style="left:56px;top:520px">wenquestrobotics.com</div>
+ <div style="position:absolute;left:56px;top:640px;width:1800px;display:flex;flex-wrap:wrap;gap:18px 18px" data-k="1">
+  <span class="pill" data-en="Circuit analysis">电路分析</span><span class="pill" data-en="Sensor virtual instruments">传感器虚拟仪器</span><span class="pill" data-en="PCB design">电路板设计</span>
+  <span class="pill" data-en="Firmware and simulation">固件与仿真</span><span class="pill" data-en="Chip design">芯片设计</span><span class="pill" data-en="PCB plant">电路板厂</span>
+  <span class="pill" data-en="Chip packaging and test plant">芯片封测厂</span><span class="pill" data-en="Sensor plant">传感器厂</span><span class="pill" data-en="Encoder error curve">编码器误差曲线</span>
+  <span class="pill hot" data-en="WenQuest Electronics">问渠电子</span>
+ </div>
+ <style>.pill{font-size:32px;font-weight:700;color:#eaf1fb;padding:14px 28px;border-radius:40px;border:2px solid #2f5d8a;background:linear-gradient(#14304f,#0c2038)}
+  .pill.hot{border-color:#f5c344;color:#f5c344}html[lang=en] .pill{font-family:Inter,"Noto Sans CJK SC",sans-serif}</style>
 </section>
-<section class="pg shot" data-n="6">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">芯片设计</div>
-<div class="title">编码器接口芯片，自己设计</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/chip-design</span></div><div class="vp"><div class="cam" data-z2="1.4,55,75"><img src="media/chip-layout-zh.jpg" alt=""><div class="ring" data-k="1" style="left:18%;top:30.5%;width:39.5%;height:5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">Verilog → 综合 → 版图</li><li data-k="2" data-n="2">全用开源工具</li></ul>
-</section>
-<section class="pg shot" data-n="7">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">数字工厂</div>
-<div class="title">电路板厂、芯片封测厂生产、测试</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>pcb.factory.wenquestrobotics.com/fct</span></div><div class="vp"><div class="cam"><img src="media/pcb-fct-zh.jpg" alt=""><div class="ring" data-k="1" style="left:41%;top:25.5%;width:53.5%;height:5%"></div><div class="ring" data-k="2" style="left:27%;top:12.5%;width:59%;height:5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">每块板出厂前逐项测</li><li data-k="2" data-n="2">关节驱动板，再卖给机器人厂</li></ul>
-</section>
-<section class="pg shot" data-n="8">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">问渠电子 · 起草台</div>
-<div class="title">面向企业：AI 帮你起草设计</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/eda/</span></div><div class="vp"><div class="cam"><img src="media/eda-desk-zh.jpg" alt=""><div class="ring" data-k="1" style="left:9%;top:27.5%;width:82.5%;height:35.5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">写下需求，AI 起草</li></ul>
-</section>
-<section class="pg shot" data-n="9">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="kick">问渠电子 · 工厂端</div>
-<div class="title">生产资料进厂，先自动查一遍</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>wenquestrobotics.com/eda/factory/</span></div><div class="vp"><div class="cam"><img src="media/eda-factory-zh.jpg" alt=""><div class="ring" data-k="1" style="left:8.5%;top:4.5%;width:25%;height:7.5%"></div><div class="ring" data-k="2" style="left:20%;top:77.5%;width:6%;height:10%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">自动查一遍</li><li data-k="2" data-n="2">有问题当场开问题单</li></ul>
-</section>
-<section class="pg end" data-n="10">
-<div class="brand"><b>问渠</b>电子与芯片</div>
-<div class="title">首页“电子与芯片”</div>
-<div class="sub">这些都能在这里直接打开</div>
-<div class="url">问渠官网首页 → 电子与芯片</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/home-elec-zh.jpg" alt=""></div></div></div>
-</section></div><script>
+</div><script>
 (() => {
+  const en = document.documentElement.lang === 'en'
+  if (en) document.querySelectorAll('[data-en]').forEach((e) => { e.textContent = e.dataset.en })
   const pages = [...document.querySelectorAll('section.pg')]
-  let cur = 0, frag = 0, t0 = performance.now()
+  let cur = 0, frag = 0
   const frags = (i) => [...pages[i].querySelectorAll('[data-k]')].reduce((m, e) => Math.max(m, +e.dataset.k), 0)
-  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; t0 = performance.now()
+  const prep = (p) => p.querySelectorAll('[data-a="draw"]').forEach((e) => {
+    if (e.dataset.len) return
+    const L = e.getTotalLength ? e.getTotalLength() : 1000
+    e.dataset.len = L; e.style.strokeDasharray = L + ' ' + L
+  })
+  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; prep(pages[i])
     pages[i].querySelectorAll('[data-k]').forEach((e) => { e.dataset.t = '' }); while (frag < s) next() }
   function next() { if (frag >= frags(cur)) { if (cur < pages.length - 1) go(cur + 1, 0); return } frag++
-    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = performance.now() })
-    const z = pages[cur].querySelector(`.cam[data-z${frag}]`); if (z) { z.dataset.from = z.dataset.now || '1,0,0'; z.dataset.to = z.dataset['z' + frag]; z.dataset.zt = performance.now() } }
-  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
+    const now = performance.now()
+    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = now + (+e.dataset.d || 0) }) }
+  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3)
   function tick() {
     const now = performance.now(), p = pages[cur]; if (!p) return
-    p.querySelectorAll('[data-k]').forEach((e) => { const t = +e.dataset.t; const a = e.dataset.t ? ease((now - t) / 450) : 0
-      e.style.opacity = a; if (e.tagName === 'LI') e.style.transform = `translateX(${(1 - a) * 24}px)` })
-    p.querySelectorAll('.cam').forEach((c) => {
-      const drift = 1 + 0.035 * Math.min(1, (now - t0) / 14000)          // 缓慢推近，画面不死
-      let [s, x, y] = (c.dataset.now || '1,0,0').split(',').map(Number)
-      if (c.dataset.to) { const a = ease((now - +c.dataset.zt) / 1200), A = c.dataset.from.split(',').map(Number), B = c.dataset.to.split(',').map(Number)
-        ;[s, x, y] = A.map((v, k) => v + (B[k] - v) * a); if (a >= 1) { c.dataset.now = c.dataset.to; delete c.dataset.to } }
-      const W = c.clientWidth, H = c.clientHeight, S = s * drift
-      // 把 (x%, y%) 放到画面中心，且不露出边
-      const tx = Math.min(0, Math.max(W - W * S, W / 2 - W * S * x / 100)), ty = Math.min(0, Math.max(H - H * S, H / 2 - H * S * y / 100))
-      c.style.transform = `translate(${s === 1 && !x ? 0 : tx}px,${s === 1 && !y ? 0 : ty}px) scale(${S})`
+    p.querySelectorAll('[data-k]').forEach((e) => {
+      const a = e.dataset.t ? ease((now - +e.dataset.t) / 600) : 0, kind = e.dataset.a
+      if (kind === 'draw') { e.style.strokeDashoffset = (+e.dataset.len) * (1 - ease((now - +e.dataset.t) / 900) * (e.dataset.t ? 1 : 0)); e.style.opacity = e.dataset.t && now >= +e.dataset.t ? 1 : 0; return }
+      e.style.opacity = a
+      // 用 CSS 的 translate / scale 属性（不碰 transform）：SVG 分组自己的 transform 属性不被覆盖
+      if (e instanceof SVGElement) { e.style.transformBox = 'fill-box'; e.style.transformOrigin = 'center' }
+      if (kind === 'pop') e.style.scale = 0.85 + 0.15 * a; else e.style.translate = `0 ${(1 - a) * 18}px`
     })
+    p.querySelectorAll('.flow').forEach((e) => { e.style.strokeDashoffset = -((now / 40) % 1000) })
   }
   setInterval(tick, 16)
   function fit() { const k = Math.min(innerWidth / 1920, innerHeight / 1080); document.getElementById('stage').style.transform = `scale(${k})` }
   addEventListener('resize', fit); fit()
   addEventListener('keydown', (e) => { if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) next(); if (e.key === 'ArrowLeft') go(Math.max(0, cur - 1), 0) })
   const h = +(location.hash.match(/#p(\d+)/) || [])[1]; go(h ? h - 1 : 0, 0)
-  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags,
-    notes: (i) => '', state: () => ({ page: cur, frag }) }
+  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags, notes: () => '', state: () => ({ page: cur, frag }) }
 })()
 </script></body></html>

@@ -297,7 +297,8 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
                     cta2=lec.t(["实验 · 程序 · 讲义 · 作业 · AI 反馈", "Labs · programs · notes · exercises · instant AI feedback"], lang),
                     cta_at=max(0.5, tl_lines[n]["start"] - LEAD) if len(tl_lines) > n else tl["total"] - 3)
     key = h([spec, (HERE / "slides.py").read_text(encoding="utf-8"), quality] + ([d, (HERE / "labrec.py").read_text(encoding="utf-8")] if shot.kind in ("lab", "clip", "deck", "page") else [])
-            + ([hashlib.sha1((lec.dir / deck_of(lec, lang)).read_bytes()).hexdigest(), PAGE_INIT] if shot.kind == "page" else []))   # 实验镜头：步骤或录屏程序变了要重录；网页课件改了也重录
+            + ([hashlib.sha1((lec.dir / deck_of(lec, lang)).read_bytes()).hexdigest(), PAGE_INIT] if shot.kind == "page" else [])
+            + ([hashlib.sha1(rec_clip(lec, d, lang).read_bytes()).hexdigest(), "rec2"] if shot.kind == "rec" else []))   # 实验镜头：步骤或录屏程序变了要重录；网页课件改了也重录
     out = work / "shots" / f"{shot.id}.{lang}.{key}.mp4"
     if out.exists():
         return out
@@ -368,6 +369,10 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
         url = page.resolve().as_uri() + f"#lab-{lab}" + ("-en" if lang == "en" else "")
         raw = work / "shots" / f"lab_{shot.id}_{lang}.mp4"
         labrec.run(url, lab, d.get("steps") or [], tl["steps"], tl["total"], raw)
+    elif shot.kind == "rec":
+        # 第 127 轮：真页面的录屏片段（tools/video/screenrec.py 在本机录好、放在讲稿目录里），按这句配音的长度对齐
+        retime(rec_clip(lec, d, lang), tl["total"], out, work / "shots" / f"rec_{shot.id}_{lang}.mp4")
+        return out
     elif shot.kind == "clip":
         src = Path(os.environ.get("WQ_FOOTAGE", ROOT / "docs" / "课程视频" / "素材")) / d["src"]
         if not src.exists():
@@ -383,6 +388,24 @@ def render_shot(lec, shot, tl, lang, work: Path, quality: str, voice_backend: st
         raise S.ScriptError(f"unknown kind {shot.kind}")
     fit_length(raw, tl["total"], out)
     return out
+
+
+def rec_clip(lec, d: dict, lang: str) -> Path:
+    """rec 镜头的录屏文件：clip（两种语言同一段，例如只有中文界面的数字工厂）或 clip_zh / clip_en。"""
+    p = lec.dir / (d.get(f"clip_{lang}") or d["clip"])
+    if not p.exists():
+        raise S.ScriptError(f"找不到录屏 {p}（先在本机录：python3 tools/video/screenrec.py {lec.dir}）")
+    return p
+
+
+def retime(src: Path, total: float, dst: Path, tmp: Path):
+    """录屏片段对齐到镜头长度：差得不多（0.7～1.25 倍）就整体放慢或加快；更短就放慢到 1.25 倍后停在最后一帧；更长就加快到 0.7 倍后截掉。"""
+    c = dur(src)
+    r = min(1.25, max(0.7, total / c)) if c > 0 else 1.0
+    sh("ffmpeg", "-y", "-loglevel", "error", "-i", src, "-vf",
+       f"setpts={r:.4f}*PTS,scale=1920:1080:flags=lanczos,fps={FPS},format=yuv420p",
+       "-an", "-c:v", "libx264", "-crf", "16", "-preset", "medium", tmp)
+    fit_length(tmp, total, dst)
 
 
 PAGE_INIT = r"""(() => {

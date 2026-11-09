@@ -1,0 +1,116 @@
+# 18 电子与芯片 · 真页面录屏（第 127 轮）。tools/video/screenrec.py 在本机录，写进 录屏/；讲稿.yaml 的 rec 镜头引用。
+# 本机要起：电路板厂的教学版数字工厂（端口 8142，WQ_PLANT_FILE=factory/plants/wenquest-pcb.yaml，WQ_CAE_URL 指计算服务；
+# 功能测试台要先有做过功能测试的板：tests/plant_loop.py 接一张 DRV-JOINT 订单走完）、计算服务 cae.service（8200）、
+# 问渠电子 services/eda（8150，录时 WQ_PROXY=eda=8150）。起法见 ../README.md。
+# 每段的长度按那句配音估的；出片时 make.py 再按真实配音长度整体放慢或加快（0.8～1.25 倍），黄圈跟着走。
+clips:
+  # s02 电路分析：选一道例题，改驱动电阻，点运行，波形出来（浏览器里的 ngspice）
+  - name: circuit
+    hub: 8142
+    url: /circuit
+    viewport: [1440, 810]
+    wait: 5000
+    setup:
+      - {click: "button.tab:has-text('2 栅极驱动')", pause: 1200}
+      - {js: "window.scrollTo(0, 70)"}
+    dur: 11
+    do:
+      - {at: 0.3, ring: "svg.sch", for: 2.4}
+      - {at: 2.2, ring: ".params", for: 3.2}
+      - {at: 2.9, type: [".params input", "22"]}
+      - {at: 4.4, ring: "button.btn.primary", for: 1.6, pad: 6}
+      - {at: 5.0, click: "button.btn.primary"}
+      - {at: 6.6, scroll: ".card-head", offset: 12, dur: 1.3}
+      - {at: 8.2, ring: ".sc", for: 2.6}
+  # s03 虚拟仪器：霍尔电流传感器——直流电流源 + 万用表、信号源 + 示波器；改电流，读数跟着变
+  - name: instruments
+    hub: 8142
+    url: /instruments
+    viewport: [1440, 810]
+    wait: 5000
+    setup:
+      - {click: "button.tab:has-text('4 霍尔')", pause: 1500}
+    dur: 10
+    do:
+      - {at: 0.4, ring: ".bench > div:nth-child(2)", for: 2.2}
+      - {at: 2.0, ring: ".dut", for: 2.6}
+      - {at: 2.8, type: [".dut input.num", "5"]}
+      - {at: 4.0, type: [".dut input.num", "10"]}
+      - {at: 5.2, ring: ".card > p.small", for: 3.4}
+      - {at: 6.4, type: [".dut input.num", "15"]}
+  # s05 驱动板：PCB 视图里 A 版、B 版切换着看
+  - name: pcb-ab
+    hub: 8142
+    url: "/pcb-design?rev=A&tab=pcb"
+    viewport: [1440, 810]
+    wait: 6000
+    setup:                                 # 先把两版各打开一次，切换时不用等加载
+      - {click: "button.chip:has-text('B 版')", pause: 4000}
+      - {click: "button.chip:has-text('A 版')", pause: 4000}
+      - {js: "window.scrollTo(0, 0)"}
+    dur: 6
+    cut: [[2.05, 2.95]]                    # 切换时页面先清空再画新版本（约 0.8 秒），剪掉
+    do:
+      - {at: 0.3, ring: "button.chip:has-text('A 版')", for: 1.6, pad: 6}
+      - {at: 2.0, click: "button.chip:has-text('B 版')"}
+      - {at: 2.2, ring: "button.chip:has-text('B 版')", for: 3.2, pad: 6}
+  # s06 固件：Renode 里跑真固件、带着仿真电机转；一个个场景切着看
+  - name: firmware
+    hub: 8142
+    url: "/pcb-design?rev=B&tab=fw"
+    viewport: [1440, 810]
+    wait: 8000
+    setup:
+      - {scroll: ".dia", offset: 70, dur: 0.1, pause: 800}
+    dur: 11
+    do:
+      - {at: 0.3, ring: ".dia .b.pw >> nth=0", for: 2.6, pad: 6}
+      - {at: 2.8, scroll: ".dia ~ h3", offset: 96, dur: 1.2}
+      - {at: 4.3, click: "button:has-text('电流环阶跃')", keep: true}
+      - {at: 4.40, scroll: ".dia ~ h3", offset: 96, dur: 0.35}
+      - {at: 4.55, ring: ".dia ~ div.line button.chip.on", for: 1.3, pad: 4}
+      - {at: 5.8, click: "button:has-text('输出端编码器线断')", keep: true}
+      - {at: 5.90, scroll: ".dia ~ h3", offset: 96, dur: 0.35}
+      - {at: 6.05, ring: ".dia ~ div.line button.chip.on", for: 1.3, pad: 4}
+      - {at: 7.3, click: "button:has-text('上电抱着')", keep: true}
+      - {at: 7.40, scroll: ".dia ~ h3", offset: 96, dur: 0.35}
+      - {at: 7.55, ring: ".dia ~ div.line button.chip.on", for: 1.3, pad: 4}
+      - {at: 8.8, click: "button:has-text('⑥ 保护')", keep: true}
+      - {at: 8.90, scroll: ".dia ~ h3", offset: 96, dur: 0.35}
+      - {at: 9.05, ring: ".dia ~ div.line button.chip.on", for: 1.6, pad: 4}
+  # s08 进工厂：电路板厂功能测试台，一块驱动板逐项测
+  - name: fct
+    hub: 8142
+    url: /fct
+    viewport: [1280, 720]
+    wait: 5000
+    dur: 10
+    do:
+      - {at: 0.3, ring: ".page-title", for: 2.2}
+      - {at: 1.4, click: "button:has-text('2 母线电压读数')"}
+      - {at: 1.4, ring: "button:has-text('2 母线电压读数')", for: 1.0, pad: 4}
+      - {at: 2.6, click: "button:has-text('3 相电流采样')"}
+      - {at: 2.6, ring: "button:has-text('3 相电流采样')", for: 1.0, pad: 4}
+      - {at: 3.8, click: "button:has-text('4 栅极死区')"}
+      - {at: 3.8, ring: "button:has-text('4 栅极死区')", for: 1.0, pad: 4}
+      - {at: 5.0, click: "button:has-text('5 编码器接口')"}
+      - {at: 5.0, ring: "button:has-text('5 编码器接口')", for: 1.0, pad: 4}
+      - {at: 6.2, click: "button:has-text('6 老化后电流零点')"}
+      - {at: 6.2, ring: "button:has-text('6 老化后电流零点')", for: 1.0, pad: 4}
+      - {at: 7.4, ring: ".page-title", for: 2.4}
+  # s10 问渠电子工厂端：用演示资料包（驱动板 A 版，故意漏了 C47 的物料编号）真跑检查，板图上标出问题
+  - name: eda-factory
+    site: true
+    url: /eda/factory/
+    langs: [zh, en]
+    viewport: [1280, 720]
+    wait: 3000
+    dur: 9
+    cut: [[1.6, 4.8]]                      # 服务器读光绘、检查要四秒左右，剪掉中间的等待
+    do:
+      - {at: 0.3, ring: "#demo", for: 1.2, pad: 6}
+      - {at: 0.8, click: "#demo"}
+      - {at: 5.0, scroll: "#tally", offset: 16, dur: 0.8}
+      - {at: 5.9, ring: "#tally", for: 2.6}
+      - {at: 6.4, js: "[...document.querySelectorAll('#res tr')].find((r) => r.textContent.includes('C47')).click()"}
+      - {at: 6.7, ring: "#marks circle", for: 2.2, pad: 22}

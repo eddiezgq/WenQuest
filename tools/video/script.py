@@ -206,8 +206,10 @@ def load_standalone(d: Path, raw: dict) -> Lecture:
         if sid in seen:
             raise ScriptError(f"镜头 id 重复：{sid}")
         seen.add(sid)
-        if s.get("kind") != "page":
-            raise ScriptError(f"镜头 {sid}：独立视频只有 kind: page")
+        if s.get("kind") not in ("page", "rec"):
+            raise ScriptError(f"镜头 {sid}：独立视频只有 kind: page（网页课件 / 网页版 PPT）和 rec（真页面录屏，第 127 轮）")
+        if s.get("kind") == "rec" and not (s.get("clip") or (s.get("clip_zh") and s.get("clip_en"))):
+            raise ScriptError(f"镜头 {sid}：rec 镜头要写 clip（或 clip_zh、clip_en）")
         say = s.get("say") or {}
         lines = {}
         for lang in LANGS:
@@ -217,14 +219,14 @@ def load_standalone(d: Path, raw: dict) -> Lecture:
         if raw.get("subs") == "en+zh":
             if len(lines["zh"]) != len(lines["en"]) or any(a.step != b.step for a, b in zip(lines["zh"], lines["en"])):
                 raise ScriptError(f"镜头 {sid}：双语字幕要求中英文逐句对应，“>” 位置相同")
-        shot = Shot(id=sid, kind="page", data={k: v for k, v in s.items() if k != "say"}, lines=lines)
+        shot = Shot(id=sid, kind=s["kind"], data={k: v for k, v in s.items() if k != "say"}, lines=lines)
         n = shot.steps("en")
         if n != shot.steps("zh"):
             raise ScriptError(f"镜头 {sid}：中文 {shot.steps('zh')} 个“>”，英文 {n} 个，应相同")
         for k in ("steps", "steps_zh", "steps_en"):   # 第 46 轮：中文课件里按文字点的步骤可另写 steps_zh
             if k in s and n != len(s.get(k) or []):
                 raise ScriptError(f"镜头 {sid}：“>” 有 {n} 个，{k} 有 {len(s.get(k) or [])} 步，应相同")
-        if "steps" not in s and n:
+        if "steps" not in s and n and s["kind"] == "page":
             raise ScriptError(f"镜头 {sid}：“>” 有 {n} 个，没有 steps")
         shots.append(shot)
     return Lecture(dir=d, book="", section="", chapter_no=0, data=data, shots=shots, values={})
