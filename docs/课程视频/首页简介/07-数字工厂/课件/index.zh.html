@@ -1,167 +1,203 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>问渠数字工厂：一座会运转的教学工业园</title><style>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>07-数字工厂</title><style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#07131f}
-body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",Inter,Arial,sans-serif;color:#eaf1fb}
+body{font-family:"Noto Sans CJK SC","Source Han Sans SC","PingFang SC",Inter,Arial,sans-serif;color:#eaf1fb}
 #stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;
   background:radial-gradient(1200px 700px at 85% -10%,#1d3f7a 0%,transparent 60%),radial-gradient(900px 600px at -10% 110%,#0f4a4a 0%,transparent 60%),#07131f}
 section.pg{position:absolute;inset:0;display:none}
 section.pg.on{display:block}
-.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,sans-serif;letter-spacing:.18em;color:#7fb6ff;text-transform:uppercase}
-.brand b{color:#f5c344;font-weight:700;letter-spacing:.05em;margin-right:14px}
-.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600;letter-spacing:.04em}
-.title{position:absolute;left:56px;top:122px;width:1800px;font-size:52px;font-weight:800;line-height:1.15;color:#fff}
-.win{position:absolute;left:56px;top:212px;width:1280px;height:720px;border-radius:14px;overflow:hidden;background:#fff;
-  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.08)}
-.win .bar{position:absolute;left:0;top:0;right:0;height:34px;background:#e9edf2;display:flex;align-items:center;gap:8px;padding-left:14px;z-index:3}
-.win .bar i{width:12px;height:12px;border-radius:50%;background:#ff5f57}.win .bar i:nth-child(2){background:#febc2e}.win .bar i:nth-child(3){background:#28c840}
-.win .bar span{margin-left:18px;font:500 15px/1 Inter,sans-serif;color:#5b6775;background:#fff;border-radius:6px;padding:5px 14px}
-.win .vp{position:absolute;left:0;top:34px;right:0;bottom:0;overflow:hidden}
-.win .vp .cam{position:absolute;inset:0;transform-origin:0 0}
-.win .vp img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover;object-position:top left}
-.ring{position:absolute;border:5px solid #f5c344;border-radius:12px;box-shadow:0 0 0 9999px rgba(7,19,31,.16),0 0 24px rgba(245,195,68,.8);opacity:0}
-.side{position:absolute;left:1384px;top:236px;width:480px}
-.side li{list-style:none;position:relative;padding:0 0 0 46px;margin:0 0 30px;font-size:31px;line-height:1.38;color:#dbe7f7;opacity:0}
-.side li::before{content:attr(data-n);position:absolute;left:0;top:4px;width:32px;height:32px;border-radius:50%;background:#f5c344;color:#07131f;
-  font:700 19px/32px Inter,sans-serif;text-align:center}
-.side li b{color:#fff}
-.cover .title{top:330px;font-size:78px;width:900px}
-.cover .sub{position:absolute;left:56px;top:600px;width:860px;font-size:36px;line-height:1.45;color:#bcd0ea}
-.cover .line{position:absolute;left:56px;top:300px;width:120px;height:6px;background:#f5c344;border-radius:3px}
-.cover .win{left:1010px;top:200px;width:1000px;height:597px;transform:perspective(1800px) rotateY(-16deg) rotateX(3deg);transform-origin:left center;opacity:.92}
-.end .title{top:300px;font-size:84px;width:1700px}
-.end .sub{position:absolute;left:56px;top:430px;font-size:40px;color:#bcd0ea}
-.end .url{position:absolute;left:56px;top:540px;font:600 44px/1.2 Inter,sans-serif;color:#f5c344}
-.end .win{left:1180px;top:260px;width:680px;height:416px;opacity:.85}
-.f{opacity:0}
-</style></head><body><div id="stage"><section class="pg cover" data-n="1">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="title">一座会运转的教学工业园</div>
-<div class="line"></div>
-<div class="sub">问渠数字工厂：减速器厂、机器人厂、电路板厂、芯片封测厂互为上下游</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/park-4-zh.jpg" alt=""></div></div></div>
+.brand{position:absolute;left:56px;top:40px;font:600 24px/1 Inter,"Noto Sans CJK SC",sans-serif;letter-spacing:.18em;color:#7fb6ff}
+.brand b{color:#f5c344;letter-spacing:.05em;margin-right:14px}
+.kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600}
+.title{position:absolute;left:56px;top:122px;width:1800px;font-size:56px;font-weight:800;line-height:1.2;color:#fff}
+.sub:not(svg *){font:500 34px/1.3 Inter,"Noto Sans CJK SC",sans-serif;color:#8fb3dd;display:block;margin-top:6px}
+svg .sub{font-family:Inter,"Noto Sans CJK SC",sans-serif}   /* SVG 里的英文小字：字号按 font-size 属性 */
+svg text{font-family:"Noto Sans CJK SC",Inter,sans-serif}
+.code{position:absolute;border-radius:16px;background:#0b1d30;border:1px solid #23415f;padding:26px 28px;
+  font:500 21px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;color:#cfe2ff;white-space:pre;overflow:hidden}
+.code .k{color:#f5c344}.code .c{color:#6f8db0}.code .n{color:#7fe0c0}
+.cap{position:absolute;font-size:30px;font-weight:700;color:#fff}.cap .sub{font-size:21px;margin-top:4px}
+.tag{position:absolute;left:56px;bottom:118px;font-size:30px;color:#bcd0ea}.tag b{color:#f5c344}
+.card{position:absolute;border-radius:22px;background:linear-gradient(#14304f,#0c2038);border:2px solid #2f5d8a}
+.card.hot{border:3px solid #f5c344}
+.big{position:absolute;font-size:84px;font-weight:800;color:#fff;line-height:1.15}
+.url{position:absolute;font:600 46px/1.2 Inter,"Noto Sans CJK SC",sans-serif;color:#f5c344}
+html[lang=en] .sub,html[lang=en] .zh-only{display:none!important}
+html[lang=zh-CN] .en-only{display:none!important}
+html[lang=en] .title{font-family:Inter,"Noto Sans CJK SC",sans-serif}
+</style></head><body><div id="stage"><!-- 07 数字工厂 · 网页版 PPT（第 127 轮做法）。tools/video/intro_ppt.py 套上样式写出 index.zh.html / index.html。
+     图都是示意（不是系统界面）；系统里真实的样子用录屏（录屏.yaml）。第 1 页是 Eddie 认可的样页（../样页/样页.html），加了分步出现。 -->
+<svg width="0" height="0" style="position:absolute"><defs>
+ <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#f5c344"/></marker>
+ <linearGradient id="cardg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14304f"/><stop offset="1" stop-color="#0c2038"/></linearGradient>
+</defs></svg>
+
+<style>html[lang=en] svg text[font-size="40"]{font-size:34px}</style>
+<!-- p1 开场：四座厂，互为上下游（样页 1） -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST DIGITAL FACTORY</div>
+ <div class="kick" data-en="Digital factory">数字工厂</div>
+ <div class="title"><span data-en="Four plants, each supplying the next">四座厂，互为上下游</span><span class="sub">Four plants, each supplying the next</span></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0"><g transform="translate(0,-40)">
+  <g transform="translate(110,330)"><g data-k="1" data-d="0">
+   <rect width="480" height="250" rx="22" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <g transform="translate(40,58)" fill="none" stroke="#7fb6ff" stroke-width="5">
+    <circle cx="60" cy="60" r="44"/><circle cx="60" cy="60" r="16"/>
+    <g stroke-linecap="round"><line x1="60" y1="4" x2="60" y2="-6"/><line x1="60" y1="116" x2="60" y2="126"/><line x1="4" y1="60" x2="-6" y2="60"/><line x1="116" y1="60" x2="126" y2="60"/>
+     <line x1="20" y1="20" x2="13" y2="13"/><line x1="100" y1="100" x2="107" y2="107"/><line x1="100" y1="20" x2="107" y2="13"/><line x1="20" y1="100" x2="13" y2="107"/></g></g>
+   <text x="200" y="110" font-size="40" font-weight="800" fill="#fff" data-en="Gearbox plant">减速器厂</text>
+   <text x="200" y="152" font-size="24" fill="#8fb3dd" class="sub">Gearbox plant</text>
+   <text x="200" y="196" font-size="24" fill="#bcd0ea" data-en="two-stage reducer">二级齿轮减速器</text>
+  </g></g>
+  <g transform="translate(1330,330)"><g data-k="1" data-d="1300">
+   <rect width="480" height="250" rx="22" fill="url(#cardg)" stroke="#f5c344" stroke-width="3"/>
+   <g transform="translate(46,48)" fill="none" stroke="#f5c344" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="10" y1="140" x2="110" y2="140"/><path d="M60 140 L60 108 L28 64 L82 26"/><circle cx="60" cy="108" r="9" fill="#07131f"/><circle cx="28" cy="64" r="9" fill="#07131f"/><path d="M82 26 l20 -6 M82 26 l14 16"/></g>
+   <text x="200" y="110" font-size="40" font-weight="800" fill="#fff" data-en="Robot plant">机器人厂</text>
+   <text x="200" y="152" font-size="24" fill="#8fb3dd" class="sub">Robot plant</text>
+   <text x="200" y="196" font-size="24" fill="#bcd0ea" data-en="cobots · AGVs">协作臂 · AGV · 人形</text>
+  </g></g>
+  <g transform="translate(110,700)"><g data-k="1" data-d="2400">
+   <rect width="480" height="250" rx="22" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <g transform="translate(40,60)" fill="none" stroke="#7fe0c0" stroke-width="5" stroke-linejoin="round">
+    <rect x="8" y="10" width="112" height="110" rx="10"/><g fill="#7fe0c0" stroke="none"><rect x="30" y="34" width="22" height="22" rx="3"/><rect x="68" y="34" width="34" height="14" rx="3"/><rect x="68" y="56" width="34" height="14" rx="3"/><circle cx="40" cy="92" r="9"/><circle cx="84" cy="92" r="9"/></g>
+    <g stroke-linecap="round"><line x1="34" y1="10" x2="34" y2="-6"/><line x1="64" y1="10" x2="64" y2="-6"/><line x1="94" y1="10" x2="94" y2="-6"/></g></g>
+   <text x="200" y="110" font-size="40" font-weight="800" fill="#fff" data-en="PCB plant">电路板厂</text>
+   <text x="200" y="152" font-size="24" fill="#8fb3dd" class="sub">Circuit board plant</text>
+   <text x="200" y="196" font-size="24" fill="#bcd0ea" data-en="drive · AGV boards">驱动板 · AGV 控制板</text>
+  </g></g>
+  <g transform="translate(1330,700)"><g data-k="1" data-d="3400">
+   <rect width="480" height="250" rx="22" fill="url(#cardg)" stroke="#2f5d8a" stroke-width="2"/>
+   <g transform="translate(40,58)" fill="none" stroke="#c9a2ff" stroke-width="5">
+    <rect x="20" y="20" width="84" height="84" rx="8"/><rect x="42" y="42" width="40" height="40" rx="4" fill="#c9a2ff" stroke="none" opacity=".8"/>
+    <g stroke-linecap="round"><line x1="40" y1="20" x2="40" y2="2"/><line x1="62" y1="20" x2="62" y2="2"/><line x1="84" y1="20" x2="84" y2="2"/>
+    <line x1="40" y1="104" x2="40" y2="122"/><line x1="62" y1="104" x2="62" y2="122"/><line x1="84" y1="104" x2="84" y2="122"/>
+    <line x1="20" y1="40" x2="2" y2="40"/><line x1="20" y1="62" x2="2" y2="62"/><line x1="20" y1="84" x2="2" y2="84"/>
+    <line x1="104" y1="40" x2="122" y2="40"/><line x1="104" y1="62" x2="122" y2="62"/><line x1="104" y1="84" x2="122" y2="84"/></g></g>
+   <text x="200" y="110" font-size="40" font-weight="800" fill="#fff" data-en="Chip plant">芯片封测厂</text>
+   <text x="200" y="152" font-size="24" fill="#8fb3dd" class="sub">Chip test &amp; packaging</text>
+   <text x="200" y="196" font-size="24" fill="#bcd0ea" data-en="encoder interface chip">编码器接口芯片</text>
+  </g></g>
+  <g stroke="#f5c344" stroke-width="5" fill="none" marker-end="url(#ar)">
+   <path d="M598 455 L1318 455" data-k="1" data-d="4300" data-a="draw"/>
+   <path d="M1322 825 L610 825" data-k="1" data-d="4800" data-a="draw"/>
+   <path d="M598 825 C 900 825, 1000 620, 1318 520" data-k="1" data-d="5300" data-a="draw"/>
+  </g>
+  <g font-size="28" font-weight="700" fill="#fff" text-anchor="middle">
+   <g data-k="1" data-d="4600"><rect x="830" y="398" width="260" height="44" rx="22" fill="#07131f" stroke="#f5c344" stroke-width="2"/><text x="960" y="430" data-en="reducers">减速器</text></g>
+   <g data-k="1" data-d="5100"><rect x="840" y="852" width="270" height="44" rx="22" fill="#07131f" stroke="#f5c344" stroke-width="2"/><text x="975" y="884" data-en="encoder chips">编码器接口芯片</text></g>
+   <g data-k="1" data-d="5600"><rect x="1000" y="600" width="250" height="44" rx="22" fill="#07131f" stroke="#f5c344" stroke-width="2"/><text x="1125" y="632" data-en="drive boards">驱动板</text></g>
+  </g>
+  <g font-size="20" fill="#8fb3dd" text-anchor="middle" class="sub"><text x="960" y="488" data-k="1" data-d="4600">reducers</text><text x="1125" y="664" data-k="1" data-d="5600">drive boards</text><text x="975" y="918" data-k="1" data-d="5100">encoder interface chips</text></g>
+ </g></svg>
+ <div class="tag"><span class="zh-only">数据一条线连着：订单 → 排产 → 车间 → 质量 → 售后　<b>教学用工业园</b></span><span class="en-only">One data thread: order → schedule → shop floor → quality → after-sales　<b>a teaching industrial park</b></span></div>
 </section>
-<section class="pg shot" data-n="2">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">减速器厂</div>
-<div class="title">二级齿轮减速器</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/3d</span></div><div class="vp"><div class="cam" data-z1="1.3,45,35"><img src="media/fac-3d-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">二级齿轮减速器 WQR-105</li></ul>
+
+<!-- p2 减速器厂：一张订单进来 → ERP 排产 → MRP 算料 → 车间终端报工 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST DIGITAL FACTORY</div>
+ <div class="kick" data-en="The gearbox plant">减速器厂</div>
+ <div class="title"><span data-en="One order, one data thread">一张订单，数据一路连着</span><span class="sub">One order, one data thread</span></div>
+ <div class="card" style="left:70px;top:350px;width:390px;height:400px" data-k="1" data-d="0"></div>
+ <div class="card" style="left:540px;top:350px;width:390px;height:400px" data-k="1" data-d="900"></div>
+ <div class="card" style="left:1010px;top:350px;width:390px;height:400px" data-k="1" data-d="1800"></div>
+ <div class="card hot" style="left:1480px;top:350px;width:380px;height:400px" data-k="1" data-d="2700"></div>
+ <svg width="1920" height="1080" style="position:absolute;left:0;top:0">
+  <g data-k="1" data-d="0">
+   <g transform="translate(110,400)" fill="none" stroke="#7fb6ff" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M10 0 H90 L120 30 V140 H10 Z"/><path d="M90 0 V30 H120"/><path d="M32 62 H96 M32 88 H96 M32 114 H72"/></g>
+   <text x="110" y="610" font-size="40" font-weight="800" fill="#fff" data-en="Order in">订单进来</text>
+   <text x="110" y="650" font-size="24" fill="#8fb3dd" class="sub">an order comes in</text>
+   <text x="110" y="700" font-size="23" fill="#bcd0ea" data-en="sales order">销售订单</text>
+  </g>
+  <g data-k="1" data-d="900">
+   <g transform="translate(580,400)" fill="none" stroke="#f5c344" stroke-width="5" stroke-linecap="round"><rect x="0" y="10" width="140" height="120" rx="10"/><path d="M0 46 H140 M40 10 V0 M100 10 V0"/><path d="M22 70 H70 M22 98 H110" stroke-width="10"/></g>
+   <text x="580" y="610" font-size="40" font-weight="800" fill="#fff" data-en="ERP schedules">ERP 排产</text>
+   <text x="580" y="650" font-size="24" fill="#8fb3dd" class="sub">ERP schedules</text>
+   <text x="580" y="700" font-size="23" fill="#bcd0ea" data-en="work orders">工单</text>
+  </g>
+  <g data-k="1" data-d="1800">
+   <g transform="translate(1050,400)" fill="none" stroke="#7fe0c0" stroke-width="5" stroke-linejoin="round"><path d="M70 0 L140 35 L70 70 L0 35 Z"/><path d="M0 70 L70 105 L140 70"/><path d="M0 105 L70 140 L140 105"/></g>
+   <text x="1050" y="610" font-size="40" font-weight="800" fill="#fff" data-en="MRP plans">MRP 算料</text>
+   <text x="1050" y="650" font-size="24" fill="#8fb3dd" class="sub">MRP plans materials</text>
+   <text x="1050" y="700" font-size="23" fill="#bcd0ea" data-en="purchase requests">请购</text>
+  </g>
+  <g data-k="1" data-d="2700">
+   <g transform="translate(1520,400)" fill="none" stroke="#f5c344" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><rect x="0" y="0" width="140" height="100" rx="10"/><path d="M50 100 L40 140 H100 L90 100"/><path d="M28 64 L56 36 L80 56 L112 24"/></g>
+   <text x="1520" y="610" font-size="40" font-weight="800" fill="#fff" data-en="Shop floor reports">车间终端报工</text>
+   <text x="1520" y="650" font-size="24" fill="#8fb3dd" class="sub">the shop floor reports</text>
+   <text x="1520" y="700" font-size="23" fill="#bcd0ea" data-en="start · finish · measure">开工 · 完工 · 测量</text>
+  </g>
+  <g stroke="#f5c344" stroke-width="6" fill="none" marker-end="url(#ar)">
+   <path d="M464 550 H534" data-k="1" data-d="700" data-a="draw"/><path d="M934 550 H1004" data-k="1" data-d="1600" data-a="draw"/><path d="M1404 550 H1474" data-k="1" data-d="2500" data-a="draw"/>
+  </g>
+  <path d="M160 800 H1700" stroke="#f5c344" stroke-width="4" stroke-dasharray="14 12" class="flow" fill="none" data-k="1" data-d="3300"/>
+ </svg>
+ <div class="tag" data-k="1" data-d="3300"><span data-en="one data thread, from order to operation">从订单到工序，数据一路连着</span></div>
 </section>
-<section class="pg shot" data-n="3">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">订单与计划</div>
-<div class="title">一张订单进来</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/work/planner</span></div><div class="vp"><div class="cam" data-z1="1.4,40,45" data-z2="1.0,0,0"><img src="media/fac-planner-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">一张订单进来</li><li data-k="2" data-n="2">ERP 排产、MRP 算料</li></ul>
+
+<!-- p3 实验：二十多个，像在真厂里上班（实验名取自 factory/digital/实验*.md） -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST DIGITAL FACTORY</div>
+ <div class="kick" data-en="Students">学生</div>
+ <div class="title"><span data-en="More than twenty labs, much like a real job">二十多个实验，像在真厂里上班</span><span class="sub">More than twenty labs, much like a real job</span></div>
+ <div style="position:absolute;left:70px;top:330px;width:1780px;display:grid;grid-template-columns:repeat(4,1fr);gap:28px">
+  <div class="lab" data-k="1" data-d="0"><b data-en="Order to delivery">从订单到交付</b><span class="sub">order to delivery</span><i data-en="Lab 7 · closed loop of the digital factory">实验 7 · 数字工厂闭环</i><i data-en="Lab 24 · one cobot from order to delivery">实验 24 · 一台协作机器人从订单到交付</i></div>
+  <div class="lab" data-k="1" data-d="700"><b data-en="Root cause">追因</b><span class="sub">root cause</span><i data-en="Lab 15 · tracing a shop-floor anomaly">实验 15 · 车间异常的追因推演与决策</i><i data-en="Lab 25 · joint backlash and 8D">实验 25 · 关节背隙异常的追因与 8D</i></div>
+  <div class="lab" data-k="1" data-d="1400"><b data-en="Calibration">标定</b><span class="sub">calibration</span><i data-en="Lab 26 · kinematic calibration of a cobot">实验 26 · 一台协作机器人的运动学标定</i><i data-en="Lab 28 · run-in bench, simulation vs. test">实验 28 · 负载跑合台上的仿真与实测对比</i></div>
+  <div class="lab hot" data-k="1" data-d="2100"><b data-en="After-sales">售后</b><span class="sub">after-sales</span><i data-en="Lab 16 · complaint, recall and service">实验 16 · 客户投诉的追溯召回与服务决策</i><i data-en="Lab 29 · after-sales tracing of one robot">实验 29 · 一台机器人的售后追溯</i></div>
+ </div>
+ <div class="tag" data-k="2"><span data-en="Labs 7–31 in the digital factory: design, process, planning, purchasing, quality, maintenance, energy, finance">数字工厂实验 7–31：设计、工艺、计划、采购、质量、设备、能源、经营</span></div>
+ <style>.lab{min-height:470px;border-radius:22px;border:2px solid #2f5d8a;background:linear-gradient(#14304f,#0c2038);padding:36px 32px;display:flex;flex-direction:column;gap:10px}
+  .lab.hot{border:3px solid #f5c344}.lab b{font-size:44px;font-weight:800;color:#fff}.lab .sub{font-size:26px;margin:0 0 18px}
+  .lab i{font-style:normal;font-size:25px;line-height:1.45;color:#bcd0ea;padding:14px 0;border-top:1px solid #23415f}
+  html[lang=en] .lab b{font-family:Inter,"Noto Sans CJK SC",sans-serif;font-size:40px}html[lang=en] .lab b{margin-bottom:18px}</style>
 </section>
-<section class="pg shot" data-n="4">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">车间终端</div>
-<div class="title">报工，数据一路连着</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/work/operator</span></div><div class="vp"><div class="cam" data-z1="1.45,40,62"><img src="media/fac-operator-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">车间终端报工</li></ul>
+
+<!-- p4 结尾 -->
+<section class="pg">
+ <div class="brand"><b>问渠</b>WENQUEST DIGITAL FACTORY</div>
+ <div class="big" style="left:56px;top:230px"><span data-en="Enter the digital factory">进入数字工厂</span><span class="sub" style="font-size:40px;margin-top:10px">Enter the digital factory</span></div>
+ <div class="url" style="left:56px;top:470px">factory.wenquestrobotics.com</div>
+ <div data-k="1" style="position:absolute;left:56px;top:620px">
+  <div class="big" style="position:static;font-size:60px"><span data-en="Or start with the factory demo">或者先看工厂演示</span><span class="sub" style="font-size:34px;margin-top:8px">Or start with the factory demo</span></div>
+  <div class="url" style="position:static;margin-top:24px">wenquestrobotics.com/factory　<span style="color:#bcd0ea;font-size:34px" data-en="no sign-in needed">不用登录</span></div>
+ </div>
 </section>
-<section class="pg shot" data-n="5">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">机器人厂</div>
-<div class="title">协作机器人、AGV、轮式人形</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/3d</span></div><div class="vp"><div class="cam"><img src="media/rob-3d-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">协作机器人、AGV、轮式人形</li><li data-k="2" data-n="2">减速器向减速器厂买，驱动板向电路板厂买</li></ul>
-</section>
-<section class="pg shot" data-n="6">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">出厂之后</div>
-<div class="title">关节背隙，一直盯到客户现场</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/rservice</span></div><div class="vp"><div class="cam" data-z2="1.4,40,70"><img src="media/rob-service-zh.jpg" alt=""><div class="ring" data-k="1" style="left:19%;top:50%;width:79%;height:46%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">关节测试台量背隙</li><li data-k="2" data-n="2">出厂后每天回传运行数据</li></ul>
-</section>
-<section class="pg shot" data-n="7">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">电路板厂</div>
-<div class="title">一条贴片线，加后段十几台设备</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>pcb.factory.wenquestrobotics.com/3d</span></div><div class="vp"><div class="cam"><img src="media/pcb-3d-zh.jpg" alt=""><div class="ring" data-k="1" style="left:37.5%;top:35.5%;width:41%;height:23%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">贴片线 + 后段设备</li><li data-k="2" data-n="2">关节驱动板、AGV 控制板</li></ul>
-</section>
-<section class="pg shot" data-n="8">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">功能测试台</div>
-<div class="title">每块板出厂前逐项测</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>pcb.factory.wenquestrobotics.com/fct</span></div><div class="vp"><div class="cam"><img src="media/pcb-fct-zh.jpg" alt=""><div class="ring" data-k="1" style="left:41%;top:25.5%;width:53.5%;height:5%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">功能测试台逐项测</li></ul>
-</section>
-<section class="pg shot" data-n="9">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">芯片封测厂</div>
-<div class="title">我们自己设计的编码器接口芯片</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>chip.factory.wenquestrobotics.com/wafer-map</span></div><div class="vp"><div class="cam" data-z2="1.3,57,50"><img src="media/chip-wafer-zh.jpg" alt=""><div class="ring" data-k="2" style="left:43.5%;top:25%;width:27%;height:50%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">晶圆测试、封装、成品测试</li><li data-k="2" data-n="2">每个格子是一颗芯片的测试结果</li></ul>
-</section>
-<section class="pg shot" data-n="10">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">质量</div>
-<div class="title">控制图和 8D</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/work/quality</span></div><div class="vp"><div class="cam" data-z1="1.5,38,42"><img src="media/fac-quality-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">控制图</li><li data-k="2" data-n="2">8D：从一台机器追到一个批次、一把扳手</li></ul>
-</section>
-<section class="pg shot" data-n="11">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">厂情中枢</div>
-<div class="title">一张图看全厂</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/ont</span></div><div class="vp"><div class="cam"><img src="media/fac-ont-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">发现异常、追原因、推演后果</li></ul>
-</section>
-<section class="pg shot" data-n="12">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">AI 工厂助手</div>
-<div class="title">AI 提醒，人来决定</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com</span></div><div class="vp"><div class="cam"><img src="media/fac-home-zh.jpg" alt=""><div class="ring" data-k="1" style="left:18%;top:32%;width:80%;height:24%"></div></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">AI 提醒，决定由人来做</li></ul>
-</section>
-<section class="pg shot" data-n="13">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="kick">学生</div>
-<div class="title">二十多个实验，像在真厂里上班</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span>factory.wenquestrobotics.com/labs</span></div><div class="vp"><div class="cam"><img src="media/fac-labs-zh.jpg" alt=""></div></div></div>
-<ul class="side"><li data-k="1" data-n="1">从订单到交付、追因、标定、售后</li><li data-k="2" data-n="2">像在真厂里上班</li></ul>
-</section>
-<section class="pg end" data-n="14">
-<div class="brand"><b>问渠</b>数字工厂</div>
-<div class="title">进入数字工厂</div>
-<div class="sub">或者先看不用登录的工厂演示</div>
-<div class="url">问渠官网首页 → 数字工业园</div>
-<div class="win"><div class="bar"><i></i><i></i><i></i><span></span></div><div class="vp"><div class="cam"><img src="media/site-factory-zh.jpg" alt=""></div></div></div>
-</section></div><script>
+</div><script>
 (() => {
+  const en = document.documentElement.lang === 'en'
+  if (en) document.querySelectorAll('[data-en]').forEach((e) => { e.textContent = e.dataset.en })
   const pages = [...document.querySelectorAll('section.pg')]
-  let cur = 0, frag = 0, t0 = performance.now()
+  let cur = 0, frag = 0
   const frags = (i) => [...pages[i].querySelectorAll('[data-k]')].reduce((m, e) => Math.max(m, +e.dataset.k), 0)
-  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; t0 = performance.now()
+  const prep = (p) => p.querySelectorAll('[data-a="draw"]').forEach((e) => {
+    if (e.dataset.len) return
+    const L = e.getTotalLength ? e.getTotalLength() : 1000
+    e.dataset.len = L; e.style.strokeDasharray = L + ' ' + L
+  })
+  function go(i, s) { pages.forEach((p, k) => p.classList.toggle('on', k === i)); cur = i; frag = 0; prep(pages[i])
     pages[i].querySelectorAll('[data-k]').forEach((e) => { e.dataset.t = '' }); while (frag < s) next() }
   function next() { if (frag >= frags(cur)) { if (cur < pages.length - 1) go(cur + 1, 0); return } frag++
-    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = performance.now() })
-    const z = pages[cur].querySelector(`.cam[data-z${frag}]`); if (z) { z.dataset.from = z.dataset.now || '1,0,0'; z.dataset.to = z.dataset['z' + frag]; z.dataset.zt = performance.now() } }
-  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2
+    const now = performance.now()
+    pages[cur].querySelectorAll(`[data-k="${frag}"]`).forEach((e) => { e.dataset.t = now + (+e.dataset.d || 0) }) }
+  const ease = (x) => x < 0 ? 0 : x > 1 ? 1 : 1 - Math.pow(1 - x, 3)
   function tick() {
     const now = performance.now(), p = pages[cur]; if (!p) return
-    p.querySelectorAll('[data-k]').forEach((e) => { const t = +e.dataset.t; const a = e.dataset.t ? ease((now - t) / 450) : 0
-      e.style.opacity = a; if (e.tagName === 'LI') e.style.transform = `translateX(${(1 - a) * 24}px)` })
-    p.querySelectorAll('.cam').forEach((c) => {
-      const drift = 1 + 0.035 * Math.min(1, (now - t0) / 14000)          // 缓慢推近，画面不死
-      let [s, x, y] = (c.dataset.now || '1,0,0').split(',').map(Number)
-      if (c.dataset.to) { const a = ease((now - +c.dataset.zt) / 1200), A = c.dataset.from.split(',').map(Number), B = c.dataset.to.split(',').map(Number)
-        ;[s, x, y] = A.map((v, k) => v + (B[k] - v) * a); if (a >= 1) { c.dataset.now = c.dataset.to; delete c.dataset.to } }
-      const W = c.clientWidth, H = c.clientHeight, S = s * drift
-      // 把 (x%, y%) 放到画面中心，且不露出边
-      const tx = Math.min(0, Math.max(W - W * S, W / 2 - W * S * x / 100)), ty = Math.min(0, Math.max(H - H * S, H / 2 - H * S * y / 100))
-      c.style.transform = `translate(${s === 1 && !x ? 0 : tx}px,${s === 1 && !y ? 0 : ty}px) scale(${S})`
+    p.querySelectorAll('[data-k]').forEach((e) => {
+      const a = e.dataset.t ? ease((now - +e.dataset.t) / 600) : 0, kind = e.dataset.a
+      if (kind === 'draw') { e.style.strokeDashoffset = (+e.dataset.len) * (1 - ease((now - +e.dataset.t) / 900) * (e.dataset.t ? 1 : 0)); e.style.opacity = e.dataset.t && now >= +e.dataset.t ? 1 : 0; return }
+      e.style.opacity = a
+      // 用 CSS 的 translate / scale 属性（不碰 transform）：SVG 分组自己的 transform 属性不被覆盖
+      if (e instanceof SVGElement) { e.style.transformBox = 'fill-box'; e.style.transformOrigin = 'center' }
+      if (kind === 'pop') e.style.scale = 0.85 + 0.15 * a; else e.style.translate = `0 ${(1 - a) * 18}px`
     })
+    p.querySelectorAll('.flow').forEach((e) => { e.style.strokeDashoffset = -((now / 40) % 1000) })
   }
   setInterval(tick, 16)
   function fit() { const k = Math.min(innerWidth / 1920, innerHeight / 1080); document.getElementById('stage').style.transform = `scale(${k})` }
   addEventListener('resize', fit); fit()
   addEventListener('keydown', (e) => { if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) next(); if (e.key === 'ArrowLeft') go(Math.max(0, cur - 1), 0) })
   const h = +(location.hash.match(/#p(\d+)/) || [])[1]; go(h ? h - 1 : 0, 0)
-  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags,
-    notes: (i) => '', state: () => ({ page: cur, frag }) }
+  window.__deck = { pages: pages.length, go: (i, s) => go(i, s ?? 0), next, fragments: frags, notes: () => '', state: () => ({ page: cur, frag }) }
 })()
 </script></body></html>

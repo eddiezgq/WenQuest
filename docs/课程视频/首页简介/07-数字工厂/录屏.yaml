@@ -1,0 +1,138 @@
+# 07 数字工厂 · 真页面录屏（第 127 轮做法）。tools/video/screenrec.py 在本机录，写进 录屏/；讲稿.yaml 的 rec 镜头引用。
+# 本机起四座厂的教学版数字工厂（各自一套总线、mock_erpnext、枢纽、sim；起法见 ../README.md）：
+#   减速器厂 8160（演示工厂，实验 7 情景在跑）、机器人厂 8161、电路板厂 8162、芯片封测厂 8163。
+#   电路板厂、芯片封测厂要先接过订单（tests/plant_loop.py，Node-RED 桥接要起），功能测试台、晶圆图才有内容。
+# 数字工厂界面录的是中文界面（2026-11-09 录时英文界面第 130 轮还在做），两种语言共用。
+clips:
+  # 减速器厂：3D 车间，转个角度，AGV 在送料
+  - name: gear-3d
+    hub: 8160
+    url: /3d
+    viewport: [1440, 810]
+    wait: 9000
+    setup:
+      - {wheel: -600, at_xy: [820, 420], pause: 1500}
+    dur: 5
+    do:
+      - {at: 0.2, drag: [[700, 430], [940, 400]], dur: 4.2}
+  # 机器人厂：3D 车间
+  - name: robot-3d
+    hub: 8161
+    url: /3d
+    viewport: [1440, 810]
+    wait: 9000
+    setup:
+      - {wheel: -600, at_xy: [820, 420], pause: 1500}
+    dur: 6
+    do:
+      - {at: 0.2, drag: [[900, 430], [660, 410]], dur: 5}
+  # 机器人厂向谁买：采购与来料 → 供应商（减速器 = 问渠减速器厂，电路板 = 问渠电路板厂）
+  - name: robot-supply
+    hub: 8161
+    url: /supply
+    viewport: [1440, 810]
+    wait: 5000
+    setup:
+      - {click: "button:has-text('供应商')", pause: 2000}
+    dur: 6
+    do:
+      - {at: 0.3, ring: "tr:has-text('问渠减速器厂')", for: 5.5, pad: 4}
+      - {at: 2.6, ring: "tr:has-text('问渠电路板厂')", for: 3.2, pad: 4}
+  # 机器人厂出厂之后：现场的机器人每天回传，最差关节的背隙
+  - name: robot-field
+    hub: 8161
+    url: /rservice
+    viewport: [1440, 810]
+    wait: 5000
+    dur: 6
+    do:
+      - {at: 0.3, ring: "th:has-text('最差的关节')", for: 2.4, pad: 6}
+      - {at: 2.6, ring: ".kpis", for: 3.2}
+  # 电路板厂：3D 车间（贴片线 + 后段设备）
+  - name: pcb-3d
+    hub: 8162
+    url: /3d
+    viewport: [1440, 810]
+    wait: 9000
+    setup:
+      - {wheel: -600, at_xy: [820, 420], pause: 1500}
+    dur: 7
+    do:
+      - {at: 0.2, drag: [[680, 430], [900, 400]], dur: 6}
+  # 电路板厂功能测试台：一块驱动板逐项测
+  - name: pcb-fct
+    hub: 8162
+    url: /fct
+    viewport: [1280, 720]
+    wait: 5000
+    dur: 6
+    do:
+      - {at: 0.3, click: "button:has-text('2 母线电压读数')"}
+      - {at: 0.3, ring: "button:has-text('2 母线电压读数')", for: 0.9, pad: 4}
+      - {at: 1.3, click: "button:has-text('3 相电流采样')"}
+      - {at: 1.3, ring: "button:has-text('3 相电流采样')", for: 0.9, pad: 4}
+      - {at: 2.3, click: "button:has-text('4 栅极死区')"}
+      - {at: 2.3, ring: "button:has-text('4 栅极死区')", for: 0.9, pad: 4}
+      - {at: 3.3, click: "button:has-text('5 编码器接口')"}
+      - {at: 3.3, ring: "button:has-text('5 编码器接口')", for: 0.9, pad: 4}
+      - {at: 4.3, click: "button:has-text('6 老化后电流零点')"}
+      - {at: 4.3, ring: "button:has-text('6 老化后电流零点')", for: 1.4, pad: 4}
+  # 芯片封测厂：3D 车间
+  - name: chip-3d
+    hub: 8163
+    url: /3d
+    viewport: [1440, 810]
+    wait: 9000
+    setup:
+      - {wheel: -600, at_xy: [820, 420], pause: 1500}
+    dur: 7
+    do:
+      - {at: 0.2, drag: [[700, 430], [920, 410]], dur: 6}
+  # 芯片封测厂：晶圆图，一片片看，每个格子一颗芯片
+  - name: chip-wafer
+    hub: 8163
+    url: /wafer-map
+    viewport: [1440, 810]
+    wait: 5000
+    dur: 8
+    do:
+      - {at: 0.3, ring: "canvas.wafer", for: 2.6, pad: 6}
+      - {at: 3.0, click: "button.brd >> nth=1"}
+      - {at: 3.0, ring: "button.brd >> nth=1", for: 1.3, pad: 4}
+      - {at: 4.6, click: "button.brd >> nth=2"}
+      - {at: 4.6, ring: "button.brd >> nth=2", for: 1.3, pad: 4}
+      - {at: 6.2, click: "button.brd >> nth=0"}
+      - {at: 6.4, ring: "canvas.wafer", for: 1.5, pad: 6}
+  # 质量：控制图（实时刷新）和 8D
+  - name: quality
+    hub: 8160
+    url: /work/quality
+    viewport: [1440, 810]
+    wait: 6000
+    dur: 8
+    do:
+      - {at: 0.3, ring: "section.card.grow", for: 3.6}
+      - {at: 4.0, ring: "div.card-head:has-text('质量异常单（8D）')", for: 3.6, pad: 8}
+  # 厂情中枢：全厂态势 → 异常处理 → 推演工作台
+  - name: ont
+    hub: 8160
+    url: /ont
+    viewport: [1440, 810]
+    wait: 6000
+    dur: 7
+    do:
+      - {at: 0.3, ring: "button[role=tab]:has-text('全厂态势')", for: 1.6, pad: 4}
+      - {at: 2.0, click: "button[role=tab]:has-text('异常处理')"}
+      - {at: 2.1, ring: "button[role=tab]:has-text('异常处理')", for: 1.8, pad: 4}
+      - {at: 4.1, ring: "a.tablink:has-text('推演工作台')", for: 0.9, pad: 4}
+      - {at: 4.6, click: "a.tablink:has-text('推演工作台')"}
+  # AI 提醒，人来决定：首页的厂情中枢提醒条和 AI 今日简报
+  - name: ai-brief
+    hub: 8160
+    url: /
+    viewport: [1440, 810]
+    wait: 7000
+    dur: 5
+    do:
+      - {at: 0.3, ring: "a.ont-banner >> nth=0", for: 2.2, pad: 4}
+      - {at: 2.4, ring: "section.brief", for: 2.5, pad: 6}

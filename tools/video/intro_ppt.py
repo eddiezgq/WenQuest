@@ -33,7 +33,8 @@ section.pg.on{display:block}
 .brand b{color:#f5c344;letter-spacing:.05em;margin-right:14px}
 .kick{position:absolute;left:56px;top:84px;font-size:26px;color:#f5c344;font-weight:600}
 .title{position:absolute;left:56px;top:122px;width:1800px;font-size:56px;font-weight:800;line-height:1.2;color:#fff}
-.sub{font:500 34px/1.3 Inter,"Noto Sans CJK SC",sans-serif;color:#8fb3dd;display:block;margin-top:6px}
+.sub:not(svg *){font:500 34px/1.3 Inter,"Noto Sans CJK SC",sans-serif;color:#8fb3dd;display:block;margin-top:6px}
+svg .sub{font-family:Inter,"Noto Sans CJK SC",sans-serif}   /* SVG 里的英文小字：字号按 font-size 属性 */
 svg text{font-family:"Noto Sans CJK SC",Inter,sans-serif}
 .code{position:absolute;border-radius:16px;background:#0b1d30;border:1px solid #23415f;padding:26px 28px;
   font:500 21px/1.6 "JetBrains Mono","DejaVu Sans Mono",monospace;color:#cfe2ff;white-space:pre;overflow:hidden}
