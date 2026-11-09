@@ -1,73 +1,74 @@
 <template>
   <div class="modal-mask" @click.self="$emit('close')">
-    <div class="modal" role="dialog" aria-modal="true" :aria-label="p?.title || t('提议')">
-      <div v-if="!p" class="muted">{{ t('载入中…') }}</div>
+    <div class="modal" role="dialog" aria-modal="true" :aria-label="p?.title || '提议'">
+      <div v-if="!p" class="muted">载入中…</div>
       <template v-else>
         <div class="head">
-          <h2>{{ td(p.title) }}</h2>
+          <h2>{{ p.title }}</h2>
           <span class="pill" :class="statusTone">{{ statusText }}</span>
         </div>
-        <p class="muted small">{{ t('提议') }} <span class="mono">{{ p.proposal_id }}</span> · {{ t('由 {w} 起草', { w: p.requested_by }) }} ·
-          {{ t('确认后才由桥接写入 ERPNext（统一数据总线 ai/proposal）') }}</p>
+        <p class="muted small">提议 <span class="mono">{{ p.proposal_id }}</span> · 由 {{ p.requested_by }} 起草 ·
+          确认后才由桥接写入 ERPNext（统一数据总线 ai/proposal）</p>
 
         <template v-if="p.action === 'create_order_and_plan'">
-          <h3>{{ t('销售订单') }}</h3>
+          <h3>销售订单</h3>
           <table class="t"><tbody>
-            <tr><td>{{ t('客户') }}</td><td>{{ bi(so.customer) }}</td><td>{{ t('产品') }}</td><td class="mono">{{ so.item_code }} × {{ so.qty }}</td></tr>
-            <tr><td>{{ t('交期') }}</td><td class="mono">{{ so.delivery_date }}</td><td>{{ t('金额') }}</td><td class="mono">{{ so.amount ? '$' + so.amount.toLocaleString() : '—' }}</td></tr>
+            <tr><td>客户</td><td>{{ so.customer }}</td><td>产品</td><td class="mono">{{ so.item_code }} × {{ so.qty }}</td></tr>
+            <tr><td>交期</td><td class="mono">{{ so.delivery_date }}</td><td>金额</td><td class="mono">{{ so.amount ? '$' + so.amount.toLocaleString() : '—' }}</td></tr>
           </tbody></table>
-          <h3>{{ t('算料结果（MRP）') }}</h3>
+          <h3>算料结果（MRP）</h3>
           <table class="t">
-            <thead><tr><th>{{ t('物料') }}</th><th>{{ t('名称') }}</th><th class="num">{{ t('毛需求') }}</th><th class="num">{{ t('其他订单占用') }}</th>
-              <th class="num">{{ t('库存') }}</th><th class="num">{{ t('在途') }}</th><th class="num">{{ t('安全库存') }}</th><th class="num">{{ t('净需求') }}</th><th>{{ t('动作') }}</th></tr></thead>
+            <thead><tr><th>物料</th><th>名称</th><th class="num">毛需求</th><th class="num">其他订单占用</th>
+              <th class="num">库存</th><th class="num">在途</th><th class="num">安全库存</th><th class="num">净需求</th><th>动作</th></tr></thead>
             <tbody>
               <tr v-for="r in pv.mrp" :key="r.item_code" :class="{ need: r.net > 0 }">
-                <td class="mono">{{ r.item_code }}</td><td>{{ isEn() ? bi(r.name) : r.name.split(' ')[0] }}</td>
+                <td class="mono">{{ r.item_code }}</td><td>{{ r.name.split(' ')[0] }}</td>
                 <td class="num">{{ n(r.gross) }}</td><td class="num">{{ n(r.committed) }}</td><td class="num">{{ n(r.stock) }}</td>
                 <td class="num">{{ n(r.on_order) }}</td><td class="num">{{ n(r.safety) }}</td><td class="num">{{ n(r.net) }}</td>
-                <td>{{ td(r.action) }}</td>
+                <td>{{ r.action }}</td>
               </tr>
             </tbody>
           </table>
-          <p class="muted small">{{ td(pv.basis) }}</p>
-          <h3>{{ t('工单（本轮只下达输出轴 SH-301）') }}</h3>
+          <p class="muted small">{{ pv.basis }}</p>
+          <h3>工单（本轮只下达输出轴 SH-301）</h3>
           <table class="t">
-            <thead><tr><th>{{ t('物料') }}</th><th class="num">{{ t('数量') }}</th><th>{{ t('计划开工') }}</th><th>{{ t('计划完工') }}</th><th class="num">{{ t('理论工时') }}</th></tr></thead>
+            <thead><tr><th>物料</th><th class="num">数量</th><th>计划开工</th><th>计划完工</th><th class="num">理论工时</th></tr></thead>
             <tbody><tr v-for="w in pv.work_orders" :key="w.production_item">
               <td class="mono">{{ w.production_item }}</td><td class="num">{{ w.qty }}</td><td class="mono">{{ w.planned_start_date }}</td>
-              <td class="mono">{{ w.expected_delivery_date }}</td><td class="num">{{ t('{n} 分钟', { n: w.est_minutes }) }}</td></tr></tbody>
+              <td class="mono">{{ w.expected_delivery_date }}</td><td class="num">{{ w.est_minutes }} 分钟</td></tr></tbody>
           </table>
-          <p v-if="pv.deferred?.length" class="muted small">{{ t('其余自制件（{l}）列出需求但本轮不下达工单（实施细则决定 F4）。', { l: pv.deferred.map((d) => d.item_code).join(', ') }) }}</p>
+          <p v-if="pv.deferred?.length" class="muted small">其余自制件（{{ pv.deferred.map((d) => d.item_code).join('、') }}）
+            列出需求但本轮不下达工单（实施细则决定 F4）。</p>
         </template>
         <template v-if="pv.material_requests?.length">
-          <h3>{{ t('请购单') }}</h3>
+          <h3>请购单</h3>
           <table class="t">
-            <thead><tr><th>{{ t('物料') }}</th><th class="num">{{ t('数量') }}</th><th>{{ t('需求日期') }}</th><th>{{ t('建议供应商') }}</th><th>{{ t('说明') }}</th></tr></thead>
+            <thead><tr><th>物料</th><th class="num">数量</th><th>需求日期</th><th>建议供应商</th><th>说明</th></tr></thead>
             <tbody><tr v-for="m in pv.material_requests" :key="m.item_code">
               <td class="mono">{{ m.item_code }}</td><td class="num">{{ m.qty }} {{ m.uom }}</td><td class="mono">{{ m.schedule_date }}</td>
-              <td>{{ isEn() ? bi(m.supplier) : short(m.supplier) }}</td><td class="small">{{ td(m.reason) }}</td></tr></tbody>
+              <td>{{ short(m.supplier) }}</td><td class="small">{{ m.reason }}</td></tr></tbody>
           </table>
         </template>
         <template v-if="p.action === 'release_work_order'">
-          <p>{{ t('把工单 {w} 按工艺路线逐道派给车间设备。', { w: pv.work_order }) }}</p>
+          <p>把工单 <b class="mono">{{ pv.work_order }}</b> 按工艺路线逐道派给车间设备。</p>
         </template>
         <div v-if="pv.warnings?.length" class="warns">
-          <b>{{ t('注意') }}</b><div v-for="w in pv.warnings" :key="w">{{ td(w) }}</div>
+          <b>注意</b><div v-for="w in pv.warnings" :key="w">{{ w }}</div>
         </div>
 
         <div v-if="p.results?.length" class="results">
-          <h3>{{ t('ERPNext 写入结果') }}</h3>
+          <h3>ERPNext 写入结果</h3>
           <div v-for="r in p.results" :key="r.doctype + r.name" class="small">
-            <span :class="r.action === 'failed' ? 'err' : 'ok'">{{ r.action === 'failed' ? t('失败') : t('已建') }}</span>
+            <span :class="r.action === 'failed' ? 'err' : 'ok'">{{ r.action === 'failed' ? '失败' : '已建' }}</span>
             {{ r.doctype }} <b class="mono">{{ r.name }}</b> {{ r.error || '' }}
           </div>
         </div>
         <div v-if="error" class="err">{{ error }}</div>
         <div class="actions">
-          <button class="btn ghost" @click="$emit('close')">{{ t('关闭') }}</button>
+          <button class="btn ghost" @click="$emit('close')">关闭</button>
           <template v-if="p.status === 'pending'">
-            <button class="btn danger" :disabled="busy" @click="decide('reject')">{{ t('否决') }}</button>
-            <button class="btn primary" :disabled="busy" @click="decide('confirm')">{{ t('确认执行') }}</button>
+            <button class="btn danger" :disabled="busy" @click="decide('reject')">否决</button>
+            <button class="btn primary" :disabled="busy" @click="decide('confirm')">确认执行</button>
           </template>
         </div>
       </template>
@@ -79,7 +80,6 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { get, post } from '../lib/api';
 import { short } from '../lib/fmt';
-import { bi, isEn, t, td, tk } from '../lib/i18n';
 
 const props = defineProps({ pid: String });
 const emit = defineEmits(['close', 'done']);
@@ -89,8 +89,7 @@ const error = ref(null);
 let timer;
 const pv = computed(() => p.value?.preview || {});
 const so = computed(() => pv.value.sales_order || {});
-const STATUS = { pending: tk('待确认'), confirmed: tk('已确认，执行中'), executed: tk('已执行'), rejected: tk('已否决'), failed: tk('执行失败') };
-const statusText = computed(() => t(STATUS[p.value?.status] || ''));
+const statusText = computed(() => ({ pending: '待确认', confirmed: '已确认，执行中', executed: '已执行', rejected: '已否决', failed: '执行失败' }[p.value?.status]));
 const statusTone = computed(() => ({ pending: 'warn', confirmed: 'info', executed: 'good', rejected: 'mute', failed: 'bad' }[p.value?.status]));
 const n = (v) => (v === null || v === undefined ? '—' : Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }));
 

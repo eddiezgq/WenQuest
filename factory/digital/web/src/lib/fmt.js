@@ -1,14 +1,12 @@
-import { loc, t } from './i18n';
-
 export const pct = (v, d = 0) => (v === null || v === undefined ? '—' : (v * 100).toFixed(d) + '%');
 export const pctSigned = (v, d = 1) => (v === null || v === undefined ? '—' : (v >= 0 ? '+' : '') + (v * 100).toFixed(d) + '%');
 export const money = (v) => (v === null || v === undefined ? '—' : '$' + Number(v).toFixed(2));
-export const short = (s) => (s || '').replace('示例·', '')   /* i18n-ok 数据前缀 */.split(' ')[0];
+export const short = (s) => (s || '').replace('示例·', '').split(' ')[0];
 export const opShort = (s) => (s || '').split(' ')[0];
 export function timeOf(iso) {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleString(loc(), { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+  return d.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
 }
 export function kpiValue(k) {
   if (k.fmt === 'ratio') return `${k.value} / ${k.total}`;
@@ -20,10 +18,10 @@ export function kpiValue(k) {
   return String(k.value);
 }
 export const STATE = {
-  run: { get label() { return t('运行'); }, color: 'var(--good)', bg: 'var(--good-bg)' },
-  idle: { get label() { return t('空闲'); }, color: 'var(--idle-ink)', bg: 'var(--idle-bg)' },
-  setup: { get label() { return t('调整'); }, color: 'var(--warn-ink)', bg: 'var(--warn-bg)' },
-  down: { get label() { return t('停机'); }, color: 'var(--bad)', bg: 'var(--bad-bg)' },
-  fault: { get label() { return t('故障'); }, color: 'var(--bad)', bg: 'var(--bad-bg)' },
+  run: { label: '运行', color: 'var(--good)', bg: 'var(--good-bg)' },
+  idle: { label: '空闲', color: 'var(--idle-ink)', bg: 'var(--idle-bg)' },
+  setup: { label: '调整', color: 'var(--warn-ink)', bg: 'var(--warn-bg)' },
+  down: { label: '停机', color: 'var(--bad)', bg: 'var(--bad-bg)' },
+  fault: { label: '故障', color: 'var(--bad)', bg: 'var(--bad-bg)' },
 };
 export const TONE = { good: 'var(--good)', warn: 'var(--warn-ink)', bad: 'var(--bad)', mute: 'var(--muted)', info: 'var(--accent)' };
