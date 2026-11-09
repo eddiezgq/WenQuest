@@ -3780,7 +3780,8 @@ const messages: Record<Locale, Record<string, string>> = {
   },
 };
 
-const KEY = "wq.locale";
+// 第 129 轮换新钥匙：以前的版本按浏览器语言定、用户点过的“中文”都记在旧钥匙里，换钥匙后大家先按站点默认（美国站英文），再点过的才记住
+const KEY = "wq.locale2";
 
 function initial(): Locale {
   try {
