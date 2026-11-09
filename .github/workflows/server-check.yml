@@ -64,14 +64,17 @@ jobs:
       - name: 工业园各厂网址（第 125 轮：新厂打不开时查证书与转发）
         if: always() && inputs.server == 'us'
         run: |
-          ssh "deploy@$HOST" 'for h in robot pcb chip sensor; do
+          ssh "deploy@$HOST" 'for h in chip sensor; do
               d=$h.factory.wenquestrobotics.com
-              echo "$d https=$(curl -s -o /dev/null -m 20 -w "%{http_code}" https://$d/api/health 2>&1) dns=$(getent hosts $d | cut -d" " -f1 | head -1 | sed -E "s/[0-9]+\.[0-9]+\.[0-9]+\.([0-9]+)/x.x.x.\1/")"
+              echo "$d local=$(curl -sk -o /dev/null -m 20 -w "%{http_code}" --resolve $d:443:127.0.0.1 https://$d/api/health 2>&1)"
+              curl -sv -o /dev/null -m 20 --resolve $d:443:127.0.0.1 https://$d/api/health 2>&1 | grep -iE "subject:|issuer:|expire|SSL|alert|HTTP/" | head -6
             done
-            cd /opt/wenquest 2>/dev/null && c=$(docker ps --format "{{.Names}}" | grep -i caddy | head -1) && echo "caddy=$c" &&
-              docker logs --since 3h "$c" 2>&1 | grep -iE "sensor" | tail -12 | cut -c1-300
-            docker ps --format "{{.Names}} {{.Status}}" | grep -E "c-sensor" ; docker exec "$c" wget -qO- -T 5 http://wqf-hub-c-sensor:8100/api/health 2>&1 | head -c 200; echo
-            docker exec "$c" wget -qO- -T 5 "http://gateway:8000/api/v1/caddy/ask?domain=sensor.factory.wenquestrobotics.com" 2>&1 | head -c 200; echo' 2>&1 \
+            c=$(docker ps --format "{{.Names}}" | grep -i caddy | head -1); echo "caddy=$c"
+            docker logs "$c" 2>&1 | grep -i "sensor" | tail -15 | cut -c1-400
+            g=$(docker ps --format "{{.Names}}" | grep -i gateway | head -1); echo "gateway=$g"
+            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://localhost:8000/api/v1/caddy/ask?domain=sensor.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
+            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub:8100/api/caddy/ask?domain=sensor.factory.wenquestrobotics.com\",timeout=5).read()[:200])" 2>&1 | tail -2
+            docker exec "$g" python3 -c "import urllib.request as u;print(u.urlopen(\"http://wqf-hub-c-sensor:8100/api/health\",timeout=5).read()[:200])" 2>&1 | tail -2' 2>&1 \
             | sed 's/^/site: /' | while IFS= read -r l; do echo "::notice::$l"; done
       - name: Clean (only when asked) — 先于试传文件执行
         if: always() && inputs.clean == 'yes'
