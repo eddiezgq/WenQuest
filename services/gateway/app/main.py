@@ -49,6 +49,7 @@ from . import content
 from . import course_api
 from . import edit_api
 from . import learn_api
+from . import webdocs_api
 from . import life_api
 from . import course_builder as cb
 from . import generate as gen
@@ -145,6 +146,7 @@ def create_app() -> FastAPI:
     studio_api.register(app, sys.modules[__name__])
     course_api.register(app, sys.modules[__name__])
     learn_api.register(app, sys.modules[__name__])
+    webdocs_api.register(app, sys.modules[__name__])      # 第 122 轮：网页实验报告（用 learn_api 的作业调用）
     edit_api.register(app, sys.modules[__name__])
     life_api.register(app, sys.modules[__name__])
     textbook_api.register(app, sys.modules[__name__])

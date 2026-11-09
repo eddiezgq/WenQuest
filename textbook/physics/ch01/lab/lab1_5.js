@@ -71,6 +71,13 @@ WQ.lab({
     check15(api);
   },
   change(api, s, pid) { if (pid === "Uhat") check15(api); },
+  // 第 122 轮：“记入报告”时把记录的读数填进报告表 1、表 2（{{D1}}…{{D10}}、{{h1}}…{{h5}}，按记录先后）
+  results(api, s) {
+    const out = {};
+    rec15.D.slice(0, 10).forEach((x, i) => { out["D" + (i + 1)] = x.toFixed(2); });
+    rec15.h.slice(0, 5).forEach((x, i) => { out["h" + (i + 1)] = x.toFixed(3); });
+    return out;
+  },
   readouts(api, s) {
     const f = api.fmt, k = key15(api.scene), list = rec15[k];
     const rows = [[["我的读数", "My reading"], f(mine15(api), api.scene === "micro" ? 3 : 2) + " mm"],

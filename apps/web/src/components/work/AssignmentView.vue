@@ -35,6 +35,13 @@
           </view>
         </view>
 
+        <!-- 第 122 轮：作业关联了实验时，在线写实验报告 -->
+        <view v-if="link?.linked" class="wq-card report-card">
+          <text class="wq-label">{{ t("report.linkedTo", { lab: linkTitle }) }}</text>
+          <text class="wq-muted block">{{ t("report.studentHint") }}</text>
+          <view class="wq-btn primary" @click="openReport">{{ t("report.write") }}</view>
+        </view>
+
         <!-- what was handed in -->
         <view v-if="!editing && (sub.text || sub.files.length)" class="wq-card">
           <text class="wq-label">{{ t("work.myWork") }}</text>
@@ -81,6 +88,21 @@
 
       <!-- ===================== teacher ===================== -->
       <template v-else-if="a.teacher">
+        <view class="wq-card report-card">
+          <text class="wq-label">{{ t("report.linkTitle") }}</text>
+          <text class="block">{{ link?.linked ? t("report.linkedTo", { lab: linkTitle }) : t("report.notLinked") }}</text>
+          <text class="wq-muted block">{{ t("report.linkHint") }}</text>
+          <view class="wq-row actions">
+            <picker v-if="labBooks.length" mode="multiSelector" :range="labRange" :value="labPick" @columnchange="labColumn" @change="setLink">
+              <view class="wq-btn small">{{ link?.linked ? t("report.changeLink") : t("report.chooseLab") }}</view>
+            </picker>
+            <view v-else class="wq-btn small" @click="loadLabs">{{ link?.linked ? t("report.changeLink") : t("report.chooseLab") }}</view>
+            <view v-if="link?.linked" class="wq-btn small" @click="unlink">{{ t("report.unlink") }}</view>
+            <view v-if="link?.linked" class="wq-btn small" :class="{ disabled: exporting }" @click="exportClass('docx')">{{ t("report.exportClassWord") }}</view>
+            <view v-if="link?.linked" class="wq-btn small" :class="{ disabled: exporting }" @click="exportClass('pdf')">{{ t("report.exportClassPdf") }}</view>
+          </view>
+          <text v-if="linkError" class="wq-error block">{{ linkError }}</text>
+        </view>
         <view v-if="a.summary" class="counts">
           <view class="count"><text class="c-n">{{ a.summary.participants }}</text><text class="wq-muted">{{ t("work.participants") }}</text></view>
           <view class="count"><text class="c-n">{{ a.summary.submitted }}</text><text class="wq-muted">{{ t("work.submitted") }}</text></view>
@@ -109,6 +131,7 @@
             <text v-if="!work" class="wq-muted">{{ t("common.loading") }}</text>
             <template v-else>
               <text class="wq-tag">{{ t("work.status." + work.status) }}</text>
+              <text v-if="link?.linked" class="wq-link block" @click="openStudentReport">{{ t("report.viewStudent") }}</text>
               <view v-if="work.text" class="paper small"><MathContent :html="work.text" /></view>
               <view v-for="f in work.files" :key="f.url" class="frow"><text class="wq-link" @click="open(f.url)">📎 {{ f.name }}</text><text class="wq-muted">{{ fileSize(f.size) }}</text></view>
               <text v-if="!work.text && !work.files.length" class="wq-muted block">{{ t("work.nothingYet") }}</text>
@@ -147,7 +170,8 @@ import AiBadge from "../AiBadge.vue";
 import MathContent from "../MathContent.vue";
 import { absolute, ApiError } from "../../api";
 import {
-  type Assignment, fileSize, initials, openOutside, type Picked, pickFiles, saveSubmission, type Submission, type SubmissionRow, workApi,
+  type Assignment, downloadAuthed, fileSize, initials, openOutside, type Picked, pickFiles, reportApi, type ReportLabs, saveSubmission, type Submission,
+  type SubmissionRow, workApi,
 } from "../../courseApi";
 import { errorText, formatDate, t } from "../../i18n";
 
@@ -171,6 +195,49 @@ const feedback = ref("");
 const aiBusy = ref(false);
 const criteria = ref<{ name: string; score: number; max: number; note: string }[]>([]);
 
+// ---------- 第 122 轮：作业关联实验，网页实验报告 ----------
+const link = ref<{ linked: boolean; book?: string; lab?: string; title?: [string, string] } | null>(null);
+const linkTitle = computed(() => (link.value?.title ? `${link.value.title[0]}` : `${link.value?.book || ""} ${link.value?.lab || ""}`));
+const labBooks = ref<ReportLabs["books"]>([]);
+const labPick = ref([0, 0]);
+const labRange = computed(() => [labBooks.value.map((b) => b.title), (labBooks.value[labPick.value[0]]?.labs || []).map((l) => `${l.no} ${l.title?.[0] || ""}`)]);
+const linkError = ref("");
+const exporting = ref(false);
+async function loadLink() {
+  try { link.value = await reportApi.link(props.cmid); } catch { link.value = null; }
+}
+async function loadLabs() {
+  try {
+    labBooks.value = (await reportApi.labs()).books;
+    if (!labBooks.value.length) linkError.value = t("report.noLabs");
+  } catch (e) { linkError.value = errorText(e instanceof ApiError ? e.code : "unknown"); }
+}
+function labColumn(e: any) { if (e.detail.column === 0) labPick.value = [e.detail.value, 0]; }
+async function setLink(e: any) {
+  const [bi, li] = e.detail.value as number[];
+  const b = labBooks.value[bi], l = b?.labs[li];
+  if (!b || !l) return;
+  linkError.value = "";
+  try { link.value = await reportApi.setLink(props.cmid, b.book, l.lab); } catch (err) { linkError.value = errorText(err instanceof ApiError ? err.code : "unknown"); }
+}
+async function unlink() {
+  try { link.value = await reportApi.unlink(props.cmid); } catch (err) { linkError.value = errorText(err instanceof ApiError ? err.code : "unknown"); }
+}
+async function exportClass(fmt: "docx" | "pdf") {
+  if (exporting.value) return;
+  exporting.value = true;
+  linkError.value = "";
+  try { await downloadAuthed(`/api/v1/assignments/${props.cmid}/reports.zip?fmt=${fmt}`, `${a.value?.name || "reports"}.zip`); }
+  catch (err) { linkError.value = errorText(err instanceof ApiError ? err.code : "unknown"); }
+  finally { exporting.value = false; }
+}
+function openReport() {
+  if (link.value?.book) uni.navigateTo({ url: `/pages/report/report?b=${link.value.book}&l=${link.value.lab}&cmid=${props.cmid}` });
+}
+function openStudentReport() {
+  if (current.value) uni.navigateTo({ url: `/pages/report/report?cmid=${props.cmid}&u=${current.value.id}` });
+}
+
 const sub = computed(() => a.value?.submission || null);
 const hasWork = computed(() => !!sub.value && (!!sub.value.text || sub.value.files.length > 0));
 const late = computed(() => !!a.value?.due && !!sub.value?.modified && sub.value.status === "submitted" && sub.value.modified > a.value.due);
@@ -190,8 +257,11 @@ async function load() {
   try {
     a.value = await workApi.assignment(props.cmid);
     emit("loaded", a.value);
+    await loadLink();
+    if (a.value.teacher) loadLabs();
     if (a.value.teacher) rows.value = (await workApi.submissions(props.cmid)).rows;
-    else if (a.value.submission && !hasWork.value && a.value.submission.can_edit) startEdit();
+    // linked to a lab (第 122 轮): the online report is the way in; the plain editor opens only on request
+    else if (a.value.submission && !hasWork.value && a.value.submission.can_edit && !link.value?.linked) startEdit();
   } catch (e) {
     error.value = e instanceof ApiError ? e.code : "unknown";
   } finally {
@@ -365,4 +435,6 @@ onMounted(load);
   .grading.split { grid-template-columns: 1fr; }
   .panel { position: static; }
 }
+.report-card { display: flex; flex-direction: column; gap: 6px; }
+.report-card .actions { gap: 8px; flex-wrap: wrap; }
 </style>

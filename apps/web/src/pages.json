@@ -175,6 +175,15 @@
       }
     },
     {
+      "path": "pages/report/report",
+      "style": {
+        "navigationBarTitleText": "实验报告",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/committee/committee",
       "style": {
         "navigationBarTitleText": "课程审核",

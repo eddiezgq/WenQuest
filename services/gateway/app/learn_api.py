@@ -9,6 +9,7 @@ import json
 import random
 import re
 import time
+from types import SimpleNamespace
 from typing import Annotated, Any
 
 from fastapi import Depends, File, Form, UploadFile
@@ -254,6 +255,10 @@ def register(app, m) -> None:
     async def student_work(sess: Session, a: dict, userid: int, lg: str | None) -> tuple[dict, dict]:
         st = await call(sess, "mod_assign_get_submission_status", lg, assignid=a["id"], userid=userid)
         return st, submission_view(st, sess.moodle_token, lg)
+
+    # 网页实验报告（第 122 轮，webdocs_api）交作业时用同一套 Moodle 调用
+    m.assign_tools = SimpleNamespace(call=call, is_teacher=is_teacher, assignment=assignment, assign_config=assign_config,
+                                     submission_view=submission_view, build_draft=build_draft, files_of=files_of)
 
     @app.get("/api/v1/assignments/{cmid}/submissions/{userid}")
     async def submission_detail(cmid: int, userid: int, sess: Annotated[Session, Depends(current)], lang: str | None = None):

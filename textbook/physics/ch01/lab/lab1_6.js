@@ -75,6 +75,15 @@ WQ.lab({
     fin16(api, s);
   },
   change(api, s, pid) { if (pid === "ghat") fin16(api, s); },
+  // 第 122 轮：“记入报告”时把记录的 t₂₀ 填进报告：表 1 按摆长（摆角 ≤ 10°），表 2 按摆角（L = 0.80 m）；同一格取最后一次
+  results(api, s) {
+    const out = {};
+    rec16.pts.forEach(([L, th, t]) => {
+      if (th <= 10 && [0.2, 0.35, 0.5, 0.65, 0.8, 0.95].some((x) => Math.abs(x - L) < 1e-6)) out["t20_L" + L.toFixed(2).replace(".", "")] = t.toFixed(2);
+      if (Math.abs(L - 0.8) < 1e-6 && [5, 30, 55].includes(Math.round(th))) out["t20_A" + Math.round(th)] = t.toFixed(2);
+    });
+    return out;
+  },
   readouts(api, s) {
     const f = api.fmt;
     const rows = [[["20 个周期的时间（秒表）", "Time for 20 periods"], s.last ? f(s.last[2], 2) + " s" : "—"],

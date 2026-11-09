@@ -342,3 +342,72 @@ export const taskApi = {
   push: (cid: number, code: string, again = false) =>
     request<{ pushed: number; failed: { name: string; error: string }[] }>("POST", `/api/v1/courses/${cid}/tasks/${code}/push`, { again }),
 };
+
+// ---------- 网页实验报告（第 122 轮） ----------
+export type Pair = [string, string];
+export type ReportBlock =
+  | { t: "title"; zh: string; en: string }
+  | { t: "fields"; id: string; items: { k: string; label: string; v: string; fixed?: boolean }[] }
+  | { t: "note"; text: string }
+  | { t: "h" | "p" | "prompt"; zh: string; en: string }
+  | { t: "strong" | "label"; text: string }
+  | { t: "text"; id: string; lines: number; v: string }
+  | { t: "table"; id: string; title: Pair; head: string[]; head_en: string[]; rows: string[][]; grow?: boolean; records?: boolean }
+  | { t: "check"; id: string; options: Pair[]; v: number[]; other: string }
+  | { t: "figure"; id: string; png: string; caption: string; src?: Record<string, string> }
+  | { t: "rubric"; head: string[]; rows: string[][] };
+export interface ReportDoc { v: number; kind: string; lab: string; title: Pair; where: string[]; gpu: boolean; blocks: ReportBlock[] }
+export interface ReportVersion { ver: number; at: number; cmid: number }
+export interface ReportState {
+  book: string; lab: string; doc: ReportDoc; status: "new" | "draft" | "submitted"; updated: number; cmid: number | null;
+  versions: ReportVersion[]; assignments: { cmid: number; name: string; course: number; due: number }[];
+  lab_url: string | null; slots: Record<string, [string, number, number]>; pdf: boolean;
+  /** which cells of each template table the student fills in (rows added later are always fillable) */
+  editable: Record<string, boolean[][]>;
+}
+export interface ReportLabs { books: { book: string; title: string; labs: { lab: string; no: string; title: Pair }[] }[] }
+
+export const reportApi = {
+  get: (book: string, lab: string) => request<ReportState>("GET", `/api/v1/reports/${book}/${lab}`),
+  save: (book: string, lab: string, doc: ReportDoc, base: number) =>
+    request<{ updated: number; status: string }>("PUT", `/api/v1/reports/${book}/${lab}`, { doc, base }),
+  submit: (book: string, lab: string, cmid: number) =>
+    request<{ status: string; version: number; versions: ReportVersion[] }>("POST", `/api/v1/reports/${book}/${lab}/submit`, { cmid }, 120000),
+  version: (book: string, lab: string, ver: number) =>
+    request<{ ver: number; at: number; cmid: number; doc: ReportDoc }>("GET", `/api/v1/reports/${book}/${lab}/versions/${ver}`),
+  labs: () => request<ReportLabs>("GET", "/api/v1/report-labs"),
+  link: (cmid: number) => request<{ linked: boolean; book?: string; lab?: string; title?: Pair }>("GET", `/api/v1/assignments/${cmid}/lab-link`),
+  setLink: (cmid: number, book: string, lab: string) =>
+    request<{ linked: boolean; book?: string; lab?: string; title?: Pair }>("PUT", `/api/v1/assignments/${cmid}/lab-link`, { book, lab }),
+  unlink: (cmid: number) => request<{ linked: boolean }>("DELETE", `/api/v1/assignments/${cmid}/lab-link`),
+  studentReport: (cmid: number, uid: number, ver = 0) =>
+    request<{ ver: number; at: number; doc: ReportDoc; versions: ReportVersion[] }>("GET", `/api/v1/assignments/${cmid}/reports/${uid}${ver ? `?ver=${ver}` : ""}`),
+};
+
+/** A file from the gateway that needs the login (Word / PDF export). H5 saves it; the mini program opens it. */
+export async function downloadAuthed(path: string, name: string): Promise<void> {
+  // #ifdef H5
+  const res = await fetch(`${BASE}${path}`, { headers: { Authorization: `Bearer ${token.value}` } });
+  if (!res.ok) {
+    let code = `http_${res.status}`;
+    try { code = (await res.json()).error || code; } catch { /* not json */ }
+    throw new ApiError(code, res.status);
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(await res.blob());
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  // #endif
+  // #ifndef H5
+  await new Promise<void>((resolve, reject) => {
+    uni.downloadFile({
+      url: `${BASE}${path}`, header: { Authorization: `Bearer ${token.value}` },
+      success: (r) => (r.statusCode === 200 ? uni.openDocument({ filePath: r.tempFilePath, showMenu: true, success: () => resolve(), fail: () => resolve() })
+        : reject(new ApiError(`http_${r.statusCode}`, r.statusCode))),
+      fail: () => reject(new ApiError("network", 0)),
+    });
+  });
+  // #endif
+}

@@ -69,6 +69,10 @@ class Settings(BaseSettings):
     voice_url: str = ""
     # 在线文档服务（OnlyOffice，第 121 轮），e.g. http://docs. Only its health is checked here; editing goes through Moodle.
     docs_url: str = ""
+    # 第 122 轮：网页报告导出 PDF 时请 OnlyOffice 转换，签名密钥同 Moodle 插件（.env 的 DOCS_JWT_SECRET）；
+    # 文档服务从这个地址取要转换的 Word（服务器内网）。密钥为空 = 只能导出 Word。
+    docs_jwt_secret: str = ""
+    internal_url: str = "http://gateway:8000"
     # The course lead's model (专家版, round 5): the strongest available; empty = the same as the rest of the team.
     lead_model: str = "claude-opus-5-5"
     # 问渠数字工厂 course interface (read-only key copied by deploy/update.sh). Empty = lessons without factory data.

@@ -8,6 +8,7 @@ lab program itself, so nothing is written twice. Both Word files use the platfor
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -85,16 +86,20 @@ def _env_rows(m: dict) -> list[list[str]]:
     return rows
 
 
-def _table(d, t: dict) -> None:
+_MARK = re.compile(r"^\s*\{\{\s*[^{}\s]+\s*\}\}\s*$")
+
+
+def _cells(rows, keep: bool) -> list[list[str]]:
+    """Table cells for Word: a {{name}} cell (filled in the online report, 第 122 轮) is left blank, except in a GPU
+    lab's documents, where the returned numbers are put in by name."""
+    return [[str(c) if keep or not _MARK.match(str(c)) else "" for c in r] for r in rows]
+
+
+def _table(d, t: dict, keep: bool = False) -> None:
     d.p(f"{t['标题'][0]}  {t['标题'][1]}", indent=False)
+    _check_table(t)
     n = len(t["表头"])
-    # 行与表头的列数必须一致：不一致时 docgen 会抛 IndexError，看不出是哪张表，所以这里先报清楚
-    for i, r in enumerate(t["行"], 1):
-        if len(r) != n:
-            raise ValueError(f"数据表《{t['标题'][0]}》第 {i} 行有 {len(r)} 格，表头有 {n} 格——两者必须一致")
-    if t.get("表头英文") and len(t["表头英文"]) != n:
-        raise ValueError(f"数据表《{t['标题'][0]}》的表头英文有 {len(t['表头英文'])} 格，表头有 {n} 格")
-    d.table([str(h) for h in t["表头"]], [[str(c) for c in r] for r in t["行"]], widths=[round(16.0 / n, 2)] * n, font_size=9.5)
+    d.table([str(h) for h in t["表头"]], _cells(t["行"], keep), widths=[round(16.0 / n, 2)] * n, font_size=9.5)
 
 
 def guide(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
@@ -145,7 +150,7 @@ def guide(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
     d.bp("以下表格同时出现在实验报告模板中，请在报告里填写。" + ("写有 {{结果名}} 的格子由回传的数自动填好。" if m.get("gpu") else ""),
          "The same tables appear in the report template; fill them in there." + (" Cells marked {{name}} are filled from your results." if m.get("gpu") else ""))
     for t in g["数据表"]:
-        _table(d, t)
+        _table(d, t, keep=bool(m.get("gpu")))
     d.bh("六、注意事项", "6  Notes")
     d.blist(g["注意"])
     d.bh("七、思考题", "7  Questions")
@@ -169,52 +174,90 @@ def questions(m: dict, g: dict) -> list:
     return ([th] if _pair(th) else []) + list(g.get("思考题") or [])
 
 
-def report(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
-    """《实验报告模板》: the platform's eight sections, AI statement and rubric, with this lab's tables and questions."""
-    docs, docgen = _docs()
-    d = docgen.Doc()
-    d.title(f"实验报告  {m['title'][0]}", f"Lab Report  {m['title'][1]}")
-    d.table(["姓名 Name", "", "学号 ID", "", "日期 Date", ""], [["班级 Class", "", "同组 Partner", "", "成绩 Score", ""]],
-            widths=[2.4, 3.2, 2.2, 2.8, 2.2, 3.2], font_size=10)
-    d.en(f"配套教材：{where[0]}。填写本模板后在问渠“作业”中上传。  Textbook: {where[1]}. Submit this file in WenQuest Assignments.", size=9)
+RUBRIC = {"head": ["项目 Criterion", "分值 Points", "要求 What earns full marks"],
+          "rows": [["原理 Principles", "20", "公式正确、说明其含义 / correct formulas with their meaning"],
+                   ["数据 Data", "25", "数据完整、单位与有效数字规范 / complete data, correct units and significant figures"],
+                   ["分析 Analysis", "25", "理论与测量比较、误差来源分析 / theory vs measurement, sources of error"],
+                   ["实际问题 Real problem", "20", "五步完整，假设清楚，指出模型局限 / all five steps, clear assumptions, limits named"],
+                   ["规范 Presentation", "10", "书写清楚、图表规范、AI 使用如实声明 / clear writing and graphs, honest AI statement"]]}
+RECORDS = {"t": "table", "id": "records", "records": True, "grow": True,
+           "title": ["实验记录（在虚拟实验里点“记入报告”自动添加）", "Lab records (added by “Record to report” in the virtual lab)"],
+           "head": ["时间", "场景", "参数", "读数"], "head_en": ["Time", "Scene", "Parameters", "Readings"], "rows": []}
+
+
+def report_doc(m: dict, g: dict, no: str, where: tuple[str, str]) -> dict:
+    """《实验报告》 as a web document (第 122 轮): the same sections, tables, questions and rubric as the Word template,
+    which is drawn from this very structure (`report`). Ids are stable so a student's answers survive a rebuild."""
+    docs, _ = _docs()
+    B: list[dict] = [
+        {"t": "title", "zh": f"实验报告  {m['title'][0]}", "en": f"Lab Report  {m['title'][1]}"},
+        {"t": "fields", "id": "info", "items": [
+            {"k": "name", "label": "姓名 Name", "v": ""}, {"k": "sid", "label": "学号 ID", "v": ""},
+            {"k": "date", "label": "日期 Date", "v": ""}, {"k": "class", "label": "班级 Class", "v": ""},
+            {"k": "partner", "label": "同组 Partner", "v": ""}, {"k": "score", "label": "成绩 Score", "v": "", "fixed": True}]},
+        {"t": "note", "id": "where", "text": f"配套教材：{where[0]}。  Textbook: {where[1]}."},
+    ]
     robot = next((s for s in m.get("scenes") or [] if s.get("robot")), (m.get("scenes") or [{}])[0])
-    for zh, en, n in docs.REPORT_SECTIONS:
-        d.bh(zh, en)
+    for k, (zh, en, n) in enumerate(docs.REPORT_SECTIONS, 1):
+        B.append({"t": "h", "zh": zh, "en": en})
         if zh.startswith("四"):
-            for t in g["数据表"]:
-                _table(d, t)
-            d.bp("数据处理：写出计算过程，与理论值比较，至少完成一张图。", "Processing: show your calculations, compare with theory, include at least one graph.")
-            d.lines(4)
+            for i, t in enumerate(g["数据表"], 1):
+                _check_table(t)
+                head = [str(h) for h in t["表头"]]
+                B.append({"t": "table", "id": f"t{i}", "title": [t["标题"][0], t["标题"][1]], "head": head,
+                          "head_en": [str(h) for h in (t.get("表头英文") or head)], "rows": [[str(c) for c in r] for r in t["行"]]})
+            B.append(dict(RECORDS))
+            B.append({"t": "p", "zh": "数据处理：写出计算过程，与理论值比较，至少完成一张图。",
+                      "en": "Processing: show your calculations, compare with theory, include at least one graph."})
+            B.append({"t": "text", "id": "process", "lines": 4, "v": ""})
         elif zh.startswith("六") and robot.get("problem"):
             p = robot["problem"]
-            d.p(p["title"][0], indent=False).runs[0].bold = True
-            d.bp(p["text"][0], p["text"][1])
-            for step, en_step in docs.FIVE:
-                d.p(step, indent=False)
-                d.en(en_step)
-                d.lines(3)
+            B.append({"t": "strong", "text": p["title"][0]})
+            B.append({"t": "p", "zh": p["text"][0], "en": p["text"][1]})
+            for j, (step, en_step) in enumerate(docs.FIVE, 1):
+                B.append({"t": "prompt", "zh": step, "en": en_step})
+                B.append({"t": "text", "id": f"s6_{j}", "lines": 3, "v": ""})
         elif zh.startswith("八"):
-            for zq, eq in questions(m, g):
-                d.p(zq, indent=False)
-                d.en(eq)
-                d.lines(3)
+            for j, (zq, eq) in enumerate(questions(m, g), 1):
+                B.append({"t": "prompt", "zh": zq, "en": eq})
+                B.append({"t": "text", "id": f"q{j}", "lines": 3, "v": ""})
         else:
-            d.lines(n)
-    d.bh("九、AI 使用声明", "9  AI use statement")
-    d.p("□ 未使用 AI　　□ 用 AI 解释概念　　□ 用 AI 检查计算　　□ 其他：____________", indent=False)
-    d.en("□ No AI used   □ AI to explain concepts   □ AI to check calculations   □ Other: ____________")
-    d.p("如使用了 AI，请写明用在哪里：", indent=False)
-    d.lines(2)
-    d.bh("评分量规", "Rubric")
-    d.table(["项目 Criterion", "分值 Points", "要求 What earns full marks"],
-            [["原理 Principles", "20", "公式正确、说明其含义 / correct formulas with their meaning"],
-             ["数据 Data", "25", "数据完整、单位与有效数字规范 / complete data, correct units and significant figures"],
-             ["分析 Analysis", "25", "理论与测量比较、误差来源分析 / theory vs measurement, sources of error"],
-             ["实际问题 Real problem", "20", "五步完整，假设清楚，指出模型局限 / all five steps, clear assumptions, limits named"],
-             ["规范 Presentation", "10", "书写清楚、图表规范、AI 使用如实声明 / clear writing and graphs, honest AI statement"]],
-            widths=[4.0, 2.2, 9.8], font_size=9.5)
+            B.append({"t": "text", "id": f"s{k}", "lines": n, "v": ""})
+    B.append({"t": "h", "zh": "九、AI 使用声明", "en": "9  AI use statement"})
+    B.append({"t": "check", "id": "ai", "v": [], "other": "",
+              "options": [["未使用 AI", "No AI used"], ["用 AI 解释概念", "AI to explain concepts"],
+                          ["用 AI 检查计算", "AI to check calculations"]]})
+    B.append({"t": "label", "text": "如使用了 AI，请写明用在哪里："})
+    B.append({"t": "text", "id": "ai_where", "lines": 2, "v": ""})
+    B.append({"t": "h", "zh": "评分量规", "en": "Rubric"})
+    B.append({"t": "rubric", **RUBRIC})
+    return {"v": 1, "kind": "labreport", "lab": no, "title": [m["title"][0], m["title"][1]], "where": list(where),
+            "gpu": bool(m.get("gpu")), "blocks": B}
+
+
+def _check_table(t: dict) -> None:
+    n = len(t["表头"])
+    # 行与表头的列数必须一致：不一致时 docgen 会抛 IndexError，看不出是哪张表，所以这里先报清楚
+    for i, r in enumerate(t["行"], 1):
+        if len(r) != n:
+            raise ValueError(f"数据表《{t['标题'][0]}》第 {i} 行有 {len(r)} 格，表头有 {n} 格——两者必须一致")
+    if t.get("表头英文") and len(t["表头英文"]) != n:
+        raise ValueError(f"数据表《{t['标题'][0]}》的表头英文有 {len(t['表头英文'])} 格，表头有 {n} 格")
+
+
+def report(m: dict, g: dict, out: Path, no: str, where: tuple[str, str]) -> Path:
+    """《实验报告模板》 (Word) and, next to it, the same report as a web document (NAME-report.json, 第 122 轮)."""
+    sys.path.insert(0, str(GATEWAY)) if str(GATEWAY) not in sys.path else None
+    from app.production import webdoc
+    doc = report_doc(m, g, no, where)
     out.parent.mkdir(parents=True, exist_ok=True)
-    d.save(str(out))
+    word = webdoc.blank(doc, gpu=doc["gpu"])
+    for b in word["blocks"]:      # the Word template is filled in on a computer and uploaded
+        if b.get("id") == "where":
+            b["text"] = (f"配套教材：{where[0]}。填写本模板后在问渠“作业”中上传，或在问渠里“在线写报告”。  "
+                         f"Textbook: {where[1]}. Submit this file in WenQuest Assignments, or write the report online in WenQuest.")
+    webdoc.to_docx(word, str(out), template=True)
+    out.with_suffix(".json").write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
     return out
 
 
@@ -251,11 +294,11 @@ def english_warnings(g: dict) -> list[str]:
             for x in g.get("原理") or [] if isinstance(x, dict) and isinstance(x.get("式"), str) and _CJK.search(x["式"])]
 
 
-def _en_tab(d, t: dict) -> None:
+def _en_tab(d, t: dict, keep: bool = False) -> None:
     d.p(t["标题"][1], indent=False)
     head, rows = _en_table(t)
     n = len(head)
-    d.table(head, rows, widths=[round(16.0 / n, 2)] * n, font_size=9.5)
+    d.table(head, _cells(rows, keep), widths=[round(16.0 / n, 2)] * n, font_size=9.5)
 
 
 def _second(items) -> list[str]:
@@ -294,7 +337,7 @@ def guide_en(m: dict, g: dict, out: Path, no: str, where: str) -> Path:
     d.h("5  Data record")
     d.p("The same tables appear in the report template; fill them in there.")
     for t in g["数据表"]:
-        _en_tab(d, t)
+        _en_tab(d, t, keep=bool(m.get("gpu")))
     d.h("6  Notes")
     d.bullets(_second(g["注意"]))
     d.h("7  Questions")
@@ -324,7 +367,7 @@ def report_en(m: dict, g: dict, out: Path, no: str, where: str) -> Path:
         d.h(en)
         if zh.startswith("四"):
             for t in g["数据表"]:
-                _en_tab(d, t)
+                _en_tab(d, t, keep=bool(m.get("gpu")))
             d.p("Processing: show your calculations, compare with theory, include at least one graph.")
             d.lines(4)
         elif zh.startswith("六") and robot.get("problem"):

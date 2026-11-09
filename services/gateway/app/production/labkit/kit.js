@@ -753,6 +753,29 @@ function readouts(L) {
   rows.forEach((r, i) => { dl.children[2 * i].textContent = P(r[0]); dl.children[2 * i + 1].textContent = String(r[1]); });
 }
 
+// ---------- 记入报告（第 122 轮） ----------
+let reportHost = false;
+function record(id) {
+  const L = LABS[id];
+  if (!L || !L.ready || window.parent === window) return;
+  const def = L.def, api = L.api;
+  const sc = def.scenes.find((s) => s.id === api.scene) || def.scenes[0];
+  const hidden = new Set(sc.hide || []);      // sliders this scene hides do not belong to the record
+  const params = def.params.filter((p) => !hidden.has(p.id))
+    .map((p) => `${P(p.name)} = ${fmt(Number(api.p[p.id]), p.digits != null ? p.digits : 3)}${p.unit ? " " + p.unit : ""}`);
+  const rows = safe(L, () => (def.readouts ? def.readouts(api, L.state) : [])) || [];
+  // 实验可另给 results(api, s) → {名: 数}，填报告数据表里写 {{名}} 的格子
+  const values = safe(L, () => (def.results ? def.results(api, L.state) : {})) || {};
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
+  try {
+    window.parent.postMessage({ type: "wq-lab-record", lab: id.replace("-", "."), time, scene: P(sc.name),
+      params: params.join("；"), readings: rows.map((r) => `${P(r[0])}：${r[1]}`).join("；"), values }, "*");
+  } catch (e) { /* no parent */ }
+  const b = L.dom.sec.querySelector("button.torep");
+  if (b) { b.textContent = T("已记入 ✓", "Recorded ✓"); setTimeout(() => { b.textContent = T("记入报告", "Record to report"); }, 1200); }
+}
+
 function build(id, def) {
   const no = id.replace("-", ".");
   // tab
@@ -814,6 +837,11 @@ function build(id, def) {
   });
   const rc = el("div", "card"); rc.appendChild(biText(el("h3"), ["测量", "MEASUREMENTS"]));
   const read = el("dl", "readout"); rc.appendChild(read);
+  // 第 122 轮：在网页实验报告旁边打开时（外层页面先发 wq-report-host），把此刻的场景、参数、读数记进报告
+  const rec = biText(el("button", "btn torep"), ["记入报告", "Record to report"]);
+  rec.hidden = !reportHost;
+  rec.addEventListener("click", () => record(id));
+  rc.appendChild(rec);
   const tc = el("div", "card"); tc.appendChild(biText(el("h3"), ["任务", "TASKS"]));
   const tasks = el("ul", "tasks"); tc.appendChild(tasks);
   if (def.think) tc.appendChild(biText(el("p", "hint"), def.think));
@@ -1202,7 +1230,11 @@ window.WQ = {
 function begin() {
   if (!ORDER.length) return;
   const pick = (v) => { const k = String(v || "").replace(".", "-"); if (LABS[k] && k !== active) show(k); };
-  addEventListener("message", (e) => { const d = e.data || {}; if (d && d.type === "wq-lab") pick(d.lab); });
+  addEventListener("message", (e) => {
+    const d = e.data || {};
+    if (d && d.type === "wq-lab") pick(d.lab);
+    if (d && d.type === "wq-report-host") { reportHost = true; document.querySelectorAll("button.torep").forEach((b) => { b.hidden = false; }); }
+  });
   addEventListener("hashchange", () => pick((location.hash.match(/lab-(\d+-\d+)/) || [])[1]));
   const fromHash = (location.hash.match(/lab-(\d+-\d+)/) || [])[1];
   const last = store.get(KEY + "-tab");

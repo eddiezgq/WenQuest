@@ -259,6 +259,9 @@ def register(app, m) -> None:
             out = (f"<details class='wq-labrun'><summary>▶ {run}</summary>"
                    f"<iframe class='wq-labframe' loading='lazy' src='{url}' title='{html.escape(label)}'></iframe></details>"
                    f"<a class='wq-labbtn' href='{url}' target='_blank' rel='noopener'>↗ {'Open ' + label if en else '打开' + label}</a>")
+            if (root() / book / "lab" / f"lab{ch}_{k}-report.json").exists():      # 网页实验报告（第 122 轮）
+                out += (f" <a class='wq-labbtn wq-report' href='/pages/report/report?b={book}&amp;l={ch}_{k}'>"
+                        f"✎ {'Write the report online' if en else '在线写报告'}</a>")
             docs_ = (("guide", "Lab guide (Word)"), ("report", "Report template (Word)")) if en else \
                 (("guide", "实验指导书（Word）"), ("report", "实验报告模板（Word）"))
             for kind, text in docs_:

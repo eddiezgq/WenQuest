@@ -8,6 +8,7 @@ import pytest
 TOOLS = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(TOOLS))
 import build  # noqa: E402
+import json  # noqa: E402
 
 ROBOTICS = TOOLS.parent / "robotics"
 
@@ -152,6 +153,28 @@ def test_every_lab_has_a_guide_and_a_report_template(book):
     text = "\n".join(map(str, run(book).errors))
     assert "实验 4.2：没有实验说明文件 lab4_2.yaml" in text
     assert "实验 4.3：lab4_3.yaml“表 2  转了半圈”有一行 3 格，表头是 5 格" in text
+
+
+def test_the_web_report_matches_the_word_template(book):
+    """第 122 轮：每个实验的网页报告模板（NAME-report.json）和 Word 模板出自同一份结构——栏目、题目、表格逐项一致。"""
+    import docx
+    rep = run(book)
+    assert not rep.errors
+    lab = book.parent / "build" / "robotics" / "lab"
+    for k in range(1, 9):
+        doc = json.loads((lab / f"lab4_{k}-report.json").read_text(encoding="utf-8"))
+        assert doc["kind"] == "labreport" and doc["lab"] == f"4.{k}"
+        w = docx.Document(str(lab / f"lab4_{k}-report.docx"))
+        text = "\n".join(p.text for p in w.paragraphs)
+        cells = {c.text for t in w.tables for r in t.rows for c in r.cells}
+        for b in doc["blocks"]:
+            if b["t"] in ("h", "prompt"):
+                assert b["zh"] in text, b["zh"]
+            elif b["t"] == "table":
+                assert b["title"][0] in text and set(b["head"]) <= cells, b["title"][0]
+        ids = [b["id"] for b in doc["blocks"] if "id" in b]
+        assert len(ids) == len(set(ids)) and {"info", "records", "process", "ai", "ai_where"} <= set(ids)
+        assert sum(b["t"] == "h" for b in doc["blocks"]) == 10        # 一 至 八、九 AI 使用声明、评分量规
 
 
 def test_the_english_edition_is_checked_against_the_chinese(book):

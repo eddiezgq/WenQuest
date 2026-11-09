@@ -193,3 +193,6 @@ canvas.plctrace { width: 100%; display: block; background: var(--stage); border-
 .fbdpic .fv.on { fill: var(--green); font-weight: 600; }
 .fbdpic .neg { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
 .fbdpic .pin { fill: var(--muted); font-size: 10px; }
+
+/* 第 122 轮：记入报告 */
+.btn.torep { margin-top: 8px; width: 100%; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }

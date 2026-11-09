@@ -85,6 +85,7 @@ services:
       WQ_VOICE_URL: http://voice:8000
       # 在线文档服务（第 121 轮），只用来查健康；编辑走 Moodle 插件
       WQ_DOCS_URL: http://docs
+      WQ_DOCS_JWT_SECRET: ${DOCS_JWT_SECRET:-}
       # 三维仿真视频（第 38 轮）：关键画面在 blender 容器出；小样、高清租 Lambda 机器出（密钥 WQ_VIDEO3D_LAMBDA_KEY，空则用 WQ_GPU_LAMBDA_KEY）。
       WQ_VIDEO3D_BLENDER_URL: http://blender:8000
       WQ_VIDEO3D_LAMBDA_KEY: ${VIDEO3D_LAMBDA_KEY:-}
