@@ -359,6 +359,9 @@ jobs:
             if [ -z "$changed" ] || echo "$changed" | grep -qE "hub/(lab29|rfield|rfield_api)\.py|tests/plant_loop\.py|workflows/factory\.yml"; then
               extra="$extra --lab29"                # 第 68 轮：实验 29 售后追溯
             fi
+            if [ -z "$changed" ] || echo "$changed" | grep -qE "hub/lab31\.py|drv-joint-b/fw/out/sim_motor\.json|tests/plant_loop\.py|workflows/factory\.yml"; then
+              extra="$extra --lab31"                # 第 123 轮：实验 31 关节终检抱闸报警的排查
+            fi
             if [ -z "$changed" ] || echo "$changed" | grep -qE "hub/(lab24|lab30|mrp)\.py|tests/plant_loop\.py|workflows/factory\.yml"; then
               extra="$extra --lab30"                # 第 74 轮：实验 30 一台轮式人形从订单到交付
             fi
