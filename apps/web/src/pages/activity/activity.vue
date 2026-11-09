@@ -143,6 +143,7 @@ const ctx = computed(() => (d.value ? findModule(d.value, id.value) : null));
 const canEdit = computed(() => !!a.value && isTeacher(d.value) && ["page", "url", "assign", "quiz"].includes(a.value.type));
 function editThis() {
   if (!a.value) return;
+  if (a.value.webdoc) return uni.navigateTo({ url: `/pages/doc/doc?id=${a.value.webdoc}` });     // 第 126 轮：网页文档
   uni.navigateTo({ url: `/pages/edit/${a.value.type === "quiz" ? "quiz" : "edit"}?course=${courseId.value}&cmid=${id.value}` });
 }
 const siblings = computed(() => (d.value && ctx.value ? visibleModules(d.value, ctx.value.section) : []));

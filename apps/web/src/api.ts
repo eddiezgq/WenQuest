@@ -69,6 +69,8 @@ export interface CourseInfo {
 export interface Activity {
   id: number;
   type: string;
+  /** 第 126 轮：这个页面是老师的网页文档（老师点“编辑”进文档编辑页） */
+  webdoc?: number;
   course_id: number;
   name: string;
   html?: string;

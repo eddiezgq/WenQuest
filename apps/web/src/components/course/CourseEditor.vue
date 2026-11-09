@@ -78,7 +78,7 @@
           <template v-else>
             <view class="m-main">
               <text class="m-name">{{ mod.title }}</text>
-              <text class="wq-muted">{{ t("type." + typeKey(mod)) }}<text v-if="!mod.visible"> · {{ t("course.teacherOnly") }}</text></text>
+              <text class="wq-muted">{{ mod.webdoc ? t("edit.kind.webdoc") : t("type." + typeKey(mod)) }}<text v-if="!mod.visible"> · {{ t("course.teacherOnly") }}</text></text>
             </view>
             <view class="m-acts">
               <text v-if="editable(mod)" class="wq-link" @click="openEditor(mod)">{{ t("common.edit") }}</text>
@@ -114,14 +114,14 @@ import { computed, onMounted, ref } from "vue";
 import { isCN } from "../../site";
 import BiField from "../edit/BiField.vue";
 import { ApiError } from "../../api";
-import { type Bi, confirmAction, editApi, type EditModule, type EditSection, pickFiles, type Structure, uploadToSection } from "../../courseApi";
+import { type Bi, confirmAction, docApi, editApi, type EditModule, type EditSection, pickFiles, type Structure, uploadToSection } from "../../courseApi";
 import { errorText, t } from "../../i18n";
 import { KIND_ICON } from "../../store";
 import { type Listing, accountApi } from "../../accountApi";
 
 const props = defineProps<{ courseId: number }>();
 const emit = defineEmits<{ (e: "done"): void; (e: "changed"): void }>();
-const ADD = ["page", "file", "assign", "quiz", "url", "forum", "online"];
+const ADD = ["webdoc", "page", "file", "assign", "quiz", "url", "forum", "online"];
 const s = ref<Structure | null>(null);
 const loading = ref(true);
 const error = ref("");
@@ -215,11 +215,13 @@ const addSection = () => run(async () => {
 });
 
 function openEditor(m: EditModule) {
+  if (m.webdoc) return uni.navigateTo({ url: `/pages/doc/doc?id=${m.webdoc}` });     // 第 126 轮：网页文档在文档页里编辑
   const page = m.type === "quiz" ? "quiz" : "edit";
   uni.navigateTo({ url: `/pages/edit/${page}?course=${props.courseId}&cmid=${m.cmid}` });
 }
 async function add(sec: EditSection, kind: string) {
   if (kind === "online") return uni.redirectTo({ url: `/pages/course/course?id=${props.courseId}&tab=online` });
+  if (kind === "webdoc") return newDoc(sec);
   if (kind === "quiz") return uni.navigateTo({ url: `/pages/edit/quiz?course=${props.courseId}&section=${sec.number}` });
   if (kind === "file") {
     const files = await pickFiles(10);
@@ -230,6 +232,22 @@ async function add(sec: EditSection, kind: string) {
     return;
   }
   uni.navigateTo({ url: `/pages/edit/edit?course=${props.courseId}&section=${sec.number}&type=${kind}` });
+}
+
+/** 第 126 轮：新建网页文档——选模板、写标题，课程里多一个（先对学生隐藏的）页面，进文档页（新文档可让 AI 写初稿）。 */
+async function newDoc(sec: EditSection) {
+  const tpls = ["plan", "guide", "notice", "blank"];
+  const i = await new Promise<number>((res) => uni.showActionSheet({ itemList: tpls.map((k) => t("doc.tpl." + k)), success: (r) => res(r.tapIndex), fail: () => res(-1) }));
+  if (i < 0) return;
+  const name = await new Promise<string>((res) => uni.showModal({
+    title: t("doc.askTitle"), editable: true, placeholderText: t("doc.titlePh"),
+    success: (r) => res(r.confirm ? String(r.content || "").trim() : ""), fail: () => res(""),
+  }));
+  if (!name) return;
+  await run(async () => {
+    const d = await docApi.create(props.courseId, sec.number, tpls[i], name);
+    uni.navigateTo({ url: `/pages/doc/doc?id=${d.id}&ai=1` });
+  });
 }
 
 onMounted(load);

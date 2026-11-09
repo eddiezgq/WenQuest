@@ -9,7 +9,7 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from app import main
+from app import coursedocs_api, main
 from app import materials as mt
 from app import studio as st
 from app.ai import ModelGateway
@@ -26,7 +26,8 @@ def moodle(request: httpx.Request) -> httpx.Response:
     if fn in ("local_wenquest_create_course", "local_wenquest_add_activities"):
         CALLS.append((fn, {k: v[0] for k, v in parse_qs(request.content.decode()).items()}))
         if fn == "local_wenquest_add_activities":
-            return httpx.Response(200, json={"courseid": 7, "sectionid": 30, "cmids": [101, 102, 103]})
+            n = sum(1 for k in parse_qs(request.content.decode()) if k.endswith("][type]"))
+            return httpx.Response(200, json={"courseid": 7, "sectionid": 30, "cmids": [101 + i for i in range(max(n, 3))]})
     return fake_moodle(request)
 
 
@@ -38,6 +39,7 @@ def client(tmp_path):
         main.state.ai = ModelGateway("fake", main.state.http)
         main.state.store = mt.Store(str(tmp_path / "imports"))
         main.state.projects_dir = str(tmp_path / "projects")
+        main.state.coursedocs = coursedocs_api.Store(str(tmp_path / "data"))
         CALLS.clear()
         yield c
 
@@ -158,8 +160,15 @@ def test_whole_flow_from_materials_to_a_published_lesson(client):
     assert order[0][0] == "page" and "课件" in order[1][1] and order[1][0] == "resource"
     # the notes page carries its figures: one draft area, content points at the page's own files
     assert "@@PLUGINFILE@@/fig-1.png" in sent["activities[0][content]"] and int(sent["activities[0][draftitemid]"]) > 0
-    assert "练习" in order[2][1] and "实验指导书" in order[3][1] and "实验报告模板" in order[4][1]
-    assert "答案" in order[5][1] and order[5][2] == "0" and "教案" in order[6][1] and order[6][2] == "0"
+    assert "练习" in order[2][1] and "实验指导书" in order[3][1] and "实验报告模板" in order[5][1]
+    # 第 126 轮: the guide also as a web document (a page students see), the plan as a hidden one teachers edit in WenQuest
+    assert order[4][0] == "page" and "实验指导书（网页版）" in order[4][1] and order[4][2] == "1"
+    assert "答案" in order[6][1] and order[6][2] == "0" and "教案" in order[7][1] and order[7][2] == "0"
+    assert order[8][0] == "page" and "教案（网页版）" in order[8][1] and order[8][2] == "0"
+    assert "一、实验目的" in sent["activities[4][content]"]
+    adopted = main.state.coursedocs.of_course(7)
+    assert {d["template"]: d["audience"] for d in adopted} == {"guide": "students", "plan": "teachers"}
+    assert all(d["cmid"] and d["published"] == 1 for d in adopted)
     assert "第1章教案" in names and "讲义" in names
 
 

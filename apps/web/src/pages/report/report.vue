@@ -140,6 +140,7 @@ import MathContent from "../../components/MathContent.vue";
 import { ApiError } from "../../api";
 import { confirmAction, downloadAuthed, type ReportBlock, type ReportDoc, type ReportState, type ReportVersion, reportApi } from "../../courseApi";
 import { errorText, formatDate, locale, t } from "../../i18n";
+import { drawChart, num } from "../../chart";
 
 type TableBlock = Extract<ReportBlock, { t: "table" }>;
 const book = ref("");
@@ -326,58 +327,12 @@ function openChart() {
   chart.x = 0; chart.y = 1; chart.caption = "";
   setTimeout(draw, 50);
 }
-const num = (c: string) => { const v = parseFloat(String(c).replace(/,/g, "").replace(/[−–]/g, "-")); return Number.isFinite(v) ? v : null; };
 function draw() {
-  // #ifdef H5
   const tb = tables.value[chart.table];
   if (!tb) return;
-  const cv = document.createElement("canvas");      // off-screen: uni-app's <canvas> resizes and clears itself
-  cv.width = 640; cv.height = 420;
-  // a table is read by columns; a one-row table like 表 1 (位置 1…10) is read along its row
-  let pts: [number, number][] = tb.rows.map((r) => [num(r[chart.x]), num(r[chart.y])]).filter((p) => p[0] !== null && p[1] !== null) as [number, number][];
-  let xLabel = tb.head[chart.x] || "", yLabel = tb.head[chart.y] || "";
-  chart.byRow = false;
-  if (pts.length < 2 && tb.rows.length === 1) {      // 表 1 那样只有一行（位置 1…10）：沿着这一行画
-    pts = tb.head.map((h, j) => [num(h), num(tb.rows[0][j])]).filter((p) => p[0] !== null && p[1] !== null) as [number, number][];
-    xLabel = tb.head[0] || ""; yLabel = tb.rows[0][0] || "";
-    chart.byRow = true;
-  }
-  const g = cv.getContext("2d")!;
-  const W = cv.width, H = cv.height, L = 70, R = 20, T = 20, B = 50;
-  g.fillStyle = "#fff"; g.fillRect(0, 0, W, H);
-  chart.ok = pts.length >= 2;
-  chart.note = chart.ok ? "" : t("report.chartNeedData");
-  if (!chart.ok) return;
-  const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-  const pad = (a: number, b: number) => { const d = (b - a) || Math.abs(a) || 1; return [a - d * 0.08, b + d * 0.08]; };
-  const [x0, x1] = pad(Math.min(...xs), Math.max(...xs)), [y0, y1] = pad(Math.min(...ys), Math.max(...ys));
-  const X = (x: number) => L + (x - x0) / (x1 - x0) * (W - L - R), Y = (y: number) => H - B - (y - y0) / (y1 - y0) * (H - T - B);
-  g.strokeStyle = "#333"; g.lineWidth = 1; g.beginPath(); g.moveTo(L, T); g.lineTo(L, H - B); g.lineTo(W - R, H - B); g.stroke();
-  g.fillStyle = "#333"; g.font = "13px sans-serif"; g.textAlign = "center";
-  // tick labels with enough decimals for the step (62.94 … 63.00 needs two)
-  const dec = (a: number, b: number) => Math.min(6, Math.max(0, Math.ceil(-Math.log10((b - a) / 5)) + 1));
-  const dx = dec(x0, x1), dy = dec(y0, y1);
-  for (let i = 0; i <= 5; i++) {
-    const xv = x0 + (x1 - x0) * i / 5, yv = y0 + (y1 - y0) * i / 5;
-    g.fillText(xv.toFixed(dx), X(xv), H - B + 18);
-    g.textAlign = "right"; g.fillText(yv.toFixed(dy), L - 6, Y(yv) + 4); g.textAlign = "center";
-    g.strokeStyle = "#e5e5e5"; g.beginPath(); g.moveTo(L, Y(yv)); g.lineTo(W - R, Y(yv)); g.stroke();
-  }
-  g.fillText(xLabel, (L + W - R) / 2, H - 10);
-  g.save(); g.translate(16, (T + H - B) / 2); g.rotate(-Math.PI / 2); g.fillText(yLabel, 0, 0); g.restore();
-  chart.xLabel = xLabel; chart.yLabel = yLabel;
-  const sorted = pts.slice().sort((a, b) => a[0] - b[0]);
-  if (chart.line) { g.strokeStyle = "#1f6f8b"; g.lineWidth = 1.5; g.beginPath(); sorted.forEach((p, i) => (i ? g.lineTo(X(p[0]), Y(p[1])) : g.moveTo(X(p[0]), Y(p[1])))); g.stroke(); }
-  g.fillStyle = "#1f6f8b"; pts.forEach((p) => { g.beginPath(); g.arc(X(p[0]), Y(p[1]), 4, 0, Math.PI * 2); g.fill(); });
-  if (chart.fit && new Set(xs).size >= 2) {
-    const n = pts.length, mx = xs.reduce((a, b) => a + b, 0) / n, my = ys.reduce((a, b) => a + b, 0) / n;
-    let sxy = 0, sxx = 0; pts.forEach(([x, y]) => { sxy += (x - mx) * (y - my); sxx += (x - mx) * (x - mx); });
-    const k = sxy / sxx, b = my - k * mx;
-    g.strokeStyle = "#b8860b"; g.setLineDash([6, 4]); g.beginPath(); g.moveTo(X(x0), Y(k * x0 + b)); g.lineTo(X(x1), Y(k * x1 + b)); g.stroke(); g.setLineDash([]);
-    chart.note = t("report.chartFitResult", { k: +k.toPrecision(4), b: +b.toPrecision(4) });
-  }
-  chart.png = cv.toDataURL("image/png").split(",")[1];
-  // #endif
+  const r = drawChart(tb.head, tb.rows, { x: chart.x, y: chart.y, line: chart.line, fit: chart.fit });
+  chart.ok = r.ok; chart.byRow = r.byRow; chart.png = r.png; chart.xLabel = r.xLabel; chart.yLabel = r.yLabel;
+  chart.note = !r.ok ? t("report.chartNeedData") : r.fit ? t("report.chartFitResult", r.fit) : "";
 }
 function addChart() {
   if (!chart.ok || !doc.value) return;

@@ -226,7 +226,7 @@ export const fileSize = (n: number) => (n > 1048576 ? `${(n / 1048576).toFixed(1
 
 /** Text as edited: one language (text) or both (zh, en). */
 export interface Bi { text?: string; zh?: string; en?: string }
-export interface EditModule { cmid: number; type: string; name: Bi; title: string; visible: boolean; file: { name: string; kind: string } | null }
+export interface EditModule { cmid: number; type: string; name: Bi; title: string; visible: boolean; file: { name: string; kind: string } | null; webdoc?: number | null }
 export interface EditSection { id: number; number: number; name: Bi; title: string; summary: Bi; visible: boolean; modules: EditModule[] }
 export interface Structure { course: { id: number; name: Bi; summary: Bi; visible: boolean }; sections: EditSection[] }
 export interface QAnswer { text: string; fraction: number; feedback: string; tolerance: number }
@@ -383,6 +383,42 @@ export const reportApi = {
   studentReport: (cmid: number, uid: number, ver = 0) =>
     request<{ ver: number; at: number; doc: ReportDoc; versions: ReportVersion[] }>("GET", `/api/v1/assignments/${cmid}/reports/${uid}${ver ? `?ver=${ver}` : ""}`),
 };
+
+// ---------- 老师用的网页文档（第 126 轮）----------
+export type CItem = { text: string; en: string };
+export type CBlock =
+  | { t: "h"; level: 1 | 2 | 3; text: string; en: string }
+  | { t: "para"; text: string; en: string }
+  | { t: "list"; ordered: boolean; items: CItem[] }
+  | { t: "table"; id: string; caption: string; head: string[]; rows: string[][] }
+  | { t: "image"; img: string; caption: string }
+  | { t: "callout"; text: string }
+  | { t: "hr" };
+export interface CDoc { v: number; kind: "coursedoc"; template: string; title: Pair; sub: string; blocks: CBlock[] }
+export interface CVersion { ver: number; at: number; by: number; audience: "teachers" | "students" }
+export interface CDocState {
+  id: number; course: number; cmid: number; template: string; doc: CDoc; audience: "teachers" | "students"; published: number;
+  updated: number; versions: CVersion[]; pdf: boolean;
+}
+export interface CDocItem { id: number; cmid: number; section: number; template: string; title: Pair; audience: string; published: number; updated: number }
+export interface AiSource { cmid: number; name: string; section: string; type: string }
+export const docApi = {
+  create: (cid: number, section: number, template: string, title: string) =>
+    request<CDocState>("POST", `/api/v1/courses/${cid}/webdocs`, { section, template, title }),
+  get: (id: number) => request<CDocState>("GET", `/api/v1/webdocs/${id}`),
+  save: (id: number, doc: CDoc, base: number) => request<{ updated: number }>("PUT", `/api/v1/webdocs/${id}`, { doc, base }),
+  publish: (id: number, audience: string) => request<CDocState>("POST", `/api/v1/webdocs/${id}/publish`, { audience }),
+  version: (id: number, ver: number) => request<{ ver: number; at: number; audience: string; doc: CDoc }>("GET", `/api/v1/webdocs/${id}/versions/${ver}`),
+  restore: (id: number, ver: number) => request<CDocState>("POST", `/api/v1/webdocs/${id}/restore`, { ver }),
+  image: (id: number, data: string) => request<{ img: string; url: string }>("POST", `/api/v1/webdocs/${id}/images`, { data }, 120000),
+  list: (cid: number) => request<{ docs: CDocItem[] }>("GET", `/api/v1/courses/${cid}/webdocs`),
+  sources: (cid: number) => request<{ sources: AiSource[] }>("GET", `/api/v1/courses/${cid}/ai-sources`),
+  aiDraft: (id: number, prompt: string, sources: number[]) =>
+    request<{ doc: CDoc }>("POST", `/api/v1/webdocs/${id}/ai-draft`, { prompt, sources }, 300000),
+  aiBlock: (id: number, index: number, action: string, block: CBlock, note = "") =>
+    request<{ block: CBlock }>("POST", `/api/v1/webdocs/${id}/ai-block`, { index, action, block, note }, 180000),
+};
+export const docImageUrl = (h: string) => `${BASE}/api/v1/webdoc-img/${h}`;
 
 /** A file from the gateway that needs the login (Word / PDF export). H5 saves it; the mini program opens it. */
 export async function downloadAuthed(path: string, name: string): Promise<void> {

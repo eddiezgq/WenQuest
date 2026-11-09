@@ -7,6 +7,7 @@ teacher's own Moodle token.
 
 import asyncio
 import json
+import logging
 import re
 import time
 from pathlib import Path
@@ -22,6 +23,8 @@ from . import team
 from .moodle import EngineError
 from .session import Session
 from .studio import disp, lang_keys, new_id, new_project
+
+log = logging.getLogger("wenquest.studio_api")
 
 
 class NewProject(BaseModel):
@@ -1278,6 +1281,18 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             acts.append({"type": "page", "name": ml({k: ex_name[k] + v for k, v in les["title"].items() if k in ex_name}, lg),
                          "content": html_of(les["exercises"])})
         acts += await produced("guide")
+        webdocs: list[tuple[int, dict, str]] = []      # 第 126 轮：(活动下标, 网页文档, 可见范围)
+
+        def webdoc(kind: str, audience: str, name: str) -> None:
+            path = d / f"webdoc-{kind}.json"
+            if not path.exists() or not hasattr(m, "coursedoc_html"):
+                return
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            webdocs.append((len(acts), doc, audience))
+            acts.append({"type": "page", "name": f"{name}（网页版）"[:250], "content": m.coursedoc_html(doc),
+                         "visible": 1 if audience == "students" else 0})
+        no = studio().lesson_no(proj, chapter, les)
+        webdoc("guide", "students", f"实验{no} 实验指导书")
         acts += await produced("report")
         lab_act = await chapter_lab(proj, chapter, les, sess)
         lab_index = -1
@@ -1288,6 +1303,7 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
             acts.append({"type": "page", "name": ml({k: ans_name[k] + v for k, v in les["title"].items() if k in ans_name}, lg),
                          "content": html_of(les["answers"]), "visible": 0})
         acts += await produced("plan")
+        webdoc("plan", "teachers", f"{no} 教案")
         if chapter["id"] not in course["attached"]:
             fids = [fid for fid, f in proj["materials"]["files"].items()
                     if f["role"] in team.ATTACH_ROLES and chapter["no"] in (f.get("chapters") or [])]
@@ -1299,6 +1315,12 @@ def register(app, m) -> None:  # m: the main module (state, current, helpers)
         if chapter["id"] not in course["attached"]:
             course["attached"].append(chapter["id"])
         les["cmids"] = res.get("cmids", [])
+        for i, doc, audience in webdocs:
+            if i < len(les["cmids"]) and les["cmids"][i]:
+                try:
+                    m.coursedoc_adopt(course["id"], int(les["cmids"][i]), doc, audience, sess.user_id)
+                except Exception:  # noqa: BLE001 - the page is in the course; only in-place editing is missing
+                    log.exception("adopting the web document of %s failed", les.get("id"))
         # a new version of a published lesson (round 32, D5): the new activities are in; now take the old ones out
         for cmid in old:
             if cmid in les["cmids"]:

@@ -285,6 +285,7 @@ def register(app, m) -> None:
                 f = next((x for x in mod.get("contents") or [] if x.get("type") == "file"), None)
                 mods.append({"cmid": mod["id"], "type": mod.get("modname"), "name": split(mod.get("name")),
                              "title": m.plain(mod.get("name"), lg), "visible": bool(mod.get("visible", 1)),
+                             "webdoc": m.coursedoc_of_cmid(int(mod["id"])) if mod.get("modname") == "page" and hasattr(m, "coursedoc_of_cmid") else None,
                              "file": {"name": f.get("filename"), "kind": m.content.file_kind(f.get("filename"), f.get("mimetype"))} if f else None})
             sections.append({"id": s["id"], "number": s.get("section"), "name": split(s.get("name")),
                              "title": m.plain(s.get("name"), lg) or (f"#{s.get('section')}"),

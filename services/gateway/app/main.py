@@ -50,6 +50,7 @@ from . import course_api
 from . import edit_api
 from . import learn_api
 from . import webdocs_api
+from . import coursedocs_api
 from . import life_api
 from . import course_builder as cb
 from . import generate as gen
@@ -147,6 +148,7 @@ def create_app() -> FastAPI:
     course_api.register(app, sys.modules[__name__])
     learn_api.register(app, sys.modules[__name__])
     webdocs_api.register(app, sys.modules[__name__])      # 第 122 轮：网页实验报告（用 learn_api 的作业调用）
+    coursedocs_api.register(app, sys.modules[__name__])   # 第 126 轮：老师用的网页文档（用 webdocs_api 的 PDF 导出）
     edit_api.register(app, sys.modules[__name__])
     life_api.register(app, sys.modules[__name__])
     textbook_api.register(app, sys.modules[__name__])
@@ -470,6 +472,9 @@ def register(app: FastAPI) -> None:
                 raise EngineError("not_found", "page", 404)
             base["html"] = content.clean(resolve(page.get("content"), lg), state.settings.moodle_url, sign)
             base["intro"] = plain(page.get("intro"), lg)
+            wd = getattr(sys.modules[__name__], "coursedoc_of_cmid", None)
+            if wd and wd(cmid):
+                base["webdoc"] = wd(cmid)      # 第 126 轮：老师的网页文档，老师点“编辑”进文档编辑页
             try:
                 await state.moodle.view_page(tok, inst)
             except EngineError:

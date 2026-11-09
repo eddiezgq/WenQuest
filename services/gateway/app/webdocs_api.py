@@ -303,6 +303,8 @@ def register(app, m) -> None:
         finally:
             tmp.pop(key, None)
 
+    m.webdocs_pdf = to_pdf      # 第 126 轮老师的网页文档也用它导出 PDF
+
     @app.get("/api/v1/webdocs-tmp/{signed}")
     async def tmp_file(signed: str):
         try:

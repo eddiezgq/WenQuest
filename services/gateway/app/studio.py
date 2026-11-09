@@ -1708,6 +1708,14 @@ class Studio(ReviewMixin, LessonEditMixin, LeadAgentMixin, ExpertMixin, LeadMixi
         files.append({"name": f"实验{no} 实验报告模板.docx", "kind": "report", "teacher_only": False})
         docs.plan(spec, gp, d / f"{no} 教案.docx", no, course[0], chap[0], proj.get("owner_name", ""))
         files.append({"name": f"{no} 教案.docx", "kind": "plan", "teacher_only": True})
+        # 第 126 轮：教案、指导书也做成网页文档（发布时成为课程里的页面，老师以后在网页上改）；Word 照旧
+        from .production import coursedoc
+        try:
+            (d / "webdoc-guide.json").write_text(json.dumps(coursedoc.from_guide(spec, gp, no), ensure_ascii=False), encoding="utf-8")
+            (d / "webdoc-plan.json").write_text(json.dumps(coursedoc.from_plan(spec, gp, no, course[0], chap[0], proj.get("owner_name", "")),
+                                                           ensure_ascii=False), encoding="utf-8")
+        except Exception:  # noqa: BLE001 - the Word files stand; the web versions are a convenience
+            log.exception("web documents for %s failed", no)
         for f in spec.get("figures_made") or []:
             if (d / f["png"]).exists():
                 files.append({"name": f["png"], "kind": "figure", "teacher_only": False, "title": f["title"], "no": f["no"]})

@@ -175,6 +175,15 @@
       }
     },
     {
+      "path": "pages/doc/doc",
+      "style": {
+        "navigationBarTitleText": "网页文档",
+        "h5": {
+          "titleNView": false
+        }
+      }
+    },
+    {
       "path": "pages/report/report",
       "style": {
         "navigationBarTitleText": "实验报告",
