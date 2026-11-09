@@ -1,0 +1,875 @@
+1
+00:00:00,600 --> 00:00:01,933
+Hi everyone,
+
+2
+00:00:01,953 --> 00:00:10,049
+and welcome back to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:10,449 --> 00:00:16,229
+This is Lecture 30, trends in sewing equipment.
+
+4
+00:00:16,629 --> 00:00:21,510
+Last time we saw how five kinds of factory use their machines.
+
+5
+00:00:21,530 --> 00:00:23,882
+Today we look ten years ahead,
+
+6
+00:00:23,902 --> 00:00:29,969
+at which changes are already happening and which still have hurdles to clear.
+
+7
+00:00:30,369 --> 00:00:35,529
+This video concentrates on saving power and robot loading;
+
+8
+00:00:35,549 --> 00:00:42,674
+software-defined machines and garments without stitches get only a mention here,
+
+9
+00:00:42,694 --> 00:00:45,442
+with the details in the slides.
+
+10
+00:00:46,962 --> 00:00:48,862
+Here's the problem.
+
+11
+00:00:49,262 --> 00:00:56,123
+A shirt factory is considering a robot to take cut pieces from a stack to the
+
+12
+00:00:56,143 --> 00:00:57,464
+sewing machine:
+
+13
+00:00:57,484 --> 00:01:02,379
+separate a ply, lift it, flatten it, align it, load it,
+
+14
+00:01:02,399 --> 00:01:05,060
+ten actions of 8 seconds each,
+
+15
+00:01:05,080 --> 00:01:09,707
+and the supplier quotes 97 percent success per step.
+
+16
+00:01:10,107 --> 00:01:17,623
+Each failure takes a person 30 seconds to sort out, then the step is redone.
+
+17
+00:01:18,023 --> 00:01:21,582
+The robot costs 250 thousand yuan,
+
+18
+00:01:21,602 --> 00:01:26,424
+maintenance is 10 percent of the price a year,
+
+19
+00:01:26,444 --> 00:01:33,160
+it replaces one operator per shift, two shifts, 300 days a year,
+
+20
+00:01:33,180 --> 00:01:36,107
+labour at 0.5 yuan a minute.
+
+21
+00:01:36,507 --> 00:01:39,930
+What's the chance the whole sequence runs unattended?
+
+22
+00:01:40,330 --> 00:01:42,990
+How often per hour must a person step in?
+
+23
+00:01:43,390 --> 00:01:44,699
+How long to pay back?
+
+24
+00:01:45,099 --> 00:01:46,679
+We'll answer at the end.
+
+25
+00:01:48,199 --> 00:01:49,859
+Four directions.
+
+26
+00:01:51,379 --> 00:01:58,207
+Four columns: leaner, smarter, fewer hands, no stitches; in each,
+
+27
+00:01:58,227 --> 00:02:01,999
+the lower the newer and less mature.
+
+28
+00:02:02,399 --> 00:02:06,939
+Leaner is the most mature: servo direct drive.
+
+29
+00:02:07,339 --> 00:02:13,990
+Smarter means electronic feed, tension and presser foot,
+
+30
+00:02:14,010 --> 00:02:18,279
+plus connectivity and digital twins.
+
+31
+00:02:18,679 --> 00:02:24,976
+Fewer hands runs from pattern sewers and automatic units to robot loading and
+
+32
+00:02:24,996 --> 00:02:26,699
+then humanoid robots.
+
+33
+00:02:27,099 --> 00:02:31,728
+No stitches means whole-garment knitting, welding and bonding,
+
+34
+00:02:31,748 --> 00:02:33,303
+and digital printing.
+
+35
+00:02:33,703 --> 00:02:38,867
+We'll spend most time on fewer hands, because two things hold it back:
+
+36
+00:02:38,887 --> 00:02:42,643
+fabric is soft, and the investment has to pay back.
+
+37
+00:02:44,163 --> 00:02:47,103
+The most mature trend is saving power.
+
+38
+00:02:47,503 --> 00:02:52,809
+An old clutch motor spins at rated speed whenever it's switched on,
+
+39
+00:02:52,829 --> 00:02:58,452
+and the pedal only engages the clutch; a servo turns only while sewing,
+
+40
+00:02:58,472 --> 00:03:01,314
+and direct drive drops the belt too.
+
+41
+00:03:01,714 --> 00:03:10,308
+A published retrofit cut average power from about 450 to 250 watts,
+
+42
+00:03:10,328 --> 00:03:16,094
+about 44 percent, paying back in four months.
+
+43
+00:03:16,494 --> 00:03:22,255
+Scale to 500 machines running 3550 hours a year:
+
+44
+00:03:22,275 --> 00:03:30,928
+about 80 ten-thousand kilowatt-hours with clutch motors, 44 with servos,
+
+45
+00:03:30,948 --> 00:03:37,794
+saving 35.5 ten-thousand a year, about 202 tonnes of CO2.
+
+46
+00:03:38,194 --> 00:03:41,454
+The more idle time, the bigger the saving.
+
+47
+00:03:42,973 --> 00:03:48,993
+How soft is cloth? It won't stand, it can't be pushed.
+
+48
+00:03:50,513 --> 00:03:55,762
+Why is handling cloth so hard for robots?
+
+49
+00:03:56,162 --> 00:03:58,598
+First measure how soft it is.
+
+50
+00:03:58,998 --> 00:04:00,868
+The cantilever test:
+
+51
+00:04:00,888 --> 00:04:07,388
+slide a strip out over the table edge until it droops to a set angle;
+
+52
+00:04:07,408 --> 00:04:10,978
+that overhang is the bending length c.
+
+53
+00:04:11,378 --> 00:04:16,718
+Bending rigidity is weight per area times c cubed.
+
+54
+00:04:17,118 --> 00:04:27,319
+Single jersey is about 4, shirt poplin about 9.4, suiting about 38,
+
+55
+00:04:27,339 --> 00:04:32,658
+denim about 168 micronewton-metres.
+
+56
+00:04:33,058 --> 00:04:39,190
+A one-millimetre steel plate is 16.7 newton-metres,
+
+57
+00:04:39,210 --> 00:04:44,738
+roughly 1.8 million times stiffer than poplin.
+
+58
+00:04:45,138 --> 00:04:48,638
+Robots are used to handling steel, not cloth.
+
+59
+00:04:50,158 --> 00:04:51,421
+Watch the lab:
+
+60
+00:04:51,441 --> 00:04:58,388
+a strip sticks out 10 centimetres from the clamp while its bending length is
+
+61
+00:04:58,408 --> 00:05:01,871
+raised from jersey-soft to card-stiff;
+
+62
+00:05:01,891 --> 00:05:05,538
+the orange line is the current material.
+
+63
+00:05:05,938 --> 00:05:10,002
+With small c the whole strip hangs down:
+
+64
+00:05:10,022 --> 00:05:16,229
+jersey and poplin droop more than 80 degrees, denim about 65,
+
+65
+00:05:16,249 --> 00:05:19,598
+while card and steel barely move.
+
+66
+00:05:19,998 --> 00:05:28,441
+At an overhang of about twice the bending length the chord angle is about 42
+
+67
+00:05:28,461 --> 00:05:29,332
+degrees,
+
+68
+00:05:29,352 --> 00:05:32,896
+which is how the test defines c.
+
+69
+00:05:33,296 --> 00:05:38,916
+Clamped upright, shirt fabric stands only about 4 centimetres.
+
+70
+00:05:39,316 --> 00:05:44,936
+Lift cloth off the table and it stops doing what you want.
+
+71
+00:05:46,456 --> 00:05:48,346
+Cloth can't be pushed either.
+
+72
+00:05:48,746 --> 00:05:55,838
+A strip clamped at one end and free to move sideways at the other behaves
+
+73
+00:05:55,858 --> 00:05:57,981
+like a slender column:
+
+74
+00:05:58,001 --> 00:06:02,755
+push it to the critical force F_cr and it arches.
+
+75
+00:06:03,155 --> 00:06:12,963
+F_cr is pi squared times B times width b, over four times length squared.
+
+76
+00:06:13,363 --> 00:06:20,297
+Shirt poplin 5 centimetres long and 30 wide buckles at about 2.8 millinewtons,
+
+77
+00:06:20,317 --> 00:06:27,161
+while it weighs about 18: you can't even push with a sixth of its own weight.
+
+78
+00:06:27,561 --> 00:06:35,476
+To push harder than its weight, c must exceed 0.74 L: for 5 centimetres,
+
+79
+00:06:35,496 --> 00:06:40,435
+more than 37 millimetres, stiffer than denim.
+
+80
+00:06:40,835 --> 00:06:47,071
+That's why a sewing machine drags fabric with its feed dog instead of pushing it.
+
+81
+00:06:48,591 --> 00:06:54,505
+Robot loading: check the numbers, then compute pⁿ.
+
+82
+00:06:56,025 --> 00:06:58,005
+Here's a public case.
+
+83
+00:06:58,405 --> 00:07:07,145
+In 2017 a sewing-robot company and an apparel maker announced a plant with 21
+
+84
+00:07:07,165 --> 00:07:10,558
+fully automatic T-shirt lines,
+
+85
+00:07:10,578 --> 00:07:15,905
+one shirt every 22 seconds, 800 thousand a day.
+
+86
+00:07:16,305 --> 00:07:26,838
+Do the sums: 86400 seconds a day over 22 is about 3927 per line,
+
+87
+00:07:26,858 --> 00:07:39,205
+so 21 lines make about 82 thousand, roughly 10 times short of 800 thousand.
+
+88
+00:07:39,605 --> 00:07:41,980
+The numbers contradict themselves.
+
+89
+00:07:42,380 --> 00:07:44,526
+The plan never happened,
+
+90
+00:07:44,546 --> 00:07:51,026
+and reports in 2025 said round-the-clock high speed with yields above 98
+
+91
+00:07:51,046 --> 00:07:53,012
+percent is still hard;
+
+92
+00:07:53,032 --> 00:07:59,240
+a new batch of cotton or a new dye lot means stopping to recalibrate.
+
+93
+00:07:59,640 --> 00:08:04,835
+When you read about new technology, check the numbers first.
+
+94
+00:08:06,355 --> 00:08:13,091
+A process has n actions, each succeeding with probability p, independently;
+
+95
+00:08:13,111 --> 00:08:18,135
+the chance it finishes with no human help is p to the n.
+
+96
+00:08:18,535 --> 00:08:26,640
+The lab cycles the per-step success from 0.90 to 0.999;
+
+97
+00:08:26,660 --> 00:08:30,629
+watch the dot at ten steps.
+
+98
+00:08:31,029 --> 00:08:35,094
+0.97 to the tenth is about 74 percent,
+
+99
+00:08:35,114 --> 00:08:39,609
+so about one piece in four needs a person.
+
+100
+00:08:40,009 --> 00:08:45,970
+At 99 percent per step, the whole is about 90 percent.
+
+101
+00:08:46,370 --> 00:08:55,750
+For 90 percent unattended over ten steps you need about 98.95 percent per step.
+
+102
+00:08:56,150 --> 00:09:01,967
+A respectable-looking 97 falls short once you multiply.
+
+103
+00:09:03,487 --> 00:09:06,102
+Now the interventions.
+
+104
+00:09:06,502 --> 00:09:14,632
+Expected failures per piece are n times one minus p, over p:
+
+105
+00:09:14,652 --> 00:09:20,202
+ten steps at 97 percent gives about 0.31.
+
+106
+00:09:20,602 --> 00:09:27,224
+With 8-second steps and 30 seconds of human fixing per failure plus a redo,
+
+107
+00:09:27,244 --> 00:09:32,094
+the cycle is about 92 seconds, about 39 pieces an hour,
+
+108
+00:09:32,114 --> 00:09:39,091
+and about 12.1 interventions an hour: someone has to walk over every 5 minutes,
+
+109
+00:09:39,111 --> 00:09:42,102
+so a person can't leave the robot.
+
+110
+00:09:42,502 --> 00:09:48,962
+At 99 percent it's about 4.3 an hour; at 99.9, under half.
+
+111
+00:09:49,362 --> 00:09:54,721
+Only beyond 99 percent per step can the robot be left alone.
+
+112
+00:09:56,241 --> 00:10:03,286
+The buckling formula is exactly the problem robots face assembling wiring
+
+113
+00:10:03,306 --> 00:10:05,221
+harnesses and hoses.
+
+114
+00:10:05,621 --> 00:10:09,304
+When a gripper pushes a wire into a connector,
+
+115
+00:10:09,324 --> 00:10:14,940
+the unsupported length of wire is a slender column clamped at one end.
+
+116
+00:10:15,340 --> 00:10:20,366
+The critical force goes inversely with the square of that length,
+
+117
+00:10:20,386 --> 00:10:25,800
+so gripping twice as close to the tip lets you push four times harder.
+
+118
+00:10:26,200 --> 00:10:32,850
+That's why harness robots grip near the tip and push in several short strokes,
+
+119
+00:10:32,870 --> 00:10:34,218
+or pull instead.
+
+120
+00:10:34,618 --> 00:10:41,258
+And the p-to-the-n rule applies to bin picking too: recognition, grasping,
+
+121
+00:10:41,278 --> 00:10:46,478
+pose correction and placing, each success rate multiplied.
+
+122
+00:10:47,998 --> 00:10:48,921
+Try it at home.
+
+123
+00:10:49,321 --> 00:10:54,223
+Pull a towel by one corner and it slides flat across the table after you;
+
+124
+00:10:54,243 --> 00:10:57,325
+push it from behind and it bunches up at once.
+
+125
+00:10:57,725 --> 00:11:01,099
+That's the buckling formula we just saw:
+
+126
+00:11:01,119 --> 00:11:07,633
+cloth's bending rigidity is so small that it arches before the push reaches a
+
+127
+00:11:07,653 --> 00:11:09,585
+fraction of its weight.
+
+128
+00:11:09,985 --> 00:11:16,296
+And it's why a sewing machine's feed dog drags the fabric from underneath
+
+129
+00:11:16,316 --> 00:11:19,245
+instead of pushing it from behind.
+
+130
+00:11:20,765 --> 00:11:23,288
+Back to our problem.
+
+131
+00:11:23,688 --> 00:11:32,653
+The chance the whole sequence runs unattended is 0.97 to the tenth,
+
+132
+00:11:32,673 --> 00:11:39,761
+about 73.7 percent: one piece in four needs a person.
+
+133
+00:11:40,161 --> 00:11:47,778
+Expected failures are about 0.31 a piece, the cycle about 92 seconds,
+
+134
+00:11:47,798 --> 00:11:54,420
+output about 39 an hour, and about 12 interventions an hour.
+
+135
+00:11:54,820 --> 00:11:59,607
+Labour saved is 14.4 ten-thousand yuan a year;
+
+136
+00:11:59,627 --> 00:12:03,683
+after failure handling and maintenance,
+
+137
+00:12:03,703 --> 00:12:09,640
+payback is about 29 months on two shifts and 18 on three.
+
+138
+00:12:10,040 --> 00:12:15,427
+For 90 percent unattended you need about 99 percent per step,
+
+139
+00:12:15,447 --> 00:12:19,327
+which cuts interventions to about 4 an hour.
+
+140
+00:12:19,727 --> 00:12:26,747
+The supplier's 97 sounds high, but multiplied it isn't enough.
+
+141
+00:12:28,267 --> 00:12:32,293
+Now Virtual lab 30-1, soft fabric and robots,
+
+142
+00:12:32,313 --> 00:12:36,788
+which you can do yourself on WenQuest. The checks,
+
+143
+00:12:36,808 --> 00:12:43,441
+the payback chart and the tasks are blurred. Page one, how soft is fabric:
+
+144
+00:12:43,461 --> 00:12:49,644
+pick the four fabrics, card and steel in turn from the material list,
+
+145
+00:12:49,664 --> 00:12:52,341
+with a 10-centimetre overhang.
+
+146
+00:12:52,361 --> 00:12:58,545
+Watch the orange line go from hanging straight down to barely moving,
+
+147
+00:12:58,565 --> 00:13:01,781
+and record each material's rigidity,
+
+148
+00:13:01,801 --> 00:13:06,007
+chord angle and the force that buckles a strip.
+
+149
+00:13:06,407 --> 00:13:08,520
+Back on shirting poplin,
+
+150
+00:13:08,540 --> 00:13:13,409
+drag only the weight and see whether the droop changes;
+
+151
+00:13:13,429 --> 00:13:19,187
+then drag only the bending length, and compare which one matters.
+
+152
+00:13:19,587 --> 00:13:22,624
+Tasks one and two are on this page too:
+
+153
+00:13:22,644 --> 00:13:28,582
+one asks you to bring the chord angle under 10 degrees and work out how much
+
+154
+00:13:28,602 --> 00:13:29,837
+stiffer that is;
+
+155
+00:13:29,857 --> 00:13:35,089
+the other changes the strip width, checks the push-to-weight ratio,
+
+156
+00:13:35,109 --> 00:13:39,087
+and finds the bending length at which you can push.
+
+157
+00:13:39,487 --> 00:13:42,097
+Page two is the robot workflow.
+
+158
+00:13:42,117 --> 00:13:47,357
+Start from ten steps at 97 percent and record unattended rate,
+
+159
+00:13:47,377 --> 00:13:51,345
+interventions and output per hour, and payback.
+
+160
+00:13:51,365 --> 00:13:58,387
+Task three asks for the lowest per-step success that reaches 90 percent unattended.
+
+161
+00:13:58,787 --> 00:14:05,783
+Task four keeps two shifts, at most 97 percent and at least ten steps,
+
+162
+00:14:05,803 --> 00:14:08,490
+and asks you to tune price,
+
+163
+00:14:08,510 --> 00:14:16,107
+wage or step time until payback is 24 months or less; then try three shifts.
+
+164
+00:14:16,507 --> 00:14:22,235
+Page three is the direct-drive energy account. Record the plant's annual use,
+
+165
+00:14:22,255 --> 00:14:27,311
+saving and emissions at the defaults, then change the running hours;
+
+166
+00:14:27,331 --> 00:14:30,595
+task five asks for a set saving per machine.
+
+167
+00:14:30,615 --> 00:14:34,327
+The guide and report template are on the platform.
+
+168
+00:14:35,847 --> 00:14:42,565
+Everything in this lecture is on the WenQuest learning platform.
+
+169
+00:14:42,965 --> 00:14:50,211
+You can open the interactive slides and the soft-fabric lab and work them yourself,
+
+170
+00:14:50,231 --> 00:14:53,625
+including the pages this video skipped.
+
+171
+00:14:54,025 --> 00:14:58,544
+You submit the assignment and the lab report on the platform,
+
+172
+00:14:58,564 --> 00:15:00,925
+and get marks and comments back.
+
+173
+00:15:01,325 --> 00:15:07,845
+Questions go to the discussion forum, and the grades page shows every mark.
+
+174
+00:15:09,365 --> 00:15:17,213
+The assignment has three questions. One: a factory has 300 lockstitch machines,
+
+175
+00:15:17,233 --> 00:15:20,301
+each running 3000 hours a year;
+
+176
+00:15:20,321 --> 00:15:25,580
+clutch motors average 0.45 kilowatts and servos 0.25,
+
+177
+00:15:25,600 --> 00:15:32,652
+power costs 0.7 yuan a kilowatt-hour, and each retrofit costs 500 yuan.
+
+178
+00:15:32,672 --> 00:15:37,831
+Find the annual energy and cost saving, the payback,
+
+179
+00:15:37,851 --> 00:15:44,305
+and the annual CO2 reduction at 0.57 kilograms per kilowatt-hour.
+
+180
+00:15:44,705 --> 00:15:44,997
+Two:
+
+181
+00:15:45,017 --> 00:15:51,464
+a fabric weighs 200 grams per square metre with a bending length of 25 millimetres.
+
+182
+00:15:51,484 --> 00:15:53,490
+Find its bending rigidity.
+
+183
+00:15:53,510 --> 00:15:59,101
+A strip 5 centimetres long and 20 wide is clamped at one end and pushed,
+
+184
+00:15:59,121 --> 00:16:04,088
+its other end free to move sideways: at what force does it arch?
+
+185
+00:16:04,108 --> 00:16:06,347
+Compare that with its weight,
+
+186
+00:16:06,367 --> 00:16:12,737
+and say how the critical force changes if the clamp is moved to half the distance.
+
+187
+00:16:13,137 --> 00:16:18,837
+Three: a vendor proposes 8-step robot loading at 98 percent per step,
+
+188
+00:16:18,857 --> 00:16:23,893
+everything else as in this lecture. Find the unattended rate,
+
+189
+00:16:23,913 --> 00:16:26,794
+interventions per hour and payback,
+
+190
+00:16:26,814 --> 00:16:31,354
+and the per-step rate needed for 95 percent unattended.
+
+191
+00:16:31,374 --> 00:16:35,498
+Then list the data you'd still ask the vendor for,
+
+192
+00:16:35,518 --> 00:16:38,317
+and recommend whether to pilot it.
+
+193
+00:16:38,717 --> 00:16:43,817
+Submit the assignment and the lab report on the WenQuest platform.
+
+194
+00:16:45,337 --> 00:16:49,146
+There's also a ten-question quiz. For example:
+
+195
+00:16:49,166 --> 00:16:52,808
+two fabrics weigh the same per square metre,
+
+196
+00:16:52,828 --> 00:16:58,218
+and A's bending length is twice B's. How many times stiffer is A?
+
+197
+00:16:58,618 --> 00:17:01,517
+Or true or false: for the same fabric,
+
+198
+00:17:01,537 --> 00:17:07,201
+doubling only the weight while keeping the bending length leaves the droop
+
+199
+00:17:07,221 --> 00:17:11,349
+and chord angle at a 10-centimetre overhang unchanged.
+
+200
+00:17:11,749 --> 00:17:17,329
+You get three attempts, and the explanations appear as soon as you submit.
+
+201
+00:17:18,849 --> 00:17:20,189
+Three things to remember.
+
+202
+00:17:20,589 --> 00:17:25,286
+One: servo direct drive is the most mature trend;
+
+203
+00:17:25,306 --> 00:17:32,312
+annual saving is machines times running hours times the power difference,
+
+204
+00:17:32,332 --> 00:17:35,489
+so the more idle time the better.
+
+205
+00:17:35,889 --> 00:17:39,272
+Two: cloth has almost no bending rigidity;
+
+206
+00:17:39,292 --> 00:17:45,511
+it stands only about two bending lengths and buckles before you can push with
+
+207
+00:17:45,531 --> 00:17:47,537
+a fraction of its weight,
+
+208
+00:17:47,557 --> 00:17:50,697
+so machines drag fabric with feed dogs,
+
+209
+00:17:50,717 --> 00:17:54,829
+and workable automation keeps it flat on the table.
+
+210
+00:17:55,229 --> 00:18:01,028
+Three: a multi-step process runs unattended with probability p to the n,
+
+211
+00:18:01,048 --> 00:18:06,605
+so each step must beat 99 percent before the robot can be left alone;
+
+212
+00:18:06,625 --> 00:18:10,969
+and check the numbers in any report on new technology.
+
+213
+00:18:11,369 --> 00:18:13,933
+The slides, the virtual lab,
+
+214
+00:18:13,953 --> 00:18:20,394
+the assignment and the quiz are all on the WenQuest learning platform,
+
+215
+00:18:20,414 --> 00:18:26,578
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+216
+00:18:26,978 --> 00:18:31,683
+Today we asked whether robot loading can be trusted. Next time,
+
+217
+00:18:31,703 --> 00:18:37,308
+in the final lecture, we look at artificial intelligence in apparel making:
+
+218
+00:18:37,328 --> 00:18:42,783
+what it does in design, patterns and inspection, and where it goes wrong.
+
+219
+00:18:42,803 --> 00:18:43,758
+See you then.
