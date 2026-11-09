@@ -1,0 +1,117 @@
+# -*- coding: utf-8 -*-
+"""第 130 轮：数字工厂英文版（第一批）。
+- 网页第一批页面：t() 的钥匙英文表里都有、t() 外不留中文、页面显示的数据文件都能译成英文（web/tools/i18n_check.mjs，要 Node）；
+- 枢纽、计算服务给第一批页面的固定文字（例题参数、读数名、测量任务、功能测试步骤）英文表里都有；
+- 枢纽看板文字的英文、语言怎么定。"""
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+import pytest
+
+DIG = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path[:0] = [DIG, os.path.dirname(DIG)]
+WEB = os.path.join(DIG, "web")
+EN = json.load(open(os.path.join(WEB, "src", "locales", "en.json"), encoding="utf-8"))
+CJK = re.compile(r"[　-〿㐀-鿿＀-￯]")
+
+
+@pytest.mark.skipif(not shutil.which("node"), reason="没有 Node")
+def test_web_batch1_node():
+    r = subprocess.run(["node", "tools/i18n_check.mjs"], capture_output=True, text=True, cwd=WEB, timeout=120)
+    assert r.returncode == 0, r.stdout[-4000:] + r.stderr[-2000:]
+
+
+def test_en_table_is_english():
+    for k, v in EN.items():
+        assert v and not CJK.search(v), "英文表里还有中文：{} → {}".format(k, v)
+        assert set(re.findall(r"\{(\w+)\}", k)) == set(re.findall(r"\{(\w+)\}", v)), "占位符对不上：" + k
+
+
+def test_hub_texts_have_english():
+    from cae import circuit as C
+    from cae import instruments as I
+    from hub import fct
+    need = []
+    for k, v in C.EXAMPLES.items():
+        need += [b for _, b, *_ in v["params"]] + [v["title"]]
+        assert C.EN[k][0] and not CJK.search(C.EN[k][0] + C.EN[k][1])
+    need += [v[0] for v in C.READING_NAMES.values()]
+    need += re.findall(r'"note_formula": "([^"]+)"', open(os.path.join(DIG, "cae", "circuit.py"), encoding="utf-8").read())
+    need += list(I.TITLES.values()) + [v[0] for v in I.LABELS.values()]
+    for st in fct.STEPS:
+        need += [st["title"], st["how"]]
+    missing = [x for x in need if x not in EN]
+    assert not missing, missing
+
+
+def test_circuit_catalog_english():
+    from cae import circuit as C
+    for e in C.catalog():
+        assert e["title_en"] and e["question_en"] and not CJK.search(e["question_en"])
+    b = C.build("sense")
+    assert "30 A" in b["question_en"]
+
+
+def test_overview_localized():
+    from hub import i18n
+    ov = {
+        "kpis": [{"label": "准时交付率（本月）", "note": "目标 95% · 2 单延期风险"},
+                 {"label": "在制品", "note": "比昨天 +3（GRD-01 前排队 4 件）", "unit": "件"},
+                 {"label": "设备综合效率 OEE（今日）", "note": "目标 75% · GRD-01 仅 52%"},
+                 {"label": "一次合格率（本周）", "note": "目标 97% · 未达标 · 12 件"},
+                 {"label": "本周完工 SH-301", "note": "计划到今天 8 件"},
+                 {"label": "实际成本偏差（本周）", "note": "每件高 $12 · 主要是调整与换刀工时"}],
+        "orders": [{"risk": "预计晚 2 天", "work_orders": "WO-0001 SH-301 已完工 3/10；WO-0002 SH-301 已完工 0/5"},
+                   {"risk": "待排产，缺 BRG-6207", "work_orders": "尚未下达工单"}],
+        "materials": [{"status": "低于安全库存", "qty_text": "6 件 · 在途 20", "uom": "件"}, {"status": "11-12 到货", "qty_text": "3.5 kg"}],
+        "machines": [{"unit": "grd-01", "name": "外圆磨床"}],
+        "week": {"days": [{"day": "周一"}], "bottleneck": "grd-01"},
+        "quality": {"chart": {"title": "SH-301 轴承位 Ø35k6"}},
+        "todos": [{"kind": "任务", "act": "去做", "src": "实验 7 · 接单", "text": "x"}],
+    }
+    units = {"grd-01": ("machining", "外圆磨床", "Cylindrical grinder", None)}
+    out = i18n.localize_overview(json.loads(json.dumps(ov)), "en", units)
+    texts = [k["label"] for k in out["kpis"]] + [k["note"] for k in out["kpis"]] + [o["risk"] for o in out["orders"]] \
+        + [o["work_orders"] for o in out["orders"]] + [m["status"] for m in out["materials"]] + [m["qty_text"] for m in out["materials"]] \
+        + [out["week"]["days"][0]["day"], out["quality"]["chart"]["title"], out["todos"][0]["kind"], out["todos"][0]["act"]]
+    for x in texts:
+        assert not CJK.search(x), x
+    assert out["kpis"][1]["note"] == "+3 vs yesterday (4 queued at GRD-01)"
+    assert out["machines"][0]["name_en"] == "Cylindrical grinder" and out["machines"][0]["name"] == "外圆磨床"
+    assert out["todos"][0]["src"] == "Lab 7 · 接单"          # 实验任务的说明第二批再翻
+    zh = i18n.localize_overview(json.loads(json.dumps(ov)), "zh", units)
+    assert zh["kpis"] == ov["kpis"] and zh["machines"][0]["name_en"] == "Cylindrical grinder"   # 中文不变，只多 name_en
+
+
+def test_lang_and_names():
+    from hub import i18n
+
+    class R:
+        def __init__(self, h, c):
+            self.headers, self.cookies = h, c
+    assert i18n.lang_of(R({"x-wq-lang": "en"}, {})) == "en"
+    assert i18n.lang_of(R({}, {"wq_lang": "en"})) == "en"
+    assert i18n.lang_of(R({}, {})) == "zh"                       # 没带语言：照旧中文
+    assert i18n.en_part("问渠电路板厂 WenQuest Electronics (Demo)") == "WenQuest Electronics (Demo)"
+    assert i18n.en_part("贴片电阻 0402 Chip resistor 0402") == "Chip resistor 0402"
+    assert i18n.en_part("45钢圆棒 Ø50 Steel bar 1045 Ø50") == "Steel bar 1045 Ø50"
+    assert i18n.tr("没有这块板的功能测试记录：P-1") == "No functional test record for this board: P-1"
+    assert i18n.tr("没见过的提示") == "没见过的提示"            # 没有对照的原样（中文），不报错
+
+
+@pytest.mark.parametrize("plant", ["wenquest-gearbox", "wenquest-robot", "wenquest-pcb", "wenquest-chip", "wenquest-sensor"])
+def test_plant_names_have_english(plant):
+    """第一批页面显示的厂名、设备名、物料名、客户名：都能取到英文"""
+    import yaml
+    from hub import i18n
+    p = yaml.safe_load(open(os.path.join(os.path.dirname(DIG), "plants", plant + ".yaml"), encoding="utf-8"))
+    names = [p["company"]["name"]] + [i["name"] for i in p.get("items", [])] + list(p.get("customers", [])) + [o["name"] for o in p["operations"]]
+    for n in names:
+        e = i18n.en_part(n)
+        assert e and not CJK.search(e), n
+    for u in p["units"]:
+        assert u.get("name_en") and not CJK.search(u["name_en"]), u["id"]

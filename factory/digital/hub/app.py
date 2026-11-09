@@ -49,6 +49,7 @@ from hub.historian import Historian  # noqa: E402
 from hub.privacy import actor  # noqa: E402
 from hub.mes import MES  # noqa: E402
 from hub.teach import Teach  # noqa: E402
+from hub import i18n  # noqa: E402  第 130 轮：英文版
 
 log = logging.getLogger("hub")
 logging.basicConfig(level=os.environ.get("WQ_LOG", "INFO"), format="%(asctime)s hub %(levelname)s %(message)s")
@@ -437,6 +438,18 @@ async def _demo_plant_only(request: Request, call_next):
     return await call_next(request)
 
 
+# 第 130 轮：报错文字按请求的语言（第一批页面会遇到的有英文，其余照旧中文）
+from fastapi.exception_handlers import http_exception_handler as _http_exc  # noqa: E402
+from starlette.exceptions import HTTPException as _StarletteHTTPException  # noqa: E402
+
+
+@app.exception_handler(_StarletteHTTPException)
+async def _localized_http_exc(request: Request, exc):
+    if i18n.lang_of(request) == "en" and isinstance(exc.detail, str):
+        exc = _StarletteHTTPException(exc.status_code, i18n.localize_detail(exc.detail, "en"), headers=getattr(exc, "headers", None))
+    return await _http_exc(request, exc)
+
+
 @app.on_event("startup")
 def _startup():
     if os.environ.get("WQ_HUB_NO_START") != "1":
@@ -675,7 +688,8 @@ def _plant_cfg():
     from sim import calendar as cal
     c = PLANT.company()
     act = PLANT.active()
-    return {"name": PLANT.display_name(), "company": c["name"], "currency": c["currency"], "demo": DEMO_PLANT,
+    return {"name": PLANT.display_name(), "name_en": "WenQuest Gearbox" if PLANT.is_demo() else i18n.en_part(c["name"]),   # 第 130 轮
+            "company": c["name"], "currency": c["currency"], "demo": DEMO_PLANT,
             "id": act["ID"] if act else "wenquest-gearbox",          # 第 45 轮：帮助按它显示“机器人厂”一册
             "shift": "{}–{}".format(cal.DEF_START, cal.DEF_END),
             # “实验与任务”：本厂有自己的实验（机器人厂的实验 24、25，第 47 轮）就显示
@@ -755,7 +769,7 @@ def _pm_h(u):
 @app.get("/api/layout")
 def get_layout():
     return {"floor": L.FLOOR, "units": {u: {"x": v[0], "y": v[1], "w": v[2], "d": v[3],
-                                           "name": wqbus.UNITS[u][1], "en": wqbus.UNITS[u][2],
+                                           "name": wqbus.UNITS[u][1], "en": wqbus.UNITS[u][2], "name_en": wqbus.UNITS[u][2],
                                            **({"h": L.HEIGHT[u]} if L.HEIGHT and u in L.HEIGHT else {}),
                                            **_pm_h(u)}
                                        for u, v in L.LAYOUT.items()},
@@ -764,8 +778,11 @@ def get_layout():
 
 # ---------------------------------------------------------------- 看板
 @app.get("/api/overview")
-def get_overview(u=Depends(user_of)):
+def get_overview(request: Request, u=Depends(user_of)):
     ov = kpi.overview(H.db, None, u["mode"])
+    for x in ov.get("materials", []):           # 第 130 轮：物料的英文名（清单里中英合写）
+        if x.get("code") in F.ITEMS:
+            x["name_en"] = i18n.en_part(F.ITEMS[x["code"]][0])
     b = H.db.one("select payload from bus_message where type='ai.briefing' and mode=%s order by ts desc limit 1",
                  (u["mode"],))
     ov["briefing"] = b["payload"] if b else None
@@ -784,7 +801,7 @@ def get_overview(u=Depends(user_of)):
     ov["todos"] = todos_for(u, ov)
     if u["mode"] == "teach" and DEMO_PLANT:
         ov["teach"] = H.teach.check(u["name"])
-    return ov
+    return i18n.localize_overview(ov, i18n.lang_of(request), wqbus.UNITS)
 
 
 def _prop(p):

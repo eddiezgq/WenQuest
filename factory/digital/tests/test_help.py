@@ -456,7 +456,7 @@ def test_glossary_banned_words_not_on_pages():
 def test_nav_groups_and_old_routes():
     app = _read(WEB, "App.vue")
     for g in ("总览", "从订单到回款", "保障", "设计与工艺", "教学", "资源"):
-        assert "title: '{}'".format(g) in app
+        assert "title: tk('{}')".format(g) in app          # 第 130 轮：导航文字用 tk() 标出，显示时按语言
     assert "实验 15 · 任务" not in app and "'/labs'" in app and "'/director'" in app
     routes = _read(WEB, "main.js")
     assert "{ path: '/work/manager', redirect: { path: '/finance', query: { tab: 'production' } } }" in routes
@@ -471,7 +471,7 @@ def test_nav_groups_and_old_routes():
 def test_cost_entry_only_on_enterprise_plants():
     """第 30 轮：企业工厂没有“经营与财务”，厂长用左栏“生产成本”；演示工厂导航不变（不显示这一项）"""
     app = _read(WEB, "App.vue")
-    assert "{ to: '/cost', label: '生产成本', role: 'manager', only: () => !demoPlant.value }" in app
+    assert "{ to: '/cost', label: tk('生产成本'), role: 'manager', only: () => !demoPlant.value }" in app
     assert "const demoPlant = computed(() => cfg.value.plant?.demo !== false);" in app
     assert ROUTES.get("/cost") == "Cost" and "<ProductionCost" in _read(WEB, "pages", "Cost.vue")
     hub = _read(DIGITAL, "hub", "app.py")
