@@ -17,7 +17,7 @@ c = TestClient(A.app)
 def test_designs_and_files():
     d = {x["key"]: x for x in c.get("/api/view/designs").json()["designs"]}
     assert set(d) == {"A", "B", "24V"} and "drv-joint.kicad_pcb" in d["A"]["files"]
-    assert d["A"]["count"]["fail"] == 7 and "sym-lib-table" not in d["B"]["files"]
+    assert d["A"]["count"]["fail"] == 2 and "sym-lib-table" not in d["B"]["files"]
     r = c.get("/api/view/file/A/drv-joint.kicad_pcb")
     assert r.status_code == 200 and r.text.startswith("(kicad_pcb")
     for bad in ("../design.yaml", "drv-joint.kicad_pcb.bak", "sym-lib-table", "..%2F..%2Fapp.py"):
@@ -26,7 +26,11 @@ def test_designs_and_files():
 
 
 def test_report_issues_in_kicad_coordinates():
-    r = c.get("/api/view/report/A").json()
+    # A 版第 129 轮去耦电容挪近后只剩热的问题（按位号跳）；带坐标的“靠近”类问题拿 24 V 示例测（它没改摆放）
+    a = c.get("/api/view/report/A").json()
+    assert all(i["status"] != "pass" for i in a["issues"]) and not any(i["key"].startswith("L-") for i in a["issues"])
+    assert next(i for i in a["issues"] if i["key"] == "TH-Q3")["refs"] == ["Q3"]
+    r = c.get("/api/view/report/24V").json()
     keys = [i["key"] for i in r["issues"]]
     assert "L-near-C27" in keys and all(i["status"] != "pass" for i in r["issues"])
     c27 = next(i for i in r["issues"] if i["key"] == "L-near-C27")
