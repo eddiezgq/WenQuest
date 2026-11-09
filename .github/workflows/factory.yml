@@ -608,7 +608,7 @@ jobs:
 
   deploy:
     name: 部署到服务器
-    needs: [build, rehearsal, design]
+    needs: [build, design]                  # 2026-11-08 Eddie：ERP 演练不卡上线——演练照跑、出错标红，但部署不等它
     runs-on: ubuntu-latest
     environment: production
     env:
