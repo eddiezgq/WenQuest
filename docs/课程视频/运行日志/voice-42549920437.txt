@@ -1,0 +1,400 @@
+
+100%|██████████| 1/1 [00:07<00:00,  7.03s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:55:56,800 INFO synthesis text Single jersey is about four, shirt poplin about nine.four, suiting about thirty-eight, denim about one hundred and sixty-eight micronewton-metres.
+2026-11-09 02:56:03,981 INFO yield speech len 13.72, rtf 0.5234138437332286
+
+100%|██████████| 1/1 [00:07<00:00,  7.39s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.39s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:56:04,640 INFO synthesis text Single jersey is about four, shirt poplin about nine.four, suiting about thirty-eight, denim about one hundred and sixty-eight micronewton-metres.
+2026-11-09 02:56:12,745 INFO yield speech len 15.56, rtf 0.5208974325871406
+
+100%|██████████| 1/1 [00:08<00:00,  8.29s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:56:13,381 INFO synthesis text A one-millimetre steel plate is sixteen.seven newton-metres, roughly one.eight million times stiffer than poplin.
+2026-11-09 02:56:18,989 INFO yield speech len 10.96, rtf 0.511609964127088
+
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:56:19,604 INFO synthesis text A one-millimetre steel plate is sixteen.seven newton-metres, roughly one.eight million times stiffer than poplin.
+2026-11-09 02:56:25,189 INFO yield speech len 10.68, rtf 0.5229104324226522
+
+100%|██████████| 1/1 [00:05<00:00,  5.76s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.76s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:56:25,851 INFO synthesis text A one-millimetre steel plate is sixteen.seven newton-metres, roughly one.eight million times stiffer than poplin.
+
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.11s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:57:03,592 INFO synthesis text With small c the whole strip hangs down: jersey and poplin droop more than eighty degrees, denim about sixty-five, while card and steel barely move.
+2026-11-09 02:57:09,394 INFO yield speech len 11.44, rtf 0.5071403888555673
+
+100%|██████████| 1/1 [00:05<00:00,  5.97s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:57:10,091 INFO synthesis text At an overhang of about twice the bending length the chord angle is about forty-two degrees, which is how the test defines c.
+2026-11-09 02:57:16,896 INFO yield speech len 12.96, rtf 0.525104981145741
+
+100%|██████████| 1/1 [00:06<00:00,  6.99s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:57:17,605 INFO synthesis text Clamped upright, shirt fabric stands only about four centimetres.
+2026-11-09 02:57:20,723 INFO yield speech len 5.64, rtf 0.5528854985609123
+
+100%|██████████| 1/1 [00:03<00:00,  3.29s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:57:21,166 INFO synthesis text Lift cloth off the table and it stops doing what you want.
+2026-11-09 02:57:24,199 INFO yield speech len 5.64, rtf 0.5377201323813581
+
+100%|██████████| 1/1 [00:03<00:00,  3.21s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.21s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:57:24,548 WARNING synthesis text Cloth can't be pushed either. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-09 02:57:24,674 INFO synthesis text Cloth can't be pushed either.
+2026-11-09 02:57:25,987 INFO yield speech len 1.92, rtf 0.6841090818246206
+
+100%|██████████| 1/1 [00:01<00:00,  1.49s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.49s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:57:26,473 INFO synthesis text A strip clamped at one end and free to move sideways at the other behaves like a slender column: push it to the critical force F_cr and it arches.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:58:11,027 INFO synthesis text Shirt poplin five centimetres long and thirty wide buckles at about two.eight millinewtons, while it weighs about eighteen: you can't even push with a sixth of its own weight.
+2026-11-09 02:58:18,128 INFO yield speech len 13.84, rtf 0.513051458865921
+
+100%|██████████| 1/1 [00:07<00:00,  7.27s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.27s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:58:19,032 INFO synthesis text To push harder than its weight, c must exceed zero.seventy-four L: for five centimetres, more than thirty-seven millimetres, stiffer than denim.
+2026-11-09 02:58:25,891 INFO yield speech len 12.92, rtf 0.5308605015462398
+
+100%|██████████| 1/1 [00:07<00:00,  7.03s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.03s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:58:26,625 INFO synthesis text That's why a sewing machine drags fabric with its feed dog instead of pushing it.
+2026-11-09 02:58:30,042 INFO yield speech len 6.32, rtf 0.5407561984243272
+
+100%|██████████| 1/1 [00:03<00:00,  3.59s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:58:30,590 INFO synthesis text Robot loading: check the numbers, then compute pⁿ.
+2026-11-09 02:58:42,245 INFO yield speech len 2.0, rtf 0.7145977020263672
+
+100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.60s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:58:42,626 INFO synthesis text In two thousand and seventeen a sewing-robot company and an apparel maker announced a plant with twenty-one fully automatic T-shirt lines, one shirt every twenty-two seconds, eight hundred thousand a day.
+2026-11-09 02:58:51,534 INFO yield speech len 17.52, rtf 0.5084937974198224
+
+100%|██████████| 1/1 [00:09<00:00,  9.09s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:58:52,339 INFO synthesis text Do the sums: eighty-six thousand, four hundred seconds a day over twenty-two is about three thousand, nine hundred and twenty-seven per line, so twenty-one lines make about eighty-two thousand, roughly ten times short of eight hundred thousand.
+2026-11-09 02:59:04,153 INFO yield speech len 22.92, rtf 0.5154470706693373
+
+100%|██████████| 1/1 [00:12<00:00, 12.00s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.00s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:59:04,978 INFO synthesis text Do the sums: eighty-six thousand, four hundred seconds a day over twenty-two is about three thousand, nine hundred and twenty-seven per line, so twenty-one lines make about eighty-two thousand, roughly ten times short of eight hundred thousand.
+2026-11-09 02:59:14,276 INFO yield speech len 17.76, rtf 0.5235665150590845
+
+100%|██████████| 1/1 [00:09<00:00,  9.48s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.48s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:59:15,103 INFO synthesis text Do the sums: eighty-six thousand, four hundred seconds a day over twenty-two is about three thousand, nine hundred and twenty-seven per line, so twenty-one lines make about eighty-two thousand, roughly ten times short of eight hundred thousand.
+2026-11-09 02:59:24,968 INFO yield speech len 18.88, rtf 0.5224840241973683
+
+100%|██████████| 1/1 [00:10<00:00, 10.05s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.05s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:59:25,626 WARNING synthesis text The numbers contradict themselves. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-09 02:59:25,752 INFO synthesis text The numbers contradict themselves.
+2026-11-09 02:59:27,402 INFO yield speech len 2.44, rtf 0.6763211039246106
+
+100%|██████████| 1/1 [00:01<00:00,  1.82s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.82s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 02:59:27,761 INFO synthesis text The plan never happened, and reports in two thousand and twenty-five said round-the-clock high speed with yields above ninety-eight percent is still hard; a new batch of cotton or a new dye lot means stopping to recalibrate.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:10,014 INFO synthesis text zero.ninety-seven to the tenth is about seventy-four percent, so about one piece in four needs a person.
+2026-11-09 03:00:17,106 INFO yield speech len 11.72, rtf 0.6050931715721156
+
+100%|██████████| 1/1 [00:07<00:00,  7.29s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:17,814 INFO synthesis text zero.ninety-seven to the tenth is about seventy-four percent, so about one piece in four needs a person.
+2026-11-09 03:00:24,932 INFO yield speech len 8.92, rtf 0.797988988893449
+
+100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.35s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:25,784 INFO synthesis text zero.ninety-seven to the tenth is about seventy-four percent, so about one piece in four needs a person.
+2026-11-09 03:00:32,395 INFO yield speech len 8.6, rtf 0.768767373506413
+
+100%|██████████| 1/1 [00:06<00:00,  6.92s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.92s/it]
+！听着不清（0.8，试了 3 次）：At 99 percent per step, the whole is about 90 percent. → at 99% per step. The whole is about 90%.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:43,242 INFO synthesis text For ninety percent unattended over ten steps you need about ninety-eight.ninety-five percent per step.
+2026-11-09 03:00:47,644 INFO yield speech len 7.84, rtf 0.5614799808482734
+
+100%|██████████| 1/1 [00:04<00:00,  4.58s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.58s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:48,187 INFO synthesis text For ninety percent unattended over ten steps you need about ninety-eight.ninety-five percent per step.
+2026-11-09 03:00:53,174 INFO yield speech len 9.4, rtf 0.5304672616593381
+
+100%|██████████| 1/1 [00:05<00:00,  5.16s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.16s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:53,733 INFO synthesis text For ninety percent unattended over ten steps you need about ninety-eight.ninety-five percent per step.
+2026-11-09 03:00:59,067 INFO yield speech len 9.72, rtf 0.5488050817952724
+
+100%|██████████| 1/1 [00:05<00:00,  5.51s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.51s/it]
+！听着不清（0.81，试了 3 次）：For 90 percent unattended over ten steps you need about 98.9 → For 90%, unattended over 10 steps, you need about 98% and 95
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:00:59,651 INFO synthesis text A respectable-looking ninety-seven falls short once you multiply.
+2026-11-09 03:01:02,767 INFO yield speech len 5.84, rtf 0.5334818199889301
+
+100%|██████████| 1/1 [00:03<00:00,  3.29s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.29s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:01:03,071 WARNING synthesis text Now the interventions. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-09 03:01:03,198 INFO synthesis text Now the interventions.
+2026-11-09 03:01:04,965 INFO yield speech len 2.72, rtf 0.6496981662862441
+
+100%|██████████| 1/1 [00:01<00:00,  1.94s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.94s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:01:05,314 INFO synthesis text Expected failures per piece are n times one minus p, over p: ten steps at ninety-seven percent gives about zero.thirty-one.
+2026-11-09 03:01:11,160 INFO yield speech len 11.2, rtf 0.5220303790909904
+
+100%|██████████| 1/1 [00:06<00:00,  6.02s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.02s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:01:11,831 INFO synthesis text Expected failures per piece are n times one minus p, over p: ten steps at ninety-seven percent gives about zero.thirty-one.
+2026-11-09 03:01:19,027 INFO yield speech len 13.72, rtf 0.5245193621855088
+
+100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+100%|██████████| 1/1 [00:07<00:00,  7.37s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:01:19,699 INFO synthesis text Expected failures per piece are n times one minus p, over p: ten steps at ninety-seven percent gives about zero.thirty-one.
+2026-11-09 03:01:25,503 INFO yield speech len 11.08, rtf 0.523816334211439
+
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.98s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:01:26,119 INFO synthesis text With eight-second steps and thirty seconds of human fixing per failure plus a redo, the cycle is about ninety-two seconds, about thirty-nine pieces an hour, and about twelve.one interventions an hour: someone has to walk over every five minutes, so a person can't leave the robot.
+2026-11-09 03:02:12,560 INFO yield speech len 9.0, rtf 0.5275198353661431
+
+100%|██████████| 1/1 [00:04<00:00,  4.92s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:13,197 INFO synthesis text When a gripper pushes a wire into a connector, the unsupported length of wire is a slender column clamped at one end.
+2026-11-09 03:02:18,098 INFO yield speech len 9.4, rtf 0.5213652773106352
+
+100%|██████████| 1/1 [00:05<00:00,  5.08s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:18,825 INFO synthesis text The critical force goes inversely with the square of that length, so gripping twice as close to the tip lets you push four times harder.
+2026-11-09 03:02:24,204 INFO yield speech len 10.48, rtf 0.5132921096932797
+
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.55s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:24,906 INFO synthesis text That's why harness robots grip near the tip and push in several short strokes, or pull instead.
+2026-11-09 03:02:29,168 INFO yield speech len 8.04, rtf 0.5300414799457759
+
+100%|██████████| 1/1 [00:04<00:00,  4.44s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.44s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:29,746 INFO synthesis text And the p-to-the-n rule applies to bin picking too: recognition, grasping, pose correction and placing, each success rate multiplied.
+2026-11-09 03:02:40,306 INFO yield speech len 0.76, rtf 1.198883433091013
+
+100%|██████████| 1/1 [00:01<00:00,  1.09s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.09s/it]
+！听着不清（0.706，试了 3 次）：Try it at home. → at home.
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:40,662 INFO synthesis text Pull a towel by one corner and it slides flat across the table after you; push it from behind and it bunches up at once.
+2026-11-09 03:02:44,918 INFO yield speech len 8.04, rtf 0.5292873477461326
+
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+100%|██████████| 1/1 [00:04<00:00,  4.43s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:45,645 INFO synthesis text That's the buckling formula we just saw: cloth's bending rigidity is so small that it arches before the push reaches a fraction of its weight.
+2026-11-09 03:02:51,790 INFO yield speech len 11.88, rtf 0.5172852313879764
+
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.33s/it]
+cv2: 160/190 句，用时 36.4 分钟，预计还要 6.8 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:52,506 INFO synthesis text And it's why a sewing machine's feed dog drags the fabric from underneath instead of pushing it from behind.
+2026-11-09 03:02:57,424 INFO yield speech len 9.28, rtf 0.5300379004971735
+
+100%|██████████| 1/1 [00:05<00:00,  5.09s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.09s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:57,872 WARNING synthesis text Back to our problem. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-09 03:02:57,998 INFO synthesis text Back to our problem.
+2026-11-09 03:02:59,130 INFO yield speech len 1.48, rtf 0.76505590129543
+
+100%|██████████| 1/1 [00:01<00:00,  1.30s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.30s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:02:59,406 WARNING synthesis text Back to our problem. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-09 03:02:59,534 INFO synthesis text Back to our problem.
+2026-11-09 03:03:01,157 INFO yield speech len 2.56, rtf 0.6338999606668949
+
+100%|██████████| 1/1 [00:01<00:00,  1.80s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.80s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:03:01,547 INFO synthesis text The chance the whole sequence runs unattended is zero.ninety-seven to the tenth, about seventy-three.seven percent: one piece in four needs a person.
+2026-11-09 03:03:10,218 INFO yield speech len 16.12, rtf 0.5379132390318082
+
+100%|██████████| 1/1 [00:08<00:00,  8.85s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.85s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:03:10,977 INFO synthesis text The chance the whole sequence runs unattended is zero.ninety-seven to the tenth, about seventy-three.seven percent: one piece in four needs a person.
+2026-11-09 03:03:20,429 INFO yield speech len 15.12, rtf 0.62513047109836
+
+100%|██████████| 1/1 [00:09<00:00,  9.66s/it]
+100%|██████████| 1/1 [00:09<00:00,  9.66s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:03:21,490 INFO synthesis text The chance the whole sequence runs unattended is zero.ninety-seven to the tenth, about seventy-three.seven percent: one piece in four needs a person.
+2026-11-09 03:03:31,878 INFO yield speech len 14.2, rtf 0.7315187890764694
+
+100%|██████████| 1/1 [00:10<00:00, 10.59s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.59s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:03:32,679 INFO synthesis text Expected failures are about zero.thirty-one a piece, the cycle about ninety-two seconds, output about thirty-nine an hour, and about twelve interventions an hour.
+
+100%|██████████| 2/2 [00:18<00:00,  8.93s/it]
+100%|██████████| 2/2 [00:18<00:00,  9.36s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-11-09 03:04:52,259 INFO synthesis text Now Virtual lab thirty-one, soft fabric and robots, which you can do yourself on WenQuest. The checks, the payback chart and the tasks are blurred. Page one, how soft is fabric: pick the four fabrics, card and steel in turn from the material list, with a ten-centimetre overhang.
+2026-11-09 03:05:04,332 INFO yield speech len 23.2, rtf 0.5204070231010174
+
+ 50%|█████     | 1/2 [00:12<00:12, 12.26s/it]2026-11-09 03:05:04,521 INFO synthesis text  Watch the orange line go from hanging straight down to barely moving, and record each material's rigidity, chord angle and the force that buckles a strip.
+2026-11-09 03:05:12,033 INFO yield speech len 14.56, rtf 0.5159817062891446
+
+100%|██████████| 2/2 [00:19<00:00,  9.57s/it]
+100%|██████████| 2/2 [00:19<00:00,  9.97s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:05:13,635 INFO synthesis text Back on shirting poplin, drag only the weight and see whether the droop changes; then drag only the bending length, and compare which one matters.
+2026-11-09 03:05:20,249 INFO yield speech len 12.8, rtf 0.5167136900126934
+
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.79s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:05:21,006 INFO synthesis text Tasks one and two are on this page too: one asks you to bring the chord angle under ten degrees and work out how much stiffer that is; the other changes the strip width, checks the push-to-weight ratio, and finds the bending length at which you can push.
+2026-11-09 03:05:31,019 INFO yield speech len 19.52, rtf 0.5129634479030234
+
+100%|██████████| 1/1 [00:10<00:00, 10.20s/it]
+100%|██████████| 1/1 [00:10<00:00, 10.20s/it]
+cv2: 170/190 句，用时 39.1 分钟，预计还要 4.6 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:05:32,087 INFO synthesis text Page two is the robot workflow. Start from ten steps at ninety-seven percent and record unattended rate, interventions and output per hour, and payback. Task three asks for the lowest per-step success that reaches ninety percent unattended.
+
+100%|██████████| 1/1 [00:08<00:00,  8.92s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:06:24,514 INFO synthesis text Task four keeps two shifts, at most ninety-seven percent and at least ten steps, and asks you to tune price, wage or step time until payback is twenty-four months or less; then try three shifts.
+2026-11-09 03:06:33,237 INFO yield speech len 17.36, rtf 0.5025199069405482
+
+100%|██████████| 1/1 [00:08<00:00,  8.91s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.91s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:06:34,161 INFO synthesis text Page three is the direct-drive energy account. Record the plant's annual use, saving and emissions at the defaults, then change the running hours; task five asks for a set saving per machine. The guide and report template are on the platform.
+2026-11-09 03:06:51,088 INFO yield speech len 6.84, rtf 0.5476050558145981
+
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.92s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:06:51,553 INFO synthesis text You can open the interactive slides and the soft-fabric lab and work them yourself, including the pages this video skipped.
+2026-11-09 03:06:57,063 INFO yield speech len 10.68, rtf 0.5158500501725558
+
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+100%|██████████| 1/1 [00:05<00:00,  5.68s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:06:57,687 INFO synthesis text You submit the assignment and the lab report on the platform, and get marks and comments back.
+2026-11-09 03:07:01,410 INFO yield speech len 6.92, rtf 0.53797595073722
+
+100%|██████████| 1/1 [00:03<00:00,  3.89s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.89s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:07:01,921 INFO synthesis text Questions go to the discussion forum, and the grades page shows every mark.
+2026-11-09 03:07:05,496 INFO yield speech len 6.56, rtf 0.5449456412617754
+
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.75s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-11-09 03:07:06,021 INFO synthesis text The assignment has three questions. One: a factory has three hundred lockstitch machines, each running three thousand hours a year; clutch motors average zero.forty-five kilowatts and servos zero.twenty-five, power costs zero.seven yuan a kilowatt-hour, and each retrofit costs five hundred yuan.
+2026-11-09 03:07:17,714 INFO yield speech len 23.28, rtf 0.5022628610486427
+
+ 50%|█████     | 1/2 [00:11<00:11, 11.88s/it]2026-11-09 03:07:17,899 INFO synthesis text  Find the annual energy and cost saving, the payback, and the annual COtwo reduction at zero.fifty-seven kilograms per kilowatt-hour.
+2026-11-09 03:07:24,340 INFO yield speech len 12.32, rtf 0.5227903654048969
+
+100%|██████████| 2/2 [00:18<00:00,  8.78s/it]
+100%|██████████| 2/2 [00:18<00:00,  9.25s/it]
+
+  0%|          | 0/2 [00:00<?, ?it/s]2026-11-09 03:07:25,797 INFO synthesis text The assignment has three questions. One: a factory has three hundred lockstitch machines, each running three thousand hours a year; clutch motors average zero.forty-five kilowatts and servos zero.twenty-five, power costs zero.seven yuan a kilowatt-hour, and each retrofit costs five hundred yuan.
+
+100%|██████████| 1/1 [00:13<00:00, 13.63s/it]
+100%|██████████| 1/1 [00:13<00:00, 13.63s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:08:35,361 INFO synthesis text Three: a vendor proposes eight-step robot loading at ninety-eight percent per step, everything else as in this lecture. Find the unattended rate, interventions per hour and payback, and the per-step rate needed for ninety-five percent unattended. Then list the data you'd still ask the vendor for, and recommend whether to pilot it.
+2026-11-09 03:08:59,907 INFO yield speech len 25.2, rtf 0.5031487771442958
+
+100%|██████████| 1/1 [00:12<00:00, 12.87s/it]
+100%|██████████| 1/1 [00:12<00:00, 12.87s/it]
+cv2: 180/190 句，用时 42.6 分钟，预计还要 2.4 分钟
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:01,098 INFO synthesis text Submit the assignment and the lab report on the WenQuest platform.
+2026-11-09 03:09:04,285 INFO yield speech len 5.6, rtf 0.5690859471048628
+
+100%|██████████| 1/1 [00:03<00:00,  3.38s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.38s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:04,797 INFO synthesis text Submit the assignment and the lab report on the WenQuest platform.
+2026-11-09 03:09:07,697 INFO yield speech len 5.12, rtf 0.566514115780592
+
+100%|██████████| 1/1 [00:03<00:00,  3.08s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.08s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:08,192 INFO synthesis text There's also a ten-question quiz. For example: two fabrics weigh the same per square metre, and A's bending length is twice B's. How many times stiffer is A?
+2026-11-09 03:09:15,010 INFO yield speech len 13.0, rtf 0.524476748246413
+
+100%|██████████| 1/1 [00:06<00:00,  6.99s/it]
+100%|██████████| 1/1 [00:06<00:00,  6.99s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:15,985 INFO synthesis text Or true or false: for the same fabric, doubling only the weight while keeping the bending length leaves the droop and chord angle at a ten-centimetre overhang unchanged.
+2026-11-09 03:09:24,035 INFO yield speech len 12.76, rtf 0.63083846367265
+
+100%|██████████| 1/1 [00:08<00:00,  8.24s/it]
+100%|██████████| 1/1 [00:08<00:00,  8.24s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:24,945 INFO synthesis text You get three attempts, and the explanations appear as soon as you submit.
+2026-11-09 03:09:28,265 INFO yield speech len 5.6, rtf 0.5929681232997349
+
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+100%|██████████| 1/1 [00:03<00:00,  3.53s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:28,616 WARNING synthesis text Three things to remember. too short than prompt text real and its eigenvectors are perpendicular, so it can be written as Q Lambda Q transpose:, this may lead to bad performance
+2026-11-09 03:09:28,745 INFO synthesis text Three things to remember.
+2026-11-09 03:09:29,806 INFO yield speech len 1.36, rtf 0.7801359190660364
+
+100%|██████████| 1/1 [00:01<00:00,  1.23s/it]
+100%|██████████| 1/1 [00:01<00:00,  1.23s/it]
+
+  0%|          | 0/1 [00:00<?, ?it/s]2026-11-09 03:09:30,261 INFO synthesis text One: servo direct drive is the most mature trend; annual saving is machines times running hours times the power difference, so the more idle time the better.
+2026-11-09 03:10:32,178 DEBUG Attempting to acquire lock 133657867927312 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-11-09 03:10:32,178 DEBUG Lock 133657867927312 acquired on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-11-09 03:10:32,178 DEBUG Attempting to release lock 133657867927312 on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+2026-11-09 03:10:32,178 DEBUG Lock 133657867927312 released on /home/ubuntu/.triton/autotune/Fp16Matmul_4d_kernel.pickle.lock
+GPU 机器已关机，用时 54 分钟
