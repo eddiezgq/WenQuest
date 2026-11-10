@@ -212,22 +212,22 @@ def kinematic():
 
     # ---- 右：前视传动示意（X–Z）
     b = bx
-    xe, xb = 150.0, 232.0                                                  # 送布偏心、同步带
+    xe, xb = S.X_FEED_E, S.X_BELT                                          # 送布偏心、同步带
     b.plot([-22, S.X_HAND], [ZU, ZU], color=INK, lw=3.4, solid_capstyle="butt", zorder=3)
-    b.plot([-8, 330], [S.ZL, S.ZL], color=INK, lw=3.4, solid_capstyle="butt", zorder=3)
+    b.plot([-8, S.X_BELT + 20], [S.ZL, S.ZL], color=INK, lw=3.4, solid_capstyle="butt", zorder=3)
     b.plot([-30, 18], [S.ZH, S.ZH], color=BLU, lw=3.4, solid_capstyle="butt", zorder=3)
-    for x in (12, 120, 300):
+    for x in S.X_BRG:
         bushing(b, x, ZU, 3.4, 14, vertical=False)
-    for x in (44, 200, 312):
+    for x in (44, 200, S.X_BELT + 12):
         bushing(b, x, S.ZL, 3.4, 14, vertical=False)
     bushing(b, 8, S.ZH, 3.4, 12, vertical=False)
     # 刺布：曲柄在上轴左端，针杆在 x = 0
-    b.add_patch(Rectangle((-22, ZU - r - 4), 8, 2 * r + 8, fc="#cfd8df", ec=INK, lw=0.9, zorder=4))
+    b.add_patch(Rectangle((-26, ZU - r - 4), 8, 2 * r + 8, fc="#cfd8df", ec=INK, lw=0.9, zorder=4))
     b.plot([-18, 0], [ZU - r, ZU - r - l + 8], color=INK, lw=2.2, zorder=4)
     b.add_patch(Rectangle((-3, 20), 6, ZU - r - l + 8 - 20, fc="#dfe5ea", ec=INK, lw=0.9, zorder=4))
     b.plot([0, 0], [20, 3], color=INK, lw=1.4)
     # 挑线曲柄（同在左端，挑线杆向前伸出）
-    b.add_patch(Circle((-10, ZU), 6, fc="white", ec=GRN, lw=1.4, zorder=5))
+    b.add_patch(Circle((S.X_TAKEUP, ZU), 6, fc="white", ec=GRN, lw=1.4, zorder=5))
     # 同步带 1:1
     for z in (ZU, S.ZL):
         b.add_patch(Rectangle((xb - 5, z - 15), 10, 30, fc="#cfd8df", ec=INK, lw=0.9, zorder=4))
@@ -248,13 +248,13 @@ def kinematic():
     # 电机
     b.add_patch(FancyBboxPatch((S.X_HAND - 34, ZU - 40), 44, 80, boxstyle="round,pad=2", fc="#2b3440", ec=INK, zorder=4))
     b.axhline(0, color=INK, lw=1.4)
-    lbl = [((-18, ZU + r + 4), "刺布曲柄", (-60, ZU + 46), INK), ((-10, ZU + 6), "挑线曲柄", (-14, ZU + 62), GRN),
-           ((60, ZU), "上轴", (60, ZU + 30), INK), ((xe, ZU + 11), "送布偏心 + 针距调节器", (110, ZU + 46), INK),
-           ((xb, (ZU + S.ZL) / 2), "同步带 1 : 1", (xb + 34, (ZU + S.ZL) / 2), INK),
+    lbl = [((-18, ZU + r + 4), "刺布曲柄", (-60, ZU + 46), INK), ((S.X_TAKEUP, ZU + 6), "挑线曲柄", (S.X_TAKEUP - 4, ZU + 62), GRN),
+           ((80, ZU), "上轴", (80, ZU + 30), INK), ((xe, ZU + 11), "送布偏心 + 针距调节器", (xe - 40, ZU + 46), INK),
+           ((xb, (ZU + S.ZL) / 2), "同步带 1 : 1（在立柱里）", (xb - 140, (ZU + S.ZL) / 2), INK),
            ((S.X_HAND - 12, ZU + 40), "直驱伺服电机（手轮内）", (S.X_HAND - 60, ZU + 62), INK),
            ((0, 60), "针杆", (40, 70), INK), ((-1, -1), "送布牙", (-62, 22), INK),
            ((-36, S.ZH - 11), "旋梭", (-70, S.ZH - 32), BLU), ((25, S.ZL - 12), "齿轮 1 : 2", (20, S.ZL - 62), INK),
-           ((90, S.ZL + 7), "抬牙偏心（下轴）", (112, -15), INK), ((250, S.ZL), "下轴", (262, S.ZL + 18), INK),
+           ((90, S.ZL + 7), "抬牙偏心（下轴）", (112, -15), INK), ((250, S.ZL), "下轴", (262, S.ZL + 18), INK), ((S.X_BRG[0], ZU - 7), "6201", (S.X_BRG[0] + 18, ZU - 30), INK), ((S.X_BRG[1], ZU - 7), "6201", (S.X_BRG[1] - 30, ZU - 30), INK),
            ((160, S.ZL - 26), "送布摆轴", (190, S.ZL - 40), MUTE), ((100, S.ZL - 40), "抬牙摆轴", (130, S.ZL - 58), MUTE),
            ((380, 0), "台面", (395, 12), INK)]
     for xy, t_, xt, col in lbl:
