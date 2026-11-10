@@ -33,6 +33,10 @@ WALL = float(os.environ.get("WQ_WALL", 8.0))
 ARM_Y = (-46.0, 70.0)          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 5.0))
+BEDWALL = float(os.environ.get("WQ_BEDWALL", 8.0))
+ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 0.0))
+ROOT_X = float(os.environ.get("WQ_ROOTX", 190.0))
+BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 62.0))       # 机座纵筋高（从机座顶面往下）
 RIB_T = 7.0
 RIB_X = (75.0, 150.0, 225.0)
 S_BELT_X = 352.0
@@ -40,8 +44,8 @@ ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿�
 
 ZU = 200.0
 BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, z0=-62.0)
-PIL = dict(x0=300.0, x1=396.0, y0=-60.0, y1=90.0)
-HEAD = dict(x0=-62.0, x1=52.0, y0=-52.0, y1=70.0, z0=46.0)
+PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -60.0)), y1=float(os.environ.get("WQ_PY1", 90.0)))
+HEAD = dict(x0=-62.0, x1=52.0, y0=float(os.environ.get("WQ_HY0", -52.0)), y1=70.0, z0=46.0)
 
 
 # ---------------------------------------------------------------- 截面
@@ -191,7 +195,8 @@ def casting():
     info = {"body_valid": body.isValid()}
     # 除了坐在机座上的底边，全部倒圆（或倒角），从大到小试
     es = [e for e in body.Edges if not (abs(e.BoundBox.ZMax) < 1e-6)]
-    for r in (*P["edge"], 5, 4, 3):
+    radii = () if os.environ.get("WQ_NOEDGE") else (*P["edge"], 5, 4, 3)   # 有限元用的简化模型不倒外圆角（常规做法，对刚度影响很小）
+    for r in radii:
         try:
             b2 = body.makeChamfer(r, es) if ch else body.makeFillet(r, es)
             if b2.isValid():
@@ -221,8 +226,19 @@ def casting():
     ct = Part.Face(plan(WALL)).extrude(V(0, 0, zhi - zlo))
     ct.translate(V(0, 0, zlo))
     cav = cf.common(ct)
-    bcav = Part.makeBox(BED["x1"] - BED["x0"] - 2 * WALL, BED["y1"] - BED["y0"] - 2 * WALL, -BED["z0"] - WALL + 1,
-                        V(BED["x0"] + WALL, BED["y0"] + WALL, BED["z0"] - 1))
+    # 根部加厚：立柱和机臂靠立柱一段（x ≥ ROOT_X）弯矩最大，壁厚 ROOTWALL；其余 WALL。内腔在 ROOT_X 处分两段，一次挖出
+    if ROOTWALL > WALL:
+        rf = Part.Face(outline(ROOTWALL)).extrude(V(0, 300, 0))
+        rf.translate(V(0, -150, 0))
+        rt = Part.Face(plan(ROOTWALL)).extrude(V(0, 0, zhi - zlo))
+        rt.translate(V(0, 0, zlo))
+        left = Part.makeBox(600, 400, 400, V(ROOT_X - 600, -200, -50))
+        right = Part.makeBox(600, 400, 400, V(ROOT_X, -200, -50))
+        cav = cav.common(left).fuse(rf.common(rt).common(right)).removeSplitter()
+        info["rootwall"] = ROOTWALL
+    bw = BEDWALL
+    bcav = Part.makeBox(BED["x1"] - BED["x0"] - 2 * bw, BED["y1"] - BED["y0"] - 2 * bw, -BED["z0"] - bw + 1,
+                        V(BED["x0"] + bw, BED["y0"] + bw, BED["z0"] - 1))
     hollow = solid.cut(cav).cut(bcav)
     # 机头壁薄一些（机头在悬臂端，越轻固有频率越高）：机头区域按 HEADWALL 再挖一次
     if HEADWALL < WALL:
@@ -249,7 +265,7 @@ def casting():
             slot = Part.makeBox(34, 60, RIB_T + 2, V(S_BELT_X - 17, -30, z - 1)).fuse(Part.makeCylinder(10, RIB_T + 2, V(330, 45, z - 1), V(0, 0, 1)))
             rb.append(sl.common(cav).cut(slot))
         for y in (-20.0, 50.0):
-            sl = Part.makeBox(BED["x1"] - 80, RIB_T, -BED["z0"], V(80, y - RIB_T / 2, BED["z0"]))
+            sl = Part.makeBox(BED["x1"] - 80, RIB_T, BED_RIB_H, V(80, y - RIB_T / 2, -BED_RIB_H))
             rb.append(sl.common(bcav))
         for x in (PIL["x0"], PIL["x1"] - RIB_T):
             sl = Part.makeBox(RIB_T, BED["y1"] - BED["y0"], -BED["z0"], V(x, BED["y0"], BED["z0"]))
