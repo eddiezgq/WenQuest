@@ -601,6 +601,18 @@ def eto(teacher):
     check(any(x.get("production_item") == jn for x in wos), "ERPNext 里有作业 {} 的工单（{}）".format(jn, "、".join(x["name"] for x in wos)))
     sc = hub("GET", "/api/eto/jobs/{}/schedule".format(jn), token=sales)                     # 139d
     check(sc["make"] and sc["earliest"] and "slack_days" in sc and sc["load"]["rows"], "倒排：最早 {} 能交，松紧 {} 个工作日".format(sc["earliest"], sc["slack_days"]))
+    # 139e：作业的工单下达车间 → 仿真车间报工 → 作业成本有实际工序
+    shop = hub("GET", "/api/eto/jobs/{}/shop".format(jn), token=sales)
+    top = next((w for w in shop["work_orders"] if w["item"] == jn), None)
+    check(top is not None and top["current_design"], "作业工单 {} 用的是发布的那一版物料清单".format((top or {}).get("name")))
+    if top:
+        planner = login("测试计划员", "planner")
+        q = hub("POST", "/api/eto/jobs/{}/release".format(jn), {"work_order": top["name"]}, planner)
+        hub("POST", "/api/proposals/{}/confirm".format(q["proposal_id"]), token=planner)
+        c = wait(lambda: (lambda x: x if x["cost"]["actual"]["operations"] > 0 else None)(
+            hub("GET", "/api/eto/jobs/{}/shop".format(jn), token=sales)), "车间报工计入作业成本", 600, 5)
+        check(c is not None, "作业成本：实际工序 ${}（估算 ${}）".format((c or {}).get("cost", {}).get("actual", {}).get("operations"),
+                                                               ((c or {}).get("cost", {}).get("estimate") or {}).get("operations")))
 
 
 def safety(teacher):

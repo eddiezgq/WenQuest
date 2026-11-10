@@ -124,6 +124,8 @@ class Hub:
         from hub import eto_design as _ETOD
         _ETO.init(self.db)
         _ETOD.init(self.db)
+        from hub import eto_exec as _ETOX
+        _ETOX.init(self.db)
         _ETOD.load_all(self.db)
         self.bus = Bus("wq-hub-" + secrets.token_hex(3))
         self.ai = Assistant(self.db, self.publish)
@@ -2296,6 +2298,8 @@ def reset_teach(by, speed=1.0, scores=False):
     from hub import eto as _ETO                           # 第 139 轮：按单设计的作业、估算、设计随情景清空
     from hub import eto_design as _ETOD
     _ETOD.reset(H.db, "teach")
+    from hub import eto_exec as _ETOX
+    _ETOX.reset(H.db, "teach")
     _ETO.reset(H.db, "teach")
     if scores:
         H.db.x("delete from task_result")

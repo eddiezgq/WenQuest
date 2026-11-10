@@ -46,6 +46,7 @@ export const BATCH2 = [
   'components/EtoDesign.vue',
   'components/EtoMaterials.vue',
   'components/EtoPlan.vue',
+  'components/EtoShop.vue',
   'pages/WaferMap.vue',
   'pages/EncCurve.vue',
   'pages/MotorWave.vue',

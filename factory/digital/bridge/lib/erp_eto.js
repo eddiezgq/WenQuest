@@ -159,4 +159,15 @@ module.exports = ({ WH }) => ({
     await etoRequest.call(this, company, pv.job.project || pv.job.job_no, pv.material_requests, { out, created, opt }, WH);
   },
 
+
+  async eto_hours(pv, { out, created, opt }) {
+    const company = await this.getCompany();
+    const act = '设计 Engineering';
+    if (!(await this.list('Activity Type', [['name', '=', act]])).length) await this.insert('Activity Type', { activity_type: act });
+    const ts = await this.insert('Timesheet', { company, parent_project: pv.job.project, note: pv.note || '',
+      time_logs: [{ activity_type: act, hours: pv.hours, from_time: `${pv.day} 09:00:00`, project: pv.job.project,
+        description: `${pv.who}：${pv.note || '设计'}` }], docstatus: 1 });
+    out.push(this.doc('Timesheet', ts, 'submitted', opt));
+    created.push(['Timesheet', ts.name]);
+  },
 });
