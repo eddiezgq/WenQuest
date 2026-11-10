@@ -170,4 +170,35 @@ module.exports = ({ WH }) => ({
     out.push(this.doc('Timesheet', ts, 'submitted', opt));
     created.push(['Timesheet', ts.name]);
   },
+
+  // 检验记录 → ERPNext 质量检验单（挂这张工单最后一道工序的作业卡）
+  async eto_inspection(pv, { out, created, opt }) {
+    for (const r of pv.readings) {
+      if (!(await this.list('Quality Inspection Parameter', [['name', '=', r.spec]], ['name'])).length) {
+        await this.insert('Quality Inspection Parameter', { parameter: r.spec });
+      }
+    }
+    const jc = await this.jobCard(pv.work_order, pv.operation);
+    if (!jc) throw new Error(`工单 ${pv.work_order} 的工序 ${pv.operation} 没有作业卡（工单下达车间了吗？）`);
+    const qi = await this.insert('Quality Inspection', { report_date: pv.day, inspection_type: 'In Process', reference_type: 'Job Card',
+      reference_name: jc, item_code: pv.item, sample_size: 1, inspected_by: 'Administrator', manual_inspection: 1,
+      status: pv.result === 'pass' ? 'Accepted' : 'Rejected',
+      remarks: `作业 ${pv.job.job_no} ${pv.kind === 'fai' ? '首件检验' : '终检'} 第 ${pv.piece} 件，检验员 ${pv.inspector}（问渠数字工厂）`,
+      readings: pv.readings.map((r) => ({ specification: r.spec, numeric: 1, manual_inspection: 1, min_value: r.lo, max_value: r.hi,
+        reading_1: r.value === null ? '' : String(r.value), status: r.result === 'pass' ? 'Accepted' : 'Rejected' })),
+      docstatus: 1 });
+    out.push(this.doc('Quality Inspection', qi, 'submitted', opt));
+    created.push(['Quality Inspection', qi.name]);
+  },
+
+  // 发货：按销售订单生成发货单，发这一单的件数（终检合格的关口在平台上判过）
+  async eto_ship(pv, { out, created, opt }) {
+    const draft = await this.method('erpnext.selling.doctype.sales_order.sales_order.make_delivery_note', { source_name: pv.sales_order });
+    draft.items = (draft.items || []).filter((i) => i.item_code === pv.job.job_no).map((i) => ({ ...i, qty: pv.qty }));
+    if (!draft.items.length) throw new Error(`销售订单 ${pv.sales_order} 上没有 ${pv.job.job_no} 待发`);
+    delete draft.__islocal;
+    const dn = await this.insert('Delivery Note', { ...draft, remarks: `作业 ${pv.job.job_no}：终检合格 ${pv.qty} 件，合格证见问渠数字工厂`, docstatus: 1 });
+    out.push(this.doc('Delivery Note', dn, 'submitted', opt));
+    created.push(['Delivery Note', dn.name]);
+  },
 });

@@ -126,6 +126,8 @@ class Hub:
         _ETOD.init(self.db)
         from hub import eto_exec as _ETOX
         _ETOX.init(self.db)
+        from hub import eto_quality as _ETOQ
+        _ETOQ.init(self.db)
         _ETOD.load_all(self.db)
         self.bus = Bus("wq-hub-" + secrets.token_hex(3))
         self.ai = Assistant(self.db, self.publish)
@@ -2300,6 +2302,8 @@ def reset_teach(by, speed=1.0, scores=False):
     _ETOD.reset(H.db, "teach")
     from hub import eto_exec as _ETOX
     _ETOX.reset(H.db, "teach")
+    from hub import eto_quality as _ETOQ
+    _ETOQ.reset(H.db, "teach")
     _ETO.reset(H.db, "teach")
     if scores:
         H.db.x("delete from task_result")
