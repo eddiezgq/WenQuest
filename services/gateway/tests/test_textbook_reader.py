@@ -46,7 +46,7 @@ def test_reading_and_pdf_rules(client, tmp_path):
     assert client.get("/api/v1/textbooks").status_code == 401                      # signed in only
     h, hs = login(client), student(client)
     books = client.get("/api/v1/textbooks", headers=hs).json()["books"]
-    assert books == [{"book": "robotics", "title": "机器人学", "chapters": 1, "sections": 3, "written": 2}]
+    assert books == [{"book": "robotics", "title": "机器人学", "title_en": "", "chapters": 1, "sections": 3, "written": 2}]
     idx = client.get("/api/v1/textbooks/robotics", headers=hs).json()
     assert not idx["teacher"] and idx["pdf"] == []
     s = client.get("/api/v1/textbooks/robotics/sections/4.1", headers=hs).json()

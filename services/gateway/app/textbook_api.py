@@ -188,7 +188,7 @@ def register(app, m) -> None:
             for d in sorted(root().iterdir()):
                 if (d / "web" / "index.json").exists() and BOOK.match(d.name):
                     idx = index(d.name)
-                    out.append({"book": d.name, "title": idx.get("title", d.name), "chapters": len(idx["chapters"]),
+                    out.append({"book": d.name, "title": idx.get("title", d.name), "title_en": idx.get("title_en", ""), "chapters": len(idx["chapters"]),
                                 "sections": sum(len(c["sections"]) for c in idx["chapters"]), "written": len(written(idx))})
                 elif (d / "webed" / "book.json").exists() and BOOK.match(d.name):      # 网页版（第 15 轮）
                     w = json.loads((d / "webed" / "book.json").read_text(encoding="utf-8"))
