@@ -1058,6 +1058,10 @@ function summarize(doctype, d) {
     case 'Quotation':
       return { ...pick(['quotation_to', 'party_name', 'status', 'docstatus', 'valid_till', 'grand_total', 'total', 'opportunity', 'transaction_date', 'wq_job']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, rate: i.rate })) };
+    case 'Delivery Note':               // 第 139 轮：按单设计发货
+      return { ...pick(['customer', 'status', 'docstatus', 'posting_date', 'grand_total']),
+        sales_orders: [...new Set((d.items || []).map((i) => i.against_sales_order).filter(Boolean))],
+        items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty })) };
     case 'BOM':                         // 第 139 轮：按单设计的物料清单带设计指纹
       return pick(['item', 'is_default', 'is_active', 'docstatus', 'wq_fingerprint', 'project']);
     case 'Timesheet':

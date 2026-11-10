@@ -80,11 +80,13 @@
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'mat'" :class="{ on: tab === 'mat' }" @click="tab = 'mat'">{{ $t('物料') }}</button>
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'plan'" :class="{ on: tab === 'plan' }" @click="tab = 'plan'">{{ $t('计划') }}</button>
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'shop'" :class="{ on: tab === 'shop' }" @click="tab = 'shop'">{{ $t('车间与成本') }}</button>
+          <button role="tab" :aria-selected="tab === 'qual'" :class="{ on: tab === 'qual' }" @click="tab = 'qual'">{{ $t('图纸与质量') }}</button>
         </div>
         <EtoDesign v-if="tab === 'design'" :job="d.job" :ops="ops" :items="allItems" :suppliers="suppliers" @changed="open(sel)" />
         <EtoMaterials v-else-if="tab === 'mat'" :job="d.job" @changed="open(sel)" />
         <EtoPlan v-else-if="tab === 'plan'" :job="d.job" />
         <EtoShop v-else-if="tab === 'shop'" :job="d.job" />
+        <EtoQuality v-else-if="tab === 'qual'" :job="d.job" @changed="open(sel)" />
         <template v-else>
         <div class="tools">
           <span class="muted small">{{ d.estimate ? $t('第 {r} 版估算', { r: d.estimate.rev }) : $t('还没有估算') }}
@@ -144,10 +146,11 @@ import EtoDesign from '../components/EtoDesign.vue';
 import EtoMaterials from '../components/EtoMaterials.vue';
 import EtoPlan from '../components/EtoPlan.vue';
 import EtoShop from '../components/EtoShop.vue';
+import EtoQuality from '../components/EtoQuality.vue';
 
 const KINDS = ['material', 'buyout', 'operation', 'outside', 'engineering'];
 const KIND_ZH = { material: tk('材料'), buyout: tk('外购件'), operation: tk('工序'), outside: tk('外协'), engineering: tk('设计') };
-const STATUS = { estimating: tk('估算中'), quoting: tk('报价待确认'), quoted: tk('已报价'), ordered: tk('已接单') };
+const STATUS = { estimating: tk('估算中'), quoting: tk('报价待确认'), quoted: tk('已报价'), ordered: tk('已接单'), shipped: tk('已发货') };
 const CATS = [['material', tk('材料与外购件')], ['operations', tk('工序')], ['outside', tk('外协')], ['engineering', tk('设计（一次性）')]];
 const FIELDS = { material: ['qty_per', 'unit_price'], buyout: ['qty_per', 'unit_price'], operation: ['setup_min', 'run_min'],
   outside: ['unit_price'], engineering: ['hours'] };
@@ -188,7 +191,7 @@ const quoteHint = computed(() => {
 });
 const money = (x) => (x === null || x === undefined ? '—' : '$' + Number(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 const fmtTime = (s) => new Date(s).toLocaleString(loc(), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-const tone = (s) => ({ estimating: 'info', quoting: 'warn', quoted: 'good', ordered: 'good' }[s] || 'mute');
+const tone = (s) => ({ estimating: 'info', quoting: 'warn', quoted: 'good', ordered: 'good', shipped: 'good' }[s] || 'mute');
 const has = (ln, f) => (FIELDS[ln.kind] || []).includes(f);
 const rowErr = (i) => !dirty.value && (res.value.lines?.[i]?.errors || []).length > 0;
 const rowMiss = (i) => !dirty.value && (res.value.lines?.[i]?.missing || []).length > 0;

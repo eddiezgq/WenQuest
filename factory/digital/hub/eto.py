@@ -298,8 +298,8 @@ def draft(llm, job):
             "engineering 行写设计、出图、编程的工时；外协（outside）只写说明。拿不准的写进 note 请估算员核对，不要编数据。\n"
             "本厂工序表：{}\n物料表（原材料、外购件）：{}\n现有产品：{}".format(
                 json.dumps(ops, ensure_ascii=False), json.dumps(items, ensure_ascii=False), json.dumps(prods, ensure_ascii=False)))
-        user = "客户：{}\n名称：{}\n数量：{}\n交期：{}\n要求：\n{}".format(
-            job.get("customer"), job.get("title"), job.get("qty"), job.get("due_date") or "未定", req)
+        user = "客户：{}\n名称：{}\n数量：{}\n交期：{}\n要求：\n{}\n\n客户图纸的文字（第 139f 段）：\n{}".format(
+            job.get("customer"), job.get("title"), job.get("qty"), job.get("due_date") or "未定", req, job.get("drawing_text") or "（没有）")
         llm.run(system, [{"role": "user", "content": user}], [TOOL], call, max_turns=3)
         if got.get("lines") is not None:
             lines = []

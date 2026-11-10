@@ -52,6 +52,8 @@ REQUIRED = {
     "Quotation": ["quotation_to", "party_name", "company", "transaction_date", "items"],
     "Quotation Item": ["item_code", "qty"],
     "Project": ["project_name"],
+    "Delivery Note": ["customer", "company", "posting_date", "items"],                 # 第 139 轮：按单设计发货
+    "Delivery Note Item": ["item_code", "qty"],
     "Timesheet": ["time_logs"],                                                        # 第 139 轮：设计工时
     "Timesheet Detail": ["activity_type", "hours"],                                                       # 第 139 轮：按单设计的作业号
     "Contract": ["party_type", "party_name", "contract_terms"],
@@ -92,10 +94,10 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
           "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}",
           "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}",
-          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Project": "PROJ-{n:04d}", "Timesheet": "TS-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
+          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Project": "PROJ-{n:04d}", "Delivery Note": "MAT-DN-{y}-{n:05d}", "Timesheet": "TS-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
             "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name",
-            "Item": "item_code", "Activity Type": "activity_type"}   # 真 ERPNext：物料按物料编号命名；活动类型按名称
+            "Item": "item_code", "Activity Type": "activity_type", "Quality Inspection Parameter": "parameter"}   # 真 ERPNext：物料按物料编号命名；活动类型按名称
 
 
 ALLOW_ON_SUBMIT = {"BOM": {"is_default", "is_active"}}       # 真 ERPNext 里这几个字段提交后也能改（第 139 轮）
@@ -398,6 +400,15 @@ class Mock:
                 opp.update(status="Quotation", modified=now_str())
         elif dt_ == "Contract":
             doc["status"] = "Active" if doc.get("is_signed") else "Unsigned"
+        elif dt_ == "Delivery Note":                 # 第 139 轮：发货后销售订单的已发数量、发货百分比跟着变
+            for it in doc.get("items", []):
+                so = self.db.get("Sales Order", {}).get(it.get("against_sales_order") or "")
+                if so:
+                    row = next((r for r in so["items"] if r["name"] == it.get("so_detail")), None)
+                    if row:
+                        row["delivered_qty"] = float(row.get("delivered_qty") or 0) + float(it["qty"])
+                    tot = sum(float(r["qty"]) for r in so["items"])
+                    so["per_delivered"] = round(sum(float(r.get("delivered_qty") or 0) for r in so["items"]) / tot * 100, 2) if tot else 0
         elif dt_ == "BOM" and doc.get("is_default"):
             for b in self.db["BOM"].values():
                 if b["item"] == doc["item"] and b["name"] != doc["name"]:
@@ -596,6 +607,20 @@ def msi(body: dict = Body(...)):
     today = dt.date.today().isoformat()
     return {"message": {"doctype": "Sales Invoice", "customer": so["customer"], "company": so["company"], "posting_date": today, "due_date": today,
                         "currency": "USD", "conversion_rate": 1, "debit_to": "Debtors - " + ABBR, "items": items, "__islocal": 1}}
+
+
+@app.post("/api/method/erpnext.selling.doctype.sales_order.sales_order.make_delivery_note")
+def mdn(body: dict = Body(...)):
+    """第 139 轮：按销售订单生成发货单（未保存）：带出没发的数量"""
+    so = M.db.get("Sales Order", {}).get(body.get("source_name") or "")
+    if so is None or so.get("docstatus") != 1:
+        raise Err(417, "ValidationError", "销售订单 {} 不存在或没提交".format(body.get("source_name")))
+    items = [{"item_code": r["item_code"], "qty": float(r["qty"]) - float(r.get("delivered_qty") or 0), "rate": float(r.get("rate") or 0),
+              "uom": r.get("uom") or "Nos", "conversion_factor": 1, "against_sales_order": so["name"], "so_detail": r["name"],
+              "warehouse": r.get("warehouse")}
+             for r in so["items"] if float(r["qty"]) > float(r.get("delivered_qty") or 0)]
+    return {"message": {"doctype": "Delivery Note", "customer": so["customer"], "company": so["company"],
+                        "posting_date": dt.date.today().isoformat(), "items": items, "__islocal": 1}}
 
 
 @app.post("/api/method/erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice")

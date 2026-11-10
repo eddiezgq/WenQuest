@@ -87,6 +87,13 @@
               <td class="mono">{{ w.expected_delivery_date }}</td><td class="num">{{ t('{n} 分钟', { n: w.est_minutes }) }}</td></tr></tbody>
           </table>
         </template>
+        <template v-if="p.action === 'eto_ship'">
+          <p>{{ t('作业 {j}：按销售订单 {s} 发货 {n} 件给 {c}。首件、终检、不合格品处置都已核过。', { j: pv.job.job_no, s: pv.sales_order, n: pv.qty, c: bi(pv.job.customer) }) }}</p>
+          <p class="muted small">{{ t('确认后在 ERPNext 建发货单（发货里程碑到了，下一段按它开票）。') }}</p>
+        </template>
+        <template v-if="p.action === 'eto_inspection'">
+          <p>{{ t('{k} {w} 第 {n} 件：{r}，写进 ERPNext 质量检验单。', { k: pv.kind === 'fai' ? t('首件检验') : t('终检'), w: pv.work_order, n: pv.piece, r: pv.result }) }}</p>
+        </template>
         <template v-if="p.action === 'eto_hours'">
           <p>{{ t('作业 {j}：{h} 小时设计工时（{w}，{d}）进 ERPNext 工时表，挂项目 {p}。', { j: pv.job.job_no, h: pv.hours, w: pv.who, d: pv.day, p: pv.job.project }) }}</p>
         </template>

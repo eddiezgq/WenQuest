@@ -613,6 +613,20 @@ def eto(teacher):
             hub("GET", "/api/eto/jobs/{}/shop".format(jn), token=sales)), "车间报工计入作业成本", 600, 5)
         check(c is not None, "作业成本：实际工序 ${}（估算 ${}）".format((c or {}).get("cost", {}).get("actual", {}).get("operations"),
                                                                ((c or {}).get("cost", {}).get("estimate") or {}).get("operations")))
+    # 139f：检验计划（起草人和批准人不同）→ 终检记录 → ERPNext 质量检验单
+    qa, qb = login("测试质检甲", "quality"), login("测试质检乙", "quality")
+    hub("PUT", "/api/eto/jobs/{}/quality/plan".format(jn), {"chars": [{"code": "len", "name": "闭环测试总长", "item": jn, "kind": "final",
+                                                                     "nominal": 100, "lo": 99.8, "hi": 100.2, "unit": "mm"}]}, qa)
+    qd = hub("POST", "/api/eto/jobs/{}/quality/plan/approve".format(jn), token=qb)
+    check(qd["approved"] and qd["approved"]["approved_by"], "检验计划第 {} 版已批准".format((qd.get("approved") or {}).get("rev")))
+    if top:
+        r = hub("POST", "/api/eto/jobs/{}/quality/inspect".format(jn), {"kind": "final", "work_order": top["name"], "piece": 1,
+                                                                         "readings": {"len": 100.05}}, qa)
+        p = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(hub("GET", "/api/proposals/" + r["proposal_id"], token=qa)),
+                 "ERPNext 质量检验单", 120, 2)
+        check(r["result"] == "pass" and p is not None and p["status"] == "executed", "终检第 1 件合格，进 ERPNext 质量检验单：{}".format(p and p.get("result")))
+        qs = hub("GET", "/api/eto/jobs/{}/quality".format(jn), token=qa)
+        check(any("终检合格 1 / 2" in b for b in qs["ship_block"]), "发货关口：终检不够数时挡住（{}）".format(qs["ship_block"]))
 
 
 def safety(teacher):

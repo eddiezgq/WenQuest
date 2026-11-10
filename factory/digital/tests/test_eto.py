@@ -122,6 +122,9 @@ def db():
     d = DB(base + "/wq_eto_test")
     d.init()
     E.init(d)
+    from hub import eto_design, eto_exec, eto_quality
+    for m in (eto_design, eto_exec, eto_quality):                # 接口测试要用到后面几段的表（枢纽启动时一起建）
+        m.init(d)
     return d
 
 

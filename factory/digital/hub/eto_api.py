@@ -2,21 +2,23 @@
 """按单设计（ETO，第 139 轮）的网页接口：作业、估算、AI 起草、发报价（提议 → 人确认 → 桥接写入 ERPNext）。"""
 import logging
 
-from fastapi import Body, Depends, HTTPException
+from fastapi import Body, Depends, File, HTTPException, UploadFile
 
 from hub import ai as _ai
+from factory import data as F
 from hub import eto as E
 from hub import eto_design as ED
 from hub import eto_mrp as EM
 from hub import eto_plan as EP
 from hub import eto_exec as EX
+from hub import eto_quality as EQ
 
 log = logging.getLogger("eto")
 ROLES = ("sales", "planner", "engineer", "manager", "approver")
 
 
 def mount(app, H, user_of, who, ai_quota=None):
-    for fn in (E.on_proposal_done, ED.on_proposal_done, EX.on_proposal_done):
+    for fn in (E.on_proposal_done, ED.on_proposal_done, EX.on_proposal_done, EQ.on_proposal_done):
         if fn not in _ai.ON_PROPOSAL_DONE:
             _ai.ON_PROPOSAL_DONE.append(fn)
 
@@ -81,6 +83,7 @@ def mount(app, H, user_of, who, ai_quota=None):
         """起草估算行（AI；没有模型照现有产品）。只返回草稿，估算员看过再存。"""
         can(u)
         j = found(E.job(H.db, u["mode"], job_no), job_no)
+        j["drawing_text"] = EQ.drawing_text(H.db, u["mode"], job_no)
         llm = getattr(getattr(H, "ai", None), "llm", None)
         if llm is not None and llm.available() and ai_quota:
             ai_quota(u)
@@ -227,3 +230,107 @@ def mount(app, H, user_of, who, ai_quota=None):
         r = propose(u, "eto_hours", pv, "设计工时 {}：{:g} 小时".format(job_no, pv["hours"]))
         H.ai.decide(r["proposal_id"], u["name"], True, role=u["role"])
         return r
+
+    # ------------------------------------------------------------ 139f：客户图纸、检验计划、首件与终检、发货、合格证
+    QROLES = ("quality", "manager")
+
+    def qcan(u):
+        if u.get("role") not in QROLES and not u.get("teacher"):
+            raise HTTPException(403, "检验计划和检验记录由质量人员做")
+
+    @app.post("/api/eto/jobs/{job_no}/files")
+    async def eto_upload(job_no: str, file: UploadFile = File(...), u=Depends(user_of)):
+        """客户图纸：存进平台文件库，PDF 抽出文字给 AI 读"""
+        import hashlib
+        can(u)
+        data = await file.read()
+        if len(data) > 20 * 1024 * 1024:
+            raise HTTPException(413, "图纸超过 20 MB")
+        sha = hashlib.sha256(data).hexdigest()
+        H.db.x("insert into stored_file (sha256, name, mime, size, content) values (%s,%s,%s,%s,%s) on conflict (sha256) do nothing",
+               (sha, file.filename, file.content_type, len(data), data))
+        text = EQ.pdf_text(data) if (file.content_type == "application/pdf" or str(file.filename).lower().endswith(".pdf")) else ""
+        guard(lambda: EQ.add_file(H.db, u["mode"], job_no, sha, file.filename, file.content_type, len(data), text, who(u)))
+        return {"sha256": sha, "name": file.filename, "text_chars": len(text), "url": "/api/files/" + sha}
+
+    @app.get("/api/eto/jobs/{job_no}/quality")
+    def eto_quality(job_no: str, u=Depends(user_of)):
+        def run():
+            j = E.job(H.db, u["mode"], job_no)
+            if not j:
+                raise KeyError(job_no)
+            items = EQ.job_items(H.db, u["mode"], job_no)
+            plan = EQ.plan_latest(H.db, u["mode"], job_no)
+            wos = EX.work_orders(H.db, u["mode"], job_no) if j.get("sales_order") else []
+            recs = EQ.records(H.db, u["mode"], job_no)
+            appr = EQ.plan_approved(H.db, u["mode"], job_no)
+            return {"files": EQ.files(H.db, u["mode"], job_no), "items": items, "plan": plan, "approved": appr,
+                    "errors": EQ.check_plan(plan["chars"], items, job_no) if plan else [], "work_orders": wos, "records": recs,
+                    "ship_block": EQ.ship_check(dict(j, shipped=bool(j.get("delivery_note"))), wos, appr, recs),
+                    "delivery_note": j.get("delivery_note")}
+        return guard(run)
+
+    @app.post("/api/eto/jobs/{job_no}/quality/plan/draft")
+    def eto_qplan_draft(job_no: str, u=Depends(user_of)):
+        qcan(u)
+        j = found(E.job(H.db, u["mode"], job_no), job_no)
+        d = ED.released(H.db, u["mode"], job_no) or ED.latest(H.db, u["mode"], job_no)
+        llm = getattr(getattr(H, "ai", None), "llm", None)
+        if llm is not None and llm.available() and ai_quota:
+            ai_quota(u)
+        args = (j, EQ.job_items(H.db, u["mode"], job_no), (d or {}).get("spec"), EQ.drawing_text(H.db, u["mode"], job_no))
+        try:
+            return EQ.draft_plan(llm, *args)
+        except Exception as ex:  # noqa: BLE001
+            log.warning("AI 起草检验计划出错，改用规则：%s", ex)
+            return EQ.draft_plan(None, *args)
+
+    @app.put("/api/eto/jobs/{job_no}/quality/plan")
+    def eto_qplan_save(job_no: str, body: dict = Body(...), u=Depends(user_of)):
+        qcan(u)
+        guard(lambda: EQ.save_plan(H.db, u["mode"], job_no, body.get("chars"), who(u)))
+        return eto_quality(job_no, u)
+
+    @app.post("/api/eto/jobs/{job_no}/quality/plan/approve")
+    def eto_qplan_approve(job_no: str, u=Depends(user_of)):
+        qcan(u)
+        guard(lambda: EQ.approve_plan(H.db, u["mode"], job_no, who(u)))
+        return eto_quality(job_no, u)
+
+    @app.post("/api/eto/jobs/{job_no}/quality/inspect")
+    def eto_inspect(job_no: str, body: dict = Body(...), u=Depends(user_of)):
+        """记一件的检验：判定、不合格开不合格品单；写进 ERPNext 质量检验单（数据录入：提议后自动确认）"""
+        qcan(u)
+        wos = guard(lambda: EX.work_orders(H.db, u["mode"], job_no))
+        rec = guard(lambda: EQ.record(H.db, u["mode"], job_no, body.get("kind"), body.get("work_order"), body.get("piece"),
+                                      body.get("readings") or {}, who(u), wos))
+        w = next(x for x in wos if x["name"] == body.get("work_order"))
+        ops = [op for op, _ in F.ROUTINGS[F.BOMS[w["item"]][0]]] if w["item"] in F.BOMS else []
+        pv = EQ.inspection_preview(job_no, dict(rec, kind=body.get("kind"), piece=int(body.get("piece"))), w, who(u), ops)
+        r = propose(u, "eto_inspection", pv, "{} {} 第 {} 件：{}".format("首件检验" if pv["kind"] == "fai" else "终检", w["name"], pv["piece"],
+                                                                  {"pass": "合格", "fail": "不合格", "unknown": "未知"}[rec["result"]]))
+        H.ai.decide(r["proposal_id"], u["name"], True, role=u["role"])
+        return dict(rec, proposal_id=r["proposal_id"])
+
+    @app.post("/api/eto/jobs/{job_no}/quality/inspect/{insp_id}/void")
+    def eto_inspect_void(job_no: str, insp_id: int, body: dict = Body(...), u=Depends(user_of)):
+        qcan(u)
+        guard(lambda: EQ.void(H.db, u["mode"], insp_id, who(u), body.get("reason")))
+        return {"ok": True}
+
+    @app.post("/api/eto/jobs/{job_no}/ship")
+    def eto_ship(job_no: str, u=Depends(user_of)):
+        """发货：关口（完工、首件、终检、不合格品）都过了才生成提议；人确认后 ERPNext 建发货单"""
+        can(u)
+        pv = guard(lambda: EQ.ship_preview(H.db, u["mode"], job_no, EX.work_orders(H.db, u["mode"], job_no)))
+        return propose(u, "eto_ship", pv, "发货 {}：{} {} 件".format(job_no, pv["job"]["customer"], pv["qty"]))
+
+    @app.get("/api/eto/jobs/{job_no}/certificate")
+    def eto_certificate(job_no: str, u=Depends(user_of)):
+        def run():
+            j = E.job(H.db, u["mode"], job_no)
+            if not j:
+                raise KeyError(job_no)
+            return EQ.certificate(j, EQ.plan_approved(H.db, u["mode"], job_no), EQ.records(H.db, u["mode"], job_no),
+                                  ED.released(H.db, u["mode"], job_no))
+        return guard(run)
