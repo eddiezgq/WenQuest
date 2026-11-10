@@ -422,6 +422,7 @@ def main():
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 15 页：5 个任务，自动评 60 分")
     hub("POST", "/api/mes/cmd", {"unit": "grd-01", "command": "reset"}, teacher)
     customer_and_service(teacher)
+    eto(teacher)
     safety(teacher)
     maintenance(teacher)
     people(teacher)
@@ -544,6 +545,34 @@ def customer_and_service(teacher):
     check(st["of"] == 60 and len(st["tasks"]) == 5, "实验 16 页：5 个任务，自动评 60 分")
     k = hub("GET", "/api/service/kpis", token=teacher)
     check("open_complaints" in k and "funnel_amount" in k, "客户与服务态势：开着的投诉 {}，漏斗 ${}".format(k.get("open_complaints"), k.get("funnel_amount")))
+
+
+def eto(teacher):
+    """第 139 轮 139a：按单设计——询价建作业、估算（手填，结果确定）、报价提议 → 确认 → ERPNext 建 Project、物料、报价单"""
+    print("13b. 按单设计：估算与报价（第 139 轮）")
+    sales = login("测试销售", "sales")
+    j = hub("POST", "/api/eto/jobs", {"customer": "示例·闭环测试客户 (Demo)", "title": "闭环测试非标轴", "requirement": "按图加长输出轴",
+                                      "qty": 2, "qty_breaks": [5], "due_date": delivery_date()}, sales)
+    jn = j["job_no"]
+    lines = [{"kind": "material", "item_code": "RM-45-D50", "qty_per": 4},
+             {"kind": "operation", "op": "粗车 Rough turning", "setup_min": 20, "run_min": 15},
+             {"kind": "outside", "desc": "发黑", "unit_price": 5},
+             {"kind": "engineering", "desc": "改图", "hours": 2}]
+    d = hub("PUT", "/api/eto/jobs/{}/estimate".format(jn), {"lines": lines}, sales)
+    b2 = next(b for b in d["result"]["breaks"] if b["qty"] == 2)
+    # 2 件：材料 4 × 1.6 × 2 = 12.8；粗车 (20 + 30) / 60 × 48 = 40；外协 10；设计 2 × 65 = 130 → 小计 192.8
+    check(d["result"]["can_quote"] and b2["subtotal"] == 192.8 and b2["price"] == round(192.8 * 1.1 * 1.3, 2),
+          "估算 {}：2 件报 ${}（手算一致）".format(jn, b2["price"]))
+    q = hub("POST", "/api/eto/jobs/{}/quote".format(jn), token=sales)
+    hub("POST", "/api/proposals/{}/confirm".format(q["proposal_id"]), token=sales)
+    prop = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(
+        hub("GET", "/api/proposals/" + q["proposal_id"], token=sales)), "桥接建项目、物料、报价单", 120, 2)
+    check(prop is not None and prop["status"] == "executed", "报价提议已执行：{}".format(prop and prop.get("result")))
+    j = hub("GET", "/api/eto/jobs/" + jn, token=sales)["job"]
+    check(j["status"] == "quoted" and j["quotation"] and j["project"], "作业已报价：报价单 {}，项目 {}".format(j["quotation"], j["project"]))
+    qt = [x for x in erp_docs("Quotation") if x.get("name") == j["quotation"]]
+    check(any(x.get("wq_job") == jn for x in qt), "ERPNext 里有报价单 {}（作业号 {}）".format(j["quotation"], jn))
+    check(any(x.get("name") == j["project"] for x in erp_docs("Project")), "ERPNext 里有项目 {}".format(j["project"]))
 
 
 def safety(teacher):

@@ -51,6 +51,7 @@ REQUIRED = {
     "Opportunity": ["opportunity_from", "party_name", "company", "transaction_date"],     # 第 18 轮 E1
     "Quotation": ["quotation_to", "party_name", "company", "transaction_date", "items"],
     "Quotation Item": ["item_code", "qty"],
+    "Project": ["project_name"],                                                       # 第 139 轮：按单设计的作业号
     "Contract": ["party_type", "party_name", "contract_terms"],
     "Issue": ["subject"],
     # 第 18 轮 E3：资产维护模块（必填与真 ERPNext v16 一致）
@@ -92,7 +93,8 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
             "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name",
-            "Item": "item_code"}                                  # 真 ERPNext：物料按物料编号命名
+            "Item": "item_code",                                  # 真 ERPNext：物料按物料编号命名
+            "Project": "project_name"}                            # 真 ERPNext：项目默认按项目名称命名（Projects Settings）
 
 
 def now_str():

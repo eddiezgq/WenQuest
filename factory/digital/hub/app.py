@@ -120,6 +120,8 @@ class Hub:
 
     def start(self):
         self.db.init()
+        from hub import eto as _ETO                   # 按单设计（第 139 轮）的作业、估算表
+        _ETO.init(self.db)
         self.bus = Bus("wq-hub-" + secrets.token_hex(3))
         self.ai = Assistant(self.db, self.publish)
         ai_setting_load(self.db, self.ai.llm)          # 第 30 轮 H-6：管理员选的模型（Claude / DeepSeek / 自动）
@@ -2288,6 +2290,8 @@ def reset_teach(by, speed=1.0, scores=False):
     H.db.x("delete from machine_state_log where mode='teach'")
     H.db.x("delete from ncr where mode='teach' or mode is null")
     H.db.x("delete from ai_proposal where mode='teach'")
+    from hub import eto as _ETO                           # 第 139 轮：按单设计的作业、估算随情景清空
+    _ETO.reset(H.db, "teach")
     if scores:
         H.db.x("delete from task_result")
     H.hist._last_state = {k: v for k, v in H.hist._last_state.items() if k[1] != "teach"}
@@ -2346,6 +2350,11 @@ _cfd.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quot
 # ---------------------------------------------------------------- 数字孪生（第 15 轮）
 from hub import twin_api as _twin  # noqa: E402
 _twin.mount(app, H, user_of, who, _uid, lambda u: bool(u.get("teacher")), ai_quota)
+
+
+# ---------------------------------------------------------------- 按单设计（ETO，第 139 轮）
+from hub import eto_api as _eto  # noqa: E402
+_eto.mount(app, H, user_of, who, ai_quota)
 
 
 # ---------------------------------------------------------------- 厂情中枢：工厂本体（第 17 轮 A 期）

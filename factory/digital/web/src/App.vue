@@ -90,6 +90,7 @@ const NAV = [
     { to: '/service', label: tk('客户与服务'), role: 'service' },          // 第 18 轮 E1
     { to: '/rservice', label: tk('客户与服务'), role: 'service', only: () => cfg.value.plant?.id === 'wenquest-robot' },   // 第 64 轮：现场的机器人
     { to: '/work/planner', label: tk('订单与计划'), role: 'planner' },
+    { to: '/eto', label: tk('按单设计（ETO）'), role: 'sales' },          // 第 139 轮：估算、报价（后续段：设计、物料、计划、质量、开票）
     { to: '/supply', label: tk('采购与来料'), role: 'planner' },          // 第 18 轮 E5
     { to: '/work/operator', label: tk('车间执行'), role: 'operator' },
     { to: '/work/quality', label: tk('质量'), role: 'quality' },

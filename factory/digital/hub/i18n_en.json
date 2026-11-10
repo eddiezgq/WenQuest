@@ -1,5 +1,6 @@
 {
 "exact": {
+"估算和报价由销售、计划、设计或厂长做": "Estimates and quotes are made by sales, planning, engineering or the plant manager",
 "这个角色或生产模式没有授权给你（请老师或企业管理员在“企业成员”里授权）": "This role or production mode is not granted to you (ask the teacher or company admin to grant it under “Members”)",
 "不是班级工厂": "Not a class factory",
 "AI 模型设置要用厂长或管理员账号": "AI model settings need the plant manager or an admin account",
@@ -211,6 +212,10 @@
 "这项功能只属于演示工厂（问渠减速器厂），本厂没有": "This feature belongs to the demo plant only (WenQuest Gearbox); this plant does not have it"
 },
 "templates": [
+[
+"没有作业 {a}",
+"No job {a}"
+],
 [
 "不允许的指令 {a}",
 "Command not allowed: {a}"
