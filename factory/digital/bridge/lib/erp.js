@@ -1044,8 +1044,8 @@ function summarize(doctype, d) {
       return pick(['purpose', 'stock_entry_type', 'work_order', 'fg_completed_qty', 'docstatus']);
     case 'Item':
       return pick(['item_code', 'item_name', 'wq_revision']);
-    case 'BOM':
-      return { ...pick(['item', 'is_default', 'is_active', 'docstatus']),
+    case 'BOM':                         // 第 139 轮：按单设计的物料清单带设计指纹（原来下面另有一个 case 'BOM'，永远走不到）
+      return { ...pick(['item', 'is_default', 'is_active', 'docstatus', 'wq_fingerprint', 'project']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty })) };
     case 'Bin':
       return pick(['item_code', 'warehouse', 'actual_qty', 'ordered_qty', 'reserved_qty', 'projected_qty', 'stock_uom']);
@@ -1062,8 +1062,6 @@ function summarize(doctype, d) {
       return { ...pick(['customer', 'status', 'docstatus', 'posting_date', 'grand_total']),
         sales_orders: [...new Set((d.items || []).map((i) => i.against_sales_order).filter(Boolean))],
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty })) };
-    case 'BOM':                         // 第 139 轮：按单设计的物料清单带设计指纹
-      return pick(['item', 'is_default', 'is_active', 'docstatus', 'wq_fingerprint', 'project']);
     case 'Timesheet':
       return { ...pick(['docstatus', 'total_hours', 'parent_project']), projects: [...new Set((d.time_logs || []).map((l) => l.project).filter(Boolean))] };
     case 'Project':                     // 第 139 轮：按单设计的作业号
