@@ -590,12 +590,21 @@ function metroTable(rows, showItem, showUnit) {
     }).join('')}</div></td>` : ''}<td>${md(r.row[1])}</td>${showUnit ? `<td>${md(r.row[2])}<div class="ulinks"><button data-u="${esc(r.unit)}" data-tab="metro">${esc(r.unit)}</button></div></td>` : ''}<td>${md(r.row[3])}</td><td>${md(r.row[4])}</td></tr>`).join('') +
     `</tbody></table></div>`;
 }
+function simSampleTable(rows, showItem) {
+  if (!rows.length) return '';
+  return `<div class="tw"><table><thead><tr>${showItem ? '<th>零件</th>' : '<th>计量设备</th>'}<th>何时抽</th><th>特性</th><th>名义</th><th>下限</th><th>上限</th></tr></thead><tbody>` +
+    rows.flatMap((x) => x.chars.map((c, k) => `<tr>${k === 0 ? `<td rowspan="${x.chars.length}">${showItem ? esc(x.item) : `<div class="ulinks"><button data-u="${esc(x.unit)}" data-tab="metro">${esc(x.unit)}</button></div>`}</td>
+      <td rowspan="${x.chars.length}">${esc(x.after)} 做完后；每张工单首件，以后每 ${x.every} 件 1 件；每次 ${x.minutes} min</td>` : ''}
+      <td>${esc(c.name)}</td><td class="num">${c.nominal}</td><td class="num">${c.lo}</td><td class="num">${c.hi} ${esc(c.unit || '')}</td></tr>`)).join('') +
+    `</tbody></table></div>`;
+}
 function metroCard(id) {
   const u = D.units[id], rows = metroRows(id);
   const parts = [...new Set(rows.flatMap((r) => r.items))];
   return `<div class="card"><div class="ct"><b>计量室检验任务</b><span>${esc(id)}</span></div>` +
     kv([['设备', esc(u.name)], ['所在', esc(ZONE[u.zone]?.name)], ['抽检的零件', esc(parts.join('、'))], ['任务数', rows.length]]) +
-    `<div class="sec"><p>${md(D.metro.intro.join(''))}</p></div><div class="sec"><h4>检验项目与频次（点零件号看它的检验规程）</h4>${metroTable(rows, true, false)}<div class="src">出处：${esc(D.metro.src)}</div></div></div>`;
+    `<div class="sec"><p>${md(D.metro.intro.join(''))}</p></div><div class="sec"><h4>检验项目与频次（点零件号看它的检验规程）</h4>${metroTable(rows, true, false)}<div class="src">出处：${esc(D.metro.src)}</div></div>` +
+    (D.sampling.some((x) => x.unit === id) ? `<div class="sec"><h4>数字工厂里正在抽检的特性（测量值进质量页、控制图）</h4>${simSampleTable(D.sampling.filter((x) => x.unit === id), true)}<div class="src">出处：工厂清单 wenquest-sewing.yaml 的 sampling 一节（示例值）</div></div>` : '') + `</div>`;
 }
 function closeDrawer() { $('#drawer').classList.remove('open'); }
 $('#dclose').onclick = () => go({ view: 'zone', zone: state.zone });
@@ -707,6 +716,8 @@ function qcCard(item, code) {
   if (!qf && !ms && !(fq && fq.length)) h += `<div class="sec"><p class="empty">方案没有给这道工序单列检验要求；按下面的通用检验规程执行（首件、巡检、完工检）。</p></div>`;
   const mr = D.metro.rows.filter((r) => r.items.includes(item));
   if (mr.length) h += `<div class="sec"><h4>计量室首件与抽检（三坐标等）</h4>${metroTable(mr, false, true)}<div class="src">出处：${esc(D.metro.src)}</div></div>`;
+  const sr = D.sampling.filter((x) => x.item === item);
+  if (sr.length) h += `<div class="sec"><h4>数字工厂里正在抽检的特性</h4>${simSampleTable(sr, false)}</div>`;
   h += `<div class="sec"><h4>通用检验规程</h4>${generalHtml()}</div></div>`;
   return h;
 }

@@ -232,6 +232,8 @@ def main():
         "holes": {"HSG-LS": first_list(secs["3.2"]["lines"]), "HSG-OL": first_list(secs["3.3"]["lines"])},
         "asmNote": {"WQ-LS": secs["五"]["lines"][:1], "WQ-OL": secs["六"]["lines"][:1]},
         "general": secs["八"]["lines"],
+        "sampling": [{"item": x["item"], "after": split_name(x["after"])[0], "unit": x["unit"], "every": x["every"],
+                      "minutes": x["minutes"], "chars": x["chars"]} for x in plant.get("sampling") or []],
         "metro": {"head": head71, "rows": metro, "intro": metro_intro, "src": f"《缝纫机厂工艺方案》{secs['7.1']['title']}"},
     }
     tpl = (HERE / "template.html").read_text(encoding="utf-8")
