@@ -33,6 +33,11 @@ WALL = float(os.environ.get("WQ_WALL", 6.0))
 ARM_Y = (-46.0, 70.0)          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 5.0))
+FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
+FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1
+X_TAKEUP = 30.0
+TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端（挑线眼一转里在 z 165–204 之间走，留余量）
+TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 设计软件 link_pose(φ = 180°)：P、M、线眼，端视坐标 mm
 BEDWALL = float(os.environ.get("WQ_BEDWALL", 6.0))
 ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 9.0))
 ROOT_X = float(os.environ.get("WQ_ROOTX", 230.0))
@@ -273,6 +278,12 @@ def casting():
         for r_ in rb:
             hollow = hollow.fuse(r_)
         hollow = hollow.removeSplitter()
+    # 机头前盖板窗口（Eddie 11-10 14:08）：机头前面开窗，调针杆高度、挑线机构、加油都从这里；窗口四周留 8 mm 法兰装前盖板
+    if FRONT_COVER:
+        win = Part.makeBox(FC_WIN[1] - FC_WIN[0], WALL + 4, FC_WIN[3] - FC_WIN[2], V(FC_WIN[0], HEAD["y0"] - 2, FC_WIN[2]))
+        win = win.makeFillet(10, [e for e in win.Edges if abs(e.BoundBox.YLength - (WALL + 4)) < 1e-6])
+        hollow = hollow.cut(win)
+        info["front_window"] = FC_WIN
     info["solid_valid"] = solid.isValid()
     info["hollow_valid"] = hollow.isValid()
     return solid, hollow, info
@@ -307,8 +318,17 @@ def parts_visible(cast):
     # 面板（机头左端）、顶盖
     # 面板：机头左端 7 mm 一片，外形跟机头一样（真机上是可拆的面板，盖住针杆、挑线机构）
     cut = Part.makeBox(7.0, 400, 400, V(HEAD["x0"] - 1, -200, 90))
-    g["paint"] = [cast.cut(cut)]
+    body = cast.cut(cut)
     g["graphite"].append(cast.common(cut))
+    if FRONT_COVER:                                   # 前盖板：机头前面一片（比窗口四周大 8 mm），外形跟机头一样
+        fx0, fx1, fz0, fz1 = FC_WIN
+        cv = Part.makeBox(fx1 - fx0 + 16, 8.0, fz1 - fz0 + 16, V(fx0 - 8, HEAD["y0"] - 1, fz0 - 8))
+        cv = cv.makeFillet(14, [e for e in cv.Edges if abs(e.BoundBox.YLength - 8.0) < 1e-6])
+        slot = Part.makeBox(10, 20, TK_SLOT[1] - TK_SLOT[0], V(X_TAKEUP - 5, HEAD["y0"] - 10, TK_SLOT[0]))
+        slot = slot.makeFillet(4.9, [e for e in slot.Edges if abs(e.BoundBox.YLength - 20) < 1e-6])
+        g["graphite"].append(body.common(cv).cut(slot))
+        body = body.cut(cv)
+    g["paint"] = [body]
     tc = Part.makeBox(150, 52, 3, V(110, -14, (t0 + t1) / 2 + crown - 1.5))
     tc = tc.makeFillet(6, [e for e in tc.Edges if abs(e.BoundBox.ZLength - 3) < 1e-6])
     g["graphite"].append(tc)
@@ -334,10 +354,16 @@ def parts_visible(cast):
     g["metal"].append(Part.makeBox(64, 44, 0.6, V(-32, -22, -0.2)).cut(cyl(1.2, 2, V(0, 0, -1), V(0, 0, 1))))
     g["chrome"].append(Part.makeBox(46, 36, 0.6, V(-23, -58, -0.2)))
     # 挑线杆（从机头前面的长槽伸出）、夹线器、过线
-    g["graphite"].append(Part.makeBox(48, 1.2, 10, V(-30, HEAD["y0"] - 1.2, 196)))     # 槽盖
-    tk = Part.makeBox(30, 5, 6, V(-34, HEAD["y0"] - 16, 205)).fuse(Part.makeBox(5, 16, 6, V(-34, HEAD["y0"] - 16, 205)))
-    tk = tk.cut(cyl(1.8, 10, V(-8, HEAD["y0"] - 14, 204), V(0, 0, 1)))                      # 挑线杆伸出机头，头上有线眼
-    g["chrome"].append(tk)
+    # 挑线杆：位置按设计软件的挑线四连杆算（主轴 φ = TK_PHI 时的姿态），在 x = X_TAKEUP 的平面里摆动，
+    # 从前盖板上的竖槽伸出（端视的 u 指向机器前方，即 −Y）。G4 换成真零件、能转动。
+    P_, M_, E_ = (V(X_TAKEUP, -u, ZU + v) for u, v in TK_POSE)
+    lev = None
+    for a_, b_ in ((P_, M_), (M_, E_)):
+        d_ = b_ - a_
+        seg = Part.makeCylinder(3.0, d_.Length, a_, d_)
+        lev = seg if lev is None else lev.fuse(seg)
+    eye = Part.makeTorus(4.0, 1.4, E_, V(1, 0, 0))
+    g["chrome"].append(lev.fuse(eye))
     tz, tx = 210, 66
     g["chrome"].append(cyl(3, 22, V(tx, -46, tz), V(0, -1, 0)))
     for dy in (-52, -55.5):
