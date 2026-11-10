@@ -29,14 +29,14 @@ P = dict(
     B=dict(top=(262, 242, 0), r_out=44, r_head=38, r_arch=46, r_hj=24, plan=(46, 34), edge=(14, 12, 10, 8), chamfer=False),
     C=dict(top=(258, 256, 0), r_out=14, r_head=12, r_arch=26, r_hj=10, plan=(14, 12), edge=(8, 6, 5), chamfer=True),
 )[VAR]
-WALL = float(os.environ.get("WQ_WALL", 8.0))
+WALL = float(os.environ.get("WQ_WALL", 6.0))
 ARM_Y = (-46.0, 70.0)          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 5.0))
-BEDWALL = float(os.environ.get("WQ_BEDWALL", 8.0))
-ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 0.0))
-ROOT_X = float(os.environ.get("WQ_ROOTX", 190.0))
-BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 62.0))       # 机座纵筋高（从机座顶面往下）
+BEDWALL = float(os.environ.get("WQ_BEDWALL", 6.0))
+ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 9.0))
+ROOT_X = float(os.environ.get("WQ_ROOTX", 230.0))
+BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 30.0))       # 机座纵筋高（从机座顶面往下）
 RIB_T = 7.0
 RIB_X = (75.0, 150.0, 225.0)
 S_BELT_X = 352.0
@@ -44,8 +44,8 @@ ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿�
 
 ZU = 200.0
 BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, z0=-62.0)
-PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -60.0)), y1=float(os.environ.get("WQ_PY1", 90.0)))
-HEAD = dict(x0=-62.0, x1=52.0, y0=float(os.environ.get("WQ_HY0", -52.0)), y1=70.0, z0=46.0)
+PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -70.0)), y1=float(os.environ.get("WQ_PY1", 96.0)))
+HEAD = dict(x0=-62.0, x1=52.0, y0=float(os.environ.get("WQ_HY0", -48.0)), y1=70.0, z0=46.0)
 
 
 # ---------------------------------------------------------------- 截面
