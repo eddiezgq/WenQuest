@@ -9,11 +9,11 @@
           <select v-model="sel" @change="load" :aria-label="$t('测量特性')">
             <option v-for="c in chars" :key="c.item + '|' + c.key" :value="c.item + '|' + c.key">{{ $td(c.name) }}</option>
           </select>
-          <span class="muted small">{{ $t('{a}最近 {b} 件', { a: demo ? 'quality/qc-01/measurement · ' : '', b: rows.length }) }}</span>
+          <span class="muted small">{{ $t('{a}最近 {b} 件', { a: demo ? 'quality/qc-01/measurement · ' : '', b: $td(rows.length) }) }}</span>
         </div>
         <ControlChart v-if="chart.points.length && !attr" :chart="chart" :height="220" />
         <div v-else-if="!chart.points.length" class="empty">{{ $t('还没有这个特性的测量值。') }}</div>
-        <p v-if="chart.points.length && attr" class="small attr">{{ $t('计数型检验项目（有或无），不画控制图、不算过程能力，只统计不合格件数：最近') }} <b class="mono">{{ chart.points.length }}</b> {{ $t('件里不合格') }} <b class="mono">{{ attrFails }}</b> {{ $t('件。') }}</p>
+        <p v-if="chart.points.length && attr" class="small attr">{{ $t('计数型检验项目（有或无），不画控制图、不算过程能力，只统计不合格件数：最近') }} <b class="mono">{{ $td(chart.points.length) }}</b> {{ $t('件里不合格') }} <b class="mono">{{ attrFails }}</b> {{ $t('件。') }}</p>
         <p v-else-if="chart.points.length && unit === 'mm'" class="small">{{ $t('最近 5 件均值') }} <b class="mono">{{ mean5.toFixed(4) }}</b> {{ $t('mm，偏离公差中值') }}
           <b class="mono">{{ ((mean5 - chart.center) * 1000).toFixed(1) }}</b> {{ $t('µm，距上限') }} <b class="mono">{{ ((chart.upper - max5) * 1000).toFixed(1) }}</b> {{ $t('µm。') }}</p>
         <p v-else-if="chart.points.length" class="small">{{ $t('最近 5 件均值') }} <b class="mono">{{ mean5.toFixed(3) }}</b> {{ $t('{a}，偏离公差中值', { a: unit }) }}
@@ -21,8 +21,8 @@
         <div v-if="strata.length" class="strata" data-help="q-strata">
           <div v-for="g in strata" :key="g.by"><b class="small">{{ $t('按{a}分层', { a: $td(g.label) }) }}</b>
             <table class="t small"><thead><tr><th>{{ $td(g.label) }}</th><th class="num">{{ $t('件数') }}</th><th class="num">{{ $t('均值 {a}', { a: unit }) }}</th><th class="num">{{ $t('超差') }}</th></tr></thead>
-              <tbody><tr v-for="x in g.rows" :key="x.k"><td class="mono">{{ x.k }}</td><td class="num">{{ x.n }}</td><td class="num">{{ x.mean }}</td>
-                <td class="num">{{ x.fails }}</td></tr></tbody></table></div>
+              <tbody><tr v-for="x in g.rows" :key="x.k"><td class="mono">{{ $td(x.k) }}</td><td class="num">{{ $td(x.n) }}</td><td class="num">{{ $td(x.mean) }}</td>
+                <td class="num">{{ $td(x.fails) }}</td></tr></tbody></table></div>
         </div>
         <table class="t">
           <thead><tr><th>{{ $t('时间') }}</th><th>{{ $t('零件') }}</th><th>{{ $t('工单') }}</th><th class="num">{{ attr ? $t('检验结果') : $t('实测 ') + unit }}</th><th class="num">{{ attr ? '' : $t('公差') }}</th><th>{{ $t('判定') }}</th></tr></thead>
@@ -38,15 +38,15 @@
         <div v-if="!ncr.length" class="empty">{{ $t('没有不合格品。') }}</div>
         <div v-for="n in ncr" :key="n.ncr_id" class="ncr">
           <div><b class="mono"><ObjLink type="Ncr" :k="n.ncr_id" /></b> <span class="mono small"><ObjLink type="PartSerial" :k="n.part_serial" /></span>
-            <span class="pill" :class="n.status === 'open' ? 'bad' : 'good'">{{ DISP[n.status] }}</span></div>
+            <span class="pill" :class="n.status === 'open' ? 'bad' : 'good'">{{ $td(DISP[n.status]) }}</span></div>
           <div v-if="n.detail.upper_tol_mm - n.detail.lower_tol_mm <= 0" class="small muted">{{ $t('{a}：{b}，不合格', { a: $td(n.detail.name), b: n.detail.value_mm > 0 ? $t('有') : $t('无') }) }}</div>
-          <div v-else class="small muted">{{ $t('{a} 实测 {b} {c}（{d}–{e}）', { a: $td(n.detail.name), b: n.detail.value_mm, c: n.detail.unit || unitOf(n.detail.characteristic), d: n.detail.lower_tol_mm, e: n.detail.upper_tol_mm }) }}</div>
+          <div v-else class="small muted">{{ $t('{a} 实测 {b} {c}（{d}–{e}）', { a: $td(n.detail.name), b: $td(n.detail.value_mm), c: n.detail.unit || unitOf(n.detail.characteristic), d: $td(n.detail.lower_tol_mm), e: $td(n.detail.upper_tol_mm) }) }}</div>
           <div v-if="n.status === 'open'" class="acts">
             <button class="btn" @click="decide(n, 'rework')">{{ $t('返修') }}</button>
             <button class="btn danger" @click="decide(n, 'scrap')">{{ $t('报废') }}</button>
             <button class="btn ghost" @click="decide(n, 'use_as_is')">{{ $t('让步接收') }}</button>
           </div>
-          <div v-else class="small muted">{{ $t('由 {a} 评审', { a: n.decided_by }) }}</div>
+          <div v-else class="small muted">{{ $t('由 {a} 评审', { a: $td(n.decided_by) }) }}</div>
         </div>
         <div class="card-head" data-help="q-8d" style="margin-top: 18px;"><h2>{{ $t('质量异常单（8D）') }}</h2>
           <router-link to="/quality/8d" class="small">{{ $t('全部') }}</router-link></div>
@@ -56,13 +56,13 @@
           <button class="btn primary" :disabled="!newTitle.trim()" @click="open8d">{{ $t('为当前特性开单') }}</button>
         </div>
         <div v-for="q in q8d.slice(0, 5)" :key="q.id" class="ncr">
-          <router-link :to="'/quality/8d/' + q.id"><b class="mono">{{ q.id }}</b> {{ $td(q.title) }}</router-link>
-          <span class="small muted">{{ STATUS8D[q.status] }} · {{ q.author }}</span>
+          <router-link :to="'/quality/8d/' + q.id"><b class="mono">{{ $td(q.id) }}</b> {{ $td(q.title) }}</router-link>
+          <span class="small muted">{{ $td(STATUS8D[q.status]) }} · {{ $td(q.author) }}</span>
         </div>
         <template v-if="isTeacher && demo">
           <div class="card-head" data-help="q-problems" style="margin-top: 18px;"><h2>{{ $t('问题情景（老师）') }}</h2></div>
           <p class="small muted">{{ $t('注入一个隐藏的加工问题，学生只能从数据里找原因。学生看不到这一栏。') }}</p>
-          <div v-for="a in problems" :key="a.id" class="small">{{ $t('● {a}（量值 {b}，{c}）', { a: $td(a.name), b: a.magnitude, c: timeOf(a.injected_at) }) }}</div>
+          <div v-for="a in problems" :key="a.id" class="small">{{ $t('● {a}（量值 {b}，{c}）', { a: $td(a.name), b: $td(a.magnitude), c: timeOf(a.injected_at) }) }}</div>
           <div class="new8d">
             <select v-model="prob"><option value="">{{ $t('选择问题…') }}</option>
               <option v-for="(p, k) in catalog.problems || {}" :key="k" :value="k">{{ $td(p.name) }}</option></select>
@@ -77,7 +77,7 @@
         <template v-if="teachStatus">
           <div class="card-head" style="margin-top: 18px;"><h2>{{ $t('任务 5 问答') }}</h2></div>
           <p class="small">{{ $t('轴承位直径为什么会逐渐变大？') }}</p>
-          <label v-for="c in teachStatus.t5_choices" :key="c" class="choice small"><input v-model="t5" type="radio" :value="c"> {{ c }}</label>
+          <label v-for="c in teachStatus.t5_choices" :key="c" class="choice small"><input v-model="t5" type="radio" :value="c"> {{ $td(c) }}</label>
           <button class="btn primary" :disabled="!t5" @click="answer">{{ $t('提交') }}</button>
           <div v-if="fb" class="small" :class="fbOk ? 'ok' : 'err'">{{ fb }}</div>
         </template>
@@ -162,7 +162,7 @@ async function answer() {
   const r = await post('/teach/t5', { reason: t5.value });
   fb.value = $t('{a}（本题得 {b} / {c}）', { a: r.feedback, b: r.score, c: r.of });
   fbOk.value = r.score >= 8;
-  teachStatus.value = await get('/teach');
+  teachStatus.value = await get('/teach').catch(() => null);   // 实验 7 只在减速器厂，别的厂回 404
 }
 // 分层（第 47 轮实验 25）：机器人厂的关节记了装配工位、谐波减速器批次，按它们分组比均值
 const strata = computed(() => [['assembled_on', $t('装配工位')], ['lot', $t('减速器批次')]].map(([by, label]) => {
@@ -185,7 +185,7 @@ onMounted(async () => {
   load();
   catalog.value = await get('/quality/problems/catalog');
   load8d();
-  if (session.user.mode === 'teach') teachStatus.value = await get('/teach');
+  if (session.user.mode === 'teach') teachStatus.value = await get('/teach').catch(() => null);   // 实验 7 只在减速器厂，别的厂回 404
 });
 </script>
 

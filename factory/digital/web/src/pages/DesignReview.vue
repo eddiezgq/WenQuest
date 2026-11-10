@@ -1,14 +1,14 @@
 <template>
   <div class="page">
-    <div class="page-title"><h1>{{ $t('审阅 {a}', { a: s?.item }) }}</h1>
+    <div class="page-title"><h1>{{ $t('审阅 {a}', { a: $td(s?.item) }) }}</h1>
       <router-link to="/design" class="small">{{ $t('← 返回列表') }}</router-link></div>
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="s" class="row">
       <section class="card grow">
         <div class="card-head">
           <h2>{{ $t('三维模型') }}</h2>
-          <span class="pill" :class="TONE[s.status]">{{ STATUS[s.status] }}{{ s.revision ? ' · rev ' + s.revision : '' }}</span>
-          <span class="muted small">{{ $t('提交时现行 rev {a}', { a: s.base_rev }) }}</span>
+          <span class="pill" :class="TONE[s.status]">{{ $td(STATUS[s.status]) }}{{ s.revision ? ' · rev ' + s.revision : '' }}</span>
+          <span class="muted small">{{ $t('提交时现行 rev {a}', { a: $td(s.base_rev) }) }}</span>
         </div>
         <ModelViewer v-if="glb" :url="glb" :base-url="s.base_glb || ''" :diff-url="diffUrl" :pins="pins"
           :can-pin="s.status === 'pending'" @pick="startPin" />
@@ -17,8 +17,8 @@
           <b>{{ $t('与现行版的差异：') }}</b>
           <span v-if="s.diff.changed === false">{{ $t('几何没有变化。') }}</span>
           <template v-else>
-            <span v-if="s.diff.changed_area_mm2 !== undefined">{{ $t('新增或改动的表面 {a} mm²，去掉的表面 {b} mm²；', { a: s.diff.changed_area_mm2, b: s.diff.removed_area_mm2 }) }}</span>
-            {{ $t('体积 {a} → {b} mm³；外形 {c} → {d} mm。', { a: s.diff.volume_old_mm3, b: s.diff.volume_new_mm3, c: (s.diff.size_old_mm || []).join(' × '), d: (s.diff.size_new_mm || []).join(' × ') }) }}
+            <span v-if="s.diff.changed_area_mm2 !== undefined">{{ $t('新增或改动的表面 {a} mm²，去掉的表面 {b} mm²；', { a: $td(s.diff.changed_area_mm2), b: $td(s.diff.removed_area_mm2) }) }}</span>
+            {{ $t('体积 {a} → {b} mm³；外形 {c} → {d} mm。', { a: $td(s.diff.volume_old_mm3), b: $td(s.diff.volume_new_mm3), c: (s.diff.size_old_mm || []).join(' × '), d: (s.diff.size_new_mm || []).join(' × ') }) }}
           </template>
           <span v-if="s.diff.note" class="muted">{{ $td(s.diff.note) }}</span>
         </div>
@@ -34,16 +34,16 @@
 
       <section class="card side">
         <div class="card-head"><h2>{{ $t('提交信息') }}</h2></div>
-        <p class="small"><b>{{ s.author }}</b><span v-if="s.mine" class="muted">{{ $t('（我）') }}</span> · {{ timeOf(s.ts) }}</p>
+        <p class="small"><b>{{ $td(s.author) }}</b><span v-if="s.mine" class="muted">{{ $t('（我）') }}</span> · {{ timeOf(s.ts) }}</p>
         <p class="small">{{ s.note || $t('（没有写改动说明）') }}</p>
-        <p v-if="s.decided_by" class="small muted">{{ $t('{a}：{b} · {c}{d}', { a: STATUS[s.status], b: s.decided_by, c: timeOf(s.decided_at), d: s.decision ? ' · ' + s.decision : '' }) }}</p>
+        <p v-if="s.decided_by" class="small muted">{{ $t('{a}：{b} · {c}{d}', { a: $td(STATUS[s.status]), b: $td(s.decided_by), c: timeOf(s.decided_at), d: s.decision ? ' · ' + s.decision : '' }) }}</p>
 
         <div class="card-head"><h2>{{ $t('批注') }}</h2><span class="muted small">{{ $t('{a} 条未处理', { a: openCount }) }}</span></div>
         <div v-if="!s.comments.length" class="empty small">{{ $t('还没有批注。{a}', { a: s.status === 'pending' ? $t('可以在左边选“点处批注”，点模型上的位置写意见。') : '' }) }}</div>
         <div v-for="(c, i) in s.comments" :key="c.id" class="cm" :class="{ done: c.resolved }">
-          <div class="small"><span v-if="c.anchor" class="num-badge" :class="{ done: c.resolved }">{{ i + 1 }}</span><b>{{ c.author }}</b>
+          <div class="small"><span v-if="c.anchor" class="num-badge" :class="{ done: c.resolved }">{{ i + 1 }}</span><b>{{ $td(c.author) }}</b>
             <span class="muted"> · {{ timeOf(c.ts) }}</span></div>
-          <div>{{ c.body }}</div>
+          <div>{{ $td(c.body) }}</div>
           <button v-if="s.status === 'pending'" class="btn ghost small" @click="resolve(c)">{{ c.resolved ? $t('重新打开') : $t('标为已处理') }}</button>
         </div>
         <form v-if="s.status === 'pending'" class="add" @submit.prevent="addComment">

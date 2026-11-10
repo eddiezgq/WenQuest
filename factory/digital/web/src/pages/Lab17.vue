@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span v-if="!s.teacher" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? $t('比对模式：提交任务 3 之前，指挥台和 AI 不显示建议') : $t('已提交选择：可以看中枢的建议，和你的对比') }}</span>
         <router-link v-if="s.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.anomaly_id } }">{{ $t('打开这条隐患的异常') }}</router-link>
         <router-link class="small" to="/ehs">{{ $t('安全环保') }}</router-link>
@@ -25,12 +25,12 @@
         </div>
         <p class="small muted">{{ $t('建议 GRD-01 + 防护罩缺失；先在“情景导演”的教师控制台切到“按班次”。“违规拆锁”只在这台设备挂着锁时有效：设备恢复运转而许可没关，规则 E5 会报警。') }}</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ $td(t.title) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l17_t1'" class="f" @submit.prevent="submit('l17_t1', a1)">
@@ -42,14 +42,14 @@
             <input v-model.number="a1.likelihood" type="number" min="1" max="5" required :aria-label="$t('可能性')"> ×
             <input v-model.number="a1.severity" type="number" min="1" max="5" required :aria-label="$t('严重度')">
             <span class="small">= {{ (a1.likelihood || 0) * (a1.severity || 0) }}</span></div>
-          <div class="field"><label>{{ $t('等级') }}</label><span class="cks"><label v-for="l in s.levels" :key="l"><input v-model="a1.level" type="radio" :value="l" required> {{ l }}</label></span></div>
+          <div class="field"><label>{{ $t('等级') }}</label><span class="cks"><label v-for="l in s.levels" :key="l"><input v-model="a1.level" type="radio" :value="l" required> {{ $td(l) }}</label></span></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
         <form v-if="t.id === 'l17_t2'" class="f" @submit.prevent="submit('l17_t2', a2)">
           <div class="field"><label>{{ $t('受影响的工单') }}</label><span class="cks">
-            <label v-for="w in s.options.work_orders" :key="w"><input v-model="a2.work_orders" type="checkbox" :value="w"> {{ w }}</label></span></div>
+            <label v-for="w in s.options.work_orders" :key="w"><input v-model="a2.work_orders" type="checkbox" :value="w"> {{ $td(w) }}</label></span></div>
           <div class="field"><label>{{ $t('受影响的订单') }}</label><span class="cks">
-            <label v-for="o in s.options.sales_orders" :key="o"><input v-model="a2.sales_orders" type="checkbox" :value="o"> {{ o }}</label></span></div>
+            <label v-for="o in s.options.sales_orders" :key="o"><input v-model="a2.sales_orders" type="checkbox" :value="o"> {{ $td(o) }}</label></span></div>
           <div class="field"><label>{{ $t('整改要多少分钟') }}</label><input v-model.number="a2.fix_minutes" type="number" min="0" step="10" required></div>
           <button class="btn primary" :disabled="!s.issue_id">{{ $t('提交') }}</button>
         </form>
@@ -66,10 +66,10 @@
         </div>
         <form v-if="t.id === 'l17_t5'" class="f" @submit.prevent="submit('l17_t5', a5)">
           <div class="field"><label>{{ $t('受影响的订单') }}</label><span class="cks">
-            <label v-for="b in s.buckets" :key="b"><input v-model="a5.bucket" type="radio" :value="b" required> {{ b }}</label></span></div>
+            <label v-for="b in s.buckets" :key="b"><input v-model="a5.bucket" type="radio" :value="b" required> {{ $td(b) }}</label></span></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

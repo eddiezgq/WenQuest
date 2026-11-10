@@ -7,11 +7,11 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
-        <span v-if="s.order" class="small">{{ $t('你的订单') }} <b class="mono">{{ s.order.sales_order }}</b>{{ $t('（WQ-AGV300 × {a}），请购单', { a: s.order.qty }) }}
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
+        <span v-if="s.order" class="small">{{ $t('你的订单') }} <b class="mono">{{ $td(s.order.sales_order) }}</b>{{ $t('（WQ-AGV300 × {a}），请购单', { a: $td(s.order.qty) }) }}
           <b class="mono">{{ s.order.material_request || '—' }}</b></span>
         <span v-else class="small muted">{{ $t('还没有你的 AGV 订单：先做任务 1') }}</span>
-        <span v-if="s.lot" class="small">{{ $t('WQR-105 批次') }} <b class="mono">{{ s.lot.lot || '#' + s.lot.id }}</b>{{ $t('：{a}{b}', { a: s.lot.status_label, b: s.lot_days !== null ? $t('，用了 ') + s.lot_days + $t(' 天') : '' }) }}</span>
+        <span v-if="s.lot" class="small">{{ $t('WQR-105 批次') }} <b class="mono">{{ s.lot.lot || '#' + s.lot.id }}</b>{{ $t('：{a}{b}', { a: $td(s.lot.status_label), b: s.lot_days !== null ? $t('，用了 ') + s.lot_days + $t(' 天') : '' }) }}</span>
         <router-link class="small" to="/work/planner">{{ $t('订单与计划') }}</router-link>
         <router-link class="small" to="/supply">{{ $t('采购与来料') }}</router-link>
         <button class="btn sm" @click="load">{{ $t('刷新') }}</button>
@@ -20,12 +20,12 @@
       <section v-if="s.teacher && s.class?.length" class="card">
         <div class="card-head"><h2>{{ $t('老师：全班成绩') }}</h2></div>
         <table class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l27_t1'" class="f" @submit.prevent="submit(t.id, a1)">
@@ -45,7 +45,7 @@
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
         <form v-if="t.id === 'l27_t5'" class="f" @submit.prevent="submit(t.id, a5)">
-          <p class="small">{{ $t('你的数据（示例值）：日需求均值 d =') }} <b>{{ s.demand.d }}</b> {{ $t('台/天，标准差 σ_d =') }} <b>{{ s.demand.sigma_d }}</b> {{ $t('台/天，提前期 L =') }} <b>{{ s.demand.lead_days }}</b> {{ $t('天，z = {a}', { a: s.demand.z }) }}</p>
+          <p class="small">{{ $t('你的数据（示例值）：日需求均值 d =') }} <b>{{ $td(s.demand.d) }}</b> {{ $t('台/天，标准差 σ_d =') }} <b>{{ $td(s.demand.sigma_d) }}</b> {{ $t('台/天，提前期 L =') }} <b>{{ $td(s.demand.lead_days) }}</b> {{ $t('天，z = {a}', { a: $td(s.demand.z) }) }}</p>
           <div class="lf"><label>{{ $t('安全库存 SS（台）') }}</label><input v-model.number="a5.ss" type="number" step="0.01" required></div>
           <div class="lf"><label>{{ $t('订货点 ROP（台）') }}</label><input v-model.number="a5.rop" type="number" step="0.01" required></div>
           <button class="btn primary">{{ $t('提交') }}</button>
@@ -55,7 +55,7 @@
             <label v-for="o in s.t6_choices" :key="o.value"><input v-model="a6.choice" type="radio" :value="o.value" required> {{ $td(o.label) }}</label></span></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

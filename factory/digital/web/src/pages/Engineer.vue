@@ -39,7 +39,7 @@
             <div v-for="e in chk.errors" :key="e" class="err">✗ {{ e }}</div>
             <div v-for="w in chk.warnings" :key="w" class="warnline">{{ $t('！{a}', { a: w }) }}
               <button v-if="chk.recommended" class="btn ghost small" @click="useRec">{{ $t('用推荐值') }}</button></div>
-            <div v-if="chk.ok" class="okline">{{ $t('✓ 校核通过 · 总长 {a} mm · 45 钢下料 {b} kg', { a: chk.total_length_mm, b: chk.bom?.[0]?.qty }) }}</div>
+            <div v-if="chk.ok" class="okline">{{ $t('✓ 校核通过 · 总长 {a} mm · 45 钢下料 {b} kg', { a: $td(chk.total_length_mm), b: chk.bom?.[0]?.qty }) }}</div>
           </div>
           <div class="line">
             <input v-model="note" class="note" maxlength="200" :placeholder="$t('改动说明，例如：键槽长 45 → 42')">
@@ -59,7 +59,7 @@
         <table v-else class="t">
           <thead><tr><th>{{ $t('版本') }}</th><th>{{ $t('时间') }}</th><th>{{ $t('设计者') }}</th><th>{{ $t('改动') }}</th><th>{{ $t('BOM（45 钢）') }}</th><th>{{ $t('文件') }}</th></tr></thead>
           <tbody><tr v-for="r in d.releases" :key="r.id">
-            <td class="mono b">rev {{ r.revision }}</td><td class="small">{{ timeOf(r.ts) }}</td><td>{{ r.author }}</td>
+            <td class="mono b">rev {{ $td(r.revision) }}</td><td class="small">{{ timeOf(r.ts) }}</td><td>{{ $td(r.author) }}</td>
             <td>{{ r.change_note || '—' }}</td><td class="mono">{{ r.bom?.[0]?.qty }} kg</td>
             <td class="small"><a v-for="f in r.files" :key="f.sha256" :href="'/api' + f.url.replace(/^\/api/, '')" target="_blank" class="flink">{{ f.kind === 'drawing' ? $t('零件图') : f.kind === 'step' ? 'STEP' : f.name }}</a></td>
           </tr></tbody>
@@ -88,20 +88,20 @@
           <router-link v-if="g" :to="{ path: '/3d', query: { gcode: g.gcode_ref } }" class="more">{{ $t('在 3D 车间回放 →') }}</router-link></div>
         <div v-if="!g" class="empty">{{ $t('还没有 G 代码（随设计发布一起生成）。') }}</div>
         <template v-else>
-          <p class="small">{{ $t('rev {a} · 刀具 {b} ·切削长度 {c} mm · 预计 {d} 分钟', { a: g.revision, b: g.tools.map((t) => t.type + ' Ø' + t.diameter_mm).join($t('、')), c: g.cut_length_mm, d: Math.round(g.est_time_s / 60 * 10) / 10 }) }}</p>
+          <p class="small">{{ $t('rev {a} · 刀具 {b} ·切削长度 {c} mm · 预计 {d} 分钟', { a: $td(g.revision), b: g.tools.map((t) => t.type + ' Ø' + t.diameter_mm).join($t('、')), c: $td(g.cut_length_mm), d: Math.round(g.est_time_s / 60 * 10) / 10 }) }}</p>
           <GcodeView :code="code" :slot="g.slot" />
           <pre class="code">{{ code }}</pre>
         </template>
       </section>
       <section class="card side">
-        <div class="card-head"><h2>{{ $t('工艺路线 {a}', { a: rt?.routing }) }}</h2></div>
+        <div class="card-head"><h2>{{ $t('工艺路线 {a}', { a: $td(rt?.routing) }) }}</h2></div>
         <table v-if="rt" class="t">
           <thead><tr><th>{{ $t('工序') }}</th><th class="num">{{ $t('分钟/件') }}</th><th>{{ $t('设备') }}</th></tr></thead>
           <tbody><tr v-for="o in rt.operations" :key="o.operation">
-            <td>{{ $td(o.operation.split(' ')[0]) }}</td><td class="num">{{ o.minutes }}</td><td class="mono small">{{ o.units.map((u) => u.toUpperCase()).join(' / ') }}</td>
+            <td>{{ $td(o.operation.split(' ')[0]) }}</td><td class="num">{{ $td(o.minutes) }}</td><td class="mono small">{{ o.units.map((u) => u.toUpperCase()).join(' / ') }}</td>
           </tr></tbody>
         </table>
-        <p v-if="rt" class="small muted">{{ $t('标准成本：材料 ${a} + 加工 ${b} / 件', { a: $td(rt.std_cost.material), b: rt.std_cost.operations }) }}</p>
+        <p v-if="rt" class="small muted">{{ $t('标准成本：材料 ${a} + 加工 ${b} / 件', { a: $td(rt.std_cost.material), b: $td(rt.std_cost.operations) }) }}</p>
       </section>
     </div>
   </div>
@@ -213,7 +213,7 @@ onMounted(async () => {
   if (g.value) code.value = await (await fetch(g.value.gcode_ref)).text();
   const al = await get('/history?type=ai.alert&hours=72&limit=50');
   alerts.value = al.filter((a) => (a.data.key || '').startsWith('release:')).slice(0, 3).map((a) => ({ id: a.id, ...a.data }));
-  if (session.user.mode === 'teach') teachStatus.value = await get('/teach');
+  if (session.user.mode === 'teach') teachStatus.value = await get('/teach').catch(() => null);   // 实验 7 只在减速器厂，别的厂回 404
 });
 </script>
 

@@ -6,6 +6,8 @@
 厂名、设备名、物料名：工厂清单里本来就是“中文 English”合写或有 name_en，这里给出 name_en 字段，网页按语言取。
 AI 简报、提醒正文、实验任务说明仍是中文（第三批）。
 """
+import json
+import os
 import re
 
 LANGS = ("zh", "en")
@@ -94,8 +96,31 @@ PATTERNS = [
 PATTERNS = [(re.compile(p), f) for p, f in PATTERNS]
 
 
-def tr(s, lang="en"):
-    """一句话译成英文；没有对照的原样返回（还是中文，第三批再补）"""
+# 第三批（细则 D-9）：各接口的报错，表在 hub/i18n_en.json：{"exact": {中文: 英文}, "templates": [[中文句型, 英文句型], …]}
+# 句型里变的部分写 {a} {b} …，整句对上后占位里的中文再换一遍（与网页 lib/i18n-core.js 的句型表同一规则）
+_TABLE = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "i18n_en.json"), encoding="utf-8"))
+EXACT.update(_TABLE.get("exact", {}))
+
+
+def _compile(lst):
+    out = []
+    for zh, en in lst:
+        lits = re.split(r"\{[a-z]\}", zh)
+        names = re.findall(r"\{([a-z])\}", zh)
+        if not names:
+            EXACT.setdefault(zh, en)
+            continue
+        src = re.escape(lits[0]) + "".join(r"([\s\S]*?)" + re.escape(lits[i + 1]) for i in range(len(names)))
+        out.append(((re.compile("^" + src + "$"), re.compile("^" + src.replace("*?)", "\0", 1).replace("*?)", "*)").replace("\0", "*?)") + "$"),
+                     re.compile("^" + src.replace("*?)", "*)") + "$")), names, en, max(lits, key=len), len("".join(lits))))
+    return sorted(out, key=lambda x: -x[4])
+
+
+TEMPLATES = _compile(_TABLE.get("templates", []))
+
+
+def tr(s, lang="en", _depth=0):
+    """一句话译成英文；没有对照的原样返回（中文）"""
     if lang != "en" or not isinstance(s, str) or not has_cjk(s):
         return s
     if s in EXACT:
@@ -104,6 +129,18 @@ def tr(s, lang="en"):
         m = rx.match(s)
         if m:
             return f(m)
+    if _depth < 4:
+        for rxs, names, en, key, _w in TEMPLATES:
+            if key and key not in s:
+                continue
+            for rx in rxs:                  # 先最短、再最长地分占位
+                m = rx.match(s)
+                if not m:
+                    continue
+                vals = {n: tr(m.group(i + 1), "en", _depth + 1) for i, n in enumerate(names)}
+                if any(has_cjk(v) for v in vals.values()):
+                    continue
+                return re.sub(r"\{([a-z])\}", lambda mm: vals.get(mm.group(1), mm.group(0)), en)
     return s
 
 
@@ -163,3 +200,25 @@ def localize_overview(ov, lang, units=None):
 def localize_detail(detail, lang):
     """HTTPException 的 detail（报错文字）"""
     return tr(detail, lang) if isinstance(detail, str) else detail
+
+
+# ---------------------------------------------------------------- 实验作答的关键词（第三批）
+# 实验 7、15–22 的“理由”按关键词给分；英文界面的学生用英文写，同一个意思的英文词也认
+KW_EN = {
+    "交期": ("due", "deliver", "schedule", "lead time"), "按时": ("on time", "on-time"), "晚": ("late", "delay"),
+    "成本": ("cost",), "钱": ("money", "$", "cost", "spend"), "费": ("fee", "cost", "expens", "pay"),
+    "风险": ("risk",), "客户": ("customer", "client"), "保修": ("warranty",), "安全": ("safe",), "伤": ("injur", "hurt"),
+    "概率": ("probab", "chance"), "可能": ("likel", "possib", "probab"), "损失": ("loss", "lose"),
+    "订单": ("order",), "产量": ("output", "throughput", "volume"), "少做": ("fewer", "less output", "lost parts"), "件": ("part", "pcs", "piece"),
+    "加班": ("overtime",), "班": ("shift",), "到料": ("arriv", "material"), "等": ("wait",), "贵": ("expensive", "pricier", "premium"),
+    "质量": ("quality",), "度": ("kwh",), "电": ("electric", "energy", "power"), "预热": ("warm",), "慢": ("slow",),
+    "现金": ("cash",), "收": ("collect", "receiv"), "款": ("payment", "invoice"), "关系": ("relationship", "relation"),
+    "发货": ("ship",), "调整": ("setup", "set-up", "adjust"), "换刀": ("tool change", "tool-change"), "准备": ("prepar",), "装夹": ("clamp", "fixtur"),
+}
+
+
+def has_kw(text, words):
+    """作答里有没有这些关键词之一（中文原词，或它的英文说法，不分大小写）"""
+    t = str(text or "")
+    low = t.lower()
+    return any(w in t or any(e in low for e in KW_EN.get(w, ())) for w in words)

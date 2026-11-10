@@ -1,15 +1,15 @@
 <template>
   <div class="page">
-    <div class="page-title"><h1><span class="mono">{{ task?.code }}</span> {{ task?.title?.[0] }}</h1>
+    <div class="page-title"><h1><span class="mono">{{ $td(task?.code) }}</span> {{ task?.title?.[0] }}</h1>
       <router-link to="/tasks" class="small">{{ $t('← 我的任务') }}</router-link></div>
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="task">
       <section class="card">
-        <p class="small">{{ $t('角色：') }}<b>{{ task.role?.[0] }}</b> {{ $t('· 建议 {a} 学时 · 交期', { a: task.hours }) }} <b>{{ task.due ? timeOf(task.due) : $t('未定') }}</b>
+        <p class="small">{{ $t('角色：') }}<b>{{ task.role?.[0] }}</b> {{ $t('· 建议 {a} 学时 · 交期', { a: $td(task.hours) }) }} <b>{{ task.due ? timeOf(task.due) : $t('未定') }}</b>
           <span v-if="left" class="muted">{{ $t('（{a}）', { a: left }) }}</span> {{ $t('· 工位') }} <span v-for="s in task.stations" :key="s" class="pill">{{ s }}</span></p>
         <p>{{ task.background?.[0] }}</p>
         <p v-if="task.docs_base" class="small">{{ $t('下载：') }}
-          <a v-for="k in task.docs" :key="k" :href="task.docs_base + k" target="_blank">{{ DOCS[k] }}</a></p>
+          <a v-for="k in task.docs" :key="k" :href="task.docs_base + k" target="_blank">{{ $td(DOCS[k]) }}</a></p>
         <div class="stages">
           <span v-for="(n, i) in STAGES" :key="n" class="stage" :class="{ done: i <= stage, now: i === stage + 1 }">{{ i + 1 }} {{ n }}</span>
         </div>
@@ -22,9 +22,9 @@
         <table v-else class="t">
           <thead><tr><th>{{ $t('学生') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('轮次') }}</th><th>{{ $t('AI 意见（未关闭）') }}</th><th class="num">{{ $t('AI 建议分') }}</th><th class="num">{{ $t('成绩') }}</th><th></th></tr></thead>
           <tbody><tr v-for="s in subs" :key="s.id">
-            <td>{{ $td(s.name) }}</td><td><span class="pill" :class="TONE[s.status]">{{ s.status_zh }}</span></td>
-            <td class="num">{{ s.rounds }}</td>
-            <td class="small">{{ $t('{a} 必改 · {b} 建议', { a: s.open_errors, b: s.open_warnings }) }}</td>
+            <td>{{ $td(s.name) }}</td><td><span class="pill" :class="TONE[s.status]">{{ $td(s.status_zh) }}</span></td>
+            <td class="num">{{ $td(s.rounds) }}</td>
+            <td class="small">{{ $t('{a} 必改 · {b} 建议', { a: $td(s.open_errors), b: $td(s.open_warnings) }) }}</td>
             <td class="num">{{ s.suggested ?? '—' }}</td><td class="num">{{ s.total ?? '—' }}</td>
             <td><router-link v-if="s.status !== 'draft'" :to="'/tasks/review/' + s.id">{{ $t('审阅') }}</router-link></td></tr></tbody>
         </table>
@@ -34,13 +34,13 @@
       <section v-else class="card">
         <div class="card-head"><h2>{{ $t('交付物') }}</h2>
           <span class="pill" :class="TONE[sub?.status || 'draft']">{{ sub ? sub.status_zh : $t('未开始') }}</span>
-          <span v-if="sub?.status === 'returned'" class="err small">{{ $t('老师退回：{a}', { a: sub.decision }) }}</span></div>
+          <span v-if="sub?.status === 'returned'" class="err small">{{ $t('老师退回：{a}', { a: $td(sub.decision) }) }}</span></div>
         <table class="t">
           <thead><tr><th>#</th><th>{{ $t('交付物') }}</th><th>{{ $t('验收标准') }}</th><th>{{ $t('状态') }}</th><th></th></tr></thead>
           <tbody><tr v-for="d in task.deliverables" :key="d.i">
             <td>{{ d.i + 1 }}</td>
-            <td>{{ d.name[0] }}<div class="small muted">{{ KIND[d.kind] }}{{ d.formats ? $t('（') + d.formats.join($t('、')) + $t('）') : '' }}{{ d.item ? ' · ' + d.item : '' }}</div></td>
-            <td class="small">{{ d.accept[0] }}</td>
+            <td>{{ $td(d.name[0]) }}<div class="small muted">{{ $td(KIND[d.kind]) }}{{ d.formats ? $t('（') + d.formats.join($t('、')) + $t('）') : '' }}{{ d.item ? ' · ' + d.item : '' }}</div></td>
+            <td class="small">{{ $td(d.accept[0]) }}</td>
             <td class="small">
               <template v-if="got(d)">
                 <span v-if="d.kind === '文件'">✓ <a :href="got(d).files[0].url" target="_blank">{{ got(d).files[0].name }}</a></span><!-- i18n-ok 数据值比较 -->
@@ -68,7 +68,7 @@
         <!-- 弹出的小表单 -->
         <div v-if="open" class="pop">
           <template v-if="open.kind === 'design'">
-            <b>{{ $t('提交 {a} 的模型（进“待审”，任务单批准时一并生效）', { a: open.d.item }) }}</b>
+            <b>{{ $t('提交 {a} 的模型（进“待审”，任务单批准时一并生效）', { a: $td(open.d.item) }) }}</b>
             <label>{{ $t('STEP 模型') }} <input type="file" accept=".step,.stp" @change="(e) => (open.step = e.target.files[0])"></label>
             <label>{{ $t('图纸（可选，PDF 或 SVG）') }}<input type="file" accept=".pdf,.svg" @change="(e) => (open.drawing = e.target.files[0])"></label>
             <label>{{ $t('改动说明') }} <input v-model="open.note" maxlength="300"></label>
@@ -79,14 +79,14 @@
             <b>{{ $t('选择“仿真与分析”里自己算完的作业') }}</b>
             <div v-if="!jobs.length" class="small muted">{{ $t('还没有作业。先到') }} <router-link to="/cae">{{ $t('仿真与分析') }}</router-link> {{ $t('算一个。') }}</div>
             <label v-for="j in jobs" :key="j.id" class="opt"><input v-model="open.job" type="radio" :value="j.id">
-              <span class="mono">{{ j.id }}</span> {{ j.title || j.item }} · {{ j.status }}</label>
+              <span class="mono">{{ $td(j.id) }}</span> {{ j.title || j.item }} · {{ $td(j.status) }}</label>
             <div class="line"><button class="btn primary" :disabled="!open.job" @click="sendLink({ job: open.job })">{{ $t('选定') }}</button>
               <button class="btn ghost" @click="open = null">{{ $t('取消') }}</button></div>
           </template>
           <template v-else-if="open.kind === 'process'">
             <b>{{ $t('选择自己提交的工艺规程') }}</b>
             <label v-for="p in procs" :key="p.id" class="opt"><input v-model="open.process" type="radio" :value="p.id">
-              <span class="mono">{{ p.id }}</span> {{ $t('{a} · {b} · AI 建议分 {c}', { a: $td(p.status), b: timeOf(p.ts), c: p.score ?? '—' }) }}</label>
+              <span class="mono">{{ $td(p.id) }}</span> {{ $t('{a} · {b} · AI 建议分 {c}', { a: $td(p.status), b: timeOf(p.ts), c: p.score ?? '—' }) }}</label>
             <div class="line"><button class="btn primary" :disabled="!open.process" @click="sendLink({ process: open.process })">{{ $t('选定') }}</button>
               <button class="btn ghost" @click="open = null">{{ $t('取消') }}</button></div>
           </template>
@@ -109,9 +109,9 @@
           <span class="small muted">{{ $t('预检随时可点，只给意见、不记录；提交后进“待老师审阅”，不能再改，退回后才能改。') }}</span>
         </div>
         <div v-if="pre" class="pre">
-          <b>{{ $t('AI 预检：建议分 {a}', { a: pre.suggested_score }) }}</b>
+          <b>{{ $t('AI 预检：建议分 {a}', { a: $td(pre.suggested_score) }) }}</b>
           <div v-if="!pre.findings.length" class="small ok">{{ $t('没有发现问题。') }}</div>
-          <div v-for="(f, i) in pre.findings" :key="i" class="small"><span class="pill" :class="f.level === 'error' ? 'bad' : f.level === 'warning' ? 'warn' : ''">{{ LEVEL[f.level] }}</span>
+          <div v-for="(f, i) in pre.findings" :key="i" class="small"><span class="pill" :class="f.level === 'error' ? 'bad' : f.level === 'warning' ? 'warn' : ''">{{ $td(LEVEL[f.level]) }}</span>
             {{ f.d !== null ? $t('〔') + task.deliverables[f.d].name[0] + $t('〕') : '' }}{{ $td(f.text) }}</div>
         </div>
         <div v-if="msg" class="small" :class="ok ? 'ok' : 'err'">{{ msg }}</div>
@@ -120,10 +120,10 @@
       <section v-if="sub && sub.comments?.length && !teacher" class="card">
         <div class="card-head"><h2>{{ $t('评审意见') }}</h2><span class="muted small">{{ $t('{a} 条未关闭（老师看过你的回复后关闭）', { a: openCount }) }}</span></div>
         <div v-for="c in sub.comments" :key="c.id" class="cm" :class="{ done: c.resolved }">
-          <div class="small"><span v-if="c.level" class="pill" :class="c.level === 'error' ? 'bad' : 'warn'">{{ LEVEL[c.level] }}</span>
-            <b>{{ c.author }}</b> <span class="muted">· {{ timeOf(c.ts) }}{{ c.resolved ? $t(' · 已关闭') : '' }}</span></div>
-          <div>{{ c.body }}</div>
-          <div v-if="c.reply" class="reply small">{{ $t('我的回复：{a}', { a: c.reply }) }}</div>
+          <div class="small"><span v-if="c.level" class="pill" :class="c.level === 'error' ? 'bad' : 'warn'">{{ $td(LEVEL[c.level]) }}</span>
+            <b>{{ $td(c.author) }}</b> <span class="muted">· {{ timeOf(c.ts) }}{{ c.resolved ? $t(' · 已关闭') : '' }}</span></div>
+          <div>{{ $td(c.body) }}</div>
+          <div v-if="c.reply" class="reply small">{{ $t('我的回复：{a}', { a: $td(c.reply) }) }}</div>
           <form v-if="!c.resolved" class="line" @submit.prevent="reply(c)">
             <input v-model="replies[c.id]" maxlength="1000" :placeholder="$t('回复：改了什么，或为什么不改')">
             <button class="btn small" :disabled="!(replies[c.id] || '').trim()">{{ $t('回复') }}</button>
@@ -136,8 +136,8 @@
         <div class="card-head"><h2>{{ $t('检验结果（仿真车间三坐标）') }}</h2></div>
         <table class="t small">
           <thead><tr><th>{{ $t('零件序号') }}</th><th>{{ $t('特性') }}</th><th class="num">{{ $t('名义') }}</th><th class="num">{{ $t('实测') }}</th><th>{{ $t('结论') }}</th></tr></thead>
-          <tbody><tr v-for="(m, i) in sub.inspection" :key="i"><td class="mono">{{ m.part_serial }}</td><td>{{ m.characteristic }}</td>
-            <td class="num">{{ m.nominal_mm }}</td><td class="num mono">{{ m.value_mm }}</td>
+          <tbody><tr v-for="(m, i) in sub.inspection" :key="i"><td class="mono">{{ $td(m.part_serial) }}</td><td>{{ $td(m.characteristic) }}</td>
+            <td class="num">{{ $td(m.nominal_mm) }}</td><td class="num mono">{{ $td(m.value_mm) }}</td>
             <td><span class="pill" :class="m.result === 'pass' ? 'good' : 'bad'">{{ m.result === 'pass' ? $t('合格') : $t('不合格') }}</span></td></tr></tbody>
         </table>
       </section>
@@ -146,28 +146,28 @@
         <div class="card-head"><h2>{{ $t('虚拟 PLC 试生产') }}</h2><router-link to="/plc" class="more">{{ $t('打开“虚拟 PLC”页看详情') }}</router-link></div>
         <table class="t small">
           <thead><tr><th>{{ $t('班次') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('产量') }}</th><th class="num">{{ $t('合格 / 不合格') }}</th><th class="num">{{ $t('平均节拍') }}</th><th class="num">{{ $t('报警') }}</th><th class="num">{{ $t('停机') }}</th><th>{{ $t('OpenPLC 兼容') }}</th></tr></thead>
-          <tbody><tr v-for="r in sub.plc_runs" :key="r.id"><td class="mono">{{ r.id }}</td>
+          <tbody><tr v-for="r in sub.plc_runs" :key="r.id"><td class="mono">{{ $td(r.id) }}</td>
             <td>{{ { queued: $t('排队'), running: $t('运行中'), done: $t('班次完成'), failed: $t('失败'), cancelled: $t('已停止') }[r.status] }}{{ r.status === 'running' ? $t('（') + Math.round((r.live.progress || 0) * 100) + $t('%）') : '' }}</td>
             <td class="num">{{ r.summary ? r.summary.parts : r.live.n || 0 }}</td>
             <td class="num">{{ r.summary ? r.summary.good + ' / ' + r.summary.nok : (r.live.good_n || 0) + ' / ' + (r.live.nok_n || 0) }}</td>
-            <td class="num">{{ r.summary?.cycle_mean_s ?? r.live.cycle_s ?? '—' }} s</td><td class="num">{{ r.alarms.length }}</td>
+            <td class="num">{{ r.summary?.cycle_mean_s ?? r.live.cycle_s ?? '—' }} s</td><td class="num">{{ $td(r.alarms.length) }}</td>
             <td class="num">{{ r.summary ? r.summary.downtime_min + $t(' 分') : '—' }}</td>
             <td>{{ !r.compat ? '—' : r.compat.ok ? $t('通过') : r.compat.stage === 'compile' ? $t('编译不过（看详情）') : $t('没做成') }}</td></tr></tbody>
         </table>
-        <div v-for="r in sub.plc_runs.filter((x) => x.error)" :key="r.id + 'e'" class="err small">{{ $t('{a}：{b}', { a: r.id, b: r.error }) }}</div>
+        <div v-for="r in sub.plc_runs.filter((x) => x.error)" :key="r.id + 'e'" class="err small">{{ $t('{a}：{b}', { a: $td(r.id), b: $td(r.error) }) }}</div>
       </section>
 
       <section v-if="sub?.score" class="card">
-        <div class="card-head"><h2>{{ $t('成绩：{a} 分', { a: sub.score.total }) }}</h2></div>
-        <table class="t small"><tbody><tr v-for="(x, i) in task.rubric" :key="i"><td>{{ x[$t('项')][0] }}</td><td class="num">{{ sub.score.items[i] }} / {{ x[$t('分')] }}</td></tr></tbody></table>
+        <div class="card-head"><h2>{{ $t('成绩：{a} 分', { a: $td(sub.score.total) }) }}</h2></div>
+        <table class="t small"><tbody><tr v-for="(x, i) in task.rubric" :key="i"><td>{{ x[$t('项')][0] }}</td><td class="num">{{ $td(sub.score.items[i]) }} / {{ x[$t('分')] }}</td></tr></tbody></table>
         <p v-if="sub.score.note" class="small">{{ $td(sub.score.note) }}</p>
       </section>
 
       <section class="card">
         <div class="card-head"><h2>{{ $t('步骤') }}</h2></div>
-        <ol class="small"><li v-for="(s, i) in task.steps" :key="i">{{ s[0] }}</li></ol>
+        <ol class="small"><li v-for="(s, i) in task.steps" :key="i">{{ $td(s[0]) }}</li></ol>
         <div class="card-head"><h2>{{ $t('评审要点') }}</h2></div>
-        <ol class="small"><li v-for="(s, i) in task.review_points" :key="i">{{ s[0] }}</li></ol>
+        <ol class="small"><li v-for="(s, i) in task.review_points" :key="i">{{ $td(s[0]) }}</li></ol>
         <div class="card-head"><h2>{{ $t('评分量规') }}</h2></div>
         <table class="t small"><tbody><tr v-for="(x, i) in task.rubric" :key="i"><td>{{ x[$t('项')][0] }}</td><td class="num">{{ x[$t('分')] }}</td><td>{{ x[$t('标准')][0] }}</td></tr></tbody></table>
       </section>

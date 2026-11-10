@@ -7,14 +7,14 @@
     <div class="layout">
       <section class="card left">
         <div class="card-head"><h2>{{ $t('改动') }}</h2></div>
-        <p class="small muted">{{ $t('快照：') }}<template v-if="snap">#{{ snap.id }} · {{ fmtTs(snap.factory_now) }} · {{ snap.exact ? $t('精确') : $t('近似（从总线状态重建）') }}</template>
+        <p class="small muted">{{ $t('快照：') }}<template v-if="snap">#{{ $td(snap.id) }} · {{ fmtTs(snap.factory_now) }} · {{ snap.exact ? $t('精确') : $t('近似（从总线状态重建）') }}</template>
           <template v-else>{{ $t('未拍') }}</template>
           <button class="linkbtn" :disabled="busy" @click="newSnap">{{ $t('拍新快照') }}</button></p>
         <p v-if="isPast" class="small pastn">{{ $t('复盘推演：这是过去的快照，可以试“如果当时那样做会怎样”，但不能变成动作。') }}</p>
         <p class="small muted">{{ $t('车间：{a}', { a: shift.mode === 'shift' ? $t('按班次（') + shift.start + '–' + shift.end + $t('）') : $t('24 小时连续') }) }}</p>
         <ol class="changes">
           <li v-for="(c, i) in changes" :key="i">
-            <span class="pill info">{{ TYPE_LABEL[c.type] }}</span> <span class="small">{{ describe(c) }}</span>
+            <span class="pill info">{{ $td(TYPE_LABEL[c.type]) }}</span> <span class="small">{{ describe(c) }}</span>
             <button class="linkbtn" @click="changes.splice(i, 1); run()">{{ $t('删除') }}</button>
           </li>
         </ol>
@@ -25,12 +25,12 @@
             <select v-model="form.type"><option v-for="(l, k) in TYPES" :key="k" :value="k">{{ $td(l) }}</option></select></div>
           <template v-if="form.type === 'reassign'">
             <div class="field"><label>{{ $t('工单 · 工序（在哪台设备）') }}</label>
-              <select v-model="form.job"><option v-for="j in jobs" :key="j.k" :value="j">{{ $t('{a} · {b}（{c}）', { a: j.wo, b: j.op.split(' ')[0], c: j.unit.toUpperCase() }) }}</option></select></div>
+              <select v-model="form.job"><option v-for="j in jobs" :key="j.k" :value="j">{{ $t('{a} · {b}（{c}）', { a: $td(j.wo), b: j.op.split(' ')[0], c: j.unit.toUpperCase() }) }}</option></select></div>
             <div class="field"><label>{{ $t('改到') }}</label><select v-model="form.to_unit"><option v-for="u in alts" :key="u" :value="u">{{ u.toUpperCase() }}</option></select></div>
           </template>
           <template v-if="form.type === 'reorder' || form.type === 'outsource'">
             <div class="field"><label>{{ $t('工单 · 工序（在哪台设备）') }}</label>
-              <select v-model="form.job"><option v-for="j in jobs" :key="j.k" :value="j">{{ $t('{a} · {b}（{c}）', { a: j.wo, b: j.op.split(' ')[0], c: j.unit.toUpperCase() }) }}</option></select></div>
+              <select v-model="form.job"><option v-for="j in jobs" :key="j.k" :value="j">{{ $t('{a} · {b}（{c}）', { a: $td(j.wo), b: j.op.split(' ')[0], c: j.unit.toUpperCase() }) }}</option></select></div>
             <template v-if="form.type === 'outsource'">
               <div class="field"><label>{{ $t('件数') }}</label><input v-model.number="form.qty" type="number" min="1"></div>
               <div class="field"><label>{{ $t('外协周期（天）') }}</label><input v-model.number="form.days" type="number" min="0.5" step="0.5"></div>
@@ -53,7 +53,7 @@
             <div class="field"><label>{{ $t('到货日') }}</label><input v-model="form.arrive" type="date"></div>
           </template>
           <template v-if="form.type === 'split_delivery'">
-            <div class="field"><label>{{ $t('销售订单') }}</label><select v-model="form.sales_order"><option v-for="s in sos" :key="s.name" :value="s.name">{{ $t('{a}（{b} 台，交期 {c}）', { a: $td(s.name), b: s.qty, c: s.delivery_date }) }}</option></select></div>
+            <div class="field"><label>{{ $t('销售订单') }}</label><select v-model="form.sales_order"><option v-for="s in sos" :key="s.name" :value="s.name">{{ $t('{a}（{b} 台，交期 {c}）', { a: $td(s.name), b: $td(s.qty), c: $td(s.delivery_date) }) }}</option></select></div>
             <div class="field"><label>{{ $t('首批台数') }}</label><input v-model.number="form.first_qty" type="number" min="1"></div>
             <div class="field"><label>{{ $t('首批交期') }}</label><input v-model="form.first_date" type="date"></div>
           </template>
@@ -81,13 +81,13 @@
         <table class="t small">
           <thead><tr><th>{{ $t('订单') }}</th><th>{{ $t('交期') }}</th><th>{{ $t('不处理') }}</th><th>{{ $t('本方案') }}</th><th v-for="s in compared" :key="s.id">{{ $td(s.title) }}</th></tr></thead>
           <tbody><tr v-for="so in orderRows" :key="so.name">
-            <td class="mono">{{ $td(so.name) }}</td><td>{{ so.delivery_date }}</td>
+            <td class="mono">{{ $td(so.name) }}</td><td>{{ $td(so.delivery_date) }}</td>
             <td v-for="(r, i) in [base, cur, ...compared.map((x) => x.result)]" :key="i" v-html="soCell(r, so.name)"></td>
           </tr>
           <tr><td>{{ $t('多花的钱') }}</td><td></td><td v-for="(r, i) in [base, cur, ...compared.map((x) => x.result)]" :key="'c' + i" class="num">${{ Math.round(r?.cost_total || 0).toLocaleString() }}</td></tr>
           <tr><td>{{ $t('加班') }}</td><td></td><td v-for="(r, i) in [base, cur, ...compared.map((x) => x.result)]" :key="'o' + i" class="num">{{ otText(r) }}</td></tr></tbody>
         </table>
-        <ul v-if="cur?.costs?.length" class="small costs"><li v-for="(c, i) in cur.costs" :key="i">{{ $t('{a}：${b}', { a: c.what, b: c.usd.toLocaleString() }) }}</li></ul>
+        <ul v-if="cur?.costs?.length" class="small costs"><li v-for="(c, i) in cur.costs" :key="i">{{ $t('{a}：${b}', { a: $td(c.what), b: c.usd.toLocaleString() }) }}</li></ul>
         <ul v-if="cur?.checks?.length" class="small"><li v-for="(c, i) in cur.checks" :key="i" :class="c.ok ? 'ok' : 'err'">{{ $td(c.text) }}</li></ul>
       </section>
 
@@ -95,7 +95,7 @@
         <div class="card-head"><h2>{{ $t('场景') }}</h2><span class="small muted">{{ $t('勾选最多 4 个并排比较') }}</span></div>
         <p v-if="!scenarios.length" class="small muted">{{ $t('还没有保存的场景。') }}</p>
         <label v-for="s in scenarios" :key="s.id" class="sc small"><input v-model="cmp" type="checkbox" :value="s.id" :disabled="cmp.length >= 4 && !cmp.includes(s.id)" @change="loadCompared">
-          <b>{{ $td(s.title) }}</b> <span class="muted">SC-{{ String(s.id).padStart(5, '0') }} · {{ s.created_by }} · ${{ Math.round(s.cost || 0) }}</span>
+          <b>{{ $td(s.title) }}</b> <span class="muted">SC-{{ String(s.id).padStart(5, '0') }} · {{ $td(s.created_by) }} · ${{ Math.round(s.cost || 0) }}</span>
           <button class="linkbtn" @click.prevent="open(s.id)">{{ $t('载入') }}</button></label>
       </section>
     </div>

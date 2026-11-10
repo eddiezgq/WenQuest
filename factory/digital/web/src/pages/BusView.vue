@@ -3,13 +3,13 @@
     <div class="page-title"><h1>{{ $t('统一数据总线') }}</h1><span class="muted">{{ $t('所有软件、设备和 AI 只和总线打交道；这里是总线上正在流过的消息（本页只显示当前模式）') }}</span></div>
     <div class="row">
       <section class="card grow">
-        <div class="card-head"><h2>{{ $t('实时消息') }}</h2><span class="muted small">{{ $t('{a} · 最近一分钟 {b} 条', { a: bus.connected ? $t('已连接') : $t('未连接'), b: bus.rate }) }}</span>
+        <div class="card-head"><h2>{{ $t('实时消息') }}</h2><span class="muted small">{{ $t('{a} · 最近一分钟 {b} 条', { a: bus.connected ? $t('已连接') : $t('未连接'), b: $td(bus.rate) }) }}</span>
           <label class="more small"><input v-model="paused" type="checkbox"> {{ $t('暂停') }}</label></div>
         <table class="t">
           <thead><tr><th>{{ $t('时间') }}</th><th>{{ $t('主题') }}</th><th>{{ $t('类型') }}</th><th>{{ $t('关联号') }}</th><th>{{ $t('内容') }}</th></tr></thead>
           <tbody><tr v-for="(m, i) in shown" :key="i">
             <td class="mono small">{{ new Date(m.ts).toLocaleTimeString('zh-CN', { hour12: false }) }}</td>
-            <td class="mono small">{{ m.topic }}</td><td class="mono small">{{ m.type }}</td><td class="mono small">{{ m.corr || '' }}</td>
+            <td class="mono small">{{ $td(m.topic) }}</td><td class="mono small">{{ $td(m.type) }}</td><td class="mono small">{{ m.corr || '' }}</td>
             <td class="small data">{{ brief(m.data) }}</td>
           </tr></tbody>
         </table>

@@ -888,10 +888,6 @@
 "HT200 Housing base casting"
 ],
 [
-"贴片电阻 0805（抱闸电流采样 0.5 Ω，第 114 轮）",
-"Chip resistor 0805"
-],
-[
 "输入齿轮轴 m2 z24 Input pinion shaft",
 "m2 z24 Input pinion shaft"
 ],
@@ -1038,14 +1034,6 @@
 [
 "贴片电容 0402 Chip capacitor 0402",
 "Chip capacitor 0402"
-],
-[
-"钕铁硼磁钢 60 机座（10 块一套，未充磁，型号待确认）",
-"NdFeB magnet set frame 60"
-],
-[
-"钕铁硼磁钢 80 机座（10 块一套，未充磁，型号待确认）",
-"NdFeB magnet set frame 80"
 ],
 [
 "45钢圆棒 Ø50 Steel bar 1045 Ø50",
@@ -1364,14 +1352,6 @@
 "Pin-hole reaming"
 ],
 [
-"定子硅钢冲片 60 机座（一台份，型号待确认）",
-"Stator laminations frame 60"
-],
-[
-"定子硅钢冲片 80 机座（一台份，型号待确认）",
-"Stator laminations frame 80"
-],
-[
 "嵌线整形 Insertion & lacing",
 "Insertion & lacing"
 ],
@@ -1482,10 +1462,6 @@
 [
 "平键 8×7×36 Parallel key",
 "8×7×36 Parallel key"
-],
-[
-"应变片 350 Ω（剪切型双栅，型号待确认）",
-"Strain gauge 350 Ω"
 ],
 [
 "扭矩终检 Torque final test",
@@ -1880,14 +1856,6 @@
 "Quench & temper"
 ],
 [
-"转子铁芯与轴 60 机座（外协机加）",
-"Rotor core & shaft frame 60"
-],
-[
-"转子铁芯与轴 80 机座（外协机加）",
-"Rotor core & shaft frame 80"
-],
-[
 "轴承闷盖 Ø52 Blind cap",
 "Ø52 Blind cap"
 ],
@@ -1974,14 +1942,6 @@
 [
 "旧砂处理（磁选、破碎、筛分、冷却）",
 "Sand reclamation"
-],
-[
-"机壳与端盖 60 机座（铝，外协）",
-"Housing & end caps frame 60"
-],
-[
-"机壳与端盖 80 机座（铝，外协）",
-"Housing & end caps frame 80"
 ],
 [
 "清洁度分析（过滤称重 + 显微镜）",
@@ -2526,10 +2486,6 @@
 [
 "跑合试验台 TEST-01",
 "Run-in test rig TEST-01"
-],
-[
-"轴套 Ø20（型号待确认）",
-"Bushing Ø20"
 ],
 [
 "上刀、下刀（型号待确认）",
@@ -3110,14 +3066,6 @@
 [
 "面漆喷房 PAINT",
 "Top-coat booth PAINT"
-],
-[
-"6061 铝合金棒",
-"Aluminium bar 6061 Ø120"
-],
-[
-"6061 铝合金管",
-"Aluminium tube Ø90×3"
 ],
 [
 "三坐标 CMM-R",
@@ -3936,10 +3884,6 @@
 "Passives & Connectors (Demo)"
 ],
 [
-"45 钢圆棒",
-"Steel bar 1045 Ø16"
-],
-[
 "三坐标测量室",
 "CMM room"
 ],
@@ -4172,10 +4116,6 @@
 "Bearings & Fasteners (Demo)"
 ],
 [
-"轴承钢冷拉棒",
-"Bearing steel bar Ø9"
-],
-[
 "选择焊 SW",
 "Selective soldering SW"
 ],
@@ -4214,10 +4154,6 @@
 [
 "驱动板贴片板",
 "Drive board SMT assembly"
-],
-[
-"45钢圆棒",
-"Steel bar 1045 Ø50"
 ],
 [
 "AI 运行",
@@ -4270,10 +4206,6 @@
 [
 "关节测试台",
 "Joint test bench"
-],
-[
-"内六角螺钉",
-"Socket screw M4×12"
 ],
 [
 "出厂测试台",
@@ -4334,10 +4266,6 @@
 [
 "嵌线整形台",
 "Insertion & lacing bench"
-],
-[
-"工业齿轮油",
-"L-CKC 220 Gear oil"
 ],
 [
 "工程任务单",
@@ -4458,10 +4386,6 @@
 [
 "激光打标机",
 "Laser marker"
-],
-[
-"激光扫描仪",
-"SICK TiM781 Laser scanner"
 ],
 [
 "炉前分析室",
@@ -5066,14 +4990,6 @@
 [
 "负载跑合",
 "Load run-in"
-],
-[
-"贴片电容",
-"Chip capacitor 0402"
-],
-[
-"贴片电阻",
-"Chip resistor 0402"
 ],
 [
 "跑合试验",

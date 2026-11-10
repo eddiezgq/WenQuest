@@ -7,14 +7,14 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span v-if="!s.teacher" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? $t('比对模式：提交任务 3 之前，指挥台和 AI 不显示建议') : $t('已提交选择：可以看中枢的建议，和你的对比') }}</span>
         <span class="small" :class="s.sim ? 'ok' : 'muted'">{{ $t('能源模拟器{a}', { a: s.sim ? $t('已打开') : $t('没打开') }) }}</span>
         <span v-if="s.lab" class="small">{{ $t('已注入：{a} 下班忘关、峰时开炉', { a: s.unit.toUpperCase() }) }}</span>
         <router-link v-if="s.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.anomaly_id } }">{{ $t('打开 {a} 空转异常', { a: s.unit.toUpperCase() }) }}</router-link>
         <router-link class="small" to="/energy?tab=overview">{{ $t('能源总览') }}</router-link>
         <router-link class="small" to="/energy?tab=unit">{{ $t('单耗') }}</router-link>
-        <span class="small muted">{{ $t('电价 峰 ${a} / 平 ${b} / 谷 ${c}；排放因子 {d} kg/度', { a: s.price.peak, b: s.price.flat, c: s.price.valley, d: s.factor }) }}</span>
+        <span class="small muted">{{ $t('电价 峰 ${a} / 平 ${b} / 谷 ${c}；排放因子 {d} kg/度', { a: $td(s.price.peak), b: $td(s.price.flat), c: $td(s.price.valley), d: $td(s.factor) }) }}</span>
         <span v-if="!s.teacher && session.user?.role !== 'planner'" class="small warn-t">{{ $t('提示：节能设定用“计划员”角色发起（右上角切换角色）。') }}</span>
       </div>
 
@@ -27,12 +27,12 @@
         </div>
         <p class="small muted">{{ $t('空转满 1 小时（工厂时间；20 倍速约 3 分钟）后厂情中枢出异常；这两个问题不会被模拟器自动“修好”。') }}</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ $td(t.title) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l21_t1'" class="f" @submit.prevent="submit('l21_t1', a1)">
@@ -61,7 +61,7 @@
           <div class="field"><label>{{ $t('③ {a} 每晚待机一个月少排的碳（kg）', { a: s.unit.toUpperCase() }) }}</label><input v-model.number="a5.standby_co2" type="number" step="0.1" required></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

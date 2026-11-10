@@ -7,11 +7,11 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span v-if="!s.teacher" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? $t('比对模式：提交任务 2 之前，指挥台和 AI 不显示建议') : $t('已提交选择：可以看中枢的建议，和你的对比') }}</span>
         <router-link v-if="s.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.anomaly_id } }">{{ $t('打开这台设备的异常') }}</router-link>
         <router-link class="small" to="/maint">{{ $t('设备维护') }}</router-link>
-        <span class="small muted">{{ $t('车间可靠性系数 {a}', { a: s.factor }) }}</span>
+        <span class="small muted">{{ $t('车间可靠性系数 {a}', { a: $td(s.factor) }) }}</span>
         <span v-if="!s.teacher && session.user?.role !== 'maintenance'" class="small warn-t">{{ $t('提示：保养工单要用“维修工”角色发起（右上角切换角色）。') }}</span>
       </div>
 
@@ -25,12 +25,12 @@
         </div>
         <p class="small muted">{{ $t('建议：加速 ×5，GRD-01 拨到 600–700 小时（保养周期 500）。运行小时填 0 表示只改可靠性。') }}</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ $td(t.title) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l18_t1'" class="f" @submit.prevent="submit('l18_t1', a1)">
@@ -60,7 +60,7 @@
           <div class="field"><label>{{ $t('全厂近 30 天 MTBF（运行小时）') }}</label><input v-model.number="a5.mtbf" type="number" step="0.1" required></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

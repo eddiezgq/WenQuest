@@ -7,8 +7,8 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
-        <span class="small">{{ $t('终检报故障 7（抱闸）的 3 台关节模组：') }}<b v-for="j in s.joints" :key="j.serial" class="mono sn">{{ j.serial }}</b></span>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
+        <span class="small">{{ $t('终检报故障 7（抱闸）的 3 台关节模组：') }}<b v-for="j in s.joints" :key="j.serial" class="mono sn">{{ $td(j.serial) }}</b></span>
         <button class="btn sm" @click="load">{{ $t('刷新') }}</button>
       </div>
       <div v-if="s.sim_missing" class="err">{{ $t('固件仿真结果缺失（designs/drv-joint-b/fw/out/sim_motor.json），这个实验暂时做不了。') }}</div>
@@ -16,8 +16,8 @@
       <section v-if="s.teacher && s.class?.length" class="card">
         <div class="card-head"><h2>{{ $t('老师：全班成绩') }}</h2></div>
         <table class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section class="card" data-help="lab31-protocol">
@@ -27,12 +27,12 @@
       </section>
 
       <section v-for="j in s.joints" :key="j.serial" class="card" data-help="lab31-record">
-        <div class="card-head"><h2 class="mono">{{ j.serial }}</h2><span class="small muted">{{ $t('{a} · 抱闸保持力矩名义 {b} N·m', { a: j.item, b: j.brake_nominal }) }}</span></div>
+        <div class="card-head"><h2 class="mono">{{ $td(j.serial) }}</h2><span class="small muted">{{ $t('{a} · 抱闸保持力矩名义 {b} N·m', { a: $td(j.item), b: $td(j.brake_nominal) }) }}</span></div>
         <template v-if="j.record">
           <p class="small">{{ $td(j.record.desc) }}</p>
           <div class="charts">
             <div v-for="tr in TRACES" :key="tr.k" class="chart">
-              <div class="small"><b>{{ $td(tr.name) }}</b> <span class="muted">{{ tr.unit }}</span></div>
+              <div class="small"><b>{{ $td(tr.name) }}</b> <span class="muted">{{ $td(tr.unit) }}</span></div>
               <svg viewBox="0 0 600 110" preserveAspectRatio="none" class="svg">
                 <line x1="40" y1="100" x2="595" y2="100" class="ax" /><line x1="40" y1="5" x2="40" y2="100" class="ax" />
                 <polyline :points="pts(j.record.series, tr)" class="ln" :style="{ stroke: tr.c }" />
@@ -45,25 +45,25 @@
           </div>
           <div class="frames">
             <div class="small">{{ $t('报文') }}
-              <label v-for="id in IDS" :key="id" class="ck"><input v-model="show[j.serial + id]" type="checkbox"> {{ id }}</label></div>
+              <label v-for="id in IDS" :key="id" class="ck"><input v-model="show[j.serial + id]" type="checkbox"> {{ $td(id) }}</label></div>
             <div class="scroll"><table class="tbl small mono"><thead><tr><th class="num">{{ $t('时间 s') }}</th><th>{{ $t('方向') }}</th><th>ID</th><th>{{ $t('数据') }}</th></tr></thead>
               <tbody><tr v-for="(f, k) in frames(j)" :key="k" :class="{ alarm: f.id === '0x081' }">
-                <td class="num">{{ f.t.toFixed(5) }}</td><td>{{ f.dir === 'tx' ? $t('驱动板 →') : $t('→ 驱动板') }}</td><td>{{ f.id }}</td><td>{{ f.data.match(/../g).join(' ') }}</td></tr></tbody></table></div>
+                <td class="num">{{ f.t.toFixed(5) }}</td><td>{{ f.dir === 'tx' ? $t('驱动板 →') : $t('→ 驱动板') }}</td><td>{{ $td(f.id) }}</td><td>{{ f.data.match(/../g).join(' ') }}</td></tr></tbody></table></div>
           </div>
         </template>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l31_t1'" class="f" @submit.prevent="submit(t.id, a1)">
-          <div v-for="j in s.joints" :key="j.serial" class="lf"><label class="mono">{{ j.serial }}</label>
+          <div v-for="j in s.joints" :key="j.serial" class="lf"><label class="mono">{{ $td(j.serial) }}</label>
             {{ $t('故障码') }} <input v-model="a1[j.serial].code" class="n" required> {{ $t('子码') }} <input v-model="a1[j.serial].sub" class="n" required></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
         <form v-if="t.id === 'l31_t2' || t.id === 'l31_t5'" class="f" @submit.prevent="submit(t.id, t.id === 'l31_t2' ? a2 : a5)">
-          <div v-for="j in s.joints" :key="j.serial" class="lf"><label class="mono">{{ j.serial }}</label>
+          <div v-for="j in s.joints" :key="j.serial" class="lf"><label class="mono">{{ $td(j.serial) }}</label>
             <select v-if="t.id === 'l31_t2'" v-model="a2[j.serial]" class="w2" required><option v-for="o in s.parts" :key="o.value" :value="o.value">{{ $td(o.label) }}</option></select>
             <select v-else v-model="a5[j.serial]" class="w2" required><option v-for="o in s.actions" :key="o.value" :value="o.value">{{ $td(o.label) }}</option></select></div>
           <button class="btn primary">{{ $t('提交') }}</button>
@@ -81,11 +81,11 @@
         <div v-if="t.id === 'l31_t6'" class="f">
           <button class="btn primary" @click="submit(t.id, {})">{{ $t('复测') }}</button>
           <table v-if="s.retest" class="tbl small"><thead><tr><th>{{ $t('关节') }}</th><th>{{ $t('上电抱闸时序') }}</th><th class="num">{{ $t('抱闸保持力矩 N·m') }}</th><th>{{ $t('规格') }}</th><th>{{ $t('判定') }}</th></tr></thead>
-            <tbody><tr v-for="r in s.retest.rows" :key="r.serial"><td class="mono">{{ r.serial }}</td><td>{{ r.sequence_ok ? $t('通过') : $t('不通过') }}</td>
-              <td class="num">{{ r.brake_hold }}</td><td>{{ r.lo }}–{{ r.hi }}</td><td><b>{{ r.ok ? $t('合格，放行') : $t('不合格') }}</b></td></tr></tbody></table>
-          <p v-if="s.retest" class="small muted">{{ $t('时序：{a}（{b}）。{c}', { a: s.retest.sequence, b: s.retest.checks.join($t('；')), c: $td(s.retest.note) }) }}</p>
+            <tbody><tr v-for="r in s.retest.rows" :key="r.serial"><td class="mono">{{ $td(r.serial) }}</td><td>{{ r.sequence_ok ? $t('通过') : $t('不通过') }}</td>
+              <td class="num">{{ $td(r.brake_hold) }}</td><td>{{ $td(r.lo) }}–{{ $td(r.hi) }}</td><td><b>{{ r.ok ? $t('合格，放行') : $t('不合格') }}</b></td></tr></tbody></table>
+          <p v-if="s.retest" class="small muted">{{ $t('时序：{a}（{b}）。{c}', { a: $td(s.retest.sequence), b: s.retest.checks.join($t('；')), c: $td(s.retest.note) }) }}</p>
         </div>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

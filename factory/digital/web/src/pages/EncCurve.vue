@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <div class="cols">
       <section class="card list">
-        <div class="card-head"><h2>{{ $t('最近的编码器（{a} 台）', { a: shown.length }) }}</h2></div>
+        <div class="card-head"><h2>{{ $t('最近的编码器（{a} 台）', { a: $td(shown.length) }) }}</h2></div>
         <div class="small">
           <label>{{ $t('粘接对心机') }}
             <select v-model="station"><option value="">{{ $t('全部') }}</option><option v-for="s in stations" :key="s" :value="s">{{ $td(s) }}</option></select>
@@ -16,16 +16,16 @@
         </div>
         <div v-if="!list.length" class="small muted">{{ $t('还没有。接一张 WQ-ENC17 订单，让车间做到“编码器终检”。') }}</div>
         <button v-for="w in shown" :key="w.serial" class="brd" :class="{ on: sel === w.serial }" @click="open(w.serial)">
-          <span class="mono">{{ w.serial }}</span>
+          <span class="mono">{{ $td(w.serial) }}</span>
           <span class="small" :class="w.pass ? 'ok' : 'bad'">{{ w.pass ? $t('合格') : $t('不合格') }}</span>
-          <span class="small muted">{{ $t('{a}　精度 {b}″　一次 {c}″', { a: w.station, b: v(w, 'enc_acc'), c: v(w, 'enc_h1') }) }}</span>
+          <span class="small muted">{{ $t('{a}　精度 {b}″　一次 {c}″', { a: $td(w.station), b: v(w, 'enc_acc'), c: v(w, 'enc_h1') }) }}</span>
           <span class="small muted">{{ $t('幅值 {a} %（最低 {b} %）', { a: v(w, 'enc_amp'), b: v(w, 'enc_amp_min') }) }}</span>
         </button>
       </section>
       <section v-if="m" class="card main">
-        <div class="card-head"><h2>{{ m.serial }} · <small class="muted">{{ $t('工单 {a}　粘接对心机 {b}　偏心 {c} µm', { a: m.work_order, b: m.station, c: m.ecc_um }) }}</small></h2></div>
+        <div class="card-head"><h2>{{ $td(m.serial) }} · <small class="muted">{{ $t('工单 {a}　粘接对心机 {b}　偏心 {c} µm', { a: $td(m.work_order), b: $td(m.station), c: $td(m.ecc_um) }) }}</small></h2></div>
         <div class="kpis">
-          <div :class="{ bad: m.acc > m.acc_hi }"><b>{{ m.acc.toFixed(1) }}″</b><span>{{ $t('精度（峰峰值，上限 {a}″）', { a: m.acc_hi }) }}</span></div>
+          <div :class="{ bad: m.acc > m.acc_hi }"><b>{{ m.acc.toFixed(1) }}″</b><span>{{ $t('精度（峰峰值，上限 {a}″）', { a: $td(m.acc_hi) }) }}</span></div>
           <div :class="{ bad: m.h1 > 30 }"><b>{{ m.h1.toFixed(1) }}″</b><span>{{ $t('一次谐波（偏心，上限 30″）') }}</span></div>
           <div :class="{ bad: m.interp > 20 }"><b>{{ m.interp.toFixed(1) }}″</b><span>{{ $t('细分误差（上限 20″）') }}</span></div>
           <div :class="{ bad: m.amp < 80 || m.amp_min < 70 }"><b>{{ m.amp.toFixed(0) }} %</b><span>{{ $t('信号幅值（最低 {a} %）', { a: m.amp_min.toFixed(0) }) }}</span></div>
@@ -50,7 +50,7 @@
                 <div class="small">{{ k + 1 }}</div>
               </div>
             </div>
-            <p class="small">{{ $t('1 次 = 每圈一个起伏 = 码盘偏心（e ÷ 码道半径 {a} mm，1 µm ≈ 16″）；2 次 = 倾斜、轴承椭圆；更高次 = 码盘刻划误差。', { a: m.r_mm }) }}</p>
+            <p class="small">{{ $t('1 次 = 每圈一个起伏 = 码盘偏心（e ÷ 码道半径 {a} mm，1 µm ≈ 16″）；2 次 = 倾斜、轴承椭圆；更高次 = 码盘刻划误差。', { a: $td(m.r_mm) }) }}</p>
           </div>
           <div>
             <h3>{{ $t('信号幅值随角度（%，额定 100）') }}</h3>
@@ -68,7 +68,7 @@
               <line :x1="x(0)" :x2="x(360)" :y1="H2 / 2" :y2="H2 / 2" class="axis" />
               <polyline :points="ipts" class="ln ip" />
             </svg>
-            <p class="small">{{ $t('码盘 {a} 线，一个信号周期 360° ÷ {b} ≈ 633″。读头的正弦、余弦信号幅值不等、有偏置时，每个周期里起伏一两次；幅值越低，这个误差越大。它周期太短，整圈曲线上看不出来，要单独看。', { a: m.lines, b: m.lines }) }}</p>
+            <p class="small">{{ $t('码盘 {a} 线，一个信号周期 360° ÷ {b} ≈ 633″。读头的正弦、余弦信号幅值不等、有偏置时，每个周期里起伏一两次；幅值越低，这个误差越大。它周期太短，整圈曲线上看不出来，要单独看。', { a: $td(m.lines), b: $td(m.lines) }) }}</p>
           </div>
         </div>
         <p class="small muted">{{ $t('示例模型：码道半径、线数、误差量级、规格限都是示例值；曲线由 4096 个点算出，这里抽稀到 720 点画。') }}</p>

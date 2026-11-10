@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-title">
       <h1><router-link to="/ont" class="back">{{ $t('厂情中枢') }}</router-link> {{ $t('/ 规则目录') }}</h1>
-      <span class="muted">{{ $t('{a} 条在跑、{b} 条待数据', { a: live, b: waiting }) }}<template v-if="data?.last_round"> {{ $t('· 上一轮检测用时 {a} 毫秒', { a: data.last_round.ms }) }}</template>
+      <span class="muted">{{ $t('{a} 条在跑、{b} 条待数据', { a: live, b: waiting }) }}<template v-if="data?.last_round"> {{ $t('· 上一轮检测用时 {a} 毫秒', { a: $td(data.last_round.ms) }) }}</template>
         · {{ data?.can_edit ? $t('厂长（教师）可以改阈值和开关，每次改动都有记录') : $t('阈值和开关由厂长（教师）调整') }}</span>
     </div>
     <div v-if="err" class="err">{{ err }}</div>
@@ -17,10 +17,10 @@
         <tbody>
           <template v-for="r in g.rules" :key="r.id">
             <tr :class="{ off: !r.enabled }">
-              <td class="mono">{{ r.id }}</td>
+              <td class="mono">{{ $td(r.id) }}</td>
               <td><b>{{ $td(r.name) }}</b><div class="small muted">{{ $td(r.desc) }}</div>
-                <div v-if="r.error" class="small bad">{{ $t('出错：{a}', { a: r.error }) }}</div></td>
-              <td><span class="sev" :class="r.severity">{{ LV[r.severity] }}</span></td>
+                <div v-if="r.error" class="small bad">{{ $t('出错：{a}', { a: $td(r.error) }) }}</div></td>
+              <td><span class="sev" :class="r.severity">{{ $td(LV[r.severity]) }}</span></td>
               <td class="small">{{ r.role.map((x) => ROLES[x] || x).join($t('、')) }}</td>
               <td class="small">
                 <template v-if="r.waiting"><span class="pill mute">{{ $t('待数据') }}</span></template>
@@ -28,12 +28,12 @@
                   <span v-for="(v, k) in r.params" :key="k" class="param">{{ k }}
                     <input v-if="data.can_edit && !Array.isArray(v)" v-model="edits[r.id][k]" :aria-label="r.id + ' ' + k" class="mono">
                     <b v-else class="mono">{{ Array.isArray(v) ? v.join($t('、')) : v }}</b>
-                    <span v-if="v !== r.defaults[k]" class="muted">{{ $t('（默认 {a}）', { a: r.defaults[k] }) }}</span>
+                    <span v-if="v !== r.defaults[k]" class="muted">{{ $t('（默认 {a}）', { a: $td(r.defaults[k]) }) }}</span>
                   </span>
                   <span v-if="!Object.keys(r.params).length" class="muted">—</span>
                 </template>
               </td>
-              <td class="num">{{ r.fired }}</td><td class="num">{{ r.open }}</td>
+              <td class="num">{{ $td(r.fired) }}</td><td class="num">{{ $td(r.open) }}</td>
               <td class="small">{{ r.last_fired ? fmtTs(r.last_fired) : '—' }}</td>
               <td><label v-if="!r.waiting" class="small"><input type="checkbox" :checked="r.enabled" :disabled="!data.can_edit"
                 @change="save(r, { enabled: $event.target.checked })"> {{ $t('启用') }}</label></td>
@@ -44,7 +44,7 @@
             </tr>
             <tr v-if="bt[r.id] && bt[r.id] !== 'busy'" class="btrow">
               <td></td><td colspan="9" class="small">
-                {{ $t('过去 7 天每 6 小时按当时的数据跑一次{a}：共报', { a: changed(r) ? $t('（用上面改过的阈值）') : '' }) }} <b>{{ bt[r.id].total }}</b> {{ $t('次。') }}
+                {{ $t('过去 7 天每 6 小时按当时的数据跑一次{a}：共报', { a: changed(r) ? $t('（用上面改过的阈值）') : '' }) }} <b>{{ $td(bt[r.id].total) }}</b> {{ $t('次。') }}
                 <span class="bars"><span v-for="p in bt[r.id].points" :key="p.at" class="bar" :style="{ height: Math.min(24, 3 + p.count * 6) + 'px' }"
                   :class="{ on: p.count }" :title="fmtTs(p.at) + $t('：') + p.count + $t(' 次') + (p.items.length ? $t('（') + p.items.map((x) => x.title).join($t('；')) + $t('）') : '')"></span></span>
                 <div class="muted">{{ $td(bt[r.id].note) }}</div>
@@ -57,7 +57,7 @@
     <section v-if="data?.changes?.length" class="card">
       <div class="card-head"><h2>{{ $t('改动记录') }}</h2></div>
       <table class="t small"><tbody><tr v-for="(c, i) in data.changes" :key="i">
-        <td class="mono">{{ fmtTs(c.ts) }}</td><td>{{ c.who }}</td><td class="mono">{{ c.rule }}</td><td>{{ c.field }}</td>
+        <td class="mono">{{ fmtTs(c.ts) }}</td><td>{{ $td(c.who) }}</td><td class="mono">{{ $td(c.rule) }}</td><td>{{ $td(c.field) }}</td>
         <td class="mono">{{ JSON.stringify(c.old) }} → {{ JSON.stringify(c.new) }}</td></tr></tbody></table>
     </section>
   </div>

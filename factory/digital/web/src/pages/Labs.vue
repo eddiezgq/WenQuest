@@ -8,10 +8,10 @@
     <p v-if="d && d.mode !== 'teach'" class="card empty">{{ $t('实验只在教学模式出现。右上角切到“教学模式”。') }}</p>
     <div v-if="d && d.mode === 'teach'" class="grid" data-help="labs-grid">
       <router-link v-for="l in d.labs" :key="l.no" :to="l.path" class="card lab" :class="{ done: l.done === l.tasks, started: l.started }">
-        <div class="lh"><b class="no">{{ $t('实验 {a}', { a: l.no }) }}</b><span class="dom small">{{ $td(l.domain) }}</span></div>
+        <div class="lh"><b class="no">{{ $t('实验 {a}', { a: $td(l.no) }) }}</b><span class="dom small">{{ $td(l.domain) }}</span></div>
         <h2>{{ $td(l.title) }}</h2>
-        <p class="small muted">{{ $t('{a} · {b} 个任务{c}', { a: typeof l.hours === 'number' ? $td(l.hours) + $t(' 学时') : $td(l.hours), b: l.tasks, c: l.team ? $t(' · 4–6 人一组') : '' }) }}</p>
-        <p class="sc"><b>{{ l.score }}</b> / {{ l.of }}<span class="small muted">{{ $t('（自动评）+ 报告 {a}', { a: l.report_points || '—' }) }}</span>
+        <p class="small muted">{{ $t('{a} · {b} 个任务{c}', { a: typeof l.hours === 'number' ? $td(l.hours) + $t(' 学时') : $td(l.hours), b: $td(l.tasks), c: l.team ? $t(' · 4–6 人一组') : '' }) }}</p>
+        <p class="sc"><b>{{ $td(l.score) }}</b> / {{ $td(l.of) }}<span class="small muted">{{ $t('（自动评）+ 报告 {a}', { a: l.report_points || '—' }) }}</span>
           <span class="small st">{{ l.done === l.tasks ? $t('✓ 全部完成') : (l.started ? $t('做到第 ') + (l.done + 1) + $t(' 个任务') : $t('还没开始')) }}</span></p>
         <span class="small"><a v-if="l.guide" :href="l.guide" @click.stop>{{ $t('指导书') }}</a><template v-if="l.template"> · <a :href="l.template" @click.stop>{{ $t('报告模板') }}</a></template></span>
       </router-link>

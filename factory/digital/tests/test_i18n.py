@@ -154,3 +154,44 @@ def test_plant_names_table_in_sync():
     assert have == plant_names.pairs(), "重跑 python3 factory/digital/web/tools/plant_names.py"
     d = dict(have)
     assert d["带锯床"] == "Band saw" and d["精车"] == "Finish turning"
+
+
+def test_backend_texts_have_english():
+    """第三批（细则 D-7、D-8）：枢纽、仿真写给页面的句子（句型）都在英文表、名字表或句型表里，占位一致；跳过的只能是不给人看的"""
+    sys.path.insert(0, os.path.join(WEB, "tools"))
+    import backend_texts as B
+    loc = os.path.join(WEB, "src", "locales")
+    names = dict(json.load(open(os.path.join(loc, "en_names.json"), encoding="utf-8")))
+    tpls = json.load(open(os.path.join(loc, "en_templates.json"), encoding="utf-8"))
+    skip = set(json.load(open(os.path.join(WEB, "tools", "backend_texts_skip.json"), encoding="utf-8")))
+    have = set(EN) | set(names) | {z for z, _ in tpls}
+    missing = [k for k in list(B.texts()) + list(B.yaml_texts()) if k not in have and k not in skip]
+    assert not missing, missing[:20]
+    for z, e in tpls:
+        assert set(re.findall(r"\{([a-z])\}", z)) == set(re.findall(r"\{([a-z])\}", e)), z
+        assert e.strip() and not CJK.search(e), z
+    assert len(skip) < 40      # 跳过的只是认关键词的字、给大模型的工具说明
+
+
+def test_hub_errors_have_english():
+    """第三批（D-9）：各接口的报错都有英文（hub/i18n_en.json），按请求语言返回"""
+    sys.path.insert(0, os.path.join(WEB, "tools"))
+    import backend_texts as B
+    from hub import i18n
+    tpl = {z for z, _ in i18n._TABLE["templates"]}
+    missing = [k for k in B.errors() if k not in i18n.EXACT and k not in tpl]
+    assert not missing, missing[:20]
+    assert i18n.tr("实验 7 只在减速器厂") == "Lab 7 is only in the reducer plant"
+    assert i18n.tr("实验 24 只在机器人厂") == "Lab 24 is only in the robot plant"
+    assert i18n.tr("本小时已问了 20 次，请 13 分钟后再问") == "You have asked 20 times this hour; ask again in 13 minutes"
+    assert i18n.tr("实验 7 只在减速器厂", "zh") == "实验 7 只在减速器厂"      # 中文界面原样
+
+
+def test_lab7_only_in_reducer_plant(monkeypatch):
+    """第三批 D-12：别的厂打开实验 7（/api/teach）回 404“实验 7 只在减速器厂”，不再 500"""
+    from fastapi import HTTPException
+    from hub import app as A
+    monkeypatch.setattr(A.F, "ITEMS", {"WQ-CR5": ("协作机器人",)})
+    with pytest.raises(HTTPException) as e:
+        A._lab7_here()
+    assert e.value.status_code == 404 and e.value.detail == "实验 7 只在减速器厂"

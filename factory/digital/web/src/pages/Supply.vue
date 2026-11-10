@@ -8,9 +8,9 @@
     <div v-if="msg" class="ok small">{{ msg }}</div>
 
     <section v-if="kp" class="kpis" data-help="sup-kpis">
-      <div class="card k"><span class="small muted">{{ $t('在途') }}</span><b>{{ kp.in_transit }}</b><span class="small muted">{{ $t('批') }}</span></div>
-      <div class="card k"><span class="small muted">{{ $t('到货待检') }}</span><b :class="{ warn: kp.waiting_inspection }">{{ kp.waiting_inspection }}</b></div>
-      <div class="card k"><span class="small muted">{{ $t('不合格待处理') }}</span><b :class="{ bad: kp.rejected_open }">{{ kp.rejected_open }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('在途') }}</span><b>{{ $td(kp.in_transit) }}</b><span class="small muted">{{ $t('批') }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('到货待检') }}</span><b :class="{ warn: kp.waiting_inspection }">{{ $td(kp.waiting_inspection) }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('不合格待处理') }}</span><b :class="{ bad: kp.rejected_open }">{{ $td(kp.rejected_open) }}</b></div>
       <div class="card k"><span class="small muted">{{ $t('准时率 / 合格率') }}</span><b>{{ pct(kp.on_time) }} / {{ pct(kp.pass_rate) }}</b><span class="small muted">{{ $t('近 30 天') }}</span></div>
       <div class="card k"><span class="small muted">{{ $t('供应商模拟器') }}</span><b>{{ kp.enabled ? $t('开') : $t('关') }}</b>
         <span v-if="teacher" class="row small"><button class="btn sm" @click="setSim(!kp.enabled)">{{ kp.enabled ? $t('关闭') : $t('打开') }}</button></span>
@@ -22,16 +22,16 @@
       <div v-if="rq?.requests.length" class="card">
         <h3>{{ $t('还没下采购单的请购') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('请购单') }}</th><th>{{ $t('物料') }}</th><th class="num">{{ $t('数量') }}</th><th>{{ $t('需要日期') }}</th><th>{{ $t('供应商') }}</th><th></th></tr></thead>
-          <tbody><tr v-for="r in rq.requests" :key="r.mr + r.item_code"><td>{{ r.mr }}</td><td>{{ r.item_code }}</td><td class="num">{{ r.qty }}</td><td>{{ r.schedule_date }}</td>
+          <tbody><tr v-for="r in rq.requests" :key="r.mr + r.item_code"><td>{{ $td(r.mr) }}</td><td>{{ $td(r.item_code) }}</td><td class="num">{{ $td(r.qty) }}</td><td>{{ $td(r.schedule_date) }}</td>
             <td><select v-model="pick[r.mr + r.item_code]" :aria-label="$t('供应商')"><option v-for="s in r.suppliers" :key="s.name" :value="s.name">
-              {{ $t('{a}（{b}，{c} 天{d}）', { a: s.name.split(' ')[0], b: s.role === 'alt' ? $t('备选') : $t('默认'), c: s.lead_days, d: s.price_index > 1 ? $t('，贵 ') + Math.round((s.price_index - 1) * 100) + '%' : '' }) }}</option></select></td>
+              {{ $t('{a}（{b}，{c} 天{d}）', { a: s.name.split(' ')[0], b: s.role === 'alt' ? $t('备选') : $t('默认'), c: $td(s.lead_days), d: s.price_index > 1 ? $t('，贵 ') + Math.round((s.price_index - 1) * 100) + '%' : '' }) }}</option></select></td>
             <td><button class="linkbtn" @click="toPo(r)">{{ $t('转采购单') }}</button></td></tr></tbody></table>
         <p class="small muted">{{ $t('转采购单生成“采购单”动作，厂长批准后进 ERPNext。教学模拟器打开时，请购单 3 分钟没人转，采购员（模拟器）按默认供应商下单。') }}</p>
       </div>
       <div v-if="lt" class="card">
         <table class="tbl small"><thead><tr><th>{{ $t('批号') }}</th><th>{{ $t('采购单') }}</th><th>{{ $t('物料') }}</th><th class="num">{{ $t('数量') }}</th><th>{{ $t('供应商') }}</th><th>{{ $t('承诺到货') }}</th><th>{{ $t('状态') }}</th><th></th></tr></thead>
-          <tbody><tr v-for="x in lt.lots" :key="x.id"><td>{{ x.lot || '#' + x.id }}</td><td>{{ x.po || '—' }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ x.qty }}</td>
-            <td>{{ x.supplier.split(' ')[0] }}</td><td>{{ x.promised || '—' }}<span v-if="x.late_days > 0 && x.arrived_at" class="bad"> {{ $t('晚 {a} 天', { a: x.late_days }) }}</span></td>
+          <tbody><tr v-for="x in lt.lots" :key="x.id"><td>{{ x.lot || '#' + x.id }}</td><td>{{ x.po || '—' }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ $td(x.qty) }}</td>
+            <td>{{ x.supplier.split(' ')[0] }}</td><td>{{ x.promised || '—' }}<span v-if="x.late_days > 0 && x.arrived_at" class="bad"> {{ $t('晚 {a} 天', { a: $td(x.late_days) }) }}</span></td>
             <td :class="TONE[x.status]">{{ $td(x.status_label) }}{{ x.concession ? $t('（让步接收）') : '' }}
               <span v-if="x.park" class="small muted">{{ parkText(x.park) }}</span></td>
             <td><button v-if="lt.can_receive && x.status === 'transit' && !kp?.enabled" class="linkbtn" @click="arrive(x)">{{ $t('登记到货') }}</button></td></tr></tbody></table>
@@ -43,16 +43,16 @@
       <div class="card" data-help="sup-inspect">
         <table class="tbl small"><thead><tr><th>{{ $t('批号') }}</th><th>{{ $t('物料') }}</th><th class="num">{{ $t('数量') }}</th><th>{{ $t('供应商') }}</th><th>{{ $t('到货') }}</th><th>{{ $t('状态') }}</th><th></th></tr></thead>
           <tbody><tr v-for="x in lt.lots.filter((y) => ['arrived', 'rejected', 'accepted'].includes(y.status)).slice(0, 40)" :key="x.id" :class="{ sel: sm && sm.id === x.id }">
-            <td>{{ x.lot }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ x.qty }}</td><td>{{ x.supplier.split(' ')[0] }}</td><td>{{ (x.arrived_at || '').slice(5, 16).replace('T', ' ') }}</td>
+            <td>{{ $td(x.lot) }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ $td(x.qty) }}</td><td>{{ x.supplier.split(' ')[0] }}</td><td>{{ (x.arrived_at || '').slice(5, 16).replace('T', ' ') }}</td>
             <td :class="TONE[x.status]">{{ $td(x.status_label) }}</td><td><button class="linkbtn" @click="openSample(x)">{{ x.status === 'arrived' ? $t('检验') : $t('看检验') }}</button></td></tr></tbody></table>
       </div>
       <div v-if="sm" class="card">
-        <h3>{{ $t('{a} · {b}：{c}', { a: sm.lot, b: sm.item, c: sm.template || $t('没有检验模板（直接收货）') }) }}</h3>
+        <h3>{{ $t('{a} · {b}：{c}', { a: $td(sm.lot), b: $td(sm.item), c: sm.template || $t('没有检验模板（直接收货）') }) }}</h3>
         <template v-if="sm.template">
           <p class="small muted">{{ $t('上下限：{a}', { a: sm.params.map((p) => p.specification.split(' ')[0] + (p.numeric ? ' ' + p.min + $t('～') + p.max : $t('：') + p.value)).join($t('；')) }) }}</p>
           <table class="tbl small"><thead><tr><th>{{ $t('件') }}</th><th v-for="p in sm.params" :key="p.specification">{{ p.specification.split(' ')[0] }}</th></tr></thead>
             <tbody><tr v-for="(r, i) in sm.rows" :key="i"><td>{{ i + 1 }}</td>
-              <td v-for="p in sm.params" :key="p.specification">{{ r[p.specification] }}</td></tr></tbody></table>
+              <td v-for="p in sm.params" :key="p.specification">{{ $td(r[p.specification]) }}</td></tr></tbody></table>
           <p class="small muted">{{ $t('自己逐件对照上下限，判定这一批。') }}</p>
         </template>
         <div v-if="sm.status === 'arrived' && lt.can_inspect" class="row">
@@ -60,7 +60,7 @@
           <button class="btn primary sm" @click="judge(true)">{{ sm.template ? $t('合格，收货入库') : $t('收货入库') }}</button>
           <button v-if="sm.template" class="btn danger sm" @click="judge(false)">{{ $t('不合格') }}</button></div>
         <p v-else-if="sm.status === 'arrived'" class="small muted">{{ $t('来料检验由质量或厂长操作（右上角切换角色）。') }}</p>
-        <p v-else class="small">{{ $t('结论：') }}<b :class="TONE[sm.status]">{{ STATUS[sm.status] }}</b>{{ $t('，检验人 {a}。不合格的批次到厂情中枢看处理方案（退货 / 备选急单 / 让步接收）。', { a: sm.inspected_by || '—' }) }}</p>
+        <p v-else class="small">{{ $t('结论：') }}<b :class="TONE[sm.status]">{{ $td(STATUS[sm.status]) }}</b>{{ $t('，检验人 {a}。不合格的批次到厂情中枢看处理方案（退货 / 备选急单 / 让步接收）。', { a: sm.inspected_by || '—' }) }}</p>
       </div>
     </template>
 
@@ -70,21 +70,21 @@
         <div class="row"><input v-model="q" :placeholder="$t('批号（L……）或零件 / 设备序列号')" :aria-label="$t('批号或序列号')"><button class="btn sm" @click="doTrace">{{ $t('追溯') }}</button></div>
         <template v-if="tr">
           <div v-if="tr.row" class="small">
-            <p><b>{{ tr.lot }}</b>{{ $t('：{a} × {b}，{c}，采购单 {d}，{e}，剩 {f}', { a: tr.row.item, b: tr.row.qty, c: $td(tr.row.supplier), d: tr.row.po || '—', e: tr.row.status_label, f: tr.row.qty_left }) }}</p>
-            <p>{{ $t('用到了 {a} 个零件、{b} 张工单：{c}{d}', { a: tr.parts.length, b: tr.work_orders.length, c: tr.parts.slice(0, 20).join($t('、')), d: tr.parts.length > 20 ? '……' : '' }) }}</p>
+            <p><b>{{ $td(tr.lot) }}</b>{{ $t('：{a} × {b}，{c}，采购单 {d}，{e}，剩 {f}', { a: $td(tr.row.item), b: $td(tr.row.qty), c: $td(tr.row.supplier), d: tr.row.po || '—', e: $td(tr.row.status_label), f: $td(tr.row.qty_left) }) }}</p>
+            <p>{{ $t('用到了 {a} 个零件、{b} 张工单：{c}{d}', { a: $td(tr.parts.length), b: $td(tr.work_orders.length), c: tr.parts.slice(0, 20).join($t('、')), d: tr.parts.length > 20 ? '……' : '' }) }}</p>
             <p v-if="tr.units.length">{{ $t('装进了现场设备：{a}', { a: tr.units.map((u) => u.serial).join($t('、')) }) }}</p>
             <p v-if="lt?.can_inspect && tr.row.status === 'accepted'"><button class="linkbtn" @click="suspect(tr.row)">{{ $t('判为可疑批次（事后发现问题）') }}</button></p>
           </div>
           <div v-else-if="tr.lots" class="small">
-            <p>{{ $t('{a} 用了这些批次：', { a: tr.serial }) }}</p>
-            <ul><li v-for="x in tr.lots" :key="x.id">{{ $t('{a}：{b}，{c}（{d}）', { a: x.lot, b: x.item, c: $td(x.supplier), d: x.status_label }) }}</li></ul>
+            <p>{{ $t('{a} 用了这些批次：', { a: $td(tr.serial) }) }}</p>
+            <ul><li v-for="x in tr.lots" :key="x.id">{{ $t('{a}：{b}，{c}（{d}）', { a: $td(x.lot), b: $td(x.item), c: $td(x.supplier), d: $td(x.status_label) }) }}</li></ul>
             <p v-if="!tr.lots.length" class="muted">{{ $t('没有记录（情景开始时库里的料记为“期初”）。') }}</p>
           </div>
         </template>
         <p class="small muted">{{ $t('车间每开工一件，按先进先出记下用了哪个批次的料。也可以在下面的表里点批号。') }}</p>
         <table v-if="lt" class="tbl small"><tbody><tr v-for="x in lt.lots.filter((y) => y.lot && ['accepted', 'suspect'].includes(y.status)).slice(0, 30)" :key="x.id">
-          <td><button class="linkbtn" @click="q = x.lot; doTrace()">{{ x.lot }}</button></td><td>{{ $td(x.item) }}</td><td>{{ x.supplier.split(' ')[0] }}</td>
-          <td class="num">{{ $t('剩 {a} / {b}', { a: x.qty_left, b: x.qty_ok ?? x.qty }) }}</td><td :class="TONE[x.status]">{{ $td(x.status_label) }}</td></tr></tbody></table>
+          <td><button class="linkbtn" @click="q = x.lot; doTrace()">{{ $td(x.lot) }}</button></td><td>{{ $td(x.item) }}</td><td>{{ x.supplier.split(' ')[0] }}</td>
+          <td class="num">{{ $t('剩 {a} / {b}', { a: $td(x.qty_left), b: x.qty_ok ?? x.qty }) }}</td><td :class="TONE[x.status]">{{ $td(x.status_label) }}</td></tr></tbody></table>
       </div>
     </template>
 
@@ -93,10 +93,10 @@
       <div class="card">
         <table class="tbl small"><thead><tr><th>{{ $t('供应商') }}</th><th>{{ $t('物料') }}</th><th>{{ $t('默认 / 备选') }}</th><th class="num">{{ $t('价格指数') }}</th><th class="num">{{ $t('提前期') }}</th>
           <th class="num">{{ $t('准时率') }}</th><th class="num">{{ $t('合格率') }}</th><th class="num">{{ $t('在途') }}</th></tr></thead>
-          <tbody><tr v-for="s in sp.suppliers" :key="s.supplier" :class="{ off: !s.active }"><td>{{ $td(s.supplier) }}</td><td>{{ s.cat_name }}</td>
-            <td>{{ s.role === 'alt' ? (s.active ? $t('备选') : $t('备选（未启用）')) : $t('默认') }}</td><td class="num">{{ s.price_index }}</td><td class="num">{{ $t('{a} 天', { a: s.lead_days }) }}</td>
+          <tbody><tr v-for="s in sp.suppliers" :key="s.supplier" :class="{ off: !s.active }"><td>{{ $td(s.supplier) }}</td><td>{{ $td(s.cat_name) }}</td>
+            <td>{{ s.role === 'alt' ? (s.active ? $t('备选') : $t('备选（未启用）')) : $t('默认') }}</td><td class="num">{{ $td(s.price_index) }}</td><td class="num">{{ $t('{a} 天', { a: $td(s.lead_days) }) }}</td>
             <td class="num">{{ pct(s.on_time) }} <span class="muted">{{ $t('（{a}）', { a: pct(s.hist_on_time) }) }}</span></td>
-            <td class="num">{{ pct(s.pass_rate) }} <span class="muted">{{ $t('（{a}）', { a: pct(s.hist_pass) }) }}</span></td><td class="num">{{ s.in_transit }}</td></tr></tbody></table>
+            <td class="num">{{ pct(s.pass_rate) }} <span class="muted">{{ $t('（{a}）', { a: pct(s.hist_pass) }) }}</span></td><td class="num">{{ $td(s.in_transit) }}</td></tr></tbody></table>
         <p class="small muted">{{ $t('准时率、合格率：近 30 天到货、检验的批次（让步接收不算合格）；括号里是过去一年的历史。每件总拥有成本 = 单价 × 价格指数 + (1 − 合格率) × $4 + (1 − 准时率) × $3。') }}</p>
         <h3>{{ $t('单一来源') }}</h3>
         <ul class="small"><li v-for="x in sp.single_source" :key="x.cat">{{ $t('{a}：只有 {b}{c}', { a: $td(x.cat_name), b: (x.supplier || '—').split(' ')[0], c: x.has_alt ? $t('（有可开发的备选）') : $t('（还没有备选）') }) }}</li></ul>

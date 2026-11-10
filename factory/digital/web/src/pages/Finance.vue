@@ -20,14 +20,14 @@
       <div class="card" data-help="fin-objectives">
         <h3>{{ $t('指标树（目标 → 指标 → 领域）') }}</h3>
         <div class="tree">
-          <div class="root">{{ $t('本年经营目标') }} <span class="small muted">{{ $t('达标 {a} / {b}', { a: ob.objectives.filter((o) => o.tone === 'good').length, b: ob.objectives.length }) }}</span></div>
+          <div class="root">{{ $t('本年经营目标') }} <span class="small muted">{{ $t('达标 {a} / {b}', { a: ob.objectives.filter((o) => o.tone === 'good').length, b: $td(ob.objectives.length) }) }}</span></div>
           <div v-for="o in ob.objectives" :key="o.code" class="node" :class="o.tone">
-            <div class="nh"><b>{{ o.code }} {{ $td(o.name) }}</b><span class="dom small">{{ DOMAINS[o.domain] || o.domain }}</span></div>
+            <div class="nh"><b>{{ $td(o.code) }} {{ $td(o.name) }}</b><span class="dom small">{{ DOMAINS[o.domain] || o.domain }}</span></div>
             <div class="nv"><span class="big">{{ fmt(o, o.value) }}</span><span class="small muted"> {{ $t('目标 {a} {b}', { a: o.direction === 'ge' ? '≥' : '≤', b: fmt(o, o.target) }) }}</span>
-              <span class="pill" :class="o.tone">{{ TONE[o.tone] }}</span></div>
+              <span class="pill" :class="o.tone">{{ $td(TONE[o.tone]) }}</span></div>
             <svg v-if="o.history.length > 1" class="spark" viewBox="0 0 100 24" preserveAspectRatio="none" :aria-label="o.name + $t(' 近 7 天')">
               <polyline :points="spark(o)" class="sl" /></svg>
-            <div class="small muted">{{ $t('近 {a} 天红 {b} 天', { a: o.history.length, b: o.red_days }) }}</div>
+            <div class="small muted">{{ $t('近 {a} 天红 {b} 天', { a: $td(o.history.length), b: $td(o.red_days) }) }}</div>
             <div v-if="ob.can_edit" class="row small"><input v-model.number="tg[o.code]" type="number" step="any" :aria-label="o.name + $t(' 目标')"><button class="linkbtn" @click="setTarget(o)">{{ $t('改目标') }}</button></div>
           </div>
         </div>
@@ -41,7 +41,7 @@
         <h3>{{ $t('做完的订单（工单全部完工）') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('订单') }}</th><th>{{ $t('客户') }}</th><th class="num">{{ $t('台数') }}</th><th class="num">{{ $t('收入') }}</th><th class="num">{{ $t('成本') }}</th><th class="num">{{ $t('毛利') }}</th><th class="num">{{ $t('毛利率') }}</th><th class="num">{{ $t('按标准') }}</th><th></th></tr></thead>
           <tbody><tr v-for="m in mg.margins" :key="m.sales_order" :class="{ sel: sel?.sales_order === m.sales_order }">
-            <td>{{ m.sales_order }}<span v-if="m.pseudo" class="muted">{{ $t('（估）') }}</span></td><td>{{ (m.customer || '—').split(' ')[0] }}</td><td class="num">{{ m.qty }}</td>
+            <td>{{ $td(m.sales_order) }}<span v-if="m.pseudo" class="muted">{{ $t('（估）') }}</span></td><td>{{ (m.customer || '—').split(' ')[0] }}</td><td class="num">{{ $td(m.qty) }}</td>
             <td class="num">${{ num(m.revenue) }}</td><td class="num">${{ num(m.cost) }}</td><td class="num">${{ num(m.margin) }}</td>
             <td class="num" :class="tone(m.margin_pct, mg.target)">{{ pct1(m.margin_pct) }}</td><td class="num muted">{{ pct1(m.std_margin_pct) }}</td>
             <td><button class="linkbtn" @click="sel = m">{{ $t('分解') }}</button></td></tr></tbody></table>
@@ -49,12 +49,12 @@
         <p class="small muted">{{ $t('（估）：订单本身不在 ERPNext 快照里（情景里早先的订单），按它的工单件数和标准售价估。') }}</p>
       </div>
       <div v-if="sel" class="card">
-        <h3>{{ $t('{a} 的毛利分解', { a: sel.sales_order }) }}</h3>
+        <h3>{{ $t('{a} 的毛利分解', { a: $td(sel.sales_order) }) }}</h3>
         <div v-for="x in sel.lines" :key="x.key" class="bar-row">
           <span class="bn">{{ $td(x.label) }}</span>
           <span class="bar"><span :style="{ width: (x.usd / sel.revenue * 100).toFixed(2) + '%' }"></span></span>
           <span class="bv small">${{ num(x.usd) }}</span>
-          <span class="bh small muted">{{ x.how }}<template v-if="x.actions?.length">{{ $t('：{a}', { a: x.actions.map((a) => a.title + ' $' + num(a.usd)).join($t('；')) }) }}</template></span>
+          <span class="bh small muted">{{ $td(x.how) }}<template v-if="x.actions?.length">{{ $t('：{a}', { a: x.actions.map((a) => a.title + ' $' + num(a.usd)).join($t('；')) }) }}</template></span>
         </div>
         <p class="small">{{ $t('收入 ${a} − 成本 ${b} =', { a: num(sel.revenue), b: num(sel.cost) }) }} <b>${{ num(sel.margin) }}</b>{{ $t('（{a}；按标准 {b}）', { a: pct1(sel.margin_pct), b: pct1(sel.std_margin_pct) }) }}</p>
       </div>
@@ -66,7 +66,7 @@
         <h3>{{ $t('应收账龄') }}</h3>
         <div class="aging"><div v-for="(l, k) in ar.buckets" :key="k" class="ag" :class="k"><span class="small muted">{{ l }}</span><b>${{ num(ar.aging[k]) }}</b></div></div>
         <table class="tbl small"><thead><tr><th>{{ $t('发票') }}</th><th>{{ $t('客户') }}</th><th>{{ $t('订单') }}</th><th class="num">{{ $t('未付') }}</th><th>{{ $t('到期') }}</th><th class="num">{{ $t('逾期（天）') }}</th><th>{{ $t('状态') }}</th><th>{{ $t('催款') }}</th></tr></thead>
-          <tbody><tr v-for="x in ar.invoices" :key="x.id"><td>{{ x.doc || $t('期初 #') + x.id }}</td><td>{{ x.party.split(' ')[0] }}</td><td>{{ x.ref }}</td>
+          <tbody><tr v-for="x in ar.invoices" :key="x.id"><td>{{ x.doc || $t('期初 #') + x.id }}</td><td>{{ x.party.split(' ')[0] }}</td><td>{{ $td(x.ref) }}</td>
             <td class="num">${{ num(x.outstanding) }}</td><td>{{ x.due_at.slice(5, 16).replace('T', ' ') }}</td>
             <td class="num" :class="{ bad: x.overdue_days > 30, warn: x.overdue_days > 0 }">{{ x.overdue_days > 0 ? x.overdue_days : '—' }}</td>
             <td>{{ $td(x.status_label) }}</td><td>{{ x.dunned_n ? x.dunned_n + $t(' 次') : '' }}</td></tr></tbody></table>
@@ -86,14 +86,14 @@
           <rect v-for="(w, i) in cf.weeks" :key="i" :x="i * 100 + 20" width="60" :y="Math.min(yc(w.balance), yc(0))" :height="Math.abs(yc(w.balance) - yc(0))" :class="w.balance < 0 ? 'neg' : 'pos'" />
         </svg>
         <table class="tbl small"><thead><tr><th>{{ $t('周') }}</th><th class="num">{{ $t('收款') }}</th><th class="num">{{ $t('支出') }}</th><th class="num">{{ $t('周末现金') }}</th></tr></thead>
-          <tbody><tr v-for="w in cf.weeks" :key="w.week" :class="{ sel: w.week === cf.low.week }"><td>{{ $t('第 {a} 周', { a: w.week }) }}</td><td class="num">${{ num(w.in) }}</td><td class="num">${{ num(w.out) }}</td>
+          <tbody><tr v-for="w in cf.weeks" :key="w.week" :class="{ sel: w.week === cf.low.week }"><td>{{ $t('第 {a} 周', { a: $td(w.week) }) }}</td><td class="num">${{ num(w.in) }}</td><td class="num">${{ num(w.out) }}</td>
             <td class="num" :class="{ bad: w.balance < 0 }">${{ num(w.balance) }}</td></tr></tbody></table>
         <p class="small muted">{{ $t('现在现金 ${a}；收款按到期日 + 这个客户平时晚几天（催过的按 3 天内），支出 = 应付到期 + 每周固定开支 ${b}。', { a: num(cf.cash), b: num(cf.weekly_expense) }) }}</p>
       </div>
       <div v-if="apd" class="card">
         <h3>{{ $t('应付（供应商发票）') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('发票') }}</th><th>{{ $t('供应商') }}</th><th>{{ $t('收货单') }}</th><th class="num">{{ $t('未付') }}</th><th>{{ $t('付款日') }}</th><th>{{ $t('状态') }}</th></tr></thead>
-          <tbody><tr v-for="x in apd.invoices" :key="x.id"><td>{{ x.doc || '#' + x.id }}</td><td>{{ x.party.split(' ')[0] }}</td><td>{{ x.ref }}</td>
+          <tbody><tr v-for="x in apd.invoices" :key="x.id"><td>{{ x.doc || '#' + x.id }}</td><td>{{ x.party.split(' ')[0] }}</td><td>{{ $td(x.ref) }}</td>
             <td class="num">${{ num(x.outstanding) }}</td><td>{{ x.pay_at.slice(5, 16).replace('T', ' ') }}</td><td>{{ $td(x.status_label) }}</td></tr></tbody></table>
         <p v-if="!apd.invoices.length" class="small muted">{{ $t('没有未付的供应商发票。') }}</p>
       </div>
@@ -111,7 +111,7 @@
 
     <template v-if="tab === 'budget' && bd">
       <div class="card">
-        <h3>{{ $t('{a} 预算（月度进度 {b}）', { a: bd.month, b: pct(bd.progress) }) }}</h3>
+        <h3>{{ $t('{a} 预算（月度进度 {b}）', { a: $td(bd.month), b: pct(bd.progress) }) }}</h3>
         <div v-for="x in bd.rows" :key="x.center" class="bar-row b4">
           <span class="bn">{{ $td(x.name) }}</span>
           <span class="bar"><span :class="{ over: x.ratio > 1.1 }" :style="{ width: Math.min(100, x.actual / (x.budget || 1) * 100).toFixed(2) + '%' }"></span>

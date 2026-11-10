@@ -7,10 +7,10 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span v-if="!s.teacher" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? $t('比对模式：提交任务 3 之前，指挥台和 AI 不显示建议') : $t('已提交选择：可以看中枢的建议，和你的对比') }}</span>
         <span class="small" :class="s.enabled ? 'ok' : 'muted'">{{ $t('车间“要有人”{a}', { a: s.enabled ? $t('已打开') : $t('没打开') }) }}</span>
-        <span v-if="s.gap" class="small">{{ $t('缺口：{a} {b} {c}（{d} 请假）', { a: s.gap.day, b: s.gap.shift === 'day' ? $t('早班') : $t('晚班'), c: s.gap.unit.toUpperCase(), d: $td(s.gap.name) }) }}</span>
+        <span v-if="s.gap" class="small">{{ $t('缺口：{a} {b} {c}（{d} 请假）', { a: $td(s.gap.day), b: s.gap.shift === 'day' ? $t('早班') : $t('晚班'), c: s.gap.unit.toUpperCase(), d: $td(s.gap.name) }) }}</span>
         <router-link v-if="s.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.anomaly_id } }">{{ $t('打开排班缺口异常') }}</router-link>
         <router-link v-if="s.h1_anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.h1_anomaly_id } }">{{ $t('单点依赖异常') }}</router-link>
         <router-link class="small" to="/people?tab=skills">{{ $t('人员') }}</router-link>
@@ -26,12 +26,12 @@
         </div>
         <p class="small muted">{{ $t('建议：王强（P01，外圆磨床早班；磨床是瓶颈）。') }}</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ $td(t.title) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l19_t1'" class="f" @submit.prevent="submit('l19_t1', { units: a1 })">
@@ -57,10 +57,10 @@
         </div>
         <div v-if="t.id === 'l19_t5'" class="small">
           <template v-if="t.evidence?.actions?.length">{{ $t('技能培训：') }}<span v-for="x in t.evidence.actions" :key="x.id"> {{ $t('{a}（{b}）', { a: x.unit.toUpperCase(), b: ST[x.status] || x.status }) }}</span>
-            {{ $t('· 覆盖 {a} / {b} 台单点依赖设备', { a: t.evidence.covered.length, b: t.evidence.single_points.length }) }}</template>
+            {{ $t('· 覆盖 {a} / {b} 台单点依赖设备', { a: $td(t.evidence.covered.length), b: $td(t.evidence.single_points.length) }) }}</template>
           <template v-else>{{ $t('还没有技能培训动作。') }}</template>
         </div>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

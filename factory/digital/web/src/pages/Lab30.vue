@@ -7,10 +7,10 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
-        <span v-if="s.order" class="small">{{ $t('你的订单') }} <b class="mono">{{ s.order.sales_order }}</b>{{ $t('，{a} 张工单', { a: Object.keys(s.order.work_orders).length }) }}</span>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
+        <span v-if="s.order" class="small">{{ $t('你的订单') }} <b class="mono">{{ $td(s.order.sales_order) }}</b>{{ $t('，{a} 张工单', { a: Object.keys(s.order.work_orders).length }) }}</span>
         <span v-else class="small muted">{{ $t('还没有你的 WQ-H1 订单：先做任务 1') }}</span>
-        <span v-if="s.other_order" class="small">{{ $t('同周的协作臂订单') }} <b class="mono">{{ s.other_order }}</b></span>
+        <span v-if="s.other_order" class="small">{{ $t('同周的协作臂订单') }} <b class="mono">{{ $td(s.other_order) }}</b></span>
         <router-link class="small" to="/work/planner">{{ $t('订单与计划') }}</router-link>
         <router-link class="small" to="/work/quality">{{ $t('质量') }}</router-link>
         <router-link class="small" to="/cost">{{ $t('生产成本') }}</router-link>
@@ -20,12 +20,12 @@
       <section v-if="s.teacher && s.class?.length" class="card">
         <div class="card-head"><h2>{{ $t('老师：全班成绩') }}</h2></div>
         <table class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l30_t1'" class="f" @submit.prevent="submit(t.id, a1)">
@@ -38,7 +38,7 @@
         <div v-if="t.id === 'l30_t2'" class="small">
           <table v-if="s.layers.length" class="tbl"><thead><tr><th>{{ $t('物料') }}</th><th>{{ $t('工单') }}</th><th>{{ $t('下达') }}</th><th>{{ $t('用到的下一层') }}</th><th>{{ $t('核对') }}</th></tr></thead>
             <tbody><tr v-for="l in s.layers" :key="l.work_order">
-              <td class="mono">{{ $td(l.item) }}</td><td class="mono">{{ l.work_order }}</td><td>{{ l.released ? timeOf(l.released) : $t('还没下达') }}</td>
+              <td class="mono">{{ $td(l.item) }}</td><td class="mono">{{ $td(l.work_order) }}</td><td>{{ l.released ? timeOf(l.released) : $t('还没下达') }}</td>
               <td>{{ l.children.join($t('、')) || '—' }}</td>
               <td><span v-if="!l.released" class="muted">—</span><span v-else-if="l.released_before_children_done.length" class="bad-t">
                 {{ $t('{a} 还没做完就下达了', { a: l.released_before_children_done.join($t('、')) }) }}</span><span v-else class="ok">✓</span></td></tr></tbody></table>
@@ -53,9 +53,9 @@
         </form>
         <form v-if="t.id === 'l30_t4'" class="f" @submit.prevent="submit(t.id, a4)">
           <div class="lf"><label>{{ $t('人形') }}</label><select v-model="a4.serial" required>
-            <option v-for="j in s.units" :key="j.serial" :value="j.serial">{{ $t('{a}（{b}）', { a: j.serial, b: j.item }) }}</option></select></div>
+            <option v-for="j in s.units" :key="j.serial" :value="j.serial">{{ $t('{a}（{b}）', { a: $td(j.serial), b: $td(j.item) }) }}</option></select></div>
           <div v-if="unit" class="lf"><label>{{ $t('测量值') }}</label><span class="small">
-            <span v-for="(c, k) in unit.chars" :key="k" class="chip">{{ $td(c.name) }} <b class="mono">{{ c.value }}</b> {{ $t('{a}（公差 {b}–{c}）', { a: c.unit, b: c.lo, c: c.hi }) }}</span></span></div>
+            <span v-for="(c, k) in unit.chars" :key="k" class="chip">{{ $td(c.name) }} <b class="mono">{{ $td(c.value) }}</b> {{ $t('{a}（公差 {b}–{c}）', { a: $td(c.unit), b: $td(c.lo), c: $td(c.hi) }) }}</span></span></div>
           <div class="lf"><label>{{ $t('判定') }}</label><span class="cks">
             <label><input v-model="a4.verdict" type="radio" value="pass" required> {{ $t('合格') }}</label>
             <label><input v-model="a4.verdict" type="radio" value="fail"> {{ $t('不合格') }}</label></span></div>
@@ -70,7 +70,7 @@
           <div class="lf"><label>{{ $t('差得最多的工单（物料编号）') }}</label><input v-model="a6.worst" :placeholder="$t('如 WQJ-S')" required></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

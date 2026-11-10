@@ -8,16 +8,16 @@
       <table v-else class="t">
         <thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('任务') }}</th><th>{{ $t('课程') }}</th><th>{{ $t('交期') }}</th><th>{{ teacher ? $t('提交情况') : $t('我的进度') }}</th></tr></thead>
         <tbody><tr v-for="t in rows" :key="t.id">
-          <td class="mono">{{ t.code }}</td>
+          <td class="mono">{{ $td(t.code) }}</td>
           <td><router-link :to="'/tasks/' + t.id">{{ t.title?.[0] }}</router-link>
-            <div class="small muted">{{ $t('{a} · {b} 学时 · {c}', { a: t.role?.[0], b: t.hours, c: (t.stations || []).join(' ') }) }}</div></td>
+            <div class="small muted">{{ $t('{a} · {b} 学时 · {c}', { a: t.role?.[0], b: $td(t.hours), c: (t.stations || []).join(' ') }) }}</div></td>
           <td class="small">{{ t.course_name || '—' }}</td>
           <td class="small">{{ t.due ? timeOf(t.due) : '—' }}</td>
           <td v-if="teacher" class="small">
-            <span v-for="(n, k) in t.counts || {}" :key="k" class="pill" :class="TONE[k]">{{ STATUS[k] }} {{ n }}</span>
+            <span v-for="(n, k) in t.counts || {}" :key="k" class="pill" :class="TONE[k]">{{ $td(STATUS[k]) }} {{ n }}</span>
             <span v-if="!Object.keys(t.counts || {}).length" class="muted">{{ $t('还没有人开始') }}</span></td>
           <td v-else><span class="pill" :class="TONE[t.mine?.status || 'draft']">{{ t.mine ? t.mine.status_zh : $t('未开始') }}</span>
-            <span v-if="t.mine?.total != null" class="small"> {{ $t('{a} 分', { a: t.mine.total }) }}</span></td>
+            <span v-if="t.mine?.total != null" class="small"> {{ $t('{a} 分', { a: $td(t.mine.total) }) }}</span></td>
         </tr></tbody>
       </table>
     </section>

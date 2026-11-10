@@ -2,7 +2,7 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>{{ $t('情景导演') }}</h1>
-      <span class="muted">{{ $t('{a} · 一张急单串起七个领域', { a: st?.scenario?.name || $t('两周情景') }) }}</span>
+      <span class="muted">{{ $t('{a} · 一张急单串起七个领域', { a: $td(st?.scenario?.name) || $t('两周情景') }) }}</span>
       <span class="r small"><router-link to="/help/teach/director">{{ $t('怎么用') }}</router-link> · <router-link to="/help/docs/学校版演示脚本">{{ $t('学校版演示脚本') }}</router-link> · <router-link to="/help/docs/企业版演示脚本">{{ $t('企业版演示脚本') }}</router-link> · <router-link to="/help/docs/演示前检查表">{{ $t('检查表') }}</router-link></span></div><!-- i18n-ok 数据值比较 -->
     <div v-if="err" class="err">{{ err }}</div>
     <div v-if="!isTeacher" class="card empty">{{ $t('情景导演只给老师（教学模式）。学生在“实验与任务 → 实验 23”里跟着情景做决定。') }}</div>
@@ -24,9 +24,9 @@
           <span v-if="!run" class="muted">{{ $t('还没开始。“开始”会清空教学模式的历史、重新载入实验 7 情景（约 10–20 秒），再把车间设到所选倍速。') }}</span>
           <template v-else>
             <span>{{ $t('状态：') }}<b>{{ RUN[run.status] || run.status }}</b>{{ run.auto ? $t('（自动演示中）') : '' }}</span>
-            <span>{{ $t('已演') }} <b>{{ run.beat_no }}</b> {{ $t('/ {a} 幕', { a: st.beats.length }) }}</span>
-            <span v-if="run.so">{{ $t('订单') }} <router-link :to="'/ont/o/SalesOrder/' + run.so">{{ run.so }}</router-link></span>
-            <span v-if="st.order?.qty">{{ $t('车间') }} <b>{{ st.order.parts }} / {{ st.order.qty }}</b> {{ $t('根{a}', { a: st.order.done ? $t('（做完了）') : '' }) }}</span>
+            <span>{{ $t('已演') }} <b>{{ $td(run.beat_no) }}</b> {{ $t('/ {a} 幕', { a: $td(st.beats.length) }) }}</span>
+            <span v-if="run.so">{{ $t('订单') }} <router-link :to="'/ont/o/SalesOrder/' + run.so">{{ $td(run.so) }}</router-link></span>
+            <span v-if="st.order?.qty">{{ $t('车间') }} <b>{{ $td(st.order.parts) }} / {{ $td(st.order.qty) }}</b> {{ $t('根{a}', { a: st.order.done ? $t('（做完了）') : '' }) }}</span>
             <span>{{ $t('倍速 {a}', { a: run.ff ? run.ff_speed + $t('×（快进中，做完回到 ') + run.speed + $t('×）') : run.speed + '×' }) }}</span>
             <span v-if="st.next && !st.next.ok" class="warn-t">{{ $td(st.next.why) }}</span>
           </template>
@@ -38,17 +38,17 @@
       <ol class="timeline" data-help="dir-timeline">
         <li v-for="b in st.beats" :key="b.n" class="card beat" :class="[b.status, { cur: run && b.n === run.beat_no }]">
           <div class="bh">
-            <span class="no">{{ $t('第 {a} 幕', { a: b.n }) }}</span><span class="day small muted">{{ $t('第 {a} 天', { a: b.day }) }}</span>
-            <span class="dom small">{{ b.domain_name }}</span>
+            <span class="no">{{ $t('第 {a} 幕', { a: $td(b.n) }) }}</span><span class="day small muted">{{ $t('第 {a} 天', { a: $td(b.day) }) }}</span>
+            <span class="dom small">{{ $td(b.domain_name) }}</span>
             <h2>{{ $td(b.title) }}</h2>
-            <span class="stt small" :class="b.status">{{ STT[b.status] }}<template v-if="b.status === 'waiting'">{{ $t('（{a} 秒）', { a: b.elapsed_s }) }}</template></span>
+            <span class="stt small" :class="b.status">{{ $td(STT[b.status]) }}<template v-if="b.status === 'waiting'">{{ $t('（{a} 秒）', { a: $td(b.elapsed_s) }) }}</template></span>
           </div>
-          <p class="story">{{ b.story }}</p>
+          <p class="story">{{ $td(b.story) }}</p>
           <p v-if="b.note" class="small note">{{ $td(b.note) }}</p>
           <p v-if="b.pending?.length" class="small warn-t">{{ $t('还在等：{a}', { a: b.pending.join($t('；')) }) }}</p>
           <div v-if="b.seen?.length" class="seen small">
             <span v-for="x in b.seen" :key="x.id || x.check" class="pill" :class="x.status === 'open' ? 'warn' : 'good'">
-              <router-link v-if="x.id" :to="{ path: '/ont', query: { view: 'anomalies', a: x.id } }">{{ x.rule }} {{ $td(x.title) }}</router-link>
+              <router-link v-if="x.id" :to="{ path: '/ont', query: { view: 'anomalies', a: x.id } }">{{ $td(x.rule) }} {{ $td(x.title) }}</router-link>
               <template v-else>✓ {{ $td(x.title) }}</template></span>
           </div>
           <details :open="run && (b.n === run.beat_no || b.n === run.beat_no + 1)">
@@ -56,19 +56,19 @@
             <ul class="small"><li v-for="t in b.talk" :key="t">{{ t }}</li></ul>
             <p class="small looks"><router-link v-for="l in b.look" :key="l.to" :to="l.to">{{ $td(l.label) }}</router-link></p>
             <p class="small muted">{{ $t('谁处理：{a} · 预计厂情中枢报：{b}', { a: b.roles.map((r) => ROLE[r] || r).join($t('、')), b: b.expect.map((e) => RULE[e] || e).join($t('、')) }) }}</p>
-            <p v-if="b.link" class="small link">↓ {{ b.link }}</p>
+            <p v-if="b.link" class="small link">↓ {{ $td(b.link) }}</p>
           </details>
         </li>
       </ol>
 
       <section v-if="rv" class="card">
-        <div class="card-head"><h2>{{ $t('复盘：{a} 这张订单', { a: rv.sales_order }) }}</h2><span class="small muted">{{ $t('{a} · 车间 {b} / {c} 根', { a: rv.customer.split(' ')[0], b: rv.order.parts, c: rv.order.qty }) }}</span></div>
+        <div class="card-head"><h2>{{ $t('复盘：{a} 这张订单', { a: $td(rv.sales_order) }) }}</h2><span class="small muted">{{ $t('{a} · 车间 {b} / {c} 根', { a: rv.customer.split(' ')[0], b: $td(rv.order.parts), c: $td(rv.order.qty) }) }}</span></div>
         <p v-for="t in rv.chain.summary" :key="t">{{ t }}</p>
         <template v-if="rv.margin">
           <table class="tbl small"><thead><tr><th>{{ $t('项') }}</th><th class="num">$</th><th>{{ $t('怎么算') }}</th></tr></thead>
             <tbody>
-              <tr><td>{{ $t('收入') }}</td><td class="num">{{ num(rv.margin.revenue) }}</td><td>{{ $t('{a} 台 × 订单单价', { a: rv.margin.qty }) }}</td></tr>
-              <tr v-for="l in rv.margin.lines" :key="l.key"><td>{{ $td(l.label) }}</td><td class="num">−{{ num(l.usd) }}</td><td>{{ l.how }}<template v-if="l.actions?.length">{{ $t('：{a}', { a: l.actions.map((a) => a.title + ' $' + num(a.usd)).join($t('；')) }) }}</template></td></tr>
+              <tr><td>{{ $t('收入') }}</td><td class="num">{{ num(rv.margin.revenue) }}</td><td>{{ $t('{a} 台 × 订单单价', { a: $td(rv.margin.qty) }) }}</td></tr>
+              <tr v-for="l in rv.margin.lines" :key="l.key"><td>{{ $td(l.label) }}</td><td class="num">−{{ num(l.usd) }}</td><td>{{ $td(l.how) }}<template v-if="l.actions?.length">{{ $t('：{a}', { a: l.actions.map((a) => a.title + ' $' + num(a.usd)).join($t('；')) }) }}</template></td></tr>
               <tr><td><b>{{ $t('毛利') }}</b></td><td class="num"><b>{{ num(rv.margin.margin) }}</b></td><td>{{ $t('毛利率') }} <b>{{ pct1(rv.margin.margin_pct) }}</b>{{ $t('（按标准 {a}）', { a: pct1(rv.margin.std_margin_pct) }) }}</td></tr>
             </tbody></table>
         </template>
@@ -76,11 +76,11 @@
         <h3>{{ $t('每一幕花在这张订单上的钱') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('幕') }}</th><th>{{ $t('领域') }}</th><th>{{ $t('异常') }}</th><th>{{ $t('采纳的动作') }}</th><th class="num">{{ $t('记到订单（$）') }}</th></tr></thead>
           <tbody><tr v-for="b in rv.beats" :key="b.n" :class="{ top: b.n === rv.top_beat }">
-            <td>{{ b.n }} {{ $td(b.title) }}</td><td>{{ b.domain_name }}</td>
+            <td>{{ $td(b.n) }} {{ $td(b.title) }}</td><td>{{ $td(b.domain_name) }}</td>
             <td>{{ b.anomalies.filter((x) => x.id).map((x) => x.rule).join($t('、')) || '—' }}</td>
             <td>{{ b.actions.map((a) => a.title + $t('（') + (ACT[a.status] || a.status) + $t('）')).join($t('；')) || '—' }}</td>
             <td class="num">{{ num(b.cost + (b.idle_usd || 0)) }}</td></tr></tbody></table>
-        <p v-if="rv.invoice" class="small">{{ $t('这张订单的发票 {a}：${b}，{c}{d}。', { a: rv.invoice.doc || $t('（开票中）'), b: num(rv.invoice.amount), c: rv.invoice.status_name, d: rv.invoice.dunned_n ? $t('，催过 ') + rv.invoice.dunned_n + $t(' 次') : '' }) }}</p>
+        <p v-if="rv.invoice" class="small">{{ $t('这张订单的发票 {a}：${b}，{c}{d}。', { a: rv.invoice.doc || $t('（开票中）'), b: num(rv.invoice.amount), c: $td(rv.invoice.status_name), d: rv.invoice.dunned_n ? $t('，催过 ') + rv.invoice.dunned_n + $t(' 次') : '' }) }}</p>
         <h3>{{ $t('跨领域因果链') }}</h3>
         <div v-if="rv.chain.nodes.length > 1" class="cgbox"><ChainGraph :chain="rv.chain" /></div>
         <details v-if="rv.report"><summary>{{ $t('两周的周报（{a}）', { a: rv.report.at.slice(0, 16).replace('T', ' ') }) }}</summary><pre class="rep">{{ $td(rv.report.text) }}</pre></details>

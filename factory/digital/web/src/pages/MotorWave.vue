@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <div class="cols">
       <section class="card list">
-        <div class="card-head"><h2>{{ $t('最近的电机（{a} 台）', { a: shown.length }) }}</h2></div>
+        <div class="card-head"><h2>{{ $t('最近的电机（{a} 台）', { a: $td(shown.length) }) }}</h2></div>
         <div class="small">
           <label>{{ $t('型号') }}
             <select v-model="item"><option value="">{{ $t('全部') }}</option><option v-for="s in items" :key="s" :value="s">{{ $td(s) }}</option></select>
@@ -19,14 +19,14 @@
         <div v-if="winders.length > 1" class="small muted">{{ $t('三相电阻不平衡均值：') }}<span v-for="s in winders" :key="s" class="mono">{{ s }} {{ meanBy(s) }} % · </span></div>
         <div v-if="!list.length" class="small muted">{{ $t('还没有。接一张伺服电机订单，让车间做到“电机终检”。') }}</div>
         <button v-for="w in shown" :key="w.serial" class="brd" :class="{ on: sel === w.serial }" @click="open(w.serial)">
-          <span class="mono">{{ w.serial }}</span>
+          <span class="mono">{{ $td(w.serial) }}</span>
           <span class="small" :class="w.pass ? 'ok' : 'bad'">{{ w.pass ? $t('合格') : $t('不合格') }}</span>
-          <span class="small muted">{{ $t('{a}　绕线 {b}', { a: w.item, b: w.winder || '—' }) }}</span>
+          <span class="small muted">{{ $t('{a}　绕线 {b}', { a: $td(w.item), b: w.winder || '—' }) }}</span>
           <span class="small muted">{{ $t('反电势 {a} %　齿槽 {b} %　THD {c} %', { a: v(w, 'mt_ke', 1), b: v(w, 'mt_cog', 2), c: v(w, 'mt_thd', 1) }) }}</span>
         </button>
       </section>
       <section v-if="m" class="card main">
-        <div class="card-head"><h2>{{ m.serial }} · <small class="muted">{{ $t('{a}　工单 {b}　绕线机 {c}　{d} 极 {e} 槽', { a: m.item, b: m.work_order, c: m.winder || '—', d: m.poles, e: m.slots }) }}</small></h2></div>
+        <div class="card-head"><h2>{{ $td(m.serial) }} · <small class="muted">{{ $t('{a}　工单 {b}　绕线机 {c}　{d} 极 {e} 槽', { a: $td(m.item), b: $td(m.work_order), c: m.winder || '—', d: $td(m.poles), e: $td(m.slots) }) }}</small></h2></div>
         <div class="kpis">
           <div :class="{ bad: m.ke < 95 || m.ke > 105 }"><b>{{ m.ke.toFixed(1) }} %</b><span>{{ $t('反电势常数（95–105）') }}</span></div>
           <div :class="{ bad: m.unbal > 2 }"><b>{{ m.unbal.toFixed(2) }} %</b><span>{{ $t('三相不平衡（上限 2）') }}</span></div>
@@ -68,7 +68,7 @@
                 <span class="small mono">{{ a.toFixed(2) }}</span>
               </div>
             </div>
-            <p class="small">{{ $t('{a} 极 {b} 槽，设计本身的齿槽转矩是每圈 60 次（灰）；每圈 12、24 次本来互相抵消，磁钢贴歪时抵消不掉（红），峰峰值变大，关节低速转动时会“一顿一顿”。', { a: m.poles, b: m.slots }) }}</p>
+            <p class="small">{{ $t('{a} 极 {b} 槽，设计本身的齿槽转矩是每圈 60 次（灰）；每圈 12、24 次本来互相抵消，磁钢贴歪时抵消不掉（红），峰峰值变大，关节低速转动时会“一顿一顿”。', { a: $td(m.poles), b: $td(m.slots) }) }}</p>
           </div>
         </div>
         <h3>{{ $t('10 块磁钢（强度、位置误差）') }}</h3>

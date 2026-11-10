@@ -4,16 +4,16 @@
       <span class="muted">{{ $t('按客户要求填参数 → 自动校核、出三维、图纸和报价 → 生成订单提议（确认后写入 ERPNext）') }}</span></div>
     <div class="tabs" role="tablist">
       <button v-for="t in tpls" :key="t.id" role="tab" :aria-selected="tid === t.id" :class="{ on: tid === t.id }" @click="pickT(t.id)">
-        <b>{{ t.id }}</b> {{ $td(t.name) }}</button>
+        <b>{{ $td(t.id) }}</b> {{ $td(t.name) }}</button>
     </div>
     <div v-if="tpl" class="row">
       <section class="card side">
         <div class="card-head"><h2>{{ $t('参数') }}</h2><button class="btn ghost small" @click="reset">{{ $t('恢复默认') }}</button></div>
         <p class="small muted">{{ $td(tpl.summary) }}</p>
         <div v-for="(ps, g) in groups" :key="g" class="grp">
-          <h3>{{ g }}</h3>
+          <h3>{{ $td(g) }}</h3>
           <label v-for="p in ps" :key="p.key" class="fld">
-            <span>{{ p.zh }}<small v-if="p.unit" class="muted"> {{ p.unit }}</small></span>
+            <span>{{ $td(p.zh) }}<small v-if="p.unit" class="muted"> {{ $td(p.unit) }}</small></span>
             <select v-if="p.choices" v-model="vals[p.key]"><option v-for="c in p.choices" :key="c.value" :value="c.value">{{ $td(c.label) }}</option></select>
             <input v-else v-model.number="vals[p.key]" type="number" :min="p.min" :max="p.max" :step="p.step">
             <small v-if="p.hint" class="muted">{{ $td(p.hint) }}</small>
@@ -24,14 +24,14 @@
       <section class="card grow">
         <div class="card-head"><h2>{{ $t('结果') }}</h2><span class="muted small">{{ busy ? $t('正在计算…') : '' }}</span></div>
         <div v-if="res" class="checks">
-          <div v-for="e in res.errors" :key="e" class="err">✗ {{ e }}</div>
+          <div v-for="e in res.errors" :key="e" class="err">✗ {{ $td(e) }}</div>
           <div v-for="w in res.warnings" :key="w" class="warnline">{{ $t('！{a}', { a: w }) }}</div>
           <div v-if="res.ok" class="okline">{{ $t('✓ 校核通过') }}</div>
         </div>
         <table v-if="res" class="t figs"><tbody>
-          <tr v-for="f in res.figures" :key="f[0]"><td class="muted">{{ f[0] }}</td><td class="mono">{{ f[1] }}</td></tr>
-          <tr v-for="p in res.parts || []" :key="p.ref"><td class="muted">{{ p.zh }}</td>
-            <td><router-link :to="{ path: '/library', query: { ref: p.ref } }" class="mono">{{ p.ref }}</router-link></td></tr>
+          <tr v-for="f in res.figures" :key="f[0]"><td class="muted">{{ $td(f[0]) }}</td><td class="mono">{{ $td(f[1]) }}</td></tr>
+          <tr v-for="p in res.parts || []" :key="p.ref"><td class="muted">{{ $td(p.zh) }}</td>
+            <td><router-link :to="{ path: '/library', query: { ref: p.ref } }" class="mono">{{ $td(p.ref) }}</router-link></td></tr>
         </tbody></table>
         <div class="viewer">
           <ModelViewer v-if="model" :url="model.glb" />
@@ -48,7 +48,7 @@
             <tr v-for="l in res.quote.lines" :key="l.desc"><td class="small">{{ $td(l.desc) }}</td><td class="num mono">{{ money(l.amount) }}</td></tr>
             <tr v-if="res.quote.unit_cost"><td class="small muted">{{ $t('单件成本 · 毛利 {a}%', { a: Math.round(res.quote.margin * 100) }) }}</td><td class="num mono">{{ money(res.quote.unit_cost) }}</td></tr>
             <tr><td><b>{{ $t('单价') }}</b></td><td class="num mono"><b>{{ money(res.quote.unit_price) }}</b></td></tr>
-            <tr><td><b>{{ $t('合计 × {a}', { a: res.quote.qty }) }}</b></td><td class="num mono"><b>{{ money(res.quote.total) }}</b></td></tr>
+            <tr><td><b>{{ $t('合计 × {a}', { a: $td(res.quote.qty) }) }}</b></td><td class="num mono"><b>{{ money(res.quote.total) }}</b></td></tr>
           </tbody></table>
           <h3>{{ $t('生成订单提议') }}</h3>
           <label class="fld"><span>{{ $t('客户') }}</span><select v-model="customer"><option v-for="c in customers" :key="c" :value="c">{{ $td(c) }}</option></select></label>

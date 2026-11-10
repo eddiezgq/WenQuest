@@ -1,0 +1,17 @@
+[
+"select * from ehs_person where mode=%s and active and post in ('操作工','学徒') order by id",
+"一二三四五",
+"一二三四五六日",
+"伤",
+"到料",
+"取首页看板数据（全部从历史库计算）。section 可选 kpis/machines/orders/week/quality/materials/oee/cost/all",
+"可能",
+"对一张假设的新订单做算料（MRP），只计算不写入",
+"把这份{a}改写成给厂长看的简报：先一句总评，再分点；保留全部数字和单号",
+"按总线历史算一张工单的标准成本、实际成本和按工序的差异",
+"查总线历史消息。types 如 [\"machine.event\"]，topic_like 用 SQL like（如 wq/gearbox/machining/grd-01/%），corr 为工单号或提议号",
+"概率",
+"贵",
+"起草“接单并算料”提议（销售订单 + 工单 + 请购单），等人确认后才写入 ERPNext。仅生产模式可用",
+"预热"
+]

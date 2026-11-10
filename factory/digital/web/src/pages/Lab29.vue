@@ -7,8 +7,8 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
-        <span class="small">{{ $t('你的场景：客户') }} <b>{{ s.case.customer.split(' ')[0] }}</b>{{ $t('，机器人序列号以') }} <b class="mono">{{ s.case.prefix }}</b> {{ $t('开头（3 台）') }}</span>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
+        <span class="small">{{ $t('你的场景：客户') }} <b>{{ $td(s.case.customer.split(' ')[0]) }}</b>{{ $t('，机器人序列号以') }} <b class="mono">{{ $td(s.case.prefix) }}</b> {{ $t('开头（3 台）') }}</span>
         <router-link class="small" to="/rservice">{{ $t('客户与服务（现场的机器人）') }}</router-link>
         <router-link class="small" to="/ont">{{ $t('厂情中枢') }}</router-link>
         <button class="btn sm" @click="load">{{ $t('刷新') }}</button>
@@ -17,12 +17,12 @@
       <section v-if="s.teacher && s.class?.length" class="card">
         <div class="card-head"><h2>{{ $t('老师：全班成绩') }}</h2></div>
         <table class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l29_t1'" class="f" @submit.prevent="submit(t.id, a1)">
@@ -51,7 +51,7 @@
           <span class="small muted">{{ $t('B 的每次停线损失 ${a}（示例值）', { a: s.loss_per_complaint.toLocaleString() }) }}</span>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

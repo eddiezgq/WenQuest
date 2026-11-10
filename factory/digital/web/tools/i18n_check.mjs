@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { hasCjk, sortPhrases, translate } from '../src/lib/i18n-core.js';
+import { compileTemplates, hasCjk, sortPhrases, translate } from '../src/lib/i18n-core.js';
 
 const WEB = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SRC = path.join(WEB, 'src');
@@ -15,6 +15,7 @@ const REPO_FACTORY = path.resolve(WEB, '..', '..');           // factory/
 const en = JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en.json'), 'utf8'));
 const phrases = sortPhrases([...JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en_phrases.json'), 'utf8')),
   ...JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en_names.json'), 'utf8'))]);
+const tpls = compileTemplates(JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en_templates.json'), 'utf8')));   // 第三批：后端句型
 
 // 第一批（细则 D-4）：外壳与导航、首页、三维车间、电路分析、虚拟仪器、电路板设计（含固件）、芯片设计、功能测试台、零件与机器人库
 export const BATCH = [
@@ -105,7 +106,7 @@ const KEY_FILES = ['help/pages.js'];
 const strip = (txt) => txt
   .replace(/<style[\s\S]*?<\/style>/g, (m) => m.replace(/[^\n]/g, ''))
   .replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ' '))
-  .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+  .replace(/(^|[\s;{}(])\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))   // 只认真正的注释（“machining/*/status”这类路径里的 /* 不算）
   .split('\n').map((l) => l.replace(/(^|[^:'"\\])\/\/.*$/, '$1')).join('\n');
 
 const CALL = /\b(?:t|tk|tr)\(\s*(?:'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`([^`$]*)`)/g;
@@ -203,7 +204,11 @@ export function check() {
     for (const k of r.keys) if (!en[k]) missing.set(k, rel);
     if (r.left.length) left[rel] = r.left;
   }
-  const data = [...dataStrings()].filter((x) => hasCjk(translate(x, en, phrases)));
+  const data = [...dataStrings()].filter((x) => hasCjk(translate(x, en, phrases, tpls)));
+  // 第三批：后端写的句子按句型表能换成英文（抽几句真实样子的，含占位里套名字、分句）
+  const SAMPLES = ['宋雨 的 HT-01 操作资质 20 天后到期', '外圆磨床（GRD-01）停机了。想一想：它会影响哪张订单？在“车间实况”和“订单与交期”里找答案。',
+    '预计还要约 12 分钟（工厂时间）；排队 3 件，是本周瓶颈', '客户投诉 CP-00002：客户反映：设备异响、温度偏高（示例·海港起重 Harbor Crane Systems (Demo)）'];
+  for (const x of SAMPLES) if (hasCjk(translate(x, en, phrases, tpls))) data.push('（句型自检）' + x);
   return { missing: [...missing.entries()].map(([k, f]) => ({ key: k, file: f })), left, data };
 }
 

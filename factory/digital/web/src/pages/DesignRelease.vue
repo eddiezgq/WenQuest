@@ -8,7 +8,7 @@
         <div class="card-head"><h2>{{ $t('提交新版本') }}</h2></div>
         <form class="form" @submit.prevent="submit">
           <label>{{ $t('物料编号') }} <input v-model.trim="item" :placeholder="$t('例如 SH-301、CAP-52-T')" required @change="lookup"></label>
-          <div v-if="info" class="small ok">{{ $t('{a} · 现行 rev {b}', { a: $td(info.name), b: info.revision }) }}</div>
+          <div v-if="info" class="small ok">{{ $t('{a} · 现行 rev {b}', { a: $td(info.name), b: $td(info.revision) }) }}</div>
           <div v-if="infoErr" class="small err">{{ infoErr }}</div>
           <label>{{ $t('三维模型（STEP）') }} <input type="file" accept=".step,.stp,.STEP,.STP" @change="pick('step', $event)"></label>
           <label>{{ $t('图纸（PDF 或 SVG，可选）') }} <input type="file" accept=".pdf,.svg" @change="pick('drawing', $event)"></label>
@@ -31,8 +31,8 @@
           <thead><tr><th>{{ $t('物料') }}</th><th>{{ $t('状态') }}</th><th>{{ $t('提交人') }}</th><th>{{ $t('时间') }}</th><th>{{ $t('说明') }}</th><th class="num">{{ $t('未处理批注') }}</th><th></th></tr></thead>
           <tbody><tr v-for="r in rows" :key="r.id">
             <td class="mono b">{{ $td(r.item) }}</td>
-            <td><span class="pill" :class="TONE[r.status]">{{ STATUS[r.status] }}{{ r.revision ? ' rev ' + r.revision : '' }}</span></td>
-            <td>{{ r.author }}<span v-if="r.mine" class="muted small">{{ $t('（我）') }}</span></td>
+            <td><span class="pill" :class="TONE[r.status]">{{ $td(STATUS[r.status]) }}{{ r.revision ? ' rev ' + r.revision : '' }}</span></td>
+            <td>{{ $td(r.author) }}<span v-if="r.mine" class="muted small">{{ $t('（我）') }}</span></td>
             <td class="small">{{ timeOf(r.ts) }}</td>
             <td class="small">{{ r.note || '—' }}</td>
             <td class="num">{{ r.open_comments || '' }}</td>

@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span class="pill" :class="s.injected ? 'warn' : ''">{{ s.injected ? $t('老师已注入问题：从数据里找原因') : $t('等老师注入问题') }}</span>
         <router-link class="small" to="/work/quality">{{ $t('质量（控制图）') }}</router-link>
         <router-link class="small" to="/quality/8d">{{ $t('质量异常单（8D）') }}</router-link>
@@ -24,12 +24,12 @@
         <p v-if="s.problem" class="small">{{ $t('当前：{a}（{b} 注入{c}）', { a: $td(s.problem.name), b: timeOf(s.problem.injected_at), c: s.problem.cleared_at ? $t('，已被措施消除') : '' }) }}</p>
         <p class="small muted">{{ $t('注入后让车间接着做关节：在“订单与计划”接几张 WQJ-L / M / S 的单（每张 8–10 台），按层下达。学生的 8D 措施要您在“质量异常单”里批准，批准后才下发车间。') }}</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l25_t1'" class="f" @submit.prevent="submit(t.id, a1)">
@@ -46,8 +46,8 @@
             <div v-for="(g, by) in { station: strata.station, lot: strata.lot }" :key="by">
               <b class="small">{{ $t('按{a}', { a: by === 'station' ? $t('装配工位') : $t('谐波减速器批次') }) }}</b>
               <table class="tbl small"><thead><tr><th>{{ by === 'station' ? $t('工位') : $t('批次') }}</th><th class="num">{{ $t('台数') }}</th><th class="num">{{ $t('均值') }}</th><th class="num">{{ $t('超差') }}</th></tr></thead>
-                <tbody><tr v-for="(x, k) in g" :key="k"><td class="mono">{{ k }}</td><td class="num">{{ x.n }}</td><td class="num">{{ x.mean }}</td>
-                  <td class="num" :class="{ 'bad-t': x.fails }">{{ x.fails }}</td></tr></tbody></table>
+                <tbody><tr v-for="(x, k) in g" :key="k"><td class="mono">{{ k }}</td><td class="num">{{ $td(x.n) }}</td><td class="num">{{ $td(x.mean) }}</td>
+                  <td class="num" :class="{ 'bad-t': x.fails }">{{ $td(x.fails) }}</td></tr></tbody></table>
               <p v-if="!Object.keys(g).length" class="small muted">{{ $t('还没有数据。') }}</p>
             </div>
           </div>
@@ -59,12 +59,12 @@
           </form>
         </template>
         <div v-if="['l25_t3', 'l25_t4', 'l25_t5'].includes(t.id)" class="small">
-          <template v-if="t.evidence?.q8d">{{ $t('你的 8D：') }}<router-link :to="'/quality/8d/' + t.evidence.q8d">{{ t.evidence.q8d }}</router-link>
+          <template v-if="t.evidence?.q8d">{{ $t('你的 8D：') }}<router-link :to="'/quality/8d/' + t.evidence.q8d">{{ $td(t.evidence.q8d) }}</router-link>
             <span v-if="t.id === 'l25_t4' && t.evidence.effective === false">{{ $t('（措施对了，等车间再做 10 台后在 8D 页点“验证”）') }}</span></template>
           <template v-else-if="t.evidence?.note">{{ $td(t.evidence.note) }}</template>
           <template v-else>{{ $t('平台自动检查你的 8D 单。') }}</template>
         </div>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

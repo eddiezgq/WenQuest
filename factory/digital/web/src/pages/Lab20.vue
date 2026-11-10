@@ -7,10 +7,10 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span v-if="!s.teacher" class="pill" :class="s.locked ? 'warn' : 'good'">{{ s.locked ? $t('比对模式：提交任务 3 之前，指挥台和 AI 不显示建议') : $t('已提交选择：可以看中枢的建议，和你的对比') }}</span>
         <span class="small" :class="s.enabled ? 'ok' : 'muted'">{{ $t('供应商模拟器{a}', { a: s.enabled ? $t('已打开') : $t('没打开') }) }}</span>
-        <span v-if="s.target" class="small">{{ $t('这一批：{a} {b}（{c}），{d}', { a: s.target.lot || $t('已下单'), b: s.target.item, c: s.target.supplier.split(' ')[0], d: $td(s.target.status) }) }}</span>
+        <span v-if="s.target" class="small">{{ $t('这一批：{a} {b}（{c}），{d}', { a: s.target.lot || $t('已下单'), b: $td(s.target.item), c: s.target.supplier.split(' ')[0], d: $td(s.target.status) }) }}</span>
         <router-link v-if="s.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: s.anomaly_id } }">{{ $t('打开来料不合格异常') }}</router-link>
         <router-link class="small" to="/supply?tab=inspect">{{ $t('到货与检验') }}</router-link>
         <router-link class="small" to="/supply?tab=suppliers">{{ $t('供应商') }}</router-link>
@@ -26,12 +26,12 @@
         </div>
         <p class="small muted">{{ $t('约 15 分钟（真实时间）后到货；这一批留给学生检验，质检员模拟器不替他们检。') }}</p>
         <table v-if="s.class?.length" class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="t in s.tasks" :key="t.id" class="num">{{ $td(t.title) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l20_t1'" class="f" @submit.prevent="submit('l20_t1', { cats: a1 })">
@@ -59,7 +59,7 @@
           <div class="field"><label>{{ $t('备选供应商每件总拥有成本（$）') }}</label><input v-model.number="a5.tco_alt" type="number" step="0.01" required></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

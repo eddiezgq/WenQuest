@@ -9,7 +9,7 @@
     </svg>
     <div class="ctl small">
       <button class="btn ghost" @click="play">{{ playing ? $t('暂停') : $t('回放刀路') }}</button>
-      <span class="muted">{{ $t('灰虚线：快移；实线：切削。共 {a} 个刀位点', { a: pts.length }) }}</span>
+      <span class="muted">{{ $t('灰虚线：快移；实线：切削。共 {a} 个刀位点', { a: $td(pts.length) }) }}</span>
     </div>
   </div>
 </template>

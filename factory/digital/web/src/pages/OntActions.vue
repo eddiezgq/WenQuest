@@ -8,11 +8,11 @@
     <div v-if="!list.length" class="empty">{{ box === 'todo' ? $t('没有等你批准的动作。') : $t('还没有动作。') }}</div>
     <section v-for="a in list" :key="a.id" class="card act" data-help="act-list" :class="a.status">
       <div class="a-h">
-        <span class="mono small">{{ a.key }}</span>
+        <span class="mono small">{{ $td(a.key) }}</span>
         <b>{{ $td(a.title) }}</b>
         <span v-if="a.costly" class="pill warn">{{ $t('花钱') }}</span>
         <span class="pill" :class="tone(a.status)">{{ $td(a.status_label) }}</span>
-        <span class="small muted r">{{ $t('{a} 发起 · {b}', { a: a.initiator, b: fmtTs(a.created_at) }) }}<template v-if="a.approver"> · {{ a.approver }} {{ a.status === 'rejected' ? $t('驳回') : $t('批准') }}</template></span>
+        <span class="small muted r">{{ $t('{a} 发起 · {b}', { a: $td(a.initiator), b: fmtTs(a.created_at) }) }}<template v-if="a.approver"> · {{ $td(a.approver) }} {{ a.status === 'rejected' ? $t('驳回') : $t('批准') }}</template></span>
       </div>
       <div v-if="a.trial" class="trial small">
         <span class="muted">{{ $t('试运行（{a}）：', { a: fmtTs(a.trial.at) }) }}</span>
@@ -34,7 +34,7 @@
           <input v-model="reason[a.id]" :placeholder="$t('驳回原因')" :aria-label="$t('驳回原因')">
           <button class="btn sm danger" :disabled="!a.can_approve" @click="act(a, 'reject', { text: reason[a.id] })">{{ $t('驳回') }}</button>
           <button class="btn sm ghost" @click="act(a, 'rerun')">{{ $t('用最新快照重新试运行') }}</button>
-          <span v-if="!a.can_approve && a.why_not" class="small muted">{{ a.why_not }}</span>
+          <span v-if="!a.can_approve && a.why_not" class="small muted">{{ $td(a.why_not) }}</span>
         </template>
         <router-link v-if="a.anomaly_id" class="small" :to="{ path: '/ont', query: { view: 'anomalies', a: a.anomaly_id } }">{{ $t('看对应的异常') }}</router-link>
         <button class="linkbtn" @click="toggle(a)">{{ open[a.id] ? $t('收起记录') : $t('看记录') }}</button>

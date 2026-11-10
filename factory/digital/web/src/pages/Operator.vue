@@ -6,23 +6,23 @@
     <div class="tabs" data-help="op-units" role="tablist">
       <button v-for="m in machines" :key="m.unit" role="tab" :aria-selected="unit === m.unit" :class="{ on: unit === m.unit }"
         @click="pick(m.unit)">
-        <i :style="{ background: STATE[m.state].color }"></i>{{ m.code }}
+        <i :style="{ background: STATE[m.state].color }"></i>{{ $td(m.code) }}
       </button>
     </div>
     <div v-if="cur" class="row">
       <section class="card grow">
         <div class="head">
-          <div><h2 class="big">{{ cur.code }} {{ $td(cur.name) }}</h2>
+          <div><h2 class="big">{{ $td(cur.code) }} {{ $td(cur.name) }}</h2>
             <span class="muted small">{{ $t('主题 wq/gearbox/{a}/{b}/status', { a: area, b: unit }) }}</span></div>
           <span class="state" :style="{ color: STATE[cur.state].color, background: STATE[cur.state].bg }">{{ $td(STATE[cur.state].label) }}</span>
         </div>
         <div v-if="['down', 'fault'].includes(cur.state)" class="downbox">
-          <b>{{ cur.locked ? '🔒 ' : '' }}{{ cur.reason || $t('停机') }}</b>{{ $t('：已停 {a} 分钟，预计还要 {b} 分钟（工厂时间），排队 {c} 件。', { a: Math.round((cur.down_for_s || 0) / 60), b: Math.round((cur.down_until_s || 0) / 60), c: cur.queue }) }}
+          <b>{{ cur.locked ? '🔒 ' : '' }}{{ $td(cur.reason) || $t('停机') }}</b>{{ $t('：已停 {a} 分钟，预计还要 {b} 分钟（工厂时间），排队 {c} 件。', { a: Math.round((cur.down_for_s || 0) / 60), b: Math.round((cur.down_until_s || 0) / 60), c: $td(cur.queue) }) }}
           <button class="btn danger" @click="cmd('reset')">{{ $t('处理完毕，复位') }}</button>
         </div>
         <div class="now" data-help="op-now">
           <div><span class="muted small">{{ $t('当前工单') }}</span><b class="mono"><ObjLink v-if="cur.work_order" type="WorkOrder" :k="cur.work_order" /><template v-else>—</template></b></div>
-          <div><span class="muted small">{{ $t('工序') }}</span><b>{{ cur.operation ? cur.operation.split(' ')[0] : '—' }}</b></div>
+          <div><span class="muted small">{{ $t('工序') }}</span><b>{{ cur.operation ? $td(cur.operation.split(' ')[0]) : '—' }}</b></div>
           <div><span class="muted small">{{ $t('零件') }}</span><b class="mono"><ObjLink v-if="cur.part_serial && !/件在炉/.test(cur.part_serial)" type="PartSerial" :k="cur.part_serial" /><template v-else>{{ cur.part_serial || '—' }}</template></b></div><!-- i18n-ok 数据值比较 -->
           <div><span class="muted small">{{ $t('完成') }}</span><b class="mono">{{ cur.qty_done || 0 }} / {{ cur.qty || 0 }}</b></div>
           <div><span class="muted small">{{ $t('主轴') }}</span><b class="mono">{{ cur.spindle_rpm || 0 }} r/min</b></div>
@@ -37,7 +37,7 @@
         <div v-if="!(cur.dispatched || []).length" class="empty">{{ $t('这台设备还没有派工，所以没有“开工”按钮。先到') }}
           <router-link to="/work/planner">{{ $t('订单与计划') }}</router-link> {{ $t('下达工单（或请计划员下达），这里就会出现要做的工序。') }}</div>
         <div v-for="j in cur.dispatched || []" :key="j.work_order + j.operation" class="job">
-          <div class="jinfo"><b class="mono"><ObjLink type="WorkOrder" :k="j.work_order" /></b> {{ $td(j.operation) }}<span class="muted small"> {{ $t('· {a} / {b} 件', { a: j.done, b: j.qty }) }}</span></div>
+          <div class="jinfo"><b class="mono"><ObjLink type="WorkOrder" :k="j.work_order" /></b> {{ $td(j.operation) }}<span class="muted small"> {{ $t('· {a} / {b} 件', { a: $td(j.done), b: $td(j.qty) }) }}</span></div>
           <span class="pill" :class="j.started ? 'good' : 'warn'">{{ j.started ? $t('已开工') : $t('待开工') }}</span>
           <button v-if="!j.started" class="btn primary big" @click="cmd('start', j)">{{ $t('开工') }}</button>
           <button v-else class="btn ghost big" @click="cmd('pause', j)">{{ $t('暂停') }}</button>
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { t as $t } from '../lib/i18n';
+import { t as $t, td } from '../lib/i18n';
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { get, post, session } from '../lib/api';
@@ -92,10 +92,10 @@ async function loadEvents() {
 }
 function evText(e) {
   const d = e.data;
-  const op = (d.operation || '').split(' ')[0];
+  const op = td((d.operation || '').split(' ')[0]);
   return { cycle_start: $t('开始 {a} {b}', { a: d.part_serial, b: op }), cycle_end: $t('完成 {a} {b}，用时 {c} 分钟', { a: d.part_serial, b: op, c: Math.round(d.cycle_time_s / 60 * 10) / 10 }),
     op_complete: $t('工序完工 {a} {b}：合格 {c}/{d}', { a: d.work_order, b: op, c: d.qty_good, d: d.qty }), tool_change: d.message,
-    alarm: $t('报警：') + d.message, fault: $t('故障：') + d.message, recover: $t('恢复：') + d.message }[d.event] || d.event;
+    alarm: $t('报警：') + td(d.message), fault: $t('故障：') + td(d.message), recover: $t('恢复：') + td(d.message) }[d.event] || d.event;
 }
 async function cmd(command, j) {
   msg.value = '';
@@ -113,7 +113,7 @@ onMounted(async () => {
     if (m.type === 'machine.ack') { msgOk.value = m.data.accepted; msg.value = $t('设备应答：') + m.data.reason; }
     if (m.type === 'machine.event') events.value = [{ id: m.id, ts: m.ts, data: m.data }, ...events.value].slice(0, 25);
   });
-  if (session.user.mode === 'teach') teachStatus.value = await get('/teach');
+  if (session.user.mode === 'teach') teachStatus.value = await get('/teach').catch(() => null);   // 实验 7 只在减速器厂，别的厂回 404
 });
 onUnmounted(() => off && off());
 </script>

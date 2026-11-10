@@ -21,10 +21,10 @@
         <section class="card">
           <div class="card-head"><h2>{{ $t('文件头') }}</h2><span class="muted small">{{ $t('卡片表头和签署栏') }}</span></div>
           <div class="grid">
-            <label v-for="f in HEAD" :key="f[0]" class="small">{{ f[1] }}<input :value="getp(f[0])" @input="setp(f[0], $event.target.value, f[2])"></label>
+            <label v-for="f in HEAD" :key="f[0]" class="small">{{ $td(f[1]) }}<input :value="getp(f[0])" @input="setp(f[0], $event.target.value, f[2])"></label>
           </div>
           <div class="grid">
-            <label v-for="s in SIGNS" :key="s[0]" class="small">{{ s[1] }}
+            <label v-for="s in SIGNS" :key="s[0]" class="small">{{ $td(s[1]) }}
               <span class="two"><input :value="sig(s[0]).by" :placeholder="$t('签字')" @input="setSig(s[0], 'by', $event.target.value)">
                 <input :value="sig(s[0]).date" :placeholder="$t('日期')" @input="setSig(s[0], 'date', $event.target.value)"></span></label>
           </div>
@@ -36,7 +36,7 @@
         </section>
 
         <section v-if="op" class="card">
-          <div class="card-head"><h2>{{ $t('机械加工工序卡片 · 工序 {a} {b}', { a: op.seq, b: $td(op.operation) }) }}</h2>
+          <div class="card-head"><h2>{{ $t('机械加工工序卡片 · 工序 {a} {b}', { a: $td(op.seq), b: $td(op.operation) }) }}</h2>
             <span class="muted small">{{ $t('转速、机动时间由切削用量算出，不手填；车削走刀写“切前直径,背吃刀量,走刀长度”，多刀用分号隔开') }}</span></div>
           <div class="grid">
             <label class="small">{{ $t('定位基准') }}<input v-model="op.datum" @input="changed"></label>
@@ -76,14 +76,14 @@
           <div class="card-head"><h2>{{ $t('核算与 AI 预检') }}</h2><span class="muted small">{{ checking ? $t('检查中…') : $t('改完 1 秒自动检查') }}</span></div>
           <div v-if="problems.length" class="probs"><div v-for="(p, i) in problems" :key="i" class="small bad-t">✗ {{ p }}</div></div>
           <div v-else class="small ok">{{ $t('卡片数据完整，可以生成全套卡片。') }}</div>
-          <div v-if="live" class="score">{{ $t('AI 预检 · 建议分') }} <b>{{ live.suggested_score }}</b>
+          <div v-if="live" class="score">{{ $t('AI 预检 · 建议分') }} <b>{{ $td(live.suggested_score) }}</b>
             <span class="pill bad">{{ $t('{a} 必须改', { a: count(live.findings, 'error') }) }}</span>
             <span class="pill warn">{{ $t('{a} 建议', { a: count(live.findings, 'warning') }) }}</span></div>
           <table v-if="live?.findings?.length" class="t small">
             <thead><tr><th>{{ $t('级别') }}</th><th>{{ $t('规则') }}</th><th>{{ $t('工序') }}</th><th>{{ $t('意见') }}</th></tr></thead>
             <tbody><tr v-for="(f, i) in live.findings" :key="i">
               <td><span class="pill" :class="f.level === 'error' ? 'bad' : f.level === 'warning' ? 'warn' : ''">{{ LEVEL[f.level] || f.level }}</span></td>
-              <td>{{ f.rule }}</td><td class="num">{{ f.seq ?? '—' }}</td><td>{{ $td(f.text) }}</td></tr></tbody>
+              <td>{{ $td(f.rule) }}</td><td class="num">{{ f.seq ?? '—' }}</td><td>{{ $td(f.text) }}</td></tr></tbody>
           </table>
         </section>
         <section class="card">

@@ -14,49 +14,49 @@
         <p v-if="!list.length" class="muted small">{{ $t('还没有报告。') }}</p>
         <button v-for="r in list" :key="r.id" class="row" :class="{ on: sel?.id === r.id }" @click="open(r.id)">
           <b>{{ $td(r.title) }}</b><span class="small muted">{{ r.summary.slice(0, 70) }}…</span>
-          <span class="small muted">{{ r.created_by }} · {{ r.engine === 'rules' ? $t('规则文字') : $t('AI 改写') }}</span>
+          <span class="small muted">{{ $td(r.created_by) }} · {{ r.engine === 'rules' ? $t('规则文字') : $t('AI 改写') }}</span>
         </button>
       </div>
       <article v-if="sel" class="card rpt">
         <header><h2>{{ $td(sel.title) }}</h2>
-          <span class="small muted">{{ fmtTs(sel.period_start) }} — {{ fmtTs(sel.period_end) }} · {{ sel.key }} · {{ sel.engine === 'rules' ? $t('规则文字') : $t('AI 改写（数字已核对）') }}</span>
+          <span class="small muted">{{ fmtTs(sel.period_start) }} — {{ fmtTs(sel.period_end) }} · {{ $td(sel.key) }} · {{ sel.engine === 'rules' ? $t('规则文字') : $t('AI 改写（数字已核对）') }}</span>
           <button class="btn sm noprint r" @click="print">{{ $t('打印') }}</button></header>
         <pre class="txt">{{ $td(sel.text) }}</pre>
         <h3>{{ $t('关键指标') }}</h3>
         <div class="tiles">
-          <div v-for="t in tiles" :key="t[0]" class="tile"><span class="small muted">{{ t[0] }}</span><b>{{ t[1] }}</b></div>
+          <div v-for="t in tiles" :key="t[0]" class="tile"><span class="small muted">{{ $td(t[0]) }}</span><b>{{ $td(t[1]) }}</b></div>
         </div>
         <h3>{{ $t('异常') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('领域') }}</th><th class="num">{{ $t('新发现') }}</th><th class="num">{{ $t('处理完') }}</th><th class="num">{{ $t('还开着') }}</th></tr></thead>
-          <tbody><tr v-for="(v, k) in d.anomalies.by_domain" :key="k"><td>{{ domLabel(k) }}</td><td class="num">{{ v.new }}</td><td class="num">{{ v.closed }}</td><td class="num">{{ v.open }}</td></tr>
-            <tr class="sum"><td>{{ $t('合计') }}</td><td class="num">{{ d.anomalies.new }}</td><td class="num">{{ d.anomalies.closed }}</td><td class="num">{{ d.anomalies.open }}</td></tr></tbody></table>
+          <tbody><tr v-for="(v, k) in d.anomalies.by_domain" :key="k"><td>{{ domLabel(k) }}</td><td class="num">{{ $td(v.new) }}</td><td class="num">{{ $td(v.closed) }}</td><td class="num">{{ $td(v.open) }}</td></tr>
+            <tr class="sum"><td>{{ $t('合计') }}</td><td class="num">{{ $td(d.anomalies.new) }}</td><td class="num">{{ $td(d.anomalies.closed) }}</td><td class="num">{{ $td(d.anomalies.open) }}</td></tr></tbody></table>
         <h3>{{ $t('{a}要关注', { a: sel.kind === 'daily' ? $t('今天') : $t('本周') }) }}</h3>
         <ol class="small"><li v-for="(f, i) in d.focus" :key="i"><router-link :to="f.url">{{ $td(f.text) }}</router-link></li></ol>
         <template v-if="d.risk_orders.length"><h3>{{ $t('交付风险') }}</h3>
           <table class="tbl small"><thead><tr><th>{{ $t('订单') }}</th><th>{{ $t('客户') }}</th><th>{{ $t('交期') }}</th><th>{{ $t('预计') }}</th><th>{{ $t('情况') }}</th></tr></thead>
-            <tbody><tr v-for="o in d.risk_orders" :key="o.name"><td class="mono">{{ $td(o.name) }}</td><td>{{ $td(o.customer) }}</td><td>{{ o.delivery_date }}</td>
-              <td>{{ o.projected || '—' }}</td><td>{{ o.risk }}</td></tr></tbody></table></template>
+            <tbody><tr v-for="o in d.risk_orders" :key="o.name"><td class="mono">{{ $td(o.name) }}</td><td>{{ $td(o.customer) }}</td><td>{{ $td(o.delivery_date) }}</td>
+              <td>{{ o.projected || '—' }}</td><td>{{ $td(o.risk) }}</td></tr></tbody></table></template>
         <template v-if="d.service"><h3>{{ $t('客户与服务') }}</h3>
-          <p class="small">{{ $t('新投诉 {a} 张、开着 {b} 张 · 完成服务 {c} 单、待上门 {d} 单 ·满意度 {e} · 平均响应 {f} 小时 · 保修成本 ${g}', { a: d.service.new_complaints, b: d.service.open_complaints, c: d.service.jobs_done, d: d.service.open_jobs, e: d.service.satisfaction ?? '—', f: d.service.response_h ?? '—', g: Math.round(d.service.warranty_cost || 0).toLocaleString() }) }}</p></template>
+          <p class="small">{{ $t('新投诉 {a} 张、开着 {b} 张 · 完成服务 {c} 单、待上门 {d} 单 ·满意度 {e} · 平均响应 {f} 小时 · 保修成本 ${g}', { a: $td(d.service.new_complaints), b: $td(d.service.open_complaints), c: $td(d.service.jobs_done), d: $td(d.service.open_jobs), e: d.service.satisfaction ?? '—', f: d.service.response_h ?? '—', g: Math.round(d.service.warranty_cost || 0).toLocaleString() }) }}</p></template>
         <template v-if="d.maint"><h3>{{ $t('设备维护') }}</h3>
-          <p class="small">{{ $t('故障 {a} 次（停机 {b} 分钟）· 完成保养 {c} 次 · 保养逾期 {d} 台{e} · 开着的维修单 {f} 张 ·平均故障间隔 {g} 小时', { a: d.maint.failures, b: d.maint.failure_down_min, c: d.maint.pms_done, d: d.maint.overdue, e: d.maint.overdue_units?.length ? $t('（') + d.maint.overdue_units.map((u) => u.toUpperCase()).join($t('、')) + $t('）') : '', f: d.maint.open_repairs, g: d.maint.mtbf ?? '—' }) }}</p></template>
+          <p class="small">{{ $t('故障 {a} 次（停机 {b} 分钟）· 完成保养 {c} 次 · 保养逾期 {d} 台{e} · 开着的维修单 {f} 张 ·平均故障间隔 {g} 小时', { a: $td(d.maint.failures), b: $td(d.maint.failure_down_min), c: $td(d.maint.pms_done), d: $td(d.maint.overdue), e: d.maint.overdue_units?.length ? $t('（') + d.maint.overdue_units.map((u) => u.toUpperCase()).join($t('、')) + $t('）') : '', f: $td(d.maint.open_repairs), g: d.maint.mtbf ?? '—' }) }}</p></template>
         <template v-if="d.ehs"><h3>{{ $t('安全环保') }}</h3>
-          <p class="small">{{ $t('新隐患 {a} 条（重大 {b}）· 整改关闭 {c} 条 · 还开着 {d} 条（重大 {e}、逾期 {f}）·挂牌上锁 {g} 台 · 培训 30 天内到期 {h} 项 · 近 30 天未遂 {i} 起', { a: d.ehs.new_issues, b: d.ehs.new_major, c: d.ehs.closed, d: d.ehs.open_issues, e: d.ehs.major_open, f: d.ehs.overdue, g: d.ehs.locked, h: d.ehs.training_due, i: d.ehs.near_miss_30d }) }}</p></template>
+          <p class="small">{{ $t('新隐患 {a} 条（重大 {b}）· 整改关闭 {c} 条 · 还开着 {d} 条（重大 {e}、逾期 {f}）·挂牌上锁 {g} 台 · 培训 30 天内到期 {h} 项 · 近 30 天未遂 {i} 起', { a: $td(d.ehs.new_issues), b: $td(d.ehs.new_major), c: $td(d.ehs.closed), d: $td(d.ehs.open_issues), e: $td(d.ehs.major_open), f: $td(d.ehs.overdue), g: $td(d.ehs.locked), h: $td(d.ehs.training_due), i: $td(d.ehs.near_miss_30d) }) }}</p></template>
         <h3>{{ $t('动作') }}</h3>
-        <p class="small">{{ $t('共 {a} 个', { a: d.actions.total }) }}<template v-for="(n, s) in d.actions.by_status" :key="s"> · {{ ST[s] || s }} {{ n }}</template></p>
-        <ul v-if="d.actions.executed.length" class="small"><li v-for="a in d.actions.executed" :key="a.key">{{ $t('{a} {b}（{c}）', { a: a.key, b: $td(a.title), c: ST[a.status] }) }}</li></ul>
+        <p class="small">{{ $t('共 {a} 个', { a: $td(d.actions.total) }) }}<template v-for="(n, s) in d.actions.by_status" :key="s"> · {{ ST[s] || s }} {{ n }}</template></p>
+        <ul v-if="d.actions.executed.length" class="small"><li v-for="a in d.actions.executed" :key="a.key">{{ $t('{a} {b}（{c}）', { a: $td(a.key), b: $td(a.title), c: $td(ST[a.status]) }) }}</li></ul>
         <template v-if="d.retros.length"><h3>{{ $t('推演与实际') }}</h3>
-          <ul class="small"><li v-for="r in d.retros" :key="r.key">{{ $t('{a} {b}：完工偏差 {c}', { a: r.key, b: $td(r.title), c: r.finish_pct == null ? '—' : (r.finish_pct > 0 ? '+' : '') + r.finish_pct + '%' }) }}</li></ul></template>
+          <ul class="small"><li v-for="r in d.retros" :key="r.key">{{ $t('{a} {b}：完工偏差 {c}', { a: $td(r.key), b: $td(r.title), c: r.finish_pct == null ? '—' : (r.finish_pct > 0 ? '+' : '') + r.finish_pct + '%' }) }}</li></ul></template>
         <template v-if="sel.kind === 'weekly'">
           <template v-if="Object.keys(d.trends || {}).length"><h3>{{ $t('趋势（每天一个点）') }}</h3>
             <table class="tbl small"><tbody><tr v-for="(pts, m) in d.trends" :key="m"><td>{{ METRIC[m] || m }}</td>
               <td v-for="p in pts" :key="p[0]" class="num">{{ fmtMetric(m, p[1]) }}</td></tr></tbody></table></template>
           <template v-if="d.recurring?.length"><h3>{{ $t('反复出现的异常') }}</h3>
-            <ul class="small"><li v-for="r in d.recurring" :key="r.rule + r.subject">{{ $t('{a}（{b} · {c}，{d} 次）', { a: $td(r.title), b: r.rule, c: r.subject, d: r.n }) }}</li></ul></template>
+            <ul class="small"><li v-for="r in d.recurring" :key="r.rule + r.subject">{{ $t('{a}（{b} · {c}，{d} 次）', { a: $td(r.title), b: $td(r.rule), c: $td(r.subject), d: $td(r.n) }) }}</li></ul></template>
           <template v-if="d.cost_top?.length"><h3>{{ $t('成本差异前五') }}</h3>
             <table class="tbl small"><thead><tr><th>{{ $t('工单') }}</th><th class="num">{{ $t('差异') }}</th><th class="num">%</th><th>{{ $t('差得最多的工序') }}</th></tr></thead>
-              <tbody><tr v-for="c in d.cost_top" :key="c.work_order"><td class="mono">{{ c.work_order }}</td><td class="num">${{ c.variance }}</td>
-                <td class="num">{{ c.variance_pct == null ? '—' : c.variance_pct.toFixed(1) }}</td><td>{{ c.worst }}</td></tr></tbody></table></template>
+              <tbody><tr v-for="c in d.cost_top" :key="c.work_order"><td class="mono">{{ $td(c.work_order) }}</td><td class="num">${{ $td(c.variance) }}</td>
+                <td class="num">{{ c.variance_pct == null ? '—' : c.variance_pct.toFixed(1) }}</td><td>{{ $td(c.worst) }}</td></tr></tbody></table></template>
           <template v-if="d.rule_hits && Object.keys(d.rule_hits).length"><h3>{{ $t('规则命中') }}</h3>
             <p class="small"><span v-for="(n, r) in d.rule_hits" :key="r" class="hit">{{ r }} × {{ n }}</span></p></template>
         </template>

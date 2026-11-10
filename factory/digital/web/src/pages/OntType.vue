@@ -2,7 +2,7 @@
   <div class="page">
     <div class="page-title">
       <h1><router-link to="/ont/map" class="back">{{ $t('全貌地图') }}</router-link> / {{ spec?.label || type }}</h1>
-      <span class="muted">{{ spec?.label_en }} · {{ spec?.domain_label }} · {{ spec?.maturity_label }}<template v-if="spec?.key"> {{ $t('· 编号：{a}', { a: spec.key }) }}</template></span>
+      <span class="muted">{{ $td(spec?.label_en) }} · {{ $td(spec?.domain_label) }} · {{ $td(spec?.maturity_label) }}<template v-if="spec?.key"> {{ $t('· 编号：{a}', { a: $td(spec.key) }) }}</template></span>
     </div>
     <div v-if="err" class="err">{{ err }}</div>
 
@@ -29,9 +29,9 @@
       </div>
       <div v-else class="scroll">
         <table class="t">
-          <thead><tr><th>{{ $t('对象') }}</th><th v-for="p in cols" :key="p.name">{{ $td(p.label) }}<span v-if="p.unit" class="muted">{{ $t('（{a}）', { a: p.unit }) }}</span></th></tr></thead>
+          <thead><tr><th>{{ $t('对象') }}</th><th v-for="p in cols" :key="p.name">{{ $td(p.label) }}<span v-if="p.unit" class="muted">{{ $t('（{a}）', { a: $td(p.unit) }) }}</span></th></tr></thead>
           <tbody><tr v-for="r in rows" :key="r.key">
-            <td><router-link :to="objPath(type, r.key)"><b>{{ r.display }}</b></router-link></td>
+            <td><router-link :to="objPath(type, r.key)"><b>{{ $td(r.display) }}</b></router-link></td>
             <td v-for="p in cols" :key="p.name" class="mono small">{{ fmtVal(r.props[p.name]) }}</td>
           </tr></tbody>
         </table>

@@ -434,7 +434,7 @@ def teach_only(path):
 @app.middleware("http")
 async def _demo_plant_only(request: Request, call_next):
     if not DEMO_PLANT and (teach_only(request.url.path) or (request.url.path == "/api/labs" and not _labs_api.has_labs())):
-        return JSONResponse({"detail": "这项功能只属于演示工厂（问渠减速器厂），本厂没有"}, 404)
+        return JSONResponse({"detail": i18n.tr("这项功能只属于演示工厂（问渠减速器厂），本厂没有", i18n.lang_of(request))}, 404)   # 第 130 轮第三批：按语言
     return await call_next(request)
 
 
@@ -972,14 +972,14 @@ def decide(pid: str, decision: str, u=Depends(user_of)):
 
 # ---------------------------------------------------------------- AI 助手
 @app.post("/api/ai/chat")
-def ai_chat(body: dict = Body(...), u=Depends(user_of)):
+def ai_chat(request: Request, body: dict = Body(...), u=Depends(user_of)):
     msgs = [m for m in body.get("messages", []) if m.get("role") in ("user", "assistant") and m.get("content")]
     if not msgs:
         raise HTTPException(400, "请输入问题")
     ai_quota(u)
     if H.agent is None:
         return H.ai.chat(msgs, u["mode"], u["role"], u["name"])
-    return H.agent.ask(u, msgs[-12:])
+    return H.agent.ask(dict(u, lang=i18n.lang_of(request)), msgs[-12:])   # 第 130 轮 D-10：英文界面让模型用英文答
 
 
 _catalog = lib_select.Catalog()
@@ -1918,10 +1918,17 @@ SolidWorks（第 10 轮）：
 
 
 # ---------------------------------------------------------------- 教学
+def _lab7_here():
+    """实验 7（输出轴 SH-301 闭环）只在减速器厂：别的厂没有 45 钢圆棒等物料，原来会 KeyError 报 500（第 130 轮第三批 D-12）"""
+    if "RM-45-D50" not in F.ITEMS:   # i18n-ok 物料编号
+        raise HTTPException(404, "实验 7 只在减速器厂")
+
+
 @app.get("/api/teach")
 def teach_status(u=Depends(user_of)):
     if u["mode"] != "teach":
         raise HTTPException(409, "生产模式没有实验任务")
+    _lab7_here()
     return H.teach.check(u["name"])
 
 
@@ -1929,6 +1936,7 @@ def teach_status(u=Depends(user_of)):
 def teach_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
     if u["mode"] != "teach":
         raise HTTPException(409, "生产模式没有实验任务")
+    _lab7_here()
     try:
         return H.teach.answer(u["name"], tid, body)
     except KeyError:

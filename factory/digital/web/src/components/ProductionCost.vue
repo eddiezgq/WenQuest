@@ -31,19 +31,19 @@
         <span class="muted small">{{ $t('标准只含单件工时；实际另含调整与换刀 · 工时 × 工位小时费率') }}</span></div>
       <div v-if="costErr" class="empty">{{ costErr }}</div>
       <template v-if="cost">
-        <p>{{ $t('{a} 已完工 {b} 件：加工标准成本', { a: cost.work_order, b: cost.parts_finished }) }} <b class="mono">{{ money(cost.std_cost) }}</b>{{ $t('，实际') }}
-          <b class="mono">{{ money(cost.actual_cost) }}</b>{{ $t('，差异') }} <b class="mono" :style="{ color: cost.variance > 0 ? 'var(--bad)' : 'var(--good)' }">{{ $t('{a}（{b}{c}%）', { a: money(cost.variance), b: cost.variance_pct > 0 ? '+' : '', c: cost.variance_pct }) }}</b>{{ $t('。材料按标准每件 {a}。', { a: money(cost.material_std_per_unit) }) }}</p>
+        <p>{{ $t('{a} 已完工 {b} 件：加工标准成本', { a: $td(cost.work_order), b: $td(cost.parts_finished) }) }} <b class="mono">{{ money(cost.std_cost) }}</b>{{ $t('，实际') }}
+          <b class="mono">{{ money(cost.actual_cost) }}</b>{{ $t('，差异') }} <b class="mono" :style="{ color: cost.variance > 0 ? 'var(--bad)' : 'var(--good)' }">{{ $t('{a}（{b}{c}%）', { a: money(cost.variance), b: cost.variance_pct > 0 ? '+' : '', c: $td(cost.variance_pct) }) }}</b>{{ $t('。材料按标准每件 {a}。', { a: money(cost.material_std_per_unit) }) }}</p>
         <table class="t">
           <thead><tr><th>{{ $t('工序') }}</th><th>{{ $t('设备') }}</th><th class="num">{{ $t('件数') }}</th><th class="num">{{ $t('标准工时') }}</th><th class="num">{{ $t('实际加工') }}</th><th class="num">{{ $t('调整+换刀') }}</th>
             <th class="num">{{ $t('费率/时') }}</th><th class="num">{{ $t('标准成本') }}</th><th class="num">{{ $t('实际成本') }}</th><th class="num">{{ $t('差异') }}</th></tr></thead>
           <tbody><tr v-for="l in cost.lines" :key="l.op_index">
-            <td>{{ $td(l.operation.split(' ')[0]) }}</td><td class="mono">{{ l.unit.toUpperCase() }}</td><td class="num">{{ l.parts }}</td>
+            <td>{{ $td(l.operation.split(' ')[0]) }}</td><td class="mono">{{ l.unit.toUpperCase() }}</td><td class="num">{{ $td(l.parts) }}</td>
             <td class="num">{{ mins(l.std_s) }}</td><td class="num">{{ mins(l.cycle_s) }}</td><td class="num">{{ mins(l.setup_s + l.tool_change_s) }}</td>
-            <td class="num">${{ l.rate_h }}</td><td class="num">{{ money(l.std_cost) }}</td><td class="num">{{ money(l.actual_cost) }}</td>
+            <td class="num">${{ $td(l.rate_h) }}</td><td class="num">{{ money(l.std_cost) }}</td><td class="num">{{ money(l.actual_cost) }}</td>
             <td class="num" :style="{ color: l.variance > 0 ? 'var(--bad)' : 'var(--good)' }">{{ money(l.variance) }}</td>
           </tr></tbody>
         </table>
-        <p class="muted small">{{ $t('{a} 来源：{b}，corr = {c}，{d} 条完工事件。时长为工厂分钟。', { a: $td(cost.note), b: cost.evidence.topic, c: cost.work_order, d: cost.evidence.messages }) }}</p>
+        <p class="muted small">{{ $t('{a} 来源：{b}，corr = {c}，{d} 条完工事件。时长为工厂分钟。', { a: $td(cost.note), b: $td(cost.evidence.topic), c: $td(cost.work_order), d: $td(cost.evidence.messages) }) }}</p>
       </template>
     </section>
   </div>
@@ -76,7 +76,7 @@ onMounted(async () => {
   wos.value = list.filter((w) => w.started).map((w) => w.name);
   wo.value = wos.value[0] || '';
   loadCost();
-  if (teach.value) teachStatus.value = await get('/teach');
+  if (teach.value) teachStatus.value = await get('/teach').catch(() => null);   // 实验 7 只在减速器厂，别的厂回 404
 });
 </script>
 

@@ -4,15 +4,15 @@
     <div class="page-title"><h1>{{ $t('安全环保') }}</h1>
       <span class="muted">{{ $t('隐患随手拍 → 整改 → 验收；作业许可核对资质；挂牌上锁时车间里这台设备真的停下') }}</span>
       <span class="tabs" data-help="ehs-tabs" role="tablist"><button v-for="(l, k) in TABS" :key="k" type="button" role="tab" :class="{ on: tab === k }" @click="go(k)">{{ l }}
-        <span v-if="k === 'issues' && kp?.major_open" class="cnt">{{ kp.major_open }}</span></button></span></div>
+        <span v-if="k === 'issues' && kp?.major_open" class="cnt">{{ $td(kp.major_open) }}</span></button></span></div>
     <div v-if="err" class="err">{{ err }}</div>
 
     <section v-if="kp" class="kpis" data-help="ehs-kpis">
-      <div class="card k"><span class="small muted">{{ $t('开着的隐患') }}</span><b>{{ kp.open_issues }}</b><span class="small" :class="{ bad: kp.major_open }">{{ $t('重大 {a} · 逾期 {b}', { a: kp.major_open, b: kp.overdue }) }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('开着的隐患') }}</span><b>{{ $td(kp.open_issues) }}</b><span class="small" :class="{ bad: kp.major_open }">{{ $t('重大 {a} · 逾期 {b}', { a: $td(kp.major_open), b: $td(kp.overdue) }) }}</span></div>
       <div class="card k"><span class="small muted">{{ $t('整改按期率（近 30 天）') }}</span><b>{{ kp.on_time == null ? '—' : Math.round(kp.on_time * 100) + '%' }}</b></div>
-      <div class="card k"><span class="small muted">{{ $t('挂牌上锁的设备') }}</span><b>{{ kp.locked }}</b></div>
-      <div class="card k"><span class="small muted">{{ $t('培训 30 天内到期') }}</span><b>{{ kp.training_due }}</b><span class="small muted">{{ $t('已过期 {a}', { a: kp.training_expired }) }}</span></div>
-      <div class="card k"><span class="small muted">{{ $t('未遂（近 30 天）') }}</span><b>{{ kp.near_miss_30d }}</b><span class="small muted">{{ $t('危废超期 {a} 批', { a: kp.waste_over }) }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('挂牌上锁的设备') }}</span><b>{{ $td(kp.locked) }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('培训 30 天内到期') }}</span><b>{{ $td(kp.training_due) }}</b><span class="small muted">{{ $t('已过期 {a}', { a: $td(kp.training_expired) }) }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('未遂（近 30 天）') }}</span><b>{{ $td(kp.near_miss_30d) }}</b><span class="small muted">{{ $t('危废超期 {a} 批', { a: $td(kp.waste_over) }) }}</span></div>
     </section>
 
     <!-- ① 隐患 -->
@@ -29,15 +29,15 @@
           <label>{{ $t('照片') }}<input type="file" accept="image/*" capture="environment" @change="photo"></label>
         </div>
         <button class="btn primary sm" :disabled="busy" @click="newIssue">{{ $t('提交') }}</button> <span class="small ok">{{ msg }}</span>
-        <span v-if="ni.photo_ids.length" class="small muted">{{ $t('已附 {a} 张照片', { a: ni.photo_ids.length }) }}</span>
+        <span v-if="ni.photo_ids.length" class="small muted">{{ $t('已附 {a} 张照片', { a: $td(ni.photo_ids.length) }) }}</span>
       </div>
       <div class="filters small"><label><input v-model="isOpen" type="checkbox" @change="loadIs"> {{ $t('只看没关闭的') }}</label></div>
       <p v-if="!is.issues.length" class="muted small">{{ $t('没有隐患。') }}</p>
       <div v-for="x in is.issues" :key="x.id" class="card item" :class="x.level">
-        <div class="ih"><span class="mono small">{{ x.key }}</span><b>{{ x.subject }}</b>
+        <div class="ih"><span class="mono small">{{ $td(x.key) }}</span><b>{{ $td(x.subject) }}</b>
           <span class="pill" :class="x.level === 'major' ? 'bad' : 'mute'">{{ $td(x.level_label) }}</span>
           <span class="pill" :class="x.status === 'closed' ? 'good' : x.overdue ? 'bad' : 'warn'">{{ $td(x.status_label) }}{{ x.overdue ? $t(' · 逾期') : '' }}</span></div>
-        <div class="small">{{ $t('{a} · 发现人 {b} · {c}· 整改期限 {d}', { a: x.unit ? x.unit.toUpperCase() + ' ' + (x.unit_name || '') : x.area || '—', b: x.found_by, c: fmtTs(x.found_at), d: x.due_day }) }}<template v-if="x.owner"> {{ $t('· 整改人 {a}', { a: who(x.owner) }) }}</template><template v-if="x.permit_id"> {{ $t('· 挂牌上锁 PTW-{a}', { a: String(x.permit_id).padStart(5, '0') }) }}</template></div>
+        <div class="small">{{ $t('{a} · 发现人 {b} · {c}· 整改期限 {d}', { a: x.unit ? x.unit.toUpperCase() + ' ' + $td(x.unit_name || '') : x.area || '—', b: $td(x.found_by), c: fmtTs(x.found_at), d: $td(x.due_day) }) }}<template v-if="x.owner"> {{ $t('· 整改人 {a}', { a: who(x.owner) }) }}</template><template v-if="x.permit_id"> {{ $t('· 挂牌上锁 PTW-{a}', { a: String(x.permit_id).padStart(5, '0') }) }}</template></div>
         <div v-if="x.photo_ids.length" class="photos"><a v-for="p in x.photo_ids" :key="p" :href="'/api/files/' + p" target="_blank"><img :src="'/api/files/' + p" :alt="$t('隐患照片')"></a></div>
         <div class="act">
           <router-link v-if="x.anomaly_id" :to="{ path: '/ont', query: { view: 'anomalies', a: x.anomaly_id } }" class="btn sm primary">{{ $t('影响与处理方案') }}</router-link>
@@ -53,8 +53,8 @@
 
       <details class="card" @toggle="loadHz"><summary><b>{{ $t('危险源清单') }}</b> <span class="small muted">{{ $t('（可能性 × 严重度：≥ 15 重大，8–14 较大）') }}</span></summary>
         <table v-if="hz" class="tbl small"><thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('危险源') }}</th><th>{{ $t('设备') }}</th><th class="num">{{ $t('可能性') }}</th><th class="num">{{ $t('严重度') }}</th><th>{{ $t('风险') }}</th><th>{{ $t('控制措施') }}</th></tr></thead>
-          <tbody><tr v-for="h in hz.hazards" :key="h.id"><td class="mono">{{ h.id }}</td><td>{{ $td(h.name) }}</td><td>{{ (h.unit || '—').toUpperCase() }}</td>
-            <td class="num">{{ h.likelihood }}</td><td class="num">{{ h.severity }}</td><td>{{ $t('{a}（{b}）', { a: h.risk.score, b: h.risk.level }) }}</td><td>{{ h.controls.join($t('、')) }}</td></tr></tbody></table>
+          <tbody><tr v-for="h in hz.hazards" :key="h.id"><td class="mono">{{ $td(h.id) }}</td><td>{{ $td(h.name) }}</td><td>{{ (h.unit || '—').toUpperCase() }}</td>
+            <td class="num">{{ $td(h.likelihood) }}</td><td class="num">{{ $td(h.severity) }}</td><td>{{ $t('{a}（{b}）', { a: $td(h.risk.score), b: $td(h.risk.level) }) }}</td><td>{{ h.controls.join($t('、')) }}</td></tr></tbody></table>
       </details>
     </template>
 
@@ -73,11 +73,11 @@
         <button class="btn primary sm" @click="newPermit">{{ $t('提交申请') }}</button> <span class="small" :class="pmMsgOk ? 'ok' : 'bad'">{{ pmMsg }}</span>
       </div>
       <table class="tbl small card"><thead><tr><th>{{ $t('许可') }}</th><th>{{ $t('种类') }}</th><th>{{ $t('设备') }}</th><th>{{ $t('作业人') }}</th><th>{{ $t('状态') }}</th><th>{{ $t('内容') }}</th><th></th></tr></thead>
-        <tbody><tr v-for="p in pm.permits" :key="p.id"><td class="mono">{{ p.key }}</td><td>{{ $td(p.kind_label) }}</td><td>{{ (p.unit || '—').toUpperCase() }}</td>
-          <td>{{ p.holder }}</td>
+        <tbody><tr v-for="p in pm.permits" :key="p.id"><td class="mono">{{ $td(p.key) }}</td><td>{{ $td(p.kind_label) }}</td><td>{{ (p.unit || '—').toUpperCase() }}</td>
+          <td>{{ $td(p.holder) }}</td>
           <td><span class="pill" :class="{ active: 'warn', blocked: 'bad', closed: 'good', requested: 'info' }[p.status] || 'mute'">{{ $td(p.status_label) }}</span>
-            <div v-if="p.block_reason" class="small bad">{{ p.block_reason }}</div></td>
-          <td>{{ $td(p.reason) }}<div v-if="p.minutes" class="small muted">{{ $t('{a} 分钟{b}', { a: p.minutes, b: p.delay_minutes ? $t('，') + p.delay_minutes + $t(' 分钟后开始') : '' }) }}</div></td>
+            <div v-if="p.block_reason" class="small bad">{{ $td(p.block_reason) }}</div></td>
+          <td>{{ $td(p.reason) }}<div v-if="p.minutes" class="small muted">{{ $t('{a} 分钟{b}', { a: $td(p.minutes), b: p.delay_minutes ? $t('，') + p.delay_minutes + $t(' 分钟后开始') : '' }) }}</div></td>
           <td><template v-if="pm.can_manage">
             <button v-if="['requested', 'blocked'].includes(p.status)" class="linkbtn" @click="approveP(p)">{{ $t('批准') }}</button>
             <button v-if="p.status === 'active'" class="linkbtn" @click="closeP(p)">{{ p.kind === 'loto' ? $t('验收解锁') : $t('关闭') }}</button></template></td></tr></tbody></table>
@@ -100,8 +100,8 @@
         <p class="small"><span v-for="(n, k) in ic.counts" :key="k">{{ $t('{a} {b} 起', { a: k, b: n }) }} · </span><span v-if="!Object.keys(ic.counts).length" class="muted">{{ $t('没有记录。') }}</span></p>
         <p v-if="!ic.full" class="small muted">{{ $t('事故调查记录是 3 级敏感：只有厂长和老师能看详情。') }}</p>
         <table v-else-if="ic.incidents.length" class="tbl small"><thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('日期') }}</th><th>{{ $t('种类') }}</th><th>{{ $t('设备') }}</th><th>{{ $t('经过') }}</th><th>{{ $t('根因') }}</th><th>{{ $t('报告人') }}</th></tr></thead>
-          <tbody><tr v-for="x in ic.incidents" :key="x.id"><td class="mono">{{ x.key }}</td><td>{{ x.day }}</td><td>{{ $td(x.kind_label) }}</td><td>{{ (x.unit || '—').toUpperCase() }}</td>
-            <td>{{ x.description }}</td><td>{{ x.root_cause || '—' }}</td><td>{{ x.created_by }}</td></tr></tbody></table>
+          <tbody><tr v-for="x in ic.incidents" :key="x.id"><td class="mono">{{ $td(x.key) }}</td><td>{{ $td(x.day) }}</td><td>{{ $td(x.kind_label) }}</td><td>{{ (x.unit || '—').toUpperCase() }}</td>
+            <td>{{ $td(x.description) }}</td><td>{{ x.root_cause || '—' }}</td><td>{{ $td(x.created_by) }}</td></tr></tbody></table>
       </div>
     </template>
 
@@ -109,7 +109,7 @@
     <template v-if="tab === 'people' && pp">
       <div class="card">
         <table class="tbl small"><thead><tr><th>{{ $t('员工') }}</th><th>{{ $t('岗位') }}</th><th v-for="(l, k) in pp.kinds" :key="k">{{ l }}</th></tr></thead>
-          <tbody><tr v-for="p in pp.people" :key="p.id"><td>{{ $td(p.name) }} <span class="muted">{{ p.id }}</span></td><td>{{ $td(p.post) }} · {{ $td(p.team) }}</td>
+          <tbody><tr v-for="p in pp.people" :key="p.id"><td>{{ $td(p.name) }} <span class="muted">{{ $td(p.id) }}</span></td><td>{{ $td(p.post) }} · {{ $td(p.team) }}</td>
             <td v-for="(l, k) in pp.kinds" :key="k" :class="cls(p, k)" :title="tip(p, k)">{{ cell(p, k) }}</td></tr></tbody></table>
         <p class="small muted">{{ $t('红：已过期；黄：30 天内到期；空：没有这项培训。') }}</p>
       </div>
@@ -128,15 +128,15 @@
     <template v-if="tab === 'chem' && ch">
       <div class="card"><h3>{{ $t('化学品') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('名称') }}</th><th class="num">{{ $t('存量 kg') }}</th><th class="num">{{ $t('安全库存') }}</th><th class="num">{{ $t('现场限额') }}</th><th>{{ $t('安全数据表') }}</th></tr></thead>
-          <tbody><tr v-for="c in ch.chemicals" :key="c.code"><td class="mono">{{ c.code }}</td><td>{{ $td(c.name) }}</td>
-            <td class="num" :class="{ bad: c.stock_kg < c.min_kg || c.stock_kg > c.max_kg }">{{ c.stock_kg.toFixed(1) }}</td><td class="num">{{ c.min_kg }}</td><td class="num">{{ c.max_kg }}</td>
-            <td class="small">{{ c.sds }}</td></tr></tbody></table></div>
+          <tbody><tr v-for="c in ch.chemicals" :key="c.code"><td class="mono">{{ $td(c.code) }}</td><td>{{ $td(c.name) }}</td>
+            <td class="num" :class="{ bad: c.stock_kg < c.min_kg || c.stock_kg > c.max_kg }">{{ c.stock_kg.toFixed(1) }}</td><td class="num">{{ $td(c.min_kg) }}</td><td class="num">{{ $td(c.max_kg) }}</td>
+            <td class="small">{{ $td(c.sds) }}</td></tr></tbody></table></div>
       <div class="card"><h3>{{ $t('废弃物台账') }}</h3>
-        <p class="small muted">{{ $t('危险废物产生后 {a} 天内要交有资质的单位处置。', { a: ch.limit_days }) }}</p>
+        <p class="small muted">{{ $t('危险废物产生后 {a} 天内要交有资质的单位处置。', { a: $td(ch.limit_days) }) }}</p>
         <table class="tbl small"><thead><tr><th>{{ $t('种类') }}</th><th class="num">kg</th><th>{{ $t('产生') }}</th><th class="num">{{ $t('天数') }}</th><th>{{ $t('处置') }}</th></tr></thead>
           <tbody><tr v-for="w in ch.wastes" :key="w.id"><td>{{ $td(w.label) }}<span v-if="w.hazardous" class="pill warn">{{ $t('危废') }}</span></td><td class="num">{{ w.qty_kg.toFixed(1) }}</td>
-            <td>{{ w.produced_day }}</td><td class="num" :class="{ bad: w.over_limit }">{{ w.age_days }}</td>
-            <td><template v-if="w.disposed_day">{{ w.disposed_day }} · {{ w.disposed_by }}</template>
+            <td>{{ $td(w.produced_day) }}</td><td class="num" :class="{ bad: w.over_limit }">{{ $td(w.age_days) }}</td>
+            <td><template v-if="w.disposed_day">{{ $td(w.disposed_day) }} · {{ $td(w.disposed_by) }}</template>
               <template v-else-if="ch.can_manage"><input v-model="disp[w.id]" :placeholder="$t('处置单位')" class="d"><button class="linkbtn" @click="dispose(w)">{{ $t('登记处置') }}</button></template></td></tr></tbody></table></div>
     </template>
   </div>
@@ -181,7 +181,7 @@ const loadKp = () => wrap(async () => { kp.value = await get('/ehs/kpis'); });
 const loadIs = () => wrap(async () => { is.value = await get('/ehs/issues' + (isOpen.value ? '' : '?status=all')); });
 const loadPm = () => wrap(async () => {
   pm.value = await get('/ehs/permits');
-  if (!np.holder_id) np.holder_id = (pm.value.people.find((p) => p.id === 'P06') || pm.value.people.find((p) => p.post === '维修工') || pm.value.people[0] || {}).id || '';
+  if (!np.holder_id) np.holder_id = (pm.value.people.find((p) => p.id === 'P06') || pm.value.people.find((p) => p.post === '维修工') || pm.value.people[0] || {}).id || '';   // i18n-ok 数据比较
 });
 const loadIc = () => wrap(async () => { ic.value = await get('/ehs/incidents'); });
 const loadPp = () => wrap(async () => { pp.value = await get('/ehs/people'); });

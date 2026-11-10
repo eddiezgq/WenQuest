@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b v-if="!s.prod" class="big">{{ s.score }} / {{ s.of }}</b>
+        <b v-if="!s.prod" class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span class="small">{{ $t('你的机器人') }}
           <select v-model="serial" :aria-label="$t('机器人')" @change="pick"><option v-for="r in s.robots" :key="r" :value="r">{{ $td(r) }}</option></select></span>
         <span v-if="!s.robots.length" class="small muted">{{ $t('还没有标定过的 WQ-CR5：先接一台（实验 24），做到整机标定（实验 26）') }}</span>
@@ -19,14 +19,14 @@
       <section v-if="s.teacher && s.class?.length" class="card">
         <div class="card-head"><h2>{{ $t('老师：全班成绩') }}</h2></div>
         <table class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section v-if="c" class="card" data-help="runin-case">
-        <div class="card-head"><h2>{{ $t('{a} 在负载跑合台上', { a: c.serial }) }}</h2>
-          <span class="muted small">{{ $t('负载 {a} kg，标准动作 {b} s（三段，每段 {c} s、停 {d} s），驱动器按电流记力矩 {e} Hz', { a: c.load_kg, b: c.duration_s, c: c.seg_s, d: c.dwell_s, e: c.hz }) }}</span></div>
-        <div class="tabs small"><button v-for="(j, i) in c.joints" :key="j.joint" class="btn sm" :class="{ primary: ji === i }" @click="ji = i">{{ j.joint }}</button></div>
+        <div class="card-head"><h2>{{ $t('{a} 在负载跑合台上', { a: $td(c.serial) }) }}</h2>
+          <span class="muted small">{{ $t('负载 {a} kg，标准动作 {b} s（三段，每段 {c} s、停 {d} s），驱动器按电流记力矩 {e} Hz', { a: $td(c.load_kg), b: $td(c.duration_s), c: $td(c.seg_s), d: $td(c.dwell_s), e: $td(c.hz) }) }}</span></div>
+        <div class="tabs small"><button v-for="(j, i) in c.joints" :key="j.joint" class="btn sm" :class="{ primary: ji === i }" @click="ji = i">{{ $td(j.joint) }}</button></div>
         <TimeChart :title="c.joints[ji].joint + $t(' 力矩：实测与仿真')" unit="N·m" :t="tArr" :series="chartSeries" />
         <TimeChart :title="c.joints[ji].joint + $t(' 实测 − 仿真（差放大来看）')" unit="N·m" :t="tArr" :series="diffSeries" />
         <p class="small muted">{{ $t('仿真 = 零件库 B-ARM-WQCR5（名义摩擦）算的同一段动作；实测里有这台机器人自己的摩擦和测量噪声。') }}</p>
@@ -35,9 +35,9 @@
             <th class="num">{{ $t('均方根差') }}</th><th class="num">{{ $t('f_c 测试台') }}</th><th class="num">{{ $t('f_c 辨识') }}</th><th class="num">{{ $t('f_v 名义') }}</th><th class="num">{{ $t('f_v 辨识') }}</th>
             <th class="num">{{ $t('更新模型后均方根差') }}</th><th class="num">{{ $t('噪声 σ') }}</th><th class="num">{{ $t('额定 / 上限') }}</th><th>{{ $t('裕量') }}</th></tr></thead>
           <tbody><tr v-for="j in c.joints" :key="j.joint">
-            <td>{{ j.joint }}</td><td>{{ j.module }}</td><td class="num">{{ j.peak_meas }}</td><td class="num">{{ j.peak_sim }}</td><td class="num">{{ j.rms_meas }}</td><td class="num">{{ j.rms_sim }}</td>
-            <td class="num">{{ j.rms_diff }}</td><td class="num">{{ j.fc_bench }}</td><td class="num">{{ j.fc_hat }}</td><td class="num">{{ j.fv_nominal }}</td><td class="num">{{ j.fv_hat }}</td>
-            <td class="num">{{ j.rms_diff_updated }}</td><td class="num">{{ j.noise_sigma }}</td><td class="num">{{ j.rated }} / {{ j.limit }}</td>
+            <td>{{ $td(j.joint) }}</td><td>{{ $td(j.module) }}</td><td class="num">{{ $td(j.peak_meas) }}</td><td class="num">{{ $td(j.peak_sim) }}</td><td class="num">{{ $td(j.rms_meas) }}</td><td class="num">{{ $td(j.rms_sim) }}</td>
+            <td class="num">{{ $td(j.rms_diff) }}</td><td class="num">{{ $td(j.fc_bench) }}</td><td class="num">{{ $td(j.fc_hat) }}</td><td class="num">{{ $td(j.fv_nominal) }}</td><td class="num">{{ $td(j.fv_hat) }}</td>
+            <td class="num">{{ $td(j.rms_diff_updated) }}</td><td class="num">{{ $td(j.noise_sigma) }}</td><td class="num">{{ $td(j.rated) }} / {{ $td(j.limit) }}</td>
             <td :class="j.pass ? 'good' : 'bad'">{{ j.pass ? $t('合格') : $t('不合格') }}</td></tr></tbody></table></div>
         <p class="small">{{ $t('力矩 N·m，f_v 单位 N·m·s/rad。整台：') }}<b :class="c.pass ? 'good' : 'bad'">{{ c.pass ? $t('力矩裕量合格') : $t('力矩裕量不合格') }}</b>
           <span v-if="!c.bench_known" class="muted">{{ $t('（这台有关节缺测试台记录，按名义值补了）') }}</span></p>
@@ -45,7 +45,7 @@
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l28_t1'" class="f" @submit.prevent="submit(t.id, a1)">
@@ -54,7 +54,7 @@
         </form>
         <form v-if="t.id === 'l28_t2'" class="f" @submit.prevent="submit(t.id, a2)">
           <div class="lf"><label>{{ $t('差得最多的关节') }}</label><span class="cks">
-            <label v-for="j in s.joints" :key="j"><input v-model="a2.joint" type="radio" :value="j" required> {{ j }}</label></span></div>
+            <label v-for="j in s.joints" :key="j"><input v-model="a2.joint" type="radio" :value="j" required> {{ $td(j) }}</label></span></div>
           <button class="btn primary" :disabled="!s.serial">{{ $t('提交') }}</button>
         </form>
         <form v-if="t.id === 'l28_t3'" class="f" @submit.prevent="submit(t.id, a3)">
@@ -75,7 +75,7 @@
               <input v-else v-model="a6.choice" type="radio" :value="o.value" required> {{ $td(o.label) }}</label></span></div>
           <button class="btn primary" :disabled="!s.serial">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

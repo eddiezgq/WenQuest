@@ -7,7 +7,7 @@
     <div v-if="err" class="err">{{ err }}</div>
     <template v-if="s">
       <div class="card sum" data-help="lab-sum">
-        <b class="big">{{ s.score }} / {{ s.of }}</b>
+        <b class="big">{{ $td(s.score) }} / {{ $td(s.of) }}</b>
         <span class="small">{{ $t('你的机器人') }}
           <select v-model="serial" :aria-label="$t('机器人')" @change="pick"><option v-for="r in s.robots" :key="r" :value="r">{{ $td(r) }}</option></select></span>
         <span v-if="!s.robots.length" class="small muted">{{ $t('还没有标定过的 WQ-CR5：先接一台（实验 24），做到整机标定') }}</span>
@@ -18,18 +18,18 @@
       <section v-if="s.teacher && s.class?.length" class="card">
         <div class="card-head"><h2>{{ $t('老师：全班成绩') }}</h2></div>
         <table class="tbl small"><thead><tr><th>{{ $t('学生') }}</th><th v-for="(t, i) in s.tasks" :key="t.id" class="num">{{ $t('任务 {a}', { a: i + 1 }) }}</th><th class="num">{{ $t('合计') }}</th></tr></thead>
-          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ c.user }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
-            <td class="num"><b>{{ c.total }}</b></td></tr></tbody></table>
+          <tbody><tr v-for="c in s.class" :key="c.user"><td>{{ $td(c.user) }}</td><td v-for="t in s.tasks" :key="t.id" class="num">{{ c.scores[t.id] ?? '—' }}</td>
+            <td class="num"><b>{{ $td(c.total) }}</b></td></tr></tbody></table>
       </section>
 
       <section class="card small">
         <div class="card-head"><h2>{{ $t('名义 DH 参数（示例值）') }}</h2><span class="muted">{{ $t('T = Rz(θ)·Tz(d)·Tx(a)·Rx(α)；工具点在法兰坐标系 ({a}) mm', { a: s.nominal.tool_mm.join(', ') }) }}</span></div>
         <table class="tbl"><thead><tr><th>{{ $t('关节') }}</th><th class="num">{{ $t('a（mm）') }}</th><th class="num">{{ $t('α（°）') }}</th><th class="num">{{ $t('d（mm）') }}</th></tr></thead>
-          <tbody><tr v-for="r in s.nominal.dh" :key="r.joint"><td>{{ r.joint }}</td><td class="num">{{ r.a_mm }}</td><td class="num">{{ r.alpha_deg }}</td><td class="num">{{ r.d_mm }}</td></tr></tbody></table>
+          <tbody><tr v-for="r in s.nominal.dh" :key="r.joint"><td>{{ $td(r.joint) }}</td><td class="num">{{ $td(r.a_mm) }}</td><td class="num">{{ $td(r.alpha_deg) }}</td><td class="num">{{ $td(r.d_mm) }}</td></tr></tbody></table>
       </section>
 
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" data-help="lab-task" :class="{ done: t.done }">
-        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ t.score }} / {{ t.points }}</span></div>
+        <div class="card-head"><h2>{{ $t('任务 {a}　{b}', { a: i + 1, b: $td(t.title) }) }}</h2><span class="pts">{{ $td(t.score) }} / {{ $td(t.points) }}</span></div>
         <p>{{ $td(t.desc) }}</p>
         <p class="small muted">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
         <form v-if="t.id === 'l26_t1'" class="f" @submit.prevent="submit(t.id, a1)">
@@ -47,7 +47,7 @@
         </form>
         <form v-if="t.id === 'l26_t3'" class="f" @submit.prevent="submit(t.id, a3)">
           <div class="lf"><label>{{ $t('零位偏得最多的两个') }}</label><span class="cks">
-            <label v-for="j in s.joints" :key="j"><input v-model="a3.joints" type="checkbox" :value="j"> {{ j }}</label></span></div>
+            <label v-for="j in s.joints" :key="j"><input v-model="a3.joints" type="checkbox" :value="j"> {{ $td(j) }}</label></span></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
         <form v-if="t.id === 'l26_t4'" class="f" @submit.prevent="submit(t.id, a4)">
@@ -63,7 +63,7 @@
               <input v-else v-model="a6.choice" type="radio" :value="o.value" required> {{ $td(o.label) }}</label></span></div>
           <button class="btn primary">{{ $t('提交') }}</button>
         </form>
-        <p v-if="fb[t.id]" class="small fb">{{ fb[t.id] }}</p>
+        <p v-if="fb[t.id]" class="small fb">{{ $td(fb[t.id]) }}</p>
       </section>
     </template>
   </div>

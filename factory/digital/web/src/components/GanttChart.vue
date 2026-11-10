@@ -25,7 +25,7 @@
       <rect v-for="(d, i) in downs" :key="'d' + i" :x="x(d.s)" :y="22 + rowOf(d.unit) * ROW" :width="Math.max(2, x(d.e) - x(d.s))"
         :height="ROW - 6" fill="url(#gc-down)"><title>{{ $t('{a} 停机：{b}', { a: d.unit.toUpperCase(), b: $td(d.reason) }) }}</title></rect>
       <rect v-for="(g, i) in segs" :key="'g' + i" :x="x(g.s)" :y="24 + rowOf(g.unit) * ROW" :width="Math.max(1.5, x(g.e) - x(g.s) - 0.5)"
-        :height="ROW - 10" :fill="color(g.wo)" rx="1.5"><title>{{ g.wo }} · {{ g.op }} · {{ g.part }}
+        :height="ROW - 10" :fill="color(g.wo)" rx="1.5"><title>{{ $td(g.wo) }} · {{ $td(g.op) }} · {{ $td(g.part) }}
 {{ fmt(g.s) }} – {{ fmt(g.e) }}</title></rect>
       <line v-if="nowX" :x1="nowX" y1="16" :x2="nowX" :y2="H" stroke="#0E5E6F" stroke-dasharray="3 3" />
     </svg>

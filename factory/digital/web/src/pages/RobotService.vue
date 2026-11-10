@@ -7,11 +7,11 @@
     <div v-if="msg" class="ok-msg small">{{ msg }}</div>
 
     <section v-if="kp" class="kpis" data-help="rs-kpis">
-      <div class="card k"><span class="small muted">{{ $t('在现场') }}</span><b>{{ kp.in_field }}</b><span class="small muted">{{ $t('出厂待发 {a}', { a: kp.built }) }}</span></div>
-      <div class="card k"><span class="small muted">{{ $t('报警') }}</span><b :class="{ 'bad-t': kp.red }">{{ $t('红 {a} · 黄 {b}', { a: kp.red, b: kp.yellow }) }}</b></div>
-      <div class="card k"><span class="small muted">{{ $t('投诉') }}</span><b>{{ kp.open_complaints }}</b><span class="small muted">{{ $t('共 {a}，未关闭 {b}', { a: kp.complaints, b: kp.open_complaints }) }}</span></div>
-      <div class="card k"><span class="small muted">{{ $t('服务工单（未完成）') }}</span><b>{{ kp.open_jobs }}</b></div>
-      <div class="card k"><span class="small muted">{{ $t('满意度') }}</span><b>{{ kp.satisfaction ?? '—' }}</b><span class="small muted">{{ $t('现场日 {a}', { a: kp.field_day }) }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('在现场') }}</span><b>{{ $td(kp.in_field) }}</b><span class="small muted">{{ $t('出厂待发 {a}', { a: $td(kp.built) }) }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('报警') }}</span><b :class="{ 'bad-t': kp.red }">{{ $t('红 {a} · 黄 {b}', { a: $td(kp.red), b: $td(kp.yellow) }) }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('投诉') }}</span><b>{{ $td(kp.open_complaints) }}</b><span class="small muted">{{ $t('共 {a}，未关闭 {b}', { a: $td(kp.complaints), b: $td(kp.open_complaints) }) }}</span></div>
+      <div class="card k"><span class="small muted">{{ $t('服务工单（未完成）') }}</span><b>{{ $td(kp.open_jobs) }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('满意度') }}</span><b>{{ kp.satisfaction ?? '—' }}</b><span class="small muted">{{ $t('现场日 {a}', { a: $td(kp.field_day) }) }}</span></div>
     </section>
 
     <div class="row">
@@ -25,21 +25,21 @@
         <div class="scroll"><table class="tbl small">
           <thead><tr><th>{{ $t('序列号') }}</th><th>{{ $t('客户') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('运行小时') }}</th><th>{{ $t('最差的关节') }}</th><th>{{ $t('健康') }}</th><th>{{ $t('原因') }}</th></tr></thead>
           <tbody><tr v-for="r in fl.robots" :key="r.serial" :class="{ sel: r.serial === sel }" @click="open(r.serial)">
-            <td class="mono">{{ r.serial }}</td><td>{{ short(r.customer) }}</td><td>{{ r.status === 'field' ? $t('在现场') : $t('出厂待发') }}</td>
+            <td class="mono">{{ $td(r.serial) }}</td><td>{{ short(r.customer) }}</td><td>{{ r.status === 'field' ? $t('在现场') : $t('出厂待发') }}</td>
             <td class="num">{{ r.run_h.toLocaleString() }}</td>
             <td>{{ r.worst ? r.worst.joint + ' ' + r.worst.backlash.toFixed(2) + '′ / ' + r.worst.limit + '′' : '—' }}</td>
-            <td><span class="dot" :class="r.health"></span>{{ HL[r.health] }}</td>
-            <td class="small">{{ r.why.map((w) => w.text).join($t('；')) || '—' }}</td></tr></tbody></table></div>
+            <td><span class="dot" :class="r.health"></span>{{ $td(HL[r.health]) }}</td>
+            <td class="small">{{ r.why.map((w) => $td(w.text)).join($t('；')) || '—' }}</td></tr></tbody></table></div>
       </section>
 
       <section v-if="dt" class="card" data-help="rs-detail">
-        <div class="card-head"><h2 class="mono">{{ dt.serial }}</h2><span class="muted small">{{ $t('{a}{b} · 运行 {c} h', { a: $td(dt.customer), b: dt.site ? ' · ' + dt.site.what : '', c: dt.run_h.toLocaleString() }) }}</span></div>
+        <div class="card-head"><h2 class="mono">{{ $td(dt.serial) }}</h2><span class="muted small">{{ $t('{a}{b} · 运行 {c} h', { a: $td(dt.customer), b: dt.site ? ' · ' + dt.site.what : '', c: dt.run_h.toLocaleString() }) }}</span></div>
         <p v-if="dt.why.length" class="small"><b>{{ $t('报警：') }}</b>{{ dt.why.map((w) => w.text).join($t('；')) }}</p>
         <h3>{{ $t('背隙趋势（arcmin，近 120 个现场日；虚线 = 上限）') }}</h3>
         <svg v-if="dt.series.length" :viewBox="'0 0 ' + W + ' ' + Hh" class="chart" role="img" :aria-label="$t('背隙趋势')">
           <g v-for="(j, i) in dt.as_built.joints" :key="j.joint">
             <polyline :points="line(i)" fill="none" :stroke="COLORS[i]" stroke-width="1.6" />
-            <text :x="W - 34" :y="yOf(last(i)) + 4" :fill="COLORS[i]" font-size="11">{{ j.joint }}</text>
+            <text :x="W - 34" :y="yOf(last(i)) + 4" :fill="COLORS[i]" font-size="11">{{ $td(j.joint) }}</text>
           </g>
           <line v-for="lim in [1.0, 1.2]" :key="lim" x1="30" :x2="W - 40" :y1="yOf(lim)" :y2="yOf(lim)" stroke="currentColor" stroke-dasharray="4 4" opacity=".5" />
           <text x="2" :y="yOf(1.2) + 4" font-size="10" fill="currentColor">1.2</text><text x="2" :y="yOf(1.0) + 4" font-size="10" fill="currentColor">1.0</text>
@@ -49,19 +49,19 @@
         <div class="scroll"><table class="tbl small">
           <thead><tr><th>{{ $t('关节') }}</th><th>{{ $t('模组') }}</th><th>{{ $t('关节序列号') }}</th><th>{{ $t('减速器批次') }}</th><th class="num">{{ $t('出厂背隙') }}</th><th class="num">{{ $t('现在') }}</th><th class="num">{{ $t('温度峰值') }}</th><th class="num">{{ $t('电流') }}</th><th>{{ $t('同批还装在') }}</th></tr></thead>
           <tbody><tr v-for="(j, i) in dt.as_built.joints" :key="j.joint">
-            <td>{{ j.joint }}</td><td>{{ $td(j.item) }}</td><td class="mono">{{ j.serial }}</td>
+            <td>{{ $td(j.joint) }}</td><td>{{ $td(j.item) }}</td><td class="mono">{{ $td(j.serial) }}</td>
             <td class="mono" :class="{ 'bad-t': j.bad }">{{ j.lot || '—' }}{{ j.replaced ? $t('（换过，原批 ') + (j.replaced.lot || '—') + $t('）') : '' }}</td>
             <td class="num">{{ j.backlash0.toFixed(2) }}′</td><td class="num">{{ cur(i)?.backlash?.toFixed(2) ?? '—' }}′</td>
             <td class="num">{{ cur(i)?.temp_max ?? '—' }} ℃</td><td class="num">{{ cur(i)?.i_rms ?? '—' }} A</td>
             <td class="small">{{ sameLot(j) }}</td></tr></tbody></table></div>
-        <p class="small muted">{{ $t('标定后绝对定位误差 {a} mm；工单 {b}；销售订单 {c}；{d}', { a: dt.as_built.cr_abs ?? '—', b: dt.wo || '—', c: dt.sales_order || '—', d: dt.as_built.source }) }}</p>
+        <p class="small muted">{{ $t('标定后绝对定位误差 {a} mm；工单 {b}；销售订单 {c}；{d}', { a: dt.as_built.cr_abs ?? '—', b: dt.wo || '—', c: dt.sales_order || '—', d: $td(dt.as_built.source) }) }}</p>
         <div class="row">
           <label>{{ $t('服务方案') }} <select v-model="nj.kind" :aria-label="$t('服务方案')"><option v-for="(l, k) in fl.kinds" :key="k" :value="k">{{ $td(l) }}</option></select></label>
           <label v-if="nj.kind === 'swap'">{{ $t('关节') }} <select v-model="nj.joint" :aria-label="$t('关节')"><option v-for="j in dt.as_built.joints" :key="j.joint" :value="j.joint">{{ $td(j.joint) }}</option></select></label>
           <button class="btn primary sm" @click="plan">{{ $t('派工') }}</button>
         </div>
         <table v-if="dt.jobs.length" class="tbl small"><thead><tr><th>{{ $t('工单') }}</th><th>{{ $t('方案') }}</th><th>{{ $t('工程师') }}</th><th>{{ $t('日子') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('费用') }}</th></tr></thead>
-          <tbody><tr v-for="j in dt.jobs" :key="j.id"><td class="mono">{{ j.key }}</td><td>{{ $td(j.kind_label) }}{{ j.joint ? ' ' + j.joint : '' }}</td><td>{{ j.engineer }}</td>
+          <tbody><tr v-for="j in dt.jobs" :key="j.id"><td class="mono">{{ $td(j.key) }}</td><td>{{ $td(j.kind_label) }}{{ j.joint ? ' ' + j.joint : '' }}</td><td>{{ $td(j.engineer) }}</td>
             <td>{{ j.done_day || j.plan_day }}</td><td>{{ $td(j.status_label) }}</td><td class="num">${{ j.cost_usd.toLocaleString() }}</td></tr></tbody></table>
       </section>
     </template>
@@ -80,8 +80,8 @@
         <p v-if="!cs.complaints.length" class="empty">{{ $t('还没有投诉。') }}</p>
         <div v-else class="scroll"><table class="tbl small">
           <thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('机器人') }}</th><th>{{ $t('客户') }}</th><th>{{ $t('现象') }}</th><th>ERPNext</th><th>{{ $t('状态') }}</th><th>{{ $t('满意度') }}</th><th></th></tr></thead>
-          <tbody><tr v-for="c in cs.complaints" :key="c.id"><td class="mono">{{ c.key }}</td><td class="mono">{{ c.serial || '—' }}</td><td>{{ short(c.customer) }}</td>
-            <td>{{ c.subject }}</td><td class="mono">{{ c.issue || '…' }}</td><td>{{ $td(c.status_label) }}</td><td>{{ c.score ?? '—' }}</td>
+          <tbody><tr v-for="c in cs.complaints" :key="c.id"><td class="mono">{{ $td(c.key) }}</td><td class="mono">{{ c.serial || '—' }}</td><td>{{ short(c.customer) }}</td>
+            <td>{{ $td(c.subject) }}</td><td class="mono">{{ c.issue || '…' }}</td><td>{{ $td(c.status_label) }}</td><td>{{ c.score ?? '—' }}</td>
             <td><button v-if="c.serial && !c.job_id" class="btn ghost sm" @click="tab = 'fleet'; open(c.serial, c.id)">{{ $t('派工') }}</button>
               <span v-if="c.status === 'closed' && c.score === null" class="cks">
                 <button v-for="s in [5, 4, 3, 2, 1]" :key="s" class="btn ghost sm" @click="rate(c.id, s)">{{ s }}</button></span></td></tr></tbody></table></div>
@@ -91,8 +91,8 @@
         <p v-if="!cs.jobs.length" class="empty">{{ $t('还没有。') }}</p>
         <div v-else class="scroll"><table class="tbl small">
           <thead><tr><th>{{ $t('工单') }}</th><th>{{ $t('机器人') }}</th><th>{{ $t('方案') }}</th><th>{{ $t('工程师') }}</th><th>{{ $t('日子') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('费用') }}</th><th></th></tr></thead>
-          <tbody><tr v-for="j in cs.jobs" :key="j.id"><td class="mono">{{ j.key }}</td><td class="mono">{{ j.serial }}</td><td>{{ $td(j.kind_label) }}{{ j.joint ? ' ' + j.joint : '' }}</td>
-            <td>{{ j.engineer }}</td><td>{{ j.done_day || j.plan_day }}</td><td>{{ $td(j.status_label) }}</td><td class="num">${{ j.cost_usd.toLocaleString() }}</td>
+          <tbody><tr v-for="j in cs.jobs" :key="j.id"><td class="mono">{{ $td(j.key) }}</td><td class="mono">{{ $td(j.serial) }}</td><td>{{ $td(j.kind_label) }}{{ j.joint ? ' ' + j.joint : '' }}</td>
+            <td>{{ $td(j.engineer) }}</td><td>{{ j.done_day || j.plan_day }}</td><td>{{ $td(j.status_label) }}</td><td class="num">${{ j.cost_usd.toLocaleString() }}</td>
             <td><button v-if="j.status !== 'done'" class="btn ghost sm" @click="done(j.id)">{{ $t('做完') }}</button></td></tr></tbody></table></div>
       </section>
     </template>
@@ -100,7 +100,7 @@
 </template>
 
 <script setup>
-import { t as $t } from '../lib/i18n';
+import { bi, isEn, t as $t } from '../lib/i18n';
 import { onMounted, reactive, ref } from 'vue';
 import { get, post } from '../lib/api';
 
@@ -120,7 +120,7 @@ const sel = ref('');
 const cid = ref(null);
 const nj = reactive({ kind: 'swap', joint: 'J1' });
 const nc = reactive({ serial: '', subject: '' });
-const short = (c) => (c || '—').split(' ')[0];
+const short = (c) => (isEn() ? bi(c || '—') : (c || '—').split(' ')[0]);   // 英文取英文名（第 130 轮第三批）
 
 async function wrap(fn) { try { err.value = ''; await fn(); } catch (e) { err.value = e.message; } }
 const load = () => wrap(async () => {

@@ -2,14 +2,14 @@
 <template>
   <div class="rp">
     <div class="rp-h"><h3>{{ $t('复盘') }}</h3>
-      <span v-if="r" class="small muted">{{ r.key }} · {{ fmtTs(r.created_at) }}<template v-if="r.partial"> {{ $t('· 受影响的工单还没做完，做完后会自动更新') }}</template></span>
+      <span v-if="r" class="small muted">{{ $td(r.key) }} · {{ fmtTs(r.created_at) }}<template v-if="r.partial"> {{ $t('· 受影响的工单还没做完，做完后会自动更新') }}</template></span>
       <button v-if="data?.can_create && (!r || r.partial)" class="linkbtn" :disabled="busy" @click="make">{{ busy ? $t('复盘中…') : $t('现在复盘') }}</button></div>
     <p v-if="err" class="small err">{{ err }}</p>
     <p v-if="data && !r" class="small muted">{{ data.can_create ? $t('采纳的动作已执行；异常解决、受影响的工单做完后会自动复盘。') : $t('这个异常还没有执行完的动作，处理完以后自动复盘。') }}</p>
     <template v-if="r">
       <table class="t small">
         <thead><tr><th>{{ $t('工单') }}</th><th>{{ $t('推演完工') }}</th><th>{{ $t('实际完工') }}</th><th class="num">{{ $t('偏差') }}</th></tr></thead>
-        <tbody><tr v-for="w in r.deviation.work_orders" :key="w.work_order"><td class="mono">{{ w.work_order }}</td><td>{{ fmtTs(w.predicted) || '—' }}</td>
+        <tbody><tr v-for="w in r.deviation.work_orders" :key="w.work_order"><td class="mono">{{ $td(w.work_order) }}</td><td>{{ fmtTs(w.predicted) || '—' }}</td>
           <td>{{ w.actual ? fmtTs(w.actual) : $t('还没做完（') + w.done + '/' + w.qty + $t('）') }}</td>
           <td class="num">{{ w.pct == null ? '—' : (w.diff_h > 0 ? $t('晚 ') : $t('早 ')) + Math.abs(w.diff_h) + $t(' 小时（') + (w.pct > 0 ? '+' : '') + w.pct + $t('%）') }}</td></tr></tbody>
       </table>
@@ -24,7 +24,7 @@
         <ul v-else><li v-for="(c, i) in r.causes" :key="i">{{ $td(c.text) }}<router-link v-if="c.anomaly_id" :to="{ path: '/ont', query: { view: 'anomalies', a: c.anomaly_id } }"> {{ $t('看') }}</router-link></li></ul></div>
       <div v-if="r.counterfactual.length" class="small"><b>{{ $t('如果当时……') }}</b>{{ $t('（用当时的快照重算各方案）') }}
         <table class="t small"><thead><tr><th>{{ $t('方案') }}</th><th>{{ $t('订单') }}</th><th class="num">{{ $t('多花') }}</th></tr></thead>
-          <tbody><tr v-for="o in r.counterfactual" :key="o.key" :class="{ chosen: o.chosen }"><td>{{ o.key }} {{ $td(o.label) }}<span v-if="o.chosen" class="pill info">{{ $t('采纳了') }}</span>
+          <tbody><tr v-for="o in r.counterfactual" :key="o.key" :class="{ chosen: o.chosen }"><td>{{ $td(o.key) }} {{ $td(o.label) }}<span v-if="o.chosen" class="pill info">{{ $t('采纳了') }}</span>
             <span v-if="o.recommended" class="pill good">{{ $t('当时建议') }}</span></td>
             <td>{{ o.sales_orders.map(soText).join($t('；')) }}</td><td class="num">${{ money(o.cost_total) }}</td></tr></tbody></table></div>
       <router-link v-if="r.scenario_id" class="small" :to="{ path: '/ont/sim', query: { scenario: r.scenario_id } }">{{ $t('在推演工作台打开当时的推演') }}</router-link>

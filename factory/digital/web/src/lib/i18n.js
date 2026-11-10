@@ -4,11 +4,13 @@
 import { reactive } from 'vue';
 import en from '../locales/en.json';
 import phraseList from '../locales/en_phrases.json';
-import nameList from '../locales/en_names.json';      // 第二批：各厂清单里的名字（tools/plant_names.py 生成）
-import { enPart, fill, hasCjk, siteLang, sortPhrases, translate } from './i18n-core.js';
+import nameList from '../locales/en_names.json';
+import tplList from '../locales/en_templates.json';     // 第三批：后端写的句子（句型）      // 第二批：各厂清单里的名字（tools/plant_names.py 生成）
+import { compileTemplates, enPart, fill, hasCjk, siteLang, sortPhrases, translate } from './i18n-core.js';
 
 const KEY = 'wq-factory-lang';
 const PHRASES = sortPhrases([...phraseList, ...nameList]);
+const TPLS = compileTemplates(tplList);
 
 function stored() {
   try { const v = localStorage.getItem(KEY); return v === 'zh' || v === 'en' ? v : null; } catch (e) { return null; }
@@ -46,7 +48,7 @@ export const tk = (zh) => zh;
 // 数据里的文字（设计产物、仿真结果、测试程序……）：先查表，查不到按词组表换，换不干净就显示中文
 export function td(zh) {
   if (i18n.lang !== 'en' || zh == null) return zh ?? '';
-  return translate(zh, en, PHRASES);
+  return translate(zh, en, PHRASES, TPLS);
 }
 // 对象的名字：英文时取 <字段>_en（工厂清单的 name_en 等），没有就取中英合写名字的英文部分，再没有就中文
 export function nm(o, f = 'name') {

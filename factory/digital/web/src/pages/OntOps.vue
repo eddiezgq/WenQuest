@@ -36,31 +36,31 @@
               :class="{ waiting: c.waiting }" @click="go({ view: 'anomalies', domain: c.domain })">
               <span class="sc-h"><b>{{ $td(c.label) }}</b>
                 <span class="badges">
-                  <span v-if="c.anomalies.critical" class="b crit" :title="c.anomalies.critical + $t(' 个严重')">{{ c.anomalies.critical }}</span>
-                  <span v-if="c.anomalies.warn" class="b warn" :title="c.anomalies.warn + $t(' 个警告')">{{ c.anomalies.warn }}</span>
-                  <span v-if="c.anomalies.info" class="b info" :title="c.anomalies.info + $t(' 个提示')">{{ c.anomalies.info }}</span>
+                  <span v-if="c.anomalies.critical" class="b crit" :title="c.anomalies.critical + $t(' 个严重')">{{ $td(c.anomalies.critical) }}</span>
+                  <span v-if="c.anomalies.warn" class="b warn" :title="c.anomalies.warn + $t(' 个警告')">{{ $td(c.anomalies.warn) }}</span>
+                  <span v-if="c.anomalies.info" class="b info" :title="c.anomalies.info + $t(' 个提示')">{{ $td(c.anomalies.info) }}</span>
                 </span></span>
               <span v-for="m in c.metrics" :key="m.key" class="met">
                 <span class="ml small muted">{{ $td(m.label) }}</span>
                 <span class="mv mono">{{ fmt(m.value, m.fmt) }}</span>
                 <svg v-if="m.trend.length > 1" class="spark" viewBox="0 0 60 16" aria-hidden="true"><polyline :points="spark(m.trend)" /></svg>
               </span>
-              <span v-if="c.waiting" class="small wait">{{ c.waiting }}</span>
+              <span v-if="c.waiting" class="small wait">{{ $td(c.waiting) }}</span>
               <span class="small muted foot">{{ c.rules_live.length ? c.rules_live.length + $t(' 条规则在跑') : $t('还没有规则在跑') }}<template
-                v-if="c.rules_waiting.length"> {{ $t('· {a} 条待数据', { a: c.rules_waiting.length }) }}</template></span>
+                v-if="c.rules_waiting.length"> {{ $t('· {a} 条待数据', { a: $td(c.rules_waiting.length) }) }}</template></span>
             </button>
           </div>
         </div>
         <p class="muted small">{{ $t('点卡片看这个领域的异常。指标每天记一次，小折线是近 7 天。') }}</p>
         <section v-if="hist" class="card">
-          <div class="card-head"><h2>{{ $t('那时开着的异常（{a}）', { a: hist.anomalies.length }) }}</h2>
+          <div class="card-head"><h2>{{ $t('那时开着的异常（{a}）', { a: $td(hist.anomalies.length) }) }}</h2>
             <span v-if="hist.snapshot" class="muted small">{{ $t('设备状态取 {a} 的快照（{b}）', { a: fmtTs(hist.snapshot.ts), b: hist.snapshot.exact ? $t('精确') : $t('近似') }) }}</span></div>
-          <ul class="small hlist"><li v-for="a in hist.anomalies" :key="a.id"><span class="sev" :class="a.severity">{{ LVL[a.severity] }}</span>
+          <ul class="small hlist"><li v-for="a in hist.anomalies" :key="a.id"><span class="sev" :class="a.severity">{{ $td(LVL[a.severity]) }}</span>
             <router-link :to="{ path: '/ont', query: { view: 'anomalies', a: a.id } }">{{ $td(a.title) }}</router-link>
             <span class="muted"> {{ $t('· {a} 起{b}', { a: fmtTs(a.first_seen), b: a.closed_at ? $t('，') + fmtTs(a.closed_at) + $t(' 结束') : '' }) }}</span></li></ul>
           <table v-if="hist.machines" class="t small"><thead><tr><th>{{ $t('设备') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('派工') }}</th><th class="num">{{ $t('排队') }}</th><th class="num">{{ $t('在做') }}</th></tr></thead>
-            <tbody><tr v-for="(m, u) in hist.machines" :key="u"><td class="mono">{{ u.toUpperCase() }}</td><td>{{ m.state }}</td>
-              <td class="num">{{ m.jobs }}</td><td class="num">{{ m.queue }}</td><td class="num">{{ m.busy }}</td></tr></tbody></table>
+            <tbody><tr v-for="(m, u) in hist.machines" :key="u"><td class="mono">{{ u.toUpperCase() }}</td><td>{{ $td(m.state) }}</td>
+              <td class="num">{{ $td(m.jobs) }}</td><td class="num">{{ $td(m.queue) }}</td><td class="num">{{ $td(m.busy) }}</td></tr></tbody></table>
         </section>
       </template>
     </template>
@@ -79,10 +79,10 @@
           <li v-for="a in list" :key="a.id" :class="{ sel: a.id === sel?.id }" @click="go({ a: a.id })">
             <span class="sev" :class="a.severity">{{ $td(a.severity_label) }}</span>
             <span class="it"><b>{{ $td(a.title) }}</b>
-              <span class="small muted">{{ a.domain_label }} · {{ a.rule }} {{ a.rule_name }} · {{ $td(a.status_label) }} · {{ ago(a.last_seen) }}<template v-if="a.hits > 1"> {{ $t('· {a} 次', { a: a.hits }) }}</template></span></span>
+              <span class="small muted">{{ $td(a.domain_label) }} · {{ $td(a.rule) }} {{ $td(a.rule_name) }} · {{ $td(a.status_label) }} · {{ ago(a.last_seen) }}<template v-if="a.hits > 1"> {{ $t('· {a} 次', { a: $td(a.hits) }) }}</template></span></span>
           </li>
         </ul>
-        <p v-if="last" class="small muted">{{ $t('上一轮检测 {a}，用时 {b} 毫秒', { a: ago(new Date(last.ts * 1000).toISOString()), b: last.ms }) }}</p>
+        <p v-if="last" class="small muted">{{ $t('上一轮检测 {a}，用时 {b} 毫秒', { a: ago(new Date(last.ts * 1000).toISOString()), b: $td(last.ms) }) }}</p>
       </section>
 
       <section class="card mid">
@@ -98,13 +98,13 @@
           </div>
           <ChainGraph data-help="ont-chain" :chain="sel.chain" @edge="(e) => (basis = e)" @node="(n) => (node = n)" />
           <div v-if="basis" class="basis small">
-            <b>{{ $t('依据') }}</b>{{ $t('：{a} —— {b}', { a: $td(basis.label), b: basis.basis.how }) }}
+            <b>{{ $t('依据') }}</b>{{ $t('：{a} —— {b}', { a: $td(basis.label), b: $td(basis.basis.how) }) }}
             <template v-if="basis.basis.text">{{ $t('；{a}', { a: $td(basis.basis.text) }) }}</template>
-            <button v-if="basis.basis.seq" class="linkbtn" @click="showSource(basis.basis.seq)">{{ $t('看原始记录 #{a}', { a: basis.basis.seq }) }}</button>
+            <button v-if="basis.basis.seq" class="linkbtn" @click="showSource(basis.basis.seq)">{{ $t('看原始记录 #{a}', { a: $td(basis.basis.seq) }) }}</button>
             <span v-for="(v, k) in basis.values" :key="k" class="muted"> · {{ k }} {{ fmtVal(v) }}</span>
           </div>
           <div v-if="node && !node.hidden" class="basis small">
-            <span class="pill info">{{ $td(node.label) }}</span> <ObjLink :type="node.type" :k="node.key">{{ node.display }}</ObjLink>
+            <span class="pill info">{{ $td(node.label) }}</span> <ObjLink :type="node.type" :k="node.key">{{ $td(node.display) }}</ObjLink>
             <span v-for="(v, k) in node.values" :key="k" class="muted"> · {{ k }} {{ fmtVal(v) }}</span>
           </div>
           <div v-else-if="node?.hidden" class="basis small muted">{{ $t('这一环的原因需要自己查（学生看不到老师注入的情景）。') }}</div>
@@ -115,9 +115,9 @@
       <section class="card right" data-help="ont-actions">
         <template v-if="sel">
           <h2>{{ $t('处理') }}</h2>
-          <p class="small"><b>{{ sel.rule_info.id }} {{ $td(sel.rule_info.name) }}</b>{{ $t('：') }}<span class="muted">{{ $td(sel.rule_info.desc) }}</span></p>
-          <p v-if="sel.hint" class="hint small">{{ $t('建议：{a}', { a: sel.hint }) }}</p>
-          <p class="small muted">{{ $t('负责：{a} · 状态：{b}', { a: roleName(sel.role), b: sel.status_label }) }}<template v-if="sel.assignee"> · {{ sel.assignee }}</template>
+          <p class="small"><b>{{ $td(sel.rule_info.id) }} {{ $td(sel.rule_info.name) }}</b>{{ $t('：') }}<span class="muted">{{ $td(sel.rule_info.desc) }}</span></p>
+          <p v-if="sel.hint" class="hint small">{{ $t('建议：{a}', { a: $td(sel.hint) }) }}</p>
+          <p class="small muted">{{ $t('负责：{a} · 状态：{b}', { a: roleName(sel.role), b: $td(sel.status_label) }) }}<template v-if="sel.assignee"> · {{ $td(sel.assignee) }}</template>
             {{ $t('· 首次 {a}', { a: ago(sel.first_seen) }) }}</p>
           <div v-if="isOpen" class="acts">
             <button v-if="sel.status === 'open'" class="btn" :disabled="!sel.can_act" @click="act('ack')">{{ $t('确认') }}</button>
@@ -140,8 +140,8 @@
           </ol>
           <h3 class="small">{{ $t('原始记录') }}</h3>
           <ul class="small ev">
-            <li v-for="(e, i) in sel.evidence" :key="i"><span class="mono">{{ e.topic }}</span>
-              <button v-if="e.seq" class="linkbtn" @click="showSource(e.seq)">#{{ e.seq }}</button>
+            <li v-for="(e, i) in sel.evidence" :key="i"><span class="mono">{{ $td(e.topic) }}</span>
+              <button v-if="e.seq" class="linkbtn" @click="showSource(e.seq)">#{{ $td(e.seq) }}</button>
               <span v-else class="muted"> {{ e.name || e.item || e.id || e.ts || '' }}</span></li>
           </ul>
           <OptionsPanel v-if="isOpen" data-help="ont-options" :anomaly-id="sel.id" @adopted="loadSel" />
@@ -152,9 +152,9 @@
 
     <div v-if="src" class="modal-mask" @click.self="src = null">
       <div class="modal src-modal" role="dialog" :aria-label="$t('原始记录')">
-        <div class="card-head"><h2>{{ $t('原始记录 #{a}', { a: src.seq }) }}</h2><button class="more btn ghost" @click="src = null">{{ $t('关闭') }}</button></div>
-        <div v-if="src.error" class="err">{{ src.error }}</div>
-        <template v-else><p class="small mono muted">{{ $t('{a}（{b}）· {c}', { a: src.topic, b: src.type, c: ts(src.ts) }) }}</p>
+        <div class="card-head"><h2>{{ $t('原始记录 #{a}', { a: $td(src.seq) }) }}</h2><button class="more btn ghost" @click="src = null">{{ $t('关闭') }}</button></div>
+        <div v-if="src.error" class="err">{{ $td(src.error) }}</div>
+        <template v-else><p class="small mono muted">{{ $t('{a}（{b}）· {c}', { a: $td(src.topic), b: $td(src.type), c: ts(src.ts) }) }}</p>
           <pre class="raw">{{ JSON.stringify(src.data, null, 2) }}</pre></template>
       </div>
     </div>

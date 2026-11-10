@@ -12,7 +12,7 @@
       <div v-else-if="list" class="scroll"><table class="tbl small">
         <thead><tr><th>{{ $t('出厂编号') }}</th><th>{{ $t('工单') }}</th><th class="num">{{ $t('标定前（mm）') }}</th><th class="num">{{ $t('标定后（mm）') }}</th><th class="num">{{ $t('条件数') }}</th><th>{{ $t('判定') }}</th></tr></thead>
         <tbody><tr v-for="r in list.robots" :key="r.serial" :class="{ sel: r.serial === serial }" @click="choose(r.serial)">
-          <td class="mono">{{ r.serial }}</td><td class="mono">{{ r.work_order }}</td><td class="num">{{ f3(r.before_mm) }}</td><td class="num">{{ f3(r.after_mm) }}</td>
+          <td class="mono">{{ $td(r.serial) }}</td><td class="mono">{{ $td(r.work_order) }}</td><td class="num">{{ f3(r.before_mm) }}</td><td class="num">{{ f3(r.after_mm) }}</td>
           <td class="num">{{ r.cond ?? '—' }}</td><td :class="r.pass ? 'ok' : 'bad-t'">{{ r.pass ? $t('合格') : $t('不合格') }}</td></tr></tbody></table></div>
     </section>
 
@@ -27,11 +27,11 @@
 
       <template v-if="r">
         <section class="kpis" data-help="calib-result">
-          <div class="card k"><span class="small muted">{{ $t('条件数') }}</span><b :class="{ warn: r.cond > 100 }">{{ r.cond }}</b>
-            <span class="small muted">{{ $t('分得开的参数组合 {a} / {b}', { a: r.rank, b: r.params }) }}</span></div>
+          <div class="card k"><span class="small muted">{{ $t('条件数') }}</span><b :class="{ warn: r.cond > 100 }">{{ $td(r.cond) }}</b>
+            <span class="small muted">{{ $t('分得开的参数组合 {a} / {b}', { a: $td(r.rank), b: $td(r.params) }) }}</span></div>
           <div class="card k"><span class="small muted">{{ $t('标定前（验证 20 个位姿）') }}</span><b>{{ f3(r.before_mean_mm) }} mm</b><span class="small muted">{{ $t('最大 {a}', { a: f3(r.before_max_mm) }) }}</span></div>
           <div class="card k"><span class="small muted">{{ $t('标定后') }}</span><b :class="r.pass ? 'ok' : 'bad-t'">{{ f3(r.after_mean_mm) }} mm</b>
-            <span class="small muted">{{ $t('最大 {a}；≤ {b} 合格', { a: f3(r.after_max_mm), b: r.limit_mm }) }}</span></div>
+            <span class="small muted">{{ $t('最大 {a}；≤ {b} 合格', { a: f3(r.after_max_mm), b: $td(r.limit_mm) }) }}</span></div>
         </section>
 
         <div class="two">
@@ -47,7 +47,7 @@
             </div>
           </section>
           <section class="card">
-            <div class="card-head"><h2>{{ $t('验证：每个位姿的误差') }}</h2><span class="muted small"><i class="sw b"></i> {{ $t('标定前') }} <i class="sw a"></i> {{ $t('标定后（mm）；红虚线 = {a} mm 合格线', { a: r.limit_mm }) }}</span></div>
+            <div class="card-head"><h2>{{ $t('验证：每个位姿的误差') }}</h2><span class="muted small"><i class="sw b"></i> {{ $t('标定前') }} <i class="sw a"></i> {{ $t('标定后（mm）；红虚线 = {a} mm 合格线', { a: $td(r.limit_mm) }) }}</span></div>
             <svg :viewBox="'0 0 ' + BW + ' ' + BH" class="bars" role="img" :aria-label="$t('验证误差')">
               <line :x1="0" :y1="by(r.limit_mm)" :x2="BW" :y2="by(r.limit_mm)" class="lim" />
               <g v-for="(v, i) in r.verify_before_mm" :key="i">
@@ -64,8 +64,8 @@
           <div class="scroll"><table class="tbl small">
             <thead><tr><th>{{ $t('关节') }}</th><th class="num">{{ $t('零位 Δθ（°）') }}</th><th class="num">{{ $t('偏距 Δd（mm）') }}</th><th class="num">{{ $t('连杆长度 Δa（mm）') }}</th><th class="num">{{ $t('扭角 Δα（°）') }}</th>
               <th v-if="r.truth" class="num">{{ $t('老师：真实 Δθ（°）') }}</th></tr></thead>
-            <tbody><tr v-for="(p, i) in r.identified" :key="p.joint"><td>{{ p.joint }}</td><td class="num">{{ p.dtheta_deg }}</td><td class="num">{{ p.dd_mm }}</td>
-              <td class="num">{{ p.da_mm }}</td><td class="num">{{ p.dalpha_deg }}</td><td v-if="r.truth" class="num">{{ r.truth[i].dtheta_deg }}</td></tr></tbody></table></div>
+            <tbody><tr v-for="(p, i) in r.identified" :key="p.joint"><td>{{ $td(p.joint) }}</td><td class="num">{{ $td(p.dtheta_deg) }}</td><td class="num">{{ $td(p.dd_mm) }}</td>
+              <td class="num">{{ $td(p.da_mm) }}</td><td class="num">{{ $td(p.dalpha_deg) }}</td><td v-if="r.truth" class="num">{{ $td(r.truth[i].dtheta_deg) }}</td></tr></tbody></table></div>
           <p class="small muted">{{ $t('名义 DH 参数（示例值）与实验 26 的任务在“实验与任务 → 实验 26”。') }}</p>
         </section>
       </template>

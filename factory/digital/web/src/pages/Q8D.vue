@@ -7,19 +7,19 @@
       <table v-else class="t">
         <thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('现象') }}</th><th>{{ $t('特性') }}</th><th>{{ $t('状态') }}</th><th>{{ $t('开单人') }}</th><th>{{ $t('时间') }}</th></tr></thead>
         <tbody><tr v-for="q in list" :key="q.id">
-          <td><router-link :to="'/quality/8d/' + q.id" class="mono">{{ q.id }}</router-link></td><td>{{ $td(q.title) }}</td>
-          <td class="small">{{ CHARS[q.characteristic] || q.characteristic }}</td><td>{{ STATUS[q.status] }}</td>
-          <td class="small">{{ q.author }}</td><td class="small">{{ timeOf(q.created_at) }}</td></tr></tbody>
+          <td><router-link :to="'/quality/8d/' + q.id" class="mono">{{ $td(q.id) }}</router-link></td><td>{{ $td(q.title) }}</td>
+          <td class="small">{{ CHARS[q.characteristic] || q.characteristic }}</td><td>{{ $td(STATUS[q.status]) }}</td>
+          <td class="small">{{ $td(q.author) }}</td><td class="small">{{ timeOf(q.created_at) }}</td></tr></tbody>
       </table>
     </section>
     <template v-else-if="q">
       <section class="card">
-        <div class="card-head"><h2><span class="mono">{{ q.id }}</span> {{ $td(q.title) }}</h2>
-          <span class="pill" :class="q.status === 'closed' ? 'good' : 'warn'">{{ STATUS[q.status] }}</span></div>
-        <p class="small muted">{{ $t('零件 {a} · 特性 {b} · 开单 {c} {d}', { a: q.item, b: CHARS[q.characteristic] || q.characteristic, c: q.author, d: timeOf(q.created_at) }) }}
+        <div class="card-head"><h2><span class="mono">{{ $td(q.id) }}</span> {{ $td(q.title) }}</h2>
+          <span class="pill" :class="q.status === 'closed' ? 'good' : 'warn'">{{ $td(STATUS[q.status]) }}</span></div>
+        <p class="small muted">{{ $t('零件 {a} · 特性 {b} · 开单 {c} {d}', { a: $td(q.item), b: CHARS[q.characteristic] || q.characteristic, c: $td(q.author), d: timeOf(q.created_at) }) }}
           <router-link to="/work/quality">{{ $t('· 看控制图') }}</router-link></p>
         <div v-for="k in ORDER" :key="k" class="sec">
-          <label><b>{{ (catalog.sections || {})[k] }}</b><span class="small muted"> {{ HINT[k] }}</span></label>
+          <label><b>{{ (catalog.sections || {})[k] }}</b><span class="small muted"> {{ $td(HINT[k]) }}</span></label>
           <template v-if="k === 'd5'">
             <select v-model="fix" :disabled="!editableFix">
               <option value="">{{ $t('选择纠正措施…') }}</option>
@@ -28,7 +28,7 @@
           </template>
           <textarea v-model="d[k]" :disabled="q.status === 'closed'" rows="3" />
         </div>
-        <div v-if="q.d && q.d.teacher_note" class="err small">{{ $t('老师退回意见：{a}', { a: q.d.teacher_note }) }}</div>
+        <div v-if="q.d && q.d.teacher_note" class="err small">{{ $t('老师退回意见：{a}', { a: $td(q.d.teacher_note) }) }}</div>
         <div class="acts">
           <button class="btn" :disabled="q.status === 'closed'" @click="act('save')">{{ $t('保存') }}</button>
           <button v-if="['open', 'rejected'].includes(q.status)" class="btn primary" @click="act('submit')">{{ $t('提交纠正措施，请老师批准') }}</button>
@@ -53,7 +53,7 @@
               <td class="num">{{ r ? r.fails : '—' }}</td><td class="num mono">{{ r && r.Cpk != null ? r.Cpk.toFixed(2) : '—' }}</td></tr>
           </tbody>
         </table>
-        <p class="small muted">{{ $t('判定：措施后至少 {a} 件、全部合格且 C', { a: q.verify.need }) }}<sub>pk</sub> {{ $t('≥ 1.33。数据不够就等车间多做几件再验证。') }}</p>
+        <p class="small muted">{{ $t('判定：措施后至少 {a} 件、全部合格且 C', { a: $td(q.verify.need) }) }}<sub>pk</sub> {{ $t('≥ 1.33。数据不够就等车间多做几件再验证。') }}</p>
       </section>
     </template>
   </div>

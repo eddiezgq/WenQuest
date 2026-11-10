@@ -7,17 +7,17 @@
     <div v-if="err" class="err">{{ err }}</div>
     <div class="cols">
       <section class="card list">
-        <div class="card-head"><h2>{{ $t('最近的晶圆（{a} 片）', { a: list.length }) }}</h2></div>
+        <div class="card-head"><h2>{{ $t('最近的晶圆（{a} 片）', { a: $td(list.length) }) }}</h2></div>
         <div v-if="!list.length" class="small muted">{{ $t('还没有。接一张 WQ-ENCIF 订单，或下一张“已测晶圆 WAF-ENCIF-CP”工单，让车间做到“晶圆测试 CP”。') }}</div>
         <button v-for="w in list" :key="w.serial" class="brd" :class="{ on: sel === w.serial }" @click="open(w.serial)">
-          <span class="mono">{{ w.serial }}</span>
+          <span class="mono">{{ $td(w.serial) }}</span>
           <span class="small" :class="w.pass ? 'ok' : 'bad'">{{ $t('良率 {a} %', { a: w.yield_pct.toFixed(1) }) }}</span>
-          <span class="small muted">{{ $t('最差测试位 {a}：{b} %', { a: w.worst_site, b: w.site_fail_pct[w.worst_site - 1] }) }}</span>
+          <span class="small muted">{{ $t('最差测试位 {a}：{b} %', { a: $td(w.worst_site), b: w.site_fail_pct[w.worst_site - 1] }) }}</span>
           <span class="spark"><i v-for="(f, k) in w.site_fail_pct" :key="k" :style="{ height: Math.min(100, f * 2) + '%' }" :class="{ hot: f > 15 }" /></span>
         </button>
       </section>
       <section v-if="m" class="card main">
-        <div class="card-head"><h2>{{ m.serial }} · <small class="muted">{{ $t('工单 {a}　{b} 颗　良率 {c} %', { a: m.work_order, b: m.total.toLocaleString(), c: m.yield_pct.toFixed(2) }) }}</small></h2></div>
+        <div class="card-head"><h2>{{ $td(m.serial) }} · <small class="muted">{{ $t('工单 {a}　{b} 颗　良率 {c} %', { a: $td(m.work_order), b: m.total.toLocaleString(), c: m.yield_pct.toFixed(2) }) }}</small></h2></div>
         <div class="grid2">
           <div>
             <canvas ref="cv" class="wafer" :width="CW" :height="CW" @mousemove="hover" @mouseleave="tip = ''" />
@@ -40,7 +40,7 @@
               <tbody><tr><td>{{ $t('接触电阻 Ω') }}</td><td v-for="(r, k) in m.site_rc" :key="k" class="mono" :class="{ bad: r > 2.5 }">{{ r.toFixed(2) }}</td></tr></tbody>
             </table>
             <p class="small">{{ $t('探针卡一次扎') }} <b>{{ $t('2 行 × 4 列') }}</b> {{ $t('共 8 颗芯片：测试位 1–4 在上一行、5–8 在下一行。某个测试位的探针磨损、接触电阻升高时，它扎到的芯片会被误判“开路”——晶圆图上就是每隔 4 列、每隔 1 行规律地红一颗；而真正的缺陷是散点、成簇，IDDQ 超标集中在边缘一圈。误判的芯片其实是好的，复测能过；不清洁 / 不换探针卡，每片都白白损失这些好芯片。') }}</p>
-            <p class="small muted">{{ $t('示例：200 mm 晶圆、步距 {a} mm、边缘去除 {b} mm；缺陷率、簇、接触电阻阈值 2.5 Ω 都是示例值。', { a: m.pitch_mm, b: m.edge_mm }) }}</p>
+            <p class="small muted">{{ $t('示例：200 mm 晶圆、步距 {a} mm、边缘去除 {b} mm；缺陷率、簇、接触电阻阈值 2.5 Ω 都是示例值。', { a: $td(m.pitch_mm), b: $td(m.edge_mm) }) }}</p>
           </div>
         </div>
       </section>

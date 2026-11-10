@@ -42,7 +42,7 @@ def pairs():
         if s and CJK.search(s) and en_part(s):
             add(s, en_part(s))
             z, e = zh_part(s), en_part(s)
-            if not re.search(r"\d", e.split()[0]) and not re.search(r"[A-Za-z]", z):   # 中文部分里有规格、编号的不单拆
+            if not re.search(r"\d", e) and not re.search(r"[A-Za-z]", z):   # 英文里有规格、编号（中文部分没有）的不单拆
                 add(z, e)
                 add(re.sub(r"^示例·", "", z), e)
 

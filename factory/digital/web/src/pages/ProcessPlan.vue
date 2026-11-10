@@ -37,7 +37,7 @@
         </div>
         <p class="small muted">{{ $t('预检随时可点，只给意见、不记录；提交后 AI 评审员的意见写成批注，进“待审”，老师或审批人批准后成为新版本。') }}</p>
         <div v-if="pre" class="result">
-          <div class="score">{{ $t('AI 预检 · 建议分') }} <b>{{ pre.suggested_score }}</b>
+          <div class="score">{{ $t('AI 预检 · 建议分') }} <b>{{ $td(pre.suggested_score) }}</b>
             <span class="pill bad">{{ $t('{a} 必须改', { a: count(pre.findings, 'error') }) }}</span>
             <span class="pill warn">{{ $t('{a} 建议', { a: count(pre.findings, 'warning') }) }}</span></div>
           <Findings :list="pre.findings" />
@@ -50,20 +50,20 @@
         <table v-else class="t">
           <thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('状态') }}</th><th>{{ $t('提交人') }}</th><th>{{ $t('时间') }}</th><th class="num">{{ $t('AI 建议分') }}</th></tr></thead>
           <tbody><tr v-for="s in info.submissions" :key="s.id">
-            <td><router-link class="mono" :to="'/process/' + s.id">{{ s.id }}</router-link></td>
+            <td><router-link class="mono" :to="'/process/' + s.id">{{ $td(s.id) }}</router-link></td>
             <td><span class="pill" :class="TONE[s.status]">{{ STATUS[s.status] || s.status }}</span></td>
-            <td>{{ s.author }}</td><td class="small">{{ timeOf(s.ts) }}</td><td class="num">{{ s.score ?? '—' }}</td></tr></tbody>
+            <td>{{ $td(s.author) }}</td><td class="small">{{ timeOf(s.ts) }}</td><td class="num">{{ s.score ?? '—' }}</td></tr></tbody>
         </table>
       </section>
     </template>
 
     <template v-else-if="sub">
       <section class="card">
-        <div class="card-head"><h2>{{ $t('提交') }} <span class="mono">{{ sub.id }}</span> · {{ $td(sub.item) }}</h2>
+        <div class="card-head"><h2>{{ $t('提交') }} <span class="mono">{{ $td(sub.id) }}</span> · {{ $td(sub.item) }}</h2>
           <span class="pill" :class="TONE[sub.status]">{{ STATUS[sub.status] || sub.status }}</span>
           <router-link to="/process" class="small">{{ $t('← 工艺规程') }}</router-link></div>
-        <p class="small">{{ $t('提交人 {a} · {b}', { a: sub.author, b: timeOf(sub.ts) }) }}<template v-if="sub.note"> {{ $t('· 说明：{a}', { a: $td(sub.note) }) }}</template>
-          <template v-if="sub.revision"> {{ $t('· 已生效为第 {a} 版', { a: sub.revision }) }}</template></p>
+        <p class="small">{{ $t('提交人 {a} · {b}', { a: $td(sub.author), b: timeOf(sub.ts) }) }}<template v-if="sub.note"> {{ $t('· 说明：{a}', { a: $td(sub.note) }) }}</template>
+          <template v-if="sub.revision"> {{ $t('· 已生效为第 {a} 版', { a: $td(sub.revision) }) }}</template></p>
         <div class="line"><button class="btn" @click="cards('/process/submissions/' + sub.id + '/cards')">{{ $t('看这份的全套工艺文件') }}</button>
           <router-link v-if="sub.plan?.doc" class="btn" :to="{ path: '/process/edit/' + sub.item, query: { start: sub.id } }">{{ $t('在这一份上改') }}</router-link></div>
         <div class="result">
@@ -78,7 +78,7 @@
         <div v-if="!sub.comments?.length" class="empty">{{ $t('没有批注。') }}</div>
         <div v-for="c in sub.comments" :key="c.id" class="cm" :class="{ done: c.resolved }">
           <label class="small"><input type="checkbox" :checked="c.resolved" :disabled="sub.status !== 'pending'" @change="resolve(c, $event.target.checked)"> {{ $t('已处理') }}</label>
-          <span class="small">{{ c.body }}</span> <span class="small muted">— {{ c.author }}</span>
+          <span class="small">{{ $td(c.body) }}</span> <span class="small muted">— {{ $td(c.author) }}</span>
         </div>
         <div v-if="sub.status === 'pending' && session.user?.teacher" class="line top">
           <input v-model="note" class="note" maxlength="300" :placeholder="$t('审批意见')">

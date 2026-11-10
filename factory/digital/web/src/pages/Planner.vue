@@ -9,7 +9,7 @@
         <form class="form" @submit.prevent="calc">
           <div class="field" data-help="planner-customer"><label>{{ $t('客户') }}</label>
             <select v-model="f.customer" required><option v-for="c in customers" :key="c" :value="c">{{ short(c) }}</option></select></div>
-          <div class="field" data-help="planner-item"><label>{{ $t('产品') }}</label><select v-model="f.item"><option v-for="p in products" :key="p.item_code" :value="p.item_code">{{ p.item_code }} {{ isEn() ? $td(p.name) : p.name.split(' ')[0] }}</option></select></div>
+          <div class="field" data-help="planner-item"><label>{{ $t('产品') }}</label><select v-model="f.item"><option v-for="p in products" :key="p.item_code" :value="p.item_code">{{ $td(p.item_code) }} {{ isEn() ? $td(p.name) : p.name.split(' ')[0] }}</option></select></div>
           <div class="field" data-help="planner-qty"><label>{{ $t('数量（台）') }}</label><input v-model.number="f.qty" type="number" min="1" max="200" required></div>
           <div class="field"><label>{{ $t('交期') }}</label><input v-model="f.delivery_date" type="date" required></div>
           <button class="btn" data-help="planner-calc">{{ $t('算料') }}</button>
@@ -23,13 +23,13 @@
             <tbody><tr v-for="r in pv.mrp" :key="r.item_code" :class="{ need: r.net > 0 }">
               <td><ObjLink type="Item" :k="r.item_code" mono /> <span class="muted small">{{ r.name.split(' ')[0] }}</span></td>
               <td class="num">{{ n(r.gross) }}</td><td class="num">{{ n(r.committed) }}</td><td class="num">{{ n(r.stock) }}</td>
-              <td class="num">{{ n(r.on_order) }}</td><td class="num">{{ n(r.safety) }}</td><td class="num">{{ n(r.net) }}</td><td>{{ r.action }}</td>
+              <td class="num">{{ n(r.on_order) }}</td><td class="num">{{ n(r.safety) }}</td><td class="num">{{ n(r.net) }}</td><td>{{ $td(r.action) }}</td>
             </tr></tbody>
           </table>
-          <p class="small">{{ $t('工单：') }}<b v-for="w in pv.work_orders" :key="w.production_item" class="mono">{{ $t('{a} × {b}（{c} → {d}）', { a: w.production_item, b: w.qty, c: w.planned_start_date, d: w.expected_delivery_date }) }}</b>
-            {{ $t('· 请购 {a} 项', { a: pv.material_requests.length }) }}<template v-if="pv.std_cost_sh301"> {{ $t('· SH-301 标准成本 ${a}/件', { a: pv.std_cost_sh301.total }) }}</template></p>
+          <p class="small">{{ $t('工单：') }}<b v-for="w in pv.work_orders" :key="w.production_item" class="mono">{{ $t('{a} × {b}（{c} → {d}）', { a: $td(w.production_item), b: $td(w.qty), c: $td(w.planned_start_date), d: $td(w.expected_delivery_date) }) }}</b>
+            {{ $t('· 请购 {a} 项', { a: $td(pv.material_requests.length) }) }}<template v-if="pv.std_cost_sh301"> {{ $t('· SH-301 标准成本 ${a}/件', { a: $td(pv.std_cost_sh301.total) }) }}</template></p>
           <p v-if="pv.warnings.length" class="warn small">{{ pv.warnings.join($t('；')) }}</p>
-          <p class="muted small">{{ $t('{a}。净需求 = 毛需求 + 其他订单占用 + 安全库存 − 库存 − 在途。', { a: pv.basis }) }}</p>
+          <p class="muted small">{{ $t('{a}。净需求 = 毛需求 + 其他订单占用 + 安全库存 − 库存 − 在途。', { a: $td(pv.basis) }) }}</p>
           <button class="btn primary" :disabled="busy" @click="submit">{{ $t('提交（生成待确认的提议）') }}</button>
         </template>
       </section>
@@ -55,10 +55,10 @@
         <tbody>
           <tr v-for="o in park.orders" :key="o.id">
             <td class="small">{{ short(o.from_name) }}</td><td class="mono small">{{ o.po || '—' }}</td>
-            <td class="mono"><ObjLink type="Item" :k="o.item" /></td><td class="num">{{ o.qty }}</td><td class="mono small">{{ o.need_by || '—' }}</td>
+            <td class="mono"><ObjLink type="Item" :k="o.item" /></td><td class="num">{{ $td(o.qty) }}</td><td class="mono small">{{ o.need_by || '—' }}</td>
             <td class="mono small"><ObjLink v-if="o.so" type="SalesOrder" :k="o.so" /><span v-else>—</span></td>
             <td><span class="pill" :class="{ pending: 'warn', accepted: 'info', released: 'info', shipped: 'good', failed: 'bad' }[o.status]">{{ $td(o.status_label) }}</span>
-              <span v-if="o.shipment" class="muted small"> {{ $t('批 {a}', { a: o.shipment.lot }) }}</span><span v-if="o.note" class="muted small"> {{ $td(o.note) }}</span></td>
+              <span v-if="o.shipment" class="muted small"> {{ $t('批 {a}', { a: $td(o.shipment.lot) }) }}</span><span v-if="o.note" class="muted small"> {{ $td(o.note) }}</span></td>
             <td><button v-if="o.status === 'pending' && park.can_accept" class="btn primary" :disabled="busy" @click="acceptPark(o.id)">{{ $t('接单') }}</button></td>
           </tr>
         </tbody>
@@ -74,8 +74,8 @@
         <tbody>
           <tr v-for="w in wos" :key="w.name">
             <td class="mono"><ObjLink type="WorkOrder" :k="w.name" /><span v-if="w.demo" class="pill mute">{{ $t('演示') }}</span></td>
-            <td class="mono"><ObjLink type="Item" :k="w.production_item" /></td><td class="num">{{ w.qty }}</td><td class="num">{{ w.produced }}</td>
-            <td class="mono small">{{ w.planned_start_date }} → {{ w.expected_delivery_date }}</td>
+            <td class="mono"><ObjLink type="Item" :k="w.production_item" /></td><td class="num">{{ $td(w.qty) }}</td><td class="num">{{ $td(w.produced) }}</td>
+            <td class="mono small">{{ $td(w.planned_start_date) }} → {{ $td(w.expected_delivery_date) }}</td>
             <td class="mono small"><ObjLink v-if="w.sales_order" type="SalesOrder" :k="w.sales_order" /></td>
             <td><span class="pill" :class="w.status === 'Completed' ? 'good' : w.released ? 'info' : 'warn'">{{ woStatus(w) }}</span></td>
             <td><button v-if="!w.released && w.status !== 'Completed' && !w.demo" class="btn primary" :disabled="busy" @click="release(w.name)">{{ $t('下达车间') }}</button></td>
@@ -125,7 +125,7 @@ async function load() {
   if (!f.value.customer) f.value.customer = c.customers[0];
   props_.value = p;
   wos.value = w;
-  if (session.user.mode === 'teach') teachStatus.value = await get('/teach');
+  if (session.user.mode === 'teach') teachStatus.value = await get('/teach').catch(() => null);   // 实验 7 只在减速器厂，别的厂回 404
   try { park.value = await get('/park'); } catch { park.value = null; }
 }
 async function acceptPark(id) {

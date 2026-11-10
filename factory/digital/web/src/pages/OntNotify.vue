@@ -13,7 +13,7 @@
             <label v-for="x in d.domains" :key="x.domain" class="ck"><input v-model="form.domains" type="checkbox" :value="x.domain"> {{ $td(x.label) }}</label>
           </div></div>
         <div class="field"><label>{{ $t('最低严重程度') }}</label>
-          <select v-model="form.min_severity"><option v-for="(l, k) in d.severities" :key="k" :value="k">{{ $t('{a}及以上', { a: l }) }}</option></select></div>
+          <select v-model="form.min_severity"><option v-for="(l, k) in d.severities" :key="k" :value="k">{{ $t('{a}及以上', { a: $td(l) }) }}</option></select></div>
         <div class="field"><label>{{ $t('邮件') }}</label>
           <label class="ck"><input v-model="form.email_on" type="checkbox" :disabled="!d.external"> {{ $t('同时发邮件到') }}</label>
           <input v-model="form.email" type="email" placeholder="you@example.com" :disabled="!d.external">
@@ -30,16 +30,16 @@
         <div class="card-head"><h2>{{ $t('群机器人') }}</h2><span class="small muted">{{ $t('把厂情提醒和日报周报推到企业微信、钉钉或飞书群（生产模式）。可以按领域分到不同的群') }}</span></div>
         <table v-if="d.channels.length" class="tbl small">
           <thead><tr><th>{{ $t('名称') }}</th><th>{{ $t('种类') }}</th><th>{{ $t('领域') }}</th><th>{{ $t('最低严重程度') }}</th><th>{{ $t('地址') }}</th><th>{{ $t('添加人') }}</th><th></th></tr></thead>
-          <tbody><tr v-for="c in d.channels" :key="c.id"><td>{{ $td(c.name) }}</td><td>{{ d.channel_kinds[c.kind] }}</td>
-            <td>{{ c.domain ? domLabel(c.domain) : $t('全部') }}</td><td>{{ d.severities[c.min_severity] }}</td><td class="mono">…{{ c.tail }}</td>
-            <td>{{ c.created_by }}</td><td><button class="linkbtn" @click="del(c.id)">{{ $t('删除') }}</button></td></tr></tbody>
+          <tbody><tr v-for="c in d.channels" :key="c.id"><td>{{ $td(c.name) }}</td><td>{{ $td(d.channel_kinds[c.kind]) }}</td>
+            <td>{{ c.domain ? domLabel(c.domain) : $t('全部') }}</td><td>{{ $td(d.severities[c.min_severity]) }}</td><td class="mono">…{{ $td(c.tail) }}</td>
+            <td>{{ $td(c.created_by) }}</td><td><button class="linkbtn" @click="del(c.id)">{{ $t('删除') }}</button></td></tr></tbody>
         </table>
         <p v-else class="small muted">{{ $t('还没有群机器人。') }}</p>
         <div class="add">
           <select v-model="ch.kind"><option v-for="(l, k) in d.channel_kinds" :key="k" :value="k">{{ $td(l) }}</option></select>
           <input v-model="ch.name" :placeholder="$t('名称，例如：车间管理群')">
           <select v-model="ch.domain"><option value="">{{ $t('全部领域') }}</option><option v-for="x in d.domains" :key="x.domain" :value="x.domain">{{ $td(x.label) }}</option></select>
-          <select v-model="ch.min_severity"><option v-for="(l, k) in d.severities" :key="k" :value="k">{{ $t('{a}及以上', { a: l }) }}</option></select>
+          <select v-model="ch.min_severity"><option v-for="(l, k) in d.severities" :key="k" :value="k">{{ $t('{a}及以上', { a: $td(l) }) }}</option></select>
           <input v-model="ch.url" class="url" :placeholder="$t('Webhook 地址（https://…）')">
           <button class="btn" @click="add">{{ $t('添加') }}</button>
         </div>

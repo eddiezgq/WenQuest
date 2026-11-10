@@ -22,7 +22,7 @@
       </g>
     </svg>
     <div v-if="hi != null" class="tip small" :style="{ left: Math.min(70, hi / Math.max(1, days.length - 1) * 100) + '%' }">
-      <div class="muted">{{ days[hi] }}</div>
+      <div class="muted">{{ $td(days[hi]) }}</div>
       <div v-for="s in series" :key="'v' + s.label"><i :style="{ background: s.color }"></i>{{ $t('{a}：', { a: $td(s.label) }) }}<b>{{ s.values[hi] == null ? '—' : fmt(s.values[hi]) }}</b></div>
     </div>
   </div>

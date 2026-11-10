@@ -7,13 +7,13 @@
           <router-link :to="'/ont/' + o.type">{{ $td(o.label) }}</router-link></div>
         <div class="title">
           <span class="badge">{{ $td(o.label) }}</span>
-          <h1>{{ o.display }}</h1>
-          <span v-if="o.display !== o.key" class="mono muted">{{ o.key }}</span>
+          <h1>{{ $td(o.display) }}</h1>
+          <span v-if="o.display !== o.key" class="mono muted">{{ $td(o.key) }}</span>
           <span v-if="tone" class="pill" :class="tone">{{ stateText }}</span>
-          <button class="btn sm ghost askbtn" @click="ask($t('{a} 现在怎么样？有什么影响？', { a: o.key }))">{{ $t('问 AI 这个对象') }}</button>
+          <button class="btn sm ghost askbtn" @click="ask($t('{a} 现在怎么样？有什么影响？', { a: $td(o.key) }))">{{ $t('问 AI 这个对象') }}</button>
         </div>
         <div class="small muted">
-          {{ $t('{a} · 首次出现 {b} · 最近更新 {c}', { a: o.label_en, b: fmtTs(o.first_ts) || '—', c: fmtTs(o.updated_at) }) }}
+          {{ $t('{a} · 首次出现 {b} · 最近更新 {c}', { a: $td(o.label_en), b: fmtTs(o.first_ts) || '—', c: fmtTs(o.updated_at) }) }}
           <template v-if="o.aliases.length"> {{ $t('· 也叫：') }}<span class="mono">{{ o.aliases.join($t('、')) }}</span></template>
         </div>
       </header>
@@ -57,8 +57,8 @@
         <template v-if="impact">
           <ul class="small isum"><li v-for="(x, i) in impact.summary" :key="i">{{ x }}</li></ul>
           <div class="impact"><ChainGraph :chain="impact" @edge="(e) => (ibasis = e)" /></div>
-          <p v-if="ibasis" class="small muted">{{ $t('依据：{a} —— {b}', { a: $td(ibasis.label), b: ibasis.basis.how }) }}<template v-if="ibasis.basis.seq">
-            <button class="src-btn" @click="showSource(ibasis.basis.seq, ibasis.label)">ⓘ #{{ ibasis.basis.seq }}</button></template></p>
+          <p v-if="ibasis" class="small muted">{{ $t('依据：{a} —— {b}', { a: $td(ibasis.label), b: $td(ibasis.basis.how) }) }}<template v-if="ibasis.basis.seq">
+            <button class="src-btn" @click="showSource(ibasis.basis.seq, ibasis.label)">ⓘ #{{ $td(ibasis.basis.seq) }}</button></template></p>
         </template>
       </section>
 
@@ -67,11 +67,11 @@
           <button class="more btn ghost sm" :disabled="!o.links.length" @click="exportCsv">{{ $t('导出 CSV') }}</button></div>
         <p v-if="!o.links.length" class="muted small">{{ $t('还没有和其他对象的关系。') }}</p>
         <details v-for="g in o.links" :key="g.link + g.direction" open class="grp">
-          <summary><b>{{ $td(g.label) }}</b> <span class="muted">{{ $td(g.type_label) }}</span> <span class="pill mute">{{ g.items.length }}{{ g.more ? '+' : '' }}</span>
+          <summary><b>{{ $td(g.label) }}</b> <span class="muted">{{ $td(g.type_label) }}</span> <span class="pill mute">{{ $td(g.items.length) }}{{ g.more ? '+' : '' }}</span>
             <router-link v-if="g.more" class="small" :to="'/ont/' + g.type">{{ $t('查看全部') }}</router-link></summary>
           <table class="t">
             <tbody><tr v-for="it in g.items" :key="it.key">
-              <td><ObjLink :type="g.type" :k="it.key">{{ it.display }}</ObjLink></td>
+              <td><ObjLink :type="g.type" :k="it.key">{{ $td(it.display) }}</ObjLink></td>
               <td class="small muted mono">{{ linkProps(it.props) }}</td>
               <td class="srccol"><button v-if="it.seq" class="src-btn" @click="showSource(it.seq, g.label)">ⓘ</button></td>
             </tr></tbody>
@@ -83,10 +83,10 @@
     <div v-if="src" class="modal-mask" @click.self="src = null">
       <div class="modal src-modal" role="dialog" :aria-label="$t('原始记录')">
         <div class="card-head"><h2>{{ $t('原始记录 · {a}', { a: srcTitle }) }}</h2><button class="more btn ghost sm" @click="src = null">{{ $t('关闭') }}</button></div>
-        <div v-if="src.error" class="err">{{ src.error }}</div>
+        <div v-if="src.error" class="err">{{ $td(src.error) }}</div>
         <template v-else>
-          <p class="small">{{ $t('总线消息') }} <b class="mono">#{{ src.seq }}</b> {{ $t('· {a} · 来源', { a: fmtTs(src.ts) }) }} <span class="mono">{{ src.source }}</span></p>
-          <p class="small mono muted">{{ $t('{a}（{b}）', { a: src.topic, b: src.type }) }}<template v-if="src.corr"> {{ $t('· 关联 {a}', { a: src.corr }) }}</template></p>
+          <p class="small">{{ $t('总线消息') }} <b class="mono">#{{ $td(src.seq) }}</b> {{ $t('· {a} · 来源', { a: fmtTs(src.ts) }) }} <span class="mono">{{ $td(src.source) }}</span></p>
+          <p class="small mono muted">{{ $t('{a}（{b}）', { a: $td(src.topic), b: $td(src.type) }) }}<template v-if="src.corr"> {{ $t('· 关联 {a}', { a: $td(src.corr) }) }}</template></p>
           <pre class="raw">{{ JSON.stringify(src.data, null, 2) }}</pre>
         </template>
       </div>

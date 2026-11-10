@@ -1,9 +1,10 @@
 <template>
   <div class="page">
     <div class="page-title"><h1>{{ $t('实验 7 · 数字工厂闭环') }}</h1><span class="muted">{{ $t('6 个任务，满分 100；系统按统一数据总线上的事实自动评分') }}</span></div>
+    <p v-if="loadErr" class="card muted">{{ loadErr }}</p>
     <div v-if="s" class="score card">
-      <span class="mono big">{{ s.score }} / {{ s.of }}</span>
-      <span class="muted">{{ $t('已用 {a} 分钟{b}', { a: s.elapsed_min, b: s.work_order ? $t(' · 你的工单 ') + s.work_order : '' }) }}</span>
+      <span class="mono big">{{ $td(s.score) }} / {{ $td(s.of) }}</span>
+      <span class="muted">{{ $t('已用 {a} 分钟{b}', { a: $td(s.elapsed_min), b: s.work_order ? $t(' · 你的工单 ') + s.work_order : '' }) }}</span>
     </div>
     <div v-if="s" class="tasks">
       <section v-for="(t, i) in s.tasks" :key="t.id" class="card task" :class="{ done: t.done, cur: i === s.current }">
@@ -11,7 +12,7 @@
           <span class="num">{{ i + 1 }}</span>
           <h2>{{ $td(t.title) }}</h2>
           <span class="pill task">{{ roleName(t.role) }}</span>
-          <span class="pts mono">{{ t.score }} / {{ t.points }}</span>
+          <span class="pts mono">{{ $td(t.score) }} / {{ $td(t.points) }}</span>
         </div>
         <p>{{ $td(t.desc) }}</p>
         <p class="muted small">{{ $t('提示：{a}', { a: $td(t.hint) }) }}</p>
@@ -53,7 +54,8 @@ const t1 = reactive({ machine: '', order: '', material: '' });
 const t5 = reactive({ reason: '' });
 const t6 = reactive({ variance_pct: '', reason: '' });
 const fb = reactive({});
-async function load() { s.value = await get('/teach'); }
+const loadErr = ref('');
+async function load() { try { s.value = await get('/teach'); loadErr.value = ''; } catch (e) { loadErr.value = e.message; } }   // 别的厂：“实验 7 只在减速器厂”
 async function submit(id, body) {
   try {
     const r = await post('/teach/' + id, { ...body });

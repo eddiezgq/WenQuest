@@ -19,9 +19,9 @@
         <li v-for="r in results" :key="r.id">
           <router-link :to="objPath(r.type, r.key)">
             <i class="dot" :style="{ background: DOMAIN_COLOR[r.domain] }"></i>
-            <span class="pill mute">{{ $td(r.label) }}</span> <b>{{ r.display }}</b>
-            <span v-if="r.display !== r.key" class="mono muted small">{{ r.key }}</span>
-            <span class="muted small how">{{ $t('{a}匹配', { a: r.how }) }}</span>
+            <span class="pill mute">{{ $td(r.label) }}</span> <b>{{ $td(r.display) }}</b>
+            <span v-if="r.display !== r.key" class="mono muted small">{{ $td(r.key) }}</span>
+            <span class="muted small how">{{ $t('{a}匹配', { a: $td(r.how) }) }}</span>
           </router-link>
         </li>
       </ul>
@@ -43,7 +43,7 @@
             :style="{ '--c': DOMAIN_COLOR[d.domain] }" @click="toggle(d.domain)">
             <span class="dname">{{ $td(d.label) }}</span>
             <span class="dnum mono">{{ d.count.toLocaleString() }}</span>
-            <span class="small dsub">{{ $t('{a} / {b} 类有数据 · 24h {c}', { a: d.with_data, b: d.types.length, c: sum(d, 'changes_24h') }) }}</span>
+            <span class="small dsub">{{ $t('{a} / {b} 类有数据 · 24h {c}', { a: $td(d.with_data), b: $td(d.types.length), c: sum(d, 'changes_24h') }) }}</span>
             <span class="mbar"><i v-for="t in d.types" :key="t.name" :class="MATURITY_STYLE[t.maturity].cls" :title="t.label + $t('：') + t.maturity_label"></i></span>
           </button>
         </div>
@@ -52,22 +52,22 @@
 
     <section v-if="openDomain" class="card">
       <div class="card-head"><h2><i class="dot" :style="{ background: DOMAIN_COLOR[openDomain.domain] }"></i> {{ $td(openDomain.label) }}</h2>
-        <span class="muted small">{{ $t('{a} · 点对象类型看对象列表', { a: openDomain.label_en }) }}</span>
+        <span class="muted small">{{ $t('{a} · 点对象类型看对象列表', { a: $td(openDomain.label_en) }) }}</span>
         <button class="more btn ghost" @click="open = ''">{{ $t('收起') }}</button></div>
       <div class="types">
         <component :is="t.hidden ? 'div' : 'router-link'" v-for="t in openDomain.types" :key="t.name" class="type" :class="[MATURITY_STYLE[t.maturity].cls, { hidden: t.hidden }]"
           :to="t.hidden ? undefined : '/ont/' + t.name">
-          <b>{{ $td(t.label) }}</b> <span class="muted small">{{ t.label_en }}</span>
+          <b>{{ $td(t.label) }}</b> <span class="muted small">{{ $td(t.label_en) }}</span>
           <span class="tcount mono">{{ t.hidden ? $t('无权限') : t.count.toLocaleString() }}</span>
-          <span class="small muted">{{ t.maturity_label }}<template v-if="t.changes_24h"> {{ $t('· 24h {a} 次变化', { a: t.changes_24h }) }}</template></span>
+          <span class="small muted">{{ $td(t.maturity_label) }}<template v-if="t.changes_24h"> {{ $t('· 24h {a} 次变化', { a: $td(t.changes_24h) }) }}</template></span>
           <span class="small muted src">{{ (t.sources || []).join($t('、')) || '—' }}</span>
         </component>
       </div>
     </section>
 
     <section class="card health small muted" v-if="health">
-      {{ $t('同步状态：已处理到第 {a} 条总线消息，落后 {b} 条，延迟 {c} 秒', { a: health.cursor?.toLocaleString(), b: health.behind, c: health.lag_s }) }}
-      <template v-if="health.errors"> · <span class="bad">{{ $t('跳过 {a} 条（{b}）', { a: health.errors, b: health.last_error }) }}</span></template>
+      {{ $t('同步状态：已处理到第 {a} 条总线消息，落后 {b} 条，延迟 {c} 秒', { a: health.cursor?.toLocaleString(), b: $td(health.behind), c: $td(health.lag_s) }) }}
+      <template v-if="health.errors"> · <span class="bad">{{ $t('跳过 {a} 条（{b}）', { a: $td(health.errors), b: $td(health.last_error) }) }}</span></template>
       <button v-if="canReplay" class="btn ghost sm" :disabled="replaying" @click="replay">{{ replaying ? $t('重建中…') : $t('从头重建本体') }}</button>
     </section>
   </div>

@@ -7,12 +7,12 @@
     <div v-if="err" class="err">{{ err }}</div>
 
     <section v-if="kp" class="kpis" data-help="maint-kpis">
-      <div class="card k"><span class="small muted">{{ $t('保养逾期的设备') }}</span><b :class="{ bad: kp.overdue }">{{ kp.overdue }}</b>
+      <div class="card k"><span class="small muted">{{ $t('保养逾期的设备') }}</span><b :class="{ bad: kp.overdue }">{{ $td(kp.overdue) }}</b>
         <span class="small muted">{{ kp.overdue_units.map((u) => u.toUpperCase()).join($t('、')) || '—' }}</span></div>
-      <div class="card k"><span class="small muted">{{ $t('开着的维修单') }}</span><b>{{ kp.open_repairs }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('开着的维修单') }}</span><b>{{ $td(kp.open_repairs) }}</b></div>
       <div class="card k"><span class="small muted">{{ $t('近 7 天故障停机') }}</span><b>{{ Math.round(kp.failure_down_7d) }}</b><span class="small muted">{{ $t('分钟') }}</span></div>
       <div class="card k"><span class="small muted">{{ $t('平均故障间隔') }}</span><b>{{ kp.mtbf ?? '—' }}</b><span class="small muted">{{ $t('运行小时（近 30 天）') }}</span></div>
-      <div class="card k"><span class="small muted">{{ $t('点检异常待处理') }}</span><b>{{ kp.open_inspections }}</b></div>
+      <div class="card k"><span class="small muted">{{ $t('点检异常待处理') }}</span><b>{{ $td(kp.open_inspections) }}</b></div>
     </section>
 
     <!-- ① 台账 -->
@@ -24,17 +24,17 @@
       </div>
       <div class="card" data-help="maint-assets">
         <table class="tbl small"><thead><tr><th>{{ $t('设备') }}</th><th>{{ $t('资产号') }}</th><th class="num">{{ $t('原值') }}</th><th class="num">{{ $t('自上次保养') }}</th><th class="num">{{ $t('周期') }}</th><th>{{ $t('保养') }}</th>
-          <th class="num">{{ $t('未来 {a} 运行小时坏的概率', { a: as.horizon_h }) }}</th><th class="num">{{ $t('预期损失') }}</th><th class="num">{{ $t('近 30 天故障') }}</th><th></th></tr></thead>
+          <th class="num">{{ $t('未来 {a} 运行小时坏的概率', { a: $td(as.horizon_h) }) }}</th><th class="num">{{ $t('预期损失') }}</th><th class="num">{{ $t('近 30 天故障') }}</th><th></th></tr></thead>
           <tbody><tr v-for="a in as.assets" :key="a.unit" :class="{ sel: sel === a.unit }">
             <td><b>{{ a.unit.toUpperCase() }}</b> {{ $td(a.name) }} <span v-if="a.locked">🔒</span></td><td class="mono">{{ a.asset || $t('（建档中）') }}</td>
-            <td class="num">${{ (a.value || 0).toLocaleString() }}</td><td class="num">{{ a.run_h }} h</td><td class="num">{{ a.pm_h }} h</td>
-            <td><span v-if="a.overdue_h" class="pill bad">{{ $t('逾期 {a} h', { a: a.overdue_h }) }}</span><span v-else-if="a.due_in_h < 50" class="pill warn">{{ $t('{a} h 后到期', { a: a.due_in_h }) }}</span>
-              <span v-else class="muted">{{ $t('{a} h 后', { a: a.due_in_h }) }}</span></td>
+            <td class="num">${{ (a.value || 0).toLocaleString() }}</td><td class="num">{{ $td(a.run_h) }} h</td><td class="num">{{ $td(a.pm_h) }} h</td>
+            <td><span v-if="a.overdue_h" class="pill bad">{{ $t('逾期 {a} h', { a: $td(a.overdue_h) }) }}</span><span v-else-if="a.due_in_h < 50" class="pill warn">{{ $t('{a} h 后到期', { a: $td(a.due_in_h) }) }}</span>
+              <span v-else class="muted">{{ $t('{a} h 后', { a: $td(a.due_in_h) }) }}</span></td>
             <td class="num" :class="{ bad: a.p_fail >= 0.2 }">{{ (a.p_fail * 100).toFixed(1) }}%</td><td class="num">${{ Math.round(a.expected_loss_usd) }}</td>
-            <td class="num">{{ a.failures_30d }}</td><td><button class="linkbtn" @click="open(a.unit)">{{ $t('详情') }}</button></td></tr></tbody></table>
+            <td class="num">{{ $td(a.failures_30d) }}</td><td><button class="linkbtn" @click="open(a.unit)">{{ $t('详情') }}</button></td></tr></tbody></table>
       </div>
       <section v-if="dt" class="card">
-        <div class="card-head"><h2>{{ dt.unit.toUpperCase() }} {{ $td(dt.name) }}</h2><span class="small muted">{{ $t('保养：{a}（停 {b} 分钟）', { a: dt.pm_text, b: dt.pm_minutes }) }}</span></div>
+        <div class="card-head"><h2>{{ dt.unit.toUpperCase() }} {{ $td(dt.name) }}</h2><span class="small muted">{{ $t('保养：{a}（停 {b} 分钟）', { a: $td(dt.pm_text), b: $td(dt.pm_minutes) }) }}</span></div>
         <div class="two">
           <div>
             <svg :viewBox="`0 0 ${W} ${Hh}`" class="curve" role="img" :aria-label="$t('累计故障概率曲线')">
@@ -46,12 +46,12 @@
               <text x="2" y="12" class="t">100%</text><text x="8" :y="Hh - 22" class="t">0</text>
               <text :x="W - 60" :y="Hh - 6" class="t">{{ $t('运行小时') }}</text>
             </svg>
-            <p class="small muted">{{ $t('F(t) = 1 − exp(−(t/η)^β)，β = {a}，η = {b} 小时（可靠性系数 {c}）', { a: dt.risk.beta, b: dt.risk.eta_h, c: dt.risk.factor }) }}</p>
+            <p class="small muted">{{ $t('F(t) = 1 − exp(−(t/η)^β)，β = {a}，η = {b} 小时（可靠性系数 {c}）', { a: $td(dt.risk.beta), b: $td(dt.risk.eta_h), c: $td(dt.risk.factor) }) }}</p>
           </div>
           <div class="small">
-            <p>{{ $t('自上次保养已运行') }} <b>{{ dt.risk.run_h }}</b> {{ $t('小时，周期 {a} 小时{b}。', { a: dt.risk.pm_h, b: dt.risk.overdue_h ? $t('，逾期 ') + dt.risk.overdue_h + $t(' 小时') : '' }) }}</p>
-            <p>{{ $t('未来 {a} 运行小时坏掉的概率', { a: dt.risk.horizon_h }) }} <b>{{ (dt.risk.p_fail * 100).toFixed(1) }}%</b>{{ $t('；保养后同样时间 {a}%。', { a: (dt.risk.p_after_pm * 100).toFixed(1) }) }}</p>
-            <p>{{ $t('坏一次：修理 ${a} + 停机 {b} 分钟损失 ${c}；预期损失', { a: dt.risk.repair_usd, b: dt.risk.mttr_min, c: dt.risk.lost_usd }) }} <b>${{ Math.round(dt.risk.expected_loss_usd) }}</b>{{ $t('。一次保养约 ${a}。', { a: dt.risk.pm_usd }) }}</p>
+            <p>{{ $t('自上次保养已运行') }} <b>{{ $td(dt.risk.run_h) }}</b> {{ $t('小时，周期 {a} 小时{b}。', { a: $td(dt.risk.pm_h), b: dt.risk.overdue_h ? $t('，逾期 ') + dt.risk.overdue_h + $t(' 小时') : '' }) }}</p>
+            <p>{{ $t('未来 {a} 运行小时坏掉的概率', { a: $td(dt.risk.horizon_h) }) }} <b>{{ (dt.risk.p_fail * 100).toFixed(1) }}%</b>{{ $t('；保养后同样时间 {a}%。', { a: (dt.risk.p_after_pm * 100).toFixed(1) }) }}</p>
+            <p>{{ $t('坏一次：修理 ${a} + 停机 {b} 分钟损失 ${c}；预期损失', { a: $td(dt.risk.repair_usd), b: $td(dt.risk.mttr_min), c: $td(dt.risk.lost_usd) }) }} <b>${{ Math.round(dt.risk.expected_loss_usd) }}</b>{{ $t('。一次保养约 ${a}。', { a: $td(dt.risk.pm_usd) }) }}</p>
             <p>{{ $t('故障模式：{a}', { a: dt.modes.map((m) => m[1] + (m[2] ? $t('（') + m[2] + $t('）') : '')).join($t('、')) }) }}</p>
             <p>{{ $t('平均故障间隔：{a} 运行小时 · ERPNext 资产 {b} · 维护计划 {c}', { a: dt.mtbf ?? '—', b: dt.asset?.name || '—', c: dt.maintenance?.name || '—' }) }}</p>
             <p><a :href="`/api/maint/qr/${dt.unit}.svg`" target="_blank">{{ $t('打印点检二维码') }}</a></p>
@@ -61,7 +61,7 @@
         </div>
         <h3>{{ $t('最近的故障') }}</h3>
         <table v-if="dt.failures.length" class="tbl small"><thead><tr><th>{{ $t('时间') }}</th><th>{{ $t('故障') }}</th><th class="num">{{ $t('运行小时') }}</th><th class="num">{{ $t('停机（分钟）') }}</th><th>{{ $t('维修单') }}</th></tr></thead>
-          <tbody><tr v-for="f in dt.failures" :key="f.id"><td>{{ fmtTs(f.at) }}</td><td>{{ $td(f.name) }}</td><td class="num">{{ f.run_h ?? '—' }}</td><td class="num">{{ f.down_min }}</td>
+          <tbody><tr v-for="f in dt.failures" :key="f.id"><td>{{ fmtTs(f.at) }}</td><td>{{ $td(f.name) }}</td><td class="num">{{ f.run_h ?? '—' }}</td><td class="num">{{ $td(f.down_min) }}</td>
             <td>{{ f.repair_id ? 'MR-' + String(f.repair_id).padStart(5, '0') : '—' }}</td></tr></tbody></table>
         <p v-else class="small muted">{{ $t('没有故障记录。') }}</p>
       </section>
@@ -71,9 +71,9 @@
     <template v-if="tab === 'pm' && rp">
       <p class="small muted">{{ $t('保养在厂情中枢里排：保养逾期（M2）、故障风险高（M4）的异常右栏有“现在保养 / 下班后保养 / 不做”三个方案，采纳后生成保养工单，到时间自动挂牌上锁。') }}</p>
       <table class="tbl small card" data-help="maint-pm"><thead><tr><th>{{ $t('保养单') }}</th><th>{{ $t('设备') }}</th><th>{{ $t('状态') }}</th><th class="num">{{ $t('时长') }}</th><th class="num">{{ $t('保养时运行小时') }}</th><th>{{ $t('做的人 / 验收') }}</th><th></th></tr></thead>
-        <tbody><tr v-for="p in rp.pms" :key="p.id"><td class="mono">{{ p.key }}</td><td>{{ p.unit.toUpperCase() }}</td>
+        <tbody><tr v-for="p in rp.pms" :key="p.id"><td class="mono">{{ $td(p.key) }}</td><td>{{ p.unit.toUpperCase() }}</td>
           <td><span class="pill" :class="{ closed: 'good', fixed: 'info', doing: 'warn' }[p.status] || 'mute'">{{ $td(p.status_label) }}</span></td>
-          <td class="num">{{ $t('{a} 分钟{b}', { a: p.minutes, b: p.delay_minutes ? $t('（') + p.delay_minutes + $t(' 分钟后）') : '' }) }}</td><td class="num">{{ p.run_h ?? '—' }}</td>
+          <td class="num">{{ $t('{a} 分钟{b}', { a: $td(p.minutes), b: p.delay_minutes ? $t('（') + p.delay_minutes + $t(' 分钟后）') : '' }) }}</td><td class="num">{{ p.run_h ?? '—' }}</td>
           <td>{{ p.fixed_by || '—' }} / {{ p.verified_by || '—' }}</td>
           <td><button v-if="rp.can_manage && p.status === 'doing'" class="linkbtn" @click="pmDone(p)">{{ $t('保养完成') }}</button>
             <button v-if="rp.can_verify && p.status === 'fixed'" class="linkbtn" @click="pmVerify(p)">{{ $t('验收解锁') }}</button></td></tr></tbody></table>
@@ -98,7 +98,7 @@
       </div>
       <div v-if="ins" class="card"><h3>{{ $t('最近的点检') }}</h3>
         <table class="tbl small"><thead><tr><th>{{ $t('编号') }}</th><th>{{ $t('设备') }}</th><th>{{ $t('时间') }}</th><th>{{ $t('点检人') }}</th><th>{{ $t('结果') }}</th><th></th></tr></thead>
-          <tbody><tr v-for="x in ins.inspections" :key="x.id"><td class="mono">{{ x.key }}</td><td>{{ x.unit.toUpperCase() }}</td><td>{{ fmtTs(x.at) }}</td><td>{{ x.by_name }}</td>
+          <tbody><tr v-for="x in ins.inspections" :key="x.id"><td class="mono">{{ $td(x.key) }}</td><td>{{ x.unit.toUpperCase() }}</td><td>{{ fmtTs(x.at) }}</td><td>{{ $td(x.by_name) }}</td>
             <td><span v-if="!x.abnormal.length" class="muted">{{ $t('正常') }}</span><span v-else class="bad">{{ $t('异常：{a}', { a: x.abnormal.map((a) => a.item).join($t('、')) }) }}</span>
               <span v-if="x.status === 'handled'" class="pill info">{{ $t('已开维修单') }}</span><span v-if="x.status === 'watch'" class="pill mute">{{ $t('观察') }}</span></td>
             <td><template v-if="ins.can_manage && x.status === 'open'"><button class="linkbtn" @click="toRepair(x)">{{ $t('开维修单') }}</button><button class="linkbtn" @click="watchIt(x)">{{ $t('先观察') }}</button></template></td></tr></tbody></table></div>
@@ -107,9 +107,9 @@
     <!-- ④ 维修与备件 -->
     <template v-if="tab === 'repairs' && rp">
       <div class="card"><h3>{{ $t('备件') }}</h3>
-        <span v-for="s in rp.spares" :key="s.item_code" class="pill" :class="s.stock < s.min ? 'bad' : 'mute'">{{ $t('{a}：{b}（最低 {c}）', { a: s.item_code, b: s.stock, c: s.min }) }}</span></div>
+        <span v-for="s in rp.spares" :key="s.item_code" class="pill" :class="s.stock < s.min ? 'bad' : 'mute'">{{ $t('{a}：{b}（最低 {c}）', { a: $td(s.item_code), b: $td(s.stock), c: $td(s.min) }) }}</span></div>
       <table class="tbl small card"><thead><tr><th>{{ $t('维修单') }}</th><th>{{ $t('设备') }}</th><th>{{ $t('内容') }}</th><th>{{ $t('备件') }}</th><th>{{ $t('状态') }}</th><th>ERPNext</th><th>{{ $t('维修 / 验收') }}</th><th></th></tr></thead>
-        <tbody><tr v-for="r in rp.repairs" :key="r.id"><td class="mono">{{ r.key }}</td><td>{{ r.unit.toUpperCase() }}</td><td>{{ $td(r.title) }}</td>
+        <tbody><tr v-for="r in rp.repairs" :key="r.id"><td class="mono">{{ $td(r.key) }}</td><td>{{ r.unit.toUpperCase() }}</td><td>{{ $td(r.title) }}</td>
           <td>{{ (r.parts || []).map((p) => p.item_code + ' × ' + p.qty).join($t('、')) || '—' }}</td>
           <td><span class="pill" :class="{ closed: 'good', fixed: 'info', waiting_parts: 'bad', doing: 'warn' }[r.status] || 'mute'">{{ $td(r.status_label) }}</span></td>
           <td class="mono">{{ r.erp_repair || '—' }}</td><td>{{ r.fixed_by || '—' }} / {{ r.verified_by || '—' }}</td>
