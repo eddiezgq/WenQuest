@@ -254,7 +254,7 @@ class Seeder:
         self.log("工作中心、工序与工艺路线")
         for ws, (capacity, costs) in D.WORKSTATIONS.items():
             self.ensure("Workstation", ws, {
-                "workstation_name": ws, "production_capacity": capacity,
+                "workstation_name": ws, "production_capacity": max(capacity, D.WORKSTATION_PARALLEL.get(ws, capacity)),
                 "holiday_list": self.holiday_list,
                 "working_hours": [{"start_time": a, "end_time": b} for a, b in D.SHIFT],
                 "workstation_costs": [{"operating_component": comp, "operating_cost": cost}
