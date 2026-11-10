@@ -228,6 +228,22 @@ def main():
         return evs if any(e["data"].get("last_op") for e in evs) else None
     done = wait(finished, "10 根轴全部完工", A.timeout, 3)
     print("   用时 {:.0f} 秒".format(time.time() - t0))
+    if not done:                         # 诊断（第 134 轮）：每道工序做了几件、每台设备最后的状态（缺人、下班、故障、排队）
+        evs = [e["data"] for e in hub("GET", "/api/history?type=machine.event&corr={}&limit=500".format(wo), token=op)]
+        cnt = {}
+        for e in evs:
+            if e.get("event") in ("cycle_end", "op_complete"):
+                cnt.setdefault(e.get("operation"), {}).setdefault(e["event"], 0)
+                cnt[e.get("operation")][e["event"]] += 1
+        check(False, "诊断 每道工序：{}".format(json.dumps(cnt, ensure_ascii=False)))
+        last = {}
+        for m in hub("GET", "/api/history?type=machine.status&limit=400", token=op):
+            u = m["data"].get("unit") or m.get("source", "").split("/")[-1]
+            if u in {d["unit"] for d in rel} and u not in last:
+                last[u] = m["data"]
+        for u, x in sorted(last.items()):
+            check(False, "诊断 {}：{}".format(u, json.dumps({k: x.get(k) for k in ("state", "work_order", "operation", "qty_done", "queue", "off_shift",
+                                                                                  "staff_level", "no_staff", "alarm", "factory_ts")}, ensure_ascii=False)))
     check(done and len(done) == 7, "7 道工序全部完工")
     if REAL:
         # 真 ERPNext 每记一次工时要一两秒，桥接按顺序补记：等作业卡全部提交、完工入库做完再核对
@@ -782,6 +798,11 @@ def supply(teacher):
     kinds = [y["kind"] for y in o["options"]]
     check(o.get("supply") and kinds == ["none", "return", "alt", "concession"], "来料不合格四方案：{}；{}".format("、".join(y["label"] for y in o["options"]), o.get("reason")))
     alt = next(y for y in o["options"] if y["kind"] == "alt")
+    # 备选这一批定为合格（老师注入“下一批：正常”）：不注入时按合格率随机，偶尔不合格，后面“经营与财务”就等不到
+    # 来料合格 → 采购发票（11-07 运行 42344181422 就是这样超时，第 134 轮）
+    sup = next(c["supplier"] for c in alt["changes"] if c["type"] == "purchase_order")
+    r = hub("POST", "/api/supply/sim", {"supplier": sup, "bad": False}, teacher)
+    check("正常" in (r.get("text") or ""), "老师注入：{}".format(r.get("text")))
     a = hub("POST", "/api/ont/actions", {"changes": alt["changes"], "anomaly_id": an["id"]}, pl)
     for aid in a["ids"]:
         d = hub("POST", "/api/ont/actions/{}/approve".format(aid), {}, teacher)
@@ -797,7 +818,7 @@ def supply(teacher):
     sm = hub("GET", "/api/supply/lots/{}/sample".format(nl["id"]), token=qa)
     ok = all(p["min"] <= row[p["specification"]] <= p["max"] for row in sm["rows"] for p in sm["params"] if p["numeric"])
     r = hub("POST", "/api/supply/lots/{}/inspect".format(nl["id"]), {"accept": ok}, qa)
-    check(r["status"] == ("accepted" if ok else "rejected"), "备选这一批检验：{}".format("合格" if ok else "不合格（随机）"))
+    check(ok and r["status"] == "accepted", "备选这一批检验：{}".format("合格" if ok else "不合格（注入了正常，不该不合格）"))
     if ok:
         prs = wait(lambda: [p for p in erp_docs("Purchase Receipt") if p.get("docstatus") == 1 and (p.get("wq_lot") == nl["lot"] or nl["lot"] in str(p.get("remarks") or ""))],
                    "ERPNext 收货单提交", 120, 3)
