@@ -94,6 +94,11 @@ jobs:
               docker logs --since 4h "$c" 2>&1 | grep -B2 -A12 -E "Traceback|Error|login" | grep -v "^--$" | tail -25 | cut -c1-300
               docker exec "$c" sh -c "tail -n 40 /home/frappe/frappe-bench/logs/frappe.log 2>/dev/null | grep -A10 -E \"Traceback|Error\" | tail -20" 2>&1 | cut -c1-300
             done
+            b=$(docker ps --format "{{.Names}}" | grep -E "wq-factory-erp-backend" | head -1)
+            for s in erp.localhost c-sewing c-motor; do
+              echo "login-probe $s: $(docker exec "$b" curl -s -m 30 -o /tmp/lp.txt -w "%{http_code}" -H "Host: $s" -X POST -d usr=probe -d pwd=wrong http://localhost:8000/api/method/login 2>&1) $(docker exec "$b" sh -c "head -c 300 /tmp/lp.txt" 2>&1 | tr "\n" " ")"
+            done
+            docker exec "$b" sh -c "ls /home/frappe/frappe-bench/logs/ 2>&1 | head; tail -n 60 /home/frappe/frappe-bench/logs/*.error.log 2>/dev/null | grep -B3 -A8 -iE \"traceback|exception\" | tail -30" 2>&1 | cut -c1-300
             for c in $(docker ps --format "{{.Names}}" | grep -E "wq-factory-(redis|erp-redis)" | head -6); do echo "$c $(docker inspect -f "{{.State.Status}} restarts={{.RestartCount}}" $c)"; done
             free -m | head -2; uptime' 2>&1 \
             | sed 's/^/erp: /' | while IFS= read -r l; do echo "::notice::$l"; done
