@@ -631,6 +631,15 @@ def eto(teacher):
         planner = login("测试计划员", "planner")
         q = hub("POST", "/api/eto/jobs/{}/release".format(jn), {"work_order": top["name"]}, planner)
         hub("POST", "/api/proposals/{}/confirm".format(q["proposal_id"]), token=planner)
+        rp = hub("GET", "/api/proposals/" + q["proposal_id"], token=planner)
+        dis = (rp.get("result") or {}).get("dispatched") or []
+        check(rp["status"] == "executed" and dis, "作业工单下达车间：{} 道工序（{}）".format(len(dis), rp["status"]))
+        # 下达只是派工；和第 5 段一样，操作工逐道开工，车间才开始做
+        hub("POST", "/api/mes/cmd", {"unit": "sim", "command": "set_speed", "speed": A.speed}, teacher)
+        opr = login("测试操作工", "operator")
+        time.sleep(1)
+        for d in dis:
+            hub("POST", "/api/mes/cmd", {"unit": d["unit"], "command": "start", "work_order": top["name"], "operation": d["operation"]}, opr)
         c = wait(lambda: (lambda x: x if x["cost"]["actual"]["operations"] > 0 else None)(
             hub("GET", "/api/eto/jobs/{}/shop".format(jn), token=sales)), "车间报工计入作业成本", 600, 5)
         check(c is not None, "作业成本：实际工序 ${}（估算 ${}）".format((c or {}).get("cost", {}).get("actual", {}).get("operations"),
