@@ -66,6 +66,19 @@ function erpDatetime(iso) {
   return `${w.slice(0, 10)} ${w.slice(11, 19)}`;
 }
 const erpDate = (iso) => erpDatetime(iso).slice(0, 10);
+// ERPNext 的本地时间字符串加若干秒（不经时区换算：两边都是同一种本地时间）
+function shiftSeconds(local, sec) {
+  const t = new Date(Date.parse(String(local).slice(0, 19).replace(' ', 'T') + 'Z') + Math.round(sec * 1000)).toISOString();
+  return `${t.slice(0, 10)} ${t.slice(11, 19)}`;
+}
+// 417 工时重叠：从提示里取出冲突的那张作业卡（“… is overlapping with PO-JOB00005”）
+function overlapWith(e) {
+  if (!(e instanceof ErpError) || e.status !== 417) return null;
+  const text = `${e.message} ${JSON.stringify(e.body || {})}`.replace(/<[^>]+>/g, '');
+  if (!/OverlapError|overlapping/i.test(text)) return null;
+  const mm = text.match(/overlapping with\s+([A-Za-z0-9][A-Za-z0-9._-]*)/i);
+  return mm ? mm[1] : null;
+}
 
 class ErpError extends Error {
   constructor(status, message, body) {
@@ -729,9 +742,27 @@ class ERP {
       const logs = (doc.time_logs || []).map((l) => ({ from_time: l.from_time, to_time: l.to_time,
         completed_qty: l.completed_qty }));
       const start = d.factory_start_ts || new Date(Date.parse(d.factory_ts || m.ts) - d.cycle_time_s * 1000).toISOString();
-      logs.push({ from_time: erpDatetime(start), to_time: erpDatetime(d.factory_ts || m.ts), completed_qty: 1 });
-      const upd = await this.update('Job Card', jc, { time_logs: logs });
-      return [this.doc('Job Card', upd, 'updated', { corr: m.corr, mode: m.mode })];
+      let from = erpDatetime(start);
+      let to = erpDatetime(d.factory_ts || m.ts);
+      // 第 139 轮 139e0：工位上别的作业卡已经占了这段时间（教学情景重载后工厂时钟回到起点，和上一次情景的工时叠在一起），
+      // ERPNext 按工位台数拒收（417 重叠）。这时把这条工时顺延到冲突那张卡的最后一条工时之后，时长不变；最多顺延 6 次。
+      // 只改 ERPNext 里记的时段，总线上的事件（成本、节拍）照旧按仿真时间算
+      for (let k = 0; ; k++) {
+        try {
+          const upd = await this.update('Job Card', jc, { time_logs: [...logs, { from_time: from, to_time: to, completed_qty: 1 }] });
+          return [this.doc('Job Card', upd, 'updated', { corr: m.corr, mode: m.mode })];
+        } catch (e) {
+          const other = overlapWith(e);
+          if (!other || k >= 6) throw e;
+          const od = await this.get('Job Card', other);
+          const end = (od.time_logs || []).map((l) => l.to_time).sort().pop();
+          if (!end || end <= from) throw e;
+          const dur = Date.parse(to.replace(' ', 'T') + 'Z') - Date.parse(from.replace(' ', 'T') + 'Z');
+          from = shiftSeconds(end, 1);
+          to = shiftSeconds(from, dur / 1000);
+          this.log('作业卡工时与', other, '重叠，顺延到', from, '（', jc, d.operation, '）');
+        }
+      }
     });
   }
 
@@ -1068,4 +1099,4 @@ function summarize(doctype, d) {
   }
 }
 
-module.exports = { ERP, ErpError, summarize, erpDatetime, WH, QI_PARAM };
+module.exports = { ERP, ErpError, summarize, erpDatetime, WH, QI_PARAM, overlapWith, shiftSeconds };
