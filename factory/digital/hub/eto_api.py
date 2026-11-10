@@ -12,13 +12,14 @@ from hub import eto_mrp as EM
 from hub import eto_plan as EP
 from hub import eto_exec as EX
 from hub import eto_quality as EQ
+from hub import eto_billing as EB
 
 log = logging.getLogger("eto")
 ROLES = ("sales", "planner", "engineer", "manager", "approver")
 
 
 def mount(app, H, user_of, who, ai_quota=None):
-    for fn in (E.on_proposal_done, ED.on_proposal_done, EX.on_proposal_done, EQ.on_proposal_done):
+    for fn in (E.on_proposal_done, ED.on_proposal_done, EX.on_proposal_done, EQ.on_proposal_done, EB.on_proposal_done):
         if fn not in _ai.ON_PROPOSAL_DONE:
             _ai.ON_PROPOSAL_DONE.append(fn)
 
@@ -334,3 +335,33 @@ def mount(app, H, user_of, who, ai_quota=None):
             return EQ.certificate(j, EQ.plan_approved(H.db, u["mode"], job_no), EQ.records(H.db, u["mode"], job_no),
                                   ED.released(H.db, u["mode"], job_no))
         return guard(run)
+
+    # ------------------------------------------------------------ 139g：按里程碑分期开票、客户验收、收付与毛利
+    @app.get("/api/eto/jobs/{job_no}/billing")
+    def eto_billing(job_no: str, u=Depends(user_of)):
+        def run():
+            j = E.job(H.db, u["mode"], job_no)
+            if not j:
+                raise KeyError(job_no)
+            acc = H.db.one("select day, note, who from eto_accept where mode=%s and job_no=%s", (u["mode"], job_no))
+            return {"milestones": EB.milestones(H.db, u["mode"], job_no),
+                    "money": EB.money(H.db, u["mode"], job_no, EX.cost(H.db, u["mode"], job_no) if j.get("sales_order") else None),
+                    "accepted": {"day": acc["day"].isoformat(), "note": acc["note"], "who": acc["who"]} if acc else None,
+                    "sales_order": j.get("sales_order"), "delivery_note": j.get("delivery_note")}
+        return guard(run)
+
+    @app.post("/api/eto/jobs/{job_no}/invoice")
+    def eto_invoice(job_no: str, body: dict = Body(...), u=Depends(user_of)):
+        """里程碑到了的那一期：销售发票提议；人确认后桥接在 ERPNext 开票"""
+        can(u)
+        pv = guard(lambda: EB.invoice_preview(H.db, u["mode"], job_no, body.get("key")))
+        r = propose(u, "eto_invoice", pv, "开票 {}：{} {}% ${:,.2f}".format(job_no, pv["description"], pv["pct"], pv["amount"]))
+        EB.mark_invoicing(H.db, u["mode"], pv, r["proposal_id"])
+        return r
+
+    @app.post("/api/eto/jobs/{job_no}/accept")
+    def eto_accept(job_no: str, body: dict = Body(default={}), u=Depends(user_of)):
+        """客户验收：发货后登记验收日期（验收那一期才能开票）"""
+        can(u)
+        guard(lambda: EB.accept(H.db, u["mode"], job_no, body.get("day"), body.get("note"), who(u)))
+        return eto_billing(job_no, u)

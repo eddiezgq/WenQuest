@@ -1033,7 +1033,7 @@ function summarize(doctype, d) {
     case 'Purchase Order':
       return { ...pick(['supplier', 'status', 'docstatus']), ...projectOf(d),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, received_qty: i.received_qty || 0,
-          schedule_date: i.schedule_date })) };
+          schedule_date: i.schedule_date, ...(i.rate !== undefined ? { rate: i.rate } : {}) })) };
     case 'Job Card':
       return pick(['work_order', 'operation', 'workstation', 'for_quantity', 'total_completed_qty', 'total_time_in_mins',
         'status', 'docstatus', 'quality_inspection']);

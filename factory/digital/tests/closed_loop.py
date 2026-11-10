@@ -586,6 +586,28 @@ def eto(teacher):
     j = hub("GET", "/api/eto/jobs/" + jn, token=sales)["job"]
     so = [x for x in erp_docs("Sales Order") if x.get("name") == j.get("sales_order")]
     check(j["status"] == "ordered" and so and so[0].get("project") == j["project"], "作业已接单：销售订单 {}，挂项目 {}".format(j.get("sales_order"), j["project"]))
+    # 139g：订单确认那一期（订金）开票；发货那一期还没到，挡住
+    bl = hub("GET", "/api/eto/jobs/{}/billing".format(jn), token=sales)
+    due = [m for m in bl["milestones"] if m["state"] == "due"]
+    later = [m for m in bl["milestones"] if m["state"] == "waiting"]
+    check(due and later, "分期开票：到了的 {}，没到的 {}".format([m["key"] for m in due], [m["key"] for m in later]))
+    if later:
+        try:
+            hub("POST", "/api/eto/jobs/{}/invoice".format(jn), {"key": later[0]["key"]}, sales)
+            check(False, "里程碑没到的一期不能开票")
+        except RuntimeError as e:
+            check("409" in str(e), "里程碑没到的一期不能开票（{}）".format(str(e)[-60:]))
+    if due:
+        q = hub("POST", "/api/eto/jobs/{}/invoice".format(jn), {"key": due[0]["key"]}, sales)
+        hub("POST", "/api/proposals/{}/confirm".format(q["proposal_id"]), token=sales)
+        p = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(
+            hub("GET", "/api/proposals/" + q["proposal_id"], token=sales)), "分期发票", 120, 2)
+        check(p is not None and p["status"] == "executed", "第一期发票提议执行：{}".format(p and p.get("result")))
+        bl = wait(lambda: (lambda x: x if x["milestones"][0]["invoice"] else None)(
+            hub("GET", "/api/eto/jobs/{}/billing".format(jn), token=sales)), "分期发票记回作业", 60, 2)
+        si = [x for x in erp_docs("Sales Invoice") if bl and x.get("name") == bl["milestones"][0]["invoice"]]
+        check(si and abs(float(si[0]["grand_total"]) - float(due[0]["payment_amount"])) < 0.01,
+              "ERPNext 销售发票 {}：${}（本期 {}%）".format(si and si[0]["name"], si and si[0]["grand_total"], due[0]["invoice_portion"]))
     spec = hub("POST", "/api/eto/jobs/{}/design/draft".format(jn), token=sales)
     d = hub("PUT", "/api/eto/jobs/{}/design".format(jn), {"spec": spec}, sales)
     check(not d["errors"], "照估算起草设计、检查通过（{}）".format(d["errors"][:2]))
