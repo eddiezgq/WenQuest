@@ -595,6 +595,10 @@ def eto(teacher):
     boms = [x for x in erp_docs("BOM") if x.get("item") == jn and x.get("docstatus") == 1]
     check(d["design"]["status"] == "released" and any(b.get("wq_fingerprint") == fp for b in boms),
           "设计第 {} 版已发布，ERPNext 物料清单带指纹 {}".format(d["design"]["rev"], (fp or "")[:12]))
+    # 139c：作业算料 → 工单（挂作业号）
+    run("materials", "作业算料提议执行（工单、请购挂作业号）")
+    wos = [x for x in erp_docs("Work Order") if x.get("project") == jn and x.get("docstatus") == 1]
+    check(any(x.get("production_item") == jn for x in wos), "ERPNext 里有作业 {} 的工单（{}）".format(jn, "、".join(x["name"] for x in wos)))
 
 
 def safety(teacher):

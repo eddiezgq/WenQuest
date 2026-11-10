@@ -44,6 +44,7 @@ export const BATCH2 = [
   'pages/Configurator.vue',
   'pages/Eto.vue',                 // 第 139 轮
   'components/EtoDesign.vue',
+  'components/EtoMaterials.vue',
   'pages/WaferMap.vue',
   'pages/EncCurve.vue',
   'pages/MotorWave.vue',

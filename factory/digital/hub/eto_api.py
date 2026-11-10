@@ -7,6 +7,7 @@ from fastapi import Body, Depends, HTTPException
 from hub import ai as _ai
 from hub import eto as E
 from hub import eto_design as ED
+from hub import eto_mrp as EM
 
 log = logging.getLogger("eto")
 ROLES = ("sales", "planner", "engineer", "manager", "approver")
@@ -152,3 +153,32 @@ def mount(app, H, user_of, who, ai_quota=None):
         pv = guard(lambda: ED.release_preview(H.db, u["mode"], job_no))
         return propose(u, "eto_release", pv, "设计发布 {} 第 {} 版（{} 个新物料、{} 组物料清单）".format(
             job_no, pv["job"]["rev"], len(pv["items"]), len(pv["boms"])))
+
+    # ------------------------------------------------------------ 139c：作业算料、长周期件提前采购
+    @app.get("/api/eto/jobs/{job_no}/materials")
+    def eto_materials(job_no: str, u=Depends(user_of)):
+        """算料预览（不下单）"""
+        return guard(lambda: EM.plan(H.db, u["mode"], job_no))
+
+    @app.post("/api/eto/jobs/{job_no}/materials")
+    def eto_materials_propose(job_no: str, u=Depends(user_of)):
+        """算料 → 提议：工单、请购单都挂作业号；人确认后桥接写入 ERPNext"""
+        can(u)
+        if ED.pending(H.db, u["mode"], "eto_materials", job_no):
+            raise HTTPException(409, "已经有一份算料提议在等确认")
+        pv = guard(lambda: EM.plan(H.db, u["mode"], job_no))
+        if not pv["work_orders"] and not pv["material_requests"]:
+            raise HTTPException(409, "都够用了：没有要下的工单和请购")
+        return propose(u, "eto_materials", pv, "作业算料 {}：工单 {} 张、请购 {} 项".format(
+            job_no, len(pv["work_orders"]), len(pv["material_requests"])))
+
+    @app.get("/api/eto/jobs/{job_no}/early-buy")
+    def eto_early_candidates(job_no: str, u=Depends(user_of)):
+        return EM.early_candidates(H.db, u["mode"], job_no)
+
+    @app.post("/api/eto/jobs/{job_no}/early-buy")
+    def eto_early_buy(job_no: str, body: dict = Body(...), u=Depends(user_of)):
+        """长周期件提前采购（设计发布前）：单独的提议，人确认"""
+        can(u)
+        pv = guard(lambda: EM.early_buy_preview(H.db, u["mode"], job_no, list(body.get("items") or [])))
+        return propose(u, "eto_early_buy", pv, "提前采购 {}：{}".format(job_no, "、".join(r["item_code"] for r in pv["material_requests"])))

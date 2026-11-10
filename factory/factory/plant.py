@@ -202,6 +202,8 @@ def _validate_eto(e):
             need(_num(e[k]) and 0 <= e[k] <= hi, k, "0–{} 的百分数".format(hi))
     if e.get("engineering_rate_per_h") is not None:
         need(_num(e["engineering_rate_per_h"]) and e["engineering_rate_per_h"] >= 0, "engineering_rate_per_h", "设计每小时费率，≥ 0")
+    if e.get("long_lead_days") is not None:
+        need(isinstance(e["long_lead_days"], int) and 0 < e["long_lead_days"] <= 365, "long_lead_days", "提前期达到多少天算长周期件（可在设计发布前先买），1–365")
     if e.get("valid_days") is not None:
         need(isinstance(e["valid_days"], int) and 0 < e["valid_days"] <= 365, "valid_days", "报价有效天数 1–365")
     ms = e.get("milestones")

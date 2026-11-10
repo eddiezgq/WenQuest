@@ -6286,5 +6286,19 @@
 "确认后在 ERPNext 建销售订单：单价按报出去的那一版，挂项目，付款计划按里程碑。": "On confirmation ERPNext gets a sales order at the quoted price, linked to the project, with the milestone payment schedule.",
 "设计（物料清单与工艺）": "Design (BOM and routing)",
 "销售订单 {s}": "Sales order {s}",
-"已发布": "Released"
+"已发布": "Released",
+"专用": "job",
+"层": "Level",
+"当前设计里没有长周期件。": "No long-lead items in the current design.",
+"按设计第 {r} 版算料": "Materials for design rev {r}",
+"提前期 {d} 天": "lead time {d} days",
+"本作业已有": "Already on this job",
+"生成提前采购提议": "Create early-buy proposal",
+"生成算料提议": "Create materials proposal",
+"自由库存": "Free stock",
+"设计发布前，提前期 ≥ {d} 天的外购件、原材料可以先请购（挂作业号，单独确认）。": "Before the design is released, bought-out parts and raw materials with lead time ≥ {d} days can be requested early (on the job, confirmed separately).",
+"重新算": "Recalculate",
+"长周期件提前采购": "Early buy of long-lead items",
+"作业 {j}（设计第 {r} 版）：工单、请购单都挂作业号，专料专用。": "Job {j} (design rev {r}): work orders and material requests all carry the job number; materials are reserved for the job.",
+"设计第 {r} 版还没发布：这些长周期件先请购，设计改了要人处理这些请购单。": "Design rev {r} is not released yet: these long-lead items are requested early; if the design changes, someone must handle these requests."
 }

@@ -6,6 +6,19 @@
 // 共有文件（问渠与 freecad-ai-parts 两边一样）；erp.js 加载后，方法里的 this 是 ERP 实例。
 const erpToday = () => new Date().toISOString().slice(0, 10);
 
+
+// 请购单：每行挂作业号（Project）；仓库按物料类别（原材料库 / 外购件库；外协服务挂外购件库，不进库存）
+async function etoRequest(company, jn, rows, { out, created, opt }, WH) {
+  if (!(rows || []).length) return;
+  const today = new Date().toISOString().slice(0, 10);
+  const mr = await this.insert('Material Request', { material_request_type: 'Purchase', company, transaction_date: today,
+    schedule_date: rows.map((r) => r.schedule_date).sort()[0], docstatus: 1,
+    items: rows.map((r) => ({ item_code: r.item_code, qty: r.qty, schedule_date: r.schedule_date, project: jn,
+      warehouse: r.wh === 'raw' ? WH.raw : WH.purchased })) });
+  out.push(this.doc('Material Request', mr, 'submitted', opt));
+  created.push(['Material Request', mr.name]);
+}
+
 const WHK = { make: 'semi', buy: 'purchased', raw: 'raw' };
 
 module.exports = ({ WH }) => ({
@@ -101,4 +114,49 @@ module.exports = ({ WH }) => ({
       created.push(['BOM', doc.name]);
     }
   },
+
+  async eto_materials(pv, { out, created, opt }) {
+    const company = await this.getCompany();
+    const jn = pv.job.job_no;
+    for (const sv of pv.service_items || []) {          // 外协服务：不进库存的物料
+      if ((await this.list('Item', [['name', '=', sv.code]])).length) continue;
+      const grp = (await this.list('Item Group', [['is_group', '=', 0]], ['name'], { limit: 1 }))[0];
+      const it = await this.insert('Item', { item_code: sv.code, item_name: sv.name, stock_uom: 'Nos', is_stock_item: 0, is_purchase_item: 1,
+        description: `${sv.name}（按单设计 ${jn}）`, ...(grp ? { item_group: grp.name } : {}) });
+      out.push(this.doc('Item', it, 'created', opt));
+      created.push(['Item', it.name]);
+    }
+    for (const w of pv.work_orders || []) {
+      const top = w.production_item === pv.job.job_no;
+      if (!top) {
+        await this.ensureCustomField('Work Order', 'wq_sales_order', { label: '对应销售订单 For sales order',
+          fieldtype: 'Link', options: 'Sales Order', insert_after: 'sales_order', read_only: 1 });
+      }
+      const wo = await this.withBomOperations({ production_item: w.production_item, bom_no: await this.defaultBom(w.production_item),
+        qty: w.qty, company, project: jn, ...(top ? { sales_order: pv.job.sales_order } : { wq_sales_order: pv.job.sales_order }),
+        planned_start_date: `${w.planned_start_date} 08:00:00`, expected_delivery_date: w.expected_delivery_date, skip_transfer: 1,
+        source_warehouse: WH.raw, wip_warehouse: WH.wip, fg_warehouse: w.warehouse === 'fg' ? WH.fg : WH.semi, use_multi_level_bom: 0 });
+      if (w.sources) wo.required_items = (wo.required_items || []).map((r) => ({ ...r, source_warehouse: WH[w.sources[r.item_code]] || WH.raw }));
+      const doc = await this.insert('Work Order', { ...wo, docstatus: 1 });
+      out.push(this.doc('Work Order', doc, 'submitted', opt));
+      created.push(['Work Order', doc.name]);
+    }
+    await etoRequest.call(this, company, jn, pv.material_requests, { out, created, opt }, WH);
+  },
+
+  async eto_early_buy(pv, { out, created, opt }) {
+    const company = await this.getCompany();
+    for (const r of pv.material_requests) {          // 设计里的新外购件：先在 ERPNext 建物料
+      const it = r.new_item;
+      if (!it || (await this.list('Item', [['name', '=', it.code]])).length) continue;
+      const doc = await this.insert('Item', { item_code: it.code, item_name: it.name, item_group: it.item_group, stock_uom: it.uom,
+        is_stock_item: 1, is_purchase_item: 1, description: `${it.name}（按单设计 ${pv.job.job_no}）`,
+        item_defaults: [{ company, default_warehouse: it.kind === 'raw' ? WH.raw : WH.purchased }],
+        ...(it.price !== null && it.price !== undefined ? { valuation_rate: it.price } : {}), ...(it.lead ? { lead_time_days: it.lead } : {}) });
+      out.push(this.doc('Item', doc, 'created', opt));
+      created.push(['Item', doc.name]);
+    }
+    await etoRequest.call(this, company, pv.job.job_no, pv.material_requests, { out, created, opt }, WH);
+  },
+
 });
