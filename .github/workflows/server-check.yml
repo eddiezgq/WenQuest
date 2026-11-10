@@ -100,7 +100,7 @@ jobs:
             done
             for s in c-sensor c-sewing; do
               echo "errorlog $s:"
-              docker exec "$b" bench --site $s execute frappe.get_all --kwargs "{\"doctype\": \"Error Log\", \"fields\": [\"creation\", \"method\", \"error\"], \"limit\": 1, \"order_by\": \"creation desc\"}" 2>&1 | tr "\\\\" "\n" | grep -v "^n *$" | tail -30 | cut -c1-250
+              docker exec "$b" bench --site $s execute frappe.get_all --kwargs "{\"doctype\": \"Error Log\", \"fields\": [\"creation\", \"method\", \"error\"], \"limit\": 1, \"order_by\": \"creation desc\"}" 2>&1 | tr "\\\\" "\n" | grep -E "^n  File|line [0-9]+, in|creation|method" | head -40 | cut -c1-200
             done
             for c in $(docker ps --format "{{.Names}}" | grep -E "wq-factory-(redis|erp-redis)" | head -6); do echo "$c $(docker inspect -f "{{.State.Status}} restarts={{.RestartCount}}" $c)"; done
             free -m | head -2; uptime' 2>&1 \
