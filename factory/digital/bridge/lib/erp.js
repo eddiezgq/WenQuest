@@ -979,21 +979,28 @@ class ERP {
 }
 
 // erp.doc 的 data：只放看板和 AI 需要的字段
+// 第 139 轮：请购单、采购单的项目（作业号）记在明细行上
+function projectOf(d) {
+  const p = (d.items || []).map((i) => i.project).find(Boolean) || d.project;
+  return p ? { project: p } : {};
+}
+
 function summarize(doctype, d) {
   const pick = (keys) => Object.fromEntries(keys.filter((k) => d[k] !== undefined).map((k) => [k, d[k]]));
   switch (doctype) {
     case 'Sales Order':
-      return { ...pick(['customer', 'delivery_date', 'transaction_date', 'status', 'docstatus', 'per_delivered']),
+      return { ...pick(['customer', 'delivery_date', 'transaction_date', 'status', 'docstatus', 'per_delivered', 'project']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, delivered_qty: i.delivered_qty || 0, rate: i.rate })), ...pick(['per_billed']) };
     case 'Work Order':
       return { ...pick(['production_item', 'qty', 'produced_qty', 'status', 'docstatus', 'bom_no',
-        'expected_delivery_date']), planned_start_date: String(d.planned_start_date || '').slice(0, 10),
+        'expected_delivery_date', 'project']), planned_start_date: String(d.planned_start_date || '').slice(0, 10),
         ...((d.sales_order || d.wq_sales_order) ? { sales_order: d.sales_order || d.wq_sales_order } : {}) };
     case 'Material Request':
       return { ...pick(['material_request_type', 'status', 'docstatus', 'transaction_date', 'schedule_date']),
+        ...projectOf(d),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, schedule_date: i.schedule_date })) };
     case 'Purchase Order':
-      return { ...pick(['supplier', 'status', 'docstatus']),
+      return { ...pick(['supplier', 'status', 'docstatus']), ...projectOf(d),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, received_qty: i.received_qty || 0,
           schedule_date: i.schedule_date })) };
     case 'Job Card':

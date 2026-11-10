@@ -63,6 +63,34 @@
           </table>
           <p class="muted small">{{ t('确认后在 ERPNext 建：项目 {p}（作业号）、物料 {i}、报价单（条款写数量阶梯和付款条件）。', { p: pv.project.project_name, i: pv.item.item_code }) }}</p>
         </template>
+        <template v-if="p.action === 'eto_order'">
+          <table class="t"><tbody>
+            <tr><td>{{ t('作业号') }}</td><td class="mono">{{ pv.job.job_no }}</td><td>{{ t('客户') }}</td><td>{{ bi(pv.sales_order.customer) }}</td></tr>
+            <tr><td>{{ t('订单') }}</td><td class="mono">{{ pv.sales_order.qty }} × {{ money(pv.sales_order.rate) }} = {{ money(pv.sales_order.amount) }}</td>
+              <td>{{ t('交期') }}</td><td class="mono">{{ pv.sales_order.delivery_date }}</td></tr>
+          </tbody></table>
+          <h3>{{ t('付款计划') }}</h3>
+          <table class="t">
+            <thead><tr><th>{{ t('名称') }}</th><th class="num">{{ t('比例') }}</th><th class="num">{{ t('金额') }}</th><th>{{ t('计划日期') }}</th></tr></thead>
+            <tbody><tr v-for="m in pv.sales_order.payment_schedule" :key="m.key"><td>{{ bi(m.description) }}</td><td class="num">{{ m.invoice_portion }}%</td>
+              <td class="num mono">{{ money(m.payment_amount) }}</td><td class="mono">{{ m.due_date }}</td></tr></tbody>
+          </table>
+          <p class="muted small">{{ t('确认后在 ERPNext 建销售订单（引用报价单 {q}、挂项目 {p}）。各期到了里程碑才开票。', { q: pv.sales_order.quotation, p: pv.sales_order.project }) }}</p>
+        </template>
+        <template v-if="p.action === 'eto_release'">
+          <p>{{ t('作业 {j} 第 {r} 版设计，指纹 {f}', { j: pv.job.job_no, r: pv.job.rev, f: pv.fingerprint.slice(0, 12) }) }}</p>
+          <h3>{{ t('新物料') }}</h3>
+          <table class="t">
+            <thead><tr><th>{{ t('编号') }}</th><th>{{ t('名称') }}</th><th>{{ t('类别') }}</th><th class="num">{{ t('单价') }}</th></tr></thead>
+            <tbody><tr v-for="i in pv.items" :key="i.code"><td class="mono">{{ i.code }}</td><td>{{ i.name }}</td><td>{{ td(i.item_group) }}</td>
+              <td class="num mono">{{ money(i.price) }}</td></tr></tbody>
+          </table>
+          <h3>{{ t('物料清单（子件先建）') }}</h3>
+          <div v-for="b in pv.boms" :key="b.item" class="small"><b class="mono">{{ b.item }}</b>
+            {{ t('：{c}；{n} 道工序', { c: b.components.map((c) => c.item_code + ' × ' + c.qty).join(', '), n: b.operations.length }) }}</div>
+          <p v-if="pv.affected?.length" class="warns">{{ t('改版影响：{a}', { a: pv.affected.map((a) => a.name).join(', ') }) }}</p>
+          <p class="muted small">{{ t('确认后在 ERPNext 建新物料和物料清单（带工序）并设为默认；这一版冻结，再改出新版本。') }}</p>
+        </template>
         <template v-if="p.action === 'release_work_order'">
           <p>{{ t('把工单 {w} 按工艺路线逐道派给车间设备。', { w: pv.work_order }) }}</p>
         </template>

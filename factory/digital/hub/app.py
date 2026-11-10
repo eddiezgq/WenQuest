@@ -120,8 +120,11 @@ class Hub:
 
     def start(self):
         self.db.init()
-        from hub import eto as _ETO                   # 按单设计（第 139 轮）的作业、估算表
+        from hub import eto as _ETO                   # 按单设计（第 139 轮）的作业、估算、设计表；已发布的设计并回主数据
+        from hub import eto_design as _ETOD
         _ETO.init(self.db)
+        _ETOD.init(self.db)
+        _ETOD.load_all(self.db)
         self.bus = Bus("wq-hub-" + secrets.token_hex(3))
         self.ai = Assistant(self.db, self.publish)
         ai_setting_load(self.db, self.ai.llm)          # 第 30 轮 H-6：管理员选的模型（Claude / DeepSeek / 自动）
@@ -2290,7 +2293,9 @@ def reset_teach(by, speed=1.0, scores=False):
     H.db.x("delete from machine_state_log where mode='teach'")
     H.db.x("delete from ncr where mode='teach' or mode is null")
     H.db.x("delete from ai_proposal where mode='teach'")
-    from hub import eto as _ETO                           # 第 139 轮：按单设计的作业、估算随情景清空
+    from hub import eto as _ETO                           # 第 139 轮：按单设计的作业、估算、设计随情景清空
+    from hub import eto_design as _ETOD
+    _ETOD.reset(H.db, "teach")
     _ETO.reset(H.db, "teach")
     if scores:
         H.db.x("delete from task_result")

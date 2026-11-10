@@ -574,6 +574,28 @@ def eto(teacher):
     check(any(x.get("wq_job") == jn for x in qt), "ERPNext 里有报价单 {}（作业号 {}）".format(j["quotation"], jn))
     check(any(x.get("name") == j["project"] for x in erp_docs("Project")), "ERPNext 里有项目 {}".format(j["project"]))
 
+    # 139b：客户接受 → 销售订单（付款计划）；照估算起草设计 → 发布 → ERPNext 建物料清单
+    def run(path, what):
+        q = hub("POST", "/api/eto/jobs/{}/{}".format(jn, path), token=sales)
+        hub("POST", "/api/proposals/{}/confirm".format(q["proposal_id"]), token=sales)
+        p = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(
+            hub("GET", "/api/proposals/" + q["proposal_id"], token=sales)), what, 120, 2)
+        check(p is not None and p["status"] == "executed", "{}：{}".format(what, p and p.get("result")))
+        return p
+    run("order", "接单提议执行（销售订单带付款计划）")
+    j = hub("GET", "/api/eto/jobs/" + jn, token=sales)["job"]
+    so = [x for x in erp_docs("Sales Order") if x.get("name") == j.get("sales_order")]
+    check(j["status"] == "ordered" and so and so[0].get("project") == jn, "作业已接单：销售订单 {}，挂项目 {}".format(j.get("sales_order"), jn))
+    spec = hub("POST", "/api/eto/jobs/{}/design/draft".format(jn), token=sales)
+    d = hub("PUT", "/api/eto/jobs/{}/design".format(jn), {"spec": spec}, sales)
+    check(not d["errors"], "照估算起草设计、检查通过（{}）".format(d["errors"][:2]))
+    run("design/release", "设计发布执行（物料清单）")
+    d = hub("GET", "/api/eto/jobs/{}/design".format(jn), token=sales)
+    fp = d["design"]["fingerprint"]
+    boms = [x for x in erp_docs("BOM") if x.get("item") == jn and x.get("docstatus") == 1]
+    check(d["design"]["status"] == "released" and any(b.get("wq_fingerprint") == fp for b in boms),
+          "设计第 {} 版已发布，ERPNext 物料清单带指纹 {}".format(d["design"]["rev"], (fp or "")[:12]))
+
 
 def safety(teacher):
     """第 18 轮 E2：隐患随手拍 → 异常 E1 → 停机挂牌（车间里设备真的停下、不能复位）→ 整改、验收解锁；许可缺资质；整改工单进 ERPNext"""
