@@ -1,0 +1,116 @@
+<!doctype html>
+<!-- 第 138 轮 G3：WQ-LS 外观效果图（three.js 物理材质 + 环境光 + 软阴影）。
+     网格是 FreeCAD 按材料分组导出的 STL（tools/wqls/cad/housing.py）。
+     用法：在放 three 和网格的目录起一个静态服务，打开 studio.html?d=<网格目录>&view=front|rear|face|top&w=1600&h=1000 -->
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#e9ecef}</style></head>
+<body><canvas id="c"></canvas>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { toCreasedNormals, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const q = new URLSearchParams(location.search);
+const W = +(q.get('w') || 1600), H = +(q.get('h') || 1000), DIR = q.get('d') || 'A', VIEW = q.get('view') || 'front';
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true });
+r.setPixelRatio(+(q.get('pr') || 2));
+r.setSize(W, H);
+r.toneMapping = THREE.ACESFilmicToneMapping;
+r.toneMappingExposure = 1.05;
+r.outputColorSpace = THREE.SRGBColorSpace;
+r.shadowMap.enabled = true;
+r.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xdde1e5);
+const pm = new THREE.PMREMGenerator(r);
+scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.5;
+
+// 机器坐标：毫米、Z 向上 → three：米、Y 向上（x, z, -y）
+const root = new THREE.Group();
+root.rotation.x = -Math.PI / 2;
+root.scale.setScalar(0.001);
+scene.add(root);
+
+// 三个外观方案的配色：A 珍珠白机身 + 石墨灰盖板；B 银灰金属漆机身 + 石墨灰盖板；C 石墨灰机身 + 珍珠白盖板
+const VK = DIR.replace(/.*\//, '');
+const SCHEME = {
+  A: [{ color: 0xe9e8e3, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.09 }, { color: 0x23272c, roughness: 0.5, clearcoat: 0.5, clearcoatRoughness: 0.2 }],
+  B: [{ color: 0xb7bbc0, metalness: 0.45, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.06 }, { color: 0x23272c, roughness: 0.5, clearcoat: 0.5, clearcoatRoughness: 0.2 }],
+  C: [{ color: 0x2b2f35, roughness: 0.45, clearcoat: 1, clearcoatRoughness: 0.1 }, { color: 0xe9e8e3, roughness: 0.42, clearcoat: 1, clearcoatRoughness: 0.1 }],
+}[VK] || [{ color: 0xe9e8e3, roughness: 0.42 }, { color: 0x23272c, roughness: 0.5 }];
+const M = {
+  paint: new THREE.MeshPhysicalMaterial(SCHEME[0]),
+  graphite: new THREE.MeshPhysicalMaterial(SCHEME[1]),
+  metal: new THREE.MeshStandardMaterial({ color: 0xb9bdc1, metalness: 1, roughness: 0.32 }),
+  chrome: new THREE.MeshStandardMaterial({ color: 0xe4e6e8, metalness: 1, roughness: 0.08 }),
+  black: new THREE.MeshPhysicalMaterial({ color: 0x111214, roughness: 0.62 }),
+  blue: new THREE.MeshPhysicalMaterial({ color: 0x0b4fae, roughness: 0.35, clearcoat: 0.6 }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0x0b1418, roughness: 0.08, emissive: 0x7fd3ff, emissiveIntensity: 0.6 }),
+};
+const loader = new STLLoader();
+const box = new THREE.Box3();
+for (const [name, mat] of Object.entries(M)) {
+  let g;
+  try { g = await loader.loadAsync(`${DIR}/${name}.stl`); } catch (e) { continue; }
+  g.deleteAttribute('normal');
+  g = mergeVertices(g, 1e-3);
+  g = toCreasedNormals(g, THREE.MathUtils.degToRad(30));
+  const m = new THREE.Mesh(g, mat);
+  m.castShadow = true; m.receiveShadow = true;
+  root.add(m);
+}
+root.updateMatrixWorld(true);
+box.setFromObject(root);
+
+// 工作台：台面与机座顶面平齐，开孔比机座大 3 mm
+const s = new THREE.Shape();
+s.moveTo(-0.46, -0.30); s.lineTo(0.76, -0.30); s.lineTo(0.76, 0.32); s.lineTo(-0.46, 0.32); s.lineTo(-0.46, -0.30);
+const hole = new THREE.Path();
+hole.moveTo(-0.108, -0.065); hole.lineTo(0.415, -0.065); hole.lineTo(0.415, 0.119); hole.lineTo(-0.108, 0.119); hole.lineTo(-0.108, -0.065);
+s.holes.push(hole);
+const tg = new THREE.ExtrudeGeometry(s, { depth: 0.032, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.002, bevelSegments: 3 });
+const table = new THREE.Mesh(tg, new THREE.MeshPhysicalMaterial({ color: 0xd9d6cf, roughness: 0.6 }));
+table.rotation.x = -Math.PI / 2;
+table.position.y = -0.034;
+table.receiveShadow = true; table.castShadow = true;
+scene.add(table);
+
+// 线架（外购件，示意）：台面右后方，两只线团，顶上过线杆
+{
+  const chrome = M.chrome, g = new THREE.Group();
+  const add = (geo, mat, x, y, z, rx = 0, rz = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.rotation.set(rx, 0, rz); m.castShadow = m.receiveShadow = true; g.add(m); };
+  add(new THREE.CylinderGeometry(0.004, 0.004, 0.56, 24), chrome, 0, 0.28, 0);
+  add(new THREE.BoxGeometry(0.16, 0.004, 0.05), chrome, 0, 0.006, 0);
+  add(new THREE.CylinderGeometry(0.0025, 0.0025, 0.2, 16), chrome, 0, 0.56, 0, 0, Math.PI / 2);
+  const cone = new THREE.CylinderGeometry(0.017, 0.028, 0.07, 48);
+  add(cone, new THREE.MeshPhysicalMaterial({ color: 0xf2efe6, roughness: 0.85, sheen: 1, sheenRoughness: 0.6 }), -0.05, 0.043, 0);
+  add(cone, new THREE.MeshPhysicalMaterial({ color: 0x1d3f7a, roughness: 0.85, sheen: 1, sheenRoughness: 0.6 }), 0.05, 0.043, 0);
+  g.position.set(0.56, 0, -0.26);
+  scene.add(g);
+}
+
+// 灯：主光（软阴影）、补光、轮廓光
+const key = new THREE.DirectionalLight(0xffffff, 3.0);
+key.position.set(-0.6, 1.4, 0.9); key.castShadow = true;
+key.shadow.mapSize.set(4096, 4096); key.shadow.radius = 6; key.shadow.bias = -0.0004;
+Object.assign(key.shadow.camera, { left: -0.7, right: 0.9, top: 0.7, bottom: -0.7, near: 0.1, far: 4 });
+key.target.position.set(0.15, 0.1, 0);
+scene.add(key, key.target);
+const fill = new THREE.DirectionalLight(0xe8f0ff, 0.6); fill.position.set(1.4, 0.5, 1.0); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 1.0); rim.position.set(0.4, 1.0, -1.4); scene.add(rim);
+
+const CAMS = {
+  front: [[-0.42, 0.46, 0.98], [0.16, 0.11, 0.0], 32],
+  rear: [[1.05, 0.52, -0.95], [0.15, 0.12, -0.02], 32],
+  face: [[-0.72, 0.28, 0.42], [0.0, 0.12, 0.0], 28],
+  top: [[0.16, 1.25, 0.25], [0.16, 0.0, -0.02], 38],
+  side: [[0.15, 0.16, 1.25], [0.15, 0.11, 0.0], 30],
+};
+const [p, t, fov] = CAMS[VIEW];
+const cam = new THREE.PerspectiveCamera(fov, W / H, 0.01, 20);
+cam.position.set(...p); cam.lookAt(...t);
+r.render(scene, cam);
+document.title = 'done';
+</script></body></html>
