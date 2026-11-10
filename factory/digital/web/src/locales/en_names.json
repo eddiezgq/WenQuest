@@ -96,6 +96,10 @@
 "Motor-control MCU"
 ],
 [
+"送布牙、针板、压脚（型号待确认） Feed dog, throat plate, presser foot",
+"Feed dog, throat plate, presser foot"
+],
+[
 "WQ-ENCIF 工程样片（一片晶圆的批次，老化后全测、托盘装） Engineering samples",
 "Engineering samples"
 ],
@@ -112,8 +116,16 @@
 "Stator laminations frame 80"
 ],
 [
+"问渠工业直驱四线包缝机 WQ-OL（示例）Direct-drive 4-thread overlock",
+"4-thread overlock"
+],
+[
 "RS-485 收发器（示例选型 MAX3485，未经硬件验证） RS-485 transceiver",
 "RS-485 transceiver"
+],
+[
+"主送布牙、差动送布牙、针板（型号待确认） Main & differential feed dogs",
+"Main & differential feed dogs"
 ],
 [
 "低边栅极驱动（示例选型 UCC27511A，未经硬件验证） Low-side gate driver",
@@ -128,12 +140,20 @@
 "Chip resistor 0805"
 ],
 [
+"问渠工业直驱平缝机 WQ-LS（示例）Direct-drive lockstitch machine",
+"lockstitch machine"
+],
+[
 "AGV 驱动电机 WQ-AM750（750 W，示例） AGV drive motor 750 W",
 "AGV drive motor 750 W"
 ],
 [
 "CAN 收发器（示例选型 MCP2562-E/SN，未经硬件验证） CAN transceiver",
 "CAN transceiver"
+],
+[
+"OL50 精铣结合面、铰销孔、打刻 Finish base, pin holes, ID mark",
+"Finish base, pin holes, ID mark"
 ],
 [
 "信号调理板（仪表放大 + ADC，型号待确认） Signal conditioning board",
@@ -148,6 +168,14 @@
 "1.8 V LDO"
 ],
 [
+"LA-S4 分装针杆挑线组件 Sub-assembly needle bar & take-up",
+"Sub-assembly needle bar & take-up"
+],
+[
+"LS50 精铣底面、铰销孔、打刻 Finish base, pin holes, ID mark",
+"Finish base, pin holes, ID mark"
+],
+[
 "失电制动器 60 机座（24 V，型号待确认） Fail-safe brake frame 60",
 "Fail-safe brake frame 60"
 ],
@@ -156,12 +184,28 @@
 "Fail-safe brake frame 80"
 ],
 [
+"LA-A07 装针杆挑线压脚 Fit needle bar, take-up, presser",
+"Fit needle bar, take-up, presser"
+],
+[
+"OA-B05 装送布、差动、刀片 Fit feed, differential, knives",
+"Fit feed, differential, knives"
+],
+[
 "示例·谐波减速器代理商 Strain-wave Gear Distributor (Demo)",
 "Strain-wave Gear Distributor (Demo)"
 ],
 [
 "AGV 驱动电机 750 W（问渠电机厂 WQ-AM750） AGV drive motor",
 "AGV drive motor"
+],
+[
+"包缝机直驱伺服电机（型号待确认） Direct-drive servo motor (OL)",
+"Direct-drive servo motor (OL)"
+],
+[
+"平缝机直驱伺服电机（型号待确认） Direct-drive servo motor (LS)",
+"Direct-drive servo motor (LS)"
 ],
 [
 "电机动力线与抱闸线（带插头，型号待确认） Motor power & brake leads",
@@ -178,6 +222,10 @@
 [
 "转子铁芯与轴 80 机座（外协机加） Rotor core & shaft frame 80",
 "Rotor core & shaft frame 80"
+],
+[
+"OA-B06 装油底壳、电机、外罩 Fit oil sump, motor, covers",
+"Fit oil sump, motor, covers"
 ],
 [
 "机壳与端盖 60 机座（铝，外协） Housing & end caps frame 60",
@@ -208,12 +256,32 @@
 "Encoder read-head board"
 ],
 [
+"LA-A01 机壳上线、扫序列号 Head loading & serial scan",
+"Head loading & serial scan"
+],
+[
+"OA-B01 机壳上线、装油泵油管 Housing loading, oil pump",
+"Housing loading, oil pump"
+],
+[
+"平缝机电控箱（出厂测试时烧录本厂固件）（型号待确认） Control box (LS)",
+"Control box (LS)"
+],
+[
 "示例·北方精密轴承 Northern Precision Bearing (Demo)",
 "Northern Precision Bearing (Demo)"
 ],
 [
+"示例·生铁废钢供应商 Pig Iron & Scrap Supplier (Demo)",
+"Pig Iron & Scrap Supplier (Demo)"
+],
+[
 "示例·自动化设备厂 Automation Equipment Maker (Demo)",
 "Automation Equipment Maker (Demo)"
+],
+[
+"LA-S3 分装送布抬牙组件 Sub-assembly feed mechanism",
+"Sub-assembly feed mechanism"
 ],
 [
 "六轴协作机器人 WQ-CR5（示例：负载 5 kg 一类） 6-axis cobot",
@@ -244,6 +312,10 @@
 "AGV controller bare PCB"
 ],
 [
+"OL70 钻攻螺纹、油路深孔 Drill & tap, oil galleries",
+"Drill & tap, oil galleries"
+],
+[
 "已测晶圆 WQ-ENCIF（CP 完成、减薄，带晶圆图） Probed wafer",
 "Probed wafer"
 ],
@@ -264,12 +336,20 @@
 "Logistics Equipment Maker (Demo)"
 ],
 [
+"示例·缝纫设备经销商 Sewing Equipment Dealer (Demo)",
+"Sewing Equipment Dealer (Demo)"
+],
+[
 "线性稳压芯片（示例选型 AMS1117，未经硬件验证） LDO regulator",
 "LDO regulator"
 ],
 [
 "采样电阻 2 mΩ 1%（型号待确认） Current shunt 2 mΩ 1%",
 "Current shunt 2 mΩ 1%"
+],
+[
+"LA-A02 压装轴承、轴套 Press bearings & bushings",
+"Press bearings & bushings"
 ],
 [
 "二级圆柱齿轮减速器 WQR-105 Two-stage gear reducer",
@@ -284,6 +364,18 @@
 "Encoder read-head board"
 ],
 [
+"K30 铣梭尖、梭道 Milling hook point & raceway",
+"Milling hook point & raceway"
+],
+[
+"LA-A04 装下轴、同步带张紧 Fit lower shaft & belt",
+"Fit lower shaft & belt"
+],
+[
+"P80 淬火后校直 Straightening after hardening",
+"Straightening after hardening"
+],
+[
 "二指电动夹爪（型号待确认） 2-finger electric gripper",
 "2-finger electric gripper"
 ],
@@ -294,6 +386,10 @@
 [
 "双臂与手眼标定 Dual-arm & hand-eye calibration",
 "Dual-arm & hand-eye calibration"
+],
+[
+"平缝机壳铸件 HT250 Lockstitch housing casting",
+"HT250 Lockstitch housing casting"
 ],
 [
 "示例·电子分销商 Electronics Distributor (Demo)",
@@ -312,12 +408,36 @@
 "Drive board bare PCB"
 ],
 [
+"20CrMnTi 圆棒 Ø40 Steel bar 20CrMnTi Ø40",
+"Steel bar 20CrMnTi Ø40"
+],
+[
 "6061 铝合金棒 Ø120 Aluminium bar 6061 Ø120",
 "Aluminium bar 6061 Ø120"
 ],
 [
 "AGV 控制板贴片板 AGV controller SMT assembly",
 "AGV controller SMT assembly"
+],
+[
+"LA-A09 装油泵、面板、盖板 Fit oil pump & covers",
+"Fit oil pump & covers"
+],
+[
+"N30 车、钻针夹孔 Turning & needle clamp hole",
+"Turning & needle clamp hole"
+],
+[
+"OA-B04 装针杆、压脚 Fit needle bar & presser",
+"Fit needle bar & presser"
+],
+[
+"OA-S2 分装弯针机构 Sub-assembly looper drive",
+"Sub-assembly looper drive"
+],
+[
+"夹线器与挑线簧（型号待确认） Thread tension assembly",
+"Thread tension assembly"
 ],
 [
 "机器人控制柜（型号待确认） Robot controller cabinet",
@@ -328,12 +448,24 @@
 "Authorized Distributor (Demo)"
 ],
 [
+"示例·缝纫机电控商 Sewing Drive Supplier (Demo)",
+"Sewing Drive Supplier (Demo)"
+],
+[
+"示例·缝纫机配件商 Sewing Parts Supplier (Demo)",
+"Sewing Parts Supplier (Demo)"
+],
+[
 "绝缘套件（槽绝缘纸、槽楔、绑扎带，型号待确认） Insulation kit",
 "Insulation kit"
 ],
 [
 "编码器读头板光板 4 层（外协） Encoder head bare PCB",
 "Encoder head bare PCB"
+],
+[
+"问渠缝纫机厂 WenQuest Sewing Machines (Demo)",
+"WenQuest Sewing Machines (Demo)"
 ],
 [
 "20CrMnTi圆钢 Ø60 Steel bar 20CrMnTi Ø60",
@@ -344,8 +476,20 @@
 "Steel bar 20CrMnTi Ø70"
 ],
 [
+"LA-S1 分装上轴组件 Sub-assembly upper shaft",
+"Sub-assembly upper shaft"
+],
+[
+"LA-S2 分装下轴组件 Sub-assembly lower shaft",
+"Sub-assembly lower shaft"
+],
+[
 "光电读头传感器（型号待确认） Optical encoder sensor",
 "Optical encoder sensor"
+],
+[
+"包缝机壳铸件 HT250 Overlock housing casting",
+"HT250 Overlock housing casting"
 ],
 [
 "扭矩传感器线缆（屏蔽，型号待确认） Torque sensor cable",
@@ -362,6 +506,10 @@
 [
 "示例·绿谷输送设备 GreenValley Conveyor (Demo)",
 "GreenValley Conveyor (Demo)"
+],
+[
+"示例·轴承标准件商 Bearings & Fasteners (Demo)",
+"Bearings & Fasteners (Demo)"
 ],
 [
 "编带材料（一盘：载带、盖带、13 吋卷盘） Tape & reel kit",
@@ -382,6 +530,14 @@
 [
 "6061 铝合金管 Ø90×3 Aluminium tube Ø90×3",
 "Aluminium tube Ø90×3"
+],
+[
+"LS70 钻攻螺纹、油路孔 Drill & tap, oil holes",
+"Drill & tap, oil holes"
+],
+[
+"OA-S1 分装主轴组件 Sub-assembly main shaft",
+"Sub-assembly main shaft"
 ],
 [
 "人形主控（型号待确认） Humanoid main controller",
@@ -428,6 +584,18 @@
 "Li-ion battery pack"
 ],
 [
+"N60 无心精磨 Centreless finish grinding",
+"Centreless finish grinding"
+],
+[
+"包缝机包装箱与附件包 Box & accessory kit (OL)",
+"Box & accessory kit (OL)"
+],
+[
+"平缝机包装箱与附件包 Box & accessory kit (LS)",
+"Box & accessory kit (LS)"
+],
+[
 "示例·五大湖轴承 Great Lakes Bearing (Demo)",
 "Great Lakes Bearing (Demo)"
 ],
@@ -452,6 +620,10 @@
 "Precision Machining (Demo)"
 ],
 [
+"示例·造型材料商 Foundry Consumables (Demo)",
+"Foundry Consumables (Demo)"
+],
+[
 "示例·钕铁硼磁钢厂 NdFeB Magnet Maker (Demo)",
 "NdFeB Magnet Maker (Demo)"
 ],
@@ -466,6 +638,18 @@
 [
 "高性能 MCU（型号待确认） High-performance MCU",
 "High-performance MCU"
+],
+[
+"C60 造型下芯合型 Moulding & core setting",
+"Moulding & core setting"
+],
+[
+"H110 机壳终检 Housing final inspection",
+"Housing final inspection"
+],
+[
+"N20 无心粗磨 Centreless rough grinding",
+"Centreless rough grinding"
 ],
 [
 "划片膜与晶圆框（型号待确认） Dicing tape & frame",
@@ -500,6 +684,10 @@
 "Solder & Chemicals (Demo)"
 ],
 [
+"示例·特钢棒材商 Special Steel Bars (Demo)",
+"Special Steel Bars (Demo)"
+],
+[
 "示例·编带与防潮包装商 Tape & Dry-pack (Demo)",
 "Tape & Dry-pack (Demo)"
 ],
@@ -516,8 +704,28 @@
 "Ø225×45 Forging blank 40Cr"
 ],
 [
+"LA-A06 装针距倒缝 Fit stitch regulator",
+"Fit stitch regulator"
+],
+[
+"LS30 粗加工各面、粗镗 Rough faces & bores",
+"Rough faces & bores"
+],
+[
+"OL30 粗加工各面、粗镗 Rough faces & bores",
+"Rough faces & bores"
+],
+[
+"上刀、下刀（型号待确认） Upper & lower knives",
+"Upper & lower knives"
+],
+[
 "中间轴组件 Intermediate shaft assembly",
 "Intermediate shaft assembly"
+],
+[
+"梭壳与梭芯（型号待确认） Bobbin case & bobbin",
+"Bobbin case & bobbin"
 ],
 [
 "示例·伺服电机厂 Servo Motor Maker (Demo)",
@@ -540,6 +748,10 @@
 "Encoder cable"
 ],
 [
+"膨润土与煤粉（型砂补充）Bentonite & coal dust",
+"& coal dust"
+],
+[
 "谐波减速器 CSF-17-100 Strain wave gear",
 "CSF-17-100 Strain wave gear"
 ],
@@ -554,6 +766,18 @@
 [
 "防潮包装（一盘：防潮袋、干燥剂、湿度卡） Dry-pack kit",
 "Dry-pack kit"
+],
+[
+"H40 第二次人工时效 Second stress relief",
+"Second stress relief"
+],
+[
+"K40 渗碳淬火 Carburising & hardening",
+"Carburising & hardening"
+],
+[
+"LA-A10 装电机、接线 Fit motor & wiring",
+"Fit motor & wiring"
 ],
 [
 "三防漆（丙烯酸，型号待确认） Conformal coating",
@@ -588,16 +812,48 @@
 "Servo Supplier (Demo)"
 ],
 [
+"示例·家纺厂 Home Textile Maker (Demo)",
+"Home Textile Maker (Demo)"
+],
+[
 "示例·标准件商 Fastener Supplier (Demo)",
 "Fastener Supplier (Demo)"
+],
+[
+"示例·钣金塑料件商 Covers Supplier (Demo)",
+"Covers Supplier (Demo)"
 ],
 [
 "箱盖铸件 HT200 Housing cover casting",
 "HT200 Housing cover casting"
 ],
 [
+"LA-A05 装送布抬牙 Fit feed mechanism",
+"Fit feed mechanism"
+],
+[
+"LA-A08 装旋梭（扫批次） Fit rotary hook",
+"Fit rotary hook"
+],
+[
+"LS80 精镗孔系（一次装夹）Finish bore line",
+"bore line"
+],
+[
+"OL80 精镗孔系（一次装夹）Finish bore line",
+"bore line"
+],
+[
+"P60 铣扁、钻孔 Milling flats & holes",
+"Milling flats & holes"
+],
+[
 "应变胶（热固化环氧，型号待确认） Gauge adhesive",
 "Gauge adhesive"
+],
+[
+"深沟球轴承 6000 Ball bearing 10×26×8",
+"6000 Ball bearing 10×26×8"
 ],
 [
 "激光扫描仪 SICK TiM781 Laser scanner",
@@ -648,8 +904,32 @@
 "Drive board SMT assembly"
 ],
 [
+"40Cr 圆棒 Ø16 Steel bar 40Cr Ø16",
+"Steel bar 40Cr Ø16"
+],
+[
 "40Cr 圆钢 Ø60 Steel bar 40Cr Ø60",
 "Steel bar 40Cr Ø60"
+],
+[
+"C65 孕育浇注 Inoculation & pouring",
+"Inoculation & pouring"
+],
+[
+"E50 磨内孔端面 Bore & face grinding",
+"Bore & face grinding"
+],
+[
+"E70 偏心测量 Eccentric measurement",
+"Eccentric measurement"
+],
+[
+"N40 淬火回火 Hardening & tempering",
+"Hardening & tempering"
+],
+[
+"P70 轴颈高频淬火 Induction hardening",
+"Induction hardening"
 ],
 [
 "人形联调 Humanoid integration test",
@@ -658,6 +938,18 @@
 [
 "内六角螺钉 M4×12 Socket screw M4×12",
 "Socket screw M4×12"
+],
+[
+"包缝机电控箱（型号待确认） Control box (OL)",
+"Control box (OL)"
+],
+[
+"包缝机针 DC×27（型号待确认） Needle DC×27",
+"Needle DC×27"
+],
+[
+"平缝机面板、后盖、顶盖（型号待确认） Covers (LS)",
+"Covers (LS)"
 ],
 [
 "磁钢胶（结构胶，型号待确认） Magnet adhesive",
@@ -696,12 +988,24 @@
 "Schottky diode"
 ],
 [
+"轴承钢冷拉棒 Ø9 Bearing steel bar Ø9",
+"Bearing steel bar Ø9"
+],
+[
 "问渠传感器厂 WenQuest Sensors (Demo)",
 "WenQuest Sensors (Demo)"
 ],
 [
 "问渠减速器厂 WenQuest Gearbox (Demo)",
 "WenQuest Gearbox (Demo)"
+],
+[
+"45 钢圆棒 Ø16 Steel bar 1045 Ø16",
+"Steel bar 1045 Ø16"
+],
+[
+"LA-PK 清洗包装 Cleaning & packing",
+"Cleaning & packing"
 ],
 [
 "信号连接器（型号待确认） Signal connector",
@@ -752,8 +1056,36 @@
 "AGV controller board"
 ],
 [
+"C160 铸件检验 Casting inspection",
+"Casting inspection"
+],
+[
+"E60 磨偏心外圆 Eccentric grinding",
+"Eccentric grinding"
+],
+[
+"LA-A03 装上轴组件 Fit upper shaft",
+"Fit upper shaft"
+],
+[
+"LA-EOL 出厂测试 End-of-line test",
+"End-of-line test"
+],
+[
+"OA-EOL 出厂测试 End-of-line test",
+"End-of-line test"
+],
+[
+"P90 磨外圆 Cylindrical grinding",
+"Cylindrical grinding"
+],
+[
 "内六角螺钉 M3×8 Socket screw M3×8",
 "Socket screw M3×8"
+],
+[
+"平缝机针 DB×1（型号待确认） Needle DB×1",
+"Needle DB×1"
 ],
 [
 "砝码标定 Dead-weight calibration",
@@ -762,6 +1094,10 @@
 [
 "示例·协作机器人厂 Cobot Maker (Demo)",
 "Cobot Maker (Demo)"
+],
+[
+"示例·涂料商 Paint Supplier (Demo)",
+"Paint Supplier (Demo)"
 ],
 [
 "示例·编码器厂 Encoder Maker (Demo)",
@@ -784,8 +1120,24 @@
 "WenQuest Semiconductor"
 ],
 [
+"K60 研磨梭尖 Hook point lapping",
+"Hook point lapping"
+],
+[
+"OA-B02 装主轴组件 Fit main shaft",
+"Fit main shaft"
+],
+[
 "RT-箱体合镗 Housing line-boring",
 "Housing line-boring"
+],
+[
+"包缝机外罩与前盖（型号待确认） Covers (OL)",
+"Covers (OL)"
+],
+[
+"包缝机油底壳（型号待确认） Oil sump (OL)",
+"Oil sump (OL)"
 ],
 [
 "漆包线（聚酯亚胺，型号待确认） Magnet wire",
@@ -796,8 +1148,32 @@
 "Sensor Maker (Demo)"
 ],
 [
+"示例·服装厂 Garment Maker (Demo)",
+"Garment Maker (Demo)"
+],
+[
 "输出轴组件 Output shaft assembly",
 "Output shaft assembly"
+],
+[
+"C140 第一次人工时效 Stress relief",
+"Stress relief"
+],
+[
+"H10 毛坯检验 Casting receiving",
+"Casting receiving"
+],
+[
+"H100 清洗吹干 Washing & drying",
+"Washing & drying"
+],
+[
+"LA-A11 通电检查 Power-on check",
+"Power-on check"
+],
+[
+"OA-B03 装上下弯针机构 Fit loopers",
+"Fit loopers"
 ],
 [
 "RT-部件装配 Shaft sub-assembly",
@@ -816,6 +1192,18 @@
 "Power terminal"
 ],
 [
+"包缝机油泵（型号待确认） Oil pump (OL)",
+"Oil pump (OL)"
+],
+[
+"平缝机电控箱（出厂测试时烧录本厂固件）（型号待确认）",
+"Control box (LS)"
+],
+[
+"弯针 / 差动偏心 Looper eccentric",
+"Looper eccentric"
+],
+[
 "聚氨酯驱动轮 Ø200 PU drive wheel",
 "Ø200 PU drive wheel"
 ],
@@ -824,8 +1212,36 @@
 "Input shaft assembly"
 ],
 [
+"C90 旧砂处理 Sand reclamation",
+"Sand reclamation"
+],
+[
+"H105 三坐标检测 CMM inspection",
+"CMM inspection"
+],
+[
+"LS20 粗铣底面 Rough mill base",
+"Rough mill base"
+],
+[
+"OL20 粗铣底面 Rough mill base",
+"Rough mill base"
+],
+[
+"P110 零件检验 Part inspection",
+"Part inspection"
+],
+[
 "RT-样片 Engineering samples",
 "Engineering samples"
+],
+[
+"同步带轮（型号待确认） Timing pulley",
+"Timing pulley"
+],
+[
+"平缝机油盘（型号待确认） Oil pan (LS)",
+"Oil pan (LS)"
 ],
 [
 "箱体组件（合镗） Housing assembly",
@@ -836,12 +1252,28 @@
 "Accuracy calibration"
 ],
 [
+"轴套 Ø20（型号待确认） Bushing Ø20",
+"Bushing Ø20"
+],
+[
+"C120 清内腔芯砂 Core knockout",
+"Core knockout"
+],
+[
+"K50 磨梭道 Raceway grinding",
+"Raceway grinding"
+],
+[
 "RT-棒料齿轮 Bar-stock pinion",
 "Bar-stock pinion"
 ],
 [
 "RT-轮式人形 Wheeled humanoid",
 "Wheeled humanoid"
+],
+[
+"内六角螺钉 M5×12 Socket screw",
+"M5×12 Socket screw"
 ],
 [
 "内六角螺钉 M5×16 Socket screw",
@@ -854,6 +1286,10 @@
 [
 "工业齿轮油 L-CKC 220 Gear oil",
 "L-CKC 220 Gear oil"
+],
+[
+"平缝机下轴 Lower (hook) shaft",
+"Lower (hook) shaft"
 ],
 [
 "来料检验 Incoming inspection",
@@ -872,6 +1308,10 @@
 "Encoder final test"
 ],
 [
+"送布 / 抬牙偏心 Feed eccentric",
+"Feed eccentric"
+],
+[
 "钻攻螺纹孔 Drilling & tapping",
 "Drilling & tapping"
 ],
@@ -888,8 +1328,24 @@
 "AGV drive unit"
 ],
 [
+"P100 零件清洗 Parts washing",
+"Parts washing"
+],
+[
 "RT-封装测试 Assembly & test",
 "Assembly & test"
+],
+[
+"三坐标测量机（计量室，恒温 20 ± 1 ℃）",
+"CMM (metrology room)"
+],
+[
+"上弯针（型号待确认） Upper looper",
+"Upper looper"
+],
+[
+"下弯针（型号待确认） Lower looper",
+"Lower looper"
 ],
 [
 "关节壳体（中） Joint housing M",
@@ -920,6 +1376,10 @@
 "Insertion & lacing"
 ],
 [
+"平缝机壳 Lockstitch housing",
+"Lockstitch housing"
+],
+[
 "平键 10×8×28 Parallel key",
 "10×8×28 Parallel key"
 ],
@@ -940,6 +1400,10 @@
 "Disk hub"
 ],
 [
+"立式加工中心 5 号（零件：铣扁、键槽、梭道）",
+"VMC 5 (parts)"
+],
+[
 "绝缘套件（槽绝缘纸、槽楔、绑扎带，型号待确认）",
 "Insulation kit"
 ],
@@ -952,8 +1416,28 @@
 "Selective soldering"
 ],
 [
+"遮蔽堵头与胶带（一台份）Masking set",
+"set"
+],
+[
+"防锈油 Rust-preventive oil",
+"Rust-preventive oil"
+],
+[
 "AGV 车架（外协焊接） AGV frame",
 "AGV frame"
+],
+[
+"C30 炉前分析 Melt analysis",
+"Melt analysis"
+],
+[
+"E30 铣键槽 Keyway milling",
+"Keyway milling"
+],
+[
+"P30 调质 Quench & temper",
+"Quench & temper"
 ],
 [
 "QFN 托盘（工程样片用） QFN tray",
@@ -988,6 +1472,10 @@
 "Joint module S"
 ],
 [
+"同步带（型号待确认） Timing belt",
+"Timing belt"
+],
+[
 "平键 6×6×25 Parallel key",
 "6×6×25 Parallel key"
 ],
@@ -1012,6 +1500,18 @@
 "Arm cable harness"
 ],
 [
+"C110 抛丸 Shot blasting",
+"Shot blasting"
+],
+[
+"C45 型砂检测 Sand testing",
+"Sand testing"
+],
+[
+"P50 精车 Finish turning",
+"Finish turning"
+],
+[
 "RT-关节壳体 Joint housing",
 "Joint housing"
 ],
@@ -1020,8 +1520,32 @@
 "Shaft (45 steel)"
 ],
 [
+"RT-铸件 包缝机壳 Casting OL",
+"Casting OL"
+],
+[
+"RT-铸件 平缝机壳 Casting LS",
+"Casting LS"
+],
+[
 "出厂检验 Final inspection",
 "Final inspection"
+],
+[
+"包缝机壳 Overlock housing",
+"Overlock housing"
+],
+[
+"包缝机针杆 Needle bar (OL)",
+"Needle bar (OL)"
+],
+[
+"台车式时效炉（铸件第一次、机壳第二次时效）",
+"Bogie stress-relief furnace"
+],
+[
+"平缝机针杆 Needle bar (LS)",
+"Needle bar (LS)"
 ],
 [
 "弹簧垫圈 12 Spring washer",
@@ -1044,6 +1568,18 @@
 "Tape & reel kit"
 ],
 [
+"覆膜砂 Resin-coated sand",
+"Resin-coated sand"
+],
+[
+"通过式机壳清洗机（定点高压冲洗、热风吹干）",
+"Through-feed housing washer"
+],
+[
+"铸造生铁 Foundry pig iron",
+"Foundry pig iron"
+],
+[
 "锡膏印刷 Stencil printing",
 "Stencil printing"
 ],
@@ -1056,8 +1592,36 @@
 "30×47×7 Oil seal"
 ],
 [
+"LA-ADJ 调试 Adjustment",
+"Adjustment"
+],
+[
+"OA-ADJ 调试 Adjustment",
+"Adjustment"
+],
+[
+"OL110 渗漏试验 Leak test",
+"Leak test"
+],
+[
+"P20 粗车 Rough turning",
+"Rough turning"
+],
+[
+"P40 校直 Straightening",
+"Straightening"
+],
+[
 "RT-关节模组 Joint module",
 "Joint module"
+],
+[
+"RT-包缝机总装 OL assembly",
+"OL assembly"
+],
+[
+"RT-平缝机总装 LS assembly",
+"LS assembly"
 ],
 [
 "RT-总装 Final assembly",
@@ -1066,6 +1630,10 @@
 [
 "RT-箱体零件 Housing part",
 "Housing part"
+],
+[
+"主送布牙、差动送布牙、针板（型号待确认）",
+"Main & differential feed dogs"
 ],
 [
 "原材料库（硅钢片、漆包线、磁钢单独存放）",
@@ -1082,6 +1650,10 @@
 [
 "温度循环 Thermal cycling",
 "Thermal cycling"
+],
+[
+"理化室（拉伸试验机、硬度计、金相显微镜）",
+"Test lab (tensile, hardness, metallography)"
 ],
 [
 "电机动力线与抱闸线（带插头，型号待确认）",
@@ -1108,6 +1680,10 @@
 "Ø72 Through cap"
 ],
 [
+"连续式网带渗碳淬火线（旋梭、偏心、针杆）",
+"Continuous mesh-belt carburising line"
+],
+[
 "通气器 M16×1.5 Breather",
 "M16×1.5 Breather"
 ],
@@ -1124,6 +1700,14 @@
 "AGV assembly"
 ],
 [
+"C158 理化检验 Lab tests",
+"Lab tests"
+],
+[
+"C55 砂芯检验 Core check",
+"Core check"
+],
+[
 "RT-SMT 贴片线 SMT line",
 "SMT line"
 ],
@@ -1134,6 +1718,14 @@
 [
 "RT-晶圆测试 Wafer probe",
 "Wafer probe"
+],
+[
+"RT-机壳 包缝 Housing OL",
+"Housing OL"
+],
+[
+"RT-机壳 平缝 Housing LS",
+"Housing LS"
 ],
 [
 "RT-空心轴 Hollow shaft",
@@ -1196,6 +1788,26 @@
 "Chip placement"
 ],
 [
+"C100 去浇冒口 Degating",
+"Degating"
+],
+[
+"C40 混砂 Sand mixing",
+"Sand mixing"
+],
+[
+"C50 制芯 Core making",
+"Core making"
+],
+[
+"LS90 去毛刺 Deburring",
+"Deburring"
+],
+[
+"OL90 去毛刺 Deburring",
+"Deburring"
+],
+[
 "RT-AGV电机 AGV motor",
 "AGV motor"
 ],
@@ -1218,6 +1830,18 @@
 [
 "多功能贴片 IC placement",
 "IC placement"
+],
+[
+"平缝机面板、后盖、顶盖（型号待确认）",
+"Covers (LS)"
+],
+[
+"总装线 B01：机壳上线、装油泵油管",
+"Line OL B01: Housing loading, oil pump"
+],
+[
+"总装线 B06：装油底壳、电机、外罩",
+"Line OL B06: Fit oil sump, motor, covers"
 ],
 [
 "成品测试 FT Final test",
@@ -1280,6 +1904,22 @@
 "Keyway milling"
 ],
 [
+"零件检验站（电子测微仪、跳动检查仪）",
+"Parts inspection (gauges, runout tester)"
+],
+[
+"RT-旋梭 Rotary hook",
+"Rotary hook"
+],
+[
+"原材料库（炉料、型砂、钢材、油漆）",
+"Raw materials store"
+],
+[
+"外购件库（电机、电控、轴承、机针）",
+"Bought-out parts store"
+],
+[
 "定子测试台（电阻、匝间冲击、耐压）",
 "Stator tester"
 ],
@@ -1292,12 +1932,32 @@
 "Insertion & lacing bench"
 ],
 [
+"平缝机上轴 Upper shaft",
+"Upper shaft"
+],
+[
 "引线键合 Wire bonding",
 "Wire bonding"
 ],
 [
 "总装 Final assembly",
 "Final assembly"
+],
+[
+"总装线 A01：机壳上线、扫序列号",
+"Line LS A01: Head loading & serial scan"
+],
+[
+"总装线 A04：装下轴、同步带张紧",
+"Line LS A04: Fit lower shaft & belt"
+],
+[
+"总装线 A09：装油泵、面板、盖板",
+"Line LS A09: Fit oil pump & covers"
+],
+[
+"总装线 B05：装送布、差动、刀片",
+"Line OL B05: Fit feed, differential, knives"
 ],
 [
 "扭矩传感器线缆（屏蔽，型号待确认）",
@@ -1308,6 +1968,14 @@
 "Prober + tester (CP)"
 ],
 [
+"数控凸轮磨床 1 号（偏心、凸轮）",
+"CNC cam grinder 1"
+],
+[
+"旧砂处理（磁选、破碎、筛分、冷却）",
+"Sand reclamation"
+],
+[
 "机壳与端盖 60 机座（铝，外协）",
 "Housing & end caps frame 60"
 ],
@@ -1316,8 +1984,16 @@
 "Housing & end caps frame 80"
 ],
 [
+"清洁度分析（过滤称重 + 显微镜）",
+"Cleanliness analysis"
+],
+[
 "温度循环箱（−20 ~ 85 ℃）",
 "Thermal cycling chamber"
+],
+[
+"炉前分析室（直读光谱仪、热分析仪）",
+"Melt lab (spectrometer, thermal analysis)"
 ],
 [
 "电机轴承（深沟球轴承，型号待确认）",
@@ -1344,8 +2020,52 @@
 "Sub-assembly"
 ],
 [
+"钻攻中心 1 号（平缝机壳，四轴）",
+"Tapping centre 1 (LS, 4-axis)"
+],
+[
+"钻攻中心 2 号（平缝机壳，四轴）",
+"Tapping centre 2 (LS, 4-axis)"
+],
+[
+"钻攻中心 3 号（平缝机壳，四轴）",
+"Tapping centre 3 (LS, 4-axis)"
+],
+[
+"钻攻中心 4 号（包缝机壳，四轴）",
+"Tapping centre 4 (OL, 4-axis)"
+],
+[
 "铣结合面 Face milling",
 "Face milling"
+],
+[
+"C130 打磨 Fettling",
+"Fettling"
+],
+[
+"H115 面漆 Top coat",
+"Top coat"
+],
+[
+"LA-A12 下线 Unload",
+"Unload"
+],
+[
+"LA-RUN 跑合 Run-in",
+"Run-in"
+],
+[
+"OA-PK 包装 Packing",
+"Packing"
+],
+[
+"OA-RUN 跑合 Run-in",
+"Run-in"
+],
+[
+"RT-针杆 Needle bar",
+"Needle bar"
 ],
 [
 "六角螺母 M12 Hex nut",
@@ -1360,6 +2080,42 @@
 "Trim & form"
 ],
 [
+"包缝机主轴 Main shaft",
+"Main shaft"
+],
+[
+"包缝机直驱伺服电机（型号待确认）",
+"Direct-drive servo motor (OL)"
+],
+[
+"卧式加工中心 1 号（平缝机壳）",
+"HMC 1 (LS housing)"
+],
+[
+"卧式加工中心 2 号（平缝机壳）",
+"HMC 2 (LS housing)"
+],
+[
+"卧式加工中心 3 号（平缝机壳）",
+"HMC 3 (LS housing)"
+],
+[
+"卧式加工中心 4 号（平缝机壳）",
+"HMC 4 (LS housing)"
+],
+[
+"卧式加工中心 5 号（平缝机壳）",
+"HMC 5 (LS housing)"
+],
+[
+"卧式加工中心 6 号（包缝机壳）",
+"HMC 6 (OL housing)"
+],
+[
+"卧式加工中心 7 号（包缝机壳）",
+"HMC 7 (OL housing)"
+],
+[
 "原材料库（码盘、应变片防潮存放）",
 "Material store"
 ],
@@ -1368,12 +2124,24 @@
 "Stator test"
 ],
 [
+"平缝机直驱伺服电机（型号待确认）",
+"Direct-drive servo motor (LS)"
+],
+[
 "应变胶（热固化环氧，型号待确认）",
 "Gauge adhesive"
 ],
 [
+"总装线 A08：装旋梭（扫批次）",
+"Line LS A08: Fit rotary hook"
+],
+[
 "抱闸测试台（保持力矩、吸合电压）",
 "Brake tester"
+],
+[
+"机壳终检站（气动量仪、综合检具）",
+"Housing final inspection (air gauges, check fixture)"
 ],
 [
 "渗碳淬火 Carburizing",
@@ -1382,6 +2150,22 @@
 [
 "程序烧录 Programming",
 "Programming"
+],
+[
+"立式加工中心 1 号（平缝机壳）",
+"VMC 1 (LS housing)"
+],
+[
+"立式加工中心 2 号（平缝机壳）",
+"VMC 2 (LS housing)"
+],
+[
+"立式加工中心 3 号（平缝机壳）",
+"VMC 3 (LS housing)"
+],
+[
+"立式加工中心 4 号（包缝机壳）",
+"VMC 4 (OL housing)"
 ],
 [
 "箱盖 Housing cover",
@@ -1428,12 +2212,32 @@
 "Output shaft"
 ],
 [
+"送布牙、针板、压脚（型号待确认）",
+"Feed dog, throat plate, presser foot"
+],
+[
 "铁芯叠压机（硅钢冲片叠压、扣片）",
 "Lamination stacking press"
 ],
 [
 "AGV 调试 AGV test",
 "AGV test"
+],
+[
+"C10 配料 Charging",
+"Charging"
+],
+[
+"C155 喷底漆 Primer",
+"Primer"
+],
+[
+"C80 落砂 Shakeout",
+"Shakeout"
+],
+[
+"RT-偏心 Eccentric",
+"Eccentric"
 ],
 [
 "万向轮 Ø100 Caster",
@@ -1448,6 +2252,10 @@
 "Joint test"
 ],
 [
+"包缝机外罩与前盖（型号待确认）",
+"Covers (OL)"
+],
+[
 "大齿轮 m2 z72 Gear",
 "m2 z72 Gear"
 ],
@@ -1458,6 +2266,18 @@
 [
 "导电银浆（装片胶，型号待确认）",
 "Die-attach epoxy"
+],
+[
+"总装线 A02：压装轴承、轴套",
+"Line LS A02: Press bearings & bushings"
+],
+[
+"总装线 A07：装针杆挑线压脚",
+"Line LS A07: Fit needle bar, take-up, presser"
+],
+[
+"总装线 B03：装上下弯针机构",
+"Line OL B03: Fit loopers"
 ],
 [
 "抱闸测试 Brake test",
@@ -1474,6 +2294,10 @@
 [
 "漆包线（聚酯亚胺，型号待确认）",
 "Magnet wire"
+],
+[
+"烘道（低温烘干 ≤ 80 ℃）",
+"Low-temperature curing oven"
 ],
 [
 "磁钢粘贴台（定位工装 + 胶）",
@@ -1494,6 +2318,34 @@
 [
 "贴片肖特基二极管（型号待确认）",
 "Schottky diode"
+],
+[
+"1 t 中频感应电炉 1 号",
+"Induction furnace 1 t no.1"
+],
+[
+"1 t 中频感应电炉 2 号",
+"Induction furnace 1 t no.2"
+],
+[
+"C150 刮腻子 Putty",
+"Putty"
+],
+[
+"C20 熔炼 Melting",
+"Melting"
+],
+[
+"C70 冷却 Cooling",
+"Cooling"
+],
+[
+"H118 烘干 Curing",
+"Curing"
+],
+[
+"K20 车削 Turning",
+"Turning"
 ],
 [
 "RT-协作机器人 Cobot",
@@ -1528,8 +2380,32 @@
 "Dicing tape & frame"
 ],
 [
+"增碳剂 Carburiser",
+"Carburiser"
+],
+[
+"夹线器与挑线簧（型号待确认）",
+"Thread tension assembly"
+],
+[
 "应变片粘贴台（显微镜、压块）",
 "Strain-gauge bonding bench"
+],
+[
+"废钢 Steel scrap",
+"Steel scrap"
+],
+[
+"总装线 A10：装电机、接线",
+"Line LS A10: Fit motor & wiring"
+],
+[
+"总装线 B04：装针杆、压脚",
+"Line OL B04: Fit needle bar & presser"
+],
+[
+"旋梭 Rotary hook",
+"Rotary hook"
 ],
 [
 "码盘轴套（不锈钢，外协机加）",
@@ -1540,6 +2416,10 @@
 "Magnet adhesive"
 ],
 [
+"立式加工中心 6 号（零件）",
+"VMC 6 (parts)"
+],
+[
 "绝缘漆（无溶剂，型号待确认）",
 "Impregnating varnish"
 ],
@@ -1548,12 +2428,44 @@
 "Read-head mounting & gap adjust"
 ],
 [
+"调质炉（淬火 + 高温回火）",
+"Hardening & tempering furnace"
+],
+[
 "防静电包装盒 ESD box",
 "ESD box"
 ],
 [
+"P10 下料 Sawing",
+"Sawing"
+],
+[
+"内圆磨床（偏心内孔、端面）",
+"Internal grinder"
+],
+[
+"包缝机油底壳（型号待确认）",
+"Oil sump (OL)"
+],
+[
+"包缝机电控箱（型号待确认）",
+"Control box (OL)"
+],
+[
 "卧式加工中心 HMC-01",
 "Horizontal machining centre HMC-01"
+],
+[
+"去毛刺工位 1 号（平缝）",
+"Deburring 1 (LS)"
+],
+[
+"去毛刺工位 2 号（平缝）",
+"Deburring 2 (LS)"
+],
+[
+"去毛刺工位 3 号（包缝）",
+"Deburring 3 (OL)"
 ],
 [
 "头部双目相机（型号待确认）",
@@ -1564,8 +2476,28 @@
 "Robot base"
 ],
 [
+"总装线 A03：装上轴组件",
+"Line LS A03: Fit upper shaft"
+],
+[
+"总装线 A05：装送布抬牙",
+"Line LS A05: Fit feed mechanism"
+],
+[
+"总装线 A06：装针距倒缝",
+"Line LS A06: Fit stitch regulator"
+],
+[
+"总装线 B02：装主轴组件",
+"Line OL B02: Fit main shaft"
+],
+[
 "机器人控制柜（型号待确认）",
 "Robot controller cabinet"
+],
+[
+"渗漏试验台（包缝机壳油池）",
+"Leak test bench (OL oil sump)"
 ],
 [
 "立式加工中心 VMC-01",
@@ -1584,6 +2516,10 @@
 "Waist seat"
 ],
 [
+"螺钉 M4×8 Screw",
+"M4×8 Screw"
+],
+[
 "装片 Die attach",
 "Die attach"
 ],
@@ -1592,20 +2528,84 @@
 "Run-in test rig TEST-01"
 ],
 [
+"轴套 Ø20（型号待确认）",
+"Bushing Ø20"
+],
+[
+"上刀、下刀（型号待确认）",
+"Upper & lower knives"
+],
+[
 "信号连接器（型号待确认）",
 "Signal connector"
+],
+[
+"包缝机总装线 ASM-O",
+"Line OL B01: Housing loading, oil pump ASM-O"
+],
+[
+"包缝机油泵（型号待确认）",
+"Oil pump (OL)"
 ],
 [
 "大臂 Upper arm",
 "Upper arm"
 ],
 [
+"平缝机出厂测试台 1 号",
+"LS end-of-line tester 1"
+],
+[
+"平缝机出厂测试台 2 号",
+"LS end-of-line tester 2"
+],
+[
+"平缝机出厂测试台 3 号",
+"LS end-of-line tester 3"
+],
+[
+"平缝机总装线 ASM-L",
+"Line LS A01: Head loading & serial scan ASM-L"
+],
+[
+"平缝机油盘（型号待确认）",
+"Oil pan (LS)"
+],
+[
+"总装线 A11：通电检查",
+"Line LS A11: Power-on check"
+],
+[
 "数字隔离器（型号待确认）",
 "Digital isolator"
 ],
 [
+"数控凸轮磨床 GRD-K",
+"CNC cam grinder 1 GRD-K"
+],
+[
 "数控车床 CNC-L01",
 "CNC lathe CNC-L01"
+],
+[
+"梭壳与梭芯（型号待确认）",
+"Bobbin case & bobbin"
+],
+[
+"梭道磨床 1 号（旋梭）",
+"Hook raceway grinder 1"
+],
+[
+"物流小车 1 号（铸件）",
+"AGV 1 (castings)"
+],
+[
+"物流小车 2 号（零件）",
+"AGV 2 (parts)"
+],
+[
+"物流小车 3 号（装配）",
+"AGV 3 (assembly)"
 ],
 [
 "环氧塑封料（型号待确认）",
@@ -1616,12 +2616,24 @@
 "Magnet Wire Supplier (Demo)"
 ],
 [
+"立式加工中心 VMC-H",
+"VMC 1 (LS housing) VMC-H"
+],
+[
+"立式加工中心 VMC-P",
+"VMC 1 (LS housing) VMC-P"
+],
+[
 "立式加工中心 VMC-R",
 "VMC 1 VMC-R"
 ],
 [
 "防静电袋 ESD bag",
 "ESD bag"
+],
+[
+"零件清洗机 WASH-P",
+"Parts washer WASH-P"
 ],
 [
 "AGV 装配工位 AA",
@@ -1636,6 +2648,22 @@
 "Humanoid main controller"
 ],
 [
+"出厂测试台 EOL-L",
+"LS end-of-line tester 1 EOL-L"
+],
+[
+"出厂测试台 EOL-O",
+"LS end-of-line tester 1 EOL-O"
+],
+[
+"刮腻子打磨工位 1 号",
+"Putty station 1"
+],
+[
+"刮腻子打磨工位 2 号",
+"Putty station 2"
+],
+[
 "功率电感（型号待确认）",
 "Power inductor"
 ],
@@ -1644,12 +2672,92 @@
 "Power terminal"
 ],
 [
+"包缝机调试工位 1 号",
+"OL adjustment station 1"
+],
+[
+"包缝机调试工位 2 号",
+"OL adjustment station 2"
+],
+[
+"包缝机调试工位 3 号",
+"OL adjustment station 3"
+],
+[
+"半成品库（机壳、零件）",
+"WIP store (housings, parts)"
+],
+[
+"同步带轮（型号待确认）",
+"Timing pulley"
+],
+[
 "回流焊炉（10 温区）",
 "Reflow oven"
 ],
 [
+"型砂实验室 LAB-S",
+"Sand lab LAB-S"
+],
+[
 "外圆磨床 GRD-01",
 "Cylindrical grinder GRD-01"
+],
+[
+"平缝机调试工位 1 号",
+"LS adjustment station 1"
+],
+[
+"平缝机调试工位 2 号",
+"LS adjustment station 2"
+],
+[
+"平缝机调试工位 3 号",
+"LS adjustment station 3"
+],
+[
+"平缝机调试工位 4 号",
+"LS adjustment station 4"
+],
+[
+"平缝机调试工位 5 号",
+"LS adjustment station 5"
+],
+[
+"平缝机跑合台 10 号",
+"LS run-in stand 10"
+],
+[
+"平缝机跑合台 11 号",
+"LS run-in stand 11"
+],
+[
+"平缝机跑合台 12 号",
+"LS run-in stand 12"
+],
+[
+"平缝机跑合台 13 号",
+"LS run-in stand 13"
+],
+[
+"平缝机跑合台 14 号",
+"LS run-in stand 14"
+],
+[
+"平缝机跑合台 15 号",
+"LS run-in stand 15"
+],
+[
+"振动清砂机（内腔芯砂）",
+"Vibratory core knockout"
+],
+[
+"水平分型脱箱射压造型线",
+"Flaskless horizontal moulding line"
+],
+[
+"炉前分析室 LAB-M",
+"Melt lab (spectrometer, thermal analysis) LAB-M"
 ],
 [
 "码盘粘接对心机 1 号",
@@ -1680,6 +2788,10 @@
 "Encoder calibration bench ECAL"
 ],
 [
+"自动浇注机（随流孕育）",
+"Automatic pouring unit (stream inoculation)"
+],
+[
 "装配工位 ASM-01",
 "Assembly station ASM-01"
 ],
@@ -1692,8 +2804,36 @@
 "Keyway miller KEY-01"
 ],
 [
+"面漆 Top coat",
+"Top coat"
+],
+[
+"面漆喷房（遮蔽后喷涂）",
+"Top-coat booth"
+],
+[
 "RT-底座 Base",
 "Base"
+],
+[
+"RT-轴 Shaft",
+"Shaft"
+],
+[
+"三坐标测量机 CMM",
+"CMM (metrology room) CMM"
+],
+[
+"上弯针（型号待确认）",
+"Upper looper"
+],
+[
+"下弯针（型号待确认）",
+"Lower looper"
+],
+[
+"中频感应电炉 IND",
+"Induction furnace 1 t no.1 IND"
 ],
 [
 "充磁机（电容放电式）",
@@ -1708,12 +2848,68 @@
 "Joint assembly 2"
 ],
 [
+"内圆磨床 GRD-I",
+"Internal grinder GRD-I"
+],
+[
+"凸轮 / 偏心测量仪",
+"Cam & eccentric gauge"
+],
+[
+"分装台：送布抬牙组件",
+"Sub-assembly: feed mechanism"
+],
+[
+"分装台：针杆挑线组件",
+"Sub-assembly: needle bar & take-up"
+],
+[
+"包缝机包装箱与附件包",
+"Box & accessory kit (OL)"
+],
+[
+"包缝机跑合台 1 号",
+"OL run-in stand 1"
+],
+[
+"包缝机跑合台 2 号",
+"OL run-in stand 2"
+],
+[
+"包缝机跑合台 3 号",
+"OL run-in stand 3"
+],
+[
+"包缝机跑合台 4 号",
+"OL run-in stand 4"
+],
+[
+"包缝机跑合台 5 号",
+"OL run-in stand 5"
+],
+[
+"包缝机跑合台 6 号",
+"OL run-in stand 6"
+],
+[
 "包装 Packing",
 "Packing"
 ],
 [
+"卧式加工中心 HMC",
+"HMC 1 (LS housing) HMC"
+],
+[
+"同步带（型号待确认）",
+"Timing belt"
+],
+[
 "塑封 Molding",
 "Molding"
+],
+[
+"外圆磨床 GRD-C",
+"Cylindrical grinder 1 GRD-C"
 ],
 [
 "外圆磨床 GRD-R",
@@ -1728,8 +2924,60 @@
 "Band saw SAW-01"
 ],
 [
+"平缝机包装箱与附件包",
+"Box & accessory kit (LS)"
+],
+[
+"平缝机跑合台 1 号",
+"LS run-in stand 1"
+],
+[
+"平缝机跑合台 2 号",
+"LS run-in stand 2"
+],
+[
+"平缝机跑合台 3 号",
+"LS run-in stand 3"
+],
+[
+"平缝机跑合台 4 号",
+"LS run-in stand 4"
+],
+[
+"平缝机跑合台 5 号",
+"LS run-in stand 5"
+],
+[
+"平缝机跑合台 6 号",
+"LS run-in stand 6"
+],
+[
+"平缝机跑合台 7 号",
+"LS run-in stand 7"
+],
+[
+"平缝机跑合台 8 号",
+"LS run-in stand 8"
+],
+[
+"平缝机跑合台 9 号",
+"LS run-in stand 9"
+],
+[
+"底漆喷房 PRIME",
+"Primer booth PRIME"
+],
+[
+"总装线 A12：下线",
+"Line LS A12: Unload"
+],
+[
 "探针台与测试机 CP",
 "Prober + tester (CP) CP"
+],
+[
+"数控凸轮磨床 2 号",
+"CNC cam grinder 2"
 ],
 [
 "数控车床 CNC-R",
@@ -1740,8 +2988,28 @@
 "Robot calibration cell CAL"
 ],
 [
+"无心磨床 GRD-L",
+"Centreless grinder GRD-L"
+],
+[
 "晶圆来料检验台 WI",
 "Wafer incoming inspection WI"
+],
+[
+"机壳终检站 QC-H",
+"Housing final inspection (air gauges, check fixture) QC-H"
+],
+[
+"梭道磨床 GRD-H",
+"Hook raceway grinder 1 GRD-H"
+],
+[
+"清洗机 WASH-H",
+"Through-feed housing washer WASH-H"
+],
+[
+"渗漏试验台 LEAK",
+"Leak test bench (OL oil sump) LEAK"
 ],
 [
 "滚齿机 HOB-01",
@@ -1772,6 +3040,14 @@
 "Mold Compound & Adhesive (Demo)"
 ],
 [
+"示例·生铁废钢供应商",
+"Pig Iron & Scrap Supplier (Demo)"
+],
+[
+"示例·缝纫设备经销商",
+"Sewing Equipment Dealer (Demo)"
+],
+[
 "示例·阻容与连接器商",
 "Passives & Connectors (Demo)"
 ],
@@ -1800,8 +3076,40 @@
 "AOI AOI"
 ],
 [
+"自动浇注机 POUR",
+"Automatic pouring unit (stream inoculation) POUR"
+],
+[
+"覆膜砂射芯机 1 号",
+"Shell core shooter no.1"
+],
+[
+"覆膜砂射芯机 2 号",
+"Shell core shooter no.2"
+],
+[
+"覆膜砂射芯机 3 号",
+"Shell core shooter no.3"
+],
+[
+"调试工位 ADJ-L",
+"LS adjustment station 1 ADJ-L"
+],
+[
+"调试工位 ADJ-O",
+"LS adjustment station 1 ADJ-O"
+],
+[
 "铣削 Milling",
 "Milling"
+],
+[
+"零件检验站 QC-P",
+"Parts inspection (gauges, runout tester) QC-P"
+],
+[
+"面漆喷房 PAINT",
+"Top-coat booth PAINT"
 ],
 [
 "6061 铝合金棒",
@@ -1828,12 +3136,36 @@
 "Joint assembly 1 JA"
 ],
 [
+"分装台 SUB-L",
+"Sub-assembly: upper shaft SUB-L"
+],
+[
+"分装台 SUB-O",
+"Sub-assembly: upper shaft SUB-O"
+],
+[
 "划片 Dicing",
 "Dicing"
 ],
 [
+"刮腻子工位 PUT",
+"Putty station 1 PUT"
+],
+[
 "功能测试台 FCT",
 "Functional test bench FCT"
+],
+[
+"原子灰 Putty",
+"Putty"
+],
+[
+"去毛刺工位 DEB",
+"Deburring 1 (LS) DEB"
+],
+[
+"去浇冒口 GATE",
+"Degating station GATE"
 ],
 [
 "在线测试仪 ICT",
@@ -1860,6 +3192,10 @@
 "Strain-gauge bonding bench SG"
 ],
 [
+"底漆 Primer",
+"Primer"
+],
+[
 "引线键合机 1 号",
 "Wire bonder 1"
 ],
@@ -1868,8 +3204,16 @@
 "Wire bonder 2"
 ],
 [
+"弯针 / 差动偏心",
+"Looper eccentric"
+],
+[
 "扭矩终检台 TFT",
 "Torque sensor final test TFT"
+],
+[
+"数控车床 10 号",
+"CNC lathe 10"
 ],
 [
 "整机装配单元 RA",
@@ -1880,8 +3224,28 @@
 "Incoming inspection IQC"
 ],
 [
+"梭尖研磨机 1 号",
+"Hook point lapping 1"
+],
+[
+"梭尖研磨机 2 号",
+"Hook point lapping 2"
+],
+[
+"梭尖研磨机 LAP",
+"Hook point lapping 1 LAP"
+],
+[
 "检验站 QC-01",
 "Inspection station QC-01"
+],
+[
+"毛坯检验台 IQC",
+"Casting receiving inspection IQC"
+],
+[
+"渗碳淬火线 CAR",
+"Continuous mesh-belt carburising line CAR"
 ],
 [
 "温度循环箱 TCY",
@@ -1894,6 +3258,10 @@
 [
 "漆包线与绝缘材料商",
 "Magnet Wire Supplier (Demo)"
+],
+[
+"理化室 LAB-P",
+"Test lab (tensile, hardness, metallography) LAB-P"
 ],
 [
 "电机总装台 ASM",
@@ -1940,12 +3308,28 @@
 "GreenValley Conveyor (Demo)"
 ],
 [
+"示例·缝纫机电控商",
+"Sewing Drive Supplier (Demo)"
+],
+[
+"示例·缝纫机配件商",
+"Sewing Parts Supplier (Demo)"
+],
+[
 "示例·自动化设备厂",
 "Automation Equipment Maker (Demo)"
 ],
 [
+"示例·轴承标准件商",
+"Bearings & Fasteners (Demo)"
+],
+[
 "示例·钕铁硼磁钢厂",
 "NdFeB Magnet Maker (Demo)"
+],
+[
+"示例·钣金塑料件商",
+"Covers Supplier (Demo)"
 ],
 [
 "等离子清洗机 PL",
@@ -1964,8 +3348,24 @@
 "Virtual PLC run"
 ],
 [
+"计量室 CMM-R",
+"Cam & eccentric gauge CMM-R"
+],
+[
 "质量异常单（8D）",
 "8D report"
+],
+[
+"跑合台 RUN-L",
+"LS run-in stand 1 RUN-L"
+],
+[
+"跑合台 RUN-O",
+"LS run-in stand 1 RUN-O"
+],
+[
+"送布 / 抬牙偏心",
+"Feed eccentric"
 ],
 [
 "铁芯叠压机 STK",
@@ -1974,6 +3374,14 @@
 [
 "锡膏检测仪 SPI",
 "Solder paste inspection SPI"
+],
+[
+"高频淬火机 IHD",
+"Induction hardening machine IHD"
+],
+[
+"高频淬火机（轴颈）",
+"Induction hardening machine"
 ],
 [
 "AGV 装配工位",
@@ -1992,6 +3400,26 @@
 "Joint test bench JT"
 ],
 [
+"冷却线 COOL",
+"Mould cooling line COOL"
+],
+[
+"分装台：上轴组件",
+"Sub-assembly: upper shaft"
+],
+[
+"分装台：下轴组件",
+"Sub-assembly: lower shaft"
+],
+[
+"分装台：主轴组件",
+"Sub-assembly: main shaft"
+],
+[
+"分装台：弯针机构",
+"Sub-assembly: looper drive"
+],
+[
 "切筋成型机 TF",
 "Trim & form / singulation TF"
 ],
@@ -2002,6 +3430,18 @@
 [
 "动平衡机 BAL",
 "Rotor balancing machine BAL"
+],
+[
+"包缝机出厂测试台",
+"OL end-of-line tester"
+],
+[
+"包装台 PK-L",
+"LS cleaning & packing PK-L"
+],
+[
+"包装台 PK-O",
+"LS cleaning & packing PK-O"
 ],
 [
 "包装台（防静电）",
@@ -2016,20 +3456,68 @@
 "ICT"
 ],
 [
+"外圆磨床 1 号",
+"Cylindrical grinder 1"
+],
+[
+"外圆磨床 2 号",
+"Cylindrical grinder 2"
+],
+[
+"外圆磨床 3 号",
+"Cylindrical grinder 3"
+],
+[
+"外圆磨床 4 号",
+"Cylindrical grinder 4"
+],
+[
 "安全、健康与环境",
 "EHS"
+],
+[
+"射芯机 CORE",
+"Shell core shooter no.1 CORE"
 ],
 [
 "工业机器人集成商",
 "Robot Integrator (Demo)"
 ],
 [
+"平缝机清洗包装台",
+"LS cleaning & packing"
+],
+[
 "引线键合机 WB",
 "Wire bonder 1 WB"
 ],
 [
+"打磨工位 1 号",
+"Fettling station 1"
+],
+[
+"打磨工位 2 号",
+"Fettling station 2"
+],
+[
+"打磨工位 3 号",
+"Fettling station 3"
+],
+[
+"打磨工位 FET",
+"Fettling station 1 FET"
+],
+[
+"抛丸机 SHOT",
+"Hanger shot-blast machine SHOT"
+],
+[
 "抱闸测试台 BT",
 "Brake tester BT"
+],
+[
+"振动清砂 VIB",
+"Vibratory core knockout VIB"
 ],
 [
 "数控车床 1 号",
@@ -2038,6 +3526,46 @@
 [
 "数控车床 2 号",
 "CNC lathe 2"
+],
+[
+"数控车床 3 号",
+"CNC lathe 3"
+],
+[
+"数控车床 4 号",
+"CNC lathe 4"
+],
+[
+"数控车床 5 号",
+"CNC lathe 5"
+],
+[
+"数控车床 6 号",
+"CNC lathe 6"
+],
+[
+"数控车床 7 号",
+"CNC lathe 7"
+],
+[
+"数控车床 8 号",
+"CNC lathe 8"
+],
+[
+"数控车床 9 号",
+"CNC lathe 9"
+],
+[
+"数控车床 CNC",
+"CNC lathe 1 CNC"
+],
+[
+"无心磨床（针杆）",
+"Centreless grinder"
+],
+[
+"梭道磨床 2 号",
+"Hook raceway grinder 2"
 ],
 [
 "测试分选机 FT",
@@ -2054,6 +3582,14 @@
 [
 "物流小车 2 号",
 "AGV 2"
+],
+[
+"砂处理 SAND",
+"Rotor sand mixer SAND"
+],
+[
+"砂芯检验台 CQ",
+"Core finishing & check bench CQ"
 ],
 [
 "磁钢粘贴台 MG",
@@ -2112,6 +3648,10 @@
 "Logistics Equipment Maker (Demo)"
 ],
 [
+"示例·特钢棒材商",
+"Special Steel Bars (Demo)"
+],
+[
 "示例·电子元件商",
 "Electronics Supplier (Demo)"
 ],
@@ -2134,6 +3674,10 @@
 [
 "示例·芯片代理商",
 "IC Distributor (Demo)"
+],
+[
+"示例·造型材料商",
+"Foundry Consumables (Demo)"
 ],
 [
 "空心输出轴（中）",
@@ -2166,6 +3710,22 @@
 [
 "谐波减速器代理商",
 "Strain-wave Gear Distributor (Demo)"
+],
+[
+"造型线 MOLD",
+"Flaskless horizontal moulding line MOLD"
+],
+[
+"配料加料 CHG",
+"Charge scale & feeder CHG"
+],
+[
+"钻攻中心 TAP",
+"Tapping centre 1 (LS, 4-axis) TAP"
+],
+[
+"铸件检验台 CI",
+"Casting inspection bench CI"
 ],
 [
 "锡膏印刷机 SP",
@@ -2232,6 +3792,18 @@
 "Transfer molding press MLD"
 ],
 [
+"带锯床 1 号",
+"Band saw 1"
+],
+[
+"带锯床 2 号",
+"Band saw 2"
+],
+[
+"带锯床 SAW",
+"Band saw 1 SAW"
+],
+[
 "成品库（防潮）",
 "Finished goods store"
 ],
@@ -2240,16 +3812,32 @@
 "Prober + tester (CP)"
 ],
 [
+"时效炉 AGE",
+"Bogie stress-relief furnace AGE"
+],
+[
 "晶圆来料检验台",
 "Wafer incoming inspection"
+],
+[
+"校直机 STR",
+"Straightening press STR"
 ],
 [
 "浸漆烘箱 VO",
 "Varnish dip & bake oven VO"
 ],
 [
+"烘道 OVEN",
+"Low-temperature curing oven OVEN"
+],
+[
 "烧录工位 PG",
 "Programming station PG"
+],
+[
+"生铁废钢供应商",
+"Pig Iron & Scrap Supplier (Demo)"
 ],
 [
 "电镀线 PLT",
@@ -2262,6 +3850,10 @@
 [
 "码盘粘接对心机",
 "Disk bonding & centering 1"
+],
+[
+"砂芯修整检验台",
+"Core finishing & check bench"
 ],
 [
 "示例·东岳铸造",
@@ -2324,8 +3916,16 @@
 "Changhe Forging (Demo)"
 ],
 [
+"缝纫设备经销商",
+"Sewing Equipment Dealer (Demo)"
+],
+[
 "设备维护与资产",
 "Maintenance & assets"
+],
+[
+"配料秤与加料车",
+"Charge scale & feeder"
 ],
 [
 "问渠芯片封测厂",
@@ -2336,8 +3936,20 @@
 "Passives & Connectors (Demo)"
 ],
 [
+"45 钢圆棒",
+"Steel bar 1045 Ø16"
+],
+[
 "三坐标测量室",
 "CMM room"
+],
+[
+"三坐标测量机",
+"CMM (metrology room)"
+],
+[
+"中频感应电炉",
+"Induction furnace 1 t no.1"
 ],
 [
 "人形总装工位",
@@ -2364,6 +3976,14 @@
 "Dicing saw DC"
 ],
 [
+"包缝机包装台",
+"OL packing"
+],
+[
+"包缝机总装线",
+"Line OL B01: Housing loading, oil pump"
+],
+[
 "包装台 PK",
 "Packing bench PK"
 ],
@@ -2380,12 +4000,24 @@
 "Horizontal machining centre"
 ],
 [
+"去浇冒口工位",
+"Degating station"
+],
+[
 "合箱钻铰销孔",
 "Pin-hole reaming"
 ],
 [
+"吊钩式抛丸机",
+"Hanger shot-blast machine"
+],
+[
 "多功能贴片机",
 "Flexible placer"
+],
+[
+"平缝机总装线",
+"Line LS A01: Head loading & serial scan"
 ],
 [
 "应变片粘贴台",
@@ -2394,6 +4026,10 @@
 [
 "应变胶固化炉",
 "Adhesive cure oven"
+],
+[
+"数控凸轮磨床",
+"CNC cam grinder 1"
 ],
 [
 "数控车床 A",
@@ -2440,6 +4076,18 @@
 "Disk bonding & centering"
 ],
 [
+"示例·家纺厂",
+"Home Textile Maker (Demo)"
+],
+[
+"示例·服装厂",
+"Garment Maker (Demo)"
+],
+[
+"示例·涂料商",
+"Paint Supplier (Demo)"
+],
+[
 "程序烧录工位",
 "Programming station"
 ],
@@ -2450,6 +4098,10 @@
 [
 "等离子清洗机",
 "Plasma cleaner"
+],
+[
+"粗糙度轮廓仪",
+"Surface roughness & contour tester"
 ],
 [
 "绕线机 WD",
@@ -2472,6 +4124,14 @@
 "Encoder final test"
 ],
 [
+"缝纫机电控商",
+"Sewing Drive Supplier (Demo)"
+],
+[
+"缝纫机配件商",
+"Sewing Parts Supplier (Demo)"
+],
+[
 "老化房 BI",
 "Burn-in room BI"
 ],
@@ -2484,8 +4144,16 @@
 "Automation Equipment Maker (Demo)"
 ],
 [
+"落砂机 SO",
+"Vibrating shakeout SO"
+],
+[
 "装片机 DA",
 "Die bonder DA"
+],
+[
+"调质炉 QT",
+"Hardening & tempering furnace QT"
 ],
 [
 "质量问题情景",
@@ -2500,12 +4168,24 @@
 "Bearing press-fit station"
 ],
 [
+"轴承标准件商",
+"Bearings & Fasteners (Demo)"
+],
+[
+"轴承钢冷拉棒",
+"Bearing steel bar Ø9"
+],
+[
 "选择焊 SW",
 "Selective soldering SW"
 ],
 [
 "钕铁硼磁钢厂",
 "NdFeB Magnet Maker (Demo)"
+],
+[
+"钣金塑料件商",
+"Covers Supplier (Demo)"
 ],
 [
 "问渠传感器厂",
@@ -2522,6 +4202,10 @@
 [
 "问渠电路板厂",
 "WenQuest Electronics (Demo)"
+],
+[
+"问渠缝纫机厂",
+"WenQuest Sewing Machines (Demo)"
 ],
 [
 "防静电包装盒",
@@ -2592,16 +4276,36 @@
 "Socket screw M4×12"
 ],
 [
+"出厂测试台",
+"LS end-of-line tester 1"
+],
+[
 "切筋成型机",
 "Trim & form / singulation"
+],
+[
+"刮腻子工位",
+"Putty station 1"
 ],
 [
 "功能测试台",
 "Functional test bench"
 ],
 [
+"包缝机主轴",
+"Main shaft"
+],
+[
+"包缝机针杆",
+"Needle bar (OL)"
+],
+[
 "包装材料商",
 "Packaging Supplier (Demo)"
+],
+[
+"去毛刺工位",
+"Deburring 1 (LS)"
 ],
 [
 "后固化烘箱",
@@ -2610,6 +4314,10 @@
 [
 "在线测试仪",
 "In-circuit tester"
+],
+[
+"型砂实验室",
+"Sand lab"
 ],
 [
 "多功能贴片",
@@ -2638,6 +4346,18 @@
 [
 "市场与客户",
 "Market & customers"
+],
+[
+"平缝机上轴",
+"Upper shaft"
+],
+[
+"平缝机下轴",
+"Lower (hook) shaft"
+],
+[
+"平缝机针杆",
+"Needle bar (LS)"
 ],
 [
 "平面密封胶",
@@ -2672,6 +4392,10 @@
 "Brake tester"
 ],
 [
+"振动落砂机",
+"Vibrating shakeout"
+],
+[
 "授权分销商",
 "Authorized Distributor (Demo)"
 ],
@@ -2688,8 +4412,20 @@
 "Service engineer"
 ],
 [
+"机壳终检站",
+"Housing final inspection (air gauges, check fixture)"
+],
+[
 "来料检验台",
 "Incoming inspection"
+],
+[
+"梭尖研磨机",
+"Hook point lapping 1"
+],
+[
+"毛坯检验台",
+"Casting receiving inspection"
 ],
 [
 "测试分选机",
@@ -2698,6 +4434,14 @@
 [
 "海湾润滑油",
 "Gulf Coast Lubricants (Demo)"
+],
+[
+"渗漏试验台",
+"Leak test bench (OL oil sump)"
+],
+[
+"渗碳淬火线",
+"Continuous mesh-belt carburising line"
 ],
 [
 "温度循环箱",
@@ -2720,12 +4464,20 @@
 "SICK TiM781 Laser scanner"
 ],
 [
+"炉前分析室",
+"Melt lab (spectrometer, thermal analysis)"
+],
+[
 "焊接材料商",
 "Solder & Chemicals (Demo)"
 ],
 [
 "物流设备厂",
 "Logistics Equipment Maker (Demo)"
+],
+[
+"特钢棒材商",
+"Special Steel Bars (Demo)"
 ],
 [
 "电子元件商",
@@ -2750,6 +4502,10 @@
 [
 "码盘清洗台",
 "Disk cleaning station"
+],
+[
+"砂芯检验台",
+"Core finishing & check bench"
 ],
 [
 "砝码标定台",
@@ -2792,6 +4548,10 @@
 "Energy & utilities"
 ],
 [
+"自动浇注机",
+"Automatic pouring unit (stream inoculation)"
+],
+[
 "芯片代理商",
 "IC Distributor (Demo)"
 ],
@@ -2812,6 +4572,10 @@
 "Run-in test rig"
 ],
 [
+"转子混砂机",
+"Rotor sand mixer"
+],
+[
 "输入轴组件",
 "Input shaft assembly"
 ],
@@ -2820,12 +4584,24 @@
 "Output shaft assembly"
 ],
 [
+"造型材料商",
+"Foundry Consumables (Demo)"
+],
+[
 "钻攻螺纹孔",
 "Drilling & tapping"
 ],
 [
 "铁芯叠压机",
 "Lamination stacking press"
+],
+[
+"铸件检验台",
+"Casting inspection bench"
+],
+[
+"铸型冷却线",
+"Mould cooling line"
 ],
 [
 "销售与交付",
@@ -2852,8 +4628,20 @@
 "Library entry"
 ],
 [
+"零件检验站",
+"Parts inspection (gauges, runout tester)"
+],
+[
+"零件清洗机",
+"Parts washer"
+],
+[
 "高速贴片机",
 "Chip shooter"
+],
+[
+"高频淬火机",
+"Induction hardening machine"
 ],
 [
 "三防涂覆",
@@ -2904,6 +4692,10 @@
 "Joint assembly"
 ],
 [
+"内圆磨床",
+"Internal grinder"
+],
+[
 "出厂检验",
 "Final inspection"
 ],
@@ -2932,6 +4724,10 @@
 "PPE issue"
 ],
 [
+"包缝机壳",
+"Overlock housing"
+],
+[
 "北方铝业",
 "Northern Aluminium (Demo)"
 ],
@@ -2954,6 +4750,10 @@
 [
 "厂情报告",
 "Ops report"
+],
+[
+"去浇冒口",
+"Degating station"
 ],
 [
 "回流焊炉",
@@ -3016,12 +4816,20 @@
 "Process plan"
 ],
 [
+"平缝机壳",
+"Lockstitch housing"
+],
+[
 "应变片商",
 "Strain Gauge Supplier (Demo)"
 ],
 [
 "应急演练",
 "Emergency drill"
+],
+[
+"底漆喷房",
+"Primer booth"
 ],
 [
 "引线键合",
@@ -3036,12 +4844,20 @@
 "Cost center"
 ],
 [
+"打磨工位",
+"Fettling station 1"
+],
+[
 "扭矩终检",
 "Torque final test"
 ],
 [
 "抱闸测试",
 "Brake test"
+],
+[
+"振动清砂",
+"Vibratory core knockout"
 ],
 [
 "排放指标",
@@ -3072,6 +4888,10 @@
 "Robot assembly"
 ],
 [
+"无心磨床",
+"Centreless grinder"
+],
+[
 "晶圆测试",
 "CP Wafer probe"
 ],
@@ -3086,6 +4906,10 @@
 [
 "标准件商",
 "Fastener Supplier (Demo)"
+],
+[
+"梭道磨床",
+"Hook raceway grinder 1"
 ],
 [
 "检验计划",
@@ -3236,6 +5060,10 @@
 "Read-head mounting"
 ],
 [
+"调试工位",
+"LS adjustment station 1"
+],
+[
 "负载跑合",
 "Load run-in"
 ],
@@ -3260,12 +5088,24 @@
 "Sub-assembly"
 ],
 [
+"配料加料",
+"Charge scale & feeder"
+],
+[
+"钻攻中心",
+"Tapping centre 1 (LS, 4-axis)"
+],
+[
 "铁芯叠压",
 "Lamination stacking"
 ],
 [
 "铣结合面",
 "Face milling"
+],
+[
+"铸造生铁",
+"Foundry pig iron"
 ],
 [
 "销售订单",
@@ -3308,6 +5148,10 @@
 "Part inspection"
 ],
 [
+"面漆喷房",
+"Top-coat booth"
+],
+[
 "风险评估",
 "Risk assessment"
 ],
@@ -3340,12 +5184,20 @@
 "Magnetizer"
 ],
 [
+"冷却线",
+"Mould cooling line"
+],
+[
 "减薄机",
 "Back grinder"
 ],
 [
 "出入库",
 "Stock movement"
+],
+[
+"分装台",
+"Sub-assembly: upper shaft"
 ],
 [
 "划片机",
@@ -3368,6 +5220,10 @@
 "Hazard"
 ],
 [
+"原子灰",
+"Putty"
+],
+[
 "原料库",
 "Raw store"
 ],
@@ -3388,8 +5244,24 @@
 "Post-mold cure oven"
 ],
 [
+"圆度仪",
+"Roundness tester"
+],
+[
 "塑封机",
 "Transfer molding press"
+],
+[
+"增碳剂",
+"Carburiser"
+],
+[
+"家纺厂",
+"Home Textile Maker (Demo)"
+],
+[
+"射芯机",
+"Shell core shooter no.1"
 ],
 [
 "带锯床",
@@ -3404,20 +5276,52 @@
 "Finished store"
 ],
 [
+"抛丸机",
+"Hanger shot-blast machine"
+],
+[
 "收货单",
 "Purchase receipt"
+],
+[
+"时效炉",
+"Bogie stress-relief furnace"
+],
+[
+"服装厂",
+"Garment Maker (Demo)"
+],
+[
+"校直机",
+"Straightening press"
 ],
 [
 "检验站",
 "Inspection station"
 ],
 [
+"涂料商",
+"Paint Supplier (Demo)"
+],
+[
+"清洗机",
+"Through-feed housing washer"
+],
+[
 "滚齿机",
 "Gear hobber"
 ],
 [
+"理化室",
+"Test lab (tensile, hardness, metallography)"
+],
+[
 "电镀线",
 "Plating line"
+],
+[
+"砂处理",
+"Rotor sand mixer"
 ],
 [
 "磨外圆",
@@ -3444,8 +5348,20 @@
 "Adhesive cure"
 ],
 [
+"落砂机",
+"Vibrating shakeout"
+],
+[
 "装片机",
 "Die bonder"
+],
+[
+"覆膜砂",
+"Resin-coated sand"
+],
+[
+"计量室",
+"Cam & eccentric gauge"
 ],
 [
 "计量点",
@@ -3456,8 +5372,16 @@
 "Material request"
 ],
 [
+"调质炉",
+"Hardening & tempering furnace"
+],
+[
 "贴片机",
 "Chip shooter"
+],
+[
+"跑合台",
+"LS run-in stand 1"
 ],
 [
 "输出轴",
@@ -3468,12 +5392,24 @@
 "Selective soldering"
 ],
 [
+"造型线",
+"Flaskless horizontal moulding line"
+],
+[
 "采购单",
 "Purchase order"
 ],
 [
 "铣键槽",
 "Keyway milling"
+],
+[
+"铸件库",
+"Castings store"
+],
+[
+"防锈油",
+"Rust-preventive oil"
 ],
 [
 "下料",
@@ -3580,6 +5516,14 @@
 "Robot base"
 ],
 [
+"底漆",
+"Primer"
+],
+[
+"废钢",
+"Steel scrap"
+],
+[
 "异常",
 "Anomaly"
 ],
@@ -3608,6 +5552,10 @@
 "Proposal"
 ],
 [
+"旋梭",
+"Rotary hook"
+],
+[
 "测量",
 "Measurement"
 ],
@@ -3618,6 +5566,10 @@
 [
 "点检",
 "Routine check"
+],
+[
+"烘道",
+"Low-temperature curing oven"
 ],
 [
 "物料",
@@ -3702,6 +5654,10 @@
 [
 "隐患",
 "Safety issue"
+],
+[
+"面漆",
+"Top coat"
 ],
 [
 "预算",

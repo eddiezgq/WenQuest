@@ -171,7 +171,7 @@ jobs:
     name: 服务器演练（真 ERPNext）
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 230
+    timeout-minutes: 260
     env:
       FACTORY_DIR: /tmp/fac
       LEARN_DIR: /tmp/nolearn
@@ -380,8 +380,8 @@ jobs:
                                  python3 factory/deploy/ci_annotate.py 电机厂闭环失败项 /tmp/logs/motor_fail.log 40; }
             fi
           fi
-          # 第 133 轮：示例缝纫机厂（企业版样板）起来，自己接单走到开票（不接入工业园）
-          sewing=$(awk -F'\t' '$2 ~ /example-sewing-products\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
+          # 第 133 轮：缝纫机厂起来，自己接单走到开票（不接入工业园）；第 134 轮换成按工艺方案建的问渠缝纫机厂（平缝机、包缝机各一台）
+          sewing=$(awk -F'\t' '$2 ~ /wenquest-sewing\.yaml$/ {print $1; exit}' "$FACTORY_DIR/classes.plants")
           if [ "$st" = 0 ] && [ -n "$sewing" ]; then
             m=0; for c in $(cat "$FACTORY_DIR/classes.ids"); do [ "$c" = "$sewing" ] && break; m=$((m + 1)); done
             sewhubp=$((8102 + m)); sewerpp=$((8093 + m)); sup=$(echo "$sewing" | tr '[:lower:]' '[:upper:]')
@@ -391,8 +391,8 @@ jobs:
               for i in $(seq 1 40); do curl -fsS localhost:$sewhubp/api/health && break; sleep 5; done
               cd factory/digital
               python tests/plant_loop.py --hub http://localhost:$sewhubp --erp http://localhost:$sewerpp --erp-kind real \
-                --erp-key "$(val WQ_C_${sup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${sup}_ERP_API_SECRET)" --speed 300 --timeout 900 \
-                --item SEW-DDL:1 --reliability 0 --staffing 0 --domains --expect-products SEW-DDL \
+                --erp-key "$(val WQ_C_${sup}_ERP_API_KEY)" --erp-secret "$(val WQ_C_${sup}_ERP_API_SECRET)" --speed 600 --timeout 1800 \
+                --item WQ-LS:1 --item WQ-OL:1 --reliability 0 --staffing 0 --domains --expect-products WQ-LS,WQ-OL \
                 2>&1 | tee /tmp/logs/sewing_loop.log
               st=${PIPESTATUS[0]}
               cd - >/dev/null

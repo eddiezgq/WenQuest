@@ -51,6 +51,22 @@ site_setup() {
     local year keys setup i
     [ -n "$(envval "${pre}_SECRET")" ] || envset "${pre}_SECRET" "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32 || true)"
     [ -n "$(envval "${pre}_ERP_OAUTH_SECRET")" ] || envset "${pre}_ERP_OAUTH_SECRET" "$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 40 || true)"
+    # 第 134 轮：按清单起的厂换了清单（公司变了，如缝纫机厂从“示例缝纫机厂”换成“问渠缝纫机厂”）——旧站点里没有这家公司：
+    # 删掉这座厂的 ERPNext 站点和历史库，按新清单重建（只在公司对不上时发生；其他厂、其他部署不受影响）
+    if [ -n "${SETUP_COMPANY:-}" ] && dc exec -T erp-backend test -d "sites/$site"; then
+        setup=$(ERP_SITE=$site bench_exec frappe.is_setup_complete 2>/dev/null | tail -n 1 || true)
+        if [ "$setup" = "true" ] || [ "$setup" = "True" ] || [ "$setup" = "1" ]; then
+            local has
+            has=$(ERP_SITE=$site bench_exec frappe.db.exists --args "['Company', '$SETUP_COMPANY']" 2>/dev/null | tail -n 1 || true)
+            if [ -z "$has" ] || [ "$has" = "None" ]; then
+                log "$label：清单换了公司（$SETUP_COMPANY），重建 ERPNext 站点和历史库..."
+                dc exec -T erp-backend bench drop-site "$site" --force --no-backup \
+                    --root-login root --root-password "$(envval ERP_DB_ROOT_PASSWORD)" || true
+                dc exec -T db psql -U wq -d wq_factory -c "drop database if exists $db with (force)" >/dev/null || true
+                envset "${pre}_SEEDED" 0; envset "${pre}_ERP_API_KEY" ""; envset "${pre}_ERP_API_SECRET" ""
+            fi
+        fi
+    fi
     dc exec -T db psql -U wq -d wq_factory -tAc "select 1 from pg_database where datname='$db'" | grep -q 1 \
         || { log "$label：新建历史库 $db..."; dc exec -T db psql -U wq -d wq_factory -c "create database $db" >/dev/null; }
     if ! dc exec -T erp-backend test -d "sites/$site"; then

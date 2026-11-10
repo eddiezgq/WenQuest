@@ -47,7 +47,7 @@ def test_plants_listing_for_setup_script():
     assert rows[2][1:4] == ["/app/plants/wenquest-chip.yaml", "问渠芯片封测厂 WenQuest Semiconductor (Demo)", "WQSC"]
     assert rows[3][1:4] == ["/app/plants/wenquest-sensor.yaml", "问渠传感器厂 WenQuest Sensors (Demo)", "WQSN"]
     assert rows[4][1:4] == ["/app/plants/wenquest-motor.yaml", "问渠电机厂 WenQuest Motors (Demo)", "WQMT"]
-    assert rows[5][1:4] == ["/app/plants/example-sewing-products.yaml", "示例缝纫机厂", "SEW"]
+    assert rows[5][1:4] == ["/app/plants/wenquest-sewing.yaml", "问渠缝纫机厂 WenQuest Sewing Machines (Demo)", "WQSW"]   # 第 134 轮
 
 
 def test_park_peers_between_class_plants():
