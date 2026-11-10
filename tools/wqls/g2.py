@@ -263,10 +263,9 @@ def fatigue(R, x, Mb, T):
     mat = mdstd.material("45-QT")
     out = {}
     import _fea
-    for name, xsec, d, D_, r_ in (("截面 I：曲柄座 Ø10→前轴颈 Ø12", 11.0, 10.0, 12.0, 0.5),
-                                  ("截面 II：前轴颈 Ø12→轴身 Ø16", 21.0, 12.0, 16.0, 0.5),
-                                  ("截面 III：轴身 Ø16→后轴颈 Ø12", 330.0, 12.0, 16.0, 0.5),
-                                  ("截面 IV：后轴颈 Ø12→带轮座 Ø10", 340.0, 10.0, 12.0, 0.5)):
+    secs = [(f"截面 {k}", s[1], min(s[2], n[2]), max(s[2], n[2]), 0.5)
+            for k, (s, n) in zip(("I", "II", "III", "IV"), zip(S.UPPER_SEGS, S.UPPER_SEGS[1:]))]
+    for name, xsec, d, D_, r_ in secs:
         j = int(np.argmin(abs(x - xsec)))
         Mx, My = Mb[:, j, 0], Mb[:, j, 1]
         tau = T[:, j] / (math.pi * d ** 3 / 16)
