@@ -425,14 +425,16 @@ class Mock:
         cap = int(self.db["Workstation"][doc["workstation"]]["production_capacity"] or 1)
         for lg in doc.get("time_logs", []):
             a, b = parse_dt(lg["from_time"]), parse_dt(lg["to_time"])
-            others = sorted([(parse_dt(x["from_time"]), parse_dt(x["to_time"]))
-                             for jc in self.db["Job Card"].values()
-                             if jc["name"] != doc["name"] and jc["workstation"] == doc["workstation"]
-                             for x in jc.get("time_logs", [])
-                             if parse_dt(x["from_time"]) < b and a < parse_dt(x["to_time"])])
+            hits = sorted([(parse_dt(x["from_time"]), parse_dt(x["to_time"]), jc["name"])
+                           for jc in self.db["Job Card"].values()
+                           if jc["name"] != doc["name"] and jc["workstation"] == doc["workstation"]
+                           for x in jc.get("time_logs", [])
+                           if parse_dt(x["from_time"]) < b and a < parse_dt(x["to_time"])])
+            others = [(x, y) for x, y, _ in hits]
             if others and _has_overlap(cap, others):
-                raise Err(417, "OverlapError", "Row: From Time and To Time of {} is overlapping with other job cards "
-                          "（工位 {} 台数 {}）".format(doc["workstation"], lg["from_time"], cap))
+                # 真 ERPNext 的提示：Row {idx}: From Time and To Time of {本卡} is overlapping with {冲突的那张卡}
+                raise Err(417, "OverlapError", "Row {}: From Time and To Time of {} is overlapping with {}".format(
+                    lg.get("idx") or 1, doc["name"], hits[-1][2]))
         doc["total_completed_qty"] = tot_q
         doc["total_time_in_mins"] = round(tot_t, 3)
         if doc.get("docstatus", 0) == 0 and tot_q > 0:
