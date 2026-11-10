@@ -106,6 +106,12 @@ export const BATCH2 = [
   'components/DayChart.vue',
   'lib/ont.js', 'lib/tasks.js', 'lib/ai.js',
 ];
+// 第 130 轮第四批：工程软件 7 页与它们的组件
+export const BATCH4 = ['pages/Cae.vue', 'pages/Cam.vue', 'pages/Cfd.vue', 'pages/Mbd.vue', 'pages/Opt.vue', 'pages/Twin.vue', 'pages/VirtualPlc.vue',
+  'lib/cae.js', 'lib/cam.js', 'lib/mbd.js', 'components/CaeViewer.vue', 'components/CamLathe.vue', 'components/CamMill.vue',
+  'components/CfdViewer.vue', 'components/MbdViewer.vue', 'components/TopoPanel.vue', 'components/GearboxTwin.vue',
+  // 帮助页与它的块、动画（正文是文档，按语言换稿，见 help/index.js）
+  'pages/Help.vue', 'components/help/HelpBlock.vue', 'components/help/LabBlock.vue', 'components/help/QuizBlock.vue', 'components/help/TryBlock.vue', 'components/help/anim/AiDraftAnim.vue', 'components/help/anim/BomTreeAnim.vue', 'components/help/anim/CausalAnim.vue', 'components/help/anim/EnergyDayAnim.vue', 'components/help/anim/FlowAnim.vue', 'components/help/anim/InspectAnim.vue', 'components/help/anim/JointTestAnim.vue', 'components/help/anim/MrpAnim.vue', 'components/help/anim/RecallAnim.vue', 'components/help/anim/RiskAnim.vue', 'components/help/anim/ShiftAnim.vue', 'components/help/anim/SpcAnim.vue', 'components/help/anim/TerminalAnim.vue', 'components/help/anim/WorkOrderAnim.vue'];
 // 整个文件里的中文字面量都是钥匙（页面名字表）
 const KEY_FILES = ['help/pages.js'];
 
@@ -205,7 +211,7 @@ export function dataStrings() {
 export function check() {
   const missing = new Map();   // 钥匙 → 文件
   const left = {};
-  for (const rel of [...BATCH, ...BATCH2, ...KEY_FILES]) {
+  for (const rel of [...BATCH, ...BATCH2, ...BATCH4, ...KEY_FILES]) {
     const r = scan(rel, KEY_FILES.includes(rel));
     for (const k of r.keys) if (!en[k]) missing.set(k, rel);
     if (r.left.length) left[rel] = r.left;

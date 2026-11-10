@@ -11,7 +11,7 @@
 import os
 import re
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -48,15 +48,22 @@ def render(md):
     return re.sub(r'href="(?:\./)?([^"/#]+)\.md(#[^"]*)?"', lambda m: 'href="/help/docs/{}{}"'.format(m.group(1), m.group(2) or ""), html)
 
 
-def listing():
+def en_path(p):
+    """第 130 轮第四批（细则 D-13）：英文稿和中文稿放在一起，叫 <名字>.en.md；没有就 None"""
+    q = p[:-3] + ".en.md" if p and p.endswith(".md") else None
+    return q if q and os.path.exists(q) else None
+
+
+def listing(lang="zh"):
     out = []
     for g, names in GROUPS:
         items = []
         for n in names:
             p = path_of(n)
             if p:
-                with open(p, encoding="utf-8") as f:
-                    items.append({"name": n, "title": title_of(f.read(), n)})
+                e = en_path(p) if lang == "en" else None
+                with open(e or p, encoding="utf-8") as f:
+                    items.append({"name": n, "title": title_of(f.read(), n), "en_missing": lang == "en" and not e})
         out.append({"group": g, "items": items})
     return out
 
@@ -80,14 +87,17 @@ def mount(app, user_of):
         return FileResponse(f, headers={"Cache-Control": "public, max-age=86400"})
 
     @app.get("/api/help/docs")
-    def help_index(u=Depends(user_of)):
-        return {"groups": listing()}
+    def help_index(request: Request, u=Depends(user_of)):
+        from hub import i18n
+        return {"groups": listing(i18n.lang_of(request))}
 
     @app.get("/api/help/docs/{name}")
-    def help_doc(name: str, u=Depends(user_of)):
+    def help_doc(name: str, request: Request, u=Depends(user_of)):
+        from hub import i18n
         p = path_of(name)
         if not p:
             raise HTTPException(404, "没有这份帮助：{}".format(name))
-        with open(p, encoding="utf-8") as f:
+        e = en_path(p) if i18n.lang_of(request) == "en" else None      # 英文界面有英文稿用英文稿
+        with open(e or p, encoding="utf-8") as f:
             md = f.read()
-        return {"name": name, "title": title_of(md, name), "html": render(md)}
+        return {"name": name, "title": title_of(md, name), "html": render(md), "en_missing": i18n.lang_of(request) == "en" and not e}

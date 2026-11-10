@@ -17,6 +17,7 @@ sys.path[:0] = [DIG, os.path.dirname(DIG)]
 WEB = os.path.join(DIG, "web")
 EN = json.load(open(os.path.join(WEB, "src", "locales", "en.json"), encoding="utf-8"))
 CJK = re.compile(r"[　-〿㐀-鿿＀-￯]")
+ALLOW = 40     # 第 130 轮第四批 D-16：后端句子、报错的英文缺口容许数（别的轮次新加的句子先显示中文）
 
 
 @pytest.mark.skipif(not shutil.which("node"), reason="没有 Node")
@@ -166,11 +167,12 @@ def test_backend_texts_have_english():
     skip = set(json.load(open(os.path.join(WEB, "tools", "backend_texts_skip.json"), encoding="utf-8")))
     have = set(EN) | set(names) | {z for z, _ in tpls}
     missing = [k for k in list(B.texts()) + list(B.yaml_texts()) if k not in have and k not in skip]
-    assert not missing, missing[:20]
+    # 别的轮次往这些模块里加了新句子、还没配英文时不卡他们的测试（英文界面显示中文）；缺口超过 ALLOW 才算回退（细则 D-16）
+    assert len(missing) <= ALLOW, missing[:20]
     for z, e in tpls:
         assert set(re.findall(r"\{([a-z])\}", z)) == set(re.findall(r"\{([a-z])\}", e)), z
         assert e.strip() and not CJK.search(e), z
-    assert len(skip) < 40      # 跳过的只是认关键词的字、给大模型的工具说明
+    assert len(skip) < 260     # 跳过的只是认关键词的字、给大模型的提示词与工具说明、正则
 
 
 def test_hub_errors_have_english():
@@ -180,7 +182,7 @@ def test_hub_errors_have_english():
     from hub import i18n
     tpl = {z for z, _ in i18n._TABLE["templates"]}
     missing = [k for k in B.errors() if k not in i18n.EXACT and k not in tpl]
-    assert not missing, missing[:20]
+    assert len(missing) <= ALLOW, missing[:20]
     assert i18n.tr("实验 7 只在减速器厂") == "Lab 7 is only in the reducer plant"
     assert i18n.tr("实验 24 只在机器人厂") == "Lab 24 is only in the robot plant"
     assert i18n.tr("本小时已问了 20 次，请 13 分钟后再问") == "You have asked 20 times this hour; ask again in 13 minutes"
@@ -195,3 +197,68 @@ def test_lab7_only_in_reducer_plant(monkeypatch):
     with pytest.raises(HTTPException) as e:
         A._lab7_here()
     assert e.value.status_code == 404 and e.value.detail == "实验 7 只在减速器厂"
+
+
+# —— 第四批（细则 D-13、D-14）：英文帮助稿 ——
+HELP = os.path.join(WEB, "src", "help")
+FENCE = re.compile(r"^```(\w+)\n(.*?)^```", re.M | re.S)
+KEEP = ("name", "tour", "action", "kind", "id", "preset", "domain", "height")     # 这些字段英文稿不改
+
+
+def _blocks(md):
+    out = []
+    for kind, body in FENCE.findall(md):
+        keys = tuple(ln for ln in body.splitlines() if ln.split(":")[0].strip() in KEEP)
+        out.append((kind, keys))
+    return out
+
+
+def _en_chapters():
+    for ed in sorted(os.listdir(HELP)):
+        d = os.path.join(HELP, ed, "en")
+        if os.path.isdir(d):
+            for f in sorted(os.listdir(d)):
+                if f.endswith(".md"):
+                    yield ed, f
+
+
+def test_en_help_matches_zh():
+    """英文章节：中文稿得有；块的种类、顺序和 name/tour/id 等字段跟中文稿一样；问答的 more 锚点在英文稿里有这个标题。"""
+    n = 0
+    for ed, f in _en_chapters():
+        zh = os.path.join(HELP, ed, f)
+        assert os.path.exists(zh), "英文稿没有对应的中文稿：{}/en/{}".format(ed, f)
+        a, b = open(zh, encoding="utf-8").read(), open(os.path.join(HELP, ed, "en", f), encoding="utf-8").read()
+        assert _blocks(a) == _blocks(b), "块和中文稿对不上：{}/en/{}".format(ed, f)
+        assert ("\n:::查表" in a) == ("\n:::查表" in b), "查表分隔：" + f
+        heads = set(re.findall(r"^#+\s+(.+?)\s*$", b, re.M))
+        for anchor in re.findall(r"^more:\s*#(.+?)\s*$", b, re.M):
+            assert anchor in heads, "{}/en/{}：more 指向的标题不存在：{}".format(ed, f, anchor)
+        assert not CJK.search(re.sub(r":::查表|\{\{厂名\}\}", "", b)), "英文稿里还有中文：{}/en/{}".format(ed, f)
+        n += 1
+    assert n >= 18     # 教学版 18 章
+
+
+def test_docs_en_pending():
+    """每份中文资料要么有英文稿，要么在待译表里；待译表里的东西真实存在、还没译（表只许变短）。"""
+    P = json.load(open(os.path.join(WEB, "tools", "docs_en_pending.json"), encoding="utf-8"))
+    pend = set(P["help_chapters"]) | set(P["reference_docs"]) | set(P["lab_guides"])
+    missing = []
+    for ed in sorted(os.listdir(HELP)):
+        d = os.path.join(HELP, ed)
+        if os.path.isdir(d):
+            for f in sorted(os.listdir(d)):
+                if f.endswith(".md") and not os.path.exists(os.path.join(d, "en", f)) and "{}/{}".format(ed, f) not in pend:
+                    missing.append("{}/{}".format(ed, f))
+    hd = os.path.join(DIG, "help")
+    for f in sorted(os.listdir(hd)):
+        if f.endswith(".md") and not f.endswith(".en.md") and not os.path.exists(os.path.join(hd, f[:-3] + ".en.md")) and f not in pend:
+            missing.append("help/" + f)
+    for f in sorted(os.listdir(DIG)):
+        if f.startswith("实验") and f.endswith(".md") and f not in pend:
+            missing.append(f)
+    assert len(missing) <= ALLOW, "这些中文资料既没有英文稿，也不在 web/tools/docs_en_pending.json：{}".format(missing)
+    stale = [x for x in P["help_chapters"] if os.path.exists(os.path.join(HELP, x.split("/")[0], "en", x.split("/")[1]))]
+    stale += [x for x in P["reference_docs"] if os.path.exists(os.path.join(hd, x[:-3] + ".en.md"))]
+    assert not stale, "已经有英文稿，从待译表删掉：{}".format(stale)
+    assert len(pend) <= 93, "待译表只许变短（第四批 4a 收尾时 93 份）"

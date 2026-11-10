@@ -56,7 +56,7 @@ def _chapters():
     out = []
     for ed in EDITIONS:
         d = os.path.join(HELP, ed)
-        for fn in sorted(os.listdir(d)):
+        for fn in sorted(f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))):   # en/ 是英文稿（第 130 轮 D-13），另查
             out.append((ed, re.sub(r"^\d+-", "", fn[:-3]) if fn.endswith(".md") else fn, fn, _read(d, fn)))
     return out
 
