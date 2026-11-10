@@ -50,6 +50,13 @@
         <p class="small muted">{{ quoteHint }}</p>
         <button v-if="d.job.pending_proposal" class="btn ghost" @click="pid = d.job.pending_proposal">{{ $t('打开待确认的报价提议') }}</button>
         <div v-if="d.job.quotation" class="small ok">{{ $t('ERPNext 报价单 {q} · 项目 {p}', { q: d.job.quotation, p: d.job.project }) }}</div>
+        <template v-if="d.job.status === 'quoted' && !d.job.sales_order">
+          <h3>{{ $t('客户接受报价') }}</h3>
+          <label class="fld"><span>{{ $t('交期') }}</span><input v-model="orderDue" type="date"></label>
+          <button class="btn primary" :disabled="busy" @click="order">{{ $t('生成接单提议') }}</button>
+          <p class="small muted">{{ $t('确认后在 ERPNext 建销售订单：单价按报出去的那一版，挂项目，付款计划按里程碑。') }}</p>
+        </template>
+        <div v-if="d.job.sales_order" class="small ok">{{ $t('销售订单 {s}', { s: d.job.sales_order }) }}</div>
         <h3>{{ $t('估算版本') }}</h3>
         <div v-for="r in d.revisions" :key="r.rev" class="small">
           <b>{{ $t('第 {r} 版', { r: r.rev }) }}</b> <span class="muted">{{ r.created_by }} · {{ fmtTime(r.created_at) }}</span>
@@ -61,6 +68,12 @@
         <div class="card-head"><h2>{{ d.job.job_no }} {{ d.job.title }}</h2>
           <span class="muted small">{{ $td(d.job.customer) }} · {{ $t('{n} 件', { n: d.job.qty }) }}<template v-if="d.job.due_date"> · {{ $t('交期 {d}', { d: d.job.due_date }) }}</template></span></div>
         <p v-if="d.job.requirement" class="req">{{ d.job.requirement }}</p>
+        <div class="tabs" role="tablist">
+          <button role="tab" :aria-selected="tab === 'est'" :class="{ on: tab === 'est' }" @click="tab = 'est'">{{ $t('估算') }}</button>
+          <button role="tab" :aria-selected="tab === 'design'" :class="{ on: tab === 'design' }" @click="tab = 'design'">{{ $t('设计（物料清单与工艺）') }}</button>
+        </div>
+        <EtoDesign v-if="tab === 'design'" :job="d.job" :ops="ops" :items="allItems" :suppliers="suppliers" @changed="open(sel)" />
+        <template v-else>
         <div class="tools">
           <span class="muted small">{{ d.estimate ? $t('第 {r} 版估算', { r: d.estimate.rev }) : $t('还没有估算') }}
             <template v-if="d.frozen"> · {{ $t('已报价，改动会出新版本') }}</template></span>
@@ -101,6 +114,7 @@
         </div>
         <p class="muted small">{{ $t('单价空着的：有物料编号就取物料主数据的单价（灰字），没有的要填。工序费率取工作站的折旧 + 人工 + 能耗。') }}</p>
         <div v-if="dirty" class="small warnline">{{ $t('有改动还没保存：下面的金额是上次保存的。') }}</div>
+        </template>
       </section>
       <section v-else class="card grow empty">{{ $t('选一个作业，或录入新询价。') }}</section>
 
@@ -114,10 +128,11 @@ import { computed, onMounted, ref } from 'vue';
 import { api, get, loadConfig, post } from '../lib/api';
 import { loc, t as $t, td as $td, tk } from '../lib/i18n';
 import ProposalModal from '../components/ProposalModal.vue';
+import EtoDesign from '../components/EtoDesign.vue';
 
 const KINDS = ['material', 'buyout', 'operation', 'outside', 'engineering'];
 const KIND_ZH = { material: tk('材料'), buyout: tk('外购件'), operation: tk('工序'), outside: tk('外协'), engineering: tk('设计') };
-const STATUS = { estimating: tk('估算中'), quoting: tk('报价待确认'), quoted: tk('已报价') };
+const STATUS = { estimating: tk('估算中'), quoting: tk('报价待确认'), quoted: tk('已报价'), ordered: tk('已接单') };
 const CATS = [['material', tk('材料与外购件')], ['operations', tk('工序')], ['outside', tk('外协')], ['engineering', tk('设计（一次性）')]];
 const FIELDS = { material: ['qty_per', 'unit_price'], buyout: ['qty_per', 'unit_price'], operation: ['setup_min', 'run_min'],
   outside: ['unit_price'], engineering: ['hours'] };
@@ -136,6 +151,10 @@ const showNew = ref(false);
 const customers = ref([]);
 const ops = ref([]);
 const items = ref([]);
+const allItems = ref([]);
+const suppliers = ref({});
+const tab = ref('est');
+const orderDue = ref('');
 const pid = ref(null);
 const msg = ref('');
 const msgOk = ref(true);
@@ -154,7 +173,7 @@ const quoteHint = computed(() => {
 });
 const money = (x) => (x === null || x === undefined ? '—' : '$' + Number(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 const fmtTime = (s) => new Date(s).toLocaleString(loc(), { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-const tone = (s) => ({ estimating: 'info', quoting: 'warn', quoted: 'good' }[s] || 'mute');
+const tone = (s) => ({ estimating: 'info', quoting: 'warn', quoted: 'good', ordered: 'good' }[s] || 'mute');
 const has = (ln, f) => (FIELDS[ln.kind] || []).includes(f);
 const rowErr = (i) => !dirty.value && (res.value.lines?.[i]?.errors || []).length > 0;
 const rowMiss = (i) => !dirty.value && (res.value.lines?.[i]?.missing || []).length > 0;
@@ -168,6 +187,7 @@ function say(text, ok = true) { msg.value = text; msgOk.value = ok; }
 async function loadJobs() { jobs.value = await get('/eto/jobs'); }
 async function open(jn) {
   if (!jn) return;
+  if (sel.value !== jn) tab.value = 'est';
   sel.value = jn; msg.value = '';
   const r = await get('/eto/jobs/' + encodeURIComponent(jn));
   apply(r);
@@ -175,6 +195,7 @@ async function open(jn) {
 }
 function apply(r) {
   d.value = r;
+  orderDue.value = r.job.due_date || '';
   lines.value = JSON.parse(JSON.stringify(r.estimate?.lines || []));
   note.value = r.estimate?.note || '';
   source.value = r.estimate?.source || 'human';
@@ -215,12 +236,21 @@ async function quote() {
     await open(sel.value);
   } catch (e) { say(e.message, false); } finally { busy.value = false; }
 }
+async function order() {
+  busy.value = true;
+  try {
+    const r = await post(`/eto/jobs/${encodeURIComponent(sel.value)}/order`, { delivery_date: orderDue.value || null });
+    pid.value = r.proposal_id;
+  } catch (e) { say(e.message, false); } finally { busy.value = false; }
+}
 onMounted(async () => {
   const [c, conf] = await Promise.all([get('/eto/config'), loadConfig()]);
   cfg.value = c;
   customers.value = conf.customers || [];
   ops.value = c.operations || [];
   items.value = c.items || [];
+  allItems.value = c.all_items || [];
+  suppliers.value = c.suppliers || {};
   await loadJobs();
   if (jobs.value.length) await open(jobs.value[0].job_no);
 });
@@ -259,6 +289,9 @@ tr.main td { font-weight: 600; }
 .err { color: var(--bad); } .ok { color: var(--good); } .warnline { color: var(--warn-ink); }
 .warnbox { background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 10px 12px; }
 .empty { color: var(--muted, #888); padding: 16px 0; }
+.tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.tabs button { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; font: inherit; }
+.tabs button.on { border-color: var(--accent); background: var(--accent-bg); }
 .btn.small { height: 26px; font-size: 12px; margin-left: auto; }
 .side h3 { font-size: 13px; margin: 10px 0 4px; }
 @media (max-width: 1100px) { .row { flex-direction: column; } .col { width: auto; } }

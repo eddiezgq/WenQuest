@@ -97,6 +97,9 @@ BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category
             "Project": "project_name"}                            # 真 ERPNext：项目默认按项目名称命名（Projects Settings）
 
 
+ALLOW_ON_SUBMIT = {"BOM": {"is_default", "is_active"}}       # 真 ERPNext 里这几个字段提交后也能改（第 139 轮）
+
+
 def now_str():
     return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
@@ -696,6 +699,7 @@ def update(doctype: str, name: str, body: dict = Body(...)):
     body = {k: v for k, v in body.items() if k != "doctype"}
     M.validate(doctype, body, "修改 {} {}".format(doctype, name), partial=True)
     on_submit_ok = {cf["fieldname"] for cf in M.db.get("Custom Field", {}).values() if cf.get("dt") == doctype and cf.get("allow_on_submit")}
+    on_submit_ok |= ALLOW_ON_SUBMIT.get(doctype, set())
     if doc.get("docstatus") == 1 and any(k not in ("docstatus",) and k not in on_submit_ok for k in body) and doctype not in ("Item",):
         raise Err(417, "UpdateAfterSubmitError", "{} {} 已提交，不能修改".format(doctype, name))
     submit = int(body.get("docstatus", doc.get("docstatus", 0))) == 1 and doc.get("docstatus", 0) == 0

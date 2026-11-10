@@ -69,6 +69,11 @@ def _source(code):
 
 
 def plan_order(db, customer, item, qty, delivery_date, mode="teach", now=None):
+    from hub import eto_design as _ETOD          # 第 139 轮：按单设计的作业，设计发布前不能算料、下工单
+    try:
+        _ETOD.require_released(db, mode, item)
+    except _ETOD.E.EtoError as e:
+        raise ValueError(str(e)) from None
     o = Overview(db, now, mode)
     today = o.now.astimezone(TZ).date()
     qty = int(qty)
