@@ -90,11 +90,10 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
           "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}",
           "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}",
-          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
+          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Project": "PROJ-{n:04d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
             "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name",
-            "Item": "item_code",                                  # 真 ERPNext：物料按物料编号命名
-            "Project": "project_name"}                            # 真 ERPNext：项目默认按项目名称命名（Projects Settings）
+            "Item": "item_code"}                                  # 真 ERPNext：物料按物料编号命名
 
 
 ALLOW_ON_SUBMIT = {"BOM": {"is_default", "is_active"}}       # 真 ERPNext 里这几个字段提交后也能改（第 139 轮）

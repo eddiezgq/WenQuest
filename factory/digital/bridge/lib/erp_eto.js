@@ -107,7 +107,7 @@ module.exports = ({ WH }) => ({
         items.push(row);
       }
       const doc = await this.insert('BOM', { item: b.item, quantity: 1, company, is_active: 1, is_default: 1, with_operations: 1,
-        rm_cost_as_per: 'Valuation Rate', wq_fingerprint: pv.fingerprint, project: pv.job.job_no,
+        rm_cost_as_per: 'Valuation Rate', wq_fingerprint: pv.fingerprint, project: pv.job.project || pv.job.job_no,
         operations: b.operations.map((o, i) => ({ ...o, sequence_id: i + 1 })), items, docstatus: 1 });
       made[b.item] = doc.name;
       out.push(this.doc('BOM', doc, 'submitted', opt));
@@ -133,7 +133,7 @@ module.exports = ({ WH }) => ({
           fieldtype: 'Link', options: 'Sales Order', insert_after: 'sales_order', read_only: 1 });
       }
       const wo = await this.withBomOperations({ production_item: w.production_item, bom_no: await this.defaultBom(w.production_item),
-        qty: w.qty, company, project: jn, ...(top ? { sales_order: pv.job.sales_order } : { wq_sales_order: pv.job.sales_order }),
+        qty: w.qty, company, project: pv.job.project || jn, ...(top ? { sales_order: pv.job.sales_order } : { wq_sales_order: pv.job.sales_order }),
         planned_start_date: `${w.planned_start_date} 08:00:00`, expected_delivery_date: w.expected_delivery_date, skip_transfer: 1,
         source_warehouse: WH.raw, wip_warehouse: WH.wip, fg_warehouse: w.warehouse === 'fg' ? WH.fg : WH.semi, use_multi_level_bom: 0 });
       if (w.sources) wo.required_items = (wo.required_items || []).map((r) => ({ ...r, source_warehouse: WH[w.sources[r.item_code]] || WH.raw }));
@@ -141,7 +141,7 @@ module.exports = ({ WH }) => ({
       out.push(this.doc('Work Order', doc, 'submitted', opt));
       created.push(['Work Order', doc.name]);
     }
-    await etoRequest.call(this, company, jn, pv.material_requests, { out, created, opt }, WH);
+    await etoRequest.call(this, company, pv.job.project || jn, pv.material_requests, { out, created, opt }, WH);
   },
 
   async eto_early_buy(pv, { out, created, opt }) {
@@ -156,7 +156,7 @@ module.exports = ({ WH }) => ({
       out.push(this.doc('Item', doc, 'created', opt));
       created.push(['Item', doc.name]);
     }
-    await etoRequest.call(this, company, pv.job.job_no, pv.material_requests, { out, created, opt }, WH);
+    await etoRequest.call(this, company, pv.job.project || pv.job.job_no, pv.material_requests, { out, created, opt }, WH);
   },
 
 });
