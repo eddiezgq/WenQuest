@@ -397,7 +397,11 @@ jobs:
               st=${PIPESTATUS[0]}
               cd - >/dev/null
               [ "$st" = 0 ] || { grep -v "ERPNext 进度" /tmp/logs/sewing_loop.log | grep -E "✗|失败|超时|Traceback|Error|错误" | tail -n 40 > /tmp/logs/sewing_fail.log;
-                                 python3 factory/deploy/ci_annotate.py 缝纫机厂闭环失败项 /tmp/logs/sewing_fail.log 40; }
+                                 python3 factory/deploy/ci_annotate.py 缝纫机厂闭环失败项 /tmp/logs/sewing_fail.log 40;
+                                 # 第 134 轮 D-8：缝纫机厂桥接出错的原文（通用诊断只看最后一座班级工厂）
+                                 docker compose -p wq-factory -f /tmp/fac/docker-compose.yml -f /tmp/fac/ci.yml -f /tmp/fac/docker-compose.classes.yml \
+                                   logs --no-color bridge-c-$sewing 2>&1 | grep -E "\[error\]" | cut -c1-400 | tail -n 30 > /tmp/logs/sewing_bridge.log;
+                                 python3 factory/deploy/ci_annotate.py 缝纫机厂桥接出错 /tmp/logs/sewing_bridge.log 30; }
             fi
           fi
           if [ "$st" = 0 ]; then
