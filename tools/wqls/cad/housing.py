@@ -30,7 +30,7 @@ P = dict(
     C=dict(top=(258, 256, 0), r_out=14, r_head=12, r_arch=26, r_hj=10, plan=(14, 12), edge=(8, 6, 5), chamfer=True),
 )[VAR]
 WALL = float(os.environ.get("WQ_WALL", 6.0))
-ARM_Y = (-46.0, 70.0)          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
+ARM_Y = (float(os.environ.get("WQ_AY0", -46.0)), float(os.environ.get("WQ_AY1", 70.0)))          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 5.0))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
@@ -43,7 +43,7 @@ ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 9.0))
 ROOT_X = float(os.environ.get("WQ_ROOTX", 230.0))
 BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 30.0))       # 机座纵筋高（从机座顶面往下）
 RIB_T = 7.0
-RIB_X = (75.0, 150.0, 225.0)
+RIB_X = tuple(float(v) for v in os.environ.get("WQ_RIBX", "75,150,225").split(",") if v)
 S_BELT_X = 352.0
 ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿（机臂空间高度 135；G1 的 160 在 G3 为比例改小，见细则）
 
@@ -269,7 +269,7 @@ def casting():
             sl = Part.makeBox(PIL["x1"] - PIL["x0"] + 20, 300, RIB_T, V(PIL["x0"] - 10, -150, z))
             slot = Part.makeBox(34, 60, RIB_T + 2, V(S_BELT_X - 17, -30, z - 1)).fuse(Part.makeCylinder(10, RIB_T + 2, V(330, 45, z - 1), V(0, 0, 1)))
             rb.append(sl.common(cav).cut(slot))
-        for y in (-20.0, 50.0):
+        for y in ((-20.0, 50.0) if BED_RIB_H > 1 else ()):
             sl = Part.makeBox(BED["x1"] - 80, RIB_T, BED_RIB_H, V(80, y - RIB_T / 2, -BED_RIB_H))
             rb.append(sl.common(bcav))
         for x in (PIL["x0"], PIL["x1"] - RIB_T):
