@@ -3,6 +3,7 @@
 name: Digital factory 数字工厂部署
 
 on:
+  workflow_dispatch: {}                                     # 第 133 轮：演练偶发超时时手动整条重跑（取不到改动清单 → 各段都演练）
   push:
     branches: [main]
     paths:
