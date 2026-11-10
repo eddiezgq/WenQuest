@@ -26,6 +26,7 @@ const QI_TEMPLATE = { 'SH-301': '零件检验-输出轴' };
 const MAKE_WH = { 'SH-301': WH.semi };
 // 扩展（第 30 轮 H-8）：freecad-ai-parts 独有的提议（CAD 方案转为生产物料、到货入库）在它的 lib/erp_enterprise.js；问渠这边没有这个文件
 const EXTRA_ACTIONS = {};
+Object.assign(EXTRA_ACTIONS, require('./erp_eto')({ WH }));     // 按单设计（第 139 轮），两边共有
 try {
   Object.assign(EXTRA_ACTIONS, require('./erp_enterprise')({ WH }));
 } catch (e) {
@@ -1017,8 +1018,10 @@ function summarize(doctype, d) {
     case 'Opportunity':
       return pick(['opportunity_from', 'party_name', 'status', 'opportunity_amount', 'expected_closing', 'transaction_date']);
     case 'Quotation':
-      return { ...pick(['quotation_to', 'party_name', 'status', 'docstatus', 'valid_till', 'grand_total', 'total', 'opportunity', 'transaction_date']),
+      return { ...pick(['quotation_to', 'party_name', 'status', 'docstatus', 'valid_till', 'grand_total', 'total', 'opportunity', 'transaction_date', 'wq_job']),
         items: (d.items || []).map((i) => ({ item_code: i.item_code, qty: i.qty, rate: i.rate })) };
+    case 'Project':                     // 第 139 轮：按单设计的作业号
+      return pick(['project_name', 'status', 'customer', 'company', 'expected_end_date', 'percent_complete']);
     case 'Contract':
       return pick(['party_type', 'party_name', 'status', 'docstatus', 'is_signed', 'start_date', 'end_date', 'wq_penalty_per_day',
         'wq_response_h', 'wq_warranty_months', 'wq_amount', 'wq_quotation', 'wq_sales_order']);

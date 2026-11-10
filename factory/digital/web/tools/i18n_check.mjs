@@ -42,6 +42,7 @@ export const BATCH2 = [
   'pages/DesignReview.vue',
   'pages/Members.vue',
   'pages/Configurator.vue',
+  'pages/Eto.vue',                 // 第 139 轮
   'pages/WaferMap.vue',
   'pages/EncCurve.vue',
   'pages/MotorWave.vue',

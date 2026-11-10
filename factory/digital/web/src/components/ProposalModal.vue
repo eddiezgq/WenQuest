@@ -48,6 +48,21 @@
               <td>{{ isEn() ? bi(m.supplier) : short(m.supplier) }}</td><td class="small">{{ td(m.reason) }}</td></tr></tbody>
           </table>
         </template>
+        <template v-if="p.action === 'eto_quote'">
+          <table class="t"><tbody>
+            <tr><td>{{ t('作业号') }}</td><td class="mono">{{ pv.job.job_no }}</td><td>{{ t('客户') }}</td><td>{{ bi(pv.job.customer) }}</td></tr>
+            <tr><td>{{ t('名称') }}</td><td>{{ pv.job.title }}</td><td>{{ t('估算版本') }}</td><td>{{ t('第 {r} 版', { r: pv.job.rev }) }}</td></tr>
+            <tr><td>{{ t('报价') }}</td><td class="mono">{{ pv.quotation.qty }} × {{ money(pv.quotation.rate) }} = {{ money(pv.quotation.amount) }}</td>
+              <td>{{ t('有效期至') }}</td><td class="mono">{{ pv.quotation.valid_till }}</td></tr>
+          </tbody></table>
+          <h3>{{ t('数量阶梯') }}</h3>
+          <table class="t">
+            <thead><tr><th class="num">{{ t('数量') }}</th><th class="num">{{ t('成本') }}</th><th class="num">{{ t('单价') }}</th><th class="num">{{ t('合计') }}</th></tr></thead>
+            <tbody><tr v-for="b in pv.breaks" :key="b.qty"><td class="num">{{ b.qty }}</td><td class="num mono">{{ money(b.cost) }}</td>
+              <td class="num mono">{{ money(b.unit_price) }}</td><td class="num mono">{{ money(b.price) }}</td></tr></tbody>
+          </table>
+          <p class="muted small">{{ t('确认后在 ERPNext 建：项目 {p}（作业号）、物料 {i}、报价单（条款写数量阶梯和付款条件）。', { p: pv.project.project_name, i: pv.item.item_code }) }}</p>
+        </template>
         <template v-if="p.action === 'release_work_order'">
           <p>{{ t('把工单 {w} 按工艺路线逐道派给车间设备。', { w: pv.work_order }) }}</p>
         </template>
@@ -92,6 +107,7 @@ const so = computed(() => pv.value.sales_order || {});
 const STATUS = { pending: tk('待确认'), confirmed: tk('已确认，执行中'), executed: tk('已执行'), rejected: tk('已否决'), failed: tk('执行失败') };
 const statusText = computed(() => t(STATUS[p.value?.status] || ''));
 const statusTone = computed(() => ({ pending: 'warn', confirmed: 'info', executed: 'good', rejected: 'mute', failed: 'bad' }[p.value?.status]));
+const money = (x) => (x === null || x === undefined ? '—' : '$' + Number(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 const n = (v) => (v === null || v === undefined ? '—' : Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 }));
 
 async function load() { p.value = await get('/proposals/' + props.pid); }
