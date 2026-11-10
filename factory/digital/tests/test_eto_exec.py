@@ -105,3 +105,27 @@ def test_hours_rules_and_bridge_timesheet(db, job, mock_erp):  # noqa: F811
     EX.on_proposal_done(db, "eto_hours", pv, "teach")
     EX.on_proposal_done(db, "eto_hours", pv, "teach")
     assert len(EX.hours(db, "teach", job)) == n0 + 1
+
+
+def test_bridge_summary_keeps_bom_fingerprint():
+    """真 ERPNext 演练 42888610320 查出：summarize 里有两个 case 'BOM'，前一个不带指纹，作业工单永远认不出发布版。
+    这里直接调桥接的 summarize，并查整个 switch 没有重复的 case。"""
+    import re
+    import shutil
+    import subprocess
+    from pathlib import Path
+    if not shutil.which(os.environ.get("WQ_NODE", "node")):
+        pytest.skip("需要 node")
+    erp_js = Path(__file__).resolve().parents[1] / "bridge" / "lib" / "erp.js"
+    src = erp_js.read_text(encoding="utf-8")
+    body = src[src.index("function summarize("):]
+    body = body[:body.index("\n}\n")]
+    cases = re.findall(r"case '([^']+)':", body)
+    assert len(cases) == len(set(cases)), sorted({c for c in cases if cases.count(c) > 1})
+    js = ("const {summarize} = require(process.argv[1]);"
+          "console.log(JSON.stringify(summarize('BOM', {item: 'J', is_default: 1, docstatus: 1, wq_fingerprint: 'fp9', project: 'P',"
+          " items: [{item_code: 'A', qty: 2}]})));")
+    r = subprocess.run([os.environ.get("WQ_NODE", "node"), "-e", js, str(erp_js)], capture_output=True, text=True, timeout=30)
+    assert r.returncode == 0, r.stderr[-1000:]
+    d = json.loads(r.stdout)
+    assert d["wq_fingerprint"] == "fp9" and d["project"] == "P" and d["items"] == [{"item_code": "A", "qty": 2}]
