@@ -1,0 +1,136 @@
+# 《缝纫机设计与制造》公开课 第 31 讲：人工智能与制衣业（全课最后一讲）
+# 第 25 轮起的视频标准：画面就是这一讲的网页互动课件（course/slides/ch31.yaml；2026-11-10 补英文版 SVG、大数字改纯数字、回答页中英两栏、封面右移），
+# 配音是课件每页的讲稿（notes），中文版放双语课件，英文版放只显示英文的课件；每页按句子让要点逐条出现。这里只写开场、课后部分和结尾。
+# 课后部分（约 5 分钟）：虚拟实验 31-1（AI 质检与预测维护）录屏、平台学习方式页（第 23 轮 3.4：本讲不放数字工厂）、作业页、测验页。
+# 配音：2026-11-09 起停用租用 GPU，本讲用 AI 配音（kokoro），不用本人声音克隆。
+# 数字一律由 course/calc/ch31.py 算出（{{ch31.键:格式}}）。实验镜头 steps 数 = “>” 个数（第一步也用一个 “>” 句触发）。
+book: sewing
+section: "31"
+deck: ch31
+skip: [5, 6, 13, 17, 20, 21, 22, 23]   # 设计打版、排料排产、提高 d′（解答页再给）、预测维护三个数、规则查表还是学习、按需生产、就业、学生项目：课程部分约 10 分钟；这几页留给课件
+code: [ch31]
+title: ["人工智能与制衣业——用 AI，也判断 AI", "Artificial Intelligence and Apparel Making — Use AI, and Judge It Too"]
+chapter: ["第八篇 工厂与未来 · 第 31 章", "Part VIII Factories and the Future · Chapter 31"]
+next: ["无（本讲是全课最后一讲）", "none, this is the final lecture"]
+cover_formula: 'P = \frac{\pi R}{\pi R + (1-\pi)F}'
+tags:
+  zh: [人工智能, 制衣业, 视觉质检, 召回率, 误报率, 精确率, 混淆矩阵, 基础比例, ROC 曲线, 报警阈值, 区分能力, 预测性维护, 滑动平均, 提前量, AI 缝纫机, 电子送布, 料框抓取, 烟雾报警器, 缝纫机]
+  en: [artificial intelligence, apparel manufacturing, vision inspection, recall, false alarm rate, precision, confusion matrix, base rate, ROC curve, alarm threshold, discriminability, predictive maintenance, moving average, lead time, AI sewing machine, electronic feed, bin picking, smoke alarm, sewing machine]
+
+intro:
+  zh:
+    - 同学们好，欢迎来到问渠。
+    - 这是《缝纫机设计与制造》第三十一讲，也是最后一讲：人工智能与制衣业。
+    - 上一讲往前看了十年的设备；今天看人工智能，问它三件事：吃什么数据，怎样评价，会在哪里出错。
+    - 这次视频重点讲视觉质检的报警该不该信，和预测性维护怎样取舍；设计、排料、就业这些话题只点到为止，详细内容在课件里。
+  en:
+    - Hi everyone, and welcome to Sewing Machine Design and Manufacturing at WenQuest.
+    - This is Lecture 31, the last one in the course, on artificial intelligence in apparel making.
+    - "Last time we looked ten years ahead at the machines. Today we look at AI and ask it three things: what data it eats, how it's judged, and where it goes wrong."
+    - "This video concentrates on whether a vision inspector's alarms can be trusted and on the trade-offs in predictive maintenance; design, marker making and jobs get only a mention here, with the details in the slides."
+
+after:
+  - id: lab311
+    kind: lab
+    lab: aiqc
+    part: ["虚拟实验", "Virtual lab"]
+    viewport: [1600, 900]
+    steps:
+      - js: "(() => { document.body.style.zoom = '0.7'; window.scrollTo(0, 0); const st = document.createElement('style'); st.textContent = '#checks0,#checks1,#tasks,#msg,#tp,#fp,#fn,#tn{filter:blur(7px) grayscale(1)}'; document.head.appendChild(st); document.querySelectorAll('p.note').forEach(n => { n.style.visibility = 'hidden'; }); document.getElementById('tab0').click(); document.getElementById('reset0').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [1.5, 1.0, 0.5, 1.0, 2.5, 3.0, 3.5, 2.5].forEach((v, i) => setTimeout(() => f('t', v), 1500 + i * 900)); })()"
+        dur: 10
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('t', 1.88); [40, 70, 100].forEach((v, i) => setTimeout(() => f('cm', v), 800 + i * 900)); setTimeout(() => f('cm', 20), 3800); [1.5, 3, 5].forEach((v, i) => setTimeout(() => f('cf', v), 4600 + i * 900)); setTimeout(() => f('cf', 0.5), 7400); })()"
+        dur: 8
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [0.05, 0.1, 0.15, 0.1].forEach((v, i) => setTimeout(() => f('prev', v), 600 + i * 900)); [0.03, 0.01, 0.005].forEach((v, i) => setTimeout(() => f('prev', v), 4600 + i * 900)); })()"
+        dur: 8
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; f('prev', 0.02); [3.0, 2.5, 2.0, 3.0, 4.5, 5.0].forEach((v, i) => setTimeout(() => f('dp', v), 800 + i * 900)); setTimeout(() => document.getElementById('reset0').click(), 6800); })()"
+        dur: 8
+      - js: "(() => { document.getElementById('tab1').click(); window.scrollTo(0, 0); document.getElementById('reset1').click(); const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [1.08, 1.05, 1.25, 1.4, 1.15].forEach((v, i) => setTimeout(() => f('thr', v), 2000 + i * 1100)); })()"
+        dur: 9
+      - js: "(() => { const f = (id, v) => { const e = document.getElementById(id); e.value = v; e.dispatchEvent(new Event('input', {bubbles: true})); }; [5, 10, 14].forEach((v, i) => setTimeout(() => f('w', v), 800 + i * 1400)); setTimeout(() => f('w', 1), 5400); setTimeout(() => f('thr', 1.3), 6400); setTimeout(() => f('w', 7), 7400); })()"
+        dur: 9
+    say:
+      zh:
+        - ">下面是虚拟实验 31-1，AI 质检与预测维护，在问渠平台上可以亲手做，结果栏、混淆矩阵的数字和任务先遮住。第①页“视觉质检的阈值”：先用默认值记下召回率、误报率、精确率和每 1000 件成本，再拖动报警阈值，看得分分布上的竖线、ROC 和成本曲线上的圆点一起移动。"
+        - ">再改漏检一件和误报一件的代价，看成本曲线的谷底往哪边走，用 t* 公式核对。任务一要你在默认代价下找到成本最低的阈值。"
+        - ">任务二把阈值放回 1.88，把次品率改成 10% 和 1%，记下精确率和报警件数：检测器一点没变，报警的可信度却差很多。"
+        - ">任务三在次品率 2% 下逐步加大区分能力 d′，配合调阈值，找出精确率和召回率同时达标所需的最小 d′。"
+        - ">第②页是预测性维护：先用默认值记下检出率、平均提前量和每台每月误报，再拖报警阈值，看三台机器的三角报警怎样增减。"
+        - ">任务四在噪声 0.08 下组合调滑动平均窗口和阈值，让检出率、误报和提前量同时满足要求，再试长窗口比一比。指导书和报告模板在平台上。"
+      en:
+        - ">Now Virtual lab 31-1, AI inspection and predictive maintenance. The results, the confusion-matrix numbers and the tasks are blurred. Page one is the inspection threshold. Record recall, false-alarm rate, precision and cost per 1000 pieces at the defaults, then drag the alarm threshold and watch the line on the score plot and the dots on the ROC and cost curves move together."
+        - ">Next, change the cost of a miss and of a false alarm, see which way the bottom of the cost curve moves, and check it with the t-star formula. Task one asks for the cheapest threshold at the default costs."
+        - ">Task two puts the threshold back at 1.88 and sets the defect rate to 10 and then 1 percent; record precision and the alarm count. The inspector hasn't changed at all, yet its alarms mean something very different."
+        - ">Task three keeps 2 percent defects and raises the discriminability d-prime step by step, retuning the threshold, to find the smallest d-prime that meets the precision and recall targets together."
+        - ">Page two is predictive maintenance. Record detection rate, average lead time and false alarms per machine a month at the defaults, then drag the alarm threshold and watch the triangles on the three machines come and go."
+        - ">Task four keeps the noise at 0.08 and combines the moving-average window and threshold until detection, false alarms and lead time all meet the targets; then try a long window and compare. The guide and report template are on the platform."
+
+  - id: platform
+    part: ["平台上怎样学", "Learning on WenQuest"]
+    slide:
+      layout: points
+      title: ["在问渠学习平台上学这一讲", "This lecture on WenQuest"]
+      points:
+        - ["互动课件和虚拟实验 31-1，可以自己动手", "Interactive slides and Lab 31-1, to try yourself"]
+        - ["作业和实验报告在线提交，得到批改和评语", "Submit work and lab reports online; get marks and comments"]
+        - ["讨论区提问，成绩页看每项得分", "Ask in the forum; see every mark on the grades page"]
+      foot: ["课件、动画、实验都和这段视频里的一样。", "The slides, animations and labs are the same as in this video."]
+    say:
+      zh:
+        - 这一讲的内容都在问渠学习平台上。
+        - ">互动课件和 AI 质检实验都可以自己打开动手做，视频里跳过的几页，比如就业的几种观点和学生项目，也在课件里。"
+        - ">作业和实验报告在平台上提交，提交后可以得到批改和评语。"
+        - ">有问题可以到讨论区提问，每项得分在成绩页一目了然。"
+      en:
+        - Everything in this lecture is on the WenQuest learning platform.
+        - ">You can open the interactive slides and the AI inspection lab and work them yourself, including the pages this video skipped, such as the views on jobs and the student project."
+        - ">You submit the assignment and the lab report on the platform, and get marks and comments back."
+        - ">Questions go to the discussion forum, and the grades page shows every mark."
+
+  - id: homework
+    part: ["作业", "Assignment"]
+    slide:
+      layout: points
+      title: ["作业 31：为领子工段选一套视觉质检方案", "Assignment 31: choosing a vision inspection scheme for the collar section"]
+      points:
+        - ["供应商 A：报警数、精确率、两种阈值的成本", "Vendor A: alarms, precision, cost at two thresholds"]
+        - ["供应商 B：最省阈值、成本、所需 d′", "Vendor B: cheapest threshold, cost, the d′ needed"]
+        - ["验收与运行方案：验证、换款重验、重训、调阈值", "Acceptance and operating plan: validate, re-check, retrain, tune"]
+      foot: ["作业和实验报告都在问渠学习平台提交。", "Submit the assignment and the lab report on WenQuest."]
+    say:
+      zh:
+        - ">作业一共三道题。第一题，供应商 A 的检测器召回率 90%、误报率 5%，车间次品率 3%：求每 1000 件的报警数和精确率；漏检一件 30 元、误报一件 1 元，求每 1000 件成本；提高阈值后召回率降到 80%、误报率降到 2%，成本变为多少，选哪个阈值，为什么。"
+        - ">第二题，供应商 B 声称 d′ 为 3.53：按等方差正态模型，在次品率 2%、漏检 20 元、复检 0.5 元时求最省阈值和每 1000 件成本；车间要求精确率不低于 80%、召回率不低于 90%，B 能不能满足，需要的 d′ 是多少。"
+        - ">第三题写一份验收与运行方案：上线前用自己工段的样本验证哪些指标，换款、换面料时怎样重新验证，误报和漏检样本怎样收集、多久重训，报警阈值由谁按什么数据调整。"
+        - 作业和实验报告都在问渠学习平台上提交。
+      en:
+        - ">The assignment has three questions. One: Vendor A's inspector has 90 percent recall and 5 percent false alarms, and the defect rate is 3 percent. Find alarms per 1000 pieces and precision. With a miss costing 30 yuan and a false alarm 1 yuan, find the cost per 1000; if a higher threshold gives 80 percent recall and 2 percent false alarms, what's the cost then? Which threshold would you pick, and why?"
+        - ">Two: Vendor B claims a d-prime of 3.53. Using the equal-variance normal model, with 2 percent defects, 20 yuan per miss and 0.5 per recheck, find the cheapest threshold and the cost per 1000. If the section needs at least 80 percent precision and 90 percent recall, can B deliver, and what d-prime is needed?"
+        - ">Three: write an acceptance and operating plan. Which metrics will you validate on your own section's samples before go-live, how will you re-validate when the style or fabric changes, how are false alarms and misses collected and how often is the model retrained, and who adjusts the threshold, using what data?"
+        - Submit the assignment and the lab report on the WenQuest platform.
+
+  - id: quiz
+    part: ["测验", "Quiz"]
+    slide:
+      layout: points
+      title: ["课后测验：9 题，即时反馈", "After-class quiz: 9 questions, instant feedback"]
+      points:
+        - ["召回 95%、误报 3%、次品率 5%：精确率多少？", "95% recall, 3% false alarms, 5% defects: precision?"]
+        - ["次品率 2%，永远判“合格”：准确率能说明什么？", "2% defects, always 'good': what does accuracy tell you?"]
+        - ["可以做三次，交卷后立刻看到解析", "Three attempts, explanations as soon as you submit"]
+    say:
+      zh:
+        - ">学完还有一份九道题的测验，比如：一个检测器召回率 95%、误报率 3%，车间次品率 5%，它的精确率是多少？"
+        - ">再比如判断题：次品率 2% 时，一个永远判“合格”的检测器准确率也有 98%，所以准确率几乎说明不了质检模型的好坏，对不对？"
+        - ">这份测验可以做三次，交卷后马上能看到每题的解析。"
+      en:
+        - ">There's also a nine-question quiz. For example: an inspector has 95 percent recall and 3 percent false alarms, and the defect rate is 5 percent. What is its precision?"
+        - ">Or true or false: at a 2 percent defect rate, an inspector that always says 'good' is 98 percent accurate, so accuracy says almost nothing about an inspection model."
+        - ">You get three attempts, and the explanations appear as soon as you submit."
+
+outro:
+  zh:
+    - 课件、虚拟实验、作业和测验都在问渠学习平台，免费注册就能学。
+    - 三十一讲从一针怎样缝出来，讲到机构、电控、制造、工厂，最后讲到人工智能。希望你带走的不只是公式，还有判断一台机器、一套方案、一个 AI 的习惯。我们平台上见。
+  en:
+    - The slides, the virtual lab, the assignment and the quiz are all on the WenQuest learning platform, at [learn.wenquestrobotics.com|learn dot wen quest robotics dot com]. Sign up for free and start learning.
+    - "Over thirty-one lectures we went from how a single stitch is formed, through mechanisms, controls, manufacturing and factories, to artificial intelligence. I hope you take away not just formulas but the habit of judging a machine, a proposal, or an AI. See you on the platform."

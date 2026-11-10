@@ -5,12 +5,12 @@ lesson: 31
 code: [ch31]
 
 clips:
-  hero:          # 封面：实验 31-1 得分分布，区分能力 d′ 从 1.5 增大到 4.5，次品分布慢慢分开（深色显示）
+  hero:          # 封面：实验 31-1 得分分布，区分能力 d′ 从 1.5 增大到 4.5，次品分布慢慢分开（深色显示；右移让开标题）
     page: aiqc
     selector: "#dist"
     loop: 14
     steps:
-      - {at: 0, set: {t: 1.88, dp: 1.5}, js: "document.documentElement.style.filter='invert(.9) hue-rotate(180deg)'"}
+      - {at: 0, set: {t: 1.88, dp: 1.5}, js: "var d=document.documentElement;d.style.filter='invert(.9) hue-rotate(180deg)';var s=document.getElementById('dist');if(!s.dataset.sh){s.dataset.sh=1;var w=s.getBoundingClientRect().width;s.style.boxSizing='content-box';s.style.width=w+'px';s.style.paddingLeft=Math.round(w*0.7)+'px';s.style.marginLeft=-Math.round(w*0.7)+'px';s.style.background='transparent';document.body.style.visibility='hidden';s.style.visibility='visible';d.style.background='transparent';document.body.style.background='transparent'}"}
       - {at: 1, set: {dp: 2.0}}
       - {at: 2, set: {dp: 2.5}}
       - {at: 3, set: {dp: 3.0}}
@@ -111,30 +111,30 @@ slides:
     title: ["四类应用，各有各怕的", "Four kinds of application, each with its own weakness"]
     visual:
       svg: |
-        <svg viewBox="0 0 1700 620" width="1700" height="620">
+        <svg viewBox="0 0 1700 620" width="1700" height="620"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <g>
             <rect x="0" y="0" width="830" height="290" rx="28" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="40" y="80" font-size="52" font-weight="800" fill="#5ee0d2">感知</text>
-            <text x="40" y="150" font-size="32" fill="#f3f6fa">视觉质检 · 识别面料 · 追踪布边</text>
-            <text x="40" y="240" font-size="34" font-weight="700" fill="#ff9c75">怕“没见过”</text>
+            <text x="40" y="80" font-size="52" font-weight="800" fill="#5ee0d2" class="zh">感知</text><text x="40" y="80" font-size="46" font-weight="800" fill="#5ee0d2" class="eo">Perception</text>
+            <text x="40" y="150" font-size="32" fill="#f3f6fa" class="zh">视觉质检 · 识别面料 · 追踪布边</text><text x="40" y="150" font-size="30" fill="#f3f6fa" class="eo">Inspection · fabric ID · edge tracking</text>
+            <text x="40" y="240" font-size="34" font-weight="700" fill="#ff9c75" class="zh">怕“没见过”</text><text x="40" y="240" font-size="34" font-weight="700" fill="#ff9c75" class="eo">Weak spot: the unseen</text>
           </g>
           <g>
             <rect x="870" y="0" width="830" height="290" rx="28" fill="#111d31" stroke="#4c8dff" stroke-width="3"/>
-            <text x="910" y="80" font-size="52" font-weight="800" fill="#8fb6ff">预测</text>
-            <text x="910" y="150" font-size="32" fill="#f3f6fa">销量 · 订单延期 · 设备故障</text>
-            <text x="910" y="240" font-size="34" font-weight="700" fill="#ff9c75">怕“世道变了”</text>
+            <text x="910" y="80" font-size="52" font-weight="800" fill="#8fb6ff" class="zh">预测</text><text x="910" y="80" font-size="46" font-weight="800" fill="#8fb6ff" class="eo">Prediction</text>
+            <text x="910" y="150" font-size="32" fill="#f3f6fa" class="zh">销量 · 订单延期 · 设备故障</text><text x="910" y="150" font-size="30" fill="#f3f6fa" class="eo">Sales · late orders · machine faults</text>
+            <text x="910" y="240" font-size="34" font-weight="700" fill="#ff9c75" class="zh">怕“世道变了”</text><text x="910" y="240" font-size="34" font-weight="700" fill="#ff9c75" class="eo">Weak spot: a changed world</text>
           </g>
           <g>
             <rect x="0" y="330" width="830" height="290" rx="28" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-            <text x="40" y="410" font-size="52" font-weight="800" fill="#ffd75a">优化与生成</text>
-            <text x="40" y="480" font-size="32" fill="#f3f6fa">排料 · 排产 · 设计效果图</text>
-            <text x="40" y="570" font-size="34" font-weight="700" fill="#ff9c75">怕“目标写错”</text>
+            <text x="40" y="410" font-size="52" font-weight="800" fill="#ffd75a" class="zh">优化与生成</text><text x="40" y="410" font-size="46" font-weight="800" fill="#ffd75a" class="eo">Optimise and generate</text>
+            <text x="40" y="480" font-size="32" fill="#f3f6fa" class="zh">排料 · 排产 · 设计效果图</text><text x="40" y="480" font-size="30" fill="#f3f6fa" class="eo">Markers · schedules · design images</text>
+            <text x="40" y="570" font-size="34" font-weight="700" fill="#ff9c75" class="zh">怕“目标写错”</text><text x="40" y="570" font-size="34" font-weight="700" fill="#ff9c75" class="eo">Weak spot: the wrong goal</text>
           </g>
           <g>
             <rect x="870" y="330" width="830" height="290" rx="28" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
-            <text x="910" y="410" font-size="52" font-weight="800" fill="#c4b5fd">语言助手</text>
-            <text x="910" y="480" font-size="32" fill="#f3f6fa">读单据 · 答问题 · 起草</text>
-            <text x="910" y="570" font-size="34" font-weight="700" fill="#ff9c75">怕“说得通顺却不对”</text>
+            <text x="910" y="410" font-size="52" font-weight="800" fill="#c4b5fd" class="zh">语言助手</text><text x="910" y="410" font-size="46" font-weight="800" fill="#c4b5fd" class="eo">Language assistants</text>
+            <text x="910" y="480" font-size="32" fill="#f3f6fa" class="zh">读单据 · 答问题 · 起草</text><text x="910" y="480" font-size="30" fill="#f3f6fa" class="eo">Read forms · answer · draft</text>
+            <text x="910" y="570" font-size="34" font-weight="700" fill="#ff9c75" class="zh">怕“说得通顺却不对”</text><text x="910" y="570" font-size="34" font-weight="700" fill="#ff9c75" class="eo">Weak spot: fluent but wrong</text>
           </g>
         </svg>
     notes:
@@ -175,24 +175,24 @@ slides:
       - ["精确率：报警中真正是次品的比例", "Precision: share of alarms that are real defects"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
-          <text x="400" y="50" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="middle">实际次品</text>
-          <text x="720" y="50" font-size="28" font-weight="700" fill="#8fb6ff" text-anchor="middle">实际合格</text>
-          <text x="120" y="195" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">报警</text>
-          <text x="120" y="425" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle">放行</text>
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
+          <text x="400" y="50" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="middle" class="zh">实际次品</text><text x="400" y="50" font-size="28" font-weight="700" fill="#ff9c75" text-anchor="middle" class="eo">Defective</text>
+          <text x="720" y="50" font-size="28" font-weight="700" fill="#8fb6ff" text-anchor="middle" class="zh">实际合格</text><text x="720" y="50" font-size="28" font-weight="700" fill="#8fb6ff" text-anchor="middle" class="eo">Good</text>
+          <text x="120" y="195" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="zh">报警</text><text x="120" y="195" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="eo">Alarm</text>
+          <text x="120" y="425" font-size="30" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="zh">放行</text><text x="120" y="425" font-size="28" font-weight="700" fill="#f3f6fa" text-anchor="middle" class="eo">Pass</text>
           <rect x="240" y="80" width="320" height="210" rx="20" fill="rgba(46,196,182,.18)" stroke="#2ec4b6" stroke-width="3"/>
           <text x="400" y="180" font-size="64" font-weight="800" fill="#5ee0d2" text-anchor="middle" class="en">{{ch31.tp:.0f}}</text>
-          <text x="400" y="240" font-size="28" fill="#5ee0d2" text-anchor="middle">抓对</text>
+          <text x="400" y="240" font-size="28" fill="#5ee0d2" text-anchor="middle" class="zh">抓对</text><text x="400" y="240" font-size="28" fill="#5ee0d2" text-anchor="middle" class="eo">Caught</text>
           <rect x="580" y="80" width="300" height="210" rx="20" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/>
-          <text x="730" y="180" font-size="64" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">{{ch31.fp:.1f}}</text>
-          <text x="730" y="240" font-size="28" fill="#ff9c75" text-anchor="middle">误报</text>
+          <text x="730" y="180" font-size="64" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">{{ch31.fp:.0f}}</text>
+          <text x="730" y="240" font-size="28" fill="#ff9c75" text-anchor="middle" class="zh">误报</text><text x="730" y="240" font-size="28" fill="#ff9c75" text-anchor="middle" class="eo">False alarm</text>
           <rect x="240" y="310" width="320" height="210" rx="20" fill="rgba(255,122,69,.15)" stroke="#ff7a45" stroke-width="3"/>
           <text x="400" y="410" font-size="64" font-weight="800" fill="#ff9c75" text-anchor="middle" class="en">{{ch31.fn:.0f}}</text>
-          <text x="400" y="470" font-size="28" fill="#ff9c75" text-anchor="middle">漏检</text>
+          <text x="400" y="470" font-size="28" fill="#ff9c75" text-anchor="middle" class="zh">漏检</text><text x="400" y="470" font-size="28" fill="#ff9c75" text-anchor="middle" class="eo">Missed</text>
           <rect x="580" y="310" width="300" height="210" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
           <text x="730" y="410" font-size="64" font-weight="800" fill="#d3deea" text-anchor="middle" class="en">{{ch31.tn:.0f}}</text>
-          <text x="730" y="470" font-size="28" fill="#d3deea" text-anchor="middle">正确放行</text>
-          <text x="450" y="590" font-size="27" fill="#ffd75a" text-anchor="middle">次品率 2%、召回 95%、误报 3%（每 1000 件）</text>
+          <text x="730" y="470" font-size="28" fill="#d3deea" text-anchor="middle" class="zh">正确放行</text><text x="730" y="470" font-size="28" fill="#d3deea" text-anchor="middle" class="eo">Correctly passed</text>
+          <text x="450" y="590" font-size="27" fill="#ffd75a" text-anchor="middle" class="zh">次品率 2%、召回 95%、误报 3%（每 1000 件）</text><text x="450" y="590" font-size="26" fill="#ffd75a" text-anchor="middle" class="eo">2% defects, 95% recall, 3% false alarms (per 1000)</text>
         </svg>
     notes:
       - "视觉质检的结果可以排成一张四格表，叫混淆矩阵。按供应商的数，每 1000 件里，20 件次品抓住约 {{ch31.tp:.0f}} 件、漏检约 {{ch31.fn:.0f}} 件；980 件合格品里误报约 {{ch31.fp:.0f}} 件，正确放行约 {{ch31.tn:.0f}} 件。三个比例要分清：召回率是次品中被抓住的比例，误报率是合格品中被报警的比例，这两个是检测器自己的性质；精确率是报警中真正是次品的比例，它还要看次品率。"
@@ -204,7 +204,7 @@ slides:
     caption: ["蓝 = 合格品得分 N(0,1)，橙 = 次品得分 N(d′,1)，竖线 = 报警阈值；d′ = 3.53", "Blue: good N(0,1); orange: defects N(d′,1); line: threshold"]
     notes:
       - "检测器给每件衣片打一个像次品的得分。合格品的得分服从均值 0、标准差 1 的正态分布，次品服从均值 d′ 的正态分布，d′ 叫区分能力，越大两堆分得越开。得分超过阈值 t 就报警。召回率等于 1 减 Φ(t 减 d′)，误报率等于 1 减 Φ(t)。看实验页阈值来回移动：右移，误报少了，漏检多了；左移相反。算例 d′ 3.53、阈值 1.88，召回率 {{ch31.tpr:.0f}}%，误报率 {{ch31.fpr:.0f}}%。"
-      - "The inspector gives each piece a 'looks defective' score. Good pieces score as a normal distribution with mean 0 and standard deviation 1; defects score with mean d-prime, the discriminability: the larger it is, the further apart the two heaps. A score above threshold t raises an alarm. Recall is one minus Phi of t minus d-prime; the false-alarm rate is one minus Phi of t. Watch the threshold sweep in the lab: move it right and false alarms fall but misses rise; move it left and the opposite. In our example, d-prime 3.53 and threshold 1.88 give {{ch31.tpr:.0f}} percent recall and {{ch31.fpr:.0f}} percent false alarms."
+      - "The inspector gives each piece a 'looks defective' score. Good pieces score as a normal distribution with mean 0 and standard deviation 1; defects score with mean d-prime, the discriminability: the larger it is, the further apart the two distributions. A score above threshold t raises an alarm. Recall is one minus Phi of t minus d-prime; the false-alarm rate is one minus Phi of t. Watch the threshold sweep in the lab: move it right and false alarms fall but misses rise; move it left and the opposite. In our example, d-prime 3.53 and threshold 1.88 give {{ch31.tpr:.0f}} percent recall and {{ch31.fpr:.0f}} percent false alarms."
 
   - layout: bignum
     title: ["基础比例：次品越少，报警里误报越多", "Base rates: the rarer the defects, the more alarms are false"]
@@ -273,7 +273,7 @@ slides:
   - layout: bignum
     title: ["提前量、误报、漏报：三个数一起看", "Lead time, false alarms, misses: judge all three"]
     nums:
-      - {n: "{{ch31.lead1:.0f}} 天", n_en: "lead · daily, 1.15", label: ["单日值：全部检出、提前约 {{ch31.lead1:.0f}} 天", "Daily values: all caught, early"]}
+      - {n: "{{ch31.lead1:.0f}}", n_en: "days early · daily, 1.15", label: ["单日值：全部检出、提前约 {{ch31.lead1:.0f}} 天", "Daily values: all caught, early"]}
       - {n: "{{ch31.fpm1:.2f}}", n_en: "false / machine / month", label: ["每台每月误报，200 台约 {{ch31.fleet_fa:.0f}} 次", "200 machines: about {{ch31.fleet_fa:.0f}} a month"]}
       - {n: "{{ch31.fpm3:.2f}}", n_en: "3-day mean, 1.12", label: ["误报压下来，提前约 {{ch31.lead3:.1f}} 天", "Few false alarms, {{ch31.lead3:.1f}} days early"]}
     foot: ["滑动平均压误报，但会推迟报警；窗口拉到 7 天，提前量反而略降", "Averaging cuts false alarms but delays alarms; a 7-day window even loses a little lead time"]
@@ -293,24 +293,24 @@ slides:
       - ["调参：电子送布、张力、压脚改参数", "Adjust: electronic feed, tension, foot"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <defs><marker id="m31" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f2b705"/></marker></defs>
           <path d="M450 150 A 230 200 0 0 1 700 420" stroke="#f2b705" stroke-width="6" fill="none" marker-end="url(#m31)"/>
           <path d="M610 520 A 230 200 0 0 1 290 520" stroke="#f2b705" stroke-width="6" fill="none" marker-end="url(#m31)"/>
           <path d="M200 420 A 230 200 0 0 1 380 150" stroke="#f2b705" stroke-width="6" fill="none" marker-end="url(#m31)"/>
           <g text-anchor="middle">
             <rect x="290" y="30" width="320" height="130" rx="22" fill="#111d31" stroke="#2ec4b6" stroke-width="3"/>
-            <text x="450" y="85" font-size="36" font-weight="800" fill="#5ee0d2">感知</text>
-            <text x="450" y="130" font-size="24" fill="#d3deea">厚度 · 电流 · 负载</text>
+            <text x="450" y="85" font-size="36" font-weight="800" fill="#5ee0d2" class="zh">感知</text><text x="450" y="85" font-size="34" font-weight="800" fill="#5ee0d2" class="eo">Sense</text>
+            <text x="450" y="130" font-size="24" fill="#d3deea" class="zh">厚度 · 电流 · 负载</text><text x="450" y="130" font-size="20" fill="#d3deea" class="eo">Thickness · current · load</text>
             <rect x="560" y="420" width="320" height="130" rx="22" fill="#111d31" stroke="#a78bfa" stroke-width="3"/>
-            <text x="720" y="475" font-size="36" font-weight="800" fill="#c4b5fd">识别</text>
-            <text x="720" y="520" font-size="24" fill="#d3deea">层数 · 接缝 · 面料</text>
+            <text x="720" y="475" font-size="36" font-weight="800" fill="#c4b5fd" class="zh">识别</text><text x="720" y="475" font-size="34" font-weight="800" fill="#c4b5fd" class="eo">Recognise</text>
+            <text x="720" y="520" font-size="24" fill="#d3deea" class="zh">层数 · 接缝 · 面料</text><text x="720" y="520" font-size="22" fill="#d3deea" class="eo">Plies · seams · fabric</text>
             <rect x="20" y="420" width="320" height="130" rx="22" fill="#111d31" stroke="#ff7a45" stroke-width="3"/>
-            <text x="180" y="475" font-size="36" font-weight="800" fill="#ff9c75">调参</text>
-            <text x="180" y="520" font-size="24" fill="#d3deea">针距 · 压力 · 张力 · 转速</text>
+            <text x="180" y="475" font-size="36" font-weight="800" fill="#ff9c75" class="zh">调参</text><text x="180" y="475" font-size="34" font-weight="800" fill="#ff9c75" class="eo">Adjust</text>
+            <text x="180" y="520" font-size="24" fill="#d3deea" class="zh">针距 · 压力 · 张力 · 转速</text><text x="180" y="520" font-size="19" fill="#d3deea" class="eo">Stitch · force · tension · speed</text>
           </g>
-          <text x="450" y="330" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle">调参要有上下限</text>
-          <text x="450" y="370" font-size="24" fill="#8fa3ba" text-anchor="middle">关键动作要有保护</text>
+          <text x="450" y="330" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">调参要有上下限</text><text x="450" y="330" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">Adjust within limits</text>
+          <text x="450" y="370" font-size="24" fill="#8fa3ba" text-anchor="middle" class="zh">关键动作要有保护</text><text x="450" y="370" font-size="24" fill="#8fa3ba" text-anchor="middle" class="eo">Protect critical actions</text>
         </svg>
     notes:
       - "一件衣服有的地方一层布，有的地方四五层，比如牛仔裤过梗处；传统平缝机的针距、张力、压脚压力调好就固定了，厚薄突变处容易针距不匀、跳针、断针。AI 缝纫机是个闭环：感知，靠压脚高度看厚度、主轴电流看穿刺阻力、送布电机负载看送布阻力；识别，判断层数变了、遇到接缝还是换了面料；调参，由电子送布、电子张力、电子压脚执行，调完继续测。公开专利的例子就是在两个时刻测厚度再查表。"
@@ -368,10 +368,10 @@ slides:
       - ["力控打磨：感知—识别—调参，并设上下限", "Force-controlled grinding: sense, recognise, adjust, with limits"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <rect x="40" y="380" width="520" height="200" rx="20" fill="#111d31" stroke="#4b5f7d" stroke-width="3"/>
           <g fill="#4c8dff"><rect x="80" y="470" width="80" height="60" rx="8"/><rect x="180" y="450" width="80" height="80" rx="8"/><rect x="280" y="480" width="80" height="50" rx="8"/><rect x="380" y="460" width="80" height="70" rx="8"/></g>
-          <text x="300" y="610" font-size="26" fill="#8fa3ba" text-anchor="middle">料框</text>
+          <text x="300" y="610" font-size="26" fill="#8fa3ba" text-anchor="middle" class="zh">料框</text><text x="300" y="610" font-size="26" fill="#8fa3ba" text-anchor="middle" class="eo">Bin</text>
           <g font-size="26" font-weight="800" text-anchor="middle" class="en">
             <text x="120" y="440" fill="#5ee0d2">0.92</text><text x="220" y="420" fill="#ff9c75">0.41</text><text x="320" y="450" fill="#5ee0d2">0.88</text><text x="420" y="430" fill="#ff9c75">0.35</text>
           </g>
@@ -379,10 +379,10 @@ slides:
           <circle cx="300" cy="200" r="18" fill="#f2b705"/>
           <path d="M370 280 L360 310 M395 270 L410 300" stroke="#f3f6fa" stroke-width="7" stroke-linecap="round"/>
           <rect x="600" y="80" width="280" height="200" rx="20" fill="#111d31" stroke="#f2b705" stroke-width="3"/>
-          <text x="740" y="140" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle">阈值 0.8</text>
-          <text x="740" y="190" font-size="24" fill="#d3deea" text-anchor="middle">低：抓空抓错多</text>
-          <text x="740" y="235" font-size="24" fill="#d3deea" text-anchor="middle">高：漏抓多</text>
-          <text x="740" y="340" font-size="26" fill="#5ee0d2" text-anchor="middle">按代价定阈值</text>
+          <text x="740" y="140" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">阈值 0.8</text><text x="740" y="140" font-size="28" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">Threshold 0.8</text>
+          <text x="740" y="190" font-size="24" fill="#d3deea" text-anchor="middle" class="zh">低：抓空抓错多</text><text x="740" y="190" font-size="22" fill="#d3deea" text-anchor="middle" class="eo">Low: wrong grasps</text>
+          <text x="740" y="235" font-size="24" fill="#d3deea" text-anchor="middle" class="zh">高：漏抓多</text><text x="740" y="235" font-size="22" fill="#d3deea" text-anchor="middle" class="eo">High: missed parts</text>
+          <text x="740" y="340" font-size="26" fill="#5ee0d2" text-anchor="middle" class="zh">按代价定阈值</text><text x="740" y="340" font-size="26" fill="#5ee0d2" text-anchor="middle" class="eo">Set it by cost</text>
         </svg>
     notes:
       - "这一套取舍在机器人上一模一样。料框抓取用视觉给每个候选抓取点打一个置信度，超过阈值才去抓：阈值低了抓空、抓错多，高了漏抓多，和质检的召回率与误报率是同一条 ROC 曲线，阈值同样按抓错一次和漏抓一次的代价来定。协作机器人的关节减速器磨损时，同样负载下电机电流会慢慢升高，对电流做滑动平均再和阈值比，就是预测性维护。力控打磨则对应 AI 缝纫机的感知—识别—调参闭环，同样要设上下限防止过载。"
@@ -396,7 +396,7 @@ slides:
       - ["精确率太低，人就不再相信报警", "Low precision teaches people to ignore alarms"]
     visual:
       svg: |
-        <svg viewBox="0 0 900 640" width="100%" height="640">
+        <svg viewBox="0 0 900 640" width="100%" height="640"><style>html:not(.en-only) .eo{display:none} .eo{font-family:var(--enf)}</style>
           <circle cx="450" cy="170" r="120" fill="#111d31" stroke="#f3f6fa" stroke-width="5"/>
           <circle cx="450" cy="170" r="30" fill="#ff7a45"/>
           <g stroke="#ff7a45" stroke-width="6" fill="none" stroke-linecap="round"><path d="M600 110 q30 60 0 120"/><path d="M640 80 q50 90 0 180"/><path d="M300 110 q-30 60 0 120"/><path d="M260 80 q-50 90 0 180"/></g>
@@ -404,9 +404,9 @@ slides:
             <text x="110" y="410" fill="#ff9c75">✗</text><text x="190" y="410" fill="#ff9c75">✗</text><text x="270" y="410" fill="#ff9c75">✗</text><text x="350" y="410" fill="#ff9c75">✗</text><text x="430" y="410" fill="#ff9c75">✗</text>
             <text x="510" y="410" fill="#ff9c75">✗</text><text x="590" y="410" fill="#ff9c75">✗</text><text x="670" y="410" fill="#ff9c75">✗</text><text x="750" y="410" fill="#ff9c75">✗</text><text x="830" y="410" fill="#ff9c75">✗</text>
           </g>
-          <text x="450" y="470" font-size="28" fill="#d3deea" text-anchor="middle">十次报警，全是炒菜</text>
+          <text x="450" y="470" font-size="28" fill="#d3deea" text-anchor="middle" class="zh">十次报警，全是炒菜</text><text x="450" y="470" font-size="28" fill="#d3deea" text-anchor="middle" class="eo">Ten alarms, all from frying</text>
           <rect x="150" y="520" width="600" height="80" rx="20" fill="rgba(242,183,5,.12)"/>
-          <text x="450" y="572" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle">阈值要按代价定</text>
+          <text x="450" y="572" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="zh">阈值要按代价定</text><text x="450" y="572" font-size="30" font-weight="700" fill="#ffd75a" text-anchor="middle" class="eo">Set the threshold by cost</text>
         </svg>
     notes:
       - "家里也有同样的事。厨房里的烟雾报警器一炒菜就响，响了十次都不是火灾，家里人就会把电池拆了，真着火时反而不响。报警的精确率太低，人就不再相信报警。车间里的视觉质检也一样，十次报警六次是误报，工人很快就不认真复检了。这正是车间质检要按代价定阈值、要算精确率的原因。"
@@ -416,9 +416,9 @@ slides:
     tag: ["回到车间问题", "Back to the problem"]
     title: ["报警 {{ch31.alarms:.0f}} 件，真次品只有 {{ch31.prec:.0f}}%", "{{ch31.alarms:.0f}} alarms, only {{ch31.prec:.0f}}% real"]
     rows:
-      - ["每 1000 件：抓住 / 误报", "{{ch31.tp:.0f}} / {{ch31.fp:.0f}} 件"]
-      - ["最省阈值 / 成本", "{{ch31.tbest:.2f}} · {{ch31.cbest:.0f}} 元"]
-      - ["精确率 80% + 召回率 90%", "d′ ≈ {{ch31.dneed:.1f}}"]
+      - [["每 1000 件：抓住 / 误报", "Per 1000: caught / false alarms"], ["{{ch31.tp:.0f}} / {{ch31.fp:.0f}} 件", "{{ch31.tp:.0f}} / {{ch31.fp:.0f}}"]]
+      - [["最省阈值 / 成本", "Cheapest threshold / cost"], ["{{ch31.tbest:.2f}} · {{ch31.cbest:.0f}} 元", "{{ch31.tbest:.2f}} · ¥{{ch31.cbest:.0f}}"]]
+      - [["精确率 80% + 召回率 90%", "80% precision + 90% recall"], ["d′ ≈ {{ch31.dneed:.1f}}", "d′ ≈ {{ch31.dneed:.1f}}"]]
     side: {big: "{{ch31.false10:.0f}} / 10", text: ["十次报警六次是误报：只调阈值不够，要提高 d′", "Six alarms in ten are false: raise d′, not just the threshold"]}
     foot: ["召回率和误报率是检测器的性质，精确率还取决于次品率；阈值按漏检和误报的代价定", "Recall and false-alarm rate belong to the inspector; precision also depends on the defect rate; set thresholds by cost"]
     notes:
