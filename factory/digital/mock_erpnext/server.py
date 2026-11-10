@@ -51,7 +51,9 @@ REQUIRED = {
     "Opportunity": ["opportunity_from", "party_name", "company", "transaction_date"],     # 第 18 轮 E1
     "Quotation": ["quotation_to", "party_name", "company", "transaction_date", "items"],
     "Quotation Item": ["item_code", "qty"],
-    "Project": ["project_name"],                                                       # 第 139 轮：按单设计的作业号
+    "Project": ["project_name"],
+    "Timesheet": ["time_logs"],                                                        # 第 139 轮：设计工时
+    "Timesheet Detail": ["activity_type", "hours"],                                                       # 第 139 轮：按单设计的作业号
     "Contract": ["party_type", "party_name", "contract_terms"],
     "Issue": ["subject"],
     # 第 18 轮 E3：资产维护模块（必填与真 ERPNext v16 一致）
@@ -90,10 +92,10 @@ SERIES = {"Sales Order": "SAL-ORD-{y}-{n:05d}", "Work Order": "MFG-WO-{y}-{n:05d
           "Contract": "CON-{y}-{n:05d}", "Issue": "ISS-{y}-{n:05d}",
           "Asset": "ACC-ASS-{y}-{n:05d}", "Asset Maintenance Log": "ACC-AML-{y}-{n:05d}", "Asset Repair": "ACC-ASR-{y}-{n:05d}",
           "Employee": "HR-EMP-{n:05d}", "Purchase Receipt": "MAT-PRE-{y}-{n:05d}",
-          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Project": "PROJ-{n:04d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
+          "Sales Invoice": "ACC-SINV-{y}-{n:05d}", "Project": "PROJ-{n:04d}", "Timesheet": "TS-{y}-{n:05d}", "Purchase Invoice": "ACC-PINV-{y}-{n:05d}", "Payment Entry": "ACC-PAY-{y}-{n:05d}"}
 BY_FIELD = {"Asset Maintenance": "asset_name", "Asset Category": "asset_category_name", "Asset Maintenance Team": "maintenance_team_name",
             "Location": "location_name", "User": "email", "Designation": "designation_name", "Supplier": "supplier_name",
-            "Item": "item_code"}                                  # 真 ERPNext：物料按物料编号命名
+            "Item": "item_code", "Activity Type": "activity_type"}   # 真 ERPNext：物料按物料编号命名；活动类型按名称
 
 
 ALLOW_ON_SUBMIT = {"BOM": {"is_default", "is_active"}}       # 真 ERPNext 里这几个字段提交后也能改（第 139 轮）

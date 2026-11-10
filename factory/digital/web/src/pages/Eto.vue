@@ -79,10 +79,12 @@
           <button role="tab" :aria-selected="tab === 'design'" :class="{ on: tab === 'design' }" @click="tab = 'design'">{{ $t('设计（物料清单与工艺）') }}</button>
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'mat'" :class="{ on: tab === 'mat' }" @click="tab = 'mat'">{{ $t('物料') }}</button>
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'plan'" :class="{ on: tab === 'plan' }" @click="tab = 'plan'">{{ $t('计划') }}</button>
+          <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'shop'" :class="{ on: tab === 'shop' }" @click="tab = 'shop'">{{ $t('车间与成本') }}</button>
         </div>
         <EtoDesign v-if="tab === 'design'" :job="d.job" :ops="ops" :items="allItems" :suppliers="suppliers" @changed="open(sel)" />
         <EtoMaterials v-else-if="tab === 'mat'" :job="d.job" @changed="open(sel)" />
         <EtoPlan v-else-if="tab === 'plan'" :job="d.job" />
+        <EtoShop v-else-if="tab === 'shop'" :job="d.job" />
         <template v-else>
         <div class="tools">
           <span class="muted small">{{ d.estimate ? $t('第 {r} 版估算', { r: d.estimate.rev }) : $t('还没有估算') }}
@@ -141,6 +143,7 @@ import ProposalModal from '../components/ProposalModal.vue';
 import EtoDesign from '../components/EtoDesign.vue';
 import EtoMaterials from '../components/EtoMaterials.vue';
 import EtoPlan from '../components/EtoPlan.vue';
+import EtoShop from '../components/EtoShop.vue';
 
 const KINDS = ['material', 'buyout', 'operation', 'outside', 'engineering'];
 const KIND_ZH = { material: tk('材料'), buyout: tk('外购件'), operation: tk('工序'), outside: tk('外协'), engineering: tk('设计') };

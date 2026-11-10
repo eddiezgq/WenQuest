@@ -87,6 +87,9 @@
               <td class="mono">{{ w.expected_delivery_date }}</td><td class="num">{{ t('{n} 分钟', { n: w.est_minutes }) }}</td></tr></tbody>
           </table>
         </template>
+        <template v-if="p.action === 'eto_hours'">
+          <p>{{ t('作业 {j}：{h} 小时设计工时（{w}，{d}）进 ERPNext 工时表，挂项目 {p}。', { j: pv.job.job_no, h: pv.hours, w: pv.who, d: pv.day, p: pv.job.project }) }}</p>
+        </template>
         <template v-if="p.action === 'eto_early_buy'">
           <p class="warns">{{ t('设计第 {r} 版还没发布：这些长周期件先请购，设计改了要人处理这些请购单。', { r: pv.job.design_rev }) }}</p>
         </template>

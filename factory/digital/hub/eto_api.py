@@ -9,13 +9,14 @@ from hub import eto as E
 from hub import eto_design as ED
 from hub import eto_mrp as EM
 from hub import eto_plan as EP
+from hub import eto_exec as EX
 
 log = logging.getLogger("eto")
 ROLES = ("sales", "planner", "engineer", "manager", "approver")
 
 
 def mount(app, H, user_of, who, ai_quota=None):
-    for fn in (E.on_proposal_done, ED.on_proposal_done):
+    for fn in (E.on_proposal_done, ED.on_proposal_done, EX.on_proposal_done):
         if fn not in _ai.ON_PROPOSAL_DONE:
             _ai.ON_PROPOSAL_DONE.append(fn)
 
@@ -198,3 +199,31 @@ def mount(app, H, user_of, who, ai_quota=None):
             t["load"] = EP.load(H.db, u["mode"], job_no)
             return t
         return guard(run)
+
+    # ------------------------------------------------------------ 139e：车间执行与作业成本
+    @app.get("/api/eto/jobs/{job_no}/shop")
+    def eto_shop(job_no: str, u=Depends(user_of)):
+        return guard(lambda: {"work_orders": EX.work_orders(H.db, u["mode"], job_no), "cost": EX.cost(H.db, u["mode"], job_no),
+                              "hours": EX.hours(H.db, u["mode"], job_no)})
+
+    @app.get("/api/eto/jobs/{job_no}/traveler/{wo}")
+    def eto_traveler(job_no: str, wo: str, u=Depends(user_of)):
+        return guard(lambda: EX.traveler(H.db, u["mode"], job_no, wo))
+
+    @app.post("/api/eto/jobs/{job_no}/release")
+    def eto_release_wo(job_no: str, body: dict = Body(...), u=Depends(user_of)):
+        """下达车间：查过设计版本再走原来的“下达工单”提议（人确认后车间按工艺路线逐道做）"""
+        if u.get("role") not in ("planner", "manager", "lead") and not u.get("teacher"):
+            raise HTTPException(403, "下达车间由计划员或厂长做")
+        w = guard(lambda: EX.release_check(H.db, u["mode"], job_no, str(body.get("work_order") or "")))
+        return propose(u, "release_work_order", {"work_order": w["name"], "job": {"job_no": job_no}},
+                       "下达工单 {}（作业 {}，{} × {:g}）".format(w["name"], job_no, w["item"], w["qty"]))
+
+    @app.post("/api/eto/jobs/{job_no}/hours")
+    def eto_hours(job_no: str, body: dict = Body(...), u=Depends(user_of)):
+        """登记设计工时 → ERPNext Timesheet（数据录入：提议后自动确认，留记录）"""
+        can(u)
+        pv = guard(lambda: EX.hours_preview(H.db, u["mode"], job_no, body.get("hours"), body.get("note"), who(u), body.get("day")))
+        r = propose(u, "eto_hours", pv, "设计工时 {}：{:g} 小时".format(job_no, pv["hours"]))
+        H.ai.decide(r["proposal_id"], u["name"], True, role=u["role"])
+        return r
