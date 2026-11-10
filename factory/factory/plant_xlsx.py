@@ -142,7 +142,8 @@ ETO_ROWS = [("prefix", "作业号前缀", "str", "字母开头，不超过 10 �
             ("markup_pct", "加价率（%）", "num", "报价 = 成本 × (1 + 加价率)"),
             ("engineering_rate_per_h", "设计费率（每小时）", "num", "设计、出图、编程每小时多少钱"),
             ("valid_days", "报价有效天数", "int", "1–365"),
-            ("long_lead_days", "长周期件（天）", "int", "提前期达到多少天算长周期件，可在设计发布前先买；不填按 15 天")]
+            ("long_lead_days", "长周期件（天）", "int", "提前期达到多少天算长周期件，可在设计发布前先买；不填按 15 天"),
+            ("accept_days", "验收期（天）", "int", "交货后多少天验收（验收那一期的计划付款日）；不填按 10 天")]
 MS_COLS = [("代号", "key", "str", "英文小写，如 deposit"), ("名称", "name", "str", "如 订金"), ("比例（%）", "pct", "num", "各期加起来 100"),
            ("开票时点", "on", "eto_on", "/".join(ETO_ON_ZH.values()))]
 PRODUCT_SHEETS = (("物料", ITEM_COLS), ("工艺路线", ROUTE_COLS), ("物料清单", BOM_COLS), ("成品", PROD_COLS),

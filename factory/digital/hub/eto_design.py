@@ -34,6 +34,7 @@ create table if not exists eto_design (
 );
 """
 NEW_KINDS = ("make", "buy", "raw")
+ACCEPT_DAYS = 10            # 缺省验收期（天）：验收那一期的计划付款日 = 交期 + 它（清单 eto.accept_days 可改）
 KIND_ZH = {"make": "自制件", "buy": "外购件", "raw": "原材料"}
 
 
@@ -64,12 +65,20 @@ def order_preview(db, mode, job_no, delivery_date=None, today=None):
         raise E.EtoError("交期 {} 早于今天".format(due.isoformat()))
     cfg = E.config()
     ms = [m for m in cfg.get("milestones") or [] if m.get("pct")]
-    sched, left = [], b["price"]
+    # 各期的计划日期：订单确认 = 下单日，设计发布 = 下单日与交期之间，发货 = 交期，验收 = 交期 + 验收期（eto.accept_days，缺省 10 天）。
+    # 只是计划日期（开票看里程碑真到了没有）；ERPNext 不许两期同一天，同一天的顺延一天（2026-11-10 演练 42872216480 查出）
+    accept = int(cfg.get("accept_days") or ACCEPT_DAYS)
+    plan_day = {"order": today, "design": today + (due - today) / 2, "ship": due, "accept": due + dt.timedelta(days=accept)}
+    sched, left, last = [], b["price"], None
     for i, m in enumerate(ms):
         amt = round(b["price"] * m["pct"] / 100, 2) if i < len(ms) - 1 else round(left, 2)
         left -= amt
+        day = plan_day.get(m["on"], due)
+        if last and day <= last:
+            day = last + dt.timedelta(days=1)
+        last = day
         sched.append({"key": m["key"], "description": m["name"], "invoice_portion": m["pct"], "payment_amount": amt,
-                      "on": m["on"], "due_date": (today if m["on"] == "order" else due).isoformat()})
+                      "on": m["on"], "due_date": day.isoformat()})
     return {"job": {"job_no": job_no, "title": j["title"], "customer": j["customer"], "rev": j["quoted_rev"]},
             "sales_order": {"customer": j["customer"], "item_code": job_no, "qty": j["qty"], "rate": b["unit_price"], "amount": b["price"],
                             "transaction_date": today.isoformat(), "delivery_date": due.isoformat(), "project": E.project_of(j),

@@ -131,7 +131,8 @@ def test_order_design_release_flow(db, keep_master):
     ps = so["payment_schedule"]
     assert so["project"] == jn and so["quotation"] == "SAL-QTN-1" and so["delivery_date"] == "2026-12-30"
     assert [p["invoice_portion"] for p in ps] == [30, 60, 10] and round(sum(p["payment_amount"] for p in ps), 2) == so["amount"]
-    assert ps[0]["due_date"] == "2026-11-10" and ps[1]["due_date"] == "2026-12-30"
+    assert ps[0]["due_date"] == "2026-11-10" and ps[1]["due_date"] == "2026-12-30" and ps[2]["due_date"] == "2027-01-09"   # 验收 = 交期 + 10 天
+    assert len({p["due_date"] for p in ps}) == len(ps)                     # ERPNext 不许两期同一天
     with pytest.raises(E.EtoError):
         ED.order_preview(db, "teach", jn, "2026-01-01", today=dt.date(2026, 11, 10))       # 交期早于今天
     # 没接单不能发布
@@ -196,6 +197,9 @@ def test_bridge_order_and_release(mock_erp):  # noqa: F811
           "delivery_date": "2026-12-30", "project": jn, "quotation": "SAL-QTN-X",
           "payment_schedule": [{"description": "订金", "invoice_portion": 30, "payment_amount": 600, "due_date": "2026-11-10"},
                                {"description": "发货", "invoice_portion": 70, "payment_amount": 1400, "due_date": "2026-12-30"}]}
+    bad = dict(so, payment_schedule=[dict(p, due_date="2026-12-30") for p in so["payment_schedule"]])
+    dup, _ = run("eto_order", {"job": {"job_no": jn}, "sales_order": bad})
+    assert dup[-1]["action"] == "failed" and "duplicate due dates" in dup[-1]["error"]       # 模拟 ERPNext 和真的一样拦
     first, _ = run("eto_order", {"job": {"job_no": jn}, "sales_order": so})
     sod = M.db["Sales Order"][first[-1]["created"][0][1]]
     assert sod["project"] == jn and [p["invoice_portion"] for p in sod["payment_schedule"]] == [30, 70] and first[-1]["project"] == jn

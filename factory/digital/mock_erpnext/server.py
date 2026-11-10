@@ -261,6 +261,11 @@ class Mock:
     # ------------------------------------------------------------ 业务规则
     def on_submit(self, dt_, doc):
         if dt_ == "Sales Order":
+            days = [str(p.get("due_date")) for p in doc.get("payment_schedule") or []]
+            dup = next((d for i, d in enumerate(days) if d in days[:i]), None)
+            if dup:                                  # 真 ERPNext：付款计划不许两期同一天（第 139 轮演练查出）
+                raise Err(417, "ValidationError", "Rows with duplicate due dates in other rows were found: <br>{} in row {}".format(
+                    dup, days.index(dup, days.index(dup) + 1) + 1))
             doc.update(status="To Deliver and Bill", per_delivered=0)
             for it in doc.get("items", []):
                 it.setdefault("delivered_qty", 0)
