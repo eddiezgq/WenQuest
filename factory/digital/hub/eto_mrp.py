@@ -72,6 +72,11 @@ def plan(db, mode, job_no, now=None):
     today = o.now.astimezone(TZ).date()
     start = today if o.now.astimezone(TZ).hour < 12 and today.weekday() < 5 else add_working_days(today, 1)
     due = dt.date.fromisoformat(j["due_date"]) if j.get("due_date") else None
+    # 第 139d 段：工单、请购的日期按从交期倒排的结果（没有交期时从今天起）
+    from hub import eto_plan as EP
+    sch = EP.schedule_tree(job_no, j["qty"], due, start, 0, EP._cfg_ship()) if due else None
+    smk = {x["item_code"]: x for x in (sch or {}).get("make", [])}
+    sby = {x["item_code"]: x for x in (sch or {}).get("buy", [])}
     stock = o.stock()
     on_order, committed = mrp.supply_demand(o, exclude_project=job_no)
     pegged = _pegged(o, job_no)
@@ -95,8 +100,14 @@ def plan(db, mode, job_no, now=None):
                 q = math.ceil(net)
                 mins = sum(m for _, m in F.ROUTINGS[F.BOMS[code][0]]) * q
                 days = max(1, math.ceil(mins / 480))
-                wos.append({"production_item": code, "qty": q, "planned_start_date": start.isoformat(),
-                            "expected_delivery_date": add_working_days(start, days - 1).isoformat(), "est_minutes": round(mins, 1),
+                ws_ = start
+                if code in smk:
+                    ls = dt.date.fromisoformat(smk[code]["latest_start"])
+                    if ls < start:
+                        warns.append("{} 按交期倒排应在 {} 开工，已经晚了 {} 个工作日".format(code, ls.isoformat(), smk[code]["late_days"]))
+                    ws_ = max(ls, start)
+                wos.append({"production_item": code, "qty": q, "planned_start_date": ws_.isoformat(),
+                            "expected_delivery_date": add_working_days(ws_, days - 1).isoformat(), "est_minutes": round(mins, 1),
                             "warehouse": "fg" if code == job_no else "semi",
                             "sources": {c: ("semi" if c in F.BOMS else ("raw" if F.ITEMS[c][1] == "raw" else "purchased"))
                                         for c, _ in F.BOMS[code][1]}})
@@ -107,13 +118,15 @@ def plan(db, mode, job_no, now=None):
                 q = net if own(code) else math.ceil(net / mrp.lot_size(code)) * mrp.lot_size(code)
                 q = round(q, 4)
                 lead, sup = _lead(code)
+                arrive = add_working_days(start, lead * 5 // 7 or 1) if lead is not None else None
+                need_by = dt.date.fromisoformat(sby[code]["need_by"]) if code in sby else None
                 if lead is None:
-                    sched = start
-                    warns.append("{} 的采购交期待确认（没有供应商或提前期），需求日暂按 {}".format(code, start.isoformat()))
+                    sched = max(need_by or start, start)
+                    warns.append("{} 的采购交期待确认（没有供应商或提前期），需求日按 {}".format(code, sched.isoformat()))
                 else:
-                    sched = add_working_days(start, lead * 5 // 7 or 1)
-                    if due and sched > due:
-                        warns.append("{} 采购提前期 {} 天，预计 {} 到货，晚于交期 {}".format(code, lead, sched.isoformat(), due.isoformat()))
+                    sched = max(need_by or arrive, arrive)       # 需求日 = 倒排的最晚到货日；来不及就按最早能到的日子
+                    if need_by and arrive > need_by:
+                        warns.append("{} 采购提前期 {} 天，最早 {} 到货，晚于倒排要求的 {}".format(code, lead, arrive.isoformat(), need_by.isoformat()))
                 mrs.append({"item_code": code, "qty": q, "uom": F.ITEMS[code][2], "schedule_date": sched.isoformat(), "wh": "raw" if kind == "raw" else "purchased",
                             "supplier": sup, "reason": "作业 {} 净需求 {:g}".format(job_no, round(net, 4))})
                 action = "请购 {:g}".format(q)

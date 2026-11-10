@@ -42,6 +42,12 @@
           <tr><td class="muted">{{ $t('加价 {p}% · 毛利 {m}%', { p: res.basis.markup_pct ?? '?', m: mainB.margin_pct ?? '?' }) }}</td><td></td></tr>
         </tbody></table>
         <p v-if="res.basis.example" class="small muted">{{ $t('演示工厂：费率与比例是示例值。') }}</p>
+        <div v-if="d.feasibility" class="feas small" :class="d.feasibility.ok ? 'ok' : 'warnline'">
+          {{ $t('粗算最早 {e} 交货（设计 {a} + 采购 {b} + 加工 {c} + 发货 {s} 个工作日）', { e: d.feasibility.earliest, a: d.feasibility.engineering_days,
+            b: d.feasibility.purchase_days, c: d.feasibility.manufacturing_days, s: d.feasibility.ship_days }) }}
+          <template v-if="d.feasibility.due">{{ d.feasibility.slack_days >= 0 ? $t('，赶得上交期。') : $t('，比交期晚 {n} 个工作日。', { n: -d.feasibility.slack_days }) }}</template>
+          <span v-if="d.feasibility.unknown.length">{{ $t('周期不明：{a}', { a: d.feasibility.unknown.join(', ') }) }}</span>
+        </div>
         <div v-if="res.errors.length || res.unknown.length" class="issues">
           <div v-for="e in res.errors" :key="e" class="err small">✗ {{ $td(e) }}</div>
           <div v-for="u in res.unknown" :key="u" class="warnline small">{{ $t('未知：{a}', { a: $td(u) }) }}</div>
@@ -72,9 +78,11 @@
           <button role="tab" :aria-selected="tab === 'est'" :class="{ on: tab === 'est' }" @click="tab = 'est'">{{ $t('估算') }}</button>
           <button role="tab" :aria-selected="tab === 'design'" :class="{ on: tab === 'design' }" @click="tab = 'design'">{{ $t('设计（物料清单与工艺）') }}</button>
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'mat'" :class="{ on: tab === 'mat' }" @click="tab = 'mat'">{{ $t('物料') }}</button>
+          <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'plan'" :class="{ on: tab === 'plan' }" @click="tab = 'plan'">{{ $t('计划') }}</button>
         </div>
         <EtoDesign v-if="tab === 'design'" :job="d.job" :ops="ops" :items="allItems" :suppliers="suppliers" @changed="open(sel)" />
         <EtoMaterials v-else-if="tab === 'mat'" :job="d.job" @changed="open(sel)" />
+        <EtoPlan v-else-if="tab === 'plan'" :job="d.job" />
         <template v-else>
         <div class="tools">
           <span class="muted small">{{ d.estimate ? $t('第 {r} 版估算', { r: d.estimate.rev }) : $t('还没有估算') }}
@@ -132,6 +140,7 @@ import { loc, t as $t, td as $td, tk } from '../lib/i18n';
 import ProposalModal from '../components/ProposalModal.vue';
 import EtoDesign from '../components/EtoDesign.vue';
 import EtoMaterials from '../components/EtoMaterials.vue';
+import EtoPlan from '../components/EtoPlan.vue';
 
 const KINDS = ['material', 'buyout', 'operation', 'outside', 'engineering'];
 const KIND_ZH = { material: tk('材料'), buyout: tk('外购件'), operation: tk('工序'), outside: tk('外协'), engineering: tk('设计') };
@@ -292,6 +301,7 @@ tr.main td { font-weight: 600; }
 .err { color: var(--bad); } .ok { color: var(--good); } .warnline { color: var(--warn-ink); }
 .warnbox { background: var(--warn-bg); color: var(--warn-ink); border-radius: 8px; padding: 10px 12px; }
 .empty { color: var(--muted, #888); padding: 16px 0; }
+.feas { border-radius: 6px; padding: 6px 8px; background: #F7F8FA; }
 .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
 .tabs button { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); background: #fff; cursor: pointer; font: inherit; }
 .tabs button.on { border-color: var(--accent); background: var(--accent-bg); }
