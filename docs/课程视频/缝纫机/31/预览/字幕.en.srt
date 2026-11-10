@@ -1,0 +1,899 @@
+1
+00:00:00,600 --> 00:00:01,223
+Hi everyone,
+
+2
+00:00:01,243 --> 00:00:04,815
+and welcome to Sewing Machine Design and Manufacturing at WenQuest.
+
+3
+00:00:05,215 --> 00:00:08,313
+This is Lecture 31, the last one in the course,
+
+4
+00:00:08,333 --> 00:00:11,299
+on artificial intelligence in apparel making.
+
+5
+00:00:11,699 --> 00:00:14,650
+Last time we looked ten years ahead at the machines.
+
+6
+00:00:14,670 --> 00:00:18,249
+Today we look at AI and ask it three things: what data it eats,
+
+7
+00:00:18,269 --> 00:00:20,592
+how it's judged, and where it goes wrong.
+
+8
+00:00:20,992 --> 00:00:25,171
+This video concentrates on whether a vision inspector's alarms can be trusted
+
+9
+00:00:25,191 --> 00:00:27,788
+and on the trade-offs in predictive maintenance;
+
+10
+00:00:27,808 --> 00:00:30,788
+design, marker making and jobs get only a mention here,
+
+11
+00:00:30,808 --> 00:00:32,478
+with the details in the slides.
+
+12
+00:00:33,998 --> 00:00:34,968
+Here's the problem.
+
+13
+00:00:35,368 --> 00:00:39,527
+A shirt factory plans to install vision inspection on the collar line.
+
+14
+00:00:39,927 --> 00:00:44,263
+The supplier's report says recall 95 percent, false-alarm rate 3 percent.
+
+15
+00:00:44,663 --> 00:00:47,081
+The station's defect rate is 2 percent;
+
+16
+00:00:47,101 --> 00:00:51,955
+a missed defect reaching the next station or the customer costs about 20 yuan,
+
+17
+00:00:51,975 --> 00:00:55,580
+and a false alarm costs about 0.5 yuan to recheck by hand.
+
+18
+00:00:55,980 --> 00:01:00,547
+Out of 1000 pieces, how many alarms, and what share are real defects?
+
+19
+00:01:00,947 --> 00:01:03,443
+Where should the threshold go to minimise cost?
+
+20
+00:01:03,843 --> 00:01:07,177
+And to reach 80 percent precision with 90 percent recall,
+
+21
+00:01:07,197 --> 00:01:09,472
+how much better must the inspector get?
+
+22
+00:01:09,872 --> 00:01:11,272
+We'll answer at the end.
+
+23
+00:01:12,792 --> 00:01:14,740
+What AI does in apparel making.
+
+24
+00:01:16,260 --> 00:01:19,516
+By what they do, AI applications in apparel fall into four kinds.
+
+25
+00:01:19,916 --> 00:01:23,038
+Perception: recognising things in images and signals,
+
+26
+00:01:23,058 --> 00:01:27,010
+such as vision inspection, fabric identification and edge tracking;
+
+27
+00:01:27,030 --> 00:01:30,982
+its weakness is the unseen: a new colour or style and it misjudges.
+
+28
+00:01:31,382 --> 00:01:34,328
+Prediction: projecting the past forward, such as sales,
+
+29
+00:01:34,348 --> 00:01:37,618
+delays and machine failures; its weakness is a changed world.
+
+30
+00:01:38,018 --> 00:01:41,788
+Optimisation and generation: finding good options or making new ones,
+
+31
+00:01:41,808 --> 00:01:44,260
+such as markers, schedules and design images;
+
+32
+00:01:44,280 --> 00:01:46,347
+its weakness is a wrongly stated goal.
+
+33
+00:01:46,747 --> 00:01:49,589
+Language assistants: reading documents and answering questions;
+
+34
+00:01:49,609 --> 00:01:51,950
+their weakness is sounding fluent while being wrong.
+
+35
+00:01:52,350 --> 00:01:56,830
+For any AI application, ask three things: what data, how it's judged,
+
+36
+00:01:56,850 --> 00:01:58,069
+and where it fails.
+
+37
+00:01:59,589 --> 00:02:01,694
+Vision inspection: get three ratios straight.
+
+38
+00:02:03,214 --> 00:02:07,000
+Inspection results fit a four-cell table, the confusion matrix.
+
+39
+00:02:07,400 --> 00:02:09,411
+With the supplier's figures,
+
+40
+00:02:09,431 --> 00:02:14,777
+out of 1000 pieces the 20 defects split into about 19 caught and 1 missed,
+
+41
+00:02:14,797 --> 00:02:20,289
+and the 980 good pieces into about 29 false alarms and 951 correctly passed.
+
+42
+00:02:20,689 --> 00:02:21,878
+Keep three ratios apart.
+
+43
+00:02:22,278 --> 00:02:24,475
+Recall is the share of defects caught,
+
+44
+00:02:24,495 --> 00:02:28,032
+and the false-alarm rate is the share of good pieces flagged;
+
+45
+00:02:28,052 --> 00:02:30,015
+these two belong to the inspector.
+
+46
+00:02:30,415 --> 00:02:33,407
+Precision is the share of alarms that are real defects,
+
+47
+00:02:33,427 --> 00:02:35,543
+and it also depends on the defect rate.
+
+48
+00:02:37,063 --> 00:02:39,315
+The inspector gives each piece a 'looks defective' score.
+
+49
+00:02:39,715 --> 00:02:44,349
+Good pieces score as a normal distribution with mean 0 and standard deviation 1;
+
+50
+00:02:44,369 --> 00:02:48,537
+defects score with mean d-prime, the discriminability: the larger it is,
+
+51
+00:02:48,557 --> 00:02:50,863
+the further apart the two distributions.
+
+52
+00:02:51,263 --> 00:02:54,037
+A score above threshold t raises an alarm.
+
+53
+00:02:54,437 --> 00:02:57,283
+Recall is one minus Phi of t minus d-prime;
+
+54
+00:02:57,303 --> 00:03:00,150
+the false-alarm rate is one minus Phi of t.
+
+55
+00:03:00,550 --> 00:03:02,768
+Watch the threshold sweep in the lab:
+
+56
+00:03:02,788 --> 00:03:05,914
+move it right and false alarms fall but misses rise;
+
+57
+00:03:05,934 --> 00:03:07,729
+move it left and the opposite.
+
+58
+00:03:08,129 --> 00:03:09,266
+In our example,
+
+59
+00:03:09,286 --> 00:03:15,593
+d-prime 3.53 and threshold 1.88 give 95 percent recall and 3 percent false alarms.
+
+60
+00:03:17,113 --> 00:03:19,829
+Here's the thing most often missed: the base rate.
+
+61
+00:03:20,229 --> 00:03:24,899
+At a 2 percent defect rate, 1000 pieces bring about 48 alarms,
+
+62
+00:03:24,919 --> 00:03:29,514
+only about 19 of them real, so precision is about 39 percent:
+
+63
+00:03:29,534 --> 00:03:31,633
+six alarms in ten are false.
+
+64
+00:03:32,033 --> 00:03:37,192
+The same inspector at a 10 percent defect rate has about 78 percent precision,
+
+65
+00:03:37,212 --> 00:03:39,250
+and at 1 percent only about 24.
+
+66
+00:03:39,650 --> 00:03:42,555
+So don't look at 'accuracy' alone: at 2 percent defects,
+
+67
+00:03:42,575 --> 00:03:46,732
+an inspector that always says 'good' is 98 percent accurate and catches nothing.
+
+68
+00:03:48,252 --> 00:03:52,827
+Join up recall and false-alarm rate for every threshold and you get the ROC
+
+69
+00:03:52,847 --> 00:03:53,929
+curve on the left;
+
+70
+00:03:53,949 --> 00:03:57,912
+the closer it hugs the top-left corner, the better the inspector.
+
+71
+00:03:58,312 --> 00:04:01,867
+On the right is cost per 1000 pieces against threshold:
+
+72
+00:04:01,887 --> 00:04:06,939
+misses times the cost of a miss plus false alarms times the cost of a recheck.
+
+73
+00:04:07,339 --> 00:04:10,767
+Too low a threshold means many false alarms and high cost;
+
+74
+00:04:10,787 --> 00:04:15,167
+too high means many misses and high cost too; there's a valley in between.
+
+75
+00:04:15,567 --> 00:04:19,512
+Watch the dots move with the threshold: sliding along the ROC curve,
+
+76
+00:04:19,532 --> 00:04:21,553
+and down then up on the cost curve.
+
+77
+00:04:23,073 --> 00:04:25,350
+The cheapest threshold can be computed directly.
+
+78
+00:04:25,749 --> 00:04:30,281
+Under the equal-variance normal model, t-star equals d-prime over 2,
+
+79
+00:04:30,301 --> 00:04:34,632
+plus the natural log of one minus pi times C_f over pi times C_m,
+
+80
+00:04:34,652 --> 00:04:35,903
+divided by d-prime.
+
+81
+00:04:36,303 --> 00:04:40,934
+At a 2 percent defect rate, 20 yuan per miss and 0.5 per recheck,
+
+82
+00:04:40,954 --> 00:04:45,513
+t-star is about 1.82 and the cost about 34 yuan per 1000 pieces,
+
+83
+00:04:45,533 --> 00:04:48,517
+slightly cheaper than the supplier's 1.88.
+
+84
+00:04:48,917 --> 00:04:53,407
+At 10 percent defects the cheapest threshold falls to about 1.34;
+
+85
+00:04:53,427 --> 00:04:55,905
+at 1 percent it rises to about 2.02.
+
+86
+00:04:56,305 --> 00:04:59,493
+The rarer the defects or the dearer the false alarms,
+
+87
+00:04:59,513 --> 00:05:01,611
+the higher the threshold should go.
+
+88
+00:05:03,131 --> 00:05:04,549
+Predictive maintenance.
+
+89
+00:05:06,069 --> 00:05:09,484
+The second classic application is predictive maintenance.
+
+90
+00:05:09,884 --> 00:05:15,102
+In our example, 200 machines over 180 days each report one indicator a day,
+
+91
+00:05:15,122 --> 00:05:20,409
+such as the RMS of vibration or motor current, normalised to 1 when healthy,
+
+92
+00:05:20,429 --> 00:05:24,600
+with noise of 0.08; 89 of them start to degrade on some day,
+
+93
+00:05:24,620 --> 00:05:28,231
+growing exponentially until they fail 30 days later.
+
+94
+00:05:28,631 --> 00:05:32,463
+Look at three machines: green is healthy, orange and blue degrade.
+
+95
+00:05:32,863 --> 00:05:37,442
+The thin line is the daily value and the thick line the moving average,
+
+96
+00:05:37,462 --> 00:05:40,227
+cycling through windows of 1, 3 and 7 days.
+
+97
+00:05:40,627 --> 00:05:41,908
+The longer the window,
+
+98
+00:05:41,928 --> 00:05:45,573
+the smoother the line and the fewer noise-driven false alarms,
+
+99
+00:05:45,593 --> 00:05:49,297
+but the later it crosses the threshold once degradation starts.
+
+100
+00:05:50,817 --> 00:05:53,021
+AI sewing machines and make-to-order.
+
+101
+00:05:54,541 --> 00:05:59,288
+Parts of a garment are one ply, parts four or five, like a jeans yoke crossing.
+
+102
+00:05:59,688 --> 00:06:03,068
+A traditional lockstitch machine keeps its stitch length,
+
+103
+00:06:03,088 --> 00:06:05,514
+tension and foot pressure fixed once set,
+
+104
+00:06:05,534 --> 00:06:10,049
+so sudden thickness changes cause uneven stitches, skips and broken needles.
+
+105
+00:06:10,449 --> 00:06:12,747
+An AI sewing machine closes a loop.
+
+106
+00:06:13,147 --> 00:06:17,714
+Sense: foot height for thickness, spindle current for penetration resistance,
+
+107
+00:06:17,734 --> 00:06:19,859
+feed-motor load for feed resistance.
+
+108
+00:06:20,259 --> 00:06:23,921
+Recognise: more plies, a cross seam, or a different fabric.
+
+109
+00:06:24,321 --> 00:06:28,299
+Adjust: electronic feed, tension and foot carry out the change,
+
+110
+00:06:28,319 --> 00:06:29,759
+then sensing continues.
+
+111
+00:06:30,159 --> 00:06:33,470
+A published patent's example simply measures thickness at two moments and
+
+112
+00:06:33,490 --> 00:06:34,246
+looks up a table.
+
+113
+00:06:35,766 --> 00:06:37,567
+The same trade-offs apply to robots.
+
+114
+00:06:37,967 --> 00:06:42,526
+In bin picking, vision scores each candidate grasp point with a confidence,
+
+115
+00:06:42,546 --> 00:06:45,212
+and the robot grasps only above a threshold:
+
+116
+00:06:45,232 --> 00:06:49,912
+too low and it grabs air or the wrong part, too high and it skips good parts.
+
+117
+00:06:50,312 --> 00:06:54,033
+That's the same ROC curve as inspection recall and false alarms,
+
+118
+00:06:54,053 --> 00:06:58,766
+and the threshold should be set by the cost of a wrong grasp versus a missed one.
+
+119
+00:06:59,166 --> 00:07:01,145
+When a cobot's joint reducer wears,
+
+120
+00:07:01,165 --> 00:07:03,829
+motor current under the same load slowly rises;
+
+121
+00:07:03,849 --> 00:07:08,112
+average it and compare with a threshold, and that's predictive maintenance.
+
+122
+00:07:08,512 --> 00:07:11,465
+Force-controlled grinding mirrors the AI sewing machine's
+
+123
+00:07:11,485 --> 00:07:12,926
+sense-recognise-adjust loop,
+
+124
+00:07:12,946 --> 00:07:14,595
+with limits to prevent overload.
+
+125
+00:07:16,115 --> 00:07:17,862
+The same thing happens at home.
+
+126
+00:07:18,262 --> 00:07:22,332
+The kitchen smoke alarm goes off every time someone fries something;
+
+127
+00:07:22,352 --> 00:07:25,880
+ten alarms and not one fire, so somebody pulls the battery,
+
+128
+00:07:25,900 --> 00:07:27,985
+and in a real fire it stays silent.
+
+129
+00:07:28,385 --> 00:07:32,219
+When alarm precision is too low, people stop believing alarms.
+
+130
+00:07:32,619 --> 00:07:37,495
+Vision inspection on the floor is no different: if six alarms in ten are false,
+
+131
+00:07:37,515 --> 00:07:40,036
+operators soon stop rechecking carefully.
+
+132
+00:07:40,436 --> 00:07:43,827
+That's exactly why inspection thresholds must be set by cost,
+
+133
+00:07:43,847 --> 00:07:45,896
+and why precision must be calculated.
+
+134
+00:07:47,416 --> 00:07:48,657
+Back to our problem.
+
+135
+00:07:49,057 --> 00:07:53,104
+Of 1000 pieces, about 19 of the 20 defects are caught,
+
+136
+00:07:53,124 --> 00:07:57,548
+and about 29 of the 980 good pieces are flagged by mistake:
+
+137
+00:07:57,568 --> 00:08:01,766
+about 48 alarms in all, with precision about 39 percent,
+
+138
+00:08:01,786 --> 00:08:03,574
+six alarms in ten false.
+
+139
+00:08:03,974 --> 00:08:08,353
+By the cost formula the cheapest threshold is about 1.82,
+
+140
+00:08:08,373 --> 00:08:11,285
+costing about 34 yuan per 1000 pieces.
+
+141
+00:08:11,685 --> 00:08:16,703
+For 80 percent precision with 90 percent recall no threshold will do;
+
+142
+00:08:16,723 --> 00:08:19,696
+d-prime must rise from 3.53 to about 3.9.
+
+143
+00:08:20,096 --> 00:08:21,959
+So '95 percent recall' can be believed,
+
+144
+00:08:21,979 --> 00:08:23,938
+but it doesn't mean the alarms are right.
+
+145
+00:08:25,458 --> 00:08:30,076
+Now Virtual lab 31-1, AI inspection and predictive maintenance. The results,
+
+146
+00:08:30,096 --> 00:08:33,432
+the confusion-matrix numbers and the tasks are blurred.
+
+147
+00:08:33,452 --> 00:08:37,704
+Page one is the inspection threshold. Record recall, false-alarm rate,
+
+148
+00:08:37,724 --> 00:08:40,816
+precision and cost per 1000 pieces at the defaults,
+
+149
+00:08:40,836 --> 00:08:45,332
+then drag the alarm threshold and watch the line on the score plot and the
+
+150
+00:08:45,352 --> 00:08:48,139
+dots on the ROC and cost curves move together.
+
+151
+00:08:48,539 --> 00:08:51,726
+Next, change the cost of a miss and of a false alarm,
+
+152
+00:08:51,746 --> 00:08:54,691
+see which way the bottom of the cost curve moves,
+
+153
+00:08:54,711 --> 00:08:56,930
+and check it with the t-star formula.
+
+154
+00:08:56,950 --> 00:09:00,682
+Task one asks for the cheapest threshold at the default costs.
+
+155
+00:09:01,082 --> 00:09:05,708
+Task two puts the threshold back at 1.88 and sets the defect rate to 10 and
+
+156
+00:09:05,728 --> 00:09:06,637
+then 1 percent;
+
+157
+00:09:06,657 --> 00:09:11,221
+record precision and the alarm count. The inspector hasn't changed at all,
+
+158
+00:09:11,241 --> 00:09:14,009
+yet its alarms mean something very different.
+
+159
+00:09:14,409 --> 00:09:18,801
+Task three keeps 2 percent defects and raises the discriminability d-prime
+
+160
+00:09:18,821 --> 00:09:19,576
+step by step,
+
+161
+00:09:19,596 --> 00:09:20,947
+retuning the threshold,
+
+162
+00:09:20,967 --> 00:09:25,836
+to find the smallest d-prime that meets the precision and recall targets together.
+
+163
+00:09:26,236 --> 00:09:29,343
+Page two is predictive maintenance. Record detection rate,
+
+164
+00:09:29,363 --> 00:09:33,170
+average lead time and false alarms per machine a month at the defaults,
+
+165
+00:09:33,190 --> 00:09:37,213
+then drag the alarm threshold and watch the triangles on the three machines
+
+166
+00:09:37,233 --> 00:09:37,860
+come and go.
+
+167
+00:09:38,260 --> 00:09:42,953
+Task four keeps the noise at 0.08 and combines the moving-average window and
+
+168
+00:09:42,973 --> 00:09:44,565
+threshold until detection,
+
+169
+00:09:44,585 --> 00:09:47,541
+false alarms and lead time all meet the targets;
+
+170
+00:09:47,561 --> 00:09:49,711
+then try a long window and compare.
+
+171
+00:09:49,731 --> 00:09:52,811
+The guide and report template are on the platform.
+
+172
+00:09:54,331 --> 00:09:57,318
+Everything in this lecture is on the WenQuest learning platform.
+
+173
+00:09:57,718 --> 00:10:02,259
+You can open the interactive slides and the AI inspection lab and work them
+
+174
+00:10:02,279 --> 00:10:02,807
+yourself,
+
+175
+00:10:02,827 --> 00:10:05,179
+including the pages this video skipped,
+
+176
+00:10:05,199 --> 00:10:08,220
+such as the views on jobs and the student project.
+
+177
+00:10:08,620 --> 00:10:11,810
+You submit the assignment and the lab report on the platform,
+
+178
+00:10:11,830 --> 00:10:13,494
+and get marks and comments back.
+
+179
+00:10:13,894 --> 00:10:18,092
+Questions go to the discussion forum, and the grades page shows every mark.
+
+180
+00:10:19,612 --> 00:10:22,213
+The assignment has three questions. One:
+
+181
+00:10:22,233 --> 00:10:26,800
+Vendor A's inspector has 90 percent recall and 5 percent false alarms,
+
+182
+00:10:26,820 --> 00:10:31,779
+and the defect rate is 3 percent. Find alarms per 1000 pieces and precision.
+
+183
+00:10:31,799 --> 00:10:36,825
+With a miss costing 30 yuan and a false alarm 1 yuan, find the cost per 1000;
+
+184
+00:10:36,845 --> 00:10:41,608
+if a higher threshold gives 80 percent recall and 2 percent false alarms,
+
+185
+00:10:41,628 --> 00:10:45,671
+what's the cost then? Which threshold would you pick, and why?
+
+186
+00:10:46,071 --> 00:10:51,044
+Two: Vendor B claims a d-prime of 3.53. Using the equal-variance normal model,
+
+187
+00:10:51,064 --> 00:10:54,950
+with 2 percent defects, 20 yuan per miss and 0.5 per recheck,
+
+188
+00:10:54,970 --> 00:10:58,151
+find the cheapest threshold and the cost per 1000.
+
+189
+00:10:58,171 --> 00:11:02,824
+If the section needs at least 80 percent precision and 90 percent recall,
+
+190
+00:11:02,844 --> 00:11:05,513
+can B deliver, and what d-prime is needed?
+
+191
+00:11:05,913 --> 00:11:08,522
+Three: write an acceptance and operating plan.
+
+192
+00:11:08,542 --> 00:11:12,922
+Which metrics will you validate on your own section's samples before go-live,
+
+193
+00:11:12,942 --> 00:11:16,236
+how will you re-validate when the style or fabric changes,
+
+194
+00:11:16,256 --> 00:11:20,750
+how are false alarms and misses collected and how often is the model retrained,
+
+195
+00:11:20,770 --> 00:11:23,436
+and who adjusts the threshold, using what data?
+
+196
+00:11:23,836 --> 00:11:27,072
+Submit the assignment and the lab report on the WenQuest platform.
+
+197
+00:11:28,592 --> 00:11:31,643
+There's also a nine-question quiz. For example:
+
+198
+00:11:31,663 --> 00:11:35,695
+an inspector has 95 percent recall and 3 percent false alarms,
+
+199
+00:11:35,715 --> 00:11:39,354
+and the defect rate is 5 percent. What is its precision?
+
+200
+00:11:39,754 --> 00:11:42,513
+Or true or false: at a 2 percent defect rate,
+
+201
+00:11:42,533 --> 00:11:46,218
+an inspector that always says 'good' is 98 percent accurate,
+
+202
+00:11:46,238 --> 00:11:49,799
+so accuracy says almost nothing about an inspection model.
+
+203
+00:11:50,199 --> 00:11:53,165
+You get three attempts, and the explanations appear as soon as you submit.
+
+204
+00:11:54,685 --> 00:11:57,361
+Three things to remember from the last lecture.
+
+205
+00:11:57,761 --> 00:12:00,850
+One: of any AI application ask what data it eats,
+
+206
+00:12:00,870 --> 00:12:03,071
+how it's judged and where it fails;
+
+207
+00:12:03,091 --> 00:12:05,862
+each of the four kinds has its own weakness.
+
+208
+00:12:06,262 --> 00:12:09,559
+Two: recall and false-alarm rate belong to the inspector,
+
+209
+00:12:09,579 --> 00:12:12,351
+while precision also depends on the defect rate;
+
+210
+00:12:12,371 --> 00:12:15,552
+set thresholds by the costs of misses and false alarms,
+
+211
+00:12:15,572 --> 00:12:19,683
+and to have both high precision and high recall you must raise d-prime;
+
+212
+00:12:19,703 --> 00:12:24,105
+judge predictive maintenance on lead time, false alarms and misses together.
+
+213
+00:12:24,505 --> 00:12:27,956
+Three: an AI sewing machine is mostly sensors, actuators and control,
+
+214
+00:12:27,976 --> 00:12:30,069
+so adjustments need limits and protection,
+
+215
+00:12:30,089 --> 00:12:33,842
+and language assistants must cite sources and wait for a person to confirm.
+
+216
+00:12:34,242 --> 00:12:35,568
+That's the end of the course.
+
+217
+00:12:35,968 --> 00:12:36,903
+Thank you all.
+
+218
+00:12:37,303 --> 00:12:38,975
+The slides, the virtual lab,
+
+219
+00:12:38,995 --> 00:12:43,204
+the assignment and the quiz are all on the WenQuest learning platform,
+
+220
+00:12:43,224 --> 00:12:47,252
+at learn.wenquestrobotics.com. Sign up for free and start learning.
+
+221
+00:12:47,652 --> 00:12:51,742
+Over thirty-one lectures we went from how a single stitch is formed,
+
+222
+00:12:51,762 --> 00:12:55,246
+through mechanisms, controls, manufacturing and factories,
+
+223
+00:12:55,266 --> 00:12:56,878
+to artificial intelligence.
+
+224
+00:12:56,898 --> 00:13:01,350
+I hope you take away not just formulas but the habit of judging a machine,
+
+225
+00:13:01,370 --> 00:13:04,129
+a proposal, or an AI. See you on the platform.
