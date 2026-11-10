@@ -377,6 +377,8 @@ class Mock:
                         billed = sum(float(i["amount"]) for si in self.db.get("Sales Invoice", {}).values() if si.get("docstatus") == 1
                                      for i in si["items"] if i.get("sales_order") == so_name) + sum(i["amount"] for i in doc["items"] if i.get("sales_order") == so_name)
                         tot_so = sum(float(r["qty"]) * float(r.get("rate") or 0) for r in so["items"]) or billed
+                        if billed > tot_so + 0.01:            # 第 139g 段：ERPNext 按金额防超开（订单的开票额不能超过订单金额）
+                            raise Err(417, "ValidationError", "Cannot overbill for Sales Order {} more than {}".format(so_name, round(tot_so, 2)))
                         so.update(per_billed=round(min(100, 100 * billed / tot_so), 2) if tot_so else 100, modified=now_str())
             else:
                 for pr_name in {i.get("purchase_receipt") for i in doc["items"] if i.get("purchase_receipt")}:
@@ -594,16 +596,21 @@ def msi(body: dict = Body(...)):
     so = M.db.get("Sales Order", {}).get(body.get("source_name") or "")
     if so is None or so.get("docstatus") != 1:
         raise Err(417, "ValidationError", "销售订单 {} 不存在或没提交".format(body.get("source_name")))
+    # 和 ERPNext 一样按金额算还没开票的部分（分期开票后剩下的数量 = 剩余金额 / 单价，第 139g 段）
     billed = {}
     for si in M.db.get("Sales Invoice", {}).values():
         if si.get("docstatus") == 1:
             for i in si["items"]:
                 if i.get("so_detail"):
-                    billed[i["so_detail"]] = billed.get(i["so_detail"], 0) + float(i["qty"])
-    items = [{"item_code": r["item_code"], "qty": float(r["qty"]) - billed.get(r["name"], 0), "rate": float(r.get("rate") or 0),
-              "uom": r.get("uom") or "Nos", "conversion_factor": 1, "sales_order": so["name"], "so_detail": r["name"],
-              "income_account": "Sales - " + ABBR, "cost_center": "Main - " + ABBR}
-             for r in so["items"] if float(r["qty"]) > billed.get(r["name"], 0)]
+                    billed[i["so_detail"]] = billed.get(i["so_detail"], 0) + float(i["qty"]) * float(i["rate"])
+    items = []
+    for r in so["items"]:
+        rate, amt = float(r.get("rate") or 0), float(r["qty"]) * float(r.get("rate") or 0)
+        left = amt - billed.get(r["name"], 0)
+        if left > 0.005 or (not amt and r["name"] not in billed):
+            items.append({"item_code": r["item_code"], "qty": round(left / rate, 6) if rate else float(r["qty"]), "rate": rate,
+                          "uom": r.get("uom") or "Nos", "conversion_factor": 1, "sales_order": so["name"], "so_detail": r["name"],
+                          "income_account": "Sales - " + ABBR, "cost_center": "Main - " + ABBR})
     today = dt.date.today().isoformat()
     return {"message": {"doctype": "Sales Invoice", "customer": so["customer"], "company": so["company"], "posting_date": today, "due_date": today,
                         "currency": "USD", "conversion_rate": 1, "debit_to": "Debtors - " + ABBR, "items": items, "__islocal": 1}}

@@ -81,12 +81,14 @@
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'plan'" :class="{ on: tab === 'plan' }" @click="tab = 'plan'">{{ $t('计划') }}</button>
           <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'shop'" :class="{ on: tab === 'shop' }" @click="tab = 'shop'">{{ $t('车间与成本') }}</button>
           <button role="tab" :aria-selected="tab === 'qual'" :class="{ on: tab === 'qual' }" @click="tab = 'qual'">{{ $t('图纸与质量') }}</button>
+          <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'bill'" :class="{ on: tab === 'bill' }" @click="tab = 'bill'">{{ $t('开票与毛利') }}</button>
         </div>
         <EtoDesign v-if="tab === 'design'" :job="d.job" :ops="ops" :items="allItems" :suppliers="suppliers" @changed="open(sel)" />
         <EtoMaterials v-else-if="tab === 'mat'" :job="d.job" @changed="open(sel)" />
         <EtoPlan v-else-if="tab === 'plan'" :job="d.job" />
         <EtoShop v-else-if="tab === 'shop'" :job="d.job" />
         <EtoQuality v-else-if="tab === 'qual'" :job="d.job" @changed="open(sel)" />
+        <EtoBilling v-else-if="tab === 'bill'" :job="d.job" />
         <template v-else>
         <div class="tools">
           <span class="muted small">{{ d.estimate ? $t('第 {r} 版估算', { r: d.estimate.rev }) : $t('还没有估算') }}
@@ -147,6 +149,7 @@ import EtoMaterials from '../components/EtoMaterials.vue';
 import EtoPlan from '../components/EtoPlan.vue';
 import EtoShop from '../components/EtoShop.vue';
 import EtoQuality from '../components/EtoQuality.vue';
+import EtoBilling from '../components/EtoBilling.vue';
 
 const KINDS = ['material', 'buyout', 'operation', 'outside', 'engineering'];
 const KIND_ZH = { material: tk('材料'), buyout: tk('外购件'), operation: tk('工序'), outside: tk('外协'), engineering: tk('设计') };

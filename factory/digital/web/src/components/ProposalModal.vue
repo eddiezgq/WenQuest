@@ -89,7 +89,11 @@
         </template>
         <template v-if="p.action === 'eto_ship'">
           <p>{{ t('作业 {j}：按销售订单 {s} 发货 {n} 件给 {c}。首件、终检、不合格品处置都已核过。', { j: pv.job.job_no, s: pv.sales_order, n: pv.qty, c: bi(pv.job.customer) }) }}</p>
-          <p class="muted small">{{ t('确认后在 ERPNext 建发货单（发货里程碑到了，下一段按它开票）。') }}</p>
+          <p class="muted small">{{ t('确认后在 ERPNext 建发货单（发货那一期到了，可以在“开票与毛利”开票）。') }}</p>
+        </template>
+        <template v-if="p.action === 'eto_invoice'">
+          <p>{{ t('作业 {j}：按销售订单 {s} 开第“{d}”期发票 {a}（{p}%），客户 {c}，到期 {u}。', { j: pv.job.job_no, s: pv.sales_order, d: bi(pv.description), a: '$' + Number(pv.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), p: pv.pct, c: bi(pv.job.customer), u: pv.due_date }) }}</p>
+          <p class="muted small">{{ t('这一期的里程碑已经到了。确认后在 ERPNext 开销售发票（金额按接单时定的付款计划）。') }}</p>
         </template>
         <template v-if="p.action === 'eto_inspection'">
           <p>{{ t('{k} {w} 第 {n} 件：{r}，写进 ERPNext 质量检验单。', { k: pv.kind === 'fai' ? t('首件检验') : t('终检'), w: pv.work_order, n: pv.piece, r: pv.result }) }}</p>

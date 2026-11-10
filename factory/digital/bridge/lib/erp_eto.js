@@ -201,4 +201,33 @@ module.exports = ({ WH }) => ({
     out.push(this.doc('Delivery Note', dn, 'submitted', opt));
     created.push(['Delivery Note', dn.name]);
   },
+
+  // 第 139g 段：按里程碑分期开票。按销售订单生成发票骨架，只留作业这一行，数量 1、单价 = 本期金额（ERPNext 按金额防超开）
+  async eto_invoice(pv, { out, created, opt }) {
+    const mark = `作业 ${pv.job.job_no} 分期 ${pv.key}`;
+    const had = (await this.list('Sales Invoice', [['remarks', 'like', `%${mark}：%`], ['docstatus', '=', 1]], ['name']))[0];
+    if (had) {                                   // 重发：这一期已经开过，就用开好的那张
+      out.push(this.doc('Sales Invoice', await this.get('Sales Invoice', had.name), 'updated', opt));
+      created.push(['Sales Invoice', had.name]);
+      return;
+    }
+    const made = await this.method('erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice', { source_name: pv.sales_order });
+    const row = (made.items || []).find((i) => i.item_code === pv.job.job_no);
+    if (!row) throw new Error(`销售订单 ${pv.sales_order} 已经全部开票`);
+    for (const k of ['name', '__islocal', '__unsaved', 'idx', 'docstatus']) delete made[k];
+    for (const k of ['name', '__islocal', '__unsaved', 'parent', 'parenttype', 'parentfield', 'idx', 'docstatus', 'amount', 'base_amount']) delete row[k];
+    made.items = [{ ...row, qty: 1, rate: pv.amount, price_list_rate: pv.amount, discount_percentage: 0,
+      description: `${pv.job.title}：${pv.description}（${pv.pct}%）` }];
+    made.posting_date = pv.posting_date;
+    made.set_posting_time = 1;
+    made.due_date = pv.due_date;
+    made.payment_terms_template = null;
+    made.payment_schedule = [];
+    if (pv.job.project) made.project = pv.job.project;
+    made.remarks = `${mark}：${pv.description} ${pv.pct}%（问渠数字工厂）`;
+    made.docstatus = 1;
+    const si = await this.insert('Sales Invoice', made);
+    out.push(this.doc('Sales Invoice', si, 'submitted', opt));
+    created.push(['Sales Invoice', si.name]);
+  },
 });

@@ -1,5 +1,13 @@
 {
 "exact": {
+"作业还没接单": "The job has no sales order yet",
+"这一期已经开过票（或开票提议在等确认）": "This installment has already been invoiced (or its invoice proposal is awaiting confirmation)",
+"订单确认": "order confirmed",
+"设计发布": "design released",
+"客户验收": "customer acceptance",
+"发货": "shipment",
+"付款计划里没有这一期": "This installment is not in the payment schedule",
+"还没发货，不能登记验收": "Not shipped yet; customer acceptance cannot be recorded",
 "检验计划和检验记录由质量人员做": "Inspection plans and records are made by quality staff",
 "图纸超过 20 MB": "The drawing is larger than 20 MB",
 "下达车间由计划员或厂长做": "Releasing to the shop floor is done by the planner or the plant manager",
@@ -368,6 +376,10 @@
 [
 "数据不合规范：{a}",
 "Malformed data: {a}"
+],
+[
+"这一期的里程碑（{a}）还没到，不能开票",
+"The milestone for this installment ({a}) has not been reached; it cannot be invoiced yet"
 ]
 ]
 }

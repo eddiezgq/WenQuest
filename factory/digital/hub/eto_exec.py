@@ -170,14 +170,42 @@ def cost(db, mode, job_no):
     hrs = sum(h["hours"] for h in hours(db, mode, job_no))
     rate = cfg.get("engineering_rate_per_h")
     eng = round(hrs * float(rate), 2) if rate is not None else None
-    actual = {"material": None if mat_unknown else round(mat, 2), "operations": round(ops_act, 2), "outside": None,
+    out_amt, out_unknown = outside_actual(db, mode, j)
+    actual = {"material": None if mat_unknown else round(mat, 2), "operations": round(ops_act, 2), "outside": out_amt,
               "engineering": eng, "engineering_hours": hrs}
     known = [v for k, v in actual.items() if k != "engineering_hours"]
     actual["total"] = None if any(v is None for v in known) else round(sum(known), 2)
     return {"estimate": est, "actual": actual, "operations_std": round(ops_std, 2), "work_orders": lines,
             "unknown": (["材料单价缺：" + "、".join(sorted(set(mat_unknown)))] if mat_unknown else []) +
-                       ["外协：采购发票到了才有实际（139g）"] + ([] if rate is not None else ["设计费率没有配置"]),
-            "basis": "工序按总线上每件实际节拍 + 调整 + 换刀 × 工位费率；材料按已完工件数 × 标准用量 × 单价；设计按登记工时 × 设计费率"}
+                       out_unknown + ([] if rate is not None else ["设计费率没有配置"]),
+            "basis": "工序按总线上每件实际节拍 + 调整 + 换刀 × 工位费率；材料按已完工件数 × 标准用量 × 单价；"
+                     "外协按挂在作业上的采购单（数量 × 单价）；设计按登记工时 × 设计费率"}
+
+
+def outside_actual(db, mode, j):
+    """外协实际（第 139g 段）：已发布设计里的每项外协（作业号-OS序号），按挂在作业项目上、已提交的采购单的数量 × 单价合计；
+    哪一项还没下采购单或采购单没单价，外协实际就是未知"""
+    rel = ED.released(db, mode, j["job_no"])
+    n = len((rel or {}).get("spec", {}).get("outside") or [])
+    if not n:
+        return 0.0, []
+    proj = E.project_of(j)
+    codes = ["{}-OS{:02d}".format(j["job_no"], i) for i in range(1, n + 1)]
+    amt, seen, norate = 0.0, set(), set()
+    for m in db.erp_docs("Purchase Order", mode):
+        d = m["data"]
+        if d.get("docstatus") != 1 or d.get("project") not in (None, proj):
+            continue
+        for it in d.get("items") or []:
+            if it.get("item_code") in codes:
+                seen.add(it["item_code"])
+                if it.get("rate") is None:
+                    norate.add(it["item_code"])
+                else:
+                    amt += float(it["qty"]) * float(it["rate"])
+    miss = [c for c in codes if c not in seen]
+    msgs = (["外协还没下采购单：" + "、".join(miss)] if miss else []) + (["外协采购单没有单价：" + "、".join(sorted(norate))] if norate else [])
+    return (None if msgs else round(amt, 2)), msgs
 
 
 def on_proposal_done(db, action, preview, mode):

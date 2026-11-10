@@ -75,7 +75,9 @@ def test_job_cost_from_shop_events(db, job):  # noqa: F811
     line = next(x for x in c["work_orders"] if x["work_order"] == "WO-E1")
     assert line["done"] == 2 and line["material"] == round(4 * 1.6 * 2, 2) and line["operations_actual"] > line["operations_std"] > 0
     assert act["material"] == line["material"] and act["engineering_hours"] == 3 and act["engineering"] == 3 * 65
-    assert act["outside"] is None and act["total"] is None and any("外协" in u for u in c["unknown"])   # 外协没有发票：不当 0
+    # 139g：设计里没有外协，外协实际就是 0、合计可算（有外协但没下采购单时是“未知”，见 test_eto_billing）
+    assert act["outside"] == 0.0 and not any("外协" in u for u in c["unknown"])
+    assert act["total"] == round(act["material"] + act["operations"] + act["engineering"], 2)
 
 
 def test_hours_rules_and_bridge_timesheet(db, job, mock_erp):  # noqa: F811
