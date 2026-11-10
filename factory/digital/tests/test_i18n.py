@@ -236,7 +236,7 @@ def test_en_help_matches_zh():
             assert anchor in heads, "{}/en/{}：more 指向的标题不存在：{}".format(ed, f, anchor)
         assert not CJK.search(re.sub(r":::查表|\{\{厂名\}\}", "", b)), "英文稿里还有中文：{}/en/{}".format(ed, f)
         n += 1
-    assert n >= 18     # 教学版 18 章
+    assert n >= 62     # 8 册 62 章（第四批 b 第一次推送）
 
 
 def test_docs_en_pending():
@@ -261,4 +261,4 @@ def test_docs_en_pending():
     stale = [x for x in P["help_chapters"] if os.path.exists(os.path.join(HELP, x.split("/")[0], "en", x.split("/")[1]))]
     stale += [x for x in P["reference_docs"] if os.path.exists(os.path.join(hd, x[:-3] + ".en.md"))]
     assert not stale, "已经有英文稿，从待译表删掉：{}".format(stale)
-    assert len(pend) <= 93, "待译表只许变短（第四批 4a 收尾时 93 份）"
+    assert len(pend) <= 49, "待译表只许变短（第四批 a 收尾时 93 份，b 第一次推送后 49 份）"
