@@ -4,10 +4,11 @@
 import { reactive } from 'vue';
 import en from '../locales/en.json';
 import phraseList from '../locales/en_phrases.json';
+import nameList from '../locales/en_names.json';      // 第二批：各厂清单里的名字（tools/plant_names.py 生成）
 import { enPart, fill, hasCjk, siteLang, sortPhrases, translate } from './i18n-core.js';
 
 const KEY = 'wq-factory-lang';
-const PHRASES = sortPhrases(phraseList);
+const PHRASES = sortPhrases([...phraseList, ...nameList]);
 
 function stored() {
   try { const v = localStorage.getItem(KEY); return v === 'zh' || v === 'en' ? v : null; } catch (e) { return null; }

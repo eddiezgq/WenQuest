@@ -115,3 +115,42 @@ def test_plant_names_have_english(plant):
         assert e and not CJK.search(e), n
     for u in p["units"]:
         assert u.get("name_en") and not CJK.search(u["name_en"]), u["id"]
+
+
+def test_lab_task_texts_have_english():
+    """第二批：实验 7、实验 15–31 的任务题目、说明、提示、选项（模块常量），实验目录的题目、领域、学时，英文表里都有（页面用 $td 显示）"""
+    import importlib
+    from hub import labs_api
+    need = []
+    for m in ["teach"] + ["lab%d" % n for n in range(15, 32)]:
+        mod = importlib.import_module("hub." + m)
+        for t in mod.TASKS:
+            need += [t[k] for k in ("title", "desc", "hint") if t.get(k)]
+    for lab in labs_api.LABS:
+        need += [lab[k] for k in ("title", "domain", "hours") if isinstance(lab.get(k), str) and CJK.search(lab[k])]
+
+    def walk(o):                      # 模块里的常量（选择题选项、注入的问题种类……）
+        if isinstance(o, str):
+            if CJK.search(o):
+                need.append(o)
+        elif isinstance(o, dict):
+            [walk(v) for v in o.values()]
+        elif isinstance(o, (list, tuple)):
+            [walk(v) for v in o]
+    for m in ["teach"] + ["lab%d" % n for n in range(15, 32)]:
+        for k, v in vars(importlib.import_module("hub." + m)).items():
+            if k.isupper() and isinstance(v, (list, tuple, dict)):
+                walk(v)
+    names = dict(json.load(open(os.path.join(WEB, "src", "locales", "en_names.json"), encoding="utf-8")))
+    missing = [x for x in need if x not in EN and x not in names]
+    assert not missing, missing[:10]
+
+
+def test_plant_names_table_in_sync():
+    """第二批：运营各页按 web/src/locales/en_names.json 把清单里的名字换成英文；清单改了要重跑 web/tools/plant_names.py"""
+    sys.path.insert(0, os.path.join(WEB, "tools"))
+    import plant_names
+    have = json.load(open(os.path.join(WEB, "src", "locales", "en_names.json"), encoding="utf-8"))
+    assert have == plant_names.pairs(), "重跑 python3 factory/digital/web/tools/plant_names.py"
+    d = dict(have)
+    assert d["带锯床"] == "Band saw" and d["精车"] == "Finish turning"

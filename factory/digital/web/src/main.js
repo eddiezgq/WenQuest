@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import App from './App.vue';
 import './styles.css';
 import { session } from './lib/api';
+import { t, td } from './lib/i18n';
 
 const routes = [
   { path: '/login', component: () => import('./pages/Login.vue'), meta: { public: true } },
@@ -99,4 +100,7 @@ router.beforeEach((to) => {
   return true;
 });
 
-createApp(App).use(router).mount('#app');
+const app = createApp(App);
+app.config.globalProperties.$t = t;      // 第 130 轮第二批：模板里直接用 $t('中文原文')
+app.config.globalProperties.$td = td;    // 数据里的文字（实验任务的题目、说明、提示）按英文表译
+app.use(router).mount('#app');

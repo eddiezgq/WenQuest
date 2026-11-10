@@ -154,7 +154,7 @@
         <div v-for="(x, i) in ov.todos" :key="i" class="todo">
           <span class="pill" :class="x.tone">{{ td(x.kind) }}</span>
           <span class="ttext">{{ td(x.text) }}<span v-if="x.hint" class="muted small"> · {{ t('建议：') }}{{ td(x.hint) }}</span></span>
-          <span class="src">{{ td(x.src) }}</span>
+          <span class="src">{{ todoSrc(x.src) }}</span>
           <button class="btn" @click="act(x)">{{ td(x.act) }}</button>
         </div>
       </section>
@@ -214,6 +214,8 @@ function jobText(m) {
   return `${m.item || ''} ${opText(m.operation)} · ` + t('第 {i} / {n} 件', { i: Math.min(m.qty_done + (m.state === 'run' ? 1 : 0), m.qty), n: m.qty })
     + (m.job_started ? '' : ' · ' + t('待开工')) + (m.staff_level === 1 ? ' · ' + t('学徒带着开') : '');
 }
+// 待办来源“Lab 7 · 任务名”（枢纽已把“实验 7”换成英文）：任务名按英文表译（第 130 轮第二批）
+const todoSrc = (s) => { const m = /^(Lab 7 · |实验 7 · )(.+)$/.exec(s || ''); return m ? (isEn() ? 'Lab 7 · ' : '实验 7 · ') + td(m[2]) : td(s); };   // i18n-ok 识别枢纽给的前缀
 function srcText(ev) {
   if (!ev || !ev.length) return t('全厂汇总');
   const e = ev[0];

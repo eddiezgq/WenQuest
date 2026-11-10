@@ -224,8 +224,8 @@ onUnmounted(() => clearInterval(timer));
 .top { height: 64px; flex-shrink: 0; background: #fff; border-bottom: 1px solid var(--line); display: flex;
   align-items: center; padding: 0 28px; gap: 20px; position: sticky; top: 0; z-index: 10; }
 .title { display: flex; flex-direction: column; line-height: 1.3; }
-.langs { display: flex; gap: 2px; background: var(--bg); border-radius: 8px; padding: 3px; }
-.langs button { height: 26px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: #3D4852; cursor: pointer; font-size: 12px; }
+.langs { display: flex; flex-shrink: 0; gap: 2px; background: var(--bg); border-radius: 8px; padding: 3px; }
+.langs button { height: 26px; padding: 0 8px; white-space: nowrap; border: 0; border-radius: 6px; background: transparent; color: #3D4852; cursor: pointer; font-size: 12px; }
 .langs button.on { background: #fff; color: var(--ink, #17212B); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
 .helpbtn { height: 30px; padding: 0 10px; border: 1px solid var(--line); border-radius: 6px; display: inline-flex; align-items: center; font-size: 13px; color: inherit; text-decoration: none; }
 .title b { font-size: 17px; font-weight: 600; }

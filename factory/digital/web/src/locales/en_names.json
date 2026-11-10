@@ -1,0 +1,3710 @@
+[
+[
+"编码器接口芯片 WQ-ENCIF QFN-16（一片晶圆的批次，约 34 000 只，编带 12 盘） Encoder interface IC",
+"Encoder interface IC"
+],
+[
+"关节伺服驱动板 B 版（编码器接口芯片 WQ-ENCIF；抱闸驱动与线圈电流检测） Joint servo drive board rev B",
+"Joint servo drive board rev B"
+],
+[
+"编码器接口芯片 WQ-ENCIF QFN-16（问渠芯片厂，第 92 轮设计；示例芯片） Encoder interface IC",
+"Encoder interface IC"
+],
+[
+"伺服电机 100 W（带失电制动抱闸，问渠电机厂 WQ-SM100） Servo motor 100 W with brake",
+"Servo motor 100 W with brake"
+],
+[
+"伺服电机 200 W（带失电制动抱闸，问渠电机厂 WQ-SM200） Servo motor 200 W with brake",
+"Servo motor 200 W with brake"
+],
+[
+"伺服电机 400 W（带失电制动抱闸，问渠电机厂 WQ-SM400） Servo motor 400 W with brake",
+"Servo motor 400 W with brake"
+],
+[
+"QFN-16 3×3 mm 引线框架条（每条 256 位，型号待确认） QFN-16 leadframe strip",
+"QFN-16 leadframe strip"
+],
+[
+"功率 MOSFET 80 V（示例选型 BSC040N08NS5，未经硬件验证） Power MOSFET 80 V",
+"Power MOSFET 80 V"
+],
+[
+"伺服电机 WQ-SM100（100 W，带抱闸，示例） Servo motor 100 W with brake",
+"Servo motor 100 W with brake"
+],
+[
+"伺服电机 WQ-SM200（200 W，带抱闸，示例） Servo motor 200 W with brake",
+"Servo motor 200 W with brake"
+],
+[
+"伺服电机 WQ-SM400（400 W，带抱闸，示例） Servo motor 400 W with brake",
+"Servo motor 400 W with brake"
+],
+[
+"关节伺服驱动板（示例：48 V、三相、电流采样 + 编码器接口） Joint servo drive board",
+"Joint servo drive board"
+],
+[
+"轮式人形 WQ-H1（示例：双臂 + 腰 + 头 16 个关节，AGV 底盘） Wheeled humanoid",
+"Wheeled humanoid"
+],
+[
+"关节扭矩传感器 WQ-TS（应变片全桥，量程 ±200 N·m，示例） Joint torque sensor",
+"Joint torque sensor"
+],
+[
+"搬运 AGV WQ-AGV300（示例：载重 300 kg 一类） Material-handling AGV",
+"Material-handling AGV"
+],
+[
+"钕铁硼磁钢 60 机座（10 块一套，未充磁，型号待确认） NdFeB magnet set frame 60",
+"NdFeB magnet set frame 60"
+],
+[
+"钕铁硼磁钢 80 机座（10 块一套，未充磁，型号待确认） NdFeB magnet set frame 80",
+"NdFeB magnet set frame 80"
+],
+[
+"光电码盘 Ø32 mm（玻璃，绝对码道 + 增量码道，外协，型号待确认） Optical code disk",
+"Optical code disk"
+],
+[
+"关节伺服驱动板 B 版（抱闸驱动、输出端编码器） Joint servo drive board rev B",
+"Joint servo drive board rev B"
+],
+[
+"关节绝对值编码器 WQ-ENC17（光电、17 位单圈，示例） Joint absolute encoder",
+"Joint absolute encoder"
+],
+[
+"电流采样放大器（示例选型 INA240A1D，未经硬件验证） Current-sense amplifier",
+"Current-sense amplifier"
+],
+[
+"AGV 控制板（示例：双路电机控制 + CAN + 安全 IO） AGV controller board",
+"AGV controller board"
+],
+[
+"扭矩传感器弹性体（17-4PH 不锈钢，外协机加，型号待确认） Torque sensor flexure",
+"Torque sensor flexure"
+],
+[
+"电机控制 MCU（示例选型 STM32G431CBT6，未经硬件验证） Motor-control MCU",
+"Motor-control MCU"
+],
+[
+"WQ-ENCIF 工程样片（一片晶圆的批次，老化后全测、托盘装） Engineering samples",
+"Engineering samples"
+],
+[
+"半桥栅极驱动（示例选型 IR2101S，未经硬件验证） Half-bridge gate driver",
+"Half-bridge gate driver"
+],
+[
+"定子硅钢冲片 60 机座（一台份，型号待确认） Stator laminations frame 60",
+"Stator laminations frame 60"
+],
+[
+"定子硅钢冲片 80 机座（一台份，型号待确认） Stator laminations frame 80",
+"Stator laminations frame 80"
+],
+[
+"RS-485 收发器（示例选型 MAX3485，未经硬件验证） RS-485 transceiver",
+"RS-485 transceiver"
+],
+[
+"低边栅极驱动（示例选型 UCC27511A，未经硬件验证） Low-side gate driver",
+"Low-side gate driver"
+],
+[
+"已流片晶圆 WQ-ENCIF（200 mm、SKY130，外协代工） Processed wafer",
+"Processed wafer"
+],
+[
+"贴片电阻 0805（抱闸电流采样 0.5 Ω，第 114 轮） Chip resistor 0805",
+"Chip resistor 0805"
+],
+[
+"AGV 驱动电机 WQ-AM750（750 W，示例） AGV drive motor 750 W",
+"AGV drive motor 750 W"
+],
+[
+"CAN 收发器（示例选型 MCP2562-E/SN，未经硬件验证） CAN transceiver",
+"CAN transceiver"
+],
+[
+"信号调理板（仪表放大 + ADC，型号待确认） Signal conditioning board",
+"Signal conditioning board"
+],
+[
+"键合金线 1.0 mil（25 µm，型号待确认） Gold bonding wire 25 µm",
+"Gold bonding wire 25 µm"
+],
+[
+"1.8 V 低压差稳压芯片（示例选型 AP2112K-1.8，未经硬件验证） 1.8 V LDO",
+"1.8 V LDO"
+],
+[
+"失电制动器 60 机座（24 V，型号待确认） Fail-safe brake frame 60",
+"Fail-safe brake frame 60"
+],
+[
+"失电制动器 80 机座（24 V，型号待确认） Fail-safe brake frame 80",
+"Fail-safe brake frame 80"
+],
+[
+"示例·谐波减速器代理商 Strain-wave Gear Distributor (Demo)",
+"Strain-wave Gear Distributor (Demo)"
+],
+[
+"AGV 驱动电机 750 W（问渠电机厂 WQ-AM750） AGV drive motor",
+"AGV drive motor"
+],
+[
+"电机动力线与抱闸线（带插头，型号待确认） Motor power & brake leads",
+"Motor power & brake leads"
+],
+[
+"贴片肖特基二极管 100 V 1 A（型号待确认） Schottky diode 100 V",
+"Schottky diode 100 V"
+],
+[
+"转子铁芯与轴 60 机座（外协机加） Rotor core & shaft frame 60",
+"Rotor core & shaft frame 60"
+],
+[
+"转子铁芯与轴 80 机座（外协机加） Rotor core & shaft frame 80",
+"Rotor core & shaft frame 80"
+],
+[
+"机壳与端盖 60 机座（铝，外协） Housing & end caps frame 60",
+"Housing & end caps frame 60"
+],
+[
+"机壳与端盖 80 机座（铝，外协） Housing & end caps frame 80",
+"Housing & end caps frame 80"
+],
+[
+"补偿电阻套件（零点、温漂，型号待确认） Compensation resistor kit",
+"Compensation resistor kit"
+],
+[
+"贴片陶瓷电容 1206（100 V / 25 V） Chip capacitor 1206",
+"Chip capacitor 1206"
+],
+[
+"降压稳压芯片（示例选型 LMR16006YQ，未经硬件验证） Buck regulator",
+"Buck regulator"
+],
+[
+"驱动板 B 版贴片板（试产） Drive board rev B SMT assembly",
+"Drive board rev B SMT assembly"
+],
+[
+"编码器读头板（问渠电路板厂，正余弦输出） Encoder read-head board",
+"Encoder read-head board"
+],
+[
+"示例·北方精密轴承 Northern Precision Bearing (Demo)",
+"Northern Precision Bearing (Demo)"
+],
+[
+"示例·自动化设备厂 Automation Equipment Maker (Demo)",
+"Automation Equipment Maker (Demo)"
+],
+[
+"六轴协作机器人 WQ-CR5（示例：负载 5 kg 一类） 6-axis cobot",
+"6-axis cobot"
+],
+[
+"关节伺服驱动板（A 版） Joint servo drive board rev A",
+"Joint servo drive board rev A"
+],
+[
+"关节绝对值编码器（问渠传感器厂 WQ-ENC17） Absolute encoder",
+"Absolute encoder"
+],
+[
+"有源晶振 50 MHz 3.3 V（型号待确认） Oscillator 50 MHz",
+"Oscillator 50 MHz"
+],
+[
+"母线电解电容 470 μF / 63 V（型号待确认） Bulk capacitor",
+"Bulk capacitor"
+],
+[
+"示例·塑封料与银浆商 Mold Compound & Adhesive (Demo)",
+"Mold Compound & Adhesive (Demo)"
+],
+[
+"AGV 控制板光板 6 层（外协） AGV controller bare PCB",
+"AGV controller bare PCB"
+],
+[
+"已测晶圆 WQ-ENCIF（CP 完成、减薄，带晶圆图） Probed wafer",
+"Probed wafer"
+],
+[
+"应变片 350 Ω（剪切型双栅，型号待确认） Strain gauge 350 Ω",
+"Strain gauge 350 Ω"
+],
+[
+"无铅锡膏 SAC305（型号待确认） Lead-free solder paste",
+"Lead-free solder paste"
+],
+[
+"示例·先锋工业品 Pioneer Industrial Supply (Demo)",
+"Pioneer Industrial Supply (Demo)"
+],
+[
+"示例·物流设备厂 Logistics Equipment Maker (Demo)",
+"Logistics Equipment Maker (Demo)"
+],
+[
+"线性稳压芯片（示例选型 AMS1117，未经硬件验证） LDO regulator",
+"LDO regulator"
+],
+[
+"采样电阻 2 mΩ 1%（型号待确认） Current shunt 2 mΩ 1%",
+"Current shunt 2 mΩ 1%"
+],
+[
+"二级圆柱齿轮减速器 WQR-105 Two-stage gear reducer",
+"WQR-105 Two-stage gear reducer"
+],
+[
+"示例·漆包线与绝缘材料商 Magnet Wire Supplier (Demo)",
+"Magnet Wire Supplier (Demo)"
+],
+[
+"编码器读头板（示例：正余弦输出） Encoder read-head board",
+"Encoder read-head board"
+],
+[
+"二指电动夹爪（型号待确认） 2-finger electric gripper",
+"2-finger electric gripper"
+],
+[
+"二级圆柱齿轮减速器 i=10.5 Two-stage gear reducer",
+"i=10.5 Two-stage gear reducer"
+],
+[
+"双臂与手眼标定 Dual-arm & hand-eye calibration",
+"Dual-arm & hand-eye calibration"
+],
+[
+"示例·电子分销商 Electronics Distributor (Demo)",
+"Electronics Distributor (Demo)"
+],
+[
+"示例·阻容与连接器商 Passives & Connectors (Demo)",
+"Passives & Connectors (Demo)"
+],
+[
+"编码器壳体与盖（铝，外协机加） Encoder housing & cover",
+"Encoder housing & cover"
+],
+[
+"驱动板光板 4 层 2 oz（外协） Drive board bare PCB",
+"Drive board bare PCB"
+],
+[
+"6061 铝合金棒 Ø120 Aluminium bar 6061 Ø120",
+"Aluminium bar 6061 Ø120"
+],
+[
+"AGV 控制板贴片板 AGV controller SMT assembly",
+"AGV controller SMT assembly"
+],
+[
+"机器人控制柜（型号待确认） Robot controller cabinet",
+"Robot controller cabinet"
+],
+[
+"示例·授权分销商 Authorized Distributor (Demo)",
+"Authorized Distributor (Demo)"
+],
+[
+"绝缘套件（槽绝缘纸、槽楔、绑扎带，型号待确认） Insulation kit",
+"Insulation kit"
+],
+[
+"编码器读头板光板 4 层（外协） Encoder head bare PCB",
+"Encoder head bare PCB"
+],
+[
+"20CrMnTi圆钢 Ø60 Steel bar 20CrMnTi Ø60",
+"Steel bar 20CrMnTi Ø60"
+],
+[
+"20CrMnTi圆钢 Ø70 Steel bar 20CrMnTi Ø70",
+"Steel bar 20CrMnTi Ø70"
+],
+[
+"光电读头传感器（型号待确认） Optical encoder sensor",
+"Optical encoder sensor"
+],
+[
+"扭矩传感器线缆（屏蔽，型号待确认） Torque sensor cable",
+"Torque sensor cable"
+],
+[
+"示例·海湾润滑油 Gulf Coast Lubricants (Demo)",
+"Gulf Coast Lubricants (Demo)"
+],
+[
+"示例·湖畔特钢 Lakeside Special Steel (Demo)",
+"Lakeside Special Steel (Demo)"
+],
+[
+"示例·绿谷输送设备 GreenValley Conveyor (Demo)",
+"GreenValley Conveyor (Demo)"
+],
+[
+"编带材料（一盘：载带、盖带、13 吋卷盘） Tape & reel kit",
+"Tape & reel kit"
+],
+[
+"问渠芯片封测厂 WenQuest Semiconductor (Demo)",
+"WenQuest Semiconductor (Demo)"
+],
+[
+"6061 铝合金板 20 mm Aluminium plate 6061",
+"20 mm Aluminium plate 6061"
+],
+[
+"6061 铝合金管 Ø75×3 Aluminium tube Ø75×3",
+"Aluminium tube Ø75×3"
+],
+[
+"6061 铝合金管 Ø90×3 Aluminium tube Ø90×3",
+"Aluminium tube Ø90×3"
+],
+[
+"人形主控（型号待确认） Humanoid main controller",
+"Humanoid main controller"
+],
+[
+"深沟球轴承 6205-2RS Ball bearing 25×52×15",
+"6205-2RS Ball bearing 25×52×15"
+],
+[
+"深沟球轴承 6206-2RS Ball bearing 30×62×16",
+"6206-2RS Ball bearing 30×62×16"
+],
+[
+"深沟球轴承 6207-2RS Ball bearing 35×72×17",
+"6207-2RS Ball bearing 35×72×17"
+],
+[
+"示例·AGV 配件商 AGV Parts Supplier (Demo)",
+"AGV Parts Supplier (Demo)"
+],
+[
+"示例·应变片商 Strain Gauge Supplier (Demo)",
+"Strain Gauge Supplier (Demo)"
+],
+[
+"示例·电子元件商 Electronics Supplier (Demo)",
+"Electronics Supplier (Demo)"
+],
+[
+"示例·电子装配厂 Electronics Assembly (Demo)",
+"Electronics Assembly (Demo)"
+],
+[
+"示例·键合丝商 Bonding Wire Supplier (Demo)",
+"Bonding Wire Supplier (Demo)"
+],
+[
+"编码器轴承（小型深沟球轴承，型号待确认） Encoder bearing",
+"Encoder bearing"
+],
+[
+"锂电池包 48 V（型号待确认） Li-ion battery pack",
+"Li-ion battery pack"
+],
+[
+"示例·五大湖轴承 Great Lakes Bearing (Demo)",
+"Great Lakes Bearing (Demo)"
+],
+[
+"示例·华东铝业 East China Aluminium (Demo)",
+"East China Aluminium (Demo)"
+],
+[
+"示例·工业机器人集成商 Robot Integrator (Demo)",
+"Robot Integrator (Demo)"
+],
+[
+"示例·海港起重 Harbor Crane Systems (Demo)",
+"Harbor Crane Systems (Demo)"
+],
+[
+"示例·硅钢冲片厂 Lamination Supplier (Demo)",
+"Lamination Supplier (Demo)"
+],
+[
+"示例·精密机加厂 Precision Machining (Demo)",
+"Precision Machining (Demo)"
+],
+[
+"示例·钕铁硼磁钢厂 NdFeB Magnet Maker (Demo)",
+"NdFeB Magnet Maker (Demo)"
+],
+[
+"绝缘漆（无溶剂，型号待确认） Impregnating varnish",
+"Impregnating varnish"
+],
+[
+"编码器读头板贴片板 Encoder head SMT assembly",
+"Encoder head SMT assembly"
+],
+[
+"高性能 MCU（型号待确认） High-performance MCU",
+"High-performance MCU"
+],
+[
+"划片膜与晶圆框（型号待确认） Dicing tape & frame",
+"Dicing tape & frame"
+],
+[
+"晶振 8 MHz 3225（型号待确认） Crystal 8 MHz",
+"Crystal 8 MHz"
+],
+[
+"码盘粘接胶（紫外固化，型号待确认） UV disk adhesive",
+"UV disk adhesive"
+],
+[
+"示例·伺服驱动器厂 Servo Drive Maker (Demo)",
+"Servo Drive Maker (Demo)"
+],
+[
+"示例·包装材料商 Packaging Supplier (Demo)",
+"Packaging Supplier (Demo)"
+],
+[
+"示例·峰顶搅拌机 Summit Mixer Works (Demo)",
+"Summit Mixer Works (Demo)"
+],
+[
+"示例·引线框架商 Leadframe Supplier (Demo)",
+"Leadframe Supplier (Demo)"
+],
+[
+"示例·焊接材料商 Solder & Chemicals (Demo)",
+"Solder & Chemicals (Demo)"
+],
+[
+"示例·编带与防潮包装商 Tape & Dry-pack (Demo)",
+"Tape & Dry-pack (Demo)"
+],
+[
+"问渠电路板厂 WenQuest Electronics (Demo)",
+"WenQuest Electronics (Demo)"
+],
+[
+"40Cr锻坯 Ø155×32 Forging blank 40Cr",
+"Ø155×32 Forging blank 40Cr"
+],
+[
+"40Cr锻坯 Ø225×45 Forging blank 40Cr",
+"Ø225×45 Forging blank 40Cr"
+],
+[
+"中间轴组件 Intermediate shaft assembly",
+"Intermediate shaft assembly"
+],
+[
+"示例·伺服电机厂 Servo Motor Maker (Demo)",
+"Servo Motor Maker (Demo)"
+],
+[
+"示例·北方铝业 Northern Aluminium (Demo)",
+"Northern Aluminium (Demo)"
+],
+[
+"示例·汽车零部件厂 Auto Parts Plant (Demo)",
+"Auto Parts Plant (Demo)"
+],
+[
+"示例·物流仓储中心 Logistics Center (Demo)",
+"Logistics Center (Demo)"
+],
+[
+"编码器线缆（屏蔽，带插头，型号待确认） Encoder cable",
+"Encoder cable"
+],
+[
+"谐波减速器 CSF-17-100 Strain wave gear",
+"CSF-17-100 Strain wave gear"
+],
+[
+"谐波减速器 CSF-25-100 Strain wave gear",
+"CSF-25-100 Strain wave gear"
+],
+[
+"谐波减速器 CSF-32-100 Strain wave gear",
+"CSF-32-100 Strain wave gear"
+],
+[
+"防潮包装（一盘：防潮袋、干燥剂、湿度卡） Dry-pack kit",
+"Dry-pack kit"
+],
+[
+"三防漆（丙烯酸，型号待确认） Conformal coating",
+"Conformal coating"
+],
+[
+"头部双目相机（型号待确认） Stereo head camera",
+"Stereo head camera"
+],
+[
+"导电银浆（装片胶，型号待确认） Die-attach epoxy",
+"Die-attach epoxy"
+],
+[
+"深沟球轴承 6004 Ball bearing 20×42×12",
+"6004 Ball bearing 20×42×12"
+],
+[
+"深沟球轴承 6007 Ball bearing 35×62×14",
+"6007 Ball bearing 35×62×14"
+],
+[
+"深沟球轴承 6010 Ball bearing 50×80×16",
+"6010 Ball bearing 50×80×16"
+],
+[
+"环氧塑封料（型号待确认） Epoxy mold compound",
+"Epoxy mold compound"
+],
+[
+"示例·伺服电机供应商 Servo Supplier (Demo)",
+"Servo Supplier (Demo)"
+],
+[
+"示例·标准件商 Fastener Supplier (Demo)",
+"Fastener Supplier (Demo)"
+],
+[
+"箱盖铸件 HT200 Housing cover casting",
+"HT200 Housing cover casting"
+],
+[
+"应变胶（热固化环氧，型号待确认） Gauge adhesive",
+"Gauge adhesive"
+],
+[
+"激光扫描仪 SICK TiM781 Laser scanner",
+"SICK TiM781 Laser scanner"
+],
+[
+"电机轴承（深沟球轴承，型号待确认） Motor bearing",
+"Motor bearing"
+],
+[
+"码盘粘接对心 Disk bonding & centering",
+"Disk bonding & centering"
+],
+[
+"示例·东岳铸造 Dongyue Castings (Demo)",
+"Dongyue Castings (Demo)"
+],
+[
+"示例·光栅码盘厂 Code Disk Maker (Demo)",
+"Code Disk Maker (Demo)"
+],
+[
+"示例·基石锻造 Keystone Forging (Demo)",
+"Keystone Forging (Demo)"
+],
+[
+"示例·电磁制动器商 Brake Supplier (Demo)",
+"Brake Supplier (Demo)"
+],
+[
+"箱座铸件 HT200 Housing base casting",
+"HT200 Housing base casting"
+],
+[
+"贴片电阻 0805（抱闸电流采样 0.5 Ω，第 114 轮）",
+"Chip resistor 0805"
+],
+[
+"输入齿轮轴 m2 z24 Input pinion shaft",
+"m2 z24 Input pinion shaft"
+],
+[
+"问渠机器人厂 WenQuest Robotics (Demo)",
+"WenQuest Robotics (Demo)"
+],
+[
+"驱动板贴片板 Drive board SMT assembly",
+"Drive board SMT assembly"
+],
+[
+"40Cr 圆钢 Ø60 Steel bar 40Cr Ø60",
+"Steel bar 40Cr Ø60"
+],
+[
+"人形联调 Humanoid integration test",
+"Humanoid integration test"
+],
+[
+"内六角螺钉 M4×12 Socket screw M4×12",
+"Socket screw M4×12"
+],
+[
+"磁钢胶（结构胶，型号待确认） Magnet adhesive",
+"Magnet adhesive"
+],
+[
+"示例·精密传动 Precision Drive (Demo)",
+"Precision Drive (Demo)"
+],
+[
+"示例·芯片代理商 IC Distributor (Demo)",
+"IC Distributor (Demo)"
+],
+[
+"示例·长河锻压 Changhe Forging (Demo)",
+"Changhe Forging (Demo)"
+],
+[
+"空心输出轴（中） Hollow output shaft M",
+"Hollow output shaft M"
+],
+[
+"空心输出轴（大） Hollow output shaft L",
+"Hollow output shaft L"
+],
+[
+"空心输出轴（小） Hollow output shaft S",
+"Hollow output shaft S"
+],
+[
+"精铣钻孔 Finish milling & drilling",
+"Finish milling & drilling"
+],
+[
+"贴片肖特基二极管（型号待确认） Schottky diode",
+"Schottky diode"
+],
+[
+"问渠传感器厂 WenQuest Sensors (Demo)",
+"WenQuest Sensors (Demo)"
+],
+[
+"问渠减速器厂 WenQuest Gearbox (Demo)",
+"WenQuest Gearbox (Demo)"
+],
+[
+"信号连接器（型号待确认） Signal connector",
+"Signal connector"
+],
+[
+"数字隔离器（型号待确认） Digital isolator",
+"Digital isolator"
+],
+[
+"温度补偿 Temperature compensation",
+"Temperature compensation"
+],
+[
+"示例·中西部钢材 Midwest Steel (Demo)",
+"Midwest Steel (Demo)"
+],
+[
+"示例·华美铸业 Huamei Foundry (Demo)",
+"Huamei Foundry (Demo)"
+],
+[
+"示例·印制板厂 PCB Fabricator (Demo)",
+"PCB Fabricator (Demo)"
+],
+[
+"示例·晶圆代工厂 Wafer Foundry (Demo)",
+"Wafer Foundry (Demo)"
+],
+[
+"贴片电容 0402 Chip capacitor 0402",
+"Chip capacitor 0402"
+],
+[
+"钕铁硼磁钢 60 机座（10 块一套，未充磁，型号待确认）",
+"NdFeB magnet set frame 60"
+],
+[
+"钕铁硼磁钢 80 机座（10 块一套，未充磁，型号待确认）",
+"NdFeB magnet set frame 80"
+],
+[
+"45钢圆棒 Ø50 Steel bar 1045 Ø50",
+"Steel bar 1045 Ø50"
+],
+[
+"AGV 控制板 AGV controller board",
+"AGV controller board"
+],
+[
+"内六角螺钉 M3×8 Socket screw M3×8",
+"Socket screw M3×8"
+],
+[
+"砝码标定 Dead-weight calibration",
+"Dead-weight calibration"
+],
+[
+"示例·协作机器人厂 Cobot Maker (Demo)",
+"Cobot Maker (Demo)"
+],
+[
+"示例·编码器厂 Encoder Maker (Demo)",
+"Encoder Maker (Demo)"
+],
+[
+"编码器信号调理芯片（型号待确认） Encoder AFE",
+"Encoder AFE"
+],
+[
+"贴片电阻 0402 Chip resistor 0402",
+"Chip resistor 0402"
+],
+[
+"问渠电机厂 WenQuest Motors (Demo)",
+"WenQuest Motors (Demo)"
+],
+[
+"问渠芯片厂 WenQuest Semiconductor",
+"WenQuest Semiconductor"
+],
+[
+"RT-箱体合镗 Housing line-boring",
+"Housing line-boring"
+],
+[
+"漆包线（聚酯亚胺，型号待确认） Magnet wire",
+"Magnet wire"
+],
+[
+"示例·传感器厂 Sensor Maker (Demo)",
+"Sensor Maker (Demo)"
+],
+[
+"输出轴组件 Output shaft assembly",
+"Output shaft assembly"
+],
+[
+"RT-部件装配 Shaft sub-assembly",
+"Shaft sub-assembly"
+],
+[
+"六角头螺栓 M12×110 Hex bolt 8.8",
+"M12×110 Hex bolt 8.8"
+],
+[
+"功率电感（型号待确认） Power inductor",
+"Power inductor"
+],
+[
+"功率端子（型号待确认） Power terminal",
+"Power terminal"
+],
+[
+"聚氨酯驱动轮 Ø200 PU drive wheel",
+"Ø200 PU drive wheel"
+],
+[
+"输入轴组件 Input shaft assembly",
+"Input shaft assembly"
+],
+[
+"RT-样片 Engineering samples",
+"Engineering samples"
+],
+[
+"箱体组件（合镗） Housing assembly",
+"Housing assembly"
+],
+[
+"精度标定 Accuracy calibration",
+"Accuracy calibration"
+],
+[
+"RT-棒料齿轮 Bar-stock pinion",
+"Bar-stock pinion"
+],
+[
+"RT-轮式人形 Wheeled humanoid",
+"Wheeled humanoid"
+],
+[
+"内六角螺钉 M5×16 Socket screw",
+"M5×16 Socket screw"
+],
+[
+"内六角螺钉 M8×25 Socket screw",
+"M8×25 Socket screw"
+],
+[
+"工业齿轮油 L-CKC 220 Gear oil",
+"L-CKC 220 Gear oil"
+],
+[
+"来料检验 Incoming inspection",
+"Incoming inspection"
+],
+[
+"电机终检台（测功台：反电势、齿槽转矩、空载电流）",
+"Motor final test dyno"
+],
+[
+"磨外圆 Cylindrical grinding",
+"Cylindrical grinding"
+],
+[
+"编码器终检 Encoder final test",
+"Encoder final test"
+],
+[
+"钻攻螺纹孔 Drilling & tapping",
+"Drilling & tapping"
+],
+[
+"铁芯叠压 Lamination stacking",
+"Lamination stacking"
+],
+[
+"镗轴承孔 Bearing-bore boring",
+"Bearing-bore boring"
+],
+[
+"AGV 驱动单元 AGV drive unit",
+"AGV drive unit"
+],
+[
+"RT-封装测试 Assembly & test",
+"Assembly & test"
+],
+[
+"关节壳体（中） Joint housing M",
+"Joint housing M"
+],
+[
+"关节壳体（大） Joint housing L",
+"Joint housing L"
+],
+[
+"关节壳体（小） Joint housing S",
+"Joint housing S"
+],
+[
+"合箱钻铰销孔 Pin-hole reaming",
+"Pin-hole reaming"
+],
+[
+"定子硅钢冲片 60 机座（一台份，型号待确认）",
+"Stator laminations frame 60"
+],
+[
+"定子硅钢冲片 80 机座（一台份，型号待确认）",
+"Stator laminations frame 80"
+],
+[
+"嵌线整形 Insertion & lacing",
+"Insertion & lacing"
+],
+[
+"平键 10×8×28 Parallel key",
+"10×8×28 Parallel key"
+],
+[
+"平键 12×8×45 Parallel key",
+"12×8×45 Parallel key"
+],
+[
+"放油螺塞 M16×1.5 Drain plug",
+"M16×1.5 Drain plug"
+],
+[
+"清洗包装 Cleaning & packing",
+"Cleaning & packing"
+],
+[
+"码盘轴套（不锈钢，外协机加） Disk hub",
+"Disk hub"
+],
+[
+"绝缘套件（槽绝缘纸、槽楔、绑扎带，型号待确认）",
+"Insulation kit"
+],
+[
+"读头装调 Read-head mounting",
+"Read-head mounting"
+],
+[
+"选择焊 Selective soldering",
+"Selective soldering"
+],
+[
+"AGV 车架（外协焊接） AGV frame",
+"AGV frame"
+],
+[
+"QFN 托盘（工程样片用） QFN tray",
+"QFN tray"
+],
+[
+"RT-扭矩传感器 Torque sensor",
+"Torque sensor"
+],
+[
+"三防涂覆 Conformal coating",
+"Conformal coating"
+],
+[
+"中间轴 Intermediate shaft",
+"Intermediate shaft"
+],
+[
+"人形总装 Humanoid assembly",
+"Humanoid assembly"
+],
+[
+"关节模组（中） Joint module M",
+"Joint module M"
+],
+[
+"关节模组（大） Joint module L",
+"Joint module L"
+],
+[
+"关节模组（小） Joint module S",
+"Joint module S"
+],
+[
+"平键 6×6×25 Parallel key",
+"6×6×25 Parallel key"
+],
+[
+"平键 8×7×36 Parallel key",
+"8×7×36 Parallel key"
+],
+[
+"应变片 350 Ω（剪切型双栅，型号待确认）",
+"Strain gauge 350 Ω"
+],
+[
+"扭矩终检 Torque final test",
+"Torque final test"
+],
+[
+"整机标定 Robot calibration",
+"Robot calibration"
+],
+[
+"臂内线束 Arm cable harness",
+"Arm cable harness"
+],
+[
+"RT-关节壳体 Joint housing",
+"Joint housing"
+],
+[
+"RT-轴 Shaft (45 steel)",
+"Shaft (45 steel)"
+],
+[
+"出厂检验 Final inspection",
+"Final inspection"
+],
+[
+"弹簧垫圈 12 Spring washer",
+"12 Spring washer"
+],
+[
+"晶圆来料检验 Wafer incoming",
+"Wafer incoming"
+],
+[
+"杆式油标 M12 Oil dipstick",
+"M12 Oil dipstick"
+],
+[
+"电机终检 Motor final test",
+"Motor final test"
+],
+[
+"编带材料（一盘：载带、盖带、13 吋卷盘）",
+"Tape & reel kit"
+],
+[
+"锡膏印刷 Stencil printing",
+"Stencil printing"
+],
+[
+"骨架油封 20×35×7 Oil seal",
+"20×35×7 Oil seal"
+],
+[
+"骨架油封 30×47×7 Oil seal",
+"30×47×7 Oil seal"
+],
+[
+"RT-关节模组 Joint module",
+"Joint module"
+],
+[
+"RT-总装 Final assembly",
+"Final assembly"
+],
+[
+"RT-箱体零件 Housing part",
+"Housing part"
+],
+[
+"原材料库（硅钢片、漆包线、磁钢单独存放）",
+"Material store"
+],
+[
+"回流焊 Reflow soldering",
+"Reflow soldering"
+],
+[
+"平面密封胶 Flange sealant",
+"Flange sealant"
+],
+[
+"温度循环 Thermal cycling",
+"Thermal cycling"
+],
+[
+"电机动力线与抱闸线（带插头，型号待确认）",
+"Motor power & brake leads"
+],
+[
+"电机包装盒（带内衬） Motor box",
+"Motor box"
+],
+[
+"编码器读头板（问渠电路板厂，正余弦输出）",
+"Encoder read-head board"
+],
+[
+"编码器轴承（小型深沟球轴承，型号待确认）",
+"Encoder bearing"
+],
+[
+"轴承透盖 Ø52 Through cap",
+"Ø52 Through cap"
+],
+[
+"轴承透盖 Ø72 Through cap",
+"Ø72 Through cap"
+],
+[
+"通气器 M16×1.5 Breather",
+"M16×1.5 Breather"
+],
+[
+"防潮包装（一盘：防潮袋、干燥剂、湿度卡）",
+"Dry-pack kit"
+],
+[
+"零件检验 Part inspection",
+"Part inspection"
+],
+[
+"AGV 装配 AGV assembly",
+"AGV assembly"
+],
+[
+"RT-SMT 贴片线 SMT line",
+"SMT line"
+],
+[
+"RT-伺服电机 Servo motor",
+"Servo motor"
+],
+[
+"RT-晶圆测试 Wafer probe",
+"Wafer probe"
+],
+[
+"RT-空心轴 Hollow shaft",
+"Hollow shaft"
+],
+[
+"RT-锻坯齿轮 Forged gear",
+"Forged gear"
+],
+[
+"RT-齿轮轴 Pinion shaft",
+"Pinion shaft"
+],
+[
+"关节装配 Joint assembly",
+"Joint assembly"
+],
+[
+"动平衡 Rotor balancing",
+"Rotor balancing"
+],
+[
+"应变片粘贴 Gauge bonding",
+"Gauge bonding"
+],
+[
+"整机装配 Robot assembly",
+"Robot assembly"
+],
+[
+"晶圆测试 CP Wafer probe",
+"CP Wafer probe"
+],
+[
+"测试分选机 + 测试机（4 个测试位）",
+"Final test handler"
+],
+[
+"浸漆烘干 Varnish & bake",
+"Varnish & bake"
+],
+[
+"电机总装 Motor assembly",
+"Motor assembly"
+],
+[
+"磁钢粘贴 Magnet bonding",
+"Magnet bonding"
+],
+[
+"编码器线缆（屏蔽，带插头，型号待确认）",
+"Encoder cable"
+],
+[
+"补偿电阻套件（零点、温漂，型号待确认）",
+"Compensation resistor kit"
+],
+[
+"高速贴片 Chip placement",
+"Chip placement"
+],
+[
+"RT-AGV电机 AGV motor",
+"AGV motor"
+],
+[
+"RT-驱动单元 Drive unit",
+"Drive unit"
+],
+[
+"原材料与晶圆库（氮气柜、温湿度受控）",
+"Wafer & material store"
+],
+[
+"后固化 Post-mold cure",
+"Post-mold cure"
+],
+[
+"圆锥销 8×35 Taper pin",
+"8×35 Taper pin"
+],
+[
+"多功能贴片 IC placement",
+"IC placement"
+],
+[
+"成品测试 FT Final test",
+"FT Final test"
+],
+[
+"温度补偿箱（测零点温漂、配补偿电阻）",
+"Temperature compensation chamber"
+],
+[
+"激光打标 Laser marking",
+"Laser marking"
+],
+[
+"电机总装台（压轴承、装抱闸、装端盖）",
+"Motor assembly bench"
+],
+[
+"码盘清洗 Disk cleaning",
+"Disk cleaning"
+],
+[
+"码盘清洗台（超声清洗 + 洁净风淋）",
+"Disk cleaning station"
+],
+[
+"等离子清洗 Plasma clean",
+"Plasma clean"
+],
+[
+"组桥焊线 Bridge wiring",
+"Bridge wiring"
+],
+[
+"调质 Quench & temper",
+"Quench & temper"
+],
+[
+"转子铁芯与轴 60 机座（外协机加）",
+"Rotor core & shaft frame 60"
+],
+[
+"转子铁芯与轴 80 机座（外协机加）",
+"Rotor core & shaft frame 80"
+],
+[
+"轴承闷盖 Ø52 Blind cap",
+"Ø52 Blind cap"
+],
+[
+"轴承闷盖 Ø62 Blind cap",
+"Ø62 Blind cap"
+],
+[
+"轴承闷盖 Ø72 Blind cap",
+"Ø72 Blind cap"
+],
+[
+"铣键槽 Keyway milling",
+"Keyway milling"
+],
+[
+"定子测试台（电阻、匝间冲击、耐压）",
+"Stator tester"
+],
+[
+"小齿轮 m3 z20 Pinion",
+"m3 z20 Pinion"
+],
+[
+"嵌线整形台（槽楔、绑扎、端部整形）",
+"Insertion & lacing bench"
+],
+[
+"引线键合 Wire bonding",
+"Wire bonding"
+],
+[
+"总装 Final assembly",
+"Final assembly"
+],
+[
+"扭矩传感器线缆（屏蔽，型号待确认）",
+"Torque sensor cable"
+],
+[
+"探针台 + 测试机（8 个测试位）",
+"Prober + tester (CP)"
+],
+[
+"机壳与端盖 60 机座（铝，外协）",
+"Housing & end caps frame 60"
+],
+[
+"机壳与端盖 80 机座（铝，外协）",
+"Housing & end caps frame 80"
+],
+[
+"温度循环箱（−20 ~ 85 ℃）",
+"Thermal cycling chamber"
+],
+[
+"电机轴承（深沟球轴承，型号待确认）",
+"Motor bearing"
+],
+[
+"码盘粘接胶（紫外固化，型号待确认）",
+"UV disk adhesive"
+],
+[
+"精车 Finish turning",
+"Finish turning"
+],
+[
+"肩架 Shoulder frame",
+"Shoulder frame"
+],
+[
+"胶固化 Adhesive cure",
+"Adhesive cure"
+],
+[
+"部件装配 Sub-assembly",
+"Sub-assembly"
+],
+[
+"铣结合面 Face milling",
+"Face milling"
+],
+[
+"六角螺母 M12 Hex nut",
+"M12 Hex nut"
+],
+[
+"减薄 Back grinding",
+"Back grinding"
+],
+[
+"切筋成型 Trim & form",
+"Trim & form"
+],
+[
+"原材料库（码盘、应变片防潮存放）",
+"Material store"
+],
+[
+"定子测试 Stator test",
+"Stator test"
+],
+[
+"应变胶（热固化环氧，型号待确认）",
+"Gauge adhesive"
+],
+[
+"抱闸测试台（保持力矩、吸合电压）",
+"Brake tester"
+],
+[
+"渗碳淬火 Carburizing",
+"Carburizing"
+],
+[
+"程序烧录 Programming",
+"Programming"
+],
+[
+"箱盖 Housing cover",
+"Housing cover"
+],
+[
+"粗车 Rough turning",
+"Rough turning"
+],
+[
+"编带包装 Tape & reel",
+"Tape & reel"
+],
+[
+"编码器信号调理芯片（型号待确认）",
+"Encoder AFE"
+],
+[
+"编码器终检台（复测整圈误差曲线）",
+"Encoder final test"
+],
+[
+"编码器读头板光板 4 层（外协）",
+"Encoder head bare PCB"
+],
+[
+"编码器读头板（示例：正余弦输出）",
+"Encoder read-head board"
+],
+[
+"负载跑合 Load run-in",
+"Load run-in"
+],
+[
+"跑合试验 Run-in test",
+"Run-in test"
+],
+[
+"躯干壳体 Torso shell",
+"Torso shell"
+],
+[
+"输出轴 Output shaft",
+"Output shaft"
+],
+[
+"铁芯叠压机（硅钢冲片叠压、扣片）",
+"Lamination stacking press"
+],
+[
+"AGV 调试 AGV test",
+"AGV test"
+],
+[
+"万向轮 Ø100 Caster",
+"Ø100 Caster"
+],
+[
+"元器件库（防潮柜、温湿度受控）",
+"Component store"
+],
+[
+"关节测试 Joint test",
+"Joint test"
+],
+[
+"大齿轮 m2 z72 Gear",
+"m2 z72 Gear"
+],
+[
+"大齿轮 m3 z70 Gear",
+"m3 z70 Gear"
+],
+[
+"导电银浆（装片胶，型号待确认）",
+"Die-attach epoxy"
+],
+[
+"抱闸测试 Brake test",
+"Brake test"
+],
+[
+"浸漆烘箱（真空浸漆 + 烘干）",
+"Varnish dip & bake oven"
+],
+[
+"滚齿 Gear hobbing",
+"Gear hobbing"
+],
+[
+"漆包线（聚酯亚胺，型号待确认）",
+"Magnet wire"
+],
+[
+"磁钢粘贴台（定位工装 + 胶）",
+"Magnet bonding bench"
+],
+[
+"箱座 Housing base",
+"Housing base"
+],
+[
+"编码器壳体与盖（铝，外协机加）",
+"Encoder housing & cover"
+],
+[
+"编码器标定台（基准编码器对照）",
+"Encoder calibration bench"
+],
+[
+"贴片肖特基二极管（型号待确认）",
+"Schottky diode"
+],
+[
+"RT-协作机器人 Cobot",
+"Cobot"
+],
+[
+"RT-后段 Back end",
+"Back end"
+],
+[
+"RT-编码器 Encoder",
+"Encoder"
+],
+[
+"RT-臂管 Arm tube",
+"Arm tube"
+],
+[
+"三防漆（丙烯酸，型号待确认）",
+"Conformal coating"
+],
+[
+"充磁 Magnetizing",
+"Magnetizing"
+],
+[
+"光电读头传感器（型号待确认）",
+"Optical encoder sensor"
+],
+[
+"划片膜与晶圆框（型号待确认）",
+"Dicing tape & frame"
+],
+[
+"应变片粘贴台（显微镜、压块）",
+"Strain-gauge bonding bench"
+],
+[
+"码盘轴套（不锈钢，外协机加）",
+"Disk hub"
+],
+[
+"磁钢胶（结构胶，型号待确认）",
+"Magnet adhesive"
+],
+[
+"绝缘漆（无溶剂，型号待确认）",
+"Impregnating varnish"
+],
+[
+"读头装调台（调间隙、看信号）",
+"Read-head mounting & gap adjust"
+],
+[
+"防静电包装盒 ESD box",
+"ESD box"
+],
+[
+"卧式加工中心 HMC-01",
+"Horizontal machining centre HMC-01"
+],
+[
+"头部双目相机（型号待确认）",
+"Stereo head camera"
+],
+[
+"底座 Robot base",
+"Robot base"
+],
+[
+"机器人控制柜（型号待确认）",
+"Robot controller cabinet"
+],
+[
+"立式加工中心 VMC-01",
+"Vertical machining centre VMC-01"
+],
+[
+"绕线机 1 号（针式绕线）",
+"Needle winder 1"
+],
+[
+"绕线机 2 号（针式绕线）",
+"Needle winder 2"
+],
+[
+"腰座 Waist seat",
+"Waist seat"
+],
+[
+"装片 Die attach",
+"Die attach"
+],
+[
+"跑合试验台 TEST-01",
+"Run-in test rig TEST-01"
+],
+[
+"信号连接器（型号待确认）",
+"Signal connector"
+],
+[
+"大臂 Upper arm",
+"Upper arm"
+],
+[
+"数字隔离器（型号待确认）",
+"Digital isolator"
+],
+[
+"数控车床 CNC-L01",
+"CNC lathe CNC-L01"
+],
+[
+"环氧塑封料（型号待确认）",
+"Epoxy mold compound"
+],
+[
+"示例·漆包线与绝缘材料商",
+"Magnet Wire Supplier (Demo)"
+],
+[
+"立式加工中心 VMC-R",
+"VMC 1 VMC-R"
+],
+[
+"防静电袋 ESD bag",
+"ESD bag"
+],
+[
+"AGV 装配工位 AA",
+"AGV assembly AA"
+],
+[
+"AGV 调试场地 AT",
+"AGV test area AT"
+],
+[
+"人形主控（型号待确认）",
+"Humanoid main controller"
+],
+[
+"功率电感（型号待确认）",
+"Power inductor"
+],
+[
+"功率端子（型号待确认）",
+"Power terminal"
+],
+[
+"回流焊炉（10 温区）",
+"Reflow oven"
+],
+[
+"外圆磨床 GRD-01",
+"Cylindrical grinder GRD-01"
+],
+[
+"码盘粘接对心机 1 号",
+"Disk bonding & centering 1"
+],
+[
+"码盘粘接对心机 2 号",
+"Disk bonding & centering 2"
+],
+[
+"砝码标定台（杠杆加载）",
+"Dead-weight calibration rig"
+],
+[
+"示例·工业机器人集成商",
+"Robot Integrator (Demo)"
+],
+[
+"示例·编带与防潮包装商",
+"Tape & Dry-pack (Demo)"
+],
+[
+"示例·谐波减速器代理商",
+"Strain-wave Gear Distributor (Demo)"
+],
+[
+"编码器标定台 ECAL",
+"Encoder calibration bench ECAL"
+],
+[
+"装配工位 ASM-01",
+"Assembly station ASM-01"
+],
+[
+"负载跑合台 RUN-R",
+"Load run-in stand RUN-R"
+],
+[
+"键槽铣床 KEY-01",
+"Keyway miller KEY-01"
+],
+[
+"RT-底座 Base",
+"Base"
+],
+[
+"充磁机（电容放电式）",
+"Magnetizer"
+],
+[
+"关节装配工位 1 号",
+"Joint assembly 1"
+],
+[
+"关节装配工位 2 号",
+"Joint assembly 2"
+],
+[
+"包装 Packing",
+"Packing"
+],
+[
+"塑封 Molding",
+"Molding"
+],
+[
+"外圆磨床 GRD-R",
+"Cylindrical grinder GRD-R"
+],
+[
+"小臂 Forearm",
+"Forearm"
+],
+[
+"带锯床 SAW-01",
+"Band saw SAW-01"
+],
+[
+"探针台与测试机 CP",
+"Prober + tester (CP) CP"
+],
+[
+"数控车床 CNC-R",
+"CNC lathe 1 CNC-R"
+],
+[
+"整机标定工位 CAL",
+"Robot calibration cell CAL"
+],
+[
+"晶圆来料检验台 WI",
+"Wafer incoming inspection WI"
+],
+[
+"滚齿机 HOB-01",
+"Gear hobber HOB-01"
+],
+[
+"热处理炉 HT-01",
+"Heat-treat furnace HT-01"
+],
+[
+"电机包装盒（带内衬）",
+"Motor box"
+],
+[
+"电镀 Plating",
+"Plating"
+],
+[
+"码盘粘接对心机 CB",
+"Disk bonding & centering 1 CB"
+],
+[
+"示例·伺服电机供应商",
+"Servo Supplier (Demo)"
+],
+[
+"示例·塑封料与银浆商",
+"Mold Compound & Adhesive (Demo)"
+],
+[
+"示例·阻容与连接器商",
+"Passives & Connectors (Demo)"
+],
+[
+"立式加工中心 1 号",
+"VMC 1"
+],
+[
+"立式加工中心 2 号",
+"VMC 2"
+],
+[
+"绕线 Winding",
+"Winding"
+],
+[
+"编码器终检台 EFT",
+"Encoder final test EFT"
+],
+[
+"老化 Burn-in",
+"Burn-in"
+],
+[
+"自动光学检测 AOI",
+"AOI AOI"
+],
+[
+"铣削 Milling",
+"Milling"
+],
+[
+"6061 铝合金棒",
+"Aluminium bar 6061 Ø120"
+],
+[
+"6061 铝合金管",
+"Aluminium tube Ø90×3"
+],
+[
+"三坐标 CMM-R",
+"CMM room CMM-R"
+],
+[
+"下料 Sawing",
+"Sawing"
+],
+[
+"人形总装工位 HA",
+"Humanoid assembly cell HA"
+],
+[
+"关节装配工位 JA",
+"Joint assembly 1 JA"
+],
+[
+"划片 Dicing",
+"Dicing"
+],
+[
+"功能测试台 FCT",
+"Functional test bench FCT"
+],
+[
+"在线测试仪 ICT",
+"In-circuit tester ICT"
+],
+[
+"在线测试仪（针床）",
+"In-circuit tester"
+],
+[
+"定子测试台 STT",
+"Stator tester STT"
+],
+[
+"嵌线整形台 INS",
+"Insertion & lacing bench INS"
+],
+[
+"带锯床 SAW-R",
+"Band saw SAW-R"
+],
+[
+"应变片粘贴台 SG",
+"Strain-gauge bonding bench SG"
+],
+[
+"引线键合机 1 号",
+"Wire bonder 1"
+],
+[
+"引线键合机 2 号",
+"Wire bonder 2"
+],
+[
+"扭矩终检台 TFT",
+"Torque sensor final test TFT"
+],
+[
+"整机装配单元 RA",
+"Robot assembly cell RA"
+],
+[
+"来料检验台 IQC",
+"Incoming inspection IQC"
+],
+[
+"检验站 QC-01",
+"Inspection station QC-01"
+],
+[
+"温度循环箱 TCY",
+"Thermal cycling chamber TCY"
+],
+[
+"温度补偿箱 TCP",
+"Temperature compensation chamber TCP"
+],
+[
+"漆包线与绝缘材料商",
+"Magnet Wire Supplier (Demo)"
+],
+[
+"电机总装台 ASM",
+"Motor assembly bench ASM"
+],
+[
+"电机终检台 DYN",
+"Motor final test dyno DYN"
+],
+[
+"码盘清洗台 DCL",
+"Disk cleaning station DCL"
+],
+[
+"砝码标定台 DWT",
+"Dead-weight calibration rig DWT"
+],
+[
+"示例·伺服驱动器厂",
+"Servo Drive Maker (Demo)"
+],
+[
+"示例·北方精密轴承",
+"Northern Precision Bearing (Demo)"
+],
+[
+"示例·协作机器人厂",
+"Cobot Maker (Demo)"
+],
+[
+"示例·汽车零部件厂",
+"Auto Parts Plant (Demo)"
+],
+[
+"示例·物流仓储中心",
+"Logistics Center (Demo)"
+],
+[
+"示例·电磁制动器商",
+"Brake Supplier (Demo)"
+],
+[
+"示例·绿谷输送设备",
+"GreenValley Conveyor (Demo)"
+],
+[
+"示例·自动化设备厂",
+"Automation Equipment Maker (Demo)"
+],
+[
+"示例·钕铁硼磁钢厂",
+"NdFeB Magnet Maker (Demo)"
+],
+[
+"等离子清洗机 PL",
+"Plasma cleaner PL"
+],
+[
+"编码器读头板贴片板",
+"Encoder head SMT assembly"
+],
+[
+"老化房（工程样片）",
+"Burn-in room"
+],
+[
+"虚拟 PLC 运行",
+"Virtual PLC run"
+],
+[
+"质量异常单（8D）",
+"8D report"
+],
+[
+"铁芯叠压机 STK",
+"Lamination stacking press STK"
+],
+[
+"锡膏检测仪 SPI",
+"Solder paste inspection SPI"
+],
+[
+"AGV 装配工位",
+"AGV assembly"
+],
+[
+"AGV 调试场地",
+"AGV test area"
+],
+[
+"三防涂覆机 CC",
+"Conformal coater CC"
+],
+[
+"关节测试台 JT",
+"Joint test bench JT"
+],
+[
+"切筋成型机 TF",
+"Trim & form / singulation TF"
+],
+[
+"功能测试 FCT",
+"FCT"
+],
+[
+"动平衡机 BAL",
+"Rotor balancing machine BAL"
+],
+[
+"包装台（防静电）",
+"Packing bench"
+],
+[
+"原材料与外购件库",
+"Raw & purchased store"
+],
+[
+"在线测试 ICT",
+"ICT"
+],
+[
+"安全、健康与环境",
+"EHS"
+],
+[
+"工业机器人集成商",
+"Robot Integrator (Demo)"
+],
+[
+"引线键合机 WB",
+"Wire bonder 1 WB"
+],
+[
+"抱闸测试台 BT",
+"Brake tester BT"
+],
+[
+"数控车床 1 号",
+"CNC lathe 1"
+],
+[
+"数控车床 2 号",
+"CNC lathe 2"
+],
+[
+"测试分选机 FT",
+"Final test handler FT"
+],
+[
+"激光打标机 LM",
+"Laser marker LM"
+],
+[
+"物流小车 1 号",
+"AGV 1"
+],
+[
+"物流小车 2 号",
+"AGV 2"
+],
+[
+"磁钢粘贴台 MG",
+"Magnet bonding bench MG"
+],
+[
+"示例·中西部钢材",
+"Midwest Steel (Demo)"
+],
+[
+"示例·五大湖轴承",
+"Great Lakes Bearing (Demo)"
+],
+[
+"示例·伺服电机厂",
+"Servo Motor Maker (Demo)"
+],
+[
+"示例·先锋工业品",
+"Pioneer Industrial Supply (Demo)"
+],
+[
+"示例·光栅码盘厂",
+"Code Disk Maker (Demo)"
+],
+[
+"示例·包装材料商",
+"Packaging Supplier (Demo)"
+],
+[
+"示例·峰顶搅拌机",
+"Summit Mixer Works (Demo)"
+],
+[
+"示例·引线框架商",
+"Leadframe Supplier (Demo)"
+],
+[
+"示例·授权分销商",
+"Authorized Distributor (Demo)"
+],
+[
+"示例·晶圆代工厂",
+"Wafer Foundry (Demo)"
+],
+[
+"示例·海湾润滑油",
+"Gulf Coast Lubricants (Demo)"
+],
+[
+"示例·焊接材料商",
+"Solder & Chemicals (Demo)"
+],
+[
+"示例·物流设备厂",
+"Logistics Equipment Maker (Demo)"
+],
+[
+"示例·电子元件商",
+"Electronics Supplier (Demo)"
+],
+[
+"示例·电子分销商",
+"Electronics Distributor (Demo)"
+],
+[
+"示例·电子装配厂",
+"Electronics Assembly (Demo)"
+],
+[
+"示例·硅钢冲片厂",
+"Lamination Supplier (Demo)"
+],
+[
+"示例·精密机加厂",
+"Precision Machining (Demo)"
+],
+[
+"示例·芯片代理商",
+"IC Distributor (Demo)"
+],
+[
+"空心输出轴（中）",
+"Hollow output shaft M"
+],
+[
+"空心输出轴（大）",
+"Hollow output shaft L"
+],
+[
+"空心输出轴（小）",
+"Hollow output shaft S"
+],
+[
+"箱体组件（合镗）",
+"Housing assembly"
+],
+[
+"组桥焊线台 TB",
+"Bridge wiring bench TB"
+],
+[
+"编带与防潮包装商",
+"Tape & Dry-pack (Demo)"
+],
+[
+"读头装调台 HM",
+"Read-head mounting & gap adjust HM"
+],
+[
+"谐波减速器代理商",
+"Strain-wave Gear Distributor (Demo)"
+],
+[
+"锡膏印刷机 SP",
+"Stencil printer SP"
+],
+[
+"锡膏检测 SPI",
+"SPI"
+],
+[
+"事故 / 未遂",
+"Incident / near miss"
+],
+[
+"伺服电机供应商",
+"Servo Supplier (Demo)"
+],
+[
+"关节壳体（中）",
+"Joint housing M"
+],
+[
+"关节壳体（大）",
+"Joint housing L"
+],
+[
+"关节壳体（小）",
+"Joint housing S"
+],
+[
+"关节模组（中）",
+"Joint module M"
+],
+[
+"关节模组（大）",
+"Joint module L"
+],
+[
+"关节模组（小）",
+"Joint module S"
+],
+[
+"刀具 / 砂轮",
+"Tool"
+],
+[
+"双臂与手眼标定",
+"Dual-arm & hand-eye calibration"
+],
+[
+"回流焊炉 RF",
+"Reflow oven RF"
+],
+[
+"固化炉 CUR",
+"Post-mold cure oven CUR"
+],
+[
+"塑封料与银浆商",
+"Mold Compound & Adhesive (Demo)"
+],
+[
+"塑封机 MLD",
+"Transfer molding press MLD"
+],
+[
+"成品库（防潮）",
+"Finished goods store"
+],
+[
+"探针台与测试机",
+"Prober + tester (CP)"
+],
+[
+"晶圆来料检验台",
+"Wafer incoming inspection"
+],
+[
+"浸漆烘箱 VO",
+"Varnish dip & bake oven VO"
+],
+[
+"烧录工位 PG",
+"Programming station PG"
+],
+[
+"电镀线 PLT",
+"Plating line PLT"
+],
+[
+"电镀线（雾锡）",
+"Plating line"
+],
+[
+"码盘粘接对心机",
+"Disk bonding & centering 1"
+],
+[
+"示例·东岳铸造",
+"Dongyue Castings (Demo)"
+],
+[
+"示例·传感器厂",
+"Sensor Maker (Demo)"
+],
+[
+"示例·北方铝业",
+"Northern Aluminium (Demo)"
+],
+[
+"示例·华东铝业",
+"East China Aluminium (Demo)"
+],
+[
+"示例·华美铸业",
+"Huamei Foundry (Demo)"
+],
+[
+"示例·印制板厂",
+"PCB Fabricator (Demo)"
+],
+[
+"示例·基石锻造",
+"Keystone Forging (Demo)"
+],
+[
+"示例·应变片商",
+"Strain Gauge Supplier (Demo)"
+],
+[
+"示例·标准件商",
+"Fastener Supplier (Demo)"
+],
+[
+"示例·海港起重",
+"Harbor Crane Systems (Demo)"
+],
+[
+"示例·湖畔特钢",
+"Lakeside Special Steel (Demo)"
+],
+[
+"示例·精密传动",
+"Precision Drive (Demo)"
+],
+[
+"示例·编码器厂",
+"Encoder Maker (Demo)"
+],
+[
+"示例·键合丝商",
+"Bonding Wire Supplier (Demo)"
+],
+[
+"示例·长河锻压",
+"Changhe Forging (Demo)"
+],
+[
+"设备维护与资产",
+"Maintenance & assets"
+],
+[
+"问渠芯片封测厂",
+"WenQuest Semiconductor (Demo)"
+],
+[
+"阻容与连接器商",
+"Passives & Connectors (Demo)"
+],
+[
+"三坐标测量室",
+"CMM room"
+],
+[
+"人形总装工位",
+"Humanoid assembly cell"
+],
+[
+"伺服驱动器厂",
+"Servo Drive Maker (Demo)"
+],
+[
+"充磁机 MZ",
+"Magnetizer MZ"
+],
+[
+"关节装配工位",
+"Joint assembly 1"
+],
+[
+"减薄机 BG",
+"Back grinder BG"
+],
+[
+"划片机 DC",
+"Dicing saw DC"
+],
+[
+"包装台 PK",
+"Packing bench PK"
+],
+[
+"北方精密轴承",
+"Northern Precision Bearing (Demo)"
+],
+[
+"协作机器人厂",
+"Cobot Maker (Demo)"
+],
+[
+"卧式加工中心",
+"Horizontal machining centre"
+],
+[
+"合箱钻铰销孔",
+"Pin-hole reaming"
+],
+[
+"多功能贴片机",
+"Flexible placer"
+],
+[
+"应变片粘贴台",
+"Strain-gauge bonding bench"
+],
+[
+"应变胶固化炉",
+"Adhesive cure oven"
+],
+[
+"数控车床 A",
+"CNC lathe A"
+],
+[
+"数控车床 B",
+"CNC lathe B"
+],
+[
+"整机标定工位",
+"Robot calibration cell"
+],
+[
+"整机装配单元",
+"Robot assembly cell"
+],
+[
+"晶圆来料检验",
+"Wafer incoming"
+],
+[
+"汽车零部件厂",
+"Auto Parts Plant (Demo)"
+],
+[
+"物流仓储中心",
+"Logistics Center (Demo)"
+],
+[
+"物流小车 1",
+"AGV 1"
+],
+[
+"物流小车 2",
+"AGV 2"
+],
+[
+"电磁制动器商",
+"Brake Supplier (Demo)"
+],
+[
+"码盘粘接对心",
+"Disk bonding & centering"
+],
+[
+"程序烧录工位",
+"Programming station"
+],
+[
+"立式加工中心",
+"Vertical machining centre"
+],
+[
+"等离子清洗机",
+"Plasma cleaner"
+],
+[
+"绕线机 WD",
+"Needle winder 1 WD"
+],
+[
+"绿谷输送设备",
+"GreenValley Conveyor (Demo)"
+],
+[
+"编带机 TR",
+"Tape & reel TR"
+],
+[
+"编码器标定台",
+"Encoder calibration bench"
+],
+[
+"编码器终检台",
+"Encoder final test"
+],
+[
+"老化房 BI",
+"Burn-in room BI"
+],
+[
+"自动光学检测",
+"AOI"
+],
+[
+"自动化设备厂",
+"Automation Equipment Maker (Demo)"
+],
+[
+"装片机 DA",
+"Die bonder DA"
+],
+[
+"质量问题情景",
+"Injected quality problem"
+],
+[
+"贴片机 PP",
+"Chip shooter PP"
+],
+[
+"轴承压装工位",
+"Bearing press-fit station"
+],
+[
+"选择焊 SW",
+"Selective soldering SW"
+],
+[
+"钕铁硼磁钢厂",
+"NdFeB Magnet Maker (Demo)"
+],
+[
+"问渠传感器厂",
+"WenQuest Sensors (Demo)"
+],
+[
+"问渠减速器厂",
+"WenQuest Gearbox (Demo)"
+],
+[
+"问渠机器人厂",
+"WenQuest Robotics (Demo)"
+],
+[
+"问渠电路板厂",
+"WenQuest Electronics (Demo)"
+],
+[
+"防静电包装盒",
+"ESD box"
+],
+[
+"驱动板贴片板",
+"Drive board SMT assembly"
+],
+[
+"45钢圆棒",
+"Steel bar 1045 Ø50"
+],
+[
+"AI 运行",
+"AI run"
+],
+[
+"三防涂覆机",
+"Conformal coater"
+],
+[
+"中西部钢材",
+"Midwest Steel (Demo)"
+],
+[
+"中间轴组件",
+"Intermediate shaft assembly"
+],
+[
+"五大湖轴承",
+"Great Lakes Bearing (Demo)"
+],
+[
+"产品与研发",
+"Product & engineering"
+],
+[
+"人员与组织",
+"People & organization"
+],
+[
+"仓储与物流",
+"Warehouse & logistics"
+],
+[
+"伺服电机厂",
+"Servo Motor Maker (Demo)"
+],
+[
+"供应商评价",
+"Supplier rating"
+],
+[
+"先锋工业品",
+"Pioneer Industrial Supply (Demo)"
+],
+[
+"光栅码盘厂",
+"Code Disk Maker (Demo)"
+],
+[
+"关节测试台",
+"Joint test bench"
+],
+[
+"内六角螺钉",
+"Socket screw M4×12"
+],
+[
+"切筋成型机",
+"Trim & form / singulation"
+],
+[
+"功能测试台",
+"Functional test bench"
+],
+[
+"包装材料商",
+"Packaging Supplier (Demo)"
+],
+[
+"后固化烘箱",
+"Post-mold cure oven"
+],
+[
+"在线测试仪",
+"In-circuit tester"
+],
+[
+"多功能贴片",
+"IC placement"
+],
+[
+"定子测试台",
+"Stator tester"
+],
+[
+"峰顶搅拌机",
+"Summit Mixer Works (Demo)"
+],
+[
+"嵌线整形台",
+"Insertion & lacing bench"
+],
+[
+"工业齿轮油",
+"L-CKC 220 Gear oil"
+],
+[
+"工程任务单",
+"Engineering task sheet"
+],
+[
+"市场与客户",
+"Market & customers"
+],
+[
+"平面密封胶",
+"Flange sealant"
+],
+[
+"应变片粘贴",
+"Gauge bonding"
+],
+[
+"引线框架商",
+"Leadframe Supplier (Demo)"
+],
+[
+"引线键合机",
+"Wire bonder 1"
+],
+[
+"成品分拣线",
+"Finished-part sorting line"
+],
+[
+"扭矩终检台",
+"Torque sensor final test"
+],
+[
+"技能与资质",
+"Qualification"
+],
+[
+"抱闸测试台",
+"Brake tester"
+],
+[
+"授权分销商",
+"Authorized Distributor (Demo)"
+],
+[
+"晶圆代工厂",
+"Wafer Foundry (Demo)"
+],
+[
+"晶圆减薄机",
+"Back grinder"
+],
+[
+"服务工程师",
+"Service engineer"
+],
+[
+"来料检验台",
+"Incoming inspection"
+],
+[
+"测试分选机",
+"Final test handler"
+],
+[
+"海湾润滑油",
+"Gulf Coast Lubricants (Demo)"
+],
+[
+"温度循环箱",
+"Thermal cycling chamber"
+],
+[
+"温度补偿箱",
+"Temperature compensation chamber"
+],
+[
+"满意度调查",
+"Satisfaction survey"
+],
+[
+"激光打标机",
+"Laser marker"
+],
+[
+"激光扫描仪",
+"SICK TiM781 Laser scanner"
+],
+[
+"焊接材料商",
+"Solder & Chemicals (Demo)"
+],
+[
+"物流设备厂",
+"Logistics Equipment Maker (Demo)"
+],
+[
+"电子元件商",
+"Electronics Supplier (Demo)"
+],
+[
+"电子分销商",
+"Electronics Distributor (Demo)"
+],
+[
+"电子装配厂",
+"Electronics Assembly (Demo)"
+],
+[
+"电机总装台",
+"Motor assembly bench"
+],
+[
+"电机终检台",
+"Motor final test dyno"
+],
+[
+"码盘清洗台",
+"Disk cleaning station"
+],
+[
+"砝码标定台",
+"Dead-weight calibration rig"
+],
+[
+"硅钢冲片厂",
+"Lamination Supplier (Demo)"
+],
+[
+"碳排放核算",
+"Carbon account"
+],
+[
+"磁钢粘贴台",
+"Magnet bonding bench"
+],
+[
+"等离子清洗",
+"Plasma clean"
+],
+[
+"精密机加厂",
+"Precision Machining (Demo)"
+],
+[
+"组桥焊线台",
+"Bridge wiring bench"
+],
+[
+"经营与战略",
+"Strategy & management"
+],
+[
+"编码器终检",
+"Encoder final test"
+],
+[
+"能源与公用",
+"Energy & utilities"
+],
+[
+"芯片代理商",
+"IC Distributor (Demo)"
+],
+[
+"计划与排产",
+"Planning & scheduling"
+],
+[
+"读头装调台",
+"Read-head mounting & gap adjust"
+],
+[
+"负载跑合台",
+"Load run-in stand"
+],
+[
+"跑合试验台",
+"Run-in test rig"
+],
+[
+"输入轴组件",
+"Input shaft assembly"
+],
+[
+"输出轴组件",
+"Output shaft assembly"
+],
+[
+"钻攻螺纹孔",
+"Drilling & tapping"
+],
+[
+"铁芯叠压机",
+"Lamination stacking press"
+],
+[
+"销售与交付",
+"Sales & delivery"
+],
+[
+"锡膏印刷机",
+"Stencil printer"
+],
+[
+"锡膏检测仪",
+"Solder paste inspection"
+],
+[
+"问渠电机厂",
+"WenQuest Motors (Demo)"
+],
+[
+"问渠芯片厂",
+"WenQuest Semiconductor"
+],
+[
+"零件库条目",
+"Library entry"
+],
+[
+"高速贴片机",
+"Chip shooter"
+],
+[
+"三防涂覆",
+"Conformal coating"
+],
+[
+"不合格品",
+"Nonconformance"
+],
+[
+"东岳铸造",
+"Dongyue Castings (Demo)"
+],
+[
+"交付承诺",
+"Delivery promise"
+],
+[
+"人形总装",
+"Humanoid assembly"
+],
+[
+"人形联调",
+"Humanoid integration test"
+],
+[
+"传感器厂",
+"Sensor Maker (Demo)"
+],
+[
+"体系审核",
+"QMS audit"
+],
+[
+"作业许可",
+"Work permit"
+],
+[
+"停机记录",
+"Downtime"
+],
+[
+"关节测试",
+"Joint test"
+],
+[
+"关节装配",
+"Joint assembly"
+],
+[
+"出厂检验",
+"Final inspection"
+],
+[
+"分析作业",
+"Analysis job"
+],
+[
+"切筋成型",
+"Trim & form"
+],
+[
+"功能测试",
+"FCT"
+],
+[
+"动作记录",
+"Action run"
+],
+[
+"动平衡机",
+"Rotor balancing machine"
+],
+[
+"劳保发放",
+"PPE issue"
+],
+[
+"北方铝业",
+"Northern Aluminium (Demo)"
+],
+[
+"华东铝业",
+"East China Aluminium (Demo)"
+],
+[
+"华美铸业",
+"Huamei Foundry (Demo)"
+],
+[
+"印制板厂",
+"PCB Fabricator (Demo)"
+],
+[
+"厂情中枢",
+"Ops center"
+],
+[
+"厂情报告",
+"Ops report"
+],
+[
+"回流焊炉",
+"Reflow oven"
+],
+[
+"在线测试",
+"ICT"
+],
+[
+"培训记录",
+"Training record"
+],
+[
+"基石锻造",
+"Keystone Forging (Demo)"
+],
+[
+"外圆磨床",
+"Cylindrical grinder"
+],
+[
+"安全培训",
+"Safety training"
+],
+[
+"安装记录",
+"Installation"
+],
+[
+"定子测试",
+"Stator test"
+],
+[
+"客户投诉",
+"Customer complaint"
+],
+[
+"客户服务",
+"Customer service"
+],
+[
+"嵌线整形",
+"Insertion & lacing"
+],
+[
+"工单成本",
+"Work order cost"
+],
+[
+"工序任务",
+"Operation task"
+],
+[
+"工程更改",
+"Engineering change"
+],
+[
+"工艺规程",
+"Process plan"
+],
+[
+"应变片商",
+"Strain Gauge Supplier (Demo)"
+],
+[
+"应急演练",
+"Emergency drill"
+],
+[
+"引线键合",
+"Wire bonding"
+],
+[
+"成品测试",
+"FT Final test"
+],
+[
+"成本中心",
+"Cost center"
+],
+[
+"扭矩终检",
+"Torque final test"
+],
+[
+"抱闸测试",
+"Brake test"
+],
+[
+"排放指标",
+"Emission"
+],
+[
+"搬运任务",
+"Transport task"
+],
+[
+"故障记录",
+"Failure record"
+],
+[
+"数控程序",
+"NC program"
+],
+[
+"数控车床",
+"CNC lathe"
+],
+[
+"整机标定",
+"Robot calibration"
+],
+[
+"整机装配",
+"Robot assembly"
+],
+[
+"晶圆测试",
+"CP Wafer probe"
+],
+[
+"服务工单",
+"Service order"
+],
+[
+"来料检验",
+"Incoming inspection"
+],
+[
+"标准件商",
+"Fastener Supplier (Demo)"
+],
+[
+"检验计划",
+"Inspection plan"
+],
+[
+"海港起重",
+"Harbor Crane Systems (Demo)"
+],
+[
+"浸漆烘干",
+"Varnish & bake"
+],
+[
+"浸漆烘箱",
+"Varnish dip & bake oven"
+],
+[
+"清洗包装",
+"Cleaning & packing"
+],
+[
+"渗碳淬火",
+"Carburizing"
+],
+[
+"温度循环",
+"Thermal cycling"
+],
+[
+"温度补偿",
+"Temperature compensation"
+],
+[
+"湖畔特钢",
+"Lakeside Special Steel (Demo)"
+],
+[
+"激光打标",
+"Laser marking"
+],
+[
+"烧录工位",
+"Programming station"
+],
+[
+"热处理炉",
+"Heat-treat furnace"
+],
+[
+"物料清单",
+"BOM"
+],
+[
+"现场设备",
+"Field unit"
+],
+[
+"班次日历",
+"Shift calendar"
+],
+[
+"生产执行",
+"Production"
+],
+[
+"电机总装",
+"Motor assembly"
+],
+[
+"电机终检",
+"Motor final test"
+],
+[
+"码盘清洗",
+"Disk cleaning"
+],
+[
+"砝码标定",
+"Dead-weight calibration"
+],
+[
+"磁钢粘贴",
+"Magnet bonding"
+],
+[
+"程序烧录",
+"Programming"
+],
+[
+"精密传动",
+"Precision Drive (Demo)"
+],
+[
+"精度标定",
+"Accuracy calibration"
+],
+[
+"精铣钻孔",
+"Finish milling & drilling"
+],
+[
+"组桥焊线",
+"Bridge wiring"
+],
+[
+"经营目标",
+"Objective"
+],
+[
+"维修工单",
+"Repair order"
+],
+[
+"维护计划",
+"Maintenance plan"
+],
+[
+"编带包装",
+"Tape & reel"
+],
+[
+"编码器厂",
+"Encoder Maker (Demo)"
+],
+[
+"臂内线束",
+"Arm cable harness"
+],
+[
+"装配工位",
+"Assembly station"
+],
+[
+"计量器具",
+"Gauge"
+],
+[
+"设计提交",
+"Design submission"
+],
+[
+"设计版本",
+"Design revision"
+],
+[
+"读头装调",
+"Read-head mounting"
+],
+[
+"负载跑合",
+"Load run-in"
+],
+[
+"贴片电容",
+"Chip capacitor 0402"
+],
+[
+"贴片电阻",
+"Chip resistor 0402"
+],
+[
+"跑合试验",
+"Run-in test"
+],
+[
+"躯干壳体",
+"Torso shell"
+],
+[
+"部件装配",
+"Sub-assembly"
+],
+[
+"铁芯叠压",
+"Lamination stacking"
+],
+[
+"铣结合面",
+"Face milling"
+],
+[
+"销售订单",
+"Sales order"
+],
+[
+"锡膏印刷",
+"Stencil printing"
+],
+[
+"锡膏检测",
+"SPI"
+],
+[
+"键合丝商",
+"Bonding Wire Supplier (Demo)"
+],
+[
+"键槽铣床",
+"Keyway miller"
+],
+[
+"镗轴承孔",
+"Bearing-bore boring"
+],
+[
+"长河锻压",
+"Changhe Forging (Demo)"
+],
+[
+"防静电袋",
+"ESD bag"
+],
+[
+"零件实物",
+"Serialized part"
+],
+[
+"零件检验",
+"Part inspection"
+],
+[
+"风险评估",
+"Risk assessment"
+],
+[
+"高速贴片",
+"Chip placement"
+],
+[
+"三坐标",
+"CMM room"
+],
+[
+"中间轴",
+"Intermediate shaft"
+],
+[
+"主计划",
+"Master plan"
+],
+[
+"供应商",
+"Supplier"
+],
+[
+"供应链",
+"Supply chain"
+],
+[
+"充磁机",
+"Magnetizer"
+],
+[
+"减薄机",
+"Back grinder"
+],
+[
+"出入库",
+"Stock movement"
+],
+[
+"划片机",
+"Dicing saw"
+],
+[
+"动平衡",
+"Rotor balancing"
+],
+[
+"包装台",
+"Packing bench"
+],
+[
+"化学品",
+"Chemical"
+],
+[
+"危险源",
+"Hazard"
+],
+[
+"原料库",
+"Raw store"
+],
+[
+"发货单",
+"Delivery note"
+],
+[
+"后固化",
+"Post-mold cure"
+],
+[
+"回流焊",
+"Reflow soldering"
+],
+[
+"固化炉",
+"Post-mold cure oven"
+],
+[
+"塑封机",
+"Transfer molding press"
+],
+[
+"带锯床",
+"Band saw"
+],
+[
+"废弃物",
+"Waste"
+],
+[
+"成品库",
+"Finished store"
+],
+[
+"收货单",
+"Purchase receipt"
+],
+[
+"检验站",
+"Inspection station"
+],
+[
+"滚齿机",
+"Gear hobber"
+],
+[
+"电镀线",
+"Plating line"
+],
+[
+"磨外圆",
+"Cylindrical grinding"
+],
+[
+"绕线机",
+"Needle winder 1"
+],
+[
+"编带机",
+"Tape & reel"
+],
+[
+"老化房",
+"Burn-in room"
+],
+[
+"联系人",
+"Contact"
+],
+[
+"胶固化",
+"Adhesive cure"
+],
+[
+"装片机",
+"Die bonder"
+],
+[
+"计量点",
+"Meter"
+],
+[
+"请购单",
+"Material request"
+],
+[
+"贴片机",
+"Chip shooter"
+],
+[
+"输出轴",
+"Output shaft"
+],
+[
+"选择焊",
+"Selective soldering"
+],
+[
+"采购单",
+"Purchase order"
+],
+[
+"铣键槽",
+"Keyway milling"
+],
+[
+"下料",
+"Sawing"
+],
+[
+"产品",
+"Product"
+],
+[
+"仓库",
+"Warehouse"
+],
+[
+"保修",
+"Warranty"
+],
+[
+"充磁",
+"Magnetizing"
+],
+[
+"减薄",
+"Back grinding"
+],
+[
+"划片",
+"Dicing"
+],
+[
+"包装",
+"Packing"
+],
+[
+"合同",
+"Contract"
+],
+[
+"员工",
+"Employee"
+],
+[
+"商机",
+"Opportunity"
+],
+[
+"回访",
+"Follow-up"
+],
+[
+"场景",
+"Scenario"
+],
+[
+"塑封",
+"Molding"
+],
+[
+"备件",
+"Spare part"
+],
+[
+"复盘",
+"Retrospective"
+],
+[
+"大臂",
+"Upper arm"
+],
+[
+"客户",
+"Customer"
+],
+[
+"小臂",
+"Forearm"
+],
+[
+"岗位",
+"Position"
+],
+[
+"工单",
+"Work order"
+],
+[
+"工厂",
+"Plant"
+],
+[
+"库存",
+"Stock level"
+],
+[
+"应付",
+"Payable"
+],
+[
+"应收",
+"Receivable"
+],
+[
+"底座",
+"Robot base"
+],
+[
+"异常",
+"Anomaly"
+],
+[
+"总装",
+"Final assembly"
+],
+[
+"批次",
+"Batch"
+],
+[
+"报价",
+"Quotation"
+],
+[
+"指标",
+"Metric"
+],
+[
+"排班",
+"Roster"
+],
+[
+"提议",
+"Proposal"
+],
+[
+"测量",
+"Measurement"
+],
+[
+"滚齿",
+"Gear hobbing"
+],
+[
+"点检",
+"Routine check"
+],
+[
+"物料",
+"Item"
+],
+[
+"电镀",
+"Plating"
+],
+[
+"箱座",
+"Housing base"
+],
+[
+"箱盖",
+"Housing cover"
+],
+[
+"粗车",
+"Rough turning"
+],
+[
+"精车",
+"Finish turning"
+],
+[
+"线索",
+"Lead"
+],
+[
+"绕线",
+"Winding"
+],
+[
+"老化",
+"Burn-in"
+],
+[
+"肩架",
+"Shoulder frame"
+],
+[
+"能耗",
+"Energy use"
+],
+[
+"腰座",
+"Waist seat"
+],
+[
+"装片",
+"Die attach"
+],
+[
+"设备",
+"Machine"
+],
+[
+"调质",
+"Quench & temper"
+],
+[
+"财务",
+"Finance"
+],
+[
+"质量",
+"Quality"
+],
+[
+"资产",
+"Asset"
+],
+[
+"部门",
+"Department"
+],
+[
+"铣削",
+"Milling"
+],
+[
+"隐患",
+"Safety issue"
+],
+[
+"预算",
+"Budget"
+]
+]

@@ -1,9 +1,10 @@
-import { loc, t } from './i18n';
+import { bi, isEn, loc, t } from './i18n';
 
 export const pct = (v, d = 0) => (v === null || v === undefined ? '—' : (v * 100).toFixed(d) + '%');
 export const pctSigned = (v, d = 1) => (v === null || v === undefined ? '—' : (v >= 0 ? '+' : '') + (v * 100).toFixed(d) + '%');
 export const money = (v) => (v === null || v === undefined ? '—' : '$' + Number(v).toFixed(2));
-export const short = (s) => (s || '').replace('示例·', '')   /* i18n-ok 数据前缀 */.split(' ')[0];
+// 客户、供应商的短名：中文取“示例·”后的第一个词；英文取中英合写名字的英文部分（第 130 轮第二批）
+export const short = (s) => (isEn() ? bi(s || '') : (s || '').replace('示例·', '')   /* i18n-ok 数据前缀 */.split(' ')[0]);
 export const opShort = (s) => (s || '').split(' ')[0];
 export function timeOf(iso) {
   if (!iso) return '';

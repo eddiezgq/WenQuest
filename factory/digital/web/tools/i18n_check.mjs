@@ -13,7 +13,8 @@ const WEB = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SRC = path.join(WEB, 'src');
 const REPO_FACTORY = path.resolve(WEB, '..', '..');           // factory/
 const en = JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en.json'), 'utf8'));
-const phrases = sortPhrases(JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en_phrases.json'), 'utf8')));
+const phrases = sortPhrases([...JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en_phrases.json'), 'utf8')),
+  ...JSON.parse(fs.readFileSync(path.join(SRC, 'locales', 'en_names.json'), 'utf8'))]);
 
 // 第一批（细则 D-4）：外壳与导航、首页、三维车间、电路分析、虚拟仪器、电路板设计（含固件）、芯片设计、功能测试台、零件与机器人库
 export const BATCH = [
@@ -24,6 +25,79 @@ export const BATCH = [
   'components/SchematicView.vue', 'components/SpiceChart.vue', 'components/ScopeScreen.vue', 'components/ModelViewer.vue',
   'components/FirmwarePanel.vue', 'components/MotorPanel.vue', 'components/MasterPanel.vue', 'components/LineChart.vue',
   'lib/fmt.js', 'lib/machinfo.js', 'lib/api.js', 'lib/schematics.js', 'lib/encif.js', 'lib/instruments.js', 'lib/spice.js', 'lib/bus.js',
+];
+// 第二批（细则 D-4）：工厂运营各页、厂情中枢、实验与任务页（含首页的实验 7 任务）
+export const BATCH2 = [
+  'pages/Planner.vue',
+  'pages/Engineer.vue',
+  'pages/Operator.vue',
+  'pages/Quality.vue',
+  'pages/Q8D.vue',
+  'pages/Teach.vue',
+  'pages/BusView.vue',
+  'pages/DesignRelease.vue',
+  'pages/ProcessPlan.vue',
+  'pages/ProcessEdit.vue',
+  'pages/DesignReview.vue',
+  'pages/Members.vue',
+  'pages/Configurator.vue',
+  'pages/WaferMap.vue',
+  'pages/EncCurve.vue',
+  'pages/MotorWave.vue',
+  'pages/Ehs.vue',
+  'pages/Maint.vue',
+  'pages/People.vue',
+  'pages/Supply.vue',
+  'pages/Calib.vue',
+  'pages/RobotService.vue',
+  'pages/Energy.vue',
+  'pages/Finance.vue',
+  'pages/Director.vue',
+  'pages/Cost.vue',
+  'pages/CustomerService.vue',
+  'pages/Tasks.vue',
+  'pages/TaskReview.vue',
+  'pages/TaskPage.vue',
+  'pages/Labs.vue',
+  'pages/Lab15.vue',
+  'pages/Lab16.vue',
+  'pages/Lab17.vue',
+  'pages/Lab18.vue',
+  'pages/Lab19.vue',
+  'pages/Lab20.vue',
+  'pages/Lab21.vue',
+  'pages/Lab22.vue',
+  'pages/Lab23.vue',
+  'pages/Lab24.vue',
+  'pages/Lab25.vue',
+  'pages/Lab26.vue',
+  'pages/Lab27.vue',
+  'pages/Lab28.vue',
+  'pages/Lab29.vue',
+  'pages/Lab30.vue',
+  'pages/Lab31.vue',
+  'pages/OntOps.vue',
+  'pages/OntHub.vue',
+  'pages/OntRules.vue',
+  'pages/OntSim.vue',
+  'pages/OntActions.vue',
+  'pages/OntAi.vue',
+  'pages/OntNotify.vue',
+  'pages/OntReports.vue',
+  'pages/OntType.vue',
+  'pages/OntObject.vue',
+  'components/ChainGraph.vue',
+  'components/GanttChart.vue',
+  'components/GcodeView.vue',
+  'components/OntGraph.vue',
+  'components/OptionsPanel.vue',
+  'components/ProductionCost.vue',
+  'components/RetroPanel.vue',
+  'components/ShaftView.vue',
+  'components/TeacherConsole.vue',
+  'components/TimeChart.vue',
+  'components/DayChart.vue',
+  'lib/ont.js', 'lib/tasks.js', 'lib/ai.js',
 ];
 // 整个文件里的中文字面量都是钥匙（页面名字表）
 const KEY_FILES = ['help/pages.js'];
@@ -124,7 +198,7 @@ export function dataStrings() {
 export function check() {
   const missing = new Map();   // 钥匙 → 文件
   const left = {};
-  for (const rel of [...BATCH, ...KEY_FILES]) {
+  for (const rel of [...BATCH, ...BATCH2, ...KEY_FILES]) {
     const r = scan(rel, KEY_FILES.includes(rel));
     for (const k of r.keys) if (!en[k]) missing.set(k, rel);
     if (r.left.length) left[rel] = r.left;
