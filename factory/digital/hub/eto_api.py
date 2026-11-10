@@ -8,6 +8,7 @@ from hub import ai as _ai
 from hub import eto as E
 from hub import eto_design as ED
 from hub import eto_mrp as EM
+from hub import eto_plan as EP
 
 log = logging.getLogger("eto")
 ROLES = ("sales", "planner", "engineer", "manager", "approver")
@@ -50,10 +51,16 @@ def mount(app, H, user_of, who, ai_quota=None):
         except E.EtoError as e:
             raise HTTPException(400, str(e))
 
+    def with_feas(d):
+        """第 139d 段：报价时能否按期（按估算粗算）"""
+        if d:
+            d["feasibility"] = EP.feasibility(d["job"], (d.get("estimate") or {}).get("lines") or [])
+        return d
+
     @app.get("/api/eto/jobs/{job_no}")
     def eto_detail(job_no: str, u=Depends(user_of)):
         try:
-            return found(E.detail(H.db, u["mode"], job_no), job_no)
+            return with_feas(found(E.detail(H.db, u["mode"], job_no), job_no))
         except E.EtoError as e:
             raise HTTPException(400, str(e))
 
@@ -66,7 +73,7 @@ def mount(app, H, user_of, who, ai_quota=None):
             raise HTTPException(404, "没有作业 {}".format(job_no))
         except E.EtoError as e:
             raise HTTPException(409, str(e))
-        return E.detail(H.db, u["mode"], job_no)
+        return with_feas(E.detail(H.db, u["mode"], job_no))
 
     @app.post("/api/eto/jobs/{job_no}/draft")
     def eto_draft(job_no: str, u=Depends(user_of)):
@@ -182,3 +189,12 @@ def mount(app, H, user_of, who, ai_quota=None):
         can(u)
         pv = guard(lambda: EM.early_buy_preview(H.db, u["mode"], job_no, list(body.get("items") or [])))
         return propose(u, "eto_early_buy", pv, "提前采购 {}：{}".format(job_no, "、".join(r["item_code"] for r in pv["material_requests"])))
+
+    # ------------------------------------------------------------ 139d：倒排与负荷
+    @app.get("/api/eto/jobs/{job_no}/schedule")
+    def eto_schedule(job_no: str, u=Depends(user_of)):
+        def run():
+            t = EP.schedule(H.db, u["mode"], job_no)
+            t["load"] = EP.load(H.db, u["mode"], job_no)
+            return t
+        return guard(run)

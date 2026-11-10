@@ -599,6 +599,8 @@ def eto(teacher):
     run("materials", "作业算料提议执行（工单、请购挂作业号）")
     wos = [x for x in erp_docs("Work Order") if x.get("project") == jn and x.get("docstatus") == 1]
     check(any(x.get("production_item") == jn for x in wos), "ERPNext 里有作业 {} 的工单（{}）".format(jn, "、".join(x["name"] for x in wos)))
+    sc = hub("GET", "/api/eto/jobs/{}/schedule".format(jn), token=sales)                     # 139d
+    check(sc["make"] and sc["earliest"] and "slack_days" in sc and sc["load"]["rows"], "倒排：最早 {} 能交，松紧 {} 个工作日".format(sc["earliest"], sc["slack_days"]))
 
 
 def safety(teacher):
