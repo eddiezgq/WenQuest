@@ -347,10 +347,10 @@ def parts_visible(cast):
     kn = cyl(9, 10, V(tx, -58, tz), V(0, -1, 0))
     g["graphite"].append(fil(kn, 2.5, circ_far(kn, V(0, -1, 0))))
     # 针距旋钮、倒缝扳手、操作面板、照明
-    dl = cyl(19, 10, V(340, -52, 170), V(0, -1, 0))
+    dl = cyl(19, 10, V(340, PIL["y0"] + 2, 170), V(0, -1, 0))
     g["graphite"].append(fil(dl, 2, circ_far(dl, V(0, -1, 0))))
-    g["blue"].append(cyl(19.3, 1.2, V(340, -61.2, 170), V(0, -1, 0)).cut(cyl(17, 2, V(340, -60.7, 170), V(0, -1, 0))))
-    lev = Part.makeBox(10, 8, 56, V(347, -62, 60)).fuse(cyl(7, 10, V(352, -52, 116), V(0, -1, 0)))
+    g["blue"].append(cyl(19.3, 1.2, V(340, PIL["y0"] - 7.2, 170), V(0, -1, 0)).cut(cyl(17, 2, V(340, PIL["y0"] - 6.7, 170), V(0, -1, 0))))
+    lev = Part.makeBox(10, 8, 56, V(347, PIL["y0"] - 8, 60)).fuse(cyl(7, 10, V(352, PIL["y0"] + 2, 116), V(0, -1, 0)))
     g["graphite"].append(lev)
     pan = Part.makeBox(76, 9, 46, V(118, -47, 168))
     pan = pan.makeFillet(4, [e for e in pan.Edges if abs(e.BoundBox.YLength) < 1e-6])
