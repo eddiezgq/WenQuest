@@ -71,8 +71,10 @@
         <div class="tabs" role="tablist">
           <button role="tab" :aria-selected="tab === 'est'" :class="{ on: tab === 'est' }" @click="tab = 'est'">{{ $t('估算') }}</button>
           <button role="tab" :aria-selected="tab === 'design'" :class="{ on: tab === 'design' }" @click="tab = 'design'">{{ $t('设计（物料清单与工艺）') }}</button>
+          <button v-if="d.job.sales_order" role="tab" :aria-selected="tab === 'mat'" :class="{ on: tab === 'mat' }" @click="tab = 'mat'">{{ $t('物料') }}</button>
         </div>
         <EtoDesign v-if="tab === 'design'" :job="d.job" :ops="ops" :items="allItems" :suppliers="suppliers" @changed="open(sel)" />
+        <EtoMaterials v-else-if="tab === 'mat'" :job="d.job" @changed="open(sel)" />
         <template v-else>
         <div class="tools">
           <span class="muted small">{{ d.estimate ? $t('第 {r} 版估算', { r: d.estimate.rev }) : $t('还没有估算') }}
@@ -129,6 +131,7 @@ import { api, get, loadConfig, post } from '../lib/api';
 import { loc, t as $t, td as $td, tk } from '../lib/i18n';
 import ProposalModal from '../components/ProposalModal.vue';
 import EtoDesign from '../components/EtoDesign.vue';
+import EtoMaterials from '../components/EtoMaterials.vue';
 
 const KINDS = ['material', 'buyout', 'operation', 'outside', 'engineering'];
 const KIND_ZH = { material: tk('材料'), buyout: tk('外购件'), operation: tk('工序'), outside: tk('外协'), engineering: tk('设计') };

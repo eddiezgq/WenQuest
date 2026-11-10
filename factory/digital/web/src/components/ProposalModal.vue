@@ -77,6 +77,19 @@
           </table>
           <p class="muted small">{{ t('确认后在 ERPNext 建销售订单（引用报价单 {q}、挂项目 {p}）。各期到了里程碑才开票。', { q: pv.sales_order.quotation, p: pv.sales_order.project }) }}</p>
         </template>
+        <template v-if="p.action === 'eto_materials'">
+          <p>{{ t('作业 {j}（设计第 {r} 版）：工单、请购单都挂作业号，专料专用。', { j: pv.job.job_no, r: pv.job.design_rev }) }}</p>
+          <h3>{{ t('工单') }}</h3>
+          <table class="t">
+            <thead><tr><th>{{ t('物料') }}</th><th class="num">{{ t('数量') }}</th><th>{{ t('计划开工') }}</th><th>{{ t('计划完工') }}</th><th class="num">{{ t('理论工时') }}</th></tr></thead>
+            <tbody><tr v-for="w in pv.work_orders" :key="w.production_item">
+              <td class="mono">{{ w.production_item }}</td><td class="num">{{ w.qty }}</td><td class="mono">{{ w.planned_start_date }}</td>
+              <td class="mono">{{ w.expected_delivery_date }}</td><td class="num">{{ t('{n} 分钟', { n: w.est_minutes }) }}</td></tr></tbody>
+          </table>
+        </template>
+        <template v-if="p.action === 'eto_early_buy'">
+          <p class="warns">{{ t('设计第 {r} 版还没发布：这些长周期件先请购，设计改了要人处理这些请购单。', { r: pv.job.design_rev }) }}</p>
+        </template>
         <template v-if="p.action === 'eto_release'">
           <p>{{ t('作业 {j} 第 {r} 版设计，指纹 {f}', { j: pv.job.job_no, r: pv.job.rev, f: pv.fingerprint.slice(0, 12) }) }}</p>
           <h3>{{ t('新物料') }}</h3>
