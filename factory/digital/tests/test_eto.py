@@ -236,7 +236,10 @@ def test_bridge_creates_project_item_and_quotation(mock_erp):
     assert first[-1]["proposal_done"] and [c[0] for c in first[-1]["created"]] == ["Project", "Item", "Quotation"]
     assert not any(x["action"] == "failed" for x in first + again)
     assert [x["doctype"] for x in again] == ["Quotation"]                  # 第二次只多一张报价单
-    proj = M.db["Project"]["JOB-2026-0007"]
+    pname = first[-1]["created"][0][1]
+    assert pname.startswith("PROJ-")                                        # 真 ERPNext 按编号规则给项目起名，不等于作业号
+    proj = M.db["Project"][pname]
+    assert proj["project_name"] == "JOB-2026-0007"
     assert proj["customer"] == "示例·客户甲 (Demo)" and proj["status"] == "Open"
     assert M.db["Item"]["JOB-2026-0007"]["item_group"] == F.KIND_GROUP["fg"]
     q = M.db["Quotation"][first[-1]["created"][2][1]]

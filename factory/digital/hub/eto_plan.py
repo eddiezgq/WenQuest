@@ -219,11 +219,12 @@ def load(db, mode, job_no=None, today=None):
             ws = F.OPERATIONS.get(op)
             for d in days:
                 bucket[ws][week(d)] += m * qty / len(days)
+    proj = E.project_of(E.job(db, mode, job_no)) if job_no else None
     for w in o.wos:
         d = w["data"]
         if d.get("status") in ("Completed", "Stopped", "Closed", "Cancelled") or d.get("docstatus") == 2:
             continue
-        if job_no and d.get("project") == job_no:
+        if proj and d.get("project") == proj:
             continue
         try:
             a = dt.date.fromisoformat(str(d.get("planned_start_date"))[:10])

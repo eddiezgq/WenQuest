@@ -472,6 +472,11 @@ def quote_preview(db, mode, job_no, cfg=None):
     }
 
 
+def project_of(j):
+    """作业在 ERPNext 里的项目名：真 ERPNext 按编号规则命名（如 PROJ-0001），不一定等于作业号；报价执行时记下"""
+    return (j or {}).get("project") or (j or {}).get("job_no")
+
+
 def on_proposal_done(db, action, preview, mode):
     """桥接建好 Project、物料、报价单后：作业记为已报价，冻结这一版估算"""
     if action != "eto_quote":

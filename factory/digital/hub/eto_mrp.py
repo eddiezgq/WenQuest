@@ -21,7 +21,7 @@ from hub import mrp
 from hub.kpi import TZ, Overview, add_working_days
 
 
-def _pegged(o, job_no):
+def _pegged(o, job_no):          # job_no：作业在 ERPNext 里的项目名（E.project_of）
     """已经挂在这个作业上的供应：工单（未完成数）、请购单与采购单（未收数）"""
     sup = defaultdict(float)
     for w in o.wos:
@@ -78,8 +78,9 @@ def plan(db, mode, job_no, now=None):
     smk = {x["item_code"]: x for x in (sch or {}).get("make", [])}
     sby = {x["item_code"]: x for x in (sch or {}).get("buy", [])}
     stock = o.stock()
-    on_order, committed = mrp.supply_demand(o, exclude_project=job_no)
-    pegged = _pegged(o, job_no)
+    on_order, committed = mrp.supply_demand(o, exclude_project=E.project_of(j))
+    proj = E.project_of(j)
+    pegged = _pegged(o, proj)
     own = lambda c: c == job_no or c.startswith(job_no + "-")  # noqa: E731
     lv = _llc(job_no)
     gross = defaultdict(float)
@@ -145,7 +146,8 @@ def plan(db, mode, job_no, now=None):
                         "supplier": None, "reason": "外协（{}）".format(x.get("desc") or "")})
             if not lead:
                 warns.append("外协 {} 没写周期，需求日暂按 {}".format(x.get("desc") or code, start.isoformat()))
-    return {"job": {"job_no": job_no, "title": j["title"], "qty": j["qty"], "design_rev": rel["rev"], "sales_order": j["sales_order"]},
+    return {"job": {"job_no": job_no, "title": j["title"], "qty": j["qty"], "design_rev": rel["rev"], "sales_order": j["sales_order"],
+                    "project": proj},
             "mrp": rows, "work_orders": wos, "material_requests": mrs, "service_items": services, "warnings": warns,
             "basis": "本单专用件只认挂在作业上的工单、请购单；通用件先用自由库存（实有 − 安全库存 − 其他订单占用），再认挂在作业上的在途"}
 
@@ -196,7 +198,8 @@ def early_buy_preview(db, mode, job_no, codes):
                      "reason": "长周期件提前采购（设计第 {} 版{}）".format(d["rev"], "，未发布" if d["status"] != "released" else "")})
     if not rows:
         raise E.EtoError("没有选物料")
-    return {"job": {"job_no": job_no, "title": j["title"], "design_rev": d["rev"], "design_status": d["status"]}, "material_requests": rows}
+    return {"job": {"job_no": job_no, "title": j["title"], "design_rev": d["rev"], "design_status": d["status"], "project": E.project_of(j)},
+            "material_requests": rows}
 
 
 def early_candidates(db, mode, job_no):

@@ -72,7 +72,7 @@ def order_preview(db, mode, job_no, delivery_date=None, today=None):
                       "on": m["on"], "due_date": (today if m["on"] == "order" else due).isoformat()})
     return {"job": {"job_no": job_no, "title": j["title"], "customer": j["customer"], "rev": j["quoted_rev"]},
             "sales_order": {"customer": j["customer"], "item_code": job_no, "qty": j["qty"], "rate": b["unit_price"], "amount": b["price"],
-                            "transaction_date": today.isoformat(), "delivery_date": due.isoformat(), "project": job_no,
+                            "transaction_date": today.isoformat(), "delivery_date": due.isoformat(), "project": E.project_of(j),
                             "quotation": j["quotation"], "payment_schedule": sched}}
 
 
@@ -343,17 +343,17 @@ def release_preview(db, mode, job_no):
                                                         for c, q in b["components"]],
                      "operations": [{"operation": op, "workstation": F.OPERATIONS[op], "time_in_mins": float(m),
                                      "hour_rate": float(sum(F.WORKSTATIONS[F.OPERATIONS[op]][1]))} for op, m in b["routing"]]})
-    return {"job": {"job_no": job_no, "title": j["title"], "rev": d["rev"]}, "fingerprint": fp, "items": items, "boms": boms,
+    return {"job": {"job_no": job_no, "title": j["title"], "rev": d["rev"], "project": E.project_of(j)}, "fingerprint": fp, "items": items, "boms": boms,
             "warnings": warns, "affected": affected(db, mode, job_no), "outside": spec.get("outside") or []}
 
 
 def affected(db, mode, job_no):
     """已经挂在这个作业上、还没完的工单、请购单、采购单（设计改版时要人逐条处理）"""
-    out = []
+    out, proj = [], E.project_of(E.job(db, mode, job_no))
     for dt_ in ("Work Order", "Material Request", "Purchase Order"):
         for m in db.erp_docs(dt_, mode):
             d = m["data"]
-            if d.get("project") == job_no and d.get("docstatus") != 2 and d.get("status") not in ("Completed", "Closed", "Cancelled", "Stopped"):
+            if d.get("project") == proj and d.get("docstatus") != 2 and d.get("status") not in ("Completed", "Closed", "Cancelled", "Stopped"):
                 out.append({"doctype": dt_, "name": d["name"], "status": d.get("status")})
     return out
 

@@ -585,7 +585,7 @@ def eto(teacher):
     run("order", "接单提议执行（销售订单带付款计划）")
     j = hub("GET", "/api/eto/jobs/" + jn, token=sales)["job"]
     so = [x for x in erp_docs("Sales Order") if x.get("name") == j.get("sales_order")]
-    check(j["status"] == "ordered" and so and so[0].get("project") == jn, "作业已接单：销售订单 {}，挂项目 {}".format(j.get("sales_order"), jn))
+    check(j["status"] == "ordered" and so and so[0].get("project") == j["project"], "作业已接单：销售订单 {}，挂项目 {}".format(j.get("sales_order"), j["project"]))
     spec = hub("POST", "/api/eto/jobs/{}/design/draft".format(jn), token=sales)
     d = hub("PUT", "/api/eto/jobs/{}/design".format(jn), {"spec": spec}, sales)
     check(not d["errors"], "照估算起草设计、检查通过（{}）".format(d["errors"][:2]))
@@ -597,7 +597,7 @@ def eto(teacher):
           "设计第 {} 版已发布，ERPNext 物料清单带指纹 {}".format(d["design"]["rev"], (fp or "")[:12]))
     # 139c：作业算料 → 工单（挂作业号）
     run("materials", "作业算料提议执行（工单、请购挂作业号）")
-    wos = [x for x in erp_docs("Work Order") if x.get("project") == jn and x.get("docstatus") == 1]
+    wos = [x for x in erp_docs("Work Order") if x.get("project") == j["project"] and x.get("docstatus") == 1]
     check(any(x.get("production_item") == jn for x in wos), "ERPNext 里有作业 {} 的工单（{}）".format(jn, "、".join(x["name"] for x in wos)))
     sc = hub("GET", "/api/eto/jobs/{}/schedule".format(jn), token=sales)                     # 139d
     check(sc["make"] and sc["earliest"] and "slack_days" in sc and sc["load"]["rows"], "倒排：最早 {} 能交，松紧 {} 个工作日".format(sc["earliest"], sc["slack_days"]))
