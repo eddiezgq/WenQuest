@@ -46,7 +46,11 @@ ASM_OL = {"OA-S1": "分装 1", "OA-S2": "分装 2", "OA-ADJ": "调试", "OA-RUN"
           "OA-PK": "清洗包装", **{f"OA-B{i:02d}": f"B{i:02d}" for i in range(1, 7)}}
 ROWMAP = {"CAST-LS": ("2.2", FOUNDRY), "CAST-OL": ("2.2", FOUNDRY), "HSG-LS": ("3.2", HSG_LS), "HSG-OL": ("3.3", HSG_OL),
           "LS-101": ("4.2", SHAFT), "LS-102": ("4.2", SHAFT), "OL-101": ("4.2", SHAFT),
-          "WQ-LS": ("五", ASM_LS), "WQ-OL": ("六", ASM_OL)}
+          "WQ-LS": ("五", ASM_LS), "WQ-OL": ("六", ASM_OL),
+          # 第 137 轮补的工艺规程：表里的工序号就是工艺路线的工序号
+          "LS-201": ("4.3", None), "OL-201": ("4.3", None), "LS-301": ("4.4", None), "LS-401": ("4.5", None), "OL-401": ("4.5", None)}
+# 计量室检验规程（7.1）：设备名 → 计量室的设备
+METRO_UNIT = [("三坐标", "cmm-1"), ("凸轮", "cmm-2"), ("圆度仪", "cmm-3"), ("粗糙度", "cmm-4"), ("清洁度", "cmm-5")]
 # 方案 4.1 节零件表里的哪一行（没有逐道工序的工艺规程，只有路线和关键特性）
 PARTROW = {"LS-101": "平缝上轴", "LS-102": "平缝下轴", "OL-101": "包缝主轴", "LS-201": "针杆", "OL-201": "针杆",
            "LS-301": "旋梭", "LS-401": "偏心", "OL-401": "偏心"}
@@ -97,6 +101,17 @@ def parse_doc(text):
 def table_rows(sec):
     head, *rows = sec["tables"][0]
     return head, rows
+
+
+def first_list(lines):
+    """小节里第一段连续的“- ”列表（关键孔系）"""
+    out = []
+    for l in lines:
+        if l.startswith("- "):
+            out.append(l)
+        elif out:
+            break
+    return out
 
 
 def md_inline(s):
@@ -158,7 +173,7 @@ def main():
     for item, (sk, mp) in ROWMAP.items():
         steps = routings[made[item]["routing"]]
         for code, _ in steps:
-            key = mp.get(code)
+            key = mp.get(code) if mp else code
             hit = find_row(sk, key) if key else None
             if not hit:
                 missing.append((item, code))
@@ -185,6 +200,17 @@ def main():
         fqc[code] = [r for r in rows23 if any(r[0].startswith(k) for k in kws)]
     defects = secs["2.3"]["tables"][1] if len(secs["2.3"]["tables"]) > 1 else []
 
+    # 计量室抽检（7.1）：按零件、按设备
+    head71, rows71 = table_rows(secs["7.1"])
+    metro = []
+    for r in rows71:
+        its = re.findall(r"(?:CAST|HSG)-(?:LS|OL)|[A-Z]{2}-\d{3}", r[0])
+        unit = next((u for k, u in METRO_UNIT if k in r[2]), None)
+        if not its or not unit:
+            raise SystemExit(f"计量室检验规程这一行对不上零件或设备：{r}")
+        metro.append({"items": its, "unit": unit, "row": r})
+    metro_intro = secs["7.1"]["lines"][:1]
+
     # 每个工位做哪些（零件, 工序）
     unit_jobs = {}
     for item, mk in made.items():
@@ -203,10 +229,10 @@ def main():
         "routings": routings, "meas": meas, "docrows": docrows, "partrows": partrows, "castrows": castrows,
         "fqc": {"head": head23, "rows": fqc}, "defects": defects, "unitJobs": unit_jobs,
         "principles": secs["3.1"]["lines"],
-        "holes": {"HSG-LS": [l for l in secs["3.2"]["lines"] if l.startswith("- ")],
-                  "HSG-OL": [l for l in secs["3.3"]["lines"] if l.startswith("- ")]},
+        "holes": {"HSG-LS": first_list(secs["3.2"]["lines"]), "HSG-OL": first_list(secs["3.3"]["lines"])},
         "asmNote": {"WQ-LS": secs["五"]["lines"][:1], "WQ-OL": secs["六"]["lines"][:1]},
         "general": secs["八"]["lines"],
+        "metro": {"head": head71, "rows": metro, "intro": metro_intro, "src": f"《缝纫机厂工艺方案》{secs['7.1']['title']}"},
     }
     tpl = (HERE / "template.html").read_text(encoding="utf-8")
     out = tpl.replace("/*__DATA__*/null", json.dumps(data, ensure_ascii=False, separators=(",", ":")))

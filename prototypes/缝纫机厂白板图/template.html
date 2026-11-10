@@ -150,6 +150,7 @@ td.num{text-align:right;white-space:nowrap}
         <button role="tab" data-t="route" aria-selected="true">工艺卡</button>
         <button role="tab" data-t="op" aria-selected="false">工序卡</button>
         <button role="tab" data-t="qc" aria-selected="false">检验规程</button>
+        <button role="tab" data-t="metro" aria-selected="false" hidden>抽检任务</button>
       </div>
       <div class="dbody" id="dbody"></div>
     </section>
@@ -378,7 +379,8 @@ function drawPlant() {
     ['housing', 'ol', '包缝机壳 HSG-OL', 'violet', 26, false],
     ['parts', 'ls', '轴、针杆、旋梭、偏心', 'green', 14, false],
     ['parts', 'ol', '主轴、针杆、偏心', 'green', 8, false],
-    ['housing', 'metro', '三坐标抽检', 'orange', 10, true],
+    ['housing', 'metro', '机壳三坐标抽检', 'orange', 10, true],
+    ['parts', 'metro', '轴、针杆、旋梭、偏心抽检', 'orange', 30, true],
   ];
   flows.forEach(([a, b, s, col, lift, dash], i) => {
     const pa = centers[a].slice(), pb = centers[b].slice();
@@ -553,9 +555,47 @@ function openUnit(id, pref) {
   const jb = $('#djobs');
   jb.innerHTML = jobs.length > 1 ? jobs.map(([it, c], i) => `<button class="chip" data-i="${i}" aria-pressed="${job && it === job[0] && c === job[1]}">${esc(it)} · ${esc(c)}</button>`).join('') : '';
   jb.querySelectorAll('[data-i]').forEach((b) => b.onclick = () => { job = jobs[+b.dataset.i]; jb.querySelectorAll('.chip').forEach((x) => x.setAttribute('aria-pressed', x === b)); renderTab(); });
-  $('#dtabs').hidden = !job;
+  const mt = metroRows(id);
+  const mtab = $('#dtabs').querySelector('[data-t="metro"]');
+  mtab.hidden = !mt.length;
+  if (!mt.length && tab === 'metro') tab = 'route';
+  if (mt.length && (!job || !pref)) tab = 'metro';
+  $('#dtabs').querySelectorAll('[data-t="route"],[data-t="op"],[data-t="qc"]').forEach((b) => { b.hidden = !job; });
+  $('#dtabs').hidden = !job && !mt.length;
   dr.classList.add('open');
   renderTab();
+}
+function bindLinks(body, jb) {
+  const [item, code] = jb || [];
+  body.querySelectorAll('tr.go').forEach((tr) => tr.onclick = () => {
+    const c = tr.dataset.op, uu = D.ops[c].units[0];
+    go({ view: 'zone', zone: D.units[uu].zone, unit: uu, job: [item, c] });
+  });
+  body.querySelectorAll('[data-u]').forEach((b) => b.onclick = () => {
+    const uu = b.dataset.u, it = b.dataset.item || item;
+    const js = D.unitJobs[uu] || [];
+    const j = it ? (js.find((x) => x[0] === it && x[1] === code) || js.find((x) => x[0] === it)) : null;
+    if (b.dataset.tab) tab = b.dataset.tab;
+    go({ view: 'zone', zone: D.units[uu].zone, unit: uu, job: j || (jb && uu !== state.unit ? null : jb) || null });
+  });
+}
+const metroRows = (unit) => D.metro.rows.filter((r) => r.unit === unit);
+function metroTable(rows, showItem, showUnit) {
+  const H = D.metro.head;
+  return `<div class="tw"><table><thead><tr>${showItem ? `<th>${esc(H[0])}</th>` : ''}<th>${esc(H[1])}</th>${showUnit ? `<th>${esc(H[2])}</th>` : ''}<th>${esc(H[3])}</th><th>${esc(H[4])}</th></tr></thead><tbody>` +
+    rows.map((r) => `<tr>${showItem ? `<td>${md(r.row[0])}<div class="ulinks">${r.items.map((it) => {
+      const j = (D.unitJobs[r.unit] || []).find((x) => x[0] === it);
+      const lu = j ? r.unit : (D.made[it] ? D.ops[D.routings[D.made[it].routing].slice(-1)[0][0]].units[0] : null);
+      return lu ? `<button data-u="${esc(lu)}" data-item="${esc(it)}" data-tab="qc">${esc(it)}</button>` : '';
+    }).join('')}</div></td>` : ''}<td>${md(r.row[1])}</td>${showUnit ? `<td>${md(r.row[2])}<div class="ulinks"><button data-u="${esc(r.unit)}" data-tab="metro">${esc(r.unit)}</button></div></td>` : ''}<td>${md(r.row[3])}</td><td>${md(r.row[4])}</td></tr>`).join('') +
+    `</tbody></table></div>`;
+}
+function metroCard(id) {
+  const u = D.units[id], rows = metroRows(id);
+  const parts = [...new Set(rows.flatMap((r) => r.items))];
+  return `<div class="card"><div class="ct"><b>计量室检验任务</b><span>${esc(id)}</span></div>` +
+    kv([['设备', esc(u.name)], ['所在', esc(ZONE[u.zone]?.name)], ['抽检的零件', esc(parts.join('、'))], ['任务数', rows.length]]) +
+    `<div class="sec"><p>${md(D.metro.intro.join(''))}</p></div><div class="sec"><h4>检验项目与频次（点零件号看它的检验规程）</h4>${metroTable(rows, true, false)}<div class="src">出处：${esc(D.metro.src)}</div></div></div>`;
 }
 function closeDrawer() { $('#drawer').classList.remove('open'); }
 $('#dclose').onclick = () => go({ view: 'zone', zone: state.zone });
@@ -570,19 +610,16 @@ function renderTab() {
   $('#dtabs').querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', b.dataset.t === tab));
   const body = $('#dbody');
   const id = state.unit, u = D.units[id];
+  if (tab === 'metro') { body.innerHTML = metroCard(id); bindLinks(body, null); return; }
   if (!job) {
     body.innerHTML = `<div class="card"><div class="ct"><b>设备卡</b><span>${esc(id)}</span></div>${kv([['名称', esc(u.name)], ['英文', esc(u.en)], ['所在', esc(ZONE[u.zone]?.name || '物流通道')],
       ['工作中心', esc(u.ws || '—')], ['外形', u.lay ? `${u.lay[2]} × ${u.lay[3]} × ${u.h} m` : '—']])}
-      <div class="sec"><p class="empty">这台设备 / 这个库位不在任何零件的工艺路线上（库房、物流、计量抽检设备），所以没有工艺卡、工序卡。</p></div></div>`;
+      <div class="sec"><p class="empty">这台设备 / 这个库位不在任何零件的工艺路线上（库房、物流），所以没有工艺卡、工序卡。</p></div></div>`;
     return;
   }
   const [item, code] = job;
   body.innerHTML = tab === 'route' ? routeCard(item, code) : tab === 'op' ? opCard(item, code) : qcCard(item, code);
-  body.querySelectorAll('tr.go').forEach((tr) => tr.onclick = () => {
-    const c = tr.dataset.op, uu = D.ops[c].units[0];
-    go({ view: 'zone', zone: D.units[uu].zone, unit: uu, job: [item, c] });
-  });
-  body.querySelectorAll('[data-u]').forEach((b) => b.onclick = () => go({ view: 'zone', zone: D.units[b.dataset.u].zone, unit: b.dataset.u, job: [item, code] }));
+  bindLinks(body, job);
   body.scrollTop = 0;
 }
 function cardKind(item) {
@@ -595,6 +632,8 @@ function material(item) {
   if (pr) return esc(pr[1]);
   const cr = D.castrows[item]?.fields.find(([k]) => k.startsWith('材料'));
   if (cr) return esc(cr[1]);
+  const blank = D.made[item].bom.find(([c]) => D.made[c] && c.startsWith('CAST'));
+  if (blank) { const cm = D.castrows[blank[0]]?.fields.find(([k]) => k.startsWith('材料')); return `铸件 ${esc(blank[0])}${cm ? '（' + esc(cm[1]) + '）' : ''}`; }
   const raw = D.made[item].bom.find(([c]) => (D.items[c]?.kind === 'raw'));
   return raw ? esc(raw[1]) : '';
 }
@@ -603,7 +642,7 @@ function routeCard(item, code) {
   const total = steps.reduce((s, [, t]) => s + t, 0);
   let h = `<div class="card"><div class="ct"><b>${cardKind(item)}</b><span>${esc(m.routing)}</span></div>`;
   h += kv([['零件号', esc(item)], ['名称', esc(D.items[item]?.name)], ['用于', esc((parentOf[item] || []).join('、') || '出厂整机')],
-    ['材料', material(item)], ['工序数', steps.length], ['单件工时合计', `${+total.toFixed(1)} min`]]);
+    ['材料', material(item)], ['工序数', steps.length], ['工时合计（含按炉工序）', `${+total.toFixed(1)} min`]]);
   const extra = D.castrows[item] || D.partrows[item];
   if (extra) h += `<div class="sec"><h4>零件要点</h4>${fieldsDl(extra.fields, 1)}<div class="src">出处：${esc(extra.src)}</div></div>`;
   if (D.holes[item]) h += `<div class="sec"><h4>关键孔系</h4><ul>${D.holes[item].map((l) => `<li>${md(l.slice(2))}</li>`).join('')}</ul></div>`;
@@ -666,6 +705,8 @@ function qcCard(item, code) {
     }
   }
   if (!qf && !ms && !(fq && fq.length)) h += `<div class="sec"><p class="empty">方案没有给这道工序单列检验要求；按下面的通用检验规程执行（首件、巡检、完工检）。</p></div>`;
+  const mr = D.metro.rows.filter((r) => r.items.includes(item));
+  if (mr.length) h += `<div class="sec"><h4>计量室首件与抽检（三坐标等）</h4>${metroTable(mr, false, true)}<div class="src">出处：${esc(D.metro.src)}</div></div>`;
   h += `<div class="sec"><h4>通用检验规程</h4>${generalHtml()}</div></div>`;
   return h;
 }
