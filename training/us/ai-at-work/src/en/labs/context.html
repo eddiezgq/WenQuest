@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab 1-2 · What the model sees</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,'DejaVu Sans',Arial,sans-serif;background:#f6f7f9;color:#14213a;padding:26px 34px}
+h1{font-size:28px;font-weight:800}
+.sub{color:#5b6b82;font-size:18px;margin-top:6px}
+.wrap{display:grid;grid-template-columns:330px 1fr 1fr;gap:22px;margin-top:20px}
+.card{background:#fff;border:1px solid #dfe5ee;border-radius:18px;padding:18px 20px;box-shadow:0 8px 24px rgba(20,33,58,.06)}
+.card h2{font-size:19px;color:#5b6b82;font-weight:700;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+label{display:flex;gap:12px;align-items:flex-start;font-size:19px;padding:10px 6px;border-radius:10px;cursor:pointer}
+label:hover{background:#f2f5f9}
+label input{width:22px;height:22px;margin-top:3px;accent-color:#f2b705;flex:none}
+label small{display:block;color:#5b6b82;font-size:15px;margin-top:2px}
+pre{white-space:pre-wrap;font-family:inherit;font-size:17px;line-height:1.5}
+.k{color:#a07800;font-weight:700}
+#meter{height:14px;border-radius:7px;background:#eef2f7;margin-top:14px;overflow:hidden}
+#meter i{display:block;height:100%;background:#2ec4b6;transition:width .3s}
+#mt{font-size:17px;margin-top:8px;color:#5b6b82}
+.out{font-size:17px;line-height:1.55}
+.flag{display:inline-block;font-size:14px;font-weight:700;padding:3px 8px;border-radius:6px;margin:2px 4px 2px 0}
+.bad{background:#ffe2d6;color:#a3401a}.ok{background:#d6f5f1;color:#0d6b62}
+</style></head><body>
+<h1>Lab 1-2 · What the model sees</h1>
+<div class="sub">Task: a supplier shipment is late. Tick what you give the AI and watch the draft change. The model only knows what is in the box.</div>
+<div class="wrap">
+  <div class="card"><h2>Context you provide</h2>
+    <label><input type="checkbox" id="c-role">Role &amp; audience<small>who you are, who reads it</small></label>
+    <label><input type="checkbox" id="c-facts">Source facts<small>PO, part, dates, impact</small></label>
+    <label><input type="checkbox" id="c-goal">The outcome you want<small>what you need from them</small></label>
+    <label><input type="checkbox" id="c-fmt">Format<small>length, structure</small></label>
+    <label><input type="checkbox" id="c-limits">Limits<small>what not to say or promise</small></label>
+    <div id="meter"><i></i></div><div id="mt"></div>
+  </div>
+  <div class="card"><h2>What the model sees (your prompt)</h2><pre id="prompt"></pre></div>
+  <div class="card"><h2>A typical draft back</h2><div class="out" id="out"></div><div id="flags" style="margin-top:12px"></div></div>
+</div>
+<script>
+var P={
+ base:'Write an email to our supplier about a late shipment.',
+ role:'<span class="k">Role:</span> I am the buyer at a 60-person machine shop in Tampa. The reader is our account manager at the casting supplier.',
+ facts:'<span class="k">Facts:</span> PO 45127, 200 pcs housing casting P/N HC-220. Promised Nov 3; still not shipped. Our customer line stops Nov 17 without them.',
+ goal:'<span class="k">Outcome:</span> a firm ship date by Friday, and a partial shipment of 80 pcs this week if possible.',
+ fmt:'<span class="k">Format:</span> under 120 words, 3 short paragraphs, subject line first.',
+ limits:'<span class="k">Limits:</span> polite; do not threaten penalties; do not mention our customer by name; cc purchasing@ourshop.com.'};
+function on(id){return document.getElementById('c-'+id).checked;}
+function render(){
+ var ids=['role','facts','goal','fmt','limits'],have=ids.filter(on);
+ document.getElementById('prompt').innerHTML=[P.base].concat(have.map(function(i){return P[i];})).join('\n\n');
+ var out=[],flags=[];
+ out.push(on('fmt')?'<b>Subject: PO 45127 – firm ship date needed by Friday</b><br><br>':(on('facts')?'<b>Subject: Late shipment – PO 45127</b><br><br>':'<b>Subject: Late Shipment</b><br><br>'));
+ out.push(on('role')?'Hi Dana,<br><br>':'Dear Supplier,<br><br>');
+ if(on('facts'))out.push('Our PO 45127 for 200 HC-220 housing castings was due Nov 3 and has not shipped. We need them to keep a customer line running after Nov 17. ');
+ else{out.push('I am writing regarding our recent order, which has not arrived as expected. ');flags.push(['bad','no PO / part / dates — the AI cannot know them']);}
+ if(on('goal'))out.push('Could you confirm a firm ship date by Friday, and ship a partial 80 pcs this week if possible? ');
+ else{out.push('Please let us know the status at your earliest convenience. ');flags.push(['bad','no clear ask — reply will be vague']);}
+ if(on('limits'))out.push('<br><br>We value working with you and appreciate your help.<br><br>(cc: purchasing@ourshop.com)');
+ else{out.push('<br><br>Please be aware that continued delays may result in penalties and affect our future business with your company.');flags.push(['bad','invented threat — you never said that']);}
+ if(!on('fmt')){out.push('<br><br>We look forward to resolving this matter promptly and maintaining our strong partnership going forward. Thank you for your attention to this matter.');flags.push(['bad','padding — longer than needed']);}
+ out.push('<br><br>Best regards,<br>'+(on('role')?'[Your name], Buyer':'[Your Name]'));
+ if(!on('role'))flags.push(['bad','generic tone and greeting']);
+ if(!flags.length)flags.push(['ok','ready to review and send — you still read it before sending']);
+ document.getElementById('out').innerHTML=out.join('');
+ document.getElementById('flags').innerHTML=flags.map(function(f){return '<span class="flag '+f[0]+'">'+f[1]+'</span>';}).join('');
+ document.querySelector('#meter i').style.width=(have.length*20)+'%';
+ document.getElementById('mt').textContent=have.length+' of 5 pieces of context';
+}
+document.querySelectorAll('input').forEach(function(i){i.addEventListener('change',render);});
+render();
+</script>
+</body></html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lab 1-1 · How a language model picks the next words</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,'DejaVu Sans',Arial,sans-serif;background:#f6f7f9;color:#14213a;padding:28px 36px}
+h1{font-size:28px;font-weight:800}
+.sub{color:#5b6b82;font-size:18px;margin-top:6px}
+.wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:28px;margin-top:22px}
+.card{background:#fff;border:1px solid #dfe5ee;border-radius:18px;padding:22px 24px;box-shadow:0 8px 24px rgba(20,33,58,.06)}
+.prompt{font-size:24px;line-height:1.4}
+.prompt b{background:#fff3c4;padding:2px 8px;border-radius:6px;font-weight:700}
+.row{display:flex;align-items:center;gap:12px;margin:14px 0}
+.lbl{width:110px;font-size:20px;font-weight:700;text-align:right}
+.bar{flex:1;height:30px;background:#eef2f7;border-radius:8px;position:relative;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:#4c8dff;transition:width .35s}
+.bar i.ok{background:#2ec4b6}.bar i.bad{background:#ff7a45}
+.pct{width:70px;font-size:20px;font-variant-numeric:tabular-nums}
+.ctl{display:flex;align-items:center;gap:16px;margin-top:18px;font-size:20px}
+input[type=range]{flex:1;accent-color:#f2b705}
+button{font:inherit;font-size:20px;font-weight:700;border:0;border-radius:12px;padding:12px 20px;background:#f2b705;color:#14213a;cursor:pointer}
+button.alt{background:#e7ecf3}
+.legend{font-size:16px;color:#5b6b82;margin-top:10px}
+.legend span{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin:0 6px 0 14px}
+#hist{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;min-height:90px;align-content:flex-start}
+#hist span{font-size:17px;padding:6px 10px;border-radius:8px;font-weight:700}
+#hist .ok{background:#d6f5f1;color:#0d6b62}#hist .bad{background:#ffe2d6;color:#a3401a}
+.score{font-size:22px;margin-top:14px}
+.score b{font-size:30px}
+#viz{margin-top:22px;background:#0b1424;border-radius:18px;padding:26px 30px;color:#f3f6fa;min-height:190px}
+#viz .p{font-size:26px;line-height:1.45;color:#c9d6e6}
+#viz .t{color:#f2b705;font-weight:800}
+#viz .v{font-size:22px;margin-top:14px;min-height:30px}
+#viz .v.ok{color:#2ec4b6}#viz .v.bad{color:#ff7a45}
+.cursor{display:inline-block;width:12px;height:26px;background:#f2b705;vertical-align:-4px;animation:bl 1s steps(2) infinite}
+@keyframes bl{50%{opacity:0}}
+</style></head><body>
+<h1>Lab 1-1 · How a language model picks the next words</h1>
+<div class="sub">The model scores every possible continuation, turns the scores into probabilities, then draws one. "Temperature" controls how adventurous the draw is.</div>
+<div class="wrap">
+  <div>
+    <div class="card">
+      <div class="prompt">"The ultimate tensile strength of 6061-T6 aluminum is about <b>___</b>"</div>
+      <div id="bars"></div>
+      <div class="legend"><span style="background:#2ec4b6"></span>correct for UTS<span style="background:#ff7a45"></span>wrong (276 MPa / 40 ksi is the <i>yield</i> strength)</div>
+      <div class="ctl">Temperature <input id="temp" type="range" min="0.1" max="2" step="0.1" value="0.7"><b id="tv">0.7</b></div>
+    </div>
+    <div id="viz"><div class="p">The ultimate tensile strength of 6061-T6 aluminum is about <span class="t" id="vt"></span><span class="cursor"></span></div><div class="v" id="vv"></div></div>
+  </div>
+  <div class="card">
+    <div class="row" style="margin-top:0"><button id="sample">Ask once ▶</button><button id="ten" class="alt">Ask 10 times</button><button id="clear" class="alt">Clear</button></div>
+    <div class="score">Answers so far: <b id="n">0</b> &nbsp; wrong: <b id="w" style="color:#ff7a45">0</b> (<span id="wp">–</span>)</div>
+    <div id="hist"></div>
+    <div class="legend" style="margin-top:16px">Every answer reads fluently. Nothing on the screen tells you which ones are wrong — only checking a primary source does.</div>
+  </div>
+</div>
+<script>
+// Same numbers as course/calc/ch01.py (checked by tools/check_ch01.py)
+var LOGITS={"310 MPa":2.2,"45 ksi":1.6,"276 MPa":1.9,"290 MPa":1.0,"40 ksi":1.1,"350 MPa":0.4};
+var OK={"310 MPa":1,"45 ksi":1};
+var keys=Object.keys(LOGITS),n=0,w=0;
+function probs(t){var z={},s=0;keys.forEach(function(k){z[k]=Math.exp(LOGITS[k]/t);s+=z[k];});keys.forEach(function(k){z[k]/=s;});return z;}
+function T(){return +document.getElementById('temp').value;}
+function draw(){var p=probs(T());document.getElementById('tv').textContent=T().toFixed(1);
+ document.getElementById('bars').innerHTML=keys.map(function(k){return '<div class="row"><div class="lbl">'+k+'</div><div class="bar"><i class="'+(OK[k]?'ok':'bad')+'" style="width:'+(p[k]*100).toFixed(1)+'%"></i></div><div class="pct">'+(p[k]*100).toFixed(1)+'%</div></div>';}).join('');}
+function pick(){var p=probs(T()),r=Math.random(),c=0;for(var i=0;i<keys.length;i++){c+=p[keys[i]];if(r<c)return keys[i];}return keys[keys.length-1];}
+function ask(){var k=pick();n++;if(!OK[k])w++;var h=document.getElementById('hist');var s=document.createElement('span');s.className=OK[k]?'ok':'bad';s.textContent=k;h.appendChild(s);
+ while(h.children.length>40)h.removeChild(h.firstChild);
+ document.getElementById('n').textContent=n;document.getElementById('w').textContent=w;document.getElementById('wp').textContent=(100*w/n).toFixed(0)+'%';}
+document.getElementById('temp').addEventListener('input',draw);
+document.getElementById('sample').onclick=ask;
+document.getElementById('ten').onclick=function(){for(var i=0;i<10;i++)ask();};
+document.getElementById('clear').onclick=function(){n=0;w=0;document.getElementById('hist').innerHTML='';document.getElementById('n').textContent=0;document.getElementById('w').textContent=0;document.getElementById('wp').textContent='–';};
+draw();
+// The dark panel types an answer, says whether it is right, and repeats for ever (used as the live cover).
+(function loop(){var k=pick(),i=0,vt=document.getElementById('vt'),vv=document.getElementById('vv');vt.textContent='';vv.textContent='';vv.className='v';
+ var id=setInterval(function(){vt.textContent=k.slice(0,++i);if(i>=k.length){clearInterval(id);
+  setTimeout(function(){vv.className='v '+(OK[k]?'ok':'bad');vv.textContent=OK[k]?'✓ Correct — but it sounds exactly as sure when it is wrong.':(k==='276 MPa'||k==='40 ksi')?'✗ Wrong — that is the yield strength, not the tensile strength. It still sounded certain.':'✗ Wrong — no reference gives that value. It still sounded certain.';},500);
+  setTimeout(loop,3200);}},120);})();
+</script>
+</body></html>

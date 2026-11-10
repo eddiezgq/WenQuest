@@ -1,0 +1,245 @@
+# Session 1 · How Generative AI Works — and Where It Breaks（第 140 轮 · A 课第 1 次课，样品）
+# 每页最多 3 条；[中文, English]，美国班用 --lang en 只出英文。{{ch01.键:格式}} 由 course/calc/ch01.py 算出。
+lesson: 1
+code: [ch01]
+
+clips:
+  hero:            # 封面：同一个问题被一遍遍回答，有对有错，语气一样（页面自己循环）
+    page: cover1
+    selector: "#stage"
+  sweep:           # 温度 0.2 → 1.5 来回扫，柱状概率跟着变（一直循环）
+    page: nexttoken
+    selector: ".card"
+    vw: 1500
+    vh: 900
+    loop: 16
+    steps:
+      - {at: 0, set: {temp: 0.2}}
+      - {at: 4, set: {temp: 0.7}}
+      - {at: 8, set: {temp: 1.5}}
+      - {at: 12, set: {temp: 0.7}}
+
+slides:
+  - layout: cover
+    video: hero
+    kicker: ["第 1 次课", "Session 1"]
+    title: ["AI 怎样工作，在哪里出错", "How Generative AI Works — and Where It Breaks"]
+    sub: ["它说得很肯定，但它在“猜”", "It sounds certain. It is predicting."]
+    notes:
+      - "欢迎来到《职场 AI 实战》。今天两小时，我们先把底子打牢：AI 写东西时到底在做什么，为什么它有时一本正经地说错。看背景里这个面板：同一个问题问了一遍又一遍，大多数时候答对，偶尔答错，但语气永远一样肯定。今天结束时，你会知道什么时候该信它、什么时候该查。"
+      - "Welcome to Practical AI at Work. Today we build the foundation: what AI is actually doing when it writes, and why it is sometimes confidently wrong. Watch the panel behind me: the same question, asked again and again. Mostly right, sometimes wrong, always in the same confident tone. By the end of today you'll know when to trust it and when to check."
+
+  - layout: question
+    tag: ["工作中的问题", "A problem from work"]
+    title: ["AI 说是 276 MPa，能写进报告吗？", "The AI says 276 MPa. Does it go in the report?"]
+    facts:
+      - ["工程师在写支架强度报告，问 AI：6061-T6 铝的抗拉强度是多少", "An engineer writing a bracket report asks AI for the tensile strength of 6061-T6"]
+      - ["AI 立刻答：约 276 MPa（40 ksi），还给了出处", "It answers instantly: about 276 MPa (40 ksi), with a source"]
+      - ["报告下周交客户，要过客户审核", "The report goes to the customer next week, for audit"]
+    notes:
+      - "先看一个真实会发生的场景。一位工程师在写支架的强度计算报告，需要 6061-T6 铝合金的抗拉强度。他问了 AI，AI 马上回答：大约 276 MPa，也就是 40 ksi，还附了一个出处。报告下周要交给客户审核。问题是：这个数能直接写进去吗？先别回答，我们学完今天的内容再回来。"
+      - "Here's a situation that really happens. An engineer is writing a strength report for a bracket and needs the tensile strength of 6061-T6 aluminum. The AI answers right away: about 276 MPa, or 40 ksi, and it even cites a source. The report goes to the customer for audit next week. Can that number go straight in? Hold your answer. We'll come back to it at the end."
+
+  - layout: roadmap
+    title: ["这门课的八次课", "The eight sessions"]
+    parts:
+      - ["它怎样工作", "How AI works"]
+      - ["给足上下文", "Prompting with context"]
+      - ["核对输出", "Checking output"]
+      - ["文件与邮件", "Docs & email"]
+      - ["数据与表格", "Data & spreadsheets"]
+      - ["工程工作", "Engineering work"]
+      - ["团队流程", "Team workflows"]
+      - ["结业项目", "Capstone"]
+    notes:
+      - "这是八次课的路线。前三次是基本功：懂原理、会给上下文、会核对。中间三次用到具体工作上：文件邮件、数据表格、工程计算和代码。最后两次落到团队：把流程固定下来，做一个自己岗位的结业项目，再起草一份团队用 AI 的规矩。"
+      - "Here is the route. The first three sessions are fundamentals: how it works, how to give context, how to check. The middle three apply it to real work: documents and email, data and spreadsheets, engineering calculations and code. The last two are about the team: turning it into a repeatable workflow, a capstone on your own job, and a draft AI policy for your team."
+
+  - layout: section
+    num: "01"
+    title: ["它实际在做什么", "What the model actually does"]
+
+  - layout: points
+    title: ["一句话：预测下一段文字", "In one line: it predicts the next piece of text"]
+    points:
+      - ["读了海量文字，学会“接下来最可能写什么”", "Trained on huge amounts of text to learn what usually comes next"]
+      - ["一次写一小段，再把它接上，继续写", "Writes one small piece at a time, adds it, and keeps going"]
+      - ["本身不查资料，除非接了搜索或你的文件", "It does not look anything up, unless it is connected to search or your files"]
+    notes:
+      - "用一句话说，大语言模型做的事就是：根据前面的文字，预测下一小段文字。它读过海量的文本，学会了在什么上下文后面、通常接什么。它一次只写一小段，写完接上去，再预测下一段，一直这样写下去。关键在第三条：模型本身不去查资料。除非你用的工具接了搜索、或者你把文件给了它，它说的数字来自它“记得”的文字规律，而不是查到的事实。"
+      - "In one line: a large language model predicts the next small piece of text from the text before it. It has read enormous amounts of writing and learned what usually follows what. It writes one small piece, appends it, predicts the next, and keeps going. The key is the third point: the model itself does not look anything up. Unless your tool is connected to search, or you've given it your files, its numbers come from patterns in text it has seen, not from a lookup."
+
+  - layout: split
+    title: ["每个候选答案都有一个概率", "Every candidate answer gets a probability"]
+    points:
+      - ["绿色是对的，橙色是错的", "Green is correct, orange is wrong"]
+      - ["“温度”越高，越敢选不太可能的", "Higher temperature: more willing to pick unlikely ones"]
+      - ["错的答案也有不小的概率", "The wrong answers still have real probability"]
+    visual: {video: sweep}
+    notes:
+      - "右边是一个简化的演示。问题是 6061-T6 的抗拉强度大约是多少，模型给每个候选答案打分，再换算成概率。绿色的 310 MPa、45 ksi 是对的；橙色的都是错的，其中 276 MPa 和 40 ksi 其实是屈服强度，不是抗拉强度。看柱子随温度变化：温度低，它更集中在最可能的答案上；温度高，它更愿意选不太可能的。但请注意，即使在低温，错的答案也有不小的概率。"
+      - "On the right is a simplified demo. The question is the tensile strength of 6061-T6. The model scores each candidate and turns the scores into probabilities. Green, 310 MPa and 45 ksi, are correct. Orange are wrong; 276 MPa and 40 ksi are actually the yield strength, not the tensile strength. Watch the bars as the temperature changes. Low temperature concentrates on the most likely answer; high temperature spreads out. But notice: even at low temperature, the wrong answers keep a real share."
+
+  - layout: lab
+    title: ["实验 1-1：让它回答 20 次", "Lab 1-1: ask it 20 times"]
+    shot: {page: nexttoken, vw: 1500, vh: 900}
+    tasks:
+      - ["把温度放在 0.2，点“问 10 次”两次", "Set temperature to 0.2 and click “Ask 10 times” twice"]
+      - ["记下错了几次，再把温度调到 1.0 重做", "Note how many were wrong, then repeat at 1.0"]
+      - ["每个答案读起来，有区别吗？", "Did the wrong answers read any differently?"]
+    notes:
+      - "现在大家自己动手。打开实验 1-1，把温度放在 0.2，点两次“问 10 次”，数一数错了几次。然后把温度调到 1.0，清空，再做一遍。最后一个问题最重要：错的答案和对的答案，读起来有没有任何区别？做完我们在聊天框里分享各自的错误次数。给大家四分钟。"
+      - "Now try it yourself. Open Lab 1-1, set the temperature to 0.2, click Ask 10 times twice, and count the wrong ones. Then set it to 1.0, clear, and do it again. The last question matters most: did the wrong answers read any differently from the right ones? Post your counts in the chat when you're done. Four minutes."
+
+  - layout: bignum
+    title: ["同一个问题，问很多次", "Same question, many times"]
+    nums:
+      - {n: "{{ch01.wrong_t02:.0f}}%", n_en: "T = 0.2", label: ["低温时答错的比例", "wrong at low temperature"]}
+      - {n: "{{ch01.wrong_t07:.0f}}%", n_en: "T = 0.7", label: ["常见设置时答错的比例", "wrong at a typical setting"]}
+      - {n: "{{ch01.wrong_t15:.0f}}%", n_en: "T = 1.5", label: ["高温时答错的比例", "wrong at high temperature"]}
+    foot: ["演示用的简化模型；真实模型更大，但道理一样：流利 ≠ 正确", "A simplified demo model. Real models are larger, but the lesson holds: fluent ≠ correct"]
+    notes:
+      - "按这个演示模型算，温度 0.2 时，大约每 {{ch01.one_in}} 次就有一次答错，错的比例 {{ch01.wrong_t02:.0f}}%；常见设置 0.7 时，错的比例升到 {{ch01.wrong_t07:.0f}}%；温度 1.5 时超过一半。这是一个简化的教学模型，真实的模型大得多，在常见知识上也准得多，但道理一样：它给出的是最像答案的文字，不是查证过的事实。"
+      - "With this demo model, at temperature 0.2 about one answer in {{ch01.one_in}} is wrong, {{ch01.wrong_t02:.0f}} percent. At a typical 0.7, it rises to {{ch01.wrong_t07:.0f}} percent. At 1.5 it is more than half. This is a simplified teaching model; real models are much larger and far more accurate on common facts. But the principle is the same: you get the most answer-like text, not a verified fact."
+
+  - layout: section
+    num: "02"
+    title: ["流利不等于正确", "Fluent is not the same as correct"]
+
+  - layout: points
+    title: ["最常见的三种错", "The three most common failures"]
+    points:
+      - ["编造：数字、出处、条款号看着都很真", "Made-up details: numbers, citations, clause numbers that look real"]
+      - ["过时：只知道训练截止前的事", "Out of date: it only knows what it saw before its training cutoff"]
+      - ["算错：单位、换算、多步计算", "Arithmetic slips: units, conversions, multi-step math"]
+    notes:
+      - "在工作中最常碰到的错有三种。第一，编造：数字、引用的出处、标准的条款号，看起来都很像真的，其实是模型按文字规律拼出来的。第二，过时：模型只知道训练截止之前的东西，最新的价格、法规、产品型号它可能不知道，还会照样回答。第三，算错：尤其是单位换算和多步计算。好消息是，这三种错都有固定的查法，第 3 次课专门练。"
+      - "Three failures show up most at work. First, made-up details: numbers, sources, clause numbers that look real but were assembled from text patterns. Second, out of date: the model only knows what it saw before its training cutoff, so recent prices, regulations or part numbers may be missing, and it will answer anyway. Third, arithmetic slips, especially unit conversions and multi-step math. The good news: each one has a standard check, and Session 3 drills them."
+
+  - layout: duo
+    title: ["查资料 vs 生成文字", "Looking up vs generating"]
+    left:
+      svg: "<svg viewBox='0 0 600 300'><rect x='40' y='40' width='520' height='220' rx='22' fill='none' stroke='#4c8dff' stroke-width='6'/><text x='300' y='130' font-size='46' fill='#f3f6fa' text-anchor='middle'>Handbook</text><text x='300' y='200' font-size='34' fill='#2ec4b6' text-anchor='middle'>UTS 310 MPa (45 ksi)</text></svg>"
+      label: ["查资料：答案来自一个出处", "Lookup: the answer comes from a source"]
+      note: ["可以回头核对", "You can trace it"]
+    right:
+      svg: "<svg viewBox='0 0 600 300'><rect x='40' y='40' width='520' height='220' rx='22' fill='none' stroke='#ff7a45' stroke-width='6'/><text x='300' y='130' font-size='46' fill='#f3f6fa' text-anchor='middle'>Language model</text><text x='300' y='200' font-size='34' fill='#f2b705' text-anchor='middle'>“about 276 MPa…”</text></svg>"
+      label: ["生成：答案是最像的文字", "Generation: the most likely-sounding text"]
+      note: ["要你去核对", "You must verify it"]
+    notes:
+      - "把两种方式放在一起看。左边是查资料：答案来自一本手册或一份数据表，你能回头翻到那一页。右边是生成：模型写出最像答案的一段文字，它没有“那一页”可以翻。所以对右边的东西，规矩很简单：凡是要交出去、要拿去做决定的数字和事实，都要能追到左边那样的出处。"
+      - "Put the two side by side. On the left, lookup: the answer comes from a handbook or a datasheet, and you can turn to that page. On the right, generation: the model writes the most answer-like text, and there is no page to turn to. So the rule for anything on the right is simple: any number or fact that leaves your desk, or drives a decision, must trace back to a source like the one on the left."
+
+  - layout: section
+    num: "03"
+    title: ["它看到了什么：上下文", "What it sees: context"]
+
+  - layout: points
+    title: ["上下文就是它全部的“记忆”", "The context is all it knows about your job"]
+    points:
+      - ["它只看得到这次对话里的文字和文件", "It only sees the text and files in this conversation"]
+      - ["不知道你的公司、客户、订单号", "It does not know your company, customers or PO numbers"]
+      - ["给得越准，草稿越能直接用", "The more precise the context, the more usable the draft"]
+    notes:
+      - "第二个关键概念是上下文。模型能用的，只有这一次对话里你给它的文字和文件。它不知道你是谁、你的公司做什么、这批订单号是多少、你的客户是谁。你不给，它就编一个“听起来合理”的。所以同样一个工具，有人觉得没用，有人觉得省了一半时间，差别往往就在给没给足上下文。"
+      - "The second key idea is context. All the model can use is the text and files you give it in this conversation. It doesn't know who you are, what your company makes, the PO number, or the customer. If you don't say, it invents something plausible. That's why the same tool feels useless to one person and saves another half their time. The difference is usually the context."
+
+  - layout: lab
+    title: ["实验 1-2：一封催货邮件", "Lab 1-2: a late-shipment email"]
+    shot: {page: context, vw: 1500, vh: 900}
+    tasks:
+      - ["先一项都不勾，读草稿，数数问题", "Tick nothing first; read the draft and count the problems"]
+      - ["逐项勾上，看草稿哪里变了", "Tick the pieces one by one and watch what changes"]
+      - ["哪一项改善最大？为什么？", "Which piece helped most, and why?"]
+    notes:
+      - "打开实验 1-2。任务是给供应商写一封催货邮件。先一项上下文都不给，读一下 AI 的草稿：没有订单号、没有日期、要求含糊，还自己加了一句威胁罚款的话，这句你根本没说过。然后逐项勾上：角色、事实、想要的结果、格式、限制，看草稿每次变在哪里。最后想一想，哪一项改善最大。三分钟。"
+      - "Open Lab 1-2. The task is an email chasing a late shipment. First give no context and read the draft: no PO number, no dates, a vague ask, and a threat about penalties you never made. Then tick the pieces one by one, role, facts, outcome, format, limits, and see what changes each time. Finally, decide which piece helped most. Three minutes."
+
+  - layout: chain
+    title: ["好提示的五个部分", "Five parts of a useful prompt"]
+    steps:
+      - ["角色与读者", "Role & reader"]
+      - ["事实与材料", "Facts & sources"]
+      - ["要的结果", "Outcome"]
+      - ["格式", "Format"]
+      - ["限制", "Limits"]
+    hot: [1]
+    mark: ["最重要", "matters most"]
+    foot: ["第 2 次课把这五部分练成习惯", "Session 2 turns these five parts into a habit"]
+    notes:
+      - "刚才实验里的五项，就是一个好提示的五个部分：你是谁、写给谁；事实和材料；你要的结果；格式；限制，也就是不能说什么、不能承诺什么。五项里最重要的是事实和材料，因为模型最缺的就是你手上的具体信息。下次课我们把这五部分练成习惯。"
+      - "The five boxes in the lab are the five parts of a useful prompt: who you are and who reads it; the facts and sources; the outcome you want; the format; and the limits, what it must not say or promise. The most important is facts and sources, because that's exactly what the model lacks. Next session we make these five parts a habit."
+
+  - layout: section
+    num: "04"
+    title: ["在工作中安全地用", "Using it safely at work"]
+
+  - layout: tiles
+    title: ["什么能放进 AI，什么不能", "What can go into an AI tool"]
+    tiles:
+      - {k: "✓", name: ["公开资料", "Public info"], use: ["随便用", "Fine"]}
+      - {k: "✓", name: ["内部资料", "Internal info"], use: ["只用公司批准的工具", "Approved company tools only"]}
+      - {k: "✗", name: ["客户机密图纸", "Customer drawings"], use: ["按合同，一般不能", "Per contract; usually no"], hot: true}
+      - {k: "✗", name: ["出口管制技术", "Export-controlled data"], use: ["出口管制规定下，不能", "ITAR / EAR: no"], hot: true}
+      - {k: "✗", name: ["个人信息", "Personal data"], use: ["员工、客户个人信息，不能", "Employee or customer PII: no"], hot: true}
+      - {k: "✗", name: ["密码与密钥", "Passwords & keys"], use: ["永远不能", "Never"], hot: true}
+    notes:
+      - "安全这一节只记一张表。公开资料随便用。公司内部资料，只用公司批准的工具和账号，不要用个人账号。客户的机密图纸，要看合同，一般不能。出口管制的技术资料，也就是 ITAR、EAR 管的东西，不能。员工和客户的个人信息不能。密码和密钥永远不能。拿不准的时候，问你的主管或者 IT，别自己判断。"
+      - "For safety, remember one table. Public information: fine. Internal company information: only in company-approved tools and accounts, never a personal account. Customer confidential drawings: check the contract; usually no. Export-controlled technical data under ITAR or EAR: no. Employee or customer personal data: no. Passwords and keys: never. When in doubt, ask your manager or IT, don't guess."
+
+  - layout: points
+    tag: ["机器人上的同一道理", "The same idea in robots"]
+    title: ["AI 提方案，确定的检查来把关", "AI proposes; deterministic checks decide"]
+    points:
+      - ["机器人用 AI 规划路线，安全控制器独立把关", "A robot's AI plans the path; a separate safety controller checks it"]
+      - ["超速、越界、碰撞风险：安全回路直接停", "Overspeed, out of zone, collision risk: the safety circuit stops it"]
+      - ["你的工作也一样：AI 起草，你和程序核对", "Your work is the same: AI drafts, you and your checks decide"]
+    notes:
+      - "这个道理在机器人上早就是标准做法。机器人可以用 AI 规划路线，但它旁边有一个独立的安全控制器：速度超了、跑出安全区、有碰撞风险，安全回路直接让它停下，不管 AI 怎么想。你的工作也一样：AI 负责起草，数字由计算核对、事实由出处核对、能不能发由你和流程决定。"
+      - "In robotics this has long been standard practice. A robot can use AI to plan its path, but a separate safety controller sits beside it: overspeed, leaving the safe zone, collision risk, and the safety circuit stops the robot, whatever the AI planned. Your work is the same: AI drafts; calculations check the numbers, sources check the facts, and you and your procedure decide what goes out."
+
+  - layout: points
+    tag: ["生活中的例子", "An everyday example"]
+    title: ["手机输入法的联想词", "Your phone's next-word suggestions"]
+    points:
+      - ["打“明天下午”，它猜“开会”", "Type “see you at” and it suggests “the meeting”"]
+      - ["猜得常常对，但它不知道你的日程", "Often right, but it does not know your calendar"]
+      - ["大模型是同一件事，只是大得多", "A language model is the same idea, vastly bigger"]
+    notes:
+      - "其实大家每天都在用同一种东西：手机输入法的联想词。你打“see you at”，它猜“the meeting”。猜得常常挺准，但它并不知道你明天到底有没有会。大语言模型做的是同一件事，只是规模大了无数倍，所以写出来的东西流利得多，也就更容易让人忘了它是在猜。"
+      - "You already use the same thing every day: your phone's next-word suggestions. Type 'see you at' and it offers 'the meeting'. Often right, but it doesn't know whether you actually have a meeting. A language model does the same thing at an enormously larger scale, so its writing is far more fluent, which makes it easier to forget it is predicting."
+
+  - layout: answer
+    tag: ["回到问题", "Back to the problem"]
+    title: ["276 MPa 能写进报告吗？不能", "Does 276 MPa go in the report? No"]
+    rows:
+      - [["AI 说 276 MPa", "AI said 276 MPa"], ["那是屈服强度；抗拉 310 MPa", "That's yield. UTS = 310 MPa"]]
+      - [["它算 {{ch01.f_yield:,}} N", "Its math: {{ch01.f_yield:,}} N"], ["应为 {{ch01.f_uts:,}} N", "Should be {{ch01.f_uts:,}} N"]]
+      - [["它给的出处", "Its source"], ["打开原文，找到那张表", "Open it. Find the table."]]
+    side: {big: "5 min", text: ["查一本手册、重算一遍，五分钟", "One handbook lookup and one recalculation: five minutes"]}
+    foot: ["用屈服还是抗拉强度，由设计规范定，并要人签字", "Your design code decides yield vs. ultimate; a person signs off"]
+    notes:
+      - "回到开头的问题。答案是：不能直接写。查一下手册就知道，276 MPa、40 ksi 是 6061-T6 的屈服强度，抗拉强度是 310 MPa、45 ksi。AI 还顺手算了一个 {{ch01.area}} 平方毫米截面能拉 {{ch01.f_yield:,}} 牛，算法没错，但用错了数，用对的数是 {{ch01.f_uts:,}} 牛。它给的出处，要打开原文找到那张表才算数。整个核对只要五分钟。另外提醒一句：报告到底该用屈服强度还是抗拉强度，由你的设计规范决定，而且要有人签字。"
+      - "Back to the opening problem. The answer: not as is. One look at a handbook shows that 276 MPa, 40 ksi, is the yield strength of 6061-T6; the ultimate tensile strength is 310 MPa, 45 ksi. The AI also computed that a {{ch01.area}} square-millimetre bar holds {{ch01.f_yield:,}} newtons. Right arithmetic, wrong input; with the right value it's {{ch01.f_uts:,}}. And the source it cited counts only once you open it and find the table. The whole check takes five minutes. One more thing: whether the report should use yield or ultimate strength is set by your design code, and a person signs off."
+
+  - layout: lab
+    title: ["实验 1-3：每一句该怎么查", "Lab 1-3: how to check each claim"]
+    shot: {page: verify, vw: 1500, vh: 900}
+    tasks:
+      - ["给 AI 答案里的四句话各选一种查法", "Pick a check for each of the four marked claims"]
+      - ["点“核对”，看哪种查法能抓到错", "Click Check and see which checks catch the errors"]
+      - ["想想你工作里最常见的是哪一类", "Which kind shows up most in your own work?"]
+    notes:
+      - "最后一个实验，把今天的内容收一收。AI 的回答里标了四句话，每句选一种最快、又真能抓到错的查法：查一手资料、自己重算、打开引用的原文、问负责的人。注意还有一个选项叫“再问 AI 一遍”，想想它为什么不算核对。做完点核对，看看结果。"
+      - "One last lab to pull today together. Four claims are marked in the AI's answer. For each, choose the fastest check that would actually catch an error: a primary source, recompute it, open the cited source, or ask the owner. There's also an option to ask the AI again; think about why that isn't a check. Then click Check."
+
+  - layout: summary
+    title: ["今天记住三件事", "Three things to remember"]
+    points:
+      - ["AI 是在预测文字，不是在查事实", "AI predicts text; it does not look up facts"]
+      - ["给足上下文，草稿才贴近你的工作", "Give it real context to get a usable draft"]
+      - ["要交出去的数字和事实，追到出处", "Anything that leaves your desk must trace to a source"]
+    after: ["课后：带 3 件你这周真实要做的事来上第 2 次课", "Before Session 2: bring three real tasks from your week"]
+    notes:
+      - "今天记住三件事。第一，AI 是在预测文字，不是在查事实。第二，给足上下文，草稿才贴近你的工作。第三，凡是要交出去、要拿去做决定的数字和事实，都要追到出处。课后作业很简单：想好这周你真实要做的三件事，比如一封邮件、一份报告、一张表格，第 2 次课我们就用它们来练。"
+      - "Three things to remember. One: AI predicts text; it doesn't look up facts. Two: give it real context and the draft fits your work. Three: any number or fact that leaves your desk or drives a decision must trace back to a source. Homework is simple: bring three real tasks from your week, an email, a report, a spreadsheet, and we'll use them in Session 2."
