@@ -40,7 +40,9 @@ faces, _, solid = GEO.faces(step)
 bottom = [f["id"] for f in faces if f["kind"] == "plane" and abs(f["bbox"][2] + 62) < 0.05 and abs(f["bbox"][5] + 62) < 0.05]
 mat = dict(MATS.get("HT200"), id="HT250", name="HT250 灰铸铁", E_mpa=120000, ultimate_mpa=250)
 if os.environ.get("WQ_MAT") == "QT450":                    # 球墨铸铁 QT450-10：E 取 169 GPa、密度 7.1（常用值，待核）
-    mat = dict(mat, id="QT450", name="QT450-10 球墨铸铁", E_mpa=169000, nu=0.275, density=7.10, ultimate_mpa=450)
+    mat = dict(mat, id="QT450", name="QT450-10 球墨铸铁", E_mpa=169000, nu=0.275, density=7.10, density_t_mm3=7.10e-9, ultimate_mpa=450)
+if os.environ.get("WQ_MAT") == "ADC12":                    # 压铸铝 ADC12（AlSi11Cu3）：E 取 71 GPa、密度 2.74（常用值）
+    mat = dict(mat, id="ADC12", name="ADC12 压铸铝合金", E_mpa=71000, nu=0.33, density=2.74, density_t_mm3=2.74e-9, ultimate_mpa=310)
 os.environ.setdefault("WQ_CAE_TIME_LIMIT_S", "3000")
 st, surf = MO.solve(step, {"material": mat, "mesh": {"size_mm": size}, "loads": [{"type": "fixed", "faces": bottom}]}, n_modes=int(os.environ.get("WQ_NMODES", 6)))
 res = dict(solid=solid, bottom_faces=bottom, mesh=size, stats=st)
