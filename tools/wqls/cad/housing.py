@@ -29,19 +29,19 @@ P = dict(
     B=dict(top=(262, 242, 0), r_out=44, r_head=38, r_arch=46, r_hj=24, plan=(46, 34), edge=(14, 12, 10, 8), chamfer=False),
     C=dict(top=(258, 256, 0), r_out=14, r_head=12, r_arch=26, r_hj=10, plan=(14, 12), edge=(8, 6, 5), chamfer=True),
 )[VAR]
-WALL = float(os.environ.get("WQ_WALL", 6.0))
-ARM_Y = (float(os.environ.get("WQ_AY0", -46.0)), float(os.environ.get("WQ_AY1", 70.0)))          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
+WALL = float(os.environ.get("WQ_WALL", 5.8))
+ARM_Y = (float(os.environ.get("WQ_AY0", -45.0)), float(os.environ.get("WQ_AY1", 67.6)))          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
-HEADWALL = float(os.environ.get("WQ_HEADWALL", 5.0))
+HEADWALL = float(os.environ.get("WQ_HEADWALL", 4.5))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
 FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1
 X_TAKEUP = 30.0
 TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端（挑线眼一转里在 z 165–204 之间走，留余量）
 TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 设计软件 link_pose(φ = 180°)：P、M、线眼，端视坐标 mm
-BEDWALL = float(os.environ.get("WQ_BEDWALL", 6.0))
-ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 9.0))
-ROOT_X = float(os.environ.get("WQ_ROOTX", 230.0))
-BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 30.0))       # 机座纵筋高（从机座顶面往下）
+BEDWALL = float(os.environ.get("WQ_BEDWALL", 5.6))
+ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 8.1))
+ROOT_X = float(os.environ.get("WQ_ROOTX", 183.0))
+BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 14.0))       # 机座纵筋高（从机座顶面往下）
 RIB_T = 7.0
 RIB_X = tuple(float(v) for v in os.environ.get("WQ_RIBX", "75,150,225").split(",") if v)
 S_BELT_X = 352.0
@@ -49,7 +49,7 @@ ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿�
 
 ZU = 200.0
 BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, z0=-62.0)
-PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -70.0)), y1=float(os.environ.get("WQ_PY1", 96.0)))
+PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -70.6)), y1=float(os.environ.get("WQ_PY1", 97.4)))
 HEAD = dict(x0=-62.0, x1=52.0, y0=float(os.environ.get("WQ_HY0", -48.0)), y1=70.0, z0=46.0)
 
 
