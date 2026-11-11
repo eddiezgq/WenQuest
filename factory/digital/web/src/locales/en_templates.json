@@ -3978,5 +3978,13 @@
 [
 "从交期倒排：发货预留 {a} 个工作日，父件开工前一天子件做完或到货；每件工期 = 单件分钟 × 件数 ÷ 480（一天 8 小时，串行），采购按供应商提前期",
 "Backward from the due date: {a} working days kept for shipping; children finish or arrive the day before the parent starts; each part's duration = minutes per piece × quantity ÷ 480 (8-hour day, in series); purchases by supplier lead time"
+],
+[
+"本单新件还没有批准的图纸：{a}（先到“设计发布与审批”提交图纸并批准）",
+"New parts for this job have no approved drawing yet: {a} (submit drawings in “Design release & approval” and get them approved first)"
+],
+[
+"本单新件没有批准的图纸：{a}",
+"New parts for this job have no approved drawing: {a}"
 ]
 ]
