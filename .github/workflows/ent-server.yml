@@ -5,6 +5,9 @@
 #   deploy：装企业服务器的前门（deploy/enterprise：Caddy、app. 入口页、交接桥脚本），把教育服务器上 deploy 用户认的公钥
 #           （含质量 ERP 部署用的那把）也加到企业服务器，写好 /opt/wenquest/.env 的 SITE_DOMAIN（质量 ERP 的部署读它）。
 #           不碰交接桥钥匙：开桥是晚上切换时的事（第 146 轮 7.4）
+#   bridge-on：晚上切换用。试点开通改由企业服务器做：生成交接桥钥匙写进两台的 .env（不进日志），教育服务器上停掉
+#              质量 ERP 的开通程序（crontab 的 pilot-runner），重启网关；试点名额改成 5 家（企业服务器 8 GB）
+#   bridge-off：回退。去掉教育服务器上的钥匙、恢复它的开通程序、重启网关
 name: Enterprise server 企业服务器
 
 on:
@@ -13,7 +16,7 @@ on:
       task:
         description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）/ deploy（装前门 Caddy 与交接桥）"
         type: choice
-        options: [pubkey, check, bootstrap, deploy]
+        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off]
         default: check
       host:
         description: "企业服务器 IP（11-10 开的：161.35.185.35）"
@@ -140,3 +143,39 @@ jobs:
             echo "$h.$site -> $(curl -s -o /dev/null -m 30 -w '%{http_code}' --resolve "$h.$site:80:$HOST" "http://$h.$site/" || true) (http)"
           done
           echo "app.$site https -> $(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://app.$site/" || true)"
+
+  bridge:
+    if: inputs.task == 'bridge-on' || inputs.task == 'bridge-off'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - name: ${{ inputs.task }}
+        env:
+          HOST: ${{ inputs.host }}
+          EDU: ${{ secrets.DEPLOY_HOST }}
+          TASK: ${{ inputs.task }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 "$HOST" "$EDU" > ~/.ssh/known_hosts 2>/dev/null
+          if [ "$TASK" = bridge-on ]; then
+            # 钥匙：企业服务器上已有就沿用，没有才生成；经标准输入写，不上命令行、不进日志
+            key=$(ssh "deploy@$HOST" "grep -E '^WQ_PILOT_BRIDGE_KEY=' /opt/wenquest/edge/.env | tail -n1 | cut -d= -f2-" || true)
+            [ -n "$key" ] || key=$(openssl rand -hex 32)
+            echo "::add-mask::$key"
+            put='f=$1; k=$2; IFS= read -r v; touch "$f"; if grep -q "^$k=" "$f"; then sed -i "s|^$k=.*|$k=$v|" "$f"; else echo "$k=$v" >> "$f"; fi'
+            printf '%s\n' "$key" | ssh "deploy@$HOST" "bash -c '$put' _ /opt/wenquest/edge/.env WQ_PILOT_BRIDGE_KEY"
+            printf '%s\n' "$key" | ssh "deploy@$EDU" "bash -c '$put' _ /opt/wenquest/.env WQ_PILOT_BRIDGE_KEY"
+            printf '%s\n' 5 | ssh "deploy@$EDU" "bash -c '$put' _ /opt/wenquest/.env WQ_PILOT_MAX"
+            ssh "deploy@$EDU" '{ crontab -l 2>/dev/null | grep -v pilot-runner.sh || true; } | crontab -; echo "教育服务器 crontab:"; crontab -l | sed "s/^/  /"'
+          else
+            ssh "deploy@$EDU" 'sed -i "/^WQ_PILOT_BRIDGE_KEY=/d; /^WQ_PILOT_MAX=/d" /opt/wenquest/.env
+              d=$(docker inspect qms-demo-edge --format "{{ index .Config.Labels \"com.docker.compose.project.working_dir\" }}" 2>/dev/null || echo /opt/wenquest/qms)
+              line="* * * * * $d/pilot-runner.sh >> $d/pilot-runner.log 2>&1"
+              { crontab -l 2>/dev/null | grep -v pilot-runner.sh || true; echo "$line"; } | crontab -; crontab -l | grep pilot-runner'
+          fi
+          # 网关重新读 .env（只重建网关一个容器）
+          ssh "deploy@$EDU" 'cd /opt/wenquest && exec 9>/tmp/wenquest-deploy.lock && flock -w 1500 9 && docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps --no-build gateway </dev/null 2>&1 | tail -n 3'
+          sleep 30
+          echo "企业服务器交接桥日志："; ssh "deploy@$HOST" 'tail -n 5 /opt/wenquest/edge/bridge.log 2>/dev/null; ls /opt/wenquest/edge/allow /opt/wenquest/pilot-queue'
