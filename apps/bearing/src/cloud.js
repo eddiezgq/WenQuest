@@ -39,7 +39,7 @@ export async function loadMe() {
 
 // The site-wide sign-in page on the learning platform, coming back here afterwards (same as site/auth.js).
 export function loginUrl() {
-  const host = location.hostname.replace(/^www\./, '')
+  const host = location.hostname.replace(/^(www|app)\./, '')   // app.<主域名>：企业服务器上的工业软件（第 146 轮）
   const local = host === 'localhost' || host === '127.0.0.1'
   const learn = local ? 'http://localhost:8088' : location.protocol + '//learn.' + host
   return learn + '/pages/login/login?back=' + encodeURIComponent(location.href)

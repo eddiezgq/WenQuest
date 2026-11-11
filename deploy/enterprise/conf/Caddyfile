@@ -47,10 +47,27 @@ qms.{$SITE_DOMAIN}, qms-erp.{$SITE_DOMAIN} {
 	reverse_proxy qms-{labels.3}-edge:80
 }
 
-# 工业软件（第 146 轮；账号做法待 Eddie 定，先放入口页）
+# 工业软件（第 146 轮）：凸轮、轴承、问渠电子，账号用学习平台那套（Eddie 11-11“按建议”）
 app.{$SITE_DOMAIN} {
 	import security_headers
 	encode zstd gzip
-	root * /srv/app
-	file_server
+	request_body {
+		max_size 60MB
+	}
+	redir /cam /cam/ 308
+	handle_path /cam/* {
+		reverse_proxy cam:8000
+	}
+	redir /bearing /bearing/ 308
+	handle_path /bearing/* {
+		reverse_proxy bearing:8000
+	}
+	redir /eda /eda/ 308
+	handle_path /eda/* {
+		reverse_proxy eda:8000
+	}
+	handle {
+		root * /srv/app
+		file_server
+	}
 }

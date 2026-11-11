@@ -196,7 +196,7 @@ function readValues() {
 
 // 全站登录页在学习平台上，登录后回到这里（同凸轮、site/auth.js）
 function loginUrl() {
-  const host = location.hostname.replace(/^www\./, "");
+  const host = location.hostname.replace(/^(www|app)\./, "");   // app.<主域名>：企业服务器上的工业软件（第 146 轮）
   const local = host === "localhost" || host === "127.0.0.1";
   const learn = local ? "http://localhost:8088" : location.protocol + "//learn." + host;
   return learn + "/pages/login/login?back=" + encodeURIComponent(location.href);

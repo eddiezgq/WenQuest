@@ -22,6 +22,7 @@ on:
 
 permissions:
   contents: read
+  packages: read      # deploy：企业服务器从 ghcr.io 拉工业软件镜像
 
 jobs:
   pubkey:
@@ -91,16 +92,30 @@ jobs:
           acme=$(ssh "deploy@$EDU" "grep -E '^ACME_EMAIL=' /opt/wenquest/.env | tail -n1 | cut -d= -f2-")
           [ -n "$site" ] && [ -n "$acme" ] || { echo "::error::教育服务器 .env 里没有 SITE_DOMAIN 或 ACME_EMAIL"; exit 1; }
           echo "SITE_DOMAIN=$site  keys=$(grep -c . "$RUNNER_TEMP/keys")"
+          # 工业软件：照教育服务器正在跑的镜像（同一份程序两处部署，第 146 轮二.2）
+          imgs=$(ssh "deploy@$EDU" "docker ps --format '{{.Names}} {{.Image}}'")
+          img() { printf '%s\n' "$imgs" | awk -v n="-$1-1" 'index($1, n) == length($1) - length(n) + 1 {print $2; exit}'; }
+          CAM=$(img cam); BEARING=$(img bearing); EDA=$(img eda)
+          echo "cam=$CAM bearing=$BEARING eda=$EDA"
+          [ -n "$CAM" ] && [ -n "$BEARING" ] && [ -n "$EDA" ] || { echo "::error::教育服务器上没找到凸轮、轴承或问渠电子的容器"; exit 1; }
+          # 凸轮的 CAE 走数字工厂：网址和钥匙照教育服务器 .env（钥匙经标准输入传，不上命令行、不进日志）
+          ssh "deploy@$EDU" "grep -E '^(WQ_FACTORY_URL|WQ_FACTORY_CAE_KEY)=' /opt/wenquest/.env" > "$RUNNER_TEMP/fx" || true
           ssh "deploy@$HOST" 'mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
           ssh "deploy@$HOST" 'k=~/.ssh/authorized_keys; while IFS= read -r l; do [ -n "$l" ] && ! grep -qxF "$l" "$k" && echo "$l" >> "$k" && echo "added a key"; done; true' < "$RUNNER_TEMP/keys"
           tar czf - -C deploy/enterprise . | ssh "deploy@$HOST" 'mkdir -p /opt/wenquest/edge /opt/wenquest/pilot-queue && tar xzf - -C /opt/wenquest/edge && chmod +x /opt/wenquest/edge/*.py && mkdir -p /opt/wenquest/edge/allow'
+          ssh "deploy@$HOST" 'f=/opt/wenquest/edge/.env; touch $f; chmod 600 $f; while IFS= read -r l; do k=${l%%=*}; grep -v "^$k=" $f > $f.n || true; echo "$l" >> $f.n; mv $f.n $f; chmod 600 $f; done' < "$RUNNER_TEMP/fx"
+          rm -f "$RUNNER_TEMP/fx"
+          printf '%s' "${{ secrets.GITHUB_TOKEN }}" | ssh "deploy@$HOST" "docker login ghcr.io -u '${{ github.actor }}' --password-stdin" >/dev/null
           # .env：有这一行就改，没有才加（不重复写）
-          ssh "deploy@$HOST" "SITE='$site' ACME='$acme' bash -s" <<'EOF'
+          ssh "deploy@$HOST" "SITE='$site' ACME='$acme' CAM='$CAM' BEARING='$BEARING' EDA='$EDA' bash -s" <<'EOF'
           set -euo pipefail
           envset() { f=$1; k=$2; v=$3; touch "$f"; chmod 600 "$f"; if grep -q "^$k=" "$f"; then sed -i "s|^$k=.*|$k=$v|" "$f"; else echo "$k=$v" >> "$f"; fi; }
           envset /opt/wenquest/.env SITE_DOMAIN "$SITE"
           envset /opt/wenquest/edge/.env SITE_DOMAIN "$SITE"
           envset /opt/wenquest/edge/.env ACME_EMAIL "$ACME"
+          envset /opt/wenquest/edge/.env CAM_IMAGE "$CAM"
+          envset /opt/wenquest/edge/.env BEARING_IMAGE "$BEARING"
+          envset /opt/wenquest/edge/.env EDA_IMAGE "$EDA"
           cd /opt/wenquest/edge
           docker network inspect qms-edge >/dev/null 2>&1 || docker network create qms-edge
           docker compose --env-file .env pull -q </dev/null    # docker 读标准输入会吃掉这段脚本后面的行
@@ -113,12 +128,14 @@ jobs:
           docker compose ps </dev/null
           free -m | head -2
           EOF
+          ssh "deploy@$HOST" 'docker logout ghcr.io >/dev/null 2>&1 || true'
       - name: 从外面看（还没切 DNS，用 --resolve 指到企业服务器）
         env:
           HOST: ${{ inputs.host }}
         run: |
           site=$(ssh "deploy@$HOST" "grep -E '^SITE_DOMAIN=' /opt/wenquest/edge/.env | cut -d= -f2-")
           sleep 20
+          for p in cam/ bearing/ eda/; do echo "app.$site/$p -> $(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://app.$site/$p" || true)"; done
           for h in app qms; do
             echo "$h.$site -> $(curl -s -o /dev/null -m 30 -w '%{http_code}' --resolve "$h.$site:80:$HOST" "http://$h.$site/" || true) (http)"
           done

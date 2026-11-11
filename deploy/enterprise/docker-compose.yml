@@ -22,6 +22,55 @@ services:
     mem_limit: 256m
     networks: [default, qms-edge]
 
+  # 工业软件（第 146 轮，Eddie 11-11“按建议”）：和教育服务器同一个镜像（部署时照教育服务器正在跑的取）；
+  # 账号用学习平台那套（全站 cookie），身份、云端项目、AI 起草都经教育服务器的网关（HTTPS）。
+  cam:
+    image: ${CAM_IMAGE:?CAM_IMAGE}
+    restart: unless-stopped
+    environment:
+      WQ_GATEWAY_URL: https://learn.${SITE_DOMAIN}
+      WQ_FACTORY_URL: ${WQ_FACTORY_URL:-}
+      WQ_FACTORY_CAE_KEY: ${WQ_FACTORY_CAE_KEY:-}
+    cpus: 1
+    mem_limit: 768m
+    pids_limit: 64
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+
+  bearing:
+    image: ${BEARING_IMAGE:?BEARING_IMAGE}
+    restart: unless-stopped
+    environment:
+      WQ_GATEWAY_URL: https://learn.${SITE_DOMAIN}
+    cpus: 1
+    mem_limit: 512m
+    pids_limit: 64
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+
+  eda:
+    image: ${EDA_IMAGE:?EDA_IMAGE}
+    restart: unless-stopped
+    environment:
+      WQ_GATEWAY_URL: https://learn.${SITE_DOMAIN}
+    cpus: 1
+    mem_limit: 512m
+    pids_limit: 64
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop: [ALL]
+
 volumes:
   caddy_data:
   caddy_config:
