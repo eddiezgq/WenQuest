@@ -8647,5 +8647,15 @@
 "新版用量减少：取消这张请购，再算料按新需求补请": "Less is needed in the new revision: cancel this request, then run materials planning to request what is still needed",
 "新版不再用这些料，也还没到货：取消": "The new revision no longer uses these materials and nothing has arrived: cancel",
 "新版用量减少，已到的够了：关闭剩下没到的": "Less is needed and what has arrived is enough: close the rest",
-"新版用量减少：改量（不少于已到货）": "Less is needed in the new revision: reduce the quantity (not below what has arrived)"
+"新版用量减少：改量（不少于已到货）": "Less is needed in the new revision: reduce the quantity (not below what has arrived)",
+"采购对账": "Purchase reconciliation",
+"作业上还没有采购单。": "No purchase orders on this job yet.",
+"采购单价": "PO price",
+"发票单价": "Invoice price",
+"差额": "Difference",
+"部分：{a}": "Partly: {a}",
+"发票未到": "Invoice not received",
+"发票未到，暂按采购单算：{a}": "Invoice not received, costed at PO price for now: {a}",
+"外协和本单专料的实际成本按供应商发票算；差额 = 发票金额 − 采购单价 × 已开票数量，正数是多付。发票的录入和付款在 ERPNext 里做。": "Actual cost of outside processing and job-specific materials comes from supplier invoices; difference = invoice amount − PO price × invoiced qty, positive means paid more. Invoices are entered and paid in ERPNext.",
+"工序按总线上每件实际节拍 + 调整 + 换刀 × 工位费率；材料按已完工件数 × 标准用量 × 单价；外协和本单专料按供应商发票（发票没到的按采购单，标“发票未到”）；设计按登记工时 × 设计费率": "Operations: actual cycle time per part on the bus + setup + tool changes × workstation rate; materials: finished parts × standard usage × unit price; outside processing and job-specific materials: supplier invoices (PO price where the invoice has not arrived, marked \"Invoice not received\"); engineering: logged hours × engineering rate"
 }
