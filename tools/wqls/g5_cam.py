@@ -251,8 +251,13 @@ def simulate(ops, text, machine, tris_blank, tris_part, frames, tol=0.02):
         h = 1.0
         xs = np.arange(x0, x1, h) + h / 2
         ys = np.arange(y0, y1, h) + h / 2
-        HB = heightmap(tris_blank, fr, xs, ys)
         HP = heightmap(tris_part, fr, xs, ys)
+        # 毛坯一定包住零件：毛坯与零件的三角网格在圆柱面的轮廓边上各自取弦，会差零点几毫米，起始材料取两者的较高者；
+        # 比对过切时，目标取 3 × 3 格（±1 mm）里最低的，免得把轮廓边上的取弦差当成过切
+        HB = np.fmax(heightmap(tris_blank, fr, xs, ys), HP)
+        from scipy import ndimage
+        HPm = ndimage.minimum_filter(np.where(np.isnan(HP), np.inf, HP), size=3)
+        HP = np.where(np.isnan(HP), np.nan, HPm)
 
         def hb(X, Y):
             ix = np.clip(((X - xs[0]) / h).round().astype(int), 0, len(xs) - 1)

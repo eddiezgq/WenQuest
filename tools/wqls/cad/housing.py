@@ -256,7 +256,9 @@ def details(solid, hollow, info):
         inner_ribs = r_ if inner_ribs is None else inner_ribs.fuse(r_)
     hollow = fuse_fillet(hollow, inner_ribs.common(solid).cut(Part.makeCylinder(25, 40, V(xr0 - 1, 0, ZU), V(1, 0, 0))))
     hollow = fuse_fillet(hollow, tube)
-    hollow = hollow.cut(Part.makeCylinder(16, 10, V(X_BRG_REAR - 5, 0, ZU), V(1, 0, 0)))                     # 6201 外圈 Ø32 H7
+    # 6201 座孔 Ø32 H7：x 370…385，向立柱里面敞开（轴承从里面装进去，靠 x 385 的台肩），外侧只剩 Ø20 轴过孔。
+    # G5.1 改：原来是 x 375…385 两头都是 Ø20 的“孔中槽”，轴承装不进去，也没有刀能镗到
+    hollow = hollow.cut(Part.makeCylinder(16, X_BRG_REAR + 5 - (xr0 - 2), V(xr0 - 2, 0, ZU), V(1, 0, 0)))
     hollow = hollow.cut(Part.makeCylinder(10, xr1 - xr0 + 4, V(xr0 - 2, 0, ZU), V(1, 0, 0)))                 # 轴、油封过孔 Ø20
     mpts = [(xr1, 20 * math.cos(a), ZU + 20 * math.sin(a)) for a in (math.radians(45 + 90 * i) for i in range(4))]
     hollow = tap_holes(hollow, mpts, M5_TAP, 12, V(-1, 0, 0))
