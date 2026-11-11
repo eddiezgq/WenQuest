@@ -42,7 +42,7 @@ def main():
             if w in t or (w in ("Claude", "Anthropic", "Google", "YouTube", "wenquestrobotics") and w.lower() in h.lower()):
                 errs.append(f"{rel}：出现“{w}”")
         for host in re.findall(r'(?:href|src)="https?://([^/"]+)', h):
-            if host not in ALLOWED_HOSTS and not host.startswith(("learn.{{", "qms.{{", "factory.{{")):
+            if host not in ALLOWED_HOSTS and not re.match(r"(learn|qms|factory|demo|[a-z]+\.factory)\.\{\{", host):
                 errs.append(f"{rel}：外部链接 {host}")
         for k in NEED:
             if k not in h:

@@ -27,7 +27,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   plan:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       list: ${{ steps.m.outputs.list }}
     steps:
@@ -38,7 +38,7 @@ jobs:
           echo "list=$(python3 -c "import json;print(json.dumps(list(range($n))))")" >> "$GITHUB_OUTPUT"
   render:
     needs: plan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150            # 透视两遍渲染的高清片，单份可能超过 1 小时
     strategy:
       fail-fast: true
@@ -75,7 +75,7 @@ jobs:
           compression-level: 0
   encode:
     needs: render
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:

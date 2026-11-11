@@ -43,6 +43,31 @@ LEARN = "#" if PREVIEW else 'https://learn.{{env "SITE_DOMAIN"}}'
 QMS = "#" if PREVIEW else 'https://qms.{{env "SITE_DOMAIN"}}'
 FACTORY = "#" if PREVIEW else 'https://factory.{{env "SITE_DOMAIN"}}'  # 第 144 轮：国内数字工厂
 
+
+def sub(h):
+    """本站子域名（国内服务器上的各座厂）"""
+    return "#" if PREVIEW else f'https://{h}.{{{{env "SITE_DOMAIN"}}}}'
+
+
+# 第 144 轮补充：数字工业园各厂（照美国首页“数字工业园”；试点班级厂 pilot 不放）
+PARK = [
+    ("减速器厂（教学工厂）", "精密减速器：接单、算料、排产、加工、装配、检验到发货，实验 7 和各岗位实验在这里做", "factory"),
+    ("企业版演示工厂", "生产模式：设计发布、审批、配置器出图出价", "demo"),
+    ("机器人厂", "协作机器人与 AGV：装配、整机标定、跑合、出厂与现场售后；减速器向减速器厂买，驱动板向电路板厂买", "robot.factory"),
+    ("电路板厂", "关节驱动板、AGV 控制板：锡膏印刷、贴片、回流、AOI 到功能测试，给机器人厂供货", "pcb.factory"),
+    ("芯片封测厂", "编码器接口芯片 WQ-ENCIF 的封装与测试：晶圆外协，封装、测试、分档", "chip.factory"),
+    ("传感器厂", "关节编码器与扭矩传感器：码盘对心、读头装调、精度标定；编码器卖给机器人厂", "sensor.factory"),
+    ("电机厂", "伺服电机与 AGV 驱动电机：叠压、绕线、浸漆、充磁、动平衡与测功台终检；电机卖给机器人厂", "motor.factory"),
+    ("缝纫机厂", "五个车间：机壳铸造、机壳加工、关键零件、平缝机与包缝机装配；订单到开票走通", "sewing.factory"),
+]
+
+
+def park():
+    cards = "".join(f'<a class="card" href="{sub(h)}/" style="text-decoration:none"><span class="tag">需登录</span><h3 style="margin-top:10px">{n}</h3><p>{d}</p></a>'
+                    for n, d, h in PARK)
+    return (f'<div class="cards" style="--n:4">{cards}</div>'
+            '<p class="note">各厂之间互相下单、发货（机器人厂向减速器厂、电路板厂、传感器厂、电机厂采购）；用学习平台的账号登录，默认中文，AI 助手用国内模型。</p>')
+
 # 第 143 轮：已开通的单位从官网直接进入各产品（学习平台里的几项要登录；凸轮、轴承在线试用；质量 ERP 演示）
 ENTRIES = [
     ("学习平台", "课程、作业测验、讨论、直播课", "/pages/login/login", "需登录"),
@@ -60,7 +85,7 @@ def entries():
         ("凸轮设计与制造软件", "运动要求到廓线、误差与补偿", "/cam/", "在线试用"),
         ("轴承设计与制造软件", "每个钢球的载荷、游隙、油膜", "/bearing/", "在线试用"),
         ("问渠质量 ERP", "演示企业：体系自查、不合格、追溯", QMS + "/", "在线演示"),
-        ("数字工厂", "教学工厂和工业园各厂：车间、ERP、厂情中枢、实训", FACTORY + "/", "需登录"),
+        ("数字工业园", "减速器、机器人、电路板、芯片、传感器、电机、缝纫机 8 座厂：车间、ERP、厂情中枢、实训", "/solutions/platform/#park", "需登录"),
     ]
     cards = "".join(f'<a class="card" href="{u}" style="text-decoration:none"><span class="tag">{tag}</span><h3 style="margin-top:10px">{n}</h3><p>{d}</p></a>'
                     for n, d, u, tag in items)
@@ -387,9 +412,11 @@ def platform():
     body = f"""{hero("旗舰产品二", "问渠数字工厂集成平台：CAD、CAM、CAE、MES、MRP、ERP 信息集成化", "一条数字主线把设计、工艺、加工、经营和车间连起来：改一次设计，下游自动跟着变，车间只拿到批准过的版本。", "企业服务 / 数字工厂集成平台", [("预约演示", "/contact/"), ("数字工厂登录", FACTORY + "/"), ("看案例", "/cases/")], video="factory")}
 {part("一", "设计、工艺、经营、车间，一条线", None, thread)}
 {part("二", "各模块：每个都能单独用", "下表最后一列是 AI 在这个模块里做的事；它起草的东西都要人批准。", table, "alt")}
+<div id="park"></div>
+{part("三", "数字工业园：8 座厂在线运行", "每座厂一套独立的车间、ERPNext 和厂情中枢；点进去用学习平台账号登录。", park())}
 <div id="combine"></div>
-{part("三", "怎样组合", None, combine)}
-{part("四", "部署怎么走", None, steps(DEPLOY_STEPS), "dark")}
+{part("四", "怎样组合", None, combine)}
+{part("五", "部署怎么走", None, steps(DEPLOY_STEPS), "dark")}
 {cta()}"""
     page("/solutions/platform/", "问渠数字工厂集成平台", "问渠数字工厂集成平台：CAD、CAM、CAE、MES、MRP、ERP 信息集成化，模块自由组合，设计改动经审批自动传到 BOM、工单和车间。", body, "/solutions/platform/")
 

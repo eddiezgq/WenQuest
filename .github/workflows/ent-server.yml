@@ -23,7 +23,7 @@ permissions:
 jobs:
   pubkey:
     if: inputs.task == 'pubkey'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: 部署公钥
         run: |
@@ -36,7 +36,7 @@ jobs:
 
   check:
     if: inputs.task == 'check'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: 登录并检查
         env:
@@ -52,7 +52,7 @@ jobs:
 
   bootstrap:
     if: inputs.task == 'bootstrap'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: 初始化

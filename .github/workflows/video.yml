@@ -51,7 +51,7 @@ concurrency:
 jobs:
   voice:
     if: inputs.task == 'audition' || inputs.voice == 'clone'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
 
   ytcheck:
     if: inputs.task == 'ytcheck'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -124,7 +124,7 @@ jobs:
   render:
     needs: voice
     if: always() && inputs.task == 'render' && (needs.voice.result == 'success' || needs.voice.result == 'skipped')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
@@ -229,7 +229,7 @@ jobs:
   upload:
     needs: render
     if: inputs.task == 'render' && inputs.upload == 'youtube' && needs.render.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
@@ -251,7 +251,7 @@ jobs:
 
   release:
     if: inputs.task == 'release' && inputs.run != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Direct download page for an earlier run
         env:
@@ -275,7 +275,7 @@ jobs:
   # 补传（2026-10-31 第 22 讲：英文版传完后加播放列表一步遇到 YouTube 临时错误，中文版没传；重跑整个上传作业会重复传英文版）
   reupload:
     if: inputs.task == 'upload' && inputs.run != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4

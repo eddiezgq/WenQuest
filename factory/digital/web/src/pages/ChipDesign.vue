@@ -186,7 +186,7 @@
       <p class="small muted">{{ bwinText }}</p>
       <div class="line"><router-link class="btn" to="/instruments?task=encoder">{{ t('去虚拟仪器量一台真编码器 →') }}</router-link>
         <router-link class="btn" to="/pcb-design?rev=B&tab=diff">{{ t('驱动板 B 版：这颗芯片上板后改了什么 →') }}</router-link>
-        <a class="btn" href="https://chip.factory.wenquestrobotics.com" target="_blank" rel="noopener">{{ t('芯片厂：流片回来的晶圆怎么封装测试 →') }}</a></div>
+        <a class="btn" :href="chipPlant" target="_blank" rel="noopener">{{ t('芯片厂：流片回来的晶圆怎么封装测试 →') }}</a></div>
     </section>
 
     <section v-if="d && tab === 'dl'" class="card">
@@ -205,6 +205,12 @@ import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { bench } from '../lib/encif.js';
 import { t, td, tk } from '../lib/i18n';
+
+// 芯片封测厂网址跟着当前网站的主域名走（国内 wenquestech.online，美国 wenquestrobotics.com；第 144 轮）
+const chipPlant = (() => {
+  const d = typeof location === 'undefined' ? '' : location.hostname.split('.').slice(-2).join('.');
+  return `https://chip.factory.${d === 'wenquestech.online' ? d : 'wenquestrobotics.com'}`;
+})();
 
 const BASE = '/api/designs/wq-encif/';
 const TABS = [{ k: 'spec', label: tk('规格') }, { k: 'rtl', label: 'Verilog' }, { k: 'sim', label: tk('仿真') }, { k: 'syn', label: tk('综合') },

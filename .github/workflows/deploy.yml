@@ -49,7 +49,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     # A stuck runner should fail, not hold the deploy queue for hours.
     timeout-minutes: 40
     steps:
@@ -130,7 +130,7 @@ jobs:
 
   # 教材：每本书一个并行任务（第 10 轮）。书越来越多，串行构建超过 40 分钟的限制，所以按书拆开。
   books:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       list: ${{ steps.list.outputs.list }}
     steps:
@@ -205,7 +205,7 @@ jobs:
   textbook:
     needs: books
     if: needs.books.outputs.list != '[]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 150      # 《机器人学》全书检查已超过 60 分钟（10-07 起每次部署都卡在这里超时，什么都没上线）
     strategy:
       fail-fast: false
@@ -326,7 +326,7 @@ jobs:
 
   # 网页版教材（第 15 轮）：整本网页书（textbook/web-editions/<书>/），构建成 <书>/webed/，随教材一起部署
   webeditions:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -358,7 +358,7 @@ jobs:
 
   build:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       image: ${{ steps.meta.outputs.image }}
     steps:
@@ -509,7 +509,7 @@ jobs:
     # 推送只跑检查，不上线（上线由每半小时的定时任务与手动触发做，见文件开头的 concurrency）。
     # the textbook checks are skipped when no book changed: deploy anyway (the books on the server stay as they are)
     if: always() && !cancelled() && github.event_name != 'push' && needs.build.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment: production
     env:
       HOST: ${{ secrets.DEPLOY_HOST }}
@@ -697,7 +697,7 @@ jobs:
   mirror-cn:
     needs: build
     if: github.event_name != 'push' && vars.CN_REGISTRY != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 240   # 自带仓库第一次要跨境传十几 GB；以后只传变化的层
     outputs:
       image: ${{ steps.copy.outputs.image }}
@@ -830,7 +830,7 @@ jobs:
   deploy-cn:
     needs: [mirror-cn, textbook, webeditions]
     if: always() && !cancelled() && github.event_name != 'push' && needs.mirror-cn.result == 'success' && needs.webeditions.result == 'success' && (needs.textbook.result == 'success' || needs.textbook.result == 'skipped')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
       HOST: ${{ secrets.CN_DEPLOY_HOST }}
