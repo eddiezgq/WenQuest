@@ -1,7 +1,7 @@
 """检查国内版官网 site/cn/（第 48 轮）。CI 测试里跑：先 build.py，再本脚本。
 
 - 不该出现的词：学校用语（公司不能招生）、捐赠、境外服务、美元、绝对化用语（《广告法》）、美国版域名；
-- 外部链接只允许备案系统（beian.miit.gov.cn、beian.mps.gov.cn）；
+- 外部链接只允许备案系统（beian.miit.gov.cn、beian.mps.gov.cn）和本站自己的子域名 learn.、qms.（第 143 轮加 qms.）；
 - 每页页脚有 ICP 备案号、公安备案号、生成式 AI 登记编号的模板位置；
 - 页面引用的 /assets/ 文件都存在；Caddy 模板只用 env 和 regexFind。
 有问题就列出并以非零状态退出。
@@ -42,7 +42,7 @@ def main():
             if w in t or (w in ("Claude", "Anthropic", "Google", "YouTube", "wenquestrobotics") and w.lower() in h.lower()):
                 errs.append(f"{rel}：出现“{w}”")
         for host in re.findall(r'(?:href|src)="https?://([^/"]+)', h):
-            if host not in ALLOWED_HOSTS and not host.startswith("learn.{{"):
+            if host not in ALLOWED_HOSTS and not host.startswith(("learn.{{", "qms.{{")):
                 errs.append(f"{rel}：外部链接 {host}")
         for k in NEED:
             if k not in h:

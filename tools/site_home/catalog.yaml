@@ -44,6 +44,7 @@ groups:
     en: Digital industrial park
     items:
       - {zh: "进入数字工厂", en: "Enter the digital factory", dz: "减速器厂、机器人厂、电路板厂、芯片封测厂、传感器厂、电机厂、缝纫机厂：ERP、工艺、MES、质量、设备、能源", de: "Gearbox, robot, PCB, chip, sensor, motor and sewing machine plants: ERP, process, MES, quality, maintenance, energy", url: "https://factory.wenquestrobotics.com/", login: true, intro: factory}
+      - {zh: "机器人厂", en: "Robot plant", dz: "协作机器人与 AGV：装配、整机标定、跑合、出厂与现场售后；减速器向减速器厂买，驱动板向电路板厂买", de: "Cobots and AGVs: assembly, calibration, run-in, shipping and field service; buys gearboxes from the gearbox plant and driver boards from the PCB plant", url: "https://robot.factory.wenquestrobotics.com/", login: true, intro: factory}
       - {zh: "工厂演示", en: "Factory demo", dz: "不用登录，看车间怎样运转", de: "See the shop floor run, no sign-in", url: "/factory", intro: factory}
       - {zh: "三维工厂", en: "3D factory", dz: "车间、设备、在制品的三维视图", de: "The plant in 3D", url: "https://factory.wenquestrobotics.com/3d", login: true, intro: factory}
       - {zh: "数字工厂实验", en: "Factory labs", dz: "__FLAB__ 个实验：从订单到交付、追因、标定、售后", de: "__FLAB__ labs: order to delivery, root cause, calibration, after-sales", url: "https://factory.wenquestrobotics.com/labs", login: true, intro: factory}
