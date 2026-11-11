@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 
 const saved = (() => { try { return localStorage.getItem('wqbearing-lang') } catch { return null } })()
-export const lang = ref(saved || (navigator.language?.startsWith('zh') ? 'zh' : 'en'))
+// 默认语言按站点：国内站中文，美国站（含企业服务器 app.）英文；自己切换过的照记住的（第 146 轮，Eddie 11-11“美国这边请确保默认英文”）
+export const lang = ref(saved || (location.hostname.endsWith('wenquestech.online') ? 'zh' : 'en'))
 export function setLang(l) { lang.value = l; try { localStorage.setItem('wqbearing-lang', l) } catch { /* private mode */ } }
 
 const W = {
