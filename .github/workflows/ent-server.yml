@@ -103,14 +103,14 @@ jobs:
           envset /opt/wenquest/edge/.env ACME_EMAIL "$ACME"
           cd /opt/wenquest/edge
           docker network inspect qms-edge >/dev/null 2>&1 || docker network create qms-edge
-          docker compose --env-file .env pull -q
-          docker compose --env-file .env run --rm --no-deps -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -n 3
-          docker compose --env-file .env up -d --remove-orphans
-          docker compose --env-file .env exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -n 2 || true
+          docker compose --env-file .env pull -q </dev/null    # docker 读标准输入会吃掉这段脚本后面的行
+          docker compose --env-file .env run --rm --no-deps -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile </dev/null 2>&1 | tail -n 3
+          docker compose --env-file .env up -d --remove-orphans </dev/null
+          docker compose --env-file .env exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile </dev/null 2>&1 | tail -n 2 || true
           line='* * * * * python3 /opt/wenquest/edge/bridge-sync.py >> /opt/wenquest/edge/bridge.log 2>&1'
           { crontab -l 2>/dev/null | grep -v 'bridge-sync.py' || true; echo "$line"; } | crontab -
           crontab -l
-          docker compose ps
+          docker compose ps </dev/null
           free -m | head -2
           EOF
       - name: 从外面看（还没切 DNS，用 --resolve 指到企业服务器）
