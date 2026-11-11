@@ -91,7 +91,7 @@ def services(c, ci_ports=None, classes=None):
         base_env["WQ_PLANT_FILE"] = pi["file"]
     app = {"image": "${FACTORY_APP_IMAGE:?FACTORY_APP_IMAGE}", "restart": "unless-stopped", "logging": log}
     s = {}
-    s["bus-c-" + cid] = {"image": "eclipse-mosquitto:2.0.20", "restart": "unless-stopped", "logging": log,
+    s["bus-c-" + cid] = {"image": "${FACTORY_MQTT_IMAGE:-eclipse-mosquitto:2.0.20}", "restart": "unless-stopped", "logging": log,
                          "volumes": ["./mosquitto:/mosquitto/config:ro"],
                          "networks": {"default": {}, "edge": {"aliases": ["wqf-bus-c-" + cid]}}}
     s["hub-c-" + cid] = dict(app, environment=dict(
@@ -128,7 +128,7 @@ def services(c, ci_ports=None, classes=None):
                                             "WQ_ERP_API_KEY": "${%s:-}" % env_key(cid, "ERP_API_KEY"),
                                             "WQ_ERP_API_SECRET": "${%s:-}" % env_key(cid, "ERP_API_SECRET"),
                                             "WQ_ERP_ABBR": "WQ", "WQ_HUB_PUBLIC_URL": "https://%s.factory.${SITE_DOMAIN}" % cid}}
-    s["erp-frontend-c-" + cid] = {"image": "frappe/erpnext:v16.34.1", "restart": "unless-stopped", "logging": log,
+    s["erp-frontend-c-" + cid] = {"image": "${FACTORY_ERP_IMAGE:-frappe/erpnext:v16.34.1}", "restart": "unless-stopped", "logging": log,
                                   "command": ["nginx-entrypoint.sh"],
                                   "volumes": ["erp-sites:/home/frappe/frappe-bench/sites", "erp-logs:/home/frappe/frappe-bench/logs"],
                                   "environment": {"BACKEND": "erp-backend:8000", "FRAPPE_SITE_NAME_HEADER": "c-" + cid,

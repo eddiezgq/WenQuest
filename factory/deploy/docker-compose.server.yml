@@ -4,6 +4,7 @@
 #   数字工厂：bus 总线、db 历史库、hub 枢纽（工作台网页 + AI 助手）、sim 仿真车间、bridge 桥接（Node-RED，不对外）
 #   ERPNext v16：erp-* 一组容器，网页经 Caddy 对外 erp.<域名>
 # 密码全部在同目录 .env（安装脚本生成），不进仓库。
+# 基础镜像可在 .env 里换地址（第 144 轮：国内服务器拉不到 Docker Hub，FACTORY_ERP_IMAGE 等指向本机仓库 127.0.0.1:5000）；不填 = 原名。
 name: wq-factory
 
 x-app: &app
@@ -33,7 +34,7 @@ x-demo-env: &demo-env
   WQ_FACTORY_READ_KEY: ${WQ_FACTORY_READ_KEY:-}   # 转 PDF 时向网关出示（第 128 轮）
 
 x-erpnext: &erpnext
-  image: frappe/erpnext:v16.34.1
+  image: ${FACTORY_ERP_IMAGE:-frappe/erpnext:v16.34.1}
   restart: unless-stopped
   networks: [erp]
   logging: *logging
@@ -48,7 +49,7 @@ x-erp-redis-env: &erp-redis-env
 services:
   # ------------------------------------------------------------------ 数字工厂
   bus:
-    image: eclipse-mosquitto:2.0.20
+    image: ${FACTORY_MQTT_IMAGE:-eclipse-mosquitto:2.0.20}
     restart: unless-stopped
     logging: *logging
     volumes:
@@ -59,7 +60,7 @@ services:
       edge: { aliases: [wqf-bus] }
 
   db:
-    image: postgres:16-alpine
+    image: ${FACTORY_PG_IMAGE:-postgres:16-alpine}
     restart: unless-stopped
     logging: *logging
     environment:
@@ -187,7 +188,7 @@ services:
   # ------------------------------------------------------------------ 企业版演示工厂（第 9 轮）：生产模式，与教学工厂完全隔离
   # 总线、枢纽、仿真、桥接另起一组（-demo）；历史库在同一数据库服务器的 wq_demo 库；ERPNext 用同一套程序里的 demo 站点
   bus-demo:
-    image: eclipse-mosquitto:2.0.20
+    image: ${FACTORY_MQTT_IMAGE:-eclipse-mosquitto:2.0.20}
     restart: unless-stopped
     logging: *logging
     volumes:
@@ -373,7 +374,7 @@ services:
       erp-configurator: { condition: service_completed_successfully }
 
   erp-db:
-    image: mariadb:11.8
+    image: ${FACTORY_MARIADB_IMAGE:-mariadb:11.8}
     restart: unless-stopped
     logging: *logging
     networks: [erp]
@@ -393,14 +394,14 @@ services:
     volumes: [erp-db-data:/var/lib/mysql]
 
   erp-redis-queue:
-    image: redis:6.2-alpine
+    image: ${FACTORY_REDIS_IMAGE:-redis:6.2-alpine}
     restart: unless-stopped
     logging: *logging
     networks: [erp]
     volumes: [erp-redis-queue-data:/data]
 
   erp-redis-cache:
-    image: redis:6.2-alpine
+    image: ${FACTORY_REDIS_IMAGE:-redis:6.2-alpine}
     restart: unless-stopped
     logging: *logging
     networks: [erp]

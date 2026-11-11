@@ -23,7 +23,8 @@ fi
 
 # ---------------------------------------------------------------- 2 总线账号（D5）
 log "总线账号与授权..."
-docker run --rm -v "$FD/mosquitto:/c" eclipse-mosquitto:2.0.20 sh -c "
+mq=$(envval FACTORY_MQTT_IMAGE); mq="${mq:-eclipse-mosquitto:2.0.20}"     # 第 144 轮：国内服务器用本机仓库里的
+docker run --rm -v "$FD/mosquitto:/c" "$mq" sh -c "
     rm -f /c/passwd &&
     mosquitto_passwd -c -b /c/passwd hub '$(envval WQ_MQTT_HUB_PASSWORD)' &&
     mosquitto_passwd -b /c/passwd sim '$(envval WQ_MQTT_SIM_PASSWORD)' &&

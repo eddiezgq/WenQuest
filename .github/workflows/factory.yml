@@ -761,3 +761,150 @@ jobs:
           done
           ssh "deploy@$HOST" "cd /opt/wenquest/factory && docker compose -p wq-factory ps --format 'table {{.Service}}\t{{.State}}\t{{.Status}}' && echo && docker compose -p wq-factory logs --no-color --tail 25 sim bus && echo '---- 单点登录（枢纽）----' && docker compose -p wq-factory logs --no-color --since 6h hub 2>&1 | grep -iE 'oauth|ERPNext|Traceback|Error' | tail -n 30 && echo '---- 单点登录（ERPNext）----' && docker compose -p wq-factory exec -T erp-backend bash -c 'grep -ihE \"oauth|social|login\" logs/*.log | tail -n 30' | sed -E 's/(password)[ =]+[^ ]+/\1 ***/Ig'; cat /tmp/wq-sso.log 2>/dev/null | tail -5" > /tmp/workshop.log 2>&1 || true
           python3 factory/deploy/ci_annotate.py 服务器车间状态 /tmp/workshop.log 150 | sed 's/^::error /::notice /'
+
+  # 第 144 轮：国内服务器也部署一套数字工厂（Eddie 11-10“国内服务器也部署一套”，服务器已升到 8 核 16 GB）。
+  # 做法同学习平台的 mirror-cn + deploy-cn：国内拉不到 GitHub、Docker Hub，镜像经 SSH 隧道复制进国内服务器自己的仓库（127.0.0.1:5000），
+  # 再在服务器上跑同一个 deploy/update.sh。.env 里基础镜像指向本机仓库，WQ_TZ=Asia/Shanghai（AI 只用 DeepSeek，界面按国内域名默认中文）。
+  deploy-cn:
+    name: 部署到国内服务器
+    needs: [build, design]
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 240          # 第一次要跨境传几 GB；以后只传变化的层
+    env:
+      HOST: ${{ secrets.CN_DEPLOY_HOST }}
+      BASE: frappe/erpnext:v16.34.1 mariadb:11.8 redis:6.2-alpine eclipse-mosquitto:2.0.20 postgres:16-alpine
+    steps:
+      - uses: actions/checkout@v4
+      - name: 检查部署设置
+        run: |
+          if [ -z "$HOST" ]; then
+            echo "::warning::CN_DEPLOY_HOST 没有设置，跳过国内部署。"
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+      - name: SSH
+        if: env.SKIP != '1'
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CN_DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          if [ -n "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" ]; then
+            printf '%s\n' "${{ secrets.CN_DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts
+          fi
+          printf 'Host cn\n  HostName %s\n  User deploy\n  ServerAliveInterval 30\n  ServerAliveCountMax 6\n' "$HOST" > ~/.ssh/config
+          ssh cn 'echo connected; free -m | head -2; df -h / | tail -1'
+      - name: 复制镜像进国内服务器的仓库（经 SSH 隧道，只传缺的层）
+        if: env.SKIP != '1'
+        run: |
+          set -euo pipefail
+          ssh cn 'curl -sf http://127.0.0.1:5000/v2/ >/dev/null' \
+            || { echo "::error::国内服务器的镜像仓库 wq-registry 没在运行（由学习平台的 mirror-cn 建）；先跑一次学习平台部署"; exit 1; }
+          command -v skopeo >/dev/null || { sudo apt-get update -q && sudo apt-get install -yq skopeo; }
+          ssh -fN -o ExitOnForwardFailure=yes -L 5000:127.0.0.1:5000 cn
+          for i in $(seq 1 15); do curl -sf http://localhost:5000/v2/ >/dev/null && break; sleep 2; done
+          creds="${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}"
+          copy() {   # $1 来源，$2 仓库里的路径，$3 来源账号（可选）
+            for i in 1 2 3 4; do
+              curl -sf http://localhost:5000/v2/ >/dev/null || ssh -fN -o ExitOnForwardFailure=yes -L 5000:127.0.0.1:5000 cn || true
+              start=$(date +%s)
+              if skopeo copy --retry-times 3 --dest-tls-verify=false ${3:+--src-creds "$3"} "docker://$1" "docker://localhost:5000/$2"; then
+                echo "::notice title=国内仓库::$2 已复制（$(( $(date +%s) - start )) 秒）"; return 0
+              fi
+              echo "retry $i: $1"; sleep 20
+            done
+            return 1
+          }
+          for b in $BASE; do
+            case "$b" in */*) src="docker.io/$b" ;; *) src="docker.io/library/$b" ;; esac
+            copy "$src" "${b##*/}"
+          done
+          for img in "${{ needs.build.outputs.app }}" "${{ needs.build.outputs.bridge }}" "${{ needs.build.outputs.openplc }}"; do
+            copy "$img" "${img##*/}" "$creds"
+          done
+      - name: 复制部署文件到 /opt/wenquest/factory
+        if: env.SKIP != '1'
+        run: |
+          mkdir -p stage/deploy stage/mosquitto
+          cp factory/deploy/docker-compose.server.yml stage/docker-compose.yml
+          cp factory/deploy/*.sh stage/deploy/
+          cp factory/digital/mosquitto/server/* stage/mosquitto/
+          python3 -c "import yaml" 2>/dev/null || pip install -q pyyaml || pip install -q --break-system-packages pyyaml
+          for a in "stage/docker-compose.classes.yml" "--ids" "--names" "--plants"; do
+            case "$a" in --*) out="stage/classes.${a#--}";; *) out=/dev/null;; esac
+            python3 factory/deploy/classes.py factory/deploy/classes.yaml $a > "$out"
+          done
+          tar czf - -C stage . | ssh cn 'mkdir -p /opt/wenquest/factory && tar xzf - -C /opt/wenquest/factory && chmod +x /opt/wenquest/factory/deploy/*.sh'
+      - name: 国内设置（基础镜像走本机仓库、时区）
+        if: env.SKIP != '1'
+        run: |
+          ssh cn 'bash -s' <<'SH'
+          set -euo pipefail
+          . /opt/wenquest/factory/deploy/lib.sh
+          R=127.0.0.1:5000
+          envset FACTORY_ERP_IMAGE "$R/erpnext:v16.34.1"
+          envset FACTORY_MARIADB_IMAGE "$R/mariadb:11.8"
+          envset FACTORY_REDIS_IMAGE "$R/redis:6.2-alpine"
+          envset FACTORY_MQTT_IMAGE "$R/eclipse-mosquitto:2.0.20"
+          envset FACTORY_PG_IMAGE "$R/postgres:16-alpine"
+          [ -n "$(envval WQ_TZ)" ] || envset WQ_TZ Asia/Shanghai     # 时区决定 AI 用哪家：国内只用 DeepSeek
+          echo "set; SITE_DOMAIN=$(envval SITE_DOMAIN || true) WQ_TZ=$(envval WQ_TZ)"
+          SH
+      - name: 更新数字工厂（国内）
+        if: env.SKIP != '1'
+        run: |
+          set +e
+          R=127.0.0.1:5000
+          app="${{ needs.build.outputs.app }}"; app="$R/${app##*/}"
+          bridge="${{ needs.build.outputs.bridge }}"; bridge="$R/${bridge##*/}"
+          openplc="${{ needs.build.outputs.openplc }}"; openplc="$R/${openplc##*/}"
+          ssh cn "flock -w 1500 /tmp/wenquest-deploy.lock /opt/wenquest/factory/deploy/update.sh $app $bridge $openplc" 2>&1 | tee /tmp/update.log
+          st=${PIPESTATUS[0]}
+          if [ "$st" = 3 ]; then
+            echo "::warning::国内服务器可用内存不够，数字工厂这次没装（升配后要重启服务器才生效）；学习平台未受影响。"
+            exit 0
+          fi
+          if [ "$st" != 0 ]; then
+            python3 factory/deploy/ci_annotate.py 国内服务器更新 /tmp/update.log 180
+            ssh cn "cd /opt/wenquest/factory && docker compose -p wq-factory ps -a && docker compose -p wq-factory logs --no-color --tail 60 hub bridge erp-backend" > /tmp/server.log 2>&1
+            python3 factory/deploy/ci_annotate.py 国内服务器容器 /tmp/server.log 180
+          fi
+          exit "$st"
+      - name: 国内仓库只留最近 3 个版本
+        if: env.SKIP != '1'
+        continue-on-error: true
+        run: |
+          app="${{ needs.build.outputs.app }}"; TAG="${app##*:}"
+          ssh cn "TAG='$TAG' bash -s" <<'EOF'
+          set -u
+          R=http://127.0.0.1:5000
+          H='Accept: application/vnd.docker.distribution.manifest.v2+json, application/vnd.oci.image.manifest.v1+json, application/vnd.oci.image.index.v1+json, application/vnd.docker.distribution.manifest.list.v2+json'
+          L=/opt/wenquest/registry/.tags-factory
+          { grep -vx "$TAG" "$L" 2>/dev/null; echo "$TAG"; } > "$L.new" && mv "$L.new" "$L"
+          keep=$(tail -n 3 "$L"); old=$(head -n -3 "$L")
+          digest() { curl -sfI -H "$H" "$R/v2/$1/manifests/$2" | tr -d '\r' | awk -F': ' 'tolower($1)=="docker-content-digest"{print $2}'; }
+          n=0
+          for name in factory-app factory-bridge factory-openplc; do
+            kept=$(for t in $keep; do digest "$name" "$t"; done)
+            for t in $old; do
+              d=$(digest "$name" "$t") || continue; [ -n "$d" ] || continue
+              echo "$kept" | grep -qx "$d" && continue
+              curl -sf -X DELETE "$R/v2/$name/manifests/$d" >/dev/null && n=$((n+1))
+            done
+          done
+          printf '%s\n' $keep > "$L"
+          docker exec wq-registry registry garbage-collect --delete-untagged /etc/docker/registry/config.yml >/dev/null 2>&1 || true
+          echo "removed $n old manifests; disk $(df -h / | tail -1 | awk '{print $5}') used"
+          EOF
+      - name: 检查国内网址
+        if: env.SKIP != '1'
+        run: |
+          domain=$(ssh cn "grep '^SITE_DOMAIN=' /opt/wenquest/factory/.env | cut -d= -f2" || true)
+          [ -n "$domain" ] || { echo "::warning::国内数字工厂还没装（.env 没有 SITE_DOMAIN）"; exit 0; }
+          for u in "https://factory.$domain/api/health" "https://erp.$domain/api/method/ping"; do
+            code=$(curl -s -o /tmp/h.txt -w '%{http_code}' --max-time 30 "$u" || true)
+            echo "$u → $code $(head -c 200 /tmp/h.txt)"
+            [ "$code" = 200 ] || echo "::warning::$u 还打不开（$code）"
+          done
+          ssh cn 'free -m | head -2'

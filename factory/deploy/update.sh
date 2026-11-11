@@ -43,7 +43,7 @@ if [ "$(envval FACTORY_INSTALLED)" != 1 ]; then
     need="${FACTORY_MIN_MEM_MB:-3000}"
     log "可用内存 ${avail} MB，交换空间 ${swap} MB（需要至少 ${need} MB 可用内存）"
     if [ "$avail" -lt "$need" ]; then
-        echo "::error::服务器可用内存只有 ${avail} MB，装数字工厂需要 ${need} MB。请在 DigitalOcean 控制台把这台服务器升到 16 GB（Resize），完成后重新运行“数字工厂部署”。学习平台未受影响。"
+        echo "::error::服务器可用内存只有 ${avail} MB，装数字工厂需要 ${need} MB。请把这台服务器升到 16 GB（美国 DigitalOcean 控制台 Resize；国内阿里云“资源变配”，升配后重启服务器才生效），完成后重新运行“数字工厂部署”。学习平台未受影响。"
         exit 3
     fi
     log "第一次部署：执行安装（先生成密码和配置，再拉镜像、启动）..."
