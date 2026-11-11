@@ -1,0 +1,327 @@
+{
+ "HSG-LS-U": {
+  "ops": [
+   [
+    10,
+    "铣结合面",
+    5.5
+   ],
+   [
+    20,
+    "镗轴承孔",
+    7.5
+   ],
+   [
+    30,
+    "时效",
+    6
+   ],
+   [
+    40,
+    "铣结合面",
+    6.5
+   ],
+   [
+    50,
+    "镗轴承孔",
+    12.0
+   ],
+   [
+    60,
+    "钻攻螺纹孔",
+    5.0
+   ],
+   [
+    70,
+    "零件检验",
+    25
+   ]
+  ],
+  "total_min": 67.5,
+  "review": [],
+  "cards_check": [],
+  "holes": [
+   {
+    "feature": "前轴承孔",
+    "from_": "铸出",
+    "to": 20,
+    "d_from": 30.0,
+    "d_to": 34.0,
+    "z_min": 1.7,
+    "z_max": 2.35,
+    "ok": true
+   },
+   {
+    "feature": "前轴承孔",
+    "from_": 20,
+    "to": 50,
+    "d_from": 34.0,
+    "d_to": 34.7,
+    "z_min": 0.3,
+    "z_max": 0.37,
+    "ok": true
+   },
+   {
+    "feature": "前轴承孔",
+    "from_": 50,
+    "to": 50,
+    "d_from": 34.7,
+    "d_to": 35.0,
+    "z_min": 0.13,
+    "z_max": 0.162,
+    "ok": true
+   },
+   {
+    "feature": "后轴承孔",
+    "from_": "铸出",
+    "to": 20,
+    "d_from": 27.0,
+    "d_to": 31.0,
+    "z_min": 1.7,
+    "z_max": 2.35,
+    "ok": true
+   },
+   {
+    "feature": "后轴承孔",
+    "from_": 20,
+    "to": 50,
+    "d_from": 31.0,
+    "d_to": 31.7,
+    "z_min": 0.3,
+    "z_max": 0.37,
+    "ok": true
+   },
+   {
+    "feature": "后轴承孔",
+    "from_": 50,
+    "to": 50,
+    "d_from": 31.7,
+    "d_to": 32.0,
+    "z_min": 0.13,
+    "z_max": 0.162,
+    "ok": true
+   },
+   {
+    "feature": "针杆孔",
+    "from_": "钻",
+    "to": 50,
+    "d_from": 11.5,
+    "d_to": 11.85,
+    "z_min": 0.125,
+    "z_max": 0.188,
+    "ok": true
+   },
+   {
+    "feature": "针杆孔",
+    "from_": 50,
+    "to": 50,
+    "d_from": 11.85,
+    "d_to": 12.0,
+    "z_min": 0.062,
+    "z_max": 0.084,
+    "ok": true
+   },
+   {
+    "feature": "电机止口（外圆）",
+    "from_": "铸出",
+    "to": 20,
+    "d_from": 57.0,
+    "d_to": 53.0,
+    "z_min": 1.7,
+    "z_max": 2.35,
+    "ok": true
+   },
+   {
+    "feature": "电机止口（外圆）",
+    "from_": 20,
+    "to": 50,
+    "d_from": 53.0,
+    "d_to": 52.0,
+    "z_min": 0.45,
+    "z_max": 0.515,
+    "ok": true
+   },
+   {
+    "feature": "销孔",
+    "from_": 10,
+    "to": 40,
+    "d_from": 9.5,
+    "d_to": 9.85,
+    "z_min": 0.125,
+    "z_max": 0.186,
+    "ok": true
+   },
+   {
+    "feature": "销孔",
+    "from_": 40,
+    "to": 40,
+    "d_from": 9.85,
+    "d_to": 10.0,
+    "z_min": 0.064,
+    "z_max": 0.083,
+    "ok": true
+   }
+  ],
+  "power": [
+   {
+    "seq": 10,
+    "step": 1,
+    "P_kw": 3.73,
+    "need_kw": 4.66,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 10,
+    "step": 2,
+    "P_kw": 0.6,
+    "need_kw": 0.75,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 20,
+    "step": 2,
+    "P_kw": 2.04,
+    "need_kw": 2.55,
+    "motor_kw": 18.5,
+    "ok": true
+   },
+   {
+    "seq": 20,
+    "step": 4,
+    "P_kw": 1.63,
+    "need_kw": 2.04,
+    "motor_kw": 18.5,
+    "ok": true
+   },
+   {
+    "seq": 40,
+    "step": 1,
+    "P_kw": 0.46,
+    "need_kw": 0.57,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 50,
+    "step": 3,
+    "P_kw": 0.32,
+    "need_kw": 0.4,
+    "motor_kw": 18.5,
+    "ok": true
+   },
+   {
+    "seq": 50,
+    "step": 6,
+    "P_kw": 0.32,
+    "need_kw": 0.4,
+    "motor_kw": 18.5,
+    "ok": true
+   }
+  ],
+  "pdf": "/tmp/claude-0/-home-claude/977649d0-331f-55bb-b300-57007deb1961/scratchpad/g5/proc/工艺卡_上件.pdf"
+ },
+ "HSG-LS-L": {
+  "ops": [
+   [
+    10,
+    "铣结合面",
+    9.0
+   ],
+   [
+    20,
+    "铣结合面",
+    7.0
+   ],
+   [
+    30,
+    "时效",
+    6
+   ],
+   [
+    40,
+    "铣结合面",
+    21.0
+   ],
+   [
+    50,
+    "钻攻螺纹孔",
+    3.5
+   ],
+   [
+    60,
+    "零件检验",
+    15
+   ]
+  ],
+  "total_min": 61.5,
+  "review": [],
+  "cards_check": [],
+  "holes": [
+   {
+    "feature": "销孔",
+    "from_": 40,
+    "to": 40,
+    "d_from": 9.5,
+    "d_to": 9.85,
+    "z_min": 0.125,
+    "z_max": 0.186,
+    "ok": true
+   },
+   {
+    "feature": "销孔",
+    "from_": 40,
+    "to": 40,
+    "d_from": 9.85,
+    "d_to": 10.0,
+    "z_min": 0.064,
+    "z_max": 0.083,
+    "ok": true
+   }
+  ],
+  "power": [
+   {
+    "seq": 10,
+    "step": 1,
+    "P_kw": 4.11,
+    "need_kw": 5.14,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 10,
+    "step": 2,
+    "P_kw": 0.76,
+    "need_kw": 0.95,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 20,
+    "step": 1,
+    "P_kw": 3.27,
+    "need_kw": 4.09,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 40,
+    "step": 1,
+    "P_kw": 0.34,
+    "need_kw": 0.42,
+    "motor_kw": 15.0,
+    "ok": true
+   },
+   {
+    "seq": 40,
+    "step": 2,
+    "P_kw": 0.57,
+    "need_kw": 0.71,
+    "motor_kw": 15.0,
+    "ok": true
+   }
+  ],
+  "pdf": "/tmp/claude-0/-home-claude/977649d0-331f-55bb-b300-57007deb1961/scratchpad/g5/proc/工艺卡_下件.pdf"
+ }
+}
