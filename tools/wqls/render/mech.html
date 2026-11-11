@@ -73,16 +73,29 @@ const loader = new STLLoader();
 const prep = g => { g.deleteAttribute('normal'); g = mergeVertices(g, 1e-3); return toCreasedNormals(g, THREE.MathUtils.degToRad(30)); };
 const info = await (await fetch(`${BASE}/parts.json`)).json();
 const FR = (await (await fetch(`${BASE}/frames.json`)).json()).frames;
+// 网格：优先读打包的 meshes.json（发布到网页用，render/stl2json.py 生成），没有就读各零件的 STL
+let PACK = null;
+try { const r_ = await fetch(`${BASE}/meshes.json`); if (r_.ok) PACK = await r_.json(); } catch (e) { PACK = null; }
+async function geom(k) {
+  if (PACK && PACK[k]) {
+    const bin = Uint8Array.from(atob(PACK[k]), c => c.charCodeAt(0));
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(bin.buffer), 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(bin.length / 4), 3));
+    return g;
+  }
+  return loader.loadAsync(`${BASE}/${k}.stl`);
+}
 const mesh = {};
 await Promise.all(Object.entries(info.parts).map(async ([k, p]) => {
-  const g = prep(await loader.loadAsync(`${BASE}/${k}.stl`));
+  const g = prep(await geom(k));
   const m = new THREE.Mesh(g, MAT[p.material] || MAT.metal);
   m.castShadow = m.receiveShadow = true; m.matrixAutoUpdate = false;
   root.add(m); mesh[k] = m;
 }));
 let shell = null;
 try {
-  shell = new THREE.Mesh(prep(await loader.loadAsync(`${BASE}/head.stl`)), MAT.shell);
+  shell = new THREE.Mesh(prep(await geom('head')), MAT.shell);
   shell.renderOrder = 2; root.add(shell);
 } catch (e) { /* 没有机壳也能看 */ }
 // 面线
