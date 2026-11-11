@@ -54,6 +54,7 @@ def work_orders(db, mode, job_no):
     proj = E.project_of(j)
     rel = ED.released(db, mode, job_no)
     fp = rel["fingerprint"] if rel else None
+    from hub import eto_change as EC
     o = Overview(db, None, mode)
     out = []
     for w in o.wos:
@@ -65,6 +66,7 @@ def work_orders(db, mode, job_no):
                     "status": d.get("status"), "bom_no": d.get("bom_no"), "planned_start_date": d.get("planned_start_date"),
                     "started": d["name"] in o.started_wos,
                     "current_design": (bfp == fp) if (bfp and fp) else None,
+                    "kept": EC.kept(db, mode, job_no, d["name"]) if (bfp and fp and bfp != fp) else False,
                     "own": str(d.get("production_item") or "").startswith(job_no)})
     out.sort(key=lambda x: (x["planned_start_date"] or "", x["name"]))
     return out
@@ -75,7 +77,8 @@ def release_check(db, mode, job_no, work_order):
     w = wos.get(work_order)
     if not w:
         raise E.EtoError("工单 {} 不是这个作业的".format(work_order))
-    if w["current_design"] is False:
+    from hub import eto_change as EC
+    if w["current_design"] is False and not EC.kept(db, mode, job_no, work_order):
         raise E.EtoError("工单 {} 用的是旧版物料清单（设计已改版），先在 ERPNext 里处理这张工单再下达".format(work_order))
     if w["status"] in ("Completed", "Stopped", "Closed"):
         raise E.EtoError("工单 {} 已经{}".format(work_order, w["status"]))
@@ -144,6 +147,7 @@ def cost(db, mode, job_no):
         est = {"material": b["material"], "operations": b["operations"], "outside": b["outside"], "engineering": b["engineering"],
                "cost": b["cost"], "price": b["price"], "rev": j["quoted_rev"]}
     wos = work_orders(db, mode, job_no)
+    rev_of = {r["fingerprint"]: r["rev"] for r in ED.revisions(db, mode, job_no) if r.get("fingerprint")}   # 第 150 轮：变更前后分开
     ops_act = ops_std = 0.0
     mat, mat_unknown, lines = 0.0, [], []
     for w in wos:
@@ -166,7 +170,8 @@ def cost(db, mode, job_no):
         mat += m
         lines.append({"work_order": w["name"], "item": w["item"], "done": done, "qty": w["qty"],
                       "operations_actual": round(c["actual_cost"], 2) if c else 0.0, "operations_std": round(c["std_cost"], 2) if c else 0.0,
-                      "material": round(m, 2), "worst_operation": (c or {}).get("worst_operation")})
+                      "material": round(m, 2), "worst_operation": (c or {}).get("worst_operation"),
+                      "design_rev": rev_of.get(_bom_fp(db, mode, w["bom_no"]))})
     hrs = sum(h["hours"] for h in hours(db, mode, job_no))
     rate = cfg.get("engineering_rate_per_h")
     eng = round(hrs * float(rate), 2) if rate is not None else None
@@ -175,7 +180,16 @@ def cost(db, mode, job_no):
               "engineering": eng, "engineering_hours": hrs}
     known = [v for k, v in actual.items() if k != "engineering_hours"]
     actual["total"] = None if any(v is None for v in known) else round(sum(known), 2)
+    from hub import eto_change as EC
+    by_rev = {}
+    for ln in lines:
+        k = ln["design_rev"]
+        by_rev.setdefault(k, {"design_rev": k, "operations_actual": 0.0, "material": 0.0})
+        by_rev[k]["operations_actual"] = round(by_rev[k]["operations_actual"] + ln["operations_actual"], 2)
+        by_rev[k]["material"] = round(by_rev[k]["material"] + ln["material"], 2)
     return {"estimate": est, "actual": actual, "operations_std": round(ops_std, 2), "work_orders": lines,
+            "by_design_rev": sorted(by_rev.values(), key=lambda x: (x["design_rev"] is None, x["design_rev"] or 0)),
+            "change_loss": EC.loss(db, mode, job_no),
             "unknown": (["材料单价缺：" + "、".join(sorted(set(mat_unknown)))] if mat_unknown else []) +
                        out_unknown + ([] if rate is not None else ["设计费率没有配置"]),
             "basis": "工序按总线上每件实际节拍 + 调整 + 换刀 × 工位费率；材料按已完工件数 × 标准用量 × 单价；"
