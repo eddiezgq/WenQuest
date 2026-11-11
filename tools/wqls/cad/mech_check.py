@@ -65,8 +65,10 @@ def placed(k, f):
 
 
 names = list(parts) + ["casting"]
+ONLY = set(x for x in os.environ.get("WQ_ONLY", "").split(",") if x)    # 只查和这些零件有关的组合（G4.5：只查旋梭组，机头部分 G4.1–4.3 查过）
 worst = {}
 t0 = time.time()
+first = True
 for f in FR[::max(1, STEP // 2)]:
     sh = {k: placed(k, f) for k in parts}
     sh["casting"] = near
@@ -74,8 +76,10 @@ for f in FR[::max(1, STEP // 2)]:
         for b in names[i + 1:]:
             if frozenset((a, b)) in JOINT:
                 continue
-            if a != "casting" and b != "casting" and not f["M"].get(a) and not f["M"].get(b):
-                continue                                        # 两个都不动，不用每帧算
+            if ONLY and a not in ONLY and b not in ONLY:
+                continue
+            if not first and not f["M"].get(a) and not f["M"].get(b):
+                continue                                        # 两个都不动（机壳也不动），只在第一帧算
             A, B = sh[a], sh[b]
             if A.BoundBox.isValid() and B.BoundBox.isValid():
                 bb = App.BoundBox(A.BoundBox)
@@ -86,6 +90,7 @@ for f in FR[::max(1, STEP // 2)]:
             key = f"{a} | {b}"
             if key not in worst or d < worst[key][0]:
                 worst[key] = (round(d, 3), f["phi"])
+    first = False
 res = sorted(([k, v[0], v[1]] for k, v in worst.items()), key=lambda x: x[1])
 bad = [r for r in res if r[1] < LIMIT]
 out = dict(limit_mm=LIMIT, step_deg=STEP, frames=len(FR[::max(1, STEP // 2)]), seconds=round(time.time() - t0), pairs=res, too_close=bad)
