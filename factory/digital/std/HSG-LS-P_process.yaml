@@ -1,0 +1,232 @@
+# 第 138 轮 G5.1：WQ-LS 机壳机械加工工艺规程（由 tools/wqls/g5_process.py 生成，不要手改）
+version: 2
+item: HSG-LS-P
+material: HT250
+batch: 200
+doc:
+  number: GY-HSG-LS-P
+  revision: A
+  product_model: WQ-LS
+  product_name: WQ-LS 工业平缝机
+  drawing_no: WQLS-HSG-P
+  part_name: 机壳部件（上件＋下件，配对）
+  per_unit: 1
+  per_blank: 1
+  batch: 200
+  factory: 问渠数字工厂
+  signatures:
+    prepared:
+      by: 工艺员（AI 起草）
+      date: '2026-11-11'
+    checked:
+      by: 工艺主管
+      date: '2026-11-11'
+    standardized:
+      by: 标准化员
+      date: '2026-11-11'
+    approved:
+      by: 技术负责人
+      date: '2026-11-11'
+  changes: []
+part:
+  kind: housing
+  mass_kg: 24.2
+  source: tools/wqls/cad/housing.py（G4.4）
+blank:
+  kind: 上件 HSG-LS-U ＋ 下件 HSG-LS-L（各自加工完）
+  spec: ''
+  length_mm: ''
+  material_item: CS-HSG-LS-P
+  drawing: docs/设计/WQ-LS/G5/机壳铸造工艺.md
+chains:
+- name: 针杆孔对针板孔基准（装配找正后配铰锥销）
+  char: P1
+  links:
+  - name: 找正检棒在针杆孔里的间隙
+    nominal: 0.0
+    es: 0.013
+    ei: -0.013
+    sense: 1
+  - name: 下件检具基准
+    nominal: 0.0
+    es: 0.01
+    ei: -0.01
+    sense: 1
+  - name: 调整分辨率
+    nominal: 0.0
+    es: 0.005
+    ei: -0.005
+    sense: 1
+  - name: 配铰、打锥销的拉动
+    nominal: 0.0
+    es: 0.005
+    ei: -0.005
+    sense: 1
+characteristics:
+- id: P1
+  name: 针杆孔轴线对针板孔基准的位置
+  spec: Ø0.1，即 ±0.05（找正检棒能顺利插进针板孔基准检具的 Ø12 H6 衬套）
+  nominal: 0.0
+  es: 0.05
+  ei: -0.05
+  kind: geo
+  key: true
+- id: P2
+  name: 接合面贴合
+  spec: 0.02 塞尺塞不进
+  kind: other
+- id: P3
+  name: M10 螺钉拧紧力矩
+  spec: 4 × M10（10.9 级）45 N·m，对角分两次拧紧
+  kind: other
+  key: true
+- id: P4
+  name: 锥销孔
+  spec: 2 × 锥销 10 × 40（GB/T 117，1:50），红丹检查接触 ≥ 75%，锥销打入后露出 3–4 mm
+  kind: other
+  key: true
+- id: P5
+  name: 配对编号
+  spec: 上、下件在立柱脚打同一配对编号，此后不得与别的件互换
+  kind: other
+tool_list:
+- id: T01
+  name: 直角铣头
+  spec: 90° 直角铣头（同上件工序 50）
+  ops:
+  - 20
+- id: T02
+  name: 钻头 Ø8.5
+  spec: 整体硬质合金钻 Ø8.5（穿过下件顶板进上件凸台，扩通上件工艺孔下面那一段）
+  ops:
+  - 20
+- id: T03
+  name: 锥度铰刀 1:50
+  spec: 1:50 锥度铰刀（粗、精两把），按 GB/T 117 锥销 10 × 40 的小端 Ø10 铰到锥销打入后露出 3–4 mm
+  ops:
+  - 20
+gauges:
+- id: G01
+  name: 三坐标测量机
+- id: G02
+  name: 找正检棒 Ø12 h5 × 260（插进针杆两个孔，下端伸到针板座）
+- id: G03
+  name: 针板孔基准检具：装在针板座里，用针板的 4 个 M3 孔和两侧边定位，中间 Ø12 H6 衬套
+- id: G04
+  name: 扭力扳手 20–100 N·m
+- id: G05
+  name: 锥销接触检查（红丹）
+operations:
+- seq: 10
+  operation: 部件装配 Sub-assembly
+  workstation: 装配工位 ASM-01
+  shop: 装配
+  content: 下件以底面 A 和两个工艺孔装在找正台上；针板座里装针板孔基准检具。接合面清洁后放上上件，套上 4 个 M10 螺钉（不拧紧）。找正检棒从机头上面的针杆孔插入，用立柱脚两侧的顶丝微调上件，直到检棒下端顺利插进检具的 Ø12 H6 衬套；对角分两次拧紧 4 个 M10 到 45 N·m，再插一次检棒复查
+  datum: 下件底面 A、两工艺孔；上件针杆孔（找正）
+  clamping: 找正台 3 点压板压下件底边法兰
+  fixture: 找正台 FX-HSG-P-10 ＋ 针板孔基准检具
+  minutes: 14.0
+  setup_min: 5
+  steps:
+  - step: 1
+    content: 清洁接合面，下件装上找正台，装针板孔基准检具
+    tool: ''
+    gauge: G03
+    tb_min: 0
+    ta_min: 3.0
+  - step: 2
+    content: 放上上件，插找正检棒，微调到检棒插进衬套
+    tool: ''
+    gauge: G02
+    tb_min: 0
+    ta_min: 5.0
+  - step: 3
+    content: 4 × M10 对角分两次拧到 45 N·m，复查检棒
+    tool: ''
+    gauge: G04
+    tb_min: 0
+    ta_min: 2.5
+  inspect:
+  - char: 找正检棒插进衬套（P1）
+    gauge: G02
+    freq: 每件
+  - char: M10 拧紧力矩 45 N·m（P3）
+    gauge: G04
+    freq: 每件
+- seq: 20
+  operation: 合箱钻铰销孔 Pin-hole reaming
+  workstation: 卧式加工中心 HMC-01
+  shop: 机加
+  content: 合好的部件立在夹具 FX-HSG-P-20 上（底面 A、两个工艺孔；夹具中间开窗）。直角铣头从机座里面向上：钻 Ø8.5 穿过下件顶板，扩通到上件工艺孔；锥度铰刀粗铰、精铰两个锥销孔；打入锥销；在立柱脚打配对编号
+  datum: 下件底面 A、两工艺孔
+  clamping: 液压 4 点压底边法兰
+  fixture: 专用夹具 FX-HSG-P-20（中间开窗，放直角铣头）
+  coolant: 干切
+  setup_min: 30
+  steps:
+  - step: 1
+    content: 直角铣头：钻 2 × Ø8.5 穿过下件顶板（约 9.6 mm），与上件工艺孔对通
+    tool: T02
+    vc: 60
+    f: 0.15
+    ap: null
+    passes: 1
+    tb_min: 0.16
+    ta_min: 0.3
+  - step: 2
+    content: 粗铰、精铰 1:50 锥销孔（两孔）
+    tool: T03
+    gauge: G05
+    vc: 8
+    f: 0.15
+    ap: null
+    passes: 1
+    tb_min: 3.87
+    ta_min: 0.3
+  - step: 3
+    content: 打入锥销 10 × 40，检查露出 3–4 mm；打配对编号
+    tool: ''
+    gauge: G05
+    vc: null
+    f: null
+    ap: null
+    passes: 1
+    tb_min: 0.0
+    ta_min: 1.5
+  inspect:
+  - char: 锥销孔接触 ≥ 75%（红丹）
+    gauge: G05
+    freq: 首件、每 10 件
+  minutes: 9.0
+- seq: 30
+  operation: 零件检验 Part inspection
+  workstation: 检验站 QC-01
+  shop: 检验
+  final_inspection: true
+  content: 部件三坐标检测：以下件 A 与工艺孔建坐标系，测针杆孔轴线、上轴 B 对针板座的位置；检查配对编号
+  datum: 下件底面 A、两工艺孔
+  clamping: 三坐标测量夹具
+  minutes: 12
+  setup_min: 5
+  steps: []
+  inspect:
+  - char: P1
+    gauge: G01
+    freq: 每件
+  - char: P2
+    gauge: G01
+    freq: 每件
+  - char: P3
+    gauge: G04
+    freq: 每件
+  - char: P4
+    gauge: G05
+    freq: 每件
+  - char: P5
+    gauge: G01
+    freq: 每件
+hole_sizes: {}
+attachments:
+- kind: calc
+  name: 机壳机械加工工艺计算（tools/wqls/g5_process.py，切削用量、机动时间、余量、功率）
+  missing: []

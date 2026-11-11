@@ -24,7 +24,7 @@
    [
     50,
     "镗轴承孔",
-    12.0
+    12.5
    ],
    [
     60,
@@ -37,7 +37,7 @@
     25
    ]
   ],
-  "total_min": 67.5,
+  "total_min": 68.0,
   "review": [],
   "cards_check": [],
   "holes": [
@@ -142,21 +142,21 @@
     "ok": true
    },
    {
-    "feature": "销孔",
+    "feature": "工艺孔",
     "from_": 10,
     "to": 40,
-    "d_from": 9.5,
-    "d_to": 9.85,
+    "d_from": 8.5,
+    "d_to": 8.85,
     "z_min": 0.125,
     "z_max": 0.186,
     "ok": true
    },
    {
-    "feature": "销孔",
+    "feature": "工艺孔",
     "from_": 40,
     "to": 40,
-    "d_from": 9.85,
-    "d_to": 10.0,
+    "d_from": 8.85,
+    "d_to": 9.0,
     "z_min": 0.064,
     "z_max": 0.083,
     "ok": true
@@ -205,7 +205,7 @@
    },
    {
     "seq": 50,
-    "step": 3,
+    "step": 2,
     "P_kw": 0.32,
     "need_kw": 0.4,
     "motor_kw": 18.5,
@@ -213,14 +213,14 @@
    },
    {
     "seq": 50,
-    "step": 6,
+    "step": 4,
     "P_kw": 0.32,
     "need_kw": 0.4,
     "motor_kw": 18.5,
     "ok": true
    }
   ],
-  "pdf": "/tmp/claude-0/-home-claude/977649d0-331f-55bb-b300-57007deb1961/scratchpad/g5/proc/工艺卡_上件.pdf"
+  "pdf": "docs/设计/WQ-LS/G5/工艺卡_上件.pdf"
  },
  "HSG-LS-L": {
   "ops": [
@@ -242,7 +242,7 @@
    [
     40,
     "铣结合面",
-    21.0
+    20.0
    ],
    [
     50,
@@ -255,14 +255,14 @@
     15
    ]
   ],
-  "total_min": 61.5,
+  "total_min": 60.5,
   "review": [],
   "cards_check": [],
   "holes": [
    {
-    "feature": "销孔",
-    "from_": 40,
-    "to": 40,
+    "feature": "工艺孔",
+    "from_": 10,
+    "to": 10,
     "d_from": 9.5,
     "d_to": 9.85,
     "z_min": 0.125,
@@ -270,9 +270,9 @@
     "ok": true
    },
    {
-    "feature": "销孔",
-    "from_": 40,
-    "to": 40,
+    "feature": "工艺孔",
+    "from_": 10,
+    "to": 10,
     "d_from": 9.85,
     "d_to": 10.0,
     "z_min": 0.064,
@@ -322,6 +322,31 @@
     "ok": true
    }
   ],
-  "pdf": "/tmp/claude-0/-home-claude/977649d0-331f-55bb-b300-57007deb1961/scratchpad/g5/proc/工艺卡_下件.pdf"
+  "pdf": "docs/设计/WQ-LS/G5/工艺卡_下件.pdf"
+ },
+ "HSG-LS-P": {
+  "ops": [
+   [
+    10,
+    "部件装配",
+    14.0
+   ],
+   [
+    20,
+    "合箱钻铰销孔",
+    9.0
+   ],
+   [
+    30,
+    "零件检验",
+    12
+   ]
+  ],
+  "total_min": 35.0,
+  "review": [],
+  "cards_check": [],
+  "holes": [],
+  "power": [],
+  "pdf": "docs/设计/WQ-LS/G5/工艺卡_部件.pdf"
  }
 }

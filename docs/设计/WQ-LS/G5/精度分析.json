@@ -1,0 +1,188 @@
+{
+ "scheme_I": {
+  "R_mm": 318.2,
+  "pin_L_mm": 71.9,
+  "X1_fixture": 0.026,
+  "X2_fixture": 0.0314,
+  "rot_fixture_rad": 0.000797834992892341,
+  "X_assembly": 0.024,
+  "links": [
+   {
+    "name": "针杆孔对上件销孔：夹具定位",
+    "half": 0.1399
+   },
+   {
+    "name": "针杆孔对上件销孔：机床",
+    "half": 0.008
+   },
+   {
+    "name": "装配：定位销间隙（含转角）",
+    "half": 0.1181
+   },
+   {
+    "name": "旋梭轴孔对下件销孔",
+    "half": 0.1479
+   }
+  ],
+  "extreme_half": 0.414,
+  "statistical_half": 0.2355,
+  "required_half": 0.05,
+  "ok_extreme": false,
+  "ok_statistical": false
+ },
+ "scheme_III": {
+  "links": [
+   {
+    "name": "找正检棒在针杆孔里的间隙",
+    "half": 0.013
+   },
+   {
+    "name": "下件检具基准",
+    "half": 0.01
+   },
+   {
+    "name": "调整分辨率",
+    "half": 0.005
+   },
+   {
+    "name": "配铰、打锥销的拉动",
+    "half": 0.005
+   }
+  ],
+  "extreme_half": 0.033,
+  "statistical_half": 0.0179,
+  "required_half": 0.05,
+  "ok_extreme": true
+ },
+ "fixture_upper": {
+  "Fc_bore_edge_N": 498,
+  "Ff_bore_N": 398,
+  "torque_bore_Nm": 16.9,
+  "Fc_face_N": 765,
+  "weight_N": 158,
+  "K": 3.89,
+  "W_slide_N": 9137,
+  "W_tip_N": 982,
+  "W_required_N": 9137,
+  "cylinders": {
+   "n": 4,
+   "p_mpa": 4.0,
+   "D_min": 29.2,
+   "D": 32,
+   "Q_each": 2350
+  },
+  "locating": {
+   "X1": 0.003,
+   "X2": 0.004,
+   "note": "液压涨销定位，间隙按 0.003–0.004 计（产品样本量级）",
+   "rot_rad": 9.729695035272243e-05,
+   "at_needle_mm": 0.031
+  },
+  "note": "上件的孔系都在这一次装夹里加工，相互位置与定位误差无关；工艺孔不是装配基准（装配靠找正后配铰的锥销）"
+ },
+ "budgets": {
+  "两轴承孔同轴度 Ø0.02": {
+   "items": [
+    {
+     "name": "旋转导向套（预紧轴承，零间隙）轴线对主轴轴线：夹具装上后在机用检棒调到 0.002",
+     "kind": "sys",
+     "range": 0.004
+    },
+    {
+     "name": "旋转导向套径向跳动 0.002",
+     "kind": "rand",
+     "range": 0.004
+    },
+    {
+     "name": "主轴径向跳动（精镗区 0.002）",
+     "kind": "rand",
+     "range": 0.004
+    },
+    {
+     "name": "两端支承之间镗杆的弯曲（自重和切削力，前后两刀处之差）",
+     "kind": "sys",
+     "range": 0.0016
+    },
+    {
+     "name": "精镗前松开、以精镗用的小夹紧力重夹，夹紧变形残余（估 0.001）",
+     "kind": "sys",
+     "range": 0.002
+    }
+   ],
+   "sys": 0.0076,
+   "rand": 0.0057,
+   "total": 0.0133,
+   "T": 0.02,
+   "share": 0.66,
+   "ok": true,
+   "tight": false
+  },
+  "针杆孔对 B 位置度 Ø0.05": {
+   "items": [
+    {
+     "name": "直角铣头输出轴倾斜：装好后用检棒在机标定，超过 ±3″ 就重装（铰孔长 150）",
+     "kind": "sys",
+     "range": 0.0087
+    },
+    {
+     "name": "直角铣头偏置标定（测头，±0.002）",
+     "kind": "rand",
+     "range": 0.008
+    },
+    {
+     "name": "转台分度 ±3″（针杆孔与轴承孔相差 90°，离转台中心约 180）",
+     "kind": "rand",
+     "range": 0.0105
+    },
+    {
+     "name": "X/Y 定位重复性 ±0.002",
+     "kind": "rand",
+     "range": 0.008
+    },
+    {
+     "name": "热漂移",
+     "kind": "sys",
+     "range": 0.004
+    }
+   ],
+   "sys": 0.0127,
+   "rand": 0.0154,
+   "total": 0.0281,
+   "T": 0.05,
+   "share": 0.56,
+   "ok": true,
+   "tight": false
+  },
+  "上轴中心高 200 ± 0.03（对 C）": {
+   "items": [
+    {
+     "name": "夹具垫块顶面（C 的支承面）对托盘的高度，标定后 0.005",
+     "kind": "sys",
+     "range": 0.005
+    },
+    {
+     "name": "Y 轴定位精度 ±0.004",
+     "kind": "rand",
+     "range": 0.008
+    },
+    {
+     "name": "C 面平面度 0.02 与垫块贴合",
+     "kind": "rand",
+     "range": 0.01
+    },
+    {
+     "name": "热漂移 Y 向",
+     "kind": "sys",
+     "range": 0.004
+    }
+   ],
+   "sys": 0.009,
+   "rand": 0.0128,
+   "total": 0.0218,
+   "T": 0.06,
+   "share": 0.36,
+   "ok": true,
+   "tight": false
+  }
+ }
+}

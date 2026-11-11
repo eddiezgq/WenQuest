@@ -35,9 +35,10 @@ part:
 blank:
   kind: 铸件
   spec: HT250 砂型铸件 11.28 kg
-  length_mm: —
+  length_mm: ''
   material_item: CS-HSG-LS-L
   drawing: docs/设计/WQ-LS/G5/机壳铸造工艺.md
+chains: []
 characteristics:
 - id: C1
   name: 底面 A
@@ -80,13 +81,12 @@ characteristics:
   ei: -0.05
   kind: dim
 - id: C6
-  name: 销孔
-  spec: 2 × Ø10 H7（+0.015/0），位置度 Ø0.02（对 A 与工艺孔）
+  name: 工艺孔（底边法兰）
+  spec: 2 × Ø10 H7（+0.015/0）：加工、检测、装配找正共用的基准
   nominal: 10
   es: 0.015
   ei: 0.0
   kind: dim
-  key: true
 - id: C7
   name: 螺钉过孔与锪平
   spec: 4 × Ø11，背面锪平 Ø18 深 1.5
@@ -114,10 +114,9 @@ tool_list:
   - 40
 - id: T03
   name: 钻头 Ø9.5 / 铰刀 Ø10 H7
-  spec: 整体硬质合金钻 Ø9.5；铰刀 Ø10 H7
+  spec: 整体硬质合金钻 Ø9.5；铰刀 Ø10 H7（底边法兰上的两个工艺孔）
   ops:
   - 10
-  - 40
 - id: T04
   name: 钻头 Ø11
   spec: 硬质合金钻 Ø11（M10 螺钉过孔）
@@ -267,7 +266,7 @@ operations:
   operation: 铣结合面 Face milling
   workstation: 立式加工中心 VMC-01
   shop: 机加
-  content: 一面两销（底面 A ＋ 两工艺孔）。精铣底面 A 前先翻面精铣 A（以顶面粗铣面定位，0.3），再回到一面两销：精铣机座顶面保证高度 62 ± 0.05、平面度 0.02、对 A 平行度 0.03；精铣针板座、滑板座；钻铰销孔 2 × Ø10 H7；钻 4 × Ø11 过孔，反锪 Ø18
+  content: 一面两销（底面 A ＋ 两工艺孔）。精铣底面 A 前先翻面精铣 A（以顶面粗铣面定位，0.3），再回到一面两销：精铣机座顶面保证高度 62 ± 0.05、平面度 0.02、对 A 平行度 0.03；精铣针板座、滑板座；钻 4 × Ø11 过孔，反锪 Ø18。立柱脚的两个锥销孔不在这里加工，装配找正后与上件配铰
   datum: 底面 A、两工艺孔
   clamping: 液压 4 点
   fixture: 专用夹具 FX-HSG-L-20
@@ -306,16 +305,6 @@ operations:
     tb_min: 4.0
     ta_min: 0.3
   - step: 4
-    content: 钻、扩、铰销孔 2 × Ø10 H7
-    tool: T03
-    gauge: G04
-    vc: 70
-    f: 0.2
-    ap: null
-    passes: 1
-    tb_min: 0.78
-    ta_min: 0.3
-  - step: 5
     content: 钻 4 × Ø11 通孔，反锪 Ø18 深 1.5
     tool: T04
     gauge: G08
@@ -335,10 +324,7 @@ operations:
   - char: 针板座深 2.5 ± 0.03
     gauge: G12
     freq: 每件
-  - char: 销孔 Ø10 H7
-    gauge: G04
-    freq: 每件
-  minutes: 21.0
+  minutes: 20.0
 - seq: 50
   operation: 钻攻螺纹孔 Drilling & tapping
   workstation: 立式加工中心 VMC-01
@@ -380,8 +366,8 @@ operations:
   workstation: 检验站 QC-01
   shop: 检验
   final_inspection: true
-  content: 清洗后在恒温室三坐标全检：A–销孔坐标系；首件 X 光（立柱脚凸台）
-  datum: 底面 A、两销孔
+  content: 清洗后在恒温室三坐标全检：A–工艺孔坐标系；首件 X 光（立柱脚凸台）
+  datum: 底面 A、两工艺孔
   clamping: 三坐标测量夹具
   minutes: 15
   setup_min: 10
@@ -404,7 +390,7 @@ operations:
     freq: 每 5 件
   - char: C6
     gauge: G01
-    freq: 每件
+    freq: 每 5 件
   - char: C7
     gauge: G01
     freq: 每 5 件
@@ -415,16 +401,16 @@ operations:
     gauge: G10
     freq: 每 5 件
 hole_sizes:
-  销孔:
-  - op: 40
+  工艺孔:
+  - op: 10
     d: 9.5
     es: 0.1
     ei: 0.0
-  - op: 40
+  - op: 10
     d: 9.85
     es: 0.022
     ei: 0.0
-  - op: 40
+  - op: 10
     d: 10.0
     es: 0.015
     ei: 0.0

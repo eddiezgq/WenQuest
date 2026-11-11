@@ -324,7 +324,7 @@ def joint(hollow, solid, info):
         hollow = hollow.cut(Part.makeCylinder(5.5, 26, V(x_, y_, -25), V(0, 0, 1)))                       # 下件 Ø11 通孔
         hollow = hollow.cut(Part.makeCylinder(9, 1.5, V(x_, y_, -25), V(0, 0, 1)))                         # 锪平 Ø18
     for x_, y_ in ([] if FEA_SIMPLE else pins):
-        hollow = hollow.cut(Part.makeCylinder(5, 24, V(x_, y_, -12), V(0, 0, 1)))                          # Ø10 H7 销孔（两件同钻铰）
+        hollow = hollow.cut(Part.makeCylinder(4.5, 24, V(x_, y_, -12), V(0, 0, 1)))                        # G5.1：工艺孔 Ø9 H7；装配找正后两件配铰成 1:50 锥销孔（GB/T 117 10 × 40）
     belt = Part.makeBox(44, 60, 20, V(S_BELT_X - 22, -25, -15))
     belt = belt.makeFillet(6, [e for e in belt.Edges if e.BoundBox.ZLength > 19])
     hollow = hollow.cut(belt)                                                                                  # 同步带、电线过孔
