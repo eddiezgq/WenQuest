@@ -8679,8 +8679,6 @@
 "没有批准的图纸（按物料清单和工艺做）": "No approved drawing (build to the BOM and routing)",
 "！本单新件没有批准的图纸：{a}（本厂不要求）": "! New parts for this job have no approved drawing: {a} (not required in this plant)",
 "图纸：": "Drawing: ",
-  "发布前检查不过会列出原因。最早交货日期在计划页上方。": "If the pre-release check fails it lists the reasons. The earliest delivery date is at the top of the “Plan” tab.",
-  "在“设计（物料清单与工艺）”里照估算起草，把客户要改的那个件“复制为新件”（编号以作业号开头），发布设计；再到“计划”里看倒排结果，填最早能交货的日期。": "In “Design (BOM and routing)” draft from the estimate, “Copy as new part” for the part the customer wants changed (its code starts with the job number) and release the design; then read the backward schedule in “Plan” and enter the earliest delivery date.",
   "在“订单与计划”里接 1 台 200 W 伺服电机 WQ-SM200（客户、交期自定），点“算料”，看清楚再提交、确认。回答：这张单要下几张工单？一台电机要领多少千克漆包线（WIRE-CU）？": "In Orders & Planning, take an order for 1 × 200 W servo motor WQ-SM200 (customer and due date of your choice), click “MRP”, check, then submit and confirm. Answer: how many work orders does this order need? How many kilograms of magnet wire (WIRE-CU) does one motor take?",
   "工单 = 成品 + 每一种自制的半成品各一张；本厂的冲片、磁钢、转子轴都是外购的。漆包线按 kg 领，看物料清单。": "Work orders = the finished product + one for each made sub-assembly; in this plant laminations, magnets and rotor shafts are all bought. Magnet wire is issued by kg — see the BOM.",
   "看工艺路线、找瓶颈": "Read the routing, find the bottleneck",
