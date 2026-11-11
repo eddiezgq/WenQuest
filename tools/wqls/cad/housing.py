@@ -377,6 +377,8 @@ def machined_faces(shape):
                 out.append(f)
             elif SPLIT and abs(c.z) < 0.05 and abs(n.z) > 0.99 and PIL["x0"] - 30 < c.x < PIL["x1"] + 30 and n.z < 0:
                 out.append(f)                                                      # 上件立柱脚接合面
+            elif SPLIT and abs(c.z) < 0.05 and n.z > 0.99:
+                out.append(f)                                                      # 下件机座顶面（整面精铣，同时是接合面）
             elif SPLIT and abs(c.z + 25) < 0.05 and abs(n.z) > 0.99:
                 out.append(f)                                                      # 下件螺钉锪平面
             elif abs(n.z) > 0.99 and (abs(c.z + 2.5) < 0.05 or abs(c.z + 1.5) < 0.05) and -33 < c.x < 33 and -59 < c.y < 23:
