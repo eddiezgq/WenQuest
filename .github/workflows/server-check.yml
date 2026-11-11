@@ -97,7 +97,7 @@ jobs:
           for p in glob.glob(os.environ.get(\"DATA_DIR\",\"/tmp/wq-data\")+\"/pilots.db\")+glob.glob(\"/data/**/pilots.db\",recursive=True):
               c=sqlite3.connect(p)
               for r in c.execute(\"select substr(email,1,3),substr(email,instr(email,\x27@\x27)),created,expires,used,code_sent,tries from invite order by created desc limit 8\"): print(p,r,int(time.time()))
-              print(\"tenants\",c.execute(\"select count(*) from tenant\").fetchone())" 2>&1 | tail -12' 2>&1 \
+              print(\"tenants\",c.execute(\"select id,status from tenant\").fetchall())" 2>&1 | tail -12' 2>&1 \
             | sed 's/^/mail: /' | while IFS= read -r l; do echo "::notice::$l"; done
       - name: ERPNext 登录报 500 的原因（第 134 轮：11-10 部署时各厂单点登录都“登录失败（500）”）
         if: always() && inputs.server == 'us'
