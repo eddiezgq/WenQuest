@@ -17,7 +17,13 @@
   "crank_moment_kgmm": 1.121,
   "sector_half_deg": 30.8,
   "equiv_at_r_g": 72.3,
-  "J_rotor_handwheel_kgm2": 0.0003939
+  "J_rotor_handwheel_kgm2": 0.0003939,
+  "J_hook_train_kgm2": {
+   "upper": 1.0573e-05,
+   "lower": 3.488e-05,
+   "hook": 8.93e-06
+  },
+  "J_hook_train_reflected_kgm2": 8.1173e-05
  },
  "parts": {
   "needle_bar": {
@@ -115,6 +121,50 @@
   "handwheel_ring": {
    "mass_g": 3.1,
    "material": "blue"
+  },
+  "pulley_upper": {
+   "mass_g": 73.6,
+   "material": "metal"
+  },
+  "pulley_lower": {
+   "mass_g": 89.6,
+   "material": "metal"
+  },
+  "belt": {
+   "mass_g": 21.0,
+   "material": "black"
+  },
+  "lower_shaft": {
+   "mass_g": 278.8,
+   "material": "chrome"
+  },
+  "bearings_lower": {
+   "mass_g": 57.6,
+   "material": "metal"
+  },
+  "gear_hook": {
+   "mass_g": 21.6,
+   "material": "metal"
+  },
+  "gear_lower": {
+   "mass_g": 86.3,
+   "material": "metal"
+  },
+  "hook_shaft": {
+   "mass_g": 42.6,
+   "material": "chrome"
+  },
+  "bushes_hook": {
+   "mass_g": 18.6,
+   "material": "brass"
+  },
+  "hook": {
+   "mass_g": 46.6,
+   "material": "chrome"
+  },
+  "bobbin_case": {
+   "mass_g": 31.2,
+   "material": "metal"
   }
  },
  "note": "质量按钢 7.85 g/cm³ 从 FreeCAD 实体算；滚针轴承 2 只约 10 g 计入曲柄销；平衡块按平衡率 k 定（cad/mech.py）。"
