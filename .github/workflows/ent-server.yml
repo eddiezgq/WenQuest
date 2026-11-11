@@ -8,6 +8,7 @@
 #   bridge-on：晚上切换用。试点开通改由企业服务器做：生成交接桥钥匙写进两台的 .env（不进日志），教育服务器上停掉
 #              质量 ERP 的开通程序（crontab 的 pilot-runner），重启网关；试点名额改成 5 家（企业服务器 8 GB）
 #   bridge-off：回退。去掉教育服务器上的钥匙、恢复它的开通程序、重启网关
+#   caddy-reset：证书签发卡住时用（11-11 切换后 qms 的锁文件坏了）：删 Caddy 的签发锁、重启 Caddy、看证书
 name: Enterprise server 企业服务器
 
 on:
@@ -16,7 +17,7 @@ on:
       task:
         description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）/ deploy（装前门 Caddy 与交接桥）"
         type: choice
-        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off]
+        options: [pubkey, check, bootstrap, deploy, bridge-on, bridge-off, caddy-reset]
         default: check
       host:
         description: "企业服务器 IP（11-10 开的：161.35.185.35）"
@@ -42,9 +43,19 @@ jobs:
           echo "::notice title=部署公钥::$pub"
 
   check:
-    if: inputs.task == 'check'
+    if: inputs.task == 'check' || inputs.task == 'caddy-reset'
     runs-on: ubuntu-24.04
     steps:
+      - name: 清签发锁并重启 Caddy（只在 caddy-reset 时）
+        if: inputs.task == 'caddy-reset'
+        env:
+          HOST: ${{ inputs.host }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null
+          ssh "deploy@$HOST" 'cd /opt/wenquest/edge && docker compose exec -T caddy sh -c "ls -la /data/caddy/locks; rm -f /data/caddy/locks/*.lock; ls /data/caddy/certificates/*/ 2>/dev/null" </dev/null; docker compose restart caddy </dev/null 2>&1 | tail -n 2'
+          sleep 90
       - name: 登录并检查
         env:
           HOST: ${{ inputs.host }}
