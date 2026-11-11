@@ -138,11 +138,11 @@ def test_supplier_categories_have_english():
 
 
 def test_lab_task_texts_have_english():
-    """第二批：实验 7、实验 15–31 的任务题目、说明、提示、选项（模块常量），实验目录的题目、领域、学时，英文表里都有（页面用 $td 显示）"""
+    """第二批：实验 7、实验 15–33 的任务题目、说明、提示、选项（模块常量），实验目录的题目、领域、学时，英文表里都有（页面用 $td 显示）"""
     import importlib
     from hub import labs_api
     need = []
-    for m in ["teach"] + ["lab%d" % n for n in range(15, 33)]:
+    for m in ["teach"] + ["lab%d" % n for n in range(15, 34)]:
         mod = importlib.import_module("hub." + m)
         for t in mod.TASKS:
             need += [t[k] for k in ("title", "desc", "hint") if t.get(k)]
@@ -157,7 +157,7 @@ def test_lab_task_texts_have_english():
             [walk(v) for v in o.values()]
         elif isinstance(o, (list, tuple)):
             [walk(v) for v in o]
-    for m in ["teach"] + ["lab%d" % n for n in range(15, 33)]:
+    for m in ["teach"] + ["lab%d" % n for n in range(15, 34)]:
         for k, v in vars(importlib.import_module("hub." + m)).items():
             if k.isupper() and isinstance(v, (list, tuple, dict)):
                 walk(v)
@@ -255,7 +255,15 @@ def test_en_help_matches_zh():
             assert anchor in heads, "{}/en/{}：more 指向的标题不存在：{}".format(ed, f, anchor)
         assert not CJK.search(re.sub(r":::查表|\{\{厂名\}\}", "", b)), "英文稿里还有中文：{}/en/{}".format(ed, f)
         n += 1
-    assert n >= 62     # 8 册 62 章（第四批 b 第一次推送）
+    # 8 册 62 章（第四批 b 第一次推送）。企业版帮助两边各写各的（SYNC.md 的 sync-own）：freecad-ai-parts 那边的企业版是全套中文、
+    # 还没有英文稿，所以共有的 7 册必须全有英文（56 章），企业版有 en/ 的那边也要每章都有（第 139 轮 139h 同步时改）
+    shared = ("chip", "motor", "pcb", "robot", "sensor", "sewing", "teach")
+    for ed in sorted(os.listdir(HELP)):
+        zh = {f for f in os.listdir(os.path.join(HELP, ed)) if re.match(r"\d\d-.*\.md$", f)} if os.path.isdir(os.path.join(HELP, ed)) else set()
+        if ed in shared or os.path.isdir(os.path.join(HELP, ed, "en")):
+            en = set(os.listdir(os.path.join(HELP, ed, "en"))) if os.path.isdir(os.path.join(HELP, ed, "en")) else set()
+            assert zh <= en, "{} 册缺英文稿：{}".format(ed, sorted(zh - en))
+    assert n >= 56 + (6 if os.path.isdir(os.path.join(HELP, "enterprise", "en")) else 0)
 
 
 def test_docs_en_pending():

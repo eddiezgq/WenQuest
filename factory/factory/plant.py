@@ -206,6 +206,8 @@ def _validate_eto(e):
         need(isinstance(e["long_lead_days"], int) and 0 < e["long_lead_days"] <= 365, "long_lead_days", "提前期达到多少天算长周期件（可在设计发布前先买），1–365")
     if e.get("accept_days") is not None:
         need(isinstance(e["accept_days"], int) and 0 <= e["accept_days"] <= 365, "accept_days", "交货后多少天验收（验收那一期的计划付款日），0–365")
+    if e.get("ship_days") is not None:
+        need(isinstance(e["ship_days"], int) and 0 <= e["ship_days"] <= 30, "ship_days", "倒排时发货预留几个工作日，0–30")
     if e.get("valid_days") is not None:
         need(isinstance(e["valid_days"], int) and 0 < e["valid_days"] <= 365, "valid_days", "报价有效天数 1–365")
     ms = e.get("milestones")

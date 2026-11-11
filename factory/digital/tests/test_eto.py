@@ -307,9 +307,9 @@ def test_plant_manifest_eto_section():
     from factory import plant as P
     assert P._validate_eto(None) == [] and F.ETO["markup_pct"] == 30
     assert P._validate_eto(F.ETO) == []
-    bad = P._validate_eto({"prefix": "1x", "markup_pct": -1, "valid_days": 0,
+    bad = P._validate_eto({"prefix": "1x", "markup_pct": -1, "valid_days": 0, "ship_days": "1",
                            "milestones": [{"key": "a", "name": "订金", "pct": 30, "on": "order"},
                                           {"key": "a", "name": "尾款", "pct": 60, "on": "later"}]})
     text = "；".join(bad)
-    assert "prefix" in text and "markup_pct" in text and "valid_days" in text and "代号重复" in text and ".on" in text and "等于 100" in text
+    assert "prefix" in text and "markup_pct" in text and "valid_days" in text and "代号重复" in text and ".on" in text and "等于 100" in text and "ship_days" in text
     assert E.config()["example"] and E.config()["configured"]

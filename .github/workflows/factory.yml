@@ -31,6 +31,8 @@ on:
       - "docs/帮助/设计优化.md"
       - "docs/帮助/虚拟PLC.md"
       - "docs/帮助/零件与机器人库.md"
+      - "docs/帮助/按单设计（ETO）.md"
+      - "docs/帮助/图/按单设计/**"
       - "docs/帮助/数字工厂企业版使用说明.md"
       - "docs/帮助/数字工厂课程接口.md"
       # 帮助里嵌的虚拟实验（第 30 轮 §八）：工作台 web/public/labs/ 是这些原件的副本（tools/sync_help_labs.py 同步，tests/test_help.py 核对一致）

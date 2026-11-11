@@ -658,6 +658,46 @@ def eto(teacher):
         check(r["result"] == "pass" and p is not None and p["status"] == "executed", "终检第 1 件合格，进 ERPNext 质量检验单：{}".format(p and p.get("result")))
         qs = hub("GET", "/api/eto/jobs/{}/quality".format(jn), token=qa)
         check(any("终检合格 1 / 2" in b for b in qs["ship_block"]), "发货关口：终检不够数时挡住（{}）".format(qs["ship_block"]))
+        # 139h：两件都做完、都终检 → 发货 → 客户验收 → 发货、验收两期开票 → ERPNext 销售订单全额开票
+        w = wait(lambda: (lambda x: x if x and x["produced"] >= 2 else None)(
+            next((x for x in hub("GET", "/api/eto/jobs/{}/shop".format(jn), token=sales)["work_orders"] if x["item"] == jn), None)),
+            "作业工单两件完工", 900, 5)
+        check(w is not None, "作业工单 {} 完工 {} / 2 件".format(top["name"], (w or {}).get("produced")))
+        if not w:
+            return
+        r = hub("POST", "/api/eto/jobs/{}/quality/inspect".format(jn), {"kind": "final", "work_order": top["name"], "piece": 2,
+                                                                         "readings": {"len": 99.97}}, qa)
+        p = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(hub("GET", "/api/proposals/" + r["proposal_id"], token=qa)),
+                 "第 2 件质量检验单", 120, 2)
+        check(r["result"] == "pass" and p is not None and p["status"] == "executed", "终检第 2 件合格")
+        qs = hub("GET", "/api/eto/jobs/{}/quality".format(jn), token=qa)
+        check(not qs["ship_block"], "发货关口全部通过（{}）".format(qs["ship_block"]))
+        if qs["ship_block"]:
+            return
+        run("ship", "发货提议执行（ERPNext 发货单）")
+        j = hub("GET", "/api/eto/jobs/" + jn, token=sales)["job"]
+        check(any(x.get("name") == j.get("delivery_note") and x.get("docstatus") == 1 for x in erp_docs("Delivery Note")),
+              "ERPNext 发货单 {}".format(j.get("delivery_note")))
+        hub("POST", "/api/eto/jobs/{}/accept".format(jn), {"note": "闭环测试：客户现场验收"}, sales)
+        for key in ("ship", "accept"):
+            q = hub("POST", "/api/eto/jobs/{}/invoice".format(jn), {"key": key}, sales)
+            hub("POST", "/api/proposals/{}/confirm".format(q["proposal_id"]), token=sales)
+            p = wait(lambda: (lambda x: x if x["status"] in ("executed", "failed") else None)(
+                hub("GET", "/api/proposals/" + q["proposal_id"], token=sales)), "分期发票 " + key, 120, 2)
+            check(p is not None and p["status"] == "executed", "{} 那一期开票：{}".format(key, p and p.get("result")))
+        bl = wait(lambda: (lambda x: x if all(m["invoice"] for m in x["milestones"]) else None)(
+            hub("GET", "/api/eto/jobs/{}/billing".format(jn), token=sales)), "三期发票都记回作业", 60, 2) \
+            or hub("GET", "/api/eto/jobs/{}/billing".format(jn), token=sales)
+        mon = bl["money"]
+        check(mon["order_amount"] is not None and abs(mon["invoiced"] - mon["order_amount"]) < 0.01 and mon["not_invoiced"] == 0,
+              "三期开完：订单 ${}，已开票 ${}".format(mon["order_amount"], mon["invoiced"]))
+        names = {m["invoice"] for m in bl["milestones"]}
+        tot = sum(float(x.get("grand_total") or 0) for x in erp_docs("Sales Invoice") if x.get("name") in names and x.get("docstatus") == 1)
+        check(abs(tot - (mon["order_amount"] or 0)) < 0.01, "ERPNext 三张销售发票合计 ${:,.2f} = 订单金额".format(tot))
+        if REAL:                                   # 真 ERPNext 按发票回写销售订单的开票比例
+            so = wait(lambda: next((x for x in erp_docs("Sales Order") if x.get("name") == j.get("sales_order") and
+                                    float(x.get("per_billed") or 0) >= 99.99), None), "ERPNext 销售订单全额开票", 60, 3)
+            check(so is not None, "ERPNext 销售订单 {} 已开票 100%".format(j.get("sales_order")))
 
 
 def safety(teacher):

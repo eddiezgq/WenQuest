@@ -80,6 +80,33 @@ Net requirement = this order's need + other orders' allocations + safety stock �
 
 MRP on the workbench uses real data: stock from ERPNext's latest stock snapshot, in transit from purchase orders and material requests, allocations from other open orders and unstarted work orders.
 
+## Engineer to order (ETO): no drawing exists yet
+
+A one-off order (a different ratio, a longer shaft, a special coating…) has no bill of materials yet: estimate and quote first, then design and build after the order. One page does it all: “Orders & planning → **Engineer to order (ETO)**”.
+
+| Step | Who | Needs a person to confirm? | What ERPNext gets |
+| --- | --- | --- | --- |
+| Estimate: material, bought-out, operations, outside work, engineering (AI can draft) | Sales | No (nothing goes to ERPNext) | — |
+| Quotation | Sales | Yes (proposal) | Project, quotation |
+| Order (with a payment schedule) | Sales | Yes (proposal) | Sales order |
+| Design: draft from the estimate, “copy as new” the parts that change, release | Process engineer | Yes (proposal) | Items, BOMs |
+| MRP and backward schedule from the due date | Planner | Yes (proposal) | Work orders, material requests |
+| Release to the shop, start each operation | Planner, operator | Release: yes (proposal) | Job cards |
+| Inspection plan, first article, final inspection | Inspector | Plan is approved; results: yes (proposal) | Quality inspections |
+| Shipping and customer acceptance | Sales | Shipping: yes (proposal) | Delivery note |
+| Invoicing by milestone | Sales | Yes (proposal) | Sales invoices |
+
+A “proposal” shows a person what will be written to ERPNext; nothing is written until they click “Confirm”. In teaching mode the teacher (plant manager) or another student confirms.
+
+The rules (all decided by the platform from facts, never by AI):
+
+- One “unknown” line blocks the quotation; the quoted revision is frozen and later changes start a new one.
+- Work orders must use the released design; after a design change, run MRP again.
+- Too few final inspections, an unapproved plan or an open nonconformance blocks shipping.
+- Each installment is invoiced once, and only after its milestone (order, shipment, acceptance) is reached.
+
+Step-by-step details and FAQs are in the document “Engineer to order (ETO)”; to practise, do lab 33.
+
 ## Where else orders come from
 
 - Sales pipeline: under “Customers & service” a lead, opportunity, quotation and contract turn into an order, opening the same “take order and compute materials” preview (see “Customers & service”).

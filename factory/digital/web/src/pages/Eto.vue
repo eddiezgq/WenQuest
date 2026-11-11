@@ -141,6 +141,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
 import { api, get, loadConfig, post } from '../lib/api';
 import { loc, t as $t, td as $td, tk } from '../lib/i18n';
 import ProposalModal from '../components/ProposalModal.vue';
@@ -160,6 +161,7 @@ const FIELDS = { material: ['qty_per', 'unit_price'], buyout: ['qty_per', 'unit_
 
 const cfg = ref(null);
 const jobs = ref([]);
+const route = useRoute();
 const sel = ref(null);
 const d = ref(null);
 const lines = ref([]);
@@ -273,7 +275,9 @@ onMounted(async () => {
   allItems.value = c.all_items || [];
   suppliers.value = c.suppliers || {};
   await loadJobs();
-  if (jobs.value.length) await open(jobs.value[0].job_no);
+  const want = String(route.query.job || '');                 // 实验 33 等页面带 ?job= 直接打开那张作业
+  const hit = jobs.value.find((j) => j.job_no === want);
+  if (hit || jobs.value.length) await open((hit || jobs.value[0]).job_no);
 });
 </script>
 
