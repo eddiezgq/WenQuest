@@ -1,107 +1,107 @@
 1
-00:00:00,500 --> 00:00:02,681
+00:00:00,500 --> 00:00:02,684
 This is the WenQuest digital factory:
 
 2
-00:00:02,701 --> 00:00:06,250
+00:00:02,704 --> 00:00:06,259
 a teaching industrial park with four plants, gearbox, robot,
 
 3
-00:00:06,270 --> 00:00:10,235
+00:00:06,279 --> 00:00:10,250
 circuit board and chip test and packaging, each supplying the next.
 
 4
-00:00:11,255 --> 00:00:13,835
+00:00:11,270 --> 00:00:13,845
 The gearbox plant builds a two-stage reducer.
 
 5
-00:00:14,555 --> 00:00:17,065
+00:00:14,565 --> 00:00:17,075
 An order comes in, ERP schedules it, MRP plans materials,
 
 6
-00:00:17,085 --> 00:00:19,728
+00:00:17,095 --> 00:00:19,739
 and the shop floor reports progress, all on one data thread.
 
 7
-00:00:20,748 --> 00:00:23,885
+00:00:20,759 --> 00:00:23,896
 The robot plant builds cobots, AGVs and a wheeled humanoid.
 
 8
-00:00:24,605 --> 00:00:28,213
+00:00:24,616 --> 00:00:28,223
 It buys reducers from the gearbox plant and drive boards from the circuit
 
 9
-00:00:28,233 --> 00:00:28,809
+00:00:28,243 --> 00:00:28,820
 board plant.
 
 10
-00:00:29,529 --> 00:00:31,515
+00:00:29,540 --> 00:00:31,521
 A joint test bench measures backlash,
 
 11
-00:00:31,535 --> 00:00:34,010
+00:00:31,541 --> 00:00:34,009
 and robots keep reporting back after shipping.
 
 12
-00:00:34,730 --> 00:00:38,821
+00:00:34,729 --> 00:00:38,824
 The circuit board plant runs an SMT line and a dozen back-end machines,
 
 13
-00:00:38,841 --> 00:00:41,601
+00:00:38,844 --> 00:00:41,605
 building joint drive boards and AGV controllers,
 
 14
-00:00:42,321 --> 00:00:45,685
+00:00:42,325 --> 00:00:45,685
 each tested item by item on a functional test bench.
 
 15
-00:00:46,405 --> 00:00:51,271
+00:00:46,405 --> 00:00:51,161
 The chip plant tests, packages and final-tests our own encoder interface chip.
 
 16
-00:00:51,991 --> 00:00:54,819
+00:00:51,881 --> 00:00:54,738
 Every square on the wafer map is one die's result,
 
 17
-00:00:54,839 --> 00:00:57,440
+00:00:54,758 --> 00:00:57,385
 and the B revision of the drive board uses it.
 
 18
-00:00:58,160 --> 00:01:01,009
+00:00:58,105 --> 00:01:00,949
 Quality issues come with control charts and 8D,
 
 19
-00:01:01,029 --> 00:01:04,794
+00:01:00,969 --> 00:01:04,727
 traced from one machine to a batch, even to one torque wrench.
 
 20
-00:01:05,514 --> 00:01:08,443
+00:01:05,447 --> 00:01:08,377
 The command center shows the whole plant: it spots problems,
 
 21
-00:01:08,463 --> 00:01:10,262
+00:01:08,397 --> 00:01:10,196
 traces causes and simulates outcomes.
 
 22
-00:01:10,981 --> 00:01:12,968
+00:01:10,916 --> 00:01:12,901
 The AI alerts; people decide.
 
 23
-00:01:13,688 --> 00:01:17,942
+00:01:13,621 --> 00:01:17,870
 Students work through more than twenty labs here, from order to delivery,
 
 24
-00:01:17,962 --> 00:01:20,284
+00:01:17,890 --> 00:01:20,209
 root cause, calibration and after-sales,
 
 25
-00:01:20,754 --> 00:01:22,249
+00:01:20,679 --> 00:01:22,178
 much like a real job.
 
 26
-00:01:23,269 --> 00:01:24,948
+00:01:23,198 --> 00:01:24,877
 Enter the digital factory,
 
 27
-00:01:25,118 --> 00:01:28,263
+00:01:25,047 --> 00:01:28,193
 or start with the factory demo, no sign-in needed.
