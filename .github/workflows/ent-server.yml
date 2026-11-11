@@ -1,0 +1,29 @@
+# 第 146 轮：企业服务器（美国第二台）的准备。手动运行。
+#   pubkey：打印部署钥匙（DEPLOY_SSH_KEY）的公钥一半，开新服务器时填进“初始化脚本”，让部署能登录（公钥可以公开，私钥不出 GitHub）
+name: Enterprise server 企业服务器
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "pubkey（打印部署公钥）"
+        type: choice
+        options: [pubkey]
+        default: pubkey
+
+permissions:
+  contents: read
+
+jobs:
+  pubkey:
+    if: inputs.task == 'pubkey'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 部署公钥
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/k && chmod 600 ~/.ssh/k
+          pub=$(ssh-keygen -y -f ~/.ssh/k)
+          rm -f ~/.ssh/k
+          echo "$pub"
+          echo "::notice title=部署公钥::$pub"
