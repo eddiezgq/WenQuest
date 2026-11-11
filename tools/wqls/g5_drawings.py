@@ -243,6 +243,22 @@ def fixture_model():
     bush = at(bd.Cylinder(35, 40, rotation=(0, 90, 0), align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), 440, 0, ZU)
     bush = bush - at(bd.Cylinder(8.5, 50, rotation=(0, 90, 0), align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), 440, 0, ZU)
     parts.append(("8", "FX-U20-08", "旋转导向套（预紧角接触轴承，内孔 Ø17）", 1, "组件", bush))
+    # 辅助支承（G5.1 补充）：液压浮动支承，弹簧推出、液压锁紧；只撑不定位
+    C = bd.Cylinder
+    up = (bd.Align.CENTER, bd.Align.CENTER, bd.Align.MIN)
+    sup = None
+    for x, y in ((-25, 52), (25, 52)):
+        s = at(C(16, 180, align=up), x, y, -200) + at(C(16, 50, align=up), x, y, -20) + at(C(8, 16, align=up), x, y, 30)   # 支柱、支承缸体、柱塞（顶到 z 46）
+        sup = s if sup is None else sup + s
+    parts.append(("9", "外购", "液压辅助支承（机头底面）", 2, "—", sup))
+    side = at(B(40, 40, 520, align=up), -20, 120, -200)                             # 后支架立柱（在机头后面：让开 B 0° 主轴和 B 270° 前窗口加工）
+    side = side + at(C(16, 18, rotation=(90, 0, 0), align=up), -20, 104, 190)       # 缸体 y 86..104
+    side = side + at(C(8, 16, rotation=(90, 0, 0), align=up), -20, 86, 190)        # 柱塞顶到 y 70
+    parts.append(("10", "FX-U20-10", "液压辅助支承（机头后侧，含立柱）", 1, "—", side))
+    top = at(B(40, 190, 30, align=up), -20, 47, 290)                               # 回转臂（绕立柱手动转开，定位销定位），y −48..142
+    top = top + at(C(16, 16, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), -20, -28, 290)
+    top = top + at(C(8, 16, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.MAX)), -20, -28, 274)
+    parts.append(("11", "FX-U20-11", "液压辅助支承（机头顶面，含回转臂）", 1, "—", top))
     return parts
 
 
@@ -266,7 +282,9 @@ def fixture_sheet(step_part: Path) -> Sheet:
         "支承钉顶面等高 0.005，对底板底面平行度 0.005；两涨销中心距 75.8 ± 0.005。",
         "导向套支架翻上后，导向套轴线对主轴（B 0°）同轴 0.002（在机用检棒调整）；翻下时让开电机端的加工。",
         "垫块高 200（接合面到托盘顶面），机头下方留出 245 mm 放直角铣头。",
-    ], (395, 222))
+        "辅助支承（件 9、10、11，柱塞 Ø16、额定 4 kN）只撑不定位：定位、拉紧之后，弹簧推柱塞贴住工件（≤ 10 N），再液压锁紧；松开时反过来。"
+        "精镗两轴承孔前全部松开缩回。件 11 管直角铣头从下往上钻孔的轴向力，工序 60 攻顶盖螺孔前转开。",
+    ], (395, 150))
     return sh
 
 

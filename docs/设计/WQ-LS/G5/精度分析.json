@@ -78,6 +78,66 @@
    "rot_rad": 9.233446549063386e-05,
    "at_needle_mm": 0.0292
   },
+  "aux_supports": {
+   "supports": [
+    {
+     "where": "机头底面，往上撑",
+     "at": [
+      -25,
+      52,
+      46
+     ]
+    },
+    {
+     "where": "机头底面，往上撑",
+     "at": [
+      25,
+      52,
+      46
+     ]
+    },
+    {
+     "where": "机头后侧面，往前撑",
+     "at": [
+      -20,
+      70,
+      190
+     ]
+    },
+    {
+     "where": "机头顶面，往下撑（后立柱的回转臂上）",
+     "at": [
+      -20,
+      -28,
+      258
+     ]
+    }
+   ],
+   "k_head_lat_N_um": 9.6,
+   "k_head_ver_N_um": 10.4,
+   "k_support_N_um": 60.0,
+   "k_top_eff_N_um": 24.0,
+   "face_mill_N": 765,
+   "drill_thrust_up_N": 875,
+   "deflect_face_um": {
+    "without": 79,
+    "with_": 11.0
+   },
+   "deflect_drill_um": {
+    "without": 85,
+    "with_": 25.5
+   },
+   "f_head_Hz": {
+    "lat": 594,
+    "ver": 813
+   },
+   "load_max_N": 1313,
+   "rated_N": 4000,
+   "spring_N": 10,
+   "preload_deflect_um": 0.97,
+   "clear_angle_head_mm": 21.7,
+   "note": "支承只能往一个方向撑：底面两个管往下的力，后侧面管往后的力，顶面那个管直角铣头从下往上钻孔的轴向力。弹簧推出后液压锁紧，只撑不定位；精镗两轴承孔前全部松开缩回，同轴度不受影响"
+  },
   "note": "上件的孔系都在这一次装夹里加工，相互位置与定位误差无关；工艺孔不是装配基准（装配靠找正后配铰的锥销）"
  },
  "budgets": {
@@ -143,13 +203,18 @@
      "name": "热漂移",
      "kind": "sys",
      "range": 0.004
+    },
+    {
+     "name": "辅助支承弹簧推力（≤ 10 N）引起的机头附加变形，锁紧后保持（G5.1 补充）",
+     "kind": "sys",
+     "range": 0.002
     }
    ],
-   "sys": 0.0127,
+   "sys": 0.0147,
    "rand": 0.0154,
-   "total": 0.0281,
+   "total": 0.0301,
    "T": 0.05,
-   "share": 0.56,
+   "share": 0.6,
    "ok": true,
    "tight": false
   },

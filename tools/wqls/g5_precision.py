@@ -100,12 +100,33 @@ def fixture_upper():
     W_tip = K * T_bore / 0.067
     W = max(W_slide, W_tip)
     cyl = FX.cylinder_bore(W / 4, p=4.0, eta=0.85, pull=True)
+    # 辅助支承（G5.1 补充）：机头悬伸，粗估机头一端的刚度 k ≈ m·(2πf)²（有效质量约 5 kg，前后 221 Hz、上下 229 Hz）
+    k_lat = 5.0 * (2 * math.pi * 221) ** 2 / 1e6        # N/μm
+    k_ver = 5.0 * (2 * math.pi * 229) ** 2 / 1e6
+    # 直角铣头从下往上钻针杆孔 Ø11.5、f 0.15：Ff ≈ 0.5·kc·(D/2)·f·sinκ（Sandvik 公式），kc = kc1·h^−mc，h = f/2·sinκ
+    kap = math.radians(59)
+    h = 0.15 / 2 * math.sin(kap)
+    Ff_drill = 0.5 * (1160 * h ** -0.26) * (11.5 / 2) * 0.15 * math.sin(kap)
+    k_sup = 60.0                                        # 液压浮动支承锁紧后的刚度（柱塞 Ø16，产品样本量级 50–80 N/μm）
+    k_top = 1 / (1 / k_sup + 1 / 40.0)                  # 顶部支承顶在 4.5 mm 顶壁上，顶壁局部刚度按 40 N/μm 串联
+    aux = dict(supports=[dict(where="机头底面，往上撑", at=(-25, 52, 46)), dict(where="机头底面，往上撑", at=(25, 52, 46)),
+                         dict(where="机头后侧面，往前撑", at=(-20, 70, 190)), dict(where="机头顶面，往下撑（后立柱的回转臂上）", at=(-20, -28, 258))],
+               k_head_lat_N_um=round(k_lat, 1), k_head_ver_N_um=round(k_ver, 1), k_support_N_um=k_sup, k_top_eff_N_um=round(k_top, 1),
+               face_mill_N=round(Fc_face), drill_thrust_up_N=round(Ff_drill),
+               deflect_face_um=dict(without=round(Fc_face / k_lat), with_=round(Fc_face / (k_lat + k_sup), 1)),
+               deflect_drill_um=dict(without=round(Ff_drill / k_ver), with_=round(Ff_drill / (k_ver + k_top), 1)),
+               f_head_Hz=dict(lat=round(221 * math.sqrt((k_lat + k_sup) / k_lat)), ver=round(229 * math.sqrt((k_ver + 2 * k_sup) / k_ver))),
+               load_max_N=round(1.5 * max(Fc_face, Ff_drill)), rated_N=4000, spring_N=10,
+               preload_deflect_um=round(10 / k_ver, 2),
+               clear_angle_head_mm=round(min(math.hypot(x, y) for x, y in ((-25, 52), (25, 52))) - 8 - 28, 1),
+               note="支承只能往一个方向撑：底面两个管往下的力，后侧面管往后的力，顶面那个管直角铣头从下往上钻孔的轴向力。"
+                    "弹簧推出后液压锁紧，只撑不定位；精镗两轴承孔前全部松开缩回，同轴度不受影响")
     expand = dict(X1=0.003, X2=0.004, note="液压涨销定位，间隙按 0.003–0.004 计（产品样本量级）")
     th = (expand["X1"] + expand["X2"]) / PIN_L
     return dict(Fc_bore_edge_N=round(Fc_edge), Ff_bore_N=round(Ff_bore), torque_bore_Nm=round(T_bore, 1), Fc_face_N=round(Fc_face),
                 weight_N=round(G), K=round(K, 2), W_slide_N=round(W_slide), W_tip_N=round(W_tip), W_required_N=round(W),
                 cylinders=dict(n=4, p_mpa=4.0, D_min=round(cyl["D_min"], 1), D=cyl["D"], Q_each=round(cyl["Q"]) if cyl["Q"] else None),
-                locating=dict(expand, rot_rad=th, at_needle_mm=round(dist_point_to_pins(NEEDLE) * th, 4)),
+                locating=dict(expand, rot_rad=th, at_needle_mm=round(dist_point_to_pins(NEEDLE) * th, 4)), aux_supports=aux,
                 note="上件的孔系都在这一次装夹里加工，相互位置与定位误差无关；工艺孔不是装配基准（装配靠找正后配铰的锥销）")
 
 
@@ -128,6 +149,7 @@ def budgets():
         dict(name="转台分度 ±3″（针杆孔与轴承孔相差 90°，离转台中心约 180）", range=2 * 2 * 3 * ARCSEC * 180, kind="rand"),
         dict(name="X/Y 定位重复性 ±0.002", range=2 * 2 * 0.002, kind="rand"),
         dict(name="热漂移", range=2 * 0.002, kind="sys"),
+        dict(name="辅助支承弹簧推力（≤ 10 N）引起的机头附加变形，锁紧后保持（G5.1 补充）", range=2 * 0.001, kind="sys"),
     ]
     height = [   # 上轴中心到接合面 C：200 ± 0.03（T = 0.06）
         dict(name="夹具垫块顶面（C 的支承面）对托盘的高度，标定后 0.005", range=0.005, kind="sys"),
@@ -153,7 +175,8 @@ def main():
     for l in I["links"]:
         print("    ", l)
     print(f"方案 III（找正后配铰锥销）：极值 ±{II['extreme_half']}，概率 ±{II['statistical_half']}")
-    print("夹具", res["fixture_upper"])
+    print("夹具", {k: v for k, v in res["fixture_upper"].items() if k != "aux_supports"})
+    print("辅助支承", res["fixture_upper"]["aux_supports"])
     for k, v in res["budgets"].items():
         print(k, "合计", v["total"], "/", v["T"], f"{v['share']:.0%}", "OK" if v["ok"] else "超差", "裕量不足" if v["tight"] else "")
 

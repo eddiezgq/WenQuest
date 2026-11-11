@@ -49,7 +49,7 @@ body.shot .panel,body.shot #busy{display:none}
   <div id="machbox" hidden>
     <div class="lbl">刀路</div>
     <div class="row"><button data-n="path_1205" class="on">工序 50、60 精加工</button><button data-n="path_1202">工序 20 粗加工</button></div>
-    <p class="sub" style="margin:4px 0 0">接合面 C 贴支承钉，两工艺孔套液压涨销；4 根液压拉杆拧进立柱脚 M10 螺孔拉紧。红线是刀具中心的切削轨迹。</p>
+    <p class="sub" style="margin:4px 0 0">接合面 C 贴支承钉，两工艺孔套液压涨销；4 根液压拉杆拧进立柱脚 M10 螺孔拉紧；机头悬伸，底面、后侧、顶面 4 个液压辅助支承锁紧后只撑不定位（精镗两轴承孔时缩回）。红线是刀具中心的切削轨迹。</p>
   </div>
   <div class="lbl">数据</div>
   <table id="tbl"></table>
@@ -83,7 +83,7 @@ const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
 
 const P = await (await fetch('d/proc.json')).json();
 for (const f of ['d/proc_upper.json', 'd/proc_lower.json']) Object.assign(P, await (await fetch(f)).json());   // 凝固过程的网格按件分文件
-document.getElementById('busy').hidden = true;
+document.getElementById('busy').style.display = 'none';
 const info = P._info;
 function geo(k, lines = false) {
   const b = atob(P[k] || ''); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
@@ -131,8 +131,8 @@ function show() {
   document.getElementById('machbox').hidden = mode !== 'mach';
   const I = info[part], g = I.gating;
   document.getElementById('tbl').innerHTML = mode === 'mach'
-    ? `<tr><td>夹具</td><td>FX-HSG-U-20，一面两销</td></tr><tr><td>夹紧</td><td>4 × 液压拉缸，合计 9.4 kN</td></tr>
-       <tr><td>两轴承孔同轴度</td><td>Ø0.02（预算 73%）</td></tr><tr><td>针杆孔位置度</td><td>Ø0.05（预算 56%）</td></tr><tr><td>上轴中心高</td><td>200 ± 0.03（预算 36%）</td></tr>`
+    ? `<tr><td>夹具</td><td>FX-HSG-U-20，一面两销</td></tr><tr><td>夹紧</td><td>4 × 液压拉缸，合计 9.4 kN</td></tr><tr><td>辅助支承</td><td>4 个，机头让刀 79 → 11 μm</td></tr>
+       <tr><td>两轴承孔同轴度</td><td>Ø0.02（预算 73%）</td></tr><tr><td>针杆孔位置度</td><td>Ø0.05（预算 60%）</td></tr><tr><td>上轴中心高</td><td>200 ± 0.03（预算 36%）</td></tr>`
     : `<tr><td>铸件 / 浇注重量</td><td>${I.mass_casting} / ${I.mass_poured} kg</td></tr><tr><td>工艺出品率</td><td>${I.yield_pct} %</td></tr>
        <tr><td>浇注温度、时间</td><td>1380 ℃，${g.tau_s} s</td></tr><tr><td>内浇道总截面</td><td>${g.A_ingate_cm2} cm²（${g.n_ingates} 个）</td></tr>
        <tr><td>全部凝固（含冒口）</td><td>${I.t_total} s</td></tr>`;
