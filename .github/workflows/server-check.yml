@@ -90,7 +90,8 @@ jobs:
         if: always()
         run: |
           ssh "deploy@$HOST" 'g=$(docker ps --format "{{.Names}}" | grep -i gateway | head -1); echo "gateway=$g"
-            docker exec "$g" python3 -c "import os;print({k:(\"set\" if os.environ.get(k) else \"EMPTY\") for k in (\"SMTP_HOST\",\"SMTP_PORT\",\"SMTP_SECURE\",\"SMTP_USER\",\"SMTP_PASSWORD\",\"MOODLE_NOREPLY_EMAIL\")}, os.environ.get(\"SMTP_HOST\",\"\"), os.environ.get(\"SMTP_PORT\",\"\"))" 2>&1 | tail -2
+            docker exec "$g" python3 -c "import os;print({k:(\"set\" if os.environ.get(k) else \"EMPTY\") for k in (\"WQ_SMTP_HOST\",\"WQ_SMTP_PORT\",\"WQ_SMTP_SECURE\",\"WQ_SMTP_USER\",\"WQ_SMTP_PASSWORD\",\"WQ_MAIL_FROM\")}, os.environ.get(\"WQ_SMTP_HOST\",\"\"), os.environ.get(\"WQ_SMTP_PORT\",\"\"), os.environ.get(\"WQ_MAIL_FROM\",\"\"))" 2>&1 | tail -2
+            docker exec "$g" python3 -c "import os,smtplib,ssl;e=os.environ;s=smtplib.SMTP(e[\"WQ_SMTP_HOST\"],int(e.get(\"WQ_SMTP_PORT\") or 2525),timeout=20);s.starttls(context=ssl.create_default_context());print(\"smtp-login\",s.login(e[\"WQ_SMTP_USER\"],e[\"WQ_SMTP_PASSWORD\"])[0])" 2>&1 | tail -2
             docker logs --since 72h "$g" 2>&1 | grep -iE "wenquest.mail|mail to|mail not configured|pilot" | tail -30 | cut -c1-300
             docker exec "$g" python3 -c "import sqlite3,glob,time,os
           for p in glob.glob(os.environ.get(\"DATA_DIR\",\"/tmp/wq-data\")+\"/pilots.db\")+glob.glob(\"/data/**/pilots.db\",recursive=True):
