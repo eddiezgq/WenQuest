@@ -8657,5 +8657,14 @@
 "发票未到": "Invoice not received",
 "发票未到，暂按采购单算：{a}": "Invoice not received, costed at PO price for now: {a}",
 "外协和本单专料的实际成本按供应商发票算；差额 = 发票金额 − 采购单价 × 已开票数量，正数是多付。发票的录入和付款在 ERPNext 里做。": "Actual cost of outside processing and job-specific materials comes from supplier invoices; difference = invoice amount − PO price × invoiced qty, positive means paid more. Invoices are entered and paid in ERPNext.",
-"工序按总线上每件实际节拍 + 调整 + 换刀 × 工位费率；材料按已完工件数 × 标准用量 × 单价；外协和本单专料按供应商发票（发票没到的按采购单，标“发票未到”）；设计按登记工时 × 设计费率": "Operations: actual cycle time per part on the bus + setup + tool changes × workstation rate; materials: finished parts × standard usage × unit price; outside processing and job-specific materials: supplier invoices (PO price where the invoice has not arrived, marked \"Invoice not received\"); engineering: logged hours × engineering rate"
+"工序按总线上每件实际节拍 + 调整 + 换刀 × 工位费率；材料按已完工件数 × 标准用量 × 单价；外协和本单专料按供应商发票（发票没到的按采购单，标“发票未到”）；设计按登记工时 × 设计费率": "Operations: actual cycle time per part on the bus + setup + tool changes × workstation rate; materials: finished parts × standard usage × unit price; outside processing and job-specific materials: supplier invoices (PO price where the invoice has not arrived, marked \"Invoice not received\"); engineering: logged hours × engineering rate",
+"{w} 在 {k} 这一周不够：本单 {a} 分 + 其他 {o} 分 > 能力 {c} 分，缺 {s} 分": "{w} is short in the week of {k}: this job {a} min + others {o} min > capacity {c} min, {s} min short",
+"{w} 这一周": "week of {w}",
+"其他工单与作业（分）": "Other work orders and jobs (min)",
+"占用：{a}": "Booked by: {a}",
+"只是建议：推迟哪张、要不要加班外协，由计划员决定，平台不改任何作业的日期。": "Suggestions only: the planner decides which job to delay or whether to use overtime or outside processing; the platform does not change any job's dates.",
+"工位冲突与建议": "Workstation conflicts and suggestions",
+"{j} {m} 分": "{j} {m} min",
+"{j} {m} 分（松紧 {n}）": "{j} {m} min (slack {n})",
+"能力 = 同时开工数 × 480 分钟 × 5 天；工单按计划开工到计划完工的工作日平均摊开；其他已接单作业没下工单的部分按它的倒排（设计没发布按估算工序从交期往回）摊开；只给建议，不改任何作业的日期": "Capacity = machines running at once × 480 min × 5 days; work orders are spread evenly over the working days from planned start to planned finish; other accepted jobs without work orders are spread by their own backward schedule (from the estimate's operations, working back from the due date, if the design is not released); suggestions only, no job's dates are changed"
 }
