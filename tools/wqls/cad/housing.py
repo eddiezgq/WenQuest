@@ -334,9 +334,24 @@ def joint(hollow, solid, info):
 
 def split(hollow):
     """在接合面 z = 0 把铸件分成上件、下件"""
-    up = hollow.common(Part.makeBox(1000, 600, 600, V(-300, -300, 0)))
-    lo = hollow.common(Part.makeBox(1000, 600, 300, V(-300, -300, -300)))
-    return up.removeSplitter(), lo.removeSplitter()
+    def cut_at(h):
+        up = h.common(Part.makeBox(1000, 600, 600, V(-300, -300, 0)))
+        lo = h.common(Part.makeBox(1000, 600, 300, V(-300, -300, -300)))
+        return up.removeSplitter(), lo.removeSplitter()
+    try:
+        return cut_at(hollow)
+    except Exception as e:                       # 倒圆后个别面朝向不一致（OCC 报 Unorientable）：修复后再分
+        print("split: 修复后重试", e)
+        h = hollow.copy()
+        h.fix(1e-4, 1e-5, 1e-3)
+        try:
+            return cut_at(h)
+        except Exception:
+            sh = Part.Shell(h.Faces)
+            sh.sewShape()
+            h = Part.Solid(sh)
+            h.fix(1e-4, 1e-5, 1e-3)
+            return cut_at(h)
 
 
 def machined_faces(shape):
