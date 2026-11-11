@@ -364,8 +364,10 @@ def mount(app, H, user_of, who, ai_quota=None):
             if not j:
                 raise KeyError(job_no)
             acc = H.db.one("select day, note, who from eto_accept where mode=%s and job_no=%s", (u["mode"], job_no))
+            c = EX.cost(H.db, u["mode"], job_no) if j.get("sales_order") else None
             return {"milestones": EB.milestones(H.db, u["mode"], job_no),
-                    "money": EB.money(H.db, u["mode"], job_no, EX.cost(H.db, u["mode"], job_no) if j.get("sales_order") else None),
+                    "money": EB.money(H.db, u["mode"], job_no, c),
+                    "purchases": (c or {}).get("purchases") or [], "invoice_pending": (c or {}).get("invoice_pending") or [],
                     "accepted": {"day": acc["day"].isoformat(), "note": acc["note"], "who": acc["who"]} if acc else None,
                     "sales_order": j.get("sales_order"), "delivery_note": j.get("delivery_note")}
         return guard(run)
