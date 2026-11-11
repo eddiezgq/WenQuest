@@ -18,6 +18,7 @@
 
 import asyncio
 import json
+import logging
 import os
 import re
 import secrets
@@ -32,8 +33,10 @@ from pydantic import BaseModel, Field
 from .moodle import EngineError
 from .session import Session
 
+log = logging.getLogger("wenquest.pilots")
 DAY = 86400
 INVITE_DAYS = 7
+ADMIN_CODE_HOURS = 24   # 第 151 轮：管理员转交的验证码有效时间
 ID_RE = re.compile(r"^[a-z][a-z0-9-]{2,19}$")
 # 部署直接装的演示企业（不经开通流程）：证书照办，试点企业不能用这些编号
 QMS_DEMOS = {"sewing"}
@@ -126,8 +129,8 @@ def register(app, m) -> None:
             base = "https://" + base[len("https://learn."):]
         return f"{base}/pilot/?t={token}" + ("" if zh(lang) else "&lang=en")
 
-    async def mail(to: str, subject: str, text: str) -> None:
-        await state.mailer.send(to, subject, text)
+    async def mail(to: str, subject: str, text: str) -> bool:
+        return await state.mailer.send(to, subject, text)
 
     # ------------------------------------------------------------------ administration
 
@@ -136,7 +139,9 @@ def register(app, m) -> None:
         await m.accounts_require_admin(sess)
         now = time.time()
         with db() as c:
-            inv = [{k: r[k] for k in ("email", "company", "lang", "created", "expires", "used")} | {"live": not r["used"] and r["expires"] > now}
+            # 第 151 轮：管理员能再拿到链接、直接给验证码，所以列表带 token 和链接（只给管理员看）
+            inv = [{k: r[k] for k in ("email", "company", "lang", "created", "expires", "used", "token")}
+                   | {"live": not r["used"] and r["expires"] > now, "link": link(r["token"], r["lang"])}
                    for r in c.execute("select * from invite order by created desc limit 50")]
             ts = [tenant_out(t) for t in c.execute("select * from tenant order by created desc")]
             used = taken(c)
@@ -171,6 +176,21 @@ def register(app, m) -> None:
                        f"company and name, and confirm with the code we email you. It is set up automatically and the sign-in "
                        f"is sent to this address:\n{url}\n\nThe link works once.\n\nWenQuest")
         return {"ok": True, "email": email, "link": url, "expires": now + INVITE_DAYS * DAY}
+
+    @app.post("/api/v1/admin/pilots/invites/{token}/code")
+    async def admin_code(token: str, sess: Annotated[Session, Depends(m.current)]):
+        """第 151 轮：对方收不到验证码邮件时，管理员当场取一个码转给他。不发邮件；24 小时有效；再取一次旧码作废。"""
+        await m.accounts_require_admin(sess)
+        now = int(time.time())
+        with db() as c:
+            r = get_invite(c, token)
+            if r["used"]:
+                raise EngineError("invite_used", "这个邀请已经用过了" if cn() else "This invitation was used already", 409)
+            code = f"{secrets.randbelow(10 ** 6):06d}"
+            c.execute("update invite set code=?, code_exp=?, code_sent=?, tries=0 where token=?",
+                      (code, now + ADMIN_CODE_HOURS * 3600, now, token))
+        log.info("pilot code handed out by an administrator for %s", mask(r["email"]))
+        return {"code": code, "expires": now + ADMIN_CODE_HOURS * 3600, "email": r["email"]}
 
     @app.post("/api/v1/admin/pilots/{tid}/{action}")
     async def stop_start(tid: str, action: str, sess: Annotated[Session, Depends(m.current)]):
@@ -214,9 +234,13 @@ def register(app, m) -> None:
             code = f"{secrets.randbelow(10 ** 6):06d}"
             c.execute("update invite set code=?, code_exp=?, code_sent=?, tries=0 where token=?", (code, now + 900, now, token))
         if zh(r["lang"]):
-            await mail(r["email"], f"问渠质量 ERP 试点验证码：{code}", f"您的验证码是 {code}，15 分钟内有效。不是您本人操作请忽略。")
+            ok = await mail(r["email"], f"问渠质量 ERP 试点验证码：{code}", f"您的验证码是 {code}，15 分钟内有效。不是您本人操作请忽略。")
         else:
-            await mail(r["email"], f"WenQuest Ops pilot code: {code}", f"Your code is {code}. It is valid for 15 minutes.")
+            ok = await mail(r["email"], f"WenQuest Ops pilot code: {code}", f"Your code is {code}. It is valid for 15 minutes.")
+        if not ok:   # 第 151 轮：11-11 发验证码没发出去，页面却说已发送
+            log.error("pilot code mail to %s was not sent", mask(r["email"]))
+            raise EngineError("mail_failed", "验证码邮件没发出去，请联系邀请您的人要验证码" if zh(r["lang"]) else
+                              "We could not send the code email. Please ask the person who invited you for the code.", 502)
         return {"ok": True, "email": mask(r["email"])}
 
     @app.post("/api/v1/public/pilot/{token}/apply")

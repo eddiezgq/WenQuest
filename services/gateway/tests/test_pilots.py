@@ -123,3 +123,34 @@ def test_full_and_busy(pc):
 def test_bad_invite_link(pc):
     assert pc.get("/api/v1/public/pilot/nonsense").status_code == 404
     assert pc.post("/api/v1/public/pilot/nonsense/code").status_code == 404
+
+
+def test_admin_hands_out_code(pc, monkeypatch):
+    """第 151 轮：对方收不到验证码邮件时，管理员当场取码转给他；发信失败要明说。"""
+    heartbeat(pc.queue)
+    token = invite(pc, "gabe@acme.com")
+    lst = pc.get("/api/v1/admin/pilots", headers=admin(pc)).json()
+    row = [v for v in lst["invites"] if v["email"] == "gabe@acme.com"][0]
+    assert row["token"] == token and row["link"].endswith("t=" + token)
+    url = f"/api/v1/admin/pilots/invites/{token}/code"
+    assert pc.post(url).status_code in (401, 403)
+    assert pc.post(url, headers=login(pc, "t@school.org")).status_code == 403
+    n = len(main.state.mailer.outbox)
+    first = pc.post(url, headers=admin(pc)).json()["code"]
+    r = pc.post(url, headers=admin(pc)).json()                                       # a new code voids the old one
+    assert len(main.state.mailer.outbox) == n and r["email"] == "gabe@acme.com"      # no mail is sent
+    assert r["expires"] - time.time() > 23 * 3600
+    body = {"company": "Acme Inc", "id": "acme", "contact": "Gabe"}
+    if first != r["code"]:
+        assert pc.post(f"/api/v1/public/pilot/{token}/apply", json=body | {"code": first}).json()["error"] == "bad_code"
+    assert pc.post(f"/api/v1/public/pilot/{token}/apply", json=body | {"code": r["code"]}).status_code == 200
+    assert pc.post(url, headers=admin(pc)).status_code == 409                        # used invitations get no code
+    assert pc.post("/api/v1/admin/pilots/invites/nope/code", headers=admin(pc)).status_code == 404
+
+    token = invite(pc, "lost@acme.com")
+
+    async def down(*a, **k):
+        return False
+    monkeypatch.setattr(main.state.mailer, "send", down)
+    r = pc.post(f"/api/v1/public/pilot/{token}/code")
+    assert r.status_code == 502 and r.json()["error"] == "mail_failed"
