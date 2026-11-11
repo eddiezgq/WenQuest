@@ -32,3 +32,7 @@ Each work order is dispatched to the shop operation by operation along its own r
 | Overlock final assembly | 2 subassemblies → B01–B06 final assembly line → adjustment → run-in → factory test → packing |
 
 ERPNext has one inspection template per item, so all of an item's measurements are recorded on its last inspection operation, with the measuring machine named in the measurement name.
+
+## Lab 34: one lockstitch machine from order to delivery
+
+On the left, Labs & tasks → Lab 34: take an order for 1 WQ-LS, run MRP, release by level (casting and key parts → housing → machine), judge one machine's final test, receive it and invoice, compare the machine's standard and actual cost, then review. The platform grades 60 points automatically; the lab report is worth 40.
