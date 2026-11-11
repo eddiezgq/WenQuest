@@ -126,9 +126,9 @@ def upper_hmc_finish():
     r = rpm(200, 63)
     ops.append(op("B0 精铣面板口端面", "B0", 2, "面铣刀 Ø63", 63, 200, face_rows(-72, 50, -82, 60, 63, 0.0, 0.08 * 5 * r)))
     r = rpm(150, 35)
-    ops.append(op("B0 同轴精镗两轴承孔（镗杆：后刀 Ø32 在杆端，前刀 Ø35 在后刀前 344；程序按后刀编）", "B0", 13, "同轴精镗杆", 32, 150,
+    ops.append(op("B0 同轴精镗两轴承孔（镗杆：前刀 Ø35、后刀 Ø32 相距 342.5；刀长补偿到前刀，程序按前刀编，前刀走完 6202 孔时后刀正好走完 6201 孔）", "B0", 13, "同轴精镗杆", 32, 150,
                   [{"t": "comment", "text": "导向套支架翻上；精镗前夹紧力降到 40%（M 代码由夹具 PLC 处理）"}]
-                  + cam.bore([(0.0, 0.0)], 62 + 385 + 3, 0.06 * r, r_plane=-(62 + 375 - 2)), kind="linebar"))
+                  + cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.06 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
     r = rpm(12, 12)
     ops.append(op("直角铣头 铰针杆孔 Ø12 H7（上下两孔一次铰通）", "DOWN_HEAD", 7, "铰刀 Ø12 H7", 12, 12, cam.bore([(0.0, 0.0)], 150, 0.25 * r, r_plane=8, safe=15)))
     # 工序 60：螺纹孔
@@ -158,8 +158,8 @@ def upper_hmc_rough():
     r = rpm(160, 63)
     ops.append(op("B0 粗铣面板口端面（留 0.5）", "B0", 2, "面铣刀 Ø63", 63, 160, face_rows(-72, 50, -82, 60, 63, 0.5, 0.15 * 5 * r, stock_top=8)))
     r = rpm(110, 34)
-    ops.append(op("B0 同轴粗镗两轴承孔 Ø34 / Ø31（程序按后刀编）", "B0", 3, "同轴粗镗杆", 31, 110,
-                  cam.bore([(0.0, 0.0)], 62 + 385 + 3, 0.25 * r, r_plane=-(62 + 375 - 2)), kind="linebar"))
+    ops.append(op("B0 同轴粗镗两轴承孔 Ø34 / Ø31（程序按前刀编）", "B0", 3, "同轴粗镗杆", 31, 110,
+                  cam.bore([(0.0, 0.0)], 62 + 44 + 1, 0.25 * r, r_plane=-(62 + 31 - 2)), kind="linebar"))
     r = rpm(60, 11.5)
     ops.append(op("直角铣头 钻针杆孔 Ø11.5（钻通上下两个导套座）", "DOWN_HEAD", 7, "钻头 Ø11.5", 11.5, 60, cam.drill([(0.0, 0.0)], 150, 10, 0.15 * r, r_plane=8, safe=15),
                   kind="drill"))
@@ -177,16 +177,16 @@ def upper_vmc(finish):
         r = rpm(200, 80, "VMC-01")
         ops.append(op("半精铣接合面 C（留 0.5）", "C_UP", 1, "面铣刀 Ø80", 80, 200, face_rows(-56, 56, -98, 98, 80, 0.5, 0.10 * 8 * r, 10), machine="VMC-01"))
         r = rpm(70, 8.5, "VMC-01")
-        ops.append(op("钻两个工艺孔 Ø8.5", "C_UP", 8, "钻头 Ø8.5", 8.5, 70, cam.drill(pins, 24, 0, 0.2 * r), machine="VMC-01", kind="drill"))
-        ops.append(op("钻 M10 底孔 Ø8.5", "C_UP", 12, "钻头 Ø8.5", 8.5, 70, cam.drill(bolts, 26, 0, 0.18 * rpm(70, 8.5, "VMC-01")), machine="VMC-01",
+        ops.append(op("钻两个工艺孔 Ø8.5", "C_UP", 8, "钻头 Ø8.5", 8.5, 70, cam.drill(pins, 12, 0, 0.2 * r), machine="VMC-01", kind="drill"))
+        ops.append(op("钻 M10 底孔 Ø8.5", "C_UP", 12, "钻头 Ø8.5", 8.5, 70, cam.drill(bolts, 22, 0, 0.18 * rpm(70, 8.5, "VMC-01")), machine="VMC-01",
                       kind="drill"))
-        ops.append(op("攻 M10（卧加夹具的拉杆也拧在这里）", "C_UP", 17, "丝锥 M10（仿真按底孔 Ø8.5）", 8.5, 10, cam.tap(bolts, 22, 1.5, rpm(10, 10, "VMC-01")),
+        ops.append(op("攻 M10（卧加夹具的拉杆也拧在这里）", "C_UP", 17, "丝锥 M10（仿真按底孔 Ø8.5）", 8.5, 10, cam.tap(bolts, 18, 1.5, rpm(10, 10, "VMC-01")),
                       machine="VMC-01", kind="drill"))
     else:
         r = rpm(220, 80, "VMC-01")
         ops.append(op("精铣接合面 C（中心高 200 ± 0.03）", "C_UP", 1, "面铣刀 Ø80", 80, 220, face_rows(-56, 56, -98, 98, 80, 0.0, 0.06 * 8 * r, 10), machine="VMC-01"))
-        ops.append(op("扩工艺孔 Ø8.85", "C_UP", 8, "扩孔钻 Ø8.85", 8.85, 60, cam.bore(pins, 24, 0.15 * rpm(60, 8.85, "VMC-01")), machine="VMC-01"))
-        ops.append(op("铰工艺孔 Ø9 H7", "C_UP", 9, "铰刀 Ø9 H7", 9, 12, cam.bore(pins, 24, 0.3 * rpm(12, 9, "VMC-01")), machine="VMC-01"))
+        ops.append(op("扩工艺孔 Ø8.85", "C_UP", 8, "扩孔钻 Ø8.85", 8.85, 60, cam.bore(pins, 12, 0.15 * rpm(60, 8.85, "VMC-01")), machine="VMC-01"))
+        ops.append(op("铰工艺孔 Ø9 H7", "C_UP", 9, "铰刀 Ø9 H7", 9, 12, cam.bore(pins, 12, 0.3 * rpm(12, 9, "VMC-01")), machine="VMC-01"))
     return ops
 
 

@@ -1,5 +1,5 @@
 {
- "filled_holes": 36,
+ "filled_holes": 34,
  "pads": [
   {
    "area_cm2": 17.3,
@@ -11,7 +11,7 @@
    "allowance": 3.0
   },
   {
-   "area_cm2": 112.2,
+   "area_cm2": 112.5,
    "normal": [
     -0.0,
     -0.0,
@@ -68,10 +68,19 @@
    ]
   },
   {
+   "d": 20.0,
+   "cast_d": 16.0,
+   "at": [
+    385.0,
+    0.0,
+    200.0
+   ]
+  },
+  {
    "d": 32.0,
    "allowance": 2.5,
    "at": [
-    375.0,
+    372.0,
     0.0,
     200.0
    ]
@@ -96,10 +105,11 @@
    ]
   }
  ],
+ "part_outside_blank_mm3": 0.0,
  "part": "upper",
  "valid": true,
- "mass_part_kg": 15.78,
- "mass_blank_kg": 16.45,
+ "mass_part_kg": 15.73,
+ "mass_blank_kg": 16.36,
  "allowance": {
   "side": 3.0,
   "top": 4.0,

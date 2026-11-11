@@ -18,16 +18,16 @@
  "mass_poured_kg": 15.35,
  "yield_pct": 73.2,
  "gating": {
-  "G_pour_kg": 14.1,
+  "G_pour_kg": 14.09,
   "tau_s": 6.4,
   "Hp_cm": 15.0,
   "mu": 0.42,
   "S": 1.7,
   "A_ingate_cm2": 4.38,
-  "A_runner_cm2": 5.26,
+  "A_runner_cm2": 5.25,
   "A_sprue_cm2": 6.13,
   "n_ingates": 4,
-  "A_each_ingate_cm2": 1.1,
+  "A_each_ingate_cm2": 1.09,
   "sprue_d_mm": 27.9,
   "pour_rate_kg_s": 2.21
  },
@@ -52,11 +52,11 @@
  "seconds": 110,
  "pockets": [
   {
-   "volume_cm3": 6.22,
+   "volume_cm3": 6.27,
    "center_mm": [
     408.8,
-    -3.8,
-    -51.2
+    78.8,
+    -53.8
    ],
    "box_mm": [
     [
@@ -130,30 +130,56 @@
    "modulus_cm": 0.33
   },
   {
-   "volume_cm3": 0.08,
+   "volume_cm3": 0.06,
    "center_mm": [
-    306.2,
-    6.2,
-    -6.2
+    -98.8,
+    -31.2,
+    -56.2
    ],
    "box_mm": [
     [
-     305.0,
-     310.0
+     -100.0,
+     -95.0
     ],
     [
-     0.0,
-     10.0
+     -32.5,
+     -27.5
     ],
     [
-     -7.5,
-     -5.0
+     -57.5,
+     -55.0
     ]
    ],
-   "t_isolated_s": 54.0,
-   "t_end_s": 56.1,
+   "t_isolated_s": 6.0,
+   "t_end_s": 8.1,
    "in_casting": true,
-   "modulus_cm": 0.55
+   "modulus_cm": 0.18
+  },
+  {
+   "volume_cm3": 0.03,
+   "center_mm": [
+    -93.8,
+    -31.2,
+    -58.8
+   ],
+   "box_mm": [
+    [
+     -95.0,
+     -92.5
+    ],
+    [
+     -32.5,
+     -27.5
+    ],
+    [
+     -60.0,
+     -57.5
+    ]
+   ],
+   "t_isolated_s": 6.0,
+   "t_end_s": 8.1,
+   "in_casting": true,
+   "modulus_cm": 0.16
   },
   {
    "volume_cm3": 0.03,
@@ -210,11 +236,11 @@
  ],
  "pockets_over_limit": [
   {
-   "volume_cm3": 6.22,
+   "volume_cm3": 6.27,
    "center_mm": [
     408.8,
-    -3.8,
-    -51.2
+    78.8,
+    -53.8
    ],
    "box_mm": [
     [

@@ -134,7 +134,7 @@ characteristics:
   kind: dim
 - id: C13
   name: 螺纹孔
-  spec: 4 × M10-6H 深 22（接合面）；4 × M5-6H（电机座 PCD 40）；10 × M4-6H（面板口 4、前窗口 6）；4 × M4-6H（顶盖）
+  spec: 4 × M10-6H 螺纹深 18、底孔深 22（接合面）；4 × M5-6H（电机座 PCD 40）；10 × M4-6H（面板口 4、前窗口 6）；4 × M4-6H（顶盖）
   kind: other
 - id: C14
   name: 面板口端面、前窗口法兰面
@@ -196,7 +196,7 @@ tool_list:
   name: 钻头 Ø8.5、丝锥 M10
   spec: 硬质合金钻 Ø8.5；M10 螺旋槽丝锥（铸铁用，6H）
   ops:
-  - 40
+  - 10
 - id: T10
   name: 钻头 Ø4.2、丝锥 M5
   spec: 硬质合金钻 Ø4.2；M5 丝锥（6H）
@@ -215,8 +215,8 @@ tool_list:
   - 40
   - 60
 - id: T14
-  name: 钻头 Ø18
-  spec: Ø18 可转位浅孔钻（U 钻），轴过孔
+  name: 粗镗刀 Ø18
+  spec: Ø16–Ø22 单刃粗镗刀（K20），轴过孔
   ops:
   - 20
 - id: T13
@@ -253,7 +253,7 @@ operations:
   operation: 铣结合面 Face milling
   workstation: 立式加工中心 VMC-01
   shop: 机加
-  content: 工件倒放（接合面朝上）。粗基准：前后两个轴承孔的铸孔（两端锥面涨套，保证轴承孔余量均匀）＋机臂顶面一个可调支承限转。粗铣、半精铣接合面 C，留精铣余量 0.5；钻两个工艺孔（以后铰成 Ø9 H7），作为以后各工序“一面两销”的定位基准；装配找正后它们再与下件一起配铰成锥销孔
+  content: 工件倒放（接合面朝上）。粗基准：前后两个轴承孔的铸孔（两端锥面涨套，保证轴承孔余量均匀）＋机臂顶面一个可调支承限转。粗铣、半精铣接合面 C，留精铣余量 0.5；钻两个工艺孔（以后铰成 Ø9 H7），作为以后各工序“一面两销”的定位基准，装配找正后它们再与下件一起配铰成锥销孔；钻攻 4 × M10（装配用，也是卧加夹具拉紧工件用的螺孔：立柱脚的凸台在立柱里面，外面压不到）
   datum: 前后轴承孔铸孔（粗基准）、机臂顶面
   clamping: 两端锥面涨套（液压），机臂顶面辅助支承
   fixture: 专用夹具 FX-HSG-U-10（涨套式）
@@ -300,30 +300,53 @@ operations:
     tb_min: 0.05
     ta_min: 0.3
   - step: 4
-    content: 钻两个工艺孔 Ø8.5 深 24（x 318.1 / y 7.0 与 x 377.9 / y 47.0）
+    content: 钻两个工艺孔 Ø8.5 深 12（x 315.8 / y 7.0 与 x 380.2 / y 47.0）
     tool: T08
     gauge: G08
     vc: 70
     f: 0.2
     ap: null
     passes: 1
-    tb_min: 0.11
+    tb_min: 0.06
+    ta_min: 0.3
+  - step: 5
+    content: 定心、钻 4 × Ø8.5 深 22
+    tool: T09
+    gauge: G08
+    vc: 70
+    f: 0.18
+    ap: null
+    passes: 1
+    tb_min: 0.23
+    ta_min: 0.3
+  - step: 6
+    content: 攻 4 × M10-6H 深 18（刚性攻丝）：以后各道卧加工序的液压拉杆拧进这 4 个孔，把工件拉紧在垫块上
+    tool: T09
+    gauge: G06
+    vc: 10
+    f: 1.5
+    ap: null
+    passes: 1
+    tb_min: 0.35
     ta_min: 0.3
   inspect:
   - char: 接合面 C 平面度 0.05（半精铣后）
     gauge: G09
     freq: 首件、每 10 件
+  - char: M10-6H
+    gauge: G06
+    freq: 每件
   - char: C 面到两轴承孔铸孔中心的距离（余量均匀）200.5 ± 0.5
     gauge: G01
     freq: 首件
-  minutes: 5.5
+  minutes: 6.5
 - seq: 20
   operation: 镗轴承孔 Bearing-bore boring
   workstation: 卧式加工中心 HMC-01
   shop: 机加
   content: 一面两销定位（接合面 C ＋ 两工艺孔），夹具抬高 160 让出机头下方空间。B 180° 钻轴过孔、粗铣电机座端面和止口外圆；B 0° 粗铣面板口端面，同轴镗杆（带导向套）粗镗两轴承孔；直角铣头从下方钻针杆孔 Ø11.5。各面单边留 0.5。后轴承孔 6201 在电机座里面、外侧只有 Ø20 的轴过孔，只能从机头一端用长镗杆镗
   datum: 接合面 C、两工艺孔（一面两销，精基准）
-  clamping: 液压，压在立柱脚凸台上（4 点）
+  clamping: 4 个液压拉缸，拉杆拧进立柱脚 4 个 M10 螺孔，把工件拉紧在正下方的 4 个支承钉上
   fixture: 专用夹具 FX-HSG-U-20（一面两销，与工序 50 共用）
   coolant: 干切（铸铁）
   setup_min: 45
@@ -339,18 +362,18 @@ operations:
     symbol: pin_diamond
     dof: 1
   clamp:
-  - surface: 立柱脚 4 个凸台
+  - surface: 立柱脚 4 个 M10 螺孔（液压拉杆）
     kind: hydraulic
   steps:
   - step: 1
-    content: B 180°（电机端）：钻轴过孔 Ø18 深 40（毛坯是实心，后轴承孔 6201 在它里面，只能从机头一端镗）
+    content: B 180°（电机端）：粗镗轴过孔 Ø16（铸出）→ Ø18，深 40（后轴承孔 6201 在它里面，只能从机头一端镗）
     tool: T14
     gauge: G08
-    vc: 70
-    f: 0.25
-    ap: null
+    vc: 110
+    f: 0.2
+    ap: 1.0
     passes: 1
-    tb_min: 0.15
+    tb_min: 0.11
     ta_min: 0.3
   - step: 2
     content: B 180°：粗铣电机座端面（余量 3 → 0.5）
@@ -428,7 +451,7 @@ operations:
   operation: 铣结合面 Face milling
   workstation: 立式加工中心 VMC-01
   shop: 机加
-  content: 工件倒放。以粗镗后的两个轴承孔定位（两端涨芯轴，B 轴线成为这道的基准）＋机臂顶面限转：精铣接合面 C 保证中心高 200 ± 0.03、平面度 0.02；扩、铰两个工艺孔 Ø9 H7；钻攻 4 × M10 深 22
+  content: 工件倒放。以粗镗后的两个轴承孔定位（两端涨芯轴，B 轴线成为这道的基准）＋机臂顶面限转：精铣接合面 C 保证中心高 200 ± 0.03、平面度 0.02（M10 螺纹深 18，精铣 0.5 后仍有 17.5 ≥ 1.5d）；扩、铰两个工艺孔 Ø9 H7
   datum: 两轴承孔（粗镗后，涨芯轴）—— 即 B 轴线
   clamping: 两端液压涨芯轴，机臂顶面辅助支承
   fixture: 专用夹具 FX-HSG-U-40（涨芯轴式）
@@ -463,7 +486,7 @@ operations:
     f: 0.15
     ap: null
     passes: 1
-    tb_min: 0.08
+    tb_min: 0.05
     ta_min: 0.3
   - step: 3
     content: 铰工艺孔 Ø9 H7（两孔）
@@ -473,27 +496,7 @@ operations:
     f: 0.3
     ap: null
     passes: 1
-    tb_min: 0.21
-    ta_min: 0.3
-  - step: 4
-    content: 定心、钻 4 × Ø8.5 深 26
-    tool: T09
-    gauge: G08
-    vc: 70
-    f: 0.18
-    ap: null
-    passes: 1
-    tb_min: 0.26
-    ta_min: 0.3
-  - step: 5
-    content: 攻 4 × M10-6H 深 22（刚性攻丝）
-    tool: T09
-    gauge: G06
-    vc: 10
-    f: 1.5
-    ap: null
-    passes: 1
-    tb_min: 0.42
+    tb_min: 0.12
     ta_min: 0.3
   inspect:
   - char: C 面平面度 0.02
@@ -505,17 +508,14 @@ operations:
   - char: 工艺孔 Ø9 H7
     gauge: G04
     freq: 每件
-  - char: M10-6H
-    gauge: G06
-    freq: 每件
-  minutes: 6.5
+  minutes: 5.0
 - seq: 50
   operation: 镗轴承孔 Bearing-bore boring
   workstation: 卧式加工中心 HMC-01
   shop: 机加
   content: 一面两销（接合面 C ＋ 两个 Ø9 H7 工艺孔，液压圆柱涨销 ＋ 削边涨销，零间隙）。上轴两孔、针杆孔、止口、各端面都在这一次装夹里完成，相互位置与定位误差无关。B 180° 镗轴过孔 Ø20、精铣电机法兰端面、圆弧插补精铣止口 Ø52 h7；B 0° 精铣面板口端面，用镗杆加旋转导向套同轴半精镗、精镗两轴承孔（两孔一刀）；直角铣头扩、铰针杆孔 Ø12 H7（上下两孔一次铰通）
   datum: 接合面 C、两工艺孔（一面两销，精基准）
-  clamping: 液压 4 点，压在立柱脚凸台上
+  clamping: 4 个液压拉缸（拉杆拧进 M10 螺孔），拉在支承钉正上方
   fixture: 专用夹具 FX-HSG-U-20
   coolant: 干切；精镗用油雾
   setup_min: 45
@@ -531,7 +531,7 @@ operations:
     symbol: pin_diamond
     dof: 1
   clamp:
-  - surface: 立柱脚 4 个凸台
+  - surface: 立柱脚 4 个 M10 螺孔（液压拉杆）
     kind: hydraulic
   steps:
   - step: 1
@@ -585,7 +585,7 @@ operations:
     tb_min: 0.16
     ta_min: 1.0
   - step: 6
-    content: B 0°：同轴精镗杆（镗模式）：前刀 Ø35 H7、后刀 Ø32 H7 相距 344，尾部导向柱插进旋转导向套（预紧轴承，零间隙），两孔一刀镗出，Ra 1.6；镗完支架翻下，夹紧力恢复
+    content: B 0°：同轴精镗杆（镗模式）：前刀 Ø35 H7、后刀 Ø32 H7 相距 344，尾部导向柱插进旋转导向套（预紧轴承，零间隙），两孔一刀镗出，Ra 1.6（镗杆通过时离后轴承孔入口只有 0.86 mm：进、退刀时主轴定向、刀尖朝上，抬高 1 mm 走）；镗完支架翻下，夹紧力恢复
     tool: T13
     gauge: G02
     vc: 150
@@ -845,6 +845,10 @@ hole_sizes:
     es: 0.0
     ei: -0.03
   轴过孔:
+  - op: 铸出
+    d: 16.0
+    es: 0.5
+    ei: -0.5
   - op: 20
     d: 18.0
     es: 0.2

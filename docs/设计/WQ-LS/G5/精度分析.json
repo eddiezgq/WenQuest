@@ -1,15 +1,15 @@
 {
  "scheme_I": {
-  "R_mm": 318.2,
-  "pin_L_mm": 71.9,
+  "R_mm": 315.9,
+  "pin_L_mm": 75.8,
   "X1_fixture": 0.026,
   "X2_fixture": 0.0314,
-  "rot_fixture_rad": 0.000797834992892341,
+  "rot_fixture_rad": 0.0007571426170232138,
   "X_assembly": 0.024,
   "links": [
    {
     "name": "针杆孔对上件销孔：夹具定位",
-    "half": 0.1399
+    "half": 0.1326
    },
    {
     "name": "针杆孔对上件销孔：机床",
@@ -17,15 +17,15 @@
    },
    {
     "name": "装配：定位销间隙（含转角）",
-    "half": 0.1181
+    "half": 0.112
    },
    {
     "name": "旋梭轴孔对下件销孔",
-    "half": 0.1479
+    "half": 0.1406
    }
   ],
-  "extreme_half": 0.414,
-  "statistical_half": 0.2355,
+  "extreme_half": 0.3932,
+  "statistical_half": 0.2235,
   "required_half": 0.05,
   "ok_extreme": false,
   "ok_statistical": false
@@ -75,8 +75,8 @@
    "X1": 0.003,
    "X2": 0.004,
    "note": "液压涨销定位，间隙按 0.003–0.004 计（产品样本量级）",
-   "rot_rad": 9.729695035272243e-05,
-   "at_needle_mm": 0.031
+   "rot_rad": 9.233446549063386e-05,
+   "at_needle_mm": 0.0292
   },
   "note": "上件的孔系都在这一次装夹里加工，相互位置与定位误差无关；工艺孔不是装配基准（装配靠找正后配铰的锥销）"
  },

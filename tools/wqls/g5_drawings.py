@@ -110,9 +110,9 @@ def upper_part(step: Path) -> Sheet:
     for (x, y) in ((315.8, 7.0), (380.2, 47.0)):
         sh.center_mark(tv, (x, y, 0), 4.5)
     pp = tv.at((315.8, 7.0, 0))
-    sh.leader_note(pp, (pp[0] - 95, pp[1] + 75), "2 × Ø9 H7（装配后配铰 1:50 锥销孔）")
+    sh.leader_note(pp, (pp[0] - 95, pp[1] + 75), "2 × Ø9 H7 ↧12（装配后配铰 1:50 锥销孔）")
     pb = tv.at((319.8, -42.2, 0))
-    sh.leader_note(pb, (pb[0] - 40, pb[1] + 40), "4 × M10-6H ↧22（仰视）")
+    sh.leader_note(pb, (pb[0] - 40, pb[1] + 40), "4 × M10-6H ↧18，底孔 ↧22（仰视）")
     sh.dim(tv, (319.8, -42.2, 0), (376.2, -42.2, 0), "56.4", offset=-30)
     sh.dim(tv, (376.2, -42.2, 0), (376.2, 96.2, 0), "138.4", offset=-20, orient="v")
     # 左视图（机头端）：面板口螺孔

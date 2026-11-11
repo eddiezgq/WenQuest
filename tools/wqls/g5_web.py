@@ -51,7 +51,7 @@ def main():
         d = np.load(g6 / "sim" / f"cast_{part}_v{var}.npz")
         mat, cast, feeder = d["mat"], d["cast"], d["feeder"]
         o, dx = d["o"], float(d["dx"])
-        P[f"gate_{part}"] = pack(iso(feeder, o, dx))
+        P[f"gate_{part}"] = pack(iso(feeder, o, dx, step=2, smooth=1.0))
         P[f"chill_{part}"] = pack(iso(mat == 3, o, dx, smooth=0.5))
         met = mat == 1
         st, snaps = d["snap_t"], d["snaps"]
@@ -61,7 +61,7 @@ def main():
             fs = np.ones(mat.shape, np.float32)
             fs[met] = snaps[j].astype(np.float32)
             liq = met & (fs < 0.99) & cast                     # 只看铸件本身（冒口、浇道另外画成半透明）
-            P[f"liq_{part}_{t}"] = pack(iso(liq, o, dx, smooth=0.6))
+            P[f"liq_{part}_{t}"] = pack(iso(liq, o, dx, step=2, smooth=1.0))
             tl.append(dict(t=t, frac=round(float(liq.sum()) / max(int(cast.sum()), 1), 3)))
         res = json.loads((g6 / "sim" / f"cast_{part}_v{var}.json").read_text())
         info[part] = dict(times=tl, mass_casting=res["mass_casting_kg"], mass_poured=res["mass_poured_kg"], yield_pct=res["yield_pct"],
@@ -97,8 +97,14 @@ def main():
         paths[f"path_{num}"] = pack(np.asarray(segs).reshape(-1, 2, 3))   # 线段：每段 6 个数
     P.update(paths)
     P["_info"] = info
+    # 网页托管单个文件 ≤ 16 MB：凝固过程的网格按件分开放
+    for part in ("upper", "lower"):
+        sub = {k: P.pop(k) for k in [k for k in P if k.startswith(f"liq_{part}_")]}
+        (out / f"proc_{part}.json").write_text(json.dumps(sub))
     (out / "proc.json").write_text(json.dumps(P))
-    print("proc.json", (out / "proc.json").stat().st_size // 1024, "KB", json.dumps(info, ensure_ascii=False)[:400])
+    for f in ("proc.json", "proc_upper.json", "proc_lower.json"):
+        print(f, (out / f).stat().st_size // 1024, "KB")
+    print(json.dumps(info, ensure_ascii=False)[:400])
 
 
 if __name__ == "__main__":

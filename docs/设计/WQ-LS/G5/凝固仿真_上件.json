@@ -14,22 +14,22 @@
   -85.0
  ],
  "t_pour_c": 1380.0,
- "mass_casting_kg": 16.05,
- "mass_poured_kg": 24.86,
- "yield_pct": 64.6,
+ "mass_casting_kg": 15.96,
+ "mass_poured_kg": 24.79,
+ "yield_pct": 64.4,
  "gating": {
-  "G_pour_kg": 20.56,
+  "G_pour_kg": 20.45,
   "tau_s": 7.7,
   "Hp_cm": 16.0,
   "mu": 0.42,
   "S": 1.7,
-  "A_ingate_cm2": 5.12,
-  "A_runner_cm2": 6.14,
-  "A_sprue_cm2": 7.17,
+  "A_ingate_cm2": 5.1,
+  "A_runner_cm2": 6.12,
+  "A_sprue_cm2": 7.15,
   "n_ingates": 4,
   "A_each_ingate_cm2": 1.28,
   "sprue_d_mm": 30.2,
-  "pour_rate_kg_s": 2.67
+  "pour_rate_kg_s": 2.66
  },
  "layout": {
   "up": [
@@ -49,19 +49,19 @@
  "modulus_max_cm": 1.0,
  "steps": 5765,
  "dt_s": 0.0975,
- "seconds": 441,
+ "seconds": 421,
  "pockets": [
   {
-   "volume_cm3": 48.91,
+   "volume_cm3": 34.44,
    "center_mm": [
     388.8,
     -16.2,
-    186.2
+    183.8
    ],
    "box_mm": [
     [
      375.0,
-     400.0
+     397.5
     ],
     [
      -32.5,
@@ -73,9 +73,9 @@
     ]
    ],
    "t_isolated_s": 10.0,
-   "t_end_s": 22.0,
+   "t_end_s": 20.1,
    "in_casting": true,
-   "modulus_cm": 0.33
+   "modulus_cm": 0.31
   },
   {
    "volume_cm3": 29.39,
@@ -234,32 +234,6 @@
    "modulus_cm": 0.35
   },
   {
-   "volume_cm3": 5.52,
-   "center_mm": [
-    -3.8,
-    1.2,
-    181.2
-   ],
-   "box_mm": [
-    [
-     -12.5,
-     5.0
-    ],
-    [
-     -10.0,
-     22.5
-    ],
-    [
-     170.0,
-     195.0
-    ]
-   ],
-   "t_isolated_s": 12.1,
-   "t_end_s": 26.0,
-   "in_casting": true,
-   "modulus_cm": 0.34
-  },
-  {
    "volume_cm3": 5.19,
    "center_mm": [
     -1.2,
@@ -284,6 +258,32 @@
    "t_end_s": 20.1,
    "in_casting": true,
    "modulus_cm": 0.31
+  },
+  {
+   "volume_cm3": 2.86,
+   "center_mm": [
+    -3.8,
+    1.2,
+    176.2
+   ],
+   "box_mm": [
+    [
+     -12.5,
+     5.0
+    ],
+    [
+     -7.5,
+     20.0
+    ],
+    [
+     170.0,
+     182.5
+    ]
+   ],
+   "t_isolated_s": 8.1,
+   "t_end_s": 16.1,
+   "in_casting": true,
+   "modulus_cm": 0.28
   },
   {
    "volume_cm3": 2.84,
@@ -546,6 +546,84 @@
    "modulus_cm": 0.28
   },
   {
+   "volume_cm3": 0.83,
+   "center_mm": [
+    386.2,
+    -18.8,
+    216.2
+   ],
+   "box_mm": [
+    [
+     382.5,
+     392.5
+    ],
+    [
+     -22.5,
+     -5.0
+    ],
+    [
+     205.0,
+     222.5
+    ]
+   ],
+   "t_isolated_s": 18.0,
+   "t_end_s": 22.0,
+   "in_casting": true,
+   "modulus_cm": 0.31
+  },
+  {
+   "volume_cm3": 0.83,
+   "center_mm": [
+    386.2,
+    16.2,
+    181.2
+   ],
+   "box_mm": [
+    [
+     382.5,
+     392.5
+    ],
+    [
+     5.0,
+     22.5
+    ],
+    [
+     177.5,
+     195.0
+    ]
+   ],
+   "t_isolated_s": 18.0,
+   "t_end_s": 22.0,
+   "in_casting": true,
+   "modulus_cm": 0.31
+  },
+  {
+   "volume_cm3": 0.83,
+   "center_mm": [
+    386.2,
+    18.8,
+    216.2
+   ],
+   "box_mm": [
+    [
+     382.5,
+     392.5
+    ],
+    [
+     5.0,
+     22.5
+    ],
+    [
+     205.0,
+     222.5
+    ]
+   ],
+   "t_isolated_s": 18.0,
+   "t_end_s": 22.0,
+   "in_casting": true,
+   "modulus_cm": 0.31
+  },
+  {
    "volume_cm3": 0.67,
    "center_mm": [
     -48.8,
@@ -702,110 +780,6 @@
    "modulus_cm": 0.31
   },
   {
-   "volume_cm3": 0.48,
-   "center_mm": [
-    386.2,
-    -16.2,
-    183.8
-   ],
-   "box_mm": [
-    [
-     382.5,
-     387.5
-    ],
-    [
-     -20.0,
-     -5.0
-    ],
-    [
-     180.0,
-     195.0
-    ]
-   ],
-   "t_isolated_s": 22.0,
-   "t_end_s": 24.1,
-   "in_casting": true,
-   "modulus_cm": 0.33
-  },
-  {
-   "volume_cm3": 0.48,
-   "center_mm": [
-    386.2,
-    -16.2,
-    216.2
-   ],
-   "box_mm": [
-    [
-     382.5,
-     387.5
-    ],
-    [
-     -20.0,
-     -5.0
-    ],
-    [
-     205.0,
-     220.0
-    ]
-   ],
-   "t_isolated_s": 22.0,
-   "t_end_s": 24.1,
-   "in_casting": true,
-   "modulus_cm": 0.33
-  },
-  {
-   "volume_cm3": 0.48,
-   "center_mm": [
-    386.2,
-    16.2,
-    183.8
-   ],
-   "box_mm": [
-    [
-     382.5,
-     387.5
-    ],
-    [
-     5.0,
-     20.0
-    ],
-    [
-     180.0,
-     195.0
-    ]
-   ],
-   "t_isolated_s": 22.0,
-   "t_end_s": 24.1,
-   "in_casting": true,
-   "modulus_cm": 0.33
-  },
-  {
-   "volume_cm3": 0.48,
-   "center_mm": [
-    386.2,
-    16.2,
-    216.2
-   ],
-   "box_mm": [
-    [
-     382.5,
-     387.5
-    ],
-    [
-     5.0,
-     20.0
-    ],
-    [
-     205.0,
-     220.0
-    ]
-   ],
-   "t_isolated_s": 22.0,
-   "t_end_s": 24.1,
-   "in_casting": true,
-   "modulus_cm": 0.33
-  },
-  {
    "volume_cm3": 0.47,
    "center_mm": [
     38.8,
@@ -830,20 +804,46 @@
    "t_end_s": 18.0,
    "in_casting": true,
    "modulus_cm": 0.33
+  },
+  {
+   "volume_cm3": 0.44,
+   "center_mm": [
+    38.8,
+    -41.2,
+    198.8
+   ],
+   "box_mm": [
+    [
+     35.0,
+     45.0
+    ],
+    [
+     -45.0,
+     -37.5
+    ],
+    [
+     195.0,
+     205.0
+    ]
+   ],
+   "t_isolated_s": 14.0,
+   "t_end_s": 16.1,
+   "in_casting": true,
+   "modulus_cm": 0.33
   }
  ],
  "pockets_over_limit": [
   {
-   "volume_cm3": 48.91,
+   "volume_cm3": 34.44,
    "center_mm": [
     388.8,
     -16.2,
-    186.2
+    183.8
    ],
    "box_mm": [
     [
      375.0,
-     400.0
+     397.5
     ],
     [
      -32.5,
@@ -855,9 +855,9 @@
     ]
    ],
    "t_isolated_s": 10.0,
-   "t_end_s": 22.0,
+   "t_end_s": 20.1,
    "in_casting": true,
-   "modulus_cm": 0.33
+   "modulus_cm": 0.31
   },
   {
    "volume_cm3": 29.39,
@@ -1016,32 +1016,6 @@
    "modulus_cm": 0.35
   },
   {
-   "volume_cm3": 5.52,
-   "center_mm": [
-    -3.8,
-    1.2,
-    181.2
-   ],
-   "box_mm": [
-    [
-     -12.5,
-     5.0
-    ],
-    [
-     -10.0,
-     22.5
-    ],
-    [
-     170.0,
-     195.0
-    ]
-   ],
-   "t_isolated_s": 12.1,
-   "t_end_s": 26.0,
-   "in_casting": true,
-   "modulus_cm": 0.34
-  },
-  {
    "volume_cm3": 5.19,
    "center_mm": [
     -1.2,
@@ -1066,6 +1040,32 @@
    "t_end_s": 20.1,
    "in_casting": true,
    "modulus_cm": 0.31
+  },
+  {
+   "volume_cm3": 2.86,
+   "center_mm": [
+    -3.8,
+    1.2,
+    176.2
+   ],
+   "box_mm": [
+    [
+     -12.5,
+     5.0
+    ],
+    [
+     -7.5,
+     20.0
+    ],
+    [
+     170.0,
+     182.5
+    ]
+   ],
+   "t_isolated_s": 8.1,
+   "t_end_s": 16.1,
+   "in_casting": true,
+   "modulus_cm": 0.28
   },
   {
    "volume_cm3": 2.84,

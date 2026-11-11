@@ -1,3 +1,5 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>WQ-LS 机壳工艺</title>
 <!-- 第 138 轮 G5.1：机壳的铸造与机加工工艺三维。数据 d/proc.json（tools/wqls/g5_web.py）：
      铸件毛坯、浇注系统与冒口、冷铁（凝固仿真的体素等值面），各时刻还没凝固的区域；上件在卧加夹具上、刀具中心轨迹。
@@ -22,6 +24,7 @@ table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:
 @media (max-width:520px){.panel{max-height:46%}.sub{display:none}}
 body.shot .panel,body.shot #busy{display:none}
 </style>
+</head><body>
 <canvas id="c"></canvas>
 <div id="busy">正在载入（约 10 MB）…</div>
 <div class="panel" id="ui">
@@ -79,6 +82,7 @@ const cam = new THREE.PerspectiveCamera(32, W() / H(), 0.01, 20);
 const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
 
 const P = await (await fetch('d/proc.json')).json();
+for (const f of ['d/proc_upper.json', 'd/proc_lower.json']) Object.assign(P, await (await fetch(f)).json());   // 凝固过程的网格按件分文件
 document.getElementById('busy').hidden = true;
 const info = P._info;
 function geo(k, lines = false) {
@@ -145,3 +149,5 @@ window.go = (o) => { if (o.mode) mode = o.mode; if (o.part) part = o.part; if (o
 (function loop() { ctl.update(); r.render(scene, cam); requestAnimationFrame(loop); })();
 document.title = q.has('film') ? 'ready' : document.title;
 </script>
+
+</body></html>

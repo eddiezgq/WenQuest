@@ -1,5 +1,5 @@
 {
- "filled_holes": 14,
+ "filled_holes": 16,
  "pads": [
   {
    "area_cm2": 4.6,
@@ -20,7 +20,7 @@
    "allowance": 4.0
   },
   {
-   "area_cm2": 225.7,
+   "area_cm2": 224.1,
    "normal": [
     -0.0,
     -0.0,
@@ -29,7 +29,7 @@
    "allowance": 3.0
   },
   {
-   "area_cm2": 787.9,
+   "area_cm2": 788.2,
    "normal": [
     0.0,
     0.0,
@@ -39,10 +39,11 @@
   }
  ],
  "bores": [],
+ "part_outside_blank_mm3": 0.0,
  "part": "lower",
  "valid": true,
  "mass_part_kg": 8.38,
- "mass_blank_kg": 11.28,
+ "mass_blank_kg": 11.27,
  "allowance": {
   "side": 3.0,
   "top": 4.0,

@@ -1,0 +1,222 @@
+{
+ "O1201": {
+  "title": "上件 工序 10 粗、半精铣接合面、钻工艺孔、攻 M10",
+  "machine": "VMC-01",
+  "lines": 110,
+  "tools": [
+   1,
+   8,
+   12,
+   17
+  ],
+  "b_indexes": 0,
+  "time_min": 3.18,
+  "cut_min": 2.82,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "C_UP",
+    "steps": 5,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.0
+   }
+  ]
+ },
+ "O1202": {
+  "title": "上件 工序 20 卧加粗加工",
+  "machine": "HMC-01",
+  "lines": 270,
+  "tools": [
+   2,
+   3,
+   5,
+   7,
+   14
+  ],
+  "b_indexes": 2,
+  "time_min": 3.76,
+  "cut_min": 2.97,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "B0",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.5
+   },
+   {
+    "frame": "B180",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 8.0
+   },
+   {
+    "frame": "DOWN_HEAD",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   }
+  ]
+ },
+ "O1204": {
+  "title": "上件 工序 40 精铣接合面、铰工艺孔",
+  "machine": "VMC-01",
+  "lines": 66,
+  "tools": [
+   1,
+   8,
+   9
+  ],
+  "b_indexes": 0,
+  "time_min": 2.84,
+  "cut_min": 2.59,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "C_UP",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": -0.0,
+    "ap_max": 3.0
+   }
+  ]
+ },
+ "O1205": {
+  "title": "上件 工序 50、60 卧加精加工、钻攻",
+  "machine": "HMC-01",
+  "lines": 313,
+  "tools": [
+   2,
+   4,
+   5,
+   7,
+   10,
+   11,
+   13,
+   15,
+   16
+  ],
+  "b_indexes": 5,
+  "time_min": 9.77,
+  "cut_min": 8.29,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "B0",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 3.0
+   },
+   {
+    "frame": "B180",
+    "steps": 5,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 8.0
+   },
+   {
+    "frame": "B270",
+    "steps": 2,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   },
+   {
+    "frame": "DOWN_HEAD",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 0.5
+   }
+  ]
+ },
+ "O1301": {
+  "title": "下件 工序 10 铣底面 A、工艺孔",
+  "machine": "VMC-01",
+  "lines": 70,
+  "tools": [
+   1,
+   3
+  ],
+  "b_indexes": 0,
+  "time_min": 5.64,
+  "cut_min": 5.39,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "A_UP",
+    "steps": 3,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 2.2
+   }
+  ]
+ },
+ "O1302": {
+  "title": "下件 工序 20 粗铣顶面",
+  "machine": "VMC-01",
+  "lines": 47,
+  "tools": [
+   1
+  ],
+  "b_indexes": 0,
+  "time_min": 4.31,
+  "cut_min": 4.18,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "TOP",
+    "steps": 1,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": 0.0,
+    "ap_max": 1.75
+   }
+  ]
+ },
+ "O1304": {
+  "title": "下件 工序 40、50 精铣顶面、针板座、过孔、M3",
+  "machine": "VMC-01",
+  "lines": 158,
+  "tools": [
+   1,
+   2,
+   4,
+   6,
+   18
+  ],
+  "b_indexes": 0,
+  "time_min": 7.5,
+  "cut_min": 7.01,
+  "checks": [],
+  "sim": [
+   {
+    "frame": "TOP",
+    "steps": 6,
+    "issues": [],
+    "over_cells": 0,
+    "dev_min": -0.0,
+    "ap_max": 4.0
+   }
+  ]
+ },
+ "linebar": {
+  "min_clearance_mm": 0.86,
+  "at_x": 374.0
+ }
+}
