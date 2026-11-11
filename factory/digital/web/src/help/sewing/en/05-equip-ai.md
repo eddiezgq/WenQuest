@@ -38,3 +38,15 @@ Each problem has a fix that addresses the cause, plus a few that sound reasonabl
 - Reboring out-of-tolerance housings.
 
 Choose a fix that misses the cause and the problem stays.
+
+## Lab 32: tracing quality problems with 8D
+
+The practice above as a graded lab: on the left, Labs & tasks → Lab 32.
+
+1. The instructor injects one problem on the lab page (it can be a random one of the five; students can't see which).
+2. Students find the characteristic and the rule that fired on the control charts on the Quality page.
+3. On the lab page, compare means by the machining centre that fine-bored each housing: is only one machine off, or is everything off together? Then name the machine (e.g. hmc-3, mix-1, pour-1, age-1, ihd-1).
+4. Open an 8D and choose an action; once the instructor approves, it goes to the shop. After another batch, it counts as effective only if every part is in tolerance and Cpk ≥ 1.33. For casting porosity, open the 8D on the pore count.
+5. Write D7 and close.
+
+The platform grades 60 points automatically; the lab report is worth 40. The guide and report template are at the top right of the lab page.

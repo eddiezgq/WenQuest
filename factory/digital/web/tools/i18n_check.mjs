@@ -84,6 +84,7 @@ export const BATCH2 = [
   'pages/Lab29.vue',
   'pages/Lab30.vue',
   'pages/Lab31.vue',
+  'pages/Lab32.vue',
   'pages/OntOps.vue',
   'pages/OntHub.vue',
   'pages/OntRules.vue',

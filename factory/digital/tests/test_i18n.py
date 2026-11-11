@@ -123,7 +123,7 @@ def test_lab_task_texts_have_english():
     import importlib
     from hub import labs_api
     need = []
-    for m in ["teach"] + ["lab%d" % n for n in range(15, 32)]:
+    for m in ["teach"] + ["lab%d" % n for n in range(15, 33)]:
         mod = importlib.import_module("hub." + m)
         for t in mod.TASKS:
             need += [t[k] for k in ("title", "desc", "hint") if t.get(k)]
@@ -138,7 +138,7 @@ def test_lab_task_texts_have_english():
             [walk(v) for v in o.values()]
         elif isinstance(o, (list, tuple)):
             [walk(v) for v in o]
-    for m in ["teach"] + ["lab%d" % n for n in range(15, 32)]:
+    for m in ["teach"] + ["lab%d" % n for n in range(15, 33)]:
         for k, v in vars(importlib.import_module("hub." + m)).items():
             if k.isupper() and isinstance(v, (list, tuple, dict)):
                 walk(v)
