@@ -54,7 +54,7 @@ defaults:
 jobs:
   test:
     name: 测试
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     services:
       postgres:
         image: postgres:16
@@ -172,7 +172,7 @@ jobs:
   rehearsal:
     name: 服务器演练（真 ERPNext）
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     timeout-minutes: 260
     env:
       FACTORY_DIR: /tmp/fac
@@ -510,7 +510,7 @@ jobs:
     # 不挡部署（deploy 只等 build、rehearsal）
     name: 本地版能起来
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
@@ -575,7 +575,7 @@ jobs:
     # 推送到 main 时发布到 Release help-videos，镜像构建时取最新的一份（factory/digital/Dockerfile）。不挡部署
     name: 录帮助视频
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     timeout-minutes: 90
     permissions:
       contents: write          # 发布到 Release
@@ -633,7 +633,7 @@ jobs:
   build:
     name: 构建镜像
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     outputs:
       app: ${{ steps.meta.outputs.app }}
       bridge: ${{ steps.meta.outputs.bridge }}
@@ -680,7 +680,7 @@ jobs:
   deploy:
     name: 部署到服务器
     needs: [build, design]                  # 2026-11-08 Eddie：ERP 演练不卡上线——演练照跑、出错标红，但部署不等它
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     environment: production
     env:
       HOST: ${{ secrets.DEPLOY_HOST }}
@@ -768,7 +768,7 @@ jobs:
   deploy-cn:
     name: 部署到国内服务器
     needs: [build, design]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # ubuntu-latest 11-11 起换成 26.04，没有 openfoam 包
     environment: production
     timeout-minutes: 240          # 第一次要跨境传几 GB；以后只传变化的层
     env:
