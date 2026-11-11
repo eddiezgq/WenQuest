@@ -30,7 +30,7 @@ X_GEAR = 72.0                          # 齿轮左端面（齿宽 b = 8）
 X_BRG_L = (92.0, 366.0)                # 下轴两个 6201 的左端面（宽 10）
 X_PULLEY = S.X_BELT                    # 带轮中面 352
 LOW_SHAFT = (70.0, 384.0)              # 下轴 x 范围
-HOOK_SHAFT = (8.0, 92.0)               # 旋梭轴 x 范围
+HOOK_SHAFT = (17.0, 92.0)              # 旋梭轴 x 范围（左端不伸进梭芯套，离它 1.5；干涉检查查出原来的 8 伸进去了）
 PD = S.BELT["z"] * S.BELT["pitch"] / math.pi      # 带轮节圆直径 28.65
 OD_PULLEY = PD - 0.76                              # HTD 3M 的节线差 2 × 0.381
 
@@ -145,7 +145,7 @@ def build():
     gl = gl.fuse(tube(10.0, 6.0, 6, X_GEAR + b, YL, ZL))
     P["gear_hook"] = (gh, "metal", "steel", "hook")
     P["gear_lower"] = (gl, "metal", "steel", "lower")
-    # 旋梭轴：Ø7.94 装旋梭（x 8…23），Ø10 轴身；轴心 Ø2.5 油孔
+    # 旋梭轴：Ø7.94 装旋梭（x 17…23），Ø10 轴身；轴心 Ø2.5 油孔
     hs = cyl(7.94 / 2, 23 - HOOK_SHAFT[0], HOOK_SHAFT[0], 0.0, ZH).fuse(cyl(5.0, HOOK_SHAFT[1] - 23, 23, 0.0, ZH))
     hs = hs.cut(cyl(1.25, 60, HOOK_SHAFT[0] - 1, 0.0, ZH))
     P["hook_shaft"] = (hs, "chrome", "steel", "hook")

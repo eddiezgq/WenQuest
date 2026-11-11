@@ -316,7 +316,8 @@ def lower_seats(hollow, solid, info):
     ① 旋梭轴座：轴线 y 0、z −21.5，x 24…66 的圆柱凸台 Ø24（孔 Ø14，壁厚 5；凝固仿真定的，Ø28 时是热节），上面一道 5 mm 厚的筋连到机座顶板；孔铸出 Ø9（砂芯）；孔 Ø14 H7 装两个铜套；
     ② 下轴左轴承座：轴线 (y 27.8, z −35.4)，x 88…104，Ø42 凸台，6 mm 厚的筋连到顶板；孔 Ø32 H7 装 6201；
     ③ 下轴右轴承座：x 364…378，同上（在同步带轮右边，筋在过带孔右边）；
-    ④ 两个端壁上的工艺孔：右端壁在下轴轴线上 Ø34（镗下轴两孔时镗杆从这里进），左端壁在旋梭轴轴线上 Ø20（镗旋梭轴孔），装配后橡胶堵堵上。"""
+    ④ 两个端壁上的工艺孔：右端壁在下轴轴线上 Ø34（镗下轴两孔时镗杆从这里进），左端壁在旋梭轴轴线上 Ø20（镗旋梭轴孔），装配后橡胶堵堵上；
+    ⑤ 立柱下左横筋上 Ø34 铸孔，让下轴穿过（干涉检查查出）。"""
     sp = _spec()
     zh, zl, yl = sp.ZH, sp.ZL, sp.YL
     top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))       # 筋伸进顶板 1 mm，保证连上
@@ -330,6 +331,8 @@ def lower_seats(hollow, solid, info):
     for f_ in feats:
         hollow = fuse_fillet(hollow, f_.fuse(top.common(Part.makeBox(f_.BoundBox.XLength, f_.BoundBox.YLength, 3.0,
                                                                      V(f_.BoundBox.XMin, f_.BoundBox.YMin, -BEDWALL - 1.0)))).common(solid))
+    # ⑤ 立柱下的左横筋（x 300…307）挡在下轴上：开 Ø34 铸孔（下轴穿过；G5.2 镗下轴两孔时镗杆也从这里过）
+    hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(PIL["x0"] - 6, yl, zl), V(1, 0, 0)))
     if not FEA_SIMPLE:
         hollow = hollow.cut(Part.makeCylinder(7.0, 46, V(22, 0, zh), V(1, 0, 0)))            # 旋梭轴孔 Ø14 H7
         for x0, L in ((88.0, 16.0), (364.0, 14.0)):
@@ -337,7 +340,7 @@ def lower_seats(hollow, solid, info):
         hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(BED["x1"] - 12, yl, zl), V(1, 0, 0)))  # 右端壁工艺孔 Ø34
         hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, 0, zh), V(1, 0, 0)))    # 左端壁工艺孔 Ø20
     info["lower_seats"] = dict(hook_bore=dict(axis=(0.0, zh), x=(24, 66), d=14), lower_bores=dict(axis=(yl, zl), x=[(88, 104), (364, 378)], d=32),
-                               end_holes=dict(right=34, left=20))
+                               end_holes=dict(right=34, left=20), rib_hole=dict(x=PIL["x0"], d=34))
     return hollow
 
 
@@ -671,7 +674,7 @@ def casting():
             rb.append(sl.common(cav).cut(hole))
         for z in (55.0, 115.0):
             sl = Part.makeBox(PIL["x1"] - PIL["x0"] + 20, 300, RIB_T, V(PIL["x0"] - 10, -150, z))
-            slot = Part.makeBox(34, 60, RIB_T + 2, V(S_BELT_X - 17, -30, z - 1)).fuse(Part.makeCylinder(10, RIB_T + 2, V(330, 45, z - 1), V(0, 0, 1)))
+            slot = Part.makeBox(34, 80, RIB_T + 2, V(S_BELT_X - 17, -30, z - 1))   # G4.5：y −30…50（下轴在后面，带的后边在 z 55 处到 y 约 34）.fuse(Part.makeCylinder(10, RIB_T + 2, V(330, 45, z - 1), V(0, 0, 1)))
             rb.append(sl.common(cav).cut(slot))
         for y in ((-20.0, 50.0) if BED_RIB_H > 1 else ()):
             sl = Part.makeBox(BED["x1"] - 80, RIB_T, BED_RIB_H, V(80, y - RIB_T / 2, -BED_RIB_H))
