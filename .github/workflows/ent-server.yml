@@ -61,7 +61,8 @@ jobs:
           if [ -n "$site" ]; then
             for h in qms qms-erp probe.qms probe.qms-erp app; do echo "dns $h.$site -> $(getent ahostsv4 "$h.$site" | awk '{print $1}' | sort -u | tr '\n' ' ')"; done
             for h in qms qms-erp app; do echo "https $h.$site -> $(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://$h.$site/" || true)"; done
-            ssh "deploy@$HOST" 'cd /opt/wenquest/edge && docker compose logs --since 2h caddy 2>&1 | grep -iE "certificate obtained|error" | tail -n 8 | cut -c1-300; echo "bridge.log:"; tail -n 5 bridge.log 2>/dev/null; crontab -l | grep -E "bridge|pilot"'
+            for h in qms qms-erp; do echo "curl -v $h:"; curl -sv -o /dev/null -m 30 "https://$h.$site/" 2>&1 | grep -E "^\* (Connected|SSL|TLS|subject|issuer|expire)|^< HTTP|alert|error" | head -8; done
+            ssh "deploy@$HOST" 'cd /opt/wenquest/edge && echo "caddy-logs:"; docker compose logs --since 3h caddy 2>&1 | grep -E "qms" | grep -iE "certificate|obtain|error|challenge|ask|tls" | tail -n 15 | cut -c1-400; echo "local:"; for h in qms qms-erp; do curl -sk -o /dev/null -m 20 -w "$h local %{http_code}\n" --resolve $h.wenquestrobotics.com:443:127.0.0.1 https://$h.wenquestrobotics.com/; done; ss -ltnp 2>/dev/null | grep -E ":(80|443) " ; echo "bridge.log:"; tail -n 5 bridge.log 2>/dev/null; crontab -l | grep -E "bridge|pilot"'
           fi
 
   bootstrap:
