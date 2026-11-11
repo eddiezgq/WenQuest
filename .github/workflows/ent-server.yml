@@ -56,6 +56,13 @@ jobs:
             echo "== $u@$HOST"
             ssh -o BatchMode=yes -o ConnectTimeout=20 "$u@$HOST" 'id; uptime; free -m | head -2; df -h / | tail -1; docker --version 2>&1; ls -ld /opt/wenquest 2>&1; sudo -n true 2>/dev/null && echo sudo-ok; tail -n 5 /root/bootstrap.log 2>/dev/null; echo "qms:"; docker ps --format "{{.Names}} {{.Status}}" 2>/dev/null | grep -E "^qms|^edge" | sed "s/^/  /"; ls /opt/wenquest/qms-tenants 2>/dev/null; ls -la /opt/wenquest/qms/.demo-loaded 2>/dev/null; tail -n 3 /opt/wenquest/qms/demo.log 2>/dev/null' || echo "($u 登不上)"
           done
+          # 切换后（第 146 轮 7.6）：从外面按真实 DNS 看，四条记录是否指到企业服务器、证书是否签下来
+          site=$(ssh "deploy@$HOST" "grep -E '^SITE_DOMAIN=' /opt/wenquest/edge/.env | cut -d= -f2-" || true)
+          if [ -n "$site" ]; then
+            for h in qms qms-erp probe.qms probe.qms-erp app; do echo "dns $h.$site -> $(getent ahostsv4 "$h.$site" | awk '{print $1}' | sort -u | tr '\n' ' ')"; done
+            for h in qms qms-erp app; do echo "https $h.$site -> $(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://$h.$site/" || true)"; done
+            ssh "deploy@$HOST" 'cd /opt/wenquest/edge && docker compose logs --since 2h caddy 2>&1 | grep -iE "certificate obtained|error" | tail -n 8 | cut -c1-300; echo "bridge.log:"; tail -n 5 bridge.log 2>/dev/null; crontab -l | grep -E "bridge|pilot"'
+          fi
 
   bootstrap:
     if: inputs.task == 'bootstrap'
