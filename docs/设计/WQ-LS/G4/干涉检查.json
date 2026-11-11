@@ -1,0 +1,124 @@
+{
+ "limit_mm": 1.0,
+ "step_deg": 2,
+ "frames": 180,
+ "seconds": 295,
+ "pairs": [
+  [
+   "rocker | casting",
+   1.0,
+   352
+  ],
+  [
+   "crank | casting",
+   1.0,
+   352
+  ],
+  [
+   "pin_M | crank",
+   1.0,
+   286
+  ],
+  [
+   "needle_bar | crank_pin",
+   1.5,
+   358
+  ],
+  [
+   "needle_clamp | casting",
+   1.5,
+   358
+  ],
+  [
+   "nb_link | casting",
+   1.5,
+   0
+  ],
+  [
+   "rod | lever",
+   1.5,
+   350
+  ],
+  [
+   "lever | shaft",
+   1.5,
+   358
+  ],
+  [
+   "lever | crank",
+   1.5,
+   358
+  ],
+  [
+   "needle_bar | rod",
+   2.0,
+   358
+  ],
+  [
+   "needle_bar | casting",
+   2.0,
+   358
+  ],
+  [
+   "crank_pin | casting",
+   2.5,
+   244
+  ],
+  [
+   "rod | casting",
+   3.0,
+   358
+  ],
+  [
+   "lever | rocker",
+   3.5,
+   358
+  ],
+  [
+   "crank_pin | shaft",
+   4.0,
+   358
+  ],
+  [
+   "needle | casting",
+   5.19,
+   358
+  ],
+  [
+   "lever | casting",
+   5.794,
+   60
+  ],
+  [
+   "rod | rocker",
+   6.46,
+   32
+  ],
+  [
+   "lever | stud_Q",
+   6.612,
+   32
+  ],
+  [
+   "pin_M | shaft",
+   7.934,
+   234
+  ],
+  [
+   "pin_M | casting",
+   9.293,
+   60
+  ],
+  [
+   "rod | stud_Q",
+   10.703,
+   14
+  ],
+  [
+   "rocker | crank_pin",
+   13.46,
+   32
+  ]
+ ],
+ "too_close": []
+}

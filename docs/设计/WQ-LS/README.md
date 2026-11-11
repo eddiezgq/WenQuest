@@ -6,6 +6,8 @@
 |---|---|---|
 | G1 | 设计任务书与总体方案、时序图、机构运动简图、总体布置图、1–5 mm 全针距校核 | `G1/` |
 | G2 | 动力学（含 MuJoCo 对照）、平衡、上轴强度疲劳与有限元、轴承、临界转速、电机与惯量 | `G2/设计计算书.md` |
-| G3 | 外观与机壳铸件 | `G3/`（待做） |
+| G3 | 外观（定 B）与机壳铸件（HT250）、模态、材料比较、前盖板、机壳优化 | `G3/外观与机壳铸件.md` |
+| GC | 控制器：主轴伺服控制仿真（110–250 V） | `GC/` |
+| G4 | 零件与整机。G4.1 刺布与挑线机构：挑线四连杆重新综合、零件实体、平衡块、一转干涉检查、会动的三维 | `G4/刺布与挑线机构.md` |
 
-主参数：`tools/wqls/spec.py`。重新生成 G1：`python3 tools/wqls/g1.py`。
+主参数：`tools/wqls/spec.py`。重新生成 G1：`python3 tools/wqls/g1.py`；G2：`python3 tools/wqls/g2.py`；G4.1：`python3 tools/wqls/g4_takeup.py`，再 `python3 tools/wqls/g4_parts.py <工作目录> <housing.step>`。

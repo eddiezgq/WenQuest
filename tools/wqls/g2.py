@@ -169,7 +169,7 @@ def balance():
 
 # ================================================================ 4 上轴：梁单元
 def shaft_mesh(h=2.0, mid=False):
-    pts = {S.UPPER_SEGS[0][0], S.UPPER_SEGS[-1][1], S.X_CRANK, S.X_TAKEUP, S.X_FEED_E, S.X_BELT, S.X_ROTOR, *S.X_BRG}
+    pts = {S.UPPER_SEGS[0][0], S.UPPER_SEGS[-1][1], S.X_CRANK, S.X_WEB, S.X_TAKEUP, S.X_FEED_E, S.X_BELT, S.X_ROTOR, *S.X_BRG}
     if mid:
         pts.add(S.X_MID_BUSH)
     for x0, x1, *_ in S.UPPER_SEGS:
@@ -182,11 +182,14 @@ def shaft_mesh(h=2.0, mid=False):
     return np.array(x)
 
 
+STUB_D = 40.0   # 轴端外侧（曲柄销、曲柄）按刚性短梁：力经曲柄销传到轴端，连同力臂产生的弯矩；质量另按集中质量计
+
+
 def dia(x):
     for x0, x1, d, _ in S.UPPER_SEGS:
         if x0 - 1e-9 <= x <= x1 + 1e-9:
             return d
-    return S.UPPER_SEGS[-1][2]
+    return STUB_D if x < S.UPPER_SEGS[0][0] else S.UPPER_SEGS[-1][2]
 
 
 def beam_KM(x, E=206000.0, rho=7.85e-9):
@@ -198,7 +201,7 @@ def beam_KM(x, E=206000.0, rho=7.85e-9):
         I, A = math.pi * d ** 4 / 64, math.pi * d ** 2 / 4
         k = E * I / L ** 3 * np.array([[12, 6 * L, -12, 6 * L], [6 * L, 4 * L * L, -6 * L, 2 * L * L],
                                         [-12, -6 * L, 12, -6 * L], [6 * L, 2 * L * L, -6 * L, 4 * L * L]])
-        mm = rho * A * L / 420 * np.array([[156, 22 * L, 54, -13 * L], [22 * L, 4 * L * L, 13 * L, -3 * L * L],
+        mm = (rho * 1e-3 if d == STUB_D else rho) * A * L / 420 * np.array([[156, 22 * L, 54, -13 * L], [22 * L, 4 * L * L, 13 * L, -3 * L * L],
                                            [54, 13 * L, 156, -22 * L], [-13 * L, -3 * L * L, -22 * L, 4 * L * L]])
         idx = [2 * e, 2 * e + 1, 2 * e + 2, 2 * e + 3]
         K[np.ix_(idx, idx)] += k
@@ -226,7 +229,8 @@ def shaft(R, mid=False):
     for i in range(N):
         for pl in (0, 1):                                  # 0：水平面（u），1：铅垂面（v）
             F = np.zeros(2 * len(x))
-            F[nd(S.X_CRANK)] += R["F_crank"][i, pl]
+            F[nd(S.X_CRANK)] += R["F_rod"][i, pl]          # 连杆力在连杆平面
+            F[nd(S.X_WEB)] += R["F_cent"][i, pl]           # 曲柄销当量与平衡块的离心力在曲柄平面
             F[nd(S.X_TAKEUP)] += R["F_tk"][i, pl]
             if pl == 1:
                 F[nd(S.X_FEED_E)] += R["F_fe"][i]
@@ -263,8 +267,8 @@ def fatigue(R, x, Mb, T):
     mat = mdstd.material("45-QT")
     out = {}
     import _fea
-    secs = [(f"截面 {k}", s[1], min(s[2], n[2]), max(s[2], n[2]), 0.5)
-            for k, (s, n) in zip(("I", "II", "III", "IV"), zip(S.UPPER_SEGS, S.UPPER_SEGS[1:]))]
+    steps = [(s, n) for s, n in zip(S.UPPER_SEGS, S.UPPER_SEGS[1:]) if abs(s[2] - n[2]) > 1e-9]   # 只算有台阶的截面（同直径的分界没有缺口）
+    secs = [(f"截面 {k}", s[1], min(s[2], n[2]), max(s[2], n[2]), 0.5) for k, (s, n) in zip(("I", "II", "III", "IV"), steps)]
     for name, xsec, d, D_, r_ in secs:
         j = int(np.argmin(abs(x - xsec)))
         Mx, My = Mb[:, j, 0], Mb[:, j, 1]
@@ -296,7 +300,8 @@ def fatigue(R, x, Mb, T):
 def critical(mid=False):
     x = shaft_mesh(mid=mid)
     K, Mm = beam_KM(x)
-    masses = [(S.X_CRANK, 0.15), (S.X_TAKEUP, 0.05), (S.X_FEED_E, 0.08), (S.X_BELT, 0.06), (S.X_ROTOR, 0.45)]
+    masses = [(S.X_WEB, 0.17), (S.X_CRANK, 0.04), (S.X_TAKEUP, 0.04),   # G4.1：曲柄带平衡块 167 g（实体）、销上连杆与销、挑线杆
+               (S.X_FEED_E, 0.08), (S.X_BELT, 0.06), (S.X_ROTOR, 0.45)]
     for xm, mk in masses:
         i = 2 * int(np.argmin(abs(x - xm)))
         Mm[i, i] += mk / 1000.0
@@ -316,7 +321,7 @@ def bearing_life(reac, n):
     for b in range(reac.shape[1]):
         F = np.hypot(reac[:, b, 0], reac[:, b, 1])
         Pm = float(np.mean(F ** 3) ** (1 / 3))
-        L10 = (S.BRG_6201["C"] / max(Pm, 1e-9)) ** 3 * 1e6
+        L10 = (S.BRG[b]["C"] / max(Pm, 1e-9)) ** 3 * 1e6
         out.append(dict(P_mean=Pm, F_max=float(F.max()), L10h=float(L10 / (n * 60))))
     return out
 
@@ -342,7 +347,7 @@ def shaft_report(R):
         a.add_patch(plt.Rectangle((x0, -d / 2), x1 - x0, d, fc="#dfe5ea", ec=INK, lw=0.8))
     for xb in S.X_BRG:
         a.add_patch(plt.Rectangle((xb - 5, -16), 10, 32, fc="none", ec=INK, lw=0.8, hatch="////"))
-    for xx, nm, tx, ty in ((S.X_CRANK, "针杆曲柄", -25, 28), (S.X_BRG[0], "6201", S.X_BRG[0] + 6, -30),
+    for xx, nm, tx, ty in ((S.X_CRANK, "针杆曲柄", -25, 28), (S.X_BRG[0], "6202", S.X_BRG[0] + 6, -30),
                            (S.X_TAKEUP, "挑线曲柄", 48, 28), (S.X_FEED_E, "送布偏心", S.X_FEED_E, 28),
                            (S.X_BRG[1], "6201", S.X_BRG[1] - 10, -30), (S.X_BELT, "同步带轮", S.X_BELT - 6, 28),
                            (S.X_ROTOR, "电机转子", S.X_ROTOR + 10, 28)):
@@ -353,7 +358,7 @@ def shaft_report(R):
     a.set_ylim(-36, 36)
     a.set_aspect("auto")
     a.axis("off")
-    a.set_title("上轴 LS-101 B 版（单位 mm），两个 6201 支承", loc="left", fontsize=10.5)
+    a.set_title("上轴 LS-101 D 版（单位 mm），前 6202、后 6201", loc="left", fontsize=10.5)
     Mm_ = np.hypot(Mb[:, :, 0], Mb[:, :, 1]) / 1000
     b.fill_between(x, Mm_.min(axis=0), Mm_.max(axis=0), color=BLU, alpha=0.18, lw=0)
     b.plot(x, Mm_.max(axis=0), color=BLU, lw=1.2, label="一转之内的最大合成弯矩")

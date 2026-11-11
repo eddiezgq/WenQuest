@@ -1,0 +1,76 @@
+{
+ "dyn_mass": {
+  "m_bar": 0.0917,
+  "m_rod": 0.04622,
+  "g_rod": 0.423,
+  "I_rod": 1.875e-05,
+  "m_pin": 0.0173,
+  "m_tk": 0.04118,
+  "g_tk": 0.4
+ },
+ "balance": {
+  "k": 0.4,
+  "m_recip_kg": 0.1112,
+  "m_rot_kg": 0.044,
+  "g_rod_mm": 23.25,
+  "M_req_kgmm": 1.371,
+  "crank_moment_kgmm": 1.379,
+  "sector_half_deg": 37.59,
+  "equiv_at_r_g": 89.0
+ },
+ "parts": {
+  "needle_bar": {
+   "mass_g": 71.0,
+   "material": "chrome"
+  },
+  "needle_clamp": {
+   "mass_g": 3.2,
+   "material": "metal"
+  },
+  "needle": {
+   "mass_g": 0.3,
+   "material": "chrome"
+  },
+  "nb_link": {
+   "mass_g": 17.2,
+   "material": "metal"
+  },
+  "rod": {
+   "mass_g": 46.2,
+   "material": "metal"
+  },
+  "lever": {
+   "mass_g": 41.2,
+   "material": "chrome"
+  },
+  "rocker": {
+   "mass_g": 10.9,
+   "material": "metal"
+  },
+  "pin_M": {
+   "mass_g": 2.1,
+   "material": "chrome"
+  },
+  "stud_Q": {
+   "mass_g": 4.5,
+   "material": "chrome"
+  },
+  "crank_pin": {
+   "mass_g": 7.3,
+   "material": "chrome"
+  },
+  "shaft": {
+   "mass_g": 621.7,
+   "material": "metal"
+  },
+  "bearing_front": {
+   "mass_g": 66.2,
+   "material": "metal"
+  },
+  "crank": {
+   "mass_g": 120.7,
+   "material": "metal"
+  }
+ },
+ "note": "质量按钢 7.85 g/cm³ 从 FreeCAD 实体算；滚针轴承 2 只约 10 g 计入曲柄销；平衡块按平衡率 k 定（cad/mech.py）。"
+}

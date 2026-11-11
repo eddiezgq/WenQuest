@@ -22,6 +22,8 @@ from app.sewcore.kit import AC, B_GUIDE  # noqa: E402
 import spec as S  # noqa: E402
 
 G = 9.81
+_TKJ = ROOT / "docs" / "设计" / "WQ-LS" / "G4" / "挑线机构.json"
+TK_LK = __import__("json").loads(_TKJ.read_text())["lk"] if _TKJ.exists() else None
 DEG = math.pi / 180
 
 # 质量与转动惯量（估计值，G4 用实体零件替换）。来历：
@@ -30,6 +32,11 @@ DEG = math.pi / 180
 #   曲柄销当量 0.06 kg（设计软件 mo）；挑线杆 0.025 kg（设计软件 mt），质心在 P→线眼 0.45 处（设计软件 link_com），
 #   I_G = m c²/12；摇杆 8 g 按二力杆不计惯性；送布当量 0.05 kg（设计软件 mf，送布牙、牙架、摆轴折算）
 MASS = dict(m_bar=0.09, m_rod=0.040, g_rod=0.38, I_rod=1.3e-5, m_pin=0.06, m_tk=0.025, g_tk=0.45, m_feed=0.05)
+
+# G4.1 起：有了 FreeCAD 实体零件，就用实体算出的质量替换上面的估计（docs/设计/WQ-LS/G4/零件质量.json，由 g4_parts.py 写）
+_PM = ROOT / "docs" / "设计" / "WQ-LS" / "G4" / "零件质量.json"
+if _PM.exists():
+    MASS.update(__import__("json").loads(_PM.read_text())["dyn_mass"])
 
 # 缝纫阻力（示例估计；文献里机针穿刺力为几牛量级，G2 做 0.5–2 倍的敏感性分析）
 RESIST = dict(F_pen=4.0,        # 针下行穿布时的穿刺力 N（Nm 90、棉布两层）
@@ -45,9 +52,12 @@ def omega(n):
 
 
 class Machine:
-    def __init__(self, p=None, mass=None, resist=None, k=None):
+    def __init__(self, p=None, mass=None, resist=None, k=None, textbook_takeup=False):
         self.p = D.clean({**S.SEW, **(p or {})})
         self.M = D.mech_of(self.p)
+        if TK_LK and textbook_takeup is False:          # G4.1 起：挑线杆与连杆共用曲柄销（g4_takeup.py 综合的四连杆）
+            from g4_takeup import Mech2
+            self.M = Mech2(r=self.p["r"], l=self.p["l"], mr=self.p["mr"], lk=TK_LK)
         self.ms = {**MASS, **(mass or {})}
         self.rs = {**RESIST, **(resist or {})}
         self.k = self.p["k"] if k is None else k
@@ -207,7 +217,7 @@ class Machine:
 
         return dict(phi=phi, n=n, w=w, T=T, T_bar=T_bar, T_rod=T_rod, T_tk=T_tk, T_fd=T_fd, T_grav=T_grav,
                     T_needle=T_needle, T_thread=T_thread, T_feed=T_feed, T_fric=T_fric, T_sew=T_sew,
-                    F_crank=F_crank_total, F_tk=F_tk, F_fe=F_fe, N_guide=N_guide, F_shake=F_shake, cw=cw,
+                    F_crank=F_crank_total, F_rod=F_crank, F_cent=F_cent, F_tk=F_tk, F_fe=F_fe, N_guide=N_guide, F_shake=F_shake, cw=cw,
                     m_recip=m_recip, m_rot=m_rot)
 
 

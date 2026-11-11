@@ -1,0 +1,147 @@
+<!doctype html>
+<!-- 第 138 轮 G4.1：WQ-LS 刺布与挑线机构的三维动画。
+     零件网格来自 FreeCAD（tools/wqls/cad/mech.py），每 2° 的变换来自设计软件的运动学（tools/wqls/g4_mech.py → frames.json）。
+     用法：与 mech/ 目录（零件 STL、parts.json、frames.json、head.stl）放在一起，静态服务打开。
+     ?shot=<φ>&view=face|front|iso  只渲染一帧（出图用）；不带 shot 时可以拖动、播放。 -->
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WQ-LS 刺布与挑线机构</title>
+<style>
+:root{--bg:#e9ecef;--ink:#1d2329;--mut:#5b6670;--card:rgba(255,255,255,.86);--line:#cfd5db;--acc:#0b4fae}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#15181b;--ink:#e6e9ec;--mut:#9aa5ae;--card:rgba(30,34,38,.86);--line:#39414a;--acc:#6aa7ff}}
+:root[data-theme="dark"]{--bg:#15181b;--ink:#e6e9ec;--mut:#9aa5ae;--card:rgba(30,34,38,.86);--line:#39414a;--acc:#6aa7ff}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif;overflow:hidden}
+canvas{display:block;width:100vw;height:100vh}
+.panel{position:fixed;left:16px;top:16px;max-width:min(340px,calc(100vw - 32px));background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;backdrop-filter:blur(6px)}
+.panel h1{font-size:15px;margin:0 0 4px}.panel p{margin:0 0 8px;color:var(--mut);font-size:12.5px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
+button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+input[type=range]{width:100%}
+table{border-collapse:collapse;font-size:12.5px;width:100%;font-variant-numeric:tabular-nums}td{padding:1px 0}td:last-child{text-align:right}
+.legend{position:fixed;right:16px;bottom:16px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px;max-width:calc(100vw - 32px)}
+.legend span{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 5px 0 10px;vertical-align:-1px}
+body.shot .panel,body.shot .legend{display:none}
+</style></head>
+<body><canvas id="c"></canvas>
+<div class="panel" id="ui">
+  <h1>WQ-LS 刺布与挑线机构</h1>
+  <p>挑线杆与针杆连杆共用曲柄销；所有零件是 FreeCAD 实体，运动来自设计软件的运动学，每 2° 一帧。拖动画面可旋转，滚轮缩放。</p>
+  <div class="row"><button id="play" class="on">暂停</button><button data-sp="0.25">慢</button><button data-sp="1" class="on">中</button><button data-sp="3">快</button></div>
+  <input id="phi" type="range" min="0" max="358" step="2" value="0">
+  <table>
+    <tr><td>上轴转角 φ</td><td id="t_phi">0°</td></tr>
+    <tr><td>针尖高出针板</td><td id="t_tip">—</td></tr>
+    <tr><td>线眼（Y, Z）</td><td id="t_eye">—</td></tr>
+  </table>
+  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button></div>
+  <div class="row"><button id="shell" class="on">机壳半透明</button><button id="thr" class="on">面线</button></div>
+</div>
+<div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { toCreasedNormals, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const q = new URLSearchParams(location.search);
+const BASE = q.get('d') || 'mech';
+const SHOT = q.has('shot') ? +q.get('shot') : null;
+if (SHOT !== null || q.has('film')) document.body.classList.add('shot');
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true });
+r.setPixelRatio(+(q.get('pr') || Math.min(2, devicePixelRatio)));
+const W = () => +(q.get('w') || innerWidth), H = () => +(q.get('h') || innerHeight);
+r.setSize(W(), H());
+r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const dark = matchMedia('(prefers-color-scheme: dark)').matches && SHOT === null;
+scene.background = new THREE.Color(dark ? 0x15181b : 0xdde1e5);
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.6;
+// 机器坐标 mm、Z 向上 → three：m、Y 向上
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; root.scale.setScalar(0.001); scene.add(root);
+
+const MAT = {
+  metal: new THREE.MeshPhysicalMaterial({ color: 0xc8ccd1, metalness: 1, roughness: 0.3 }),
+  chrome: new THREE.MeshPhysicalMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
+  shell: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.4, roughness: 0.4, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }),
+  shellSolid: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.45, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.06 }),
+};
+const loader = new STLLoader();
+const prep = g => { g.deleteAttribute('normal'); g = mergeVertices(g, 1e-3); return toCreasedNormals(g, THREE.MathUtils.degToRad(30)); };
+const info = await (await fetch(`${BASE}/parts.json`)).json();
+const FR = (await (await fetch(`${BASE}/frames.json`)).json()).frames;
+const mesh = {};
+await Promise.all(Object.entries(info.parts).map(async ([k, p]) => {
+  const g = prep(await loader.loadAsync(`${BASE}/${k}.stl`));
+  const m = new THREE.Mesh(g, MAT[p.material] || MAT.metal);
+  m.castShadow = m.receiveShadow = true; m.matrixAutoUpdate = false;
+  root.add(m); mesh[k] = m;
+}));
+let shell = null;
+try {
+  shell = new THREE.Mesh(prep(await loader.loadAsync(`${BASE}/head.stl`)), MAT.shell);
+  shell.renderOrder = 2; root.add(shell);
+} catch (e) { /* 没有机壳也能看 */ }
+// 面线
+const thrGeo = new THREE.BufferGeometry();
+const thr = new THREE.Line(thrGeo, new THREE.LineBasicMaterial({ color: 0xd24a3a }));
+root.add(thr);
+
+const key = new THREE.DirectionalLight(0xffffff, 2.6); key.position.set(-0.5, 1.2, 0.9); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -0.2, right: 0.2, top: 0.2, bottom: -0.2, near: 0.1, far: 4 });
+scene.add(key, new THREE.HemisphereLight(0xffffff, 0x8a8f96, 0.5));
+const rim = new THREE.DirectionalLight(0xffffff, 0.9); rim.position.set(0.6, 0.6, -1.2); scene.add(rim);
+
+const cam = new THREE.PerspectiveCamera(30, W() / H(), 0.005, 10);
+const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
+// 视角：three 坐标 = (x, z, −y)/1000；目标对着机头（x ≈ 0、z ≈ 0.15）
+const VIEWS = { iso: [[-0.32, 0.27, 0.40], [0.01, 0.15, 0.0]], face: [[-0.55, 0.15, 0.0], [0.0, 0.15, 0.0]], front: [[0.0, 0.15, 0.55], [0.0, 0.15, 0.0]] };
+function view(v) { const [p, t] = VIEWS[v]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
+view(q.get('view') || 'iso');
+
+const tmp = new THREE.Matrix4();
+function setFrame(i) {
+  const f = FR[i];
+  for (const [k, m] of Object.entries(mesh)) {
+    const M = f.M[k];
+    if (M) { tmp.fromArray(M).transpose(); m.matrix.copy(tmp); } else m.matrix.identity();
+    m.matrixWorldNeedsUpdate = true;
+  }
+  thrGeo.setFromPoints(f.thread.map(p => new THREE.Vector3(...p)));
+  document.getElementById('t_phi').textContent = `${f.phi}°`;
+  document.getElementById('t_tip').textContent = `${f.tip_z.toFixed(1)} mm`;
+  document.getElementById('t_eye').textContent = `${f.eye[0].toFixed(1)}, ${f.eye[1].toFixed(1)} mm`;
+  document.getElementById('phi').value = f.phi;
+}
+let idx = 0, play = true, speed = 1, acc = 0, last = performance.now();
+const ph = document.getElementById('phi');
+ph.oninput = () => { idx = Math.round(ph.value / 2); setFrame(idx); };
+document.getElementById('play').onclick = e => { play = !play; e.target.textContent = play ? '暂停' : '播放'; e.target.classList.toggle('on', play); };
+document.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll('[data-sp]').forEach(x => x.classList.toggle('on', x === b)); });
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view(b.dataset.v); document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); });
+document.getElementById('shell').onclick = e => { if (!shell) return; const t = shell.material === MAT.shell; shell.material = t ? MAT.shellSolid : MAT.shell; shell.visible = true; e.target.classList.toggle('on', !t); e.target.textContent = t ? '机壳实体' : '机壳半透明'; };
+document.getElementById('thr').onclick = e => { thr.visible = !thr.visible; e.target.classList.toggle('on', thr.visible); };
+addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); });
+
+// 出片用：window.go(φ, 视角) 摆好一帧并渲染（tools/wqls/render/mech_film.js 逐帧截图）
+window.go = (phi, v) => { if (v) view(v); setFrame(Math.round(phi / 2) % FR.length); ctl.update(); r.render(scene, cam); return true; };
+if (q.has('film')) {
+  if (q.get('shell') === 'solid' && shell) shell.material = MAT.shellSolid;
+  document.title = 'ready';
+} else if (SHOT !== null) {
+  setFrame(Math.round(SHOT / 2) % FR.length);
+  if (q.get('shell') === 'solid' && shell) shell.material = MAT.shellSolid;
+  if (q.get('shell') === 'off' && shell) shell.visible = false;
+  r.render(scene, cam); document.title = 'done';
+} else {
+  setFrame(0);
+  r.setAnimationLoop(t => {
+    const dt = Math.min(0.1, (t - last) / 1000); last = t;
+    if (play) { acc += dt * speed * 60; while (acc >= 1) { acc -= 1; idx = (idx + 1) % FR.length; } setFrame(idx); }
+    ctl.update(); r.render(scene, cam);
+  });
+}
+</script></body></html>

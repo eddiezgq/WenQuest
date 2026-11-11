@@ -35,9 +35,16 @@ RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 4.5))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
 FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1
-X_TAKEUP = 30.0
-TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端（挑线眼一转里在 z 165–204 之间走，留余量）
-TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 设计软件 link_pose(φ = 180°)：P、M、线眼，端视坐标 mm
+X_TAKEUP = 16.0                            # 挑线杆平面（G4.1 起与针杆连杆共用曲柄销，见 tools/wqls/g4_takeup.py）
+TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端；G4.1 起按挑线机构的线眼轨迹自动定（下面 TK_JSON）
+TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 外观件里的示意挑线杆（没有 G4 零件时用）：P、M、线眼，端视坐标 mm
+BOSSES = os.environ.get("WQ_BOSSES", "1") == "1" and not os.environ.get("WQ_NOEDGE")   # 机头内的凸台（针杆导套、前轴承座、摇杆销座）
+_tkj = os.path.join(os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else os.path.join(os.getcwd(), "tools", "wqls", "cad"),
+                    "..", "..", "..", "docs", "设计", "WQ-LS", "G4", "挑线机构.json")
+TK_JSON = json.load(open(_tkj)) if os.path.exists(_tkj) else None
+if TK_JSON:
+    _ev = TK_JSON["result"]["E_v"]
+    TK_SLOT = (round(200.0 + _ev[0] - 8), round(200.0 + _ev[1] + 8))
 BEDWALL = float(os.environ.get("WQ_BEDWALL", 5.6))
 ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 8.1))
 ROOT_X = float(os.environ.get("WQ_ROOTX", 183.0))
@@ -223,7 +230,9 @@ def casting():
     ped = loft([rrect_xy(0.0, PIL["x0"] - 16, PIL["x1"] + 12, y0 - 16, y1 + 12, 26, ch),
                 rrect_xy(12.0, PIL["x0"] - 5, PIL["x1"] + 3, y0 - 5, y1 + 3, 18, ch),
                 rrect_xy(30.0, PIL["x0"] + 1.5, PIL["x1"] - 1.5, y0 + 1.5, y1 - 1.5, 13, ch)])
-    boss = Part.makeCylinder(9, 8, V(0, 0, HEAD["z0"] - 8), V(0, 0, 1)).fuse(Part.makeCylinder(9, 8, V(-16, 6, HEAD["z0"] - 8), V(0, 0, 1)))
+    boss = Part.makeCylinder(9, 8, V(-16, 6, HEAD["z0"] - 8), V(0, 0, 1))      # 压脚杆导套座（针杆导套座 G4.1 移进机头里，见 BOSSES）
+    if not BOSSES:
+        boss = boss.fuse(Part.makeCylinder(9, 8, V(0, 0, HEAD["z0"] - 8), V(0, 0, 1)))
     solid = body.fuse(bed).fuse(ped).fuse(boss).removeSplitter()
     # 空心：内腔 = 两个内轮廓相交；机座底面敞开
     cf = Part.Face(outline(WALL)).extrude(V(0, 300, 0))
@@ -278,6 +287,35 @@ def casting():
         for r_ in rb:
             hollow = hollow.fuse(r_)
         hollow = hollow.removeSplitter()
+    # 机头内的凸台（G4.1）：针杆上、下导套座，前轴承座（整块隔板），挑线摇杆销座。与刺布、挑线零件的间隙在 G4.1 的干涉检查里核对
+    if BOSSES:
+        hw = HEADWALL
+        y_back = HEAD["y1"] - hw
+        bs = []
+        # 针杆下导套座：机头底板上 Ø22 × 28 的凸台，孔 Ø12（含油轴套 Ø8 × Ø12 × 20）
+        bs.append(Part.makeCylinder(11, 28, V(0, 0, HEAD["z0"]), V(0, 0, 1)).cut(Part.makeCylinder(6, 40, V(0, 0, HEAD["z0"] - 5), V(0, 0, 1))))
+        # 针杆上导套座：x −16…3（不越过连杆平面 x 5），z 170…194，一条筋接到机头后壁；孔 Ø12
+        ub = Part.makeBox(19, 20, 24, V(-16, -10, 170)).fuse(Part.makeBox(10, y_back - 8 + 1, 14, V(-14, 8, 175)))
+        bs.append(ub.cut(Part.makeCylinder(6, 40, V(0, 0, 160), V(0, 0, 1))))
+        # 前轴承座：x 31…44 一整块隔板（与机头内腔相交），中间 Ø35 轴承孔（6202），下面开孔走油管和线
+        wall = Part.makeBox(13, 400, 400, V(31, -200, HEAD["z0"])).common(cav)
+        wall = wall.cut(Part.makeCylinder(17.5, 15, V(30, 0, ZU), V(1, 0, 0)))            # 6202 外圈 Ø35
+        wall = wall.cut(Part.makeCylinder(12, 15, V(30, 20, HEAD["z0"] + 40), V(1, 0, 0)))    # 油管、线的过孔
+        bs.append(wall)
+        if TK_JSON:                                     # 摇杆销座：从轴承隔板伸出的凸台，销 Ø6
+            qu, qv = TK_JSON["lk"]["Qz"], TK_JSON["lk"]["Qy"]
+            if TK_JSON["lk"].get("side", "in") == "in":       # 摇杆在内侧：销座从轴承隔板往外伸
+                qb = Part.makeCylinder(8, 32 - 25.5, V(25.5, -qu, ZU + qv), V(1, 0, 0))
+            else:                                             # 摇杆在外侧（与连杆同一平面 x 6–10）：销座从机头顶内壁吊下来，在摇杆外侧 x −10…5
+                qb = Part.makeCylinder(8, 15, V(-10, -qu, ZU + qv), V(1, 0, 0)).fuse(
+                    Part.makeBox(15, 12, 60, V(-10, -qu - 6, ZU + qv)))
+            bs.append(qb.cut(Part.makeCylinder(3, 40, V(-20, -qu, ZU + qv), V(1, 0, 0))))
+        for b_ in bs:
+            hollow = hollow.fuse(b_.common(solid))
+        hollow = hollow.cut(Part.makeCylinder(6, 200, V(0, 0, 20), V(0, 0, 1)))       # 针杆孔 Ø12 穿过机头底（导套外径）
+        hollow = hollow.cut(Part.makeCylinder(7, 14, V(0, 0, 36), V(0, 0, 1)))        # 底下沉孔 Ø14 到 z 50：上止点时针夹进来 0.5 mm
+        hollow = hollow.removeSplitter()
+        info["bosses"] = len(bs)
     # 机头前盖板窗口（Eddie 11-10 14:08）：机头前面开窗，调针杆高度、挑线机构、加油都从这里；窗口四周留 8 mm 法兰装前盖板
     if FRONT_COVER:
         win = Part.makeBox(FC_WIN[1] - FC_WIN[0], WALL + 4, FC_WIN[3] - FC_WIN[2], V(FC_WIN[0], HEAD["y0"] - 2, FC_WIN[2]))
