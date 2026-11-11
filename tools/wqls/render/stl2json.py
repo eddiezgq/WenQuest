@@ -18,5 +18,18 @@ for f in sorted(d.glob("*.stl")):
         o = 84 + 50 * i + 12
         pos += b[o:o + 36]
     out[f.stem] = base64.b64encode(bytes(pos)).decode()
-(d / "meshes.json").write_text(json.dumps(out))
+LIMIT = 12_000_000                                  # 网页托管单个文件 ≤ 16 MB：超过就分成几个文件，主文件 _more 里列出其余文件
+files, cur, size = [], {}, 0
+for k, v in out.items():
+    if cur and size + len(v) > LIMIT:
+        files.append(cur)
+        cur, size = {}, 0
+    cur[k], size = v, size + len(v)
+files.append(cur)
+for f in d.glob("meshes*.json"):
+    f.unlink()
+if len(files) > 1:
+    files[0]["_more"] = [f"meshes{i}.json" for i in range(1, len(files))]
+for i, part in enumerate(files):
+    (d / ("meshes.json" if i == 0 else f"meshes{i}.json")).write_text(json.dumps(part))
 print(len(out), "meshes", (d / "meshes.json").stat().st_size // 1024, "KB")

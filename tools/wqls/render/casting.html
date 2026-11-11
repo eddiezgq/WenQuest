@@ -104,6 +104,7 @@ const MAT = {
   mChrome: new THREE.MeshStandardMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
 };
 const pack = await (await fetch('d/meshes.json')).json();
+for (const extra of pack._more || []) Object.assign(pack, await (await fetch('d/' + extra)).json());   // 网格太大时分成几个文件（网页托管单个文件 ≤ 16 MB）
 const info = await (await fetch('d/parts.json')).json();
 const FR = (await (await fetch('d/frames.json')).json()).frames;
 function geo(k) {
