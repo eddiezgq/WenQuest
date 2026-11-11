@@ -39,6 +39,11 @@ X_BRG_REAR = 380.0                         # 后轴承 6201 中心（spec.X_BRG[
 LIP_W_F = 14.0                             # 面板口法兰宽（端面外圆角 R14 占掉约 10 mm，法兰要宽些面板才有贴合面）
 LIP_W, LIP_T, WIN_LIP_D = 8.0, 8.0, 8.0          # G4.3 面板口法兰宽、厚（沿 x），前窗口法兰宽、深（沿 y）（加宽加厚试过：频率不升反降，只是加了机头质量）
 MOTOR_SEAT_X = 408.0                       # G4.3 电机座端面（后轴承座伸出立柱右壁 12 mm）
+FEA_SIMPLE = os.environ.get("WQ_FEA_SIMPLE") == "1"   # 有限元模型的特征简化：不倒内圆角、根部圆角，不打小螺孔（网格划分才稳）
+if FEA_SIMPLE:
+    os.environ["WQ_NOHOLES"] = "1"
+SPLIT = os.environ.get("WQ_SPLIT", "1") == "1"   # G4.4 机壳分上下两件（上件：机头、机臂、立柱；下件：机座），接合面 z = 0
+SPLIT_PARTS = {}
 DETAIL = os.environ.get("WQ_DETAIL", "0" if os.environ.get("WQ_NOEDGE") else "1") == "1"   # G4.3 铸件细节：内圆角、拔模筋、法兰、加工面
 if DETAIL:
     # G4.3：窗口和前盖板都放在机头前面的平面区（外圆角 R14 以内），盖板 x −46…36、z 112…232
@@ -85,7 +90,8 @@ ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿�
 ZU = 200.0
 BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, z0=-62.0)
 # 立柱深 178（G4 优化定 168；G4.3 机头开面板口、加法兰和凸台后，前后摆一阶由 125 降到 122.7 Hz，立柱加深 10 回到 126 Hz）
-PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -75.6)), y1=float(os.environ.get("WQ_PY1", 102.4)))
+# G4.4 分上下两件：立柱脚整个落在机座上，立柱前后与机座前后壁齐平（y −62…116，深 178，与机座同深）
+PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -62.0)), y1=float(os.environ.get("WQ_PY1", 116.0)))
 HEAD = dict(x0=-62.0, x1=52.0, y0=float(os.environ.get("WQ_HY0", -48.0)), y1=70.0, z0=46.0)
 
 
@@ -284,7 +290,53 @@ def details(solid, hollow, info):
             if ln.Vertexes:
                 tpts.append((xs_, ys_, max(v.Point.z for v in ln.Vertexes)))
     hollow = tap_holes(hollow, tpts, M4_TAP, 5, V(0, 0, -1))
+    if SPLIT and os.environ.get("WQ_NOJOINT") != "1" and not FEA_SIMPLE:   # 有限元模型：接合面按刚性连接，凸台、螺孔、销孔不进网格
+        hollow = joint(hollow, solid, info)
     return hollow.removeSplitter()
+
+
+M10_TAP = 8.5
+
+
+def joint(hollow, solid, info):
+    """G4.4 上下件接合：立柱脚四角 4 个凸台（Ø28，高 32）攻 M10 深 22；机座顶板下对应 4 个凸台（Ø28，z −24…0），
+    Ø11 通孔、底下锪平，M10 × 45 内六角螺钉从机座里往上拧；2 个 Ø10 圆柱销（立柱左右壁上的凸台、机座顶板下的凸台）；
+    机座顶板在立柱里面开同步带和电线过孔。接合面两面精铣。"""
+    w = ROOTWALL
+    ix0, ix1, iy0, iy1 = PIL["x0"] + w, PIL["x1"] - w, PIL["y0"] + w, PIL["y1"] - w
+    r = 14.0
+    bolts = [(ix0 + r, iy0 + r), (ix1 - r, iy0 + r), (ix0 + r, iy1 - r), (ix1 - r, iy1 - r)]
+    pins = [(ix0 + 10, (iy0 + iy1) / 2 - 20), (ix1 - 10, (iy0 + iy1) / 2 + 20)]
+    feats_u, feats_l = None, None
+    for x_, y_ in bolts:
+        u = Part.makeCylinder(r, 32, V(x_, y_, 0), V(0, 0, 1))
+        l_ = Part.makeCylinder(r, 24, V(x_, y_, -24), V(0, 0, 1))
+        feats_u = u if feats_u is None else feats_u.fuse(u)
+        feats_l = l_ if feats_l is None else feats_l.fuse(l_)
+    for x_, y_ in pins:
+        u = Part.makeCylinder(10, 26, V(x_, y_, 0), V(0, 0, 1))
+        l_ = Part.makeCylinder(10, 16, V(x_, y_, -16), V(0, 0, 1))
+        feats_u, feats_l = feats_u.fuse(u), feats_l.fuse(l_)
+    hollow = fuse_fillet(hollow, feats_u.common(solid))
+    hollow = fuse_fillet(hollow, feats_l.common(Part.makeBox(600, 400, 30, V(-200, -200, -30))))
+    for x_, y_ in ([] if FEA_SIMPLE else bolts):        # 有限元模型不打这些孔（网格划分在接合面的孔口处失败）
+        hollow = hollow.cut(Part.makeCylinder(M10_TAP / 2, 22, V(x_, y_, 0), V(0, 0, 1)))                # 上件 M10 螺孔
+        hollow = hollow.cut(Part.makeCylinder(5.5, 26, V(x_, y_, -25), V(0, 0, 1)))                       # 下件 Ø11 通孔
+        hollow = hollow.cut(Part.makeCylinder(9, 1.5, V(x_, y_, -25), V(0, 0, 1)))                         # 锪平 Ø18
+    for x_, y_ in ([] if FEA_SIMPLE else pins):
+        hollow = hollow.cut(Part.makeCylinder(5, 24, V(x_, y_, -12), V(0, 0, 1)))                          # Ø10 H7 销孔（两件同钻铰）
+    belt = Part.makeBox(44, 60, 20, V(S_BELT_X - 22, -25, -15))
+    belt = belt.makeFillet(6, [e for e in belt.Edges if e.BoundBox.ZLength > 19])
+    hollow = hollow.cut(belt)                                                                                  # 同步带、电线过孔
+    info["joint"] = dict(bolts=bolts, pins=pins, plane_z=0.0)
+    return hollow
+
+
+def split(hollow):
+    """在接合面 z = 0 把铸件分成上件、下件"""
+    up = hollow.common(Part.makeBox(1000, 600, 600, V(-300, -300, 0)))
+    lo = hollow.common(Part.makeBox(1000, 600, 300, V(-300, -300, -300)))
+    return up.removeSplitter(), lo.removeSplitter()
 
 
 def machined_faces(shape):
@@ -308,11 +360,15 @@ def machined_faces(shape):
                 out.append(f)
             elif abs(c.z - BED["z0"]) < 0.05 and abs(n.z) > 0.99:
                 out.append(f)
+            elif SPLIT and abs(c.z) < 0.05 and abs(n.z) > 0.99 and PIL["x0"] - 30 < c.x < PIL["x1"] + 30 and n.z < 0:
+                out.append(f)                                                      # 上件立柱脚接合面
+            elif SPLIT and abs(c.z + 25) < 0.05 and abs(n.z) > 0.99:
+                out.append(f)                                                      # 下件螺钉锪平面
             elif abs(n.z) > 0.99 and (abs(c.z + 2.5) < 0.05 or abs(c.z + 1.5) < 0.05) and -33 < c.x < 33 and -59 < c.y < 23:
                 out.append(f)
         elif name == "Cylinder":
             r = s.Radius
-            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 16.0, 17.5, 6.0, 3.0, 4.1)):
+            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 16.0, 17.5, 6.0, 3.0, 4.1, 4.25, 5.5, 5.0, 9.0)):
                 out.append(f)
             elif abs(r - 26.0) < 0.02 and c.x > PIL["x1"] - 0.5:                 # 电机止口 Ø52
                 out.append(f)
@@ -357,7 +413,7 @@ def fillet_what_you_can(shape, radius):
 def fuse_fillet(base, feat, radii=(3.0, 2.0)):
     """把凸台、筋并到铸件上，并在相接处倒根部圆角（铸件不能有尖内角）。只在 feat 附近找新生成的相接棱，失败就不倒"""
     new = base.fuse(feat)
-    if not DETAIL or feat.isNull() or feat.Volume < 1:
+    if not DETAIL or FEA_SIMPLE or feat.isNull() or feat.Volume < 1:
         return new
     bb = App.BoundBox(feat.BoundBox)
     bb.enlarge(0.5)
@@ -425,12 +481,14 @@ def outline(inset=0.0):
     nl, nr, nz = HEAD["x0"] + 22, HEAD["x1"] - 16, 96.0       # 机头下部收窄（针杆、压脚杆所在的“鼻子”）
     pts = [(nr - k, HEAD["z0"] + k), (nl + k, HEAD["z0"] + k), (nl + k, nz - k), (HEAD["x0"] + k, nz + 34 - k),
            (HEAD["x0"] + k, t1 - k), (140, (t0 + t1) / 2 + crown - k), (PIL["x1"] - k, t0 - k),
-           (PIL["x1"] - k, -10.0 if k else 0.0), (PIL["x0"] + k, -10.0 if k else 0.0), (PIL["x0"] + k, ARMB - k),
-           (HEAD["x1"] - k, ARMB - k), (HEAD["x1"] - k, ARMB - P["r_hj"] - 18 - k), (nr - k, max(ARMB - P["r_hj"] - 38, HEAD["z0"] + 26) - k)]
+           (PIL["x1"] - k, (0.0 if SPLIT else -10.0) if k else 0.0), (PIL["x0"] + k, (0.0 if SPLIT else -10.0) if k else 0.0), (PIL["x0"] + k, ARMB + k),
+           (HEAD["x1"] - k, ARMB + k), (HEAD["x1"] - k, ARMB - P["r_hj"] - 18 - k), (nr - k, max(ARMB - P["r_hj"] - 38, HEAD["z0"] + 26) - k)]
+    # ↑ 机臂下沿是内腔往“上”收（ARMB + k）。G3–G4.3 这里误写成 ARMB − k，机臂底面一直没有壁（2026-11-11 Eddie 看剖视图发现）
     rr = [8, 8, 24, 24, P["r_head"], 1200 if crown else 0, P["r_out"], 0, 0, P["r_arch"], P["r_hj"], 10, 10]
     if k:
         rr = [max(r - k, 0) if 0 < r < 900 else r for r in rr]
         rr[0] = rr[1] = 0
+        rr[-4], rr[-3] = P["r_arch"] + k, P["r_hj"] + k    # 机臂与立柱、机头相接的两个内凹角：内腔圆角 = 外圆角 + 壁厚（壁厚均匀）
     if not crown:                                       # 机臂顶面平直时去掉中间那个共线点（否则生出碎边）
         del pts[5], rr[5]
     return rounded_polygon_xz(pts, rr, P["chamfer"])
@@ -510,13 +568,13 @@ def casting():
         right = Part.makeBox(600, 400, 400, V(ROOT_X, -200, -50))
         cav = cav.common(left).fuse(rf.common(rt).common(right)).removeSplitter()
         info["rootwall"] = ROOTWALL
-    if DETAIL:                                          # G4.3 内圆角：内腔的棱倒圆 = 铸件内角 R5（铸造内角不能是尖角）
+    if DETAIL and not FEA_SIMPLE:                       # G4.3 内圆角：内腔的棱倒圆 = 铸件内角 R5（铸造内角不能是尖角）
         cav, r_, n_ = fillet_what_you_can(cav, 5.0)
         info["inner_fillet"] = dict(r=r_, edges=n_)
     bw = BEDWALL
     bcav = Part.makeBox(BED["x1"] - BED["x0"] - 2 * bw, BED["y1"] - BED["y0"] - 2 * bw, -BED["z0"] - bw + 1,
                         V(BED["x0"] + bw, BED["y0"] + bw, BED["z0"] - 1))
-    if DETAIL:
+    if DETAIL and not FEA_SIMPLE:
         bcav, info["bed_inner_fillet"] = try_fillet(bcav, [e for e in bcav.Edges if e.BoundBox.ZMin > BED["z0"] + 0.5], (5.0, 4.0))
     hollow = solid.cut(cav).cut(bcav)
     # 机头壁薄一些（机头在悬臂端，越轻固有频率越高）：机头区域按 HEADWALL 再挖一次
@@ -528,7 +586,7 @@ def casting():
         hbox = Part.makeBox(HEAD["x1"] - HEAD["x0"] - 2 * HEADWALL, 400, 400, V(HEAD["x0"] + HEADWALL, -200, HEAD["z0"] + HEADWALL))
         try:
             hc = hf.common(ht).common(hbox)
-            if DETAIL:
+            if DETAIL and not FEA_SIMPLE:
                 hc, r_, n_ = fillet_what_you_can(hc, 4.0)
                 info["head_inner_fillet"] = dict(r=r_, edges=n_)
             hollow = hollow.cut(hc)
@@ -612,6 +670,11 @@ def casting():
         info["front_window"] = FC_WIN
     info["solid_valid"] = solid.isValid()
     info["hollow_valid"] = hollow.isValid()
+    if SPLIT and DETAIL:
+        up, lo = split(hollow)
+        SPLIT_PARTS["upper"], SPLIT_PARTS["lower"] = up, lo
+        info["mass_upper_kg"] = round(up.Volume * 7.2e-6, 2)
+        info["mass_lower_kg"] = round(lo.Volume * 7.2e-6, 2)
     return solid, hollow, info
 
 
@@ -729,11 +792,13 @@ def parts_visible(cast, hollow=None, info=None):
         slot = slot.makeFillet(4.9, [e for e in slot.Edges if abs(e.BoundBox.YLength - 20) < 1e-6])
         g["graphite"].append(body.common(cv).cut(slot))
         body = body.cut(cv)
-    if DETAIL and hollow is not None:                  # 加工面单独一组（亮金属），其余是铸造面（喷漆）
-        mf = machined_faces(body)
-        ids = {f.hashCode() for f in mf}
-        g["paint"] = [Part.makeCompound([f for f in body.Faces if f.hashCode() not in ids])]
-        g["machined"] = [Part.makeCompound(mf)]
+    if DETAIL and hollow is not None:                  # 加工面单独一组（亮金属），其余是铸造面（喷漆）；分两件时下件单独成组
+        pieces = [("", SPLIT_PARTS["upper"]), ("_lower", SPLIT_PARTS["lower"])] if SPLIT_PARTS else [("", body)]
+        for suf, sh in pieces:
+            mf = machined_faces(sh)
+            ids = {f.hashCode() for f in mf}
+            g["paint" + suf] = [Part.makeCompound([f for f in sh.Faces if f.hashCode() not in ids])]
+            g["machined" + suf] = [Part.makeCompound(mf)]
     else:
         g["paint"] = [body]
     tc = None
@@ -839,6 +904,8 @@ def parts_visible(cast, hollow=None, info=None):
 def main():
     cast, hollow, info = casting()
     hollow.exportStep(os.path.join(OUT, "housing.step"))
+    for k_, s_ in SPLIT_PARTS.items():
+        s_.exportStep(os.path.join(OUT, f"housing_{k_}.step"))
     g = parts_visible(cast, hollow, info)
     stats = {"variant": VAR, "info": info, "volume_cm3": round(hollow.Volume / 1000, 1), "mass_kg_ht250": round(hollow.Volume * 7.2e-6, 1)}
     for mat, shapes in g.items():

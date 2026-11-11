@@ -36,6 +36,8 @@ body.shot .panel,body.shot #busy{display:none}
     <input id="pos" type="range" min="-60" max="110" step="1" value="0" aria-labelledby="poslbl">
     <p class="sub" style="margin:4px 0 0"><span class="cutkey"></span>剖到的铸铁截面</p>
   </div>
+  <div class="lbl">上下两件</div>
+  <div class="row"><button id="explode">分开看</button></div>
   <div class="lbl">面板、前盖板</div>
   <div class="row"><button id="covers" class="on">盖板：装上</button></div>
   <div class="lbl">机构</div>
@@ -111,15 +113,20 @@ function geo(k) {
   g = mergeVertices(g, 1e-3);
   return toCreasedNormals(g, THREE.MathUtils.degToRad(30));
 }
-const ext = new THREE.Group(), caps = new THREE.Group(), mech = new THREE.Group(), coverG = new THREE.Group();
-root.add(ext, caps, mech, coverG);
+// 上件（机头、机臂、立柱）连同盖板、机构、电机放在 upper 里；下件（机座）放在 lowerG 里；“分开看”时 upper 抬高 90 mm
+const upper = new THREE.Group(), ext = new THREE.Group(), caps = new THREE.Group(), mech = new THREE.Group(), coverG = new THREE.Group();
+const lowerG = new THREE.Group(), capsL = new THREE.Group();
+upper.add(ext, caps, mech, coverG); lowerG.add(capsL);
+root.add(upper, lowerG);
 // x_ 开头：机壳（铸造面 paint、加工面 machined）和外观件；graphite 里是面板、前盖板、顶盖
-for (const k of ['paint', 'machined', 'graphite', 'coverscrew', 'metal', 'black', 'blue', 'chrome', 'glass']) {
+for (const k of ['paint', 'machined', 'paint_lower', 'machined_lower', 'graphite', 'coverscrew', 'metal', 'black', 'blue', 'chrome', 'glass']) {
   if (!pack['x_' + k]) continue;
   const g = geo('x_' + k);
-  const m = new THREE.Mesh(g, MAT[k === 'coverscrew' ? 'black' : k]); m.castShadow = m.receiveShadow = true;
-  (k === 'graphite' || k === 'coverscrew' ? coverG : ext).add(m);
-  if (k === 'paint' || k === 'machined') caps.add(new THREE.Mesh(g, MAT.castCut));
+  const base = k.replace('_lower', '');
+  const m = new THREE.Mesh(g, MAT[k === 'coverscrew' ? 'black' : base]); m.castShadow = m.receiveShadow = true;
+  const isLower = k.endsWith('_lower');
+  (k === 'graphite' || k === 'coverscrew' ? coverG : isLower ? lowerG : ext).add(m);
+  if (base === 'paint' || base === 'machined') (isLower ? capsL : caps).add(new THREE.Mesh(g, MAT.castCut));
   else caps.add(new THREE.Mesh(g, MAT.partCut));
 }
 const parts = {};
@@ -129,7 +136,7 @@ for (const [k, p] of Object.entries(info.parts)) {
   const m = new THREE.Mesh(geo('m_' + k), mat);
   m.matrixAutoUpdate = false; m.castShadow = true; mech.add(m); parts[k] = m;
 }
-const CLIPPED = [...new Set([...ext.children, ...coverG.children, ...mech.children].map(m => m.material))];
+const CLIPPED = [...new Set([...ext.children, ...lowerG.children.filter(m => m.isMesh), ...coverG.children, ...mech.children].map(m => m.material))];
 document.getElementById('busy').hidden = true;
 
 // 工作台
@@ -164,7 +171,7 @@ function setClip() {
   document.getElementById('poslbl').textContent = `位置 ${RANGE[plane][3]} = ${pos} mm`;
 }
 function setMode(m) {
-  mode = m; caps.visible = m === 'cut'; table.visible = m === 'ext';   // 剖开时不画工作台，机座也看得见
+  mode = m; caps.visible = capsL.visible = m === 'cut'; table.visible = m === 'ext';   // 剖开时不画工作台，机座也看得见
   for (const mm of CLIPPED) { mm.clippingPlanes = m === 'cut' ? C : []; mm.needsUpdate = true; }   // 机壳、盖板、机构、电机一起剖开
   document.getElementById('cutbox').hidden = m !== 'cut';
   document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === m));
@@ -187,6 +194,7 @@ document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => setPlane(b.
 document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view(b.dataset.v); document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); });
 document.getElementById('pos').oninput = e => { pos = +e.target.value; setClip(); };
 document.getElementById('covers').onclick = e => { coverG.visible = !coverG.visible; e.target.classList.toggle('on', coverG.visible); e.target.textContent = coverG.visible ? '盖板：装上' : '盖板：拆下'; };
+document.getElementById('explode').onclick = e => { const on = upper.position.z === 0; upper.position.z = on ? 90 : 0; e.target.classList.toggle('on', on); e.target.textContent = on ? '合上' : '分开看'; };
 let play = false;
 document.getElementById('play').onclick = e => { play = !play; e.target.classList.toggle('on', play); e.target.textContent = play ? '停' : '转动'; };
 addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); });
@@ -194,6 +202,7 @@ addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); 
 setMode(q.get('mode') || 'ext'); setPlane(q.get('plane') || 'y', q.has('pos') ? +q.get('pos') : undefined); view(q.get('view') || 'iso'); setFrame(0);
 window.go = (o) => {
   if (o.covers !== undefined) coverG.visible = o.covers;
+  if (o.explode !== undefined) upper.position.z = o.explode ? 90 : 0;
   if (o.mode) setMode(o.mode); if (o.plane) setPlane(o.plane, o.pos); if (o.view) view(o.view);
   if (o.cam) { cam.position.set(...o.cam[0]); ctl.target.set(...o.cam[1]); ctl.update(); }
   if (o.phi !== undefined) setFrame(Math.round(o.phi / 2) % FR.length);
