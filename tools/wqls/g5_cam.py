@@ -178,14 +178,15 @@ def upper_vmc(finish):
         ops.append(op("半精铣接合面 C（留 0.5）", "C_UP", 1, "面铣刀 Ø80", 80, 200, face_rows(-56, 56, -98, 98, 80, 0.5, 0.10 * 8 * r, 10), machine="VMC-01"))
         r = rpm(70, 8.5, "VMC-01")
         ops.append(op("钻两个工艺孔 Ø8.5", "C_UP", 8, "钻头 Ø8.5", 8.5, 70, cam.drill(pins, 24, 0, 0.2 * r), machine="VMC-01", kind="drill"))
+        ops.append(op("钻 M10 底孔 Ø8.5", "C_UP", 12, "钻头 Ø8.5", 8.5, 70, cam.drill(bolts, 26, 0, 0.18 * rpm(70, 8.5, "VMC-01")), machine="VMC-01",
+                      kind="drill"))
+        ops.append(op("攻 M10（卧加夹具的拉杆也拧在这里）", "C_UP", 17, "丝锥 M10（仿真按底孔 Ø8.5）", 8.5, 10, cam.tap(bolts, 22, 1.5, rpm(10, 10, "VMC-01")),
+                      machine="VMC-01", kind="drill"))
     else:
         r = rpm(220, 80, "VMC-01")
         ops.append(op("精铣接合面 C（中心高 200 ± 0.03）", "C_UP", 1, "面铣刀 Ø80", 80, 220, face_rows(-56, 56, -98, 98, 80, 0.0, 0.06 * 8 * r, 10), machine="VMC-01"))
         ops.append(op("扩工艺孔 Ø8.85", "C_UP", 8, "扩孔钻 Ø8.85", 8.85, 60, cam.bore(pins, 24, 0.15 * rpm(60, 8.85, "VMC-01")), machine="VMC-01"))
         ops.append(op("铰工艺孔 Ø9 H7", "C_UP", 9, "铰刀 Ø9 H7", 9, 12, cam.bore(pins, 24, 0.3 * rpm(12, 9, "VMC-01")), machine="VMC-01"))
-        ops.append(op("钻 M10 底孔 Ø8.5", "C_UP", 12, "钻头 Ø8.5", 8.5, 70, cam.drill(bolts, 26, 0, 0.18 * rpm(70, 8.5, "VMC-01")), machine="VMC-01",
-                      kind="drill"))
-        ops.append(op("攻 M10", "C_UP", 17, "丝锥 M10（仿真按底孔 Ø8.5）", 8.5, 10, cam.tap(bolts, 22, 1.5, rpm(10, 10, "VMC-01")), machine="VMC-01", kind="drill"))
     return ops
 
 
@@ -224,9 +225,9 @@ def lower_vmc(stage):
 
 
 PROGRAMS = {   # 程序号: (标题, 零件, 工序, 机床, 生成函数)
-    1201: ("上件 工序 10 粗、半精铣接合面", "upper", 10, "VMC-01", lambda: upper_vmc(False)),
+    1201: ("上件 工序 10 粗、半精铣接合面、钻工艺孔、攻 M10", "upper", 10, "VMC-01", lambda: upper_vmc(False)),
     1202: ("上件 工序 20 卧加粗加工", "upper", 20, "HMC-01", upper_hmc_rough),
-    1204: ("上件 工序 40 精铣接合面、铰工艺孔、攻 M10", "upper", 40, "VMC-01", lambda: upper_vmc(True)),
+    1204: ("上件 工序 40 精铣接合面、铰工艺孔", "upper", 40, "VMC-01", lambda: upper_vmc(True)),
     1205: ("上件 工序 50、60 卧加精加工、钻攻", "upper", 50, "HMC-01", upper_hmc_finish),
     1301: ("下件 工序 10 铣底面 A、工艺孔", "lower", 10, "VMC-01", lambda: lower_vmc(10)),
     1302: ("下件 工序 20 粗铣顶面", "lower", 20, "VMC-01", lambda: lower_vmc(20)),

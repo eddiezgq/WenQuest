@@ -97,7 +97,7 @@ def upper():
         dict(id="T06", name="直角铣头", spec="90° 直角铣头（HSK-A63 接口，回转定位精度 ±0.005）", ops=[20, 50, 60]),
         dict(id="T07", name="钻头 Ø11.5 / 铰刀 Ø12 H7", spec="整体硬质合金钻 Ø11.5；整体硬质合金铰刀 Ø12 H7（针杆孔）", ops=[20, 50]),
         dict(id="T08", name="钻头 Ø8.5 / 铰刀 Ø9 H7", spec="整体硬质合金钻 Ø8.5；铰刀 Ø9 H7（两个工艺孔；装配时再配铰成锥销孔）", ops=[10, 40]),
-        dict(id="T09", name="钻头 Ø8.5、丝锥 M10", spec="硬质合金钻 Ø8.5；M10 螺旋槽丝锥（铸铁用，6H）", ops=[40]),
+        dict(id="T09", name="钻头 Ø8.5、丝锥 M10", spec="硬质合金钻 Ø8.5；M10 螺旋槽丝锥（铸铁用，6H）", ops=[10]),
         dict(id="T10", name="钻头 Ø4.2、丝锥 M5", spec="硬质合金钻 Ø4.2；M5 丝锥（6H）", ops=[60]),
         dict(id="T11", name="钻头 Ø3.3、丝锥 M4", spec="硬质合金钻 Ø3.3；M4 丝锥（6H）", ops=[60]),
         dict(id="T12", name="中心钻", spec="Ø6 90° 定心钻（硬质合金）", ops=[10, 40, 60]),
@@ -152,7 +152,8 @@ def upper():
     ops = []
     o10 = dict(seq=10, operation="铣结合面 Face milling", workstation="立式加工中心 VMC-01", shop="机加",
                content="工件倒放（接合面朝上）。粗基准：前后两个轴承孔的铸孔（两端锥面涨套，保证轴承孔余量均匀）＋机臂顶面一个可调支承限转。"
-                       "粗铣、半精铣接合面 C，留精铣余量 0.5；钻两个工艺孔（以后铰成 Ø9 H7），作为以后各工序“一面两销”的定位基准；装配找正后它们再与下件一起配铰成锥销孔",
+                       "粗铣、半精铣接合面 C，留精铣余量 0.5；钻两个工艺孔（以后铰成 Ø9 H7），作为以后各工序“一面两销”的定位基准，装配找正后它们再与下件一起配铰成锥销孔；"
+                       "钻攻 4 × M10（装配用，也是卧加夹具拉紧工件用的螺孔：立柱脚的凸台在立柱里面，外面压不到）",
                datum="前后轴承孔铸孔（粗基准）、机臂顶面", clamping="两端锥面涨套（液压），机臂顶面辅助支承", fixture="专用夹具 FX-HSG-U-10（涨套式）",
                coolant="干切（铸铁）", setup_min=40, fixture_id=None,
                locate=[dict(surface="前后轴承孔铸孔", symbol="mandrel", dof=4), dict(surface="机臂顶面", symbol="support", dof=1)],
@@ -163,9 +164,12 @@ def upper():
     cd = drill(6, 0.08, 60, 2, 2)
     s3 = step(3, "定心钻两个工艺孔位置", "T12", "", cd, vc=60, f=0.08)
     dr = drill(8.5, 0.2, 70, 24, 2)
-    s4 = step(4, "钻两个工艺孔 Ø8.5 深 24（x 318.1 / y 7.0 与 x 377.9 / y 47.0）", "T08", "G08", dr, vc=70, f=0.2)
-    o10["steps"] = [s1, s2, s3, s4]
-    o10["inspect"] = [dict(char="接合面 C 平面度 0.05（半精铣后）", gauge="G09", freq="首件、每 10 件"),
+    s4 = step(4, "钻两个工艺孔 Ø8.5 深 24（x 315.8 / y 7.0 与 x 380.2 / y 47.0）", "T08", "G08", dr, vc=70, f=0.2)
+    s5 = step(5, "定心、钻 4 × Ø8.5 深 26", "T09", "G08", drill(8.5, 0.18, 70, 26, 4), vc=70, f=0.18)
+    s6 = step(6, "攻 4 × M10-6H 深 22（刚性攻丝）：以后各道卧加工序的液压拉杆拧进这 4 个孔，把工件拉紧在垫块上", "T09", "G06",
+              tap(10, 1.5, 10, 22, 4), vc=10, f=1.5)
+    o10["steps"] = [s1, s2, s3, s4, s5, s6]
+    o10["inspect"] = [dict(char="接合面 C 平面度 0.05（半精铣后）", gauge="G09", freq="首件、每 10 件"), dict(char="M10-6H", gauge="G06", freq="每件"),
                       dict(char="C 面到两轴承孔铸孔中心的距离（余量均匀）200.5 ± 0.5", gauge="G01", freq="首件")]
     ops.append(o10)
     # ---- 工序 20：HMC 粗加工
@@ -177,11 +181,11 @@ def upper():
                content="一面两销定位（接合面 C ＋ 两工艺孔），夹具抬高 160 让出机头下方空间。B 180° 钻轴过孔、粗铣电机座端面和止口外圆；"
                        "B 0° 粗铣面板口端面，同轴镗杆（带导向套）粗镗两轴承孔；直角铣头从下方钻针杆孔 Ø11.5。各面单边留 0.5。"
                        "后轴承孔 6201 在电机座里面、外侧只有 Ø20 的轴过孔，只能从机头一端用长镗杆镗",
-               datum="接合面 C、两工艺孔（一面两销，精基准）", clamping="液压，压在立柱脚凸台上（4 点）", fixture="专用夹具 FX-HSG-U-20（一面两销，与工序 50 共用）",
+               datum="接合面 C、两工艺孔（一面两销，精基准）", clamping="4 个液压拉缸，拉杆拧进立柱脚 4 个 M10 螺孔，把工件拉紧在正下方的 4 个支承钉上", fixture="专用夹具 FX-HSG-U-20（一面两销，与工序 50 共用）",
                coolant="干切（铸铁）", setup_min=45, fixture_id="FX-HSG-U-20",
                locate=[dict(surface="接合面 C", symbol="plane", dof=3), dict(surface="工艺孔 1（圆柱销）", symbol="pin", dof=2),
                        dict(surface="工艺孔 2（削边销）", symbol="pin_diamond", dof=1)],
-               clamp=[dict(surface="立柱脚 4 个凸台", kind="hydraulic")])
+               clamp=[dict(surface="立柱脚 4 个 M10 螺孔（液压拉杆）", kind="hydraulic")])
     o20["steps"] = [
         step(1, "B 180°（电机端）：粗镗轴过孔 Ø16（铸出）→ Ø18，深 40（后轴承孔 6201 在它里面，只能从机头一端镗）", "T14", "G08",
              bore(18, 0.2, 110, 40), vc=110, f=0.2, ap=1.0),
@@ -203,7 +207,7 @@ def upper():
     fm4 = face_mill(80, 8, 220, 0.06, 178, 96, 0.5)
     o40 = dict(seq=40, operation="铣结合面 Face milling", workstation="立式加工中心 VMC-01", shop="机加",
                content="工件倒放。以粗镗后的两个轴承孔定位（两端涨芯轴，B 轴线成为这道的基准）＋机臂顶面限转：精铣接合面 C 保证中心高 200 ± 0.03、"
-                       "平面度 0.02；扩、铰两个工艺孔 Ø9 H7；钻攻 4 × M10 深 22",
+                       "平面度 0.02（M10 螺孔深 22，精铣 0.5 后仍有 21.5）；扩、铰两个工艺孔 Ø9 H7",
                datum="两轴承孔（粗镗后，涨芯轴）—— 即 B 轴线", clamping="两端液压涨芯轴，机臂顶面辅助支承", fixture="专用夹具 FX-HSG-U-40（涨芯轴式）",
                coolant="干切；攻丝用切削油", setup_min=40,
                locate=[dict(surface="两轴承孔（粗镗）", symbol="mandrel", dof=4), dict(surface="机臂顶面", symbol="support", dof=1)],
@@ -212,22 +216,20 @@ def upper():
         step(1, "精铣接合面 C（0.5），保证 C 到 B 轴线 200 ± 0.03、平面度 0.02、Ra 1.6（修光刃刀片）", "T01", "G09", fm4, vc=220, f=0.48, ap=0.5),
         step(2, "扩工艺孔 Ø8.5 → Ø8.85", "T08", "G04", bore(8.85, 0.15, 60, 24), vc=60, f=0.15),
         step(3, "铰工艺孔 Ø9 H7（两孔）", "T08", "G04", bore(9, 0.3, 12, 24), vc=12, f=0.3),
-        step(4, "定心、钻 4 × Ø8.5 深 26", "T09", "G08", drill(8.5, 0.18, 70, 26, 4), vc=70, f=0.18),
-        step(5, "攻 4 × M10-6H 深 22（刚性攻丝）", "T09", "G06", tap(10, 1.5, 10, 22, 4), vc=10, f=1.5),
     ]
     o40["inspect"] = [dict(char="C 面平面度 0.02", gauge="G09", freq="每件"), dict(char="C 到 B 轴线 200 ± 0.03", gauge="G01", freq="首件、每 5 件"),
-                      dict(char="工艺孔 Ø9 H7", gauge="G04", freq="每件"), dict(char="M10-6H", gauge="G06", freq="每件")]
+                      dict(char="工艺孔 Ø9 H7", gauge="G04", freq="每件")]
     ops.append(o40)
     # ---- 工序 50：HMC 精加工
     o50 = dict(seq=50, operation="镗轴承孔 Bearing-bore boring", workstation="卧式加工中心 HMC-01", shop="机加",
                content="一面两销（接合面 C ＋ 两个 Ø9 H7 工艺孔，液压圆柱涨销 ＋ 削边涨销，零间隙）。上轴两孔、针杆孔、止口、各端面都在这一次装夹里完成，相互位置与定位误差无关。"
                        "B 180° 镗轴过孔 Ø20、精铣电机法兰端面、圆弧插补精铣止口 Ø52 h7；B 0° 精铣面板口端面，"
                        "用镗杆加旋转导向套同轴半精镗、精镗两轴承孔（两孔一刀）；直角铣头扩、铰针杆孔 Ø12 H7（上下两孔一次铰通）",
-               datum="接合面 C、两工艺孔（一面两销，精基准）", clamping="液压 4 点，压在立柱脚凸台上", fixture="专用夹具 FX-HSG-U-20",
+               datum="接合面 C、两工艺孔（一面两销，精基准）", clamping="4 个液压拉缸（拉杆拧进 M10 螺孔），拉在支承钉正上方", fixture="专用夹具 FX-HSG-U-20",
                coolant="干切；精镗用油雾", setup_min=45, fixture_id="FX-HSG-U-20",
                locate=[dict(surface="接合面 C", symbol="plane", dof=3), dict(surface="工艺孔 1（圆柱涨销）", symbol="pin", dof=2),
                        dict(surface="工艺孔 2（削边涨销）", symbol="pin_diamond", dof=1)],
-               clamp=[dict(surface="立柱脚 4 个凸台", kind="hydraulic")])
+               clamp=[dict(surface="立柱脚 4 个 M10 螺孔（液压拉杆）", kind="hydraulic")])
     o50["steps"] = [
         step(1, "B 180°（电机端）：镗轴过孔 Ø18 → Ø20 H11", "T04", "G08", bore(20, 0.12, 120, 40), vc=120, f=0.12, ap=1.0),
         step(2, "B 180°：精铣电机法兰端面（0.5），对 B 垂直度 0.02", "T02", "G09", face_mill(63, 5, 200, 0.08, 57, 57, 0.5), vc=200, f=0.4, ap=0.5),

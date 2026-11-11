@@ -1,0 +1,147 @@
+<title>WQ-LS 机壳工艺</title>
+<!-- 第 138 轮 G5.1：机壳的铸造与机加工工艺三维。数据 d/proc.json（tools/wqls/g5_web.py）：
+     铸件毛坯、浇注系统与冒口、冷铁（凝固仿真的体素等值面），各时刻还没凝固的区域；上件在卧加夹具上、刀具中心轨迹。
+     坐标同整机（mm），three 里 (x, z, −y)/1000。?film=1 时提供 window.go({...}) 给出图脚本。 -->
+<style>
+:root{--bg:#e6e9ec;--ink:#1c2228;--mut:#5a6570;--card:rgba(255,255,255,.9);--line:#cbd2d8;--acc:#0b4fae;--hot:#c2410c;--chill:#2b5c8a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#14171a;--ink:#e5e8eb;--mut:#9aa4ad;--card:rgba(28,32,36,.9);--line:#3a424a;--acc:#6aa7ff;--hot:#f0763c;--chill:#5b8fc4;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171a;--ink:#e5e8eb;--mut:#9aa4ad;--card:rgba(28,32,36,.9);--line:#3a424a;--acc:#6aa7ff;--hot:#f0763c;--chill:#5b8fc4;color-scheme:dark}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+.panel{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));top:calc(16px + env(safe-area-inset-top,0px));width:min(330px,calc(100vw - 32px));max-height:calc(100% - 32px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;backdrop-filter:blur(6px);box-sizing:border-box}
+h1{font-size:15px;margin:0 0 2px}.sub{margin:0 0 8px;color:var(--mut);font-size:12.5px}
+.lbl{font-size:11.5px;letter-spacing:.06em;color:var(--mut);margin:10px 0 4px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+button,a.btn{font:inherit;font-size:12.5px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer;text-decoration:none}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input[type=range]{width:100%}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}td{padding:1px 0;vertical-align:top}td:last-child{text-align:right;padding-left:8px}
+.key{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+#busy{position:fixed;inset:0;display:grid;place-items:center;color:var(--mut);font-size:13px;pointer-events:none}
+@media (max-width:520px){.panel{max-height:46%}.sub{display:none}}
+body.shot .panel,body.shot #busy{display:none}
+</style>
+<canvas id="c"></canvas>
+<div id="busy">正在载入（约 10 MB）…</div>
+<div class="panel" id="ui">
+  <h1>WQ-LS 机壳工艺</h1>
+  <p class="sub">HT250 砂型铸造（上件、下件各一套工艺）；上件在卧式加工中心上一次装夹完成孔系。数值来自凝固仿真和工艺规程。</p>
+  <div class="lbl">看什么</div>
+  <div class="row"><button data-m="cast" class="on">铸造工艺</button><button data-m="solid">凝固过程</button><button data-m="mach">夹具与刀路</button></div>
+  <div id="partbox">
+    <div class="lbl">哪一件</div>
+    <div class="row"><button data-p="upper" class="on">上件</button><button data-p="lower">下件</button></div>
+  </div>
+  <div id="castkey">
+    <p class="sub" style="margin:8px 0 0"><span class="key" style="background:#9aa4ae"></span>铸件（含加工余量）
+      <span class="key" style="background:var(--hot);margin-left:8px"></span>浇注系统、冒口
+      <span class="key" style="background:var(--chill);margin-left:8px"></span>冷铁</p>
+  </div>
+  <div id="solidbox" hidden>
+    <div class="lbl" id="tlbl">浇注后 10 s</div>
+    <input id="t" type="range" min="0" max="6" step="1" value="0" aria-labelledby="tlbl">
+    <p class="sub" style="margin:4px 0 0"><span class="key" style="background:var(--hot)"></span>还没凝固完的铁水；铸件画成半透明。最后凝固的地方要落在冒口里或有冷铁。</p>
+  </div>
+  <div id="machbox" hidden>
+    <div class="lbl">刀路</div>
+    <div class="row"><button data-n="path_1205" class="on">工序 50、60 精加工</button><button data-n="path_1202">工序 20 粗加工</button></div>
+    <p class="sub" style="margin:4px 0 0">接合面 C 贴支承钉，两工艺孔套液压涨销；4 根液压拉杆拧进立柱脚 M10 螺孔拉紧。红线是刀具中心的切削轨迹。</p>
+  </div>
+  <div class="lbl">数据</div>
+  <table id="tbl"></table>
+  <div class="lbl">其他</div>
+  <div class="row"><a class="btn" href="index.html">← 机壳三维与剖切</a></div>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { mergeVertices, toCreasedNormals } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const q = new URLSearchParams(location.search);
+if (q.has('film')) document.body.classList.add('shot');
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true });
+r.setPixelRatio(+(q.get('pr') || Math.min(2, devicePixelRatio)));
+const W = () => +(q.get('w') || document.documentElement.clientWidth), H = () => +(q.get('h') || document.documentElement.clientHeight);
+r.setSize(W(), H());
+r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(css('--bg') || '#e6e9ec');
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.6;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.8));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(-0.6, 1.2, 0.9); scene.add(sun);
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; root.scale.setScalar(0.001); scene.add(root);
+const cam = new THREE.PerspectiveCamera(32, W() / H(), 0.01, 20);
+const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
+
+const P = await (await fetch('d/proc.json')).json();
+document.getElementById('busy').hidden = true;
+const info = P._info;
+function geo(k, lines = false) {
+  const b = atob(P[k] || ''); const u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(u.buffer), 3));
+  if (lines) return g;
+  return toCreasedNormals(mergeVertices(g, 1e-3), THREE.MathUtils.degToRad(35));
+}
+const M = {
+  cast: new THREE.MeshPhysicalMaterial({ color: 0x9aa4ae, metalness: 0.2, roughness: 0.75 }),
+  castGhost: new THREE.MeshPhysicalMaterial({ color: 0x9aa4ae, metalness: 0.1, roughness: 0.8, transparent: true, opacity: 0.16, depthWrite: false }),
+  gate: new THREE.MeshPhysicalMaterial({ color: new THREE.Color(css('--hot') || '#c2410c'), roughness: 0.6 }),
+  gateGhost: new THREE.MeshPhysicalMaterial({ color: new THREE.Color(css('--hot') || '#c2410c'), roughness: 0.6, transparent: true, opacity: 0.18, depthWrite: false }),
+  chill: new THREE.MeshPhysicalMaterial({ color: new THREE.Color(css('--chill') || '#2b5c8a'), metalness: 0.6, roughness: 0.4 }),
+  liq: new THREE.MeshPhysicalMaterial({ color: new THREE.Color(css('--hot') || '#c2410c'), emissive: 0xff5a1a, emissiveIntensity: 0.5, roughness: 0.5 }),
+  part: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.45, roughness: 0.4 }),
+  fix: new THREE.MeshPhysicalMaterial({ color: 0x4a5560, metalness: 0.7, roughness: 0.45 }),
+};
+const G = {};
+function mesh(k, m) { const x = new THREE.Mesh(geo(k), m); root.add(x); return x; }
+for (const p of ['upper', 'lower']) {
+  G['cast_' + p] = mesh('cast_' + p, M.cast);
+  G['gate_' + p] = mesh('gate_' + p, M.gate);
+  G['chill_' + p] = mesh('chill_' + p, M.chill);
+  for (const t of info[p].times) G[`liq_${p}_${t.t}`] = mesh(`liq_${p}_${t.t}`, M.liq);
+}
+G.part = mesh('part_upper', M.part); G.fix = mesh('fixture', M.fix);
+for (const n of ['path_1202', 'path_1205']) { const l = new THREE.LineSegments(geo(n, true), new THREE.LineBasicMaterial({ color: 0xd8341a })); root.add(l); G[n] = l; }
+
+let mode = 'cast', part = 'upper', ti = 0, path = 'path_1205';
+const VIEW = { upper: [[-0.30, 0.42, 0.62], [0.17, 0.12, 0.0]], lower: [[-0.25, 0.42, 0.55], [0.15, -0.03, -0.03]], mach: [[-0.55, 0.40, 0.75], [0.2, 0.0, -0.03]] };
+function show() {
+  for (const o of Object.values(G)) o.visible = false;
+  const T = info[part].times;
+  if (mode === 'cast') { G['cast_' + part].visible = G['gate_' + part].visible = G['chill_' + part].visible = true; G['cast_' + part].material = M.cast; G['gate_' + part].material = M.gate; }
+  if (mode === 'solid') {
+    G['cast_' + part].visible = G['gate_' + part].visible = G['chill_' + part].visible = true;
+    G['cast_' + part].material = M.castGhost; G['gate_' + part].material = M.gateGhost;
+    G[`liq_${part}_${T[ti].t}`].visible = true;
+    document.getElementById('tlbl').textContent = `浇注后 ${T[ti].t} s：铸件还有 ${(T[ti].frac * 100).toFixed(1)}% 没凝固完`;
+  }
+  if (mode === 'mach') { G.part.visible = G.fix.visible = true; G[path].visible = true; }
+  document.getElementById('partbox').hidden = mode === 'mach';
+  document.getElementById('castkey').hidden = mode !== 'cast';
+  document.getElementById('solidbox').hidden = mode !== 'solid';
+  document.getElementById('machbox').hidden = mode !== 'mach';
+  const I = info[part], g = I.gating;
+  document.getElementById('tbl').innerHTML = mode === 'mach'
+    ? `<tr><td>夹具</td><td>FX-HSG-U-20，一面两销</td></tr><tr><td>夹紧</td><td>4 × 液压拉缸，合计 9.4 kN</td></tr>
+       <tr><td>两轴承孔同轴度</td><td>Ø0.02（预算 73%）</td></tr><tr><td>针杆孔位置度</td><td>Ø0.05（预算 56%）</td></tr><tr><td>上轴中心高</td><td>200 ± 0.03（预算 36%）</td></tr>`
+    : `<tr><td>铸件 / 浇注重量</td><td>${I.mass_casting} / ${I.mass_poured} kg</td></tr><tr><td>工艺出品率</td><td>${I.yield_pct} %</td></tr>
+       <tr><td>浇注温度、时间</td><td>1380 ℃，${g.tau_s} s</td></tr><tr><td>内浇道总截面</td><td>${g.A_ingate_cm2} cm²（${g.n_ingates} 个）</td></tr>
+       <tr><td>全部凝固（含冒口）</td><td>${I.t_total} s</td></tr>`;
+}
+function view(k) { const [p, t] = VIEW[k]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
+document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { mode = b.dataset.m; document.querySelectorAll('[data-m]').forEach(x => x.classList.toggle('on', x === b)); view(mode === 'mach' ? 'mach' : part); show(); });
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => { part = b.dataset.p; document.querySelectorAll('[data-p]').forEach(x => x.classList.toggle('on', x === b)); view(part); show(); });
+document.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { path = b.dataset.n; document.querySelectorAll('[data-n]').forEach(x => x.classList.toggle('on', x === b)); show(); });
+document.getElementById('t').oninput = e => { ti = +e.target.value; show(); };
+addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); });
+view('upper'); show();
+window.go = (o) => { if (o.mode) mode = o.mode; if (o.part) part = o.part; if (o.ti !== undefined) ti = o.ti; if (o.path) path = o.path;
+  view(o.view || (mode === 'mach' ? 'mach' : part)); if (o.cam) { cam.position.set(...o.cam[0]); ctl.target.set(...o.cam[1]); ctl.update(); } show(); r.render(scene, cam); };
+(function loop() { ctl.update(); r.render(scene, cam); requestAnimationFrame(loop); })();
+document.title = q.has('film') ? 'ready' : document.title;
+</script>
