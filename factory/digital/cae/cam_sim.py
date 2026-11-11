@@ -3,7 +3,7 @@
 
 不只读本平台生成的程序，也读学生 / 桌面 FreeCAD 写的 FANUC 风格程序：G00/G01/G02/G03、G90/G91、G17/G18、
 G20/G21、G28、G50（限速）、G96/G97、G94/G95（铣）、G98/G99（车：每分 / 每转进给；铣：钻孔循环返回平面）、
-G80/G81/G83、T、M03/M04/M05/M06/M08/M09/M30、S、F。
+G80/G81/G83/G84/G85、B（卧加转台分度，第 138 轮）、T、M03/M04/M05/M06/M08/M09/M30、S、F。
 
 仿真：
   车削——沿轴线的半径网格（每 0.02 mm 一格）。外圆车刀按“刀尖在左下角，刀体朝右上”处理：刀尖到过的地方，右边、外面的材料都去掉；
@@ -42,6 +42,8 @@ def parse(text, machine):
     else:
         st["pos"] = [0.0, 0.0, m["z"][1]]
     moves, warns, tools, tool_changes = [], [], [], []
+    st["b"] = 0.0                                          # 第 138 轮：卧加转台 B（分度，度）
+    b_index = []
     rpm_req = 0.0
     cyc = None
 
@@ -50,7 +52,7 @@ def parse(text, machine):
         b = tuple(float(v) for v in b)
         if max(abs(b[i] - a[i]) for i in range(3)) > 1e-9:
             moves.append(dict(t=t, a=a, b=b, line=line, tool=st["tool"], f=st["f"], per_rev=st["per_rev"], css=st["css"],
-                              rpm=st["rpm"], smax=st["smax"], spin=st["spin"], **kw))
+                              rpm=st["rpm"], smax=st["smax"], spin=st["spin"], B=st["b"], **kw))
         st["pos"] = list(b)
 
     for ln, raw in enumerate(text.splitlines(), 1):
@@ -101,7 +103,7 @@ def parse(text, machine):
             elif gg in (0, 1, 2, 3):
                 st["motion"] = int(gg)
                 cyc = None
-            elif gg in (81, 83):
+            elif gg in (81, 83, 84, 85):
                 st["motion"] = int(gg)
             elif gg == 80:
                 cyc = None
@@ -143,6 +145,15 @@ def parse(text, machine):
             st["spin"] = True
         if 5 in mc:
             st["spin"] = False
+        if "B" in w:
+            nb = w["B"] if st["abs"] else st["b"] + w["B"]
+            if "b" not in m:
+                warns.append({"line": ln, "level": "error", "text": "{} 没有转台 B".format(m["name"])})
+            elif not (m["b"][0] - 1e-6 <= nb <= m["b"][1] + 1e-6):
+                warns.append({"line": ln, "level": "error", "text": "B{:g} 超出转台范围 {:g} ~ {:g}".format(nb, *m["b"])})
+            if abs(nb - st["b"]) > 1e-9:
+                b_index.append((ln, st["b"], nb))
+            st["b"] = nb
         if 28 in g:
             if lathe:
                 st["pos"] = [hx, 0.0, hz]
@@ -161,7 +172,7 @@ def parse(text, machine):
                 if "W" in w:
                     tgt[2] += w["W"] * sc
             mo = st["motion"]
-            if mo in (81, 83):
+            if mo in (81, 83, 84, 85):
                 old = cyc or {}
                 cyc = {"z": w["Z"] * sc if "Z" in w else old.get("z", 0.0), "r": w["R"] * sc if "R" in w else old.get("r", 2.0),
                        "q": w["Q"] * sc if "Q" in w else old.get("q", 0.0), "init": old.get("init", st["pos"][2])}
@@ -181,6 +192,8 @@ def parse(text, machine):
                         depth, first = nd, False
                 else:
                     emit("feed", (x, y, cyc["z"]), ln, cycle=True)
+                if mo in (84, 85):                          # 攻丝、镗铰：进给（攻丝为反转）退回 R 平面
+                    emit("feed", (x, y, cyc["r"]), ln, cycle=True)
                 emit("rapid", (x, y, z0 if st["ret98"] else cyc["r"]), ln, cycle=True)
             elif mo in (2, 3):
                 for p in _arc(st, tgt, w, mo, lathe, sc):
@@ -192,7 +205,7 @@ def parse(text, machine):
         if 30 in mc or 2 in mc:
             break
     return {"moves": moves, "tools": sorted(set(tools)), "tool_changes": tool_changes, "warnings": warns, "rpm_req": rpm_req,
-            "lathe": lathe}
+            "lathe": lathe, "b_index": b_index}
 
 
 def _arc(st, tgt, w, mo, lathe, sc):
@@ -288,8 +301,9 @@ def timing(parsed, machine):
             Lc += L
         mv["dt"] = t
     tc = len(parsed["tool_changes"]) * MACHINES[machine]["tool_change_s"]
-    return {"cut_s": cut, "rapid_s": rap, "tool_s": tc, "total_s": cut + rap + tc, "cut_len_mm": Lc, "rapid_len_mm": Lr,
-            "tool_changes": len(parsed["tool_changes"])}
+    bi = len(parsed.get("b_index") or []) * MACHINES[machine].get("b_index_s", 0.0)     # 转台分度时间
+    return {"cut_s": cut, "rapid_s": rap, "tool_s": tc, "index_s": bi, "total_s": cut + rap + tc + bi, "cut_len_mm": Lc,
+            "rapid_len_mm": Lr, "tool_changes": len(parsed["tool_changes"]), "b_indexes": len(parsed.get("b_index") or [])}
 
 
 # ---------------------------------------------------------------- 检查（机床）
@@ -421,13 +435,17 @@ def simulate_mill(parsed, stock, tools, target=None, h=None, tol=0.01):
     top = float(stock.get("top", 0.0))
     AIR = -1e6
     H = np.where(inside, top, AIR)
+    if stock.get("height") is not None:          # 第 138 轮：毛坯顶面不平（铸件从主轴方向看的高度图），height(X, Y) → 高度，NaN 为空
+        H0 = stock["height"](X, Y)
+        H = np.where(inside & np.isfinite(H0), H0, AIR)
     if stock.get("cyl_r"):                       # 轴类零件铣键槽：毛坯顶面是圆柱面（轴线沿 X，最高点 Z0）
         R0 = float(stock["cyl_r"])
         H = np.where(inside & (np.abs(Y) < R0), np.sqrt(np.clip(R0 ** 2 - Y ** 2, 0, None)) - R0, AIR)
     issues, ap_max = [], 0.0
+    only_b = stock.get("b")                      # 第 138 轮：卧加按转台位置分面仿真，只算这个 B 的走刀
     for mv in parsed["moves"]:
         tl = tools.get(mv["tool"])
-        if not tl:
+        if not tl or (only_b is not None and abs(mv.get("B", 0.0) - only_b) > 1e-6):
             continue
         R = tl["d"] / 2
         k = int(math.ceil(R / h)) + 1

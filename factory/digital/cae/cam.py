@@ -7,7 +7,7 @@
   轮廓 profile：[(z, d), …]，z 从 0 递减，d 为该处直径；轴肩是同一 z 上的两个点。
 铣削坐标：工件坐标系 G54，XY 在工件上表面，Z0 为上表面，向下为负。
 
-动作 move：{"t": "rapid" | "feed" | "drill" | "tool" | "spindle" | "comment", …}
+动作 move：{"t": "rapid" | "feed" | "drill" | "tool" | "spindle" | "comment", …}；drill 可带 "cycle"（G81/G83/G85/G84，第 138 轮）
   rapid / feed：x, y（铣）, z；feed 带 f（车削 mm/r，铣削 mm/min）
   drill：x, y, z（孔底）, r（R 平面）, q（啄钻每次深度，0 = 一次钻到底）, f
   tool：n（刀号）、name；spindle：css（恒线速 m/min）或 rpm、max_rpm
@@ -317,6 +317,23 @@ def drill(points, depth, peck, f, r_plane=2.0, safe=5.0):
     mv = [{"t": "comment", "text": "钻孔 Drilling：{} 个孔，深 {:g}{}".format(len(points), depth, "，啄钻每次 {:g}".format(peck) if peck else "")}]
     for x, y in points:
         mv.append({"t": "drill", "x": x, "y": y, "z": -depth, "r": r_plane, "q": peck, "f": f, "safe": safe})
+    return mv
+
+
+def bore(points, depth, f, r_plane=2.0, safe=5.0, cycle="G85"):
+    """镗孔、铰孔（第 138 轮）：G85 进给到底、进给退回（精镗、铰孔，退刀不划伤孔壁）。"""
+    mv = [{"t": "comment", "text": "镗孔 / 铰孔 Boring / reaming（{}）：{} 个孔，深 {:g}".format(cycle, len(points), depth)}]
+    for x, y in points:
+        mv.append({"t": "drill", "x": x, "y": y, "z": -depth, "r": r_plane, "q": 0, "f": f, "safe": safe, "cycle": cycle})
+    return mv
+
+
+def tap(points, depth, pitch, rpm, r_plane=3.0, safe=5.0):
+    """刚性攻丝（第 138 轮）：G84，进给 F = 螺距 × 转速（mm/min），到底主轴反转退出。"""
+    mv = [{"t": "comment", "text": "攻丝 Tapping G84：{} 个孔，深 {:g}，螺距 {:g}".format(len(points), depth, pitch)}]
+    for x, y in points:
+        mv.append({"t": "drill", "x": x, "y": y, "z": -depth, "r": r_plane, "q": 0, "f": pitch * rpm, "safe": safe, "cycle": "G84",
+                   "pitch": pitch})
     return mv
 
 

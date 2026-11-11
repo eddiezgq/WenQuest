@@ -65,14 +65,20 @@ for f in part.Faces:
         u0_, u1_, _, _ = f.ParameterRange
         if L < 0.05 or (u1_ - u0_) < 3.0:                # 只认完整的孔和外圆（OCC 把圆柱面分成两半，各 180°）；内外圆角面（90°）不算
             continue
-        if hole and r <= R_SOLID + 1e-6:
-            adds.append(Part.makeCylinder(r + 0.02, L + 0.2, p0 - ax * 0.1, ax))
+        shaft_pass = PART == "upper" and abs(r - 10.0) < 0.05 and abs(ax.x) > 0.99 and abs(p0.y) < 0.5 and abs(p0.z - 200) < 0.5
+        if hole and shaft_pass:
+            # 电机座的轴过孔 Ø20：铸出 Ø16（与 6201 座孔 Ø27 一起由立柱内腔砂芯伸出的台阶芯头形成），
+            # 否则 6201 座孔会成为封闭在铸件里的环形空腔，造不出型，也镗不到
+            adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(8.0, L + 2, p0 - ax, ax)))
+            log["bores"].append(dict(d=20.0, cast_d=16.0, at=[round(x, 1) for x in p0]))
+        elif hole and r <= R_SOLID + 1e-6:
+            adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax))     # 比孔大 0.4：与孔壁重叠，布尔运算不碰共面
             log["filled_holes"] += 1
         elif f.hashCode() in mf_ids and hole:
-            adds.append(Part.makeCylinder(r + 0.02, L, p0, ax).cut(Part.makeCylinder(r - A_BORE, L + 2, p0 - ax, ax)))
+            adds.append(Part.makeCylinder(r + 0.4, L, p0, ax).cut(Part.makeCylinder(r - A_BORE, L + 2, p0 - ax, ax)))
             log["bores"].append(dict(d=round(2 * r, 2), allowance=A_BORE, at=[round(x, 1) for x in p0]))
         elif f.hashCode() in mf_ids and not hole:
-            adds.append(Part.makeCylinder(r + A_BORE, L, p0, ax).cut(Part.makeCylinder(r - 0.02, L + 2, p0 - ax, ax)))
+            adds.append(Part.makeCylinder(r + A_BORE, L, p0, ax).cut(Part.makeCylinder(r - 0.4, L + 2, p0 - ax, ax)))
             log["bores"].append(dict(d=round(2 * r, 2), allowance=A_BORE, outer=True, at=[round(x, 1) for x in p0]))
     elif name == "Plane" and f.hashCode() in mf_ids:
         n = face_normal(f)
@@ -83,12 +89,24 @@ for f in part.Faces:
         except Exception as e:  # noqa: BLE001
             print("pad 失败", e)
 
+# 逐个合并，每一步核对体积不减少（OCC 的布尔运算偶尔会丢掉一块实体：第一版就把前轴承座圈丢了，凝固仿真因此漏看了那里）
 blank = part
-for i in range(0, len(adds), 25):                       # 分批合并，OCC 一次合太多会慢
-    blank = blank.fuse(Part.makeCompound(adds[i:i + 25]) if len(adds[i:i + 25]) > 1 else adds[i])
+for a_ in adds:
+    v0 = blank.Volume
+    nb = blank.fuse(a_)
+    if nb.Volume < v0 - 1.0:
+        nb = blank.fuse(a_, 0.01)                    # 模糊布尔
+    if nb.Volume < v0 - 1.0:
+        print("合并后体积减少，跳过这一块", round(v0 - nb.Volume, 1))
+        continue
+    blank = nb
 blank = blank.removeSplitter()
 if len(blank.Solids) == 1:
     blank = blank.Solids[0]
+lost = part.cut(blank).Volume                        # 零件上有、毛坯上没有的材料，必须接近 0
+log["part_outside_blank_mm3"] = round(lost, 1)
+if lost > 50:
+    raise SystemExit(f"毛坯没有包住零件：差 {lost:.0f} mm³")
 log.update(part=PART, valid=blank.isValid(), mass_part_kg=round(part.Volume * RHO, 2), mass_blank_kg=round(blank.Volume * RHO, 2),
            allowance=dict(side=A_SIDE, top=A_TOP, bore_radial=A_BORE, solid_holes_r_max=R_SOLID),
            bbox=[round(x, 1) for x in (blank.BoundBox.XMin, blank.BoundBox.YMin, blank.BoundBox.ZMin,

@@ -17,7 +17,8 @@ MACHINES = {
                "rapid": {"x": 24000.0, "y": 24000.0, "z": 20000.0}, "tools": 24, "tool_change_s": 4.0},
     "HMC-01": {"kind": "mill", "name": "卧式加工中心 HMC-01", "max_rpm": 6000, "power_kw": 18.5, "eff": 0.8,
                "x": (-400.0, 400.0), "y": (-300.0, 300.0), "z": (-400.0, 200.0),
-               "rapid": {"x": 30000.0, "y": 30000.0, "z": 30000.0}, "tools": 40, "tool_change_s": 5.0},
+               "rapid": {"x": 30000.0, "y": 30000.0, "z": 30000.0}, "tools": 40, "tool_change_s": 5.0,
+               "b": (0.0, 360.0), "b_index_s": 3.0},          # 第 138 轮：数控转台 B（1° 分度，光栅闭环）
 }
 
 
@@ -103,7 +104,8 @@ def post_lathe(prog):
 
 
 def post_mill(prog):
-    """2.5 轴铣：G17、G90 绝对、G94 每分进给、G54、M06 换刀、G43 长度补偿、G81 / G83 钻孔循环"""
+    """2.5 轴铣：G17、G90 绝对、G94 每分进给、G54、M06 换刀、G43 长度补偿、G81 / G83 钻孔、G85 镗铰、G84 攻丝循环；
+    卧加的转台分度 B（第 138 轮：工序 op 带 "b" 和工件坐标系 "wcs"）"""
     m = MACHINES[prog["machine"]]
     lines = []
     header(prog, lines)
@@ -112,7 +114,11 @@ def post_mill(prog):
         t, sp = op["tool"], op["spindle"]
         safe = op.get("safe", 50.0)
         lines.append(_comment(op.get("title", "")))
-        lines += ["T{} M06".format(t["n"]), "G54", "S{} M03".format(int(round(sp["rpm"])))]
+        if op.get("b") is not None:                   # 第 138 轮：卧加转台分度，先回 Z 参考点，转到位，每个面用自己的工件坐标系
+            if "b" not in m:
+                raise ValueError("{} 没有转台 B，不能分度".format(m["name"]))
+            lines += ["G91 G28 Z0.0", "G90", "G00 B{}".format(num(op["b"]))]
+        lines += ["T{} M06".format(t["n"]), op.get("wcs", "G54"), "S{} M03".format(int(round(sp["rpm"])))]
         mvs = [mv for mv in op["moves"] if mv["t"] != "comment"]
         x0 = next((mv for mv in mvs if "x" in mv), {"x": 0, "y": 0})
         lines.append("G00 X{} Y{}".format(num(x0["x"]), num(x0["y"])))
@@ -129,7 +135,7 @@ def post_mill(prog):
                     if cyc is not None:
                         lines.append("G80")
                     lines.append("G00 Z{}".format(num(mv.get("safe", 5.0))))
-                    g = "G83" if mv.get("q") else "G81"
+                    g = mv.get("cycle") or ("G83" if mv.get("q") else "G81")
                     w = ["G98", g, "X" + num(mv["x"]), "Y" + num(mv["y"]), "Z" + num(mv["z"]), "R" + num(mv["r"])]
                     if mv.get("q"):
                         w.append("Q" + num(mv["q"]))

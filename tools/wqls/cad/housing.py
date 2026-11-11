@@ -89,6 +89,7 @@ ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿�
 
 ZU = 200.0
 BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, z0=-62.0)
+BED_PROC_HOLES = ((-94.4, -30.0), (401.4, 80.0))      # G5.1 下件工艺孔（底边法兰中线上）
 # 立柱深 178（G4 优化定 168；G4.3 机头开面板口、加法兰和凸台后，前后摆一阶由 125 降到 122.7 Hz，立柱加深 10 回到 126 Hz）
 # G4.4 分上下两件：立柱脚整个落在机座上，立柱前后与机座前后壁齐平（y −62…116，深 178，与机座同深）
 PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -62.0)), y1=float(os.environ.get("WQ_PY1", 116.0)))
@@ -275,6 +276,9 @@ def details(solid, hollow, info):
     inn = Part.makeBox(BED["x1"] - BED["x0"] - 2 * bw - 20, BED["y1"] - BED["y0"] - 2 * bw - 20, 8, V(BED["x0"] + bw + 10, BED["y0"] + bw + 10, BED["z0"] - 1))
     inn = inn.makeFillet(6, [e for e in inn.Edges if e.BoundBox.ZLength > 7])
     hollow = fuse_fillet(hollow, outer.cut(inn).common(solid))
+    if SPLIT:                                            # G5.1：底边法兰上两个工艺孔 Ø10 H7（对角，相距约 500）：下件加工、检测、装配找正共用的基准
+        for xp_, yp_ in BED_PROC_HOLES:
+            hollow = hollow.cut(Part.makeCylinder(5.0, 10, V(xp_, yp_, BED["z0"] - 1), V(0, 0, 1)))
     for xh in (20.0, 300.0):
         lug = Part.makeBox(26, 14, 22, V(xh - 13, BED["y1"], -44))
         lug = lug.makeFillet(5, [e for e in lug.Edges if e.BoundBox.ZLength > 21 and e.BoundBox.YMin > BED["y1"] + 1])
@@ -643,10 +647,12 @@ def casting():
         bs = []
         # 针杆下导套座：机头底板上 Ø22 × 28 的凸台，孔 Ø12（含油轴套 Ø8 × Ø12 × 20）
         bs.append(Part.makeCylinder(11, 28, V(0, 0, HEAD["z0"]), V(0, 0, 1)).cut(Part.makeCylinder(6, 40, V(0, 0, HEAD["z0"] - 5), V(0, 0, 1))))
-        # 针杆上导套座：x −16…3（不越过连杆平面 x 5），z 170…194，一条筋接到机头后壁；孔 Ø12
+        # 针杆上导套座：x −16…3（不越过连杆平面 x 5），z 170…182，一条筋接到机头后壁；孔 Ø12
+        # G5.1：顶面由 z 194 降到 182。上轴两孔要用同轴镗杆从机头端伸进去镗（后轴承孔只能这样镗），镗杆 Ø28、刀 Ø35 要从
+        # 这个凸台上面过去；原来凸台顶离上轴轴线只有 6 mm，挡住了。导套长 12（含油轴套 Ø8 × Ø12 × 12），与下导套相距约 125
         if DETAIL:                                      # G4.3：圆凸台（被 x = 3 平面切成 D 形，让开连杆），一条筋接到后壁
-            ub = Part.makeCylinder(11, 24, V(0, 0, 170), V(0, 0, 1)).common(Part.makeBox(40, 40, 40, V(-37, -20, 160)))
-            ub = ub.fuse(Part.makeBox(8, y_back + 1, 18, V(-12, 0, 172)))
+            ub = Part.makeCylinder(11, 12, V(0, 0, 170), V(0, 0, 1)).common(Part.makeBox(40, 40, 40, V(-37, -20, 160)))
+            ub = ub.fuse(Part.makeBox(8, y_back + 1, 10, V(-12, 0, 172)))
         else:
             ub = Part.makeBox(19, 20, 24, V(-16, -10, 170)).fuse(Part.makeBox(10, y_back - 8 + 1, 14, V(-14, 8, 175)))
         bs.append(ub.cut(Part.makeCylinder(6, 40, V(0, 0, 160), V(0, 0, 1))))

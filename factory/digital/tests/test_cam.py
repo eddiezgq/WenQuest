@@ -565,3 +565,28 @@ def test_pocket_curved_narrow_slot_stays_inside():
     pts = [(m["x"], m["y"]) for m in mv if m.get("t") == "feed" and m["z"] < 0]
     for a, b in zip(pts, pts[1:]):
         assert LineString([a, b]).within(ok.buffer(1e-3)) or Point(a).distance(Point(b)) < 1e-9, (a, b)
+
+
+def test_boring_tapping_cycles_and_rotary_b():
+    """第 138 轮：G85 镗铰、G84 攻丝循环，卧加转台 B 分度（后处理 → 独立读程序 → 时间、仿真）"""
+    from cae import cam, cam_post, cam_sim
+    ops = [dict(title="B0 bore", tool={"n": 1}, spindle={"rpm": 1000}, b=0, wcs="G54", moves=cam.bore([(0, 0)], 20, 60)),
+           dict(title="B180 tap", tool={"n": 2}, spindle={"rpm": 300}, b=180, wcs="G55", moves=cam.tap([(10, 0), (-10, 0)], 10, 1.5, 300))]
+    text = cam_post.post({"machine": "HMC-01", "title": "t", "number": 1, "ops": ops})
+    assert "G85" in text and "G84" in text and "B180." in text and "G55" in text
+    p = cam_sim.parse(text, "HMC-01")
+    assert not [w for w in p["warnings"] if w["level"] == "error"]
+    assert len(p["b_index"]) == 1 and p["b_index"][0][2] == 180
+    bores = [m for m in p["moves"] if m.get("cycle") and m["B"] == 0 and m["t"] == "feed"]
+    assert len(bores) == 2 and bores[0]["b"][2] == -20 and bores[1]["b"][2] == 2.0      # 进给到底、进给退回 R
+    taps = [m for m in p["moves"] if m.get("cycle") and m["B"] == 180 and m["t"] == "feed"]
+    assert len(taps) == 4 and abs(taps[0]["f"] - 450) < 1e-9                              # F = 1.5 × 300
+    tm = cam_sim.timing(p, "HMC-01")
+    assert tm["b_indexes"] == 1 and tm["index_s"] == 3.0
+    # 只仿真 B = 0 的面：Ø20 镗刀在平板上镗一个深 20 的孔
+    sim = cam_sim.simulate_mill(p, {"box": (-30, -30, 30, 30), "top": 0, "b": 0}, {1: {"kind": "endmill", "d": 20}, 2: {"kind": "drill", "d": 8.5}})
+    hx = sim["H"][np.argmin(abs(sim["x"])), np.argmin(abs(sim["y"]))]
+    assert abs(hx + 20) < 1e-6 and sim["H"][np.argmin(abs(sim["x"] - 10)), np.argmin(abs(sim["y"]))] < 0   # B180 的攻丝不算进这个面
+    # 没有转台的机床分度要报错
+    p2 = cam_sim.parse(text, "VMC-01")
+    assert any("没有转台" in w["text"] for w in p2["warnings"])
