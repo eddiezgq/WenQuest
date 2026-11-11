@@ -1,6 +1,6 @@
 # Labs and tasks
 
-> One entry in the left sidebar, “Teaching → Labs & tasks”: a card each for labs 7 and 15–23. In every lab you do it yourself first, then compare with the hub's suggestion; the platform scores part automatically from facts, and the teacher grades the report.
+> One entry in the left sidebar, “Teaching → Labs & tasks”: a card each for labs 7, 15–23 and 33. In every lab you do it yourself first, then compare with the hub's suggestion; the platform scores part automatically from facts, and the teacher grades the report.
 
 ## Decide yourself first, then see the suggestion
 
@@ -80,6 +80,7 @@ The colored bar on the left: gray not started, yellow partly done, green all don
 | Lab 21 | Energy: idle, peak shifting and carbon per part | Energy & environment | [Lab 21](/lab21) |
 | Lab 22 | Business: order margin, receivables and cash | Business & finance | [Lab 22](/lab22) |
 | Lab 23 | Two-week scenario: plant-wide decisions on a rush order (two-week course project, groups of 4–6) | All seven domains | [Lab 23](/lab23) |
+| Lab 33 | One engineer-to-order job from inquiry to payment (estimate, quotation, design, schedule, shop, quality, milestone billing) | Orders & planning | [Lab 33](/lab33) |
 
 There are also labs 8–14 done on the computation desks (strength and fatigue, joint torque, CNC programming, heat balance and lightweighting, digital design of a shaft, digital twin, flow); see the computation desk table in “From design to factory”.
 

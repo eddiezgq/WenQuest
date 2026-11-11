@@ -85,12 +85,12 @@ SUPPLY_ON = PLANT.has_supply()            # 第 51 轮：采购与来料（E5）
 DOMAINS_ON = PLANT.has_domains()          # 第 59 轮：设备维护（E3）、能源（E6）、经营财务（E7）也在清单写了产品的厂开（教学模式）
 DOMAIN_API = ("/api/maint", "/api/energy", "/api/finance", "/api/ehs", "/api/people")      # 第 61 轮：加安全环保（E2）、人员排班（E4）
 DOMAIN_NAV = ("/maint", "/energy", "/finance", "/ehs", "/people")
-TEACH_ONLY_API = tuple("/api/lab{}".format(n) for n in range(15, 24)) + (
+TEACH_ONLY_API = tuple("/api/lab{}".format(n) for n in (*range(15, 24), 33)) + (
     "/api/story", "/api/scenario", "/api/teach/batch-complaint", "/api/help/try",       # 帮助里的“当场动手”（第 30 轮 §八）
     "/api/complaints", "/api/crm", "/api/followups", "/api/ont/customer360", "/api/service",     # E1 客户与服务
     "/api/ehs", "/api/maint", "/api/people", "/api/supply", "/api/energy", "/api/finance")      # E2–E7
 TEACH_ONLY_NAV = ("/service", "/supply", "/finance", "/maint", "/people", "/ehs", "/energy", "/director", "/labs", "/teach",
-                  "/plc") + tuple("/lab{}".format(n) for n in range(15, 24))
+                  "/plc") + tuple("/lab{}".format(n) for n in (*range(15, 24), 33))
 PUBLISH_ALLOW = ("wq/gearbox/design/",)       # HTTP → 总线网关只放行这些主题（FreeCAD 宏用）
 
 
@@ -2174,6 +2174,30 @@ def lab22_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
         raise HTTPException(409, "生产模式没有实验任务")
     try:
         return lab22.answer(H.db, u["name"], tid, body)
+    except KeyError:
+        raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
+
+
+# ---------------------------------------------------------------- 实验 33（第 139 轮 139h：一张非标订单从询价到收款）
+@app.get("/api/lab33")
+def lab33_status(u=Depends(user_of)):
+    from hub import lab33
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    out = lab33.check(H.db, u["name"])
+    out["teacher"] = bool(u.get("teacher"))
+    if u.get("teacher"):
+        out["class"] = lab33.class_view(H.db)
+    return out
+
+
+@app.post("/api/lab33/{tid}")
+def lab33_answer(tid: str, body: dict = Body(...), u=Depends(user_of)):
+    from hub import lab33
+    if u["mode"] != "teach":
+        raise HTTPException(409, "生产模式没有实验任务")
+    try:
+        return lab33.answer(H.db, u["name"], tid, body)
     except KeyError:
         raise HTTPException(404, "这个任务不用提交答案，系统会自动检查")
 
