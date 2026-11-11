@@ -260,6 +260,19 @@ for k, (s, mat_, rk, rotating) in motor.build().items():
             J_rot += motor.inertia_x(so, motor.RHO[rk])
 bal["J_rotor_handwheel_kgm2"] = round(J_rot, 7)
 
+# G4.5 旋梭组（cad/hook.py）：带轮、同步带、下轴、齿轮、旋梭轴、旋梭
+spec_h = importlib.util.spec_from_file_location("wq_hook", os.path.join(HERE, "hook.py"))
+hookm = importlib.util.module_from_spec(spec_h)
+spec_h.loader.exec_module(hookm)
+J_train = dict(upper=0.0, lower=0.0, hook=0.0)
+for k, (s, mat_, rk, spin) in hookm.build().items():
+    parts[k], mats[k], dens[k] = s, mat_, hookm.RHO[rk]
+    if spin:
+        yc, zc = {"upper": (0.0, ZU), "lower": (S.YL, S.ZL), "hook": (0.0, S.ZH)}[spin]
+        J_train[spin] += hookm.inertia_x(s, hookm.RHO[rk], yc, zc)
+bal["J_hook_train_kgm2"] = {k: round(v, 9) for k, v in J_train.items()}
+bal["J_hook_train_reflected_kgm2"] = round(J_train["upper"] + J_train["lower"] + 4 * J_train["hook"], 9)   # 折算到上轴（旋梭 2 倍速）
+
 out = dict(lk=TK, x=X, balance=bal, parts={})
 for k, s in parts.items():
     s.exportStep(os.path.join(OUT, f"{k}.step"))

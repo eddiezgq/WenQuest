@@ -66,7 +66,12 @@ for f in part.Faces:
         if L < 0.05 or (u1_ - u0_) < 3.0:                # 只认完整的孔和外圆（OCC 把圆柱面分成两半，各 180°）；内外圆角面（90°）不算
             continue
         shaft_pass = PART == "upper" and abs(r - 10.0) < 0.05 and abs(ax.x) > 0.99 and abs(p0.y) < 0.5 and abs(p0.z - 200) < 0.5
-        if hole and shaft_pass:
+        hook_bore = PART == "lower" and abs(r - 7.0) < 0.05 and abs(ax.x) > 0.99 and abs(p0.y) < 0.5 and abs(p0.z + 21.5) < 0.5
+        if hole and hook_bore:
+            # G4.5 旋梭轴孔 Ø14：铸出 Ø9（砂芯），否则 Ø28 的座成了实心，凝固仿真里是热节（加冷铁也去不掉）
+            adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(4.5, L + 2, p0 - ax, ax)))
+            log["bores"].append(dict(d=14.0, cast_d=9.0, at=[round(x, 1) for x in p0]))
+        elif hole and shaft_pass:
             # 电机座的轴过孔 Ø20：铸出 Ø16（与 6201 座孔 Ø27 一起由立柱内腔砂芯伸出的台阶芯头形成），
             # 否则 6201 座孔会成为封闭在铸件里的环形空腔，造不出型，也镗不到
             adds.append(Part.makeCylinder(r + 0.4, L + 0.2, p0 - ax * 0.1, ax).cut(Part.makeCylinder(8.0, L + 2, p0 - ax, ax)))

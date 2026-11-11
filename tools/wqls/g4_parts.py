@@ -1,6 +1,6 @@
 """第 138 轮 G4.1 一键：刺布与挑线机构的零件 → 运动 → 干涉检查 → 质量回填 → 网页三维的文件。
 
-    python3 tools/wqls/g4_parts.py <工作目录> [<机壳 housing.step>]
+    python3 tools/wqls/g4_parts.py <工作目录> [<机壳上件 housing_upper.step> [<下件 housing_lower.step>]]
 
 步骤：
  1. FreeCAD 跑 cad/mech.py：按 spec.py 和 G4/挑线机构.json 画零件（φ = 0 位置），按平衡率定平衡块，导出 STEP/STL 和质量特性；
@@ -34,12 +34,14 @@ def fc(script, env):
 def main():
     out = Path(sys.argv[1] if len(sys.argv) > 1 else "/tmp/wqls_mech")
     housing = sys.argv[2] if len(sys.argv) > 2 else None
+    housing_lower = sys.argv[3] if len(sys.argv) > 3 else ""          # G4.5：下件（机座）也查
     out.mkdir(parents=True, exist_ok=True)
     print("1 零件", fc("mech.py", {"WQ_OUT": str(out)})["balance"])
     subprocess.run([sys.executable, str(HERE / "g4_mech.py"), str(out)], check=True)
     info = json.loads((out / "parts.json").read_text())
     if housing:
-        chk = fc("mech_check.py", {"WQ_MECH": str(out), "WQ_HOUSING": housing, "WQ_STEP": os.environ.get("WQ_STEP", "2")})
+        chk = fc("mech_check.py", {"WQ_MECH": str(out), "WQ_HOUSING": housing, "WQ_HOUSING_LOWER": housing_lower,
+                                  "WQ_STEP": os.environ.get("WQ_STEP", "2")})
         full = json.loads((out / "clearance.json").read_text())
         (G4 / "干涉检查.json").write_text(json.dumps(full, ensure_ascii=False, indent=1))
         print("3 干涉", "太近：", chk["too_close"], "最近：", chk["closest"][:5])

@@ -31,8 +31,18 @@ BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, top=0.0, depth=62.0)    # 51
 ARM = dict(space_x=300.0, space_z=160.0)    # 机针到立柱内侧的距离、台面到机臂下沿的距离
 ZU = 200.0           # 上轴中心高出针板
 ZH = -21.5           # 旋梭轴中心：梭尖在钩线时高于针眼上沿 1 mm（sewcore 钩线几何反推）
-ZL = -36.0           # 下轴中心（与旋梭轴用一对 1 : 2 齿轮，中心距 30 mm）
-YL = 26.0
+# ---------- 旋梭组（G4.5，2026-11-11） ----------
+# 齿轮：斜齿 mn 1、z 20 / 40、β 15°，中心距 a = 31.058；同步带 HTD 3M（节距 3）中心距固定，带长 = 2C + 3z 必须是 3 的整数倍，
+# 所以中心距 C 取 237.0（= 3 × 158 / 2）。由 C 和 a 两个条件定下轴的位置（G1 的 ZL −36、YL 26 只是估计）：
+#   C² = (ZU − ZL)² + YL²，a² = (ZL − ZH)² + YL²  →  ZL = ZH − h，h = (C² − (ZU − ZH)² − a²) / (2(ZU − ZH))
+import math as _m  # noqa: E402
+GEAR = dict(mn=1.0, z_hook=20, z_lower=40, beta=15.0, b=8.0)
+A_GEAR = GEAR["mn"] * (GEAR["z_hook"] + GEAR["z_lower"]) / (2 * _m.cos(_m.radians(GEAR["beta"])))
+C_BELT = 237.0
+_h = (C_BELT ** 2 - (ZU - ZH) ** 2 - A_GEAR ** 2) / (2 * (ZU - ZH))
+ZL = ZH - _h         # 下轴中心 ≈ −35.37
+YL = _m.sqrt(A_GEAR ** 2 - _h ** 2)    # ≈ 27.79（下轴在旋梭轴后面）
+BELT = dict(profile="HTD 3M", pitch=3.0, width=15.0, z=32, teeth=int(round((2 * C_BELT + 3.0 * 32) / 3.0)))   # 570-3M-15，190 齿
 X_PILLAR = ARM["space_x"]          # 立柱内侧
 X_HAND = 472.0                     # 手轮中心面（G4.3：手轮 x 464…480）
 NEEDLE_DB1 = 33.4                  # DB×1 机针全长

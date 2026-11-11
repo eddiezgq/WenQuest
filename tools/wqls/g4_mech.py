@@ -83,7 +83,12 @@ def frames(step=2):
         rot = rot_x(phi)
         M = dict(shaft=rot, crank=rot, crank_pin=rot, needle_bar=tb, needle_clamp=tb, needle=tb, nb_link=tb, rod=rod,
                  lever=lev, rocker=rck, pin_M=trans(*dM),
-                 rotor=rot, rotor_magnets=rot, encoder_disc=rot, handwheel=rot, handwheel_ring=rot)   # G4.3 电机转子、码盘、手轮随上轴转
+                 rotor=rot, rotor_magnets=rot, encoder_disc=rot, handwheel=rot, handwheel_ring=rot,   # G4.3 电机转子、码盘、手轮随上轴转
+                 pulley_upper=rot)
+        # G4.5 旋梭组：下轴经同步带 1 : 1 同向转；旋梭轴经外啮合齿轮 1 : 2 反向转
+        low = rot_x(phi, S.YL, S.ZL)
+        hk = rot_x(-2 * phi, 0.0, S.ZH)
+        M.update(pulley_lower=low, lower_shaft=low, gear_lower=low, gear_hook=hk, hook_shaft=hk, hook=hk)
         # 面线：A → 线眼 → B → 针杆线钩 → 针眼（x 取各自所在平面）
         tip = Bv + ZU - X["nb_below"] - X["tip_below"]
         Ey, Ez = w(lp["E"])

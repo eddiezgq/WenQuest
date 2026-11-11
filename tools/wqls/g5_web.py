@@ -46,7 +46,7 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     g6 = mdir
     P, info = {}, {}
-    for part, var in (("upper", 3), ("lower", 2)):
+    for part, var in (("upper", 3), ("lower", 8)):
         P[f"cast_{part}"] = pack(C.read_stl(g6 / f"blank_{part}.stl"))
         d = np.load(g6 / "sim" / f"cast_{part}_v{var}.npz")
         mat, cast, feeder = d["mat"], d["cast"], d["feeder"]

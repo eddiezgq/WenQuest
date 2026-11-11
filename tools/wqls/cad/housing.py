@@ -296,9 +296,49 @@ def details(solid, hollow, info):
             if ln.Vertexes:
                 tpts.append((xs_, ys_, max(v.Point.z for v in ln.Vertexes)))
     hollow = tap_holes(hollow, tpts, M4_TAP, 5, V(0, 0, -1))
+    if os.environ.get("WQ_NOHOOK") != "1":
+        hollow = lower_seats(hollow, solid, info)
     if SPLIT and os.environ.get("WQ_NOJOINT") != "1" and not FEA_SIMPLE:   # 有限元模型：接合面按刚性连接，凸台、螺孔、销孔不进网格
         hollow = joint(hollow, solid, info)
     return hollow.removeSplitter()
+
+
+def _spec():
+    import importlib.util as _iu
+    sp = _iu.spec_from_file_location("wq_spec", os.path.join(os.path.dirname(_tkj), "..", "..", "..", "..", "tools", "wqls", "spec.py"))
+    m = _iu.module_from_spec(sp)
+    sp.loader.exec_module(m)
+    return m
+
+
+def lower_seats(hollow, solid, info):
+    """G4.5 机座里的旋梭组支承（cad/hook.py 的零件装在这里）：
+    ① 旋梭轴座：轴线 y 0、z −21.5，x 24…66 的圆柱凸台 Ø24（孔 Ø14，壁厚 5；凝固仿真定的，Ø28 时是热节），上面一道 5 mm 厚的筋连到机座顶板；孔铸出 Ø9（砂芯）；孔 Ø14 H7 装两个铜套；
+    ② 下轴左轴承座：轴线 (y 27.8, z −35.4)，x 88…104，Ø42 凸台，6 mm 厚的筋连到顶板；孔 Ø32 H7 装 6201；
+    ③ 下轴右轴承座：x 364…378，同上（在同步带轮右边，筋在过带孔右边）；
+    ④ 两个端壁上的工艺孔：右端壁在下轴轴线上 Ø34（镗下轴两孔时镗杆从这里进），左端壁在旋梭轴轴线上 Ø20（镗旋梭轴孔），装配后橡胶堵堵上。"""
+    sp = _spec()
+    zh, zl, yl = sp.ZH, sp.ZL, sp.YL
+    top = Part.makeBox(600, 400, 3.0, V(-200, -200, -BEDWALL - 1.0))       # 筋伸进顶板 1 mm，保证连上
+    feats = []
+    hb = Part.makeCylinder(12, 42, V(24, 0, zh), V(1, 0, 0)).fuse(Part.makeBox(42, 5, -zh, V(24, -2.5, zh)))   # 筋厚 5（凝固仿真：12、8 厚时筋、座、顶板交接处是热节）
+    feats.append(hb)
+    for x0, L in ((88.0, 16.0), (364.0, 14.0)):
+        # 筋厚 6（凝固仿真：14 厚时筋和顶板交接处是热节）
+        sb = Part.makeCylinder(21, L, V(x0, yl, zl), V(1, 0, 0)).fuse(Part.makeBox(L if x0 < 300 else 10.0, 6, -zl, V(x0 if x0 < 300 else x0 + 4.0, yl - 3, zl)))
+        feats.append(sb)
+    for f_ in feats:
+        hollow = fuse_fillet(hollow, f_.fuse(top.common(Part.makeBox(f_.BoundBox.XLength, f_.BoundBox.YLength, 3.0,
+                                                                     V(f_.BoundBox.XMin, f_.BoundBox.YMin, -BEDWALL - 1.0)))).common(solid))
+    if not FEA_SIMPLE:
+        hollow = hollow.cut(Part.makeCylinder(7.0, 46, V(22, 0, zh), V(1, 0, 0)))            # 旋梭轴孔 Ø14 H7
+        for x0, L in ((88.0, 16.0), (364.0, 14.0)):
+            hollow = hollow.cut(Part.makeCylinder(16.0, L + 2, V(x0 - 1, yl, zl), V(1, 0, 0)))   # 6201 座孔 Ø32 H7
+        hollow = hollow.cut(Part.makeCylinder(17.0, 20, V(BED["x1"] - 12, yl, zl), V(1, 0, 0)))  # 右端壁工艺孔 Ø34
+        hollow = hollow.cut(Part.makeCylinder(10.0, 20, V(BED["x0"] - 8, 0, zh), V(1, 0, 0)))    # 左端壁工艺孔 Ø20
+    info["lower_seats"] = dict(hook_bore=dict(axis=(0.0, zh), x=(24, 66), d=14), lower_bores=dict(axis=(yl, zl), x=[(88, 104), (364, 378)], d=32),
+                               end_holes=dict(right=34, left=20))
+    return hollow
 
 
 M10_TAP = 8.5
@@ -331,7 +371,7 @@ def joint(hollow, solid, info):
         hollow = hollow.cut(Part.makeCylinder(9, 1.5, V(x_, y_, -25), V(0, 0, 1)))                         # 锪平 Ø18
     for x_, y_ in ([] if FEA_SIMPLE else pins):
         hollow = hollow.cut(Part.makeCylinder(4.5, 24, V(x_, y_, -12), V(0, 0, 1)))                        # G5.1：工艺孔 Ø9 H7；装配找正后两件配铰成 1:50 锥销孔（GB/T 117 10 × 40）
-    belt = Part.makeBox(44, 60, 20, V(S_BELT_X - 22, -25, -15))
+    belt = Part.makeBox(24, 50, 20, V(S_BELT_X - 12, 0, -15))                    # G4.5：带的两边在 z 0 处 y 约 8…39（下轴在后面）
     belt = belt.makeFillet(6, [e for e in belt.Edges if e.BoundBox.ZLength > 19])
     hollow = hollow.cut(belt)                                                                                  # 同步带、电线过孔
     info["joint"] = dict(bolts=bolts, pins=pins, plane_z=0.0)

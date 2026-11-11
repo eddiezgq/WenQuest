@@ -33,7 +33,7 @@ body.shot .panel,body.shot .legend{display:none}
     <tr><td>针尖高出针板</td><td id="t_tip">—</td></tr>
     <tr><td>线眼（Y, Z）</td><td id="t_eye">—</td></tr>
   </table>
-  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button></div>
+  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button><button data-v="hook">旋梭</button><button data-v="train">传动</button></div>
   <div class="row"><button id="shell" class="on">机壳半透明</button><button id="thr" class="on">面线</button></div>
 </div>
 <div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
@@ -66,6 +66,8 @@ const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; root.scale.setSc
 const MAT = {
   metal: new THREE.MeshPhysicalMaterial({ color: 0xc8ccd1, metalness: 1, roughness: 0.3 }),
   chrome: new THREE.MeshPhysicalMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
+  black: new THREE.MeshPhysicalMaterial({ color: 0x2a2d31, metalness: 0.2, roughness: 0.6 }),
+  brass: new THREE.MeshPhysicalMaterial({ color: 0xc9a25a, metalness: 1, roughness: 0.3 }),
   shell: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.4, roughness: 0.4, transparent: true, opacity: 0.22, depthWrite: false, side: THREE.DoubleSide }),
   shellSolid: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.45, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.06 }),
 };
@@ -98,6 +100,11 @@ try {
   shell = new THREE.Mesh(prep(await geom('head')), MAT.shell);
   shell.renderOrder = 2; root.add(shell);
 } catch (e) { /* 没有机壳也能看 */ }
+let bed = null;                                      // G4.5：机座（旋梭组装在里面），与机头外壳一起切换
+try {
+  bed = new THREE.Mesh(prep(await geom('bed')), MAT.shell);
+  bed.renderOrder = 2; root.add(bed);
+} catch (e) { /* 旧数据没有机座 */ }
 // 面线
 const thrGeo = new THREE.BufferGeometry();
 const thr = new THREE.Line(thrGeo, new THREE.LineBasicMaterial({ color: 0xd24a3a }));
@@ -111,7 +118,8 @@ const rim = new THREE.DirectionalLight(0xffffff, 0.9); rim.position.set(0.6, 0.6
 const cam = new THREE.PerspectiveCamera(30, W() / H(), 0.005, 10);
 const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
 // 视角：three 坐标 = (x, z, −y)/1000；目标对着机头（x ≈ 0、z ≈ 0.15）
-const VIEWS = { iso: [[-0.32, 0.27, 0.40], [0.01, 0.15, 0.0]], face: [[-0.55, 0.15, 0.0], [0.0, 0.15, 0.0]], front: [[0.0, 0.15, 0.55], [0.0, 0.15, 0.0]] };
+const VIEWS = { iso: [[-0.32, 0.27, 0.40], [0.01, 0.15, 0.0]], face: [[-0.55, 0.15, 0.0], [0.0, 0.15, 0.0]], front: [[0.0, 0.15, 0.55], [0.0, 0.15, 0.0]],
+                hook: [[-0.16, -0.02, 0.17], [0.04, -0.03, -0.01]], train: [[0.15, 0.12, 0.62], [0.2, 0.08, 0.0]] };
 function view(v) { const [p, t] = VIEWS[v]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
 view(q.get('view') || 'iso');
 
@@ -135,7 +143,7 @@ ph.oninput = () => { idx = Math.round(ph.value / 2); setFrame(idx); };
 document.getElementById('play').onclick = e => { play = !play; e.target.textContent = play ? '暂停' : '播放'; e.target.classList.toggle('on', play); };
 document.querySelectorAll('[data-sp]').forEach(b => b.onclick = () => { speed = +b.dataset.sp; document.querySelectorAll('[data-sp]').forEach(x => x.classList.toggle('on', x === b)); });
 document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view(b.dataset.v); document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); });
-document.getElementById('shell').onclick = e => { if (!shell) return; const t = shell.material === MAT.shell; shell.material = t ? MAT.shellSolid : MAT.shell; shell.visible = true; e.target.classList.toggle('on', !t); e.target.textContent = t ? '机壳实体' : '机壳半透明'; };
+document.getElementById('shell').onclick = e => { if (!shell) return; const t = shell.material === MAT.shell; shell.material = t ? MAT.shellSolid : MAT.shell; shell.visible = true; if (bed) bed.material = shell.material; e.target.classList.toggle('on', !t); e.target.textContent = t ? '机壳实体' : '机壳半透明'; };
 document.getElementById('thr').onclick = e => { thr.visible = !thr.visible; e.target.classList.toggle('on', thr.visible); };
 addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); });
 

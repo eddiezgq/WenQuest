@@ -26,6 +26,11 @@ head = head.Solids[0] if head.ShapeType != "Solid" and len(head.Solids) == 1 els
 MeshPart.meshFromShape(Shape=head, LinearDeflection=0.08, AngularDeflection=0.25).write(os.path.join(D, "head.stl"))
 near = head.common(Part.makeBox(110, 200, 230, V(-50, -100, 40)))          # 干涉检查只用机构附近这一块
 near = near.fuse(cast.common(Part.makeBox(120, 200, 160, V(360, -100, 120))))   # 加上立柱右端（后轴承座、电机座）
+if os.environ.get("WQ_HOUSING_LOWER"):                                        # G4.5：机座（旋梭组装在里面）、立柱脚（同步带穿过）
+    low = Part.read(os.environ["WQ_HOUSING_LOWER"])
+    near = near.fuse(low.common(Part.makeBox(520, 200, 64, V(-110, -70, -63))))
+    MeshPart.meshFromShape(Shape=low, LinearDeflection=0.08, AngularDeflection=0.25).write(os.path.join(D, "bed.stl"))   # 网页三维的机座
+    near = near.fuse(cast.common(Part.makeBox(110, 200, 220, V(300, -80, 0))))
 
 parts = {k: Part.read(os.path.join(D, f"{k}.step")) for k in info["parts"]}
 JOINT = {frozenset(p) for p in [
@@ -36,7 +41,14 @@ JOINT = {frozenset(p) for p in [
     ("casting", "motor_cap"), ("casting", "motor_bolts"), ("motor_cap", "motor_bolts"), ("motor_cap", "motor_housing"),
     ("motor_rods", "motor_housing"), ("motor_rods", "motor_cap"), ("stator_core", "motor_housing"), ("stator_winding", "stator_core"),
     ("rotor", "shaft"), ("rotor_magnets", "rotor"), ("encoder_disc", "shaft"), ("encoder_disc", "rotor"), ("handwheel", "shaft"),
-    ("handwheel_ring", "handwheel")]}
+    ("handwheel_ring", "handwheel"),
+    # G4.5 旋梭组
+    ("pulley_upper", "shaft"), ("pulley_lower", "lower_shaft"), ("belt", "pulley_upper"), ("belt", "pulley_lower"),
+    ("lower_shaft", "bearings_lower"), ("casting", "bearings_lower"), ("gear_lower", "lower_shaft"),
+    ("hook_shaft", "bushes_hook"), ("casting", "bushes_hook"), ("gear_hook", "hook_shaft"), ("hook", "hook_shaft"),
+    ("gear_hook", "gear_lower"),          # 啮合（齿侧间隙另算）
+    ("hook", "bobbin_case"),              # 梭芯套装在旋梭里（梭床导轨配合）
+    ("needle", "hook")]}                  # 梭尖与机针的间隙是设计的 0.08，单独核对（G4.5 计算书），不按 1 mm 要求
 
 
 def mat(m):
