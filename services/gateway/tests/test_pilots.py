@@ -154,3 +154,35 @@ def test_admin_hands_out_code(pc, monkeypatch):
     monkeypatch.setattr(main.state.mailer, "send", down)
     r = pc.post(f"/api/v1/public/pilot/{token}/code")
     assert r.status_code == 502 and r.json()["error"] == "mail_failed"
+
+
+def test_bridge_to_the_enterprise_server(pc, monkeypatch):
+    """第 146 轮：开通程序搬到企业服务器，经交接桥取申请、送结果；没设钥匙时接口关着。"""
+    q = pc.queue
+    assert pc.get("/api/v1/pilot-bridge/outbox").status_code == 404                 # no key set: closed
+    monkeypatch.setenv("WQ_PILOT_BRIDGE_KEY", "k" * 32)
+    H = {"x-bridge-key": "k" * 32}
+    assert pc.get("/api/v1/pilot-bridge/outbox", headers={"x-bridge-key": "wrong"}).status_code == 404
+    heartbeat(q)
+    token = invite(pc)
+    code = code_for(pc, token)
+    body = {"company": "艾克米五金有限公司", "id": "acme", "contact": "王老板", "code": code}
+    assert pc.post(f"/api/v1/public/pilot/{token}/apply", json=body).status_code == 200
+    files = pc.get("/api/v1/pilot-bridge/outbox", headers=H).json()["files"]
+    assert [f["name"] for f in files] == ["req-acme.json"] and json.loads(files[0]["text"])["email"] == "boss@acme.cn"
+    assert pc.post("/api/v1/pilot-bridge/ack", headers=H, json={"names": ["req-acme.json", "../x.json"]}).json()["removed"] == 1
+    assert not (q / "req-acme.json").exists() and pc.get("/api/v1/pilot-bridge/outbox", headers=H).json()["files"] == []
+    # results come back the other way
+    bad = {"files": [{"name": "../../etc/passwd", "text": "{}"}]}
+    assert pc.post("/api/v1/pilot-bridge/inbox", headers=H, json=bad).status_code == 400
+    assert pc.post("/api/v1/pilot-bridge/inbox", headers=H, json={"files": [{"name": "host.json", "text": "nope"}]}).status_code == 400
+    res = {"id": "acme", "url": "https://acme.qms.wenquestech.online", "erp_url": "https://acme.qms-erp.wenquestech.online",
+           "email": "boss@acme.cn", "password": "pw-123456"}
+    up = {"files": [{"name": "state-acme.json", "text": json.dumps({"id": "acme", "status": "active"})},
+                    {"name": "res-acme.json", "text": json.dumps(res)},
+                    {"name": "host.json", "text": json.dumps({"mem_free_mb": 2500, "ts": time.time()})}]}
+    assert pc.post("/api/v1/pilot-bridge/inbox", headers=H, json=up).json()["stored"] == 3
+    assert "pw-123456" in last_mail("boss@acme.cn")["text"] and not (q / "res-acme.json").exists()   # emailed, file gone
+    assert pc.get(f"/api/v1/public/pilot/{token}/status").json()["status"] == "active"
+    doms = pc.get("/api/v1/pilot-bridge/tenants", headers=H).json()["domains"]
+    assert "acme.qms.wenquestech.online" in doms and "acme.qms-erp.wenquestech.online" in doms and "sewing.qms.wenquestech.online" in doms

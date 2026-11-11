@@ -64,6 +64,7 @@ services:
       WQ_ASSIST_AI_DAILY: ${WQ_ASSIST_AI_DAILY:-300}   # 第 87 轮：客服 AI 档每天调用上限，超了退回检索档
       WQ_ASSIST_CN_AI: ${WQ_ASSIST_CN_AI:-1}           # 国内站客服用 DeepSeek（11-06 Eddie 定），填 0 关掉
       WQ_PILOT_MAX: ${WQ_PILOT_MAX:-}                  # 第 97 轮：试点企业最多几家（空 = 国内 3、美国 2）
+      WQ_PILOT_BRIDGE_KEY: ${WQ_PILOT_BRIDGE_KEY:-}    # 第 146 轮：企业服务器来取开通申请用的钥匙（空 = 交接桥关着，开通程序在本机）
       # 国内在线体验按单位开通（第 50 轮）：最多几家单位、每家默认几个账号（最多几个）、体验期几天
       WQ_CN_MAX_ORGS: ${WQ_CN_MAX_ORGS:-100}
       WQ_CN_ORG_SEATS: ${WQ_CN_ORG_SEATS:-5}

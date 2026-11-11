@@ -2,15 +2,18 @@
 #   pubkey：打印部署钥匙（DEPLOY_SSH_KEY）的公钥一半，开新服务器时填进“初始化脚本”，让部署能登录（公钥可以公开，私钥不出 GitHub）
 #   bootstrap：用 root 登录跑 deploy/bootstrap.sh（装 Docker、建 deploy 用户、防火墙、交换空间、每日备份定时）；开机时的初始化脚本没跑时用
 #   check：用部署钥匙登录企业服务器（deploy 用户），看初始化有没有做完、内存、磁盘、Docker
+#   deploy：装企业服务器的前门（deploy/enterprise：Caddy、app. 入口页、交接桥脚本），把教育服务器上 deploy 用户认的公钥
+#           （含质量 ERP 部署用的那把）也加到企业服务器，写好 /opt/wenquest/.env 的 SITE_DOMAIN（质量 ERP 的部署读它）。
+#           不碰交接桥钥匙：开桥是晚上切换时的事（第 146 轮 7.4）
 name: Enterprise server 企业服务器
 
 on:
   workflow_dispatch:
     inputs:
       task:
-        description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）"
+        description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）/ deploy（装前门 Caddy 与交接桥）"
         type: choice
-        options: [pubkey, check, bootstrap]
+        options: [pubkey, check, bootstrap, deploy]
         default: check
       host:
         description: "企业服务器 IP（11-10 开的：161.35.185.35）"
@@ -66,3 +69,57 @@ jobs:
           scp deploy/bootstrap.sh "root@$HOST:/root/bootstrap.sh"
           ssh "root@$HOST" "bash /root/bootstrap.sh '$pub'" 2>&1 | tail -n 40
           ssh "deploy@$HOST" 'id; docker --version; free -m | head -2'
+
+  deploy:
+    if: inputs.task == 'deploy'
+    runs-on: ubuntu-24.04
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: 装前门
+        env:
+          HOST: ${{ inputs.host }}
+          EDU: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 "$HOST" "$EDU" > ~/.ssh/known_hosts 2>/dev/null
+          # 教育服务器上 deploy 用户认的公钥（公钥可以公开），和它的 SITE_DOMAIN、ACME_EMAIL
+          ssh "deploy@$EDU" 'cat ~/.ssh/authorized_keys' > "$RUNNER_TEMP/keys"
+          site=$(ssh "deploy@$EDU" "grep -E '^SITE_DOMAIN=' /opt/wenquest/.env | tail -n1 | cut -d= -f2-")
+          acme=$(ssh "deploy@$EDU" "grep -E '^ACME_EMAIL=' /opt/wenquest/.env | tail -n1 | cut -d= -f2-")
+          [ -n "$site" ] && [ -n "$acme" ] || { echo "::error::教育服务器 .env 里没有 SITE_DOMAIN 或 ACME_EMAIL"; exit 1; }
+          echo "SITE_DOMAIN=$site  keys=$(grep -c . "$RUNNER_TEMP/keys")"
+          ssh "deploy@$HOST" 'mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'
+          ssh "deploy@$HOST" 'k=~/.ssh/authorized_keys; while IFS= read -r l; do [ -n "$l" ] && ! grep -qxF "$l" "$k" && echo "$l" >> "$k" && echo "added a key"; done; true' < "$RUNNER_TEMP/keys"
+          tar czf - -C deploy/enterprise . | ssh "deploy@$HOST" 'mkdir -p /opt/wenquest/edge /opt/wenquest/pilot-queue && tar xzf - -C /opt/wenquest/edge && chmod +x /opt/wenquest/edge/*.py && mkdir -p /opt/wenquest/edge/allow'
+          # .env：有这一行就改，没有才加（不重复写）
+          ssh "deploy@$HOST" "SITE='$site' ACME='$acme' bash -s" <<'EOF'
+          set -euo pipefail
+          envset() { f=$1; k=$2; v=$3; touch "$f"; chmod 600 "$f"; if grep -q "^$k=" "$f"; then sed -i "s|^$k=.*|$k=$v|" "$f"; else echo "$k=$v" >> "$f"; fi; }
+          envset /opt/wenquest/.env SITE_DOMAIN "$SITE"
+          envset /opt/wenquest/edge/.env SITE_DOMAIN "$SITE"
+          envset /opt/wenquest/edge/.env ACME_EMAIL "$ACME"
+          cd /opt/wenquest/edge
+          docker network inspect qms-edge >/dev/null 2>&1 || docker network create qms-edge
+          docker compose --env-file .env pull -q
+          docker compose --env-file .env run --rm --no-deps -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -n 3
+          docker compose --env-file .env up -d --remove-orphans
+          docker compose --env-file .env exec -T caddy caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile 2>&1 | tail -n 2 || true
+          line='* * * * * python3 /opt/wenquest/edge/bridge-sync.py >> /opt/wenquest/edge/bridge.log 2>&1'
+          { crontab -l 2>/dev/null | grep -v 'bridge-sync.py' || true; echo "$line"; } | crontab -
+          crontab -l
+          docker compose ps
+          free -m | head -2
+          EOF
+      - name: 从外面看（还没切 DNS，用 --resolve 指到企业服务器）
+        env:
+          HOST: ${{ inputs.host }}
+        run: |
+          site=$(ssh "deploy@$HOST" "grep -E '^SITE_DOMAIN=' /opt/wenquest/edge/.env | cut -d= -f2-")
+          sleep 20
+          for h in app qms; do
+            echo "$h.$site -> $(curl -s -o /dev/null -m 30 -w '%{http_code}' --resolve "$h.$site:80:$HOST" "http://$h.$site/" || true) (http)"
+          done
+          echo "app.$site https -> $(curl -s -o /dev/null -m 60 -w '%{http_code}' "https://app.$site/" || true)"

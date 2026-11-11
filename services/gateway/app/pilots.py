@@ -27,7 +27,7 @@ import time
 from pathlib import Path
 from typing import Annotated
 
-from fastapi import Depends, Response
+from fastapi import Depends, Request, Response
 from pydantic import BaseModel, Field
 
 from .moodle import EngineError
@@ -306,6 +306,71 @@ def register(app, m) -> None:
             return Response(status_code=200 if r.status_code == 200 else 404)
         except Exception:                              # noqa: BLE001  问不到就不办证书
             return Response(status_code=404)
+
+    # ------------------------------------------------------------------ 交接桥（第 146 轮）
+    # 质量 ERP 搬到企业服务器以后，开通程序不在这台机器上：企业服务器每分钟用钥匙来取申请、送回结果和内存，
+    # 再取一份“开通了哪些企业”的名单给它的 Caddy 办证书用。没设 WQ_PILOT_BRIDGE_KEY 时这些接口一律 404。
+
+    DOWN = re.compile(r"^(req|cmd|trial)-[a-z0-9-]{1,40}\.json$")
+    UP = re.compile(r"^((state|res|res-trial)-[a-z0-9-]{1,40}|host)\.json$")
+
+    def bridge(req: Request) -> None:
+        key = os.environ.get("WQ_PILOT_BRIDGE_KEY", "")
+        if not key or not secrets.compare_digest(req.headers.get("x-bridge-key", ""), key):
+            raise EngineError("not_found", "not found", 404)
+
+    class BridgeFile(BaseModel):
+        name: str = Field(max_length=80)
+        text: str = Field(max_length=20000)
+
+    class BridgeIn(BaseModel):
+        files: list[BridgeFile] = Field(default_factory=list, max_length=50)
+
+    class AckIn(BaseModel):
+        names: list[str] = Field(default_factory=list, max_length=50)
+
+    @app.get("/api/v1/pilot-bridge/outbox")
+    async def bridge_outbox(req: Request):
+        bridge(req)
+        q = queue()
+        files = [{"name": f.name, "text": f.read_text(encoding="utf-8")}
+                 for f in sorted(q.glob("*.json")) if DOWN.match(f.name)] if q.is_dir() else []
+        return {"files": files[:50]}
+
+    @app.post("/api/v1/pilot-bridge/ack")
+    async def bridge_ack(body: AckIn, req: Request):
+        bridge(req)
+        gone = [n for n in body.names if DOWN.match(n)]
+        for n in gone:
+            (queue() / n).unlink(missing_ok=True)
+        return {"ok": True, "removed": len(gone)}
+
+    @app.post("/api/v1/pilot-bridge/inbox")
+    async def bridge_inbox(body: BridgeIn, req: Request):
+        bridge(req)
+        for f in body.files:
+            if not UP.match(f.name):
+                raise EngineError("bad_name", f"not a result file: {f.name}", 400)
+            try:
+                json.loads(f.text)                     # a broken file is refused, not written
+            except ValueError:
+                raise EngineError("bad_file", f"not JSON: {f.name}", 400) from None
+        q = queue()
+        q.mkdir(parents=True, exist_ok=True)
+        for f in body.files:
+            tmp = q / f".{f.name}.tmp"
+            tmp.write_text(f.text, encoding="utf-8")
+            tmp.replace(q / f.name)
+        await collect()
+        return {"ok": True, "stored": len(body.files)}
+
+    @app.get("/api/v1/pilot-bridge/tenants")
+    async def bridge_tenants(req: Request):
+        bridge(req)
+        with db() as c:
+            ids = [r[0] for r in c.execute("select id from tenant where status in ('active','stopped')")]
+        ids = sorted(set(ids) | QMS_DEMOS)
+        return {"domains": [domain(k, i) for i in ids for k in ("qms", "qms-erp")]}
 
     # ------------------------------------------------------------------ results from the server
 

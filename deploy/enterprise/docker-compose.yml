@@ -1,0 +1,32 @@
+# 企业服务器（美国第二台，161.35.185.35）的前门（第 146 轮）。
+# Caddy 自己办证书，管 qms / qms-erp / *.qms / *.qms-erp（问渠质量 ERP，wenquest-ops 部署，接在 qms-edge 上）和 app.（工业软件）。
+# 部署：ent-server.yml 的 deploy 任务把这个文件夹传到 /opt/wenquest/edge 再 up。
+name: edge
+services:
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2.10-alpine}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+    volumes:
+      - ./conf:/etc/caddy:ro          # 文件夹而不是单个文件：部署换了新文件，caddy reload 才看得到
+      - ./allow:/srv/allow:ro         # bridge-sync.py 写：开通了的试点企业网址，一个网址一个空文件
+      - ./app:/srv/app:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    mem_limit: 256m
+    networks: [default, qms-edge]
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  qms-edge:
+    name: qms-edge
+    external: true

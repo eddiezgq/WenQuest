@@ -1,0 +1,56 @@
+# 企业服务器的 Caddy（第 146 轮）。
+{
+	email {$ACME_EMAIL}
+	# 试点企业 <编号>.qms 的证书按需办：先问下面 127.0.0.1:5555，名单上有才办（名单由 bridge-sync.py 从网关取）
+	on_demand_tls {
+		ask http://127.0.0.1:5555/ask
+	}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+}
+
+http://127.0.0.1:5555 {
+	bind 127.0.0.1
+	root * /srv/allow
+	@ok file {query.domain}
+	respond @ok 200
+	respond 404
+}
+
+# 问渠质量 ERP 演示（wenquest-ops ADR-0025）：qms-erp 是它的 ERPNext
+qms.{$SITE_DOMAIN}, qms-erp.{$SITE_DOMAIN} {
+	import security_headers
+	encode gzip
+	request_body {
+		max_size 100MB
+	}
+	reverse_proxy qms-demo-edge:80
+}
+
+# 试点企业（每家一套，容器 qms-<编号>-edge）与缝纫机演示企业 sewing
+*.qms.{$SITE_DOMAIN}, *.qms-erp.{$SITE_DOMAIN} {
+	tls {
+		on_demand
+	}
+	import security_headers
+	encode gzip
+	request_body {
+		max_size 100MB
+	}
+	reverse_proxy qms-{labels.3}-edge:80
+}
+
+# 工业软件（第 146 轮；账号做法待 Eddie 定，先放入口页）
+app.{$SITE_DOMAIN} {
+	import security_headers
+	encode zstd gzip
+	root * /srv/app
+	file_server
+}
