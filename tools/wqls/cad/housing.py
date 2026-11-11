@@ -30,7 +30,7 @@ P = dict(
     C=dict(top=(258, 256, 0), r_out=14, r_head=12, r_arch=26, r_hj=10, plan=(14, 12), edge=(8, 6, 5), chamfer=True),
 )[VAR]
 WALL = float(os.environ.get("WQ_WALL", 5.8))
-ARM_Y = (float(os.environ.get("WQ_AY0", -45.0)), float(os.environ.get("WQ_AY1", 67.6)))          # 机臂前后（G3 模态迭代：由 −38…60 加深到 −46…70）
+ARM_Y = (float(os.environ.get("WQ_AY0", -38.0)), float(os.environ.get("WQ_AY1", 60.0)))          # 机臂前后（G4.4：机臂补上底壁后刚度富余，回到 −38…60）
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 4.5))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
@@ -79,11 +79,11 @@ if TK_JSON:
     except Exception as _exc:  # noqa: BLE001
         print("slot from linkage skipped", _exc)
 BEDWALL = float(os.environ.get("WQ_BEDWALL", 5.6))
-ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 8.1))
+ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 5.8))   # G4.4：机臂根部不再加厚，与机臂同壁厚
 ROOT_X = float(os.environ.get("WQ_ROOTX", 183.0))
-BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 14.0))       # 机座纵筋高（从机座顶面往下）
+BED_RIB_H = float(os.environ.get("WQ_BEDRIB", 0.0))       # 机座纵筋高（从机座顶面往下）
 RIB_T = 7.0
-RIB_X = tuple(float(v) for v in os.environ.get("WQ_RIBX", "75,150,225").split(",") if v)
+RIB_X = tuple(float(v) for v in os.environ.get("WQ_RIBX", "").split(",") if v)
 S_BELT_X = 352.0
 ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿（机臂空间高度 135；G1 的 160 在 G3 为比例改小，见细则）
 
