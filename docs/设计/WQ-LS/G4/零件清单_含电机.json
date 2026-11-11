@@ -1,0 +1,365 @@
+{
+ "lk": {
+  "r": 15.5,
+  "d": 180.0,
+  "a": 33.37,
+  "b": 23.41,
+  "c": 72.72,
+  "al": -18.51,
+  "Qz": 20.71,
+  "Qy": 33.0,
+  "br": -1,
+  "A": [
+   51.17,
+   -6.46
+  ],
+  "B": [
+   50.15,
+   -52.26
+  ],
+  "side": "out"
+ },
+ "x": {
+  "rod": [
+   6.0,
+   12.0
+  ],
+  "lever": [
+   13.5,
+   5.0
+  ],
+  "rocker_in": [
+   21.0,
+   4.0
+  ],
+  "rocker_out": [
+   6.0,
+   4.0
+  ],
+  "web": [
+   20.0,
+   30.0
+  ],
+  "R_cw": 38.0,
+  "nb_below": 118.0,
+  "nb_above": 62.0,
+  "tip_below": 24.5
+ },
+ "balance": {
+  "k": 0.25,
+  "m_recip_kg": 0.1112,
+  "m_rot_kg": 0.044,
+  "g_rod_mm": 23.25,
+  "M_req_kgmm": 1.113,
+  "crank_moment_kgmm": 1.121,
+  "sector_half_deg": 30.8,
+  "equiv_at_r_g": 72.3,
+  "J_rotor_handwheel_kgm2": 0.0003939
+ },
+ "parts": {
+  "needle_bar": {
+   "material": "chrome",
+   "valid": true,
+   "mass_kg": 0.07098,
+   "com": [
+    0.0,
+    0.0,
+    132.5
+   ],
+   "Ixx_kgmm2": 191.6702,
+   "Iyy_kgmm2": 191.6702,
+   "Izz_kgmm2": 0.5675
+  },
+  "needle_clamp": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.00323,
+   "com": [
+    -0.0,
+    -0.929,
+    42.433
+   ],
+   "Ixx_kgmm2": 0.0676,
+   "Iyy_kgmm2": 0.049,
+   "Izz_kgmm2": 0.0845
+  },
+  "needle": {
+   "material": "chrome",
+   "valid": true,
+   "mass_kg": 0.00028,
+   "com": [
+    -0.0,
+    0.0,
+    40.967
+   ],
+   "Ixx_kgmm2": 0.0232,
+   "Iyy_kgmm2": 0.0232,
+   "Izz_kgmm2": 0.0001
+  },
+  "nb_link": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.01722,
+   "com": [
+    0.942,
+    0.425,
+    160.5
+   ],
+   "Ixx_kgmm2": 0.7116,
+   "Iyy_kgmm2": 0.7003,
+   "Izz_kgmm2": 0.7711
+  },
+  "rod": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.04622,
+   "com": [
+    9.0,
+    0.0,
+    192.252
+   ],
+   "Ixx_kgmm2": 18.7475,
+   "Iyy_kgmm2": 17.3891,
+   "Izz_kgmm2": 1.6147
+  },
+  "lever": {
+   "material": "chrome",
+   "valid": true,
+   "mass_kg": 0.02423,
+   "com": [
+    16.0,
+    -25.027,
+    207.739
+   ],
+   "Ixx_kgmm2": 11.2941,
+   "Iyy_kgmm2": 2.1613,
+   "Izz_kgmm2": 9.1918
+  },
+  "rocker": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.01087,
+   "com": [
+    8.0,
+    -27.159,
+    222.884
+   ],
+   "Ixx_kgmm2": 1.0579,
+   "Iyy_kgmm2": 0.7098,
+   "Izz_kgmm2": 0.3771
+  },
+  "pin_M": {
+   "material": "chrome",
+   "valid": true,
+   "mass_kg": 0.00208,
+   "com": [
+    12.25,
+    -33.295,
+    213.26
+   ],
+   "Ixx_kgmm2": 0.0065,
+   "Iyy_kgmm2": 0.0349,
+   "Izz_kgmm2": 0.0349
+  },
+  "stud_Q": {
+   "material": "chrome",
+   "valid": true,
+   "mass_kg": 0.00455,
+   "com": [
+    0.25,
+    -20.71,
+    233.0
+   ],
+   "Ixx_kgmm2": 0.0205,
+   "Iyy_kgmm2": 0.1696,
+   "Izz_kgmm2": 0.1696
+  },
+  "crank_pin": {
+   "material": "chrome",
+   "valid": true,
+   "mass_kg": 0.0073,
+   "com": [
+    14.75,
+    0.0,
+    215.5
+   ],
+   "Ixx_kgmm2": 0.0584,
+   "Iyy_kgmm2": 0.2374,
+   "Izz_kgmm2": 0.2374
+  },
+  "shaft": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.62167,
+   "com": [
+    220.42,
+    -0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 18.7455,
+   "Iyy_kgmm2": 8712.4984,
+   "Izz_kgmm2": 8712.4984
+  },
+  "bearing_front": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.0662,
+   "com": [
+    37.627,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 12.0361,
+   "Iyy_kgmm2": 6.6571,
+   "Izz_kgmm2": 6.6571
+  },
+  "crank": {
+   "material": "metal",
+   "valid": true,
+   "mass_kg": 0.10976,
+   "com": [
+    25.0,
+    0.131,
+    189.791
+   ],
+   "Ixx_kgmm2": 44.0074,
+   "Iyy_kgmm2": 36.3444,
+   "Izz_kgmm2": 9.5314
+  },
+  "motor_cap": {
+   "material": "black",
+   "valid": true,
+   "mass_kg": 0.32795,
+   "com": [
+    409.257,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 571.107,
+   "Iyy_kgmm2": 290.7432,
+   "Izz_kgmm2": 290.7432
+  },
+  "motor_bolts": {
+   "material": "black",
+   "valid": true,
+   "mass_kg": 0.00765,
+   "com": [
+    413.327,
+    -0.0,
+    200.0
+   ],
+   "solids": 4
+  },
+  "motor_housing": {
+   "material": "black",
+   "valid": true,
+   "mass_kg": 0.29009,
+   "com": [
+    448.009,
+    0.0,
+    200.219
+   ],
+   "Ixx_kgmm2": 646.2807,
+   "Iyy_kgmm2": 381.2594,
+   "Izz_kgmm2": 379.4869
+  },
+  "motor_rods": {
+   "material": "black",
+   "valid": true,
+   "mass_kg": 0.00427,
+   "com": [
+    459.888,
+    -0.0,
+    200.0
+   ],
+   "solids": 4
+  },
+  "stator_core": {
+   "material": "steelDark",
+   "valid": true,
+   "mass_kg": 1.03968,
+   "com": [
+    433.003,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 1823.7901,
+   "Iyy_kgmm2": 970.4622,
+   "Izz_kgmm2": 970.4622
+  },
+  "stator_winding": {
+   "material": "copper",
+   "valid": true,
+   "mass_kg": 0.28967,
+   "com": [
+    434.0,
+    0.0,
+    200.0
+   ],
+   "solids": 2
+  },
+  "rotor": {
+   "material": "steelDark",
+   "valid": true,
+   "mass_kg": 0.39291,
+   "com": [
+    434.251,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 110.3908,
+   "Iyy_kgmm2": 85.5658,
+   "Izz_kgmm2": 85.5658
+  },
+  "rotor_magnets": {
+   "material": "magnet",
+   "valid": true,
+   "mass_kg": 0.06531,
+   "com": [
+    433.0,
+    -0.0,
+    200.0
+   ],
+   "solids": 8
+  },
+  "encoder_disc": {
+   "material": "glassDisc",
+   "valid": true,
+   "mass_kg": 0.00505,
+   "com": [
+    451.91,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 0.7522,
+   "Iyy_kgmm2": 0.385,
+   "Izz_kgmm2": 0.385
+  },
+  "handwheel": {
+   "material": "graphite",
+   "valid": true,
+   "mass_kg": 0.12523,
+   "com": [
+    471.036,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 232.7517,
+   "Iyy_kgmm2": 118.3356,
+   "Izz_kgmm2": 118.3356
+  },
+  "handwheel_ring": {
+   "material": "blue",
+   "valid": true,
+   "mass_kg": 0.00314,
+   "com": [
+    481.2,
+    0.0,
+    200.0
+   ],
+   "Ixx_kgmm2": 8.296,
+   "Iyy_kgmm2": 4.149,
+   "Izz_kgmm2": 4.149
+  }
+ }
+}

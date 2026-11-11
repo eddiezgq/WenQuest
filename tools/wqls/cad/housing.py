@@ -34,7 +34,17 @@ ARM_Y = (float(os.environ.get("WQ_AY0", -45.0)), float(os.environ.get("WQ_AY1", 
 RIBS = os.environ.get("WQ_RIBS", "1") == "1"
 HEADWALL = float(os.environ.get("WQ_HEADWALL", 4.5))
 FRONT_COVER = os.environ.get("WQ_FRONTCOVER", "1") == "1"
-FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1
+FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z1（G3）
+X_BRG_REAR = 380.0                         # 后轴承 6201 中心（spec.X_BRG[1]）
+LIP_W_F = 14.0                             # 面板口法兰宽（端面外圆角 R14 占掉约 10 mm，法兰要宽些面板才有贴合面）
+LIP_W, LIP_T, WIN_LIP_D = 8.0, 8.0, 8.0          # G4.3 面板口法兰宽、厚（沿 x），前窗口法兰宽、深（沿 y）（加宽加厚试过：频率不升反降，只是加了机头质量）
+MOTOR_SEAT_X = 408.0                       # G4.3 电机座端面（后轴承座伸出立柱右壁 12 mm）
+DETAIL = os.environ.get("WQ_DETAIL", "0" if os.environ.get("WQ_NOEDGE") else "1") == "1"   # G4.3 铸件细节：内圆角、拔模筋、法兰、加工面
+if DETAIL:
+    # G4.3：窗口和前盖板都放在机头前面的平面区（外圆角 R14 以内），盖板 x −46…36、z 112…232
+    # 窗口上沿到 z 234（挑线杆、摇杆在前壁附近要摆到 z 230 左右），前盖板随形包到机头顶的圆角上（z 240）
+    FC_WIN = (-38.0, 28.0, 120.0, 234.0)
+FC_PLATE = (FC_WIN[0] - 8, FC_WIN[1] + 8, FC_WIN[2] - 8, min(FC_WIN[3] + 8, 240.0))
 X_TAKEUP = 16.0                            # 挑线杆平面（G4.1 起与针杆连杆共用曲柄销，见 tools/wqls/g4_takeup.py）
 TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端；G4.1 起按挑线机构的线眼轨迹自动定（下面 TK_JSON）
 TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 外观件里的示意挑线杆（没有 G4 零件时用）：P、M、线眼，端视坐标 mm
@@ -47,6 +57,22 @@ REALMECH = os.environ.get("WQ_REALMECH", "1" if TK_JSON_EXISTS else "0") == "1" 
 if TK_JSON:
     _ev = TK_JSON["result"]["E_v"]
     TK_SLOT = (round(200.0 + _ev[0] - 8), round(200.0 + _ev[1] + 8))
+    try:                                                # G4.3：槽按挑线杆穿过前壁处的上下范围开（加杆宽一半和间隙 7 mm）
+        import sys as _sys
+        _sys.path[:0] = [os.path.join(os.path.dirname(_tkj), "..", "..", "..", "..", "tools", "wqls")]
+        import g4_takeup as _T
+        _m = _T.Mech2(lk=TK_JSON["lk"])
+        _zs = []
+        for _f in range(360):
+            _p = _m.link_pose(_f, _m.LK0)
+            for _u0 in (43.5, 48.0):                    # 机头前壁内面、外面（端视 u = −y）
+                if (_p["P"][0] - _u0) * (_p["E"][0] - _u0) < 0:
+                    _t = (_u0 - _p["P"][0]) / (_p["E"][0] - _p["P"][0])
+                    _zs.append(200.0 + _p["P"][1] + _t * (_p["E"][1] - _p["P"][1]))
+        if _zs:
+            TK_SLOT = (math.floor(min(_zs) - 7), math.ceil(max(_zs) + 7))
+    except Exception as _exc:  # noqa: BLE001
+        print("slot from linkage skipped", _exc)
 BEDWALL = float(os.environ.get("WQ_BEDWALL", 5.6))
 ROOTWALL = float(os.environ.get("WQ_ROOTWALL", 8.1))
 ROOT_X = float(os.environ.get("WQ_ROOTX", 183.0))
@@ -58,7 +84,8 @@ ARMB = float(os.environ.get("WQ_ARMB", 120.0))                   # 机臂下沿�
 
 ZU = 200.0
 BED = dict(x0=-105.0, x1=412.0, y0=-62.0, y1=116.0, z0=-62.0)
-PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -70.6)), y1=float(os.environ.get("WQ_PY1", 97.4)))
+# 立柱深 178（G4 优化定 168；G4.3 机头开面板口、加法兰和凸台后，前后摆一阶由 125 降到 122.7 Hz，立柱加深 10 回到 126 Hz）
+PIL = dict(x0=300.0, x1=396.0, y0=float(os.environ.get("WQ_PY0", -75.6)), y1=float(os.environ.get("WQ_PY1", 102.4)))
 HEAD = dict(x0=-62.0, x1=52.0, y0=float(os.environ.get("WQ_HY0", -48.0)), y1=70.0, z0=46.0)
 
 
@@ -117,6 +144,237 @@ def seam_edges(fused, a, b, tol=0.05):
         if a.distToShape(Part.Vertex(p))[0] < tol and b.distToShape(Part.Vertex(p))[0] < tol:
             out.append(e)
     return out
+
+
+M4_TAP, M5_TAP, M6_TAP = 3.3, 4.2, 5.0          # 攻丝底孔（GB/T 20330）
+
+
+def tap_holes(shape, pts, d, depth, axis):
+    """在 pts（孔口中心）沿 axis（指向材料里面）钻攻丝底孔，深 depth"""
+    if os.environ.get("WQ_NOHOLES") == "1":          # 有限元模型去掉小螺孔（常规的特征简化）
+        return shape
+    for q in pts:
+        shape = shape.cut(Part.makeCylinder(d / 2, depth, V(*q) - axis * 1.0, axis))
+    return shape
+
+
+def section_x(shape, x):
+    """shape 在平面 x 上的截面（面），用来做与机头端面同形的面板"""
+    sl = shape.common(Part.makeBox(0.02, 600, 600, V(x, -300, -300)))
+    fs = []
+    for f in sl.Faces:
+        try:
+            if f.Surface.__class__.__name__ == "Plane" and abs(f.Surface.Axis.x) > 0.99 and abs(f.CenterOfMass.x - x) < 0.015:
+                fs.append(f)
+        except Exception:  # noqa: BLE001
+            continue
+    fs.sort(key=lambda f: -f.Area)
+    return fs[0] if fs else None
+
+
+def details(solid, hollow, info):
+    """G4.3 铸件的装配和加工结构（2026-11-10 Eddie：“哪里像个铸件，机头要有前盖板，上轴哪里装电机”）：
+    ① 机头左端敞开，内侧一圈 8 mm 宽的法兰（端面加工），6 个 M4 螺孔，装面板；
+    ② 机头前窗口内侧一圈法兰，6 个 M4 螺孔，装前盖板；
+    ③ 立柱里的后轴承座（6201，Ø32 H7）伸出立柱右壁成“电机座”：外圆 Ø52 h7 是电机止口、端面加工，4 个 M5 螺孔；
+    ④ 机座顶面：针板座（沉 2.5）、滑板座（沉 1.5），针板下开口（送布牙、旋梭从这里伸上来），滑板下开口（换梭芯）；
+    ⑤ 机座底边一圈向内的法兰（加工面，与油盘贴合），后面两个铰链耳；
+    ⑥ 机臂顶面两个清砂工艺孔（顶盖盖住）。"""
+    hw = HEADWALL
+    x0 = HEAD["x0"]
+    zlo, zhi = -10.0, 300.0
+
+    def inner(k):                                       # 外形向里收 k 的实体（前视、俯视两个轮廓相交）
+        f_ = Part.Face(outline(k)).extrude(V(0, 300, 0))
+        f_.translate(V(0, -150, 0))
+        t_ = Part.Face(plan(k)).extrude(V(0, 0, zhi - zlo))
+        t_.translate(V(0, 0, zlo))
+        return f_.common(t_)
+
+    # ① 面板口：机头左端开 (壁厚 + 8) 以内的口子；法兰 = 壁厚以内、(壁厚 + 8) 以外的一圈，厚 8（沿 x）
+    # inner(k) 在 x 方向也收了 k，所以要取机头里面某一截（x0 + 25）的轮廓，再沿 x 拉伸到端头
+    xs_ = x0 + 25
+    pw, pf = section_x(inner(hw), xs_), section_x(inner(hw + LIP_W_F), xs_)
+    if pw is not None and pf is not None:
+        ring_f = pw.cut(pf)
+        ring_f.translate(V(x0 + hw - 0.2 - xs_, 0, 0))
+        hollow = fuse_fillet(hollow, ring_f.extrude(V(LIP_T - hw + 0.2, 0, 0)).common(solid))   # 只留在外形里面（机头下部“鼻子”处不伸出去）
+        if os.environ.get("WQ_NOFACEOPEN") != "1":
+            op_ = pf.copy()
+            op_.translate(V(x0 - 1 - xs_, 0, 0))
+            hollow = hollow.cut(op_.extrude(V(LIP_T + 1.5, 0, 0)))
+    # （试过在面板口里加一圈隔框：一阶反而降——这一阶是机臂连机头在立柱上前后摆，机头上加质量就降，不是截面走形）
+    ring_pts = []                                       # 6 × M4：在法兰中线上（离机头内壁 LIP_W / 2）
+    if pw is not None:
+        bb = pw.BoundBox
+        m_ = LIP_W_F - 4                                # 端面外圆角 R14 吃掉约 10 mm，螺孔放在离外形约 14.5 mm 处（端面平面区里）
+        yc, zc = (bb.YMin + bb.YMax) / 2, (bb.ZMin + bb.ZMax) / 2
+        cand = [(bb.YMin + m_, zc - 30), (bb.YMin + m_, zc + 30), (bb.YMax - m_, zc - 30), (bb.YMax - m_, zc + 30),
+                (yc, bb.ZMax - m_), (yc, bb.ZMin + m_)]
+        for y_, z_ in cand:
+            if hollow.isInside(V(x0 + LIP_T - 1, y_, z_), 0.01, True) and hollow.isInside(V(x0 + 1, y_, z_), 0.01, True):
+                ring_pts.append((x0, y_, z_))
+        hollow = tap_holes(hollow, ring_pts, M4_TAP, 10, V(1, 0, 0))
+    info["faceplate_holes"] = ring_pts
+    # ② 前窗口：内侧法兰（窗口外扩 8，y 从内壁到 y0 + 8），窗口四角 R10；6 个 M4 螺孔沿 +y 打进法兰
+    fx0, fx1, fz0, fz1 = FC_WIN
+    y0 = HEAD["y0"]
+    fr = Part.makeBox(fx1 - fx0 + 2 * LIP_W, WIN_LIP_D - hw + 0.2, fz1 - fz0 + 2 * LIP_W, V(fx0 - LIP_W, y0 + hw - 0.2, fz0 - LIP_W))
+    win = Part.makeBox(fx1 - fx0, 20, fz1 - fz0, V(fx0, y0 - 10, fz0))
+    win = win.makeFillet(10, [e for e in win.Edges if abs(e.BoundBox.YLength - 20) < 1e-6])
+    fr = fr.cut(Part.makeBox(fx1 - fx0 + 20, 20, 30, V(fx0 - 10, y0, fz1 - 2)))   # 上边不要法兰：挑线杆、摇杆从这里摆过，上边又在顶圆角里
+    hollow = fuse_fillet(hollow, fr.cut(win).common(solid))
+    hollow = hollow.cut(win)
+    zm = (fz0 + fz1) / 2 - 8
+    wpts = [(fx0 - 4, y0, fz0 + 12), (fx0 - 4, y0, zm), (fx0 - 4, y0, 220.0),
+            (fx1 + 4, y0, fz0 + 12), (fx1 + 4, y0, zm), (fx1 + 4, y0, 220.0)]       # 左右两边各 3 个（上边是圆角，不打孔）
+    hollow = tap_holes(hollow, wpts, M4_TAP, 10, V(0, 1, 0))
+    info["front_window"] = FC_WIN
+    info["window_holes"] = wpts
+    # ③ 后轴承座与电机座：Ø52 的筒从立柱里 x 372 伸到立柱外 x 408；里面四条筋接立柱四壁
+    xr0, xr1 = 372.0, MOTOR_SEAT_X
+    tube = Part.makeCylinder(26, xr1 - xr0, V(xr0, 0, ZU), V(1, 0, 0))
+    # 只在立柱右壁里面加 4 块短三角筋托住轴承座（原来 4 条通到立柱四壁的长筋约 0.7 kg 在立柱顶上，前后摆一阶降了 5 Hz）
+    ribs = []
+    for a in (45, 135, 225, 315):
+        ca, sa = math.cos(math.radians(a)), math.sin(math.radians(a))
+        tri = Part.makePolygon([V(PIL["x1"] - 1, 25 * ca, ZU + 25 * sa), V(PIL["x1"] - 1, 52 * ca, ZU + 52 * sa),
+                                V(xr0 + 2, 25 * ca, ZU + 25 * sa), V(PIL["x1"] - 1, 25 * ca, ZU + 25 * sa)])
+        nrm = V(0, -sa, ca)
+        f_ = Part.Face(tri)
+        f_.translate(nrm * -3)
+        ribs.append(f_.extrude(nrm * 6))
+    inner_ribs = None
+    for r_ in ribs:
+        inner_ribs = r_ if inner_ribs is None else inner_ribs.fuse(r_)
+    hollow = fuse_fillet(hollow, inner_ribs.common(solid).cut(Part.makeCylinder(25, 40, V(xr0 - 1, 0, ZU), V(1, 0, 0))))
+    hollow = fuse_fillet(hollow, tube)
+    hollow = hollow.cut(Part.makeCylinder(16, 10, V(X_BRG_REAR - 5, 0, ZU), V(1, 0, 0)))                     # 6201 外圈 Ø32 H7
+    hollow = hollow.cut(Part.makeCylinder(10, xr1 - xr0 + 4, V(xr0 - 2, 0, ZU), V(1, 0, 0)))                 # 轴、油封过孔 Ø20
+    mpts = [(xr1, 20 * math.cos(a), ZU + 20 * math.sin(a)) for a in (math.radians(45 + 90 * i) for i in range(4))]
+    hollow = tap_holes(hollow, mpts, M5_TAP, 12, V(-1, 0, 0))
+    info["motor_seat"] = dict(x=xr1, spigot_d=52, holes=mpts)
+    # ④ 机座顶面：针板座、滑板座（沉孔），针板下、滑板下开口
+    hollow = hollow.cut(Part.makeBox(64, 44, 2.5, V(-32, -22, -2.5)))
+    hollow = hollow.cut(Part.makeBox(46, 36, 1.5, V(-23, -58, -1.5)))
+    op = Part.makeBox(50, 36, 20, V(-22, -18, -15)).fuse(Part.makeBox(40, 34, 20, V(-20, -52, -15)))
+    op = op.removeSplitter()
+    op, _ = try_fillet(op, [e for e in op.Edges if e.BoundBox.ZLength > 19], (4.0, 3.0, 2.0))
+    hollow = hollow.cut(op)
+    npts = [(-27, -17, -2.5), (27, -17, -2.5), (-27, 17, -2.5), (27, 17, -2.5)]
+    hollow = tap_holes(hollow, npts, 2.5, 8, V(0, 0, -1))                                    # 针板螺钉 M3
+    # ⑤ 机座底边法兰（内侧一圈，宽 10、厚 6，底面加工）和后面两个铰链耳
+    bw = BEDWALL
+    outer = Part.makeBox(BED["x1"] - BED["x0"] - 2 * bw + 0.4, BED["y1"] - BED["y0"] - 2 * bw + 0.4, 6, V(BED["x0"] + bw - 0.2, BED["y0"] + bw - 0.2, BED["z0"]))
+    inn = Part.makeBox(BED["x1"] - BED["x0"] - 2 * bw - 20, BED["y1"] - BED["y0"] - 2 * bw - 20, 8, V(BED["x0"] + bw + 10, BED["y0"] + bw + 10, BED["z0"] - 1))
+    inn = inn.makeFillet(6, [e for e in inn.Edges if e.BoundBox.ZLength > 7])
+    hollow = fuse_fillet(hollow, outer.cut(inn).common(solid))
+    for xh in (20.0, 300.0):
+        lug = Part.makeBox(26, 14, 22, V(xh - 13, BED["y1"], -44))
+        lug = lug.makeFillet(5, [e for e in lug.Edges if e.BoundBox.ZLength > 21 and e.BoundBox.YMin > BED["y1"] + 1])
+        lug = lug.cut(Part.makeCylinder(4.1, 30, V(xh - 15, BED["y1"] + 7, -33), V(1, 0, 0)))             # 铰链销孔 Ø8.2
+        hollow = fuse_fillet(hollow, lug)
+    # ⑥ 机臂顶面清砂工艺孔 2 × Ø36（顶盖 x 110…260 盖住）
+    for xs in (() if os.environ.get("WQ_NOSAND") == "1" else (150.0, 225.0)):
+        hollow = hollow.cut(Part.makeCylinder(18, 40, V(xs, 12, 220), V(0, 0, 1)))
+    tpts = []                                           # 顶盖螺孔 4 × M4（盲孔深 5，壁厚 5.8）
+    for xs_ in (118.0, 252.0):
+        for ys_ in (-6.0, 30.0):
+            ln = Part.LineSegment(V(xs_, ys_, 300), V(xs_, ys_, 180)).toShape().common(hollow)
+            if ln.Vertexes:
+                tpts.append((xs_, ys_, max(v.Point.z for v in ln.Vertexes)))
+    hollow = tap_holes(hollow, tpts, M4_TAP, 5, V(0, 0, -1))
+    return hollow.removeSplitter()
+
+
+def machined_faces(shape):
+    """加工面：面板、前盖板法兰面，电机座端面和止口，轴承孔、针杆孔、销孔、螺孔，针板座、滑板座，机座底面。用来单独上色（亮金属）"""
+    out = []
+    x0, y0 = HEAD["x0"], HEAD["y0"]
+    for f in shape.Faces:
+        s = f.Surface
+        c = f.CenterOfMass
+        try:
+            n = f.normalAt(*f.Surface.parameter(c)) if hasattr(f.Surface, "parameter") else f.normalAt(0, 0)
+        except Exception:  # noqa: BLE001
+            n = f.normalAt(0, 0)
+        name = type(s).__name__
+        if name == "Plane":
+            if abs(c.x - x0) < 0.05 and abs(n.x) > 0.99:
+                out.append(f)
+            elif abs(c.y - y0) < 0.05 and abs(n.y) > 0.99 and FC_PLATE[0] - 1 < c.x < FC_PLATE[1] + 1:
+                out.append(f)
+            elif abs(c.x - MOTOR_SEAT_X) < 0.05 and abs(n.x) > 0.99:
+                out.append(f)
+            elif abs(c.z - BED["z0"]) < 0.05 and abs(n.z) > 0.99:
+                out.append(f)
+            elif abs(n.z) > 0.99 and (abs(c.z + 2.5) < 0.05 or abs(c.z + 1.5) < 0.05) and -33 < c.x < 33 and -59 < c.y < 23:
+                out.append(f)
+        elif name == "Cylinder":
+            r = s.Radius
+            if any(abs(r - v) < 0.02 for v in (1.65, 2.1, 1.25, 16.0, 17.5, 6.0, 3.0, 4.1)):
+                out.append(f)
+            elif abs(r - 26.0) < 0.02 and c.x > PIL["x1"] - 0.5:                 # 电机止口 Ø52
+                out.append(f)
+    return out
+
+
+def sharp_edges(shape, min_deg=10.0):
+    """真正有棱角的棱（两侧面法向夹角 > min_deg）。圆角轮廓生出的相切棱不算（对它们倒圆一定失败）"""
+    out = []
+    for e in shape.Edges:
+        try:
+            fs = shape.ancestorsOfType(e, Part.Face)
+            if len(fs) != 2:
+                continue
+            p_ = e.valueAt((e.FirstParameter + e.LastParameter) / 2)
+            n = []
+            for f in fs:
+                u, v = f.Surface.parameter(p_)
+                n.append(f.normalAt(u, v))
+            if math.degrees(n[0].getAngle(n[1])) > min_deg:
+                out.append(e)
+        except Exception:  # noqa: BLE001
+            continue
+    return out
+
+
+def fillet_what_you_can(shape, radius):
+    """内腔倒圆：逐条试，能倒的一起倒。两个轮廓相交生出的 B 样条棱 OCC 倒不了，留着（图纸“未注铸造圆角 R3–R5”覆盖）"""
+    ok = []
+    for e in sharp_edges(shape):
+        try:
+            if shape.makeFillet(radius, [e]).isValid():
+                ok.append(e)
+        except Exception:  # noqa: BLE001
+            pass
+    if not ok:
+        return shape, 0, 0
+    s, r = try_fillet(shape, ok, (radius, radius - 1, radius - 2))
+    return s, r, len(ok)
+
+
+def fuse_fillet(base, feat, radii=(3.0, 2.0)):
+    """把凸台、筋并到铸件上，并在相接处倒根部圆角（铸件不能有尖内角）。只在 feat 附近找新生成的相接棱，失败就不倒"""
+    new = base.fuse(feat)
+    if not DETAIL or feat.isNull() or feat.Volume < 1:
+        return new
+    bb = App.BoundBox(feat.BoundBox)
+    bb.enlarge(0.5)
+    es = []
+    for e in new.Edges:
+        try:
+            if not bb.isInside(e.BoundBox.Center):
+                continue
+        except Exception:  # noqa: BLE001
+            continue
+        p_ = Part.Vertex(e.valueAt((e.FirstParameter + e.LastParameter) / 2))
+        if feat.isInside(p_.Point, 0.05, True) and base.isInside(p_.Point, 0.05, True):
+            es.append(e)
+    if not es:
+        return new
+    s2, r_ = try_fillet(new, es, radii)
+    return s2 if r_ else new
 
 
 # ---------------------------------------------------------------- 铸件
@@ -252,9 +510,14 @@ def casting():
         right = Part.makeBox(600, 400, 400, V(ROOT_X, -200, -50))
         cav = cav.common(left).fuse(rf.common(rt).common(right)).removeSplitter()
         info["rootwall"] = ROOTWALL
+    if DETAIL:                                          # G4.3 内圆角：内腔的棱倒圆 = 铸件内角 R5（铸造内角不能是尖角）
+        cav, r_, n_ = fillet_what_you_can(cav, 5.0)
+        info["inner_fillet"] = dict(r=r_, edges=n_)
     bw = BEDWALL
     bcav = Part.makeBox(BED["x1"] - BED["x0"] - 2 * bw, BED["y1"] - BED["y0"] - 2 * bw, -BED["z0"] - bw + 1,
                         V(BED["x0"] + bw, BED["y0"] + bw, BED["z0"] - 1))
+    if DETAIL:
+        bcav, info["bed_inner_fillet"] = try_fillet(bcav, [e for e in bcav.Edges if e.BoundBox.ZMin > BED["z0"] + 0.5], (5.0, 4.0))
     hollow = solid.cut(cav).cut(bcav)
     # 机头壁薄一些（机头在悬臂端，越轻固有频率越高）：机头区域按 HEADWALL 再挖一次
     if HEADWALL < WALL:
@@ -264,7 +527,11 @@ def casting():
         ht.translate(V(0, 0, zlo))
         hbox = Part.makeBox(HEAD["x1"] - HEAD["x0"] - 2 * HEADWALL, 400, 400, V(HEAD["x0"] + HEADWALL, -200, HEAD["z0"] + HEADWALL))
         try:
-            hollow = hollow.cut(hf.common(ht).common(hbox))
+            hc = hf.common(ht).common(hbox)
+            if DETAIL:
+                hc, r_, n_ = fillet_what_you_can(hc, 4.0)
+                info["head_inner_fillet"] = dict(r=r_, edges=n_)
+            hollow = hollow.cut(hc)
             info["headwall"] = HEADWALL
         except Exception as exc:  # noqa: BLE001
             info["headwall"] = f"skipped: {str(exc)[:60]}"
@@ -273,6 +540,11 @@ def casting():
         rb = []
         for x in RIB_X:
             sl = Part.makeBox(RIB_T, 400, 400, V(x - RIB_T / 2, -200, ARMB - 20))
+            if DETAIL:                                  # 拔模 1°：分型面 y = 0，筋在分型面处最厚（7），往前后两壁逐渐变薄（到壁约 4.6）
+                h0, d_ = RIB_T / 2, 150 * math.tan(math.radians(1.0))
+                pts = [(x - h0, 0), (x - h0 + d_, 150), (x + h0 - d_, 150), (x + h0, 0), (x + h0 - d_, -150), (x - h0 + d_, -150)]
+                w_ = Part.makePolygon([V(a_, b_, ARMB - 20) for a_, b_ in pts] + [V(pts[0][0], pts[0][1], ARMB - 20)])
+                sl = Part.Face(w_).extrude(V(0, 0, 400))
             hole = Part.makeCylinder(20, RIB_T + 2, V(x - RIB_T / 2 - 1, 0, ZU), V(1, 0, 0))
             hole = hole.fuse(Part.makeCylinder(12, RIB_T + 2, V(x - RIB_T / 2 - 1, 30, ARMB + 22), V(1, 0, 0)))
             rb.append(sl.common(cav).cut(hole))
@@ -287,7 +559,7 @@ def casting():
             sl = Part.makeBox(RIB_T, BED["y1"] - BED["y0"], -BED["z0"], V(x, BED["y0"], BED["z0"]))
             rb.append(sl.common(bcav))
         for r_ in rb:
-            hollow = hollow.fuse(r_)
+            hollow = fuse_fillet(hollow, r_)
         hollow = hollow.removeSplitter()
     # 机头内的凸台（G4.1）：针杆上、下导套座，前轴承座（整块隔板），挑线摇杆销座。与刺布、挑线零件的间隙在 G4.1 的干涉检查里核对
     if BOSSES:
@@ -297,7 +569,11 @@ def casting():
         # 针杆下导套座：机头底板上 Ø22 × 28 的凸台，孔 Ø12（含油轴套 Ø8 × Ø12 × 20）
         bs.append(Part.makeCylinder(11, 28, V(0, 0, HEAD["z0"]), V(0, 0, 1)).cut(Part.makeCylinder(6, 40, V(0, 0, HEAD["z0"] - 5), V(0, 0, 1))))
         # 针杆上导套座：x −16…3（不越过连杆平面 x 5），z 170…194，一条筋接到机头后壁；孔 Ø12
-        ub = Part.makeBox(19, 20, 24, V(-16, -10, 170)).fuse(Part.makeBox(10, y_back - 8 + 1, 14, V(-14, 8, 175)))
+        if DETAIL:                                      # G4.3：圆凸台（被 x = 3 平面切成 D 形，让开连杆），一条筋接到后壁
+            ub = Part.makeCylinder(11, 24, V(0, 0, 170), V(0, 0, 1)).common(Part.makeBox(40, 40, 40, V(-37, -20, 160)))
+            ub = ub.fuse(Part.makeBox(8, y_back + 1, 18, V(-12, 0, 172)))
+        else:
+            ub = Part.makeBox(19, 20, 24, V(-16, -10, 170)).fuse(Part.makeBox(10, y_back - 8 + 1, 14, V(-14, 8, 175)))
         bs.append(ub.cut(Part.makeCylinder(6, 40, V(0, 0, 160), V(0, 0, 1))))
         # 前轴承座：x 31…44，轴承座圈加四条筋（G4.2 由整块隔板改，见下），中间 Ø35 轴承孔（6202）
         # 原来是一整块隔板：机头上多了约 1.7 kg，机壳一阶从 129 Hz 掉到 93 Hz（靠近 5000 r/min 的 83 Hz），
@@ -321,13 +597,15 @@ def casting():
                     Part.makeBox(15, 12, 60, V(-10, -qu - 6, ZU + qv)))
             bs.append(qb.cut(Part.makeCylinder(3, 40, V(-20, -qu, ZU + qv), V(1, 0, 0))))
         for b_ in bs:
-            hollow = hollow.fuse(b_.common(solid))
+            hollow = fuse_fillet(hollow, b_.common(solid))
         hollow = hollow.cut(Part.makeCylinder(6, 200, V(0, 0, 20), V(0, 0, 1)))       # 针杆孔 Ø12 穿过机头底（导套外径）
         hollow = hollow.cut(Part.makeCylinder(7, 14, V(0, 0, 36), V(0, 0, 1)))        # 底下沉孔 Ø14 到 z 50：上止点时针夹进来 0.5 mm
         hollow = hollow.removeSplitter()
         info["bosses"] = len(bs)
+    if DETAIL:
+        hollow = details(solid, hollow, info)
     # 机头前盖板窗口（Eddie 11-10 14:08）：机头前面开窗，调针杆高度、挑线机构、加油都从这里；窗口四周留 8 mm 法兰装前盖板
-    if FRONT_COVER:
+    if FRONT_COVER and not DETAIL:
         win = Part.makeBox(FC_WIN[1] - FC_WIN[0], WALL + 4, FC_WIN[3] - FC_WIN[2], V(FC_WIN[0], HEAD["y0"] - 2, FC_WIN[2]))
         win = win.makeFillet(10, [e for e in win.Edges if abs(e.BoundBox.YLength - (WALL + 4)) < 1e-6])
         hollow = hollow.cut(win)
@@ -360,15 +638,90 @@ def circ_far(s, d):
     return f
 
 
-def parts_visible(cast):
+def screw_7380(p, axis, d=4):
+    """ISO 7380 内六角圆头螺钉的头（M4：头径 7.6、头高 2.2、内六角 2.5），p 是支承面中心，axis 指向头外"""
+    dk, k, s = {4: (7.6, 2.2, 2.5), 5: (9.5, 2.75, 3.0), 6: (10.5, 3.3, 4.0)}[d]
+    head = Part.makeCylinder(dk / 2, k * 0.45, p, axis).fuse(Part.makeSphere(dk / 2, p + axis * (k * 0.45)).common(
+        Part.makeCylinder(dk / 2, k * 0.55, p + axis * (k * 0.45), axis)))
+    hexp = [p + axis * (k + 0.1) + _perp(axis, a) * (s / math.sqrt(3)) for a in range(0, 360, 60)]
+    hx = Part.Face(Part.makePolygon(hexp + [hexp[0]])).extrude(axis * -(k * 0.6))
+    return head.cut(hx)
+
+
+def _perp(axis, deg):
+    a = V(axis)
+    u = V(0, 0, 1) if abs(a.z) < 0.9 else V(1, 0, 0)
+    e1 = a.cross(u)
+    e1.normalize()
+    e2 = a.cross(e1)
+    return e1 * math.cos(math.radians(deg)) + e2 * math.sin(math.radians(deg))
+
+
+def covers(hollow, info, solid=None):
+    """G4.3 面板、前盖板（铝合金压铸 ADC12，厚 3，黑灰色喷涂）和固定螺钉（ISO 7380 M4，发黑）"""
+    out = {"graphite": [], "black": []}
+    x0, y0 = HEAD["x0"], HEAD["y0"]
+    # 面板：盖住整个机头左端，外形取机头离端头 15 mm 处的截面（圆角以外的全尺寸外形），铝合金压铸厚 3，外缘倒 R2.5
+    plate = None
+    try:
+        sec = section_x(solid.common(Part.makeBox(400, 400, 400, V(x0 - 1, -200, 95))), x0 + 15)
+        if sec is not None:
+            f_ = Part.Face(sec.OuterWire)
+            f_.translate(V(x0 - 3 - (x0 + 15), 0, 0))
+            plate = f_.extrude(V(3, 0, 0))
+            plate = fil(plate, 2.5, lambda e: e.BoundBox.XMax < x0 - 2.9)
+    except Exception as exc:  # noqa: BLE001
+        print("face plate skipped", exc)
+        plate = None
+    if plate is not None:
+        for _, y_, z_ in info.get("faceplate_holes", []):
+            plate = plate.cut(Part.makeCylinder(2.25, 6, V(x0 - 5, y_, z_), V(1, 0, 0)))
+            out["black"].append(screw_7380(V(x0 - 3, y_, z_), V(-1, 0, 0)))
+        out["graphite"].append(plate)
+    a0, a1, b0, b1 = FC_PLATE
+    cv = None
+    try:                                              # 随形：取机壳前面（含顶上圆角）这一片外表面，向外加厚 3
+        reg = solid.common(Part.makeBox(a1 - a0 + 2, 40, b1 - b0 + 30, V(a0 - 1, y0 - 2, b0 - 1)))
+        fs = []
+        for f in reg.Faces:
+            u_, v_ = f.Surface.parameter(f.CenterOfMass)
+            n_ = f.normalAt(u_, v_)
+            if n_.y < -0.15 and f.CenterOfMass.y < y0 + 15:
+                fs.append(f)
+        th = Part.Shell(fs).makeOffsetShape(3.0, 0.01, fill=True)
+        prof = Part.makeBox(a1 - a0, 80, b1 - b0, V(a0, y0 - 20, b0))
+        prof = prof.makeFillet(10, [e for e in prof.Edges if abs(e.BoundBox.YLength - 80) < 1e-6])
+        cv = th.common(prof)
+        if cv.Volume < 1000:
+            cv = None
+    except Exception as exc:  # noqa: BLE001
+        print("conforming cover skipped", exc)
+    if cv is None:
+        cv = Part.makeBox(a1 - a0, 3, b1 - b0, V(a0, y0 - 3, b0))
+        cv = cv.makeFillet(10, [e for e in cv.Edges if abs(e.BoundBox.YLength - 3) < 1e-6])
+    slot = Part.makeBox(10, 20, TK_SLOT[1] - TK_SLOT[0], V(X_TAKEUP - 5, y0 - 10, TK_SLOT[0]))
+    slot = slot.makeFillet(4.9, [e for e in slot.Edges if abs(e.BoundBox.YLength - 20) < 1e-6])
+    cv = cv.cut(slot)
+    for x_, _, z_ in info.get("window_holes", []):
+        cv = cv.cut(Part.makeCylinder(2.25, 5, V(x_, y0 - 4, z_), V(0, 1, 0)))
+        out["black"].append(screw_7380(V(x_, y0 - 3, z_), V(0, -1, 0)))
+    out["graphite"].append(cv)
+    return out
+
+
+def parts_visible(cast, hollow=None, info=None):
     t0, t1, crown = P["top"]
     g = {"paint": [cast], "graphite": [], "metal": [], "black": [], "blue": [], "chrome": [], "glass": []}
-    # 面板（机头左端）、顶盖
-    # 面板：机头左端 7 mm 一片，外形跟机头一样（真机上是可拆的面板，盖住针杆、挑线机构）
-    cut = Part.makeBox(7.0, 400, 400, V(HEAD["x0"] - 1, -200, 90))
-    body = cast.cut(cut)
-    g["graphite"].append(cast.common(cut))
-    if FRONT_COVER:                                   # 前盖板：机头前面一片（比窗口四周大 8 mm），外形跟机头一样
+    if DETAIL and hollow is not None:                  # G4.3：外观就是铸件本身（带开口、法兰），面板和前盖板是单独的零件
+        body = hollow
+        cv = covers(hollow, info, cast)
+        g["graphite"] += cv["graphite"]
+        g["coverscrew"] = list(cv["black"])            # 盖板螺钉单独一组（网页上拆盖板时一起拆）
+    else:
+        cut = Part.makeBox(7.0, 400, 400, V(HEAD["x0"] - 1, -200, 90))
+        body = cast.cut(cut)
+        g["graphite"].append(cast.common(cut))
+    if FRONT_COVER and not DETAIL:                                   # 前盖板：机头前面一片（比窗口四周大 8 mm），外形跟机头一样
         fx0, fx1, fz0, fz1 = FC_WIN
         cv = Part.makeBox(fx1 - fx0 + 16, 8.0, fz1 - fz0 + 16, V(fx0 - 8, HEAD["y0"] - 1, fz0 - 8))
         cv = cv.makeFillet(14, [e for e in cv.Edges if abs(e.BoundBox.YLength - 8.0) < 1e-6])
@@ -376,20 +729,50 @@ def parts_visible(cast):
         slot = slot.makeFillet(4.9, [e for e in slot.Edges if abs(e.BoundBox.YLength - 20) < 1e-6])
         g["graphite"].append(body.common(cv).cut(slot))
         body = body.cut(cv)
-    g["paint"] = [body]
-    tc = Part.makeBox(150, 52, 3, V(110, -14, (t0 + t1) / 2 + crown - 1.5))
-    tc = tc.makeFillet(6, [e for e in tc.Edges if abs(e.BoundBox.ZLength - 3) < 1e-6])
+    if DETAIL and hollow is not None:                  # 加工面单独一组（亮金属），其余是铸造面（喷漆）
+        mf = machined_faces(body)
+        ids = {f.hashCode() for f in mf}
+        g["paint"] = [Part.makeCompound([f for f in body.Faces if f.hashCode() not in ids])]
+        g["machined"] = [Part.makeCompound(mf)]
+    else:
+        g["paint"] = [body]
+    tc = None
+    if DETAIL:                                          # G4.3 顶盖随形贴在机臂顶面上（盖住两个清砂孔），4 个 M4 螺钉
+        try:
+            reg = cast.common(Part.makeBox(156, 56, 80, V(107, -16, 200)))
+            fs = []
+            for f in reg.Faces:
+                u_, v_ = f.Surface.parameter(f.CenterOfMass)
+                if f.normalAt(u_, v_).z > 0.3:
+                    fs.append(f)
+            th = Part.Shell(fs).makeOffsetShape(2.5, 0.01, fill=True)
+            prof = Part.makeBox(150, 52, 120, V(110, -14, 180))
+            prof = prof.makeFillet(8, [e for e in prof.Edges if abs(e.BoundBox.ZLength - 120) < 1e-6])
+            tc = th.common(prof)
+            for xs_ in (118.0, 252.0):
+                for ys_ in (-6.0, 30.0):
+                    ln = Part.LineSegment(V(xs_, ys_, 300), V(xs_, ys_, 180)).toShape().common(tc)
+                    if ln.Vertexes:
+                        ztop = max(v.Point.z for v in ln.Vertexes)
+                        g.setdefault("coverscrew", []).append(screw_7380(V(xs_, ys_, ztop), V(0, 0, 1)))
+        except Exception as exc:  # noqa: BLE001
+            print("conforming top cover skipped", exc)
+            tc = None
+    if tc is None:
+        tc = Part.makeBox(150, 52, 3, V(110, -14, (t0 + t1) / 2 + crown - 1.5))
+        tc = tc.makeFillet(6, [e for e in tc.Edges if abs(e.BoundBox.ZLength - 3) < 1e-6])
     g["graphite"].append(tc)
-    # 直驱电机与手轮（立柱外侧）
-    mo = cyl(56, 54, V(PIL["x1"], 0, ZU))
-    g["black"].append(fil(mo, 4, circ_far(mo, V(1, 0, 0))))
-    hw = cyl(52, 20, V(PIL["x1"] + 55, 0, ZU))
-    for k in range(36):                                   # 手轮外圈防滑槽
-        a = 2 * math.pi * k / 36
-        hw = hw.cut(cyl(1.4, 22, V(PIL["x1"] + 54, 52.5 * math.cos(a), ZU + 52.5 * math.sin(a))))
-    g["graphite"].append(hw)
-    g["chrome"].append(cyl(18, 3, V(PIL["x1"] + 75, 0, ZU)))
-    g["blue"].append(cyl(53, 2.0, V(PIL["x1"] + 53.5, 0, ZU)).cut(cyl(49, 3, V(PIL["x1"] + 53, 0, ZU))))
+    if not (DETAIL and REALMECH):                       # G4.3 起电机、手轮是实体零件（cad/motor.py）
+        # 直驱电机与手轮（立柱外侧）
+        mo = cyl(56, 54, V(PIL["x1"], 0, ZU))
+        g["black"].append(fil(mo, 4, circ_far(mo, V(1, 0, 0))))
+        hw = cyl(52, 20, V(PIL["x1"] + 55, 0, ZU))
+        for k in range(36):                                   # 手轮外圈防滑槽
+            a = 2 * math.pi * k / 36
+            hw = hw.cut(cyl(1.4, 22, V(PIL["x1"] + 54, 52.5 * math.cos(a), ZU + 52.5 * math.sin(a))))
+        g["graphite"].append(hw)
+        g["chrome"].append(cyl(18, 3, V(PIL["x1"] + 75, 0, ZU)))
+        g["blue"].append(cyl(53, 2.0, V(PIL["x1"] + 53.5, 0, ZU)).cut(cyl(49, 3, V(PIL["x1"] + 53, 0, ZU))))
     # 针杆、压脚杆、机针、压脚
     if not REALMECH:
         g["chrome"].append(cyl(4, 32, V(0, 0, HEAD["z0"] - 30), V(0, 0, 1)))                # 针杆（上止点附近）
@@ -456,7 +839,7 @@ def parts_visible(cast):
 def main():
     cast, hollow, info = casting()
     hollow.exportStep(os.path.join(OUT, "housing.step"))
-    g = parts_visible(cast)
+    g = parts_visible(cast, hollow, info)
     stats = {"variant": VAR, "info": info, "volume_cm3": round(hollow.Volume / 1000, 1), "mass_kg_ht250": round(hollow.Volume * 7.2e-6, 1)}
     for mat, shapes in g.items():
         if not shapes:
@@ -470,4 +853,5 @@ def main():
     print(json.dumps(stats, ensure_ascii=False))
 
 
-main()
+if os.environ.get("WQ_NOMAIN") != "1":
+    main()

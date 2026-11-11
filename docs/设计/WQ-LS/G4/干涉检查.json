@@ -2,7 +2,7 @@
  "limit_mm": 1.0,
  "step_deg": 2,
  "frames": 180,
- "seconds": 264,
+ "seconds": 1604,
  "pairs": [
   [
    "rocker | casting",
@@ -18,6 +18,11 @@
    "pin_M | crank",
    1.0,
    276
+  ],
+  [
+   "stator_core | rotor_magnets",
+   1.099,
+   4
   ],
   [
    "needle_bar | crank_pin",
@@ -50,6 +55,31 @@
    358
   ],
   [
+   "motor_housing | rotor",
+   1.998,
+   24
+  ],
+  [
+   "motor_cap | rotor",
+   1.999,
+   356
+  ],
+  [
+   "motor_housing | encoder_disc",
+   1.999,
+   14
+  ],
+  [
+   "motor_housing | handwheel",
+   1.999,
+   356
+  ],
+  [
+   "motor_rods | handwheel",
+   1.999,
+   356
+  ],
+  [
    "needle_bar | rod",
    2.0,
    358
@@ -62,7 +92,12 @@
   [
    "crank_pin | casting",
    2.5,
-   244
+   248
+  ],
+  [
+   "motor_housing | rotor_magnets",
+   2.998,
+   24
   ],
   [
    "rod | casting",
@@ -70,9 +105,34 @@
    358
   ],
   [
+   "stator_winding | rotor_magnets",
+   3.499,
+   4
+  ],
+  [
    "lever | rocker",
    3.5,
    358
+  ],
+  [
+   "stator_core | rotor",
+   3.599,
+   4
+  ],
+  [
+   "motor_cap | rotor_magnets",
+   3.999,
+   356
+  ],
+  [
+   "motor_bolts | rotor",
+   3.999,
+   356
+  ],
+  [
+   "motor_bolts | rotor_magnets",
+   3.999,
+   356
   ],
   [
    "crank_pin | shaft",
@@ -80,19 +140,44 @@
    358
   ],
   [
+   "lever | casting",
+   4.282,
+   60
+  ],
+  [
    "needle | casting",
    5.19,
    358
   ],
   [
-   "lever | casting",
-   6.294,
-   60
+   "stator_winding | rotor",
+   5.999,
+   4
   ],
   [
    "rod | rocker",
    6.46,
    32
+  ],
+  [
+   "shaft | motor_cap",
+   6.999,
+   4
+  ],
+  [
+   "shaft | motor_housing",
+   6.999,
+   4
+  ],
+  [
+   "pin_M | casting",
+   7.128,
+   60
+  ],
+  [
+   "rotor_magnets | encoder_disc",
+   7.211,
+   0
   ],
   [
    "pin_M | shaft",
@@ -105,9 +190,14 @@
    32
   ],
   [
-   "pin_M | casting",
-   9.293,
-   60
+   "stator_core | encoder_disc",
+   9.682,
+   356
+  ],
+  [
+   "stator_winding | encoder_disc",
+   10.049,
+   356
   ],
   [
    "rod | stud_Q",
@@ -115,9 +205,44 @@
    14
   ],
   [
+   "shaft | motor_bolts",
+   10.749,
+   4
+  ],
+  [
    "rocker | crank_pin",
    13.46,
    32
+  ],
+  [
+   "shaft | rotor_magnets",
+   19.0,
+   358
+  ],
+  [
+   "shaft | stator_core",
+   22.599,
+   4
+  ],
+  [
+   "shaft | stator_winding",
+   24.999,
+   4
+  ],
+  [
+   "motor_rods | rotor",
+   26.385,
+   14
+  ],
+  [
+   "motor_rods | encoder_disc",
+   27.95,
+   336
+  ],
+  [
+   "shaft | motor_rods",
+   42.499,
+   4
   ]
  ],
  "too_close": []

@@ -26,7 +26,7 @@ body.shot .panel,body.shot #busy{display:none}
 <div id="busy">正在载入网格（约 7 MB）…</div>
 <div class="panel" id="ui">
   <h1>WQ-LS 机壳与剖切</h1>
-  <p class="sub">HT250 灰铸铁，外观方案 B。机头里装的是 G4.1 的刺布、挑线机构实体零件，可以转动。</p>
+  <p class="sub">HT250 灰铸铁，外观方案 B。面板、前盖板可拆；立柱右端装直驱伺服电机；机头里的刺布、挑线机构可以转动。</p>
   <div class="lbl">看什么</div>
   <div class="row"><button data-m="ext" class="on">整机外观</button><button data-m="cut">机壳剖开</button></div>
   <div id="cutbox" hidden>
@@ -36,17 +36,23 @@ body.shot .panel,body.shot #busy{display:none}
     <input id="pos" type="range" min="-60" max="110" step="1" value="0" aria-labelledby="poslbl">
     <p class="sub" style="margin:4px 0 0"><span class="cutkey"></span>剖到的铸铁截面</p>
   </div>
+  <div class="lbl">面板、前盖板</div>
+  <div class="row"><button id="covers" class="on">盖板：装上</button></div>
   <div class="lbl">机构</div>
   <div class="row"><button id="play">转动</button><span id="phi" style="color:var(--mut);font-size:12.5px">φ = 0°</span></div>
   <div class="lbl">视角</div>
   <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="front">正面</button><button data-v="face">机头端面</button><button data-v="top">俯视</button></div>
   <div class="lbl">机壳数据</div>
   <table>
-    <tr><td>材料</td><td>HT250 灰铸铁</td></tr>
-    <tr><td>铸件重量</td><td>24.6 kg</td></tr>
+    <tr><td>材料</td><td>HT250 灰铸铁，砂型铸造</td></tr>
+    <tr><td>铸件重量</td><td>25.3 kg</td></tr>
     <tr><td>壁厚：机臂 / 根部 / 机头 / 机座</td><td>5.8 / 8.1 / 4.5 / 5.6 mm</td></tr>
-    <tr><td>筋</td><td>机臂 3 道、立柱 2 道、机座纵筋 2 道</td></tr>
-    <tr><td>前两阶固有频率</td><td id="modal">125 / 221 Hz（前后摆 / 上下）</td></tr>
+    <tr><td>立柱深</td><td>178 mm</td></tr>
+    <tr><td>分型面、拔模</td><td>y = 0；筋 1°</td></tr>
+    <tr><td>开口</td><td>面板口（法兰 + 4 × M4）、前窗口（法兰 + 6 × M4）</td></tr>
+    <tr><td>电机座</td><td>Ø52 h7 止口 + 4 × M5</td></tr>
+    <tr><td>前两阶固有频率</td><td id="modal">127 / 225 Hz（前后摆 / 上下）</td></tr>
+    <tr><td>加工面</td><td>亮金属色；其余铸造面喷漆</td></tr>
   </table>
 </div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
@@ -77,15 +83,21 @@ const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
 const C = [clip];
 const MAT = {
   paint: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.45, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.06 }),
+  // 加工面：不喷漆，精镗、精铣后的金属本色（细纹、半亮）
+  machined: new THREE.MeshPhysicalMaterial({ color: 0xd9dcdf, metalness: 1, roughness: 0.22, anisotropy: 0.6 }),
   graphite: new THREE.MeshPhysicalMaterial({ color: 0x23272c, roughness: 0.5, clearcoat: 0.5, clearcoatRoughness: 0.2 }),
   metal: new THREE.MeshStandardMaterial({ color: 0xb9bdc1, metalness: 1, roughness: 0.32 }),
   chrome: new THREE.MeshStandardMaterial({ color: 0xe4e6e8, metalness: 1, roughness: 0.1 }),
-  black: new THREE.MeshPhysicalMaterial({ color: 0x111214, roughness: 0.62 }),
+  black: new THREE.MeshPhysicalMaterial({ color: 0x1a1c1f, metalness: 0.3, roughness: 0.5 }),
   blue: new THREE.MeshPhysicalMaterial({ color: 0x0b4fae, roughness: 0.35, clearcoat: 0.6 }),
   glass: new THREE.MeshPhysicalMaterial({ color: 0x0b1418, roughness: 0.08, emissive: 0x7fd3ff, emissiveIntensity: 0.6 }),
-  // 剖开时：铸件外表面银灰，里面（背面）就是剖到的截面，用一种颜色画出来
-  cast: new THREE.MeshPhysicalMaterial({ color: 0xaeb3b8, metalness: 0.35, roughness: 0.45, clippingPlanes: C, side: THREE.FrontSide }),
+  steelDark: new THREE.MeshStandardMaterial({ color: 0x6d7378, metalness: 1, roughness: 0.45 }),
+  copper: new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: 1, roughness: 0.35 }),
+  magnet: new THREE.MeshStandardMaterial({ color: 0x8a8f94, metalness: 0.9, roughness: 0.25 }),
+  glassDisc: new THREE.MeshPhysicalMaterial({ color: 0x9fb7c8, metalness: 0.2, roughness: 0.1, transmission: 0.3 }),
+  // 剖开时：剖到的铸铁截面（铸件的背面）用一种颜色画出来
   castCut: new THREE.MeshBasicMaterial({ color: new THREE.Color(css('--cut') || '#c4532d'), clippingPlanes: C, side: THREE.BackSide }),
+  partCut: new THREE.MeshBasicMaterial({ color: 0x4a4f55, clippingPlanes: C, side: THREE.BackSide }),
   mMetal: new THREE.MeshStandardMaterial({ color: 0xc8ccd1, metalness: 1, roughness: 0.3 }),
   mChrome: new THREE.MeshStandardMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
 };
@@ -99,21 +111,25 @@ function geo(k) {
   g = mergeVertices(g, 1e-3);
   return toCreasedNormals(g, THREE.MathUtils.degToRad(30));
 }
-const ext = new THREE.Group(), cut = new THREE.Group(), mech = new THREE.Group();
-root.add(ext, cut, mech);
-for (const k of ['paint', 'graphite', 'metal', 'black', 'blue', 'chrome', 'glass']) {
+const ext = new THREE.Group(), caps = new THREE.Group(), mech = new THREE.Group(), coverG = new THREE.Group();
+root.add(ext, caps, mech, coverG);
+// x_ 开头：机壳（铸造面 paint、加工面 machined）和外观件；graphite 里是面板、前盖板、顶盖
+for (const k of ['paint', 'machined', 'graphite', 'coverscrew', 'metal', 'black', 'blue', 'chrome', 'glass']) {
   if (!pack['x_' + k]) continue;
-  const m = new THREE.Mesh(geo('x_' + k), MAT[k]); m.castShadow = m.receiveShadow = true; ext.add(m);
+  const g = geo('x_' + k);
+  const m = new THREE.Mesh(g, MAT[k === 'coverscrew' ? 'black' : k]); m.castShadow = m.receiveShadow = true;
+  (k === 'graphite' || k === 'coverscrew' ? coverG : ext).add(m);
+  if (k === 'paint' || k === 'machined') caps.add(new THREE.Mesh(g, MAT.castCut));
+  else caps.add(new THREE.Mesh(g, MAT.partCut));
 }
-const cg = geo('x_casting');
-cut.add(new THREE.Mesh(cg, MAT.cast), new THREE.Mesh(cg, MAT.castCut));
-cut.children[0].castShadow = cut.children[0].receiveShadow = true;
 const parts = {};
 for (const [k, p] of Object.entries(info.parts)) {
   if (!pack['m_' + k]) continue;
-  const m = new THREE.Mesh(geo('m_' + k), p.material === 'chrome' ? MAT.mChrome : MAT.mMetal);
+  const mat = p.material === 'chrome' ? MAT.mChrome : p.material === 'metal' ? MAT.mMetal : (MAT[p.material] || MAT.mMetal);
+  const m = new THREE.Mesh(geo('m_' + k), mat);
   m.matrixAutoUpdate = false; m.castShadow = true; mech.add(m); parts[k] = m;
 }
+const CLIPPED = [...new Set([...ext.children, ...coverG.children, ...mech.children].map(m => m.material))];
 document.getElementById('busy').hidden = true;
 
 // 工作台
@@ -148,8 +164,8 @@ function setClip() {
   document.getElementById('poslbl').textContent = `位置 ${RANGE[plane][3]} = ${pos} mm`;
 }
 function setMode(m) {
-  mode = m; ext.visible = m === 'ext'; cut.visible = m === 'cut'; table.visible = m === 'ext';   // 剖开时不画工作台，机座也看得见
-  for (const mm of [MAT.mMetal, MAT.mChrome]) { mm.clippingPlanes = m === 'cut' ? C : []; mm.needsUpdate = true; }   // 机构零件也一起剖开
+  mode = m; caps.visible = m === 'cut'; table.visible = m === 'ext';   // 剖开时不画工作台，机座也看得见
+  for (const mm of CLIPPED) { mm.clippingPlanes = m === 'cut' ? C : []; mm.needsUpdate = true; }   // 机壳、盖板、机构、电机一起剖开
   document.getElementById('cutbox').hidden = m !== 'cut';
   document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === m));
 }
@@ -170,12 +186,14 @@ document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => setMode(b.d
 document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => setPlane(b.dataset.p));
 document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view(b.dataset.v); document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); });
 document.getElementById('pos').oninput = e => { pos = +e.target.value; setClip(); };
+document.getElementById('covers').onclick = e => { coverG.visible = !coverG.visible; e.target.classList.toggle('on', coverG.visible); e.target.textContent = coverG.visible ? '盖板：装上' : '盖板：拆下'; };
 let play = false;
 document.getElementById('play').onclick = e => { play = !play; e.target.classList.toggle('on', play); e.target.textContent = play ? '停' : '转动'; };
 addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); });
 
 setMode(q.get('mode') || 'ext'); setPlane(q.get('plane') || 'y', q.has('pos') ? +q.get('pos') : undefined); view(q.get('view') || 'iso'); setFrame(0);
 window.go = (o) => {
+  if (o.covers !== undefined) coverG.visible = o.covers;
   if (o.mode) setMode(o.mode); if (o.plane) setPlane(o.plane, o.pos); if (o.view) view(o.view);
   if (o.cam) { cam.position.set(...o.cam[0]); ctl.target.set(...o.cam[1]); ctl.update(); }
   if (o.phi !== undefined) setFrame(Math.round(o.phi / 2) % FR.length);

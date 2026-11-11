@@ -25,13 +25,18 @@ head = cast.common(Part.makeBox(130, 300, 260, V(-55, -150, 30)))          # 机
 head = head.Solids[0] if head.ShapeType != "Solid" and len(head.Solids) == 1 else head
 MeshPart.meshFromShape(Shape=head, LinearDeflection=0.08, AngularDeflection=0.25).write(os.path.join(D, "head.stl"))
 near = head.common(Part.makeBox(110, 200, 230, V(-50, -100, 40)))          # 干涉检查只用机构附近这一块
+near = near.fuse(cast.common(Part.makeBox(120, 200, 160, V(360, -100, 120))))   # 加上立柱右端（后轴承座、电机座）
 
 parts = {k: Part.read(os.path.join(D, f"{k}.step")) for k in info["parts"]}
 JOINT = {frozenset(p) for p in [
     ("crank", "crank_pin"), ("crank", "shaft"), ("rod", "crank_pin"), ("lever", "crank_pin"), ("rod", "nb_link"),
     ("lever", "pin_M"), ("rocker", "pin_M"), ("rocker", "stud_Q"), ("needle_bar", "nb_link"), ("needle_bar", "needle_clamp"),
     ("needle_clamp", "needle"), ("needle", "needle_bar"), ("shaft", "bearing_front"), ("crank", "bearing_front"),
-    ("casting", "bearing_front"), ("casting", "stud_Q"), ("casting", "shaft")]}
+    ("casting", "bearing_front"), ("casting", "stud_Q"), ("casting", "shaft"),
+    ("casting", "motor_cap"), ("casting", "motor_bolts"), ("motor_cap", "motor_bolts"), ("motor_cap", "motor_housing"),
+    ("motor_rods", "motor_housing"), ("motor_rods", "motor_cap"), ("stator_core", "motor_housing"), ("stator_winding", "stator_core"),
+    ("rotor", "shaft"), ("rotor_magnets", "rotor"), ("encoder_disc", "shaft"), ("encoder_disc", "rotor"), ("handwheel", "shaft"),
+    ("handwheel_ring", "handwheel")]}
 
 
 def mat(m):

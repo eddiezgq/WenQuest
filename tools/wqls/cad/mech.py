@@ -87,17 +87,17 @@ def solid(s):
     return Part.makeCompound(sol)
 
 
-def props(s):
+def props(s, rho=RHO_STEEL):
     s = solid(s)
     if s.ShapeType == "Compound":
         vol = sum(x.Volume for x in s.Solids)
         cx = sum((x.CenterOfMass * x.Volume for x in s.Solids), V(0, 0, 0)) * (1 / vol)
-        return dict(mass_kg=round(vol * RHO_STEEL, 5), com=[round(cx.x, 3), round(cx.y, 3), round(cx.z, 3)], solids=len(s.Solids))
-    m = s.Volume * RHO_STEEL
+        return dict(mass_kg=round(vol * rho, 5), com=[round(cx.x, 3), round(cx.y, 3), round(cx.z, 3)], solids=len(s.Solids))
+    m = s.Volume * rho
     c = s.CenterOfMass
     I = s.MatrixOfInertia          # 单位密度、绕质心
     return dict(mass_kg=round(m, 5), com=[round(c.x, 3), round(c.y, 3), round(c.z, 3)],
-                Ixx_kgmm2=round(I.A11 * RHO_STEEL, 4), Iyy_kgmm2=round(I.A22 * RHO_STEEL, 4), Izz_kgmm2=round(I.A33 * RHO_STEEL, 4))
+                Ixx_kgmm2=round(I.A11 * rho, 4), Iyy_kgmm2=round(I.A22 * rho, 4), Izz_kgmm2=round(I.A33 * rho, 4))
 
 
 # ---------------------------------------------------------------- φ = 0 的位置
@@ -247,11 +247,24 @@ parts["crank"], mats["crank"] = cr, "metal"
 bal = dict(k=K, m_recip_kg=round(m_recip, 4), m_rot_kg=round(m_rot, 4), g_rod_mm=round(g_rod, 2), M_req_kgmm=round(M_req, 3),
            crank_moment_kgmm=round(-mv, 3), sector_half_deg=round(hi, 2), equiv_at_r_g=round(1000 * (-mv) / R, 1))
 
+# G4.3 主轴直驱电机与手轮（cad/motor.py）
+dens = {}
+spec_m = importlib.util.spec_from_file_location("wq_motor", os.path.join(HERE, "motor.py"))
+motor = importlib.util.module_from_spec(spec_m)
+spec_m.loader.exec_module(motor)
+J_rot = 0.0
+for k, (s, mat_, rk, rotating) in motor.build().items():
+    parts[k], mats[k], dens[k] = s, mat_, motor.RHO[rk]
+    if rotating:
+        for so in (s.Solids or [s]):
+            J_rot += motor.inertia_x(so, motor.RHO[rk])
+bal["J_rotor_handwheel_kgm2"] = round(J_rot, 7)
+
 out = dict(lk=TK, x=X, balance=bal, parts={})
 for k, s in parts.items():
     s.exportStep(os.path.join(OUT, f"{k}.step"))
     mesh = MeshPart.meshFromShape(Shape=s, LinearDeflection=0.02, AngularDeflection=0.2)
     mesh.write(os.path.join(OUT, f"{k}.stl"))
-    out["parts"][k] = dict(material=mats[k], valid=s.isValid(), **props(s))
+    out["parts"][k] = dict(material=mats[k], valid=s.isValid(), **props(s, dens.get(k, RHO_STEEL)))
 json.dump(out, open(os.path.join(OUT, "parts.json"), "w"), ensure_ascii=False, indent=1)
 print(json.dumps(dict(balance=bal, mass={k: v["mass_kg"] for k, v in out["parts"].items()}), ensure_ascii=False))

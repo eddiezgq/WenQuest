@@ -16,7 +16,8 @@
   "M_req_kgmm": 1.113,
   "crank_moment_kgmm": 1.121,
   "sector_half_deg": 30.8,
-  "equiv_at_r_g": 72.3
+  "equiv_at_r_g": 72.3,
+  "J_rotor_handwheel_kgm2": 0.0003939
  },
  "parts": {
   "needle_bar": {
@@ -70,6 +71,50 @@
   "crank": {
    "mass_g": 109.8,
    "material": "metal"
+  },
+  "motor_cap": {
+   "mass_g": 328.0,
+   "material": "black"
+  },
+  "motor_bolts": {
+   "mass_g": 7.6,
+   "material": "black"
+  },
+  "motor_housing": {
+   "mass_g": 290.1,
+   "material": "black"
+  },
+  "motor_rods": {
+   "mass_g": 4.3,
+   "material": "black"
+  },
+  "stator_core": {
+   "mass_g": 1039.7,
+   "material": "steelDark"
+  },
+  "stator_winding": {
+   "mass_g": 289.7,
+   "material": "copper"
+  },
+  "rotor": {
+   "mass_g": 392.9,
+   "material": "steelDark"
+  },
+  "rotor_magnets": {
+   "mass_g": 65.3,
+   "material": "magnet"
+  },
+  "encoder_disc": {
+   "mass_g": 5.0,
+   "material": "glassDisc"
+  },
+  "handwheel": {
+   "mass_g": 125.2,
+   "material": "graphite"
+  },
+  "handwheel_ring": {
+   "mass_g": 3.1,
+   "material": "blue"
   }
  },
  "note": "质量按钢 7.85 g/cm³ 从 FreeCAD 实体算；滚针轴承 2 只约 10 g 计入曲柄销；平衡块按平衡率 k 定（cad/mech.py）。"
