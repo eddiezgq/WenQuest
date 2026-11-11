@@ -41,6 +41,7 @@ ADDRESS = env("WQ_ADDRESS", "地址")
 AI_REG = env("WQ_AI_REG", "生成式AI登记编号")
 LEARN = "#" if PREVIEW else 'https://learn.{{env "SITE_DOMAIN"}}'
 QMS = "#" if PREVIEW else 'https://qms.{{env "SITE_DOMAIN"}}'
+FACTORY = "#" if PREVIEW else 'https://factory.{{env "SITE_DOMAIN"}}'  # 第 144 轮：国内数字工厂
 
 # 第 143 轮：已开通的单位从官网直接进入各产品（学习平台里的几项要登录；凸轮、轴承在线试用；质量 ERP 演示）
 ENTRIES = [
@@ -59,11 +60,12 @@ def entries():
         ("凸轮设计与制造软件", "运动要求到廓线、误差与补偿", "/cam/", "在线试用"),
         ("轴承设计与制造软件", "每个钢球的载荷、游隙、油膜", "/bearing/", "在线试用"),
         ("问渠质量 ERP", "演示企业：体系自查、不合格、追溯", QMS + "/", "在线演示"),
+        ("数字工厂", "教学工厂和工业园各厂：车间、ERP、厂情中枢、实训", FACTORY + "/", "需登录"),
     ]
     cards = "".join(f'<a class="card" href="{u}" style="text-decoration:none"><span class="tag">{tag}</span><h3 style="margin-top:10px">{n}</h3><p>{d}</p></a>'
                     for n, d, u, tag in items)
     return (f'<div class="cards" style="--n:3">{cards}</div>'
-            '<p class="note">学习平台的账号按单位开通：单位联系人在“预约演示”里申请在线体验，再给同事开账号。数字工厂国内服务器部署后在这里加入口。</p>')
+            '<p class="note">学习平台的账号按单位开通：单位联系人在“预约演示”里申请在线体验，再给同事开账号；数字工厂用学习平台的账号登录。</p>')
 
 # ---------------------------------------------------------------- 页面框架
 
@@ -382,7 +384,7 @@ def platform():
   <article class="card"><h3>CAD + 审批 + ERP</h3><p>设计改动走审批，批准后自动更新物料版本和 BOM，采购和生产用的永远是最新批准的版本。</p></article>
   <article class="card"><h3>整套</h3><p>从设计、仿真、编程到车间执行、质量和售后，一条线；卖出的产品还能在线监测、预测维护。</p></article>
 </div><p class="note">选哪几个就集成哪几个，并可对接你已有的系统（经统一的数据总线和接口）。</p>"""
-    body = f"""{hero("旗舰产品二", "问渠数字工厂集成平台：CAD、CAM、CAE、MES、MRP、ERP 信息集成化", "一条数字主线把设计、工艺、加工、经营和车间连起来：改一次设计，下游自动跟着变，车间只拿到批准过的版本。", "企业服务 / 数字工厂集成平台", [("预约演示", "/contact/"), ("看案例", "/cases/")], video="factory")}
+    body = f"""{hero("旗舰产品二", "问渠数字工厂集成平台：CAD、CAM、CAE、MES、MRP、ERP 信息集成化", "一条数字主线把设计、工艺、加工、经营和车间连起来：改一次设计，下游自动跟着变，车间只拿到批准过的版本。", "企业服务 / 数字工厂集成平台", [("预约演示", "/contact/"), ("数字工厂登录", FACTORY + "/"), ("看案例", "/cases/")], video="factory")}
 {part("一", "设计、工艺、经营、车间，一条线", None, thread)}
 {part("二", "各模块：每个都能单独用", "下表最后一列是 AI 在这个模块里做的事；它起草的东西都要人批准。", table, "alt")}
 <div id="combine"></div>
