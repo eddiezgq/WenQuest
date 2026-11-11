@@ -405,6 +405,11 @@ operations:
   units:
   - ht-01
   stage: harden
+- name: 时效 Stress relieving
+  workstation: 热处理炉 HT-01
+  units:
+  - ht-01
+  stage: age
 - name: 磨外圆 Cylindrical grinding
   workstation: 外圆磨床 GRD-01
   units:
@@ -414,11 +419,13 @@ operations:
   workstation: 立式加工中心 VMC-01
   units:
   - vmc-01
+  - hmc-01
   stage: rough
 - name: 钻攻螺纹孔 Drilling & tapping
   workstation: 立式加工中心 VMC-01
   units:
   - vmc-01
+  - hmc-01
   stage: finish
 - name: 合箱钻铰销孔 Pin-hole reaming
   workstation: 卧式加工中心 HMC-01

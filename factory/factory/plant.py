@@ -16,7 +16,7 @@ SCHEMA_VERSION = 2
 VERSIONS = (1, 2)                       # 第 1 版清单（没有产品几节）照样能读
 KINDS = ("raw", "buy", "make", "sub", "fg")   # 原材料、外购件、自制件、部件、成品
 AREAS = ("office", "design", "machining", "quality", "warehouse", "logistics", "ai", "field")
-STAGES = ("blank", "rough", "qt", "finish", "keyway", "gear", "harden", "grind", "inspect", "assembly", "other")
+STAGES = ("blank", "rough", "qt", "finish", "keyway", "gear", "harden", "grind", "age", "inspect", "assembly", "other")
 ID_CHARS = set("abcdefghijklmnopqrstuvwxyz0123456789-")
 
 

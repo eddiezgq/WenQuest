@@ -12,7 +12,7 @@ from . import plant as P
 
 AREA_ZH = {"office": "办公", "design": "设计", "machining": "机加工", "quality": "质检", "warehouse": "仓库",
            "logistics": "物流", "ai": "AI", "field": "现场"}
-STAGE_ZH = {"blank": "下料", "rough": "粗加工", "qt": "调质", "finish": "精加工", "keyway": "键槽", "gear": "齿形",
+STAGE_ZH = {"blank": "下料", "rough": "粗加工", "qt": "调质", "finish": "精加工", "keyway": "键槽", "gear": "齿形", "age": "时效",
             "harden": "淬火", "grind": "磨削", "inspect": "检验", "assembly": "装配", "other": "其他"}
 KIND_ZH = {"raw": "原材料", "buy": "外购件", "make": "自制件", "sub": "部件", "fg": "成品"}
 WEEK = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
