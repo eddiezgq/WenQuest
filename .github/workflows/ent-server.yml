@@ -1,5 +1,6 @@
 # 第 146 轮：企业服务器（美国第二台）的准备。手动运行。
 #   pubkey：打印部署钥匙（DEPLOY_SSH_KEY）的公钥一半，开新服务器时填进“初始化脚本”，让部署能登录（公钥可以公开，私钥不出 GitHub）
+#   bootstrap：用 root 登录跑 deploy/bootstrap.sh（装 Docker、建 deploy 用户、防火墙、交换空间、每日备份定时）；开机时的初始化脚本没跑时用
 #   check：用部署钥匙登录企业服务器（deploy 用户），看初始化有没有做完、内存、磁盘、Docker
 name: Enterprise server 企业服务器
 
@@ -7,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       task:
-        description: "pubkey（打印部署公钥）/ check（检查企业服务器）"
+        description: "pubkey（打印部署公钥）/ check（检查企业服务器）/ bootstrap（初始化企业服务器）"
         type: choice
-        options: [pubkey, check]
+        options: [pubkey, check, bootstrap]
         default: check
       host:
         description: "企业服务器 IP（11-10 开的：161.35.185.35）"
@@ -48,3 +49,20 @@ jobs:
             echo "== $u@$HOST"
             ssh -o BatchMode=yes -o ConnectTimeout=20 "$u@$HOST" 'id; uptime; free -m | head -2; df -h / | tail -1; docker --version 2>&1; ls -ld /opt/wenquest 2>&1; sudo -n true 2>/dev/null && echo sudo-ok; tail -n 5 /root/bootstrap.log 2>/dev/null' || echo "($u 登不上)"
           done
+
+  bootstrap:
+    if: inputs.task == 'bootstrap'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 初始化
+        env:
+          HOST: ${{ inputs.host }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null
+          pub=$(ssh-keygen -y -f ~/.ssh/id_ed25519)
+          scp deploy/bootstrap.sh "root@$HOST:/root/bootstrap.sh"
+          ssh "root@$HOST" "bash /root/bootstrap.sh '$pub'" 2>&1 | tail -n 40
+          ssh "deploy@$HOST" 'id; docker --version; free -m | head -2'
