@@ -118,6 +118,25 @@ def test_plant_names_have_english(plant):
         assert u.get("name_en") and not CJK.search(u["name_en"]), u["id"]
 
 
+def test_supplier_categories_have_english():
+    """供应商的物料类别（清单 suppliers.*.cat_name，采购与来料页“物料”一列用 $td 显示）：英文表里都有（11-10 录 07 英文画面时发现漏翻）"""
+    import glob
+    import yaml
+    names = dict(json.load(open(os.path.join(WEB, "src", "locales", "en_names.json"), encoding="utf-8")))
+    cats = set()
+
+    def walk(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                cats.add(v) if k == "cat_name" and isinstance(v, str) else walk(v)
+        elif isinstance(o, list):
+            [walk(x) for x in o]
+    for f in glob.glob(os.path.join(os.path.dirname(DIG), "plants", "*.yaml")):
+        walk(yaml.safe_load(open(f, encoding="utf-8")))
+    missing = sorted(c for c in cats if CJK.search(c) and c not in EN and c not in names)
+    assert not missing, missing
+
+
 def test_lab_task_texts_have_english():
     """第二批：实验 7、实验 15–31 的任务题目、说明、提示、选项（模块常量），实验目录的题目、领域、学时，英文表里都有（页面用 $td 显示）"""
     import importlib

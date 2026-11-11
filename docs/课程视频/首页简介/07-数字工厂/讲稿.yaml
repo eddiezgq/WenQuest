@@ -25,6 +25,7 @@ shots:
 - id: s02
   kind: rec
   clip: 录屏/gear-3d.mp4
+  clip_en: 录屏/gear-3d.en.mp4
   part: [减速器厂, Gearbox plant]
   say:
     zh: ['减速器厂生产二级齿轮减速器。']
@@ -40,6 +41,7 @@ shots:
 - id: s04
   kind: rec
   clip: 录屏/robot-3d.mp4
+  clip_en: 录屏/robot-3d.en.mp4
   part: [机器人厂, Robot plant]
   say:
     zh: ['机器人厂造协作机器人、AGV 和轮式人形：']
@@ -47,6 +49,7 @@ shots:
 - id: s05
   kind: rec
   clip: 录屏/robot-supply.mp4
+  clip_en: 录屏/robot-supply.en.mp4
   part: [机器人厂, Robot plant]
   say:
     zh: ['减速器向减速器厂买，驱动板向电路板厂买。']
@@ -54,6 +57,7 @@ shots:
 - id: s06
   kind: rec
   clip: 录屏/robot-field.mp4
+  clip_en: 录屏/robot-field.en.mp4
   part: [机器人厂, Robot plant]
   say:
     zh: ['关节测试台量背隙，出厂后每天回传运行数据。']
@@ -61,6 +65,7 @@ shots:
 - id: s07
   kind: rec
   clip: 录屏/pcb-3d.mp4
+  clip_en: 录屏/pcb-3d.en.mp4
   part: [电路板厂, Circuit board plant]
   say:
     zh: ['电路板厂一条贴片线加后段十几台设备，做关节驱动板和 AGV 控制板；']
@@ -68,6 +73,7 @@ shots:
 - id: s08
   kind: rec
   clip: 录屏/pcb-fct.mp4
+  clip_en: 录屏/pcb-fct.en.mp4
   part: [电路板厂, Circuit board plant]
   say:
     zh: ['每块板出厂前在功能测试台上逐项测。']
@@ -75,6 +81,7 @@ shots:
 - id: s09
   kind: rec
   clip: 录屏/chip-3d.mp4
+  clip_en: 录屏/chip-3d.en.mp4
   part: [芯片封测厂, Chip plant]
   say:
     zh: ['芯片封测厂把我们自己设计的编码器接口芯片做晶圆测试、封装、成品测试；']
@@ -82,6 +89,7 @@ shots:
 - id: s10
   kind: rec
   clip: 录屏/chip-wafer.mp4
+  clip_en: 录屏/chip-wafer.en.mp4
   part: [芯片封测厂, Chip plant]
   say:
     zh: ['晶圆图上每个格子就是一颗芯片的测试结果。驱动板 B 版就用它。']
@@ -89,6 +97,7 @@ shots:
 - id: s11
   kind: rec
   clip: 录屏/quality.mp4
+  clip_en: 录屏/quality.en.mp4
   part: [质量, Quality]
   say:
     zh: ['质量问题有控制图、有 8D，从一台机器追到一个批次、一把扳手。']
@@ -96,6 +105,7 @@ shots:
 - id: s12
   kind: rec
   clip: 录屏/ont.mp4
+  clip_en: 录屏/ont.en.mp4
   part: [厂情中枢, Command center]
   say:
     zh: ['厂情中枢一张图看全厂：发现异常、追原因、推演后果，']
@@ -103,6 +113,7 @@ shots:
 - id: s13
   kind: rec
   clip: 录屏/ai-brief.mp4
+  clip_en: 录屏/ai-brief.en.mp4
   part: [厂情中枢, Command center]
   say:
     zh: ['AI 提醒，但决定由人来做。']

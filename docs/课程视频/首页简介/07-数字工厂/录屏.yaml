@@ -2,7 +2,8 @@
 # 本机起四座厂的教学版数字工厂（各自一套总线、mock_erpnext、枢纽、sim；起法见 ../README.md）：
 #   减速器厂 8160（演示工厂，实验 7 情景在跑）、机器人厂 8161、电路板厂 8162、芯片封测厂 8163。
 #   电路板厂、芯片封测厂要先接过订单（tests/plant_loop.py，Node-RED 桥接要起），功能测试台、晶圆图才有内容。
-# 数字工厂界面录的是中文界面（2026-11-09 录时英文界面第 130 轮还在做），两种语言共用。
+# 中文版用 录屏/<名字>.mp4（中文界面，11-09 录）；英文版用 录屏/<名字>.en.mp4（英文界面，11-10 用 --lang en 重录，第 130 轮英文版上线后）。
+# 按文字找的选择器按语言分开写 {zh: …, en: …}。
 clips:
   # 减速器厂：3D 车间，转个角度，AGV 在送料
   - name: gear-3d
@@ -33,11 +34,11 @@ clips:
     viewport: [1440, 810]
     wait: 5000
     setup:
-      - {click: "button:has-text('供应商')", pause: 2000}
+      - {click: {zh: "button:has-text('供应商')", en: "button:has-text('Supplier')"}, pause: 2000}
     dur: 6
     do:
-      - {at: 0.3, ring: "tr:has-text('问渠减速器厂')", for: 5.5, pad: 4}
-      - {at: 2.6, ring: "tr:has-text('问渠电路板厂')", for: 3.2, pad: 4}
+      - {at: 0.3, ring: {zh: "tr:has-text('问渠减速器厂')", en: "tr:has-text('WenQuest Gearbox')"}, for: 5.5, pad: 4}
+      - {at: 2.6, ring: {zh: "tr:has-text('问渠电路板厂')", en: "tr:has-text('WenQuest Electronics')"}, for: 3.2, pad: 4}
   # 机器人厂出厂之后：现场的机器人每天回传，最差关节的背隙
   - name: robot-field
     hub: 8161
@@ -46,7 +47,7 @@ clips:
     wait: 5000
     dur: 6
     do:
-      - {at: 0.3, ring: "th:has-text('最差的关节')", for: 2.4, pad: 6}
+      - {at: 0.3, ring: {zh: "th:has-text('最差的关节')", en: "th:has-text('Worst joint')"}, for: 2.4, pad: 6}
       - {at: 2.6, ring: ".kpis", for: 3.2}
   # 电路板厂：3D 车间（贴片线 + 后段设备）
   - name: pcb-3d
@@ -67,16 +68,16 @@ clips:
     wait: 5000
     dur: 6
     do:
-      - {at: 0.3, click: "button:has-text('2 母线电压读数')"}
-      - {at: 0.3, ring: "button:has-text('2 母线电压读数')", for: 0.9, pad: 4}
-      - {at: 1.3, click: "button:has-text('3 相电流采样')"}
-      - {at: 1.3, ring: "button:has-text('3 相电流采样')", for: 0.9, pad: 4}
-      - {at: 2.3, click: "button:has-text('4 栅极死区')"}
-      - {at: 2.3, ring: "button:has-text('4 栅极死区')", for: 0.9, pad: 4}
-      - {at: 3.3, click: "button:has-text('5 编码器接口')"}
-      - {at: 3.3, ring: "button:has-text('5 编码器接口')", for: 0.9, pad: 4}
-      - {at: 4.3, click: "button:has-text('6 老化后电流零点')"}
-      - {at: 4.3, ring: "button:has-text('6 老化后电流零点')", for: 1.4, pad: 4}
+      - {at: 0.3, click: {zh: "button:has-text('2 母线电压读数')", en: "button:has-text('2 Bus voltage reading')"}}
+      - {at: 0.3, ring: {zh: "button:has-text('2 母线电压读数')", en: "button:has-text('2 Bus voltage reading')"}, for: 0.9, pad: 4}
+      - {at: 1.3, click: {zh: "button:has-text('3 相电流采样')", en: "button:has-text('3 Phase current sensing')"}}
+      - {at: 1.3, ring: {zh: "button:has-text('3 相电流采样')", en: "button:has-text('3 Phase current sensing')"}, for: 0.9, pad: 4}
+      - {at: 2.3, click: {zh: "button:has-text('4 栅极死区')", en: "button:has-text('4 Gate dead time')"}}
+      - {at: 2.3, ring: {zh: "button:has-text('4 栅极死区')", en: "button:has-text('4 Gate dead time')"}, for: 0.9, pad: 4}
+      - {at: 3.3, click: {zh: "button:has-text('5 编码器接口')", en: "button:has-text('5 Encoder interface')"}}
+      - {at: 3.3, ring: {zh: "button:has-text('5 编码器接口')", en: "button:has-text('5 Encoder interface')"}, for: 0.9, pad: 4}
+      - {at: 4.3, click: {zh: "button:has-text('6 老化后电流零点')", en: "button:has-text('6 Current zero after burn-in')"}}
+      - {at: 4.3, ring: {zh: "button:has-text('6 老化后电流零点')", en: "button:has-text('6 Current zero after burn-in')"}, for: 1.4, pad: 4}
   # 芯片封测厂：3D 车间
   - name: chip-3d
     hub: 8163
@@ -112,7 +113,7 @@ clips:
     dur: 8
     do:
       - {at: 0.3, ring: "section.card.grow", for: 3.6}
-      - {at: 4.0, ring: "div.card-head:has-text('质量异常单（8D）')", for: 3.6, pad: 8}
+      - {at: 4.0, ring: {zh: "div.card-head:has-text('质量异常单（8D）')", en: "div.card-head:has-text('Quality problem report (8D)')"}, for: 3.6, pad: 8}
   # 厂情中枢：全厂态势 → 异常处理 → 推演工作台
   - name: ont
     hub: 8160
@@ -121,11 +122,11 @@ clips:
     wait: 6000
     dur: 7
     do:
-      - {at: 0.3, ring: "button[role=tab]:has-text('全厂态势')", for: 1.6, pad: 4}
-      - {at: 2.0, click: "button[role=tab]:has-text('异常处理')"}
-      - {at: 2.1, ring: "button[role=tab]:has-text('异常处理')", for: 1.8, pad: 4}
-      - {at: 4.1, ring: "a.tablink:has-text('推演工作台')", for: 0.9, pad: 4}
-      - {at: 4.6, click: "a.tablink:has-text('推演工作台')"}
+      - {at: 0.3, ring: {zh: "button[role=tab]:has-text('全厂态势')", en: "button[role=tab]:has-text('Plant situation')"}, for: 1.6, pad: 4}
+      - {at: 2.0, click: {zh: "button[role=tab]:has-text('异常处理')", en: "button[role=tab]:has-text('Anomalies')"}}
+      - {at: 2.1, ring: {zh: "button[role=tab]:has-text('异常处理')", en: "button[role=tab]:has-text('Anomalies')"}, for: 1.8, pad: 4}
+      - {at: 4.1, ring: {zh: "a.tablink:has-text('推演工作台')", en: "a.tablink:has-text('What-if workbench')"}, for: 0.9, pad: 4}
+      - {at: 4.6, click: {zh: "a.tablink:has-text('推演工作台')", en: "a.tablink:has-text('What-if workbench')"}}
   # AI 提醒，人来决定：首页的厂情中枢提醒条和 AI 今日简报
   - name: ai-brief
     hub: 8160

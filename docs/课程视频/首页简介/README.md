@@ -24,7 +24,7 @@
 - **看真东西的句子 → 真页面录屏**（讲稿 `kind: rec`，`clip:` 或 `clip_zh` / `clip_en`）。在 `<段>/录屏.yaml` 写每段录什么
   （页面、开录前的准备、第几秒点哪儿 / 填什么 / 滚到哪儿 / 黄圈圈哪儿、要剪掉的等待），本机起好服务后
   `WQ_PROXY=eda=8150 python3 tools/video/screenrec.py <段> [--only 名字]` 录成 `录屏/<名字>.mp4`（1920×1080、30 帧、H.264）。
-  写法见 `tools/video/screenrec.py` 开头。数字工厂界面只有中文，录一段两种语言共用；官网、问渠电子按语言各录一段（`langs: [zh, en]`）。
+  写法见 `tools/video/screenrec.py` 开头。数字工厂有中英两种界面（第 130 轮）：中文界面录 `<名字>.mp4`，英文界面 `--lang en` 另录 `<名字>.en.mp4`（讲稿写 `clip_en`），按文字找的选择器按语言分写 `{zh: …, en: …}`；官网、问渠电子按语言各录一段（`langs: [zh, en]`）。
   录法：Chrome screencast 收帧（JPEG 95），不用 Playwright 的 recordVideo（码率低、文字糊）；`viewport: [1440, 810]` 这类小视口 = 页面放大后按设备像素渲染，文字清楚。
 - 出片时 `make.py` 把录屏按这句配音的长度整体放慢或加快（0.8～1.25 倍），还不够长就停在最后一帧，太长就截掉——所以录屏长度按配音估（中文约每秒 4 字）。
 - 本机要起的服务（18 段）：PostgreSQL、MQTT 总线、电路板厂的 mock_erpnext + 枢纽（8142，`WQ_PLANT_FILE=factory/plants/wenquest-pcb.yaml`、

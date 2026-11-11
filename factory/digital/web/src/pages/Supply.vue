@@ -24,14 +24,14 @@
         <table class="tbl small"><thead><tr><th>{{ $t('请购单') }}</th><th>{{ $t('物料') }}</th><th class="num">{{ $t('数量') }}</th><th>{{ $t('需要日期') }}</th><th>{{ $t('供应商') }}</th><th></th></tr></thead>
           <tbody><tr v-for="r in rq.requests" :key="r.mr + r.item_code"><td>{{ $td(r.mr) }}</td><td>{{ $td(r.item_code) }}</td><td class="num">{{ $td(r.qty) }}</td><td>{{ $td(r.schedule_date) }}</td>
             <td><select v-model="pick[r.mr + r.item_code]" :aria-label="$t('供应商')"><option v-for="s in r.suppliers" :key="s.name" :value="s.name">
-              {{ $t('{a}（{b}，{c} 天{d}）', { a: s.name.split(' ')[0], b: s.role === 'alt' ? $t('备选') : $t('默认'), c: $td(s.lead_days), d: s.price_index > 1 ? $t('，贵 ') + Math.round((s.price_index - 1) * 100) + '%' : '' }) }}</option></select></td>
+              {{ $t('{a}（{b}，{c} 天{d}）', { a: sname(s.name), b: s.role === 'alt' ? $t('备选') : $t('默认'), c: $td(s.lead_days), d: s.price_index > 1 ? $t('，贵 ') + Math.round((s.price_index - 1) * 100) + '%' : '' }) }}</option></select></td>
             <td><button class="linkbtn" @click="toPo(r)">{{ $t('转采购单') }}</button></td></tr></tbody></table>
         <p class="small muted">{{ $t('转采购单生成“采购单”动作，厂长批准后进 ERPNext。教学模拟器打开时，请购单 3 分钟没人转，采购员（模拟器）按默认供应商下单。') }}</p>
       </div>
       <div v-if="lt" class="card">
         <table class="tbl small"><thead><tr><th>{{ $t('批号') }}</th><th>{{ $t('采购单') }}</th><th>{{ $t('物料') }}</th><th class="num">{{ $t('数量') }}</th><th>{{ $t('供应商') }}</th><th>{{ $t('承诺到货') }}</th><th>{{ $t('状态') }}</th><th></th></tr></thead>
           <tbody><tr v-for="x in lt.lots" :key="x.id"><td>{{ x.lot || '#' + x.id }}</td><td>{{ x.po || '—' }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ $td(x.qty) }}</td>
-            <td>{{ x.supplier.split(' ')[0] }}</td><td>{{ x.promised || '—' }}<span v-if="x.late_days > 0 && x.arrived_at" class="bad"> {{ $t('晚 {a} 天', { a: $td(x.late_days) }) }}</span></td>
+            <td>{{ sname(x.supplier) }}</td><td>{{ x.promised || '—' }}<span v-if="x.late_days > 0 && x.arrived_at" class="bad"> {{ $t('晚 {a} 天', { a: $td(x.late_days) }) }}</span></td>
             <td :class="TONE[x.status]">{{ $td(x.status_label) }}{{ x.concession ? $t('（让步接收）') : '' }}
               <span v-if="x.park" class="small muted">{{ parkText(x.park) }}</span></td>
             <td><button v-if="lt.can_receive && x.status === 'transit' && !kp?.enabled" class="linkbtn" @click="arrive(x)">{{ $t('登记到货') }}</button></td></tr></tbody></table>
@@ -43,7 +43,7 @@
       <div class="card" data-help="sup-inspect">
         <table class="tbl small"><thead><tr><th>{{ $t('批号') }}</th><th>{{ $t('物料') }}</th><th class="num">{{ $t('数量') }}</th><th>{{ $t('供应商') }}</th><th>{{ $t('到货') }}</th><th>{{ $t('状态') }}</th><th></th></tr></thead>
           <tbody><tr v-for="x in lt.lots.filter((y) => ['arrived', 'rejected', 'accepted'].includes(y.status)).slice(0, 40)" :key="x.id" :class="{ sel: sm && sm.id === x.id }">
-            <td>{{ $td(x.lot) }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ $td(x.qty) }}</td><td>{{ x.supplier.split(' ')[0] }}</td><td>{{ (x.arrived_at || '').slice(5, 16).replace('T', ' ') }}</td>
+            <td>{{ $td(x.lot) }}</td><td>{{ $td(x.item) }}</td><td class="num">{{ $td(x.qty) }}</td><td>{{ sname(x.supplier) }}</td><td>{{ (x.arrived_at || '').slice(5, 16).replace('T', ' ') }}</td>
             <td :class="TONE[x.status]">{{ $td(x.status_label) }}</td><td><button class="linkbtn" @click="openSample(x)">{{ x.status === 'arrived' ? $t('检验') : $t('看检验') }}</button></td></tr></tbody></table>
       </div>
       <div v-if="sm" class="card">
@@ -83,7 +83,7 @@
         </template>
         <p class="small muted">{{ $t('车间每开工一件，按先进先出记下用了哪个批次的料。也可以在下面的表里点批号。') }}</p>
         <table v-if="lt" class="tbl small"><tbody><tr v-for="x in lt.lots.filter((y) => y.lot && ['accepted', 'suspect'].includes(y.status)).slice(0, 30)" :key="x.id">
-          <td><button class="linkbtn" @click="q = x.lot; doTrace()">{{ $td(x.lot) }}</button></td><td>{{ $td(x.item) }}</td><td>{{ x.supplier.split(' ')[0] }}</td>
+          <td><button class="linkbtn" @click="q = x.lot; doTrace()">{{ $td(x.lot) }}</button></td><td>{{ $td(x.item) }}</td><td>{{ sname(x.supplier) }}</td>
           <td class="num">{{ $t('剩 {a} / {b}', { a: $td(x.qty_left), b: x.qty_ok ?? x.qty }) }}</td><td :class="TONE[x.status]">{{ $td(x.status_label) }}</td></tr></tbody></table>
       </div>
     </template>
@@ -99,14 +99,16 @@
             <td class="num">{{ pct(s.pass_rate) }} <span class="muted">{{ $t('（{a}）', { a: pct(s.hist_pass) }) }}</span></td><td class="num">{{ $td(s.in_transit) }}</td></tr></tbody></table>
         <p class="small muted">{{ $t('准时率、合格率：近 30 天到货、检验的批次（让步接收不算合格）；括号里是过去一年的历史。每件总拥有成本 = 单价 × 价格指数 + (1 − 合格率) × $4 + (1 − 准时率) × $3。') }}</p>
         <h3>{{ $t('单一来源') }}</h3>
-        <ul class="small"><li v-for="x in sp.single_source" :key="x.cat">{{ $t('{a}：只有 {b}{c}', { a: $td(x.cat_name), b: (x.supplier || '—').split(' ')[0], c: x.has_alt ? $t('（有可开发的备选）') : $t('（还没有备选）') }) }}</li></ul>
+        <ul class="small"><li v-for="x in sp.single_source" :key="x.cat">{{ $t('{a}：只有 {b}{c}', { a: $td(x.cat_name), b: sname(x.supplier), c: x.has_alt ? $t('（有可开发的备选）') : $t('（还没有备选）') }) }}</li></ul>
       </div>
     </template>
   </div>
 </template>
 
 <script setup>
-import { t as $t } from '../lib/i18n';
+import { bi, isEn, t as $t } from '../lib/i18n';
+// 供应商名是中英合写（“示例·谐波减速器代理商 Strain-wave Gear Distributor (Demo)”）：中文界面取中文部分，英文界面取英文部分
+const sname = (s) => (!s ? '—' : isEn() ? bi(s) : String(s).split(' ')[0]);
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { get, post, session } from '../lib/api';

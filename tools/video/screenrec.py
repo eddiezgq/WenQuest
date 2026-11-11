@@ -10,7 +10,7 @@
 录屏.yaml：
   clips:
     - name: circuit
-      hub: 8141            # 数字工厂（本机教学版，端口）：先用 /api/login 拿令牌（教学模式、厂长）；界面只有中文，录一段两种语言共用
+      hub: 8141            # 数字工厂（本机教学版，端口）：先用 /api/login 拿令牌（教学模式、厂长）；界面语言按录的语言固定（wq-factory-lang），--lang en 另录英文界面
       url: /circuit
       # site: true         # 或者：官网 site/ 当网站打开（WQ_PROXY="eda=8150" 把 /eda/ 转给本机服务），按语言各录一段
       viewport: [1440, 810]  # 可选：页面按这个大小排版，放大到 1920×1080 录（文字更大、照样是矢量渲染）；不写 = 1920×1080 原大
@@ -24,6 +24,7 @@
         - {at: 4, scroll: 600, dur: 1.5}             # 平滑滚到这个位置（像素，或 CSS 选择器、offset）
         - {at: 5, drag: [[900, 500], [1300, 520]], dur: 3}   # 按住拖动（三维视图转动）
         - {at: 6, js: "…"}                           # 页面里执行一段程序
+        # ring / click / type / select / scroll 可以按语言分开写：{ring: {zh: "button:has-text('供应商')", en: "button:has-text('Suppliers')"}}
       langs: [zh, en]      # 官网、问渠电子这类有中英两版的页面
       cut: [[1.5, 4.6]]    # 可选：剪掉开录后这几段（秒），比如等服务器算结果的几秒；片子相应变短
 """
@@ -85,7 +86,8 @@ def hub_token(port: int, role="manager"):
     return {"token": s["token"], "user": s.get("user") or s}
 
 
-def act(page, a: dict):
+def act(page, a: dict, lang: str = "zh"):
+    a = {k: (v.get(lang, v.get("zh")) if isinstance(v, dict) and k in ("ring", "click", "type", "select", "scroll") else v) for k, v in a.items()}
     if "ring" in a:
         t = a["ring"]
         if isinstance(t, str):                       # Playwright 选择器（可以用 :has-text）→ 画面里的位置
@@ -152,7 +154,7 @@ def record(b, c: dict, lang: str, site_port: int, out: Path):
     page.wait_for_timeout(int(c.get("wait", 4000)))
     page.add_script_tag(content=OVERLAY)
     for a in c.get("setup") or []:
-        act(page, a)
+        act(page, a, lang)
         page.wait_for_timeout(int(a.get("pause", 600)))
     page.wait_for_timeout(int(c.get("settle", 800)))
 
@@ -175,7 +177,7 @@ def record(b, c: dict, lang: str, site_port: int, out: Path):
         wait = float(a["at"]) - (time.time() - t0)
         if wait > 0:
             page.wait_for_timeout(wait * 1000)
-        act(page, a)
+        act(page, a, lang)
     rest = dur - (time.time() - t0)
     if rest > 0:
         page.wait_for_timeout(rest * 1000)
@@ -225,6 +227,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("dir")
     ap.add_argument("--only", default="")
+    ap.add_argument("--lang", default="", help="只录这种语言；数字工厂这类一段共用的，写成 <name>.<lang>.mp4（第 130 轮后数字工厂有英文界面）")
     a = ap.parse_args()
     lec = Path(a.dir).resolve()
     spec = yaml.safe_load((lec / "录屏.yaml").read_text(encoding="utf-8"))
@@ -238,8 +241,10 @@ def main():
             if only and c["name"] not in only:
                 continue
             langs = c.get("langs") or ["zh"]
+            if a.lang:
+                langs = [a.lang]
             for lang in langs:
-                name = f"{c['name']}.{lang}.mp4" if len(langs) > 1 else f"{c['name']}.mp4"
+                name = f"{c['name']}.{lang}.mp4" if len(langs) > 1 or a.lang else f"{c['name']}.mp4"
                 record(b, c, lang, site_port, lec / "录屏" / name)
         b.close()
 
