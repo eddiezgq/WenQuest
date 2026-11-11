@@ -48,7 +48,24 @@
         <template v-if="v.live && !v.used">
           <text class="wq-link" @click="copy(v.link)">{{ zh ? "复制邀请链接" : "Copy the link" }}</text>
           <text class="wq-link" @click="giveCode(v.token)">{{ zh ? "给验证码" : "Get a code for them" }}</text>
+          <text class="wq-link" @click="startApprove(v)">{{ zh ? "直接开通" : "Set it up now" }}</text>
         </template>
+      </view>
+      <!-- 第 151 轮补充：管理员替对方填好，直接开通，不用验证码；账号照样发到受邀邮箱 -->
+      <view v-if="ap" class="approve">
+        <text class="wq-muted block">{{ zh ? "直接开通" : "Set up" }} {{ ap.email }}{{ zh
+          ? "：不用对方填验证码。装好后（约 15 分钟）账号和初始密码发到这个邮箱。"
+          : " without a code. When it is ready (about 15 minutes) the sign-in is emailed to this address." }}</text>
+        <view class="grid">
+          <input v-model="ap.company" class="wq-input" :placeholder="zh ? '单位全称 *' : 'Company name *'" maxlength="100" />
+          <input v-model="ap.id" class="wq-input" :placeholder="zh ? '简称（网址里用，如 acme）*' : 'Short name for the address (e.g. acme) *'" maxlength="20" />
+          <input v-model="ap.contact" class="wq-input" :placeholder="zh ? '联系人姓名 *' : 'Contact name *'" maxlength="40" />
+        </view>
+        <text class="wq-muted block">{{ zh ? "网址：" : "Address: " }}https://{{ (ap.id || "…").toLowerCase() }}.qms.{{ domain }}</text>
+        <view class="wq-row">
+          <view class="wq-btn primary" :class="{ disabled: busy || !ap.company.trim() || !ap.id.trim() || !ap.contact.trim() }" @click="approve">{{ zh ? "开通" : "Set it up" }}</view>
+          <text class="wq-link" @click="ap = null">{{ zh ? "取消" : "Cancel" }}</text>
+        </view>
       </view>
       <text v-if="given" class="wq-muted block">{{ zh ? "给" : "Code for" }} {{ given.email }}{{ zh ? " 的验证码：" : ": " }}<text class="strong code">{{ given.code }}</text>
         · <text class="wq-link" @click="copy(given.code)">{{ zh ? "复制" : "Copy" }}</text>
@@ -77,6 +94,13 @@ const busy = ref(false);
 const sent = ref<{ email: string; link: string } | null>(null);
 const f = reactive({ email: "", company: "" });
 const given = ref<{ email: string; code: string } | null>(null);
+const ap = ref<{ token: string; email: string; company: string; id: string; contact: string } | null>(null);
+const domain = computed(() => {
+  // #ifdef H5
+  return window.location.hostname.split(".").slice(-2).join(".");
+  // #endif
+  return "";
+});
 let timer: ReturnType<typeof setTimeout> | undefined;
 
 function fail(e: unknown) {
@@ -102,6 +126,21 @@ async function giveCode(token: string) {
   try { given.value = await request<{ email: string; code: string }>("POST", `/api/v1/admin/pilots/invites/${token}/code`); }
   catch (e) { fail(e); }
 }
+function startApprove(v: { token: string; email: string; company: string }) {
+  given.value = null; err.value = "";
+  ap.value = { token: v.token, email: v.email, company: v.company || "", id: "", contact: "" };
+}
+async function approve() {
+  const a = ap.value;
+  if (!a || busy.value || !a.company.trim() || !a.id.trim() || !a.contact.trim()) return;
+  busy.value = true; err.value = "";
+  try {
+    await request("POST", `/api/v1/admin/pilots/invites/${a.token}/approve`,
+      { company: a.company.trim(), id: a.id.trim().toLowerCase(), contact: a.contact.trim() });
+    ap.value = null;
+    await load();
+  } catch (e) { fail(e); } finally { busy.value = false; }
+}
 async function act(id: string, what: "stop" | "start") {
   try { await request("POST", `/api/v1/admin/pilots/${id}/${what}`); await load(); } catch (e) { fail(e); }
 }
@@ -122,4 +161,5 @@ onUnmounted(() => clearTimeout(timer));
 .block { display: block; }
 .strong { font-weight: 600; }
 .code { font-size: 18px; letter-spacing: 2px; }
+.approve { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--wq-line, #e3e6ea); }
 </style>

@@ -52,10 +52,13 @@ class InviteIn(BaseModel):
     lang: str = Field(default="", max_length=5)
 
 
-class ApplyIn(BaseModel):
+class ApproveIn(BaseModel):
     company: str = Field(min_length=2, max_length=100)
     id: str = Field(min_length=3, max_length=20)
     contact: str = Field(min_length=1, max_length=40)
+
+
+class ApplyIn(ApproveIn):
     code: str = Field(min_length=6, max_length=6)
 
 
@@ -192,6 +195,20 @@ def register(app, m) -> None:
         log.info("pilot code handed out by an administrator for %s", mask(r["email"]))
         return {"code": code, "expires": now + ADMIN_CODE_HOURS * 3600, "email": r["email"]}
 
+    @app.post("/api/v1/admin/pilots/invites/{token}/approve")
+    async def admin_approve(token: str, body: ApproveIn, sess: Annotated[Session, Depends(m.current)]):
+        """第 151 轮补充（Eddie 11-11“我可以直接批 erp 邀请”）：管理员替对方填单位、简称、联系人，直接排队开通，
+        不用验证码；装好后账号照样发到受邀邮箱。"""
+        await m.accounts_require_admin(sess)
+        tid = body.id.strip().lower()
+        with db() as c:
+            r = get_invite(c, token)
+            if r["used"]:
+                raise EngineError("invite_used", "这个邀请已经用过了" if cn() else "This invitation was used already", 409)
+            open_tenant(c, r, token, tid, body.company, body.contact, not cn())
+        log.info("pilot %s approved by an administrator for %s", tid, mask(r["email"]))
+        return {"ok": True, "id": tid, "status": "queued", "minutes": 15}
+
     @app.post("/api/v1/admin/pilots/{tid}/{action}")
     async def stop_start(tid: str, action: str, sess: Annotated[Session, Depends(m.current)]):
         await m.accounts_require_admin(sess)
@@ -243,6 +260,27 @@ def register(app, m) -> None:
                               "We could not send the code email. Please ask the person who invited you for the code.", 502)
         return {"ok": True, "email": mask(r["email"])}
 
+    def open_tenant(c, r, token: str, tid: str, company: str, contact: str, en: bool) -> None:
+        """排队开通一家（对方凭验证码注册，或管理员直接开通，第 151 轮补充）。"""
+        if not ID_RE.match(tid) or tid.endswith("-") or tid in RESERVED:
+            raise EngineError("bad_id", "The short name: 3-20 lower-case letters, digits or -, starting with a letter" if en else
+                                  "简称（网址里用）：3–20 位小写字母、数字或 -，以字母开头", 400)
+        if c.execute("select 1 from tenant where id=?", (tid,)).fetchone():
+            raise EngineError("id_taken", "This short name is taken; choose another" if en else "这个简称已被使用，请换一个", 409)
+        if taken(c) >= most():
+            raise EngineError("pilot_full", "All pilot places are taken; we will contact you" if en else
+                                  "试点名额已满，我们会尽快联系您", 409)
+        h = host()
+        if not h["fresh"] or (h.get("mem_free_mb") or 0) < MIN_FREE_MB:
+            raise EngineError("server_busy", "We cannot set it up right now; we have been told and will contact you" if en else
+                                  "服务器暂时不能开通，已通知管理员，我们会尽快联系您", 503)
+        now = int(time.time())
+        c.execute("insert into tenant(id,company,contact,email,lang,status,token,created) values(?,?,?,?,?,'queued',?,?)",
+                  (tid, company.strip(), contact.strip(), r["email"], "zh" if zh(r["lang"]) else "en", token, now))
+        c.execute("update invite set used=1, code=null where token=?", (token,))
+        write(f"req-{tid}.json", {"id": tid, "name": company.strip(), "contact": contact.strip(),
+                                  "email": r["email"], "lang": "zh" if zh(r["lang"]) else "en", "ts": now})
+
     @app.post("/api/v1/public/pilot/{token}/apply")
     async def apply(token: str, body: ApplyIn):
         tid = body.id.strip().lower()
@@ -256,24 +294,7 @@ def register(app, m) -> None:
             if not r["code"] or r["code_exp"] < time.time() or not secrets.compare_digest(r["code"], body.code.strip()):
                 c.execute("update invite set tries=tries+1 where token=?", (token,))
                 raise EngineError("bad_code", "Wrong or expired code" if en else "验证码不对或已过期", 400)
-            if not ID_RE.match(tid) or tid.endswith("-") or tid in RESERVED:
-                raise EngineError("bad_id", "The short name: 3-20 lower-case letters, digits or -, starting with a letter" if en else
-                                  "简称（网址里用）：3–20 位小写字母、数字或 -，以字母开头", 400)
-            if c.execute("select 1 from tenant where id=?", (tid,)).fetchone():
-                raise EngineError("id_taken", "This short name is taken; choose another" if en else "这个简称已被使用，请换一个", 409)
-            if taken(c) >= most():
-                raise EngineError("pilot_full", "All pilot places are taken; we will contact you" if en else
-                                  "试点名额已满，我们会尽快联系您", 409)
-            h = host()
-            if not h["fresh"] or (h.get("mem_free_mb") or 0) < MIN_FREE_MB:
-                raise EngineError("server_busy", "We cannot set it up right now; we have been told and will contact you" if en else
-                                  "服务器暂时不能开通，已通知管理员，我们会尽快联系您", 503)
-            now = int(time.time())
-            c.execute("insert into tenant(id,company,contact,email,lang,status,token,created) values(?,?,?,?,?,'queued',?,?)",
-                      (tid, body.company.strip(), body.contact.strip(), r["email"], "zh" if zh(r["lang"]) else "en", token, now))
-            c.execute("update invite set used=1, code=null where token=?", (token,))
-            write(f"req-{tid}.json", {"id": tid, "name": body.company.strip(), "contact": body.contact.strip(),
-                                      "email": r["email"], "lang": "zh" if zh(r["lang"]) else "en", "ts": now})
+            open_tenant(c, r, token, tid, body.company, body.contact, en)
         return {"ok": True, "id": tid, "status": "queued", "minutes": 15}
 
     @app.get("/api/v1/public/pilot/{token}/status")

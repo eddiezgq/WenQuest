@@ -186,3 +186,19 @@ def test_bridge_to_the_enterprise_server(pc, monkeypatch):
     assert pc.get(f"/api/v1/public/pilot/{token}/status").json()["status"] == "active"
     doms = pc.get("/api/v1/pilot-bridge/tenants", headers=H).json()["domains"]
     assert "acme.qms.wenquestech.online" in doms and "acme.qms-erp.wenquestech.online" in doms and "sewing.qms.wenquestech.online" in doms
+
+
+def test_admin_approves_directly(pc):
+    """第 151 轮补充：管理员替对方填好，直接开通，不用验证码；账号照样发到受邀邮箱。"""
+    heartbeat(pc.queue)
+    token = invite(pc, "gabe@acme.com")
+    url = f"/api/v1/admin/pilots/invites/{token}/approve"
+    body = {"company": "Acme Inc", "id": "acme", "contact": "Gabe"}
+    assert pc.post(url, json=body).status_code in (401, 403)
+    assert pc.post(url, json=body, headers=login(pc, "t@school.org")).status_code == 403
+    assert pc.post(url, json=body | {"id": "qms"}, headers=admin(pc)).json()["error"] == "bad_id"
+    assert pc.post(url, json=body, headers=admin(pc)).json()["status"] == "queued"
+    req = json.loads((pc.queue / "req-acme.json").read_text())
+    assert req["email"] == "gabe@acme.com" and req["contact"] == "Gabe"
+    assert pc.post(url, json=body, headers=admin(pc)).status_code == 409                 # once
+    assert pc.get(f"/api/v1/public/pilot/{token}/status").json()["status"] == "queued"
