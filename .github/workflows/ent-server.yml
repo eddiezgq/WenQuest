@@ -54,7 +54,7 @@ jobs:
           ssh-keyscan -t ed25519 "$HOST" > ~/.ssh/known_hosts 2>/dev/null
           for u in deploy root; do
             echo "== $u@$HOST"
-            ssh -o BatchMode=yes -o ConnectTimeout=20 "$u@$HOST" 'id; uptime; free -m | head -2; df -h / | tail -1; docker --version 2>&1; ls -ld /opt/wenquest 2>&1; sudo -n true 2>/dev/null && echo sudo-ok; tail -n 5 /root/bootstrap.log 2>/dev/null' || echo "($u 登不上)"
+            ssh -o BatchMode=yes -o ConnectTimeout=20 "$u@$HOST" 'id; uptime; free -m | head -2; df -h / | tail -1; docker --version 2>&1; ls -ld /opt/wenquest 2>&1; sudo -n true 2>/dev/null && echo sudo-ok; tail -n 5 /root/bootstrap.log 2>/dev/null; echo "qms:"; docker ps --format "{{.Names}} {{.Status}}" 2>/dev/null | grep -E "^qms|^edge" | sed "s/^/  /"; ls /opt/wenquest/qms-tenants 2>/dev/null; ls -la /opt/wenquest/qms/.demo-loaded 2>/dev/null; tail -n 3 /opt/wenquest/qms/demo.log 2>/dev/null' || echo "($u 登不上)"
           done
 
   bootstrap:
