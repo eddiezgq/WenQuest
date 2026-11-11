@@ -1,0 +1,266 @@
+{
+ "fs_feed": 0.3,
+ "part": "lower",
+ "variant": 2,
+ "dx_mm": 2.5,
+ "grid": [
+  259,
+  131,
+  133
+ ],
+ "origin_mm": [
+  -147.5,
+  -142.5,
+  -122.5
+ ],
+ "t_pour_c": 1380.0,
+ "mass_casting_kg": 11.24,
+ "mass_poured_kg": 15.35,
+ "yield_pct": 73.2,
+ "gating": {
+  "G_pour_kg": 14.1,
+  "tau_s": 6.4,
+  "Hp_cm": 15.0,
+  "mu": 0.42,
+  "S": 1.7,
+  "A_ingate_cm2": 4.38,
+  "A_runner_cm2": 5.26,
+  "A_sprue_cm2": 6.13,
+  "n_ingates": 4,
+  "A_each_ingate_cm2": 1.1,
+  "sprue_d_mm": 27.9,
+  "pour_rate_kg_s": 2.21
+ },
+ "layout": {
+  "up": [
+   0,
+   0,
+   1
+  ],
+  "gate": 6,
+  "risers": 4,
+  "chills": 3,
+  "H0": 15.0,
+  "P": 0.0,
+  "C": 7.0
+ },
+ "chvorinov_B_s_cm2": 322.0,
+ "t_solid_total_s": 202.0,
+ "modulus_max_cm": 0.79,
+ "steps": 2134,
+ "dt_s": 0.0975,
+ "seconds": 110,
+ "pockets": [
+  {
+   "volume_cm3": 6.22,
+   "center_mm": [
+    408.8,
+    -3.8,
+    -51.2
+   ],
+   "box_mm": [
+    [
+     407.5,
+     412.5
+    ],
+    [
+     -40.0,
+     95.0
+    ],
+    [
+     -55.0,
+     -42.5
+    ]
+   ],
+   "t_isolated_s": 8.1,
+   "t_end_s": 10.0,
+   "in_casting": true,
+   "modulus_cm": 0.25
+  },
+  {
+   "volume_cm3": 2.84,
+   "center_mm": [
+    18.8,
+    113.8,
+    -33.8
+   ],
+   "box_mm": [
+    [
+     5.0,
+     35.0
+    ],
+    [
+     110.0,
+     115.0
+    ],
+    [
+     -47.5,
+     -20.0
+    ]
+   ],
+   "t_isolated_s": 14.0,
+   "t_end_s": 16.1,
+   "in_casting": true,
+   "modulus_cm": 0.28
+  },
+  {
+   "volume_cm3": 0.12,
+   "center_mm": [
+    18.8,
+    108.8,
+    -58.8
+   ],
+   "box_mm": [
+    [
+     10.0,
+     30.0
+    ],
+    [
+     107.5,
+     110.0
+    ],
+    [
+     -60.0,
+     -57.5
+    ]
+   ],
+   "t_isolated_s": 18.0,
+   "t_end_s": 20.1,
+   "in_casting": true,
+   "modulus_cm": 0.33
+  },
+  {
+   "volume_cm3": 0.08,
+   "center_mm": [
+    306.2,
+    6.2,
+    -6.2
+   ],
+   "box_mm": [
+    [
+     305.0,
+     310.0
+    ],
+    [
+     0.0,
+     10.0
+    ],
+    [
+     -7.5,
+     -5.0
+    ]
+   ],
+   "t_isolated_s": 54.0,
+   "t_end_s": 56.1,
+   "in_casting": true,
+   "modulus_cm": 0.55
+  },
+  {
+   "volume_cm3": 0.03,
+   "center_mm": [
+    303.8,
+    -53.8,
+    -56.2
+   ],
+   "box_mm": [
+    [
+     302.5,
+     305.0
+    ],
+    [
+     -55.0,
+     -52.5
+    ],
+    [
+     -57.5,
+     -52.5
+    ]
+   ],
+   "t_isolated_s": 28.1,
+   "t_end_s": 30.0,
+   "in_casting": true,
+   "modulus_cm": 0.41
+  },
+  {
+   "volume_cm3": 0.03,
+   "center_mm": [
+    376.2,
+    -38.8,
+    -1.2
+   ],
+   "box_mm": [
+    [
+     375.0,
+     377.5
+    ],
+    [
+     -42.5,
+     -37.5
+    ],
+    [
+     -2.5,
+     0.0
+    ]
+   ],
+   "t_isolated_s": 110.1,
+   "t_end_s": 112.0,
+   "in_casting": true,
+   "modulus_cm": 0.69
+  }
+ ],
+ "pockets_over_limit": [
+  {
+   "volume_cm3": 6.22,
+   "center_mm": [
+    408.8,
+    -3.8,
+    -51.2
+   ],
+   "box_mm": [
+    [
+     407.5,
+     412.5
+    ],
+    [
+     -40.0,
+     95.0
+    ],
+    [
+     -55.0,
+     -42.5
+    ]
+   ],
+   "t_isolated_s": 8.1,
+   "t_end_s": 10.0,
+   "in_casting": true,
+   "modulus_cm": 0.25
+  },
+  {
+   "volume_cm3": 2.84,
+   "center_mm": [
+    18.8,
+    113.8,
+    -33.8
+   ],
+   "box_mm": [
+    [
+     5.0,
+     35.0
+    ],
+    [
+     110.0,
+     115.0
+    ],
+    [
+     -47.5,
+     -20.0
+    ]
+   ],
+   "t_isolated_s": 14.0,
+   "t_end_s": 16.1,
+   "in_casting": true,
+   "modulus_cm": 0.28
+  }
+ ],
+ "pocket_limit_cm3": 2.0
+}

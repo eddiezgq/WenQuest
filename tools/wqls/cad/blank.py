@@ -6,7 +6,7 @@
   ① 不铸出的孔：半径 ≤ 10 mm 的孔（螺孔、销孔、针杆孔 Ø12、锪孔、过线小孔）铸成实心，全部由机加工钻出；
   ② 加工面加余量：平面朝铸型下面和侧面的加 3 mm，朝上（浇注位置的上表面，夹渣、气孔多）的加 4 mm；
   ③ 铸出的加工孔（轴承孔 Ø35、Ø32 等）单边留 2.5 mm；电机止口外圆 Ø52 单边加 2.5 mm。
-浇注位置：上件分型面 y = 0，后面（+y）朝上；下件机座顶面朝下，−z 朝上。
+浇注位置：上件分型面 y = 0，后面（+y）朝上；下件分型面在机座顶面，整件在下型、开口朝下（内腔由下型自带砂芯形成，不用芯子），+z 朝上。
 输出：blank_<part>.step / .stl，blank_<part>.json（余量清单、填实的孔、毛坯重量）。
 """
 import json
@@ -21,7 +21,7 @@ PART = os.environ.get("WQ_PART", "upper")
 SRC = os.environ["WQ_SRC"]
 OUT = os.environ.get("WQ_OUT", SRC)
 os.makedirs(OUT, exist_ok=True)
-UP = {"upper": V(0, 1, 0), "lower": V(0, 0, -1)}[PART]       # 浇注位置的“上”
+UP = {"upper": V(0, 1, 0), "lower": V(0, 0, 1)}[PART]        # 浇注位置的“上”
 A_SIDE, A_TOP, A_BORE, R_SOLID = 3.0, 4.0, 2.5, 10.0
 RHO = 7.2e-6                                                   # HT250 kg/mm³
 
@@ -62,7 +62,8 @@ for f in part.Faces:
     name = type(f.Surface).__name__
     if name == "Cylinder":
         p0, ax, r, L, hole = cyl_extent(f)
-        if L < 0.05:
+        u0_, u1_, _, _ = f.ParameterRange
+        if L < 0.05 or (u1_ - u0_) < 3.0:                # 只认完整的孔和外圆（OCC 把圆柱面分成两半，各 180°）；内外圆角面（90°）不算
             continue
         if hole and r <= R_SOLID + 1e-6:
             adds.append(Part.makeCylinder(r + 0.02, L + 0.2, p0 - ax * 0.1, ax))

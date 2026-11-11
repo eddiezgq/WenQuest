@@ -46,8 +46,9 @@ OP_UNITS = {
     "铣键槽 Keyway milling": ["key-01"],
     "滚齿 Gear hobbing": ["hob-01"],
     "磨外圆 Cylindrical grinding": ["grd-01"],
-    "铣结合面 Face milling": ["vmc-01"],
-    "钻攻螺纹孔 Drilling & tapping": ["vmc-01"],
+    "铣结合面 Face milling": ["vmc-01", "hmc-01"],          # 第 138 轮：卧加也能铣面、钻攻（机壳一次装夹），默认设备不变
+    "钻攻螺纹孔 Drilling & tapping": ["vmc-01", "hmc-01"],
+    "时效 Stress relieving": ["ht-01"],                       # 第 138 轮：铸件去应力退火
     "合箱钻铰销孔 Pin-hole reaming": ["hmc-01"],
     "镗轴承孔 Bearing-bore boring": ["hmc-01"],
     "零件检验 Part inspection": ["qc-01"],

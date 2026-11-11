@@ -1,0 +1,60 @@
+{
+ "filled_holes": 14,
+ "pads": [
+  {
+   "area_cm2": 4.6,
+   "normal": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "allowance": 4.0
+  },
+  {
+   "area_cm2": 8.5,
+   "normal": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "allowance": 4.0
+  },
+  {
+   "area_cm2": 225.7,
+   "normal": [
+    -0.0,
+    -0.0,
+    -1.0
+   ],
+   "allowance": 3.0
+  },
+  {
+   "area_cm2": 787.9,
+   "normal": [
+    0.0,
+    0.0,
+    1.0
+   ],
+   "allowance": 4.0
+  }
+ ],
+ "bores": [],
+ "part": "lower",
+ "valid": true,
+ "mass_part_kg": 8.38,
+ "mass_blank_kg": 11.28,
+ "allowance": {
+  "side": 3.0,
+  "top": 4.0,
+  "bore_radial": 2.5,
+  "solid_holes_r_max": 10.0
+ },
+ "bbox": [
+  -106.3,
+  -63.3,
+  -65.0,
+  413.3,
+  130.0,
+  4.0
+ ]
+}

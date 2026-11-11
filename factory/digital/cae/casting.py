@@ -176,35 +176,36 @@ def solidify(mold: Mold, t_end=None, fs_crit=0.7, snap_every=5.0, dt=None, progr
             t_sol[newly] = t
             newc = met & np.isnan(t_crit) & (fs >= fs_crit)
             t_crit[newc] = t
-            # 孤立液相：还没到 fs_crit 的金属格按 6 连通分组，不碰冒口的就是孤立区
+            # 孤立液相：还没到 fs_crit 的金属格按 6 连通分组，不碰冒口（浇注系统）的就是孤立区。
+            # 每个孤立区记一个“代表格”（区内固相分数最低、最后凝固的那一格），下一次用代表格认出还是不是同一个区
             liq = met & (fs < fs_crit)
             lab, n = ndimage.label(liq)
+            labf = lab.ravel()
+            fed = set(np.unique(lab[feeder & liq]).tolist()) if n else set()
+            seen = set()
+            for key in list(open_p):                       # 已有的孤立区：代表格还在液相里就更新，否则收尾
+                p = open_p[key]
+                li = int(labf[p["rep"]])
+                if li == 0 or li in seen:
+                    p["t_end"] = t
+                    pockets.append(open_p.pop(key))
+                    continue
+                seen.add(li)
+                p["cells_now"] = int((labf == li).sum())
             if n:
-                fed = np.unique(lab[feeder & liq])
-                sizes = ndimage.sum(np.ones_like(lab), lab, index=np.arange(1, n + 1))
-                for i in range(1, n + 1):
-                    if i in fed or sizes[i - 1] < 1:
+                objs = ndimage.find_objects(lab)
+                for li in range(1, n + 1):
+                    if li in fed or li in seen or objs[li - 1] is None:
                         continue
-                    sl = ndimage.find_objects((lab == i).astype(np.int8))[0]
-                    key = tuple((s.start, s.stop) for s in sl)
-                    # 用包围盒中心认同一个区（区会缩小，取第一次出现时的记录）
-                    cen = tuple(int((s.start + s.stop) / 2) for s in sl)
-                    hit = None
-                    for kk, p in open_p.items():
-                        if all(a <= cc < b for cc, (a, b) in zip(cen, p["box"])):
-                            hit = kk
-                            break
-                    if hit is None:
-                        open_p[key] = dict(box=key, t_iso=t, cells=int(sizes[i - 1]), center=cen)
-                    else:
-                        open_p[hit]["cells_now"] = int(sizes[i - 1])
-                # 已经凝固完的孤立区收尾
-                for kk in list(open_p):
-                    p = open_p[kk]
-                    sl = tuple(slice(a, b) for a, b in p["box"])
-                    if not (liq[sl]).any():
-                        p["t_end"] = t
-                        pockets.append(open_p.pop(kk))
+                    sl = objs[li - 1]
+                    sub = lab[sl] == li
+                    cells = int(sub.sum())
+                    fsub = np.where(sub, fs[sl], 2.0)
+                    loc = np.unravel_index(int(np.argmin(fsub)), fsub.shape)
+                    g = tuple(s.start + l_ for s, l_ in zip(sl, loc))
+                    rep = int(np.ravel_multi_index(g, mat.shape))
+                    open_p[rep] = dict(rep=rep, box=tuple((s.start, s.stop) for s in sl), t_iso=t, cells=cells,
+                                       center=tuple(int(v) for v in g))
             snaps.append((round(t, 2), fs[met].astype(np.float16)))      # 只存金属格（省内存），顺序同 mat == METAL
             next_snap += snap_every
             if progress:

@@ -209,6 +209,7 @@ OPERATIONS = {
     "滚齿 Gear hobbing": "滚齿机 HOB-01",
     "调质 Quench & temper": "热处理炉 HT-01",
     "渗碳淬火 Carburizing": "热处理炉 HT-01",
+    "时效 Stress relieving": "热处理炉 HT-01",               # 第 138 轮：铸件去应力退火（WQ-LS 机壳）
     "磨外圆 Cylindrical grinding": "外圆磨床 GRD-01",
     "铣结合面 Face milling": "立式加工中心 VMC-01",
     "钻攻螺纹孔 Drilling & tapping": "立式加工中心 VMC-01",

@@ -49,6 +49,7 @@ STAGE = {
     "铣键槽 Keyway milling": "keyway",
     "滚齿 Gear hobbing": "gear",
     "渗碳淬火 Carburizing": "harden",
+    "时效 Stress relieving": "age",            # 第 138 轮：铸件时效，可以在粗、精加工之间
     "磨外圆 Cylindrical grinding": "grind",
     "铣结合面 Face milling": "rough",
     "钻攻螺纹孔 Drilling & tapping": "finish",
