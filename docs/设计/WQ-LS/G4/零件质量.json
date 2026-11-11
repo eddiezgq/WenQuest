@@ -5,18 +5,18 @@
   "g_rod": 0.423,
   "I_rod": 1.875e-05,
   "m_pin": 0.0173,
-  "m_tk": 0.04118,
-  "g_tk": 0.4
+  "m_tk": 0.02423,
+  "g_tk": 0.359
  },
  "balance": {
-  "k": 0.4,
+  "k": 0.25,
   "m_recip_kg": 0.1112,
   "m_rot_kg": 0.044,
   "g_rod_mm": 23.25,
-  "M_req_kgmm": 1.371,
-  "crank_moment_kgmm": 1.379,
-  "sector_half_deg": 37.59,
-  "equiv_at_r_g": 89.0
+  "M_req_kgmm": 1.113,
+  "crank_moment_kgmm": 1.121,
+  "sector_half_deg": 30.8,
+  "equiv_at_r_g": 72.3
  },
  "parts": {
   "needle_bar": {
@@ -40,7 +40,7 @@
    "material": "metal"
   },
   "lever": {
-   "mass_g": 41.2,
+   "mass_g": 24.2,
    "material": "chrome"
   },
   "rocker": {
@@ -68,7 +68,7 @@
    "material": "metal"
   },
   "crank": {
-   "mass_g": 120.7,
+   "mass_g": 109.8,
    "material": "metal"
   }
  },

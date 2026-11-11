@@ -38,10 +38,12 @@ FC_WIN = (-40.0, 34.0, 118.0, 236.0)       # 机头前盖板窗口 x0, x1, z0, z
 X_TAKEUP = 16.0                            # 挑线杆平面（G4.1 起与针杆连杆共用曲柄销，见 tools/wqls/g4_takeup.py）
 TK_SLOT = (152.0, 214.0)                   # 前盖板上挑线杆竖槽的上下端；G4.1 起按挑线机构的线眼轨迹自动定（下面 TK_JSON）
 TK_POSE = [(-2.5, 20.6), (31.9, -5.9), (51.5, -17.0)]   # 外观件里的示意挑线杆（没有 G4 零件时用）：P、M、线眼，端视坐标 mm
-BOSSES = os.environ.get("WQ_BOSSES", "1") == "1" and not os.environ.get("WQ_NOEDGE")   # 机头内的凸台（针杆导套、前轴承座、摇杆销座）
+BOSSES = os.environ.get("WQ_BOSSES", "0" if os.environ.get("WQ_NOEDGE") else "1") == "1"   # 机头内的凸台（针杆导套、前轴承座、摇杆销座）；优化试算（不倒圆）默认不带，要带就 WQ_BOSSES=1
 _tkj = os.path.join(os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else os.path.join(os.getcwd(), "tools", "wqls", "cad"),
                     "..", "..", "..", "docs", "设计", "WQ-LS", "G4", "挑线机构.json")
 TK_JSON = json.load(open(_tkj)) if os.path.exists(_tkj) else None
+TK_JSON_EXISTS = TK_JSON is not None
+REALMECH = os.environ.get("WQ_REALMECH", "1" if TK_JSON_EXISTS else "0") == "1"   # 有 G4 实体机构时，外观件里不再画示意的针杆、挑线杆
 if TK_JSON:
     _ev = TK_JSON["result"]["E_v"]
     TK_SLOT = (round(200.0 + _ev[0] - 8), round(200.0 + _ev[1] + 8))
@@ -297,11 +299,19 @@ def casting():
         # 针杆上导套座：x −16…3（不越过连杆平面 x 5），z 170…194，一条筋接到机头后壁；孔 Ø12
         ub = Part.makeBox(19, 20, 24, V(-16, -10, 170)).fuse(Part.makeBox(10, y_back - 8 + 1, 14, V(-14, 8, 175)))
         bs.append(ub.cut(Part.makeCylinder(6, 40, V(0, 0, 160), V(0, 0, 1))))
-        # 前轴承座：x 31…44 一整块隔板（与机头内腔相交），中间 Ø35 轴承孔（6202），下面开孔走油管和线
-        wall = Part.makeBox(13, 400, 400, V(31, -200, HEAD["z0"])).common(cav)
-        wall = wall.cut(Part.makeCylinder(17.5, 15, V(30, 0, ZU), V(1, 0, 0)))            # 6202 外圈 Ø35
-        wall = wall.cut(Part.makeCylinder(12, 15, V(30, 20, HEAD["z0"] + 40), V(1, 0, 0)))    # 油管、线的过孔
-        bs.append(wall)
+        # 前轴承座：x 31…44，轴承座圈加四条筋（G4.2 由整块隔板改，见下），中间 Ø35 轴承孔（6202）
+        # 原来是一整块隔板：机头上多了约 1.7 kg，机壳一阶从 129 Hz 掉到 93 Hz（靠近 5000 r/min 的 83 Hz），
+        # 改成轴承座圈（Ø50 × 13）加四条筋（上、后、前、下，厚 8），接到机头四壁
+        ring = Part.makeCylinder(25, 13, V(31, 0, ZU), V(1, 0, 0))
+        rbs = [Part.makeBox(13, 8, 60, V(31, -4, ZU)), Part.makeBox(13, 80, 8, V(31, 0, ZU - 4)),
+               Part.makeBox(10, 80, 8, V(34, -80, ZU - 4)), Part.makeBox(13, 8, 200, V(31, -4, ZU - 200))]
+        wall = ring
+        for rb_ in rbs:
+            wall = wall.fuse(rb_)
+        # 不与内腔 cav 求交：cav 是按机臂壁厚 5.8 挖的，机头壁只有 4.5，求交后筋离机头内壁差 1.3 mm、是悬空的
+        # （第一次模态 93 Hz 就是这块悬空的板在晃）。直接与外形 solid 求交，筋伸进壁里和壁连成一体
+        wall = wall.cut(Part.makeCylinder(17.5, 15, V(30, 0, ZU), V(1, 0, 0)))   # 6202 外圈 Ø35
+        bs.append(wall.removeSplitter())
         if TK_JSON:                                     # 摇杆销座：从轴承隔板伸出的凸台，销 Ø6
             qu, qv = TK_JSON["lk"]["Qz"], TK_JSON["lk"]["Qy"]
             if TK_JSON["lk"].get("side", "in") == "in":       # 摇杆在内侧：销座从轴承隔板往外伸
@@ -381,9 +391,10 @@ def parts_visible(cast):
     g["chrome"].append(cyl(18, 3, V(PIL["x1"] + 75, 0, ZU)))
     g["blue"].append(cyl(53, 2.0, V(PIL["x1"] + 53.5, 0, ZU)).cut(cyl(49, 3, V(PIL["x1"] + 53, 0, ZU))))
     # 针杆、压脚杆、机针、压脚
-    g["chrome"].append(cyl(4, 32, V(0, 0, HEAD["z0"] - 30), V(0, 0, 1)))                # 针杆（上止点附近）
-    g["metal"].append(Part.makeBox(10, 10, 9, V(-5, -5, 14)))                           # 针夹
-    g["chrome"].append(cyl(0.9, 20, V(0, 0, -1.5), V(0, 0, 1)).fuse(cyl(1.0, 8, V(0, 0, 13), V(0, 0, 1))))
+    if not REALMECH:
+        g["chrome"].append(cyl(4, 32, V(0, 0, HEAD["z0"] - 30), V(0, 0, 1)))                # 针杆（上止点附近）
+        g["metal"].append(Part.makeBox(10, 10, 9, V(-5, -5, 14)))                           # 针夹
+        g["chrome"].append(cyl(0.9, 20, V(0, 0, -1.5), V(0, 0, 1)).fuse(cyl(1.0, 8, V(0, 0, 13), V(0, 0, 1))))
     g["chrome"].append(cyl(4, 40, V(-16, 6, HEAD["z0"] - 38), V(0, 0, 1)))              # 压脚杆
     foot = Part.makeBox(30, 26, 4, V(-20, -14, 0.2)).fuse(Part.makeBox(8, 8, 18, V(-20, 2, 3)))
     foot = foot.cut(cyl(2.4, 10, V(0, 0, -1), V(0, 0, 1)))
@@ -401,7 +412,8 @@ def parts_visible(cast):
         seg = Part.makeCylinder(3.0, d_.Length, a_, d_)
         lev = seg if lev is None else lev.fuse(seg)
     eye = Part.makeTorus(4.0, 1.4, E_, V(1, 0, 0))
-    g["chrome"].append(lev.fuse(eye))
+    if not REALMECH:
+        g["chrome"].append(lev.fuse(eye))
     tz, tx = 210, 66
     g["chrome"].append(cyl(3, 22, V(tx, -46, tz), V(0, -1, 0)))
     for dy in (-52, -55.5):

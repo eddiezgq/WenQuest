@@ -2,7 +2,7 @@
  "limit_mm": 1.0,
  "step_deg": 2,
  "frames": 180,
- "seconds": 295,
+ "seconds": 264,
  "pairs": [
   [
    "rocker | casting",
@@ -17,7 +17,7 @@
   [
    "pin_M | crank",
    1.0,
-   286
+   276
   ],
   [
    "needle_bar | crank_pin",
@@ -86,7 +86,7 @@
   ],
   [
    "lever | casting",
-   5.794,
+   6.294,
    60
   ],
   [
@@ -95,14 +95,14 @@
    32
   ],
   [
-   "lever | stud_Q",
-   6.612,
-   32
-  ],
-  [
    "pin_M | shaft",
    7.934,
    234
+  ],
+  [
+   "lever | stud_Q",
+   8.88,
+   32
   ],
   [
    "pin_M | casting",

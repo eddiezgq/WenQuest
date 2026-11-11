@@ -154,7 +154,11 @@ MK = tkm.Mech2(r=R, l=L, mr=S.SEW["mr"], lk=TK)
 p0 = MK.link_pose(PHI0, MK.LK0)
 Pp, Mp, Ep, Qp = (tuple(p0[k]) for k in ("P", "M", "E", "Q"))
 x0, t = X["lever"]
-lever = link2(Pp, 9.0, Mp, 6.0, x0, t).fuse(link2(Pp, 7.0, Ep, 3.5, x0, t)).removeSplitter()
+# G4.2 减重：杆身改 3 mm 钢板（居中），只在 P、M 两个毂处保留 5 mm；杆身收窄（真机挑线杆 15–25 g）
+tp = 3.0
+xp = x0 + (t - tp) / 2
+lever = disc(*Pp, 9.0, x0, t).fuse(disc(*Mp, 5.5, x0, t))
+lever = lever.fuse(link2(Pp, 6.5, Mp, 4.5, xp, tp)).fuse(link2(Pp, 5.5, Ep, 3.0, xp, tp)).removeSplitter()
 lever = lever.cut(hole(*Pp, 6.0, x0, t)).cut(hole(*Mp, 2.5, x0, t)).cut(hole(*Ep, 1.5, x0, t))
 parts["lever"], mats["lever"] = lever, "chrome"
 

@@ -1,0 +1,193 @@
+<title>WQ-LS 机壳与剖切</title>
+<!-- 第 138 轮：WQ-LS 机壳（HT250 灰铸铁，外观 B）三维与剖切。网格来自 FreeCAD（cad/housing.py、cad/mech.py），
+     打包成 d/meshes.json（render/stl2json.py；文件名 x_ 开头是机壳与外观件，m_ 开头是刺布挑线机构零件）。
+     ?film=1 时提供 window.go(φ, 视角, 剖切面, 位置) 给出片脚本。 -->
+<style>
+:root{--bg:#e6e9ec;--ink:#1c2228;--mut:#5a6570;--card:rgba(255,255,255,.88);--line:#cbd2d8;--acc:#0b4fae;--cut:#c4532d}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#14171a;--ink:#e5e8eb;--mut:#9aa4ad;--card:rgba(28,32,36,.88);--line:#3a424a;--acc:#6aa7ff;--cut:#e0774f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14171a;--ink:#e5e8eb;--mut:#9aa4ad;--card:rgba(28,32,36,.88);--line:#3a424a;--acc:#6aa7ff;--cut:#e0774f;color-scheme:dark}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,"Noto Sans CJK SC","PingFang SC",sans-serif;overflow:hidden}
+canvas{display:block;width:100%;height:100%}
+.panel{position:fixed;left:calc(16px + env(safe-area-inset-left,0px));top:calc(16px + env(safe-area-inset-top,0px));width:min(320px,calc(100vw - 32px));max-height:calc(100% - 32px);overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;backdrop-filter:blur(6px);box-sizing:border-box}
+h1{font-size:15px;margin:0 0 2px}.sub{margin:0 0 8px;color:var(--mut);font-size:12.5px}
+.lbl{font-size:11.5px;letter-spacing:.06em;color:var(--mut);margin:10px 0 4px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+button{font:inherit;font-size:12.5px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:6px;padding:3px 9px;cursor:pointer}
+button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+button:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+input[type=range]{width:100%}
+table{border-collapse:collapse;width:100%;font-size:12.5px;font-variant-numeric:tabular-nums}td{padding:1px 0;vertical-align:top}td:last-child{text-align:right;padding-left:8px}
+.cutkey{display:inline-block;width:10px;height:10px;background:var(--cut);border-radius:2px;vertical-align:-1px;margin-right:4px}
+#busy{position:fixed;inset:0;display:grid;place-items:center;color:var(--mut);font-size:13px;pointer-events:none}
+@media (max-width:520px){.panel{max-height:46%}.sub{display:none}}
+body.shot .panel,body.shot #busy{display:none}
+</style>
+<canvas id="c"></canvas>
+<div id="busy">正在载入网格（约 7 MB）…</div>
+<div class="panel" id="ui">
+  <h1>WQ-LS 机壳与剖切</h1>
+  <p class="sub">HT250 灰铸铁，外观方案 B。机头里装的是 G4.1 的刺布、挑线机构实体零件，可以转动。</p>
+  <div class="lbl">看什么</div>
+  <div class="row"><button data-m="ext" class="on">整机外观</button><button data-m="cut">机壳剖开</button></div>
+  <div id="cutbox" hidden>
+    <div class="lbl">剖切面</div>
+    <div class="row"><button data-p="y" class="on">前后剖（过机针）</button><button data-p="x">左右剖</button><button data-p="z">水平剖</button></div>
+    <div class="lbl" id="poslbl">位置 y = 0 mm</div>
+    <input id="pos" type="range" min="-60" max="110" step="1" value="0" aria-labelledby="poslbl">
+    <p class="sub" style="margin:4px 0 0"><span class="cutkey"></span>剖到的铸铁截面</p>
+  </div>
+  <div class="lbl">机构</div>
+  <div class="row"><button id="play">转动</button><span id="phi" style="color:var(--mut);font-size:12.5px">φ = 0°</span></div>
+  <div class="lbl">视角</div>
+  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="front">正面</button><button data-v="face">机头端面</button><button data-v="top">俯视</button></div>
+  <div class="lbl">机壳数据</div>
+  <table>
+    <tr><td>材料</td><td>HT250 灰铸铁</td></tr>
+    <tr><td>铸件重量</td><td>24.6 kg</td></tr>
+    <tr><td>壁厚：机臂 / 根部 / 机头 / 机座</td><td>5.8 / 8.1 / 4.5 / 5.6 mm</td></tr>
+    <tr><td>筋</td><td>机臂 3 道、立柱 2 道、机座纵筋 2 道</td></tr>
+    <tr><td>前两阶固有频率</td><td id="modal">125 / 221 Hz（前后摆 / 上下）</td></tr>
+  </table>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { toCreasedNormals, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const q = new URLSearchParams(location.search);
+const FILM = q.has('film');
+if (FILM) document.body.classList.add('shot');
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true });
+r.setPixelRatio(+(q.get('pr') || Math.min(2, devicePixelRatio)));
+const W = () => +(q.get('w') || document.documentElement.clientWidth), H = () => +(q.get('h') || document.documentElement.clientHeight);
+r.setSize(W(), H());
+r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+r.localClippingEnabled = true;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(css('--bg') || '#e6e9ec');
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.55;
+const root = new THREE.Group(); root.rotation.x = -Math.PI / 2; root.scale.setScalar(0.001); scene.add(root);
+
+const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+const C = [clip];
+const MAT = {
+  paint: new THREE.MeshPhysicalMaterial({ color: 0xb7bbc0, metalness: 0.45, roughness: 0.38, clearcoat: 1, clearcoatRoughness: 0.06 }),
+  graphite: new THREE.MeshPhysicalMaterial({ color: 0x23272c, roughness: 0.5, clearcoat: 0.5, clearcoatRoughness: 0.2 }),
+  metal: new THREE.MeshStandardMaterial({ color: 0xb9bdc1, metalness: 1, roughness: 0.32 }),
+  chrome: new THREE.MeshStandardMaterial({ color: 0xe4e6e8, metalness: 1, roughness: 0.1 }),
+  black: new THREE.MeshPhysicalMaterial({ color: 0x111214, roughness: 0.62 }),
+  blue: new THREE.MeshPhysicalMaterial({ color: 0x0b4fae, roughness: 0.35, clearcoat: 0.6 }),
+  glass: new THREE.MeshPhysicalMaterial({ color: 0x0b1418, roughness: 0.08, emissive: 0x7fd3ff, emissiveIntensity: 0.6 }),
+  // 剖开时：铸件外表面银灰，里面（背面）就是剖到的截面，用一种颜色画出来
+  cast: new THREE.MeshPhysicalMaterial({ color: 0xaeb3b8, metalness: 0.35, roughness: 0.45, clippingPlanes: C, side: THREE.FrontSide }),
+  castCut: new THREE.MeshBasicMaterial({ color: new THREE.Color(css('--cut') || '#c4532d'), clippingPlanes: C, side: THREE.BackSide }),
+  mMetal: new THREE.MeshStandardMaterial({ color: 0xc8ccd1, metalness: 1, roughness: 0.3 }),
+  mChrome: new THREE.MeshStandardMaterial({ color: 0xeef0f2, metalness: 1, roughness: 0.1 }),
+};
+const pack = await (await fetch('d/meshes.json')).json();
+const info = await (await fetch('d/parts.json')).json();
+const FR = (await (await fetch('d/frames.json')).json()).frames;
+function geo(k) {
+  const bin = Uint8Array.from(atob(pack[k]), c => c.charCodeAt(0));
+  let g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(bin.buffer), 3));
+  g = mergeVertices(g, 1e-3);
+  return toCreasedNormals(g, THREE.MathUtils.degToRad(30));
+}
+const ext = new THREE.Group(), cut = new THREE.Group(), mech = new THREE.Group();
+root.add(ext, cut, mech);
+for (const k of ['paint', 'graphite', 'metal', 'black', 'blue', 'chrome', 'glass']) {
+  if (!pack['x_' + k]) continue;
+  const m = new THREE.Mesh(geo('x_' + k), MAT[k]); m.castShadow = m.receiveShadow = true; ext.add(m);
+}
+const cg = geo('x_casting');
+cut.add(new THREE.Mesh(cg, MAT.cast), new THREE.Mesh(cg, MAT.castCut));
+cut.children[0].castShadow = cut.children[0].receiveShadow = true;
+const parts = {};
+for (const [k, p] of Object.entries(info.parts)) {
+  if (!pack['m_' + k]) continue;
+  const m = new THREE.Mesh(geo('m_' + k), p.material === 'chrome' ? MAT.mChrome : MAT.mMetal);
+  m.matrixAutoUpdate = false; m.castShadow = true; mech.add(m); parts[k] = m;
+}
+document.getElementById('busy').hidden = true;
+
+// 工作台
+const s = new THREE.Shape();
+s.moveTo(-0.46, -0.30); s.lineTo(0.76, -0.30); s.lineTo(0.76, 0.32); s.lineTo(-0.46, 0.32); s.closePath();
+const hole = new THREE.Path(); hole.moveTo(-0.108, -0.065); hole.lineTo(0.415, -0.065); hole.lineTo(0.415, 0.119); hole.lineTo(-0.108, 0.119); hole.closePath();
+s.holes.push(hole);
+const table = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: 0.032, bevelEnabled: true, bevelThickness: 0.002, bevelSize: 0.002, bevelSegments: 3 }),
+  new THREE.MeshPhysicalMaterial({ color: 0xd9d6cf, roughness: 0.6 }));
+table.rotation.x = -Math.PI / 2; table.position.y = -0.034; table.receiveShadow = true; scene.add(table);
+
+const key = new THREE.DirectionalLight(0xffffff, 2.8); key.position.set(-0.6, 1.4, 0.9); key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 5; key.shadow.bias = -0.0004;
+Object.assign(key.shadow.camera, { left: -0.7, right: 0.9, top: 0.7, bottom: -0.7, near: 0.1, far: 4 });
+key.target.position.set(0.15, 0.1, 0); scene.add(key, key.target);
+const fill = new THREE.DirectionalLight(0xe8f0ff, 0.6); fill.position.set(1.4, 0.5, 1.0); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xffffff, 1.0); rim.position.set(0.4, 1.0, -1.4); scene.add(rim);
+
+const cam = new THREE.PerspectiveCamera(30, W() / H(), 0.01, 20);
+const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
+const VIEWS = { iso: [[-0.42, 0.46, 0.98], [0.16, 0.11, 0.0]], front: [[0.16, 0.13, 1.25], [0.16, 0.12, 0.0]],
+  face: [[-0.9, 0.18, 0.02], [0.0, 0.12, 0.0]], top: [[0.16, 1.25, 0.01], [0.16, 0.0, -0.02]] };
+function view(v) { const [p, t] = VIEWS[v]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
+
+// 剖切：机器坐标 (x, y, z) mm → three (x, z, −y)/1000
+let mode = 'ext', plane = 'y', pos = 0;
+const RANGE = { y: [-60, 110, 0, 'y'], x: [-60, 410, 0, 'x'], z: [-55, 260, 200, 'z'] };
+function setClip() {
+  if (plane === 'y') clip.set(new THREE.Vector3(0, 0, -1), -pos / 1000);          // 留 y ≥ pos（从前面看进去）
+  if (plane === 'x') clip.set(new THREE.Vector3(1, 0, 0), -pos / 1000);           // 留 x ≥ pos（从机头一侧看进去）
+  if (plane === 'z') clip.set(new THREE.Vector3(0, -1, 0), pos / 1000);           // 留 z ≤ pos（从上面看进去）
+  document.getElementById('poslbl').textContent = `位置 ${RANGE[plane][3]} = ${pos} mm`;
+}
+function setMode(m) {
+  mode = m; ext.visible = m === 'ext'; cut.visible = m === 'cut'; table.visible = m === 'ext';   // 剖开时不画工作台，机座也看得见
+  for (const mm of [MAT.mMetal, MAT.mChrome]) { mm.clippingPlanes = m === 'cut' ? C : []; mm.needsUpdate = true; }   // 机构零件也一起剖开
+  document.getElementById('cutbox').hidden = m !== 'cut';
+  document.querySelectorAll('[data-m]').forEach(b => b.classList.toggle('on', b.dataset.m === m));
+}
+function setPlane(p, v) {
+  plane = p; const [lo, hi, def] = RANGE[p]; pos = v ?? def;
+  const el = document.getElementById('pos'); el.min = lo; el.max = hi; el.value = pos;
+  document.querySelectorAll('[data-p]').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+  setClip();
+}
+const tmp = new THREE.Matrix4();
+let idx = 0;
+function setFrame(i) {
+  idx = i; const f = FR[i];
+  for (const [k, m] of Object.entries(parts)) { const M = f.M[k]; if (M) m.matrix.copy(tmp.fromArray(M).transpose()); else m.matrix.identity(); m.matrixWorldNeedsUpdate = true; }
+  document.getElementById('phi').textContent = `φ = ${f.phi}°`;
+}
+document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => setMode(b.dataset.m));
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => setPlane(b.dataset.p));
+document.querySelectorAll('[data-v]').forEach(b => b.onclick = () => { view(b.dataset.v); document.querySelectorAll('[data-v]').forEach(x => x.classList.toggle('on', x === b)); });
+document.getElementById('pos').oninput = e => { pos = +e.target.value; setClip(); };
+let play = false;
+document.getElementById('play').onclick = e => { play = !play; e.target.classList.toggle('on', play); e.target.textContent = play ? '停' : '转动'; };
+addEventListener('resize', () => { r.setSize(W(), H()); cam.aspect = W() / H(); cam.updateProjectionMatrix(); });
+
+setMode(q.get('mode') || 'ext'); setPlane(q.get('plane') || 'y', q.has('pos') ? +q.get('pos') : undefined); view(q.get('view') || 'iso'); setFrame(0);
+window.go = (o) => {
+  if (o.mode) setMode(o.mode); if (o.plane) setPlane(o.plane, o.pos); if (o.view) view(o.view);
+  if (o.cam) { cam.position.set(...o.cam[0]); ctl.target.set(...o.cam[1]); ctl.update(); }
+  if (o.phi !== undefined) setFrame(Math.round(o.phi / 2) % FR.length);
+  r.render(scene, cam); return true;
+};
+if (FILM) { document.title = 'ready'; }
+else {
+  let acc = 0, last = performance.now();
+  r.setAnimationLoop(t => {
+    const dt = Math.min(0.1, (t - last) / 1000); last = t;
+    if (play) { acc += dt * 45; while (acc >= 1) { acc -= 1; setFrame((idx + 1) % FR.length); } }
+    ctl.update(); r.render(scene, cam);
+  });
+}
+</script>
