@@ -174,6 +174,7 @@ def page(head, topbar, bi, script):
 <script>
 {script.split("/*LANG-END*/")[0]}
 </script>
+<script src="/assist.js" defer></script>
 </body>
 </html>
 """

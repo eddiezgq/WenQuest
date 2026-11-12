@@ -96,3 +96,21 @@ def test_faq_first_and_no_junk(client, monkeypatch):  # noqa: F811
     for f in load_faq("cn").items:
         a = f[0]["a"]["zh"]
         assert not [w for w in BANNED if w in a], (f[0]["id"], a)
+
+
+def test_every_site_page_has_the_assistant():
+    """第 154 轮：官网每一页右下角都有问渠客服（Google 验证文件、离线版演示稿除外）；
+    数字工业园各厂的网页也加载同一个 assist.js（前门把 /assist.js 和问答接口转给网关）。"""
+    root = Path(__file__).resolve().parents[3]
+    site = root / "site"
+    skip = ("google", "演示稿-离线版")
+    missing = [str(f.relative_to(site)) for f in sorted(site.rglob("*.html"))
+               if f.relative_to(site).parts[0] not in ("cn", "vendor")
+               and not any(k in f.name for k in skip)
+               and "assist.js" not in f.read_text(encoding="utf-8")]
+    assert not missing, f"这些页面没有 <script src=\"/assist.js\" defer></script>：{missing}"
+    cn = [str(f.relative_to(site)) for f in sorted((site / "cn").rglob("*.html")) if "assist.js" not in f.read_text(encoding="utf-8")]
+    assert not cn or cn == ["404.html"], f"国内官网缺：{cn}"
+    assert '<script src="/assist.js" defer></script>' in (root / "factory/digital/web/index.html").read_text(encoding="utf-8")
+    caddy = (root / "deploy/Caddyfile").read_text(encoding="utf-8")
+    assert caddy.count("import assist_widget") >= 3

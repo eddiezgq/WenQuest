@@ -168,7 +168,7 @@ def page(case, preview):
 <script>
 {SCRIPT}
 </script>
-{'' if preview else '</body>' + chr(10) + '</html>'}
+{'' if preview else '<script src="/assist.js" defer></script>' + chr(10) + '</body>' + chr(10) + '</html>'}
 """
 
 
@@ -238,6 +238,7 @@ def story_page(st):
 {SCRIPT.split("/*LANG-END*/")[0]}
 {STORY_JS}
 </script>
+<script src="/assist.js" defer></script>
 </body>
 </html>
 """
@@ -277,7 +278,7 @@ def index(preview):
 <script>
 {SCRIPT.split("/*LANG-END*/")[0]}
 </script>
-{'' if preview else '</body>' + chr(10) + '</html>'}
+{'' if preview else '<script src="/assist.js" defer></script>' + chr(10) + '</body>' + chr(10) + '</html>'}
 """
 
 

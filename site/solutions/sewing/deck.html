@@ -230,4 +230,6 @@ document.getElementById('bp').onclick=prev;document.getElementById('bn').onclick
 const h=parseInt(location.hash.slice(1));show(isNaN(h)?0:h-1,document.body.classList.contains('all')?-1:0);
 addEventListener('hashchange',()=>{const h=parseInt(location.hash.slice(1));if(!isNaN(h)&&h-1!==cur)show(h-1,document.body.classList.contains('all')?-1:0);});
 })();
-</script></body></html>
+</script>
+<script src="/assist.js" defer></script>
+</body></html>

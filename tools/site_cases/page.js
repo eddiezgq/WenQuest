@@ -1,13 +1,13 @@
-// ---- language (shared with the home page: localStorage "wq-site-lang") ----
+// ---- language (shared with the home page: localStorage "wq-site-lang2") ----
 const root = document.documentElement, langBtn = document.getElementById("langBtn");
 let lang;
-try { lang = localStorage.getItem("wq-site-lang"); } catch (e) {}
-lang = lang || ((navigator.language || "").toLowerCase().startsWith("zh") ? "zh" : "en");
+try { lang = localStorage.getItem("wq-site-lang2"); } catch (e) {}
+lang = lang || (location.hostname.endsWith("wenquestech.online") ? "zh" : "en");
 const onLang = [];
 function setLang(l) {
   lang = l; root.lang = l === "en" ? "en" : "zh-CN";
   langBtn.textContent = l === "en" ? "中文" : "EN";
-  try { localStorage.setItem("wq-site-lang", l); } catch (e) {}
+  try { localStorage.setItem("wq-site-lang2", l); } catch (e) {}
   onLang.forEach(f => f());
 }
 langBtn.addEventListener("click", () => setLang(lang === "en" ? "zh" : "en"));

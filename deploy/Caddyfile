@@ -26,6 +26,19 @@
 	file_server
 }
 
+# 问渠客服（第 154 轮）：数字工业园各厂网页右下角的“Ask WenQuest / 问问问渠”，和官网同一个脚本、同一个问答接口。
+# 工厂自己的接口不动；这两条路径在工厂网址下转给官网同样的地方（脚本取 site/assist.js，问答经 web 转网关）。
+(assist_widget) {
+	handle /assist.js {
+		root * /srv/site
+		header Cache-Control "public, max-age=3600"
+		file_server
+	}
+	handle /api/v1/public/assist {
+		reverse_proxy web:80
+	}
+}
+
 # Academy website (static files in site/).
 {$SITE_DOMAIN} {
 	import security_headers
@@ -117,6 +130,7 @@ factory.{$SITE_DOMAIN} {
 	request_body {
 		max_size 60MB
 	}
+	import assist_widget
 	handle /mqtt* {
 		reverse_proxy wqf-bus:9001
 	}
@@ -146,6 +160,7 @@ demo.{$SITE_DOMAIN} {
 	request_body {
 		max_size 60MB
 	}
+	import assist_widget
 	handle /mqtt* {
 		reverse_proxy wqf-bus-demo:9001
 	}
@@ -177,6 +192,7 @@ demo-erp.{$SITE_DOMAIN} {
 	request_body {
 		max_size 60MB
 	}
+	import assist_widget
 	handle /mqtt* {
 		reverse_proxy wqf-bus-c-{labels.3}:9001
 	}
