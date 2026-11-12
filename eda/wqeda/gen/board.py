@@ -276,8 +276,10 @@ def dsn_keepouts(txt, keepouts, inset=0.45):
     return txt[:i] + add + txt[i:]
 
 
-def autoroute(board, workdir, jar, classes, passes=40, timeout=1800, plane_layers=("In1.Cu",), keepouts=(), pairs=()):
-    """导出 DSN（去掉电源平面网络）→ Freerouting → 读回 SES；返回 (走线段数, 过孔数)"""
+def autoroute(board, workdir, jar, classes, passes=40, timeout=1800, plane_layers=("In1.Cu",), keepouts=(), pairs=(),
+              replace=False):
+    """导出 DSN（去掉电源平面网络）→ Freerouting → 读回 SES；返回 (走线段数, 过孔数)。
+    replace=True：第二遍（板上已有上一遍的线，布线器接着补没连上的），读回前把没锁定的线删掉"""
     dsn = os.path.join(workdir, "route.dsn")
     ses = os.path.join(workdir, "route.ses")
     pcbnew.ExportSpecctraDSN(board, dsn)
@@ -302,6 +304,9 @@ def autoroute(board, workdir, jar, classes, passes=40, timeout=1800, plane_layer
     r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, cwd=workdir)
     if not os.path.exists(ses):
         raise RuntimeError("Freerouting 没有产出：" + (r.stdout[-2000:] + r.stderr[-2000:]))
+    if replace:  # 板上已有的线（上一遍的结果）导出时一起给了布线器，它可能改过：没锁定的先删掉，按它的结果整个换
+        for t in [t for t in board.GetTracks() if not t.IsLocked()]:
+            board.Remove(t)
     return import_ses(board, ses)
 
 

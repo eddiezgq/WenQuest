@@ -257,8 +257,6 @@ def board_build(route, jar):
     hole_nets(board, nets)
     planes(board, nets)
     keep = gb.tie_keepouts(board)
-    for net, layer, pts in D.X["pours"]:            # 功率铺铜（设计描述 board.pours）：导出给布线器时它自己就是这一网络的平面，
-        gb.add_pour(board, nets[net], layer, pts)   # 不再另加禁布区（两样叠在一起 Freerouting 一遍也走不完，159d2b 试出来的）
     os.makedirs(TMP, exist_ok=True)
     stats = None
     if route:
@@ -284,9 +282,22 @@ def board_build(route, jar):
         print("引出线（器件自己引脚比布线间距近的焊盘）：", n_stub)
         stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=30, keepouts=keep, pairs=gb.pairs_of(D.X),
                              timeout=3000)
-        print("去掉重复的固定线：", RF.dedupe(board), "；用不上的引出线：", RF.drop_dangling(board))
+        print("去掉重复的固定线：", RF.dedupe(board))
+        # 第二遍：带着第一遍的线再给布线器，只补没连上的（第十三次布线剩 8 处，多是第一遍绕不开的几根）
+        board.BuildConnectivity()
+        left = board.GetConnectivity().GetUnconnectedCount(False)
+        if left:
+            stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=15, keepouts=keep, pairs=gb.pairs_of(D.X),
+                                 timeout=1500, replace=True)
+            print("第二遍（第一遍剩 {} 处）：".format(left), stats, "；去重：", RF.dedupe(board))
+        print("用不上的引出线：", RF.drop_dangling(board))
         targets = {n: c["track_mm"] for c in D.X["net_classes"] if c.get("route_mm") for n in c["nets"]}
         print("加宽（到目标 / 部分 / 没动）：", RF.widen(board, targets, clearance))
+    # 功率铺铜（设计描述 board.pours）布完线再加：给布线器当平面时，别的网络从底层穿过去把它切成几块、块和块之间没连上
+    # （第十二、十三次布线的“铺铜孤岛”）；现在母线全部按走线布通，铺铜只是加宽电流通路，连不上的碎块自动去掉
+    for net, layer, pts in D.X["pours"]:
+        z = gb.add_pour(board, nets[net], layer, pts)
+        z.SetIslandRemovalMode(pcbnew().ISLAND_REMOVAL_MODE_ALWAYS)
     board.BuildConnectivity()
     gb.fill_zones(board)
     pcbnew().SaveBoard(path, board)

@@ -5,10 +5,10 @@
     314.15,
     216.0,
     "In1",
-    "zone GND_ISO zone:a6e7e767-8dcc-475a-9268-0accabde1d35 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45"
+    "zone GND_ISO zone:d621067e-1280-4f03-8d01-484faadf45ae ↔ zone GND zone:7953209c-1c21-48f2-b023-5c46563df135"
    ]
   ],
-  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:a6e7e767-8dcc-475a-9268-0accabde1d35 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45）",
+  "detail": "最近 4.00 mm（In1 层，zone GND_ISO zone:d621067e-1280-4f03-8d01-484faadf45ae ↔ zone GND zone:7953209c-1c21-48f2-b023-5c46563df135）",
   "example": true,
   "groups": [
    [
@@ -181,10 +181,10 @@
     121.63,
     122.08,
     "In1",
-    "pth PE C102 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45"
+    "pth PE C102 ↔ zone GND zone:7953209c-1c21-48f2-b023-5c46563df135"
    ]
   ],
-  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:736a5163-a20f-4f18-91bf-e5abd5726d45）",
+  "detail": "最近 4.20 mm（In1 层，pth PE C102 ↔ zone GND zone:7953209c-1c21-48f2-b023-5c46563df135）",
   "example": true,
   "groups": [
    [
@@ -357,7 +357,7 @@
     "track L_F ↔ pth N_C C103"
    ]
   ],
-  "detail": "最近 2.60 mm（F 层，track L_F ↔ pth N_C C103）",
+  "detail": "最近 2.62 mm（F 层，track L_F ↔ pth N_C C103）",
   "example": true,
   "groups": [
    [
@@ -379,18 +379,18 @@
   "source": "示例值",
   "status": "pass",
   "unit": "mm",
-  "value": 2.602
+  "value": 2.624
  },
  {
   "at": [
    [
-    276.07,
-    171.72,
-    "F",
-    "pad VBUS R420 ↔ pad GND R413"
+    319.59,
+    135.17,
+    "B",
+    "zone VBUS zone:753e5527-538a-4040-ab9c-52fec64c3cc4 ↔ track IN_UH"
    ]
   ],
-  "detail": "最近 1.75 mm（F 层，pad VBUS R420 ↔ pad GND R413）",
+  "detail": "最近 2.20 mm（B 层，zone VBUS zone:753e5527-538a-4040-ab9c-52fec64c3cc4 ↔ track IN_UH）",
   "example": true,
   "groups": [
    [
@@ -540,8 +540,8 @@
   "name": "安全距离：390 V 母线与电机相线 ↔ 弱电",
   "rule": "电气间隙 ≥ 2 mm、爬电距离 ≥ 2 mm（直线距离量，偏保守）",
   "source": "示例值",
-  "status": "fail",
+  "status": "pass",
   "unit": "mm",
-  "value": 1.75
+  "value": 2.2
  }
 ]
