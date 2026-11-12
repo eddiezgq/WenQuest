@@ -217,10 +217,16 @@ def planes(board, nets):
     main = [(0.5, 0.5), (w - 0.5, 0.5), (w - 0.5, y), (x, y), (x, h - 0.5), (0.5, h - 0.5)]
     iso = [(x, y), (w - 0.5, y), (w - 0.5, h - 0.5), (x, h - 0.5)]
     for net, pts in (("GND", main), ("GND_ISO", iso)):
-        z = gb.add_pour(board, nets[net], "In1.Cu", pts, clearance=0.3)
+        # 主地平面离别的网络 2.2 mm（= 高压类布线间距；地平面挨着母线、电机相线的过孔和通孔焊盘）
+        z = gb.add_pour(board, nets[net], "In1.Cu", pts, clearance=2.2 if net == "GND" else 0.3)
         z.SetAssignedPriority(0)
         z.SetPadConnection(pcbnew().ZONE_CONNECTION_FULL)
     rule_area(board, _band(), "隔离带")
+    # 内层没有引脚要穿过：内层 1 的隔离带不收窄，整条 4 mm（两块地平面之间）
+    w_, h_ = D.X["board_mm"]
+    r = b["w"] / 2
+    inner = [(x - r, y - r), (w_, y - r), (w_, y + r), (x + r, y + r), (x + r, h_), (x - r, h_)]
+    rule_area(board, inner, "隔离带（内层）")
     for k, (hx, hy) in enumerate(D.X["holes"]):
         rule_area(board, _circle(hx, hy, HOLE_KEEP), "安装孔{}".format(k + 1))
 
@@ -313,7 +319,7 @@ def board_exports():
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as z:
         for fn in sorted(os.listdir(KDIR)):
-            if fn.endswith((".kicad_sch", ".kicad_pcb", ".kicad_pro", ".kicad_sym")) or fn == "sym-lib-table":
+            if fn.endswith((".kicad_sch", ".kicad_pcb", ".kicad_pro", ".kicad_sym", ".kicad_dru")) or fn == "sym-lib-table":
                 zi = zipfile.ZipInfo(NAME + "/" + fn, date_time=(2026, 11, 12, 0, 0, 0))
                 with open(os.path.join(KDIR, fn), "rb") as f:
                     z.writestr(zi, f.read())
@@ -364,6 +370,10 @@ def main():
         import build as B
         B.KDIR, B.NAME, B.CLASSES = KDIR, NAME, {c["name"]: (c["track_mm"], c["clearance_mm"], c["nets"]) for c in D.X["net_classes"]}
         B._project_settings()
+        # 同一个器件自己的焊盘之间不按网络分类的间距查（引脚间距是器件自己的事；安全距离另查，见 safety.yaml）
+        with open(os.path.join(KDIR, NAME + ".kicad_dru"), "w", encoding="utf-8") as f:
+            f.write('(version 1)\n(rule "same_footprint_pads"\n  (condition "A.Type == \'Pad\' && B.Type == \'Pad\' && '
+                    'A.Parent.Reference == B.Parent.Reference")\n  (constraint clearance (min 0.15mm)))\n')
     schematic()
     net = exports()
     nc = netcheck(net)

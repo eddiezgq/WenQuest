@@ -196,9 +196,13 @@ board:
   # 间距是布线器用的数（示例值）；安全距离（电气间隙、爬电距离）按 ctrl-ls/safety.yaml 的规则另查。
   # 159d2b 第一次：高压类间距 2.0–2.5 mm、自举线也放在里面时 Freerouting 30 分钟走不完一遍（功率模块脚距只有 2.35 mm），
   # 自举线单独一类后再试；安全距离另由检查把关
-  holes: [[5, 28], [241, 28], [5, 145], [241, 145]]   # H1 接 PE（保护地从 J101 第 3 脚来），其余安装孔不在板上连线
+  holes: [[5, 28], [241, 28], [5, 145], [241, 145]]   # H1 接 PE（Y 电容经它接箱体），其余安装孔不在板上连线
+  # 母线（390 V）铺在底层：散热器边的升压二极管、母线电容、功率模块 P 脚之间大电流走铺铜
+  pours:
+  - {net: VBUS, layer: B.Cu, points: [[106, 9], [244, 9], [244, 68], [106, 68]]}
   net_classes:
-  - {name: AC, track_mm: 2.5, clearance_mm: 2.6, nets: [L_IN, N_IN, L_F, N_C, L_C, L_R, VRECT, SW_PFC, PE], layers: [F.Cu, B.Cu]}
+  - {name: AC, track_mm: 2.5, clearance_mm: 2.6, nets: [L_IN, N_IN, L_F, N_C, L_C, L_R, VRECT, SW_PFC], layers: [F.Cu, B.Cu]}
+  - {name: PE, track_mm: 1.5, clearance_mm: 4.2, nets: [PE], layers: [F.Cu, B.Cu]}
   - {name: HV, track_mm: 2.0, clearance_mm: 2.2, nets: [VBUS, MOT_U, MOT_V, MOT_W, RECT_N], layers: [F.Cu, B.Cu]}
   - {name: HVSig, track_mm: 0.5, clearance_mm: 2.2, nets: [XDIS, BRO_A, BRO_B, TOP_V1, TOP_V, FLY_D, CLAMP, CLAMP_M, VSENSE_1, VSENSE_2,
                                                        OVP_1, OVP_2, VBUS_SNS_1, VBUS_SNS_2],
@@ -299,7 +303,7 @@ board:
     D507: [170.12, 96.23, 0, F]
     D508: [211.73, 96.23, 0, F]
     F101: [16.34, 3.38, 0, F]
-    J101: [6.74, 15.23, 90, F]
+    J101: [6.74, 10.15, 90, F]
     J401: [239.24, 17.23, 90, F]
     J501: [150.92, 143.72, 0, F]
     J502: [188.97, 144.88, 0, F]

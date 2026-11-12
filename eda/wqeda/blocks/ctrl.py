@@ -79,13 +79,13 @@ def gen_ac_input(block, spec, d):
     return [
         c.part(
             "J101",
-            "Connector:Screw_Terminal_01x03",
-            "AC IN L/N/PE",
-            FP_TERM3,
+            "Connector:Screw_Terminal_01x02",
+            "AC IN L/N",
+            "TerminalBlock_Phoenix:TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",
             k,
-            {"1": "L_IN", "2": "N_IN", "3": "PE"},
+            {"1": "L_IN", "2": "N_IN"},
             "CONN-AC",
-            "交流输入：1 相线、2 零线、3 保护地",
+            "交流输入：1 相线、2 零线。保护地线不上板：直接接电控箱的接地螺柱；板上的 Y 电容经安装孔 H1 接箱体（159d2b）",
         ),
         c.part(
             "F101",

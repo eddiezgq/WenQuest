@@ -1,0 +1,4 @@
+(version 1)
+(rule "same_footprint_pads"
+  (condition "A.Type == 'Pad' && B.Type == 'Pad' && A.Parent.Reference == B.Parent.Reference")
+  (constraint clearance (min 0.15mm)))
