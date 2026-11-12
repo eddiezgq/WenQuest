@@ -183,7 +183,7 @@ cs = _calc33.sheet(MAT_CHOSEN)
 kg, kc = mdstd.key_for(40), mdstd.key_for(30)
 T_kg = S.key_torque_limit(40, kg["b"], kg["h"], S.L_KEY_GEAR, "A") / 1e3
 T_kc = S.key_torque_limit(30, kc["b"], kc["h"], S.L_KEY_CPL, "C") / 1e3
-FP = 1.2
+FP = 1.1                                   # 转矩已含 K_A，载荷系数按“无冲击或轻微冲击 1.0–1.2”取中间值（与案例 C 一致）
 R_max = max(RA_h, RB_h)
 P = FP * R_max
 L10h = (brg["C_kN"] * 1e3 / P) ** 3 * 1e6 / (60 * S.N_OUT)
@@ -195,7 +195,7 @@ extra = f"""
 |---|---|---|---|---|
 | 齿轮处平键 A 型 {kg['b']}×{kg['h']}×{S.L_KEY_GEAR} | T = σp·d·(h/2)·(L−b)/2，σp = {S.SIGMA_P_ALLOW:g} MPa | {T_kg:.0f} N·m | ≥ {S.T_RATED / 1e3:.0f} N·m | 第 25 章；33.2 节 |
 | 外伸段平键 C 型 {kc['b']}×{kc['h']}×{S.L_KEY_CPL} | T = σp·d·(h/2)·(L−b/2)/2 | {T_kc:.0f} N·m | ≥ {S.T_RATED / 1e3:.0f} N·m | 同上 |
-| 轴承 {S.BRG} 当量载荷 | P = f_p·R_max，f_p = {FP}（中等冲击） | {P:.0f} N | — | 濮良贵《机械设计》滚动轴承一章 |
+| 轴承 {S.BRG} 当量载荷 | P = f_p·R_max，f_p = {FP}（转矩已含 K_A，按轻微冲击取） | {P:.0f} N | — | 濮良贵《机械设计》滚动轴承一章 |
 | 轴承 {S.BRG} 基本额定寿命 | L₁₀h = (C/P)³ × 10⁶ / (60 n) | {L10h:,.0f} h | ≥ {S.LIFE_H:,.0f} h | GB/T 6391（ISO 281） |
 """
 calc_ok = cs.ok
