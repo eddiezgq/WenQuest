@@ -1,0 +1,173 @@
+# 第 162 轮第 1 步样片：白板三维简画讲故事。原创人物、原创情节；AI 配音（kokoro）。
+title: 老板不在的那一周
+sub: 一个原创小故事
+note: 本片人物、公司、情节均为虚构 · AI 配音
+size: [1280, 720]
+narrator: 52            # 云扬（旁白）
+cast:
+  林总: {voice: 49, look: {height: 1.76, build: 1.06, hair: short, hairColor: '#3a3632', fringe: 0.55, top: suit, topColor: '#2f3e55', shirt: '#ffffff', tie: '#a8343a', pants: '#2f3e55', shoes: '#22252a', glasses: true, wrinkles: true}}
+  周敏: {voice: 48, look: {sex: f, height: 1.64, hair: bob, hairColor: '#2b2420', top: suit, topColor: '#6b4f7a', shirt: '#f4efe6', pants: '#3b3346', shoes: '#3a2f2f', glasses: true, skin: '#f3d3b6'}}
+  小陈: {voice: 50, look: {height: 1.75, build: 0.95, hair: short, hairColor: '#1f1d1b', top: hoodie, topColor: '#3f7d6e', logo: '#f0b14a', pants: '#4a5466', shoes: '#e9e9e9', skin: '#efc9a6'}}
+  老马: {voice: 51, look: {height: 1.72, build: 1.15, hair: short, hairColor: '#8b8b8b', fringe: 0.7, top: shirt, topColor: '#9cc0e0', badge: '#ffffff', pants: '#4b4237', belt: true, shoes: '#4a3424', wrinkles: true, skin: '#eac3a0'}}
+  客户: {voice: 46, look: {sex: f, height: 1.66, hair: bun, hairColor: '#4a3428', top: suit, topColor: '#b9543f', shirt: '#ffffff', skirt: '#3b3b46', shoes: '#2b2b2b', skin: '#f2d0b2'}}
+  爸爸: {voice: 49, look: {height: 1.78, hair: short, hairColor: '#24201c', top: shirt, topColor: '#e3b45c', pants: '#5a6b7c', shoes: '#ffffff', beard: true, skin: '#edc6a2'}}
+  女儿: {voice: 45, look: {sex: f, height: 1.22, build: 0.9, hair: pony, hairColor: '#2a221e', top: shirt, topColor: '#f08fa4', short: true, skirt: '#6c8fd1', shoes: '#d64a4a', skin: '#f5d6bb'}}
+
+scenes:
+  meeting:
+    - {type: room, w: 9, d: 7, h: 3, wall: '#f3eee4', floor: '#d9cdb8'}
+    - {type: screen, x: -1.1, y: 1.0, z: -3.48, w: 2.2, h: 1.25, chip: true}
+    - {type: whiteboard, id: wb, x: 1.6, y: 0.9, z: -3.48, w: 2.2, h: 1.3}
+    - {type: window, x: -4.5, y: 0.9, z: -2.8, w: 2.0, h: 1.4, side: true, city: true}
+    - {type: table, x: 0, z: -0.9, w: 2.8, d: 1.1, c: '#c9a27a'}
+    - {type: chair, x: -0.8, z: -1.75, face: 0}
+    - {type: chair, x: 0.8, z: -1.75, face: 0}
+    - {type: plant, x: 3.9, z: -3.0}
+    - {type: sign, x: -3.6, y: 2.55, z: -3.47, text: '新一代芯片 · 下周发布', size: 0.2, c: '#c2410c'}
+  office:
+    - {type: room, w: 9, d: 7, h: 3, wall: '#eef2f3', floor: '#c9d3d9'}
+    - {type: window, x: -2.6, y: 0.9, z: -3.48, w: 2.4, h: 1.5, city: true}
+    - {type: window, x: 0.6, y: 0.9, z: -3.48, w: 2.4, h: 1.5, city: true}
+    - {type: table, x: 2.9, z: -2.7, w: 1.6, d: 0.7, c: '#e2e2e2'}
+    - {type: monitor, x: 2.9, y: 0.75, z: -2.75, face: 0}
+    - {type: chair, x: 2.9, z: -2.0, face: 180}
+    - {type: sofa, x: -4.3, z: -1.2, w: 1.0}
+    - {type: plant, x: -0.2, z: -3.0}
+    - {type: rug, x: -1.5, z: -1.2, w: 3.4, d: 2.6, c: '#d8cfc0'}
+    - {type: table, x: -2.6, z: -0.2, w: 0.9, d: 0.9, h: 0.72, c: '#b88a5e'}
+  lab:
+    - {type: room, w: 9, d: 7, h: 3, wall: '#e9edf0', floor: '#d5d9dc'}
+    - {type: shelf, x: -4.0, z: -3.45, w: 1.8, h: 1.9, d: 0.45}
+    - {type: cabinet, x: 3.0, y: 0, z: -3.45, w: 1.2, h: 1.1, d: 0.55, drawers: 4}
+    - {type: stripe, x: -0.2, z: -2.6, w: 2.6, d: 2.0}
+    - {type: bench, x: 1.1, z: -1.6, w: 1.4, c: '#7d8a97'}
+    - {type: arm, id: arm, x: 1.1, y: 0.8, z: -1.6, s: 1.45}
+    - {type: table, x: -1.9, z: -0.9, w: 1.0, d: 1.6, c: '#dcdcdc'}
+    - {type: monitor, id: mon, x: -2.15, y: 0.75, z: -0.9, face: 90, w: 0.7, h: 0.42}
+    - {type: chair, x: -1.25, z: -0.9, face: -90}
+    - {type: sign, x: -1.0, y: 2.35, z: -3.47, text: 测试室, size: 0.26}
+  kitchen:
+    - {type: room, w: 8, d: 7, h: 2.8, wall: '#f6ecd9', floor: '#d8b98f', tile: 0.8}
+    - {type: window, x: -1.6, y: 1.3, z: -3.48, w: 1.6, h: 1.0}
+    - {type: stove, x: -1.8, z: -3.45, bias: 0}
+    - {type: fridge, x: -3.4, z: -3.45, note: 妈妈的菜谱}
+    - {type: table, x: 1.2, z: -0.6, w: 1.5, d: 1.0, c: '#c9925e'}
+    - {type: dishes, x: 1.2, z: -0.6, y: 0.75}
+    - {type: chair, x: 0.6, z: -1.45, face: 0}
+    - {type: chair, x: 1.8, z: -1.45, face: 0}
+    - {type: plant, x: 3.6, z: -3.0}
+
+shots:
+  - title: true
+    dur: 3.4
+
+  - scene: meeting
+    chars:
+      林总: {pos: [0, -1.85], face: 0, pose: stand, expr: serious}
+      周敏: {pos: [-2.0, -0.6], face: '@林总', lookAt: 林总}
+      老马: {pos: [2.0, -0.4], face: '@林总', lookAt: 林总, expr: smile}
+      小陈: {pos: [1.0, 0.45], face: '@林总', lookAt: 林总}
+    cam:
+      - {at: 0, pos: [2.6, 2.3, 5.2], look: [0.1, 1.05, -0.9], fov: 44}
+      - {at: 0.55, pos: [1.2, 1.9, 2.8], look: [0, 1.25, -1.4], fov: 40}
+      - {at: 1, pos: [-1.6, 1.8, 3.2], look: [0, 1.2, -1.0], fov: 44}
+    beats:
+      - {say: 旁白, text: 周一早上九点，一家做机器人芯片的公司，全体开会。}
+      - {say: 林总, text: 有件事要跟大家说：我要离开公司一段时间。, do: [{who: 林总, pose: talk}]}
+      - {say: 旁白, text: 会议室一下子安静了。下周，新一代芯片就要发布。,
+         do: [{who: 林总, pose: stand, expr: neutral}, {who: 周敏, expr: surprised, pose: surprised}, {who: 老马, expr: worried, pose: cross, delay: 0.3}, {who: 小陈, expr: surprised}]}
+
+  - scene: office
+    chars:
+      老马: {pos: [-2.2, -1.6], face: 60, pose: phone, expr: smile}
+    cam:
+      - {at: 0, pos: [1.6, 1.7, 3.6], look: [-1.0, 1.25, -1.2], fov: 42}
+      - {at: 1, pos: [0.6, 1.6, 2.6], look: [-0.4, 1.35, -1.1], fov: 38}
+    beats:
+      - {say: 客户, style: phone, at: 老马, label: 电话里, text: 马总，你们老板不在，下周的芯片还能按时交吗？, do: [{who: 老马, walk: {to: [-0.4, -1.2], face: 20}}]}
+      - {say: 老马, text: 能，一定能！, do: [{who: 老马, expr: laugh}]}
+      - {say: 旁白, text: 话说出去了，可他心里一点底也没有。, do: [{who: 老马, pose: stand, expr: worried, delay: 0.2}, {who: 老马, pose: cross, delay: 1.2}]}
+
+  - scene: lab
+    chars:
+      小陈: {pos: [-1.25, -0.9], face: -90, pose: sit_type, expr: neutral}
+    props:
+      arm: {mode: smooth}
+      mon: {mode: code}
+    cam:
+      - {at: 0, pos: [3.4, 2.0, 3.6], look: [0, 1.0, -1.2], fov: 44}
+      - {at: 1, pos: [1.2, 1.7, 2.4], look: [-0.4, 1.05, -1.2], fov: 42}
+    beats:
+      - {say: 旁白, text: 测试室里，新芯片装在机械臂上，正跑最后一轮测试。}
+      - {say: 小陈, text: 糟了！第三个关节在抖。, do: [{prop: arm, set: {mode: jitter}}, {prop: mon, set: {mode: bad}}, {who: 小陈, pose: stand, expr: surprised, face: 105, lookAt: [1.1, -1.6], pos: [-1.05, -0.85]}]}
+
+  - scene: meeting
+    chars:
+      周敏: {pos: [2.7, -2.75], face: 180, pose: write}
+      小陈: {pos: [0.4, -0.2], face: '@周敏', lookAt: 周敏, expr: worried}
+      老马: {pos: [-1.0, 0.3], face: '@周敏', lookAt: 周敏, expr: worried, pose: cross}
+    props:
+      wb: {lines: ['谁来定？', '① 查数据：小陈', '② 说实话：老马'], k: 0}
+    cam:
+      - {at: 0, pos: [-1.8, 1.9, 4.2], look: [1.4, 1.3, -2.0], fov: 42}
+      - {at: 1, pos: [0.2, 1.8, 3.3], look: [1.6, 1.4, -2.0], fov: 40}
+    beats:
+      - {say: 小陈, text: 以前这种事，都等林总拍板。, do: [{prop: wb, set: {k: 0.34}}]}
+      - {say: 周敏, text: 他不在，我们自己定。小陈查数据，老马先跟客户说实话。,
+         do: [{who: 周敏, face: '@小陈', pose: talk, lookAt: 小陈, expr: serious}, {prop: wb, set: {k: 1}, delay: 2.0}, {who: 周敏, pose: point, lookAt: 老马, face: '@老马', delay: 2.4}]}
+      - {say: 老马, text: 说实话？万一客户跑了呢？, do: [{who: 老马, pose: shrug, expr: worried}]}
+      - {say: 周敏, text: 瞒着，客户才会跑。, do: [{who: 周敏, pose: stand, expr: neutral, face: '@老马'}, {who: 老马, pose: stand, expr: thinking, delay: 0.6}]}
+
+  - scene: lab
+    chars:
+      小陈: {pos: [-1.25, -0.9], face: -90, pose: sit_type, expr: thinking}
+      周敏: {pos: [-0.55, -1.5], face: -72, pose: look_screen, expr: thinking}
+    props:
+      arm: {mode: jitter}
+      mon: {mode: bad}
+    cam:
+      - {at: 0, pos: [0.9, 1.6, 1.9], look: [-1.5, 1.05, -0.8], fov: 40}
+      - {at: 0.5, pos: [-0.2, 1.75, 2.2], look: [-1.5, 1.1, -0.8], fov: 38}
+      - {at: 1, pos: [2.0, 1.8, 2.3], look: [-0.2, 1.1, -1.3], fov: 44}
+    beats:
+      - {say: 旁白, text: 两个人把测试数据一段一段地对。}
+      - {say: 小陈, text: 找到了！电机的控制参数，还是旧芯片的。, do: [{prop: mon, set: {mode: find}}, {who: 小陈, expr: happy, pose: sit, delay: 0.3}, {who: 周敏, expr: smile, pose: stand, delay: 0.5}]}
+      - {say: 周敏, text: 换成新参数，再跑一遍。, do: [{who: 周敏, pose: point, lookAt: [1.1, -1.6], face: 85}]}
+      - {say: 旁白, text: 这一次，机械臂稳稳地走完了全程。, do: [{prop: arm, set: {mode: smooth, trace: true}}, {prop: mon, set: {mode: ok}}, {who: 小陈, pose: stand, pos: [-1.05, -0.85], face: 40, expr: laugh, delay: 0.3}, {who: 小陈, pose: clap, delay: 1.0}, {who: 周敏, pose: thumbs, expr: smile, delay: 0.8}]}
+
+  - scene: office
+    chars:
+      老马: {pos: [-0.85, -0.2], face: 90, pose: stand, expr: neutral, lookAt: 客户}
+      客户: {pos: [0.45, -0.2], face: -90, pose: stand, expr: serious, lookAt: 老马}
+    cam:
+      - {at: 0, pos: [0.3, 1.6, 3.4], look: [0, 1.3, -0.3], fov: 40}
+      - {at: 1, pos: [-0.6, 1.55, 2.5], look: [0.1, 1.35, -0.3], fov: 36}
+    beats:
+      - {say: 旁白, text: 老马去见了客户，把问题和解决办法，原原本本讲了一遍。, do: [{who: 老马, pose: talk}]}
+      - {say: 客户, text: 你们主动把问题讲清楚，我们反而更放心。, do: [{who: 老马, pose: stand}, {who: 客户, pose: talk, expr: smile}]}
+      - {say: 老马, text: 下周，准时交货！, do: [{who: 老马, walk: {to: [-0.43, -0.2], face: 90}}, {who: 客户, pose: shake}, {who: 老马, pose: shake, expr: laugh, delay: 0.45}, {who: 客户, expr: happy, delay: 0.5}]}
+
+  - scene: kitchen
+    chars:
+      爸爸: {pos: [-1.2, -2.35], face: 180, pose: stir, expr: thinking}
+      女儿: {pos: [-2.6, -2.2], face: 180, pose: stand, lookAt: [-3.1, -2.8]}
+    cam:
+      - {at: 0, pos: [1.6, 1.7, 3.4], look: [-1.2, 1.1, -1.8], fov: 44}
+      - {at: 1, pos: [3.8, 1.9, 3.8], look: [0.3, 1.0, -1.0], fov: 44}
+    beats:
+      - {say: 旁白, text: 其实家里也一样。妈妈出差了，爸爸和女儿照着她写下的菜谱，做了一桌饭。, do: [{who: 女儿, walk: {to: [0.4, -0.4], face: 60}, delay: 2.6}, {who: 爸爸, pose: stand, delay: 3.0}, {who: 爸爸, walk: {to: [2.1, -0.3], face: -110}, delay: 3.3}]}
+      - {say: 女儿, text: 爸爸，跟妈妈做的一样好吃！, do: [{who: 女儿, pose: cheer, expr: laugh, lookAt: 爸爸}, {who: 爸爸, expr: laugh, lookAt: 女儿}]}
+
+  - scene: meeting
+    chars:
+      周敏: {pos: [-1.4, -0.3], face: 20, pose: stand, expr: smile}
+      小陈: {pos: [-0.3, 0.1], face: 0, pose: stand, expr: smile}
+      老马: {pos: [0.8, 0.0], face: -15, pose: stand, expr: smile}
+    props:
+      wb: {lines: ['把本事写下来', '把经验教出去'], k: 1}
+    cam:
+      - {at: 0, pos: [0.0, 1.7, 3.6], look: [-0.2, 1.2, -1.0], fov: 46}
+      - {at: 1, pos: [0.4, 2.4, 5.6], look: [0.0, 1.3, -1.6], fov: 46}
+    beats:
+      - {say: 旁白, text: 一家公司也好，一个家也好，都不能只靠一个人。, do: [{who: 小陈, pose: wave}]}
+      - {say: 旁白, text: 把本事写下来、把经验教出去，谁暂时不在，事情都能接着做。, do: [{who: 小陈, pose: stand}, {who: 老马, pose: thumbs}]}
