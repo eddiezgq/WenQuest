@@ -168,15 +168,15 @@
    "material": "metal"
   },
   "feed_ecc": {
-   "mass_g": 11.2,
+   "mass_g": 20.7,
    "material": "metal"
   },
   "feed_rod": {
-   "mass_g": 49.4,
+   "mass_g": 50.1,
    "material": "metal"
   },
   "regulator": {
-   "mass_g": 20.8,
+   "mass_g": 20.4,
    "material": "metal"
   },
   "reg_slider": {
@@ -208,7 +208,7 @@
    "material": "metal"
   },
   "oil_ecc": {
-   "mass_g": 1.9,
+   "mass_g": 4.1,
    "material": "metal"
   },
   "oil_plunger": {
@@ -216,7 +216,7 @@
    "material": "metal"
   },
   "oil_pump": {
-   "mass_g": 19.4,
+   "mass_g": 18.2,
    "material": "metal"
   }
  },

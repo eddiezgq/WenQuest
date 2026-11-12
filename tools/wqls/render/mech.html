@@ -33,7 +33,7 @@ body.shot .panel,body.shot .legend{display:none}
     <tr><td>针尖高出针板</td><td id="t_tip">—</td></tr>
     <tr><td>线眼（Y, Z）</td><td id="t_eye">—</td></tr>
   </table>
-  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button><button data-v="hook">旋梭</button><button data-v="train">传动</button></div>
+  <div class="row"><button data-v="iso" class="on">斜视</button><button data-v="face">端面</button><button data-v="front">正面</button><button data-v="hook">旋梭</button><button data-v="train">传动</button><button data-v="feed">送布</button><button data-v="dog">送布牙</button></div>
   <div class="row"><button id="shell" class="on">机壳半透明</button><button id="thr" class="on">面线</button></div>
 </div>
 <div class="legend"><span style="background:#c8ccd1"></span>钢件<span style="background:#eef0f2"></span>镀铬件<span style="background:#d24a3a"></span>面线<span style="background:#b7bbc0;opacity:.6"></span>机壳</div>
@@ -119,7 +119,8 @@ const cam = new THREE.PerspectiveCamera(30, W() / H(), 0.005, 10);
 const ctl = new OrbitControls(cam, r.domElement); ctl.enableDamping = true;
 // 视角：three 坐标 = (x, z, −y)/1000；目标对着机头（x ≈ 0、z ≈ 0.15）
 const VIEWS = { iso: [[-0.32, 0.27, 0.40], [0.01, 0.15, 0.0]], face: [[-0.55, 0.15, 0.0], [0.0, 0.15, 0.0]], front: [[0.0, 0.15, 0.55], [0.0, 0.15, 0.0]],
-                hook: [[-0.16, -0.02, 0.17], [0.04, -0.03, -0.01]], train: [[0.15, 0.12, 0.62], [0.2, 0.08, 0.0]] };
+                hook: [[-0.16, -0.02, 0.17], [0.04, -0.03, -0.01]], train: [[0.15, 0.12, 0.62], [0.2, 0.08, 0.0]],
+                feed: [[0.02, 0.16, 0.48], [0.17, -0.03, 0.0]], dog: [[-0.11, 0.012, 0.0], [0.012, -0.006, 0.0]] };   // G4.6：送布组全貌（机壳透明看机座里）；送布牙（从左往右看 y–z 平面）
 function view(v) { const [p, t] = VIEWS[v]; cam.position.set(...p); ctl.target.set(...t); ctl.update(); }
 view(q.get('view') || 'iso');
 
