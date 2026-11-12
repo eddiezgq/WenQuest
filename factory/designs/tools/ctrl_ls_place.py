@@ -31,9 +31,13 @@ REGIONS = {
     "pfc": [(62, 9, 146, 33), (62, 112, 146, 124)],
     "servo": [(146, 68, W - EDGE, 84), (196, 18, 232, 34)],
     "act": [(146, 86, W - EDGE, 118), (146, 120, 204, 136)],
-    "comm": [(206, 120, W - EDGE, 138)],
+    "comm": [(211, 119, W - EDGE, H - 10)],
     "io": [(62, 126, 146, 138), (62, 112, 146, 124)],
 }
+# 跨隔离带的器件按引脚位置定（器件原点位置 x, y 和角度）：数字隔离器两排脚分在带两边；隔离电源 2、3 脚之间是带的收窄处
+B = D.BARRIER
+FIXED_POS = {"U601": (B["x"], 124.0, 0), "U602": (B["x"] - 3.81, 132.0, 0), "C601": (B["x"] - 6.5, 120.5, 90),
+             "C603": (B["x"] - 9.0, 128.0, 90)}
 # 大件、板边件：外框左上角 (x, y) 和角度
 FIXED = {
     # 散热器边（上边）：整流桥、升压管、升压二极管、功率模块的散热面朝上边
@@ -42,7 +46,7 @@ FIXED = {
     "L101": (EDGE, 53, 0), "K101": (EDGE + 44, 2, 0),
     "L201": (64, 34, 0), "C221": (147, 36, 0), "C222": (179, 36, 0), "C223": (W - 33, 36, 0),
     "T301": (EDGE + 1, 77, 0),
-    "J501": (148, H - 10.5, 0), "J502": (186, H - 8, 0), "J601": (W - 15, H - 8, 0),
+    "J501": (148, H - 10.5, 0), "J502": (186, H - 8, 0), "J601": (W - 34, H - 8, 0),
     "J701": (66, H - 8, 0), "J702": (93, H - 8, 0), "U10": (110, 127, 0),
 }
 
@@ -70,13 +74,19 @@ def overlaps(a, b):
 
 
 def main():
-    place, used = {}, [(hx - 4, hy - 4, hx + 4, hy + 4) for hx, hy in D.X["holes"]]   # 安装孔周围留空
+    place, used = {}, [(hx - 8, hy - 8, hx + 8, hy + 8) for hx, hy in D.X["holes"]]   # 安装孔周围留空（孔焊盘 + 4 mm）
+    bw = B["w"] / 2 + 1.0                                                                       # 隔离带两边再各留 1 mm
+    used += [(B["x"] - bw, B["y"] - bw, B["x"] + bw, H), (B["x"] - bw, B["y"] - bw, W, B["y"] + bw)]
     parts = {p["ref"]: p for p in D.PARTS}
+    for ref, (x, y, rot) in FIXED_POS.items():
+        bx, by, bw_, bh = bbox(parts[ref]["fp"], rot)
+        place[ref] = (round(x, 2), round(y, 2), rot, "F")
+        used.append((x + bx, y + by, x + bx + bw_, y + by + bh))
     for ref, (x, y, rot) in FIXED.items():
         bx, by, bw, bh = bbox(parts[ref]["fp"], rot)
         place[ref] = (round(x - bx, 2), round(y - by, 2), rot, "F")
         used.append((x, y, x + bw, y + bh))
-    order = {k: [p for p in D.PARTS if p["sheet"] == k and p["ref"] not in FIXED] for k in REGIONS}
+    order = {k: [p for p in D.PARTS if p["sheet"] == k and p["ref"] not in FIXED and p["ref"] not in FIXED_POS] for k in REGIONS}
     left = []
     for k, plist in order.items():
         queue = list(plist)

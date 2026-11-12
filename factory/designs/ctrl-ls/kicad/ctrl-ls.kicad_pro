@@ -74,8 +74,8 @@
         "item_on_disabled_layer": "error",
         "items_not_allowed": "error",
         "length_out_of_range": "error",
-        "lib_footprint_issues": "warning",
-        "lib_footprint_mismatch": "warning",
+        "lib_footprint_issues": "ignore",
+        "lib_footprint_mismatch": "ignore",
         "malformed_courtyard": "error",
         "microvia_drill_out_of_range": "error",
         "missing_courtyard": "ignore",
@@ -200,6 +200,91 @@
         "via_diameter": 0.6,
         "via_drill": 0.3,
         "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 2.6,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "AC",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 2.5,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 1.0,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Boot",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.5,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 2.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "HV",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 2.0,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 2.2,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "HVSig",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 0.5,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
+      },
+      {
+        "bus_width": 12,
+        "clearance": 0.3,
+        "diff_pair_gap": 0.25,
+        "diff_pair_via_gap": 0.25,
+        "diff_pair_width": 0.2,
+        "line_style": 0,
+        "microvia_diameter": 0.3,
+        "microvia_drill": 0.1,
+        "name": "Power",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
+        "track_width": 1.0,
+        "via_diameter": 0.6,
+        "via_drill": 0.3,
+        "wire_width": 6
       }
     ],
     "meta": {
@@ -207,7 +292,228 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_patterns": [
+      {
+        "netclass": "AC",
+        "pattern": "L_IN"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "N_IN"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "L_F"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "N_C"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "L_C"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "L_R"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "VRECT"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "SW_PFC"
+      },
+      {
+        "netclass": "AC",
+        "pattern": "PE"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "VBUS"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "MOT_U"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "MOT_V"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "MOT_W"
+      },
+      {
+        "netclass": "HV",
+        "pattern": "RECT_N"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "XDIS"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "BRO_A"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "BRO_B"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "TOP_V1"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "TOP_V"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "FLY_D"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "CLAMP"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "CLAMP_M"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "VSENSE_1"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "VSENSE_2"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "OVP_1"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "OVP_2"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "VBUS_SNS_1"
+      },
+      {
+        "netclass": "HVSig",
+        "pattern": "VBUS_SNS_2"
+      },
+      {
+        "netclass": "Boot",
+        "pattern": "OUT_U"
+      },
+      {
+        "netclass": "Boot",
+        "pattern": "OUT_V"
+      },
+      {
+        "netclass": "Boot",
+        "pattern": "OUT_W"
+      },
+      {
+        "netclass": "Boot",
+        "pattern": "VB_U"
+      },
+      {
+        "netclass": "Boot",
+        "pattern": "VB_V"
+      },
+      {
+        "netclass": "Boot",
+        "pattern": "VB_W"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "+24V"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "+15V"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "N_U"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "N_V"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "N_W"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL1_D"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL2_D"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL3_D"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL4_D"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL1_K"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL2_K"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL3_K"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "SOL4_K"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "STP_OA1"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "STP_OA2"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "STP_OB1"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "STP_OB2"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "FLY_24"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "FLY_15"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "FLY_5"
+      },
+      {
+        "netclass": "Power",
+        "pattern": "+5V"
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {

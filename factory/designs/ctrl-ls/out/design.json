@@ -67,9 +67,25 @@
  "bom_rows": 95,
  "date": "2026-11-12",
  "disclaimer": "示例设计，未经硬件验证，不能直接投产",
+ "drc": {
+  "errors": 529,
+  "unconnected": 21,
+  "warnings": 63
+ },
  "files": {
   "bom.csv": "9ccf2d3bd4b0d552",
+  "drc.json": "279bb2faf1adb1bf",
+  "gerber.zip": "d43b70e28c04ca76",
+  "kicad-project.zip": "3871592d3897b594",
   "netcheck.json": "9eddaa8fe06de745",
+  "pcb/B_Cu.svg": "0c8b128caafcc303",
+  "pcb/B_Silk.svg": "eab6e8db4d210e92",
+  "pcb/F_Cu.svg": "ab9b89e2ac7ddc87",
+  "pcb/F_Silk.svg": "ff85613291d0d6f4",
+  "pcb/In1_Cu.svg": "13d318e340f736a1",
+  "pcb/In2_Cu.svg": "ccee1a1635377ab0",
+  "pos.csv": "6e08b9e2bc3deecc",
+  "safety.json": "89f9d66698c622cc",
   "schematic/ctrl-ls-1 交流输入、浪涌与整流.svg": "6e838f858b991632",
   "schematic/ctrl-ls-2 功率因数校正与母线.svg": "d0b0075d62408796",
   "schematic/ctrl-ls-3 辅助电源.svg": "4fc48a7082c416a7",
@@ -2091,8 +2107,74 @@
    "value": "20k"
   }
  ],
+ "pcb_layers": [
+  {
+   "key": "F_Cu",
+   "name": "顶层铜",
+   "svg": "F_Cu.svg"
+  },
+  {
+   "key": "In1_Cu",
+   "name": "内层 1（地平面，隔离角另铺 GND_ISO）",
+   "svg": "In1_Cu.svg"
+  },
+  {
+   "key": "In2_Cu",
+   "name": "内层 2",
+   "svg": "In2_Cu.svg"
+  },
+  {
+   "key": "B_Cu",
+   "name": "底层铜",
+   "svg": "B_Cu.svg"
+  },
+  {
+   "key": "F_Silk",
+   "name": "顶面丝印与装配",
+   "svg": "F_Silk.svg"
+  },
+  {
+   "key": "B_Silk",
+   "name": "底面丝印与装配",
+   "svg": "B_Silk.svg"
+  }
+ ],
  "rev": "示例 A",
  "root_svg": "ctrl-ls.svg",
+ "safety": [
+  {
+   "example": true,
+   "key": "S-iso",
+   "limit": 4.0,
+   "name": "安全距离：隔离面板口 ↔ 其余电路",
+   "status": "fail",
+   "value": 0.202
+  },
+  {
+   "example": true,
+   "key": "S-pe",
+   "limit": 4.0,
+   "name": "安全距离：保护地（安装孔） ↔ 带电部分",
+   "status": "fail",
+   "value": 1.002
+  },
+  {
+   "example": true,
+   "key": "S-ln",
+   "limit": 2.5,
+   "name": "安全距离：相线 ↔ 零线（保险丝之后）",
+   "status": "fail",
+   "value": 1.002
+  },
+  {
+   "example": true,
+   "key": "S-bus",
+   "limit": 2.0,
+   "name": "安全距离：390 V 母线与电机相线 ↔ 弱电",
+   "status": "fail",
+   "value": 0.802
+  }
+ ],
  "sheets": [
   {
    "key": "mains",

@@ -167,23 +167,74 @@ def summary(nc, n_bom, brd=None):
 
 
 # ------------------------------------------------------------------ 板子（159d2b）
-# 隔离面板口所在的角（右下）：内层地平面在这里断开，隔离侧另铺 GND_ISO；两者之间的缝就是隔离带（安全距离检查量它）
-ISO_CORNER = (204.0, 118.0)
-BARRIER = 6.0          # 隔离带宽度 mm（示例值，规则在 safety.yaml）
+HOLE_KEEP = 7.5        # 安装孔（接保护地）周围不走线、不铺铜的半径 mm：孔焊盘半径 3.2 + 安全距离示例值 4.0 + 余量
+
+
+def _band():
+    """隔离带的多边形（板子坐标）：竖带 + 横带，B0505S 的 2、3 脚之间收窄"""
+    b = D.BARRIER
+    w, h = D.X["board_mm"]
+    x, y, r = b["x"], b["y"], b["w"] / 2
+    n0, n1 = b["notch_y"]
+    rn = b["notch_w"] / 2
+    return [(x - r, y - r), (w, y - r), (w, y + r), (x + r, y + r), (x + r, n0), (x + rn, n0), (x + rn, n1), (x + r, n1), (x + r, h),
+            (x - r, h), (x - r, n1), (x - rn, n1), (x - rn, n0), (x - r, n0)]
+
+
+def _circle(cx, cy, r, n=24):
+    import math
+    return [(cx + r * math.cos(2 * math.pi * k / n), cy + r * math.sin(2 * math.pi * k / n)) for k in range(n)]
+
+
+def rule_area(board, pts, name):
+    """禁布区：所有铜层不走线、不打过孔、不铺铜（KiCad 规则区，导出给布线器时一起带上）"""
+    m = pcbnew()
+    z = m.ZONE(board)
+    z.SetIsRuleArea(True)
+    z.SetDoNotAllowTracks(True)
+    z.SetDoNotAllowVias(True)
+    z.SetDoNotAllowCopperPour(True)
+    z.SetDoNotAllowPads(False)
+    z.SetDoNotAllowFootprints(False)
+    z.SetZoneName(name)
+    ls = m.LSET()
+    for lay in (m.F_Cu, m.In1_Cu, m.In2_Cu, m.B_Cu):
+        ls.AddLayer(lay)
+    z.SetLayerSet(ls)
+    ol = z.Outline()
+    ol.NewOutline()
+    for px, py in pts:
+        ol.Append(m.FromMM(100 + px), m.FromMM(100 + py))
+    board.Add(z)
 
 
 def planes(board, nets):
+    """内层 1：主地平面（带以外）+ 隔离侧地平面（右下角）；隔离带和安装孔周围由禁布区挖掉"""
     from wqeda.gen import board as gb
     w, h = D.X["board_mm"]
-    ix, iy = ISO_CORNER
-    b = BARRIER / 2
-    main = [(0.5, 0.5), (w - 0.5, 0.5), (w - 0.5, iy - b), (ix - b, iy - b), (ix - b, h - 0.5), (0.5, h - 0.5)]
-    iso = [(ix + b, iy + b), (w - 0.5, iy + b), (w - 0.5, h - 0.5), (ix + b, h - 0.5)]
+    b = D.BARRIER
+    x, y = b["x"], b["y"]
+    main = [(0.5, 0.5), (w - 0.5, 0.5), (w - 0.5, y), (x, y), (x, h - 0.5), (0.5, h - 0.5)]
+    iso = [(x, y), (w - 0.5, y), (w - 0.5, h - 0.5), (x, h - 0.5)]
     for net, pts in (("GND", main), ("GND_ISO", iso)):
         z = gb.add_pour(board, nets[net], "In1.Cu", pts, clearance=0.3)
         z.SetAssignedPriority(0)
         z.SetPadConnection(pcbnew().ZONE_CONNECTION_FULL)
-    return [("In1.Cu", main), ("In1.Cu", iso)]
+    rule_area(board, _band(), "隔离带")
+    for k, (hx, hy) in enumerate(D.X["holes"]):
+        rule_area(board, _circle(hx, hy, HOLE_KEEP), "安装孔{}".format(k + 1))
+
+
+def hole_nets(board, nets):
+    """只有 H1（靠交流输入）在板上接 PE 网络（保护地从 J101 第 3 脚经它到箱体）；其余安装孔各自一个网络，不在板上连线，
+    但螺钉同样压在接地的箱体上，安全距离检查都算保护地"""
+    m = pcbnew()
+    for k in range(2, len(D.X["holes"]) + 1):
+        fp = board.FindFootprintByReference("H{}".format(k))
+        ni = m.NETINFO_ITEM(board, "PE_H{}".format(k))
+        board.Add(ni)
+        for pad in fp.Pads():
+            pad.SetNet(ni)
 
 
 def pcbnew():
@@ -197,13 +248,12 @@ def board_build(route, jar):
     path = os.path.join(KDIR, NAME + ".kicad_pcb")
     title = {"title": D.TITLE, "company": "问渠数字工业园 · 电路板厂（示例设计，未经硬件验证，不能直接投产）", "rev": "示例 A", "date": DATE}
     board, nets = gb.build(D.X, path, title, hole_net="PE")
+    hole_nets(board, nets)
     planes(board, nets)
     os.makedirs(TMP, exist_ok=True)
     stats = None
     if route:
-        keep = tie = gb.tie_keepouts(board)
-        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=20, keepouts=keep)
-        del tie
+        stats = gb.autoroute(board, TMP, jar, gb.classes_of(D.X), passes=20, keepouts=gb.tie_keepouts(board))
     board.BuildConnectivity()
     gb.fill_zones(board)
     pcbnew().SaveBoard(path, board)
@@ -280,6 +330,12 @@ def board_checks():
     from wqeda.readers import kicad as RK
 
     B.KDIR, B.NAME, B.PROJ = KDIR, NAME, PROJ
+    # 铺铜按工程文件里的线宽 / 间距类别重新填（布线那个进程没有这些设置，填出来的间距按缺省 0.3 mm）
+    m = pcbnew()
+    pcbf = os.path.join(KDIR, NAME + ".kicad_pcb")
+    brd = m.LoadBoard(pcbf)
+    m.ZONE_FILLER(brd).Fill(brd.Zones())
+    m.SaveBoard(pcbf, brd)
     dr = B.drc()
     with open(os.path.join(OUT, "drc.json"), "w", encoding="utf-8") as f:
         json.dump(dr, f, ensure_ascii=False, indent=1, sort_keys=True)
